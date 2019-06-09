@@ -1,0 +1,1252 @@
+// This class uses windows specific inter-app communication
+#ifdef _WIN32
+
+#define _AFXDLL
+#include <afx.h>
+
+#include "dxa_if.h"
+
+#include "callback.h"
+#include "book.h"
+#include "extract_data.h"
+#include "status.h"
+#include "tabbed_forms.h"
+#include "spec_data.h"
+#include "drawing.h"
+
+#include <set>
+
+#include <FL/Fl_Preferences.H>
+#include <FL/Fl_Choice.H>
+#include <FL/Fl_Int_Input.H>
+#include <FL/Fl_Output.h>
+#include <FL/Fl.H>
+
+#include <atlbase.h>
+#include <atlcom.h>
+
+using namespace zzalog;
+
+// Top-level data items
+extern Fl_Preferences* settings_;
+extern book* book_;
+extern extract_data* extract_records_;
+extern book* navigation_book_;
+extern status* status_;
+extern tabbed_forms* tabbed_view_;
+extern spec_data* spec_data_;
+extern void add_sub_window(Fl_Window* w);
+
+// Constructor
+dxa_if::dxa_if() :
+	Fl_Window(10, 10, "DxAtlas Control")
+	, qso_display_(AQ_NONE)
+	, atlas_colour_(AC_NONE)
+	, atlas_(nullptr)
+	, home_lat_(0.0)
+	, home_long_(0.0)
+	, centre_lat_(0.0)
+	, centre_long_(0.0)
+	, atlas_width_(0)
+	, atlas_height_(0)
+	, atlas_left_(0)
+	, atlas_top_(0)
+	, call_layer_(nullptr)
+	, is_my_change_(false)
+	, locator_("")
+	, most_recent_count_(0)
+	, location_name_("")
+	, home_lat_dms_("")
+	, home_long_dms_("")
+{
+	records_to_display_.clear();
+	colours_used_.clear();
+	colour_bns_.clear();
+	locations_.clear();
+
+	load_values();
+	// Create the form
+	create_form();
+	enable_widgets();
+	// Connect to DXATLAS:
+	connect_dxatlas();
+	// If successful
+	if (atlas_) {
+		// Get map
+		DxAtlas::IDxMapPtr map = atlas_->GetMap();
+		//delete all existing layers - set call_layer_ to nullptr to prevent callbacks from using it
+		call_layer_ = nullptr;
+		DxAtlas::ICustomLayersPtr pin_layers = map->GetCustomLayers();
+		pin_layers->Clear();
+		// Add pins
+		enable_widgets();
+		get_records();
+		get_colours(false);
+		draw_pins();
+	}
+	// Set position 
+	position(window_left_, window_top_);
+	resizable(nullptr);
+
+}
+
+// Destructor
+dxa_if::~dxa_if()
+{
+	// Remove and delete all other widtgets
+	clear();
+	colour_bns_.clear();
+	// Clear the various data sets
+	records_to_display_.clear();
+	colours_used_.clear();
+}
+
+// Public methods
+
+// Load values from settings_
+void dxa_if::load_values() {
+	// Get Configuration
+	Fl_Preferences dxatlas_settings(settings_, "DXATLAS:");
+	dxatlas_settings.get("QSOs Displayed", (int&)qso_display_, AQ_NONE);
+	dxatlas_settings.get("Most Recent Count", (int&)most_recent_count_, 1);
+	dxatlas_settings.get("Coloured By", (int&)atlas_colour_, AC_BANDS);
+	dxatlas_settings.get("Centre Latitude", centre_lat_, 0.0);
+	dxatlas_settings.get("Centre Longitude", centre_long_, 0.0);
+	dxatlas_settings.get("Atlas Left", atlas_left_, 0);
+	dxatlas_settings.get("Atlas Top", atlas_top_, 0);
+	dxatlas_settings.get("Atlas Width", atlas_width_, 0);
+	dxatlas_settings.get("Atlas Height", atlas_height_, 0);
+	dxatlas_settings.get("Window Left", window_left_, 100);
+	dxatlas_settings.get("Window Top", window_top_, 100);
+	dxatlas_settings.get("Include SWLs", (int&)include_swl_, false);
+	dxatlas_settings.get("Zoom Value", zoom_value_, 1.0);
+
+	// Get stations details - QTH locations used to mark hone location on map
+	Fl_Preferences stations_settings(settings_, "Stations");
+	char* temp;
+	// All QTH settings
+	Fl_Preferences qths_settings(stations_settings, "QTHs");
+	qths_settings.get("Current", temp, "");
+	location_name_ = temp;
+	Fl_Preferences qth_settings(qths_settings, temp);
+	free(temp);
+	qth_settings.get("Locator", temp, "RR73TU");
+	locator_ = temp;
+	free(temp);
+	int num_qths = qths_settings.groups();
+	for (int i = 0; i < num_qths; i++) {
+		string location = qths_settings.group(i);
+		locations_.push_back(location);
+	}
+	// Get home location from gridsquare in float and string form
+	home_location();
+
+}
+
+// Used to create the form
+void dxa_if::create_form() {
+
+	// Now create the groups
+
+	// Group 1 - DxAtlas controls
+	Fl_Group* grp1 = new Fl_Group(EDGE, EDGE, 10, 10);
+	grp1->box(FL_THIN_DOWN_BOX);
+	grp1->labelfont(FONT);
+	grp1->labelsize(FONT_SIZE);
+	// Choice - which QSOs to display
+	Fl_Choice* ch11 = new Fl_Choice(grp1->x() + GAP, grp1->y() + HTEXT, WSMEDIT, HTEXT, "QSOs showing");
+	ch11->align(FL_ALIGN_LEFT | FL_ALIGN_TOP);
+	ch11->labelfont(FONT);
+	ch11->labelsize(FONT_SIZE);
+	ch11->textfont(FONT);
+	ch11->textsize(FONT_SIZE);
+	ch11->callback(cb_ch_qsos);
+	ch11->when(FL_WHEN_RELEASE);
+	ch11->clear();
+	ch11->add("None");
+	ch11->add("Selected QSO");
+	ch11->add("All QSOs");
+	ch11->add("Extracted QSOs");
+	ch11->add("QSOs on recent days");
+	ch11->add("Recent QSOs");
+	ch11->value((int)qso_display_);
+	ch11->tooltip("Select which QSOs to display");
+	// Input - Number of days or QSOs
+	Fl_Int_Input* ip11 = new Fl_Int_Input(ch11->x(), ch11->y() + ch11->h(), ch11->w(), HTEXT);
+	ip11->textfont(FONT);
+	ip11->textsize(FONT_SIZE);
+	ip11->callback(cb_value_int<Fl_Int_Input>, (void*)&most_recent_count_);
+	ip11->value(to_string(most_recent_count_).c_str());
+	ip11->tooltip("Enter the number of QSOs or days");
+	most_recent_ip_ = ip11;
+	// Check button - display SWLs
+	Fl_Check_Button* bn11 = new Fl_Check_Button(ch11->x(), ip11->y() + ip11->h(), WRADIO, HRADIO, "Include SWLs");
+	bn11->labelfont(FONT);
+	bn11->labelsize(FONT_SIZE);
+	bn11->align(FL_ALIGN_RIGHT);
+	bn11->callback(cb_ch_swlen);
+	bn11->when(FL_WHEN_RELEASE);
+	bn11->tooltip("Include SWLs in display");
+	// Choice - What to colour by
+	Fl_Choice* ch12 = new Fl_Choice(ch11->x() + ch11->w() + GAP, ch11->y(), ch11->w(), ch11->h(), "Colour pins by");
+	ch12->align(FL_ALIGN_LEFT | FL_ALIGN_TOP);
+	ch12->labelfont(FONT);
+	ch12->labelsize(FONT_SIZE);
+	ch12->textfont(FONT);
+	ch12->textsize(FONT_SIZE);
+	ch12->callback(cb_ch_colour);
+	ch12->clear();
+	ch12->add("All black");
+	ch12->add("By band");
+	ch12->add("By logged mode");
+	ch12->add("By award mode");
+	ch12->value((int)atlas_colour_);
+	// Button - Start stop
+	Fl_Button* bn12 = new Fl_Button(ch12->x(), ch12->y() + ch12->h() + GAP, WBUTTON, HBUTTON, "Start");
+	bn12->labelfont(FONT);
+	bn12->labelsize(FONT_SIZE);
+	bn12->callback(cb_bn_start_stop);
+	bn12->color(FL_GREEN);
+	bn12->tooltip("Start or Stop current DxAtlas session");
+	start_stop_bn_ = bn12;
+	int next_y = max(bn11->y() + bn11->h(), bn12->y() + bn12->h());
+	// Choice - provides all user's locations (in settings)
+	Fl_Choice* ch21 = new Fl_Choice(ch11->x(), next_y + HTEXT, WSMEDIT, HBUTTON, "Location");
+	ch21->labelfont(FONT);
+	ch21->labelsize(FONT_SIZE);
+	ch21->textfont(FONT);
+	ch21->textsize(FONT_SIZE);
+	ch21->align(FL_ALIGN_TOP | FL_ALIGN_LEFT);
+	ch21->callback(cb_ch_locn, &location_name_);
+	ch21->when(FL_WHEN_RELEASE);
+	ch21->clear();
+	for (size_t i = 0; i < locations_.size(); i++) {
+		int index = ch21->add(locations_[i].c_str());
+		if (locations_[i] == location_name_) {
+			ch21->value(index);
+		}
+	}
+	ch21->tooltip("Specify the location to use as home location");
+	// Output - the locator grid square for the selected location
+	Fl_Output* op21 = new Fl_Output(ch21->x(), ch21->y() + ch21->h(), WSMEDIT, HBUTTON);
+	op21->labelfont(FONT);
+	op21->labelsize(FONT_SIZE);
+	op21->textfont(FONT);
+	op21->textsize(FONT_SIZE);
+	op21->value(locator_.c_str());
+	op21->box(FL_FLAT_BOX);
+	op21->color(grp1->color());
+	op21->tooltip("The grid-square of the current home location");
+	locator_op_ = op21;
+	// Output - the latitude of the location
+	Fl_Output* op22 = new Fl_Output(ch12->x(), ch21->y(), WSMEDIT, HBUTTON);
+	op22->labelfont(FONT);
+	op22->labelsize(FONT_SIZE);
+	op22->textfont(FONT);
+	op22->textsize(FONT_SIZE);
+	op22->value(home_lat_dms_.c_str());
+	op22->box(FL_FLAT_BOX);
+	op22->color(grp1->color());
+	op22->tooltip("The latitude of the current home location");
+	lat_dms_op_ = op22;
+	// Output - the longitude of the location
+	Fl_Output* op23 = new Fl_Output(op22->x(), op22->y() + op22->h(), WSMEDIT, HBUTTON);
+	op23->labelfont(FONT);
+	op23->labelsize(FONT_SIZE);
+	op23->textfont(FONT);
+	op23->textsize(FONT_SIZE);
+	op23->value(home_long_dms_.c_str());
+	op23->box(FL_FLAT_BOX);
+	op23->color(grp1->color());
+	op23->tooltip("The longitude of the current home location");
+	lon_dms_op_ = op23;
+
+	// Resize group by size of choices
+	const int WGRP_1 = ch12->x() + ch12->w() + GAP;
+	const int HGRP_1 = max(op21->y() + op21->h(), op23->y() + op23->h()) + GAP;
+	grp1->resizable(nullptr);
+	grp1->size(WGRP_1, HGRP_1);
+	grp1->end();
+	// Size of window
+	const int WWIN = EDGE + WGRP_1 + EDGE;
+
+	// Group to contain the buttons displaying the colours
+	colour_grp_ = new Fl_Group(EDGE, HGRP_1 + GAP, WGRP_1, HTEXT, "Colour legend");
+	colour_grp_->box(FL_THIN_DOWN_BOX);
+	colour_grp_->labelfont(FONT);
+	colour_grp_->labelsize(FONT_SIZE);
+	colour_grp_->align(FL_ALIGN_TOP | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
+
+	colour_grp_->end();
+
+	resizable(nullptr);
+	resize(window_left_, window_top_, WWIN, colour_grp_->y() + colour_grp_->h() + EDGE);
+
+	// Add all the colour buttons
+
+	get_colours(true);
+	this->position(window_left_, window_top_);
+	this->show();
+};
+
+// Used to write settings back
+void dxa_if::save_values() {
+	// Get Configuration
+	Fl_Preferences dxatlas_settings(settings_, "DXATLAS:");
+	dxatlas_settings.set("QSOs Displayed", qso_display_);
+	dxatlas_settings.set("Most Recent Count", (signed)most_recent_count_);
+	dxatlas_settings.set("Coloured By", atlas_colour_);
+	dxatlas_settings.set("Centre Latitude", centre_lat_);
+	dxatlas_settings.set("Centre Longitude", centre_long_);
+	dxatlas_settings.set("Atlas Left", atlas_left_);
+	dxatlas_settings.set("Atlas Top", atlas_top_);
+	dxatlas_settings.set("Atlas Width", atlas_width_);
+	dxatlas_settings.set("Atlas Height", atlas_height_);
+	dxatlas_settings.set("Window Left", x_root());
+	dxatlas_settings.set("Window Top", y_root());
+	dxatlas_settings.set("Include SWLs", include_swl_);
+}
+
+// Used to enable/disable specific widget - any widgets enabled must be attributes
+void dxa_if::enable_widgets() {
+	// The number of most-recent items input
+	if (qso_display_ == AQ_DAYS || qso_display_ == AQ_QSOS) {
+		most_recent_ip_->activate();
+	}
+	else {
+		most_recent_ip_->deactivate();
+	}
+	if (atlas_ == nullptr) {
+		start_stop_bn_->label("Start");
+		start_stop_bn_->color(FL_GREEN);
+	}
+	else {
+		start_stop_bn_->label("Stop");
+		start_stop_bn_->color(FL_RED);
+	}
+	start_stop_bn_->labelcolor(fl_contrast(FL_BLACK, start_stop_bn_->color()));
+}
+
+// Callbacks
+
+// Choice for QSOs
+void dxa_if::cb_ch_qsos(Fl_Widget* w, void* v) {
+	dxa_if* that = ancestor_view<dxa_if>(w);
+	// get value of radio button
+	cb_value<Fl_Choice, int>(w, (void*)&that->qso_display_);
+	// Redraw the data
+	that->enable_widgets();
+	that->get_records();
+	that->get_colours(false);
+	that->draw_pins();
+}
+
+// Colour by radio button selected - redraw pins using new colour spec
+void dxa_if::cb_ch_colour(Fl_Widget* w, void* v) {
+	dxa_if* that = ancestor_view<dxa_if>(w);
+	// get value
+	cb_value<Fl_Choice, int>(w, &that->atlas_colour_);
+	// Redraw data
+	that->get_records();
+	that->get_colours(true);
+	that->draw_pins();
+}
+
+// Include SWL reports
+void dxa_if::cb_ch_swlen(Fl_Widget* w, void* v) {
+	dxa_if* that = ancestor_view<dxa_if>(w);
+	// get value
+	cb_value<Fl_Check_Button, bool>(w, &that->include_swl_);
+	// Redraw the data
+	that->enable_widgets();
+	that->get_records();
+	that->get_colours(false);
+	that->draw_pins();
+}
+
+// Open DxAtlas
+void dxa_if::cb_bn_start_stop(Fl_Widget* w, void* v) {
+	dxa_if* that = ancestor_view<dxa_if>(w);
+	// Connect to DXATLAS: if not already
+	if (that->atlas_ == nullptr) {
+		that->connect_dxatlas();
+
+		// and get new position of DXATLAS:
+		that->atlas_left_ = that->atlas_->GetLeft();
+		that->atlas_width_ = that->atlas_->GetWidth();
+		that->atlas_top_ = that->atlas_->GetTop();
+		that->atlas_height_ = that->atlas_->GetHeight();
+		that->save_values();
+
+		// Enable the controls, update configuration, and initialise the map
+		that->enable_widgets();
+		// Get the items to display
+		that->get_records();
+		that->get_colours(true);
+
+		that->draw_pins();
+	}
+	else {
+		that->disconnect_dxatlas(false);
+		that->enable_widgets();
+	}
+}
+
+// Location choice widget selected
+void dxa_if::cb_ch_locn(Fl_Widget* w, void* v) {
+	dxa_if* that = ancestor_view<dxa_if>(w);
+	// Get the location selected
+	that->location_name_ = ((Fl_Choice*)w)->mvalue()->label();
+	// Get the details of the new location from settings
+	Fl_Preferences stations_settings(settings_, "Stations");
+	Fl_Preferences qths_settings(stations_settings, "QTHs");
+	Fl_Preferences qth_settings(qths_settings, that->location_name_.c_str());
+	char * temp;
+	qth_settings.get("Locator", temp, "RR73TU");
+	that->locator_ = temp;
+	free(temp);
+	// Get home location from gridsquare in string form
+	that->home_location();
+	// Update the output widgets with the values of the new location
+	((Fl_Output*)that->locator_op_)->value(that->locator_.c_str());
+	((Fl_Output*)that->lat_dms_op_)->value(that->home_lat_dms_.c_str());
+	((Fl_Output*)that->lon_dms_op_)->value(that->home_long_dms_.c_str());
+	that->draw_home_flag();
+}
+
+// DXATLAS: callback - some detail of the map has been changed
+HRESULT dxa_if::cb_map_changed(enum DxAtlas::EnumMapChange change_kind) {
+	if (!is_my_change_) {
+		// The change was instigated from a control in DXATLAS:
+		DxAtlas::IDxMapPtr map = atlas_->GetMap();
+		// Select reason for change
+		switch (change_kind) {
+		case DxAtlas::EnumMapChange::MC_VIEW:
+			// The view has changed - get resultant parameters that we are interested in saving
+			// zoom, centre point and window position
+			zoom_value_ = map->GetZoom();
+			centre_lat_ = map->GetCenterLatitude();
+			centre_long_ = map->GetCenterLongitude();
+			atlas_left_ = atlas_->GetLeft();
+			atlas_top_ = atlas_->GetTop();
+			atlas_height_ = atlas_->GetHeight();
+			atlas_width_ = atlas_->GetWidth();
+			break;
+		}
+		// Save new configuration
+		save_values();
+	}
+	return S_OK;
+}
+
+// Call back from DXATLAS: when the mouse has been clicked on the map - show selected QSO or QSOs
+// If we are displaying extracted records then only show the last record in the record view.
+// If we are not, then copy all records within the tolerance to the extracted records.
+HRESULT dxa_if::cb_map_clicked(float latitude, float longitude) {
+	int num_found = 0;
+	record_num_t record_num;
+	record* disp_record = nullptr;
+	if (qso_display_ != AQ_SEARCH && extract_records_) {
+		// Copy all records within the specified tolerance of the click point in the extracted records
+		// view. So clear any existing criteria and generate header 
+		extract_records_->clear_criteria();
+		record* header = new record;
+		char format[] = "DxAtlas generated extract.\nContacts near %s %s (%s)\n";
+		string s_lat = degrees_to_dms(latitude, true);
+		string s_lon = degrees_to_dms(longitude, false);
+		string gridsquare = latlong_to_grid({ latitude, longitude }, 6);
+		char* text = new char[strlen(format) + s_lat.length() + s_lon.length() + 20];
+		sprintf(text, format, s_lat.c_str(), s_lon.c_str(), gridsquare.c_str());
+		header->header(string(text));
+		extract_records_->header(header);
+		navigation_book_ = extract_records_;
+	}
+	for (auto it = records_displayed_.begin(); it != records_displayed_.end(); it++) {
+		// For all records beging displayed - get those that are within a small distance 
+		// from the click point and add them to the list control
+		record_num = *it;
+		disp_record = book_->get_record(record_num, false);
+		lat_long_t lat_long = disp_record->location(false);
+		float tolerance = (float)5.0 / zoom_value_;
+		float d_lat = (float)lat_long.latitude - latitude;
+		float d_long = (float)lat_long.longitude - longitude;
+		float diff = sqrtf((d_lat * d_lat) + (d_long * d_long));
+		if (diff < tolerance) {
+			// within a small tolerance from the click point
+			// Set the selected record to each record in turn
+			if (qso_display_ != AQ_SEARCH && extract_records_) {
+				extract_records_->add_record(record_num);
+			}
+			num_found++;
+		}
+	}
+	if (!num_found) {
+		// Do nothing except update status
+		status_->misc_status(ST_ERROR, "DXATLAS: No stations found");
+	}
+	else {
+		// Send how many found to the status
+		char message[256];
+		sprintf(message, "DXATLAS: %d stations found", num_found);
+		status_->misc_status(ST_NOTE, message);
+		book_->selection(record_num);
+		if (tabbed_view_) {
+			// Open the appropriate view
+			if (qso_display_ != AQ_SEARCH) {
+				tabbed_view_->activate_pane(OT_EXTRACT, true);
+			}
+			else {
+				tabbed_view_->activate_pane(OT_RECORD, true);
+			}
+		}
+	}
+	return S_OK;
+}
+
+// Callback from DXATLAS: that the mouse position has changed
+HRESULT dxa_if::cb_mouse_moved(float latitude, float longitude) {
+	if (call_layer_ != nullptr && !is_my_change_) {
+		// 
+		_variant_t pt_lat, pt_long, pt_text;
+		_variant_t label, labels;
+
+		pt_lat.ChangeType(VT_R4);
+		pt_long.ChangeType(VT_R4);
+
+		label.vt = VT_ARRAY | VT_VARIANT;
+		labels.vt = VT_ARRAY | VT_VARIANT;
+
+		DxAtlas::IDxMapPtr map = atlas_->GetMap();
+		// We are going to change the map - let callbacks know and start building bulk change.
+		is_my_change_ = true;
+		map->BeginUpdate();
+
+		//create array of labels - 1 dimensional
+		SAFEARRAYBOUND rgsabound[1];
+		rgsabound[0].lLbound = 0;
+		rgsabound[0].cElements = 1;
+
+		// Create an array of data (3 data items, longitude, latitude and callsign
+		SAFEARRAY * points = SafeArrayCreate(VT_VARIANT, 1, rgsabound);
+		if (points == nullptr) {
+			status_->misc_status(ST_SEVERE, "DXATLAS: Fatal error in callback");
+			return E_ABORT;
+		}
+		rgsabound[0].cElements = 3;
+		SAFEARRAY* point = SafeArrayCreate(VT_VARIANT, 1, rgsabound);
+		if (point == nullptr) {
+			status_->misc_status(ST_SEVERE, "DXATLAS: Fatal error in callback");
+			return E_ABORT;
+		}
+		// Default data will not display anything - 
+		// if mouseover is not enabled or no record found close enough
+		pt_long = (float)0.0;
+		pt_lat = (float)0.0;
+		pt_text.SetString(" ");
+
+		// Start by having ridiculous closest point (As far away as we can consider
+		record_num_t closest_num = -1;
+		float closest_diff = 360.0;
+		float allowed_diff = (float)5.0 / zoom_value_;
+		for (auto it = records_to_display_.begin(); it != records_to_display_.end(); it++ ) {
+			// For all records being displayed
+			record_num_t record_num = *it;
+			// Get the location of the record
+			record* record = book_->get_record(record_num, false);
+			if (record) {
+				lat_long_t lat_long = record->location(false);
+				// If this is closer than previous closest
+				float diff_lat = (float)(lat_long.latitude) - latitude;
+				float diff_long = (float)(lat_long.longitude) - longitude;
+				// Use sum of squares to get a qualitative figure of distance
+				float this_diff = sqrtf((diff_lat*diff_lat) + (diff_long*diff_long));
+				if (this_diff < closest_diff && this_diff < allowed_diff) {
+					// Check whether it gets displayed
+					if (is_displayed(record_num)) {
+						closest_diff = this_diff;
+						closest_num = record_num;
+					}
+				}
+			}
+		}
+		// We now have the closest
+		if (closest_num != -1) {
+			record* record = book_->get_record(closest_num, false);
+			if (record != nullptr) {
+				lat_long_t lat_long = record->location(false);
+
+				// Only add if the location is valid
+				if (!isnan(lat_long.latitude) && !isnan(lat_long.longitude)) {
+					//calculate attributes
+					pt_long = (float)lat_long.longitude;
+					pt_lat = (float)lat_long.latitude;
+					pt_text.SetString(record->item("CALL").c_str());
+				}
+			}
+		}
+
+		//set attributes for point
+		long ix = 0;
+		SafeArrayPutElement(point, &ix, &pt_long);
+		ix = 1; SafeArrayPutElement(point, &ix, &pt_lat);
+		ix = 2; SafeArrayPutElement(point, &ix, &pt_text);
+		//add point to the array
+		ix = 0; label.parray = point;
+		SafeArrayPutElement(points, &ix, &label);
+		//put data into the layer
+		labels.parray = points;
+		try {
+			call_layer_->SetData(labels);
+		}
+		catch (_com_error* e) {
+			char error[256];
+			sprintf(error, "DXATLAS: Got error displaying data : %s", e->ErrorMessage());
+			status_->misc_status(ST_ERROR, error);
+		}
+		//now allow repainting
+		map->EndUpdate();
+		is_my_change_ = false;
+	}
+	return S_OK;
+}
+
+// Exit requested - disconnect from DxAtlas and tidy it up.
+HRESULT dxa_if::cb_exit_requested() {
+	disconnect_dxatlas(true);
+	return S_OK;
+}
+
+// Get the colour for a particular button number
+Fl_Color dxa_if::button_colour(int button_num) {
+	return ZLG_PALETTE[button_num];
+}
+
+// Get details of the home location for the selected record
+void dxa_if::home_location() {
+	// Get home location for the current active location
+	lat_long_t home_lat_long = grid_to_latlong(locator_);
+	// Convert to single precision explicitly
+	home_lat_ = (float)(home_lat_long.latitude);
+	home_long_ = (float)(home_lat_long.longitude);
+	// Convert to ° ' " N/E/S/W format
+	home_lat_dms_ = degrees_to_dms(home_lat_, true);
+	home_long_dms_ = degrees_to_dms(home_long_, false);
+}
+
+// Connect to DXATLAS:
+bool dxa_if::connect_dxatlas() {
+	bool opened_ok = true;
+
+	if (atlas_ == nullptr) {
+		// We aren't connected already
+		try {
+			// First try to connect to DX Atlas if it is running
+			HRESULT hAtlas = atlas_.GetActiveObject("DxAtlas.Atlas");
+			if (FAILED(hAtlas)) _com_issue_error(hAtlas);
+		}
+		catch (_com_error& /*e*/) {
+			try {
+				// If that fails, try to start a new instance of DX Atlas
+				HRESULT hAtlas = atlas_.CreateInstance("DxAtlas.Atlas", nullptr, CLSCTX_ALL);
+				if (FAILED(hAtlas)) _com_issue_error(hAtlas);
+			}
+			catch (_com_error& /*e*/) {
+				// And if that fails, say oops and hide this view
+				status_->misc_status(ST_ERROR, "DXATLAS: Unable to connect to DxAtlas.");
+				opened_ok = false;
+			}
+		}
+
+		if (opened_ok) {
+			try {
+				// Tell the connection we are implementing callbacks
+				IDispEventSimpleImpl<2, dxa_if, &__uuidof(DxAtlas::IDxAtlasEvents)>::DispEventAdvise(atlas_);
+			} 
+			catch (exception&) {
+				// And if that fails, say oops and hide this view
+				status_->misc_status(ST_ERROR, "DXATLAS: Exception in DxAtlas.");
+				opened_ok = false;
+			}
+		}
+	}
+	if (opened_ok) {
+		// Initialise the map and make DXATLAS: visible
+		enable_widgets();
+		initialise_map();
+		atlas_->PutVisible(true);
+		// Allow mouse click and override active labels
+		atlas_->GetMap()->PutMouseMode(DxAtlas::MM_USER);
+		atlas_->GetMap()->PutActiveLabels(false);
+		status_->misc_status(ST_OK, "DXATLAS: Connected");
+	}
+	else {
+		status_->misc_status(ST_ERROR, "DXATLAS: failed to open");
+	}
+
+	return opened_ok;
+
+}
+
+// Disconnect from DXATLAS:
+void dxa_if::disconnect_dxatlas(bool dxatlas_exit) {
+	// Note that we may have moved the window without resizing, so won't have had the map changed callback
+	atlas_left_ = atlas_->GetLeft();
+	atlas_width_ = atlas_->GetWidth();
+	atlas_top_ = atlas_->GetTop();
+	atlas_height_ = atlas_->GetHeight();
+	save_values();
+	// Ignore any callbacks from DXATLAS: while we disconnect it.
+	is_my_change_ = true;
+	atlas_->GetMap()->BeginUpdate();
+	atlas_->GetMap()->GetCustomLayers()->Clear();
+	atlas_->GetMap()->EndUpdate();
+	call_layer_ = nullptr;
+	// Tell the interface we no longer support the callback
+	IDispEventSimpleImpl<2, dxa_if, &__uuidof(DxAtlas::IDxAtlasEvents)>::DispEventUnadvise(atlas_);
+	//if (!dxatlas_exit) {
+	//	// Setting this nullptr closes the DXATLAS: window
+	//	delete atlas_;
+	//}
+	atlas_ = nullptr;
+	is_my_change_ = false;
+	// Maybe allow FLTK scheduler to let DxAtlas do its stuff
+	Fl::wait(0.1);
+	status_->misc_status(ST_WARNING, "DXATLAS: Disconnected");
+}
+
+// Initialise DXATLAS: with the current configuration
+void dxa_if::initialise_map() {
+	DxAtlas::IDxMapPtr map = atlas_->GetMap();
+
+	// Don't redraw until we have set all the properties
+	is_my_change_ = true;
+	map->BeginUpdate();
+
+	// Find the screen that intersects with the saved dimensions - Note this returns zero if there is none.
+	int screen = Fl::screen_num(atlas_left_, atlas_top_, atlas_width_, atlas_height_);
+	int screen_x;
+	int screen_y;
+	int screen_w;
+	int screen_h;
+	// Now see if it really does intersect and by how much
+	Fl::screen_work_area(screen_x, screen_y, screen_w, screen_h, screen);
+	int w;
+	int h;
+	if (atlas_left_ > screen_x) {
+		// Want to place it to the right of the left screen edge
+		if (atlas_left_ > screen_x + screen_w) {
+			// It is wholly to theright of the screen
+			w = 0;
+		}
+		else if (atlas_left_ + atlas_width_ > screen_x + screen_w) {
+			// It overhangs the right edge of the screen
+			w = screen_w - (atlas_left_ - screen_x);
+		}
+		else {
+			// It is wholly within the screen
+			w = atlas_width_;
+		}
+	}
+	else {
+		// Want to place it to the left of the left edge
+		if (atlas_left_ + atlas_width_ > screen_x) {
+			// It overhangs the left edge
+			w = atlas_width_ - (screen_x - atlas_left_);
+		}
+		else {
+			// It is wholly off the left of the screen
+			w = 0;
+		}
+	}
+	if (atlas_top_ > screen_y) {
+		// Want to place it below the top edge
+		if (atlas_top_ > screen_y + screen_h) {
+			// It is wholly below the screen
+			h = 0;
+		} 
+		else if (atlas_top_ + atlas_height_ > screen_y + screen_h) {
+			// It overhangs tthe bottom of the screen
+			h = screen_h - (atlas_top_ - screen_y);
+		}
+		else {
+			// It is wholly with the screen
+			h = atlas_height_;
+		}
+	}
+	else {
+		// Want to place it above the screen
+		if (atlas_top_ + atlas_height_ > screen_y) {
+			// It overhangs the top edge
+			h = atlas_height_ - (screen_y - atlas_top_);
+		}
+		else {
+			// It is wholly above the screen
+			h = 0;
+		}
+	}
+	// If we have a reasonable overlap - greater than 10*10 pixels
+	if (h > 10 && w > 10) {
+		atlas_->PutLeft(atlas_left_);
+		atlas_->PutWidth(atlas_width_);
+		atlas_->PutTop(atlas_top_);
+		atlas_->PutHeight(atlas_height_);
+	}
+
+	// Set map parameters
+	draw_home_flag();
+	// Don't use pins facility within DXATLAS:
+	map->PutPinsVisible(false);
+
+	map->EndUpdate();
+	is_my_change_ = false;
+}
+
+// Create colour buttons with current colour configuration
+void dxa_if::create_colour_buttons() {
+
+	int button_num = 0;
+	// Delete all existing widgets
+	colour_grp_->clear();
+	// get FLTK scheduler delete them
+	Fl::wait();
+	colour_bns_.clear();
+	// Hide the window so it can be resized
+	hide();
+
+	// Work out the geometry of the buttons 
+	int num_colours = colours_used_.size();
+	// If we have no colours create a button with the label "None"
+	if (num_colours == 0) {
+		num_colours = 1;
+		colours_used_.push_back("None");
+	}
+
+	// Work out how much space we have to draw them in - the size of the group less one row (for set and clear)
+	int num_cols = (colour_grp_->w() - GAP - GAP) / WBUTTON;
+	int num_rows = ((num_colours - 1) / num_cols) + 1; 
+
+	// Create all buttons
+	button_num = 0;
+	for (int c = 0; c < num_cols && button_num < num_colours; c++) {
+		for (int r = 0; r < num_rows && button_num < num_colours; r++) {
+			Fl_Box* bn = new Fl_Box(colour_grp_->x() + (c * WBUTTON) + GAP, (r * HBUTTON) + HTEXT + colour_grp_->y(), WBUTTON, HBUTTON);
+			bn->box(FL_BORDER_BOX);
+			bn->labelfont(FONT);
+			bn->labelsize(FONT_SIZE);
+			bn->color(button_colour(button_num));
+			bn->copy_label(colours_used_[button_num].c_str());
+			bn->labelcolor(fl_contrast(FL_BLACK, button_colour(button_num)));
+			colour_bns_.push_back(bn);
+			colour_grp_->add(bn);
+			button_num++;
+		}
+	}
+	// Now resize the window to just contain the buttons and don't allow the user to resize it smaller
+	colour_grp_->resizable(nullptr);
+	resizable(colour_grp_);
+	colour_grp_->size(colour_grp_->w(), (num_rows * HBUTTON) + HTEXT + GAP );
+	size(w(), colour_grp_->y() + colour_grp_->h() + GAP + EDGE);
+	size_range(w(), h());
+	show();
+}
+
+// Is the point displayed
+bool dxa_if::is_displayed(record_num_t record_num) {
+	string selected_by;
+	record* record = book_->get_record(record_num, false);
+	if (record == nullptr) {
+		return false;
+	}
+	switch (atlas_colour_) {
+	case AC_NONE:
+		// Is displayed, no need to look further
+		return true;
+	case AC_AWARDMODE:
+		// Get the awardmode
+		selected_by = spec_data_->dxcc_mode(record->item("MODE"));
+		break;
+	case AC_LOGMODE:
+		// Get the logged mode
+		selected_by = record->item("MODE");
+		break;
+	case AC_BANDS:
+		// get the logged band
+		selected_by = record->item("BAND");
+		break;
+	}
+	// Get the colour index for this
+	int colour_num = -1;
+	for (size_t i = 0; i < colours_used_.size() && colour_num == -1; i++) {
+		if (colours_used_[i] == selected_by) {
+			colour_num = i;
+		}
+	}
+	// If the colour wasn't found or it's not in the list of used colours
+	if (colour_num == -1) {
+		return false;
+	}
+	else {
+		return true;
+	}
+}
+
+// Convert FLTK colour value to DXATLAS: colour value 
+DxAtlas::EnumColor dxa_if::convert_colour(Fl_Color colour) {
+	unsigned char red;
+	unsigned char blue;
+	unsigned char green;
+	Fl::get_color(colour, red, green, blue);
+	unsigned result = blue << 16 | green << 8 | red;
+	return (DxAtlas::EnumColor)result;
+}
+
+// Get records to display
+void dxa_if::get_records() {
+	fl_cursor(FL_CURSOR_WAIT);
+	// Temporary list of record numbers
+	set<int> record_nums;
+	// select all, current, extracted or most recent
+	switch (qso_display_) {
+	case AQ_ALL:
+		// Get all record numbers
+		for (record_num_t i = 0; i < book_->size(); i++) {
+			record_nums.insert(i);
+		}
+		break;
+	case AQ_CURRENT:
+		// List of 1 - the number of currently selected record
+		record_nums.insert(book_->selection());
+		break;
+	case AQ_SEARCH:
+		// Copy the list of extracted records
+		for (record_num_t i = 0; i < extract_records_->size(); i++) {
+			record_nums.insert(extract_records_->record_number(i));
+		}
+		break;
+	case AQ_DAYS:
+		// Get all record numbers that are within so many of most recently operated date
+	{
+		if (book_->size()) {
+			// only if the log has records
+			record_num_t last_record_num = book_->size() - 1;
+			time_t last_date = book_->get_record(last_record_num, false)->timestamp();
+			bool done = false;
+			// Always insert the last record
+			record_nums.insert(last_record_num);
+			record_num_t i = last_record_num - 1;
+			// Go backwards until the time difference is > n days.
+			for (; (signed)i >= 0 && !done; i--) {
+				// Compare the time difference (in seconds)
+				if (difftime(last_date, book_->get_record(i, false)->timestamp()) <= most_recent_count_ * 24 * 60 * 60) {
+					record_nums.insert(i);
+				}
+				else {
+					// We guarantee the book is in time order
+					done = true;
+				}
+			}
+		}
+		break;
+	}
+	case AQ_QSOS:
+		// The most recent N QSOs
+		for (size_t i = book_->size() - 1, j = 0; j < most_recent_count_; i--, j++) {
+			record_nums.insert(i);
+		}
+	}
+
+	// Now see if QSOs, DXCCs or zones
+	set<string> got_items;
+
+	records_to_display_.clear();
+	// All records - copy temporary list
+	records_to_display_.insert(record_nums.begin(), record_nums.end());
+
+	if (atlas_) {
+		if (records_to_display_.size() == 0) {
+			status_->misc_status(ST_WARNING, "DXATLAS: No records match these criteria");
+		}
+		else {
+			char text[256];
+			sprintf(text, "DXATLAS: %d records being displayed", records_to_display_.size());
+			status_->misc_status(ST_OK, text);
+		}
+	}
+	else {
+		status_->misc_status(ST_WARNING, "DXATLAS: Not connected - change has been remembered");
+	}
+	fl_cursor(FL_CURSOR_DEFAULT);
+}
+
+// Allocate colours - and reset filter
+void dxa_if::allocate_colours() {
+	// Get the colour list
+	colours_used_.clear();
+	set<string> text_values;
+	text_values.clear();
+	// Select on colour mode
+	switch (atlas_colour_) {
+	case AC_NONE:
+		// Default colour only
+		colours_used_.push_back("Default");
+		break;
+	case AC_BANDS:
+		// Colour by the bands that have been found in the book
+		if (book_) {
+			text_values = book_->used_bands();
+			// Arrange the bands in frequency order rather than string order of the band name
+			for (auto it = text_values.begin(); it != text_values.end(); it++) {
+				string text = *it;
+				bool done = false;
+				for (size_t i2 = 0; i2 < colours_used_.size() && !done; i2++) {
+					// insert it if it's less than the current entry 
+					if (spec_data_->freq_for_band(text) < spec_data_->freq_for_band(colours_used_[i2])) {
+						colours_used_.insert(colours_used_.begin() + i2, text);
+						done = true;
+					}
+				}
+				if (!done) {
+					colours_used_.push_back(text);
+				}
+			}
+		}
+		break;
+	case AC_LOGMODE:
+		// Colour by logged mode that have been found in the book
+		if (book_) {
+			text_values = book_->used_submodes();
+			for (auto it = text_values.begin(); it != text_values.end(); it++) {
+				string text = *it;
+				bool done = false;
+				for (size_t i2 = 0; i2 < colours_used_.size() && !done; i2++) {
+					// insert it if it's less than the current entry 
+					if (text < colours_used_[i2]) {
+						colours_used_.insert(colours_used_.begin() + i2, text);
+						done = true;
+					}
+				}
+				if (!done) {
+					colours_used_.push_back(text);
+				}
+			}
+		}
+		break;
+	case AC_AWARDMODE:
+		// Colour by DXCC Award mode - first get all modes that have been used in the book
+		if (book_) {
+			text_values = book_->used_modes();
+			for (auto it = text_values.begin(); it != text_values.end(); it++) {
+				// Convert it to award mode
+				string text = spec_data_->dxcc_mode(*it);
+				bool done = false;
+				for (size_t i2 = 0; i2 < colours_used_.size() && !done; i2++) {
+					// insert it if it's less than the current entry 
+					if (text < colours_used_[i2]) {
+						colours_used_.insert(colours_used_.begin() + i2, text);
+						done = true;
+					}
+					else if (text == colours_used_[i2]) {
+						done = true;
+					}
+				}
+				if (!done) {
+					colours_used_.push_back(text);
+				}
+			}
+		}
+		break;
+	}
+}
+
+
+// Draw pins
+void dxa_if::draw_pins() {
+	if (atlas_) {
+		// Put up the hour-glass
+		fl_cursor(FL_CURSOR_WAIT);
+		try {
+			_variant_t pt_lat, pt_long, pt_value, pt_text;
+			_variant_t point, points;
+			// Set these "variant_t" to single precision floating point
+			pt_lat.ChangeType(VT_R4);
+			pt_long.ChangeType(VT_R4);
+			pt_value.ChangeType(VT_R4);
+			// Set these to arrays of variants.
+			point.vt = VT_ARRAY | VT_VARIANT;
+			points.vt = VT_ARRAY | VT_VARIANT;
+
+			// Get map
+			DxAtlas::IDxMapPtr map = atlas_->GetMap();
+			// It is necessary to have Begin/EndUpdate around deleting the existing data to
+			// allow DxAtlas to implement it before reapplying the data - this may be an artifice
+			// of FLTK scheduling
+			map->BeginUpdate();
+			//delete all existing layers - set call_layer_ to nullptr to prevent callbacks from using it
+			call_layer_ = nullptr;
+			DxAtlas::ICustomLayersPtr pin_layers = map->GetCustomLayers();
+			pin_layers->Clear();
+			map->EndUpdate();
+			// Maybe allow FLTK scheduler to let DxAtlas do its stuff
+			Fl::wait(0.1);
+			status_->misc_status(ST_NOTE, "DXATLAS: Update started");
+			status_->progress(records_to_display_.size(), OT_DXATLAS, "records");
+			int count = 0;
+
+			// Clear records displayed
+			records_displayed_.clear();
+
+			// For all the wanted colours
+			for (int colour_layer = 0; colour_layer < (signed)colours_used_.size(); colour_layer++) {
+				// Get the text associated with this colour
+				string colour_text;
+				if (colour_layer < (signed)colours_used_.size()) {
+					colour_text = colours_used_[colour_layer];
+				}
+				else {
+					colour_text = "";
+				}
+				// do not repaint map while we are updating data
+				// This will repaint the map between each colour
+				map->BeginUpdate();
+
+				// add new layer for points - allow lower layers to be visible
+				DxAtlas::ICustomLayerPtr layer = pin_layers->Add(DxAtlas::LK_POINTS);
+				layer->PutLabelsTransparent(true);
+
+				// create 1-D array of labels - use the maximum possible array size
+				SAFEARRAYBOUND rgsabound[1];
+				rgsabound[0].lLbound = 0;
+				rgsabound[0].cElements = records_to_display_.size();
+
+				// The colour of points to display
+				DxAtlas::EnumColor colour = convert_colour(button_colour(colour_layer));
+
+				// Array to hold all the points
+				SAFEARRAY * point_array = SafeArrayCreate(VT_VARIANT, 1, rgsabound);
+				long index_2 = 0;
+
+				// For each record check it is this colour and whether to display it
+				for (auto it2 = records_to_display_.begin(); it2 != records_to_display_.end(); it2++) {
+					// Go through all the selected records
+					record_num_t record_num = *it2;
+					long index_1 = 0;
+					record* record = book_->get_record(record_num, false);
+					lat_long_t lat_long;
+					SAFEARRAY* point_data;
+					bool use_item = false;
+					bool display_colour = ((Fl_Button*)colour_bns_[colour_layer])->value();
+					string item;
+					if (record != nullptr && display_colour && (include_swl_ || record->item("SWL") != "Y")) {
+						// Select on 'colour by' mode
+						switch (atlas_colour_) {
+						case AC_NONE:
+							// 1 colour - use every record
+							use_item = true;
+							break;
+						case AC_BANDS:
+							// select record if it's the band we are drawing
+							use_item = (colour_text == record->item("BAND"));
+							break;
+						case AC_LOGMODE:
+							// select record if it's the ADIF mode we are drawing
+							use_item = (colour_text == record->item("MODE", true));
+							break;
+						case AC_AWARDMODE:
+							// select record if it's the DXCC award mode we are drawing
+							item = record->item("MODE");
+							use_item = (colour_text == spec_data_->dxcc_mode(item));
+							break;
+						}
+
+						if (use_item) {
+							// This record is to be drawn in this layer
+							lat_long = record->location(false);
+							// Only add if the location is valid
+							if (!isnan(lat_long.latitude) && !isnan(lat_long.longitude)) {
+								//create label entry (array of 3 elements: Long, Lat, Text)
+								rgsabound[0].cElements = 3;
+								point_data = SafeArrayCreate(VT_VARIANT, 1, rgsabound);
+								//calculate attributes - explicitly convert from double to single precision
+								pt_long = (float)lat_long.longitude;
+								pt_lat = (float)lat_long.latitude;
+								pt_value = 0;
+								//set attributes 
+								index_1 = 0; SafeArrayPutElement(point_data, &index_1, &pt_long);
+								index_1 = 1; SafeArrayPutElement(point_data, &index_1, &pt_lat);
+								index_1 = 2; SafeArrayPutElement(point_data, &index_1, &pt_value);
+								//add point to the array
+								point.parray = point_data;
+								SafeArrayPutElement(point_array, &index_2, &point);
+								index_2++;
+								// Add it to the set of records being displayed
+								records_displayed_.insert(record_num);
+							}
+							count += 1;
+							status_->progress(count);
+						}
+
+					}
+				}
+				// Resize array if fewer items have been created.
+				if (index_2 != records_to_display_.size()) {
+					rgsabound[0].cElements = index_2;
+					SafeArrayRedim(point_array, rgsabound);
+				}
+				// Set point size and paint colour
+				layer->PutBrushColor(colour);
+				layer->PutPointSize(3);
+				// font/line color
+				layer->PutPenColor(DxAtlas::clBlack);
+				// put data into the layer
+				points.parray = point_array;
+				// Now put the data onto the DXATLAS: map and display an error if it failed
+				try {
+					layer->SetData(points);
+				}
+				catch (_com_error& e) {
+					char error[256];
+					sprintf(error, "DXATLAS: Got error displaying data : %s", e.ErrorMessage());
+					status_->misc_status(ST_ERROR, error);
+				}
+				// now allow repainting
+				map->EndUpdate();
+				// Maybe allow FLTK scheduler to let DxAtlas do its stuff
+				Fl::wait(0.1);
+			}
+			// Now add a layer for textual information - used for interactive displays
+			call_layer_ = pin_layers->Add(DxAtlas::LK_LABELS);
+			// Make it opaque so that the label is visible against the background
+			call_layer_->LabelsTransparent = false;
+			// font attributes for this layer - default size, courier new, navy text on a white background
+			IFontPtr pFont = call_layer_->GetFont();
+			pFont->put_Name(_com_util::ConvertStringToBSTR("Courier New"));
+			call_layer_->PenColor = DxAtlas::clNavy;
+			call_layer_->BrushColor = DxAtlas::clWhite;
+
+			status_->misc_status(ST_OK, "DXATLAS: Update done!");
+			status_->progress(records_to_display_.size());
+		}
+		catch (exception& /*e*/) {
+			status_->misc_status(ST_SEVERE, "DXATLAS: Error detected during update");
+			disconnect_dxatlas(false);
+		}
+		fl_cursor(FL_CURSOR_DEFAULT);
+	}
+}
+
+// draw home flag
+void dxa_if::draw_home_flag() {
+	if (atlas_) {
+		// Set home location
+		atlas_->GetMap()->PutHomeLatitude((float)home_lat_);
+		atlas_->GetMap()->PutHomeLongitude((float)home_long_);
+	}
+}
+
+// Get colours and initialse them - if reset then removes any existing filter
+void dxa_if::get_colours(bool reset) {
+	allocate_colours();
+	create_colour_buttons();
+}
+
+#endif // _WIN32

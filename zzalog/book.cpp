@@ -1,0 +1,1189 @@
+#include "book.h"
+#include "adi_reader.h"
+#include "adi_writer.h"
+#include "adx_reader.h"
+#include "adx_writer.h"
+#include "tsv_writer.h"
+#include "about_dialog.h"
+#include "view.h"
+#include "status.h"
+#include "menu.h"
+#include "tabbed_forms.h"
+#include "spec_data.h"
+#include "pfx_data.h"
+#include "prefix.h"
+#include "utils.h"
+
+// C/C++ header files
+#include <ctime>
+// FLTK header files
+#include <FL/Fl.H>
+#include <FL/fl_ask.H>
+#include <FL/Fl_Menu_Item.H>
+#include <FL/Fl_Preferences.H>
+#include <FL/Fl_Single_Window.H>
+#include <FL/Fl_Text_Editor.H>
+
+using namespace zzalog;
+
+// Global data items
+extern status* status_;
+extern menu* menu_;
+extern tabbed_forms* tabbed_view_;
+extern spec_data* spec_data_;
+extern pfx_data* pfx_data_;
+extern Fl_Preferences* settings_;
+extern Fl_Single_Window* main_window_;
+extern bool read_only_;
+extern void main_window_label(string text);
+extern void add_sub_window(Fl_Window* win);
+
+// Constructor - initialises some attributes
+book::book()
+	: book_type_(OT_MAIN)
+	, modified_record_(false)
+	, new_record_(false)
+	, header_(nullptr)
+	, inhibit_view_update_(false)
+	, save_enabled_(true)
+	, current_item_(0)
+	, modified_(false)
+	, filename_("")
+	, format_(FT_ADI)
+	, logging_mode_(LM_OFF_AIR)
+	, criteria_(nullptr)
+	, last_search_result_(0)
+	, save_in_progress_(false)
+	, delete_in_progress_(false)
+	, old_record_(nullptr)
+{
+	used_bands_.clear();
+	used_modes_.clear();
+	used_submodes_.clear();
+	delete_contents(true);
+
+}
+
+// Destructor - iterative destroys contents
+book::~book()
+{
+	// Just destroy the contents
+	delete_contents(false);
+}
+
+// constructor to open a file and populate book
+bool book::load_data(string filename)
+{
+	bool ok = false;
+	if (book_type_ == OT_MAIN || book_type_ == OT_IMPORT) {
+		// Only book types we should load
+		// selection for the below choice
+		enum choice_t : int {
+			SAVE = 0,
+			DONT_SAVE = 1,
+			CANCEL = 2
+		};
+		choice_t choice = SAVE;
+		if (modified()) {
+			// If the current data is modified, ask the user if it should be saved first
+			choice = (choice_t)fl_choice("Current file is modified - do you want to save the changes?", "Save", "Don't Save", "Cancel");
+			if (choice == SAVE) {
+				store_data();
+			}
+		}
+		if (choice != CANCEL) {
+			// delete current contents (main only) - also stuff created by book
+			if (book_type_ == OT_MAIN) {
+				delete_contents(true);
+			}
+			// not called File->New
+			if (filename.length() != 0) {
+				// remember filename and tell ADIF spec database
+				this->filename_ = filename;
+				spec_data_->loaded_filename(filename_);
+				// Update status bar
+				char* message = new char[filename_.length() + 20];
+				sprintf(message, "LOG READ: %s", filename_.c_str());
+				status_->misc_status(ST_NOTE, message);
+				free(message);
+				// Get the filetype suffix from the filename to know which reader to use
+				string filetype;
+				size_t last_period = filename.find_last_of('.');
+				if (last_period != string::npos) {
+					filetype = to_lower(filename.substr(last_period));
+				}
+				size_t last_slash = filename.find_last_of("/\\");
+				if (last_slash != string::npos) {
+					string file_directory = filename.substr(0, last_slash);
+					Fl_Preferences datapath_settings(settings_, "Datapath");
+					datapath_settings.set("Log Directory", file_directory.c_str());
+				}
+				// Check for .adi or .adif format
+				if (filetype == ".adi" || filetype == ".adif") {
+					// Use ADI reader to read from an input stream connected to thefile
+					adi_reader* reader = new adi_reader;
+					input_.open(filename.c_str(), fstream::in);
+					// Load the book
+					status_->file_status(FS_LOADING);
+					if (!reader->load_book(this, input_)) {
+						// Error while reading book
+						char message[256];
+						sprintf(message, "LOG READ: Failed to open %s", filename.c_str());
+						status_->misc_status(ST_ERROR, message);
+						if (book_type_ == OT_MAIN) {
+							// Display message in main window title and update views that there's no or partial data
+							main_window_label("[load failed]");
+							selection(0, HT_NO_DATA);
+							Fl::wait();
+						}
+						delete reader;
+						ok = false;
+					}
+					else {
+						if (book_type_ == OT_MAIN) {
+							// Display filename in title bar and update views there's new data
+							if (read_only_) {
+								main_window_label(filename + " [read-only]");
+							}
+							else {
+								main_window_label(filename);
+							}
+							selection(size() - 1, HT_NEW_DATA, nullptr);
+							if (modified()) {
+								status_->file_status(FS_MODIFIED);
+							}
+							else {
+								status_->file_status(FS_SAVED);
+							}
+							// Parse and validate
+//							Fl::wait();
+						}
+						delete reader;
+						ok = true;
+					}
+					input_.close();
+					if (format_ == FT_ADX) {
+						// We have already loaded ADX data 
+						status_->misc_status(ST_WARNING, "LOG READ: Loading .adi format when .adx already loaded, validation will be compromised");
+						format_ = FT_MIXED;
+					}
+					else {
+						// Set the format to ADI - this affects validation
+						format_ = FT_ADI;
+					}
+				}
+				// Check for .adx format
+				else if (filetype == ".adx") {
+					// Use ADX reader to load the data from the file through an input stream
+					adx_reader* reader = new adx_reader;
+					// Opening in text mode appears to do some behind-the-scenes processing
+					// when seeking backwards passed NL.
+					input_.open(filename.c_str(), fstream::in | fstream::binary);
+					status_->file_status(FS_LOADING);
+					if (!input_.good() || !reader->load_book(this, input_)) {
+						// Failed to complete the load
+						char * message = new char[filename.length() + reader->information().length() + 100];
+						sprintf(message, "LOG READ: Failed to open %s. Error messages = %s", filename.c_str(), reader->information().c_str());
+						status_->misc_status(ST_ERROR, message);
+						delete[] message;
+						clear();
+						if (book_type_ == OT_MAIN) {
+							// Update title bar and tell views
+							main_window_label("[load failed]");
+							selection(0, HT_NO_DATA);
+							Fl::wait();
+						}
+						delete reader;
+						ok = false;
+					}
+					else {
+						if (book_type_ == OT_MAIN) {
+							// Update title bar and tell views
+							if (read_only_) {
+								main_window_label(filename + " [read-only]");
+							}
+							else {
+								main_window_label(filename);
+							}
+							selection(size() - 1, HT_NEW_DATA);
+							if (modified()) {
+								status_->file_status(FS_MODIFIED);
+							}
+							else {
+								status_->file_status(FS_SAVED);
+							}
+							// Parse and validate
+							Fl::wait();
+						}
+						delete reader;
+						ok = true;
+					}
+					input_.close();
+					if (format_ == FT_ADI) {
+						// Mixed source
+						status_->misc_status(ST_WARNING, "LOG READ: Loading .adi format when .adx already loaded, validation will be compromised");
+						format_ = FT_MIXED;
+					}
+					else {
+						// Remeber ADX for validation
+						format_ = FT_ADX;
+					}
+
+					ok = false;
+				}
+				// neither .adi nor .adx 
+				else {
+					char* message = new char[filename.length() + 100];
+					sprintf(message, "LOG READ: Unknown file format. %s ignored", filename.c_str());
+					status_->misc_status(ST_ERROR, message);
+					delete[] message;
+					ok = false;
+				}
+			}
+			else { // filename.length() == 0 (File->New)
+				main_window_label("[No file loaded]");
+				// Create a header record
+				record* header = new record();
+				this->header(header);
+				header_->header("ADIF File generated by ZZALOG");
+				// tell views there is no data to display
+				selection(0, HT_NO_DATA);
+				Fl::redraw();
+				ok = true;
+			}
+		}
+		else { // choice == CANCEL
+			ok = false;
+		}
+	}
+	else {
+		// Cannot load other types.
+		status_->misc_status(ST_ERROR, "LOG READ: An extract or export type of book cannot be constructed by reading a file");
+		ok = false;
+	}
+	return ok;
+}
+
+// Store data - only if modified or force is true. If fields is defined only output specified fields
+bool book::store_data(string filename, bool force, set<string>* fields) {
+	bool ok = false;
+	if (save_in_progress_) {
+		status_->misc_status(ST_LOG, "LOG WRITE: Ignoring request to store log as currently doing so");
+	}
+	else {
+		if (book_type_ == OT_MAIN || book_type_ == OT_EXTRACT) {
+			// can only write out main log or extracted records
+			// Race hazard - can instigate a second store before finished this one
+			save_in_progress_ = true;
+			// First parse and validate if necessary
+			if (modified() == true || force) {
+				// Only write out if modified or force is set (for 
+				// The book has a header so update header specific items
+				if (header_) {
+					header_->item("APP_ZZA_NUMREC", to_string(size()));
+					header_->item("PROGRAMID", PROGRAM_ID);
+					header_->item("PROGRAMVERSION", PROGRAM_VERSION);
+					header_->item("ADIF_VER", spec_data_->adif_version());
+				}
+
+				// use supplied filename (for Save As) or remembered filename (for Save)
+				if (filename != "") {
+					filename_ = filename;
+				}
+				// Update status bar
+				char * message = new char[filename_.length() + 20];
+				sprintf(message, "LOG WRITE: %s", filename_.c_str());
+				status_->misc_status(ST_NOTE, message);
+				delete[] message;
+				// Output stream
+				ofstream file;
+				// Get file type suffix
+				string filetype = "";
+				size_t last_period = filename_.find_last_of('.');
+				if (last_period != string::npos) {
+					// Get file type
+					filetype = to_lower(filename_.substr(last_period));
+				}
+				size_t last_slash = filename.find_last_of("/\\");
+				if (last_slash != string::npos) {
+					string file_directory = filename.substr(0, last_slash);
+					Fl_Preferences datapath_settings(settings_, "Datapath");
+					datapath_settings.set("Log Directory", file_directory.c_str());
+				}
+				// Check for .adi format
+				if (filetype == ".adi" || filetype == ".adif") {
+					// Connect file to output stream and get ADI writer to write it
+					status_->file_status(FS_SAVING);
+					file.open(filename_.c_str(), fstream::out);
+					adi_writer* writer = new adi_writer;
+					if (writer->store_book(this, file, fields) != LR_GOOD) {
+						// Store failed
+						char* message = new char[filename_.length() + 100];
+						sprintf(message, "LOG WRITE: Failed to open %s", filename_.c_str());
+						delete[] message;
+						file.close();
+						ok = false;
+					}
+					else {
+						ok = true;
+					}
+					delete writer;
+				}
+				// check for .adx format
+				else if (filetype == ".adx") {
+					// Connect file to output stream and store data
+					status_->file_status(FS_SAVING);
+					file.open(filename_.c_str(), fstream::out);
+					adx_writer* writer = new adx_writer;
+					if (!writer->store_book(this, file)) {
+						// Store failed
+						char * message = new char[filename_.length() + 100];
+						sprintf(message, "LOG WRITE: Failed to open %s", filename_.c_str());
+						status_->misc_status(ST_ERROR, message);
+						delete[] message;
+						file.close();
+						ok = false;
+					}
+					else {
+						ok = true;
+					}
+					delete writer;
+				}
+				// check for .tsv format
+				else if (filetype == ".tsv" || filetype == ".tab") {
+					// Connect file to output stream and store data
+					file.open(filename_.c_str(), fstream::out);
+					tsv_writer* writer = new tsv_writer;
+					if (!writer->store_book(this, file, fields)) {
+						// Store failed
+						char * message = new char[filename_.length() + 100];
+						sprintf(message, "LOG WRITE: Failed to open %s", filename_.c_str());
+						status_->misc_status(ST_ERROR, message);
+						delete[] message;
+						file.close();
+						ok = false;
+					}
+					else {
+						ok = true;
+					}
+					delete writer;
+				}
+				else {
+					// Unknown file type
+					char * message = new char[filename_.length() + 100];
+					sprintf(message, "LOG WRITE: Unknown file format. %s ignored", filename_.c_str());
+					status_->misc_status(ST_WARNING, message);
+					delete[] message;
+					ok = false;
+				}
+				if (ok && book_type_ == OT_MAIN) {
+					// As file has been stored, clear modified flag
+					modified(false);
+					// File was closed in the fail paths
+					file.close();
+					// Update file name on window label
+					main_window_label(filename_);
+				}
+			}
+			else {
+				ok = false;
+			}
+			save_in_progress_ = false;
+		}
+		else {
+			// Cannot write an imported file
+			status_->misc_status(ST_ERROR, "LOG WRITE: An import type of book cannot be written to a file");
+			ok = false;
+		}
+	}
+	// Update menu item activeness
+	menu_->update_items();
+	return ok;
+}
+
+// Get the current selected record - return NULL if current_record beyond the size of array
+record* book::get_record() {
+	if (current_item_ < size()) {
+		return at(current_item_);
+	}
+	else {
+		return NULL;
+	}
+}
+
+// Get the numbered record and optionally select it (quietly)
+record* book::get_record(record_num_t num_item, bool set_selected/* = true*/) {
+	if (num_item < size()) {
+		if (set_selected) {
+			// Set the selected record
+			current_item_ = num_item;
+		}
+		return at(num_item);
+	}
+	else {
+		// item number beyond the size of the book
+		return NULL;
+	}
+}
+
+// Copy the current record
+void book::remember_record() {
+	// Assume we are changing selection so if the record is unmodified save its contents
+	if (!modified_record_ && !new_record() && book_type_ == OT_MAIN) {
+		delete old_record_;
+		old_record_ = new record(*get_record(current_item_, false));
+	}
+}
+
+// Change the selected record (& update any necessary controls
+void book::selection(record_num_t num_item, hint_t hint /* = HT_SELECTED */, view* requester /* = nullptr */, record_num_t num_other /*= 0*/) {
+	record_num_t previous = current_item_;
+	// Special case - -1 indicates no change to the selection
+	if ((signed)num_item != -1) {
+		current_item_ = num_item;
+		remember_record();
+	}
+	else {
+	}
+	bool force_save = false;
+	if (!inhibit_view_update_) {
+		// update turned off during certain activities
+		switch (hint) {
+		case HT_IMPORT_QUERY:
+		case HT_IMPORT_QUERYNEW:
+		case HT_DUPE_QUERY:
+			// Query against first record in import_data or identified record
+			tabbed_view_->update_views(requester, hint, record_number(current_item_), num_other);
+			break;
+		case HT_CHANGED:
+		case HT_MINOR_CHANGE:
+			// Set modified flag
+			modified(true);
+			// Update to this record
+			tabbed_view_->update_views(requester, hint, record_number(current_item_));
+			break;
+		case HT_INSERTED:
+		case HT_DELETED:
+			// Set force save as the record number will not change but a record has been inserted or deleted
+			force_save = true;
+			// Set modified flag
+			modified(true);
+			// Update to this record
+			tabbed_view_->update_views(requester, hint, record_number(current_item_));
+			break;
+		default:
+			tabbed_view_->update_views(requester, hint, record_number(current_item_));
+			break;
+		}
+		if (force_save || (num_item != previous && !read_only_ && save_enabled_)) {
+#ifndef _DEBUG
+			store_data();
+#endif // _DEBUG
+		}
+	}
+	// Update menu item activeness
+	menu_->update_items();
+}
+
+// Get the current selected item
+record_num_t book::selection() {
+	return current_item_;
+}
+
+// Insert a record in its chronological position 
+record_num_t book::insert_record(record* record) {
+	// Get the offset where to add the record and insert it into the array
+	record_num_t pos_record = get_insert_point(record);
+	insert_record_at(pos_record, record);
+	return pos_record;
+}
+
+// Append a record at the end of the book
+record_num_t book::append_record(record* record) {
+	record_num_t pos_record = size();
+	insert_record_at(pos_record, record);
+	return pos_record;
+}
+
+// add a header record
+void book::header(record* header) {
+	delete header_;
+	header_ = header;
+	header_->header();
+}
+
+// return the header record
+record* book::header() {
+	return header_;
+}
+
+// Delete all records and tidy up
+void book::delete_contents(bool new_book) {
+	// Delete the individual records
+	for (auto it = begin(); it != end(); it++) {
+		delete *it;
+	}
+	// Clear the array
+	clear();
+	// Set it unmodified
+	modified(false);
+	filename_ = "";
+	format_ = FT_NONE;
+	delete header_;
+	header_ = nullptr;
+	// Delate all informationed maintained about data
+	used_modes_.clear();
+	used_bands_.clear();
+	used_submodes_.clear();
+	if (new_book && book_type_ == OT_MAIN) {
+		// Delete all non-ADIF defined fields 
+		spec_data_->delete_appdefs();
+		spec_data_->delete_userdefs();
+		// Restore this app's app-defined fields
+		spec_data_->add_my_appdefs();
+
+	}
+	if (book_type_ == OT_MAIN) {
+		// Update status to empty
+		status_->file_status(FS_EMPTY);
+	}
+}
+
+// Return count of records
+record_num_t book::get_count() {
+	return size();
+}
+
+// returns the position at which to chronologically insert a record
+record_num_t book::get_insert_point(record* record) {
+	// Find where to insert the record
+	// operator> overloaded to compare Record date and start time
+	// Check at tail as new record likely to be a more recent one.
+	record_num_t upper_bound = size() == 0 ? 0 : size() - 1;
+	record_num_t lower_bound = 0;
+	record_num_t next_bound;
+
+	// if the book is empty add to the beginning 
+	if (size() == 0) {
+		return 0;
+	}
+	// if the record is later than the last in the book.
+	else if (*record > *(at(upper_bound))) {
+		return size();
+	}
+	else {
+		// Check at beginning - is it earlier?
+		if (!(*record > *(at(0)))) {
+			return 0;
+		}
+		else {
+			// Binary slice the array until found
+			// Keep comparing the record between upper bound and lower bound
+			// until the gap between them is nil. then put it there.
+			while (upper_bound - 1 != lower_bound) {
+				// Compare with the half-way point 
+				next_bound = (lower_bound + upper_bound) / 2;
+				if (*record > *(at(next_bound))) {
+					// It's between half-way and upper-bound, move lower-bound to half-way
+					lower_bound = next_bound;
+				}
+				else {
+					// It's between half-way and lower-bound, move upper-bound to half-way
+					upper_bound = next_bound;
+				}
+			}
+			return upper_bound;
+		}
+	}
+}
+
+// insert the record at specific position
+void book::insert_record_at(record_num_t pos_record, record* record) {
+	// get the iterator to the insert position
+	insert(begin() + pos_record, record);
+	// Update summary lookups
+	add_band_mode(record);
+}
+
+// Navigate the log - i.e. go to specific position
+void book::navigate(navigate_t target) {
+	switch (target) {
+	case NV_FIRST:
+		// Select first record
+		selection(0);
+		break;
+	case NV_PREV:
+		// Select previous record
+		if (selection() != 0) {
+			selection(selection() - 1);
+		}
+		break;
+	case NV_LAST:
+		// Select last record
+		selection(size() - 1);
+		break;
+	case NV_NEXT:
+		// select next record 
+		if (selection() != size() - 1) {
+			selection(selection() + 1);
+		}
+		break;
+	}
+}
+
+// Set the modified flag - conditionally update the status progress bar (as indication it's modified
+void book::modified(bool value, bool update_progress /*= true*/) {
+	// Set the flag
+	modified_ = value;
+	if (book_type_ == OT_MAIN) {
+		// Only change file status for main book
+		if (modified_) {
+			// Set the progress bar to indicate it's been modified
+			status_->file_status(FS_MODIFIED);
+		}
+		else {
+			// If the main book is empty indicate so.
+			if (get_count() == 0) {
+				status_->file_status(FS_EMPTY);
+			}
+			else {
+				status_->file_status(FS_SAVED);
+			}
+		}
+	}
+}
+
+// Return the modified flag
+bool book::modified() {
+	return modified_;
+}
+
+// Create a new record and start editing it.
+record* book::new_record(logging_mode_t mode) {
+	// Create new QSO record with default fields for the logging mode
+	record* new_record = new record(mode);
+	// put it in the book 
+	record_num_t pos_record;
+	if (mode == LM_RADIO_CONN || mode == LM_RADIO_DISC) {
+		// On-air logging - insert against date/time (which should be at the end
+		pos_record = insert_record(new_record);
+	}
+	else {
+		// Off-air logging - insert at end as there is no timestamp in the record
+		pos_record = append_record(new_record);
+	}
+	// Set the appropriate flags
+	logging_mode_ = mode;
+	new_record_ = true;
+	// Select the new record and tell all views
+	selection(pos_record, HT_STARTING);
+
+	return new_record;
+}
+
+// return the filename
+string book::filename(bool full /*=true*/) {
+	if (full) {
+		// Returns full filename
+		return filename_;
+	}
+	else {
+		// Return the filename after the last slash
+		size_t pos = filename_.find_last_of("/\\");
+		return filename_.substr(pos + 1);
+	}
+}
+
+// Mark the record saved - 
+void book::save_record() {
+	// Update status bar
+	char text[128];
+	sprintf(text, "LOG: Saving record %s %s %s",
+		get_record()->item("QSO_DATE").c_str(),
+		get_record()->item("TIME_ON").c_str(),
+		get_record()->item("CALL").c_str());
+	status_->misc_status(ST_NOTE, text);
+	// Add to used bands and modes
+	add_band_mode(get_record());
+
+	if (new_record_ || modified_record_) {
+		// Record entry was started by user - tidy up record
+		get_record()->end_record(logging_mode_);
+		// If this is a new record, it will already be in the book, it now needs to be moved to its correct
+		// place.
+		current_item_ = correct_record_position(current_item_);
+	}
+
+	// Modified by parsing and validation
+	bool record_modified = false;
+	// check whether record has changed - when parsed
+	if (pfx_data_->parse(get_record())) {
+		record_modified = true;
+	}
+		 
+	// check whether record has changed - when validated
+	if (spec_data_->validate(get_record(), selection())) {
+		record_modified = true;
+	}
+
+	// If new or changed then update the fact and let every one know
+	if (record_modified || new_record_ || modified_record_) {
+		modified(true);
+		modified_record_ = false;
+		if (new_record_) {
+			// Turn this off before telling everyone
+			new_record_ = false;
+			selection(current_item_, HT_INSERTED);
+		}
+		else {
+			selection(current_item_, HT_CHANGED);
+		}
+	}
+
+	// Do not automatically save when in debug mode as there may be a problem
+#ifndef _DEBUG
+	if (save_enabled_ && !read_only_) {
+		store_data();
+	}
+#endif // _DEBUG
+
+}
+
+// delete the selected record - force set when explicitly deleting a record from the menu
+void book::delete_record(bool force) {
+	// Either entering a new record or user allows to delete a saved record
+	if (force || new_record_) {
+		// We cannot delete twp records at once as it confuses the value of current_item_
+		if (delete_in_progress_) {
+			status_->misc_status(ST_WARNING, "LOG: Delete record inhibited");
+		}
+		else {
+			// Update status bar and menu items
+			char text[128];
+			sprintf(text, "LOG: Deleting record %s %s %s",
+				get_record()->item("QSO_DATE").c_str(),
+				get_record()->item("TIME_ON").c_str(),
+				get_record()->item("CALL").c_str());
+			status_->misc_status(ST_NOTE, text);
+			delete_in_progress_ = true;
+			menu_->update_items();
+			// Remove the current record from the book
+			erase(begin() + current_item_);
+			new_record_ = false;
+			modified_record_ = false;
+			modified(true);
+			// if current record no longer exists decrement it (exept if already first record)
+			if (current_item_ == size() && current_item_ > 0) {
+				current_item_--;
+			}
+			// Tell the views a record has been deleted and to redraw from the current selection
+			selection(current_item_, HT_DELETED);
+			// After selection has done its all can allow another delete
+			delete_in_progress_ = false;
+			menu_->update_items();
+		}
+	}
+	else if (modified_record_) {
+		// Cancel record edit.
+		*get_record() = *old_record_;
+		delete old_record_;
+		old_record_ = nullptr;
+		modified_record_ = false;
+		selection(-1, HT_MINOR_CHANGE);
+		menu_->update_items();
+	}
+}
+
+// Move the record to its correct chronological position
+record_num_t book::correct_record_position(record_num_t current_pos) {
+	// First delete the old position so it doesn't confuse GetOffset
+	// Save the record first
+	record* this_record = get_record(current_pos, false);
+	// remove record at existing position
+	erase(begin() + current_pos);
+	// Now insert it in the correct position and other bookkeeping
+	return insert_record(this_record);
+}
+
+// Returns whether a record matches the search criteria
+bool book::match_record(record* record) {
+	// Two level matching
+	bool match = basic_match(record) && refine_match(record);
+	if (criteria_->negate_results) {
+		return !match;
+	}
+	else {
+		return match;
+	}
+}
+
+// Returns whether a record matches the basic search condition.
+bool book::basic_match(record* record) {
+	string::size_type dummy = 0;
+	// See if record matches criterion
+	switch (criteria_->condition) {
+	case XC_UNFILTERED:
+		// match all records
+		return true;
+	case XC_CALL:
+		// match by callsign
+		return match_string(criteria_->pattern, criteria_->by_regex, record->item("CALL"));
+		break;
+	case XC_CONT:
+		// match by continent
+		return match_string(criteria_->pattern, false, record->item("CONT"));
+		break;
+	case XC_CQZ:
+		// match by CQ Zone number
+		return match_int(criteria_->pattern, record->item("CQZ"));
+		break;
+	case XC_DXCC:
+		// all numeric so its a DXCC code
+		return match_int(criteria_->pattern, record->item("DXCC"));
+		break;
+	case XC_FIELD:
+		// match by a specified field
+		return match_string(criteria_->pattern, criteria_->by_regex, record->item(criteria_->field_name));
+		break;
+	case XC_GEO: {
+		// match by the "geography" - based on default prefix for that region
+		prefix* prefix = pfx_data_->get_prefix(record->item("APP_ZZA_PFX"));
+		bool match = false;
+		while (!match && prefix != nullptr && prefix->parent_ != nullptr) {
+			return match_string(criteria_->pattern, criteria_->by_regex, prefix->nickname_);
+			prefix = prefix->parent_;
+		}
+		break;
+	}
+	case XC_ITUZ:
+		// match by ITU zone number
+		return match_int(criteria_->pattern, record->item("ITUZ"));
+		break;
+	case XC_SQ2:
+		// match by first two characters of locator
+		// condition too short
+		if (criteria_->pattern.length() < 2) break;
+		// gridsquare in record too short
+		if (!criteria_->by_regex && record->item("GRIDSQUARE").length() < 2) break;
+		return match_string(criteria_->pattern.substr(0, 2), criteria_->by_regex, record->item("GRIDSQUARE").substr(0, 2));
+		break;
+	case XC_SQ4:
+		// match by first 4 charactes of locator
+		if (criteria_->pattern.length() < 4) break;
+		if (!criteria_->by_regex && record->item("GRIDSQUARE").length() < 4) break;
+		return match_string(criteria_->pattern.substr(0, 4), criteria_->by_regex, record->item("GRIDSQUARE").substr(0, 4));
+		break;
+	}
+	// we should never get here
+	return false;
+}
+
+// refine match - by date, band, mode or confirmation
+bool book::refine_match(record* record) {
+	// Now refine by dates
+	if (criteria_->by_dates) {
+		string record_date = record->item("QSO_DATE");
+		// confirm the match is between specified dates - inclusive
+		if (record_date < criteria_->from_date || record_date > criteria_->to_date) {
+			return false;
+		}
+	}
+	// Now refine by band - confirm if the record is on that band
+	if (criteria_->band != "Any" && criteria_->band != record->item("BAND")) {
+		return false;
+	}
+	// Refine by mode - confirm if the record has that mode (converted to DXCC modes PHONE, CW, DATA)
+	if (criteria_->mode != "Any" && criteria_->mode == record->item("MODE")) {
+		return false;
+	}
+	// Refine by eQSL card - confirm if eQSL confirmation
+	if (criteria_->confirmed_eqsl && record->item("EQSL_QSL_RCVD") != "Y") {
+		return false;
+	}
+	// Refine by LotW - confirm if LotW confirmation
+	if (criteria_->confirmed_eqsl && record->item("LOTW_QSL_RCVD") != "Y") {
+		return false;
+	}
+	// Refine by card - confirm if card confirmation
+	if (criteria_->confirmed_card && record->item("QSL_RCVD") != "Y") {
+		return false;
+	}
+	return true;
+}
+
+// item matching - string
+bool book::match_string(string test, bool is_regex, string value) {
+	if (is_regex) {
+		basic_regex<char> regex(to_upper(test));
+		return regex_match(to_upper(value), regex);
+	}
+	else {
+		return (to_upper(test) == to_upper(value));
+	}
+}
+
+// item matching - integer
+bool book::match_int(string test, string value) {
+	try {
+		return (test.length() > 0 && value.length() > 0 && stoi(test) == stoi(value));
+	} 
+	// Not an integer value so mismatch
+	catch (const invalid_argument&) {
+		return false;
+	}
+
+}
+
+// Returns the position of the next record that matches search criterion
+record_num_t book::search(search_criteria_t* criteria, bool reset_search) {
+	// Save the criteria
+	criteria_ = criteria;
+	record_num_t ix;
+	if (reset_search) {
+		ix = 0;
+	}
+	else {
+		ix = last_search_result_ + 1;
+	}
+	for (; ix < size() && !match_record(get_record(ix, false)); ix++) {}
+	if (ix < size()) {
+		last_search_result_ = ix;
+	}
+	else {
+		last_search_result_ = -1;
+	}
+	return last_search_result_;
+}
+
+// returns the current usage of the book
+object_t book::book_type() { return book_type_; }
+
+// Add the band and mode to the lists of used bands and modes if not already there
+void book::add_band_mode(record* record) {
+	string band = record->item("BAND");
+	if (band == "") {
+		// Get the band from the frequency 
+		double freq = 0.0;
+		record->item("FREQ", freq);
+		band = spec_data_->band_for_freq(freq);
+		record->item("BAND", band);
+	}
+	if (band.length()) {
+		used_bands_.insert(band);
+	}
+	string mode = record->item("MODE");
+	if (mode.length()) {
+		used_modes_.insert(mode);
+	}
+	string submode = record->item("SUBMODE");
+	if (!submode.length()) {
+		submode = record->item("MODE");
+	}
+	if (submode.length()) {
+		used_submodes_.insert(submode);
+	}
+}
+
+// get used bands
+set<string>& book::used_bands() { return used_bands_; }
+
+// get used modes
+set<string>& book::used_modes() { return used_modes_; }
+
+// get used submodes
+set<string>& book::used_submodes() { return used_submodes_;  }
+
+// Returns true if in incomplete new_record
+bool book::modified_record() { return modified_record_; }
+
+// Set entering record
+void book::modified_record(bool value) { 
+	modified_record_ = value;
+}
+
+// Returns true if a new record being entered
+bool book::new_record() { return new_record_; }
+
+// Set save_enabled_ (and save if modified)
+void book::enable_save(bool enable) {
+	save_enabled_ = enable;
+#ifndef _DEBUG
+	if (enable && !read_only_) {
+		store_data();
+	}
+#endif
+}
+
+// Return value of save_enabled_
+bool book::save_enabled() {
+	return save_enabled_;
+}
+
+// Check duplicates - restart set after a query to confirm it's a duplicate
+void book::check_dupes(bool restart) {
+	if (restart) {
+		duplicate_item_ = 0;
+		status_->progress(size(), book_type(), "duplicates checked");
+		status_->misc_status(ST_NOTE, "DUPE_CHECK: Checking started");
+		inhibit_view_update_ = true;
+	}
+	bool possible = FALSE;
+	for (; duplicate_item_ < size() - 1 && !possible;) {
+		// Get adjacent records
+		record_num_t record_num_1 = record_number(duplicate_item_);
+		record_num_t record_num_2 = record_number(duplicate_item_ + 1);
+		record* record_1 = get_record(duplicate_item_, true);
+		record* record_2 = get_record(duplicate_item_ + 1, false);
+		status_->progress(duplicate_item_);
+		match_result_t match = record_1->match_records(record_2);
+		switch (match) {
+		case MT_NOMATCH:
+		case MT_SWL_NOMATCH:
+		case MT_SWL_MATCH:
+			duplicate_item_++;
+			// Do nothing
+			break;
+		case MT_EXACT:
+			// Delete second occurence after query
+			match_question_ = "These appear to be duplicates - select one to delete";
+			selection(record_num_1, HT_DUPE_QUERY, nullptr, record_num_2);
+			possible = true;
+			break;
+		default:
+			// Open QSO query 
+			match_question_ = "Possible duplicate record found";
+			selection(record_num_1, HT_DUPE_QUERY, nullptr, record_num_2);
+			possible = true;
+			break;
+		}
+	}
+	if (!possible) {
+		status_->misc_status(ST_OK, "DUPE CHECK: Complete");
+		inhibit_view_update_ = false;
+		selection(size() - 1, HT_ALL);
+	}
+	else {
+		// Activate record view
+		tabbed_view_->activate_pane(OT_RECORD, true);
+	}
+}
+
+// Handle duplicate action - KEEP_LOG or KEEP_DUPE - delete it
+void book::reject_dupe(bool use_dupe) {
+	if (use_dupe) {
+		selection(duplicate_item_, HT_DUPE_DELETED);
+	}
+	else {
+		selection(duplicate_item_ + 1, HT_DUPE_DELETED);
+	}
+	char message[128];
+	snprintf(message, 128, "DUPE CHECK: Checked record %s deleted", get_record()->item("CALL").c_str());
+	status_->misc_status(ST_WARNING, message);
+	delete_record(true);
+}
+
+// Handle duplicate action - MERGE_DUPE - merge and delete it
+void book::merge_dupe() {
+	record_num_t curr_record = record_number(duplicate_item_);
+	record_num_t dupe_record = record_number(duplicate_item_ + 1);
+	get_record(duplicate_item_, false)->merge_records(get_record(duplicate_item_ + 1, false));
+	selection(dupe_record, HT_DUPE_DELETED);
+	char message[128];
+	snprintf(message, 128, "DUPE CHECK: Checked record %s merged && deleted", get_record(duplicate_item_ + 1, false)->item("CALL").c_str());
+	status_->misc_status(ST_WARNING, message);
+	delete_record(true);
+}
+
+// Handle duplicate action - KEEP_BOTH - ignore and restart check
+void book::accept_dupe() {
+	char message[128];
+	snprintf(message, 128, "DUPE CHECK: Checked record %s not duplicate", get_record(duplicate_item_ + 1, false)->item("CALL").c_str());
+	status_->misc_status(ST_WARNING, message);
+}
+
+// Returns the reason record view has been activated - used by record view to prompt the user
+string book::match_question() {
+	return match_question_;
+}
+
+// Opens a text editor to allow the header comment to be edited
+void book::edit_header() {
+	status_->misc_status(ST_NOTE, "MISC: Editting header comment");
+	// Now read it into the text buffer
+	Fl_Text_Buffer* buffer = new Fl_Text_Buffer;
+	// Window to display the text editor and Save and Cancel buttons
+	Fl_Window* win = new Fl_Window(640, 480);
+	win->label("Header comment");
+	// Save button
+	Fl_Button* bn_save = new Fl_Button(GAP, GAP, WBUTTON, HBUTTON, "Save");
+	bn_save->callback(cb_close_edith, (void*)this);
+	bn_save->labelfont(FONT);
+	bn_save->labelsize(FONT_SIZE);
+	// Cancel button
+	Fl_Button* bn_cncl = new Fl_Button(GAP + WBUTTON + GAP, GAP, WBUTTON, HBUTTON, "Cancel");
+	bn_cncl->callback(cb_cancel_edith, (void*)this);
+	bn_cncl->labelfont(FONT);
+	bn_cncl->labelsize(FONT_SIZE);
+	// Text editor
+	Fl_Text_Editor* editor = new Fl_Text_Editor(GAP, HBUTTON + 2 * GAP, 640 - 2 * GAP, 480 - 3 * GAP - HBUTTON);
+	editor->buffer(buffer);
+	editor->wrap_mode(Fl_Text_Display::WRAP_AT_BOUNDS, 0);
+	editor->textfont(FL_COURIER);
+	editor->textsize(12);
+	if (header_) {
+		// Edit the header
+		editor->buffer()->insert(0, header_->header().c_str());
+	}
+	else {
+		// New header
+		editor->buffer()->insert(0, "Type header here....");
+	}
+	// Allow editor to resize with window
+	win->resizable(editor);
+	// Close X button uses same callback as cancel
+	win->callback(cb_close_edith, (void*)this);
+	win->end();
+	win->show();
+	// Add the display to the main window to delete it if the main window is deleted first.
+	add_sub_window(win);
+}
+
+// Call back to save the new header value
+void book::cb_close_edith(Fl_Widget* w, void* v) {
+	// Find the parent window of the widget (which may itself be the parent)
+	Fl_Window* win = w->window();
+	if (win == nullptr) win = (Fl_Window*)w;
+	Fl_Text_Editor* editor = nullptr;
+	// Look at each child of the window until we find that is a text editor
+	for (int i = 0; i < win->children() && editor == nullptr; i++) {
+		editor = dynamic_cast<Fl_Text_Editor*>(win->child(i));
+	}
+	// If we do find a text editor update the header from its current text
+	if (editor) {
+		book* that = (book*)v;
+		if (!that->header_) {
+			that->header_ = new record();
+		}
+		that->header_->header(string(editor->buffer()->text()));
+		that->modified(true);
+	}
+	menu_->enable(true);
+	status_->misc_status(ST_OK, "MISC: Editting header comment - Done!");
+	Fl_Window::default_callback(win, v);
+}
+
+// Call back to cancel the new header edit
+void book::cb_cancel_edith(Fl_Widget* w, void* v) {
+	status_->misc_status(ST_OK, "MISC: Editting header comment - Cancelled!");
+	Fl_Window::default_callback(w->window(), v);
+}
+
+// Return delete in progress - used to disable menu items
+bool book::delete_enabled() {
+	if (delete_in_progress_) {
+		return false;
+	}
+	else {
+		return true;
+	}
+}

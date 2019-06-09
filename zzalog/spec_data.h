@@ -1,0 +1,253 @@
+#ifndef __ADIF_DATA__
+#define __ADIF_DATA__
+
+#include "record.h"
+
+#include <vector>
+#include <string>
+#include <map>
+#include <set>
+#include <regex>
+#include <fstream>
+#include <ostream>
+
+#include <FL/Fl_Choice.H>
+
+using namespace std;
+
+namespace zzalog {
+
+	// File type
+	enum adif_format_t {
+		FT_NONE,             // no file loaded
+		FT_ADI,              // .adi
+		FT_ADX,              // .adx
+		FT_MIXED             // both .adx and .adi
+	};
+
+	// validation status for each check
+	enum error_t {
+		VE_OK,                         // No problem
+		VE_TYPE_UNKNOWN,               // Datatype or enumeration type not known
+		VE_FIELD_UNKNOWN,              // Field name is not known
+		VE_FIELD_INPUT_ONLY,           // Field is import only - to be modified
+		VE_FIELD_UNSUPPORTED,          // Field cannot yet be validated
+		VE_VALUE_INPUT_ONLY,           // value is Import Only - to be modified
+		VE_VALUE_OUT_OF_RANGE,         // value is < minimum or > maximum values
+		VE_VALUE_FORMAT_ERROR,         // value is not formatted correctly for data type
+		VE_VALUE_FORMAT_WARNING,       // string value does not have the recommended format
+		VE_VALUE_INVALID,              // enumeration value is not valid 
+		VE_VALUE_NOT_RECOMMENDED,      // string value not recommended for interoperability
+		VE_VALUE_INCOMPATIBLE,         // string value is incompatible with another field
+		VE_VALUE_OUTDATED,             // string value has been removed from valid list
+		VE_VALUE_MULTILINE,            // string value includes \n and \r when not multiline
+		VE_VALUE_INTL,                 // string value includes non-ASCII characters
+		VE_VALUE_UNCHECKABLE,          // string value cannot be checked for compatibility
+		VE_TOP                         // last element in enumerated type
+	};
+
+	// regular expressions used in validation
+	const basic_regex<char> REGEX_ADIF_VERSION("[0-9]\\.[0-9]\\.[0-9]");
+	// One of Y, y, N, n
+	const basic_regex<char> REGEX_BOOLEAN("[YyNn]");
+	// A signed number with an optional decimal point
+	const basic_regex<char> REGEX_NUMERIC("-?([0-9]*(.?[0-9]*)|[0-9]+)");
+	// Valid date - YYYYMMDD from 1930
+	const basic_regex<char> REGEX_DATE("(19[0-9]{2}|[2-9][0-9]{3})(0[1-9]|1[0-2])(0[1-9]|[1-2][0-9]|3[01])");
+	// Valid Time - HHMM or HHMMSS
+	const basic_regex<char> REGEX_TIME("([01][0-9]|2[0-3])[0-5][0-9]([0-5][0-9]){0,1}");
+	// A sequence of ASCII characters
+	const basic_regex<char> REGEX_STRING("[\\x20-\\x7E]+");
+	// Sequence of Character + CR/LF
+	const basic_regex<char> REGEX_MULTILINE("([\\x20-\\x7E]|\\x0d\\x0a)+");
+	// Sequence of Character + CR/LF
+	const basic_regex<char> REGEX_BAD_MULTILINE("([\\x20-\\x7E]|\\x0d|\\x0a)+");
+	// A sequence of IntlCharacter (UTF-8) 
+	const basic_regex<char> REGEX_INTL_STRING("([\\xF0-\\xFF][\\x80-\\xBF]{3}|[\\xE0-\\xEF][\\x80-\\xBF]{2}|[\\xC0-\\xDF][\\x80-\\xBF]|[\\x20-\\x7F]|[\\x80-\\xBF])+");
+	// A single IntlCharacter (UTF-8) 
+	const basic_regex<char> REGEX_INTL_CHAR("[\\xF0-\\xFF][\\x80-\\xBF]{3}|[\\xE0-\\xEF][\\x80-\\xBF]{2}|[\\xC0-\\xDF][\\x80-\\xBF]|[\\x20-\\x7F]|[\\x80-\\xBF]");
+	// Sequence of IntlCharacter (UTF-8) plus CR/LF
+	// const basic_regex<char> REGEX_INTL_MULTILINE("([\\x20-\\x7F]|[\\x80-\\xBF]|\\x0d\\x0a)+");
+	const basic_regex<char> REGEX_INTL_MULTILINE("([\\xF0-\\xFF][\\x80-\\xBF]{3}|[\\xE0-\\xEF][\\x80-\\xBF]{2}|[\\xC0-\\xDF][\\x80-\\xBF]|[\\x20-\\x7F]|[\\x80-\\xBF]|\\x0d\\x0a)+");
+	const basic_regex<char> REGEX_BAD_INTL_MULTILINE("([\\xF0-\\xFF][\\x80-\\xBF]{3}|[\\xE0-\\xEF][\\x80-\\xBF]{2}|[\\xC0-\\xDF][\\x80-\\xBF]|[\\x20-\\x7F]|[\\x80-\\xBF]|\\x0d|\\x0a)+");
+	// XDDD MM.MMM   X = NESW, DDD 0->180, MM.MMM 00.000->59.999
+	const basic_regex<char> REGEX_LAT_LONG("[NESWnesw](0[0-9][0-9]|1[0-7][0-9]|180) [0-5][0-9]\\.[0-9]{3}");
+	// A signed integer
+	const basic_regex<char> REGEX_POS_INTEGER("[0-9]+");
+	// 2- 4- 6- or 8- character maidenhead locator
+	const basic_regex<char> REGEX_GRIDSQUARE("[a-rA-R]{2}(|[0-9]{2}(|[a-xA-X]{2}(|[0-9]{2})))");
+	// A signed integer
+	const basic_regex<char> REGEX_INTEGER("-?[0-9]+");
+	// CC-XXX - CC is a valid Continent, XXX is a valid number 000-999
+	const basic_regex<char> REGEX_IOTA("[A-Za-z]{2}-[0-9]{3}");
+	// A single decimal digit
+	const basic_regex<char> REGEX_DIGIT("[0-9]");
+	// A single non-control ASCII character
+	const basic_regex<char> REGEX_CHAR("[\\x20-\\x7E]");
+	// D/RR-XXX - D is a country id (nickname), RR is two letter range ID, XXX is a three digit summit ID
+	const basic_regex<char> REGEX_SOTA("[A-Za-z0-9]{1,3}/[A-Za-z]{2}-[0-9]{3}");
+
+	// Reference dataset - data structure
+	struct spec_dataset {
+		// Names of the columns in the data set
+		vector<string> column_names;
+		// The data records - map from first data item to a map of column names to other data items
+		map<string, map<string, string>* > data;
+		spec_dataset() {
+			column_names.clear();
+			data.clear();
+		}
+	};
+
+	// This class provides the ADIF specification reference database as a set of named datasets. 
+	// It provides the access to the database and methods to validate the ADIF data against the specification
+	// The database is a map of the dataset name to a dataset
+	class spec_data : public map<string, spec_dataset*>
+	{
+	public:
+
+	public:
+		spec_data();
+		~spec_data();
+
+		// public methods
+	public:
+		// load the data
+		bool load_data(bool force);
+		// Get the DXCC award mode for a particulat ADIF mode
+		string dxcc_mode(string mode);
+		// Get the ADIF mode for a submode
+		string mode_for_submode(string submode);
+		// Get the band for a specific frequency
+		string band_for_freq(double frequency);
+		// Get the Lower frequency for a band
+		double freq_for_band(string sBand);
+		// Get mode/submode for a particular mode
+		bool is_submode(string mode);
+		// Get DataSet
+		spec_dataset* dataset(string name);
+		// Get Adif Vesrions
+		string adif_version();
+		// Get sorted list of field names
+		set<string>* sorted_fieldnames();
+		// Add user defined fields - returns TRUE if a new one.
+		bool add_userdef(int id, const string& name, char indicator, string& values);
+		// Get data type indicator
+		char datatype_indicator(string& field_name);
+		// Get list or range
+		string userdef_values(string& field_name);
+		// Add application defined field
+		bool add_appdef(const string& name, char indicator);
+		// Initialise this app's app-specific fieldnames
+		void add_my_appdefs();
+		// Remove existing user defined fields
+		void delete_userdefs();
+		void delete_appdefs();
+		// Return true if field is a user defined one.
+		bool is_userdef(string field_name);
+		// Get data type from indicator
+		string datatype(char indicator);
+		// Get data type from field name
+		string datatype(string field_name);
+		// Get enumeration name
+		string enumeration_name(string& field, record* record);
+		// The DXCC has ADIF defined primary administrative districts
+		bool has_states(string dxcc_name);
+		// Set it
+		void set_has_states(string dxcc_name);
+		// Validate a record - returns TRUE if record corrected
+		bool validate(record* record, record_num_t number);
+		// Validate the data in the field
+		bool validate(const string&  field_name, const string& data, bool inhibit_report = false);
+		// initialise the choice widget with the ADIF filed names
+		void initialise_field_choice(Fl_Choice* ch, const string dataset_name = "Fields");
+		// Set the loaded filename
+		void loaded_filename(string value);
+		// Get tip for the field and data
+		string get_tip(const string& field, record* record);
+		// Get tip for just the field
+		string get_tip(const string& field);
+		// User wants to continue
+		bool do_continue();
+		// Reset continue flag
+		void reset_continue();
+
+		// protected methods
+	protected:
+		string get_path(bool force);
+		// Sort filed names
+		void process_fieldnames();
+		// Check the data is the correct format for the field either against a regex for specific datatypes
+		error_t check_format(const string&  data, const string&  field, const string&  datatype, const basic_regex<char>& pattern);
+		// Check that data is in the correct value range
+		error_t check_string(const string&  data, const string&  field, const string&  datatype);
+		// Check the data is between to non-integer minimum and maximum values
+		error_t check_number(const string&  data, const string&  field, const string&  datatype);
+		// Check the data is between two integer minimum and maximum values
+		error_t check_integer(const string&  data, const string&  field, const string&  datatype);
+		// Check that an enumeration is valid
+		error_t check_enumeration(const string& data, const string& field, const string& datatype);
+		// Check that the data is a separated list of the specified datatype/enumeration
+		error_t check_list(const string&  data, const string&  field, const string&  datatype, bool bIsEnumeration, char cSeparator);
+		// Check that the data is the specified datatype/enumeration
+		error_t check_datatype(const string&  data, const string&  field, const string&  datatype, bool bIsEnumeration);
+		// Check that time is valid
+		error_t check_time(const string& data, const string& field);
+		// Handle a validation error
+		void handle_error(error_t error_code, const string&  data, const string&  datatype, const string&  field);
+		// Report validation error
+		void report_error(error_t error_code, const string&  data, const string&  datatype, const string&  field);
+		// Auto-correct error returns TRUE if successful
+		bool auto_correction(error_t error_code, const string&  data, const string& sDisplayData, const string&  datatype, const string&  field);
+		// User-correct error 
+		bool ask_correction(const string& field);
+		// Report correction
+		void report_correction(const string&  field, const string&  data);
+		// Remove CR and LF characters
+		string convert_ml_string(const string& data);
+		// Generate report timestamp and fault
+		string report_timestamp(string field, string data);
+		// protected attributes
+	protected:
+		// ADIF Version
+		string adif_version_;
+		// List of Fieldnames
+		set<string> field_names_;
+		// Array of user defs
+		vector<string> userdef_names_;
+		// List of app defs (not in reference)
+		set<string> appdef_names_;
+		// List of DXCCs that have states
+		set<string> dxccs_with_states_;
+		// Quick lookup of datatype indicator
+		map<string, char> datatype_indicators_;
+		// Missing file already reported
+		bool error_reported_;
+		// Correction message
+		string correction_message_;
+		// User or auto corrected
+		bool field_corrected_;
+		// Error message
+		string error_message_;
+		// Record
+		record* record_;
+		// Saved record
+		record* saved_record_;
+		// Record number
+		record_num_t record_number_;
+		// Number of validation errors
+		int error_count_;
+		int error_record_count_;
+		int record_count_;
+		bool record_corrected_;
+		// Inhibit report
+		bool inhibit_error_report_;
+		// Loaded filename
+		string loaded_filename_;
+		// Abandon validate 
+		bool abandon_validation_;
+
+	};
+
+}
+#endif
