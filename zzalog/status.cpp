@@ -160,7 +160,7 @@ status::status(int X, int Y, int W, int H, const char * label) :
 	}
 
 	// Try to open the file.
-	report_file_ = new ofstream(report_filename_, ios::out);
+	report_file_ = new ofstream(report_filename_, ios::out | ios::app);
 	if (!report_file_->good()) {
 		delete report_file_;
 		report_file_ = nullptr;

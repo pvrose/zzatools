@@ -82,6 +82,11 @@ namespace zzalog {
 	{ "Radio &Disconnected", 0, menu::cb_mi_log_mode, (void*)(LM_RADIO_DISC), FL_MENU_RADIO },
 	{ "&Import", 0, menu::cb_mi_log_mode, (void*)(LM_IMPORTED), FL_MENU_RADIO },
 	{ 0 },
+	{ "&Use View", 0, 0, 0, FL_SUBMENU | FL_MENU_DIVIDER },
+	{ "Main &Log", 0, menu::cb_mi_log_view, (void*)(OT_MAIN), FL_MENU_RADIO | FL_MENU_VALUE },
+	{ "&Report View", 0, menu::cb_mi_log_view, (void*)(OT_REPORT), FL_MENU_RADIO  },
+	{ "&Scratchpad", 0, menu::cb_mi_log_view, (void*)(OT_SCRATCH), FL_MENU_RADIO  },
+	{ 0 },
 	{ "&New record", 0, menu::cb_mi_log_new, nullptr },
 	{ "&Save record", 0, menu::cb_mi_log_save, nullptr },
 	{ "&Cancel", 0, menu::cb_mi_log_del, (void*)false },
@@ -230,6 +235,8 @@ menu::menu(int X, int Y, int W, int H, const char* label) :
 	// This will get set to either ON_AIR or IMPORT if a rig gets connected depending on whether the rig is in a digital mode.
 	logging(LM_OFF_AIR);
 	criteria_ = nullptr;
+	Fl_Preferences spad_settings(settings_, "Scratchpad");
+	spad_settings.get("Edit view", (int&)editting_view_, OT_REPORT);
 	show();
 }
 
@@ -237,6 +244,8 @@ menu::menu(int X, int Y, int W, int H, const char* label) :
 menu::~menu()
 {
 	clear();
+	Fl_Preferences spad_settings(settings_, "Scratchpad");
+	spad_settings.set("Edit view", editting_view_);
 }
 
 // Dummy callback as place-holder for unimplemented menu items
@@ -719,6 +728,13 @@ void menu::cb_mi_log_mode(Fl_Widget* w, void* v) {
 	}
 }
 
+// Log->Use View->
+// v is which view
+void menu::cb_mi_log_view(Fl_Widget* w, void* v) {
+	menu* that = ancestor_view<menu>(w);
+	that->editting_view_ = (object_t)(long)v;
+}
+
 // Log->New - start a new record
 // v is not used
 void menu::cb_mi_log_new(Fl_Widget* w, void* v) {
@@ -728,7 +744,18 @@ void menu::cb_mi_log_new(Fl_Widget* w, void* v) {
 	// Create a new record - on or off-air
 	book_->new_record(that->logging());
 	// Open log view
-	tabbed_view_->activate_pane(OT_RECORD, true);
+	switch (that->editting_view_) {
+	case OT_MAIN:
+	case OT_RECORD:
+		tabbed_view_->activate_pane(that->editting_view_, true);
+		break;
+	case OT_SCRATCH:
+		if (!scratchpad_) {
+			add_scratchpad();
+		}
+		scratchpad_->show();
+		break;
+	}
 }
 
 
@@ -1506,6 +1533,9 @@ void menu::update_items() {
 		int index_ref = find_index("&Reference");
 		int index_rep = find_index("Re&port");
 		int index_info = find_index("&Information");
+		int index_use_log = find_index("&Log/&Use View/Main &Log");
+		int index_use_form = find_index("&Log/&Use View/&Report View");
+		int index_use_spad = find_index("&Log/&Use View/&Scratchpad");
 		// Enable/Disable save 
 		if (modified) {
 			mode(index_save, mode(index_save) & ~FL_MENU_INACTIVE);
@@ -1607,6 +1637,24 @@ void menu::update_items() {
 		}
 		else {
 			mode(index_spad, mode(index_spad) & ~FL_MENU_VALUE);
+		}
+		// Editting view
+		switch (editting_view_) {
+		case OT_MAIN:
+			mode(index_use_log, mode(index_use_log) | FL_MENU_VALUE);
+			mode(index_use_form, mode(index_use_form) & ~FL_MENU_VALUE);
+			mode(index_use_spad, mode(index_use_spad) & ~FL_MENU_VALUE);
+			break;
+		case OT_REPORT:
+			mode(index_use_log, mode(index_use_log) & ~FL_MENU_VALUE);
+			mode(index_use_form, mode(index_use_form) | FL_MENU_VALUE);
+			mode(index_use_spad, mode(index_use_spad) & ~FL_MENU_VALUE);
+			break;
+		case OT_SCRATCH:
+			mode(index_use_log, mode(index_use_log) & ~FL_MENU_VALUE);
+			mode(index_use_form, mode(index_use_form) & ~FL_MENU_VALUE);
+			mode(index_use_spad, mode(index_use_spad) | FL_MENU_VALUE);
+			break;
 		}
 		// Update logging commands and rig status
 		logging(logging());

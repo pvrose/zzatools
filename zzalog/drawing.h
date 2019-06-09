@@ -23,6 +23,7 @@ namespace zzalog {
 		OT_ADIF,             // ADIF specification (data & view)
 		OT_REPORT,           // Report view (view)
 		OT_BAND,             // Band-plan data
+		OT_SCRATCH,          // Scratchpad 
 		OT_DXATLAS           // DxAtlas control view
 	};
 

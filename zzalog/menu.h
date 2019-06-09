@@ -66,6 +66,8 @@ namespace zzalog {
 		static void cb_mi_log_dupes(Fl_Widget* w, void* v);
 		// Log->Scrathpad
 		static void cb_mi_log_spad(Fl_Widget* w, void* v);
+		// Log->New View->Main,Record,Scratchpad
+		static void cb_mi_log_view(Fl_Widget* w, void* v);
 		// Log->Change->Rig/Aerial/QTH
 		static void cb_mi_oper_change(Fl_Widget* w, void* v);
 		// Log->Set->Rig/Aerial/QTH
@@ -137,6 +139,8 @@ namespace zzalog {
 		search_criteria_t* criteria_;
 		// Enabled
 		bool active_enabled_;
+		// Current logging view
+		object_t editting_view_;
 
 	};
 
