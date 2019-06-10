@@ -150,6 +150,7 @@ int pfx_dlg_table::clicks() { return last_clicks_; }
 pfx_dialog::pfx_dialog() :
 	win_dialog(500, 200, "Prefix Selection")
 {
+	prefixes_ = nullptr;
 
 	// output field to display callsign
 	int curr_x = EDGE;

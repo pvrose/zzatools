@@ -51,7 +51,6 @@ bool specx_reader::load_data(spec_data* data, istream& in, string& version) {
 		version = adif_version_;
 		data->erase("Primary_Administrative_Subdivision");
 		data->erase("Secondary_Administrative_Subdivision");
-		data->erase("Submode");
 		fl_cursor(FL_CURSOR_DEFAULT);
 		return true;
 	}
@@ -369,10 +368,6 @@ bool specx_reader::end_record() {
 	else if (dataset_name_.length() >= 36 && dataset_name_.substr(0, 36) == "Secondary_Administrative_Subdivision") {
 		string this_code = record_data_->at("DXCC Entity Code");
 		dataset_name_ = "Secondary_Administrative_Subdivision[" + this_code + "]";
-	}
-	else if (dataset_name_.length() >= 7 && dataset_name_.substr(0, 7) == "Submode") {
-		string this_code = record_data_->at("Mode");
-		dataset_name_ = "Submode[" + this_code + "]";
 	}
 	spec_dataset* dataset = (*data_)[dataset_name_];
 	if (dataset == nullptr) {

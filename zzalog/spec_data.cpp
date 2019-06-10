@@ -215,7 +215,7 @@ string spec_data::dxcc_mode(string mode) {
 // Get the ADIF mode for a submode
 string spec_data::mode_for_submode(string submode) {
 	// Get the Submode dataset
-	spec_dataset* table = dataset("Submode");
+	spec_dataset* table = dataset("Submode[" + submode + ']');
 	auto it = table->data.find(submode);
 	if (it != table->data.end()) {
 		// If there's an entry for this mode return the Mode field
@@ -264,9 +264,8 @@ double spec_data::freq_for_band(string band) {
 // Is a particulat mode a submode of another mode?
 bool spec_data::is_submode(string mode) {
 	// Get the Submode dataset
-	spec_dataset* table = dataset("Submode");
-	auto it = table->data.find(mode);
-	if (it != table->data.end()) {
+	string submode = "Submode[" + mode + ']';
+	if (find (submode) != end()) {
 		// If there's an entry return that it's a submode
 		return true;
 	}
@@ -441,10 +440,13 @@ string spec_data::userdef_values(string& field_name) {
 		}
 		if (it_field->second->at("Data Type") == "Number") {
 			// Build up min:max range
-			string min_value = it_field->second->at("Minimum Value");
-			string max_value = it_field->second->at("Maximum Value");
-			if (min_value.length() > 0 || max_value.length() > 0) {
-				return min_value + ':' + max_value;
+			string min_value = "";
+			if (it_field->second->find("Minimum Value") != it_field->second->end()) {
+				min_value = it_field->second->at("Minimum Value");
+			}
+			string max_value = "";
+			if (it_field->second->find("Maximum Value") != it_field->second->end()) {
+				max_value = it_field->second->at("Maximum Value");
 			}
 		}
 	}
@@ -464,7 +466,10 @@ bool spec_data::add_appdef(const string& name, char indicator) {
 		string data_type = it_field->second->at("Data Type");
 		auto it_data_type = data_types->data.find(data_type);
 		// Get its existing type indicator and check it's the same or not empty
-		string indicator_value = it_data_type->second->at("Data Type Indicator");
+		string indicator_value = "";
+		if (it_data_type->second->find("Data Type Indicator") != it_data_type->second->end()) {
+			indicator_value = it_data_type->second->at("Data Type Indicator");
+		}
 		if (indicator_value.length() > 0 && indicator != ' ' && indicator_value[0] != indicator) {
 			char message[256];
 			sprintf(message, "SPEC: Application defined field %s attempted to redefine data type from %s to %c", name.c_str(), indicator_value.c_str(), indicator);
@@ -648,11 +653,16 @@ string spec_data::enumeration_name(string& field_name, record* record) {
 		if (it_field->second->at("Data Type") == "Enumeration") {
 			// And if it's an enumeration - get the enumeration name
 			string enumeration_name = it_field->second->at("Enumeration");
-			int open = enumeration_name.find('[');
-			if (open != string::npos) {
-				int close = enumeration_name.find(']');
-				string index = enumeration_name.substr(open + 1, close - open - 1);
-				enumeration_name = enumeration_name.substr(0, open) + '[' + record->item(index) + ']';
+			if (enumeration_name.substr(0, 7) != "Submode") {
+				int open = enumeration_name.find('[');
+				if (open != string::npos) {
+					int close = enumeration_name.find(']');
+					string index = enumeration_name.substr(open + 1, close - open - 1);
+					enumeration_name = enumeration_name.substr(0, open) + '[' + record->item(index) + ']';
+				}
+			}
+			else {
+				enumeration_name = "Submode";
 			}
 			if (dataset(enumeration_name) != nullptr) {
 				// A dataset exists for just the enumeration name
@@ -702,10 +712,14 @@ error_t spec_data::check_number(const string&  data, const string&  field, const
 	}
 	// Get the ADIF field parameters. Minimum and Maximum values - uses largest +/- value if blank
 	map<string, string>* fields = dataset("Fields")->data.at(field);
-	string minimum = fields->at("Minimum Value");
-	double min_value = (minimum == "") ? -DBL_MAX : stod(minimum);
-	string maximum = fields->at("Maximum Value");
-	double max_value = (maximum == "") ? DBL_MAX : stod(maximum);
+	double min_value = -DBL_MAX;
+	if (fields->find("Minimum Value") != fields->end()) {
+		min_value = stod(fields->at("Minimum Value"));
+	}
+	double max_value = DBL_MAX;
+	if (fields->find("Maximum Value") != fields->end()) {
+		max_value = stod(fields->at("Maximum Value"));
+	}
 	// Check the value is within range
 	if (data_value >= min_value && data_value <= max_value) {
 		// It is - OK
@@ -800,10 +814,14 @@ error_t spec_data::check_integer(const string&  data, const string&  field, cons
 	}
 	// Get the ADIF field parameters. Minimum and Maximum values - uses largest +/- value if blank
 	map<string, string>* fields = dataset("Fields")->data.at(field);
-	string minimum = fields->at("Minimum Value");
-	int min_value = (minimum == "") ? MININT : stoi(minimum);
-	string maximum = fields->at("Maximum Value");
-	int max_value = (maximum == "") ? MAXINT : stoi(maximum);
+	int min_value = MININT;
+	if (fields->find("Minimum Value") != fields->end()) {
+		min_value = stoi(fields->at("Minimum Value"));
+	}
+	int max_value = MAXINT;
+	if (fields->find("Maximum Value") != fields->end()) {
+		max_value = stoi(fields->at("Maximum Value"));
+	}
 	// Check the value is in range
 	if (data_value >= min_value && data_value <= max_value) {
 		// It is - OK
@@ -843,7 +861,7 @@ error_t spec_data::check_enumeration(const string& data, const string& field, co
 				return VE_OK;
 			}
 			else {
-				// Get the band edges
+				// Get the band edges - these must be coded so let except if not
 				string lower_edge = fields->at("Lower Freq (MHz)");
 				string upper_edge = fields->at("Upper Freq (MHz)");
 				double lower_value = stod(lower_edge);
@@ -1093,8 +1111,7 @@ error_t spec_data::check_datatype(const string&  data, const string&  field, con
 		if (enumeration_data->data.find(data) != enumeration_data->data.end()) {
 			map<string, string>* enumeration_record = enumeration_data->data.at(data);
 			// Check it's not marked "Import Only" or deleted
-			string import_only = enumeration_record->at("Import-only");
-			if (import_only == "") {
+			if (enumeration_record->find("Import-only") == enumeration_record->end()) {
 				// Not Import Only
 				if (enumeration_record->find("Deleted Date") != enumeration_record->end()) {
 					string deleted_date = enumeration_record->at("Deleted Date");
@@ -1128,10 +1145,16 @@ error_t spec_data::check_datatype(const string&  data, const string&  field, con
 		if (datatypes_set->data.find(datatype) != datatypes_set->data.end()) {
 			map<string, string>* datatype_record = datatypes_set->data.at(datatype);
 			// First check that it's not import only
-			string import_only = datatype_record->at("Import-only");
+			string import_only = "";
+			if (datatype_record->find("Import-only") != datatype_record->end()) {
+				import_only = datatype_record->at("Import-only");
+			};
 			if (import_only == "") {
 				// check those with a Data Type Indicator as most likely types
-				string indicator = datatype_record->at("Data Type Indicator");
+				string indicator = "";
+				if (datatype_record->find("Data Type Indicator") != datatype_record->end()) {
+					indicator = datatype_record->at("Data Type Indicator");
+				}
 				if (indicator.length() == 1) {
 					error_t error;
 					switch (indicator[0]) {
