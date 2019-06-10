@@ -827,8 +827,10 @@ void dxa_if::create_colour_buttons() {
 
 	// Create all buttons
 	button_num = 0;
-	for (int c = 0; c < num_cols && button_num < num_colours; c++) {
-		for (int r = 0; r < num_rows && button_num < num_colours; r++) {
+	int button_todo = num_colours;
+	for (int c = 0; c < num_cols && button_todo > 0; c++) {
+		int num_rows_col = ((button_todo - 1) / (num_cols - c)) + 1;
+		for (int r = 0; r < num_rows_col && button_num < num_colours; r++) {
 			Fl_Box* bn = new Fl_Box(colour_grp_->x() + (c * WBUTTON) + GAP, (r * HBUTTON) + HTEXT + colour_grp_->y(), WBUTTON, HBUTTON);
 			bn->box(FL_BORDER_BOX);
 			bn->labelfont(FONT);
@@ -839,6 +841,7 @@ void dxa_if::create_colour_buttons() {
 			colour_bns_.push_back(bn);
 			colour_grp_->add(bn);
 			button_num++;
+			button_todo--;
 		}
 	}
 	// Now resize the window to just contain the buttons and don't allow the user to resize it smaller
