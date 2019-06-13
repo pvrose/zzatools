@@ -105,7 +105,7 @@ bool book::load_data(string filename)
 				char* message = new char[filename_.length() + 20];
 				sprintf(message, "LOG READ: %s", filename_.c_str());
 				status_->misc_status(ST_NOTE, message);
-				delete message;
+				delete[] message;
 				// Get the filetype suffix from the filename to know which reader to use
 				string filetype;
 				size_t last_period = filename.find_last_of('.');
@@ -439,7 +439,7 @@ void book::remember_record() {
 void book::selection(record_num_t num_item, hint_t hint /* = HT_SELECTED */, view* requester /* = nullptr */, record_num_t num_other /*= 0*/) {
 	record_num_t previous = current_item_;
 	// Special case - -1 indicates no change to the selection
-	if ((signed)num_item != -1) {
+	if ((signed)num_item != -1 && hint != HT_NO_DATA) {
 		current_item_ = num_item;
 		remember_record();
 	}
