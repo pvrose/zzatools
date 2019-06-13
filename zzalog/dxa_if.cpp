@@ -2,7 +2,7 @@
 #ifdef _WIN32
 
 #define _AFXDLL
-#include <afx.h>
+// #include <afx.h>
 
 #include "dxa_if.h"
 
@@ -149,12 +149,12 @@ void dxa_if::create_form() {
 	// Now create the groups
 
 	// Group 1 - DxAtlas controls
-	Fl_Group* grp1 = new Fl_Group(EDGE, EDGE, 10, 10);
-	grp1->box(FL_THIN_DOWN_BOX);
-	grp1->labelfont(FONT);
-	grp1->labelsize(FONT_SIZE);
+	Fl_Group* group1 = new Fl_Group(EDGE, EDGE, 10, 10);
+	group1->box(FL_THIN_DOWN_BOX);
+	group1->labelfont(FONT);
+	group1->labelsize(FONT_SIZE);
 	// Choice - which QSOs to display
-	Fl_Choice* ch11 = new Fl_Choice(grp1->x() + GAP, grp1->y() + HTEXT, WSMEDIT, HTEXT, "QSOs showing");
+	Fl_Choice* ch11 = new Fl_Choice(group1->x() + GAP, group1->y() + HTEXT, WSMEDIT, HTEXT, "QSOs showing");
 	ch11->align(FL_ALIGN_LEFT | FL_ALIGN_TOP);
 	ch11->labelfont(FONT);
 	ch11->labelsize(FONT_SIZE);
@@ -235,7 +235,7 @@ void dxa_if::create_form() {
 	op21->textsize(FONT_SIZE);
 	op21->value(locator_.c_str());
 	op21->box(FL_FLAT_BOX);
-	op21->color(grp1->color());
+	op21->color(group1->color());
 	op21->tooltip("The grid-square of the current home location");
 	locator_op_ = op21;
 	// Output - the latitude of the location
@@ -246,7 +246,7 @@ void dxa_if::create_form() {
 	op22->textsize(FONT_SIZE);
 	op22->value(home_lat_dms_.c_str());
 	op22->box(FL_FLAT_BOX);
-	op22->color(grp1->color());
+	op22->color(group1->color());
 	op22->tooltip("The latitude of the current home location");
 	lat_dms_op_ = op22;
 	// Output - the longitude of the location
@@ -257,16 +257,16 @@ void dxa_if::create_form() {
 	op23->textsize(FONT_SIZE);
 	op23->value(home_long_dms_.c_str());
 	op23->box(FL_FLAT_BOX);
-	op23->color(grp1->color());
+	op23->color(group1->color());
 	op23->tooltip("The longitude of the current home location");
 	lon_dms_op_ = op23;
 
 	// Resize group by size of choices
 	const int WGRP_1 = ch12->x() + ch12->w() + GAP;
 	const int HGRP_1 = max(op21->y() + op21->h(), op23->y() + op23->h()) + GAP;
-	grp1->resizable(nullptr);
-	grp1->size(WGRP_1, HGRP_1);
-	grp1->end();
+	group1->resizable(nullptr);
+	group1->size(WGRP_1, HGRP_1);
+	group1->end();
 	// Size of window
 	const int WWIN = EDGE + WGRP_1 + EDGE;
 

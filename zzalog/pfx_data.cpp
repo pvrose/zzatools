@@ -28,9 +28,16 @@ pfx_data::pfx_data()
 	string filename = get_file(false);
 	pfx_reader* reader = new pfx_reader;
 	// Carry attempting to read the file until successful
-	while (!reader->load_data(*this, filename)) {
-		status_->misc_status(ST_ERROR, "Unable to load prefix reference - please reselect directory!");
-		filename = get_file(true);
+	bool carry_on = true;
+	while (!reader->load_data(*this, filename) && carry_on) {
+		status_->misc_status(ST_ERROR, "PFX_DATA: Unable to load prefix reference - please reselect directory!");
+		if (fl_choice("Do you want to continue!", "Yes", "No", nullptr) == 1) {
+			carry_on = false;
+			status_->misc_status(ST_FATAL, "PFX_DATA: Load cancelled by user");
+		}
+		else {
+			filename = get_file(true);
+		}
 	}
 
 	delete reader;

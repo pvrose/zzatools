@@ -1,0 +1,861 @@
+Id,Name,Nickname,Prefix,CQZone,ITUZone,Continent,Province,Timezone,ValidFrom,ValidUntil,Countries_Code
+1,Capital Territory,VK1,..1,30,59,OC,,Australia/Sydney,1900-01-01,2035-12-31,150
+2,External territories,VK9,"[A-Z][A-Z]9R|[A-Z][A-Z]9[ABD-KOPQS-VYZ]R|[A-Z][A-Z]9[ABD-KOPQS-VYZ].|[A-Z][A-Z]9[ABD-KOPQS-VYZ][ABD-KOPQS-VYZ]|[A-Z][A-Z]9[0-9]",29,58,OC,,Australia/Perth,1900-01-01,2035-12-31,150
+3,New South Wales,VK2,..2,30,59,OC,,,1900-01-01,2035-12-31,150
+4,Northern Territory,VK8,..8,29,55,OC,,Australia/Darwin,1900-01-01,2035-12-31,150
+5,Queensland,VK4,..4,30,55,OC,,,1900-01-01,2035-12-31,150
+6,South Australia,VK5,..5,30,59,OC,,Australia/Adelaide,1900-01-01,2035-12-31,150
+7,Tasmania,VK7,..7,30,59,OC,,Australia/Hobart,1900-01-01,2035-12-31,150
+8,Victoria,VK3,..3,30,59,OC,,Australia/Melbourne,1900-01-01,2035-12-31,150
+9,Western Australia,VK6,..6,29,58,OC,,Australia/Perth,1900-01-01,2035-12-31,150
+10,Alberta,VE6,"V[ABCEGX]6|C[FGJK]6|X[KLM]6",4,2,NA,AB,America/Edmonton,1900-01-01,2035-12-31,1
+11,British Columbia,VE7,"V[ABCEGX]7|C[FGJK]7|X[KLM]7",3,2,NA,BC,,1900-01-01,2035-12-31,1
+12,Labrador,VO2,"V[DO]2|CH2|X[JN]2",2,9,NA,NL,,1900-01-01,2035-12-31,1
+13,Manitoba,VE4,"V[ABCEGX]4|C[FGJK]4|X[KLM]4",4,3,NA,MB,America/Winnipeg,1900-01-01,2035-12-31,1
+14,New Brunswick,VE9,"V[ABCEGX]9|C[FGJK]9|X[KLM]9",5,9,NA,NB,America/Moncton,1900-01-01,2035-12-31,1
+15,Newfoundland,VO1,"V[DO]1|CH1|X[JN]1",5,9,NA,NL,America/St_Johns,1900-01-01,2035-12-31,1
+16,North West Territories,VE8,"V[ABCEGX]8|C[FGJK]8|X[KLM]8",1,0,NA,NT,America/Yellowknife,1900-01-01,2035-12-31,1
+17,Nova Scotia,VE1,"V[ABCEGX]1|C[FGJK]1|X[KLM]1",5,9,NA,NS,,1900-01-01,2035-12-31,1
+18,Nunavut,VY0,"V[FY]0|X[KO]0|CI0",0,0,NA,NU,,1900-01-01,2035-12-31,1
+19,Ontario,VE3,"V[ABCEGX]3|C[FGJK]3|X[KLM]3",4,0,NA,ON,,1900-01-01,2035-12-31,1
+20,Prince Edward I.,VY2,"V[FY]2|X[KO]2|CI2",5,9,NA,PE,America/Halifax,1900-01-01,2035-12-31,1
+21,Quebec,VE2,"V[ABCEGX]2|C[FGJK]2|X[KLM]2",0,0,NA,QC,,1900-01-01,2035-12-31,1
+22,Saskatchewan,VE5,"V[ABCEGX]5|C[FGJK]5|X[KLM]5",4,3,NA,SK,,1900-01-01,2035-12-31,1
+23,Yukon,VY1,"V[FY]1|X[KO]1|CI1",1,2,NA,YT,,1900-01-01,2035-12-31,1
+24,Call Area 1,PY1,..1,11,15,SA,,America/Sao_Paulo,1900-01-01,2035-12-31,108
+25,Call Area 2,PY2,..2,11,15,SA,,America/Sao_Paulo,1900-01-01,2035-12-31,108
+26,Call Area 3,PY3,..3,11,13,SA,,America/Araguaina,1900-01-01,2035-12-31,108
+27,Call Area 4,PY4,..4,11,15,SA,,America/Sao_Paulo,1900-01-01,2035-12-31,108
+28,Call Area 5,PY5,..5,11,15,SA,,America/Sao_Paulo,1900-01-01,2035-12-31,108
+29,Call Area 6,PY6,..6,11,13,SA,,,1900-01-01,2035-12-31,108
+30,Call Area 7,PY7,..7,11,13,SA,,,1900-01-01,2035-12-31,108
+31,Call Area 8,PY8,..8,11,0,SA,,,1900-01-01,2035-12-31,108
+32,Call Area 9,PY9,..9,11,0,SA,,,1900-01-01,2035-12-31,108
+33,"Rowley Shoals, OC-230",VK9[R],"[A-Z][A-Z]9R|[A-Z][A-Z]9[ABD-KOPQS-VYZ]R",29,58,OC,,Australia/Perth,1900-01-01,2035-12-31,150
+34,Espirito Santo,PP1,"PP1|PU1[A-I]|PU1Z[A-I]",11,15,SA,ES,America/Sao_Paulo,1900-01-01,2035-12-31,108
+35,Rio de Janeiro,,"PY1|PU1[J-Y]|PU1Z[J-Y]",11,15,SA,RJ,America/Sao_Paulo,1900-01-01,2035-12-31,108
+36,Distrito Federal,PT2,"PT2|PU2[A-E]|PU2Z[A-E]",11,13,SA,DF,America/Sao_Paulo,1900-01-01,2035-12-31,108
+37,Goias,PP2,"PP2|PU2[FGH]|PU2Z[FGH]",11,13,SA,GO,America/Sao_Paulo,1900-01-01,2035-12-31,108
+38,Sao Paulo,,"PY2|PU2[K-Y]|PU2Z[K-Y]",11,15,SA,SP,America/Sao_Paulo,1900-01-01,2035-12-31,108
+39,Tocantins,PQ2,"PQ2|PU2[IJ]|PU2Z[IJ]",11,13,SA,TO,America/Araguaina,1900-01-01,2035-12-31,108
+40,Rio Grande do Sul,,"PY3|PU3[A-Y]|PU3Z[A-Y]",11,15,SA,RS,America/Sao_Paulo,1900-01-01,2035-12-31,108
+41,Minas Gerais,,"PY4|PU4[A-Y]|PU4Z[A-Y]",11,15,SA,MG,America/Sao_Paulo,1900-01-01,2035-12-31,108
+42,Parana,,"PY5|PU5[M-Y]|PU5Z[M-Y]",11,15,SA,PR,America/Sao_Paulo,1900-01-01,2035-12-31,108
+43,Santa Catarina,PP5,"PP5|PU5[A-L]|PU5Z[A-L]",11,15,SA,SC,America/Sao_Paulo,1900-01-01,2035-12-31,108
+44,Bahia,,"PY6|PU6[J-Y]|PU6Z[J-Y]",11,13,SA,BA,America/Bahia,1900-01-01,2035-12-31,108
+45,Sergipe,PP6,"PP6|PU6[A-I]|PU6Z[A-I]",11,13,SA,SE,America/Maceio,1900-01-01,2035-12-31,108
+46,Alagoas,PP7,"PP7|PU7[A-D]|PU7Z[A-D]",11,13,SA,AL,America/Maceio,1900-01-01,2035-12-31,108
+47,Ceara,PT7,"PT7|PU7[M-P]|PU7Z[M-P]",11,13,SA,CE,America/Fortaleza,1900-01-01,2035-12-31,108
+48,Paraiba,PR7,"PR7|PU7[E-H]|PU7Z[E-H]",11,13,SA,PB,America/Fortaleza,1900-01-01,2035-12-31,108
+49,Pernambuco,,"PY7|PU7[R-Y]|PU7Z[R-Y]",11,13,SA,PE,America/Recife,1900-01-01,2035-12-31,108
+50,Rio Grande do Norte,PS7,"PS7|PU7[I-L]|PU7Z[I-L]",11,13,SA,RN,America/Fortaleza,1900-01-01,2035-12-31,108
+51,Acre,PT8,"PT8|PU8[JKL]|PU8Z[JKL]",11,12,SA,AC,America/Rio_Branco,1900-01-01,2035-12-31,108
+52,Amapa,PQ8,"PQ8|PU8[GHI]|PU8Z[GHI]",11,13,SA,AP,America/Belem,1900-01-01,2035-12-31,108
+53,Amazonas,PP8,"PP8|PU8[ABC]|PU8Z[ABC]",11,0,SA,AM,,1900-01-01,2035-12-31,108
+54,Maranhao,PR8,"PR8|PU8[MNO]|PU8Z[MNO]",11,13,SA,MA,America/Fortaleza,1900-01-01,2035-12-31,108
+55,Para,,"PY8|PU8[WXY]|PU8Z[WXY]",11,13,SA,PA,,1900-01-01,2035-12-31,108
+56,Piaui,PS8,"PS8|PU8[P-S]|PU8Z[P-S]",11,13,SA,PI,America/Fortaleza,1900-01-01,2035-12-31,108
+57,Rondonia,PW8,"PW8|PU8[DEF]|PU8Z[DEF]",11,12,SA,RO,America/Porto_Velho,1900-01-01,2035-12-31,108
+58,Roraima,PV8,"PV8|PU8[TUV]|PU8Z[TUV]",11,0,SA,RR,America/Boa_Vista,1900-01-01,2035-12-31,108
+59,Mato Grosso,,"PY9|PU9[O-Y]|PU9Z[O-Y]",11,0,SA,MT,America/Cuiaba,1900-01-01,2035-12-31,108
+60,Mato Grosso do Sul,PT9,"PT9|PU9[A-N]|PU9Z[A-N]",11,15,SA,MS,America/Campo_Grande,1900-01-01,2035-12-31,108
+61,Eastern Siberia,UA0,"[A-Z]0[A-Z][A-Z].|[A-Z]0[A-Z][A-Z][A-Z].|[A-Z][A-Z]0[A-Z]",0,0,AS,,,1900-01-01,2035-12-31,15
+62,Western Siberia,,"[A-Z][89][A-Z][A-Z].|[A-Z][89][A-Z][A-Z][A-Z].|[A-Z][A-Z][89][A-Z]",0,0,AS,,,1900-01-01,2035-12-31,15
+63,Central,,"[A-Z][235][A-Z][A-Z].|[A-Z][235][A-Z][A-Z][A-Z].|[A-Z][A-Z][235][A-Z]",16,29,EU,,Europe/Moscow,1900-01-01,2035-12-31,54
+64,Northern Caucasus,UA6,"[A-Z][67][A-Z][A-Z].|[A-Z][67][A-Z][A-Z][A-Z].|[A-Z][A-Z][67][A-Z]",16,29,EU,,Europe/Moscow,1900-01-01,2035-12-31,54
+65,Northwest,UA1,"[A-Z]1[A-Z][A-Z].|[A-Z]1[A-Z][A-Z][A-Z].|[A-Z][A-Z]1[A-Z]",16,0,EU,,Europe/Moscow,1900-01-01,2035-12-31,54
+66,Volga,UA4,"[A-Z]4[A-Z][A-Z].|[A-Z]4[A-Z][A-Z][A-Z].|[A-Z][A-Z]4[A-Z]",16,0,EU,,,1900-01-01,2035-12-31,54
+67,Western Siberia,UA9,"[A-Z][89][A-Z][A-Z].|[A-Z][89][A-Z][A-Z][A-Z].|[A-Z][A-Z][89][A-Z]",17,0,EU,,,1900-01-01,2035-12-31,54
+68,AL;FL;GA;KY;NC;SC;TN;VA,W4,"[A-Z]4|[A-Z][A-Z]4",0,8,NA,,,1900-01-01,2035-12-31,291
+69,AR;LA;MS;NM;OK;TX,W5,"[A-Z]5|[A-Z][A-Z]5",4,0,NA,,,1900-01-01,2035-12-31,291
+70,AZ;ID;MT;NV;OR;UT;WA;WY,W7,"[A-Z]7|[A-Z][A-Z]7",0,0,NA,,,1900-01-01,2035-12-31,291
+71,CA,W6,"[A-Z]6|[A-Z][A-Z]6",3,6,NA,,America/Los_Angeles,1900-01-01,2035-12-31,291
+72,CO;IA;KS;MN;MO;ND;NE;SD,W0,"[A-Z]0|[A-Z][A-Z]0",4,7,NA,,,1900-01-01,2035-12-31,291
+73,CT;MA;ME;NH;RI;VT,W1,"[A-Z]1|[A-Z][A-Z]1",5,8,NA,,America/New_York,1900-01-01,2035-12-31,291
+74,DE;MD;D.C.;PA,W3,"[A-Z]3|[A-Z][A-Z]3",5,8,NA,,America/New_York,1900-01-01,2035-12-31,291
+75,IL;IN;WI,W9,"[A-Z]9|[A-Z][A-Z]9",4,8,NA,,,1900-01-01,2035-12-31,291
+76,MI;OH;WV,W8,"[A-Z]8|[A-Z][A-Z]8",0,8,NA,,,1900-01-01,2035-12-31,291
+77,NJ;NY,W2,"[A-Z]2|[A-Z][A-Z]2",5,8,NA,,America/New_York,1900-01-01,2035-12-31,291
+78,Agalega,,3B6,39,53,AF,,Indian/Mauritius,1900-01-01,2035-12-31,4
+79,St. Brandon,3B7,3B7,39,53,AF,,Indian/Mauritius,1900-01-01,2035-12-31,4
+80,Berat;Fier;Gramsh;Korca;Pogradec;Skrapar;Balish;Kucove;Devoll,ZA2,ZA2,15,28,EU,,Europe/Tirane,1900-01-01,2035-12-31,7
+81,Dibre;Kruje;Lezhe;Mirdite;Mati;Kurbin;Bulqize,ZA4,ZA4,15,28,EU,,Europe/Tirane,1900-01-01,2035-12-31,7
+82,Durres;Elbasan;Librazhde;Lushnje;Tirana;Kavaje;Peqin,ZA1,ZA1,15,28,EU,,Europe/Tirane,1900-01-01,2035-12-31,7
+83,Kolonje;Gjirokastra;Permete;Sarande;Mallakaster;Vlora;Delvine,ZA3,ZA3,15,28,EU,,Europe/Tirane,1900-01-01,2035-12-31,7
+84,Sazan I.;coastal Is.,ZA0,ZA0,15,28,EU,,Europe/Tirane,1900-01-01,2035-12-31,7
+85,Tropoje;Kukes;Puke;Shkoder;Malesi e Madhe;Has,ZA5,ZA5,15,28,EU,,Europe/Tirane,1900-01-01,2035-12-31,7
+86,Buenos Aires Prov.,LU[0-9]D,..[0-9][A-E],13,14,SA,D,America/Argentina/Buenos_Aires,1900-01-01,2035-12-31,100
+87,Catamarca,LU[0-9]R,..[0-9]R,13,14,SA,R,America/Argentina/Catamarca,1900-01-01,2035-12-31,100
+88,Chaco,LU[0-9]GA,..[0-9]G[A-O],13,14,SA,GA,America/Argentina/Cordoba,1900-01-01,2035-12-31,100
+89,Chubut,LU[0-9]W,..[0-9]W,13,16,SA,W,America/Argentina/Catamarca,1900-01-01,2035-12-31,100
+90,Cordoba,LU[0-9]H,..[0-9]H,13,14,SA,H,America/Argentina/Cordoba,1900-01-01,2035-12-31,100
+91,Corrientes,LU[0-9]L,..[0-9]L,13,14,SA,L,America/Argentina/Cordoba,1900-01-01,2035-12-31,100
+92,Entre Rios,LU[0-9]J,..[0-9]J,13,14,SA,J,America/Argentina/Cordoba,1900-01-01,2035-12-31,100
+93,Formosa,LU[0-9]GP,..[0-9]G[P-Z],13,14,SA,GP,America/Argentina/Cordoba,1900-01-01,2035-12-31,100
+94,Jujuy,LU[0-9]T,..[0-9]T,13,14,SA,L,America/Argentina/Jujuy,1900-01-01,2035-12-31,100
+95,La Pampa,LU[0-9]U,..[0-9]U,13,14,SA,U,America/Argentina/Cordoba,1900-01-01,2035-12-31,100
+96,La Rioja,LU[0-9]S,..[0-9]S,13,14,SA,S,America/Argentina/La_Rioja,1900-01-01,2035-12-31,100
+97,Mendoza,LU[0-9]M,..[0-9]M,13,14,SA,M,America/Argentina/Mendoza,1900-01-01,2035-12-31,100
+98,Misiones,LU[0-9]I,..[0-9]I,13,14,SA,I,America/Argentina/Cordoba,1900-01-01,2035-12-31,100
+99,Neuquen,LU[0-9]Y,..[0-9]Y,13,14,SA,Y,America/Argentina/Cordoba,1900-01-01,2035-12-31,100
+100,Rio Negro,LU[0-9]V,..[0-9]V,13,16,SA,V,America/Argentina/Cordoba,1900-01-01,2035-12-31,100
+101,Salta,LU[0-9]O,..[0-9]O,13,14,SA,O,America/Argentina/Cordoba,1900-01-01,2035-12-31,100
+102,San Juan,LU[0-9]P,..[0-9]P,13,14,SA,P,America/Argentina/San_Juan,1900-01-01,2035-12-31,100
+103,San Luis,LU[0-9]Q,..[0-9]Q,13,14,SA,Q,America/Argentina/Cordoba,1900-01-01,2035-12-31,100
+104,Santa Cruz,LU[0-9]XA,..[0-9]X[A-O],13,16,SA,XA,America/Argentina/Rio_Gallegos,1900-01-01,2035-12-31,100
+105,Santa Fe,LU[0-9]F,..[0-9]F,13,14,SA,F,America/Argentina/Cordoba,1900-01-01,2035-12-31,100
+106,Santiago del Estero,LU[0-9]N,..[0-9]N,13,14,SA,N,America/Argentina/Cordoba,1900-01-01,2035-12-31,100
+107,Tierra del Fuego,LU[0-9]XP,..[0-9]X[P-Z],13,16,SA,XP,America/Argentina/Ushuaia,1900-01-01,2035-12-31,100
+108,Tucuman,LU[0-9]K,..[0-9]K,13,14,SA,K,America/Argentina/Tucuman,1900-01-01,2035-12-31,100
+109,Burgenland,OE4,OE4,15,28,EU,,Europe/Vienna,1900-01-01,2035-12-31,206
+110,Kaernten,OE8,OE8,15,28,EU,,Europe/Vienna,1900-01-01,2035-12-31,206
+111,Niederoesterreich,OE3,OE3,15,28,EU,,Europe/Vienna,1900-01-01,2035-12-31,206
+112,Oberoesterreich,OE5,OE5,15,28,EU,,Europe/Vienna,1900-01-01,2035-12-31,206
+113,Salzburg,OE2,OE2,15,28,EU,,Europe/Vienna,1900-01-01,2035-12-31,206
+114,Steiermark,OE6,OE6,15,28,EU,,Europe/Vienna,1900-01-01,2035-12-31,206
+115,Tirol,OE7,OE7,15,28,EU,,Europe/Vienna,1900-01-01,2035-12-31,206
+116,Vorarlberg,OE9,OE9,15,28,EU,,Europe/Vienna,1900-01-01,2035-12-31,206
+117,Wien,OE1,OE1,15,28,EU,,Europe/Vienna,1900-01-01,2035-12-31,206
+118,excluding Baku and Nakhichevan,4J3,..3,21,29,AS,,Asia/Baku,1900-01-01,2035-12-31,18
+119,Nakhichevan,4J2,..2,21,29,AS,NH,Asia/Baku,1900-01-01,2035-12-31,18
+120,Corvo I.,CU9,CU9,14,36,EU,,Atlantic/Azores,1900-01-01,2035-12-31,149
+121,Faial I.,CU7,CU7,14,36,EU,,Atlantic/Azores,1900-01-01,2035-12-31,149
+122,Flores I.,CU8,CU8,14,36,EU,,Atlantic/Azores,1900-01-01,2035-12-31,149
+123,Graciosa I.,CU4,CU4,14,36,EU,,Atlantic/Azores,1900-01-01,2035-12-31,149
+124,Pico I.,CU6,CU6,14,36,EU,,Atlantic/Azores,1900-01-01,2035-12-31,149
+125,Santa Maria I.,CU1,CU1,14,36,EU,,Atlantic/Azores,1900-01-01,2035-12-31,149
+126,Sao Jorge I.,CU5,CU5,14,36,EU,,Atlantic/Azores,1900-01-01,2035-12-31,149
+127,Sao Miguel I.,CU2,CU2,14,36,EU,,Atlantic/Azores,1900-01-01,2035-12-31,149
+128,Terceira I.,CU3,CU3,14,36,EU,,Atlantic/Azores,1900-01-01,2035-12-31,149
+129,Brestskaya oblast,EU3,..3,16,29,EU,BR,Europe/Minsk,1900-01-01,2035-12-31,27
+130,Gomelskaya oblast,EU8,..8,16,29,EU,HO,Europe/Minsk,1900-01-01,2035-12-31,27
+131,Grodnenskaya oblast,EU4,..4,16,29,EU,HR,Europe/Minsk,1900-01-01,2035-12-31,27
+132,Minskaya oblast,EU2,..2,16,29,EU,MI,Europe/Minsk,1900-01-01,2035-12-31,27
+133,Mogilyovskaya oblast,EU7,..7,16,29,EU,MA,Europe/Minsk,1900-01-01,2035-12-31,27
+134,Vitebskaya oblast,EU6,..6,16,29,EU,VI,Europe/Minsk,1900-01-01,2035-12-31,27
+135,Beni,CP8,CP8,10,12,SA,,America/La_Paz,1900-01-01,2035-12-31,104
+136,Chuquisaca,CP2,CP2,10,12,SA,,America/La_Paz,1900-01-01,2035-12-31,104
+137,Cochabamba,CP5,CP5,10,12,SA,,America/La_Paz,1900-01-01,2035-12-31,104
+138,La Paz,CP1,CP1,10,12,SA,,America/La_Paz,1900-01-01,2035-12-31,104
+139,Oruro,CP3,CP3,10,12,SA,,America/La_Paz,1900-01-01,2035-12-31,104
+140,Pando,CP9,CP9,10,12,SA,,America/La_Paz,1900-01-01,2035-12-31,104
+141,Potosi,CP4,CP4,10,12,SA,,America/La_Paz,1900-01-01,2035-12-31,104
+142,Santa Cruz,CP6,CP6,10,12,SA,,America/La_Paz,1900-01-01,2035-12-31,104
+143,Tarija,CP7,CP7,10,12,SA,,America/La_Paz,1900-01-01,2035-12-31,104
+144,North Bulgaria,LZ2,LZ[2468],20,28,EU,,Europe/Sofia,1900-01-01,2035-12-31,212
+145,South Bulgaria,LZ1,LZ[13579],20,28,EU,,Europe/Sofia,1900-01-01,2035-12-31,212
+146,Cayman Brac I.,ZF9,ZF9,8,11,NA,,America/Cayman,1900-01-01,2035-12-31,69
+147,Grand Cayman I.,ZF1,ZF1,8,11,NA,,America/Cayman,1900-01-01,2035-12-31,69
+148,Little Cayman I.,ZF8,ZF8,8,11,NA,,America/Cayman,1900-01-01,2035-12-31,69
+149,"Aisen;Los Lagos (Llanquihue, Isla Chiloe and Palena)",CE7,..7,12,16,SA,,America/Santiago,1900-01-01,2035-12-31,112
+150,Antofagasta;Atacama;Tarapaca,CE1,..1,12,14,SA,,America/Santiago,1900-01-01,2035-12-31,112
+151,Bio-Bio,CE5,..5,12,14,SA,,America/Santiago,1900-01-01,2035-12-31,112
+152,Coquimbo;Valparaiso,CE2,..2,12,14,SA,,America/Santiago,1900-01-01,2035-12-31,112
+153,La Araucania;Los Lagos (Valdivia and Osorno),CE6,..6,12,14,SA,,America/Santiago,1900-01-01,2035-12-31,112
+154,Magallanes,CE8,..8,12,16,SA,,America/Santiago,1900-01-01,2035-12-31,112
+155,Maule;O'Higgins,CE4,..4,12,14,SA,,America/Santiago,1900-01-01,2035-12-31,112
+156,Reg. Metr. de Santiago,CE3,..3,12,14,SA,,America/Santiago,1900-01-01,2035-12-31,112
+157,An Hui,BY6A,..6[A-H],24,44,AS,,Asia/Shanghai,1900-01-01,2035-12-31,318
+158,Bei Jing,BY1,..1[A-X],24,44,AS,,Asia/Shanghai,1900-01-01,2035-12-31,318
+159,Chong Qing,BY8G,..8[G-L],24,43,AS,,Asia/Chongqing,1900-01-01,2035-12-31,318
+160,Fu Jian,BY5Q,..5[Q-X],24,44,AS,,Asia/Shanghai,1900-01-01,2035-12-31,318
+161,Gan Su,BY9G,..9[G-L],23,43,AS,,Asia/Chongqing,1900-01-01,2035-12-31,318
+162,Guang Dong,BY7I,..7[I-P],24,44,AS,,Asia/Shanghai,1900-01-01,2035-12-31,318
+163,Guang Xi,BY7Q,..7[Q-X],24,43,AS,,Asia/Chongqing,1900-01-01,2035-12-31,318
+164,Gui Zhou,BY8M,..8[M-R],24,43,AS,,Asia/Chongqing,1900-01-01,2035-12-31,318
+165,"Hainan I., AS-129",BY7Y,..7[YZ],24,44,AS,,Asia/Chongqing,1900-01-01,2035-12-31,318
+166,He Nan,BY6I,..6[I-P],24,44,AS,,Asia/Shanghai,1900-01-01,2035-12-31,318
+167,Hei Bei,BY3M,..3[M-R],24,44,AS,,Asia/Shanghai,1900-01-01,2035-12-31,318
+168,Hei Long Jiang,BY2A,..2[A-H],24,33,AS,,Asia/Harbin,1900-01-01,2035-12-31,318
+169,Hu Bei,BY6Q,..6[Q-X],24,44,AS,,Asia/Chongqing,1900-01-01,2035-12-31,318
+170,Hu Nan,BY7A,..7[A-H],24,44,AS,,Asia/Chongqing,1900-01-01,2035-12-31,318
+171,Ji Lin,BY2I,..2[I-P],24,44,AS,,Asia/Shanghai,1900-01-01,2035-12-31,318
+172,Jiang Su,BY4Q,..4[Q-X],24,44,AS,,Asia/Shanghai,1900-01-01,2035-12-31,318
+173,Jiang Xi,BY5I,..5[I-P],24,44,AS,,Asia/Shanghai,1900-01-01,2035-12-31,318
+174,Liao Ning,BY2Q,..2[Q-X],24,44,AS,,Asia/Shanghai,1900-01-01,2035-12-31,318
+175,Nei Meng,BY3G,..3[G-L],23,44,AS,,Asia/Shanghai,1900-01-01,2035-12-31,318
+176,Ning Xia,BY9M,..9[M-R],23,43,AS,,Asia/Chongqing,1900-01-01,2035-12-31,318
+177,Qing Hai,BY9S,..9[S-X],23,43,AS,,Asia/Chongqing,1900-01-01,2035-12-31,318
+178,Shaan Xi,BY9A,..9[A-F],24,43,AS,,Asia/Chongqing,1900-01-01,2035-12-31,318
+179,Shan Dong,BY4I,..4[I-P],24,44,AS,,Asia/Shanghai,1900-01-01,2035-12-31,318
+180,Shan Xi,BY3S,..3[S-X],24,44,AS,,Asia/Chongqing,1900-01-01,2035-12-31,318
+181,Shang Hai,BY4A,..4[A-H],24,44,AS,,Asia/Shanghai,1900-01-01,2035-12-31,318
+182,Si Chuan,BY8A,..8[A-F],24,43,AS,,Asia/Chongqing,1900-01-01,2035-12-31,318
+183,Tian Jin,BY3A,..3[A-F],24,44,AS,,Asia/Shanghai,1900-01-01,2035-12-31,318
+184,Xi Zang,BY0G,..0[G-L],23,42,AS,,Asia/Urumqi,1900-01-01,2035-12-31,318
+185,Xin Jiang,BY0A,..0[A-F],23,42,AS,,Asia/Urumqi,1900-01-01,2035-12-31,318
+186,Yun Nan,BY8S,..8[S-X],24,43,AS,,Asia/Chongqing,1900-01-01,2035-12-31,318
+187,Zhe Jiang,BY5A,..5[A-H],24,44,AS,,Asia/Shanghai,1900-01-01,2035-12-31,318
+188,Amazonas;Guainia;Vaupes,HK9,..9,9,12,SA,,America/Bogota,1900-01-01,2035-12-31,116
+189,Antioquia;Choco,HK4,..4,9,12,SA,,America/Bogota,1900-01-01,2035-12-31,116
+190,Arauca;Boyaca;Casanare;Santander,HK7,..7,9,12,SA,,America/Bogota,1900-01-01,2035-12-31,116
+191,Atlantico;Bolivar;Cordoba;Sucre,HK1,..1,9,12,SA,,America/Bogota,1900-01-01,2035-12-31,116
+192,Bogota;Cundinamarca;Guaviare;Meta,HK3,..3,9,12,SA,,America/Bogota,1900-01-01,2035-12-31,116
+193,Caldas;Huila;Quindio;Risaralda;Tolima,HK6,..6,9,12,SA,,America/Bogota,1900-01-01,2035-12-31,116
+194,Caqueta;Narino;Putumayo,HK8,..8,9,12,SA,,America/Bogota,1900-01-01,2035-12-31,116
+195,Cauca;Valle del Cauca,HK5,..5,9,12,SA,,America/Bogota,1900-01-01,2035-12-31,116
+196,Cesar;La Guajira;Magdalena;Norte de Santander,HK2,..2,9,12,SA,,America/Bogota,1900-01-01,2035-12-31,116
+197,Ciego de Avila;Camaguey,CO7,"C[LMO]7|CO9[IJK][A-Z][A-Z]|T47",8,11,NA,,America/Havana,1900-01-01,2035-12-31,70
+198,Holguin;Granma;Santiago de Cuba;Guantanamo;Las Tunas,CO8,"C[LMO]8|CO9[LMNO][A-Z][A-Z]|T48",8,11,NA,,America/Havana,1900-01-01,2035-12-31,70
+199,Isla de la Juventud,CO4,"C[LMO]4|CO9D[A-Z][A-Z]|T44",8,11,NA,,America/Havana,1900-01-01,2035-12-31,70
+200,La Habana,CO3,"C[LMO]3|CO9C[A-Z][A-Z]|T43",8,11,NA,,America/Havana,1900-01-01,2035-12-31,70
+201,Matanzas,CO5,"C[LMO]5|CO9E[A-Z][A-Z]|T45",8,11,NA,,America/Havana,1900-01-01,2035-12-31,70
+202,Pinar del Rio,CO1,"C[LMO]1|CO9A[A-Z][A-Z]|T41",8,11,NA,,America/Havana,1900-01-01,2035-12-31,70
+203,Santa Clara;Cienfuegos;Sancti Spiritus,CO6,"C[LMO]6|CO9[FGH][A-Z][A-Z]|T46",8,11,NA,,America/Havana,1900-01-01,2035-12-31,70
+204,Bandundu,9Q3,..3,36,52,AF,,Africa/Kinshasa,1900-01-01,2035-12-31,414
+205,Bas Congo,9Q2,..2,36,52,AF,,Africa/Kinshasa,1900-01-01,2035-12-31,414
+206,Equateur,9Q4,..4,36,52,AF,,Africa/Kinshasa,1900-01-01,2035-12-31,414
+207,Katanga,9Q7,..7,36,52,AF,,Africa/Lubumbashi,1900-01-01,2035-12-31,414
+208,N. Kivu;S. Kivu;Maniema,9Q6,..6,36,52,AF,,Africa/Lubumbashi,1900-01-01,2035-12-31,414
+209,Occidental Kasai,9Q9,..9,36,52,AF,,Africa/Lubumbashi,1900-01-01,2035-12-31,414
+210,Oriental Kasai,9Q8,..8,36,52,AF,,Africa/Lubumbashi,1900-01-01,2035-12-31,414
+211,Province Orientale,9Q5,..5,36,52,AF,,Africa/Lubumbashi,1900-01-01,2035-12-31,414
+212,Azua;San Juan;Elias Pina,HI6,HI6,8,11,NA,,America/Santo_Domingo,1900-01-01,2035-12-31,72
+213,Bahoruco;Barahona;Independencia;Pedernales,HI5,HI5,8,11,NA,,America/Santo_Domingo,1900-01-01,2035-12-31,72
+214,Dajabon; Montecristi;Valverde,HI4,HI4,8,11,NA,,America/Santo_Domingo,1900-01-01,2035-12-31,72
+215,Duarte;Espaillat;La Vega;Puerto Plata;Salcedo;Sanchez;Santiago;Santiago,HI3,HI3,8,11,NA,,America/Santo_Domingo,1900-01-01,2035-12-31,72
+216,Isla Beata,HI1,HI1,8,11,NA,,America/Santo_Domingo,1900-01-01,2035-12-31,72
+217,Isla Saona;Isla Catalina,HI2,HI2,8,11,NA,,America/Santo_Domingo,1900-01-01,2035-12-31,72
+218,La Altagracia;La Romana;El Seibo;San Pedro de Macoris,HI7,HI7,8,11,NA,,America/Santo_Domingo,1900-01-01,2035-12-31,72
+219,Samana; Maria Trinidad Sanchez,HI9,HI9,8,11,NA,,America/Santo_Domingo,1900-01-01,2035-12-31,72
+220,Santo Domingo;Peravia;San Cristobal,HI8,HI8,8,11,NA,,America/Santo_Domingo,1900-01-01,2035-12-31,72
+221,Sabah,,..6,28,54,OC,,Asia/Kuching,1963-09-16,2035-12-31,46
+222,Sarawak,9M8,..8,28,54,OC,,Asia/Kuching,1963-09-16,2035-12-31,46
+223,Azuay; Canar;Morona Santiago,HC5,..5,10,12,SA,,America/Guayaquil,1900-01-01,2035-12-31,120
+224,Bolivar;Chimborazo;Cotopaxi;Tungurahua,HC6,..6,10,12,SA,,America/Guayaquil,1900-01-01,2035-12-31,120
+225,Carchi;Imbabura;Pichincha,HC1,..1,10,12,SA,,America/Guayaquil,1900-01-01,2035-12-31,120
+226,Esmeraldas;Manabi,HC4,..4,10,12,SA,,America/Guayaquil,1900-01-01,2035-12-31,120
+227,Guyas;Los Rios,HC2,..2,10,12,SA,,America/Guayaquil,1900-01-01,2035-12-31,120
+228,Loja;El Oro;Zamora Chinchipe,HC3,..3,10,12,SA,,America/Guayaquil,1900-01-01,2035-12-31,120
+229,Napo;Pastaza;Sucumbios,HC7,..7,10,12,SA,,America/Guayaquil,1900-01-01,2035-12-31,120
+230,San Miguel;La Union;Usulutan;Morazan,YS3,..3,7,11,NA,,America/El_Salvador,1900-01-01,2035-12-31,74
+231,San Salvador;La Libertad;Cuscatlan;Chalatenango,YS1,..1,7,11,NA,,America/El_Salvador,1900-01-01,2035-12-31,74
+232,San Vicente;Cabanas;La Paz,YS4,..4,7,11,NA,,America/El_Salvador,1900-01-01,2035-12-31,74
+233,Santa Ana;Ahuachapan;Sonsonate,YS2,..2,7,11,NA,,America/El_Salvador,1900-01-01,2035-12-31,74
+234,Harjumaa,ES2,ES2,15,29,EU,,Europe/Tallinn,1900-01-01,2035-12-31,52
+235,Hiiumaa;Saaremaa,ES0,ES0,15,29,EU,,Europe/Tallinn,1900-01-01,2035-12-31,52
+236,Jarvamaa;Raplamaa;Laanemaa,ES3,ES3,15,29,EU,,Europe/Tallinn,1900-01-01,2035-12-31,52
+237,Jogevamaa;Tartumaa,ES5,ES5,15,29,EU,,Europe/Tallinn,1900-01-01,2035-12-31,52
+238,Laane-Virumaa;Ida-Virumaa,ES4,ES4,15,29,EU,,Europe/Tallinn,1900-01-01,2035-12-31,52
+239,Parnumaa,ES8,ES8,15,29,EU,,Europe/Tallinn,1900-01-01,2035-12-31,52
+240,Polvamaa;Vorumaa;Valgamaa,ES6,ES6,15,29,EU,,Europe/Tallinn,1900-01-01,2035-12-31,52
+241,Viljandimaa,ES7,ES7,15,29,EU,,Europe/Tallinn,1900-01-01,2035-12-31,52
+242,Atol das Rocas,PY0R,"..[0-9]R|..[0-9]ZR",11,13,SA,,America/Noronha,1900-01-01,2035-12-31,56
+243,Haeme,OH3,..3,15,18,EU,,Europe/Helsinki,1900-01-01,2035-12-31,224
+244,Kuopio;Pohjois-Karjala,OH7,..7,15,18,EU,,Europe/Helsinki,1900-01-01,2035-12-31,224
+245,Kymi,OH5,..5,15,18,EU,,Europe/Helsinki,1900-01-01,2035-12-31,224
+246,Lappland,OH9,..9,15,18,EU,,Europe/Helsinki,1900-01-01,2035-12-31,224
+247,Mikkeli,OH4,..4,15,18,EU,,Europe/Helsinki,1900-01-01,2035-12-31,224
+248,Oulu,OH8,..8,15,18,EU,,Europe/Helsinki,1900-01-01,2035-12-31,224
+249,Turku-Pori,OH1,..1,15,18,EU,,Europe/Helsinki,1900-01-01,2035-12-31,224
+250,Uudenmaa,OH2,..2,15,18,EU,,Europe/Helsinki,1900-01-01,2035-12-31,224
+251,Vaasa;Keski-Suomi,OH6,..6,15,18,EU,,Europe/Helsinki,1900-01-01,2035-12-31,224
+252,Abkhasia,4L[0-9]V,..[0-9][V-X],21,29,AS,AB,Asia/Tbilisi,1900-01-01,2035-12-31,75
+253,Adsharia,4L[0-9]Q,..[0-9][Q-S],21,29,AS,AD,Asia/Tbilisi,1900-01-01,2035-12-31,75
+254,Epirus,SV6,..6,20,28,EU,,Europe/Athens,1900-01-01,2035-12-31,236
+255,Ionian and Aegen Sea  Is.,SV8,..8,20,28,EU,,Europe/Athens,1900-01-01,2035-12-31,236
+256,Makedonia,SV2,..2,20,28,EU,,Europe/Athens,1900-01-01,2035-12-31,236
+257,Pelloponisos,SV3,..3,20,28,EU,,Europe/Athens,1900-01-01,2035-12-31,236
+258,Sterea Ellada,SV1,..1,20,28,EU,,Europe/Athens,1900-01-01,2035-12-31,236
+259,Thessalia,SV4,..4,20,28,EU,,Europe/Athens,1900-01-01,2035-12-31,236
+260,Thrakia,SV7,..7,20,28,EU,,Europe/Athens,1900-01-01,2035-12-31,236
+261,Alta Verapaz;Izabal;Peten,TG7,..7,7,11,NA,,America/Guatemala,1900-01-01,2035-12-31,76
+262,Baja Verapaz;Guatemala City;Jalapa;El Progreso;Sacatepequez,TG9,..9,7,11,NA,,America/Guatemala,1900-01-01,2035-12-31,76
+263,Chimaltenango;Escuintia;Santa Rosa;Solola;Suchitepequez,TG4,..4,7,11,NA,,America/Guatemala,1900-01-01,2035-12-31,76
+264,Chiquimula;Jutiapa;Zacapa,TG6,..6,7,11,NA,,America/Guatemala,1900-01-01,2035-12-31,76
+265,Huehuetenango;Quiche;Totonicapan,TG5,..5,7,11,NA,,America/Guatemala,1900-01-01,2035-12-31,76
+266,Quezaltenango;Retalhuleu;San Marcos,TG8,..8,7,11,NA,,America/Guatemala,1900-01-01,2035-12-31,76
+267,"Demerara-Mahaica;West Demerara, Upper;Demerara-Berbice",8R1,8R1,9,12,SA,,America/Guyana,1900-01-01,2035-12-31,129
+268,East Berbice-Corentyne;Mahaica-Berbice,8R2,8R2,9,12,SA,,America/Guyana,1900-01-01,2035-12-31,129
+269,Pomeroom-Supenaam;Essequibo Islands;Cuyuni-Mazaruni;Potaro-Siparuni;Barima-Waini;Upper Takutu-Upper Essequibo,8R3,8R3,9,12,SA,,America/Guyana,1900-01-01,2035-12-31,129
+270,Atlantida;Colon,HR3,..3,7,11,NA,,America/Tegucigalpa,1900-01-01,2035-12-31,80
+271,Choluteca;Valle,HR4,..4,7,11,NA,,America/Tegucigalpa,1900-01-01,2035-12-31,80
+272,Comayagua;El Paraiso;F.Morazan,HR1,..1,7,11,NA,,America/Tegucigalpa,1900-01-01,2035-12-31,80
+273,Copan;Lempira;Santa Barbara,HR5,..5,7,11,NA,,America/Tegucigalpa,1900-01-01,2035-12-31,80
+274,Cortez;Yoro,HR2,..2,7,11,NA,,America/Tegucigalpa,1900-01-01,2035-12-31,80
+275,Intibuca;La Paz,HR7,..7,7,11,NA,,America/Tegucigalpa,1900-01-01,2035-12-31,80
+276,Islas de la Bahia,HR9,..9,7,11,NA,,America/Tegucigalpa,1900-01-01,2035-12-31,80
+277,Ocotepeque;Lempira,HR6,..6,7,11,NA,,America/Tegucigalpa,1900-01-01,2035-12-31,80
+278,Olancho;Gracias a Dios,HR8,..8,7,11,NA,,America/Tegucigalpa,1900-01-01,2035-12-31,80
+279,Bacs-Kiskun;Bekes;Csongrad;Szeged,HA8,..8,15,28,EU,,Europe/Budapest,1900-01-01,2035-12-31,239
+280,Baranya;Somogy;Tolna,HA3,..3,15,28,EU,,Europe/Budapest,1900-01-01,2035-12-31,239
+281,Borsod-Abauj-Zemplen,HA9,..9,15,28,EU,,Europe/Budapest,1900-01-01,2035-12-31,239
+282,Fejer,HA4,..4,15,28,EU,,Europe/Budapest,1900-01-01,2035-12-31,239
+283,Gyor-Moson-Sopron;Vas;Zala,HA1,..1,15,28,EU,,Europe/Budapest,1900-01-01,2035-12-31,239
+284,Hajdu-Bihar;Szabolcs-Szatmar-Bereg,HA0,..0,15,28,EU,,Europe/Budapest,1900-01-01,2035-12-31,239
+285,Heves;Nograd,HA6,..6,15,28,EU,,Europe/Budapest,1900-01-01,2035-12-31,239
+286,Komarom-Esztergom;Veszprem,HA2,..2,15,28,EU,,Europe/Budapest,1900-01-01,2035-12-31,239
+287,Pest;Jasz-Nagykun-Szolnok,HA7,..7,15,28,EU,,Europe/Budapest,1900-01-01,2035-12-31,239
+288,Akranes;Borgarnes;Olafsvik;Stykkisholmur,TF2,TF2,40,17,EU,,Atlantic/Reykjavik,1900-01-01,2035-12-31,242
+289,Bolungarvik;Isafjoerdur;Holmavik,TF4,TF4,40,17,EU,,Atlantic/Reykjavik,1900-01-01,2035-12-31,242
+290,Central uninhabited Iceland,TF0,TF0,40,17,EU,,Atlantic/Reykjavik,1900-01-01,2035-12-31,242
+291,Grindavik;Keflavik;Gardur,TF8,TF8,40,17,EU,,Atlantic/Reykjavik,1900-01-01,2035-12-31,242
+292,Hvammstangi;Bloenduos;Saudarkrokur,TF9,TF9,40,17,EU,,Atlantic/Reykjavik,1900-01-01,2035-12-31,242
+293,Hveragerdi;Selfoss;Arborg;Hella;Vik,TF1,TF1,40,17,EU,,Atlantic/Reykjavik,1900-01-01,2035-12-31,242
+294,Olafsfjoerdur;Dalvik;Akureyri;Husavik,TF5,TF5,40,17,EU,,Atlantic/Reykjavik,1900-01-01,2035-12-31,242
+295,Reykjavik;Kopavogur;Gardabaer;Hafnarfjoerdur,TF3,TF3,40,17,EU,,Atlantic/Reykjavik,1900-01-01,2035-12-31,242
+296,Vestmannaeyjar,TF7,TF7,40,17,EU,,Atlantic/Reykjavik,1900-01-01,2035-12-31,242
+297,Vopnafjoerdur;Seydisfjoerdur;Djupivogur;Hoefn,TF6,TF6,40,17,EU,,Atlantic/Reykjavik,1900-01-01,2035-12-31,242
+298,Bali,YB9A,"Y[A-Z]9[A-F]|Y[A-Z]9Z[A-F]",28,54,AS,,Asia/Makassar,1900-01-01,2035-12-31,327
+299,Bangka Belitung,YE4F,"Y[E-H]4[F-L]|Y[E-H]4Z[F-L]",28,54,AS,,Asia/Jakarta,1900-01-01,2035-12-31,327
+300,Banten,YB1R,"Y[A-Z]1[R-Y][A-Z]|Y[A-Z]1[R-Z].|Y[A-Z]1Z[R-Z]",28,54,AS,,Asia/Jakarta,1900-01-01,2035-12-31,327
+301,Bengkulu,YB4M,"Y[A-Z]4[M-R][A-Z].|Y[A-Z]4[M-PR][A-Z][A-Z]|Y[A-Z]4[M-R].|Y[A-Z]4Z[M-R]",28,54,AS,,Asia/Jakarta,1900-01-01,2035-12-31,327
+302,Central Java,YB2A,"Y[A-Z]2[A-T][A-Z].|Y[A-Z]2[A-PR-T][A-Z][A-Z]|Y[A-Z]2[A-T].|Y[A-Z]2Z[A-T]",28,54,AS,,Asia/Jakarta,1900-01-01,2035-12-31,327
+303,Central Kalimantan,YB7O,"Y[A-Z]7[O-T][A-Z].|Y[A-Z]7[O-PR-T][A-Z][A-Z]|Y[A-Z]7[O-T].|Y[A-Z]7Z[O-T]",28,54,AS,,Asia/Pontianak,1900-01-01,2035-12-31,327
+304,Central Sulawesi,YB8M,"Y[A-Z]8[M-P]|Y[A-Z]8Z[M-P]",28,54,AS,,Asia/Makassar,1900-01-01,2035-12-31,327
+305,DI Yogyakarta,YB2U,"Y[A-Z]2[U-Y][A-Z]|Y[A-Z]2[U-Z].|Y[A-Z]2Z[U-Z]",28,54,AS,,Asia/Jakarta,1900-01-01,2035-12-31,327
+306,DKI Jakarta,YB0,"Y[A-Z]0[A-Y][A-Z].|Y[A-Z]0[A-PR-Y][A-Z][A-Z]|Y[A-Z]0[A-Z].|Y[A-Z]0Z[A-Z]",28,54,AS,,Asia/Jakarta,1900-01-01,2035-12-31,327
+307,East Java,YB3,"Y[A-Z]3[A-Y][A-Z].|Y[A-Z]3[A-PR-Y][A-Z][A-Z]|Y[A-Z]3[A-Z].|Y[A-Z]3Z[A-Z]",28,54,AS,,Asia/Jakarta,1900-01-01,2035-12-31,327
+308,East Kalimantan,YB7U,"Y[A-Z]7[U-Y][A-Z]|Y[A-Z]7[U-Z].|Y[A-Z]7Z[U-Z]",28,54,AS,,Asia/Makassar,1900-01-01,2035-12-31,327
+309,East Nusatenggara,YB9L,"Y[A-Z]9[L-P]|Y[A-Z]9Z[L-P]",28,54,AS,,Asia/Makassar,1900-01-01,2035-12-31,327
+310,Gorontalo,YE8Q,"Y[E-H]8[Q-U][A-Z].|Y[E-H]8[R-U][A-Z][A-Z]|Y[E-H]8[Q-U].|Y[E-H]8Z[Q-U]",28,54,AS,,Asia/Makassar,1900-01-01,2035-12-31,327
+311,Jambi,YB4A,"Y[A-Z]4[A-E]|Y[A-Z]4Z[A-E]",28,54,AS,,Asia/Jakarta,1900-01-01,2035-12-31,327
+312,Lampung,YB4R,"Y[A-Z]4[S-Y][A-Z]|Y[A-Z]4[S-Z].|Y[A-Z]4Z[S-Z]",28,54,AS,,Asia/Jakarta,1900-01-01,2035-12-31,327
+313,Maluku,YB8V,"Y[B-DH]8[V-Y][A-Z]|Y[B-DH]8[V-Z].|Y[B-DH]8Z[V-Z]",28,0,AS,,Asia/Jayapura,1900-01-01,2035-12-31,327
+314,Nanggroe Aceh Darussalam,YB6A,"Y[A-Z]6[A-G]|Y[A-Z]6Z[A-G]",28,54,AS,,Asia/Jakarta,1900-01-01,2035-12-31,327
+315,North Maluku,YE8V,"Y[E-H]8[V-Y][A-Z]|Y[E-H]8[V-Z].|Y[E-H]8Z[V-Z]",28,54,AS,,Asia/Jayapura,1900-01-01,2035-12-31,327
+316,North Sulawesi,YB8Q,"Y[BCDH]8[Q-U][A-Z].|Y[BCDH]8[R-U][A-Z][A-Z]|Y[BCDH]8[Q-U].|Y[BCDH]8Z[Q-U]",28,54,AS,,Asia/Makassar,1900-01-01,2035-12-31,327
+317,North Sumatera,YB6H,"Y[A-Z]6[H-Y][A-Z].|Y[A-Z]6[H-PR-Y][A-Z][A-Z]|Y[A-Z]6[H-Z].|Y[A-Z]6Z[H-Z]",28,54,AS,,Asia/Jakarta,1900-01-01,2035-12-31,327
+318,Papua,YB9Q,"Y[A-Z]9[Q-Y][A-Z].|Y[A-Z]9[R-Y][A-Z][A-Z]|Y[A-Z]9[Q-Z].|Y[A-Z]9Z[Q-Z]",28,51,AS,,Asia/Jayapura,1900-01-01,2035-12-31,327
+319,Riau,YB5N,"Y[A-Z]5[N-Y][A-Z].|Y[A-Z]5[N-PR-Y][A-Z][A-Z]|Y[A-Z]5[N-Z].|Y[A-Z]5Z[N-Z]",28,54,AS,,Asia/Jakarta,1900-01-01,2035-12-31,327
+320,South East Sulawesi,YB8I,"Y[A-Z]8[I-L]|Y[A-Z]8Z[I-L]",28,54,AS,,Asia/Makassar,1900-01-01,2035-12-31,327
+321,South Kalimantan,YB7H,"Y[A-Z]7[H-N]|Y[A-Z]7Z[H-N]",28,54,AS,,Asia/Makassar,1900-01-01,2035-12-31,327
+322,South Sulawesi,YB8A,"Y[A-Z]8[A-H]|Y[A-Z]8Z[A-H]",28,54,AS,,Asia/Makassar,1900-01-01,2035-12-31,327
+323,South Sumatera,YB4F,"Y[BCDH]4[F-L]|Y[BCDH]4Z[F-L]",28,54,AS,,Asia/Jakarta,1900-01-01,2035-12-31,327
+324,West Java,YB1A,"Y[A-Z]1[A-Q][A-Z].|Y[A-Z]1[A-P][A-Z][A-Z]|Y[A-Z]1[A-Q].|Y[A-Z]1Z[A-Q]",28,54,AS,,Asia/Jakarta,1900-01-01,2035-12-31,327
+325,West Kalimantan,YB7A,"Y[A-Z]7[A-G]|Y[A-Z]7Z[A-G]",28,54,AS,,Asia/Pontianak,1900-01-01,2035-12-31,327
+326,West Nusatenggara,YB9G,"Y[A-Z]9[G-K]|Y[A-Z]9Z[G-K]",28,54,AS,,Asia/Makassar,1900-01-01,2035-12-31,327
+327,West Sumatera,YB5A,"Y[A-Z]5[A-M]|Y[A-Z]5Z[A-M]",28,54,AS,,Asia/Jakarta,1900-01-01,2035-12-31,327
+328,Mainland,,EI,14,27,EU,,Europe/Dublin,1900-01-01,2035-12-31,245
+329,Offshore islands,EJ,EJ,14,27,EU,,Europe/Dublin,1900-01-01,2035-12-31,245
+330,Abruzzo;Marche,I6,"I6|I[A-Z]6",15,28,EU,,Europe/Rome,1900-01-01,2035-12-31,248
+331,Calabria;Campania;Molise;Basilicata (Potenza),I8,"I8|I[A-Z]8",15,28,EU,,Europe/Rome,1900-01-01,2035-12-31,248
+332,Emilia-Romagna,I4,"I4|I[A-Z]4",15,28,EU,,Europe/Rome,1900-01-01,2035-12-31,248
+333,Friuli Venezia Giulia,IV3,"I[A-JMO-VXY]3|IW3[Q-Z]",15,28,EU,,Europe/Rome,1900-01-01,2035-12-31,248
+334,Lazio;Umbria,I0,"I0|I[B-LN-RTUVXYZ]0|IW0[A-T]|IW0[0-9]",15,28,EU,,Europe/Rome,1900-01-01,2035-12-31,248
+335,Liguria;Piemonte,I1,"I1|I[A-WYZ]1",15,28,EU,,Europe/Rome,1900-01-01,2035-12-31,248
+336,Lombardia,I2,"I2|I[A-Z]2",15,28,EU,,Europe/Rome,1900-01-01,2035-12-31,248
+337,Pantelleria I.,IH9,I[ABCHIL-SU-Y]9,33,37,AF,,Europe/Rome,1900-01-01,2035-12-31,248
+338,Pelagie Is.,IG9,I[ABCGIL-SU-Y]9,33,37,AF,,Europe/Rome,1900-01-01,2035-12-31,248
+339,Puglia;Basilicata (Matera),I7,"I7|I[A-Z]7",15,28,EU,,Europe/Rome,1900-01-01,2035-12-31,248
+340,Sicily,IT9,I[A-FIJL-Y]9,15,28,EU,,Europe/Rome,1900-01-01,2035-12-31,248
+341,Toscana,I5,"I5|I[A-Z]5",15,28,EU,,Europe/Rome,1900-01-01,2035-12-31,248
+342,Trentino Alto Adige,IN3,"I[A-JM-UXY]3|IW3[A-D]",15,28,EU,,Europe/Rome,1900-01-01,2035-12-31,248
+343,Valle d'Aosta,IX1,"I[A-JL-OQ-VXY]1|IW1[A-O]",15,28,EU,,Europe/Rome,1900-01-01,2035-12-31,248
+344,Veneto,I3,"I3|I[A-MO-UXYZ]3|IW3[E-P]|IW3[0-9]",15,28,EU,,Europe/Rome,1900-01-01,2035-12-31,248
+345,Chugoku,JA4,"J[A-Z]4|7J4",25,45,AS,,Asia/Tokyo,1900-01-01,2035-12-31,339
+346,Hokkaido,JA8,"J[A-Z]8|7J8",25,45,AS,,Asia/Tokyo,1900-01-01,2035-12-31,339
+347,Hokuriku,JA9,"J[A-Z]9|7J9",25,45,AS,,Asia/Tokyo,1900-01-01,2035-12-31,339
+348,Kanto,JA1,"J[A-CE-S]1|7J1|7[K-N][1-4]",25,45,AS,,Asia/Tokyo,1900-01-01,2035-12-31,339
+349,Kinki,JA3,"J[A-Z]3|7J3",25,45,AS,,Asia/Tokyo,1900-01-01,2035-12-31,339
+350,Kyushu,JA6,"J[A-Q]6|JR6[A-P][A-Z][A-Z]|JR6Q[A-T][A-Z]|7J6[ABD-Z]",25,45,AS,,Asia/Tokyo,1900-01-01,2035-12-31,339
+351,Okinawa,JR6,"JR6[A-Z][A-Z].|JR6Q[U-Z][A-Z]|JR6[R-Z][A-Z][A-Z]|JS6|7J6C",25,45,AS,,Asia/Tokyo,1972-05-15,2035-12-31,339
+352,Shikoku,JA5,"J[A-Z]5|7J5",25,45,AS,,Asia/Tokyo,1900-01-01,2035-12-31,339
+353,Shinetsu,JA0,"J[A-Z]0|7J0",25,45,AS,,Asia/Tokyo,1900-01-01,2035-12-31,339
+354,Tohoku,JA7,"J[A-Z]7|7J7",25,45,AS,,Asia/Tokyo,1900-01-01,2035-12-31,339
+355,Tokai,JA2,"J[A-Z]2|7J2",25,45,AS,,Asia/Tokyo,1900-01-01,2035-12-31,339
+356,Europa I.,,FT[0-9]E,39,53,AF,,Indian/Reunion,1960-06-25,2035-12-31,124
+357,Juan de Nova I.,FT[0-9]J,FT[0-9]J,39,53,AF,,Indian/Reunion,1960-06-25,2035-12-31,124
+358,Akmola,UN[0-9]B,[A-Z][A-Z][0-9][BE],17,30,AS,AK,Asia/Almaty,1900-01-01,2035-12-31,130
+359,Aktobe,UN[0-9]I,[A-Z][A-Z][0-9]I,17,30,AS,AT,Asia/Aqtobe,1900-01-01,2035-12-31,130
+360,Almaty,UN[0-9]Q,[A-Z][A-Z][0-9][QV],17,0,AS,AY,Asia/Almaty,1900-01-01,2035-12-31,130
+361,Atyrau,UN[0-9]O,[A-Z][A-Z][0-9]O,17,0,AS,AR,Asia/Aqtau,1900-01-01,2035-12-31,130
+362,East Kazakhstan,UN[0-9]J,[A-Z][A-Z][0-9][JD],17,31,AS,SG,Asia/Almaty,1900-01-01,2035-12-31,130
+363,Karaganda,UN[0-9]P,[A-Z][A-Z][0-9][PR],17,0,AS,KG,Asia/Almaty,1900-01-01,2035-12-31,130
+364,Kostanay,UN[0-9]L,[A-Z][A-Z][0-9]L,17,30,AS,KT,Asia/Almaty,1900-01-01,2035-12-31,130
+365,Kyzylorda,UN[0-9]K,[A-Z][A-Z][0-9][KS],17,30,AS,KO,Asia/Qyzylorda,1900-01-01,2035-12-31,130
+366,Mangystau,UN[0-9]A,[A-Z][A-Z][0-9]A,17,30,AS,MN,Asia/Aqtau,1900-01-01,2035-12-31,130
+367,North Kazakhstan,UN[0-9]C,[A-Z][A-Z][0-9]C,17,30,AS,SL,Asia/Almaty,1900-01-01,2035-12-31,130
+368,Pavlodar,UN[0-9]F,[A-Z][A-Z][0-9]F,17,0,AS,PV,Asia/Almaty,1900-01-01,2035-12-31,130
+369,South Kazakhstan,UN[0-9]N,[A-Z][A-Z][0-9]N,17,0,AS,ON,,1900-01-01,2035-12-31,130
+370,West Kazakhstan,UN[0-9]M,[A-Z][A-Z][0-9]M,17,0,AS,BY,Asia/Oral,1900-01-01,2035-12-31,130
+371,Zhambyl,UN[0-9]T,[A-Z][A-Z][0-9]T,17,30,AS,ZM,Asia/Almaty,1900-01-01,2035-12-31,130
+372,Chuyskaya oblast,EX[0-9]M,EX[0-9][H-M],17,0,AS,,Asia/Bishkek,1900-01-01,2035-12-31,135
+373,Dzhalal-Abadskaya oblast,EX[0-9]V,EX[0-9]V,17,30,AS,,Asia/Bishkek,1900-01-01,2035-12-31,135
+374,Issyk-kulskaya oblast,EX[0-9]Q,EX[0-9]Q,17,31,AS,,Asia/Bishkek,1900-01-01,2035-12-31,135
+375,Narynskaya oblast,EX[0-9]P,EX[0-9]P,17,0,AS,,Asia/Bishkek,1900-01-01,2035-12-31,135
+376,Oshskaya oblast,EX[0-9]N,EX[0-9]N,17,30,AS,,Asia/Bishkek,1900-01-01,2035-12-31,135
+377,Talasskaya oblast,EX[0-9]T,EX[0-9]T,17,30,AS,,Asia/Bishkek,1900-01-01,2035-12-31,135
+378,Bong,EL7,..7,35,46,AF,,Africa/Monrovia,1900-01-01,2035-12-31,434
+379,Grand Bassa;River Cess,EL1,..1,35,46,AF,,Africa/Monrovia,1900-01-01,2035-12-31,434
+380,Grand Cape Mount,EL9,..9,35,46,AF,,Africa/Monrovia,1900-01-01,2035-12-31,434
+381,Grand Gedeh,EL6,..6,35,46,AF,,Africa/Monrovia,1900-01-01,2035-12-31,434
+382,Lofa,EL5,..5,35,46,AF,,Africa/Monrovia,1900-01-01,2035-12-31,434
+383,Maryland; Grand Kru,EL4,..4,35,46,AF,,Africa/Monrovia,1900-01-01,2035-12-31,434
+384,Montserrado;Bomi;Margibi,EL2,..2,35,46,AF,,Africa/Monrovia,1900-01-01,2035-12-31,434
+385,Nimba,EL8,..8,35,46,AF,,Africa/Monrovia,1900-01-01,2035-12-31,434
+386,Sinoe,EL3,..3,35,46,AF,,Africa/Monrovia,1900-01-01,2035-12-31,434
+387,Comino I.,9H8,9H8,15,28,EU,,Europe/Malta,1900-01-01,2035-12-31,258
+388,Gozo I.,9H4,9H4,15,28,EU,,Europe/Malta,1900-01-01,2035-12-31,259
+389,Caribbean Is. east of 90W,XF3,"XF3|4[A-C]3|6[D-J]3",6,10,NA,,America/Cancun,1900-01-01,2035-12-31,50
+390,Caribbean Is. west of 90W,XF2,"XF2|4[A-C]2|6[D-J]2",6,10,NA,,,1900-01-01,2035-12-31,50
+391,Central Mexico,XE1,"4[A-C]1|6[D-J]1|X[A-EG-I]1",6,10,NA,,,1900-01-01,2035-12-31,50
+392,North Mexico,XE2,"4[A-C]2|6[D-J]2|X[A-EG-I]2",6,10,NA,,,1900-01-01,2035-12-31,50
+393,Pacific Is.,XF1,"XF1|4[A-C]1|6[D-J]1",6,10,NA,,,1900-01-01,2035-12-31,50
+394,South Mexico,XE3,"4[A-C]3|6[D-J]3|X[A-EG-I]3",6,10,NA,,,1900-01-01,2035-12-31,50
+395,Beltsy;Rybnitsa;Floreshty,ER3,ER3,16,29,EU,,Europe/Chisinau,1900-01-01,2035-12-31,179
+396,Kagul;Komrat;Leovo;Chadyr-Lunga,ER5,ER5,16,29,EU,,Europe/Chisinau,1900-01-01,2035-12-31,179
+397,Kishinev;Dubossary;Orgeev;Khyncheshty,ER1,ER1,16,29,EU,,Europe/Chisinau,1900-01-01,2035-12-31,179
+398,Tiraspol;Bendery;Kaushany,ER2,ER2,16,29,EU,,Europe/Chisinau,1900-01-01,2035-12-31,179
+399,Yedintsy;Drokia;Soroki,ER4,ER4,16,29,EU,,Europe/Chisinau,1900-01-01,2035-12-31,179
+400,Arhangay;Ovorhangay,JT6,..6,23,32,AS,,Asia/Ulaanbaatar,1900-01-01,2035-12-31,363
+401,Bayan-Olgiy;Hovd,JT0,..0,23,32,AS,,Asia/Hovd,1900-01-01,2035-12-31,363
+402,Dornogovi;Hentiy,JT3,..3,23,33,AS,,Asia/Choibalsan,1900-01-01,2035-12-31,363
+403,Dundgovi;Omnogovi,JT4,..4,23,32,AS,,Asia/Ulaanbaatar,1900-01-01,2035-12-31,363
+404,Govi-Altay,JT8,..8,23,32,AS,,Asia/Hovd,1900-01-01,2035-12-31,363
+405,Hovsgol;Bulgan,JT7,..7,23,32,AS,,Asia/Ulaanbaatar,1900-01-01,2035-12-31,363
+406,Selenge;Ulaanbaatar,JT5,..5,23,32,AS,,Asia/Ulaanbaatar,1900-01-01,2035-12-31,363
+407,Suhbaatar,JT2,..2,23,33,AS,,Asia/Choibalsan,1900-01-01,2035-12-31,363
+408,"Uvs,Dzavhan",JT9,..9,23,32,AS,,Asia/Hovd,1900-01-01,2035-12-31,363
+409,Bottom of the North Is.,ZL2,..2,32,60,OC,,Pacific/Auckland,1900-01-01,2035-12-31,170
+410,"Bottom of the South Is., Stewart I.",ZL4,Z[LM]4,32,60,OC,,Pacific/Auckland,1900-01-01,2035-12-31,170
+411,Top of the North Is.,ZL1,Z[LM]1,32,60,OC,,Pacific/Auckland,1900-01-01,2035-12-31,170
+412,Top of the South Is.,ZL3,Z[LM]3,32,60,OC,,Pacific/Auckland,1900-01-01,2035-12-31,170
+413,"Boaco, Jinotega, Matagalpa",YN9,..9,7,11,NA,,America/Managua,1900-01-01,2035-12-31,86
+414,"Carazo, Rivas",YN5,..5,7,11,NA,,America/Managua,1900-01-01,2035-12-31,86
+415,Chinandega,YN6,..6,7,11,NA,,America/Managua,1900-01-01,2035-12-31,86
+416,"Chontales, Rio San Juan, Zelaya",YN4,..4,7,11,NA,,America/Managua,1900-01-01,2035-12-31,86
+417,"Esteli, Madriz, Nueva Segovia",YN8,..8,7,11,NA,,America/Managua,1900-01-01,2035-12-31,86
+418,Granada,YN2,..2,7,11,NA,,America/Managua,1900-01-01,2035-12-31,86
+419,Leon,YN3,..3,7,11,NA,,America/Managua,1900-01-01,2035-12-31,86
+420,Managua,YN1,..1,7,11,NA,,America/Managua,1900-01-01,2035-12-31,86
+421,Masaya,YN7,..7,7,11,NA,,America/Managua,1900-01-01,2035-12-31,86
+422,Anambra;Rivers;Bayelsa;Enugu;Ebonyi;Abia,5N4,..4,35,46,AF,,Africa/Lagos,1900-01-01,2035-12-31,450
+423,Bauchi;Adamawa,5N7,..7,35,46,AF,,Africa/Lagos,1900-01-01,2035-12-31,450
+424,Benue;Plateau;Nassarawa;Taraba,5N6,..6,35,46,AF,,Africa/Lagos,1900-01-01,2035-12-31,450
+425,Borno;Kano;Jigawa;Yobe,5N8,..8,35,46,AF,,Africa/Lagos,1900-01-01,2035-12-31,450
+426,Cross River;Imo;Akwa-Ibom,5N5,..5,35,46,AF,,Africa/Lagos,1900-01-01,2035-12-31,450
+427,Ekiti;Ondo;Edo;Delta,5N3,..3,35,46,AF,,Africa/Lagos,1900-01-01,2035-12-31,450
+428,Kaduna;Sokoto;Kebbi;Katsina;Zamfara,5N9,..9,35,46,AF,,Africa/Lagos,1900-01-01,2035-12-31,450
+429,Kwara;Niger;Kogi,5N2,..2,35,46,AF,,Africa/Lagos,1900-01-01,2035-12-31,450
+430,Lagos;Abuja,5N0,..0,35,46,AF,,Africa/Lagos,1900-01-01,2035-12-31,450
+431,Ogun;Oyo;Osun,5N1,..1,35,46,AF,,Africa/Lagos,1900-01-01,2035-12-31,450
+432,Morokulien,LG5LG,LG5LG.,14,18,EU,,Europe/Oslo,1900-01-01,2035-12-31,266
+433,Bocas del Toro,HP4,..4,7,11,NA,,America/Panama,1900-01-01,2035-12-31,88
+434,Chiriqui,HP3,..3,7,11,NA,,America/Panama,1900-01-01,2035-12-31,88
+435,Cocle,HP8,..8,7,11,NA,,America/Panama,1900-01-01,2035-12-31,88
+436,Coiba I.,HP0,..0,7,11,NA,,America/Panama,1900-01-01,2035-12-31,88
+437,Colon,HP2,..2,7,11,NA,,America/Panama,1900-01-01,2035-12-31,88
+438,Darien,HP7,..7,7,11,NA,,America/Panama,1900-01-01,2035-12-31,88
+439,Herrera,HP5,..5,7,11,NA,,America/Panama,1900-01-01,2035-12-31,88
+440,Los Santos,HP9,..9,7,11,NA,,America/Panama,1900-01-01,2035-12-31,88
+441,Panama,HP1,..1,7,11,NA,,America/Panama,1900-01-01,2035-12-31,88
+442,Veraguas,HP6,..6,7,11,NA,,America/Panama,1900-01-01,2035-12-31,88
+443,Alto Paraguay;Presidente Hayes,ZP2,ZP2,11,14,SA,,America/Asuncion,1900-01-01,2035-12-31,132
+444,Alto Parana;Itapua,ZP9,ZP9,11,14,SA,,America/Asuncion,1900-01-01,2035-12-31,132
+445,Boqueron;Chaco;Nueva Asuncion,ZP1,ZP1,11,14,SA,,America/Asuncion,1900-01-01,2035-12-31,132
+446,Caaguazu;Caazapa;Guaira,ZP7,ZP7,11,14,SA,,America/Asuncion,1900-01-01,2035-12-31,132
+447,Canindeiyu;San Pedro,ZP4,ZP4,11,14,SA,,America/Asuncion,1900-01-01,2035-12-31,132
+448,Central;Cordillera;Paraguari,ZP6,ZP6,11,14,SA,,America/Asuncion,1900-01-01,2035-12-31,132
+449,Concepcion;Amambay,ZP3,ZP3,11,14,SA,,America/Asuncion,1900-01-01,2035-12-31,132
+450,Misiones;Neembucu,ZP8,ZP8,11,14,SA,,America/Asuncion,1900-01-01,2035-12-31,132
+451,Amazonas;San Martin,OA9,..9,10,12,SA,,America/Lima,1900-01-01,2035-12-31,136
+452,Ancash;Huanuco,OA3,..3,10,12,SA,,America/Lima,1900-01-01,2035-12-31,136
+453,Apurimac;Ayacucho;Huancavelica;Ica,OA5,..5,10,12,SA,,America/Lima,1900-01-01,2035-12-31,136
+454,Arequipa;Moquegua;Tacna,OA6,..6,10,12,SA,,America/Lima,1900-01-01,2035-12-31,136
+455,Cajamarca;La Libertad,OA2,..2,10,12,SA,,America/Lima,1900-01-01,2035-12-31,136
+456,Cuzco;Puno;Madre de Dios,OA7,..7,10,12,SA,,America/Lima,1900-01-01,2035-12-31,136
+457,Lima;Callao;Junin;Pasco,OA4,..4,10,12,SA,,America/Lima,1900-01-01,2035-12-31,136
+458,Loreto;Ucayali,OA8,..8,10,12,SA,,America/Lima,1900-01-01,2035-12-31,136
+459,Piura;Tumbes;Lambayeque,OA1,..1,10,12,SA,,America/Lima,1900-01-01,2035-12-31,136
+460,Leyte I.;Samar I.,DU5,..5,27,50,OC,,Asia/Manila,1900-01-01,2035-12-31,375
+461,Luzon I. Central,DU1,..1,27,50,OC,,Asia/Manila,1900-01-01,2035-12-31,375
+462,Luzon I. North,DU3,..3,27,50,OC,,Asia/Manila,1900-01-01,2035-12-31,375
+463,Luzon I. North-Central,DU2,..2,27,50,OC,,Asia/Manila,1900-01-01,2035-12-31,375
+464,Luzon I. South,DU4,..4,27,50,OC,,Asia/Manila,1900-01-01,2035-12-31,375
+465,Mindanao I. East,DU9,..9,27,50,OC,,Asia/Manila,1900-01-01,2035-12-31,375
+466,Mindanao I. West,DU8,..8,27,50,OC,,Asia/Manila,1900-01-01,2035-12-31,375
+467,Negros Occidental;Panay I.,DU6,..6,27,50,OC,,Asia/Manila,1900-01-01,2035-12-31,375
+468,Negros Oriental;Bantayan;Bohol;Cebu;Mactan;Siquior Is.,DU7,..7,27,50,OC,,Asia/Manila,1900-01-01,2035-12-31,375
+469,Biala Podlaska;Chelm;Krosno;Lublin;Przemysl;Rzeszow;Zamosc,SP8,..8,15,28,EU,,Europe/Warsaw,1900-01-01,2035-12-31,269
+470,Bialystok;Lormza;Suwalki;Olsztyn,SP4,..4,15,28,EU,,Europe/Warsaw,1900-01-01,2035-12-31,269
+471,Bielsko Biala;Czestochowa;Katowice;Krakow;Nowy Sacz;Tarnow,SP9,..9,15,28,EU,,Europe/Warsaw,1900-01-01,2035-12-31,269
+472,Bydgoszcz;Elblag;Gdansk;Torun;Wloclawek,SP2,..2,15,28,EU,,Europe/Warsaw,1900-01-01,2035-12-31,269
+473,Ciechanow;Ostroleka;Plock;Siedlce;Warszawa,SP5,..5,15,28,EU,,Europe/Warsaw,1900-01-01,2035-12-31,269
+474,Gorzow Wlkp.;Kalisz;Konin;Leszno;Pila;Poznan;Zielona Gora,SP3,..3,15,28,EU,,Europe/Warsaw,1900-01-01,2035-12-31,269
+475,Jelenia Gora;Legnica;Opole;Walbrzych;Wroclaw,SP6,..6,15,28,EU,,Europe/Warsaw,1900-01-01,2035-12-31,269
+476,Kielce;Lodz;Piotrkow;Radom;Sieradz;Skierniewice;Tarnobrzeg,SP7,..7,15,28,EU,,Europe/Warsaw,1900-01-01,2035-12-31,269
+477,Koszalin;Slupsk;Szczecin,SP1,..1,15,28,EU,,Europe/Warsaw,1900-01-01,2035-12-31,269
+478,Alba;Bihor;Bistrita Nasaud;Cluj;Maramures;Salaj;Satu Mare,YO5,..5,20,28,EU,,Europe/Bucharest,1900-01-01,2035-12-31,275
+479,Arad;Caras Severin;Hunedoara;Timis,YO2,..2,20,28,EU,,Europe/Bucharest,1900-01-01,2035-12-31,275
+480,Arges;Dolj;Gorj;Mehedinti;Olt;Vilcea,YO7,..7,20,28,EU,,Europe/Bucharest,1900-01-01,2035-12-31,275
+481,Bacau;Botosani;Iasi;Neamt;Suceava;Vaslui,YO8,..8,20,28,EU,,Europe/Bucharest,1900-01-01,2035-12-31,275
+482,Braila;Constanta;Galati;Tulcea;Vrancea,YO4,..4,20,28,EU,,Europe/Bucharest,1900-01-01,2035-12-31,275
+483,Brasov;Covasna;Harghita;Mures;Sibiu,YO6,..6,20,28,EU,,Europe/Bucharest,1900-01-01,2035-12-31,275
+484,Buzau;Calarasi;Dimbovita;Giurgiu;Ialomita;Prahova;Teleorman,YO9,..9,20,28,EU,,Europe/Bucharest,1900-01-01,2035-12-31,275
+485,Saba I.,PJ6,PJ6,8,11,NA,,America/Curacao,2010-10-10,2035-12-31,519
+486,St.Eustatius,,PJ5,8,11,NA,,America/Curacao,2010-10-10,2035-12-31,519
+487,Small islands,IM0,IM0,15,28,EU,,Europe/Rome,1900-01-01,2035-12-31,225
+488,Shetland Is.,GZ,[GM2]Z,14,27,EU,,Europe/London,1900-01-01,2035-12-31,279
+489,Dakar,6W1,..1,35,46,AF,,Africa/Dakar,1960-06-20,2035-12-31,456
+490,Diourbel,6W3,..3,35,46,AF,,Africa/Dakar,1960-06-20,2035-12-31,456
+491,Fatick,6W9,..9,35,46,AF,,Africa/Dakar,1960-06-20,2035-12-31,456
+492,Kaolack,6W6,..6,35,46,AF,,Africa/Dakar,1960-06-20,2035-12-31,456
+493,Kolda,6W0,..0,35,46,AF,,Africa/Dakar,1960-06-20,2035-12-31,456
+494,Louga,6W8,..8,35,46,AF,,Africa/Dakar,1960-06-20,2035-12-31,456
+495,St. Louis,6W4,..4,35,46,AF,,Africa/Dakar,1960-06-20,2035-12-31,456
+496,Tambacounda,6W5,..5,35,46,AF,,Africa/Dakar,1960-06-20,2035-12-31,456
+497,Thies,6W7,..7,35,46,AF,,Africa/Dakar,1960-06-20,2035-12-31,456
+498,Ziguinchor,6W2,..2,35,46,AF,,Africa/Dakar,1960-06-20,2035-12-31,456
+499,Kosovo,YU8,..8,15,28,EU,,Europe/Belgrade,1900-01-01,2035-12-31,296
+500,Serbia,YU1,..1,15,28,EU,,Europe/Belgrade,1900-01-01,2035-12-31,296
+501,Vojvodina,YU7,..7,15,28,EU,,Europe/Belgrade,1900-01-01,2035-12-31,296
+502,"Central Slovakia, Centre/South",OM7,OM7,15,28,EU,,Europe/Prague,1993-01-01,2035-12-31,504
+503,"Central Slovakia, North",OM6,OM6,15,28,EU,,Europe/Prague,1993-01-01,2035-12-31,504
+504,"Eastern Slovakia, North-East",OM0,OM0,15,28,EU,,Europe/Prague,1993-01-01,2035-12-31,504
+505,"Eastern Slovakia, West/South",OM8,OM8,15,28,EU,,Europe/Prague,1993-01-01,2035-12-31,504
+506,"Western Slovakia, Centre/South",OM5,OM5,15,28,EU,,Europe/Prague,1993-01-01,2035-12-31,504
+507,"Western Slovakia, North",OM4,OM4,15,28,EU,,Europe/Prague,1993-01-01,2035-12-31,504
+508,"Western Slovakia, West",OM2,OM2,15,28,EU,,Europe/Prague,1993-01-01,2035-12-31,504
+509,Eastern Cape,ZS2,Z[A-Z]2,38,57,AF,,Africa/Johannesburg,1900-01-01,2035-12-31,462
+510,Free State,ZS4,Z[A-Z]4,38,57,AF,,Africa/Johannesburg,1900-01-01,2035-12-31,462
+511,Gauteng;Limpopo Province;Mpumalanga;North-West,ZS6,Z[A-Z]6,38,57,AF,,Africa/Johannesburg,1900-01-01,2035-12-31,462
+512,Kwazulu-Natal,ZS5,Z[A-Z]5,38,57,AF,,Africa/Johannesburg,1900-01-01,2035-12-31,462
+513,Northern Cape,ZS3,Z[A-Z]3,38,57,AF,,Africa/Johannesburg,1900-01-01,2035-12-31,462
+514,Western Cape,ZS1,Z[A-Z]1,38,57,AF,,Africa/Johannesburg,1900-01-01,2035-12-31,462
+515,Kyounggi;Kangwon,HL2,..2,25,44,AS,,Asia/Seoul,1900-01-01,2035-12-31,137
+516,N. Cholla;S. Cholla,HL4,..4,25,44,AS,,Asia/Seoul,1900-01-01,2035-12-31,137
+517,N. Chungchong;S. Chungchong,HL3,..3,25,44,AS,,Asia/Seoul,1900-01-01,2035-12-31,137
+518,N. Kyongsang;S. Kyongsang,HL5,..5,25,44,AS,,Asia/Seoul,1900-01-01,2035-12-31,137
+519,Andalucia,EA7,..7,14,37,EU,,Europe/Madrid,1900-01-01,2035-12-31,281
+520,Castilla La-Mancha;Madrid;Extremadura,EA4,..4,14,37,EU,,Europe/Madrid,1900-01-01,2035-12-31,281
+521,Catalunya,EA3,..3,14,37,EU,,Europe/Madrid,1900-01-01,2035-12-31,281
+522,Comunidad Valenciana;Murcia;Castilla La-Mancha,EA5,..5,14,37,EU,,Europe/Madrid,1900-01-01,2035-12-31,281
+523,Galicia;Asturias;Cantabria;Castilla-Leon;La Rioja,EA1,..1,14,37,EU,,Europe/Madrid,1900-01-01,2035-12-31,281
+524,Pays Vasco;Navarra;Aragon,EA2,..2,14,37,EU,,Europe/Madrid,1900-01-01,2035-12-31,281
+525,Itu-Aba Is.,BV9S,B[M-QU-X]9S,26,50,AS,,+07:00,1900-01-01,2035-12-31,247
+526,Ad Damir;northwest region,ST7,..7,34,48,AF,,Africa/Khartoum,1900-01-01,2035-12-31,466
+527,Al Fashir;Darfour region,ST8,..8,34,48,AF,,Africa/Khartoum,1900-01-01,2035-12-31,466
+528,Al Ubayyid;Kurdufan region,ST4,..4,34,48,AF,,Africa/Khartoum,1900-01-01,2035-12-31,466
+529,Kassala;eastern region,ST5,..5,34,48,AF,,Africa/Khartoum,1900-01-01,2035-12-31,466
+530,Khartoum Region,ST1,..2,34,48,AF,,Africa/Khartoum,1900-01-01,2035-12-31,466
+531,Malakal;central-south region; Wau; Bahr-al-Ghazal region,ST9,..9,34,48,AF,,Africa/Khartoum,1900-01-01,2035-12-31,466
+532,Port Sudan;northeast region,ST6,..6,34,48,AF,,Africa/Khartoum,1900-01-01,2035-12-31,466
+533,Wad Madani;central region,ST3,..3,34,48,AF,,Africa/Khartoum,1900-01-01,2035-12-31,466
+534,Brokopondo,PZ7,PZ7,9,12,SA,,America/Paramaribo,1900-01-01,2035-12-31,140
+535,Commewijne,PZ8,PZ8,9,12,SA,,America/Paramaribo,1900-01-01,2035-12-31,140
+536,Coronie,PZ3,PZ3,9,12,SA,,America/Paramaribo,1900-01-01,2035-12-31,140
+537,Marowijne,PZ9,PZ9,9,12,SA,,America/Paramaribo,1900-01-01,2035-12-31,140
+538,Nickerie,PZ2,PZ2,9,12,SA,,America/Paramaribo,1900-01-01,2035-12-31,140
+539,Para,PZ6,PZ6,9,12,SA,,America/Paramaribo,1900-01-01,2035-12-31,140
+540,Paramaribo;Wanica,PZ1,PZ1,9,12,SA,,America/Paramaribo,1900-01-01,2035-12-31,140
+541,Saramacca,PZ4,PZ4,9,12,SA,,America/Paramaribo,1900-01-01,2035-12-31,140
+542,Gothenburg & West Gothia,SM6,..6,14,18,EU,,Europe/Stockholm,1900-01-01,2035-12-31,284
+543,Gotland I.,SM1,..1,14,18,EU,,Europe/Stockholm,1900-01-01,2035-12-31,284
+544,Kopparberg and Orebro,SM4,..4,14,18,EU,,Europe/Stockholm,1900-01-01,2035-12-31,284
+545,Morokulien,SJ9,SJ9,14,18,EU,,Europe/Stockholm,1900-01-01,2035-12-31,284
+546,N. Norrland,SM2,..2,14,18,EU,,Europe/Stockholm,1900-01-01,2035-12-31,284
+547,S. Norrland,SM3,..3,14,18,EU,,Europe/Stockholm,1900-01-01,2035-12-31,284
+548,Smaaland & Scania,SM7,..7,14,18,EU,,Europe/Stockholm,1900-01-01,2035-12-31,284
+549,Stockholm Area,SM0,..0,14,18,EU,,Europe/Stockholm,1900-01-01,2035-12-31,284
+550,Svealand & East Gothia,SM5,..5,14,18,EU,,Europe/Stockholm,1900-01-01,2035-12-31,284
+551,Chang-Hua;Nan-Tou;Yun-Lin,BV5,..5,24,44,AS,,Asia/Taipei,1900-01-01,2035-12-31,386
+552,Chia-I;Tainan,BV6,..6,24,44,AS,,Asia/Taipei,1900-01-01,2035-12-31,386
+553,Green I.,BV9G,..9G,24,44,AS,,Asia/Taipei,1900-01-01,2035-12-31,386
+554,Huapimg I.,BV9H,..9H,24,44,AS,,Asia/Taipei,1900-01-01,2035-12-31,386
+555,Kaohsiung,BV7,..7,24,44,AS,,Asia/Taipei,1900-01-01,2035-12-31,386
+556,Keelung I.,BV9C,..9C,24,44,AS,,Asia/Taipei,1900-01-01,2035-12-31,386
+557,Keelung;I-Lang,BV1,B[MNPQU-X]1,24,44,AS,,Asia/Taipei,1900-01-01,2035-12-31,386
+558,Kinmem I.,BO0K,"BO0K|BO2",24,44,AS,,Asia/Taipei,1900-01-01,2035-12-31,386
+559,Kueishan I.,BV9K,..9K,24,44,AS,,Asia/Taipei,1900-01-01,2035-12-31,386
+560,Liuchiu Is.,BV9L,..9L,24,44,AS,,Asia/Taipei,1900-01-01,2035-12-31,386
+561,Matsu I.,BO0M,"BO0M|BO1",24,44,AS,,Asia/Taipei,1900-01-01,2035-12-31,386
+562,Miao-Li;Tai-Chung,BV4,..4,24,44,AS,,Asia/Taipei,1900-01-01,2035-12-31,386
+563,Mienhua I.,BV9M,..9M,24,44,AS,,Asia/Taipei,1900-01-01,2035-12-31,386
+564,Orchid I.,BV9O,..[09]O,24,44,AS,,Asia/Taipei,1900-01-01,2035-12-31,386
+565,Pen-Hu I.,BV9A,..9A,24,44,AS,,Asia/Taipei,1900-01-01,2035-12-31,386
+566,Pengchia I.,BV9W,..9W,24,44,AS,,Asia/Taipei,1900-01-01,2035-12-31,386
+567,Pintung;Tai-Tung;Hua-Lian,BV8,..8,24,44,AS,,Asia/Taipei,1900-01-01,2035-12-31,386
+568,Taipei,BV2,B[MNPQU-X]2,24,44,AS,,Asia/Taipei,1900-01-01,2035-12-31,386
+569,Tau-Yuan; Hsin-Chu,BV3,..3,24,44,AS,,Asia/Taipei,1900-01-01,2035-12-31,386
+570,Gorno-Badakhshanskaya A.Obl.,EY4,EY4,17,30,AS,,Asia/Dushanbe,1900-01-01,2035-12-31,262
+571,Khatlonskaya oblast / Kuliab Reg.,EY5,EY5,17,30,AS,,Asia/Dushanbe,1900-01-01,2035-12-31,262
+572,Khatlonskaya oblast / Kurgan-Tube Reg.,EY6,EY6,17,30,AS,,Asia/Dushanbe,1900-01-01,2035-12-31,262
+573,Leninabadskaya oblast,EY7,EY7,17,30,AS,,Asia/Dushanbe,1900-01-01,2035-12-31,262
+574,Nurek and Rep. subord.,EY9,EY9,17,30,AS,,Asia/Dushanbe,1900-01-01,2035-12-31,262
+575,Arusha;Kilimanjaro;Tanga,5H2,..2,37,53,AF,,Africa/Dar_es_Salaam,1900-01-01,2035-12-31,470
+576,Coast;Dar Es Salaam;Mafia I.,5H3,..3,37,53,AF,,Africa/Dar_es_Salaam,1900-01-01,2035-12-31,470
+577,Dodoma;Singida W.,5H0,..0,37,53,AF,,Africa/Dar_es_Salaam,1900-01-01,2035-12-31,470
+578,Iringa,5H6,..6,37,53,AF,,Africa/Dar_es_Salaam,1900-01-01,2035-12-31,470
+579,Kagera;Mwanza;Mara;Shinyanga;Ukerewe I.,5H9,..9,37,53,AF,,Africa/Dar_es_Salaam,1900-01-01,2035-12-31,470
+580,Kigoma;Rukwa;Tabora,5H8,..8,37,53,AF,,Africa/Dar_es_Salaam,1900-01-01,2035-12-31,470
+581,Lindi;Mtwara;Ruvuma,5H5,..5,37,53,AF,,Africa/Dar_es_Salaam,1900-01-01,2035-12-31,470
+582,Mbeya,5H7,..7,37,53,AF,,Africa/Dar_es_Salaam,1900-01-01,2035-12-31,470
+583,Morogoro,5H4,..4,37,53,AF,,Africa/Dar_es_Salaam,1900-01-01,2035-12-31,470
+584,Zanzibar;Pemba I.,5H1,..1,37,53,AF,,Africa/Dar_es_Salaam,1900-01-01,2035-12-31,470
+585,"Bangkok, Nontaburi,Pathumtani, Samut Prakarn, Chainat, Phra Nakhon, Lop Buri, Saraburi, Ang Tong, Sing . Buri",HS1,..1,26,49,AS,,Asia/Bangkok,1900-01-01,2035-12-31,387
+586,"Chantaburi,Chachoengsao, Chonburi,Trat, Nakhon Nayok,Prachin Buri, Rayong, Sa Kaeo",HS2,..2,26,49,AS,,Asia/Bangkok,1900-01-01,2035-12-31,387
+587,"Chiang Rai, Chiang Mai, Lampang, Nan, Phayao, Phrae, Mae Hong Son, Lamphun",HS5,..5,26,49,AS,,Asia/Bangkok,1900-01-01,2035-12-31,387
+588,"Chumphon, Surat Thani, Nakhon Si Thammarat, Phang Nga, Phuket, Ranong",HS8,..8,26,49,AS,,Asia/Bangkok,1900-01-01,2035-12-31,387
+589,"Kalasin, Khon Kaen, Maha Sarakham, Mukdahan, Roi Et, Yasothon, Sakon Nakhon, Nong Khai, Udon Thani",HS4,..4,26,49,AS,,Asia/Bangkok,1900-01-01,2035-12-31,387
+590,"Krabi, Trang, Pattani, Narathiwat, Phattalung, Yala, Songkhia, Satun",HS9,..9,26,49,AS,,Asia/Bangkok,1900-01-01,2035-12-31,387
+591,"Nakhon Pathom, Samut Sakhon, Kanchanaburi, Suphan Buri, Prachuab Khiri Khan, Phetchaburi, . Ratchaburi, Samut Songkhram",HS7,..7,26,49,AS,,Asia/Bangkok,1900-01-01,2035-12-31,387
+592,"Nakhon Ratchasima, Chayaphum, Buri Ram, Ubon Ratchathani, Si Sa Ket, Surin",HS3,..3,26,49,AS,,Asia/Bangkok,1900-01-01,2035-12-31,387
+593,"Nakhon Sawan, Kamphaeng Phet, Phitsanulok, Tak, Phichit, Phetchabum, Sukhothai, Uttaradit, Uthai Thani",HS6,..6,26,49,AS,,Asia/Bangkok,1900-01-01,2035-12-31,387
+594,Martin Vaz I.,PY0M,"..[0-9]M|..[0-9]ZM",11,15,SA,,America/Noronha,1900-01-01,2035-12-31,273
+595,Trindade I.,,"..[0-9]T|..[0-9]ZT",11,15,SA,,America/Noronha,1900-01-01,2035-12-31,273
+596,Gough I.,ZD9G,ZD9G,38,66,AF,,Atlantic/St_Helena,1900-01-01,2035-12-31,274
+597,Tristan da Cunha I.,ZD9B,ZD9[BC],38,66,AF,,Atlantic/St_Helena,1900-01-01,2035-12-31,274
+598,Center-north Anatolia,TA6,..6,20,39,AS,,Europe/Istanbul,1900-01-01,2035-12-31,390
+599,Center-south Anatolia,TA5,..5,20,39,AS,,Europe/Istanbul,1900-01-01,2035-12-31,390
+600,Eastern Anatolia,TA9,..9,20,39,AS,,Europe/Istanbul,1900-01-01,2035-12-31,390
+601,European Turkey,TA1,..1,20,39,EU,,Europe/Istanbul,1900-01-01,2035-12-31,390
+602,Northeastern Anatolia,TA7,..7,20,39,AS,,Europe/Istanbul,1900-01-01,2035-12-31,390
+603,Nortwestern Anatolia,TA2,..2,20,39,AS,,Europe/Istanbul,1900-01-01,2035-12-31,390
+604,Southeastern Anatolia,TA8,..8,20,39,AS,,Europe/Istanbul,1900-01-01,2035-12-31,390
+605,Southwestern Anatolia,TA4,..4,20,39,AS,,Europe/Istanbul,1900-01-01,2035-12-31,390
+606,Station on an Island,TA0,..0,20,39,AS,,Europe/Istanbul,1900-01-01,2035-12-31,390
+607,Western Anatolia,TA3,..3,20,39,AS,,Europe/Istanbul,1900-01-01,2035-12-31,390
+608,Akhalsky veloyat,EZ3,..3,17,30,AS,,Asia/Ashgabat,1900-01-01,2035-12-31,280
+609,Balkansky veloyat,EZ4,..4,17,30,AS,,Asia/Ashgabat,1900-01-01,2035-12-31,280
+610,Dashkhovuzsky veloyat,EZ6,..6,17,30,AS,,Asia/Ashgabat,1900-01-01,2035-12-31,280
+611,Lebapsky veloyat,EZ7,..7,17,30,AS,,Asia/Ashgabat,1900-01-01,2035-12-31,280
+612,Maryisky veloyat,EZ5,..5,17,30,AS,,Asia/Ashgabat,1900-01-01,2035-12-31,280
+613,Cherkaska oblast,UR[0-9]C,U[R-TV-Z][0-9]C,16,29,EU,CH,Europe/Kiev,1900-01-01,2035-12-31,288
+614,Chernigivska oblast,UR[0-9]R,U[R-TV-Z][0-9]R,16,29,EU,CR,Europe/Kiev,1900-01-01,2035-12-31,288
+615,Chernovytska oblast,UR[0-9]Y,U[R-TV-Z][0-9]Y,16,29,EU,CN,Europe/Kiev,1900-01-01,2035-12-31,288
+616,Crimea,UU,UU,16,29,EU,KR,Europe/Simferopol,1900-01-01,2035-12-31,288
+617,Dnipropetrovska oblast,UR[0-9]E,U[R-TV-Z][0-9]E,16,29,EU,DN,Europe/Kiev,1900-01-01,2035-12-31,288
+618,Donetska oblast,UR[0-9]I,U[R-TV-Z][0-9]I,16,29,EU,DO,Europe/Kiev,1900-01-01,2035-12-31,288
+619,Ivano-Frankivska oblast,UR[0-9]S,U[R-TV-Z][0-9]S,16,29,EU,IF,Europe/Kiev,1900-01-01,2035-12-31,288
+620,Kharkivska oblast,UR[0-9]L,U[R-TV-Z][0-9]L,16,29,EU,HA,Europe/Kiev,1900-01-01,2035-12-31,288
+621,Khersonska oblast,UR[0-9]G,U[R-TV-Z][0-9]G,16,29,EU,HE,Europe/Kiev,1900-01-01,2035-12-31,288
+622,Khmelnitska oblast,UR[0-9]T,U[R-TV-Z][0-9]T,16,29,EU,HM,Europe/Kiev,1900-01-01,2035-12-31,288
+623,Kirovogradska oblast,UR[0-9]V,U[R-TV-Z][0-9]V,16,29,EU,KI,Europe/Kiev,1900-01-01,2035-12-31,288
+624,Kyivska oblast,UR[0-9]U,U[R-TV-Z][0-9]U,16,29,EU,KO,Europe/Kiev,1900-01-01,2035-12-31,288
+625,Luganska oblast,UR[0-9]M,U[R-TV-Z][0-9]M,16,29,EU,LU,Europe/Zaporozhye,1900-01-01,2035-12-31,288
+626,Lvivska oblast,UR[0-9]W,U[R-TV-Z][0-9]W,16,29,EU,LV,Europe/Kiev,1900-01-01,2035-12-31,288
+627,Mykolaivska oblast,UR[0-9]Z,U[R-TV-Z][0-9]Z,16,29,EU,NI,Europe/Kiev,1900-01-01,2035-12-31,288
+628,Odeska oblast,UR[0-9]F,U[R-TV-Z][0-9]F,16,29,EU,OD,Europe/Kiev,1900-01-01,2035-12-31,288
+629,Poltavska oblast,UR[0-9]H,U[R-TV-Z][0-9]H,16,29,EU,PO,Europe/Kiev,1900-01-01,2035-12-31,288
+630,Rivenska oblast,UR[0-9]K,U[R-TV-Z][0-9]K,16,29,EU,RI,Europe/Kiev,1900-01-01,2035-12-31,288
+631,Sumyska oblast,UR[0-9]A,U[R-TV-Z][0-9]A,16,29,EU,SU,Europe/Kiev,1900-01-01,2035-12-31,288
+632,Ternopilska oblast,UR[0-9]B,U[R-TV-Z][0-9]B,16,29,EU,TE,Europe/Kiev,1900-01-01,2035-12-31,288
+633,Vinnitska oblast,UR[0-9]N,U[R-TV-Z][0-9]N,16,29,EU,VI,Europe/Kiev,1900-01-01,2035-12-31,288
+634,Volynska oblast,UR[0-9]P,U[R-TV-Z][0-9]P,16,29,EU,VO,Europe/Kiev,1900-01-01,2035-12-31,288
+635,Zakarpatska oblast,UR[0-9]D,U[R-TV-Z][0-9]D,16,29,EU,ZA,Europe/Uzhgorod,1900-01-01,2035-12-31,288
+636,Zaporizhska oblast,UR[0-9]Q,U[R-TV-Z][0-9]Q,16,29,EU,ZP,Europe/Zaporozhye,1900-01-01,2035-12-31,288
+637,Zhytomirska oblast,UR[0-9]X,U[R-TV-Z][0-9]X,16,29,EU,ZH,Europe/Kiev,1900-01-01,2035-12-31,288
+638,Artigas,CX[0-9]K,..[0-9]K,13,14,SA,,America/Montevideo,1900-01-01,2035-12-31,144
+639,Canelones,CX[0-9]D,..[0-9]D,13,14,SA,,America/Montevideo,1900-01-01,2035-12-31,144
+640,Cerro Largo,CX[0-9]V,..[0-9]V,13,14,SA,,America/Montevideo,1900-01-01,2035-12-31,144
+641,Colonia,CX[0-9]F,..[0-9]F,13,14,SA,,America/Montevideo,1900-01-01,2035-12-31,144
+642,Durazno,CX[0-9]N,..[0-9]N,13,14,SA,,America/Montevideo,1900-01-01,2035-12-31,144
+643,Flores,CX[0-9]M,..[0-9]M,13,14,SA,,America/Montevideo,1900-01-01,2035-12-31,144
+644,Florida,CX[0-9]L,..[0-9]L,13,14,SA,,America/Montevideo,1900-01-01,2035-12-31,144
+645,Lavalleja,CX[0-9]S,..[0-9]S,13,14,SA,,America/Montevideo,1900-01-01,2035-12-31,144
+646,Maldonado,CX[0-9]R,..[0-9]R,13,14,SA,,America/Montevideo,1900-01-01,2035-12-31,144
+647,Montevideo,CX[0-9]A,..[0-9][ABC],13,14,SA,,America/Montevideo,1900-01-01,2035-12-31,144
+648,Paysandu,CX[0-9]I,..[0-9]I,13,14,SA,,America/Montevideo,1900-01-01,2035-12-31,144
+649,Rio Negro,CX[0-9]H,..[0-9]H,13,14,SA,,America/Montevideo,1900-01-01,2035-12-31,144
+650,Rivera,CX[0-9]P,..[0-9]P,13,14,SA,,America/Montevideo,1900-01-01,2035-12-31,144
+651,Rocha,CX[0-9]T,..[0-9]T,13,14,SA,,America/Montevideo,1900-01-01,2035-12-31,144
+652,Salto,CX[0-9]J,..[0-9]J,13,14,SA,,America/Montevideo,1900-01-01,2035-12-31,144
+653,San Jose,CX[0-9]E,..[0-9]E,13,14,SA,,America/Montevideo,1900-01-01,2035-12-31,144
+654,Soriano,CX[0-9]G,..[0-9]G,13,14,SA,,America/Montevideo,1900-01-01,2035-12-31,144
+655,Tacuarembo,CX[0-9]O,..[0-9]O,13,14,SA,,America/Montevideo,1900-01-01,2035-12-31,144
+656,Treinta y Tres,CX[0-9]U,..[0-9]U,13,14,SA,,America/Montevideo,1900-01-01,2035-12-31,144
+657,Andizhanskaya oblast,UK[0-9]F,..[0-9]F,17,30,AS,,Asia/Tashkent,1900-01-01,2035-12-31,292
+658,Bukharskaya oblast,UK[0-9]L,..[0-9]L,17,30,AS,,Asia/Samarkand,1900-01-01,2035-12-31,292
+659,Dzhizakskaya oblast,UK[0-9]V,..[0-9]V,17,30,AS,,Asia/Samarkand,1900-01-01,2035-12-31,292
+660,Ferganskaya oblast,UK[0-9]G,..[0-9]G,17,30,AS,,Asia/Tashkent,1900-01-01,2035-12-31,292
+661,Karakalpakia,UK[0-9]Z,..[0-9]Z,17,30,AS,,Asia/Samarkand,1900-01-01,2035-12-31,292
+662,Kashkardaryinskaya oblast,UK[0-9]C,..[0-9]C,17,30,AS,,Asia/Samarkand,1900-01-01,2035-12-31,292
+663,Khorezmskaya oblast,UK[0-9]U,..[0-9]U,17,30,AS,,Asia/Samarkand,1900-01-01,2035-12-31,292
+664,Namanganskaya oblast,UK[0-9]O,..[0-9]O,17,30,AS,,Asia/Tashkent,1900-01-01,2035-12-31,292
+665,Navoiyskaya oblast,UK[0-9]Q,..[0-9]Q,17,30,AS,,Asia/Samarkand,1900-01-01,2035-12-31,292
+666,Samarkandskaya oblast,UK[0-9]I,..[0-9]I,17,30,AS,,Asia/Samarkand,1900-01-01,2035-12-31,292
+667,Surkhandaryinskaya oblast,UK[0-9]T,..[0-9]T,17,30,AS,,Asia/Samarkand,1900-01-01,2035-12-31,292
+668,Syrdaryinskaya oblast,UK[0-9]D,..[0-9]D,17,30,AS,,Asia/Tashkent,1900-01-01,2035-12-31,292
+669,Tashkentskaya oblast,UK[0-9]B,..[0-9]B,17,30,AS,,Asia/Tashkent,1900-01-01,2035-12-31,292
+670,Apure;Amazonas,YV9,..9,9,12,SA,,America/Caracas,1900-01-01,2035-12-31,148
+671,Aragua;Carabobo;Cojedes,YV4,..4,9,12,SA,,America/Caracas,1900-01-01,2035-12-31,148
+672,Barinas;Merida;Tachira,YV2,..2,9,12,SA,,America/Caracas,1900-01-01,2035-12-31,148
+673,Bolivar;Anzoategui,YV6,..6,9,12,SA,,America/Caracas,1900-01-01,2035-12-31,148
+674,Distrito Federal;Guarico;Miranda;Vargas,YV5,..5,9,12,SA,,America/Caracas,1900-01-01,2035-12-31,148
+675,Falcon;Trujillo;Zulia,YV1,..1,9,12,SA,,America/Caracas,1900-01-01,2035-12-31,148
+676,Lara;Portuguesa;Yaracuy,YV3,..3,9,12,SA,,America/Caracas,1900-01-01,2035-12-31,148
+677,Monagas;Delta Amacuro,YV8,..8,9,12,SA,,America/Caracas,1900-01-01,2035-12-31,148
+678,Sucre;Nueva Esparta,YV7,..7,9,12,SA,,America/Caracas,1900-01-01,2035-12-31,148
+679,Islands of Calabria Region,ID8,ID8,15,28,EU,,Europe/Rome,1900-01-01,2035-12-31,248
+680,Islands of Campania Region,IC8,"IC8|IL8",15,28,EU,,Europe/Rome,1900-01-01,2035-12-31,248
+681,Emilia Romagna's Is.,IL4,IL4,15,28,EU,,Europe/Rome,1900-01-01,2035-12-31,248
+682,Islands of Lazio Region,IB0,IB0,15,28,EU,,Europe/Rome,1900-01-01,2035-12-31,248
+683,Ligurian Is.,IP1,IP1,15,28,EU,,Europe/Rome,1900-01-01,2035-12-31,248
+684,Pugliese Ionian Is.,IJ7,IJ7,15,28,EU,,Europe/Rome,1900-01-01,2035-12-31,248
+685,Tremiti islands,IL7,IL7,15,28,EU,,Europe/Rome,1900-01-01,2035-12-31,248
+686,Egadi Is.,IF9,IF9,15,28,EU,,Europe/Rome,1900-01-01,2035-12-31,248
+687,Eolie's Is.,ID9,ID9,15,28,EU,,Europe/Rome,1900-01-01,2035-12-31,248
+688,Sicilian Ionian Is.,IJ9,IJ9,15,28,EU,,Europe/Rome,1900-01-01,2035-12-31,248
+689,Ustica I.,IE9,IE9,15,28,EU,,Europe/Rome,1900-01-01,2035-12-31,248
+690,Islands of Toscana Region,IA5,IA5,15,28,EU,,Europe/Rome,1900-01-01,2035-12-31,248
+691,Friuli Venezia Giulia & Veneto's Is.,IL3,IL3,15,28,EU,,Europe/Rome,1900-01-01,2035-12-31,248
+692,Amurskaya oblast,UA0J,"[A-Z][0-9]J|[A-Z][A-Z][0-9]J",19,33,AS,AM,Asia/Yakutsk,1900-01-01,2035-12-31,15
+693,Chukotsky A.O.,UA0K,"[A-Z][0-9]K|[A-Z][A-Z][0-9]K",19,0,AS,CK,Asia/Anadyr,1900-01-01,2035-12-31,15
+694,Irkutskaya oblast,UA0S,"[A-Z][0-9][RST]|[A-Z][A-Z][0-9][RST]",18,0,AS,IR,Asia/Irkutsk,1900-01-01,2035-12-31,15
+695,Kamchatskiy Kray,UA0Z,"[A-Z][0-9][XZ]|[A-Z][A-Z][0-9][XZ]",19,35,AS,KT,Asia/Kamchatka,1900-01-01,2035-12-31,15
+696,Khabarovsky Kray,UA0C,"[A-Z][0-9]C|[A-Z][A-Z][0-9][GC]",19,0,AS,HK,Asia/Vladivostok,1900-01-01,2035-12-31,15
+697,Krasnoyarsky Kray,UA0A,"[A-Z][0-9][ABH]|[A-Z][A-Z][0-9][ABH]",18,0,AS,KK,Asia/Krasnoyarsk,1900-01-01,2035-12-31,15
+698,Magadanskaya oblast,UA0I,"[A-Z][0-9]I|[A-Z][A-Z][0-9]I",19,0,AS,MG,Asia/Magadan,1900-01-01,2035-12-31,15
+699,Primorsky Kray,UA0L,"[A-Z][0-9]L|[A-Z][A-Z][0-9]L",19,34,AS,PK,Asia/Vladivostok,1900-01-01,2035-12-31,15
+700,Rep. of Buryatia,UA0O,"[A-Z][0-9]O|[A-Z][A-Z][0-9]O",18,0,AS,BU,Asia/Irkutsk,1900-01-01,2035-12-31,15
+701,Rep. of Khakassia,UA0W,"[A-Z][0-9]W|[A-Z][A-Z][0-9]W",18,0,AS,HA,Asia/Krasnoyarsk,1900-01-01,2035-12-31,15
+702,Rep. of Saha,UA0Q,"[A-Z][0-9]Q|[A-Z][A-Z][0-9]Q",19,0,AS,YA,,1900-01-01,2035-12-31,15
+703,Rep. of Tuva,UA0Y,"[A-Z][0-9]Y|[A-Z][A-Z][0-9]Y",23,32,AS,TU,Asia/Krasnoyarsk,1900-01-01,2035-12-31,15
+704,Sakhalinskaya oblast,UA0F,"[A-Z][0-9]F|[A-Z][A-Z][0-9]F",19,34,AS,SL,Asia/Sakhalin,1900-01-01,2035-12-31,15
+705,Yevreyskaya A.Obl.,UA0D,"[A-Z][0-9]D|[A-Z][A-Z][0-9]D",19,34,AS,SL,Asia/Sakhalin,1900-01-01,2035-12-31,15
+706,Zabajkalskiy Kray,UA0U,"[A-Z][0-9][UV]|[A-Z][A-Z][0-9][UV]",18,33,AS,ZK,Asia/Yakutsk,1900-01-01,2035-12-31,15
+707,Altaisky Kray,UA9Y,"[A-Z][0-9]Y|[A-Z][A-Z][0-9]Y",18,31,AS,AL,Asia/Novosibirsk,1900-01-01,2035-12-31,15
+708,Altay Rep.,UA9Z,"[A-Z][0-9]Z|[A-Z][A-Z][0-9]Z",18,31,AS,GA,Asia/Novosibirsk,1900-01-01,2035-12-31,15
+709,Bashkortostan,UA9W,"[A-Z][0-9]W|[A-Z][A-Z][0-9]W",16,30,AS,BA,Asia/Yekaterinburg,1900-01-01,2035-12-31,15
+710,Chelyabinskaya oblast,UA9A,"[A-Z][0-9][AB]|[A-Z][A-Z][0-9][AB]",17,30,AS,CB,Asia/Yekaterinburg,1900-01-01,2035-12-31,15
+711,Kemerovskaya oblast,UA9U,"[A-Z][0-9][UV]|[A-Z][A-Z][0-9][UV]",18,31,AS,KE,Asia/Krasnoyarsk,1900-01-01,2035-12-31,15
+712,Khanty-Mansyisky A.O.,UA9J,"[A-Z][0-9]J|[A-Z][A-Z][0-9]J",17,0,AS,HM,Asia/Yekaterinburg,1900-01-01,2035-12-31,15
+713,Kurganskaya oblast,UA9Q,"[A-Z][0-9][QR]|[A-Z][A-Z][0-9][QR]",17,30,AS,KN,Asia/Yekaterinburg,1900-01-01,2035-12-31,15
+714,Novosibirskaya oblast,UA9O,"[A-Z][0-9][OP]|[A-Z][A-Z][0-9][OP]",18,31,AS,NS,Asia/Novosibirsk,1900-01-01,2035-12-31,15
+715,Omskaya oblast,UA9M,"[A-Z][0-9][MN]|[A-Z][A-Z][0-9][MN]",17,0,AS,OM,Asia/Omsk,1900-01-01,2035-12-31,15
+716,Orenburgskaya oblast,UA9S,"[A-Z][0-9][ST]|[A-Z][A-Z][0-9][ST]",16,30,AS,OB,Asia/Yekaterinburg,1900-01-01,2035-12-31,15
+717,Sverdlovskaya oblast,UA9C,"[A-Z][0-9][CD]|[A-Z][A-Z][0-9][CD]",17,0,AS,SV,Asia/Yekaterinburg,1900-01-01,2035-12-31,15
+718,Tomskaya oblast,UA9H,"[A-Z][0-9][HI]|[A-Z][A-Z][0-9][HI]",18,31,AS,TO,Asia/Omsk,1900-01-01,2035-12-31,15
+719,Tyumenskaya oblast,UA9L,"[A-Z][0-9]L|[A-Z][A-Z][0-9]L",17,30,AS,TN,Asia/Yekaterinburg,1900-01-01,2035-12-31,15
+720,Yamalo-Nenetsky A.O.,UA9K,"[A-Z][0-9]K|[A-Z][A-Z][0-9]K",17,0,AS,YN,Asia/Yekaterinburg,1900-01-01,2035-12-31,15
+721,Belgorodskaya oblast,UA3Z,"[A-Z][0-9]Z|[A-Z][A-Z][0-9]Z",16,0,EU,BO,Europe/Moscow,1900-01-01,2035-12-31,54
+722,Bryanskaya oblast,UA3Y,"[A-Z][0-9]Y|[A-Z][A-Z][0-9]Y",16,0,EU,BR,Europe/Moscow,1900-01-01,2035-12-31,54
+723,Ivanovskaya oblast,UA3U,"[A-Z][0-9]U|[A-Z][A-Z][0-9]U",16,0,EU,IV,Europe/Moscow,1900-01-01,2035-12-31,54
+724,Kaluzhskaya oblast,UA3X,"[A-Z][0-9]X|[A-Z][A-Z][0-9]X",16,0,EU,KG,Europe/Moscow,1900-01-01,2035-12-31,54
+725,Kostromskaya oblast,UA3N,"[A-Z][0-9]N|[A-Z][A-Z][0-9]N",16,0,EU,KS,Europe/Moscow,1900-01-01,2035-12-31,54
+726,Kurskaya oblast,UA3W,"[A-Z][0-9]W|[A-Z][A-Z][0-9]W",16,0,EU,KU,Europe/Moscow,1900-01-01,2035-12-31,54
+727,Lipetskaya oblast,UA3G,"[A-Z][0-9]G|[A-Z][A-Z][0-9]G",16,0,EU,LP,Europe/Moscow,1900-01-01,2035-12-31,54
+728,Moscovskaya oblast,UA3D,"[A-Z][0-9][DFH]|[A-Z][A-Z][0-9][DFH]",16,0,EU,MO,Europe/Moscow,1900-01-01,2035-12-31,54
+729,Nizhegorodskaya oblast,UA3T,"[A-Z][0-9]T|[A-Z][A-Z][0-9]T",16,0,EU,NN,Europe/Moscow,1900-01-01,2035-12-31,54
+730,Orlovskaya oblast,UA3E,"[A-Z][0-9]E|[A-Z][A-Z][0-9]E",16,0,EU,OR,Europe/Moscow,1900-01-01,2035-12-31,54
+731,Ryazanskaya oblast,UA3S,"[A-Z][0-9]S|[A-Z][A-Z][0-9]S",16,0,EU,RA,Europe/Moscow,1900-01-01,2035-12-31,54
+732,Smolenskaya oblast,UA3L,"[A-Z][0-9]L|[A-Z][A-Z][0-9]L",16,0,EU,SM,Europe/Moscow,1900-01-01,2035-12-31,54
+733,Tambovskaya oblast,UA3R,"[A-Z][0-9]R|[A-Z][A-Z][0-9]R",16,0,EU,TB,Europe/Moscow,1900-01-01,2035-12-31,54
+734,Tulskaya oblast,UA3P,"[A-Z][0-9]P|[A-Z][A-Z][0-9]P",16,0,EU,TL,Europe/Moscow,1900-01-01,2035-12-31,54
+735,Tverskaya oblast,UA3I,"[A-Z][0-9]I|[A-Z][A-Z][0-9]I",16,0,EU,TV,Europe/Moscow,1900-01-01,2035-12-31,54
+736,Vladimirskaya oblast,UA3V,"[A-Z][0-9]V|[A-Z][A-Z][0-9]V",16,0,EU,VL,Europe/Moscow,1900-01-01,2035-12-31,54
+737,Voronezhskaya oblast,UA3Q,"[A-Z][0-9][KOQ]|[A-Z][A-Z][0-9][KOQ]",16,0,EU,VR,Europe/Moscow,1900-01-01,2035-12-31,54
+738,Yaroslavskaya oblast,UA3M,"[A-Z][0-9]M|[A-Z][A-Z][0-9]M",16,0,EU,JA,Europe/Moscow,1900-01-01,2035-12-31,54
+739,Astrakhanskaya oblast,UA6U,"[A-Z][0-9]U|[A-Z][A-Z][0-9]U",16,0,EU,AO,Europe/Volgograd,1900-01-01,2035-12-31,54
+740,Krasnodarsky Kray,UA6A,"[A-Z][0-9][A-D]|[A-Z][A-Z][0-9][A-D]",16,0,EU,KR,Europe/Moscow,1900-01-01,2035-12-31,54
+741,Rep. Chechnya,UA6P,"[A-Z][0-9]P|[A-Z][A-Z][0-9]P",16,0,EU,CN,Europe/Moscow,1900-01-01,2035-12-31,54
+742,Rep. of Adygeya,UA6Y,"[A-Z][0-9]Y,[A-Z][A-Z][0-9]Y",16,0,EU,AD,Europe/Moscow,1900-01-01,2035-12-31,54
+743,Rep. of Daghestan,UA6W,"[A-Z][0-9]W|[A-Z][A-Z][0-9]W",16,0,EU,DA,Europe/Moscow,1900-01-01,2035-12-31,54
+744,Rep. of Ingushetia,UA6Q,"[A-Z][0-9]Q|[A-Z][A-Z][0-9]Q",16,0,EU,IN,Europe/Moscow,1900-01-01,2035-12-31,54
+745,Rep. of Kabardino-Balkaria,UA6X,"[A-Z][0-9]X|[A-Z][A-Z][0-9]X",16,0,EU,KB,Europe/Moscow,1900-01-01,2035-12-31,54
+746,Rep. of Kalmykia,UA6I,"[A-Z][0-9]I|[A-Z][A-Z][0-9]I",16,0,EU,KM,Europe/Moscow,1900-01-01,2035-12-31,54
+747,Rep. of Karachaevo-Cherkessia,UA6E,"[A-Z][0-9]E|[A-Z][A-Z][0-9]E",16,0,EU,KC,Europe/Moscow,1900-01-01,2035-12-31,54
+748,Rep. of Northern Ossetia,UA6J,"[A-Z][0-9]J|[A-Z][A-Z][0-9]J",16,0,EU,SO,Europe/Moscow,1900-01-01,2035-12-31,54
+749,Rostovskaya oblast,UA6L,"[A-Z][0-9][LMN]|[A-Z][A-Z][0-9][LMN]",16,0,EU,RO,Europe/Moscow,1900-01-01,2035-12-31,54
+750,Stavropolsky Kray,UA6H,"[A-Z][0-9][FGH]|[A-Z][A-Z][0-9][FGH]",16,0,EU,ST,Europe/Moscow,1900-01-01,2035-12-31,54
+751,Arkhangelskaya oblast,UA1O,"[A-Z][0-9]O|[A-Z][A-Z][0-9]O",16,19,EU,AR,Europe/Moscow,1900-01-01,2035-12-31,54
+752,Leningradskaya oblast,UA1C,"[A-Z][0-9][CD]|[A-Z][A-Z][0-9][CD]",16,0,EU,LO,Europe/Moscow,1900-01-01,2035-12-31,54
+753,Murmanskaya oblast,UA1Z,"[A-Z][0-9]Z|[A-Z][A-Z][0-9]Z",16,19,EU,MU,Europe/Moscow,1900-01-01,2035-12-31,54
+754,Nenetsky A.O.,UA1P,"[A-Z][0-9]P|[A-Z][A-Z][0-9]P",16,0,EU,NO,Europe/Moscow,1900-01-01,2035-12-31,54
+755,Novgorodskaya oblast,UA1T,"[A-Z][0-9]T|[A-Z][A-Z][0-9]T",16,29,EU,NV,Europe/Moscow,1900-01-01,2035-12-31,54
+756,Pskovskaya oblast,UA1W,"[A-Z][0-9]W|[A-Z][A-Z][0-9]W",16,29,EU,PS,Europe/Moscow,1900-01-01,2035-12-31,54
+757,Rep. of Karelia,UA1N,"[A-Z][0-9]N|[A-Z][A-Z][0-9]N",16,19,EU,KL,Europe/Moscow,1900-01-01,2035-12-31,54
+758,Vologodskaya oblast,UA1Q,"[A-Z][0-9]Q|[A-Z][A-Z][0-9]Q",16,0,EU,VO,Europe/Moscow,1900-01-01,2035-12-31,54
+759,Kirovskaya oblast,UA4N,"[A-Z][0-9]N|[A-Z][A-Z][0-9]N",16,0,EU,KI,Europe/Volgograd,1900-01-01,2035-12-31,54
+760,Penzenskaya oblast,UA4F,"[A-Z][0-9]F|[A-Z][A-Z][0-9]F",16,29,EU,PE,Europe/Moscow,1900-01-01,2035-12-31,54
+761,Rep. of Chuvashia,UA4Y,"[A-Z][0-9]Y|[A-Z][A-Z][0-9]Y",16,29,EU,CU,Europe/Moscow,1900-01-01,2035-12-31,54
+762,Rep. of Marij-El,UA4S,"[A-Z][0-9]S|[A-Z][A-Z][0-9]S",16,29,EU,MR,Europe/Moscow,1900-01-01,2035-12-31,54
+763,Rep. of Mordovia,UA4U,"[A-Z][0-9]U|[A-Z][A-Z][0-9]U",16,29,EU,MD,Europe/Moscow,1900-01-01,2035-12-31,54
+764,Rep. of Tataria,UA4P,"[A-Z][0-9][PQR]|[A-Z][A-Z][0-9][PQR]",16,0,EU,TA,Europe/Moscow,1900-01-01,2035-12-31,54
+765,Rep. of Udmurtia,UA4W,"[A-Z][0-9]W|[A-Z][A-Z][0-9]W",16,30,EU,UD,Europe/Samara,1900-01-01,2035-12-31,54
+766,Samarskaya oblast,UA4H,"[A-Z][0-9][HI]|[A-Z][A-Z][0-9][HI]",16,0,EU,SR,Europe/Samara,1900-01-01,2035-12-31,54
+767,Saratovskaya oblast,UA4C,"[A-Z][0-9][CD]|[A-Z][A-Z][0-9][CD]",16,29,EU,SA,Europe/Volgograd,1900-01-01,2035-12-31,54
+768,Ulyanovskaya oblast,UA4L,"[A-Z][0-9][LM]|[A-Z][A-Z][0-9][LM]",16,29,EU,UL,Europe/Moscow,1900-01-01,2035-12-31,54
+769,Volgogradskaya oblast,UA4A,"[A-Z][0-9][AB]|[A-Z][A-Z][0-9][AB]",16,29,EU,VG,Europe/Volgograd,1900-01-01,2035-12-31,54
+770,Permskiy Kray,UA9F,"[A-Z][0-9][FG]|[A-Z][A-Z][0-9][FG]",17,0,EU,PM,Asia/Yekaterinburg,1900-01-01,2035-12-31,54
+771,Rep. of Komi,UA9X,"[A-Z][0-9]X|[A-Z][A-Z][0-9]X",17,20,EU,KO,Europe/Moscow,1900-01-01,2035-12-31,54
+772,Alabama,W4[AL],[A-Z]4|[A-Z][A-Z]4,4,8,NA,AL,,1900-01-01,2035-12-31,291
+773,Florida,W4[FL],[A-Z]4|[A-Z][A-Z]4,5,8,NA,FL,,1900-01-01,2035-12-31,291
+774,Georgia,W4[GA],[A-Z]4|[A-Z][A-Z]4,5,8,NA,GA,,1900-01-01,2035-12-31,291
+775,Kentucky,W4[KY],[A-Z]4|[A-Z][A-Z]4,4,8,NA,KY,,1900-01-01,2035-12-31,291
+776,North Carolina,W4[NC],[A-Z]4|[A-Z][A-Z]4,5,8,NA,NC,,1900-01-01,2035-12-31,291
+777,South Carolina,W4[SC],[A-Z]4|[A-Z][A-Z]4,5,8,NA,SC,,1900-01-01,2035-12-31,291
+778,Tennessee,W4[TN],[A-Z]4|[A-Z][A-Z]4,4,8,NA,TN,,1900-01-01,2035-12-31,291
+779,Virginia,W4[VA],[A-Z]4|[A-Z][A-Z]4,5,8,NA,VA,,1900-01-01,2035-12-31,291
+780,Arcansas,W5[AR],[A-Z]5|[A-Z][A-Z]5,4,7,NA,AR,,1900-01-01,2035-12-31,291
+781,Louisiana,W5[LA],[A-Z]5|[A-Z][A-Z]5,4,7,NA,LA,,1900-01-01,2035-12-31,291
+782,Mississippi,W5[MS],[A-Z]5|[A-Z][A-Z]5,4,8,NA,MS,,1900-01-01,2035-12-31,291
+783,New Mexico,W5[NM],[A-Z]5|[A-Z][A-Z]5,4,7,NA,NM,,1900-01-01,2035-12-31,291
+784,Oklahoma,W5[OK],[A-Z]5|[A-Z][A-Z]5,4,7,NA,OK,,1900-01-01,2035-12-31,291
+785,Texas,W5[TX],[A-Z]5|[A-Z][A-Z]5,4,7,NA,TX,,1900-01-01,2035-12-31,291
+786,Arizona,W7[AZ],[A-Z]7|[A-Z][A-Z]7,3,6,NA,AZ,,1900-01-01,2035-12-31,291
+787,Idaho,W7[ID],[A-Z]7|[A-Z][A-Z]7,3,6,NA,ID,,1900-01-01,2035-12-31,291
+788,Montana,W7[MT],[A-Z]7|[A-Z][A-Z]7,4,6,NA,MT,,1900-01-01,2035-12-31,291
+789,Nevada,W7[NV],[A-Z]7|[A-Z][A-Z]7,3,6,NA,NV,,1900-01-01,2035-12-31,291
+790,Oregon,W7[OR],[A-Z]7|[A-Z][A-Z]7,3,6,NA,OR,,1900-01-01,2035-12-31,291
+791,Utah,W7[UT],[A-Z]7|[A-Z][A-Z]7,3,6,NA,UT,,1900-01-01,2035-12-31,291
+792,Washington,W7[WA],[A-Z]7|[A-Z][A-Z]7,3,6,NA,WA,,1900-01-01,2035-12-31,291
+793,Wyoming,W7[WY],[A-Z]7|[A-Z][A-Z]7,4,7,NA,WY,,1900-01-01,2035-12-31,291
+794,California,W6[CA],[A-Z]7|[A-Z][A-Z]7,3,6,NA,CA,America/Los_Angeles,1900-01-01,2035-12-31,291
+795,Colorado,W0[CO],[A-Z]0|[A-Z][A-Z]0,4,7,NA,CO,,1900-01-01,2035-12-31,291
+796,Iowa,W0[IA],[A-Z]0|[A-Z][A-Z]0,4,7,NA,IA,,1900-01-01,2035-12-31,291
+797,Kansas,W0[KS],[A-Z]0|[A-Z][A-Z]0,4,7,NA,KS,,1900-01-01,2035-12-31,291
+798,Minnesota,W0[MN],[A-Z]0|[A-Z][A-Z]0,4,7,NA,MN,,1900-01-01,2035-12-31,291
+799,Missouri,W0[MO],[A-Z]0|[A-Z][A-Z]0,4,7,NA,MO,,1900-01-01,2035-12-31,291
+800,Nebraska,W0[NE],[A-Z]0|[A-Z][A-Z]0,4,7,NA,NB,,1900-01-01,2035-12-31,291
+801,North Dakota,W0[ND],[A-Z]0|[A-Z][A-Z]0,4,7,NA,ND,,1900-01-01,2035-12-31,291
+802,South Dakota,W0[SD],[A-Z]0|[A-Z][A-Z]0,4,7,NA,SD,,1900-01-01,2035-12-31,291
+803,Connecticut,W1[CT],[A-Z]1|[A-Z][A-Z]1,5,8,NA,CT,,1900-01-01,2035-12-31,291
+804,Maine,W1[ME],[A-Z]1|[A-Z][A-Z]1,5,8,NA,ME,,1900-01-01,2035-12-31,291
+805,Massachusetts,W1[MA],[A-Z]1|[A-Z][A-Z]1,5,8,NA,MA,,1900-01-01,2035-12-31,291
+806,New Hampshire,W1[NH],[A-Z]1|[A-Z][A-Z]1,5,8,NA,NH,,1900-01-01,2035-12-31,291
+807,Rhode Island,W1[RI],[A-Z]1|[A-Z][A-Z]1,5,8,NA,RI,,1900-01-01,2035-12-31,291
+808,Vermont,W1[VT],[A-Z]1|[A-Z][A-Z]1,5,8,NA,VT,,1900-01-01,2035-12-31,291
+809,D.C.,W3[DC],[A-Z]3|[A-Z][A-Z]3,5,8,NA,DC,America/New_York,1900-01-01,2035-12-31,291
+810,Delaware,W3[DE],[A-Z]3|[A-Z][A-Z]3,5,8,NA,DE,America/New_York,1900-01-01,2035-12-31,291
+811,Maryland,W3[MD],[A-Z]3|[A-Z][A-Z]3,5,8,NA,MD,America/New_York,1900-01-01,2035-12-31,291
+812,Pennsylvania,W3[PA],[A-Z]3|[A-Z][A-Z]3,5,8,NA,PA,America/New_York,1900-01-01,2035-12-31,291
+813,Illinois,W9[IL],[A-Z]9|[A-Z][A-Z]9,4,8,NA,IL,,1900-01-01,2035-12-31,291
+814,Indiana,W9[IN],[A-Z]9|[A-Z][A-Z]9,4,8,NA,IN,,1900-01-01,2035-12-31,291
+815,Wisconsin,W9[WI],[A-Z]9|[A-Z][A-Z]9,4,8,NA,WI,,1900-01-01,2035-12-31,291
+816,Michigan,W8[MI],[A-Z]8|[A-Z][A-Z]8,4,8,NA,MI,,1900-01-01,2035-12-31,291
+817,Ohio,W8[OH],[A-Z]8|[A-Z][A-Z]8,4,8,NA,OH,,1900-01-01,2035-12-31,291
+818,West Virginia,W8[WV],[A-Z]8|[A-Z][A-Z]8,5,8,NA,WV,,1900-01-01,2035-12-31,291
+819,New Jersey,W2[NJ],[A-Z]2|[A-Z][A-Z]2,5,8,NA,NJ,America/New_York,1900-01-01,2035-12-31,291
+820,New York,W2[NY],[A-Z]2|[A-Z][A-Z]2,5,8,NA,NY,America/New_York,1900-01-01,2035-12-31,291
+821,Algiers,7X2,..2,33,37,AF,,Africa/Algiers,1900-01-01,2035-12-31,400
+822,Constantine,7X5,..5,33,37,AF,,Africa/Algiers,1900-01-01,2035-12-31,400
+823,Ghardaia,7X3,..3,33,37,AF,,Africa/Algiers,1900-01-01,2035-12-31,400
+824,Oran,7X4,..4,33,37,AF,,Africa/Algiers,1900-01-01,2035-12-31,400
+825,Baku city,4J4,..[4-9],21,29,AS,BK,Asia/Baku,1900-01-01,2035-12-31,18
+826,Minsk City,EU1,..1,16,29,EU,HM,Europe/Minsk,1900-01-01,2035-12-31,27
+827,Ciudad de la Habana,CO2,"C[LMO]2|CO9B[A-Z][A-Z]|T42",8,11,NA,,America/Havana,1900-01-01,2035-12-31,70
+828,Kinshasa,9Q1,..1,36,52,AF,,Africa/Kinshasa,1900-01-01,2035-12-31,414
+829,Alexandria;Al-Sarai,SU2,..2,34,38,AF,,Africa/Cairo,1900-01-01,2035-12-31,478
+830,Cairo;Giza,SU1,..1,34,38,AF,,Africa/Cairo,1900-01-01,2035-12-31,478
+831,Port Said,SU3,..3,34,38,AF,,Africa/Cairo,1900-01-01,2035-12-31,478
+832,Tallinn,ES1,ES1,15,29,EU,,Europe/Tallinn,1900-01-01,2035-12-31,52
+833,Budapest,HA5,..5,15,28,EU,,Europe/Budapest,1900-01-01,2035-12-31,239
+834,Almaty city,UN[0-9]G,[A-Z][A-Z][0-9]G,17,31,AS,AL,Asia/Almaty,1900-01-01,2035-12-31,130
+835,Astana city,UN[0-9]Z,[A-Z][A-Z][0-9]Z,17,0,AS,AA,,1900-01-01,2035-12-31,130
+836,Bishkek city,EX[0-9]A,EX[0-9][A-G],17,0,AS,,Asia/Bishkek,1900-01-01,2035-12-31,135
+837,Osh city,EX[0-9]O,EX[0-9]O,17,0,AS,,Asia/Bishkek,1900-01-01,2035-12-31,135
+838,Ulaan Bataar City,JT1,..1,23,32,AS,,Asia/Ulaanbaatar,1900-01-01,2035-12-31,363
+839,Asuncion city,ZP5,ZP5,11,14,SA,,America/Asuncion,1900-01-01,2035-12-31,132
+840,Bucharest,YO3,..3,20,28,EU,,Europe/Bucharest,1900-01-01,2035-12-31,275
+841,Bratislava city,OM1,OM1,15,28,EU,,Europe/Prague,1993-01-01,2035-12-31,504
+842,Seoul city,HL1,..1,25,44,AS,,Asia/Seoul,1900-01-01,2035-12-31,137
+843,Dushanbe City,EY8,EY8,17,30,AS,,Asia/Dushanbe,1900-01-01,2035-12-31,262
+844,Ashgabad,EZ8,..8,17,30,AS,,Asia/Ashgabat,1900-01-01,2035-12-31,280
+845,Tashkent City,UK[0-9]A,..[0-9]A,17,30,AS,,Asia/Tashkent,1900-01-01,2035-12-31,292
+846,"Mekong Delta, Can Tho City, Vinh Long City, Phu Quoc Island",3W4,..4,26,49,AS,,Asia/Ho_Chi_Minh,1900-01-01,2035-12-31,293
+847,"North Central Coast, Nghe An. Vinh City",3W6,..6,26,49,AS,,Asia/Ho_Chi_Minh,1900-01-01,2035-12-31,293
+848,"Northwestern, Dien Bien City",3W8,..8,26,49,AS,,Asia/Ho_Chi_Minh,1900-01-01,2035-12-31,293
+849,"Red River Delta, Hai Phong City",3W5,..5,26,49,AS,,Asia/Ho_Chi_Minh,1900-01-01,2035-12-31,293
+850,"Red River Delta, Hanoi City",3W1,..[19],26,49,AS,,Asia/Ho_Chi_Minh,1900-01-01,2035-12-31,293
+851,"South Central Coast, Hue City, Da Nang City, Hoi An City",3W3,..3,26,49,AS,,Asia/Ho_Chi_Minh,1900-01-01,2035-12-31,293
+852,"South Central Coast, Nha Trang City",3W7,..7,26,49,AS,,Asia/Ho_Chi_Minh,1900-01-01,2035-12-31,293
+853,"Southeastern, Ho Chi Minh City, Vung Tau City",3W2,..2,26,49,AS,,Asia/Ho_Chi_Minh,1900-01-01,2035-12-31,293
+854,Buenos Aires,LU[0-9]A,..[0-9][A-C],13,14,SA,D,America/Argentina/Buenos_Aires,1900-01-01,2035-12-31,100
+855,Baikonur,UN[0-9]S,UN[0-9]S,17,0,AS,,Asia/Almaty,1900-01-01,2035-12-31,130
+856,Moscow City,UA3A,"[A-Z][0-9][ABC]|[A-Z][A-Z][0-9][ABC]",16,0,EU,MA,Europe/Moscow,1900-01-01,2035-12-31,54
+857,St. Petersburg City,UA1A,"[A-Z][0-9][AB]|[A-Z][A-Z][0-9][AB]",16,29,EU,SP,Europe/Moscow,1900-01-01,2035-12-31,54
+858,Sevastopol,UU9,UU[09],16,29,EU,SL,Europe/Simferopol,1900-01-01,2035-12-31,288
+859,Kyiv city,UT[0-9]U,UT[0-9]U,16,29,EU,KV,Europe/Kiev,1900-01-01,2035-12-31,288
+-1

@@ -105,7 +105,7 @@ bool book::load_data(string filename)
 				char* message = new char[filename_.length() + 20];
 				sprintf(message, "LOG READ: %s", filename_.c_str());
 				status_->misc_status(ST_NOTE, message);
-				free(message);
+				delete message;
 				// Get the filetype suffix from the filename to know which reader to use
 				string filetype;
 				size_t last_period = filename.find_last_of('.');
@@ -509,7 +509,7 @@ record_num_t book::append_record(record* record) {
 void book::header(record* header) {
 	delete header_;
 	header_ = header;
-	header_->header();
+	header_->header("");
 }
 
 // return the header record

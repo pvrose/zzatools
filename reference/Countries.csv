@@ -1,0 +1,405 @@
+Code,Name,Nickname,Mask,CQZone,ITUZone,Continent,Timezone,ValidFrom,ValidUntil
+3,Afghanistan,T6,"YA|T6",21,40,AS,Asia/Kabul,1900-01-01,2035-12-31
+5,Aland Is.,OH0,O[F-I]0,15,18,EU,Europe/Helsinki,1900-01-01,2035-12-31
+6,Alaska,KL,[KANW]L,1,1,NA,America/Nome>America/Anchorage,1900-01-01,2035-12-31
+9,American Samoa,KH8,[KANW]H8,32,62,OC,Pacific/Pago_Pago,1900-01-01,2035-12-31
+10,Amsterdam & St. Paul Is.,FT[0-9]Z,FT[0-9]Z,39,68,AF,Indian/Kerguelen,1900-01-01,2035-12-31
+11,Andaman & Nicobar Is.,VU4,VU4,26,49,AS,Asia/Kolkata,1900-01-01,2035-12-31
+203,Andorra,C3,C3,14,27,EU,Europe/Andorra,1900-01-01,2035-12-31
+401,Angola,D2,D[23],36,52,AF,Africa/Luanda,1900-01-01,2035-12-31
+12,Anguilla,VP2E,VP2E,8,11,NA,America/Anguilla,1900-01-01,2035-12-31
+94,Antigua & Barbuda,V2,V2,8,11,NA,America/Antigua,1900-01-01,2035-12-31
+14,Armenia,EK,EK,21,29,AS,Asia/Yerevan,1900-01-01,2035-12-31
+91,Aruba,P4,P4,9,11,SA,America/Aruba,1986-01-01,2035-12-31
+205,Ascension I.,ZD8,ZD8,36,66,AF,Atlantic/St_Helena,1900-01-01,2035-12-31
+16,Auckland & Campbell Is.,ZL9,Z[LM]9,32,60,OC,Pacific/Auckland,1900-01-01,2035-12-31
+508,Austral I.,FO[A],"FO|T[OX]",32,63,OC,Pacific/Tahiti,1998-04-01,2035-12-31
+17,Aves I.,YV0,"Y[V-Y]0|4M0",8,11,NA,America/Caracas,1900-01-01,2035-12-31
+60,Bahamas,C6,C6,8,11,NA,America/Nassau,1900-01-01,2035-12-31
+304,Bahrain,A9,A9,21,39,AS,Asia/Bahrain,1900-01-01,2035-12-31
+20,Baker & Howland Is.,KH1,[KANW]H1,31,61,OC,Pacific/Pago_Pago,1900-01-01,2035-12-31
+21,Balearic Is.,EA6,"E[A-H][06]|A[M-O][06]",14,37,EU,Europe/Madrid,1900-01-01,2035-12-31
+490,Banaba I.,T33,"T3[A-Z]|T3[3-9]",31,65,OC,Pacific/Tarawa,1900-01-01,2035-12-31
+305,Bangladesh,S2,S[23],22,41,AS,Asia/Dhaka,1900-01-01,2035-12-31
+62,Barbados,8P,8P,8,11,NA,America/Barbados,1900-01-01,2035-12-31
+209,Belgium,ON,O[N-T],14,27,EU,Europe/Brussels,1900-01-01,2035-12-31
+66,Belize,V3,V3,7,11,NA,America/Belize,1900-01-01,2035-12-31
+416,Benin,TY,TY,35,46,AF,Africa/Porto-Novo,1960-08-01,2035-12-31
+64,Bermuda,VP9,VP9,5,11,NA,Atlantic/Bermuda,1900-01-01,2035-12-31
+306,Bhutan,A5,A5,22,41,AS,Asia/Thimphu,1900-01-01,2035-12-31
+520,Bonaire,PJ4,PJ[013489],9,11,SA,America/Curacao,2010-10-10,2035-12-31
+501,Bosnia-Herzegovina,E7,E7,15,28,EU,Europe/Belgrade,1991-10-15,2035-12-31
+402,Botswana,A2,"A2|8O",38,57,AF,Africa/Gaborone,1900-01-01,2035-12-31
+24,Bouvet I.,3Y[B],3Y,38,67,AF,+00:00,1900-01-01,2035-12-31
+65,British Virgin Is.,VP2V,VP2V,8,11,NA,America/Tortola,1900-01-01,2035-12-31
+345,Brunei,V8,V8,28,54,OC,Asia/Brunei,1900-01-01,2035-12-31
+480,Burkina Faso,XT,XT,35,46,AF,Africa/Ouagadougou,1960-08-16,2035-12-31
+404,Burundi,9U,9U,36,52,AF,Africa/Bujumbura,1962-07-01,2035-12-31
+312,Cambodia,XU,XU,26,49,AS,Asia/Phnom_Penh,1900-01-01,2035-12-31
+406,Cameroon,TJ,TJ,36,47,AF,Africa/Douala,1900-01-01,2035-12-31
+29,Canary Is.,EA8,"E[A-H][08]|A[M-O][08]",33,36,AF,Atlantic/Canary,1900-01-01,2035-12-31
+409,Cape Verde,D4,D4,35,46,AF,Atlantic/Cape_Verde,1900-01-01,2035-12-31
+408,Central Africa,TL,TL,36,47,AF,Africa/Bangui,1960-08-13,2035-12-31
+31,Central Kiribati (Phoenix Is.),T31,"T3[A-Z]|T3[14-9]",31,62,OC,Pacific/Enderbury,1900-01-01,2035-12-31
+32,Ceuta & Melilla,EA9,"E[A-H][09]|A[M-O][09]",33,37,AF,Africa/Ceuta,1900-01-01,2035-12-31
+410,Chad,TT,TT,36,47,AF,Africa/Ndjamena,1960-08-11,2035-12-31
+33,Chagos Is.,VQ9,VQ9,39,41,AF,Indian/Chagos,1900-01-01,2035-12-31
+34,Chatham Is.,ZL7,Z[LM]7,32,60,OC,Pacific/Chatham,1900-01-01,2035-12-31
+512,Chesterfield Is.,FK[C],"FK|T[OX]",30,56,OC,Pacific/Noumea,2000-03-23,2035-12-31
+35,Christmas Is.,VK9[X],"AX9X|AX9[ABD-KOPQS-VYZ]X|V[H-NZ]9X|V[H-NZ]9[ABD-KOPQS-VYZ]X|AX9[ABD-KOPQS-VYZ].|AX9[ABD-KOPQS-VYZ][ABD-KOPQS-VYZ]|V[H-NZ]9[ABD-KOPQS-VYZ].|V[H-NZ]9[ABD-KOPQS-VYZ][ABD-KOPQS-VYZ]|AX9[0-9]|V[H-NZ]9[0-9]",29,54,OC,Indian/Christmas,1900-01-01,2035-12-31
+36,Clipperton I.,FO[C],"FO|T[OX]",7,10,NA,-07:00,1900-01-01,2035-12-31
+37,Cocos I.,TI9,T[EI]9,7,12,NA,America/Costa_Rica,1900-01-01,2035-12-31
+38,Cocos-Keeling Is.,VK9[C],"AX9C|AX9[ABD-KOPQS-VYZ]C|V[H-NZ]9C|V[H-NZ]9[ABD-KOPQS-VYZ]C|AX9[ABD-KOPQS-VYZ].|AX9[ABD-KOPQS-VYZ][ABD-KOPQS-VYZ]|V[H-NZ]9[ABD-KOPQS-VYZ].|V[H-NZ]9[ABD-KOPQS-VYZ][ABD-KOPQS-VYZ]|AX9[0-9]|V[H-NZ]9[0-9]",29,54,OC,Indian/Cocos,1900-01-01,2035-12-31
+411,Comoros,D6,D6,39,53,AF,Indian/Comoro,1975-07-06,2035-12-31
+412,Congo,TN,TN,36,52,AF,Africa/Brazzaville,1960-08-15,2035-12-31
+489,Conway Reef,3D2[C],"3D[N-Z]|3D[0-9]",32,56,OC,Pacific/Fiji,1900-01-01,2035-12-31
+214,Corsica,TK,TK,15,28,EU,Europe/Paris,1900-01-01,2035-12-31
+308,Costa Rica,TI,T[EI][0-8],7,11,NA,America/Costa_Rica,1900-01-01,2035-12-31
+428,Cote d'Ivoire,TU,TU,35,46,AF,Africa/Abidjan,1960-08-07,2035-12-31
+40,Crete,SV9,"S[V-Z]9|J49",20,28,EU,Europe/Athens,1900-01-01,2035-12-31
+497,Croatia,9A,9A,15,28,EU,Europe/Belgrade,1991-06-26,2035-12-31
+41,Crozet I.,FT[0-9]W,FT[0-9]W,39,68,AF,Indian/Kerguelen,1900-01-01,2035-12-31
+517,Curacao,PJ2,PJ[0-389],9,11,SA,America/Curacao,2010-10-10,2035-12-31
+215,Cyprus,5B,"5B|C4|H2|P3",20,39,AS,Asia/Nicosia,1900-01-01,2035-12-31
+503,Czech Rep.,OK,O[KL],15,28,EU,Europe/Prague,1993-01-01,2035-12-31
+221,Denmark,OZ,"5[PQ]|O[UVZ]",14,18,EU,Europe/Copenhagen,1900-01-01,2035-12-31
+43,Desecheo I.,KP5,[KNW]P5,8,11,NA,America/Puerto_Rico,1979-03-01,2035-12-31
+382,Djibouti,J2,J2,37,48,AF,Africa/Djibouti,1900-01-01,2035-12-31
+45,Dodecanese,SV5,"S[V-Z]5|J45",20,28,EU,Europe/Athens,1900-01-01,2035-12-31
+95,Dominica,J7,J7,8,11,NA,America/Dominica,1900-01-01,2035-12-31
+513,Ducie I.,VP6[D],VP6,32,63,OC,Pacific/Pitcairn,2001-11-16,2035-12-31
+48,East Kiribati (Line Is.),T32,"T3[A-Z]|T3[24-9]",31,0,OC,Pacific/Kiritimati,1900-01-01,2035-12-31
+47,Easter I.,CE0Y,"C[A-E]0[AEFY]|X[QR]0[AEFY]|3G0[AEFY]",12,63,SA,Pacific/Easter,1900-01-01,2035-12-31
+223,England,G,"[GM][0-9]|[GM]$|[GM2][ABEFGKLOQRVXY]|Z[EHIJNOQ]|VP[01347]|VQ[0-4678]|VS[0-9]|ZD[0-6]|VP2[0-9]|VP2[A-DF-LN-UW-Z]",14,27,EU,Europe/London,1900-01-01,2035-12-31
+49,Equatorial Guinea,3C,"3C[1-9]|3C[A-Z]",36,47,AF,Africa/Malabo,1900-01-01,2035-12-31
+51,Eritrea,E3,E3,37,48,AF,Africa/Asmara,1991-05-24,2035-12-31
+53,Ethiopia,ET,"ET|9[EF]",37,48,AF,Africa/Addis_Ababa,1900-01-01,2035-12-31
+141,Falkland Is.,VP8[F],VP8,13,16,SA,Atlantic/Stanley,1900-01-01,2035-12-31
+222,Faroe Is.,OY,O[WY],14,18,EU,Atlantic/Faroe,1900-01-01,2035-12-31
+230,Fed. Rep. of Germany,DL,"D[A-R]|Y[2-9]",14,28,EU,Europe/Berlin,1990-10-03,2035-12-31
+56,Fernando de Noronha,PY0F,"P[P-Y]0[FR]|Z[V-Z]0[FR]|P[P-Y]0Z[FR]|Z[V-Z]0Z[FR]",11,13,SA,America/Noronha,1900-01-01,2035-12-31
+176,Fiji,3D2,"3D[N-Z]|3D[0-9]",32,56,OC,Pacific/Fiji,1900-01-01,2035-12-31
+227,France,F,"F[0-9]|F$|F[A-FILNQUVXZ]|H[WXY]|T[HMPQVW]|FT[0-9][A-DFHIK-SUV]|FT[0-9][0-9]",14,27,EU,Europe/Paris,1900-01-01,2035-12-31
+61,Franz Josef Land,RI1FJ,RI1FJ,40,75,EU,Europe/Moscow,1900-01-01,2035-12-31
+63,French Guiana,FY,"FY|T[OX]",9,12,SA,America/Cayenne,1900-01-01,2035-12-31
+175,French Polynesia,FO[P],"FO|T[OX]",32,63,OC,,1900-01-01,2035-12-31
+420,Gabon,TR,TR,36,52,AF,Africa/Libreville,1960-08-17,2035-12-31
+71,Galapagos Is.,HC8,H[CD]8,10,12,SA,Pacific/Galapagos,1900-01-01,2035-12-31
+75,Georgia,4L,4L,21,29,AS,Asia/Tbilisi,1900-01-01,2035-12-31
+424,Ghana,9G,9G,35,46,AF,Africa/Accra,1957-03-05,2035-12-31
+233,Gibraltar,ZB2,Z[BG],14,37,EU,Europe/Gibraltar,1900-01-01,2035-12-31
+99,Glorioso Is.,FT[0-9]G,FT[0-9]G,39,53,AF,Indian/Reunion,1960-06-25,2035-12-31
+237,Greenland,OX,"OX|XP",40,0,NA,,1900-01-01,2035-12-31
+77,Grenada,J3,J3,8,11,NA,America/Grenada,1900-01-01,2035-12-31
+79,Guadeloupe I.,FG,"FG|T[OX]",8,11,NA,America/Guadeloupe,1900-01-01,2035-12-31
+103,Guam,KH2,[AKNW]H2,27,64,OC,Pacific/Guam,1900-01-01,2035-12-31
+105,Guantanamo Bay,KG4,KG4[A-Z][A-Z].,8,11,NA,America/New_York,1900-01-01,2035-12-31
+106,Guernsey,GU,"[GM2][UP]|GB",14,27,EU,Europe/London,1900-01-01,2035-12-31
+107,Guinea,3X,3X.,35,46,AF,Africa/Conakry,1900-01-01,2035-12-31
+109,Guinea-Bissau,J5,J5,35,46,AF,Africa/Bissau,1900-01-01,2035-12-31
+78,Haiti,HH,"4V|HH",8,11,NA,America/Port-au-Prince,1900-01-01,2035-12-31
+110,Hawaii,KH6,"[KANW]H6|[KANW]H7[A-JL-Z]|[KANW]H7[0-9]|[KANW]H7$",31,61,OC,Pacific/Honolulu,1900-01-01,2035-12-31
+111,Heard I.,VK0[H],"AX0|V[H-NZ]0",39,68,AF,+05:00,1900-01-01,2035-12-31
+321,Hong Kong,VR2,VR[0-9],24,44,AS,Asia/Hong_Kong,1900-01-01,2035-12-31
+324,India,VU,"V[TVW]|VU[0-35689]|[A8][T-W]|8[XY]",22,41,AS,Asia/Kolkata,1900-01-01,2035-12-31
+330,Iran,EP,"E[PQ]|9[B-D]",21,40,AS,Asia/Tehran,1900-01-01,2035-12-31
+333,Iraq,YI,"YI|HN",21,39,AS,Asia/Baghdad,1900-01-01,2035-12-31
+114,Isle of Man,GD,"[GM2][DT]|GB",14,27,EU,Europe/London,1900-01-01,2035-12-31
+336,Israel,4Z,4[XZ],20,39,AS,Asia/Jerusalem,1900-01-01,2035-12-31
+117,ITU HQ (Geneva),4U[0-9]ITU,"4U[0-9]ITU|4U[0-9]WRC|4U[0-9][0-9]|4U[A-Z]|4U[0-9][A-HJ-TXYZ]|4U[0-9]I[A-SU-Z]|4U[0-9]IT[A-TV-Z]|4U[0-9]U[A-MO-Z]|4U[0-9]V[A-HJ-Z]|4U[0-9]VI[ABD-Z]|4U[0-9]W[A-QS-Z]|4U[0-9]WR[ABD-Z]|4U[0-9][IUVW].|4U[0-9]IT.|4U[0-9]VI.|4U[0-9]WR.",14,28,EU,Europe/Zurich,1900-01-01,2035-12-31
+82,Jamaica,6Y,6Y,8,11,NA,America/Jamaica,1900-01-01,2035-12-31
+118,Jan Mayen,JX,JX,40,18,EU,Europe/Oslo,1900-01-01,2035-12-31
+122,Jersey,GJ,"[GM2][JH]|GB",14,27,EU,Europe/London,1900-01-01,2035-12-31
+123,Johnston I.,KH3,[KANW]H3,31,61,OC,Pacific/Johnston,1900-01-01,2035-12-31
+342,Jordan,JY,JY,20,39,AS,Asia/Amman,1900-01-01,2035-12-31
+125,Juan Fernandez Is.,CE0Z,"C[A-E]0[IZ]|X[QR]0[IZ]|3G0[IZ]",12,14,SA,America/Santiago,1900-01-01,2035-12-31
+126,Kaliningradskaya Obl.,UA2F,"[RU]2[FK]|R[A-Z]2[FK]|U[A-I]2[FK]",15,29,EU,Europe/Kaliningrad,1900-01-01,2035-12-31
+430,Kenya,5Z,5[YZ],37,48,AF,Africa/Nairobi,1900-01-01,2035-12-31
+131,Kerguelen Is.,FT[0-9]X,FT[0-9]X,39,68,AF,Indian/Kerguelen,1900-01-01,2035-12-31
+133,Kermadec Is.,ZL8,Z[LM]8,32,60,OC,Pacific/Auckland,1900-01-01,2035-12-31
+134,Kingman Reef,KH5K,[KANW]H5K,31,61,OC,Pacific/Honolulu,1900-01-01,2035-12-31
+138,Kure I.,KH7K,[KANW]H7K,31,61,OC,Pacific/Honolulu,1900-01-01,2035-12-31
+348,Kuwait,9K,9K,21,39,AS,Asia/Kuwait,1900-01-01,2035-12-31
+142,Laccadive Is.,VU7,VU7,22,41,AS,Asia/Kolkata,1900-01-01,2035-12-31
+143,Laos,XW,XW,26,49,AS,Asia/Vientiane,1900-01-01,2035-12-31
+145,Latvia,YL,YL,15,29,EU,Europe/Riga,1900-01-01,2035-12-31
+354,Lebanon,OD,OD,20,39,AS,Asia/Beirut,1900-01-01,2035-12-31
+432,Lesotho,7P,7P,38,57,AF,Africa/Maseru,1900-01-01,2035-12-31
+436,Libya,5A,5A.,34,38,AF,Africa/Tripoli,1900-01-01,2035-12-31
+251,Liechtenstein,HB0,H[BE]0,14,28,EU,Europe/Vaduz,1900-01-01,2035-12-31
+146,Lithuania,LY,LY,15,29,EU,Europe/Vilnius,1900-01-01,2035-12-31
+147,Lord Howe I.,VK9[L],"AX9L|AX9[ABD-KOPQS-VYZ]L|V[H-NZ]9L|V[H-NZ]9[ABD-KOPQS-VYZ]L|AX9[ABD-KOPQS-VYZ].|AX9[ABD-KOPQS-VYZ][ABD-KOPQS-VYZ]|V[H-NZ]9[ABD-KOPQS-VYZ].|V[H-NZ]9[ABD-KOPQS-VYZ][ABD-KOPQS-VYZ]|AX9[0-9]|V[H-NZ]9[0-9]",30,60,OC,Australia/Lord_Howe,1900-01-01,2035-12-31
+254,Luxembourg,LX,LX,14,27,EU,Europe/Luxembourg,1900-01-01,2035-12-31
+152,Macao,XX,XX,24,44,AS,Asia/Macau,1900-01-01,2035-12-31
+502,Macedonia,Z3,Z3,15,28,EU,Europe/Belgrade,1991-09-08,2035-12-31
+153,Macquarie I.,VK0[M],"AX0|V[H-NZ]0",30,60,OC,Australia/Hobart,1900-01-01,2035-12-31
+438,Madagascar,5R,"5[RS]|6X",39,53,AF,Indian/Antananarivo,1900-01-01,2035-12-31
+256,Madeira I.,CT3,"CQ2|C[Q-T][39]",33,36,AF,Atlantic/Madeira,1900-01-01,2035-12-31
+440,Malawi,7Q,7Q,37,53,AF,Africa/Blantyre,1900-01-01,2035-12-31
+159,Maldives,8Q,8Q,22,41,AS,Indian/Maldives,1900-01-01,2035-12-31
+442,Mali,TZ,TZ,35,46,AF,Africa/Bamako,1960-06-20,2035-12-31
+161,Malpelo I.,HK0[M],[5H][JK]0,9,12,SA,America/Bogota,1900-01-01,2035-12-31
+257,Malta,9H,9H,15,28,EU,Europe/Malta,1900-01-01,2035-12-31
+166,Mariana Is.,KH0,[KANW]H0,27,64,OC,Pacific/Saipan,1900-01-01,2035-12-31
+167,Market Reef,OJ0,OJ0,15,18,EU,Europe/Helsinki,1900-01-01,2035-12-31
+509,Marquesas I.,FO[M],"FO|T[OX]",31,63,OC,Pacific/Marquesas,1998-04-01,2035-12-31
+168,Marshall Is.,V7,V7,31,65,OC,Pacific/Majuro,1900-01-01,2035-12-31
+84,Martinique,FM,"FM|T[OX]",8,11,NA,America/Martinique,1900-01-01,2035-12-31
+444,Mauritania,5T,5T,35,46,AF,Africa/Nouakchott,1960-06-20,2035-12-31
+165,Mauritius,3B8,"3B[0-58]|3B[A-Z]",39,53,AF,Indian/Mauritius,1900-01-01,2035-12-31
+169,Mayotte,FH,"FH|T[OX]",39,53,AF,Indian/Mayotte,1975-07-06,2035-12-31
+171,Mellish Reef,VK9[M],"AX9M|AX9[ABD-KOPQS-VYZ]M|V[H-NZ]9M|V[H-NZ]9[ABD-KOPQS-VYZ]M|AX9[ABD-KOPQS-VYZ].|AX9[ABD-KOPQS-VYZ][ABD-KOPQS-VYZ]|V[H-NZ]9[ABD-KOPQS-VYZ].|V[H-NZ]9[ABD-KOPQS-VYZ][ABD-KOPQS-VYZ]|AX9[0-9]|V[H-NZ]9[0-9]",30,56,OC,Australia/Brisbane,1900-01-01,2035-12-31
+173,Micronesia,V6,V6,27,65,OC,,1900-01-01,2035-12-31
+174,Midway I.,KH4,[KANW]H4,31,61,OC,Pacific/Midway,1900-01-01,2035-12-31
+177,Minami Torishima,JD1[M],"JD1|7J1",27,90,OC,Asia/Tokyo,1900-01-01,2035-12-31
+260,Monaco,3A,3A,14,27,EU,Europe/Monaco,1900-01-01,2035-12-31
+514,Montenegro,4O,4O,15,28,EU,Europe/Belgrade,2006-06-28,2035-12-31
+96,Montserrat,VP2M,VP2M,8,11,NA,America/Montserrat,1900-01-01,2035-12-31
+446,Morocco,CN,"CN|5[C-G]",33,37,AF,Africa/Casablanca,1900-01-01,2035-12-31
+180,Mount Athos,SV/A,SV2ASP/A.,20,28,EU,Europe/Athens,1900-01-01,2035-12-31
+181,Mozambique,C9,C[89],37,53,AF,Africa/Maputo,1900-01-01,2035-12-31
+309,Myanmar,XZ,X[YZ],26,49,AS,Asia/Rangoon,1900-01-01,2035-12-31
+464,Namibia,V5,V5,38,57,AF,Africa/Windhoek,1900-01-01,2035-12-31
+157,Nauru,C2,C2,31,65,OC,Pacific/Nauru,1900-01-01,2035-12-31
+182,Navassa I.,KP1,[KNW]P1,8,11,NA,-05:00,1900-01-01,2035-12-31
+369,Nepal,9N,9N,22,42,AS,Asia/Kathmandu,1900-01-01,2035-12-31
+263,Netherlands,PA,P[A-I],14,27,EU,Europe/Amsterdam,1900-01-01,2035-12-31
+162,New Caledonia,FK,"FK|T[OX]",32,56,OC,Pacific/Noumea,1900-01-01,2035-12-31
+187,Niger,5U,5U,35,46,AF,Africa/Niamey,1960-08-03,2035-12-31
+188,Niue,ZK2,ZK2,32,62,OC,Pacific/Niue,1900-01-01,2035-12-31
+189,Norfolk I.,VK9[N],"AX9N|AX9[ABD-KOPQS-VYZ]N|V[H-NZ]9N|V[H-NZ]9[ABD-KOPQS-VYZ]N|AX9[ABD-KOPQS-VYZ].|AX9[ABD-KOPQS-VYZ][ABD-KOPQS-VYZ]|V[H-NZ]9[ABD-KOPQS-VYZ].|V[H-NZ]9[ABD-KOPQS-VYZ][ABD-KOPQS-VYZ]|AX9[0-9]|V[H-NZ]9[0-9]",32,60,OC,Pacific/Norfolk,1900-01-01,2035-12-31
+191,North Cook Is.,E51[N],E5,32,62,OC,Pacific/Rarotonga,1900-01-01,2035-12-31
+344,North Korea,P5,"HM|P[5-9]",25,44,AS,Asia/Pyongyang,1995-05-14,2035-12-31
+265,Northern Ireland,GI,"[GM2][IN]|GB",14,27,EU,Europe/London,1900-01-01,2035-12-31
+266,Norway,LA,L[A-N],14,18,EU,Europe/Oslo,1900-01-01,2035-12-31
+192,Ogasawara,JD1[O],"JD1|7J1",27,45,AS,Asia/Tokyo,1900-01-01,2035-12-31
+370,Oman,A4,A4,21,39,AS,Asia/Muscat,1900-01-01,2035-12-31
+195,Pagalu I.,3C0,3C0,36,52,AF,Africa/Malabo,1900-01-01,2035-12-31
+372,Pakistan,AP,[6A][P-S],21,41,AS,Asia/Karachi,1900-01-01,2035-12-31
+22,Palau,T8,T8,27,64,OC,Pacific/Palau,1900-01-01,2035-12-31
+510,Palestine,E4,E4,20,39,AS,Asia/Gaza,1999-02-01,2035-12-31
+197,Palmyra & Jarvis Is.,KH5,"[KANW]H5[A-JL-Z]|[KANW]H5[0-9]|KH5$",31,0,OC,Pacific/Honolulu,1900-01-01,2035-12-31
+163,Papua New Guinea,P2,P2,28,51,OC,Pacific/Port_Moresby,1975-09-16,2035-12-31
+199,Peter I I.,3Y[P],3Y,12,72,AN,-06:00,1900-01-01,2035-12-31
+172,Pitcairn I.,VP6[P],VP6,32,63,OC,Pacific/Pitcairn,1900-01-01,2035-12-31
+272,Portugal,CT,"C[Q-T][0567]|C[ST][12]|C[QRT]4",14,37,EU,Europe/Lisbon,1900-01-01,2035-12-31
+505,Pratas,BQ9P,B[M-QU-X]9P,24,44,AS,+08:00,1994-01-01,2035-12-31
+201,Prince Edward & Marion Is.,ZS8,Z[R-U]8,38,57,AF,Africa/Johannesburg,1900-01-01,2035-12-31
+202,Puerto Rico,KP4,[KNW]P[34],8,11,NA,America/Puerto_Rico,1900-01-01,2035-12-31
+376,Qatar,A7,A7,21,39,AS,Asia/Qatar,1900-01-01,2035-12-31
+453,Reunion I.,FR,"FR|T[OX]",39,53,AF,Indian/Reunion,1900-01-01,2035-12-31
+204,Revilla Gigedo I.,XF4,"4[A-C]4|6[D-J]4|X[A-I]4",6,10,NA,America/Mazatlan,1900-01-01,2035-12-31
+207,Rodrigues I.,3B9,3B9,39,53,AF,Indian/Mauritius,1900-01-01,2035-12-31
+460,Rotuma I.,3D2[R],"3D[N-Z]|3D[0-9]",32,56,OC,Pacific/Fiji,1900-01-01,2035-12-31
+454,Rwanda,9X,9X,36,52,AF,Africa/Kigali,1962-07-01,2035-12-31
+211,Sable I.,CY0,CY0,5,9,NA,America/Halifax,1900-01-01,2035-12-31
+213,Saint Martin,FS,"FS|T[OX]",8,11,NA,America/Curacao,1900-01-01,2035-12-31
+190,Samoa,5W,5W,32,62,OC,Pacific/Apia,1900-01-01,2035-12-31
+216,San Andres & Providencia Is.,HK0[A],[5H][JK]0,7,11,NA,America/Bogota,1900-01-01,2035-12-31
+217,San Felix & San Ambrosio,CE0X,"C[A-E]0X|X[QR]0X|3G0X",12,14,SA,America/Santiago,1900-01-01,2035-12-31
+278,San Marino,T7,T7,15,28,EU,Europe/Rome,1900-01-01,2035-12-31
+219,Sao Tome & Principe,S9,S9,36,47,AF,Africa/Sao_Tome,1900-01-01,2035-12-31
+225,Sardinia,IS,"I[C-JL-VXY]0|IW0[U-Z]|IW0[0-9]|IS0$",15,28,EU,Europe/Rome,1900-01-01,2035-12-31
+378,Saudi Arabia,HZ,[78H]Z,21,39,AS,Asia/Riyadh,1900-01-01,2035-12-31
+506,Scarborough Reef,BS7,BS,27,50,AS,+08:00,1995-01-01,2035-12-31
+279,Scotland,GM,"[GM2][MSZ]|GB",14,27,EU,Europe/London,1900-01-01,2035-12-31
+379,Seychelles,S7,S7,39,53,AF,Indian/Mahe,1900-01-01,2035-12-31
+458,Sierra Leone,9L,9L,35,46,AF,Africa/Freetown,1900-01-01,2035-12-31
+381,Singapore,9V,"9V|S6",28,54,AS,Asia/Singapore,1900-01-01,2035-12-31
+518,Sint Maarten,PJ7,PJ[013789],8,11,NA,America/Curacao,2010-10-10,2035-12-31
+499,Slovenia,S5,S5,15,28,EU,Europe/Belgrade,1991-06-26,2035-12-31
+185,Solomon Is.,H44,"H4[1-9]|H4[A-Z]",28,51,OC,Pacific/Guadalcanal,1900-01-01,2035-12-31
+232,Somalia,T5,"6O|T5",37,48,AF,Africa/Mogadishu,1900-01-01,2035-12-31
+234,South Cook Is.,E51[S],E5,32,63,OC,Pacific/Rarotonga,1900-01-01,2035-12-31
+235,South Georgia I.,VP8[G],VP8,13,73,SA,Atlantic/South_Georgia,1900-01-01,2035-12-31
+238,South Orkney Is.,VP8[O],"VP8|L[2-9O-W][0-9]Z|A[YZ][0-9]Z",13,73,SA,-03:00,1900-01-01,2035-12-31
+240,South Sandwich Is.,VP8[S],"VP8|L[2-9O-W][0-9]Z|A[YZ][0-9]Z",13,73,SA,Atlantic/South_Georgia,1900-01-01,2035-12-31
+241,South Shetland Is.,VP8[H],"C[A-E]9|X[QR]9|3G9|RI1AN|L[2-9O-W][0-9]Z|A[YZ][0-9]Z|VP8|HL8|6[K-N]8|D[7-9ST]8",13,73,SA,-04:00,1900-01-01,2035-12-31
+521,Southern Sudan,Z8,Z8,34,48,AF,Africa/Khartoum,2011-07-14,2035-12-31
+246,Sov. Mil. Order of Malta,1A,1A.,15,28,EU,Europe/Rome,1900-01-01,2035-12-31
+247,Spratly Is.,9M0,"9M0|B[M-QU-X]9S|DX0",26,50,AS,+07:00,1900-01-01,2035-12-31
+315,Sri Lanka,4S,4[P-S],22,41,AS,Asia/Colombo,1900-01-01,2035-12-31
+516,St. Barthelemy,FJ,"FJ|T[OX]",8,11,NA,America/Curacao,2007-12-14,2035-12-31
+250,St. Helena,ZD7,ZD7,36,66,AF,Atlantic/St_Helena,1900-01-01,2035-12-31
+249,St. Kitts & Nevis,V4,V4,8,11,NA,America/St_Kitts,1900-01-01,2035-12-31
+97,St. Lucia,J6,J6,8,11,NA,America/St_Lucia,1900-01-01,2035-12-31
+252,St. Paul I.,CY9,CY9,5,9,NA,America/Glace_Bay,1900-01-01,2035-12-31
+253,St. Peter & St. Paul Rocks,PY0S,"P[P-Y]0S|Z[V-Z]0S|P[P-Y]0ZS|Z[V-Z]0ZS",11,13,SA,America/Noronha,1900-01-01,2035-12-31
+277,St. Pierre & Miquelon,FP,"FP|T[OX]",5,9,NA,America/Miquelon,1900-01-01,2035-12-31
+98,St. Vincent,J8,J8,8,11,NA,America/St_Vincent,1900-01-01,2035-12-31
+259,Svalbard,JW,JW,40,18,EU,Europe/Oslo,1900-01-01,2035-12-31
+515,Swain's I.,KH8[S],[KANW]H8,32,62,OC,Pacific/Pago_Pago,2006-07-22,2035-12-31
+468,Swaziland,3DA,3D[A-M],38,57,AF,Africa/Mbabane,1900-01-01,2035-12-31
+287,Switzerland,HB9,"H[BE][1-9]|C7",14,28,EU,Europe/Zurich,1900-01-01,2035-12-31
+384,Syria,YK,"YK|6C",20,39,AS,Asia/Damascus,1900-01-01,2035-12-31
+507,Temotu Province,H40,H40,32,51,OC,Pacific/Guadalcanal,1998-04-01,2035-12-31
+422,The Gambia,C5,C5,35,46,AF,Africa/Banjul,1900-01-01,2035-12-31
+511,Timor Leste,4W,4W,28,54,OC,Asia/Dili,2000-03-01,2035-12-31
+483,Togo,5V,5V,35,46,AF,Africa/Lome,1900-01-01,2035-12-31
+270,Tokelau Is.,ZK3,ZK3,31,62,OC,Pacific/Fakaofo,1900-01-01,2035-12-31
+160,Tonga,A3,A3,32,62,OC,Pacific/Tongatapu,1900-01-01,2035-12-31
+90,Trinidad & Tobago,9Y,9[YZ],9,11,SA,America/Port_of_Spain,1900-01-01,2035-12-31
+276,Tromelin I.,FT[0-9]T,FT[0-9]T,39,53,AF,Indian/Reunion,1900-01-01,2035-12-31
+474,Tunisia,3V,"3V|TS",33,37,AF,Africa/Tunis,1900-01-01,2035-12-31
+89,Turks & Caicos Is.,VP5,V[PQ]5,8,11,NA,America/Grand_Turk,1900-01-01,2035-12-31
+282,Tuvalu,T2,T2,31,65,OC,Pacific/Funafuti,1900-01-01,2035-12-31
+286,Uganda,5X,5X,37,48,AF,Africa/Kampala,1900-01-01,2035-12-31
+283,UK Sov. Base Areas on Cyprus,ZC4,ZC,20,39,AS,Asia/Nicosia,1960-08-16,2035-12-31
+289,UN HQ (New York),4U[0-9]UN,"4U[0-9]UN|4U[0-9][0-9]|4U[A-Z]|4U[0-9][A-HJ-TXYZ]|4U[0-9]I[A-SU-Z]|4U[0-9]IT[A-TV-Z]|4U[0-9]U[A-MO-Z]|4U[0-9]V[A-HJ-Z]|4U[0-9]VI[ABD-Z]|4U[0-9]W[A-QS-Z]|4U[0-9]WR[ABD-Z]|4U[0-9][IUVW].|4U[0-9]IT.|4U[0-9]VI.|4U[0-9]WR.",5,8,NA,America/New_York,1900-01-01,2035-12-31
+391,United Arab Emirates,A6,A6,21,39,AS,Asia/Dubai,1900-01-01,2035-12-31
+158,Vanuatu,YJ,YJ,32,56,OC,Pacific/Efate,1900-01-01,2035-12-31
+295,Vatican,HV,HV,15,28,EU,Europe/Rome,1900-01-01,2035-12-31
+285,Virgin Is.,KP2,[KNW]P2,8,11,NA,America/St_Thomas,1900-01-01,2035-12-31
+297,Wake I.,KH9,[AKNW]H9,31,65,OC,Pacific/Wake,1900-01-01,2035-12-31
+294,Wales,GW,"[GM2][WC]|GB",14,27,EU,Europe/London,1900-01-01,2035-12-31
+298,Wallis & Futuna Is.,FW,"FW|T[OX]",32,62,OC,Pacific/Wallis,1900-01-01,2035-12-31
+301,West Kiribati (Gilbert Is.),T30,"T3[A-Z]|T3[04-9]",31,65,OC,Pacific/Tarawa,1900-01-01,2035-12-31
+299,West Malaysia,9M2,"9[MW][1-579]|9W0|9[MW][A-Z]",28,54,AS,Asia/Kuala_Lumpur,1963-09-16,2035-12-31
+302,Western Sahara,S0,S0,33,37,AF,Africa/El_Aaiun,1900-01-01,2035-12-31
+303,Willis I.,VK9[W],"AX9W|AX9[ABD-KOPQS-VYZ]W|V[H-NZ]9W|V[H-NZ]9[ABD-KOPQS-VYZ]W|AX9[ABD-KOPQS-VYZ].|AX9[ABD-KOPQS-VYZ][ABD-KOPQS-VYZ]|V[H-NZ]9[ABD-KOPQS-VYZ].|V[H-NZ]9[ABD-KOPQS-VYZ][ABD-KOPQS-VYZ]|AX9[0-9]|V[H-NZ]9[0-9]",30,55,OC,Australia/Brisbane,1900-01-01,2035-12-31
+492,Yemen,7O,7O,21,39,AS,Asia/Aden,1990-05-22,2035-12-31
+482,Zambia,9J,9[IJ],36,53,AF,Africa/Lusaka,1900-01-01,2035-12-31
+452,Zimbabwe,Z2,Z2,38,53,AF,Africa/Harare,1900-01-01,2035-12-31
+13,Antarctica,CE9,"C[A-E]9|X[QR]9|3G9|Z[LM]5[A-Z]|FT[0-9]Y|AX0|V[H-NZ]0|Z[R-U]7[A-Z]|RI1AN|KC4AA[A-F].|KC4US[A-Z].|L[2-9O-W][0-9]Z|A[YZ][0-9]Z|VP8|3Y|P[P-Y]0A|P[P-Y]0ZA|Z[V-Z]0A|Z[V-Z]0ZA|IA0|HL8|6[K-N]8|D[7-9ST]8",0,0,AN,,1900-01-01,2035-12-31
+150,Australia,VK,"AX[1-8]|V[H-NZ][1-8]|AX9R|AX9[ABD-KOPQS-VYZ]R|V[H-NZ]9R|V[H-NZ]9[ABD-KOPQS-VYZ]R|AX9[ABD-KOPQS-VYZ].|AX9[ABD-KOPQS-VYZ][ABD-KOPQS-VYZ]|V[H-NZ]9[ABD-KOPQS-VYZ].|V[H-NZ]9[ABD-KOPQS-VYZ][ABD-KOPQS-VYZ]|AX9[0-9]|V[H-NZ]9[0-9]",0,0,OC,,1900-01-01,2035-12-31
+108,Brazil,PY,"P[P-Y][1-9]|Z[V-Z][1-9]|P[P-Y]0[B-EG-LN-QU-Y]|Z[V-Z]0[B-EG-LN-QU-Y]|P[P-Y]0Z[B-EG-LN-QU-Z]|Z[V-Z]0Z[B-EG-LN-QU-Z]|Z[V-Z]0[0-9]|Z[V-Z]0Z.|P[P-Y]0[0-9]|P[P-Y]0Z.",11,0,SA,,1900-01-01,2035-12-31
+1,Canada,VE,"C[F-KZ]|V[A-GOXY]|X[J-O]|4Y|CY[1-8]",0,0,NA,,1900-01-01,2035-12-31
+15,Russia (As),UA9,"[RU][89][A-EH-WYZ]|R[A-Z][89][A-EH-WYZ]|U[A-I][89][A-EH-WYZ]|[RU]0[A-Z]|R[A-Z]0[A-Z]|U[A-I]0[A-Z]|[UR][0-9][0-9]|R[A-Z][0-9][0-9]|U[A-I][0-9][0-9]|R[890]$",0,0,AS,,1900-01-01,2035-12-31
+54,Russia (Eu),UA3,"[RU][0-9][0-9]|R[A-Z][0-9][0-9]|U[A-I][0-9][0-9]|[RU][89][FGX]|R[A-Z][89][FGX]|U[A-I][89][FGX]|R[3-7][A-Z]|U[3467][A-Z]|R[A-Z][3-7][A-Z]|U[A-I][13-7][A-Z]|U5[A-Z].|U5[A-Z][A-Z][A-Z]|[RU]2[A-EG-JL-Z]|R[A-Z]2[A-EG-JL-Z]|U[A-I]2[A-EG-JL-Z]|[RU]1[A-Z]|R[A-HJ-Z]1[A-Z]|RI1[B-EG-Z]|RI1A.|RI1F.|RI1A[A-MO-Z]|RI1F[A-IK-Z]|R[2-7]$",16,0,EU,,1900-01-01,2035-12-31
+291,United States of America,W,"[KWN][0-9]|[KWN][ABDEFIJKMNOQ-Z]|A[A-GIJK]|[KNW]P[06-9]|[NW][CG]|K[CG][0-35-9]|KG4[A-Z].|KG4[A-Z][A-Z][A-Z]|KC4[A-Z].|KC4[A-Z][A-Z].|KC4[B-TV-Z][A-Z][A-Z].|KC4A[B-Z][A-Z]|KC4AA[G-Z]|KC4U[A-RT-Z][A-Z]|K[CG]4[0-9]|KC4[B-TV-Z][A-Z][A-Z][A-Z]|KC4AA[A-F][A-Z]|KC4US[A-Z][A-Z]",0,0,NA,,1900-01-01,2035-12-31
+4,Agalega & St. Brandon,3B6,3B[67],39,53,AF,Indian/Mauritius,1900-01-01,2035-12-31
+7,Albania,ZA,ZA,15,28,EU,Europe/Tirane,1900-01-01,2035-12-31
+400,Algeria,7X,7[RT-Y],33,37,AF,Africa/Algiers,1900-01-01,2035-12-31
+100,Argentina,LU,"A[YZ][0-9][0-9]|A[YZ][0-9][A-Y]|L[2-9O-W][0-9][0-9]|L[2-9O-W][0-9][A-Y]|L[2-9][A-Z]|LU$",13,0,SA,,1900-01-01,2035-12-31
+206,Austria,OE,"OE|4U[0-9]VIC",15,28,EU,Europe/Vienna,1900-01-01,2035-12-31
+18,Azerbaijan,4J,4[JK],21,29,AS,Asia/Baku,1900-01-01,2035-12-31
+149,Azores,CU,"CU|C[Q-T]8|CQ1|CS4|CR[12]",14,36,EU,Atlantic/Azores,1900-01-01,2035-12-31
+27,Belarus,EU,E[U-W],16,29,EU,Europe/Minsk,1900-01-01,2035-12-31
+104,Bolivia,CP,CP,10,0,SA,America/La_Paz,1900-01-01,2035-12-31
+212,Bulgaria,LZ,LZ,20,28,EU,Europe/Sofia,1900-01-01,2035-12-31
+69,Cayman Is.,ZF,ZF,8,11,NA,America/Cayman,1900-01-01,2035-12-31
+112,Chile,CE,"3G[1-8]|C[A-E][1-8]|X[QR][1-8]|3G0[0-9]|3G0[BCDGHJ-W]|C[A-E]0[0-9]|C[A-E]0[BCDGHJ-W]|X[QR]0[0-9]|X[QR]0[BCDGHJ-W]|3G[A-Z]|CE$",12,0,SA,America/Santiago,1900-01-01,2035-12-31
+318,China,BY,"B[0-9]|B[A-LRTYZ]|3[H-U]|XS",0,0,AS,,1900-01-01,2035-12-31
+116,Colombia,HK,"[5H][JK][1-9]|5[JK][A-Z]",9,12,SA,America/Bogota,1900-01-01,2035-12-31
+70,Cuba,CO,"C[LMO]|T4",8,11,NA,America/Havana,1900-01-01,2035-12-31
+414,Dem. Rep. of Congo,9Q,9[O-T],36,52,AF,Africa/Kinshasa>Africa/Lubumbashi,1900-01-01,2035-12-31
+72,Dominican Rep.,HI,HI,8,11,NA,America/Santo_Domingo,1900-01-01,2035-12-31
+46,East Malaysia,9M6,"9[MW][135-9]|9[MW][A-Z]",28,54,OC,Asia/Kuching,1963-09-16,2035-12-31
+120,Ecuador,HC,H[CD][0-79],10,12,SA,America/Guayaquil,1900-01-01,2035-12-31
+478,Egypt,SU,"SU|6[AB]|SS[0-9][A-M]",34,38,AF,Africa/Cairo,1900-01-01,2035-12-31
+74,El Salvador,YS,"YS|HU",7,11,NA,America/El_Salvador,1900-01-01,2035-12-31
+52,Estonia,ES,ES,15,29,EU,Europe/Tallinn,1900-01-01,2035-12-31
+224,Finland,OH,O[F-J][1-9],15,18,EU,Europe/Helsinki,1900-01-01,2035-12-31
+236,Greece,SV,"S[V-Z][0-46-8]|J4[0-46-8]|J4[A-Z]",20,28,EU,Europe/Athens,1900-01-01,2035-12-31
+76,Guatemala,TG,T[DG],7,11,NA,America/Guatemala,1900-01-01,2035-12-31
+129,Guyana,8R,8R,9,12,SA,America/Guyana,1900-01-01,2035-12-31
+80,Honduras,HR,H[QR],7,11,NA,America/Tegucigalpa,1900-01-01,2035-12-31
+239,Hungary,HA,H[AG],15,28,EU,Europe/Budapest,1900-01-01,2035-12-31
+242,Iceland,TF,TF,40,17,EU,Atlantic/Reykjavik,1900-01-01,2035-12-31
+327,Indonesia,YB,"[78][A-I]|JZ|P[K-O]|Y[B-H]",28,0,OC,,1963-05-01,2035-12-31
+245,Ireland,EI,E[IJ],14,27,EU,Europe/Dublin,1900-01-01,2035-12-31
+248,Italy,I,"I[0-9]|I[A-Z][1-9]|I[B-LN-RT-VXYZ]0|IW0[A-T]|IW0[0-9]|I$",0,0,XX,Europe/Rome,1900-01-01,2035-12-31
+339,Japan,JA,"[78][J-N]|J[A-CE-S]|JD[02-9]",25,45,AS,Asia/Tokyo,1900-01-01,2035-12-31
+124,Juan de Nova;Europa,FT[0-9]E,FT[0-9][EJ],39,53,AF,Indian/Reunion,1960-06-25,2035-12-31
+130,Kazakhstan,UN,U[N-Q],17,0,AS,,1900-01-01,2035-12-31
+135,Kyrgyzstan,EX,EX,17,0,AS,Asia/Bishkek,1900-01-01,2035-12-31
+434,Liberia,EL,"EL|5[LM]|A8|D5|6Z",35,46,AF,Africa/Monrovia,1900-01-01,2035-12-31
+50,Mexico,XE,"4[ABC][0-35-9]|4[ABC][A-Z]|6[D-J][0-35-9]|6[D-J][A-Z]|X[A-I][0-35-9]",6,10,NA,,1900-01-01,2035-12-31
+179,Moldovia,ER,ER,16,29,EU,Europe/Chisinau,1900-01-01,2035-12-31
+363,Mongolia,JT,J[T-V],23,0,AS,,1900-01-01,2035-12-31
+170,New Zealand,ZL,"Z[LM][0-46]|ZK[014-9]|Z[LM]5[0-9]|ZL$",32,60,OC,Pacific/Auckland,1900-01-01,2035-12-31
+86,Nicaragua,YN,"H[67T]|YN",7,11,NA,America/Managua,1900-01-01,2035-12-31
+450,Nigeria,5N,5[NO],35,46,AF,Africa/Lagos,1900-01-01,2035-12-31
+88,Panama,HP,"3[EF]|H[389OP]",7,11,NA,America/Panama,1900-01-01,2035-12-31
+132,Paraguay,ZP,ZP,11,14,SA,America/Asuncion,1900-01-01,2035-12-31
+136,Peru,OA,"4T|O[A-C]",10,12,SA,America/Lima,1900-01-01,2035-12-31
+375,Philippines,DU,"4[D-I]|D[UVWYZ]|DX[1-9]",27,50,OC,Asia/Manila,1900-01-01,2035-12-31
+269,Poland,SP,"3Z|HF|S[N-R]",15,28,EU,Europe/Warsaw,1900-01-01,2035-12-31
+275,Romania,YO,Y[O-R],20,28,EU,Europe/Bucharest,1900-01-01,2035-12-31
+519,Saba and St. Eustatius,PJ5,PJ[0135689],8,11,NA,America/Curacao,2010-10-10,2035-12-31
+456,Senegal,6W,6[VW],35,46,AF,Africa/Dakar,1960-06-20,2035-12-31
+296,Serbia,YU,Y[TU],15,28,EU,Europe/Belgrade,1900-01-01,2035-12-31
+504,Slovak Rep.,OM,OM,15,28,EU,Europe/Prague,1993-01-01,2035-12-31
+462,South Africa,ZS,"Z[R-U][0-69]|S8|V9|Z[R-U]7[0-9]|ZS$",38,57,AF,Africa/Johannesburg,1900-01-01,2035-12-31
+137,South Korea,HL,"HL[0-79]|6[K-N][0-79]|D[789ST][0-79]|6[K-N][A-Z]|D[789][A-Z]",25,44,AS,Asia/Seoul,1900-01-01,2035-12-31
+281,Spain,EA,"E[A-H][0-57]|A[M-O][0-57]",14,37,EU,Europe/Madrid,1900-01-01,2035-12-31
+466,Sudan,ST,"ST|6[TU]|SS[0-9][N-Z]|SS[0-9][0-9]",34,48,AF,Africa/Khartoum,1900-01-01,2035-12-31
+140,Suriname,PZ,PZ,9,12,SA,America/Paramaribo,1900-01-01,2035-12-31
+284,Sweden,SM,"[78]S|S[A-M]",14,18,EU,Europe/Stockholm,1900-01-01,2035-12-31
+386,Taiwan,BV,"B[M-QU-X][0-8]|B[M-QU-X]9[A-OQRT-Z]|B[M-QU-X]9[0-9]|BV$",24,44,AS,Asia/Taipei,1900-01-01,2035-12-31
+262,Tajikistan,EY,EY,17,30,AS,Asia/Dushanbe,1900-01-01,2035-12-31
+470,Tanzania,5H,5[HI],37,53,AF,Africa/Dar_es_Salaam,1900-01-01,2035-12-31
+387,Thailand,HS,"E2|HS",26,49,AS,Asia/Bangkok,1900-01-01,2035-12-31
+273,Trindade & Martim Vaz Is.,PY0T,"P[P-Y]0[TM]|Z[V-Z]0[TM]|P[P-Y]0Z[TM]|Z[V-Z]0Z[TM]",11,15,SA,America/Noronha,1900-01-01,2035-12-31
+274,Tristan da Cunha & Gough I.,ZD9,ZD9,38,66,AF,Atlantic/St_Helena,1900-01-01,2035-12-31
+390,Turkey,TA,"T[A-C]|YM",20,39,AS,Europe/Istanbul,1900-01-01,2035-12-31
+280,Turkmenistan,EZ,EZ,17,30,AS,Asia/Ashgabat,1900-01-01,2035-12-31
+288,Ukraine,UR,"E[MNO]|U[R-Z]|U5[A-Z][A-Z].",16,29,EU,,1900-01-01,2035-12-31
+144,Uruguay,CX,C[V-X],13,14,SA,America/Montevideo,1900-01-01,2035-12-31
+292,Uzbekistan,UK,U[J-M],17,30,AS,,1900-01-01,2035-12-31
+148,Venezuela,YV,"4M[1-9]|4M[A-Z]|Y[V-Y][1-9]",9,12,SA,America/Caracas,1900-01-01,2035-12-31
+293,Vietnam,3W,"3W.|XV",26,49,AS,Asia/Ho_Chi_Minh,1900-01-01,2035-12-31
+2,Abu Ail Is.,A1,A1,21,39,AS,Asia/Aden,1900-01-01,1991-03-30
+8,Aldabra,VQ9,VQ9,39,53,AF,Indian/Mahe,1900-01-01,1976-06-28
+19,Bajo Nuevo,HK0,HK0,8,11,NA,America/Bogota,1900-01-01,1981-09-16
+23,Blenheim Reef,1B[B],1B,39,41,AF,Indian/Chagos,1967-05-04,1975-06-30
+85,"Bonaire,Curacao",PJ2,PJ[0-489],9,11,SA,America/Curacao,1900-01-01,2010-10-01
+25,British North Borneo,ZC5,ZC5,28,54,OC,Asia/Kuching,1900-01-01,1963-09-15
+26,British Somaliland,VQ6,VQ6,37,48,AF,Africa/Mogadishu,1900-01-01,1960-06-30
+28,Canal Zone,KZ5,"KZ5|K5",7,11,NA,America/Panama,1900-01-01,1979-09-30
+30,Celebe & Molucca Is.,PK6,PK6,28,54,OC,"Asia/Makassar,Asia/Jayapura",1900-01-01,1963-04-30
+39,Comoros,FH,"FH|FB8",39,53,AF,Indian/Comoro,1900-01-01,1975-07-05
+218,Czechoslovakia,OK,O[K-M],15,28,EU,Europe/Prague,1900-01-01,1992-12-31
+42,Damao;Diu,CR8,CR8,22,41,AS,Asia/Kolkata,1900-01-01,1961-12-31
+44,Desroches,VQ9,VQ9,39,53,AF,Indian/Mahe,1900-01-01,1976-06-28
+55,Farquhar,VQ9,VQ9,39,53,AF,Indian/Mahe,1900-01-01,1976-06-28
+57,French Equatorial Africa,FQ8,FQ8,36,0,AF,Africa/Bangui,1900-01-01,1960-08-16
+67,French India,FN8,FN8,22,41,AS,Asia/Kolkata,1900-01-01,1954-10-31
+58,French Indo-China,FI8,FI8,26,49,AS,"Asia/Ho_Chi_Minh,Asia/Phnom_Penh",1900-01-01,1950-12-20
+59,French West Africa,FF,FF,35,46,AF,Africa/Dakar,1900-01-01,1960-08-06
+229,German Democratic Rep.,DM,"D[MT]|Y[2-9]",14,28,EU,Europe/Berlin,1973-09-17,1990-10-02
+81,Germany,DL,"D[A-R]|Y[2-9]",14,28,EU,Europe/Berlin,1900-01-01,1973-09-16
+93,Geyser Reef,1B[G],1B,39,53,AF,Indian/Mayotte,1967-05-04,1978-02-28
+101,Goa,CR8,CR8,22,41,AS,Asia/Kolkata,1900-01-01,1961-12-31
+102,Gold Coast;Togoland,ZD4,ZD4,35,46,AF,Africa/Accra,1900-01-01,1957-03-05
+113,Ifni,EA9,EA9,33,37,AF,Africa/Casablanca,1900-01-01,1969-05-13
+115,Italian Somaliland,I5,I5,37,48,AF,Africa/Mogadishu,1900-01-01,1960-06-30
+119,Java,PK1,"PK[1-3]|VK9",28,54,OC,Asia/Jakarta,1900-01-01,1963-04-30
+127,Kamaran Is.,VS9K,VS9K,21,39,AS,Asia/Aden,1900-01-01,1982-03-10
+128,Karelo-Finnish Rep.,UN1,UN1,16,19,EU,Europe/Moscow,1900-01-01,1960-06-30
+139,Kuria Muria Is.,VS9H,VS9H,21,39,AS,Asia/Muscat,1900-01-01,1967-11-29
+68,Kuwait/Saudi Arabia Neut. Zone,8Z5,"8Z5|9K3",21,39,AS,Asia/Kuwait,1900-01-01,1969-12-14
+155,Malaya,VS2,"VS2|9M2",28,54,AS,Asia/Kuala_Lumpur,1900-01-01,1963-09-15
+151,Malyj Vysotskij I.,RI1MV,RI1MV,16,29,EU,Europe/Moscow,1900-01-01,2012-02-17
+164,Manchuria,C9,C9,24,33,AS,Asia/Urumqi,1900-01-01,1963-09-15
+178,Minerva Reef,1M,1M,32,62,OC,+12:00,1900-01-01,1972-07-15
+183,Netherlands Borneo,PK5,PK5,28,54,OC,,1900-01-01,1963-04-30
+184,Netherlands N. Guinea,JZ0,"JZ0|7J1",28,51,OC,Pacific/Port_Moresby,1900-01-01,1963-04-30
+186,Newfoundland;Labrador,VO,VO,0,9,NA,,1900-01-01,1949-03-31
+193,Okinawa,KA6,"KR[68]|KA6",25,45,AS,Asia/Tokyo,1900-01-01,1972-05-14
+194,Okino Tori-shima,7J1,"7J1|JD1",27,45,AS,Asia/Tokyo,1976-05-30,1980-11-30
+196,Palestine,ZC6,"ZC6|4X1",20,39,AS,Asia/Gaza,1900-01-01,1968-06-30
+198,Papua Territory,P2,"P2|VK9",28,51,OC,Pacific/Port_Moresby,1900-01-01,1975-09-15
+493,Penguin Is.,ZS0,ZS[01],38,57,AF,Africa/Windhoek,1900-01-01,1994-02-28
+243,People's Dem. Rep. of Yemen,VS9A,VS9[APS],21,39,AS,Asia/Aden,1900-01-01,1990-05-22
+200,Portuguese Timor,CR8,"CR8|CR10",28,54,OC,Asia/Dili,1900-01-01,1976-09-14
+208,Ruanda-Urundi,9U5,9U5,36,52,AF,Africa/Bujumbura,1960-07-01,1962-06-30
+210,Saar,9S4,"9S4|9K3",14,28,EU,Europe/Berlin,1900-01-01,1957-03-31
+220,Sarawak,VS4,VS4,28,54,OC,Asia/Kuching,1900-01-01,1963-09-15
+226,Saudi Arabia/Iraq Neut. Zone,8Z4,8Z4,21,39,AS,Asia/Riyadh,1900-01-01,1981-12-25
+228,Serrana Bank & Roncador Cay,HK0,"HK0|KP3|KS4",7,11,NA,America/Bogota,1900-01-01,1981-09-16
+231,Sikkim,AC3,"AC3|J2/A",22,41,AS,Asia/Kolkata,1900-01-01,1975-04-30
+244,Southern Sudan,ST0,"ST0|6[TU]0|SS0[N-Z]",34,0,AF,Africa/Khartoum,1972-05-07,1994-12-31
+255,St. Maarten;Saba;St. Eustasius,PJ7,PJ[15-9],8,11,NA,America/Curacao,1900-01-01,2010-10-01
+258,Sumatra,PK4,PK[2-4],28,54,OC,Asia/Jakarta,1900-01-01,1963-04-30
+261,Swan I.,KS4,"KR8|JR6|KA6|K[DS]4",7,11,NA,America/Tegucigalpa,1900-01-01,1972-08-31
+264,Tangier,CN2,"CN2|EK",33,37,AF,Africa/Casablanca,1900-01-01,1960-06-30
+267,Territory of New Guinea,P2,"P2|VK9",28,51,OC,Pacific/Port_Moresby,1900-01-01,1975-09-15
+268,Tibet,AC4,AC4,23,41,AS,Asia/Urumqi,1900-01-01,1974-05-30
+271,Trieste,I1,I1,15,28,EU,Europe/Rome,1900-01-01,1957-03-30
+488,Walvis Bay,ZS9,ZS9,38,57,AF,Africa/Windhoek,1977-09-01,1994-02-28
+154,Yemen Arab Rep.,4W,4W,21,39,AS,Asia/Aden,1900-01-01,1990-05-21
+307,Zanzibar,VQ1,"VQ1|5H1",37,53,AF,Africa/Dar_es_Salaam,1900-01-01,1974-05-31
+999,Northern Cyprus,1B[C],1B,20,39,AS,Asia/Nicosia,1900-01-01,2035-12-31
+0,Unassigned,0,"[0-9][0-9]|0[A-Z]|1[C-Z]|4N|Q.|[OX][0-9]|[ACDLPV][01]|E[01689]|H[015]|[JT][019]|Z[014-79]|Y[01Z]|S[14]",0,0,XX,,1900-01-01,2035-12-31
+-1

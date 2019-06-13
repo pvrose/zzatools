@@ -57,7 +57,7 @@ enum edit_action_t {
 // Event handler - handle event as normal then set the cursor depending on current insert mode
 int record_form::editor::handle(int event) {
 	// Tell the international character dialog this is the current editor
-	intl_dialog_->editor(this);
+	if (intl_dialog_) intl_dialog_->editor(this);
 	int result = Fl_Text_Editor::handle(event);
 	insert_mode_ = insert_mode();
 	if (insert_mode_) {

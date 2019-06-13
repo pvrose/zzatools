@@ -1,6 +1,8 @@
 #include "rpc_data_item.h"
 #include "utils.h"
 
+#include <stdexcept>
+
 using namespace zzalog;
 
 // Constructor - sets default values

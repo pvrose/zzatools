@@ -1,0 +1,510 @@
+Id,Name,Prefix,Country_Code
+1,Antarctic Base (France),FT[0-9]Y,13
+2,Unauthorized operation,YA,3
+3,Guest operator,..0,400
+4,Beacon or repeater,C30,203
+5,HF 1-st class license,C31,203
+6,Novice HF/VHF license,C33,203
+7,VHF license,C32,203
+8,Antarctic Base (Argentina),"L[2-9O-W][0-9]Z|A[YZ][0-9]Z",13
+9,Antarctic Base (Australia),"AX0|V[H-NZ]0",13
+10,Antarctic Base (Chile),"C[A-E]9|X[QR]9|3G9",13
+11,Antarctic Base (Italy),IA0,13
+12,Antarctic Base (New Zealand),Z[LM]5[A-Z],13
+13,Antarctic Base (Norway),3Y,13
+14,Antarctic Base (Russia),RI1AN,13
+15,Antarctic Base (South Africa),Z[R-U]7[A-Z],13
+16,Antarctic Base (South Korea),"HL8|6[K-N]8|D[7-9ST]8",13
+17,Antarctic Base (UK),VP8,13
+18,Antarctic Base (USN MARS),"KC4AA[A-F].|KC4US[A-Z].",13
+19,General (1KW) or Superior (1.5KW),..[0-9][A-Z][A-Z].,100
+20,Initial category (50W),AZ,100
+21,Special event,"L[2-9]|L[O-TV]|AY",100
+22,1 or 2 class license,EK[0-9][A-Z][A-Z].,14
+23,3 or 4 class license,EK[0-9][A-Z][A-Z][A-Z].,14
+24,Club Station,EK8,14
+25,Foreign Operator,EK9,14
+26,Reserved Prefix,EK3,14
+27,Special Event,EK0,14
+28,Contest station,P40,91
+29,Resident,P43,91
+30,"Resident, special event",P41,91
+31,Visitor,P49,91
+32,Advanced license,"[A-Z][A-Z][0-9][A-Z][A-Z].|[A-Z][A-Z][0-9][A-GIJKOSTUW-Z][A-Z][A-Z].",150
+33,Beacon or repeater,[A-Z][A-Z][0-9]R[A-Z][A-Z].,150
+34,Foundation license,[A-Z][A-Z][0-9]F[A-Z][A-Z][A-Z],150
+35,Guides Australia,..[0-9]GG[A-Z].,150
+36,International UN event,[A-Z][A-Z][0-9]IY[A-Z].,150
+37,Local event,VI,150
+38,National event,AX,150
+39,Official ACA call sign,..[0-9]AA.,150
+40,Scout Association,..[0-9]S[A-D][A-Z].,150
+41,Standard license,[A-Z][A-Z][0-9][HLMNPV][A-Z][A-Z].,150
+42,Wireless Institute (WIA),"[A-Z][A-Z][0-9]WI.|[A-Z][A-Z][0-9]WI[A-Z].",150
+43,Club station / repeater / beacon,OE[0-9]X,206
+44,Guest operator,OE[0-9]Z,206
+45,Special station,OE0,206
+46,1 category,..[0-9][A-Z][A-Z].,18
+47,2;3 category,..[0-9][A-Z][A-V][A-Z].,18
+48,Club Station,..[0-9][A-Z][W-Z][A-Z],18
+49,Extra license,..[0-9][A-Z].,18
+50,Special event,..[01],18
+51,Club station,"CQ1|CS4",149
+52,Special event,"CQ8|CR[12]",149
+53,Alternate call for 6 m,EH,21
+54,Cept class 1,E[AD],21
+55,Cept class 2,E[BE],21
+56,Cept class 3,E[CF],21
+57,Special event,E[DEFG],21
+58,Beacon/repeater,EV[1-4678][A-Z]R.,27
+59,Class A and B,..[0-9][A-Z][A-Z].,27
+60,Class C,..[0-9][A-Z][A-Z][A-Z].,27
+61,Club station,..[0-9][WXZ],27
+62,Contest station,EV[1-46-8][A-Z].,27
+63,Guest Operator,E[UW]0,27
+64,Lady,..[0-9]Y,27
+65,Reserved prefix block,"..9|EV0",27
+66,Special event,..5,27
+67,"Guest Operator, 144 MHz",ON9A,209
+68,"Guest operator, HF/VHF/UHF",ON9C,209
+69,"Guest operator, VHF/UHF",ON9B,209
+70,HF station,..[4-8],209
+71,Novice VHF,ON2,209
+72,QRO Contest station,OT,209
+73,Repeater,ON0,209
+74,Special event,O[RS],209
+75,VHF station,..1,209
+76,Novice,VP9N,64
+77,Club or Event station,CP0,104
+78,Foreign operator,3Y0,24
+79,Class C license,"PU|Z[V-Z][0-9][A-Z]W[A-Z]",108
+80,Contest or special event,"Z[V-Z][0-9]|..[0-9][A-Z].|PX8|PQ7|P[RS]2|P[P-S]9|PP4|PP3|P[VWX][1-79]|P[Q-T][13-6]",108
+81,Foreign operator,..[0-9]Z,108
+82,Special station,"LZ[0-9][0-9]|LZ[06-9][A-Z][A-Z]|LZ[0-9][A-Z].",212
+83,Station at sea,VE0,1
+84,Alternate call for 6 m,EH,29
+85,Cept class 1,E[AD],29
+86,Cept class 2,E[BE],29
+87,Cept class 3,E[CF],29
+88,Special event,E[DEFG],29
+89,Visitor,ZF2,69
+90,Foreign Operator,TL0,408
+91,Alternate call for 6 m,EH,32
+92,Cept class 1,E[AD],32
+93,Cept class 2,E[BE],32
+94,Cept class 3,E[CF],32
+95,Special event,E[DEFG],32
+96,1st class,BA,318
+97,2nd class,BD,318
+98,3rd class,BG,318
+99,Club station,BY,318
+100,Contest station,"B[0-9][A-Z].|B[0-9][A-Z][A-Z].",318
+101,IOTA station,BI,318
+102,Repeater,BR,318
+103,Reserved prefix block,"3[H-U]|XS",318
+104,Special event,"BT|B[0-9][A-Z].",318
+105,Advanced license,"[A-Z][A-Z][0-9][A-Z][A-Z].|[A-Z][A-Z][0-9][A-GIJKSTUW-Z][A-Z][A-Z].",35
+106,Foundation license,[A-Z][A-Z][0-9]F[A-Z][A-Z][A-Z].,35
+107,Standard license,[A-Z][A-Z][0-9][HLMNPV][A-Z][A-Z].,35
+108,Advanced license,"[A-Z][A-Z][0-9][A-Z][A-Z].|[A-Z][A-Z][0-9][A-GIJKSTUW-Z][A-Z][A-Z].",38
+109,Foundation license,[A-Z][A-Z][0-9]F[A-Z][A-Z][A-Z].,38
+110,Standard license,[A-Z][A-Z][0-9][HLMNPV][A-Z][A-Z].,38
+111,Novice,HJ,116
+112,Experimental station,TU3,428
+113,HF/VHF license,TU[25],428
+114,Temporary license,TU4,428
+115,VHF license,TU1,428
+116,"1-st class, 2000W",CO,70
+117,"2-nd class, 500W",CM,70
+118,"3-rd class, 50W",CL,70
+119,Club station,C[LMO]9[A-Z][A-Z][A-Z].,70
+120,Special event,"T4|C[LMO]0|C[LMO]9[A-Z].|C[LMO]9[A-Z][A-Z].",70
+121,Reserved prefix,PJ[01389],517
+122,Club station,"OK[12][KOR][A-Z].|OK[12][KOR][A-Z][A-Z].",503
+123,Contest station,"OK[1-7][A-Z].|OL[0-9][A-Z].",503
+124,Guest operator,"OK8[A-Z][A-Z].|OK8[A-Z][A-Z][A-Z].",503
+125,HAREC Class,"OK[1-7][A-Z][A-Z].|OK[1-7][A-Z][A-Z][A-Z].",503
+126,NOVICE Class,OK9[A-Z][A-Z][A-Z].,503
+127,Packet or Beacon,OK0,503
+128,Special event,"OL[0-9][A-Z][A-Z].|OL[0-9][A-Z][A-Z][A-Z].",503
+129,Club station,,218
+130,Contest station,,218
+131,Experimental station,,218
+132,Foreign citizen,,218
+133,Maritime or Aero Mobile station,,218
+134,Novice class,,218
+135,Prefix not used,,218
+136,"PTT, repeater",,218
+137,Special event,,218
+138,Special station,,218
+139,Reserved,..0,414
+140,Club station,HI0,72
+141,Guest operator,..9,478
+142,Club station,..0,74
+143,Unused prefix,..[5-9],74
+144,Advanced license,2E,223
+145,Beacon or repeater,GB[37],223
+146,Club station,[GM]X,223
+147,Emergency service,M2,223
+148,Foundation license,M3[A-Z][A-Z][A-Z].,223
+149,Full license,"G[0-46-8][A-Z][A-Z][A-Z].|G[2-68][A-Z][A-Z].|M[015][A-Z][A-Z][A-Z].",223
+150,HF Contest station,M[0-9][A-Z].,223
+151,Reserved prefix block,"G[0179][A-Z][A-Z].|G[59][A-Z][A-Z][A-Z].|M[246-9]|G[1-4678]Q[A-Z][A-Z].|2E[2-9]|M[135][A-Z][A-Z].",223
+152,Special station,GB[0-24-689],223
+153,Special station,ES9,52
+154,Army-Guest,DN9,230
+155,Class 1 (HF/VHF),D[FHJKL],230
+156,Class 2 (VHF),D[CDG],230
+157,Class 3 (QRP VHF),DO,230
+158,Club or special station,D[A-DF-HJ-MOP]0,230
+159,Club station,D[FJKL]0,230
+160,"Club, repeater",D[JFK-M]0,230
+161,Experimental station,DA5,230
+162,Experimental station,DI,230
+163,Exterritorial station,DP,230
+164,Foreigner,DA[1-4],230
+165,Former G.D.R. station,"Y[2-9][A-Z][A-Z][A-Z].|DM",230
+166,Instructional Station,DN[1-8],230
+167,Personal station,D[B-DF-HJ-MOP][1-9],230
+168,Special station,D[QR],230
+169,SWL,DE,230
+170,Guest operator,..[0-9]Z,56
+171,Beacon,..[0-9]X.,227
+172,Classe 1 (CEPT A),..[568],227
+173,Classe 2 (CEPT B),..[14],227
+174,Classe 3,..0,227
+175,"Club, continental",..[0-9]K[A-Z][A-Z].,227
+176,Repeater,..[0-9][YZ],227
+177,Reserved prefix,..[2379],227
+178,Satellite,FX,227
+179,"Special call, continental",TM,227
+180,Visitor,..[0-9][VW][A-Z][A-Z].,227
+181,Extra class license,4L[0-9][A-Z].,75
+182,Guest operator,SV0,236
+183,Special event,SY,236
+184,U.S. personnel,OX5,237
+185,Special station,..0,76
+186,Advanced license,2U,106
+187,Beacon or repeater,GB[37],106
+188,Club station,[GM]P,106
+189,Foundation license,MU3[A-Z][A-Z][A-Z].,106
+190,Full license,"GU|MU[015][A-Z][A-Z][A-Z].",106
+191,HF Contest station,MU[0-9][A-Z].,106
+192,Special station,GB[0-24-689],106
+193,Guest operator,..0,80
+194,Club station,..[0-9]K[A-Z][A-Z].,239
+195,VHF only,HG,239
+196,Youth Club station,..[0-9]Y[A-Z][A-Z].,239
+197,"Grade 1, Advanced class",VU2,324
+198,"Grade 2, Restricted class",VU3,324
+199,Special event,AT,324
+200,Advanced Class,Y[BE],327
+201,Club or special event,"Y[A-Z][0-9][A-Z].|Y[A-Z][0-9]Z[A-Z]",327
+202,General Class,Y[CF],327
+203,No Code Class,YH,327
+204,Novice Class,Y[DG],327
+205,Class A,E[IJ][0-9][A-Z][A-Z].,245
+206,Class B,E[IJ][0-9][A-Z][A-Z][A-Z].,245
+207,Visitor,"..[0-9][A-Z][A-Z]V.|..[0-9][A-Z]V.",245
+208,Advanced license,2D,114
+209,Beacon or repeater,GB[37],114
+210,Club station,[GM]T,114
+211,Foundation license,MD3[A-Z][A-Z][A-Z].,114
+212,Full license,"GD|MD[015][A-Z][A-Z][A-Z].",114
+213,HF Contest station,MD[0-9][A-Z].,114
+214,Special station,GB[0-24-689],114
+215,Class A,4[XZ]1[A-Z][A-Z].,336
+216,Class B,"4[XZ]4[A-Z][A-Z].|4X6[A-Z][A-Z].|4Z5[A-Z][A-Z].",336
+217,Class C,4Z9[A-Z][A-Z][A-Z].,336
+218,Class D,4Z7[A-Z][A-Z][A-Z].,336
+219,Contest call,4[XZ]2[A-Z][A-Z].,336
+220,Foreign operator,4Z8,336
+221,Honor call,4X8[A-Z][A-Z].,336
+222,Club station,IQ,248
+223,Special event,"I[IJO-RUY]|IA[0-46-9]|IB[1-9]|I[C-HL][0-79]|I[NV][0-24-9]|IX[02-9]|I[A-Z][0-9][A-Z].",248
+224,VHF only,IW,248
+225,Guest operator,JX0,118
+226,Club station,..[0-9][YZ][A-Z][A-Z].,339
+227,Guest operator,7J,339
+228,Reserved prefix block,"J[BC]|JD[02-9]|J[A-Z][0-9]Q[RST][A-Z][A-Z].",339
+229,Special event station,8[A-Z],339
+230,Very old timer,"JA[0-9][A-Z][A-Z].|JR6[A-Z][A-Z].",339
+231,Advanced license,2J,122
+232,Beacon or repeater,GB[37],122
+233,Club station,[GM]H,122
+234,Foundation license,MJ3[A-Z][A-Z][A-Z].,122
+235,Full license,"GJ|MJ[015][A-Z][A-Z][A-Z].",122
+236,HF Contest station,MJ[0-9][A-Z].,122
+237,Special station,GB[0-24-689],122
+238,Club station,JY6,342
+239,Foreign operator,JY[89],342
+240,HF,JY5,342
+241,Privileged Class,JY3,342
+242,Royal Family Members,JY2,342
+243,Special event,JY7,342
+244,VHF,JY4,342
+245,1-st category,"R[0-9][A-Z][A-Z].|R[ACDFGJ-OQT-Z][0-9][A-Z][A-Z].|U[A-I][0-9][A-Z][A-Z].|R[ACDFGJ-OQT-Z][0-9][A-Z].|U[A-I][0-9][A-Z].",126
+246,2-nd category,"R[0-9][A-Z][A-Z][A-Z].|R[ACDFGJ-OQT-Z][0-9][A-Z][A-Z][A-Z].|UA[0-9][A-Z][A-Z][A-Z].",126
+247,3-rd category,U[BCDFG][0-9][A-Z][A-Z][A-Z].,126
+248,4-th category,U[EHI][0-9][A-Z][A-Z][A-Z].,126
+249,Beacon,RB[0-9][A-Z][A-Z].,126
+250,Repeater,"RR[0-9][A-Z][A-Z].|RR[0-9][A-Z][A-Z][A-Z].",126
+251,WW II veteran,U[0-9][A-Z][A-Z].,126
+252,1st category license,[A-Z][A-Z][0-9][A-Z][A-Z].,130
+253,2-4 category license,[A-Z][A-Z][0-9][A-Z][A-Z][A-Z].,130
+254,Club Station,U[A-Z][0-9][A-Z][WYZ][A-Z].,130
+255,Extra class license,[A-Z][A-Z][0-9][A-Z].,130
+256,Special event,UP,130
+257,1st category license,[A-Z][A-Z][678][A-Z][A-Z],135
+258,2 or 3 category license,[A-Z][A-Z]8[A-Z][A-Z][A-Z].,135
+259,Club Station,[A-Z][A-Z]9[A-Z][W-Z][A-Z].,135
+260,Extra class license,[A-Z][A-Z][028][A-Z].,135
+261,Special event,[A-Z][A-Z][1-35],135
+262,1 / 2 category,[A-Z][A-Z][23][A-Z][A-Z].,145
+263,3 / 4 category,[A-Z][A-Z][23]G[A-Z][A-Z].,145
+264,Club station,YL1[A-Z][A-Z].,145
+265,Repeater,YL[0-9]R[A-Z][A-Z].,145
+266,Novice or club station,..0,434
+267,Class A,LY[0-9][A-Z].,146
+268,Class A or B,LY[0-9][A-Z][A-Z].,146
+269,Class C,LY[0-9]N[A-Z][A-Z].,146
+270,Family station,LY1F[A-Z][A-Z].,146
+271,Foreign station,LY2A[A-Z][A-Z].,146
+272,Military station,LY1K[A-Z][A-Z].,146
+273,Repeater,LY0R[A-Z][A-Z].,146
+274,Advanced license,"[A-Z][A-Z][0-9][A-Z][A-Z].|[A-Z][A-Z][0-9][A-GIJKSTUW-Z][A-Z][A-Z].",147
+275,Foundation license,[A-Z][A-Z][0-9]F[A-Z][A-Z][A-Z].,147
+276,Standard license,[A-Z][A-Z][0-9][HLMNPV][A-Z][A-Z].,147
+277,Club station,LX9,254
+278,Full privilege license,LX[1-3],254
+279,Guest operator,LX2,254
+280,Novice license,LX6,254
+281,Repeater,LX0,254
+282,Special Callsign,LX[4578],254
+283,"A class: all bands, all modes, 1.5kw",Z31,502
+284,"B class: all bands exp 30 & 160m, 300w",Z32,502
+285,"C class: 40m & 80m only, all modes; 21.1-21.15 cw, 300w",Z33,502
+286,"D class: VHF & UHF only, all modes, 150w",Z34,502
+287,"E class: VHF & UHF only, FM only, 30w",Z36,502
+288,Radio club + K471 K480,Z37,502
+289,Repeater or beacon,Z35,502
+290,Special call,Z3[09],502
+291,"Special call, foreigner",Z38,502
+292,Club station,"CQ2|CS3",257
+293,Special event,"CQ[39]|CR3",258
+294,Guest operator,9H3,260
+295,HF Class,9H1,261
+296,VHF Class,9H5,262
+297,Resident,5T5,444
+298,Visitor,5T0,444
+299,Advanced license,"[A-Z][A-Z][0-9][A-Z][A-Z].|[A-Z][A-Z][0-9][A-GIJKSTUW-Z][A-Z][A-Z].",171
+300,Foundation license,[A-Z][A-Z][0-9]F[A-Z][A-Z][A-Z].,171
+301,Standard license,[A-Z][A-Z][0-9][HLMNPV][A-Z][A-Z].,171
+302,1/2/3 category license,[A-Z][A-Z][0-9][A-Z][A-Z].,179
+303,4 category license,ER[0-9][A-JL-Z][A-Z][A-Z].,179
+304,Club station,[A-Z][A-Z][0-9]K[A-Z][A-Z],179
+305,Extra category license,ER[0-9][A-Z].,179
+306,Foreign operator,[A-Z][A-Z]0,179
+307,Special event,[A-Z][A-Z][6-9],179
+308,All bands,3A2,260
+309,VHF only,3A1,260
+310,Visitor,CN0,446
+311,Beacon,PI7,263
+312,Class 1 license,P[ABCE-H][0-57-9],263
+313,Club Station,PI4,263
+314,Novice class license,PD[0-57-9],263
+315,Packet BBS,PI8,263
+316,Repeater,PI[236],263
+317,School license,PI5[A-Z],263
+318,Special event,"P[A-H]6|PI9|P[A-Z][0-9][A-Z].",263
+319,Special event,PI50,263
+320,VHF/UHF Packet node,PI1,263
+321,Novice class,ZL[0-9][A-Z][A-Z]N.,170
+322,Special Event or Club Station,YN0,86
+323,Advanced license,"[A-Z][A-Z][0-9][A-Z][A-Z].|[A-Z][A-Z][0-9][A-GIJKSTUW-Z][A-Z][A-Z].",189
+324,Foundation license,[A-Z][A-Z][0-9]F[A-Z][A-Z][A-Z].,189
+325,Standard license,[A-Z][A-Z][0-9][HLMNPV][A-Z][A-Z].,189
+326,Resident,..[0-9][A-Z][A-Z].,191
+327,Visitor,..[0-9][A-Z][A-Z][A-Z].,191
+328,Advanced license,2I,265
+329,Beacon or repeater,GB[37],265
+330,Club station,[GM]N,265
+331,Foundation license,MI3[A-Z][A-Z][A-Z].,265
+332,Full license,"GI|MI[015][A-Z][A-Z][A-Z].",265
+333,HF Contest station,MI[0-9][A-Z].,265
+334,Special station,GB[0-24-689],265
+335,CEPT Licence,L[AB],266
+336,Club station,LA[0-9][A-Z].,266
+337,Digital station,LD,266
+338,Electronics company,LF,266
+339,Emergency station,LE,266
+340,Guest Operator,L[A-C]0,266
+341,Reserved prefix block,L[CHJ],266
+342,Guest operator,A4[0-9]V,370
+343,Novice,P2[0-9]N,163
+344,VHF station,P2[0-9]Z,163
+345,Mobile or club station,ZP0,132
+346,Special Event or Club Station,OA0,136
+347,Advanced class,4[FI],375
+348,Club station,DX,375
+349,Novice class,DY,375
+350,Special event,..0,375
+351,"Technician,General,Advanced class",DU,375
+352,Club Station,...[KPZY][A-Z][A-Z].,269
+353,Guest Operator,SO[1-9],269
+354,Special Station,"SP0|SN|HF|3Z",269
+355,Club station,"CQ0|CS5",272
+356,Reserved prefix,"C[RST]0|CS1|C[QR]4|CQ5|C[QST]6",272
+357,Special event,"CQ7|CR[56]|CS2",272
+358,Club Station,[A-Z][A-Z][0-9]K[A-Z][A-Z],275
+359,Special Station,..[01],275
+360,1-st category,"R[0-9][A-Z][A-Z].|R[ACDFGJ-OQT-Z][0-9][A-Z][A-Z].|U[A-I][0-9][A-Z][A-Z].|R[ACDFGJ-OQT-Z][0-9][A-Z].|U[A-I][0-9][A-Z].",15
+361,2-nd category,"R[0-9][A-Z][A-Z][A-Z].|R[ACDFGJ-OQT-Z][0-9][A-Z][A-Z][A-Z].|UA[0-9][A-Z][A-Z][A-Z].",15
+362,3-rd category,U[BCDFGH][0-9][A-Z][A-Z][A-Z].,15
+363,4-th category,U[EHI][0-9][A-Z][A-Z][A-Z].,15
+364,Beacon,RB[0-9][A-Z][A-Z].,15
+365,Contest station,"R[0-9][A-Z].|R[0-9][0-9][A-Z].|R[0-9][0-9][A-RT-Z][A-Z].|R[0-9][0-9]S[A-OQ-Z].",15
+366,Drifting polar station,R[0-9][0-9]SP.,15
+367,Pobeda event,RP,15
+368,Repeater,"RR[0-9][A-Z][A-Z].|RR[0-9][A-Z][A-Z][A-Z].",15
+369,Satellite,RS[0-9][0-9]S.,15
+370,Space station,RS[0-9][0-9]ISS.,15
+371,Special event,"R[0-9]SRR.|R[0-9]HQ.|R[0-9][A-Z][A-Z][A-Z][A-Z]|R[0-9][0-9][A-Z][A-Z][A-Z].|R[0-9][0-9][0-9][A-Z].|R[0-9][0-9][0-9][A-Z][A-Z].|R[0-9][0-9][0-9][0-9][A-Z].|R[AC-HJ-OQT-Z][0-9][0-9][A-Z].|R[AC-HJ-OQT-Z][0-9][0-9][A-Z][A-Z].|R[AC-HJ-OQT-Z][0-9][0-9][A-Z][A-Z][A-Z].|R[AC-HJ-OQT-Z][0-9][0-9][0-9][A-Z].|R[AC-HJ-OQT-Z][0-9][0-9][0-9][A-Z][A-Z].",15
+372,WW II veteran,U[0-9][A-Z][A-Z].,15
+373,1-st category,"R[0-9][A-Z][A-Z].|R[ACDFGJ-OQT-Z][0-9][A-Z][A-Z].|U[A-I][0-9][A-Z][A-Z].|R[ACDFGJ-OQT-Z][0-9][A-Z].|U[A-I][0-9][A-Z].",54
+374,2-nd category,"R[0-9][A-Z][A-Z][A-Z].|R[ACDFGJ-OQT-Z][0-9][A-Z][A-Z][A-Z].|UA[0-9][A-Z][A-Z][A-Z].",54
+375,3-rd category,U[BCDFG][0-9][A-Z][A-Z][A-Z].,54
+376,4-th category,U[EHI][0-9][A-Z][A-Z][A-Z].,54
+377,Beacon,RB[0-9][A-Z][A-Z].,54
+378,Contest station,"R[0-9][A-Z].|R[0-9][0-9][A-Z].|R[0-9][0-9][A-RT-Z][A-Z].|R[0-9][0-9]S[A-OQ-Z].",54
+379,Drifting Polar Station,R[0-9][0-9]SP.,54
+380,Pobeda event,RP,54
+381,Repeater,"RR[0-9][A-Z][A-Z].|RR[0-9][A-Z][A-Z][A-Z].",54
+382,Satellite,RS[0-9][0-9]S.,54
+383,Space station,RS[0-9][0-9]ISS.,54
+384,Special event,"R[0-9]SRR.|R[0-9]HQ.|R[0-9][A-Z][A-Z][A-Z][A-Z]|R[0-9][0-9][A-Z][A-Z][A-Z].|R[0-9][0-9][0-9][A-Z].|R[0-9][0-9][0-9][A-Z][A-Z].|R[0-9][0-9][0-9][0-9][A-Z].|R[AC-HJ-OQT-Z][0-9][0-9][A-Z].|R[AC-HJ-OQT-Z][0-9][0-9][A-Z][A-Z].|R[AC-HJ-OQT-Z][0-9][0-9][A-Z][A-Z][A-Z].|R[AC-HJ-OQT-Z][0-9][0-9][0-9][A-Z].|R[AC-HJ-OQT-Z][0-9][0-9][0-9][A-Z][A-Z].",54
+385,WW II veteran,U[0-9][A-Z][A-Z].,54
+386,HF license,T77,278
+387,Special Event or Club Station,T70,278
+388,VHF license,T72,278
+389,Advanced license,2M,279
+390,Beacon or repeater,GB[37],279
+391,Club station,[GM]S,279
+392,Foundation license,MM3[A-Z][A-Z][A-Z].,279
+393,Full license,"GM|MM[015][A-Z][A-Z][A-Z].",279
+394,HF Contest station,MM[0-9][A-Z].,279
+395,Special station,GB[0-24-689],279
+396,Class A - E,YU,296
+397,Class F,YT,296
+398,Club station,..[0-9][A-M],296
+399,BBS,OM0[PS][A-Z][A-Z].,504
+400,Beacon,OM0M[A-Z][A-Z].,504
+401,Club station,OM3[KR][A-Z][A-Z].,504
+402,Contest station,OM[0-9][A-Z].,504
+403,Guest operator,OM9[A-S][A-Z][A-Z].,504
+404,Licence class A or B,OM[0-8][A-Z][A-Z].,504
+405,Licence class C or D,OM[0-8][A-Z][A-Z][A-Z].,504
+406,Old call carried over,"OM3[A-Z][A-Z].|OM3[A-Z][A-Z][A-Z].",504
+407,Packet,OM0N[A-Z][A-Z].,504
+408,Repeater,OM0O[A-Z][A-Z].,504
+409,Special station,OM9[A-Z][A-Z].,504
+410,"Class A1, 400W",ZS,462
+411,"Class A3, 100W",ZT,462
+412,"Class B, 25W",ZU,462
+413,VHF only,ZR,462
+414,Resident,..[0-9][A-Z][A-Z].,234
+415,Visitor,..[0-9][A-Z][A-Z][A-Z].,234
+416,Club station,..0,137
+417,U.S. Army station,..9,137
+418,Antarctic Base (Argentina),"L[2-9O-W][0-9]Z|A[YZ][0-9]Z",238
+419,Antarctic Base (UK),VP8,238
+420,Antarctic Base (Argentina),"L[2-9O-W][0-9]Z|A[YZ][0-9]Z",240
+421,Antarctic Base (UK),VP8,240
+422,Antarctic Base (Argentina),"L[2-9O-W][0-9]Z|A[YZ][0-9]Z",241
+423,Antarctic Base (Chile),"C[A-E]9|X[QR]9|3G9",241
+424,Antarctic Base (Russia),R1AN,241
+425,Antarctic Base (South Korea),"HL8|6[K-N]8|D[7-9ST]8",241
+426,Antarctic Base (UK),VP8,241
+427,Alternate call for 6 m,EH,281
+428,Cept class 1,E[AD],281
+429,Cept class 2,E[BE],281
+430,Cept class 3,E[CF],281
+431,Special event,E[DEFG],281
+432,Novice license,4S6,315
+433,Reserved prefix,,255
+434,Guest operator,..[0-9]Z,253
+435,Guest operator,PZ5,140
+436,Special station,PZ0,140
+437,Foreign operator,JW0,259
+438,Army club station,"SL|SA[0-9][A-Z][A-Z].",284
+439,Club station,SK,284
+440,Contest Station,SC,284
+441,Maritime mobile,SM8,284
+442,Memorial station,S[D-G],284
+443,Navy ship,SL8,284
+444,Novice station,SH[0-9][ABC][A-Z][A-Z].,284
+445,HF license,"HB9[A-Z].|HB9[A-Z][A-Z].|HB9[A-L][A-Z][A-Z].",287
+446,Military Station,HB4,287
+447,Novice,HB3,287
+448,SWL,HE9[A-Z][A-Z][A-Z].,287
+449,VHF license,HB9[M-Z][A-Z][A-Z].,287
+450,Class 1,BX[0-9][A-Z][A-Z].,386
+451,Class 2,.[M-W][0-9][A-Z][A-Z].,386
+452,Class 3,BX[0-9][A-Z][A-Z][A-Z].,386
+453,Class 4,.[M-W][0-9][A-Z][A-Z][A-Z].,386
+454,Club station,"..[0-9]Y[A-Z].|..[0-9][A-Z]Y[A-Z].",386
+455,Repeater,BX[0-9][A-Z].,386
+456,Special station,"..0|.[M-W][0-9][A-Z].",386
+457,VHF Class,B[MN][1-8][A-Z][A-Z][A-Z].,386
+458,Club station,..[0-9]Z,262
+459,Special event,EY1,262
+460,US Forces,,264
+461,Club Station,..0[A-Y],387
+462,Guest operator,"..0.|..0Z[A-Z][A-Z].",387
+463,Resident,C53,422
+464,Visitor,C56,422
+465,Guest operator,..[0-9]Z,273
+466,Club Station,[A-Z][A-Z][0-9]K,390
+467,Club station,[A-Z][A-Z][0-9][A-Z].,280
+468,Guest operator,[A-Z][A-Z]0,280
+469,Novice licence,ZC4N,283
+470,Club station,U.[0-9][A-Z][W-Z][A-Z].,288
+471,WW II veteran,U5[A-Z][A-Z].,288
+472,RESERVED PREFIX BLOCK,"[KNW]P|KA[2-9][A-Z][A-Z].|KX6[A-Z][A-Z].|KL9K[A-H][A-Z].",291
+473,Mobile station,..[0-9]Z,144
+474,Special station,..[0-9]X,144
+475,Club Station,..[0-9][A-Z][W-Z][A-Z].,292
+476,WW II veteran,U8[A-Z][A-Z].,292
+477,Class A license,YY,148
+478,Class B license,YV,148
+479,Special event,"4M|YW|YX",148
+480,Advanced license,2W,294
+481,Beacon or repeater,GB[37],294
+482,Club station,[GM]C,294
+483,Foundation license,MW3[A-Z][A-Z][A-Z].,294
+484,Full license,"GW|MW[015][A-Z][A-Z][A-Z].",294
+485,HF Contest station,MW[0-9][A-Z].,294
+486,Special station,GB[0-24-689],294
+487,Advanced license,"[A-Z][A-Z][0-9][A-Z][A-Z].|[A-Z][A-Z][0-9][A-GIJKSTUW-Z][A-Z][A-Z].",303
+488,Foundation license,[A-Z][A-Z][0-9]F[A-Z][A-Z][A-Z].,303
+489,Standard license,[A-Z][A-Z][0-9][HLMNPV][A-Z][A-Z].,303
+490,DX Cluster,PI8DX[A-Z].,263
+491,Drifting Polar Station,,15
+492,Drifting Polar Station (As),,15
+493,IARC (Vienna),4U[0-9]VIC,206
+494,Government of Canada,VY9,1
+495,ICAO (Montreal),4Y,1
+496,EC (Strassbourg),TP,227
+497,WMO (Geneva),C7,287
+498,Vrangel I.,RI0K,15
+499,Karaginskiy I.,RI0X,15
+500,Komandorskie Is.,RI0Z,15
+501,Iony I.,RI0C,15
+502,Severnaya Zemlya,RI0B,15
+503,Mdevezhi Is.,RI0Q[A-L],15
+504,Novosibirskie Is.,RI0Q[M-Z],15
+505,Kuril Is.,RI0F,15
+506,Novaya Zemlya I.,RI1O,54
+507,Kolguyev I.,RI1P,54
+-1
+

@@ -301,7 +301,9 @@ void add_data() {
 		((spec_tree*)tabbed_view_->get_view(OT_ADIF))->populate_tree(false);
 	}
 	// Add intl dialog
-	intl_dialog_ = new intl_dialog;
+	if (!closing_) {
+		intl_dialog_ = new intl_dialog;
+	}
 	// Don't show here - add a menu item to show it.
 }
 

@@ -146,7 +146,7 @@ status::status(int X, int Y, int W, int H, const char * label) :
 	// If it's not in the settings, open file dialog, get it and set it.
 	while (report_filename_.length() == 0) {
 		// Create an Open dialog; the default file name extension is ".txt".
-		Fl_File_Chooser* chooser = new Fl_File_Chooser(report_filename_.c_str(), "Text Files(*.txt)\tAll Files (*.*)", Fl_File_Chooser::SINGLE, "Select file name for status report");
+		Fl_File_Chooser* chooser = new Fl_File_Chooser(report_filename_.c_str(), "Text Files(*.txt)\tAll Files (*.*)", Fl_File_Chooser::CREATE, "Select file name for status report");
 		chooser->callback(cb_chooser, &report_filename_);
 		chooser->textfont(FONT);
 		chooser->textsize(FONT_SIZE);

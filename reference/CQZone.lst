@@ -1,0 +1,43 @@
+#-----------------------------------------------------------
+#InternalUse|Longitude|Latitude|ZoneDescription|+ZoneNumber|
+#-----------------------------------------------------------
+|-26585|12364|Northwestern Zone of North America: KL, VY1/VE8 Yukon, the Northwest Territories west of 102 degrees. (Includes the islands of Victoria, Banks, Melville, and Prince Patrick.)|1
+|-14507|12952|Northeastern Zone of North America: VO2 Labrador, the portion of VE2 Quebec north of the 50th parallel, the VE8 Northwest Territories east of 102 degrees. (Includes the islands of King Christian, King William, Prince of Wales, Somerset, Bathurst, Devon, Ellesmere, Baffin, and the Melville and Boothia Peninsulas, excluding Akimiski Island.)|2
+|-22356|7826|Western Zone of North America: VE7, W6, and the W7 states of Arizona, Idaho, Nevada, Oregon, Utah, and Washington.|3
+|-17428|8278|Central Zone of North America: VE3, VE4, VE5, VE6, VE8 Akimiski Island, and W7 states of Montana and Wyoming. W0, W9, W8 (except West Virginia), W5, and the W4 states of Alabama, Tennessee, and Kentucky.|4
+|-10343|7156|Eastern Zone of North America: 4U1UN, CY9, CY0, FP, VE1/VE9, VO1, VY2, the portion of VE2 Quebec south of the 50th parallel, VP9, W1, W2, W3, and the W4 states of Florida, Georgia, South Carolina, North Carolina, Virginia, and the W8 state of West Virginia.|5
+|-20642|4055|Southern Zone of North America: XE, XF4 (Revilla Gigedo).|6
+|-19157|1682|Central American Zone: FO (Clipperton), HK0 (San Andres), HP, HR, TG, TI, TI9, V3, YN, and YS.|7
+|-10150|3695|West Indies Zone: C6, CO, FG, FJ, FM, FS, HH, HI, J3, J6, J7, J8, KG4 (Guantanamo), KP1, KP2, KP4, KP5, PJ (Saba, St. Maarten, St. Eustatius), V2, V4, VP2, VP5, YV0 (Aves I.), ZF, 6Y, and 8P.|8
+|-9774|1348|Northern Zone of South America: FY, HK, HK0 (Malpelo), P4, PJ (Bonaire, Curacao), PZ, YV, 8R, and 9Y.|9
+|-17905|-1586|Western Zone of South America: CP, HC, HC8, and OA.|10
+|-7856|-2250|Central Zone of South America: PY, PY0, and ZP.|11
+|-17095|-9925|Southwest Zone of South America: 3Y (Peter I), CE, CE0 (Easter Is., Juan Fernandez Is., San Felix Is.), and some Antarctic stations.(Note 3)|12
+|-8844|-10890|Southeast Zone of South America: CX, LU, VP8 Islands, and some Antarctic stations.(Note 3)|13
+|-1187|9173|Western Zone of Europe: C3, CT, CU, DL, EA, EA6, EI, F, G, GD, GI, GJ, GM, GU, GW, HB, HB0, LA, LX, ON, OY, OZ, PA, SM, ZB, 3A, and 4U1ITU.|14
+|3466|9008|Central European Zone: 1A0, 9A, 9H, ES, HA, HV, I, IS0, LY, OE, OH, OH0, OJ0, OK, OM, S5, SP, T7, T9, TK, UA2, YL, YU, ZA, Z3.|15
+|7280|10852|Eastern Zone of Europe: UR-UZ, EU-EW, ER, UA1, UA3, UA4, UA6, UA9 (S,W), and R1MV (M.V. Island).|16
+|12410|10345|Western Zone of Siberia: EZ, EY, EX, UA9 (A, C, F, G, J, K, L, M, Q, X), UK and UN-UQ.|17
+|17557|12624|Central Siberian Zone: UA8 (T,V), UA9 (H, O, U, Y, Z), and UA0 (A, B, H, S, U, W).|18
+|26579|12338|Eastern Siberian Zone: UA0 (C, D, F, I, J, K, L, Q, X, Z).|19
+|5432|6924|Balkan Zone: JY, LZ, OD, SV, TA, YK, YO, ZC4, 4X, and 5B.|20
+|9460|4987|Southwestern Zone of Asia: 4J, 4L, A4, A6, A7, A9, AP, EK, EP, HZ, YA, YI, 7O, and 9K.|21
+|13853|2305|Southern Zone of Asia: A5, S2, VU, VU7 (Laccadive Is.), 4S, 8Q, and 9N.|22
+|17318|7512|Central Zone of Asia: JT, UA0Y, BY3G-L, BY9A-L, BY9T-Z, and BY0.|23
+|20792|5674|Eastern Zone of Asia: BV, BY1, BY2, BY3A-F, BY3M-S, BY3T-Z, BY4, BY5, BY6, BY7, BY8, BY9M-S, VR2, and XX9.|24
+|24606|6415|Japanese Zone: HL and JA.|25
+|17872|2620|Southeastern Zone of Asia: HS, VU4 (Andaman and Nicobar Islands), XV, XU, XW, XZ, and 1S (Spratly Islands).|26
+|25734|2659|Philippine Zone: DU (Philippines), JD1 (Minami Torishima), JD1 (Ogasawara), KH2 (Guam), KH0 (Marianas Is.), T8, V6 (Fed. States of Micronesia).|27
+|22716|-662|Indonesian Zone: H4, P2, V8, YB, 9M, and 9V.|28
+|19621|-8891|Western Zone of Australia: VK6, VK8, VK9X (Christmas Is.), VK9Y (Cocos-Keeling Is.), and some Antarctic stations.(Note 3)|29
+|27492|-9829|Eastern Zone of Australia: VK1, VK5, VK7, VK9L (Lord Howe Is.), VK9 (Willis Is.), VK9 (Mellish Reef), VK0 (Macquarie Is.), and some Antarctic stations.(Note 3)|30
+|-30265|2561|Central Pacific Zone: C2, FO (Marquises), KH1, KH3, KH4, KH5, KH6, KH7, KH9, T2, T3, V7, and ZK3.|31
+|-27122|-9112|New Zealand Zone: A3, FK, FO (except Marquises and Clipperton), FW, KH8, VK9 (Norfolk Is.), VP6, YJ, ZK1, ZK2, ZL, 3D2, 5W, and some Antarctic stations. (Note 3)|32
+|-2206|5224|Northwestern Zone of Africa: CN, CT3, EA8, EA9, IG9, IH9 (Pantelleria Is.), S0, 3V, and 7X.|33
+|4881|4226|Northeastern Zone of Africa: ST, SU, and 5A.|34
+|-1350|2253|Central Zone of Africa: C5, D4, EL, J5, TU, TY, TZ, XT, 3X, 5N, 5T, 5U, 5V, 6W, 9G, and 9L.|35
+|1532|-1279|Equatorial Zone of Africa: D2, TJ, TL, TN, S9, TR, TT, ZD7, ZD8, 3C, 9J, 9Q, 9U, and 9X.|36
+|7359|232|Eastern Zone of Africa: C9, ET, E3, J2, T5, 5H, 5X, 5Z, and 7Q.|37
+|1320|-9932|South African Zone: A2, V5, ZD9, Z2, ZS1-ZS9, 3DA, 3Y (Bouvet Is.), 7P, and some Antarctic stations.(Note 3)|38
+|10792|-8305|Madagascar Zone: D6, FT-W, FT-X, FT-Z, FH, FR, S7, VK0 (Heard Is.), VQ9, 3B6/7, 3B8, 3B9, 5R8, and some Antarctic stations.(Note 3)|39
+|-2986|14066|North Atlantic Zone: JW, JX, OX, TF, and R1FJ (Franz Josef Land).|40

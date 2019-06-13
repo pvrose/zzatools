@@ -1,0 +1,13 @@
+Field Name	Data Type	Enumeration	Description	Header Field	Minimum Value	Maximum Value	Import-only	Comments	ADIF Version	ADIF Status
+APP_EQSL_AG	String		Added by eQSL to denote contact is an approved station	N						Not Approved
+APP_EQSL_SWL	String		Added by eQSL to denote an SWL report	N						Not Approved
+APP_LOTW_LASTQSL	String		Added by LotW to indicate when the last QSL record was received (YYYY-MM-DD HH:MM:SS)	Y						Not Approved
+APP_LOTW_LASTQSORX	String		Added by LotW to indicate when the last QSL record was received (YYYY-MM-DD HH:MM:SS)	Y						Not Approved
+APP_LOTW_MODEGROUP	String		Added by LotW to indicate the award class for the mode	N						Not Approved
+APP_LOTW_NUMREC	Integer		Added by LotW to indicate number of records in file	N						Not Approved
+APP_ZZALOG_EQSL	String		Added by ZLG to contain the eQSL download warning message	N						Not Approved
+APP_ZZALOG_EQSL_MSG	String		Added by ZLG to contain the QSL_MESSAGE received from eQSL	N						Not Approved
+APP_ZZALOG_EQSL_TS	String		Added by ZLG to contain the QSO_DATE and TIME in the eQSL download file (differemnt from the log)	N						Not Approved
+APP_ZZALOG_NUMREC	Integer		Added by ZLG to indicate number of records in log file	Y						Not Approved
+APP_ZZALOG_PFX	String		Added by ZLG to indicate the nickname (prefix) of the prefix data record for the parsed call	N						Not Approved
+APP_ZZALOG_QTH	String		Added by ZLG as info about the station location	N						Not Approved

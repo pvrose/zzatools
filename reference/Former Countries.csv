@@ -1,0 +1,62 @@
+Code,Name,Nickname,Mask,CQZone,ITUZone,Continent,Timezone,ValidFrom,ValidUntil
+2,Abu Ail Is.,A1,A1,21,39,AS,Asia/Aden,01/01/1900,30/03/1991
+8,Aldabra,VQ9,VQ9,39,53,AF,Indian/Mahe,01/01/1900,28/06/1976
+19,Bajo Nuevo,HK0,HK0,8,11,NA,America/Bogota,01/01/1900,16/09/1981
+23,Blenheim Reef,1B[B],1B,39,41,AF,Indian/Chagos,04/05/1967,30/06/1975
+85,"Bonaire,Curacao",PJ2,PJ[0-489],9,11,SA,America/Curacao,01/01/1900,10/10/2010
+25,British North Borneo,ZC5,ZC5,28,54,OC,Asia/Kuching,01/01/1900,15/09/1963
+26,British Somaliland,VQ6,VQ6,37,48,AF,Africa/Mogadishu,01/01/1900,30/06/1960
+28,Canal Zone,KZ5,"KZ5,K5",7,11,NA,America/Panama,01/01/1900,30/09/1979
+30,Celebe & Molucca Is.,PK6,PK6,28,54,OC,"Asia/Makassar,Asia/Jayapura",01/01/1900,30/04/1963
+39,Comoros,FH,"FH,FB8",39,53,AF,Indian/Comoro,01/01/1900,05/07/1975
+218,Czechoslovakia,OK,O[K-M],15,28,EU,Europe/Prague,01/01/1900,31/12/1992
+42,Damao;Diu,CR8,CR8,22,41,AS,Asia/Kolkata,01/01/1900,31/12/1961
+44,Desroches,VQ9,VQ9,39,53,AF,Indian/Mahe,01/01/1900,28/06/1976
+55,Farquhar,VQ9,VQ9,39,53,AF,Indian/Mahe,01/01/1900,28/06/1976
+57,French Equatorial Africa,FQ8,FQ8,36,0,AF,Africa/Bangui,01/01/1900,16/08/1960
+67,French India,FN8,FN8,22,41,AS,Asia/Kolkata,01/01/1900,31/10/1954
+58,French Indo-China,FI8,FI8,26,49,AS,"Asia/Ho_Chi_Minh,Asia/Phnom_Penh",01/01/1900,20/12/1950
+59,French West Africa,FF,FF,35,46,AF,Africa/Dakar,01/01/1900,06/08/1960
+229,German Democratic Rep.,DM,"D[MT],Y[2-9]",14,28,EU,Europe/Berlin,17/09/1973,02/10/1990
+81,Germany,DL,"D[A-R],Y[2-9]",14,28,EU,Europe/Berlin,01/01/1900,16/09/1973
+93,Geyser Reef,1B[G],1B,39,53,AF,Indian/Mayotte,04/05/1967,28/02/1978
+101,Goa,CR8,CR8,22,41,AS,Asia/Kolkata,01/01/1900,31/12/1961
+102,Gold Coast;Togoland,ZD4,ZD4,35,46,AF,Africa/Accra,01/01/1900,05/03/1957
+113,Ifni,EA9,EA9,33,37,AF,Africa/Casablanca,01/01/1900,13/05/1969
+115,Italian Somaliland,I5,I5,37,48,AF,Africa/Mogadishu,01/01/1900,30/06/1960
+119,Java,PK1,"PK[1-3],VK9",28,54,OC,Asia/Jakarta,01/01/1900,30/04/1963
+127,Kamaran Is.,VS9K,VS9K,21,39,AS,Asia/Aden,01/01/1900,10/03/1982
+128,Karelo-Finnish Rep.,UN1,UN1,16,19,EU,Europe/Moscow,01/01/1900,30/06/1960
+139,Kuria Muria Is.,VS9H,VS9H,21,39,AS,Asia/Muscat,01/01/1900,29/11/1967
+68,Kuwait/Saudi Arabia Neut. Zone,8Z5,"8Z5,9K3",21,39,AS,Asia/Kuwait,01/01/1900,14/12/1969
+155,Malaya,VS2,"VS2,9M2",28,54,AS,Asia/Kuala_Lumpur,01/01/1900,15/09/1963
+151,Malyj Vysotskij I.,RI1MV,RI1MV,16,29,EU,Europe/Moscow,01/01/1900,17/02/2012
+164,Manchuria,C9,C9,24,33,AS,Asia/Urumqi,01/01/1900,15/09/1963
+178,Minerva Reef,1M,1M,32,62,OC,+12:00,01/01/1900,15/07/1972
+183,Netherlands Borneo,PK5,PK5,28,54,OC,,01/01/1900,30/04/1963
+184,Netherlands N. Guinea,JZ0,"JZ0,7J1",28,51,OC,Pacific/Port_Moresby,01/01/1900,30/04/1963
+186,Newfoundland;Labrador,VO,VO,0,9,NA,,01/01/1900,31/03/1949
+193,Okinawa,KA6,"KR[68],KA6",25,45,AS,Asia/Tokyo,01/01/1900,14/05/1972
+194,Okino Tori-shima,7J1,"7J1,JD1",27,45,AS,Asia/Tokyo,30/05/1976,30/11/1980
+196,Palestine,ZC6,"ZC6,4X1",20,39,AS,Asia/Gaza,01/01/1900,30/06/1968
+198,Papua Territory,P2,"P2,VK9",28,51,OC,Pacific/Port_Moresby,01/01/1900,15/09/1975
+493,Penguin Is.,ZS0,ZS[01],38,57,AF,Africa/Windhoek,01/01/1900,28/02/1994
+243,People's Dem. Rep. of Yemen,VS9A,VS9[APS],21,39,AS,Asia/Aden,01/01/1900,22/05/1990
+200,Portuguese Timor,CR8,"CR8,CR10",28,54,OC,Asia/Dili,01/01/1900,14/09/1976
+208,Ruanda-Urundi,9U5,9U5,36,52,AF,Africa/Bujumbura,01/07/1960,30/06/1962
+210,Saar,9S4,"9S4,9K3",14,28,EU,Europe/Berlin,01/01/1900,31/03/1957
+220,Sarawak,VS4,VS4,28,54,OC,Asia/Kuching,01/01/1900,15/09/1963
+226,Saudi Arabia/Iraq Neut. Zone,8Z4,8Z4,21,39,AS,Asia/Riyadh,01/01/1900,25/12/1981
+228,Serrana Bank & Roncador Cay,HK0,"HK0,KP3,KS4",7,11,NA,America/Bogota,01/01/1900,16/09/1981
+231,Sikkim,AC3,"AC3,J2/A",22,41,AS,Asia/Kolkata,01/01/1900,30/04/1975
+244,Southern Sudan,ST0,"ST0,6[TU]0,SS0[N-Z]",34,0,AF,Africa/Khartoum,07/05/1972,31/12/1994
+255,St. Maarten;Saba;St. Eustasius,PJ7,PJ[15-9],8,11,NA,America/Curacao,01/01/1900,10/10/2010
+258,Sumatra,PK4,PK[2-4],28,54,OC,Asia/Jakarta,01/01/1900,30/04/1963
+261,Swan I.,KS4,"KR8,JR6,KA6,K[DS]4",7,11,NA,America/Tegucigalpa,01/01/1900,31/08/1972
+264,Tangier,CN2,"CN2,EK",33,37,AF,Africa/Casablanca,01/01/1900,30/06/1960
+267,Territory of New Guinea,P2,"P2,VK9",28,51,OC,Pacific/Port_Moresby,01/01/1900,15/09/1975
+268,Tibet,AC4,AC4,23,41,AS,Asia/Urumqi,01/01/1900,30/05/1974
+271,Trieste,I1,I1,15,28,EU,Europe/Rome,01/01/1900,31/03/1957
+488,Walvis Bay,ZS9,ZS9,38,57,AF,Africa/Windhoek,01/09/1977,28/02/1994
+154,Yemen Arab Rep.,4W,4W,21,39,AS,Asia/Aden,01/01/1900,21/05/1990
+307,Zanzibar,VQ1,"VQ1,5H1",37,53,AF,Africa/Dar_es_Salaam,01/01/1900,31/05/1974

@@ -71,9 +71,9 @@ record::record(logging_mode_t type) {
 		item("QSO_DATE", timestamp.substr(0,8));
 		// Time as HHMMSS - always log seconds.
 		item("TIME_ON", timestamp.substr(8));  
-		item("QSO_DATE_OFF", "");
-		item("TIME_OFF", "");
-		item("CALL", "");
+		item("QSO_DATE_OFF", string(""));
+		item("TIME_OFF", string(""));
+		item("CALL", string(""));
 		// If rig is connected - get information from rig
 		if (rig_if_ != nullptr) {
 			frequency_t freq_format;
@@ -118,37 +118,37 @@ record::record(logging_mode_t type) {
 		}
 		else {
 			// otherwise we enter it manually later.
-			item("FREQ", "");
-			item("MODE", "");
-			item("SUBMODE", "");
-			item("TX_PWR", "");
+			item("FREQ", string(""));
+			item("MODE", string(""));
+			item("SUBMODE", string(""));
+			item("TX_PWR", string(""));
 		}
 		// initialise fields
-		item("RX_PWR", "");
-		item("RST_SENT", "");
-		item("RST_RVCD", "");
-		item("NAME", "");
-		item("QTH", "");
-		item("GRIDSQUARE", "");
+		item("RX_PWR", string(""));
+		item("RST_SENT", string(""));
+		item("RST_RVCD", string(""));
+		item("NAME", string(""));
+		item("QTH", string(""));
+		item("GRIDSQUARE", string(""));
 		break;
 	}
 	case LM_OFF_AIR:
 	case LM_IMPORTED:
 		// Just initialise to empty strings
-		item("QSO_DATE", "");
-		item("TIME_ON", "");
-		item("QSO_DATE_OFF", "");
-		item("TIME_OFF", "");
-		item("CALL", "");
-		item("FREQ", "");
-		item("MODE", "");
-		item("TX_PWR", "");
-		item("RX_PWR", "");
-		item("RST_SENT", "");
-		item("RST_RVCD", "");
-		item("NAME", "");
-		item("QTH", "");
-		item("GRIDSQUARE", "");
+		item("QSO_DATE", string(""));
+		item("TIME_ON", string(""));
+		item("QSO_DATE_OFF", string(""));
+		item("TIME_OFF", string(""));
+		item("CALL", string(""));
+		item("FREQ", string(""));
+		item("MODE", string(""));
+		item("TX_PWR", string(""));
+		item("RX_PWR", string(""));
+		item("RST_SENT", string(""));
+		item("RST_RVCD", string(""));
+		item("NAME", string(""));
+		item("QTH", string(""));
+		item("GRIDSQUARE", string(""));
 		break;
 	}
 }
@@ -663,7 +663,7 @@ bool record::update_band(bool force /*=false*/) {
 			}
 			else {
 				if (item("BAND_RX") != "") {
-					item("BAND_RX", "", true);
+					item("BAND_RX", string(""), true);
 					updated = true;
 				}
 			}
