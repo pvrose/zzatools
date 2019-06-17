@@ -439,7 +439,7 @@ void book::remember_record() {
 void book::selection(record_num_t num_item, hint_t hint /* = HT_SELECTED */, view* requester /* = nullptr */, record_num_t num_other /*= 0*/) {
 	record_num_t previous = current_item_;
 	// Special case - -1 indicates no change to the selection
-	if ((signed)num_item != -1 && hint != HT_NO_DATA) {
+	if ((signed)num_item != -1 && size()) {
 		current_item_ = num_item;
 		remember_record();
 	}
@@ -509,7 +509,7 @@ record_num_t book::append_record(record* record) {
 void book::header(record* header) {
 	delete header_;
 	header_ = header;
-	header_->header("");
+	header_->header(string(""));
 }
 
 // return the header record

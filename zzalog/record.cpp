@@ -52,14 +52,12 @@ bool record::operator > (record& them) {
 // Default constructor
 record::record()
 {
-	is_header_ = false;
-	is_incomplete_ = false;
-	header_comment_ = "";
+	delete_contents();
 }
 
 // Constructor that pre-populates certain fields
 record::record(logging_mode_t type) {
-	record();
+	delete_contents();
 	
 	switch (type) {
 	case LM_RADIO_CONN:
@@ -126,7 +124,7 @@ record::record(logging_mode_t type) {
 		// initialise fields
 		item("RX_PWR", string(""));
 		item("RST_SENT", string(""));
-		item("RST_RVCD", string(""));
+		item("RST_RCVD", string(""));
 		item("NAME", string(""));
 		item("QTH", string(""));
 		item("GRIDSQUARE", string(""));
@@ -145,7 +143,7 @@ record::record(logging_mode_t type) {
 		item("TX_PWR", string(""));
 		item("RX_PWR", string(""));
 		item("RST_SENT", string(""));
-		item("RST_RVCD", string(""));
+		item("RST_RCVD", string(""));
 		item("NAME", string(""));
 		item("QTH", string(""));
 		item("GRIDSQUARE", string(""));
@@ -187,6 +185,7 @@ record::~record() {
 void record::delete_contents() {
 	is_header_ = false;
 	header_comment_ = "";
+	is_incomplete_ = false;
 	// Delete items
 	clear();
 }

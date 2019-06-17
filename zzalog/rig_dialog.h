@@ -82,9 +82,9 @@ namespace zzalog {
 			// Portname
 			string port_name;
 			// Baud rate
-			int baud_rate;
+			int baud_rate = 9600;
 			// Override caps
-			bool override_caps;
+			bool override_caps = false;
 		};
 		// Manufacturer
 		string hamlib_mfr_;

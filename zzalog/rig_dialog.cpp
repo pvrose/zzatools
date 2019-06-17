@@ -35,6 +35,15 @@ rig_dialog::rig_dialog(int X, int Y, int W, int H, const char* label) :
 	, flrig_grp_(nullptr)
 	, norig_grp_(nullptr)
 	, override_caps_(false)
+	, baud_rate_(9600)
+	, baud_rate_choice_(nullptr)
+	, data_width_(8)
+	, ip_address_()
+	, mfr_choice_(nullptr)
+	, model_id_(0)
+	, override_check_(nullptr)
+	, rig_choice_(nullptr)
+	, rig_model_choice_(nullptr)
 {
 	actual_rigs_.clear();
 	for (int i = 0; i < 4; i++) ip_address_[i] = 0;
@@ -369,7 +378,7 @@ void rig_dialog::populate_model_choice() {
 	}
 	bool found = false;
 	// Go through all the menu items until we find our remembered pathname, and set the choice value to that item number
-	for (int i = 0; i < rig_model_choice_->size() && !found; i++) {
+	for (int i = 0; i < rig_model_choice_->size() && !found && target_pathname; i++) {
 		char item_pathname[128];
 		rig_model_choice_->item_pathname(item_pathname, 127, &rig_model_choice_->menu()[i]);
 		if (strcmp(item_pathname, target_pathname) == 0) {
@@ -603,8 +612,13 @@ void rig_dialog::populate_baud_choice() {
 	baud_rate_choice_->clear();
 	override_check_->value(override_caps_);
 	const rig_caps* caps = rig_get_caps(model_id_);
-	int min_baud_rate = caps->serial_rate_min;
-	int max_baud_rate = caps->serial_rate_max;
+
+	int min_baud_rate = 300;
+	int max_baud_rate = 460800;
+	if (caps) {
+		min_baud_rate = caps->serial_rate_min;
+		max_baud_rate = caps->serial_rate_max;
+	}
 	const int baud_rates[] = { 300, 600, 1200, 2400, 4800, 9600, 19200, 38400, 57600, 115200, 230400, 460800 };
 	int num_rates = sizeof(baud_rates) / sizeof(int);
 	int index = 0;

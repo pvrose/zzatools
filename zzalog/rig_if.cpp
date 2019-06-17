@@ -496,28 +496,28 @@ rig_mode_t rig_hamlib::mode() {
 	shortfreq_t bandwidth;
 	if ((error_code_ = rig_get_mode(rig_, RIG_VFO_CURR, &mode, &bandwidth)) == RIG_OK) {
 		// Convert hamlib mode encoding to ZLG encoding
-		if (mode & rmode_t::RIG_MODE_AM) {
+		if (mode & RIG_MODE_AM) {
 			return GM_AM;
 		}
-		if (mode & rmode_t::RIG_MODE_CW) {
+		if (mode & RIG_MODE_CW) {
 			return GM_CWU;
 		}
-		if (mode & rmode_t::RIG_MODE_CWR) {
+		if (mode & RIG_MODE_CWR) {
 			return GM_CWL;
 		}
-		if (mode & rmode_t::RIG_MODE_LSB) {
+		if (mode & RIG_MODE_LSB) {
 			return GM_LSB;
 		}
-		if (mode & rmode_t::RIG_MODE_USB) {
+		if (mode & RIG_MODE_USB) {
 			return GM_USB;
 		}
-		if (mode & rmode_t::RIG_MODE_FM) {
+		if (mode & RIG_MODE_FM) {
 			return GM_FM;
 		}
-		if (mode & rmode_t::RIG_MODE_PKTLSB) {
+		if (mode & RIG_MODE_PKTLSB) {
 			return GM_DIGL;
 		}
-		if (mode & rmode_t::RIG_MODE_PKTUSB) {
+		if (mode & RIG_MODE_PKTUSB) {
 			return GM_DIGU;
 		}
 		else {

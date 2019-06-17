@@ -9,6 +9,7 @@
 #include "spec_tree.h"
 #include "report_tree.h"
 #include "toolbar.h"
+#include "dxa_if.h"
 
 using namespace zzalog;
 
@@ -17,6 +18,7 @@ extern book* navigation_book_;
 extern extract_data* extract_records_;
 extern import_data* import_data_;
 extern toolbar* toolbar_;
+extern dxa_if* dxatlas_;
 extern bool closing_;
 
 // Constructor
@@ -83,7 +85,7 @@ void tabbed_forms::add_view(const char* label, field_ordering_t column_data, obj
 	widgets_[object] = view;
 }
 
-// tell all views that record(s) have changed
+// tell all views and others that record(s) have changed
 void tabbed_forms::update_views(view* requester, hint_t hint, record_num_t record_1, record_num_t record_2) {
 	// Pass to each view in turn - note update() is a method in view.
 	for (auto ix = forms_.begin() ; ix != forms_.end() && !closing_; ix++) {
@@ -93,6 +95,7 @@ void tabbed_forms::update_views(view* requester, hint_t hint, record_num_t recor
 	}
 	if (record_1 != -1) {
 		toolbar_->search_text(record_1);
+		if (dxatlas_) dxatlas_->update(hint);
 	} 
 }
 

@@ -1252,4 +1252,55 @@ void dxa_if::get_colours(bool reset) {
 	create_colour_buttons();
 }
 
+// something has changed in the book - usually record 1 is to be selected, record_2 usage per view
+void dxa_if::update(hint_t hint) {
+	switch(hint) {
+	case HT_ALL:
+	case HT_CHANGED:
+	case HT_INSERTED:
+	case HT_DELETED:
+	case HT_DUPE_DELETED:    
+	case HT_NEW_DATA:
+	case HT_NO_DATA:
+		// Data has changed 
+		enable_widgets();
+		get_records();
+		get_colours(false);
+		draw_pins();
+		break;
+
+	case HT_SELECTED:
+		// The selected record has changed
+		if (qso_display_ == AQ_CURRENT) {
+			// Data has changed 
+			enable_widgets();
+			get_records();
+			get_colours(false);
+			draw_pins();
+		}
+		break;
+
+	case HT_EXTRACTION:
+		// The search results have changed
+		if (qso_display_ == AQ_SEARCH) {
+			// Data has changed 
+			enable_widgets();
+			get_records();
+			get_colours(false);
+			draw_pins();
+		}
+		break;
+
+	default:
+		// HT_MINOR_CHANGE,          // Invalidate the record, but not location, band or mode - don't redraw
+		// HT_IMPORT_QUERY,          // Import record cannot be processed without user intervention - 
+		// HT_IMPORT_QUERYNEW,       // Query whether mismatch is a new record
+		// HT_DUPE_QUERY,            // Query whether records are duplicates
+		// HT_FORMAT,                // Formats or Columns have changed (LOGVIEW and EXTRACTVIEW)
+		// HT_STARTING,              // Record is being created as HT_INSERTED but don't include it
+		// Do nothing 
+		break;
+	}
+}
+
 #endif // _WIN32

@@ -6,6 +6,7 @@
 
 #include "record.h"
 #include "fields.h"
+#include "view.h"
 
 #include <set>
 #include <string>
@@ -31,7 +32,6 @@ namespace zzalog {
 		public Fl_Window,
 		// inheritance for DxAtlas communication interface
 		public ::IDispEventSimpleImpl<2, dxa_if, &__uuidof(::DxAtlas::IDxAtlasEvents)>
-
 
 	{
 	protected:
@@ -66,6 +66,8 @@ namespace zzalog {
 		void save_values();
 		// Enable widgets
 		void enable_widgets();
+		// something has changed in the book - usually record 1 is to be selected, record_2 usage per view
+		void update(hint_t hint);
 		// Callbacks
 
 		// QSOs choice
