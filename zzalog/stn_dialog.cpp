@@ -206,7 +206,15 @@ void stn_dialog::power_table::cb_tab(Fl_Widget* w, void* v) {
 
 // constructor that does no constructing other than set the group up.
 stn_dialog::common_grp::common_grp(int X, int Y, int W, int H, const char* label)
-	: Fl_Group(X, Y, W, H, label) { }
+	: Fl_Group(X, Y, W, H, label)
+    , active_(nullptr)
+	, choice_(nullptr)
+	, display_all_items_(false)
+	, item_active_(false)
+	, my_settings_(nullptr)
+	, selected_item_(0)
+	, type_(NONE)
+{ }
 
 // Destructor
 stn_dialog::common_grp::~common_grp() {
@@ -457,6 +465,18 @@ stn_dialog::qth_group::qth_group(int X, int Y, int W, int H, const char* label) 
 common_grp(X, Y, W, H, label) {
 	type_ = QTH;
 	settings_name_ = "QTHs";
+	// Read settings
+	load_values();
+	// Create the form
+	create_form(X, Y);
+	// Enable widgets
+	enable_widgets();
+	// populate the choice an set and pass parameters to callback
+	// must be done after all widgets created
+	populate_choice();
+	// Now populate the other items
+	add_item();
+	update_item();
 }
 
 // Destructor
@@ -594,9 +614,7 @@ void stn_dialog::qth_group::save_values() {
 	// Clear to remove deleted entries
 	my_settings_->clear();
 	*all_qths_[selected_name_] = current_qth_;
-
-	my_settings_->set("Current", selected_name_.c_str());
-	my_settings_->set("Display All", display_all_items_);
+	common_grp::save_values();
 	// For each item
 	for (auto it = all_items_.begin(); it != all_items_.end(); it++) {
 		// Get item settings
@@ -722,7 +740,9 @@ void stn_dialog::qth_group::cb_ip_call(Fl_Widget* w, void*) {
 	qth->dxcc_id = to_string(prefix->dxcc_code_);
 	qth->dxcc_name = prefix->nickname_ + ": " + prefix->name_;
 
-	// update the fields
+	// update the fields - first create the item if it does not yet exist
+	that->add_item();
+	*that->all_qths_[that->selected_name_] = *qth;
 	that->update_item();
 	that->redraw();
 }
@@ -958,6 +978,9 @@ void stn_dialog::aerial_group::create_form(int X, int Y) {
 // The main dialog constructor
 stn_dialog::stn_dialog(int X, int Y, int W, int H, const char* label) :
 	page_dialog(X, Y, W, H, label)
+	, aerial_grp_(nullptr)
+	, qth_grp_(nullptr)
+	, rig_grp_(nullptr)
 {
 	do_creation(X, Y);
 }

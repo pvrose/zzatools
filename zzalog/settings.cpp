@@ -115,6 +115,8 @@ settings::settings(int W, int H, const char* label, cfg_dialog_t active) :
 	end();
 	resizable(nullptr);
 
+	callback(cb_bn_cal, (long)CA_CANCEL);
+
 	show();
 	add_sub_window(this);
 }

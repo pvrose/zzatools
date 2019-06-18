@@ -25,7 +25,8 @@ namespace zzalog {
 		enum equipment_t {
 			RIG,
 			AERIAL,
-			QTH
+			QTH,
+			NONE
 		};
 
 		// Station location details - ADIF field name
