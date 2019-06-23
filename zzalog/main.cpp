@@ -408,12 +408,14 @@ void add_rig_if() {
 					import_data_->start_auto_update();
 				}
 				else if (!rig_if_->is_good()) {
+					char message[512];
+					sprintf(message, "RIG: Bad access - %s. Assume real-time logging, no rig", rig_if_->error_message().c_str());
 					// Problem with rig_if when making first access, close it to stop timer and clean up 
 					rig_if_->close();
 					delete rig_if_;
 					rig_if_ = nullptr;
 					menu_->logging(LM_RADIO_DISC);
-					status_->misc_status(ST_ERROR, "RIG: Bad access - close rig, and assume real-time logging, no rig");
+					status_->misc_status(ST_ERROR, message);
 				}
 				else {
 					// Access rig - timer will have been started by rig_if_->open()

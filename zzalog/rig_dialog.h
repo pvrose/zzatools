@@ -82,7 +82,7 @@ namespace zzalog {
 			// Portname
 			string port_name;
 			// Baud rate
-			int baud_rate = 9600;
+			string baud_rate = "9600";
 			// Override caps
 			bool override_caps = false;
 		};
@@ -93,9 +93,7 @@ namespace zzalog {
 		// Serial port name
 		string port_name_;
 		// Baud rate
-		int baud_rate_;
-		// Number of bits in each data item
-		int data_width_;
+		string baud_rate_;
 		// Set of actual supported rigs
 		map<string, hamlib_data> actual_rigs_;
 		string current_rig_;

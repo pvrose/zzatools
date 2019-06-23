@@ -667,6 +667,11 @@ record* book::new_record(logging_mode_t mode) {
 	if (mode == LM_RADIO_CONN || mode == LM_RADIO_DISC) {
 		// On-air logging - insert against date/time (which should be at the end
 		pos_record = insert_record(new_record);
+		char message[256];
+		sprintf(message, "LOG: New record at %s %s",
+			new_record->item("QSO_DATE").c_str(),
+			new_record->item("TIME_ON").c_str());
+		status_->misc_status(ST_LOG, message);
 	}
 	else {
 		// Off-air logging - insert at end as there is no timestamp in the record

@@ -35,9 +35,8 @@ rig_dialog::rig_dialog(int X, int Y, int W, int H, const char* label) :
 	, flrig_grp_(nullptr)
 	, norig_grp_(nullptr)
 	, override_caps_(false)
-	, baud_rate_(9600)
+	, baud_rate_("9600")
 	, baud_rate_choice_(nullptr)
-	, data_width_(8)
 	, ip_address_()
 	, mfr_choice_(nullptr)
 	, model_id_(0)
@@ -193,7 +192,7 @@ void rig_dialog::create_form(int X, int Y) {
 	baud_rate_choice_->labelsize(FONT_SIZE);
 	baud_rate_choice_->textsize(FONT_SIZE);
 	baud_rate_choice_->tooltip("Enter baud rate");
-	baud_rate_choice_->callback(cb_value_int<Fl_Int_Input>, &baud_rate_);
+	baud_rate_choice_->callback(cb_text<Fl_Choice, string>, &baud_rate_);
 
 	// Override caps
 	override_check_ = new Fl_Check_Button(baud_rate_choice_->x() + baud_rate_choice_->w() + GAP, baud_rate_choice_->y(), HBUTTON, HBUTTON, "Override rig capabilities");
@@ -438,6 +437,19 @@ void rig_dialog::cb_ch_model(Fl_Widget* w, void* v) {
 	else {
 		that->hamlib_model_ = string(pos_stroke + 1, pos_bracket - pos_stroke - 1);
 	}
+	// For each possible rig ids in hamlib 
+	bool found = false;
+	for (rig_model_t i = 1; i < 4000 && !found; i += 1) {
+		// Get the capabilities of this rig ID (at ID #xx01)
+		const rig_caps* capabilities = rig_get_caps(i);
+		if (capabilities != nullptr) {
+			if (strcmp(that->hamlib_model_.c_str(), (capabilities->model_name)) == 0 &&
+				strcmp(that->hamlib_mfr_.c_str(), (capabilities->mfg_name)) == 0) {
+				that->model_id_ = i;
+				found = true;
+			}
+		}
+	}
 	that->populate_baud_choice();
 }
 
@@ -471,25 +483,34 @@ void rig_dialog::load_values() {
 	int num_rigs = rigs_settings.groups();
 	for (int i = 0; i < num_rigs; i++) {
 		string rig_name = rigs_settings.group(i);
-		Fl_Preferences act_settings(hamlib_settings, rig_name.c_str());
-		act_settings.get("Manufacturer", temp, "Hamlib");
-		hamlib_data& data = actual_rigs_[rig_name];
-		data.mfr = temp;
-		free(temp);
-		act_settings.get("Rig Model", temp, "Dummy");
-		data.model = temp;
-		free(temp);
-		act_settings.get("Port", temp, "COM6");
-		data.port_name = temp;
-		free(temp);
-		act_settings.get("Baud Rate", data.baud_rate, 9600);
-		act_settings.get("Override Rig Caps", (int&)data.override_caps, false);
-		if (rig_name == current_rig_) {
-			hamlib_mfr_ = data.mfr;
-			hamlib_model_ = data.model;
-			port_name_ = data.port_name;
-			baud_rate_ = data.baud_rate;
-			override_caps_ = data.override_caps;
+		// Check if the rig is active
+		int active = (int)false;
+		Fl_Preferences rig_settings(rigs_settings, rig_name.c_str());
+		rig_settings.get("Active", active, (int)false);
+		if (active) {
+			// If it is active, add it to the list of rigs
+			Fl_Preferences act_settings(hamlib_settings, rig_name.c_str());
+			act_settings.get("Manufacturer", temp, "Hamlib");
+			hamlib_data& data = actual_rigs_[rig_name];
+			data.mfr = temp;
+			free(temp);
+			act_settings.get("Rig Model", temp, "Dummy");
+			data.model = temp;
+			free(temp);
+			act_settings.get("Port", temp, "COM6");
+			data.port_name = temp;
+			free(temp);
+			act_settings.get("Baud Rate", temp, "9600");
+			data.baud_rate = temp;
+			free(temp);
+			act_settings.get("Override Rig Caps", (int&)data.override_caps, false);
+			if (rig_name == current_rig_) {
+				hamlib_mfr_ = data.mfr;
+				hamlib_model_ = data.model;
+				port_name_ = data.port_name;
+				baud_rate_ = data.baud_rate;
+				override_caps_ = data.override_caps;
+			}
 		}
 	}
 	// Flrig settings
@@ -534,7 +555,7 @@ void rig_dialog::save_values() {
 			act_settings.set("Manufacturer", data.mfr.c_str());
 			act_settings.set("Rig Model", data.model.c_str());
 			act_settings.set("Port", data.port_name.c_str());
-			act_settings.set("Baud Rate", data.baud_rate);
+			act_settings.set("Baud Rate", data.baud_rate.c_str());
 			act_settings.set("Override Rig Caps", data.override_caps);
 		}
 	}
@@ -627,7 +648,7 @@ void rig_dialog::populate_baud_choice() {
 		int rate = baud_rates[i];
 		if (override_caps_ || (rate >= min_baud_rate && rate <= max_baud_rate)) {
 			baud_rate_choice_->add(to_string(rate).c_str());
-			if (rate == baud_rate_) {
+			if (to_string(rate) == baud_rate_) {
 				baud_rate_choice_->value(index);
 				index++;
 			}

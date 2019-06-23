@@ -448,6 +448,8 @@ void stn_dialog::common_grp::cb_ch_stn(Fl_Widget* w, void* v) {
 		that->selected_item_ = ch->menubutton()->value();
 		// Update the shared choice value
 		ch->value(that->selected_name_.c_str());
+		// Update the active button
+		((Fl_Light_Button*)that->active_)->value(that->all_items_[that->selected_name_]);
 		that->update_item();
 	}
 	else {
