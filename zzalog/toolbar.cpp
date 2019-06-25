@@ -325,7 +325,8 @@ toolbar::~toolbar()
 // Button callback - v provides the label of the desired menu item
 void toolbar::cb_bn_menu(Fl_Widget*w, void*v) {
 	// Get the menu item
-	const Fl_Menu_Item* cb = menu_->find_item((char*)v);
+	char* item_name = (char*)v;
+	const Fl_Menu_Item* cb = menu_->find_item(item_name);
 	char* message = new char[strlen((char*)v) + 50];
 	// If the menu item exists - invoke its callback if it can be picked
 	if (cb != nullptr) {

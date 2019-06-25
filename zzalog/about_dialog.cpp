@@ -10,10 +10,12 @@
 #include <FL/fl_draw.H>
 #include <FL/Fl_Button.H>
 #include <FL/Fl_RGB_Image.H>
+#include <FL/Fl.H>
 
 using namespace zzalog;
 
 extern spec_data* spec_data_;
+
 
 // Creates the about box dialog and displays it.
 about_dialog::about_dialog() :
@@ -26,15 +28,15 @@ about_dialog::about_dialog() :
 	const int ICON = 48;
 	// Column 2 - text boxes and OK button
 	const int C2 = C1 + ICON + GAP;
-	const int W2 = WEDIT;
+	const int W2 = 2 * WEDIT;
 	const int WALL = C2 + W2 + EDGE;
 	const int YG = EDGE;
 	const int R1 = YG;
 
 	// Draw the two text boxes - first program ID and versions
-	string hamlib = "Unknown";
 	string program_id = PROGRAM_ID + " " + PROGRAM_VERSION + "\n using ADIF Version " + spec_data_->adif_version() +
-		"\n hamlib version " + hamlib;
+		"\n hamlib version " + rig_version();
+	string copyright = COPYRIGHT + "\n Hamlib " + rig_copyright() + " Hamlib";
 	int w = W2;
 	int h = 0;
 	// Get the width and height required to display the message (add a bit of height) 
@@ -48,10 +50,11 @@ about_dialog::about_dialog() :
 	op1->wrap(true);
 	const int R2 = R1 + h + GAP;
 	// Secondly - copyright statement
-	fl_measure(COPYRIGHT.c_str(), w, h);
+	h = 0;
+	fl_measure(copyright.c_str(), w, h);
 	h += 5;
 	Fl_Multiline_Output* op2 = new Fl_Multiline_Output(C2, R2, W2, h);
-	op2->value(COPYRIGHT.c_str());
+	op2->value(copyright.c_str());
 	op2->textfont(FONT);
 	op2->textsize(FONT_SIZE);
 	op2->wrap(true);

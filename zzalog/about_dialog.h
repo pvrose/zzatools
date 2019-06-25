@@ -12,9 +12,9 @@ using namespace std;
 namespace zzalog {
 
 	// Program strings
-	const string COPYRIGHT = "© Philip Rose GM3ZZA 2018. All rights reserved. Prefix data, DX Atlas & OmniRig interfaces © Alex Shovkoplyas, VE3NEA.";
+	const string COPYRIGHT = "© Philip Rose GM3ZZA 2018. All rights reserved.\n Prefix data, DX Atlas & OmniRig interfaces © Alex Shovkoplyas, VE3NEA.";
 	const string PROGRAM_ID = "ZZALOG";
-	const string version = "3.1.0";
+	const string version = "3.1.1";
 #ifdef _DEBUG
 	const string PROGRAM_VERSION = version + " (Debug)";
 #else
