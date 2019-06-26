@@ -1291,6 +1291,13 @@ void dxa_if::update(hint_t hint) {
 		}
 		break;
 
+	case HT_LOCATION:
+		// The home location may have changed
+		load_values();
+		draw_home_flag();
+		break;
+		
+
 	default:
 		// HT_MINOR_CHANGE,          // Invalidate the record, but not location, band or mode - don't redraw
 		// HT_IMPORT_QUERY,          // Import record cannot be processed without user intervention - 

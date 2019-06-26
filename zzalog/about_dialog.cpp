@@ -36,7 +36,7 @@ about_dialog::about_dialog() :
 	// Draw the two text boxes - first program ID and versions
 	string program_id = PROGRAM_ID + " " + PROGRAM_VERSION + "\n using ADIF Version " + spec_data_->adif_version() +
 		"\n hamlib version " + rig_version();
-	string copyright = COPYRIGHT + "\n Hamlib " + rig_copyright() + " Hamlib";
+	string copyright = COPYRIGHT + "\n (Hamlib " + rig_copyright() + ")";
 	int w = W2;
 	int h = 0;
 	// Get the width and height required to display the message (add a bit of height) 

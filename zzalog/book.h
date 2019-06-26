@@ -41,7 +41,8 @@ namespace zzalog {
 		HT_FORMAT,                // Formats or Columns have changed (LOGVIEW and EXTRACTVIEW)
 		HT_STARTING,              // Record is being created as HT_INSERTED but don't include it
 		HT_NEW_DATA,              // New data has been loaded - action as HT_ALL but clears modified
-		HT_NO_DATA                // Log has been cleared
+		HT_NO_DATA,               // Log has been cleared
+		HT_LOCATION               // The home locations have changed
 	};
 
 	class view;

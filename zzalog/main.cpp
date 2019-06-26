@@ -81,7 +81,9 @@ url_handler* url_handler_ = nullptr;
 intl_dialog* intl_dialog_ = nullptr;
 band_view* band_view_ = nullptr;
 scratchpad* scratchpad_ = nullptr;
+#ifdef _WIN32
 dxa_if* dxatlas_ = nullptr;
+#endif
 // Readonly flag on command-line
 bool read_only_ = false;
 // Recent files opened

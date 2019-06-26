@@ -97,7 +97,7 @@ void log_table::cb_tab_log(Fl_Widget* w, void* v) {
 		// tell all views that selection has changed
 		if (that->last_event_ == FL_PUSH) {
 			// Select the row clicked
-			that->my_book_->selection(item_num);
+			that->my_book_->selection(item_num, HT_SELECTED, that);
 			switch (that->last_button_) {
 			case FL_LEFT_MOUSE:
 				// Delete an existing edit cell

@@ -5,6 +5,7 @@
 #include "pfx_data.h"
 #include "prefix.h"
 #include "status.h"
+#include "tabbed_forms.h"
 
 #include <set>
 
@@ -21,6 +22,7 @@ using namespace zzalog;
 extern Fl_Preferences* settings_;
 extern pfx_data* pfx_data_;
 extern status* status_;
+extern tabbed_forms* tabbed_view_;
 
 // Power table constructor
 stn_dialog::power_table::power_table(int X, int Y, int W, int  H, const char* label) :
@@ -639,6 +641,8 @@ void stn_dialog::qth_group::save_values() {
 		item_settings.set("ITU Zone", qth->itu_zone.c_str());
 		item_settings.set("State", qth->state.c_str());
 	}
+	// Redraw views that need a location
+	tabbed_view_->update_views(nullptr, HT_LOCATION, -1);
 }
 
 // Update QTH related fields

@@ -95,8 +95,10 @@ void tabbed_forms::update_views(view* requester, hint_t hint, record_num_t recor
 	}
 	if (record_1 != -1) {
 		toolbar_->search_text(record_1);
-		if (dxatlas_) dxatlas_->update(hint);
 	} 
+#ifdef _WIN32
+	if (dxatlas_) dxatlas_->update(hint);
+#endif
 }
 
 // Activate or deactivate the named object
