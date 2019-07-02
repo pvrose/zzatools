@@ -369,7 +369,9 @@ void calendar::cb_cal_close(Fl_Widget* w, void* v) {
 	string* date = cb_data->date_value;
 	*date = cal->value();
 	// Update the supplied Fl_Input with the current value
-	cb_data->date_input->value(date->c_str());
+	if (cb_data->date_input != nullptr) {
+		cb_data->date_input->value(date->c_str());
+	}
 	Fl::delete_widget(cal);
 }
 

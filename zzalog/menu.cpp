@@ -26,6 +26,7 @@
 #include "intl_dialog.h"
 #include "toolbar.h"
 #include "scratchpad.h"
+#include "calendar.h"
 
 #include <sstream>
 #include <list>
@@ -70,6 +71,7 @@ namespace zzalog {
 	{ "&Previous", 0, menu::cb_mi_navigate, (void*)(NV_PREV) },
 	{ "Ne&xt", 0, menu::cb_mi_navigate, (void*)(NV_NEXT) },
 	{ "&Last", 0, menu::cb_mi_navigate, (void*)(NV_LAST) },
+	{ "&Date", 0, menu::cb_mi_nav_date	, nullptr },
 	{ "F&ind", 0, 0, 0, FL_SUBMENU | FL_MENU_DIVIDER },
 	{ "&New", 0, menu::cb_mi_nav_find, (void*)true },
 	{ "Ne&xt", 0, menu::cb_mi_nav_find, (void*)false },
@@ -488,6 +490,23 @@ void menu::cb_mi_navigate(Fl_Widget* w, void* v) {
 	}
 }
 
+// Navigate->Date: OPens a cendar window
+// v is ignored
+void menu::cb_mi_nav_date(Fl_Widget* w, void* v) {
+	menu* that = ancestor_view<menu>(w);
+	// Populate calendar with today's date
+	string date = now(false, "%Y%m%d");
+	cal_cb_data_t cb_data(&date, nullptr);
+	calendar* cal = new calendar(Fl::event_x_root(), Fl::event_y_root());
+	cal->value(date.c_str());
+	cal->callback(calendar::cb_cal_close, &cb_data);
+	cal->show();
+	while (cal->active()) Fl::wait();
+	// Now fiind the selected date
+	if (navigation_book_ != nullptr) {
+		navigation_book_->go_date(date);
+	}
+}
 // Navigate->Find
 // v is a bool. false = find next; true = new search
 void menu::cb_mi_nav_find(Fl_Widget* w, void* v) {

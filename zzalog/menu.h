@@ -42,6 +42,8 @@ namespace zzalog {
 		static void cb_mi_settings(Fl_Widget* w, void* v);
 		// Navigate->First,Previous,Next,Last callbacks
 		static void cb_mi_navigate(Fl_Widget* w, void* v);
+		// Navigate->Date
+		static void cb_mi_nav_date(Fl_Widget* w, void* v);
 		// Navigate->Find->New/Next
 		static void cb_mi_nav_find(Fl_Widget* w, void* v);
 		// Log->Parse QSO

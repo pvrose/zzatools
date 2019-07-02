@@ -81,6 +81,7 @@ record_form::record_form(int X, int Y, int W, int H, const char* label, field_or
 	, card_front_radio_(nullptr)
 	, card_back_radio_(nullptr)
 	, fetch_bn_(nullptr)
+	, scaling_image_(false)
 	, record_table_(nullptr)
 	, question_out_(nullptr)
 	, message_grp_(nullptr)
@@ -96,6 +97,7 @@ record_form::record_form(int X, int Y, int W, int H, const char* label, field_or
 	, name_bn_(nullptr)
 	, qth_bn_(nullptr)
 	, rst_rcvd_bn_(nullptr)
+	, rst_sent_bn_(nullptr)
 	, grid_bn_(nullptr)
 	, use_bn_(nullptr)
 	, edit1_bn_(nullptr)
@@ -141,6 +143,11 @@ record_form::record_form(int X, int Y, int W, int H, const char* label, field_or
 	saved_record_ = nullptr;
 	image_ = nullptr;
 
+	// Get image settings
+	Fl_Preferences display_settings(settings_, "Display");
+	display_settings.get("Image Type", (int&)selected_image_, QI_EQSL);
+	display_settings.get("Image Scale", (int&)scaling_image_, false);
+
 	// Card image and its filename
 	int curr_x = X + XLEFT;
 	int curr_y = Y + YTOP;
@@ -173,7 +180,7 @@ record_form::record_form(int X, int Y, int W, int H, const char* label, field_or
 	// QSL display controls
 	curr_x = X + XLEFT;
 	curr_y = Y + YQSL;
-	card_type_grp_ = new Fl_Group(curr_x, curr_y, WQSL + (2 * GAP), 6 * HBUTTON + (2 * GAP), "QSL type selection");
+	card_type_grp_ = new Fl_Group(curr_x, curr_y, WQSL + (2 * GAP), 7 * HBUTTON + (2 * GAP), "QSL type selection");
 	card_type_grp_->labelsize(FONT_SIZE);
 	card_type_grp_->align(FL_ALIGN_TOP_LEFT);
 	card_type_grp_->box(FL_DOWN_BOX);
@@ -224,6 +231,13 @@ record_form::record_form(int X, int Y, int W, int H, const char* label, field_or
 	log_card_bn_->tooltip("Log a paper card received on today's date");
 	log_card_bn_->callback(cb_bn_log_card, &record_1_);
 	log_card_bn_->when(FL_WHEN_RELEASE);
+	curr_y += HBUTTON;
+	// Button - Scale or streth
+	scale_bn_ = new Fl_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Scale image");
+	scale_bn_->labelsize(FONT_SIZE);
+	scale_bn_->tooltip("Scale - keep in proportion");
+	scale_bn_->callback(cb_bn_scale, nullptr);
+	scale_bn_->when(FL_WHEN_RELEASE);
 	card_type_grp_->end();
 
 	// Message group
@@ -490,6 +504,9 @@ void record_form::cb_rad_card(Fl_Widget* w, void* v) {
 	// Get the selected image and display it.
 	that->set_selected_image((image_t)(long)v);
 	that->set_image();
+	// Save setting
+	Fl_Preferences display_settings(settings_, "Display");
+	display_settings.set("Image Type", (int)that->selected_image_);
 	main_window_->flush();
 }
 
@@ -579,7 +596,7 @@ void record_form::cb_tab_record(Fl_Widget* w, void* v) {
 void record_form::cb_bn_all_fields(Fl_Widget* w, void* v) {
 	record_form* that = ancestor_view<record_form>(w);
 	cb_value<Fl_Check_Button, bool>(w, v);
-	((field_choice*)that->field_choice_)->repopulate(that->display_all_fields_);
+	((field_choice*)that->field_choice_)->repopulate(that->display_all_fields_, that->current_field_);
 }
 
 // Called when the field choice widget is clicked and released
@@ -717,6 +734,19 @@ void record_form::cb_bn_fetch(Fl_Widget* w, void* v) {
 	// no more frequently than one every 10 seconds (eQSL requirement)
 	eqsl_handler_->enqueue_request(record, true);
 	eqsl_handler_->enable_fetch(eqsl_handler::EQ_START);
+}
+
+// Set whether we stretch or scale the image
+// v is unused
+void record_form::cb_bn_scale(Fl_Widget* w, void* v) {
+	record_form* that = ancestor_view<record_form>(w);
+	cb_value<Fl_Light_Button, bool>(w, &that->scaling_image_);
+	that->set_image();
+	// Save setting
+	Fl_Preferences display_settings(settings_, "Display");
+	display_settings.set("Image Scale", (int)that->scaling_image_);
+
+	main_window_->flush();
 }
 
 // Set the QSL_RCVD and QSLRDATE values in current record
@@ -1119,12 +1149,24 @@ void record_form::set_image() {
 							}
 						}
 					}
-					else {
+					else if (raw_image) {
 						// Clear error message
-						record_1_->item("APP_ZZA_ERROR", "");
+						record_1_->item("APP_ZZA_ERROR", string(""));
 						found_image = true;
 						// Resize the image to fit the control
-						image_ = raw_image->copy(card_display_->w(), card_display_->h());
+						if (scaling_image_) {
+							float scale_w = (float)raw_image->w() / (float)card_display_->w();
+							float scale_h = (float)raw_image->h() / (float)card_display_->h();
+							if (scale_w < scale_h) {
+								image_ = raw_image->copy((int)(raw_image->w() / scale_h), card_display_->h());
+							}
+							else {
+								image_ = raw_image->copy(card_display_->w(), (int)(raw_image->h() / scale_w));
+							}
+						}
+						else {
+							image_ = raw_image->copy(card_display_->w(), card_display_->h());
+						}
 					}
 					// Tidy up
 					delete raw_image;

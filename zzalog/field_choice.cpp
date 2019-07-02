@@ -12,7 +12,7 @@ extern spec_data* spec_data_;
 field_choice::field_choice(int X, int Y, int W, int H, const char* label) :
 	Fl_Choice(X, Y, W, H, label)
 {
-	repopulate(false);
+	repopulate(false, "");
 }
 
 
@@ -21,14 +21,15 @@ field_choice::~field_choice()
 	clear();
 }
 
-void field_choice::repopulate(bool all_fields) {
+void field_choice::repopulate(bool all_fields, string default_field) {
 	clear();
 	if (all_fields) {
-		spec_data_->initialise_field_choice(this, "Fields");
+		spec_data_->initialise_field_choice(this, "Fields", default_field);
 	}
 	else {
 		// Initially add a blank item
 		add("");
+		value(0);
 		Fl_Preferences display_settings(settings_, "Display");
 		Fl_Preferences fields_settings(display_settings, "Fields");
 		char* field_set;
@@ -41,6 +42,9 @@ void field_choice::repopulate(bool all_fields) {
 				char* name;
 				field_settings.get("Name", name, "");
 				add(name, 0, (Fl_Callback*)nullptr);
+				if (string(name) == default_field) {
+					value(i + 1);
+				}
 				free(name);
 			}
 		}

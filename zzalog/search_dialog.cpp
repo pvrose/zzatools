@@ -143,6 +143,7 @@ search_dialog::search_dialog() :
 	}
 	// Choice - Field-name choice
 	field_choice* ch12 = new field_choice(C13, R13, WCHOICE, HTEXT);
+	ch12->repopulate(true, criteria_->field_name);
 	ch12->textsize(FONT_SIZE);
 	ch12->tooltip("Select field to search on");
 	ch12->callback(cb_text<Fl_Choice, string>, (void*)&criteria_->field_name);
@@ -394,7 +395,7 @@ void search_dialog::load_values() {
 	free(temp);
 	search_settings.get("Combine Extract", (int&)criteria_->combi_mode, XM_NEW);
 	search_settings.get("Criterion", (int&)criteria_->condition, XC_DXCC);
-	search_settings.get("Band", temp, "ANY");
+	search_settings.get("Band", temp, "Any");
 	criteria_->band = temp;
 	free(temp);
 	search_settings.get("Condition", temp, "");
@@ -403,7 +404,7 @@ void search_dialog::load_values() {
 	search_settings.get("Field", temp, "ADDRESS");
 	criteria_->field_name = temp;
 	free(temp);
-	search_settings.get("Mode", temp, "ANY");
+	search_settings.get("Mode", temp, "Any");
 	criteria_->mode = temp;
 	free(temp);
 }

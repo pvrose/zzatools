@@ -27,8 +27,6 @@ namespace zzalog {
 		static void cb_bn_extract(Fl_Widget* w, void* v);
 		// Call back for parsing and explaining a callsign
 		static void cb_bn_explain(Fl_Widget* w, void* v);
-		// Call back on entering search callsign
-		static void cb_ip_search(Fl_Widget* w, void* v);
 		// Supply minimum width of toolbar
 		int min_w();
 		// Add selected callsign as default input

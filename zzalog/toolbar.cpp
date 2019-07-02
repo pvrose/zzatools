@@ -255,8 +255,8 @@ toolbar::toolbar(int X, int Y, int W, int H, const char* label) :
 	search_text_ = "";
 	record_num_ = -1;
 	Fl_Input* ip = new Fl_Input(curr_x, Y, WSMEDIT, H, 0);
-	ip->callback(cb_ip_search, (void*)&search_text_);
-	ip->when(FL_WHEN_CHANGED);
+	ip->callback(cb_bn_search, (void*)true);
+	ip->when(FL_WHEN_ENTER_KEY);
 	ip->value(search_text_.c_str());
 	ip->textsize(FONT_SIZE);
 	ip->textfont(FONT);
@@ -266,7 +266,7 @@ toolbar::toolbar(int X, int Y, int W, int H, const char* label) :
 	curr_x += WSMEDIT;
 	// Button to search in log for above callsign
 	bn = new Fl_Button(curr_x, Y, H, H, "@2->");
-	bn->callback(cb_bn_search);
+	bn->callback(cb_bn_search, (void*)false);
 	bn->when(FL_WHEN_RELEASE);
 	bn->tooltip("Jump to next occurence of call in log");
 	bn->labelsize(FONT_SIZE);
@@ -347,18 +347,15 @@ void toolbar::cb_bn_menu(Fl_Widget*w, void*v) {
 	}
 }
 
-// Callback when the search input widget is typed in - v contains a pointer to the search_data_
-void toolbar::cb_ip_search(Fl_Widget* w, void* v) {
-	// Call the default callback to get the input value
-	cb_value<Fl_Input, string>(w, v);
-	// Set the start record number of the search to before the start of the log
-	toolbar* that = ancestor_view<toolbar>(w);
-	that->record_num_ = 0;
-}
-
 // Search the log for the next occurence of the callsign
+// v indicates whether to start a new search (true) or resume (false)
 void toolbar::cb_bn_search(Fl_Widget* w, void* v) {
 	toolbar* that = ancestor_view<toolbar>(w);
+	cb_value<Fl_Input, string>((Fl_Widget*)that->ip_search_, (void*)&that->search_text_);
+	bool reset = (bool)(long)v;
+	if (reset) {
+		that->record_num_ = 0;
+	}
 	bool found = false;
 	bool keep_on = true;
 	string search_call = to_upper(that->search_text_);
@@ -408,6 +405,7 @@ void toolbar::cb_bn_search(Fl_Widget* w, void* v) {
 // Callback to extract all the records for the callsign in the search text box
 void toolbar::cb_bn_extract(Fl_Widget* w, void* v) {
 	toolbar* that = ancestor_view<toolbar>(w);
+	cb_value<Fl_Input, string>((Fl_Widget*)that->ip_search_, (void*)& that->search_text_);
 	extract_records_->extract_call(that->search_text_);
 }
 

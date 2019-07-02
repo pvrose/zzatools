@@ -111,6 +111,8 @@ namespace zzalog {
 		static void cb_bn_modify(Fl_Widget* w, void* v);
 		// Fetch eQSL button has been clicked
 		static void cb_bn_fetch(Fl_Widget* w, void* v);
+		// Stretcch/Scale button has been clicked
+		static void cb_bn_scale(Fl_Widget*, void* v);
 		// Log Card button has been clicked
 		static void cb_bn_log_card(Fl_Widget* w, void* v);
 		// find possible matches
@@ -153,6 +155,7 @@ namespace zzalog {
 		Fl_Radio_Round_Button* card_back_radio_;
 		Fl_Button* fetch_bn_;
 		Fl_Button* log_card_bn_;
+		Fl_Light_Button* scale_bn_;
 		// Record table and ifo
 		record_table* record_table_;
 		Fl_Box* question_out_;
@@ -215,6 +218,8 @@ namespace zzalog {
 		image_t selected_image_;
 		// the image file
 		Fl_Image* image_;
+		// Scale or stretch the image
+		bool scaling_image_;
 		// What the current edit value of a field is:
 		edit_mode_t edit_mode_;
 		// Current field

@@ -95,6 +95,8 @@ namespace zzalog {
 		record_num_t get_count();
 		// Navigate the log 
 		void navigate(navigate_t target);
+		// Go to a date
+		void go_date(string date);
 		// set modified
 		void modified(bool yes, bool update_progress = true);
 		// get the position at which to chronologically insert a record

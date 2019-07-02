@@ -631,6 +631,34 @@ void book::navigate(navigate_t target) {
 	}
 }
 
+// Go to the date specified
+void book::go_date(string date) {
+	// set the bounds of the search
+	record_num_t u_bound = size() - 1;
+	record_num_t l_bound = 0;
+	while (u_bound - l_bound > 1) {
+		string u_date = at(u_bound)->item("QSO_DATE");
+		string l_date = at(l_bound)->item("QSO_DATE");
+		if (u_date < date) {
+			l_bound = u_bound;
+		}
+		else if (l_date > date) {
+			u_bound = l_bound;
+		}
+		else {
+			record_num_t mid_pos = (l_bound + u_bound) / 2;
+			string m_date = at(mid_pos)->item("QSO_DATE");
+			if (m_date > date) {
+				u_bound = mid_pos;
+			}
+			else {
+				l_bound = mid_pos;
+			}
+		}
+	}
+	selection(l_bound);
+}
+
 // Set the modified flag - conditionally update the status progress bar (as indication it's modified
 void book::modified(bool value, bool update_progress /*= true*/) {
 	// Set the flag

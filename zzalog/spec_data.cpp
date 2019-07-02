@@ -650,7 +650,7 @@ string spec_data::enumeration_name(string& field_name, record* record) {
 	auto it_field = fields->data.find(field_name);
 	if (it_field != fields->data.end()) {
 		// If it's a valid field name
-		if (it_field->second->at("Data Type") == "Enumeration") {
+		if (it_field->second->at("Data Type") == "Enumeration" && it_field->second->find("Enumeration") != it_field->second->end()) {
 			// And if it's an enumeration - get the enumeration name
 			string enumeration_name = it_field->second->at("Enumeration");
 			if (enumeration_name.substr(0, 7) != "Submode") {
@@ -2030,7 +2030,7 @@ string spec_data::convert_ml_string(const string& data) {
 }
 
 // Called by some views and dialogs to populate an Fl_Choice widget with a list of all fields
-void spec_data::initialise_field_choice(Fl_Choice* ch, string dataset_name /* = "Fields" */) {
+void spec_data::initialise_field_choice(Fl_Choice* ch, string dataset_name /* = "Fields" */, string default_field /*= ""*/) {
 	// Get the Fields dataset
 	spec_dataset* dataset = spec_data::dataset(dataset_name);
 	// Initialiseo
@@ -2040,8 +2040,9 @@ void spec_data::initialise_field_choice(Fl_Choice* ch, string dataset_name /* = 
 	// Add a blank entry to allow deletin of enumeration
 	ch->add("", 0, (Fl_Callback*)nullptr);
 	char prev = 0;
+	int default_value = 0;
 	// For all dataset
-	while (it != dataset->data.end()) {
+	for (int i = 1; it != dataset->data.end(); i++) {
 		char curr = it->first[0];
 		if (curr != prev) {
 			// If this is the first entry starting with this letter use this as a short-cut to reduce need for scrolling
@@ -2052,8 +2053,13 @@ void spec_data::initialise_field_choice(Fl_Choice* ch, string dataset_name /* = 
 			// Just add the entry without a short-cut.
 			ch->add(it->first.c_str(), 0, (Fl_Callback*)nullptr);
 		}
+		if (it->first == default_field) {
+			default_value = i;
+		}
+
 		it++;
 	}
+	ch->value(default_value);
 }
 
 // Generate a timestamp of the QSO for the report listing - QSO <date> <time> <call> <field> (<data>)
