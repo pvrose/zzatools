@@ -11,7 +11,7 @@ using namespace zzalog;
 extern tabbed_forms* tabbed_view_;
 extern status* status_;
 
-const int LINE_GAP = 1;
+const int LINE_MARGIN = 1;
 const int LINE_WIDTH = 1;
 const Fl_Font PRINT_FONT = FL_HELVETICA;
 const int HEADER_SIZE = 12;
@@ -23,8 +23,6 @@ printer::printer(book* book) :
 	, printable_height_(0)
 	, printable_width_(0)
 	, items_per_page_(0)
-	, item_height_(0)
-	, header_height_(0)
 	, my_book_(book)
 	, current_y_(0)
 	, number_pages_(0)
@@ -41,10 +39,17 @@ printer::~printer()
 
 // Print the whole document
 int printer::do_job() {
+	// Set status - not using progress and this interferes with the colours used.
+	char message[256];
+	sprintf(message, "PRINTER: Starting print, %d records", my_book_->size());
+	status_->misc_status(ST_NOTE, message);
 	int from_page;
 	int to_page;
 	// Start the job with unknown number of pages - exit if cancelled
-	if (start_job(0, &from_page, &to_page)) return 1;
+	if (start_job(0, &from_page, &to_page)) {
+		status_->misc_status(ST_WARNING, "PRINTER: Unable to proceed with print job");
+		return 1;
+	}
 
 	fl_cursor(FL_CURSOR_WAIT);
 	// calculate basic properies - row height etc.
@@ -58,11 +63,14 @@ int printer::do_job() {
 	int error = 0;
 	print_page_header(page_number);
 	// For each record that would be in the page range
-	for (size_t i = ((from_page - 1) * items_per_page_) + 1; i < my_book_->size() && page_number <= to_page && !error; i++) {
+	size_t i = (from_page - 1) * items_per_page_;
+	while (i < my_book_->size() && page_number <= to_page && !error) {
 		// Print the record
 		print_record(my_book_->get_record(i, false));
+		i++;
 		// When the record would be the last on the page and is not the last in the book
-		if (!error && (i % items_per_page_ == 0) && i < my_book_->size() - 1) {
+		if (!error && (i % items_per_page_ == 0) && i < my_book_->size()) {
+			fl_line(0, current_y_, printable_width_, current_y_);
 			page_number++;
 			// not yet reached the last wanted page
 			if (page_number <= to_page) {
@@ -72,38 +80,49 @@ int printer::do_job() {
 				if (!error) error = start_page();
 				if (!error) print_page_header(page_number);
 			}
+			//Fl::wait();
+		}
+		else if (!error && i == my_book_->size()) {
+			// Draw thick line at the bottom
+			fl_line(0, current_y_, printable_width_, current_y_);
+		} else {
+			// Print line between records a bit shorter so that the vertical lines win.
+			fl_color(FL_DARK1);
+			fl_line(LINE_WIDTH, current_y_, printable_width_ - LINE_WIDTH, current_y_);
 		}
 	}
 	// End the page
 	if (!error) error = end_page();
 	if (!error) end_job();
 	fl_cursor(FL_CURSOR_DEFAULT);
+	if (error) {
+		status_->misc_status(ST_ERROR, "PRINTER: Failed!");
+	}
+	else {
+		status_->misc_status(ST_OK, "PRINTER: Done!");
+	}
 	return error;
 }
 
 // calculate_properties
 void printer::calculate_properties() {
 	int available_height;
-	const int line_gap = 1;
 	// Get the area that will be printed on
 	printable_rect(&printable_width_, &printable_height_);
 	// Now start allocating the height to header and records
 	available_height = printable_height_;
 	// Header has two lines - page title and column headers
-	header_height_ = 0;
 	// get the font for the page header - and adjust available height by its height plus a line width
 	fl_font(PRINT_FONT + FL_BOLD, HEADER_SIZE);
 	available_height -= (fl_height() + LINE_WIDTH);
-	header_height_ += fl_height() + LINE_WIDTH;
 	// get the font for the field header - and ditto
 	fl_font(PRINT_FONT + FL_BOLD + FL_ITALIC, ROW_SIZE);
 	available_height -= (fl_height() + LINE_WIDTH);
-	header_height_ += fl_height() + LINE_WIDTH;
-	// set the record font
+	// set the record font - keep 1 point margin
 	fl_font(PRINT_FONT, ROW_SIZE);
-	item_height_ = fl_height();
+	int item_height = fl_height() + LINE_WIDTH + LINE_MARGIN;
 	// set page properties
-	items_per_page_ = available_height / item_height_;
+	items_per_page_ = available_height / item_height;
 	number_pages_ = ((my_book_->get_count() - 1) / items_per_page_) + 1;
 }
 
@@ -158,17 +177,26 @@ void printer::print_page_header(int page_number) {
 	int height = fl_height();
 	int descent = fl_descent();
 	int delta_y = height - descent;
+	fl_line(0, current_y_, 0, current_y_ + height);
 	// For each field
 	for (auto it = fields_.begin(); it != fields_.end(); it++) {
 		// Limit drawing area to cell to avoid overlap (allow descenders to be drawn outside the box)
 		fl_push_clip(current_x, current_y_, it->width, height);
 		// Draw the text
 		fl_draw(it->header.c_str(), current_x, current_y_ + delta_y);
+		// Inter field lines
+		if (it != fields_.begin()) {
+			fl_color(FL_DARK1);
+			fl_line(current_x, current_y_, current_x, current_y_ + height);
+			fl_color(FL_BLACK);
+		}
 		// Step to next field position
 		current_x += it->width;
 		fl_pop_clip();
 	}
-	// Draw another line
+	// Draw right hand vertical  line
+	fl_line(printable_width_, current_y_, printable_width_, current_y_ + height);
+	// Draw another horizontal line
 	current_y_ += height;
 	fl_line(0, current_y_, printable_width_, current_y_);
 	current_y_ += LINE_WIDTH;
@@ -177,6 +205,7 @@ void printer::print_page_header(int page_number) {
 // Print a record
 void printer::print_record(record* record) {
 	// set up the record font and calculate depth dimensions
+	fl_color(FL_BLACK);
 	fl_font(PRINT_FONT, ROW_SIZE);
 	int height = fl_height();
 	int descent = fl_descent();
@@ -185,12 +214,22 @@ void printer::print_record(record* record) {
 	// For each field
 	for (auto it = fields_.begin(); it != fields_.end(); it++) {
 		// Limit drawing area to the cell
-		fl_push_clip(current_x, current_y_, it->width, height);
+		fl_push_clip(current_x + 1, current_y_, it->width - 2, height);
 		// Draw the text
-		fl_draw(record->item(it->field).c_str(), current_x, current_y_ + delta_y);
+		fl_draw(record->item(it->field).c_str(), current_x + 1, current_y_ + delta_y);
+		// Inter field lines
+		if (it != fields_.begin()) {
+			fl_color(FL_DARK1);
+		}
+		fl_pop_clip();
+
+		fl_line(current_x, current_y_, current_x, current_y_ + height + LINE_MARGIN + LINE_WIDTH);
+		fl_color(FL_BLACK);
 		// Step to next field position
 		current_x += it->width;
-		fl_pop_clip();
 	}
-	current_y_ += height;
+	// Draw right hand vertical  line
+	fl_line(printable_width_, current_y_, printable_width_, current_y_ + height + LINE_MARGIN + LINE_WIDTH);
+
+	current_y_ += height + LINE_WIDTH + LINE_MARGIN;
 }

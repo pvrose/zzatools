@@ -36,10 +36,6 @@ namespace zzalog {
 		void print_record(record* record);
 
 	protected:
-		// height of header rows
-		int header_height_;
-		// height of record
-		int item_height_;
 		// current drawing position
 		int current_y_;
 		// number of records per page

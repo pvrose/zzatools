@@ -109,6 +109,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="qsl_form.cpp" />
     <ClCompile Include="zzalog\about_dialog.cpp" />
     <ClCompile Include="zzalog\adi_reader.cpp" />
     <ClCompile Include="zzalog\adi_writer.cpp" />
@@ -171,6 +172,7 @@
     <ClCompile Include="zzalog\xml_writer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="qsl_form.h" />
     <ClInclude Include="zzalog\about_dialog.h" />
     <ClInclude Include="zzalog\adi_reader.h" />
     <ClInclude Include="zzalog\adi_writer.h" />
