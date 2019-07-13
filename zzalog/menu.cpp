@@ -127,6 +127,7 @@ namespace zzalog {
 	{ "Ca&brillo", 0, menu::cb_mi_ext_qsl, (void*)extract_data::CABRILLO, FL_MENU_DIVIDER },
 	{ "&Save", 0, menu::cb_mi_file_saveas, (void*)OT_EXTRACT },
 	{ "&Upload", 0, menu::cb_mi_ext_upload, 0 },
+	{ "&Print", 0, menu::cb_mi_ext_print, 0 },
 	{ 0 },
 	{ "&Import", 0, 0, 0, FL_SUBMENU },
 	{ "&File", 0, menu::cb_mi_imp_file, nullptr },
@@ -458,7 +459,11 @@ void menu::cb_mi_file_auto(Fl_Widget* w, void* v) {
 // v is not used
 void menu::cb_mi_file_print(Fl_Widget* w, void* v) {
 	// Print the current book
-	printer* ptr = new printer(navigation_book_);
+	object_t type = (object_t)(long)v;
+	if (type == OT_MAIN) {
+		type = navigation_book_->book_type();
+	}
+	printer* ptr = new printer(type);
 	delete ptr;
 }
 
@@ -1046,15 +1051,35 @@ void menu::cb_mi_ext_disp(Fl_Widget* w, void* v) {
 // Extract->eQSL/LotW/Card - specificall extract records for QSL use
 // v is enum extract_mode_t: EQSL, LOTW or CARD
 void menu::cb_mi_ext_qsl(Fl_Widget* w, void* v) {
+	menu* that = (menu*)w;
 	// v passes the particular option
-	extract_data::extract_mode_t option = (extract_data::extract_mode_t)(long)v;
-	extract_records_->extract_qsl(option);
+	that->qsl_type_ = (extract_data::extract_mode_t)(long)v;
+	extract_records_->extract_qsl(that->qsl_type_);
 }
 
 // Extract->Upload - upload to the server the data was extracted for
 // v is not used
 void menu::cb_mi_ext_upload(Fl_Widget* w, void* v) {
 	extract_records_->upload();
+}
+
+// Extract->Print - print 
+// v is not used
+void menu::cb_mi_ext_print(Fl_Widget* w, void* v) {
+	menu* that = (menu*)w;
+	navigation_book_ = extract_records_;
+	printer* ptr;
+	switch (that->qsl_type_) {
+	case extract_data::EQSL:
+	case extract_data::LOTW:
+		ptr = new printer(OT_EXTRACT);
+		delete ptr;
+		break;
+	case extract_data::CARD:
+		ptr = new printer(OT_CARD);
+		delete ptr;
+		break;
+	}
 }
 
 // Reference->Prefix->Filter - used to set the filter for displaying prefix data

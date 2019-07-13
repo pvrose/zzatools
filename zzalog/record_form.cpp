@@ -10,6 +10,8 @@
 #include "callback.h"
 #include "intl_dialog.h"
 #include "field_choice.h"
+#include "qsl_form.h"
+
 #include <array>
 #include <string>
 #include <map>
@@ -80,6 +82,7 @@ record_form::record_form(int X, int Y, int W, int H, const char* label, field_or
 	, eqsl_radio_(nullptr)
 	, card_front_radio_(nullptr)
 	, card_back_radio_(nullptr)
+	, gen_card_radio_(nullptr)
 	, fetch_bn_(nullptr)
 	, scaling_image_(false)
 	, record_table_(nullptr)
@@ -152,9 +155,11 @@ record_form::record_form(int X, int Y, int W, int H, const char* label, field_or
 	int curr_x = X + XLEFT;
 	int curr_y = Y + YTOP;
 	// Box - for the display of a card image
-	card_display_ = new Fl_Box(curr_x, curr_y, WCARD, HCARD);
+	card_display_ = new Fl_Group(curr_x, curr_y, WCARD, HCARD);
 	card_display_->box(FL_UP_BOX);
 	card_display_->tooltip("The card image is displayed here!");
+	card_display_->align(FL_ALIGN_CENTER);
+	card_display_->end();
 	curr_y += HCARD;
 	// Output - Filename of the image
 	card_filename_out_ = new Fl_Box(curr_x, curr_y, WCARD, HTEXT);
@@ -180,7 +185,7 @@ record_form::record_form(int X, int Y, int W, int H, const char* label, field_or
 	// QSL display controls
 	curr_x = X + XLEFT;
 	curr_y = Y + YQSL;
-	card_type_grp_ = new Fl_Group(curr_x, curr_y, WQSL + (2 * GAP), 7 * HBUTTON + (2 * GAP), "QSL type selection");
+	card_type_grp_ = new Fl_Group(curr_x, curr_y, WQSL + (2 * GAP), 8 * HBUTTON + (2 * GAP), "QSL type selection");
 	card_type_grp_->labelsize(FONT_SIZE);
 	card_type_grp_->align(FL_ALIGN_TOP_LEFT);
 	card_type_grp_->box(FL_DOWN_BOX);
@@ -218,6 +223,15 @@ record_form::record_form(int X, int Y, int W, int H, const char* label, field_or
 	card_back_radio_->labelsize(FONT_SIZE);
 	card_back_radio_->tooltip("Select image scanned of paper card back");
 	curr_y += HBUTTON;
+	// Radio - generate QSL card and display
+	gen_card_radio_ = new Fl_Radio_Round_Button(curr_x, curr_y, WQSL, HBUTTON, "Generate");
+	gen_card_radio_->align(FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
+	gen_card_radio_->callback(cb_rad_card, (void*)QI_GEN_CARD);
+	gen_card_radio_->when(FL_WHEN_RELEASE);
+	gen_card_radio_->labelsize(FONT_SIZE);
+	gen_card_radio_->tooltip("Select image scanned of paper card back");
+	curr_y += HBUTTON;
+
 	// Button - Fetch the card image from eQSL.cc
 	fetch_bn_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Fetch");
 	fetch_bn_->labelsize(FONT_SIZE);
@@ -1027,109 +1041,72 @@ void record_form::update_form() {
 // Get the card image to display and put it in the image widget.
 void record_form::set_image() {
 	if (record_1_ != nullptr) {
-		// We have a record to display - get the card directory
-		char filename[256];
-		string directory;
-		char* temp;
-		Fl_Preferences datapath(settings_, "Datapath");
-		if (!datapath.get("QSLs", temp, "")) {
-			Fl_File_Chooser* chooser = new Fl_File_Chooser("", nullptr, Fl_File_Chooser::DIRECTORY,
-				"Select QSL card directory");
-			chooser->callback(cb_chooser, &directory);
-			chooser->textfont(FONT);
-			chooser->textsize(FONT_SIZE);
-			chooser->show();
-			while (chooser->visible()) Fl::wait();
-			delete chooser;
-			datapath.set("QSLs", directory.c_str());
-		}
-		else {
-			directory = temp;
-		}
-		free(temp);
-		// Get callsign
-		string call = record_1_->item("CALL");
-		// OPtional file types
-		string file_types[] = { ".png", ".jpg", ".bmp" };
-		const int num_types = 3;
-		if (call != "") {
-			// Replace all / with _ - e.g. PA/GM3ZZA/P => PA_GM3ZZA_P
-			size_t pos = call.find('/');
-			while (pos != call.npos) {
-				call[pos] = '_';
-				pos = call.find('/', pos + 1);
-			}
-			// Select the image type: eQSL or scanned in card (front or back)
-			switch (selected_image_) {
-			case QI_EQSL:
-				// Find the filename saved when card was downloaded - i.e. use same algorithm
-				strcpy(filename, eqsl_handler_->card_filename_l(record_1_).c_str());
-				break;
-			case QI_CARD_FRONT:
-				// File name e.g.= <root>\scans\<received date>\PA_GM3ZZA_P__<QSO date>.png
-				sprintf(filename, "%s\\Scans\\%s\\%s__%s",
-					directory.c_str(),
-					record_1_->item("QSLRDATE").c_str(),
-					call.c_str(),
-					record_1_->item("QSO_DATE").c_str());
-				break;
-			case QI_CARD_BACK:
-				// File name e.g.= <root>\scans\<received date>\PA_GM3ZZA_P++<QSO date>.png
-				sprintf(filename, "%s\\Scans\\%s\\%s++%s",
-					directory.c_str(),
-					record_1_->item("QSLRDATE").c_str(),
-					call.c_str(),
-					record_1_->item("QSO_DATE").c_str());
-				break;
-			}
-			// Look for a possible image file and try and load into the image object
-			bool found_image = false;
-			string full_name;
-			Fl_Image* raw_image = nullptr;
-			delete image_;
-			image_ = nullptr;
-			// For each of coded image file types
-			if (selected_image_ == QI_EQSL) {
-				raw_image = new Fl_PNG_Image(filename);
-				if (raw_image->fail()) {
-					// File didn't load OK 
-					if (record_1_->item("APP_ZZA_ERROR").length() > 0) {
-						// Set error message ton what we already know
-						full_name = record_1_->item("APP_ZZA_ERROR");
-					}
-					else {
-						switch (raw_image->fail()) {
-						case Fl_Image::ERR_NO_IMAGE:
-						case Fl_Image::ERR_FILE_ACCESS:
-							// Got a problem accessing file
-							full_name = "*** ERROR ACCESSING FILE: " + string(strerror(errno)) + " ***";
-							break;
-						case Fl_Image::ERR_FORMAT:
-							// Not a recognised format
-							full_name = "*** ERROR FILE FORMAT ERROR ***";
-							break;
-						}
-					}
-				}
-				else {
-					image_ = raw_image->copy(card_display_->w(), card_display_->h());
-				}
-				delete raw_image;
+		if (selected_image_ != QI_GEN_CARD) {
+			// We have a record to display - get the card directory
+			char filename[256];
+			string directory;
+			char* temp;
+			Fl_Preferences datapath(settings_, "Datapath");
+			if (!datapath.get("QSLs", temp, "")) {
+				Fl_File_Chooser* chooser = new Fl_File_Chooser("", nullptr, Fl_File_Chooser::DIRECTORY,
+					"Select QSL card directory");
+				chooser->callback(cb_chooser, &directory);
+				chooser->textfont(FONT);
+				chooser->textsize(FONT_SIZE);
+				chooser->show();
+				while (chooser->visible()) Fl::wait();
+				delete chooser;
+				datapath.set("QSLs", directory.c_str());
 			}
 			else {
-				for (int i = 0; i < num_types && !found_image; i++) {
-					full_name = string(filename) + file_types[i];
-					// Read files depending on file type
-					if (file_types[i] == ".jpg") {
-						raw_image = new Fl_JPEG_Image(full_name.c_str());
-					}
-					else if (file_types[i] == ".png") {
-						raw_image = new Fl_PNG_Image(full_name.c_str());
-					}
-					else if (file_types[i] == ".bmp") {
-						raw_image = new Fl_BMP_Image(full_name.c_str());
-					}
-					if (raw_image && raw_image->fail()) {
+				directory = temp;
+			}
+			free(temp);
+			// Get callsign
+			string call = record_1_->item("CALL");
+			// OPtional file types
+			string file_types[] = { ".png", ".jpg", ".bmp" };
+			const int num_types = 3;
+			if (call != "") {
+				// Replace all / with _ - e.g. PA/GM3ZZA/P => PA_GM3ZZA_P
+				size_t pos = call.find('/');
+				while (pos != call.npos) {
+					call[pos] = '_';
+					pos = call.find('/', pos + 1);
+				}
+				// Select the image type: eQSL or scanned in card (front or back)
+				switch (selected_image_) {
+				case QI_EQSL:
+					// Find the filename saved when card was downloaded - i.e. use same algorithm
+					strcpy(filename, eqsl_handler_->card_filename_l(record_1_).c_str());
+					break;
+				case QI_CARD_FRONT:
+					// File name e.g.= <root>\scans\<received date>\PA_GM3ZZA_P__<QSO date>.png
+					sprintf(filename, "%s\\Scans\\%s\\%s__%s",
+						directory.c_str(),
+						record_1_->item("QSLRDATE").c_str(),
+						call.c_str(),
+						record_1_->item("QSO_DATE").c_str());
+					break;
+				case QI_CARD_BACK:
+					// File name e.g.= <root>\scans\<received date>\PA_GM3ZZA_P++<QSO date>.png
+					sprintf(filename, "%s\\Scans\\%s\\%s++%s",
+						directory.c_str(),
+						record_1_->item("QSLRDATE").c_str(),
+						call.c_str(),
+						record_1_->item("QSO_DATE").c_str());
+					break;
+				}
+				// Look for a possible image file and try and load into the image object
+				bool found_image = false;
+				string full_name;
+				Fl_Image* raw_image = nullptr;
+				delete image_;
+				image_ = nullptr;
+				// For each of coded image file types
+				if (selected_image_ == QI_EQSL) {
+					raw_image = new Fl_PNG_Image(filename);
+					if (raw_image->fail()) {
 						// File didn't load OK 
 						if (record_1_->item("APP_ZZA_ERROR").length() > 0) {
 							// Set error message ton what we already know
@@ -1149,35 +1126,79 @@ void record_form::set_image() {
 							}
 						}
 					}
-					else if (raw_image) {
-						// Clear error message
-						record_1_->item("APP_ZZA_ERROR", string(""));
-						found_image = true;
-						// Resize the image to fit the control
-						if (scaling_image_) {
-							float scale_w = (float)raw_image->w() / (float)card_display_->w();
-							float scale_h = (float)raw_image->h() / (float)card_display_->h();
-							if (scale_w < scale_h) {
-								image_ = raw_image->copy((int)(raw_image->w() / scale_h), card_display_->h());
-							}
-							else {
-								image_ = raw_image->copy(card_display_->w(), (int)(raw_image->h() / scale_w));
-							}
-						}
-						else {
-							image_ = raw_image->copy(card_display_->w(), card_display_->h());
-						}
+					else {
+						image_ = raw_image->copy(card_display_->w(), card_display_->h());
 					}
-					// Tidy up
 					delete raw_image;
 				}
-			}
+				else {
+					for (int i = 0; i < num_types && !found_image; i++) {
+						full_name = string(filename) + file_types[i];
+						// Read files depending on file type
+						if (file_types[i] == ".jpg") {
+							raw_image = new Fl_JPEG_Image(full_name.c_str());
+						}
+						else if (file_types[i] == ".png") {
+							raw_image = new Fl_PNG_Image(full_name.c_str());
+						}
+						else if (file_types[i] == ".bmp") {
+							raw_image = new Fl_BMP_Image(full_name.c_str());
+						}
+						if (raw_image && raw_image->fail()) {
+							// File didn't load OK 
+							if (record_1_->item("APP_ZZA_ERROR").length() > 0) {
+								// Set error message ton what we already know
+								full_name = record_1_->item("APP_ZZA_ERROR");
+							}
+							else {
+								switch (raw_image->fail()) {
+								case Fl_Image::ERR_NO_IMAGE:
+								case Fl_Image::ERR_FILE_ACCESS:
+									// Got a problem accessing file
+									full_name = "*** ERROR ACCESSING FILE: " + string(strerror(errno)) + " ***";
+									break;
+								case Fl_Image::ERR_FORMAT:
+									// Not a recognised format
+									full_name = "*** ERROR FILE FORMAT ERROR ***";
+									break;
+								}
+							}
+						}
+						else if (raw_image) {
+							// Clear error message
+							record_1_->item("APP_ZZA_ERROR", string(""));
+							found_image = true;
+							// Resize the image to fit the control
+							if (scaling_image_) {
+								float scale_w = (float)raw_image->w() / (float)card_display_->w();
+								float scale_h = (float)raw_image->h() / (float)card_display_->h();
+								if (scale_w < scale_h) {
+									image_ = raw_image->copy((int)(raw_image->w() / scale_h), card_display_->h());
+								}
+								else {
+									image_ = raw_image->copy(card_display_->w(), (int)(raw_image->h() / scale_w));
+								}
+							}
+							else {
+								image_ = raw_image->copy(card_display_->w(), card_display_->h());
+							}
+						}
+						// Tidy up
+						delete raw_image;
+					}
+				}
 
-			// Update view.
-			card_filename_out_->copy_label(full_name.c_str());
+				// Update view.
+				card_filename_out_->copy_label(full_name.c_str());
+			}
 		}
-	} else {
-	// Asking to accept a new contact so expect no image
+		else {
+			delete image_;
+			image_ = nullptr;
+		}
+	}
+	else {
+		// Asking to accept a new contact so expect no image
 		delete image_;
 		image_ = nullptr;
 	}
@@ -1192,43 +1213,64 @@ void record_form::set_image_buttons() {
 		eqsl_radio_->value(true);
 		card_front_radio_->value(false);
 		card_back_radio_->value(false);
+		gen_card_radio_->value(false);
 		break;
 	case QI_CARD_FRONT:
 		// Display the front of a scanned-in paper card
 		eqsl_radio_->value(false);
 		card_front_radio_->value(true);
 		card_back_radio_->value(false);
+		gen_card_radio_->value(false);
 		break;
 	case QI_CARD_BACK:
 		// Display the back of a scanned-in paper card
 		eqsl_radio_->value(false);
 		card_front_radio_->value(false);
 		card_back_radio_->value(true);
+		gen_card_radio_->value(false);
+		break;
+	case QI_GEN_CARD:
+		// Display the back of a scanned-in paper card
+		eqsl_radio_->value(false);
+		card_front_radio_->value(false);
+		card_back_radio_->value(false);
+		gen_card_radio_->value(true);
 		break;
 	}
 }
 
 // Draw the selected QSL card image (or callsign if no image)
 void record_form::draw_image() {
-	if (image_ != nullptr) {
+	card_display_->clear();
+	card_display_->label(nullptr);
+	card_display_->image(nullptr);
+	card_display_->deimage(nullptr);
+	switch (selected_image_) {
+	case QI_EQSL:
 		// we have an image
 		// Set the rsized image as the selected and unselected image for the control
 		card_display_->image(image_);
 		card_display_->deimage(image_);
-		card_display_->label(nullptr);
 		// Set the image fileanme text colour black (i.e. OK)
 		card_filename_out_->labelcolor(FL_BLACK);
-	}
-	else {
+		break;
+	case QI_CARD_BACK:
+	case QI_CARD_FRONT:
 		// Display a label instead in large letters - 36
 		card_display_->copy_label(record_1_->item("CALL").c_str());
-		card_display_->image(nullptr);
-		card_display_->deimage(nullptr);
 		card_display_->labelsize(36);
 		card_display_->color(FL_WHITE);
 		card_display_->labelcolor(FL_BLACK);
 		// Display the error message in red.
 		card_filename_out_->labelcolor(FL_RED);
+		break;
+	case QI_GEN_CARD:
+		if (record_1_ != nullptr) {
+			qsl_form* card = new qsl_form(card_display_->x(), card_display_->y(), record_1_);
+			card_display_->color(FL_WHITE);
+			card_display_->align(FL_ALIGN_CENTER);
+			card_display_->add(card);
+		}
 	}
 	card_display_->redraw();
 }

@@ -1010,7 +1010,7 @@ string record::item_merge(string data) {
 	size_t right = result.find('>');
 	while (left != result.npos && right != result.npos) {
 		string field_name = result.substr(left + 1, right - left - 1);
-		result.replace(left, right - left + 1, item(field_name));
+		result.replace(left, right - left + 1, item(field_name, false, true));
 		left = result.find('<');
 		right = result.find('>');
 	}

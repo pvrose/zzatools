@@ -50,7 +50,8 @@ namespace zzalog {
 		enum image_t {
 			QI_EQSL,            // Downloaded eQSL image
 			QI_CARD_FRONT,      // Scanned-in front of a card
-			QI_CARD_BACK        // Scanned-in back of a card
+			QI_CARD_BACK,       // Scanned-in back of a card
+			QI_GEN_CARD         // Generated QSL card
 		};
 
 		// An editor for modifying a fields value - it allows cut and paste
@@ -145,7 +146,7 @@ namespace zzalog {
 	protected:
 		// widgets
 		// Card image and info
-		Fl_Box * card_display_;
+		Fl_Group * card_display_;
 		Fl_Box* card_filename_out_;
 		Fl_Light_Button* keep_bn_;
 		// Card controls
@@ -153,6 +154,7 @@ namespace zzalog {
 		Fl_Radio_Round_Button* eqsl_radio_;
 		Fl_Radio_Round_Button* card_front_radio_;
 		Fl_Radio_Round_Button* card_back_radio_;
+		Fl_Radio_Round_Button* gen_card_radio_;
 		Fl_Button* fetch_bn_;
 		Fl_Button* log_card_bn_;
 		Fl_Light_Button* scale_bn_;

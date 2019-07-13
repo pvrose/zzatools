@@ -24,7 +24,8 @@ namespace zzalog {
 		OT_REPORT,           // Report view (view)
 		OT_BAND,             // Band-plan data
 		OT_SCRATCH,          // Scratchpad 
-		OT_DXATLAS           // DxAtlas control view
+		OT_DXATLAS,          // DxAtlas control view
+		OT_CARD              // Used for printing QSL card labels
 	};
 
 	// Default colours to use in tab view labels 
@@ -39,6 +40,7 @@ namespace zzalog {
 		{ OT_REPORT, fl_color_average(FL_RED, FL_WHITE, 0.25) },
 		{ OT_BAND, FL_GRAY },
 		{ OT_DXATLAS,fl_color_average(FL_BLUE, FL_MAGENTA, (float)(1.0 / 3.0)) },
+		{ OT_CARD, fl_color_average(FL_BLUE, FL_WHITE, 0.25) }
 	};
 
 	// Colour palette used in DxAtlas legend and band plan

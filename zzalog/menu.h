@@ -4,6 +4,7 @@
 #include "book.h"
 #include "report_tree.h"
 #include "status.h"
+#include "extract_data.h"
 
 #include <vector>
 
@@ -88,6 +89,8 @@ namespace zzalog {
 		static void cb_mi_ext_qsl(Fl_Widget* w, void* v);
 		// Extract->Upload
 		static void cb_mi_ext_upload(Fl_Widget* w, void* v);
+		// Extract->Print
+		static void cb_mi_ext_print(Fl_Widget* w, void* v);
 		// Import->File
 		static void cb_mi_imp_file(Fl_Widget* w, void* v);
 		// Import->Download->eQSL/LotW
@@ -143,6 +146,8 @@ namespace zzalog {
 		bool active_enabled_;
 		// Current logging view
 		object_t editting_view_;
+		// Current extraction
+		extract_data::extract_mode_t qsl_type_;
 
 	};
 

@@ -2,6 +2,7 @@
 #include "log_table.h"
 #include "tabbed_forms.h"
 #include "status.h"
+#include "qsl_form.h"
 
 #include <FL/fl_ask.H>
 #include <FL/fl_draw.H>
@@ -10,6 +11,7 @@ using namespace zzalog;
 
 extern tabbed_forms* tabbed_view_;
 extern status* status_;
+extern book* navigation_book_;
 
 const int LINE_MARGIN = 1;
 const int LINE_WIDTH = 1;
@@ -18,12 +20,12 @@ const int HEADER_SIZE = 12;
 const int ROW_SIZE = 9;
 
 // Constructor - supply the book to print (main log or extract)
-printer::printer(book* book) :
+printer::printer(object_t type) :
 	Fl_Printer()
 	, printable_height_(0)
 	, printable_width_(0)
 	, items_per_page_(0)
-	, my_book_(book)
+	, type_(type)
 	, current_y_(0)
 	, number_pages_(0)
 {
@@ -39,9 +41,23 @@ printer::~printer()
 
 // Print the whole document
 int printer::do_job() {
-	// Set status - not using progress and this interferes with the colours used.
+	switch (type_) {
+	case OT_EXTRACT:
+	case OT_MAIN:
+		return print_book();
+	case OT_CARD:
+		return print_cards();
+	default:
+		// Should not get here
+		return 1;
+	}
+}
+
+// Print records from the book
+int printer::print_book() {
+	// Set status 
 	char message[256];
-	sprintf(message, "PRINTER: Starting print, %d records", my_book_->size());
+	sprintf(message, "PRINTER: Starting print, %d records", navigation_book_->size());
 	status_->misc_status(ST_NOTE, message);
 	int from_page;
 	int to_page;
@@ -54,6 +70,10 @@ int printer::do_job() {
 	fl_cursor(FL_CURSOR_WAIT);
 	// calculate basic properies - row height etc.
 	calculate_properties();
+	// Initialise progress - switch to display device and back again
+	Fl_Display_Device::display_device()->set_current();
+	status_->progress(min(to_page + 1 - from_page, number_pages_), type_, "pages");
+	set_current();
 	// Get field data and calculate field widths
 	book_properties();
 	// Start the page - exit on error
@@ -64,25 +84,29 @@ int printer::do_job() {
 	print_page_header(page_number);
 	// For each record that would be in the page range
 	size_t i = (from_page - 1) * items_per_page_;
-	while (i < my_book_->size() && page_number <= to_page && !error) {
+	while (i < navigation_book_->size() && page_number <= to_page && !error) {
 		// Print the record
-		print_record(my_book_->get_record(i, false));
+		print_record(navigation_book_->get_record(i, false));
 		i++;
 		// When the record would be the last on the page and is not the last in the book
-		if (!error && (i % items_per_page_ == 0) && i < my_book_->size()) {
+		if (!error && (i % items_per_page_ == 0) && i < navigation_book_->size()) {
 			fl_line(0, current_y_, printable_width_, current_y_);
 			page_number++;
 			// not yet reached the last wanted page
 			if (page_number <= to_page) {
 				// End the page
 				error = end_page();
+				// Update progress
+				Fl_Display_Device::display_device()->set_current();
+				status_->progress(page_number - from_page);
+				set_current();
 				// Start the next page
 				if (!error) error = start_page();
 				if (!error) print_page_header(page_number);
 			}
 			//Fl::wait();
 		}
-		else if (!error && i == my_book_->size()) {
+		else if (!error && i == navigation_book_->size()) {
 			// Draw thick line at the bottom
 			fl_line(0, current_y_, printable_width_, current_y_);
 		} else {
@@ -94,6 +118,8 @@ int printer::do_job() {
 	// End the page
 	if (!error) error = end_page();
 	if (!error) end_job();
+	// Final progress
+	status_->progress(min(to_page + 1 - from_page, number_pages_));
 	fl_cursor(FL_CURSOR_DEFAULT);
 	if (error) {
 		status_->misc_status(ST_ERROR, "PRINTER: Failed!");
@@ -123,35 +149,29 @@ void printer::calculate_properties() {
 	int item_height = fl_height() + LINE_WIDTH + LINE_MARGIN;
 	// set page properties
 	items_per_page_ = available_height / item_height;
-	number_pages_ = ((my_book_->get_count() - 1) / items_per_page_) + 1;
+	number_pages_ = (((signed)(navigation_book_->size() - 1)) / items_per_page_) + 1;
 }
 
 // get field properties
 void printer::book_properties() {
 	// we only support printing from log_table views
-	log_table* form = dynamic_cast<log_table*>(tabbed_view_->value());
-	if (form == nullptr) {
-		status_->misc_status(ST_ERROR, "PRINT: Attempting to print a view that doesn't support it!");
+	log_table* form = (log_table*)tabbed_view_->get_view(type_);
+	// Copy fields from log table
+	fields_.clear();
+	fields_.insert(fields_.end(), form->fields().begin(), form->fields().end());
+	// get book from log table
+	// adjust field widths to the widths available
+	int required_width = 0;
+	// total up required width
+	for (auto it = fields_.begin(); it != fields_.end(); it++) {
+		required_width += it->width;
 	}
-	else {
-		// Copy fields from log table
-		fields_.clear();
-		fields_.insert(fields_.end(), form->fields().begin(), form->fields().end());
-		// get book from log table
-		my_book_ = form->get_book();
-		// adjust field widths to the widths available
-		int required_width = 0;
-		// total up required width
-		for (auto it = fields_.begin(); it != fields_.end(); it++) {
-			required_width += it->width;
-		}
-		// Calculate scale factor
-		double multiplier = (double)printable_width_ / (double)required_width;
-		// adjust widths accordingly
-		for (auto it = fields_.begin(); it != fields_.end(); it++) {
-			// Scale as floating point and convert back to integer
-			it->width = (int)((double)it->width * multiplier);
-		}
+	// Calculate scale factor
+	double multiplier = (double)printable_width_ / (double)required_width;
+	// adjust widths accordingly
+	for (auto it = fields_.begin(); it != fields_.end(); it++) {
+		// Scale as floating point and convert back to integer
+		it->width = (int)((double)it->width * multiplier);
 	}
 }
 
@@ -163,7 +183,7 @@ void printer::print_page_header(int page_number) {
 	current_y_ = fl_height() - fl_descent();
 	// Add the page title
 	char title[1024];
-	sprintf(title, "Log: %s - Page %d of %d", my_book_->filename(false).c_str(), page_number, number_pages_);
+	sprintf(title, "Log: %s - Page %d of %d", navigation_book_->filename(false).c_str(), page_number, number_pages_);
 	// Position it centrally
 	fl_draw(title, ((printable_width_ - (int)fl_width(title)) / 2), current_y_);
 	// Draw a line beneath the pagetitle
@@ -232,4 +252,111 @@ void printer::print_record(record* record) {
 	fl_line(printable_width_, current_y_, printable_width_, current_y_ + height + LINE_MARGIN + LINE_WIDTH);
 
 	current_y_ += height + LINE_WIDTH + LINE_MARGIN;
+}
+
+// Print cards
+int printer::print_cards() {
+	// Set status 
+	char message[256];
+	sprintf(message, "PRINTER: Starting print, %d cards", navigation_book_->size());
+	status_->misc_status(ST_NOTE, message);
+	int from_page;
+	int to_page;
+	// Start the job with unknown number of pages - exit if cancelled
+	if (start_job(0, &from_page, &to_page)) {
+		Fl_Display_Device::display_device()->set_current();
+		status_->misc_status(ST_WARNING, "PRINTER: Unable to proceed with print job");
+		return 1;
+	}
+	if (card_properties()) {
+		return 1;
+	}
+
+	fl_cursor(FL_CURSOR_WAIT);
+	// calculate basic properies - row height etc.
+	// Initialise progress - switch to display device and back again
+	Fl_Display_Device::display_device()->set_current();
+	status_->progress(min(to_page + 1 - from_page, number_pages_), type_, "pages");
+	set_current();
+	// For each record
+	int page_number = from_page;
+	int error = 0;
+	// For each record that would be in the page range
+	size_t i = (from_page - 1) * items_per_page_;
+	while (i < navigation_book_->size() && page_number <= to_page && !error) {
+		error = start_page();
+		// Print the record
+		error = print_page_cards(i);
+		i+=8;
+		// When the record would be the last on the page and is not the last in the book
+		if (!error) {
+			page_number++;
+			// not yet reached the last wanted page
+			if (page_number <= to_page && i) {
+				// End the page
+				error = end_page();
+				// Update progress
+				Fl_Display_Device::display_device()->set_current();
+				status_->progress(page_number - from_page);
+				set_current();
+				// Start the next page
+				if (i < navigation_book_->size() && !error) {
+					error = start_page();
+				}
+			}
+			//Fl::wait();
+		}
+	}
+	if (!error) end_job();
+	// Final progress
+	status_->progress(min(to_page + 1 - from_page, number_pages_));
+	fl_cursor(FL_CURSOR_DEFAULT);
+	if (error) {
+		status_->misc_status(ST_ERROR, "PRINTER: Failed!");
+	}
+	else {
+		status_->misc_status(ST_OK, "PRINTER: Done!");
+	}
+	return error;
+}
+
+int printer::print_page_cards(size_t item_num) {
+	record_num_t current_item = item_num;
+	Fl_Window* win = new Fl_Window(cwin_x_, cwin_y_, cwin_w_, cwin_h_);
+	for (int card = 0; current_item < navigation_book_->size() && card < items_per_page_; card++, current_item++) {
+		record* record = navigation_book_->get_record(current_item, false);
+		qsl_form* qsl = new qsl_form(cwin_x_ + ((card % num_cols_) * card_w_), cwin_y_ + (((card / num_cols_) % num_rows_) * card_h_), record);
+	}
+	win->end();
+	print_window(win);
+	return 0;
+}
+
+// Get the various dimensions of the card page - TODO: These will be obtained from settings
+int printer::card_properties() {
+	items_per_page_ = 8;
+	num_rows_ = 4;
+	num_cols_ = 2;
+	int top_margin = 0;
+	int left_margin = 0;
+	margins(&left_margin, &top_margin, nullptr, nullptr);
+	// These are in mm
+	float left_card = 4.6f;
+	float top_card = 12.9f;
+	float col_card = 106.2f - 4.6f;
+	float row_card = 67.7f;
+	cwin_x_ = (int)(left_card * MM_TO_POINT) - left_margin;
+	cwin_y_ =  (int)(top_card * MM_TO_POINT) - top_margin;
+	//if (cwin_x_ < 0 || cwin_y_ < 0) {
+	//	Fl_Display_Device::display_device()->set_current();
+	//	status_->misc_status(ST_ERROR, "PRINTER: Insufficient margin for printing labels");
+	//	return 1;
+	//}
+	card_w_ = (int)(col_card * MM_TO_POINT);
+	cwin_w_ = num_cols_ * card_w_;
+	card_h_ = (int)(row_card * MM_TO_POINT);
+	cwin_h_ = num_rows_ * card_h_;
+	//
+	number_pages_ = ((navigation_book_->size() - 1) / items_per_page_) + 1;
+	return 0;
 }
