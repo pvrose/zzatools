@@ -1247,22 +1247,25 @@ void record_form::draw_image() {
 	card_display_->deimage(nullptr);
 	switch (selected_image_) {
 	case QI_EQSL:
-		// we have an image
-		// Set the rsized image as the selected and unselected image for the control
-		card_display_->image(image_);
-		card_display_->deimage(image_);
-		// Set the image fileanme text colour black (i.e. OK)
-		card_filename_out_->labelcolor(FL_BLACK);
-		break;
 	case QI_CARD_BACK:
 	case QI_CARD_FRONT:
-		// Display a label instead in large letters - 36
-		card_display_->copy_label(record_1_->item("CALL").c_str());
-		card_display_->labelsize(36);
-		card_display_->color(FL_WHITE);
-		card_display_->labelcolor(FL_BLACK);
-		// Display the error message in red.
-		card_filename_out_->labelcolor(FL_RED);
+		if (image_) {
+			// we have an image
+			// Set the rsized image as the selected and unselected image for the control
+			card_display_->image(image_);
+			card_display_->deimage(image_);
+			// Set the image fileanme text colour black (i.e. OK)
+			card_filename_out_->labelcolor(FL_BLACK);
+		}
+		else {
+			// Display a label instead in large letters - 36
+			card_display_->copy_label(record_1_->item("CALL").c_str());
+			card_display_->labelsize(36);
+			card_display_->color(FL_WHITE);
+			card_display_->labelcolor(FL_BLACK);
+			// Display the error message in red.
+			card_filename_out_->labelcolor(FL_RED);
+		}
 		break;
 	case QI_GEN_CARD:
 		if (record_1_ != nullptr) {

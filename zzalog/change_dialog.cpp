@@ -121,6 +121,7 @@ void change_dialog::create_form() {
 
 	// Old field name choice
 	field_choice* ch12 = new field_choice(C2, R1, W2, H1);
+	ch12->repopulate(true, "");
 	ch12->textsize(FONT_SIZE);
 	int ix = 0;
 	ch12->value(0);
@@ -131,6 +132,7 @@ void change_dialog::create_form() {
 
 	// New field name choice
 	field_choice* ch22 = new field_choice(C2, R2, W2, H2);
+	ch22->repopulate(true, "");
 	ch22->textsize(FONT_SIZE);
 	ix = 0;
 	ch22->value(0);
