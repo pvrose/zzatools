@@ -401,6 +401,7 @@ void status::cb_bn_misc(Fl_Widget* w, void* v) {
 		that->status_file_viewer_->buffer()->loadfile(that->report_filename_.c_str());
 		win->resizable(that->status_file_viewer_);
 		win->show();
+		win->end();
 		// Add the display to the main window to delete it if the main window is first.
 		add_sub_window(win);
 	}

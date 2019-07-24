@@ -4,6 +4,7 @@
 #include "web_dialog.h"
 #include "stn_dialog.h"
 #include "fields_dialog.h"
+#include "qsl_design.h"
 #include "config_tree.h"
 
 #include "utils.h"
@@ -61,6 +62,12 @@ settings::settings(int W, int H, const char* label, cfg_dialog_t active) :
 	fields->labelsize(FONT_SIZE);
 	fields->selection_color(fl_lighter(FL_YELLOW));
 	fields->tooltip("Allows the specification of which fields to display in the various applications");
+	// QSL Design - allows user to modify the QSL design
+	qsl_design* qsl = new qsl_design(rx, ry, rw, rh, "QSL Design");
+	qsl->labelsize(FONT_SIZE);
+	qsl->selection_color(fl_lighter(FL_YELLOW));
+	qsl->tooltip("Allows the simple design of QSL labels");
+
 	// Lastly - a tree display showing all settings
 	config_tree* all_settings = new config_tree(rx, ry, rw, rh, "All Settings");
 	all_settings->labelsize(FONT_SIZE);
@@ -84,6 +91,9 @@ settings::settings(int W, int H, const char* label, cfg_dialog_t active) :
 		break;
 	case DLG_COLUMN:
 		tabs->value(fields);
+		break;
+	case DLG_QSL:
+		tabs->value(qsl);
 		break;
 	case DLG_ALL:
 		tabs->value(all_settings);

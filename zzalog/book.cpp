@@ -239,6 +239,12 @@ bool book::load_data(string filename)
 					delete[] message;
 					ok = false;
 				}
+				if (ok) {
+					char* message = new char[filename.length() + 100];
+					sprintf(message, "LOG READ: %d records read from %s", size(), filename.c_str());
+					status_->misc_status(ST_OK, message);
+					delete[] message;
+				}
 			}
 			else { // filename.length() == 0 (File->New)
 				main_window_label("[No file loaded]");
@@ -375,6 +381,12 @@ bool book::store_data(string filename, bool force, set<string>* fields) {
 					status_->misc_status(ST_WARNING, message);
 					delete[] message;
 					ok = false;
+				}
+				if (ok) {
+					char* message = new char[filename_.length() + 100];
+					sprintf(message, "LOG WRITE: %d records written to %s", size(), filename_.c_str());
+					status_->misc_status(ST_OK, message);
+					delete[] message;
 				}
 				if (ok && book_type_ == OT_MAIN) {
 					// As file has been stored, clear modified flag

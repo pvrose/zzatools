@@ -64,6 +64,7 @@ namespace zzalog {
 	{ "&Web", 0, menu::cb_mi_settings, (void*)DLG_WEB },
 	{ "&Station", 0, menu::cb_mi_settings, (void*)DLG_STATION },
 	{ "&Fields", 0, menu::cb_mi_settings, (void*)DLG_COLUMN },
+	{ "&QSL Design", 0, menu::cb_mi_settings, (void*)DLG_QSL },
 	{ "All", 0, menu::cb_mi_settings, (void*)DLG_ALL },
 	{ 0 },
 	{ "&Navigate", 0, 0, 0, FL_SUBMENU },

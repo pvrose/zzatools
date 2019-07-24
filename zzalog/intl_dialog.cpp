@@ -153,11 +153,13 @@ void intl_dialog::cb_bn_add(Fl_Widget* w, void* v) {
 void intl_dialog::cb_bn_use(Fl_Widget* w, void* v) {
 	const char* utf8 = ((Fl_Button*)w)->label();
 	intl_dialog* that = ancestor_view<intl_dialog>(w);
-	int len = strlen(utf8);
-	// Copy to clipboard
-	Fl::copy(utf8, len);
-	// Paste to currently open editor
-	Fl::paste(*that->editor_);
+	if (that->editor_) {
+		int len = strlen(utf8);
+		// Copy to clipboard
+		Fl::copy(utf8, len);
+		// Paste to currently open editor
+		Fl::paste(*that->editor_);
+	}
 }
 
 // Get the data path to the files - returns directory name

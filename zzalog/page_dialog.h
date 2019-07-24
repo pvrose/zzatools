@@ -22,6 +22,7 @@ namespace zzalog {
 		DLG_STATION,
 		DLG_COLUMN,
 		DLG_ADIF,
+		DLG_QSL,
 		DLG_ALL
 	};
 

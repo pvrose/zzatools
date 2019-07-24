@@ -140,6 +140,7 @@
     <ClCompile Include="zzalog\pfx_tree.cpp" />
     <ClCompile Include="zzalog\power_matrix.cpp" />
     <ClCompile Include="zzalog\printer.cpp" />
+    <ClCompile Include="zzalog\qsl_design.cpp" />
     <ClCompile Include="zzalog\qsl_form.cpp" />
     <ClCompile Include="zzalog\record.cpp" />
     <ClCompile Include="zzalog\record_form.cpp" />
@@ -209,6 +210,7 @@
     <ClInclude Include="zzalog\power_matrix.h" />
     <ClInclude Include="zzalog\prefix.h" />
     <ClInclude Include="zzalog\printer.h" />
+    <ClInclude Include="zzalog\qsl_design.h" />
     <ClInclude Include="zzalog\qsl_form.h" />
     <ClInclude Include="zzalog\record.h" />
     <ClInclude Include="zzalog\record_form.h" />
