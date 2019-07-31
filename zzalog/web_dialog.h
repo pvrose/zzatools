@@ -4,13 +4,13 @@
 #include "page_dialog.h"
 #include "calendar.h"
 #include "callback.h"
+#include "intl_widgets.h"
 
 #include <string>
 #include <ctime>
 #include <set>
 
 #include <FL/Fl_Group.H>
-#include <FL/Fl_Input.H>
 
 using namespace std;
 

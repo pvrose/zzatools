@@ -4,12 +4,12 @@
 //#include "spec_data.h"
 #include "utils.h"
 #include "field_choice.h"
+#include "intl_widgets.h"
 
 #include <FL/Fl.H>
 #include <FL/Fl_Window.H>
 #include <FL/Fl_Box.H>
 #include <FL/Fl_Choice.H>
-#include <FL/Fl_Input.H>
 #include <FL/Fl_Output.H>
 #include <FL/Fl_Multiline_Output.H>
 #include <FL/Fl_Check_Button.H>
@@ -90,9 +90,9 @@ corr_dialog::corr_dialog(record* record, const string& field, const string& mess
 	cb1->when(FL_WHEN_CHANGED);
 	cb1->tooltip("Change the data in the field");
 	// Input - the new value wanted
-	Fl_Input* ip1 = new Fl_Input(COL3, ROW2, WEDIT, HTEXT);
+	intl_input* ip1 = new intl_input(COL3, ROW2, WEDIT, HTEXT);
 	ip1->textsize(FONT_SIZE);
-	ip1->callback(cb_value<Fl_Input, string>, (void*)&change_value_data_);
+	ip1->callback(cb_value<intl_input, string>, (void*)&change_value_data_);
 	ip1->value(op2->value());
 	ip1->when(FL_WHEN_CHANGED);
 	ip1->tooltip("Value to change data to");
@@ -123,10 +123,10 @@ corr_dialog::corr_dialog(record* record, const string& field, const string& mess
 	ch2->when(FL_WHEN_CHANGED);
 	ch2->tooltip("Field to add");
 	// Input - data to use in the additional field
-	Fl_Input* ip2 = new Fl_Input(COL3, ROW4, WEDIT, HTEXT);
+	intl_input* ip2 = new intl_input(COL3, ROW4, WEDIT, HTEXT);
 	ip2->textsize(FONT_SIZE);
 	ip2->value(op2->value());
-	ip2->callback(cb_value<Fl_Input, string>, (void*)&add_value_data_);
+	ip2->callback(cb_value<intl_input, string>, (void*)&add_value_data_);
 	ip2->when(FL_WHEN_CHANGED);
 	ip2->tooltip("Data to use in added field");
 	// Output to display the reason for the validation error.

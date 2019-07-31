@@ -38,8 +38,9 @@ namespace zzalog {
 	};
 
 	// Default colours for status bars
-	const map<status_t, Fl_Color> status_colours = {
+	const map<status_t, Fl_Color> STATUS_COLOURS = {
 		{ ST_NONE, FL_LIGHT2 },
+		{ ST_LOG, FL_GRAY },
 		{ ST_NOTE, fl_lighter(FL_CYAN) },
 		{ ST_OK, fl_lighter(FL_GREEN) },
 		{ ST_WARNING, FL_YELLOW },
@@ -48,6 +49,27 @@ namespace zzalog {
 		{ ST_FATAL, FL_BLACK }
 	};
 
+	const map<status_t, char> STATUS_CODES = {
+	{ ST_NONE, ' '},
+	{ ST_LOG, 'L'},
+	{ ST_NOTE, 'N'},
+	{ ST_OK, 'D'},
+	{ ST_WARNING, 'W'},
+	{ ST_ERROR, 'E'},
+	{ ST_SEVERE, 'S'},
+	{ ST_FATAL, 'F'}
+	};
+
+	const Fl_Text_Display::Style_Table_Entry STATUS_STYLES[] = {        // Style label and status
+		{ fl_gray_ramp(4), FL_COURIER_ITALIC, 12, 0 },                  // A - ST_NONE
+		{ fl_gray_ramp(4), FL_COURIER, 12, 0 },                         // B - ST_LOG
+		{ FL_BLACK, FL_COURIER, 12, 0 },                                // C - ST_NOTE
+		{ fl_darker(FL_GREEN), FL_COURIER, 12, 0},                      // D - ST_OK
+		{ fl_color_average(FL_RED, FL_YELLOW, 0.5), FL_COURIER, 12, 0}, // E - ST_WARNING
+		{ FL_RED, FL_COURIER, 12, 0} ,                                  // F - ST_ERROR
+		{ fl_darker(FL_RED), FL_COURIER, 12, 0 },                       // G - ST_SEVERE
+		{ fl_darker(FL_RED), FL_COURIER_BOLD, 12, 0}                    // H - ST_FATAL
+	};
 
 	enum object_t;
 
@@ -96,6 +118,10 @@ namespace zzalog {
 		static void cb_bn_misc(Fl_Widget* bn, void* v);
 		// Status log display is closed
 		static void cb_text(Fl_Widget* w, void* v);
+
+	protected:
+		// Add colourin to buffer
+		void colour_buffer();
 
 	protected:
 		// The clock display

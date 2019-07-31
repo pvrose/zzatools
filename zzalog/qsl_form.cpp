@@ -156,7 +156,7 @@ void qsl_form::draw_lines(Fl_Align align, int& curr_y, vector<qsl_form::qsl_widg
 		int curr_x = x() + ((align & FL_ALIGN_LEFT) ? MARGIN : (width / 2));
 		Fl_Button* item = new Fl_Button(curr_x, curr_y, (width / 2) - MARGIN, curr_h);
 		item->box(FL_NO_BOX);
-		item->copy_label(record_->item_merge(it->text).c_str());
+		item->copy_label(record_ ? record_->item_merge(it->text).c_str() : it->text.c_str());
 		item->labelcolor(it->colour);
 		item->labelfont(it->font);
 		item->labelsize(it->font_size);
@@ -182,7 +182,7 @@ void qsl_form::draw_table(int& curr_y) {
 		for (auto col = it->begin(); col != it->end(); col++) {
 			Fl_Button* item = new Fl_Button(curr_x, curr_y, curr_w, curr_h);
 			item->box(FL_BORDER_FRAME);
-			item->copy_label(record_->item_merge(col->text).c_str());
+			item->copy_label(record_ ? record_->item_merge(col->text).c_str() : col->text.c_str());
 			item->labelcolor(col->colour);
 			item->labelfont(col->font);
 			item->labelsize(col->font_size);

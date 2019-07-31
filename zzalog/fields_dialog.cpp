@@ -1,6 +1,7 @@
 #include "fields_dialog.h"
 #include "book.h"
 #include "spec_data.h"
+#include "intl_widgets.h"
 
 #include <set>
 #include <string>
@@ -8,7 +9,6 @@
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Choice.H>
 #include <FL/Fl_Button.H>
-#include <FL/Fl_Input.H>
 #include <FL/Fl_Int_Input.H>
 #include <FL/Fl_Radio_Light_Button.H>
 #include <FL/Fl_Preferences.H>
@@ -323,7 +323,7 @@ void fields_dialog::create_form(int X, int Y) {
 	bn1_2b->callback(cb_bn_copy);
 	bn1_2b->when(FL_WHEN_RELEASE);
 	// Input - specify the name of the new field-set
-	Fl_Input* ip1_2c = new Fl_Input(X1_2C, Y1_2, W1_2C, H1_2C);
+	intl_input* ip1_2c = new intl_input(X1_2C, Y1_2, W1_2C, H1_2C);
 	ip1_2c->textsize(FONT_SIZE);
 	ip1_2c->tooltip("Type in the name of the new field set");
 	gp1_2->end();
@@ -495,7 +495,7 @@ void fields_dialog::create_form(int X, int Y) {
 	gp3->add(tab3_1c);
 
 	// Input - header text for the selected field
-	Fl_Input* ip3_2a = new Fl_Input(XG3_2A, YG3_2, WG3_2, HG3_2, "Header");
+	intl_input* ip3_2a = new intl_input(XG3_2A, YG3_2, WG3_2, HG3_2, "Header");
 	ip3_2a->labelsize(FONT_SIZE);
 	ip3_2a->align(FL_ALIGN_LEFT);
 	ip3_2a->textsize(FONT_SIZE);
@@ -637,7 +637,7 @@ void fields_dialog::cb_ch_sel_col(Fl_Widget* w, void* v) {
 // Create a new field set with the default fields and make it selected field set
 void fields_dialog::cb_bn_default(Fl_Widget* w, void* v) {
 	fields_dialog* that = ancestor_view<fields_dialog>(w);
-	Fl_Input* ip = (Fl_Input*)that->name_input_;
+	intl_input* ip = (intl_input*)that->name_input_;
 	const char * new_name = ip->value();
 	// If the name is not empty
 	if (new_name[0] != 0) {
@@ -661,7 +661,7 @@ void fields_dialog::cb_bn_default(Fl_Widget* w, void* v) {
 // Create a new field set, copying from the current selected set and select it
 void fields_dialog::cb_bn_copy(Fl_Widget* w, void* v) {
 	fields_dialog* that = ancestor_view<fields_dialog>(w);
-	Fl_Input* ip = (Fl_Input*)that->name_input_;
+	intl_input* ip = (intl_input*)that->name_input_;
 	const char * new_name = ip->value();
 	// If the name is not empty
 	if (new_name[0] != 0) {
@@ -724,7 +724,7 @@ void fields_dialog::cb_tab_inuse(Fl_Widget* w, void* v) {
 			break;
 		case 2:
 			// header clicked - copy it to header input and enable it
-			((Fl_Input*)that->header_input_)->value(field->header.c_str());
+			((intl_input*)that->header_input_)->value(field->header.c_str());
 			that->width_input_->deactivate();
 			that->header_input_->activate();
 			break;
@@ -836,7 +836,7 @@ void fields_dialog::cb_bn_down(Fl_Widget* w, void * v)
 // header input changed
 void fields_dialog::cb_ip_header(Fl_Widget* w, void* v) {
 	fields_dialog* that = ancestor_view<fields_dialog>(w);
-	Fl_Input* ip = (Fl_Input*)w;
+	intl_input* ip = (intl_input*)w;
 	// Reference to active set
 	vector<field_info_t>* field_set = that->field_sets_[that->field_set_name_];
 	// Get the field at the active row in the table

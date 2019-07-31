@@ -487,7 +487,7 @@ void add_scratchpad() {
 
 // Add DxAtlas control window
 void add_dxatlas() {
-	if (dxatlas_ == nullptr) {
+	if (!closing_ && dxatlas_ == nullptr) {
 		dxatlas_ = new dxa_if();
 	}
 }

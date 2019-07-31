@@ -109,7 +109,7 @@ status::status(int X, int Y, int W, int H, const char * label) :
 	rig_status_ = new Fl_Button(curr_x, Y, rig_status_w, H, "Rig connection not yet established");
 	rig_status_->labelsize(FONT_SIZE);
 	rig_status_->box(FL_DOWN_BOX);
-	rig_status_->color(status_colours.at(ST_NONE));
+	rig_status_->color(STATUS_COLOURS.at(ST_NONE));
 	rig_status_->labelcolor(FL_BLACK);
 	rig_status_->labelfont(FONT);
 	rig_status_->copy_tooltip(rig_status_->label());
@@ -125,7 +125,7 @@ status::status(int X, int Y, int W, int H, const char * label) :
 	misc_status_ = new Fl_Button(curr_x, Y, misc_w, H, "Miscellaneous information");
 	misc_status_->labelsize(FONT_SIZE);
 	misc_status_->box(FL_DOWN_BOX);
-	misc_status_->color(status_colours.at(ST_NONE));
+	misc_status_->color(STATUS_COLOURS.at(ST_NONE));
 	misc_status_->labelcolor(FL_BLACK);
 	misc_status_->labelfont(FONT);
 	misc_status_->copy_tooltip(misc_status_->label());
@@ -270,7 +270,7 @@ void status::progress(int value) {
 // Update rig_status - set text and colour
 void status::rig_status(status_t status, const char* label) {
 	// Set the fixed label and tool tip value. Set the text colour to contrast the button colour
-	Fl_Color colour = status_colours.at(status);
+	Fl_Color colour = STATUS_COLOURS.at(status);
 	rig_status_->copy_label(label);
 	rig_status_->color(colour);
 	rig_status_->labelcolor(fl_contrast(FL_BLACK, colour));
@@ -279,23 +279,13 @@ void status::rig_status(status_t status, const char* label) {
 	Fl::wait();
 }
 
-const map<status_t, string> STATUS_CODES = {
-	{ ST_NONE, "   "},
-	{ ST_LOG, " L "},
-	{ ST_NOTE, " N "},
-	{ ST_OK, " D "},
-	{ ST_WARNING, "+W+"},
-	{ ST_ERROR, "*E*"},
-	{ ST_SEVERE, "*S*"},
-	{ ST_FATAL, "*F*"}
-};
 
 // Update miscellaneous status - set text and colour
 void status::misc_status(status_t status, const char* label) {
 	// If we are displaying the message
 	if ((int)status >= (int)min_level_ ) {
 		// Set the fixed label and tool tip value. Set the text colour to contrast the button colour
-		Fl_Color colour = status_colours.at(status);
+		Fl_Color colour = STATUS_COLOURS.at(status);
 		misc_status_->copy_label(label);
 		misc_status_->color(colour);
 		misc_status_->labelcolor(fl_contrast(FL_BLACK, colour));
@@ -317,7 +307,7 @@ void status::misc_status(status_t status, const char* label) {
 	if (report_file_) {
 		string timestamp = now(true, "%Y/%m/%d %H:%M:%S");
 		char* message = new char[timestamp.length() + 10 + strlen(label)];
-		sprintf(message, "%s %s %s\n", timestamp.c_str(), STATUS_CODES.at(status).c_str(), label);
+		sprintf(message, "%c %s %s\n", STATUS_CODES.at(status), timestamp.c_str(), label);
 		*report_file_ << message;
 		delete[] message;
 	}
@@ -405,6 +395,44 @@ void status::cb_bn_misc(Fl_Widget* w, void* v) {
 		// Add the display to the main window to delete it if the main window is first.
 		add_sub_window(win);
 	}
+	that->colour_buffer();
+}
+
+void status::colour_buffer() {
+	Fl_Text_Buffer* buffer = status_file_viewer_->buffer();
+	int num_chars = buffer->length();
+	int cur_pos = 0;
+	const int num_styles = STATUS_CODES.size();
+	char* style = new char[num_chars];
+	memset(style, 0, num_chars);
+	// Generate reverse look-up from status code to status
+	map<char, status_t> reverse_codes;
+	for (auto pos = STATUS_CODES.begin(); pos != STATUS_CODES.end(); pos++) {
+		reverse_codes[pos->second] = pos->first;
+	}
+	char style_code;
+	while (cur_pos < num_chars) {
+		char* line = buffer->line_text(cur_pos);
+		if (strlen(line) > 0) {
+			char level = line[0];
+			// Update style code if we have a valid line (some outputs have embedded new-lines)
+			if (reverse_codes.find(level) != reverse_codes.end()) {
+				style_code = reverse_codes.at(level) + 'A';
+			}
+			for (size_t i = 0; i <= strlen(line); i++) {
+				style[cur_pos + i] = style_code;
+			}
+		}
+		else {
+			style[cur_pos] = 'A';
+		}
+		cur_pos += strlen(line) + 1;
+		free(line);
+	}
+	Fl_Text_Buffer* style_buffer = new Fl_Text_Buffer;
+	style_buffer->text(style);
+	status_file_viewer_->highlight_data(style_buffer, STATUS_STYLES, num_styles, 'I', nullptr, nullptr);
+	delete[] style;
 }
 
 Fl_Widget* status::misc_status() {

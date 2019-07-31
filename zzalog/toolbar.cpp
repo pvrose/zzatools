@@ -9,12 +9,12 @@
 #include "utils.h"
 #include "status.h"
 #include "drawing.h"
+#include "intl_widgets.h"
 #include "extract_data.h"
 
 #include <FL/Fl_Button.H>
 #include <FL/Fl_RGB_Image.H>
 #include <FL/fl_ask.H>
-#include <FL/Fl_Input.H>
 #include <FL/Fl_Tooltip.H>
 #include <FL/Fl_Single_Window.H>
 
@@ -254,7 +254,7 @@ toolbar::toolbar(int X, int Y, int W, int H, const char* label) :
 	// Input widget for entering search text to look for a call or to parse the call
 	search_text_ = "";
 	record_num_ = -1;
-	Fl_Input* ip = new Fl_Input(curr_x, Y, WSMEDIT, H, 0);
+	intl_input* ip = new intl_input(curr_x, Y, WSMEDIT, H, 0);
 	ip->callback(cb_bn_search, (void*)true);
 	ip->when(FL_WHEN_ENTER_KEY);
 	ip->value(search_text_.c_str());
@@ -351,7 +351,7 @@ void toolbar::cb_bn_menu(Fl_Widget*w, void*v) {
 // v indicates whether to start a new search (true) or resume (false)
 void toolbar::cb_bn_search(Fl_Widget* w, void* v) {
 	toolbar* that = ancestor_view<toolbar>(w);
-	cb_value<Fl_Input, string>((Fl_Widget*)that->ip_search_, (void*)&that->search_text_);
+	cb_value<intl_input, string>((Fl_Widget*)that->ip_search_, (void*)&that->search_text_);
 	bool reset = (bool)(long)v;
 	if (reset) {
 		that->record_num_ = 0;
@@ -405,7 +405,7 @@ void toolbar::cb_bn_search(Fl_Widget* w, void* v) {
 // Callback to extract all the records for the callsign in the search text box
 void toolbar::cb_bn_extract(Fl_Widget* w, void* v) {
 	toolbar* that = ancestor_view<toolbar>(w);
-	cb_value<Fl_Input, string>((Fl_Widget*)that->ip_search_, (void*)& that->search_text_);
+	cb_value<intl_input, string>((Fl_Widget*)that->ip_search_, (void*)& that->search_text_);
 	extract_records_->extract_call(that->search_text_);
 }
 
@@ -477,7 +477,7 @@ void toolbar::search_text(int record_num) {
 		search_text_ = "";
 	}
 	record_num_++;
-	((Fl_Input*)ip_search_)->value(search_text_.c_str());
+	((intl_input*)ip_search_)->value(search_text_.c_str());
 	redraw();
 }
 

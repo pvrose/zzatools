@@ -6,13 +6,13 @@
 #include "callback.h"
 #include "utils.h"
 #include "settings.h"
+#include "intl_widgets.h"
 
 #include <FL/Fl_Preferences.H>
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Value_Input.H>
 #include <FL/Fl_Hold_Browser.H>
 #include <FL/Fl_Radio_Light_Button.H>
-#include <FL/Fl_Input.H>
 #include <FL/fl_show_colormap.H>
 #include <FL/Fl_Tabs.H>
 
@@ -207,7 +207,7 @@ void qsl_design::create_form(int X, int Y) {
 	gp2->box(FL_DOWN_BOX);
 	gp2->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 	// Row 1 - text value, colour selector
-	ip_text_ = new Fl_Input(X_211, Y_21, WEDIT, HBUTTON, "Text");
+	ip_text_ = new intl_input(X_211, Y_21, WEDIT, HBUTTON, "Text");
 	ip_text_->value(current_data_->text.c_str());
 	ip_text_->labelfont(FONT);
 	ip_text_->labelsize(FONT_SIZE);
@@ -312,7 +312,7 @@ void qsl_design::cb_vip_sizeu(Fl_Widget* w, void* v) {
 void qsl_design::cb_ip_text(Fl_Widget* w, void* v) {
 	qsl_design* that = ancestor_view<qsl_design>(w);
 	string value;
-	cb_value<Fl_Input, string>(w, &value);
+	cb_value<intl_input, string>(w, &value);
 	that->current_design_->update_text(that->current_data_, value);
 }
 

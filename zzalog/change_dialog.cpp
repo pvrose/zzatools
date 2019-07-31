@@ -1,13 +1,13 @@
 #include "change_dialog.h"
 #include "callback.h"
 #include "field_choice.h"
+#include "intl_widgets.h"
 //#include "spec_data.h"
 
 #include <set>
 #include <string>
 
 #include <FL/Fl_Choice.H>
-#include <FL/Fl_Input.H>
 #include <FL/Fl_Radio_Round_Button.H>
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Box.H>
@@ -143,11 +143,11 @@ void change_dialog::create_form() {
 	w_field_name_ = ch22;
 
 	// New text input
-	Fl_Input* ip42 = new Fl_Input(C2, R4, W2, H4, "Value");
+	intl_input* ip42 = new intl_input(C2, R4, W2, H4, "Value");
 	ip42->labelsize(FONT_SIZE);
 	ip42->textsize(FONT_SIZE);
 	ip42->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
-	ip42->callback(cb_value<Fl_Input, string>, (void*)&new_text_);
+	ip42->callback(cb_value<intl_input, string>, (void*)&new_text_);
 	ip42->when(FL_WHEN_CHANGED);
 	ip42->tooltip("Enter the value to apply");
 	w_text_ = ip42;

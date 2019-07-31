@@ -7,6 +7,7 @@
 #include "status.h"
 #include "tabbed_forms.h"
 #include "menu.h"
+#include "intl_dialog.h"
 
 #include <regex>
 
@@ -23,6 +24,7 @@ extern status* status_;
 extern tabbed_forms* tabbed_view_;
 extern menu* menu_;
 extern Fl_Preferences* settings_;
+extern intl_dialog* intl_dialog_;
 extern void add_scratchpad();
 
 
@@ -261,6 +263,11 @@ scratchpad::editor::editor(int X, int Y, int W, int H) :
 // Handle - special action on left and right click
 int scratchpad::editor::handle(int event) {
 	switch (event) {
+	case FL_FOCUS:
+		// Notify that this is the current editor to receive pastes of international chatacters
+		if (intl_dialog_) {
+			intl_dialog_->editor(this);
+		}
 	case FL_PUSH:
 		// Tell FLTK we want to see FL_RELEASE
 		return true;

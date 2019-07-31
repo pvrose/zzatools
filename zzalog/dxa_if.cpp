@@ -445,6 +445,9 @@ HRESULT dxa_if::cb_map_changed(enum DxAtlas::EnumMapChange change_kind) {
 HRESULT dxa_if::cb_map_clicked(float latitude, float longitude) {
 	int num_found = 0;
 	record_num_t record_num;
+	record_num_t display_num = 0;
+	float tolerance = (float)5.0 / zoom_value_;
+	float best_diff = tolerance;
 	record* disp_record = nullptr;
 	if (qso_display_ != AQ_SEARCH && extract_records_) {
 		// Copy all records within the specified tolerance of the click point in the extracted records
@@ -478,6 +481,11 @@ HRESULT dxa_if::cb_map_clicked(float latitude, float longitude) {
 				extract_records_->add_record(record_num);
 			}
 			num_found++;
+			// Set the record to display to the closest
+			if (diff < best_diff) {
+				best_diff = diff;
+				display_num = record_num;
+			}
 		}
 	}
 	if (!num_found) {
@@ -489,7 +497,7 @@ HRESULT dxa_if::cb_map_clicked(float latitude, float longitude) {
 		char message[256];
 		sprintf(message, "DXATLAS: %d stations found", num_found);
 		status_->misc_status(ST_NOTE, message);
-		book_->selection(record_num);
+		book_->selection(display_num);
 		if (tabbed_view_) {
 			// Open the appropriate view
 			if (qso_display_ != AQ_SEARCH) {

@@ -56,21 +56,6 @@ enum edit_action_t {
 	KEEP_BOTH     // Keep both log and duplicate records
 };
 
-// Event handler - handle event as normal then set the cursor depending on current insert mode
-int record_form::editor::handle(int event) {
-	// Tell the international character dialog this is the current editor
-	if (intl_dialog_) intl_dialog_->editor(this);
-	int result = Fl_Text_Editor::handle(event);
-	insert_mode_ = insert_mode();
-	if (insert_mode_) {
-		cursor_style(Fl_Text_Display::NORMAL_CURSOR);
-	}
-	else {
-		cursor_style(Fl_Text_Display::BLOCK_CURSOR);
-	}
-	return result;
-}
-
 // Constructor
 record_form::record_form(int X, int Y, int W, int H, const char* label, field_ordering_t /*app*/) :
 	Fl_Group(X, Y, W, H, label)
@@ -264,7 +249,7 @@ record_form::record_form(int X, int Y, int W, int H, const char* label, field_or
 	curr_x += GAP + WLABEL;
 	curr_y += GAP;
 	// Input - QSL message to be added to eQSL
-	qsl_message_in_ = new Fl_Input(curr_x, curr_y, WMESS, HTEXT, "QSL");
+	qsl_message_in_ = new intl_input(curr_x, curr_y, WMESS, HTEXT, "QSL");
 	qsl_message_in_->labelsize(FONT_SIZE);
 	qsl_message_in_->value("Tnx QSO <NAME>, 73");
 	qsl_message_in_->textsize(FONT_SIZE);
@@ -272,7 +257,7 @@ record_form::record_form(int X, int Y, int W, int H, const char* label, field_or
 	qsl_message_in_->tooltip("The message sent in QSLMSG when uploading to eQSL or printing card for a contact");
 	curr_y += HTEXT;
 	// Input - SWL message to be added to eQSL
-	swl_message_in_ = new Fl_Input(curr_x, curr_y, WMESS, HTEXT, "SWL");
+	swl_message_in_ = new intl_input(curr_x, curr_y, WMESS, HTEXT, "SWL");
 	swl_message_in_->labelsize(FONT_SIZE);
 	swl_message_in_->value("Tnx SWL Report <NAME>, 73");
 	swl_message_in_->textsize(FONT_SIZE);
@@ -317,7 +302,7 @@ record_form::record_form(int X, int Y, int W, int H, const char* label, field_or
 
 	curr_y += HTEXT;
 	// Text editor - new value of field
-	value_in_ = new editor(curr_x, curr_y, WEDIT, HMLIN, "Value");
+	value_in_ = new intl_editor(curr_x, curr_y, WEDIT, HMLIN, "Value");
 	value_in_->align(FL_ALIGN_LEFT);
 	value_in_->labelsize(FONT_SIZE);
 	value_in_->textsize(FONT_SIZE);

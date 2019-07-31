@@ -4,13 +4,13 @@
 #include "utils.h"
 #include "rig_if.h"
 #include "status.h"
+#include "intl_widgets.h"
 
 #include <FL/Fl_Preferences.H>
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Radio_Round_Button.H>
 #include <FL/Fl_Choice.H>
 #include <FL/Fl_Int_Input.H>
-#include <FL/Fl_Input.H>
 #include <FL/Fl_Spinner.H>
 
 using namespace zzalog;
@@ -235,13 +235,13 @@ void rig_dialog::create_form(int X, int Y) {
 	ip_port_in->callback(cb_value_int<Fl_Int_Input>, &ip_port_);
 	ip_port_in->when(FL_WHEN_ENTER_KEY_ALWAYS);
 	// XML-RPC resource name
-	Fl_Input* ip_resource_in = new Fl_Input(C2_RIG, Y1_FLRIG + (2 * HTEXT), WBUTTON, HTEXT, "Resource");
+	intl_input* ip_resource_in = new intl_input(C2_RIG, Y1_FLRIG + (2 * HTEXT), WBUTTON, HTEXT, "Resource");
 	ip_resource_in->align(FL_ALIGN_LEFT);
 	ip_resource_in->labelsize(FONT_SIZE);
 	ip_resource_in->textsize(FONT_SIZE);
 	ip_resource_in->tooltip("The IP port number of the Flrig server");
 	ip_resource_in->value(ip_resource_.c_str());
-	ip_resource_in->callback(cb_value<Fl_Input, string>, &ip_resource_);
+	ip_resource_in->callback(cb_value<intl_input, string>, &ip_resource_);
 	ip_resource_in->when(FL_WHEN_ENTER_KEY_ALWAYS);
 	flrig_grp_->end();
 

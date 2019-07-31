@@ -1,13 +1,12 @@
 #include "web_dialog.h"
 #include "utils.h"
 #include "calendar.h"
-
+#include "intl_widgets.h"
 #include "icons.h"
 
 #include <FL/Fl_Preferences.H>
 #include <FL/Fl_Check_Button.H>
 #include <FL/Fl_Button.H>
-#include <FL/Fl_Input.H>
 #include <FL/Fl_Secret_Input.H>
 #include <FL/Fl_Group.H>
 #include <FL/Fl_RGB_Image.H>
@@ -178,12 +177,12 @@ void web_dialog::create_form(int X, int Y) {
 	gp1->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 
 	// Row 1 Col 2 - Date last accessed
-	Fl_Input* in1_1_2 = new Fl_Input(X + C2, Y + R1_1, W2, H1_1, "Last accessed");
+	intl_input* in1_1_2 = new intl_input(X + C2, Y + R1_1, W2, H1_1, "Last accessed");
 	in1_1_2->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
 	in1_1_2->labelsize(FONT_SIZE);
 	in1_1_2->textsize(FONT_SIZE);
 	in1_1_2->value(eqsl_last_got_.c_str());
-	in1_1_2->callback(cb_value<Fl_Input, string>, &eqsl_last_got_);
+	in1_1_2->callback(cb_value<intl_input, string>, &eqsl_last_got_);
 	in1_1_2->when(FL_WHEN_CHANGED);
 	in1_1_2->tooltip("Last time eQSL.cc accessed");
 
@@ -197,12 +196,12 @@ void web_dialog::create_form(int X, int Y) {
 	image_widgets_.insert(bn1_1_3);
 
 	// Row 1 Col 4 - User entry field
-	Fl_Input* in1_1_4 = new Fl_Input(X + C4, Y + R1_1, W4, H1_1, "User");
+	intl_input* in1_1_4 = new intl_input(X + C4, Y + R1_1, W4, H1_1, "User");
 	in1_1_4->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
 	in1_1_4->labelsize(FONT_SIZE);
 	in1_1_4->textsize(FONT_SIZE);
 	in1_1_4->value(eqsl_username_.c_str());
-	in1_1_4->callback(cb_value<Fl_Input, string>, &eqsl_username_);
+	in1_1_4->callback(cb_value<intl_input, string>, &eqsl_username_);
 	in1_1_4->when(FL_WHEN_CHANGED);
 	in1_1_4->tooltip("Enter user name for eQSL.cc");
 
@@ -226,10 +225,10 @@ void web_dialog::create_form(int X, int Y) {
 	bn1_2_1->tooltip("Use the QSO message when sending to eQSL.cc and printing cards");
 
 	// Row2 Col 2A - QSO Message
-	Fl_Input* in1_2_2 = new Fl_Input(X + C2A, Y + R1_2, W2A, H1_2);
+	intl_input* in1_2_2 = new intl_input(X + C2A, Y + R1_2, W2A, H1_2);
 	in1_2_2->value(eqsl_qso_msg_.c_str());
 	in1_2_2->textsize(FONT_SIZE);
-	in1_2_2->callback(cb_value<Fl_Input, string>, &eqsl_qso_msg_);
+	in1_2_2->callback(cb_value<intl_input, string>, &eqsl_qso_msg_);
 	in1_2_2->when(FL_WHEN_CHANGED);
 	in1_2_2->tooltip("Message to send to eQSL.cc or print on cards for QSOs");
 
@@ -243,10 +242,10 @@ void web_dialog::create_form(int X, int Y) {
 	bn1_3_1->tooltip("Use the SWL message when sending to eQSL.cc and printing cards");
 
 	// Row2 Col 2A - SWL Message
-	Fl_Input* in1_3_2 = new Fl_Input(X + C2A, Y + R1_3, W2A, H1_3);
+	intl_input* in1_3_2 = new intl_input(X + C2A, Y + R1_3, W2A, H1_3);
 	in1_3_2->value(eqsl_swl_msg_.c_str());
 	in1_3_2->textsize(FONT_SIZE);
-	in1_3_2->callback(cb_value<Fl_Input, string>, &eqsl_swl_msg_);
+	in1_3_2->callback(cb_value<intl_input, string>, &eqsl_swl_msg_);
 	in1_3_2->when(FL_WHEN_CHANGED);
 	in1_3_2->tooltip("Message to send to eQSL.cc or print on cards for SWL reports");
 
@@ -271,12 +270,12 @@ void web_dialog::create_form(int X, int Y) {
 	gp2->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 
 	// Row 1 Col 2 - Date last accessed
-	Fl_Input* in2_1_2 = new Fl_Input(X + C2, Y + R2_1, W2, H2_1, "Last accessed");
+	intl_input* in2_1_2 = new intl_input(X + C2, Y + R2_1, W2, H2_1, "Last accessed");
 	in2_1_2->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
 	in2_1_2->labelsize(FONT_SIZE);
 	in2_1_2->textsize(FONT_SIZE);
 	in2_1_2->value(lotw_last_got_.c_str());
-	in2_1_2->callback(cb_value<Fl_Input, string>, &lotw_last_got_);
+	in2_1_2->callback(cb_value<intl_input, string>, &lotw_last_got_);
 	in2_1_2->when(FL_WHEN_CHANGED);
 	in2_1_2->tooltip("Last time Logbook of the World accessed");
 
@@ -291,12 +290,12 @@ void web_dialog::create_form(int X, int Y) {
 	image_widgets_.insert(bn2_1_3);
 
 	// Row 1 Col 4 - User entry field
-	Fl_Input* in2_1_4 = new Fl_Input(X + C4, Y + R2_1, W4, H2_1, "User");
+	intl_input* in2_1_4 = new intl_input(X + C4, Y + R2_1, W4, H2_1, "User");
 	in2_1_4->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
 	in2_1_4->labelsize(FONT_SIZE);
 	in2_1_4->textsize(FONT_SIZE);
 	in2_1_4->value(lotw_username_.c_str());
-	in2_1_4->callback(cb_value<Fl_Input, string>, &lotw_username_);
+	in2_1_4->callback(cb_value<intl_input, string>, &lotw_username_);
 	in2_1_4->when(FL_WHEN_CHANGED);
 	in2_1_4->tooltip("Enter user name for Logbook of the World");
 
@@ -332,12 +331,12 @@ void web_dialog::create_form(int X, int Y) {
 
 
 	// Row 1 Col 4 - User entry field
-	Fl_Input* in3_1_4 = new Fl_Input(X + C4, Y + R3_1, W4, H3_1, "User");
+	intl_input* in3_1_4 = new intl_input(X + C4, Y + R3_1, W4, H3_1, "User");
 	in3_1_4->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
 	in3_1_4->labelsize(FONT_SIZE);
 	in3_1_4->textsize(FONT_SIZE);
 	in3_1_4->value(qrz_username_.c_str());
-	in3_1_4->callback(cb_value<Fl_Input, string>, &qrz_username_);
+	in3_1_4->callback(cb_value<intl_input, string>, &qrz_username_);
 	in3_1_4->when(FL_WHEN_CHANGED);
 	in3_1_4->tooltip("Enter user name for QRZ.com");
 

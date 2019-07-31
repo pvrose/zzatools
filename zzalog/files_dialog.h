@@ -2,12 +2,12 @@
 #define __FILES_DIALOG__
 
 #include "page_dialog.h"
+#include "intl_widgets.h"
 
 #include <string>
 
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Widget.H>
-#include <FL/Fl_Input.H>
 #include <FL/Fl_Check_Button.H>
 
 using namespace std;

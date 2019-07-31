@@ -81,6 +81,8 @@
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>C:\Users\pvros\Documents\dev\curl-7.65.1\builds\libcurl-vc15-x86-release-dll-ipv6-sspi-winssl\include;C:\Users\pvros\Documents\dev\deps\include;C:\Users\pvros\Documents\dev\fltk-1.3.5;C:\cygwin\home\pvros\dev\Hamlib-master\include</AdditionalIncludeDirectories>
       <AssemblerOutput>NoListing</AssemblerOutput>
+      <ExpandAttributedSource>false</ExpandAttributedSource>
+      <ShowIncludes>false</ShowIncludes>
     </ClCompile>
     <Link>
       <TargetMachine>MachineX86</TargetMachine>
@@ -129,6 +131,7 @@
     <ClCompile Include="zzalog\files_dialog.cpp" />
     <ClCompile Include="zzalog\import_data.cpp" />
     <ClCompile Include="zzalog\intl_dialog.cpp" />
+    <ClCompile Include="zzalog\intl_widgets.cpp" />
     <ClCompile Include="zzalog\log_table.cpp" />
     <ClCompile Include="zzalog\lotw_handler.cpp" />
     <ClCompile Include="zzalog\main.cpp" />
@@ -199,6 +202,7 @@
     <ClInclude Include="zzalog\icons.h" />
     <ClInclude Include="zzalog\import_data.h" />
     <ClInclude Include="zzalog\intl_dialog.h" />
+    <ClInclude Include="zzalog\intl_widgets.h" />
     <ClInclude Include="zzalog\log_table.h" />
     <ClInclude Include="zzalog\lotw_handler.h" />
     <ClInclude Include="zzalog\menu.h" />

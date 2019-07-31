@@ -3,11 +3,11 @@
 #include "callback.h"
 #include "utils.h"
 #include "import_data.h"
+#include "intl_widgets.h"
 
 #include <FL/Fl_Preferences.H>
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Check_Button.H>
-#include <FL/Fl_Input.H>
 #include <FL/Fl_Spinner.H>
 #include <FL/Fl_Button.H>
 #include <FL/fl_ask.H>
@@ -201,8 +201,8 @@ void files_dialog::create_form(int X, int Y) {
 
 	// widgets required for auto-import
 	Fl_Check_Button* bn_auto_en[AUTO_COUNT];
-	Fl_Input* in_auto_file[AUTO_COUNT];
-	Fl_Input* in_auto_src[AUTO_COUNT];
+	intl_input* in_auto_file[AUTO_COUNT];
+	intl_input* in_auto_src[AUTO_COUNT];
 	Fl_Check_Button* bn_auto_mt[AUTO_COUNT];
 	Fl_Button* bn_browse_auto[AUTO_COUNT];
 
@@ -214,15 +214,15 @@ void files_dialog::create_form(int X, int Y) {
 		bn_auto_en[i]->value(enable_auto_[i]);
 		bn_auto_en[i]->tooltip("Enable this auto-import");
 		// Input - file name for auto-import
-		in_auto_file[i] = new Fl_Input(X + COL2, Y + *ROW1[i], WEDIT, HTEXT);
-		in_auto_file[i]->callback(cb_value<Fl_Input, string>, &(auto_file_[i]));
+		in_auto_file[i] = new intl_input(X + COL2, Y + *ROW1[i], WEDIT, HTEXT);
+		in_auto_file[i]->callback(cb_value<intl_input, string>, &(auto_file_[i]));
 		in_auto_file[i]->when(FL_WHEN_CHANGED);
 		in_auto_file[i]->textsize(FONT_SIZE);
 		in_auto_file[i]->value(auto_file_[i].c_str());
 		in_auto_file[i]->tooltip("File name for auto-import");
 		// Input - name of application generating the auto-import
-		in_auto_src[i] = new Fl_Input(X + COL3, Y + *ROW1[i], WBUTTON, HTEXT);
-		in_auto_src[i]->callback(cb_value<Fl_Input, string>, &(auto_src_[i]));
+		in_auto_src[i] = new intl_input(X + COL3, Y + *ROW1[i], WBUTTON, HTEXT);
+		in_auto_src[i]->callback(cb_value<intl_input, string>, &(auto_src_[i]));
 		in_auto_src[i]->when(FL_WHEN_NOT_CHANGED);
 		in_auto_src[i]->textsize(FONT_SIZE);
 		in_auto_src[i]->value(auto_src_[i].c_str());
@@ -273,8 +273,8 @@ void files_dialog::create_form(int X, int Y) {
 	bn_tqsl_en->value(enable_tqsl_);
 	bn_tqsl_en->tooltip("TQSL Executable filename is valid");
 	// Input - TQSL Executable filename
-	Fl_Input* in_tqsl_file = new Fl_Input(X + COL2, Y + ROW2_1, WEDIT + GAP + WBUTTON + GAP + WBUTTON, HTEXT);
-	in_tqsl_file->callback(cb_value<Fl_Input, string>, &tqsl_executable_);
+	intl_input* in_tqsl_file = new intl_input(X + COL2, Y + ROW2_1, WEDIT + GAP + WBUTTON + GAP + WBUTTON, HTEXT);
+	in_tqsl_file->callback(cb_value<intl_input, string>, &tqsl_executable_);
 	in_tqsl_file->when(FL_WHEN_CHANGED);
 	in_tqsl_file->textsize(FONT_SIZE);
 	in_tqsl_file->value(tqsl_executable_.c_str());
@@ -306,8 +306,8 @@ void files_dialog::create_form(int X, int Y) {
 	bn_card_en->value(enable_card_);
 	bn_card_en->tooltip("Enable downloading of eQSL e-cards");
 	// Input - Card image directory
-	Fl_Input* in_card_file = new Fl_Input(X + COL2, Y + ROW3_1, WEDIT + GAP + WBUTTON + GAP + WBUTTON, HTEXT);
-	in_card_file->callback(cb_value<Fl_Input, string>, &card_directory_);
+	intl_input* in_card_file = new intl_input(X + COL2, Y + ROW3_1, WEDIT + GAP + WBUTTON + GAP + WBUTTON, HTEXT);
+	in_card_file->callback(cb_value<intl_input, string>, &card_directory_);
 	in_card_file->when(FL_WHEN_CHANGED);
 	in_card_file->textsize(FONT_SIZE);
 	in_card_file->value(card_directory_.c_str());
@@ -328,8 +328,8 @@ void files_dialog::create_form(int X, int Y) {
 	grp_ref_data->box(FL_THIN_DOWN_BOX);
 	grp_ref_data->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 	// Input - directory name for the reference (ADIF spec, Prefix data and band plans)
-	Fl_Input* in_ref_data_file = new Fl_Input(X + COL2, Y + ROW4_1, WEDIT + GAP + WBUTTON + GAP + WBUTTON, HTEXT);
-	in_ref_data_file->callback(cb_value<Fl_Input, string>, &ref_data_directory_);
+	intl_input* in_ref_data_file = new intl_input(X + COL2, Y + ROW4_1, WEDIT + GAP + WBUTTON + GAP + WBUTTON, HTEXT);
+	in_ref_data_file->callback(cb_value<intl_input, string>, &ref_data_directory_);
 	in_ref_data_file->when(FL_WHEN_CHANGED);
 	in_ref_data_file->textsize(FONT_SIZE);
 	in_ref_data_file->value(ref_data_directory_.c_str());
@@ -356,8 +356,8 @@ void files_dialog::create_form(int X, int Y) {
 	bn_backup_en->value(enable_backup_);
 	bn_backup_en->tooltip("Enable data back-up when closing logging session");
 	// Input - Backup directory name
-	Fl_Input* in_backup_file = new Fl_Input(X + COL2, Y + ROW5_1, WEDIT + GAP + WBUTTON + GAP + WBUTTON, HTEXT);
-	in_backup_file->callback(cb_value<Fl_Input, string>, &backup_directory_);
+	intl_input* in_backup_file = new intl_input(X + COL2, Y + ROW5_1, WEDIT + GAP + WBUTTON + GAP + WBUTTON, HTEXT);
+	in_backup_file->callback(cb_value<intl_input, string>, &backup_directory_);
 	in_backup_file->when(FL_WHEN_CHANGED);
 	in_backup_file->textsize(FONT_SIZE);
 	in_backup_file->value(backup_directory_.c_str());
@@ -378,8 +378,8 @@ void files_dialog::create_form(int X, int Y) {
 	grp_web->box(FL_THIN_DOWN_BOX);
 	grp_web->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 	// Input - preferred web browser
-	Fl_Input* in_web_file = new Fl_Input(X + COL2, Y + ROW6_1, WEDIT + GAP + WBUTTON + GAP + WBUTTON, HTEXT);
-	in_web_file->callback(cb_value<Fl_Input, string>, &web_browser_);
+	intl_input* in_web_file = new intl_input(X + COL2, Y + ROW6_1, WEDIT + GAP + WBUTTON + GAP + WBUTTON, HTEXT);
+	in_web_file->callback(cb_value<intl_input, string>, &web_browser_);
 	in_web_file->when(FL_WHEN_CHANGED);
 	in_web_file->textsize(FONT_SIZE);
 	in_web_file->value(web_browser_.c_str());
@@ -405,8 +405,8 @@ void files_dialog::create_form(int X, int Y) {
 	grp_status->box(FL_THIN_DOWN_BOX);
 	grp_status->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 	// Input - status log file name
-	Fl_Input* in_status_file = new Fl_Input(X + COL2, Y + ROW7_1, WEDIT + GAP + WBUTTON + GAP + WBUTTON, HTEXT);
-	in_status_file->callback(cb_value<Fl_Input, string>, &status_log_file_);
+	intl_input* in_status_file = new intl_input(X + COL2, Y + ROW7_1, WEDIT + GAP + WBUTTON + GAP + WBUTTON, HTEXT);
+	in_status_file->callback(cb_value<intl_input, string>, &status_log_file_);
 	in_status_file->when(FL_WHEN_CHANGED);
 	in_status_file->textsize(FONT_SIZE);
 	in_status_file->value(status_log_file_.c_str());

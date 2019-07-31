@@ -6,15 +6,14 @@
 #include "record.h"
 #include "spec_data.h"
 #include "fields.h"
+#include "intl_widgets.h"
 
 #include <FL/Fl_Box.H>
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Radio_Round_Button.H>
 #include <FL/Fl_Light_Button.H>
 #include <FL/Fl_Check_Button.H>
-#include <FL/Fl_Input.H>
 #include <FL/Fl_Output.H>	
-#include <FL/Fl_Text_Editor.H>
 #include <FL/Fl_Choice.H>
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Image.H>
@@ -54,29 +53,6 @@ namespace zzalog {
 			QI_GEN_CARD         // Generated QSL card
 		};
 
-		// An editor for modifying a fields value - it allows cut and paste
-		class editor : public Fl_Text_Editor
-		{
-			// Whether the editor is inserting or overwriting
-			bool insert_mode_;
-
-		public:
-			// Constructor
-			editor(int X, int Y, int W, int H, const char* label = "") :
-				Fl_Text_Editor(X, Y, W, H, label),
-				insert_mode_(true)
-			{
-				insert_mode(insert_mode_);
-				if (insert_mode_) {
-					cursor_style(Fl_Text_Display::NORMAL_CURSOR);
-				}
-				else {
-					cursor_style(Fl_Text_Display::BLOCK_CURSOR);
-				}
-			};
-			// Event handler - handle event as normal then set the cursor depending on current insert mode
-			int handle(int event);
-		};
 
 		// Constructors and destructor
 	public:
@@ -163,14 +139,14 @@ namespace zzalog {
 		Fl_Box* question_out_;
 		// QSL messages
 		Fl_Group* message_grp_;
-		Fl_Input* qsl_message_in_;
-		Fl_Input* swl_message_in_;
+		intl_input* qsl_message_in_;
+		intl_input* swl_message_in_;
 		Fl_Button* modify_message_bn_;
 		// Editing info 
 		Fl_Group* editting_grp_;
 		Fl_Check_Button* all_fields_bn_;
 		Fl_Choice* field_choice_;
-		editor* value_in_;
+		intl_editor* value_in_;
 		Fl_Choice* enum_choice_;
 		// Quick entry buttons
 		Fl_Group* quick_grp_;

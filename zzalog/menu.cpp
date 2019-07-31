@@ -224,6 +224,7 @@ extern void backup_file(bool force, bool retrieve = false);
 extern void set_recent_file(string filename);
 extern void add_scratchpad();
 extern void remove_sub_window(Fl_Window* win);
+extern void add_sub_window(Fl_Window* win);
 
 
 // Constructor
@@ -1704,6 +1705,7 @@ void menu::update_items() {
 		// Update logging commands and rig status
 		logging(logging());
 	}
+	redraw();
 	// Update toolbar to reflect active state of menu items
 	toolbar_->update_items();
 }

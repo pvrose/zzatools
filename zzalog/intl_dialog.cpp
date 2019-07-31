@@ -199,6 +199,11 @@ void intl_dialog::editor(Fl_Widget* w) {
 	editor_ = w;
 }
 
+// Returns the editing widget
+Fl_Widget* intl_dialog::editor() {
+	return editor_;
+}
+
 // Add the characters in the input text to the list of characters displayed
 void intl_dialog::add_symbols(string text) {
 	// Create a copy of the input text and set a pointer to the end

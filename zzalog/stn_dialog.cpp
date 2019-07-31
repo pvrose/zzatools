@@ -6,6 +6,7 @@
 #include "prefix.h"
 #include "status.h"
 #include "tabbed_forms.h"
+#include "intl_widgets.h"
 
 #include <set>
 
@@ -13,7 +14,6 @@
 #include <FL/Fl_Input_Choice.H>
 #include <FL/Fl_Light_Button.H>
 #include <FL/Fl_Button.H>
-#include <FL/Fl_Input.H>
 #include <FL/Fl_Int_Input.H>
 #include <FL/fl_ask.H>
 
@@ -587,13 +587,13 @@ void stn_dialog::qth_group::create_form(int X, int Y) {
 		}
 		else {
 			// Widget is for text input
-			ip3 = new Fl_Input(x, y, W1C, H3, qth_params_[i].label);
+			ip3 = new intl_input(x, y, W1C, H3, qth_params_[i].label);
 			if (strcmp(qth_params_[i].label, "Callsign") == 0) {
 				// Entering callsign will fill or clear the other fields
 				ip3->callback(cb_ip_call, qth_params_[i].v);
 			}
 			else {
-				ip3->callback(cb_value<Fl_Input, string>, qth_params_[i].v);
+				ip3->callback(cb_value<intl_input, string>, qth_params_[i].v);
 			}
 		}
 		ip3->labelsize(FONT_SIZE);
@@ -652,9 +652,9 @@ void stn_dialog::qth_group::update_item() {
 	// For each QTH input widget
 	for (int i = 0; i < 15; i++) {
 		// Set the text in the widget
-		((Fl_Input*)qth_info_[i])->value(((string*)qth_params_[i].v)->c_str());
+		((intl_input*)qth_info_[i])->value(((string*)qth_params_[i].v)->c_str());
 		// Put a reference to the value location
-		((Fl_Input*)qth_info_[i])->user_data(qth_params_[i].v);
+		((intl_input*)qth_info_[i])->user_data(qth_params_[i].v);
 	}
 }
 
@@ -685,7 +685,7 @@ void stn_dialog::qth_group::save_item() {
 // Callsign callback
 void stn_dialog::qth_group::cb_ip_call(Fl_Widget* w, void*) {
 	qth_group* that = ancestor_view<qth_group>(w);
-	Fl_Input* ip = (Fl_Input*)w;
+	intl_input* ip = (intl_input*)w;
 	qth_info_t* qth = &that->current_qth_;
 	qth->callsign = ip->value();
 	// Parse callsign

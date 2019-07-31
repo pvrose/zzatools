@@ -3,10 +3,10 @@
 
 #include "page_dialog.h"
 #include "qsl_form.h"
+#include "intl_widgets.h"
 
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Hold_Browser.H>
-#include <FL/Fl_Input.H>
 #include <FL/Fl_Button.H>
 
 namespace zzalog {
@@ -71,7 +71,7 @@ namespace zzalog {
 		// Current widget
 		Fl_Button* current_widget_;
 		// Font and size selectors
-		Fl_Input* ip_text_;
+		intl_input* ip_text_;
 		Fl_Button* bn_colour_;
 		Fl_Hold_Browser* br_font_;
 		Fl_Hold_Browser* br_size_;

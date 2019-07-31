@@ -13,6 +13,7 @@
 #include "pfx_data.h"
 #include "prefix.h"
 #include "utils.h"
+#include "intl_widgets.h"
 
 // C/C++ header files
 #include <ctime>
@@ -22,7 +23,6 @@
 #include <FL/Fl_Menu_Item.H>
 #include <FL/Fl_Preferences.H>
 #include <FL/Fl_Single_Window.H>
-#include <FL/Fl_Text_Editor.H>
 
 using namespace zzalog;
 
@@ -1170,7 +1170,7 @@ void book::edit_header() {
 	bn_cncl->labelfont(FONT);
 	bn_cncl->labelsize(FONT_SIZE);
 	// Text editor
-	Fl_Text_Editor* editor = new Fl_Text_Editor(GAP, HBUTTON + 2 * GAP, 640 - 2 * GAP, 480 - 3 * GAP - HBUTTON);
+	intl_editor* editor = new intl_editor(GAP, HBUTTON + 2 * GAP, 640 - 2 * GAP, 480 - 3 * GAP - HBUTTON);
 	editor->buffer(buffer);
 	editor->wrap_mode(Fl_Text_Display::WRAP_AT_BOUNDS, 0);
 	editor->textfont(FL_COURIER);
@@ -1198,10 +1198,10 @@ void book::cb_close_edith(Fl_Widget* w, void* v) {
 	// Find the parent window of the widget (which may itself be the parent)
 	Fl_Window* win = w->window();
 	if (win == nullptr) win = (Fl_Window*)w;
-	Fl_Text_Editor* editor = nullptr;
+	intl_editor* editor = nullptr;
 	// Look at each child of the window until we find that is a text editor
 	for (int i = 0; i < win->children() && editor == nullptr; i++) {
-		editor = dynamic_cast<Fl_Text_Editor*>(win->child(i));
+		editor = dynamic_cast<intl_editor*>(win->child(i));
 	}
 	// If we do find a text editor update the header from its current text
 	if (editor) {

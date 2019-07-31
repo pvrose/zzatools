@@ -158,11 +158,11 @@ search_dialog::search_dialog() :
 	bn13->tooltip("Use regular expression matching");
 	bn13->when(FL_WHEN_RELEASE);
 	// Input - text to match
-	Fl_Input* ip14 = new Fl_Input(C12, R14, WEDIT, HTEXT, "Search text");
+	intl_input* ip14 = new intl_input(C12, R14, WEDIT, HTEXT, "Search text");
 	ip14->labelsize(FONT_SIZE);
 	ip14->textsize(FONT_SIZE);
 	ip14->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
-	ip14->callback(cb_value<Fl_Input, string>, (void*)&criteria_->pattern);
+	ip14->callback(cb_value<intl_input, string>, (void*)&criteria_->pattern);
 	ip14->when(FL_WHEN_CHANGED);
 	ip14->value(criteria_->pattern.c_str());
 	ip14->tooltip("The expression to match records against");
@@ -185,12 +185,12 @@ search_dialog::search_dialog() :
 	bn21->value(criteria_->by_dates);
 	bn21->tooltip("Use date range to limit records to match");
 	// Input - Start date
-	Fl_Input* in22 = new Fl_Input(C212, R21, W212, HTEXT, "From:");
+	intl_input* in22 = new intl_input(C212, R21, W212, HTEXT, "From:");
 	in22->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
 	in22->labelsize(FONT_SIZE);
 	in22->textsize(FONT_SIZE);
 	in22->value(criteria_->from_date.c_str());
-	in22->callback(cb_value<Fl_Input, string>, &criteria_->from_date);
+	in22->callback(cb_value<intl_input, string>, &criteria_->from_date);
 	in22->when(FL_WHEN_CHANGED);
 	in22->tooltip("Select date to start matching records");
 	// Button - open calendar widget to get date
@@ -201,12 +201,12 @@ search_dialog::search_dialog() :
 	bn23->when(FL_WHEN_RELEASE);
 	bn23->tooltip("Opens calendar to select start date");
 	// Input - End date
-	Fl_Input* in24 = new Fl_Input(C214, R21, W214, HTEXT, "To:");
+	intl_input* in24 = new intl_input(C214, R21, W214, HTEXT, "To:");
 	in24->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
 	in24->labelsize(FONT_SIZE);
 	in24->textsize(FONT_SIZE);
 	in24->value(criteria_->to_date.c_str());
-	in24->callback(cb_value<Fl_Input, string>, &criteria_->to_date);
+	in24->callback(cb_value<intl_input, string>, &criteria_->to_date);
 	in24->when(FL_WHEN_CHANGED);
 	in24->tooltip("Select date to end matching records");
 	// Button - open calendar widget to get date

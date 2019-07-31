@@ -368,7 +368,7 @@ void calendar::cb_cal_close(Fl_Widget* w, void* v) {
 	// write the current value back to supplied string attribute
 	string* date = cb_data->date_value;
 	*date = cal->value();
-	// Update the supplied Fl_Input with the current value
+	// Update the supplied intl_input with the current value
 	if (cb_data->date_input != nullptr) {
 		cb_data->date_input->value(date->c_str());
 	}

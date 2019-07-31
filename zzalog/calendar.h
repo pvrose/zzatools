@@ -1,13 +1,14 @@
 #ifndef __CALENDAR__
 #define __CALENDAR__
 
+#include "intl_widgets.h"
+
 #include <ctime>
 #include <string>
 #include <FL/Fl_Table.H>
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Window.H>
 #include <FL/Fl_Button.H>
-#include <FL/Fl_Input.H>
 
 using namespace std;
 
@@ -22,12 +23,12 @@ namespace zzalog {
 		// Date value in ADIF format YYYYMMDD
 		string* date_value;
 		// The input widget to receive the date
-		Fl_Input* date_input;
+		intl_input* date_input;
 		cal_cb_data_t() {
 			date_value = nullptr;
 			date_input = nullptr;
 		}
-		cal_cb_data_t(string* dv, Fl_Input* di) {
+		cal_cb_data_t(string* dv, intl_input* di) {
 			date_value = dv;
 			date_input = di;
 		}

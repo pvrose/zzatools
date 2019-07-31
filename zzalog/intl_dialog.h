@@ -21,7 +21,10 @@ namespace zzalog {
 		intl_dialog();
 		virtual ~intl_dialog();
 
+		// Set the widget that receives the paste command
 		void editor(Fl_Widget* w);
+		// REturns the widget that recives the paste command
+		Fl_Widget* editor();
 
 		// Save the data
 		static void cb_bn_save(Fl_Widget* w, void* v);
