@@ -627,7 +627,7 @@ void import_data::convert_update(record* record) {
 		//record->item("APP_ZZA_EQSL_TS", timestamp);
 
 		// Delete QSLMSG
-		record->item("QSLMSG", "");
+		record->item("QSLMSG", string(""));
 	}
 
 }

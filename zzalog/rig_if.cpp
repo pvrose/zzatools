@@ -233,6 +233,10 @@ string rig_if::display_smeter(int smeter) {
 	case SIG_dBm:
 		// display signal in -dBm, meter = 0 => -73 dBm
 		sprintf(text, " %ddBm", smeter - 73);
+		break;
+	default:
+		text[0] = 0;
+		break;
 	}
 	return text;
 }
@@ -260,7 +264,7 @@ void rig_if::cb_timer_rig(void* v) {
 	// Update the label in the rig button 
 	// Get polling intervals from settings
 	Fl_Preferences rig_settings(settings_, "Rig");
-	double timer_value;
+	double timer_value = 0.0;
 	// Set the status and get the polling interval for the current state of the rig
 	if (rig_if_ == nullptr) {
 		// Rig not set up - DLOW
@@ -592,6 +596,7 @@ bool rig_hamlib::is_good() {
 	return opened_ok_ && error_code_ == RIG_OK;
 }
 
+// Return the text for the error code.
 const char* rig_hamlib::error_text(rig_errcode_e code) {
 	switch (code) {
 	case RIG_OK:
@@ -667,7 +672,7 @@ rig_omnirig::rig_omnirig()
 // Destructor
 rig_omnirig::~rig_omnirig()
 {
-	// Tell the interface we no longer support the callback
+	// Tell the interface we can no longer support the callback
 	IDispEventSimpleImpl<1, rig_omnirig, &__uuidof(OmniRig::IOmniRigXEvents)>::DispEventUnadvise(omnirig_);
 }
 
@@ -699,7 +704,7 @@ bool rig_omnirig::open()
 		}
 	}
 	if (opened_ok_) {
-		// Tell the connection we are implementing callbacks
+		// Tell the connection we can handle callbacks
 		IDispEventSimpleImpl<1, rig_omnirig, &__uuidof(OmniRig::IOmniRigXEvents)>::DispEventAdvise(omnirig_);
 
 		// Select on rig number
@@ -976,7 +981,6 @@ void rig_omnirig::close() {
 	// Call base class  for common behaviour
 	rig_if::close();
 }
-// No implementation
 
 #endif //_WIN32
 

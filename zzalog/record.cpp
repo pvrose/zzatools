@@ -3,7 +3,7 @@ ZZALOG - Amateur radio log
 © - Copyright 2018, Philip Rose, GM3ZZA
 All Rights Reserved
 
-recod.cpp - Individual record data item: implementation file
+record.cpp - Individual record data item: implementation file
 */
 
 #include "record.h"
@@ -55,8 +55,9 @@ record::record()
 	delete_contents();
 }
 
-// Constructor that pre-populates certain fields
+// Constructor that pre-populates certain fields depending on the logging mode
 record::record(logging_mode_t type) {
+	// Reset record
 	delete_contents();
 	
 	switch (type) {
@@ -190,7 +191,7 @@ void record::delete_contents() {
 	clear();
 }
 
-// Set an item pair
+// Set an item pair.
 void record::item(string field, string value, bool formatted/* = false*/) {
 	// Certain fields - always log in upper case
 	string upper_value;
@@ -211,9 +212,11 @@ void record::item(string field, string value, bool formatted/* = false*/) {
 	}
 	else {
 		if (field[0] == '!') {
+			// Special field names used for temporary values
 			upper_value = value;
 		}
 		else {
+			// Get the type of data. Different processing for different types
 			string datatype = spec_data_->datatype(field);
 			if (datatype == "PositiveInteger") {
 				// Always strip off leading zeros
@@ -280,7 +283,7 @@ void record::item(string field, string value, bool formatted/* = false*/) {
 		// Set in item
 		(*this)[field] = formatted_value;
 	}
- else {
+	else {
 	 // Use the data directly in the item
 	 (*this)[field] = upper_value;
 	}

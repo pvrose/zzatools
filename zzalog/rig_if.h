@@ -12,7 +12,7 @@
 #include <string>
 
 #ifdef _WIN32
-//!! OmniRIG type library
+//!! OmniRIG type library - only available in windows
 #import "C:\Program Files (x86)\Afreet\OmniRig\OmniRig.exe"
 #include <atlbase.h>
 #include <atlcom.h>
@@ -178,7 +178,8 @@ namespace zzalog {
 	// Omnirig is a windows-only application
 #ifdef _WIN32
 
-// This class implements the Omnirig specific implementation of the base class
+// This class implements the Omnirig specific implementation of the base class, also inherits from
+	// inter-app event handler
 	class rig_omnirig :
 		public rig_if
 		, public ::IDispEventSimpleImpl<1, rig_omnirig, &__uuidof(::OmniRig::IOmniRigXEvents)>

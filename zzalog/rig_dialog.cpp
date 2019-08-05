@@ -629,24 +629,30 @@ void rig_dialog::populate_port_choice() {
 // TODO: Add other OS support
 #endif
 
+// Populate the baud rate choice menu
 void rig_dialog::populate_baud_choice() {
 	baud_rate_choice_->clear();
+	// Override rig's capabilities?
 	override_check_->value(override_caps_);
-	const rig_caps* caps = rig_get_caps(model_id_);
 
+	// Get the baud-rates supported by the rig
+	const rig_caps* caps = rig_get_caps(model_id_);
 	int min_baud_rate = 300;
 	int max_baud_rate = 460800;
 	if (caps) {
 		min_baud_rate = caps->serial_rate_min;
 		max_baud_rate = caps->serial_rate_max;
 	}
+	// Default baud-rates
 	const int baud_rates[] = { 300, 600, 1200, 2400, 4800, 9600, 19200, 38400, 57600, 115200, 230400, 460800 };
 	int num_rates = sizeof(baud_rates) / sizeof(int);
 	int index = 0;
 	baud_rate_choice_->value(0);
+	// For all possible rates
 	for (int i = 0; i < num_rates; i++) {
 		int rate = baud_rates[i];
 		if (override_caps_ || (rate >= min_baud_rate && rate <= max_baud_rate)) {
+			// capabilities overridden or within the range supported by capabilities
 			baud_rate_choice_->add(to_string(rate).c_str());
 			if (to_string(rate) == baud_rate_) {
 				baud_rate_choice_->value(index);

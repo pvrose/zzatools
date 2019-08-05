@@ -64,7 +64,7 @@ void scratchpad::create_form() {
 	// The callback will be explicitly done 
 	editor_->when(FL_WHEN_NEVER);
 
-	// Create the buttons
+	// Create the buttons - see labels and tooltips for more information
 	int curr_y = EDGE;
 	bn_start_ = new Fl_Button(C2, curr_y, WBUTTON, HBUTTON, "Start");
 	bn_start_->labelsize(FONT_SIZE);

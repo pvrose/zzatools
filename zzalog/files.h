@@ -16,15 +16,11 @@ namespace zzalog {
 		LR_EOF       // EOF read
 	};
 
+	// Default prefix database
 	const string PREFIX_FILE = "\\Prefix.lst";
 
-	// List of filenames containing the Specifications
+	// Default specification database
 	const string ADIF_FILE = "\\all.xml";
-	const struct { string dataset_name; string file_name; } ADIF_FILES[] = {
-		{ "Data Types", "datatypes.tsv" },
-		{ "Fields", "fields.tsv" },
-		{ "", "" }
-	};
 
 }
 #endif

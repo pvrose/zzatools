@@ -586,6 +586,7 @@ bool eqsl_handler::requests_queued() {
 }
 
 // Upload updates to eQSL.cc log
+// TODO: Consider uploading a file using URL handler
 bool eqsl_handler::upload_eqsl_log(book* book) {
 	// Takes time - show timer cursor
 	fl_cursor(FL_CURSOR_WAIT);

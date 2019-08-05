@@ -595,12 +595,12 @@ HRESULT dxa_if::cb_mouse_moved(float latitude, float longitude) {
 
 		//set attributes for point
 		long ix = 0;
-		SafeArrayPutElement(point, &ix, &pt_long);
-		ix = 1; SafeArrayPutElement(point, &ix, &pt_lat);
-		ix = 2; SafeArrayPutElement(point, &ix, &pt_text);
+		(void)SafeArrayPutElement(point, &ix, &pt_long);
+		ix = 1; (void)SafeArrayPutElement(point, &ix, &pt_lat);
+		ix = 2; (void)SafeArrayPutElement(point, &ix, &pt_text);
 		//add point to the array
 		ix = 0; label.parray = point;
-		SafeArrayPutElement(points, &ix, &label);
+		(void)SafeArrayPutElement(points, &ix, &label);
 		//put data into the layer
 		labels.parray = points;
 		try {
@@ -948,7 +948,7 @@ void dxa_if::get_records() {
 			// Go backwards until the time difference is > n days.
 			for (; (signed)i >= 0 && !done; i--) {
 				// Compare the time difference (in seconds)
-				if (difftime(last_date, book_->get_record(i, false)->timestamp()) <= most_recent_count_ * 24 * 60 * 60) {
+				if (difftime(last_date, book_->get_record(i, false)->timestamp()) <= (time_t)most_recent_count_ * 24 * 60 * 60) {
 					record_nums.insert(i);
 				}
 				else {
@@ -1182,12 +1182,12 @@ void dxa_if::draw_pins() {
 								pt_lat = (float)lat_long.latitude;
 								pt_value = 0;
 								//set attributes 
-								index_1 = 0; SafeArrayPutElement(point_data, &index_1, &pt_long);
-								index_1 = 1; SafeArrayPutElement(point_data, &index_1, &pt_lat);
-								index_1 = 2; SafeArrayPutElement(point_data, &index_1, &pt_value);
+								index_1 = 0; (void)SafeArrayPutElement(point_data, &index_1, &pt_long);
+								index_1 = 1; (void)SafeArrayPutElement(point_data, &index_1, &pt_lat);
+								index_1 = 2; (void)SafeArrayPutElement(point_data, &index_1, &pt_value);
 								//add point to the array
 								point.parray = point_data;
-								SafeArrayPutElement(point_array, &index_2, &point);
+								(void)SafeArrayPutElement(point_array, &index_2, &point);
 								index_2++;
 								// Add it to the set of records being displayed
 								records_displayed_.insert(record_num);

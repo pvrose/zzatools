@@ -14,7 +14,9 @@ namespace zzalog {
 	{
 
 	public:
+		// Defualt constructor
 		power_matrix();
+		// Constructor initialises the matrix from the rig data.
 		power_matrix(string rig);
 		~power_matrix();
 		// Returns the power for the specific band and drive-level

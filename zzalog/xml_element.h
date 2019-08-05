@@ -13,6 +13,7 @@ namespace zzalog {
 	class xml_element
 	{
 	public:
+		// XML element types
 		enum element_t {
 			ELEMENT,                // Standard element - has name, attributes and content
 			COMMENT,                // <!--........-->  - has content

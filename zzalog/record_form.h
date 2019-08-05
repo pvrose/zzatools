@@ -38,7 +38,7 @@ namespace zzalog {
 			UM_DUPEQUERY,       // Querying a duplicate (the two records are displated)
 		};
 
-		// Current contents of book_record
+		// What the source of the data in record is.
 		enum edit_mode_t {
 			EM_ORIGINAL,        // Original log record
 			EM_EDIT,            // Supplied by editing
@@ -56,6 +56,7 @@ namespace zzalog {
 
 		// Constructors and destructor
 	public:
+		// Constructor initialises both the Fl_Group and view
 		record_form(int X, int Y, int W, int H, const char* label, field_ordering_t app);
 		~record_form();
 

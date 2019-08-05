@@ -21,9 +21,11 @@ field_choice::~field_choice()
 	clear();
 }
 
+// Repulate the choice with all or most popular field names
 void field_choice::repopulate(bool all_fields, string default_field) {
 	clear();
 	if (all_fields) {
+		// Use the default method
 		spec_data_->initialise_field_choice(this, "Fields", default_field);
 	}
 	else {
@@ -33,10 +35,12 @@ void field_choice::repopulate(bool all_fields, string default_field) {
 		Fl_Preferences display_settings(settings_, "Display");
 		Fl_Preferences fields_settings(display_settings, "Fields");
 		char* field_set;
+		// Get the list of field names from settings
 		fields_settings.get("App5", field_set, "Default");
 		Fl_Preferences set_settings(display_settings, field_set);
 		free(field_set);
 		if (set_settings.groups() > 0) {
+			// WE have said list so use it
 			for (int i = 0; i < set_settings.groups(); i++) {
 				Fl_Preferences field_settings(set_settings, set_settings.group(i));
 				char* name;
@@ -49,6 +53,7 @@ void field_choice::repopulate(bool all_fields, string default_field) {
 			}
 		}
 		else {
+			// otherwise use the default list
 			for (unsigned int i = 0; DEFAULT_FIELDS[i].field.size() > 0; i++) {
 				string name = DEFAULT_FIELDS[i].field;
 				add(name.c_str(), 0, (Fl_Callback*)nullptr);

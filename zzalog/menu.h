@@ -21,8 +21,6 @@ namespace zzalog {
 		menu(int X, int Y, int W, int H, const char* label = 0);
 		virtual ~menu();
 
-		// Dummy callback as place-holder for unimplemented menu items
-		static void cb_mi_dummy(Fl_Widget*, void* v);
 		// File->New
 		static void cb_mi_file_new(Fl_Widget* w, void* v);
 		// File->Open
@@ -105,6 +103,8 @@ namespace zzalog {
 		static void cb_mi_ref_items(Fl_Widget* w, void* v);
 		// Reference->Prefix->Add details
 		static void cb_mi_ref_details(Fl_Widget* w, void* v);
+		// Reference->Reload data
+		static void cb_mi_ref_reload(Fl_Widget* w, void* v);
 		// Report->Clear/All/Extracted?Selected
 		static void cb_mi_rep_filter(Fl_Widget* w, void* v);
 		// Report->Levelx

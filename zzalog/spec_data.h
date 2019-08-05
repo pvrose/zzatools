@@ -47,6 +47,7 @@ namespace zzalog {
 	};
 
 	// regular expressions used in validation
+	// e.g. 3.1.0
 	const basic_regex<char> REGEX_ADIF_VERSION("[0-9]\\.[0-9]\\.[0-9]");
 	// One of Y, y, N, n
 	const basic_regex<char> REGEX_BOOLEAN("[YyNn]");

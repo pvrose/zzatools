@@ -14,7 +14,7 @@ namespace zzalog {
 	struct spec_dataset;
 	class spec_data;
 
-	// Class loads the adif specification database from the .tsv files provided by ADIF Forum
+	// Class loads the adif specification database from the .xml files provided by ADIF Forum
 	class spec_reader
 	{
 	public:

@@ -10,6 +10,9 @@
 #include <FL/Fl_Button.H>
 
 namespace zzalog {
+	// This class allows the user to customise the way the QSL card is printed.
+	// It allows a set of lines of text in the four corners of the card (used for operator and station info)
+	// and a set of boxes across  the middle for QSO details
 	class qsl_design : public page_dialog
 	{
 
@@ -20,19 +23,20 @@ namespace zzalog {
 		void display_design_data(Fl_Button* widget, qsl_form::qsl_widget* data);
 
 	protected:
+		// The various parameter types
 		enum size_object {
-			WIDTH,
-			HEIGHT,
-			TL_SIZE,
-			TR_SIZE,
-			BL_SIZE,
-			BR_SIZE,
-			TAB_ROWS,
-			TAB_COLS
+			WIDTH,        // width of card
+			HEIGHT,       // height of card
+			TL_SIZE,      // number of lines of text in top-left
+			TR_SIZE,      // do. in top right
+			BL_SIZE,      // do. in bottom left
+			BR_SIZE,      // do. in bottom right
+			TAB_ROWS,     // Number of rows in the central box
+			TAB_COLS      // Number of columns in the central box
 		};
 
-		// Standard methods - need to be written for each class that inherits from this
-// Load values from settings_
+		// inherited from page_dialog
+		// Load values from settings_
 		virtual void load_values();
 		// Used to create the form
 		virtual void create_form(int X, int Y);
@@ -41,7 +45,7 @@ namespace zzalog {
 		// Used to enable/disable specific widget - any widgets enabled musr be attributes
 		virtual void enable_widgets();
 
-		// Handle
+		// Inherited from Fl_Widget
 		virtual int handle(int event);
 
 		// Callbacks
@@ -68,13 +72,17 @@ namespace zzalog {
 		qsl_form* current_design_;
 		// Current widget data being edited
 		qsl_form::qsl_widget* current_data_;
-		// Current widget
+		// Current widget - each line of text is omplemented as a box-less button
 		Fl_Button* current_widget_;
-		// Font and size selectors
+		// Input that accepts pasting to edit current button label
 		intl_input* ip_text_;
+		// Button to change colour
 		Fl_Button* bn_colour_;
+		// Browser to select font
 		Fl_Hold_Browser* br_font_;
+		// Browser to select font size
 		Fl_Hold_Browser* br_size_;
+		// Surrounding window to display current design
 		Fl_Window* card_window_;
 
 	};

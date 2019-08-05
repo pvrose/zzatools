@@ -14,7 +14,10 @@ using namespace std;
 
 namespace zzalog {
 
-	// This class provides a window that can be used to paste in non-ASCII characters into a specified editor widget
+	// This class provides a window that can be used to paste non-ASCII characters into a specified editor widget.
+	// It comprises a number of buttons each of which copies a character to clipboard and pastes it into
+	// the current input or editor widget.
+	// The available characters for pasting can be added to.
 	class intl_dialog : public win_dialog
 	{
 	public:
@@ -30,7 +33,7 @@ namespace zzalog {
 		static void cb_bn_save(Fl_Widget* w, void* v);
 		// Restore saved data
 		static void cb_bn_restore(Fl_Widget* w, void* v);
-		// Add a buttin
+		// Add a button
 		static void cb_bn_add(Fl_Widget* w, void* v);
 		// Copy and paste button
 		static void cb_bn_use(Fl_Widget* w, void* v);

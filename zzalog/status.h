@@ -49,6 +49,7 @@ namespace zzalog {
 		{ ST_FATAL, FL_BLACK }
 	};
 
+	// Code - letters witten to log file to indicate severity of the logged status
 	const map<status_t, char> STATUS_CODES = {
 	{ ST_NONE, ' '},
 	{ ST_LOG, 'L'},
@@ -60,6 +61,7 @@ namespace zzalog {
 	{ ST_FATAL, 'F'}
 	};
 
+	// Styles used by Fl_Text_Display to control font and colour 
 	const Fl_Text_Display::Style_Table_Entry STATUS_STYLES[] = {        // Style label and status
 		{ fl_gray_ramp(4), FL_COURIER_ITALIC, 12, 0 },                  // A - ST_NONE
 		{ fl_gray_ramp(4), FL_COURIER, 12, 0 },                         // B - ST_LOG
@@ -69,6 +71,15 @@ namespace zzalog {
 		{ FL_RED, FL_COURIER, 12, 0} ,                                  // F - ST_ERROR
 		{ fl_darker(FL_RED), FL_COURIER, 12, 0 },                       // G - ST_SEVERE
 		{ fl_darker(FL_RED), FL_COURIER_BOLD, 12, 0}                    // H - ST_FATAL
+	};
+
+	// Default colours for file status
+	const map<file_status_t, Fl_Color> FILE_STATUS_COLOURS = {
+		{ FS_EMPTY, FL_LIGHT2 },
+		{ FS_SAVED, FL_GREEN },
+		{ FS_MODIFIED, FL_RED },
+		{ FS_LOADING, FL_YELLOW },
+		{ FS_SAVING, FL_CYAN }
 	};
 
 	enum object_t;

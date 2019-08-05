@@ -13,6 +13,7 @@
 
 namespace zzalog {
 
+	// Maximum teletype number (for Windows use - TODO: Posix)
 	const unsigned int TTY_MAX = 255;
 
 	// This class provides a dialog to configure the rig connection
@@ -24,6 +25,7 @@ namespace zzalog {
 
 		// protected methods
 	protected:
+		// Load data
 		virtual void load_values();
 		// create the form
 		virtual void create_form(int X, int Y);
@@ -42,14 +44,18 @@ namespace zzalog {
 		// Save rig values
 		void save_hamlib_values();
 
+
 #ifdef _WIN32
+		// state of the windows comms port
 		enum port_state {
 			OK,
 			NOT_PRESENT,
 			NOT_AVAILABLE
 		};
-
+		// Open the windows comms port
 		port_state open_serial(const char * dev);
+#else
+		// TODO: implement posix comms port
 #endif
 
 	protected:
@@ -71,7 +77,7 @@ namespace zzalog {
 		double fast_poll_interval_;
 		// Polling interval when disconnected
 		double slow_poll_interval_;
-		// Omnirig 
+		// Omnirig - rig number (1 or 2)
 		int omnirig_index_;
 		// Hamlib parameters 
 		struct hamlib_data {
@@ -96,6 +102,7 @@ namespace zzalog {
 		string baud_rate_;
 		// Set of actual supported rigs
 		map<string, hamlib_data> actual_rigs_;
+		// Name of current rig (as known by user)
 		string current_rig_;
 		// FLRig parameters
 		// 4-byte IPv4 address

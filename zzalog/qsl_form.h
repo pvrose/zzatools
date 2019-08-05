@@ -19,6 +19,7 @@ const float IN_TO_POINT = 72.0f;
 
 namespace zzalog {
 
+	// THis class defines the current QSL design for printing and displaying
 	class qsl_form : public Fl_Group
 	{
 	public:
@@ -29,7 +30,7 @@ namespace zzalog {
 			POINT       // = 1/72 in.
 		};
 
-		// Data for an individual widget
+		// Data for an individual widget (item of text on the card)
 		struct qsl_widget {
 			string text;
 			Fl_Color colour;
@@ -46,33 +47,42 @@ namespace zzalog {
 			BOTTOM_RIGHT
 		};
 
+		// Default margin
 		const int MARGIN = 10;
 
 	public:
+		// Constructor provides X and Y position (W and H set from design data) and current record to display in card format
 		qsl_form(int x, int y, record* record);
 		~qsl_form();
-		// Resize widget set
+		// Resize widget set - number of lines of text
 		void resize_set(widget_set set, int rows);
-		// Resize table
+		// Resize table - rows x columns
 		void resize_table(int rows, int cols);
-		// Change widget data
+		// Change widget text
 		void update_text(qsl_widget* widget, string value);
+		// Change widget font
 		void update_font(qsl_widget* widget, Fl_Font value);
+		// Change size of font used
 		void update_size(qsl_widget* widget, int value);
+		// Change the text colour
 		void update_colour(qsl_widget* widget, Fl_Color value);
 		// Return unit
 		dim_unit unit();
+		// Set unit
 		void unit(dim_unit unit);
 		// Return width
 		float width();
+		// Set width
 		void width(float width);
 		// Return height
 		float height();
+		// Set height
 		void height(float heigth);
 		// Return size
 		int set_size(widget_set set);
-		// Returb table rows
+		// Return number of rows
 		int table_rows();
+		// Return number of columns
 		int table_cols();
 
 		// Save data

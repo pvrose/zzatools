@@ -60,14 +60,14 @@ namespace zzalog {
 	// Conversion factors - angle
 	const double DEGREE_RADIAN = PI / 180.0;
 	const double RADIAN_DEGREE = 180.0 / PI;
-	// radius of earth in kilometers
+	// radius of earth in kilometers - yes I know the earth is an oblate sphere
 	const double EARTH_RADIUS = 6371.0088;
 
 
 	// This class is a container for the reference prefix database. It maps DXCC code number to
 	// a prefix definition structure with all the information for that DXCC.
 	// The original database has been produced by Alex Shovkoplyas, VE3NEA for use in DxAtlas which
-	// he has made available.
+	// he has made available. The inherited map container holds the database, indexed by DXCC code.
 	class pfx_data : public map<unsigned int, prefix*>
 	{
 	public:

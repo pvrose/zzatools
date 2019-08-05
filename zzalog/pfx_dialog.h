@@ -22,6 +22,7 @@ namespace zzalog {
 	// This class provides the extensions to Fl_Table_Row for use in pfx_dialog
 	class pfx_dlg_table : public Fl_Table_Row {
 	public:
+		// Constructor sets the parent pfx_dialog as well as standard widget construction
 		pfx_dlg_table(pfx_dialog* parent, int X, int Y, int W, int H, const char* label = 0);
 		virtual ~pfx_dlg_table();
 
@@ -50,8 +51,8 @@ namespace zzalog {
 
 	};
 
-	// This class provides a dialog whereby the user selects one of several prefixes that callsign parsing
-	// has detected
+	// This class provides a dialog whereby the user selects one of the prefixes that callsign parsing
+	// has detected for the callsign
 	class pfx_dialog : public win_dialog
 
 	{
@@ -72,7 +73,7 @@ namespace zzalog {
 
 		//public methods
 	public:
-		// Set the list of possible options
+		// Set the list of possible prefixes and the callsign being parsed
 		void set_data(vector<prefix*>* prefixes, string callsign);
 		// Get the selected prefix
 		prefix* get_prefix();

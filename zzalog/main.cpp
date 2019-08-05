@@ -278,10 +278,10 @@ void recent_files() {
 	for (int i = 1; i <= 4; i++) {
 		char path[6];
 		sprintf(path, "File%d", i);
-		char* filename;
+		char* filename = nullptr;
 		recent_settings.get(path, filename, "");
 		// If we have a non empty string then add it to the list
-		if (filename[0]) {
+		if (filename && filename[0]) {
 			recent_files_.push_back(string(filename));
 		}
 		free(filename);
@@ -608,7 +608,7 @@ void add_icon(const char* arg0) {
 	int pos = last_slash - arg0;
 	char* path = new char[pos + 16];
 	strncpy(path, arg0, pos);
-	*(path + pos) = '\0';
+	*(path + pos) = 0;
 	strcat(path, "\\zzalog.png");
 	main_icon_ = new Fl_PNG_Image(path);
 #endif
@@ -622,7 +622,7 @@ void print_args(int argc, char** argv) {
 	for (int i = 0; i < argc; i++) {
 		length += strlen(argv[i]);
 	}
-	char* message = new char[length];
+	char* message = new char[length + 10];
 	// Generate the string
 	strcpy(message, "ZZALOG: ");
 	for (int i = 0; i < argc; i++) {

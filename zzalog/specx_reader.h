@@ -13,6 +13,7 @@ namespace zzalog {
 	class spec_data;
 	struct spec_dataset;
 
+	// XML element types used in ADIF specification
 	enum specx_element_t {
 		SXE_NONE,        // Not yet processing an element
 		SXE_ADIF,        // Top-level element <adif version=".." status="Released" created = "ISO date"> datatypes enumerations fields</adif>
@@ -26,6 +27,8 @@ namespace zzalog {
 		SXE_FIELDS       // Fields dataset <fields>header record+</field>
 
 	};
+
+	// This class reads the XML specification and loads it into the specification database
 	class specx_reader :
 		public xml_reader
 	{

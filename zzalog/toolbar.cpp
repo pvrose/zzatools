@@ -465,6 +465,7 @@ void toolbar::cb_bn_explain(Fl_Widget* w, void* v) {
 	delete tip_record;
 }
 
+// Return the minimum width required
 int toolbar::min_w() { return min_w_;  }
 
 // Set the record number to get the default input for the input

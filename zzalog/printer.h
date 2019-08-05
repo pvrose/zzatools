@@ -14,13 +14,15 @@ using namespace std;
 
 namespace zzalog {
 
-	// This class provides the print facility to print the log book
+	// This class provides the print facility to print the log book and QSL cards
 	class printer : public Fl_Printer
 	{
 	public:
+		// Constructor - defines whether the main log in book format, extracted log in book format or as QSL cards 
 		printer(object_t object);
 		virtual ~printer();
 
+		// Does the printing
 		int do_job();
 
 	protected:
@@ -55,7 +57,7 @@ namespace zzalog {
 		vector<field_info_t> fields_;
 		// Object being printed
 		object_t type_;
-		// Dimensions of card window
+		// Dimensions of QSL card window
 		int cwin_x_;
 		int cwin_y_;
 		int cwin_w_;

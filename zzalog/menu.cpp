@@ -148,7 +148,7 @@ namespace zzalog {
 	{ "&Name", 0, menu::cb_mi_ref_items, (void*)RI_NAME, FL_MENU_RADIO | FL_MENU_DIVIDER },
 	{ "Add &details", 0, menu::cb_mi_ref_details, nullptr, FL_MENU_TOGGLE },
 	// TODO: implement a real callback for this menu item
-	{ "&Reload data", 0, menu::cb_mi_dummy, (void*)"Reference->Reload data" },
+	{ "&Reload data", 0, menu::cb_mi_ref_reload, 0},
 	{ 0 },
 	{ 0 },
 	{ "Re&port", 0, 0, 0, FL_SUBMENU },
@@ -251,16 +251,6 @@ menu::~menu()
 	clear();
 	Fl_Preferences spad_settings(settings_, "Scratchpad");
 	spad_settings.set("Edit view", editting_view_);
-}
-
-// Dummy callback as place-holder for unimplemented menu items
-// v is a char* with the name of the menu item
-void menu::cb_mi_dummy(Fl_Widget*, void* v) {
-	// Display a warning message
-	char* message = new char[strlen((char*)v) + 50];
-	sprintf(message, "MENU: Item %s not yet implemented", (char*)v);
-	status_->misc_status(ST_WARNING, message);
-	delete[] message;
 }
 
 // File->New
@@ -1111,6 +1101,13 @@ void menu::cb_mi_ref_details(Fl_Widget* w, void* v) {
 	bool value = item->value();
 	((pfx_tree*)tabbed_view_->get_view(OT_PREFIX))->add_details(value);
 	tabbed_view_->activate_pane(OT_PREFIX, true);
+}
+
+// Reference->Reload Data - reload the specification data
+// v is not used
+void menu::cb_mi_ref_reload(Fl_Widget* w, void* v) {
+	// Get spec_data_ to reload itself
+	spec_data_->load_data(true);
 }
 
 // Report->Clear etc. - set the report filter

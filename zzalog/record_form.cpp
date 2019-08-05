@@ -39,7 +39,7 @@ extern intl_dialog* intl_dialog_;
 
 using namespace std;
 
-
+// Actions for non-dedicated buttons
 enum edit_action_t {
 	NONE,         // No action
 	START,        // Start a new entry
@@ -139,7 +139,7 @@ record_form::record_form(int X, int Y, int W, int H, const char* label, field_or
 	// Card image and its filename
 	int curr_x = X + XLEFT;
 	int curr_y = Y + YTOP;
-	// Box - for the display of a card image
+	// Box - for the display of a card image or if no cardd exists the callsign in large text
 	card_display_ = new Fl_Group(curr_x, curr_y, WCARD, HCARD);
 	card_display_->box(FL_UP_BOX);
 	card_display_->tooltip("The card image is displayed here!");
@@ -481,7 +481,7 @@ record_form::record_form(int X, int Y, int W, int H, const char* label, field_or
 
 }
 
-// estructor
+// Destructor
 record_form::~record_form()
 {
 	delete saved_record_;
@@ -717,6 +717,7 @@ void record_form::cb_bn_quick(Fl_Widget* w, void* v) {
 }
 
 // Modify messages button has been pressed - save to settings
+// v is unused
 void record_form::cb_bn_modify(Fl_Widget* w, void* v) {
 	record_form* that = ancestor_view<record_form>(w);
 	Fl_Preferences qsl_settings(settings_, "QSL");
@@ -749,6 +750,7 @@ void record_form::cb_bn_scale(Fl_Widget* w, void* v) {
 }
 
 // Set the QSL_RCVD and QSLRDATE values in current record
+// v is unused
 void record_form::cb_bn_log_card(Fl_Widget* w, void* v) {
 	record_form* that = ancestor_view<record_form>(w);
 	string today = now(false, "%Y%m%d");
@@ -762,22 +764,25 @@ void record_form::cb_bn_log_card(Fl_Widget* w, void* v) {
 	}
 }
 
-// report back action to import data
+// Actions for configurable buttons
 // v is enum edit_action_t indicating which of the buttons was pressed under which condition
 void record_form::cb_bn_edit(Fl_Widget* w, long v) {
 	edit_action_t action = (edit_action_t)v;
 	record_form* that = ancestor_view<record_form>(w);
 	switch (action) {
 	case START:
+		// Start a new record
 		that->my_book_->new_record(menu_->logging());
 		that->use_mode_ = UM_QSO;
 		break;
 	case RESTART:
+		// Save current record and start a new one
 		that->my_book_->save_record();
 		that->my_book_->new_record(menu_->logging());
 		that->use_mode_ = UM_QSO;
 		break;
 	case SAVE:
+		// Save current record
 		that->my_book_->save_record();
 		that->use_mode_ = UM_DISPLAY;
 		break;
@@ -790,33 +795,35 @@ void record_form::cb_bn_edit(Fl_Widget* w, long v) {
 		that->my_book_->delete_record(true);
 		break;
 	case REJECT:
+		// Discard the queried record
 		import_data_->discard_update();
 		break;
 	case ADD:
+		// Add the queried record to the log
 		import_data_->save_update();
 		break;
 	case MERGE:
-		// Merge the changes 
+		// Merge the changes from the queried record
 		import_data_->merge_update();
 		break;
 	case KEEP_LOG:
-		// Discard the duplicate
+		// Discard the queried possible duplicate
 		navigation_book_->reject_dupe(false);
 		break;
 	case KEEP_DUPE:
-		// Discard the duplicate
+		// Keep the queried possible duplicate record and discard the original record
 		navigation_book_->reject_dupe(true);
 		break;
 	case MERGE_DUPE:
-		// Merge data from duplicate and discard it
+		// Discard the queried duplicate record after merging the two records
 		navigation_book_->merge_dupe();
 		break;
 	case KEEP_BOTH:
-		// Record is not a dupe - keep it
+		// Queried duplicate record is not a duplicate, keep both it and the original record
 		navigation_book_->accept_dupe();
 		break;
 	}
-	// delete query record and restart update and eqsl queue.
+	// delete pointer to query record
 	that->record_2_ = nullptr;
 	that->item_num_2_ = -1;
 	that->record_table_->set_records(that->record_1_, that->record_2_, nullptr);
@@ -825,12 +832,14 @@ void record_form::cb_bn_edit(Fl_Widget* w, long v) {
 	case REJECT:
 	case ADD:
 	case MERGE:
+		// Restart the update process
 		import_data_->update_book();
 		break;
 	case KEEP_LOG:
 	case KEEP_DUPE:
 	case MERGE_DUPE:
 	case KEEP_BOTH:
+		// Restart the duplicate check process
 		navigation_book_->check_dupes(false);
 		break;
 	}
@@ -896,7 +905,7 @@ void record_form::update(hint_t hint, record_num_t record_num_1, record_num_t re
 	case HT_INSERTED:
 	case HT_NEW_DATA:
 	case HT_NO_DATA:
-		// Current selected item number may have changed - display the record
+		// Current selected item number may have changed - display the selected record
 		item_num_1_ = item_num_1;
 		item_num_2_ = -1;
 		this->record_1_ = my_book_->get_record(item_num_1_, false);
@@ -929,7 +938,7 @@ void record_form::update(hint_t hint, record_num_t record_num_1, record_num_t re
 		update_form();
 		break;
 	case HT_IMPORT_QUERY:
-		// display both the possible log entry and the import data - allow addressing the query
+		// display both the possible log entry and the queried record - allow addressing the query
 		item_num_1_ = item_num_1;
 		item_num_2_ = item_num_2;
 		this->record_1_ = my_book_->get_record(item_num_1_, false);
@@ -943,7 +952,7 @@ void record_form::update(hint_t hint, record_num_t record_num_1, record_num_t re
 		update_form();
 		break;
 	case HT_IMPORT_QUERYNEW:
-		// Display just the import query record - allow addressing the query
+		// Display just the queried record
 		item_num_1_ = item_num_1;
 		item_num_2_ = item_num_2;
 		this->record_1_ = nullptr;
@@ -990,7 +999,7 @@ void record_form::update_form() {
 		}
 		set_image();
 	}
-	// Display the image choise buttons
+	// Display the image choice buttons
 	set_image_buttons();
 	// Get the QSL messages from settings
 	Fl_Preferences qsl_settings(settings_, "QSL");
@@ -1178,6 +1187,7 @@ void record_form::set_image() {
 			}
 		}
 		else {
+			// Delete the image - we'll generate the QSL card later
 			delete image_;
 			image_ = nullptr;
 		}
@@ -1226,6 +1236,7 @@ void record_form::set_image_buttons() {
 
 // Draw the selected QSL card image (or callsign if no image)
 void record_form::draw_image() {
+	// Remove existing images
 	card_display_->clear();
 	card_display_->label(nullptr);
 	card_display_->image(nullptr);
@@ -1234,9 +1245,10 @@ void record_form::draw_image() {
 	case QI_EQSL:
 	case QI_CARD_BACK:
 	case QI_CARD_FRONT:
+		// We want to display the saved QSL image
 		if (image_) {
 			// we have an image
-			// Set the rsized image as the selected and unselected image for the control
+			// Set the resized image as the selected and unselected image for the control
 			card_display_->image(image_);
 			card_display_->deimage(image_);
 			// Set the image fileanme text colour black (i.e. OK)
@@ -1253,6 +1265,7 @@ void record_form::draw_image() {
 		}
 		break;
 	case QI_GEN_CARD:
+		// Generate the QSL card (as to be printed)
 		if (record_1_ != nullptr) {
 			qsl_form* card = new qsl_form(card_display_->x(), card_display_->y(), record_1_);
 			card_display_->color(FL_WHITE);

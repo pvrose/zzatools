@@ -10,7 +10,7 @@ the international character dialog
 */
 namespace zzalog {
 
-	// An editor for modifying a fields value - it allows cut and paste
+	// An editor for modifying various string items - it axxepts pastes from intl_dialog
 	class intl_editor : public Fl_Text_Editor
 	{
 		// Whether the editor is inserting or overwriting
@@ -24,7 +24,7 @@ namespace zzalog {
 	};
 
 
-	// Version of Fl_Input that accepts pastes from internati
+	// Version of Fl_Input that accepts pastes from intl_dialog
 	class intl_input : public Fl_Input
 	{
 	public:

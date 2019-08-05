@@ -149,6 +149,8 @@ int pfx_dlg_table::clicks() { return last_clicks_; }
 // Dialog constructor
 pfx_dialog::pfx_dialog() :
 	win_dialog(500, 200, "Prefix Selection")
+	, button_(BN_OK)
+	, selection_(0)
 {
 	prefixes_ = nullptr;
 

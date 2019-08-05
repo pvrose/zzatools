@@ -44,14 +44,6 @@ spec_data::spec_data()
 	, inhibit_error_report_(false)
 	, loaded_filename_("")
 {
-	// Clear all containers
-	field_names_.clear();
-	userdef_names_.clear();
-	appdef_names_.clear();
-	dxccs_with_states_.clear();
-	datatype_indicators_.clear();
-	this->clear();
-
 	// get data and load it
 	load_data(false);
 }
@@ -123,6 +115,14 @@ string spec_data::get_path(bool force) {
 
 // load the data
 bool spec_data::load_data(bool force) {
+	// Clear all containers
+	field_names_.clear();
+	userdef_names_.clear();
+	appdef_names_.clear();
+	dxccs_with_states_.clear();
+	datatype_indicators_.clear();
+	this->clear();
+
 	bool ok = true;
 	// Get the directory
 	string directory = get_path(force);
@@ -1753,7 +1753,7 @@ bool spec_data::auto_correction(error_t error_code, const string&  data, const s
 		if (field == "QSL_RCVD_VIA" || field == "QSL_SENT_VIA") {
 			// Value M no longer supported - no alternate value
 			if (data == "M") {
-				record_->item(field, "");
+				record_->item(field, string(""));
 				correction_message_ = field + "=M removed" + ".";
 				return true;
 			}
@@ -1806,7 +1806,7 @@ bool spec_data::auto_correction(error_t error_code, const string&  data, const s
 				// Franz Iosef Land 
 				if (data == "FJL") {
 					// Change to Arkhangelsk Oblast
-					record_->item(field, "AR");
+					record_->item(field, string("AR"));
 					correction_message_ = "Franz Josef Land: STATE=FJL auto-corrected to STATE=AR";
 					return true;
 				}
@@ -1815,7 +1815,7 @@ bool spec_data::auto_correction(error_t error_code, const string&  data, const s
 				// Malyj Vysotski
 				if (data == "MV") {
 					// Change to Leningradski Oblast
-					record_->item(field, "LO");
+					record_->item(field, string("LO"));
 					correction_message_ = "Malyy Vysotski: STATE=MV auto-corrected to STATE=LO";
 					return true;
 				}
@@ -1824,7 +1824,7 @@ bool spec_data::auto_correction(error_t error_code, const string&  data, const s
 				// Sardinia
 				if (data == "MD") {
 					// Medio Capidano - change ID
-					record_->item(field, "VS");
+					record_->item(field, string("VS"));
 					correction_message_ = "Sardinia: STATE=MD auto-corrected to STATE=VS";
 					return true;
 				}
@@ -1833,13 +1833,13 @@ bool spec_data::auto_correction(error_t error_code, const string&  data, const s
 				// Italy
 				if (data == "FO") {
 					// Forli - change name and ID to Forli-Cesena (FC)
-					record_->item(field, "FC");
+					record_->item(field, string("FC"));
 					correction_message_ = "Italy: STATE=FO auto-corrected to STATE=FC";
 					return true;
 				}
 				else if (data == "PS") {
 					// Pesaro e Urbino - change ID
-					record_->item(field, "PU");
+					record_->item(field, string("PU"));
 					correction_message_ = "Italy: STATE=PS auto-corrected to STATE=PU";
 					return true;
 				}
@@ -1849,7 +1849,7 @@ bool spec_data::auto_correction(error_t error_code, const string&  data, const s
 		if (field == "CONTEST_ID") {
 			if (data == "EA-RTTY" || data == "RAC") {
 				// Contest removedfrom list
-				record_->item(field, "", true);
+				record_->item(field, string(""), true);
 				correction_message_ = field + "=" + display_item + " removed.";
 				return true;
 			}
@@ -1920,7 +1920,7 @@ bool spec_data::auto_correction(error_t error_code, const string&  data, const s
 			// ARRL Section
 			if (data == "NWT") {
 				// Change of ID for North West Territories
-				record_->item("ARRL_SECT", "NT");
+				record_->item("ARRL_SECT", string("NT"));
 				correction_message_ = "ARRL_SECT=NWT auto-corrected to ARRL_SECT=NT";
 				return true;
 			}

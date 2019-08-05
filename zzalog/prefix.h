@@ -34,17 +34,17 @@ namespace zzalog {
 		string name_;						// Name of country/region/speciality
 		string nickname_;					// Usual prefix as a nickname
 		vector<unsigned int> cq_zones_;		// All the zones in the area
-		vector<unsigned int> itu_zones_;		// ditto
+		vector<unsigned int> itu_zones_;	// ditto
 		vector<string> continents_;			// All continents it's in
-		string timezone_;						    // Timezone(s) TODO: make an array
-		unsigned int dxcc_code_;			    // DXCC code
+		string timezone_;					// Timezone(s) TODO: make an array
+		unsigned int dxcc_code_;			// DXCC code
 		string state_;				    	// ADIF province ID
 		string valid_from_;					// date valid from
 		string valid_to_;					// Date valid to
 		vector<string> patterns_;			// matching patterns to parse calls
 		prefix* parent_;				    // Pointer to parent
-		vector<prefix*> children_;       // List of pointers to child prefix records
-		unsigned int depth_;                 // Depth of record
+		vector<prefix*> children_;          // List of pointers to child prefix records
+		unsigned int depth_;                // Depth of record
 
 	public:
 		// Constructor - default values

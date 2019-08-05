@@ -12,7 +12,7 @@
 using namespace std;
 
 namespace zzalog {
-	// This class handles the reading of the prefix reference files and loads into pfx_data
+	// This class handles the reading of the prefix reference data and loads into pfx_data
 	class pfx_reader
 	{
 
@@ -36,7 +36,7 @@ namespace zzalog {
 		long file_size_;
 		// Number of bytes read
 		long byte_count_;
-		// Number of bytes read previous ly reported
+		// Number of bytes read previously reported
 		long previous_count_;
 	};
 

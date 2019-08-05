@@ -30,7 +30,7 @@ namespace zzalog {
 		MT_SWL_NOMATCH       // An SWL report that is no match for any activity
 	};
 
-	// Record type
+	// Logging mode - used when initialising a record
 	enum logging_mode_t {
 		LM_OFF_AIR,     // Off-line logging
 		LM_RADIO_CONN,  // radio connected to log
@@ -38,6 +38,7 @@ namespace zzalog {
 		LM_IMPORTED     // Auto-import
 	};
 
+	// The records are kept in a container with size_t as index
 	typedef size_t record_num_t;
 
 	// This class represents a single record as a container of field items NAME=>VALUE

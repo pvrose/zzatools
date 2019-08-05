@@ -15,7 +15,7 @@ using namespace std;
 
 namespace zzalog {
 	// This class implements are tabular view of a book. It inherits the tabular view from Fl_Table_Row
-	// and the necessary book view freatures from view
+	// and the necessary book view features from view
 	class log_table : public Fl_Table_Row, public view
 
 	{
@@ -34,7 +34,7 @@ namespace zzalog {
 		// inherited from Fl_Widget
 		virtual int handle(int event);
 
-		// Return fields
+		// Returns the name and attributes of the fields currently being displayed
 		vector<field_info_t>& fields();
 
 		// Protected methods

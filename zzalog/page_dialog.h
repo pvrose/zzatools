@@ -8,12 +8,14 @@
 #include <FL/Fl_Widget.H>
 
 namespace zzalog {
+	// Standard settings dialog ahs OK, Save and Cancel buttons - each settings tab needs to implement them.
 	enum cfg_action_t {
 		CA_OK,                  // OK button pressed
 		CA_SAVE,                // Save button pressed
 		CA_CANCEL               // Cancel button pressed
 	};
 
+	// The tab types in the settings dialog
 	enum cfg_dialog_t {
 		DLG_FORMAT,
 		DLG_RIG,
@@ -30,7 +32,7 @@ namespace zzalog {
 	const int WCONFIG = 600;
 	const int HCONFIG = 500;
 
-	// This class is a base class for use with settings dialogs
+	// This class is a base class for the individual tabs within the settings dialog
 	class page_dialog : public Fl_Group
 
 	{

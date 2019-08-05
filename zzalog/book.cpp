@@ -798,7 +798,7 @@ void book::save_record() {
 void book::delete_record(bool force) {
 	// Either entering a new record or user allows to delete a saved record
 	if (force || new_record_) {
-		// We cannot delete twp records at once as it confuses the value of current_item_
+		// We cannot delete two records at once as it confuses the value of current_item_
 		if (delete_in_progress_) {
 			status_->misc_status(ST_WARNING, "LOG: Delete record inhibited");
 		}

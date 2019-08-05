@@ -24,16 +24,6 @@ extern bool read_only_;
 extern void add_sub_window(Fl_Window* w);
 extern void remove_sub_window(Fl_Window* w);
 
-// Default colours for file status
-const map<file_status_t, Fl_Color> FILE_STATUS_COLOURS = {
-	{ FS_EMPTY, FL_LIGHT2 },
-	{ FS_SAVED, FL_GREEN },
-	{ FS_MODIFIED, FL_RED },
-	{ FS_LOADING, FL_YELLOW },
-	{ FS_SAVING, FL_CYAN }
-};
-
-
 // Constructor
 status::status(int X, int Y, int W, int H, const char * label) :
 	Fl_Group(X, Y, W, H, label)
@@ -312,9 +302,9 @@ void status::misc_status(status_t status, const char* label) {
 		delete[] message;
 	}
 
-	// Fatal error - ask user to continue
 	switch(status) {
 	case ST_SEVERE:
+		// A severe error - ask the user whether to continue
 		if (fl_choice("An error that resulted in reduced functionality occurred:\n%s\n\nDo you want to try to continue or quit?", "Continue", "Quit", nullptr, label, report_filename_.c_str()) == 1) {
 			// Call the exit handler
 			Fl::wait();
@@ -323,6 +313,7 @@ void status::misc_status(status_t status, const char* label) {
 			main_window_->do_callback();
 		}
 	case ST_FATAL:
+		// A fatal error - quit the application
 		fl_message("An unrecoverable error has occurred, closing down - check status log");
 		Fl::wait();
 		// Open status file viewer and update it : remove from list to be deleted when closing
@@ -337,6 +328,7 @@ void status::misc_status(status_t status, const char* label) {
 void status::file_status(file_status_t status) {
 	Fl_Color colour;
 	if (read_only_) {
+		// set a darker version of the colour if the file is read-only
 		colour = fl_darker(FILE_STATUS_COLOURS.at(status));
 	}
 	else {
@@ -398,6 +390,7 @@ void status::cb_bn_misc(Fl_Widget* w, void* v) {
 	that->colour_buffer();
 }
 
+// Format the display depending on the first characer of each line of text
 void status::colour_buffer() {
 	Fl_Text_Buffer* buffer = status_file_viewer_->buffer();
 	int num_chars = buffer->length();
@@ -435,10 +428,12 @@ void status::colour_buffer() {
 	delete[] style;
 }
 
+// Return a pointer to the status
 Fl_Widget* status::misc_status() {
 	return misc_status_;
 }
 
+// Set the minimum status severity level that is displayed
 void status::min_level(status_t level) {
 	min_level_ = level;
 	Fl_Preferences status_settings(settings_, "Status");

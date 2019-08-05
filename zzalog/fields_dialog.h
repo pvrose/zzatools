@@ -17,6 +17,7 @@ using namespace std;
 namespace zzalog {
 
 	// This class allows the fields to be displayed in a table together with parameters 
+	// it is only used in fields_dialog
 	class fields_table :
 		public Fl_Table_Row
 	{
@@ -48,6 +49,7 @@ namespace zzalog {
 	{
 	public:
 
+		// Constructor
 		fields_dialog(int X, int Y, int W, int H, const char* label);
 		virtual ~fields_dialog();
 

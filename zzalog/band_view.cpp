@@ -60,10 +60,10 @@ band_view::band_view(double frequency, int W, int H, const char* label) :
 		recalculate(rig_frequency_);
 		// Set frequency slider value and step values
 		((Fl_Counter*)w_freq_slider_)->value(frequency_);
-		((Fl_Counter*)w_freq_slider_)->step(cycles_per_major_, step_value_);
+		((Fl_Counter*)w_freq_slider_)->step(khz_per_major_, step_value_);
 		// Display zoom value as cycles per tick.
 		char temp[128];
-		sprintf(temp, "%g kHz", cycles_per_minor_);
+		sprintf(temp, "%g kHz", khz_per_minor_);
 		((Fl_Output*)w_cycles_per_)->value(temp);
 		show();
 		redraw();
@@ -223,7 +223,7 @@ void band_view::create_form() {
 	val1->type(FL_VERTICAL);
 	val1->callback(cb_roll_zoom, (void*)&zoom_value_);
 	val1->tooltip("Zoom in or out");
-	val1->bounds(0, NUM_ZOOMS - 1);
+	val1->bounds(0, (double)NUM_ZOOMS - 1);
 	val1->step(1);
 	val1->value(zoom_value_);
 
@@ -239,7 +239,7 @@ void band_view::create_form() {
 	out1->type(FL_NORMAL_COUNTER);
 	out1->tooltip("Displays cycles per tick for selected zoom");
 	char temp[128];
-	sprintf(temp, "%g kHz", cycles_per_minor_);
+	sprintf(temp, "%g kHz", khz_per_minor_);
 	out1->value(temp);
 	w_cycles_per_ = out1;
 
@@ -275,17 +275,20 @@ void band_view::create_form() {
 
 // Convert frequency to text
 void band_view::freqy_to_text(double frequency, char* text) {
-	switch ((int)(cycles_per_major_ * 1000)) {
+	switch ((int)(khz_per_major_ * 1000)) {
 	case 10:
+		// 10 Hz per tick - display as x.xx kHz
 		sprintf(text, "%0.2f", frequency);
 		break;
 	case 100:
+		// 100 Hz per tick - display as x.x kHz
 		sprintf(text, "%0.1f", frequency);
 		break;
 	case 1000:
 	case 10000:
 	case 100000:
 	case 1000000:
+		// 1KHz or greater - display as kHz.
 		sprintf(text, "%0.0f", frequency);
 		break;
 	}
@@ -316,7 +319,7 @@ int band_view::draw_scale() {
 	// Draw the ticks
 	for (int curr_x = pixel_lhs_; curr_x <= pixel_rhs_; curr_x +=PIXELS_PER_TICK) {
 		// See if we draw a major or minor tick
-		if ((long long)(frequency * 1000) % (int)(cycles_per_major_ * 1000) == 0) {
+		if ((long long)(frequency * 1000) % (int)(khz_per_major_ * 1000) == 0) {
 			// major tick - long tick and draw label
 			freqy_to_text(frequency, text);
 			fl_draw(90, text, curr_x, text_y);
@@ -326,7 +329,7 @@ int band_view::draw_scale() {
 			// minor tick - short tick only
 			fl_line(curr_x, stick_y, curr_x, horiz_y);
 		}
-		frequency += cycles_per_minor_;
+		frequency += khz_per_minor_;
 	}
 	// Return the current y position to draw next item
 	return horiz_y + 5;
@@ -427,8 +430,8 @@ void band_view::draw() {
 // Convert frequency to a x-pixel position
 int band_view::x_pos(double frequency) {
 	double offset = frequency - freqy_lhs_;
-	// Multiply first by pixels_per_tick then divide by cycles_per_tick to avoid truncation error
-	return (int)(offset * (double)PIXELS_PER_TICK / cycles_per_minor_) + pixel_lhs_;
+	// Multiply first by pixels_per_tick then divide by khz_per_tick to avoid truncation error
+	return (int)(offset * (double)PIXELS_PER_TICK / khz_per_minor_) + pixel_lhs_;
 }
 
 // Zoom slider callback
@@ -442,10 +445,10 @@ void band_view::cb_roll_zoom(Fl_Widget* w, void* v) {
 	that->recalculate(that->frequency_);
 	// Display zoom value in cycles per tick
 	char temp[128];
-	sprintf(temp, "%g kHz", that->cycles_per_minor_);
+	sprintf(temp, "%g kHz", that->khz_per_minor_);
 	((Fl_Output*)that->w_cycles_per_)->value(temp);
 	// Change frequency step values
-	((Fl_Counter*)that->w_freq_slider_)->step(that->cycles_per_minor_, that->step_value_);
+	((Fl_Counter*)that->w_freq_slider_)->step(that->khz_per_minor_, that->step_value_);
 	// redraw
 	that->redraw();
 	// Save new value
@@ -481,15 +484,15 @@ void band_view::cb_bn_reset(Fl_Widget* w, void* v) {
 void band_view::recalculate(double frequency) {
 	bool found = false;
 	// New zoom value
-	cycles_per_minor_ = POSS_MINOR[zoom_value_];
+	khz_per_minor_ = POSS_MINOR[zoom_value_];
 	// Get the appropriate major tick separation
-	cycles_per_major_ = POSS_MAJOR[zoom_value_ / 3];
+	khz_per_major_ = POSS_MAJOR[zoom_value_ / 3];
 	// Set the frequency roller step value
-	step_value_ = cycles_per_minor_ * (num_ticks_ - 1);
+	step_value_ = khz_per_minor_ * ((long)num_ticks_ - 1);
 	// Calculate mid, left and right frequencies
-	// Round mid_frequency_ to nearest multiple of cycles_per_minor_
-	mid_frequency_ = round(frequency / cycles_per_minor_) * cycles_per_minor_;
-	double delta_freq = (double)num_ticks_ * cycles_per_minor_ / 2;
+	// Round mid_frequency_ to nearest multiple of khz_per_minor_
+	mid_frequency_ = round(frequency / khz_per_minor_) * khz_per_minor_;
+	double delta_freq = (double)num_ticks_ * khz_per_minor_ / 2;
 	freqy_lhs_ = mid_frequency_ - delta_freq;
 	freqy_rhs_ = mid_frequency_ + delta_freq;
 }
@@ -545,7 +548,7 @@ double band_view::x_frequency(int x) {
 	// Convert it to numbers of ticks
 	double ticks = (double)pixels / (double)PIXELS_PER_TICK;
 	// Andf convert that to a frequency offset and add LH edge frequency
-	double result = (ticks * cycles_per_minor_) + freqy_lhs_;
+	double result = (ticks * khz_per_minor_) + freqy_lhs_;
 	return result;
 }
 

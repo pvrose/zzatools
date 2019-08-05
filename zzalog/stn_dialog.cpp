@@ -62,6 +62,7 @@ void stn_dialog::power_table::add_data(map<int, int>* data) {
 	redraw_table();
 }
 
+// Overloaded method to draw each cell
 void stn_dialog::power_table::draw_cell(TableContext context,  		// table cell drawing
 	int R, int C, int X, int Y, int W, int H) {
 	switch (context) {

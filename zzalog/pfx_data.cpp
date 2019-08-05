@@ -27,7 +27,7 @@ pfx_data::pfx_data()
 	// get data and load it.
 	string filename = get_file(false);
 	pfx_reader* reader = new pfx_reader;
-	// Carry attempting to read the file until successful
+	// Carry attempting to read the file until successful or user cancels
 	bool carry_on = true;
 	while (!reader->load_data(*this, filename) && carry_on) {
 		status_->misc_status(ST_ERROR, "PFX_DATA: Unable to load prefix reference - please reselect directory!");

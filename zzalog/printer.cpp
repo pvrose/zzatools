@@ -19,7 +19,7 @@ const Fl_Font PRINT_FONT = FL_HELVETICA;
 const int HEADER_SIZE = 12;
 const int ROW_SIZE = 9;
 
-// Constructor - supply the book to print (main log or extract)
+// Constructor - supply the book to print (main log or extract or extract(cards))
 printer::printer(object_t type) :
 	Fl_Printer()
 	, printable_height_(0)
@@ -28,6 +28,14 @@ printer::printer(object_t type) :
 	, type_(type)
 	, current_y_(0)
 	, number_pages_(0)
+	, card_h_(0)
+	, card_w_(0)
+	, cwin_h_(0)
+	, cwin_w_(0)
+	, cwin_x_(0)
+	, cwin_y_(0)
+	, num_cols_(0)
+	, num_rows_(0)
 {
 	fields_.clear();
 }

@@ -51,6 +51,7 @@ namespace zzalog {
 		public view, public Fl_Tree
 	{
 	public:
+		// Constructor initialises Fl_Tree and view
 		report_tree(int X, int Y, int W, int H, const char* label, field_ordering_t app);
 		~report_tree();
 
@@ -71,7 +72,7 @@ namespace zzalog {
 			record_list_t* record_list;
 			// map of entries to display under this entry
 			map<string, report_map_entry_t*>* next_entry;
-
+			// Default constructor
 			report_map_entry_t() {
 				entry_type = 0;
 				entry_cat = RC_DXCC;

@@ -10,7 +10,7 @@ using namespace std;
 
 namespace zzalog {
 
-	// XML-RPC Request/Response
+	// XML-RPC Request/Response - XML element types
 	enum rpc_element_t {
 		XRP_NONE,               // Not in an element - at top-level
 		XRP_METHODCALL,         // <methodCall> - requesting paticular method
@@ -33,6 +33,7 @@ namespace zzalog {
 		XRP_BASE64,             // <base64> - Binary information encoded as Base 64, as defined in RFC 2045
 	};
 
+	// XML-RPC data types
 	enum rpc_data_t {
 		XRT_EMPTY,              // Empty data set
 		XRT_INT,                // I4

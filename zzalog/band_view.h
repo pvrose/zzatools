@@ -12,9 +12,13 @@ using namespace std;
 namespace zzalog {
 
 	// Constants
+	// Number of pixels per division on the horizontal scale
 	const int PIXELS_PER_TICK = 10;
+	// POssible sub-division values for intermediate divisions
 	const double POSS_MINOR[] = { 0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1., 2., 5., 10., 20., 50., 100., 200., 500. };
+	// Possible values for the larger sub-divisions
 	const double POSS_MAJOR[] = { 0.1, 1., 10., 100., 1000. };
+	// Number of values
 	const int NUM_ZOOMS = sizeof(POSS_MINOR) / sizeof(double);
 
 	// This class provides a stand-alone window that displays the band-plan around the current
@@ -110,10 +114,10 @@ namespace zzalog {
 		double freqy_lhs_;
 		// Right hand frequency
 		double freqy_rhs_;
-		// Number of cycles per minor tick
-		double cycles_per_minor_;
-		// Number of cycles per major tick
-		double cycles_per_major_;
+		// Number of kHz per minor tick
+		double khz_per_minor_;
+		// Number of kHz per major tick
+		double khz_per_major_;
 		// Zoom value
 		int zoom_value_;
 		// Mid frequency

@@ -41,10 +41,11 @@ void qsl_form::load_default() {
 	width_ = 99.1f;
 	height_ = 66.7f;
 	unit_ = MILLIMETER;
-
+	// Default design - Contact call un top right
 	tr_widgets_ = {
 		{ "To <CALL>", FL_RED, 14, FL_HELVETICA }
 	};
+	// Default design - location info in top left
 	tl_widgets_ = {
 		{ "<MY_NAME> <STATION_CALLSIGN>", FL_BLACK, 8, FL_HELVETICA },
 		{ "<MY_CITY>",  FL_BLACK, 8, FL_HELVETICA },
@@ -53,6 +54,7 @@ void qsl_form::load_default() {
 		{ "Grid: <MY_GRIDSQUARE>", FL_BLACK, 8, FL_HELVETICA }
 
 	};
+	// CEntral box - QSO details
 	tab_widgets_ = {
 		{{ "Date", FL_BLACK, 10, FL_HELVETICA },
 		 { "Time", FL_BLACK, 10, FL_HELVETICA },
@@ -67,9 +69,11 @@ void qsl_form::load_default() {
 		 { "<RST_SENT>", FL_BLUE, 10, FL_HELVETICA_ITALIC }
 		}
 	};
+	// Bottom right - salutation
 	br_widgets_ = {
 		{ "Tnx Report, <NAME>, 73", FL_BLACK, 10, FL_HELVETICA_ITALIC }
 	};
+	// Bottom left - station details
 	bl_widgets_ = {
 		{ "Rig: <MY_RIG>", FL_BLACK, 8, FL_HELVETICA },
 		{ "Ant: <MY_ANTENNA>", FL_BLACK, 8, FL_HELVETICA }
@@ -128,18 +132,24 @@ void qsl_form::read_settings(Fl_Preferences& settings, vector<qsl_form::qsl_widg
 	}
 }
 
+// Create the card design
 void qsl_form::create_form() {
 	// dimensions in points
 	int width = to_points(width_);
 	int height = to_points(height_);
 	size(width, height);
+	// current y value on both sides
 	int ly = y() + MARGIN;
 	int ry = y() + MARGIN;
+	// Draw lines of text both top left and top right
 	draw_lines(FL_ALIGN_LEFT, ly, tl_widgets_);
 	draw_lines(FL_ALIGN_RIGHT, ry, tr_widgets_);
+	// Current y value to below the lower of the two
 	int curr_y = max(ly, ry) + GAP;
+	// Draw the central box
 	draw_table(curr_y);
 	curr_y += GAP;
+	// Current y below the central box
 	ly = curr_y;
 	ry = curr_y;
 	draw_lines(FL_ALIGN_LEFT, ly, bl_widgets_);
@@ -148,12 +158,16 @@ void qsl_form::create_form() {
 	end();
 }
 
+// Draw the lines of text for one of the four corners,
+// align indicates left or right, curr_y where to put it, widgets - the lines of text
+// returns with the latest y position in curr_y
 void qsl_form::draw_lines(Fl_Align align, int& curr_y, vector<qsl_form::qsl_widget>& widgets) {
 	// dimensions in points
 	int width = to_points(width_);
 	for (auto it = widgets.begin(); it != widgets.end(); it++) {
 		int curr_h = it->font_size + 1;
 		int curr_x = x() + ((align & FL_ALIGN_LEFT) ? MARGIN : (width / 2));
+		// Add each line of text as a button with no border. use a button so it responds to being clicked
 		Fl_Button* item = new Fl_Button(curr_x, curr_y, (width / 2) - MARGIN, curr_h);
 		item->box(FL_NO_BOX);
 		item->copy_label(record_ ? record_->item_merge(it->text).c_str() : it->text.c_str());
@@ -167,18 +181,21 @@ void qsl_form::draw_lines(Fl_Align align, int& curr_y, vector<qsl_form::qsl_widg
 	}
 }
 
+// Draw the central box
 void qsl_form::draw_table(int& curr_y) {
 	// dimensions in points
 	int width = to_points(width_);
+	// For each row
 	for (auto it = tab_widgets_.begin(); it != tab_widgets_.end(); it++) {
 		int curr_x = x() + MARGIN;
 		int curr_w = (width - MARGIN - MARGIN) / it->size();
-		// Get highest defined column
+		// Get the largest height required for each cell
 		int curr_h = 0;
 		for (auto col = it->begin(); col != it->end(); col++) {
 			int next_h = col->font_size + 1;
 			if (next_h > curr_h) curr_h = next_h;
 		}
+		// Create a button for each cell - with a border
 		for (auto col = it->begin(); col != it->end(); col++) {
 			Fl_Button* item = new Fl_Button(curr_x, curr_y, curr_w, curr_h);
 			item->box(FL_BORDER_FRAME);
@@ -194,7 +211,7 @@ void qsl_form::draw_table(int& curr_y) {
 	}
 }
 
-// Call back for all form widgets - this call qsl_form's callback which can be set by an instancing class
+// Call back for all form widgets - this calls qsl_form's callback which can be set by an instancing class
 void qsl_form::cb_button(Fl_Widget* w, void* v) {
 	qsl_form* that = ancestor_view<qsl_form>(w);
 	((qsl_design*)that->designer_)->display_design_data((Fl_Button*)w, (qsl_widget*)v);
@@ -204,8 +221,10 @@ void qsl_form::cb_button(Fl_Widget* w, void* v) {
 int qsl_form::to_points(float value) {
 	switch (unit_) {
 	case INCH:
+		// 72 points per inch
 		return (int)(value * IN_TO_POINT);
 	case MILLIMETER:
+		// 72/25.4 points per mm
 		return (int)(value * MM_TO_POINT);
 	case POINT:
 		return (int)value;
@@ -236,6 +255,7 @@ void qsl_form::resize_set(qsl_form::widget_set set, int rows) {
 		widgets->resize((size_t)rows);
 		if (old_size) {
 			if (old_size < (size_t)rows) {
+				// Adding rows to existing ones
 				qsl_widget& last_widget = (*widgets)[old_size - 1];
 				// Add any required new widgets - using colour, font and size of the last one (if there was one
 				for (size_t i = old_size; i < (size_t)rows; i++) {
@@ -244,7 +264,7 @@ void qsl_form::resize_set(qsl_form::widget_set set, int rows) {
 				}
 			}
 		} else {
-			// Add black, helvetica 8
+			// Add rows to a new set - use Helvetica 8
 			for (size_t i = 0; i < (size_t)rows; i++) {
 				(*widgets)[i] = { "Type text...", FL_BLACK, 8, FL_HELVETICA };
 			}
@@ -283,7 +303,7 @@ void qsl_form::resize_table(int rows, int cols) {
 	update();
 }
 
-// Change widget data
+// Change widget text
 void qsl_form::update_text(qsl_form::qsl_widget* widget, string value) {
 	if (widget) {
 		widget->text = value;
@@ -291,7 +311,7 @@ void qsl_form::update_text(qsl_form::qsl_widget* widget, string value) {
 	}
 }
 
-// Change widget data
+// Change widget font
 void qsl_form::update_font(qsl_form::qsl_widget* widget, Fl_Font value) {
 	if (widget) {
 		widget->font = value;
@@ -299,7 +319,7 @@ void qsl_form::update_font(qsl_form::qsl_widget* widget, Fl_Font value) {
 	}
 }
 
-// Change widget data
+// Change widget font size
 void qsl_form::update_size(qsl_form::qsl_widget* widget, int value) {
 	if (widget) {
 		widget->font_size = value;
@@ -307,7 +327,7 @@ void qsl_form::update_size(qsl_form::qsl_widget* widget, int value) {
 	}
 }
 
-// Change widget data
+// Change widget colour
 void qsl_form::update_colour(qsl_form::qsl_widget* widget, Fl_Color value) {
 	if (widget) {
 		widget->colour = value;
@@ -320,6 +340,7 @@ qsl_form::dim_unit qsl_form::unit() {
 	return unit_;
 }
 
+// Set unit
 void qsl_form::unit(dim_unit unit) {
 	unit_ = unit;
 	update();
@@ -330,6 +351,7 @@ float qsl_form::width() {
 	return width_;
 }
 
+// Set width
 void qsl_form::width(float width) {
 	width_ = width;
 	update();
@@ -340,6 +362,7 @@ float qsl_form::height() {
 	return height_;
 }
 
+// Set height
 void qsl_form::height(float height) {
 	height_ = height;
 	update();
@@ -361,11 +384,12 @@ int qsl_form::set_size(qsl_form::widget_set set) {
 	}
 }
 
-// Returb table rows
+// Return table rows
 int qsl_form::table_rows() {
 	return tab_widgets_.size();
 }
 
+// REturn table columns
 int qsl_form::table_cols() {
 	if (tab_widgets_.size()) {
 		return tab_widgets_[0].size();

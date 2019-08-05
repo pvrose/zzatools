@@ -16,6 +16,7 @@ namespace zzalog {
 
 	// text is column header
 	const char WEEKDAY[7][2] = { "S", "M", "T", "W", "T", "F", "S" };
+	// Format date is represented in ADIF
 	const char ADIF_DATEFORMAT[] = "%Y%m%d";
 
 	// Datatype to pass to a calendar call back
@@ -24,10 +25,12 @@ namespace zzalog {
 		string* date_value;
 		// The input widget to receive the date
 		intl_input* date_input;
+		// Default constructor
 		cal_cb_data_t() {
 			date_value = nullptr;
 			date_input = nullptr;
 		}
+		// Initialising constructor
 		cal_cb_data_t(string* dv, intl_input* di) {
 			date_value = dv;
 			date_input = di;
@@ -97,6 +100,7 @@ namespace zzalog {
 		static void cb_bn_cal(Fl_Widget* w, void* v);
 		// Callback when calendar is clicked
 		static void cb_cal_cal(Fl_Widget* w, void* v);
+		// Update the various representations of the date
 		void change_date();
 
 		// attributes

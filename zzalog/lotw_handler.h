@@ -8,6 +8,7 @@
 
 namespace zzalog {
 
+	// The timestamp format required by the ARRL header record.
 	const char LOTW_TIMEFORMAT[] = "%Y-%m-%d %H:%M:%S";
 
 

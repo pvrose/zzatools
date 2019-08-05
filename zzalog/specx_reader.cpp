@@ -7,6 +7,7 @@ using namespace zzalog;
 
 extern status* status_;
 
+// Constructor
 specx_reader::specx_reader() :
 	xml_reader()
 	, data_(nullptr)
@@ -15,12 +16,13 @@ specx_reader::specx_reader() :
 	, record_data_(nullptr)
 	, element_data_("")
 	, in_file_(nullptr)
+	, num_ignored_(0)
 {
 	elements_.clear();
 	column_headers_.clear();
 }
 
-
+// Destructor
 specx_reader::~specx_reader()
 {
 	elements_.clear();
@@ -30,6 +32,7 @@ specx_reader::~specx_reader()
 	}
 }
 
+// Load the specification data from the suppled stream - return the ADIF version skimmed from data in version
 bool specx_reader::load_data(spec_data* data, istream& in, string& version) {
 	data_ = data;
 	in_file_ = &in;
@@ -63,7 +66,7 @@ bool specx_reader::load_data(spec_data* data, istream& in, string& version) {
 	}
 }
 
-// Start 
+// Start an XML element
 bool specx_reader::start_element(string name, map<string, string>* attributes) {
 	string element_name = to_upper(name);
 	bool result = true;
@@ -290,6 +293,7 @@ bool specx_reader::start_fields() {
 	}
 }
 
+// End element - call the appropriate handler for the element type
 bool specx_reader::end_element(string name) {
 	string element_name = to_upper(name);
 	specx_element_t element = elements_.back();
@@ -331,6 +335,7 @@ bool specx_reader::end_element(string name) {
 	return false;
 }
 
+// end element for ADIF
 bool specx_reader::end_adif() {
 	// End of the XML - no action
 	if (num_ignored_) {
@@ -341,23 +346,27 @@ bool specx_reader::end_adif() {
 	return true;
 }
 
+// End element for datatypes
 bool specx_reader::end_datatypes() {
 	dataset_name_ = "";
 	column_headers_.clear();
 	return true;
 }
 
+// End element for header
 bool specx_reader::end_header() {
 	// Do nothing
 	return true;
 }
 
+// End element for a value within header
 bool specx_reader::end_header_value() {
 		// Add the column name - in order of the header value elements
 	column_headers_.push_back(element_data_);
 	return true;
 }
 
+// End record element
 bool specx_reader::end_record() {
 	// Add the record to the dataset
 	// For PAS and SAS need to check DXCC entity code is the same - if not create a new dataset
@@ -386,7 +395,7 @@ bool specx_reader::end_record() {
 	return true;
 }
 
-// Reached the end of the recod item
+// Reached the end of the record item
 bool specx_reader::end_record_value() {
 	if (record_data_ == nullptr) {
 		status_->misc_status(ST_FATAL, "SPEC READ: Programming error");

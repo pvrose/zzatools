@@ -11,7 +11,7 @@ using namespace std;
 
 namespace zzalog {
 
-	// auto-import polling - 15s -> 5 min (default 1 min)
+	// auto-import polling period - 15s -> 5 min (default 1 min)
 	const double AUTO_IP_MAX = 300.0;
 	const double AUTO_IP_MIN = 15.0;
 	const double AUTO_IP_DEF = 60.0;
@@ -24,7 +24,7 @@ namespace zzalog {
 	class import_data : public book
 	{
 	public:
-		// Update mode
+		// Update or import mode
 		enum update_mode_t {
 			NONE,            // Book has no data
 			AUTO_IMPORT,     // Book contains data being auto-imported 
@@ -39,7 +39,7 @@ namespace zzalog {
 		import_data();
 		~import_data();
 
-		// Timer callback
+		// Timer callback for auto-update
 		static void cb_timer_imp(void* v);
 
 		// public methods

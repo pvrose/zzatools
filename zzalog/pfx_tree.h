@@ -25,6 +25,7 @@ namespace zzalog {
 		public Fl_Tree, public view
 	{
 	public:
+		// Constructor uses the constructor parameters for both the widget and view
 		pfx_tree(int X, int Y, int W, int H, const char* label, field_ordering_t app);
 		virtual ~pfx_tree();
 

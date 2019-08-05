@@ -21,6 +21,7 @@ using namespace zzalog;
 extern Fl_Preferences* settings_;
 extern book* book_;
 
+// Constructor - standard page dialog
 qsl_design::qsl_design(int X, int Y, int W, int H, const char* label) :
 	page_dialog(X, Y, W, H, label)
 	, current_design_(nullptr)
@@ -36,11 +37,13 @@ qsl_design::qsl_design(int X, int Y, int W, int H, const char* label) :
 	do_creation(X, Y);
 }
 
+// Delete created items
 qsl_design::~qsl_design() {
 	delete current_design_;
 	delete card_window_;
 }
 
+// Load the current design from the settings
 void qsl_design::load_values() {
 	// Get the settings by creating a qsl_form
 	record* record = book_->get_record();
@@ -54,6 +57,7 @@ void qsl_design::load_values() {
 	card_window_->end();
 }
 
+//  create the form to edit the design
 void qsl_design::create_form(int X, int Y) {
 	// Group 1 to define size
 	const int XGRP1 = X + EDGE;
@@ -252,6 +256,7 @@ void qsl_design::create_form(int X, int Y) {
 	show();
 }
 
+// Save the new design
 void qsl_design::save_values() {
 	current_design_->save_data();
 }
@@ -308,7 +313,7 @@ void qsl_design::cb_vip_sizeu(Fl_Widget* w, void* v) {
 	}
 }
 
-// Callback when text value changed
+// Callback when text value changed 
 void qsl_design::cb_ip_text(Fl_Widget* w, void* v) {
 	qsl_design* that = ancestor_view<qsl_design>(w);
 	string value;
@@ -342,7 +347,7 @@ void qsl_design::cb_bn_colour(Fl_Widget* w, void* v) {
 	that->enable_widgets();
 }
 
-// Call back when a radio button is pressed
+// Call back when a radio button is pressed - v indicates which button
 void qsl_design::cb_radio_dim(Fl_Widget* w, void* v) {
 	qsl_design* that = ancestor_view<qsl_design>(w);
 	that->current_design_->unit((qsl_form::dim_unit)(long)v);
@@ -391,7 +396,7 @@ void qsl_design::populate_size() {
 			br_size_->value(current_data_->font_size);
 		}
 		else {
-			// Only list available fonts
+			// Only list available sizes
 			int select = 0;
 			for (int i = 0; i < num_sizes; i++) {
 				// while the current value is less than required up the select value
@@ -407,6 +412,7 @@ void qsl_design::populate_size() {
 	}
 }
 
+// Handle  the show events - hide or show the window where the design is being displayed
 int qsl_design::handle(int event) {
 	switch (event) {
 	case FL_SHOW:

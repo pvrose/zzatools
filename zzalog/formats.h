@@ -1,3 +1,6 @@
+/* Format enumerated types and strings
+*/
+
 #ifndef __FORMATS__
 #define __FORMATS__
 
@@ -20,10 +23,12 @@ namespace zzalog {
 		FREQ_MHz = 6
 	};
 
+	// Units used in displaying freaquencies.
 	const string FREQ_FORMATS[3] = {
 		"Hz", "kHz", "MHz"
 	};
 
+	// formats used in displaying frequencies with the precision defined as a frequency_t enum.
 	const string FREQ_PRECISION[7] = {
 		"%.6f", "%.5f", "%.4f", "%.3f", "%.2f", "%.1f", "%.0f"
 	};
@@ -37,10 +42,12 @@ namespace zzalog {
 		DATE_DD_MON_YYYY,
 	};
 
+	// Formats used for displaying dates
 	const string DATE_FORMATS[5] = {
 		"%Y%m%d", "%Y/%m/%d", "%d/%m/%Y", "%m/%d/%Y", "%d-%b-%Y"
 	};
 
+	// Formats used in a menu for displaying format options.
 	const string DATE_FORMATS_MENU[5] = {
 		"%Y%m%d", "%Y\\/%m\\/%d", "%d\\/%m\\/%Y", "%m\\/%d\\/%Y", "%d-%b-%Y"
 	};
@@ -52,10 +59,12 @@ namespace zzalog {
 		TIME_LOGGED
 	};
 
+	// Menu items formats for displaying time
 	const string TIME_FORMATS[3] = {
 		"%H%M%S", "%H%M", "As Logged"
 	};
 
+	// Formats used for times
 	const string TIME_PRECISION[2] = {
 		"%H%M%S", "%H%M"
 	};
@@ -66,6 +75,7 @@ namespace zzalog {
 		DPWR_dBW
 	};
 
+	// Units used in displaying power.
 	const string POWER_FORMATS[2] = {
 		"W", "dBw"
 	};
@@ -76,6 +86,7 @@ namespace zzalog {
 		SIG_dBm
 	};
 
+	// Units used in displaying signal strength
 	const string SIGNAL_FORMATS[2] = {
 		"S-points", "dBm"
 	};
@@ -91,6 +102,7 @@ namespace zzalog {
 		PWR_100W,
 	};
 
+	// Menu items for selecting power precision
 	const string POWER_PRECISION[7] = {
 		"100 mW", "500 mW", "1 W", "5 W", "10 W", "50 W", "100 W"
 	};

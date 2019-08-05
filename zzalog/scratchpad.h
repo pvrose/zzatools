@@ -16,6 +16,7 @@ using namespace std;
 
 namespace zzalog {
 
+	// This class provides a standalone dialog in which user can type real-time data from the QSO and set fields in the record
 	class scratchpad :
 		public win_dialog
 	{
@@ -50,6 +51,7 @@ namespace zzalog {
 		// Enable widgets
 		void enable_widgets();
 
+		// Actions attached to the various buttons
 		enum actions {
 			WRITE_CALL,
 			WRITE_NAME,
