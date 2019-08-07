@@ -178,6 +178,8 @@ namespace zzalog {
 		string get_path(bool force);
 		// Sort filed names
 		void process_fieldnames();
+		// Combine mode and submode into single dataset
+		void process_modes();
 		// Check the data is the correct format for the field either against a regex for specific datatypes
 		error_t check_format(const string&  data, const string&  field, const string&  datatype, const basic_regex<char>& pattern);
 		// Check that data is in the correct value range

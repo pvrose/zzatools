@@ -938,7 +938,7 @@ bool book::refine_match(record* record) {
 		return false;
 	}
 	// Refine by mode - confirm if the record has that mode (converted to DXCC modes PHONE, CW, DATA)
-	if (criteria_->mode != "Any" && criteria_->mode == record->item("MODE")) {
+	if (criteria_->mode != "Any" && criteria_->mode != record->item("MODE")) {
 		return false;
 	}
 	// Refine by eQSL card - confirm if eQSL confirmation

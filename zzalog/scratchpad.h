@@ -47,6 +47,12 @@ namespace zzalog {
 		static void cb_cancel(Fl_Widget* w, void* v);
 		// Callback - start button
 		static void cb_start(Fl_Widget* w, void* v);
+		// Callback - frequency input
+		static void cb_ip_freq(Fl_Widget* w, void* v);
+		// Callback - band choice
+		static void cb_ch_mode(Fl_Widget* w, void* v);
+		// Callback - power input
+		static void cb_ip_power(Fl_Widget* w, void* v);
 
 		// Enable widgets
 		void enable_widgets();

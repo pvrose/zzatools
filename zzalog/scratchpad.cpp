@@ -8,6 +8,7 @@
 #include "tabbed_forms.h"
 #include "menu.h"
 #include "intl_dialog.h"
+#include "spec_data.h"
 
 #include <regex>
 
@@ -15,6 +16,8 @@
 #include <FL/Fl_Check_Button.H>
 #include <FL/Fl_Choice.H>
 #include <FL/Fl_Preferences.H>
+#include <FL/Fl_Input.H>
+#include <FL/Fl_Hold_Browser.H>
 
 using namespace zzalog;
 
@@ -25,6 +28,7 @@ extern tabbed_forms* tabbed_view_;
 extern menu* menu_;
 extern Fl_Preferences* settings_;
 extern intl_dialog* intl_dialog_;
+extern spec_data* spec_data_;
 extern void add_scratchpad();
 
 
@@ -42,7 +46,6 @@ scratchpad::scratchpad() :
 // Destructor - delete dynamic objects and save position
 scratchpad::~scratchpad()
 {
-	delete record_;
 	Fl_Preferences spad_settings(settings_, "Scratchpad");
 	spad_settings.set("Top", this->y_root());
 	spad_settings.set("Left", this->x_root());
@@ -54,6 +57,7 @@ void scratchpad::create_form() {
 	const int HEDITOR = h() - EDGE - EDGE;
 	const int C2 = EDGE + WEDITOR + GAP;
 	const int C3 = C2 + WBUTTON;
+	const int C2A = C2 + (WBUTTON / 2);
 
 	// Create the editor
 	buffer_ = new Fl_Text_Buffer(1024);
@@ -125,7 +129,50 @@ void scratchpad::create_form() {
 	ch_field->tooltip("Select the field you want the selected text to be written to");
 	ch_field->callback(cb_text<Fl_Choice, string>, (void*)&field_);
 
+	curr_y += HTEXT;
+	const int W2A = WBUTTON * 3 / 2;
+	Fl_Input* ip_freq = new Fl_Input(C2A, curr_y, W2A, HTEXT, "Freq");
+	ip_freq->textfont(FONT);
+	ip_freq->textsize(FONT_SIZE);
+	ip_freq->labelfont(FONT);
+	ip_freq->labelsize(FONT_SIZE);
+	ip_freq->align(FL_ALIGN_LEFT);
+	ip_freq->tooltip("Enter frequency of operation, if different");
+	ip_freq->callback(cb_ip_freq);
+
+	curr_y += HTEXT;
+	Fl_Choice* ch_mode = new Fl_Choice(C2A, curr_y, W2A, HTEXT, "Mode");
+	ch_mode->textfont(FONT);
+	ch_mode->textsize(FONT_SIZE);
+	ch_mode->labelfont(FONT);
+	ch_mode->labelsize(FONT_SIZE);
+	ch_mode->align(FL_ALIGN_LEFT);
+	ch_mode->tooltip("Select mode of operatio, if different");
+	ch_mode->callback(cb_ch_mode);
+
+	curr_y += HTEXT;
+	Fl_Input* ip_power = new Fl_Input(C2A, curr_y, W2A, HTEXT);
+	ip_power->textfont(FONT);
+	ip_power->textsize(FONT_SIZE);
+	ip_power->labelfont(FONT);
+	ip_power->labelsize(FONT_SIZE);
+	ip_power->align(FL_ALIGN_LEFT);
+	ip_power->tooltip("Enter transmit power, if different");
+	ip_power->callback(cb_ip_power);
+
+	record* prev_record = book_->get_record(book_->size() - 1, false);
+	if (prev_record) {
+		ip_freq->value(prev_record->item("FREQ").c_str());
+		spec_data_->initialise_field_choice(ch_mode, "Combined", prev_record->item("MODE", true));
+		ip_power->value(prev_record->item("TX_PWR").c_str()); 
+	}
+	else {
+		ip_freq->value("14.020");
+		spec_data_->initialise_field_choice(ch_mode, "Submode", "CW");
+		ip_power->value("100");
+	}
 	curr_y += HTEXT + GAP;
+
 	bn_save_ = new Fl_Button(C2, curr_y, WBUTTON, HBUTTON, "Save");
 	bn_save_->labelsize(FONT_SIZE);
 	bn_save_->labelfont(FONT);
@@ -138,6 +185,10 @@ void scratchpad::create_form() {
 	bn_cancel_->tooltip("Cancel the record");
 	bn_cancel_->callback(cb_cancel);
 
+	// Resize if now too big
+	curr_y = max(curr_y + HBUTTON + EDGE, h());
+	size(w(), curr_y);
+	editor_->size(editor_->w(), curr_y - EDGE - EDGE);
 	end();
 	show();
 
@@ -237,6 +288,49 @@ void scratchpad::cb_start(Fl_Widget* w, void* v) {
 	scratchpad* that = ancestor_view<scratchpad>(w);
 	that->record_ = book_->new_record(menu_->logging());
 	that->enable_widgets();
+}
+
+// Frequency input
+void scratchpad::cb_ip_freq(Fl_Widget* w, void* v) {
+	scratchpad* that = ancestor_view<scratchpad>(w);
+	if (that->record_) {
+		string value;
+		cb_value<Fl_Input, string>(w, &value);
+		that->record_->item("FREQ", value);
+		// Update views
+		tabbed_view_->update_views(nullptr, HT_MINOR_CHANGE, book_->size() - 1);
+	}
+}
+
+// Mode choice
+void scratchpad::cb_ch_mode(Fl_Widget* w, void* v) {
+	scratchpad* that = ancestor_view<scratchpad>(w);
+	if (that->record_) {
+		string value;
+		cb_choice_text(w, &value);
+		if (spec_data_->is_submode(value)) {
+			that->record_->item("SUBMODE", value);
+			that->record_->item("MODE", spec_data_->mode_for_submode(value));
+		}
+		else {
+			that->record_->item("MODE", value);
+			that->record_->item("SUBMODE", string(""));
+		}
+		// Update views
+		tabbed_view_->update_views(nullptr, HT_CHANGED, book_->size() - 1);
+	}
+}
+
+// Power input
+void scratchpad::cb_ip_power(Fl_Widget* w, void* v) {
+	scratchpad* that = ancestor_view<scratchpad>(w);
+	if (that->record_) {
+		string value;
+		cb_value<Fl_Input, string>(w, &value);
+		that->record_->item("TX_PWR", value);
+		// Update views
+		tabbed_view_->update_views(nullptr, HT_MINOR_CHANGE, book_->size() - 1);
+	}
 }
 
 // Enable/disable conditional buttons

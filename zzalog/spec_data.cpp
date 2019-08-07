@@ -146,6 +146,7 @@ bool spec_data::load_data(bool force) {
 	delete reader;
 	if (ok) {
 		process_fieldnames();
+		process_modes();
 		add_my_appdefs();
 	}
 	return ok;
@@ -215,7 +216,7 @@ string spec_data::dxcc_mode(string mode) {
 // Get the ADIF mode for a submode
 string spec_data::mode_for_submode(string submode) {
 	// Get the Submode dataset
-	spec_dataset* table = dataset("Submode[" + submode + ']');
+	spec_dataset* table = dataset("Submode");
 	auto it = table->data.find(submode);
 	if (it != table->data.end()) {
 		// If there's an entry for this mode return the Mode field
@@ -264,8 +265,8 @@ double spec_data::freq_for_band(string band) {
 // Is a particulat mode a submode of another mode?
 bool spec_data::is_submode(string mode) {
 	// Get the Submode dataset
-	string submode = "Submode[" + mode + ']';
-	if (find (submode) != end()) {
+	spec_dataset* submodes = dataset("Submode");
+	if (submodes->data.find(mode) != submodes->data.end()) {
 		// If there's an entry return that it's a submode
 		return true;
 	}
@@ -2201,4 +2202,29 @@ void spec_data::add_my_appdefs() {
 		i++;
 	}
 
+}
+
+// Combine mode and submode into single dataset
+void spec_data::process_modes() {
+	spec_dataset* modes = dataset("Mode");
+	spec_dataset* submodes = dataset("Submode");
+	spec_dataset* combined = new spec_dataset;
+	combined->column_names = { "Is Mode", "Mode" };
+	for (auto it = modes->data.begin(); it != modes->data.end(); it++) {
+		if (it->second->find("Input Only") == it->second->end()) {
+			map<string, string>* data = new map<string, string>;
+			(*data)[string("Is Mode")] = "Yes";
+			(*data)[string("Mode")] = it->first;
+			combined->data[it->first] = data;
+		}
+	}
+	for (auto it = submodes->data.begin(); it != submodes->data.end(); it++) {
+		if (it->second->find("Input Only") == it->second->end()) {
+			map<string, string>* data = new map<string, string>;
+			(*data)[string("Is Mode")] = "No";
+			(*data)[string("Mode")] = it->second->at("Mode");
+			combined->data[it->first] = data;
+		}
+	}
+	(*this)["Combined"] = combined;
 }
