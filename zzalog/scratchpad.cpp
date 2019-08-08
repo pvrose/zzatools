@@ -9,6 +9,8 @@
 #include "menu.h"
 #include "intl_dialog.h"
 #include "spec_data.h"
+#include "rig_if.h"
+#include "band_view.h"
 
 #include <regex>
 
@@ -29,6 +31,8 @@ extern menu* menu_;
 extern Fl_Preferences* settings_;
 extern intl_dialog* intl_dialog_;
 extern spec_data* spec_data_;
+extern rig_if* rig_if_;
+extern band_view* band_view_;
 extern void add_scratchpad();
 
 
@@ -131,46 +135,64 @@ void scratchpad::create_form() {
 
 	curr_y += HTEXT;
 	const int W2A = WBUTTON * 3 / 2;
-	Fl_Input* ip_freq = new Fl_Input(C2A, curr_y, W2A, HTEXT, "Freq");
-	ip_freq->textfont(FONT);
-	ip_freq->textsize(FONT_SIZE);
-	ip_freq->labelfont(FONT);
-	ip_freq->labelsize(FONT_SIZE);
-	ip_freq->align(FL_ALIGN_LEFT);
-	ip_freq->tooltip("Enter frequency of operation, if different");
-	ip_freq->callback(cb_ip_freq);
+	ip_freq_ = new Fl_Input(C2A, curr_y, W2A, HTEXT, "Freq");
+	ip_freq_->textfont(FONT);
+	ip_freq_->textsize(FONT_SIZE);
+	ip_freq_->labelfont(FONT);
+	ip_freq_->labelsize(FONT_SIZE);
+	ip_freq_->align(FL_ALIGN_LEFT);
+	ip_freq_->tooltip("Enter frequency of operation, if different");
+	ip_freq_->callback(cb_ip_freq);
 
 	curr_y += HTEXT;
-	Fl_Choice* ch_mode = new Fl_Choice(C2A, curr_y, W2A, HTEXT, "Mode");
-	ch_mode->textfont(FONT);
-	ch_mode->textsize(FONT_SIZE);
-	ch_mode->labelfont(FONT);
-	ch_mode->labelsize(FONT_SIZE);
-	ch_mode->align(FL_ALIGN_LEFT);
-	ch_mode->tooltip("Select mode of operatio, if different");
-	ch_mode->callback(cb_ch_mode);
+	ch_mode_ = new Fl_Choice(C2A, curr_y, W2A, HTEXT, "Mode");
+	ch_mode_->textfont(FONT);
+	ch_mode_->textsize(FONT_SIZE);
+	ch_mode_->labelfont(FONT);
+	ch_mode_->labelsize(FONT_SIZE);
+	ch_mode_->align(FL_ALIGN_LEFT);
+	ch_mode_->tooltip("Select mode of operatio, if different");
+	ch_mode_->callback(cb_ch_mode);
 
 	curr_y += HTEXT;
-	Fl_Input* ip_power = new Fl_Input(C2A, curr_y, W2A, HTEXT);
-	ip_power->textfont(FONT);
-	ip_power->textsize(FONT_SIZE);
-	ip_power->labelfont(FONT);
-	ip_power->labelsize(FONT_SIZE);
-	ip_power->align(FL_ALIGN_LEFT);
-	ip_power->tooltip("Enter transmit power, if different");
-	ip_power->callback(cb_ip_power);
+	ip_power_ = new Fl_Input(C2A, curr_y, W2A, HTEXT);
+	ip_power_->textfont(FONT);
+	ip_power_->textsize(FONT_SIZE);
+	ip_power_->labelfont(FONT);
+	ip_power_->labelsize(FONT_SIZE);
+	ip_power_->align(FL_ALIGN_LEFT);
+	ip_power_->tooltip("Enter transmit power, if different");
+	ip_power_->callback(cb_ip_power);
 
 	record* prev_record = book_->get_record(book_->size() - 1, false);
-	if (prev_record) {
-		ip_freq->value(prev_record->item("FREQ").c_str());
-		spec_data_->initialise_field_choice(ch_mode, "Combined", prev_record->item("MODE", true));
-		ip_power->value(prev_record->item("TX_PWR").c_str()); 
+	string frequency;
+	string power;
+	string mode;
+	string submode;
+	if (rig_if_ && menu_->logging() == LM_RADIO_CONN) {
+		// Get data from rig
+		frequency = rig_if_->get_tx_frequency();
+		power = rig_if_->get_tx_power();
+		rig_if_->get_string_mode(mode, submode);
+	}
+	else if (record_) {
+		frequency = record_->item("FREQ");
+		power = record_->item("TX_PWR");
+		mode = record_->item("MODE", true);
+	}
+	else if (prev_record) {
+		frequency = prev_record->item("FREQ");
+		power = prev_record->item("TX_PWR");
+		mode = prev_record->item("MODE", true);
 	}
 	else {
-		ip_freq->value("14.020");
-		spec_data_->initialise_field_choice(ch_mode, "Submode", "CW");
-		ip_power->value("100");
+		frequency = "14.250";
+		power = "100";
+		mode = "USB";
 	}
+	ip_freq_->value(frequency.c_str());
+	spec_data_->initialise_field_choice(ch_mode_, "Combined", mode);
+	ip_power_->value(power.c_str()); 
 	curr_y += HTEXT + GAP;
 
 	bn_save_ = new Fl_Button(C2, curr_y, WBUTTON, HBUTTON, "Save");
@@ -287,6 +309,21 @@ void scratchpad::cb_close(Fl_Widget* w, void* v) {
 void scratchpad::cb_start(Fl_Widget* w, void* v) {
 	scratchpad* that = ancestor_view<scratchpad>(w);
 	that->record_ = book_->new_record(menu_->logging());
+	if (menu_->logging() != LM_RADIO_CONN) {
+		that->record_->item("FREQ", string(that->ip_freq_->value()));
+		string mode;
+		cb_choice_text(that->ch_mode_, &mode);
+		if (spec_data_->is_submode(mode)) {
+			that->record_->item("SUBMODE", mode);
+			that->record_->item("MODE", spec_data_->mode_for_submode(mode));
+		}
+		else {
+			that->record_->item("MODE", mode);
+			that->record_->item("SUBMODE", string(""));
+		}
+		that->record_->item("TX_PWR", string(that->ip_power_->value()));
+		tabbed_view_->update_views(nullptr, HT_CHANGED, book_->size() - 1);
+	}
 	that->enable_widgets();
 }
 
@@ -296,7 +333,14 @@ void scratchpad::cb_ip_freq(Fl_Widget* w, void* v) {
 	if (that->record_) {
 		string value;
 		cb_value<Fl_Input, string>(w, &value);
+		double freq = stod(value) * 1000;
 		that->record_->item("FREQ", value);
+		if (band_view_ && !band_view_->in_band(freq)) {
+			((Fl_Input*)w)->textcolor(FL_RED);
+		}
+		else {
+			((Fl_Input*)w)->textcolor(FL_BLACK);
+		}
 		// Update views
 		tabbed_view_->update_views(nullptr, HT_MINOR_CHANGE, book_->size() - 1);
 	}
@@ -348,6 +392,21 @@ void scratchpad::enable_widgets() {
 	}
  }
 
+// Called when rig is read
+void scratchpad::rig_update(string frequency, string mode, string power) {
+	ip_freq_->value(frequency.c_str());
+	double freq = stod(frequency) * 1000;
+	if (band_view_ && !band_view_->in_band(freq)) {
+		ip_freq_->textcolor(FL_RED);
+	}
+	else {
+		ip_freq_->textcolor(FL_BLACK);
+	}
+	ip_power_->value(power.c_str());
+	int index = ch_mode_->find_index(mode.c_str());
+	ch_mode_->value(index);
+	redraw();
+}
 
 // Default Text_Editor constructor
 scratchpad::editor::editor(int X, int Y, int W, int H) :

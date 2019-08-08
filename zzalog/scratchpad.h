@@ -11,6 +11,8 @@
 #include <FL/Fl_Widget.H>
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Text_Buffer.H>
+#include <FL/Fl_Input.H>
+#include <FL/Fl_Choice.H>
 
 using namespace std;
 
@@ -26,6 +28,9 @@ namespace zzalog {
 
 		// Callback - close button
 		static void cb_close(Fl_Widget* w, void* v);
+
+		// Called when rig is read
+		void rig_update(string frequency, string mode, string power);
 
 	protected:
 		class editor : public Fl_Text_Editor
@@ -78,6 +83,12 @@ namespace zzalog {
 		Fl_Button* bn_cancel_;
 		// Start button
 		Fl_Button* bn_start_;
+		// Frequency input
+		Fl_Input* ip_freq_;
+		// Mode choice
+		Fl_Choice* ch_mode_;
+		// Power input
+		Fl_Input* ip_power_;
 
 		// The record being entered
 		record* record_;

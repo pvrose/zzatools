@@ -554,3 +554,21 @@ double band_view::x_frequency(int x) {
 
 // Initialised OK
 bool band_view::valid() { return valid_; }
+
+// Is the supplied frequency in a band
+bool band_view::in_band(double frequency) {
+	bool found = false;
+	bool result = false;
+	for (auto it = entries_.begin(); it != entries_.end() && !found; it++) {
+		if ((*it)->lower <= frequency) {
+			if ((*it)->upper > frequency) {
+				result = true;
+				found = true;
+			}
+		}
+		else {
+			found = true;
+		}
+ 	}
+	return result;
+}

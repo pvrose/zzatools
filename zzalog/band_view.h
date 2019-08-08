@@ -67,6 +67,8 @@ namespace zzalog {
 
 		// Data loaded OK
 		bool valid();
+		// is the frequency supplied in band?
+		bool in_band(double frequency);
 
 	protected:
 		// Add the fixed widgets

@@ -92,6 +92,10 @@ namespace zzalog {
 
 		// return mode/submode
 		void get_string_mode(string& mode, string& submode);
+		// return frequency
+		string get_tx_frequency();
+		// return power
+		string get_tx_power();
 		// Return open message
 		string success_message();
 

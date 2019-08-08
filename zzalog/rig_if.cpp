@@ -4,6 +4,7 @@
 #include "menu.h"
 #include "utils.h"
 #include "band_view.h"
+#include "scratchpad.h"
 
 #include <FL/Fl.H>
 #include <FL/Fl_Preferences.H>
@@ -17,6 +18,7 @@ extern status* status_;
 extern rig_if* rig_if_;
 extern band_view* band_view_;
 extern menu* menu_;
+extern scratchpad* scratchpad_;
 
 extern void remove_sub_window(Fl_Window* w);
 
@@ -258,6 +260,59 @@ string rig_if::rig_info() {
 	return rig_info;
 }
 
+// Return the transmit frequency
+string rig_if::get_tx_frequency() {
+	// get settings 
+	Fl_Preferences log_settings(settings_, "Log");
+
+	// Set the frquency display unit and precision
+	frequency_t log_format;
+	string format;
+	log_settings.get("Frequency Precision", (int&)log_format, (int)FREQ_Hz);
+	double frequency = tx_frequency() / 1000000.0;
+
+	switch (log_format) {
+	case FREQ_Hz:
+		format = "%0.6f";
+		break;
+	case FREQ_Hz10:
+		format = "%0.5f";
+		break;
+	case FREQ_Hz100:
+		format = "%0.4f";
+		break;
+	case FREQ_kHz:
+		format = "%0.3f";
+		break;
+	case FREQ_kHz10:
+		format = "%0.2f";
+		break;
+	case FREQ_kHz100:
+		format = "%0.1f";
+		break;
+	case FREQ_MHz:
+		format = "%0.0f";
+		break;
+	default:
+		format = "%0d";
+	}
+	// Format the text for the display
+	char text[100];
+	sprintf(text, format.c_str(), frequency);
+
+	return text;
+
+}
+
+// Return the power
+string rig_if::get_tx_power() {
+	double tx_power = power_drive();
+	char text[100];
+	sprintf(text, "%g", tx_power);
+
+	return text;
+}
+
 // Rig timer callback
 void rig_if::cb_timer_rig(void* v) {
 	Fl::lock();
@@ -278,6 +333,20 @@ void rig_if::cb_timer_rig(void* v) {
 			// Band view may not have been created yet
 			if (band_view_) {
 				band_view_->update(rig_if_->tx_frequency() / 1000.0);
+			}
+			// Update scratchpad
+			if (scratchpad_) {
+				string mode;
+				string submode;
+				rig_if_->get_string_mode(mode, submode);
+				string freq = rig_if_->get_tx_frequency();
+				string power = rig_if_->get_tx_power();
+				if (submode.length()) {
+					scratchpad_->rig_update(freq, submode, power);
+				}
+				else {
+					scratchpad_->rig_update(freq, mode, power);
+				}
 			}
 		}
 		if (!rig_if_->is_good()) {

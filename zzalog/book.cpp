@@ -14,6 +14,7 @@
 #include "prefix.h"
 #include "utils.h"
 #include "intl_widgets.h"
+#include "band_view.h"
 
 // C/C++ header files
 #include <ctime>
@@ -34,6 +35,7 @@ extern spec_data* spec_data_;
 extern pfx_data* pfx_data_;
 extern Fl_Preferences* settings_;
 extern Fl_Single_Window* main_window_;
+extern band_view* band_view_;
 extern bool read_only_;
 extern void main_window_label(string text);
 extern void add_sub_window(Fl_Window* win);
@@ -750,6 +752,13 @@ void book::save_record() {
 	status_->misc_status(ST_NOTE, text);
 	// Add to used bands and modes
 	add_band_mode(get_record());
+	// Check within band
+	double freq;
+	get_record()->item("FREQ", freq);
+	if (band_view_ && !band_view_->in_band(freq * 1000)) {
+		sprintf(text, "LOG: Frequency %g MHz is out of band!", freq);
+		status_->misc_status(ST_ERROR, text);
+	}
 
 	if (new_record_ || modified_record_) {
 		// Record entry was started by user - tidy up record
