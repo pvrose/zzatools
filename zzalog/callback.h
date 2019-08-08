@@ -255,8 +255,17 @@ namespace zzalog {
 		char temp[128];
 		choice->item_pathname(temp, sizeof(temp) - 1);
 		// If there is a value get its text - note as pathname it will be preceded by a '/'.
-		if (temp[0] != 0) *enum_value = &temp[1];
-		else *enum_value = "";
+		if (temp[0] != 0) {
+			if (temp[0] == '/') {
+				*enum_value = &temp[1];
+			}
+			else {
+				*enum_value = temp;
+			}
+		}
+		else {
+			*enum_value = "";
+		}
 	}
 
 }
