@@ -37,7 +37,7 @@ void field_choice::repopulate(bool all_fields, string default_field) {
 		char* field_set;
 		// Get the list of field names from settings
 		fields_settings.get("App5", field_set, "Default");
-		Fl_Preferences set_settings(display_settings, field_set);
+		Fl_Preferences set_settings(fields_settings, field_set);
 		free(field_set);
 		if (set_settings.groups() > 0) {
 			// WE have said list so use it

@@ -65,14 +65,12 @@ namespace zzalog {
 		// Callbacks
 		// Select collection closed
 		static void cb_ch_sel_col(Fl_Widget* w, void* v);
-		// Create new collection from default fields
-		static void cb_bn_default(Fl_Widget* w, void* v);
+		// Select collection by application
+		static void cb_ch_sel_app(Fl_Widget* w, void* v);
 		// Copy an existing collection
-		static void cb_bn_copy(Fl_Widget* w, void* v);
-		// Save collection to use in selected application
+		static void cb_bn_new(Fl_Widget* w, void* v);
+		// Use collection in selected application
 		static void cb_bn_use_app(Fl_Widget* w, void* v);
-		// Load collection saved for application
-		static void cb_bn_sw_app(Fl_Widget* w, void* v);
 		// left-hand table clicked (fields in use)
 		static void cb_tab_inuse(Fl_Widget* w, void* v);
 		// right table clicked (fields available)
@@ -109,13 +107,13 @@ namespace zzalog {
 		field_ordering_t application_;
 		// which collections are used for which applications
 		map <field_ordering_t, string> field_set_by_app_;
-		// radio button parameters for the application (view) selection
-		radio_param_t app_params_[FO_LAST];
 		// widgets that need accessing
 		Fl_Widget* name_input_;
+		Fl_Widget* name_choice_;
+		Fl_Widget* app_choice_;
+		Fl_Widget* app_buttons_[FO_LAST];
 		Fl_Widget* used_table_;
 		Fl_Widget* avail_table_;
-		Fl_Widget* name_choice_;
 		Fl_Widget* header_input_;
 		Fl_Widget* width_input_;
 		Fl_Widget* use_button_;
@@ -125,6 +123,8 @@ namespace zzalog {
 		// Groups that need accessing
 		Fl_Group* table_group_;
 		Fl_Group* app_group_;
+
+		const string APP_NAMES[FO_LAST] = { "Log", "Extract", "Record", "Import", "TSV", "Choice" };
 
 	};
 

@@ -261,22 +261,27 @@ void fields_dialog::create_form(int X, int Y) {
 	begin();
 
 	// positioning constants
-	// Group 1.1 - Select set
+	// Group 1 - Select set
 
-	const int XG1_1 = X + EDGE;
-	const int X1_1A = XG1_1 + GAP;
-	const int W1_1A = WSMEDIT;
-	const int WG1_1 = X1_1A + W1_1A + GAP - XG1_1;
+	const int XG1 = X + EDGE;
+	const int X1_1 = XG1 + GAP;
+	const int X1_2 = X1_1 + WSMEDIT + GAP;
+	const int X1_3 = X1_2 + WSMEDIT + GAP;
+	const int X1_4 = X1_3 + WBUTTON;
+
+	const int WG1 = X1_4 + WSMEDIT + GAP - XG1;
 	const int YG1 = Y + EDGE;
-	const int Y1_1A = YG1 + HTEXT;
-	const int H1_1A = HTEXT;
-	const int HG1_1 = Y1_1A + H1_1A + GAP - YG1;
-	Fl_Group* gp1_1 = new Fl_Group(XG1_1, YG1, WG1_1, HG1_1, "Select field set");
-	gp1_1->labelsize(FONT_SIZE);
-	gp1_1->align(FL_ALIGN_TOP_LEFT | FL_ALIGN_INSIDE);
-	gp1_1->box(FL_THIN_DOWN_BOX);
+	const int Y1 = YG1 + GAP + HTEXT;
+	const int HG1 = Y1 + HTEXT + GAP - YG1;
+
+	// Group 1 surround
+	Fl_Group* gp1 = new Fl_Group(XG1, YG1, WG1, HG1, "Select field set");
+	gp1->labelsize(FONT_SIZE);
+	gp1->align(FL_ALIGN_TOP_LEFT | FL_ALIGN_INSIDE);
+	gp1->box(FL_THIN_DOWN_BOX);
+
 	// Choice - select name of field-set to use
-	Fl_Choice* ch1_1 = new Fl_Choice(X1_1A, Y1_1A, W1_1A, H1_1A);
+	Fl_Choice* ch1_1 = new Fl_Choice(X1_1, Y1, WSMEDIT, HTEXT, "Select by name");
 	// Add the name of each set of field descriptions to the SelectionName choice
 	// set the value of the choice to the number associated with the new name
 	auto it = field_sets_.begin();
@@ -286,135 +291,83 @@ void fields_dialog::create_form(int X, int Y) {
 			ch1_1->value(i);
 		}
 	}
+	ch1_1->labelfont(FONT);
+	ch1_1->labelsize(FONT_SIZE);
+	ch1_1->textfont(FONT);
 	ch1_1->textsize(FONT_SIZE);
-	ch1_1->tooltip("Select the name of the field set to be listed");
+	ch1_1->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
+	ch1_1->tooltip("Select the name of the set of fields to be listed");
 	ch1_1->callback(cb_ch_sel_col);
 	ch1_1->when(FL_WHEN_RELEASE);
-	gp1_1->end();
+	name_choice_ = ch1_1;
+
+	// Choice select field-set by an application
+	Fl_Choice* ch1_2 = new Fl_Choice(X1_2, Y1, WSMEDIT, HTEXT, "Select by app");
+	for (int i = 0; i < (int)FO_LAST; i++) {
+		ch1_2->add(APP_NAMES[i].c_str());
+		if ((field_ordering_t)i == application_) {
+			ch1_2->value(i);
+		}
+	}
+	ch1_2->labelfont(FONT);
+	ch1_2->labelsize(FONT_SIZE);
+	ch1_2->textfont(FONT);
+	ch1_2->textsize(FONT_SIZE);
+	ch1_2->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
+	ch1_2->tooltip("Select the name of the application for which to list the set of fields");
+	ch1_2->callback(cb_ch_sel_app);
+	ch1_2->when(FL_WHEN_RELEASE);
+	app_choice_ = ch1_2;
+
+	// New button
+	Fl_Button* bn1_3 = new Fl_Button(X1_3, Y1, WBUTTON, HBUTTON, "New");
+	bn1_3->labelfont(FONT);
+	bn1_3->labelsize(FONT_SIZE);
+	bn1_3->callback(cb_bn_new);
+	bn1_3->when(FL_WHEN_RELEASE);
+	bn1_3->tooltip("Create a new set of fields from the default set");
+
+	// Name of new field set
+	Fl_Input* ip1_4 = new Fl_Input(X1_4, Y1, WSMEDIT, HTEXT, "Name of new set");
+	ip1_4->labelfont(FONT);
+	ip1_4->labelsize(FONT_SIZE);
+	ip1_4->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
+	ip1_4->textfont(FONT);
+	ip1_4->textsize(FONT_SIZE);
+	name_input_ = ip1_4;
+
+	gp1->end();
 	
-	// Group 1.2 - Create new set
-	const int XG1_2 = XG1_1 + WG1_1 + GAP;
-	const int X1_2A = XG1_2 + GAP;
-	const int W1_2A = WBUTTON;
-	const int X1_2B = X1_2A + W1_2A + GAP;
-	const int W1_2B = WBUTTON;
-	const int X1_2C = X1_2B + W1_2B + GAP;
-	const int W1_2C = WSMEDIT;
-	const int WG1_2 = X1_2C + W1_2C + GAP - XG1_2;
-	const int Y1_2 = YG1 + HTEXT;
-	const int H1_2A = HBUTTON;
-	const int H1_2B = HBUTTON;
-	const int H1_2C = HTEXT;
-	const int HG1_2 = max(max(Y1_2 + H1_2A, Y1_2 + H1_2B), Y1_2 + H1_2C) + GAP - YG1;
-	Fl_Group* gp1_2 = new Fl_Group(XG1_2, YG1, WG1_2, HG1_2, "New field set");
-	gp1_2->labelsize(FONT_SIZE);
-	gp1_2->align(FL_ALIGN_TOP_LEFT | FL_ALIGN_INSIDE);
-	gp1_2->box(FL_THIN_DOWN_BOX);
-	// Button - use default field set to initially populate this set.
-	Fl_Button* bn1_2a = new Fl_Button(X1_2A, Y1_2, W1_2A, H1_2A, "Default");
-	bn1_2a->labelsize(FONT_SIZE);
-	bn1_2a->tooltip("Use default field set for new field set");
-	bn1_2a->callback(cb_bn_default);
-	bn1_2a->when(FL_WHEN_RELEASE);
-	// Button - copy an existing field-set
-	Fl_Button* bn1_2b = new Fl_Button(X1_2B, Y1_2, W1_2B, H1_2B, "Copy");
-	bn1_2b->labelsize(FONT_SIZE);
-	bn1_2b->tooltip("Create a copy of current field set for new one");
-	bn1_2b->callback(cb_bn_copy);
-	bn1_2b->when(FL_WHEN_RELEASE);
-	// Input - specify the name of the new field-set
-	intl_input* ip1_2c = new intl_input(X1_2C, Y1_2, W1_2C, H1_2C);
-	ip1_2c->textsize(FONT_SIZE);
-	ip1_2c->tooltip("Type in the name of the new field set");
-	gp1_2->end();
-
-	// Total group 1
-	const int WG1 = XG1_2 + WG1_2 - XG1_1;
-	const int HG1 = max(HG1_1, HG1_2);
-
 	// Group 2 - Fields apply to
 	const int XG2 = X + EDGE;
-	const int XG2_1 = XG2 + GAP;
-	const int WG2_1 = WBUTTON;
-	const int XG2_2 = XG2_1 + WG2_1;
-	const int WG2_2 = WBUTTON;
-	const int XG2_2A = XG2_2 + WG2_2;
-	const int WG2_2A = WBUTTON;
-	const int XG2_3 = XG2_2A + WG2_2A + GAP;
-	const int WG2_3 = WBUTTON;
-	const int WG2 = XG2_3 + WG2_3 + EDGE;
+	int X2[FO_LAST];
+	for (int i = 0; i < FO_LAST; i++) {
+		X2[i] = XG2 + GAP + (i * WBUTTON);
+	}
+	const int WG2 = X2[FO_LAST - 1] + WBUTTON + GAP - XG2;
 	const int YG2 = YG1 + HG1 + GAP;
-	const int YG2_1 = YG2 + HTEXT;
-	const int HG2_1 = HBUTTON;
-	const int YG2_2 = YG2_1 + HG2_1;
-	const int HG2_2 = HBUTTON;
-	const int HG2 = YG2_2 + HG2_2 + GAP - YG2;
-	char label2[128];
-	sprintf(label2, "Current application using %s", field_set_name_.c_str());
+	const int Y2 = YG2 + HTEXT;
+	const int HG2 = Y2 + HBUTTON + GAP - YG2;
+
 	// Allow the view that uses the field-set to be slected
 	Fl_Group* gp2 = new Fl_Group(XG2, YG2, WG2, HG2);
-	gp2->copy_label(label2);
 	gp2->labelsize(FONT_SIZE);
 	gp2->align(FL_ALIGN_TOP_LEFT | FL_ALIGN_INSIDE);
 	gp2->box(FL_THIN_DOWN_BOX);
-	// Radio button - use for the main log view
-	Fl_Radio_Light_Button* bn2_11 = new Fl_Radio_Light_Button(XG2_1, YG2_1, WG2_1, HG2_1, "Log");
-	bn2_11->labelsize(FONT_SIZE);
-	bn2_11->align(FL_ALIGN_RIGHT | FL_ALIGN_INSIDE);
-	bn2_11->tooltip("Application - full log book");
-	bn2_11->value(application_ == FO_MAINLOG);
-	app_params_[FO_MAINLOG] = { FO_MAINLOG, (int*)&application_ };
-	bn2_11->callback(cb_radio, (void*)&app_params_[FO_MAINLOG]);
-	bn2_11->when(FL_WHEN_RELEASE);
-	// Radio button - use for the extracted records view
-	Fl_Radio_Light_Button* bn2_12 = new Fl_Radio_Light_Button(XG2_1, YG2_2, WG2_1, HG2_2, "Extract");
-	bn2_12->labelsize(FONT_SIZE);
-	bn2_12->align(FL_ALIGN_RIGHT | FL_ALIGN_INSIDE);
-	bn2_12->tooltip("Application - extracted data view");
-	bn2_12->value(application_ == FO_EXTRACTLOG);
-	app_params_[FO_EXTRACTLOG] = { FO_EXTRACTLOG, (int*)&application_ };
-	bn2_12->callback(cb_radio, (void*)&app_params_[FO_EXTRACTLOG]);
-	bn2_12->when(FL_WHEN_RELEASE);
-	// Radio button - use for field table in the record view
-	Fl_Radio_Light_Button* bn2_21 = new Fl_Radio_Light_Button(XG2_2, YG2_1, WG2_2, HG2_1, "Record");
-	bn2_21->labelsize(FONT_SIZE);
-	bn2_21->align(FL_ALIGN_RIGHT | FL_ALIGN_INSIDE);
-	bn2_21->tooltip("Application - QSO record view");
-	bn2_21->value(application_ == FO_QSOVIEW);
-	app_params_[FO_QSOVIEW] = { FO_QSOVIEW, (int*)&application_ };
-	bn2_21->callback(cb_radio, (void*)&app_params_[FO_QSOVIEW]);
-	bn2_21->when(FL_WHEN_RELEASE);
-	// Radio button - define the fields to export
-	Fl_Radio_Light_Button* bn2_22 = new Fl_Radio_Light_Button(XG2_2, YG2_2, WG2_2, HG2_2, "Export");
-	bn2_22->labelsize(FONT_SIZE);
-	bn2_22->align(FL_ALIGN_RIGHT | FL_ALIGN_INSIDE);
-	bn2_22->tooltip("Application - writing out TSV data");
-	bn2_22->value(application_ == FO_EXPORTTSV);
-	app_params_[FO_EXPORTTSV] = { FO_EXPORTTSV, (int*)&application_ };
-	bn2_22->callback(cb_radio, (void*)&app_params_[FO_EXPORTTSV]);
-	bn2_22->when(FL_WHEN_RELEASE);
-	// Radio button - define the fields to export
-	Fl_Radio_Light_Button* bn2_2A1 = new Fl_Radio_Light_Button(XG2_2A, YG2_1, WG2_2A, HG2_1, "Choices");
-	bn2_2A1->labelsize(FONT_SIZE);
-	bn2_2A1->align(FL_ALIGN_RIGHT | FL_ALIGN_INSIDE);
-	bn2_2A1->tooltip("Application - fields available in drop-down lists");
-	bn2_2A1->value(application_ == FO_CHOICE);
-	app_params_[FO_EXPORTTSV] = { FO_CHOICE, (int*)&application_ };
-	bn2_2A1->callback(cb_radio, (void*)&app_params_[FO_CHOICE]);
-	bn2_2A1->when(FL_WHEN_RELEASE);
-	// Button - use the field-set for the selected application
-	Fl_Button* bn2_31 = new Fl_Button(XG2_3, YG2_1, WG2_3, HG2_1, "Use for app");
-	bn2_31->labelsize(FONT_SIZE);
-	bn2_31->tooltip("Use the fields for the selected application");
-	bn2_31->callback(cb_bn_use_app);
-	bn2_31->when(FL_WHEN_RELEASE);
-	// Button - display the field-set for the selected application
-	Fl_Button* bn2_32 = new Fl_Button(XG2_3, YG2_2, WG2_3, HG2_2, "Switch app");
-	bn2_32->labelsize(FONT_SIZE);
-	bn2_32->tooltip("Switch to the selected application");
-	bn2_32->callback(cb_bn_sw_app);
-	bn2_32->when(FL_WHEN_RELEASE);
+	// Add the app buttons
+	for (int i = 0; i < FO_LAST; i++) {
+		Fl_Light_Button* bn2 = new Fl_Light_Button(X2[i], Y2, WBUTTON, HBUTTON, APP_NAMES[i].c_str());
+		bn2->labelsize(FONT_SIZE);
+		bn2->labelfont(FONT);
+		bn2->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE);
+		bn2->tooltip("Select application to use the current set of fields in it");
+		bn2->callback(cb_bn_use_app, (void*)i);
+		bn2->when(FL_WHEN_RELEASE);
+		bn2->selection_color(FL_BLUE);
+		app_buttons_[i] = bn2;
+	}
 	gp2->end();
+	app_group_ = gp2;
 
 	// Group 3 - tables and controls - use whats left
 	const int WG3 = w() - EDGE - EDGE;
@@ -455,6 +408,7 @@ void fields_dialog::create_form(int X, int Y) {
 	tab3_1a->callback(cb_tab_inuse);
 	tab3_1a->when(FL_WHEN_RELEASE);
 	tab3_1a->tooltip("Displays the fields used in the current selected application");
+	used_table_ = tab3_1a;
 
 	// Button - move unused field to used list
 	Fl_Button* bn3_1b1 = new Fl_Button(XG3_1B, YG3_1B1, WG3_1B, HBUTTON, "@<-");
@@ -462,6 +416,7 @@ void fields_dialog::create_form(int X, int Y) {
 	bn3_1b1->tooltip("Move the selected field from the unused to the used list");
 	bn3_1b1->callback(cb_bn_use);
 	bn3_1b1->when(FL_WHEN_RELEASE);
+	use_button_ = bn3_1b1;
 	gp3->add(bn3_1b1);
 	// Button - move used field to unused list
 	Fl_Button* bn3_1b2 = new Fl_Button(XG3_1B, YG3_1B2, WG3_1B, HBUTTON, "@->");
@@ -469,6 +424,7 @@ void fields_dialog::create_form(int X, int Y) {
 	bn3_1b2->tooltip("Move the selected field from the used to the unused list");
 	bn3_1b2->callback(cb_bn_disuse);
 	bn3_1b2->when(FL_WHEN_RELEASE);
+	disuse_button_ = bn3_1b2;
 	gp3->add(bn3_1b2);
 	// Button - move field up the used list
 	Fl_Button* bn3_1b3 = new Fl_Button(XG3_1B, YG3_1B3, WG3_1B, HBUTTON, "@8->");
@@ -476,6 +432,7 @@ void fields_dialog::create_form(int X, int Y) {
 	bn3_1b3->tooltip("Move the selected field up one position in the used list");
 	bn3_1b3->callback(cb_bn_up);
 	bn3_1b3->when(FL_WHEN_RELEASE);
+	up_button_ = bn3_1b3;
 	gp3->add(bn3_1b3);
 	// Button - move field down the used list
 	Fl_Button* bn3_1b4 = new Fl_Button(XG3_1B, YG3_1B4, WG3_1B, HBUTTON, "@2->");
@@ -483,6 +440,7 @@ void fields_dialog::create_form(int X, int Y) {
 	bn3_1b4->tooltip("Move the selected field down one position in the used list");
 	bn3_1b4->callback(cb_bn_down);
 	bn3_1b4->when(FL_WHEN_RELEASE);
+	down_button_ = bn3_1b4;
 	gp3->add(bn3_1b4);
 
 	// The unused list
@@ -492,6 +450,7 @@ void fields_dialog::create_form(int X, int Y) {
 	tab3_1c->callback(cb_tab_avail);
 	tab3_1c->when(FL_WHEN_RELEASE);
 	tab3_1c->tooltip("Displays the fields not used in the current application");
+	avail_table_ = tab3_1c;
 	gp3->add(tab3_1c);
 
 	// Input - header text for the selected field
@@ -499,40 +458,29 @@ void fields_dialog::create_form(int X, int Y) {
 	ip3_2a->labelsize(FONT_SIZE);
 	ip3_2a->align(FL_ALIGN_LEFT);
 	ip3_2a->textsize(FONT_SIZE);
-	ip3_2a->callback(cb_ip_header);
-	ip3_2a->when(FL_WHEN_CHANGED);
-	ip3_2a->tooltip("Type in the new value for the header of the selected field");
-	gp3->add(ip3_2a);
-	// Input - width in pixels for the selected field
-	Fl_Int_Input* ip3_2b = new Fl_Int_Input(XG3_2B, YG3_2, WG3_2, HG3_2, "Width");
-	ip3_2b->labelsize(FONT_SIZE);
-	ip3_2b->align(FL_ALIGN_LEFT);
-	ip3_2b->textsize(FONT_SIZE);
-	ip3_2b->callback(cb_ip_width);
-	ip3_2b->when(FL_WHEN_CHANGED);
-	ip3_2b->tooltip("Type in the new value for the width of the selected field");
-	gp3->add(ip3_2b);
+ip3_2a->callback(cb_ip_header);
+ip3_2a->when(FL_WHEN_CHANGED);
+ip3_2a->tooltip("Type in the new value for the header of the selected field");
+header_input_ = ip3_2a;
+gp3->add(ip3_2a);
+// Input - width in pixels for the selected field
+Fl_Int_Input* ip3_2b = new Fl_Int_Input(XG3_2B, YG3_2, WG3_2, HG3_2, "Width");
+ip3_2b->labelsize(FONT_SIZE);
+ip3_2b->align(FL_ALIGN_LEFT);
+ip3_2b->textsize(FONT_SIZE);
+ip3_2b->callback(cb_ip_width);
+ip3_2b->when(FL_WHEN_CHANGED);
+ip3_2b->tooltip("Type in the new value for the width of the selected field");
+width_input_ = ip3_2b;
+gp3->add(ip3_2b);
+table_group_ = gp3;
 
-	gp3->end();
-	
-	Fl_Group::end();
-	show();
+gp3->end();
 
-	// Add pointers to widgets that need them
-	name_input_ = ip1_2c;
-	used_table_ = tab3_1a;
-	avail_table_ = tab3_1c;
-	name_choice_ = ch1_1;
-	header_input_ = ip3_2a;
-	width_input_ = ip3_2b;
-	use_button_ = bn3_1b1;
-	disuse_button_ = bn3_1b2;
-	up_button_ = bn3_1b3;
-	down_button_ = bn3_1b4;
-	app_group_ = gp2;
-	table_group_ = gp3;
+Fl_Group::end();
+show();
 
-	update_widgets();
+update_widgets();
 }
 
 // Used to write settings back
@@ -609,13 +557,23 @@ void fields_dialog::update_widgets(bool update_name /* = true */) {
 		int index = ((Fl_Choice*)name_choice_)->find_index(field_set_name_.c_str());
 		((Fl_Choice*)name_choice_)->value(index);
 	}
+	// Select the applications that use this field_set
+	for (int i = 0; i < FO_LAST; i++) {
+		if (field_set_by_app_[(field_ordering_t)i] == field_set_name_) {
+			((Fl_Light_Button*)app_buttons_[i])->value(true);
+		} else {
+			((Fl_Light_Button*)app_buttons_[i])->value(false);
+		}
+	}
+	// Set the app choice
+	((Fl_Choice*)app_choice_)->value((int)application_);
 	// Get the list of unused fields and copy field set and unused set to tables
 	unused_fields();
 	((fields_table*)used_table_)->fields(field_sets_[field_set_name_]);
 	((fields_table*)avail_table_)->fields(&unused_fields_);
 	// Update labels
 	char label[128];
-	sprintf(label, "Current application using %s", field_set_name_.c_str());
+	sprintf(label, "Current applications using %s", field_set_name_.c_str());
 	app_group_->copy_label(label);
 	sprintf(label, "Columns for field set %s", field_set_name_.c_str());
 	table_group_->copy_label(label);
@@ -629,13 +587,34 @@ void fields_dialog::cb_ch_sel_col(Fl_Widget* w, void* v) {
 	Fl_Choice* ch = (Fl_Choice*)w;
 	fields_dialog* that = ancestor_view<fields_dialog>(w);
 	that->field_set_name_ = ch->text();
+	// Set default application
+	bool found = false;
+	for (int i = 0; i < FO_LAST && !found; i++) {
+		if (that->field_set_name_ == that->field_set_by_app_[(field_ordering_t)i]) {
+			that->application_ = (field_ordering_t)i;
+			found = true;
+		}
+	}
 	that->update_widgets(false);
+}
 
+// Select app choice
+// Make the named field set that used by this application
+void fields_dialog::cb_ch_sel_app(Fl_Widget* w, void* v) {
+	fields_dialog* that = ancestor_view<fields_dialog>(w);
+	string app_name;
+	cb_choice_text(w, &app_name);
+	for (int i = 0; i < FO_LAST; i++) {
+		if (that->APP_NAMES[i] == app_name) {
+			that->application_ = (field_ordering_t)i;
+		}
+	}
+	that->update_widgets(true);
 }
 
 // Create new field set from default fields
 // Create a new field set with the default fields and make it selected field set
-void fields_dialog::cb_bn_default(Fl_Widget* w, void* v) {
+void fields_dialog::cb_bn_new(Fl_Widget* w, void* v) {
 	fields_dialog* that = ancestor_view<fields_dialog>(w);
 	intl_input* ip = (intl_input*)that->name_input_;
 	const char * new_name = ip->value();
@@ -657,46 +636,15 @@ void fields_dialog::cb_bn_default(Fl_Widget* w, void* v) {
 	}
 }
 
-// Copy an existing field set
-// Create a new field set, copying from the current selected set and select it
-void fields_dialog::cb_bn_copy(Fl_Widget* w, void* v) {
-	fields_dialog* that = ancestor_view<fields_dialog>(w);
-	intl_input* ip = (intl_input*)that->name_input_;
-	const char * new_name = ip->value();
-	// If the name is not empty
-	if (new_name[0] != 0) {
-		// Create a new field set 
-		vector<field_info_t>* field_set = new vector<field_info_t>;
-		vector<field_info_t>* old_field_set = that->field_sets_[that->field_set_name_];
-		// Copy the current selected set to the new one
-		field_set->insert(field_set->end(), old_field_set->begin(), old_field_set->end());
-		// Name it
-		that->field_set_name_ = string(new_name);
-		that->field_sets_[string(new_name)] = field_set;
-		that->update_widgets(false);
-		// Add field set name to name choice widget and select it
-		int value = ((Fl_Choice*)that->name_choice_)->add(new_name);
-		((Fl_Choice*)that->name_choice_)->value(value);
-	}
-}
-
 // Save field set to use in selected application
 void fields_dialog::cb_bn_use_app(Fl_Widget* w, void* v) {
 	fields_dialog* that = ancestor_view<fields_dialog>(w);
 	// Change the field set used by selected application to the selected field set
-	that->field_set_by_app_[that->application_] = that->field_set_name_;
+	field_ordering_t app = (field_ordering_t)(long)v;
+	that->field_set_by_app_[app] = that->field_set_name_;
 	that->update_widgets();
 }
 
-// Load field set saved for application and display the new fields
-void fields_dialog::cb_bn_sw_app(Fl_Widget* w, void* v) {
-	fields_dialog* that = ancestor_view<fields_dialog>(w);
-	// Change the selected field set to that used by the application
-	that->field_set_name_ = that->field_set_by_app_[that->application_];
-	int value = ((Fl_Choice*)that->name_choice_)->find_index(that->field_set_name_.c_str());
-	((Fl_Choice*)that->name_choice_)->value(value);
-	that->update_widgets();
-}
 
 // left-hand table clicked (fields in use)
 // Enable width and header to be edited (or not)
