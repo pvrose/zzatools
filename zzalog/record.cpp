@@ -559,19 +559,19 @@ lat_long_t record::location(bool my_station) {
 		value_1 = item("LAT");
 		value_2 = item("LON");
 	}
-	// LAT/LON has format [NESW]XXX.XXXXXX (degrees)
+	// LAT/LON has format [NESW]DDD MM.MMM
 	if (value_1.length() == 11 && value_2.length() == 11) {
 		try {
 			char n_e_s_w = value_1[0];
 			// Convert numeric part to double
-			lat_long.latitude = stod(value_1.substr(1, 10));
+			lat_long.latitude = stod(value_1.substr(1, 3)) + (stod(value_1.substr(5, 6)) / 60.0);
 			if (n_e_s_w == 'S') {
 				// South of the equator is negative
 				lat_long.latitude = 0. - lat_long.latitude;
 			}
 			n_e_s_w = value_2[0];
 			// Convert numeric part to double
-			lat_long.longitude = stod(value_1.substr(1, 10));
+			lat_long.longitude = stod(value_2.substr(1, 3)) + (stod(value_2.substr(5, 6)) / 60.0);;
 			if (n_e_s_w == 'W') {
 				// Western hemisphere is negative
 				lat_long.longitude = 0 - lat_long.longitude;
