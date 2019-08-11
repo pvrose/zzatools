@@ -270,6 +270,17 @@ void scratchpad::cb_action(Fl_Widget* w, void* v) {
 // Save the record and reset the state to no record
 void scratchpad::cb_save(Fl_Widget* w, void* v) {
 	scratchpad* that = ancestor_view<scratchpad>(w);
+	// Save frequency mode and TX_PWR if that didn't change
+	string freq;
+	cb_value<Fl_Input, string>(that->ip_freq_, &freq);
+	that->record_->item("FREQ", freq);
+	string mode;
+	cb_choice_text(that->ch_mode_, &mode);
+	that->record_->item("MODE", mode);
+	string power;
+	cb_value<Fl_Input, string>(that->ip_power_, &power);
+	that->record_->item("TX_PWR", power);
+	// Save the record - should update viewsg
 	book_->save_record();
 	that->record_ = nullptr;
 	that->buffer_->text("");

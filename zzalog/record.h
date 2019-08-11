@@ -37,6 +37,16 @@ namespace zzalog {
 		LM_RADIO_DISC,  // Realtime logging, no rigconnection
 		LM_IMPORTED     // Auto-import
 	};
+	
+	// Location source
+	enum location_t {
+		LOC_NONE,        // not derived
+		LOC_LATLONG,     // LAT/LON pair
+		LOC_GRID2,       // 2-letter gridsquare
+		LOC_GRID4,       // 4-character gridsquare
+		LOC_GRID6,       // 6-character 
+		LOC_GRID8        // 8-character
+	};
 
 	// The records are kept in a container with size_t as index
 	typedef size_t record_num_t;
@@ -82,7 +92,9 @@ namespace zzalog {
 		bool operator > (record& rhs);
 		// delete all the derived fields
 		void unparse();
-		// get the latitude and longitude of the contacted station
+		// get the latitude and longitude of the contacted station (ignotre less than 6 character gridsquares)
+		lat_long_t location(bool my_station, location_t& source);
+		// Get the latitude and longuitude without specifying a source
 		lat_long_t location(bool my_station);
 		// update BAND from FREQ
 		bool update_band(bool force = false);

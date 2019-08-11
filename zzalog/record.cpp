@@ -474,8 +474,52 @@ void record::item(string field, double& value) {
 			value = stod(item(field));
 		}
 		catch (invalid_argument&) {
-			// Not a valid double
 			value = nan("");
+			// Special cases
+			if (field == "LAT" || field == "LON") {
+				try {
+					string item_value = item(field);
+					double degrees = stod(item_value.substr(1, 3)) + (stod(item_value.substr(5, 6)) / 60.0);
+					switch (item_value[0]) {
+					case 'S':
+					case 'W':
+						value = 0.0 - degrees;
+						break;
+					case 'N':
+					case 'E':
+						value = degrees;
+						break;
+					}
+				}
+				catch (invalid_argument&) {
+					value = nan("");
+				}
+			}
+			else if (field == "MY_LAT" || field == "MY_LON") {
+				try {
+					// Get the inherited value if necessary
+					string item_value = item(field, false, true);
+					double degrees = stod(item_value.substr(1, 3)) + (stod(item_value.substr(5, 6)) / 60.0);
+					switch (item_value[0]) {
+					case 'S':
+					case 'W':
+						value = 0.0 - degrees;
+						break;
+					case 'N':
+					case 'E':
+						value = degrees;
+						break;
+					}
+				}
+				catch (invalid_argument&) {
+					value = nan("");
+				}
+
+			}
+			else {
+				// Not a valid double
+				value = nan("");
+			}
 		}
 	}
 	else {
@@ -540,11 +584,16 @@ void record::unparse() {
 	status_->misc_status(ST_LOG, message);
 }
 
-// Return longitude and latitude from the record
+// Return laongitude and latitude
 lat_long_t record::location(bool my_station) {
+	location_t dummy;
+	return location(my_station, dummy);
+}
+
+// Return longitude and latitude from the record
+lat_long_t record::location(bool my_station, location_t& source) {
 	// Set a bad coordinate
 	lat_long_t lat_long = { nan(""), nan("") };
-	bool got_location = false;
 
 	// Now look at the various sources of lat/lon
 	// By preference use LAT/LON
@@ -552,37 +601,14 @@ lat_long_t record::location(bool my_station) {
 	string value_2;
 	// Use LAT/LON fields
 	if (my_station) {
-		value_1 = item("MY_LAT", false, true);
-		value_2 = item("MY_LON", false, true);
+		item("MY_LAT", lat_long.latitude);
+		item("MY_LON", lat_long.longitude);
 	}
 	else {
-		value_1 = item("LAT");
-		value_2 = item("LON");
+		item("LAT", lat_long.latitude);
+		item("LON", lat_long.longitude);
 	}
-	// LAT/LON has format [NESW]DDD MM.MMM
-	if (value_1.length() == 11 && value_2.length() == 11) {
-		try {
-			char n_e_s_w = value_1[0];
-			// Convert numeric part to double
-			lat_long.latitude = stod(value_1.substr(1, 3)) + (stod(value_1.substr(5, 6)) / 60.0);
-			if (n_e_s_w == 'S') {
-				// South of the equator is negative
-				lat_long.latitude = 0. - lat_long.latitude;
-			}
-			n_e_s_w = value_2[0];
-			// Convert numeric part to double
-			lat_long.longitude = stod(value_2.substr(1, 3)) + (stod(value_2.substr(5, 6)) / 60.0);;
-			if (n_e_s_w == 'W') {
-				// Western hemisphere is negative
-				lat_long.longitude = 0 - lat_long.longitude;
-			}
-			got_location = true;
-		}
-		catch (invalid_argument&) {
-			// Invalid double - allow further search
-		}
-	}
-	if (!got_location) {
+	if (isnan(lat_long.latitude) || isnan(lat_long.longitude)) {
 		// Use either Gridsquare or prefix centre if that is more accurate
 		if (my_station) {
 			value_1 = item("MY_GRIDSQUARE", false, true);
@@ -630,6 +656,30 @@ lat_long_t record::location(bool my_station) {
 				lat_long = prefix_lat_long;
 			}
 		}
+		switch (value_1.length()) {
+		case 0:
+		case 1:
+			source = LOC_NONE;
+			break;
+		case 2:
+		case 3:
+			source = LOC_GRID2;
+			break;
+		case 4:
+		case 5:
+			source = LOC_GRID4;
+			break;
+		case 6:
+		case 7:
+			source = LOC_GRID6;
+				break;
+		default:
+			source = LOC_GRID8;
+			break;
+		}
+	}
+	else {
+		source = LOC_LATLONG;
 	}
 	return lat_long;
 }

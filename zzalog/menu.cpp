@@ -1182,6 +1182,8 @@ void menu::cb_mi_info_map(Fl_Widget* w, void* v) {
 	if (record != nullptr || v != nullptr) {
 		// If there is one
 		// Get locator, QTH and callsign
+		location_t source;
+		lat_long_t location = record->location(false, source);
 		string locator = record->item("GRIDSQUARE");
 		string city = record->item("QTH");
 		string label = record->item("CALL");
@@ -1215,16 +1217,15 @@ void menu::cb_mi_info_map(Fl_Widget* w, void* v) {
 			delete chooser;
 		}
 		char * url = nullptr;
-		if (locator.length() < 6 && city != "") {
-			// Grid square not 6 characters so too broad, therefore use city location
+		if ((source == LOC_NONE || source == LOC_GRID2 || source == LOC_GRID4) && city != "") {
+			// Location got from wide stuff, therefore use city location
 			// ?q=City&z=10 - centre on city zoom level 10
 			url = new char[format_city.length() + city.length() + browser.length() + 10];
 			sprintf(url, format_city.c_str(), browser.c_str(), city.c_str());
 		}
-		else if (locator.length() >= 6) {
+		else if (source == LOC_GRID6 || source == LOC_GRID8 || source == LOC_LATLONG) {
 			// grid square is 6 or more characters 
 			// @%f,%f,25000m display 25 km around long/lat
-			lat_long_t location = record->location(false);
 			url = new char[format_coords.length() + browser.length() + 30];
 			sprintf(url,format_coords.c_str(), browser.c_str(), location.latitude, location.longitude);
 		}
