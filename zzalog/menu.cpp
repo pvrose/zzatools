@@ -180,6 +180,7 @@ namespace zzalog {
 	{ "&Information", 0, 0, 0, FL_SUBMENU },
 	{ "&QRZ.com", 0, menu::cb_mi_info_qrz },
 	{ "Google &Maps", 0, menu::cb_mi_info_map },
+	{ "QSO &Web-site", 0, menu::cb_mi_info_web },
 	{ 0 },
 	{ "&Help", 0, 0, 0, FL_SUBMENU },
 	{ "&About", 0, menu::cb_mi_help_abt },
@@ -1133,31 +1134,12 @@ void menu::cb_mi_rep_level(Fl_Widget* w, void* v) {
 // v is string*. nullptr = uses selected record else uses call sign in v.
 void menu::cb_mi_info_qrz(Fl_Widget* w, void* v) {
 	record* record = book_->get_record();
+	menu* that = ancestor_view<menu>(w);
 	if (record != nullptr || v != nullptr) {
 		// If we have a selected record - get browser executable from settings
-		string browser;
-		char * temp;
-		Fl_Preferences datapath_settings(settings_, "Datapath");
-		datapath_settings.get("Web Browser", temp, "");
-		browser = temp;
-		free(temp);
-		if (!browser.length()) {
-			// The user hasn't set up a browser yet - open file chooser to get one
-			Fl_File_Chooser* chooser = new Fl_File_Chooser("", "Applications(*.exe)", Fl_File_Chooser::SINGLE, "Please select your favoured web browser");
-			chooser->callback(cb_chooser, &browser);
-			chooser->textfont(FONT);
-			chooser->textsize(FONT_SIZE);
-			chooser->show();
-			// Wait while the dialog is active (visible)
-			while (chooser->visible()) Fl::wait();
-			if (!chooser->count()) {
-				// Tell user and crash out of method
-				status_->misc_status(ST_WARNING, "MENU: No browser selected, abandoning");
-				delete chooser;
-				return;
-			}
-			delete chooser;
-			datapath_settings.set("Web Browser", browser.c_str());
+		string browser = that->get_browser();
+		if (browser.length() == 0) {
+			return;
 		}
 		// Open browser with QRZ.com URL 
 #ifdef _WIN32
@@ -1179,7 +1161,8 @@ void menu::cb_mi_info_qrz(Fl_Widget* w, void* v) {
 void menu::cb_mi_info_map(Fl_Widget* w, void* v) {
 	// Get currently selected record
 	record* record = book_->get_record();
-	if (record != nullptr || v != nullptr) {
+	menu* that = ancestor_view<menu>(w);
+	if (record != nullptr) {
 		// If there is one
 		// Get locator, QTH and callsign
 		location_t source;
@@ -1196,25 +1179,9 @@ void menu::cb_mi_info_map(Fl_Widget* w, void* v) {
 		string format_city = "\"%s\" http://google.com/maps/?q=%s&z=10 &";
 #endif
 		// Get browser from settings
-		char* temp;
-		Fl_Preferences datapath_settings(settings_, "Datapath");
-		datapath_settings.get("Web Browser", temp, "");
-		string browser = temp;
-		free(temp);
-		if (!browser.length()) {
-			// User hasn't defined browser yet - open dialog to get it
-			Fl_File_Chooser* chooser = new Fl_File_Chooser("", "Applications(*.exe)", Fl_File_Chooser::SINGLE, "Please select your favoured web browser");
-			chooser->callback(cb_chooser, &browser);
-			chooser->textfont(FONT);
-			chooser->textsize(FONT_SIZE);
-			chooser->show();
-			// Wait while the dialog is active (visible)
-			while (chooser->visible()) Fl::wait();
-			if (!chooser->count()) {
-				status_->misc_status(ST_WARNING, "MENU: No browser selected, abandoning");
-				return;
-			}
-			delete chooser;
+		string browser = that->get_browser();
+		if (browser.length() == 0) {
+			return;
 		}
 		char * url = nullptr;
 		if ((source == LOC_NONE || source == LOC_GRID2 || source == LOC_GRID4) && city != "") {
@@ -1236,7 +1203,33 @@ void menu::cb_mi_info_map(Fl_Widget* w, void* v) {
 		}
 		status_->misc_status(ST_NOTE, "MENU: Launching google maps");
 		int result = system(url);
-		datapath_settings.set("Web Browser", browser.c_str());
+		delete[] url;
+	}
+}
+
+// Information->QSO Web-site
+// v is not used
+void menu::cb_mi_info_web(Fl_Widget* w, void* v) {
+	// Get currently selected record
+	record* record = book_->get_record();
+	menu* that = ancestor_view<menu>(w);
+	if (record != nullptr && record->item_exists("WEB")) {
+		// Get browser from settings
+		string browser = that->get_browser();
+		if (browser.length() == 0) {
+			return;
+		}
+		// Open browser with QRZ.com URL 
+#ifdef _WIN32
+		char format[] = "start \"%s\" %s";
+#else
+		char format[] = "\"%s\" %s &";
+#endif
+		string website = record->item("WEB");
+		char* url = new char[website.length() + browser.length() + strlen(format) + 10];
+		sprintf(url, format, browser.c_str(), website.c_str());
+		status_->misc_status(ST_NOTE, "MENU: Opening QSO web-site");
+		int result = system(url);
 		delete[] url;
 	}
 }
@@ -1555,6 +1548,7 @@ void menu::update_items() {
 		bool new_record = book_->new_record();
 		bool save_enabled = book_->save_enabled();
 		bool delete_enabled = book_->delete_enabled();
+		bool web_enabled = book_ && book_->get_record() && book_->get_record()->item_exists("WEB");
 		// Get all relevant menu item indices
 		int index_save = find_index("&File/&Save");
 		int index_saveas = find_index("&File/Save &As");
@@ -1577,6 +1571,7 @@ void menu::update_items() {
 		int index_ref = find_index("&Reference");
 		int index_rep = find_index("Re&port");
 		int index_info = find_index("&Information");
+		int index_web = find_index("&Information/QSO &Web-site");
 		int index_use_log = find_index("&Log/&Use View/Main &Log");
 		int index_use_form = find_index("&Log/&Use View/&Report View");
 		int index_use_spad = find_index("&Log/&Use View/&Scratchpad");
@@ -1700,10 +1695,44 @@ void menu::update_items() {
 			mode(index_use_spad, mode(index_use_spad) | FL_MENU_VALUE);
 			break;
 		}
+		// Info->QSO WEb-site
+		if (web_enabled) {
+			mode(index_web, mode(index_web) & ~FL_MENU_INACTIVE);
+		}
+		else {
+			mode(index_web, mode(index_web) | FL_MENU_INACTIVE);
+		}
 		// Update logging commands and rig status
 		logging(logging());
 	}
 	redraw();
 	// Update toolbar to reflect active state of menu items
 	toolbar_->update_items();
+}
+
+// Get the browser form settings or if not ask user
+string menu::get_browser() {
+	// Get browser from settings
+	char* temp;
+	Fl_Preferences datapath_settings(settings_, "Datapath");
+	datapath_settings.get("Web Browser", temp, "");
+	string browser = temp;
+	free(temp);
+	if (!browser.length()) {
+		// User hasn't defined browser yet - open dialog to get it
+		Fl_File_Chooser* chooser = new Fl_File_Chooser("", "Applications(*.exe)", Fl_File_Chooser::SINGLE, "Please select your favoured web browser");
+		chooser->callback(cb_chooser, &browser);
+		chooser->textfont(FONT);
+		chooser->textsize(FONT_SIZE);
+		chooser->show();
+		// Wait while the dialog is active (visible)
+		while (chooser->visible()) Fl::wait();
+		if (!chooser->count()) {
+			status_->misc_status(ST_WARNING, "MENU: No browser selected, abandoning");
+			return "";
+		}
+		delete chooser;
+	}
+	datapath_settings.set("Web Browser", browser.c_str());
+	return browser;
 }

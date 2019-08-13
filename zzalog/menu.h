@@ -113,6 +113,8 @@ namespace zzalog {
 		static void cb_mi_info_qrz(Fl_Widget* w, void* v);
 		// Information->Google maps
 		static void cb_mi_info_map(Fl_Widget* w, void* v);
+		// Information->QSO Web-site
+		static void cb_mi_info_web(Fl_Widget* w, void* v);
 		// Help->About
 		static void cb_mi_help_abt(Fl_Widget* w, void* v);
 		// Help->View Status
@@ -136,6 +138,11 @@ namespace zzalog {
 		void add_recent_files();
 		// Update menu items - activeness
 		void update_items();
+
+	protected:
+		// Get the browser form settings or if not ask user
+		string get_browser();
+
 
 	protected:
 		// Current logging mode
