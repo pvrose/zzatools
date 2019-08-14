@@ -454,34 +454,38 @@ void add_rig_if() {
 
 // Add the various HTML handlers
 void add_qsl_handlers() {
-	// URL handler - basic HTML POST and GET
-	if (url_handler_ == nullptr) url_handler_ = new url_handler;
-	// eQSL - accesses the appropriate URLs to upload and download eQSL data
-	if (eqsl_handler_ == nullptr) eqsl_handler_ = new eqsl_handler;
-	// LotW - accesses the appropriate URL to download data, TQSL to sign and upload data
-	if (lotw_handler_ == nullptr) lotw_handler_ = new lotw_handler;
+	if (!closing_) {
+		// URL handler - basic HTML POST and GET
+		if (url_handler_ == nullptr) url_handler_ = new url_handler;
+		// eQSL - accesses the appropriate URLs to upload and download eQSL data
+		if (eqsl_handler_ == nullptr) eqsl_handler_ = new eqsl_handler;
+		// LotW - accesses the appropriate URL to download data, TQSL to sign and upload data
+		if (lotw_handler_ == nullptr) lotw_handler_ = new lotw_handler;
+	}
 }
 
 // Add a scratchpad
 void add_scratchpad() {
-	if (!scratchpad_) {
-		scratchpad_ = new scratchpad;
-	}
-	int enabled;
-	int top;
-	int left;
-	Fl_Preferences spad_settings(settings_, "Scratchpad");
-	spad_settings.get("Enabled", enabled, (int)false);
-	spad_settings.get("Top", top, 100);
-	spad_settings.get("Left", left, 100);
-	if (enabled) {
-		scratchpad_->show();
-		scratchpad_->position(left, top);
-		status_->misc_status(ST_NOTE, "SCRATCHPAD: Opened");
-	}
-	else {
-		scratchpad_->hide();
-		status_->misc_status(ST_NOTE, "SCRATCHPAD: Closed");
+	if (!closing_) {
+		if (!scratchpad_) {
+			scratchpad_ = new scratchpad;
+		}
+		int enabled;
+		int top;
+		int left;
+		Fl_Preferences spad_settings(settings_, "Scratchpad");
+		spad_settings.get("Enabled", enabled, (int)false);
+		spad_settings.get("Top", top, 100);
+		spad_settings.get("Left", left, 100);
+		if (enabled) {
+			scratchpad_->show();
+			scratchpad_->position(left, top);
+			status_->misc_status(ST_NOTE, "SCRATCHPAD: Opened");
+		}
+		else {
+			scratchpad_->hide();
+			status_->misc_status(ST_NOTE, "SCRATCHPAD: Closed");
+		}
 	}
 }
 

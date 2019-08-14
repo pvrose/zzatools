@@ -125,6 +125,8 @@ namespace zzalog {
 		bool is_displayed(record_num_t record_num);
 		// Convert colours
 		DxAtlas::EnumColor convert_colour(Fl_Color colour);
+		// Update location widgets
+		void update_loc_widgets();
 
 	protected:
 		// Radio button valur for QSOs to display

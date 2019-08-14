@@ -135,7 +135,7 @@ bool spec_data::load_data(bool force) {
 	file.open(file_name.c_str(), fstream::in);
 	// Load data from the input stream to the appropriate dataset
 	if (file.good()) {
-		reader->load_data(this, file, adif_version_);
+		ok = reader->load_data(this, file, adif_version_);
 	} else {
 		ok = false;
 		char* message = new char[30 + file_name.length()];

@@ -515,10 +515,15 @@ lat_long_t zzalog::grid_to_latlong(string gridsquare) {
 	for (unsigned int i = 0; i < gridsquare.length(); i += 2) {
 		switch (i) {
 		case 0:
-		case 4:
 			// First two letters - 18 * 18 squares - 10 * 20 degress
 			cg = gridsquare[i] - 'A' - 9;
 			ct = gridsquare[i + 1] - 'A' - 9;
+			next_inc = inc / 10.0;
+			break;
+		case 4:
+			// Second two letters - 24 * 24 squares - 2.5 * 5 minutes degress
+			cg = gridsquare[i] - 'A' - 12;
+			ct = gridsquare[i + 1] - 'A' -12;
 			next_inc = inc / 10.0;
 			break;
 		case 2:

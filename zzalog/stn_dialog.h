@@ -164,6 +164,8 @@ namespace zzalog {
 			virtual void save_values();
 			// callsign callback - update other fields
 			static void cb_ip_call(Fl_Widget* w, void* v);
+			// upper case callback
+			static void cb_ip_upper(Fl_Widget* w, void* v);
 
 
 		protected:
@@ -182,22 +184,28 @@ namespace zzalog {
 			// Current QTH
 			qth_info_t current_qth_;
 			// Parameters for each of the QTH input widgets
-			struct { const char* label; void* v; bool is_int; int row; int col; } qth_params_[15] = {
-				{ "Callsign", (void*)&(current_qth_.callsign), false, 1, 0 },
-				{ "Name", (void*)&(current_qth_.name), false, 2, 0 },
-				{ "Street", (void*)&(current_qth_.street), false, 3, 0 },
-				{ "Town", (void*)&(current_qth_.town), false, 4, 0 },
-				{ "County", (void*)&(current_qth_.county), false, 5, 0 },
-				{ "Country", (void*)&(current_qth_.country), false, 6, 0 },
-				{ "Postcode", (void*)&(current_qth_.postcode), false, 7, 0 },
-				{ "Locator", (void*)&(current_qth_.locator), false, 0, 1 },
-				{ "DXCC Id", (void*)&(current_qth_.dxcc_id), true, 1, 1 },
-				{ "DXCC Name", (void*)&(current_qth_.dxcc_name), false, 2, 1 },
-				{ "State", (void*)&(current_qth_.state), false, 3, 1 },
-				{ "CQ Zone", (void*)&(current_qth_.cq_zone), true, 4, 1 },
-				{ "ITU Zone", (void*)&(current_qth_.itu_zone), true, 5, 1 },
-				{ "Continent", (void*)&(current_qth_.continent), false, 6, 1 },
-				{ "IOTA", (void*)&(current_qth_.iota), false, 7, 1 }
+			enum input_type {
+				CALL,
+				INTEGER,
+				MIXED,
+				UPPER
+			};
+			struct { const char* label; void* v; input_type type; int row; int col; } qth_params_[15] = {
+				{ "Callsign", (void*)&(current_qth_.callsign), CALL, 1, 0 },
+				{ "Name", (void*)&(current_qth_.name), MIXED, 2, 0 },
+				{ "Street", (void*)&(current_qth_.street), MIXED, 3, 0 },
+				{ "Town", (void*)&(current_qth_.town), MIXED, 4, 0 },
+				{ "County", (void*)&(current_qth_.county), MIXED, 5, 0 },
+				{ "Country", (void*)&(current_qth_.country), MIXED, 6, 0 },
+				{ "Postcode", (void*)&(current_qth_.postcode), MIXED, 7, 0 },
+				{ "Locator", (void*)&(current_qth_.locator), UPPER, 0, 1 },
+				{ "DXCC Id", (void*)&(current_qth_.dxcc_id), INTEGER, 1, 1 },
+				{ "DXCC Name", (void*)&(current_qth_.dxcc_name), MIXED, 2, 1 },
+				{ "State", (void*)&(current_qth_.state), UPPER, 3, 1 },
+				{ "CQ Zone", (void*)&(current_qth_.cq_zone), INTEGER, 4, 1 },
+				{ "ITU Zone", (void*)&(current_qth_.itu_zone), INTEGER, 5, 1 },
+				{ "Continent", (void*)&(current_qth_.continent), UPPER, 6, 1 },
+				{ "IOTA", (void*)&(current_qth_.iota), UPPER, 7, 1 }
 			};
 		};
 

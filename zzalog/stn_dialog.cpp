@@ -581,21 +581,28 @@ void stn_dialog::qth_group::create_form(int X, int Y) {
 		int x = qth_params_[i].col == 1 ? X + C2C : X + C1C;
 		// Y-position
 		int y = Y + R3 + qth_params_[i].row * H3;
-		if (qth_params_[i].is_int) {
+		switch (qth_params_[i].type) {
+		case INTEGER:
 			// Widget is for integer input only
 			ip3 = new Fl_Int_Input(x, y, W1C, H3, qth_params_[i].label);
 			ip3->callback(cb_value<Fl_Int_Input, string>, qth_params_[i].v);
-		}
-		else {
+			break;
+		case CALL:
 			// Widget is for text input
 			ip3 = new intl_input(x, y, W1C, H3, qth_params_[i].label);
-			if (strcmp(qth_params_[i].label, "Callsign") == 0) {
-				// Entering callsign will fill or clear the other fields
-				ip3->callback(cb_ip_call, qth_params_[i].v);
-			}
-			else {
-				ip3->callback(cb_value<intl_input, string>, qth_params_[i].v);
-			}
+			// Entering callsign will fill or clear the other fields
+			ip3->callback(cb_ip_call, qth_params_[i].v);
+			break;
+		case MIXED:
+			// Widget is for text input
+			ip3 = new intl_input(x, y, W1C, H3, qth_params_[i].label);
+			ip3->callback(cb_value<intl_input, string>, qth_params_[i].v);
+			break;
+		case UPPER:
+			// Widget to only accept upper case
+			ip3 = new intl_input(x, y, W1C, H3, qth_params_[i].label);
+			ip3->callback(cb_ip_upper, qth_params_[i].v);
+			break;
 		}
 		ip3->labelsize(FONT_SIZE);
 		ip3->textsize(FONT_SIZE);
@@ -684,11 +691,10 @@ void stn_dialog::qth_group::save_item() {
 }
 
 // Callsign callback
-void stn_dialog::qth_group::cb_ip_call(Fl_Widget* w, void*) {
+void stn_dialog::qth_group::cb_ip_call(Fl_Widget* w, void* v) {
 	qth_group* that = ancestor_view<qth_group>(w);
-	intl_input* ip = (intl_input*)w;
 	qth_info_t* qth = &that->current_qth_;
-	qth->callsign = ip->value();
+	cb_ip_upper(w, v);
 	// Parse callsign
 	// Create dummy log entry to hold callsign
 	record dummy;
@@ -752,6 +758,12 @@ void stn_dialog::qth_group::cb_ip_call(Fl_Widget* w, void*) {
 	*that->all_qths_[that->selected_name_] = *qth;
 	that->update_item();
 	that->redraw();
+}
+
+void stn_dialog::qth_group::cb_ip_upper(Fl_Widget* w, void* v) {
+	cb_value<intl_input, string>(w, v);
+	*(string*)v = to_upper(*(string*)v);
+	((intl_input*)w)->value(((string*)v)->c_str());
 }
 
 // Common group constructor

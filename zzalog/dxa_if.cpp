@@ -327,6 +327,14 @@ void dxa_if::enable_widgets() {
 	start_stop_bn_->labelcolor(fl_contrast(FL_BLACK, start_stop_bn_->color()));
 }
 
+// Update location widgets
+void dxa_if::update_loc_widgets() {
+	((Fl_Output*)locator_op_)->value(locator_.c_str());
+	((Fl_Output*)lat_dms_op_)->value(home_lat_dms_.c_str());
+	((Fl_Output*)lon_dms_op_)->value(home_long_dms_.c_str());
+}
+
+
 // Callbacks
 
 // Choice for QSOs
@@ -408,9 +416,7 @@ void dxa_if::cb_ch_locn(Fl_Widget* w, void* v) {
 	// Get home location from gridsquare in string form
 	that->home_location();
 	// Update the output widgets with the values of the new location
-	((Fl_Output*)that->locator_op_)->value(that->locator_.c_str());
-	((Fl_Output*)that->lat_dms_op_)->value(that->home_lat_dms_.c_str());
-	((Fl_Output*)that->lon_dms_op_)->value(that->home_long_dms_.c_str());
+	that->update_loc_widgets();
 	that->draw_home_flag();
 }
 
@@ -639,6 +645,29 @@ void dxa_if::home_location() {
 	// Convert to ° ' " N/E/S/W format
 	home_lat_dms_ = degrees_to_dms(home_lat_, true);
 	home_long_dms_ = degrees_to_dms(home_long_, false);
+	// Add uncertainty
+	switch (locator_.length()) {
+	case 0:
+		home_lat_dms_ += " ±90°";
+		home_long_dms_ += " ±180°";
+		break;
+	case 2:
+		home_lat_dms_ += " ±5°";
+		home_long_dms_ += " ±10°";
+		break;
+	case 4:
+		home_lat_dms_ += " ±30'";
+		home_long_dms_ += " ±1°";
+		break;
+	case 6:
+		home_lat_dms_ += " ±1'15\"";
+		home_long_dms_ += " ±2'30\"";
+		break;
+	case 8:
+		home_lat_dms_ += " ±7.5\"";
+		home_long_dms_ += " ±15\"";
+		break;
+	}
 }
 
 // Connect to DXATLAS:
@@ -1302,6 +1331,7 @@ void dxa_if::update(hint_t hint) {
 	case HT_LOCATION:
 		// The home location may have changed
 		load_values();
+		update_loc_widgets();
 		draw_home_flag();
 		break;
 		

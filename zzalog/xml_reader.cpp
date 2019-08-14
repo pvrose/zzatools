@@ -50,6 +50,9 @@ bool xml_reader::parse(istream& is) {
 		ok = process_chars(is);
 		if (ok) ok = process_tag(is);
 	}
+	if (ok) {
+		ok = is.eof();
+	}
 	return ok;
 
 }
