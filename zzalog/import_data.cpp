@@ -122,6 +122,7 @@ void import_data::start_auto_update() {
 	}
 	else {
 		status_->misc_status(ST_WARNING, "AUTO IMPORT: No files available to import.");
+		status_->rig_status(ST_WARNING, "AUTO IMPORT: No files. Re-open rig to get info here");
 	}
 }
 

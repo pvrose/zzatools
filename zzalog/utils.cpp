@@ -451,21 +451,21 @@ string zzalog::escape_string(const string text, const string escapees) {
 string zzalog::degrees_to_dms(float value, bool is_latitude) {
 	int num_degrees;
 	int num_minutes;
-	int num_seconds;
+	double num_seconds;
 	string text;
-	// Convert to an integer number of seconds
-	num_seconds = abs((int)(value * 60 * 60));
+	// Strip sign off
+	num_seconds = abs(value * 60.0 * 60.0);
 	// Divide by 60 to get number of whole minutes
-	num_minutes = num_seconds / 60;
+	num_minutes = (int)num_seconds / 60;
 	// Get the number of additional seconds
-	num_seconds = num_seconds % 60;
+	num_seconds = num_seconds - (double)(num_minutes * 60);
 	// Divide by 60 to get number of degress
 	num_degrees = num_minutes / 60;
 	// Get additional minutes
 	num_minutes = num_minutes % 60;
 	// Now format the text 
-	char* temp = new char[15]; // I count 11 but add a bit
-	sprintf(temp, "%d°%d'%d\"%c", num_degrees, num_minutes, num_seconds, value < 0 ? (is_latitude ? 'S' : 'W') : (is_latitude ? 'N' : 'E'));
+	char* temp = new char[20]; // I count 11 but add a bit
+	sprintf(temp, "%d°%d'%.1f\"%c", num_degrees, num_minutes, num_seconds, value < 0 ? (is_latitude ? 'S' : 'W') : (is_latitude ? 'N' : 'E'));
 	text = temp;
 	delete[] temp;
 	return text;

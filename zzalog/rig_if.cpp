@@ -1073,6 +1073,7 @@ rig_flrig::~rig_flrig()
 {
 	if (opened_ok_) {
 		close();
+		delete rpc_handler_;
 	}
 }
 
@@ -1211,10 +1212,7 @@ bool rig_flrig::is_good() {
 void rig_flrig::close() {
 	// Call base class  for common behaviour
 	rig_if::close();
-	// Release RPC handler
 	opened_ok_ = false;
-	delete rpc_handler_;
-	rpc_handler_ = nullptr;
 }
 
 // Do the specified request using RPC handler
