@@ -583,22 +583,34 @@ void rig_dialog::save_values() {
 
 rig_dialog::port_state rig_dialog::open_serial(const char* dev)
 {
-	int error_code;
+	//int error_code;
+	//// Try and access the serial port
+	//HANDLE fd = CreateFile(dev, GENERIC_READ | GENERIC_WRITE, 0, 0, OPEN_EXISTING, 0, 0);
+	//if (fd != INVALID_HANDLE_VALUE) {
+	//	// Accessed OK
+	//	CloseHandle(fd);
+	//	return OK;
+	//}
+	//else {
+	//	// Check if the port was there but access denied - implies in use include 
+	//	error_code = GetLastError();
+	//	if (error_code == ERROR_ACCESS_DENIED) {
+	//		return NOT_AVAILABLE;
+	//	}
+	//}
+	//return NOT_PRESENT;
 	// Try and access the serial port
-	HANDLE fd = CreateFile(dev, GENERIC_READ | GENERIC_WRITE, 0, 0, OPEN_EXISTING, 0, 0);
-	if (fd != INVALID_HANDLE_VALUE) {
+	fstream* port = new fstream(dev, ios_base::in | ios_base::out);
+	if (port->good()) {
 		// Accessed OK
-		CloseHandle(fd);
+		port->close();
+		delete port;
 		return OK;
 	}
 	else {
-		// Check if the port was there but access denied - implies in use include 
-		error_code = GetLastError();
-		if (error_code == ERROR_ACCESS_DENIED) {
-			return NOT_AVAILABLE;
-		}
+		delete port;
+		return NOT_PRESENT;
 	}
-	return NOT_PRESENT;
 }
 
 // Code ripped off from flrig - assumes COM0 to COM255

@@ -587,10 +587,10 @@ rig_mode_t rig_hamlib::mode() {
 		if (mode & RIG_MODE_FM) {
 			return GM_FM;
 		}
-		if (mode & RIG_MODE_PKTLSB) {
+		if (mode & RIG_MODE_RTTY) {
 			return GM_DIGL;
 		}
-		if (mode & RIG_MODE_PKTUSB) {
+		if (mode & RIG_MODE_RTTYR) {
 			return GM_DIGU;
 		}
 		else {
