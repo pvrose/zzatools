@@ -60,6 +60,10 @@ import_data::import_data() :
 	close_pending_ = false;
 	next_logging_mode_ = LM_OFF_AIR;
 	timer_count_ = nan("");
+	Fl_Preferences update_settings(settings_, "Real Time Update");
+	int enable;
+	update_settings.get("Enabled", enable, (int)true);
+	auto_enable_ = (bool)enable;
 }
 
 // Destructor
@@ -67,6 +71,8 @@ import_data::~import_data()
 {
 	delete[] empty_files_;
 	delete[] update_files_;
+	Fl_Preferences update_settings(settings_, "Real Time Update");
+	update_settings.set("Enabled", auto_enable_);
 }
 
 // Timer callback - Called every second so that a countdown can be displayed
@@ -87,7 +93,7 @@ void import_data::cb_timer_imp(void* v) {
 }
 
 // Start the auto update process
-void import_data::start_auto_update() {
+bool import_data::start_auto_update() {
 	// Tell user
 	status_->misc_status(ST_NOTE, "AUTO IMPORT: Started");
 	close_pending_ = false;
@@ -121,9 +127,13 @@ void import_data::start_auto_update() {
 		Fl::add_timeout(0.0, import_data::cb_timer_imp, (void*)this);
 	}
 	else {
+		// No files to update - tell calling routine to open rig again and also change flag in menu
 		status_->misc_status(ST_WARNING, "AUTO IMPORT: No files available to import.");
-		status_->rig_status(ST_WARNING, "AUTO IMPORT: No files. Re-open rig to get info here");
+		status_->rig_status(ST_WARNING, "AUTO IMPORT: No files. Re-opening rig");
+		auto_enable_ = false;
+		menu_->update_items();
 	}
+	return auto_enable_;
 }
 
 // Start an automatic (on timer) update from the defined locations
@@ -744,4 +754,12 @@ void import_data::process_lotw_header() {
 		status_->misc_status(ST_OK, "IMPORT: LotW download done.");
 		status_->progress(num_records);
 	}
+}
+
+void import_data::auto_enable(bool enabled) {
+	auto_enable_ = enabled;
+}
+
+bool import_data::auto_enable() {
+	return auto_enable_;
 }

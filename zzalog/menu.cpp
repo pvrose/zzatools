@@ -135,7 +135,8 @@ namespace zzalog {
 	{ "Download e&QSL", 0, menu::cb_mi_download, (void*)(long)import_data::EQSL_UPDATE },
 	{ "Download &LotW", 0, menu::cb_mi_download, (void*)(long)import_data::LOTW_UPDATE, FL_MENU_DIVIDER },
 	{ "&Merge", 0, menu::cb_mi_imp_merge, nullptr, FL_MENU_DIVIDER },
-	{ "&Cancel", 0, menu::cb_mi_imp_cancel, nullptr },
+	{ "&Cancel", 0, menu::cb_mi_imp_cancel, nullptr, FL_MENU_DIVIDER },
+	{ "&Enable Auto-Update", 0, menu::cb_mi_imp_enauto, nullptr, FL_MENU_TOGGLE },
 	{ 0 },
 	{ "&Reference", 0, 0, 0, FL_SUBMENU },
 	{ "&Prefix", 0, 0, 0, FL_SUBMENU },
@@ -982,6 +983,16 @@ void menu::cb_mi_imp_cancel(Fl_Widget* w, void* v) {
 	navigation_book_->selection(0, HT_ALL);
 }
 
+// Import->Enable Auto Update
+// v is not used
+void menu::cb_mi_imp_enauto(Fl_Widget* w, void* v) {
+	// Get the value of the checked menu item
+	Fl_Menu_* menu = (Fl_Menu_*)w;
+	const Fl_Menu_Item* item = menu->mvalue();
+	bool value = item->value();
+	import_data_->auto_enable(value);
+}
+
 // Extract->Clear
 // v is not used
 // clear the criteria and display the log book
@@ -1549,6 +1560,7 @@ void menu::update_items() {
 		bool save_enabled = book_->save_enabled();
 		bool delete_enabled = book_->delete_enabled();
 		bool web_enabled = book_ && book_->get_record() && book_->get_record()->item_exists("WEB");
+		bool auto_enable = import_data_ && import_data_->auto_enable();
 		// Get all relevant menu item indices
 		int index_save = find_index("&File/&Save");
 		int index_saveas = find_index("&File/Save &As");
@@ -1575,6 +1587,7 @@ void menu::update_items() {
 		int index_use_log = find_index("&Log/&Use View/Main &Log");
 		int index_use_form = find_index("&Log/&Use View/&Report View");
 		int index_use_spad = find_index("&Log/&Use View/&Scratchpad");
+		int index_auto_enable = find_index("&Import/&Enable Auto-Update");
 		// Enable/Disable save 
 		if (modified) {
 			mode(index_save, mode(index_save) & ~FL_MENU_INACTIVE);
@@ -1701,6 +1714,13 @@ void menu::update_items() {
 		}
 		else {
 			mode(index_web, mode(index_web) | FL_MENU_INACTIVE);
+		}
+		// Import->Enable Auto-Update
+		if (auto_enable) {
+			mode(index_auto_enable, mode(index_auto_enable) | FL_MENU_VALUE);
+		}
+		else {
+			mode(index_auto_enable, mode(index_auto_enable) & ~FL_MENU_VALUE);
 		}
 		// Update logging commands and rig status
 		logging(logging());

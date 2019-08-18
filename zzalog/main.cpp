@@ -392,51 +392,60 @@ void add_rig_if() {
 	}
 	else {
 		// Trya and open the connection to the rig
-		if (rig_if_->open()) {
-			if (!rig_if_->is_good()) {
-				// No rig handler or rig didn't open - assume manual logging
-				delete rig_if_;
-				rig_if_ = nullptr;
-				menu_->logging(LM_RADIO_DISC);
-				status_->misc_status(ST_ERROR, "RIG: No handler - assume real-time logging, no rig");
-			}
-			else {
-				// Connect to rig OK - see if we are a digital mode
-				if (rig_if_->mode() == GM_DIGL || rig_if_->mode() == GM_DIGU) {
-					// start auto-data mode so we import the log written by the mode app
-					menu_->logging(LM_IMPORTED);
-					rig_if_->close();
-					status_->misc_status(ST_WARNING, "RIG: Data mode - assume logging by data modem app");
-					import_data_->start_auto_update();
-				}
-				else if (!rig_if_->is_good()) {
-					char message[512];
-					sprintf(message, "RIG: Bad access - %s. Assume real-time logging, no rig", rig_if_->error_message().c_str());
-					// Problem with rig_if when making first access, close it to stop timer and clean up 
-					rig_if_->close();
+		bool done = false;
+		while (!done) {
+			if (rig_if_->open()) {
+				if (!rig_if_->is_good()) {
+					// No rig handler or rig didn't open - assume manual logging
 					delete rig_if_;
 					rig_if_ = nullptr;
 					menu_->logging(LM_RADIO_DISC);
-					status_->misc_status(ST_ERROR, message);
+					status_->misc_status(ST_ERROR, "RIG: No handler - assume real-time logging, no rig");
+					done = true;
 				}
 				else {
-					// Access rig - timer will have been started by rig_if_->open()
-					status_->misc_status(ST_OK, rig_if_->success_message().c_str());
-					menu_->logging(LM_RADIO_CONN);
+					// Connect to rig OK - see if we are a digital mode
+					if ((rig_if_->mode() == GM_DIGL || rig_if_->mode() == GM_DIGU) && import_data_->auto_enable()) {
+						// start auto-data mode so we import the log written by the mode app
+						menu_->logging(LM_IMPORTED);
+						rig_if_->close();
+						status_->misc_status(ST_WARNING, "RIG: Data mode - assume logging by data modem app");
+						if (import_data_->start_auto_update()) {
+							done = true;
+						}
+					}
+					else if (!rig_if_->is_good()) {
+						char message[512];
+						sprintf(message, "RIG: Bad access - %s. Assume real-time logging, no rig", rig_if_->error_message().c_str());
+						// Problem with rig_if when making first access, close it to stop timer and clean up 
+						rig_if_->close();
+						delete rig_if_;
+						rig_if_ = nullptr;
+						menu_->logging(LM_RADIO_DISC);
+						status_->misc_status(ST_ERROR, message);
+						done = true;
+					}
+					else {
+						// Access rig - timer will have been started by rig_if_->open()
+						status_->misc_status(ST_OK, rig_if_->success_message().c_str());
+						menu_->logging(LM_RADIO_CONN);
+						done = true;
+					}
 				}
 			}
-		}
-		else {
-			// Rig hadn't opened - set off-air logging
-			char temp[128] = "RIG: failed to open - no information";
-			if (rig_if_) {
-				snprintf(temp, sizeof(temp), "RIG: failed to open - %s", rig_if_->error_message().c_str());
+			else {
+				// Rig hadn't opened - set off-air logging
+				char temp[128] = "RIG: failed to open - no information";
+				if (rig_if_) {
+					snprintf(temp, sizeof(temp), "RIG: failed to open - %s", rig_if_->error_message().c_str());
+				}
+				delete rig_if_;
+				rig_if_ = nullptr;
+				menu_->logging(LM_RADIO_DISC);
+				status_->misc_status(ST_ERROR, temp);
+				status_->rig_status(ST_WARNING, "Manual logging");
+				done = true;
 			}
-			delete rig_if_;
-			rig_if_ = nullptr;
-			menu_->logging(LM_RADIO_DISC);
-			status_->misc_status(ST_ERROR, temp);
-			status_->rig_status(ST_WARNING, "Manual logging");
 		}
 	}
 	if (rig_if_ && !band_view_) {

@@ -45,7 +45,7 @@ namespace zzalog {
 		// public methods
 	public:
 		// Start the auto update process
-		void start_auto_update();
+		bool start_auto_update();
 		// Start an automatic (on timer) update from the defined locations
 		void auto_update();
 		// Delete the mismatch record in the update 
@@ -68,6 +68,9 @@ namespace zzalog {
 		void merge_data();
 		// load data for import
 		bool load_data(string filename);
+		// Auto-update enabled
+		bool auto_enable();
+		void auto_enable(bool enabled);
 
 
 	protected:
@@ -111,6 +114,8 @@ namespace zzalog {
 		logging_mode_t next_logging_mode_;
 		// Timer count (in seconds)
 		double timer_count_;
+		// Auto-update enbled
+		bool auto_enable_;
 
 	};
 
