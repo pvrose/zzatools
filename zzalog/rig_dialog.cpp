@@ -14,6 +14,7 @@
 #include <FL/Fl_Spinner.H>
 
 using namespace zzalog;
+using namespace std;
 
 extern Fl_Preferences* settings_;
 extern rig_if* rig_if_;
@@ -43,8 +44,11 @@ rig_dialog::rig_dialog(int X, int Y, int W, int H, const char* label) :
 	, override_check_(nullptr)
 	, rig_choice_(nullptr)
 	, rig_model_choice_(nullptr)
+	, port_if_choice_(nullptr)
+	, all_ports_(false)
 {
 	actual_rigs_.clear();
+	existing_ports_.clear();
 	for (int i = 0; i < 4; i++) ip_address_[i] = 0;
 	do_creation(X, Y);
 }
@@ -184,6 +188,14 @@ void rig_dialog::create_form(int X, int Y) {
 	port_if_choice_->textsize(FONT_SIZE);
 	port_if_choice_->callback(cb_text<Fl_Choice, string>, &port_name_);
 	port_if_choice_->tooltip("Select the comms port to use");
+
+	// Use all ports
+	show_all_ports_ = new Fl_Check_Button(C2_RIG + WBUTTON + GAP, Y1_HAMLIB + (2 * HTEXT), HBUTTON, HBUTTON, "All ports");
+	show_all_ports_->align(FL_ALIGN_RIGHT);
+	show_all_ports_->labelfont(FONT);
+	show_all_ports_->labelsize(FONT_SIZE);
+	show_all_ports_->tooltip("Select all existing ports, not just those available");
+	show_all_ports_->callback(cb_bn_all, &all_ports_);
 	populate_port_choice();
 
 	// Baud rate input 
@@ -195,7 +207,7 @@ void rig_dialog::create_form(int X, int Y) {
 	baud_rate_choice_->callback(cb_text<Fl_Choice, string>, &baud_rate_);
 
 	// Override caps
-	override_check_ = new Fl_Check_Button(baud_rate_choice_->x() + baud_rate_choice_->w() + GAP, baud_rate_choice_->y(), HBUTTON, HBUTTON, "Override rig capabilities");
+	override_check_ = new Fl_Check_Button(C2_RIG + WBUTTON + GAP, baud_rate_choice_->y(), HBUTTON, HBUTTON, "Override rig capabilities");
 	override_check_->align(FL_ALIGN_RIGHT);
 	override_check_->labelsize(FONT_SIZE);
 	override_check_->tooltip("Allow full baud rate selection");
@@ -460,6 +472,13 @@ void rig_dialog::cb_ch_over(Fl_Widget* w, void* v) {
 	that->populate_baud_choice();
 }
 
+// Select all ports in port choice
+void rig_dialog::cb_bn_all(Fl_Widget* w, void* v) {
+	cb_value<Fl_Check_Button, bool>(w, v);
+	rig_dialog* that = ancestor_view<rig_dialog>(w);
+	that->populate_port_choice();
+}
+
 // Get the settings to preload the widget values
 void rig_dialog::load_values() {
 	// Get the handler-independent settings
@@ -577,69 +596,69 @@ void rig_dialog::save_values() {
 	add_rig_if();
 }
 
-// populate_port_choice code is OS dependent - see flrig/src/support/dialogs.cxx
-// Both how to test for  port's presence 
+// Get all extant ports
+void rig_dialog::existing_ports() {
 #ifdef _WIN32
-
-rig_dialog::port_state rig_dialog::open_serial(const char* dev)
-{
-	//int error_code;
-	//// Try and access the serial port
-	//HANDLE fd = CreateFile(dev, GENERIC_READ | GENERIC_WRITE, 0, 0, OPEN_EXISTING, 0, 0);
-	//if (fd != INVALID_HANDLE_VALUE) {
-	//	// Accessed OK
-	//	CloseHandle(fd);
-	//	return OK;
-	//}
-	//else {
-	//	// Check if the port was there but access denied - implies in use include 
-	//	error_code = GetLastError();
-	//	if (error_code == ERROR_ACCESS_DENIED) {
-	//		return NOT_AVAILABLE;
-	//	}
-	//}
-	//return NOT_PRESENT;
-	// Try and access the serial port
-	fstream* port = new fstream(dev, ios_base::in | ios_base::out);
-	if (port->good()) {
-		// Accessed OK
-		port->close();
-		delete port;
-		return OK;
+	const unsigned int MAX_TTY = 255;
+	vector<unsigned int> ports;
+	ports.clear();
+	// Find which ports exists (not just available) by trying to open the port
+	for (unsigned int i = 0; i < MAX_TTY; i++) {
+		char dev[16];
+		bool use_port = false;
+		snprintf(dev, sizeof(dev), "//./COM%u", i);
+		HANDLE fd = CreateFile(dev, GENERIC_READ | GENERIC_WRITE, 0, 0, OPEN_EXISTING, 0, 0);
+		if (fd != INVALID_HANDLE_VALUE) {
+			// Accessed OK - so exists and available for use
+			CloseHandle(fd);
+			use_port = true;
+		}
+		else {
+			// Check if the port was there but access denied - implies exists but in use
+			long error_code = GetLastError();
+			if (error_code == ERROR_ACCESS_DENIED && all_ports_) {
+				use_port = true;
+			}
+		}
+		// Add it to the list of 
+		if (use_port) {
+			ports.push_back(i);
+		}
 	}
-	else {
-		delete port;
-		return NOT_PRESENT;
+	// Copy found port numbers to the array of port-names
+	existing_ports_.clear();
+	for (size_t i = 0; i < ports.size(); i++) {
+		char port[16];
+		snprintf(port, sizeof(port), "COM%u", ports[i]);
+		existing_ports_.insert(string(port));
 	}
+#else
+	// Implement posix version
+#endif
+	existing_ports_.insert(port_name_);
 }
 
-// Code ripped off from flrig - assumes COM0 to COM255
+// POpulate the chice with the available ports
 void rig_dialog::populate_port_choice() {
+	port_if_choice_->clear();
 	port_if_choice_->add("NONE");
 	port_if_choice_->value(0);
-	char ttyname[21];
-	const char tty_fmt[] = "//./COM%u";
-	int port_index = 1;
-	for (unsigned int i = 0; i <= TTY_MAX; i++) {
-		snprintf(ttyname, sizeof(ttyname), tty_fmt, i);
-		port_state state = open_serial(ttyname);
-		if (state == NOT_PRESENT)
-			continue;
-		snprintf(ttyname, sizeof(ttyname), "COM%u", i);
-		char message[128];
-		snprintf(message, sizeof(message), "RIG: Found port COM%u", i);
+	existing_ports();
+	// Now for the returned ports
+	unsigned int i = 1;
+	for (auto it = existing_ports_.begin(); it != existing_ports_.end(); it++, i++) {
+		// Add the name onto the choice drop-down list
+		char message[100];
+		const char* port = (*it).c_str();
+		snprintf(message, sizeof(message), "RIG: Found port %s", port);
 		status_->misc_status(ST_LOG, message);
-		port_if_choice_->add(ttyname);
-
-		if (strcmp(ttyname, port_name_.c_str()) == 0) {
-			port_if_choice_->value(port_index);
+		port_if_choice_->add(port);
+		// Set the value to the list of ports
+		if (strcmp(port, port_name_.c_str()) == 0) {
+			port_if_choice_->value(i);
 		}
-		port_index++;
 	}
 }
-#else
-// TODO: Add other OS support
-#endif
 
 // Populate the baud rate choice menu
 void rig_dialog::populate_baud_choice() {

@@ -6,10 +6,13 @@
 
 #include <string>
 #include <map>
+#include <set>
 
 #include <FL/Fl_Widget.H>
 #include <FL/Fl_Choice.H>
 #include <FL/Fl_Int_Input.H>
+
+using namespace std;
 
 namespace zzalog {
 
@@ -43,20 +46,15 @@ namespace zzalog {
 		void populate_baud_choice();
 		// Save rig values
 		void save_hamlib_values();
+		// Get existing ports
+		void existing_ports();
 
-
-#ifdef _WIN32
 		// state of the windows comms port
 		enum port_state {
 			OK,
 			NOT_PRESENT,
 			NOT_AVAILABLE
 		};
-		// Open the windows comms port
-		port_state open_serial(const char * dev);
-#else
-		// TODO: implement posix comms port
-#endif
 
 	protected:
 		// Radio button handler
@@ -67,6 +65,8 @@ namespace zzalog {
 		static void cb_ch_model(Fl_Widget* w, void* v);
 		// Callback override caps
 		static void cb_ch_over(Fl_Widget* w, void* v);
+		// Callback all ports
+		static void cb_bn_all(Fl_Widget* w, void* v);
 
 		// attributes
 	protected:
@@ -115,6 +115,9 @@ namespace zzalog {
 		int model_id_;
 		// Allow baud choice to override rig_caps
 		bool override_caps_;
+		// The available ports
+		bool all_ports_;
+		set<string> existing_ports_;
 
 		// The handler radio button parameters
 		radio_param_t* handler_radio_params_;
@@ -130,6 +133,7 @@ namespace zzalog {
 		Fl_Choice* baud_rate_choice_;
 		Fl_Choice* rig_choice_;
 		Fl_Check_Button* override_check_;
+		Fl_Check_Button* show_all_ports_;
 
 	};
 
