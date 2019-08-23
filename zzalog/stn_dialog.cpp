@@ -1,5 +1,5 @@
 #include "stn_dialog.h"
-#include "callback.h"
+#include "../zzalib/callback.h"
 
 #include "record.h"
 #include "pfx_data.h"

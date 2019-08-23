@@ -5,7 +5,7 @@
 #include "prefix.h"
 #include "pfx_data.h"
 #include "icons.h"
-#include "utils.h"
+#include "../zzalib/utils.h"
 #include "spec_data.h"
 
 #include <set>

@@ -1,6 +1,6 @@
 #include "page_dialog.h"
 
-#include "utils.h"
+#include "../zzalib/utils.h"
 
 #include <FL/Fl_Check_Button.H>
 

@@ -46,9 +46,6 @@ namespace zzalog {
 		void populate_baud_choice();
 		// Save rig values
 		void save_hamlib_values();
-		// Get existing ports
-		void existing_ports();
-
 		// state of the windows comms port
 		enum port_state {
 			OK,
@@ -117,7 +114,7 @@ namespace zzalog {
 		bool override_caps_;
 		// The available ports
 		bool all_ports_;
-		set<string> existing_ports_;
+		string* existing_ports_;
 
 		// The handler radio button parameters
 		radio_param_t* handler_radio_params_;

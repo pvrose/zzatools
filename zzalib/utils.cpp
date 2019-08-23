@@ -7,16 +7,22 @@ utils.h - Utility methods
 */
 #include "utils.h"
 #include "drawing.h"
-#include "record.h"
 
 #include <FL/fl_draw.H>
 #include <FL/Fl_Multiline_Output.H>
 #include <FL/Fl_Tooltip.H>
 
-using namespace zzalog;
+#include <string>
+#include <exception>
+#include <stdexcept>
+#include <vector>
+#include <ctime>
+
+using namespace std;
+
 
 // Split the line into its separate words with specified separator
-void zzalog::split_line(const string& line, vector<string>& words, const char separator) {
+void split_line(const string& line, vector<string>& words, const char separator) {
 	// Quotes will escape separator
 	bool in_quotes = false;
 	words.clear();
@@ -53,7 +59,7 @@ void zzalog::split_line(const string& line, vector<string>& words, const char se
 }
 
 // Converts display format text to a tm object for reformatting
-void zzalog::string_to_tm(string source, tm& time, string format) {
+void string_to_tm(string source, tm& time, string format) {
 	bool escaped = false;
 	// Default YMD to 19700101 to avoid assertion when only setting time
 	time.tm_year = 70;
@@ -147,7 +153,7 @@ void zzalog::string_to_tm(string source, tm& time, string format) {
 }
 
 // Convert a string e.g. 00-06:08 to an array of UINTs {0,1,2,3,4,5,6,8}
-void zzalog::string_to_ints(string& text, vector<unsigned int>& ints) {
+void string_to_ints(string& text, vector<unsigned int>& ints) {
 	int current = 0;
 	int start = 0;
 	int index = 0;
@@ -213,7 +219,7 @@ void zzalog::string_to_ints(string& text, vector<unsigned int>& ints) {
 }
 
 // returns the current time in supplied format
-string zzalog::now(bool local, const char* format) {
+string now(bool local, const char* format) {
 	// Get current time
 	time_t now = time(nullptr);
 	// convert to struct in selected timezone
@@ -225,14 +231,14 @@ string zzalog::now(bool local, const char* format) {
 }
 
 // copy tm to time_t and back to update derived values in tm struct
-void zzalog::refresh_tm(tm* date) {
+void refresh_tm(tm* date) {
 	// I think mktime regards tm as a local time
 	time_t first = mktime(date);
 	*date = *(localtime(&first));
 }
 
 // return  the number of days in the month
-int zzalog::days_in_month(tm* date) {
+int days_in_month(tm* date) {
 	switch (date->tm_mon) {
 	case 0:
 	case 2:
@@ -267,7 +273,7 @@ int zzalog::days_in_month(tm* date) {
 }
 
 // return true if the year is a leap year
-bool zzalog::is_leap(tm* date) {
+bool is_leap(tm* date) {
 	int year = date->tm_year + 1900;
 	if (year % 4 != 0) {
 		// Doesn't divide by 4 - NO
@@ -288,7 +294,7 @@ bool zzalog::is_leap(tm* date) {
 }
 
 // Create a tip window - tip text, position(root_x, root_y)
-Fl_Window* zzalog::tip_window(const string& tip, int x_root, int y_root) {
+Fl_Window* tip_window(const string& tip, int x_root, int y_root) {
 	// get the size of the text, set the font, default width
 	fl_font(Fl_Tooltip::font(), Fl_Tooltip::size());
 	int width = TIP_WIDTH;
@@ -323,7 +329,7 @@ Fl_Window* zzalog::tip_window(const string& tip, int x_root, int y_root) {
 }
 
 // Create an upper-case version of a string
-string zzalog::to_upper(const string& data) {
+string to_upper(const string& data) {
 	string upper(data.length(), 0);
 	// For the length of the string convert ech character to upper case
 	for (size_t i = 0; i < data.length(); i++) upper[i] = toupper(data[i]);
@@ -331,7 +337,7 @@ string zzalog::to_upper(const string& data) {
 }
 
 // Create an lower-case version of a string
-string zzalog::to_lower(const string& data) {
+string to_lower(const string& data) {
 	string lower(data.length(), 0);
 	// For the length of the string convert ech character to lower case
 	for (size_t i = 0; i < data.length(); i++) lower[i] = tolower(data[i]);
@@ -339,7 +345,7 @@ string zzalog::to_lower(const string& data) {
 }
 
 // Search for any characters in match (assume its zero-terminated)
-size_t zzalog::find(const char* data, size_t length, const char* match) {
+size_t find(const char* data, size_t length, const char* match) {
 	size_t pos = length;
 	bool found = false;
 	// Compare each char in data with each char in find
@@ -356,7 +362,7 @@ size_t zzalog::find(const char* data, size_t length, const char* match) {
 }
 
 // Search for single character match
-size_t zzalog::find(const char* data, size_t length, const char match) {
+size_t find(const char* data, size_t length, const char match) {
 	int pos = 0;
 	bool found = false;
 	// Compare each char in data with match
@@ -372,7 +378,7 @@ size_t zzalog::find(const char* data, size_t length, const char match) {
 }
 
 // Find the occurence of match in data 
-size_t zzalog::find_substr(const char* data, size_t length, const char* match, size_t len_substr) {
+size_t find_substr(const char* data, size_t length, const char* match, size_t len_substr) {
 	// Possible start of match
 	size_t possible = 0;
 	// Length of string remaining to match
@@ -392,7 +398,7 @@ size_t zzalog::find_substr(const char* data, size_t length, const char* match, s
 }
 
 // Search for any characters not in match (assume its zero-terminated)
-size_t zzalog::find_not(const char* data, size_t length, const char* match) {
+size_t find_not(const char* data, size_t length, const char* match) {
 	size_t pos = 0;
 	bool matches = true;
 	// Compare each char in data with each char in find
@@ -410,7 +416,7 @@ size_t zzalog::find_not(const char* data, size_t length, const char* match) {
 }
 
 // Escape the non-usable characters in a url - not alphanumeric replace with %nnx 
-string zzalog::escape_url(string url)
+string escape_url(string url)
 {
 	string result = "";
 	// For the length of the string
@@ -432,7 +438,7 @@ string zzalog::escape_url(string url)
 }
 
 // Escape characters - add a '\' before any characters in escapees
-string zzalog::escape_string(const string text, const string escapees) {
+string escape_string(const string text, const string escapees) {
 	// Create a string sufficiently long to escape all characters
 	string result = "";
 	result.reserve(2 * text.length());
@@ -448,7 +454,7 @@ string zzalog::escape_string(const string text, const string escapees) {
 }
 
 // Convert a floating point degree value to ° ' " N/E/S/W
-string zzalog::degrees_to_dms(float value, bool is_latitude) {
+string degrees_to_dms(float value, bool is_latitude) {
 	int num_degrees;
 	int num_minutes;
 	double num_seconds;
@@ -472,7 +478,7 @@ string zzalog::degrees_to_dms(float value, bool is_latitude) {
 }
 
 // Convert latitude and longitode to 2, 4, 6 or 8 character grid square
-string zzalog::latlong_to_grid(lat_long_t location, int num_chars) {
+string latlong_to_grid(lat_long_t location, int num_chars) {
 	string result;
 	result.resize(num_chars, ' ');
 	// 'Normalise' location relative to 180W, 90S - i.e. AA00aa00
@@ -506,7 +512,7 @@ string zzalog::latlong_to_grid(lat_long_t location, int num_chars) {
 }
 
 // Convert gridsquare to latitude and longitude - returns the centre of the square
-lat_long_t zzalog::grid_to_latlong(string gridsquare) {
+lat_long_t grid_to_latlong(string gridsquare) {
 	double inc = 20.0;
 	double next_inc;
 	char cg;
@@ -543,7 +549,7 @@ lat_long_t zzalog::grid_to_latlong(string gridsquare) {
 
 
 // Convert from base64 encoding - single character
-unsigned char zzalog::decode_base_64(unsigned char c) {
+unsigned char decode_base_64(unsigned char c) {
 	// A-Z => 0x00 to 0x19
 	// a-z => 0x1A to 0x33
 	// 0-9 => 0x34 to 0x3D
@@ -571,7 +577,7 @@ unsigned char zzalog::decode_base_64(unsigned char c) {
 }
 
 // Convert from base64 encoding for string
-string zzalog::decode_base_64(string value) {
+string decode_base_64(string value) {
 	string result;
 	unsigned char out = 0;
 	unsigned char in = 0;
@@ -616,7 +622,7 @@ string zzalog::decode_base_64(string value) {
 }
 
 // Encode single character to base64
-unsigned char zzalog::encode_base_64(unsigned char c) {
+unsigned char encode_base_64(unsigned char c) {
 	// Look up table to convert 6 bits to 
 	// A-Z => 0x00 to 0x19
 	// a-z => 0x1A to 0x33
@@ -630,7 +636,7 @@ unsigned char zzalog::encode_base_64(unsigned char c) {
 }
 
 // Encode the string to base64
-string zzalog::encode_base_64(string value) {
+string encode_base_64(string value) {
 	string result;
 	unsigned char out = 0;
 	unsigned char in = 0;

@@ -7,8 +7,8 @@
 #include "tabbed_forms.h"
 
 #include "status.h"
-#include "callback.h"
-#include "utils.h"
+#include "../zzalib/callback.h"
+#include "../zzalib/utils.h"
 #include "menu.h"
 
 #include <FL/fl_draw.H>

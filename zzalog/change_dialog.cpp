@@ -1,5 +1,5 @@
 #include "change_dialog.h"
-#include "callback.h"
+#include "../zzalib/callback.h"
 #include "field_choice.h"
 #include "intl_widgets.h"
 //#include "spec_data.h"

@@ -1,12 +1,12 @@
 #include "spec_data.h"
 #include "specx_reader.h"
-#include "utils.h"
+#include "../zzalib/utils.h"
 #include "book.h"
 #include "pfx_data.h"
 #include "files.h"
 #include "status.h"
 #include "corr_dialog.h"
-#include "callback.h"
+#include "../zzalib/callback.h"
 
 #include <fstream>
 #include <ostream>

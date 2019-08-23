@@ -2,7 +2,7 @@
 #define __CHANGE_DIALOG__
 
 #include "win_dialog.h"
-#include "callback.h"
+#include "../zzalib/callback.h"
 
 #include <FL/Fl_Widget.H>
 

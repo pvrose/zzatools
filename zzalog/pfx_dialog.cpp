@@ -1,7 +1,7 @@
 #include "pfx_dialog.h"
 
 #include "menu.h"
-#include "utils.h"
+#include "../zzalib/utils.h"
 
 #include <FL/Fl_Window.H>
 #include <FL/Fl_Output.H>

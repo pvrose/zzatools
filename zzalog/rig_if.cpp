@@ -2,7 +2,7 @@
 #include "status.h"
 #include "formats.h"
 #include "menu.h"
-#include "utils.h"
+#include "../zzalib/utils.h"
 #include "band_view.h"
 #include "scratchpad.h"
 

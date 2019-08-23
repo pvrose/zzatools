@@ -1,0 +1,505 @@
+#include "toolbar.h"
+#include "menu.h"
+#include "import_data.h"
+#include "icons.h"
+#include "callback.h"
+#include "book.h"
+#include "tabbed_forms.h"
+#include "pfx_data.h"
+#include "utils.h"
+#include "status.h"
+#include "drawing.h"
+#include "extract_data.h"
+
+#include <FL/Fl_Button.H>
+#include <FL/Fl_RGB_Image.H>
+#include <FL/fl_ask.H>
+#include <FL/Fl_Input.H>
+#include <FL/Fl_Tooltip.H>
+#include <FL/Fl_Single_Window.H>
+
+using namespace zzalog;
+
+extern menu* menu_;
+extern book* navigation_book_;
+extern extract_data* extract_records_;
+extern tabbed_forms* tabbed_view_;
+extern pfx_data* pfx_data_;
+extern status* status_;
+extern Fl_Single_Window* main_window_;
+
+// Constructor
+toolbar::toolbar(int X, int Y, int W, int H, const char* label) :
+	Fl_Group(X, Y, W, H, label)
+	, search_text_("")
+	, record_num_(0)
+	, ip_search_(nullptr)
+	, min_w_(0)
+{
+	int curr_x = X;
+	// File->New
+	Fl_Button* bn = new Fl_Button(curr_x, Y, H, H, "@filenew");
+	bn->callback(cb_bn_menu, (void*)"&File/&New");
+	bn->when(FL_WHEN_RELEASE);
+	bn->tooltip("New file");
+	add(bn);
+	curr_x += H;
+	// File->Open
+	bn = new Fl_Button(curr_x, Y, H, H, "@fileopen");
+	bn->callback(cb_bn_menu, (void*)"&File/&Open");
+	bn->when(FL_WHEN_RELEASE);
+	bn->tooltip("Open file");
+	add(bn);
+	curr_x += H;
+	// File->Save
+	bn = new Fl_Button(curr_x, Y, H, H, "@filesave");
+	bn->callback(cb_bn_menu, (void*)"&File/&Save");
+	bn->when(FL_WHEN_RELEASE);
+	bn->tooltip("Save file");
+	add(bn);
+	curr_x += H;
+	// File->Save As
+	bn = new Fl_Button(curr_x, Y, H, H, "@filesaveas");
+	bn->callback(cb_bn_menu, (void*)"&File/Save &As");
+	bn->when(FL_WHEN_RELEASE);
+	bn->tooltip("Save file as");
+	add(bn);
+	curr_x += H + TOOL_GAP;
+	// Navigate->First
+	bn = new Fl_Button(curr_x, Y, H, H, "@$->|");
+	bn->callback(cb_bn_menu, (void*)"&Navigate/&First");
+	bn->when(FL_WHEN_RELEASE);
+	bn->tooltip("Go to first record");
+	add(bn);
+	curr_x += H;
+	// Navigate->Previous
+	bn = new Fl_Button(curr_x, Y, H, H, "@<-");
+	bn->callback(cb_bn_menu, (void*)"&Navigate/&Previous");
+	bn->when(FL_WHEN_RELEASE);
+	bn->tooltip("Go to previous record");
+	add(bn);
+	curr_x += H;
+	// Navigate->Next
+	bn = new Fl_Button(curr_x, Y, H, H, "@->");
+	bn->callback(cb_bn_menu, (void*)"&Navigate/Ne&xt");
+	bn->when(FL_WHEN_RELEASE);
+	bn->tooltip("Go to next record");
+	add(bn);
+	curr_x += H;
+	// Navigate->Last
+	bn = new Fl_Button(curr_x, Y, H, H, "@->|");
+	bn->callback(cb_bn_menu, (void*)"&Navigate/&Last");
+	bn->when(FL_WHEN_RELEASE);
+	bn->tooltip("Go to last record");
+	add(bn);
+	curr_x += H;
+	// Navigate->Find->New
+	bn = new Fl_Button(curr_x, Y, H, H, "@search");
+	bn->labelcolor(FL_BLUE);
+	bn->callback(cb_bn_menu, (void*)"&Navigate/F&ind/&New");
+	bn->when(FL_WHEN_RELEASE);
+	bn->tooltip("Go to matching record");
+	curr_x += H;
+	// Navigate->Find->Next
+	bn = new Fl_Button(curr_x, Y, H, H, "@>>");
+	bn->labelcolor(FL_BLUE);
+	bn->callback(cb_bn_menu, (void*)"&Navigate/F&ind/Ne&xt");
+	bn->when(FL_WHEN_RELEASE);
+	bn->tooltip("Go to next matching record");
+	curr_x += H + TOOL_GAP;
+	// Log->New Record
+	bn = new Fl_Button(curr_x, Y, H, H, 0);
+	bn->callback(cb_bn_menu, (void*)"&Log/&New record");
+	bn->when(FL_WHEN_RELEASE);
+	bn->image(new Fl_RGB_Image(ICON_NEW_QSO, 16, 16, 4));
+	bn->tooltip("Start new QSO");
+	add(bn);
+	curr_x += H;
+	// Log->Save Record
+	bn = new Fl_Button(curr_x, Y, H, H, 0);
+	bn->callback(cb_bn_menu, (void*)"&Log/&Save record");
+	bn->when(FL_WHEN_RELEASE);
+	bn->image(new Fl_RGB_Image(ICON_SAVE_QSO, 16, 16, 4));
+	bn->tooltip("Save QSO");
+	add(bn);
+	curr_x += H;
+	// Log->Cancel
+	bn = new Fl_Button(curr_x, Y, H, H, 0);
+	bn->callback(cb_bn_menu, (void*)"&Log/&Cancel");
+	bn->when(FL_WHEN_RELEASE);
+	bn->image(new Fl_RGB_Image(ICON_CNCL_QSO, 16, 16, 4));
+	bn->tooltip("Cancel QSO capture or edit");
+	add(bn);
+	curr_x += H;
+	// Log->Delete Record
+	bn = new Fl_Button(curr_x, Y, H, H, 0);
+	bn->callback(cb_bn_menu, (void*)"&Log/&Delete record");
+	bn->when(FL_WHEN_RELEASE);
+	bn->image(new Fl_RGB_Image(ICON_DEL_QSO, 16, 16, 4));
+	bn->tooltip("Delete QSO record");
+	add(bn);
+	curr_x += H + TOOL_GAP;
+	// Import->Download->eQSL
+	bn = new Fl_Button(curr_x, Y, H, H, 0);
+	bn->callback(cb_bn_menu, (void*)"&Import/Download e&QSL");
+	bn->when(FL_WHEN_RELEASE);
+	bn->image(new Fl_RGB_Image(ICON_DL_EQSL, 16, 16, 4));
+	bn->tooltip("Download and import eQSL records");
+	add(bn);
+	curr_x += H;
+	// Import->Download->LotW
+	bn = new Fl_Button(curr_x, Y, H, H, 0);
+	bn->callback(cb_bn_menu, (void*)"&Import/Download &LotW");
+	bn->when(FL_WHEN_RELEASE);
+	bn->image(new Fl_RGB_Image(ICON_DL_LOTW, 16, 16, 4));
+	bn->tooltip("Download and import LotW records");
+	add(bn);
+	curr_x += H;
+	// Extract->eQSL
+	bn = new Fl_Button(curr_x, Y, H, H, 0);
+	bn->callback(cb_bn_menu, (void*)"E&xtract/e&QSL");
+	bn->when(FL_WHEN_RELEASE);
+	bn->image(new Fl_RGB_Image(ICON_EXTR_EQSL, 16, 16, 4));
+	bn->tooltip("Extract unsent eQSL records");
+	add(bn);
+	curr_x += H;
+	// Extract->LotW
+	bn = new Fl_Button(curr_x, Y, H, H, 0);
+	bn->callback(cb_bn_menu, (void*)"E&xtract/&LotW");
+	bn->when(FL_WHEN_RELEASE);
+	bn->image(new Fl_RGB_Image(ICON_EXTR_LOTW, 16, 16, 4));
+	bn->tooltip("Extract unsent LotW records");
+	add(bn);
+	curr_x += H;
+	// Extract->Upload
+	bn = new Fl_Button(curr_x, Y, H, H, 0);
+	bn->callback(cb_bn_menu, (void*)"E&xtract/&Upload");
+	bn->when(FL_WHEN_RELEASE);
+	bn->image(new Fl_RGB_Image(ICON_UPLOAD, 16, 16, 4));
+	bn->tooltip("Upload extracted records");
+	add(bn);
+	curr_x += H + TOOL_GAP;
+	// Log->Mode->On-air
+	bn = new Fl_Button(curr_x, Y, H, H, 0);
+	bn->callback(cb_bn_menu, (void*)"&Log/&Mode/&Radio Connected");
+	bn->when(FL_WHEN_RELEASE);
+	bn->image(new Fl_RGB_Image(ICON_RIG_ON, 16, 16, 4));
+	bn->tooltip("Switch to on-air mode (connect rig)");
+	add(bn);
+	curr_x += H;
+	// Log->Mode->Off-air
+	bn = new Fl_Button(curr_x, Y, H, H, 0);
+	bn->callback(cb_bn_menu, (void*)"&Log/&Mode/O&ff-air");
+	bn->when(FL_WHEN_RELEASE);
+	bn->image(new Fl_RGB_Image(ICON_RIG_OFF, 16, 16, 4));
+	bn->tooltip("Switch to off-air mode (disconnect rig)");
+	add(bn);
+	curr_x += H;
+	// Log->Mode->Import
+	bn = new Fl_Button(curr_x, Y, H, H, 0);
+	bn->callback(cb_bn_menu, (void*)"&Log/&Mode/&Import");
+	bn->when(FL_WHEN_RELEASE);
+	bn->image(new Fl_RGB_Image(ICON_IMPORT, 16, 16, 4));
+	bn->tooltip("Switch to auto-import data mode (disconnects rig and gets data from other apps)");
+	add(bn);
+	curr_x += H + TOOL_GAP;
+	// Extract->Criteria
+	bn = new Fl_Button(curr_x, Y, H, H, 0);
+	bn->callback(cb_bn_menu, (void*)"E&xtract/&Criteria");
+	bn->when(FL_WHEN_RELEASE);
+	bn->image(new Fl_RGB_Image(ICON_EXTR_ON, 16, 16, 4));
+	bn->tooltip("Set extract criteria");
+	add(bn);
+	curr_x += H;
+	// Extract->Clear
+	bn = new Fl_Button(curr_x, Y, H, H, 0);
+	bn->callback(cb_bn_menu, (void*)"E&xtract/Clea&r");
+	bn->when(FL_WHEN_RELEASE);
+	bn->image(new Fl_RGB_Image(ICON_EXTR_OFF, 16, 16, 4));
+	bn->tooltip("Clear extract criteria");
+	add(bn);
+	curr_x += H;
+	// Extract->Display
+	bn = new Fl_Button(curr_x, Y, H, H, 0);
+	// Call the menu's callback direct to get the tooltip displayed on this button.
+	bn->callback(menu::cb_mi_ext_disp);
+	bn->when(FL_WHEN_RELEASE);
+	bn->image(new Fl_RGB_Image(ICON_EXTR_DISP, 16, 16, 4));
+	bn->tooltip("Display extract criteria");
+	add(bn);
+	curr_x += H + TOOL_GAP;
+	// Information->Google Maps
+	bn = new Fl_Button(curr_x, Y, H, H, 0);
+	bn->callback(cb_bn_menu, (void*)"&Information/Google &Maps");
+	bn->when(FL_WHEN_RELEASE);
+	bn->image(new Fl_RGB_Image(ICON_MAP, 16, 16, 4));
+	bn->tooltip("Look up location in Google Maps");
+	add(bn);
+	curr_x += H;
+	// Information->QRZ.com
+	bn = new Fl_Button(curr_x, Y, H, H, 0);
+	bn->callback(menu::cb_mi_info_qrz, (void*)&search_text_);
+	bn->when(FL_WHEN_RELEASE);
+	bn->image(new Fl_RGB_Image(ICON_QRZ_COM, 16, 16, 4));
+	bn->tooltip("Look up contact in QRZ.com");
+	add(bn);
+	curr_x += H;
+	// Help->Intl
+	bn = new Fl_Button(curr_x, Y, H, H, "Æ");
+	bn->callback(cb_bn_menu, (void*)"&Help/&Intl");
+	bn->when(FL_WHEN_RELEASE);
+	bn->tooltip("Hide/Show International character set");
+	add(bn);
+	curr_x += H + TOOL_GAP;
+	// Input widget for entering search text to look for a call or to parse the call
+	search_text_ = "";
+	record_num_ = -1;
+	Fl_Input* ip = new Fl_Input(curr_x, Y, WSMEDIT, H, 0);
+	ip->callback(cb_ip_search, (void*)&search_text_);
+	ip->when(FL_WHEN_CHANGED);
+	ip->value(search_text_.c_str());
+	ip->textsize(FONT_SIZE);
+	ip->textfont(FONT);
+	add(ip);
+	// Make it visible to load the text up
+	ip_search_ = ip;
+	curr_x += WSMEDIT;
+	// Button to search in log for above callsign
+	bn = new Fl_Button(curr_x, Y, H, H, "@2->");
+	bn->callback(cb_bn_search);
+	bn->when(FL_WHEN_RELEASE);
+	bn->tooltip("Jump to next occurence of call in log");
+	bn->labelsize(FONT_SIZE);
+	add(bn);
+	curr_x += H;
+	// Button to extract all records with this callsign
+	bn = new Fl_Button(curr_x, Y, H, H, "@2>[]");
+	bn->callback(cb_bn_extract);
+	bn->when(FL_WHEN_RELEASE);
+	bn->tooltip("Display all QSOs with thsi callsign in extract log");
+	bn->labelsize(FONT_SIZE);
+	add(bn);
+	curr_x += H;
+	// Button to parse and explain the callsign in a tooltip
+	bn = new Fl_Button(curr_x, Y, H, H, "DX?");
+	bn->callback(cb_bn_explain);
+	bn->when(FL_WHEN_RELEASE);
+	bn->labelfont(FONT);
+	bn->labelsize(FONT_SIZE);
+	add(bn);
+	curr_x += H + TOOL_GAP;
+
+
+	end();
+	// Now copy the active images to the deactivated images
+	for (int i = 0; i < children(); i++) {
+		Fl_RGB_Image* image = (Fl_RGB_Image*)child(i)->image();
+		if (image != nullptr) {
+			// The button has an image
+			child(i)->deimage(image->copy());
+			child(i)->deimage()->inactive();
+		}
+	}
+	// Don't allow the buttons to be resized when the window is resized
+	resizable(nullptr);
+	show();
+	// Do not allow the toolbar to be resized narrower than the width of the buttons
+	min_w_ = curr_x;
+
+}
+
+// Destructor
+toolbar::~toolbar()
+{
+	// For each button
+	for (int i = 0; i < children(); i++) {
+		// if it has an image - delete the image and the inactive image
+		if (child(i)->image() != nullptr) {
+			delete child(i)->image();
+			delete child(i)->deimage();
+		}
+	}
+	clear();
+}
+
+// Button callback - v provides the label of the desired menu item
+void toolbar::cb_bn_menu(Fl_Widget*w, void*v) {
+	// Get the menu item
+	const Fl_Menu_Item* cb = menu_->find_item((char*)v);
+	char* message = new char[strlen((char*)v) + 50];
+	// If the menu item exists - invoke its callback if it can be picked
+	if (cb != nullptr) {
+		if (cb->active()) {
+			cb->do_callback(menu_);
+		}
+		else {
+			// log that inactive menu item selected
+			sprintf(message, "MENU: Tried to select tool bar for inactive item %s", (char*)v);
+			status_->misc_status(ST_LOG, message);
+		}
+	}
+	else {
+		// If the menu items does not exists
+		sprintf(message, "MENU: Unable to find the menu item - %s", (char*)v);
+		status_->misc_status(ST_FATAL, message);
+		delete[] message;
+	}
+}
+
+// Callback when the search input widget is typed in - v contains a pointer to the search_data_
+void toolbar::cb_ip_search(Fl_Widget* w, void* v) {
+	// Call the default callback to get the input value
+	cb_value<Fl_Input, string>(w, v);
+	// Set the start record number of the search to before the start of the log
+	toolbar* that = ancestor_view<toolbar>(w);
+	that->record_num_ = 0;
+}
+
+// Search the log for the next occurence of the callsign
+void toolbar::cb_bn_search(Fl_Widget* w, void* v) {
+	toolbar* that = ancestor_view<toolbar>(w);
+	bool found = false;
+	bool keep_on = true;
+	string search_call = to_upper(that->search_text_);
+	while (keep_on) {
+		// For each record from the last search result until found
+		for (record_num_t i = that->record_num_; i < navigation_book_->size() && !found; i++) {
+			// Compare the callsign against the search input
+			record* record = navigation_book_->get_record(i, false);
+			if (record->item("CALL") == search_call) {
+				// select the record that was found
+				found = true;
+				navigation_book_->selection(i, HT_SELECTED);
+				// Remember the record found
+				that->record_num_ = i + 1;
+			}
+		}
+		if (!found) {
+			// Callsign not found
+			if (that->record_num_ == 0) {
+				// Still at the start of the book so no entries at all of this callsign
+				char* message = new char[that->search_text_.length() + 50];
+				sprintf(message, "SEARCH: %s not found", that->search_text_.c_str());
+				status_->misc_status(ST_WARNING, message);
+				delete[] message;
+				keep_on = false;
+			}
+			else {
+				// We have had at least one occurence
+				char* message = new char[that->search_text_.length() + 50];
+				sprintf(message, "SEARCH: No more instances of %s found", that->search_text_.c_str());
+				status_->misc_status(ST_NOTE, message);
+				delete[] message;
+				if (fl_choice("Reached the end of the log, do you want to start again?", "Yes", "No", nullptr) == 1) {
+					keep_on = false;
+				}
+				else {
+					that->record_num_ = 0;
+				}
+			}
+		}
+		else {
+			keep_on = false;
+		}
+	}
+}
+
+// Callback to extract all the records for the callsign in the search text box
+void toolbar::cb_bn_extract(Fl_Widget* w, void* v) {
+	toolbar* that = ancestor_view<toolbar>(w);
+	extract_records_->extract_call(that->search_text_);
+}
+
+// Open a tooltip that displays the parse results for the callsign in the search text box
+void toolbar::cb_bn_explain(Fl_Widget* w, void* v) {
+	toolbar* that = ancestor_view<toolbar>(w);
+	// Create a temporary record to parse theh callsign
+	record* tip_record = new record(LM_RADIO_CONN);
+	vector<prefix*> prefixes;
+	char temp[1024];
+	string message = "";
+	tip_record->item("CALL", that->search_text_);
+	if (pfx_data_->all_prefixes(tip_record, &prefixes, false)) {
+		// We have at least one result - add appropriate heading to tip
+		if (prefixes.size() > 1) {
+			sprintf(temp, "%d Possible prefixes found\n", prefixes.size());
+		}
+		else {
+			strcpy(temp, "Prefix found \n");
+		}
+		message += temp;
+		// For each prefix found
+		for (size_t i = 0; i < prefixes.size(); i++) {
+			// Get the prefix and its associated DXCC entity prefix
+			prefix* pfx = prefixes[i];
+			prefix* dxcc_pfx = pfx;
+			while (dxcc_pfx->parent_ != nullptr) dxcc_pfx = dxcc_pfx->parent_;
+			// Add explanation of DXCC entity
+			sprintf(temp, "DXCC %s - %s\n", dxcc_pfx->nickname_.c_str(), dxcc_pfx->name_.c_str());
+			message += temp;
+			if (pfx->parent_ != nullptr) {
+				// If prefix wasn't DXCC - add prefix explanation
+				sprintf(temp, "+ Prefix %s - %s\n", pfx->nickname_.c_str(), pfx->name_.c_str());
+				message += temp;
+			}
+			// Add any special information - add the DXCC entity code to our dummy record to speed up the search
+			string dxcc_code = to_string(pfx->dxcc_code_);
+			tip_record->item("DXCC", dxcc_code);
+			vector<prefix*> specials;
+			if (pfx_data_->all_prefixes(tip_record, &specials, true)) {
+				// Add the special call explanation
+				for (auto it = specials.begin(); it != specials.end(); it++) {
+					sprintf(temp, "+ Prefix %s - %s\n", (*it)->nickname_.c_str(), (*it)->name_.c_str());
+					message += temp;
+				}
+			}
+		}
+	} 
+	else {
+		// No prefixes found that match
+		message = "No prefixes found\n";
+	}
+	// Create a tooltip window at the explain button (in w) X and Y
+	Fl_Window* tw = ::tip_window(message, main_window_->x_root() + w->x(), main_window_->y_root() + w->y());
+	// Set the timeout on the tooltip
+	Fl::add_timeout(Fl_Tooltip::delay(), cb_timer_tip, tw);
+	delete tip_record;
+}
+
+int toolbar::min_w() { return min_w_;  }
+
+// Set the record number to get the default input for the input
+void toolbar::search_text(int record_num) {
+	record_num_ = record_num;
+	if (navigation_book_->size()) {
+		search_text_ = navigation_book_->get_record(navigation_book_->item_number(record_num_), false)->item("CALL");
+	}
+	else {
+		search_text_ = "";
+	}
+	record_num_++;
+	((Fl_Input*)ip_search_)->value(search_text_.c_str());
+	redraw();
+}
+
+// Update items 
+void toolbar::update_items() {
+	int num_children = children();
+	// For all widgets
+	for (int i = 0; i < num_children; i++) {
+		Fl_Widget* w = child(i);
+		// If it has the menu item callback, then set the widget active as the menu item is
+		if (w->callback() == &cb_bn_menu) {
+			const Fl_Menu_Item* cb = menu_->find_item((char*)w->user_data());
+			if (cb == nullptr) {
+				if (status_) status_->misc_status(ST_SEVERE, "TOOLBAR: Broken menu item");
+				w->deactivate();
+			} else if (cb->active()) {
+				w->activate();
+			}
+			else {
+				w->deactivate();
+			}
+		}
+	}
+}

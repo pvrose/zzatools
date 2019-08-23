@@ -5,7 +5,7 @@
 #include "book.h"
 #include "status.h"
 #include "tabbed_forms.h"
-#include "callback.h"
+#include "../zzalib/callback.h"
 
 #include <FL/fl_draw.H>
 

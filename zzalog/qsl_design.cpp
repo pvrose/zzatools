@@ -3,8 +3,8 @@
 #include "record.h"
 #include "book.h"
 #include "drawing.h"
-#include "callback.h"
-#include "utils.h"
+#include "../zzalib/callback.h"
+#include "../zzalib/utils.h"
 #include "settings.h"
 #include "intl_widgets.h"
 

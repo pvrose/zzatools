@@ -7,7 +7,7 @@
 #include "tabbed_forms.h"
 #include "import_data.h"
 #include "rig_if.h"
-#include "utils.h"
+#include "../zzalib/utils.h"
 #include "status.h"
 
 
@@ -21,7 +21,7 @@
 #include "spec_tree.h"
 #include "report_tree.h"
 #include "url_handler.h"
-#include "callback.h"
+#include "../zzalib/callback.h"
 #include "page_dialog.h"
 #include "intl_dialog.h"
 #include "toolbar.h"

@@ -1,10 +1,13 @@
 
 #include "rig_dialog.h"
 
-#include "utils.h"
+#include "../zzalib/utils.h"
 #include "rig_if.h"
 #include "status.h"
 #include "intl_widgets.h"
+#include "drawing.h"
+
+#include "../zzalib/serial.h"
 
 #include <FL/Fl_Preferences.H>
 #include <FL/Fl_Group.H>
@@ -45,10 +48,11 @@ rig_dialog::rig_dialog(int X, int Y, int W, int H, const char* label) :
 	, rig_choice_(nullptr)
 	, rig_model_choice_(nullptr)
 	, port_if_choice_(nullptr)
+	, show_all_ports_(nullptr)
 	, all_ports_(false)
+	, existing_ports_(nullptr)
 {
 	actual_rigs_.clear();
-	existing_ports_.clear();
 	for (int i = 0; i < 4; i++) ip_address_[i] = 0;
 	do_creation(X, Y);
 }
@@ -57,6 +61,7 @@ rig_dialog::rig_dialog(int X, int Y, int W, int H, const char* label) :
 rig_dialog::~rig_dialog()
 {
 	delete[] handler_radio_params_;
+	delete[] existing_ports_;
 }
 
 // Create the dialog display
@@ -596,60 +601,25 @@ void rig_dialog::save_values() {
 	add_rig_if();
 }
 
-// Get all extant ports
-void rig_dialog::existing_ports() {
-#ifdef _WIN32
-	const unsigned int MAX_TTY = 255;
-	vector<unsigned int> ports;
-	ports.clear();
-	// Find which ports exists (not just available) by trying to open the port
-	for (unsigned int i = 0; i < MAX_TTY; i++) {
-		char dev[16];
-		bool use_port = false;
-		snprintf(dev, sizeof(dev), "//./COM%u", i);
-		HANDLE fd = CreateFile(dev, GENERIC_READ | GENERIC_WRITE, 0, 0, OPEN_EXISTING, 0, 0);
-		if (fd != INVALID_HANDLE_VALUE) {
-			// Accessed OK - so exists and available for use
-			CloseHandle(fd);
-			use_port = true;
-		}
-		else {
-			// Check if the port was there but access denied - implies exists but in use
-			long error_code = GetLastError();
-			if (error_code == ERROR_ACCESS_DENIED && all_ports_) {
-				use_port = true;
-			}
-		}
-		// Add it to the list of 
-		if (use_port) {
-			ports.push_back(i);
-		}
-	}
-	// Copy found port numbers to the array of port-names
-	existing_ports_.clear();
-	for (size_t i = 0; i < ports.size(); i++) {
-		char port[16];
-		snprintf(port, sizeof(port), "COM%u", ports[i]);
-		existing_ports_.insert(string(port));
-	}
-#else
-	// Implement posix version
-#endif
-	existing_ports_.insert(port_name_);
-}
 
 // POpulate the chice with the available ports
 void rig_dialog::populate_port_choice() {
 	port_if_choice_->clear();
 	port_if_choice_->add("NONE");
 	port_if_choice_->value(0);
-	existing_ports();
+	delete[] existing_ports_;
+	int num_ports = 1;
+	existing_ports_ = new string[1];
+	serial serial;
+	while (!serial.available_ports(num_ports, existing_ports_, all_ports_, num_ports)) {
+		delete[] existing_ports_;
+		existing_ports_ = new string[num_ports];
+	}
 	// Now for the returned ports
-	unsigned int i = 1;
-	for (auto it = existing_ports_.begin(); it != existing_ports_.end(); it++, i++) {
+	for (int i = 0; i < num_ports; i++) {
 		// Add the name onto the choice drop-down list
 		char message[100];
-		const char* port = (*it).c_str();
+		const char* port = existing_ports_[i].c_str();
 		snprintf(message, sizeof(message), "RIG: Found port %s", port);
 		status_->misc_status(ST_LOG, message);
 		port_if_choice_->add(port);

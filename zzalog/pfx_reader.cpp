@@ -1,7 +1,7 @@
 #include "pfx_reader.h"
 #include "pfx_data.h"
 #include "prefix.h"
-#include "utils.h"
+#include "../zzalib/utils.h"
 #include "status.h"
 #include "files.h"
 

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -31,7 +31,7 @@
     <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
@@ -111,6 +111,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="zzalib\serial.cpp" />
+    <ClCompile Include="zzalib\utils.cpp" />
     <ClCompile Include="zzalog\about_dialog.cpp" />
     <ClCompile Include="zzalog\adi_reader.cpp" />
     <ClCompile Include="zzalog\adi_writer.cpp" />
@@ -167,7 +169,6 @@
     <ClCompile Include="zzalog\tsv_writer.cpp" />
     <ClCompile Include="zzalog\url_handler.cpp" />
     <ClCompile Include="zzalog\use_dialog.cpp" />
-    <ClCompile Include="zzalog\utils.cpp" />
     <ClCompile Include="zzalog\view.cpp" />
     <ClCompile Include="zzalog\web_dialog.cpp" />
     <ClCompile Include="zzalog\win_dialog.cpp" />
@@ -176,6 +177,9 @@
     <ClCompile Include="zzalog\xml_writer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="zzalib\callback.h" />
+    <ClInclude Include="zzalib\serial.h" />
+    <ClInclude Include="zzalib\utils.h" />
     <ClInclude Include="zzalog\about_dialog.h" />
     <ClInclude Include="zzalog\adi_reader.h" />
     <ClInclude Include="zzalog\adi_writer.h" />
@@ -184,7 +188,6 @@
     <ClInclude Include="zzalog\band_view.h" />
     <ClInclude Include="zzalog\book.h" />
     <ClInclude Include="zzalog\calendar.h" />
-    <ClInclude Include="zzalog\callback.h" />
     <ClInclude Include="zzalog\change_dialog.h" />
     <ClInclude Include="zzalog\config_tree.h" />
     <ClInclude Include="zzalog\corr_dialog.h" />
@@ -240,7 +243,6 @@
     <ClInclude Include="zzalog\tsv_writer.h" />
     <ClInclude Include="zzalog\url_handler.h" />
     <ClInclude Include="zzalog\use_dialog.h" />
-    <ClInclude Include="zzalog\utils.h" />
     <ClInclude Include="zzalog\view.h" />
     <ClInclude Include="zzalog\web_dialog.h" />
     <ClInclude Include="zzalog\win_dialog.h" />

@@ -1,8 +1,8 @@
 #include "edit_dialog.h"
-#include "utils.h"
+#include "../zzalib/utils.h"
 #include "intl_dialog.h"
 
-#include "callback.h"
+#include "../zzalib/callback.h"
 
 #include <FL/Fl.H>
 #include <FL/Fl_Menu_Button.H>

@@ -7,7 +7,7 @@ record.cpp - Individual record data item: implementation file
 */
 
 #include "record.h"
-#include "utils.h"
+#include "../zzalib/utils.h"
 #include "pfx_data.h"
 #include "spec_data.h"
 #include "rig_if.h"

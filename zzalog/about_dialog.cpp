@@ -2,7 +2,7 @@
 
 #include "spec_data.h"
 #include "icons.h"
-#include "utils.h"
+#include "../zzalib/utils.h"
 
 #include "hamlib/rig.h"
 

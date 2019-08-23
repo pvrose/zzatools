@@ -1,0 +1,282 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>15.0</VCProjectVersion>
+    <ProjectGuid>{5018D4FE-BCB4-4F49-AEEA-BDA0B2E229CF}</ProjectGuid>
+    <RootNamespace>zzalog</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LibraryPath>C:\Users\Philip\Downloads\fltk-1.3.4-2\lib;C:\Users\Philip\Documents\curl-7.61.0\curl-src\builds\libcurl-vc-x86-debug-dll-ipv6-sspi-winssl\lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LibraryPath>C:\Users\Philip\Downloads\fltk-1.3.4-2\lib;C:\Users\Philip\Documents\curl-7.61.0\curl-src\builds\libcurl-vc-x86-debug-dll-ipv6-sspi-winssl\lib;C:\Program Files %28x86%29\hamlib-w32-3.3\lib\msvc;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>C:\Users\Philip\Downloads\fltk-1.3.4-2;C:\Program Files %28x86%29\hamlib-w32-3.3\include;C:\Users\Philip\Documents\curl-7.61.0\curl-src\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;FL_ABI_VERSION=10304;_WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShowIncludes>false</ShowIncludes>
+      <PreprocessToFile>false</PreprocessToFile>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>fltkd.lib;wsock32.lib;comctl32.lib;fltkjpegd.lib;fltkimagesd.lib;fltkpngd.lib;fltkzlibd.lib;libcurl_debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SubSystem>Console</SubSystem>
+      <PreventDllBinding>false</PreventDllBinding>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>C:\Users\Philip\Documents\curl-7.61.0\curl-src\include;C:\Users\Philip\Downloads\fltk-1.3.4-2;C:\Program Files %28x86%29\hamlib-w32-3.3\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;_WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ShowIncludes>false</ShowIncludes>
+    </ClCompile>
+    <Link>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>fltk.lib;wsock32.lib;comctl32.lib;fltkjpeg.lib;fltkimages.lib;fltkpng.lib;fltkzlib.lib;libcurl_debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <PreventDllBinding>false</PreventDllBinding>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+      <SubSystem>NotSet</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="about_dialog.cpp" />
+    <ClCompile Include="band_view.cpp" />
+    <ClCompile Include="field_choice.cpp" />
+    <ClCompile Include="intl_dialog.cpp" />
+    <ClCompile Include="scratchpad.cpp" />
+    <ClCompile Include="specx_reader.cpp" />
+    <ClCompile Include="spec_data.cpp" />
+    <ClCompile Include="spec_tree.cpp" />
+    <ClCompile Include="adi_reader.cpp" />
+    <ClCompile Include="adi_writer.cpp" />
+    <ClCompile Include="adx_reader.cpp" />
+    <ClCompile Include="adx_writer.cpp" />
+    <ClCompile Include="book.cpp" />
+    <ClCompile Include="calendar.cpp" />
+    <ClCompile Include="change_dialog.cpp" />
+    <ClCompile Include="dxa_if.cpp" />
+    <ClCompile Include="extract_data.cpp" />
+    <ClCompile Include="lotw_handler.cpp" />
+    <ClCompile Include="pfx_tree.cpp" />
+    <ClCompile Include="power_matrix.cpp" />
+    <ClCompile Include="report_tree.cpp" />
+    <ClCompile Include="rpc_data_item.cpp" />
+    <ClCompile Include="rpc_handler.cpp" />
+    <ClCompile Include="search_dialog.cpp" />
+    <ClCompile Include="fields_dialog.cpp" />
+    <ClCompile Include="config_tree.cpp" />
+    <ClCompile Include="stn_dialog.cpp" />
+    <ClCompile Include="files_dialog.cpp" />
+    <ClCompile Include="page_dialog.cpp" />
+    <ClCompile Include="settings.cpp" />
+    <ClCompile Include="corr_dialog.cpp" />
+    <ClCompile Include="printer.cpp" />
+    <ClCompile Include="edit_dialog.cpp" />
+    <ClCompile Include="tsv_writer.cpp" />
+    <ClCompile Include="url_handler.cpp" />
+    <ClCompile Include="use_dialog.cpp" />
+    <ClCompile Include="web_dialog.cpp" />
+    <ClCompile Include="win_dialog.cpp" />
+    <ClCompile Include="eqsl_handler.cpp" />
+    <ClCompile Include="log_table.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="menu.cpp" />
+    <ClCompile Include="import_data.cpp" />
+    <ClCompile Include="pfx_data.cpp" />
+    <ClCompile Include="pfx_dialog.cpp" />
+    <ClCompile Include="pfx_reader.cpp" />
+    <ClCompile Include="record.cpp" />
+    <ClCompile Include="record_form.cpp" />
+    <ClCompile Include="rig_dialog.cpp" />
+    <ClCompile Include="rig_if.cpp" />
+    <ClCompile Include="status.cpp" />
+    <ClCompile Include="tabbed_forms.cpp" />
+    <ClCompile Include="toolbar.cpp" />
+    <ClCompile Include="utils.cpp" />
+    <ClCompile Include="view.cpp" />
+    <ClCompile Include="record_table.cpp" />
+    <ClCompile Include="xml_element.cpp" />
+    <ClCompile Include="xml_reader.cpp" />
+    <ClCompile Include="xml_writer.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="about_dialog.h" />
+    <ClInclude Include="band_view.h" />
+    <ClInclude Include="fields.h" />
+    <ClInclude Include="field_choice.h" />
+    <ClInclude Include="files.h" />
+    <ClInclude Include="formats.h" />
+    <ClInclude Include="intl_dialog.h" />
+    <ClInclude Include="scratchpad.h" />
+    <ClInclude Include="search.h" />
+    <ClInclude Include="specx_reader.h" />
+    <ClInclude Include="spec_data.h" />
+    <ClInclude Include="spec_tree.h" />
+    <ClInclude Include="adi_reader.h" />
+    <ClInclude Include="adi_writer.h" />
+    <ClInclude Include="adx_reader.h" />
+    <ClInclude Include="adx_writer.h" />
+    <ClInclude Include="book.h" />
+    <ClInclude Include="calendar.h" />
+    <ClInclude Include="callback.h" />
+    <ClInclude Include="change_dialog.h" />
+    <ClInclude Include="dxa_if.h" />
+    <ClInclude Include="extract_data.h" />
+    <ClInclude Include="lotw_handler.h" />
+    <ClInclude Include="pfx_tree.h" />
+    <ClInclude Include="power_matrix.h" />
+    <ClInclude Include="report_tree.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="rpc_data_item.h" />
+    <ClInclude Include="rpc_handler.h" />
+    <ClInclude Include="search_dialog.h" />
+    <ClInclude Include="fields_dialog.h" />
+    <ClInclude Include="config_tree.h" />
+    <ClInclude Include="stn_dialog.h" />
+    <ClInclude Include="files_dialog.h" />
+    <ClInclude Include="icons.h" />
+    <ClInclude Include="page_dialog.h" />
+    <ClInclude Include="settings.h" />
+    <ClInclude Include="drawing.h" />
+    <ClInclude Include="corr_dialog.h" />
+    <ClInclude Include="printer.h" />
+    <ClInclude Include="edit_dialog.h" />
+    <ClInclude Include="tsv_writer.h" />
+    <ClInclude Include="url_handler.h" />
+    <ClInclude Include="use_dialog.h" />
+    <ClInclude Include="web_dialog.h" />
+    <ClInclude Include="win_dialog.h" />
+    <ClInclude Include="eqsl_handler.h" />
+    <ClInclude Include="log_table.h" />
+    <ClInclude Include="menu.h" />
+    <ClInclude Include="import_data.h" />
+    <ClInclude Include="pfx_data.h" />
+    <ClInclude Include="pfx_dialog.h" />
+    <ClInclude Include="pfx_reader.h" />
+    <ClInclude Include="prefix.h" />
+    <ClInclude Include="record.h" />
+    <ClInclude Include="record_form.h" />
+    <ClInclude Include="rig_dialog.h" />
+    <ClInclude Include="rig_if.h" />
+    <ClInclude Include="status.h" />
+    <ClInclude Include="tabbed_forms.h" />
+    <ClInclude Include="toolbar.h" />
+    <ClInclude Include="utils.h" />
+    <ClInclude Include="view.h" />
+    <ClInclude Include="record_table.h" />
+    <ClInclude Include="xml_element.h" />
+    <ClInclude Include="xml_reader.h" />
+    <ClInclude Include="xml_writer.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="zzalog.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="zzalog.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="..\..\..\..\..\..\..\Program Files (x86)\hamlib-w32-3.3\lib\msvc\libhamlib-2.lib" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

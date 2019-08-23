@@ -1,8 +1,8 @@
 #include "spec_tree.h"
 
-#include "utils.h"
+#include "../zzalib/utils.h"
 #include "tabbed_forms.h"
-#include "callback.h"
+#include "../zzalib/callback.h"
 #include "status.h"
 
 #include <map>

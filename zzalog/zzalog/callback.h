@@ -20,12 +20,10 @@ namespace zzalog {
 		unsigned int value;
 		// The int or enum to receive the value
 		int* attribute;
-		// Default constructor
 		radio_param_t() {
 			value = 0;
 			attribute = nullptr;
 		}
-		// Constructor to initialise structure
 		radio_param_t(unsigned int a, int* b) {
 			value = a;
 			attribute = b;
@@ -46,7 +44,6 @@ namespace zzalog {
 		Fl_Input* input_w;
 		// The check widget to receive the enablr
 		Fl_Check_Button* enable_w;
-		// DEfault constructor
 		browser_data_t() {
 			message = "";
 			pattern = "";
@@ -55,7 +52,6 @@ namespace zzalog {
 			input_w = nullptr;
 			enable_w = nullptr;
 		}
-		// Initialising constructor
 		browser_data_t(string m, string p, string* f, bool* e, Fl_Input* i, Fl_Check_Button* w) {
 			message = m;
 			pattern = p;
@@ -255,17 +251,8 @@ namespace zzalog {
 		char temp[128];
 		choice->item_pathname(temp, sizeof(temp) - 1);
 		// If there is a value get its text - note as pathname it will be preceded by a '/'.
-		if (temp[0] != 0) {
-			if (temp[0] == '/') {
-				*enum_value = &temp[1];
-			}
-			else {
-				*enum_value = temp;
-			}
-		}
-		else {
-			*enum_value = "";
-		}
+		if (temp[0] != 0) *enum_value = &temp[1];
+		else *enum_value = "";
 	}
 
 }

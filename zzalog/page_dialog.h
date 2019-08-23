@@ -1,7 +1,7 @@
 #ifndef __PAGE_DIALOG__
 #define __PAGE_DIALOG__
 
-#include "callback.h"
+#include "../zzalib/callback.h"
 #include "drawing.h"
 
 #include <FL/Fl_Group.H>

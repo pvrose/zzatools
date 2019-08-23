@@ -2,10 +2,10 @@
 #include "pfx_dialog.h"
 #include "pfx_reader.h"
 
-#include "utils.h"
+#include "../zzalib/utils.h"
 #include "spec_data.h"
 #include "status.h"
-#include "callback.h"
+#include "../zzalib/callback.h"
 
 #include <FL/fl_ask.H>
 #include <FL/Fl_Preferences.H>

@@ -6,7 +6,7 @@
 
 #include "dxa_if.h"
 
-#include "callback.h"
+#include "../zzalib/callback.h"
 #include "book.h"
 #include "extract_data.h"
 #include "status.h"

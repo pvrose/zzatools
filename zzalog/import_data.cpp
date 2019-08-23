@@ -7,7 +7,7 @@
 #include "eqsl_handler.h"
 #include "lotw_handler.h"
 #include "rig_if.h"
-#include "utils.h"
+#include "../zzalib/utils.h"
 #include "menu.h"
 
 #include <sstream>

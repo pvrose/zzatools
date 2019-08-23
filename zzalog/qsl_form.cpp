@@ -1,7 +1,7 @@
 #include "qsl_form.h"
 #include "record.h"
 #include "drawing.h"
-#include "utils.h"
+#include "../zzalib/utils.h"
 #include "qsl_design.h"
 
 #include <FL/Fl_Group.H>

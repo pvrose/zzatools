@@ -1,7 +1,7 @@
 #include "band_view.h"
 #include "status.h"
-#include "utils.h"
-#include "callback.h"
+#include "../zzalib/utils.h"
+#include "../zzalib/callback.h"
 #include "drawing.h"
 
 #include <fstream>

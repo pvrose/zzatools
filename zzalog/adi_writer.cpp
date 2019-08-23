@@ -5,7 +5,7 @@
 #include "book.h"
 #include "files.h"
 #include "spec_data.h"
-#include "utils.h"
+#include "../zzalib/utils.h"
 #include "about_dialog.h"
 
 #include <fstream>

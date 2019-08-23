@@ -9,7 +9,7 @@ main.cpp - application entry point
 // local header files
 
 #include "icons.h"
-#include "utils.h"
+#include "../zzalib/utils.h"
 #include "record.h"
 #include "settings.h"
 #include "menu.h"
@@ -28,7 +28,7 @@ main.cpp - application entry point
 #include "pfx_tree.h"
 #include "spec_tree.h"
 #include "report_tree.h"
-#include "callback.h"
+#include "../zzalib/callback.h"
 #include "about_dialog.h"
 #include "drawing.h"
 #include "intl_dialog.h"

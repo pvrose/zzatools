@@ -12,7 +12,7 @@
 #include "spec_data.h"
 #include "pfx_data.h"
 #include "prefix.h"
-#include "utils.h"
+#include "../zzalib/utils.h"
 #include "intl_widgets.h"
 #include "band_view.h"
 

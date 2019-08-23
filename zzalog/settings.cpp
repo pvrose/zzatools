@@ -7,7 +7,7 @@
 #include "qsl_design.h"
 #include "config_tree.h"
 
-#include "utils.h"
+#include "../zzalib/utils.h"
 
 #include <FL/Fl.H>
 #include <FL/Fl_Button.H>

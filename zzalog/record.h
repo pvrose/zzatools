@@ -8,7 +8,7 @@ record.h - Individual record data item: header file
 #ifndef __RECORD__
 #define __RECORD__
 
-#include "utils.h"
+#include "../zzalib/utils.h"
 
 #include <map>
 #include <string>

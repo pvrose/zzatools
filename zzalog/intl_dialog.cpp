@@ -1,7 +1,7 @@
 #include "intl_dialog.h"
-#include "utils.h"
+#include "../zzalib/utils.h"
 #include "status.h"
-#include "callback.h"
+#include "../zzalib/callback.h"
 
 #include <FL/Fl_Preferences.H>
 #include <FL/Fl_Button.H>
