@@ -4,6 +4,8 @@
 #include "../zzalib/utils.h"
 #include "drawing.h"
 
+#include <string>
+#include <stdexcept>
 
 #include <FL/Fl.H>
 #include <FL/Fl_Widget.H>

@@ -13,8 +13,8 @@ utils.h - various utility methods
 #include <vector>
 #include <ctime>
 
-class Fl_Widget;
-class Fl_Window;
+#include <FL/Fl_Widget.H>
+#include <FL/Fl_Window.H>
 
 using namespace std;
 
@@ -69,6 +69,14 @@ string decode_base_64(string s);
 // Encode Base 64
 unsigned char encode_base_64(unsigned char c);
 string encode_base_64(string s);
+// Decode hex
+string to_hex(string data);
+// Encode hex
+string to_ascii(string data);
+// Decode single ch aracter
+string to_hex(unsigned char data);
+// Encode single character
+unsigned char to_ascii(char** data);
 
 
 // template function to find the enclosing widget of class WIDGET

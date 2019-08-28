@@ -675,3 +675,45 @@ string encode_base_64(string value) {
 	}
 	return result;
 }
+
+// Decode hex
+string to_hex(string data) {
+	string result = "";
+	char* cdata = new char[data.length() + 1];
+	strcpy(cdata, data.c_str());
+	for (size_t i = 0; i < data.length(); i++) {
+		result += to_hex(*cdata);
+		cdata++;
+	}
+	return result;
+}
+
+// Encode hex
+string to_ascii(string data) {
+	string result = "";
+	char* cdata = new char[data.length() + 1];
+	strcpy(cdata, data.c_str());
+	while (strlen(cdata)) {
+		result += to_ascii(&cdata);
+	}
+	return result;
+}
+// Decode single character
+
+string to_hex(unsigned char data) {
+	const char lookup[] = "0123456789ABCDEF";
+	string result = "";
+	result += lookup[data / 16];
+	result += lookup[data % 16];
+	result += ' ';
+	return result;
+}
+
+// Encode single character
+unsigned char to_ascii(char** data) {
+	// Skip non hex
+	while (!isxdigit(**data) && (**data != 0)) (*data)++;
+	if (**data == 0) return 0;
+	long int lval = strtol(*data, data, 16);
+	return lval & 255;
+}

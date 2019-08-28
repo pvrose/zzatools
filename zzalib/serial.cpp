@@ -11,11 +11,12 @@ serial::serial() {
 serial::~serial() {
 }
 
-bool serial::open_port(string port_name, unsigned int baud_rate, bool monitor) {
+bool serial::open_port(string port_name, unsigned int baud_rate, bool monitor, int rx_timeout) {
 	// Try an open the port - return false if fail.
 	port_name_ = port_name;
-	char* device = new char[5 + port_name.length()];
-	snprintf(device, sizeof(device), "//./%s", port_name.c_str());
+	int length = 5 + port_name.length();
+	char* device = new char[length];
+	snprintf(device, length, "//./%s", port_name.c_str());
 	DWORD access_mode;
 	if (monitor) {
 		access_mode = GENERIC_READ;
@@ -61,10 +62,10 @@ bool serial::open_port(string port_name, unsigned int baud_rate, bool monitor) {
 
 	// Set timeouts
 	COMMTIMEOUTS timeouts;
-	// Wait upto 10 s for any data to come back
-	timeouts.ReadIntervalTimeout = MAXDWORD;
-	timeouts.ReadTotalTimeoutMultiplier = MAXDWORD;
-	timeouts.ReadTotalTimeoutConstant = 10000;
+	// Wait for RX_Timeout for any data to come back
+	timeouts.ReadIntervalTimeout = rx_timeout;
+	timeouts.ReadTotalTimeoutMultiplier = 0;
+	timeouts.ReadTotalTimeoutConstant = rx_timeout;
 	timeouts.WriteTotalTimeoutConstant = 0;
 	timeouts.WriteTotalTimeoutMultiplier = 0;
 
