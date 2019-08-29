@@ -11,8 +11,11 @@
 #include <FL/Fl_Text_Display.H>
 #include <FL/Fl_Text_Buffer.H>
 #include <FL/Fl_Button.H>
+#include <FL/Fl_Preferences.H>
 
 using namespace zzaportm;
+
+extern Fl_Preferences* settings_;
 
 window::window(int W, int H, const char* label) :
 	Fl_Window(W, H, label)
@@ -23,12 +26,37 @@ window::window(int W, int H, const char* label) :
 	, rx_timeout_(1000)
 	, num_requests_(5)
 {
+	// Get parameter settings
+	Fl_Preferences params_settings(settings_, "Parameters");
+	char* temp;
+	params_settings.get("Port Name", temp, "");
+	port_name_ = temp;
+	free(temp);
+	params_settings.get("Baud Rate", (signed int&)baud_rate_, 9600);
+	params_settings.get("Test Data", temp, "");
+	data_ = temp;
+	free(temp);
+	params_settings.get("Read Timeout", (signed int&) rx_timeout_, 1000);
+	params_settings.get("Requests", (signed int&)num_requests_, DEF_REQUESTS);
+	params_settings.get("Format", (int&)format_, (int)ASCII);
+	params_settings.get("Mode", (int&)mode_, (int)TX_RX); 
+	// Create the port - but don't try and connect yet
 	port_ = new serial;
+	// Add all the widgets
 	create_form();
 	show();
 }
 
 window::~window() {
+	// Save parameter settings
+	Fl_Preferences params_settings(settings_, "Parameters");
+	params_settings.set("Port Name", port_name_.c_str());
+	params_settings.set("Baud Rate", (signed int)baud_rate_);
+	params_settings.set("Test Data", data_.c_str());
+	params_settings.set("Read Timeout", (signed int)rx_timeout_);
+	params_settings.set("Requests", (signed int)num_requests_);
+	params_settings.set("Format", (int)format_);
+	params_settings.set("Mode", (int)mode_);
 }
 
 void window::create_form() {
@@ -60,40 +88,6 @@ void window::create_form() {
 	ch_baud->tooltip("Select baud rate to use");
 	curr_x += ch_baud->w() + GAP;
 
-	// Data pattern input
-	Fl_Input* ip_text = new Fl_Input(curr_x, curr_y, WEDIT, HTEXT, "Text to send");
-	ip_text->labelfont(FONT);
-	ip_text->labelsize(FONT_SIZE);
-	ip_text->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
-	ip_text->value("");
-	ip_text->callback(cb_value<Fl_Input, string>, &data_);
-	ip_text->textfont(FONT);
-	ip_text->textsize(FONT_SIZE);
-	ip_text->tooltip("Type data to send");
-	curr_x += ip_text->w() + GAP;
-
-	// Hex radio button
-	Fl_Radio_Round_Button* bn_hex = new Fl_Radio_Round_Button(curr_x, curr_y, WRADIO, HRADIO, "Hex");
-	bn_hex->labelfont(FONT);
-	bn_hex->labelsize(FONT_SIZE);
-	bn_hex->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
-	bn_hex->value(format_ == HEX ? 1 : 0);
-	parameters_[(int)HEX] = { HEX, (int*)&format_ };
-	bn_hex->callback(cb_radio, &parameters_[(int)HEX]);
-	bn_hex->tooltip("Data in hexadecimal format");
-	curr_x += bn_hex->w() + GAP;
-
-	// ASCII radio button
-	Fl_Radio_Round_Button* bn_ascii = new Fl_Radio_Round_Button(curr_x, curr_y, WRADIO, HRADIO, "ASCII");
-	bn_ascii->labelfont(FONT);
-	bn_ascii->labelsize(FONT_SIZE);
-	bn_ascii->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
-	bn_ascii->value(format_ == ASCII ? 1 : 0);
-	parameters_[(int)ASCII] = { ASCII, (int*)& format_ };
-	bn_ascii->callback(cb_radio, &parameters_[(int)ASCII]);
-	bn_ascii->tooltip("Data in hexadecimal format");
-	curr_x += bn_ascii->w() + GAP;
-
 	// RX Timeout counter
 	Fl_Counter* ct_timeout = new Fl_Counter(curr_x, curr_y, WSMEDIT, HTEXT, "Timeout");
 	ct_timeout->type(FL_NORMAL_COUNTER);
@@ -110,19 +104,22 @@ void window::create_form() {
 	curr_x += ct_timeout->w() + GAP;
 
 	// RX Timeout spinner
-	Fl_Counter* ct_requests = new Fl_Counter(curr_x, curr_y, WSMEDIT, HTEXT, "Requests");
-	ct_requests->labelfont(FONT);
-	ct_requests->type(FL_SIMPLE_COUNTER);
-	ct_requests->labelsize(FONT_SIZE);
-	ct_requests->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
-	ct_requests->textfont(FONT);
-	ct_requests->textsize(FONT_SIZE);
-	ct_requests->value(DEF_REQUESTS);
-	ct_requests->bounds(MIN_REQUESTS, MAX_REQUESTS);
-	ct_requests->step(STEP_REQUESTS);
-	ct_requests->callback(cb_sp_number, &num_requests_);
-	ct_requests->tooltip("Select the number of requests to send");
-	curr_x += ct_requests->w() + GAP;
+	ctr_requests_ = new Fl_Counter(curr_x, curr_y, WSMEDIT, HTEXT, "Requests");
+	ctr_requests_->labelfont(FONT);
+	ctr_requests_->type(FL_SIMPLE_COUNTER);
+	ctr_requests_->labelsize(FONT_SIZE);
+	ctr_requests_->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
+	ctr_requests_->textfont(FONT);
+	ctr_requests_->textsize(FONT_SIZE);
+	ctr_requests_->value(num_requests_);
+	ctr_requests_->bounds(MIN_REQUESTS, MAX_REQUESTS);
+	ctr_requests_->step(STEP_REQUESTS);
+	ctr_requests_->callback(cb_sp_number, &num_requests_);
+	ctr_requests_->tooltip("Select the number of requests to send (0 means until Stop pressed)");
+	if (mode_ == RX_ONLY) {
+		ctr_requests_->deactivate();
+	}
+	curr_x += ctr_requests_->w() + GAP;
 
 	// GO Button
 	Fl_Button* bn_go = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "GO!");
@@ -132,14 +129,87 @@ void window::create_form() {
 	bn_go->color(FL_GREEN, fl_lighter(FL_RED));
 	bn_go->callback(cb_bn_go);
 	bn_go->tooltip("Select to start transfers");
+	curr_x += bn_go->w() + GAP;
 
+	// Stop button
+	bn_stop_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Stop");
+	bn_stop_->labelfont(FONT);
+	bn_stop_->labelsize(FONT_SIZE);
+	bn_stop_->align(FL_ALIGN_CENTER);
+	bn_stop_->color(fl_lighter(FL_RED));
+	bn_stop_->callback(cb_bn_stop, &stopped_);
+	bn_stop_->tooltip("Select to stop transfers");
+	bn_stop_->deactivate();
+
+	int w_win = curr_x + bn_stop_->w() + EDGE;
+
+	curr_x = EDGE;
+	curr_y += bn_stop_->h() + HTEXT;
+
+	// Hex radio button
+	Fl_Button* bn_format = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON);
+	bn_format->type(FL_TOGGLE_BUTTON);
+	bn_format->labelfont(FONT);
+	bn_format->labelsize(FONT_SIZE);
+	bn_format->align(FL_ALIGN_CENTER);
+	bn_format->down_box(bn_format->box());
+	bn_format->value(format_ == ASCII ? 1 : 0);
+	if (bn_format->value()) {
+		bn_format->label("ASCII");
+	}
+	else {
+		bn_format->label("Hex");
+	}
+	bn_format->callback(cb_bn_format, (void*)&format_);
+	bn_format->tooltip("Format for the data (Hex or ASCII)");
+	curr_x += bn_format->w() + GAP;
+
+	// Data pattern input
+	Fl_Input* ip_text = new Fl_Input(curr_x, curr_y, WEDIT, HTEXT, "Text to send");
+	ip_text->labelfont(FONT);
+	ip_text->labelsize(FONT_SIZE);
+	ip_text->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
+	ip_text->value("");
+	ip_text->callback(cb_value<Fl_Input, string>, &data_);
+	ip_text->textfont(FONT);
+	ip_text->textsize(FONT_SIZE);
+	ip_text->tooltip("Type data to send");
+	curr_x += ip_text->w() + GAP;
+
+	// Mode button
+	Fl_Button* bn_mode = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON);
+	bn_mode->type(FL_TOGGLE_BUTTON);
+	bn_mode->labelfont(FONT);
+	bn_mode->labelsize(FONT_SIZE);
+	bn_mode->align(FL_ALIGN_CENTER);
+	bn_mode->down_box(bn_mode->box());
+	bn_mode->value(mode_ == RX_ONLY ? 1 : 0);
+	if (bn_mode->value()) {
+		bn_mode->label("Monitor");
+	}
+	else {
+		bn_mode->label("TX/RX");
+	}
+	bn_mode->callback(cb_bn_mode, (void*)&mode_);
+	bn_mode->tooltip("Mode for the test (TX/RX or RX only)");
+	curr_x  = max (curr_x + bn_mode->w() + GAP, bn_go->x());
+
+	// Clear button
+	bn_clear_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Clear");
+	bn_clear_->labelfont(FONT);
+	bn_clear_->labelsize(FONT_SIZE);
+	bn_clear_->align(FL_ALIGN_CENTER);
+	bn_clear_->color(fl_lighter(FL_RED));
+	bn_clear_->callback(cb_bn_clear);
+	bn_clear_->tooltip("Select to clear text display");
+	bn_clear_->deactivate();
 
 	// This last widget defines the overall width of the window
-	const unsigned int w_win = curr_x + bn_go->w() + EDGE;
+	w_win = max(w_win, curr_x + bn_clear_->w() + EDGE);
 	const unsigned int w_text = w_win - EDGE - EDGE;
 
 	// Draw the txt display
-	curr_y += GAP + HTEXT;
+	curr_y += HTEXT + bn_clear_->h();
 	curr_x = EDGE;
 	// First create a buffer
 	buffer_ = new Fl_Text_Buffer;
@@ -164,15 +234,17 @@ void window::create_form() {
 
 // Make serial request
 void window::send_request(string data) {
-	display_data(TX, data);
-	if (!port_->write_buffer(data)) {
-		display_data(TX_ERROR, string("Write failed"));
+	if (mode_ == TX_RX) {
+		display_data(TX, data);
+		if (!port_->write_buffer(data)) {
+			display_data(TX_ERROR, string("Write failed"));
+		}
 	}
 	string response;
 	if (!port_->read_buffer(response)) {
 		display_data(RX_ERROR, string("Read failed"));
 	}
-	else {
+	else if (response.length()) {
 		display_data(RX, response);
 	}
 }
@@ -227,6 +299,7 @@ void window::display_data(direction direction, string data) {
 	}
 	buffer_->append(line.c_str());
 	style_buffer_->append(style_line);
+	bn_clear_->activate();
 	redraw();
 }
 
@@ -235,6 +308,7 @@ void window::populate_port_choice(Fl_Choice* ch) {
 	ch->clear();
 	string* ports = new string[1];
 	int num_ports;
+	ch->value(0);
 	if (!port_->available_ports(1, ports, true, num_ports)) {
 		delete[] ports;
 		ports = new string[num_ports];
@@ -242,9 +316,13 @@ void window::populate_port_choice(Fl_Choice* ch) {
 	}
 	for (int i = 0; i < num_ports; i++) {
 		ch->add(ports[i].c_str());
+		if (port_name_ == ports[i]) {
+			ch->value(i);
+		}
 	}
-	ch->value(0);
-	port_name_ = ports[0];
+	if (ch->value() == 0) {
+		port_name_ = ports[0];
+	}
 }
 
 // Populate the baud choice
@@ -252,15 +330,21 @@ void window::populate_baud_choice(Fl_Choice* ch) {
 	ch->clear();
 	// Default baud-rates
 	const int baud_rates[] = { 300, 600, 1200, 2400, 4800, 9600, 19200, 38400, 57600, 115200, 230400, 460800 };
+	ch->value(0);
 	int num_rates = sizeof(baud_rates) / sizeof(int);
-	int index = 0;
 	// For all possible rates
 	for (int i = 0; i < num_rates; i++) {
-		// capabilities overridden or within the range supported by capabilities
-		ch->add(to_string(baud_rates[i]).c_str());
+		// Convert to text and add it. Setting value if it matches desired
+		char value[10];
+		sprintf(value, "%d", baud_rates[i]);
+		ch->add(value);
+		if (baud_rate_ == baud_rates[i]) {
+			ch->value(i);
+		}
 	}
-	ch->value(0);
-	baud_rate_ = baud_rates[0];
+	if (ch->value() == 0) {
+		baud_rate_ = baud_rates[0];
+	}
 }
 
 // Callbacks
@@ -289,15 +373,70 @@ void window::cb_sp_number(Fl_Widget* w, void* v) {
 // Go button
 void window::cb_bn_go(Fl_Widget* w, void* v) {
 	window* that = ancestor_view<window>(w);
-	if (that->port_->open_port(that->port_name_, that->baud_rate_, false, that->rx_timeout_)) {
+	bool waiting_stop = false;
+	that->stopped_ = false;
+	if (that->mode_ == RX_ONLY || that->num_requests_ == 0) {
+		that->bn_stop_->activate();
+		that->stopped_ = false;
+		waiting_stop = true;
+	}
+	if (that->port_->open_port(that->port_name_, that->baud_rate_, (that->mode_ == RX_ONLY), that->rx_timeout_)) {
 		string data = (that->format_ == HEX) ? to_ascii(that->data_) : that->data_;
-		for (unsigned int i = 0; i < that->num_requests_; i++) {
+		unsigned int i = 0;
+		while (waiting_stop ? !that->stopped_ : i < that->num_requests_) {
 			that->send_request(data);
+			i++;
+			// Update window and allow stop button to be pressed
+			that->redraw();
+			Fl::wait();
 		}
 		that->port_->close_port();
 	}
 	else {
 		that->display_data(OPEN_ERROR, "Cannot open port " + that->port_name_);
 	}
+
+	that->bn_stop_->deactivate();
 }
 
+// Stop button - v is 
+void window::cb_bn_stop(Fl_Widget* w, void* v) {
+	*(bool*)v = true;
+}
+
+// Format button
+void window::cb_bn_format(Fl_Widget* w, void* v) {
+	cb_value<Fl_Button, int>(w, v);
+	Fl_Button* bn = (Fl_Button*)w;
+	if (bn->value()) {
+		bn->label("ASCII");
+	}
+	else {
+		bn->label("Hex");
+	}
+}
+
+// Mode button
+void window::cb_bn_mode(Fl_Widget* w, void* v) {
+	window* that = ancestor_view<window>(w);
+	cb_value<Fl_Button, int>(w, v);
+	Fl_Button* bn = (Fl_Button*)w;
+	if (bn->value()) {
+		bn->label("Monitor");
+		that->ctr_requests_->deactivate();
+	}
+	else {
+		bn->label("TX/RX");
+		that->ctr_requests_->activate();
+	}
+}
+
+// Clear button
+void window::cb_bn_clear(Fl_Widget* w, void* v) {
+	window* that = ancestor_view<window>(w);
+	that->buffer_->remove(0, that->buffer_->length());
+	that->style_buffer_->remove(0, that->style_buffer_->length());
+	w->deactivate();
+	that->redraw();
+	Fl::wait();
+}
