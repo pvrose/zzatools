@@ -51,6 +51,9 @@ namespace zzalog {
 	// The records are kept in a container with size_t as index
 	typedef size_t record_num_t;
 
+	// forward declaration
+	enum hint_t : unsigned char;
+
 	// This class represents a single record as a container of field items NAME=>VALUE
 	class record : public map<string, string> {
 	public:
@@ -98,8 +101,8 @@ namespace zzalog {
 		lat_long_t location(bool my_station);
 		// update BAND from FREQ
 		bool update_band(bool force = false);
-		// combine records
-		bool merge_records(record* record, bool allow_locn_mismatch = false);
+		// combine records - update result with hint to use in subsequent update
+		bool merge_records(record* record, bool allow_locn_mismatch = false, hint_t* result = nullptr);
 		// records are duplicates
 		match_result_t match_records(record* record);
 		// Add timeoff if its isn't set

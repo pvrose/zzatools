@@ -75,8 +75,8 @@ string to_hex(string data);
 string to_ascii(string data);
 // Decode single ch aracter
 string to_hex(unsigned char data);
-// Encode single character
-unsigned char to_ascii(char** data);
+// Encode single character - starting at data[ix] and incrementing ix to end of it.
+unsigned char to_ascii(string data, int& ix);
 
 
 // template function to find the enclosing widget of class WIDGET

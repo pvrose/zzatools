@@ -670,7 +670,12 @@ void record_form::cb_bn_use(Fl_Widget* w, void* v) {
 		if (!that->my_book_->new_record()) {
 			that->my_book_->modified_record(true);
 		}
-		that->my_book_->selection(that->item_num_1_, HT_MINOR_CHANGE, that);
+		if (field == "DXCC" || field == "GRIDSQUARE") {
+			that->my_book_->selection(that->item_num_1_, HT_CHANGED, that);
+		}
+		else {
+			that->my_book_->selection(that->item_num_1_, HT_MINOR_CHANGE, that);
+		}
 
 		that->modifying_ = false;
 		if (that->use_mode_ == UM_DISPLAY) {
@@ -710,7 +715,12 @@ void record_form::cb_bn_quick(Fl_Widget* w, void* v) {
 	if (!that->my_book_->new_record()) {
 		that->my_book_->modified_record(true);
 	}
-	that->my_book_->selection(that->item_num_1_, HT_MINOR_CHANGE, that);
+	if (field == "GRIDSQUARE") {
+		that->my_book_->selection(that->item_num_1_, HT_CHANGED, that);
+	}
+	else {
+		that->my_book_->selection(that->item_num_1_, HT_MINOR_CHANGE, that);
+	}
 	// Clear value in buffer
 	that->value_in_->buffer()->text("");
 	main_window_->flush();

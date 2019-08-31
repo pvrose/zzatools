@@ -239,6 +239,8 @@ void window::send_request(string data) {
 		if (!port_->write_buffer(data)) {
 			display_data(TX_ERROR, string("Write failed"));
 		}
+		redraw();
+		Fl::wait();
 	}
 	string response;
 	if (!port_->read_buffer(response)) {
@@ -247,6 +249,8 @@ void window::send_request(string data) {
 	else if (response.length()) {
 		display_data(RX, response);
 	}
+	redraw();
+	Fl::wait();
 }
 
 // Display the transmitted/received data
@@ -386,9 +390,6 @@ void window::cb_bn_go(Fl_Widget* w, void* v) {
 		while (waiting_stop ? !that->stopped_ : i < that->num_requests_) {
 			that->send_request(data);
 			i++;
-			// Update window and allow stop button to be pressed
-			that->redraw();
-			Fl::wait();
 		}
 		that->port_->close_port();
 	}

@@ -231,6 +231,7 @@ void scratchpad::cb_action(Fl_Widget* w, void* v) {
 		that->record_ = book_->new_record(menu_->logging());
 	}
 	// Get the field to write from the button action
+	hint_t hint = HT_MINOR_CHANGE;
 	switch (action) {
 	case WRITE_CALL:
 		field = "CALL";
@@ -243,6 +244,7 @@ void scratchpad::cb_action(Fl_Widget* w, void* v) {
 		break;
 	case WRITE_GRID:
 		field = "GRIDSQUARE";
+		hint = HT_CHANGED;
 		break;
 	case WRITE_RST_SENT:
 		field = "RST_SENT";
@@ -252,6 +254,9 @@ void scratchpad::cb_action(Fl_Widget* w, void* v) {
 		break;
 	case WRITE_FIELD:
 		field = that->field_;
+		if (field == "DXCC" || field == "GRIDSQUARE") {
+			hint = HT_MINOR_CHANGE;
+		}
 		break;
 	}
 	// Get the highlighted text from the editor buffer and write it to the selected field, unhighlight the text

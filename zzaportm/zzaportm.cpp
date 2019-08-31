@@ -13,6 +13,12 @@ using namespace zzaportm;
 
 const string VENDOR = "GM3ZZA";
 const string PROGRAM_ID = "ZZAPORTM";
+const string VERSION = "1.0.1";
+const string MAIN_LABEL = PROGRAM_ID + ' ' + VERSION +
+#ifdef _DEBUG
+" (Debug)" +
+#endif
+" Port Tester";
 
 Fl_Preferences* settings_ = nullptr;
 
@@ -21,7 +27,7 @@ int main(int argc, char** argv)
 	// Create the settings before anything else 
 	settings_ = new Fl_Preferences(Fl_Preferences::USER, VENDOR.c_str(), PROGRAM_ID.c_str());
 
-	window* main_window = new window(10, 10, "ZZAPORTM: Port tester");
+	window* main_window = new window(10, 10, MAIN_LABEL.c_str());
 
 	int code = Fl::run();
 

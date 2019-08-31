@@ -211,7 +211,9 @@ void import_data::merge_update() {
 	// Merge the first record in this book into the selected record from the main log book
 	record* import_record = at(0);
 	record* book_record = book_->get_record();
-	book_record->merge_records(import_record);
+	// Grid square may change (more accurate)
+	hint_t hint;
+	book_record->merge_records(import_record, false, &hint);
 	if (pfx_data_->parse(book_record) == PR_CHANGED) {
 		book_->modified(true, false);
 	}
@@ -219,7 +221,7 @@ void import_data::merge_update() {
 		book_->modified(true, false);
 	}
 	// Tell views to update with new record
-	book_->selection(-1, HT_MINOR_CHANGE);
+	book_->selection(-1, hint);
 	// Delete the record from this book
 	discard_update();
 }

@@ -390,7 +390,12 @@ void log_table::edit_cell(int row, int col) {
 				if (!my_book_->new_record()) {
 					my_book_->modified_record(true);
 				}
-				book_->selection(my_book_->record_number(record_num), HT_MINOR_CHANGE);
+				if (fields_[col].field == "GRIDSQUARE" || fields_[col].field == "DXCC") {
+					book_->selection(my_book_->record_number(record_num), HT_CHANGED);
+				}
+				else {
+					book_->selection(my_book_->record_number(record_num), HT_MINOR_CHANGE);
+				}
 			}
 			else {
 				redraw();

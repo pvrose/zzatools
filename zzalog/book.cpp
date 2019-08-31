@@ -843,6 +843,7 @@ void book::delete_record(bool force) {
 		delete old_record_;
 		old_record_ = nullptr;
 		modified_record_ = false;
+		// TODO: why is this only a minor change?
 		selection(-1, HT_MINOR_CHANGE);
 		menu_->update_items();
 	}

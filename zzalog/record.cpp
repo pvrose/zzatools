@@ -14,6 +14,7 @@ record.cpp - Individual record data item: implementation file
 #include "status.h"
 #include "view.h"
 #include "formats.h"
+#include "book.h"
 
 #include <ctime>
 #include <chrono>
@@ -726,7 +727,7 @@ bool record::update_band(bool force /*=false*/) {
 }
 
 // Merge fields from another record
-bool record::merge_records(record* record, bool allow_loc_mismatch /* = false */)
+bool record::merge_records(record* record, bool allow_loc_mismatch /* = false */, hint_t* result /*= nullptr*/)
 {
 	bool merged = false;
 	bool bearing_change = false;
@@ -791,6 +792,13 @@ bool record::merge_records(record* record, bool allow_loc_mismatch /* = false */
 	// Recalculate bearing and distance as location has changed
 	if (bearing_change) {
 		pfx_data_->update_bearing(this);
+	}
+	if (result) {
+		if (bearing_change) {
+			*result = hint_t::HT_CHANGED;
+		} {
+			*result = hint_t::HT_MINOR_CHANGE;
+		}
 	}
 	return merged;
 }
