@@ -35,6 +35,7 @@ main.cpp - application entry point
 #include "band_view.h"
 #include "scratchpad.h"
 #include "dxa_if.h"
+#include "qrz_handler.h"
 
 // C/C++ header files
 #include <ctime>
@@ -75,6 +76,7 @@ spec_data* spec_data_ = nullptr;
 rig_if* rig_if_ = nullptr;
 eqsl_handler* eqsl_handler_ = nullptr;
 lotw_handler* lotw_handler_ = nullptr;
+qrz_handler* qrz_handler_ = nullptr;
 Fl_RGB_Image* main_icon_ = nullptr;
 Fl_Single_Window* main_window_ = nullptr;
 url_handler* url_handler_ = nullptr;
@@ -470,6 +472,8 @@ void add_qsl_handlers() {
 		if (eqsl_handler_ == nullptr) eqsl_handler_ = new eqsl_handler;
 		// LotW - accesses the appropriate URL to download data, TQSL to sign and upload data
 		if (lotw_handler_ == nullptr) lotw_handler_ = new lotw_handler;
+		// QRZ.com - accesses the appropriate URL to get information about the other station
+		if (qrz_handler_ == nullptr) qrz_handler_ = new qrz_handler;
 	}
 }
 
@@ -577,6 +581,7 @@ void tidy() {
 	// Tidy memory - this is not perfect
 	// From inspection of the code - calling this a second time frees the memory
 	fl_message_title_default(nullptr);
+	delete qrz_handler_;
 	delete lotw_handler_;
 	delete eqsl_handler_;
 	delete url_handler_;

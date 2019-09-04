@@ -86,6 +86,8 @@ namespace zzalog {
 		// username/password
 		string qrz_username_;
 		string qrz_password_;
+		// Use XML database and merge
+		bool qrz_xml_merge_;
 
 	};
 

@@ -39,7 +39,7 @@ status::status(int X, int Y, int W, int H, const char * label) :
 	, report_file_(nullptr)
 	, progress_suffix_("")
 	, min_level_(ST_NONE)
-
+	, append_log_(false)
 {
 	// Initialise attributes
 	max_progress_ = 0;
@@ -150,7 +150,13 @@ status::status(int X, int Y, int W, int H, const char * label) :
 	}
 
 	// Try to open the file.
-	report_file_ = new ofstream(report_filename_, ios::out | ios::app);
+	status_settings.get("Append", (int&)append_log_, false);
+	if (append_log_) {
+		report_file_ = new ofstream(report_filename_, ios::out | ios::app);
+	}
+	else {
+		report_file_ = new ofstream(report_filename_, ios::out | ios::trunc);
+	}
 	if (!report_file_->good()) {
 		delete report_file_;
 		report_file_ = nullptr;
@@ -161,6 +167,7 @@ status::status(int X, int Y, int W, int H, const char * label) :
 
 	status_settings.get("Minimum Level", (int&)min_level_, ST_NOTE);
 	menu_->status_level(min_level_);
+	menu_->append_file(append_log_);
 
 	status_file_viewer_ = nullptr;
 }
@@ -440,7 +447,20 @@ void status::min_level(status_t level) {
 	status_settings.set("Minimum Level", min_level_);
 }
 
+// Get the minimum status severtity level that is dosplayed
+status_t status::min_level() {
+	return min_level_;
+}
+
 // Status log display is closed
 void status::cb_text(Fl_Widget* w, void* v) {
 	remove_sub_window((Fl_Window*)w);
 }
+
+// Set the append_log
+void status::append_log(bool append) {
+	append_log_ = append;
+	Fl_Preferences status_settings(settings_, "Status");
+	status_settings.set("Append", (int)append_log_);
+}
+

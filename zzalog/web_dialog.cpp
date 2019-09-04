@@ -97,6 +97,7 @@ void web_dialog::load_values() {
 	qrz_settings.get("Password", temp, "");
 	qrz_password_ = temp;
 	free(temp);
+	qrz_settings.get("Use XML Database", (int&)qrz_xml_merge_, false);
 
 	// QSL message settings (for eQSL and card)
 	card_settings.get("QSL Enable", (int&)eqsl_use_qso_msg_, false);
@@ -133,7 +134,9 @@ void web_dialog::create_form(int X, int Y) {
 	const int GRP3 = GRP2 + HGRP2 + GAP;
 	const int R3_1 = GRP3 + GAP + HTEXT;
 	const int H3_1 = HBUTTON;
-	const int HGRP3 = R3_1 + H3_1 + GAP - GRP3;
+	const int R3_2 = R3_1 + H3_1;
+	const int H3_2 = HRADIO;
+	const int HGRP3 = R3_2 + H3_2 + GAP - GRP3;
 
 	// overall height 
 	const int HALL = GRP3 + HGRP3 + EDGE;
@@ -350,6 +353,15 @@ void web_dialog::create_form(int X, int Y) {
 	in3_1_5->when(FL_WHEN_CHANGED);
 	in3_1_5->tooltip("Enter password for QRZ.com");
 
+	// Row 2 Col 4 - Always use XML database
+	Fl_Check_Button* bn3_2_1 = new Fl_Check_Button(X + C4, Y + R3_2, WRADIO, HRADIO, "Use XML Database");
+	bn3_2_1->align(FL_ALIGN_RIGHT);
+	bn3_2_1->labelsize(FONT_SIZE);
+	bn3_2_1->labelfont(FONT);
+	bn3_2_1->value(qrz_xml_merge_);
+	bn3_2_1->callback(cb_value<Fl_Check_Button, bool>, &qrz_xml_merge_);
+	bn3_2_1->tooltip("Always the QRZ XML database even if non-subscriber");
+
 	// Create the list of widgets to be disabled when eQSL disabled
 	grp_qrz_ = gp3;
 
@@ -380,6 +392,7 @@ void web_dialog::save_values() {
 	qrz_settings.set("Enable", qrz_enable_);
 	qrz_settings.set("User", qrz_username_.c_str());
 	qrz_settings.set("Password", qrz_password_.c_str());
+	qrz_settings.set("Use XML Database", qrz_xml_merge_);
 
 	// QSL message settings (for eQSL and card)
 	card_settings.set("QSL Enable", eqsl_use_qso_msg_);

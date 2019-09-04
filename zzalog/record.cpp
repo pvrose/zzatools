@@ -255,11 +255,12 @@ void record::item(string field, string value, bool formatted/* = false*/) {
 		}
 		else {
 			char type_indicator = spec_data_->datatype_indicator(field);
+			double as_d = 0.0;
+			int as_i = 0;
 			switch (type_indicator) {
 			case 'D':
 			case 'T':
 			case 'N':
-			case 'L':
 			case 'S':
 			case 'I':
 			case 'M': 
@@ -276,6 +277,32 @@ void record::item(string field, string value, bool formatted/* = false*/) {
 					formatted_value = spec_data_->mode_for_submode(formatted_value);
 				}
 				break;
+			case 'L':
+				as_d = stod(upper_value);
+				char c;
+				if (as_d < 0.0) {
+					as_d = -as_d;
+					if (field == "LON" || field == "MY_LON") {
+						c = 'W';
+					}
+					else {
+						c = 'S';
+					}
+				}
+				else {
+					if (field == "LON" || field == "MY_LON") {
+						c = 'E';
+					}
+					else {
+						c = 'N';
+					}
+				}
+				as_i = as_d;
+				as_d -= as_i;
+				as_d *= 60.0;
+				char as_s[12];
+				snprintf(as_s, 12, "%c%03d %2.3f", c, as_i, as_d);
+				formatted_value = as_s;
 			default:
 				formatted_value = upper_value;
 				break;
@@ -406,6 +433,8 @@ string record::item(string field, bool formatted/* = false*/, bool indirect/* = 
 			Fl_Preferences display_settings(settings_, "Display");
 			// Get the type indicator of the field
 			char type_indicator = spec_data_->datatype_indicator(field);
+			double as_d = 0.0;
+			char as_c[15];
 			switch (type_indicator) {
 			case ' ':
 			case 'D':
@@ -416,7 +445,6 @@ string record::item(string field, bool formatted/* = false*/, bool indirect/* = 
 			case 'M': 
 			case 'G':
 			case 'B':
-			case 'L':
 				result = unformatted_value;
 				break;
 			case 'E':
@@ -427,6 +455,16 @@ string record::item(string field, bool formatted/* = false*/, bool indirect/* = 
 					result = unformatted_value;
 				}
 				break;
+			case 'L':
+				as_d = stod(unformatted_value.substr(1, 3));
+				as_d += (stod(unformatted_value.substr(5)) / 60.0);
+				switch (unformatted_value[0]) {
+				case 'W':
+				case 'S':
+					as_d = -as_d;
+				}
+				snprintf(as_c, 15, "%g", as_d);
+				result = string(as_c);
 			default:
 				// If any other data indicator gets return - it shouldn't
 				result = unformatted_value;
@@ -613,6 +651,10 @@ lat_long_t record::location(bool my_station, location_t& source) {
 		// Use either Gridsquare or prefix centre if that is more accurate
 		if (my_station) {
 			value_1 = item("MY_GRIDSQUARE", false, true);
+			// No gridsquare for user. 
+			if (value_1.length() == 0) {
+				return lat_long;
+			}
 		}
 		else {
 			value_1 = item("GRIDSQUARE");

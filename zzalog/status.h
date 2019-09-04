@@ -117,6 +117,9 @@ namespace zzalog {
 		Fl_Widget* misc_status();
 		// Set minimum status reporting level
 		void min_level(status_t);
+		status_t min_level();
+		// Append or overwrite status log
+		void append_log(bool append);
 
 		// Callbacks
 		// Clock button callback
@@ -158,7 +161,8 @@ namespace zzalog {
 		string progress_suffix_;
 		// Minimum reporting level
 		status_t min_level_;
-
+		// Append log
+		bool append_log_;
 	};
 
 }

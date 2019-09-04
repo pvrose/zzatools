@@ -42,7 +42,8 @@ namespace zzalog {
 		HT_STARTING,              // Record is being created as HT_INSERTED but don't include it
 		HT_NEW_DATA,              // New data has been loaded - action as HT_ALL but clears modified
 		HT_NO_DATA,               // Log has been cleared
-		HT_LOCATION               // The home locations have changed
+		HT_LOCATION,              // The home locations have changed
+		HT_MERGE_DETAILS          // Additional details are available (e.g. from QRZ.com) - allow user to select which data to add
 	};
 
 	class view;

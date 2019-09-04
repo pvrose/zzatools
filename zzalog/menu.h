@@ -123,6 +123,8 @@ namespace zzalog {
 		static void cb_mi_help_view(Fl_Widget* w, void* v);
 		// Help->Minimum status level
 		static void cb_mi_help_level(Fl_Widget* w, void* v);
+		// Help->Status->Append log
+		static void cb_mi_help_append(Fl_Widget* w, void* v);
 		// Help->Show Intl
 		static void cb_mi_help_intl(Fl_Widget* w, void * v);
 
@@ -136,14 +138,18 @@ namespace zzalog {
 		void report_mode(vector<report_cat_t> mode, report_filter_t filter);
 		// Set ststus level
 		void status_level(status_t level);
+		// Set append status
+		void append_file(bool append);
 		// Add the recent files to the menu
 		void add_recent_files();
 		// Update menu items - activeness
 		void update_items();
-
-	protected:
 		// Get the browser form settings or if not ask user
 		string get_browser();
+
+	protected:
+		// Fetch the QRZ.com web-page
+		void fetch_qrz_web(string callsign);
 
 
 	protected:

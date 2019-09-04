@@ -36,6 +36,7 @@ namespace zzalog {
 			UM_QSO,             // Interactive QSO (capturing a contact on-air)
 			UM_QUERY,           // Querying an import (possible match and import record displayed)
 			UM_DUPEQUERY,       // Querying a duplicate (the two records are displated)
+			UM_MERGEDETAILS,    // Allowing user to merge additional data from another database
 		};
 
 		// What the source of the data in record is.

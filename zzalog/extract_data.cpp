@@ -409,7 +409,7 @@ void extract_data::selection(record_num_t num_item, hint_t hint /* = HT_SELECTED
 		current_item_ = num_item;
 	}
 	// And select the same record in the main log view
-	book_->selection(record_number(num_item), hint, requester, num_other);
+	book_->selection(record_number(current_item_), hint, requester, num_other);
 }
 
 // Void extract records with this callsign

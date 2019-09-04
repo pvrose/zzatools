@@ -27,6 +27,7 @@
 #include "toolbar.h"
 #include "scratchpad.h"
 #include "calendar.h"
+#include "qrz_handler.h"
 
 #include <sstream>
 #include <list>
@@ -192,7 +193,8 @@ namespace zzalog {
 	{ "&Warning", 0, menu::cb_mi_help_level, (void*)ST_WARNING, FL_MENU_RADIO },
 	{ "&Error", 0, menu::cb_mi_help_level, (void*)ST_ERROR, FL_MENU_RADIO },
 	{ "Se&vere", 0, menu::cb_mi_help_level, (void*)ST_SEVERE, FL_MENU_RADIO },
-	{ "&Fatal", 0, menu::cb_mi_help_level, (void*)ST_FATAL, FL_MENU_RADIO },
+	{ "&Fatal", 0, menu::cb_mi_help_level, (void*)ST_FATAL, FL_MENU_RADIO | FL_MENU_DIVIDER},
+	{ "&Append File", 0 , menu::cb_mi_help_append, 0, FL_MENU_TOGGLE},
 	{ 0 },
 	{ "&Intl", 0, menu::cb_mi_help_intl, nullptr, FL_MENU_TOGGLE },
 	{ 0 },
@@ -219,6 +221,7 @@ extern list<string> recent_files_;
 extern intl_dialog* intl_dialog_;
 extern toolbar* toolbar_;
 extern scratchpad* scratchpad_;
+extern qrz_handler* qrz_handler_;
 
 extern void add_rig_if();
 extern void main_window_label(string text);
@@ -1146,24 +1149,25 @@ void menu::cb_mi_rep_level(Fl_Widget* w, void* v) {
 void menu::cb_mi_info_qrz(Fl_Widget* w, void* v) {
 	record* record = book_->get_record();
 	menu* that = ancestor_view<menu>(w);
-	if (record != nullptr || v != nullptr) {
-		// If we have a selected record - get browser executable from settings
-		string browser = that->get_browser();
-		if (browser.length() == 0) {
-			return;
+	if (v != nullptr) {
+		// Open with the web browser
+		qrz_handler_->open_web_page(*(string*)v);
+	}
+	else {
+		// We are using selected record and merge data accordingly
+		bool ok = true;
+		if (!qrz_handler_->has_session()) {
+			// Try and open an XML Database session
+			ok = qrz_handler_->open_session();
 		}
-		// Open browser with QRZ.com URL 
-#ifdef _WIN32
-		char format[] = "start \"%s\" http://www.qrz.com/lookup?callsign=%s";
-#else
-		char format[] = "\"%s\" http://www.qrz.com/lookup?callsign=%s &";
-#endif
-		string call = v == nullptr ? record->item("CALL") : *((string*)v);
-		char * url = new char[strlen(format) + call.length() + browser.length() + 10];
-		sprintf(url, format, browser.c_str(), call.c_str());
-		status_->misc_status(ST_NOTE, "MENU: Launching QRZ.com");
-		int result = system(url);
-		delete[] url;
+		if (ok) {
+			// Access it
+			ok = qrz_handler_->fetch_details();
+		}
+		else {
+			// Fall-back to the web-page interface
+			qrz_handler_->open_web_page(record->item("CALL"));
+		}
 	}
 }
 
@@ -1262,6 +1266,15 @@ void menu::cb_mi_help_view(Fl_Widget* w, void* v) {
 // v is enum status_t: minimum display level
 void menu::cb_mi_help_level(Fl_Widget* w, void* v) {
 	status_->min_level((status_t)(long)v);
+}
+
+// Help->Status->Append File
+void menu::cb_mi_help_append(Fl_Widget* w, void* v) {
+	// Get the value of the checked menu item
+	Fl_Menu_* menu = (Fl_Menu_*)w;
+	const Fl_Menu_Item* item = menu->mvalue();
+	bool value = item->value();
+	status_->append_log(value);
 }
 
 // Hell->Intl - show/hide international character set
@@ -1547,6 +1560,17 @@ void menu::status_level(status_t level) {
 	}
 }
 
+// Update menu item Help->Status/Append File
+void menu::append_file(bool append) {
+	int index_append = find_index("&Help/&Status/&Append File");
+	if (append) {
+		mode(index_append, mode(index_append) | FL_MENU_VALUE);
+	}
+	else {
+		mode(index_append, mode(index_append) & ~FL_MENU_VALUE);
+	}
+}
+
 // Update menu items' active state depending on state of the book
 void menu::update_items() {
 	if (active_enabled_) {
@@ -1588,6 +1612,7 @@ void menu::update_items() {
 		int index_use_form = find_index("&Log/&Use View/&Report View");
 		int index_use_spad = find_index("&Log/&Use View/&Scratchpad");
 		int index_auto_enable = find_index("&Import/&Enable Auto-Update");
+		int index_append_log = find_index("&Help/&Status/&Append File");
 		// Enable/Disable save 
 		if (modified) {
 			mode(index_save, mode(index_save) & ~FL_MENU_INACTIVE);
@@ -1756,3 +1781,4 @@ string menu::get_browser() {
 	datapath_settings.set("Web Browser", browser.c_str());
 	return browser;
 }
+

@@ -11,6 +11,7 @@
 #include "intl_dialog.h"
 #include "field_choice.h"
 #include "qsl_form.h"
+#include "qrz_handler.h"
 
 #include <array>
 #include <string>
@@ -35,6 +36,7 @@ extern menu* menu_;
 extern Fl_Single_Window* main_window_;
 extern book* navigation_book_;
 extern intl_dialog* intl_dialog_;
+extern qrz_handler* qrz_handler_;
 
 
 using namespace std;
@@ -53,7 +55,8 @@ enum edit_action_t {
 	KEEP_LOG,     // Keep existing log version of duplicate entry
 	KEEP_DUPE,    // Replace log with duplicate version
 	MERGE_DUPE,   // Merge log and duplicate records
-	KEEP_BOTH     // Keep both log and duplicate records
+	KEEP_BOTH,    // Keep both log and duplicate records
+	MERGE_DONE    // Merge additional details
 };
 
 // Constructor
@@ -852,6 +855,10 @@ void record_form::cb_bn_edit(Fl_Widget* w, long v) {
 		// Restart the duplicate check process
 		navigation_book_->check_dupes(false);
 		break;
+	case MERGE_DONE:
+		// Merge additional data complete
+		qrz_handler_->merge_done();
+		break;
 	}
 }
 
@@ -986,6 +993,20 @@ void record_form::update(hint_t hint, record_num_t record_num_1, record_num_t re
 		use_mode_ = UM_DUPEQUERY;
 		edit_mode_ = EM_ORIGINAL;
 		query_message_ = my_book_->match_question();
+		is_enumeration_ = false;
+		update_form();
+		break;
+	case HT_MERGE_DETAILS:
+		// display both the possible log entry and the queried record - allow addressing the query
+		item_num_1_ = item_num_1;
+		item_num_2_ = item_num_2;
+		this->record_1_ = my_book_->get_record(item_num_1_, false);
+		this->record_2_ = qrz_handler_->get_record();
+		delete saved_record_;
+		saved_record_ = new record(*record_1_);
+		use_mode_ = UM_MERGEDETAILS;
+		edit_mode_ = EM_ORIGINAL;
+		query_message_ = qrz_handler_->get_merge_message();
 		is_enumeration_ = false;
 		update_form();
 		break;
@@ -1521,6 +1542,47 @@ void record_form::enable_widgets() {
 		edit4_bn_->tooltip("Keep both records");
 		edit4_bn_->callback(cb_bn_edit, (long)KEEP_BOTH);
 		edit4_bn_->activate();
+		break;
+	case UM_MERGEDETAILS:
+		// Card display 
+		card_display_->deactivate();
+		card_filename_out_->deactivate();
+		keep_bn_->deactivate();
+		eqsl_radio_->deactivate();
+		card_front_radio_->deactivate();
+		card_back_radio_->deactivate();
+		fetch_bn_->deactivate();
+		log_card_bn_->deactivate();
+		// Query question
+		question_out_->activate();
+		// QSL message
+		qsl_message_in_->deactivate();
+		swl_message_in_->deactivate();
+		modify_message_bn_->deactivate();
+		// Quick QSL entry
+		quick_grp_->deactivate();
+		// NAvigation group
+		find_bn_->deactivate();
+		previous_bn_->deactivate();
+		next_bn_->deactivate();
+		// Allocate spare buttons: Merge done
+		edit1_bn_->label("Done");
+		edit1_bn_->color(fl_lighter(FL_GREEN));
+		edit1_bn_->tooltip("Completed merging data");
+		edit1_bn_->callback(cb_bn_edit, (long)MERGE_DONE);
+		edit1_bn_->activate();
+		edit2_bn_->label("2");
+		edit2_bn_->color(FL_BACKGROUND_COLOR);
+		edit2_bn_->tooltip("");
+		edit2_bn_->deactivate();
+		edit3_bn_->label("3");
+		edit3_bn_->color(FL_BACKGROUND_COLOR);
+		edit3_bn_->tooltip("");
+		edit3_bn_->deactivate();
+		edit4_bn_->label("4");
+		edit4_bn_->color(FL_BACKGROUND_COLOR);
+		edit4_bn_->tooltip("");
+		edit4_bn_->deactivate();
 		break;
 	}
 	// Use button - from EDIT
