@@ -12,6 +12,7 @@
 #include "field_choice.h"
 #include "qsl_form.h"
 #include "qrz_handler.h"
+#include "status.h"
 
 #include <array>
 #include <string>
@@ -37,6 +38,7 @@ extern Fl_Single_Window* main_window_;
 extern book* navigation_book_;
 extern intl_dialog* intl_dialog_;
 extern qrz_handler* qrz_handler_;
+extern status* status_;
 
 
 using namespace std;
@@ -1606,8 +1608,17 @@ void record_form::set_edit_widgets(string field, string text) {
 	// Get the field item
 	const Fl_Menu_Item* item = field_choice_->find_item(field.c_str());
 	if (item == nullptr) {
-		// If it doesn't exist get default
-		field_choice_->value(0);
+		// If it doesn't exist try all fields
+		display_all_fields_ = true;
+		((field_choice*)field_choice_)->repopulate(true, field);
+		all_fields_bn_->value(true);
+		item = field_choice_->find_item(field.c_str());
+		if (item == nullptr) {
+			// Still not got it so error
+			status_->misc_status(ST_FATAL, string(field + " is not a valid field - application error").c_str());
+			field_choice_->value(0);
+		}
+		field_choice_->value(field_choice_->find_index(item));
 	}
 	else {
 		// else get selected

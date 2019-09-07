@@ -435,6 +435,7 @@ void log_table::edit_cell(int row, int col) {
 		// Save and edit previous record - open new edit
 		if (row > 0) {
 			// Only step back if there is a row to step into.
+			book_->navigate(NV_PREV);
 			edit_cell(row - 1, col);
 		}
 		break;
@@ -442,6 +443,7 @@ void log_table::edit_cell(int row, int col) {
 		// Save and edit next record - open new edit
 		if ((unsigned)row < my_book_->size() - 1) {
 			// Only step forward if there is a row to step into.
+			book_->navigate(NV_NEXT);
 			edit_cell(row + 1, col);
 		}
 		break;

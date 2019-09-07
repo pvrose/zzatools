@@ -144,6 +144,8 @@ void import_data::auto_update() {
 
 	// Merge all files into single import
 	delete_contents(true);
+	// Remember the time the update starts
+	this_auto_update_ = now(false, "%Y%m%d%H%M%S");
 	// For each auto-import file
 	for (int i = 0; i < num_update_files_; i++) {
 		// Timer will only restart when update is complete
@@ -153,7 +155,7 @@ void import_data::auto_update() {
 		int fd = _sopen(update_files_[i].c_str(), _O_RDONLY, _SH_DENYNO);
 		struct _stat status;
 		int result = _fstat(fd, &status);
-		strftime(timestamp, 16, "%Y%m%d%H%M", gmtime(&status.st_mtime));
+		strftime(timestamp, 16, "%Y%m%d%H%M%S", gmtime(&status.st_mtime));
 #else
 		// TODO: Code Posix version of the above
 #endif
@@ -269,6 +271,8 @@ void import_data::update_book() {
 	else {
 		// Prevent view update with every record imported
 		inhibit_view_update_ = true;
+		old_enable_save_ = book_->save_enabled();
+		book_->enable_save(false);
 		// Clear flags
 		update_in_progress_ = false;
 		update_is_new_ = false;
@@ -293,6 +297,10 @@ void import_data::update_book() {
 			// Skip records prior to last in log if we are automatically merging from e.g. fldigi
 			string qso_timestamp = import_record->item("QSO_DATE") +
 				import_record->item("TIME_ON");
+			// If we have no seconds - force it to the last second of the minute so that it will be checked
+			if (qso_timestamp.length() == 12) {
+				qso_timestamp += "59";
+			}
 			// If the record is earlier than the last update
 			if (qso_timestamp <= last_auto_update_ && update_mode_ == AUTO_IMPORT) {
 				// We should have already imported so just delete the record
@@ -481,6 +489,8 @@ void import_data::stop_update(logging_mode_t mode, bool immediate) {
 
 // Tidy up after an update
 void import_data::finish_update(bool merged /*= true*/) {
+	// Restore state of save_enabled
+	book_->enable_save(old_enable_save_);
 	// No import data so select last record and activate main log view
 	if (merged && size() == 0) {
 		if (number_updated_) {
@@ -498,7 +508,7 @@ void import_data::finish_update(bool merged /*= true*/) {
 	}
 	// Restart auto-timer - restarting timer will change update_mode
 	if (update_mode_ == AUTO_IMPORT && !close_pending_) {
-		last_auto_update_ = now(false, "%Y%m%d%H%M");
+		last_auto_update_ = this_auto_update_;
 		Fl_Preferences update_settings(settings_, "Real Time Update");
 		update_settings.set("Last Update", last_auto_update_.c_str());
 		repeat_auto_timer();

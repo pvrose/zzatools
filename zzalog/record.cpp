@@ -1071,7 +1071,7 @@ time_t record::timestamp(bool time_off /*= false*/) {
 
 // Update the time the QSO finishes
 void record::update_timeoff() {
-	if (!is_header_) {
+	if (!is_header_ && item("TIME_OFF").length() == 0) {
 		// Only do this for a QSO record - get the start time and add 10 seconds
 		chrono::system_clock::time_point time_on = chrono::system_clock::from_time_t(timestamp());
 		chrono::duration<int, ratio<1> > ten_seconds(10);
