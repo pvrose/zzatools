@@ -159,19 +159,23 @@ void stn_dialog::power_table::cb_ip_drive(Fl_Widget* w, void* v) {
 	map<int, int>::value_type* it = (map<int, int>::value_type *)v;
 	Fl_Int_Input* ip = (Fl_Int_Input*)w;
 	// Get the new drive level and old power level and create a new 
-	int drive = stoi(ip->value());
-	// If this drive does not exist add it and delete the oiginal
-	if (that->data_->find(drive) == that->data_->end()) {
-		int power = it->second;
-		(*that->data_)[drive] = power;
-		that->data_->erase(it->first);
-		that->redraw_table();
+	try {
+		int drive = stoi(ip->value());
+		// If this drive does not exist add it and delete the oiginal
+		if (that->data_->find(drive) == that->data_->end()) {
+			int power = it->second;
+			(*that->data_)[drive] = power;
+			that->data_->erase(it->first);
+			that->redraw_table();
+		}
+		else {
+			char message[100];
+			sprintf(message, "STN DLG: A cell with drive level %d exists - change ignored!", drive);
+			status_->misc_status(ST_WARNING, message);
+		}
 	}
-	else {
-		char message[100];
-		sprintf(message, "STN DLG: A cell with drive level %d exists - change ignored!", drive);
-		status_->misc_status(ST_WARNING, message);
-	}
+	catch (invalid_argument&) {}
+
 }
 
 // Callback for power input
@@ -182,9 +186,13 @@ void stn_dialog::power_table::cb_ip_power(Fl_Widget* w, void* v) {
 	Fl_Int_Input* ip = (Fl_Int_Input*)w;
 	// Get the new power level and change the value of the entry
 	int drive = it->first;
-	int power = stoi(ip->value());
-	(*that->data_)[drive] = power;
-	that->redraw_table();
+	int power;
+	try {
+		power = stoi(ip->value());
+		(*that->data_)[drive] = power;
+		that->redraw_table();
+	}
+	catch (invalid_argument&) {}
 }
 
 // Call back for mouse release

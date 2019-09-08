@@ -608,7 +608,7 @@ rig_mode_t rig_hamlib::mode() {
 double rig_hamlib::power_drive() {
 	value_t drive_level;
 	if ((error_code_ = rig_get_level(rig_, RIG_VFO_CURR, rig_level_e::RIG_LEVEL_RFPOWER, &drive_level)) == RIG_OK) {
-		return power_at_100_ * drive_level.f / 100.0;
+		return power_at_100_ * drive_level.f;
 	}
 	else {
 		return nan("");

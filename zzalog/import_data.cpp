@@ -306,6 +306,7 @@ void import_data::update_book() {
 				// We should have already imported so just delete the record
 				discard_update(false);
 				update_ignored = true;
+				status_->progress(number_to_import_ - size());
 			}
 			else {
 				// Some fields may require conversion (e.g. eQSL uses RST_SENT from contact's perspective
@@ -436,7 +437,7 @@ void import_data::update_book() {
 			// Update import progress
 			number_checked_ += 1;
 			// Update progress and update views every so often
-			status_->progress(number_checked_);
+			status_->progress(number_to_import_ - size());
 		}
 		// Allow view updates
 		inhibit_view_update_ = false;
@@ -503,7 +504,7 @@ void import_data::finish_update(bool merged /*= true*/) {
 		sprintf(message, "IMPORT: %d records read, %d checked, %d updated, %d accepted",
 			number_to_import_, number_checked_, number_updated_, number_accepted_);
 		status_->misc_status(ST_OK, message);
-		status_->progress(0);
+		status_->progress(number_to_import_);
 		tabbed_view_->activate_pane(OT_MAIN, true);
 	}
 	// Restart auto-timer - restarting timer will change update_mode
