@@ -18,13 +18,13 @@ power_matrix::power_matrix() {
 	char* rig;
 	rigs_settings.get("Current", rig, "");
 	if (strlen(rig) > 0) {
-		initialise(string(rig));
+		power_matrix(string(rig));
 	} 
 	free(rig);
 }
 
 // Constructor - takes rig and intialises the matrix from settings
-void power_matrix::initialise(string rig)
+power_matrix::power_matrix(string rig)
 {
 	map_.clear();
 	rig_ = rig;
@@ -42,12 +42,12 @@ void power_matrix::initialise(string rig)
 			// Create the map of power-levels to drives
 			power_lut* power_map = new power_lut;
 			for (int e = 0; e < band_settings.entries(); e++) {
-				// Get the drive as text and convert to int
+				// Get the power as text and convert to int
 				string name = band_settings.entry(e);
 				int drive = stoi(name);
-				// Get the power as aa double
-				double power = nan("");
-				band_settings.get(name.c_str(), power, nan(""));
+				// Get the drive as int
+				double power;
+				band_settings.get(name.c_str(), drive, nan(""));
 				// Map power to drive
 				(*power_map)[drive] = power;
 			}
@@ -100,70 +100,30 @@ void power_matrix::delete_rig() {
 	map_.clear();
 }
 
-// Returns the power for the specific band and drive-level - with limited precision
-double power_matrix::power(string band, int drive) {
-	double power = look_up(band, drive);
-	double precision = look_up(band, 100) / 100;
-	if (precision < 0.01) {
-		// Return value read
-		return power;
-	}
-	else if (precision < 0.1) {
-		// Return to closest 0.01 W
-		int result = (int)(power * 100);
-		return (double)result * 0.01;
-	}
-	else if (precision < 1.0) {
-		// return to closest 0.1W
-		int result = (int)(power * 10);
-		return (double)result * 0.1;
-	}
-	else if (precision < 10.0) {
-		int result = (int)power;
-		return (double)result;
-	}
-	else if (precision < 100.0) {
-		int result = (int)(power * 0.1);
-		return (double)result * 10.0;
-	}
-	else if (precision < 1000.0) {
-		int result = (int)(power * 0.01);
-		return (double)result * 100.0;
-	}
-	else {
-		int result = (int)(power * 0.001);
-		return (double)result * 1000.0;
-	}
-
-}
-
-// Lookup the power for the specific band and drive level
-double power_matrix::look_up(string band, int drive) {
+// Returns the power for the specific band and drive-level
+double power_matrix::power(string band, double drive) {
 	power_lut* power_map = nullptr;
 	if (map_.find(band) != map_.end()) {
 		power_map = map_[band];
 	}
 	else if (map_.find("ANY") != map_.end()) {
 		power_map = map_["ANY"];
-	}
+	} 
 	if (power_map != nullptr) {
 		double last_power = 0.0;
 		int last_drive = 0;
-		double slope = 0.0;
+		float slope = 0.0;
 		auto it = power_map->begin();
 		// Step through the map until we have passed the supplied drive
-		for (; it != power_map->end() && it->first <= drive; it++) {
+		for (; it != power_map->end() && it->first <= drive * 100; it++) {
 			// Set slope to that between the last two 
-			if (it->first == last_drive) {
-				slope = 0;
-			}
-			else {
-				slope = (it->second - last_power) / (double)(it->first - last_drive);
-			}
-			last_power = it->second;
-			last_drive = it->first;
+			slope = (it->second - last_power) / (float)(it->first - last_drive);
 		}
-		return last_power + (slope * (double)(drive - last_drive));
+		// We have another entry at higher drive so set the slope based on the before and after
+		if (it != power_map->end()) {
+			slope = (it->second - last_power) / (float)(it->first - last_drive);
+		}
+		return last_power + (slope * (float)(drive - last_drive));
 	}
 	else {
 		return nan("");

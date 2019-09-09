@@ -15,6 +15,7 @@
 #include <FL/Fl_Light_Button.H>
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Int_Input.H>
+#include <FL/Fl_Float_Input.H>
 #include <FL/fl_ask.H>
 
 using namespace zzalog;
@@ -56,7 +57,7 @@ void stn_dialog::power_table::add_row() {
 }
 
 // Add the power mapping
-void stn_dialog::power_table::add_data(map<int, int>* data) {
+void stn_dialog::power_table::add_data(power_lut* data) {
 	// Copy new data
 	data_ = data;
 	redraw_table();
@@ -138,7 +139,7 @@ void stn_dialog::power_table::redraw_table() {
 		// Power cell input
 		find_cell(CONTEXT_TABLE, r, 1, X, Y, W, H);
 		// Add input for drive
-		Fl_Int_Input* ip1 = new Fl_Int_Input(X, Y, W, H);
+		Fl_Float_Input* ip1 = new Fl_Float_Input(X, Y, W, H);
 		// pass the pointer to the iterator dereference
 		ip1->callback(cb_ip_power, (void*)&(*it));
 		ip1->when(FL_WHEN_CHANGED);
@@ -156,14 +157,14 @@ void stn_dialog::power_table::redraw_table() {
 void stn_dialog::power_table::cb_ip_drive(Fl_Widget* w, void* v) {
 	// Get pointers to the divers objects
 	power_table* that = ancestor_view<power_table>(w);
-	map<int, int>::value_type* it = (map<int, int>::value_type *)v;
+	power_lut::value_type* it = (power_lut::value_type *)v;
 	Fl_Int_Input* ip = (Fl_Int_Input*)w;
 	// Get the new drive level and old power level and create a new 
 	try {
 		int drive = stoi(ip->value());
 		// If this drive does not exist add it and delete the oiginal
 		if (that->data_->find(drive) == that->data_->end()) {
-			int power = it->second;
+			double power = it->second;
 			(*that->data_)[drive] = power;
 			that->data_->erase(it->first);
 			that->redraw_table();
@@ -182,13 +183,13 @@ void stn_dialog::power_table::cb_ip_drive(Fl_Widget* w, void* v) {
 void stn_dialog::power_table::cb_ip_power(Fl_Widget* w, void* v) {
 	// Get pointers to the divers objects
 	power_table* that = ancestor_view<power_table>(w);
-	map<int, int>::value_type* it = (map<int, int>::value_type*)v;
-	Fl_Int_Input* ip = (Fl_Int_Input*)w;
+	power_lut::value_type* it = (power_lut::value_type*)v;
+	Fl_Float_Input* ip = (Fl_Float_Input*)w;
 	// Get the new power level and change the value of the entry
 	int drive = it->first;
-	int power;
+	double power;
 	try {
-		power = stoi(ip->value());
+		power = stod(ip->value());
 		(*that->data_)[drive] = power;
 		that->redraw_table();
 	}
@@ -885,7 +886,8 @@ void stn_dialog::rig_group::update_item() {
 	// Deleting the matrix saves its settings
 	delete matrix_;
 	// Get the rig name
-	matrix_ = new power_matrix(selected_name_);
+	matrix_ = new power_matrix;
+	matrix_->initialise(selected_name_);
 	// Gat the bands
 	vector<string> bands = matrix_->bands();
 	power_table* tab = (power_table*)table_;
@@ -910,7 +912,7 @@ void stn_dialog::rig_group::update_item() {
 		selected_band_ = w->value();
 	}
 	// Send the data to the table
-	map<int, int>* map = matrix_->get_map(selected_band_);
+	power_lut* map = matrix_->get_map(selected_band_);
 	tab->add_data(map);
 	redraw();
 }

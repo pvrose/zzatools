@@ -65,7 +65,6 @@ record::record(logging_mode_t type) {
 	case LM_RADIO_CONN:
 	case LM_RADIO_DISC: {
 		// Interactive mode - start QSO 
-		char temp[20];
 		// Get current date and time in UTC
 		string timestamp = now(false, "%Y%m%d%H%M%S");
 		item("QSO_DATE", timestamp.substr(0,8));
@@ -105,16 +104,14 @@ record::record(logging_mode_t type) {
 				break;
 			}
 			// Get frequency, mode and transmit power from rig
-			sprintf(temp, item_format.c_str(), rig_if_->tx_frequency() / 1000000);
-			item("FREQ", string(temp));
+			item("FREQ", rig_if_->get_tx_frequency());
 			// Get mode - NB USB/LSB need further processing
 			string mode;
 			string submode;
 			rig_if_->get_string_mode(mode, submode);
 			item("MODE", mode);
 			item("SUBMODE", submode);
-			sprintf(temp, "%0.0f", rig_if_->power_drive());
-			item("TX_PWR", string(temp));
+			item("TX_PWR", rig_if_->get_tx_power());
 		}
 		else {
 			// otherwise we enter it manually later.
@@ -297,8 +294,8 @@ void record::item(string field, string value, bool formatted/* = false*/) {
 						c = 'N';
 					}
 				}
-				as_i = as_d;
-				as_d -= as_i;
+				as_i = (int)as_d;
+				as_d -= (double)as_i;
 				as_d *= 60.0;
 				char as_s[12];
 				snprintf(as_s, 12, "%c%03d %2.3f", c, as_i, as_d);

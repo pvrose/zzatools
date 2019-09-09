@@ -57,7 +57,7 @@ namespace zzalog {
 			// Add a new empty row
 			void add_row();
 			// Add the power mapping
-			void add_data(map<int, int>* data);
+			void add_data(power_lut* data);
 
 
 		protected:
@@ -72,7 +72,7 @@ namespace zzalog {
 			static void cb_tab(Fl_Widget* w, void* v);
 
 			// drive->power mapping
-			map<int, int>* data_;
+			power_lut* data_;
 			// Array of drive widgets
 			vector<Fl_Widget*> drive_widgets_;
 			// 

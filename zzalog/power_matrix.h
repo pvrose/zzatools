@@ -10,21 +10,26 @@ using namespace std;
 namespace zzalog {
 	// This class provides a container for the power matrix for a specific rig
 	// and the calculations necessary to interpolate power from drive
+
+	typedef map<int, double> power_lut;
+
 	class power_matrix
 	{
 
 	public:
 		// Defualt constructor
 		power_matrix();
-		// Constructor initialises the matrix from the rig data.
-		power_matrix(string rig);
 		~power_matrix();
+		// initialises the matrix from the rig data.
+		void initialise(string rig);
 		// Returns the power for the specific band and drive-level
-		int power(string band, int drive);
+		double power(string band, int drive);
+		// Look up a single value
+		double look_up(string band, int drive);
 		// Returns the number of rows (bands)
 		vector<string> bands();
 		// Returns the map for a band
-		map<int, int>* get_map(string band);
+		power_lut* get_map(string band);
 		// Delete map
 		void delete_rig();
 		// Add band
@@ -34,7 +39,7 @@ namespace zzalog {
 
 	protected:
 		// The map
-		map<string, map<int, int>* > map_;
+		map<string, power_lut* > map_;
 		// Current rig
 		string rig_;
 	};

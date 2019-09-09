@@ -5,6 +5,7 @@
 #include "../zzalib/utils.h"
 #include "band_view.h"
 #include "scratchpad.h"
+#include "spec_data.h"
 
 #include <FL/Fl.H>
 #include <FL/Fl_Preferences.H>
@@ -19,6 +20,7 @@ extern rig_if* rig_if_;
 extern band_view* band_view_;
 extern menu* menu_;
 extern scratchpad* scratchpad_;
+extern spec_data* spec_data_;
 
 extern void remove_sub_window(Fl_Window* w);
 
@@ -33,13 +35,11 @@ rig_if::rig_if()
 	// Initialise
 	rig_name_ = "";
 	mfg_name_ = "";
-	power_at_100_ = nan("");
 	opened_ok_ = false;
 	handler_ = "";
 	error_message_ = "";
-	// Get max power from configuration
-	Fl_Preferences rig_settings(settings_, "Rig");
-	rig_settings.get("Max power", power_at_100_, 5.0);
+	// Power lookup table
+	power_lookup_ = new power_matrix;
 }
 
 // Base class destructor
@@ -71,175 +71,26 @@ void rig_if::close() {
 	Fl::remove_timeout(cb_timer_rig);
 }
 
-// Convert frequency from double (in Hz) to display mode
-string rig_if::display_frequency(double frequency)
-{
-	// get settings 
-	Fl_Preferences log_settings(settings_, "Log");
-	Fl_Preferences display_settings(settings_, "Display");
-
-	// Get display precision from settings
-	// Set the frquency display unit and precision
-	frequency_t display_format;
-	frequency_t log_format;
-	double display_freq = 0.0;
-	string format;
-	display_settings.get("Frequency", (int&)display_format, (int)FREQ_Hz);
-	log_settings.get("Frequency Precision", (int&)log_format, (int)FREQ_Hz);
-	// Get the value and format to display it depending on log and display settings
-	switch (display_format) {
-	case FREQ_Hz:
-		// Display in integer Hz only
-		display_freq = frequency;
-		format = " %0.0f Hz";
-		break;
-	case FREQ_kHz:
-		// Convert frequency to kHz, display 0, 1, 2 or 3 decimal places
-		display_freq = frequency / 1000.0;
-		switch (log_format) {
-		case FREQ_Hz:
-			format = " %0.3f kHz";
-			break;
-		case FREQ_Hz10:
-			format = " %0.2f kHz";
-			break;
-		case FREQ_Hz100:
-			format = " %0.1f kHz";
-			break;
-		case FREQ_kHz:
-			format = " %0.0f kHz";
-			break;
-		default:
-			format = " %0d kHz";
-		}
-		break;
-	case FREQ_MHz:
-		// Convert frequency to MHz, display 0 to 6 decimal places
-		display_freq = frequency / 1000000.0;
-		switch (log_format) {
-		case FREQ_Hz:
-			format = " %0.6f MHz";
-			break;
-		case FREQ_Hz10:
-			format = " %0.5f MHz";
-			break;
-		case FREQ_Hz100:
-			format = " %0.4f MHz";
-			break;
-		case FREQ_kHz:
-			format = " %0.3f MHz";
-			break;
-		case FREQ_kHz10:
-			format = " %0.2f MHz";
-			break;
-		case FREQ_kHz100:
-			format = " %0.1f MHz";
-			break;
-		case FREQ_MHz:
-			format = " %0.0f MHz";
-			break;
-		default:
-			format = " %0d MHz";
-		}
-	}
-	// Format the text for the display
-	char text[100];
-	sprintf(text, format.c_str(), display_freq);
-	return text;
-}
-
-// Convert power into display format
-string rig_if::display_power(double power) {
-	// Add Power - in W or dBW
-	// Set the power display
-	Fl_Preferences display_settings(settings_, "Display");
-	display_power_t display_format;
-	char text[100] = "";
-	display_settings.get("Power", (int&)display_format, (int)DPWR_Watt);
-	// Format the power value according to display settings
-	switch (display_format) {
-	case DPWR_Watt:
-		sprintf(text, " %0.1f W", power);
-		break;
-	case DPWR_dBW:
-		// To prevent an exception when converting to dBW
-		if (power <= 0.0) {
-			strcpy(text, " Invalid Power");
-		}
-		else {
-			sprintf(text, " %0.1f dBW", log10(power));
-		}
-		break;
-	}
-	return text;
-}
-
-// Convert mode into text
-string rig_if::display_mode(rig_mode_t mode) {
-	// Add the mode - convert enum type to text
-	switch (mode) {
-	case GM_LSB:
-		return " LSB";
-		break;
-	case GM_USB:
-		return " USB";
-		break;
-	case GM_CWU:
-		return " CW(U)";
-		break;
-	case GM_CWL:
-		return " CW(L)";
-		break;
-	case GM_DIGL:
-		return " DIG(L)";
-		break;
-	case GM_DIGU:
-		return " DIG(U)";
-		break;
-	case GM_AM:
-		return " AM";
-		break;
-	case GM_FM:
-		return " FM";
-		break;
-	default:
-		return " Unknown mode";
-		break;
-	}
-}
-
 // Convert s-meter reading into display format
-string rig_if::display_smeter(int smeter) {
+string rig_if::get_smeter() {
+	int smeter = s_meter();
 	char text[100];
-	Fl_Preferences display_settings(settings_, "Display");
-	display_signal_t display_format;
-	display_settings.get("Signal Strength", (int&)display_format, (int)SIG_SPoints);
-	switch(display_format) {
-	case SIG_SPoints:
-		// SMeter value is relative to S9
-		// Smeter value 0 indicates S9,
-		// 1 S-point is 6 dB
-		if (smeter < -54) {
-			// Below S0
-			sprintf(text, " S0%d", 54 + smeter);
-		}
-		else if (smeter <= 0) {
-			// Below S9 - convert to S points (6dB per S-point
-			sprintf(text, " S%1d", (54 + smeter) / 6);
-		}
-		else {
-			// S9+
-			sprintf(text, " S9+%d", smeter);
-		}
-		break;
-	case SIG_dBm:
-		// display signal in -dBm, meter = 0 => -73 dBm
-		sprintf(text, " %ddBm", smeter - 73);
-		break;
-	default:
-		text[0] = 0;
-		break;
+	// SMeter value is relative to S9
+	// Smeter value 0 indicates S9,
+	// 1 S-point is 6 dB
+	if (smeter < -54) {
+		// Below S0
+		sprintf(text, " S0%dsB", 54 + smeter);
 	}
+	else if (smeter <= 0) {
+		// Below S9 - convert to S points (6dB per S-point
+		sprintf(text, " S%1d", (54 + smeter) / 6);
+	}
+	else {
+		// S9+
+		sprintf(text, " S9+%ddB", smeter);
+	}
+
 	return text;
 }
 
@@ -249,14 +100,18 @@ string rig_if::rig_info() {
 	string rig_info = handler_ + ": ";
 	rig_info += rig_name_;
 	// Valid rig - get data from it. TX frequency
-	rig_info += display_frequency(tx_frequency());
-	// Rig operating split RX/TX frequencies. Add RX frequency.
-	if (is_split()) {
-		rig_info += " (RX " + display_frequency(rx_frequency()) += ") ";
+	rig_info += " " + get_tx_frequency() + " Mhz";
+	rig_info += " " + get_tx_power() + " W";
+	string mode;
+	string submode;
+	get_string_mode(mode, submode);
+	if (submode.length()) {
+		rig_info += " " + mode + "(" + submode + ")";
 	}
-	rig_info += display_power(power_drive());
-	rig_info += display_mode(mode());
-	rig_info += display_smeter(s_meter());
+	else {
+		rig_info += " " + mode;
+	}
+	rig_info += " " + get_smeter();
 	return rig_info;
 }
 
@@ -306,11 +161,20 @@ string rig_if::get_tx_frequency() {
 
 // Return the power
 string rig_if::get_tx_power() {
-	double tx_power = power_drive();
+	double tx_power = power();
 	char text[100];
 	sprintf(text, "%g", tx_power);
 
 	return text;
+}
+
+// Convert the drive-level to a power
+double rig_if::power() {
+	double my_drive = drive();
+	double my_freq = tx_frequency();
+	// Get the band
+	string band = spec_data_->band_for_freq(my_freq / 1000000);
+	return power_lookup_->power(band, (int)(my_drive * 100));
 }
 
 // Rig timer callback
@@ -605,10 +469,10 @@ rig_mode_t rig_hamlib::mode() {
 }
 
 // Return drive level * 100% power
-double rig_hamlib::power_drive() {
+double rig_hamlib::drive() {
 	value_t drive_level;
 	if ((error_code_ = rig_get_level(rig_, RIG_VFO_CURR, rig_level_e::RIG_LEVEL_RFPOWER, &drive_level)) == RIG_OK) {
-		return power_at_100_ * drive_level.f;
+		return drive_level.f;
 	}
 	else {
 		return nan("");
@@ -889,7 +753,7 @@ rig_mode_t rig_omnirig::mode()
 
 /* Return rig drive level scaled by multiplier
 */
-double rig_omnirig::power_drive()
+double rig_omnirig::drive()
 {
 	// Not directly supported by OmniRig 
 	// TODO - convert to file driven - but for now just assume PowerSDR
@@ -907,9 +771,9 @@ double rig_omnirig::power_drive()
 		OmniRig::RigStatusX status;
 		while (waiting_drive_reply_ && rig_->get_Status(&status) == S_OK && status == OmniRig::ST_ONLINE) Fl::wait();
 		// Return 
-		return power_at_100_ * (double)drive_level_ / 100.0;
+		return (double)drive_level_;
 	}
-	return power_at_100_;
+	return 1.0;
 
 }
 
@@ -1163,10 +1027,10 @@ rig_mode_t rig_flrig::mode() {
 }
 
 // Return drive level * 100% power
-double rig_flrig::power_drive() {
+double rig_flrig::drive() {
 	rpc_data_item response;
 	if (do_request("rig.get_pwrmeter", nullptr, &response)) {
-		return (double)response.get_int() * power_at_100_ / 100.0;
+		return (double)response.get_int();
 	}
 	else {
 		return nan("");

@@ -5,6 +5,8 @@
 
 #include "rpc_data_item.h"
 #include "rpc_handler.h"
+#include "power_matrix.h"
+
 // hamlib icludes
 #include "hamlib/rig.h"
 
@@ -68,8 +70,8 @@ namespace zzalog {
 		virtual double tx_frequency() = 0;
 		// Read mode from rig
 		virtual rig_mode_t mode() = 0;
-		// Return drive level * 100% power
-		virtual double power_drive() = 0;
+		// Return drive level
+		virtual double drive() = 0;
 		// Rig is working split TX/RX frequency
 		virtual bool is_split() = 0;
 		// Get separate frequency
@@ -96,20 +98,16 @@ namespace zzalog {
 		string get_tx_frequency();
 		// return power
 		string get_tx_power();
+		// return S-meter reading
+		string get_smeter();
 		// Return open message
 		string success_message();
+		// Convert drive-level to power
+		double power();
 
 
 		// Protected methods
 	protected:
-		// convert frequency to text according to settings
-		string display_frequency(double frequency);
-		// convert power to text according to settings
-		string display_power(double power);
-		// convert mode to display form
-		string display_mode(rig_mode_t mode);
-		// convert s-meter reading to text according to settings
-		string display_smeter(int smeter);
 
 		// Protected attributes
 	protected:
@@ -117,8 +115,6 @@ namespace zzalog {
 		string rig_name_;
 		// Name of the rig (prepended with manufacturer)
 		string mfg_name_;
-		// Power (W) when drive level is 100%
-		double power_at_100_;
 		// Rig opened OK
 		bool opened_ok_;
 		// Handler name
@@ -127,6 +123,8 @@ namespace zzalog {
 		string error_message_;
 		// Text success message
 		string success_message_;
+		// The power lookup matrix
+		power_matrix* power_lookup_;
 
 	};
 
@@ -146,7 +144,7 @@ namespace zzalog {
 		// Read mode from rig
 		virtual rig_mode_t mode();
 		// Return drive level * 100% power
-		virtual double power_drive();
+		virtual double drive();
 		// Rig is working split TX/RX frequency
 		virtual bool is_split();
 		// Get separate frequency
@@ -202,7 +200,7 @@ namespace zzalog {
 		// Read mode from rig
 		virtual rig_mode_t mode();
 		// Return drive level * 100% power
-		virtual double power_drive();
+		virtual double drive();
 		// Rig is working split TX/RX frequency
 		virtual bool is_split();
 		// Get separate frequency
@@ -266,7 +264,7 @@ namespace zzalog {
 		// Read mode from rig
 		virtual rig_mode_t mode();
 		// Return drive level * 100% power
-		virtual double power_drive();
+		virtual double drive();
 		// Rig is working split TX/RX frequency
 		virtual bool is_split();
 		// Get separate frequency
