@@ -147,9 +147,6 @@
     <ClCompile Include="zzalog\spec_data.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="zzalog\spec_reader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="zzalog\spec_tree.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -363,9 +360,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="zzalog\spec_data.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\spec_reader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="zzalog\spec_tree.h">

@@ -611,7 +611,7 @@ void menu::cb_mi_parse_log(Fl_Widget* w, void* v) {
 				// User has the opportunity to abandon this if too many records have issues
 				abandon = true;
 				status_->misc_status(ST_WARNING, "PARSE LOG: Abandoned");
-				status_->progress(0);
+				status_->progress("Abandoned");
 			}
 		}
 		// update views with last record parsed selected

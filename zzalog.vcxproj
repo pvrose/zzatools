@@ -161,7 +161,6 @@
     <ClCompile Include="zzalog\settings.cpp" />
     <ClCompile Include="zzalog\specx_reader.cpp" />
     <ClCompile Include="zzalog\spec_data.cpp" />
-    <ClCompile Include="zzalog\spec_reader.cpp" />
     <ClCompile Include="zzalog\spec_tree.cpp" />
     <ClCompile Include="zzalog\status.cpp" />
     <ClCompile Include="zzalog\stn_dialog.cpp" />
@@ -236,7 +235,6 @@
     <ClInclude Include="zzalog\settings.h" />
     <ClInclude Include="zzalog\specx_reader.h" />
     <ClInclude Include="zzalog\spec_data.h" />
-    <ClInclude Include="zzalog\spec_reader.h" />
     <ClInclude Include="zzalog\spec_tree.h" />
     <ClInclude Include="zzalog\status.h" />
     <ClInclude Include="zzalog\stn_dialog.h" />

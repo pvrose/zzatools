@@ -1268,6 +1268,7 @@ void dxa_if::draw_pins() {
 		}
 		catch (exception& /*e*/) {
 			status_->misc_status(ST_SEVERE, "DXATLAS: Error detected during update");
+			status_->progress("Errored");
 			disconnect_dxatlas(false);
 		}
 		fl_cursor(FL_CURSOR_DEFAULT);

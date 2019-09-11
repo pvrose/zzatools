@@ -55,7 +55,7 @@ bool adi_writer::store_book(book* out_book, ostream& out, set<string>* fields /*
 	}
 	else {
 		status_->misc_status(ST_ERROR, "ADI WRITE: Failed");
-		status_->progress(0);
+		status_->progress("Write failed");
 	}
 	// restore the cursor
 	fl_cursor(FL_CURSOR_DEFAULT);

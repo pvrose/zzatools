@@ -60,7 +60,7 @@ bool specx_reader::load_data(spec_data* data, istream& in, string& version) {
 	else {
 		// Read failed - report failure
 		status_->misc_status(ST_FATAL, "SPEC READ: Failed");
-		status_->progress(0);
+		status_->progress("Load failed");
 		fl_cursor(FL_CURSOR_DEFAULT);
 		return false;
 	}

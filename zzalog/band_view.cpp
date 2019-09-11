@@ -3,6 +3,7 @@
 #include "../zzalib/utils.h"
 #include "../zzalib/callback.h"
 #include "drawing.h"
+#include "spec_data.h"
 
 #include <fstream>
 #include <istream>
@@ -23,6 +24,7 @@ using namespace zzalog;
 
 extern Fl_Preferences* settings_;
 extern status* status_;
+extern spec_data* spec_data_;
 
 // Constructor - calls the Window constructor 
 band_view::band_view(double frequency, int W, int H, const char* label) :
@@ -134,6 +136,7 @@ bool band_view::load_data() {
 	}
 	else {
 		status_->misc_status(ST_ERROR, "BAND: Load band-plan data failed");
+		status_->progress("Load failed!");
 		return false;
 	}
 }
@@ -347,8 +350,13 @@ int band_view::draw_frequency(int pos_y) {
 	fl_font(FONT, FONT_SIZE - 2);
 	fl_measure(text, text_w, text_h);
 	Fl_Color old_colour = fl_color();
-	fl_color(FL_RED);
-	// Draw a red line across scale and plans
+	if (in_band(rig_frequency_)) {
+		fl_color(FL_BLUE);
+	}
+	else {
+		fl_color(FL_RED);
+	}
+	// Draw a red or blue line across scale and plans
 	fl_line(curr_x, GAP, curr_x, pos_y);
 	// Write current frequency on line top-aligned
 	fl_draw(90, text, curr_x - 1, GAP + text_w);
@@ -425,6 +433,10 @@ void band_view::draw() {
 	pos_y = draw_frequency(pos_y);
 	// Don't allow the window to be resized to smaller than this
 	size_range(pixel_rhs_ + GAP, pos_y + GAP);
+	// Get band
+	string band = spec_data_->band_for_freq(rig_frequency_ / 1000.0);
+	string title = "Band plan " + band;
+	copy_label(title.c_str());
 }
 
 // Convert frequency to a x-pixel position

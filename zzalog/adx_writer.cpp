@@ -58,7 +58,7 @@ bool adx_writer::store_book(book* book, ostream& os) {
 		} else {
 			// Not successful
 			status_->misc_status(ST_ERROR, "ADX WRITE: XML Generation failed");
-			status_->progress(0);
+			status_->progress("Process failed");
 		}
 	}
 
@@ -76,7 +76,7 @@ bool adx_writer::store_book(book* book, ostream& os) {
 	}
 	else {
 		status_->misc_status(ST_ERROR, "ADX WRITE: XML Storing failed");
-		status_->progress(0);
+		status_->progress("Write failed");
 		return false;
 	}
 

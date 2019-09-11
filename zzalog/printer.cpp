@@ -131,6 +131,7 @@ int printer::print_book() {
 	fl_cursor(FL_CURSOR_DEFAULT);
 	if (error) {
 		status_->misc_status(ST_ERROR, "PRINTER: Failed!");
+		status_->progress("Failed");
 	}
 	else {
 		status_->misc_status(ST_OK, "PRINTER: Done!");

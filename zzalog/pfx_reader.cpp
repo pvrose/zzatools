@@ -257,6 +257,7 @@ bool pfx_reader::load_data(pfx_data& prefixes, string filename) {
 	// Return success
 	if (result == LR_BAD) {
 		status_->misc_status(ST_ERROR, "LOAD PFX DATA: Failed");
+		status_->progress("Load failed");
 		return false;
 	}
 	else {

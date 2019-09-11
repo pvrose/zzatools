@@ -76,7 +76,7 @@ bool adx_reader::load_book(book* book, istream& in) {
 	else {
 		// Read failed - report failure
 		status_->misc_status(ST_ERROR, "ADX READ: Failed");
-		status_->progress(0);
+		status_->progress("Load failed");
 		fl_cursor(FL_CURSOR_DEFAULT);
 		return false;
 	}
