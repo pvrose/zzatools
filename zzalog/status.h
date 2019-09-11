@@ -104,9 +104,11 @@ namespace zzalog {
 		~status();
 
 		// Initialise progress
-		void progress(int max_value, object_t object, const char* suffix);
+		void progress(int max_value, object_t object, const char* suffix, bool countdown = false);
 		// UPdate progress
 		void progress(int value);
+		// Update progress with a text message and mark 100%
+		void progress(const char* message);
 		// Update rig_status
 		void rig_status(status_t status, const char* label);
 		// Update miscellaneous status
@@ -163,6 +165,8 @@ namespace zzalog {
 		status_t min_level_;
 		// Append log
 		bool append_log_;
+		// Progress countdown mode
+		bool countdown_mode_;
 	};
 
 }

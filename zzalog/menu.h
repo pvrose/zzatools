@@ -55,6 +55,8 @@ namespace zzalog {
 		static void cb_mi_valid8_log(Fl_Widget* w, void* v);
 		// Log->Mode->Off-air,On-air,Import
 		static void cb_mi_log_mode(Fl_Widget* w, void* v);
+		// Log->Mode->Radio Disc/Conn
+		static void cb_mi_log_radio(Fl_Widget* w, void* v);
 		// Log->New
 		static void cb_mi_log_new(Fl_Widget* w, void* v);
 		// Log->Save

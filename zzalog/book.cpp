@@ -706,7 +706,7 @@ record* book::new_record(logging_mode_t mode) {
 	record* new_record = new record(mode);
 	// put it in the book 
 	record_num_t pos_record;
-	if (mode == LM_RADIO_CONN || mode == LM_RADIO_DISC) {
+	if (mode == LM_ON_AIR) {
 		// On-air logging - insert against date/time (which should be at the end
 		pos_record = insert_record(new_record);
 		char message[256];

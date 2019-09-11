@@ -169,7 +169,7 @@ void scratchpad::create_form() {
 	string power;
 	string mode;
 	string submode;
-	if (rig_if_ && menu_->logging() == LM_RADIO_CONN) {
+	if (rig_if_) {
 		// Get data from rig
 		frequency = rig_if_->get_tx_frequency();
 		power = rig_if_->get_tx_power();
@@ -325,7 +325,7 @@ void scratchpad::cb_close(Fl_Widget* w, void* v) {
 void scratchpad::cb_start(Fl_Widget* w, void* v) {
 	scratchpad* that = ancestor_view<scratchpad>(w);
 	that->record_ = book_->new_record(menu_->logging());
-	if (menu_->logging() != LM_RADIO_CONN) {
+	if (rig_if_) {
 		that->record_->item("FREQ", string(that->ip_freq_->value()));
 		string mode;
 		cb_choice_text(that->ch_mode_, &mode);

@@ -82,9 +82,12 @@ namespace zzalog {
 	{ "&Log", 0, 0, 0, FL_SUBMENU },
 	{ "&Mode", 0, 0, 0, FL_SUBMENU | FL_MENU_DIVIDER },
 	{ "O&ff-air", 0, menu::cb_mi_log_mode, (void*)(LM_OFF_AIR) , FL_MENU_RADIO | FL_MENU_VALUE },
-	{ "&Radio Connected", 0, menu::cb_mi_log_mode, (void*)(LM_RADIO_CONN), FL_MENU_RADIO },
-	{ "Radio &Disconnected", 0, menu::cb_mi_log_mode, (void*)(LM_RADIO_DISC), FL_MENU_RADIO },
+	{ "O&n-air", 0, menu::cb_mi_log_mode, (void*)(LM_ON_AIR), FL_MENU_RADIO },
 	{ "&Import", 0, menu::cb_mi_log_mode, (void*)(LM_IMPORTED), FL_MENU_RADIO },
+	{ 0 },
+	{ "&Rig", 0, 0, 0, FL_SUBMENU },
+	{ "&Disconnect", 0, menu::cb_mi_log_radio, (void*)(false), FL_MENU_RADIO | FL_MENU_VALUE },
+	{ "&Connect", 0, menu::cb_mi_log_radio, (void*)(true), FL_MENU_RADIO },
 	{ 0 },
 	{ "&Use View", 0, 0, 0, FL_SUBMENU | FL_MENU_DIVIDER },
 	{ "Main &Log", 0, menu::cb_mi_log_view, (void*)(OT_MAIN), FL_MENU_RADIO | FL_MENU_VALUE },
@@ -105,13 +108,13 @@ namespace zzalog {
 	{ "Scratc&hpad", 0, menu::cb_mi_log_spad, 0, FL_MENU_TOGGLE },
 	{ 0 },
 	{ "&Operating", 0, 0, 0, FL_SUBMENU },
-	{ "C&hange", 0, 0, 0, FL_SUBMENU },
+	{ "C&hange QSO && Set Next", 0, 0, 0, FL_SUBMENU },
 	{ "Ri&g", 0, menu::cb_mi_oper_change, (void*)UD_RIG },
 	{ "&Aerial", 0, menu::cb_mi_oper_change, (void*)UD_AERIAL },
 	{ "&QTH", 0, menu::cb_mi_oper_change, (void*)UD_QTH },
 	{ "&Prop mode", 0, menu::cb_mi_oper_change, (void*)UD_PROP },
 	{ 0 },
-	{ "Se&t", 0, 0, 0, FL_SUBMENU },
+	{ "Se&t Next", 0, 0, 0, FL_SUBMENU },
 	{ "Ri&g", 0, menu::cb_mi_oper_set, (void*)UD_RIG },
 	{ "&Aerial", 0, menu::cb_mi_oper_set, (void*)UD_AERIAL },
 	{ "&QTH", 0, menu::cb_mi_oper_set, (void*)UD_QTH },
@@ -264,7 +267,7 @@ void menu::cb_mi_file_new(Fl_Widget* w, void* v) {
 	menu* that = ancestor_view<menu>(w);
 	// Gracefully stop any import in progress - restart with ON_AIR logging - if no rig will drop to OFF_AIR
 	if (that->logging() == LM_IMPORTED) {
-		import_data_->stop_update(LM_RADIO_CONN, false);
+		import_data_->stop_update(LM_ON_AIR, false);
 	}
 	while (!import_data_->update_complete()) Fl::wait();
 	if (book_->modified_record() | book_->new_record()) {
@@ -689,7 +692,7 @@ void menu::cb_mi_log_mode(Fl_Widget* w, void* v) {
 	// Stop current logging mode
 	switch (that->logging_mode_) {
 	case LM_OFF_AIR:
-	case LM_RADIO_DISC:
+		book_->enable_save(true);
 		// Currently entering a QSO - ask Save or Quit
 		if (book_->modified_record() || book_->new_record()) {
 			switch (fl_choice("You are currently modifying a record? Save or Quit?", "Save?", "Quit?", nullptr)) {
@@ -702,19 +705,23 @@ void menu::cb_mi_log_mode(Fl_Widget* w, void* v) {
 			}
 		}
 		break;
-	case LM_RADIO_CONN:
-		if (rig_if_) {
-			status_->misc_status(ST_NOTE, "RIG: Closing rig connection by user");
-			// Close rig
-			rig_if_->close();
-			delete rig_if_;
-			rig_if_ = nullptr;
+	case LM_ON_AIR:
+		// Currently entering a QSO - ask Save or Quit
+		if (book_->modified_record() || book_->new_record()) {
+			switch (fl_choice("You are currently modifying a record? Save or Quit?", "Save?", "Quit?", nullptr)) {
+			case 0:
+				book_->save_record();
+				break;
+			case 1:
+				book_->delete_record(false);
+				break;
+			}
 		}
-		break;
 	case LM_IMPORTED:
 		// Stop importing - and wait for it to finish
 		import_data_->stop_update(next_mode, false);
 		while (!import_data_->update_complete()) Fl::wait();
+		status_->progress("Import cancelled!");
 		break;
 	}
 
@@ -723,28 +730,52 @@ void menu::cb_mi_log_mode(Fl_Widget* w, void* v) {
 	switch (that->logging_mode_) {
 	case LM_OFF_AIR:
 		// Let user have mode and stop auto-save
-		status_->misc_status(ST_NOTE, "RIG: Off-air logging initiated by user");
+		status_->misc_status(ST_NOTE, "LOGGING: Mode set to off-air logging");
 		book_->enable_save(false);
 		// Update enabled menu items
 		that->update_items();
 		break;
-	case LM_RADIO_DISC:
-		// Let user have mode and stop auto-save
-		status_->misc_status(ST_NOTE, "RIG: Real-time, radio disconnected logging");
-		book_->enable_save(false);
-		// Update enabled menu items
-		that->update_items();
-		break;
-
-	case LM_RADIO_CONN:
-		// attempt to open rig
-		add_rig_if();
+	case LM_ON_AIR:
+		status_->misc_status(ST_NOTE, "LOGGING: Mode set to real-time (on-air) logging");
 		break;
 	case LM_IMPORTED:
 		// Reset navigation mode
 		navigation_book_ = book_;
 		// start import_process
+		status_->misc_status(ST_NOTE, "LOGGING: Mode set to auto-import from data modems");
 		import_data_->start_auto_update();
+		break;
+	}
+}
+
+// Set radio disconnected or connected
+void menu::cb_mi_log_radio(Fl_Widget* w, void* v) {
+	menu* that = ancestor_view<menu>(w);
+	switch ((bool)(long)v) {
+	case false:
+		if (rig_if_) {
+			status_->misc_status(ST_NOTE, "RIG: Closing rig connection by user");
+			// Close rig
+			rig_if_->close();
+			delete rig_if_;
+			rig_if_ = nullptr;
+		}
+		break;
+	case true:
+		// Currently entering a QSO - ask Save or Quit
+		if (book_->modified_record() || book_->new_record()) {
+			switch (fl_choice("You are currently modifying a record? Save or Quit?", "Save?", "Quit?", nullptr)) {
+			case 0:
+				book_->save_record();
+				break;
+			case 1:
+				book_->delete_record(false);
+				break;
+			}
+		}
+		if (!rig_if_) {
+			add_rig_if();
+		}
 		break;
 	}
 }
@@ -1213,10 +1244,10 @@ void menu::cb_mi_info_map(Fl_Widget* w, void* v) {
 		}
 		else {
 			// Any thing else could be a random location somewhere up to 1 degree away.
-			status_->misc_status(ST_WARNING, "MENU: Insufficient QTH information in record to launch Google Maps");
+			status_->misc_status(ST_WARNING, "INFO: Insufficient QTH information in record to launch Google Maps");
 			return;
 		}
-		status_->misc_status(ST_NOTE, "MENU: Launching google maps");
+		status_->misc_status(ST_NOTE, "INFO: Launching google maps");
 		int result = system(url);
 		delete[] url;
 	}
@@ -1243,7 +1274,7 @@ void menu::cb_mi_info_web(Fl_Widget* w, void* v) {
 		string website = record->item("WEB");
 		char* url = new char[website.length() + browser.length() + strlen(format) + 10];
 		sprintf(url, format, browser.c_str(), website.c_str());
-		status_->misc_status(ST_NOTE, "MENU: Opening QSO web-site");
+		status_->misc_status(ST_NOTE, "INFO: Opening QSO web-site");
 		int result = system(url);
 		delete[] url;
 	}
@@ -1342,43 +1373,40 @@ void menu::add_recent_files() {
 
 // set the menu to the state of the logging mode - check mark the appropriate menu item
 void menu::logging(logging_mode_t mode) {
-	int index_conn = find_index("&Log/&Mode/&Radio Connected");
-	int index_disc = find_index("&Log/&Mode/Radio &Disconnected");
+	int index_conn = find_index("&Log/&Rig/&Connect");
+	int index_disc = find_index("&Log/&Rig/&Disconnect");
 	int index_offair = find_index("&Log/&Mode/O&ff-air");
+	int index_onair = find_index("&Log/&Mode/O&n-air");
 	int index_import = find_index("&Log/&Mode/&Import");
 	// Change the mode 
 	switch (mode) {
-	case LM_RADIO_CONN:
-		// Tick On-Air only
-		this->mode(index_conn, this->mode(index_conn) | FL_MENU_VALUE);
-		this->mode(index_disc, this->mode(index_disc) & ~FL_MENU_VALUE);
-		this->mode(index_offair, this->mode(index_offair) & ~FL_MENU_VALUE);
-		this->mode(index_import, this->mode(index_import) & ~FL_MENU_VALUE);
-		break;
-	case LM_RADIO_DISC:
-		// Tick On-Air only
-		this->mode(index_conn, this->mode(index_conn) & ~FL_MENU_VALUE);
-		this->mode(index_disc, this->mode(index_disc) | FL_MENU_VALUE);
-		this->mode(index_offair, this->mode(index_offair) & ~FL_MENU_VALUE);
-		this->mode(index_import, this->mode(index_import) & ~FL_MENU_VALUE);
-		if (status_) status_->rig_status(ST_WARNING, "Real-time, no rig logging");
-		break;
 	case LM_OFF_AIR:
-		// Tick Off-air only
-		this->mode(index_conn, this->mode(index_conn) & ~FL_MENU_VALUE);
-		this->mode(index_disc, this->mode(index_disc) & ~FL_MENU_VALUE);
+		// Tick On-Air only
 		this->mode(index_offair, this->mode(index_offair) | FL_MENU_VALUE);
+		this->mode(index_onair, this->mode(index_onair) & ~FL_MENU_VALUE);
 		this->mode(index_import, this->mode(index_import) & ~FL_MENU_VALUE);
-		if (status_) status_->rig_status(ST_WARNING, "Off-air logging");
+		break;
+	case LM_ON_AIR:
+		// Tick On-Air only
+		this->mode(index_offair, this->mode(index_offair) & ~FL_MENU_VALUE);
+		this->mode(index_onair, this->mode(index_onair) | FL_MENU_VALUE);
+		this->mode(index_import, this->mode(index_import) & ~FL_MENU_VALUE);
 		break;
 	case LM_IMPORTED:
 		// Tick Import only
-		this->mode(index_conn, this->mode(index_conn) & ~FL_MENU_VALUE);
-		this->mode(index_disc, this->mode(index_disc) & ~FL_MENU_VALUE);
 		this->mode(index_offair, this->mode(index_offair) & ~FL_MENU_VALUE);
+		this->mode(index_onair, this->mode(index_onair) & ~FL_MENU_VALUE);
 		this->mode(index_import, this->mode(index_import) | FL_MENU_VALUE);
-		if (status_) status_->rig_status(ST_WARNING, "Automatic import from data modem");
 		break;
+	}
+	if (rig_if_) {
+		// Tick On-Air only
+		this->mode(index_conn, this->mode(index_conn) | FL_MENU_VALUE);
+		this->mode(index_disc, this->mode(index_disc) & ~FL_MENU_VALUE);
+	} else {
+		// Tick On-Air only
+		this->mode(index_conn, this->mode(index_conn) & ~FL_MENU_VALUE);
+		this->mode(index_disc, this->mode(index_disc) | FL_MENU_VALUE);
 	}
 	// Set logging mode for every-one to access
 	logging_mode_ = mode;
@@ -1773,7 +1801,7 @@ string menu::get_browser() {
 		// Wait while the dialog is active (visible)
 		while (chooser->visible()) Fl::wait();
 		if (!chooser->count()) {
-			status_->misc_status(ST_WARNING, "MENU: No browser selected, abandoning");
+			status_->misc_status(ST_WARNING, "INFO: No browser selected, abandoning");
 			return "";
 		}
 		delete chooser;

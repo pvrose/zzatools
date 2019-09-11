@@ -181,7 +181,7 @@ toolbar::toolbar(int X, int Y, int W, int H, const char* label) :
 	curr_x += H + TOOL_GAP;
 	// Log->Mode->On-air
 	bn = new Fl_Button(curr_x, Y, H, H, 0);
-	bn->callback(cb_bn_menu, (void*)"&Log/&Mode/&Radio Connected");
+	bn->callback(cb_bn_menu, (void*)"&Log/&Rig/&Connect");
 	bn->when(FL_WHEN_RELEASE);
 	bn->image(new Fl_RGB_Image(ICON_RIG_ON, 16, 16, 4));
 	bn->tooltip("Switch to on-air mode (connect rig)");
@@ -189,7 +189,7 @@ toolbar::toolbar(int X, int Y, int W, int H, const char* label) :
 	curr_x += H;
 	// Log->Mode->Off-air
 	bn = new Fl_Button(curr_x, Y, H, H, 0);
-	bn->callback(cb_bn_menu, (void*)"&Log/&Mode/O&ff-air");
+	bn->callback(cb_bn_menu, (void*)"&Log/&Rig/&Disconnect");
 	bn->when(FL_WHEN_RELEASE);
 	bn->image(new Fl_RGB_Image(ICON_RIG_OFF, 16, 16, 4));
 	bn->tooltip("Switch to off-air mode (disconnect rig)");
@@ -413,7 +413,7 @@ void toolbar::cb_bn_extract(Fl_Widget* w, void* v) {
 void toolbar::cb_bn_explain(Fl_Widget* w, void* v) {
 	toolbar* that = ancestor_view<toolbar>(w);
 	// Create a temporary record to parse theh callsign
-	record* tip_record = new record(LM_RADIO_CONN);
+	record* tip_record = new record(LM_ON_AIR);
 	vector<prefix*> prefixes;
 	char temp[1024];
 	string message = "";

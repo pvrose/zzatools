@@ -331,136 +331,129 @@ void add_book(char* arg) {
 
 // Create the rig interface handler and connect to the rig.
 void add_rig_if() {
-	fl_cursor(FL_CURSOR_WAIT);
-	delete rig_if_;
-	if (band_view_) {
-		remove_sub_window(band_view_);
-		delete band_view_;
-		band_view_ = nullptr;
-	}
+	if (!closing_) {
+		fl_cursor(FL_CURSOR_WAIT);
+		delete rig_if_;
+		if (band_view_) {
+			remove_sub_window(band_view_);
+			delete band_view_;
+			band_view_ = nullptr;
+		}
 
-	// Get the handler from the settings
-	rig_handler_t handler;
-	Fl_Preferences rig_settings(settings_, "Rig");
-	rig_settings.get("Handler", (int&)handler, RIG_OMNIRIG);
-	Fl_Preferences stations_settings(settings_, "Stations");
-	Fl_Preferences rigs_settings(stations_settings, "Rigs");
-	char * rig_name;
-	rigs_settings.get("Current", rig_name, "");
-	char temp[256];
-	char handler_name[8];
-	switch (handler) {
-	case RIG_HAMLIB:
-		strcpy(handler_name, "hamlib");
-		break;
-	case RIG_OMNIRIG:
-		strcpy(handler_name, "OmniRig");
-		break;
-	case RIG_FLRIG:
-		strcpy(handler_name, "FlRig");
-		break;
-	}
-	if (handler != RIG_NONE) {
-		sprintf(temp, "RIG: Connecting %s (%s)", rig_name, handler_name);
-		status_->misc_status(ST_NOTE, temp);
-	}
-	// Cancel any possible import
-	if (menu_->logging() == LM_IMPORTED) {
-		// Stop importing - and wait for it to finish
-		import_data_->stop_update(LM_RADIO_CONN, false);
-		while (!import_data_->update_complete()) Fl::wait();
-	}
-	// Create the appropriate interface handler
-	switch (handler) {
-	case RIG_HAMLIB:
-		rig_if_ = new rig_hamlib;
-		break;
-	case RIG_OMNIRIG:
-		rig_if_ = new rig_omnirig;
-		break;
-	case RIG_FLRIG:
-		// If the HTTP URL handler hasn't yet been created do so.
-		if (url_handler_ == nullptr) url_handler_ = new url_handler;
-		rig_if_ = new rig_flrig;
-		break;
-	case RIG_NONE:
-		status_->misc_status(ST_NOTE, "RIG: Not connecting one");
-		rig_if_ = nullptr;
-	}
-	if (rig_if_ == nullptr) {
-		// No handler defined - assume manual logging
-		menu_->logging(LM_RADIO_DISC);
-		status_->misc_status(ST_WARNING, "RIG: No handler - assume real-time logging, no rig");
-	}
-	else {
-		// Trya and open the connection to the rig
-		bool done = false;
-		while (!done) {
-			if (rig_if_->open()) {
-				if (!rig_if_->is_good()) {
-					// No rig handler or rig didn't open - assume manual logging
-					delete rig_if_;
-					rig_if_ = nullptr;
-					menu_->logging(LM_RADIO_DISC);
-					status_->misc_status(ST_ERROR, "RIG: No handler - assume real-time logging, no rig");
-					done = true;
-				}
-				else {
-					// Connect to rig OK - see if we are a digital mode
-					if ((rig_if_->mode() == GM_DIGL || rig_if_->mode() == GM_DIGU) && import_data_->auto_enable()) {
-						// start auto-data mode so we import the log written by the mode app
-						menu_->logging(LM_IMPORTED);
-						rig_if_->close();
-						status_->misc_status(ST_WARNING, "RIG: Data mode - assume logging by data modem app");
-						if (import_data_->start_auto_update()) {
-							done = true;
-						}
-					}
-					else if (!rig_if_->is_good()) {
-						char message[512];
-						sprintf(message, "RIG: Bad access - %s. Assume real-time logging, no rig", rig_if_->error_message().c_str());
-						// Problem with rig_if when making first access, close it to stop timer and clean up 
-						rig_if_->close();
+		// Get the handler from the settings
+		rig_handler_t handler;
+		Fl_Preferences rig_settings(settings_, "Rig");
+		rig_settings.get("Handler", (int&)handler, RIG_OMNIRIG);
+		Fl_Preferences stations_settings(settings_, "Stations");
+		Fl_Preferences rigs_settings(stations_settings, "Rigs");
+		char* rig_name;
+		rigs_settings.get("Current", rig_name, "");
+		char temp[256];
+		char handler_name[8];
+		switch (handler) {
+		case RIG_HAMLIB:
+			strcpy(handler_name, "hamlib");
+			break;
+		case RIG_OMNIRIG:
+			strcpy(handler_name, "OmniRig");
+			break;
+		case RIG_FLRIG:
+			strcpy(handler_name, "FlRig");
+			break;
+		}
+		if (handler != RIG_NONE) {
+			sprintf(temp, "RIG: Connecting %s (%s)", rig_name, handler_name);
+			status_->misc_status(ST_NOTE, temp);
+		}
+		// Create the appropriate interface handler
+		switch (handler) {
+		case RIG_HAMLIB:
+			rig_if_ = new rig_hamlib;
+			break;
+		case RIG_OMNIRIG:
+			rig_if_ = new rig_omnirig;
+			break;
+		case RIG_FLRIG:
+			// If the HTTP URL handler hasn't yet been created do so.
+			if (url_handler_ == nullptr) url_handler_ = new url_handler;
+			rig_if_ = new rig_flrig;
+			break;
+		case RIG_NONE:
+			status_->misc_status(ST_NOTE, "RIG: Not connecting one");
+			rig_if_ = nullptr;
+		}
+		if (rig_if_ == nullptr) {
+			// No handler defined - assume manual logging
+			status_->misc_status(ST_WARNING, "RIG: No handler - assume real-time logging, no rig");
+		}
+		else {
+			// Trya and open the connection to the rig
+			bool done = false;
+			while (!done) {
+				if (rig_if_->open()) {
+					if (!rig_if_->is_good()) {
+						// No rig handler or rig didn't open - assume manual logging
 						delete rig_if_;
 						rig_if_ = nullptr;
-						menu_->logging(LM_RADIO_DISC);
-						status_->misc_status(ST_ERROR, message);
+						status_->misc_status(ST_ERROR, "RIG: No handler - assume real-time logging, no rig");
 						done = true;
 					}
 					else {
-						// Access rig - timer will have been started by rig_if_->open()
-						status_->misc_status(ST_OK, rig_if_->success_message().c_str());
-						menu_->logging(LM_RADIO_CONN);
-						done = true;
+						// Connect to rig OK - see if we are a digital mode
+						if ((rig_if_->mode() == GM_DIGL || rig_if_->mode() == GM_DIGU) && import_data_->auto_enable()) {
+							// start auto-data mode so we import the log written by the mode app
+							rig_if_->close();
+							status_->misc_status(ST_WARNING, "RIG: Data mode - assume logging by data modem app");
+							if (import_data_->start_auto_update()) {
+								done = true;
+							}
+						}
+						else if (!rig_if_->is_good()) {
+							char message[512];
+							sprintf(message, "RIG: Bad access - %s. Assume real-time logging, no rig", rig_if_->error_message().c_str());
+							// Problem with rig_if when making first access, close it to stop timer and clean up 
+							rig_if_->close();
+							delete rig_if_;
+							rig_if_ = nullptr;
+							status_->misc_status(ST_ERROR, message);
+							done = true;
+						}
+						else {
+							// Access rig - timer will have been started by rig_if_->open()
+							status_->misc_status(ST_OK, rig_if_->success_message().c_str());
+							done = true;
+						}
 					}
 				}
+				else {
+					// Rig hadn't opened - set off-air logging
+					char temp[128] = "RIG: failed to open - no information";
+					if (rig_if_) {
+						snprintf(temp, sizeof(temp), "RIG: failed to open - %s", rig_if_->error_message().c_str());
+					}
+					delete rig_if_;
+					rig_if_ = nullptr;
+					status_->misc_status(ST_ERROR, temp);
+					done = true;
+				}
+			}
+		}
+		if (rig_if_ && !band_view_) {
+			band_view_ = new band_view(rig_if_->tx_frequency() / 1000.0, 400, 100, "Band plan");
+			if (band_view_->valid()) {
+				add_sub_window(band_view_);
 			}
 			else {
-				// Rig hadn't opened - set off-air logging
-				char temp[128] = "RIG: failed to open - no information";
-				if (rig_if_) {
-					snprintf(temp, sizeof(temp), "RIG: failed to open - %s", rig_if_->error_message().c_str());
-				}
-				delete rig_if_;
-				rig_if_ = nullptr;
-				menu_->logging(LM_RADIO_DISC);
-				status_->misc_status(ST_ERROR, temp);
-				status_->rig_status(ST_WARNING, "Manual logging");
-				done = true;
+				Fl::delete_widget(band_view_);
+				band_view_ = nullptr;
 			}
 		}
-	}
-	if (rig_if_ && !band_view_) {
-		band_view_ = new band_view(rig_if_->tx_frequency() / 1000.0,400, 100, "Band plan");
-		if (band_view_->valid()) {
-			add_sub_window(band_view_);
+		menu_->update_items();
+		if (rig_if_ == nullptr) {
+			status_->rig_status(ST_WARNING, "No rig present");
 		}
-		else {
-			Fl::delete_widget(band_view_);
-			band_view_ = nullptr;
-		}
+		fl_cursor(FL_CURSOR_DEFAULT);
 	}
-	fl_cursor(FL_CURSOR_DEFAULT);
 }
 
 // Add the various HTML handlers

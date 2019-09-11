@@ -231,21 +231,22 @@ void status::cb_bn_rig(Fl_Widget* bn, void* v) {
 
 // Intialise progress bar - 
 // maximum value, purpose (used to set colour) and items counted
-void status::progress(int max_value, object_t object, const char* suffix) {
+void status::progress(int max_value, object_t object, const char* suffix, bool countdown /*= false*/) {
 	// Initialise it
 	max_progress_ = max_value;
 	progress_suffix_ = suffix;
 	Fl_Color bar_colour = OBJECT_COLOURS.at(object);
 	// Set colours
 	progress_->color(OBJECT_COLOURS.at(OT_NONE), bar_colour);
-	// display text in a colour that contrasts the bar colour
-	progress_->labelcolor(fl_contrast(FL_BLACK, bar_colour));
+	progress_->labelcolor(FL_BLACK);
 	char label[100];
-	sprintf(label, "0/%d %s", max_progress_, progress_suffix_.c_str());
+	int value = countdown ? max_value : 0;
+	sprintf(label, "%d/%d %s", value, max_value, suffix);
 	progress_->copy_label(label);
 	// Set range (0:max_value)
 	progress_->minimum(0.0);
 	progress_->maximum((float)max_value);
+	countdown_mode_ = countdown;
 	// redraw and allow scheduler to effect the redrawing
 	progress_->redraw();
 	Fl::wait();
@@ -254,12 +255,25 @@ void status::progress(int max_value, object_t object, const char* suffix) {
 // Update progress bar
 void status::progress(int value) {
 	// Update progress 
-	progress_->value((float)value);
+	if (countdown_mode_) {
+		progress_->value((float)(max_progress_ - value));
+	}
+	else {
+		progress_->value((float)value);
+	}
 	// Add label "N/M things"
 	char label[100];
 	sprintf(label, "%d/%d %s", value, max_progress_, progress_suffix_.c_str());
 	progress_->copy_label(label);
 	// redraw and allow scheduler to effect the redrawing
+	progress_->redraw();
+	Fl::wait();
+}
+
+// Update progress bar witha message - e.g. cancelled and mark 100%
+void status::progress(const char* message) {
+	progress_->value((float)max_progress_);
+	progress_->copy_label(message);
 	progress_->redraw();
 	Fl::wait();
 }
@@ -317,8 +331,10 @@ void status::misc_status(status_t status, const char* label) {
 			Fl::wait();
 			// Open status file viewer and update it.
 			cb_bn_misc(misc_status_, nullptr);
+			remove_sub_window(status_file_viewer_->top_window());
 			main_window_->do_callback();
 		}
+		break;
 	case ST_FATAL:
 		// A fatal error - quit the application
 		fl_message("An unrecoverable error has occurred, closing down - check status log");
@@ -328,6 +344,7 @@ void status::misc_status(status_t status, const char* label) {
 		remove_sub_window(status_file_viewer_->top_window());
 
 		main_window_->do_callback();
+		break;
 	}
 }
 

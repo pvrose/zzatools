@@ -62,8 +62,7 @@ record::record(logging_mode_t type) {
 	delete_contents();
 	
 	switch (type) {
-	case LM_RADIO_CONN:
-	case LM_RADIO_DISC: {
+	case LM_ON_AIR: {
 		// Interactive mode - start QSO 
 		// Get current date and time in UTC
 		string timestamp = now(false, "%Y%m%d%H%M%S");
@@ -1089,7 +1088,7 @@ void record::end_record(logging_mode_t mode) {
 		// Always update MY_RIG ets.
 		user_details();
 		// On-air logging add date/time off
-		if (mode == LM_RADIO_CONN || mode == LM_RADIO_DISC) {
+		if (mode == LM_ON_AIR) {
 			if (item("TIME_OFF") == "") {
 				// Add end date/time - current time of interactive entering
 				// Get current date and time in UTC

@@ -32,10 +32,9 @@ namespace zzalog {
 
 	// Logging mode - used when initialising a record
 	enum logging_mode_t {
-		LM_OFF_AIR,     // Off-line logging
-		LM_RADIO_CONN,  // radio connected to log
-		LM_RADIO_DISC,  // Realtime logging, no rigconnection
-		LM_IMPORTED     // Auto-import
+		LM_OFF_AIR,     // Off-line logging (w/o radio)
+		LM_ON_AIR,      // Real -time logging (w/ or w/o radio)
+		LM_IMPORTED,    // Import from modem software (w/ or w/o radio)
 	};
 	
 	// Location source

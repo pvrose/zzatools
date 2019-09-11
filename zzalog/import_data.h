@@ -100,8 +100,6 @@ namespace zzalog {
 		int number_checked_;
 		// Timestamp of the previous automatic update
 		string last_auto_update_;
-		// Timestamp when update starts
-		string this_auto_update_;
 		// Number of filed being imported 
 		int num_update_files_;
 		// Names of the files

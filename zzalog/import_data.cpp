@@ -86,9 +86,7 @@ void import_data::cb_timer_imp(void* v) {
 	else {
 		// Restart the timer
 		Fl::repeat_timeout(1.0, cb_timer_imp, v);
-		char message[64];
-		sprintf(message, "AUTO_IMPORT: waiting %g seconds", that->timer_count_);
-		status_->rig_status(ST_WARNING, message);
+		status_->progress(that->timer_count_);
 	}
 }
 
@@ -129,7 +127,6 @@ bool import_data::start_auto_update() {
 	else {
 		// No files to update - tell calling routine to open rig again and also change flag in menu
 		status_->misc_status(ST_WARNING, "AUTO IMPORT: No files available to import.");
-		status_->rig_status(ST_WARNING, "AUTO IMPORT: No files. Re-opening rig");
 		auto_enable_ = false;
 		menu_->update_items();
 	}
@@ -144,8 +141,6 @@ void import_data::auto_update() {
 
 	// Merge all files into single import
 	delete_contents(true);
-	// Remember the time the update starts
-	this_auto_update_ = now(false, "%Y%m%d%H%M%S");
 	// For each auto-import file
 	for (int i = 0; i < num_update_files_; i++) {
 		// Timer will only restart when update is complete
@@ -164,7 +159,6 @@ void import_data::auto_update() {
 			char message[256];
 			sprintf(message, "AUTO IMPORT: %s (%s)", update_files_[i].c_str(), sources_[i].c_str());
 			status_->misc_status(ST_NOTE, message);
-			status_->rig_status(ST_WARNING, message);
 			load_data(update_files_[i]);
 		}
 		else {
@@ -177,7 +171,6 @@ void import_data::auto_update() {
 		// Tell user and merge records from the auto-import
 		update_mode_ = AUTO_IMPORT;
 		status_->misc_status(ST_NOTE, "AUTO IMPORT: merging data");
-		status_->rig_status(ST_WARNING, "AUTO IMPORT: merging data");
 		status_->progress(size(), book_type_, "records");
 		number_checked_ = 0;
 		number_accepted_ = 0;
@@ -256,9 +249,7 @@ void import_data::repeat_auto_timer() {
 	// Restart the timer
 	Fl::repeat_timeout(1.0, cb_timer_imp, (void*)this);
 	// Tell user
-	char message[64];
-	sprintf(message, "AUTO_IMPORT: waiting %2.0f seconds", timer_count_);
-	status_->rig_status(ST_WARNING, message);
+	status_->progress(timer_count_, OT_IMPORT, "seconds", true);
 	update_mode_ = WAIT_AUTO;
 }
 
@@ -295,8 +286,10 @@ void import_data::update_book() {
 			// Get first QSO in update log
 			record* import_record = at(0);
 			// Skip records prior to last in log if we are automatically merging from e.g. fldigi
-			string qso_timestamp = import_record->item("QSO_DATE") +
-				import_record->item("TIME_ON");
+			string qso_timestamp = import_record->item("QSO_DATE_OFF") +
+				import_record->item("TIME_ON_OFF");
+			// TODO: If we encounter a modem program that does not log TIME_OFF, we may have to use 
+			// TIME_ON, but this introduces a race hazard.
 			// If we have no seconds - force it to the last second of the minute so that it will be checked
 			if (qso_timestamp.length() == 12) {
 				qso_timestamp += "59";
@@ -309,6 +302,10 @@ void import_data::update_book() {
 				status_->progress(number_to_import_ - size());
 			}
 			else {
+				// If this is the last record remember the timestamp as the last time of update
+				if (size() == 1) {
+					last_auto_update_ = qso_timestamp;
+				}
 				// Some fields may require conversion (e.g. eQSL uses RST_SENT from contact's perspective
 				convert_update(import_record);
 				bool found_match = false;
@@ -509,7 +506,6 @@ void import_data::finish_update(bool merged /*= true*/) {
 	}
 	// Restart auto-timer - restarting timer will change update_mode
 	if (update_mode_ == AUTO_IMPORT && !close_pending_) {
-		last_auto_update_ = this_auto_update_;
 		Fl_Preferences update_settings(settings_, "Real Time Update");
 		update_settings.set("Last Update", last_auto_update_.c_str());
 		repeat_auto_timer();
@@ -527,13 +523,6 @@ void import_data::finish_update(bool merged /*= true*/) {
 		update_files_ = nullptr;
 		delete[] empty_files_;
 		empty_files_ = nullptr;
-	}
-	// If we want to go on-air
-	if (menu_->logging() == LM_RADIO_CONN) {
-		add_rig_if();
-	}
-	else {
-		status_->rig_status(ST_WARNING, "Off-air - no imports in progress.");
 	}
 	// If we are merging eQSL, release the card queue
 	if (update_mode_ == EQSL_UPDATE) {
@@ -681,14 +670,14 @@ bool import_data::download_data(import_data::update_mode_t server) {
 	case EQSL_UPDATE: 
 		// Fetch inbox from eQSL.cc into local stream, stop fetching eQSL cards until merge complete
 		update_mode_ = server;
-		status_->rig_status(ST_WARNING, "Off-air - downloading eQSL");
+		status_->misc_status(ST_NOTE, "IMPORT: Downloading eQSL");
 		eqsl_handler_->enable_fetch(eqsl_handler::EQ_PAUSE);
 		result = eqsl_handler_->download_eqsl_log(&adif);
 		break;
 	case LOTW_UPDATE:
 		// Fetch inbox from LotW into local stream
 		update_mode_ = server;
-		status_->rig_status(ST_WARNING, "Off-air - downloading LotW");
+		status_->misc_status(ST_NOTE, "IMPORT: Downloading LotW");
 		result = lotw_handler_->download_lotw_log(&adif);
 		break;
 	}
