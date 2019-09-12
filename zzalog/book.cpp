@@ -460,40 +460,44 @@ void book::selection(record_num_t num_item, hint_t hint /* = HT_SELECTED */, vie
 	else {
 	}
 	bool force_save = false;
-	if (!inhibit_view_update_) {
-		// update turned off during certain activities
-		switch (hint) {
-		case HT_IMPORT_QUERY:
-		case HT_IMPORT_QUERYNEW:
-		case HT_DUPE_QUERY:
-			// Query against first record in import_data or identified record
-			tabbed_view_->update_views(requester, hint, record_number(current_item_), num_other);
-			break;
-		case HT_CHANGED:
-		case HT_MINOR_CHANGE:
+	// update turned off during certain activities
+	switch (hint) {
+	case HT_IMPORT_QUERY:
+	case HT_IMPORT_QUERYNEW:
+	case HT_DUPE_QUERY:
+		// Query against first record in import_data or identified record
+		tabbed_view_->update_views(requester, hint, record_number(current_item_), num_other);
+		break;
+	case HT_CHANGED:
+	case HT_MINOR_CHANGE:
+		if (!inhibit_view_update_) {
 			// Set modified flag
 			modified(true);
 			// Update to this record
 			tabbed_view_->update_views(requester, hint, record_number(current_item_));
-			break;
-		case HT_INSERTED:
-		case HT_DELETED:
+		}
+		break;
+	case HT_INSERTED:
+	case HT_DELETED:
+		if (!inhibit_view_update_) {
 			// Set force save as the record number will not change but a record has been inserted or deleted
 			force_save = true;
 			// Set modified flag
 			modified(true);
 			// Update to this record
 			tabbed_view_->update_views(requester, hint, record_number(current_item_));
-			break;
-		default:
+		}
+		break;
+	default:
+		if (!inhibit_view_update_) {
 			tabbed_view_->update_views(requester, hint, record_number(current_item_));
-			break;
 		}
-		if (force_save || (num_item != previous && !read_only_ && save_enabled_)) {
+		break;
+	}
+	if (force_save || (num_item != previous && !read_only_ && save_enabled_)) {
 #ifndef _DEBUG
-			store_data();
+		store_data();
 #endif // _DEBUG
-		}
 	}
 	// Update menu item activeness
 	menu_->update_items();
@@ -1076,11 +1080,13 @@ bool book::save_enabled() {
 
 // Check duplicates - restart set after a query to confirm it's a duplicate
 void book::check_dupes(bool restart) {
-	if (restart) {
+	if (!restart) {
 		duplicate_item_ = 0;
 		status_->progress(size(), book_type(), "duplicates checked");
 		status_->misc_status(ST_NOTE, "DUPE_CHECK: Checking started");
 		inhibit_view_update_ = true;
+		number_dupes_kept_ = 0;
+		number_dupes_removed_ = 0;
 	}
 	bool possible = FALSE;
 	for (; duplicate_item_ < size() - 1 && !possible;) {
@@ -1113,7 +1119,9 @@ void book::check_dupes(bool restart) {
 		}
 	}
 	if (!possible) {
-		status_->misc_status(ST_OK, "DUPE CHECK: Complete");
+		char message[256];
+		snprintf(message, 256, "DUPE CHECK: Complete. %d kept, %d removed", number_dupes_kept_, number_dupes_removed_);
+		status_->misc_status(ST_OK, message);
 		inhibit_view_update_ = false;
 		selection(size() - 1, HT_ALL);
 	}
@@ -1135,6 +1143,7 @@ void book::reject_dupe(bool use_dupe) {
 	snprintf(message, 128, "DUPE CHECK: Checked record %s deleted", get_record()->item("CALL").c_str());
 	status_->misc_status(ST_WARNING, message);
 	delete_record(true);
+	number_dupes_removed_++;
 }
 
 // Handle duplicate action - MERGE_DUPE - merge and delete it
@@ -1147,6 +1156,7 @@ void book::merge_dupe() {
 	snprintf(message, 128, "DUPE CHECK: Checked record %s merged && deleted", get_record(duplicate_item_ + 1, false)->item("CALL").c_str());
 	status_->misc_status(ST_WARNING, message);
 	delete_record(true);
+	number_dupes_removed_++;
 }
 
 // Handle duplicate action - KEEP_BOTH - ignore and restart check
@@ -1154,6 +1164,8 @@ void book::accept_dupe() {
 	char message[128];
 	snprintf(message, 128, "DUPE CHECK: Checked record %s not duplicate", get_record(duplicate_item_ + 1, false)->item("CALL").c_str());
 	status_->misc_status(ST_WARNING, message);
+	number_dupes_kept_++;
+	duplicate_item_++;
 }
 
 // Returns the reason record view has been activated - used by record view to prompt the user

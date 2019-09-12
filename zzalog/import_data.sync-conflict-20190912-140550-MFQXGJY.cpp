@@ -51,8 +51,6 @@ import_data::import_data() :
 	number_updated_ = 0;
 	number_accepted_ = 0;
 	number_checked_ = 0;
-	number_added_ = 0;
-	number_rejected_ = 0;
 	last_auto_update_ = "";
 	num_update_files_ = 0;
 	update_files_ = nullptr;
@@ -177,8 +175,6 @@ void import_data::auto_update() {
 		number_checked_ = 0;
 		number_accepted_ = 0;
 		number_updated_ = 0;
-		number_added_ = 0;
-		number_rejected_ = 0;
 		number_to_import_ = size();
 		update_book();
 	}
@@ -196,9 +192,6 @@ void import_data::discard_update(bool notify /*= true*/) {
 	auto it = begin();
 	delete *it;
 	erase(it);
-	if (notify) {
-		number_rejected_++;
-	}
 }
 
 // Accept the record from the update - it will have been copied to main log book
@@ -225,8 +218,7 @@ void import_data::merge_update() {
 	// Tell views to update with new record
 	book_->selection(-1, hint);
 	// Delete the record from this book
-	discard_update(false);
-	number_accepted_++;
+	discard_update();
 }
 
 // Add the update record to the log - called by record_form
@@ -364,7 +356,7 @@ void import_data::update_book() {
 							eqsl_handler_->enqueue_request(test_record);
 						}
 						// Accepted - discard this record
-						discard_update(false);
+						discard_update();
 						break;
 						// No match found - do nothing
 					case MT_NOMATCH:
@@ -399,7 +391,7 @@ void import_data::update_book() {
 						if (update_mode_ == EQSL_UPDATE) {
 							eqsl_handler_->enqueue_request(test_record);
 						}
-						discard_update(false);
+						discard_update();
 						break;
 						// Call, band and mode match (and time within 30 minutes) - update after query
 					case MT_POSSIBLE:
@@ -441,7 +433,6 @@ void import_data::update_book() {
 
 					book_->insert_record_at(offset, import_record);
 					number_updated_++;
-					number_added_++;
 					accept_update();
 					is_updated = true;
 					if (qso_timestamp < last_auto_update_) {
@@ -509,9 +500,10 @@ void import_data::finish_update(bool merged /*= true*/) {
 	// No import data so select last record and activate main log view
 	if (merged && size() == 0) {
 		char message[256];
-		sprintf(message, "IMPORT: %d records read, %d checked, %d updated, %d accepted, %d added, %d rejected",
-			number_to_import_, number_checked_, number_updated_, number_accepted_, number_added_, number_rejected_);
+		sprintf(message, "IMPORT: %d records read, %d checked, %d updated, %d accepted",
+			number_to_import_, number_checked_, number_updated_, number_accepted_);
 		status_->misc_status(ST_OK, message);
+		status_->progress(number_to_import_);
 		if (number_updated_) {
 			book_->selection(book_->size() - 1, HT_ALL);
 		}
@@ -729,8 +721,6 @@ void import_data::merge_data() {
 	number_accepted_ = 0;
 	number_updated_ = 0;
 	number_checked_ = 0;
-	number_added_ = 0;
-	number_rejected_ = 0;
 	// Merge this book into main log book
 	update_book();
 	// If we have no user query - switch to main log view

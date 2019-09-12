@@ -881,7 +881,7 @@ void menu::cb_mi_log_bulk(Fl_Widget* w, void* v) {
 // Log->Check Duplicates - call books check duplicates
 // v is not used
 void menu::cb_mi_log_dupes(Fl_Widget* w, void* v) {
-	navigation_book_->check_dupes(true);
+	navigation_book_->check_dupes(false);
 }
 
 // Log->Edit Header - open editor on header comment

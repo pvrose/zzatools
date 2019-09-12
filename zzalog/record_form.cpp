@@ -811,7 +811,7 @@ void record_form::cb_bn_edit(Fl_Widget* w, long v) {
 		break;
 	case REJECT:
 		// Discard the queried record
-		import_data_->discard_update();
+		import_data_->discard_update(true);
 		break;
 	case ADD:
 		// Add the queried record to the log
@@ -855,7 +855,7 @@ void record_form::cb_bn_edit(Fl_Widget* w, long v) {
 	case MERGE_DUPE:
 	case KEEP_BOTH:
 		// Restart the duplicate check process
-		navigation_book_->check_dupes(false);
+		navigation_book_->check_dupes(true);
 		break;
 	case MERGE_DONE:
 		// Merge additional data complete

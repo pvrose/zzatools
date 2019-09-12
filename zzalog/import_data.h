@@ -49,7 +49,7 @@ namespace zzalog {
 		// Start an automatic (on timer) update from the defined locations
 		void auto_update();
 		// Delete the mismatch record in the update 
-		void discard_update(bool notify = true);
+		void discard_update(bool notify);
 		// Accept the record from the update
 		void accept_update();
 		// Combine the record from the log and the update
@@ -98,6 +98,10 @@ namespace zzalog {
 		int number_accepted_;
 		// The number of records checked
 		int number_checked_;
+		// The number of ew records added
+		int number_added_;
+		// The number of rejected
+		int number_rejected_;
 		// Timestamp of the previous automatic update
 		string last_auto_update_;
 		// Number of filed being imported 

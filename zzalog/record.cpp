@@ -815,6 +815,14 @@ bool record::merge_records(record* record, bool allow_loc_mismatch /* = false */
 			// QSL received - need to replace N with Y
 			is_qsl_rcvd = true;
 		}
+		else if (field_name == "TIME_OFF" ||
+			field_name == "QSO_DATE_OFF") {
+			// Update from the other record - erstwhile bug overwrote previous import
+			if (!items_match(record, field_name)) {
+				item(field_name, merge_data);
+				merged = true;
+			}
+		}
 		else {
 			// All other fields
 			is_location = false;
@@ -874,9 +882,7 @@ match_result_t record::match_records(record* record) {
 		string value = it->second;
 		// Time/date match
 		if (field_name == "QSO_DATE" ||
-			field_name == "QSO_DATE_OFF" ||
-			field_name == "TIME_ON" ||
-			field_name == "TIME_OFF") {
+			field_name == "TIME_ON" ) {
 			dates_match &= items_match(record, field_name);
 		}
 		else if (

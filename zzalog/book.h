@@ -223,6 +223,10 @@ namespace zzalog {
 		bool delete_in_progress_;
 		// Unmodified record
 		record* old_record_;
+		// Number duplicates removed
+		int number_dupes_removed_;
+		// Number of duplicates accepted
+		int number_dupes_kept_;
 	};
 
 }

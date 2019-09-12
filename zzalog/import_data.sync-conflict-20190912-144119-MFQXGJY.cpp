@@ -226,7 +226,6 @@ void import_data::merge_update() {
 	book_->selection(-1, hint);
 	// Delete the record from this book
 	discard_update(false);
-	number_accepted_++;
 }
 
 // Add the update record to the log - called by record_form
