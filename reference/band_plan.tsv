@@ -132,3 +132,29 @@ Lower	Upper	Bandwidth	Modes	Notes
 29600	29600	6	CW,Dig,Phone	All modes - FM calling channel
 29610	29610	6	CW,Dig,Phone	All modes - FM simplex repeater (parrot) - input and output
 29620	29700	6	CW,Dig,Phone	All modes - FM repeater outputs (RH1-RH8)
+50000	50100	0.5	CW	Telegraphy only - beacon project (50000-50030)
+50100	50200	2.7	CW,Phone	SSB/Telegraphy - international
+50200	50300	2.7	CW,Phone	SSB/Telegraphy - general
+50300	50400	2.7	CW,Dig,Phone	SSB/MGM/Telegraphy
+50400	50500	0	Beacons	Propagation Beacons only
+50500	52000	12.5	CW,Dig,Phone	All modes
+70000	70090	1	Beacons	Propagation Beacons Only
+70090	70100	1	Beacons	Personal Beacons
+70100	70250	2.7	CW,Dig,Phone	SSB/MGM/Telegraphy
+70250	70294	12	CW,Dig,Phone	All modes
+70249	70500	12	Dig,Phone	All modes - channelised operation @ 12.5 kHz
+144000	144025	2.7	CW,Dig,Phone	All modes - incl. Satellite downlinks
+144025	144100	0.5	CW	Telegraphy - incl. EME
+144100	144150	0.5	CW,Dig	Narrow band modes
+144150	144400	2.7	CW,Dig,Phone	Limited band modse
+144400	144490	0	Beacons	Propagation Beacons
+144490	144500	0	Beacons	Personal Beacons
+144500	144794	20	CW,Dig,Phones	All modes
+144794	144990	12	Dig	MGM Digital
+144990	145193.5	12	Phone	FM/DV Repeater inputs @ 12.5 kHz channels
+145193.5	145593.5	12	Phone	FM/DV Simplex @ 12.5 kHz channels
+145593.5	145793.5	12	Phone	FM/DV Repeater outputs @ 12.5 kHz channels
+145793.5	145806	12	Phone	FM/DV Space downlink @145800
+145806	146000	12	CW,Dig,Phone	All modes - satellite exclusive
+146000	146900	500	Dig	Wideband digital modes (high-speed data or DATV)
+146900	147000	12	Dig	Narrow band digital (incl. DV)

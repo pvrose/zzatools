@@ -334,12 +334,6 @@ void add_rig_if() {
 	if (!closing_) {
 		fl_cursor(FL_CURSOR_WAIT);
 		delete rig_if_;
-		if (band_view_) {
-			remove_sub_window(band_view_);
-			delete band_view_;
-			band_view_ = nullptr;
-		}
-
 		// Get the handler from the settings
 		rig_handler_t handler;
 		Fl_Preferences rig_settings(settings_, "Rig");
@@ -438,21 +432,30 @@ void add_rig_if() {
 				}
 			}
 		}
-		if (rig_if_ && !band_view_) {
-			band_view_ = new band_view(rig_if_->tx_frequency() / 1000.0, 400, 100, "Band plan");
-			if (band_view_->valid()) {
-				add_sub_window(band_view_);
-			}
-			else {
-				Fl::delete_widget(band_view_);
-				band_view_ = nullptr;
-			}
-		}
 		menu_->update_items();
 		if (rig_if_ == nullptr) {
 			status_->rig_status(ST_WARNING, "No rig present");
 		}
 		fl_cursor(FL_CURSOR_DEFAULT);
+	}
+}
+
+void add_band_view() {
+	if (rig_if_) {
+		// Use actual rig frequency
+		band_view_ = new band_view(rig_if_->tx_frequency() / 1000.0, 400, 100, "Band plan");
+	}
+	else {
+		// Use frequency of selected record
+		double frequency = stod(book_->get_record()->item("FREQ")) * 1000.0;
+		band_view_ = new band_view(frequency, 400, 100, "Band plan");
+	}
+	if (band_view_->valid()) {
+		add_sub_window(band_view_);
+	}
+	else {
+		Fl::delete_widget(band_view_);
+		band_view_ = nullptr;
 	}
 }
 
@@ -673,6 +676,8 @@ int main(int argc, char** argv)
 	// Connect to the rig
 	rig_if_ = nullptr;
 	add_rig_if();
+	// Add band-plan 
+	add_band_view();
 	// Add qsl_handlers - note add_rig_if() may have added URL handler
 	add_qsl_handlers();
 	// Add scratchpad

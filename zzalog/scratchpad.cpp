@@ -358,6 +358,7 @@ void scratchpad::cb_ip_freq(Fl_Widget* w, void* v) {
 			((Fl_Input*)w)->textcolor(FL_BLACK);
 		}
 		// Update views
+		band_view_->update(freq);
 		tabbed_view_->update_views(nullptr, HT_MINOR_CHANGE, book_->size() - 1);
 	}
 }

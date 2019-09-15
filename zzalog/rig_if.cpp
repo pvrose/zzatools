@@ -221,11 +221,6 @@ void rig_if::cb_timer_rig(void* v) {
 			sprintf(message, "RIG: Interface broken - %s", rig_if_->error_message().c_str());
 			status_->misc_status(ST_ERROR, message);
 			rig_settings.get("Slow Polling Interval", timer_value, SLOW_RIG_DEF);
-			if (band_view_) {
-				remove_sub_window(band_view_);
-				delete band_view_;
-				band_view_ = nullptr;
-			}
 		}
 	}
 	// repeat the timer

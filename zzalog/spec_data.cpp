@@ -1649,7 +1649,7 @@ bool spec_data::auto_correction(error_t error_code, const string&  data, const s
 	{
 		size_t pos = data.find_last_not_of(' ');
 		if (pos != string::npos && pos != data.length()) {
-			string no_trail = data.substr(0, pos);
+			string no_trail = data.substr(0, pos + 1);
 			if (!check_datatype(no_trail, field, datatype, dataset(datatype) != nullptr)) {
 				record_->item(field, no_trail);
 				correction_message_ = field + '=' + display_item + " auto-corrected by removal of trailing spaces.";

@@ -999,8 +999,7 @@ bool record::items_match(record* record, string field_name) {
 		// Fields are equal or either is blank
 		return true;
 	}
-	else if (field_name == "GRIDSQUARE" || field_name == "MY_GRIDSQUARE" ||
-		field_name == "TIME_ON" || field_name == "TIME_OFF") {
+	else if (field_name == "GRIDSQUARE" || field_name == "MY_GRIDSQUARE") {
 		// Special case for GRIDSQUARE, TIME_ON or TIME_OFF - 
 		// they compare if they are equal for the length
 		// of the shorter.
@@ -1012,9 +1011,20 @@ bool record::items_match(record* record, string field_name) {
 			return false;
 		}
 	}
-	else if (field_name == "MODE") {
+	else if (field_name == "TIME_ON" || field_name == "TIME_OFF") {
+		// TIME_ON or TIME_OFF - 
+		// they compare if they are equal to the minute
+		// of the shorter.
+		if (lhs.substr(0, 4) == rhs.substr(0, 4)) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	else if (field_name == "MODE" || field_name == "SUBMODE") {
 		// Special case for MODE - check against SUBMODE as well
-		if (rhs == item("SUBMODE") || lhs == record->item("SUBMODE")) {
+		if (lhs == to_upper(record->item("SUBMODE")) || lhs == to_upper(record->item("MODE"))) {
 			return true;
 		}
 		else {
