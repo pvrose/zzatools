@@ -391,16 +391,19 @@ void add_rig_if() {
 						rig_if_ = nullptr;
 						status_->misc_status(ST_ERROR, "RIG: No handler - assume real-time logging, no rig");
 						done = true;
+						// Change logging mode from IMPORTED to ON_AIR. otherwise leave as was
+						if (menu_->logging() == LM_IMPORTED) menu_->logging(LM_ON_AIR);
 					}
 					else {
 						// Connect to rig OK - see if we are a digital mode
 						if ((rig_if_->mode() == GM_DIGL || rig_if_->mode() == GM_DIGU) && import_data_->auto_enable()) {
 							// start auto-data mode so we import the log written by the mode app
-							rig_if_->close();
 							status_->misc_status(ST_WARNING, "RIG: Data mode - assume logging by data modem app");
 							if (import_data_->start_auto_update()) {
 								done = true;
 							}
+							// Change logging mode to IMPORTED as will be using a data-modem
+							menu_->logging(LM_IMPORTED);
 						}
 						else if (!rig_if_->is_good()) {
 							char message[512];
@@ -411,11 +414,15 @@ void add_rig_if() {
 							rig_if_ = nullptr;
 							status_->misc_status(ST_ERROR, message);
 							done = true;
+							// Change logging mode from IMPORTED to ON_AIR. otherwise leave as was
+							if (menu_->logging() == LM_IMPORTED) menu_->logging(LM_ON_AIR);
 						}
 						else {
 							// Access rig - timer will have been started by rig_if_->open()
 							status_->misc_status(ST_OK, rig_if_->success_message().c_str());
 							done = true;
+							// Change logging mode to ON_AIR
+							menu_->logging(LM_ON_AIR);
 						}
 					}
 				}

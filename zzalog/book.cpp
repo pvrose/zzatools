@@ -288,6 +288,10 @@ bool book::store_data(string filename, bool force, set<string>* fields) {
 				// Only write out if modified or force is set (for 
 				// The book has a header so update header specific items
 				if (header_) {
+					// Add a single space comment if there is not an existing comment.
+					if (header_->header().length() == 0) {
+						header_->header(" ");
+					}
 					header_->item("APP_ZZA_NUMREC", to_string(size()));
 					header_->item("PROGRAMID", PROGRAM_ID);
 					header_->item("PROGRAMVERSION", PROGRAM_VERSION);

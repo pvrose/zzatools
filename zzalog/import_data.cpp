@@ -125,13 +125,14 @@ bool import_data::start_auto_update() {
 		// Set immediate timer to actuate the auto-import
 		timer_count_ = 0.0;
 		Fl::add_timeout(0.0, import_data::cb_timer_imp, (void*)this);
+		menu_->logging(LM_IMPORTED);
 	}
 	else {
 		// No files to update - tell calling routine to open rig again and also change flag in menu
 		status_->misc_status(ST_WARNING, "AUTO IMPORT: No files available to import.");
 		auto_enable_ = false;
-		menu_->update_items();
 	}
+	menu_->update_items();
 	return auto_enable_;
 }
 
@@ -782,6 +783,9 @@ void import_data::process_lotw_header() {
 
 void import_data::auto_enable(bool enabled) {
 	auto_enable_ = enabled;
+	if (auto_enable_ && update_mode_ == NONE) {
+		start_auto_update();
+	}
 }
 
 bool import_data::auto_enable() {
