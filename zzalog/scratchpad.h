@@ -31,6 +31,8 @@ namespace zzalog {
 
 		// Called when rig is read
 		void rig_update(string frequency, string mode, string power);
+		// Called when rig is deleted
+		void update();
 
 	protected:
 		class editor : public Fl_Text_Editor

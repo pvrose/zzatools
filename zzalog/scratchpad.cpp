@@ -155,7 +155,7 @@ void scratchpad::create_form() {
 	ch_mode_->callback(cb_ch_mode);
 
 	curr_y += HTEXT;
-	ip_power_ = new Fl_Input(C2A, curr_y, W2A, HTEXT);
+	ip_power_ = new Fl_Input(C2A, curr_y, W2A, HTEXT, "Power");
 	ip_power_->textfont(FONT);
 	ip_power_->textsize(FONT_SIZE);
 	ip_power_->labelfont(FONT);
@@ -454,3 +454,11 @@ int scratchpad::editor::handle(int event) {
 	return Fl_Text_Editor::handle(event);
 }
 
+void scratchpad::update() {
+	record* prev_record = book_->get_record();
+	ip_freq_->value(prev_record->item("FREQ").c_str());
+	ip_power_->value(prev_record->item("TX_PWR").c_str());
+	ch_mode_->value(ch_mode_->find_index(prev_record->item("MODE", true).c_str()));
+	band_view_->update(stod(prev_record->item("FREQ")));
+	redraw();
+}

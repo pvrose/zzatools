@@ -3,7 +3,7 @@
 #include "spec_data.h"
 #include "tabbed_forms.h"
 #include "status.h"
-
+#include "scratchpad.h"
 #include "eqsl_handler.h"
 #include "lotw_handler.h"
 #include "rig_if.h"
@@ -33,6 +33,7 @@ extern eqsl_handler* eqsl_handler_;
 extern lotw_handler* lotw_handler_;
 extern rig_if* rig_if_;
 extern menu* menu_;
+extern scratchpad* scratchpad_;
 extern void add_rig_if();
 
 // Constructor
@@ -544,6 +545,10 @@ void import_data::finish_update(bool merged /*= true*/) {
 	// If we are merging eQSL, release the card queue
 	if (update_mode_ == EQSL_UPDATE) {
 		eqsl_handler_->enable_fetch(eqsl_handler::EQ_START);
+	}
+	// If we are not connected to a rig
+	if (!rig_if_) {
+		scratchpad_->update();
 	}
 	// Allow the book to save (and save if modified)
 	book_->enable_save(true);
