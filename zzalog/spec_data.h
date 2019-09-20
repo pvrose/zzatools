@@ -154,8 +154,6 @@ namespace zzalog {
 		string enumeration_name(string& field, record* record);
 		// The DXCC has ADIF defined primary administrative districts
 		bool has_states(string dxcc_name);
-		// Set it
-		void set_has_states(string dxcc_name);
 		// Validate a record - returns TRUE if record corrected
 		bool validate(record* record, record_num_t number);
 		// Validate the data in the field
@@ -220,8 +218,6 @@ namespace zzalog {
 		vector<string> userdef_names_;
 		// List of app defs (not in reference)
 		set<string> appdef_names_;
-		// List of DXCCs that have states
-		set<string> dxccs_with_states_;
 		// Quick lookup of datatype indicator
 		map<string, char> datatype_indicators_;
 		// Missing file already reported

@@ -111,7 +111,7 @@ namespace zzalog {
 		// End record by adding certain fields
 		void end_record(logging_mode_t mode);
 		// Write to an item merging data from other items
-		string item_merge(string data);
+		string item_merge(string data, bool indirect = false);
 		// get the timestamp
 		time_t timestamp(bool time_off = false);
 		// items match between records

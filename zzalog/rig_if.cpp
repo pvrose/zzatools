@@ -70,7 +70,9 @@ void rig_if::close() {
 	// Timeout must be removed before rig connection is closed otherwise it could fire while the connection is closing
 	Fl::remove_timeout(cb_timer_rig);
 	status_->rig_status(ST_WARNING, "RIG: Connection closed");
-	scratchpad_->update();
+	if (scratchpad_) {
+		scratchpad_->update();
+	}
 }
 
 // Convert s-meter reading into display format

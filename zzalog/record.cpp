@@ -317,8 +317,8 @@ void record::item(string field, string value, bool formatted/* = false*/) {
 string record::item(string field, bool formatted/* = false*/, bool indirect/* = false*/) {
 	string result;
 	if (indirect) {
-		// Get the item value baed on APP_ZZA_QTH
-		result = item(field);
+		// Get the item value based on APP_ZZA_QTH
+		result = item(field, formatted);
 		if (result == "") {
 			// Not set in the item
 			char * temp;
@@ -1119,13 +1119,13 @@ void record::end_record(logging_mode_t mode) {
 
 // merge data from a number of items - equivalent to a mail-merge 
 // replace <FIELD> with the value of that field.
-string record::item_merge(string data) {
+string record::item_merge(string data, bool indirect /*=false*/) {
 	string result = data;
 	size_t left = result.find('<');
 	size_t right = result.find('>');
 	while (left != result.npos && right != result.npos) {
 		string field_name = result.substr(left + 1, right - left - 1);
-		result.replace(left, right - left + 1, item(field_name, false, true));
+		result.replace(left, right - left + 1, item(field_name, indirect, true));
 		left = result.find('<');
 		right = result.find('>');
 	}

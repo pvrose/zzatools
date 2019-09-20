@@ -71,7 +71,6 @@ spec_data::~spec_data()
 	field_names_.clear();
 	userdef_names_.clear();
 	appdef_names_.clear();
-	dxccs_with_states_.clear();
 	datatype_indicators_.clear();
 
 	// close any report file 
@@ -119,7 +118,6 @@ bool spec_data::load_data(bool force) {
 	field_names_.clear();
 	userdef_names_.clear();
 	appdef_names_.clear();
-	dxccs_with_states_.clear();
 	datatype_indicators_.clear();
 	this->clear();
 
@@ -686,12 +684,12 @@ string spec_data::enumeration_name(string& field_name, record* record) {
 // The DXCC has ADIF defined primary administrative districts
 bool spec_data::has_states(string dxcc_name) {
 	// Look up DXCC name in list of DXCCs with "states".
-	return (dxccs_with_states_.find(dxcc_name) != dxccs_with_states_.end());
-}
-
-// Add the DXCC to the list of DXCCs with "states"
-void spec_data::set_has_states(string dxcc_name) {
-	dxccs_with_states_.insert(dxcc_name);
+	if (dataset("Primary_Administrative_Subdivision[" + dxcc_name + "]")) {
+		return true;
+	}
+	else {
+		return false;
+	}
 }
 
 // Check that the data is a valid number between minimum and maximum values
@@ -1097,7 +1095,7 @@ error_t spec_data::check_datatype(const string&  data, const string&  field, con
 				return VE_FIELD_UNSUPPORTED;
 			}
 			// Postpend DXCC code to enumertion name
-			enumeration_name = datatype + "_" + record_->item(dxcc_code_field);
+			enumeration_name = datatype + "[" + record_->item(dxcc_code_field) + "]";
 		}
 		else {
 			enumeration_name = datatype;
@@ -2107,7 +2105,7 @@ string spec_data::get_tip(const string& field, record* record) {
 			if (text == "Primary_Administrative_Subdivision" ||
 				text == "Secondary_Adminsitrative_Subdivision") {
 				char enumeration[128];
-				sprintf(enumeration, "%s_%s", text.c_str(), record->item("DXCC").c_str());
+				sprintf(enumeration, "%s[%s]", text.c_str(), record->item("DXCC").c_str());
 				fields = dataset(enumeration);
 			}
 			else {

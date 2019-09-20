@@ -52,7 +52,7 @@ namespace zzalog {
 	{ "Save &As", 0, menu::cb_mi_file_saveas, (void*)OT_MAIN },
 	{ "&Close", 0, menu::cb_mi_file_close, 0 },
 	{ "Au&to Save", 0, menu::cb_mi_file_auto, 0, FL_MENU_TOGGLE | FL_MENU_DIVIDER },
-	{ "&Print", 0, menu::cb_mi_file_print, 0, FL_MENU_DIVIDER },
+	{ "&Print", 0, menu::cb_mi_file_print, (void*)OT_MAIN, FL_MENU_DIVIDER },
 	{ "&Recent", 0, 0, 0, FL_SUBMENU | FL_MENU_DIVIDER },
 	// Extra menu items are dynamically inserted here 
 	{ 0 },
@@ -1093,6 +1093,7 @@ void menu::cb_mi_ext_qsl(Fl_Widget* w, void* v) {
 	// v passes the particular option
 	that->qsl_type_ = (extract_data::extract_mode_t)(long)v;
 	extract_records_->extract_qsl(that->qsl_type_);
+	navigation_book_ = extract_records_;
 }
 
 // Extract->Upload - upload to the server the data was extracted for
@@ -1105,7 +1106,6 @@ void menu::cb_mi_ext_upload(Fl_Widget* w, void* v) {
 // v is not used
 void menu::cb_mi_ext_print(Fl_Widget* w, void* v) {
 	menu* that = (menu*)w;
-	navigation_book_ = extract_records_;
 	printer* ptr;
 	switch (that->qsl_type_) {
 	case extract_data::EQSL:

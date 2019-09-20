@@ -199,7 +199,7 @@ void qsl_form::draw_table(int& curr_y) {
 		for (auto col = it->begin(); col != it->end(); col++) {
 			Fl_Button* item = new Fl_Button(curr_x, curr_y, curr_w, curr_h);
 			item->box(FL_BORDER_FRAME);
-			item->copy_label(record_ ? record_->item_merge(col->text).c_str() : col->text.c_str());
+			item->copy_label(record_ ? record_->item_merge(col->text, true).c_str() : col->text.c_str());
 			item->labelcolor(col->colour);
 			item->labelfont(col->font);
 			item->labelsize(col->font_size);

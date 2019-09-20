@@ -159,7 +159,7 @@ void report_tree::add_record(record_num_t record_num, report_map_entry_t* entry)
 			if (state_code == "") {
 				// PAS not specified
 				if (spec_data_->has_states(dxcc_code)) {
-					map_key = " *** State unspecified ***";
+					map_key = "?? *** State unspecified ***";
 				}
 				else {
 					skip_state = true;
@@ -168,7 +168,7 @@ void report_tree::add_record(record_num_t record_num, report_map_entry_t* entry)
 			}
 			else {
 				// Get the PAS dataset
-				string pas_name = "Primary_Administrative_Subdivision_" + dxcc_code;
+				string pas_name = "Primary_Administrative_Subdivision[" + dxcc_code + "]";
 				spec_dataset* state_dataset = spec_data_->dataset(pas_name);
 				map<string, string>* state_data;
 				if (state_dataset == nullptr) {
