@@ -44,6 +44,8 @@ namespace zzalog {
 		void extract_call(string callsign);
 		// Add a record to the list
 		void add_record(record_num_t record_num);
+		// Sort records by filed_name
+		void sort_records(string field_name);
 
 		// return the real record number
 		virtual record_num_t record_number(record_num_t item);
@@ -58,6 +60,8 @@ namespace zzalog {
 		void extract_records();
 		// Generate description extract criterion for use in the header comment
 		string comment();
+		// Swap two records
+		void swap_records(record_num_t record_num_1, record_num_t record_num_2);
 
 		// The list of extract criteria
 		list<search_criteria_t> extract_criteria_;

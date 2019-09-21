@@ -13,11 +13,12 @@ using namespace zzalog;
 extern Fl_Preferences* settings_;
 
 // Constructor
-qsl_form::qsl_form(int X, int Y, record* record) :
+qsl_form::qsl_form(int X, int Y, record** records, int num_records) :
 	Fl_Group(X, Y, 0, 0) {
 	load_data();
 	// Get record
-	record_ = record;
+	records_ = records;
+	num_records_ = num_records;
 	// Draw the widgets
 	create_form();
 }
@@ -170,7 +171,7 @@ void qsl_form::draw_lines(Fl_Align align, int& curr_y, vector<qsl_form::qsl_widg
 		// Add each line of text as a button with no border. use a button so it responds to being clicked
 		Fl_Button* item = new Fl_Button(curr_x, curr_y, (width / 2) - MARGIN, curr_h);
 		item->box(FL_NO_BOX);
-		item->copy_label(record_ ? record_->item_merge(it->text).c_str() : it->text.c_str());
+		item->copy_label(records_[0] ? records_[0]->item_merge(it->text).c_str() : it->text.c_str());
 		item->labelcolor(it->colour);
 		item->labelfont(it->font);
 		item->labelsize(it->font_size);
@@ -199,7 +200,7 @@ void qsl_form::draw_table(int& curr_y) {
 		for (auto col = it->begin(); col != it->end(); col++) {
 			Fl_Button* item = new Fl_Button(curr_x, curr_y, curr_w, curr_h);
 			item->box(FL_BORDER_FRAME);
-			item->copy_label(record_ ? record_->item_merge(col->text, true).c_str() : col->text.c_str());
+			item->copy_label(records_[0] ? records_[0]->item_merge(col->text, true).c_str() : col->text.c_str());
 			item->labelcolor(col->colour);
 			item->labelfont(col->font);
 			item->labelsize(col->font_size);
@@ -208,6 +209,31 @@ void qsl_form::draw_table(int& curr_y) {
 			curr_x += curr_w;
 		}
 		curr_y += curr_h;
+		// Now the additional records
+		if (it != tab_widgets_.begin()) {
+			for (int i = 1; i < num_records_; i++) {
+				curr_x = x() + MARGIN;
+				// Get the largest height required for each cell
+				int curr_h = 0;
+				for (auto col = it->begin(); col != it->end(); col++) {
+					int next_h = col->font_size + 1;
+					if (next_h > curr_h) curr_h = next_h;
+				}
+				// Create a button for each cell - with a border
+				for (auto col = it->begin(); col != it->end(); col++) {
+					Fl_Button* item = new Fl_Button(curr_x, curr_y, curr_w, curr_h);
+					item->box(FL_BORDER_FRAME);
+					item->copy_label(records_[i] ? records_[i]->item_merge(col->text, true).c_str() : col->text.c_str());
+					item->labelcolor(col->colour);
+					item->labelfont(col->font);
+					item->labelsize(col->font_size);
+					item->align(FL_ALIGN_CENTER);
+					item->callback(cb_button, (void*) & (*col));
+					curr_x += curr_w;
+				}
+				curr_y += curr_h;
+			}
+		}
 	}
 }
 

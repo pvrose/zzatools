@@ -1303,7 +1303,7 @@ void record_form::draw_image() {
 	case QI_GEN_CARD:
 		// Generate the QSL card (as to be printed)
 		if (record_1_ != nullptr) {
-			qsl_form* card = new qsl_form(card_display_->x(), card_display_->y(), record_1_);
+			qsl_form* card = new qsl_form(card_display_->x(), card_display_->y(), &record_1_, 1);
 			card_display_->color(FL_WHITE);
 			card_display_->align(FL_ALIGN_CENTER);
 			card_display_->add(card);

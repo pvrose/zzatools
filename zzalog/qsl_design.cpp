@@ -48,7 +48,7 @@ void qsl_design::load_values() {
 	// Get the settings by creating a qsl_form
 	record* record = book_->get_record();
 	card_window_ = new Fl_Window(10, 10, "QSL Design");
-	current_design_ = new qsl_form(0, 0, record);
+	current_design_ = new qsl_form(0, 0, &record, 1);
 	current_design_->position(0, 0);
 	current_design_->box(FL_FLAT_BOX);
 	current_design_->color(FL_WHITE);

@@ -482,6 +482,10 @@ void log_table::dbl_click_column(int col) {
 		// Redraw the window
 		redraw();
 	}
+	else if (my_book_->book_type() == OT_EXTRACT) {
+		((extract_data*)my_book_)->sort_records(field_info.field);
+		redraw();
+	}
 }
 
 // Select and go to item 

@@ -332,9 +332,20 @@ int printer::print_cards() {
 int printer::print_page_cards(size_t item_num) {
 	record_num_t current_item = item_num;
 	Fl_Window* win = new Fl_Window(cwin_x_, cwin_y_, cwin_w_, cwin_h_);
-	for (int card = 0; current_item < navigation_book_->size() && card < items_per_page_; card++, current_item++) {
-		record* record = navigation_book_->get_record(current_item, false);
-		qsl_form* qsl = new qsl_form(cwin_x_ + ((card % num_cols_) * card_w_), cwin_y_ + (((card / num_cols_) % num_rows_) * card_h_), record);
+	for (int card = 0; current_item < navigation_book_->size() && card < items_per_page_; card++) {
+		// Get the number of items with the same callsign
+		record* record_1 = navigation_book_->get_record(current_item, false);
+		int num_records = 1;
+		while (current_item + num_records < navigation_book_->size() && 
+			navigation_book_->get_record(current_item + num_records, false)->item("CALL") == record_1->item("CALL")) {
+			num_records++;
+		}
+		record** records = new record* [num_records];
+		for (int i = 0; i < num_records; i++) {
+			records[i] = navigation_book_->get_record(current_item + i, false);
+		}
+		qsl_form* qsl = new qsl_form(cwin_x_ + ((card % num_cols_) * card_w_), cwin_y_ + (((card / num_cols_) % num_rows_) * card_h_), records, num_records);
+		current_item += num_records;
 	}
 	win->end();
 	print_window(win);

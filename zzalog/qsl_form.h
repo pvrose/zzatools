@@ -52,7 +52,7 @@ namespace zzalog {
 
 	public:
 		// Constructor provides X and Y position (W and H set from design data) and current record to display in card format
-		qsl_form(int x, int y, record* record);
+		qsl_form(int x, int y, record** records, int num_records);
 		~qsl_form();
 		// Resize widget set - number of lines of text
 		void resize_set(widget_set set, int rows);
@@ -119,8 +119,10 @@ namespace zzalog {
 	protected:
 		// The card design interface
 		Fl_Group* designer_;
-		// The record to be printed
-		record* record_;
+		// The records to be printed
+		record** records_;
+		// Number of them
+		int num_records_;
 		// Width of all instances of qsl_card
 		float width_;
 		// Height of all instances of qsl_card

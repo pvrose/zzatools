@@ -448,21 +448,23 @@ void add_rig_if() {
 }
 
 void add_band_view() {
-	if (rig_if_) {
-		// Use actual rig frequency
-		band_view_ = new band_view(rig_if_->tx_frequency() / 1000.0, 400, 100, "Band plan");
-	}
-	else {
-		// Use frequency of selected record
-		double frequency = stod(book_->get_record()->item("FREQ")) * 1000.0;
-		band_view_ = new band_view(frequency, 400, 100, "Band plan");
-	}
-	if (band_view_->valid()) {
-		add_sub_window(band_view_);
-	}
-	else {
-		Fl::delete_widget(band_view_);
-		band_view_ = nullptr;
+	if (!closing_) {
+		if (rig_if_) {
+			// Use actual rig frequency
+			band_view_ = new band_view(rig_if_->tx_frequency() / 1000.0, 400, 100, "Band plan");
+		}
+		else {
+			// Use frequency of selected record
+			double frequency = stod(book_->get_record()->item("FREQ")) * 1000.0;
+			band_view_ = new band_view(frequency, 400, 100, "Band plan");
+		}
+		if (band_view_->valid()) {
+			add_sub_window(band_view_);
+		}
+		else {
+			Fl::delete_widget(band_view_);
+			band_view_ = nullptr;
+		}
 	}
 }
 

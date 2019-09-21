@@ -458,3 +458,45 @@ void extract_data::add_record(record_num_t record_num) {
 	rev_mapping_[record_num] = ixe;
 
 }
+
+// Swap two records
+void extract_data::swap_records(record_num_t first, record_num_t second) {
+	// Swap records
+	record* record_1 = at(first);
+	at(first) = at(second);
+	at(second) = record_1;
+	// Swap mapping data
+	record_num_t record_num_1 = mapping_.at(first);
+	mapping_.at(first) = mapping_.at(second);
+	mapping_.at(second) = record_num_1;
+	// Repair the reverse mapping
+	rev_mapping_[mapping_.at(first)] = first;
+	rev_mapping_[mapping_.at(second)] = second;
+}
+
+// Sort records according to field_name
+void extract_data::sort_records(string field_name) {
+	record_num_t count = size();
+	int num_scans = 0;
+	char message[100];
+	snprintf(message, 100, "EXTRACT: Starting sorting %d records on %s", size(), field_name.c_str());
+	status_->misc_status(ST_NOTE, message);
+	status_->progress(size(), book_type(), "Sorting passes");
+	// Repeat until we no longer swap anything
+	// TODO: Implement more efficient sort algorithm, but if size() is relatively small...
+	while (count > 0) {
+		count = 0;
+		// Compare each record with its immediate follower - swap if it's larger
+		for (record_num_t ix = 0; ix < size() - 1; ix++) {
+			if (at(ix)->item(field_name, true) > at(ix + 1)->item(field_name, true)) {
+				swap_records(ix, ix + 1);
+				count++;
+			}
+		}
+		num_scans++;
+		status_->progress(num_scans);
+	}
+	snprintf(message, 100, "EXTRACT: Done - %d passes required", num_scans);
+	status_->misc_status(ST_OK, message);
+
+}
