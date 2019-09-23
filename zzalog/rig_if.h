@@ -129,6 +129,8 @@ namespace zzalog {
 	};
 
 	// THis class implements the hamlib specific methods of the base class
+	// Hamlib is an standardised API on top of the divers implementations of rig CATs
+	// It only allows one client application.
 	class rig_hamlib : public rig_if
 	{
 	public:
@@ -180,8 +182,10 @@ namespace zzalog {
 	// Omnirig is a windows-only application
 #ifdef _WIN32
 
-// This class implements the Omnirig specific implementation of the base class, also inherits from
-	// inter-app event handler
+// This class implements the Omnirig specific implementation of the base class. 
+	// Omnirig is an app that provides a standardised API for the divers rig CAT interfaces.
+	// It allows connection by multiple clients.
+	// it also inherits from inter-app event handler and is Windows only.
 	class rig_omnirig :
 		public rig_if
 		, public ::IDispEventSimpleImpl<1, rig_omnirig, &__uuidof(::OmniRig::IOmniRigXEvents)>
@@ -246,7 +250,9 @@ namespace zzalog {
 #endif
 
 
-	// This class is the flrig specific implementation of the base class
+	// This class is the flrig specific implementation of the base class.
+	// flrig is an applicatiion that provides an XML-RPI server interface over HTTP.
+	// It allows multiple client accesses.
 	class rig_flrig :
 		public rig_if
 

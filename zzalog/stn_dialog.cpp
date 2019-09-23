@@ -769,6 +769,7 @@ void stn_dialog::qth_group::cb_ip_call(Fl_Widget* w, void* v) {
 	that->redraw();
 }
 
+// Callback that converts what is typed to upper-case
 void stn_dialog::qth_group::cb_ip_upper(Fl_Widget* w, void* v) {
 	cb_value<intl_input, string>(w, v);
 	*(string*)v = to_upper(*(string*)v);

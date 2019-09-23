@@ -50,6 +50,8 @@ log_table::log_table(int X, int Y, int W, int H, const char* label, field_orderi
 	col_resize(true);
 	col_resize_min(10);
 	col_header_color(FL_GRAY);
+	row_header(true);
+	row_header_color(FL_GRAY);
 	when(FL_WHEN_RELEASE | FL_WHEN_CHANGED);
 	callback((Fl_Callback*)log_table::cb_tab_log, (void*)nullptr);
 	application_ = app;

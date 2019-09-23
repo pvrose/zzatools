@@ -258,7 +258,7 @@ void import_data::repeat_auto_timer() {
 
 	// Restart the timer
 	Fl::repeat_timeout(1.0, cb_timer_imp, (void*)this);
-	// Tell user
+	// Tell user - display countdown so that the bar gets bigger as it counts down the seconds
 	status_->progress(timer_count_, OT_IMPORT, "seconds", true);
 	update_mode_ = WAIT_AUTO;
 }
@@ -299,7 +299,7 @@ void import_data::update_book() {
 			string qso_timestamp = import_record->item("QSO_DATE_OFF") +
 				import_record->item("TIME_OFF");
 			// TODO: If we encounter a modem program that does not log TIME_OFF, we may have to use 
-			// TIME_ON, but this introduces a race hazard.
+			// TIME_ON, but this could introduce a race hazard. 
 			// If we have no seconds - force it to the last second of the minute so that it will be checked
 			if (qso_timestamp.length() == 12) {
 				qso_timestamp += "59";
@@ -472,7 +472,7 @@ void import_data::update_book() {
 	}
 }
 
-// Stop importing - about to do something else. Either crash or gradually
+// Stop importing - about to do something else. Either crash or gracefully complete
 void import_data::stop_update(logging_mode_t mode, bool immediate) {
 	// Turn auto-import off
 	Fl::remove_timeout(cb_timer_imp);
@@ -522,7 +522,7 @@ void import_data::finish_update(bool merged /*= true*/) {
 		}
 		tabbed_view_->activate_pane(OT_MAIN, true);
 	}
-	// Restart auto-timer - restarting timer will change update_mode
+	// Restart auto-timer if we aren't waiting to stop it - restarting timer will change update_mode
 	if (update_mode_ == AUTO_IMPORT && !close_pending_) {
 		Fl_Preferences update_settings(settings_, "Real Time Update");
 		update_settings.set("Last Update", last_auto_update_.c_str());
@@ -634,7 +634,7 @@ void import_data::convert_update(record* record) {
 			record->change_field_name(field_name, update_name);
 		}
 	}
-	// Set EQSL_QSLRDATE to todays date and APP_ZZA_EQSL_TS to date and time
+	// Set EQSL_QSLRDATE to todays date 
 	if (update_mode_ == EQSL_UPDATE) {
 		// Rename !RST_RCVD etc back again
 		set<string> erasees;
@@ -657,9 +657,6 @@ void import_data::convert_update(record* record) {
 		// Add EQSL_QSLRDATE - date eQSL received and the eQSL timestamp
 		string qsl_rdate = now(false, "%Y%m%d");
 		record->item("EQSL_QSLRDATE", qsl_rdate);
-		// I am not convinced this is necessary as card fetch is done after this method is called
-		//string timestamp = record->item("QSO_DATE") + record->item("TIME_ON").substr(0, 4);
-		//record->item("APP_ZZA_EQSL_TS", timestamp);
 
 		// Delete QSLMSG
 		record->item("QSLMSG", string(""));
@@ -786,6 +783,7 @@ void import_data::process_lotw_header() {
 	}
 }
 
+// Menu enable of auto update
 void import_data::auto_enable(bool enabled) {
 	auto_enable_ = enabled;
 	if (auto_enable_ && update_mode_ == NONE) {
@@ -793,6 +791,7 @@ void import_data::auto_enable(bool enabled) {
 	}
 }
 
+// Return the current state of auto-enable
 bool import_data::auto_enable() {
 	return auto_enable_;
 }

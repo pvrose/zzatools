@@ -51,7 +51,7 @@ namespace zzalog {
 		const int MARGIN = 10;
 
 	public:
-		// Constructor provides X and Y position (W and H set from design data) and current record to display in card format
+		// Constructor provides X and Y position (W and H set from design data) and current records to display in card format
 		qsl_form(int x, int y, record** records, int num_records);
 		~qsl_form();
 		// Resize widget set - number of lines of text
@@ -96,7 +96,7 @@ namespace zzalog {
 	protected:
 		// Callbacks - when clicking any item in the form
 		static void cb_button(Fl_Widget* w, void* v);
-		// Get the widget data - TODO: get from settings once we have a designer
+		// Get the widget data
 		void load_data();
 		// Default data initialise
 		void load_default();

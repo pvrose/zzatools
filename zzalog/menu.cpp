@@ -1308,7 +1308,7 @@ void menu::cb_mi_help_append(Fl_Widget* w, void* v) {
 	status_->append_log(value);
 }
 
-// Hell->Intl - show/hide international character set
+// Help->Intl - show/hide international character set
 // v is not used
 void menu::cb_mi_help_intl(Fl_Widget* w, void* v) {
 	if (intl_dialog_->visible()) {

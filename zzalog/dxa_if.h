@@ -48,7 +48,7 @@ namespace zzalog {
 		enum colour_bn_t {
 			AC_NONE,       // Diplay all selected records in black
 			AC_BANDS,      // Seperate colour per band
-			AC_LOGMODE,    // Separate colour per logged (ADIF-defined) mode
+			AC_LOGMODE,    // Separate colour per logged (ADIF-defined) mode/submode
 			AC_AWARDMODE   // Separate colour per DXCC defined mode
 		};
 

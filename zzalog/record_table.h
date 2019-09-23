@@ -12,11 +12,12 @@ namespace zzalog {
 	// This class is the table used in record_form to display the field items in the displayed record.
 	class record_table : public Fl_Table_Row
 	{
+		// The records that will be displayed
 		enum display_mode_t {
-			NO_RECORD,
-			LOG_ONLY,
-			QUERY_ONLY,
-			LOG_AND_QUERY
+			NO_RECORD,         // No record will be displayed
+			LOG_ONLY,          // Only a record from the log will be displayed
+			QUERY_ONLY,        // Only a record from an import query for which no match had been found
+			LOG_AND_QUERY      // Both the log record and supposed match from an import or duplicate query
 		};
 	public:
 		record_table(int X, int Y, int W, int H, const char* label);

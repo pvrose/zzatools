@@ -416,12 +416,6 @@
     <ClInclude Include="zzalib\callback.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="zzalib\serial.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalib\utils.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="zzalog\qrz_handler.h">
       <Filter>Header Files</Filter>
     </ClInclude>

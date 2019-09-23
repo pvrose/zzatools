@@ -17,14 +17,6 @@ using namespace std;
 
 namespace zzalog {
 
-	// File type
-	enum adif_format_t {
-		FT_NONE,             // no file loaded
-		FT_ADI,              // .adi
-		FT_ADX,              // .adx
-		FT_MIXED             // both .adx and .adi
-	};
-
 	// validation status for each check
 	enum error_t {
 		VE_OK,                         // No problem

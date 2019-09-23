@@ -367,11 +367,6 @@ int printer::card_properties() {
 	float row_card = 67.7f;
 	cwin_x_ = (int)(left_card * MM_TO_POINT) - left_margin;
 	cwin_y_ =  (int)(top_card * MM_TO_POINT) - top_margin;
-	//if (cwin_x_ < 0 || cwin_y_ < 0) {
-	//	Fl_Display_Device::display_device()->set_current();
-	//	status_->misc_status(ST_ERROR, "PRINTER: Insufficient margin for printing labels");
-	//	return 1;
-	//}
 	card_w_ = (int)(col_card * MM_TO_POINT);
 	cwin_w_ = num_cols_ * card_w_;
 	card_h_ = (int)(row_card * MM_TO_POINT);

@@ -13,7 +13,7 @@ namespace zzalog {
 
 	// This class provides the means to write out the XML prolog and element to an output
 	// string. It derives from xml_reader as this provides the base API that the
-	// application can use to generate the XML element structure
+	// application specific code uses to generate the XML element structure
 	class xml_writer :
 		public xml_reader
 	{

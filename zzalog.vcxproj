@@ -178,8 +178,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="zzalib\callback.h" />
-    <ClInclude Include="zzalib\serial.h" />
-    <ClInclude Include="zzalib\utils.h" />
     <ClInclude Include="zzalog\about_dialog.h" />
     <ClInclude Include="zzalog\adi_reader.h" />
     <ClInclude Include="zzalog\adi_writer.h" />

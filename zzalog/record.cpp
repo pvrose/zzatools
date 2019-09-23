@@ -266,7 +266,7 @@ void record::item(string field, string value, bool formatted/* = false*/) {
 				formatted_value = upper_value;
 				break;
 			case 'E':
-				// Boolean or Enumeration: convert to uppercase
+				// Enumeration: convert to uppercase
 				formatted_value = to_upper(upper_value);
 				if (field == "MODE" && spec_data_->is_submode(formatted_value)) {
 					item("SUBMODE", formatted_value, formatted);
@@ -274,9 +274,11 @@ void record::item(string field, string value, bool formatted/* = false*/) {
 				}
 				break;
 			case 'L':
+				// Convert signed decimal degree to ADIF spec LAT or LON value.
 				as_d = stod(upper_value);
 				char c;
 				if (as_d < 0.0) {
+					// Negative - West for LON, South for LAT. Covert degrees to positive number
 					as_d = -as_d;
 					if (field == "LON" || field == "MY_LON") {
 						c = 'W';
@@ -286,6 +288,7 @@ void record::item(string field, string value, bool formatted/* = false*/) {
 					}
 				}
 				else {
+					// Positive - East for LON, North for LAT
 					if (field == "LON" || field == "MY_LON") {
 						c = 'E';
 					}
@@ -293,9 +296,12 @@ void record::item(string field, string value, bool formatted/* = false*/) {
 						c = 'N';
 					}
 				}
+				// Get integer part of number
 				as_i = (int)as_d;
+				// Convert decimal degree to minutes
 				as_d -= (double)as_i;
 				as_d *= 60.0;
+				// Convert to [ENSW]ddd mm.mmm
 				char as_s[12];
 				snprintf(as_s, 12, "%c%03d %2.3f", c, as_i, as_d);
 				formatted_value = as_s;
@@ -317,8 +323,9 @@ void record::item(string field, string value, bool formatted/* = false*/) {
 string record::item(string field, bool formatted/* = false*/, bool indirect/* = false*/) {
 	string result;
 	if (indirect) {
-		// Get the item value based on APP_ZZA_QTH
+		// Get the formatted version if exists
 		result = item(field, formatted);
+		// Get the item value based on APP_ZZA_QTH if it doesn't exist
 		if (result == "") {
 			// Not set in the item
 			char * temp;
@@ -441,17 +448,21 @@ string record::item(string field, bool formatted/* = false*/, bool indirect/* = 
 			case 'M': 
 			case 'G':
 			case 'B':
+				// No formatting
 				result = unformatted_value;
 				break;
 			case 'E':
+				// Special case for MODE - use SUBMODE if it exists
 				if (field == "MODE" && item_exists("SUBMODE")) {
 					result = item("SUBMODE", formatted, indirect);
 				}
+				// No other formatting
 				else {
 					result = unformatted_value;
 				}
 				break;
 			case 'L':
+				// LAT/LON value return signed decimal degree
 				as_d = stod(unformatted_value.substr(1, 3));
 				as_d += (stod(unformatted_value.substr(5)) / 60.0);
 				switch (unformatted_value[0]) {
@@ -462,7 +473,7 @@ string record::item(string field, bool formatted/* = false*/, bool indirect/* = 
 				snprintf(as_c, 15, "%g", as_d);
 				result = string(as_c);
 			default:
-				// If any other data indicator gets return - it shouldn't
+				// If any other data indicator gets returned - it shouldn't
 				result = unformatted_value;
 				break;
 			}
@@ -472,7 +483,7 @@ string record::item(string field, bool formatted/* = false*/, bool indirect/* = 
 		// Use the field directly
 		auto it = find(field);
 		if (it == end()) {
-			// Field not present returm empty string
+			// Field not present return empty string
 			result = "";
 		}
 		else {
@@ -509,47 +520,16 @@ void record::item(string field, double& value) {
 			value = stod(item(field));
 		}
 		catch (invalid_argument&) {
-			value = nan("");
-			// Special cases
-			if (field == "LAT" || field == "LON") {
+			// Special cases - convert LAT/LON to signed decimal degrees (using formatted = true)
+			if (field == "LAT" || field == "LON" || field == "MY_LAT" || field == "MY_LON") {
+				// Get formated version
+				string item_value = item(field, true, true);
 				try {
-					string item_value = item(field);
-					double degrees = stod(item_value.substr(1, 3)) + (stod(item_value.substr(5, 6)) / 60.0);
-					switch (item_value[0]) {
-					case 'S':
-					case 'W':
-						value = 0.0 - degrees;
-						break;
-					case 'N':
-					case 'E':
-						value = degrees;
-						break;
-					}
+					value = stod(item_value);
 				}
 				catch (invalid_argument&) {
 					value = nan("");
 				}
-			}
-			else if (field == "MY_LAT" || field == "MY_LON") {
-				try {
-					// Get the inherited value if necessary
-					string item_value = item(field, false, true);
-					double degrees = stod(item_value.substr(1, 3)) + (stod(item_value.substr(5, 6)) / 60.0);
-					switch (item_value[0]) {
-					case 'S':
-					case 'W':
-						value = 0.0 - degrees;
-						break;
-					case 'N':
-					case 'E':
-						value = degrees;
-						break;
-					}
-				}
-				catch (invalid_argument&) {
-					value = nan("");
-				}
-
 			}
 			else {
 				// Not a valid double
@@ -839,6 +819,7 @@ bool record::merge_records(record* record, bool allow_loc_mismatch /* = false */
 	if (bearing_change) {
 		pfx_data_->update_bearing(this);
 	}
+	// If the location has changed we want to redraw DxAtlas, otherwise we don't.
 	if (result) {
 		if (bearing_change) {
 			*result = hint_t::HT_CHANGED;
@@ -1000,7 +981,7 @@ bool record::items_match(record* record, string field_name) {
 		return true;
 	}
 	else if (field_name == "GRIDSQUARE" || field_name == "MY_GRIDSQUARE") {
-		// Special case for GRIDSQUARE, TIME_ON or TIME_OFF - 
+		// Special case for GRIDSQUARE - 
 		// they compare if they are equal for the length
 		// of the shorter.
 		int iLength = min(lhs.length(), rhs.length());
@@ -1014,7 +995,6 @@ bool record::items_match(record* record, string field_name) {
 	else if (field_name == "TIME_ON" || field_name == "TIME_OFF") {
 		// TIME_ON or TIME_OFF - 
 		// they compare if they are equal to the minute
-		// of the shorter.
 		if (lhs.substr(0, 4) == rhs.substr(0, 4)) {
 			return true;
 		}
@@ -1023,7 +1003,7 @@ bool record::items_match(record* record, string field_name) {
 		}
 	}
 	else if (field_name == "MODE" || field_name == "SUBMODE") {
-		// Special case for MODE - check against SUBMODE as well
+		// Special case for MODE - check against SUBMODE as well (both ways)
 		if (lhs == to_upper(record->item("SUBMODE")) || lhs == to_upper(record->item("MODE"))) {
 			return true;
 		}
@@ -1043,15 +1023,34 @@ time_t record::timestamp(bool time_off /*= false*/) {
 		tm qso_time;
 		if (time_off) {
 			if (item_exists("QSO_DATE_OFF")) {
+				// Use QSO_DATE_OFF if it exists
 				qso_time.tm_year = stoi(item("QSO_DATE_OFF").substr(0, 4)) - 1900;
 				qso_time.tm_mon = stoi(item("QSO_DATE_OFF").substr(4, 2)) - 1;
 				qso_time.tm_mday = stoi(item("QSO_DATE_OFF").substr(6, 2));
 			}
 			else {
-				qso_time.tm_year = stoi(item("QSO_DATE_ON").substr(0, 4)) - 1900;
-				qso_time.tm_mon = stoi(item("QSO_DATE_ON").substr(4, 2)) - 1;
-				qso_time.tm_mday = stoi(item("QSO_DATE_ON").substr(6, 2));
+				// Use QSO_DATE if it doesn't
+				qso_time.tm_year = stoi(item("QSO_DATE").substr(0, 4)) - 1900;
+				qso_time.tm_mon = stoi(item("QSO_DATE").substr(4, 2)) - 1;
+				qso_time.tm_mday = stoi(item("QSO_DATE").substr(6, 2));
+				if (item("TIME_ON") > item("TIMEOFF")) {
+					// QSO_DATE_OFF show be inferred to be the day after - increment date
+					if (qso_time.tm_mday > days_in_month(&qso_time)) {
+						qso_time.tm_mday = 1;
+						if (qso_time.tm_mon == 11) {
+							qso_time.tm_mon = 0;
+							qso_time.tm_year += 1;
+						}
+						else {
+							qso_time.tm_mon += 1;
+						}
+					}
+					else {
+						qso_time.tm_mday += 1;
+					}
+				}
 			}
+			// Add time on
 			qso_time.tm_hour = stoi(item("TIME_OFF").substr(0, 2));
 			qso_time.tm_min = stoi(item("TIME_OFF").substr(2, 2));
 			qso_time.tm_sec = 0;
@@ -1123,6 +1122,7 @@ string record::item_merge(string data, bool indirect /*=false*/) {
 	string result = data;
 	size_t left = result.find('<');
 	size_t right = result.find('>');
+	// while we still have an unprocessed <> pair
 	while (left != result.npos && right != result.npos) {
 		string field_name = result.substr(left + 1, right - left - 1);
 		result.replace(left, right - left + 1, item(field_name, indirect, true));

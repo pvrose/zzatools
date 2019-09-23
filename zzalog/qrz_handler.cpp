@@ -24,6 +24,7 @@ extern book* navigation_book_;
 extern menu* menu_;
 extern Fl_Preferences* settings_;
 
+// Constructor
 qrz_handler::qrz_handler() :
 	username_("")
 	, password_("")
@@ -32,6 +33,7 @@ qrz_handler::qrz_handler() :
 	, qrz_version_("")
 	, merge_done_(false)
 {
+	// Got no log-in details - raise a warning for now.
 	if (!user_details()) {
 		status_->misc_status(ST_WARNING, "QRZ.com: login details have not been established yet. Do so before first use");
 	}
@@ -42,6 +44,7 @@ qrz_handler::qrz_handler() :
 	data_.clear();
 }
 
+// Destructor
 qrz_handler::~qrz_handler() {
 	delete qrz_info_;
 	data_.clear();
@@ -49,12 +52,14 @@ qrz_handler::~qrz_handler() {
 
 // Open the QRZ.com session
 bool qrz_handler::open_session() {
+	// We are unable to log-in to QRZ.com
 	if (!user_details()) {
 		status_->misc_status(ST_ERROR, "QRZ.com: login details are not available");
 		return false;
 	}
+	// We can use the XML database - note this is subscription only
 	if (use_xml_database_) {
-		// Request 
+		// Generate XML request.
 		string uri = generate_session_uri();
 		stringstream response;
 		// Send Session requesst to QRZ.com

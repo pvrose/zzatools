@@ -16,6 +16,14 @@ using namespace std;
 
 namespace zzalog {
 
+	// File type
+	enum adif_format_t {
+		FT_NONE,             // no file loaded
+		FT_ADI,              // .adi
+		FT_ADX,              // .adx
+		FT_MIXED             // both .adx and .adi
+	};
+
 	// Navigation type
 	enum navigate_t {
 		NV_FIRST,        // Go to the first record
@@ -34,7 +42,7 @@ namespace zzalog {
 		HT_DELETED,               // Record has been deleted - invalidate it and all after
 		HT_SELECTED,              // Selection has been changed to this record - remove selection from existing and select this.
 		HT_DUPE_DELETED,          // Record may have changed as the one after deleted- invalidate it and after
-		HT_EXTRACTION,            // Extract conditions have changed - invalidate IDD_ZLG_EXTRACTVIEW only
+		HT_EXTRACTION,            // Extract conditions have changed - invalidate OT_EXTRACT and views displaying extracted data
 		HT_IMPORT_QUERY,          // Import record cannot be processed without user intervention - 
 		HT_IMPORT_QUERYNEW,       // Query whether mismatch is a new record
 		HT_DUPE_QUERY,            // Query whether records are duplicates

@@ -14,7 +14,7 @@
 using namespace std;
 
 namespace zzalog {
-	// This class implements are tabular view of a book. It inherits the tabular view from Fl_Table_Row
+	// This class implements a tabular view of a book. It inherits the tabular view from Fl_Table_Row
 	// and the necessary book view features from view
 	class log_table : public Fl_Table_Row, public view
 

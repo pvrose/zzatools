@@ -476,6 +476,7 @@ void extract_data::swap_records(record_num_t first, record_num_t second) {
 
 // Sort records according to field_name
 void extract_data::sort_records(string field_name) {
+	fl_cursor(FL_CURSOR_WAIT);
 	record_num_t count = size();
 	int num_scans = 0;
 	char message[100];
@@ -483,7 +484,7 @@ void extract_data::sort_records(string field_name) {
 	status_->misc_status(ST_NOTE, message);
 	status_->progress(size(), book_type(), "Sorting passes");
 	// Repeat until we no longer swap anything
-	// TODO: Implement more efficient sort algorithm, but if size() is relatively small...
+	// TODO: Implement more efficient sort algorithm, but if size() is relatively small. Current 2K+ records takes a couple of seconds
 	while (count > 0) {
 		count = 0;
 		// Compare each record with its immediate follower - swap if it's larger
@@ -498,5 +499,6 @@ void extract_data::sort_records(string field_name) {
 	}
 	snprintf(message, 100, "EXTRACT: Done - %d passes required", num_scans);
 	status_->misc_status(ST_OK, message);
+	fl_cursor(FL_CURSOR_DEFAULT);
 
 }

@@ -48,11 +48,11 @@ int edit_dialog::edit_input::handle(int event) {
 			cb_menu(this, (void*)SAVE);
 			return true;
 		case FL_Up:
-			// Left arrow - save and select record above
+			// Up arrow - save and select record above
 			cb_menu(this, (void*)SAVE_UP);
 			break;
 		case FL_Down:
-			// Left arrow - save and select record above
+			// Down arrow - save and select record above
 			cb_menu(this, (void*)SAVE_DOWN);
 			break;
 		}

@@ -150,11 +150,6 @@ namespace zzalog {
 		string get_browser();
 
 	protected:
-		// Fetch the QRZ.com web-page
-		void fetch_qrz_web(string callsign);
-
-
-	protected:
 		// Current logging mode
 		logging_mode_t logging_mode_;
 		// search criteria - remembered

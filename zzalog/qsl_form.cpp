@@ -3,6 +3,7 @@
 #include "drawing.h"
 #include "../zzalib/utils.h"
 #include "qsl_design.h"
+#include "status.h"
 
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Button.H>
@@ -11,6 +12,7 @@
 using namespace zzalog;
 
 extern Fl_Preferences* settings_;
+extern status* status_;
 
 // Constructor
 qsl_form::qsl_form(int X, int Y, record** records, int num_records) :
@@ -118,7 +120,7 @@ void qsl_form::load_data() {
 	}
 }
 
-// REad one set of widget data
+// Read one set of widget data
 void qsl_form::read_settings(Fl_Preferences& settings, vector<qsl_form::qsl_widget>& widgets, int count) {
 	widgets.resize(count);
 	for (int i = 0; i < count; i++) {
@@ -155,6 +157,13 @@ void qsl_form::create_form() {
 	ry = curr_y;
 	draw_lines(FL_ALIGN_LEFT, ly, bl_widgets_);
 	draw_lines(FL_ALIGN_RIGHT, ry, br_widgets_);
+	// Report an error if the required height is too big
+	curr_y = max(ly, ry) + MARGIN;
+	if (curr_y > height) {
+		char message[100];
+		snprintf(message, 99, "QSL FORM: Actual height %d is shorter than required %d (point)", height, curr_y);
+		status_->misc_status(ST_ERROR, message);
+	}
 	redraw();
 	end();
 }

@@ -65,7 +65,7 @@ void scratchpad::create_form() {
 
 	// Create the editor
 	buffer_ = new Fl_Text_Buffer(1024);
-	editor_ = new Fl_Text_Editor(EDGE, EDGE, WEDITOR, HEDITOR);
+	editor_ = new intl_editor(EDGE, EDGE, WEDITOR, HEDITOR);
 	editor_->buffer(buffer_);
 	editor_->textsize(FONT_SIZE);
 	editor_->textfont(FONT);
@@ -425,35 +425,7 @@ void scratchpad::rig_update(string frequency, string mode, string power) {
 	redraw();
 }
 
-// Default Text_Editor constructor
-scratchpad::editor::editor(int X, int Y, int W, int H) :
-	Fl_Text_Editor(X, Y, W, H) {
-}
-
-// Handle - special action on left and right click
-int scratchpad::editor::handle(int event) {
-	switch (event) {
-	case FL_FOCUS:
-		// Notify that this is the current editor to receive pastes of international chatacters
-		if (intl_dialog_) {
-			intl_dialog_->editor(this);
-		}
-	case FL_PUSH:
-		// Tell FLTK we want to see FL_RELEASE
-		return true;
-	case FL_RELEASE:
-		if (Fl::event_button() == FL_LEFT_MOUSE && Fl::event_clicks() != 0) {
-			// SElect the whole word
-			int pos = insert_position();
-			int word_begin = buffer()->word_start(pos);
-			int word_end = buffer()->word_end(pos);
-			buffer()->select(word_begin, word_end);
-			return true;
-		}
-	}
-	return Fl_Text_Editor::handle(event);
-}
-
+// Get frequency, power and mode from previous record not rig
 void scratchpad::update() {
 	record* prev_record = book_->get_record();
 	ip_freq_->value(prev_record->item("FREQ").c_str());

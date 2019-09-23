@@ -25,8 +25,6 @@ namespace zzalog {
 
 		// inherited from view
 		virtual void update(hint_t hint, unsigned int record_num_1, unsigned int record_num_2 = 0);
-		//// Create the initial root
-		//void create_tree();
 		// Delete the tree
 		void delete_tree();
 

@@ -100,7 +100,7 @@ void power_matrix::delete_rig() {
 	map_.clear();
 }
 
-// Returns the power for the specific band and drive-level - with limited precision
+// Returns the power for the specific band and drive-level - with limited precision (about 100th full-power)
 double power_matrix::power(string band, int drive) {
 	double power = look_up(band, drive);
 	double precision = look_up(band, 100) / 100;

@@ -4,6 +4,7 @@
 #include "win_dialog.h"
 #include "record.h"
 #include "book.h"
+#include "intl_widgets.h"
 
 #include <string>
 
@@ -31,18 +32,10 @@ namespace zzalog {
 
 		// Called when rig is read
 		void rig_update(string frequency, string mode, string power);
-		// Called when rig is deleted
+		// Called when rig is closed
 		void update();
 
 	protected:
-		class editor : public Fl_Text_Editor
-		{
-		public:
-			editor(int X, int Y, int W, int H);
-		protected:
-			// Handle single left click and right click
-			int handle(int event);
-		};
 		// Create the form
 		void create_form();
 
@@ -78,7 +71,7 @@ namespace zzalog {
 		// The text items
 		Fl_Text_Buffer* buffer_;
 		// The editor
-		Fl_Text_Editor* editor_;
+		intl_editor* editor_;
 		// Save button
 		Fl_Button* bn_save_;
 		// Cancel button

@@ -33,7 +33,7 @@ lotw_handler::~lotw_handler()
 {
 }
 
-// Extract records that need signing and upload them to LotW
+// Export extracted records, sign them and upload to LotW
 bool lotw_handler::upload_lotw_log(book* book) {
 	fl_cursor(FL_CURSOR_WAIT);
 	// Get LotW settings

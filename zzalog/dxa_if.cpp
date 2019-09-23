@@ -99,6 +99,8 @@ dxa_if::~dxa_if()
 	// Clear the various data sets
 	records_to_display_.clear();
 	colours_used_.clear();
+	// Disconnect DxAtlas
+	disconnect_dxatlas(false);
 }
 
 // Public methods
@@ -740,10 +742,6 @@ void dxa_if::disconnect_dxatlas(bool dxatlas_exit) {
 	call_layer_ = nullptr;
 	// Tell the interface we no longer support the callback
 	IDispEventSimpleImpl<2, dxa_if, &__uuidof(DxAtlas::IDxAtlasEvents)>::DispEventUnadvise(atlas_);
-	//if (!dxatlas_exit) {
-	//	// Setting this nullptr closes the DXATLAS: window
-	//	delete atlas_;
-	//}
 	atlas_ = nullptr;
 	is_my_change_ = false;
 	// Maybe allow FLTK scheduler to let DxAtlas do its stuff

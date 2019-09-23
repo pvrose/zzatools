@@ -379,7 +379,6 @@ void add_rig_if() {
 		if (rig_if_ == nullptr) {
 			// No handler defined - assume manual logging
 			status_->misc_status(ST_WARNING, "RIG: No handler - assume real-time logging, no rig");
-			menu_->logging(LM_ON_AIR);
 		}
 		else {
 			// Trya and open the connection to the rig
