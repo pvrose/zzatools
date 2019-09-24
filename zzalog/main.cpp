@@ -145,8 +145,17 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 		}
 		// Wait for auto-import of files to complete
 		if (import_data_) {
-			import_data_->stop_update(LM_OFF_AIR, false);
-			while (!import_data_->update_complete()) Fl::wait();
+			if (!import_data_->update_complete()) {
+				switch (fl_choice("There is an import in process. Do you want to let it finish or abandon it?", "Finish?", "Abandon", nullptr)) {
+				case 0:
+					import_data_->stop_update(LM_OFF_AIR, false);
+					while (!import_data_->update_complete()) Fl::wait();
+					break;
+				case 1:
+					import_data_->stop_update(LM_OFF_AIR, true);
+					break;
+				}
+			}
 		}
 		// Wait for eQSL card downloads - user can cancel
 		if (eqsl_handler_ && eqsl_handler_->requests_queued()) {
