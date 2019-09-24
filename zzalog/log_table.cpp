@@ -41,7 +41,7 @@ log_table::log_table(int X, int Y, int W, int H, const char* label, field_orderi
 	last_rooty_ = 0;
 	application_ = FO_MAINLOG;
 	rows_per_page_ = 0;
-	reverse_order_ = false;
+	order_ = FIRST_TO_LAST;
 	edit_dialog_ = nullptr;
 
 	// Set the various fixed attributes of the table
@@ -67,7 +67,7 @@ log_table::log_table(int X, int Y, int W, int H, const char* label, field_orderi
 	rows_per_page_ = Fl_Table_Row::tih / (ROW_HEIGHT);
 	// Reverse order
 	Fl_Preferences display_settings(settings_, "Display");
-	display_settings.get("Recent First", (int&)reverse_order_, false);
+	display_settings.get("Recent First", (int&)order_, FIRST_TO_LAST);
 
 	// Set minimum resizing - width 1/3
 	min_w_ = w() / 3;
@@ -91,7 +91,7 @@ void log_table::cb_tab_log(Fl_Widget* w, void* v) {
 	// Get the row and field clicked
 	log_table* that = (log_table*)w;
 	int row = that->callback_row();
-	record_num_t item_num = that->reverse_order_ ? that->my_book_->size() - 1 - row : row;
+	record_num_t item_num = that->order_ == LAST_TO_FIRST ? that->my_book_->size() - 1 - row : row;
 	int col = that->callback_col();
 	switch (that->callback_context()) {
 	case Fl_Table::CONTEXT_CELL:
@@ -160,7 +160,7 @@ int log_table::handle(int event) {
 			return true;
 		case FL_Up:
 			// UP - Go->Prev/Next (depending on sort order
-			if (reverse_order_) {
+			if (order_ == LAST_TO_FIRST) {
 				if (my_book_->selection() != my_book_->size() - 1) {
 					my_book_->selection(my_book_->selection() + 1);
 				}
@@ -173,20 +173,20 @@ int log_table::handle(int event) {
 			return true;
 		case FL_Down:
 			// DOWN - Go->Next/Prev (depending on sort order)
-			if (!reverse_order_) {
-				if (my_book_->selection() != my_book_->size() - 1) {
-					my_book_->selection(my_book_->selection() + 1);
+			if (order_ == LAST_TO_FIRST) {
+				if (my_book_->selection() != 0) {
+					my_book_->selection(my_book_->selection() - 1);
 				}
 			}
 			else {
-				if (my_book_->selection() != 0) {
-					my_book_->selection(my_book_->selection() - 1);
+				if (my_book_->selection() != my_book_->size() - 1) {
+					my_book_->selection(my_book_->selection() + 1);
 				}
 			}
 			return true;
 		case FL_Page_Up:
 			// PGUP -  Go up one page (find out number of records displayed)
-			if (reverse_order_) {
+			if (order_ == LAST_TO_FIRST) {
 				// The lower of the one page above where we are or last record
 				my_book_->selection(min(my_book_->selection() + rows_per_page_, my_book_->size() - 1));
 			}
@@ -197,13 +197,13 @@ int log_table::handle(int event) {
 			return true;
 		case FL_Page_Down:
 			// PGDN - Go down one page (--- do. ---) - NB the bang
-			if (!reverse_order_) {
-				// The lower of the one page above where we are or last record
-				my_book_->selection(min(my_book_->selection() + rows_per_page_, my_book_->size() - 1));
-			}
-			else {
+			if (order_ == LAST_TO_FIRST) {
 				// The greater of record 0 or one page above where we are (record numbers are unsigned (size_t))
 				my_book_->selection(max(0, (signed)my_book_->selection() - rows_per_page_));
+			}
+			else {
+				// The lower of the one page above where we are or last record
+				my_book_->selection(min(my_book_->selection() + rows_per_page_, my_book_->size() - 1));
 			}
 			return true;
 		}
@@ -233,7 +233,7 @@ void log_table::update(hint_t hint, unsigned int record_num_1, unsigned int reco
 		row_height_all(ROW_HEIGHT);
 		// select specified record
 		current_item_num_ = my_book_->item_number(record_num_1);
-		if (reverse_order_) {
+		if (order_ == LAST_TO_FIRST) {
 			current_item_num_ = my_book_->size() - 1 - current_item_num_;
 		}
 		display_current();
@@ -260,10 +260,23 @@ void log_table::draw_cell(TableContext context, int R, int C, int X, int Y, int 
 		// Put record number into header (left-most column)
 		fl_push_clip(X, Y, W, H);
 		{
-			fl_draw_box(FL_FLAT_BOX, X, Y, W, H, row_header_color());
-			fl_color(FL_BLACK);
-			text = to_string(reverse_order_ ? my_book_->size() - 1 - R : R);
+
+			Fl_Color bg_colour = row_selected(R) ? selection_color() : row_header_color();
+			fl_color(bg_colour);
+			fl_rectf(X, Y, W, H);
+			// TEXT - contrast its colour to the bg colour.
+			fl_color(fl_contrast(FL_BLACK, bg_colour));
+			// Make this italic version of default font
+			Fl_Font save = fl_font();
+			fl_font(FONT | FL_ITALIC, FONT_SIZE);
+			record_num_t item_number = (order_ == LAST_TO_FIRST) ? my_book_->size() - 1 - R : R;
+			text = to_string(my_book_->record_number(item_number) + 1);
 			fl_draw(text.c_str(), X, Y, W, H, FL_ALIGN_LEFT);
+			fl_font(save, FONT_SIZE);
+			// BORDER - mid grey
+			fl_color(color());
+			// draw top and right edges only
+			fl_line(X, Y, X + W - 1, Y, X + W - 1, Y + H - 1);
 		}
 		fl_pop_clip();
 		return;
@@ -294,13 +307,13 @@ void log_table::draw_cell(TableContext context, int R, int C, int X, int Y, int 
 
 				// TEXT - contrast its colour to the bg colour.
 				fl_color(fl_contrast(FL_BLACK, bg_colour));
-				size_t record_num = reverse_order_ ? my_book_->size() - 1 - R : R;
+				record_num_t item_number = (order_ == LAST_TO_FIRST) ? my_book_->size() - 1 - R : R;
 				// get the formatted data from the field of the record
-				text = my_book_->get_record(record_num, false)->item(fields_[C].field, true);
+				text = my_book_->get_record(item_number, false)->item(fields_[C].field, true);
 				fl_draw(text.c_str(), X + 1, Y, W - 1, H, FL_ALIGN_LEFT);
 
-				// BORDER - light grey
-				fl_color(FL_LIGHT1);
+				// BORDER - unselected colour
+				fl_color(color());
 				// draw top and right edges only
 				fl_line(X, Y, X + W - 1, Y, X + W - 1, Y + H - 1);
 			}
@@ -362,8 +375,8 @@ vector<field_info_t>& log_table::fields() {
 // Open an input dialog to allow user to edit the cell 
 void log_table::edit_cell(int row, int col) {
 	// get the field item under the mouse
-	record_num_t record_num = reverse_order_ ? my_book_->size() - 1 - row : row;
-	record* record = my_book_->get_record(record_num, true);
+	record_num_t item_number = (order_ == LAST_TO_FIRST) ? my_book_->size() - 1 - row : row;
+	record* record = my_book_->get_record(item_number, true);
 	field_info_t field_info = fields_[col];
 	string text = record->item(field_info.field, true);
 	// Get cell location
@@ -393,10 +406,10 @@ void log_table::edit_cell(int row, int col) {
 					my_book_->modified_record(true);
 				}
 				if (fields_[col].field == "GRIDSQUARE" || fields_[col].field == "DXCC") {
-					book_->selection(my_book_->record_number(record_num), HT_CHANGED);
+					book_->selection(my_book_->record_number(item_number), HT_CHANGED);
 				}
 				else {
-					book_->selection(my_book_->record_number(record_num), HT_MINOR_CHANGE);
+					book_->selection(my_book_->record_number(item_number), HT_MINOR_CHANGE);
 				}
 			}
 			else {
@@ -405,7 +418,7 @@ void log_table::edit_cell(int row, int col) {
 				menu_->update_items();
 			}
 			if (fields_[col].field == "CALL") {
-				toolbar_->search_text(my_book_->record_number(record_num));
+				toolbar_->search_text(my_book_->record_number(item_number));
 			}
 			break;
 		case OT_IMPORT:
@@ -472,20 +485,72 @@ void log_table::dbl_click_column(int col) {
 		field_info.field == "TIME_ON" ||
 		field_info.field == "QSO_DATE_OFF" ||
 		field_info.field == "TIME_OFF") {
-		// A time-related field - swap orde 
-		reverse_order_ = !reverse_order_;
+		// A time-related field - swap order
+		switch (order_) {
+		case FIRST_TO_LAST:
+			order_ = LAST_TO_FIRST;
+			break;
+		case LAST_TO_FIRST:
+			order_ = FIRST_TO_LAST;
+			break;
+		case SORTED_UP:
+		case SORTED_DOWN:
+			// Revert to FIRST_TO_LAST
+			if (my_book_->book_type() == OT_EXTRACT) {
+				((extract_data*)my_book_)->reextract();
+			}
+			order_ = FIRST_TO_LAST;
+			break;
+		}
 		// Keep selected record the same
 		select_row(current_item_num_, 0);
 		current_item_num_ = my_book_->size() - 1 - current_item_num_;
 		display_current();
 		// Save value in settings
 		Fl_Preferences display_settings(settings_, "Display");
-		display_settings.set("Recent First", reverse_order_);
+		display_settings.set("Recent First", order_);
 		// Redraw the window
 		redraw();
 	}
 	else if (my_book_->book_type() == OT_EXTRACT) {
-		((extract_data*)my_book_)->sort_records(field_info.field);
+		// Save record number of selected item
+		record_num_t selected_record = my_book_->record_number(my_book_->selection());
+		switch (order_) {
+		case FIRST_TO_LAST:
+		case LAST_TO_FIRST:
+			// Sort up the way
+			((extract_data*)my_book_)->sort_records(field_info.field, false);
+			order_ = SORTED_UP;
+			break;
+		case SORTED_DOWN:
+			if (field_info.field == sorted_field_) {
+				// If sorting on same field, sort up the way
+				((extract_data*)my_book_)->sort_records(field_info.field, false);
+				order_ = SORTED_UP;
+			}
+			else {
+				((extract_data*)my_book_)->reextract();
+				((extract_data*)my_book_)->sort_records(field_info.field, false);
+				order_ = SORTED_UP;
+			}
+			break;
+		case SORTED_UP:
+			if (field_info.field == sorted_field_) {
+				// If sorting on same field, sort down the way
+				((extract_data*)my_book_)->sort_records(field_info.field, true);
+				order_ = SORTED_DOWN;
+			}
+			else {
+				// Sort on new field only (up the way)
+				((extract_data*)my_book_)->reextract();
+				((extract_data*)my_book_)->sort_records(field_info.field, false);
+				order_ = SORTED_UP;
+			}
+			break;
+		}
+		sorted_field_ = field_info.field;
+		// Restore selection to record
+		my_book_->selection(my_book_->item_number(selected_record));
 		redraw();
 	}
 }

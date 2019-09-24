@@ -540,7 +540,7 @@ void band_view::display_info(double frequency, int x, int y) {
 			found = true;
 			// Generate tip
 			char* tip = new char[100 + (*it)->notes.length()];
-			sprintf(tip, "Lower: %g kHz\nUpper: %g kHz\n%s", (*it)->lower, (*it)->lower, (*it)->notes.c_str());
+			sprintf(tip, "Lower: %g kHz\nUpper: %g kHz\n%s", (*it)->lower, (*it)->upper, (*it)->notes.c_str());
 			// Display the tip
 			tw = tip_window(string(tip), x, y);
 		}

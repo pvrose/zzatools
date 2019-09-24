@@ -177,7 +177,8 @@ void dxa_if::create_form() {
 	Fl_Int_Input* ip11 = new Fl_Int_Input(ch11->x(), ch11->y() + ch11->h(), ch11->w(), HTEXT);
 	ip11->textfont(FONT);
 	ip11->textsize(FONT_SIZE);
-	ip11->callback(cb_value_int<Fl_Int_Input>, (void*)&most_recent_count_);
+	ip11->callback(cb_ip_number);
+	ip11->when(FL_WHEN_ENTER_KEY);
 	ip11->value(to_string(most_recent_count_).c_str());
 	ip11->tooltip("Enter the number of QSOs or days");
 	most_recent_ip_ = ip11;
@@ -344,6 +345,17 @@ void dxa_if::cb_ch_qsos(Fl_Widget* w, void* v) {
 	dxa_if* that = ancestor_view<dxa_if>(w);
 	// get value of radio button
 	cb_value<Fl_Choice, int>(w, (void*)&that->qso_display_);
+	// Redraw the data
+	that->enable_widgets();
+	that->get_records();
+	that->get_colours(false);
+	that->draw_pins();
+}
+
+// Input for most recent count
+void dxa_if::cb_ip_number(Fl_Widget* w, void* v) {
+	dxa_if* that = ancestor_view<dxa_if>(w);
+	cb_value_int<Fl_Int_Input>(w, (void*)& that->most_recent_count_);
 	// Redraw the data
 	that->enable_widgets();
 	that->get_records();

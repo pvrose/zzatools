@@ -7,7 +7,7 @@
 #include "adi_writer.h"
 #include "eqsl_handler.h"
 #include "lotw_handler.h"
-
+#include "spec_data.h"
 
 #include <sstream>
 
@@ -21,6 +21,7 @@ extern tabbed_forms* tabbed_view_;
 extern status* status_;
 extern eqsl_handler* eqsl_handler_;
 extern lotw_handler* lotw_handler_;
+extern spec_data* spec_data_;
 
 // Constructor
 extract_data::extract_data() :
@@ -475,7 +476,7 @@ void extract_data::swap_records(record_num_t first, record_num_t second) {
 }
 
 // Sort records according to field_name
-void extract_data::sort_records(string field_name) {
+void extract_data::sort_records(string field_name, bool reversed) {
 	fl_cursor(FL_CURSOR_WAIT);
 	record_num_t count = size();
 	int num_scans = 0;
@@ -489,9 +490,25 @@ void extract_data::sort_records(string field_name) {
 		count = 0;
 		// Compare each record with its immediate follower - swap if it's larger
 		for (record_num_t ix = 0; ix < size() - 1; ix++) {
-			if (at(ix)->item(field_name, true) > at(ix + 1)->item(field_name, true)) {
-				swap_records(ix, ix + 1);
-				count++;
+			if (spec_data_->datatype_indicator(field_name) == 'N') {
+				// Numeric field - compare the numeric value
+				double item_1;
+				double item_2;
+				at(ix)->item(field_name, item_1);
+				at(ix + 1)->item(field_name, item_2);
+				if ((!reversed && item_1 > item_2) ||
+					(reversed && item_1 < item_2)) {
+					swap_records(ix, ix + 1);
+					count++;
+				}
+			}
+			else {
+				// compare string value
+				if ((!reversed && at(ix)->item(field_name, true) > at(ix + 1)->item(field_name, true)) ||
+					(reversed && at(ix)->item(field_name, true) < at(ix + 1)->item(field_name, true))) {
+					swap_records(ix, ix + 1);
+					count++;
+				}
 			}
 		}
 		num_scans++;

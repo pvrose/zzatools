@@ -45,7 +45,7 @@ namespace zzalog {
 		// Add a record to the list
 		void add_record(record_num_t record_num);
 		// Sort records by filed_name
-		void sort_records(string field_name);
+		void sort_records(string field_name, bool reverse);
 
 		// return the real record number
 		virtual record_num_t record_number(record_num_t item);

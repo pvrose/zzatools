@@ -80,6 +80,8 @@ namespace zzalog {
 		static void cb_bn_start_stop(Fl_Widget* w, void* v);
 		// Location choice
 		static void cb_ch_locn(Fl_Widget* w, void* v);
+		// Number days/QSOs input
+		static void cb_ip_number(Fl_Widget* w, void* v);
 
 	public:
 

@@ -77,7 +77,9 @@ namespace zzalog {
 		// Rows per page
 		int rows_per_page_;
 		// Inverse display order
-		bool reverse_order_;
+		enum {FIRST_TO_LAST, LAST_TO_FIRST, SORTED_UP, SORTED_DOWN} order_;
+		// Field on which sort was done
+		string sorted_field_;
 		// The edit window
 		Fl_Window* edit_dialog_;
 
