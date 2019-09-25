@@ -2,6 +2,7 @@
 
 #include "spec_data.h"
 #include "icons.h"
+#include "version.h"
 #include "../zzalib/utils.h"
 
 #include "hamlib/rig.h"

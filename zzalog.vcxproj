@@ -241,6 +241,7 @@
     <ClInclude Include="zzalog\tsv_writer.h" />
     <ClInclude Include="zzalog\url_handler.h" />
     <ClInclude Include="zzalog\use_dialog.h" />
+    <ClInclude Include="zzalog\version.h" />
     <ClInclude Include="zzalog\view.h" />
     <ClInclude Include="zzalog\web_dialog.h" />
     <ClInclude Include="zzalog\win_dialog.h" />

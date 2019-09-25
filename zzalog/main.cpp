@@ -29,7 +29,7 @@ main.cpp - application entry point
 #include "spec_tree.h"
 #include "report_tree.h"
 #include "../zzalib/callback.h"
-#include "about_dialog.h"
+#include "version.h"
 #include "drawing.h"
 #include "intl_dialog.h"
 #include "band_view.h"

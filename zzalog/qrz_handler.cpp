@@ -5,8 +5,8 @@
 #include "book.h"
 #include "url_handler.h"
 #include "xml_reader.h"
-#include "about_dialog.h"
 #include "menu.h"
+#include "version.h"
 
 #include <sstream>
 

@@ -6,7 +6,7 @@
 #include "files.h"
 #include "spec_data.h"
 #include "../zzalib/utils.h"
-#include "about_dialog.h"
+#include "version.h"
 
 #include <fstream>
 #include <ostream>

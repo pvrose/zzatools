@@ -4,7 +4,7 @@
 #include "adx_reader.h"
 #include "adx_writer.h"
 #include "tsv_writer.h"
-#include "about_dialog.h"
+#include "version.h"
 #include "view.h"
 #include "status.h"
 #include "menu.h"

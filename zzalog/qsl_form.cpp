@@ -159,7 +159,7 @@ void qsl_form::create_form() {
 	draw_lines(FL_ALIGN_RIGHT, ry, br_widgets_);
 	// Report an error if the required height is too big
 	curr_y = max(ly, ry) + MARGIN;
-	if (curr_y > height) {
+	if (curr_y - y() > height) {
 		char message[100];
 		snprintf(message, 99, "QSL FORM: Actual height %d is shorter than required %d (point)", height, curr_y);
 		status_->misc_status(ST_ERROR, message);
