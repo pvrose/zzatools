@@ -41,7 +41,7 @@ namespace zzalog {
 		// Print cards
 		int print_cards();
 		// Print 1 page of cards
-		int print_page_cards(size_t page_number);
+		int print_page_cards(size_t &item_num);
 
 	protected:
 		// current drawing position

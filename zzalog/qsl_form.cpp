@@ -137,6 +137,7 @@ void qsl_form::read_settings(Fl_Preferences& settings, vector<qsl_form::qsl_widg
 
 // Create the card design
 void qsl_form::create_form() {
+	size_error_ = false;
 	// dimensions in points
 	int width = to_points(width_);
 	int height = to_points(height_);
@@ -160,9 +161,7 @@ void qsl_form::create_form() {
 	// Report an error if the required height is too big
 	curr_y = max(ly, ry) + MARGIN;
 	if (curr_y - y() > height) {
-		char message[100];
-		snprintf(message, 99, "QSL FORM: Actual height %d is shorter than required %d (point)", height, curr_y);
-		status_->misc_status(ST_ERROR, message);
+		size_error_ = true;
 	}
 	redraw();
 	end();
@@ -476,4 +475,9 @@ void qsl_form::save_data() {
 // Set designer
 void qsl_form::designer(Fl_Group* designer) {
 	designer_ = designer;
+}
+
+// Size error
+bool qsl_form::size_error() {
+	return size_error_;
 }

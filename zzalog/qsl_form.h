@@ -84,6 +84,8 @@ namespace zzalog {
 		int table_rows();
 		// Return number of columns
 		int table_cols();
+		// Size error drawing card
+		bool size_error();
 
 		// Save data
 		void save_data();
@@ -135,6 +137,8 @@ namespace zzalog {
 		vector<vector<qsl_widget> > tab_widgets_;
 		vector<qsl_widget> bl_widgets_;
 		vector<qsl_widget> br_widgets_;
+		// Size error
+		bool size_error_;
 
 	};
 

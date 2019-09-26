@@ -290,13 +290,13 @@ int printer::print_cards() {
 	// For each record
 	int page_number = from_page;
 	int error = 0;
+
 	// For each record that would be in the page range
 	size_t i = (from_page - 1) * items_per_page_;
 	while (i < navigation_book_->size() && page_number <= to_page && !error) {
 		error = start_page();
 		// Print the record
 		error = print_page_cards(i);
-		i+=8;
 		// When the record would be the last on the page and is not the last in the book
 		if (!error) {
 			page_number++;
@@ -329,26 +329,39 @@ int printer::print_cards() {
 	return error;
 }
 
-int printer::print_page_cards(size_t item_num) {
-	record_num_t current_item = item_num;
+int printer::print_page_cards(size_t &item_num) {
 	Fl_Window* win = new Fl_Window(cwin_x_, cwin_y_, cwin_w_, cwin_h_);
-	for (int card = 0; current_item < navigation_book_->size() && card < items_per_page_; card++) {
+	for (int card = 0; item_num < navigation_book_->size() && card < items_per_page_; card++) {
 		// Get the number of items with the same callsign
-		record* record_1 = navigation_book_->get_record(current_item, false);
+		record* record_1 = navigation_book_->get_record(item_num, false);
 		int num_records = 1;
-		while (current_item + num_records < navigation_book_->size() && 
-			navigation_book_->get_record(current_item + num_records, false)->item("CALL") == record_1->item("CALL")) {
+		while (item_num + num_records < navigation_book_->size() && 
+			navigation_book_->get_record(item_num + num_records, false)->item("CALL") == record_1->item("CALL")) {
 			num_records++;
 		}
 		record** records = new record* [num_records];
 		for (int i = 0; i < num_records; i++) {
-			records[i] = navigation_book_->get_record(current_item + i, false);
+			records[i] = navigation_book_->get_record(item_num + i, false);
 		}
 		qsl_form* qsl = new qsl_form(cwin_x_ + ((card % num_cols_) * card_w_), cwin_y_ + (((card / num_cols_) % num_rows_) * card_h_), records, num_records);
-		current_item += num_records;
+		if (qsl->size_error()) {
+			// Update error message
+			Fl_Display_Device::display_device()->set_current();
+			char message[100];
+			if (num_records > 1) {
+				snprintf(message, 99, "PRINTER: Items %d to %d create too large a label", item_num, item_num + num_records - 1);
+			}
+			else {
+				snprintf(message, 99, "PRINTER: Item %d is too large for a label", item_num);
+			}
+			status_->misc_status(ST_ERROR, message);
+			set_current();
+		}
+		item_num += num_records;
 	}
 	win->end();
 	print_window(win);
+	Fl::delete_widget(win);
 	return 0;
 }
 

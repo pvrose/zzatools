@@ -740,25 +740,27 @@ bool dxa_if::connect_dxatlas() {
 
 // Disconnect from DXATLAS:
 void dxa_if::disconnect_dxatlas(bool dxatlas_exit) {
-	// Note that we may have moved the window without resizing, so won't have had the map changed callback
-	atlas_left_ = atlas_->GetLeft();
-	atlas_width_ = atlas_->GetWidth();
-	atlas_top_ = atlas_->GetTop();
-	atlas_height_ = atlas_->GetHeight();
-	save_values();
-	// Ignore any callbacks from DXATLAS: while we disconnect it.
-	is_my_change_ = true;
-	atlas_->GetMap()->BeginUpdate();
-	atlas_->GetMap()->GetCustomLayers()->Clear();
-	atlas_->GetMap()->EndUpdate();
-	call_layer_ = nullptr;
-	// Tell the interface we no longer support the callback
-	IDispEventSimpleImpl<2, dxa_if, &__uuidof(DxAtlas::IDxAtlasEvents)>::DispEventUnadvise(atlas_);
-	atlas_ = nullptr;
-	is_my_change_ = false;
-	// Maybe allow FLTK scheduler to let DxAtlas do its stuff
-	Fl::wait(0.1);
-	status_->misc_status(ST_WARNING, "DXATLAS: Disconnected");
+	if (atlas_) {
+		// Note that we may have moved the window without resizing, so won't have had the map changed callback
+		atlas_left_ = atlas_->GetLeft();
+		atlas_width_ = atlas_->GetWidth();
+		atlas_top_ = atlas_->GetTop();
+		atlas_height_ = atlas_->GetHeight();
+		save_values();
+		// Ignore any callbacks from DXATLAS: while we disconnect it.
+		is_my_change_ = true;
+		atlas_->GetMap()->BeginUpdate();
+		atlas_->GetMap()->GetCustomLayers()->Clear();
+		atlas_->GetMap()->EndUpdate();
+		call_layer_ = nullptr;
+		// Tell the interface we no longer support the callback
+		IDispEventSimpleImpl<2, dxa_if, & __uuidof(DxAtlas::IDxAtlasEvents)>::DispEventUnadvise(atlas_);
+		atlas_ = nullptr;
+		is_my_change_ = false;
+		// Maybe allow FLTK scheduler to let DxAtlas do its stuff
+		Fl::wait(0.1);
+		status_->misc_status(ST_WARNING, "DXATLAS: Disconnected");
+	}
 }
 
 // Initialise DXATLAS: with the current configuration
