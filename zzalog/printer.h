@@ -4,6 +4,7 @@
 #include "record.h"
 #include "view.h"
 #include "fields.h"
+#include "qsl_form.h"
 
 #include <vector>
 
@@ -63,10 +64,22 @@ namespace zzalog {
 		int cwin_w_;
 		int cwin_h_;
 		// Card parameters
+		qsl_form::dim_unit unit_;
 		int card_w_;
 		int card_h_;
+		// Label parameters
 		int num_rows_;
 		int num_cols_;
+		float col_left_;
+		float col_width_;
+		float row_top_;
+		float row_height_;
+		// Address label parameters
+		bool print_label_;
+		Fl_Font font_add_;
+		Fl_Fontsize size_add_;
+		char* address_;
+
 
 	};
 

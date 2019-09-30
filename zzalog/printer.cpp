@@ -6,12 +6,15 @@
 
 #include <FL/fl_ask.H>
 #include <FL/fl_draw.H>
+#include <FL/Fl_Preferences.H>
+#include <FL/Fl_Button.H>
 
 using namespace zzalog;
 
 extern tabbed_forms* tabbed_view_;
 extern status* status_;
 extern book* navigation_book_;
+extern Fl_Preferences* settings_;
 
 const int LINE_MARGIN = 1;
 const int LINE_WIDTH = 1;
@@ -293,7 +296,8 @@ int printer::print_cards() {
 
 	// For each record that would be in the page range
 	size_t i = (from_page - 1) * items_per_page_;
-	while (i < navigation_book_->size() && page_number <= to_page && !error) {
+
+	while ((i < navigation_book_->size() && page_number <= to_page && !error) || print_label_) {
 		error = start_page();
 		// Print the record
 		error = print_page_cards(i);
@@ -331,7 +335,8 @@ int printer::print_cards() {
 
 int printer::print_page_cards(size_t &item_num) {
 	Fl_Window* win = new Fl_Window(cwin_x_, cwin_y_, cwin_w_, cwin_h_);
-	for (int card = 0; item_num < navigation_book_->size() && card < items_per_page_; card++) {
+	int card;
+	for (card = 0; item_num < navigation_book_->size() && card < items_per_page_; card++) {
 		// Get the number of items with the same callsign
 		record* record_1 = navigation_book_->get_record(item_num, false);
 		int num_records = 1;
@@ -359,32 +364,83 @@ int printer::print_page_cards(size_t &item_num) {
 		}
 		item_num += num_records;
 	}
+	if (card < items_per_page_) {
+		// We have printed all the cards but have room left for the address label
+		int print_address;
+		Fl_Preferences qsl_settings(settings_, "QSL Design");
+		qsl_settings.get("Print Label", print_address, (int)false);
+		if (print_address) {
+			Fl_Button* bn_label = new Fl_Button(cwin_x_ + ((card % num_cols_) * card_w_), cwin_y_ + (((card / num_cols_) % num_rows_) * card_h_), card_w_, card_h_);
+			bn_label->copy_label(address_);
+			bn_label->box(FL_NO_BOX);
+			bn_label->labelfont(font_add_);
+			bn_label->labelsize(size_add_);
+		}
+		print_label_ = false;
+	}
 	win->end();
 	print_window(win);
 	Fl::delete_widget(win);
 	return 0;
 }
 
-// Get the various dimensions of the card page - TODO: These will be obtained from settings
+// Get the various dimensions of the card page 
 int printer::card_properties() {
-	items_per_page_ = 8;
-	num_rows_ = 4;
-	num_cols_ = 2;
+	Fl_Preferences qsl_settings(settings_, "QSL Design");
+	int temp;
+	qsl_settings.get("Print Label", temp, (int)false);
+	print_label_ = temp;
+	qsl_settings.get("Number Rows", num_rows_, 4);
+	qsl_settings.get("Number Columns", num_cols_, 2);
+	qsl_settings.get("Column Width", col_width_, 101.6);
+	qsl_settings.get("Row Height", row_height_, 67.7);
+	qsl_settings.get("First Row", row_top_, 12.9);
+	qsl_settings.get("First Column", col_left_, 4.6);
+	qsl_settings.get("Unit", (int&)unit_, (int)qsl_form::MILLIMETER);
+	Fl_Preferences add_settings(qsl_settings, "Address");
+	add_settings.get("Font", (int)font_add_, FONT);
+	add_settings.get("Size", size_add_, FONT_SIZE);
+	Fl_Preferences text_settings(add_settings, "Text");
+	int num_lines = text_settings.entries();
+	char** text = new char* [num_lines];
+	int length = 0;
+	for (unsigned int i = 0; i < num_lines; i++) {
+		char line_num[3];
+		snprintf(line_num, 3, "%02d", i);
+		text_settings.get(line_num, text[i], "");
+		length += strlen(text[i]) + 1;
+	}
+	address_ = new char[length + 1];
+	memset(address_, 0, length + 1);
+	for (int i = 0; i < num_lines; i++) {
+		strcat(address_, text[i]);
+		strcat(address_, "\n");
+	}
+
+	items_per_page_ = num_rows_ * num_cols_;
 	int top_margin = 0;
 	int left_margin = 0;
 	margins(&left_margin, &top_margin, nullptr, nullptr);
-	// These are in mm
-	float left_card = 4.6f;
-	float top_card = 12.9f;
-	float col_card = 106.2f - 4.6f;
-	float row_card = 67.7f;
-	cwin_x_ = (int)(left_card * MM_TO_POINT) - left_margin;
-	cwin_y_ =  (int)(top_card * MM_TO_POINT) - top_margin;
-	card_w_ = (int)(col_card * MM_TO_POINT);
+	float conversion;
+	switch (unit_) {
+		case qsl_form::INCH:
+			conversion = IN_TO_POINT;
+			break;
+		case qsl_form::MILLIMETER:
+			conversion = MM_TO_POINT;
+			break;
+		case qsl_form::POINT:
+			conversion = 1.0;
+			break;
+	}
+	cwin_x_ = (int)(conversion * col_left_) - left_margin;
+	cwin_y_ =  (int)(conversion * row_top_) - top_margin;
+	card_w_ = (int)(conversion * col_width_);
 	cwin_w_ = num_cols_ * card_w_;
-	card_h_ = (int)(row_card * MM_TO_POINT);
+	card_h_ = (int)(conversion * row_height_);
 	cwin_h_ = num_rows_ * card_h_;
 	//
-	number_pages_ = ((navigation_book_->size() - 1) / items_per_page_) + 1;
+	int last_item = print_label_ ? navigation_book_->size() : navigation_book_->size() - 1;
+	number_pages_ = (last_item / items_per_page_) + 1;
 	return 0;
 }
