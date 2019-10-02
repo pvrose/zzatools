@@ -102,8 +102,6 @@ namespace zzalog {
 		int number_added_;
 		// The number of rejected
 		int number_rejected_;
-		// Timestamp of the previous automatic update
-		string last_auto_update_;
 		// Number of filed being imported 
 		int num_update_files_;
 		// Names of the files
@@ -112,6 +110,10 @@ namespace zzalog {
 		int* empty_files_;
 		// The sources of the auto-imports
 		string* sources_;
+		// Last read timestamps of update files
+		string* last_timestamps_;
+		// Earliest last update
+		string last_timestamp_;
 		// Close is pending
 		bool close_pending_;
 		// Logging mode to enacy after close

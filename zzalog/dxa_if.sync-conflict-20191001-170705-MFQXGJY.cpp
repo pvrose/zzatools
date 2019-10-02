@@ -878,7 +878,7 @@ void dxa_if::create_colour_buttons() {
 	button_num = 0;
 	int button_todo = num_colours;
 	for (int r = 0; r < num_rows; r++) {
-		for (int c = 0; c < num_cols && button_num < num_colours; c++) {
+		for (int c = 0; c < num_cols && button_num < num_colours; r++) {
 			Fl_Box* bn = new Fl_Box(colour_grp_->x() + (c * WBUTTON) + GAP, (r * HBUTTON) + HTEXT + colour_grp_->y(), WBUTTON, HBUTTON);
 			bn->box(FL_BORDER_BOX);
 			bn->labelfont(FONT);
@@ -1142,11 +1142,6 @@ void dxa_if::draw_pins() {
 			status_->misc_status(ST_NOTE, "DXATLAS: Update started");
 			status_->progress(records_to_display_.size(), OT_DXATLAS, "records");
 			int count = 0;
-			// Set the bounds for zooming - always include the home location, these will get when stations are further W, E, N or S
-			double westernmost = home_long_;
-			double easternmost = home_long_;
-			double northernmost = home_lat_;
-			double southernmost = home_lat_;
 
 			// Clear records displayed
 			records_displayed_.clear();
@@ -1225,11 +1220,6 @@ void dxa_if::draw_pins() {
 								//calculate attributes - explicitly convert from double to single precision
 								pt_long = (float)lat_long.longitude;
 								pt_lat = (float)lat_long.latitude;
-								// Adjust furthest in each direction
-								if (lat_long.longitude < westernmost) westernmost = lat_long.longitude;
-								if (lat_long.longitude > easternmost) easternmost = lat_long.longitude;
-								if (lat_long.latitude < southernmost) southernmost = lat_long.latitude;
-								if (lat_long.latitude < northernmost) northernmost = lat_long.latitude;
 								pt_value = 0;
 								//set attributes 
 								index_1 = 0; (void)SafeArrayPutElement(point_data, &index_1, &pt_long);
@@ -1283,29 +1273,6 @@ void dxa_if::draw_pins() {
 			pFont->put_Name(_com_util::ConvertStringToBSTR("Courier New"));
 			call_layer_->PenColor = DxAtlas::clNavy;
 			call_layer_->BrushColor = DxAtlas::clWhite;
-
-			// Now centre on selected record
-			if (map->GetProjection() == DxAtlas::PRJ_RECTANGULAR) {
-				if (records_to_display_.size()) {
-					lat_long_t centre = book_->get_record()->location(false);
-					centre_lat_ = (float)centre.latitude;
-					centre_long_ = (float)centre.longitude;
-					map->PutCenterLatitude(centre_lat_);
-					map->PutCenterLongitude(centre_long_);
-					// Zoom to include all records - get the furthermost from the centre E/W and N/S
-					double zoom_long = 180. / (max(easternmost - centre.longitude, centre.longitude - westernmost));
-					double zoom_lat = 90. / (max(northernmost - centre.latitude, centre.latitude - southernmost));
-					// Now zoom by the smaller of these with 5% margin
-					map->PutZoom((float)min(zoom_long, zoom_lat) * 0.95f);
-				}
-				else {
-					map->PutCenterLatitude(home_lat_);
-					map->PutCenterLongitude(home_long_);
-					map->PutZoom(10.0f);
-				}
-				zoom_value_ = map->GetZoom();
-				save_values();
-			}
 
 			status_->misc_status(ST_OK, "DXATLAS: Update done!");
 			status_->progress(records_to_display_.size());

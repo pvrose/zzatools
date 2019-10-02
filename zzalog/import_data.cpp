@@ -54,7 +54,6 @@ import_data::import_data() :
 	number_checked_ = 0;
 	number_added_ = 0;
 	number_rejected_ = 0;
-	last_auto_update_ = "";
 	num_update_files_ = 0;
 	update_files_ = nullptr;
 	empty_files_ = nullptr;
@@ -103,25 +102,27 @@ bool import_data::start_auto_update() {
 	// Get the number of files to import
 	Fl_Preferences update_settings(settings_, "Real Time Update");
 	Fl_Preferences files_settings(update_settings, "Files");
-	char* temp;
-	update_settings.get("Last Update", temp, "201906010000");
-	last_auto_update_ = temp;
 	num_update_files_ = files_settings.groups();
 	if (num_update_files_ > 0) {
 		// Create auto-import information
 		update_files_ = new string[num_update_files_];
 		empty_files_ = new int[num_update_files_];
 		sources_ = new string[num_update_files_];
+		last_timestamps_ = new string[num_update_files_];
 		// For each auto-impor file
 		for (int i = 0; i < num_update_files_; i++) {
 			// Get the information
 			sources_[i] = files_settings.group(i);
 			Fl_Preferences file_settings(files_settings, sources_[i].c_str());
-			char * filename;
-			file_settings.get("Filename", filename, "");
-			update_files_[i] = filename;
-			free(filename);
+			char * temp;
+			file_settings.get("Filename", temp, "");
+			update_files_[i] = temp;
+			free(temp);
 			file_settings.get("Empty On Read", empty_files_[i], false);
+			// Arbbitrary previous timestamp
+			file_settings.get("Timestamp", temp, "20190601000000");
+			last_timestamps_[i] = temp;
+			free(temp);
 		}
 		// Set immediate timer to actuate the auto-import
 		timer_count_ = 0.0;
@@ -143,10 +144,11 @@ void import_data::auto_update() {
 	status_->misc_status(ST_NOTE, "AUTO IMPORT: File load started");
 	update_mode_ = READ_AUTO;
 
-	// Merge all files into single import
 	delete_contents(true);
+	last_timestamp_ = now(false, "%Y%m%d%H%M%S");
 	// For each auto-import file
 	for (int i = 0; i < num_update_files_; i++) {
+		delete_contents(true);
 		// Timer will only restart when update is complete
 		bool failed = false;
 		char timestamp[16];
@@ -158,12 +160,17 @@ void import_data::auto_update() {
 #else
 		// TODO: Code Posix version of the above
 #endif
-		if (timestamp >= last_auto_update_) {
+		if (timestamp >= last_timestamps_[i]) {
 			// Load data from the auto-import file - concatenating all files
 			char message[256];
 			sprintf(message, "AUTO IMPORT: %s (%s)", update_files_[i].c_str(), sources_[i].c_str());
 			status_->misc_status(ST_NOTE, message);
 			load_data(update_files_[i]);
+			last_timestamps_[i] = timestamp;
+			// Remember the earliest of the files that has changed
+			if (timestamp < last_timestamp_) {
+				last_timestamp_ = timestamp;
+			}
 		}
 		else {
 			char message[256];
@@ -305,17 +312,13 @@ void import_data::update_book() {
 				qso_timestamp += "59";
 			}
 			// If the record is earlier than the last update
-			if (qso_timestamp <= last_auto_update_ && update_mode_ == AUTO_IMPORT) {
+			if (qso_timestamp <= last_timestamp_ && update_mode_ == AUTO_IMPORT) {
 				// We should have already imported so just delete the record
 				discard_update(false);
 				update_ignored = true;
 				status_->progress(number_to_import_ - size());
 			}
 			else {
-				// If this is the last record remember the timestamp as the last time of update
-				if (size() == 1) {
-					last_auto_update_ = qso_timestamp;
-				}
 				// Some fields may require conversion (e.g. eQSL uses RST_SENT from contact's perspective
 				convert_update(import_record);
 				bool found_match = false;
@@ -446,9 +449,6 @@ void import_data::update_book() {
 					number_added_++;
 					accept_update();
 					is_updated = true;
-					if (qso_timestamp < last_auto_update_) {
-						status_->misc_status(ST_LOG, "IMPORT: Updated record before last update");
-					}
 				}
 			}
 			// Update import progress
@@ -525,7 +525,10 @@ void import_data::finish_update(bool merged /*= true*/) {
 	// Restart auto-timer if we aren't waiting to stop it - restarting timer will change update_mode
 	if (update_mode_ == AUTO_IMPORT && !close_pending_) {
 		Fl_Preferences update_settings(settings_, "Real Time Update");
-		update_settings.set("Last Update", last_auto_update_.c_str());
+		Fl_Preferences files_settings(update_settings, "Files");
+		for (int i = 0; i < num_update_files_; i++) {
+			update_settings.set("Timestamp", last_timestamps_[i].c_str());
+		}
 		repeat_auto_timer();
 		// Get book to update the progress 
 		book_->modified(book_->modified());

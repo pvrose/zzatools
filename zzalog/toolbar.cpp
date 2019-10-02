@@ -238,7 +238,7 @@ toolbar::toolbar(int X, int Y, int W, int H, const char* label) :
 	curr_x += H;
 	// Information->QRZ.com
 	bn = new Fl_Button(curr_x, Y, H, H, 0);
-	bn->callback(menu::cb_mi_info_qrz);
+	bn->callback(menu::cb_mi_info_qrz, &search_text_);
 	bn->when(FL_WHEN_RELEASE);
 	bn->image(new Fl_RGB_Image(ICON_QRZ_COM, 16, 16, 4));
 	bn->tooltip("Look up contact in QRZ.com");
