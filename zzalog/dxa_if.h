@@ -51,6 +51,13 @@ namespace zzalog {
 			AC_LOGMODE,    // Separate colour per logged (ADIF-defined) mode/submode
 			AC_AWARDMODE   // Separate colour per DXCC defined mode
 		};
+		// Centre map position
+		enum centre_t {
+			HOME,          // Home location
+			SELECTED,      // Selected QSO
+			GROUP,         // Centre of chosen QSOs
+			ZERO,          // zero longitude/latitude
+		};
 
 	public:
 		dxa_if();
@@ -74,6 +81,8 @@ namespace zzalog {
 		static void cb_ch_qsos(Fl_Widget* w, void* v);
 		// Colour mode choice
 		static void cb_ch_colour(Fl_Widget* w, void* v);
+		// Centre choice
+		static void cb_ch_centre(Fl_Widget* w, void* v);
 		// Add/subtract SWL reports
 		static void cb_ch_swlen(Fl_Widget* w, void* v);
 		// Open 
@@ -129,6 +138,13 @@ namespace zzalog {
 		DxAtlas::EnumColor convert_colour(Fl_Color colour);
 		// Update location widgets
 		void update_loc_widgets();
+		// Centre map
+		void centre_map();
+		// On specific centre
+		void centre_map(lat_long_t centre);
+		// Zoom to centre
+		void zoom_centre(lat_long_t centre, bool full);
+
 
 	protected:
 		// Radio button valur for QSOs to display
@@ -144,11 +160,11 @@ namespace zzalog {
 		// Name of the home location of the selected record
 		string location_name_;
 		// Latitude of home station...
-		float home_lat_;
+		double home_lat_;
 		// ...and in degrees,minutes and seconds
 		string home_lat_dms_;
 		// Longitude of home station...
-		float home_long_;
+		double home_long_;
 		// ...and in degrees,minutes and seconds
 		string home_long_dms_;
 		// Include SWL reports on map
@@ -156,9 +172,9 @@ namespace zzalog {
 		// List of texts to use in the colour buttons
 		vector<string> colours_used_;
 		// Latitude for the centre of the map
-		float centre_lat_;
+		double centre_lat_;
 		// Longitude for the centre of the map
-		float centre_long_;
+		double centre_long_;
 		// width of the DxAtlas window
 		int atlas_width_;
 		// height of the DxAtlas window
@@ -182,6 +198,15 @@ namespace zzalog {
 		vector<string> locations_;
 		// Zoom value
 		float zoom_value_;
+		// Centre mode
+		centre_t centre_mode_;
+		// Selected location
+		lat_long_t selected_locn_;
+		// Extrems of display range
+		double westernmost_;
+		double easternmost_;
+		double northernmost_;
+		double southernmost_;
 
 		Fl_Group* colour_grp_;
 		// Colour buttons - instanced in colour_win_
@@ -191,6 +216,7 @@ namespace zzalog {
 		Fl_Widget* locator_op_;
 		Fl_Widget* lat_dms_op_;
 		Fl_Widget* lon_dms_op_;
+		Fl_Widget* centre_ch_;
 	};
 
 }

@@ -80,7 +80,6 @@ dxa_if::dxa_if() :
 		DxAtlas::ICustomLayersPtr pin_layers = map->GetCustomLayers();
 		pin_layers->Clear();
 		// Add pins
-		selected_locn_ = book_->get_record()->location(false);
 		enable_widgets();
 		get_records();
 		get_colours(false);
@@ -208,8 +207,8 @@ void dxa_if::create_form() {
 	ch12->add("By award mode");
 	ch12->value((int)atlas_colour_);
 	// Choice - where to centre the map
-	Fl_Choice* ch13 = new Fl_Choice(ch12->x(), ch12->y() + ch12->h() + HTEXT, ch12->w(), ch12->h(), "Centre on...");
-	ch13->align(FL_ALIGN_LEFT | FL_ALIGN_TOP);
+	Fl_Choice* ch13 = new Fl_Choice(ch12->x(), ch12->y() + ch12->h() + HTEXT, ch12->w(), ch12->h(), "Centre");
+	ch13->align(FL_ALIGN_LEFT || FL_ALIGN_TOP);
 	ch13->labelfont(FONT);
 	ch13->labelsize(FONT_SIZE);
 	ch13->textfont(FONT);
@@ -494,7 +493,6 @@ HRESULT dxa_if::cb_map_changed(enum DxAtlas::EnumMapChange change_kind) {
 			break;
 		}
 		// Save new configuration
-		enable_widgets();
 		save_values();
 	}
 	return S_OK;
@@ -1369,7 +1367,6 @@ void dxa_if::update(hint_t hint) {
 	case HT_SELECTED:
 	case HT_NO_DATA:
 		// Data has changed 
-		selected_locn_ = book_->get_record()->location(false);
 		enable_widgets();
 		get_records();
 		get_colours(false);
@@ -1378,7 +1375,6 @@ void dxa_if::update(hint_t hint) {
 
 	case HT_EXTRACTION:
 		// The search results have changed
-		selected_locn_ = book_->get_record()->location(false);
 		if (qso_display_ == AQ_SEARCH) {
 			// Data has changed 
 			enable_widgets();
