@@ -145,10 +145,10 @@ void import_data::auto_update() {
 	update_mode_ = READ_AUTO;
 
 	delete_contents(true);
+	// Set last timestamp to the latest it can be
 	last_timestamp_ = now(false, "%Y%m%d%H%M%S");
 	// For each auto-import file
 	for (int i = 0; i < num_update_files_; i++) {
-		delete_contents(true);
 		// Timer will only restart when update is complete
 		bool failed = false;
 		char timestamp[16];
@@ -160,7 +160,7 @@ void import_data::auto_update() {
 #else
 		// TODO: Code Posix version of the above
 #endif
-		if (timestamp >= last_timestamps_[i]) {
+		if (timestamp > last_timestamps_[i]) {
 			// Load data from the auto-import file - concatenating all files
 			char message[256];
 			sprintf(message, "AUTO IMPORT: %s (%s)", update_files_[i].c_str(), sources_[i].c_str());
@@ -527,7 +527,8 @@ void import_data::finish_update(bool merged /*= true*/) {
 		Fl_Preferences update_settings(settings_, "Real Time Update");
 		Fl_Preferences files_settings(update_settings, "Files");
 		for (int i = 0; i < num_update_files_; i++) {
-			update_settings.set("Timestamp", last_timestamps_[i].c_str());
+			Fl_Preferences modem_settings(files_settings, sources_[i].c_str());
+			modem_settings.set("Timestamp", last_timestamps_[i].c_str());
 		}
 		repeat_auto_timer();
 		// Get book to update the progress 

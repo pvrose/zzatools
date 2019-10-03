@@ -223,7 +223,7 @@ void files_dialog::create_form(int X, int Y) {
 		// Input - name of application generating the auto-import
 		in_auto_src[i] = new intl_input(X + COL3, Y + *ROW1[i], WBUTTON, HTEXT);
 		in_auto_src[i]->callback(cb_value<intl_input, string>, &(auto_src_[i]));
-		in_auto_src[i]->when(FL_WHEN_NOT_CHANGED);
+		in_auto_src[i]->when(FL_WHEN_CHANGED);
 		in_auto_src[i]->textsize(FONT_SIZE);
 		in_auto_src[i]->value(auto_src_[i].c_str());
 		in_auto_src[i]->tooltip("Application generating the auto-import");
