@@ -39,6 +39,15 @@ printer::printer(object_t type) :
 	, cwin_y_(0)
 	, num_cols_(0)
 	, num_rows_(0)
+	, address_(nullptr)
+	, col_left_(nan(""))
+	, col_width_(nan(""))
+	, font_add_(FONT)
+	, print_label_(false)
+	, row_height_(nan(""))
+	, row_top_(nan(""))
+	, size_add_(FONT_SIZE)
+	, unit_(qsl_form::MILLIMETER)
 {
 	fields_.clear();
 }
