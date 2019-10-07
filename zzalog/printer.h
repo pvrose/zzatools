@@ -70,10 +70,10 @@ namespace zzalog {
 		// Label parameters
 		int num_rows_;
 		int num_cols_;
-		float col_left_;
-		float col_width_;
-		float row_top_;
-		float row_height_;
+		double col_left_;
+		double col_width_;
+		double row_top_;
+		double row_height_;
 		// Address label parameters
 		bool print_label_;
 		Fl_Font font_add_;

@@ -245,8 +245,6 @@ void log_table::update(hint_t hint, unsigned int record_num_1, unsigned int reco
 // Override of Fl_Table_Row method to provide data and formats for each cell
 void log_table::draw_cell(TableContext context, int R, int C, int X, int Y, int W, int H) {
 	string text;
-	int height;
-	int width;
 	switch (context) {
 
 	case CONTEXT_STARTPAGE:

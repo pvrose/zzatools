@@ -688,9 +688,9 @@ string to_hex(string data) {
 // Encode hex
 string to_ascii(string data) {
 	string result = "";
-	int ix = 0;
+	unsigned int ix = 0;
 	while (ix < data.length()) {
-		result += to_ascii(data, ix);
+		result += to_ascii(data, (signed int&)ix);
 	}
 	return result;
 }
@@ -708,7 +708,7 @@ string to_hex(unsigned char data) {
 // Encode single character
 unsigned char to_ascii(string data, int&ix) {
 	// Skip non hex
-	while (!isxdigit(data[ix]) && (ix < data.length())) ix++;
+	while (!isxdigit(data[ix]) && ((unsigned)ix < data.length())) ix++;
 	if (ix == data.length()) return 0;
 	size_t next_ix;
 	int val = stoi(data.substr(ix, 2), &next_ix, 16);

@@ -71,7 +71,7 @@ struct browser_data_t {
 // Template callback to get a DATA value from a WIDGET widget - compiler should catch incompatible value types
 template <class WIDGET, class DATA>
 static void cb_value(Fl_Widget* w, void* v) {
-	DATA value = ((WIDGET*)w)->value();
+	DATA value = (DATA)((WIDGET*)w)->value();
 	DATA* target = (DATA*)v;
 	*target = value;
 }

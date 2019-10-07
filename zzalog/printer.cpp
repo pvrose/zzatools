@@ -401,7 +401,7 @@ int printer::card_properties() {
 	add_settings.get("Font", (int)font_add_, FONT);
 	add_settings.get("Size", size_add_, FONT_SIZE);
 	Fl_Preferences text_settings(add_settings, "Text");
-	int num_lines = text_settings.entries();
+	unsigned int num_lines = text_settings.entries();
 	char** text = new char* [num_lines];
 	int length = 0;
 	for (unsigned int i = 0; i < num_lines; i++) {
@@ -412,7 +412,7 @@ int printer::card_properties() {
 	}
 	address_ = new char[length + 1];
 	memset(address_, 0, length + 1);
-	for (int i = 0; i < num_lines; i++) {
+	for (unsigned int i = 0; i < num_lines; i++) {
 		strcat(address_, text[i]);
 		strcat(address_, "\n");
 	}
@@ -421,7 +421,7 @@ int printer::card_properties() {
 	int top_margin = 0;
 	int left_margin = 0;
 	margins(&left_margin, &top_margin, nullptr, nullptr);
-	float conversion;
+	double conversion = nan("");
 	switch (unit_) {
 		case qsl_form::INCH:
 			conversion = IN_TO_POINT;

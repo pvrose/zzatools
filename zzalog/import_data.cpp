@@ -88,7 +88,7 @@ void import_data::cb_timer_imp(void* v) {
 	else {
 		// Restart the timer
 		Fl::repeat_timeout(1.0, cb_timer_imp, v);
-		status_->progress(that->timer_count_);
+		status_->progress((int)that->timer_count_);
 	}
 }
 
@@ -266,7 +266,7 @@ void import_data::repeat_auto_timer() {
 	// Restart the timer
 	Fl::repeat_timeout(1.0, cb_timer_imp, (void*)this);
 	// Tell user - display countdown so that the bar gets bigger as it counts down the seconds
-	status_->progress(timer_count_, OT_IMPORT, "seconds", true);
+	status_->progress((int)timer_count_, OT_IMPORT, "seconds", true);
 	update_mode_ = WAIT_AUTO;
 }
 

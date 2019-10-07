@@ -209,7 +209,7 @@ void qsl_design::create_form(int X, int Y) {
 	vip123->textfont(FONT);
 	vip123->textsize(FONT_SIZE);
 	vip123->align(FL_ALIGN_LEFT);
-	vip123->callback(cb_value<Fl_Value_Input, float>, &col_left_);
+	vip123->callback(cb_value<Fl_Value_Input, double>, &col_left_);
 	vip123->when(FL_WHEN_ENTER_KEY);
 	vip123->tooltip("Please specify the position of the first column");
 	Fl_Value_Input* vip124 = new Fl_Value_Input(X_124, Y_12, WBUTTON, HBUTTON, "Spacing");
@@ -219,7 +219,7 @@ void qsl_design::create_form(int X, int Y) {
 	vip124->textfont(FONT);
 	vip124->textsize(FONT_SIZE);
 	vip124->align(FL_ALIGN_LEFT);
-	vip124->callback(cb_value<Fl_Value_Input, float>, &col_width_);
+	vip124->callback(cb_value<Fl_Value_Input, double>, &col_width_);
 	vip124->when(FL_WHEN_ENTER_KEY);
 	vip124->tooltip("Please specify the spacing between columns");
 	// Row 2A - height parameters
@@ -250,7 +250,7 @@ void qsl_design::create_form(int X, int Y) {
 	vip12A3->textfont(FONT);
 	vip12A3->textsize(FONT_SIZE);
 	vip12A3->align(FL_ALIGN_LEFT);
-	vip12A3->callback(cb_value<Fl_Value_Input, float>, &row_top_);
+	vip12A3->callback(cb_value<Fl_Value_Input, double>, &row_top_);
 	vip12A3->when(FL_WHEN_ENTER_KEY);
 	vip12A3->tooltip("Please specify the position of the first row");
 	Fl_Value_Input* vip12A4 = new Fl_Value_Input(X_124, Y_12A, WBUTTON, HBUTTON, "Spacing");
@@ -260,7 +260,7 @@ void qsl_design::create_form(int X, int Y) {
 	vip12A4->textfont(FONT);
 	vip12A4->textsize(FONT_SIZE);
 	vip12A4->align(FL_ALIGN_LEFT);
-	vip12A4->callback(cb_value<Fl_Value_Input, float>, &row_height_);
+	vip12A4->callback(cb_value<Fl_Value_Input, double>, &row_height_);
 	vip12A4->when(FL_WHEN_ENTER_KEY);
 	vip12A4->tooltip("Please specify the spacing between rows");
 	// Row 3 - TL and TR values

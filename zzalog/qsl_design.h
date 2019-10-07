@@ -121,13 +121,13 @@ namespace zzalog {
 		// Number of columns to print
 		int num_cols_;
 		// Column width
-		float col_width_;
+		double col_width_;
 		// Row height
-		float row_height_;
+		double row_height_;
 		// First column position
-		float col_left_;
+		double col_left_;
 		// First row position
-		float row_top_;
+		double row_top_;
 
 	};
 
