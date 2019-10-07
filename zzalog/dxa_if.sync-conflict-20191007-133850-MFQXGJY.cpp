@@ -695,11 +695,11 @@ void dxa_if::home_location() {
 	// Get home location for the current active location
 	lat_long_t home_lat_long = grid_to_latlong(locator_);
 	// Convert to single precision explicitly
-	home_lat_ = home_lat_long.latitude;
-	home_long_ = home_lat_long.longitude;
+	home_lat_ = (float)(home_lat_long.latitude);
+	home_long_ = (float)(home_lat_long.longitude);
 	// Convert to ° ' " N/E/S/W format
-	home_lat_dms_ = degrees_to_dms((float)home_lat_, true);
-	home_long_dms_ = degrees_to_dms((float)home_long_, false);
+	home_lat_dms_ = degrees_to_dms(home_lat_, true);
+	home_long_dms_ = degrees_to_dms(home_long_, false);
 	// Add uncertainty
 	switch (locator_.length()) {
 	case 0:
@@ -801,7 +801,6 @@ void dxa_if::disconnect_dxatlas(bool dxatlas_exit) {
 		// Maybe allow FLTK scheduler to let DxAtlas do its stuff
 		Fl::wait(0.1);
 		status_->misc_status(ST_WARNING, "DXATLAS: Disconnected");
-		enable_widgets();
 	}
 }
 
@@ -1379,7 +1378,7 @@ void dxa_if::update(hint_t hint) {
 	case HT_SELECTED:
 		selected_locn_ = book_->get_record()->location(false);
 		// Only redraw if we are displaying selected or centring on selected
-		if (centre_mode_ == SELECTED || qso_display_ == AQ_CURRENT) {
+		if (centre_mode_ == SELECTED || qso_display_ == AQ_SEARCH) {
 			// Data has changed 
 			enable_widgets();
 			get_records();

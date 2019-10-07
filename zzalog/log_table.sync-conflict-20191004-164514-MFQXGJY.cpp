@@ -245,13 +245,23 @@ void log_table::update(hint_t hint, unsigned int record_num_1, unsigned int reco
 // Override of Fl_Table_Row method to provide data and formats for each cell
 void log_table::draw_cell(TableContext context, int R, int C, int X, int Y, int W, int H) {
 	string text;
-	int height;
-	int width;
 	switch (context) {
 
 	case CONTEXT_STARTPAGE:
 		// Set the table font
 		fl_font(FONT, FONT_SIZE);
+		int height = col_header_height();
+		int width = row_header_width();
+		fl_push_clip(0, 0, width, height);
+		{
+			fl_color(col_header_color());
+			fl_rectf(0, 0, width, height);
+			Fl_Font save = fl_font();
+			fl_font(FONT | FL_ITALIC, FONT_SIZE);
+			fl_draw("QSO №", 0, 0, width, height, FL_ALIGN_CENTER);
+			fl_font(save, FONT_SIZE);
+		}
+		fl_pop_clip();
 		return;
 
 	case CONTEXT_ENDPAGE:
