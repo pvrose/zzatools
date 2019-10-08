@@ -410,13 +410,11 @@ void add_rig_if() {
 					}
 					else {
 						// Connect to rig OK - see if we are a digital mode
-						if ((rig_if_->mode() == GM_DIGL || rig_if_->mode() == GM_DIGU) && import_data_->auto_enable()) {
+						if ((rig_if_->mode() == GM_DIGL || rig_if_->mode() == GM_DIGU) && import_data_->start_auto_update()) {
 							// start auto-data mode so we import the log written by the mode app
 							status_->misc_status(ST_WARNING, "RIG: Data mode - assume logging by data modem app");
-							if (import_data_->start_auto_update()) {
-								done = true;
-							}
 							// Change logging mode to IMPORTED as will be using a data-modem
+							done = true;
 							menu_->logging(LM_IMPORTED);
 						}
 						else if (!rig_if_->is_good()) {
@@ -613,6 +611,7 @@ void tidy() {
 	delete extract_records_;
 	delete import_data_;
 	delete book_;
+	delete intl_dialog_;
 	delete spec_data_;
 	delete pfx_data_;
 	delete tabbed_view_;

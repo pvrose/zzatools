@@ -125,10 +125,11 @@ bool import_data::start_auto_update() {
 	}
 	else {
 		// No files to update - tell calling routine to open rig again and also change flag in menu
-		status_->misc_status(ST_WARNING, "AUTO IMPORT: No files available to import, re-opening rig.");
-		add_rig_if();
+		status_->misc_status(ST_WARNING, "AUTO IMPORT: No files available to import.");
+		return false;
 	}
 	menu_->update_items();
+	return true;
 }
 
 // Start an automatic (on timer) update from the defined locations

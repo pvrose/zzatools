@@ -27,7 +27,6 @@ intl_dialog::intl_dialog() :
 		// create the dialog
 		create_form();
 	}
-	add_sub_window(this);
 }
 
 // Create the form

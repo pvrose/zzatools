@@ -2,7 +2,7 @@
 #define __QSL_FORM__
 
 #include "record.h"
-
+#include "drawing.h"
 #include <string>
 #include <vector>
 

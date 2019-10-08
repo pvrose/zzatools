@@ -151,9 +151,8 @@ namespace zzalog {
 	{ "&Prefix", 0, menu::cb_mi_ref_items, (void*)RI_NICK, FL_MENU_RADIO },
 	{ "&Name", 0, menu::cb_mi_ref_items, (void*)RI_NAME, FL_MENU_RADIO | FL_MENU_DIVIDER },
 	{ "Add &details", 0, menu::cb_mi_ref_details, nullptr, FL_MENU_TOGGLE },
-	// TODO: implement a real callback for this menu item
-	{ "&Reload data", 0, menu::cb_mi_ref_reload, 0},
 	{ 0 },
+	{ "&Reload data", 0, menu::cb_mi_ref_reload, 0},
 	{ 0 },
 	{ "Re&port", 0, 0, 0, FL_SUBMENU },
 	{ "&Clear", 0, menu::cb_mi_rep_filter, (void*)RF_NONE, FL_MENU_RADIO },
@@ -226,6 +225,7 @@ extern scratchpad* scratchpad_;
 extern qrz_handler* qrz_handler_;
 
 extern void add_rig_if();
+extern void add_data();
 extern void main_window_label(string text);
 extern void backup_file(bool force, bool retrieve = false);
 extern void set_recent_file(string filename);
@@ -1145,8 +1145,19 @@ void menu::cb_mi_ref_details(Fl_Widget* w, void* v) {
 // Reference->Reload Data - reload the specification data
 // v is not used
 void menu::cb_mi_ref_reload(Fl_Widget* w, void* v) {
+	// Turn rig timer off in case it fires while we are reloading
+	if (rig_if_ && rig_if_->is_open()) {
+		Fl::remove_timeout(rig_if::cb_timer_rig);
+	}
 	// Get spec_data_ to reload itself
-	spec_data_->load_data(true);
+	delete pfx_data_;
+	delete spec_data_;
+	delete intl_dialog_;
+	add_data();
+	// Turn the rig timer back on
+	if (rig_if_ && rig_if_->is_open()) {
+		Fl::add_timeout(0.0, rig_if::cb_timer_rig);
+	}
 }
 
 // Report->Clear etc. - set the report filter
