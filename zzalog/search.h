@@ -47,6 +47,37 @@ namespace zzalog {
 		bool negate_results;            // use records that do not match criteria
 		string field_name;              // Field name for criterion = FIELD
 		string pattern;                 // Matching pattern
+
+		search_criteria_t() :
+			condition(XC_DXCC),
+			by_regex(false),
+			by_dates(false),
+			from_date(""),
+			to_date(""),
+			band("Any"),
+			mode("Any"),
+			confirmed_eqsl(false),
+			confirmed_lotw(false),
+			confirmed_card(false),
+			combi_mode(XM_NEW),
+			negate_results(false),
+			field_name(""),
+			pattern("") {};
+		search_criteria_t(search_cond_t a, bool b, bool c, string d, string e, string f, string g, bool h, bool i, bool j, search_combi_t k, bool l, string m, string n) :
+			condition(a),
+			by_regex(b),
+			by_dates(c),
+			from_date(d),
+			to_date(e),
+			band(f),
+			mode(g),
+			confirmed_eqsl(h),
+			confirmed_lotw(i),
+			confirmed_card(j),
+			combi_mode(k),
+			negate_results(l),
+			field_name(m),
+			pattern(n) {};
 	};
 
 }

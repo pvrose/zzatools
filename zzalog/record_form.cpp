@@ -1174,6 +1174,9 @@ void record_form::set_image() {
 						else if (file_types[i] == ".bmp") {
 							raw_image = new Fl_BMP_Image(full_name.c_str());
 						}
+						else {
+							raw_image = nullptr;
+						}
 						if (raw_image && raw_image->fail()) {
 							// File didn't load OK 
 							if (record_1_->item("APP_ZZA_ERROR").length() > 0) {

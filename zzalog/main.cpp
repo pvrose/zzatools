@@ -384,6 +384,10 @@ void add_rig_if() {
 		case RIG_NONE:
 			status_->misc_status(ST_NOTE, "RIG: Not connecting one");
 			rig_if_ = nullptr;
+			break;
+		default:
+			rig_if_ = nullptr;
+			break;
 		}
 		if (rig_if_ == nullptr) {
 			// No handler defined - assume manual logging

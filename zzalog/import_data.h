@@ -68,10 +68,8 @@ namespace zzalog {
 		void merge_data();
 		// load data for import
 		bool load_data(string filename);
-		// Auto-update enabled
-		bool auto_enable();
-		void auto_enable(bool enabled);
-
+		// Number of update files
+		int number_update_files();
 
 	protected:
 		// repeat the auto-import timer
@@ -120,8 +118,6 @@ namespace zzalog {
 		logging_mode_t next_logging_mode_;
 		// Timer count (in seconds)
 		double timer_count_;
-		// Auto-update enbled
-		bool auto_enable_;
 		// Original value of book_->enable_save_
 		bool old_enable_save_;
 

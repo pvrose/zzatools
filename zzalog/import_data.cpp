@@ -62,10 +62,6 @@ import_data::import_data() :
 	close_pending_ = false;
 	next_logging_mode_ = LM_OFF_AIR;
 	timer_count_ = nan("");
-	Fl_Preferences update_settings(settings_, "Real Time Update");
-	int enable;
-	update_settings.get("Enabled", enable, (int)true);
-	auto_enable_ = (bool)enable;
 }
 
 // Destructor
@@ -73,8 +69,6 @@ import_data::~import_data()
 {
 	delete[] empty_files_;
 	delete[] update_files_;
-	Fl_Preferences update_settings(settings_, "Real Time Update");
-	update_settings.set("Enabled", auto_enable_);
 }
 
 // Timer callback - Called every second so that a countdown can be displayed
@@ -119,7 +113,7 @@ bool import_data::start_auto_update() {
 			update_files_[i] = temp;
 			free(temp);
 			file_settings.get("Empty On Read", empty_files_[i], false);
-			// Arbbitrary previous timestamp
+			// Arbitrary previous timestamp
 			file_settings.get("Timestamp", temp, "20190601000000");
 			last_timestamps_[i] = temp;
 			free(temp);
@@ -131,11 +125,10 @@ bool import_data::start_auto_update() {
 	}
 	else {
 		// No files to update - tell calling routine to open rig again and also change flag in menu
-		status_->misc_status(ST_WARNING, "AUTO IMPORT: No files available to import.");
-		auto_enable_ = false;
+		status_->misc_status(ST_WARNING, "AUTO IMPORT: No files available to import, re-opening rig.");
+		add_rig_if();
 	}
 	menu_->update_items();
-	return auto_enable_;
 }
 
 // Start an automatic (on timer) update from the defined locations
@@ -166,11 +159,11 @@ void import_data::auto_update() {
 			sprintf(message, "AUTO IMPORT: %s (%s)", update_files_[i].c_str(), sources_[i].c_str());
 			status_->misc_status(ST_NOTE, message);
 			load_data(update_files_[i]);
-			last_timestamps_[i] = timestamp;
 			// Remember the earliest of the files that has changed
-			if (timestamp < last_timestamp_) {
-				last_timestamp_ = timestamp;
+			if (last_timestamps_[i] < last_timestamp_) {
+				last_timestamp_ = last_timestamps_[i];
 			}
+			last_timestamps_[i] = timestamp;
 		}
 		else {
 			char message[256];
@@ -787,15 +780,7 @@ void import_data::process_lotw_header() {
 	}
 }
 
-// Menu enable of auto update
-void import_data::auto_enable(bool enabled) {
-	auto_enable_ = enabled;
-	if (auto_enable_ && update_mode_ == NONE) {
-		start_auto_update();
-	}
-}
-
-// Return the current state of auto-enable
-bool import_data::auto_enable() {
-	return auto_enable_;
+// Number of update files
+int import_data::number_update_files() {
+	return num_update_files_;
 }

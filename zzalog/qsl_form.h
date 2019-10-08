@@ -36,6 +36,17 @@ namespace zzalog {
 			Fl_Color colour;
 			int font_size;
 			Fl_Font font;
+
+			qsl_widget() :
+				text(""),
+				colour(FL_BLACK),
+				font_size(FONT_SIZE),
+				font(FONT) {};
+			qsl_widget(string t, Fl_Color c, int s, Fl_Font f) :
+				text(t),
+				colour(c),
+				font_size(s),
+				font(f) {};
 		};
 
 		// Widget set position

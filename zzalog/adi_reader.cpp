@@ -30,6 +30,7 @@ adi_reader::adi_reader()
 	, previous_count_(0)
 	, byte_count_(0)
 	, file_size_(0)
+	, my_book_(nullptr)
 {
 }
 

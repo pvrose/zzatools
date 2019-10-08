@@ -37,6 +37,7 @@ qsl_design::qsl_design(int X, int Y, int W, int H, const char* label) :
 	, num_lines_(0)
 	, include_address_label_(false)
 	, show_address_(false)
+	, font_add_(FONT)
 {
 	current_data_ = new qsl_form::qsl_widget({ "Text here...", FL_BLACK, 10, FL_HELVETICA });
 	do_creation(X, Y);

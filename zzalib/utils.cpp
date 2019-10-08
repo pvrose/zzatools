@@ -464,7 +464,7 @@ string degrees_to_dms(float value, bool is_latitude) {
 	// Divide by 60 to get number of whole minutes
 	num_minutes = (int)num_seconds / 60;
 	// Get the number of additional seconds
-	num_seconds = num_seconds - (double)((long)num_minutes * 60);
+	num_seconds = num_seconds - (double)(((long)num_minutes) * 60);
 	// Divide by 60 to get number of degress
 	num_degrees = num_minutes / 60;
 	// Get additional minutes

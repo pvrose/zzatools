@@ -15,7 +15,19 @@ namespace zzalog {
 		string field;
 		string header;
 		unsigned int width;
+
+		field_info_t::field_info_t() :
+			field(""),
+			header(""),
+			width(0)
+		{}
+		field_info_t::field_info_t(string f, string h, unsigned int w) :
+			field(f),
+			header(h),
+			width(w)
+		{}
 	};
+
 
 	// ADIF field ordering applications - order used for radio button and 
 	enum field_ordering_t {

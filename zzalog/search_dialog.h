@@ -47,23 +47,23 @@ namespace zzalog {
 		// Radio button callback parameters - basic condition
 		radio_param_t condition_params_[10] =
 		{
-			{ XC_DXCC, (int*)&criteria_->condition },
-			{ XC_GEO, (int*)&criteria_->condition },
-			{ XC_CQZ, (int*)&criteria_->condition },
-			{ XC_ITUZ, (int*)&criteria_->condition },
-			{ XC_CONT, (int*)&criteria_->condition },
-			{ XC_SQ2, (int*)&criteria_->condition },
-			{ XC_SQ4, (int*)&criteria_->condition },
-			{ XC_CALL, (int*)&criteria_->condition },
-			{ XC_UNFILTERED, (int*)&criteria_->condition },
-			{ XC_FIELD, (int*)&criteria_->condition }
+			{ XC_DXCC, nullptr },
+			{ XC_GEO, nullptr },
+			{ XC_CQZ, nullptr },
+			{ XC_ITUZ, nullptr },
+			{ XC_CONT, nullptr },
+			{ XC_SQ2, nullptr },
+			{ XC_SQ4, nullptr },
+			{ XC_CALL, nullptr },
+			{ XC_UNFILTERED, nullptr },
+			{ XC_FIELD, nullptr }
 		};
 		// Radio button callback parameters - combination mode
 		radio_param_t combination_params_[3] =
 		{
-			{ XM_NEW, (int*)&criteria_->combi_mode },
-			{ XM_AND, (int*)&criteria_->combi_mode },
-			{ XM_OR, (int*)&criteria_->combi_mode }
+			{ XM_NEW, nullptr },
+			{ XM_AND, nullptr },
+			{ XM_OR, nullptr }
 		};
 		// Labels for the condition radio buttons 
 		const string condition_labels_[10] =

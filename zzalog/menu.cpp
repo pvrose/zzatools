@@ -139,8 +139,7 @@ namespace zzalog {
 	{ "Download e&QSL", 0, menu::cb_mi_download, (void*)(long)import_data::EQSL_UPDATE },
 	{ "Download &LotW", 0, menu::cb_mi_download, (void*)(long)import_data::LOTW_UPDATE, FL_MENU_DIVIDER },
 	{ "&Merge", 0, menu::cb_mi_imp_merge, nullptr, FL_MENU_DIVIDER },
-	{ "&Cancel", 0, menu::cb_mi_imp_cancel, nullptr, FL_MENU_DIVIDER },
-	{ "&Enable Auto-Update", 0, menu::cb_mi_imp_enauto, nullptr, FL_MENU_TOGGLE },
+	{ "&Cancel", 0, menu::cb_mi_imp_cancel, nullptr },
 	{ 0 },
 	{ "&Reference", 0, 0, 0, FL_SUBMENU },
 	{ "&Prefix", 0, 0, 0, FL_SUBMENU },
@@ -590,6 +589,7 @@ void menu::cb_mi_parse_log(Fl_Widget* w, void* v) {
 		// If command parsing allowed
 		bool abandon = false;
 		int record_num = -1;
+		int item_number = 0;
 		// Initialise progress
 		status_->misc_status(ST_NOTE, "PARSE LOG: Started");
 		status_->progress(num_items, navigation_book_->book_type(), "records");
@@ -600,6 +600,7 @@ void menu::cb_mi_parse_log(Fl_Widget* w, void* v) {
 			parse_result_t parse_result = pfx_data_->parse(record);
 			bool changed = record->update_band(true);
 			record_num = navigation_book_->record_number(i);
+			item_number = i;
 			// Update progress
 			status_->progress(i);
 			if (changed || parse_result == PR_CHANGED) {
@@ -616,7 +617,7 @@ void menu::cb_mi_parse_log(Fl_Widget* w, void* v) {
 		}
 		// update views with last record parsed selected
 		status_->misc_status(ST_OK, "PARSE LOG: Done!");
-		navigation_book_->selection(record_num, HT_CHANGED);
+		navigation_book_->selection(item_number, HT_CHANGED);
 	}
 #ifndef _DEBUG
 	// Save document
@@ -653,6 +654,7 @@ void menu::cb_mi_valid8_log(Fl_Widget* w, void* v) {
 	fl_cursor(FL_CURSOR_WAIT);
 		// Command validation is enabled
 	int record_num = -1;
+	int item_number = 0;
 	int num_items = navigation_book_->size();
 	bool changed = false;
 	// Initialse progress
@@ -662,6 +664,7 @@ void menu::cb_mi_valid8_log(Fl_Widget* w, void* v) {
 	// For each record in selected book unless user has indicated to quit
 	for (int i = 0; i < num_items && spec_data_->do_continue(); i++) {
 		record_num = navigation_book_->record_number(i);
+		item_number = i;
 		record* record = navigation_book_->get_record(i, false);
 		// validate it
 		if (spec_data_->validate(record, record_num)) {
@@ -671,7 +674,7 @@ void menu::cb_mi_valid8_log(Fl_Widget* w, void* v) {
 	}
 	status_->misc_status(ST_OK, "VALIDATE LOG: Done!");
 	if (changed) {
-		navigation_book_->selection(record_num, HT_MINOR_CHANGE);
+		navigation_book_->selection(item_number, HT_MINOR_CHANGE);
 	}
 #ifndef _DEBUG
 	// Save document
@@ -1015,16 +1018,6 @@ void menu::cb_mi_imp_cancel(Fl_Widget* w, void* v) {
 	navigation_book_ = book_;
 	tabbed_view_->activate_pane(OT_MAIN, true);
 	navigation_book_->selection(0, HT_ALL);
-}
-
-// Import->Enable Auto Update
-// v is not used
-void menu::cb_mi_imp_enauto(Fl_Widget* w, void* v) {
-	// Get the value of the checked menu item
-	Fl_Menu_* menu = (Fl_Menu_*)w;
-	const Fl_Menu_Item* item = menu->mvalue();
-	bool value = item->value();
-	import_data_->auto_enable(value);
 }
 
 // Extract->Clear
@@ -1612,7 +1605,6 @@ void menu::update_items() {
 		bool save_enabled = book_->save_enabled();
 		bool delete_enabled = book_->delete_enabled();
 		bool web_enabled = book_ && book_->get_record() && book_->get_record()->item_exists("WEB");
-		bool auto_enable = import_data_ && import_data_->auto_enable();
 		// Get all relevant menu item indices
 		int index_save = find_index("&File/&Save");
 		int index_saveas = find_index("&File/Save &As");
@@ -1767,13 +1759,6 @@ void menu::update_items() {
 		}
 		else {
 			mode(index_web, mode(index_web) | FL_MENU_INACTIVE);
-		}
-		// Import->Enable Auto-Update
-		if (auto_enable) {
-			mode(index_auto_enable, mode(index_auto_enable) | FL_MENU_VALUE);
-		}
-		else {
-			mode(index_auto_enable, mode(index_auto_enable) & ~FL_MENU_VALUE);
 		}
 		// Update logging commands and rig status
 		logging(logging());

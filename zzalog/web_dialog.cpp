@@ -36,6 +36,10 @@ web_dialog::web_dialog(int X, int Y, int W, int H, const char* label) :
 	, qrz_enable_(false)
 	, qrz_username_("")
 	, qrz_password_("")
+	, grp_eqsl_(nullptr)
+	, grp_lotw_(nullptr)
+	, grp_qrz_(nullptr)
+	, qrz_xml_merge_(false)
 {
 	image_widgets_.clear();
 

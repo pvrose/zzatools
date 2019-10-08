@@ -801,7 +801,9 @@ void dxa_if::disconnect_dxatlas(bool dxatlas_exit) {
 		// Maybe allow FLTK scheduler to let DxAtlas do its stuff
 		Fl::wait(0.1);
 		status_->misc_status(ST_WARNING, "DXATLAS: Disconnected");
-		enable_widgets();
+		if (dxatlas_exit) {
+			enable_widgets();
+		}
 	}
 }
 
@@ -960,7 +962,7 @@ bool dxa_if::is_displayed(record_num_t record_num) {
 		break;
 	case AC_LOGMODE:
 		// Get the logged mode
-		selected_by = record->item("MODE");
+		selected_by = record->item("MODE", true);
 		break;
 	case AC_BANDS:
 		// get the logged band

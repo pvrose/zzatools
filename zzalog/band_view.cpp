@@ -500,7 +500,7 @@ void band_view::recalculate(double frequency) {
 	// Get the appropriate major tick separation
 	khz_per_major_ = POSS_MAJOR[zoom_value_ / 3];
 	// Set the frequency roller step value
-	step_value_ = khz_per_minor_ * ((long)num_ticks_ - 1);
+	step_value_ = khz_per_minor_ * (((long)num_ticks_) - 1);
 	// Calculate mid, left and right frequencies
 	// Round mid_frequency_ to nearest multiple of khz_per_minor_
 	mid_frequency_ = round(frequency / khz_per_minor_) * khz_per_minor_;
