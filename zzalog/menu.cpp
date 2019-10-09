@@ -28,6 +28,7 @@
 #include "scratchpad.h"
 #include "calendar.h"
 #include "qrz_handler.h"
+#include "edit_dialog.h"
 
 #include <sstream>
 #include <list>
@@ -74,6 +75,7 @@ namespace zzalog {
 	{ "Ne&xt", 0, menu::cb_mi_navigate, (void*)(NV_NEXT) },
 	{ "&Last", 0, menu::cb_mi_navigate, (void*)(NV_LAST) },
 	{ "&Date", 0, menu::cb_mi_nav_date	, nullptr },
+	{ "&Record No.", 0, menu::cb_mi_nav_recnum, nullptr },
 	{ "F&ind", 0, 0, 0, FL_SUBMENU | FL_MENU_DIVIDER },
 	{ "&New", 0, menu::cb_mi_nav_find, (void*)true },
 	{ "Ne&xt", 0, menu::cb_mi_nav_find, (void*)false },
@@ -511,6 +513,23 @@ void menu::cb_mi_nav_date(Fl_Widget* w, void* v) {
 		navigation_book_->go_date(date);
 	}
 }
+
+// Navigate->Record Number
+// v is ignored
+void menu::cb_mi_nav_recnum(Fl_Widget* w, void* v) {
+	record_num_t record_num;
+	edit_dialog* dlg = new edit_dialog(Fl::event_x_root(), Fl::event_y_root(), WBUTTON, HBUTTON);
+	add_sub_window(dlg);
+	if (dlg->display("") == BN_OK) {
+		// Displayed record number is 1-based.
+		record_num = stoi(string(dlg->value())) - 1;
+		record_num_t item_num = navigation_book_->item_number(record_num);
+		navigation_book_->selection(item_num);
+	}
+	remove_sub_window(dlg);
+	Fl::delete_widget(dlg);
+}
+
 // Navigate->Find
 // v is a bool. false = find next; true = new search
 void menu::cb_mi_nav_find(Fl_Widget* w, void* v) {

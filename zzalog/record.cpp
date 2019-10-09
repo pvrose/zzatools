@@ -191,6 +191,11 @@ void record::delete_contents() {
 // Set an item pair.
 void record::item(string field, string value, bool formatted/* = false*/) {
 	// Certain fields - always log in upper case
+	if (field == "CALL" && item("CALL").length() && !value.length() && 
+		fl_choice("You are deleting a callsign, are you sure?", "Yes", "No", nullptr) == 1) {
+		status_->misc_status(ST_FATAL, "Unexpected deletion of a callsign");
+		return;
+	}
 	string upper_value;
 	if (field == "CALL" ||
 		field == "CONT" ||
@@ -1007,9 +1012,14 @@ bool record::items_match(record* record, string field_name) {
 		if (lhs == to_upper(record->item("SUBMODE")) || lhs == to_upper(record->item("MODE"))) {
 			return true;
 		}
+		else if (field_name == "MODE" && spec_data_->dxcc_mode(lhs) == record->item("MODE")) {
+			// Some records from LotW only have generic modes
+			return true;
+		}
 		else {
 			return false;
 		}
+
 	}
 	else {
 		return false;

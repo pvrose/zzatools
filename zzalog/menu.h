@@ -45,6 +45,8 @@ namespace zzalog {
 		static void cb_mi_nav_date(Fl_Widget* w, void* v);
 		// Navigate->Find->New/Next
 		static void cb_mi_nav_find(Fl_Widget* w, void* v);
+		// Navigate->Record
+		static void cb_mi_nav_recnum(Fl_Widget* w, void* v);
 		// Log->Parse QSO
 		static void cb_mi_parse_qso(Fl_Widget* w, void* v);
 		// Log->Parse Log
