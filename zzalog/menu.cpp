@@ -656,7 +656,8 @@ void menu::cb_mi_valid8_qso(Fl_Widget* w, void* v) {
 	bool changed = spec_data_->validate(record, record_num);
 	if (changed) {
 		// Update views if record has changed
-		navigation_book_->selection(record_num, HT_MINOR_CHANGE);
+		record_num_t item_num = navigation_book_->item_number(record_num);
+		navigation_book_->selection(item_num, HT_MINOR_CHANGE);
 		book_->modified(true);
 	}
 #ifndef _DEBUG

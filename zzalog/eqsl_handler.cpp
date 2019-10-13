@@ -70,10 +70,18 @@ void eqsl_handler::cb_timer_deq(void* v) {
 		switch (response) {
 		case ER_FAILED:
 			// Failed - ask if retry
-			if (fl_choice("eQSL download failed, do you want try again", fl_ok, fl_cancel, nullptr) == 1) {
+			switch (fl_choice("eQSL download failed, do you want try again or cancel all", fl_yes, fl_cancel, fl_no)) {
+			case 0:
+				break;
+			case 1:
+				while (!request_queue->empty())	request_queue->pop();
+				cards_skipped = true;
+				break;
+			case 2:
 				// Request failed and repeat not wanted
 				request_queue->pop();
 				cards_skipped = true;
+				break;
 			}
 			break;
 		case ER_OK:
@@ -90,10 +98,18 @@ void eqsl_handler::cb_timer_deq(void* v) {
 			break;
 		case ER_HTML_ERR:
 			// HTML error
-			if (fl_choice("Internet access failed, do you want to try again?", fl_ok, fl_cancel, nullptr) == 1) {
-				// Cancel repeat
+			switch (fl_choice("Internet access failed, do you want to try again or cancel all?", fl_yes, fl_cancel, fl_no)) {
+			case 0:
+				break;
+			case 1:
+				while (!request_queue->empty())	request_queue->pop();
+				cards_skipped = true;
+				break;
+			case 2:
+				// Request failed and repeat not wanted
 				request_queue->pop();
 				cards_skipped = true;
+				break;
 			}
 			break;
 		}
