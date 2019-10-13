@@ -104,6 +104,8 @@ namespace zzalog {
 		long file_size_;
 		long previous_count_;
 		istream* in_;
+		// Igore non-APP_ZZA_ fields
+		bool ignore_app_;
 	};
 
 }

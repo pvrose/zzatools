@@ -51,6 +51,8 @@ istream& adi_reader::load_record(record* in_record, istream& in, load_result_t& 
 	string header = "";
 	bool eor = false;
 	result = LR_GOOD;
+	string bad_field = "";
+	bool has_bad_field = false;
 
 	// Only the header won't not start with a < character
 	// Read upto the next < character or EOF
@@ -136,7 +138,14 @@ istream& adi_reader::load_record(record* in_record, istream& in, load_result_t& 
 				if (!in.good()) result = LR_BAD;
 				else {
 					// Ignore all data until next < (or EOF) - it is likely to be white-space but ADIF says ignore anyway
-					while (c != '<' && in.good()) in.get(c);
+					while (c != '<' && in.good()) {
+						in.get(c);
+						if (c != ' ' && c != '\t' && c != '\n' && c != 'r' && c != '<') {
+							// Report band item to the status log
+							has_bad_field = true;
+							bad_field = field;
+						}
+					}
 					// Now create the hash-pair if length non-zero
 					if (count > 0 && in.good()) {
 						// Start assuming it's a valid field
@@ -162,10 +171,19 @@ istream& adi_reader::load_record(record* in_record, istream& in, load_result_t& 
 								field = "APP_ZZA_" + part2;
 								my_book_->modified(true, false);
 							}
-							field_valid = spec_data_->add_appdef(field, type_indicator);
+							// Ignore all non-ZZALOG app specific fields (except APP_EQSL_SWL)
+							if (field.substr(0, 8) != "APP_ZZA_") {
+								if (field == "APP_EQSL_SWL") {
+									field = "SWL";
+									my_book_->modified(true, false);
+								}
+								else {
+									field_valid = false;
+								}
+							}
 						}
 						// If the data type is not valid then the field isn't
-						if (spec_data_->datatype(field).length() == 0) {
+						if (field_valid && spec_data_->datatype(field).length() == 0) {
 							field_valid = false;
 						}
 						// If the user or app. defined field is valid or it's an ADIF defined field
@@ -180,19 +198,26 @@ istream& adi_reader::load_record(record* in_record, istream& in, load_result_t& 
 							in_record->item(field, value);
 						}
 						else {
-							// Report band item to the status log.
-							char message[100];
-							sprintf(message, "ADI READ: %s %s %s - Problem with field %s",
-								in_record->item("QSO_DATE").c_str(),
-								in_record->item("TIME_ON").c_str(),
-								in_record->item("CALL").c_str(),
-								field.c_str());
-							status_->misc_status(ST_WARNING, message);
+
+							// Field ignored so set modified
+							my_book_->modified(true, false);
+							has_bad_field = true;
+							bad_field = field;
 						}
 					}
 				}
 			}
 		}
+	}
+	if (has_bad_field) {
+		// Report band item to the status log.
+		char message[100];
+		sprintf(message, "ADI READ: %s %s %s - Problem with field %s",
+			in_record->item("QSO_DATE").c_str(),
+			in_record->item("TIME_ON").c_str(),
+			in_record->item("CALL").c_str(),
+			bad_field.c_str());
+		status_->misc_status(ST_ERROR, message);
 	}
 	return in;
 }

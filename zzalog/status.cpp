@@ -25,7 +25,7 @@ extern void add_sub_window(Fl_Window* w);
 extern void remove_sub_window(Fl_Window* w);
 
 // Constructor
-status::status(int X, int Y, int W, int H, const char * label) :
+status::status(int X, int Y, int W, int H, const char* label) :
 	Fl_Group(X, Y, W, H, label)
 	, clock_bn_(nullptr)
 	, progress_(nullptr)
@@ -35,11 +35,12 @@ status::status(int X, int Y, int W, int H, const char * label) :
 	, status_file_viewer_(nullptr)
 	, use_local_(false)
 	, max_progress_(0)
-	,report_filename_("")
+	, report_filename_("")
 	, report_file_(nullptr)
 	, progress_suffix_("")
 	, min_level_(ST_NONE)
 	, append_log_(false)
+	, rig_in_progress_(false)
 {
 	// Initialise attributes
 	max_progress_ = 0;
@@ -218,7 +219,14 @@ void status::cb_bn_rig(Fl_Widget* bn, void* v) {
 
 	if (rig_if_ == nullptr || !rig_if_->is_good() || !rig_if_->is_open()) {
 		// Rig wasn't present or hadn't connected or had crashed, so try again
-		add_rig_if();
+		if (!that->rig_in_progress_) {
+			that->rig_in_progress_ = true;
+			add_rig_if();
+			that->rig_in_progress_ = false;
+		}
+		else {
+			that->misc_status(ST_WARNING, "RIG: Already trying to open rig");
+		}
 	}
 	else {
 		// Close the rig

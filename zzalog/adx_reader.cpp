@@ -166,10 +166,10 @@ bool adx_reader::end_element(string name) {
 			ok = false;
 		}
 		else {
-			// Add to the app-defined fields list in ADIF database - needs to be done before the item is added
-			ok = spec_data_->add_appdef(field_name_, datatype_[0]);
-			// Copy the ADIF item to the current record
-			record_->item(field_name_, value_);
+			if (!ignore_app_) {
+				// Copy the ADIF item to the current record
+				record_->item(field_name_, value_);
+			}
 		}
 	}
 	else if (element_name == "USERDEF" && element_type == AET_USERDEFH) {
@@ -384,10 +384,19 @@ bool adx_reader::start_app(map<string, string>* attributes) {
 			error = true;
 		}
 		if (!error) {
-			// Generate field name APP_[Progid]_[Name]
-			char temp[128];
-			sprintf(temp, "APP_%s_%s", id.c_str(), field_name.c_str());
-			field_name_ = temp;
+			ignore_app_ = false;
+			if (id == "EQSL" && field_name == "SWL") {
+				field_name_ = "SWL";
+			}
+			else if (id == "ZZA") {
+				// Generate field name APP_[Progid]_[Name]
+				char temp[128];
+				sprintf(temp, "APP_%s_%s", id.c_str(), field_name.c_str());
+				field_name_ = temp;
+			}
+			else {
+				ignore_app_ = true;
+			}
 		}
 	}
 	// Clear the value

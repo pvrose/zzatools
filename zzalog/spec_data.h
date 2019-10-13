@@ -129,8 +129,6 @@ namespace zzalog {
 		char datatype_indicator(string& field_name);
 		// Get list or range
 		string userdef_values(string& field_name);
-		// Add application defined field
-		bool add_appdef(const string& name, char indicator);
 		// Initialise this app's app-specific fieldnames
 		void add_my_appdefs();
 		// Remove existing user defined fields
@@ -201,6 +199,8 @@ namespace zzalog {
 		// Generate report timestamp and fault
 		string report_timestamp(string field, string data);
 		// protected attributes
+		// Add application defined field
+		bool add_appdef(const string& name, char indicator);
 	protected:
 		// ADIF Version
 		string adif_version_;

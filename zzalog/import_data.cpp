@@ -564,6 +564,7 @@ void import_data::convert_update(record* record) {
 		string update_name;
 		string value = it->second;
 		bool override = false;
+		bool ignore = false;
 		// Sometimes need to compare different fields - RST_SENT vs RST_RCVD
 		// To avoid the name being switched back, a '!' is prepended to the field anme in some cases
 		switch (update_mode_) {
@@ -600,11 +601,6 @@ void import_data::convert_update(record* record) {
 				field_name == "RX_PWR") {
 				update_name = "!TX_PWR";
 			}
-			else if (
-				// APP_EQSL_SWL => is_swl
-				field_name == "APP_EQSL_SWL") {
-				update_name = "SWL";
-			}
 			else {
 				update_name = field_name;
 			}
@@ -627,9 +623,14 @@ void import_data::convert_update(record* record) {
 			update_name = field_name;
 			break;
 		}
-		// If field name changed move from one to the other
-		if (update_name != field_name) {
-			record->change_field_name(field_name, update_name);
+		if (ignore) {
+			record->item(field_name, string(""));
+		}
+		else {
+			// If field name changed move from one to the other
+			if (update_name != field_name) {
+				record->change_field_name(field_name, update_name);
+			}
 		}
 	}
 	// Set EQSL_QSLRDATE to todays date 

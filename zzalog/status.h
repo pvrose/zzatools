@@ -167,6 +167,8 @@ namespace zzalog {
 		bool append_log_;
 		// Progress countdown mode
 		bool countdown_mode_;
+		// Flag to prevent double clicking of rig button
+		bool rig_in_progress_;
 	};
 
 }
