@@ -76,6 +76,8 @@ namespace zzalog {
 		static void cb_tab_record(Fl_Widget* w, void* v);
 		// Field choice has been clicked
 		static void cb_ch_field(Fl_Widget* w, void* v);
+		// Editor has been typed in
+		static void cb_editor(Fl_Widget* w, void* v);
 		// enum choice has been changed
 		static void cb_ch_enum(Fl_Widget* w, void* v);
 		// use button has been clicked

@@ -140,7 +140,7 @@ istream& adi_reader::load_record(record* in_record, istream& in, load_result_t& 
 					// Ignore all data until next < (or EOF) - it is likely to be white-space but ADIF says ignore anyway
 					while (c != '<' && in.good()) {
 						in.get(c);
-						if (c != ' ' && c != '\t' && c != '\n' && c != 'r' && c != '<') {
+						if (c != ' ' && c != '\t' && c != '\n' && c != 'r' && c != '<' && !in_record->is_header()) {
 							// Report band item to the status log
 							has_bad_field = true;
 							bad_field = field;

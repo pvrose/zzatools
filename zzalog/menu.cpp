@@ -858,6 +858,7 @@ void menu::cb_mi_log_bulk(Fl_Widget* w, void* v) {
 		string old_field_name = "";
 		string new_field_name = "";
 		string new_text = "";
+		int num_changed = 0;
 		fl_cursor(FL_CURSOR_WAIT);
 		// get action
 		dialog->get_data(action, old_field_name, new_field_name, new_text);
@@ -872,30 +873,36 @@ void menu::cb_mi_log_bulk(Fl_Widget* w, void* v) {
 				// Change the field_name from old to new
 				record->change_field_name(old_field_name, new_field_name);
 				book_->modified(true);
+				num_changed++;
 				break;
 			case DELETE_FIELD:
 				// Delete the field with this name
 				record->item(old_field_name, string(""));
 				book_->modified(true);
+				num_changed++;
 				break;
 			case ADD_FIELD:
 				// Add a field with this name and value
 				if (record->item(old_field_name) == "") {
 					record->item(old_field_name, new_text);
 					book_->modified(true);
+					num_changed++;
 				}
 				break;
 			case CHANGE_FIELD:
 				// Change the field to this value - adding the field if necessary
 				record->item(old_field_name, new_text);
 				book_->modified(true);
+				num_changed++;
 				break;
 			}
 			status_->progress(i);
 		}
 		// Get all views to update
 		book_->selection(book_->selection(), HT_ALL);
-		status_->misc_status(ST_OK, "LOG: Bulk change done!");
+		char message[100];
+		snprintf(message, 100, "LOG: Bulk change done, %d records modified.", num_changed);
+		status_->misc_status(ST_OK, message);
 		fl_cursor(FL_CURSOR_DEFAULT);
 	}
 	Fl::delete_widget(dialog);

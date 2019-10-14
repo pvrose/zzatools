@@ -311,6 +311,8 @@ record_form::record_form(int X, int Y, int W, int H, const char* label, field_or
 	value_in_->align(FL_ALIGN_LEFT);
 	value_in_->labelsize(FONT_SIZE);
 	value_in_->textsize(FONT_SIZE);
+	value_in_->callback(cb_editor);
+	value_in_->when(FL_WHEN_CHANGED);
 	value_in_->tooltip("Enter the new value");
 	Fl_Text_Buffer* buff = new Fl_Text_Buffer(1024);
 	value_in_->buffer(buff);
@@ -627,6 +629,16 @@ void record_form::cb_ch_field(Fl_Widget* w, void* v) {
 	}
 }
 
+// Called after typing in the editor
+void record_form::cb_editor(Fl_Widget* w, void* v) {
+	record_form* that = ancestor_view<record_form>(w);
+	that->modifying_ = true;
+	that->enable_widgets();
+	that->redraw();
+	main_window_->flush();
+}
+
+
 // Enum choice widget has its value changed - explain what the enum value means
 void record_form::cb_ch_enum(Fl_Widget* w, void* v) {
 	record_form* that = ancestor_view<record_form>(w);
@@ -728,6 +740,9 @@ void record_form::cb_bn_quick(Fl_Widget* w, void* v) {
 	}
 	// Clear value in buffer
 	that->value_in_->buffer()->text("");
+	// Clear modifying flag
+	that->modifying_ = false;
+	that->enable_widgets();
 	main_window_->flush();
 }
 
@@ -1347,8 +1362,6 @@ void record_form::enable_widgets() {
 		qsl_message_in_->activate();
 		swl_message_in_->activate();
 		modify_message_bn_->activate();
-		// Quick QSL entry
-		quick_grp_->deactivate();
 		// Import Query 
 		find_bn_->deactivate();
 		previous_bn_->deactivate();
@@ -1377,6 +1390,8 @@ void record_form::enable_widgets() {
 			edit4_bn_->tooltip("");
 			edit4_bn_->callback(cb_bn_edit, (long)NONE);
 			edit4_bn_->deactivate();
+			// Quick QSL entry
+			quick_grp_->activate();
 		}
 		else {
 			// Displaying: Start
@@ -1400,6 +1415,8 @@ void record_form::enable_widgets() {
 			edit4_bn_->tooltip("");
 			edit4_bn_->callback(cb_bn_edit, (long)NONE);
 			edit4_bn_->deactivate();
+			// Quick QSL entry
+			quick_grp_->deactivate();
 		}
 		break;
 	case UM_QSO:
