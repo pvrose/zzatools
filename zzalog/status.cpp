@@ -353,6 +353,13 @@ void status::misc_status(status_t status, const char* label) {
 
 		main_window_->do_callback();
 		break;
+		// TODO: This causes an exception once the viewer has been deleted but not set to nullptr
+	//default:
+	//	// Redraw status file viewer
+	//	if (status_file_viewer_) {
+	//		cb_bn_misc(misc_status_, nullptr);
+	//	}
+	//	break;
 	}
 }
 
