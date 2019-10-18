@@ -180,6 +180,10 @@ status::~status()
 	report_file_->close();
 }
 
+void status::null_file_viewer() {
+	status_file_viewer_ = nullptr;
+}
+
 // Callbacks
 // Clock button callback - toggles between UTC and local-time
 void status::cb_bn_clock(Fl_Widget* bn, void* v) {
@@ -354,12 +358,12 @@ void status::misc_status(status_t status, const char* label) {
 		main_window_->do_callback();
 		break;
 		// TODO: This causes an exception once the viewer has been deleted but not set to nullptr
-	//default:
-	//	// Redraw status file viewer
-	//	if (status_file_viewer_) {
-	//		cb_bn_misc(misc_status_, nullptr);
-	//	}
-	//	break;
+	default:
+		// Redraw status file viewer
+		if (status_file_viewer_) {
+			cb_bn_misc(misc_status_, nullptr);
+		}
+		break;
 	}
 }
 

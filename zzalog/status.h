@@ -122,7 +122,8 @@ namespace zzalog {
 		status_t min_level();
 		// Append or overwrite status log
 		void append_log(bool append);
-
+		// Set file viewer to nullptr
+		void null_file_viewer();
 		// Callbacks
 		// Clock button callback
 		static void cb_bn_clock(Fl_Widget* bn, void* v);

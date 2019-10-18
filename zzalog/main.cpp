@@ -207,6 +207,13 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 		window_settings.set("Width", main_window_->w());
 		window_settings.set("Height", main_window_->h());
 
+		// delete all additional windows created - note the status file viewer is one.
+		for (auto it = sub_windows_.begin(); it != sub_windows_.end(); it++) {
+			(*it)->clear();
+			delete* it;
+		}
+		status_->null_file_viewer();
+
 		// Exit and close application
 		Fl_Single_Window::default_callback((Fl_Window*)w, v);
 	}
@@ -591,11 +598,6 @@ void resize_window() {
 // Tidy memory
 void tidy() {
 	status_->misc_status(ST_LOG, "ZZALOG: Closing...");
-	// delete all additional windows created - note the status file viewer is one.
-	for (auto it = sub_windows_.begin(); it != sub_windows_.end(); it++) {
-		(*it)->clear();
-		delete* it;
-	}
 	// Tidy memory - this is not perfect
 	// From inspection of the code - calling this a second time frees the memory
 	fl_message_title_default(nullptr);
@@ -620,11 +622,6 @@ void tidy() {
 	delete main_window_;
 	delete settings_;
 	delete main_icon_;
-	// delete all additional windows created - note the status file viewer is one.
-	for (auto it = sub_windows_.begin(); it != sub_windows_.end(); it++) {
-		(*it)->clear();
-		delete* it;
-	}
 }
 
 // Add free-standing windows to remeber to close them when we close the main window
