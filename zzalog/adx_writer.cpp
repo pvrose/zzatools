@@ -54,11 +54,11 @@ bool adx_writer::store_book(book* book, ostream& os) {
 		if (ok) {
 			// Successful
 			status_->misc_status(ST_OK, "ADX WRITE: XML Generation done!");
-			status_->progress(book->size());
+			status_->progress(book->size(), book->book_type());
 		} else {
 			// Not successful
 			status_->misc_status(ST_ERROR, "ADX WRITE: XML Generation failed");
-			status_->progress("Process failed");
+			status_->progress("Process failed", book->book_type());
 		}
 	}
 
@@ -71,12 +71,12 @@ bool adx_writer::store_book(book* book, ostream& os) {
 	}
 	if (ok) {
 		status_->misc_status(ST_OK, "ADX WRITE: XML Storing done!");
-		status_->progress(1);
+		status_->progress(1, book->book_type());
 		return ok;
 	}
 	else {
 		status_->misc_status(ST_ERROR, "ADX WRITE: XML Storing failed");
-		status_->progress("Write failed");
+		status_->progress("Write failed", book->book_type());
 		return false;
 	}
 
@@ -223,7 +223,7 @@ bool adx_writer::write_element(adx_element_t element) {
 			ok &= write_element(AET_RECORD);
 			string write_type;
 			// Update progress every record
-			status_->progress(i);
+			status_->progress(i, my_book_->book_type());
 		}
 		ok &= end_element(name);
 		break;

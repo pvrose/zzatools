@@ -45,6 +45,21 @@ namespace zzalog {
 		{ OT_CARD, fl_color_average(FL_BLUE, FL_WHITE, 0.25) }
 	};
 
+	// Names of the objects
+	const map<object_t, char*> OBJECT_NAMES = {
+		{ OT_NONE, "OT_NONE" },
+		{ OT_MAIN, "OT_MAIN" },
+		{ OT_EXTRACT, "OT_EXTRACT" },
+		{ OT_IMPORT, "OT_IMPORT" },
+		{ OT_RECORD, "OT_RECORD" },
+		{ OT_PREFIX,"OT_PREFIX" },
+		{ OT_ADIF, "OT_ADIF" },
+		{ OT_REPORT, "OT_REPORT" },
+		{ OT_BAND, "OT_BAND" },
+		{ OT_DXATLAS, "OT_DXATLAS" },
+		{ OT_CARD, "OT_CARD" }
+	};
+
 	// Colour palette used in DxAtlas legend and band plan
 	const Fl_Color ZLG_PALETTE[] =
 	{ fl_rgb_color(0,0,0),

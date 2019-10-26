@@ -6,6 +6,7 @@
 #include <map>
 #include <string>
 #include <fstream>
+#include <list>
 
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Progress.H>
@@ -82,6 +83,7 @@ namespace zzalog {
 		{ FS_SAVING, FL_CYAN }
 	};
 
+	// 
 	enum object_t;
 
 	// clock display - 1s.
@@ -95,6 +97,14 @@ namespace zzalog {
 		void reload(const char* filename);
 	};
 
+	// A progress stack entry
+	struct progress_item {
+		int max_value;
+		int value;
+		char* suffix;
+		bool countdown;
+	};
+
 	// This class provides the status bar and manages access to the various status information
 	class status : public Fl_Group
 	{
@@ -106,9 +116,9 @@ namespace zzalog {
 		// Initialise progress
 		void progress(int max_value, object_t object, const char* suffix, bool countdown = false);
 		// UPdate progress
-		void progress(int value);
+		void progress(int value, object_t object);
 		// Update progress with a text message and mark 100%
-		void progress(const char* message);
+		void progress(const char* message, object_t object);
 		// Update rig_status
 		void rig_status(status_t status, const char* label);
 		// Update miscellaneous status
@@ -139,6 +149,8 @@ namespace zzalog {
 	protected:
 		// Add colourin to buffer
 		void colour_buffer();
+		// Re-initialise progress bar
+		void update_progress(object_t object);
 
 	protected:
 		// The clock display
@@ -155,21 +167,19 @@ namespace zzalog {
 		text_display* status_file_viewer_;
 		// local or UTC
 		bool use_local_;
-		// Max progres value
-		int max_progress_;
 		// Status report file
 		string report_filename_;
 		ofstream* report_file_;
-		// Progress "label"
-		string progress_suffix_;
 		// Minimum reporting level
 		status_t min_level_;
 		// Append log
 		bool append_log_;
-		// Progress countdown mode
-		bool countdown_mode_;
 		// Flag to prevent double clicking of rig button
 		bool rig_in_progress_;
+		// The progress item stack
+		list<object_t> progress_stack_;
+		// The progress items in the stack
+		map<object_t, progress_item*> progress_items_;
 	};
 
 }

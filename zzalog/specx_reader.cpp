@@ -50,7 +50,7 @@ bool specx_reader::load_data(spec_data* data, istream& in, string& version) {
 	if (parse(in)) {
 		// Read successful - complete progress
 		status_->misc_status(ST_OK, "SPEC READ: Done!");
-		status_->progress(file_size);
+		status_->progress(file_size, OT_ADIF);
 		version = adif_version_;
 		data->erase("Primary_Administrative_Subdivision");
 		data->erase("Secondary_Administrative_Subdivision");
@@ -60,7 +60,7 @@ bool specx_reader::load_data(spec_data* data, istream& in, string& version) {
 	else {
 		// Read failed - report failure
 		status_->misc_status(ST_FATAL, "SPEC READ: Failed");
-		status_->progress("Load failed");
+		status_->progress("Load failed", OT_ADIF);
 		fl_cursor(FL_CURSOR_DEFAULT);
 		return false;
 	}
@@ -391,7 +391,7 @@ bool specx_reader::end_record() {
 	dataset->data[record_name_] = record_data_;
 	record_data_ = nullptr;
 	int byte_count = (int)in_file_->tellg();
-	status_->progress(byte_count);
+	status_->progress(byte_count, OT_ADIF);
 	return true;
 }
 

@@ -512,10 +512,11 @@ void extract_data::sort_records(string field_name, bool reversed) {
 			}
 		}
 		num_scans++;
-		status_->progress(num_scans);
+		status_->progress(num_scans, book_type());
 	}
 	snprintf(message, 100, "EXTRACT: Done - %d passes required", num_scans);
 	status_->misc_status(ST_OK, message);
+	status_->progress(nullptr, book_type());
 	fl_cursor(FL_CURSOR_DEFAULT);
 
 }

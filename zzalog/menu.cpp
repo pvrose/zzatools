@@ -621,7 +621,7 @@ void menu::cb_mi_parse_log(Fl_Widget* w, void* v) {
 			record_num = navigation_book_->record_number(i);
 			item_number = i;
 			// Update progress
-			status_->progress(i);
+			status_->progress(i, navigation_book_->book_type());
 			if (changed || parse_result == PR_CHANGED) {
 				book_->modified(true);
 				// The parsing may have modified date and time
@@ -631,7 +631,7 @@ void menu::cb_mi_parse_log(Fl_Widget* w, void* v) {
 				// User has the opportunity to abandon this if too many records have issues
 				abandon = true;
 				status_->misc_status(ST_WARNING, "PARSE LOG: Abandoned");
-				status_->progress("Abandoned");
+				status_->progress("Abandoned", navigation_book_->book_type());
 			}
 		}
 		// update views with last record parsed selected
@@ -690,7 +690,7 @@ void menu::cb_mi_valid8_log(Fl_Widget* w, void* v) {
 		if (spec_data_->validate(record, record_num)) {
 			changed = true;
 		}
-		status_->progress(i);
+		status_->progress(i, navigation_book_->book_type());
 	}
 	status_->misc_status(ST_OK, "VALIDATE LOG: Done!");
 	if (changed) {
@@ -744,7 +744,7 @@ void menu::cb_mi_log_mode(Fl_Widget* w, void* v) {
 		// Stop importing - and wait for it to finish
 		import_data_->stop_update(next_mode, false);
 		while (!import_data_->update_complete()) Fl::wait();
-		status_->progress("Import cancelled!");
+		status_->progress("Import cancelled!", OT_IMPORT);
 		break;
 	}
 
@@ -896,7 +896,7 @@ void menu::cb_mi_log_bulk(Fl_Widget* w, void* v) {
 				num_changed++;
 				break;
 			}
-			status_->progress(i);
+			status_->progress(i, navigation_book_->book_type());
 		}
 		// Get all views to update
 		book_->selection(book_->selection(), HT_ALL);

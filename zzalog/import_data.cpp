@@ -75,6 +75,7 @@ import_data::~import_data()
 void import_data::cb_timer_imp(void* v) {
 	import_data* that = (import_data*)v;
 	that->timer_count_--;
+	status_->progress((int)that->timer_count_, that->book_type());
 	if (that->timer_count_ <= 0.0) {
 		// Countdown reached zero so update
 		that->auto_update();
@@ -82,7 +83,6 @@ void import_data::cb_timer_imp(void* v) {
 	else {
 		// Restart the timer
 		Fl::repeat_timeout(1.0, cb_timer_imp, v);
-		status_->progress((int)that->timer_count_);
 	}
 }
 
@@ -310,7 +310,7 @@ void import_data::update_book() {
 				// We should have already imported so just delete the record
 				discard_update(false);
 				update_ignored = true;
-				status_->progress(number_to_import_ - size());
+				status_->progress(number_to_import_ - size(), book_type());
 			}
 			else {
 				// Some fields may require conversion (e.g. eQSL uses RST_SENT from contact's perspective
@@ -447,7 +447,7 @@ void import_data::update_book() {
 			}
 			// Update import progress
 			// Update progress and update views every so often
-			status_->progress(number_to_import_ - size());
+			status_->progress(number_to_import_ - size(), book_type());
 		}
 		// Allow view updates
 		inhibit_view_update_ = false;
@@ -486,9 +486,14 @@ void import_data::stop_update(logging_mode_t mode, bool immediate) {
 		if (size()) update_book();
 		break;
 	case NONE:
+		// 
+		delete_contents(true);
+		close_pending_ = false;
+		break;
 	case WAIT_AUTO:
 		// 
 		delete_contents(true);
+		status_->progress("Auto-update stopped", OT_IMPORT);
 		close_pending_ = false;
 		break;
 	case READ_AUTO:
@@ -778,7 +783,7 @@ void import_data::process_lotw_header() {
 	header()->item("APP_LOTW_NUMREC", num_records);
 	if ((size_t)num_records == size()) {
 		status_->misc_status(ST_OK, "IMPORT: LotW download done.");
-		status_->progress(num_records);
+		status_->progress(num_records, book_type());
 	}
 }
 

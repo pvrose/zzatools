@@ -257,10 +257,12 @@ bool pfx_reader::load_data(pfx_data& prefixes, string filename) {
 	// Return success
 	if (result == LR_BAD) {
 		status_->misc_status(ST_ERROR, "LOAD PFX DATA: Failed");
-		status_->progress("Load failed");
+		status_->progress("Load failed", OT_PREFIX);
 		return false;
 	}
 	else {
+		byte_count_ = file_size_;
+		display_progress();
 		status_->misc_status(ST_OK, "LOAD PFX DATA: Done!");
 		return true;
 	}
@@ -269,5 +271,5 @@ bool pfx_reader::load_data(pfx_data& prefixes, string filename) {
 // Display the progress 
 void pfx_reader::display_progress() {
 	// update progress every 10k bytes
-	status_->progress(byte_count_);
+	status_->progress(byte_count_, OT_PREFIX);
 }

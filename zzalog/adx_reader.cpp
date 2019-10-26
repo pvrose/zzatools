@@ -69,14 +69,14 @@ bool adx_reader::load_book(book* book, istream& in) {
 	if (parse(in)) {
 		// Read successful - complete progress
 		status_->misc_status(ST_OK, "ADX READ: Done!");
-		status_->progress(file_size_);
+		status_->progress(file_size_, book->book_type());
 		fl_cursor(FL_CURSOR_DEFAULT);
 		return true;
 	}
 	else {
 		// Read failed - report failure
 		status_->misc_status(ST_ERROR, "ADX READ: Failed");
-		status_->progress("Load failed");
+		status_->progress("Load failed", book->book_type());
 		fl_cursor(FL_CURSOR_DEFAULT);
 		return false;
 	}
@@ -216,7 +216,7 @@ bool adx_reader::end_element(string name) {
 			}
 			// Update progress every record
 			long current_count = (long)in_->tellg();
-			status_->progress(current_count);
+			status_->progress(current_count, my_book_->book_type());
 		}
 		// Clear the record - destroyed when book destroyed
 		record_ = nullptr;
@@ -244,7 +244,7 @@ bool adx_reader::end_element(string name) {
 			my_book_->header(record_);
 			// Update progress every record
 			long current_count = (long)in_->tellg();
-			status_->progress(current_count);
+			status_->progress(current_count, my_book_->book_type());
 		}
 		// Clear the record - destroyed when book destroyed
 		record_ = nullptr;

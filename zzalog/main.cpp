@@ -795,8 +795,9 @@ void backup_file(bool force, bool retrieve) {
 			out.write(buffer, in.gcount());
 			count += (int)in.gcount();
 			ok = out.good() && (in.good() || in.eof());
-			status_->progress(count);
+			status_->progress(count, OT_MAIN);
 		}
+		status_->progress(length, OT_MAIN);
 		in.close();
 		out.close();
 		if (!ok) {

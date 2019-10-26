@@ -118,7 +118,7 @@ int printer::print_book() {
 				error = end_page();
 				// Update progress
 				Fl_Display_Device::display_device()->set_current();
-				status_->progress(page_number - from_page);
+				status_->progress(page_number - from_page, type_);
 				set_current();
 				// Start the next page
 				if (!error) error = start_page();
@@ -139,11 +139,11 @@ int printer::print_book() {
 	if (!error) error = end_page();
 	if (!error) end_job();
 	// Final progress
-	status_->progress(min(to_page + 1 - from_page, number_pages_));
+	status_->progress(min(to_page + 1 - from_page, number_pages_), type_);
 	fl_cursor(FL_CURSOR_DEFAULT);
 	if (error) {
 		status_->misc_status(ST_ERROR, "PRINTER: Failed!");
-		status_->progress("Failed");
+		status_->progress("Failed", type_);
 	}
 	else {
 		status_->misc_status(ST_OK, "PRINTER: Done!");
@@ -319,7 +319,7 @@ int printer::print_cards() {
 				error = end_page();
 				// Update progress
 				Fl_Display_Device::display_device()->set_current();
-				status_->progress(page_number - from_page);
+				status_->progress(page_number - from_page, type_);
 				set_current();
 				// Start the next page
 				if (i < navigation_book_->size() && !error) {
@@ -331,7 +331,7 @@ int printer::print_cards() {
 	}
 	if (!error) end_job();
 	// Final progress
-	status_->progress(min(to_page + 1 - from_page, number_pages_));
+	status_->progress(min(to_page + 1 - from_page, number_pages_), type_);
 	fl_cursor(FL_CURSOR_DEFAULT);
 	if (error) {
 		status_->misc_status(ST_ERROR, "PRINTER: Failed!");

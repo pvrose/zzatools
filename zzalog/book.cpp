@@ -1099,7 +1099,7 @@ void book::check_dupes(bool restart) {
 		record_num_t record_num_2 = record_number(duplicate_item_ + 1);
 		record* record_1 = get_record(duplicate_item_, true);
 		record* record_2 = get_record(duplicate_item_ + 1, false);
-		status_->progress(duplicate_item_);
+		status_->progress(duplicate_item_, book_type());
 		match_result_t match = record_1->match_records(record_2);
 		switch (match) {
 		case MT_NOMATCH:

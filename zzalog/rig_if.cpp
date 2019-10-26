@@ -178,7 +178,7 @@ double rig_if::power() {
 	double my_freq = tx_frequency();
 	// Get the band
 	string band = spec_data_->band_for_freq(my_freq / 1000000);
-	return power_lookup_->power(band, (int)(my_drive * 100));
+	return power_lookup_->power(band, (int)my_drive);
 }
 
 // Rig timer callback
@@ -471,7 +471,7 @@ rig_mode_t rig_hamlib::mode() {
 double rig_hamlib::drive() {
 	value_t drive_level;
 	if ((error_code_ = rig_get_level(rig_, RIG_VFO_CURR, rig_level_e::RIG_LEVEL_RFPOWER, &drive_level)) == RIG_OK) {
-		return drive_level.f;
+		return drive_level.f * 100;
 	}
 	else {
 		return nan("");

@@ -333,7 +333,7 @@ void report_tree::copy_map_to_tree(report_map_t* this_map, Fl_Tree_Item* item, i
 		num_any += count_any;
 		// Only mark progress if top-level map
 		if (item == nullptr) {
-			status_->progress(count);
+			status_->progress(count, OT_REPORT);
 		}
 	}
 	// Only display this on top-level map
@@ -453,9 +453,9 @@ void report_tree::create_map() {
 			// If it is in the domain of the analysis - add it to the map
 			add_record(i, &map_);
 		}
-		status_->progress(i);
+		status_->progress(i, OT_REPORT);
 	}
-
+	status_->progress(get_book()->size(), OT_REPORT);
 	status_->misc_status(ST_OK, "LOG REPORT: Analysis done!");
 }
 

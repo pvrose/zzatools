@@ -34,16 +34,15 @@ status::status(int X, int Y, int W, int H, const char* label) :
 	, file_status_(nullptr)
 	, status_file_viewer_(nullptr)
 	, use_local_(false)
-	, max_progress_(0)
 	, report_filename_("")
 	, report_file_(nullptr)
-	, progress_suffix_("")
 	, min_level_(ST_NONE)
 	, append_log_(false)
 	, rig_in_progress_(false)
 {
 	// Initialise attributes
-	max_progress_ = 0;
+	progress_stack_.clear();
+	progress_items_.clear();
 
 	// Current position for next widget
 	int curr_x = X;
@@ -178,6 +177,11 @@ status::~status()
 {
 	clear();
 	report_file_->close();
+	for (auto it = progress_items_.begin(); it != progress_items_.end(); it++) {
+		delete (it->second);
+	}
+	progress_items_.clear();
+	progress_stack_.clear();
 }
 
 void status::null_file_viewer() {
@@ -241,53 +245,107 @@ void status::cb_bn_rig(Fl_Widget* bn, void* v) {
 	bn->redraw();
 }
 
-// Intialise progress bar - 
-// maximum value, purpose (used to set colour) and items counted
+// Add a progress item to the stack
 void status::progress(int max_value, object_t object, const char* suffix, bool countdown /*= false*/) {
 	// Initialise it
-	max_progress_ = max_value;
-	progress_suffix_ = suffix;
-	Fl_Color bar_colour = OBJECT_COLOURS.at(object);
-	// Set colours
-	progress_->color(OBJECT_COLOURS.at(OT_NONE), bar_colour);
-	progress_->labelcolor(FL_BLACK);
-	char label[100];
-	int value = countdown ? max_value : 0;
-	sprintf(label, "%d/%d %s", value, max_value, suffix);
-	progress_->copy_label(label);
-	// Set range (0:max_value)
-	progress_->minimum(0.0);
-	progress_->maximum((float)max_value);
-	countdown_mode_ = countdown;
-	// redraw and allow scheduler to effect the redrawing
-	progress_->redraw();
-	Fl::wait();
+	if (progress_items_.find(object) != progress_items_.end()) {
+		char message[100];
+		snprintf(message, 100, "PROGRESS: Already started progress for %s", OBJECT_NAMES.at(object));
+		misc_status(ST_ERROR, message);
+	} else {
+		progress_item* item = new progress_item;
+		item->max_value = max_value;
+		if (countdown) {
+			item->value = max_value;
+		}
+		else {
+			item->value = 0;
+		}
+		item->countdown = countdown;
+		item->suffix = new char[strlen(suffix) + 1];
+		strcpy(item->suffix, suffix);
+		progress_items_[object] = item;
+		progress_stack_.push_back(object);
+		update_progress(object);
+	}
+}
+
+// Intialise progress bar - 
+// maximum value, purpose (used to set colour) and items counted
+void status::update_progress(object_t object) {
+	if (progress_stack_.size() && progress_stack_.back() == object) {
+		progress_item* item = progress_items_.at(object);
+		Fl_Color bar_colour = OBJECT_COLOURS.at(object);
+		// Set colours
+		progress_->color(OBJECT_COLOURS.at(OT_NONE), bar_colour);
+		progress_->labelcolor(FL_BLACK);
+		char label[100];
+		// Update progress 
+		if (item->countdown) {
+			progress_->value((float)(item->max_value - item->value));
+		}
+		else {
+			progress_->value((float)item->value);
+		}
+		sprintf(label, "%d/%d %s", item->value, item->max_value, item->suffix);
+		progress_->copy_label(label);
+		// Set range (0:max_value)
+		progress_->minimum(0.0);
+		progress_->maximum((float)item->max_value);
+		// redraw and allow scheduler to effect the redrawing
+		progress_->redraw();
+		Fl::wait();
+	}
 }
 
 // Update progress bar
-void status::progress(int value) {
-	// Update progress 
-	if (countdown_mode_) {
-		progress_->value((float)(max_progress_ - value));
+void status::progress(int value, object_t object) {
+	if (progress_stack_.size()) {
+		if (progress_items_.find(object) == progress_items_.end()) {
+			char message[100];
+			snprintf(message, 100, "PROGRESS: Haven't started progress %s", OBJECT_NAMES.at(object));
+			misc_status(ST_ERROR, message);
+		} else {
+			// Update progress item
+			progress_item* item = progress_items_.at(object);
+			item->value = value;
+			update_progress(object);
+			// If it's 100% (or 0% if counting down) delte item and draw the next in the stack
+			if ((item->countdown && value == 0) || (!item->countdown && value == item->max_value)) {
+				delete item;
+				progress_items_.erase(object);
+				progress_stack_.remove(object);
+				if (progress_stack_.size()) {
+					update_progress(progress_stack_.back());
+				}
+			}
+		}
 	}
-	else {
-		progress_->value((float)value);
-	}
-	// Add label "N/M things"
-	char label[100];
-	sprintf(label, "%d/%d %s", value, max_progress_, progress_suffix_.c_str());
-	progress_->copy_label(label);
-	// redraw and allow scheduler to effect the redrawing
-	progress_->redraw();
-	Fl::wait();
 }
 
 // Update progress bar witha message - e.g. cancelled and mark 100%
-void status::progress(const char* message) {
-	progress_->value((float)max_progress_);
-	progress_->copy_label(message);
-	progress_->redraw();
-	Fl::wait();
+void status::progress(const char* message, object_t object) {
+	if (progress_stack_.size()) {
+		if (progress_items_.find(object) == progress_items_.end()) {
+			char message[100];
+			snprintf(message, 100, "PROGRESS: Haven't started progress %s", OBJECT_NAMES.at(object));
+			misc_status(ST_ERROR, message);
+		}
+		else {
+			progress_item* item = progress_items_.at(object);
+			if (item->countdown) {
+				progress(0, object);
+			}
+			else {
+				progress(item->max_value, object);
+			}
+			if (message) {
+				progress_->copy_label(message);
+				progress_->redraw();
+			}
+		}
+		Fl::wait();
+	}
 }
 
 // Update rig_status - set text and colour

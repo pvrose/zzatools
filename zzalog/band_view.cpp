@@ -93,16 +93,17 @@ bool band_view::load_data() {
 	streampos startpos = file.tellg();
 	file.seekg(0, ios::end);
 	streampos currpos = file.tellg();
+	int length = currpos - startpos;
 	// reposition back to beginning
 	file.seekg(0, ios::beg);
 	// Initialise progress
 	status_->misc_status(ST_NOTE, ("BAND: Loading band-plan data"));
 	status_->progress((int)(currpos - startpos), OT_BAND, "bytes");
-	long count = 0;
 	// Read and ignore first line
 	string line;
 	getline(file, line);
-	status_->progress((int)(currpos - startpos));
+	currpos = file.tellg();
+	status_->progress((int)(currpos - startpos), OT_BAND);
 	int mode_ix = 1;
 	int bw_ix = 1;
 	mode_palette_.clear();
@@ -113,7 +114,7 @@ bool band_view::load_data() {
 		currpos = file.tellg();
 		if (file.good()) {
 			// Update progress bar
-			status_->progress((int)(currpos - startpos));
+			status_->progress((int)(currpos - startpos), OT_BAND);
 			// Read and decode the entry and add to the end
 			band_entry_t* entry = get_entry(line);
 			entries_.push_back(entry);
@@ -132,11 +133,12 @@ bool band_view::load_data() {
 	// Return success or fail
 	if (file.eof()) {
 		status_->misc_status(ST_OK, "BAND: Loaded band-plan data");
+		status_->progress(length, OT_BAND);
 		return true;
 	}
 	else {
 		status_->misc_status(ST_ERROR, "BAND: Load band-plan data failed");
-		status_->progress("Load failed!");
+		status_->progress("Load failed!", OT_BAND);
 		return false;
 	}
 }

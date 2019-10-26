@@ -42,20 +42,21 @@ bool adi_writer::store_book(book* out_book, ostream& out, set<string>* fields /*
 	// For all records and while the output is successful
 	if (out_book->header()) {
 		store_record(out_book->header(), out, result, nullptr);
-		status_->progress(1);
+		status_->progress(1, out_book->book_type());
 	}
 	for (unsigned int i = 0; i < out_book->size() && result == LR_GOOD; i++) {
 		// Output the record
 		store_record(out_book->get_record(i, false), out, result, fields);
-		status_->progress(i + 1);
+		status_->progress(i + 1, out_book->book_type());
 	}
 	// Update the progress bar with complete or failed
 	if (result == LR_GOOD) {
+		status_->progress(out_book->size() + 1, out_book->book_type());
 		status_->misc_status(ST_OK, "ADI WRITE: Done!");
 	}
 	else {
 		status_->misc_status(ST_ERROR, "ADI WRITE: Failed");
-		status_->progress("Write failed");
+		status_->progress("Write failed", out_book->book_type());
 	}
 	// restore the cursor
 	fl_cursor(FL_CURSOR_DEFAULT);

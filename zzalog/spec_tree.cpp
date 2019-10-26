@@ -78,8 +78,9 @@ void spec_tree::populate_tree(bool activate) {
 	for (auto it = spec_data_->begin(); it != spec_data_->end(); it++, i++) {
 		// Add it to the tree
 		insert_adif_spec(nullptr, *(it->second), it->first);
-		status_->progress(i);
+		status_->progress(i, OT_ADIF);
 	}
+	status_->progress(spec_data_->size(), OT_ADIF);
 	status_->misc_status(ST_OK, "SPEC DATA: Display done!");
 	// Close PAS and SAS items
 	pas_item_->close();

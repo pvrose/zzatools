@@ -266,7 +266,7 @@ bool adi_reader::load_book(book* book, istream& in) {
 			}
 			// Check progress and update bar every record read
 			byte_count_ = (long)in.tellg();
-			status_->progress(byte_count_);
+			status_->progress(byte_count_, book->book_type());
 		}
 		else {
 			// Bad record
@@ -277,12 +277,12 @@ bool adi_reader::load_book(book* book, istream& in) {
 	fl_cursor(FL_CURSOR_DEFAULT);
 	// Update progress bar with complete or failed.
 	if (in.fail() && !in.eof()) {
-		status_->progress("Load failed");
+		status_->progress("Load failed", book->book_type());
 		status_->misc_status(ST_ERROR, "ADI READ: Failed");
 		return false;
 	}
 	else {
-		status_->progress(file_size_);
+		status_->progress(file_size_, book->book_type());
 		status_->misc_status(ST_OK, "ADI READ: Done!");
 		return true;
 	}

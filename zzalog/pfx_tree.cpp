@@ -204,9 +204,9 @@ void pfx_tree::populate_tree(bool activate) {
 			// Insert the prefix to the root of the tree (which will then be built down to it).
 			insert_child(nullptr, *it);
 		}
-		status_->progress(i);
+		status_->progress(i, OT_PREFIX);
 	}
-
+	status_->progress(prefixes_.size(), OT_PREFIX);
 	status_->misc_status(ST_OK, "PFX DATA: Display done!");
 	// Restore cursor
 	fl_cursor(FL_CURSOR_DEFAULT);
