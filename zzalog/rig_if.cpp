@@ -1028,7 +1028,7 @@ rig_mode_t rig_flrig::mode() {
 // Return drive level * 100% power
 double rig_flrig::drive() {
 	rpc_data_item response;
-	if (do_request("rig.get_pwrmeter", nullptr, &response)) {
+	if (do_request("rig.get_power", nullptr, &response)) {
 		return (double)response.get_int();
 	}
 	else {
