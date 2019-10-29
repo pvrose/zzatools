@@ -289,7 +289,7 @@ void extract_data::extract_qsl(extract_data::extract_mode_t server) {
 		break;
 	case CLUBLOG:
 		reason = "ClubLog";
-		field_name = "CLUBLOG_QSO_UPDATE_STATUS";
+		field_name = "CLUBLOG_QSO_UPLOAD_STATUS";
 		break;
 	}
 
