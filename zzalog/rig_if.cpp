@@ -104,7 +104,13 @@ string rig_if::rig_info() {
 	string rig_info = handler_ + ": ";
 	rig_info += rig_name_;
 	// Valid rig - get data from it. TX frequency
-	rig_info += " " + get_tx_frequency() + " Mhz";
+	if (is_split()) {
+		rig_info += " TX:" + get_frequency(true) + " Mhz";
+		rig_info += " RX:" + get_frequency(false) + " MHz";
+	}
+	else {
+		rig_info += " " + get_frequency(true) + " MHz";
+	}
 	rig_info += " " + get_tx_power() + " W";
 	string mode;
 	string submode;
@@ -120,7 +126,7 @@ string rig_if::rig_info() {
 }
 
 // Return the transmit frequency
-string rig_if::get_tx_frequency() {
+string rig_if::get_frequency(bool tx) {
 	// get settings 
 	Fl_Preferences log_settings(settings_, "Log");
 
@@ -128,7 +134,13 @@ string rig_if::get_tx_frequency() {
 	frequency_t log_format;
 	string format;
 	log_settings.get("Frequency Precision", (int&)log_format, (int)FREQ_Hz);
-	double frequency = tx_frequency() / 1000000.0;
+	double frequency;
+	if (tx) {
+		frequency = tx_frequency() / 1000000.0;
+	}
+	else {
+		frequency = rx_frequency() / 1000000.0;
+	}
 
 	switch (log_format) {
 	case FREQ_Hz:
@@ -207,7 +219,7 @@ void rig_if::cb_timer_rig(void* v) {
 				string mode;
 				string submode;
 				rig_if_->get_string_mode(mode, submode);
-				string freq = rig_if_->get_tx_frequency();
+				string freq = rig_if_->get_frequency(true);
 				string power = rig_if_->get_tx_power();
 				if (submode.length()) {
 					scratchpad_->rig_update(freq, submode, power);
@@ -990,9 +1002,9 @@ string& rig_flrig::rig_name() {
 }
 
 // Read TX Frequency
-double rig_flrig::tx_frequency() {
+double rig_flrig::rx_frequency() {
 	rpc_data_item response;
-	if (do_request("rig.get_vfo", nullptr, &response)) {
+	if (do_request("rig.get_vfoA", nullptr, &response)) {
 		return response.get_double();
 	}
 	else {
@@ -1038,14 +1050,34 @@ double rig_flrig::drive() {
 
 // Rig is working split TX/RX frequency
 bool rig_flrig::is_split() {
-	// There is no flrig rpc to get at split.
-	return false;
+	rpc_data_item response;
+	if (do_request("rig.get_split", nullptr, &response)) {
+		return (bool)response.get_int();
+	}
+	else {
+		return false;
+	}
 }
 
 // Get separate frequency
-double rig_flrig::rx_frequency() {
-	// It is not possible to access the alternate VFO
-	return tx_frequency();
+double rig_flrig::tx_frequency() {
+	rpc_data_item response;
+	if (is_split()) {
+		if (do_request("rig.get_AB", nullptr, &response) && response.get_int() == 0) {
+			// return VFO B 
+			if (do_request("rig.get_vfoB", nullptr, &response)) {
+				return (double)response.get_int();
+			}
+			else {
+				return nan("");
+			}
+		}
+	} 
+	// Return VFO A if either not split or VFO B is the TX frequency
+	if (do_request("rig.get_vfoA", nullptr, &response)) {
+		return (double)response.get_int();
+	}
+	return nan("");
 }
 
 // Return S-meter reading (S9+/-dB)

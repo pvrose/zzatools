@@ -95,7 +95,7 @@ namespace zzalog {
 		// return mode/submode
 		void get_string_mode(string& mode, string& submode);
 		// return frequency
-		string get_tx_frequency();
+		string get_frequency(bool tx);
 		// return power
 		string get_tx_power();
 		// return S-meter reading

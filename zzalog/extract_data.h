@@ -24,7 +24,7 @@ namespace zzalog {
 			EQSL,        // upload to eQSL.cc
 			LOTW,        // upload to arrl.org/LotW
 			CARD,        // printing cards.
-			CABRILLO     // outputting a Cabrillo file
+			CLUBLOG      // upload to ClubLog
 		};
 
 		extract_data();

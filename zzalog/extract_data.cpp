@@ -287,7 +287,12 @@ void extract_data::extract_qsl(extract_data::extract_mode_t server) {
 		reason = "Printed card";
 		field_name = "QSL_SENT";
 		break;
+	case CLUBLOG:
+		reason = "ClubLog";
+		field_name = "CLUBLOG_QSO_UPDATE_STATUS";
+		break;
 	}
+
 	// Extract those records not sent to QSL server !(*QSL_SENT==Y) 
 	search_criteria_t	new_criteria = {
 		/*search_cond_t condition*/ XC_FIELD,
@@ -324,7 +329,7 @@ void extract_data::extract_qsl(extract_data::extract_mode_t server) {
 		/*string pattern;*/ "N"
 	};
 	criteria(new_criteria, server);
-	if (server == LOTW) {
+	if (server == LOTW || server == CLUBLOG) {
 		// Only send those to which are QSOs !(SWL==Y)
 		new_criteria = {
 			/*search_cond_t condition*/ XC_FIELD,

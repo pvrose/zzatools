@@ -171,7 +171,7 @@ void scratchpad::create_form() {
 	string submode;
 	if (rig_if_) {
 		// Get data from rig
-		frequency = rig_if_->get_tx_frequency();
+		frequency = rig_if_->get_frequency(true);
 		power = rig_if_->get_tx_power();
 		rig_if_->get_string_mode(mode, submode);
 	}

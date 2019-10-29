@@ -103,7 +103,10 @@ record::record(logging_mode_t type) {
 				break;
 			}
 			// Get frequency, mode and transmit power from rig
-			item("FREQ", rig_if_->get_tx_frequency());
+			item("FREQ", rig_if_->get_frequency(true));
+			if (rig_if_->is_split()) {
+				item("FREQ_RX", rig_if_->get_frequency(false));
+			}
 			// Get mode - NB USB/LSB need further processing
 			string mode;
 			string submode;

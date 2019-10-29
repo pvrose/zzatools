@@ -101,6 +101,7 @@ namespace zzalog {
 	{ "&Cancel", 0, menu::cb_mi_log_del, (void*)false },
 	{ "&Delete record", 0, menu::cb_mi_log_del, (void*)true, FL_MENU_DIVIDER },
 	{ "&Parse record", 0, menu::cb_mi_parse_qso, 0 },
+	{ "&Unparse record", 0, menu::cb_mi_unparse_qso, 0 },
 	{ "&Validate record", 0, menu::cb_mi_valid8_qso, 0, FL_MENU_DIVIDER },
 	{ "Pa&rse log", 0, menu::cb_mi_parse_log, 0 },
 	{ "Val&idate log", 0, menu::cb_mi_valid8_log, 0, FL_MENU_DIVIDER },
@@ -131,7 +132,7 @@ namespace zzalog {
 	{ "e&QSL", 0, menu::cb_mi_ext_qsl, (void*)extract_data::EQSL },
 	{ "&LotW", 0, menu::cb_mi_ext_qsl, (void*)extract_data::LOTW },
 	{ "Car&d", 0, menu::cb_mi_ext_qsl, (void*)extract_data::CARD },
-	{ "Ca&brillo", 0, menu::cb_mi_ext_qsl, (void*)extract_data::CABRILLO, FL_MENU_DIVIDER },
+	{ "Club&Log", 0, menu::cb_mi_ext_qsl, (void*)extract_data::CLUBLOG, FL_MENU_DIVIDER },
 	{ "&Save", 0, menu::cb_mi_file_saveas, (void*)OT_EXTRACT },
 	{ "&Upload", 0, menu::cb_mi_ext_upload, 0 },
 	{ "&Print", 0, menu::cb_mi_ext_print, 0 },
@@ -595,6 +596,16 @@ void menu::cb_mi_parse_qso(Fl_Widget* w, void* v) {
 			book_->modified(true);
 		}
 	}
+}
+
+// Log->Unparse QSO - remove the parsed fields
+// v is not used
+void menu::cb_mi_unparse_qso(Fl_Widget* w, void* v) {
+	// Get selected record
+	record* record = navigation_book_->get_record();
+	record->unparse();
+	navigation_book_->selection(-1, HT_CHANGED);
+	book_->modified(true);
 }
 
 // Log ->Parse Log - parse all records in selected book
