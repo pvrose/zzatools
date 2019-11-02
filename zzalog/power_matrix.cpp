@@ -104,29 +104,29 @@ void power_matrix::delete_rig() {
 double power_matrix::power(string band, int drive) {
 	double power = look_up(band, drive);
 	double precision = look_up(band, 100) / 100;
-	if (precision < 0.01) {
+	if (precision < 0.001) {
 		// Return value read
 		return power;
 	}
-	else if (precision < 0.1) {
-		// Return to closest 0.01 W
+	else if (precision < 0.01) {
+		// Return to closest 0.1 W
 		int result = (int)(power * 100);
 		return (double)result * 0.01;
 	}
-	else if (precision < 1.0) {
+	else if (precision < 0.1) {
 		// return to closest 0.1W
 		int result = (int)(power * 10);
 		return (double)result * 0.1;
 	}
-	else if (precision < 10.0) {
+	else if (precision < 1.0) {
 		int result = (int)power;
 		return (double)result;
 	}
-	else if (precision < 100.0) {
+	else if (precision < 10.0) {
 		int result = (int)(power * 0.1);
 		return (double)result * 10.0;
 	}
-	else if (precision < 1000.0) {
+	else if (precision < 100.0) {
 		int result = (int)(power * 0.01);
 		return (double)result * 100.0;
 	}
@@ -150,9 +150,10 @@ double power_matrix::look_up(string band, int drive) {
 		double last_power = 0.0;
 		int last_drive = 0;
 		double slope = 0.0;
+		bool carry_on = true;
 		auto it = power_map->begin();
 		// Step through the map until we have passed the supplied drive
-		for (; it != power_map->end() && it->first <= drive; it++) {
+		for (; it != power_map->end() && carry_on; it++) {
 			// Set slope to that between the last two 
 			if (it->first == last_drive) {
 				slope = 0;
@@ -162,6 +163,7 @@ double power_matrix::look_up(string band, int drive) {
 			}
 			last_power = it->second;
 			last_drive = it->first;
+			if (last_drive > drive) carry_on = false;
 		}
 		return last_power + (slope * (double)(drive - last_drive));
 	}

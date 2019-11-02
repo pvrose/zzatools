@@ -907,7 +907,7 @@ void menu::cb_mi_log_bulk(Fl_Widget* w, void* v) {
 				num_changed++;
 				break;
 			}
-			status_->progress(i, navigation_book_->book_type());
+			status_->progress(i + 1, navigation_book_->book_type());
 		}
 		// Get all views to update
 		book_->selection(book_->selection(), HT_ALL);

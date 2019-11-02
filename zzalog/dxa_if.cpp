@@ -1334,7 +1334,6 @@ void dxa_if::draw_pins() {
 			}
 
 			status_->misc_status(ST_OK, "DXATLAS: Update done!");
-			status_->progress(records_to_display_.size(), OT_DXATLAS);
 		}
 		catch (exception& /*e*/) {
 			status_->misc_status(ST_SEVERE, "DXATLAS: Error detected during update");

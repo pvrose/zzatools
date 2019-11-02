@@ -6,6 +6,7 @@
 
 #include <string>
 #include <vector>
+#include <ctime>
 
 using namespace std;
 
@@ -116,8 +117,10 @@ namespace zzalog {
 		bool close_pending_;
 		// Logging mode to enacy after close
 		logging_mode_t next_logging_mode_;
-		// Timer count (in seconds)
-		double timer_count_;
+		// Start of timer
+		time_t timer_start_;
+		// Timer period
+		double timer_period_;
 		// Original value of book_->enable_save_
 		bool old_enable_save_;
 

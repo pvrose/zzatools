@@ -325,7 +325,9 @@ bool book::store_data(string filename, bool force, set<string>* fields) {
 				// Check for .adi format
 				if (filetype == ".adi" || filetype == ".adif") {
 					// Connect file to output stream and get ADI writer to write it
-					status_->file_status(FS_SAVING);
+					if (book_type_ == OT_MAIN) {
+						status_->file_status(FS_SAVING);
+					}
 					file.open(filename_.c_str(), fstream::out);
 					adi_writer* writer = new adi_writer;
 					if (writer->store_book(this, file, fields) != LR_GOOD) {
@@ -344,7 +346,9 @@ bool book::store_data(string filename, bool force, set<string>* fields) {
 				// check for .adx format
 				else if (filetype == ".adx") {
 					// Connect file to output stream and store data
-					status_->file_status(FS_SAVING);
+					if (book_type_ == OT_MAIN) {
+						status_->file_status(FS_SAVING);
+					}
 					file.open(filename_.c_str(), fstream::out);
 					adx_writer* writer = new adx_writer;
 					if (!writer->store_book(this, file)) {

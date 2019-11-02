@@ -61,6 +61,7 @@ import_data::import_data() :
 	match_question_ = "";
 	close_pending_ = false;
 	next_logging_mode_ = LM_OFF_AIR;
+	timer_start_ = nan("");
 	timer_period_ = nan("");
 }
 
@@ -121,7 +122,7 @@ bool import_data::start_auto_update() {
 			free(temp);
 		}
 		// Start auto_update
-		auto_update();
+		auto_update():
 		menu_->logging(LM_IMPORTED);
 	}
 	else {
