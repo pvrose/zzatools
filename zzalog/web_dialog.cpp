@@ -10,6 +10,7 @@
 #include <FL/Fl_Secret_Input.H>
 #include <FL/Fl_Group.H>
 #include <FL/Fl_RGB_Image.H>
+#include <FL/Fl_Int_Input.H>
 
 using namespace zzalog;
 
@@ -40,6 +41,11 @@ web_dialog::web_dialog(int X, int Y, int W, int H, const char* label) :
 	, grp_lotw_(nullptr)
 	, grp_qrz_(nullptr)
 	, qrz_xml_merge_(false)
+	, club_enable_(false)
+	, club_username_("")
+	, club_password_("")
+	, club_interval_(0)
+	, club_unzipper_("")
 {
 	image_widgets_.clear();
 
@@ -68,6 +74,7 @@ void web_dialog::load_values() {
 	Fl_Preferences lotw_settings(qsl_settings, "LotW");
 	Fl_Preferences qrz_settings(qsl_settings, "QRZ");
 	Fl_Preferences card_settings(qsl_settings, "Card");
+	Fl_Preferences club_settings(qsl_settings, "ClubLog");
 
 	// eQSL User/Password
 	eqsl_settings.get("Enable", (int&)eqsl_enable_, false);
@@ -113,6 +120,19 @@ void web_dialog::load_values() {
 	eqsl_swl_msg_ = temp;
 	free(temp);
 
+	// ClubLog settings
+	club_settings.get("Enable", (int&)club_enable_, false);
+	club_settings.get("Email", temp, "");
+	club_username_ = temp;
+	free(temp);
+	club_settings.get("Password", temp, "");
+	club_password_ = temp;
+	free(temp);
+	club_settings.get("Unzip Command", temp, "7z e %s -o %s");
+	club_unzipper_ = temp;
+	free(temp);
+	club_settings.get("Interval", club_interval_, 7);
+
 }
 
 // Create the dialog
@@ -142,8 +162,16 @@ void web_dialog::create_form(int X, int Y) {
 	const int H3_2 = HRADIO;
 	const int HGRP3 = R3_2 + H3_2 + GAP - GRP3;
 
+	// Group 4 ClubLog widgets
+	const int GRP4 = GRP3 + HGRP3 + GAP;
+	const int R4_1 = GRP4 + GAP + HTEXT;
+	const int H4_1 = HBUTTON;
+	const int R4_2 = R4_1 + H4_1 + HTEXT;
+	const int H4_2 = HTEXT;
+	const int HGRP4 = R4_2 + H4_2 + GAP - GRP4;
+
 	// overall height 
-	const int HALL = GRP3 + HGRP3 + EDGE;
+	const int HALL = GRP4 + HGRP4 + EDGE;
 
 	// Columns
 	// main columns
@@ -155,6 +183,7 @@ void web_dialog::create_form(int X, int Y) {
 	const int W3 = HBUTTON * 3 / 2;
 	const int C4 = C3 + W3 + GAP;
 	const int W4 = WSMEDIT;
+	const int W34 = W3 + W4 + GAP;
 	const int C5 = C4 + W4 + GAP;
 	const int W5 = WSMEDIT;
 
@@ -371,6 +400,65 @@ void web_dialog::create_form(int X, int Y) {
 
 	gp3->end();
 
+	// Row 1 Col 1 - ClubLog Enable
+	Fl_Check_Button* bn4_1_1 = new Fl_Check_Button(X + C1, Y + R4_1, W1, H4_1, "En");
+	bn4_1_1->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
+	bn4_1_1->labelsize(FONT_SIZE);
+	bn4_1_1->value(club_enable_);
+	bn4_1_1->callback(cb_ch_enable, &club_enable_);
+	bn4_1_1->when(FL_WHEN_CHANGED);
+	bn4_1_1->tooltip("Enable ClubLog access");
+
+	// QRZ.com group
+	Fl_Group* gp4 = new Fl_Group(X + EDGE, Y + GRP4, WGRP, HGRP4, "ClubLog");
+	gp4->labelsize(FONT_SIZE);
+	gp4->box(FL_THIN_DOWN_FRAME);
+	gp4->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
+
+
+	// Row 1 Col 3/4 - User entry field
+	intl_input* in4_1_4 = new intl_input(X + C3, Y + R4_1, W34, H4_1, "User (e-mail)");
+	in4_1_4->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
+	in4_1_4->labelsize(FONT_SIZE);
+	in4_1_4->textsize(FONT_SIZE);
+	in4_1_4->value(club_username_.c_str());
+	in4_1_4->callback(cb_value<intl_input, string>, &club_username_);
+	in4_1_4->when(FL_WHEN_CHANGED);
+	in4_1_4->tooltip("Enter e-mail address for ClubLog");
+
+	// Row 1 Col 5 - Password entry field
+	Fl_Secret_Input* in4_1_5 = new Fl_Secret_Input(X + C5, Y + R4_1, W5, H4_1, "Password");
+	in4_1_5->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
+	in4_1_5->labelsize(FONT_SIZE);
+	in4_1_5->textsize(FONT_SIZE);
+	in4_1_5->value(club_password_.c_str());
+	in4_1_5->callback(cb_value<Fl_Secret_Input, string>, &club_password_);
+	in4_1_5->when(FL_WHEN_CHANGED);
+	in4_1_5->tooltip("Enter password for ClubLog");
+
+	// Row 2 Col 2 - Interval bewteen downloads
+	Fl_Int_Input* in4_2_2 = new Fl_Int_Input(X + C2, Y + R4_2, W2, H4_2, "Interval");
+	in4_2_2->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
+	in4_2_2->labelsize(FONT_SIZE);
+	in4_2_2->textsize(FONT_SIZE);
+	in4_2_2->value(to_string(club_interval_).c_str());
+	in4_2_2->callback(cb_value_int<Fl_Int_Input>, &club_interval_);
+	in4_2_2->when(FL_WHEN_CHANGED);
+	in4_2_2->tooltip("Specify the days between updating the exception file");
+
+	// Row2 Col 3/4 - Unzipping command
+	Fl_Input* in4_2_3 = new Fl_Input(X + C3, Y + R4_2, W34, H4_2, "Unzipping command");
+	in4_2_3->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
+	in4_2_3->labelsize(FONT_SIZE);
+	in4_2_3->textsize(FONT_SIZE);
+	in4_2_3->value(club_unzipper_.c_str());
+	in4_2_3->callback(cb_value<Fl_Input, string>, &club_interval_);
+	in4_2_3->when(FL_WHEN_CHANGED);
+	in4_2_3->tooltip("Enter the command to be used to unzip the exception file - %s for file and destination directory");
+
+	grp_club_ = gp4;
+	gp4->end();
+
 	Fl_Group::end();
 }
 
@@ -382,6 +470,7 @@ void web_dialog::save_values() {
 	Fl_Preferences lotw_settings(qsl_settings, "LotW");
 	Fl_Preferences qrz_settings(qsl_settings, "QRZ");
 	Fl_Preferences card_settings(qsl_settings, "Card");
+	Fl_Preferences club_settings(qsl_settings, "ClubLog");
 	// eQSL Settings
 	eqsl_settings.set("Enable", eqsl_enable_);
 	eqsl_settings.set("User", eqsl_username_.c_str());
@@ -403,6 +492,13 @@ void web_dialog::save_values() {
 	card_settings.set("QSL Message", eqsl_qso_msg_.c_str());
 	card_settings.set("SWL Enable", eqsl_use_swl_msg_);
 	card_settings.set("SWL Message", eqsl_swl_msg_.c_str());
+
+	// ClubLog settings
+	club_settings.set("Enable", club_enable_);
+	club_settings.set("Email", club_username_.c_str());
+	club_settings.set("Password", club_password_.c_str());
+	club_settings.set("Unzip Command", club_unzipper_.c_str());
+	club_settings.set("Interval", club_interval_);
 }
 
 // Enable widgets after enabling/disabling stuff
@@ -427,5 +523,12 @@ void web_dialog::enable_widgets() {
 	}
 	else {
 		grp_qrz_->deactivate();
+	}
+	// Enable/disable ClubLog widgets
+	if (club_enable_) {
+		grp_club_->activate();
+	}
+	else {
+		grp_club_->deactivate();
 	}
 }

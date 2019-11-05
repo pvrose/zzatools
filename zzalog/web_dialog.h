@@ -44,6 +44,8 @@ namespace zzalog {
 		Fl_Group* grp_lotw_;
 		// Widgets for QRZ.com
 		Fl_Group* grp_qrz_;
+		// Widgets for ClubLog
+		Fl_Group* grp_club_;
 		// Widgets containing images
 		set<Fl_Widget*> image_widgets_;
 
@@ -88,6 +90,18 @@ namespace zzalog {
 		string qrz_password_;
 		// Use XML database and merge
 		bool qrz_xml_merge_;
+
+		// ClubLog attributes
+
+		// enable
+		bool club_enable_;
+		// username (e-mail)
+		string club_username_;
+		string club_password_;
+		// Command to unzip exception file
+		string club_unzipper_;
+		// Number of days between downloads
+		int club_interval_;
 
 	};
 

@@ -36,6 +36,7 @@ main.cpp - application entry point
 #include "scratchpad.h"
 #include "dxa_if.h"
 #include "qrz_handler.h"
+#include "clublog_handler.h"
 
 // C/C++ header files
 #include <ctime>
@@ -83,6 +84,7 @@ url_handler* url_handler_ = nullptr;
 intl_dialog* intl_dialog_ = nullptr;
 band_view* band_view_ = nullptr;
 scratchpad* scratchpad_ = nullptr;
+clublog_handler* clublog_handler_ = nullptr;
 #ifdef _WIN32
 dxa_if* dxatlas_ = nullptr;
 #endif
@@ -492,6 +494,8 @@ void add_qsl_handlers() {
 		if (lotw_handler_ == nullptr) lotw_handler_ = new lotw_handler;
 		// QRZ.com - accesses the appropriate URL to get information about the other station
 		if (qrz_handler_ == nullptr) qrz_handler_ = new qrz_handler;
+		// ClubLog handler
+		if (clublog_handler_ == nullptr) clublog_handler_ = new clublog_handler;
 	}
 }
 
@@ -603,6 +607,7 @@ void tidy() {
 	fl_message_title_default(nullptr);
 	delete scratchpad_;
 	delete dxatlas_;
+	delete clublog_handler_;
 	delete qrz_handler_;
 	delete lotw_handler_;
 	delete eqsl_handler_;
