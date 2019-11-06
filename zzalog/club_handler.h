@@ -7,14 +7,14 @@
 #include <FL/Fl_Help_Dialog.H>
 
 namespace zzalog {
-	class clublog_handler
+	class club_handler
 	{
 	private:
 		// ClubLog API developers key
 		const char* api_key_ = "ca1445fb25fef92b03c65f2484ef4d77e903e6f4";
 	public:
-		clublog_handler();
-		~clublog_handler();
+		club_handler();
+		~club_handler();
 
 		// Upload the saved log to ClubLog using putlogs.php interface
 		bool upload_log(book* book);

@@ -207,7 +207,7 @@
     <ClCompile Include="zzalog\qrz_handler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="zzalog\clublog_handler.cpp">
+    <ClCompile Include="zzalog\club_handler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -425,7 +425,7 @@
     <ClInclude Include="zzalog\version.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="zzalog\clublog_handler.h">
+    <ClInclude Include="zzalog\club_handler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

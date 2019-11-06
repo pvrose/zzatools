@@ -185,7 +185,6 @@ bool url_handler::post_form(string url, map<string, string> fields, istream* req
 	if (result != CURLE_OK) {
 		// TODO: This doesn't clean up all the memory
 		// Reset the operation and clean up
-
 		char* message = new char[strlen(curl_easy_strerror(result)) + 50];
 		sprintf(message, "HTTP POST: failed: %s", curl_easy_strerror(result));
 		status_->misc_status(ST_ERROR, message);

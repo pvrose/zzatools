@@ -8,7 +8,7 @@
 #include "eqsl_handler.h"
 #include "lotw_handler.h"
 #include "spec_data.h"
-#include "clublog_handler.h"
+#include "club_handler.h"
 
 #include <sstream>
 
@@ -22,7 +22,7 @@ extern tabbed_forms* tabbed_view_;
 extern status* status_;
 extern eqsl_handler* eqsl_handler_;
 extern lotw_handler* lotw_handler_;
-extern clublog_handler* clublog_handler_;
+extern club_handler* club_handler_;
 extern spec_data* spec_data_;
 
 // Constructor
@@ -403,7 +403,7 @@ void extract_data::upload() {
 		lotw_handler_->upload_lotw_log(this);
 		break;
 	case CLUBLOG:
-		if (clublog_handler_->upload_log(this)) {
+		if (club_handler_->upload_log(this)) {
 			status_->misc_status(ST_OK, "EXTRACT: Clublog upload successful!");
 		}
 		break;

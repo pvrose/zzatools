@@ -1,4 +1,4 @@
-#include "clublog_handler.h"
+#include "club_handler.h"
 #include "url_handler.h"
 #include "adi_writer.h"
 #include "status.h"
@@ -17,17 +17,17 @@ extern url_handler* url_handler_;
 extern Fl_Preferences* settings_;
 extern status* status_;
 
-clublog_handler::clublog_handler() {
+club_handler::club_handler() {
 
 }
 
-clublog_handler::~clublog_handler() {
+club_handler::~club_handler() {
 
 }
 
 
 // Upload the saved log to ClubLog using putlogs.php interface
-bool clublog_handler::upload_log(book* book) {
+bool club_handler::upload_log(book* book) {
 	if (book->size()) {
 		status_->misc_status(ST_NOTE, "CLUBLOG: Starting upload");
 		// Get the book data
@@ -66,7 +66,7 @@ bool clublog_handler::upload_log(book* book) {
 }
 
 // Generate the fields in the form
-void clublog_handler::generate_form(map<string, string>& fields) {
+void club_handler::generate_form(map<string, string>& fields) {
 	// Read the settings that define user's access 
 	Fl_Preferences qsl_settings(settings_, "QSL");
 	Fl_Preferences clublog_settings(qsl_settings, "ClubLog");
@@ -95,7 +95,7 @@ void clublog_handler::generate_form(map<string, string>& fields) {
 }
 
 // Download the exception file
-bool clublog_handler::download_exception() {
+bool club_handler::download_exception() {
 	// Start downloading exception file
 	status_->misc_status(ST_NOTE, "CLUBLOG: Starting to download exception file");
 	string ref_dir;
@@ -113,7 +113,7 @@ bool clublog_handler::download_exception() {
 }
 
 // Unzip the downloaded  exceptions file
-bool clublog_handler::unzip_exception(string filename) {
+bool club_handler::unzip_exception(string filename) {
 	// Read the settings that define user's access 
 	string ref_dir;
 	get_reference(ref_dir);
@@ -153,7 +153,7 @@ bool clublog_handler::unzip_exception(string filename) {
 }
 
 // Get reference directory
-void clublog_handler::get_reference(string& dir_name) {
+void club_handler::get_reference(string& dir_name) {
 	// Get the reference data directory from the settings
 	Fl_Preferences datapath(settings_, "Datapath");
 	char* temp = nullptr;

@@ -122,7 +122,7 @@
     <ClCompile Include="zzalog\book.cpp" />
     <ClCompile Include="zzalog\calendar.cpp" />
     <ClCompile Include="zzalog\change_dialog.cpp" />
-    <ClCompile Include="zzalog\clublog_handler.cpp" />
+    <ClCompile Include="zzalog\club_handler.cpp" />
     <ClCompile Include="zzalog\config_tree.cpp" />
     <ClCompile Include="zzalog\corr_dialog.cpp" />
     <ClCompile Include="zzalog\dxa_if.cpp" />
@@ -188,7 +188,7 @@
     <ClInclude Include="zzalog\book.h" />
     <ClInclude Include="zzalog\calendar.h" />
     <ClInclude Include="zzalog\change_dialog.h" />
-    <ClInclude Include="zzalog\clublog_handler.h" />
+    <ClInclude Include="zzalog\club_handler.h" />
     <ClInclude Include="zzalog\config_tree.h" />
     <ClInclude Include="zzalog\corr_dialog.h" />
     <ClInclude Include="zzalog\drawing.h" />
