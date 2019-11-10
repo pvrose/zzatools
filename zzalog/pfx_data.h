@@ -3,6 +3,8 @@
 
 #include "prefix.h"
 #include "record.h"
+#include "exc_data.h"
+
 #include <map>
 #include <unordered_set>
 #include <string>
@@ -122,6 +124,8 @@ namespace zzalog {
 	protected:
 		// Prefix data table - indexed by prefix nickname
 		map<string, prefix*> prefixes_by_nickname_;
+		// Exception data
+		exc_data* exceptions_;
 	};
 
 }

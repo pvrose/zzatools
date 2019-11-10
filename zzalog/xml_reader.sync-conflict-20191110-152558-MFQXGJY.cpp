@@ -425,12 +425,11 @@ bool xml_reader::process_start_tag(istream& is) {
 			// We have an empty element tag (i.e. no content so Start and end it)
 			end_element(name);
 			// skip />
-			char c = is.get();
-			c = is.get();
+			is.seekg(2, ios_base::cur);
 		}
 		else {
 			// skip >
-			char c = is.get();
+			is.seekg(1, ios_base::cur);
 		}
 	}
 	else
@@ -615,32 +614,22 @@ string& xml_reader::information() {
 
 // Convert XML date time format (ISO format) to time_t
 time_t xml_reader::convert_xml_datetime(string value) {
-	// Get resolution of time_t
+	// Get local TZ
 	time_t now;
 	time(&now);
-	time_t then = now + 1;
-	double resolution = difftime(then, now);
 
 	// YYY-MM-DDTHH:MM:SS+HH:MM
 	tm tv;
 	tv.tm_year = stoi(value.substr(0, 4)) - 1900;
-	tv.tm_mon = stoi(value.substr(5, 2)) - 1;
-	tv.tm_mday = stoi(value.substr(8, 2));
-	tv.tm_hour = stoi(value.substr(11, 2));
-	tv.tm_min = stoi(value.substr(14, 2));
-	tv.tm_sec = stoi(value.substr(17, 2));
+	tv.tm_mon = stoi(value.substr(6, 2)) - 1;
+	tv.tm_mday = stoi(value.substr(9, 2));
+	tv.tm_hour = stoi(value.substr(12, 2));
+	tv.tm_min = stoi(value.substr(15, 2));
+	tv.tm_sec = stoi(value.substr(18, 2));
 	tv.tm_isdst = false;
-	bool subtract = value[19] == '+';
-	long tz_hour = stoi(value.substr(20, 2));
-	long tz_min = stoi(value.substr(23, 2));
-	double seconds = (3600.0 * tz_hour) + (60.0 * tz_min);
-	long adjust = seconds / resolution;
+	if (value.length() > 20 && value.substr(21) != "00:00") {
+		status_->misc_status(ST_ERROR, "XML: XML date-time has unsupported TZ offset");
+	}
 	time_t result = _mkgmtime(&tv);
-	if (subtract) {
-		result -= adjust;
-	}
-	else {
-		result += adjust;
-	}
 	return result;
 }

@@ -42,6 +42,8 @@ pfx_data::pfx_data()
 
 	delete reader;
 
+	exceptions_ = new exc_data;
+
 }
 
 // Destructor
@@ -54,6 +56,8 @@ pfx_data::~pfx_data()
 	// clear storage in maps
 	clear();
 	prefixes_by_nickname_.clear();
+
+	delete exceptions_;
 }
 
 // get the prefix data filename
@@ -578,7 +582,7 @@ bool pfx_data::update_dxcc(record* record, prefix*& in_prefix, bool& query, stri
 		in_prefix = this->get_prefix(prefix_code);
 	}
 	// If not try DXCC
-	if (in_prefix == nullptr && dxcc_string != "" && state != "") {
+	if (in_prefix == nullptr && dxcc_string != "") {
 		in_prefix = this->get_prefix(dxcc_num, state);
 	}
 	// Otherwise parse the callsign to get it
@@ -847,6 +851,20 @@ parse_result_t pfx_data::parse(record* record) {
 	bool has_query = false;
 	bool invalid_record = !record->is_valid();
 	bool query_error = false;
+	// Check if the call is listed in exceptions
+	if (exceptions_->is_invalid(record)) {
+		char message[150];
+		snprintf(message, 150, "PARSE: Contact %s %s %s is an invalid operation", record->item("CALL").c_str(), record->item("QSO_DATE").c_str(), record->item("TIME_ON"));
+		status_->misc_status(ST_ERROR, message);
+	}
+	else {
+		exc_entry* exception = exceptions_->is_exception(record);
+		if (exception) {
+			// Use the values in the exceptions entry
+			record->item("DXCC", to_string(exception->adif_id));
+			record->item("CQZ", to_string(exception->cq_zone));
+		}
+	}
 	// Parse the various dependent fields
 	updated = update_geography(record, has_query, query_reason, query_error) || updated;
 	updated = update_bearing(record) || updated;

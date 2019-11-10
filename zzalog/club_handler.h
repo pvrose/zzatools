@@ -1,7 +1,7 @@
 #ifndef __CLUBLOG_HANDLER__
 #define __CLUBLOG_HANDLER__
 
-#include "record.h";
+#include "record.h"
 #include "book.h"
 
 #include <FL/Fl_Help_Dialog.H>

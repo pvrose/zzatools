@@ -7,6 +7,7 @@
 #include <string>
 #include <map>
 #include <regex>
+#include <ctime>
 
 using namespace std;
 
@@ -68,6 +69,8 @@ namespace zzalog {
 		bool ignore_white_space(istream& is);
 		// Convert &..; to original character
 		void process_escape(istream& is, string& result);
+		// Convert XML date-time format to time_t
+		time_t convert_xml_datetime(string value);
 		// The prolog element
 		xml_element* prolog_;
 		// The top-element
