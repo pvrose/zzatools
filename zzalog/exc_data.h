@@ -15,9 +15,8 @@ namespace zzalog {
 	// An exc_data entry - it will be mapped by callsign to a list of them
 	struct exc_entry {
 		string call;
-		string entity;
 		unsigned short adif_id;
-		unsigned char cq_zone;
+		unsigned short cq_zone;
 		string continent;
 		double longitude;
 		double latitude;
@@ -26,7 +25,6 @@ namespace zzalog {
 
 		exc_entry() {
 			call = "";
-			entity = "";
 			adif_id = 0;
 			cq_zone = 0;
 			continent = "";
@@ -35,6 +33,8 @@ namespace zzalog {
 			start = -1;
 			end = -1;
 		}
+		ostream& store(ostream& out);
+		istream& load(istream& in);
 	};
 
 	// An invalid entry
@@ -48,6 +48,8 @@ namespace zzalog {
 			start = -1;
 			end = -1;
 		}
+		ostream& store(ostream& out);
+		istream& load(istream& in);
 	};
 
 	class exc_data
@@ -60,10 +62,14 @@ namespace zzalog {
 		exc_entry* is_exception(record* record);
 		// Check timeliness of data
 		bool data_valid(string filename);
-		// Load data
+		// Load data 
 		bool load_data(string filename);
 		// Return invalid operation
 		bool is_invalid(record* record);
+		// Allow the reader to access the data directlt
+		friend class exc_reader;
+		ostream& store(ostream& out);
+		istream& load(istream& in);
 
 	protected:
 		// Get the filename {REFERENCE DIR}/cty.xml
@@ -71,14 +77,14 @@ namespace zzalog {
 		// Delete contents
 		void delete_contents();
 
-		// Allow the reader to access the data directlt
-		friend class exc_reader;
-		// The exc_data data
+			// The exc_data data
 		map < string, list<exc_entry*> > entries_;
 		// Invalid operations 
 		map<string, list<invalid*> > invalids_;
 		// File created
 		string file_created_;
+
+
 		
 	};
 

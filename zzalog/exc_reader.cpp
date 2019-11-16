@@ -47,32 +47,23 @@ bool exc_reader::end_element(string name) {
 		string element = elements_.back();
 		elements_.pop_back();
 		if (element == "exception") {
-			list<exc_entry*>* entries;
 			if (data_->entries_.find(current_exception_->call) == data_->entries_.end()) {
-				entries = new list<exc_entry*>;
-				(data_->entries_)[current_exception_->call];
+				list<exc_entry*>* entries = new list<exc_entry*>;
+				(data_->entries_)[current_exception_->call] = *entries;
 			}
-			else {
-				entries = &data_->entries_.at(current_exception_->call);
-			}
-			entries->push_back(current_exception_);
+			data_->entries_.at(current_exception_->call).push_back(current_exception_);
 			current_exception_ = nullptr;
 		}
-		else if (element == "invalid_operation") {
-			list<invalid*>* invalids;
+		else if (element == "invalid") {
 			if (data_->invalids_.find(current_invalid_->call) == data_->invalids_.end()) {
-				invalids = new list<invalid*>;
-				(data_->invalids_)[current_invalid_->call];
+				list<invalid*>* invalids = new list<invalid*>;
+				(data_->invalids_)[current_invalid_->call] = *invalids;
 			}
-			else {
-				invalids = &data_->invalids_.at(current_invalid_->call);
-			}
-			invalids->push_back(current_invalid_);
+			data_->invalids_.at(current_invalid_->call).push_back(current_invalid_);
 			current_invalid_ = nullptr;
 		}
 		else if (elements_.size() && elements_.back() == "exception") {
 			if (element == "call") current_exception_->call = value_;
-			else if (element == "entity") current_exception_->entity = value_;
 			else if (element == "adif") current_exception_->adif_id = stoi(value_);
 			else if (element == "cqz") current_exception_->cq_zone = stoi(value_);
 			else if (element == "cont") current_exception_->continent = value_;

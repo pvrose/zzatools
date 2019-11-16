@@ -3,6 +3,7 @@
 #include "adi_writer.h"
 #include "status.h"
 #include "../zzalib/callback.h"
+#include "exc_data.h"
 
 #include <sstream>
 
@@ -18,7 +19,7 @@ extern Fl_Preferences* settings_;
 extern status* status_;
 
 club_handler::club_handler() {
-
+	if (!url_handler_) url_handler_ = new url_handler;
 }
 
 club_handler::~club_handler() {
@@ -100,13 +101,15 @@ bool club_handler::download_exception() {
 	status_->misc_status(ST_NOTE, "CLUBLOG: Starting to download exception file");
 	string ref_dir;
 	get_reference(ref_dir);
-	string filename = ref_dir + "/cty.xml.gz";
+	string filename = ref_dir + "cty.xml.gz";
 	ofstream os(filename, ios::trunc | ios::out | ios::binary);
 	string url = "https://cdn.clublog.org/cty.php?api=" + string(api_key_);
 	if (url_handler_->read_url(url, &os)) {
+		os.close();
 		status_->misc_status(ST_NOTE, "CLUBLOG: Exception file downloaded successfully - unzipping it");
 		return unzip_exception(filename);
 	} else {
+		os.close();
 		status_->misc_status(ST_ERROR, "CLUBLOG: Exception file download failed.");
 		return false;
 	}
@@ -120,7 +123,7 @@ bool club_handler::unzip_exception(string filename) {
 	Fl_Preferences qsl_settings(settings_, "QSL");
 	Fl_Preferences clublog_settings(qsl_settings, "ClubLog");
 	char* cmd_format;
-	clublog_settings.get("Unzip Command", cmd_format, "7z e %s -o %s");
+	clublog_settings.get("Unzip Command", cmd_format, "\"C://Program Files (x86)/7-Zip/7z\" e %s -o%s -y");
 	char cmd[200];
 	snprintf(cmd, 199, cmd_format, filename.c_str(), ref_dir.c_str());
 	free(cmd_format);

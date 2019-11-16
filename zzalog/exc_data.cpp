@@ -7,6 +7,7 @@
 #include <io.h>
 #include <fcntl.h>
 #include <fstream>
+#include <ctime>
 
 #include <FL/Fl_Preferences.H>
 #include <FL/Fl_File_Chooser.H>
@@ -22,8 +23,9 @@ exc_data::exc_data() {
 	string filename = get_filename();
 	if (!data_valid(filename)) {
 		// Exception list has expired
-		status_->misc_status(ST_NOTE, "EXCEPTION: Downloading exception file againb as > 7 days old");
+		status_->misc_status(ST_NOTE, "EXCEPTION: Downloading exception file again as doesn't exist or is > 7 days old");
 		club_handler_->download_exception();
+		filename.replace(filename.length() - 3, 3, "xml");
 	}
 	// Load the exception data
 	load_data(filename);
@@ -63,7 +65,7 @@ exc_entry* exc_data::is_exception(record* record) {
 			if ((entry->end == -1 || entry->end > timestamp) && 
 				(entry->start == -1 || timestamp > entry->start)) {
 				char message[160];
-				snprintf(message, 160, "EXCEPTION: Contact %s at %s %s is in entity %s", call.c_str(), record->item("QSO_DATE").c_str(), record->item("TIME_ON").c_str(), entry->entity.c_str());
+				snprintf(message, 160, "EXCEPTION: Contact %s at %s %s is in ADIF %d", call.c_str(), record->item("QSO_DATE").c_str(), record->item("TIME_ON").c_str(), entry->adif_id);
 				status_->misc_status(ST_NOTE, message);
 				return entry;
 			}
@@ -77,6 +79,9 @@ exc_entry* exc_data::is_exception(record* record) {
 bool exc_data::data_valid(string filename) {
 #ifdef _WIN32
 	int fd = _sopen(filename.c_str(), _O_RDONLY, _SH_DENYNO);
+	if (fd == -1) {
+		return false;
+	}
 	struct _stat status;
 	int result = _fstat(fd, &status);
 	time_t now;
@@ -122,22 +127,61 @@ bool exc_data::is_invalid(record* record) {
 // Load data
 bool exc_data::load_data(string filename) {
 	ifstream is(filename.c_str(), ios_base::in);
-	exc_reader* reader = new exc_reader();
-	char message[160];
-	snprintf(message, 160, "EXCEPTION: Loading exception file %s", filename.c_str());
-	status_->misc_status(ST_NOTE, message);
-	if (reader->load_data(this, is, file_created_)) {
-		// OK
-		snprintf(message, 160, "EXCEPTION: Loaded exception file %s", filename.c_str());
-		status_->misc_status(ST_OK, message);
-		return true;
+	if (filename.substr(filename.length() - 3) == "xml") {
+		exc_reader* reader = new exc_reader();
+		char message[160];
+		snprintf(message, 160, "EXCEPTION: Loading exception file %s", filename.c_str());
+		status_->misc_status(ST_NOTE, message);
+		if (reader->load_data(this, is, file_created_)) {
+			// OK
+			snprintf(message, 160, "EXCEPTION: Loaded exception file %s", filename.c_str());
+			status_->misc_status(ST_OK, message);
+			filename.replace(filename.length() - 3, 3, "tsv");
+			snprintf(message, 160, "EXCEPTION: Saving exception file %s", filename.c_str());
+			status_->misc_status(ST_NOTE, message);
+			ofstream os(filename.c_str(), ios_base::out | ios_base::trunc);
+			store(os);
+			if (os.good()) {
+				snprintf(message, 160, "EXCEPTION: Saved exception file %s", filename.c_str());
+				status_->misc_status(ST_OK, message);
+				os.close();
+				return true;
+			}
+			else {
+				snprintf(message, 160, "EXCEPTION: failed to save %s", filename.c_str());
+				status_->misc_status(ST_ERROR, message);
+				os.close();
+				return false;
+			}
+		}
+		else {
+			// Failed - delete what may have been loaded - this ensures no exception is reported
+			snprintf(message, 160, "EXCEPTION: Failed to load %s", filename.c_str());
+			status_->misc_status(ST_ERROR, message);
+			delete_contents();
+			return false;
+		}
 	}
 	else {
-		// Failed - delete what may have been loaded - this ensures no exception is reported
-		snprintf(message, 160, "EXCEPTION: Failed to load %s", filename.c_str());
-		status_->misc_status(ST_ERROR, message);
-		delete_contents();
-		return false;
+		char message[160];
+		snprintf(message, 160, "EXCEPTION: Loading exception file %s", filename.c_str());
+		status_->misc_status(ST_NOTE, message);
+		load(is);
+		if (is.good() || is.eof()) {
+			snprintf(message, 160, "EXCEPTION: Loaded exception file %s", filename.c_str());
+			status_->misc_status(ST_OK, message);
+			filename.replace(filename.length() - 3, 3, "tsv");
+			is.close();
+			return true;
+		}
+		else {
+			// Failed - delete what may have been loaded - this ensures no exception is reported
+			snprintf(message, 160, "EXCEPTION: Failed to load %s", filename.c_str());
+			status_->misc_status(ST_ERROR, message);
+			is.close();
+			delete_contents();
+			return false;
+		}
 	}
 }
 
@@ -170,7 +214,129 @@ string exc_data::get_filename() {
 		directory_name.append(1, '/');
 	}
 	if (dirname) free(dirname);
-	return directory_name + "cty.xml";
+	return directory_name + "cty.tsv";
 }
 
-// Return invalid operation
+ostream& exc_data::store(ostream& out) {
+	// First number of exceptions and invalids
+	int num_exceptions = 0;
+	int num_invalids = 0;
+	for (auto it = entries_.begin(); it != entries_.end(); it++) {
+		num_exceptions += it->second.size();
+	}
+	for (auto it = invalids_.begin(); it != invalids_.end(); it++) {
+		num_invalids += it->second.size();
+	}
+	out << num_exceptions << '\t' << num_invalids << endl;
+	int i = 0;
+	status_->progress(entries_.size() + invalids_.size(), OT_PREFIX, "records");
+	// Now the individual entries
+	for (auto it = entries_.begin(); it != entries_.end() && out.good(); it++) {
+		list<exc_entry*>* data_list = &(it->second);
+		for (auto it2 = data_list->begin(); it2 != data_list->end(); it2++) {
+			(*it2)->store(out);
+		}
+		i++;
+		status_->progress(i, OT_PREFIX);
+	}
+
+	// Individual entries
+	for (auto it = invalids_.begin(); it != invalids_.end() && out.good(); it++) {
+		list<invalid*>* data_list = &(it->second);
+		for (auto it2 = data_list->begin(); it2 != data_list->end(); it2++) {
+			(*it2)->store(out);
+		}
+		i++;
+		status_->progress(i, OT_PREFIX);
+	}
+	if (!out.good()) {
+		status_->progress("Write failed", OT_PREFIX);
+	}
+	return out;
+}
+
+ostream& exc_entry::store(ostream& out) {
+	out << call << '\t';
+	out << adif_id << '\t';
+	out << cq_zone << '\t';
+	// Some records are aeronautical mobile and have no continent - this is needed so the corresponding
+	// input dows not result in IO error
+	if (continent.length()) {
+		out << continent << '\t';
+	}
+	else {
+		out << "--\t";
+	}
+	out << longitude << '\t';
+	out << latitude << '\t';
+	out << start << '\t';
+	out << end << endl;
+	return out;
+}
+
+ostream& invalid::store(ostream& out) {
+	out << call << '\t';
+	out << start << '\t';
+	out << end << endl;
+	return out;
+}
+
+istream& exc_data::load(istream& in) {
+	int num_exceptions;
+	in >> num_exceptions;
+	char tab;
+	in >> tab;
+	int num_invalids;
+	in >> num_invalids;
+	// Read to the end of line
+	string dummy;
+	getline(in, dummy);
+	int record_num = 0;
+	status_->progress(num_exceptions + num_invalids, OT_PREFIX, "records");
+	for (int i = 0; i < num_exceptions && in.good(); i++) {
+		exc_entry* entry = new exc_entry;
+		entry->load(in);
+		if (entries_.find(entry->call) == entries_.end()) {
+			list<exc_entry*>* list_data = new list<exc_entry*>;
+			entries_[entry->call] = *list_data;
+		}
+		entries_.at(entry->call).push_back(entry);
+		record_num++;
+		status_->progress(record_num, OT_PREFIX);
+	}
+	for (int i = 0; i < num_invalids && in.good(); i++) {
+		invalid* entry = new invalid;
+		entry->load(in);
+		if (invalids_.find(entry->call) == invalids_.end()) {
+			list<invalid*>* list_data = new list<invalid*>;
+			invalids_[entry->call] = *list_data;
+		}
+		invalids_.at(entry->call).push_back(entry);
+		record_num++;
+		status_->progress(record_num, OT_PREFIX);
+	}
+	if (!(in.good() || in.eof()) || record_num != num_invalids + num_exceptions) {
+		status_->progress("Read failed!", OT_PREFIX);
+	}
+	return in;
+}
+
+istream& exc_entry::load(istream& in) {
+	in >> call;
+	in >> adif_id;
+	in >> cq_zone;
+	in >> continent;
+	in >> longitude;
+	in >> latitude;
+	in >> start;
+	in >> end;
+	return in;
+}
+
+istream& invalid::load(istream& in) {
+	in >> call;
+	in >> start;
+	in >> end;
+	return in;
+}
+

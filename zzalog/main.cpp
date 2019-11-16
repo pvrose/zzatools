@@ -305,6 +305,7 @@ void recent_files() {
 // read in the prefix and adif reference data
 void add_data() {
 	if (!closing_) {
+		if (!club_handler_) club_handler_ = new club_handler;
 		// Get pfx_data
 		pfx_data_ = new pfx_data;
 		// Draw the prefix data
