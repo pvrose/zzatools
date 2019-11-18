@@ -231,6 +231,14 @@ void dxa_if::create_form() {
 	bn12->color(FL_GREEN);
 	bn12->tooltip("Start or Stop current DxAtlas session");
 	start_stop_bn_ = bn12;
+	// Button - Recentre
+	Fl_Button* bn13 = new Fl_Button(bn12->x() + bn12->w(), bn12->y(), WBUTTON, HBUTTON, "Re-centre");
+	bn13->labelfont(FONT);
+	bn13->labelsize(FONT_SIZE);
+	bn13->callback(cb_bn_centre);
+	bn13->color(FL_YELLOW);
+	bn13->tooltip("Recentre the DxAtlas window");
+
 	int next_y = max(bn11->y() + bn11->h(), bn12->y() + bn12->h());
 	// Choice - provides all user's locations (in settings)
 	Fl_Choice* ch21 = new Fl_Choice(ch11->x(), next_y + HTEXT, WSMEDIT, HBUTTON, "Location");
@@ -473,6 +481,16 @@ void dxa_if::cb_ch_centre(Fl_Widget* w, void* v) {
 		that->centre_map();
 	}
 }
+
+// Map centre choice widget selected
+void dxa_if::cb_bn_centre(Fl_Widget* w, void* v) {
+	dxa_if* that = ancestor_view<dxa_if>(w);
+	DxAtlas::IDxMapPtr map = that->atlas_->GetMap();
+	if (map->GetProjection() == DxAtlas::PRJ_RECTANGULAR) {
+		that->centre_map();
+	}
+}
+
 
 // DXATLAS: callback - some detail of the map has been changed
 HRESULT dxa_if::cb_map_changed(enum DxAtlas::EnumMapChange change_kind) {

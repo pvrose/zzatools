@@ -83,6 +83,8 @@ namespace zzalog {
 		static void cb_ch_colour(Fl_Widget* w, void* v);
 		// Centre choice
 		static void cb_ch_centre(Fl_Widget* w, void* v);
+		// Re-Centre button
+		static void cb_bn_centre(Fl_Widget* w, void* v);
 		// Add/subtract SWL reports
 		static void cb_ch_swlen(Fl_Widget* w, void* v);
 		// Open 
@@ -91,6 +93,7 @@ namespace zzalog {
 		static void cb_ch_locn(Fl_Widget* w, void* v);
 		// Number days/QSOs input
 		static void cb_ip_number(Fl_Widget* w, void* v);
+
 
 	public:
 
