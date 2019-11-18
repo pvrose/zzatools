@@ -37,12 +37,14 @@ files_dialog::files_dialog(int X, int Y, int W, int H, const char* label) :
 	backup_directory_ = "";
 	status_log_file_ = "";
 	web_browser_ = "";
+	unzipper_ = "";
 	tqsl_data_ = { "", "", nullptr, nullptr, nullptr, nullptr };
 	card_data_ = { "", "", nullptr, nullptr, nullptr, nullptr };
 	ref_data_data_ = { "", "", nullptr, nullptr, nullptr, nullptr };
 	backup_data_ = { "", "", nullptr, nullptr, nullptr, nullptr };
 	web_data_ = { "", "", nullptr, nullptr, nullptr, nullptr };
 	status_data_ = { "", "", nullptr, nullptr, nullptr, nullptr };
+	unzipper_data_ = { "", "", nullptr, nullptr, nullptr, nullptr };
 	auto_poll_ = nan("");
 
 	// initialise and create form
@@ -94,6 +96,7 @@ void files_dialog::load_values() {
 	Fl_Preferences datapath_settings(settings_, "Datapath");
 	Fl_Preferences backup_settings(settings_, "Backup");
 	Fl_Preferences status_settings(settings_, "Status");
+	Fl_Preferences clublog_settings(qsl_settings, "ClubLog");
 
 	// TQSL Executable
 	lotw_settings.get("Enable", (int&)enable_tqsl_, false);
@@ -142,7 +145,13 @@ void files_dialog::load_values() {
 	status_log_file_ = temp_string;
 	free(temp_string);
 
-
+	// Unzip command and switches
+	clublog_settings.get("Unzip Command", temp_string, "C:/Program Files (X86)/7-Zip/7z.exe");
+	unzipper_ = temp_string;
+	free(temp_string);
+	clublog_settings.get("Unzip Switches", temp_string, "e %s -o%s -y");
+	unzip_switches_ = temp_string;
+	free(temp_string);
 }
 
 // create the form
@@ -155,17 +164,17 @@ void files_dialog::create_form(int X, int Y) {
 	const int COL3 = COL2 + WEDIT + GAP;
 	const int COL4 = COL3 + WBUTTON + GAP;
 	const int COL5 = COL4 + WBUTTON + GAP;
-	const int XMAX = COL5 + WBUTTON + EDGE;
+	const int COL6 = COL5 + WBUTTON + GAP;
+	const int XMAX = COL6 + WBUTTON + EDGE;
 	// widget position - rows
 	// Group 1, rows 1 to 4
 	const int GRP1 = EDGE;
 	const int ROW1_1 = GRP1 + HTEXT;
 	const int ROW1_2 = ROW1_1 + max(HBUTTON, HTEXT);
 	const int ROW1_3 = ROW1_2 + max(HBUTTON, HTEXT);
-	const int ROW1_4 = ROW1_3 + max(HBUTTON, HTEXT);
 	const int* const ROW1[files_dialog::AUTO_COUNT + 1] =
-	{ &ROW1_1, &ROW1_2, &ROW1_3, &ROW1_4 };
-	const int HGRP1 = ROW1_4 + HTEXT;
+	{ &ROW1_1, &ROW1_2, &ROW1_3 };
+	const int HGRP1 = ROW1_3 + HTEXT;
 	// Group 2, row 1
 	const int GRP2 = GRP1 + HGRP1;
 	const int ROW2_1 = GRP2 + HTEXT;
@@ -190,9 +199,14 @@ void files_dialog::create_form(int X, int Y) {
 	const int GRP7 = GRP6 + HGRP6;
 	const int ROW7_1 = GRP7 + HTEXT;
 	const int HGRP7 = ROW7_1 - GRP7 + max(HBUTTON, HTEXT) + GAP;
+	// Group 8, row 1
+	const int GRP8 = GRP7 + HGRP7;
+	const int ROW8_1 = GRP8 + HTEXT;
+	const int HGRP8 = ROW8_1 - GRP8 + max(HBUTTON, HTEXT) + GAP;
+
 
 	// Bottom of required dialog
-	const int YMAX = GRP6 + HGRP6 + EDGE;
+	const int YMAX = GRP7 + HGRP7 + EDGE;
 	
 	Fl_Group* grp_auto = new Fl_Group (X + XGRP, Y + GRP1, XMAX, HGRP1, "Auto-import files");
 	grp_auto->labelsize(FONT_SIZE);
@@ -245,10 +259,10 @@ void files_dialog::create_form(int X, int Y) {
 		bn_browse_auto[i]->tooltip("Open file browser to locate auto-import file");
 	}
 	// Spinner - sets  the polling interval for auto-import
-	Fl_Spinner* spin_auto = new Fl_Spinner(X + COL2 + WLABEL, Y + *ROW1[AUTO_COUNT], WBUTTON, HBUTTON, "Polling\nint. (secs)");
+	Fl_Spinner* spin_auto = new Fl_Spinner(X + COL6, Y + ROW1_2, WBUTTON, HBUTTON, "Polling\nint. (secs)");
 	spin_auto->labelsize(FONT_SIZE);
 	spin_auto->textsize(FONT_SIZE);
-	spin_auto->align(FL_ALIGN_LEFT);
+	spin_auto->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
 	spin_auto->type(FL_FLOAT_INPUT);
 	spin_auto->maximum(AUTO_IP_MAX);
 	spin_auto->minimum(AUTO_IP_MIN);
@@ -414,13 +428,51 @@ void files_dialog::create_form(int X, int Y) {
 	// Button - opens file browser
 	Fl_Button* bn_browse_status = new Fl_Button(X + COL5, Y + ROW7_1, WBUTTON, HBUTTON, "Browse");
 	bn_browse_status->align(FL_ALIGN_INSIDE);
-	status_data_ = { "Please enter the status log file", "Text (*txt)|*.exe|All Files (*.*)|*.*||", &status_log_file_, nullptr, in_status_file, nullptr };
+	status_data_ = { "Please enter the status log file", "Text (*txt)|*.txt|All Files (*.*)|*.*||", &status_log_file_, nullptr, in_status_file, nullptr };
 	bn_browse_status->callback(cb_bn_browsefile, &status_data_);
 	bn_browse_status->when(FL_WHEN_RELEASE);
 	bn_browse_status->labelsize(FONT_SIZE);
-	bn_browse_status->tooltip("Opens a file browsewr to locate the status executable");
+	bn_browse_status->tooltip("Opens a file browsewr to locate the status file");
 
 	grp_status->end();
+
+	Fl_Group* grp_unzip = new Fl_Group(X + XGRP, Y + GRP8, XMAX, HGRP8, "Unzip executable");
+	grp_unzip->labelsize(FONT_SIZE);
+	grp_unzip->box(FL_THIN_DOWN_BOX);
+	grp_unzip->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
+	// Input - preferred web browser
+	intl_input* in_unzipper = new intl_input(X + COL2, Y + ROW8_1, WEDIT, HTEXT);
+	in_unzipper->callback(cb_value<intl_input, string>, &unzipper_);
+	in_unzipper->when(FL_WHEN_CHANGED);
+	in_unzipper->textsize(FONT_SIZE);
+	in_unzipper->value(unzipper_.c_str());
+	in_unzipper->tooltip("Location of unzipper executable");
+	// Input switches for unzip command
+	intl_input* in_switches = new intl_input(X + COL3, Y + ROW8_1, WSMEDIT, HTEXT, "Switches");
+	in_switches->labelfont(FONT);
+	in_switches->labelsize(FONT_SIZE);
+	in_switches->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
+	in_switches->callback(cb_value<intl_input, string>, &unzip_switches_);
+	in_switches->when(FL_WHEN_CHANGED);
+	in_switches->textsize(FONT_SIZE);
+	in_switches->value(unzip_switches_.c_str());
+	in_switches->tooltip("Location of unzipper executable");
+
+	// Button - opens file browser
+	Fl_Button* bn_browse_unzip = new Fl_Button(X + COL5, Y + ROW8_1, WBUTTON, HBUTTON, "Browse");
+	bn_browse_unzip->align(FL_ALIGN_INSIDE);
+#ifdef _WIN32
+	unzipper_data_ = { "Please select the unzip tool", "Executable (*.exe)|*.exe|All Files (*.*)|*.*||", &unzipper_, nullptr, in_unzipper, nullptr };
+#else
+	// TODO: Change file pattern for Posix executables
+	unzipper_data_ = { "Please select the unzip tool", "Executable (*.exe)|*.exe|All Files (*.*)|*.*||", &unzipper_, nullptr, in_web_file, nullptr };
+#endif
+	bn_browse_unzip->callback(cb_bn_browsefile, &unzipper_data_);
+	bn_browse_unzip->when(FL_WHEN_RELEASE);
+	bn_browse_unzip->labelsize(FONT_SIZE);
+	bn_browse_unzip->tooltip("Opens file browser to locate your preferred web browser");
+
+	grp_unzip->end();
 
 	Fl_Group::end();
 
@@ -452,6 +504,7 @@ void files_dialog::save_values() {
 	Fl_Preferences datapath_settings(settings_, "Datapath");
 	Fl_Preferences backup_settings(settings_, "Backup");
 	Fl_Preferences status_settings(settings_, "Status");
+	Fl_Preferences clublog_settings(qsl_settings, "ClubLog");
 
 	// TQSL Executable
 	lotw_settings.set("Enable", enable_tqsl_);
@@ -477,6 +530,10 @@ void files_dialog::save_values() {
 
 	// Status log file
 	status_settings.set("Report File", status_log_file_.c_str());
+
+	// Clublog
+	clublog_settings.set("Unzip Command", unzipper_.c_str());
+	clublog_settings.set("Unzip Switches", unzip_switches_.c_str());
 
 }
 

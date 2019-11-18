@@ -45,7 +45,6 @@ web_dialog::web_dialog(int X, int Y, int W, int H, const char* label) :
 	, club_username_("")
 	, club_password_("")
 	, club_interval_(0)
-	, club_unzipper_("")
 {
 	image_widgets_.clear();
 
@@ -127,9 +126,6 @@ void web_dialog::load_values() {
 	free(temp);
 	club_settings.get("Password", temp, "");
 	club_password_ = temp;
-	free(temp);
-	club_settings.get("Unzip Command", temp, "7z e %s -o %s");
-	club_unzipper_ = temp;
 	free(temp);
 	club_settings.get("Interval", club_interval_, 7);
 
@@ -446,15 +442,6 @@ void web_dialog::create_form(int X, int Y) {
 	in4_2_2->when(FL_WHEN_CHANGED);
 	in4_2_2->tooltip("Specify the days between updating the exception file");
 
-	// Row2 Col 3/4 - Unzipping command
-	Fl_Input* in4_2_3 = new Fl_Input(X + C3, Y + R4_2, W34, H4_2, "Unzipping command");
-	in4_2_3->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
-	in4_2_3->labelsize(FONT_SIZE);
-	in4_2_3->textsize(FONT_SIZE);
-	in4_2_3->value(club_unzipper_.c_str());
-	in4_2_3->callback(cb_value<Fl_Input, string>, &club_interval_);
-	in4_2_3->when(FL_WHEN_CHANGED);
-	in4_2_3->tooltip("Enter the command to be used to unzip the exception file - %s for file and destination directory");
 
 	grp_club_ = gp4;
 	gp4->end();
@@ -497,7 +484,6 @@ void web_dialog::save_values() {
 	club_settings.set("Enable", club_enable_);
 	club_settings.set("Email", club_username_.c_str());
 	club_settings.set("Password", club_password_.c_str());
-	club_settings.set("Unzip Command", club_unzipper_.c_str());
 	club_settings.set("Interval", club_interval_);
 }
 

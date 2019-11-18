@@ -112,10 +112,11 @@ bool initialised_ = false;
 // Updates recent files settings
 static void cb_bn_close(Fl_Widget* w, void*v) {
 	if (closing_) {
-		status_->misc_status(ST_WARNING, "Already closing!");
+		status_->misc_status(ST_WARNING, "ZZALOG: Already closing!");
 	}
 	else {
 		closing_ = true;
+		status_->misc_status(ST_NOTE, "ZZALOG: Closing...");
 		// If rig connected close it - this will close the timer as well
 		if (rig_if_) {
 			rig_if_->close();
@@ -198,7 +199,7 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 		}
 
 		// Back up the book
-		if (book_) {
+		if (book_ && initialised_) {
 			backup_file(false);
 		}
 
@@ -602,7 +603,6 @@ void resize_window() {
 
 // Tidy memory
 void tidy() {
-	status_->misc_status(ST_LOG, "ZZALOG: Closing...");
 	// Tidy memory - this is not perfect
 	// From inspection of the code - calling this a second time frees the memory
 	fl_message_title_default(nullptr);
@@ -719,6 +719,8 @@ int main(int argc, char** argv)
 	add_dxatlas();
 	// enable menu
 	int code = 0;
+	// We are now initialised
+	initialised_ = true;
 	if (!closing_) {
 		// Only do this if we haven't tried to close
 		menu_->enable(true);

@@ -98,8 +98,6 @@ namespace zzalog {
 		// username (e-mail)
 		string club_username_;
 		string club_password_;
-		// Command to unzip exception file
-		string club_unzipper_;
 		// Number of days between downloads
 		int club_interval_;
 

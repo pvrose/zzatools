@@ -6,6 +6,7 @@
 using namespace zzalog;
 
 extern status* status_;
+extern bool closing_;
 
 // Constructor
 specx_reader::specx_reader() :
@@ -57,7 +58,12 @@ bool specx_reader::load_data(spec_data* data, istream& in, string& version) {
 		fl_cursor(FL_CURSOR_DEFAULT);
 		return true;
 	}
-	else {
+	else if (closing_) {
+		status_->misc_status(ST_WARNING, "Spec Read: Cancelled as close-down requested");
+		status_->progress("Load abandoned", OT_ADIF);
+		fl_cursor(FL_CURSOR_DEFAULT);
+		return false;
+	} else {
 		// Read failed - report failure
 		status_->misc_status(ST_FATAL, "SPEC READ: Failed");
 		status_->progress("Load failed", OT_ADIF);

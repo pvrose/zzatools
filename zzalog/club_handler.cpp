@@ -20,10 +20,11 @@ extern status* status_;
 
 club_handler::club_handler() {
 	if (!url_handler_) url_handler_ = new url_handler;
+	help_dialog_ = nullptr;
 }
 
 club_handler::~club_handler() {
-
+	delete help_dialog_;
 }
 
 
@@ -58,6 +59,12 @@ bool club_handler::upload_log(book* book) {
 		}
 		help_dialog_->value(resp.str().c_str());
 		help_dialog_->show();
+		if (ok) {
+			if (fl_choice("Clublog access appears successful, the received information may disagree - was it successful?", "No", "Yes", nullptr) == 0) {
+				ok = false;
+			}
+		}
+		help_dialog_->hide();
 		return ok;
 	}
 	else {
@@ -122,16 +129,24 @@ bool club_handler::unzip_exception(string filename) {
 	get_reference(ref_dir);
 	Fl_Preferences qsl_settings(settings_, "QSL");
 	Fl_Preferences clublog_settings(qsl_settings, "ClubLog");
-	char* cmd_format;
-	clublog_settings.get("Unzip Command", cmd_format, "\"C://Program Files (x86)/7-Zip/7z\" e %s -o%s -y");
+	char* cmd_executable;
+	clublog_settings.get("Unzip Command", cmd_executable, "C:/Program Files (x86)/7-Zip/7z");
+	char* switch_format;
+	clublog_settings.get("Unzip Switches", switch_format, "e %s -o%s -y");
+	char* cmd_format = new char[strlen(switch_format) + 10];
+	// Add quotes around the executable in case it is in C:\Program Files (x86)
+	sprintf(cmd_format, "\"%s\" %s", cmd_executable, switch_format);
 	char cmd[200];
 	snprintf(cmd, 199, cmd_format, filename.c_str(), ref_dir.c_str());
-	free(cmd_format);
+	delete[] cmd_format;
+	free(cmd_executable);
+	free(switch_format);
 	int result = system(cmd);
 	if (result < 0) {
 		status_->misc_status(ST_ERROR, "CLUBLOG: Unzipping failed");
 		return false;
 	}
+	// This assumes 7z is the executble
 	switch (result) {
 	case 0:
 		status_->misc_status(ST_OK, "CLUBLOG: Unzipping successful");

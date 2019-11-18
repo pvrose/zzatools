@@ -7,6 +7,7 @@
 using namespace zzalog;
 
 extern status* status_;
+extern bool closing_;
 
 exc_reader::exc_reader() {
 	ignore_processing_ = false;
@@ -123,6 +124,12 @@ bool exc_reader::load_data(exc_data* data, istream& in, string& version) {
 		version = timestamp_;
 		fl_cursor(FL_CURSOR_DEFAULT);
 		return true;
+	}
+	else if (closing_) {
+		status_->misc_status(ST_WARNING, "EXCEPTION READ: Cancelled as close-down requested");
+		status_->progress("Load cancelled", OT_PREFIX);
+		fl_cursor(FL_CURSOR_DEFAULT);
+		return false;
 	}
 	else {
 		// Read failed - report failure

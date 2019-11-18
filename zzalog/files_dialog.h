@@ -61,6 +61,10 @@ namespace zzalog {
 		string auto_src_[AUTO_COUNT];
 		// Default web-browser location
 		string web_browser_;
+		// Unzipper location
+		string unzipper_;
+		// Unzipper switches
+		string unzip_switches_;
 		// Empty auto-import files after importing them
 		bool auto_empty_[AUTO_COUNT];
 		// callback data for the auto-import browse buttons
@@ -77,6 +81,8 @@ namespace zzalog {
 		browser_data_t web_data_;
 		// callback data for the status log file browse button
 		browser_data_t status_data_;
+		// callback data for the unzipper command
+		browser_data_t unzipper_data_;
 		// Poll interval (in seconds) for auto-importing
 		double auto_poll_;
 
