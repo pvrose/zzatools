@@ -1276,39 +1276,41 @@ void dxa_if::draw_pins() {
 							break;
 						}
 
-						if (use_item) {
-							if (include_swl_ || record->item("SWL") != "Y") {
-								// This record is to be drawn in this layer
-								lat_long = record->location(false);
-								// Only add if the location is valid
-								if (!isnan(lat_long.latitude) && !isnan(lat_long.longitude)) {
-									//create label entry (array of 3 elements: Long, Lat, Text)
-									rgsabound[0].cElements = 3;
-									point_data = SafeArrayCreate(VT_VARIANT, 1, rgsabound);
-									//calculate attributes - explicitly convert from double to single precision
-									pt_long = (float)lat_long.longitude;
-									pt_lat = (float)lat_long.latitude;
-									// Adjust furthest in each direction
-									if (lat_long.longitude < westernmost_) westernmost_ = lat_long.longitude;
-									if (lat_long.longitude > easternmost_) easternmost_ = lat_long.longitude;
-									if (lat_long.latitude < southernmost_) southernmost_ = lat_long.latitude;
-									if (lat_long.latitude > northernmost_) northernmost_ = lat_long.latitude;
-									pt_value = 0;
-									//set attributes 
-									index_1 = 0; (void)SafeArrayPutElement(point_data, &index_1, &pt_long);
-									index_1 = 1; (void)SafeArrayPutElement(point_data, &index_1, &pt_lat);
-									index_1 = 2; (void)SafeArrayPutElement(point_data, &index_1, &pt_value);
-									//add point to the array
-									point.parray = point_data;
-									(void)SafeArrayPutElement(point_array, &index_2, &point);
-									index_2++;
-									// Add it to the set of records being displayed
-									records_displayed_.insert(record_num);
-								}
+						if (use_item && (include_swl_ || record->item("SWL") != "Y")) {
+							// This record is to be drawn in this layer
+							lat_long = record->location(false);
+							// Only add if the location is valid
+							if (!isnan(lat_long.latitude) && !isnan(lat_long.longitude)) {
+								//create label entry (array of 3 elements: Long, Lat, Text)
+								rgsabound[0].cElements = 3;
+								point_data = SafeArrayCreate(VT_VARIANT, 1, rgsabound);
+								//calculate attributes - explicitly convert from double to single precision
+								pt_long = (float)lat_long.longitude;
+								pt_lat = (float)lat_long.latitude;
+								// Adjust furthest in each direction
+								if (lat_long.longitude < westernmost_) westernmost_ = lat_long.longitude;
+								if (lat_long.longitude > easternmost_) easternmost_ = lat_long.longitude;
+								if (lat_long.latitude < southernmost_) southernmost_ = lat_long.latitude;
+								if (lat_long.latitude > northernmost_) northernmost_ = lat_long.latitude;
+								pt_value = 0;
+								//set attributes 
+								index_1 = 0; (void)SafeArrayPutElement(point_data, &index_1, &pt_long);
+								index_1 = 1; (void)SafeArrayPutElement(point_data, &index_1, &pt_lat);
+								index_1 = 2; (void)SafeArrayPutElement(point_data, &index_1, &pt_value);
+								//add point to the array
+								point.parray = point_data;
+								(void)SafeArrayPutElement(point_array, &index_2, &point);
+								index_2++;
+								// Add it to the set of records being displayed
+								records_displayed_.insert(record_num);
 							}
 							count += 1;
 							status_->progress(count, OT_DXATLAS);
 						}
+						else {
+							count++;
+						}
+
 					}
 				}
 				// Resize array if fewer items have been created.

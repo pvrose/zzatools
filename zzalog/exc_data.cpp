@@ -229,7 +229,7 @@ ostream& exc_data::store(ostream& out) {
 	}
 	out << num_exceptions << '\t' << num_invalids << endl;
 	int i = 0;
-	status_->progress(entries_.size() + invalids_.size(), OT_PREFIX, "records");
+	status_->progress(num_exceptions + num_invalids, OT_PREFIX, "records");
 	// Now the individual entries
 	for (auto it = entries_.begin(); it != entries_.end() && out.good(); it++) {
 		list<exc_entry*>* data_list = &(it->second);
@@ -260,7 +260,7 @@ ostream& exc_entry::store(ostream& out) {
 	out << adif_id << '\t';
 	out << cq_zone << '\t';
 	// Some records are aeronautical mobile and have no continent - this is needed so the corresponding
-	// input dows not result in IO error
+	// input does not result in IO error
 	if (continent.length()) {
 		out << continent << '\t';
 	}
