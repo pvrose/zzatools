@@ -17,6 +17,7 @@
 using namespace zzalog;
 
 extern book* book_;
+extern book* navigation_book_;
 extern pfx_data* pfx_data_;
 extern tabbed_forms* tabbed_view_;
 extern status* status_;
@@ -173,6 +174,8 @@ void extract_data::clear_criteria() {
 	// Now tidy up this book
 	delete_contents(true);
 	use_mode_ = NONE;
+	// Set navigation book to main log
+	navigation_book_ = book_;
 	// Cause the views to be redrawn
 	selection(-1, HT_EXTRACTION);
 }

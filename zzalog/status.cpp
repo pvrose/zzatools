@@ -253,6 +253,9 @@ void status::progress(int max_value, object_t object, const char* suffix, bool c
 		snprintf(message, 100, "PROGRESS: Already started progress for %s", OBJECT_NAMES.at(object));
 		misc_status(ST_ERROR, message);
 	} else {
+		char message[100];
+		snprintf(message, 100, "PROGRESS: Starting %s - %d %s", OBJECT_NAMES.at(object), max_value, suffix);
+		misc_status(ST_LOG, message);
 		progress_item* item = new progress_item;
 		item->max_value = max_value;
 		if (countdown) {
@@ -312,6 +315,9 @@ void status::progress(int value, object_t object) {
 			update_progress(object);
 			// If it's 100% (or 0% if counting down) delte item and draw the next in the stack
 			if ((item->countdown && value == 0) || (!item->countdown && value == item->max_value)) {
+				char message[100];
+				snprintf(message, 100, "PROGRESS: %s finished (%d %s)", OBJECT_NAMES.at(object), item->max_value, item->suffix);
+				misc_status(ST_LOG, message);
 				delete item;
 				progress_items_.erase(object);
 				progress_stack_.remove(object);
@@ -333,6 +339,9 @@ void status::progress(const char* message, object_t object) {
 		}
 		else {
 			progress_item* item = progress_items_.at(object);
+			char message[100];
+			snprintf(message, 100, "PROGRESS %s abandoned %s (%d %s)", OBJECT_NAMES.at(object), message, item->value, item->suffix);
+			misc_status(ST_LOG, message);
 			if (item->countdown) {
 				progress(0, object);
 			}

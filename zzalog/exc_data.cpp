@@ -284,8 +284,6 @@ ostream& invalid::store(ostream& out) {
 istream& exc_data::load(istream& in) {
 	int num_exceptions;
 	in >> num_exceptions;
-	char tab;
-	in >> tab;
 	int num_invalids;
 	in >> num_invalids;
 	// Read to the end of line

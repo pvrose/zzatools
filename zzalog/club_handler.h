@@ -3,6 +3,9 @@
 
 #include "record.h"
 #include "book.h"
+#include "url_handler.h"
+
+#include <vector>
 
 #include <FL/Fl_Help_Dialog.H>
 
@@ -23,7 +26,9 @@ namespace zzalog {
 
 	protected:
 		// Generate the fields for posting the log
-		void generate_form(map<string, string>& fields);
+		void generate_form(vector<url_handler::field_pair>& fields);
+		// Get names of ADIF fields to export
+		void generate_adif(set < string > &fields);
 		// Unzip the downloaded  exceptions file
 		bool unzip_exception(string filename);
 		// Get reference directory

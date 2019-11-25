@@ -77,9 +77,9 @@ bool url_handler::read_url(string url, ostream* os) {
 		char* message = new char[strlen(curl_easy_strerror(result)) + 50];
 		sprintf(message, "HTTP GET: failed: %s", curl_easy_strerror(result));
 		status_->misc_status(ST_ERROR, message);
-delete[] message;
-curl_easy_cleanup(curl_);
-return false;
+		delete[] message;
+		curl_easy_cleanup(curl_);
+		return false;
 	}
 
 	/* reset transfer details */
@@ -104,11 +104,11 @@ bool url_handler::post_url(string url, string resource, istream* req, ostream* r
 
 	// Specify the URL
 	curl_easy_setopt(curl_, CURLOPT_URL, url.c_str());
-	/* Now specify we want to POST data */
-	curl_easy_setopt(curl_, CURLOPT_POST, 1L);
+	/* Now specify we want to POST data */ 
+    curl_easy_setopt(curl_, CURLOPT_POST, 1L);
 	// Request target
 	curl_easy_setopt(curl_, CURLOPT_REQUEST_TARGET, resource.c_str());
-	// Set the request handler
+ 	// Set the request handler
 	curl_easy_setopt(curl_, CURLOPT_READFUNCTION, cb_read);
 	// Provde the request data
 	curl_easy_setopt(curl_, CURLOPT_READDATA, req);
@@ -177,14 +177,6 @@ bool url_handler::post_form(string url, vector<field_pair> fields, istream* req,
 			// Use the specified input stream
 			curl_mime_data_cb(field, req_length, cb_read, nullptr, nullptr, req);
 		}
-		// Add a filename - if supplied
-		if ((*it).filename.length()) {
-			curl_mime_filename(field, (*it).filename.c_str());
-		}
-		// Add type
-		if ((*it).type.length()) {
-			curl_mime_type(field, (*it).type.c_str());
-		}
 	}
 	// Add the form to the post
 	curl_easy_setopt(curl_, CURLOPT_MIMEPOST, form);
@@ -205,17 +197,6 @@ bool url_handler::post_form(string url, vector<field_pair> fields, istream* req,
 		curl_easy_reset(curl_);
 		curl_easy_cleanup(curl_);
 		return false;
-	}
-	else {
-		long code;
-		if (curl_easy_getinfo(curl_, CURLINFO_RESPONSE_CODE, &code) == CURLE_OK) {
-			if (code != 200) {
-				char message[100];
-				snprintf(message, 100, "HTTP POST: Received error code %03ld", code);
-				status_->misc_status(ST_NOTE, message);
-				return false;
-			}
-		}
 	}
 
 	/* reset transfer details */
@@ -269,17 +250,10 @@ void url_handler::dump(const char* text,
 				fputc('\n', stream);
 				newline = false;
 			}
-			fprintf(stream, "\\x%02x", ptr[i]);
+			fprintf(stream, "0x%02x", ptr[i]);
 
 		}
-		else if (ptr[i] == '\\') {
-			if (newline) {
-				fputc('\n', stream);
-				newline = false;
-			}
-			fputs("\\\\", stream);
-		} else
-		{
+		else {
 			if (newline) {
 				fputc('\n', stream);
 				newline = false;

@@ -35,36 +35,33 @@ bool club_handler::upload_log(book* book) {
 		// Get the book data
 		stringstream ss;
 		adi_writer* writer = new adi_writer;
-		writer->store_book(book, ss);
+		set<string> adif_fields;
+		generate_adif(adif_fields);
+		writer->store_book(book, ss, &adif_fields);
 		// Get back to start of stream
 		ss.seekg(ss.beg);
 		// Get the parameters
-		map<string, string> fields;
+		vector<url_handler::field_pair> fields;
 		generate_form(fields);
 		stringstream resp;
 		// Post the form
 		bool ok;
 		if (!url_handler_->post_form("https://clublog.org/putlogs.php", fields, &ss, &resp)) {
 			// Display error message received from post
-			status_->misc_status(ST_ERROR, "CLUBLOG: Upload failed - see separate dialog");
+			char* message = new char[resp.str().length() + 30];
+			sprintf(message, "CLUBLOG: Upload failed - %s", resp.str().c_str());
+			status_->misc_status(ST_ERROR, message);
 			ok = false;
 		}
 		else {
-			status_->misc_status(ST_OK, "CLUBLOG: Upload successful - see separate dialog");
+			status_->misc_status(ST_OK, "CLUBLOG: Upload successful");
 			ok = true;
-		}
-		// Display the received response
-		if (!help_dialog_) {
-			help_dialog_ = new Fl_Help_Dialog;
-		}
-		help_dialog_->value(resp.str().c_str());
-		help_dialog_->show();
-		if (ok) {
-			if (fl_choice("Clublog access appears successful, the received information may disagree - was it successful?", "No", "Yes", nullptr) == 0) {
-				ok = false;
+			string today = now(false, "%Y%m%d");
+			for (auto it = book->begin(); it != book->end(); it++) {
+				(*it)->item("CLUBLOG_QSO_UPLOAD_DATE", now);
+				(*it)->item("CLUBLOG_QSO_UPLOAD_STATUS", "Y");
 			}
 		}
-		help_dialog_->hide();
 		return ok;
 	}
 	else {
@@ -74,7 +71,7 @@ bool club_handler::upload_log(book* book) {
 }
 
 // Generate the fields in the form
-void club_handler::generate_form(map<string, string>& fields) {
+void club_handler::generate_form(vector<url_handler::field_pair>& fields) {
 	// Read the settings that define user's access 
 	Fl_Preferences qsl_settings(settings_, "QSL");
 	Fl_Preferences clublog_settings(qsl_settings, "ClubLog");
@@ -84,24 +81,48 @@ void club_handler::generate_form(map<string, string>& fields) {
 	qths_settings.get("Current", current, "");
 	Fl_Preferences current_settings(qths_settings, current);
 	free(current);
-	char* callsign;
-	current_settings.get("Callsign", callsign, "");
-	fields["callsign"] = callsign;
-	free(callsign);
 	char* email;
-	clublog_settings.get("e-Mail", email, "");
-	fields["email"] = email;
+	clublog_settings.get("Email", email, "");
+	fields.push_back({"email", email, "", ""});
 	free(email);
 	char* password;
 	clublog_settings.get("Password", password, "");
-	fields["password"] = password;
+	fields.push_back({ "password", password, "", "" });
 	free(password);
+	char* callsign;
+	current_settings.get("Callsign", callsign, "");
+	fields.push_back({ "callsign", callsign, "", "" });
+	free(callsign);
 	// Set file to empty string to use the supplied data stream
-	fields["file"] = "";
+	fields.push_back({ "file", "", "clublog.adi", "application/octet-stream" });
 	// Hard-coded API Key for this application
-	fields["api"] = api_key_;
+	fields.push_back({ "api", api_key_, "", "" });
 }
 
+// Identify the ADIF fields to export
+void club_handler::generate_adif(set < string > &adif_fields) {
+	adif_fields.insert("QSO_DATE");
+	adif_fields.insert("TIME_ON");
+	adif_fields.insert("TIME_OFF");
+	adif_fields.insert("QSLRDATE");
+	adif_fields.insert("QSLSDATE");
+	adif_fields.insert("CALL");
+	adif_fields.insert("OPERATOR");
+	adif_fields.insert("MODE");
+	adif_fields.insert("BAND");
+	adif_fields.insert("BAND_RX");
+	adif_fields.insert("FREQ");
+	adif_fields.insert("QSL_RCVD");
+	adif_fields.insert("LOTW_QSL_RCVD");
+	adif_fields.insert("QSL_SENT");
+	adif_fields.insert("DXCC");
+	adif_fields.insert("PROP_MODE");
+	adif_fields.insert("CREDIT_GRANTED");
+	adif_fields.insert("RST_SENT");
+	adif_fields.insert("RST_RCVD");
+	adif_fields.insert("NOTES");
+	adif_fields.insert("GRIDSQUARE");
+}
 // Download the exception file
 bool club_handler::download_exception() {
 	// Start downloading exception file
@@ -133,7 +154,7 @@ bool club_handler::unzip_exception(string filename) {
 	clublog_settings.get("Unzip Command", cmd_executable, "C:/Program Files (x86)/7-Zip/7z");
 	char* switch_format;
 	clublog_settings.get("Unzip Switches", switch_format, "e %s -o%s -y");
-	char* cmd_format = new char[strlen(switch_format) + 10];
+	char* cmd_format = new char[strlen(switch_format) + strlen(cmd_executable) + 10];
 	// Add quotes around the executable in case it is in C:\Program Files (x86)
 	sprintf(cmd_format, "\"%s\" %s", cmd_executable, switch_format);
 	char cmd[200];

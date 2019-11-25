@@ -624,7 +624,7 @@ void menu::cb_mi_parse_log(Fl_Widget* w, void* v) {
 		status_->misc_status(ST_NOTE, "PARSE LOG: Started");
 		status_->progress(num_items, navigation_book_->book_type(), "records");
 		// For all records in selected book
-		for (int i = 0; i < num_items && !abandon; i++) {
+		for (int i = 0; i < num_items && !abandon;) {
 			record* record = navigation_book_->get_record(i, false);
 			// Parse each record in turn
 			parse_result_t parse_result = pfx_data_->parse(record);
@@ -632,11 +632,11 @@ void menu::cb_mi_parse_log(Fl_Widget* w, void* v) {
 			record_num = navigation_book_->record_number(i);
 			item_number = i;
 			// Update progress
-			status_->progress(i, navigation_book_->book_type());
+			status_->progress(++i, navigation_book_->book_type());
 			if (changed || parse_result == PR_CHANGED) {
 				book_->modified(true);
 				// The parsing may have modified date and time
-				book_->correct_record_position(navigation_book_->record_number(i));
+				book_->correct_record_position(navigation_book_->record_number(item_number));
 			}
 			else if (parse_result == PR_ABANDONED) {
 				// User has the opportunity to abandon this if too many records have issues
@@ -693,7 +693,7 @@ void menu::cb_mi_valid8_log(Fl_Widget* w, void* v) {
 	status_->progress(num_items, navigation_book_->book_type(), "records");
 	spec_data_->reset_continue();
 	// For each record in selected book unless user has indicated to quit
-	for (int i = 0; i < num_items && spec_data_->do_continue(); i++) {
+	for (int i = 0; i < num_items && spec_data_->do_continue(); ) {
 		record_num = navigation_book_->record_number(i);
 		item_number = i;
 		record* record = navigation_book_->get_record(i, false);
@@ -701,7 +701,7 @@ void menu::cb_mi_valid8_log(Fl_Widget* w, void* v) {
 		if (spec_data_->validate(record, record_num)) {
 			changed = true;
 		}
-		status_->progress(i, navigation_book_->book_type());
+		status_->progress(++i, navigation_book_->book_type());
 	}
 	status_->misc_status(ST_OK, "VALIDATE LOG: Done!");
 	if (changed) {
