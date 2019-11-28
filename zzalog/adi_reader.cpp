@@ -137,14 +137,9 @@ istream& adi_reader::load_record(record* in_record, istream& in, load_result_t& 
 				}
 				if (!in.good()) result = LR_BAD;
 				else {
-					// Ignore all data until next < (or EOF) - it is likely to be white-space but ADIF says ignore anyway
+					// Ignore all data until next < (or EOF) - ADIF says ignore, LotW uses it as annotation
 					while (c != '<' && in.good()) {
 						in.get(c);
-						if (c != ' ' && c != '\t' && c != '\n' && c != 'r' && c != '<' && !in_record->is_header()) {
-							// Report band item to the status log
-							has_bad_field = true;
-							bad_field = field;
-						}
 					}
 					// Now create the hash-pair if length non-zero
 					if (count > 0 && in.good()) {

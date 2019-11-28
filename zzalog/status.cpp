@@ -4,14 +4,17 @@
 #include "rig_if.h"
 #include "../zzalib/callback.h"
 #include "menu.h"
+#include "intl_widgets.h"
 
 #include <FL/Fl_Button.H>
+#include <FL/Fl_Radio_Round_Button.H>
 #include <FL/Fl.H>
 #include <FL/Fl_Preferences.H>
 #include <FL/Fl_Single_Window.H>
 #include <FL/Fl_File_Chooser.H>
 #include <FL/Fl_Text_Display.H>
 #include <FL/Fl_Text_Buffer.H>
+#include <FL/fl_ask.H>
 
 using namespace zzalog;
 
@@ -313,8 +316,8 @@ void status::progress(int value, object_t object) {
 			progress_item* item = progress_items_.at(object);
 			item->value = value;
 			update_progress(object);
-			// If it's 100% (or 0% if counting down) delte item and draw the next in the stack
-			if ((item->countdown && value == 0) || (!item->countdown && value == item->max_value)) {
+			// If it's 100% (or 0% if counting down) delete item and draw the next in the stack - certain objects can overrun
+			if ((item->countdown && value <= 0) || (!item->countdown && value >= item->max_value)) {
 				char message[100];
 				snprintf(message, 100, "PROGRESS: %s finished (%d %s)", OBJECT_NAMES.at(object), item->max_value, item->suffix);
 				misc_status(ST_LOG, message);
@@ -333,15 +336,15 @@ void status::progress(int value, object_t object) {
 void status::progress(const char* message, object_t object) {
 	if (progress_stack_.size()) {
 		if (progress_items_.find(object) == progress_items_.end()) {
-			char message[100];
-			snprintf(message, 100, "PROGRESS: Haven't started progress %s", OBJECT_NAMES.at(object));
-			misc_status(ST_ERROR, message);
+			char msg[100];
+			snprintf(msg, 100, "PROGRESS: Haven't started progress %s", OBJECT_NAMES.at(object));
+			misc_status(ST_ERROR, msg);
 		}
 		else {
 			progress_item* item = progress_items_.at(object);
-			char message[100];
-			snprintf(message, 100, "PROGRESS %s abandoned %s (%d %s)", OBJECT_NAMES.at(object), message, item->value, item->suffix);
-			misc_status(ST_LOG, message);
+			char msg[100];
+			snprintf(msg, 100, "PROGRESS: %s abandoned %s (%d %s)", OBJECT_NAMES.at(object), message, item->value, item->suffix);
+			misc_status(ST_LOG, msg);
 			if (item->countdown) {
 				progress(0, object);
 			}
@@ -450,20 +453,91 @@ void status::file_status(file_status_t status) {
 }
 
 // Text display constructor
-text_display::text_display(int X, int Y, int W, int H) :
-	Fl_Text_Display(X, Y, W, H)
+text_display::text_display(int W, int H, const char* label) :
+	Fl_Window(W, H, label)
 {
+	direction_ = 1;
+	match_case_ = 1;
+	Fl_Button* bn_find = new Fl_Button(GAP, GAP, WBUTTON, HBUTTON, "Find");
+	bn_find->labelfont(FONT);
+	bn_find->labelsize(FONT_SIZE);
+	bn_find->callback(cb_find);
+	intl_input* ip_search = new intl_input(bn_find->x() + bn_find->w() + GAP + (WLABEL/2), GAP, WBUTTON, HBUTTON, "Text");
+	ip_search->labelfont(FONT);
+	ip_search->labelsize(FONT_SIZE);
+	ip_search->textfont(FONT);
+	ip_search->textsize(FONT_SIZE);
+	ip_search->align(FL_ALIGN_LEFT);
+	ip_search->value(search_.c_str());
+	ip_search->callback(cb_value<intl_input, string>, &search_);
+	Fl_Group* grp = new Fl_Group(ip_search->x() + ip_search->w() + GAP, GAP, WBUTTON, HBUTTON);
+	grp->box(FL_NO_BOX);
+	Fl_Radio_Round_Button* bn_backward = new Fl_Radio_Round_Button(grp->x(), GAP, WBUTTON / 2, HBUTTON, "@<");
+	bn_backward->labelsize(FONT_SIZE);
+	bn_backward->box(FL_DOWN_BOX);
+	bn_backward->value(direction_ == 0);
+	radio_param_t* back_param = new radio_param_t(0, &direction_);
+	bn_backward->callback(cb_radio, back_param);
+	Fl_Radio_Round_Button* bn_forward = new Fl_Radio_Round_Button(grp->x() + bn_backward->w(), GAP, WBUTTON / 2, HBUTTON, "@>");
+	bn_forward->labelsize(FONT_SIZE);
+	bn_forward->box(FL_DOWN_BOX);
+	bn_forward->value(direction_ == 1);
+	radio_param_t* for_param = new radio_param_t(1, &direction_);
+	bn_forward->callback(cb_radio, for_param);
+	grp->end();
+
+	Fl_Round_Button* bn_match = new Fl_Round_Button(grp->x() + grp->w() + GAP, GAP, WBUTTON, HBUTTON, "Match Case");
+	bn_match->box(FL_DOWN_BOX);
+	bn_match->labelsize(FONT_SIZE);
+	bn_match->labelfont(FONT);
+	bn_match->value(match_case_);
+	bn_match->selection_color(FL_BLUE);
+	bn_match->callback(cb_value < Fl_Round_Button, int >, &match_case_);
+
+	display_ = new Fl_Text_Display(GAP, bn_find->y() + bn_find->h() + GAP, w() - (2 * GAP), h() - bn_find->y() - bn_find->h() - (2 * GAP));
+	Fl_Text_Buffer* buffer = new Fl_Text_Buffer;
+	display_->buffer(buffer);
+}
+
+text_display::~text_display() {
 }
 
 // Reload the file keeping the scroll position fixed - default was to start at line 0 again.
-void text_display::reload(const char* filename) {
+void text_display::load(const char* filename) {
 	// Find current scroll position
-	int scroll_pos = mVScrollBar->value();
+	int scroll_pos = display_->insert_position();
 	// Reload the file
-	buffer()->loadfile(filename);
+	display_->buffer()->loadfile(filename);
 	// Restore original scroll position
-	scroll(scroll_pos, 0);
+	display_->insert_position(scroll_pos);
 }
+
+// Call back for find/find again
+void text_display::cb_find(Fl_Widget* w, void* v) {
+	text_display* that = ancestor_view<text_display>(w);
+	bool repeat = (long)v;
+	// Look for the string from the current position
+	int pos = that->display_->insert_position();
+	int found;
+	if (that->direction_) {
+		found = that->display_->buffer()->search_forward(pos, that->search_.c_str(), &pos, that->match_case_);
+	}
+	else {
+		if (pos > that->search_.length()) { pos -= (that->search_.length() + 1); }
+		found = that->display_->buffer()->search_backward(pos, that->search_.c_str(), &pos, that->match_case_);
+	}
+	if (found) {
+		// Found a match; select and update the position...
+		that->display_->buffer()->select(pos, pos + that->search_.length());
+		that->display_->insert_position(pos + that->search_.length());
+		that->display_->show_insert_position();
+	}
+	else fl_alert("No occurrences of \'%s\' found!", that->search_.c_str());
+
+}
+
+// Return the display
+Fl_Text_Display* text_display::display() { return display_; }
 
 // Callback opens a text browser
 void status::cb_bn_misc(Fl_Widget* w, void* v) {
@@ -472,8 +546,8 @@ void status::cb_bn_misc(Fl_Widget* w, void* v) {
 	that->report_file_->flush();
 	if (that->status_file_viewer_) {
 		// Reload the viewer and force the window to be shown - it may have been closed
-		that->status_file_viewer_->reload(that->report_filename_.c_str());
-		that->status_file_viewer_->window()->show();
+		that->status_file_viewer_->load(that->report_filename_.c_str());
+		that->status_file_viewer_->show();
 	}
 	else {
 		// Now read it into the text buffer
@@ -481,28 +555,25 @@ void status::cb_bn_misc(Fl_Widget* w, void* v) {
 		// And display it
 		char * title = new char[that->report_filename_.length() + 30];
 		sprintf(title, "Status report file: %s", that->report_filename_.c_str());
-		Fl_Window* win = new Fl_Window(640, 480);
-		win->copy_label(title);
-		delete[] title;
 		// Create the text display and set its parameters
-		that->status_file_viewer_ = new text_display(10, 10, 640 - 20, 480 - 20);
-		that->status_file_viewer_->buffer(buffer);
-		that->status_file_viewer_->wrap_mode(Fl_Text_Display::WRAP_AT_BOUNDS, 0);
-		that->status_file_viewer_->textfont(FL_COURIER);
-		that->status_file_viewer_->textsize(12);
-		that->status_file_viewer_->buffer()->loadfile(that->report_filename_.c_str());
-		win->resizable(that->status_file_viewer_);
-		win->show();
-		win->end();
+		that->status_file_viewer_ = new text_display(640, 480, title);
+		that->status_file_viewer_->display()->buffer(buffer);
+		that->status_file_viewer_->display()->wrap_mode(Fl_Text_Display::WRAP_AT_BOUNDS, 0);
+		that->status_file_viewer_->display()->textfont(FL_COURIER);
+		that->status_file_viewer_->display()->textsize(12);
+		that->status_file_viewer_->display()->buffer()->loadfile(that->report_filename_.c_str());
+		that->status_file_viewer_->resizable(that->status_file_viewer_->display());
+		that->status_file_viewer_->show();
+		that->status_file_viewer_->end();
 		// Add the display to the main window to delete it if the main window is first.
-		add_sub_window(win);
+		add_sub_window(that->status_file_viewer_);
 	}
 	that->colour_buffer();
 }
 
 // Format the display depending on the first characer of each line of text
 void status::colour_buffer() {
-	Fl_Text_Buffer* buffer = status_file_viewer_->buffer();
+	Fl_Text_Buffer* buffer = status_file_viewer_->display()->buffer();
 	int num_chars = buffer->length();
 	int cur_pos = 0;
 	const int num_styles = STATUS_CODES.size();
@@ -534,7 +605,7 @@ void status::colour_buffer() {
 	}
 	Fl_Text_Buffer* style_buffer = new Fl_Text_Buffer;
 	style_buffer->text(style);
-	status_file_viewer_->highlight_data(style_buffer, STATUS_STYLES, num_styles, 'I', nullptr, nullptr);
+	status_file_viewer_->display()->highlight_data(style_buffer, STATUS_STYLES, num_styles, 'I', nullptr, nullptr);
 	delete[] style;
 }
 

@@ -90,11 +90,24 @@ namespace zzalog {
 	const double UTC_TIMER = 1.0;
 
 	// This class provides an extension to the Text Display widget to allow the buffer to be reloaded
-	class text_display : public Fl_Text_Display {
+	class text_display : public Fl_Window {
 	public:
-		text_display(int X, int Y, int W, int H);
+		text_display(int W, int H, const char* label);
+		~text_display();
 
-		void reload(const char* filename);
+		void load(const char* filename);
+
+		static void cb_find(Fl_Widget* w, void* v);
+
+		Fl_Text_Display* display();
+
+	protected:
+		Fl_Text_Display* display_;
+		Fl_Menu_Item* menu_;
+		string search_;
+		int direction_;
+		int match_case_;
+
 	};
 
 	// A progress stack entry

@@ -96,8 +96,8 @@ namespace zzalog {
 		// enable
 		bool club_enable_;
 		// username (e-mail)
-		string club_username_;
 		string club_password_;
+		string club_username_;
 		// Number of days between downloads
 		int club_interval_;
 
