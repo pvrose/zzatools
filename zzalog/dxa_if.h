@@ -210,6 +210,14 @@ namespace zzalog {
 		double easternmost_;
 		double northernmost_;
 		double southernmost_;
+		// Map properties
+		int prefixes_;
+		int cq_zones_;
+		int itu_zones_;
+		int grid_squares_;
+		int lat_lon_grid_;
+		int bearing_distance_;
+		DxAtlas::EnumProjection projection_;
 
 		Fl_Group* colour_grp_;
 		// Colour buttons - instanced in colour_win_

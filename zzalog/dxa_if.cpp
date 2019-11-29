@@ -59,6 +59,13 @@ dxa_if::dxa_if() :
 	, home_lat_dms_("")
 	, home_long_dms_("")
 	, centre_mode_(HOME)
+	, prefixes_(false)
+	, cq_zones_(false)
+	, itu_zones_(false)
+	, grid_squares_(true)
+	, lat_lon_grid_(false)
+	, bearing_distance_(false)
+	, projection_(DxAtlas::PRJ_RECTANGULAR)
 {
 	records_to_display_.clear();
 	colours_used_.clear();
@@ -124,7 +131,14 @@ void dxa_if::load_values() {
 	dxatlas_settings.get("Window Top", window_top_, 100);
 	dxatlas_settings.get("Include SWLs", (int&)include_swl_, false);
 	dxatlas_settings.get("Zoom Value", zoom_value_, 1.0);
-	dxatlas_settings.get("Cntre Mode", (int&)centre_mode_, HOME);
+	dxatlas_settings.get("Centre Mode", (int&)centre_mode_, HOME);
+	dxatlas_settings.get("Prefixes", (int&)prefixes_, false);
+	dxatlas_settings.get("CQ Zones", (int&)cq_zones_, false);
+	dxatlas_settings.get("ITU Zones", (int&)itu_zones_, false);
+	dxatlas_settings.get("Gridsquares", (int&)grid_squares_, true);
+	dxatlas_settings.get("Latitude Longitude", (int&)lat_lon_grid_, false);
+	dxatlas_settings.get("Bearing Distance", (int&)bearing_distance_, false);
+	dxatlas_settings.get("Projection", (int&)projection_, DxAtlas::PRJ_RECTANGULAR);
 
 	// Get stations details - QTH locations used to mark hone location on map
 	Fl_Preferences stations_settings(settings_, "Stations");
@@ -336,6 +350,13 @@ void dxa_if::save_values() {
 	dxatlas_settings.set("Window Top", y_root());
 	dxatlas_settings.set("Include SWLs", include_swl_);
 	dxatlas_settings.set("Centre Mode", centre_mode_);
+	dxatlas_settings.set("Prefixes", (int&)prefixes_);
+	dxatlas_settings.set("CQ Zones", (int&)cq_zones_);
+	dxatlas_settings.set("ITU Zones", (int&)itu_zones_);
+	dxatlas_settings.set("Gridsquares", (int&)grid_squares_);
+	dxatlas_settings.set("Latitude Longitude", (int&)lat_lon_grid_);
+	dxatlas_settings.set("Bearing Distance", (int&)bearing_distance_);
+	dxatlas_settings.set("Projection", (int&)projection_);
 }
 
 // Used to enable/disable specific widget - any widgets enabled must be attributes
@@ -509,6 +530,17 @@ HRESULT dxa_if::cb_map_changed(enum DxAtlas::EnumMapChange change_kind) {
 			atlas_top_ = atlas_->GetTop();
 			atlas_height_ = atlas_->GetHeight();
 			atlas_width_ = atlas_->GetWidth();
+			break;
+		case DxAtlas::MC_GRID:
+			prefixes_ = map->GetPrefixesVisible();
+			cq_zones_ = map->GetCqZonesVisible();
+			itu_zones_ = map->GetItuZonesVisible();
+			grid_squares_ = map->GetGridSquaresVisible();
+			lat_lon_grid_ = map->GetLatLonGridVisible();
+			bearing_distance_ = map->GetBearingDistanceGridVisible();
+			break;
+		case DxAtlas::MC_PROJECTION:
+			projection_ = map->GetProjection();
 			break;
 		}
 		// Save new configuration
@@ -902,6 +934,14 @@ void dxa_if::initialise_map() {
 		atlas_->PutTop(atlas_top_);
 		atlas_->PutHeight(atlas_height_);
 	}
+	// Set map properties
+	map->PutProjection(projection_);
+	map->PutPrefixesVisible((VARIANT_BOOL)prefixes_);
+	map->PutCqZonesVisible((VARIANT_BOOL)cq_zones_);
+	map->PutItuZonesVisible((VARIANT_BOOL)itu_zones_);
+	map->PutGridSquaresVisible((VARIANT_BOOL)grid_squares_);
+	map->PutLatLonGridVisible((VARIANT_BOOL)lat_lon_grid_);
+	map->PutBearingDistanceGridVisible((VARIANT_BOOL)bearing_distance_);
 
 	// Set map parameters
 	draw_home_flag();
@@ -1353,6 +1393,12 @@ void dxa_if::draw_pins() {
 			}
 
 			status_->misc_status(ST_OK, "DXATLAS: Update done!");
+			if (count != records_to_display_.size()) {
+				char message[100];
+				snprintf(message, 100, "DXATLAS: %d record(s) not displayed", records_to_display_.size() - count);
+				status_->misc_status(ST_ERROR, message);
+				status_->progress("Not all records displayed", OT_DXATLAS);
+			}
 		}
 		catch (exception& /*e*/) {
 			status_->misc_status(ST_SEVERE, "DXATLAS: Error detected during update");
