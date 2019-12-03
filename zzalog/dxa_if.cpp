@@ -1252,6 +1252,10 @@ void dxa_if::draw_pins() {
 
 			// Clear records displayed
 			records_displayed_.clear();
+			int* colour_count = new int[colours_used_.size()];
+			for (size_t i = 0; i < colours_used_.size(); i++) {
+				colour_count[i] = 0;
+			}
 
 			// For all the wanted colours
 			for (int colour_layer = 0; colour_layer < (signed)colours_used_.size(); colour_layer++) {
@@ -1292,9 +1296,8 @@ void dxa_if::draw_pins() {
 					lat_long_t lat_long;
 					SAFEARRAY* point_data;
 					bool use_item = false;
-					bool display_colour = ((Fl_Button*)colour_bns_[colour_layer])->value();
 					string item;
-					if (record != nullptr && display_colour) {
+					if (record != nullptr) {
 						// Select on 'colour by' mode
 						switch (atlas_colour_) {
 						case AC_NONE:
@@ -1347,6 +1350,7 @@ void dxa_if::draw_pins() {
 								}
 							}
 							count += 1;
+							colour_count[colour_layer]++;
 							status_->progress(count, OT_DXATLAS);
 						}
 					}
@@ -1397,6 +1401,10 @@ void dxa_if::draw_pins() {
 				char message[100];
 				snprintf(message, 100, "DXATLAS: %d record(s) not displayed", records_to_display_.size() - count);
 				status_->misc_status(ST_ERROR, message);
+				for (size_t i = 0; i < colours_used_.size(); i++) {
+					snprintf(message, 100, "DXATLAS: %s - %d records", colours_used_[i].c_str(), colour_count[i]);
+					status_->misc_status(ST_LOG, message);
+				}
 				status_->progress("Not all records displayed", OT_DXATLAS);
 			}
 		}

@@ -23,6 +23,7 @@ extern rig_if* rig_if_;
 extern menu* menu_;
 extern void add_rig_if();
 extern Fl_Single_Window* main_window_;
+extern status* status_;
 extern bool read_only_;
 extern void add_sub_window(Fl_Window* w);
 extern void remove_sub_window(Fl_Window* w);
@@ -180,6 +181,7 @@ status::~status()
 {
 	clear();
 	report_file_->close();
+	delete status_file_viewer_;
 	for (auto it = progress_items_.begin(); it != progress_items_.end(); it++) {
 		delete (it->second);
 	}
@@ -188,6 +190,7 @@ status::~status()
 }
 
 void status::null_file_viewer() {
+	delete status_file_viewer_;
 	status_file_viewer_ = nullptr;
 }
 
@@ -453,16 +456,73 @@ void status::file_status(file_status_t status) {
 }
 
 // Text display constructor
-text_display::text_display(int W, int H, const char* label) :
-	Fl_Window(W, H, label)
+text_display::text_display(int X, int Y, int W, int H, const char* label) :
+	Fl_Text_Display(X, Y, W, H, label)
 {
+
+}
+
+text_display::~text_display() {
+}
+
+// Reload the file keeping the scroll position fixed - default was to start at line 0 again.
+void text_display::load(const char* filename) {
+	// Find current scroll position
+	int scroll_pos = this->mVScrollBar->value();
+	// Reload the file
+	buffer()->loadfile(filename);
+	// Restore original scroll position
+	this->scroll(scroll_pos, 0);
+}
+
+// Call back for find/find again
+void viewer_window::cb_find(Fl_Widget* w, void* v) {
+	viewer_window* that = ancestor_view<viewer_window>(w);
+	bool repeat = (long)v;
+	// Look for the string from the current position
+	int pos = that->display_->insert_position();
+	int found;
+	if (that->direction_) {
+		found = that->display_->buffer()->search_forward(pos, that->search_.c_str(), &pos, that->match_case_);
+	}
+	else {
+		if ((unsigned)pos > that->search_.length()) { pos -= (that->search_.length() + 1); }
+		found = that->display_->buffer()->search_backward(pos, that->search_.c_str(), &pos, that->match_case_);
+	}
+	if (found) {
+		// Found a match; select and update the position...
+		that->display_->buffer()->select(pos, pos + that->search_.length());
+		that->display_->insert_position(pos + that->search_.length());
+		that->display_->show_insert_position();
+	}
+	else fl_alert("No occurrences of \'%s\' found!", that->search_.c_str());
+
+}
+
+viewer_window::viewer_window(int W, int H, const char* label)
+	: Fl_Window(W, H, label) {
+	draw_window();
+}
+
+viewer_window::~viewer_window() {
+
+}
+
+void viewer_window::load(const char* filename) {
+	display_->load(filename);
+}
+
+void viewer_window::draw_window() {
+	// Now read it into the text buffer
+	Fl_Text_Buffer* buffer = new Fl_Text_Buffer;
+	// And display it
 	direction_ = 1;
 	match_case_ = 1;
 	Fl_Button* bn_find = new Fl_Button(GAP, GAP, WBUTTON, HBUTTON, "Find");
 	bn_find->labelfont(FONT);
 	bn_find->labelsize(FONT_SIZE);
 	bn_find->callback(cb_find);
-	intl_input* ip_search = new intl_input(bn_find->x() + bn_find->w() + GAP + (WLABEL/2), GAP, WBUTTON, HBUTTON, "Text");
+	intl_input* ip_search = new intl_input(bn_find->x() + bn_find->w() + GAP + (WLABEL / 2), GAP, WBUTTON, HBUTTON, "Text");
 	ip_search->labelfont(FONT);
 	ip_search->labelsize(FONT_SIZE);
 	ip_search->textfont(FONT);
@@ -493,87 +553,41 @@ text_display::text_display(int W, int H, const char* label) :
 	bn_match->value(match_case_);
 	bn_match->selection_color(FL_BLUE);
 	bn_match->callback(cb_value < Fl_Round_Button, int >, &match_case_);
-
-	display_ = new Fl_Text_Display(GAP, bn_find->y() + bn_find->h() + GAP, w() - (2 * GAP), h() - bn_find->y() - bn_find->h() - (2 * GAP));
-	Fl_Text_Buffer* buffer = new Fl_Text_Buffer;
+	// Create the text display and set its parameters
+	display_ = new text_display(GAP, grp->y() + grp->h() + GAP, w() - GAP - GAP, h() - grp->y() - grp->h() - GAP - GAP);
 	display_->buffer(buffer);
-}
+	display_->wrap_mode(Fl_Text_Display::WRAP_AT_BOUNDS, 0);
+	display_->textfont(FL_COURIER);
+	display_->textsize(12);
+	display_->resizable(display_);
+	display_->show();
+	display_->end();
 
-text_display::~text_display() {
-}
-
-// Reload the file keeping the scroll position fixed - default was to start at line 0 again.
-void text_display::load(const char* filename) {
-	// Find current scroll position
-	int scroll_pos = display_->insert_position();
-	// Reload the file
-	display_->buffer()->loadfile(filename);
-	// Restore original scroll position
-	display_->insert_position(scroll_pos);
-}
-
-// Call back for find/find again
-void text_display::cb_find(Fl_Widget* w, void* v) {
-	text_display* that = ancestor_view<text_display>(w);
-	bool repeat = (long)v;
-	// Look for the string from the current position
-	int pos = that->display_->insert_position();
-	int found;
-	if (that->direction_) {
-		found = that->display_->buffer()->search_forward(pos, that->search_.c_str(), &pos, that->match_case_);
-	}
-	else {
-		if (pos > that->search_.length()) { pos -= (that->search_.length() + 1); }
-		found = that->display_->buffer()->search_backward(pos, that->search_.c_str(), &pos, that->match_case_);
-	}
-	if (found) {
-		// Found a match; select and update the position...
-		that->display_->buffer()->select(pos, pos + that->search_.length());
-		that->display_->insert_position(pos + that->search_.length());
-		that->display_->show_insert_position();
-	}
-	else fl_alert("No occurrences of \'%s\' found!", that->search_.c_str());
+	end();
+	show();
 
 }
-
-// Return the display
-Fl_Text_Display* text_display::display() { return display_; }
 
 // Callback opens a text browser
 void status::cb_bn_misc(Fl_Widget* w, void* v) {
 	status* that = ancestor_view<status>(w);
 	// Ensure any outstanding writes are flushed to disc
 	that->report_file_->flush();
-	if (that->status_file_viewer_) {
-		// Reload the viewer and force the window to be shown - it may have been closed
-		that->status_file_viewer_->load(that->report_filename_.c_str());
-		that->status_file_viewer_->show();
-	}
-	else {
-		// Now read it into the text buffer
-		Fl_Text_Buffer* buffer = new Fl_Text_Buffer;
-		// And display it
-		char * title = new char[that->report_filename_.length() + 30];
+	if (!that->status_file_viewer_) {
+		char* title = new char[that->report_filename_.length() + 30];
 		sprintf(title, "Status report file: %s", that->report_filename_.c_str());
-		// Create the text display and set its parameters
-		that->status_file_viewer_ = new text_display(640, 480, title);
-		that->status_file_viewer_->display()->buffer(buffer);
-		that->status_file_viewer_->display()->wrap_mode(Fl_Text_Display::WRAP_AT_BOUNDS, 0);
-		that->status_file_viewer_->display()->textfont(FL_COURIER);
-		that->status_file_viewer_->display()->textsize(12);
-		that->status_file_viewer_->display()->buffer()->loadfile(that->report_filename_.c_str());
-		that->status_file_viewer_->resizable(that->status_file_viewer_->display());
-		that->status_file_viewer_->show();
-		that->status_file_viewer_->end();
-		// Add the display to the main window to delete it if the main window is first.
-		add_sub_window(that->status_file_viewer_);
+		that->status_file_viewer_ = new viewer_window(640, 480, title);
 	}
-	that->colour_buffer();
+	// Reload the viewer and force the window to be shown - it may have been closed
+	that->status_file_viewer_->load(that->report_filename_.c_str());
+	that->status_file_viewer_->show();
+	that->status_file_viewer_->colour_buffer();
+	that->status_file_viewer_->redraw();
 }
 
 // Format the display depending on the first characer of each line of text
-void status::colour_buffer() {
-	Fl_Text_Buffer* buffer = status_file_viewer_->display()->buffer();
+void viewer_window::colour_buffer() {
+	Fl_Text_Buffer* buffer = display_->buffer();
 	int num_chars = buffer->length();
 	int cur_pos = 0;
 	const int num_styles = STATUS_CODES.size();
@@ -605,7 +619,7 @@ void status::colour_buffer() {
 	}
 	Fl_Text_Buffer* style_buffer = new Fl_Text_Buffer;
 	style_buffer->text(style);
-	status_file_viewer_->display()->highlight_data(style_buffer, STATUS_STYLES, num_styles, 'I', nullptr, nullptr);
+	display_->highlight_data(style_buffer, STATUS_STYLES, num_styles, 'I', nullptr, nullptr);
 	delete[] style;
 }
 

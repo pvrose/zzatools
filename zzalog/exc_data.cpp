@@ -235,9 +235,9 @@ ostream& exc_data::store(ostream& out) {
 		list<exc_entry*>* data_list = &(it->second);
 		for (auto it2 = data_list->begin(); it2 != data_list->end(); it2++) {
 			(*it2)->store(out);
+			i++;
+			status_->progress(i, OT_PREFIX);
 		}
-		i++;
-		status_->progress(i, OT_PREFIX);
 	}
 
 	// Individual entries
@@ -245,9 +245,9 @@ ostream& exc_data::store(ostream& out) {
 		list<invalid*>* data_list = &(it->second);
 		for (auto it2 = data_list->begin(); it2 != data_list->end(); it2++) {
 			(*it2)->store(out);
+			i++;
+			status_->progress(i, OT_PREFIX);
 		}
-		i++;
-		status_->progress(i, OT_PREFIX);
 	}
 	if (!out.good()) {
 		status_->progress("Write failed", OT_PREFIX);

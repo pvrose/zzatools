@@ -90,26 +90,41 @@ namespace zzalog {
 	const double UTC_TIMER = 1.0;
 
 	// This class provides an extension to the Text Display widget to allow the buffer to be reloaded
-	class text_display : public Fl_Window {
+	class text_display : public Fl_Text_Display {
 	public:
-		text_display(int W, int H, const char* label);
+		text_display(int X, int Y, int W, int H, const char* label = nullptr);
 		~text_display();
 
 		void load(const char* filename);
 
-		static void cb_find(Fl_Widget* w, void* v);
-
-		Fl_Text_Display* display();
-
-	protected:
-		Fl_Text_Display* display_;
-		Fl_Menu_Item* menu_;
-		string search_;
-		int direction_;
-		int match_case_;
 
 	};
 
+	class viewer_window : public Fl_Window {
+	public:
+		viewer_window(int W, int Y, const char* label);
+		~viewer_window();
+
+		void load(const char* filename);
+
+		void draw_window();
+
+		void colour_buffer();
+
+	protected:
+		// Find text in Text Buffer
+		static void cb_find(Fl_Widget* w, void* v);
+
+		// Display widget
+		text_display* display_;
+		// Find search string
+		string search_;
+		// Search direction
+		int direction_;
+		// Whether to match case
+		int match_case_;
+
+	};
 	// A progress stack entry
 	struct progress_item {
 		int max_value;
@@ -160,8 +175,6 @@ namespace zzalog {
 		static void cb_text(Fl_Widget* w, void* v);
 
 	protected:
-		// Add colourin to buffer
-		void colour_buffer();
 		// Re-initialise progress bar
 		void update_progress(object_t object);
 
@@ -177,7 +190,9 @@ namespace zzalog {
 		// File status
 		Fl_Button* file_status_;
 		// Status file viewer
-		text_display* status_file_viewer_;
+		viewer_window* status_file_viewer_;
+		// Containing window
+
 		// local or UTC
 		bool use_local_;
 		// Status report file
@@ -193,6 +208,7 @@ namespace zzalog {
 		list<object_t> progress_stack_;
 		// The progress items in the stack
 		map<object_t, progress_item*> progress_items_;
+
 	};
 
 }
