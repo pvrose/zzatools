@@ -136,6 +136,7 @@ namespace zzalog {
 	{ "&Save", 0, menu::cb_mi_file_saveas, (void*)OT_EXTRACT },
 	{ "&Upload", 0, menu::cb_mi_ext_upload, 0 },
 	{ "&Print", 0, menu::cb_mi_ext_print, 0 },
+	{ "&Mark sent", 0, menu::cb_mi_ext_mark, 0 },
 	{ 0 },
 	{ "&Import", 0, 0, 0, FL_SUBMENU },
 	{ "&File", 0, menu::cb_mi_imp_file, nullptr },
@@ -1149,6 +1150,50 @@ void menu::cb_mi_ext_print(Fl_Widget* w, void* v) {
 		delete ptr;
 		break;
 	}
+}
+
+// Extract->Mark sent
+// v is not used
+void menu::cb_mi_ext_mark(Fl_Widget* w, void* v) {
+	if (extract_records_->size()) {
+		char message[200];
+		status_->progress(extract_records_->size(), OT_EXTRACT, "records", false);
+		int count = 0;
+		menu* that = (menu*)w;
+		string date_name;
+		string sent_name;
+		switch (that->qsl_type_) {
+		case extract_data::EQSL:
+			date_name = "EQSL_QSLSDATE";
+			sent_name = "EQSL_QSL_SENT";
+			break;
+		case extract_data::LOTW:
+			date_name = "LOTW_QSLSDATE";
+			sent_name = "LOTQ_QSL_SENT";
+			break;
+		case extract_data::CARD:
+			date_name = "QSLSDATE";
+			sent_name = "QSL_SENT";
+			break;
+		case extract_data::CLUBLOG:
+			date_name = "CLUBLOG_QSO_UPLOAD_DATE";
+			sent_name = "CLUBLOG_QSO_UPLOAD_STATUS";
+			break;
+		}
+		string today = now(false, "%Y%m%d");
+		snprintf(message, 200, "EXTRACT: Setting %s to \"%s\", %s to \"Y\"", date_name.c_str(), today.c_str(), sent_name.c_str());
+		status_->misc_status(ST_NOTE, message);
+		for (auto it = extract_records_->begin(); it != extract_records_->end(); it++) {
+			(*it)->item(date_name, today);
+			(*it)->item(sent_name, string("Y"));
+			status_->progress(++count, OT_EXTRACT);
+		}
+		book_->modified(true);
+	}
+	else {
+		status_->misc_status(ST_WARNING, "EXTRACT: No records to change");
+	}
+
 }
 
 // Reference->Prefix->Filter - used to set the filter for displaying prefix data

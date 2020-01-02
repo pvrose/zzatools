@@ -95,6 +95,8 @@ namespace zzalog {
 		static void cb_mi_ext_upload(Fl_Widget* w, void* v);
 		// Extract->Print
 		static void cb_mi_ext_print(Fl_Widget* w, void* v);
+		// Extract->Mark sent
+		static void cb_mi_ext_mark(Fl_Widget* w, void* v);
 		// Import->File
 		static void cb_mi_imp_file(Fl_Widget* w, void* v);
 		// Import->Download->eQSL/LotW

@@ -58,8 +58,8 @@ bool club_handler::upload_log(book* book) {
 			ok = true;
 			string today = now(false, "%Y%m%d");
 			for (auto it = book->begin(); it != book->end(); it++) {
-				(*it)->item("CLUBLOG_QSO_UPLOAD_DATE", now);
-				(*it)->item("CLUBLOG_QSO_UPLOAD_STATUS", "Y");
+				(*it)->item("CLUBLOG_QSO_UPLOAD_DATE", today);
+				(*it)->item("CLUBLOG_QSO_UPLOAD_STATUS", string("Y"));
 			}
 		}
 		return ok;

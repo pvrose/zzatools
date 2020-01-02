@@ -515,6 +515,7 @@ void import_data::finish_update(bool merged /*= true*/) {
 		sprintf(message, "IMPORT: %d records read, %d checked, %d updated, %d accepted, %d added, %d rejected",
 			number_to_import_, number_checked_, number_updated_, number_accepted_, number_added_, number_rejected_);
 		status_->misc_status(ST_OK, message);
+		status_->progress(size(), book_type_);
 		if (number_updated_) {
 			book_->selection(book_->size() - 1, HT_ALL);
 		}
@@ -764,28 +765,12 @@ bool import_data::load_data(string filename) {
 
 // Process LotW header - merges
 void import_data::process_lotw_header() {
-	// Header contains last qsl received data to allow next download to start of where this ended
-	string update = header()->item("APP_LOTW_LASTQSL");
-	if (update.length() > 10) {
-		// Remember this in settings
-		string setting = update.substr(0, 4) + update.substr(5, 2) + update.substr(8, 2);
-		Fl_Preferences qsl_settings(settings_, "QSL");
-		Fl_Preferences lotw_settings(qsl_settings, "LotW");
-		lotw_settings.set("Last Accessed", setting.c_str());
+	if (header()->item("PROGRAMID") != "LoTW") {
+		status_->misc_status(ST_WARNING, "IMPORT: It does not appear the ADIF came from LoTW");
 	}
 	else {
-		// Not a valid date provided
-		status_->misc_status(ST_WARNING, "IMPORT: Invalid last QSL date received from LotW");
-	}
-	// LotW ADIF will always give load failed as there is an non-compliant record at the end
-	// that indicates end-of-file
-	// Replace this with "file loaded" if the number of records agrees with the 
-	// stated number in the header record
-	int num_records;
-	header()->item("APP_LOTW_NUMREC", num_records);
-	if ((size_t)num_records == size()) {
 		status_->misc_status(ST_OK, "IMPORT: LotW download done.");
-		status_->progress(num_records, book_type());
+		status_->progress(size() + 1, book_type());
 	}
 }
 

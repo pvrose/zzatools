@@ -240,6 +240,7 @@ bool eqsl_handler::card_file_valid(string& filename) {
 	else {
 		// Read the first four characters to check it's a valid PNG files
 		char buffer[5];
+		memset(&buffer, 0, 5);
 		char png_test[] = { (char)0x89, 'P', 'N', 'G', '\0' };
 		file.read(buffer, 4);
 		if (file.gcount() == 4) {

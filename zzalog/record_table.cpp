@@ -82,6 +82,11 @@ void record_table::draw_cell(TableContext context, int R, int C, int X, int Y, i
 					// Mode supplied is the DXCC version of the mode
 					fl_color(FL_DARK_YELLOW);
 				}
+				else if (field_name == "MODE" &&
+					query_record_->item(field_name) == log_record_->item("SUBMODE")) {
+					// Mode supplied is the submode
+					fl_color(FL_DARK_YELLOW);
+				}
 				else {
 					// Set text colour red to indicate significant mismatch
 					fl_color(FL_RED);

@@ -407,9 +407,6 @@
     <ClInclude Include="zzalog\xml_element.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="zzalog\xml_reader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="zzalog\xml_writer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -439,6 +436,9 @@
     </ClInclude>
     <ClInclude Include="zzalog\exc_reader.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zzalog\xml_reader.h">
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -246,7 +246,7 @@ bool lotw_handler::download_lotw_log(stringstream* adif) {
 			// Data has been downloaded - display it a text browser
 			status_->misc_status(ST_WARNING, "LOTW DOWNLOAD: data neither HTML nor ADIF - opening browser");
 			Fl_Text_Buffer *buff = new Fl_Text_Buffer;
-			Fl_Text_Display * disp = new Fl_Text_Display(0, 0, 640, 400);
+			Fl_Text_Display * disp = new Fl_Text_Display(0, 0, 640, 400, "Unexpected data received from LotW");
 			disp->buffer(buff);
 			buff->text(adif->str().c_str());
 			disp->show();
@@ -256,6 +256,11 @@ bool lotw_handler::download_lotw_log(stringstream* adif) {
 			status_->misc_status(ST_ERROR, "LOTW DOWNLOAD Failure to download, nothing to show!");
 		}
 		ok = false;
+	}
+	if (ok) {
+		Fl_Preferences qsl_settings(settings_, "QSL");
+		Fl_Preferences lotw_settings(qsl_settings, "LotW");
+		lotw_settings.set("Last Accessed", now(false, "%Y%m%d").c_str());
 	}
 	fl_cursor(FL_CURSOR_DEFAULT);
 	return ok;

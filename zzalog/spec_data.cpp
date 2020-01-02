@@ -2186,7 +2186,6 @@ void spec_data::reset_continue() {
 // Add this app's app defined fields
 void spec_data::add_my_appdefs() {
 	string my_appdefs[] = {
-		"APP_ZZA_NUMREC",
 		"APP_ZZA_PFX",
 		"APP_ZZA_QTH",
 		"APP_ZZA_EQSL_TS",
