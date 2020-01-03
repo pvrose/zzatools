@@ -93,6 +93,10 @@ namespace zzalog {
 		static void cb_ch_locn(Fl_Widget* w, void* v);
 		// Number days/QSOs input
 		static void cb_ip_number(Fl_Widget* w, void* v);
+		// Colour button click
+		static void cb_bn_colour(Fl_Widget* w, void* v);
+		// All colour button click
+		static void cb_bn_all(Fl_Widget* w, void* v);
 
 
 	public:
@@ -218,6 +222,8 @@ namespace zzalog {
 		int lat_lon_grid_;
 		int bearing_distance_;
 		DxAtlas::EnumProjection projection_;
+		// Colour button enables
+		vector<bool> colour_enables_;
 
 		Fl_Group* colour_grp_;
 		// Colour buttons - instanced in colour_win_

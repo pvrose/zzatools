@@ -70,6 +70,7 @@ dxa_if::dxa_if() :
 	records_to_display_.clear();
 	colours_used_.clear();
 	colour_bns_.clear();
+	colour_enables_.clear();
 	locations_.clear();
 
 	load_values();
@@ -105,6 +106,7 @@ dxa_if::~dxa_if()
 	// Remove and delete all other widtgets
 	clear();
 	colour_bns_.clear();
+	colour_enables_.clear();
 	// Clear the various data sets
 	records_to_display_.clear();
 	colours_used_.clear();
@@ -320,6 +322,18 @@ void dxa_if::create_form() {
 	colour_grp_->labelfont(FONT);
 	colour_grp_->labelsize(FONT_SIZE);
 	colour_grp_->align(FL_ALIGN_TOP | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
+	
+	Fl_Button* bn_set_all = new Fl_Button(EDGE + GAP+ WBUTTON + WBUTTON, colour_grp_->y() + GAP, WBUTTON, HBUTTON, "Set all");
+	bn_set_all->labelfont(FONT);
+	bn_set_all->labelsize(FONT_SIZE);
+	bn_set_all->align(FL_ALIGN_CENTER);
+	bn_set_all->callback(cb_bn_all, (void*)true);
+
+	Fl_Button* bn_clr_all = new Fl_Button(bn_set_all->x() + bn_set_all->w() , bn_set_all->y(), WBUTTON, HBUTTON, "Clear all");
+	bn_clr_all->labelfont(FONT);
+	bn_clr_all->labelsize(FONT_SIZE);
+	bn_clr_all->align(FL_ALIGN_CENTER);
+	bn_clr_all->callback(cb_bn_all, (void*)false);
 
 	colour_grp_->end();
 
@@ -387,6 +401,18 @@ void dxa_if::enable_widgets() {
 			centre_ch_->deactivate();
 		}
 	}
+	// Enable colour buttons
+	for (size_t i = 0; i < colour_bns_.size(); i++) {
+		if (colour_enables_[i]) {
+			colour_bns_[i]->color(button_colour(i));
+			colour_bns_[i]->labelcolor(fl_contrast(FL_BLACK, button_colour(i)));
+		}
+		else {
+			colour_bns_[i]->color(FL_INACTIVE_COLOR);
+			colour_bns_[i]->labelcolor(FL_BLACK);
+		}
+	}
+	redraw();
 }
 
 // Update location widgets
@@ -512,6 +538,30 @@ void dxa_if::cb_bn_centre(Fl_Widget* w, void* v) {
 	}
 }
 
+// Colour button selected
+void dxa_if::cb_bn_colour(Fl_Widget* w, void* v) {
+	dxa_if* that = ancestor_view<dxa_if>(w);
+	int number = (int)v;
+	if (that->colour_enables_[number]) {
+		that->colour_enables_[number] = false;
+	}
+	else {
+		that->colour_enables_[number] = true;
+	}
+	that->enable_widgets();
+	that->draw_pins();
+}
+
+// Set all or celar all selected
+void dxa_if::cb_bn_all(Fl_Widget* w, void* v) {
+	dxa_if* that = ancestor_view<dxa_if>(w);
+	bool enable = (long)v;
+	for (size_t i = 0; i < that->colour_enables_.size(); i++) {
+		that->colour_enables_[i] = enable;
+	}
+	that->enable_widgets();
+	that->draw_pins();
+}
 
 // DXATLAS: callback - some detail of the map has been changed
 HRESULT dxa_if::cb_map_changed(enum DxAtlas::EnumMapChange change_kind) {
@@ -956,11 +1006,15 @@ void dxa_if::initialise_map() {
 void dxa_if::create_colour_buttons() {
 
 	int button_num = 0;
-	// Delete all existing widgets
-	colour_grp_->clear();
+	// Delete all existing colour buttons
+	for (size_t i = 0; i < colour_bns_.size(); i++) {
+		colour_grp_->remove(colour_bns_[i]);
+		delete colour_bns_[i];
+	}
 	// get FLTK scheduler delete them
 	Fl::wait();
 	colour_bns_.clear();
+	colour_enables_.clear();
 	// Hide the window so it can be resized
 	hide();
 
@@ -981,14 +1035,16 @@ void dxa_if::create_colour_buttons() {
 	int button_todo = num_colours;
 	for (int r = 0; r < num_rows; r++) {
 		for (int c = 0; c < num_cols && button_num < num_colours; c++) {
-			Fl_Box* bn = new Fl_Box(colour_grp_->x() + (c * WBUTTON) + GAP, (r * HBUTTON) + HTEXT + colour_grp_->y(), WBUTTON, HBUTTON);
+			Fl_Button* bn = new Fl_Button(colour_grp_->x() + (c * WBUTTON) + GAP, (r * HBUTTON) + HBUTTON + colour_grp_->y() + GAP, WBUTTON, HBUTTON);
 			bn->box(FL_BORDER_BOX);
 			bn->labelfont(FONT);
 			bn->labelsize(FONT_SIZE);
 			bn->color(button_colour(button_num));
 			bn->copy_label(colours_used_[button_num].c_str());
 			bn->labelcolor(fl_contrast(FL_BLACK, button_colour(button_num)));
+			bn->callback(cb_bn_colour, (void*)button_num);
 			colour_bns_.push_back(bn);
+			colour_enables_.push_back(true);
 			colour_grp_->add(bn);
 			button_num++;
 			button_todo--;
@@ -997,7 +1053,7 @@ void dxa_if::create_colour_buttons() {
 	// Now resize the window to just contain the buttons and don't allow the user to resize it smaller
 	colour_grp_->resizable(nullptr);
 	resizable(colour_grp_);
-	colour_grp_->size(colour_grp_->w(), (num_rows * HBUTTON) + HTEXT + GAP );
+	colour_grp_->size(colour_grp_->w(), (num_rows * HBUTTON) + HTEXT + GAP + GAP);
 	size(w(), colour_grp_->y() + colour_grp_->h() + GAP + EDGE);
 	size_range(w(), h());
 	show();
@@ -1267,119 +1323,123 @@ void dxa_if::draw_pins() {
 				else {
 					colour_text = "";
 				}
-				// do not repaint map while we are updating data
-				// This will repaint the map between each colour
-				map->BeginUpdate();
+				// Only check if we hav enabled colour
+				if (colour_enables_[colour_layer]) {
+					// do not repaint map while we are updating data
+					// This will repaint the map between each colour
+					map->BeginUpdate();
 
-				// add new layer for points - allow lower layers to be visible
-				DxAtlas::ICustomLayerPtr layer = pin_layers->Add(DxAtlas::LK_POINTS);
-				layer->PutLabelsTransparent(true);
+					// add new layer for points - allow lower layers to be visible
+					DxAtlas::ICustomLayerPtr layer = pin_layers->Add(DxAtlas::LK_POINTS);
+					layer->PutLabelsTransparent(true);
 
-				// create 1-D array of labels - use the maximum possible array size
-				SAFEARRAYBOUND rgsabound[1];
-				rgsabound[0].lLbound = 0;
-				rgsabound[0].cElements = records_to_display_.size();
+					// create 1-D array of labels - use the maximum possible array size
+					SAFEARRAYBOUND rgsabound[1];
+					rgsabound[0].lLbound = 0;
+					rgsabound[0].cElements = records_to_display_.size();
 
-				// The colour of points to display
-				DxAtlas::EnumColor colour = convert_colour(button_colour(colour_layer));
+					// The colour of points to display
+					DxAtlas::EnumColor colour = convert_colour(button_colour(colour_layer));
 
-				// Array to hold all the points
-				SAFEARRAY * point_array = SafeArrayCreate(VT_VARIANT, 1, rgsabound);
-				long index_2 = 0;
+					// Array to hold all the points
+					SAFEARRAY* point_array = SafeArrayCreate(VT_VARIANT, 1, rgsabound);
+					long index_2 = 0;
 
-				// For each record check it is this colour and whether to display it
-				for (auto it2 = records_to_display_.begin(); it2 != records_to_display_.end(); it2++) {
-					// Go through all the selected records
-					record_num_t record_num = *it2;
-					long index_1 = 0;
-					record* record = book_->get_record(record_num, false);
-					lat_long_t lat_long;
-					SAFEARRAY* point_data;
-					bool use_item = false;
-					string item;
-					if (record != nullptr) {
-						// Select on 'colour by' mode
-						switch (atlas_colour_) {
-						case AC_NONE:
-							// 1 colour - use every record
-							use_item = true;
-							break;
-						case AC_BANDS:
-							// select record if it's the band we are drawing
-							use_item = (colour_text == record->item("BAND"));
-							break;
-						case AC_LOGMODE:
-							// select record if it's the ADIF mode we are drawing
-							use_item = (colour_text == record->item("MODE", true));
-							break;
-						case AC_AWARDMODE:
-							// select record if it's the DXCC award mode we are drawing
-							item = record->item("MODE");
-							use_item = (colour_text == spec_data_->dxcc_mode(item));
-							break;
-						}
-
-						if (use_item) {
-							if (include_swl_ || record->item("SWL") != "Y") {
-								// This record is to be drawn in this layer
-								lat_long = record->location(false);
-								// Only add if the location is valid
-								if (!isnan(lat_long.latitude) && !isnan(lat_long.longitude)) {
-									//create label entry (array of 3 elements: Long, Lat, Text)
-									rgsabound[0].cElements = 3;
-									point_data = SafeArrayCreate(VT_VARIANT, 1, rgsabound);
-									//calculate attributes - explicitly convert from double to single precision
-									pt_long = (float)lat_long.longitude;
-									pt_lat = (float)lat_long.latitude;
-									// Adjust furthest in each direction
-									if (lat_long.longitude < westernmost_) westernmost_ = lat_long.longitude;
-									if (lat_long.longitude > easternmost_) easternmost_ = lat_long.longitude;
-									if (lat_long.latitude < southernmost_) southernmost_ = lat_long.latitude;
-									if (lat_long.latitude > northernmost_) northernmost_ = lat_long.latitude;
-									pt_value = 0;
-									//set attributes 
-									index_1 = 0; (void)SafeArrayPutElement(point_data, &index_1, &pt_long);
-									index_1 = 1; (void)SafeArrayPutElement(point_data, &index_1, &pt_lat);
-									index_1 = 2; (void)SafeArrayPutElement(point_data, &index_1, &pt_value);
-									//add point to the array
-									point.parray = point_data;
-									(void)SafeArrayPutElement(point_array, &index_2, &point);
-									index_2++;
-									// Add it to the set of records being displayed
-									records_displayed_.insert(record_num);
-								}
+					// For each record check it is this colour and whether to display it
+					for (auto it2 = records_to_display_.begin(); it2 != records_to_display_.end(); it2++) {
+						// Go through all the selected records
+						record_num_t record_num = *it2;
+						long index_1 = 0;
+						record* record = book_->get_record(record_num, false);
+						lat_long_t lat_long;
+						SAFEARRAY* point_data;
+						bool use_item = false;
+						string item;
+						if (record != nullptr) {
+							// Select on 'colour by' mode
+							switch (atlas_colour_) {
+							case AC_NONE:
+								// 1 colour - use every record
+								use_item = true;
+								break;
+							case AC_BANDS:
+								// select record if it's the band we are drawing
+								use_item = (colour_text == record->item("BAND"));
+								break;
+							case AC_LOGMODE:
+								// select record if it's the ADIF mode we are drawing
+								use_item = (colour_text == record->item("MODE", true));
+								break;
+							case AC_AWARDMODE:
+								// select record if it's the DXCC award mode we are drawing
+								item = record->item("MODE");
+								use_item = (colour_text == spec_data_->dxcc_mode(item));
+								break;
 							}
-							count += 1;
-							colour_count[colour_layer]++;
-							status_->progress(count, OT_DXATLAS);
+							// Don't use item if disabled
+
+							if (use_item) {
+								if (include_swl_ || record->item("SWL") != "Y") {
+									// This record is to be drawn in this layer
+									lat_long = record->location(false);
+									// Only add if the location is valid
+									if (!isnan(lat_long.latitude) && !isnan(lat_long.longitude)) {
+										//create label entry (array of 3 elements: Long, Lat, Text)
+										rgsabound[0].cElements = 3;
+										point_data = SafeArrayCreate(VT_VARIANT, 1, rgsabound);
+										//calculate attributes - explicitly convert from double to single precision
+										pt_long = (float)lat_long.longitude;
+										pt_lat = (float)lat_long.latitude;
+										// Adjust furthest in each direction
+										if (lat_long.longitude < westernmost_) westernmost_ = lat_long.longitude;
+										if (lat_long.longitude > easternmost_) easternmost_ = lat_long.longitude;
+										if (lat_long.latitude < southernmost_) southernmost_ = lat_long.latitude;
+										if (lat_long.latitude > northernmost_) northernmost_ = lat_long.latitude;
+										pt_value = 0;
+										//set attributes 
+										index_1 = 0; (void)SafeArrayPutElement(point_data, &index_1, &pt_long);
+										index_1 = 1; (void)SafeArrayPutElement(point_data, &index_1, &pt_lat);
+										index_1 = 2; (void)SafeArrayPutElement(point_data, &index_1, &pt_value);
+										//add point to the array
+										point.parray = point_data;
+										(void)SafeArrayPutElement(point_array, &index_2, &point);
+										index_2++;
+										// Add it to the set of records being displayed
+										records_displayed_.insert(record_num);
+									}
+								}
+								count += 1;
+								colour_count[colour_layer]++;
+								status_->progress(count, OT_DXATLAS);
+							}
 						}
 					}
+					// Resize array if fewer items have been created.
+					if (index_2 != records_to_display_.size()) {
+						rgsabound[0].cElements = index_2;
+						SafeArrayRedim(point_array, rgsabound);
+					}
+					// Set point size and paint colour
+					layer->PutBrushColor(colour);
+					layer->PutPointSize(3);
+					// font/line color
+					layer->PutPenColor(DxAtlas::clBlack);
+					// put data into the layer
+					points.parray = point_array;
+					// Now put the data onto the DXATLAS: map and display an error if it failed
+					try {
+						layer->SetData(points);
+					}
+					catch (_com_error & e) {
+						char error[256];
+						sprintf(error, "DXATLAS: Got error displaying data : %s", e.ErrorMessage());
+						status_->misc_status(ST_ERROR, error);
+					}
+					// now allow repainting
+					map->EndUpdate();
+					// Maybe allow FLTK scheduler to let DxAtlas do its stuff
+					Fl::wait(0.1);
 				}
-				// Resize array if fewer items have been created.
-				if (index_2 != records_to_display_.size()) {
-					rgsabound[0].cElements = index_2;
-					SafeArrayRedim(point_array, rgsabound);
-				}
-				// Set point size and paint colour
-				layer->PutBrushColor(colour);
-				layer->PutPointSize(3);
-				// font/line color
-				layer->PutPenColor(DxAtlas::clBlack);
-				// put data into the layer
-				points.parray = point_array;
-				// Now put the data onto the DXATLAS: map and display an error if it failed
-				try {
-					layer->SetData(points);
-				}
-				catch (_com_error& e) {
-					char error[256];
-					sprintf(error, "DXATLAS: Got error displaying data : %s", e.ErrorMessage());
-					status_->misc_status(ST_ERROR, error);
-				}
-				// now allow repainting
-				map->EndUpdate();
-				// Maybe allow FLTK scheduler to let DxAtlas do its stuff
-				Fl::wait(0.1);
 			}
 			// Now add a layer for textual information - used for interactive displays
 			call_layer_ = pin_layers->Add(DxAtlas::LK_LABELS);
