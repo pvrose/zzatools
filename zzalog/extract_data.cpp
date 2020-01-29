@@ -171,7 +171,7 @@ void extract_data::clear_criteria() {
 	clear();
 	// Clear all the sets of criteria
 	extract_criteria_.clear();
-	// Now tidy up this book
+	// now tidy up this book
 	delete_contents(true);
 	use_mode_ = NONE;
 	// Set navigation book to main log

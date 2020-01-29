@@ -12,6 +12,7 @@
 #include <FL/Fl_Preferences.H>
 
 using namespace std;
+using namespace zzalib;
 
 // mm to points conversion
 const float MM_TO_POINT = 72.0f / 25.4f;

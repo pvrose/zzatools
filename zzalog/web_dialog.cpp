@@ -13,6 +13,7 @@
 #include <FL/Fl_Int_Input.H>
 
 using namespace zzalog;
+using namespace zzalib;
 
 extern Fl_Preferences* settings_;
 

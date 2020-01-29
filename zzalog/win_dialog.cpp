@@ -22,7 +22,7 @@ win_dialog::~win_dialog()
 button_t win_dialog::display() {
 	pending_button_ = true;
 	show();
-	// Now wait for OK or cancel to be clicked - using the FLTK scheduler ensures
+	// now wait for OK or cancel to be clicked - using the FLTK scheduler ensures
 	// other tasks get a look-in
 	while (pending_button_) { Fl::wait(); }
 	hide();

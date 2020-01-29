@@ -5,6 +5,7 @@
 #include <FL/Fl_Check_Button.H>
 
 using namespace zzalog;
+using namespace zzalib;
 
 // Default constructor
 page_dialog::page_dialog(int X, int Y, int W, int H, const char* label) :

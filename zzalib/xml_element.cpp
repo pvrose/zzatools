@@ -1,6 +1,6 @@
 #include "xml_element.h"
 
-using namespace zzalog;
+using namespace zzalib;
 
 // Constructor - creates an empty element
 xml_element::xml_element()

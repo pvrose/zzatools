@@ -11,7 +11,7 @@
 
 using namespace std;
 
-namespace zzalog {
+namespace zzalib {
 
 	// This class uses the Curl API to read and post to URLs
 	class url_handler

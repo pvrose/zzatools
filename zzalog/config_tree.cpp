@@ -1,10 +1,11 @@
 #include "config_tree.h"
-#include "drawing.h"
+#include "../zzalib/drawing.h"
 
 #include <map>
 
 #include <FL/fl_draw.H>
 using namespace zzalog;
+using namespace zzalib;
 
 extern Fl_Preferences* settings_;
 
@@ -72,7 +73,7 @@ void config_tree::add_branch(Fl_Tree_Item* parent, Fl_Preferences* settings) {
 		// Set attributes
 		branch->labelsize(FONT_SIZE);
 	}
-	// Now get the nodes in this settings group
+	// now get the nodes in this settings group
 	// Entries
 	int num_entries = settings->entries();
 	// For each entry

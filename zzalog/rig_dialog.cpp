@@ -2,7 +2,7 @@
 #include "rig_dialog.h"
 
 #include "../zzalib/utils.h"
-#include "rig_if.h"
+#include "../zzalib/rig_if.h"
 #include "status.h"
 #include "intl_widgets.h"
 #include "drawing.h"
@@ -17,6 +17,7 @@
 #include <FL/Fl_Spinner.H>
 
 using namespace zzalog;
+using namespace zzalib;
 using namespace std;
 
 extern Fl_Preferences* settings_;
@@ -615,7 +616,7 @@ void rig_dialog::populate_port_choice() {
 		delete[] existing_ports_;
 		existing_ports_ = new string[num_ports];
 	}
-	// Now for the returned ports
+	// now for the returned ports
 	for (int i = 0; i < num_ports; i++) {
 		// Add the name onto the choice drop-down list
 		char message[100];

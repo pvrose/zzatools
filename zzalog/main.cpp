@@ -17,14 +17,14 @@ main.cpp - application entry point
 #include "pfx_data.h"
 #include "toolbar.h"
 #include "spec_data.h"
-#include "rig_if.h"
+#include "../zzalib/rig_if.h"
 #include "status.h"
 #include "tabbed_forms.h"
 #include "import_data.h"
 #include "extract_data.h"
 #include "lotw_handler.h"
 #include "eqsl_handler.h"
-#include "url_handler.h"
+#include "../zzalib/url_handler.h"
 #include "pfx_tree.h"
 #include "spec_tree.h"
 #include "report_tree.h"
@@ -61,6 +61,9 @@ main.cpp - application entry point
 
 using namespace std;
 using namespace zzalog;
+using namespace zzalib;
+
+extern rig_if* rig_if_;
 
 // Top level data items - these are declared as externals in each .cpp that uses them
 book* book_ = nullptr;
@@ -74,13 +77,12 @@ status* status_ = nullptr;
 Fl_Preferences* settings_ = nullptr;
 pfx_data* pfx_data_ = nullptr;
 spec_data* spec_data_ = nullptr;
-rig_if* rig_if_ = nullptr;
 eqsl_handler* eqsl_handler_ = nullptr;
 lotw_handler* lotw_handler_ = nullptr;
 qrz_handler* qrz_handler_ = nullptr;
 Fl_RGB_Image* main_icon_ = nullptr;
 Fl_Single_Window* main_window_ = nullptr;
-url_handler* url_handler_ = nullptr;
+extern url_handler* url_handler_;
 intl_dialog* intl_dialog_ = nullptr;
 band_view* band_view_ = nullptr;
 scratchpad* scratchpad_ = nullptr;
@@ -120,6 +122,7 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 		// If rig connected close it - this will close the timer as well
 		if (rig_if_) {
 			rig_if_->close();
+			scratchpad_->update();
 		}
 		// Delete band view
 		if (band_view_) {
@@ -343,6 +346,28 @@ void add_book(char* arg) {
 	}
 }
 
+void cb_rig_timer() {
+		// Band view may not have been created yet
+	if (band_view_) {
+		band_view_->update(rig_if_->tx_frequency() / 1000.0);
+	}
+	// Update scratchpad
+	if (scratchpad_) {
+		string mode;
+		string submode;
+		rig_if_->get_string_mode(mode, submode);
+		string freq = rig_if_->get_frequency(true);
+		string power = rig_if_->get_tx_power();
+		if (submode.length()) {
+			scratchpad_->rig_update(freq, submode, power);
+		}
+		else {
+			scratchpad_->rig_update(freq, mode, power);
+		}
+	}
+	status_->rig_status(ST_OK, rig_if_->rig_info().c_str());
+}
+
 // Create the rig interface handler and connect to the rig.
 void add_rig_if() {
 	if (!closing_) {
@@ -427,9 +452,14 @@ void add_rig_if() {
 							sprintf(message, "RIG: Bad access - %s. Assume real-time logging, no rig", rig_if_->error_message().c_str());
 							// Problem with rig_if when making first access, close it to stop timer and clean up 
 							rig_if_->close();
+							string error_message = rig_if_->error_message();
 							delete rig_if_;
 							rig_if_ = nullptr;
+							if (scratchpad_) {
+								scratchpad_->update();
+							}
 							status_->misc_status(ST_ERROR, message);
+							status_->rig_status(ST_ERROR, error_message.c_str());
 							done = true;
 							// Change logging mode from IMPORTED to ON_AIR. otherwise leave as was
 							if (menu_->logging() == LM_IMPORTED) menu_->logging(LM_ON_AIR);
@@ -437,6 +467,7 @@ void add_rig_if() {
 						else {
 							// Access rig - timer will have been started by rig_if_->open()
 							status_->misc_status(ST_OK, rig_if_->success_message().c_str());
+							status_->rig_status(ST_OK, rig_if_->rig_info().c_str());
 							done = true;
 							// Change logging mode to ON_AIR
 							menu_->logging(LM_ON_AIR);
@@ -459,6 +490,10 @@ void add_rig_if() {
 		menu_->update_items();
 		if (rig_if_ == nullptr) {
 			status_->rig_status(ST_WARNING, "No rig present");
+		}
+		else {
+			// Set rig timer callnack
+			rig_if_->callback(cb_rig_timer);
 		}
 		fl_cursor(FL_CURSOR_DEFAULT);
 	}
@@ -578,7 +613,7 @@ void add_widgets(int& curr_y) {
 	main_window_->end();
 }
 
-// Now resize the main window
+// now resize the main window
 void resize_window() {
 	// Get the saved size and position of the window from the settings
 	int left;
@@ -700,7 +735,7 @@ int main(int argc, char** argv)
 	print_args(argc, argv);
 	// Resize the window
 	resize_window();
-	// Now show the window
+	// now show the window
 	main_window_->show(argc, argv);
 	// Read in reference data - uses progress
 	add_data();

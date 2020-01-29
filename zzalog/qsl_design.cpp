@@ -18,6 +18,7 @@
 #include <FL/Fl_Tabs.H>
 
 using namespace zzalog;
+using namespace zzalib;
 
 extern Fl_Preferences* settings_;
 extern book* book_;

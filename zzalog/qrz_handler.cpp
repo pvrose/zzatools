@@ -3,8 +3,8 @@
 #include "status.h"
 #include "tabbed_forms.h"
 #include "book.h"
-#include "url_handler.h"
-#include "xml_reader.h"
+#include "../zzalib/url_handler.h"
+#include "../zzalib/xml_reader.h"
 #include "menu.h"
 #include "version.h"
 
@@ -16,6 +16,7 @@
 #include <FL/Fl_Help_Dialog.H>
 
 using namespace zzalog;
+using namespace zzalib;
 
 extern status* status_;
 extern tabbed_forms* tabbed_view_;
@@ -247,7 +248,7 @@ bool qrz_handler::decode_top(xml_element* element) {
 			status_->misc_status(ST_WARNING, message);
 		}
 	}
-	// Now decode all the children
+	// now decode all the children
 	bool result = true;
 	for (int i = 0; i < element->count() && result; i++) {
 		result &= decode_xml(element->child(i));
@@ -305,7 +306,7 @@ bool qrz_handler::decode_callsign(xml_element* element) {
 		result &= decode_xml(element->child(i));
 	}
 	if (!result) return false;
-	// Now for each received element in turn
+	// now for each received element in turn
 	// call->CALL
 	qrz_info_->item("CALL", data_["call"]);
 	// dxcc->DXCC

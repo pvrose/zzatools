@@ -10,6 +10,7 @@
 #include <FL/Fl_File_Chooser.H>
 
 using namespace zzalog;
+using namespace zzalib;
 
 extern status* status_;
 extern Fl_Preferences* settings_;
@@ -211,7 +212,7 @@ void intl_dialog::add_symbols(string text) {
 	unsigned int ucs;
 	int len;
 	strcpy(utf8, text.c_str());
-	// Now scan the string for new symbols
+	// now scan the string for new symbols
 	while (utf8 < end) {
 		if (*utf8 & 0x80) {
 			// non-ASCII character - get it and how many bytes it is, 

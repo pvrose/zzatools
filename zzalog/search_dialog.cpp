@@ -19,6 +19,7 @@
 
 using namespace std;
 using namespace zzalog;
+using namespace zzalib;
 
 extern Fl_Preferences* settings_;
 extern spec_data* spec_data_;
@@ -112,7 +113,7 @@ search_dialog::search_dialog() :
 
 	const int H = YGX + HBUTTON + EDGE;
 
-	// Now set the correct size
+	// now set the correct size
 	size(W, H);
 	// Read initial settings
 	load_values();

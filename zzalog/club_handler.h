@@ -3,7 +3,7 @@
 
 #include "record.h"
 #include "book.h"
-#include "url_handler.h"
+#include "../zzalib/url_handler.h"
 
 #include <vector>
 
@@ -26,7 +26,7 @@ namespace zzalog {
 
 	protected:
 		// Generate the fields for posting the log
-		void generate_form(vector<url_handler::field_pair>& fields);
+		void generate_form(vector<zzalib::url_handler::field_pair>& fields);
 		// Get names of ADIF fields to export
 		void generate_adif(set < string > &fields);
 		// Unzip the downloaded  exceptions file

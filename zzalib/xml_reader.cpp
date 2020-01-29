@@ -1,16 +1,12 @@
 #include "xml_reader.h"
-#include "../zzalib/utils.h"
-#include "status.h"
-
 
 #include <regex>
 
 #include <FL/fl_ask.H>
 #include <FL/Fl.H>
 
-using namespace zzalog;
+using namespace zzalib;
 
-extern status* status_;
 extern bool closing_;
 
 // Constructor
@@ -104,12 +100,6 @@ bool xml_reader::report_error(string message, bool can_accept) {
 	if (can_accept || report_errors_to_screen_) {
 		int choice = fl_choice("XML Issue: %s at line %d. Continue yes/no?", "Continue?", "Quit?", nullptr, message.c_str(), line_num_);
 		accepted = (choice == 0);
-	}
-	else {
-		char * status = new char[message.length() + 100];
-		sprintf(status, "XML: Unrecoverable XML issue: %s at line %d", message.c_str(), line_num_);
-		status_->misc_status(ST_FATAL, status);
-		delete[] status;
 	}
 	// Accumulate error messages
 	information_ += message + '\n';

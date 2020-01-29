@@ -19,6 +19,7 @@
 #include <FL/Fl_File_Chooser.H>
 
 using namespace zzalog;
+using namespace zzalib;
 
 extern Fl_Preferences* settings_;
 extern book* book_;
@@ -352,7 +353,7 @@ bool spec_data::add_userdef(int id, const string& name, char indicator, string& 
 		dataset->column_names[0] = "Comments";
 		dataset->column_names[1] = "ADIF Version";
 		dataset->column_names[2] = "ADIF Status";
-		// Now create records for each enumeration value
+		// now create records for each enumeration value
 		split_line(values, value_array, ',');
 		for (unsigned int i = 0; i < value_array.size(); i++) {
 			temp_map = new map<string, string>;
@@ -380,7 +381,7 @@ bool spec_data::add_userdef(int id, const string& name, char indicator, string& 
 		max_value = "";
 	}
 
-	// Now create an entry for using the USERDEF in the records
+	// now create an entry for using the USERDEF in the records
 	temp_map = new map<string, string>;
 	(*temp_map)["Data Type"] = datatype(indicator);
 	(*temp_map)["Enumeration"] = enumeration_name;
@@ -498,7 +499,7 @@ bool spec_data::add_appdef(const string& name, char indicator) {
 			return false;
 		}
 
-		// Now build an entry for the app defined field for the Fields dataset
+		// now build an entry for the app defined field for the Fields dataset
 		temp_map = new map<string, string>;
 		(*temp_map)["Data Type"] = data_type;
 		(*temp_map)["Enumeration"] = "";
@@ -1266,7 +1267,7 @@ error_t spec_data::check_datatype(const string&  data, const string&  field, con
 					}
 					default:
 						// Data type indicator not understood
-						return VE_TYPE_UNKNOWN;
+						return VE_TYPE_UNKnowN;
 					}
 				}
 				// next the most likely no-indicator fields
@@ -1344,7 +1345,7 @@ error_t spec_data::check_datatype(const string&  data, const string&  field, con
 				}
 				else {
 					// Data type not recognised by the above code
-					return VE_TYPE_UNKNOWN;
+					return VE_TYPE_UNKnowN;
 				}
 			}
 			else {
@@ -1375,7 +1376,7 @@ error_t spec_data::check_datatype(const string&  data, const string&  field, con
 		}
 		else {
 			// Data type not recognised in the ADIF spec.
-			return VE_TYPE_UNKNOWN;
+			return VE_TYPE_UNKnowN;
 		}
 	}
 }
@@ -1433,7 +1434,7 @@ bool spec_data::validate(const string& field, const string& data, bool inhibit_r
 	}
 	else {
 		// The field name is not valid - either as ADIF, USER or APP specified field name
-		error = VE_FIELD_UNKNOWN;
+		error = VE_FIELD_UNKnowN;
 	}
 	if (error != VE_OK) {
 		// Handle the error as per the settings
@@ -1491,7 +1492,7 @@ void spec_data::report_error(error_t error_code, const string&  data, const stri
 	string incompat_field;
 	// Get field information for some reports - only if it's a valid field
 	map<string, string>* field_info = nullptr;
-	if (error_code != VE_FIELD_UNKNOWN) {
+	if (error_code != VE_FIELD_UNKnowN) {
 		field_info = dataset("Fields")->data.at(field);
 	}
 	string output_line = "VALIDATE: ";
@@ -1506,12 +1507,12 @@ void spec_data::report_error(error_t error_code, const string&  data, const stri
 		output_line += "OK!";
 		error_level = ST_OK;
 		break;
-	case VE_TYPE_UNKNOWN:
+	case VE_TYPE_UNKnowN:
 		// Unknown data type
 		output_line += "Data Type " + datatype + " is not valid.";
 		error_level = ST_ERROR;
 		break;
-	case VE_FIELD_UNKNOWN:
+	case VE_FIELD_UNKnowN:
 		// Unknown field name
 		output_line += "Not a valid ADIF field.";
 		error_level = ST_ERROR;
@@ -1635,8 +1636,8 @@ bool spec_data::auto_correction(error_t error_code, const string&  data, const s
 		correction_message_ = "";
 		return false;
 		break;
-	case VE_TYPE_UNKNOWN:
-	case VE_FIELD_UNKNOWN:
+	case VE_TYPE_UNKnowN:
+	case VE_FIELD_UNKnowN:
 		// Not correctable
 		return false;
 		break;
@@ -2130,7 +2131,7 @@ string spec_data::get_tip(const string& field, record* record) {
 				}
 			}
 		}
-		// Now check if contents valid
+		// now check if contents valid
 		if (validate(field, data, TRUE)) {
 			tip += "Contents Valid\n";
 		}
@@ -2191,6 +2192,8 @@ void spec_data::add_my_appdefs() {
 		"APP_ZZA_EQSL_TS",
 		"APP_ZZA_EQSL_MSG",
 		"APP_ZZA_ERROR",
+		"APP_LOTW_NUMREC",
+		"APP_LOTW_LASTQSL",
 		""
 	};
 	int i = 0;

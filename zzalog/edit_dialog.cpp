@@ -9,6 +9,7 @@
 #include <FL/Fl_Input.H>
 
 using namespace zzalog;
+using namespace zzalib;
 
 extern intl_dialog* intl_dialog_;
 

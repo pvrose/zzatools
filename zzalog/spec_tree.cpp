@@ -12,6 +12,7 @@
 #include <FL/fl_draw.H>
 
 using namespace zzalog;
+using namespace zzalib;
 
 extern spec_data* spec_data_;
 extern tabbed_forms* tabbed_view_;
@@ -57,7 +58,7 @@ void spec_tree::populate_tree(bool activate) {
 	// Lengthy operation - so put the timer cursor on
 	fl_cursor(FL_CURSOR_WAIT);
 	// Add the root
-	// Now build the tree
+	// now build the tree
 	clear();
 	// Set root item parameters - font and title
 	Fl_Tree_Item* root_item = new Fl_Tree_Item(prefs());

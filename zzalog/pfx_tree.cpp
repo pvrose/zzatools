@@ -10,6 +10,7 @@
 #include <FL/fl_draw.H>
 
 using namespace zzalog;
+using namespace zzalib;
 
 extern pfx_data* pfx_data_;
 extern extract_data* extract_records_;
@@ -141,7 +142,7 @@ void pfx_tree::populate_tree(bool activate) {
 		break;
 	}
 
-	// Now build the tree
+	// now build the tree
 	clear();
 
 	// Set the label on the root - first need a root

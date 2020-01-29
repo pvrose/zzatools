@@ -19,6 +19,7 @@
 #include <FL/Fl_Single_Window.H>
 
 using namespace zzalog;
+using namespace zzalib;
 
 extern menu* menu_;
 extern book* navigation_book_;
@@ -291,7 +292,7 @@ toolbar::toolbar(int X, int Y, int W, int H, const char* label) :
 
 
 	end();
-	// Now copy the active images to the deactivated images
+	// now copy the active images to the deactivated images
 	for (int i = 0; i < children(); i++) {
 		Fl_RGB_Image* image = (Fl_RGB_Image*)child(i)->image();
 		if (image != nullptr) {

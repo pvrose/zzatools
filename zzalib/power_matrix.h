@@ -7,7 +7,7 @@
 
 using namespace std;
 
-namespace zzalog {
+namespace zzalib {
 	// This class provides a container for the power matrix for a specific rig
 	// and the calculations necessary to interpolate power from drive
 

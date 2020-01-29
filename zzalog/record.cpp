@@ -10,10 +10,10 @@ record.cpp - Individual record data item: implementation file
 #include "../zzalib/utils.h"
 #include "pfx_data.h"
 #include "spec_data.h"
-#include "rig_if.h"
+#include "../zzalib/rig_if.h"
 #include "status.h"
 #include "view.h"
-#include "formats.h"
+#include "../zzalib/formats.h"
 #include "book.h"
 
 #include <ctime>
@@ -26,6 +26,7 @@ record.cpp - Individual record data item: implementation file
 
 using namespace std;
 using namespace zzalog;
+using namespace zzalib;
 
 extern pfx_data* pfx_data_;
 extern spec_data* spec_data_;
@@ -371,7 +372,7 @@ string record::item(string field, bool formatted/* = false*/, bool indirect/* = 
 			}
 			else if (field == "MY_CNTY") {
 				// Get operator's county
-				qth_settings.get("County", temp, "Nowhereshire");
+				qth_settings.get("County", temp, "nowhereshire");
 				result = temp;
 				free(temp);
 			}
@@ -618,7 +619,7 @@ lat_long_t record::location(bool my_station, location_t& source) {
 	// Set a bad coordinate
 	lat_long_t lat_long = { nan(""), nan("") };
 
-	// Now look at the various sources of lat/lon
+	// now look at the various sources of lat/lon
 	// By preference use LAT/LON
 	string value_1;
 	string value_2;

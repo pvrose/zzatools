@@ -1,11 +1,12 @@
 #ifndef __RIG_IF__
 #define __RIG_IF__
 
-// zzalog includes
+// zzalib includes
 
 #include "rpc_data_item.h"
 #include "rpc_handler.h"
 #include "power_matrix.h"
+#include "callback.h"
 
 // hamlib icludes
 #include "hamlib/rig.h"
@@ -22,7 +23,7 @@
 
 using namespace std;
 
-namespace zzalog {
+namespace zzalib {
 
 	// Encoding of result from reading the mode from the rig
 	enum rig_mode_t {
@@ -105,6 +106,9 @@ namespace zzalog {
 		// Convert drive-level to power
 		double power();
 
+		// Callback to update app on timer interrupt
+		void callback(void (*function)());
+
 
 		// Protected methods
 	protected:
@@ -125,6 +129,9 @@ namespace zzalog {
 		string success_message_;
 		// The power lookup matrix
 		power_matrix* power_lookup_;
+		// On timer callback to update
+		void(*on_timer_)();
+
 
 	};
 
@@ -221,7 +228,7 @@ namespace zzalog {
 
 		// Asynchronous callback from Omnirig
 		HRESULT __stdcall cb_custom_reply(long rig_number, VARIANT command, VARIANT reply);
-		// Add the callback interface from Omnirig to ZZALOG
+		// Add the callback interface from Omnirig to zzalib
 		BEGIN_SINK_MAP(rig_omnirig)
 			SINK_ENTRY_INFO_P(1, &__uuidof(::OmniRig::IOmniRigXEvents), 0x5, &rig_omnirig::cb_custom_reply, new _ATL_FUNC_INFO({ CC_STDCALL, VT_I4, 3,{ VT_I4, VT_VARIANT, VT_VARIANT } }))
 		END_SINK_MAP()

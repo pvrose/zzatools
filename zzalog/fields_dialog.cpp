@@ -2,6 +2,7 @@
 #include "book.h"
 #include "spec_data.h"
 #include "intl_widgets.h"
+#include "../zzalib/drawing.h"
 
 #include <set>
 #include <string>
@@ -15,6 +16,7 @@
 
 using namespace std;
 using namespace zzalog;
+using namespace zzalib;
 
 extern Fl_Preferences* settings_;
 extern spec_data* spec_data_;
@@ -380,7 +382,7 @@ void fields_dialog::create_form(int X, int Y) {
 	const int XG3_2B = XG3 + (WG3 / 2) + WLABEL;
 	const int HG3_2 = HTEXT;
 	const int YG3_2 = YG3 + HG3 - GAP - HG3_2;
-	// Now one row with 2 tables and 4 buttons vertical between them
+	// now one row with 2 tables and 4 buttons vertical between them
 	const int YG3_1 = YG3 + HTEXT + HTEXT;
 	const int HG3_1 = YG3_2 - YG3_1 - GAP;
 	const int WG3_1B = HBUTTON; // make these buttons square

@@ -1,8 +1,8 @@
 #ifndef __ADX_WRITER__
 #define __ADX_WRITER__
 
-#include "xml_element.h"
-#include "xml_writer.h"
+#include "../zzalib/xml_element.h"
+#include "../zzalib/xml_writer.h"
 #include "adx_reader.h"
 #include "book.h"
 #include "record.h"
@@ -16,7 +16,7 @@ namespace zzalog {
 	// This class generates the XML representation for ADIF (ADX) from the records in the book
 	// It writes them to an output stream
 	class adx_writer :
-		public xml_writer
+		public zzalib::xml_writer
 	{
 	public:
 		adx_writer();

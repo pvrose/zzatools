@@ -9,7 +9,7 @@
 #include "menu.h"
 #include "intl_dialog.h"
 #include "spec_data.h"
-#include "rig_if.h"
+#include "../zzalib/rig_if.h"
 #include "band_view.h"
 
 #include <regex>
@@ -22,6 +22,7 @@
 #include <FL/Fl_Hold_Browser.H>
 
 using namespace zzalog;
+using namespace zzalib;
 
 extern book* book_;
 extern pfx_data* pfx_data_;

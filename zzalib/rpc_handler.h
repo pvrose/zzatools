@@ -10,7 +10,7 @@
 #include <ostream>
 #include <regex>
 
-namespace zzalog {
+namespace zzalib {
 	// 
 	// RPC date time format
 	const basic_regex<char> REGEX_RPC_DATETIME("[0-9]*8T[0123][0-9]:[0-5][0-9]:[0-5][0-9]");

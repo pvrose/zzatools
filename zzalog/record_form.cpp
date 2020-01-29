@@ -28,6 +28,7 @@
 #include <FL/Fl_Tooltip.H>
 
 using namespace zzalog;
+using namespace zzalib;
 
 extern spec_data* spec_data_;
 extern import_data* import_data_;
@@ -792,7 +793,7 @@ void record_form::cb_bn_log_card(Fl_Widget* w, void* v) {
 	if (that->use_mode_ == UM_DISPLAY) {
 		that->use_mode_ = UM_MODIFIED;
 	}
-	// Now pretend the Card Front radio button has been pressed
+	// now pretend the Card Front radio button has been pressed
 	cb_rad_card(that->card_front_radio_, (void*)QI_CARD_FRONT);
 	that->set_image_buttons();
 }

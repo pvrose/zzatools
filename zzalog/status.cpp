@@ -1,10 +1,11 @@
 #include "status.h"
 
 #include "../zzalib/utils.h"
-#include "rig_if.h"
+#include "../zzalib/rig_if.h"
 #include "../zzalib/callback.h"
 #include "menu.h"
 #include "intl_widgets.h"
+#include "scratchpad.h"
 
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Radio_Round_Button.H>
@@ -17,6 +18,7 @@
 #include <FL/fl_ask.H>
 
 using namespace zzalog;
+using namespace zzalib;
 
 extern Fl_Preferences* settings_;
 extern rig_if* rig_if_;
@@ -27,6 +29,7 @@ extern status* status_;
 extern bool read_only_;
 extern void add_sub_window(Fl_Window* w);
 extern void remove_sub_window(Fl_Window* w);
+extern scratchpad* scratchpad_;
 
 // Constructor
 status::status(int X, int Y, int W, int H, const char* label) :
@@ -247,6 +250,7 @@ void status::cb_bn_rig(Fl_Widget* bn, void* v) {
 		rig_if_->close();
 		that->rig_status(ST_WARNING, "Rig closed - assume off-air logging");
 		that->misc_status(ST_WARNING, "RIG: Closing reig connection");
+		scratchpad_->update();
 	}
 	bn->redraw();
 }
@@ -513,7 +517,7 @@ void viewer_window::load(const char* filename) {
 }
 
 void viewer_window::draw_window() {
-	// Now read it into the text buffer
+	// now read it into the text buffer
 	Fl_Text_Buffer* buffer = new Fl_Text_Buffer;
 	// And display it
 	direction_ = 1;

@@ -6,7 +6,7 @@
 #include "settings.h"
 #include "tabbed_forms.h"
 #include "import_data.h"
-#include "rig_if.h"
+#include "../zzalib/rig_if.h"
 #include "../zzalib/utils.h"
 #include "status.h"
 
@@ -20,7 +20,7 @@
 #include "pfx_tree.h"
 #include "spec_tree.h"
 #include "report_tree.h"
-#include "url_handler.h"
+#include "../zzalib/url_handler.h"
 #include "../zzalib/callback.h"
 #include "page_dialog.h"
 #include "intl_dialog.h"
@@ -208,6 +208,7 @@ namespace zzalog {
 }
 
 using namespace zzalog;
+using namespace zzalib;
 
 extern book* book_;
 extern import_data* import_data_;
@@ -510,7 +511,7 @@ void menu::cb_mi_nav_date(Fl_Widget* w, void* v) {
 	cal->callback(calendar::cb_cal_close, &cb_data);
 	cal->show();
 	while (cal->active()) Fl::wait();
-	// Now fiind the selected date
+	// now fiind the selected date
 	if (navigation_book_ != nullptr) {
 		navigation_book_->go_date(date);
 	}
@@ -794,6 +795,7 @@ void menu::cb_mi_log_radio(Fl_Widget* w, void* v) {
 			rig_if_->close();
 			delete rig_if_;
 			rig_if_ = nullptr;
+			scratchpad_->update();
 		}
 		break;
 	case true:

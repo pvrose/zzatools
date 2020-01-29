@@ -5,7 +5,7 @@
 #include "status.h"
 
 #include "../zzalib/utils.h"
-#include "url_handler.h"
+#include "../zzalib/url_handler.h"
 #include "../zzalib/callback.h"
 
 #include <cstdio>
@@ -21,11 +21,12 @@
 #include <FL/Fl_Help_Dialog.H>
 
 using namespace zzalog;
+using namespace zzalib;
 
 extern book* book_;
 extern status* status_;
 extern Fl_Preferences* settings_;
-extern url_handler* url_handler_;
+extern zzalib::url_handler* url_handler_;
 
 // Constructor
 eqsl_handler::eqsl_handler()
@@ -150,6 +151,9 @@ eqsl_handler::response_t eqsl_handler::request_eqsl(request_t request) {
 	string local_filename = card_filename_l(record);
 	if (card_file_valid(local_filename) && !request.force) {
 		// already have the card and it's valid PNG and we are not deliberately requesting it again
+		char message[200];
+		snprintf(message, 200, "Not fetching %s as already have valid image", record->item("CALL").c_str());
+		status_->misc_status(ST_NOTE, message);
 		return ER_SKIPPED;
 	}
 	else {
@@ -329,7 +333,7 @@ eqsl_handler::response_t eqsl_handler::card_filename_r(record* record, string& c
 					char_pos = text_line.find(image_signature);
 					if (char_pos != string::npos) {
 						char_pos += image_signature.length();
-						// Now look for second quote ending the filename
+						// now look for second quote ending the filename
 						int end_pos = text_line.find("\"", char_pos);
 						// incorrectly formatted response
 						if (end_pos == string::npos) {
@@ -806,7 +810,7 @@ bool eqsl_handler::upload_eqsl_log(book* book) {
 			}
 		}
 	}
-	// Now update book
+	// now update book
 	book_->enable_save(true);
 
 	// Update status with succesful uploads and remove extracted records

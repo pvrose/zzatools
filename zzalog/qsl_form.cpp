@@ -10,6 +10,7 @@
 #include <FL/Fl_Preferences.H>
 
 using namespace zzalog;
+using namespace zzalib;
 
 extern Fl_Preferences* settings_;
 extern status* status_;
@@ -217,7 +218,7 @@ void qsl_form::draw_table(int& curr_y) {
 			curr_x += curr_w;
 		}
 		curr_y += curr_h;
-		// Now the additional records
+		// now the additional records
 		if (it != tab_widgets_.begin()) {
 			for (int i = 1; i < num_records_; i++) {
 				curr_x = x() + MARGIN;

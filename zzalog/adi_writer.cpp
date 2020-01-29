@@ -15,6 +15,7 @@
 #include <FL/fl_draw.H>
 
 using namespace zzalog;
+using namespace zzalib;
 
 extern status* status_;
 extern spec_data* spec_data_;

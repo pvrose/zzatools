@@ -102,9 +102,6 @@
     <ClCompile Include="zzalog\pfx_tree.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="zzalog\power_matrix.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="zzalog\printer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -121,15 +118,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="zzalog\rig_dialog.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\rig_if.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\rpc_data_item.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\rpc_handler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="zzalog\scratchpad.cpp">
@@ -165,9 +153,6 @@
     <ClCompile Include="zzalog\tsv_writer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="zzalog\url_handler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="zzalog\use_dialog.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -180,15 +165,6 @@
     <ClCompile Include="zzalog\win_dialog.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="zzalog\xml_element.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\xml_reader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\xml_writer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="zzalog\qsl_form.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -196,12 +172,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="zzalog\intl_widgets.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalib\serial.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalib\utils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="zzalog\qrz_handler.cpp">
@@ -281,9 +251,6 @@
     <ClInclude Include="zzalog\files_dialog.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="zzalog\formats.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="zzalog\icons.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -317,9 +284,6 @@
     <ClInclude Include="zzalog\pfx_tree.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="zzalog\power_matrix.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="zzalog\prefix.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -342,15 +306,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="zzalog\rig_dialog.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\rig_if.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\rpc_data_item.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\rpc_handler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="zzalog\scratchpad.h">
@@ -389,9 +344,6 @@
     <ClInclude Include="zzalog\tsv_writer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="zzalog\url_handler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="zzalog\use_dialog.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -404,12 +356,6 @@
     <ClInclude Include="zzalog\win_dialog.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="zzalog\xml_element.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\xml_writer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="zzalog\qsl_form.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -417,9 +363,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="zzalog\intl_widgets.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalib\callback.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="zzalog\qrz_handler.h">
@@ -436,9 +379,6 @@
     </ClInclude>
     <ClInclude Include="zzalog\exc_reader.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\xml_reader.h">
-      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

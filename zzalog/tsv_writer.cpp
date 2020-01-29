@@ -84,7 +84,7 @@ void tsv_writer::default_fields(set<string>* fields) {
 	fields_settings.get(app_path, field_set_name, "Default");
 	Fl_Preferences field_set_settings(fields_settings, field_set_name);
 	int num_fields = field_set_settings.groups();
-	// Now get the fields in the set
+	// now get the fields in the set
 	// For each field
 	for (int j = 0; j < num_fields; j++) {
 		// Get the field name

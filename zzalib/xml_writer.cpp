@@ -1,11 +1,8 @@
 #include "xml_writer.h"
-#include "status.h"
 
 #include <FL/fl_ask.H>
 
-using namespace zzalog;
-
-extern status* status_;
+using namespace zzalib;
 
 // Constructor
 xml_writer::xml_writer()
@@ -48,7 +45,6 @@ void xml_writer::indent(xml_writer::format_style_t output_style, int depth) {
 // Output the data to the stream
 bool xml_writer::data(ostream& os) {
 	if (element_ == nullptr || prolog_ == nullptr) {
-		status_->misc_status(ST_WARNING, "XML: XML data is empty");
 		return false;
 	}
 	else {

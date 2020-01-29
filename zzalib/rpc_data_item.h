@@ -8,7 +8,7 @@
 
 using namespace std;
 
-namespace zzalog {
+namespace zzalib {
 
 	// XML-RPC Request/Response - XML element types
 	enum rpc_element_t {

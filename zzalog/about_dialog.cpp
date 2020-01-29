@@ -14,6 +14,7 @@
 #include <FL/Fl.H>
 
 using namespace zzalog;
+using namespace zzalib;
 
 extern spec_data* spec_data_;
 
@@ -70,7 +71,7 @@ about_dialog::about_dialog() :
 	bn_ok->when(FL_WHEN_RELEASE);
 	const int HALL = R4 + HBUTTON + EDGE;
 
-	// Now calculate where to put the icon - centralise its Y position
+	// now calculate where to put the icon - centralise its Y position
 	const int YICON = (HALL - ICON) / 2;
 	Fl_Button* bn_icon = new Fl_Button(C1, YICON, ICON, ICON);
 	// Icon is defined as a 16*16 RGBA image -

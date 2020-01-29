@@ -12,6 +12,7 @@
 #include <FL/fl_ask.H>
 
 using namespace zzalog;
+using namespace zzalib;
 
 extern status* status_;
 extern bool closing_;
@@ -204,7 +205,7 @@ bool pfx_reader::load_data(pfx_data& prefixes, string filename) {
 
 			// Ignored if depth 0 and the DXCC already has a prefix
 			if (result == LR_GOOD && ( record->depth_ != 0 || prefixes.find(record->dxcc_code_) == prefixes.end())) {
-				// Now store the record
+				// now store the record
 				if (record->depth_ == 0) {
 					// It's a DXCC entity - so map it against the DXCC code
 					prefixes[record->dxcc_code_] = record;
@@ -221,7 +222,7 @@ bool pfx_reader::load_data(pfx_data& prefixes, string filename) {
 				if (record->type_ != PX_OLD_PREFIX && record->type_ != PX_REMOVED_ENTITY) {
 					prefixes.add_pfx_to_nickname(record);
 				}
-				// Now remeber this prefix as a hanger for any possible children it may have
+				// now remeber this prefix as a hanger for any possible children it may have
 				hang_points[record->depth_] = record;
 
 				// In the case where a field is empty it inherits the value from its parent

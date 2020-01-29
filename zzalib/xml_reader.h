@@ -11,7 +11,7 @@
 
 using namespace std;
 
-namespace zzalog {
+namespace zzalib {
 
 	// Definition of valid white-space
 	const basic_regex<char> REGEX_WHITE_SPACE("\\s*");

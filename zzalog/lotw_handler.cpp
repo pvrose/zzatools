@@ -3,7 +3,7 @@
 #include "status.h"
 #include "../zzalib/utils.h"
 #include "book.h"
-#include "url_handler.h"
+#include "../zzalib/url_handler.h"
 #include "../zzalib/callback.h"
 
 
@@ -17,6 +17,7 @@
 #include <FL/Fl_Help_Dialog.H>
 
 using namespace zzalog;
+using namespace zzalib;
 
 extern Fl_Preferences* settings_;
 extern status* status_;

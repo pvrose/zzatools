@@ -2,7 +2,7 @@
 #define __RIG_DIALOG__
 
 #include "page_dialog.h"
-#include "rig_if.h"
+#include "../zzalib/rig_if.h"
 
 #include <string>
 #include <map>
@@ -13,6 +13,7 @@
 #include <FL/Fl_Int_Input.H>
 
 using namespace std;
+using namespace zzalib;
 
 namespace zzalog {
 

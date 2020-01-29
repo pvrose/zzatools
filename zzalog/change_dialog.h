@@ -6,6 +6,8 @@
 
 #include <FL/Fl_Widget.H>
 
+using namespace zzalib;
+
 namespace zzalog {
 
 	// This enum is tied to a set of radio buttons in the dialog

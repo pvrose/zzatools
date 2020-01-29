@@ -13,6 +13,7 @@
 #include <FL/Fl_File_Chooser.H>
 
 using namespace zzalog;
+using namespace zzalib;
 
 extern club_handler* club_handler_;
 extern status* status_;
@@ -230,7 +231,7 @@ ostream& exc_data::store(ostream& out) {
 	out << num_exceptions << '\t' << num_invalids << endl;
 	int i = 0;
 	status_->progress(num_exceptions + num_invalids, OT_PREFIX, "records");
-	// Now the individual entries
+	// now the individual entries
 	for (auto it = entries_.begin(); it != entries_.end() && out.good(); it++) {
 		list<exc_entry*>* data_list = &(it->second);
 		for (auto it2 = data_list->begin(); it2 != data_list->end(); it2++) {

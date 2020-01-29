@@ -2,7 +2,7 @@
 #define __QRZ_HANDLER__
 
 #include "record.h"
-#include "xml_element.h"
+#include "../zzalib/xml_element.h"
 
 #include <string>
 #include <istream>
@@ -11,6 +11,7 @@
 #include <FL/Fl_Help_Dialog.H>
 
 using namespace std;
+using namespace zzalib;
 
 
 // This class provides the interface to the QRZ.com XML database look-up - it currently

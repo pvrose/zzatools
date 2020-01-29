@@ -8,6 +8,7 @@
 #include <FL/Fl_Preferences.H>
 
 using namespace zzalog;
+using namespace zzalib;
 
 extern Fl_Preferences* settings_;
 extern spec_data* spec_data_;
@@ -262,7 +263,7 @@ void record_table::assess_fields() {
 	char* field_set_name;
 	fields_settings.get(view_name, field_set_name, "Default");
 
-	// Now get all the fields in the field_set
+	// now get all the fields in the field_set
 	if (fields_settings.groups() > 0) {
 		// Settings has one or more field sets - get this one
 		Fl_Preferences field_set_settings(fields_settings, field_set_name);
@@ -298,7 +299,7 @@ void record_table::assess_fields() {
 	}
 	free(field_set_name);
 
-	// Now add all the remaining fields from the log record
+	// now add all the remaining fields from the log record
 	if (log_record_ != NULL) {
 		// For each field in the log record
 		for (auto it = log_record_->begin(); it != log_record_->end(); it++) {
@@ -316,7 +317,7 @@ void record_table::assess_fields() {
 		}
 	}
 
-	// Now add all the remaining fields from the query record
+	// now add all the remaining fields from the query record
 	if (query_record_ != NULL) {
 		// For each field in the query record
 		for (auto it = query_record_->begin(); it != query_record_->end(); it++) {

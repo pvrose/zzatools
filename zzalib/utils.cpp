@@ -20,9 +20,8 @@ utils.h - Utility methods
 
 using namespace std;
 
-
 // Split the line into its separate words with specified separator
-void split_line(const string& line, vector<string>& words, const char separator) {
+void zzalib::split_line(const string& line, vector<string>& words, const char separator) {
 	// Quotes will escape separator
 	bool in_quotes = false;
 	words.clear();
@@ -59,7 +58,7 @@ void split_line(const string& line, vector<string>& words, const char separator)
 }
 
 // Converts display format text to a tm object for reformatting
-void string_to_tm(string source, tm& time, string format) {
+void zzalib::string_to_tm(string source, tm& time, string format) {
 	bool escaped = false;
 	// Default YMD to 19700101 to avoid assertion when only setting time
 	time.tm_year = 70;
@@ -153,7 +152,7 @@ void string_to_tm(string source, tm& time, string format) {
 }
 
 // Convert a string e.g. 00-06:08 to an array of UINTs {0,1,2,3,4,5,6,8}
-void string_to_ints(string& text, vector<unsigned int>& ints) {
+void zzalib::string_to_ints(string& text, vector<unsigned int>& ints) {
 	int current = 0;
 	int start = 0;
 	int index = 0;
@@ -219,7 +218,7 @@ void string_to_ints(string& text, vector<unsigned int>& ints) {
 }
 
 // returns the current time in supplied format
-string now(bool local, const char* format) {
+string zzalib::now(bool local, const char* format) {
 	// Get current time
 	time_t now = time(nullptr);
 	// convert to struct in selected timezone
@@ -231,14 +230,14 @@ string now(bool local, const char* format) {
 }
 
 // copy tm to time_t and back to update derived values in tm struct
-void refresh_tm(tm* date) {
+void zzalib::refresh_tm(tm* date) {
 	// I think mktime regards tm as a local time
 	time_t first = mktime(date);
 	*date = *(localtime(&first));
 }
 
 // return  the number of days in the month
-int days_in_month(tm* date) {
+int zzalib::days_in_month(tm* date) {
 	switch (date->tm_mon) {
 	case 0:
 	case 2:
@@ -273,7 +272,7 @@ int days_in_month(tm* date) {
 }
 
 // return true if the year is a leap year
-bool is_leap(tm* date) {
+bool zzalib::is_leap(tm* date) {
 	int year = date->tm_year + 1900;
 	if (year % 4 != 0) {
 		// Doesn't divide by 4 - NO
@@ -294,7 +293,7 @@ bool is_leap(tm* date) {
 }
 
 // Create a tip window - tip text, position(root_x, root_y)
-Fl_Window* tip_window(const string& tip, int x_root, int y_root) {
+Fl_Window* zzalib::tip_window(const string& tip, int x_root, int y_root) {
 	// get the size of the text, set the font, default width
 	fl_font(Fl_Tooltip::font(), Fl_Tooltip::size());
 	int width = TIP_WIDTH;
@@ -329,7 +328,7 @@ Fl_Window* tip_window(const string& tip, int x_root, int y_root) {
 }
 
 // Create an upper-case version of a string
-string to_upper(const string& data) {
+string zzalib::to_upper(const string& data) {
 	string upper(data.length(), 0);
 	// For the length of the string convert ech character to upper case
 	for (size_t i = 0; i < data.length(); i++) upper[i] = toupper(data[i]);
@@ -337,7 +336,7 @@ string to_upper(const string& data) {
 }
 
 // Create an lower-case version of a string
-string to_lower(const string& data) {
+string zzalib::to_lower(const string& data) {
 	string lower(data.length(), 0);
 	// For the length of the string convert ech character to lower case
 	for (size_t i = 0; i < data.length(); i++) lower[i] = tolower(data[i]);
@@ -345,7 +344,7 @@ string to_lower(const string& data) {
 }
 
 // Search for any characters in match (assume its zero-terminated)
-size_t find(const char* data, size_t length, const char* match) {
+size_t zzalib::find(const char* data, size_t length, const char* match) {
 	size_t pos = length;
 	bool found = false;
 	// Compare each char in data with each char in find
@@ -362,7 +361,7 @@ size_t find(const char* data, size_t length, const char* match) {
 }
 
 // Search for single character match
-size_t find(const char* data, size_t length, const char match) {
+size_t zzalib::find(const char* data, size_t length, const char match) {
 	int pos = 0;
 	bool found = false;
 	// Compare each char in data with match
@@ -378,7 +377,7 @@ size_t find(const char* data, size_t length, const char match) {
 }
 
 // Find the occurence of match in data 
-size_t find_substr(const char* data, size_t length, const char* match, size_t len_substr) {
+size_t zzalib::find_substr(const char* data, size_t length, const char* match, size_t len_substr) {
 	// Possible start of match
 	size_t possible = 0;
 	// Length of string remaining to match
@@ -416,7 +415,7 @@ size_t find_not(const char* data, size_t length, const char* match) {
 }
 
 // Escape the non-usable characters in a url - not alphanumeric replace with %nnx 
-string escape_url(string url)
+string zzalib::escape_url(string url)
 {
 	string result = "";
 	// For the length of the string
@@ -438,7 +437,7 @@ string escape_url(string url)
 }
 
 // Escape characters - add a '\' before any characters in escapees
-string escape_string(const string text, const string escapees) {
+string zzalib::escape_string(const string text, const string escapees) {
 	// Create a string sufficiently long to escape all characters
 	string result = "";
 	result.reserve(2 * text.length());
@@ -454,7 +453,7 @@ string escape_string(const string text, const string escapees) {
 }
 
 // Convert a floating point degree value to ° ' " N/E/S/W
-string degrees_to_dms(float value, bool is_latitude) {
+string zzalib::degrees_to_dms(float value, bool is_latitude) {
 	int num_degrees;
 	int num_minutes;
 	double num_seconds;
@@ -478,7 +477,7 @@ string degrees_to_dms(float value, bool is_latitude) {
 }
 
 // Convert latitude and longitode to 2, 4, 6 or 8 character grid square
-string latlong_to_grid(lat_long_t location, int num_chars) {
+string zzalib::latlong_to_grid(lat_long_t location, int num_chars) {
 	string result;
 	result.resize(num_chars, ' ');
 	// 'Normalise' location relative to 180W, 90S - i.e. AA00aa00
@@ -512,7 +511,7 @@ string latlong_to_grid(lat_long_t location, int num_chars) {
 }
 
 // Convert gridsquare to latitude and longitude - returns the centre of the square
-lat_long_t grid_to_latlong(string gridsquare) {
+zzalib::lat_long_t zzalib::grid_to_latlong(string gridsquare) {
 	double inc = 20.0;
 	double next_inc;
 	char cg;
@@ -549,7 +548,7 @@ lat_long_t grid_to_latlong(string gridsquare) {
 
 
 // Convert from base64 encoding - single character
-unsigned char decode_base_64(unsigned char c) {
+unsigned char zzalib::decode_base_64(unsigned char c) {
 	// A-Z => 0x00 to 0x19
 	// a-z => 0x1A to 0x33
 	// 0-9 => 0x34 to 0x3D
@@ -577,7 +576,7 @@ unsigned char decode_base_64(unsigned char c) {
 }
 
 // Convert from base64 encoding for string
-string decode_base_64(string value) {
+string zzalib::decode_base_64(string value) {
 	string result;
 	unsigned char out = 0;
 	unsigned char in = 0;
@@ -622,7 +621,7 @@ string decode_base_64(string value) {
 }
 
 // Encode single character to base64
-unsigned char encode_base_64(unsigned char c) {
+unsigned char zzalib::encode_base_64(unsigned char c) {
 	// Look up table to convert 6 bits to 
 	// A-Z => 0x00 to 0x19
 	// a-z => 0x1A to 0x33
@@ -636,7 +635,7 @@ unsigned char encode_base_64(unsigned char c) {
 }
 
 // Encode the string to base64
-string encode_base_64(string value) {
+string zzalib::encode_base_64(string value) {
 	string result;
 	unsigned char out = 0;
 	unsigned char in = 0;
@@ -677,7 +676,7 @@ string encode_base_64(string value) {
 }
 
 // Decode hex
-string to_hex(string data) {
+string zzalib::to_hex(string data) {
 	string result = "";
 	for (size_t i = 0; i < data.length(); i++) {
 		result += to_hex(data[i]);
@@ -686,7 +685,7 @@ string to_hex(string data) {
 }
 
 // Encode hex
-string to_ascii(string data) {
+string zzalib::to_ascii(string data) {
 	string result = "";
 	unsigned int ix = 0;
 	while (ix < data.length()) {
@@ -696,7 +695,7 @@ string to_ascii(string data) {
 }
 // Decode single character
 
-string to_hex(unsigned char data) {
+string zzalib::to_hex(unsigned char data) {
 	const char lookup[] = "0123456789ABCDEF";
 	string result = "";
 	result += lookup[data / 16];
@@ -706,7 +705,7 @@ string to_hex(unsigned char data) {
 }
 
 // Encode single character
-unsigned char to_ascii(string data, int&ix) {
+unsigned char zzalib::to_ascii(string data, int&ix) {
 	// Skip non hex
 	while (!isxdigit(data[ix]) && ((unsigned)ix < data.length())) ix++;
 	if (ix == data.length()) return 0;

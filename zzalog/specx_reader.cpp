@@ -4,6 +4,7 @@
 #include "../zzalib/utils.h"
 
 using namespace zzalog;
+using namespace zzalib;
 
 extern status* status_;
 extern bool closing_;

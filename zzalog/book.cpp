@@ -26,6 +26,7 @@
 #include <FL/Fl_Single_Window.H>
 
 using namespace zzalog;
+using namespace zzalib;
 
 // Global data items
 extern status* status_;
@@ -867,7 +868,7 @@ record_num_t book::correct_record_position(record_num_t current_pos) {
 	record* this_record = get_record(current_pos, false);
 	// remove record at existing position
 	erase(begin() + current_pos);
-	// Now insert it in the correct position and other bookkeeping
+	// now insert it in the correct position and other bookkeeping
 	return insert_record(this_record);
 }
 
@@ -946,7 +947,7 @@ bool book::basic_match(record* record) {
 
 // refine match - by date, band, mode or confirmation
 bool book::refine_match(record* record) {
-	// Now refine by dates
+	// now refine by dates
 	if (criteria_->by_dates) {
 		string record_date = record->item("QSO_DATE");
 		// confirm the match is between specified dates - inclusive
@@ -954,7 +955,7 @@ bool book::refine_match(record* record) {
 			return false;
 		}
 	}
-	// Now refine by band - confirm if the record is on that band
+	// now refine by band - confirm if the record is on that band
 	if (criteria_->band != "Any" && criteria_->band != record->item("BAND")) {
 		return false;
 	}
@@ -1183,7 +1184,7 @@ string book::match_question() {
 // Opens a text editor to allow the header comment to be edited
 void book::edit_header() {
 	status_->misc_status(ST_NOTE, "MISC: Editting header comment");
-	// Now read it into the text buffer
+	// now read it into the text buffer
 	Fl_Text_Buffer* buffer = new Fl_Text_Buffer;
 	// Window to display the text editor and Save and Cancel buttons
 	Fl_Window* win = new Fl_Window(640, 480);

@@ -24,6 +24,7 @@
 #import "C:\Program Files (x86)\Afreet\DX Atlas\DxAtlas.exe"
 
 using namespace std;
+using namespace zzalib;
 
 namespace zzalog {
 

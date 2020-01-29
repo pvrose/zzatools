@@ -3,7 +3,7 @@
 
 
 #include "page_dialog.h"
-#include "power_matrix.h"
+#include "../zzalib/power_matrix.h"
 
 #include <string>
 #include <vector>
@@ -15,6 +15,7 @@
 #include <FL/Fl_Int_Input.H>
 
 using namespace std;
+using namespace zzalib;
 
 namespace zzalog {
 	// This class provides the dialog to chage the current station settings: rig, aerial and QTH

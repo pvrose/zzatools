@@ -14,6 +14,7 @@
 
 using namespace std;
 using namespace zzalog;
+using namespace zzalib;
 
 // extern spec_data* spec_data_;
 

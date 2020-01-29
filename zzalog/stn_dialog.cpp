@@ -19,6 +19,7 @@
 #include <FL/fl_ask.H>
 
 using namespace zzalog;
+using namespace zzalib;
 
 extern Fl_Preferences* settings_;
 extern pfx_data* pfx_data_;
@@ -488,7 +489,7 @@ common_grp(X, Y, W, H, label) {
 	// populate the choice an set and pass parameters to callback
 	// must be done after all widgets created
 	populate_choice();
-	// Now populate the other items
+	// now populate the other items
 	add_item();
 	update_item();
 }

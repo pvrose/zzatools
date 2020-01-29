@@ -3,6 +3,7 @@
 #include "tabbed_forms.h"
 #include "status.h"
 #include "qsl_form.h"
+#include "../zzalib/drawing.h"
 
 #include <FL/fl_ask.H>
 #include <FL/fl_draw.H>
@@ -10,6 +11,7 @@
 #include <FL/Fl_Button.H>
 
 using namespace zzalog;
+using namespace zzalib;
 
 extern tabbed_forms* tabbed_view_;
 extern status* status_;
@@ -156,7 +158,7 @@ void printer::calculate_properties() {
 	int available_height;
 	// Get the area that will be printed on
 	printable_rect(&printable_width_, &printable_height_);
-	// Now start allocating the height to header and records
+	// now start allocating the height to header and records
 	available_height = printable_height_;
 	// Header has two lines - page title and column headers
 	// get the font for the page header - and adjust available height by its height plus a line width

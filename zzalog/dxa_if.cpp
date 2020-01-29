@@ -26,6 +26,7 @@
 #include <atlcom.h>
 
 using namespace zzalog;
+using namespace zzalib;
 
 // Top-level data items
 extern Fl_Preferences* settings_;
@@ -167,7 +168,7 @@ void dxa_if::load_values() {
 // Used to create the form
 void dxa_if::create_form() {
 
-	// Now create the groups
+	// now create the groups
 
 	// Group 1 - DxAtlas controls
 	Fl_Group* group1 = new Fl_Group(EDGE, EDGE, 10, 10);
@@ -921,7 +922,7 @@ void dxa_if::initialise_map() {
 	int screen_y;
 	int screen_w;
 	int screen_h;
-	// Now see if it really does intersect and by how much
+	// now see if it really does intersect and by how much
 	Fl::screen_work_area(screen_x, screen_y, screen_w, screen_h, screen);
 	int w;
 	int h;
@@ -1050,7 +1051,7 @@ void dxa_if::create_colour_buttons() {
 			button_todo--;
 		}
 	}
-	// Now resize the window to just contain the buttons and don't allow the user to resize it smaller
+	// now resize the window to just contain the buttons and don't allow the user to resize it smaller
 	colour_grp_->resizable(nullptr);
 	resizable(colour_grp_);
 	colour_grp_->size(colour_grp_->w(), (num_rows * HBUTTON) + HTEXT + GAP + GAP);
@@ -1164,7 +1165,7 @@ void dxa_if::get_records() {
 		}
 	}
 
-	// Now see if QSOs, DXCCs or zones
+	// now see if QSOs, DXCCs or zones
 	set<string> got_items;
 
 	records_to_display_.clear();
@@ -1426,7 +1427,7 @@ void dxa_if::draw_pins() {
 					layer->PutPenColor(DxAtlas::clBlack);
 					// put data into the layer
 					points.parray = point_array;
-					// Now put the data onto the DXATLAS: map and display an error if it failed
+					// now put the data onto the DXATLAS: map and display an error if it failed
 					try {
 						layer->SetData(points);
 					}
@@ -1441,7 +1442,7 @@ void dxa_if::draw_pins() {
 					Fl::wait(0.1);
 				}
 			}
-			// Now add a layer for textual information - used for interactive displays
+			// now add a layer for textual information - used for interactive displays
 			call_layer_ = pin_layers->Add(DxAtlas::LK_LABELS);
 			// Make it opaque so that the label is visible against the background
 			call_layer_->LabelsTransparent = false;
@@ -1451,7 +1452,7 @@ void dxa_if::draw_pins() {
 			call_layer_->PenColor = DxAtlas::clNavy;
 			call_layer_->BrushColor = DxAtlas::clWhite;
 
-			// Now centre on selected record
+			// now centre on selected record
 			if (map->GetProjection() == DxAtlas::PRJ_RECTANGULAR) {
 				centre_map();
 			}
@@ -1574,7 +1575,7 @@ void dxa_if::zoom_centre(lat_long_t centre, bool full) {
 		// Zoom to include all records - get the furthermost from the centre E/W and N/S
 		double zoom_long = 180. / (max(easternmost_ - centre.longitude, centre.longitude - westernmost_));
 		double zoom_lat = 90. / (max(northernmost_ - centre.latitude, centre.latitude - southernmost_));
-		// Now zoom by the smaller of these with 5% margin
+		// now zoom by the smaller of these with 5% margin
 		map->PutZoom((float)min(zoom_long, zoom_lat) * 0.95f);
 	}
 	zoom_value_ = map->GetZoom();

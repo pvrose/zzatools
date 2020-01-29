@@ -3,7 +3,7 @@
 
 #include <stdexcept>
 
-using namespace zzalog;
+using namespace zzalib;
 
 // Constructor - sets default values
 rpc_data_item::rpc_data_item()

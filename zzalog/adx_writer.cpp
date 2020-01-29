@@ -12,6 +12,7 @@
 #include <FL/fl_draw.H>
 
 using namespace zzalog;
+using namespace zzalib;
 
 extern spec_data* spec_data_;
 extern status* status_;
@@ -63,7 +64,7 @@ bool adx_writer::store_book(book* book, ostream& os) {
 	}
 
 	fl_cursor(FL_CURSOR_DEFAULT);
-	// Now write the destination to a file.
+	// now write the destination to a file.
 	if (ok) {
 		status_->misc_status(ST_NOTE, "ADX WRITE: XML Storing started");
 		status_->progress(book->size(), book->book_type(), "records");

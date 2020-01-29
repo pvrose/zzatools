@@ -12,6 +12,7 @@
 #include <FL/Fl_File_Chooser.H>
 
 using namespace zzalog;
+using namespace zzalib;
 
 extern Fl_Preferences* settings_;
 extern spec_data* spec_data_;

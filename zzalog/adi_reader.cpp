@@ -5,6 +5,7 @@
 #include "status.h"
 #include "spec_data.h"
 #include "pfx_data.h"
+#include "../zzalib/utils.h"
 
 #include <istream>
 #include <fstream>
@@ -16,6 +17,7 @@
 #include <FL/fl_draw.H>
 
 using namespace zzalog;
+using namespace zzalib;
 using namespace std;
 
 extern status* status_;
@@ -71,7 +73,7 @@ istream& adi_reader::load_record(record* in_record, istream& in, load_result_t& 
 		in_record->header(header);
 	}
 
-	// Now turn off header checking
+	// now turn off header checking
 	expecting_header_ = false;
 
 	// Until the end of record indicated by <EOR> or <EOH> - note in.good() is continually 
@@ -107,7 +109,7 @@ istream& adi_reader::load_record(record* in_record, istream& in, load_result_t& 
 				char type_indicator = ' ';
 				// Get count the number of characters - first read the colon
 				in.get(c);
-				// Now read all numeric characters
+				// now read all numeric characters
 				while (c >= '0' && c <= '9' && in.good()) {
 					count = (count * 10) + c - '0';
 					in.get(c);
@@ -141,7 +143,7 @@ istream& adi_reader::load_record(record* in_record, istream& in, load_result_t& 
 					while (c != '<' && in.good()) {
 						in.get(c);
 					}
-					// Now create the hash-pair if length non-zero
+					// now create the hash-pair if length non-zero
 					if (count > 0 && in.good()) {
 						// Start assuming it's a valid field
 						bool field_valid = true;

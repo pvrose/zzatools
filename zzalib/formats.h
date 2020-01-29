@@ -10,7 +10,7 @@
 
 using namespace std;
 
-namespace zzalog {
+namespace zzalib {
 
 	// record display format and save precision for frequency
 	enum frequency_t : int {

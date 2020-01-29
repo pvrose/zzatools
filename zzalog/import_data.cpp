@@ -6,7 +6,7 @@
 #include "scratchpad.h"
 #include "eqsl_handler.h"
 #include "lotw_handler.h"
-#include "rig_if.h"
+#include "../zzalib/rig_if.h"
 #include "../zzalib/utils.h"
 #include "menu.h"
 
@@ -22,6 +22,7 @@
 #include <FL/Fl.H>
 
 using namespace zzalog;
+using namespace zzalib;
 
 extern status* status_;
 extern book* book_;
@@ -152,6 +153,7 @@ void import_data::auto_update() {
 		struct _stat status;
 		int result = _fstat(fd, &status);
 		strftime(timestamp, 16, "%Y%m%d%H%M%S", gmtime(&status.st_mtime));
+		close(fd);
 #else
 		// TODO: Code Posix version of the above
 #endif
@@ -626,8 +628,9 @@ void import_data::convert_update(record* record) {
 			else {
 				update_name = field_name;
 			}
+
 			break;
-		default: // MERGE or UNKNOWN 
+		default: // MERGE or UNKnowN 
 			update_name = field_name;
 			break;
 		}
@@ -667,6 +670,12 @@ void import_data::convert_update(record* record) {
 
 		// Delete QSLMSG
 		record->item("QSLMSG", string(""));
+	}
+	else if (update_mode_ == LOTW_UPDATE) {
+		// Received LotW update so need to set clublog status to M(odified) so it will get uploaded again
+		if (record->item("LOTW_QSLRDATE").length() && record->item("CLUBLOG_QSO_UPDATE_STATUS") == "Y") {
+			record->item("CLUBLOG_QSO_UPDATE_STATUS", string("M"));
+		}
 	}
 
 }

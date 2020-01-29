@@ -21,6 +21,7 @@
 #include <FL/Fl_Tooltip.H>
 
 using namespace zzalog;
+using namespace zzalib;
 
 extern Fl_Preferences* settings_;
 extern status* status_;
@@ -133,7 +134,6 @@ bool band_view::load_data() {
 	// Return success or fail
 	if (file.eof()) {
 		status_->misc_status(ST_OK, "BAND: Loaded band-plan data");
-		status_->progress(length, OT_BAND);
 		return true;
 	}
 	else {
@@ -314,7 +314,7 @@ int band_view::draw_scale() {
 	char text[20];
 	freqy_to_text(frequency_, text);
 	fl_measure(text, text_w, text_h);
-	// Now locate the y positions of the various elements
+	// now locate the y positions of the various elements
 	int text_y = text_w + GAP;
 	int ltick_y = text_y + 5;
 	int stick_y = ltick_y + LTICK - STICK;
@@ -342,7 +342,7 @@ int band_view::draw_scale() {
 
 // Draw a red line for the rig frequency
 int band_view::draw_frequency(int pos_y) {
-	// Now draw a bigger tick at the frequency
+	// now draw a bigger tick at the frequency
 	// Work out where to draw it - get number of pixels away fromm mid-point.
 	int curr_x = x_pos(rig_frequency_);
 	char text[128];

@@ -17,6 +17,7 @@
 #include <FL/Fl_Single_Window.H>
 
 using namespace zzalog;
+using namespace zzalib;
 
 extern Fl_Preferences* settings_;
 extern spec_data* spec_data_;
@@ -340,7 +341,7 @@ void log_table::get_fields() {
 		fields_.clear();
 		Fl_Preferences field_set_settings(fields_settings, field_set_name);
 		num_fields = field_set_settings.groups();
-		// Now get the field data for the field_set
+		// now get the field data for the field_set
 		for (int j = 0; j < num_fields; j++) {
 			Fl_Preferences field_settings(field_set_settings, field_set_settings.group(j));
 			field_info_t field;

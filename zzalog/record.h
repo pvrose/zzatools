@@ -16,6 +16,7 @@ record.h - Individual record data item: header file
 #include <ostream>
 
 using namespace std;
+using namespace zzalib;
 
 namespace zzalog {
 

@@ -13,6 +13,7 @@
 #include <FL/fl_ask.H>
 
 using namespace zzalog;
+using namespace zzalib;
 
 extern Fl_Preferences* settings_;
 

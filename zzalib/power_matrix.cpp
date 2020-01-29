@@ -7,9 +7,11 @@
 #include <FL/Fl_Preferences.H>
 
 using namespace std;
-using namespace zzalog;
+using namespace zzalib;
 
 extern Fl_Preferences* settings_;
+
+power_matrix* power_matrix_;
 
 // Constructor - default
 power_matrix::power_matrix() {

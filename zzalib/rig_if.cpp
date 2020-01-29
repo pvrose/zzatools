@@ -1,26 +1,17 @@
 #include "rig_if.h"
-#include "status.h"
 #include "formats.h"
-#include "menu.h"
 #include "../zzalib/utils.h"
-#include "band_view.h"
-#include "scratchpad.h"
-#include "spec_data.h"
 
 #include <FL/Fl.H>
 #include <FL/Fl_Preferences.H>
 #include <FL/fl_ask.H>
 #include <FL/Fl_Window.H>
 
-using namespace zzalog;
+using namespace zzalib;
+using namespace zzalib;
 
 extern Fl_Preferences* settings_;
-extern status* status_;
-extern rig_if* rig_if_;
-extern band_view* band_view_;
-extern menu* menu_;
-extern scratchpad* scratchpad_;
-extern spec_data* spec_data_;
+rig_if* rig_if_;
 
 extern void remove_sub_window(Fl_Window* w);
 
@@ -40,6 +31,8 @@ rig_if::rig_if()
 	error_message_ = "";
 	// Power lookup table
 	power_lookup_ = new power_matrix;
+	// Default action
+	on_timer_ = nullptr;
 }
 
 // Base class destructor
@@ -69,10 +62,6 @@ bool rig_if::open() {
 void rig_if::close() {
 	// Timeout must be removed before rig connection is closed otherwise it could fire while the connection is closing
 	Fl::remove_timeout(cb_timer_rig);
-	status_->rig_status(ST_WARNING, "RIG: Connection closed");
-	if (scratchpad_) {
-		scratchpad_->update();
-	}
 }
 
 // Convert s-meter reading into display format
@@ -187,10 +176,11 @@ string rig_if::get_tx_power() {
 // Convert the drive-level to a power
 double rig_if::power() {
 	double my_drive = drive();
-	double my_freq = tx_frequency();
-	// Get the band
-	string band = spec_data_->band_for_freq(my_freq / 1000000);
-	return power_lookup_->power(band, (int)my_drive);
+	//double my_freq = tx_frequency();
+	//// Get the band
+	//string band = spec_data_->band_for_freq(my_freq / 1000000);
+	//return power_lookup_->power(band, (int)my_drive);
+	return my_drive;
 }
 
 // Rig timer callback
@@ -208,33 +198,13 @@ void rig_if::cb_timer_rig(void* v) {
 	else {
 		if (rig_if_->is_good()) {
 			// Rig connected and is working - FAST
-			status_->rig_status(ST_OK, rig_if_->rig_info().c_str());
 			rig_settings.get("Polling Interval", timer_value, FAST_RIG_DEF);
-			// Band view may not have been created yet
-			if (band_view_) {
-				band_view_->update(rig_if_->tx_frequency() / 1000.0);
-			}
-			// Update scratchpad
-			if (scratchpad_) {
-				string mode;
-				string submode;
-				rig_if_->get_string_mode(mode, submode);
-				string freq = rig_if_->get_frequency(true);
-				string power = rig_if_->get_tx_power();
-				if (submode.length()) {
-					scratchpad_->rig_update(freq, submode, power);
-				}
-				else {
-					scratchpad_->rig_update(freq, mode, power);
-				}
+			if (rig_if_->on_timer_) {
+				rig_if_->on_timer_();
 			}
 		}
 		if (!rig_if_->is_good()) {
 			// Rig connected and broken - SLOW
-			status_->rig_status(ST_ERROR, rig_if_->error_message().c_str());
-			char message[100];
-			sprintf(message, "RIG: Interface broken - %s", rig_if_->error_message().c_str());
-			status_->misc_status(ST_ERROR, message);
 			rig_settings.get("Slow Polling Interval", timer_value, SLOW_RIG_DEF);
 		}
 	}
@@ -280,10 +250,15 @@ string rig_if::success_message() {
 	return success_message_;
 }
 
+// Set callback
+void rig_if::callback(void(*function)()) {
+	on_timer_ = function;
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////
 //    H a M L I B implementation
 //
-// hamlib is a library API compiled with ZZALOG and provides standard API connecting
+// hamlib is a library API compiled with zzalib and provides standard API connecting
 // many different rig models using a serial port.(PowerSDR emulates TS2000)
 // It has an issue that only a single app (logger or digital modem) may access the 
 // rig at the same time
@@ -640,7 +615,6 @@ bool rig_omnirig::open()
 		{
 			// Connection failed
 			// And if that fails, say oops 
-			status_->misc_status(ST_SEVERE, "Unable to open Omnirig!");
 			opened_ok_ = false;
 		}
 		else {
@@ -914,7 +888,6 @@ HRESULT rig_omnirig::cb_custom_reply(long rig_num, VARIANT command, VARIANT repl
 			waiting_smeter_reply_ = false;
 		}
 		else {
-			status_->misc_status(ST_ERROR, "OMNIRIG: Unexpected command reply received from OmniRig");
 		}
 	}
 	return 0;
@@ -958,7 +931,7 @@ bool rig_flrig::open() {
 	Fl_Preferences rig_settings(settings_, "Rig");
 	Fl_Preferences flrig_settings(rig_settings, "Flrig");
 	char *temp;
-	// Default indicates server is on same computer as running ZZALOG
+	// Default indicates server is on same computer as running zzalib
 	flrig_settings.get("Host", temp, "127.0.0.1");
 	string host_name = temp;
 	free(temp);
@@ -1025,8 +998,8 @@ rig_mode_t rig_flrig::mode() {
 		else if (mode_id == "CW") return GM_CWU;
 		else if (mode_id == "CW-R") return GM_CWL;
 		else if (mode_id == "FM") return GM_FM;
-		else if (mode_id == "FSK") return GM_DIGL;
-		else if (mode_id == "FSK-R") return GM_DIGU;
+		else if (mode_id == "FSK" || mode_id == "LSB-D") return GM_DIGL;
+		else if (mode_id == "FSK-R" || mode_id == "USB-D") return GM_DIGU;
 		else 
 			// Unsupported mode returned
 			return GM_INVALID;

@@ -7,7 +7,7 @@
 
 using namespace std;
 
-namespace zzalog {
+namespace zzalib {
 
 	// This class provides the basic constituents of an XML element
 	class xml_element

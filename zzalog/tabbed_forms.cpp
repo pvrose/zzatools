@@ -12,6 +12,7 @@
 #include "dxa_if.h"
 
 using namespace zzalog;
+using namespace zzalib;
 
 extern book* book_;
 extern book* navigation_book_;

@@ -1,14 +1,14 @@
 #ifndef __EXC_READER__
 #define __EXC_READER__
 
-#include "xml_reader.h"
+#include "../zzalib/xml_reader.h"
 
 #include <list>
 #include <string>
 #include <istream>
 
 using namespace std;
-
+using namespace zzalib;
 namespace zzalog {
 	class exc_data;
 	struct exc_entry;

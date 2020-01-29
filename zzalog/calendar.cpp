@@ -6,6 +6,7 @@
 #include <FL/Fl_Button.H>
 
 using namespace zzalog;
+using namespace zzalib;
 
 // Constructor for the calendat table
 calendar_table::calendar_table(int X, int Y, int W, int H, tm date) :
@@ -125,7 +126,7 @@ void calendar_table::value(tm date) {
 	// get the first of the month
 	month_start_ = selected_date_;
 	month_start_.tm_mday = 1;
-	// Now convert to time_t and back to correct wday
+	// now convert to time_t and back to correct wday
 	refresh_tm(&month_start_);
 	// redraw so that today is highlighted again
 	redraw();
@@ -407,7 +408,7 @@ void calendar::value(const char* date) {
 	value_ = date;
 	// Update associated 
 	string_to_tm(date, display_date_, ADIF_DATEFORMAT);
-	// Now try and set the date into calendar - it may fail so read back defaulted
+	// now try and set the date into calendar - it may fail so read back defaulted
 	change_date();
 	display_date_ = table_->value();
 }

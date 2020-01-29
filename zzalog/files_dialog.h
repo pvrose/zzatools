@@ -11,6 +11,7 @@
 #include <FL/Fl_Check_Button.H>
 
 using namespace std;
+using namespace zzalib;
 
 namespace zzalog {
 

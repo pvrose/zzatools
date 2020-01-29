@@ -20,8 +20,8 @@ namespace zzalog {
 	// validation status for each check
 	enum error_t {
 		VE_OK,                         // No problem
-		VE_TYPE_UNKNOWN,               // Datatype or enumeration type not known
-		VE_FIELD_UNKNOWN,              // Field name is not known
+		VE_TYPE_UNKnowN,               // Datatype or enumeration type not known
+		VE_FIELD_UNKnowN,              // Field name is not known
 		VE_FIELD_INPUT_ONLY,           // Field is import only - to be modified
 		VE_FIELD_UNSUPPORTED,          // Field cannot yet be validated
 		VE_VALUE_INPUT_ONLY,           // value is Import Only - to be modified
@@ -160,6 +160,8 @@ namespace zzalog {
 		bool do_continue();
 		// Reset continue flag
 		void reset_continue();
+		// Add application defined field
+		bool add_appdef(const string& name, char indicator);
 
 		// protected methods
 	protected:
@@ -199,8 +201,6 @@ namespace zzalog {
 		// Generate report timestamp and fault
 		string report_timestamp(string field, string data);
 		// protected attributes
-		// Add application defined field
-		bool add_appdef(const string& name, char indicator);
 	protected:
 		// ADIF Version
 		string adif_version_;

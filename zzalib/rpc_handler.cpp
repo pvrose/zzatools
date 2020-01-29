@@ -3,17 +3,15 @@
 #include "xml_writer.h"
 #include "xml_reader.h"
 #include "../zzalib/utils.h"
-#include "status.h"
 
 #include <sstream>
 
 #include <FL/fl_ask.H>
 
 using namespace std;
-using namespace zzalog;
+using namespace zzalib;
 
 extern url_handler* url_handler_;
-extern status* status_;
 
 // Constructor
 rpc_handler::rpc_handler(string host_name, int port_num, string resource_name)
@@ -47,11 +45,6 @@ bool rpc_handler::do_request(
 		decode_response(put_response, response, rpc_fault);
 		if (rpc_fault) {
 			// Display reeceived response
-			string error = response->print_item();
-			char* message = new char[error.length() + 100];
-			sprintf(message, "XML_RPC: Received RPC fault:\n%s", error.c_str());
-			status_->misc_status(ST_ERROR, message);
-			delete[] message;
 			return false;
 		}
 		else {
@@ -59,7 +52,6 @@ bool rpc_handler::do_request(
 		}
 	}
 	else {
-		status_->misc_status(ST_ERROR, "XML_RPC: HTTP post failed.");
 		return false;
 	}
 }
@@ -101,7 +93,7 @@ bool rpc_handler::generate_request(
 	xml_ok &= writer->end_element("params");
 	xml_ok &= writer->end_element("methodCall");
 
-	// Now write the destination to the output stream.
+	// now write the destination to the output stream.
 	xml_ok &= writer->data(request_xml);
 
 	delete writer;
@@ -233,7 +225,7 @@ bool rpc_handler::decode_response(istream& response_xml, rpc_data_item* response
 	xml_element* top_element = reader->element();
 	if (top_element == nullptr || to_upper(top_element->name()) != "METHODRESPONSE") {
 		// Bad or incorrect XML received
-		status_->misc_status(ST_ERROR, "XML_RPC: XML reader has not decoded XML or top-level != methodResponse");
+		fl_alert("XML_RPC: XML reader has not decoded XML or top-level != methodResponse");
 		delete reader;
 		return false;
 	}
@@ -254,7 +246,7 @@ bool rpc_handler::decode_request(istream& request_xml, string& method_name, rpc_
 	xml_element* top_element = reader->element();
 	if (top_element == nullptr || to_upper(top_element->name()) != "METHODCALL") {
 		// bad or incorrect XML received
-		status_->misc_status(ST_ERROR, "XML_RPC: XML reader has not decoded XML or top-level != methodCall");
+		fl_alert("XML_RPC: XML reader has not decoded XML or top-level != methodCall");
 		delete reader;
 		return false;
 	}
@@ -340,7 +332,7 @@ bool rpc_handler::decode_xml_element(rpc_element_t element_type, xml_element* el
 		error_message = "Serious programming error decoding element" + element->child(0)->name();
 	}
 	if (!xml_ok && error_message.length() > 0) {
-		status_->misc_status(ST_ERROR, ("XML_RPC" + error_message).c_str());
+		fl_alert(("XML_RPC" + error_message).c_str());
 	}
 	return xml_ok;
 }
@@ -678,7 +670,7 @@ bool rpc_handler::decode_xml_element(rpc_element_t element_type, xml_element* el
 
 	}
 	if (!xml_ok && error_message.length() > 0) {
-		status_->misc_status(ST_ERROR, ("XML_RPC: " + error_message).c_str());
+		fl_alert(("XML_RPC: " + error_message).c_str());
 	}
 	return xml_ok;
 }

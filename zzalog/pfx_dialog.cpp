@@ -11,6 +11,7 @@
 #include <FL/fl_ask.H>
 
 using namespace zzalog;
+using namespace zzalib;
 
 // Table constructor
 pfx_dlg_table::pfx_dlg_table(pfx_dialog* parent, int X, int Y, int W, int H, const char* label) 

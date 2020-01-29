@@ -15,6 +15,7 @@
 #include <FL/Fl_Preferences.H>
 
 using namespace zzalog;
+using namespace zzalib;
 
 extern book* book_;
 extern extract_data* extract_records_;
@@ -212,7 +213,7 @@ void report_tree::add_record(record_num_t record_num, report_map_entry_t* entry)
 			if (entry->next_entry == nullptr) {
 				entry->next_entry = new report_map_t;
 			}
-			// Now look in the map for the entry
+			// now look in the map for the entry
 			report_map_entry_t* next_entry;
 			// Find any existing entry with the label
 			auto it = entry->next_entry->find(map_key);

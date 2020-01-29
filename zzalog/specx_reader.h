@@ -1,12 +1,13 @@
 #ifndef __SPECX_READER__
 #define __SPECX_READER__
 
-#include "xml_reader.h"
+#include "../zzalib/xml_reader.h"
 
 #include <list>
 #include <string>
 
 using namespace std;
+using namespace zzalib;
 
 namespace zzalog {
 

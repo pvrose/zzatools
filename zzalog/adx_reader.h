@@ -1,6 +1,6 @@
 #ifndef __ADX_READER__
 #define __ADX_READER__
-#include "xml_reader.h"
+#include "../zzalib/xml_reader.h"
 #include "book.h"
 
 #include "record.h"

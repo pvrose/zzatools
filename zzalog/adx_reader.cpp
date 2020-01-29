@@ -11,6 +11,7 @@
 #include <FL/Fl_Preferences.H>
 
 using namespace zzalog;
+using namespace zzalib;
 
 extern spec_data* spec_data_;
 extern pfx_data* pfx_data_;
@@ -355,7 +356,7 @@ bool adx_reader::start_app(map<string, string>* attributes) {
 	string id;
 	string field_name;
 	bool error = false;
-	// Now read the attributes
+	// now read the attributes
 	for (auto it = attributes->begin(); it != attributes->end(); it++) 
 	{
 		// NAME="value"
@@ -393,6 +394,13 @@ bool adx_reader::start_app(map<string, string>* attributes) {
 				char temp[128];
 				sprintf(temp, "APP_%s_%s", id.c_str(), field_name.c_str());
 				field_name_ = temp;
+			}
+			else if (id == "LOTW") {
+				// Generate field name APP_[Progid]_[Name]
+				char temp[128];
+				sprintf(temp, "APP_%s_%s", id.c_str(), field_name.c_str());
+				field_name_ = temp;
+				spec_data_->add_appdef(field_name, 'S');
 			}
 			else {
 				ignore_app_ = true;

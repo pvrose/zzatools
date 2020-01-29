@@ -15,6 +15,7 @@
 #include <FL/Fl_Check_Button.H>
 
 using namespace zzalog;
+using namespace zzalib;
 
 //extern spec_data* spec_data_;
 
