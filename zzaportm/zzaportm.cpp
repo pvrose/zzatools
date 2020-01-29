@@ -10,6 +10,7 @@
 
 using namespace std;
 using namespace zzaportm;
+using namespace zzalib;
 
 const string VENDOR = "GM3ZZA";
 const string PROGRAM_ID = "ZZAPORTM";

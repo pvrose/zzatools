@@ -14,6 +14,7 @@
 #include <FL/Fl_Preferences.H>
 
 using namespace zzaportm;
+using namespace zzalib;
 
 extern Fl_Preferences* settings_;
 

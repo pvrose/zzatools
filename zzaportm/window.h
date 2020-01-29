@@ -14,6 +14,8 @@
 #include <FL/Fl_Counter.H>
 #include <FL/fl_draw.H>
 
+using namespace zzalib;
+
 namespace zzaportm {
 
 	//constants and types
