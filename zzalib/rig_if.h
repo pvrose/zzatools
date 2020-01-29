@@ -107,7 +107,7 @@ namespace zzalib {
 		double power();
 
 		// Callback to update app on timer interrupt
-		void callback(void (*function)());
+		void callback(void (*function)(), string(*spec_func)(double));
 
 
 		// Protected methods
@@ -131,6 +131,8 @@ namespace zzalib {
 		power_matrix* power_lookup_;
 		// On timer callback to update
 		void(*on_timer_)();
+		// Access spec for 
+		string(*freq_to_band_)(double frequency);
 
 
 	};

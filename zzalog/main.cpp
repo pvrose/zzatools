@@ -368,6 +368,10 @@ void cb_rig_timer() {
 	status_->rig_status(ST_OK, rig_if_->rig_info().c_str());
 }
 
+string cb_freq_to_band(double frequency) {
+	return spec_data_->band_for_freq(frequency);
+}
+
 // Create the rig interface handler and connect to the rig.
 void add_rig_if() {
 	if (!closing_) {
@@ -466,6 +470,8 @@ void add_rig_if() {
 						}
 						else {
 							// Access rig - timer will have been started by rig_if_->open()
+							// Set rig timer callnack
+							rig_if_->callback(cb_rig_timer, cb_freq_to_band);
 							status_->misc_status(ST_OK, rig_if_->success_message().c_str());
 							status_->rig_status(ST_OK, rig_if_->rig_info().c_str());
 							done = true;
@@ -490,10 +496,6 @@ void add_rig_if() {
 		menu_->update_items();
 		if (rig_if_ == nullptr) {
 			status_->rig_status(ST_WARNING, "No rig present");
-		}
-		else {
-			// Set rig timer callnack
-			rig_if_->callback(cb_rig_timer);
 		}
 		fl_cursor(FL_CURSOR_DEFAULT);
 	}

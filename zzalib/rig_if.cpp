@@ -33,6 +33,7 @@ rig_if::rig_if()
 	power_lookup_ = new power_matrix;
 	// Default action
 	on_timer_ = nullptr;
+	freq_to_band_ = nullptr;
 }
 
 // Base class destructor
@@ -176,10 +177,10 @@ string rig_if::get_tx_power() {
 // Convert the drive-level to a power
 double rig_if::power() {
 	double my_drive = drive();
-	//double my_freq = tx_frequency();
-	//// Get the band
-	//string band = spec_data_->band_for_freq(my_freq / 1000000);
-	//return power_lookup_->power(band, (int)my_drive);
+	double my_freq = tx_frequency();
+	// Get the band
+	string band = freq_to_band_(my_freq / 1000000);
+	return power_lookup_->power(band, (int)my_drive);
 	return my_drive;
 }
 
@@ -251,8 +252,9 @@ string rig_if::success_message() {
 }
 
 // Set callback
-void rig_if::callback(void(*function)()) {
+void rig_if::callback(void(*function)(), string(*spec_func)(double)) {
 	on_timer_ = function;
+	freq_to_band_ = spec_func;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////
