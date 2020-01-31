@@ -208,14 +208,23 @@ prefix* pfx_data::get_prefix(record* record, bool special) {
 				}
 				// If they do return it else return 0
 				if (ok) {
+					char message[200];
+					snprintf(message, 200, "PREFIX - User didn't select prefix for %s, prefix %s used",  record->item("CALL").c_str(), prefix->nickname_.c_str());
+					status_->misc_status(ST_WARNING, message);
 					return prefix;
 				}
 				else {
+					char message[200];
+					snprintf(message, 200, "PREFIX - User didn't select prefix for %s, no common prefix found", record->item("CALL").c_str());
+					status_->misc_status(ST_WARNING, message);
 					return nullptr;
 				}
 			}
 			else {
 				// user selected 1 prefix - return it
+				char message[200];
+				snprintf(message, 200, "PREFIX - User selected prefix for %s, prefix %s used", record->item("CALL").c_str(), prefix->nickname_.c_str());
+				status_->misc_status(ST_NOTE, message);
 				return prefix;
 			}
 		}
@@ -855,7 +864,7 @@ parse_result_t pfx_data::parse(record* record) {
 	// Check if the call is listed in exceptions
 	if (exceptions_->is_invalid(record)) {
 		char message[150];
-		snprintf(message, 150, "PARSE: Contact %s %s %s is an invalid operation", record->item("CALL").c_str(), record->item("QSO_DATE").c_str(), record->item("TIME_ON"));
+		snprintf(message, 150, "PARSE: Contact %s %s %s is an invalid operation", record->item("CALL").c_str(), record->item("QSO_DATE").c_str(), record->item("TIME_ON").c_str());
 		status_->misc_status(ST_ERROR, message);
 	}
 	else {

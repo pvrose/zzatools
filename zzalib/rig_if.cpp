@@ -1052,7 +1052,9 @@ double rig_flrig::tx_frequency() {
 	if (do_request("rig.get_vfoA", nullptr, &response)) {
 		return (double)response.get_int();
 	}
-	return nan("");
+	else {
+		return nan("");
+	}
 }
 
 // Return S-meter reading (S9+/-dB)

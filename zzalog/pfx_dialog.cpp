@@ -151,7 +151,7 @@ int pfx_dlg_table::clicks() { return last_clicks_; }
 pfx_dialog::pfx_dialog() :
 	win_dialog(500, 200, "Prefix Selection")
 	, button_(BN_OK)
-	, selection_(0)
+	, selection_(-1)
 {
 	prefixes_ = nullptr;
 
@@ -268,7 +268,12 @@ void pfx_dialog::set_data(vector<prefix*>* prefixes, string callsign) {
 
 // Get the selected prefix
 prefix* pfx_dialog::get_prefix() {
-	return (*prefixes_)[selection_];
+	if (selection_ < 0 || selection_ >= prefixes_->size()) {
+		return nullptr;
+	}
+	else {
+		return (*prefixes_)[selection_];
+	}
 }
 
 // Get numbered prefix

@@ -81,6 +81,8 @@ namespace zzalib {
 		virtual int s_meter() = 0;
 		// Return the most recent error message
 		virtual string error_message() = 0;
+		//// Send a raw message
+		//virtual string raw_message(string message) = 0;
 
 		// Error Code is not OK.
 		virtual bool is_good() = 0;
@@ -164,6 +166,8 @@ namespace zzalib {
 		virtual int s_meter();
 		// Return the most recent error message
 		virtual string error_message();
+		//// Return raw message
+		//virtual string raw_message(string message);
 
 		// Error Code is not OK.
 		virtual bool is_good();
@@ -222,6 +226,8 @@ namespace zzalib {
 		virtual int s_meter();
 		// Return the most recent error message
 		virtual string error_message();
+		//// Return raw message
+		//virtual string raw_message(string message);
 
 		// Error Code is not OK.
 		virtual bool is_good();
@@ -288,6 +294,8 @@ namespace zzalib {
 		virtual int s_meter();
 		// Return the most recent error message
 		virtual string error_message();
+		//// Return raw message
+		//virtual string raw_message(string message);
 
 		// Error Code is not OK.
 		virtual bool is_good();
