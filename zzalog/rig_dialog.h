@@ -75,8 +75,6 @@ namespace zzalog {
 		double fast_poll_interval_;
 		// Polling interval when disconnected
 		double slow_poll_interval_;
-		// Omnirig - rig number (1 or 2)
-		int omnirig_index_;
 		// Hamlib parameters 
 		struct hamlib_data {
 			// Manufacturer
@@ -120,7 +118,6 @@ namespace zzalog {
 		// The handler radio button parameters
 		radio_param_t* handler_radio_params_;
 		// widgets
-		Fl_Group* omnirig_grp_;
 		Fl_Group* hamlib_grp_;
 		Fl_Group* flrig_grp_;
 		Fl_Group* norig_grp_;

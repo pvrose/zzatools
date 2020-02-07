@@ -564,43 +564,6 @@ void dxa_if::cb_bn_all(Fl_Widget* w, void* v) {
 	that->draw_pins();
 }
 
-// DXATLAS: callback - some detail of the map has been changed
-HRESULT dxa_if::cb_map_changed(enum DxAtlas::EnumMapChange change_kind) {
-	if (!is_my_change_) {
-		// The change was instigated from a control in DXATLAS:
-		DxAtlas::IDxMapPtr map = atlas_->GetMap();
-		// Select reason for change
-		switch (change_kind) {
-		case DxAtlas::EnumMapChange::MC_VIEW:
-			// The view has changed - get resultant parameters that we are interested in saving
-			// zoom, centre point and window position
-			zoom_value_ = map->GetZoom();
-			centre_lat_ = map->GetCenterLatitude();
-			centre_long_ = map->GetCenterLongitude();
-			atlas_left_ = atlas_->GetLeft();
-			atlas_top_ = atlas_->GetTop();
-			atlas_height_ = atlas_->GetHeight();
-			atlas_width_ = atlas_->GetWidth();
-			break;
-		case DxAtlas::MC_GRID:
-			prefixes_ = map->GetPrefixesVisible();
-			cq_zones_ = map->GetCqZonesVisible();
-			itu_zones_ = map->GetItuZonesVisible();
-			grid_squares_ = map->GetGridSquaresVisible();
-			lat_lon_grid_ = map->GetLatLonGridVisible();
-			bearing_distance_ = map->GetBearingDistanceGridVisible();
-			break;
-		case DxAtlas::MC_PROJECTION:
-			projection_ = map->GetProjection();
-			break;
-		}
-		// Save new configuration
-		enable_widgets();
-		save_values();
-	}
-	return S_OK;
-}
-
 // Call back from DXATLAS: when the mouse has been clicked on the map - show selected QSO or QSOs
 // If we are displaying extracted records then only show the last record in the record view.
 // If we are not, then copy all records within the tolerance to the extracted records.
@@ -884,16 +847,27 @@ bool dxa_if::connect_dxatlas() {
 void dxa_if::disconnect_dxatlas(bool dxatlas_exit) {
 	if (atlas_) {
 		// Note that we may have moved the window without resizing, so won't have had the map changed callback
+		DxAtlas::IDxMapPtr map = atlas_->GetMap();
 		atlas_left_ = atlas_->GetLeft();
 		atlas_width_ = atlas_->GetWidth();
 		atlas_top_ = atlas_->GetTop();
 		atlas_height_ = atlas_->GetHeight();
+		zoom_value_ = map->GetZoom();
+		centre_lat_ = map->GetCenterLatitude();
+		centre_long_ = map->GetCenterLongitude();
+		prefixes_ = map->GetPrefixesVisible();
+		cq_zones_ = map->GetCqZonesVisible();
+		itu_zones_ = map->GetItuZonesVisible();
+		grid_squares_ = map->GetGridSquaresVisible();
+		lat_lon_grid_ = map->GetLatLonGridVisible();
+		bearing_distance_ = map->GetBearingDistanceGridVisible();
+		projection_ = map->GetProjection();
 		save_values();
 		// Ignore any callbacks from DXATLAS: while we disconnect it.
 		is_my_change_ = true;
-		atlas_->GetMap()->BeginUpdate();
-		atlas_->GetMap()->GetCustomLayers()->Clear();
-		atlas_->GetMap()->EndUpdate();
+		map->BeginUpdate();
+		map->GetCustomLayers()->Clear();
+		map->EndUpdate();
 		call_layer_ = nullptr;
 		// Tell the interface we no longer support the callback
 		IDispEventSimpleImpl<2, dxa_if, & __uuidof(DxAtlas::IDxAtlasEvents)>::DispEventUnadvise(atlas_);

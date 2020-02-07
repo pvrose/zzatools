@@ -14,13 +14,6 @@
 // C/C++ includes
 #include <string>
 
-#ifdef _WIN32
-//!! OmniRIG type library - only available in windows
-#import "C:\Program Files (x86)\Afreet\OmniRig\OmniRig.exe"
-#include <atlbase.h>
-#include <atlcom.h>
-#endif
-
 using namespace std;
 
 namespace zzalib {
@@ -40,9 +33,9 @@ namespace zzalib {
 
 	// Rig handler type
 	enum rig_handler_t : int {
-		RIG_OMNIRIG,
 		RIG_HAMLIB,
 		RIG_FLRIG,
+		RIG_DIRECT,
 		RIG_NONE
 	};
 
@@ -81,8 +74,8 @@ namespace zzalib {
 		virtual int s_meter() = 0;
 		// Return the most recent error message
 		virtual string error_message() = 0;
-		//// Send a raw message
-		//virtual string raw_message(string message) = 0;
+		// Send a raw message
+		virtual string raw_message(string message) = 0;
 
 		// Error Code is not OK.
 		virtual bool is_good() = 0;
@@ -109,7 +102,7 @@ namespace zzalib {
 		double power();
 
 		// Callback to update app on timer interrupt
-		void callback(void (*function)(), string(*spec_func)(double));
+		void callback(void (*function)(), string(*spec_func)(double), void(*mess_func)(bool, const char*));
 
 
 		// Protected methods
@@ -135,6 +128,9 @@ namespace zzalib {
 		void(*on_timer_)();
 		// Access spec for 
 		string(*freq_to_band_)(double frequency);
+		// Display message
+		void(*error)(bool ok, const char* message);
+		static void default_error_message(bool ok, const char* message);
 
 
 	};
@@ -166,8 +162,8 @@ namespace zzalib {
 		virtual int s_meter();
 		// Return the most recent error message
 		virtual string error_message();
-		//// Return raw message
-		//virtual string raw_message(string message);
+		// Return raw message
+		virtual string raw_message(string message);
 
 		// Error Code is not OK.
 		virtual bool is_good();
@@ -191,79 +187,6 @@ namespace zzalib {
 		// Numeric error code
 		int error_code_;
 	};
-
-	// Omnirig is a windows-only application
-#ifdef _WIN32
-
-// This class implements the Omnirig specific implementation of the base class. 
-	// Omnirig is an app that provides a standardised API for the divers rig CAT interfaces.
-	// It allows connection by multiple clients.
-	// it also inherits from inter-app event handler and is Windows only.
-	class rig_omnirig :
-		public rig_if
-		, public ::IDispEventSimpleImpl<1, rig_omnirig, &__uuidof(::OmniRig::IOmniRigXEvents)>
-
-	{
-	public:
-		rig_omnirig();
-		virtual ~rig_omnirig();
-
-		// Opens the COM port associated with the rig
-		virtual bool open();
-		// Return rig name
-		virtual string& rig_name();
-		// Read TX Frequency
-		virtual double tx_frequency();
-		// Read mode from rig
-		virtual rig_mode_t mode();
-		// Return drive level * 100% power
-		virtual double drive();
-		// Rig is working split TX/RX frequency
-		virtual bool is_split();
-		// Get separate frequency
-		virtual double rx_frequency();
-		// Return S-meter reading (S9+/-dB)
-		virtual int s_meter();
-		// Return the most recent error message
-		virtual string error_message();
-		//// Return raw message
-		//virtual string raw_message(string message);
-
-		// Error Code is not OK.
-		virtual bool is_good();
-		// close rig - may be null for some 
-		virtual void close();
-
-		// Asynchronous callback from Omnirig
-		HRESULT __stdcall cb_custom_reply(long rig_number, VARIANT command, VARIANT reply);
-		// Add the callback interface from Omnirig to zzalib
-		BEGIN_SINK_MAP(rig_omnirig)
-			SINK_ENTRY_INFO_P(1, &__uuidof(::OmniRig::IOmniRigXEvents), 0x5, &rig_omnirig::cb_custom_reply, new _ATL_FUNC_INFO({ CC_STDCALL, VT_I4, 3,{ VT_I4, VT_VARIANT, VT_VARIANT } }))
-		END_SINK_MAP()
-
-	protected:
-
-		// The Omnirig interfaces
-		::OmniRig::IOmniRigXPtr omnirig_;
-		// Rig
-		::OmniRig::IRigXPtr rig_;
-		// One of 1 or 2 rigs that Omnirig can simulatneously connect to
-		int rig_num_;
-		// Waiting for a reply for drive level
-		bool waiting_drive_reply_;
-		// Waiting for a reply for signal strength
-		bool waiting_smeter_reply_;
-		// Drive level
-		int drive_level_;
-		// Signal level
-		int signal_level_;
-		// Most recent error code received
-		HRESULT error_code_;
-
-	};
-
-#endif
-
 
 	// This class is the flrig specific implementation of the base class.
 	// flrig is an applicatiion that provides an XML-RPI server interface over HTTP.
@@ -294,8 +217,8 @@ namespace zzalib {
 		virtual int s_meter();
 		// Return the most recent error message
 		virtual string error_message();
-		//// Return raw message
-		//virtual string raw_message(string message);
+		// Return raw message
+		virtual string raw_message(string message);
 
 		// Error Code is not OK.
 		virtual bool is_good();

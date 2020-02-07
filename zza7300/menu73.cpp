@@ -6,30 +6,33 @@
 #include <FL/Fl_Menu_Item.H>
 
 using namespace zza7300;
+using namespace zzalib;
 
-extern view* view_;
+extern view73* view_;
 
 Fl_Menu_Item items_[] = {
-	{ "Settings", 'S', menu73::cb_mi_settings, 0},
+	{ "Settings", 'S', nullptr, nullptr, FL_SUBMENU},
+		{ "Rig", 'R', menu73::cb_mi_sett_rig },
+		{ 0 },
 	{ "View", 'V', nullptr, nullptr, FL_SUBMENU},
 		{ "Memories", 'M', menu73::cb_mi_view, (void*)VT_MEMORIES},
-		{ "Panadapter Bands", 'P', menu73::cb_mi_view, (void*)VT_PANADAPTER_BANDS},
+		{ "Scope Edge Bands", 'S', menu73::cb_mi_view, (void*)VT_SCOPE_BANDS},
 		{ "User Bands", 'U', menu73::cb_mi_view, (void*)VT_USER_BANDS},
 		{ "CW Messages", 'C', menu73::cb_mi_view, (void*)VT_CW_MESSAGES},
-		{ "RTTP Messages", 'V', menu73::cb_mi_view, (void*)VT_RTTY_MESSAGES},
+		{ "RTTP Messages", 'R', menu73::cb_mi_view, (void*)VT_RTTY_MESSAGES},
 		{ 0 },
 	{ 0 }
 };
 
 menu73::menu73(int X, int Y, int W, int H, const char* label) : Fl_Menu_Bar(X, Y, W, H, label) {
-	// Set the menu73
-	Fl_Menu_Bar::menu73(items_);
+	// Set the menu
+	Fl_Menu_Bar::menu(items_);
 	// Font size
 	textsize(FONT_SIZE + 1);
 }
 
 // Settings
-void menu73::cb_mi_settings(Fl_Widget* w, void* v) {
+void menu73::cb_mi_sett_rig(Fl_Widget* w, void* v) {
 	// To do open settings dialog
 }
 

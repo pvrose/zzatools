@@ -34,6 +34,7 @@ rig_if::rig_if()
 	// Default action
 	on_timer_ = nullptr;
 	freq_to_band_ = nullptr;
+	error = default_error_message;
 }
 
 // Base class destructor
@@ -55,6 +56,7 @@ bool rig_if::open() {
 		return true;
 	}
 	else {
+		error(false, "RIG_IF: Failed to open rig");
 		return false;
 	}
 }
@@ -206,6 +208,7 @@ void rig_if::cb_timer_rig(void* v) {
 		}
 		if (!rig_if_->is_good()) {
 			// Rig connected and broken - SLOW
+			rig_if_->error(false, "RIG_IF: Rig disconnected - setting slow polling period");
 			rig_settings.get("Slow Polling Interval", timer_value, SLOW_RIG_DEF);
 		}
 	}
@@ -221,6 +224,8 @@ void rig_if::get_string_mode(string& mode, string& submode) {
 	submode = "";
 	switch (rig_mode) {
 	case GM_INVALID:
+		error(false, "RIG_IF: Invalid mode got from rig");
+		return;
 	case GM_DIGL:
 	case GM_DIGU:
 		return;
@@ -252,9 +257,20 @@ string rig_if::success_message() {
 }
 
 // Set callback
-void rig_if::callback(void(*function)(), string(*spec_func)(double)) {
+void rig_if::callback(void(*function)(), string(*spec_func)(double), void(*mess_func)(bool, const char*)) {
 	on_timer_ = function;
 	freq_to_band_ = spec_func;
+	error = mess_func;
+}
+
+// Default message function
+void rig_if::default_error_message(bool ok, const char* message) {
+	if (ok) {
+		fl_message(message);
+	}
+	else {
+		fl_alert(message);
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -561,347 +577,12 @@ const char* rig_hamlib::error_text(rig_errcode_e code) {
 	}
 };
 
-#ifdef _WIN32
-///////////////////////////////////////////////////////////////////////////////////////
-//    O m n i R i g   implementation
-// 
-// Omnirig provides an API running in a separate process that provides sharable
-// access to 1 of two rigs.
-// Not all apps support Omnirig as it is a Windows-only application
-///////////////////////////////////////////////////////////////////////////////////////
+// Raw message - not implemented
+string rig_hamlib::raw_message(string message) {
+	error(false, "RIG_IF: Hamlib does not support sending raw messages");
+	return "";
+};
 
-// Constructor
-rig_omnirig::rig_omnirig()
-	: rig_if()
-	, omnirig_(nullptr)
-	, rig_num_(0)
-	, rig_(nullptr)
-	, error_code_(OmniRig::RigStatusX::ST_NOTCONFIGURED)
-	, waiting_drive_reply_(false)
-	, waiting_smeter_reply_(false)
-	, drive_level_(0)
-	, signal_level_(0)
-{
-	// Get Omnirig rig number from configuration
-	Fl_Preferences rig_settings(settings_, "Rig");
-	Fl_Preferences omnirig_settings(rig_settings, "Omnirig");
-	omnirig_settings.get("Rig Number", rig_num_, 1);
-	handler_ = "Omnirig";
-}
-
-
-// Destructor
-rig_omnirig::~rig_omnirig()
-{
-	// Tell the interface we can no longer support the callback
-	IDispEventSimpleImpl<1, rig_omnirig, &__uuidof(OmniRig::IOmniRigXEvents)>::DispEventUnadvise(omnirig_);
-}
-
-
-// Open the rig
-bool rig_omnirig::open()
-{
-	// Connect to openrig - start a new one if it's not
-	try
-	{
-		// Connect to OmniRif if it is running
-		HRESULT result = omnirig_.GetActiveObject("OmniRig.OmniRigX");
-		if (FAILED(result))
-			_com_issue_error(result);
-	}
-	catch (_com_error& /*e*/)
-	{
-		// Failed to connect to an existing copy of Omnirig so start a new instance
-		HRESULT result = omnirig_.CreateInstance("OmniRig.OmniRigX", nullptr, CLSCTX_LOCAL_SERVER);
-		if (FAILED(result))
-		{
-			// Connection failed
-			// And if that fails, say oops 
-			opened_ok_ = false;
-		}
-		else {
-			opened_ok_ = true;
-		}
-	}
-	if (opened_ok_) {
-		// Tell the connection we can handle callbacks
-		IDispEventSimpleImpl<1, rig_omnirig, &__uuidof(OmniRig::IOmniRigXEvents)>::DispEventAdvise(omnirig_);
-
-		// Select on rig number
-		switch (rig_num_) {
-		case 1:
-			rig_ = omnirig_->GetRig1();
-			break;
-		case 2:
-			rig_ = omnirig_->GetRig2();
-			break;
-		}
-		if (rig_ == nullptr) {
-			// No rig connected to that port
-			opened_ok_ = false;
-		}
-		else {
-			// Check status of rig connection
-			OmniRig::RigStatusX status;
-			error_code_ = rig_->get_Status(&status);
-			if (FAILED(error_code_) || status != OmniRig::RigStatusX::ST_ONLINE) {
-				// failed to open 
-				opened_ok_ = false;
-			}
-			else {
-				// Get rig name - failed if empty string
-				rig_name_ = rig_->GetRigType();
-				if (rig_name_ == "") {
-					opened_ok_ = false;
-				}
-			}
-		}
-	}
-
-	if (opened_ok_) {
-		success_message_ = "RIG: Omnirig connection to " + rig_name_ + " opened OK";
-	}
-	// base class open() starts timer, timer reports success or otherwise of each access
-	return rig_if::open();
-}
-
-// Return the rig name
-string& rig_omnirig::rig_name()
-{
-	return rig_name_;
-}
-
-/*  Get TX Frquency
-Get TX VFO, then get read the VFO. Convert the read string to a double
-Return 0.0 if either read fails
-*/
-double rig_omnirig::tx_frequency()
-{
-	long frequency_hz = 0;
-	OmniRig::RigParamX params;
-	// Get the VFO configuration
-	error_code_ = rig_->get_Vfo(&params);
-	if (is_good()) {
-		// Get the approprate VFO - check TX is VFO A
-		if ((params & OmniRig::RigParamX::PM_VFOA) ||
-			(params & OmniRig::RigParamX::PM_VFOAA)) {
-			error_code_ = rig_->get_FreqA(&frequency_hz);
-		}
-		else {
-			error_code_ = rig_->get_FreqB(&frequency_hz);
-		}
-	}
-	if (frequency_hz == 0) {
-		// Failed to read frequency
-		return nan("");
-	}
-	else {
-		return (double)frequency_hz;
-	}
-}
-
-/* Return mode from the rig
-*/
-rig_mode_t rig_omnirig::mode()
-{
-	OmniRig::RigParamX mode;
-	// Get the mode
-	error_code_ = rig_->get_Mode(&mode);
-	if (is_good()) {
-		// Convert from Omnirig to zlg enum type
-		if (mode & OmniRig::RigParamX::PM_AM) {
-			return GM_AM;
-		}
-		if (mode & OmniRig::RigParamX::PM_CW_U) {
-			return GM_CWU;
-		}
-		if (mode & OmniRig::RigParamX::PM_CW_L) {
-			return GM_CWL;
-		}
-		if (mode & OmniRig::RigParamX::PM_SSB_L) {
-			return GM_LSB;
-		}
-		if (mode & OmniRig::RigParamX::PM_SSB_U) {
-			return GM_USB;
-		}
-		if (mode & OmniRig::RigParamX::PM_FM) {
-			return GM_FM;
-		}
-		if (mode & OmniRig::RigParamX::PM_DIG_L) {
-			return GM_DIGL;
-		}
-		if (mode & OmniRig::RigParamX::PM_DIG_U) {
-			return GM_DIGU;
-		}
-	}
-	// Default is not a mode
-	return GM_INVALID;
-}
-
-/* Return rig drive level scaled by multiplier
-*/
-double rig_omnirig::drive()
-{
-	// Not directly supported by OmniRig 
-	// TODO - convert to file driven - but for now just assume PowerSDR
-	if (rig_name_ == "PowerSDR") {
-		// Send a custom command to Omnirig, the return data will come through a callback
-		_variant_t command;
-		_variant_t ReplyEnd;
-		command = "ZZPC;";
-		ReplyEnd = ";";
-		waiting_drive_reply_ = false;
-		// The callback does not work correctly - the VARIANT parameters are correct
-		waiting_drive_reply_ = true;
-		error_code_ = rig_->raw_SendCustomCommand(command, 3, ReplyEnd);
-		// wait for omnirig to replay - let FL scheduler still get in
-		OmniRig::RigStatusX status;
-		while (waiting_drive_reply_ && rig_->get_Status(&status) == S_OK && status == OmniRig::ST_ONLINE) Fl::wait();
-		// Return 
-		return (double)drive_level_;
-	}
-	return 1.0;
-
-}
-
-// Return true if running split frequency
-bool rig_omnirig::is_split()
-{
-	OmniRig::RigParamX RigParam;
-	error_code_ = rig_->get_Split(&RigParam);
-	if (is_good()) {
-		return ((RigParam & OmniRig::RigParamX::PM_SPLITON) == OmniRig::RigParamX::PM_SPLITON);
-	}
-	else {
-		// Default if the access failed
-		return false;
-	}
-}
-
-// Return the RX frequency_hz
-double rig_omnirig::rx_frequency()
-{
-	long frequency_hz = 0;
-	// RX is always VFO A
-	error_code_ = rig_->get_FreqA(&frequency_hz);
-	if (is_good()) {
-		return (double)frequency_hz;
-	}
-	else {
-		return nan("");
-	}
-}
-
-// Return S-meter reading (S9+/-dB)
-int rig_omnirig::s_meter()
-{
-	// Not directly supported by OmniRig 
-	// TODO - convert to file driven - but for now just assume PowerSDR
-	if (rig_name_ == "PowerSDR") {
-		// Send a custom command, data will be return with a callback
-		_variant_t command;
-		_variant_t ReplyEnd;
-		command = "ZZSM0;";
-		ReplyEnd = ";";
-		waiting_smeter_reply_ = true;
-		error_code_ = rig_->raw_SendCustomCommand(command, 3, ReplyEnd);
-		// wait for omnirig to replay - let FL scheduler still get in
-		OmniRig::RigStatusX status;
-		while (waiting_smeter_reply_ && rig_->get_Status(&status) == S_OK && status == OmniRig::ST_ONLINE) Fl::wait();
-		// signal level: 0 = -140 dBm, 260 = -10 dBm, S9 = -73 dBm
-		return signal_level_ / 2 - 140 + 73;
-	}
-	else {
-		// Default to S0
-		return -54;
-	}
-}
-
-// Return the most recent error message
-string rig_omnirig::error_message()
-{
-	BSTR status;
-	// Test for rig connection first
-	if (rig_ != nullptr) {
-		// Read the status string
-		error_code_ = rig_->get_StatusStr(&status);
-		// Convert BSTR to C++ string
-		char* temp = _com_util::ConvertBSTRToString(status);
-		error_message_ = string(temp);
-	}
-	else {
-		error_message_ = "Not connected";
-	}
-	return error_message_;
-}
-
-// Error Code is OK.
-bool rig_omnirig::is_good()
-{
-	OmniRig::RigStatusX status;
-	if (rig_->get_Status(&status) == S_OK && status == OmniRig::ST_ONLINE) {
-		return (!FAILED(error_code_));
-	}
-	else {
-		return false;
-	}
-}
-
-// Call back for replies to custom commands
-HRESULT rig_omnirig::cb_custom_reply(long rig_num, VARIANT command, VARIANT reply)
-{
-	string string_command = "";
-	string string_reply = "";
-
-	if (command.vt == (VT_ARRAY | VT_UI1)) {
-		// Get original command that triggered the callback
-		char * array;
-		HRESULT result = SafeArrayAccessData(command.parray, (void**)&array);
-		if (result == S_OK) {
-			long bound;
-			result = SafeArrayGetUBound(command.parray, 1, &bound);
-			// Copy the command byte by byte.
-			for (int pos = 0; result == S_OK && pos <= bound; pos++) {
-				string_command += *(array + pos);
-			}
-		}
-	}
-	if (reply.vt == (VT_ARRAY | VT_UI1)) {
-		// Get the reply
-		char * array;
-		HRESULT result = SafeArrayAccessData(reply.parray, (void**)&array);
-		if (result == S_OK) {
-			long bound;
-			result = SafeArrayGetUBound(reply.parray, 1, &bound);
-			// Copy the reply byte by byte
-			for (int pos = 0; result == S_OK && pos <= bound; pos++) {
-				string_reply += *(array + pos);
-			}
-		}
-		// PowerSDR specific commands
-		if (string_command == "ZZPC;") {
-			// Reading power drive level - ZZPCnnnnnn;
-			drive_level_ = stoi(string_reply.substr(4, 6), nullptr, 10);
-			waiting_drive_reply_ = false;
-		}
-		else if (string_command == "ZZSM0;") {
-			// Reading signal strength meter - ZZSM0nnnnnnn
-			signal_level_ = stoi(string_reply.substr(5, 7), nullptr, 10);
-			waiting_smeter_reply_ = false;
-		}
-		else {
-		}
-	}
-	return 0;
-}
-
-// Close rig
-void rig_omnirig::close() {
-	// Call base class  for common behaviour
-	rig_if::close();
-}
-
-#endif //_WIN32
 
 ///////////////////////////////////////////////////////////////////////////////////////
 //    F l R i g   implementation
@@ -1098,4 +779,21 @@ bool rig_flrig::do_request(string method_name, rpc_data_item::rpc_list* params, 
 	else {
 		return true;
 	}
+}
+
+// Do the raw message
+string rig_flrig::raw_message(string message) {
+	rpc_data_item param;
+	rpc_data_item::rpc_list params;
+	rpc_data_item response;
+	param.set(message, XRT_STRING);
+	params.clear();
+	params.push_back(&param);
+	if (do_request("cat_string", &params, &response)) {
+		return response.get_string();
+	}
+	else {
+		return "";
+	}
+
 }

@@ -372,6 +372,10 @@ string cb_freq_to_band(double frequency) {
 	return spec_data_->band_for_freq(frequency);
 }
 
+void cb_error_message(bool ok, const char* message) {
+	status_->misc_status(ok ? ST_NOTE : ST_ERROR, message);
+}
+
 // Create the rig interface handler and connect to the rig.
 void add_rig_if() {
 	if (!closing_) {
@@ -380,7 +384,7 @@ void add_rig_if() {
 		// Get the handler from the settings
 		rig_handler_t handler;
 		Fl_Preferences rig_settings(settings_, "Rig");
-		rig_settings.get("Handler", (int&)handler, RIG_OMNIRIG);
+		rig_settings.get("Handler", (int&)handler, RIG_FLRIG);
 		Fl_Preferences stations_settings(settings_, "Stations");
 		Fl_Preferences rigs_settings(stations_settings, "Rigs");
 		char* rig_name;
@@ -390,9 +394,6 @@ void add_rig_if() {
 		switch (handler) {
 		case RIG_HAMLIB:
 			strcpy(handler_name, "hamlib");
-			break;
-		case RIG_OMNIRIG:
-			strcpy(handler_name, "OmniRig");
 			break;
 		case RIG_FLRIG:
 			strcpy(handler_name, "FlRig");
@@ -406,9 +407,6 @@ void add_rig_if() {
 		switch (handler) {
 		case RIG_HAMLIB:
 			rig_if_ = new rig_hamlib;
-			break;
-		case RIG_OMNIRIG:
-			rig_if_ = new rig_omnirig;
 			break;
 		case RIG_FLRIG:
 			// If the HTTP URL handler hasn't yet been created do so.
@@ -429,6 +427,8 @@ void add_rig_if() {
 			menu_->logging(LM_ON_AIR);
 		}
 		else {
+			// Set callbacks
+			rig_if_->callback(cb_rig_timer, cb_freq_to_band, cb_error_message);
 			// Trya and open the connection to the rig
 			bool done = false;
 			while (!done) {
@@ -471,7 +471,6 @@ void add_rig_if() {
 						else {
 							// Access rig - timer will have been started by rig_if_->open()
 							// Set rig timer callnack
-							rig_if_->callback(cb_rig_timer, cb_freq_to_band);
 							status_->misc_status(ST_OK, rig_if_->success_message().c_str());
 							status_->rig_status(ST_OK, rig_if_->rig_info().c_str());
 							done = true;

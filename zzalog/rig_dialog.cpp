@@ -31,11 +31,9 @@ rig_dialog::rig_dialog(int X, int Y, int W, int H, const char* label) :
 	, selected_rig_if_(RIG_NONE)
 	, fast_poll_interval_(nan(""))
 	, slow_poll_interval_(nan(""))
-	, omnirig_index_(0)
 	, ip_port_(0)
 	, ip_resource_("")
 	, handler_radio_params_(nullptr)
-	, omnirig_grp_(nullptr)
 	, hamlib_grp_(nullptr)
 	, flrig_grp_(nullptr)
 	, norig_grp_(nullptr)
@@ -101,15 +99,6 @@ void rig_dialog::create_form(int X, int Y) {
 	// Group for rig radio buttons: selects the handler type
 	Fl_Group* rig_if_grp = new Fl_Group(X_RIG_RAD, Y_OMNI, WRADIO + WLABEL + GAP, H_OMNI + H_HAMLIB + H_FLRIG + H_NORIG);
 	handler_radio_params_ = new radio_param_t[4];
-	// Radio - select Omnirig
-	Fl_Radio_Round_Button* omnirig_radio = new Fl_Radio_Round_Button(C1_RIG, Y1_OMNI, WRADIO, HTEXT);
-	handler_radio_params_[0] = { (int)RIG_OMNIRIG, (int*)&selected_rig_if_ };
-	omnirig_radio->align(FL_ALIGN_RIGHT);
-	omnirig_radio->callback(cb_rad_handler, (void*)&handler_radio_params_[0]);
-	omnirig_radio->when(FL_WHEN_RELEASE);
-	omnirig_radio->labelsize(FONT_SIZE);
-	omnirig_radio->tooltip("Select Omnirig as the rig interface handler");
-	omnirig_radio->value(selected_rig_if_ == RIG_OMNIRIG);
 
 	// Radio - Select Hamlib
 	Fl_Radio_Round_Button* hamlib_radio = new Fl_Radio_Round_Button(C1_RIG, Y1_HAMLIB, WRADIO, HTEXT);
@@ -120,6 +109,7 @@ void rig_dialog::create_form(int X, int Y) {
 	hamlib_radio->labelsize(FONT_SIZE);
 	hamlib_radio->tooltip("Select Hamlib as the rig interface handler");
 	hamlib_radio->value(selected_rig_if_ == RIG_HAMLIB);
+
 	// Radio - Select Flrig
 	Fl_Radio_Round_Button* flrig_radio = new Fl_Radio_Round_Button(C1_RIG, Y1_FLRIG, WRADIO, HTEXT);
 	handler_radio_params_[2] = { (int)RIG_FLRIG, (int*)&selected_rig_if_ };
@@ -129,6 +119,7 @@ void rig_dialog::create_form(int X, int Y) {
 	flrig_radio->labelsize(FONT_SIZE);
 	flrig_radio->tooltip("Select Flrig as the rig interface handler");
 	flrig_radio->value(selected_rig_if_ == RIG_FLRIG);
+
 	// Radio - Select No Rig
 	Fl_Radio_Round_Button* norig_radio = new Fl_Radio_Round_Button(C1_RIG, Y1_NORIG, WRADIO, HTEXT);
 	handler_radio_params_[3] = { (int)RIG_NONE, (int*)&selected_rig_if_ };
@@ -140,25 +131,6 @@ void rig_dialog::create_form(int X, int Y) {
 	norig_radio->value(selected_rig_if_ == RIG_NONE);
 
 	rig_if_grp->end();
-
-	// Omni rig group
-	omnirig_grp_ = new Fl_Group(X_RIG_RAD, Y_OMNI, WALL, H_OMNI, "Omnirig");
-	omnirig_grp_->labelsize(FONT_SIZE);
-	omnirig_grp_->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
-	omnirig_grp_->box(FL_DOWN_FRAME);
-	// choice - between no rig, rig #1 or rig #2
-	Fl_Choice* rig_num_choice = new Fl_Choice(C2_RIG, Y1_OMNI, 2 * WBUTTON, HTEXT, "Rig\nNumber");
-	rig_num_choice->align(FL_ALIGN_LEFT);
-	rig_num_choice->labelsize(FONT_SIZE);
-	rig_num_choice->textsize(FONT_SIZE);
-	rig_num_choice->tooltip("Select which omnirig radio to use (1 or 2)");
-	rig_num_choice->add("None");
-	rig_num_choice->add("Rig #1");
-	rig_num_choice->add("Rig #2");
-	rig_num_choice->callback(cb_value<Fl_Choice, int>, &omnirig_index_);
-	rig_num_choice->when(FL_WHEN_RELEASE);
-	rig_num_choice->value(omnirig_index_);
-	omnirig_grp_->end();
 
 	// Hamlib group
 	hamlib_grp_ = new Fl_Group(X_RIG_RAD, Y_HAMLIB, WALL, H_HAMLIB, "Hamlib");
@@ -308,12 +280,7 @@ void rig_dialog::create_form(int X, int Y) {
 // Enable the widgets - activate the group associated with each rig handler when that
 // handler is enabled
 void rig_dialog::enable_widgets() {
-	if (selected_rig_if_ == RIG_OMNIRIG) {
-		omnirig_grp_->activate();
-	}
-	else {
-		omnirig_grp_->deactivate();
-	}
+
 	if (selected_rig_if_ == RIG_HAMLIB) {
 		hamlib_grp_->activate();
 	}
@@ -489,12 +456,9 @@ void rig_dialog::cb_bn_all(Fl_Widget* w, void* v) {
 void rig_dialog::load_values() {
 	// Get the handler-independent settings
 	Fl_Preferences rig_settings(settings_, "Rig");
-	rig_settings.get("Handler", (int&)selected_rig_if_, RIG_OMNIRIG);
+	rig_settings.get("Handler", (int&)selected_rig_if_, RIG_FLRIG);
 	rig_settings.get("Polling Interval", fast_poll_interval_, FAST_RIG_DEF);
 	rig_settings.get("Slow Polling Interval", slow_poll_interval_, SLOW_RIG_DEF);
-	// Omnirig settings
-	Fl_Preferences omnirig_settings(rig_settings, "Omnirig");
-	omnirig_settings.get("Rig Number", omnirig_index_, 1);
 	// Hamlib settings
 	Fl_Preferences hamlib_settings(rig_settings, "Hamlib");
 	// Get the rig names from the stations settings
@@ -561,12 +525,7 @@ void rig_dialog::save_values() {
 	rig_settings.set("Handler", selected_rig_if_);
 	rig_settings.set("Polling Interval", fast_poll_interval_);
 	rig_settings.set("Slow Polling Interval", slow_poll_interval_);
-	if (selected_rig_if_ == RIG_OMNIRIG) {
-		// Omnirig settings
-		Fl_Preferences omnirig_settings(rig_settings, "Omnirig");
-		omnirig_settings.set("Rig Number", omnirig_index_);
-	}
-	else if (selected_rig_if_ == RIG_HAMLIB) {
+	if (selected_rig_if_ == RIG_HAMLIB) {
 		save_hamlib_values();
 		// Change current rig
 		Fl_Preferences stations_settings(settings_, "Stations");

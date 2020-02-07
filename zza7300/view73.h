@@ -1,12 +1,16 @@
 #ifndef __VIEW73__
 #define __VIEW73__
 
+#include <string>
+
 #include <FL/Fl_Table_Row.H>
+
+using namespace std;
 
 namespace zza7300 {
 	enum view_type {
 		VT_MEMORIES,
-		VT_PANADAPTER_BANDS,
+		VT_SCOPE_BANDS,
 		VT_USER_BANDS,
 		VT_CW_MESSAGES,
 		VT_RTTY_MESSAGES
@@ -15,7 +19,7 @@ namespace zza7300 {
 	class view73 : public Fl_Table_Row
 	{
 	public:
-		view73(int X, int Y, int W, int H, const char* label);
+		view73(int X, int Y, int W, int H, const char* label = nullptr);
 		~view73();
 		
 	public:
@@ -23,45 +27,39 @@ namespace zza7300 {
 		void type(view_type t);
 		view_type type();
 
+		// inherited from Fl_Table_Row
+		virtual void draw_cell(TableContext context, int R = 0, int C = 0, int X = 0, int Y = 0,
+			int W = 0, int H = 0);
+
 	protected:
-		struct memory {
-			char number[4];
-			char split;
-			char group;
-			char rx_freq[10];
-			char rx_mode[4];
-			char rx_data;
-			char rx_tone;
-			char rx_rptr_tone[6];
-			char rx_rptr_sqlch[6];
-			char tx_freq[10];
-			char tx_mode[4];
-			char tx_data;
-			char tx_tone;
-			char tx_rptr_tone[6];
-			char tx_rptr_sqlch[6];
-			char name[10];
-		};
-		struct pan_band {
-			char lower[6];
-			char upper[6];
-		};
-		struct user_band {
-			char number[2];
-			char lower[10];
-			char upper[10];
-		};
-		struct message {
-			char number[2];
-			char message[70];
-		};
+		// Open one of the views
+		void open_view(view_type t);
+		void draw_memory_view();
+		void draw_scope_bands_view();
+		void draw_user_bands_view();
+		void draw_message_view(bool cw);
+		// Delete the current items
+		void delete_items();
+		// Convert BCD to string
+		string bcd_to_string(string, int decimals);
+		// Convert int to BCD
+		string int_to_bcd(int value, int size);
+		// Convert BCD to int
+		int bcd_to_int(string);
+		// Convert string to hex
+		string string_to_hex(string);
+		// Send command
+		string send_command(unsigned char command, string sub_command);
+		string send_command(unsigned char command, string sub_command, string data);
+		// Define structure to use with each view
+		// The specific view type
 		view_type type_;
-		// table rows
-		int rows_;
-		// table columns
-		int columns_;
-		// Items
-		void* items_;
+		// Items to display
+		string** items_;
+		// Headers
+		string* headers_;
+		// Row headers
+		string* row_headers_;
 	};
 
 }

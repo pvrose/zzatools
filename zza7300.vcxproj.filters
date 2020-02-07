@@ -21,10 +21,10 @@
     <ClCompile Include="..\zzatools\zza7300\view73.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\zzatools\zzalib\serial.cpp">
+    <ClCompile Include="zza7300\main73.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\zzatools\zzalib\utils.cpp">
+    <ClCompile Include="zza7300\rig_dgl73.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -33,6 +33,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\zzatools\zza7300\view73.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zza7300\rig_dgl73.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

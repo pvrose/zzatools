@@ -12,9 +12,12 @@ namespace zza7300 {
 
 	public:
 		// Settings
-		static void cb_mi_settings(Fl_Widget* w, void* v);
+		static void cb_mi_sett_rig(Fl_Widget* w, void* v);
 		// View->view
 		static void cb_mi_view(Fl_Widget* w, void* v);
+
+		// Enable
+		void enable(bool value);
 	};
 }
 
