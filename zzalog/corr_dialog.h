@@ -2,7 +2,7 @@
 #define __CORR_DIALOG__
 
 #include "record.h"
-#include "win_dialog.h"
+#include "../zzalib/win_dialog.h"
 
 #include <string>
 #include <set>

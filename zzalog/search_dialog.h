@@ -1,7 +1,7 @@
 #ifndef __EXTRACT_DIALOG__
 #define __EXTRACT_DIALOG__
 
-#include "win_dialog.h"
+#include "../zzalib/win_dialog.h"
 #include "calendar.h"
 #include "../zzalib/callback.h"
 #include "search.h"

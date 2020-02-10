@@ -1,13 +1,14 @@
 #ifndef __EDIT_DIALOG__
 #define __EDIT_DIALOG__
 
-#include "win_dialog.h"
+#include "../zzalib/win_dialog.h"
 
 #include <string>
 
 #include <FL/Fl_Input.H>
 
 using namespace std;
+using namespace zzalib;
 
 namespace zzalog {
 

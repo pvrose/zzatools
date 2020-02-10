@@ -2,7 +2,7 @@
 #define __STN_DIALOG__
 
 
-#include "page_dialog.h"
+#include "../zzalib/page_dialog.h"
 #include "../zzalib/power_matrix.h"
 
 #include <string>

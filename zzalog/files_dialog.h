@@ -1,7 +1,7 @@
 #ifndef __FILES_DIALOG__
 #define __FILES_DIALOG__
 
-#include "page_dialog.h"
+#include "../zzalib/page_dialog.h"
 #include "intl_widgets.h"
 
 #include <string>

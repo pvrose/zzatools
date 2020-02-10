@@ -1,7 +1,7 @@
 #ifndef __SCRATCHPAD__
 #define __SCRATCHPAD__
 
-#include "win_dialog.h"
+#include "../zzalib/win_dialog.h"
 #include "record.h"
 #include "book.h"
 #include "intl_widgets.h"

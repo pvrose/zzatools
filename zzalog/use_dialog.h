@@ -1,7 +1,7 @@
 #ifndef __USE_DIALOG__
 #define __USE_DIALOG__
 
-#include "win_dialog.h"
+#include "../zzalib/win_dialog.h"
 
 #include <string>
 #include <map>
@@ -9,6 +9,7 @@
 #include <FL/Fl_Widget.H>
 
 using namespace std;
+using namespace zzalib;
 
 namespace zzalog {
 

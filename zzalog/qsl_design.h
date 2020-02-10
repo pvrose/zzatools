@@ -1,7 +1,7 @@
 #ifndef __QSL_DESIGN__
 #define __QSL_DESIGN__
 
-#include "page_dialog.h"
+#include "../zzalib/page_dialog.h"
 #include "qsl_form.h"
 #include "intl_widgets.h"
 

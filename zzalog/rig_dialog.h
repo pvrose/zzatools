@@ -1,7 +1,7 @@
 #ifndef __RIG_DIALOG__
 #define __RIG_DIALOG__
 
-#include "page_dialog.h"
+#include "../zzalib/page_dialog.h"
 #include "../zzalib/rig_if.h"
 
 #include <string>

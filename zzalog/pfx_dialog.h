@@ -3,7 +3,7 @@
 
 #include "prefix.h"
 
-#include "win_dialog.h"
+#include "../zzalib/win_dialog.h"
 #include <vector>
 #include <string>
 
@@ -13,6 +13,7 @@
 #include <FL/Fl_Table_Row.H>
 
 using namespace std;
+using namespace zzalib;
 
 namespace zzalog {
 

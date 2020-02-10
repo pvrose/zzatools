@@ -1,7 +1,7 @@
 #ifndef __WEB_DIALOG__
 #define __WEB_DIALOG__
 
-#include "page_dialog.h"
+#include "../zzalib/page_dialog.h"
 #include "calendar.h"
 #include "../zzalib/callback.h"
 #include "intl_widgets.h"
@@ -13,6 +13,7 @@
 #include <FL/Fl_Group.H>
 
 using namespace std;
+using namespace zzalib;
 
 namespace zzalog {
 

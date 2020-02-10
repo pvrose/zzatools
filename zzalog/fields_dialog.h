@@ -1,7 +1,7 @@
 #ifndef __COLUMN_DIALOG__
 #define __COLUMN_DIALOG__
 
-#include "page_dialog.h"
+#include "../zzalib/page_dialog.h"
 #include "view.h"
 #include "fields.h"
 

@@ -141,7 +141,6 @@
     <ClCompile Include="zzalog\lotw_handler.cpp" />
     <ClCompile Include="zzalog\main.cpp" />
     <ClCompile Include="zzalog\menu.cpp" />
-    <ClCompile Include="zzalog\page_dialog.cpp" />
     <ClCompile Include="zzalog\pfx_data.cpp" />
     <ClCompile Include="zzalog\pfx_dialog.cpp" />
     <ClCompile Include="zzalog\pfx_reader.cpp" />
@@ -169,7 +168,6 @@
     <ClCompile Include="zzalog\use_dialog.cpp" />
     <ClCompile Include="zzalog\view.cpp" />
     <ClCompile Include="zzalog\web_dialog.cpp" />
-    <ClCompile Include="zzalog\win_dialog.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="zzalog\about_dialog.h" />
@@ -203,7 +201,6 @@
     <ClInclude Include="zzalog\log_table.h" />
     <ClInclude Include="zzalog\lotw_handler.h" />
     <ClInclude Include="zzalog\menu.h" />
-    <ClInclude Include="zzalog\page_dialog.h" />
     <ClInclude Include="zzalog\pfx_data.h" />
     <ClInclude Include="zzalog\pfx_dialog.h" />
     <ClInclude Include="zzalog\pfx_reader.h" />
@@ -235,7 +232,6 @@
     <ClInclude Include="zzalog\version.h" />
     <ClInclude Include="zzalog\view.h" />
     <ClInclude Include="zzalog\web_dialog.h" />
-    <ClInclude Include="zzalog\win_dialog.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="zzalog\zzalog.rc" />

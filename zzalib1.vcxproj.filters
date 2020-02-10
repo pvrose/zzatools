@@ -49,6 +49,12 @@
     <ClInclude Include="zzalib\formats.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="zzalib\page_dialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zzalib\win_dialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="zzalib1\serial.cpp" />
@@ -61,5 +67,7 @@
     <ClCompile Include="zzalib\xml_writer.cpp" />
     <ClCompile Include="zzalib\power_matrix.cpp" />
     <ClCompile Include="zzalib\url_handler.cpp" />
+    <ClCompile Include="zzalib\page_dialog.cpp" />
+    <ClCompile Include="zzalib\win_dialog.cpp" />
   </ItemGroup>
 </Project>

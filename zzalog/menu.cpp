@@ -22,7 +22,7 @@
 #include "report_tree.h"
 #include "../zzalib/url_handler.h"
 #include "../zzalib/callback.h"
-#include "page_dialog.h"
+#include "../zzalib/page_dialog.h"
 #include "intl_dialog.h"
 #include "toolbar.h"
 #include "scratchpad.h"
@@ -61,13 +61,13 @@ namespace zzalog {
 	{ "Retrie&ve", 0, menu::cb_mi_file_backup, (void*)true },
 	{ 0 },
 	{ "&Settings", 0, 0, 0, FL_SUBMENU },
-	{ "&Rig", 0, menu::cb_mi_settings, (void*)DLG_RIG },
-	{ "Fi&les", 0, menu::cb_mi_settings, (void*)DLG_FILES },
-	{ "&Web", 0, menu::cb_mi_settings, (void*)DLG_WEB },
-	{ "&Station", 0, menu::cb_mi_settings, (void*)DLG_STATION },
-	{ "&Fields", 0, menu::cb_mi_settings, (void*)DLG_COLUMN },
-	{ "&QSL Design", 0, menu::cb_mi_settings, (void*)DLG_QSL },
-	{ "All", 0, menu::cb_mi_settings, (void*)DLG_ALL },
+	{ "&Rig", 0, menu::cb_mi_settings, (void*)settings::DLG_RIG },
+	{ "Fi&les", 0, menu::cb_mi_settings, (void*)settings::DLG_FILES },
+	{ "&Web", 0, menu::cb_mi_settings, (void*)settings::DLG_WEB },
+	{ "&Station", 0, menu::cb_mi_settings, (void*)settings::DLG_STATION },
+	{ "&Fields", 0, menu::cb_mi_settings, (void*)settings::DLG_COLUMN },
+	{ "&QSL Design", 0, menu::cb_mi_settings, (void*)settings::DLG_QSL },
+	{ "All", 0, menu::cb_mi_settings, (void*)settings::DLG_ALL },
 	{ 0 },
 	{ "&Navigate", 0, 0, 0, FL_SUBMENU },
 	{ "&First", 0, menu::cb_mi_navigate, (void*)(NV_FIRST) },
@@ -483,7 +483,7 @@ void menu::cb_mi_file_backup(Fl_Widget*, void* v) {
 // v is enum cfg_dialog_t indicating which settings page to open at
 void menu::cb_mi_settings(Fl_Widget* w, void* v) {
 	// v provides that id of the page of the settings dialogs to open with
-	cfg_dialog_t active = (cfg_dialog_t)(long)v;
+	settings::cfg_dialog_t active = (settings::cfg_dialog_t)(long)v;
 	// Open the config and wait for it to close
 	settings* config = new settings(WCONFIG, HCONFIG, "Configuration", active);
 }
