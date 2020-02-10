@@ -19,6 +19,7 @@ using namespace zzalib;
 extern spec_data* spec_data_;
 
 
+
 // Creates the about box dialog and displays it.
 about_dialog::about_dialog() :
 	win_dialog(10, 10)
@@ -37,7 +38,7 @@ about_dialog::about_dialog() :
 
 	// Draw the two text boxes - first program ID and versions
 	string program_id = PROGRAM_ID + " " + PROGRAM_VERSION + "\n using ADIF Version " + spec_data_->adif_version() +
-		"\n hamlib version " + rig_version();
+		"\n hamlib version " + rig_version() + "\n zzalib version " + zzalib::LIBRARY_VERSION;
 	string copyright = COPYRIGHT + "\n (Hamlib " + rig_copyright() + ")";
 	int w = W2;
 	int h = 0;

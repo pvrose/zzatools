@@ -1373,7 +1373,9 @@ void menu::cb_mi_info_web(Fl_Widget* w, void* v) {
 // v is not used
 void menu::cb_mi_help_abt(Fl_Widget* w, void* v) {
 	about_dialog* dialog = new about_dialog();
+	add_sub_window(dialog);
 	dialog->display();
+	remove_sub_window(dialog);
 }
 
 // Help->Status->View - display status log file

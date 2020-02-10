@@ -7,21 +7,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="zzalib1\callback.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalib1\drawing.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalib1\serial.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalib1\utils.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalib1\pch.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="zzalib\rig_if.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -55,10 +40,23 @@
     <ClInclude Include="zzalib\win_dialog.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="zzalib\callback.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zzalib\drawing.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zzalib\pch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zzalib\serial.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zzalib\utils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="zzalib1\serial.cpp" />
-    <ClCompile Include="zzalib1\utils.cpp" />
     <ClCompile Include="zzalib\rig_if.cpp" />
     <ClCompile Include="zzalib\rpc_data_item.cpp" />
     <ClCompile Include="zzalib\rpc_handler.cpp" />
@@ -69,5 +67,7 @@
     <ClCompile Include="zzalib\url_handler.cpp" />
     <ClCompile Include="zzalib\page_dialog.cpp" />
     <ClCompile Include="zzalib\win_dialog.cpp" />
+    <ClCompile Include="zzalib\serial.cpp" />
+    <ClCompile Include="zzalib\utils.cpp" />
   </ItemGroup>
 </Project>
