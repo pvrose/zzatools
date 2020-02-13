@@ -695,12 +695,14 @@ string zzalib::to_ascii(string data) {
 }
 // Decode single character
 
-string zzalib::to_hex(unsigned char data) {
+string zzalib::to_hex(unsigned char data, bool add_space /* = true */) {
 	const char lookup[] = "0123456789ABCDEF";
 	string result = "";
 	result += lookup[data / 16];
 	result += lookup[data % 16];
-	result += ' ';
+	if (add_space) {
+		result += ' ';
+	}
 	return result;
 }
 

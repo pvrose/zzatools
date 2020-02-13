@@ -81,12 +81,11 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>C:\Users\pvros\Documents\dev\fltk-1.3.5;C:\Users\pvros\Documents\dev\deps\include;C:\cygwin\home\pvros\dev\Hamlib-master\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\pvros\Documents\dev\zzatools\Debug;C:\Users\pvros\Documents\dev\fltk-1.3.5\lib;C:\cygwin\usr\local\bin;C:\Users\pvros\Documents\dev\curl-7.65.1\builds\libcurl-vc15-x86-release-dll-ipv6-sspi-winssl\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Users\pvros\Documents\dev\fltk-1.3.5;C:\Users\pvros\Documents\dev\deps\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\pvros\Documents\dev\zzatools\Release;C:\Users\pvros\Documents\dev\fltk-1.3.5\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>C:\Users\pvros\Documents\dev\fltk-1.3.5;C:\Users\pvros\Documents\dev\deps\include;C:\Users\pvros\Documents\dev\hamlib-w32-3.3;C:\Users\pvros\Documents\dev\zzatools\Release;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\pvros\Documents\dev\zzatools\Release;C:\Users\pvros\Documents\dev\fltk-1.3.5\lib;C:\Users\pvros\Documents\dev\curl-7.65.1\builds\libcurl-vc15-x86-release-dll-ipv6-sspi-winssl\lib;C:\cygwin\usr\local\bin;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -99,7 +98,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>fltkd.lib;zzalib.lib;libcurl.lib;libhamlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>fltkd.lib;zzalib.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -128,7 +127,7 @@
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>zzalib.lib;fltk.lib;libcurl.lib;libhamlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>zzalib.lib;fltk.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

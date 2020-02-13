@@ -49,8 +49,8 @@ namespace zza7300 {
 		// Convert string to hex
 		string string_to_hex(string);
 		// Send command
-		string send_command(unsigned char command, string sub_command);
-		string send_command(unsigned char command, string sub_command, string data);
+		string send_command(unsigned char command, string sub_command, bool& ok);
+		string send_command(unsigned char command, string sub_command, string data, bool& ok);
 		// Define structure to use with each view
 		// The specific view type
 		view_type type_;
@@ -60,6 +60,8 @@ namespace zza7300 {
 		string* headers_;
 		// Row headers
 		string* row_headers_;
+		// Items valid
+		bool items_valid_;
 	};
 
 }

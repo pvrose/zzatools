@@ -1,4 +1,5 @@
 #include "xml_writer.h"
+#include "utils.h"
 
 #include <FL/fl_ask.H>
 
@@ -169,7 +170,9 @@ string xml_writer::escape_string(string source) {
 		if (is_entity) {
 			result += key;
 		}
-		else {
+		else if (c < '\x20' || c > '\x7f') {
+			result += "&#x" + to_hex(c, false) + ';';
+		} else {
 			result += c;
 		}
 	}

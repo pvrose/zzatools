@@ -15,9 +15,9 @@ using namespace zzalib;
 Fl_Preferences* settings_ = nullptr;
 menu73* menu_ = nullptr;
 view73* view_ = nullptr;
-rig_if* rig_if_ = nullptr;
+extern rig_if* rig_if_;
 Fl_Output* status_ = nullptr;
-url_handler* url_handler_ = nullptr;
+extern url_handler* url_handler_;
 
 Fl_Single_Window* main_window_;
 
@@ -81,12 +81,13 @@ void add_widgets(int& curr_y) {
 	menu_ = new menu73(0, curr_y, WIDTH, MENU_HEIGHT);
 	main_window_->add(menu_);
 	curr_y += menu_->h();
-	curr_y += status_->h();
 	// The main views - this is a set of tabs with each view
 	view_ = new view73(0, curr_y, WIDTH, HEIGHT - curr_y - TOOL_HEIGHT);
 	main_window_->add(view_);
+	curr_y += view_->h();
 	// Status bar - tracks progress.
 	status_ = new Fl_Output(0, curr_y, WIDTH, TOOL_HEIGHT);
+	status_->textsize(FONT_SIZE + 1);
 	main_window_->add(status_);
 	// Display the main window. Don't show it until it's been resized
 	main_window_->end();
@@ -211,6 +212,8 @@ int main(int argc, char** argv)
 	// Connect to the rig
 	rig_if_ = nullptr;
 	add_rig_if();
+
+	view_->type(VT_MEMORIES);
 
 	int code = 0;
 

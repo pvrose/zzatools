@@ -4,10 +4,19 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 16.0.29215.179
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zzalog", "zzalog.vcxproj", "{966FAF00-273A-4788-B38E-C080D6688B78}"
+	ProjectSection(ProjectDependencies) = postProject
+		{CD21D83A-E72B-4A5C-8E96-06F04ACAA391} = {CD21D83A-E72B-4A5C-8E96-06F04ACAA391}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zzaportm", "zzaportm.vcxproj", "{8C42177D-AA73-40EA-862F-C1F0CE8C1952}"
+	ProjectSection(ProjectDependencies) = postProject
+		{CD21D83A-E72B-4A5C-8E96-06F04ACAA391} = {CD21D83A-E72B-4A5C-8E96-06F04ACAA391}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zza7300", "zza7300.vcxproj", "{EF5CE8BB-26A9-476D-A039-8E9E8401FB15}"
+	ProjectSection(ProjectDependencies) = postProject
+		{CD21D83A-E72B-4A5C-8E96-06F04ACAA391} = {CD21D83A-E72B-4A5C-8E96-06F04ACAA391}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zzalib", "zzalib1.vcxproj", "{CD21D83A-E72B-4A5C-8E96-06F04ACAA391}"
 EndProject

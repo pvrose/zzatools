@@ -1,5 +1,5 @@
 /*
-ZZALOG - Amateur Radio Log
+zzalib - Amateur Radio Log
 © - Copyright 2017, Philip Rose, GM3ZZA
 All Rights Reserved
 
@@ -26,8 +26,8 @@ namespace zzalib {
 
 	// Tip display - 2 seconds
 	const double TIP_SHOW = 2.0;
-	// Library version
-	const string LIBRARY_VERSION = "1.0.1";
+
+	const string LIBRARY_VERSION = "1.0.0";
 
 	// Split a text line into separate "words" on separator
 	void split_line(const string& line, vector<string>& words, const char separator);
@@ -75,7 +75,7 @@ namespace zzalib {
 	// Encode hex
 	string to_ascii(string data);
 	// Decode single ch aracter
-	string to_hex(unsigned char data, bool add_space = true);
+	string to_hex(unsigned char data);
 	// Encode single character - starting at data[ix] and incrementing ix to end of it.
 	unsigned char to_ascii(string data, int& ix);
 

@@ -35,6 +35,7 @@ rig_if::rig_if()
 	on_timer_ = nullptr;
 	freq_to_band_ = nullptr;
 	error = default_error_message;
+	have_freq_to_band_ = false;
 }
 
 // Base class destructor
@@ -181,9 +182,13 @@ double rig_if::power() {
 	double my_drive = drive();
 	double my_freq = tx_frequency();
 	// Get the band
-	string band = freq_to_band_(my_freq / 1000000);
-	return power_lookup_->power(band, (int)my_drive);
-	return my_drive;
+	if (have_freq_to_band_) {
+		string band = freq_to_band_(my_freq / 1000000);
+		return power_lookup_->power(band, (int)my_drive);
+	}
+	else {
+		return my_drive;
+	}
 }
 
 // Rig timer callback
@@ -261,6 +266,12 @@ void rig_if::callback(void(*function)(), string(*spec_func)(double), void(*mess_
 	on_timer_ = function;
 	freq_to_band_ = spec_func;
 	error = mess_func;
+	if (spec_func) {
+		have_freq_to_band_ = true;
+	}
+	else {
+		have_freq_to_band_ = false;
+	}
 }
 
 // Default message function
@@ -789,7 +800,7 @@ string rig_flrig::raw_message(string message) {
 	param.set(message, XRT_STRING);
 	params.clear();
 	params.push_back(&param);
-	if (do_request("cat_string", &params, &response)) {
+	if (do_request("rig.cat_string", &params, &response)) {
 		return response.get_string();
 	}
 	else {

@@ -24,7 +24,7 @@ xml_reader::xml_reader()
 	entities_["&amp;"] = "&";
 	entities_["&gt;"] = ">";
 	entities_["&apos;"] = "'";
-	entities_["&quot;"] = """";
+	entities_["&quot;"] = "\"\"";
 }
 
 // Destructor

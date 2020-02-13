@@ -44,7 +44,6 @@ bool rpc_handler::do_request(
 		bool rpc_fault;
 		decode_response(put_response, response, rpc_fault);
 		if (rpc_fault) {
-			// Display reeceived response
 			return false;
 		}
 		else {
@@ -223,7 +222,7 @@ bool rpc_handler::decode_response(istream& response_xml, rpc_data_item* response
 	reader->parse(response_xml);
 	// Get the outer XML: element - it should be <methodResponse>
 	xml_element* top_element = reader->element();
-	if (top_element == nullptr || to_upper(top_element->name()) != "METHODRESPONSE") {
+	if (top_element == nullptr || top_element->name() != "methodResponse") {
 		// Bad or incorrect XML received
 		fl_alert("XML_RPC: XML reader has not decoded XML or top-level != methodResponse");
 		delete reader;
@@ -244,7 +243,7 @@ bool rpc_handler::decode_request(istream& request_xml, string& method_name, rpc_
 	reader->parse(request_xml);
 	// Get the outer XML element - it should be <methodCall>
 	xml_element* top_element = reader->element();
-	if (top_element == nullptr || to_upper(top_element->name()) != "METHODCALL") {
+	if (top_element == nullptr || top_element->name() != "methodCall") {
 		// bad or incorrect XML received
 		fl_alert("XML_RPC: XML reader has not decoded XML or top-level != methodCall");
 		delete reader;
@@ -261,7 +260,6 @@ bool rpc_handler::decode_request(istream& request_xml, string& method_name, rpc_
 bool rpc_handler::decode_xml_element(rpc_element_t element_type, xml_element* element, string& method_name, rpc_data_item::rpc_list* items) {
 	xml_element* child_element;
 	string child_name;
-	string upper_name;
 	bool xml_ok = true;
 	string error_message = "";
 	bool dummy = false;
@@ -274,9 +272,8 @@ bool rpc_handler::decode_xml_element(rpc_element_t element_type, xml_element* el
 				// Get the element
 				child_element = element->child(i);
 				child_name = child_element->name();
-				upper_name = to_upper(child_name);
 				// Element is <methodName>
-				if (upper_name == "METHODNAME") {
+				if (child_name == "methodName") {
 					// Get the element
 					rpc_data_item* name_item = new rpc_data_item;
 					xml_ok = decode_xml_element(XRP_METHODNAME, child_element, name_item, dummy);
@@ -288,7 +285,7 @@ bool rpc_handler::decode_xml_element(rpc_element_t element_type, xml_element* el
 						error_message = "Failed to decode request method name";
 					}
 				}
-				else if (upper_name == "PARAMS") {
+				else if (child_name == "params") {
 					// Get the element
 					string dummy_string;
 					xml_ok = decode_xml_element(XRP_PARAMS, child_element, dummy_string, items);
@@ -310,9 +307,8 @@ bool rpc_handler::decode_xml_element(rpc_element_t element_type, xml_element* el
 			// Get element
 			child_element = element->child(i);
 			child_name = child_element->name();
-			upper_name = to_upper(child_name);
 			rpc_data_item* item = new rpc_data_item;
-			if (upper_name == "PARAM") {
+			if (child_name == "param") {
 				// Decode <param> element
 				xml_ok = decode_xml_element(XRP_PARAM, child_element, item, dummy);
 				if (xml_ok) {
@@ -341,7 +337,6 @@ bool rpc_handler::decode_xml_element(rpc_element_t element_type, xml_element* el
 bool rpc_handler::decode_xml_element(rpc_element_t element_type, xml_element* element, rpc_data_item* item, bool& rpc_fault) {
 	xml_element* child_element;
 	string child_name;
-	string upper_name;
 	bool xml_ok = true;
 	string error_message = "";
 	bool dummy;
@@ -351,12 +346,11 @@ bool rpc_handler::decode_xml_element(rpc_element_t element_type, xml_element* el
 		if (element->count() == 1) {
 			child_element = element->child(0);
 			child_name = child_element->name();
-			upper_name = to_upper(child_name);
-			if (upper_name == "PARAMS") {
+			if (child_name == "params") {
 				xml_ok = decode_xml_element(XRP_PARAMS, child_element, item, dummy);
 				rpc_fault = false;
 			}
-			else if (upper_name == "FAULT") {
+			else if (child_name == "fault") {
 				xml_ok = decode_xml_element(XRP_FAULT, child_element, item, dummy);
 				rpc_fault = true;
 			}
@@ -376,8 +370,7 @@ bool rpc_handler::decode_xml_element(rpc_element_t element_type, xml_element* el
 		if (element->count() == 1) {
 			child_element = element->child(0);
 			child_name = child_element->name();
-			upper_name = to_upper(child_name);
-			if (upper_name == "PARAM") {
+			if (child_name == "param") {
 				// Get the single <param> element
 				xml_ok = decode_xml_element(XRP_PARAM, child_element, item, dummy);
 			}
@@ -392,15 +385,19 @@ bool rpc_handler::decode_xml_element(rpc_element_t element_type, xml_element* el
 		}
 		break;
 	case XRP_FAULT:
-		// Only 1 item expected
+		// Only 1 item expected - a struct containg an int faultCode and a string faultString
 		if (element->count() == 1) {
 			child_element = element->child(0);
 			child_name = child_element->name();
-			upper_name = to_upper(child_name);
 			rpc_data_item* item = new rpc_data_item;
-			if (upper_name == "VALUE") {
+			if (child_name == "value") {
 				// get the single <value> element
-				xml_ok = decode_xml_element(XRP_PARAM, child_element, item, dummy);
+				xml_ok = decode_xml_element(XRP_VALUE, child_element, item, dummy);
+				// Display reeceived response
+				rpc_data_item::rpc_struct* fault = item->get_struct();
+				int fault_code = fault->at("faultCode")->get_int();
+				string fault_string = fault->at("faultString")->get_string();
+				fl_alert("RPC FAULT: %d: %s", fault_code, fault_string.c_str());
 			}
 			else {
 				xml_ok = false;
@@ -417,8 +414,7 @@ bool rpc_handler::decode_xml_element(rpc_element_t element_type, xml_element* el
 		if (element->count() == 1) {
 			child_element = element->child(0);
 			child_name = child_element->name();
-			upper_name = to_upper(child_name);
-			if (upper_name == "VALUE") {
+			if (child_name == "value") {
 				// get the single <value> element
 				xml_ok = decode_xml_element(XRP_VALUE, child_element, item, dummy);
 			}
@@ -443,29 +439,28 @@ bool rpc_handler::decode_xml_element(rpc_element_t element_type, xml_element* el
 		else if (element->count() == 1) {
 			child_element = element->child(0);
 			child_name = child_element->name();
-			upper_name = to_upper(child_name);
-			if (upper_name == "BOOLEAN") {
+			if (child_name == "boolean") {
 				xml_ok = decode_xml_element(XRP_BOOLEAN, child_element, item, dummy);
 			}
-			else if (upper_name == "INT" || upper_name == "I4") {
+			else if (child_name == "int" || child_name == "i4") {
 				xml_ok = decode_xml_element(XRP_INT, child_element, item, dummy);
 			}
-			else if (upper_name == "DOUBLE") {
+			else if (child_name == "double") {
 				xml_ok = decode_xml_element(XRP_DOUBLE, child_element, item, dummy);
 			}
-			else if (upper_name == "STRING") {
+			else if (child_name == "string") {
 				xml_ok = decode_xml_element(XRP_STRING, child_element, item, dummy);
 			}
-			else if (upper_name == "DATETIME.ISO8601") {
+			else if (child_name == "dateTime.iso8601") {
 				xml_ok = decode_xml_element(XRP_DATETIME, child_element, item, dummy);
 			}
-			else if (upper_name == "BASE64") {
+			else if (child_name == "base64") {
 				xml_ok = decode_xml_element(XRP_BASE64, child_element, item, dummy);
 			}
-			else if (upper_name == "ARRAY") {
+			else if (child_name == "array") {
 				xml_ok = decode_xml_element(XRP_ARRAY, child_element, item, dummy);
 			}
-			else if (upper_name == "STRUCT") {
+			else if (child_name == "struct") {
 				xml_ok = decode_xml_element(XRP_STRUCT, child_element, item, dummy);
 			}
 			else {
@@ -589,8 +584,7 @@ bool rpc_handler::decode_xml_element(rpc_element_t element_type, xml_element* el
 		if (element->count() == 1) {
 			child_element = element->child(0);
 			child_name = child_element->name();
-			upper_name = to_upper(child_name);
-			if (upper_name == "DATA") {
+			if (child_name == "data") {
 				xml_ok = decode_xml_element(XRP_DATA, child_element, item, dummy);
 			}
 			else {
@@ -609,8 +603,7 @@ bool rpc_handler::decode_xml_element(rpc_element_t element_type, xml_element* el
 			// Get the element
 			child_element = element->child(i);
 			child_name = child_element->name();
-			upper_name = to_upper(child_name);
-			if (upper_name == "VALUE") {
+			if (child_name == "value") {
 				// Decode it
 				rpc_data_item* sub_item = new rpc_data_item;
 				xml_ok = decode_xml_element(XRP_VALUE, child_element, sub_item, dummy);
@@ -631,8 +624,7 @@ bool rpc_handler::decode_xml_element(rpc_element_t element_type, xml_element* el
 		for (int i = 0; i < element->count() && xml_ok; i++) {
 			child_element = element->child(i);
 			child_name = child_element->name();
-			upper_name = to_upper(child_name);
-			if (upper_name == "MEMBER") {
+			if (child_name == "member") {
 				xml_ok = decode_xml_element(XRP_MEMBER, child_element, item, dummy);
 			}
 			else {
@@ -649,11 +641,10 @@ bool rpc_handler::decode_xml_element(rpc_element_t element_type, xml_element* el
 			for (int i = 0; i < 2 && xml_ok; i++) {
 				child_element = element->child(i);
 				child_name = child_element->name();
-				upper_name = to_upper(child_name);
-				if (upper_name == "NAME") {
+				if (child_name == "name") {
 					xml_ok = decode_xml_element(XRP_NAME, child_element, name_item, dummy);
 				}
-				else if (upper_name == "VALUE") {
+				else if (child_name == "value") {
 					xml_ok = decode_xml_element(XRP_VALUE, child_element, sub_item, dummy);
 				}
 			}
@@ -662,6 +653,24 @@ bool rpc_handler::decode_xml_element(rpc_element_t element_type, xml_element* el
 				delete name_item;
 			}
 		}
+		else {
+			xml_ok = false;
+			error_message = "Expected 2 elemnts - got " + to_string(element->count());
+		}
+		break;
+	case XRP_NAME:
+		// Expect no elements
+		if (element->count() == 0) {
+			// Use special DEFAULT data type to cope with lazy servers that use it 
+			// for numerical data-types as well.
+			string content = element->content();
+			item->set(content, XRT_STRING);
+		}
+		else {
+			xml_ok = false;
+			error_message = to_string(element->count()) + " children found when a value expected";
+		}
+		break;
 	default:
 		// Cannot use this methods containing only a single item
 		xml_ok = false;

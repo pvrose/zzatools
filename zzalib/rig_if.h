@@ -131,6 +131,8 @@ namespace zzalib {
 		// Display message
 		void(*error)(bool ok, const char* message);
 		static void default_error_message(bool ok, const char* message);
+		// bool
+		bool have_freq_to_band_;
 
 
 	};

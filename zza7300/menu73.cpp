@@ -1,5 +1,6 @@
 #include "menu73.h"
 #include "view73.h"
+#include "rig_dgl73.h"
 #include "../zzalib/drawing.h"
 #include "../zzalib/utils.h"
 
@@ -9,6 +10,7 @@ using namespace zza7300;
 using namespace zzalib;
 
 extern view73* view_;
+extern void add_rig_if();
 
 Fl_Menu_Item items_[] = {
 	{ "Settings", 'S', nullptr, nullptr, FL_SUBMENU},
@@ -19,7 +21,7 @@ Fl_Menu_Item items_[] = {
 		{ "Scope Edge Bands", 'S', menu73::cb_mi_view, (void*)VT_SCOPE_BANDS},
 		{ "User Bands", 'U', menu73::cb_mi_view, (void*)VT_USER_BANDS},
 		{ "CW Messages", 'C', menu73::cb_mi_view, (void*)VT_CW_MESSAGES},
-		{ "RTTP Messages", 'R', menu73::cb_mi_view, (void*)VT_RTTY_MESSAGES},
+		{ "RTTY Messages", 'R', menu73::cb_mi_view, (void*)VT_RTTY_MESSAGES},
 		{ 0 },
 	{ 0 }
 };
@@ -31,9 +33,14 @@ menu73::menu73(int X, int Y, int W, int H, const char* label) : Fl_Menu_Bar(X, Y
 	textsize(FONT_SIZE + 1);
 }
 
+menu73::~menu73() {};
+
 // Settings
 void menu73::cb_mi_sett_rig(Fl_Widget* w, void* v) {
-	// To do open settings dialog
+	rig_dlg73* dialog = new rig_dlg73(100, 200, "Rig settings");
+	if (dialog->display() == BN_OK) {
+		add_rig_if();
+	}
 }
 
 // View->item
@@ -41,4 +48,20 @@ void menu73::cb_mi_sett_rig(Fl_Widget* w, void* v) {
 void menu73::cb_mi_view(Fl_Widget* w, void* v) {
 	view_type type = (view_type)(long)v;
 	view_->type(type);
+}
+
+// Enable/disable menu 
+// active: false = disable all; true = enable those which can be enabled
+void menu73::enable(bool active) {
+	// For all menu items
+	for (int i = 0; i < size(); i++) {
+		if (active) {
+			// enable item
+			mode(i, mode(i) & ~FL_MENU_INACTIVE);
+		}
+		else {
+			// disable item
+			mode(i, mode(i) | FL_MENU_INACTIVE);
+		}
+	}
 }
