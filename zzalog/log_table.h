@@ -72,6 +72,8 @@ namespace zzalog {
 		int last_rootx_;
 		// The last Y position (wrt screen)
 		int last_rooty_;
+		// Alt GR is currently pressed
+		bool alt_gr_;
 		// field aplication
 		field_ordering_t application_;
 		// Rows per page

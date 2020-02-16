@@ -44,6 +44,7 @@ log_table::log_table(int X, int Y, int W, int H, const char* label, field_orderi
 	rows_per_page_ = 0;
 	order_ = FIRST_TO_LAST;
 	edit_dialog_ = nullptr;
+	alt_gr_ = false;
 
 	// Set the various fixed attributes of the table
 	type(SELECT_SINGLE);
@@ -142,6 +143,29 @@ int log_table::handle(int event) {
 	last_rooty_ = Fl::event_y_root();
 	last_button_ = Fl::event_button();
 	last_clicks_ = Fl::event_clicks();
+	int real_event;
+	if (alt_gr_) {
+		switch (Fl::event_key()) {
+		case FL_Left:
+			real_event = FL_Home;
+			break;
+		case FL_Right:
+			real_event = FL_End;
+			break;
+		case FL_Up:
+			real_event = FL_Page_Up;
+			break;
+		case FL_Down:
+			real_event = FL_Page_Down;
+			break;
+		default: 
+			real_event = Fl::event_key();
+			break;
+		}
+	}
+	else {
+		real_event = Fl::event_key();
+	}
 	switch (event) {
 	case FL_FOCUS:
 	case FL_UNFOCUS:
@@ -150,7 +174,7 @@ int log_table::handle(int event) {
 		return true;
 	case FL_KEYBOARD:
 		// Keyboard event - used for keyboard navigation
-		switch (Fl::event_key()) {
+		switch (real_event) {
 		case FL_Home:
 			// HOME - Go->first
 			my_book_->selection(0);
@@ -206,6 +230,15 @@ int log_table::handle(int event) {
 				// The lower of the one page above where we are or last record
 				my_book_->selection(min(my_book_->selection() + rows_per_page_, my_book_->size() - 1));
 			}
+			return true;
+		case FL_Alt_R:
+			alt_gr_ = true;
+			return true;
+		}
+		break;
+	case FL_KEYUP:
+		if (Fl::event_key() == FL_Alt_R) {
+			alt_gr_ = false;
 			return true;
 		}
 		break;
