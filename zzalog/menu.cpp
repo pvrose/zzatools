@@ -128,6 +128,11 @@ namespace zzalog {
 	{ "Clea&r", 0, menu::cb_mi_ext_clr, 0 },
 	{ "&Criteria", 0, menu::cb_mi_ext_crit, 0 },
 	{ "Re&do", 0, menu::cb_mi_ext_redo, 0 },
+	{ "&Quick", 0, 0, 0, FL_SUBMENU },
+	{ "No &Name", 0, menu::cb_mi_ext_special, (void*)extract_data::NO_NAME },
+	{ "No &QTH", 0, menu::cb_mi_ext_special, (void*)extract_data::NO_QTH },
+	{ "Small &Locator", 0, menu::cb_mi_ext_special, (void*)extract_data::LOCATOR },
+	{ 0 },
 	{ "&Display", 0, menu::cb_mi_ext_disp, 0, FL_MENU_DIVIDER },
 	{ "e&QSL", 0, menu::cb_mi_ext_qsl, (void*)extract_data::EQSL },
 	{ "&LotW", 0, menu::cb_mi_ext_qsl, (void*)extract_data::LOTW },
@@ -1127,6 +1132,16 @@ void menu::cb_mi_ext_qsl(Fl_Widget* w, void* v) {
 	// v passes the particular option
 	that->qsl_type_ = (extract_data::extract_mode_t)(long)v;
 	extract_records_->extract_qsl(that->qsl_type_);
+	navigation_book_ = extract_records_;
+}
+
+// Extract->Quick->* - one-click for specific searches
+// v is enum extract_mode_t: NO_NAME, NO_QTH or (inadequate) LOCATOR
+void menu::cb_mi_ext_special(Fl_Widget* w, void* v) {
+	menu* that = (menu*)w;
+	// v passes the particular option
+	extract_data::extract_mode_t reason = (extract_data::extract_mode_t)(long)v;
+	extract_records_->extract_special(reason);
 	navigation_book_ = extract_records_;
 }
 

@@ -43,7 +43,8 @@ namespace zzalog {
 			AQ_ALL,        // Display all records
 			AQ_SEARCH,     // Display extracted records
 			AQ_DAYS,       // Display most recent days
-			AQ_QSOS        // Display most recent QSOs
+			AQ_QSOS,       // Display most recent QSOs
+			AQ_YEAR        // Year to date
 		};
 		// DX Atlas - Colour selection radio button
 		enum colour_bn_t {
@@ -150,6 +151,8 @@ namespace zzalog {
 		void centre_map(lat_long_t centre);
 		// Zoom to centre
 		void zoom_centre(lat_long_t centre, bool full);
+		// Label colour group
+		void label_colour_grp();
 
 
 	protected:

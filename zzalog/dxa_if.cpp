@@ -191,6 +191,7 @@ void dxa_if::create_form() {
 	ch11->add("Extracted QSOs");
 	ch11->add("QSOs on recent days");
 	ch11->add("Recent QSOs");
+	ch11->add("Year to date");
 	ch11->value((int)qso_display_);
 	ch11->tooltip("Select which QSOs to display");
 	// Input - Number of days or QSOs
@@ -318,13 +319,14 @@ void dxa_if::create_form() {
 	const int WWIN = EDGE + WGRP_1 + EDGE;
 
 	// Group to contain the buttons displaying the colours
-	colour_grp_ = new Fl_Group(EDGE, HGRP_1 + GAP, WGRP_1, HTEXT, "Colour legend");
+	colour_grp_ = new Fl_Group(EDGE, HGRP_1 + GAP, WGRP_1, HTEXT);
+	label_colour_grp();
 	colour_grp_->box(FL_THIN_DOWN_BOX);
 	colour_grp_->labelfont(FONT);
 	colour_grp_->labelsize(FONT_SIZE);
 	colour_grp_->align(FL_ALIGN_TOP | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
 	
-	Fl_Button* bn_set_all = new Fl_Button(EDGE + GAP+ WBUTTON + WBUTTON, colour_grp_->y() + GAP, WBUTTON, HBUTTON, "Set all");
+	Fl_Button* bn_set_all = new Fl_Button(EDGE + GAP+ WBUTTON + WBUTTON, colour_grp_->y() + HTEXT, WBUTTON, HBUTTON, "Set all");
 	bn_set_all->labelfont(FONT);
 	bn_set_all->labelsize(FONT_SIZE);
 	bn_set_all->align(FL_ALIGN_CENTER);
@@ -455,6 +457,7 @@ void dxa_if::cb_ch_colour(Fl_Widget* w, void* v) {
 	// get value
 	cb_value<Fl_Choice, int>(w, &that->atlas_colour_);
 	// Redraw data
+	that->label_colour_grp();
 	that->get_records();
 	that->get_colours(true);
 	that->draw_pins();
@@ -1010,7 +1013,7 @@ void dxa_if::create_colour_buttons() {
 	int button_todo = num_colours;
 	for (int r = 0; r < num_rows; r++) {
 		for (int c = 0; c < num_cols && button_num < num_colours; c++) {
-			Fl_Button* bn = new Fl_Button(colour_grp_->x() + (c * WBUTTON) + GAP, (r * HBUTTON) + HBUTTON + colour_grp_->y() + GAP, WBUTTON, HBUTTON);
+			Fl_Button* bn = new Fl_Button(colour_grp_->x() + (c * WBUTTON) + GAP, (r * HBUTTON) + HBUTTON + colour_grp_->y() + HTEXT, WBUTTON, HBUTTON);
 			bn->box(FL_BORDER_BOX);
 			bn->labelfont(FONT);
 			bn->labelsize(FONT_SIZE);
@@ -1137,6 +1140,17 @@ void dxa_if::get_records() {
 		for (size_t i = book_->size() - 1, j = 0; j < most_recent_count_; i--, j++) {
 			record_nums.insert(i);
 		}
+		break;
+
+	case AQ_YEAR:
+		// Get all records in the current year to date
+		if (book_->size()) {
+			string this_year = now(false, "%Y");
+			for (size_t i = book_->size() - 1; book_->get_record(i, false)->item("QSO_DATE").substr(0, 4) == this_year; i--) {
+				record_nums.insert(i);
+			}
+		}
+		break;
 	}
 
 	// now see if QSOs, DXCCs or zones
@@ -1581,6 +1595,23 @@ void dxa_if::centre_map() {
 		break;
 	}
 	save_values();
+}
+
+void dxa_if::label_colour_grp() {
+	switch (atlas_colour_) {
+	case AC_NONE:
+		colour_grp_->label("Colour legend");
+		break;
+	case AC_BANDS:
+		colour_grp_->label("Colour legend - band");
+		break;
+	case AC_LOGMODE:
+		colour_grp_->label("Colour legend - logged mode");
+		break;
+	case AC_AWARDMODE:
+		colour_grp_->label("Colour legend - award mode");
+		break;
+	}
 }
 
 #endif // _WIN32

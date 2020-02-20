@@ -393,6 +393,96 @@ void extract_data::extract_qsl(extract_data::extract_mode_t server) {
 		selection(0, HT_EXTRACTION);
 	}
 }
+// Extract records for special fixed criteria
+void extract_data::extract_special(extract_data::extract_mode_t reason) {
+	search_criteria_t new_criteria;
+	string reason_name;
+	switch (reason) {
+	case NO_NAME:
+		// Extract those records not sent to QSL server !(*QSL_SENT==Y) 
+		new_criteria = {
+			/*search_cond_t condition*/ XC_FIELD,
+			/*bool by_regex*/ false,
+			/*bool by_dates*/ false,
+			/*string from_date*/"",
+			/*string to_date;*/"",
+			/*string band;*/ "Any",
+			/*string mode;*/ "Any",
+			/*bool confirmed_eqsl;*/ false,
+			/*bool confirmed_lotw;*/ false,
+			/*bool confirmed_card;*/ false,
+			/*search_combi_t combi_mode;*/ XM_NEW,
+			/*bool negate_results;*/ false,
+			/*string field_name; */ "NAME",
+			/*string pattern;*/ ""
+		};
+		reason_name = "missing name";
+		break;
+	case NO_QTH:
+		// Extract those records not sent to QSL server !(*QSL_SENT==Y) 
+		new_criteria = {
+			/*search_cond_t condition*/ XC_FIELD,
+			/*bool by_regex*/ false,
+			/*bool by_dates*/ false,
+			/*string from_date*/"",
+			/*string to_date;*/"",
+			/*string band;*/ "Any",
+			/*string mode;*/ "Any",
+			/*bool confirmed_eqsl;*/ false,
+			/*bool confirmed_lotw;*/ false,
+			/*bool confirmed_card;*/ false,
+			/*search_combi_t combi_mode;*/ XM_NEW,
+			/*bool negate_results;*/ false,
+			/*string field_name; */ "QTH",
+			/*string pattern;*/ ""
+		};
+		reason_name = "missing QTH";
+		break;
+	case LOCATOR:
+		// Extract those records not sent to QSL server !(*QSL_SENT==Y) 
+		new_criteria = {
+			/*search_cond_t condition*/ XC_FIELD,
+			/*bool by_regex*/ true,
+			/*bool by_dates*/ false,
+			/*string from_date*/"",
+			/*string to_date;*/"",
+			/*string band;*/ "Any",
+			/*string mode;*/ "Any",
+			/*bool confirmed_eqsl;*/ false,
+			/*bool confirmed_lotw;*/ false,
+			/*bool confirmed_card;*/ false,
+			/*search_combi_t combi_mode;*/ XM_NEW,
+			/*bool negate_results;*/ true,
+			/*string field_name; */ "GRIDSQUARE",
+			/*string pattern;*/ "[A-R]{2}[0-9]{2}[A-X]{2}([0-9]{2})?"
+		};
+		reason_name = "with insufficient locator";
+		break;
+	default:
+		status_->misc_status(ST_ERROR, "EXTRACT: Unknown special extract");
+		break;
+	}
+	criteria(new_criteria);
+	if (size() == 0) {
+		// No records match these criteria
+		status_->misc_status(ST_WARNING, "EXTRACT: No records match quick extract");
+		tabbed_view_->activate_pane(OT_MAIN, true);
+		// Select most recent QSO
+		book_->selection(book_->size() - 1, HT_EXTRACTION);
+	}
+	else {
+		// Records match
+		char format[] = "EXTRACT: %d records extracted %s";
+		char* message = new char[strlen(format) + reason_name.length() + 10];
+		sprintf(message, format, size(), reason_name.c_str());
+		status_->misc_status(ST_OK, message);
+		delete[] message;
+		tabbed_view_->activate_pane(OT_EXTRACT, true);
+		// Select first extracted record
+		selection(0, HT_EXTRACTION);
+	}
+}
+
 
 // Upload the extracted data
 void extract_data::upload() {

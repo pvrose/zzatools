@@ -24,7 +24,11 @@ namespace zzalog {
 			EQSL,        // upload to eQSL.cc
 			LOTW,        // upload to arrl.org/LotW
 			CARD,        // printing cards.
-			CLUBLOG      // upload to ClubLog
+			CLUBLOG,     // upload to ClubLog
+			NO_NAME,     // Special search for empty NAME item
+			NO_QTH,      // Special search for empty QTH item
+			LOCATOR,     // Special seatch for non-6 or 8 character gridsquare
+			DUMMY        // end of enumeration
 		};
 
 		extract_data();
@@ -46,6 +50,8 @@ namespace zzalog {
 		void add_record(record_num_t record_num);
 		// Sort records by filed_name
 		void sort_records(string field_name, bool reverse);
+		// Special extract (NO_NAME, NO_QTH, LOCATOR_4)
+		void extract_special(extract_mode_t reason);
 
 		// return the real record number
 		virtual record_num_t record_number(record_num_t item);
