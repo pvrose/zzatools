@@ -647,10 +647,11 @@ string view73::send_command(unsigned char command, string sub_command, bool& ok)
 string view73::send_command(unsigned char command, string sub_command, string data, bool& ok) {
 	ok = true;
 	if (rig_if_) {
-		string to_send = "\xfe\xfe\x94\xe0";
-		to_send += command;
-		to_send += sub_command + data;
-		to_send += '\xfd';
+		string to_send = "xFE xFE x94 xE0 ";
+		string cmd = "";
+		cmd += (char)command;
+		to_send += hex_to_string(cmd + sub_command + data);
+		to_send += "xFD";
 
 		string raw_data = rig_if_->raw_message(to_send);
 
@@ -707,6 +708,17 @@ string view73::string_to_hex(string data) {
 		result[ix++] = hex_chars[(c >> 4)];
 		result[ix++] = hex_chars[(c & '\x0f')];
 		result[ix++] = ' ';
+	}
+	return result;
+}
+
+string view73::hex_to_string(string data) {
+	string result;
+	// For the length of the source striing
+	for (size_t i = 0; i < data.length(); i++) {
+		char c = data[i];
+		// Append either the entity string or the original character
+		result += "x" + to_hex(c, true);
 	}
 	return result;
 }

@@ -302,7 +302,7 @@ void menu::cb_mi_file_new(Fl_Widget* w, void* v) {
 	// Clear any extracted data as there are no records to reference
 	extract_records_->clear_criteria();
 	set_recent_file("");
-	navigation_book_ = book_;
+	tabbed_view_->activate_pane(OT_MAIN, true);
 	book_->navigate(NV_FIRST);
 }
 
@@ -367,7 +367,7 @@ void menu::cb_mi_file_open(Fl_Widget* w, void* v) {
 		if (book_->load_data(filename)) {
 			// Set off-air logging, clear any search results, select last entry
 			that->logging(LM_OFF_AIR);
-			navigation_book_ = book_;
+			tabbed_view_->activate_pane(OT_MAIN, true);
 			book_->navigate(NV_LAST);
 			// Set the filename in the window title and recent file list
 			main_window_label(filename);
@@ -781,7 +781,7 @@ void menu::cb_mi_log_mode(Fl_Widget* w, void* v) {
 		break;
 	case LM_IMPORTED:
 		// Reset navigation mode
-		navigation_book_ = book_;
+		tabbed_view_->activate_pane(OT_MAIN, true);
 		// start import_process
 		status_->misc_status(ST_NOTE, "LOGGING: Mode set to auto-import from data modems");
 		import_data_->start_auto_update();
@@ -834,7 +834,7 @@ void menu::cb_mi_log_view(Fl_Widget* w, void* v) {
 void menu::cb_mi_log_new(Fl_Widget* w, void* v) {
 	menu* that = ancestor_view<menu>(w);
 	// Force main log book
-	navigation_book_ = book_;
+	tabbed_view_->activate_pane(OT_MAIN, true);
 	// Create a new record - on or off-air
 	book_->new_record(that->logging());
 	// Open log view
@@ -1061,7 +1061,6 @@ void menu::cb_mi_imp_merge(Fl_Widget* w, void* v) {
 void menu::cb_mi_imp_cancel(Fl_Widget* w, void* v) {
 	// Delete the import records
 	import_data_->delete_contents(false);
-	navigation_book_ = book_;
 	tabbed_view_->activate_pane(OT_MAIN, true);
 	navigation_book_->selection(0, HT_ALL);
 }
@@ -1071,7 +1070,6 @@ void menu::cb_mi_imp_cancel(Fl_Widget* w, void* v) {
 // clear the criteria and display the log book
 void menu::cb_mi_ext_clr(Fl_Widget* w, void* v) {
 	extract_records_->clear_criteria();
-	navigation_book_ = book_;
 	tabbed_view_->activate_pane(OT_MAIN, true);
 	navigation_book_->selection(0, HT_EXTRACTION);
 }
@@ -1089,7 +1087,6 @@ void menu::cb_mi_ext_crit(Fl_Widget* w, void* v) {
 		if (extract_records_->criteria(criteria)) {
 			// Successful
 			do_extract = false;
-			navigation_book_ = extract_records_;
 			tabbed_view_->activate_pane(OT_EXTRACT, true);
 			navigation_book_->selection(0, HT_EXTRACTION);
 		}
@@ -1106,7 +1103,6 @@ void menu::cb_mi_ext_crit(Fl_Widget* w, void* v) {
 void menu::cb_mi_ext_redo(Fl_Widget* w, void* v) {
 	extract_records_->reextract();
 	// Display the extraction
-	navigation_book_ = extract_records_;
 	tabbed_view_->activate_pane(OT_EXTRACT, true);
 	navigation_book_->selection(0, HT_EXTRACTION);
 }
@@ -1132,7 +1128,7 @@ void menu::cb_mi_ext_qsl(Fl_Widget* w, void* v) {
 	// v passes the particular option
 	that->qsl_type_ = (extract_data::extract_mode_t)(long)v;
 	extract_records_->extract_qsl(that->qsl_type_);
-	navigation_book_ = extract_records_;
+	tabbed_view_->activate_pane(OT_EXTRACT, true);
 }
 
 // Extract->Quick->* - one-click for specific searches
@@ -1142,13 +1138,14 @@ void menu::cb_mi_ext_special(Fl_Widget* w, void* v) {
 	// v passes the particular option
 	extract_data::extract_mode_t reason = (extract_data::extract_mode_t)(long)v;
 	extract_records_->extract_special(reason);
-	navigation_book_ = extract_records_;
+	tabbed_view_->activate_pane(OT_EXTRACT, true);
 }
 
 // Extract->Upload - upload to the server the data was extracted for
 // v is not used
 void menu::cb_mi_ext_upload(Fl_Widget* w, void* v) {
 	extract_records_->upload();
+	tabbed_view_->activate_pane(OT_MAIN, true);
 }
 
 // Extract->Print - print 

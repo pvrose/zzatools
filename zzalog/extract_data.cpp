@@ -175,7 +175,7 @@ void extract_data::clear_criteria() {
 	delete_contents(true);
 	use_mode_ = NONE;
 	// Set navigation book to main log
-	navigation_book_ = book_;
+	tabbed_view_->activate_pane(OT_MAIN, true);
 	// Cause the views to be redrawn
 	selection(-1, HT_EXTRACTION);
 }

@@ -169,9 +169,9 @@ string xml_writer::escape_string(string source) {
 		// Append either the entity string or the original character
 		if (is_entity) {
 			result += key;
-		}
-		else if (c < '\x20' || c > '\x7f') {
-			result += "&#x" + to_hex(c, false) + ';';
+		//}
+		//else if (c < '\x20' || c > '\x7f') {
+		//	result += "x" + to_hex(c, false);
 		} else {
 			result += c;
 		}

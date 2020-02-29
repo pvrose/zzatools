@@ -102,7 +102,7 @@ void tabbed_forms::update_views(view* requester, hint_t hint, record_num_t recor
 #endif
 }
 
-// Activate or deactivate the named object
+// Activate or deactivate the named object - if selecting another log_view change the navigation_book_
 void tabbed_forms::activate_pane(object_t pane, bool active) {
 	if (active) {
 		// Switch to the specified view
@@ -111,12 +111,24 @@ void tabbed_forms::activate_pane(object_t pane, bool active) {
 		}
 		value(widgets_[pane]);
 		selection_color(value()->color());
+		switch (pane) {
+		case OT_MAIN:
+			navigation_book_ = book_;
+			break;
+		case OT_EXTRACT:
+			navigation_book_ = extract_records_;
+			break;
+		case OT_IMPORT:
+			navigation_book_ = import_data_;
+			break;
+		}
 	}
 	else {
 		// "Hide" the object by switching to the main log
 		if (pane != OT_MAIN) {
 			value(widgets_[OT_MAIN]);
 			selection_color(value()->color());
+			navigation_book_ = book_;
 		}
 		widgets_[pane]->deactivate();
 	}
@@ -153,6 +165,20 @@ view* tabbed_forms::get_view(object_t view_name) {
 void tabbed_forms::cb_tab_change(Fl_Widget* w, void* v) {
 	Fl_Tabs* that = (Fl_Tabs*)w;
 	that->selection_color(that->value()->color());
+	log_table* table = dynamic_cast<log_table*>(that->value());
+	if (table) {
+		switch (table->get_book()->book_type()) {
+		case OT_MAIN:
+			navigation_book_ = book_;
+			break;
+		case OT_EXTRACT:
+			navigation_book_ = extract_records_;
+			break;
+		case OT_IMPORT:
+			navigation_book_ = import_data_;
+			break;
+		}
+	}
 }
 
 // Minimum width resizing

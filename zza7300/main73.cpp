@@ -128,7 +128,7 @@ void add_properties() {
 }
 
 void cb_rig_timer() {
-	status_->value(rig_if_->rig_info().c_str());
+//	status_->value(rig_if_->rig_info().c_str());
 }
 
 void cb_error_message(bool ok, const char* message) {

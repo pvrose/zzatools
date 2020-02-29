@@ -590,7 +590,7 @@ HRESULT dxa_if::cb_map_clicked(float latitude, float longitude) {
 		sprintf(text, format, s_lat.c_str(), s_lon.c_str(), gridsquare.c_str());
 		header->header(string(text));
 		extract_records_->header(header);
-		navigation_book_ = extract_records_;
+		tabbed_view_->activate_pane(OT_EXTRACT, true);
 	}
 	for (auto it = records_displayed_.begin(); it != records_displayed_.end(); it++) {
 		// For all records beging displayed - get those that are within a small distance 

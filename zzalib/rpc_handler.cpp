@@ -5,6 +5,8 @@
 #include "../zzalib/utils.h"
 
 #include <sstream>
+#include <iostream>
+
 
 #include <FL/fl_ask.H>
 
@@ -37,10 +39,12 @@ bool rpc_handler::do_request(
 	stringstream put_response;
 	// Generate XML for the request
 	generate_request(method_name, params, put_request);
+	cout << put_request.str();
 	// Post the request and get the response
 	if (url_handler_->post_url(host_name_, resource_, &put_request, &put_response)) {
 		// Successful - process response
 		put_response.seekg(0, ios::beg);
+		cout << put_response.str();
 		bool rpc_fault;
 		decode_response(put_response, response, rpc_fault);
 		if (rpc_fault) {
