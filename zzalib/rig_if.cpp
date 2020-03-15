@@ -232,7 +232,10 @@ void rig_if::get_string_mode(string& mode, string& submode) {
 		error(false, "RIG_IF: Invalid mode got from rig");
 		return;
 	case GM_DIGL:
+		mode = "DATA L";
+		return;
 	case GM_DIGU:
+		mode = "DATA U";
 		return;
 	case GM_LSB:
 		mode = "SSB";
@@ -281,6 +284,13 @@ void rig_if::default_error_message(bool ok, const char* message) {
 	}
 	else {
 		fl_alert(message);
+	}
+}
+
+// Change power lookup
+void rig_if::change_lookup() {
+	if (power_lookup_) {
+		power_lookup_->re_initialise();
 	}
 }
 

@@ -32,10 +32,12 @@ void view73::delete_items() {
 	//}
 	//for (int c = 0; c < cols(); c++) {
 	//	delete (headers_ + c);
+	//	delete (col_widths_ + c);
 	//}
 	items_ = nullptr;
 	headers_ = nullptr;
 	row_headers_ = nullptr;
+	col_widths_ = nullptr;
 }
 
 void view73::draw_cell(TableContext context, int R, int C, int X, int Y,
@@ -66,6 +68,7 @@ void view73::draw_cell(TableContext context, int R, int C, int X, int Y,
 			if (row_headers_) {
 				fl_push_clip(X, Y, W, H);
 				{
+					fl_draw_box(FL_BORDER_BOX, X, Y, W, H, row_header_color());
 					fl_color(FL_BLACK);
 					fl_draw((row_headers_ + R)->c_str(), X, Y, W, H, FL_ALIGN_LEFT);
 				}
@@ -84,7 +87,12 @@ void view73::draw_cell(TableContext context, int R, int C, int X, int Y,
 				fl_rectf(X, Y, W, H);
 
 				// TEXT - contrast its colour to the bg colour.
-				fl_color(fl_contrast(FL_BLACK, bg_colour));
+				if (type_ == VT_MEMORIES && C > 7 && **(items_ + R) == "NO SPLIT") {
+					fl_color(FL_GRAY);
+				}
+				else {
+					fl_color(fl_contrast(FL_BLACK, bg_colour));
+				}
 				fl_draw((*(items_ + R) + C)->c_str(), X + 1, Y, W - 1, H, FL_ALIGN_CENTER);
 
 				// BORDER - unselected colour
@@ -106,6 +114,7 @@ void view73::open_view(view_type type) {
 	// delete the existing set of itesm
 	items_valid_ = false;
 	delete_items();
+	clear();
 	type_ = type;
 	// delete current table contents
 	clear();
@@ -127,12 +136,14 @@ void view73::open_view(view_type type) {
 		break;
 	}
 	items_valid_ = true;
+	Fl_Preferences view_settings(settings_, "View");
+	view_settings.set("Type", (int)type_);
 }
 
 // Open memory view
 void view73::draw_memory_view() {
 	// Define the table parameters
-	rows(102);
+	rows(101);
 	cols(15);
 	items_ = new string*[rows()];
 	headers_ = new string[cols()];
@@ -145,214 +156,236 @@ void view73::draw_memory_view() {
 	row_header_color(FL_GRAY);
 	row_height_all(FONT_SIZE + 3);
 	row_header_width(20);
+	col_widths_ = new int[cols()];
+	for (int i = 0; i < cols(); i++) {
+		*(col_widths_ + i) = 100;
+	}
 
 	bool ok = true;
 	// Create the memory list
-	for (int i = 0; i < rows() && ok; i++) {
+	for (int i = 1; i <= rows() && ok; i++) {
 		// Add memory number to sub_command
-		string sub_command = (char)'\00' + int_to_bcd(i, 2);
+		string cmd_data = int_to_bcd(i, 2, false);
+		// This is a bit of a frig 
+		string sub_command = "";
+		sub_command.resize(1, '\x00');
 		// Fetch the memory contents
-		string data = send_command('\x1A', sub_command, ok);
-		if (data.length() < 31) data.resize(31);
-		// Parse the string
-		string* item = new string[cols()];
-		items_[i] = item;
-		// Memory number - use as row header
-		if (i < 100) {
-			row_headers_[i] = to_string(i);
+		string data = send_command('\x1A', sub_command, cmd_data, ok);
+		// Strip the command, sub-command and address
+		data = data.substr(4);
+		if (data.length() != 0) {
+			if (data.length() < 38) data.resize(38);
+			// Parse the string
+			string* item = new string[cols()];
+			items_[i - 1] = item;
+			// Memory number - use as row header
+			if (i < 100) {
+				row_headers_[i - 1] = to_string(i);
+			}
+			else if (i == 100) {
+				row_headers_[i - 1] = "P1";
+			}
+			else if (i == 101) {
+				row_headers_[i - 1] = "P2";
+			}
+			// Split
+			switch (data[0] & '\xf0') {
+			case 0:
+				item[0] = "NO SPLIT";
+				break;
+			case 'x80':
+				item[0] = "SPLIT";
+				break;
+			default:
+				item[0] = "INVALID";
+				break;
+			}
+			// Memory group
+			switch (data[0] & '\xF') {
+			case 0:
+				item[1] = "OFF";
+				break;
+			case 1:
+				item[1] = "*1";
+				break;
+			case 2:
+				item[1] = "*2";
+				break;
+			case 3:
+				item[1] = "*3";
+				break;
+			default:
+				item[1] = "INVALID";
+			}
+			// RX frequency (or common frequency)
+			item[2] = to_string(bcd_to_double(data.substr(1, 5), 6, true));
+			// Operating mode
+			switch (data[6]) {
+			case 0:
+				item[3] = "LSB";
+				break;
+			case 1:
+				item[3] = "USB";
+				break;
+			case 2:
+				item[3] = "AM";
+				break;
+			case 3:
+				item[3] = "CW";
+				break;
+			case 4:
+				item[3] = "RTTY";
+				break;
+			case 5:
+				item[3] = "FM";
+				break;
+			case 7:
+				item[3] = "CW-R";
+				break;
+			case 8:
+				item[3] = "RTTY-R";
+				break;
+			default:
+				item[3] = "INVALID";
+				break;
+			}
+			// Filter
+			switch (data[7]) {
+			case 1:
+				item[4] = "FILTER 1";
+				break;
+			case 2:
+				item[4] = "FILTER 2";
+				break;
+			case 3:
+				item[4] = "FILTER 3";
+				break;
+			default:
+				item[4] = "INVALID";
+				break;
+			}
+			// Data mode
+			switch (data[8] & '\xF0') {
+			case 0:
+				break;
+			case '\x10':
+				item[3] += "-D";
+				break;
+			default:
+				item[3] += " INVALID DATA";
+				break;
+			}
+			// Tone mode
+			switch (data[8] & '\x0f') {
+			case 0:
+				item[5] = "OFF";
+				break;
+			case 1:
+				item[5] = "TONE";
+				break;
+			case 2:
+				item[5] = "TSQL";
+				break;
+			default:
+				item[5] = "INVALID";
+				break;
+			}
+			// REpeater tone setting
+			double d;
+			d = bcd_to_double(data.substr(9, 3), 1, false);
+			char temp[10];
+			sprintf(temp, "%.1f", d);
+			item[6] = temp;
+			// Tone squelch settin
+			d = bcd_to_double(data.substr(12, 3), 1, false);
+			sprintf(temp, "%.1f", d);
+			item[7] = temp;
+			// Split frequency (or common frequency)
+			item[8] = to_string(bcd_to_double(data.substr(15, 5), 6, true));
+			// Operating mode
+			switch (data[20]) {
+			case 0:
+				item[9] = "LSB";
+				break;
+			case 1:
+				item[9] = "USB";
+				break;
+			case 2:
+				item[9] = "AM";
+				break;
+			case 3:
+				item[9] = "CW";
+				break;
+			case 4:
+				item[9] = "RTTY";
+				break;
+			case 5:
+				item[9] = "FM";
+				break;
+			case 7:
+				item[9] = "CW-R";
+				break;
+			case 8:
+				item[9] = "RTTY-R";
+				break;
+			default:
+				item[9] = "INVALID";
+				break;
+			}
+			// Filter
+			switch (data[21]) {
+			case 1:
+				item[10] = "FILTER 1";
+				break;
+			case 2:
+				item[10] = "FILTER 2";
+				break;
+			case 3:
+				item[10] = "FILTER 3";
+				break;
+			default:
+				item[10] = "INVALID";
+				break;
+			}
+			// Data mode
+			switch (data[22] & '\xF0') {
+			case 0:
+				break;
+			case '\x80':
+				item[9] += "-D";
+				break;
+			default:
+				item[9] += " INVALID DATA";
+				break;
+			}
+			// Tone mode
+			switch (data[22] & '\x0f') {
+			case 0:
+				item[11] = "OFF";
+				break;
+			case 1:
+				item[11] = "TONE";
+				break;
+			case 2:
+				item[11] = "TSQL";
+				break;
+			default:
+				item[11] = "INVALID";
+				break;
+			}
+			// REpeater tone setting
+			d = bcd_to_double(data.substr(23, 3), 1, false);
+			sprintf(temp, "%.1f", d);
+			item[12] = temp;
+			// Tone squelch settin
+			d = bcd_to_double(data.substr(26, 3), 1, false);
+			sprintf(temp, "%.1f", d);
+			item[13] = temp;
+			// Mmoory name
+			item[14] = data.substr(29, 10);
 		}
-		else if (i == 100) {
-			row_headers_[i] = "P1";
-		}
-		else if (i == 101) {
-			row_headers_[i] = "P2";
-		}
-		// Split
-		switch (data[0] & '\xf0') {
-		case 0:
-			item[0] = "NO SPLIT";
-			break;
-		case 'x80':
-			item[0] = "SPLIT";
-			break;
-		default:
-			item[0] = "INVALID";
-			break;
-		}
-		// Memory group
-		switch (data[0] & '\xF') {
-		case 0:
-			item[1] = "OFF";
-			break;
-		case 1:
-			item[1] = "*1";
-			break;
-		case 2:
-			item[1] = "*2";
-			break;
-		case 3:
-			item[1] = "*3";
-			break;
-		default:
-			item[1] = "INVALID";
-		}
-		// RX frequency (or common frequency)
-		item[2] = bcd_to_string(data.substr(1, 5), 6);
-		// Operating mode
-		switch (data[7]) {
-		case 0:
-			item[3] = "LSB";
-			break;
-		case 1:
-			item[3] = "USB";
-			break;
-		case 2:
-			item[3] = "AM";
-			break;
-		case 3:
-			item[3] = "CW";
-			break;
-		case 4:
-			item[3] = "RTTY";
-			break;
-		case 5:
-			item[3] = "FM";
-			break;
-		case 7:
-			item[3] = "CW-R";
-			break;
-		case 8:
-			item[3] = "RTTY-R";
-			break;
-		default:
-			item[3] = "INVALID";
-			break;
-		}
-		// Filter
-		switch (data[8]) {
-		case 1:
-			item[4] = "FILTER 1";
-			break;
-		case 2:
-			item[4] = "FILTER 2";
-			break;
-		case 3:
-			item[4] = "FILTER 3";
-			break;
-		default:
-			item[4] = "INVALID";
-			break;
-		}
-		// Data mode
-		switch (data[9] & '\xF0') {
-		case 0:
-			break;
-		case 1:
-			item[3] += "-D";
-			break;
-		default:
-			item[3] += " INVALID DATA";
-			break;
-		}
-		// Tone mode
-		switch (data[9] & '\x0f') {
-		case 0:
-			item[5] = "OFF";
-			break;
-		case 1:
-			item[5] = "TONE";
-			break;
-		case 2:
-			item[5] = "TSQL";
-			break;
-		default:
-			item[5] = "INVALID";
-			break;
-		}
-		// REpeater tone setting
-		item[6] = bcd_to_string(data.substr(10, 3), 1);
-		// Tone squelch settin
-		item[7] = bcd_to_string(data.substr(13, 3), 1);
-		// Split frequency (or common frequency)
-		item[8] = bcd_to_string(data.substr(16, 5), 6);
-		// Operating mode
-		switch (data[21]) {
-		case 0:
-			item[9] = "LSB";
-			break;
-		case 1:
-			item[9] = "USB";
-			break;
-		case 2:
-			item[9] = "AM";
-			break;
-		case 3:
-			item[9] = "CW";
-			break;
-		case 4:
-			item[9] = "RTTY";
-			break;
-		case 5:
-			item[9] = "FM";
-			break;
-		case 7:
-			item[9] = "CW-R";
-			break;
-		case 8:
-			item[9] = "RTTY-R";
-			break;
-		default:
-			item[9] = "INVALID";
-			break;
-		}
-		// Filter
-		switch (data[22]) {
-		case 1:
-			item[10] = "FILTER 1";
-			break;
-		case 2:
-			item[10] = "FILTER 2";
-			break;
-		case 3:
-			item[10] = "FILTER 3";
-			break;
-		default:
-			item[10] = "INVALID";
-			break;
-		}
-		// Data mode
-		switch (data[23] & '\xF0') {
-		case 0:
-			break;
-		case 1:
-			item[9] += "-D";
-			break;
-		default:
-			item[9] += " INVALID DATA";
-			break;
-		}
-		// Tone mode
-		switch (data[23] & '\x0f') {
-		case 0:
-			item[11] = "OFF";
-			break;
-		case 1:
-			item[11] = "TONE";
-			break;
-		case 2:
-			item[11] = "TSQL";
-			break;
-		default:
-			item[11] = "INVALID";
-			break;
-		}
-		// REpeater tone setting
-		item[12] = bcd_to_string(data.substr(24, 3), 1);
-		// Tone squelch settin
-		item[13] = bcd_to_string(data.substr(27, 3), 1);
-		// Mmoory name
-		item[14] = data.substr(30);
 	}
+	resize_cols();
 	// Now define the headers
 	headers_[0] = "Split";
 	headers_[1] = "Group";
@@ -388,47 +421,51 @@ void view73::draw_scope_bands_view() {
 	row_header_color(FL_GRAY);
 	row_height_all(FONT_SIZE + 3);
 	row_header_width(100);
+	col_widths_ = new int[cols()];
+	for (int i = 0; i < cols(); i++) {
+		*(col_widths_ + i) = 100;
+	}
 
 	// Set row headers
-	row_headers_[0] = "0.03~1.6MHz #1";
-	row_headers_[1] = "0.03~1.6MHz #2";
-	row_headers_[2] = "0.03~1.6MHz #3";
-	row_headers_[3] = "1.6~2.0MHz #1";
-	row_headers_[4] = "1.6~2.0MHz #2";
-	row_headers_[5] = "1.6~2.0MHz #3";
-	row_headers_[6] = "2.0~6.0MHz #1";
-	row_headers_[7] = "2.0~6.0MHz #2";
-	row_headers_[8] = "2.0~6.0MHz #3";
-	row_headers_[9] = "6.0~8.0MHz #1";
-	row_headers_[10] = "6.0~8.0MHz #2";
-	row_headers_[11] = "6.0~8.0MHz #3";
-	row_headers_[12] = "8.0~11.0MHz #1";
-	row_headers_[13] = "8.0~11.0MHz #2";
-	row_headers_[14] = "8.0~11.0MHz #3";
-	row_headers_[15] = "11.0~15.0MHz #1";
-	row_headers_[16] = "11.0~15.0MHz #2";
-	row_headers_[17] = "11.0~15.0MHz #3";
-	row_headers_[18] = "15.0~20.0MHz #1";
-	row_headers_[19] = "15.0~20.0MHz #2";
-	row_headers_[20] = "15.0~20.0MHz #3";
-	row_headers_[21] = "20.0~22.0MHz #1";
-	row_headers_[22] = "20.0~22.0MHz #2";
-	row_headers_[23] = "20.0~22.0MHz #3";
-	row_headers_[24] = "22.0~26.0MHz #1";
-	row_headers_[25] = "22.0~26.0MHz #2";
-	row_headers_[26] = "22.0~26.0MHz #3";
-	row_headers_[27] = "26.0~30.0Hz #1";
-	row_headers_[28] = "26.0~30.0MHz #2";
-	row_headers_[29] = "26.0~30.0MHz #3";
-	row_headers_[30] = "30.0~45.0MHz #1";
-	row_headers_[31] = "30.0~45.0MHz #2";
-	row_headers_[32] = "30.0~45.0MHz #3";
-	row_headers_[33] = "45.0~60.0MHz #1";
-	row_headers_[34] = "45.0~60.0MHz #2";
-	row_headers_[35] = "45.0~60.0MHz #3";
-	row_headers_[36] = "60.0~74.8MHz #1";
-	row_headers_[37] = "60.0~74.8MHz #2";
-	row_headers_[38] = "60.0~74.8MHz #3";
+	row_headers_[0] = "0.03~1.6MHz";
+	row_headers_[1] = "";
+	row_headers_[2] = "";
+	row_headers_[3] = "1.6~2.0MHz";
+	row_headers_[4] = "";
+	row_headers_[5] = "";
+	row_headers_[6] = "2.0~6.0MHz";
+	row_headers_[7] = "";
+	row_headers_[8] = "";
+	row_headers_[9] = "6.0~8.0MHz";
+	row_headers_[10] = "";
+	row_headers_[11] = "";
+	row_headers_[12] = "8.0~11.0MHz";
+	row_headers_[13] = "";
+	row_headers_[14] = "";
+	row_headers_[15] = "11.0~15.0MHz";
+	row_headers_[16] = "";
+	row_headers_[17] = "";
+	row_headers_[18] = "15.0~20.0MHz";
+	row_headers_[19] = "";
+	row_headers_[20] = "";
+	row_headers_[21] = "20.0~22.0MHz";
+	row_headers_[22] = "";
+	row_headers_[23] = "";
+	row_headers_[24] = "22.0~26.0MHz";
+	row_headers_[25] = "";
+	row_headers_[26] = "";
+	row_headers_[27] = "26.0~30.0MHz";
+	row_headers_[28] = "";
+	row_headers_[29] = "";
+	row_headers_[30] = "30.0~45.0MHz";
+	row_headers_[31] = "";
+	row_headers_[32] = "";
+	row_headers_[33] = "45.0~60.0MHz";
+	row_headers_[34] = "";
+	row_headers_[35] = "";
+	row_headers_[36] = "60.0~74.8MHz";
+	row_headers_[37] = "";
+	row_headers_[38] = "";
 	// Column headers
 	headers_[0] = "Lower edge MHz";
 	headers_[1] = "Upper edge MHz";
@@ -437,14 +474,21 @@ void view73::draw_scope_bands_view() {
 	for (int r = 0; r < rows() && ok; r++) {
 		// First scope band edge is at 1A/050112 and rest increment from their
 		int address = 112 + r;
-		string subcommand = (char)'\x05' + int_to_bcd(address, 2);
+		string subcommand = (char)'\x05' + int_to_bcd(address, 2, false);
 		// Fetch it
-		string data = send_command('\x1a', subcommand.c_str(), ok);
+		string data = send_command('\x1a', subcommand.c_str(), ok).substr(4);
 		string* item = new string[cols()];
-		item[0] = bcd_to_string(data.substr(0, 3), 4);
-		item[1] = bcd_to_string(data.substr(3, 3), 4);
+		double d = bcd_to_double(data.substr(0, 3), 4, true);
+		char temp[10];
+		sprintf(temp, "%.4f", d);
+		item[0] = temp;
+		// Tone squelch settin
+		d = bcd_to_double(data.substr(3, 3), 4, true);
+		sprintf(temp, "%.4f", d);
+		item[1] = temp;
 		*(items_ + r) = item;
 	}
+	resize_cols();
 }
 
 // Display transmitter fixed bands and associated user bands - add user defined bands to the tx band row and add further rows for subsequent user defined bands
@@ -459,10 +503,17 @@ void view73::draw_user_bands_view() {
 	row_header_color(FL_GRAY);
 	row_header_width(20);
 	headers_ = new string[cols()];
+	col_widths_ = new int[cols()];
+	for (int i = 0; i < cols(); i++) {
+		*(col_widths_ + i) = 100;
+	}
 	bool ok = true;
 	// Get number of TX bands and user defined bands
-	int num_txbands = bcd_to_int(send_command('\x1e', "\x00", ok));
-	int num_userbands = bcd_to_int(send_command('\x1e', "\x02", ok));
+	string sub_command = " ";
+	sub_command[0] = 0;
+	int num_txbands = bcd_to_int(send_command('\x1e', sub_command, ok).substr(2), false);
+	sub_command[1] = 2;
+	int num_userbands = bcd_to_int(send_command('\x1e', sub_command, ok).substr(2), false);
 	string* tx_bands = new string[num_txbands];
 	string* user_bands = new string[num_userbands];
 	headers_[0] = "TX band - lower MHz";
@@ -471,13 +522,13 @@ void view73::draw_user_bands_view() {
 	headers_[3] = "User band - upper MHz";
 	// Read all the hardware defined bands
 	for (int i = 0; i < num_txbands && ok; i++) {
-		string subcommand = (char)'\x01' + int_to_bcd(i, 1);
-		*(tx_bands + i) = send_command('\x1e', subcommand, ok);
+		sub_command[0] = 1;
+		*(tx_bands + i) = send_command('\x1e', sub_command, int_to_bcd(i + 1, 1, false), ok).substr(3);
 	}
 	// Read all the user-defined bands
 	for (int i = 0; i < num_userbands && ok; i++) {
-		string subcommand = (char)'\x03' + int_to_bcd(i, 1);
-		*(user_bands + i) = send_command('\x1e', subcommand, ok);
+		sub_command[0] = 3;
+		*(user_bands + i) = send_command('\x1e', sub_command, int_to_bcd(i + 1, 1, false), ok).substr(3);
 	}
 	// This will create more items than we use
 	items_ = new string * [num_txbands + num_userbands];
@@ -490,14 +541,16 @@ void view73::draw_user_bands_view() {
 		string* item = new string[cols()];
 		*(items_ + r) = item;
 		// Add tx band to left two columns
-		string tx_lower = bcd_to_string(tx_bands[i].substr(0, 5), 6);
-		string tx_upper = bcd_to_string(tx_bands[i].substr(6, 5), 6);
+		string raw_tx_band = *(tx_bands + i);
+		string tx_lower = to_string(bcd_to_double(raw_tx_band.substr(0, 5), 6, false));
+		string tx_upper = to_string(bcd_to_double(raw_tx_band.substr(6, 5), 6, false));
 		item[0] = tx_lower;
 		item[1] = tx_upper;
 		bool user_valid = true;
 		int num_users_in_tx = 0;
 		while (user_valid && user < num_userbands) {
-			if (user_bands[0] == "\xff") {
+			string raw_user_band = *(user_bands + user);
+			if (raw_user_band[0] == '\xff' || raw_user_band.length() != 11) {
 				// User band is not valid - step to next user, but not next TX
 				item[2] = "";
 				item[3] = "";
@@ -505,8 +558,8 @@ void view73::draw_user_bands_view() {
 			}
 			else {
 				// User band is valid - is it in the tx band currently being looked at?
-				string user_lower = bcd_to_string(user_bands[user].substr(0, 5), 6);
-				string user_upper = bcd_to_string(user_bands[user].substr(6, 5), 6);
+				string user_lower = to_string(bcd_to_double(raw_user_band.substr(0, 5), 6, false));
+				string user_upper = to_string(bcd_to_double(raw_user_band.substr(6, 5), 6, false));
 				if (user_lower >= tx_lower && user_upper <= tx_upper) {
 					// User band is for the current tx band - add to columns 2 and 3 - step user and row
 					num_users_in_tx++;
@@ -519,18 +572,25 @@ void view73::draw_user_bands_view() {
 						item[3] = user_upper;
 						r++;
 					}
+					else {
+						item[2] = user_lower;
+						item[3] = user_upper;
+					}
 					user++;
 				}
 				else {
-					// User band is not for the tx band - step tx band
+					// User band is not for the tx band - step tx band and row
 					user_valid = false;
 				}
 			}
 		} 
+		// Increment row count
+		r++;
 	}
 	// Now we know the real number of rows can configure rows.
 	rows(r);
-	row_height_all(FONT_SIZE + 1);
+	row_height_all(FONT_SIZE + 3);
+	resize_cols();
 }
 
 void view73::draw_message_view(bool cw) {
@@ -547,7 +607,11 @@ void view73::draw_message_view(bool cw) {
 	row_header(true);
 	row_header_color(FL_GRAY);
 	row_height_all(FONT_SIZE + 3);
-	row_header_width(20);
+	row_header_width(30);
+	col_widths_ = new int[cols()];
+	for (int i = 0; i < cols(); i++) {
+		*(col_widths_ + i) = 100;
+	}
 	headers_[0] = "Count-up Trigger";
 	headers_[1] = "Data";
 
@@ -562,14 +626,19 @@ void view73::draw_message_view(bool cw) {
 		(void)send_command('\x06', "", "\x04\x01", ok);
 	}
 	// Get the count up trigger memory number
-	int trigger = bcd_to_int(send_command('\x1a', "\x05\x01\x56", ok));
+	int trigger = bcd_to_int(send_command('\x1a', "\x05\x01\x56", ok).substr(4), false);
 	// Now read the keyer memory
 	for (int r = 0; r < rows() && ok; r++) {
 		string* item = new string[cols()];
 		items_[r] = item;
 		// Add memory name as row header
-		char name[3];
-		sprintf(name, "M%1d", r + 1);
+		char name[4];
+		if (cw) {
+			sprintf(name, "M%1d", r + 1);
+		}
+		else {
+			sprintf(name, "RT%1d", r + 1);
+		}
 		row_headers_[r] = name;
 		// Is it trigger
 		if (r + 1 == trigger) {
@@ -579,62 +648,94 @@ void view73::draw_message_view(bool cw) {
 			item[0] = "";
 		}
 		// Read memory contents - ASCII
-		string sub_command = (char)'\x02' + int_to_bcd(r + 1, 1);
-		item[1] = send_command('\x1a', sub_command, ok);
+		string sub_command = (char)'\x02' + int_to_bcd(r + 1, 1, false);
+		item[1] = send_command('\x1a', sub_command, ok).substr(3);
 	}
+	resize_cols();
 }
 
-// Convert BCD to string
-string view73::bcd_to_string(string bcd, int decimals) {
-	string result;
-	int l_result = bcd.length() * 2;
-	result.resize(l_result + (decimals ? 1 : 0), ' ');
-	int decimal_point = l_result - decimals;
-	int curr_digit = 0;
 
-	for (size_t i = bcd.length(); i > 0;) {
-		// Decrement before it's used
-		i--;
-		unsigned char c = bcd[i];
-		if (decimals && curr_digit == decimal_point) {
-			result[curr_digit] = '.';
-			curr_digit++;
-		}
-		result[curr_digit] = '0' + (c >> 4);
-		curr_digit++;
-		if (decimals && curr_digit == decimal_point) {
-			result[curr_digit] = '.';
-			curr_digit++;
-		}
-		result[curr_digit] = '0' + (c & '\x0f');
-		curr_digit++;
-	}
-	return result;
-}
 
 // Convert int to BCD
-string view73::int_to_bcd(int value, int size) {
+string view73::int_to_bcd(int value, int size, bool least_first) {
 	string result;
 	result.resize(size, ' ');
 
 	int value_left = value;
 	// Convert each part of the integer into two BCD characters
-	for (int i = 0; i < size; i++) {
-		unsigned char c;
-		int remainder = value_left % 100;
-		c = ((remainder / 10) << 4) + (remainder % 10);
-		result[i] = c;
+	if (least_first) {
+		for (int i = 0; i < size; i++) {
+			unsigned char c;
+			int remainder = value_left % 100;
+			c = ((remainder / 10) << 4) + (remainder % 10);
+			value_left /= 100;
+			result[i] = c;
+		}
+	}
+	else {
+		for (int i = size; i > 0;) {
+			unsigned char c;
+			int remainder = value_left % 100;
+			c = ((remainder / 10) << 4) + (remainder % 10);
+			value_left /= 100;
+			result[--i] = c;
+		}
 	}
 	return result;
 }
 
 // Convert BCD to int
-int view73::bcd_to_int(string bcd) {
+int view73::bcd_to_int(string bcd, bool least_first) {
 	int result = 0;
-	for (int i = 0; i < bcd.length(); i++) {
-		unsigned char c = bcd[i];
-		result += c & '\x0f';
-		result += c >> 4;
+	if (least_first) {
+		for (size_t i = bcd.length(); i > 0;) {
+			unsigned char c = bcd[--i];
+			int ls = c & '\x0f';
+			int ms = c & '\xf0';
+			ms >>= 4;
+			result = result * 100 + ls + 10 * ms;
+		}
+	}
+	else {
+		for (size_t i = 0; i < bcd.length(); i++) {
+			unsigned char c = bcd[i];
+			int ls = c & '\x0f';
+			int ms = c & '\xf0';
+			ms >>= 4;
+			result = result * 100 + ls + 10 * ms;
+		}
+	}
+	return result;
+}
+
+// Convert BCD to doble
+double view73::bcd_to_double(string bcd, int decimals, bool least_first) {
+	double digit_value = 1.0;
+	for (int i = 0; i < decimals; i++) {
+		digit_value *= 0.1;
+	}
+	double result = 0.0;
+	if (!least_first) {
+		for (size_t i = bcd.length(); i > 0;) {
+			unsigned char c = bcd[--i];
+			int digit = c & '\x0f';
+			result += digit * digit_value;
+			digit_value *= 10.0;
+			digit = (c & '\xf0') >> 4;
+			result += digit * digit_value;
+			digit_value *= 10.0;
+		}
+	}
+	else {
+		for (size_t i = 0; i < bcd.length(); i++) {
+			unsigned char c = bcd[i];
+			int digit = c & '\x0f';
+			result += digit * digit_value;
+			digit_value *= 10.0;
+			digit = (c & '\xf0') >> 4;
+			result += digit * digit_value;
+			digit_value *= 10.0;
+		}
 	}
 	return result;
 }
@@ -647,48 +748,52 @@ string view73::send_command(unsigned char command, string sub_command, bool& ok)
 string view73::send_command(unsigned char command, string sub_command, string data, bool& ok) {
 	ok = true;
 	if (rig_if_) {
-		string to_send = "xFE xFE x94 xE0 ";
-		string cmd = "";
-		cmd += (char)command;
-		to_send += hex_to_string(cmd + sub_command + data);
-		to_send += "xFD";
+		string cmd = "\xFE\xFE\x94\xE0";
+		cmd += command;
+		cmd += sub_command;
+		cmd += data;
+		cmd += '\xfd';
+		string to_send = string_to_hex(cmd, true);
 
 		string raw_data = rig_if_->raw_message(to_send);
 
 		// Ignore reflected data
-		if (raw_data[0] != '\xfe') {
+		if (raw_data.substr(0,2) != "FE") {
 			fl_alert("Response not from IC-7300: %s", raw_data.c_str());
 			ok = false;
 			return raw_data;
 		}
-		string response = raw_data.substr(to_send.length());
+		string response = hex_to_string(raw_data);
 		if (response.length() == 0) {
 			// TRansceiver has not responded at all
 			fl_alert("Receieved no response from transceiver");
 			ok = false;
 			return "";
 		}
-		else if (response.length() == 6 && response[4] > '\xf0') {
-			if (response[4] == '\xfa') {
-				// Got NAK response from transceiver
-				fl_alert("Received a bad response from transceiver");
-				ok = false;
-				return "";
-			}
-			else {
-				// Got ACK response from transceiver, but no data
-				return ("");
-			}
-		}
 		else {
 			// For data - strip off command and subcommand
-			int discard = sub_command.length() + 1;
-			if (response.substr(0, discard) == to_send.substr(0, discard)) {
-				// Discard the reflected scommand/sub_command
-				return response.substr(discard);
+			int discard = cmd.length();
+			if (response.substr(0, discard) == cmd.substr(0, discard)) {
+				response = response.substr(discard);
+				if (response.length() == 6 && response[4] > '\xf0') {
+					if (response[4] == '\xfa') {
+						// Got NAK response from transceiver
+						fl_alert("Received a bad response from transceiver");
+						ok = false;
+						return "";
+					}
+					else {
+						// Got ACK response from transceiver, but no data
+						return ("");
+					}
+				}
+				else {
+					// Discard the CI-V preamble/postamble
+					return response.substr(4, response.length()-5);
+				}
 			}
 			else {
-				fl_alert("Unexpected response: %s\ns", response.c_str(), string_to_hex(response).c_str());
+				fl_alert("Unexpected response: %s\n%s", response.c_str(), string_to_hex(response).c_str());
 				return response;
 			}
 		}
@@ -698,13 +803,14 @@ string view73::send_command(unsigned char command, string sub_command, string da
 	}
 }
 
-string view73::string_to_hex(string data) {
+string view73::string_to_hex(string data, bool escape /*=true*/) {
 	string result;
 	char hex_chars[] = "0123456789ABCDEF";
-	result.resize(data.length() * 3, ' ');
+	result.resize(data.length() * 4, ' ');
 	int ix = 0;
 	for (size_t i = 0; i < data.length(); i++) {
 		unsigned char c = data[i];
+		if (escape) result[ix++] = 'x';
 		result[ix++] = hex_chars[(c >> 4)];
 		result[ix++] = hex_chars[(c & '\x0f')];
 		result[ix++] = ' ';
@@ -714,19 +820,41 @@ string view73::string_to_hex(string data) {
 
 string view73::hex_to_string(string data) {
 	string result;
+	int ix = 0;
 	// For the length of the source striing
-	for (size_t i = 0; i < data.length(); i++) {
-		char c = data[i];
-		// Append either the entity string or the original character
-		result += "x" + to_hex(c, true);
+	while ((unsigned)ix < data.length()) {
+		if (data[ix] == 'x') {
+			ix++;
+		}
+		result += to_ascii(data, ix);
 	}
 	return result;
 }
 
 void view73::type(view_type type) {
-	open_view(type);
+	if (type == VT_UNCHANGED) {
+		open_view(type_);
+	}
+	else {
+		open_view(type);
+	}
 }
 
 view_type view73::type() {
 	return type_;
+}
+
+void view73::resize_cols() {
+	fl_font(FONT, FONT_SIZE);
+	for (int c = 0; c < cols(); c++) {
+		for (int r = 0; r < rows(); r++) {
+			int w = 0;
+			int h = 0;
+			fl_measure(((items_[r])[c]).c_str(), w, h, 0);
+			if (w > col_widths_[c]) {
+				col_widths_[c] = w;
+			}
+		}
+		col_width(c, col_widths_[c]);
+	}
 }

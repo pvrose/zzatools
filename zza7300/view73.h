@@ -13,7 +13,8 @@ namespace zza7300 {
 		VT_SCOPE_BANDS,
 		VT_USER_BANDS,
 		VT_CW_MESSAGES,
-		VT_RTTY_MESSAGES
+		VT_RTTY_MESSAGES,
+		VT_UNCHANGED
 	};
 
 	class view73 : public Fl_Table_Row
@@ -38,16 +39,18 @@ namespace zza7300 {
 		void draw_scope_bands_view();
 		void draw_user_bands_view();
 		void draw_message_view(bool cw);
+		// Resize columns
+		void resize_cols();
 		// Delete the current items
 		void delete_items();
-		// Convert BCD to string
-		string bcd_to_string(string, int decimals);
 		// Convert int to BCD
-		string int_to_bcd(int value, int size);
+		string int_to_bcd(int value, int size, bool least_first);
 		// Convert BCD to int
-		int bcd_to_int(string);
+		int bcd_to_int(string, bool least_first);
+		// Convert BCD tp Float
+		double bcd_to_double(string, int decimals, bool least_first);
 		// Convert string to hex
-		string string_to_hex(string);
+		string string_to_hex(string, bool escape = false);
 		// Convert string to hex
 		string hex_to_string(string);
 		// Send command
@@ -62,6 +65,8 @@ namespace zza7300 {
 		string* headers_;
 		// Row headers
 		string* row_headers_;
+		// Column widths
+		int* col_widths_;
 		// Items valid
 		bool items_valid_;
 	};

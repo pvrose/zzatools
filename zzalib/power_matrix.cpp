@@ -15,6 +15,10 @@ power_matrix* power_matrix_;
 
 // Constructor - default
 power_matrix::power_matrix() {
+	re_initialise();
+}
+
+void power_matrix::re_initialise() {
 	Fl_Preferences stations_settings(settings_, "Stations");
 	Fl_Preferences rigs_settings(stations_settings, "Rigs");
 	char* rig;

@@ -1,5 +1,6 @@
 #include "stn_dialog.h"
 #include "../zzalib/callback.h"
+#include "../zzalib/rig_if.h"
 
 #include "record.h"
 #include "pfx_data.h"
@@ -25,6 +26,7 @@ extern Fl_Preferences* settings_;
 extern pfx_data* pfx_data_;
 extern status* status_;
 extern tabbed_forms* tabbed_view_;
+extern rig_if* rig_if_;
 
 // Power table constructor
 stn_dialog::power_table::power_table(int X, int Y, int W, int  H, const char* label) :
@@ -874,6 +876,7 @@ void stn_dialog::rig_group::create_form(int X, int Y) {
 // Save values in settings
 void stn_dialog::rig_group::save_values() {
 	common_grp::save_values();
+	rig_if_->change_lookup();
 	// Deleting the matrix saves its settings
 	delete matrix_;
 	matrix_ = nullptr;

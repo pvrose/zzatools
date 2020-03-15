@@ -188,6 +188,7 @@ void tidy() {
 	delete status_;
 	delete view_;
 	delete menu_;
+	delete settings_;
 	delete main_window_;
 }
 
@@ -213,7 +214,7 @@ int main(int argc, char** argv)
 	rig_if_ = nullptr;
 	add_rig_if();
 
-	view_->type(VT_MEMORIES);
+	view_->type(VT_UNCHANGED);
 
 	int code = 0;
 

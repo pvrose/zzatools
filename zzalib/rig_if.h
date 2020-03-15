@@ -100,6 +100,8 @@ namespace zzalib {
 		string success_message();
 		// Convert drive-level to power
 		double power();
+		// Change power_loopup
+		void change_lookup();
 
 		// Callback to update app on timer interrupt
 		void callback(void (*function)(), string(*spec_func)(double), void(*mess_func)(bool, const char*));

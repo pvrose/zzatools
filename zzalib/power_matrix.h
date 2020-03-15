@@ -20,6 +20,8 @@ namespace zzalib {
 		// Defualt constructor
 		power_matrix();
 		~power_matrix();
+		// Re-initialise
+		void re_initialise();
 		// initialises the matrix from the rig data.
 		void initialise(string rig);
 		// Returns the power for the specific band and drive-level
