@@ -716,3 +716,115 @@ unsigned char zzalib::to_ascii(string data, int&ix) {
 	ix += next_ix;
 	return (unsigned char)val;
 }
+
+// Convert int to BCD
+string zzalib::int_to_bcd(int value, int size, bool least_first) {
+	string result;
+	result.resize(size, ' ');
+
+	int value_left = value;
+	// Convert each part of the integer into two BCD characters
+	if (least_first) {
+		for (int i = 0; i < size; i++) {
+			unsigned char c;
+			int remainder = value_left % 100;
+			c = ((remainder / 10) << 4) + (remainder % 10);
+			value_left /= 100;
+			result[i] = c;
+		}
+	}
+	else {
+		for (int i = size; i > 0;) {
+			unsigned char c;
+			int remainder = value_left % 100;
+			c = ((remainder / 10) << 4) + (remainder % 10);
+			value_left /= 100;
+			result[--i] = c;
+		}
+	}
+	return result;
+}
+
+// Convert BCD to int
+int zzalib::bcd_to_int(string bcd, bool least_first) {
+	int result = 0;
+	if (least_first) {
+		for (size_t i = bcd.length(); i > 0;) {
+			unsigned char c = bcd[--i];
+			int ls = c & '\x0f';
+			int ms = c & '\xf0';
+			ms >>= 4;
+			result = result * 100 + ls + 10 * ms;
+		}
+	}
+	else {
+		for (size_t i = 0; i < bcd.length(); i++) {
+			unsigned char c = bcd[i];
+			int ls = c & '\x0f';
+			int ms = c & '\xf0';
+			ms >>= 4;
+			result = result * 100 + ls + 10 * ms;
+		}
+	}
+	return result;
+}
+
+// Convert BCD to doble
+double zzalib::bcd_to_double(string bcd, int decimals, bool least_first) {
+	double digit_value = 1.0;
+	for (int i = 0; i < decimals; i++) {
+		digit_value *= 0.1;
+	}
+	double result = 0.0;
+	if (!least_first) {
+		for (size_t i = bcd.length(); i > 0;) {
+			unsigned char c = bcd[--i];
+			int digit = c & '\x0f';
+			result += digit * digit_value;
+			digit_value *= 10.0;
+			digit = (c & '\xf0') >> 4;
+			result += digit * digit_value;
+			digit_value *= 10.0;
+		}
+	}
+	else {
+		for (size_t i = 0; i < bcd.length(); i++) {
+			unsigned char c = bcd[i];
+			int digit = c & '\x0f';
+			result += digit * digit_value;
+			digit_value *= 10.0;
+			digit = (c & '\xf0') >> 4;
+			result += digit * digit_value;
+			digit_value *= 10.0;
+		}
+	}
+	return result;
+}
+
+string zzalib::string_to_hex(string data, bool escape /*=true*/) {
+	string result;
+	char hex_chars[] = "0123456789ABCDEF";
+	result.resize(data.length() * 4, ' ');
+	int ix = 0;
+	for (size_t i = 0; i < data.length(); i++) {
+		unsigned char c = data[i];
+		if (escape) result[ix++] = 'x';
+		result[ix++] = hex_chars[(c >> 4)];
+		result[ix++] = hex_chars[(c & '\x0f')];
+		result[ix++] = ' ';
+	}
+	return result;
+}
+
+string zzalib::hex_to_string(string data) {
+	string result;
+	int ix = 0;
+	// For the length of the source striing
+	while ((unsigned)ix < data.length()) {
+		if (data[ix] == 'x') {
+			ix++;
+		}
+		result += to_ascii(data, ix);
+	}
+	return result;
+}

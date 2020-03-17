@@ -102,6 +102,8 @@ namespace zzalib {
 		double power();
 		// Change power_loopup
 		void change_lookup();
+		// Update rig clock
+		void update_clock();
 
 		// Callback to update app on timer interrupt
 		void callback(void (*function)(), string(*spec_func)(double), void(*mess_func)(bool, const char*));

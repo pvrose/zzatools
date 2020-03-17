@@ -18,6 +18,7 @@ main.cpp - application entry point
 #include "toolbar.h"
 #include "spec_data.h"
 #include "../zzalib/rig_if.h"
+#include "../zzalib/ic7300.h"
 #include "status.h"
 #include "tabbed_forms.h"
 #include "import_data.h"
@@ -64,6 +65,7 @@ using namespace zzalog;
 using namespace zzalib;
 
 extern rig_if* rig_if_;
+extern ic7300* ic7300_;
 
 // Top level data items - these are declared as externals in each .cpp that uses them
 book* book_ = nullptr;
@@ -476,6 +478,10 @@ void add_rig_if() {
 							done = true;
 							// Change logging mode to ON_AIR
 							menu_->logging(LM_ON_AIR);
+						}
+						if (rig_if_ && rig_if_->rig_name() == "IC-7300") {
+							ic7300_ = new ic7300;
+							rig_if_->update_clock();
 						}
 					}
 				}

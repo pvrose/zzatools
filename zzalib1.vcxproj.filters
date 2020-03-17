@@ -55,6 +55,9 @@
     <ClInclude Include="zzalib\utils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="zzalib\ic7300.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="zzalib\rig_if.cpp" />
@@ -69,5 +72,6 @@
     <ClCompile Include="zzalib\win_dialog.cpp" />
     <ClCompile Include="zzalib\serial.cpp" />
     <ClCompile Include="zzalib\utils.cpp" />
+    <ClCompile Include="zzalib\ic7300.cpp" />
   </ItemGroup>
 </Project>

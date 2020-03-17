@@ -3,6 +3,7 @@
 #include "../zzalib/rig_if.h"
 #include "../zzalib/drawing.h"
 #include "../zzalib/url_handler.h"
+#include "../zzalib/ic7300.h"
 
 #include <FL/Fl_Output.H>
 #include <FL/Fl_Preferences.H>
@@ -16,6 +17,7 @@ Fl_Preferences* settings_ = nullptr;
 menu73* menu_ = nullptr;
 view73* view_ = nullptr;
 extern rig_if* rig_if_;
+extern ic7300* ic7300_;
 Fl_Output* status_ = nullptr;
 extern url_handler* url_handler_;
 
@@ -39,6 +41,9 @@ static void cb_bn_close(Fl_Widget* w, void* v) {
 	else {
 		closing_ = true;
 		status_->value("ZZALOG: Closing...");
+		if (ic7300_) {
+			delete ic7300_;
+		}
 		// If rig connected close it - this will close the timer as well
 		if (rig_if_) {
 			rig_if_->close();
@@ -161,6 +166,10 @@ void add_rig_if() {
 					// Access rig - timer will have been started by rig_if_->open()
 					// Set rig timer callnack
 					status_->value(rig_if_->success_message().c_str());
+					if (rig_if_->rig_name() == "IC-7300") {
+						ic7300_ = new ic7300;
+						rig_if_->update_clock();
+					}
 					done = true;
 					// Change logging mode to ON_AIR
 				}

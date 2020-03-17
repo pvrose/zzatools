@@ -22,6 +22,7 @@
     <ClInclude Include="zzalib\callback.h" />
     <ClInclude Include="zzalib\drawing.h" />
     <ClInclude Include="zzalib\formats.h" />
+    <ClInclude Include="zzalib\ic7300.h" />
     <ClInclude Include="zzalib\page_dialog.h" />
     <ClInclude Include="zzalib\pch.h" />
     <ClInclude Include="zzalib\power_matrix.h" />
@@ -37,6 +38,7 @@
     <ClInclude Include="zzalib\xml_writer.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="zzalib\ic7300.cpp" />
     <ClCompile Include="zzalib\page_dialog.cpp" />
     <ClCompile Include="zzalib\power_matrix.cpp" />
     <ClCompile Include="zzalib\rig_if.cpp" />

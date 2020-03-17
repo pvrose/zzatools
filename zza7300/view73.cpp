@@ -1,14 +1,17 @@
 #include "view73.h"
-#include "../zzalib/rig_if.h"
+#include "../zzalib/ic7300.h"
+#include "../zzalib/drawing.h"
+#include "../zzalib/utils.h"
 
 #include <FL/Fl_Preferences.H>
 #include <FL/fl_ask.H>
+#include <FL/fl_draw.H>
 
 using namespace zza7300;
 using namespace zzalib;
 
 extern Fl_Preferences* settings_;
-extern rig_if* rig_if_;
+extern ic7300* ic7300_;
 
 view73::view73(int X, int Y, int W, int H, const char* label) : Fl_Table_Row(X, Y, W, H, label) {
 	Fl_Preferences view_settings(settings_, "View");
@@ -170,7 +173,7 @@ void view73::draw_memory_view() {
 		string sub_command = "";
 		sub_command.resize(1, '\x00');
 		// Fetch the memory contents
-		string data = send_command('\x1A', sub_command, cmd_data, ok);
+		string data = ic7300_->send_command('\x1A', sub_command, cmd_data, ok);
 		// Strip the command, sub-command and address
 		data = data.substr(4);
 		if (data.length() != 0) {
@@ -476,7 +479,7 @@ void view73::draw_scope_bands_view() {
 		int address = 112 + r;
 		string subcommand = (char)'\x05' + int_to_bcd(address, 2, false);
 		// Fetch it
-		string data = send_command('\x1a', subcommand.c_str(), ok).substr(4);
+		string data = ic7300_->send_command('\x1a', subcommand.c_str(), ok).substr(4);
 		string* item = new string[cols()];
 		double d = bcd_to_double(data.substr(0, 3), 4, true);
 		char temp[10];
@@ -511,9 +514,9 @@ void view73::draw_user_bands_view() {
 	// Get number of TX bands and user defined bands
 	string sub_command = " ";
 	sub_command[0] = 0;
-	int num_txbands = bcd_to_int(send_command('\x1e', sub_command, ok).substr(2), false);
+	int num_txbands = bcd_to_int(ic7300_->send_command('\x1e', sub_command, ok).substr(2), false);
 	sub_command[1] = 2;
-	int num_userbands = bcd_to_int(send_command('\x1e', sub_command, ok).substr(2), false);
+	int num_userbands = bcd_to_int(ic7300_->send_command('\x1e', sub_command, ok).substr(2), false);
 	string* tx_bands = new string[num_txbands];
 	string* user_bands = new string[num_userbands];
 	headers_[0] = "TX band - lower MHz";
@@ -523,12 +526,12 @@ void view73::draw_user_bands_view() {
 	// Read all the hardware defined bands
 	for (int i = 0; i < num_txbands && ok; i++) {
 		sub_command[0] = 1;
-		*(tx_bands + i) = send_command('\x1e', sub_command, int_to_bcd(i + 1, 1, false), ok).substr(3);
+		*(tx_bands + i) = ic7300_->send_command('\x1e', sub_command, int_to_bcd(i + 1, 1, false), ok).substr(3);
 	}
 	// Read all the user-defined bands
 	for (int i = 0; i < num_userbands && ok; i++) {
 		sub_command[0] = 3;
-		*(user_bands + i) = send_command('\x1e', sub_command, int_to_bcd(i + 1, 1, false), ok).substr(3);
+		*(user_bands + i) = ic7300_->send_command('\x1e', sub_command, int_to_bcd(i + 1, 1, false), ok).substr(3);
 	}
 	// This will create more items than we use
 	items_ = new string * [num_txbands + num_userbands];
@@ -619,14 +622,14 @@ void view73::draw_message_view(bool cw) {
 
 	if (cw) {
 		// set transceiver into CW mode
-		(void)send_command('\x06', "", "\x03\x01", ok);
+		(void)ic7300_->send_command('\x06', "", "\x03\x01", ok);
 	}
 	else {
 		// set transceiver into RTTY mode
-		(void)send_command('\x06', "", "\x04\x01", ok);
+		(void)ic7300_->send_command('\x06', "", "\x04\x01", ok);
 	}
 	// Get the count up trigger memory number
-	int trigger = bcd_to_int(send_command('\x1a', "\x05\x01\x56", ok).substr(4), false);
+	int trigger = bcd_to_int(ic7300_->send_command('\x1a', "\x05\x01\x56", ok).substr(4), false);
 	// Now read the keyer memory
 	for (int r = 0; r < rows() && ok; r++) {
 		string* item = new string[cols()];
@@ -649,186 +652,9 @@ void view73::draw_message_view(bool cw) {
 		}
 		// Read memory contents - ASCII
 		string sub_command = (char)'\x02' + int_to_bcd(r + 1, 1, false);
-		item[1] = send_command('\x1a', sub_command, ok).substr(3);
+		item[1] = ic7300_->send_command('\x1a', sub_command, ok).substr(3);
 	}
 	resize_cols();
-}
-
-
-
-// Convert int to BCD
-string view73::int_to_bcd(int value, int size, bool least_first) {
-	string result;
-	result.resize(size, ' ');
-
-	int value_left = value;
-	// Convert each part of the integer into two BCD characters
-	if (least_first) {
-		for (int i = 0; i < size; i++) {
-			unsigned char c;
-			int remainder = value_left % 100;
-			c = ((remainder / 10) << 4) + (remainder % 10);
-			value_left /= 100;
-			result[i] = c;
-		}
-	}
-	else {
-		for (int i = size; i > 0;) {
-			unsigned char c;
-			int remainder = value_left % 100;
-			c = ((remainder / 10) << 4) + (remainder % 10);
-			value_left /= 100;
-			result[--i] = c;
-		}
-	}
-	return result;
-}
-
-// Convert BCD to int
-int view73::bcd_to_int(string bcd, bool least_first) {
-	int result = 0;
-	if (least_first) {
-		for (size_t i = bcd.length(); i > 0;) {
-			unsigned char c = bcd[--i];
-			int ls = c & '\x0f';
-			int ms = c & '\xf0';
-			ms >>= 4;
-			result = result * 100 + ls + 10 * ms;
-		}
-	}
-	else {
-		for (size_t i = 0; i < bcd.length(); i++) {
-			unsigned char c = bcd[i];
-			int ls = c & '\x0f';
-			int ms = c & '\xf0';
-			ms >>= 4;
-			result = result * 100 + ls + 10 * ms;
-		}
-	}
-	return result;
-}
-
-// Convert BCD to doble
-double view73::bcd_to_double(string bcd, int decimals, bool least_first) {
-	double digit_value = 1.0;
-	for (int i = 0; i < decimals; i++) {
-		digit_value *= 0.1;
-	}
-	double result = 0.0;
-	if (!least_first) {
-		for (size_t i = bcd.length(); i > 0;) {
-			unsigned char c = bcd[--i];
-			int digit = c & '\x0f';
-			result += digit * digit_value;
-			digit_value *= 10.0;
-			digit = (c & '\xf0') >> 4;
-			result += digit * digit_value;
-			digit_value *= 10.0;
-		}
-	}
-	else {
-		for (size_t i = 0; i < bcd.length(); i++) {
-			unsigned char c = bcd[i];
-			int digit = c & '\x0f';
-			result += digit * digit_value;
-			digit_value *= 10.0;
-			digit = (c & '\xf0') >> 4;
-			result += digit * digit_value;
-			digit_value *= 10.0;
-		}
-	}
-	return result;
-}
-
-// Send command
-string view73::send_command(unsigned char command, string sub_command, bool& ok) {
-	return send_command(command, sub_command, "", ok);
-}
-
-string view73::send_command(unsigned char command, string sub_command, string data, bool& ok) {
-	ok = true;
-	if (rig_if_) {
-		string cmd = "\xFE\xFE\x94\xE0";
-		cmd += command;
-		cmd += sub_command;
-		cmd += data;
-		cmd += '\xfd';
-		string to_send = string_to_hex(cmd, true);
-
-		string raw_data = rig_if_->raw_message(to_send);
-
-		// Ignore reflected data
-		if (raw_data.substr(0,2) != "FE") {
-			fl_alert("Response not from IC-7300: %s", raw_data.c_str());
-			ok = false;
-			return raw_data;
-		}
-		string response = hex_to_string(raw_data);
-		if (response.length() == 0) {
-			// TRansceiver has not responded at all
-			fl_alert("Receieved no response from transceiver");
-			ok = false;
-			return "";
-		}
-		else {
-			// For data - strip off command and subcommand
-			int discard = cmd.length();
-			if (response.substr(0, discard) == cmd.substr(0, discard)) {
-				response = response.substr(discard);
-				if (response.length() == 6 && response[4] > '\xf0') {
-					if (response[4] == '\xfa') {
-						// Got NAK response from transceiver
-						fl_alert("Received a bad response from transceiver");
-						ok = false;
-						return "";
-					}
-					else {
-						// Got ACK response from transceiver, but no data
-						return ("");
-					}
-				}
-				else {
-					// Discard the CI-V preamble/postamble
-					return response.substr(4, response.length()-5);
-				}
-			}
-			else {
-				fl_alert("Unexpected response: %s\n%s", response.c_str(), string_to_hex(response).c_str());
-				return response;
-			}
-		}
-	}
-	else {
-		return "NO RIG";
-	}
-}
-
-string view73::string_to_hex(string data, bool escape /*=true*/) {
-	string result;
-	char hex_chars[] = "0123456789ABCDEF";
-	result.resize(data.length() * 4, ' ');
-	int ix = 0;
-	for (size_t i = 0; i < data.length(); i++) {
-		unsigned char c = data[i];
-		if (escape) result[ix++] = 'x';
-		result[ix++] = hex_chars[(c >> 4)];
-		result[ix++] = hex_chars[(c & '\x0f')];
-		result[ix++] = ' ';
-	}
-	return result;
-}
-
-string view73::hex_to_string(string data) {
-	string result;
-	int ix = 0;
-	// For the length of the source striing
-	while ((unsigned)ix < data.length()) {
-		if (data[ix] == 'x') {
-			ix++;
-		}
-		result += to_ascii(data, ix);
-	}
-	return result;
 }
 
 void view73::type(view_type type) {

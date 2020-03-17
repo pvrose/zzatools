@@ -1,6 +1,7 @@
 #include "rig_if.h"
 #include "formats.h"
 #include "../zzalib/utils.h"
+#include "../zzalib/ic7300.h"
 
 #include <FL/Fl.H>
 #include <FL/Fl_Preferences.H>
@@ -12,6 +13,7 @@ using namespace zzalib;
 
 extern Fl_Preferences* settings_;
 rig_if* rig_if_;
+extern ic7300* ic7300_;
 
 extern void remove_sub_window(Fl_Window* w);
 
@@ -293,6 +295,37 @@ void rig_if::change_lookup() {
 		power_lookup_->re_initialise();
 	}
 }
+
+void rig_if::update_clock() {
+	// Only implemented for IC-7300
+	if (rig_name() == "IC-7300" && ic7300_) {
+		// Get current time
+		time_t now = time(nullptr);
+		// convert to struct in UTC
+		tm* figures = gmtime(&now);
+		// Convert date and time to integers. 20200317, 1514
+		int date = (figures->tm_year + 1900) * 10000 + (figures->tm_mon + 1) * 100 + figures->tm_mday;
+		int time = figures->tm_hour * 100 + figures->tm_min;
+		string data = int_to_bcd(date, 4, false);
+		char command = '\x1a';
+		bool ok;
+		// Set date
+		string sub_command = "   ";  
+		sub_command[0] = '\x05';
+		sub_command[1] = '\x00';
+		sub_command[2] = '\x94';
+		ic7300_->send_command(command, sub_command, data, ok);
+		// Set time
+		data = int_to_bcd(time, 2, false);
+		sub_command[2] = '\x95';
+		ic7300_->send_command(command, sub_command, data, ok);
+		// Set UTC off-set - UTC + 0000
+		data.resize(3, '\x00');
+		sub_command[2] = '\x96';
+		ic7300_->send_command(command, sub_command, data, ok);
+	}
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////////////
 //    H a M L I B implementation

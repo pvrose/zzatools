@@ -78,6 +78,16 @@ namespace zzalib {
 	string to_hex(unsigned char data, bool add_space = true);
 	// Encode single character - starting at data[ix] and incrementing ix to end of it.
 	unsigned char to_ascii(string data, int& ix);
+	// Convert int to BCD
+	string int_to_bcd(int value, int size, bool least_first);
+	// Convert BCD to int
+	int bcd_to_int(string, bool least_first);
+	// Convert BCD tp Float
+	double bcd_to_double(string, int decimals, bool least_first);
+	// Convert string to hex
+	string string_to_hex(string, bool escape = false);
+	// Convert string to hex
+	string hex_to_string(string);
 
 
 	// template function to find the enclosing widget of class WIDGET
