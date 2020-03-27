@@ -714,7 +714,7 @@ void stn_dialog::qth_group::cb_ip_call(Fl_Widget* w, void* v) {
 	string timestamp = now(false, "%Y%m%d%H%M%S");
 	dummy.item("QSO_DATE", timestamp.substr(0, 8));
 	// Get the prefix and track up to the DXCC prefix
-	prefix* prefix = pfx_data_->get_prefix(&dummy, FALSE);
+	prefix* prefix = pfx_data_->get_prefix(&dummy, false);
 	// Get CQZone - if > 1 supplied then message for now
 	if (prefix->cq_zones_.size() > 1) {
 		string message = "STN DLG: Multiple CQ Zones: ";

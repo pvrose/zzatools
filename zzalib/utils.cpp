@@ -11,6 +11,7 @@ utils.h - Utility methods
 #include <FL/fl_draw.H>
 #include <FL/Fl_Multiline_Output.H>
 #include <FL/Fl_Tooltip.H>
+#include <FL/Fl_Window.H>
 
 #include <string>
 #include <exception>

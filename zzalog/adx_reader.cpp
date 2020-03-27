@@ -314,7 +314,7 @@ bool adx_reader::characters(string content) {
 			break;
 		}
 	}
-	return TRUE;
+	return true;
 }
 
 // Explicitly ignore declaration tags - except comments

@@ -146,7 +146,7 @@ void pfx_tree::populate_tree(bool activate) {
 	clear();
 
 	// Set the label on the root - first need a root
-	Fl_Tree_Item* root_item = new Fl_Tree_Item(prefs());
+	Fl_Tree_Item* root_item = new Fl_Tree_Item(this);
 	root(root_item);
 	root_item->labelfont(item_labelfont() | FL_BOLD);
 	// Generate the text to add as root label

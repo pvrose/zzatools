@@ -502,7 +502,7 @@ void report_tree::populate_tree(bool activate) {
 			int num_card = 0;
 			int num_any = 0;
 			// Define a custom root item so we can label it later
-			Fl_Tree_Item* root_item = new Fl_Tree_Item(prefs());
+			Fl_Tree_Item* root_item = new Fl_Tree_Item(this);
 			root(root_item);
 			root_item->labelfont(item_labelfont() | FL_BOLD);
 			root_item->labelcolor(FL_BLACK);

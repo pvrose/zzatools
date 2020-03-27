@@ -12,6 +12,7 @@
 #include <FL/Fl_Progress.H>
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Text_Display.H>
+#include <FL/Fl_Window.H>
 
 using namespace std;
 

@@ -13,6 +13,7 @@
 #include <sstream>
 #include <regex>
 #include <chrono>
+#include <climits>
 
 #include <FL/Fl_Preferences.H>
 #include <FL/fl_ask.H>
@@ -20,6 +21,7 @@
 
 using namespace zzalog;
 using namespace zzalib;
+using namespace std;
 
 extern Fl_Preferences* settings_;
 extern book* book_;
@@ -814,11 +816,11 @@ error_t spec_data::check_integer(const string&  data, const string&  field, cons
 	}
 	// Get the ADIF field parameters. Minimum and Maximum values - uses largest +/- value if blank
 	map<string, string>* fields = dataset("Fields")->data.at(field);
-	int min_value = MININT;
+	int min_value = INT_MIN;
 	if (fields->find("Minimum Value") != fields->end()) {
 		min_value = stoi(fields->at("Minimum Value"));
 	}
-	int max_value = MAXINT;
+	int max_value = INT_MAX;
 	if (fields->find("Maximum Value") != fields->end()) {
 		max_value = stoi(fields->at("Maximum Value"));
 	}
@@ -2132,7 +2134,7 @@ string spec_data::get_tip(const string& field, record* record) {
 			}
 		}
 		// now check if contents valid
-		if (validate(field, data, TRUE)) {
+		if (validate(field, data, true)) {
 			tip += "Contents Valid\n";
 		}
 		else {

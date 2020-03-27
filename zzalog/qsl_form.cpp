@@ -11,6 +11,7 @@
 
 using namespace zzalog;
 using namespace zzalib;
+using namespace std;
 
 extern Fl_Preferences* settings_;
 extern status* status_;
@@ -150,7 +151,7 @@ void qsl_form::create_form() {
 	draw_lines(FL_ALIGN_LEFT, ly, tl_widgets_);
 	draw_lines(FL_ALIGN_RIGHT, ry, tr_widgets_);
 	// Current y value to below the lower of the two
-	int curr_y = max(ly, ry) + GAP;
+	int curr_y = (ly > ry ? ly : ry) + GAP;
 	// Draw the central box
 	draw_table(curr_y);
 	curr_y += GAP;
@@ -160,7 +161,7 @@ void qsl_form::create_form() {
 	draw_lines(FL_ALIGN_LEFT, ly, bl_widgets_);
 	draw_lines(FL_ALIGN_RIGHT, ry, br_widgets_);
 	// Report an error if the required height is too big
-	curr_y = max(ly, ry) + MARGIN;
+	curr_y = (ly > ry ? ly : ry) + MARGIN;
 	if (curr_y - y() > height) {
 		size_error_ = true;
 	}

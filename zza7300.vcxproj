@@ -88,6 +88,9 @@
     <IncludePath>C:\Users\pvros\Documents\dev\fltk-1.3.5;C:\Users\pvros\Documents\dev\deps\include;C:\Users\pvros\Documents\dev\hamlib-w32-3.3;C:\Users\pvros\Documents\dev\zzatools\Release;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Users\pvros\Documents\dev\zzatools\Release;C:\Users\pvros\Documents\dev\fltk-1.3.5\lib;C:\Users\pvros\Documents\dev\curl-7.65.1\builds\libcurl-vc15-x86-release-dll-ipv6-sspi-winssl\lib;C:\cygwin\usr\local\bin;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LibraryPath>C:\Users\pvros\Documents\dev\zzatools\Debug;C:\Users\pvros\Documents\dev\fltk-1.4.x-20200320-0a38e2e3\build\lib\Debug;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -108,9 +111,12 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>C:\Users\pvros\Documents\dev\fltk-1.4.x-20200320-0a38e2e3\build;C:\Users\pvros\Documents\dev\fltk-1.4.x-20200320-0a38e2e3;C:\Users\pvros\Documents\dev\zzatools;C:\cygwin\home\pvros\dev\Hamlib-master\include;C:\Users\pvros\Documents\dev\curl-7.65.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
+      <AdditionalDependencies>fltkd.lib;zzalib.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

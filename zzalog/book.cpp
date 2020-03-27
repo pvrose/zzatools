@@ -27,6 +27,7 @@
 
 using namespace zzalog;
 using namespace zzalib;
+using namespace std;
 
 // Global data items
 extern status* status_;
@@ -1096,7 +1097,7 @@ void book::check_dupes(bool restart) {
 		number_dupes_kept_ = 0;
 		number_dupes_removed_ = 0;
 	}
-	bool possible = FALSE;
+	bool possible = false;
 	for (; duplicate_item_ < size() - 1 && !possible;) {
 		// Get adjacent records
 		record_num_t record_num_1 = record_number(duplicate_item_);

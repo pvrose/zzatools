@@ -73,6 +73,7 @@ dxa_if::dxa_if() :
 	colour_bns_.clear();
 	colour_enables_.clear();
 	locations_.clear();
+	button_map_.clear();
 
 	load_values();
 	// Create the form
@@ -989,6 +990,8 @@ void dxa_if::create_colour_buttons() {
 		colour_grp_->remove(colour_bns_[i]);
 		delete colour_bns_[i];
 	}
+	// Clear button map (name to widget)
+	button_map_.clear();
 	// get FLTK scheduler delete them
 	Fl::wait();
 	colour_bns_.clear();
@@ -1024,6 +1027,7 @@ void dxa_if::create_colour_buttons() {
 			colour_bns_.push_back(bn);
 			colour_enables_.push_back(true);
 			colour_grp_->add(bn);
+			button_map_[colours_used_[button_num]] = bn;
 			button_num++;
 			button_todo--;
 		}
@@ -1301,6 +1305,9 @@ void dxa_if::draw_pins() {
 			for (size_t i = 0; i < colours_used_.size(); i++) {
 				colour_count[i] = 0;
 			}
+			// Create a set of colour names;
+			set<string> colours_used;
+			colours_used.clear();
 
 			// For all the wanted colours
 			for (int colour_layer = 0; colour_layer < (signed)colours_used_.size(); colour_layer++) {
@@ -1369,6 +1376,8 @@ void dxa_if::draw_pins() {
 
 							if (use_item) {
 								if (include_swl_ || record->item("SWL") != "Y") {
+									// Add the colour name to the used list
+									colours_used.insert(colour_text);
 									// This record is to be drawn in this layer
 									lat_long = record->location(false);
 									// Only add if the location is valid
@@ -1443,6 +1452,15 @@ void dxa_if::draw_pins() {
 			// now centre on selected record
 			if (map->GetProjection() == DxAtlas::PRJ_RECTANGULAR) {
 				centre_map();
+			}
+
+			// Now deactivate all colour buttons
+			for (auto it = colour_bns_.begin(); it != colour_bns_.end(); it++) {
+				(*it)->deactivate();
+			}
+			// And activate those buttons used
+			for (auto it = colours_used.begin(); it != colours_used.end(); it++) {
+				(button_map_.at(*it))->activate();
 			}
 
 			status_->misc_status(ST_OK, "DXATLAS: Update done!");

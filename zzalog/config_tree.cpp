@@ -64,7 +64,7 @@ void config_tree::add_branch(Fl_Tree_Item* parent, Fl_Preferences* settings) {
 	}
 	else {	
 		// Create the root item as the branch
-		branch = new Fl_Tree_Item(prefs());
+		branch = new Fl_Tree_Item(this);
 		root(branch);
 		branch->labelfont(item_labelfont() | FL_BOLD);
 		root_label("All Settings");

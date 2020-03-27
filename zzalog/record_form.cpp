@@ -514,7 +514,7 @@ void record_form::cb_rad_card(Fl_Widget* w, void* v) {
 	// Save setting
 	Fl_Preferences display_settings(settings_, "Display");
 	display_settings.set("Image Type", (int)that->selected_image_);
-	main_window_->flush();
+//	main_window_->flush();
 }
 
 // Called when a cell is clicked in the record table
@@ -561,7 +561,7 @@ void record_form::cb_tab_record(Fl_Widget* w, void* v) {
 			that->modifying_ = true;
 			that->enable_widgets();
 			that->redraw();
-			main_window_->flush();
+//			main_window_->flush();
 			break;
 		}
 		case FL_RIGHT_MOUSE: {
@@ -626,7 +626,7 @@ void record_form::cb_ch_field(Fl_Widget* w, void* v) {
 		that->modifying_ = true;
 		that->enable_widgets();
 		that->redraw();
-		main_window_->flush();
+//		main_window_->flush();
 	}
 }
 
@@ -636,7 +636,7 @@ void record_form::cb_editor(Fl_Widget* w, void* v) {
 	that->modifying_ = true;
 	that->enable_widgets();
 	that->redraw();
-	main_window_->flush();
+//	main_window_->flush();
 }
 
 
@@ -654,7 +654,7 @@ void record_form::cb_ch_enum(Fl_Widget* w, void* v) {
 	that->explain_enum(dataset, enum_value);
 	that->modifying_ = true;
 	that->enable_widgets();
-	main_window_->flush();
+//	main_window_->flush();
 }
 
 // Use the txt in the text edit or selected enum choice value 
@@ -703,7 +703,7 @@ void record_form::cb_bn_use(Fl_Widget* w, void* v) {
 	// Clear value in buffer
 	that->value_in_->buffer()->text("");
 	that->enable_widgets();
-	main_window_->flush();
+//	main_window_->flush();
 }
 
 // Clear edit value button has been clicked
@@ -715,7 +715,7 @@ void record_form::cb_bn_clear(Fl_Widget* w, void* v) {
 	that->enum_choice_->value(0);
 	that->field_choice_->value(0);
 	that->enable_widgets();
-	main_window_->flush();
+//	main_window_->flush();
 }
 
 // Use the txt in the text edit for a specific field
@@ -744,7 +744,7 @@ void record_form::cb_bn_quick(Fl_Widget* w, void* v) {
 	// Clear modifying flag
 	that->modifying_ = false;
 	that->enable_widgets();
-	main_window_->flush();
+//	main_window_->flush();
 }
 
 // Modify messages button has been pressed - save to settings
@@ -777,7 +777,7 @@ void record_form::cb_bn_scale(Fl_Widget* w, void* v) {
 	Fl_Preferences display_settings(settings_, "Display");
 	display_settings.set("Image Scale", (int)that->scaling_image_);
 
-	main_window_->flush();
+//	main_window_->flush();
 }
 
 // Set the QSL_RCVD and QSLRDATE values in current record

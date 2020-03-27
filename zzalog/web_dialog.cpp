@@ -189,7 +189,7 @@ void web_dialog::create_form(int X, int Y) {
 	const int W2A = WMESS;
 
 	// overall width 
-	const int WGRP = max(C5 + W5, C2A + W2A) + GAP;
+	const int WGRP = ((C5 + W5) > (C2A + W2A) ? C5 + W5 : C2A + W2A) + GAP;
 	const int WALL = WGRP + EDGE;
 
 	image_widgets_.clear();

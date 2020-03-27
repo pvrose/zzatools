@@ -236,6 +236,8 @@ namespace zzalog {
 		Fl_Widget* lat_dms_op_;
 		Fl_Widget* lon_dms_op_;
 		Fl_Widget* centre_ch_;
+		// Map of colour "names" to buttons.
+		map<string, Fl_Widget*> button_map_;
 	};
 
 }

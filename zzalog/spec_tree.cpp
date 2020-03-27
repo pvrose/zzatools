@@ -61,7 +61,7 @@ void spec_tree::populate_tree(bool activate) {
 	// now build the tree
 	clear();
 	// Set root item parameters - font and title
-	Fl_Tree_Item* root_item = new Fl_Tree_Item(prefs());
+	Fl_Tree_Item* root_item = new Fl_Tree_Item(this);
 	root(root_item);
 	root_item->labelfont(item_labelfont() | FL_BOLD);
 	root_label("Specifications");
