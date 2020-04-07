@@ -498,10 +498,6 @@ void import_data::stop_update(logging_mode_t mode, bool immediate) {
 		if (size()) update_book();
 		break;
 	case NONE:
-		// 
-		delete_contents(true);
-		close_pending_ = false;
-		break;
 	case WAIT_AUTO:
 		// 
 		delete_contents(true);

@@ -800,6 +800,9 @@ void menu::cb_mi_log_radio(Fl_Widget* w, void* v) {
 			rig_if_->close();
 			delete rig_if_;
 			rig_if_ = nullptr;
+			import_data_->stop_update(that->logging(), false);
+			while (!import_data_->update_complete()) Fl::wait(0);
+			that->logging(LM_OFF_AIR);
 			scratchpad_->update();
 		}
 		break;
