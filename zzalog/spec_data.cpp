@@ -615,7 +615,7 @@ string spec_data::datatype(char indicator) {
 	for (auto it = data_types->data.begin(); it != data_types->data.end(); it++) {
 		// Get the Indicator field from the enyry
 		auto it_indicator = it->second->find("Data Type Indicator");
-		if (it_indicator->second[0] == indicator) {
+		if (it_indicator != it->second->end() && it_indicator->second[0] == indicator) {
 			// Returrn the name of the entry that matches
 			return it->first;
 		}

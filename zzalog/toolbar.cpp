@@ -23,6 +23,7 @@ using namespace zzalib;
 
 extern menu* menu_;
 extern book* navigation_book_;
+extern book* book_;
 extern extract_data* extract_records_;
 extern tabbed_forms* tabbed_view_;
 extern pfx_data* pfx_data_;
@@ -472,8 +473,8 @@ int toolbar::min_w() { return min_w_;  }
 // Set the record number to get the default input for the input
 void toolbar::search_text(int record_num) {
 	record_num_ = record_num;
-	if (navigation_book_->size()) {
-		search_text_ = navigation_book_->get_record(navigation_book_->item_number(record_num_), false)->item("CALL");
+	if (book_->size() > record_num) {
+		search_text_ = book_->get_record(record_num_, false)->item("CALL");
 	}
 	else {
 		search_text_ = "";

@@ -33,6 +33,7 @@ eqsl_handler::eqsl_handler()
 	: empty_queue_enable_(false)
 	, dequeue_parameter_({ &request_queue_, this })
 	, help_dialog_(nullptr)
+	, debug_enabled_(true)
 {
 }
 
@@ -44,12 +45,14 @@ eqsl_handler::~eqsl_handler()
 
 // Put the image request on to the queue
 void eqsl_handler::enqueue_request(record_num_t record_num, bool force /*=false*/) {
-	// Enqueue request
-	request_queue_.push(request_t(record_num, force));
-	// Update status
-	char message[512];
-	sprintf(message, "eQSL: %d Card requests pending", request_queue_.size());
-	status_->misc_status(ST_NOTE, message);
+	if (debug_enabled_) {
+		// Enqueue request
+		request_queue_.push(request_t(record_num, force));
+		// Update status
+		char message[512];
+		sprintf(message, "eQSL: %d Card requests pending", request_queue_.size());
+		status_->misc_status(ST_NOTE, message);
+	}
 }
 
 // handle the timeout for the request queue
@@ -846,6 +849,11 @@ string eqsl_handler::adif_item(record* record, string fieldname) {
 		delete[] temp;
 	}
 	return adif_text;
+}
+
+// Set/clear debug_enabled
+void eqsl_handler::debug_enable(bool value) {
+	debug_enabled_ = value;
 }
 
 

@@ -150,29 +150,37 @@ void import_data::auto_update() {
 		char timestamp[16];
 #ifdef _WIN32
 		int fd = _sopen(update_files_[i].c_str(), _O_RDONLY, _SH_DENYNO);
-		struct _stat status;
-		int result = _fstat(fd, &status);
-		strftime(timestamp, 16, "%Y%m%d%H%M%S", gmtime(&status.st_mtime));
-		close(fd);
+		if (fd == -1) {
+			string message = "IMPORT: Error opening file " + update_files_[i] + ": " + string(strerror(errno));
+			status_->misc_status(ST_ERROR, message.c_str());
+			failed = true;
+
+		}
+		else {
+			struct _stat status;
+			int result = _fstat(fd, &status);
+			strftime(timestamp, 16, "%Y%m%d%H%M%S", gmtime(&status.st_mtime));
+			close(fd);
 #else
 		// TODO: Code Posix version of the above
 #endif
-		if (timestamp > last_timestamps_[i]) {
-			// Load data from the auto-import file - concatenating all files
-			char message[256];
-			sprintf(message, "AUTO IMPORT: %s (%s)", update_files_[i].c_str(), sources_[i].c_str());
-			status_->misc_status(ST_NOTE, message);
-			load_data(update_files_[i]);
-			// Remember the earliest of the files that has changed
-			if (last_timestamps_[i] < last_timestamp_) {
-				last_timestamp_ = last_timestamps_[i];
+			if (timestamp > last_timestamps_[i]) {
+				// Load data from the auto-import file - concatenating all files
+				char message[256];
+				sprintf(message, "AUTO IMPORT: %s (%s)", update_files_[i].c_str(), sources_[i].c_str());
+				status_->misc_status(ST_NOTE, message);
+				load_data(update_files_[i]);
+				// Remember the earliest of the files that has changed
+				if (last_timestamps_[i] < last_timestamp_) {
+					last_timestamp_ = last_timestamps_[i];
+				}
+				last_timestamps_[i] = timestamp;
 			}
-			last_timestamps_[i] = timestamp;
-		}
-		else {
-			char message[256];
-			sprintf(message, "AUTO IMPORT: %s not changed", update_files_[i].c_str());
-			status_->misc_status(ST_WARNING, message);
+			else {
+				char message[256];
+				sprintf(message, "AUTO IMPORT: %s not changed", update_files_[i].c_str());
+				status_->misc_status(ST_WARNING, message);
+			}
 		}
 	}
 	if (size()) {
@@ -708,6 +716,17 @@ bool import_data::download_data(import_data::update_mode_t server) {
 		status_->misc_status(ST_NOTE, "IMPORT: Downloading eQSL");
 		eqsl_handler_->enable_fetch(eqsl_handler::EQ_PAUSE);
 		result = eqsl_handler_->download_eqsl_log(&adif);
+#ifdef _DEBUG
+		// Give developer a choice of whether to downloag eQSL images
+		if (fl_choice("You are in debug mode. Do you want to download eQSL images?", "YES", "NO", nullptr) == 1) {
+			eqsl_handler_->debug_enable(false);
+		}
+		else {
+			eqsl_handler_->debug_enable(true);
+		}
+#else
+		eqsl_handler_->debug_enable(true);
+#endif
 		break;
 	case LOTW_UPDATE:
 		// Fetch inbox from LotW into local stream

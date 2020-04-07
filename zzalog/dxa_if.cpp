@@ -13,8 +13,10 @@
 #include "tabbed_forms.h"
 #include "spec_data.h"
 #include "drawing.h"
+#include "pfx_data.h"
 
 #include <set>
+#include <iostream>
 
 #include <FL/Fl_Preferences.H>
 #include <FL/Fl_Choice.H>
@@ -225,6 +227,7 @@ void dxa_if::create_form() {
 	ch12->add("By band");
 	ch12->add("By logged mode");
 	ch12->add("By award mode");
+	ch12->add("By distance");
 	ch12->value((int)atlas_colour_);
 	// Choice - where to centre the map
 	Fl_Choice* ch13 = new Fl_Choice(ch12->x(), ch12->y() + ch12->h() + HTEXT, ch12->w(), ch12->h(), "Centre on...");
@@ -412,8 +415,9 @@ void dxa_if::enable_widgets() {
 			colour_bns_[i]->labelcolor(fl_contrast(FL_BLACK, button_colour(i)));
 		}
 		else {
-			colour_bns_[i]->color(FL_INACTIVE_COLOR);
-			colour_bns_[i]->labelcolor(FL_BLACK);
+			Fl_Color inactive_colour = fl_color_average(button_colour(i), FL_WHITE, 0.5f);
+			colour_bns_[i]->color(inactive_colour);
+			colour_bns_[i]->labelcolor(fl_contrast(FL_BLACK, inactive_colour));
 		}
 	}
 	redraw();
@@ -1044,6 +1048,7 @@ void dxa_if::create_colour_buttons() {
 // Is the point displayed
 bool dxa_if::is_displayed(record_num_t record_num) {
 	string selected_by;
+	int distance;
 	record* record = book_->get_record(record_num, false);
 	if (record == nullptr) {
 		return false;
@@ -1063,6 +1068,10 @@ bool dxa_if::is_displayed(record_num_t record_num) {
 	case AC_BANDS:
 		// get the logged band
 		selected_by = record->item("BAND");
+		break;
+	case AC_DISTANCE:
+		// Get the distance
+		selected_by = get_distance(record);
 		break;
 	}
 	// Get the colour index for this
@@ -1087,7 +1096,10 @@ DxAtlas::EnumColor dxa_if::convert_colour(Fl_Color colour) {
 	unsigned char blue;
 	unsigned char green;
 	Fl::get_color(colour, red, green, blue);
-	unsigned result = blue << 16 | green << 8 | red;
+	unsigned result = ((unsigned)blue << 16) | ((unsigned)green << 8) | (unsigned)red;
+	char message[200];
+	snprintf(message, 200, "DEBUG: Fl_Color %8x, DxAtlas: %8x\n", colour, result);
+	cout << message;
 	return (DxAtlas::EnumColor)result;
 }
 
@@ -1257,6 +1269,13 @@ void dxa_if::allocate_colours() {
 			}
 		}
 		break;
+	case AC_DISTANCE:
+		// Colour by distance
+		for (int i = 1; i < (int)(EARTH_RADIUS * PI) / 1000; i ++) {
+			string value = "<" + to_string(i * 1000) + "km";
+			colours_used_.push_back(value);
+		}
+		break;
 	}
 }
 
@@ -1371,6 +1390,9 @@ void dxa_if::draw_pins() {
 								item = record->item("MODE");
 								use_item = (colour_text == spec_data_->dxcc_mode(item));
 								break;
+							case AC_DISTANCE:
+								use_item = (colour_text == get_distance(record));
+								break;
 							}
 							// Don't use item if disabled
 
@@ -1412,26 +1434,29 @@ void dxa_if::draw_pins() {
 							}
 						}
 					}
-					// Resize array if fewer items have been created.
-					if (index_2 != records_to_display_.size()) {
-						rgsabound[0].cElements = index_2;
-						SafeArrayRedim(point_array, rgsabound);
-					}
-					// Set point size and paint colour
-					layer->PutBrushColor(colour);
-					layer->PutPointSize(3);
-					// font/line color
-					layer->PutPenColor(DxAtlas::clBlack);
-					// put data into the layer
-					points.parray = point_array;
-					// now put the data onto the DXATLAS: map and display an error if it failed
-					try {
-						layer->SetData(points);
-					}
-					catch (_com_error & e) {
-						char error[256];
-						sprintf(error, "DXATLAS: Got error displaying data : %s", e.ErrorMessage());
-						status_->misc_status(ST_ERROR, error);
+					// Don't attempt to draw an empty set of points
+					if (index_2 > 0) {
+						// Resize array if fewer items have been created.
+						if (index_2 != records_to_display_.size()) {
+							rgsabound[0].cElements = index_2;
+							SafeArrayRedim(point_array, rgsabound);
+						}
+						// Set point size and paint colour
+						layer->PutBrushColor(colour);
+						layer->PutPointSize(3);
+						// font/line color
+						layer->PutPenColor(DxAtlas::clBlack);
+						// put data into the layer
+						points.parray = point_array;
+						// now put the data onto the DXATLAS: map and display an error if it failed
+						try {
+							layer->SetData(points);
+						}
+						catch (_com_error& e) {
+							char error[256];
+							sprintf(error, "DXATLAS: Got error displaying data : %s", e.ErrorMessage());
+							status_->misc_status(ST_ERROR, error);
+						}
 					}
 					// now allow repainting
 					map->EndUpdate();
@@ -1455,7 +1480,20 @@ void dxa_if::draw_pins() {
 			}
 
 			// Now deactivate all colour buttons
+			for (size_t i = 0; i < colour_bns_.size(); i++) {
+				if (colours_used.find(colours_used_[i]) == colours_used.end()) {
+					Fl_Color inactive_colour = fl_color_average(button_colour(i), FL_WHITE, 0.5f);
+					colour_bns_[i]->color(inactive_colour);
+					colour_bns_[i]->labelcolor(fl_contrast(FL_BLACK, inactive_colour));
+				}
+				else {
+					Fl_Color active_colour = button_colour(i);
+					colour_bns_[i]->color(active_colour);
+					colour_bns_[i]->labelcolor(fl_contrast(FL_BLACK, active_colour));
+				}
+			}
 			for (auto it = colour_bns_.begin(); it != colour_bns_.end(); it++) {
+
 				(*it)->deactivate();
 			}
 			// And activate those buttons used
@@ -1629,7 +1667,17 @@ void dxa_if::label_colour_grp() {
 	case AC_AWARDMODE:
 		colour_grp_->label("Colour legend - award mode");
 		break;
+	case AC_DISTANCE:
+		colour_grp_->label("Colour legend - distance");
+		break;
 	}
 }
 
+string dxa_if::get_distance(record* this_record) {
+	int distance;
+	this_record->item("DISTANCE", distance);
+	distance = (((distance - 1) / 1000) + 1) * 1000;
+	string result = "<" + to_string(distance) + "km";
+	return result;
+}
 #endif // _WIN32

@@ -85,6 +85,8 @@ namespace zzalog {
 		bool requests_queued();
 		// get the local card file-name
 		string card_filename_l(record* record);
+		// Set/Clear debug_enabled_
+		void debug_enable(bool value);
 
 	protected:
 		// call backs
@@ -117,6 +119,8 @@ namespace zzalog {
 		bool empty_queue_enable_;
 		// Help dialog
 		Fl_Help_Dialog* help_dialog_;
+		// Queue enabled for debug
+		bool debug_enabled_;
 
 	};
 

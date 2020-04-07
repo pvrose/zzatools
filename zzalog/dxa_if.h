@@ -51,7 +51,8 @@ namespace zzalog {
 			AC_NONE,       // Diplay all selected records in black
 			AC_BANDS,      // Seperate colour per band
 			AC_LOGMODE,    // Separate colour per logged (ADIF-defined) mode/submode
-			AC_AWARDMODE   // Separate colour per DXCC defined mode
+			AC_AWARDMODE,  // Separate colour per DXCC defined mode
+			AC_DISTANCE    // Separate colour per distance bands (every 1000 km)
 		};
 		// Centre map position
 		enum centre_t {
@@ -153,6 +154,8 @@ namespace zzalog {
 		void zoom_centre(lat_long_t centre, bool full);
 		// Label colour group
 		void label_colour_grp();
+		// Get distance in 1000 km bands
+		string get_distance(record* this_record);
 
 
 	protected:
