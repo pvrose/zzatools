@@ -242,6 +242,13 @@ void dxa_if::create_form() {
 	ch13->add("Selected QSO");
 	ch13->add("In group");
 	ch13->add("At 0°N 0°E");
+	ch13->add("Continent/Europe");
+	ch13->add("Continent/Asia");
+	ch13->add("Continent/Africa");
+	ch13->add("Continent/North America");
+	ch13->add("Continent/South America");
+	ch13->add("Continent/Oceania");
+	ch13->add("Continent/Antarctica");
 	ch13->value((int)centre_mode_);
 	centre_ch_ = ch13;
 
@@ -1099,7 +1106,7 @@ DxAtlas::EnumColor dxa_if::convert_colour(Fl_Color colour) {
 	unsigned result = ((unsigned)blue << 16) | ((unsigned)green << 8) | (unsigned)red;
 	char message[200];
 	snprintf(message, 200, "DEBUG: Fl_Color %8x, DxAtlas: %8x\n", colour, result);
-	cout << message;
+	// cout << message;
 	return (DxAtlas::EnumColor)result;
 }
 
@@ -1648,6 +1655,55 @@ void dxa_if::centre_map() {
 		centre = { 0.0, 0.0 };
 		centre_map(centre);
 		zoom_centre(centre, true);
+		break;
+	default:
+		switch (centre_mode_) {
+		case EU:
+			northernmost_ = 60.0;
+			southernmost_ = 35.0;
+			westernmost_ = -30.0;
+			easternmost_ = 50.0;
+			break;
+		case AS:
+			northernmost_ = 80.0;
+			southernmost_ = -10.0;
+			westernmost_ = 20.0;
+			easternmost_ = 205.0;
+			break;
+		case AF:
+			northernmost_ = 40.0;
+			southernmost_ = -35.0;
+			westernmost_ = -25.0;
+			easternmost_ = 55.0;
+			break;
+		case NA:
+			northernmost_ = 80.0;
+			southernmost_ = 10.0;
+			westernmost_ = -155.0;
+			easternmost_ = -20.0;
+			break;
+		case SA:
+			northernmost_ = 15.0;
+			southernmost_ = -55.0;
+			westernmost_ = -95.0;
+			easternmost_ = -30.0;
+			break;
+		case OC:
+			northernmost_ = 30.0;
+			southernmost_ = -55.0;
+			westernmost_ = 120.0;
+			easternmost_ = 245.0;
+			break;
+		case AN:
+			northernmost_ = -40.0;
+			southernmost_ = -90.0;
+			westernmost_ = -180.0;
+			easternmost_ = 180.0;
+			break;
+		}
+		centre = { (northernmost_ + southernmost_) * 0.5, (westernmost_ + easternmost_) * 0.5 };
+		centre_map(centre);
+		zoom_centre(centre, false);
 		break;
 	}
 	save_values();

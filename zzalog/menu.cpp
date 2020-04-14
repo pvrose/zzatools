@@ -763,6 +763,9 @@ void menu::cb_mi_log_mode(Fl_Widget* w, void* v) {
 		import_data_->stop_update(next_mode, false);
 		while (!import_data_->update_complete()) Fl::wait();
 		status_->progress("Import cancelled!", OT_IMPORT);
+		if (next_mode == LM_IMPORTED) {
+			next_mode = LM_OFF_AIR;
+		}
 		break;
 	}
 

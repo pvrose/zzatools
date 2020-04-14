@@ -141,7 +141,7 @@ namespace zzalog {
 		// Get data type from field name
 		string datatype(string field_name);
 		// Get enumeration name
-		string enumeration_name(string& field, record* record);
+		string enumeration_name(const string& field, record* record);
 		// The DXCC has ADIF defined primary administrative districts
 		bool has_states(string dxcc_name);
 		// Validate a record - returns TRUE if record corrected
@@ -162,6 +162,8 @@ namespace zzalog {
 		void reset_continue();
 		// Add application defined field
 		bool add_appdef(const string& name, char indicator);
+		// Generate the description of the enumeration for the designated enumerated field
+		string describe_enumeration(spec_dataset* dataset, string value);
 
 		// protected methods
 	protected:

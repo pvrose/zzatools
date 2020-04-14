@@ -501,11 +501,27 @@ void log_table::edit_cell(int row, int col) {
 
 // Display a tooltip describing the field item and validating the value
 void log_table::describe_cell(int item, int col) {
-	// Get the field item under the mouse
-	record* record = my_book_->get_record(item, true);
-	field_info_t field_info = fields_[col];
-	// get the tip
-	string tip = spec_data_->get_tip(field_info.field, record);
+	int item_number;
+	string tip = "";
+	switch (order_) {
+	case FIRST_TO_LAST:
+		item_number = item;
+		break;
+	case LAST_TO_FIRST:
+		item_number = my_book_->size() - 1 - item;
+		break;
+	default:
+		// TODO: How do we handle record numbers in sorted data
+		tip = "Cannot provide tip for sorted displays!";
+		break;
+	}
+	if (tip.length() == 0) {
+		// Get the field item under the mouse
+		record* record = my_book_->get_record(item_number, true);
+		field_info_t field_info = fields_[col];
+		// get the tip
+		tip = spec_data_->get_tip(field_info.field, record);
+	}
 	// display it in a window that will time-out. Position the window where the mouse clicked
 	Fl_Window* tw = ::tip_window(tip, last_rootx_, last_rooty_);
 	// Set a timeout to remove the tip window

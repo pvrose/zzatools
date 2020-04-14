@@ -1717,30 +1717,7 @@ void record_form::set_enum_choice(string enumeration_type, string text) {
 
 // add text explaining the enumeration value in the value_in_ widget
 void record_form::explain_enum(spec_dataset* dataset, string enum_value) {
-	// Get the selected explanation - default to Not Available
-	string enum_text = "";
-	auto items = dataset->data.find(enum_value);
-	if (items != dataset->data.end()) {
-		// For each item in the dataset explanation for this enumeratiom
-		for (auto item = (items->second)->begin(); item != (items->second)->end(); item++) {
-			if (item->first != "Enumeration Name" &&
-				item->first != "Import-only" &&
-				item->first != "Comments" &&
-				item->first != "ADIF Version" &&
-				item->first != "ADIF Status" &&
-				item->second != "") {
-				// Add salient information to the explanation
-				char* line = new char[item->first.length() + item->second.length() + 10];
-				sprintf(line, "%s: %s\n", item->first.c_str(), item->second.c_str());
-				enum_text += string(line);
-				delete[] line;
-			}
-		}
-	}
-	if (enum_text == "") {
-		// There is no explanation
-		enum_text = "No data available";
-	}
+	string enum_text = spec_data_->describe_enumeration(dataset, enum_value);
 	// Put the explanation in the text edit field and disallow editing
 	value_in_->buffer()->text(enum_text.c_str());
 	value_in_->deactivate();

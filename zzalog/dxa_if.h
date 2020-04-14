@@ -60,6 +60,14 @@ namespace zzalog {
 			SELECTED,      // Selected QSO
 			GROUP,         // Centre of chosen QSOs
 			ZERO,          // zero longitude/latitude
+			DUMMY,         // For the sub-menu header
+			EU,            // Europe
+			AS,            // Asia
+			AF,            // Africa
+			NA,            // North America
+			SA,            // South America
+			OC,            // Oceania
+			AN,            // Antarctica
 		};
 
 	public:

@@ -645,7 +645,7 @@ string spec_data::datatype(string field_name) {
 }
 
 // Get enumeration name for the field name - note it may be DXCC dependent
-string spec_data::enumeration_name(string& field_name, record* record) {
+string spec_data::enumeration_name(const string& field_name, record* record) {
 	// Get the Fields dataset
 	spec_dataset* fields = dataset("Fields");
 	// Get the entry for the field name
@@ -2101,37 +2101,9 @@ string spec_data::get_tip(const string& field, record* record) {
 		tip += line;
 		if (text == "Enumeration") {
 			// Enumeration name
-			text = (*field_data)["Enumeration"];
-			sprintf(line, "Enumeration: %s\n", text.c_str());
-			tip += line;
-			// Get the enumartion dataset
-			if (text == "Primary_Administrative_Subdivision" ||
-				text == "Secondary_Adminsitrative_Subdivision") {
-				char enumeration[128];
-				sprintf(enumeration, "%s[%s]", text.c_str(), record->item("DXCC").c_str());
-				fields = dataset(enumeration);
-			}
-			else {
-				fields = dataset(text);
-			}
-			if (fields == nullptr) {
-				// Enumeration dataset doesn't exist
-				tip += "No elaboration data!\n";
-			}
-			else {
-				// Get the entry for the enumeration value
-				field_data = fields->data[data];
-				// For each item in the entry
-				for (unsigned int i = 0; i < fields->column_names.size(); i++) {
-					string& column = fields->column_names[i];
-					text = (*field_data)[column];
-					// Add a line to the tip if it's not empty nor item name starts with ADIF
-					if (text != "" && column.substr(0,4) != "ADIF") {
-						sprintf(line, "%s: %s\n", column.c_str(), text.c_str());
-						tip += line;
-					}
-				}
-			}
+			string enumeration = enumeration_name(field, record).c_str();
+			spec_dataset* dataset = this->dataset(enumeration);
+			tip += describe_enumeration(dataset, data);
 		}
 		// now check if contents valid
 		if (validate(field, data, true)) {
@@ -2229,4 +2201,32 @@ void spec_data::process_modes() {
 		}
 	}
 	(*this)["Combined"] = combined;
+}
+
+string spec_data::describe_enumeration(spec_dataset* dataset, string value) {
+	// Get the selected explanation - default to Not Available
+	string enum_text = "";
+	auto items = dataset->data.find(value);
+	if (items != dataset->data.end()) {
+		// For each item in the dataset explanation for this enumeratiom
+		for (auto item = (items->second)->begin(); item != (items->second)->end(); item++) {
+			if (item->first != "Enumeration Name" &&
+				item->first != "Import-only" &&
+				item->first != "Comments" &&
+				item->first != "ADIF Version" &&
+				item->first != "ADIF Status" &&
+				item->second != "") {
+				// Add salient information to the explanation
+				char* line = new char[item->first.length() + item->second.length() + 10];
+				sprintf(line, "%s: %s\n", item->first.c_str(), item->second.c_str());
+				enum_text += string(line);
+				delete[] line;
+			}
+		}
+	}
+	if (enum_text == "") {
+		// There is no explanation
+		enum_text = "No data available";
+	}
+	return enum_text;
 }

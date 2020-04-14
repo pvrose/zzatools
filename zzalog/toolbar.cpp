@@ -173,6 +173,14 @@ toolbar::toolbar(int X, int Y, int W, int H, const char* label) :
 	bn->tooltip("Extract unsent LotW records");
 	add(bn);
 	curr_x += H;
+	// Extract->LotW
+	bn = new Fl_Button(curr_x, Y, H, H, 0);
+	bn->callback(cb_bn_menu, (void*)"E&xtract/Club&Log");
+	bn->when(FL_WHEN_RELEASE);
+	bn->image(new Fl_RGB_Image(ICON_EXTR_CLOG, 16, 16, 4));
+	bn->tooltip("Extract unsent ClubLog records");
+	add(bn);
+	curr_x += H;
 	// Extract->Upload
 	bn = new Fl_Button(curr_x, Y, H, H, 0);
 	bn->callback(cb_bn_menu, (void*)"E&xtract/&Upload");
