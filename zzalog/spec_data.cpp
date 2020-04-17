@@ -2055,13 +2055,15 @@ void spec_data::initialise_field_choice(Fl_Choice* ch, string dataset_name /* = 
 			// Just add the entry without a short-cut.
 			ch->add(it->first.c_str(), 0, (Fl_Callback*)nullptr);
 		}
-		if (it->first == default_field) {
-			default_value = i;
-		}
-
 		it++;
 	}
-	ch->value(default_value);
+	int index = ch->find_index(default_field.c_str());
+	if (index == -1) {
+		ch->value(0);
+	}
+	else {
+		ch->value(index);
+	}
 }
 
 // Generate a timestamp of the QSO for the report listing - QSO <date> <time> <call> <field> (<data>)

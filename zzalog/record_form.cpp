@@ -943,6 +943,7 @@ void record_form::update(hint_t hint, record_num_t record_num_1, record_num_t re
 	case HT_INSERTED:
 	case HT_NEW_DATA:
 	case HT_NO_DATA:
+	case HT_EXTRACTION:
 		// Current selected item number may have changed - display the selected record
 		item_num_1_ = item_num_1;
 		item_num_2_ = -1;
@@ -1032,7 +1033,6 @@ void record_form::update(hint_t hint, record_num_t record_num_1, record_num_t re
 		update_form();
 		break;
 	case HT_FORMAT:
-	case HT_EXTRACTION:
 		// Format and/or columns have changed - just redraw the form without changing records
 		update_form();
 		break;

@@ -151,6 +151,7 @@ void extract_data::extract_records() {
 		}
 		break;
 	}
+	navigation_book_ = this;
 }
 
 // Repeat the extractions
@@ -549,7 +550,9 @@ void extract_data::extract_call(string callsign) {
 		sprintf(message, format, size());
 		status_->misc_status(ST_OK, message);
 		delete[] message;
-		book::selection(book::selection(), HT_EXTRACTION);
+		// Select first record in list and display the extraction page
+		selection(0, HT_EXTRACTION);
+		tabbed_view_->activate_pane(OT_EXTRACT, true);
 	}
 
 }

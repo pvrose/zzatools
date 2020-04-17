@@ -7,6 +7,7 @@
 #include "intl_widgets.h"
 
 #include <string>
+#include <queue>
 
 #include <FL/Fl_Text_Editor.H>
 #include <FL/Fl_Widget.H>
@@ -18,6 +19,19 @@
 using namespace std;
 
 namespace zzalog {
+
+	class spad_editor :
+		public intl_editor
+	{
+	public:
+		spad_editor(int x, int y, int w, int h);
+		~spad_editor();
+
+		int handle(int event);
+
+	protected:
+
+	};
 
 	// This class provides a standalone dialog in which user can type real-time data from the QSO and set fields in the record
 	class scratchpad :
@@ -34,30 +48,16 @@ namespace zzalog {
 		void rig_update(string frequency, string mode, string power);
 		// Called when rig is closed
 		void update();
-
-	protected:
-		// Create the form
-		void create_form();
-
 		// Call back - general button action
 		static void cb_action(Fl_Widget* w, void* v);
+		// Callback - start button
+		static void cb_start(Fl_Widget* w, void* v);
 		// Callback - save button
 		static void cb_save(Fl_Widget* w, void* v);
 		// Callback - cancel button
 		static void cb_cancel(Fl_Widget* w, void* v);
-		// Callback - start button
-		static void cb_start(Fl_Widget* w, void* v);
-		// Callback - frequency input
-		static void cb_ip_freq(Fl_Widget* w, void* v);
-		// Callback - band choice
-		static void cb_ch_mode(Fl_Widget* w, void* v);
-		// Callback - power input
-		static void cb_ip_power(Fl_Widget* w, void* v);
 
-		// Enable widgets
-		void enable_widgets();
-
-		// Actions attached to the various buttons
+		// Actions attached to the various buttons and keyboard shortcuts
 		enum actions {
 			WRITE_CALL,
 			WRITE_NAME,
@@ -68,10 +68,25 @@ namespace zzalog {
 			WRITE_FIELD
 		};
 
+	protected:
+		// Create the form
+		void create_form();
+
+		// Callback - frequency input
+		static void cb_ip_freq(Fl_Widget* w, void* v);
+		// Callback - band choice
+		static void cb_ch_mode(Fl_Widget* w, void* v);
+		// Callback - power input
+		static void cb_ip_power(Fl_Widget* w, void* v);
+
+		// Enable widgets
+		void enable_widgets();
+
+
 		// The text items
 		Fl_Text_Buffer* buffer_;
 		// The editor
-		intl_editor* editor_;
+		spad_editor* editor_;
 		// Save button
 		Fl_Button* bn_save_;
 		// Cancel button

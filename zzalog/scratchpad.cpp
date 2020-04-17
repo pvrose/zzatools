@@ -36,6 +36,54 @@ extern rig_if* rig_if_;
 extern band_view* band_view_;
 extern void add_scratchpad();
 
+spad_editor::spad_editor(int x, int y, int w, int h) :
+	intl_editor(x, y, w, h)
+{
+}
+
+spad_editor::~spad_editor() {
+
+}
+
+int spad_editor::handle(int event) {
+	switch (event) {
+	case FL_FOCUS:
+	case FL_UNFOCUS:
+		// mouse going in and out of focus on this view
+		// tell FLTK we've acknowledged it so we can receive keyboard events (or not)
+		return true;
+	case FL_KEYBOARD:
+		// Keyboard event - used for keyboard navigation
+		switch (Fl::event_key()) {
+		case FL_F + 1:
+			scratchpad::cb_action(this, (void*)scratchpad::WRITE_CALL);
+			return true;
+		case FL_F + 2:
+			scratchpad::cb_action(this, (void*)scratchpad::WRITE_NAME);
+			return true;
+		case FL_F + 3:
+			scratchpad::cb_action(this, (void*)scratchpad::WRITE_QTH);
+			return true;
+		case FL_F + 4:
+			scratchpad::cb_action(this, (void*)scratchpad::WRITE_RST_RCVD);
+			return true;
+		case FL_F + 5:
+			scratchpad::cb_action(this, (void*)scratchpad::WRITE_RST_SENT);
+			return true;
+		case FL_F + 6:
+			scratchpad::cb_action(this, (void*)scratchpad::WRITE_GRID);
+			return true;
+		case FL_F + 7:
+			scratchpad::cb_save(this, nullptr);
+			return true;
+		case FL_F + 8:
+			scratchpad::cb_cancel(this, nullptr);
+			return true;
+		}
+	}
+	// Not handled the event - pass up the inheritance
+	return intl_editor::handle(event);
+}
 
 scratchpad::scratchpad() :
 	win_dialog(480, 200, "Scratchpad")
@@ -66,7 +114,7 @@ void scratchpad::create_form() {
 
 	// Create the editor
 	buffer_ = new Fl_Text_Buffer(1024);
-	editor_ = new intl_editor(EDGE, EDGE, WEDITOR, HEDITOR);
+	editor_ = new spad_editor(EDGE, EDGE, WEDITOR, HEDITOR);
 	editor_->buffer(buffer_);
 	editor_->textsize(FONT_SIZE);
 	editor_->textfont(FONT);
@@ -229,7 +277,7 @@ void scratchpad::cb_action(Fl_Widget* w, void* v) {
 	string field;
 	// Create a record if we haven't started editing one
 	if (that->record_ == nullptr) {
-		that->record_ = book_->new_record(menu_->logging());
+		cb_start(w, nullptr);
 	}
 	// Get the field to write from the button action
 	hint_t hint = HT_MINOR_CHANGE;
@@ -261,9 +309,11 @@ void scratchpad::cb_action(Fl_Widget* w, void* v) {
 		break;
 	}
 	// Get the highlighted text from the editor buffer and write it to the selected field, unhighlight the text
-	char* text = that->buffer_->selection_text();
-	that->record_->item(field, string(text));
-	free(text);
+	string text = that->buffer_->selection_text();
+	// Remove leading and trailing white space
+	while (isspace(text[0])) text = text.substr(1);
+	while (isspace(text[text.length() - 1])) text = text.substr(0, text.length() - 1);
+	that->record_->item(field, text);
 	that->buffer_->unselect();
 	// Update views
 	tabbed_view_->update_views(nullptr, HT_MINOR_CHANGE, book_->size() - 1);
@@ -401,11 +451,13 @@ void scratchpad::enable_widgets() {
 		// Allow save and cancel as we have a record
 		bn_save_->activate();
 		bn_cancel_->activate();
+		bn_cancel_->label("Cancel");
 		bn_start_->deactivate();
 	}
 	else {
 		bn_save_->deactivate();
-		bn_cancel_->deactivate();
+		bn_cancel_->activate();
+		bn_cancel_->label("Clear");
 		bn_start_->activate();
 	}
  }
