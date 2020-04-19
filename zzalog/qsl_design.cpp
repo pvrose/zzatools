@@ -56,9 +56,10 @@ qsl_design::~qsl_design() {
 // Load the current design from the settings
 void qsl_design::load_values() {
 	// Get the settings by creating a qsl_form
-	record* record = book_->get_record();
+	record** my_record = new record * [1];
+	my_record[0] = book_->get_record();
 	card_window_ = new Fl_Window(10, 10, "QSL Design");
-	current_design_ = new qsl_form(0, 0, &record, 1);
+	current_design_ = new qsl_form(0, 0, my_record, 1);
 	current_design_->position(0, 0);
 	current_design_->box(FL_FLAT_BOX);
 	current_design_->color(FL_WHITE);
@@ -226,13 +227,13 @@ void qsl_design::create_form(int X, int Y) {
 	vip124->tooltip("Please specify the spacing between columns");
 	// Row 2A - height parameters
 	Fl_Value_Input* vip12A1 = new Fl_Value_Input(X_121, Y_12A, WBUTTON, HBUTTON, "Rows");
-	vip12A1->value(num_cols_);
+	vip12A1->value(num_rows_);
 	vip12A1->labelfont(FONT);
 	vip12A1->labelsize(FONT_SIZE);
 	vip12A1->textfont(FONT);
 	vip12A1->textsize(FONT_SIZE);
 	vip12A1->align(FL_ALIGN_LEFT);
-	vip12A1->callback(cb_value<Fl_Value_Input, int>, &num_cols_);
+	vip12A1->callback(cb_value<Fl_Value_Input, int>, &num_rows_);
 	vip12A1->when(FL_WHEN_ENTER_KEY);
 	vip12A1->tooltip("Please specify the number of rows when printing");
 	Fl_Value_Input* vip12A2 = new Fl_Value_Input(X_122, Y_12A, WBUTTON, HBUTTON, "Height");

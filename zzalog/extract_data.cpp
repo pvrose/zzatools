@@ -374,6 +374,9 @@ void extract_data::extract_qsl(extract_data::extract_mode_t server) {
 			/*string pattern;*/ "Y"
 		};
 		criteria(new_criteria, server);
+		sort_records("CALL", false);
+		tabbed_view_->update_views(nullptr, HT_RESET_ORDER, 0);
+
 	}
 	if (size() == 0) {
 		// No records match these criteria

@@ -139,6 +139,8 @@ void qsl_form::read_settings(Fl_Preferences& settings, vector<qsl_form::qsl_widg
 
 // Create the card design
 void qsl_form::create_form() {
+	begin();
+	color(FL_WHITE);
 	size_error_ = false;
 	// dimensions in points
 	int width = to_points(width_);
@@ -167,6 +169,7 @@ void qsl_form::create_form() {
 	}
 	redraw();
 	end();
+	show();
 }
 
 // Draw the lines of text for one of the four corners,
@@ -437,6 +440,7 @@ int qsl_form::table_cols() {
 
 // Write one set of widget data
 void qsl_form::write_settings(Fl_Preferences& settings, vector<qsl_widget>& widgets) {
+	settings.clear();
 	for (unsigned int i = 0; i < widgets.size(); i++) {
 		char group[3];
 		sprintf(group, "%d", i);

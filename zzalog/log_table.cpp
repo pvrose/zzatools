@@ -260,6 +260,11 @@ void log_table::update(hint_t hint, unsigned int record_num_1, unsigned int reco
 			col_width(i, fields_[i].width);
 		}
 		break;
+	case HT_RESET_ORDER:
+		// Reset order to FIRST_TO_LAST
+		order_ = FIRST_TO_LAST;
+		redraw();
+		break;
 	default:
 		// set the number of rows
 		rows(my_book_->get_count());

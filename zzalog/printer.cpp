@@ -346,6 +346,8 @@ int printer::print_cards() {
 
 int printer::print_page_cards(size_t &item_num) {
 	Fl_Window* win = new Fl_Window(cwin_x_, cwin_y_, cwin_w_, cwin_h_);
+	win->clear_border();
+	win->color(FL_WHITE);
 	int card;
 	for (card = 0; item_num < navigation_book_->size() && card < items_per_page_; card++) {
 		// Get the number of items with the same callsign
@@ -381,8 +383,9 @@ int printer::print_page_cards(size_t &item_num) {
 		Fl_Preferences qsl_settings(settings_, "QSL Design");
 		qsl_settings.get("Print Label", print_address, (int)false);
 		if (print_address) {
-			Fl_Button* bn_label = new Fl_Button(cwin_x_ + ((card % num_cols_) * card_w_), cwin_y_ + (((card / num_cols_) % num_rows_) * card_h_), card_w_, card_h_);
+			Fl_Button* bn_label = new Fl_Button(cwin_x_ + ((card % num_cols_) * card_w_) + GAP, cwin_y_ + (((card / num_cols_) % num_rows_) * card_h_), card_w_ - GAP, card_h_);
 			bn_label->copy_label(address_);
+			bn_label->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
 			bn_label->box(FL_NO_BOX);
 			bn_label->labelfont(font_add_);
 			bn_label->labelsize(size_add_);
@@ -390,6 +393,7 @@ int printer::print_page_cards(size_t &item_num) {
 		print_label_ = false;
 	}
 	win->end();
+	win->show();
 	print_window(win);
 	Fl::delete_widget(win);
 	return 0;
