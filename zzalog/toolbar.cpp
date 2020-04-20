@@ -482,7 +482,7 @@ int toolbar::min_w() { return min_w_;  }
 // Set the record number to get the default input for the input
 void toolbar::search_text(int record_num) {
 	record_num_ = record_num;
-	if (book_->size() > record_num) {
+	if (book_->size() > record_num_) {
 		search_text_ = book_->get_record(record_num_, false)->item("CALL");
 	}
 	else {

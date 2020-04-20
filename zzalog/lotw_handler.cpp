@@ -45,15 +45,18 @@ bool lotw_handler::upload_lotw_log(book* book) {
 	bool ok;
 	lotw_settings.get("Export File", filename, "");
 	// Open a file chooser to get file to export to - allows user to cancel upload
-	Fl_File_Chooser* chooser = new Fl_File_Chooser(filename, "ADI Files(*.adi)", Fl_File_Chooser::CREATE, "Please select file for sending to LotW");
-	chooser->callback(cb_chooser, &new_filename);
-	chooser->textfont(FONT);
-	chooser->textsize(FONT_SIZE);
-	chooser->show();
-	// Wait while the dialog is active (visible)
-	while (chooser->visible()) Fl::wait();
+	Fl_File_Chooser* chooser = nullptr;
+	if (strlen(filename) == 0) {
+		chooser = new Fl_File_Chooser(filename, "ADI Files(*.adi)", Fl_File_Chooser::CREATE, "Please select file for sending to LotW");
+		chooser->callback(cb_chooser, &new_filename);
+		chooser->textfont(FONT);
+		chooser->textsize(FONT_SIZE);
+		chooser->show();
+		// Wait while the dialog is active (visible)
+		while (chooser->visible()) Fl::wait();
+	}
 	free(filename);
-	if (!chooser->count()) {
+	if (chooser != nullptr && !chooser->count()) {
 		// User cancelled
 		status_->misc_status(ST_ERROR, "LOTW UPLOAD: No file selected, upload cancelled");
 		ok = false;

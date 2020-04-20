@@ -55,6 +55,7 @@ import_data::import_data() :
 	number_checked_ = 0;
 	number_added_ = 0;
 	number_rejected_ = 0;
+	number_clublog_ = 0;
 	num_update_files_ = 0;
 	update_files_ = nullptr;
 	empty_files_ = nullptr;
@@ -193,6 +194,7 @@ void import_data::auto_update() {
 		number_updated_ = 0;
 		number_added_ = 0;
 		number_rejected_ = 0;
+		number_clublog_ = 0;
 		number_to_import_ = size();
 		update_book();
 	}
@@ -518,8 +520,14 @@ void import_data::finish_update(bool merged /*= true*/) {
 	// No import data so select last record and activate main log view
 	if (merged && size() == 0) {
 		char message[256];
-		sprintf(message, "IMPORT: %d records read, %d checked, %d updated, %d accepted, %d added, %d rejected",
-			number_to_import_, number_checked_, number_updated_, number_accepted_, number_added_, number_rejected_);
+		if (update_mode_ == LOTW_UPDATE) {
+			sprintf(message, "IMPORT: %d records read, %d checked, %d updated, %d accepted, %d added, %d rejected, %d changed ClubLog",
+				number_to_import_, number_checked_, number_updated_, number_accepted_, number_added_, number_rejected_, number_clublog_);
+		}
+		else {
+			sprintf(message, "IMPORT: %d records read, %d checked, %d updated, %d accepted, %d added, %d rejected",
+				number_to_import_, number_checked_, number_updated_, number_accepted_, number_added_, number_rejected_);
+		}
 		status_->misc_status(ST_OK, message);
 		status_->progress(size(), book_type_);
 		if (number_updated_) {

@@ -101,6 +101,8 @@ namespace zzalog {
 		int number_added_;
 		// The number of rejected
 		int number_rejected_;
+		// The number of records with clublog modified
+		int number_clublog_;
 		// Number of filed being imported 
 		int num_update_files_;
 		// Names of the files
