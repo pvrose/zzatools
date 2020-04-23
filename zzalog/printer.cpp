@@ -83,11 +83,17 @@ int printer::print_book() {
 	status_->misc_status(ST_NOTE, message);
 	int from_page;
 	int to_page;
+	char* error_message = new char[256];
+	memset(error_message, 0, 256);
 	// Start the job with unknown number of pages - exit if cancelled
-	if (start_job(0, &from_page, &to_page)) {
-		status_->misc_status(ST_WARNING, "PRINTER: Unable to proceed with print job");
+	if (start_job(0, &from_page, &to_page, &error_message)) {
+		Fl_Display_Device::display_device()->set_current();
+		char* message = new char[266];
+		snprintf(message, 256, "PRINTER: %s", error_message);
+		status_->misc_status(ST_WARNING, message);
 		return 1;
 	}
+	delete error_message;
 
 	fl_cursor(FL_CURSOR_WAIT);
 	// calculate basic properies - row height etc.
@@ -285,12 +291,17 @@ int printer::print_cards() {
 	status_->misc_status(ST_NOTE, message);
 	int from_page;
 	int to_page;
+	char* error_message = new char[256];;
+	memset(error_message, 0, 256);
 	// Start the job with unknown number of pages - exit if cancelled
-	if (start_job(0, &from_page, &to_page)) {
+	if (start_job(0, &from_page, &to_page, &error_message)) {
 		Fl_Display_Device::display_device()->set_current();
-		status_->misc_status(ST_WARNING, "PRINTER: Unable to proceed with print job");
+		char* message = new char[266];
+		snprintf(message, 256, "PRINTER: %s", error_message);
+		status_->misc_status(ST_WARNING, message);
 		return 1;
 	}
+	delete error_message;
 	if (card_properties()) {
 		return 1;
 	}
