@@ -83,7 +83,9 @@ int printer::print_book() {
 	status_->misc_status(ST_NOTE, message);
 	int from_page;
 	int to_page;
-	if (!start_printer(from_page, to_page)) {
+	// Start the job with unknown number of pages - exit if cancelled
+	if (start_job(0, &from_page, &to_page)) {
+		status_->misc_status(ST_WARNING, "PRINTER: Unable to proceed with print job");
 		return 1;
 	}
 
@@ -283,9 +285,16 @@ int printer::print_cards() {
 	status_->misc_status(ST_NOTE, message);
 	int from_page;
 	int to_page;
-	if (!start_printer(from_page, to_page)) {
+	char* error_message = new char[256];;
+	// Start the job with unknown number of pages - exit if cancelled
+	if (start_job(0, &from_page, &to_page, &error_message)) {
+		Fl_Display_Device::display_device()->set_current();
+		char* message = new char[266];
+		snprintf(message, 256, "PRINTER: %s", error_message);
+		status_->misc_status(ST_WARNING, error_message);
 		return 1;
 	}
+	delete error_message;
 	if (card_properties()) {
 		return 1;
 	}
@@ -453,34 +462,4 @@ int printer::card_properties() {
 	int last_item = print_label_ ? navigation_book_->size() : navigation_book_->size() - 1;
 	number_pages_ = (last_item / items_per_page_) + 1;
 	return 0;
-}
-
-bool printer::start_printer(int& from_page, int& to_page) {
-	char* error_message = new char[256];;
-	memset(error_message, 0, 256);
-	char* message = new char[266];
-	bool result;
-	// Start the job with unknown number of pages - exit if cancelled
-	switch (start_job(0, &from_page, &to_page, &error_message)) {
-	case 0:
-		// Successful
-		result = true;
-		break;
-	case 1:
-		// User cancel
-		strcpy(message, "PRINTER: Print cancelled by user");
-		Fl_Display_Device::display_device()->set_current();
-		status_->misc_status(ST_WARNING, message);
-		result = false;
-		break;
-	default:
-		snprintf(message, 256, "PRINTER: %s", error_message);
-		Fl_Display_Device::display_device()->set_current();
-		status_->misc_status(ST_ERROR, message);
-		result = false;
-		break;
-	}
-	delete[] error_message;
-	delete[] message;
-	return result;
 }
