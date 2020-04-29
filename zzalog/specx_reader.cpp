@@ -46,12 +46,12 @@ bool specx_reader::load_data(spec_data* data, istream& in, string& version) {
 	// reposition back to beginning
 	in.seekg(0, ios::beg);
 	// Initialsie the progress
-	status_->misc_status(ST_NOTE, "SPEC READ: Started");
+	status_->misc_status(ST_NOTE, "ADIF SPEC: Started");
 	status_->progress(file_size, OT_ADIF, "bytes");
 	// Call the XML parser - calls back to the overides herein
 	if (parse(in)) {
 		// Read successful - complete progress
-		status_->misc_status(ST_OK, "SPEC READ: Done!");
+		status_->misc_status(ST_OK, "ADIF SPEC: Done!");
 		status_->progress(file_size, OT_ADIF);
 		version = adif_version_;
 		data->erase("Primary_Administrative_Subdivision");
@@ -60,13 +60,13 @@ bool specx_reader::load_data(spec_data* data, istream& in, string& version) {
 		return true;
 	}
 	else if (closing_) {
-		status_->misc_status(ST_WARNING, "Spec Read: Cancelled as close-down requested");
+		status_->misc_status(ST_WARNING, "ADIF SPEC: Read cancelled as close-down requested");
 		status_->progress("Load abandoned", OT_ADIF);
 		fl_cursor(FL_CURSOR_DEFAULT);
 		return false;
 	} else {
 		// Read failed - report failure
-		status_->misc_status(ST_FATAL, "SPEC READ: Failed");
+		status_->misc_status(ST_FATAL, "ADIF SPEC: Read failed");
 		status_->progress("Load failed", OT_ADIF);
 		fl_cursor(FL_CURSOR_DEFAULT);
 		return false;
@@ -136,7 +136,7 @@ bool specx_reader::characters(string content) {
 // Start <adif vesrion="ADIF Version" status="Released" created="ISO Date">
 bool specx_reader::start_adif(map<string, string>* attributes) {
 	if (elements_.size()) {
-		status_->misc_status(ST_ERROR, "SPEC READ: Incorrect XML - unexpected adif element");
+		status_->misc_status(ST_ERROR, "ADIF SPEC: Incorrect XML - unexpected adif element");
 		return false;
 	}
 	else {
@@ -156,7 +156,7 @@ bool specx_reader::start_adif(map<string, string>* attributes) {
 			}
 			else {
 				char* message = new char[50 + (it->second).length()];
-				sprintf(message, "SPEC READ: Invalid attribute %s in ADIF element", it->second.c_str());
+				sprintf(message, "ADIF SPEC: Invalid attribute %s in ADIF element", it->second.c_str());
 				status_->misc_status(ST_ERROR, message);
 				delete[] message;
 				return false;
@@ -169,7 +169,7 @@ bool specx_reader::start_adif(map<string, string>* attributes) {
 // Start <dataTypes>
 bool specx_reader::start_datatypes() {
 	if (elements_.back() != SXE_ADIF) {
-		status_->misc_status(ST_ERROR, "SPEC READ: Incorrect XML - unexpected dataTypes element");
+		status_->misc_status(ST_ERROR, "ADIF SPEC: Incorrect XML - unexpected dataTypes element");
 		return false;
 	}
 	else {
@@ -177,7 +177,7 @@ bool specx_reader::start_datatypes() {
 		// Create a dataset "Data Types"
 		dataset_name_ = "Data Types";
 		char message[120];
-		sprintf(message, "SPEC READ: %s", dataset_name_.c_str());
+		sprintf(message, "ADIF SPEC: %s", dataset_name_.c_str());
 		status_->misc_status(ST_NOTE, message);
 		return true;
 	}
@@ -186,7 +186,7 @@ bool specx_reader::start_datatypes() {
 // Start header
 bool specx_reader::start_header() {
 	if (elements_.back() != SXE_DATATYPES && elements_.back() != SXE_ENUM && elements_.back() != SXE_FIELDS) {
-		status_->misc_status(ST_ERROR, "SPEC READ: Incorrect XML - unexpected header element");
+		status_->misc_status(ST_ERROR, "ADIF SPEC: Incorrect XML - unexpected header element");
 		return false;
 	}
 	else {
@@ -214,7 +214,7 @@ bool specx_reader::start_value(map<string, string>* attributes) {
 			}
 			else {
 				char* message = new char[50 + it->second.length()];
-				sprintf(message, "SPEC READ: Incorrect XML - unknown value attribute %s", it->second.c_str());
+				sprintf(message, "ADIF SPEC: Incorrect XML - unknown value attribute %s", it->second.c_str());
 				status_->misc_status(ST_ERROR, message);
 				delete[] message;
 				return false;
@@ -222,7 +222,7 @@ bool specx_reader::start_value(map<string, string>* attributes) {
 		}
 		return true;
 	default:
-		status_->misc_status(ST_ERROR, "SPEC READ: Incorrect XML - unexpected value element");
+		status_->misc_status(ST_ERROR, "ADIF SPEC: Incorrect XML - unexpected value element");
 		return false;
 	}
 }
@@ -230,7 +230,7 @@ bool specx_reader::start_value(map<string, string>* attributes) {
 // Start record
 bool specx_reader::start_record() {
 	if (elements_.back() != SXE_DATATYPES && elements_.back() != SXE_ENUM && elements_.back() != SXE_FIELDS) {
-		status_->misc_status(ST_ERROR, "SPEC READ: Incorrect XML - unexpected record element");
+		status_->misc_status(ST_ERROR, "ADIF SPEC: Incorrect XML - unexpected record element");
 		return false;
 	}
 	else {
@@ -244,7 +244,7 @@ bool specx_reader::start_record() {
 // Start enumerations
 bool specx_reader::start_enumerations() {
 	if (elements_.back() != SXE_ADIF) {
-		status_->misc_status(ST_ERROR, "SPEC READ: Incorrect XML - unexpected enumerations element");
+		status_->misc_status(ST_ERROR, "ADIF SPEC: Incorrect XML - unexpected enumerations element");
 		return false;
 	}
 	else {
@@ -258,7 +258,7 @@ bool specx_reader::start_enumerations() {
 // Start enumeration
 bool specx_reader::start_enumeration(map<string, string>* attributes) {
 	if (elements_.back() != SXE_ENUMS) {
-		status_->misc_status(ST_ERROR, "SPEC READ: Incorrect XML - unexpected dataTypes element");
+		status_->misc_status(ST_ERROR, "ADIF SPEC: Incorrect XML - unexpected dataTypes element");
 		return false;
 	}
 	else {
@@ -269,12 +269,12 @@ bool specx_reader::start_enumeration(map<string, string>* attributes) {
 			if (att_name == "NAME") {
 				dataset_name_ = it->second;
 				char message[120];
-				sprintf(message, "SPEC READ: %s", dataset_name_.c_str());
+				sprintf(message, "ADIF SPEC: %s", dataset_name_.c_str());
 				status_->misc_status(ST_NOTE, message);
 			}
 			else {
 				char* message = new char[50 + it->second.length()];
-				sprintf(message, "SPEC READ: Incorrect XML - unknown value attribute %s", it->second.c_str());
+				sprintf(message, "ADIF SPEC: Incorrect XML - unknown value attribute %s", it->second.c_str());
 				status_->misc_status(ST_ERROR, message);
 				delete[] message;
 				return false;
@@ -287,14 +287,14 @@ bool specx_reader::start_enumeration(map<string, string>* attributes) {
 // Start fields
 bool specx_reader::start_fields() {
 	if (elements_.back() != SXE_ADIF) {
-		status_->misc_status(ST_ERROR, "SPEC READ: Incorrect XML - unexpected fields element");
+		status_->misc_status(ST_ERROR, "ADIF SPEC: Incorrect XML - unexpected fields element");
 		return false;
 	}
 	else {
 		elements_.push_back(SXE_FIELDS);
 		dataset_name_ = "Fields";
 		char message[120];
-		sprintf(message, "SPEC READ: %s", dataset_name_.c_str());
+		sprintf(message, "ADIF SPEC: %s", dataset_name_.c_str());
 		status_->misc_status(ST_NOTE, message);
 		return true;
 	}
@@ -347,7 +347,7 @@ bool specx_reader::end_adif() {
 	// End of the XML - no action
 	if (num_ignored_) {
 		char message[128];
-		sprintf(message, "SPEC READ: %d XML elements ignored", num_ignored_);
+		sprintf(message, "ADIF SPEC: %d XML elements ignored", num_ignored_);
 		status_->misc_status(ST_WARNING, message);
 	}
 	return true;
@@ -405,7 +405,7 @@ bool specx_reader::end_record() {
 // Reached the end of the record item
 bool specx_reader::end_record_value() {
 	if (record_data_ == nullptr) {
-		status_->misc_status(ST_FATAL, "SPEC READ: Programming error");
+		status_->misc_status(ST_FATAL, "ADIF SPEC: Programming error");
 		return false;
 	}
 	else {

@@ -36,7 +36,7 @@ qrz_handler::qrz_handler() :
 {
 	// Got no log-in details - raise a warning for now.
 	if (!user_details()) {
-		status_->misc_status(ST_WARNING, "QRZ.com: login details have not been established yet. Do so before first use");
+		status_->misc_status(ST_WARNING, "QRZ: login details have not been established yet. Do so before first use");
 	}
 	if (!url_handler_) {
 		url_handler_ = new url_handler();
@@ -51,11 +51,11 @@ qrz_handler::~qrz_handler() {
 	data_.clear();
 }
 
-// Open the QRZ.com session
+// Open the QRZ session
 bool qrz_handler::open_session() {
-	// We are unable to log-in to QRZ.com
+	// We are unable to log-in to QRZ
 	if (!user_details()) {
-		status_->misc_status(ST_ERROR, "QRZ.com: login details are not available");
+		status_->misc_status(ST_ERROR, "QRZ: login details are not available");
 		return false;
 	}
 	// We can use the XML database - note this is subscription only
@@ -63,11 +63,11 @@ bool qrz_handler::open_session() {
 		// Generate XML request.
 		string uri = generate_session_uri();
 		stringstream response;
-		// Send Session requesst to QRZ.com
+		// Send Session requesst to QRZ
 		if (!url_handler_->read_url(uri, &response)) {
 			int length = uri.length() + 50;
 			char* message = new char[length];
-			snprintf(message, length, "QRZ.com: Failed to access %s", uri.c_str());
+			snprintf(message, length, "QRZ: Failed to access %s", uri.c_str());
 			status_->misc_status(ST_ERROR, message);
 			return false;
 		}
@@ -75,7 +75,7 @@ bool qrz_handler::open_session() {
 		if (decode_session_response(response)) {
 			if (non_subscriber_) {
 				// User is not a subscriber - ask whether to continue
-				if (fl_choice("You are not a subscriber to the QRZ.com XML Database so will only receive limited info.\n"
+				if (fl_choice("You are not a subscriber to the QRZ XML Database so will only receive limited info.\n"
 					"Do you wish to continue or use the standard web page?", "Continue", "Use Web Page", nullptr) == 1) {
 					use_xml_database_ = false;
 					Fl_Preferences qrz_settings(settings_, "QRZ");
@@ -83,7 +83,7 @@ bool qrz_handler::open_session() {
 					return false;
 				}
 			}
-			status_->misc_status(ST_OK, "QRZ.com: session started");
+			status_->misc_status(ST_OK, "QRZ: session started");
 			return true;
 		}
 		else {
@@ -98,23 +98,23 @@ bool qrz_handler::open_session() {
 // Fetch the contacts details and present the user with a merge opportunity
 bool qrz_handler::fetch_details() {
 	if (!user_details()) {
-		status_->misc_status(ST_ERROR, "QRZ.com: login details are not available");
+		status_->misc_status(ST_ERROR, "QRZ: login details are not available");
 		return false;
 	}
 	if (!session_key_.length()) {
-		status_->misc_status(ST_ERROR, "QRZ.com: session has not been estalished");
+		status_->misc_status(ST_ERROR, "QRZ: session has not been estalished");
 		return false;
 	}
 	// Request 
 	record* query = navigation_book_->get_record();
-	status_->misc_status(ST_NOTE, string("QRZ.com: Fetching information for " + query->item("CALL")).c_str());
+	status_->misc_status(ST_NOTE, string("QRZ: Fetching information for " + query->item("CALL")).c_str());
 	string uri = generate_details_uri(query->item("CALL"));
 	stringstream response;
-	// Send Session requesst to QRZ.com
+	// Send Session requesst to QRZ
 	if (!url_handler_->read_url(uri, &response)) {
 		int length = uri.length() + 50;
 		char* message = new char[length];
-		snprintf(message, length, "QRZ.com: Failed to access %s", uri.c_str());
+		snprintf(message, length, "QRZ: Failed to access %s", uri.c_str());
 		status_->misc_status(ST_ERROR, message);
 	}
 	// Create a new record
@@ -122,7 +122,7 @@ bool qrz_handler::fetch_details() {
 	qrz_info_ = new record;
 	if (decode_details_response(response) && 
 		query_merge()) {
-		status_->misc_status(ST_OK, string("QRZ.com: query for " + query->item("CALL") + " completed.").c_str());
+		status_->misc_status(ST_OK, string("QRZ: query for " + query->item("CALL") + " completed.").c_str());
 		return true;
 	}
 	else {
@@ -158,7 +158,7 @@ bool qrz_handler::query_merge() {
 	navigation_book_->selection(-1, HT_MERGE_DETAILS);
 	tabbed_view_->activate_pane(OT_RECORD, true);
 	while (!merge_done_) Fl::wait();
-	status_->misc_status(ST_OK, "QRZ.com: Update complete");
+	status_->misc_status(ST_OK, "QRZ: Update complete");
 	return false;
 }
 
@@ -214,7 +214,7 @@ bool qrz_handler::decode_xml(xml_element* element) {
 	if (element->parent() == nullptr) {
 		// Top element - must be named QRZDatabase
 		if (element->name() != "QRZDatabase") {
-			string message = "QRZ.com: unexpected XML " + element->name() + " received";
+			string message = "QRZ: unexpected XML " + element->name() + " received";
 			status_->misc_status(ST_ERROR, message.c_str());
 			return false;
 		}
@@ -241,7 +241,7 @@ bool qrz_handler::decode_top(xml_element* element) {
 	if (attributes->find("version") != attributes->end()) {
 		string version = attributes->at("version");
 		if (qrz_version_.length() && qrz_version_ != version) {
-			char format[] = "QRZ.com: database version mis-match: previously %s currently %s";
+			char format[] = "QRZ: database version mis-match: previously %s currently %s";
 			int length = strlen(format) + version.length() + qrz_version_.length();
 			char* message = new char[length];
 			snprintf(message, length, format, qrz_version_.c_str(), version.c_str());
@@ -269,9 +269,9 @@ bool qrz_handler::decode_session(xml_element* element) {
 	if (data_.find("Key") != data_.end()) {
 		string key = data_.at("Key");
 		if (session_key_.length() && session_key_ != key) {
-			status_->misc_status(ST_ERROR, "QRZ.com: Incompatible session keys received - see log");
-			status_->misc_status(ST_LOG, string("QRZ.com: Previously " + session_key_).c_str());
-			status_->misc_status(ST_LOG, string("QRZ.com: Currently  " + key).c_str());
+			status_->misc_status(ST_ERROR, "QRZ: Incompatible session keys received - see log");
+			status_->misc_status(ST_LOG, string("QRZ: Previously " + session_key_).c_str());
+			status_->misc_status(ST_LOG, string("QRZ: Currently  " + key).c_str());
 			return false;
 		}
 		else {
@@ -280,12 +280,12 @@ bool qrz_handler::decode_session(xml_element* element) {
 	}
 	// Error detected - stop decoding
 	if (data_.find("Error") != data_.end()) {
-		status_->misc_status(ST_ERROR, string("QRZ.com: error: " + data_.at("Error")).c_str());
+		status_->misc_status(ST_ERROR, string("QRZ: error: " + data_.at("Error")).c_str());
 		return false;
 	}
 	// Warning message received
 	if (data_.find("Message") != data_.end()) {
-		status_->misc_status(ST_WARNING, string("QRZ.com: warning: " + data_.at("Message")).c_str());
+		status_->misc_status(ST_WARNING, string("QRZ: warning: " + data_.at("Message")).c_str());
 	}
 	// Check subscription status
 	if (data_.find("SubExp") != data_.end() && data_["SubExp"] == "non-subscriber") {
@@ -355,7 +355,7 @@ void qrz_handler::merge_done() {
 
 // REturn message
 string qrz_handler::get_merge_message() {
-	return "Please merge in data downloaded from QRZ.com database";
+	return "Please merge in data downloaded from QRZ database";
 }
 
 // Get merge data
@@ -379,7 +379,7 @@ void qrz_handler::open_web_page(string callsign) {
 	if (browser.length() == 0) {
 		return;
 	}
-	// Open browser with QRZ.com URL 
+	// Open browser with QRZ URL 
 #ifdef _WIN32
 	char format[] = "start \"%s\" http://www.qrz.com/lookup?callsign=%s";
 #else
@@ -387,7 +387,7 @@ void qrz_handler::open_web_page(string callsign) {
 #endif
 	char* url = new char[strlen(format) + callsign.length() + browser.length() + 10];
 	sprintf(url, format, browser.c_str(), callsign.c_str());
-	status_->misc_status(ST_NOTE, string("QRZ.com: Launching QRZ.com web page for " + callsign).c_str());
+	status_->misc_status(ST_NOTE, string("QRZ: Launching QRZ web page for " + callsign).c_str());
 	int result = system(url);
 	delete[] url;
 }

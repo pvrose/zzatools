@@ -27,6 +27,9 @@ namespace zzalib {
 		page_dialog(int X, int Y, int W, int H, const char* label = nullptr);
 		virtual ~page_dialog();
 
+		// Update - implementation specific action, default do nothing.
+		virtual void update() {};
+
 	protected:
 		// CB from external source - usually the controlling tabbed view OK/Cancel
 		static void cb_bn_ok(Fl_Widget* w, void* v);

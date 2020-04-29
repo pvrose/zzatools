@@ -72,7 +72,7 @@ void spec_tree::populate_tree(bool activate) {
 	sas_item_->labelfont(item_labelfont() | FL_BOLD);
 	sub_item_ = add("Submode");
 	sub_item_->labelfont(item_labelfont() | FL_BOLD);
-	status_->misc_status(ST_NOTE, "SPEC DATA: Display started");
+	status_->misc_status(ST_NOTE, "ADIF SPEC: Display started");
 	status_->progress(spec_data_->size(), OT_ADIF, "datasets");
 	// Add all the datasets
 	int i = 0;
@@ -82,7 +82,7 @@ void spec_tree::populate_tree(bool activate) {
 		status_->progress(i, OT_ADIF);
 	}
 	status_->progress(spec_data_->size(), OT_ADIF);
-	status_->misc_status(ST_OK, "SPEC DATA: Display done!");
+	status_->misc_status(ST_OK, "ADIF SPEC: Display done!");
 	// Close PAS and SAS items
 	pas_item_->close();
 	sas_item_->close();
@@ -140,7 +140,7 @@ void spec_tree::insert_adif_spec(Fl_Tree_Item* parent, const spec_dataset& datas
 						dxcc_data = dxcc_dataset->data.at(item);
 					}
 					else {
-						status_->misc_status(ST_FATAL, "Error in specification data");
+						status_->misc_status(ST_FATAL, "ADIF SPEC: Error in specification data");
 					}
 				}
 				else {

@@ -1635,6 +1635,10 @@ void dxa_if::zoom_centre(lat_long_t centre, bool full) {
 
 void dxa_if::centre_map() {
 	lat_long_t centre;
+	double save_n;
+	double save_s;
+	double save_w;
+	double save_e;
 	switch (centre_mode_) {
 	case HOME:
 		centre = { (double)home_lat_, (double)home_long_ };
@@ -1657,6 +1661,10 @@ void dxa_if::centre_map() {
 		zoom_centre(centre, true);
 		break;
 	default:
+		save_n = northernmost_;
+		save_s = southernmost_;
+		save_w = westernmost_;
+		save_e = easternmost_;
 		switch (centre_mode_) {
 		case EU:
 			northernmost_ = 60.0;
@@ -1704,6 +1712,11 @@ void dxa_if::centre_map() {
 		centre = { (northernmost_ + southernmost_) * 0.5, (westernmost_ + easternmost_) * 0.5 };
 		centre_map(centre);
 		zoom_centre(centre, false);
+		// Restore bounds
+		northernmost_ = save_n;
+		southernmost_ = save_s;
+		westernmost_ = save_w;
+		easternmost_ = save_e;
 		break;
 	}
 	save_values();

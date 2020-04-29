@@ -1639,7 +1639,7 @@ void record_form::set_edit_widgets(string field, string text) {
 		item = field_choice_->find_item(field.c_str());
 		if (item == nullptr) {
 			// Still not got it so error
-			status_->misc_status(ST_FATAL, string(field + " is not a valid field - application error").c_str());
+			status_->misc_status(ST_FATAL, string("LOG: " + field + " is not a valid field - application error").c_str());
 			field_choice_->value(0);
 		}
 		field_choice_->value(field_choice_->find_index(item));

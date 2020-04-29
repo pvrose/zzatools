@@ -58,7 +58,7 @@ bool lotw_handler::upload_lotw_log(book* book) {
 	free(filename);
 	if (chooser != nullptr && !chooser->count()) {
 		// User cancelled
-		status_->misc_status(ST_ERROR, "LOTW UPLOAD: No file selected, upload cancelled");
+		status_->misc_status(ST_ERROR, "LOTW: No file selected, upload cancelled");
 		ok = false;
 	}
 	else {
@@ -100,7 +100,7 @@ bool lotw_handler::upload_lotw_log(book* book) {
 				while (chooser->visible()) Fl::wait();
 				if (!chooser->count()) {
 					// No executable found - cancel upload
-					status_->misc_status(ST_ERROR, "LOTW UPLOAD: TQSL Execuatble not found, upload cancelled");
+					status_->misc_status(ST_ERROR, "LOTW: TQSL Execuatble not found, upload cancelled");
 					ok = false;
 				}
 				else {
@@ -112,59 +112,59 @@ bool lotw_handler::upload_lotw_log(book* book) {
 			// Generate TQSL command line - note the executable may have spaces in its filename
 			char* command = new char[20 + new_filename.length() + tqsl_executable.length()];
 			sprintf(command, "\"%s\" -x -u -d %s", tqsl_executable.c_str(), new_filename.c_str());
-			status_->misc_status(ST_NOTE, "LOTW UPLOAD: Signing and uploading QSLs to LotW");
+			status_->misc_status(ST_NOTE, "LOTW: Signing and uploading QSLs to LotW");
 			// Launch TQSL - signs and uploads data
 			int result = system(command);
 			delete[] command;
 			// Analyse result received from TQSL - responses documented in TQSL help
-			string default_message = "LOTW UPLOAD: Unknown response";
+			string default_message = "LOTW: Unknown response";
 			switch (result) {
 			case 0:
-				status_->misc_status(ST_OK, "LOTW UPLOAD: all qsos submitted were signed and uploaded");
+				status_->misc_status(ST_OK, "LOTW: all qsos submitted were signed and uploaded");
 				ok = true;
 				break;
 			case 1:
-				status_->misc_status(ST_WARNING, "LOTW UPLOAD: cancelled by user");
+				status_->misc_status(ST_WARNING, "LOTW: cancelled by user");
 				ok = false;
 				break;
 			case 2:
-				status_->misc_status(ST_ERROR, "LOTW UPLOAD: rejected by LoTW");
+				status_->misc_status(ST_ERROR, "LOTW: rejected by LoTW");
 				ok = false;
 				break;
 			case 3:
-				status_->misc_status(ST_ERROR, "LOTW UPLOAD: unexpected response from TQSL server");
+				status_->misc_status(ST_ERROR, "LOTW: unexpected response from TQSL server");
 				ok = false;
 				break;
 			case 4:
-				status_->misc_status(ST_ERROR, "LOTW UPLOAD: TQSL error");
+				status_->misc_status(ST_ERROR, "LOTW: TQSL error");
 				ok = false;
 				break;
 			case 5:
-				status_->misc_status(ST_ERROR, "LOTW UPLOAD: TQSLlib error");
+				status_->misc_status(ST_ERROR, "LOTW: TQSLlib error");
 				ok = false;
 				break;
 			case 6:
-				status_->misc_status(ST_ERROR, "LOTW UPLOAD: unable to open input file");
+				status_->misc_status(ST_ERROR, "LOTW: unable to open input file");
 				ok = false;
 				break;
 			case 7:
-				status_->misc_status(ST_ERROR, "LOTW UPLOAD: unable to open output file");
+				status_->misc_status(ST_ERROR, "LOTW: unable to open output file");
 				ok = false;
 				break;
 			case 8:
-				status_->misc_status(ST_WARNING, "LOTW UPLOAD: No QSOs were processed since some QSOs were duplicates or out of date range");
+				status_->misc_status(ST_WARNING, "LOTW: No QSOs were processed since some QSOs were duplicates or out of date range");
 				ok = false;
 				break;
 			case 9:
-				status_->misc_status(ST_WARNING, "LOTW UPLOAD: Some QSOs were processed, and some QSOs were ignored because they were duplicates or out of date range");
+				status_->misc_status(ST_WARNING, "LOTW: Some QSOs were processed, and some QSOs were ignored because they were duplicates or out of date range");
 				ok = true;
 				break;
 			case 10:
-				status_->misc_status(ST_ERROR, "LOTW UPLOAD:command syntax error");
+				status_->misc_status(ST_ERROR, "LOTW:command syntax error");
 				ok = false;
 				break;
 			case 11:
-				status_->misc_status(ST_ERROR, "LOTW UPLOAD: LoTW Connection error (no network or LoTW is unreachable)");
+				status_->misc_status(ST_ERROR, "LOTW: LoTW Connection error (no network or LoTW is unreachable)");
 				ok = false;
 				break;
 			default:
@@ -196,7 +196,7 @@ bool lotw_handler::upload_lotw_log(book* book) {
 		}
 		else {
 			// Extraction of data failed
-			status_->misc_status(ST_ERROR, "LOTW UPLOAD: Failed to create upload file, upload cancelled");
+			status_->misc_status(ST_ERROR, "LOTW: Failed to create upload file, upload cancelled");
 			ok = false;
 		}
 	}
@@ -214,7 +214,7 @@ bool lotw_handler::download_lotw_log(stringstream* adif) {
 	bool ok = false;
 	fl_cursor(FL_CURSOR_WAIT);
 	if (!user_details(&username, &password, &last_done)) {
-		status_->misc_status(ST_ERROR, "LOTW DOWNLOAD: Access requires username and password!");
+		status_->misc_status(ST_ERROR, "LOTW: Access requires username and password!");
 		return false;
 	}
 	// Set URL to get LotW in-box
@@ -234,7 +234,7 @@ bool lotw_handler::download_lotw_log(stringstream* adif) {
 			ok = true;
 		} else {
 			// display HTML in in help browser
-			status_->misc_status(ST_WARNING, "LOTW DOWNLOAD: data is HTML not ADIF - opening browser");
+			status_->misc_status(ST_WARNING, "LOTW: data is HTML not ADIF - opening browser");
 			adif->seekg(adif->beg);
 			Fl_Help_Dialog* help_dlg = new Fl_Help_Dialog;
 			// stringstream needs converting to a C++ string then a C-string
@@ -248,7 +248,7 @@ bool lotw_handler::download_lotw_log(stringstream* adif) {
 		adif->seekg(adif->beg);
 		if (adif->peek() != EOF) {
 			// Data has been downloaded - display it a text browser
-			status_->misc_status(ST_WARNING, "LOTW DOWNLOAD: data neither HTML nor ADIF - opening browser");
+			status_->misc_status(ST_WARNING, "LOTW: data neither HTML nor ADIF - opening browser");
 			Fl_Text_Buffer *buff = new Fl_Text_Buffer;
 			Fl_Text_Display * disp = new Fl_Text_Display(0, 0, 640, 400, "Unexpected data received from LotW");
 			disp->buffer(buff);
@@ -257,7 +257,7 @@ bool lotw_handler::download_lotw_log(stringstream* adif) {
 		}
 		else {
 			// Nothing downloaded
-			status_->misc_status(ST_ERROR, "LOTW DOWNLOAD Failure to download, nothing to show!");
+			status_->misc_status(ST_ERROR, "LOTW Failure to download, nothing to show!");
 		}
 		ok = false;
 	}
@@ -306,14 +306,14 @@ bool lotw_handler::user_details(string* username, string* password, string* last
 
 // Download the data at URL into streaming data
 bool lotw_handler::download_adif(const char* url, stringstream* adif) {
-	status_->misc_status(ST_NOTE, "LOTW DOWNLOAD: Downloading log...");
+	status_->misc_status(ST_NOTE, "LOTW: Downloading log...");
 	// Fetch the ADIF file
 	if (url_handler_->read_url(url, adif)) {
-		status_->misc_status(ST_OK, "LOTW DOWNLOAD: Log downloaded");
+		status_->misc_status(ST_OK, "LOTW: Log downloaded");
 		return true;
 	}
 	else {
-		status_->misc_status(ST_ERROR, "LOTW DOWNLOAD: Log download failed");
+		status_->misc_status(ST_ERROR, "LOTW: Log download failed");
 		return false;
 	}
 }

@@ -26,7 +26,9 @@ extern void remove_sub_window(Fl_Window* w);
 settings::settings(int W, int H, const char* label, cfg_dialog_t active) :
 	Fl_Window(W, H, label)
 	, settings_view_(nullptr)
+	, active_(true)
 {
+	updatable_views_.clear();
 	// Create the set of tabs
 	Fl_Tabs* tabs = new Fl_Tabs(0, 0, W, H - HBUTTON - GAP);
 	tabs->labelsize(FONT_SIZE);
@@ -68,6 +70,8 @@ settings::settings(int W, int H, const char* label, cfg_dialog_t active) :
 	qsl->labelsize(FONT_SIZE);
 	qsl->selection_color(fl_lighter(FL_YELLOW));
 	qsl->tooltip("Allows the simple design of QSL labels");
+	// Add to the list of updatable views
+	updatable_views_.insert(qsl);
 
 	// Lastly - a tree display showing all settings
 	config_tree* all_settings = new config_tree(rx, ry, rw, rh, "All Settings");
@@ -135,6 +139,7 @@ settings::settings(int W, int H, const char* label, cfg_dialog_t active) :
 // Destructor
 settings::~settings()
 {
+	active_ = false;
 }
 
 // Callback - Save, OK or Cancel
@@ -164,3 +169,16 @@ void settings::cb_bn_cal(Fl_Widget* w, long arg) {
 	}
 }
 
+void settings::update() {
+	for (auto it = updatable_views_.begin(); it != updatable_views_.end(); it++) {
+		(*it)->update();
+	}
+}
+
+bool settings::active() {
+	return active_;
+}
+
+void settings::inactive() {
+	active_ = false;
+}

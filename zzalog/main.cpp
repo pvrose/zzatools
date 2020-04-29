@@ -473,7 +473,9 @@ void add_rig_if() {
 						else {
 							// Access rig - timer will have been started by rig_if_->open()
 							// Set rig timer callnack
-							status_->misc_status(ST_OK, rig_if_->success_message().c_str());
+							char message[256];
+							snprintf(message, 256, "RIG: %s", rig_if_->success_message().c_str());
+							status_->misc_status(ST_OK, message);
 							status_->rig_status(ST_OK, rig_if_->rig_info().c_str());
 							done = true;
 							// Change logging mode to ON_AIR

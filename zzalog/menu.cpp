@@ -233,6 +233,7 @@ extern intl_dialog* intl_dialog_;
 extern toolbar* toolbar_;
 extern scratchpad* scratchpad_;
 extern qrz_handler* qrz_handler_;
+settings* config_ = nullptr;
 
 extern void add_rig_if();
 extern void add_data();
@@ -489,8 +490,12 @@ void menu::cb_mi_file_backup(Fl_Widget*, void* v) {
 void menu::cb_mi_settings(Fl_Widget* w, void* v) {
 	// v provides that id of the page of the settings dialogs to open with
 	settings::cfg_dialog_t active = (settings::cfg_dialog_t)(long)v;
-	// Open the config and wait for it to close
-	settings* config = new settings(WCONFIG, HCONFIG, "Configuration", active);
+	if (!config_) {
+		// Open the config and wait for it to close
+		config_ = new settings(WCONFIG, HCONFIG, "Configuration", active);
+		while (config_->active()) Fl::wait();
+		config_ = nullptr;
+	}
 }
 
 // Navigate->First,Previous,Next,Last callbacks
@@ -628,7 +633,7 @@ void menu::cb_mi_parse_log(Fl_Widget* w, void* v) {
 		int record_num = -1;
 		int item_number = 0;
 		// Initialise progress
-		status_->misc_status(ST_NOTE, "PARSE LOG: Started");
+		status_->misc_status(ST_NOTE, "LOG: Started");
 		status_->progress(num_items, navigation_book_->book_type(), "records");
 		// For all records in selected book
 		for (int i = 0; i < num_items && !abandon;) {
@@ -648,12 +653,12 @@ void menu::cb_mi_parse_log(Fl_Widget* w, void* v) {
 			else if (parse_result == PR_ABANDONED) {
 				// User has the opportunity to abandon this if too many records have issues
 				abandon = true;
-				status_->misc_status(ST_WARNING, "PARSE LOG: Abandoned");
+				status_->misc_status(ST_WARNING, "PARSE: Abandoned");
 				status_->progress("Abandoned", navigation_book_->book_type());
 			}
 		}
 		// update views with last record parsed selected
-		status_->misc_status(ST_OK, "PARSE LOG: Done!");
+		status_->misc_status(ST_OK, "PARSE: Done!");
 		navigation_book_->selection(item_number, HT_CHANGED);
 	}
 #ifndef _DEBUG
@@ -696,7 +701,7 @@ void menu::cb_mi_valid8_log(Fl_Widget* w, void* v) {
 	int num_items = navigation_book_->size();
 	bool changed = false;
 	// Initialse progress
-	status_->misc_status(ST_NOTE, "VALIDATE LOG: Started");
+	status_->misc_status(ST_NOTE, "VALIDATE: Started");
 	status_->progress(num_items, navigation_book_->book_type(), "records");
 	spec_data_->reset_continue();
 	// For each record in selected book unless user has indicated to quit
@@ -710,7 +715,7 @@ void menu::cb_mi_valid8_log(Fl_Widget* w, void* v) {
 		}
 		status_->progress(++i, navigation_book_->book_type());
 	}
-	status_->misc_status(ST_OK, "VALIDATE LOG: Done!");
+	status_->misc_status(ST_OK, "VALIDATE: Done!");
 	if (changed) {
 		navigation_book_->selection(item_number, HT_MINOR_CHANGE);
 	}
@@ -774,19 +779,19 @@ void menu::cb_mi_log_mode(Fl_Widget* w, void* v) {
 	switch (that->logging_mode_) {
 	case LM_OFF_AIR:
 		// Let user have mode and stop auto-save
-		status_->misc_status(ST_NOTE, "LOGGING: Mode set to off-air logging");
+		status_->misc_status(ST_NOTE, "LOG: Mode set to off-air logging");
 		book_->enable_save(false);
 		// Update enabled menu items
 		that->update_items();
 		break;
 	case LM_ON_AIR:
-		status_->misc_status(ST_NOTE, "LOGGING: Mode set to real-time (on-air) logging");
+		status_->misc_status(ST_NOTE, "LOG: Mode set to real-time (on-air) logging");
 		break;
 	case LM_IMPORTED:
 		// Reset navigation mode
 		tabbed_view_->activate_pane(OT_MAIN, true);
 		// start import_process
-		status_->misc_status(ST_NOTE, "LOGGING: Mode set to auto-import from data modems");
+		status_->misc_status(ST_NOTE, "LOG: Mode set to auto-import from data modems");
 		import_data_->start_auto_update();
 		break;
 	}
@@ -1016,7 +1021,7 @@ void menu::cb_mi_oper_set(Fl_Widget* w, void* v) {
 	// Open dialog for the type - dialog changes settings
 	use_dialog* dialog = new use_dialog(type);
 	if (dialog->display() != BN_OK) {
-		status_->misc_status(ST_WARNING, "Set rig or aerail or QTH cancelled by user");
+		status_->misc_status(ST_WARNING, "LOG: Set rig or aerial or QTH cancelled by user");
 	}
 	book_->modified(true);
 	Fl::delete_widget(dialog);

@@ -43,22 +43,22 @@ bool adx_writer::store_book(book* book, ostream& os) {
 	// Get the book
 	my_book_ = book;
 	if (my_book_ == nullptr) {
-		status_->misc_status(ST_SEVERE, "ADX WRITE: No book to write");
+		status_->misc_status(ST_SEVERE, "LOG: No book to write");
 		ok = false;
 	}
 	else {
 		// configure progress widget
-		status_->misc_status(ST_NOTE, "ADX WRITE: XML Generation started");
+		status_->misc_status(ST_NOTE, "LOG: XML Generation started");
 		status_->progress(book->size(), book->book_type(), "records");
 		// Write the outer element - will iteratively write sub-elements
 		ok &= write_element(AET_NONE);
 		if (ok) {
 			// Successful
-			status_->misc_status(ST_OK, "ADX WRITE: XML Generation done!");
+			status_->misc_status(ST_OK, "LOG: XML Generation done!");
 			status_->progress(book->size(), book->book_type());
 		} else {
 			// Not successful
-			status_->misc_status(ST_ERROR, "ADX WRITE: XML Generation failed");
+			status_->misc_status(ST_ERROR, "LOG: XML Generation failed");
 			status_->progress("Process failed", book->book_type());
 		}
 	}
@@ -66,17 +66,17 @@ bool adx_writer::store_book(book* book, ostream& os) {
 	fl_cursor(FL_CURSOR_DEFAULT);
 	// now write the destination to a file.
 	if (ok) {
-		status_->misc_status(ST_NOTE, "ADX WRITE: XML Storing started");
+		status_->misc_status(ST_NOTE, "LOG: XML Storing started");
 		status_->progress(book->size(), book->book_type(), "records");
 		ok &= data(os);
 	}
 	if (ok) {
-		status_->misc_status(ST_OK, "ADX WRITE: XML Storing done!");
+		status_->misc_status(ST_OK, "LOG: XML Storing done!");
 		status_->progress(1, book->book_type());
 		return ok;
 	}
 	else {
-		status_->misc_status(ST_ERROR, "ADX WRITE: XML Storing failed");
+		status_->misc_status(ST_ERROR, "LOG: XML Storing failed");
 		status_->progress("Write failed", book->book_type());
 		return false;
 	}
@@ -273,7 +273,7 @@ bool adx_writer::write_element(adx_element_t element) {
 		ok &= declaration(xml_element::COMMENT, name, value_);
 	}
 	if (!ok) {
-		status_->misc_status(ST_ERROR, "WRITE ADX: Error occured while writing XML!");
+		status_->misc_status(ST_ERROR, "LOG: Error occured while writing XML!");
 	}
 	return ok;
 }

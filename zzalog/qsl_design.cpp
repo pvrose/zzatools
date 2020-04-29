@@ -53,8 +53,8 @@ qsl_design::~qsl_design() {
 	}
 }
 
-// Load the current design from the settings
-void qsl_design::load_values() {
+// Draw the card window - used in load_values() and update()
+void qsl_design::draw_card_window() {
 	// Get the settings by creating a qsl_form
 	record** my_record = new record * [1];
 	my_record[0] = book_->get_record();
@@ -71,6 +71,11 @@ void qsl_design::load_values() {
 	bn_address_->hide();
 	card_window_->size(current_design_->w(), current_design_->h());
 	card_window_->end();
+}
+
+// Load the current design from the settings
+void qsl_design::load_values() {
+	draw_card_window();
 	Fl_Preferences qsl_settings(settings_, "QSL Design");
 	int temp;
 	qsl_settings.get("Print Label", temp, (int)false);
@@ -699,4 +704,19 @@ void qsl_design::redraw_address() {
 	bn_address_->labelsize(size_add_);
 	bn_address_->label(editor_->buffer()->text());
 	card_window_->redraw();
+}
+
+// Update the card window by deleting it and drawing a new one.
+void qsl_design::update() {
+	delete card_window_;
+	draw_card_window();
+
+	// Add the design here
+	if (((Fl_Tabs*)parent())->value() == this) {
+		card_window_->show();
+	}
+	else {
+		card_window_->hide();
+	}
+
 }

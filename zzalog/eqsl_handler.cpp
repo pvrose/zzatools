@@ -50,7 +50,7 @@ void eqsl_handler::enqueue_request(record_num_t record_num, bool force /*=false*
 		request_queue_.push(request_t(record_num, force));
 		// Update status
 		char message[512];
-		sprintf(message, "eQSL: %d Card requests pending", request_queue_.size());
+		sprintf(message, "EQSL: %d Card requests pending", request_queue_.size());
 		status_->misc_status(ST_NOTE, message);
 	}
 }
@@ -66,7 +66,7 @@ void eqsl_handler::cb_timer_deq(void* v) {
 		request_t request = request_queue->front();
 		// Let user know what we are doing
 		char message[512];
-		sprintf(message, "eQSL: Downloading card %s", book_->get_record(request.record_num, false)->item("CALL").c_str());
+		sprintf(message, "EQSL: Downloading card %s", book_->get_record(request.record_num, false)->item("CALL").c_str());
 		status_->misc_status(ST_NOTE, message);
 		// Request the eQSL card
 		response_t response = that->request_eqsl(request);
@@ -120,7 +120,7 @@ void eqsl_handler::cb_timer_deq(void* v) {
 		// Set the timeout again if the queue is still not empty and fetches are enabled
 		if (!request_queue->empty() && that->empty_queue_enable_) {
 			// Let user know
-			sprintf(message, "eQSL: %d card requests pending", request_queue->size());
+			sprintf(message, "EQSL: %d card requests pending", request_queue->size());
 			status_->misc_status(ST_NOTE, message);
 
 			switch (response) {
@@ -137,10 +137,10 @@ void eqsl_handler::cb_timer_deq(void* v) {
 		}
 		else {
 			if (cards_skipped) {
-				status_->misc_status(ST_WARNING, "eQSL: Card fetching done, but 1 or more failed");
+				status_->misc_status(ST_WARNING, "EQSL: Card fetching done, but 1 or more failed");
 			}
 			else {
-				status_->misc_status(ST_OK, "eQSL: Card fetching done!");
+				status_->misc_status(ST_OK, "EQSL: Card fetching done!");
 			}
 		}
 	}
@@ -155,14 +155,14 @@ eqsl_handler::response_t eqsl_handler::request_eqsl(request_t request) {
 	if (card_file_valid(local_filename) && !request.force) {
 		// already have the card and it's valid PNG and we are not deliberately requesting it again
 		char message[200];
-		snprintf(message, 200, "Not fetching %s as already have valid image", record->item("CALL").c_str());
+		snprintf(message, 200, "EQSL: Not fetching %s as already have valid image", record->item("CALL").c_str());
 		status_->misc_status(ST_NOTE, message);
 		return ER_SKIPPED;
 	}
 	else {
 		// Update status with 
 		char message[256];
-		sprintf(message, "eQSL: Info: Fetching %s", local_filename.c_str());
+		sprintf(message, "EQSL: Info: Fetching %s", local_filename.c_str());
 		status_->misc_status(ST_NOTE, message);
 		// fetch it
 		string remote_filename;
@@ -278,11 +278,11 @@ eqsl_handler::response_t eqsl_handler::card_filename_r(record* record, string& c
 	char message[256];
 	// Get users details
 	if (!user_details(&username, &password, nullptr, nullptr, nullptr)) {
-		sprintf(message, "eQSL: User or password is missing: U=%s, P=%s", username.c_str(), password.c_str());
+		sprintf(message, "EQSL: User or password is missing: U=%s, P=%s", username.c_str(), password.c_str());
 		status_->misc_status(ST_ERROR, message);
 		return ER_FAILED;
 	}
-	sprintf(message, "eQSL: %s: Getting remote filename", record->item("CALL").c_str());
+	sprintf(message, "EQSL: %s: Getting remote filename", record->item("CALL").c_str());
 	status_->misc_status(ST_NOTE, message);
 
 	// url to get the front page of the eQSL card fetch interface
@@ -318,7 +318,7 @@ eqsl_handler::response_t eqsl_handler::card_filename_r(record* record, string& c
 				// We have an error
 				got_card_filename = false;
 				response = ER_FAILED;
-				sprintf(message, "eQSL: %s fetching card %s", text_line.substr(char_pos).c_str(), call.c_str());
+				sprintf(message, "EQSL: %s fetching card %s", text_line.substr(char_pos).c_str(), call.c_str());
 				status_->misc_status(ST_ERROR, message);
 			}
 			else {
@@ -328,7 +328,7 @@ eqsl_handler::response_t eqsl_handler::card_filename_r(record* record, string& c
 					// We have been throttled
 					response = ER_THROTTLED;
 					got_card_filename = false;
-					sprintf(message, "eQSL: throttle fetching card %s", call.c_str());
+					sprintf(message, "EQSL: throttle fetching card %s", call.c_str());
 					status_->misc_status(ST_ERROR, message);
 				}
 				else {
@@ -342,7 +342,7 @@ eqsl_handler::response_t eqsl_handler::card_filename_r(record* record, string& c
 						if (end_pos == string::npos) {
 							response = ER_FAILED;
 							got_card_filename = false;
-							sprintf(message, "eQSL: error: %s Cannot find image file name", call.c_str());
+							sprintf(message, "EQSL: error: %s Cannot find image file name", call.c_str());
 							status_->misc_status(ST_ERROR, message);
 						}
 						// Extract file name from response
@@ -359,7 +359,7 @@ eqsl_handler::response_t eqsl_handler::card_filename_r(record* record, string& c
 	}
 	else {
 		// Failed to get first page
-		sprintf(message, "eQSL: Fail to open HTML connection for card %s", call.c_str());
+		sprintf(message, "EQSL: Fail to open HTML connection for card %s", call.c_str());
 		status_->misc_status(ST_ERROR, message);
 		return ER_HTML_ERR;
 	}
@@ -372,19 +372,19 @@ eqsl_handler::response_t eqsl_handler::download(string remote_filename, string l
 	char url[2048];
 	char message[256];
 	sprintf(url, "http://www.eqsl.cc%s", remote_filename.c_str());
-	sprintf(message, "eQSL: Getting remote image");
+	sprintf(message, "EQSL: Getting remote image");
 	status_->misc_status(ST_NOTE, message);
 	// Create an output stream and fetch the file
 	ofstream* os = new ofstream(local_filename, ios_base::out | ios_base::binary);
 	if (url_handler_->read_url(url, os)) {
 		os->close();
-		status_->misc_status(ST_OK, "eQSL: Download successful");
+		status_->misc_status(ST_OK, "EQSL: Download successful");
 		return ER_OK;
 	}
 	// Failed to get card image page
 	else {
 		os->close();
-		status_->misc_status(ST_ERROR, "eQSL: HTML error fetching card file");
+		status_->misc_status(ST_ERROR, "EQSL: HTML error fetching card file");
 		return ER_HTML_ERR;
 	}
 }
@@ -460,7 +460,7 @@ eqsl_handler::response_t eqsl_handler::adif_filename(string& filename) {
 	string last_access;
 	char message[256];
 	if (!user_details(&username, &password, &last_access, nullptr, nullptr)) {
-		sprintf(message, "eQSL: User or password is missing: U=%s, P=%s", username.c_str(), password.c_str());
+		sprintf(message, "EQSL: User or password is missing: U=%s, P=%s", username.c_str(), password.c_str());
 		status_->misc_status(ST_ERROR, message);
 		return ER_FAILED;
 	}
@@ -471,7 +471,7 @@ eqsl_handler::response_t eqsl_handler::adif_filename(string& filename) {
 	response_t result = ER_OK;
 	stringstream eqsl_ss;
 	// Put download status into status pane
-	strcpy(message, "eQSL: Querying in-box...");
+	strcpy(message, "EQSL: Querying in-box...");
 	status_->misc_status(ST_NOTE, message);
 	// Fetch first page
 	if (url_handler_->read_url(url, &eqsl_ss)) {
@@ -530,19 +530,19 @@ eqsl_handler::response_t eqsl_handler::adif_filename(string& filename) {
 		}
 		if (nak_seen) {
 			// Nak signature found
-			strcpy(message, "eQSL: No records to download");
+			strcpy(message, "EQSL: No records to download");
 			status_->misc_status(ST_OK, message);
 			result = ER_SKIPPED;
 		}
 		else if (error_seen) {
 			// Error message captured above
-			strcpy(message, error_message.c_str());
+			sprintf(message, "EQSL: %s", error_message.c_str());
 			status_->misc_status(ST_ERROR, message);
 			result = ER_FAILED;
 		}
 		else if (!ack_seen || !tag_seen) {
 			// No signature comment found
-			strcpy(message, "eQSL: Unrecognised download data");
+			strcpy(message, "EQSL: Unrecognised download data");
 			status_->misc_status(ST_ERROR, message);
 			result = ER_FAILED;
 		}
@@ -566,19 +566,19 @@ eqsl_handler::response_t eqsl_handler::adif_filename(string& filename) {
 eqsl_handler::response_t eqsl_handler::download_adif(string& filename, stringstream* adif) {
 	// Tell user
 	char message[256];
-	sprintf(message, "eQSL: Download %s...", filename.c_str());
+	sprintf(message, "EQSL: Download %s...", filename.c_str());
 	status_->misc_status(ST_NOTE, message);
 	// Fetch the ADIF file 
 	string url = "http://www.eqsl.cc/qslcard/" + filename;
 	if (url_handler_->read_url(url, adif)) {
 		// Successful
-		strcpy(message, "eQSL: log download done!");
+		strcpy(message, "EQSL: log download done!");
 		status_->misc_status(ST_OK, message);
 		return ER_OK;
 	}
 	else {
 		// Failed
-		strcpy(message, "eQSL: Log download failed");
+		strcpy(message, "EQSL: Log download failed");
 		status_->misc_status(ST_ERROR, message);
 		return ER_HTML_ERR;
 	}
@@ -627,7 +627,7 @@ bool eqsl_handler::upload_eqsl_log(book* book) {
 	response_t status = ER_OK;
 	if (!user_details(&username, &password, nullptr, &qsl_message, &swl_message)) {
 		char* message = new char[50 + username.length() + password.length()];
-		sprintf(message, "eQSL: User or password is missing: U=%s, P=%s", username.c_str(), password.c_str());
+		sprintf(message, "EQSL: User or password is missing: U=%s, P=%s", username.c_str(), password.c_str());
 		status_->misc_status(ST_ERROR, message);
 		delete[] message;
 		return false;
@@ -788,14 +788,17 @@ bool eqsl_handler::upload_eqsl_log(book* book) {
 			}
 			// Display error or warning message and display received page
 			if (status != ER_OK) {
+
+				char* message = new char[256];
+				snprintf(message, 256, "EQSL: %s", error_message.c_str());
 				switch(status) {
 				case ER_SKIPPED:
 					// Warning message 
-					status_->misc_status(ST_WARNING, error_message.c_str());
+					status_->misc_status(ST_WARNING, message);
 					break;
 				case ER_FAILED:
 					// Error message
-					status_->misc_status(ST_ERROR, error_message.c_str());
+					status_->misc_status(ST_ERROR, message);
 					break;
 				}
 				// Display the response in a help dialog
@@ -819,7 +822,7 @@ bool eqsl_handler::upload_eqsl_log(book* book) {
 	// Update status with succesful uploads and remove extracted records
 	if (passed) {
 		char ok_message[256];
-		sprintf(ok_message, "eQSL: %d QSLs uploaded %d accept", book->size(), num_successful);
+		sprintf(ok_message, "EQSL: %d QSLs uploaded %d accept", book->size(), num_successful);
 		status_->misc_status(ST_OK, ok_message);
 	}
 

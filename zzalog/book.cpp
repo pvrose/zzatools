@@ -107,7 +107,7 @@ bool book::load_data(string filename)
 				spec_data_->loaded_filename(filename_);
 				// Update status bar
 				char* message = new char[filename_.length() + 20];
-				sprintf(message, "LOG READ: %s", filename_.c_str());
+				sprintf(message, "LOG: %s", filename_.c_str());
 				status_->misc_status(ST_NOTE, message);
 				delete[] message;
 				// Get the filetype suffix from the filename to know which reader to use
@@ -132,7 +132,7 @@ bool book::load_data(string filename)
 					if (!reader->load_book(this, input_)) {
 						// Error while reading book
 						char message[256];
-						sprintf(message, "LOG READ: Failed to open %s", filename.c_str());
+						sprintf(message, "LOG: Failed to open %s", filename.c_str());
 						status_->misc_status(ST_ERROR, message);
 						if (book_type_ == OT_MAIN) {
 							// Display message in main window title and update views that there's no or partial data
@@ -168,7 +168,7 @@ bool book::load_data(string filename)
 					input_.close();
 					if (format_ == FT_ADX) {
 						// We have already loaded ADX data 
-						status_->misc_status(ST_WARNING, "LOG READ: Loading .adi format when .adx already loaded, validation will be compromised");
+						status_->misc_status(ST_WARNING, "LOG: Loading .adi format when .adx already loaded, validation will be compromised");
 						format_ = FT_MIXED;
 					}
 					else {
@@ -187,7 +187,7 @@ bool book::load_data(string filename)
 					if (!input_.good() || !reader->load_book(this, input_)) {
 						// Failed to complete the load
 						char * message = new char[filename.length() + reader->information().length() + 100];
-						sprintf(message, "LOG READ: Failed to open %s. Error messages = %s", filename.c_str(), reader->information().c_str());
+						sprintf(message, "LOG: Failed to open %s. Error messages = %s", filename.c_str(), reader->information().c_str());
 						status_->misc_status(ST_ERROR, message);
 						delete[] message;
 						clear();
@@ -225,7 +225,7 @@ bool book::load_data(string filename)
 					input_.close();
 					if (format_ == FT_ADI) {
 						// Mixed source
-						status_->misc_status(ST_WARNING, "LOG READ: Loading .adi format when .adx already loaded, validation will be compromised");
+						status_->misc_status(ST_WARNING, "LOG: Loading .adi format when .adx already loaded, validation will be compromised");
 						format_ = FT_MIXED;
 					}
 					else {
@@ -238,14 +238,14 @@ bool book::load_data(string filename)
 				// neither .adi nor .adx 
 				else {
 					char* message = new char[filename.length() + 100];
-					sprintf(message, "LOG READ: Unknown file format. %s ignored", filename.c_str());
+					sprintf(message, "LOG: Unknown file format. %s ignored", filename.c_str());
 					status_->misc_status(ST_ERROR, message);
 					delete[] message;
 					ok = false;
 				}
 				if (ok) {
 					char* message = new char[filename.length() + 100];
-					sprintf(message, "LOG READ: %d records read from %s", size(), filename.c_str());
+					sprintf(message, "LOG: %d records read from %s", size(), filename.c_str());
 					status_->misc_status(ST_OK, message);
 					delete[] message;
 				}
@@ -268,7 +268,7 @@ bool book::load_data(string filename)
 	}
 	else {
 		// Cannot load other types.
-		status_->misc_status(ST_ERROR, "LOG READ: An extract or export type of book cannot be constructed by reading a file");
+		status_->misc_status(ST_ERROR, "LOG: An extract or export type of book cannot be constructed by reading a file");
 		ok = false;
 	}
 	return ok;
@@ -278,7 +278,7 @@ bool book::load_data(string filename)
 bool book::store_data(string filename, bool force, set<string>* fields) {
 	bool ok = false;
 	if (save_in_progress_) {
-		status_->misc_status(ST_LOG, "LOG WRITE: Ignoring request to store log as currently doing so");
+		status_->misc_status(ST_LOG, "LOG: Ignoring request to store log as currently doing so");
 	}
 	else {
 		if (book_type_ == OT_MAIN || book_type_ == OT_EXTRACT) {
@@ -305,7 +305,7 @@ bool book::store_data(string filename, bool force, set<string>* fields) {
 				}
 				// Update status bar
 				char * message = new char[filename_.length() + 20];
-				sprintf(message, "LOG WRITE: %s", filename_.c_str());
+				sprintf(message, "LOG: %s", filename_.c_str());
 				status_->misc_status(ST_NOTE, message);
 				delete[] message;
 				// Output stream
@@ -334,7 +334,7 @@ bool book::store_data(string filename, bool force, set<string>* fields) {
 					if (writer->store_book(this, file, fields) != LR_GOOD) {
 						// Store failed
 						char* message = new char[filename_.length() + 100];
-						sprintf(message, "LOG WRITE: Failed to open %s", filename_.c_str());
+						sprintf(message, "LOG: Failed to open %s", filename_.c_str());
 						delete[] message;
 						file.close();
 						ok = false;
@@ -355,7 +355,7 @@ bool book::store_data(string filename, bool force, set<string>* fields) {
 					if (!writer->store_book(this, file)) {
 						// Store failed
 						char * message = new char[filename_.length() + 100];
-						sprintf(message, "LOG WRITE: Failed to open %s", filename_.c_str());
+						sprintf(message, "LOG: Failed to open %s", filename_.c_str());
 						status_->misc_status(ST_ERROR, message);
 						delete[] message;
 						file.close();
@@ -374,7 +374,7 @@ bool book::store_data(string filename, bool force, set<string>* fields) {
 					if (!writer->store_book(this, file, fields)) {
 						// Store failed
 						char * message = new char[filename_.length() + 100];
-						sprintf(message, "LOG WRITE: Failed to open %s", filename_.c_str());
+						sprintf(message, "LOG: Failed to open %s", filename_.c_str());
 						status_->misc_status(ST_ERROR, message);
 						delete[] message;
 						file.close();
@@ -388,14 +388,14 @@ bool book::store_data(string filename, bool force, set<string>* fields) {
 				else {
 					// Unknown file type
 					char * message = new char[filename_.length() + 100];
-					sprintf(message, "LOG WRITE: Unknown file format. %s ignored", filename_.c_str());
+					sprintf(message, "LOG: Unknown file format. %s ignored", filename_.c_str());
 					status_->misc_status(ST_WARNING, message);
 					delete[] message;
 					ok = false;
 				}
 				if (ok) {
 					char* message = new char[filename_.length() + 100];
-					sprintf(message, "LOG WRITE: %d records written to %s", size(), filename_.c_str());
+					sprintf(message, "LOG: %d records written to %s", size(), filename_.c_str());
 					status_->misc_status(ST_OK, message);
 					delete[] message;
 				}
@@ -415,7 +415,7 @@ bool book::store_data(string filename, bool force, set<string>* fields) {
 		}
 		else {
 			// Cannot write an imported file
-			status_->misc_status(ST_ERROR, "LOG WRITE: An import type of book cannot be written to a file");
+			status_->misc_status(ST_ERROR, "LOG: An import type of book cannot be written to a file");
 			ok = false;
 		}
 	}
@@ -1092,7 +1092,7 @@ void book::check_dupes(bool restart) {
 	if (!restart) {
 		duplicate_item_ = 0;
 		status_->progress(size(), book_type(), "duplicates checked");
-		status_->misc_status(ST_NOTE, "DUPE_CHECK: Checking started");
+		status_->misc_status(ST_NOTE, "LOG: Duplicate checking started");
 		inhibit_view_update_ = true;
 		number_dupes_kept_ = 0;
 		number_dupes_removed_ = 0;
@@ -1129,7 +1129,7 @@ void book::check_dupes(bool restart) {
 	}
 	if (!possible) {
 		char message[256];
-		snprintf(message, 256, "DUPE CHECK: Complete. %d kept, %d removed", number_dupes_kept_, number_dupes_removed_);
+		snprintf(message, 256, "LOG: Dupe check complete. %d kept, %d removed", number_dupes_kept_, number_dupes_removed_);
 		status_->misc_status(ST_OK, message);
 		inhibit_view_update_ = false;
 		selection(size() - 1, HT_ALL);
@@ -1149,7 +1149,7 @@ void book::reject_dupe(bool use_dupe) {
 		selection(duplicate_item_ + 1, HT_DUPE_DELETED);
 	}
 	char message[128];
-	snprintf(message, 128, "DUPE CHECK: Checked record %s deleted", get_record()->item("CALL").c_str());
+	snprintf(message, 128, "LOG: Duplicate record %s deleted", get_record()->item("CALL").c_str());
 	status_->misc_status(ST_WARNING, message);
 	delete_record(true);
 	number_dupes_removed_++;
@@ -1162,7 +1162,7 @@ void book::merge_dupe() {
 	get_record(duplicate_item_, false)->merge_records(get_record(duplicate_item_ + 1, false));
 	selection(dupe_record, HT_DUPE_DELETED);
 	char message[128];
-	snprintf(message, 128, "DUPE CHECK: Checked record %s merged && deleted", get_record(duplicate_item_ + 1, false)->item("CALL").c_str());
+	snprintf(message, 128, "LOG: Duplicate record %s merged && deleted", get_record(duplicate_item_ + 1, false)->item("CALL").c_str());
 	status_->misc_status(ST_WARNING, message);
 	delete_record(true);
 	number_dupes_removed_++;
@@ -1171,7 +1171,7 @@ void book::merge_dupe() {
 // Handle duplicate action - KEEP_BOTH - ignore and restart check
 void book::accept_dupe() {
 	char message[128];
-	snprintf(message, 128, "DUPE CHECK: Checked record %s not duplicate", get_record(duplicate_item_ + 1, false)->item("CALL").c_str());
+	snprintf(message, 128, "LOG: Checked record %s not a duplicate", get_record(duplicate_item_ + 1, false)->item("CALL").c_str());
 	status_->misc_status(ST_WARNING, message);
 	number_dupes_kept_++;
 	duplicate_item_++;
@@ -1184,7 +1184,7 @@ string book::match_question() {
 
 // Opens a text editor to allow the header comment to be edited
 void book::edit_header() {
-	status_->misc_status(ST_NOTE, "MISC: Editting header comment");
+	status_->misc_status(ST_NOTE, "LOG: Editting header comment");
 	// now read it into the text buffer
 	Fl_Text_Buffer* buffer = new Fl_Text_Buffer;
 	// Window to display the text editor and Save and Cancel buttons
@@ -1244,13 +1244,13 @@ void book::cb_close_edith(Fl_Widget* w, void* v) {
 		that->modified(true);
 	}
 	menu_->enable(true);
-	status_->misc_status(ST_OK, "MISC: Editting header comment - Done!");
+	status_->misc_status(ST_OK, "LOG: Editting header comment - Done!");
 	Fl_Window::default_callback(win, v);
 }
 
 // Call back to cancel the new header edit
 void book::cb_cancel_edith(Fl_Widget* w, void* v) {
-	status_->misc_status(ST_OK, "MISC: Editting header comment - Cancelled!");
+	status_->misc_status(ST_OK, "LOG: Editting header comment - Cancelled!");
 	Fl_Window::default_callback(w->window(), v);
 }
 

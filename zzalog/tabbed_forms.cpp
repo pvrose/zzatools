@@ -10,6 +10,7 @@
 #include "report_tree.h"
 #include "toolbar.h"
 #include "dxa_if.h"
+#include "settings.h"
 
 using namespace zzalog;
 using namespace zzalib;
@@ -20,6 +21,7 @@ extern extract_data* extract_records_;
 extern import_data* import_data_;
 extern toolbar* toolbar_;
 extern dxa_if* dxatlas_;
+extern settings* config_;
 extern bool closing_;
 
 // Constructor
@@ -94,12 +96,14 @@ void tabbed_forms::update_views(view* requester, hint_t hint, record_num_t recor
 			ix->second->update(hint, record_1, record_2);
 		}
 	}
+	// Update all the other objects that use the current selection
 	if (record_1 != -1) {
 		toolbar_->search_text(record_1);
 	} 
 #ifdef _WIN32
 	if (dxatlas_) dxatlas_->update(hint);
 #endif
+	if (config_) config_->update();
 }
 
 // Activate or deactivate the named object - if selecting another log_view change the navigation_book_

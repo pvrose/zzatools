@@ -140,7 +140,7 @@ bool spec_data::load_data(bool force) {
 	} else {
 		ok = false;
 		char* message = new char[30 + file_name.length()];
-		sprintf(message, "SPEC: Fail to open %s", file_name.c_str());
+		sprintf(message, "ADIF SPEC: Fail to open %s", file_name.c_str());
 		status_->misc_status(ST_FATAL, message);
 	} 
 	file.close();
@@ -306,7 +306,7 @@ bool spec_data::add_userdef(int id, const string& name, char indicator, string& 
 	// Check ID not already defined
 	if (userdef_names_.size() > (unsigned)id && userdef_names_[id] != "") {
 		char message[256];
-		sprintf(message, "SPEC: User defined field id %d already allocated - fieldname %s ignored", id, name.c_str());
+		sprintf(message, "ADIF SPEC: User defined field id %d already allocated - fieldname %s ignored", id, name.c_str());
 		status_->misc_status(ST_ERROR, message);
 		return false;
 	}
@@ -314,7 +314,7 @@ bool spec_data::add_userdef(int id, const string& name, char indicator, string& 
 	spec_dataset* fields = dataset("Fields");
 	if (fields->data.find(name) != fields->data.end()) {
 		char message[256];
-		sprintf(message, "SPEC: User defined field %s already allocated - fieldname ignored", name.c_str());
+		sprintf(message, "ADIF SPEC: User defined field %s already allocated - fieldname ignored", name.c_str());
 		status_->misc_status(ST_ERROR, message);
 		return false;
 	}
@@ -474,7 +474,7 @@ bool spec_data::add_appdef(const string& name, char indicator) {
 		}
 		if (indicator_value.length() > 0 && indicator != ' ' && indicator_value[0] != indicator) {
 			char message[256];
-			sprintf(message, "SPEC: Application defined field %s attempted to redefine data type from %s to %c", name.c_str(), indicator_value.c_str(), indicator);
+			sprintf(message, "ADIF SPEC: Application defined field %s attempted to redefine data type from %s to %c", name.c_str(), indicator_value.c_str(), indicator);
 			status_->misc_status(ST_ERROR, message);
 			return false;
 		}
@@ -496,7 +496,7 @@ bool spec_data::add_appdef(const string& name, char indicator) {
 		if (not_found) {
 			// If it doesn't
 			char message[256];
-			sprintf(message, "SPEC: Application defined field %s has invalid data type %c", name.c_str(), real_indicator);
+			sprintf(message, "ADIF SPEC: Application defined field %s has invalid data type %c", name.c_str(), real_indicator);
 			status_->misc_status(ST_ERROR, message);
 			return false;
 		}
@@ -541,7 +541,7 @@ void spec_data::delete_userdefs() {
 				// Remove the entry from the dataset
 				if (!fields->data.erase(field_name)) {
 					char message[256];
-					sprintf(message, "SPEC: Internal discrepancy - user defined field %s", field_name.c_str());
+					sprintf(message, "ADIF SPEC: Internal discrepancy - user defined field %s", field_name.c_str());
 					status_->misc_status(ST_SEVERE, message);
 				}
 			}
@@ -559,7 +559,7 @@ void spec_data::delete_userdefs() {
 				// Remove the entry from the dataset
 				if (!fields->data.erase(userdef_name)) {
 					char message[256];
-					sprintf(message, "SPEC: Internal discrepancy - user defined field %s", userdef_name.c_str());
+					sprintf(message, "ADIF SPEC: Internal discrepancy - user defined field %s", userdef_name.c_str());
 					status_->misc_status(ST_SEVERE, message);
 				}
 			}
@@ -585,7 +585,7 @@ void spec_data::delete_appdefs() {
 				// Remove the entry from the dataset
 				if (!fields->data.erase(*it)) {
 					char message[256];
-					sprintf(message, "SPEC: Internal discrepancy - app defined field %s", (*it).c_str());
+					sprintf(message, "ADIF SPEC: Internal discrepancy - app defined field %s", (*it).c_str());
 					status_->misc_status(ST_SEVERE, message);
 				}
 			}
@@ -622,7 +622,7 @@ string spec_data::datatype(char indicator) {
 	}
 	// Not found in the list
 	char message[256];
-	sprintf(message, "SPEC: Cannot find the data type for indicator %c", indicator);
+	sprintf(message, "ADIF SPEC: Cannot find the data type for indicator %c", indicator);
 	status_->misc_status(ST_ERROR, message);
 	return "";
 }
@@ -638,7 +638,7 @@ string spec_data::datatype(string field_name) {
 	}
 	else {
 		char message[256];
-		sprintf(message, "SPEC: Cannot find data type for field name %s", field_name.c_str());
+		sprintf(message, "ADIF SPEC: Cannot find data type for field name %s", field_name.c_str());
 		status_->misc_status(ST_ERROR, message);
 		return "";
 	}

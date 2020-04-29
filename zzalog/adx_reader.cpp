@@ -64,19 +64,19 @@ bool adx_reader::load_book(book* book, istream& in) {
 	// reposition back to beginning
 	in.seekg(0, ios::beg);
 	// Initialsie the progress
-	status_->misc_status(ST_NOTE, "ADX READ: Started");
+	status_->misc_status(ST_NOTE, "LOG: Started");
 	status_->progress(file_size_, book->book_type(), "bytes");
 	// Call the XML parser
 	if (parse(in)) {
 		// Read successful - complete progress
-		status_->misc_status(ST_OK, "ADX READ: Done!");
+		status_->misc_status(ST_OK, "LOG: Done!");
 		status_->progress(file_size_, book->book_type());
 		fl_cursor(FL_CURSOR_DEFAULT);
 		return true;
 	}
 	else {
 		// Read failed - report failure
-		status_->misc_status(ST_ERROR, "ADX READ: Failed");
+		status_->misc_status(ST_ERROR, "LOG: Failed");
 		status_->progress("Load failed", book->book_type());
 		fl_cursor(FL_CURSOR_DEFAULT);
 		return false;
@@ -231,7 +231,7 @@ bool adx_reader::end_element(string name) {
 		// Report if any XML constructs have been ignored
 		if (num_ignored_ > 0) {
 			char message[256];
-			sprintf(message, "ADX READ: %d XML constructs have been ignored", num_ignored_);
+			sprintf(message, "LOG: %d XML constructs have been ignored", num_ignored_);
 			status_->misc_status(ST_WARNING, message);
 		}
 	}
@@ -262,7 +262,7 @@ bool adx_reader::end_element(string name) {
 		// Report error in end element
 		string temp = error_msg;
 		char message[100];
-		sprintf(message, "ADX READ: %s %s %s - Problem with record in XML",
+		sprintf(message, "LOG: %s %s %s - Problem with record in XML",
 			record_->item("QSO_DATE").c_str(),
 			record_->item("TIME_ON").c_str(),
 			record_->item("CALL").c_str());
@@ -286,7 +286,7 @@ bool adx_reader::characters(string content) {
 		case AET_HEADER:
 		case AET_RECORD:
 		case AET_RECORDS:
-			// TODO: review whether this is necessary as it takes 25% of CPU ADX READ
+			// TODO: review whether this is necessary as it takes 25% of CPU LOG
 			//// Expect white space
 			//if (!regex_match(content.c_str(), REGEX_WHITE_SPACE)) {
 			//	char* temp = new char[40 + content.length()];

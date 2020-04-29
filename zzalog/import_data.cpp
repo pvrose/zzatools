@@ -93,7 +93,7 @@ void import_data::cb_timer_imp(void* v) {
 // Start the auto update process
 bool import_data::start_auto_update() {
 	// Tell user
-	status_->misc_status(ST_NOTE, "AUTO IMPORT: Started");
+	status_->misc_status(ST_NOTE, "IMPORT: Started");
 	close_pending_ = false;
 	update_mode_ = WAIT_AUTO;
 
@@ -128,7 +128,7 @@ bool import_data::start_auto_update() {
 	}
 	else {
 		// No files to update - tell calling routine to open rig again and also change flag in menu
-		status_->misc_status(ST_WARNING, "AUTO IMPORT: No files available to import.");
+		status_->misc_status(ST_WARNING, "IMPORT: No files available to auto-import.");
 		return false;
 	}
 	menu_->update_items();
@@ -138,7 +138,7 @@ bool import_data::start_auto_update() {
 // Start an automatic (on timer) update from the defined locations
 void import_data::auto_update() {
 	// Report auto-update
-	status_->misc_status(ST_NOTE, "AUTO IMPORT: File load started");
+	status_->misc_status(ST_NOTE, "IMPORT: File load started");
 	update_mode_ = READ_AUTO;
 
 	delete_contents(true);
@@ -168,7 +168,7 @@ void import_data::auto_update() {
 			if (timestamp > last_timestamps_[i]) {
 				// Load data from the auto-import file - concatenating all files
 				char message[256];
-				sprintf(message, "AUTO IMPORT: %s (%s)", update_files_[i].c_str(), sources_[i].c_str());
+				sprintf(message, "IMPORT: %s (%s)", update_files_[i].c_str(), sources_[i].c_str());
 				status_->misc_status(ST_NOTE, message);
 				load_data(update_files_[i]);
 				// Remember the earliest of the files that has changed
@@ -179,7 +179,7 @@ void import_data::auto_update() {
 			}
 			else {
 				char message[256];
-				sprintf(message, "AUTO IMPORT: %s not changed", update_files_[i].c_str());
+				sprintf(message, "IMPORT: %s not changed", update_files_[i].c_str());
 				status_->misc_status(ST_WARNING, message);
 			}
 		}
@@ -187,7 +187,7 @@ void import_data::auto_update() {
 	if (size()) {
 		// Tell user and merge records from the auto-import
 		update_mode_ = AUTO_IMPORT;
-		status_->misc_status(ST_NOTE, "AUTO IMPORT: merging data");
+		status_->misc_status(ST_NOTE, "IMPORT: merging data");
 		status_->progress(size(), book_type_, "records");
 		number_checked_ = 0;
 		number_accepted_ = 0;
@@ -201,7 +201,7 @@ void import_data::auto_update() {
 	else {
 		// Tell user no data and restart the timer. Even though nothing to import we need to set AUTO_IMPORT.
 		update_mode_ = AUTO_IMPORT;
-		status_->misc_status(ST_WARNING, "AUTO IMPORT: No data - skipped");
+		status_->misc_status(ST_WARNING, "IMPORT: No data - skipped");
 		finish_update(false);
 	}
 }

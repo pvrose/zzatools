@@ -98,7 +98,7 @@ istream& adi_reader::load_record(record* in_record, istream& in, load_result_t& 
 		}
 		// Set read fail if we see EOH for a non-header record
 		if (field == "EOH" && !in_record->is_header()) {
-			status_->misc_status(ST_ERROR, "<EOH> found when not expecting it!");
+			status_->misc_status(ST_ERROR, "LOG: <EOH> found when not expecting it!");
 			result = LR_BAD;
 		}
 		else {
@@ -213,7 +213,7 @@ istream& adi_reader::load_record(record* in_record, istream& in, load_result_t& 
 	if (has_bad_field) {
 		// Report band item to the status log.
 		char message[100];
-		sprintf(message, "ADI READ: %s %s %s - Problem with field %s",
+		sprintf(message, "LOG: %s %s %s - Problem with field %s",
 			in_record->item("QSO_DATE").c_str(),
 			in_record->item("TIME_ON").c_str(),
 			in_record->item("CALL").c_str(),
@@ -239,7 +239,7 @@ bool adi_reader::load_book(book* book, istream& in) {
 	in.seekg(0, ios::end);
 	streampos endpos = in.tellg();
 	file_size_ = (long)(endpos - startpos);
-	status_->misc_status(ST_NOTE, "ADI READ: Started");
+	status_->misc_status(ST_NOTE, "LOG: Started");
 	status_->progress(file_size_, book->book_type(), "bytes");
 	// reposition back to beginning
 	in.seekg(0, ios::beg);
@@ -275,12 +275,12 @@ bool adi_reader::load_book(book* book, istream& in) {
 	// Update progress bar with complete or failed.
 	if (in.fail() && !in.eof()) {
 		status_->progress("Load failed", book->book_type());
-		status_->misc_status(ST_ERROR, "ADI READ: Failed");
+		status_->misc_status(ST_ERROR, "LOG: Failed");
 		return false;
 	}
 	else {
 		status_->progress(file_size_, book->book_type());
-		status_->misc_status(ST_OK, "ADI READ: Done!");
+		status_->misc_status(ST_OK, "LOG: Done!");
 		return true;
 	}
 }

@@ -98,6 +98,9 @@ namespace zzalog {
 
 		void load(const char* filename);
 
+		// Text filter
+		string filter_;
+
 
 	};
 
@@ -115,6 +118,8 @@ namespace zzalog {
 	protected:
 		// Find text in Text Buffer
 		static void cb_find(Fl_Widget* w, void* v);
+		// Filter choice button
+		static void cb_ch_filter(Fl_Widget* w, void* v);
 
 		// Display widget
 		text_display* display_;
@@ -124,6 +129,8 @@ namespace zzalog {
 		int direction_;
 		// Whether to match case
 		int match_case_;
+		// Filename
+		char* filename_;
 
 	};
 	// A progress stack entry
@@ -209,6 +216,8 @@ namespace zzalog {
 		list<object_t> progress_stack_;
 		// The progress items in the stack
 		map<object_t, progress_item*> progress_items_;
+		// Report file unusable
+		bool file_unusable_;
 
 	};
 

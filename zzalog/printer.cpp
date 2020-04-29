@@ -303,7 +303,7 @@ int printer::print_cards() {
 	// For each record that would be in the page range
 	size_t i = (from_page - 1) * items_per_page_;
 
-	while ((i < navigation_book_->size() && page_number <= to_page && !error) || print_label_) {
+	while ((i < navigation_book_->size() || print_label_) && page_number <= to_page && !error) {
 		error = start_page();
 		// Print the record
 		error = print_page_cards(i);
@@ -311,7 +311,7 @@ int printer::print_cards() {
 		if (!error) {
 			page_number++;
 			// not yet reached the last wanted page
-			if (page_number <= to_page && i) {
+			if ((page_number <= to_page) && i) {
 				// End the page
 				error = end_page();
 				// Update progress
@@ -322,6 +322,9 @@ int printer::print_cards() {
 				if (i < navigation_book_->size() && !error) {
 					error = start_page();
 				}
+			}
+			else {
+				error = end_page();
 			}
 			//Fl::wait();
 		}

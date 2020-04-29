@@ -21,6 +21,8 @@ namespace zzalog {
 		~qsl_design();
 		// Display widget design
 		void display_design_data(Fl_Button* widget, qsl_form::qsl_widget* data);
+		// Update record being displayed in viewer
+		virtual void update();
 
 	protected:
 		// The various parameter types
@@ -77,6 +79,8 @@ namespace zzalog {
 		void populate_size(Fl_Hold_Browser* b);
 		// Redraw the address in the window
 		void redraw_address();
+		// Draw card window
+		void draw_card_window();
 
 		// Current design data
 		qsl_form* current_design_;

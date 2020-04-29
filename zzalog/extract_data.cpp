@@ -493,7 +493,7 @@ void extract_data::upload() {
 	switch (use_mode_) {
 	case EQSL:
 		if (eqsl_handler_->upload_eqsl_log(this)) {
-			status_->misc_status(ST_OK, "EXTRACT eQSL: upload successful!");
+			status_->misc_status(ST_OK, "EXTRACT: eQSL upload successful!");
 		}
 		break;
 	case LOTW:

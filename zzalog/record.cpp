@@ -197,7 +197,7 @@ void record::item(string field, string value, bool formatted/* = false*/) {
 	// Certain fields - always log in upper case
 	if (field == "CALL" && item("CALL").length() && !value.length() && 
 		fl_choice("You are deleting a callsign, are you sure?", "Yes", "No", nullptr) == 1) {
-		status_->misc_status(ST_FATAL, "Unexpected deletion of a callsign");
+		status_->misc_status(ST_FATAL, "LOG: Unexpected deletion of a callsign");
 		return;
 	}
 	string upper_value;
@@ -603,7 +603,7 @@ void record::unparse() {
 	item("ANT_AZ", string(""));
 	item("DISTANCE", string(""));
 	char message[100];
-	sprintf(message,"UNPARSE QSO: %s %s %s - unparsed",
+	sprintf(message,"PARSE: %s %s %s - unparsed",
 		item("QSO_DATE").c_str(), item("TIME_ON").c_str(), item("CALL").c_str());
 	status_->misc_status(ST_LOG, message);
 }

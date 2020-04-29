@@ -174,7 +174,7 @@ void stn_dialog::power_table::cb_ip_drive(Fl_Widget* w, void* v) {
 		}
 		else {
 			char message[100];
-			sprintf(message, "STN DLG: A cell with drive level %d exists - change ignored!", drive);
+			sprintf(message, "STATION: A cell with drive level %d exists - change ignored!", drive);
 			status_->misc_status(ST_WARNING, message);
 		}
 	}
@@ -717,7 +717,7 @@ void stn_dialog::qth_group::cb_ip_call(Fl_Widget* w, void* v) {
 	prefix* prefix = pfx_data_->get_prefix(&dummy, false);
 	// Get CQZone - if > 1 supplied then message for now
 	if (prefix->cq_zones_.size() > 1) {
-		string message = "STN DLG: Multiple CQ Zones: ";
+		string message = "STATION: Multiple CQ Zones: ";
 		for (unsigned int i = 0; i < prefix->cq_zones_.size(); i++) {
 			string zone = to_string(prefix->cq_zones_[i]);
 			message += zone;
@@ -731,7 +731,7 @@ void stn_dialog::qth_group::cb_ip_call(Fl_Widget* w, void* v) {
 	}
 	// Get ITUZone - if > 1 supplied then message for now
 	if (prefix->itu_zones_.size() > 1) {
-		string message = "STN DLG: Multiple ITU Zones: ";
+		string message = "STATION: Multiple ITU Zones: ";
 		for (unsigned int i = 0; i < prefix->itu_zones_.size(); i++) {
 			string zone = to_string(prefix->itu_zones_[i]);
 			message += zone;
@@ -745,7 +745,7 @@ void stn_dialog::qth_group::cb_ip_call(Fl_Widget* w, void* v) {
 	}
 	// Get Continent - if > 1 supplied then message for now
 	if (prefix->continents_.size() > 1) {
-		string message = "STN DLG: Multiple Continents: ";
+		string message = "STATION: Multiple Continents: ";
 		for (unsigned int i = 0; i < prefix->continents_.size(); i++) {
 			message += prefix->continents_[i] + "; ";
 		}

@@ -46,6 +46,7 @@ status::status(int X, int Y, int W, int H, const char* label) :
 	, min_level_(ST_NONE)
 	, append_log_(false)
 	, rig_in_progress_(false)
+	, file_unusable_(false)
 {
 	// Initialise attributes
 	progress_stack_.clear();
@@ -156,25 +157,11 @@ status::status(int X, int Y, int W, int H, const char* label) :
 		delete chooser;
 	}
 
-	// Try to open the file.
-	status_settings.get("Append", (int&)append_log_, false);
-	if (append_log_) {
-		report_file_ = new ofstream(report_filename_, ios::out | ios::app);
-	}
-	else {
-		report_file_ = new ofstream(report_filename_, ios::out | ios::trunc);
-	}
-	if (!report_file_->good()) {
-		delete report_file_;
-		report_file_ = nullptr;
-		char * message = new char[report_filename_.length() + 50];
-		sprintf(message, "Failed to open status report file %s", report_filename_.c_str());
-		misc_status(ST_ERROR, message);
-	}
-
 	status_settings.get("Minimum Level", (int&)min_level_, ST_NOTE);
 	menu_->status_level(min_level_);
 	menu_->append_file(append_log_);
+
+	status_settings.get("Append", (int&)append_log_, false);
 
 	status_file_viewer_ = nullptr;
 }
@@ -183,7 +170,6 @@ status::status(int X, int Y, int W, int H, const char* label) :
 status::~status()
 {
 	clear();
-	report_file_->close();
 	delete status_file_viewer_;
 	for (auto it = progress_items_.begin(); it != progress_items_.end(); it++) {
 		delete (it->second);
@@ -402,14 +388,37 @@ void status::misc_status(status_t status, const char* label) {
 	strncpy(marker, label, 15);
 #endif
 
+	if (!file_unusable_) {
+		// Append the status to the file
+		// Try to open the file. Open and close it each message
+		if (append_log_) {
+			report_file_ = new ofstream(report_filename_, ios::out | ios::app);
+		}
+		else {
+			report_file_ = new ofstream(report_filename_, ios::out | ios::trunc);
+			append_log_ = true;
+		}
+		if (!report_file_->good()) {
+			delete report_file_;
+			report_file_ = nullptr;
+			file_unusable_ = true;
+			char* message = new char[report_filename_.length() + 50];
+			sprintf(message, "STATUS: Failed to open status report file %s", report_filename_.c_str());
+			misc_status(ST_ERROR, message);
+			delete[] message;
+		}
 
-	// Append the status to the file
-	if (report_file_) {
-		string timestamp = now(true, "%Y/%m/%d %H:%M:%S");
-		char* message = new char[timestamp.length() + 10 + strlen(label)];
-		sprintf(message, "%c %s %s\n", STATUS_CODES.at(status), timestamp.c_str(), label);
-		*report_file_ << message;
-		delete[] message;
+
+		if (report_file_) {
+			string timestamp = now(true, "%Y/%m/%d %H:%M:%S");
+			char* message = new char[timestamp.length() + 10 + strlen(label)];
+			sprintf(message, "%c %s %s\n", STATUS_CODES.at(status), timestamp.c_str(), label);
+			*report_file_ << message;
+			delete[] message;
+			report_file_->close();
+			delete report_file_;
+			report_file_ = nullptr;
+		}
 	}
 
 	switch(status) {
@@ -462,6 +471,7 @@ void status::file_status(file_status_t status) {
 // Text display constructor
 text_display::text_display(int X, int Y, int W, int H, const char* label) :
 	Fl_Text_Display(X, Y, W, H, label)
+	, filter_("")
 {
 
 }
@@ -473,10 +483,20 @@ text_display::~text_display() {
 void text_display::load(const char* filename) {
 	// Find current scroll position
 	int scroll_pos = this->mVScrollBar->value();
-	// Reload the file
-	buffer()->loadfile(filename);
-	// Restore original scroll position
-	this->scroll(scroll_pos, 0);
+	buffer()->remove(0, buffer()->length());
+	ifstream* file = new ifstream(filename, ios_base::in);
+	while (file->good()) {
+		string line;
+		getline(*file, line);
+		if (filter_.length() == 0 || filter_ == " " ||
+			((line.length() > 22 + filter_.length()) && (line.substr(22, filter_.length()) == filter_))) {
+			buffer()->append(line.c_str());
+			buffer()->append("\n");
+		}
+	}
+	file->close();
+	delete file;
+	this->mVScrollBar->value(scroll_pos);
 }
 
 // Call back for find/find again
@@ -503,17 +523,31 @@ void viewer_window::cb_find(Fl_Widget* w, void* v) {
 
 }
 
+// Call back for filter
+void viewer_window::cb_ch_filter(Fl_Widget* w, void* v) {
+	cb_choice_text(w, v);
+	viewer_window* that = ancestor_view<viewer_window>(w);
+	that->display_->load(that->filename_);
+	that->colour_buffer();
+}
+
+
 viewer_window::viewer_window(int W, int H, const char* label)
-	: Fl_Window(W, H, label) {
+	: Fl_Window(W, H, label)
+	, filename_(nullptr)
+{
 	draw_window();
 }
 
 viewer_window::~viewer_window() {
-
+	delete[] filename_;
 }
 
 void viewer_window::load(const char* filename) {
 	display_->load(filename);
+	if (filename_) delete[] filename_;
+	filename_ = new char[strlen(filename) + 1];
+	strcpy(filename_, filename);
 }
 
 void viewer_window::draw_window() {
@@ -557,6 +591,38 @@ void viewer_window::draw_window() {
 	bn_match->value(match_case_);
 	bn_match->selection_color(FL_BLUE);
 	bn_match->callback(cb_value < Fl_Round_Button, int >, &match_case_);
+
+	Fl_Choice* ch_filter = new Fl_Choice(bn_match->x() + bn_match->w() + GAP + WLABEL, GAP, WEDIT, HTEXT, "Filter");
+	ch_filter->labelfont(FONT);
+	ch_filter->labelsize(FONT_SIZE);
+	ch_filter->align(FL_ALIGN_LEFT);
+	ch_filter->clear();
+	ch_filter->add(" ");
+	ch_filter->add("ADIF SPEC");
+	ch_filter->add("BACKUP");
+	ch_filter->add("BAND");
+	ch_filter->add("CLUBLOG");
+	ch_filter->add("DXATLAS");
+	ch_filter->add("EQSL");
+	ch_filter->add("EXCEPTION");
+	ch_filter->add("EXTRACT");
+	ch_filter->add("IMPORT");
+	ch_filter->add("INFO");
+	ch_filter->add("INTL");
+	ch_filter->add("LOG");
+	ch_filter->add("LOTW");
+	ch_filter->add("MENU");
+	ch_filter->add("PARSE");
+	ch_filter->add("PREFIX");
+	ch_filter->add("PRINTER");
+	ch_filter->add("PROGRESS");
+	ch_filter->add("QRZ");
+	ch_filter->add("RIG");
+	ch_filter->add("SCRATCHPAD");
+	ch_filter->add("STATUS");
+	ch_filter->add("VALIDATE");
+	ch_filter->add("ZZALOG");
+
 	// Create the text display and set its parameters
 	display_ = new text_display(GAP, grp->y() + grp->h() + GAP, w() - GAP - GAP, h() - grp->y() - grp->h() - GAP - GAP);
 	display_->buffer(buffer);
@@ -566,6 +632,7 @@ void viewer_window::draw_window() {
 	display_->resizable(display_);
 	display_->show();
 	display_->end();
+	ch_filter->callback(cb_ch_filter, &(display_->filter_));
 
 	end();
 	show();
@@ -575,8 +642,6 @@ void viewer_window::draw_window() {
 // Callback opens a text browser
 void status::cb_bn_misc(Fl_Widget* w, void* v) {
 	status* that = ancestor_view<status>(w);
-	// Ensure any outstanding writes are flushed to disc
-	that->report_file_->flush();
 	if (!that->status_file_viewer_) {
 		char* title = new char[that->report_filename_.length() + 30];
 		sprintf(title, "Status report file: %s", that->report_filename_.c_str());

@@ -191,7 +191,7 @@ void pfx_tree::populate_tree(bool activate) {
 	root_label(string(item_desc + filter_desc + detail_desc).c_str());
 
 	// Initial status
-	status_->misc_status(ST_NOTE, "PFX DATA: Display started");
+	status_->misc_status(ST_NOTE, "PREFIX: Display started");
 	status_->progress(prefixes_.size(), OT_PREFIX, "prefixes");
 	// For all prefixes that we want to display
 	int i = 0;
@@ -208,7 +208,7 @@ void pfx_tree::populate_tree(bool activate) {
 		status_->progress(i, OT_PREFIX);
 	}
 	status_->progress(prefixes_.size(), OT_PREFIX);
-	status_->misc_status(ST_OK, "PFX DATA: Display done!");
+	status_->misc_status(ST_OK, "PREFIX: Display done!");
 	// Restore cursor
 	fl_cursor(FL_CURSOR_DEFAULT);
 	if (filter_ != RF_NONE && activate) {

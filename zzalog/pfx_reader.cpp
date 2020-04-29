@@ -162,7 +162,7 @@ istream& pfx_reader::load_record(prefix* record, istream& in, load_result_t& res
 		}
 		catch (invalid_argument&) {
 			char * message = new char[fields[field_num].length() + 100];
-			sprintf(message, "LOAD PFX DATA: Invalid data reading prefix record: field %d = %s", field_num, fields[field_num].c_str());
+			sprintf(message, "PREFIX: Invalid data reading prefix record: field %d = %s", field_num, fields[field_num].c_str());
 			status_->misc_status(ST_WARNING, message);
 			delete[] message;
 		}
@@ -190,7 +190,7 @@ bool pfx_reader::load_data(pfx_data& prefixes, string filename) {
 	file_size_ = (long)(endpos - startpos);
 	// reposition back to beginning
 	file.seekg(0, ios::beg);
-	status_->misc_status(ST_NOTE, "LOAD PFX DATA: Started");
+	status_->misc_status(ST_NOTE, "PREFIX: Started");
 	status_->progress(file_size_, OT_PREFIX, "bytes");
 
 	string line;
@@ -257,14 +257,14 @@ bool pfx_reader::load_data(pfx_data& prefixes, string filename) {
 
 	// Return success
 	if (result == LR_BAD) {
-		status_->misc_status(ST_ERROR, "LOAD PFX DATA: Failed");
+		status_->misc_status(ST_ERROR, "PREFIX: Failed");
 		status_->progress("Load failed", OT_PREFIX);
 		return false;
 	}
 	else {
 		byte_count_ = file_size_;
 		display_progress();
-		status_->misc_status(ST_OK, "LOAD PFX DATA: Done!");
+		status_->misc_status(ST_OK, "PREFIX: Done!");
 		return true;
 	}
 }

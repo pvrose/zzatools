@@ -31,10 +31,10 @@ pfx_data::pfx_data()
 	// Carry attempting to read the file until successful or user cancels
 	bool carry_on = true;
 	while (!reader->load_data(*this, filename) && carry_on) {
-		status_->misc_status(ST_ERROR, "PFX_DATA: Unable to load prefix reference - please reselect directory!");
+		status_->misc_status(ST_ERROR, "PREFIX: Unable to load prefix reference - please reselect directory!");
 		if (fl_choice("Do you want to continue!", "Yes", "No", nullptr) == 1) {
 			carry_on = false;
-			status_->misc_status(ST_FATAL, "PFX_DATA: Load cancelled by user");
+			status_->misc_status(ST_FATAL, "PREFIX: Load cancelled by user");
 		}
 		else {
 			filename = get_file(true);
@@ -603,7 +603,7 @@ bool pfx_data::update_dxcc(record* record, prefix*& in_prefix, bool& query, stri
 	// Still haven't parsed the callsign...
 	if (query_error && in_prefix == nullptr) {
 		char * message = new char[callsign.length() + 100];
-		sprintf(message, "PFX DATA: Unable to parse the callsign: %s", callsign.c_str());
+		sprintf(message, "PREFIX: Unable to parse the callsign: %s", callsign.c_str());
 		status_->misc_status(ST_WARNING, message);
 		delete[] message;
 		query = true;
@@ -803,7 +803,7 @@ bool pfx_data::update_bearing(record* record) {
 	string call = record->item("CALL");
 	char* message = new char[50 + date.length() + time.length() + call.length()];
 	if (updated) {
-		sprintf(message, "PARSE QSO: %s %s %s - record changed: Bearing/distance",
+		sprintf(message, "PARSE: %s %s %s - record changed: Bearing/distance",
 			date.c_str(),
 			time.c_str(),
 			call.c_str());
@@ -831,7 +831,7 @@ bool pfx_data::update_geography(record* record, bool &query, string& reason, boo
 		char* message = new char[50 + date.length() + time.length() + call.length()];
 		// Update status with a warning
 		if (prefix == nullptr) {
-			sprintf(message, "PARSE QSO: %s %s %s - unable to identify prefix",
+			sprintf(message, "PARSE: %s %s %s - unable to identify prefix",
 				date.c_str(),
 				time.c_str(),
 				call.c_str());
@@ -839,7 +839,7 @@ bool pfx_data::update_geography(record* record, bool &query, string& reason, boo
 		}
 		// Enter QSO changed in status log message
 		if (changed) {
-			sprintf(message, "PARSE QSO: %s %s %s - record changed: %s",
+			sprintf(message, "PARSE: %s %s %s - record changed: %s",
 				date.c_str(),
 				time.c_str(),
 				call.c_str(),

@@ -3,6 +3,8 @@
 
 #include "../zzalib/page_dialog.h"
 
+#include <set>
+
 #include <FL/Fl_Window.H>
 #include <FL/Fl_Widget.H>
 
@@ -37,12 +39,23 @@ namespace zzalog {
 		// callbacks
 		static void cb_bn_cal(Fl_Widget* w, long arg);
 
+		void update();
+		// Test whether any we've had OK or Cancel
+		bool active();
+		// Clear active flag
+		void inactive();
+
 		// protected methods
 	protected:
 		// protected attributes
 	protected:
 		// The currently active dialog
 		Fl_Widget * settings_view_;
+		// Any widgets that need updating on record selection
+		set<page_dialog*> updatable_views_;
+		// Active flag
+		bool active_;
+
 
 
 	};

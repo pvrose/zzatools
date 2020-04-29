@@ -114,26 +114,26 @@ bool exc_reader::load_data(exc_data* data, istream& in, string& version) {
 	// reposition back to beginning
 	in.seekg(0, ios::beg);
 	// Initialsie the progress
-	status_->misc_status(ST_NOTE, "EXCEPTION READ: Started");
+	status_->misc_status(ST_NOTE, "EXCEPTION: Started");
 	status_->progress(file_size, OT_PREFIX, "bytes");
 	// Call the XML parser - calls back to the overides herein
 	if (parse(in)) {
 		// Read successful - complete progress
-		status_->misc_status(ST_OK, "EXCEPTION READ: Done!");
+		status_->misc_status(ST_OK, "EXCEPTION: Done!");
 		status_->progress(file_size, OT_PREFIX);
 		version = timestamp_;
 		fl_cursor(FL_CURSOR_DEFAULT);
 		return true;
 	}
 	else if (closing_) {
-		status_->misc_status(ST_WARNING, "EXCEPTION READ: Cancelled as close-down requested");
+		status_->misc_status(ST_WARNING, "EXCEPTION: Cancelled as close-down requested");
 		status_->progress("Load cancelled", OT_PREFIX);
 		fl_cursor(FL_CURSOR_DEFAULT);
 		return false;
 	}
 	else {
 		// Read failed - report failure
-		status_->misc_status(ST_FATAL, "EXCEPTION READ: Failed");
+		status_->misc_status(ST_FATAL, "EXCEPTION: Failed");
 		status_->progress("Load failed", OT_PREFIX);
 		fl_cursor(FL_CURSOR_DEFAULT);
 		return false;

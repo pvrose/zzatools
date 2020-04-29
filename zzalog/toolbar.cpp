@@ -388,7 +388,7 @@ void toolbar::cb_bn_search(Fl_Widget* w, void* v) {
 			if (that->record_num_ == 0) {
 				// Still at the start of the book so no entries at all of this callsign
 				char* message = new char[that->search_text_.length() + 50];
-				sprintf(message, "SEARCH: %s not found", that->search_text_.c_str());
+				sprintf(message, "LOG: %s not found", that->search_text_.c_str());
 				status_->misc_status(ST_WARNING, message);
 				delete[] message;
 				keep_on = false;
@@ -396,7 +396,7 @@ void toolbar::cb_bn_search(Fl_Widget* w, void* v) {
 			else {
 				// We have had at least one occurence
 				char* message = new char[that->search_text_.length() + 50];
-				sprintf(message, "SEARCH: No more instances of %s found", that->search_text_.c_str());
+				sprintf(message, "LOG: No more instances of %s found", that->search_text_.c_str());
 				status_->misc_status(ST_NOTE, message);
 				delete[] message;
 				if (fl_choice("Reached the end of the log, do you want to start again?", "Yes", "No", nullptr) == 1) {
@@ -503,7 +503,7 @@ void toolbar::update_items() {
 		if (w->callback() == &cb_bn_menu) {
 			const Fl_Menu_Item* cb = menu_->find_item((char*)w->user_data());
 			if (cb == nullptr) {
-				if (status_) status_->misc_status(ST_SEVERE, "TOOLBAR: Broken menu item");
+				if (status_) status_->misc_status(ST_SEVERE, "MENU: Broken menu item");
 				w->deactivate();
 			} else if (cb->active()) {
 				w->activate();
