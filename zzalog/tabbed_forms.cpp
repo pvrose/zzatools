@@ -8,6 +8,7 @@
 #include "pfx_tree.h"
 #include "spec_tree.h"
 #include "report_tree.h"
+#include "ic7300_table.h"
 #include "toolbar.h"
 #include "dxa_if.h"
 #include "settings.h"
@@ -46,6 +47,8 @@ tabbed_forms::tabbed_forms(int X, int Y, int W, int H, const char* label) :
 	add_view<spec_tree>("Specifications", FO_LAST, OT_ADIF, "Displays the ADIF specification data in tree format");
 	// Report view
 	add_view<report_tree>("Log analysis", FO_LAST, OT_REPORT, "Displays an analysis of the log in tree format");
+	// Memory tble view
+	add_view<ic7300_table>("Rig memories", FO_LAST, OT_MEMORY, "Displays the currently defiend memories in the rig (if supported)");
 	// Documented workround (see Fl_Tabs) to keep label heights constant
 	resizable(widgets_[OT_MAIN]);
 	// Set the callback for changing tabs

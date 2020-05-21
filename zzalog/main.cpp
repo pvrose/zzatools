@@ -38,6 +38,7 @@ main.cpp - application entry point
 #include "dxa_if.h"
 #include "qrz_handler.h"
 #include "club_handler.h"
+#include "ic7300_table.h"
 
 // C/C++ header files
 #include <ctime>
@@ -484,6 +485,8 @@ void add_rig_if() {
 						if (rig_if_ && rig_if_->rig_name() == "IC-7300") {
 							ic7300_ = new ic7300;
 							rig_if_->update_clock();
+							ic7300_table* mem_table = (ic7300_table*)(tabbed_view_->get_view(OT_MEMORY));
+							mem_table->type(mem_table->type());
 						}
 					}
 				}
@@ -516,7 +519,13 @@ void add_band_view() {
 		}
 		else {
 			// Use frequency of selected record
-			double frequency = stod(book_->get_record()->item("FREQ")) * 1000.0;
+			double frequency;
+			if (book_->size()) {
+				frequency = stod(book_->get_record()->item("FREQ")) * 1000.0;
+			}
+			else {
+				frequency = 14100.0;
+			}
 			band_view_ = new band_view(frequency, 400, 100, "Band plan");
 		}
 		if (band_view_->valid()) {

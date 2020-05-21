@@ -156,6 +156,7 @@
     <ClCompile Include="zzalog\log_table.cpp" />
     <ClCompile Include="zzalog\lotw_handler.cpp" />
     <ClCompile Include="zzalog\main.cpp" />
+    <ClCompile Include="zzalog\ic7300_table.cpp" />
     <ClCompile Include="zzalog\menu.cpp" />
     <ClCompile Include="zzalog\pfx_data.cpp" />
     <ClCompile Include="zzalog\pfx_dialog.cpp" />
@@ -216,6 +217,7 @@
     <ClInclude Include="zzalog\intl_widgets.h" />
     <ClInclude Include="zzalog\log_table.h" />
     <ClInclude Include="zzalog\lotw_handler.h" />
+    <ClInclude Include="zzalog\ic7300_table.h" />
     <ClInclude Include="zzalog\menu.h" />
     <ClInclude Include="zzalog\pfx_data.h" />
     <ClInclude Include="zzalog\pfx_dialog.h" />

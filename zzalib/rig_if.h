@@ -105,7 +105,7 @@ namespace zzalib {
 		// Update rig clock
 		void update_clock();
 
-		// Callback to update app on timer interrupt
+		// Callback to set certain functions (timer callback, freq to band conversion, error message
 		void callback(void (*function)(), string(*spec_func)(double), void(*mess_func)(bool, const char*));
 
 

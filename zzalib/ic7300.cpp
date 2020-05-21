@@ -6,7 +6,9 @@ using namespace zzalib;
 extern rig_if* rig_if_;
 ic7300* ic7300_;
 
-ic7300::ic7300() {
+ic7300::ic7300() :
+given_warning(false)
+{
 
 }
 
@@ -34,14 +36,20 @@ string ic7300::send_command(unsigned char command, string sub_command, string da
 
 		// Ignore reflected data
 		if (raw_data.substr(0, 2) != "FE") {
-			fl_alert("Response not from IC-7300: %s", raw_data.c_str());
+			if (!given_warning) {
+				fl_alert("Response not from IC-7300: %s", raw_data.c_str());
+				given_warning = true;
+			}
 			ok = false;
 			return raw_data;
 		}
 		string response = hex_to_string(raw_data);
 		if (response.length() == 0) {
 			// TRansceiver has not responded at all
-			fl_alert("Receieved no response from transceiver");
+			if (!given_warning) {
+				fl_alert("Receieved no response from transceiver");
+				given_warning = true;
+			}
 			ok = false;
 			return "";
 		}

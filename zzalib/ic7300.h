@@ -15,6 +15,9 @@ namespace zzalib {
 		string send_command(unsigned char command, string sub_command, bool& ok);
 		string send_command(unsigned char command, string sub_command, string data, bool& ok);
 
+	protected:
+		bool given_warning;
+
 	};
 
 }

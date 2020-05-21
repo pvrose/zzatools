@@ -59,7 +59,7 @@ bool rig_if::open() {
 		return true;
 	}
 	else {
-		error(false, "RIG_IF: Failed to open rig");
+		error(false, "RIG: Failed to open rig");
 		return false;
 	}
 }
@@ -215,7 +215,7 @@ void rig_if::cb_timer_rig(void* v) {
 		}
 		if (!rig_if_->is_good()) {
 			// Rig connected and broken - SLOW
-			rig_if_->error(false, "RIG_IF: Rig disconnected - setting slow polling period");
+			rig_if_->error(false, "RIG: Rig disconnected - setting slow polling period");
 			rig_settings.get("Slow Polling Interval", timer_value, SLOW_RIG_DEF);
 		}
 	}
@@ -231,7 +231,7 @@ void rig_if::get_string_mode(string& mode, string& submode) {
 	submode = "";
 	switch (rig_mode) {
 	case GM_INVALID:
-		error(false, "RIG_IF: Invalid mode got from rig");
+		error(false, "RIG: Invalid mode got from rig");
 		return;
 	case GM_DIGL:
 		mode = "DATA L";
@@ -633,7 +633,7 @@ const char* rig_hamlib::error_text(rig_errcode_e code) {
 
 // Raw message - not implemented
 string rig_hamlib::raw_message(string message) {
-	error(false, "RIG_IF: Hamlib does not support sending raw messages");
+	error(false, "RIG: Hamlib does not support sending raw messages");
 	return "";
 };
 

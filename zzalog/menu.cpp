@@ -29,6 +29,7 @@
 #include "calendar.h"
 #include "qrz_handler.h"
 #include "edit_dialog.h"
+#include "ic7300_table.h"
 
 #include <sstream>
 #include <list>
@@ -45,7 +46,8 @@
 namespace zzalog {
 	// The default menu - set of menu items
 	Fl_Menu_Item menu_items[] = {
-		{ "&File", 0, 0, 0, FL_SUBMENU },
+		// File operations
+	{ "&File", 0, 0, 0, FL_SUBMENU },
 	{ "&New", 0, menu::cb_mi_file_new, 0 },
 	{ "&Open", 0, menu::cb_mi_file_open, 0 },
 	{ "Rea&d", 0, menu::cb_mi_file_open, (void*)-1L },
@@ -60,6 +62,8 @@ namespace zzalog {
 	{ "&Backup", 0, menu::cb_mi_file_backup, (void*)false },
 	{ "Retrie&ve", 0, menu::cb_mi_file_backup, (void*)true },
 	{ 0 },
+
+	// Settings operations
 	{ "&Settings", 0, 0, 0, FL_SUBMENU },
 	{ "&Rig", 0, menu::cb_mi_settings, (void*)settings::DLG_RIG },
 	{ "Fi&les", 0, menu::cb_mi_settings, (void*)settings::DLG_FILES },
@@ -69,6 +73,8 @@ namespace zzalog {
 	{ "&QSL Design", 0, menu::cb_mi_settings, (void*)settings::DLG_QSL },
 	{ "All", 0, menu::cb_mi_settings, (void*)settings::DLG_ALL },
 	{ 0 },
+
+	// Log navigation
 	{ "&Navigate", 0, 0, 0, FL_SUBMENU },
 	{ "&First", 0, menu::cb_mi_navigate, (void*)(NV_FIRST) },
 	{ "&Previous", 0, menu::cb_mi_navigate, (void*)(NV_PREV) },
@@ -80,6 +86,8 @@ namespace zzalog {
 	{ "&New", 0, menu::cb_mi_nav_find, (void*)true },
 	{ "Ne&xt", 0, menu::cb_mi_nav_find, (void*)false },
 	{ 0 },
+
+	// Log operation
 	{ 0 },
 	{ "&Log", 0, 0, 0, FL_SUBMENU },
 	{ "&Mode", 0, 0, 0, FL_SUBMENU | FL_MENU_DIVIDER },
@@ -110,6 +118,8 @@ namespace zzalog {
 	{ "Edit &Header", 0, menu::cb_mi_log_edith, 0 },
 	{ "Scratc&hpad", 0, menu::cb_mi_log_spad, 0, FL_MENU_TOGGLE },
 	{ 0 },
+
+	// Operating method
 	{ "&Operating", 0, 0, 0, FL_SUBMENU },
 	{ "C&hange QSO && Set Next", 0, 0, 0, FL_SUBMENU },
 	{ "Ri&g", 0, menu::cb_mi_oper_change, (void*)UD_RIG },
@@ -124,6 +134,8 @@ namespace zzalog {
 	{ "&Prop mode", 0, menu::cb_mi_oper_set, (void*)UD_PROP },
 	{ 0 },
 	{ 0 },
+
+	// Log Extract and export operations
 	{ "E&xtract", 0, 0, 0, FL_SUBMENU },
 	{ "Clea&r", 0, menu::cb_mi_ext_clr, 0 },
 	{ "&Criteria", 0, menu::cb_mi_ext_crit, 0 },
@@ -143,6 +155,8 @@ namespace zzalog {
 	{ "&Print", 0, menu::cb_mi_ext_print, 0 },
 	{ "&Mark sent", 0, menu::cb_mi_ext_mark, 0 },
 	{ 0 },
+
+	// Log import operations
 	{ "&Import", 0, 0, 0, FL_SUBMENU },
 	{ "&File", 0, menu::cb_mi_imp_file, nullptr },
 	{ "Download e&QSL", 0, menu::cb_mi_download, (void*)(long)import_data::EQSL_UPDATE },
@@ -150,6 +164,8 @@ namespace zzalog {
 	{ "&Merge", 0, menu::cb_mi_imp_merge, nullptr, FL_MENU_DIVIDER },
 	{ "&Cancel", 0, menu::cb_mi_imp_cancel, nullptr },
 	{ 0 },
+
+	// Prefix reference
 	{ "&Reference", 0, 0, 0, FL_SUBMENU },
 	{ "&Prefix", 0, 0, 0, FL_SUBMENU },
 	{ "&Clear", 0, menu::cb_mi_ref_filter, (void*)RF_NONE, FL_MENU_RADIO },
@@ -163,6 +179,8 @@ namespace zzalog {
 	{ 0 },
 	{ "&Reload data", 0, menu::cb_mi_ref_reload, 0},
 	{ 0 },
+
+	// Log analysis reports
 	{ "Re&port", 0, 0, 0, FL_SUBMENU },
 	{ "&Clear", 0, menu::cb_mi_rep_filter, (void*)RF_NONE, FL_MENU_RADIO },
 	{ "&All", 0, menu::cb_mi_rep_filter, (void*)RF_ALL, FL_MENU_RADIO | FL_MENU_VALUE },
@@ -189,11 +207,24 @@ namespace zzalog {
 	{ "&Nothing", 0, menu::cb_mi_rep_level, (void*)((3 << 8) + RC_EMPTY), FL_MENU_RADIO | FL_MENU_VALUE },
 	{ 0 },
 	{ 0 },
+
+	// Accessing IC-7300 specific features
+	{ "I&C-7300", 0, 0, 0, FL_SUBMENU },
+	{ "&Memories", 0, menu::cb_mi_ic7300, (void*)VT_MEMORIES, FL_MENU_RADIO },
+	{ "&Scope bands", 0, menu::cb_mi_ic7300, (void*)VT_SCOPE_BANDS, FL_MENU_RADIO },
+	{ "&User bands", 0, menu::cb_mi_ic7300, (void*)VT_USER_BANDS, FL_MENU_RADIO },
+	{ "&CW Messages", 0, menu::cb_mi_ic7300, (void*)VT_CW_MESSAGES, FL_MENU_RADIO },
+	{ "&RTTY Messages", 0, menu::cb_mi_ic7300, (void*)VT_RTTY_MESSAGES, FL_MENU_RADIO },
+	{ 0 },
+
+	// Web-based information
 	{ "&Information", 0, 0, 0, FL_SUBMENU },
 	{ "&QRZ.com", 0, menu::cb_mi_info_qrz },
 	{ "Google &Maps", 0, menu::cb_mi_info_map },
 	{ "QSO &Web-site", 0, menu::cb_mi_info_web },
 	{ 0 },
+
+	// Program help features
 	{ "&Help", 0, 0, 0, FL_SUBMENU },
 	{ "&About", 0, menu::cb_mi_help_abt },
 	{ "&Status", 0, 0, 0, FL_SUBMENU },
@@ -1314,6 +1345,15 @@ void menu::cb_mi_info_qrz(Fl_Widget* w, void* v) {
 	}
 }
 
+// IC-7300 specific actions
+// v is viewtype
+void menu::cb_mi_ic7300(Fl_Widget* w, void* v) {
+	view_type type = (view_type)(long)v;
+	((ic7300_table*)tabbed_view_->get_view(OT_MEMORY))->type(type);
+	menu* that = ancestor_view<menu>(w);
+	that->update_items();
+}
+
 // Information->Google Maps - open browser with Google maps centered on contact's QTH (where calculable)
 // v is not used
 void menu::cb_mi_info_map(Fl_Widget* w, void* v) {
@@ -1726,6 +1766,7 @@ void menu::update_items() {
 		bool save_enabled = book_->save_enabled();
 		bool delete_enabled = book_->delete_enabled();
 		bool web_enabled = book_ && book_->get_record() && book_->get_record()->item_exists("WEB");
+		view_type memory = ((ic7300_table*)tabbed_view_->get_view(OT_MEMORY))->type();
 		// Get all relevant menu item indices
 		int index_save = find_index("&File/&Save");
 		int index_saveas = find_index("&File/Save &As");
@@ -1747,6 +1788,11 @@ void menu::update_items() {
 		int index_extract = find_index("E&xtract");
 		int index_ref = find_index("&Reference");
 		int index_rep = find_index("Re&port");
+		int index_memories = find_index("I&C-7300/&Memory");
+		int index_scopes = find_index("I&C-7300/&Scope bands");
+		int index_users = find_index("I&C-7300/&User bands");
+		int index_cw_mess = find_index("I&C-7300/&CW messages");
+		int index_rtty_mess = find_index("I&C-7300/&RTTY messages");
 		int index_info = find_index("&Information");
 		int index_web = find_index("&Information/QSO &Web-site");
 		int index_use_log = find_index("&Log/&Use View/Main &Log");
@@ -1883,6 +1929,44 @@ void menu::update_items() {
 		}
 		// Update logging commands and rig status
 		logging(logging());
+		// Memory table
+		switch (memory) {
+		case VT_MEMORIES:
+			mode(index_memories, mode(index_memories) | FL_MENU_VALUE);
+			mode(index_scopes, mode(index_scopes) & ~FL_MENU_VALUE);
+			mode(index_users, mode(index_users) & ~FL_MENU_VALUE);
+			mode(index_cw_mess, mode(index_cw_mess) & ~FL_MENU_VALUE);
+			mode(index_rtty_mess, mode(index_rtty_mess) & ~FL_MENU_VALUE);
+			break;
+		case VT_SCOPE_BANDS:
+			mode(index_memories, mode(index_memories) & ~FL_MENU_VALUE);
+			mode(index_scopes, mode(index_scopes) | FL_MENU_VALUE);
+			mode(index_users, mode(index_users) & ~FL_MENU_VALUE);
+			mode(index_cw_mess, mode(index_cw_mess) & ~FL_MENU_VALUE);
+			mode(index_rtty_mess, mode(index_rtty_mess) & ~FL_MENU_VALUE);
+			break;
+		case VT_USER_BANDS:
+			mode(index_memories, mode(index_memories) & ~FL_MENU_VALUE);
+			mode(index_scopes, mode(index_scopes) & ~FL_MENU_VALUE);
+			mode(index_users, mode(index_users) | FL_MENU_VALUE);
+			mode(index_cw_mess, mode(index_cw_mess) & ~FL_MENU_VALUE);
+			mode(index_rtty_mess, mode(index_rtty_mess) & ~FL_MENU_VALUE);
+			break;
+		case VT_CW_MESSAGES:
+			mode(index_memories, mode(index_memories) & ~FL_MENU_VALUE);
+			mode(index_scopes, mode(index_scopes) & ~FL_MENU_VALUE);
+			mode(index_users, mode(index_users) & ~FL_MENU_VALUE);
+			mode(index_cw_mess, mode(index_cw_mess) | FL_MENU_VALUE);
+			mode(index_rtty_mess, mode(index_rtty_mess) & ~FL_MENU_VALUE);
+			break;
+		case VT_RTTY_MESSAGES:
+			mode(index_memories, mode(index_memories) & ~FL_MENU_VALUE);
+			mode(index_scopes, mode(index_scopes) & ~FL_MENU_VALUE);
+			mode(index_users, mode(index_users) & ~FL_MENU_VALUE);
+			mode(index_cw_mess, mode(index_cw_mess) & ~FL_MENU_VALUE);
+			mode(index_rtty_mess, mode(index_rtty_mess) | FL_MENU_VALUE);
+			break;
+		}
 	}
 	redraw();
 	// Update toolbar to reflect active state of menu items

@@ -92,7 +92,12 @@ dxa_if::dxa_if() :
 		DxAtlas::ICustomLayersPtr pin_layers = map->GetCustomLayers();
 		pin_layers->Clear();
 		// Add pins
-		selected_locn_ = book_->get_record()->location(false);
+		if (book_->size()) {
+			selected_locn_ = book_->get_record()->location(false);
+		}
+		else {
+			selected_locn_ = { 0.0, 0.0 };
+		}
 		enable_widgets();
 		get_records();
 		get_colours(false);
@@ -1554,8 +1559,10 @@ void dxa_if::update(hint_t hint) {
 	case HT_DUPE_DELETED:    
 	case HT_NEW_DATA:
 	case HT_NO_DATA:
-		// Data has changed 
-		selected_locn_ = book_->get_record()->location(false);
+		// Data has changed
+		if (book_->size()) {
+			selected_locn_ = book_->get_record()->location(false);
+		}
 		enable_widgets();
 		get_records();
 		get_colours(false);
@@ -1563,7 +1570,9 @@ void dxa_if::update(hint_t hint) {
 		break;
 
 	case HT_SELECTED:
-		selected_locn_ = book_->get_record()->location(false);
+		if (book_->size()) {
+			selected_locn_ = book_->get_record()->location(false);
+		}
 		// Only redraw if we are displaying selected or centring on selected
 		if (centre_mode_ == SELECTED || qso_display_ == AQ_CURRENT) {
 			// Data has changed 
@@ -1576,7 +1585,9 @@ void dxa_if::update(hint_t hint) {
 
 	case HT_EXTRACTION:
 		// The search results have changed
-		selected_locn_ = book_->get_record()->location(false);
+		if (book_->size()) {
+			selected_locn_ = book_->get_record()->location(false);
+		}
 		if (qso_display_ == AQ_SEARCH) {
 			// Data has changed 
 			enable_widgets();
