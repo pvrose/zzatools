@@ -1788,7 +1788,7 @@ void menu::update_items() {
 		int index_extract = find_index("E&xtract");
 		int index_ref = find_index("&Reference");
 		int index_rep = find_index("Re&port");
-		int index_memories = find_index("I&C-7300/&Memory");
+		int index_memories = find_index("I&C-7300/&Memories");
 		int index_scopes = find_index("I&C-7300/&Scope bands");
 		int index_users = find_index("I&C-7300/&User bands");
 		int index_cw_mess = find_index("I&C-7300/&CW messages");
