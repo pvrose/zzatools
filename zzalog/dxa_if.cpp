@@ -38,7 +38,6 @@ extern book* navigation_book_;
 extern status* status_;
 extern tabbed_forms* tabbed_view_;
 extern spec_data* spec_data_;
-extern void add_sub_window(Fl_Window* w);
 
 // Constructor
 dxa_if::dxa_if() :
@@ -894,7 +893,7 @@ void dxa_if::disconnect_dxatlas(bool dxatlas_exit) {
 		atlas_ = nullptr;
 		is_my_change_ = false;
 		// Maybe allow FLTK scheduler to let DxAtlas do its stuff
-		Fl::wait(0.1);
+		//Fl::wait(0.1);
 		status_->misc_status(ST_WARNING, "DXATLAS: Disconnected");
 		if (dxatlas_exit) {
 			enable_widgets();
@@ -1060,7 +1059,6 @@ void dxa_if::create_colour_buttons() {
 // Is the point displayed
 bool dxa_if::is_displayed(record_num_t record_num) {
 	string selected_by;
-	int distance;
 	record* record = book_->get_record(record_num, false);
 	if (record == nullptr) {
 		return false;
@@ -1298,6 +1296,13 @@ void dxa_if::draw_pins() {
 		// Put up the hour-glass
 		fl_cursor(FL_CURSOR_WAIT);
 		try {
+			// deactivate all colour buttons
+			for (size_t i = 0; i < colour_bns_.size(); i++) {
+				Fl_Color inactive_colour = fl_color_average(button_colour(i), FL_WHITE, 0.5f);
+				colour_bns_[i]->color(inactive_colour);
+				colour_bns_[i]->labelcolor(fl_contrast(FL_BLACK, inactive_colour));
+				colour_bns_[i]->deactivate();
+			}
 			_variant_t pt_lat, pt_long, pt_value, pt_text;
 			_variant_t point, points;
 			// Set these "variant_t" to single precision floating point
@@ -1319,8 +1324,6 @@ void dxa_if::draw_pins() {
 			DxAtlas::ICustomLayersPtr pin_layers = map->GetCustomLayers();
 			pin_layers->Clear();
 			map->EndUpdate();
-			// Maybe allow FLTK scheduler to let DxAtlas do its stuff
-			Fl::wait(0.1);
 			status_->misc_status(ST_NOTE, "DXATLAS: Update started");
 			status_->progress(records_to_display_.size(), OT_DXATLAS, "records");
 			int count = 0;
@@ -1472,8 +1475,6 @@ void dxa_if::draw_pins() {
 					}
 					// now allow repainting
 					map->EndUpdate();
-					// Maybe allow FLTK scheduler to let DxAtlas do its stuff
-					Fl::wait(0.1);
 				}
 			}
 			// now add a layer for textual information - used for interactive displays

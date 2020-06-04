@@ -40,7 +40,7 @@ extern Fl_Single_Window* main_window_;
 extern band_view* band_view_;
 extern bool read_only_;
 extern void main_window_label(string text);
-extern void add_sub_window(Fl_Window* win);
+//extern void add_sub_window(Fl_Window* win);
 
 // Constructor - initialises some attributes
 book::book()
@@ -1221,7 +1221,7 @@ void book::edit_header() {
 	win->end();
 	win->show();
 	// Add the display to the main window to delete it if the main window is deleted first.
-	add_sub_window(win);
+	//add_sub_window(win);
 }
 
 // Call back to save the new header value

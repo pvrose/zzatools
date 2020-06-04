@@ -603,7 +603,7 @@ void record::unparse() {
 	item("ANT_AZ", string(""));
 	item("DISTANCE", string(""));
 	char message[100];
-	sprintf(message,"PARSE: %s %s %s - unparsed",
+	sprintf(message,"LOG: %s %s %s - parsed data removed",
 		item("QSO_DATE").c_str(), item("TIME_ON").c_str(), item("CALL").c_str());
 	status_->misc_status(ST_LOG, message);
 }

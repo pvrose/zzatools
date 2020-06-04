@@ -64,19 +64,19 @@ bool adx_reader::load_book(book* book, istream& in) {
 	// reposition back to beginning
 	in.seekg(0, ios::beg);
 	// Initialsie the progress
-	status_->misc_status(ST_NOTE, "LOG: Started");
+	status_->misc_status(ST_NOTE, "LOG: Started reading ADX");
 	status_->progress(file_size_, book->book_type(), "bytes");
 	// Call the XML parser
 	if (parse(in)) {
 		// Read successful - complete progress
-		status_->misc_status(ST_OK, "LOG: Done!");
+		status_->misc_status(ST_OK, "LOG: Reading done!");
 		status_->progress(file_size_, book->book_type());
 		fl_cursor(FL_CURSOR_DEFAULT);
 		return true;
 	}
 	else {
 		// Read failed - report failure
-		status_->misc_status(ST_ERROR, "LOG: Failed");
+		status_->misc_status(ST_ERROR, "LOG: Reading failed");
 		status_->progress("Load failed", book->book_type());
 		fl_cursor(FL_CURSOR_DEFAULT);
 		return false;

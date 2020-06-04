@@ -239,7 +239,7 @@ bool adi_reader::load_book(book* book, istream& in) {
 	in.seekg(0, ios::end);
 	streampos endpos = in.tellg();
 	file_size_ = (long)(endpos - startpos);
-	status_->misc_status(ST_NOTE, "LOG: Started");
+	status_->misc_status(ST_NOTE, "LOG: Started reading ADI");
 	status_->progress(file_size_, book->book_type(), "bytes");
 	// reposition back to beginning
 	in.seekg(0, ios::beg);
@@ -275,12 +275,12 @@ bool adi_reader::load_book(book* book, istream& in) {
 	// Update progress bar with complete or failed.
 	if (in.fail() && !in.eof()) {
 		status_->progress("Load failed", book->book_type());
-		status_->misc_status(ST_ERROR, "LOG: Failed");
+		status_->misc_status(ST_ERROR, "LOG: Reading failed");
 		return false;
 	}
 	else {
 		status_->progress(file_size_, book->book_type());
-		status_->misc_status(ST_OK, "LOG: Done!");
+		status_->misc_status(ST_OK, "LOG: Reading done!");
 		return true;
 	}
 }

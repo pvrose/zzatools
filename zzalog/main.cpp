@@ -97,14 +97,14 @@ dxa_if* dxatlas_ = nullptr;
 bool read_only_ = false;
 // Recent files opened
 list<string> recent_files_;
-// Any sub-windows opened
-set<Fl_Window*> sub_windows_;
+//// Any sub-windows opened
+//set<Fl_Window*> sub_windows_;
 
 // Forward declarations
 void backup_file(bool force, bool retrieve = false);
 void set_recent_file(string filename);
-void remove_sub_window(Fl_Window* w);
-void add_sub_window(Fl_Window* w);
+//void remove_sub_window(Fl_Window* w);
+//void add_sub_window(Fl_Window* w);
 
 // Display the time in the local timezone rather than UTC
 bool use_local_ = false;
@@ -129,7 +129,7 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 		}
 		// Delete band view
 		if (band_view_) {
-			remove_sub_window(band_view_);
+			//remove_sub_window(band_view_);
 			Fl::delete_widget(band_view_);
 			band_view_ = nullptr;
 		}
@@ -217,10 +217,11 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 		window_settings.set("Height", main_window_->h());
 
 		// delete all additional windows created - note the status file viewer is one.
-		for (auto it = sub_windows_.begin(); it != sub_windows_.end(); it++) {
-			(*it)->clear();
-			delete* it;
-		}
+		//for (auto it = sub_windows_.begin(); it != sub_windows_.end(); it++) {
+		//	(*it)->clear();
+		//	delete* it;
+		//}
+		for (Fl_Window* w = Fl::first_window(); w; w = Fl::first_window()) w->hide();
 		status_->null_file_viewer();
 
 		// Exit and close application
@@ -528,13 +529,13 @@ void add_band_view() {
 			}
 			band_view_ = new band_view(frequency, 400, 100, "Band plan");
 		}
-		if (band_view_->valid()) {
-			add_sub_window(band_view_);
-		}
-		else {
+		//if (band_view_->valid()) {
+		//	add_sub_window(band_view_);
+		//}
+		//else {
 			Fl::delete_widget(band_view_);
 			band_view_ = nullptr;
-		}
+		//}
 	}
 }
 
@@ -683,18 +684,18 @@ void tidy() {
 	delete main_icon_;
 }
 
-// Add free-standing windows to remeber to close them when we close the main window
-void add_sub_window(Fl_Window* w) {
-	// Don't add the same window twice!
-	if (sub_windows_.find(w) == sub_windows_.end()) {
-		sub_windows_.insert(w);
-	}
-}
-
-// Remove free-standing menu from list 
-void remove_sub_window(Fl_Window* w) {
-	sub_windows_.erase(w);
-}
+//// Add free-standing windows to remeber to close them when we close the main window
+//void add_sub_window(Fl_Window* w) {
+//	// Don't add the same window twice!
+//	if (sub_windows_.find(w) == sub_windows_.end()) {
+//		sub_windows_.insert(w);
+//	}
+//}
+//
+//// Remove free-standing menu from list 
+//void remove_sub_window(Fl_Window* w) {
+//	sub_windows_.erase(w);
+//}
 
 // Add the icon
 void add_icon(const char* arg0) {

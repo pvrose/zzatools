@@ -3,6 +3,9 @@
 #include "../zzalib/drawing.h"
 #include "../zzalib/utils.h"
 #include "book.h"
+#include "status.h"
+
+#include <iostream>
 
 #include <FL/Fl_Preferences.H>
 #include <FL/fl_ask.H>
@@ -14,6 +17,7 @@ using namespace zzalib;
 
 extern Fl_Preferences* settings_;
 extern ic7300* ic7300_;
+extern status* status_;
 
 ic7300_table::ic7300_table(int X, int Y, int W, int H, const char* label, field_ordering_t order) : 
 Fl_Table_Row(X, Y, W, H, label)
@@ -38,7 +42,7 @@ void ic7300_table::delete_items() {
 	//	for (int c = 0; c < cols(); c++) {
 	//		delete (item + c);
 	//	}
-	//	delete (items_ + r);
+	//	delete[] (items_ + r);
 	//	delete (row_headers_ + r);
 	//}
 	//for (int c = 0; c < cols(); c++) {
@@ -98,7 +102,7 @@ void ic7300_table::draw_cell(TableContext context, int R, int C, int X, int Y,
 				fl_rectf(X, Y, W, H);
 
 				// TEXT - contrast its colour to the bg colour.
-				if (type_ == VT_MEMORIES && C > 7 && **(items_ + R) == "NO SPLIT") {
+				if (type_ == VT_MEMORIES && C > 7 && C < 14 && **(items_ + R) != "SPLIT") {
 					fl_color(FL_GRAY);
 				}
 				else {
@@ -122,6 +126,8 @@ void ic7300_table::draw_cell(TableContext context, int R, int C, int X, int Y,
 
 // OPen specific view
 void ic7300_table::open_view(view_type type) {
+	// Use egg-timer cursor
+	fl_cursor(FL_CURSOR_WAIT);
 	// delete the existing set of itesm
 	items_valid_ = false;
 	delete_items();
@@ -147,6 +153,7 @@ void ic7300_table::open_view(view_type type) {
 		break;
 	}
 	items_valid_ = true;
+	fl_cursor(FL_CURSOR_DEFAULT);
 	Fl_Preferences view_settings(settings_, "View");
 	view_settings.set("Type", (int)type_);
 }
@@ -173,6 +180,8 @@ void ic7300_table::draw_memory_view() {
 	}
 
 	bool ok = true;
+	status_->progress(rows(), OT_MEMORY, " memories", false);
+	status_->misc_status(ST_NOTE, "RIG: Starting memory fetch");
 	// Create the memory list
 	for (int i = 1; i <= rows(); i++) {
 		// Add memory number to sub_command
@@ -184,6 +193,10 @@ void ic7300_table::draw_memory_view() {
 		string data;
 		if (ok) {
 			data = ic7300_->send_command('\x1A', sub_command, cmd_data, ok);
+			status_->progress(i, OT_MEMORY);
+		}
+		else {
+			status_->progress("Rig error", OT_MEMORY);
 		}
 		// Create a new data item
 		string* item = new string[cols()];
@@ -425,6 +438,12 @@ void ic7300_table::draw_memory_view() {
 	headers_[13] = "Tone squelch Hz";
 	headers_[14] = "Name";
 	resize_cols();
+	if (ok) {
+		status_->misc_status(ST_OK, "RIG: Complete");
+	}
+	else {
+		status_->misc_status(ST_ERROR, "RIG: Error when reading a register");
+	}
 
 }
 
@@ -494,9 +513,12 @@ void ic7300_table::draw_scope_bands_view() {
 	headers_[1] = "Upper edge MHz";
 	// For each scope edge register
 	bool ok = true;
+	status_->progress(rows(), OT_MEMORY, " Scope bands", false);
+	status_->misc_status(ST_NOTE, "RIG: Starting scope band fetch");
 	for (int r = 0; r < rows(); r++) {
 		string* item = new string[cols()];
 		if (ok) {
+			status_->progress(r + 1, OT_MEMORY);
 			// First scope band edge is at 1A/050112 and rest increment from their
 			int address = 112 + r;
 			string subcommand = (char)'\x05' + int_to_bcd(address, 2, false);
@@ -518,6 +540,7 @@ void ic7300_table::draw_scope_bands_view() {
 			}
 		}
 		else {
+			status_->progress("Rig error", OT_MEMORY);
 			item[0] = "INVALID";
 			item[1] = "INVALID";
 		}
@@ -556,17 +579,21 @@ void ic7300_table::draw_user_bands_view() {
 	int num_userbands;
 	if (ok) num_userbands = bcd_to_int(ic7300_->send_command('\x1e', sub_command, ok).substr(2), false);
 	else num_userbands = 1;
-	string* tx_bands = new string[num_txbands];
-	string* user_bands = new string[num_userbands];
 	if (ok) {
+		string* tx_bands = new string[num_txbands];
+		string* user_bands = new string[num_userbands];
+		status_->progress(num_txbands + num_userbands, OT_MEMORY, "user bands", false);
+		status_->misc_status(ST_NOTE, "RIG: Starting user band fetch");
 		// Read all the hardware defined bands
 		for (int i = 0; i < num_txbands && ok; i++) {
 			sub_command[0] = 1;
+			status_->progress(i + 1, OT_MEMORY);
 			*(tx_bands + i) = ic7300_->send_command('\x1e', sub_command, int_to_bcd(i + 1, 1, false), ok).substr(3);
 		}
 		// Read all the user-defined bands
 		for (int i = 0; i < num_userbands && ok; i++) {
 			sub_command[0] = 3;
+			status_->progress(i + 1 + num_txbands, OT_MEMORY);
 			*(user_bands + i) = ic7300_->send_command('\x1e', sub_command, int_to_bcd(i + 1, 1, false), ok).substr(3);
 		}
 		// This will create more items than we use
@@ -581,53 +608,66 @@ void ic7300_table::draw_user_bands_view() {
 			*(items_ + r) = item;
 			// Add tx band to left two columns
 			string raw_tx_band = *(tx_bands + i);
-			string tx_lower = to_string(bcd_to_double(raw_tx_band.substr(0, 5), 6, false));
-			string tx_upper = to_string(bcd_to_double(raw_tx_band.substr(6, 5), 6, false));
-			item[0] = tx_lower;
-			item[1] = tx_upper;
+			double tx_lower = bcd_to_double(raw_tx_band.substr(0, 5), 6, true);
+			double tx_upper = bcd_to_double(raw_tx_band.substr(6, 5), 6, true);
+			cout << "TX: lower = " << tx_lower << "; upper = " << tx_upper << endl;
+			item[0] = to_string(tx_lower);
+			item[1] = to_string(tx_upper);
+			item[2] = "";
+			item[3] = "";
 			bool user_valid = true;
 			int num_users_in_tx = 0;
 			while (user_valid && user < num_userbands) {
 				string raw_user_band = *(user_bands + user);
 				if (raw_user_band[0] == '\xff' || raw_user_band.length() != 11) {
-					// User band is not valid - step to next user, but not next TX
-					item[2] = "";
-					item[3] = "";
+					// User band is not valid - step to next user, but not next TX or row
+					cout << "USER: Not valid!" << endl;
 					user++;
 				}
 				else {
 					// User band is valid - is it in the tx band currently being looked at?
-					string user_lower = to_string(bcd_to_double(raw_user_band.substr(0, 5), 6, false));
-					string user_upper = to_string(bcd_to_double(raw_user_band.substr(6, 5), 6, false));
+					double user_lower = bcd_to_double(raw_user_band.substr(0, 5), 6, true);
+					double user_upper = bcd_to_double(raw_user_band.substr(6, 5), 6, true);
+					cout << "USER: lower = " << user_lower << "; upper = " << user_upper;
 					if (user_lower >= tx_lower && user_upper <= tx_upper) {
+						cout << " In current TX! written row " << r << endl;
 						// User band is for the current tx band - add to columns 2 and 3 - step user and row
+						// Need to create a new row
 						num_users_in_tx++;
 						if (num_users_in_tx > 1) {
 							item = new string[cols()];
 							*(items_ + r) = item;
 							item[0] = "";
 							item[1] = "";
-							item[2] = user_lower;
-							item[3] = user_upper;
-							r++;
+							item[2] = to_string(user_lower);
+							item[3] = to_string(user_upper);
 						}
 						else {
-							item[2] = user_lower;
-							item[3] = user_upper;
+							item[2] = to_string(user_lower);
+							item[3] = to_string(user_upper);
 						}
 						user++;
+						r++;
 					}
-					else {
-						// User band is not for the tx band - step tx band and row
+					else if (user_lower > tx_lower && num_users_in_tx == 0) {
+						// No user bands in this TX band - write TX band
+						cout << " Writing TX to row " << r << endl;
+						r++;
+						user_valid = false;
+					} else
+					{
+						// User band is not for the tx band - step tx band and not user or row
+						cout << " Not in current TX!" << endl;
 						user_valid = false;
 					}
 				}
 			}
 			// Increment row count
-			r++;
 		}
 		// Now we know the real number of rows can configure rows.
 		rows(r);
+		delete[] tx_bands;
+		delete[] user_bands;
 	}
 	else {
 		items_ = new string * [1];
@@ -668,6 +708,9 @@ void ic7300_table::draw_message_view(bool cw) {
 	headers_[0] = "Count-up Trigger";
 	headers_[1] = "Data";
 
+	status_->progress(rows(), OT_MEMORY, "messages", false);
+	status_->misc_status(ST_NOTE, "RIG: Starting message fetch");
+
 	bool ok = true;
 
 	if (cw) {
@@ -675,7 +718,7 @@ void ic7300_table::draw_message_view(bool cw) {
 		(void)ic7300_->send_command('\x06', "", "\x03\x01", ok);
 	}
 	else {
-		// set transceiver into RTTY mode
+		// set transceiver into RTTY mode - TODO: This doesn't deliver RTTY messages.
 		(void)ic7300_->send_command('\x06', "", "\x04\x01", ok);
 	}
 
@@ -684,6 +727,7 @@ void ic7300_table::draw_message_view(bool cw) {
 	if (ok) trigger = bcd_to_int(ic7300_->send_command('\x1a', "\x05\x01\x56", ok).substr(4), false);
 	// Now read the keyer memory
 	for (int r = 0; r < rows(); r++) {
+		status_->progress(r + 1, OT_MEMORY);
 		string* item = new string[cols()];
 		items_[r] = item;
 		// Add memory name as row header

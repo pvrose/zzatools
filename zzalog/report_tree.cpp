@@ -351,6 +351,7 @@ void report_tree::copy_records_to_tree(record_list_t* record_list, Fl_Tree_Item*
 		char text[1024];
 		// For each entry in the record list
 		for (auto it = record_list->begin(); it != record_list->end(); it++) {
+			status_->progress(++display_count_, OT_REPORT);
 			// Get the record
 			record_num_t record_num = *it;
 			record* record = get_book()->get_record(record_num, false);
@@ -511,6 +512,7 @@ void report_tree::populate_tree(bool activate) {
 			// Initialise progress bar
 			status_->misc_status(ST_NOTE, "LOG: Display started");
 			status_->progress(map_.next_entry->size(), OT_REPORT, "entries");
+			display_count_ = 0;
 			copy_map_to_tree(map_.next_entry, nullptr, count_records, num_eqsl, num_lotw, num_card, num_any);
 			
 			// Add the root label

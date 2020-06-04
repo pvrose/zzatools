@@ -59,7 +59,8 @@ namespace zzalog {
 		{ OT_REPORT, "OT_REPORT" },
 		{ OT_BAND, "OT_BAND" },
 		{ OT_DXATLAS, "OT_DXATLAS" },
-		{ OT_CARD, "OT_CARD" }
+		{ OT_CARD, "OT_CARD" },
+		{ OT_MEMORY, "OT_MEMORY" }
 	};
 
 	// Colour palette used in DxAtlas legend and band plan

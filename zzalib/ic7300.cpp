@@ -47,7 +47,7 @@ string ic7300::send_command(unsigned char command, string sub_command, string da
 		if (response.length() == 0) {
 			// TRansceiver has not responded at all
 			if (!given_warning) {
-				fl_alert("Receieved no response from transceiver");
+				fl_alert("Receieved no response from transceiver\nCMD = %s", to_send.c_str());
 				given_warning = true;
 			}
 			ok = false;
@@ -61,7 +61,7 @@ string ic7300::send_command(unsigned char command, string sub_command, string da
 				if (response.length() == 6 && response[4] > '\xf0') {
 					if (response[4] == '\xfa') {
 						// Got NAK response from transceiver
-						fl_alert("Received a bad response from transceiver");
+						fl_alert("Received a NAK response from transceiver\nCMD = %s", to_send.c_str());
 						ok = false;
 						return "";
 					}
@@ -76,12 +76,13 @@ string ic7300::send_command(unsigned char command, string sub_command, string da
 				}
 			}
 			else {
-				fl_alert("Unexpected response: %s\n%s", response.c_str(), string_to_hex(response).c_str());
+				fl_alert("Unexpected response: %s\n%s\nCMD = %s", response.c_str(), string_to_hex(response).c_str(), to_send.c_str());
 				return response;
 			}
 		}
 	}
 	else {
+		ok = false;
 		return "NO RIG";
 	}
 }

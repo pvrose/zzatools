@@ -272,8 +272,8 @@ extern void main_window_label(string text);
 extern void backup_file(bool force, bool retrieve = false);
 extern void set_recent_file(string filename);
 extern void add_scratchpad();
-extern void remove_sub_window(Fl_Window* win);
-extern void add_sub_window(Fl_Window* win);
+//extern void remove_sub_window(Fl_Window* win);
+//extern void add_sub_window(Fl_Window* win);
 
 
 // Constructor
@@ -563,14 +563,14 @@ void menu::cb_mi_nav_date(Fl_Widget* w, void* v) {
 void menu::cb_mi_nav_recnum(Fl_Widget* w, void* v) {
 	record_num_t record_num;
 	edit_dialog* dlg = new edit_dialog(Fl::event_x_root(), Fl::event_y_root(), WBUTTON, HBUTTON);
-	add_sub_window(dlg);
+	//add_sub_window(dlg);
 	if (dlg->display("") == BN_OK) {
 		// Displayed record number is 1-based.
 		record_num = stoi(string(dlg->value())) - 1;
 		record_num_t item_num = navigation_book_->item_number(record_num);
 		navigation_book_->selection(item_num);
 	}
-	remove_sub_window(dlg);
+	//remove_sub_window(dlg);
 	Fl::delete_widget(dlg);
 }
 
@@ -664,7 +664,7 @@ void menu::cb_mi_parse_log(Fl_Widget* w, void* v) {
 		int record_num = -1;
 		int item_number = 0;
 		// Initialise progress
-		status_->misc_status(ST_NOTE, "LOG: Started");
+		status_->misc_status(ST_NOTE, "LOG: Started parsing");
 		status_->progress(num_items, navigation_book_->book_type(), "records");
 		// For all records in selected book
 		for (int i = 0; i < num_items && !abandon;) {
@@ -684,12 +684,12 @@ void menu::cb_mi_parse_log(Fl_Widget* w, void* v) {
 			else if (parse_result == PR_ABANDONED) {
 				// User has the opportunity to abandon this if too many records have issues
 				abandon = true;
-				status_->misc_status(ST_WARNING, "PARSE: Abandoned");
+				status_->misc_status(ST_WARNING, "LOG: Parsing abandoned");
 				status_->progress("Abandoned", navigation_book_->book_type());
 			}
 		}
 		// update views with last record parsed selected
-		status_->misc_status(ST_OK, "PARSE: Done!");
+		status_->misc_status(ST_OK, "LOG: Parsing done!");
 		navigation_book_->selection(item_number, HT_CHANGED);
 	}
 #ifndef _DEBUG
@@ -1436,9 +1436,10 @@ void menu::cb_mi_info_web(Fl_Widget* w, void* v) {
 // v is not used
 void menu::cb_mi_help_abt(Fl_Widget* w, void* v) {
 	about_dialog* dialog = new about_dialog();
-	add_sub_window(dialog);
+	//add_sub_window(dialog);
 	dialog->display();
-	remove_sub_window(dialog);
+	//remove_sub_window(dialog);
+	delete dialog;
 }
 
 // Help->Status->View - display status log file

@@ -27,8 +27,8 @@ extern void add_rig_if();
 extern Fl_Single_Window* main_window_;
 extern status* status_;
 extern bool read_only_;
-extern void add_sub_window(Fl_Window* w);
-extern void remove_sub_window(Fl_Window* w);
+//extern void add_sub_window(Fl_Window* w);
+//extern void remove_sub_window(Fl_Window* w);
 extern scratchpad* scratchpad_;
 
 // Constructor
@@ -429,7 +429,7 @@ void status::misc_status(status_t status, const char* label) {
 			Fl::wait();
 			// Open status file viewer and update it.
 			cb_bn_misc(misc_status_, nullptr);
-			remove_sub_window(status_file_viewer_->top_window());
+			//remove_sub_window(status_file_viewer_->top_window());
 			main_window_->do_callback();
 		}
 		break;
@@ -439,7 +439,7 @@ void status::misc_status(status_t status, const char* label) {
 		Fl::wait();
 		// Open status file viewer and update it : remove from list to be deleted when closing
 		cb_bn_misc(misc_status_, nullptr);
-		remove_sub_window(status_file_viewer_->top_window());
+		//remove_sub_window(status_file_viewer_->top_window());
 
 		main_window_->do_callback();
 		break;
@@ -496,7 +496,7 @@ void text_display::load(const char* filename) {
 	}
 	file->close();
 	delete file;
-	this->mVScrollBar->value(scroll_pos);
+	scroll(scroll_pos, 0);
 }
 
 // Call back for find/find again
@@ -595,6 +595,8 @@ void viewer_window::draw_window() {
 	Fl_Choice* ch_filter = new Fl_Choice(bn_match->x() + bn_match->w() + GAP + WLABEL, GAP, WEDIT, HTEXT, "Filter");
 	ch_filter->labelfont(FONT);
 	ch_filter->labelsize(FONT_SIZE);
+	ch_filter->textfont(FONT);
+	ch_filter->textsize(FONT_SIZE);
 	ch_filter->align(FL_ALIGN_LEFT);
 	ch_filter->clear();
 	ch_filter->add(" ");
@@ -612,7 +614,6 @@ void viewer_window::draw_window() {
 	ch_filter->add("LOG");
 	ch_filter->add("LOTW");
 	ch_filter->add("MENU");
-	ch_filter->add("PARSE");
 	ch_filter->add("PREFIX");
 	ch_filter->add("PRINTER");
 	ch_filter->add("PROGRESS");
@@ -711,7 +712,7 @@ status_t status::min_level() {
 
 // Status log display is closed
 void status::cb_text(Fl_Widget* w, void* v) {
-	remove_sub_window((Fl_Window*)w);
+	//remove_sub_window((Fl_Window*)w);
 }
 
 // Set the append_log

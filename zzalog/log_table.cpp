@@ -25,8 +25,8 @@ extern book* book_;
 extern Fl_Single_Window* main_window_;
 extern menu* menu_;
 extern toolbar* toolbar_;
-extern void add_sub_window(Fl_Window* w);
-extern void remove_sub_window(Fl_Window* w);
+//extern void add_sub_window(Fl_Window* w);
+//extern void remove_sub_window(Fl_Window* w);
 
 // constructor - passes parameters  to the two base classes
 log_table::log_table(int X, int Y, int W, int H, const char* label, field_ordering_t app) :
@@ -423,7 +423,7 @@ void log_table::edit_cell(int row, int col) {
 	find_cell(CONTEXT_CELL, row, col, X, Y, W, H);
 	// Open edit dialog - on top of cell
 	edit_dialog_ = new edit_dialog(main_window_->x_root() + X, main_window_->y_root() + Y, W, H);
-	add_sub_window(edit_dialog_);
+	//add_sub_window(edit_dialog_);
 	// Get the dialog action
 	button_t action = ((edit_dialog*)edit_dialog_)->display(text);
 	switch (action) {
@@ -467,7 +467,7 @@ void log_table::edit_cell(int row, int col) {
 		break;
 	}
 	// Remove the dialog
-	remove_sub_window(edit_dialog_);
+	//remove_sub_window(edit_dialog_);
 	Fl::delete_widget(edit_dialog_);
 	edit_dialog_ = nullptr;
 	switch (action) {

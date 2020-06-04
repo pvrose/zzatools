@@ -19,8 +19,8 @@ using namespace zzalog;
 using namespace zzalib;
 
 extern Fl_Single_Window* main_window_;
-extern void add_sub_window(Fl_Window* w);
-extern void remove_sub_window(Fl_Window* w);
+//extern void add_sub_window(Fl_Window* w);
+//extern void remove_sub_window(Fl_Window* w);
 
 // Constructor
 settings::settings(int W, int H, const char* label, cfg_dialog_t active) :
@@ -133,7 +133,7 @@ settings::settings(int W, int H, const char* label, cfg_dialog_t active) :
 	callback(cb_bn_cal, (long)CA_CANCEL);
 
 	show();
-	add_sub_window(this);
+	//add_sub_window(this);
 }
 
 // Destructor
@@ -153,12 +153,12 @@ void settings::cb_bn_cal(Fl_Widget* w, long arg) {
 	case CA_OK:
 		// Save values in active tab, close the config window
 		active_tab->do_callback(active_tab);
-		remove_sub_window(that);
+		//remove_sub_window(that);
 		Fl::delete_widget(that);
 		break;
 	case CA_CANCEL:
 		// Close the config window
-		remove_sub_window(that);
+		//remove_sub_window(that);
 		Fl::delete_widget(that);
 		break;
 	case CA_SAVE:

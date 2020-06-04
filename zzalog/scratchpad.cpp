@@ -484,6 +484,6 @@ void scratchpad::update() {
 	ip_freq_->value(prev_record->item("FREQ").c_str());
 	ip_power_->value(prev_record->item("TX_PWR").c_str());
 	ch_mode_->value(ch_mode_->find_index(prev_record->item("MODE", true).c_str()));
-	band_view_->update(stod(prev_record->item("FREQ")) * 1000.0);
+	if (band_view_) band_view_->update(stod(prev_record->item("FREQ")) * 1000.0);
 	redraw();
 }

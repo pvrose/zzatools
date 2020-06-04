@@ -803,7 +803,7 @@ bool pfx_data::update_bearing(record* record) {
 	string call = record->item("CALL");
 	char* message = new char[50 + date.length() + time.length() + call.length()];
 	if (updated) {
-		sprintf(message, "PARSE: %s %s %s - record changed: Bearing/distance",
+		sprintf(message, "LOG: %s %s %s - record changed: Bearing/distance",
 			date.c_str(),
 			time.c_str(),
 			call.c_str());
@@ -831,7 +831,7 @@ bool pfx_data::update_geography(record* record, bool &query, string& reason, boo
 		char* message = new char[50 + date.length() + time.length() + call.length()];
 		// Update status with a warning
 		if (prefix == nullptr) {
-			sprintf(message, "PARSE: %s %s %s - unable to identify prefix",
+			sprintf(message, "LOG: %s %s %s - unable to identify prefix",
 				date.c_str(),
 				time.c_str(),
 				call.c_str());
@@ -839,7 +839,7 @@ bool pfx_data::update_geography(record* record, bool &query, string& reason, boo
 		}
 		// Enter QSO changed in status log message
 		if (changed) {
-			sprintf(message, "PARSE: %s %s %s - record changed: %s",
+			sprintf(message, "LOG: %s %s %s - record changed: %s",
 				date.c_str(),
 				time.c_str(),
 				call.c_str(),
@@ -864,7 +864,7 @@ parse_result_t pfx_data::parse(record* record) {
 	// Check if the call is listed in exceptions
 	if (exceptions_->is_invalid(record)) {
 		char message[150];
-		snprintf(message, 150, "PARSE: Contact %s %s %s is an invalid operation", record->item("CALL").c_str(), record->item("QSO_DATE").c_str(), record->item("TIME_ON").c_str());
+		snprintf(message, 150, "LOG: Contact %s %s %s is an invalid operation", record->item("CALL").c_str(), record->item("QSO_DATE").c_str(), record->item("TIME_ON").c_str());
 		status_->misc_status(ST_ERROR, message);
 	}
 	else {
