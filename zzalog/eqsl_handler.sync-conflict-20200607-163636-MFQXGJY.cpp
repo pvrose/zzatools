@@ -710,12 +710,12 @@ bool eqsl_handler::upload_eqsl_log(book* book) {
 					// Warning: The sURL was OK, but the QSO was not updated - e.g. duplicate
 					//     Warning: Y=2020 M=05 D=31 LA6MNA 10M FT8 Bad record: Duplicate<BR>Warning: Y=2020 M=05 D=31 PD2DVB 10M FT8 Bad record: Duplicate<BR>\r\n
 					else if (pos_w < pos_i && pos_w < pos_e) {
-						pos = text_line.find("<BR>", pos_w);
+						pos = text_line.find("<BR>", pos_e);
 						if (pos == string::npos) {
-							error_message = text_line.substr(pos_w);
+							error_message = text_line.substr(pos_e);
 						}
 						else {
-							error_message = text_line.substr(pos_w, pos - pos_w);
+							error_message = text_line.substr(pos_e, pos - pos_e);
 						}
 						warning_text = error_message;
 						bad_records.insert(parse_warning(warning_text));

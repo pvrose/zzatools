@@ -4,11 +4,14 @@
 #include "record.h"
 #include "import_data.h"
 #include "adi_reader.h"
+#include "../zzalib/url_handler.h"
 
 #include <deque>
 #include <queue>
 #include <string>
 #include <sstream>
+#include <vector>
+#include <set>
 
 #include <FL/Fl_Help_Dialog.H>
 
@@ -108,7 +111,12 @@ namespace zzalog {
 		response_t download_adif(string& filename, stringstream* adif);
 		// convert simple ADIF items to ADIF string
 		string adif_item(record* record, string fieldname);
-
+		// Generate list of adif fields
+		void adif_fields(set<string>& fields);
+		// Generate list of POST FORM fields
+		void form_fields(vector<url_handler::field_pair>&);
+		// parse bad record
+		map<string, string> parse_warning(string text);
 
 	protected:
 		// The throttled request queue
