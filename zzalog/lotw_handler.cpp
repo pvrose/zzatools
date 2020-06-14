@@ -55,6 +55,9 @@ bool lotw_handler::upload_lotw_log(book* book) {
 		// Wait while the dialog is active (visible)
 		while (chooser->visible()) Fl::wait();
 	}
+	else {
+		new_filename = filename;
+	}
 	free(filename);
 	if (chooser != nullptr && !chooser->count()) {
 		// User cancelled

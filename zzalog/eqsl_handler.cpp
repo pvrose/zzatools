@@ -620,24 +620,19 @@ bool eqsl_handler::upload_eqsl_log(book* book) {
 		help_dialog_->value("");
 	}
 	// Get login details
-	string username;
-	string password;
 	string qsl_message;
 	string swl_message;
 	string error_message;
 	response_t status = ER_OK;
-	if (!user_details(&username, &password, nullptr, &qsl_message, &swl_message)) {
-		char* message = new char[50 + username.length() + password.length()];
-		sprintf(message, "EQSL: User or password is missing: U=%s, P=%s", username.c_str(), password.c_str());
+	if (!user_details(&username_, &password_, nullptr, &qsl_message, &swl_message)) {
+		char* message = new char[50 + username_.length() + password_.length()];
+		sprintf(message, "EQSL: User or password is missing: U=%s, P=%s", username_.c_str(), password_.c_str());
 		status_->misc_status(ST_ERROR, message);
 		delete[] message;
 		return false;
 	}
 	bool ok = true;
-	// TODO: Use url_handler to upload an HTTP POST with the stream data
 	// stream the book data
-	book->header()->item("EQSL_USER", username);
-	book->header()->item("EQSL_PSWD", password);
 	for (size_t pos = 0; pos < book->size(); pos++) {
 		status = ER_OK;
 		// Merge info from record into QSL message
@@ -807,6 +802,8 @@ void eqsl_handler::adif_fields(set<string>& fields) {
 void eqsl_handler::form_fields(vector<url_handler::field_pair>& fields) {
 	fields.clear();
 	fields.push_back({ "Filename", "", "eqsl.adi", "application/octet.stream" });
+	fields.push_back({ "EQSL_USER", username_, "", "" });
+	fields.push_back({ "EQSL_PSWD", password_, "", "" });
 }
 
 // parse bad record

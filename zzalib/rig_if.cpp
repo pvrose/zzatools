@@ -303,6 +303,11 @@ void rig_if::update_clock() {
 		time_t now = time(nullptr);
 		// convert to struct in UTC
 		tm* figures = gmtime(&now);
+		// And repeat until seconds reads 00
+		while (figures->tm_sec) {
+			now = time(nullptr);
+			figures = gmtime(&now);
+		}
 		// Convert date and time to integers. 20200317, 1514
 		int date = (figures->tm_year + 1900) * 10000 + (figures->tm_mon + 1) * 100 + figures->tm_mday;
 		int time = figures->tm_hour * 100 + figures->tm_min;
@@ -320,7 +325,7 @@ void rig_if::update_clock() {
 		sub_command[2] = '\x95';
 		ic7300_->send_command(command, sub_command, data, ok);
 		// Set UTC off-set - UTC + 0000
-		data.resize(3, '\x00');
+		data = int_to_bcd(0, 3, false);
 		sub_command[2] = '\x96';
 		ic7300_->send_command(command, sub_command, data, ok);
 	}

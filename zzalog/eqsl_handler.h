@@ -129,6 +129,10 @@ namespace zzalog {
 		Fl_Help_Dialog* help_dialog_;
 		// Queue enabled for debug
 		bool debug_enabled_;
+		// Username
+		string username_;
+		// Password
+		string password_;
 
 	};
 

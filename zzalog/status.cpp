@@ -483,6 +483,7 @@ text_display::~text_display() {
 void text_display::load(const char* filename) {
 	// Find current scroll position
 	int scroll_pos = this->mVScrollBar->value();
+	double scroll_max = this->mVScrollBar->maximum();
 	buffer()->remove(0, buffer()->length());
 	ifstream* file = new ifstream(filename, ios_base::in);
 	while (file->good()) {
@@ -496,7 +497,12 @@ void text_display::load(const char* filename) {
 	}
 	file->close();
 	delete file;
-	scroll(scroll_pos, 0);
+	if (scroll_pos == (int)scroll_max) {
+		scroll((int)this->mVScrollBar->maximum(), 0);
+	}
+	else {
+		scroll(scroll_pos, 0);
+	}
 }
 
 // Call back for find/find again

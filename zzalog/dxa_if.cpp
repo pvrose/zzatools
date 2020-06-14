@@ -1682,7 +1682,7 @@ void dxa_if::centre_map() {
 			northernmost_ = 60.0;
 			southernmost_ = 35.0;
 			westernmost_ = -30.0;
-			easternmost_ = 50.0;
+			easternmost_ = 65.0;
 			break;
 		case AS:
 			northernmost_ = 80.0;
