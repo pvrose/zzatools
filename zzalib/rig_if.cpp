@@ -328,6 +328,9 @@ void rig_if::update_clock() {
 		data = int_to_bcd(0, 3, false);
 		sub_command[2] = '\x96';
 		ic7300_->send_command(command, sub_command, data, ok);
+		char message[200];
+		snprintf(message, 200, "RIG: Updated rig clock to %04d %08d", time, date);
+		error(true, message);
 	}
 }
 

@@ -119,8 +119,6 @@ namespace zzalog {
 		record_num_t selection_;
 		// Add statesin break down of DXCC
 		bool add_states_;
-		// Display count
-		int display_count_;
 
 	};
 

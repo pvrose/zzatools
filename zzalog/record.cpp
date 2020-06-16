@@ -1016,8 +1016,9 @@ bool record::items_match(record* record, string field_name) {
 		if (lhs == to_upper(record->item("SUBMODE")) || lhs == to_upper(record->item("MODE"))) {
 			return true;
 		}
-		else if (field_name == "MODE" && spec_data_->dxcc_mode(lhs) == record->item("MODE")) {
-			// Some records from LotW only have generic modes
+		else if (field_name == "MODE" && 
+			((spec_data_->dxcc_mode(lhs) == record->item("MODE")) || (spec_data_->dxcc_mode(record->item("MODE")) == lhs))) {
+			// Some records from LotW only have generic modes - both ways
 			return true;
 		}
 		else {

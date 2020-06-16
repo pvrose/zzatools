@@ -209,9 +209,11 @@ istream& adi_reader::load_record(record* in_record, istream& in, load_result_t& 
 
 							// Field ignored so set modified
 							my_book_->modified(true, false);
-							bad_field = field;
+							if (validity != IGNORED_APP) {
+								bad_field = field;
+							}
 						}
-						char message[200];
+						char message[100];
 						switch (validity) {
 						case IGNORED_APP:
 							sprintf(message, "LOG: %s %s %s - field ignored %s",
@@ -220,7 +222,6 @@ istream& adi_reader::load_record(record* in_record, istream& in, load_result_t& 
 								in_record->item("CALL").c_str(),
 								bad_field.c_str());
 							status_->misc_status(ST_WARNING, message);
-							break;
 						case INVALID_TYPE:
 						case INVALID_USERDEF:
 							sprintf(message, "LOG: %s %s %s - invalid field %s",
@@ -229,7 +230,6 @@ istream& adi_reader::load_record(record* in_record, istream& in, load_result_t& 
 								in_record->item("CALL").c_str(),
 								bad_field.c_str());
 							status_->misc_status(ST_ERROR, message);
-							break;
 						case DUPLICATE:
 							sprintf(message, "LOG: %s %s %s - duplicate field %s",
 								in_record->item("QSO_DATE").c_str(),
@@ -237,7 +237,6 @@ istream& adi_reader::load_record(record* in_record, istream& in, load_result_t& 
 								in_record->item("CALL").c_str(),
 								bad_field.c_str());
 							status_->misc_status(ST_ERROR, message);
-							break;
 						}
 					}
 				}

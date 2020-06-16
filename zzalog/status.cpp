@@ -485,18 +485,24 @@ void text_display::load(const char* filename) {
 	int scroll_pos = this->mVScrollBar->value();
 	double scroll_max = this->mVScrollBar->maximum();
 	buffer()->remove(0, buffer()->length());
-	ifstream* file = new ifstream(filename, ios_base::in);
-	while (file->good()) {
-		string line;
-		getline(*file, line);
-		if (filter_.length() == 0 || filter_ == " " ||
-			((line.length() > 22 + filter_.length()) && (line.substr(22, filter_.length()) == filter_))) {
-			buffer()->append(line.c_str());
-			buffer()->append("\n");
-		}
+	if (filter_.length() == 0 || filter_ == " ") {
+		// No filter - load the whole file into the buffer
+		buffer()->insertfile(filename, 0);
 	}
-	file->close();
-	delete file;
+	else {
+		// Load only those lines that match the filter
+		ifstream* file = new ifstream(filename, ios_base::in);
+		while (file->good()) {
+			string line;
+			getline(*file, line);
+			if ((line.length() > 22 + filter_.length()) && (line.substr(22, filter_.length()) == filter_)) {
+				buffer()->append(line.c_str());
+				buffer()->append("\n");
+			}
+		}
+		file->close();
+		delete file;
+	}
 	if (scroll_pos == (int)scroll_max) {
 		scroll((int)this->mVScrollBar->maximum(), 0);
 	}
