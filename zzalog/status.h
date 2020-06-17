@@ -181,6 +181,9 @@ namespace zzalog {
 		static void cb_bn_misc(Fl_Widget* bn, void* v);
 		// Status log display is closed
 		static void cb_text(Fl_Widget* w, void* v);
+		// File viewer close callback
+		static void cb_fv_close(Fl_Widget* w, void* v);
+
 
 	protected:
 		// Re-initialise progress bar

@@ -783,8 +783,8 @@ bool eqsl_handler::upload_eqsl_log(book* book) {
 			status_->misc_status(ST_OK, ok_message);
 		}
 
-		fl_cursor(FL_CURSOR_DEFAULT);
 	}
+	fl_cursor(FL_CURSOR_DEFAULT);
 	return status == ER_OK;
 }
 

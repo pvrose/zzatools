@@ -659,6 +659,7 @@ void status::cb_bn_misc(Fl_Widget* w, void* v) {
 		char* title = new char[that->report_filename_.length() + 30];
 		sprintf(title, "Status report file: %s", that->report_filename_.c_str());
 		that->status_file_viewer_ = new viewer_window(640, 480, title);
+		that->status_file_viewer_->callback(cb_fv_close, that);
 	}
 	// Reload the viewer and force the window to be shown - it may have been closed
 	that->status_file_viewer_->load(that->report_filename_.c_str());
@@ -734,3 +735,9 @@ void status::append_log(bool append) {
 	status_settings.set("Append", (int)append_log_);
 }
 
+// Close file viewer 
+void status::cb_fv_close(Fl_Widget* w, void* v) {
+	status* that = (status*)v;;
+	Fl::delete_widget(that->status_file_viewer_);
+	that->status_file_viewer_ = nullptr;
+}

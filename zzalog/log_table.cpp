@@ -8,6 +8,7 @@
 #include "fields.h"
 #include "menu.h"
 #include "toolbar.h"
+#include "status.h"
 
 #include <FL/fl_draw.H>
 #include <FL/Fl_Preferences.H>
@@ -25,6 +26,7 @@ extern book* book_;
 extern Fl_Single_Window* main_window_;
 extern menu* menu_;
 extern toolbar* toolbar_;
+extern status* status_;
 //extern void add_sub_window(Fl_Window* w);
 //extern void remove_sub_window(Fl_Window* w);
 
@@ -85,6 +87,7 @@ log_table::~log_table()
 	// Remove data items
 	fields_.clear();
 	clear();
+	delete edit_dialog_;
 }
 
 // callback - called when mouse button is released but also at other times. The handle method
@@ -434,6 +437,7 @@ void log_table::edit_cell(int row, int col) {
 	case BN_SPARE + 3:
 		// Save, Save and edit previous, Save and edit next - implement the save
 		text = ((edit_dialog*)edit_dialog_)->value();
+		string old_text = record->item(fields_[col].field);
 		record->item(field_info.field, text, true);
 		switch (my_book_->book_type()) {
 		case OT_MAIN:
@@ -459,6 +463,15 @@ void log_table::edit_cell(int row, int col) {
 			if (fields_[col].field == "CALL") {
 				toolbar_->search_text(my_book_->record_number(item_number));
 			}
+			char message[200];
+			snprintf(message, 200, "LOG: %s %s %s record changed %s from %s to %s",
+				record->item("QSO_DATE").c_str(),
+				record->item("TIME_ON").c_str(),
+				record->item("CALL").c_str(),
+				fields_[col].field.c_str(),
+				old_text.c_str(),
+				text.c_str());
+			status_->misc_status(ST_LOG, message);
 			break;
 		case OT_IMPORT:
 			// Otherwise just redraw this log
