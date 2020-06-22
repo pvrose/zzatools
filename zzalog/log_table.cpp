@@ -444,21 +444,21 @@ void log_table::edit_cell(int row, int col) {
 		case OT_EXTRACT:
 			// Update all views - including this
 			if (!my_book_->modified_record() && !my_book_->new_record()) {
-				// Let menu know to re-enable save and/or cancel
 				if (!my_book_->new_record()) {
 					my_book_->modified_record(true);
-				}
-				if (fields_[col].field == "GRIDSQUARE" || fields_[col].field == "DXCC") {
-					book_->selection(my_book_->record_number(item_number), HT_CHANGED);
-				}
-				else {
-					book_->selection(my_book_->record_number(item_number), HT_MINOR_CHANGE);
 				}
 			}
 			else {
 				redraw();
 				book_->modified(true);
 				menu_->update_items();
+			}
+			// Update all views with the change
+			if (fields_[col].field == "GRIDSQUARE" || fields_[col].field == "DXCC") {
+				book_->selection(my_book_->record_number(item_number), HT_CHANGED);
+			}
+			else {
+				book_->selection(my_book_->record_number(item_number), HT_MINOR_CHANGE);
 			}
 			if (fields_[col].field == "CALL") {
 				toolbar_->search_text(my_book_->record_number(item_number));

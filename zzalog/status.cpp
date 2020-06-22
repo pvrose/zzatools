@@ -291,9 +291,12 @@ void status::update_progress(object_t object) {
 		// Set range (0:max_value)
 		progress_->minimum(0.0);
 		progress_->maximum((float)item->max_value);
-		// redraw and allow scheduler to effect the redrawing
+		// redraw and allow scheduler to effect the redrawing (only if value has gone up by > 1%)
 		progress_->redraw();
-		Fl::wait();
+		if (item->value - prev_progress_ > item->max_value / 100) {
+			Fl::wait();
+			prev_progress_ = item->value;
+		}
 	}
 }
 

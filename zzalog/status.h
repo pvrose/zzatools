@@ -221,6 +221,8 @@ namespace zzalog {
 		map<object_t, progress_item*> progress_items_;
 		// Report file unusable
 		bool file_unusable_;
+		// Previous reported progress
+		int prev_progress_;
 
 	};
 
