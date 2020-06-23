@@ -168,7 +168,7 @@ void import_data::auto_update() {
 			if (timestamp > last_timestamps_[i]) {
 				// Load data from the auto-import file - concatenating all files
 				char message[256];
-				sprintf(message, "IMPORT: %s (%s)", update_files_[i].c_str(), sources_[i].c_str());
+				sprintf(message, "IMPORT: Loading %s", sources_[i].c_str());
 				status_->misc_status(ST_NOTE, message);
 				load_data(update_files_[i]);
 				// Remember the earliest of the files that has changed
@@ -179,7 +179,7 @@ void import_data::auto_update() {
 			}
 			else {
 				char message[256];
-				sprintf(message, "IMPORT: %s not changed", update_files_[i].c_str());
+				sprintf(message, "IMPORT: %s not changed", sources_[i].c_str());
 				status_->misc_status(ST_WARNING, message);
 			}
 		}

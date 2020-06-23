@@ -70,6 +70,24 @@ namespace zzalog {
 			AN,            // Antarctica
 		};
 
+		// Pin size widget
+		class pz_widget :
+			public Fl_Widget
+
+		{
+		public:
+
+			pz_widget( int X, int Y, int W, int H );
+			virtual void draw();
+
+			void value(int v);
+			int value();
+
+		protected:
+			int value_;
+
+		};
+
 	public:
 		dxa_if();
 		virtual ~dxa_if();
@@ -108,6 +126,8 @@ namespace zzalog {
 		static void cb_bn_colour(Fl_Widget* w, void* v);
 		// All colour button click
 		static void cb_bn_all(Fl_Widget* w, void* v);
+		// Pin size slider
+		static void cb_sl_pinsize(Fl_Widget* w, void* v);
 
 
 	public:
@@ -237,6 +257,8 @@ namespace zzalog {
 		DxAtlas::EnumProjection projection_;
 		// Colour button enables
 		vector<bool> colour_enables_;
+		// Pin size
+		int pin_size_;
 
 		Fl_Group* colour_grp_;
 		// Colour buttons - instanced in colour_win_
@@ -247,6 +269,8 @@ namespace zzalog {
 		Fl_Widget* lat_dms_op_;
 		Fl_Widget* lon_dms_op_;
 		Fl_Widget* centre_ch_;
+		Fl_Widget* pz_w_;
+
 		// Map of colour "names" to buttons.
 		map<string, Fl_Widget*> button_map_;
 	};

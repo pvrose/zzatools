@@ -258,24 +258,14 @@ void dxa_if::create_form() {
 	ch13->value((int)centre_mode_);
 	centre_ch_ = ch13;
 	// Slider - pin size
-	Fl_Slider* sl10 = new Fl_Slider(ch11->x(), ch13->y() + ch13->h() + GAP, ch11->w() - HBUTTON, HBUTTON, "Pin size");
+	Fl_Slider* sl10 = new Fl_Slider(ch11->x(), ch13->y() + ch13->h() + GAP, ch11->w() - WRADIO, HRADIO, "Pin size");
 	sl10->type(FL_HORIZONTAL);
 	sl10->labelfont(FONT);
 	sl10->labelsize(FONT_SIZE);
-	sl10->align(FL_ALIGN_LEFT | FL_ALIGN_TOP);
 	sl10->callback(cb_sl_pinsize, &pin_size_);
 	sl10->when(FL_WHEN_RELEASE);
-	sl10->range(3.0, HBUTTON / 2);
-	sl10->step(1);
-	sl10->value(pin_size_);
 	// Pinsize display
-	pz_widget* pz11 = new pz_widget(sl10->x() + sl10->w(), sl10->y(), HBUTTON, HBUTTON);
-	pz11->value(pin_size_);
-	pz11->labelfont(FONT);
-	pz11->labelsize(FONT_SIZE);
-	pz11->copy_label(to_string(pin_size_).c_str());
-	pz11->color(FL_WHITE);
-	pz11->align(FL_ALIGN_TOP);
+	pz_widget* pz11 = new pz_widget(sl10->x() + sl10->w(), sl10->y(), WRADIO, HRADIO);
 	pz_w_ = pz11;
 
 	// Button - Start stop
@@ -443,10 +433,16 @@ void dxa_if::enable_widgets() {
 		}
 	}
 	// Enable colour buttons
+	bool set_pz_colour = false;
 	for (size_t i = 0; i < colour_bns_.size(); i++) {
 		if (colour_enables_[i]) {
 			colour_bns_[i]->color(button_colour(i));
 			colour_bns_[i]->labelcolor(fl_contrast(FL_BLACK, button_colour(i)));
+			// Set the pinsize colour to the first enabled colour
+			if (!set_pz_colour) {
+				set_pz_colour = true;
+				pz_w_->color(button_colour(i));
+			}
 		}
 		else {
 			Fl_Color inactive_colour = fl_color_average(button_colour(i), FL_WHITE, 0.5f);
@@ -454,7 +450,6 @@ void dxa_if::enable_widgets() {
 			colour_bns_[i]->labelcolor(fl_contrast(FL_BLACK, inactive_colour));
 		}
 	}
-
 	redraw();
 }
 
@@ -612,7 +607,6 @@ void dxa_if::cb_sl_pinsize(Fl_Widget* w, void* v) {
 	cb_value<Fl_Slider, int>(w, v);
 	dxa_if* that = ancestor_view<dxa_if>(w);
 	((pz_widget*)that->pz_w_)->value(*(int*)v);
-	that->pz_w_->copy_label(to_string(*(int*)v).c_str());
 	that->enable_widgets();
 	that->draw_pins();
 }
@@ -1527,7 +1521,6 @@ void dxa_if::draw_pins() {
 			}
 
 			// Now deactivate all colour buttons
-			bool set_pz_colour = false;
 			for (size_t i = 0; i < colour_bns_.size(); i++) {
 				if (colours_used.find(colours_used_[i]) == colours_used.end()) {
 					Fl_Color inactive_colour = fl_color_average(button_colour(i), FL_WHITE, 0.5f);
@@ -1538,11 +1531,6 @@ void dxa_if::draw_pins() {
 					Fl_Color active_colour = button_colour(i);
 					colour_bns_[i]->color(active_colour);
 					colour_bns_[i]->labelcolor(fl_contrast(FL_BLACK, active_colour));
-					// Set the pinsize colour to the first enabled colour
-					if (!set_pz_colour) {
-						set_pz_colour = true;
-						pz_w_->color(button_colour(i));
-					}
 				}
 			}
 			for (auto it = colour_bns_.begin(); it != colour_bns_.end(); it++) {
@@ -1815,13 +1803,13 @@ void dxa_if::pz_widget::draw() {
 	int y_centre = y() + (h() / 2);
 	// Limit the drawing to the widget
 	fl_push_clip(x(), y(), w(), h());
-	// Fill in first
-	fl_color(color());
-	fl_pie(x_centre - value(), y_centre - value(), value() + value(), value() + value(), 0.0, 360.0);
-	// Draw the outer circle over it.
+	// Draw the outer circle
 	fl_color(FL_BLACK);
 	fl_circle(x_centre, y_centre, value());
 
+	// Fill in
+	fl_color(color());
+	fl_pie(x_centre, y_centre, value() - 1, value() - 1, 0.0, 360.0);
 
 	fl_pop_clip();
 }
