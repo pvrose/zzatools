@@ -136,12 +136,14 @@ namespace zzalog {
 		HRESULT __stdcall cb_map_clicked(float latitude, float longitude);
 		HRESULT __stdcall cb_mouse_moved(float latitude, float longitude);
 		HRESULT __stdcall cb_exit_requested();
+		HRESULT __stdcall cb_map_changed(DxAtlas::EnumMapChange change);
 
 		// Inter-app callback map
 		BEGIN_SINK_MAP(dxa_if)
 			SINK_ENTRY_INFO(2, __uuidof(::DxAtlas::IDxAtlasEvents), 0x7, &dxa_if::cb_mouse_moved, new _ATL_FUNC_INFO({ CC_STDCALL, VT_EMPTY, 2,{ VT_R4, VT_R4 } }))
 			SINK_ENTRY_INFO(2, __uuidof(::DxAtlas::IDxAtlasEvents), 0x6, &dxa_if::cb_map_clicked, new _ATL_FUNC_INFO({ CC_STDCALL, VT_EMPTY, 2,{ VT_R4, VT_R4 } }))
 			SINK_ENTRY_INFO(2, __uuidof(::DxAtlas::IDxAtlasEvents), 0x1, &dxa_if::cb_exit_requested, new _ATL_FUNC_INFO({ CC_STDCALL, VT_EMPTY, 0, {} }))
+			SINK_ENTRY_INFO(2, __uuidof(::DxAtlas::IDxAtlasEvents), 0x3, &dxa_if::cb_map_changed, new _ATL_FUNC_INFO({ CC_STDCALL, VT_EMPTY, 1, { VT_I4 } }))
 		END_SINK_MAP()
 
 		// Get button Colour

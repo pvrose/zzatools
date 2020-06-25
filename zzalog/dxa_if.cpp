@@ -796,6 +796,18 @@ HRESULT dxa_if::cb_mouse_moved(float latitude, float longitude) {
 	return S_OK;
 }
 
+// Map changed callback
+HRESULT dxa_if::cb_map_changed(DxAtlas::EnumMapChange change) {
+	if (change == DxAtlas::EnumMapChange::MC_PROJECTION && atlas_ && !is_my_change_) {
+		projection_ = atlas_->GetMap()->GetProjection();
+		enable_widgets();
+		if (projection_ == DxAtlas::EnumProjection::PRJ_RECTANGULAR) {
+			centre_map();
+		}
+	}
+	return S_OK;
+}
+
 // Exit requested - disconnect from DxAtlas and tidy it up.
 HRESULT dxa_if::cb_exit_requested() {
 	disconnect_dxatlas(true);
