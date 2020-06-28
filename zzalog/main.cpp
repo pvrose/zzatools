@@ -483,11 +483,14 @@ void add_rig_if() {
 							// Change logging mode to ON_AIR
 							menu_->logging(LM_ON_AIR);
 						}
+						ic7300_table* mem_table = (ic7300_table*)(tabbed_view_->get_view(OT_MEMORY));
 						if (rig_if_ && rig_if_->rig_name() == "IC-7300") {
 							ic7300_ = new ic7300;
 							rig_if_->update_clock();
-							ic7300_table* mem_table = (ic7300_table*)(tabbed_view_->get_view(OT_MEMORY));
 							mem_table->type(mem_table->type());
+						}
+						else {
+							mem_table->type(VT_NONE);
 						}
 					}
 				}

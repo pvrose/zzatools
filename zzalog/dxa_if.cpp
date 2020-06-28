@@ -412,6 +412,7 @@ void dxa_if::save_values() {
 	dxatlas_settings.set("Bearing Distance", (int&)bearing_distance_);
 	dxatlas_settings.set("Projection", (int&)projection_);
 	dxatlas_settings.set("Pin Size", pin_size_);
+	dxatlas_settings.set("Zoom Value", zoom_value_);
 }
 
 // Used to enable/disable specific widget - any widgets enabled must be attributes
@@ -1032,6 +1033,9 @@ void dxa_if::initialise_map() {
 	map->PutGridSquaresVisible((VARIANT_BOOL)grid_squares_);
 	map->PutLatLonGridVisible((VARIANT_BOOL)lat_lon_grid_);
 	map->PutBearingDistanceGridVisible((VARIANT_BOOL)bearing_distance_);
+	map->PutCenterLatitude(centre_lat_);
+	map->PutCenterLongitude(centre_long_);
+	map->PutZoom(zoom_value_);
 
 	// Set map parameters
 	draw_home_flag();

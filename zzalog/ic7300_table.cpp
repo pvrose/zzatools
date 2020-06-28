@@ -136,6 +136,9 @@ void ic7300_table::open_view(view_type type) {
 	// delete current table contents
 	clear();
 	switch (type_) {
+	case VT_NONE:
+		hide();
+		break;
 	case VT_MEMORIES:
 		draw_memory_view();
 		break;
@@ -146,16 +149,14 @@ void ic7300_table::open_view(view_type type) {
 		draw_user_bands_view();
 		break;
 	case VT_CW_MESSAGES:
-		draw_message_view(true);
-		break;
-	case VT_RTTY_MESSAGES:
-		draw_message_view(false);
+		draw_message_view();
 		break;
 	}
 	items_valid_ = true;
 	fl_cursor(FL_CURSOR_DEFAULT);
 	Fl_Preferences view_settings(settings_, "View");
 	view_settings.set("Type", (int)type_);
+	status_->misc_status(ST_OK, "RIG: Finished");
 }
 
 // Open memory view
@@ -579,11 +580,11 @@ void ic7300_table::draw_user_bands_view() {
 	int num_userbands;
 	if (ok) num_userbands = bcd_to_int(ic7300_->send_command('\x1e', sub_command, ok).substr(2), false);
 	else num_userbands = 1;
+	status_->misc_status(ST_NOTE, "RIG: Starting user band fetch");
 	if (ok) {
 		string* tx_bands = new string[num_txbands];
 		string* user_bands = new string[num_userbands];
 		status_->progress(num_txbands + num_userbands, OT_MEMORY, "user bands", false);
-		status_->misc_status(ST_NOTE, "RIG: Starting user band fetch");
 		// Read all the hardware defined bands
 		for (int i = 0; i < num_txbands && ok; i++) {
 			sub_command[0] = 1;
@@ -686,7 +687,7 @@ void ic7300_table::draw_user_bands_view() {
 	resize_cols();
 }
 
-void ic7300_table::draw_message_view(bool cw) {
+void ic7300_table::draw_message_view() {
 	// Define table parameters
 	rows(8);
 	cols(2);
@@ -713,14 +714,8 @@ void ic7300_table::draw_message_view(bool cw) {
 
 	bool ok = true;
 
-	if (cw) {
-		// set transceiver into CW mode
-		(void)ic7300_->send_command('\x06', "", "\x03\x01", ok);
-	}
-	else {
-		// set transceiver into RTTY mode - TODO: This doesn't deliver RTTY messages.
-		(void)ic7300_->send_command('\x06', "", "\x04\x01", ok);
-	}
+	// set transceiver into CW mode
+	(void)ic7300_->send_command('\x06', "", "\x03\x01", ok);
 
 	// Get the count up trigger memory number
 	int trigger;
@@ -732,12 +727,7 @@ void ic7300_table::draw_message_view(bool cw) {
 		items_[r] = item;
 		// Add memory name as row header
 		char name[4];
-		if (cw) {
-			sprintf(name, "M%1d", r + 1);
-		}
-		else {
-			sprintf(name, "RT%1d", r + 1);
-		}
+		sprintf(name, "M%1d", r + 1);
 		row_headers_[r] = name;
 		// Is it trigger
 		if (ok && r + 1 == trigger) {

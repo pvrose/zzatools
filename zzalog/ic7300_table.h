@@ -9,11 +9,11 @@
 namespace zzalog {
 
 	enum view_type {
+		VT_NONE,
 		VT_MEMORIES,
 		VT_SCOPE_BANDS,
 		VT_USER_BANDS,
 		VT_CW_MESSAGES,
-		VT_RTTY_MESSAGES,
 		VT_UNCHANGED
 	};
 
@@ -41,7 +41,7 @@ namespace zzalog {
 		void draw_memory_view();
 		void draw_scope_bands_view();
 		void draw_user_bands_view();
-		void draw_message_view(bool cw);
+		void draw_message_view();
 		// Resize columns
 		void resize_cols();
 		// Delete the current items

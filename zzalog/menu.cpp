@@ -210,11 +210,11 @@ namespace zzalog {
 
 	// Accessing IC-7300 specific features
 	{ "I&C-7300", 0, 0, 0, FL_SUBMENU },
+	{ "&None", 0, menu::cb_mi_ic7300, (void*)VT_NONE, FL_MENU_RADIO },
 	{ "&Memories", 0, menu::cb_mi_ic7300, (void*)VT_MEMORIES, FL_MENU_RADIO },
 	{ "&Scope bands", 0, menu::cb_mi_ic7300, (void*)VT_SCOPE_BANDS, FL_MENU_RADIO },
 	{ "&User bands", 0, menu::cb_mi_ic7300, (void*)VT_USER_BANDS, FL_MENU_RADIO },
-	{ "&CW Messages", 0, menu::cb_mi_ic7300, (void*)VT_CW_MESSAGES, FL_MENU_RADIO },
-	{ "&RTTY Messages", 0, menu::cb_mi_ic7300, (void*)VT_RTTY_MESSAGES, FL_MENU_RADIO },
+	{ "&CW messages", 0, menu::cb_mi_ic7300, (void*)VT_CW_MESSAGES, FL_MENU_RADIO },
 	{ 0 },
 
 	// Web-based information
@@ -1789,11 +1789,11 @@ void menu::update_items() {
 		int index_extract = find_index("E&xtract");
 		int index_ref = find_index("&Reference");
 		int index_rep = find_index("Re&port");
+		int index_ic7300_none = find_index("I&C-7300/&None");
 		int index_memories = find_index("I&C-7300/&Memories");
 		int index_scopes = find_index("I&C-7300/&Scope bands");
 		int index_users = find_index("I&C-7300/&User bands");
 		int index_cw_mess = find_index("I&C-7300/&CW messages");
-		int index_rtty_mess = find_index("I&C-7300/&RTTY messages");
 		int index_info = find_index("&Information");
 		int index_web = find_index("&Information/QSO &Web-site");
 		int index_use_log = find_index("&Log/&Use View/Main &Log");
@@ -1932,40 +1932,40 @@ void menu::update_items() {
 		logging(logging());
 		// Memory table
 		switch (memory) {
+		case VT_NONE:
+			mode(index_ic7300_none, mode(index_ic7300_none) | FL_MENU_VALUE);
+			mode(index_memories, mode(index_memories) & ~FL_MENU_VALUE);
+			mode(index_scopes, mode(index_scopes) & ~FL_MENU_VALUE);
+			mode(index_users, mode(index_users) & ~FL_MENU_VALUE);
+			mode(index_cw_mess, mode(index_cw_mess) & ~FL_MENU_VALUE);
+			break;
 		case VT_MEMORIES:
+			mode(index_ic7300_none, mode(index_ic7300_none) & ~FL_MENU_VALUE);
 			mode(index_memories, mode(index_memories) | FL_MENU_VALUE);
 			mode(index_scopes, mode(index_scopes) & ~FL_MENU_VALUE);
 			mode(index_users, mode(index_users) & ~FL_MENU_VALUE);
 			mode(index_cw_mess, mode(index_cw_mess) & ~FL_MENU_VALUE);
-			mode(index_rtty_mess, mode(index_rtty_mess) & ~FL_MENU_VALUE);
 			break;
 		case VT_SCOPE_BANDS:
+			mode(index_ic7300_none, mode(index_ic7300_none) & ~FL_MENU_VALUE);
 			mode(index_memories, mode(index_memories) & ~FL_MENU_VALUE);
 			mode(index_scopes, mode(index_scopes) | FL_MENU_VALUE);
 			mode(index_users, mode(index_users) & ~FL_MENU_VALUE);
 			mode(index_cw_mess, mode(index_cw_mess) & ~FL_MENU_VALUE);
-			mode(index_rtty_mess, mode(index_rtty_mess) & ~FL_MENU_VALUE);
 			break;
 		case VT_USER_BANDS:
+			mode(index_ic7300_none, mode(index_ic7300_none) & ~FL_MENU_VALUE);
 			mode(index_memories, mode(index_memories) & ~FL_MENU_VALUE);
 			mode(index_scopes, mode(index_scopes) & ~FL_MENU_VALUE);
 			mode(index_users, mode(index_users) | FL_MENU_VALUE);
 			mode(index_cw_mess, mode(index_cw_mess) & ~FL_MENU_VALUE);
-			mode(index_rtty_mess, mode(index_rtty_mess) & ~FL_MENU_VALUE);
 			break;
 		case VT_CW_MESSAGES:
+			mode(index_ic7300_none, mode(index_ic7300_none) & ~FL_MENU_VALUE);
 			mode(index_memories, mode(index_memories) & ~FL_MENU_VALUE);
 			mode(index_scopes, mode(index_scopes) & ~FL_MENU_VALUE);
 			mode(index_users, mode(index_users) & ~FL_MENU_VALUE);
 			mode(index_cw_mess, mode(index_cw_mess) | FL_MENU_VALUE);
-			mode(index_rtty_mess, mode(index_rtty_mess) & ~FL_MENU_VALUE);
-			break;
-		case VT_RTTY_MESSAGES:
-			mode(index_memories, mode(index_memories) & ~FL_MENU_VALUE);
-			mode(index_scopes, mode(index_scopes) & ~FL_MENU_VALUE);
-			mode(index_users, mode(index_users) & ~FL_MENU_VALUE);
-			mode(index_cw_mess, mode(index_cw_mess) & ~FL_MENU_VALUE);
-			mode(index_rtty_mess, mode(index_rtty_mess) | FL_MENU_VALUE);
 			break;
 		}
 	}
