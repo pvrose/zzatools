@@ -214,7 +214,8 @@ namespace zzalog {
 	{ "&Memories", 0, menu::cb_mi_ic7300, (void*)VT_MEMORIES, FL_MENU_RADIO },
 	{ "&Scope bands", 0, menu::cb_mi_ic7300, (void*)VT_SCOPE_BANDS, FL_MENU_RADIO },
 	{ "&User bands", 0, menu::cb_mi_ic7300, (void*)VT_USER_BANDS, FL_MENU_RADIO },
-	{ "&CW messages", 0, menu::cb_mi_ic7300, (void*)VT_CW_MESSAGES, FL_MENU_RADIO },
+	{ "&CW Messages", 0, menu::cb_mi_ic7300, (void*)VT_CW_MESSAGES, FL_MENU_RADIO },
+	{ "&RTTY Messages", 0, menu::cb_mi_ic7300, (void*)VT_RTTY_MESSAGES, FL_MENU_RADIO },
 	{ 0 },
 
 	// Web-based information
@@ -446,11 +447,6 @@ void menu::cb_mi_file_saveas(Fl_Widget* w, void* v) {
 	while (chooser->visible()) Fl::wait();
 	// Trial and error indicated that if Cancel is clicked, no files are selected.
 	if (chooser->count()) {
-		// No file type - force it to .adi
-		string suffix = filename.substr(filename.length() - 4);
-		if (suffix != ".adi" && suffix != ".adx" && suffix != ".tsv" && suffix != ".tab") {
-			filename += ".adi";
-		}
 		// Got a filename
 		ifstream* check = new ifstream(filename.c_str());
 		if (check->fail() || fl_choice("File exists, do you want to over-write", "OK", "No", nullptr) == 0) {
@@ -1799,6 +1795,7 @@ void menu::update_items() {
 		int index_scopes = find_index("I&C-7300/&Scope bands");
 		int index_users = find_index("I&C-7300/&User bands");
 		int index_cw_mess = find_index("I&C-7300/&CW messages");
+		int index_rtty_mess = find_index("I&C-7300/&RTTY messages");
 		int index_info = find_index("&Information");
 		int index_web = find_index("&Information/QSO &Web-site");
 		int index_use_log = find_index("&Log/&Use View/Main &Log");
@@ -1943,6 +1940,7 @@ void menu::update_items() {
 			mode(index_scopes, mode(index_scopes) & ~FL_MENU_VALUE);
 			mode(index_users, mode(index_users) & ~FL_MENU_VALUE);
 			mode(index_cw_mess, mode(index_cw_mess) & ~FL_MENU_VALUE);
+			mode(index_rtty_mess, mode(index_rtty_mess) & ~FL_MENU_VALUE);
 			break;
 		case VT_MEMORIES:
 			mode(index_ic7300_none, mode(index_ic7300_none) & ~FL_MENU_VALUE);
@@ -1950,6 +1948,7 @@ void menu::update_items() {
 			mode(index_scopes, mode(index_scopes) & ~FL_MENU_VALUE);
 			mode(index_users, mode(index_users) & ~FL_MENU_VALUE);
 			mode(index_cw_mess, mode(index_cw_mess) & ~FL_MENU_VALUE);
+			mode(index_rtty_mess, mode(index_rtty_mess) & ~FL_MENU_VALUE);
 			break;
 		case VT_SCOPE_BANDS:
 			mode(index_ic7300_none, mode(index_ic7300_none) & ~FL_MENU_VALUE);
@@ -1957,6 +1956,7 @@ void menu::update_items() {
 			mode(index_scopes, mode(index_scopes) | FL_MENU_VALUE);
 			mode(index_users, mode(index_users) & ~FL_MENU_VALUE);
 			mode(index_cw_mess, mode(index_cw_mess) & ~FL_MENU_VALUE);
+			mode(index_rtty_mess, mode(index_rtty_mess) & ~FL_MENU_VALUE);
 			break;
 		case VT_USER_BANDS:
 			mode(index_ic7300_none, mode(index_ic7300_none) & ~FL_MENU_VALUE);
@@ -1964,6 +1964,7 @@ void menu::update_items() {
 			mode(index_scopes, mode(index_scopes) & ~FL_MENU_VALUE);
 			mode(index_users, mode(index_users) | FL_MENU_VALUE);
 			mode(index_cw_mess, mode(index_cw_mess) & ~FL_MENU_VALUE);
+			mode(index_rtty_mess, mode(index_rtty_mess) & ~FL_MENU_VALUE);
 			break;
 		case VT_CW_MESSAGES:
 			mode(index_ic7300_none, mode(index_ic7300_none) & ~FL_MENU_VALUE);
@@ -1971,6 +1972,15 @@ void menu::update_items() {
 			mode(index_scopes, mode(index_scopes) & ~FL_MENU_VALUE);
 			mode(index_users, mode(index_users) & ~FL_MENU_VALUE);
 			mode(index_cw_mess, mode(index_cw_mess) | FL_MENU_VALUE);
+			mode(index_rtty_mess, mode(index_rtty_mess) & ~FL_MENU_VALUE);
+			break;
+		case VT_RTTY_MESSAGES:
+			mode(index_ic7300_none, mode(index_ic7300_none) & ~FL_MENU_VALUE);
+			mode(index_memories, mode(index_memories) & ~FL_MENU_VALUE);
+			mode(index_scopes, mode(index_scopes) & ~FL_MENU_VALUE);
+			mode(index_users, mode(index_users) & ~FL_MENU_VALUE);
+			mode(index_cw_mess, mode(index_cw_mess) & ~FL_MENU_VALUE);
+			mode(index_rtty_mess, mode(index_rtty_mess) | FL_MENU_VALUE);
 			break;
 		}
 	}

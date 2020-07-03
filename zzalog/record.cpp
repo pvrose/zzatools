@@ -943,12 +943,13 @@ match_result_t record::match_records(record* record) {
 		// Time difference is within +/- 30 mins (fairly arbitrary)
 		bool within_30mins = abs(time_difference) <= (30.0 * 60.0);
 		bool is_swl = (item("SWL") == "Y");
+		bool other_swl = (record->item("SWL") == "Y");
 		// is_swl and time within 30 - SWL_MATCH
-		if (is_swl && swl_match && within_30mins) {
+		if (is_swl && !other_swl && swl_match && within_30mins) {
 			return MT_SWL_MATCH;
 		}
 		// is_swl - no match
-		else if (is_swl && !(swl_match && within_30mins)) {
+		else if (is_swl && !other_swl && !(swl_match && within_30mins)) {
 			return MT_SWL_NOMATCH;
 		}
 		else if (within_30mins && nondate_mismatch_count == 0) {

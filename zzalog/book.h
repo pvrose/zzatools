@@ -160,6 +160,8 @@ namespace zzalog {
 		static void cb_close_edith(Fl_Widget* w, void* v);
 		// Callback to close edit window without updating header
 		static void cb_cancel_edith(Fl_Widget* w, void* v);
+		// Call back to add default header
+		static void cb_default_edith(Fl_Widget* w, void* v);
 
 		// methods to be overridden --
 		// Add/replace the search/find criteria
