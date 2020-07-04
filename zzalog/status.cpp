@@ -47,6 +47,7 @@ status::status(int X, int Y, int W, int H, const char* label) :
 	, append_log_(false)
 	, rig_in_progress_(false)
 	, file_unusable_(false)
+	, no_update_viewer(false)
 {
 	// Initialise attributes
 	progress_stack_.clear();
@@ -243,6 +244,8 @@ void status::cb_bn_rig(Fl_Widget* bn, void* v) {
 
 // Add a progress item to the stack
 void status::progress(int max_value, object_t object, const char* suffix, bool countdown /*= false*/) {
+	// Turrn off file viewer update to improve performance
+	no_update_viewer = true;
 	// Initialise it
 	if (progress_items_.find(object) != progress_items_.end()) {
 		char message[100];
@@ -321,7 +324,16 @@ void status::progress(int value, object_t object) {
 				progress_items_.erase(object);
 				progress_stack_.remove(object);
 				if (progress_stack_.size()) {
+					// Revert to previous progress item
 					update_progress(progress_stack_.back());
+				}
+				else {
+					// Allow viewer to be updated
+					no_update_viewer = false;
+					// Redraw status file viewer
+					if (status_file_viewer_) {
+						cb_bn_misc(misc_status_, nullptr);
+					}
 				}
 			}
 		}
@@ -449,7 +461,7 @@ void status::misc_status(status_t status, const char* label) {
 		// TODO: This causes an exception once the viewer has been deleted but not set to nullptr
 	default:
 		// Redraw status file viewer
-		if (status_file_viewer_) {
+		if (status_file_viewer_ && !no_update_viewer) {
 			cb_bn_misc(misc_status_, nullptr);
 		}
 		break;
@@ -471,12 +483,22 @@ void status::file_status(file_status_t status) {
 	Fl::wait();
 }
 
+// Text buffer constructot
+text_buffer::text_buffer(int requestedSize, int preferredGapSize) :
+	Fl_Text_Buffer(requestedSize, preferredGapSize)
+{
+	// Turn off warning about converting characters to UTF-8
+	transcoding_warning_action = nullptr;
+}
+
+text_buffer::~text_buffer() {
+}
+
 // Text display constructor
 text_display::text_display(int X, int Y, int W, int H, const char* label) :
 	Fl_Text_Display(X, Y, W, H, label)
 	, filter_("")
 {
-
 }
 
 text_display::~text_display() {
@@ -567,7 +589,7 @@ void viewer_window::load(const char* filename) {
 
 void viewer_window::draw_window() {
 	// now read it into the text buffer
-	Fl_Text_Buffer* buffer = new Fl_Text_Buffer;
+	text_buffer* buffer = new text_buffer;
 	// And display it
 	direction_ = 1;
 	match_case_ = 1;

@@ -90,6 +90,13 @@ namespace zzalog {
 	// clock display - 1s.
 	const double UTC_TIMER = 1.0;
 
+	// This class extends Fl_Text_Buffer by switching off UTF-8 warnin
+	class text_buffer : public Fl_Text_Buffer {
+	public:
+		text_buffer(int requestedSize = 0, int preferredGapSize = 1024);
+		~text_buffer();
+	};
+
 	// This class provides an extension to the Text Display widget to allow the buffer to be reloaded
 	class text_display : public Fl_Text_Display {
 	public:
@@ -223,6 +230,8 @@ namespace zzalog {
 		bool file_unusable_;
 		// Previous reported progress
 		int prev_progress_;
+		// Do not update file viewer
+		bool no_update_viewer;
 
 	};
 

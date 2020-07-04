@@ -1033,8 +1033,8 @@ void dxa_if::initialise_map() {
 	map->PutGridSquaresVisible((VARIANT_BOOL)grid_squares_);
 	map->PutLatLonGridVisible((VARIANT_BOOL)lat_lon_grid_);
 	map->PutBearingDistanceGridVisible((VARIANT_BOOL)bearing_distance_);
-	map->PutCenterLatitude(centre_lat_);
-	map->PutCenterLongitude(centre_long_);
+	map->PutCenterLatitude((float)centre_lat_);
+	map->PutCenterLongitude((float)centre_long_);
 	map->PutZoom(zoom_value_);
 
 	// Set map parameters

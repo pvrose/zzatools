@@ -162,6 +162,8 @@ namespace zzalog {
 		static void cb_cancel_edith(Fl_Widget* w, void* v);
 		// Call back to add default header
 		static void cb_default_edith(Fl_Widget* w, void* v);
+		// Callback to restore original header text
+		static void cb_restore_edith(Fl_Widget* w, void* v);
 
 		// methods to be overridden --
 		// Add/replace the search/find criteria

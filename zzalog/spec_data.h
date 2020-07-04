@@ -164,6 +164,8 @@ namespace zzalog {
 		bool add_appdef(const string& name, char indicator);
 		// Generate the description of the enumeration for the designated enumerated field
 		string describe_enumeration(spec_dataset* dataset, string value);
+		// Get entity name for DXCC Number
+		string entity_name(int dxcc);
 
 		// protected methods
 	protected:

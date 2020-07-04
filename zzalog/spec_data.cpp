@@ -2232,3 +2232,10 @@ string spec_data::describe_enumeration(spec_dataset* dataset, string value) {
 	}
 	return enum_text;
 }
+
+string spec_data::entity_name(int dxcc) {
+	string result;
+	spec_dataset* dxccs = dataset("DXCC_Entity_Code");
+	map<string, string>* entry = dxccs->data[to_string(dxcc)];
+	return (*entry)["Entity Name"];
+}

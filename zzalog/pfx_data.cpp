@@ -864,15 +864,28 @@ parse_result_t pfx_data::parse(record* record) {
 	// Check if the call is listed in exceptions
 	if (exceptions_->is_invalid(record)) {
 		char message[150];
-		snprintf(message, 150, "LOG: Contact %s %s %s is an invalid operation", record->item("CALL").c_str(), record->item("QSO_DATE").c_str(), record->item("TIME_ON").c_str());
+		snprintf(message, 150, "LOG: Contact %s %s %s - unapproved operation",
+			record->item("QSO_DATE").c_str(),
+			record->item("TIME_ON").c_str(),
+			record->item("CALL").c_str());
 		status_->misc_status(ST_ERROR, message);
 	}
 	else {
 		exc_entry* exception = exceptions_->is_exception(record);
 		if (exception) {
+			string entity_name = spec_data_->entity_name(exception->adif_id);
+			char message[160];
+			snprintf(message, 160, "LOG: %s %s %s - exception in DXCC ID %d(%s)",
+				record->item("QSO_DATE").c_str(),
+				record->item("TIME_ON").c_str(),
+				record->item("CALL").c_str(),
+				exception->adif_id,
+				entity_name.c_str());
+			status_->misc_status(ST_NOTE, message);
 			// Use the values in the exceptions entry
 			record->item("DXCC", to_string(exception->adif_id));
 			record->item("CQZ", to_string(exception->cq_zone));
+			record->item("COUNTRY", entity_name);
 		}
 	}
 	// Parse the various dependent fields

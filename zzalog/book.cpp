@@ -1094,47 +1094,48 @@ bool book::save_enabled() {
 void book::check_dupes(bool restart) {
 	if (!restart) {
 		duplicate_item_ = 0;
-		status_->progress(size(), book_type(), "duplicates checked");
+		// Only check N - 1 entries against the next entry
 		status_->misc_status(ST_NOTE, "LOG: Duplicate checking started");
+		status_->progress(size() - 1, book_type(), "duplicates");
 		inhibit_view_update_ = true;
 		number_dupes_kept_ = 0;
 		number_dupes_removed_ = 0;
 	}
-	bool possible = false;
+	bool possible_dupe = false;
 	bool old_save_enabled = save_enabled();
 	enable_save(false);
-	for (; duplicate_item_ < size() - 1 && !possible;) {
+	for (; duplicate_item_ < size() - 1 && !possible_dupe;) {
 		// Get adjacent records
 		record_num_t record_num_1 = record_number(duplicate_item_);
 		record_num_t record_num_2 = record_number(duplicate_item_ + 1);
 		record* record_1 = get_record(duplicate_item_, true);
 		record* record_2 = get_record(duplicate_item_ + 1, false);
-		status_->progress(duplicate_item_, book_type());
 		match_result_t match = record_1->match_records(record_2);
 		switch (match) {
 		case MT_NOMATCH:
 		case MT_SWL_NOMATCH:
 		case MT_SWL_MATCH:
-			duplicate_item_++;
 			// Do nothing
 			break;
 		case MT_EXACT:
 			// Delete second occurence after query
 			match_question_ = "These appear to be duplicates - select one to delete";
 			selection(record_num_1, HT_DUPE_QUERY, nullptr, record_num_2);
-			possible = true;
+			possible_dupe = true;
 			break;
 		default:
 			// Open QSO query 
 			match_question_ = "Possible duplicate record found";
 			selection(record_num_1, HT_DUPE_QUERY, nullptr, record_num_2);
-			possible = true;
+			possible_dupe = true;
 			break;
 		}
+		duplicate_item_++;
+		status_->progress(duplicate_item_, book_type());
 	}
-	if (!possible) {
+	if (!possible_dupe) {
 		char message[256];
-		snprintf(message, 256, "LOG: Dupe check complete. %d kept, %d removed", number_dupes_kept_, number_dupes_removed_);
+		snprintf(message, 256, "LOG: Dupe check complete. %d checked, %d kept, %d removed", duplicate_item_, number_dupes_kept_, number_dupes_removed_);
 		status_->misc_status(ST_OK, message);
 		inhibit_view_update_ = false;
 		selection(size() - 1, HT_ALL);
@@ -1220,6 +1221,13 @@ void book::edit_header() {
 	bn_default->labelfont(FONT);
 	bn_default->labelsize(FONT_SIZE);
 	bn_default->tooltip(default_header_.c_str());
+	// Restore button
+	Fl_Button* bn_restore = new Fl_Button(bn_default->x() + bn_default->w() + GAP, GAP, WBUTTON, HBUTTON, "Restore");
+	bn_restore->callback(cb_restore_edith, (void*)this);
+	bn_restore->labelfont(FONT);
+	bn_restore->labelsize(FONT_SIZE);
+	bn_restore->tooltip("Restore the original header");
+
 	if (header_) {
 		// Edit the header
 		editor->buffer()->insert(0, header_->header().c_str());
@@ -1255,6 +1263,24 @@ void book::cb_default_edith(Fl_Widget* w, void* v) {
 	}
 }
 
+// Callback to retore original header value
+void book::cb_restore_edith(Fl_Widget* w, void* v) {
+	// Find the parent window of the widget (which may itself be the parent)
+	Fl_Window* win = w->window();
+	if (win == nullptr) win = (Fl_Window*)w;
+	intl_editor* editor = nullptr;
+	// Look at each child of the window until we find that is a text editor
+	for (int i = 0; i < win->children() && editor == nullptr; i++) {
+		editor = dynamic_cast<intl_editor*>(win->child(i));
+	}
+	// If we do find a text editor update the header from its current text
+	if (editor) {
+		book* that = (book*)v;
+		editor->buffer()->remove(0, editor->buffer()->length());
+		editor->buffer()->insert(0, that->header()->header().c_str());
+	}
+}
+
 // Call back to save the new header value
 void book::cb_close_edith(Fl_Widget* w, void* v) {
 	// Find the parent window of the widget (which may itself be the parent)
@@ -1281,8 +1307,11 @@ void book::cb_close_edith(Fl_Widget* w, void* v) {
 
 // Call back to cancel the new header edit
 void book::cb_cancel_edith(Fl_Widget* w, void* v) {
+	// Find the parent window of the widget (which may itself be the parent)
+	Fl_Window* win = w->window();
+	if (win == nullptr) win = (Fl_Window*)w;
 	status_->misc_status(ST_OK, "LOG: Editting header comment - Cancelled!");
-	Fl_Window::default_callback(w->window(), v);
+	Fl_Window::default_callback(win, v);
 }
 
 // Return delete in progress - used to disable menu items

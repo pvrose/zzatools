@@ -65,9 +65,6 @@ exc_entry* exc_data::is_exception(record* record) {
 			exc_entry* entry = *it;
 			if ((entry->end == -1 || entry->end > timestamp) && 
 				(entry->start == -1 || timestamp > entry->start)) {
-				char message[160];
-				snprintf(message, 160, "EXCEPTION: Contact %s at %s %s is in ADIF %d", call.c_str(), record->item("QSO_DATE").c_str(), record->item("TIME_ON").c_str(), entry->adif_id);
-				status_->misc_status(ST_NOTE, message);
 				return entry;
 			}
 		}

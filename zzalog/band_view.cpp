@@ -94,7 +94,7 @@ bool band_view::load_data() {
 	streampos startpos = file.tellg();
 	file.seekg(0, ios::end);
 	streampos currpos = file.tellg();
-	int length = currpos - startpos;
+	int length = (int)(currpos - startpos);
 	// reposition back to beginning
 	file.seekg(0, ios::beg);
 	// Initialise progress
