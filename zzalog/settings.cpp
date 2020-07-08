@@ -50,10 +50,10 @@ settings::settings(int W, int H, const char* label, cfg_dialog_t active) :
 	files->selection_color(fl_lighter(FL_YELLOW));
 	files->tooltip("Allows the specification of the locations of various resources used by zzalog");
 	// Web URLs, user-names and passwords
-	web_dialog* web = new web_dialog(rx, ry, rw, rh, "Web Info");
-	web->labelsize(FONT_SIZE);
-	web->selection_color(fl_lighter(FL_YELLOW));
-	web->tooltip("Allows the setting of user details for the various on-line services");
+	web_dialog* aweb = new web_dialog(rx, ry, rw, rh, "Web Info");
+	aweb->labelsize(FONT_SIZE);
+	aweb->selection_color(fl_lighter(FL_YELLOW));
+	aweb->tooltip("Allows the setting of user details for the various on-line services");
 	// Station settings: rig, aerial and QTH details
 	stn_dialog* stn = new stn_dialog(rx, ry, rw, rh, "Station");
 	stn->labelsize(FONT_SIZE);
@@ -89,7 +89,7 @@ settings::settings(int W, int H, const char* label, cfg_dialog_t active) :
 		tabs->value(files);
 		break;
 	case DLG_WEB:
-		tabs->value(web);
+		tabs->value(aweb);
 		break;
 	case DLG_STATION:
 		tabs->value(stn);

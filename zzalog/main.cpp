@@ -351,25 +351,33 @@ void add_book(char* arg) {
 }
 
 void cb_rig_timer() {
+	// There may be a race hazard involving flrig and zzalib when I try and close zzalib
+	if (!closing_) {
 		// Band view may not have been created yet
-	if (band_view_) {
-		band_view_->update(rig_if_->tx_frequency() / 1000.0);
-	}
-	// Update scratchpad
-	if (scratchpad_) {
-		string mode;
-		string submode;
-		rig_if_->get_string_mode(mode, submode);
-		string freq = rig_if_->get_frequency(true);
-		string power = rig_if_->get_tx_power();
-		if (submode.length()) {
-			scratchpad_->rig_update(freq, submode, power);
+		if (band_view_) {
+			band_view_->update(rig_if_->tx_frequency() / 1000.0);
+		}
+		// Update scratchpad
+		if (scratchpad_) {
+			string mode;
+			string submode;
+			rig_if_->get_string_mode(mode, submode);
+			string freq = rig_if_->get_frequency(true);
+			string power = rig_if_->get_tx_power();
+			if (submode.length()) {
+				scratchpad_->rig_update(freq, submode, power);
+			}
+			else {
+				scratchpad_->rig_update(freq, mode, power);
+			}
+		}
+		if (rig_if_->get_tx() == true) {
+			status_->rig_status(RS_TX, rig_if_->rig_info().c_str());
 		}
 		else {
-			scratchpad_->rig_update(freq, mode, power);
+			status_->rig_status(RS_RX, rig_if_->rig_info().c_str());
 		}
 	}
-	status_->rig_status(ST_OK, rig_if_->rig_info().c_str());
 }
 
 string cb_freq_to_band(double frequency) {
@@ -467,7 +475,7 @@ void add_rig_if() {
 								scratchpad_->update();
 							}
 							status_->misc_status(ST_ERROR, message);
-							status_->rig_status(ST_ERROR, error_message.c_str());
+							status_->rig_status(RS_ERROR, error_message.c_str());
 							done = true;
 							// Change logging mode from IMPORTED to ON_AIR. otherwise leave as was
 							if (menu_->logging() == LM_IMPORTED) menu_->logging(LM_ON_AIR);
@@ -478,7 +486,7 @@ void add_rig_if() {
 							char message[256];
 							snprintf(message, 256, "RIG: %s", rig_if_->success_message().c_str());
 							status_->misc_status(ST_OK, message);
-							status_->rig_status(ST_OK, rig_if_->rig_info().c_str());
+							status_->rig_status(rig_if_->get_tx() ? RS_TX : RS_RX, rig_if_->rig_info().c_str());
 							done = true;
 							// Change logging mode to ON_AIR
 							menu_->logging(LM_ON_AIR);
@@ -509,7 +517,7 @@ void add_rig_if() {
 		}
 		menu_->update_items();
 		if (rig_if_ == nullptr) {
-			status_->rig_status(ST_WARNING, "No rig present");
+			status_->rig_status(RS_OFF, "No rig present");
 		}
 		fl_cursor(FL_CURSOR_DEFAULT);
 	}
@@ -532,13 +540,10 @@ void add_band_view() {
 			}
 			band_view_ = new band_view(frequency, 400, 100, "Band plan");
 		}
-		//if (band_view_->valid()) {
-		//	add_sub_window(band_view_);
-		//}
-		//else {
+		if (!band_view_->valid()) {
 			Fl::delete_widget(band_view_);
 			band_view_ = nullptr;
-		//}
+		}
 	}
 }
 

@@ -39,6 +39,14 @@ namespace zzalog {
 		FS_SAVING            // The log is being saved
 	};
 
+	// The status of the rig
+	enum rig_status_t {
+		RS_OFF,              // The rig is off or disconnected
+		RS_ERROR,            // An error with the rig occured
+		RS_RX,               // The rig is connected and in RX mode
+		RS_TX                // The rig is connected and in TX mode
+	};
+
 	// Default colours for status bars
 	const map<status_t, Fl_Color> STATUS_COLOURS = {
 		{ ST_NONE, FL_LIGHT2 },
@@ -82,6 +90,14 @@ namespace zzalog {
 		{ FS_MODIFIED, FL_RED },
 		{ FS_LOADING, FL_YELLOW },
 		{ FS_SAVING, FL_CYAN }
+	};
+
+	// Default colours for rig status
+	const map<rig_status_t, Fl_Color> RIG_STATUS_COLOURS = {
+		{ RS_OFF, FL_YELLOW },
+		{ RS_ERROR, fl_color_average(FL_RED, FL_YELLOW, 0.5)},
+		{ RS_RX, FL_GREEN },
+		{ RS_TX, FL_RED }
 	};
 
 	// 
@@ -163,7 +179,7 @@ namespace zzalog {
 		// Update progress with a text message and mark 100%
 		void progress(const char* message, object_t object);
 		// Update rig_status
-		void rig_status(status_t status, const char* label);
+		void rig_status(rig_status_t status, const char* label);
 		// Update miscellaneous status
 		void misc_status(status_t status, const char* label);
 		// Update file status

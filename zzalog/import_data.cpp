@@ -334,6 +334,8 @@ void import_data::update_book() {
 				offset = book_->get_insert_point(import_record);
 				int matched_record_num = 0;
 				number_checked_++;
+				// Need separate checks for SWL report - wait until all records checked to see if one is a 2-way SWL match
+				bool had_swl_match = false;
 				// There may be a slight discrepancy in time so check 2 records either side of this position  
 				// Any more than this is presented to the user to search for possible match
 				// Start at previous record or beginning of the book
@@ -360,6 +362,8 @@ void import_data::update_book() {
 					case MT_EXACT:
 					case MT_LOC_MISMATCH:
 						found_match = true;
+						// MT_2XSWL_MATCH can be reported as MT_EXACT
+						had_swl_match = false;
 						// merge_records the matching record from the import record and delete the import record
 						if (record->merge_records(import_record, update_mode_ == LOTW_UPDATE)) {
 							char message[256];
@@ -379,25 +383,22 @@ void import_data::update_book() {
 						// Accepted - discard this record
 						discard_update(false);
 						break;
+						// 2-way SWL match - ignore it
+					case MT_2XSWL_MATCH:
+						found_match = true;
+						had_swl_match = false;
+						// Rejected - discard this record
+						discard_update(false);
+						break;
 						// No match found - do nothing
 					case MT_NOMATCH:
 					case MT_SWL_NOMATCH:
 						found_match = false;
 						break;
-						// SWL matches band and mode and time - move the import record into log
+						// SWL matches band and mode and time - wait until end of search to add it.
 					case MT_SWL_MATCH:
-						// Insert the record
-						book_->insert_record_at(offset, import_record);
-						// Fetch the e-card from eQSL.cc
-						if (update_mode_ == EQSL_UPDATE) {
-							eqsl_handler_->enqueue_request(offset);
-						}
-						// Remove the record from this book
-						accept_update();
-						is_updated = true;
-						found_match = true;
-						number_updated_++;
-						number_accepted_++;
+						had_swl_match = true;
+						found_match = false;
 						break;
 						// All fields match (time within 30 minutes) - 
 						// can update without query and delete record
@@ -426,6 +427,22 @@ void import_data::update_book() {
 						// Note matching record
 						matched_record_num = test_record;
 					}
+				}
+				if (had_swl_match) {
+					// Insert the record
+					book_->insert_record_at(offset, import_record);
+					// Fetch the e-card from eQSL.cc
+					if (update_mode_ == EQSL_UPDATE) {
+						eqsl_handler_->enqueue_request(offset);
+					}
+					// Remove the record from this book
+					accept_update();
+					is_updated = true;
+					found_match = true;
+					matched_record_num = offset;
+					number_updated_++;
+					number_accepted_++;
+					had_swl_match = false;
 				}
 				// Unexpected new record (update from log) - set flags to display new record - 
 				// user will either accept, reject or search for match

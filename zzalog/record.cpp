@@ -855,6 +855,7 @@ void record::change_field_name(string from, string to) {
 	//MT_LOC_MISMATCH,     // A close match but a location field differs
 	//MT_SWL_MATCH,        // An SWL report that is a close match to existing activity
 	//MT_SWL_NOMATCH       // An SWL report that is no match for any activity
+	//MT_2XSWL_MATCH       // An SWL report matches an existing SWL report
 match_result_t record::match_records(record* record) {
 	// return NOMATCH if no record to compare
 	if (record == nullptr || this == nullptr) {
@@ -945,7 +946,10 @@ match_result_t record::match_records(record* record) {
 		bool is_swl = (item("SWL") == "Y");
 		bool other_swl = (record->item("SWL") == "Y");
 		// is_swl and time within 30 - SWL_MATCH
-		if (is_swl && !other_swl && swl_match && within_30mins) {
+		if (is_swl && other_swl && swl_match && within_30mins) {
+			return MT_2XSWL_MATCH;
+		}
+		else if (is_swl && !other_swl && swl_match && within_30mins) {
 			return MT_SWL_MATCH;
 		}
 		// is_swl - no match

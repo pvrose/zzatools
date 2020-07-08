@@ -76,6 +76,8 @@ namespace zzalib {
 		virtual string error_message() = 0;
 		// Send a raw message
 		virtual string raw_message(string message) = 0;
+		// Get TX mode
+		virtual bool get_tx() = 0;
 
 		// Error Code is not OK.
 		virtual bool is_good() = 0;
@@ -170,6 +172,8 @@ namespace zzalib {
 		virtual string error_message();
 		// Return raw message
 		virtual string raw_message(string message);
+		// Get TX mode
+		virtual bool get_tx();
 
 		// Error Code is not OK.
 		virtual bool is_good();
@@ -225,6 +229,8 @@ namespace zzalib {
 		virtual string error_message();
 		// Return raw message
 		virtual string raw_message(string message);
+		// Get TX mode
+		virtual bool get_tx();
 
 		// Error Code is not OK.
 		virtual bool is_good();

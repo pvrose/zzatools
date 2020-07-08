@@ -28,7 +28,8 @@ namespace zzalog {
 		MT_POSSIBLE,         // call found but something important differs
 		MT_LOC_MISMATCH,     // A close match but a location field differs
 		MT_SWL_MATCH,        // An SWL report that is a close match to existing activity
-		MT_SWL_NOMATCH       // An SWL report that is no match for any activity
+		MT_SWL_NOMATCH,      // An SWL report that is no match for any activity
+		MT_2XSWL_MATCH       // An SWL report matches an existing SWL report
 	};
 
 	// Logging mode - used when initialising a record

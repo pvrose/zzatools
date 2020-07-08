@@ -645,6 +645,14 @@ string rig_hamlib::raw_message(string message) {
 	return "";
 };
 
+// Transmit mode
+bool rig_hamlib::get_tx() {
+	// Get ID of transmit VFO and read its value
+	ptt_t ptt;
+	error_code_ = rig_get_ptt(rig_, RIG_VFO_CURR, &ptt);
+	return (ptt != RIG_PTT_OFF);
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////////////
 //    F l R i g   implementation
@@ -857,5 +865,15 @@ string rig_flrig::raw_message(string message) {
 	else {
 		return "";
 	}
+}
 
+// Get PTT status
+bool rig_flrig::get_tx() {
+	rpc_data_item response;
+	if (do_request("rig.get_ptt", nullptr, &response)) {
+		return response.get_int() != 0;
+	}
+	else {
+		return false;
+	}
 }

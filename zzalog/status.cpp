@@ -235,8 +235,7 @@ void status::cb_bn_rig(Fl_Widget* bn, void* v) {
 	else {
 		// Close the rig
 		rig_if_->close();
-		that->rig_status(ST_WARNING, "Rig closed - assume off-air logging");
-		that->misc_status(ST_WARNING, "RIG: Closing reig connection");
+		that->misc_status(ST_WARNING, "RIG: Closing rig connection");
 		scratchpad_->update();
 	}
 	bn->redraw();
@@ -369,9 +368,9 @@ void status::progress(const char* message, object_t object) {
 }
 
 // Update rig_status - set text and colour
-void status::rig_status(status_t status, const char* label) {
+void status::rig_status(rig_status_t status, const char* label) {
 	// Set the fixed label and tool tip value. Set the text colour to contrast the button colour
-	Fl_Color colour = STATUS_COLOURS.at(status);
+	Fl_Color colour = RIG_STATUS_COLOURS.at(status);
 	rig_status_->copy_label(label);
 	rig_status_->color(colour);
 	rig_status_->labelcolor(fl_contrast(FL_BLACK, colour));
