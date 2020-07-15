@@ -14,7 +14,7 @@ namespace zzalib {
 		BN_SPARE    // Any third and subsequent commands - use BN_SPARE+n
 	};
 
-	// This class is the base class for free-standing dialogs
+	// This class is the base class for free-standing dialogs - it provides a standard way of waiting for the dialog to be closed
 	class win_dialog : public Fl_Window
 	{
 	public:

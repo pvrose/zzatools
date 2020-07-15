@@ -15,7 +15,8 @@ using namespace zzalib;
 
 namespace zzalog {
 
-	// This class provides a window that can be used to paste non-ASCII characters into a specified editor widget.
+	// This class provides a window that can be used to paste non-ASCII characters into the specified editor widget.
+	// The editor widget tells this dialog when it opens.
 	// It comprises a number of buttons each of which copies a character to clipboard and pastes it into
 	// the current input or editor widget.
 	// The available characters for pasting can be added to.

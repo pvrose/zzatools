@@ -135,6 +135,7 @@ bool url_handler::post_url(string url, string resource, istream* req, ostream* r
 	return true;
 }
 
+// Performa an HTTP POST FORM operation 
 bool url_handler::post_form(string url, vector<field_pair> fields, istream* req, ostream* resp) {
 	CURLcode result;
 	// Start a new transfer
@@ -179,9 +180,6 @@ bool url_handler::post_form(string url, vector<field_pair> fields, istream* req,
 	}
 	// Add the form to the post
 	curl_easy_setopt(curl_, CURLOPT_MIMEPOST, form);
-	// Add extra verbosity
-	curl_easy_setopt(curl_, CURLOPT_DEBUGFUNCTION, cb_debug);
-	curl_easy_setopt(curl_, CURLOPT_VERBOSE, 1);
 	/* get it! */
 	result = curl_easy_perform(curl_);
 
@@ -195,6 +193,7 @@ bool url_handler::post_form(string url, vector<field_pair> fields, istream* req,
 	}
 	else {
 		long code;
+		// Check the HTTP response
 		if (curl_easy_getinfo(curl_, CURLINFO_RESPONSE_CODE, &code) == CURLE_OK) {
 			if (code != 200) {
 				return false;
@@ -209,17 +208,21 @@ bool url_handler::post_form(string url, vector<field_pair> fields, istream* req,
 	return true;
 }
 
+// Dump ptr to the file stream
 void url_handler::dump(const char* text,
 	FILE* stream, unsigned char* ptr, size_t size)
 {
 	bool newline = false;
 
+	// Output the name of the data and size (in decimal and hex)
 	fprintf(stream, "%s, %10.10ld bytes (0x%8.8lx)\n",
 		text, (long)size, (long)size);
 
+	// For every data byte
 	for (size_t i = 0; i < size; i++) {
 
 		if (ptr[i] >= 7 && ptr[i] <= 13) {
+			// Convert control characters to escaped 
 			switch (ptr[i]) {
 			case '\a':
 				fputs("\\a", stream);
@@ -249,6 +252,7 @@ void url_handler::dump(const char* text,
 			}
 		}
 		else if (ptr[i] < 32 || ptr[i] > 0x7F) {
+			// Convert other non-printable or non-ASCII characters to hex escaped form
 			if (newline) {
 				fputc('\n', stream);
 				newline = false;
@@ -257,6 +261,7 @@ void url_handler::dump(const char* text,
 
 		}
 		else if (ptr[i] == '\\') {
+			// Convert '\' to '\\'
 			if (newline) {
 				fputc('\n', stream);
 				newline = false;
@@ -264,6 +269,7 @@ void url_handler::dump(const char* text,
 			fputs("\\\\", stream);
 		} else
 		{
+			// Print the ASCII character
 			if (newline) {
 				fputc('\n', stream);
 				newline = false;
@@ -274,12 +280,13 @@ void url_handler::dump(const char* text,
 	fputc('\n', stream);
 }
 
+// Callback to display any debug information
 int url_handler::cb_debug(CURL* handle, curl_infotype type,
 	char* data, size_t size,
 	void* userp)
 {
 	const char* text;
-	(void)handle; /* prevent compiler warning */
+	(void)handle; /* prevent compiler warning that we don't use input parameters*/
 	(void)userp;
 
 	switch (type) {

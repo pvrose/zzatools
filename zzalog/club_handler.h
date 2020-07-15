@@ -13,7 +13,7 @@ namespace zzalog {
 	class club_handler
 	{
 	private:
-		// ClubLog API developers key
+		// ClubLog API developers key for gm3zza@internet.com
 		const char* api_key_ = "ca1445fb25fef92b03c65f2484ef4d77e903e6f4";
 	public:
 		club_handler();

@@ -15,9 +15,6 @@ extern Fl_Preferences* settings_;
 rig_if* rig_if_;
 extern ic7300* ic7300_;
 
-extern void remove_sub_window(Fl_Window* w);
-
-
 ///////////////////////////////////////////////////////////////////////////////////////
 //    B A S E   C L A S S
 //
@@ -64,7 +61,7 @@ bool rig_if::open() {
 	}
 }
 
-// Common functionality on closing rig interface
+// Common functionality on closing rig interface - to be called before the overrides
 void rig_if::close() {
 	// Timeout must be removed before rig connection is closed otherwise it could fire while the connection is closing
 	Fl::remove_timeout(cb_timer_rig);
@@ -120,7 +117,7 @@ string rig_if::rig_info() {
 	return rig_info;
 }
 
-// Return the transmit frequency
+// Return the transmit or receive frequency
 string rig_if::get_frequency(bool tx) {
 	// get settings 
 	Fl_Preferences log_settings(settings_, "Log");
@@ -129,6 +126,7 @@ string rig_if::get_frequency(bool tx) {
 	frequency_t log_format;
 	string format;
 	log_settings.get("Frequency Precision", (int&)log_format, (int)FREQ_Hz);
+	// Read the frequency (in MHz)
 	double frequency;
 	if (tx) {
 		frequency = tx_frequency() / 1000000.0;
@@ -137,6 +135,7 @@ string rig_if::get_frequency(bool tx) {
 		frequency = rx_frequency() / 1000000.0;
 	}
 
+	// Depending on configured precision - get the relevant format
 	switch (log_format) {
 	case FREQ_Hz:
 		format = "%0.6f";
@@ -179,7 +178,7 @@ string rig_if::get_tx_power() {
 	return text;
 }
 
-// Convert the drive-level to a power
+// Convert the drive-level to a power - using lookup table
 double rig_if::power() {
 	double my_drive = drive();
 	double my_freq = tx_frequency();
@@ -262,11 +261,15 @@ void rig_if::get_string_mode(string& mode, string& submode) {
 	}
 }
 
+// Return any success message
 string rig_if::success_message() {
 	return success_message_;
 }
 
-// Set callback
+// Set callbacks - 
+// on_timer - callback on rig timer
+// freq_to_band - callback to convert frequency to band
+// error - callback for outputing error message
 void rig_if::callback(void(*function)(), string(*spec_func)(double), void(*mess_func)(bool, const char*)) {
 	on_timer_ = function;
 	freq_to_band_ = spec_func;
@@ -311,20 +314,20 @@ void rig_if::update_clock() {
 		// Convert date and time to integers. 20200317, 1514
 		int date = (figures->tm_year + 1900) * 10000 + (figures->tm_mon + 1) * 100 + figures->tm_mday;
 		int time = figures->tm_hour * 100 + figures->tm_min;
+		// Generate set date command x1A x05 x00 x94 date in BCD
 		string data = int_to_bcd(date, 4, false);
 		char command = '\x1a';
 		bool ok;
-		// Set date
 		string sub_command = "   ";  
 		sub_command[0] = '\x05';
 		sub_command[1] = '\x00';
 		sub_command[2] = '\x94';
 		ic7300_->send_command(command, sub_command, data, ok);
-		// Set time
+		// Set time - x1A x05 x00 x95 time in BCD
 		data = int_to_bcd(time, 2, false);
 		sub_command[2] = '\x95';
 		ic7300_->send_command(command, sub_command, data, ok);
-		// Set UTC off-set - UTC + 0000
+		// Set UTC off-set - UTC + 0000 - x1A x05 x00 x96 x00 x00 x00 (TZ=UTC)
 		data = int_to_bcd(0, 3, false);
 		sub_command[2] = '\x96';
 		ic7300_->send_command(command, sub_command, data, ok);
@@ -396,7 +399,7 @@ bool rig_hamlib::open() {
 		close();
 	}
 
-	// Read hamlib configuration
+	// Read hamlib configuration - manufacturer,  model, port and baud-rate
 	Fl_Preferences rig_settings(settings_, "Rig");
 	Fl_Preferences hamlib_settings(rig_settings, "Hamlib");
 	Fl_Preferences stations_settings(settings_, "Stations");
@@ -417,9 +420,9 @@ bool rig_hamlib::open() {
 	free(temp);
 	current_settings.get("Baud Rate", baud_rate_, 9600);
 
+	// Search through the rig database until we find the required rig.
 	model_id_ = -1;
 	for (rig_model_t i = 0; i < 4000 && model_id_ == -1; i++) {
-		// Search through the rig database until we find the required rig.
 		// Read each rig's capabilities
 		const rig_caps* capabilities = rig_get_caps(i);
 		try {
@@ -691,7 +694,7 @@ bool rig_flrig::open() {
 	int port_num;
 	// Default is same as hard-coded in Flrig
 	flrig_settings.get("Port", port_num, 12345);
-	// Default resource (hard-coded in flrig
+	// Default resource (hard-coded in flrig)
 	flrig_settings.get("Resource", temp, "/RPC2");
 	string resource = temp;
 	free(temp);
@@ -763,7 +766,7 @@ rig_mode_t rig_flrig::mode() {
 	}
 }
 
-// Return drive level * 100% power
+// Return drive level
 double rig_flrig::drive() {
 	rpc_data_item response;
 	if (do_request("rig.get_power", nullptr, &response)) {

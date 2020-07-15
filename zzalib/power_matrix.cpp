@@ -18,6 +18,7 @@ power_matrix::power_matrix() {
 	re_initialise();
 }
 
+// Re-read settings for the rig
 void power_matrix::re_initialise() {
 	Fl_Preferences stations_settings(settings_, "Stations");
 	Fl_Preferences rigs_settings(stations_settings, "Rigs");
@@ -29,7 +30,7 @@ void power_matrix::re_initialise() {
 	free(rig);
 }
 
-// Constructor - takes rig and intialises the matrix from settings
+// Takes rig and intialises the matrix from settings
 void power_matrix::initialise(string rig)
 {
 	map_.clear();
@@ -171,6 +172,7 @@ double power_matrix::look_up(string band, int drive) {
 			last_drive = it->first;
 			if (last_drive > drive) carry_on = false;
 		}
+		// Reurn the interpolated value
 		return last_power + (slope * (double)(drive - last_drive));
 	}
 	else {

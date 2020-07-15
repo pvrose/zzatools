@@ -41,7 +41,7 @@ namespace zzalib {
 		bool content(string& content);
 		// Returns the number of child elements
 		int count();
-		// Returns child element number i
+		// Returns child element number n
 		xml_element* child(int n);
 		// Returns the parent element
 		xml_element* parent();

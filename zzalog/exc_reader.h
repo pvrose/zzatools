@@ -14,6 +14,7 @@ namespace zzalog {
 	struct exc_entry;
 	struct invalid;
 
+	// This class reads the XML cty.xml file obtained from Clublog
 	class exc_reader :
 		public xml_reader
 	{

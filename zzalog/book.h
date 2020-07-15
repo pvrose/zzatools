@@ -62,10 +62,7 @@ namespace zzalog {
 	// As well as standing alone it is used as a base class for extract_data and import_data
 	class book : public vector<record*>
 	{
-		// public type
-	public:
-
-		// Constructors and destructors
+	// Constructors and destructors
 	public:
 		// default constructor
 		book();

@@ -8,7 +8,7 @@
 using namespace zzalog;
 using namespace zzalib;
 
-// Constructor for the calendat table
+// Constructor for the calendar table
 calendar_table::calendar_table(int X, int Y, int W, int H, tm date) :
 	Fl_Table(X, Y, W, H, nullptr)
 {

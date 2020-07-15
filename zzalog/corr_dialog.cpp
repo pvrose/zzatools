@@ -17,8 +17,6 @@
 using namespace zzalog;
 using namespace zzalib;
 
-//extern spec_data* spec_data_;
-
 // Constuctor - dialog constructor called with place holder size
 corr_dialog::corr_dialog(record* record, const string& field, const string& message) :
 	win_dialog(10, 10, "Correct invalid ADIF item")

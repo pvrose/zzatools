@@ -5,6 +5,8 @@
 
 using namespace std;
 
+// Class to send commands to an IC7300 (and other Icom rigs)
+
 namespace zzalib {
 	class ic7300
 	{
@@ -16,7 +18,8 @@ namespace zzalib {
 		string send_command(unsigned char command, string sub_command, string data, bool& ok);
 
 	protected:
-		bool given_warning;
+		// Flag to prevent multiple warnings
+		bool given_warning_;
 
 	};
 

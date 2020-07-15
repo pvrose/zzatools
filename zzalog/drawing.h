@@ -31,7 +31,7 @@ namespace zzalog {
 		OT_MEMORY            // Memory table (view)
 	};
 
-	// Default colours to use in tab view labels 
+	// Default colours to use in tab view labels and/or progress bar
 	const map<object_t, Fl_Color> OBJECT_COLOURS = {
 		{ OT_NONE, FL_BACKGROUND_COLOR },
 		{ OT_MAIN, FL_GREEN },
@@ -64,6 +64,7 @@ namespace zzalog {
 	};
 
 	// Colour palette used in DxAtlas legend and band plan
+	// TODO: DxAtlas only has a limited palette of colours for drawing
 	const Fl_Color ZLG_PALETTE[] =
 	{ fl_rgb_color(0,0,0),
 	fl_rgb_color(255,255,255),fl_rgb_color(0,255,0),fl_rgb_color(0,0,255),

@@ -43,7 +43,7 @@ namespace zzalib {
 		virtual void create_form(int X, int Y) = 0;
 		// Used to write settings back
 		virtual void save_values() = 0;
-		// Used to enable/disable specific widget - any widgets enabled musr be attributes
+		// Used to enable/disable specific widget - any widgets enabled must be attributes
 		virtual void enable_widgets() = 0;
 
 		// standard creation

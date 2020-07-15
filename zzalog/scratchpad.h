@@ -20,6 +20,7 @@ using namespace std;
 
 namespace zzalog {
 
+	// Version of intl_editor that handles events such as clicking on words
 	class spad_editor :
 		public intl_editor
 	{

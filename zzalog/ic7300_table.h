@@ -17,6 +17,8 @@ namespace zzalog {
 		VT_UNCHANGED
 	};
 
+	// This class provides the table view to display IC-7300 memory contents
+	// TODO: Add cell-edit capability
 	class ic7300_table : public Fl_Table_Row, public view
 	{
 	public:

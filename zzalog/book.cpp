@@ -663,29 +663,37 @@ void book::navigate(navigate_t target) {
 
 // Go to the date specified
 void book::go_date(string date) {
-	// set the bounds of the search
+	// set the bounds of the search - binary split search
 	record_num_t u_bound = size() - 1;
 	record_num_t l_bound = 0;
+	// Continue until a gap of only 1 between upper and lower bounds of the search
 	while (u_bound - l_bound > 1) {
+		// Compare string form of dates
 		string u_date = at(u_bound)->item("QSO_DATE");
 		string l_date = at(l_bound)->item("QSO_DATE");
 		if (u_date < date) {
+			// Date later than last record considered - force loop to end
 			l_bound = u_bound;
 		}
 		else if (l_date > date) {
+			// Date earlier than first record considered - force loop to end
 			u_bound = l_bound;
 		}
 		else {
+			// Now implement binary search - repeatedly halving search range 
 			record_num_t mid_pos = (l_bound + u_bound) / 2;
 			string m_date = at(mid_pos)->item("QSO_DATE");
 			if (m_date > date) {
+				// Date in earlier half
 				u_bound = mid_pos;
 			}
 			else {
+				// Daate in later half
 				l_bound = mid_pos;
 			}
 		}
 	}
+	// Selected the earlier of the two records
 	selection(l_bound);
 }
 
@@ -757,7 +765,7 @@ string book::filename(bool full /*=true*/) {
 	}
 }
 
-// Mark the record saved - 
+// Mark the record saved and update the other views
 void book::save_record() {
 	// Update status bar
 	char text[128];
@@ -810,7 +818,7 @@ void book::save_record() {
 		}
 	}
 
-	// Do not automatically save when in debug mode as there may be a problem
+	// Do not automatically save when in debug mode as there may be a bug in the application corrupting the log
 #ifndef _DEBUG
 	if (save_enabled_ && !read_only_) {
 		store_data();
@@ -982,7 +990,7 @@ bool book::refine_match(record* record) {
 	return true;
 }
 
-// item matching - string
+// string item matches taking whether to use regex or not.
 bool book::match_string(string test, bool is_regex, string value) {
 	if (is_regex) {
 		basic_regex<char> regex(to_upper(test));
@@ -993,7 +1001,7 @@ bool book::match_string(string test, bool is_regex, string value) {
 	}
 }
 
-// item matching - integer
+// tnteger item matching - ignores things like leading zeros and trailing non numeric characters
 bool book::match_int(string test, string value) {
 	try {
 		return (test.length() > 0 && value.length() > 0 && stoi(test) == stoi(value));

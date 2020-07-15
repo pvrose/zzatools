@@ -74,6 +74,7 @@ void rpc_data_item::set(rpc_data_item::rpc_struct* mp) {
 // Destructor
 rpc_data_item::~rpc_data_item()
 {
+	// Destroy compound types
 	switch (type_) {
 	case XRT_ARRAY:
 		// For each element of the array

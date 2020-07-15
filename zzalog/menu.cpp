@@ -799,6 +799,7 @@ void menu::cb_mi_log_mode(Fl_Widget* w, void* v) {
 				break;
 			}
 		}
+		// We can be importing while on-air.
 	case LM_IMPORTED:
 		// Stop importing - and wait for it to finish
 		import_data_->stop_update(next_mode, false);

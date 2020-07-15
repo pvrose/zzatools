@@ -44,7 +44,7 @@ int xml_element::count() {
 	return children_.size();
 }
 
-// Returns a pointer to child lement number i
+// Returns a pointer to child element number i
 xml_element* xml_element::child(int i) {
 	return children_.at(i);
 }

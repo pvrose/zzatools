@@ -436,7 +436,7 @@ bool xml_reader::process_start_tag(istream& is) {
 // Process non-mark-up characters - i.e. between > and next < - white space is preserved
 bool xml_reader::process_chars(istream& is) {
 	string chars = "";
-	// read string until we read an open tag character (oe ROF)
+	// read string until we read an open tag character (or EOF)
 	while (is.peek() != '<' && is.good()) {
 		string escapee;
 		process_escape(is, escapee);

@@ -23,7 +23,7 @@ namespace zzalog {
 	const double EQSL_THROTTLE = 10.0;
 	const char EQSL_TIMEFORMAT[] = "%Y%m%d";
 
-	// This class manages the requirements for uploading and downloading data to eQSL.cc
+	// This class manages the requirements for uploading data to and downloading data from eQSL.cc
 	class eqsl_handler
 	{
 	public:
@@ -33,7 +33,7 @@ namespace zzalog {
 			ER_SKIPPED,    // Request skipped
 			ER_THROTTLED,  // Request throttled by eQSL
 			ER_FAILED,     // Request failed
-			ER_HTML_ERR    // HT
+			ER_HTML_ERR    // HTML error
 		};
 		// Data required to repeat throttled requests
 		struct request_t {

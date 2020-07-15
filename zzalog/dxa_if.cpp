@@ -912,7 +912,7 @@ bool dxa_if::connect_dxatlas() {
 // Disconnect from DXATLAS:
 void dxa_if::disconnect_dxatlas(bool dxatlas_exit) {
 	if (atlas_) {
-		// Note that we may have moved the window without resizing, so won't have had the map changed callback
+		// Read all the data we want to save in settings.
 		DxAtlas::IDxMapPtr map = atlas_->GetMap();
 		atlas_left_ = atlas_->GetLeft();
 		atlas_width_ = atlas_->GetWidth();
@@ -1151,6 +1151,7 @@ bool dxa_if::is_displayed(record_num_t record_num) {
 }
 
 // Convert FLTK colour value to DXATLAS: colour value 
+// TODO: Not all zzalog values are supported
 DxAtlas::EnumColor dxa_if::convert_colour(Fl_Color colour) {
 	unsigned char red;
 	unsigned char blue;
@@ -1459,8 +1460,8 @@ void dxa_if::draw_pins() {
 								use_item = (colour_text == get_distance(record));
 								break;
 							}
+	
 							// Don't use item if disabled
-
 							if (use_item) {
 								if (include_swl_ || record->item("SWL") != "Y") {
 									// Add the colour name to the used list
@@ -1542,7 +1543,7 @@ void dxa_if::draw_pins() {
 				centre_map();
 			}
 
-			// Now deactivate all colour buttons
+			// Set the colours of the buttons to match that of the points on the map - and a paler one for unused colours
 			bool set_pz_colour = false;
 			for (size_t i = 0; i < colour_bns_.size(); i++) {
 				if (colours_used.find(colours_used_[i]) == colours_used.end()) {
@@ -1561,8 +1562,8 @@ void dxa_if::draw_pins() {
 					}
 				}
 			}
+			// Now deactivate all colour buttons
 			for (auto it = colour_bns_.begin(); it != colour_bns_.end(); it++) {
-
 				(*it)->deactivate();
 			}
 			// And activate those buttons used
@@ -1570,6 +1571,7 @@ void dxa_if::draw_pins() {
 				(button_map_.at(*it))->activate();
 			}
 
+			// Report finished
 			status_->misc_status(ST_OK, "DXATLAS: Update done!");
 			if (count != records_to_display_.size()) {
 				char message[100];
@@ -1606,7 +1608,7 @@ void dxa_if::get_colours(bool reset) {
 	create_colour_buttons();
 }
 
-// something has changed in the book - usually record 1 is to be selected, record_2 usage per view
+// something has changed in the book that requires DxAtlas to redraw
 void dxa_if::update(hint_t hint) {
 	switch(hint) {
 	case HT_ALL:
@@ -1700,7 +1702,7 @@ void dxa_if::zoom_centre(lat_long_t centre, bool full) {
 	zoom_value_ = map->GetZoom();
 }
 
-
+// Centre the map according to the settings
 void dxa_if::centre_map() {
 	lat_long_t centre;
 	double save_n;
@@ -1709,26 +1711,31 @@ void dxa_if::centre_map() {
 	double save_e;
 	switch (centre_mode_) {
 	case HOME:
+		// Centre on the home location
 		centre = { (double)home_lat_, (double)home_long_ };
 		centre_map(centre);
 		zoom_centre(centre, false);
 		break;
 	case SELECTED:
+		// Centre on the selected record
 		centre = selected_locn_;
 		centre_map(centre);
 		zoom_centre(centre, false);
 		break;
 	case GROUP:
+		// Centre so that the group is displayed evenly
 		centre = { (northernmost_ + southernmost_) * 0.5, (westernmost_ + easternmost_) * 0.5 };
 		centre_map(centre);
 		zoom_centre(centre, false);
 		break;
 	case ZERO:
+		// Centre at 0 N 0 W
 		centre = { 0.0, 0.0 };
 		centre_map(centre);
 		zoom_centre(centre, true);
 		break;
 	default:
+		// Display an entire continent
 		save_n = northernmost_;
 		save_s = southernmost_;
 		save_w = westernmost_;
@@ -1790,6 +1797,7 @@ void dxa_if::centre_map() {
 	save_values();
 }
 
+// Change the text on the dialog depending on the colour-by selection
 void dxa_if::label_colour_grp() {
 	switch (atlas_colour_) {
 	case AC_NONE:

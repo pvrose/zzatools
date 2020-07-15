@@ -11,6 +11,7 @@ namespace zzalib {
 	// This class provides a container for the power matrix for a specific rig
 	// and the calculations necessary to interpolate power from drive
 
+	// Set of coordinates to convert drive level to power (look-up table)
 	typedef map<int, double> power_lut;
 
 	class power_matrix
@@ -40,7 +41,7 @@ namespace zzalib {
 		bool delete_band(string band);
 
 	protected:
-		// The map
+		// The map of rig name to look-up table
 		map<string, power_lut* > map_;
 		// Current rig
 		string rig_;

@@ -20,8 +20,8 @@ namespace zzalog {
 	// validation status for each check
 	enum error_t {
 		VE_OK,                         // No problem
-		VE_TYPE_UNKnowN,               // Datatype or enumeration type not known
-		VE_FIELD_UNKnowN,              // Field name is not known
+		VE_TYPE_UNKNOWN,               // Datatype or enumeration type not known
+		VE_FIELD_UNKNOWN,              // Field name is not known
 		VE_FIELD_INPUT_ONLY,           // Field is import only - to be modified
 		VE_FIELD_UNSUPPORTED,          // Field cannot yet be validated
 		VE_VALUE_INPUT_ONLY,           // value is Import Only - to be modified

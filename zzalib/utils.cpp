@@ -297,13 +297,13 @@ bool zzalib::is_leap(tm* date) {
 Fl_Window* zzalib::tip_window(const string& tip, int x_root, int y_root) {
 	// get the size of the text, set the font, default width
 	fl_font(Fl_Tooltip::font(), Fl_Tooltip::size());
-	int width = TIP_WIDTH;
+	int width = Fl_Tooltip::wrap_width();
 	int height = 0;
 	// Now get the actual width and height
 	fl_measure(tip.c_str(), width, height, 0);
-	// adjust sizes to allow for border and margins - 4 seems to work.
-	width += 4;
-	height += 4;
+	// adjust sizes to allow for margins - use Fl_Tooltip margins.
+	width += (2 * Fl_Tooltip::margin_width());
+	height += (2 * Fl_Tooltip::margin_height());
 	// Create the window
 	Fl_Window* win = new Fl_Window(x_root, y_root, width, height, 0);
 	win->clear_border();
@@ -398,7 +398,7 @@ size_t zzalib::find_substr(const char* data, size_t length, const char* match, s
 }
 
 // Search for any characters not in match (assume its zero-terminated)
-size_t find_not(const char* data, size_t length, const char* match) {
+size_t zzalib::find_not(const char* data, size_t length, const char* match) {
 	size_t pos = 0;
 	bool matches = true;
 	// Compare each char in data with each char in find
@@ -694,8 +694,8 @@ string zzalib::to_ascii(string data) {
 	}
 	return result;
 }
-// Decode single character
 
+// Decode single character
 string zzalib::to_hex(unsigned char data, bool add_space /* = true */) {
 	const char lookup[] = "0123456789ABCDEF";
 	string result = "";
@@ -802,6 +802,7 @@ double zzalib::bcd_to_double(string bcd, int decimals, bool least_first) {
 	return result;
 }
 
+// Convert string to hex
 string zzalib::string_to_hex(string data, bool escape /*=true*/) {
 	string result;
 	char hex_chars[] = "0123456789ABCDEF";
@@ -817,6 +818,7 @@ string zzalib::string_to_hex(string data, bool escape /*=true*/) {
 	return result;
 }
 
+// Convert hex representation to string
 string zzalib::hex_to_string(string data) {
 	string result;
 	int ix = 0;

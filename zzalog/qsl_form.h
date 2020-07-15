@@ -14,8 +14,9 @@
 using namespace std;
 using namespace zzalib;
 
-// mm to points conversion
+// mm to points conversion: 1" = 72pt = 24.4 mm
 const float MM_TO_POINT = 72.0f / 25.4f;
+// inch to points - 1" = 72 pt
 const float IN_TO_POINT = 72.0f;
 
 namespace zzalog {

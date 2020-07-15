@@ -5,6 +5,7 @@
 #include <set>
 #include <string>
 
+// This code is very windows specific
 #include <Windows.h>
 #include <fileapi.h>
 
@@ -12,6 +13,7 @@ using namespace std;
 
 namespace zzalib {
 
+	// This class provides read/write access to a COM serial port
 	class serial
 	{
 	public:

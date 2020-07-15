@@ -11,7 +11,8 @@ using namespace std;
 
 namespace zzalog {
 	// This class is a container of records that have been extracted from the main log. This inheritance provides
-	// additional features required for this
+	// additional features required for this. As only pointers to the records are kept in the main log, this log
+	// contains pointers to these records and not copies of the records themselves.
 	class extract_data :
 		public book
 

@@ -63,7 +63,7 @@ namespace zzalib {
 
 		// Returns the data type
 		rpc_data_t type();
-		// Get the data as specific type - returms true/false if is thattype
+		// Get the data as specific type - returms true if is the correct type
 		bool get(int& i);
 		bool get(string& s);
 		bool get(double& d);
@@ -77,8 +77,9 @@ namespace zzalib {
 		rpc_struct* get_struct();
 		// Convert the item to a textual format
 		string print_item();
-		// Set the data as specific type
+		// Set the data as int or bool
 		void set(int i, rpc_data_t Type);
+		// Set the data as a string or byte encoded string or a date/time
 		void set(string s, rpc_data_t Type);
 		void set(double d);
 		void set(rpc_array* ap);

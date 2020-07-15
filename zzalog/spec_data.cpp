@@ -1269,7 +1269,7 @@ error_t spec_data::check_datatype(const string&  data, const string&  field, con
 					}
 					default:
 						// Data type indicator not understood
-						return VE_TYPE_UNKnowN;
+						return VE_TYPE_UNKNOWN;
 					}
 				}
 				// next the most likely no-indicator fields
@@ -1347,7 +1347,7 @@ error_t spec_data::check_datatype(const string&  data, const string&  field, con
 				}
 				else {
 					// Data type not recognised by the above code
-					return VE_TYPE_UNKnowN;
+					return VE_TYPE_UNKNOWN;
 				}
 			}
 			else {
@@ -1378,7 +1378,7 @@ error_t spec_data::check_datatype(const string&  data, const string&  field, con
 		}
 		else {
 			// Data type not recognised in the ADIF spec.
-			return VE_TYPE_UNKnowN;
+			return VE_TYPE_UNKNOWN;
 		}
 	}
 }
@@ -1436,7 +1436,7 @@ bool spec_data::validate(const string& field, const string& data, bool inhibit_r
 	}
 	else {
 		// The field name is not valid - either as ADIF, USER or APP specified field name
-		error = VE_FIELD_UNKnowN;
+		error = VE_FIELD_UNKNOWN;
 	}
 	if (error != VE_OK) {
 		// Handle the error as per the settings
@@ -1494,7 +1494,7 @@ void spec_data::report_error(error_t error_code, const string&  data, const stri
 	string incompat_field;
 	// Get field information for some reports - only if it's a valid field
 	map<string, string>* field_info = nullptr;
-	if (error_code != VE_FIELD_UNKnowN) {
+	if (error_code != VE_FIELD_UNKNOWN) {
 		field_info = dataset("Fields")->data.at(field);
 	}
 	string output_line = "VALIDATE: ";
@@ -1509,12 +1509,12 @@ void spec_data::report_error(error_t error_code, const string&  data, const stri
 		output_line += "OK!";
 		error_level = ST_OK;
 		break;
-	case VE_TYPE_UNKnowN:
+	case VE_TYPE_UNKNOWN:
 		// Unknown data type
 		output_line += "Data Type " + datatype + " is not valid.";
 		error_level = ST_ERROR;
 		break;
-	case VE_FIELD_UNKnowN:
+	case VE_FIELD_UNKNOWN:
 		// Unknown field name
 		output_line += "Not a valid ADIF field.";
 		error_level = ST_ERROR;
@@ -1638,8 +1638,8 @@ bool spec_data::auto_correction(error_t error_code, const string&  data, const s
 		correction_message_ = "";
 		return false;
 		break;
-	case VE_TYPE_UNKnowN:
-	case VE_FIELD_UNKnowN:
+	case VE_TYPE_UNKNOWN:
+	case VE_FIELD_UNKNOWN:
 		// Not correctable
 		return false;
 		break;

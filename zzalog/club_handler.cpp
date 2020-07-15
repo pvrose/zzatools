@@ -19,7 +19,9 @@ extern url_handler* url_handler_;
 extern Fl_Preferences* settings_;
 extern status* status_;
 
+// Constructor 
 club_handler::club_handler() {
+	// Create the URL handler if it hasn't already been done
 	if (!url_handler_) url_handler_ = new url_handler;
 	help_dialog_ = nullptr;
 }
@@ -34,7 +36,7 @@ bool club_handler::upload_log(book* book) {
 	if (book->size()) {
 		fl_cursor(FL_CURSOR_WAIT);
 		status_->misc_status(ST_NOTE, "CLUBLOG: Starting upload");
-		// Get the book data
+		// Get the book data and write it to the stream
 		stringstream ss;
 		adi_writer* writer = new adi_writer;
 		set<string> adif_fields;
@@ -42,7 +44,7 @@ bool club_handler::upload_log(book* book) {
 		writer->store_book(book, ss, &adif_fields);
 		// Get back to start of stream
 		ss.seekg(ss.beg);
-		// Get the parameters
+		// Get the parameters and make available for the HTTP POST FORM
 		vector<url_handler::field_pair> fields;
 		generate_form(fields);
 		stringstream resp;
@@ -56,6 +58,7 @@ bool club_handler::upload_log(book* book) {
 			ok = false;
 		}
 		else {
+			// Update all records sent with the fact that they have been uploaded and when
 			status_->misc_status(ST_OK, "CLUBLOG: Upload successful");
 			ok = true;
 			string today = now(false, "%Y%m%d");
@@ -126,6 +129,7 @@ void club_handler::generate_adif(set < string > &adif_fields) {
 	adif_fields.insert("NOTES");
 	adif_fields.insert("GRIDSQUARE");
 }
+
 // Download the exception file
 bool club_handler::download_exception() {
 	// Start downloading exception file

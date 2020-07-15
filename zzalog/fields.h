@@ -12,9 +12,9 @@ namespace zzalog {
 
 	// Column info 
 	struct field_info_t {
-		string field;
-		string header;
-		unsigned int width;
+		string field;			// Field name
+		string header;			// Text used for column headers in log table views
+		unsigned int width;		// Column width in log table views
 
 		field_info_t::field_info_t() :
 			field(""),
@@ -43,19 +43,19 @@ namespace zzalog {
 	// Default columns to use in log_form and record_form
 	const field_info_t DEFAULT_FIELDS[] = {
 		{ "QSO_DATE", "Date", 62 },
-	{ "TIME_ON", "Start", 50 },
-	{ "TIME_OFF", "End", 50 },
-	{ "FREQ", "QRG", 65 },
-	{ "BAND", "Band", 45 },
-	{ "MODE", "Mode", 50 },
-	{ "CALL", "Callsign", 100 },
-	{ "RST_SENT", "Sent", 40 },
-	{ "RST_RCVD", "Rcvd", 50 },
-	{ "TX_PWR", "Pwr", 35 },
-	{ "NAME", "Name", 65 },
-	{ "QTH", "QTH", 150 },
-	{ "GRIDSQUARE", "Loc", 62 },
-	{ "", "", 0 }
+		{ "TIME_ON", "Start", 50 },
+		{ "TIME_OFF", "End", 50 },
+		{ "FREQ", "QRG", 65 },
+		{ "BAND", "Band", 45 },
+		{ "MODE", "Mode", 50 },
+		{ "CALL", "Callsign", 100 },
+		{ "RST_SENT", "Sent", 40 },
+		{ "RST_RCVD", "Rcvd", 50 },
+		{ "TX_PWR", "Pwr", 35 },
+		{ "NAME", "Name", 65 },
+		{ "QTH", "QTH", 150 },
+		{ "GRIDSQUARE", "Loc", 62 },
+		{ "", "", 0 }
 	};
 
 }

@@ -75,17 +75,19 @@ edit_dialog::edit_dialog(int X, int Y, int W, int H) :
 	edit_input* ip = new edit_input(0, 0, W, H);
 	ip->textfont(FONT);
 	ip->textsize(FONT_SIZE);
+	ip->box(FL_DOWN_BOX);
 	ip->callback(cb_value<edit_input, string>, &value_);
 	ip->when(FL_WHEN_CHANGED);
 	ip_ = ip;
-	// Menu button - popup menu on L and R buttons - place it coterminous with the input box
+	// Menu button - popup menu on R buttons - place it coterminous with the input box
 	Fl_Menu_Button* mb = new Fl_Menu_Button(0, 0, W, H, "Edit");
+	// Popup means the button isn't drawn, but it is clickable
 	mb->type(Fl_Menu_Button::POPUP3);
 	mb->textsize(FONT_SIZE);
-	mb->box(FL_DOWN_BOX);
+	mb->box(FL_NO_BOX);
 	mb->add("&UPPER", 0, cb_menu, (void*)UPPER);
 	mb->add("&lower", 0, cb_menu, (void*)LOWER);
-	mb->add("Mi&xed", 0, cb_menu, (void*)MIXED);
+	mb->add("&Mixed", 0, cb_menu, (void*)MIXED);
 	// OK button
 	Fl_Button* bn_ok = new Fl_Button(W, 0, H, H);
 	bn_ok->color(FL_GREEN);

@@ -13,7 +13,7 @@ using namespace std;
 
 namespace zzalib {
 
-	// This class uses the Curl API to read and post to URLs
+	// This class uses the libcurl API to read and post to URLs
 	class url_handler
 	{
 	public:
@@ -27,7 +27,7 @@ namespace zzalib {
 			string type;
 		};
 
-		// curl callback to write data received to the output stream
+		// curl callback to write data received from curl to the output stream
 		static size_t cb_write(char* data, size_t size, size_t nmemb, void* userp);
 		// curl callback to read data from the input stream and forward it to curl
 		static size_t cb_read(char* data, size_t size, size_t nmemb, void* userp);
@@ -39,7 +39,9 @@ namespace zzalib {
 		bool post_form(string url, vector<field_pair> fields, istream* req, ostream* resp);
 
 	protected:
+		// Output the associated data to the stream for debugging purposes
 		static void dump(const char* text, FILE* stream, unsigned char* ptr, size_t size);
+		// Callback to print debug messages from curl
 		static int cb_debug(CURL* handle, curl_infotype type, char* data, size_t size, void* userp);
 
 

@@ -18,7 +18,7 @@ win_dialog::~win_dialog()
 	clear();
 }
 
-// Show the dialog and wait for OK or Cancel to be clicked
+// Show the dialog and wait for OK or Cancel (or any bespoke buttons) to be clicked
 button_t win_dialog::display() {
 	pending_button_ = true;
 	show();

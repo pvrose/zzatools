@@ -145,7 +145,7 @@ namespace zzalib {
 
 	// THis class implements the hamlib specific methods of the base class
 	// Hamlib is an standardised API on top of the divers implementations of rig CATs
-	// It only allows one client application.
+	// As it connects directly to the COM port, it only allows one client application.
 	class rig_hamlib : public rig_if
 	{
 	public:
@@ -199,8 +199,8 @@ namespace zzalib {
 	};
 
 	// This class is the flrig specific implementation of the base class.
-	// flrig is an applicatiion that provides an XML-RPI server interface over HTTP.
-	// It allows multiple client accesses.
+	// flrig is an application that provides an XML-RPI server interface over HTTP,
+	// so that it allows multiple applications to share the COM interface to the rig
 	class rig_flrig :
 		public rig_if
 
@@ -209,7 +209,7 @@ namespace zzalib {
 		rig_flrig();
 		virtual ~rig_flrig();
 
-		// Opens the COM port associated with the rig
+		// Opens the connection to flrig
 		virtual bool open();
 		// Return rig name
 		virtual string& rig_name();

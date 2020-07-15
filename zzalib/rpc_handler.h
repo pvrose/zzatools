@@ -12,11 +12,11 @@
 
 namespace zzalib {
 	// 
-	// RPC date time format
+	// RPC date time format - YYYYMMDDTHH:MM:SS
 	const basic_regex<char> REGEX_RPC_DATETIME("[0-9]*8T[0123][0-9]:[0-5][0-9]:[0-5][0-9]");
 
 
-	// This class acts as both a server or a client for  the XML-RPC interfcae.
+	// This class acts as both a server or a client for the XML-RPC interfcae.
 	class rpc_handler
 	{
 	public:

@@ -27,8 +27,6 @@ extern Fl_Single_Window* main_window_;
 extern menu* menu_;
 extern toolbar* toolbar_;
 extern status* status_;
-//extern void add_sub_window(Fl_Window* w);
-//extern void remove_sub_window(Fl_Window* w);
 
 // constructor - passes parameters  to the two base classes
 log_table::log_table(int X, int Y, int W, int H, const char* label, field_ordering_t app) :
@@ -483,6 +481,7 @@ void log_table::edit_cell(int row, int col) {
 	//remove_sub_window(edit_dialog_);
 	Fl::delete_widget(edit_dialog_);
 	edit_dialog_ = nullptr;
+	// If the dialog was close with a (shift) tab, up or down key - open a new edit on the adjacent cell
 	switch (action) {
 	case BN_SPARE:
 		// Save and edit next - open new edit
