@@ -5,6 +5,7 @@
 #include "book.h"
 #include "view.h"
 #include "fields.h"
+#include "edit_input.h"
 
 #include <string>
 #include <vector>
@@ -34,6 +35,9 @@ namespace zzalog {
 		// inherited from Fl_Widget
 		virtual int handle(int event);
 
+		// Get the edit_input to pass save events
+		void edit_save(edit_input::edit_exit_t exit_type);
+
 		// Returns the name and attributes of the fields currently being displayed
 		vector<field_info_t>& fields();
 
@@ -41,12 +45,16 @@ namespace zzalog {
 	protected:
 		// Call back to handle click on the table
 		static void cb_tab_log(Fl_Widget* w, void* v);
+		// Call back to handle edit input
+		static void cb_input(Fl_Widget* w, void* v);
 		// structute to support above callback
 
 		// Read fields
 		void get_fields();
 		// Open an editor and change fields
 		void edit_cell(int R, int C);
+		// Finish edit
+		void done_edit();
 		// Open a tooltip to describe the cells content
 		void describe_cell(int item, int C);
 		// Handle a double click on the column header
@@ -82,9 +90,11 @@ namespace zzalog {
 		enum {FIRST_TO_LAST, LAST_TO_FIRST, SORTED_UP, SORTED_DOWN} order_;
 		// Field on which sort was done
 		string sorted_field_;
-		// The edit window
-		Fl_Window* edit_dialog_;
-
+		// The edit input
+		edit_input* edit_input_;
+		// Edit row
+		unsigned int edit_row_;
+		unsigned int edit_col_;
 	};
 
 }

@@ -57,7 +57,7 @@ namespace zzalog {
 		// return the real record number
 		virtual record_num_t record_number(record_num_t item);
 		// return the virtual record number
-		virtual record_num_t item_number(record_num_t record);
+		virtual record_num_t item_number(record_num_t record, bool nearest = false);
 		// Change the selected record (& update any necessary controls)
 		virtual void selection(record_num_t num_record, hint_t hint = HT_SELECTED, view* requester = nullptr, record_num_t num_other = 0);
 

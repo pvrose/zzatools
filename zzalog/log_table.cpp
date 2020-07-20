@@ -4,7 +4,8 @@
 #include "spec_data.h"
 #include "../zzalib/utils.h"
 #include "../zzalib/callback.h"
-#include "edit_dialog.h"
+#include "intl_widgets.h"
+#include "intl_dialog.h"
 #include "fields.h"
 #include "menu.h"
 #include "toolbar.h"
@@ -27,6 +28,7 @@ extern Fl_Single_Window* main_window_;
 extern menu* menu_;
 extern toolbar* toolbar_;
 extern status* status_;
+extern intl_dialog* intl_dialog_;
 
 // constructor - passes parameters  to the two base classes
 log_table::log_table(int X, int Y, int W, int H, const char* label, field_ordering_t app) :
@@ -43,7 +45,17 @@ log_table::log_table(int X, int Y, int W, int H, const char* label, field_orderi
 	application_ = FO_MAINLOG;
 	rows_per_page_ = 0;
 	order_ = FIRST_TO_LAST;
-	edit_dialog_ = nullptr;
+	begin();
+	// Create cell input widget, zero size, hide it
+	edit_input_ = new edit_input(x() + w() / 2, y() + h() / 2, 100, 20);
+	edit_input_->box(FL_DOWN_BOX);
+	edit_input_->hide();
+	edit_input_->callback(cb_input, nullptr);
+	edit_input_->when(FL_WHEN_ENTER_KEY_ALWAYS);
+	edit_input_->textfont(FONT);
+	edit_input_->textsize(FONT_SIZE);
+	add(edit_input_);
+	end();
 	alt_gr_ = false;
 
 	// Set the various fixed attributes of the table
@@ -85,7 +97,6 @@ log_table::~log_table()
 	// Remove data items
 	fields_.clear();
 	clear();
-	delete edit_dialog_;
 }
 
 // callback - called when mouse button is released but also at other times. The handle method
@@ -100,35 +111,36 @@ void log_table::cb_tab_log(Fl_Widget* w, void* v) {
 	case Fl_Table::CONTEXT_CELL:
 		// Confirm that it is the button being released
 		// tell all views that selection has changed
-		if (that->last_event_ == FL_PUSH) {
+		switch (Fl::event()) {
+		case FL_RELEASE:
 			// Select the row clicked
 			that->my_book_->selection(item_num, HT_SELECTED, that);
 			switch (that->last_button_) {
 			case FL_LEFT_MOUSE:
-				// Delete an existing edit cell
-				if (that->edit_dialog_) {
-					// Remove the dialog after asking it to quit
-					((edit_dialog*)that->edit_dialog_)->do_button(BN_CANCEL);
-				}
+				that->done_edit();
 				// Left button - double click edit cell
-				if (that->last_clicks_) {
+				if (Fl::event_clicks()) {
 					that->edit_cell(row, col);
 				}
 				break;
 			case FL_RIGHT_MOUSE:
 				// Right button - display tooltip explaining the field
+				that->done_edit();
 				that->describe_cell(row, col);
 				break;
 			}
+			break;
 		}
 		break;
 	case Fl_Table::CONTEXT_COL_HEADER:
+		that->done_edit();
 		if (that->last_event_ == FL_PUSH && that->last_button_ == FL_LEFT_MOUSE && that->last_clicks_) {
 			// Left button double click on column header
 			that->dbl_click_column(col);
 		}
 		break;
 	case Fl_Table::CONTEXT_RC_RESIZE:
+		that->done_edit();
 		if (that->last_event_ == FL_DRAG && that->last_button_ == FL_LEFT_MOUSE && that->is_interactive_resize()) {
 			// A row or column has been resized
 			that->drag_column(col);
@@ -137,6 +149,67 @@ void log_table::cb_tab_log(Fl_Widget* w, void* v) {
 	}
 }
 
+void log_table::cb_input(Fl_Widget* w, void* v) {
+	log_table* that = ancestor_view<log_table>(w);
+	that->done_edit();
+}
+
+void log_table::edit_save(edit_input::edit_exit_t exit_type) {
+	// Deselect row being edited
+	select_row(edit_row_, 0);
+	switch (exit_type) {
+	case edit_input::edit_exit_t::SAVE_PREV:
+		// Save and edit previous column
+		done_edit();
+		if (edit_col_ > 0) {
+			edit_cell(edit_row_, --edit_col_);
+		}
+		else {
+			status_->misc_status(ST_WARNING, "LOG: There is no cell to the left to edit.");
+		}
+		break;
+	case edit_input::edit_exit_t::SAVE_NEXT:
+		// Save and edit next column
+		done_edit();
+		if (edit_col_ < fields_.size() - 1) {
+			edit_cell(edit_row_, ++edit_col_);
+		}
+		else {
+			status_->misc_status(ST_WARNING, "LOG: There is no cell to the right to edit.");
+		}
+		break;
+	case edit_input::edit_exit_t::SAVE_UP:
+		// Save and edit same column in previous record
+		done_edit();
+		if (edit_row_ > 0) {
+			edit_cell(--edit_row_, edit_col_);
+		}
+		else {
+			status_->misc_status(ST_WARNING, "LOG: There is no cell upwards to edit.");
+		}
+		break;
+	case edit_input::edit_exit_t::SAVE_DOWN:
+		// Save and edit smae column in next record
+		done_edit();
+		if (edit_row_ < my_book_->size() - 1) {
+			edit_cell(++edit_row_, edit_col_);
+		}
+		else {
+			status_->misc_status(ST_WARNING, "LOG: There is no cell downwards to edit.");
+		}
+		break;
+	}
+	// Select new row to edit
+	select_row(edit_row_, 1);
+	// get the visible rows - and move the current row to the top if it is outwith them
+	// note this assumes the top and bottom rows may be partially hidden
+	int r1 = 0, r2 = 0, c1 = 0, c2 = 0;
+	visible_cells(r1, r2, c1, c2);
+	if ((unsigned)r1 >= edit_row_ || (unsigned)r2 <= edit_row_) {
+		top_row(edit_row_);
+	}
+
+}
 // event handler - remember the event and call widget's handle
 int log_table::handle(int event) {
 	last_event_ = event;
@@ -169,6 +242,12 @@ int log_table::handle(int event) {
 	}
 	switch (event) {
 	case FL_FOCUS:
+		// Mouse coming into focus 
+		if (edit_input_->visible()) {
+			// restore focus to edit input and reject focus oursleves
+			edit_input_->take_focus();
+		}
+		return true;
 	case FL_UNFOCUS:
 		// mouse going in and out of focus on this view
 		// tell FLTK we've acknowledged it so we can receive keyboard events (or not)
@@ -336,8 +415,13 @@ void log_table::draw_cell(TableContext context, int R, int C, int X, int Y, int 
 
 	case CONTEXT_CELL:
 		// Get content from record R, field given by fields[C]
+		// Don't draw the cell under the Fl_INput
+		if (edit_input_->visible() && R == edit_row_ && C == edit_col_) {
+			return;
+		}
 		// Note we may be redrawing before we've updated the number of rows
-		if ((size_t)R < my_book_->size()) {
+		if ((size_t)R < my_book_->size() &&
+			!(edit_input_->visible() && R == edit_row_ && C == edit_col_)) {
 			fl_push_clip(X, Y, W, H);
 			{
 				// BG COLOR - fill the cell with a colour
@@ -360,6 +444,13 @@ void log_table::draw_cell(TableContext context, int R, int C, int X, int Y, int 
 			fl_pop_clip();
 		}
 		return;
+		
+	case CONTEXT_RC_RESIZE:
+		if (edit_input_->visible()) {
+			find_cell(CONTEXT_TABLE, edit_row_, edit_col_, X, Y, W, H);
+			edit_input_->resize(X, Y, W, H);
+			init_sizes();
+		}
 	}
 }
 
@@ -419,24 +510,35 @@ void log_table::edit_cell(int row, int col) {
 	record* record = my_book_->get_record(item_number, true);
 	field_info_t field_info = fields_[col];
 	string text = record->item(field_info.field, true);
+	intl_input* input = (intl_input*)edit_input_;
+	edit_row_ = row;
+	edit_col_ = col;
+//	set_selection(row, col, row, col);
 	// Get cell location
 	int X, Y, W, H;
 	find_cell(CONTEXT_CELL, row, col, X, Y, W, H);
 	// Open edit dialog - on top of cell
-	edit_dialog_ = new edit_dialog(main_window_->x_root() + X, main_window_->y_root() + Y, W, H);
-	//add_sub_window(edit_dialog_);
-	// Get the dialog action
-	button_t action = ((edit_dialog*)edit_dialog_)->display(text);
-	switch (action) {
-	case BN_OK:
-	case BN_SPARE:
-	case BN_SPARE + 1:
-	case BN_SPARE + 2:
-	case BN_SPARE + 3:
-		// Save, Save and edit previous, Save and edit next - implement the save
-		text = ((edit_dialog*)edit_dialog_)->value();
-		string old_text = record->item(fields_[col].field);
-		record->item(field_info.field, text, true);
+	input->resize(X, Y, W, H);				// Move Fl_Input widget there
+	input->value(text.c_str());
+	input->position(0, text.length());			// Select entire input field
+	input->show();					// Show the input widget, now that we've positioned it
+	input->take_focus();
+	input->redraw();
+//	if (intl_dialog_) intl_dialog_->editor(edit_input_);
+	damage(FL_DAMAGE_ALL, X, Y, W, H);
+	redraw();
+}
+
+// Save the edit
+void log_table::done_edit() {
+	if (edit_input_->visible()) {
+		// Get the record and field
+		record_num_t item_number = (order_ == LAST_TO_FIRST) ? my_book_->size() - 1 - edit_row_ : edit_row_;
+		record* record = my_book_->get_record(item_number, true);
+		field_info_t field_info = fields_[edit_col_];
+		string old_text = record->item(fields_[edit_col_].field);
+		string text = ((intl_input*)edit_input_)->value();
+		record->item(field_info.field, text);
 		switch (my_book_->book_type()) {
 		case OT_MAIN:
 		case OT_EXTRACT:
@@ -452,13 +554,13 @@ void log_table::edit_cell(int row, int col) {
 				menu_->update_items();
 			}
 			// Update all views with the change
-			if (fields_[col].field == "GRIDSQUARE" || fields_[col].field == "DXCC") {
+			if (fields_[edit_col_].field == "GRIDSQUARE" || fields_[edit_col_].field == "DXCC") {
 				book_->selection(my_book_->record_number(item_number), HT_CHANGED);
 			}
 			else {
 				book_->selection(my_book_->record_number(item_number), HT_MINOR_CHANGE);
 			}
-			if (fields_[col].field == "CALL") {
+			if (fields_[edit_col_].field == "CALL") {
 				toolbar_->search_text(my_book_->record_number(item_number));
 			}
 			char message[200];
@@ -466,7 +568,7 @@ void log_table::edit_cell(int row, int col) {
 				record->item("QSO_DATE").c_str(),
 				record->item("TIME_ON").c_str(),
 				record->item("CALL").c_str(),
-				fields_[col].field.c_str(),
+				fields_[edit_col_].field.c_str(),
 				old_text.c_str(),
 				text.c_str());
 			status_->misc_status(ST_LOG, message);
@@ -474,45 +576,9 @@ void log_table::edit_cell(int row, int col) {
 		case OT_IMPORT:
 			// Otherwise just redraw this log
 			redraw();
+			break;
 		}
-		break;
-	}
-	// Remove the dialog
-	//remove_sub_window(edit_dialog_);
-	Fl::delete_widget(edit_dialog_);
-	edit_dialog_ = nullptr;
-	// If the dialog was close with a (shift) tab, up or down key - open a new edit on the adjacent cell
-	switch (action) {
-	case BN_SPARE:
-		// Save and edit next - open new edit
-		if ((unsigned)col < fields_.size() - 1) {
-			// Only step forward if there is a column to step to
-			edit_cell(row, col + 1);
-		}
-		break;
-	case BN_SPARE + 1:
-		// Save and edit previous - open new edit
-		if (col > 0) {
-			// Only step back if there is a column to step into.
-			edit_cell(row, col - 1);
-		}
-		break;
-	case BN_SPARE + 2:
-		// Save and edit previous record - open new edit
-		if (row > 0) {
-			// Only step back if there is a row to step into.
-			book_->navigate(NV_PREV);
-			edit_cell(row - 1, col);
-		}
-		break;
-	case BN_SPARE + 3:
-		// Save and edit next record - open new edit
-		if ((unsigned)row < my_book_->size() - 1) {
-			// Only step forward if there is a row to step into.
-			book_->navigate(NV_NEXT);
-			edit_cell(row + 1, col);
-		}
-		break;
+		edit_input_->hide();
 	}
 }
 

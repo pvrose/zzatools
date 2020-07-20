@@ -190,11 +190,53 @@ inline record_num_t extract_data::record_number(record_num_t item_number) {
 }
 
 // Convert record index in the main log book to the index in this book
-inline record_num_t extract_data::item_number(record_num_t item_number) {
+inline record_num_t extract_data::item_number(record_num_t record_number, bool nearest /*=false*/) {
 	// Return the mapping item from main book  to this book
-	if (size() > 0)
-	return rev_mapping_[item_number];
-	else return -1;
+	if (size() == 0) {
+		if (nearest) {
+			// Nearest is first item
+			return 0;
+		}
+		else {
+			// Default
+			return -1;
+		}
+	}
+	else {
+		record_num_t item_num = rev_mapping_[record_number];
+		if (nearest && record_number != mapping_[item_num]) {
+			// Need to find nearest mapping
+			// Binary search
+			record_num_t lbound = 0;
+			record_num_t ubound = mapping_.size() - 1;
+			if (mapping_[lbound] > record_number) {
+				return 0;
+			}
+			if (mapping_[ubound] < record_number) {
+				return ubound;
+			}
+			// Binary slice the array until found
+			// Keep comparing the record number between upper bound and lower bound
+			// until the gap between them is nil. then put it there.
+			record_num_t test;
+			while (ubound - 1 != lbound) {
+				// Compare with the half-way point 
+				test = (lbound + ubound) / 2;
+				if (record_number > mapping_[test]) {
+					// It's between half-way and upper-bound, move lower-bound to half-way
+					lbound = test;
+				}
+				else {
+					// It's between half-way and lower-bound, move upper-bound to half-way
+					ubound = test;
+				}
+			}
+			return ubound;
+		}
+		else {
+			return item_num;
+		}
+	}
 }
 
 // Describe the search criteria so it can be added to the header comment

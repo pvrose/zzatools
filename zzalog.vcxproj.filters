@@ -51,9 +51,6 @@
     <ClCompile Include="zzalog\dxa_if.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="zzalog\edit_dialog.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="zzalog\eqsl_handler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -183,6 +180,9 @@
     <ClCompile Include="zzalog\ic7300_table.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="zzalog\edit_input.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="zzalog\about_dialog.h">
@@ -222,9 +222,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="zzalog\dxa_if.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\edit_dialog.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="zzalog\eqsl_handler.h">
@@ -372,6 +369,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="zzalog\ic7300_table.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zzalog\edit_input.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

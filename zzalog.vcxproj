@@ -142,7 +142,7 @@
     <ClCompile Include="zzalog\config_tree.cpp" />
     <ClCompile Include="zzalog\corr_dialog.cpp" />
     <ClCompile Include="zzalog\dxa_if.cpp" />
-    <ClCompile Include="zzalog\edit_dialog.cpp" />
+    <ClCompile Include="zzalog\edit_input.cpp" />
     <ClCompile Include="zzalog\eqsl_handler.cpp" />
     <ClCompile Include="zzalog\exc_data.cpp" />
     <ClCompile Include="zzalog\exc_reader.cpp" />
@@ -201,7 +201,7 @@
     <ClInclude Include="zzalog\corr_dialog.h" />
     <ClInclude Include="zzalog\drawing.h" />
     <ClInclude Include="zzalog\dxa_if.h" />
-    <ClInclude Include="zzalog\edit_dialog.h" />
+    <ClInclude Include="zzalog\edit_input.h" />
     <ClInclude Include="zzalog\eqsl_handler.h" />
     <ClInclude Include="zzalog\exc_data.h" />
     <ClInclude Include="zzalog\exc_reader.h" />

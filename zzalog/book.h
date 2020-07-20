@@ -171,7 +171,7 @@ namespace zzalog {
 			return item_num;
 		}
 		// return the virtual record number - base class returns it unchanged
-		inline virtual record_num_t item_number(record_num_t record_num) {
+		inline virtual record_num_t item_number(record_num_t record_num, bool nearest = false) {
 			return record_num;
 		}
 

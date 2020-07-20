@@ -28,7 +28,6 @@
 #include "scratchpad.h"
 #include "calendar.h"
 #include "qrz_handler.h"
-#include "edit_dialog.h"
 #include "ic7300_table.h"
 
 #include <sstream>
@@ -566,17 +565,17 @@ void menu::cb_mi_nav_date(Fl_Widget* w, void* v) {
 // Navigate->Record Number
 // v is ignored
 void menu::cb_mi_nav_recnum(Fl_Widget* w, void* v) {
-	record_num_t record_num;
-	edit_dialog* dlg = new edit_dialog(Fl::event_x_root(), Fl::event_y_root(), WBUTTON, HBUTTON);
-	//add_sub_window(dlg);
-	if (dlg->display("") == BN_OK) {
-		// Displayed record number is 1-based.
-		record_num = stoi(string(dlg->value())) - 1;
-		record_num_t item_num = navigation_book_->item_number(record_num);
-		navigation_book_->selection(item_num);
+	int record_num;
+	// get record number
+	const char* reply = fl_input("Enter record number");
+	if (reply) {
+		// Valid reply - convert to integer and select item
+		record_num = atoi(reply);
+		if (record_num > 0) {
+			record_num_t item_num = navigation_book_->item_number(record_num - 1, true);
+			navigation_book_->selection(item_num);
+		}
 	}
-	//remove_sub_window(dlg);
-	Fl::delete_widget(dlg);
 }
 
 // Navigate->Find
