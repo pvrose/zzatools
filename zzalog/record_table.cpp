@@ -70,15 +70,20 @@ void record_table::draw_cell(TableContext context, int R, int C, int X, int Y, i
 					fl_color(FL_BLACK);
 				}
 				else if (log_record_->items_match(query_record_, field_name)) {
-					// Set text color dark yellow if they almost match
+					// Set text color dark yellow if they almost match - e.g. 4 vs 6 character grid-square
 					fl_color(FL_DARK_YELLOW);
 				}
-				else if ((field_name == "TIME_OFF" || field_name == "QSO_DATE_OFF") &&
+				else if ((field_name == "TIME_ON" || field_name == "QSO_DATE") &&
 					abs(difftime(log_record_->timestamp(), query_record_->timestamp())) < 300.0) {
 					// Time off matches within 5 minutes
 					fl_color(FL_DARK_YELLOW);
-				} 
-				else if (field_name == "MODE" && 
+				}
+				else if ((field_name == "TIME_OFF" || field_name == "QSO_DATE_OFF") &&
+					abs(difftime(log_record_->timestamp(true), query_record_->timestamp(true))) < 300.0) {
+					// Time off matches within 5 minutes
+					fl_color(FL_DARK_YELLOW);
+				}
+				else if (field_name == "MODE" &&
 					query_record_->item(field_name) == spec_data_->dxcc_mode(log_record_->item(field_name))) {
 					// Mode supplied is the DXCC version of the mode
 					fl_color(FL_DARK_YELLOW);
@@ -248,13 +253,13 @@ void record_table::set_records(record* log_record, record* query_record, record*
 	}
 }
 
-// Get the fields that will be display - those used in records being displayed
+// Get the fields that will be displayed - those used in records being displayed plus the minimum set of records specified in settings
 void record_table::assess_fields() {
 	// Clear any existing fields
 	fields_.clear();
 
-	// Get the field_set for this view - this is the set offields that will be
-	// displayed at the top of thetable, followed by the remainder in alphabetical order
+	// Get the field_set for this view - this is the set of fields that will be
+	// displayed at the top of the table, followed by the remainder in alphabetical order
 	Fl_Preferences display_settings(settings_, "Display");
 	Fl_Preferences fields_settings(display_settings, "Fields");
 	char view_name[20];

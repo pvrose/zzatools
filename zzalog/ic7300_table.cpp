@@ -19,6 +19,7 @@ extern Fl_Preferences* settings_;
 extern ic7300* ic7300_;
 extern status* status_;
 
+// Constructor
 ic7300_table::ic7300_table(int X, int Y, int W, int H, const char* label, field_ordering_t order) : 
 Fl_Table_Row(X, Y, W, H, label)
 , view()
@@ -28,6 +29,7 @@ Fl_Table_Row(X, Y, W, H, label)
 	show();
 }
 
+// Destructor
 ic7300_table::~ic7300_table() {
 	delete_items();
 	Fl_Preferences view_settings(settings_, "View");
@@ -35,8 +37,9 @@ ic7300_table::~ic7300_table() {
 
 }
 
-// DElete items 
+// Delete items 
 void ic7300_table::delete_items() {
+	// TODO: This raises exception
 	//for (int r = 0; r < rows(); r++) {
 	//	string* item = *(items_ + r);
 	//	for (int c = 0; c < cols(); c++) {
@@ -55,6 +58,8 @@ void ic7300_table::delete_items() {
 	col_widths_ = nullptr;
 }
 
+
+// Inherited from Fl_Table_Row - supply data for the table
 void ic7300_table::draw_cell(TableContext context, int R, int C, int X, int Y,
 	int W, int H) {
 	if (items_valid_) {
@@ -124,7 +129,7 @@ void ic7300_table::draw_cell(TableContext context, int R, int C, int X, int Y,
 	}
 }
 
-// OPen specific view
+// Open specific view
 void ic7300_table::open_view(view_type type) {
 	// Use egg-timer cursor
 	fl_cursor(FL_CURSOR_WAIT);
@@ -137,18 +142,23 @@ void ic7300_table::open_view(view_type type) {
 	clear();
 	switch (type_) {
 	case VT_NONE:
+		// No data to show - hide the table 
 		hide();
 		break;
 	case VT_MEMORIES:
+		// Memory data display
 		draw_memory_view();
 		break;
 	case VT_SCOPE_BANDS:
+		// Display scope bands
 		draw_scope_bands_view();
 		break;
 	case VT_USER_BANDS:
+		// Display user defined TX bands
 		draw_user_bands_view();
 		break;
 	case VT_CW_MESSAGES:
+		// Display CW message memories
 		draw_message_view();
 		break;
 	}
@@ -207,19 +217,16 @@ void ic7300_table::draw_memory_view() {
 		if (i < 100) {
 			row_headers_[i - 1] = to_string(i);
 		}
-		else if (i == 100) {
-			row_headers_[i - 1] = "P1";
-		}
-		else if (i == 101) {
-			row_headers_[i - 1] = "P2";
-		}
+		row_headers_[99] = "P1";
+		row_headers_[100] = "P2";
 
 		if (ok) {
 			// parse the command, sub-command and address
 			data = data.substr(4);
 			if (data.length() != 0) {
+				// If successful, the data returned should be 38 bytes
 				if (data.length() < 38) data.resize(38);
-				// Split
+				// Split - ON or OFF
 				switch (data[0] & '\xf0') {
 				case 0:
 					item[0] = "NO SPLIT";
@@ -231,7 +238,7 @@ void ic7300_table::draw_memory_view() {
 					item[0] = "INVALID";
 					break;
 				}
-				// Memory group
+				// Memory group - NONE, *1, *2 or *3
 				switch (data[0] & '\xF') {
 				case 0:
 					item[1] = "OFF";
@@ -280,7 +287,7 @@ void ic7300_table::draw_memory_view() {
 					item[3] = "INVALID";
 					break;
 				}
-				// Filter
+				// Filter - 1, 2 or 3
 				switch (data[7]) {
 				case 1:
 					item[4] = "FILTER 1";
@@ -295,7 +302,7 @@ void ic7300_table::draw_memory_view() {
 					item[4] = "INVALID";
 					break;
 				}
-				// Data mode
+				// Data mode - appended to Mode.
 				switch (data[8] & '\xF0') {
 				case 0:
 					break;
@@ -321,7 +328,7 @@ void ic7300_table::draw_memory_view() {
 					item[5] = "INVALID";
 					break;
 				}
-				// REpeater tone setting
+				// Repeater tone setting
 				double d;
 				d = bcd_to_double(data.substr(9, 3), 1, false);
 				char temp[10];
@@ -331,7 +338,7 @@ void ic7300_table::draw_memory_view() {
 				d = bcd_to_double(data.substr(12, 3), 1, false);
 				sprintf(temp, "%.1f", d);
 				item[7] = temp;
-				// Split frequency (or common frequency)
+				// Split frequency
 				item[8] = to_string(bcd_to_double(data.substr(15, 5), 6, true));
 				// Operating mode
 				switch (data[20]) {
@@ -520,7 +527,7 @@ void ic7300_table::draw_scope_bands_view() {
 		string* item = new string[cols()];
 		if (ok) {
 			status_->progress(r + 1, OT_MEMORY);
-			// First scope band edge is at 1A/050112 and rest increment from their
+			// First scope band edge is at 1A/050112 and rest increment from there
 			int address = 112 + r;
 			string subcommand = (char)'\x05' + int_to_bcd(address, 2, false);
 			// Fetch it
@@ -530,7 +537,7 @@ void ic7300_table::draw_scope_bands_view() {
 				char temp[10];
 				sprintf(temp, "%.4f", d);
 				item[0] = temp;
-				// Tone squelch settin
+				// Tone squelch setting
 				d = bcd_to_double(data.substr(3, 3), 4, true);
 				sprintf(temp, "%.4f", d);
 				item[1] = temp;
@@ -687,6 +694,7 @@ void ic7300_table::draw_user_bands_view() {
 	resize_cols();
 }
 
+// Draw CW Message memories - code was to be used for RTTL Messages as well, but these aren't readable
 void ic7300_table::draw_message_view() {
 	// Define table parameters
 	rows(8);
@@ -713,9 +721,6 @@ void ic7300_table::draw_message_view() {
 	status_->misc_status(ST_NOTE, "RIG: Starting message fetch");
 
 	bool ok = true;
-
-	// set transceiver into CW mode
-	(void)ic7300_->send_command('\x06', "", "\x03\x01", ok);
 
 	// Get the count up trigger memory number
 	int trigger;
@@ -744,6 +749,7 @@ void ic7300_table::draw_message_view() {
 	resize_cols();
 }
 
+// Change view to specified type
 void ic7300_table::type(view_type type) {
 	if (type == VT_UNCHANGED) {
 		open_view(type_);
@@ -753,11 +759,12 @@ void ic7300_table::type(view_type type) {
 	}
 }
 
+// Return specified type
 view_type ic7300_table::type() {
 	return type_;
 }
 
-// Adjust all column widths to the largest data.
+// Adjust all column widths to the largest data. - add 10 pixel margin.
 void ic7300_table::resize_cols() {
 	fl_font(FONT, FONT_SIZE);
 	int w;

@@ -301,7 +301,7 @@ toolbar::toolbar(int X, int Y, int W, int H, const char* label) :
 
 
 	end();
-	// now copy the active images to the deactivated images
+	// now copy the active images to the deactivated images, note they will be greyed out
 	for (int i = 0; i < children(); i++) {
 		Fl_RGB_Image* image = (Fl_RGB_Image*)child(i)->image();
 		if (image != nullptr) {
@@ -400,14 +400,17 @@ void toolbar::cb_bn_search(Fl_Widget* w, void* v) {
 				status_->misc_status(ST_NOTE, message);
 				delete[] message;
 				if (fl_choice("Reached the end of the log, do you want to start again?", "Yes", "No", nullptr) == 1) {
+					// User wants to stop
 					keep_on = false;
 				}
 				else {
+					// Go back to start - while loop will continue
 					that->record_num_ = 0;
 				}
 			}
 		}
 		else {
+			// We have found the callsign, stop the search
 			keep_on = false;
 		}
 	}
@@ -428,7 +431,9 @@ void toolbar::cb_bn_explain(Fl_Widget* w, void* v) {
 	vector<prefix*> prefixes;
 	char temp[1024];
 	string message = "";
+	// Set the callsign in the temporary record
 	tip_record->item("CALL", that->search_text_);
+	// Parse the temporary record
 	if (pfx_data_->all_prefixes(tip_record, &prefixes, false)) {
 		// We have at least one result - add appropriate heading to tip
 		if (prefixes.size() > 1) {
@@ -477,9 +482,9 @@ void toolbar::cb_bn_explain(Fl_Widget* w, void* v) {
 }
 
 // Return the minimum width required
-int toolbar::min_w() { return min_w_;  }
+int toolbar::min_w() { return min_w_; }
 
-// Set the record number to get the default input for the input
+// Set the record number to get the default input for the search input
 void toolbar::search_text(int record_num) {
 	record_num_ = record_num;
 	if (book_->size() > record_num_) {
@@ -493,7 +498,7 @@ void toolbar::search_text(int record_num) {
 	redraw();
 }
 
-// Update items 
+// Update items - activate those that are linked to active menu items
 void toolbar::update_items() {
 	int num_children = children();
 	// For all widgets
@@ -503,12 +508,15 @@ void toolbar::update_items() {
 		if (w->callback() == &cb_bn_menu) {
 			const Fl_Menu_Item* cb = menu_->find_item((char*)w->user_data());
 			if (cb == nullptr) {
+				// Menu item does not exist - deactivate the toolbar button
 				if (status_) status_->misc_status(ST_SEVERE, "MENU: Broken menu item");
 				w->deactivate();
 			} else if (cb->active()) {
+				// It exists and ia active, activate the toolbar button
 				w->activate();
 			}
 			else {
+				// It exists and is inactive, deactivate the toolbar button
 				w->deactivate();
 			}
 		}

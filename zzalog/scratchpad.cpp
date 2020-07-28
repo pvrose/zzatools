@@ -36,15 +36,17 @@ extern rig_if* rig_if_;
 extern band_view* band_view_;
 extern void add_scratchpad();
 
+// Constructor for scratchpad editor
 spad_editor::spad_editor(int x, int y, int w, int h) :
 	intl_editor(x, y, w, h)
 {
 }
 
+// Destructor for scratchpad editor
 spad_editor::~spad_editor() {
-
 }
 
+// Handler of any event coming from the scratchpad editor
 int spad_editor::handle(int event) {
 	switch (event) {
 	case FL_FOCUS:
@@ -56,27 +58,35 @@ int spad_editor::handle(int event) {
 		// Keyboard event - used for keyboard navigation
 		switch (Fl::event_key()) {
 		case FL_F + 1:
+			// F1 - copy selected text to CALL field
 			scratchpad::cb_action(this, (void*)scratchpad::WRITE_CALL);
 			return true;
 		case FL_F + 2:
+			// F2 - copy selected text to NAME field
 			scratchpad::cb_action(this, (void*)scratchpad::WRITE_NAME);
 			return true;
 		case FL_F + 3:
+			// F3 - copy selected text to QTH field
 			scratchpad::cb_action(this, (void*)scratchpad::WRITE_QTH);
 			return true;
 		case FL_F + 4:
+			// F4 - copy selected text to RST_RCVD field
 			scratchpad::cb_action(this, (void*)scratchpad::WRITE_RST_RCVD);
 			return true;
 		case FL_F + 5:
+			// F5 - copy selected text to RST_SENT field
 			scratchpad::cb_action(this, (void*)scratchpad::WRITE_RST_SENT);
 			return true;
 		case FL_F + 6:
+			// F6 - copy selected text to GRIDSQUARE field
 			scratchpad::cb_action(this, (void*)scratchpad::WRITE_GRID);
 			return true;
 		case FL_F + 7:
+			// F7 - save record
 			scratchpad::cb_save(this, nullptr);
 			return true;
 		case FL_F + 8:
+			// F8 - discard record
 			scratchpad::cb_cancel(this, nullptr);
 			return true;
 		}
@@ -85,6 +95,7 @@ int spad_editor::handle(int event) {
 	return intl_editor::handle(event);
 }
 
+// Constructor for scratchpad
 scratchpad::scratchpad() :
 	win_dialog(480, 200, "Scratchpad")
 	, buffer_(nullptr)
@@ -105,6 +116,7 @@ scratchpad::~scratchpad()
 	status_->misc_status(ST_NOTE, "SCRATCHPAD: Deleted");
 }
 
+// Create form
 void scratchpad::create_form() {
 	const int WEDITOR = w() - EDGE - WBUTTON - WBUTTON - GAP - EDGE;
 	const int HEDITOR = h() - EDGE - EDGE;
@@ -118,7 +130,7 @@ void scratchpad::create_form() {
 	editor_->buffer(buffer_);
 	editor_->textsize(FONT_SIZE);
 	editor_->textfont(FONT);
-	// The callback will be explicitly done 
+	// The callback will be explicitly done in the handle routine of the editor
 	editor_->when(FL_WHEN_NEVER);
 
 	// Create the buttons - see labels and tooltips for more information
@@ -270,6 +282,7 @@ void scratchpad::create_form() {
 }
 
 // One of the write field buttons has been activated
+// v provides the specific action 
 void scratchpad::cb_action(Fl_Widget* w, void* v) {
 	actions action = (actions)(long)v;
 	scratchpad* that = ancestor_view<scratchpad>(w);
@@ -304,7 +317,7 @@ void scratchpad::cb_action(Fl_Widget* w, void* v) {
 	case WRITE_FIELD:
 		field = that->field_;
 		if (field == "DXCC" || field == "GRIDSQUARE") {
-			hint = HT_MINOR_CHANGE;
+			hint = HT_CHANGED;
 		}
 		break;
 	}
@@ -324,6 +337,7 @@ void scratchpad::cb_action(Fl_Widget* w, void* v) {
 }
 
 // Save the record and reset the state to no record
+// v is not used
 void scratchpad::cb_save(Fl_Widget* w, void* v) {
 	scratchpad* that = ancestor_view<scratchpad>(w);
 	// Save frequency mode and TX_PWR if that didn't change
@@ -344,6 +358,7 @@ void scratchpad::cb_save(Fl_Widget* w, void* v) {
 }
 
 // Cancel the edit and reset the state to no record
+// v is not used
 void scratchpad::cb_cancel(Fl_Widget* w, void* v) {
 	scratchpad* that = ancestor_view<scratchpad>(w);
 	book_->delete_record(false);
@@ -353,6 +368,7 @@ void scratchpad::cb_cancel(Fl_Widget* w, void* v) {
 }
 
 // Close button clicked - check editing or not
+// v is not used
 void scratchpad::cb_close(Fl_Widget* w, void* v) {
 	// It is the window that raised this callback
 	scratchpad* that = (scratchpad*)w;
@@ -373,6 +389,7 @@ void scratchpad::cb_close(Fl_Widget* w, void* v) {
 }
 
 // Start button - create a new record
+// v is not used
 void scratchpad::cb_start(Fl_Widget* w, void* v) {
 	scratchpad* that = ancestor_view<scratchpad>(w);
 	that->record_ = book_->new_record(menu_->logging());
@@ -395,6 +412,7 @@ void scratchpad::cb_start(Fl_Widget* w, void* v) {
 }
 
 // Frequency input
+// v is not used
 void scratchpad::cb_ip_freq(Fl_Widget* w, void* v) {
 	scratchpad* that = ancestor_view<scratchpad>(w);
 	if (that->record_) {
@@ -415,6 +433,7 @@ void scratchpad::cb_ip_freq(Fl_Widget* w, void* v) {
 }
 
 // Mode choice
+// v is not used
 void scratchpad::cb_ch_mode(Fl_Widget* w, void* v) {
 	scratchpad* that = ancestor_view<scratchpad>(w);
 	if (that->record_) {
@@ -434,6 +453,7 @@ void scratchpad::cb_ch_mode(Fl_Widget* w, void* v) {
 }
 
 // Power input
+// v is not used
 void scratchpad::cb_ip_power(Fl_Widget* w, void* v) {
 	scratchpad* that = ancestor_view<scratchpad>(w);
 	if (that->record_) {
@@ -462,17 +482,20 @@ void scratchpad::enable_widgets() {
 	}
  }
 
-// Called when rig is read
+// Called when rig is read to update values here
 void scratchpad::rig_update(string frequency, string mode, string power) {
 	ip_freq_->value(frequency.c_str());
 	double freq = stod(frequency) * 1000;
+	// If the frequency is outside a ham-band, display in red else in black
 	if (band_view_ && !band_view_->in_band(freq)) {
 		ip_freq_->textcolor(FL_RED);
 	}
 	else {
 		ip_freq_->textcolor(FL_BLACK);
 	}
+	// Power in watts
 	ip_power_->value(power.c_str());
+	// Mode - index into choice
 	int index = ch_mode_->find_index(mode.c_str());
 	ch_mode_->value(index);
 	redraw();
@@ -481,6 +504,8 @@ void scratchpad::rig_update(string frequency, string mode, string power) {
 // Get frequency, power and mode from previous record not rig
 void scratchpad::update() {
 	record* prev_record = book_->get_record();
+	// Assume as it's a logged record, the frequency is valid
+	ip_freq_->textcolor(FL_BLACK);
 	ip_freq_->value(prev_record->item("FREQ").c_str());
 	ip_power_->value(prev_record->item("TX_PWR").c_str());
 	ch_mode_->value(ch_mode_->find_index(prev_record->item("MODE", true).c_str()));

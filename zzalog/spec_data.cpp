@@ -777,10 +777,11 @@ error_t spec_data::check_integer(const string&  data, const string&  field, cons
 				// If the entry matches - OK
 				if (data_value == prefix->cq_zones_[i]) return VE_OK;
 			}
-			// Not found in the list for the DXCC - TODO: does this need something if DXCC code = 0;
+			// Not found in the list for the DXCC
 			return VE_VALUE_INCOMPATIBLE;
 		}
 		else {
+			// If DXCC field is blank or 0 (for a /MM station) it is not checkable
 			return VE_VALUE_UNCHECKABLE;
 		}
 	}
@@ -807,10 +808,11 @@ error_t spec_data::check_integer(const string&  data, const string&  field, cons
 			for (unsigned int i = 0; i < prefix->itu_zones_.size(); i++) {
 				if (data_value == prefix->itu_zones_[i]) return VE_OK;
 			}
-			// Not found in the list for the DXCC - TODO: does this need something if DXCC code = 0;
+			// Not found in the list for the DXCC
 			return VE_VALUE_INCOMPATIBLE;
 		}
 		else {
+			// If DXCC field is blank or 0 (for a /MM station) it is not checkable
 			return VE_VALUE_UNCHECKABLE;
 		}
 	}
@@ -846,7 +848,7 @@ error_t spec_data::check_enumeration(const string& data, const string& field, co
 			return VE_FIELD_UNSUPPORTED;
 		}
 		else {
-			// TODO: Review the design - 
+			// Wrong datatype for the field
 			return VE_VALUE_NOT_RECOMMENDED;
 		}
 	}
@@ -863,7 +865,7 @@ error_t spec_data::check_enumeration(const string& data, const string& field, co
 				return VE_OK;
 			}
 			else {
-				// Get the band edges - these must be coded so let except if not
+				// Get the band edges - these must be coded so let it raise an exception if not
 				string lower_edge = fields->at("Lower Freq (MHz)");
 				string upper_edge = fields->at("Upper Freq (MHz)");
 				double lower_value = stod(lower_edge);
@@ -917,6 +919,7 @@ error_t spec_data::check_enumeration(const string& data, const string& field, co
 			return VE_VALUE_INCOMPATIBLE;
 		}
 		else {
+			// If DXCC field is blank or 0 (for a /MM station) it is not checkable
 			return VE_VALUE_UNCHECKABLE;
 		}
 	}
@@ -1008,11 +1011,16 @@ error_t spec_data::check_string(const string&  data, const string&  field, const
 		}
 		else {
 			// DXCC is not in the list - either blank in which case how do we have a COUNTRY value
-			if (dxcc_code.length()) {
-				return VE_VALUE_INCOMPATIBLE;
+			if (data.length()) {
+				if (dxcc_code.length()) {
+					return VE_VALUE_INCOMPATIBLE;
+				}
+				else {
+					return VE_VALUE_UNCHECKABLE;
+				}
 			}
 			else {
-				return VE_VALUE_UNCHECKABLE;
+				return VE_OK;
 			}
 		}
 	}
@@ -1043,7 +1051,7 @@ error_t spec_data::check_time(const string& data, const string& field) {
 		}
 	}
 	else {
-		// Not time off so don't checl
+		// Not time off so don't check
 		return VE_OK;
 	}
 }
@@ -1082,7 +1090,7 @@ error_t spec_data::check_datatype(const string&  data, const string&  field, con
 {
 	// Process enumerations - datatype contains the enumeration name.
 	if (is_enumeration) {
-		// Check in enumeration database - note for subdivisions the database is ...._DXCC
+		// Check in enumeration database - note for subdivisions the database is ....[DXCC]
 		string enumeration_name;
 		if (datatype == "Primary_Administrative_Subdivision" ||
 			datatype == "Secondary_Administrative_Subdivision") {
@@ -1107,6 +1115,7 @@ error_t spec_data::check_datatype(const string&  data, const string&  field, con
 		spec_dataset* enumeration_data = dataset(enumeration_name);
 		// Special case for undefined Secondary_Administrative_Subdivision, Sponsored Award and any other enumerations not given - not able to check
 		if (enumeration_data == nullptr) {
+			// TODO: Code SAS enumerations 
 			return VE_FIELD_UNSUPPORTED;
 		}
 		// Get the enumeration entry for the particular value
@@ -1157,6 +1166,7 @@ error_t spec_data::check_datatype(const string&  data, const string&  field, con
 				if (datatype_record->find("Data Type Indicator") != datatype_record->end()) {
 					indicator = datatype_record->at("Data Type Indicator");
 				}
+				// If it has a data-type indicator then we can use a switch on the single char
 				if (indicator.length() == 1) {
 					error_t error;
 					switch (indicator[0]) {
@@ -1325,12 +1335,15 @@ error_t spec_data::check_datatype(const string&  data, const string&  field, con
 					return check_list(data, field, "Sponsored_Award", true, ',');
 				}
 				else if (datatype == "Digit") {
+					// Single digit
 					return check_format(data, field, datatype, REGEX_DIGIT);
 				}
 				else if (datatype == "Character") {
+					// Single character
 					return check_format(data, field, datatype, REGEX_CHAR);
 				}
 				else if (datatype == "IntlCharacter") {
+					// Single international character
 					return check_format(data, field, datatype, REGEX_INTL_CHAR);
 				}
 				else if (datatype == "GridSquareList") {
@@ -2035,11 +2048,11 @@ string spec_data::convert_ml_string(const string& data) {
 void spec_data::initialise_field_choice(Fl_Choice* ch, string dataset_name /* = "Fields" */, string default_field /*= ""*/) {
 	// Get the Fields dataset
 	spec_dataset* dataset = spec_data::dataset(dataset_name);
-	// Initialiseo
+	// Initialise
 	auto it = dataset->data.begin();
 	int num_fields = dataset->data.size();
 	ch->clear();
-	// Add a blank entry to allow deletin of enumeration
+	// Add a blank entry to allow deletion of enumeration
 	ch->add("", 0, (Fl_Callback*)nullptr);
 	char prev = 0;
 	int default_value = 0;
@@ -2160,7 +2173,7 @@ void spec_data::reset_continue() {
 	abandon_validation_ = false;
 }
 
-// Add this app's app defined fields
+// Add this app's app defined fields, plus a couple of LOTW ones
 void spec_data::add_my_appdefs() {
 	string my_appdefs[] = {
 		"APP_ZZA_PFX",
@@ -2205,6 +2218,7 @@ void spec_data::process_modes() {
 	(*this)["Combined"] = combined;
 }
 
+// Return a string that describes the enumeration and the meaning of the given value
 string spec_data::describe_enumeration(spec_dataset* dataset, string value) {
 	// Get the selected explanation - default to Not Available
 	string enum_text = "";
@@ -2233,6 +2247,7 @@ string spec_data::describe_enumeration(spec_dataset* dataset, string value) {
 	return enum_text;
 }
 
+// Return the entity name for the DXCC ADIF code
 string spec_data::entity_name(int dxcc) {
 	string result;
 	spec_dataset* dxccs = dataset("DXCC_Entity_Code");

@@ -460,29 +460,29 @@ void fields_dialog::create_form(int X, int Y) {
 	ip3_2a->labelsize(FONT_SIZE);
 	ip3_2a->align(FL_ALIGN_LEFT);
 	ip3_2a->textsize(FONT_SIZE);
-ip3_2a->callback(cb_ip_header);
-ip3_2a->when(FL_WHEN_CHANGED);
-ip3_2a->tooltip("Type in the new value for the header of the selected field");
-header_input_ = ip3_2a;
-gp3->add(ip3_2a);
-// Input - width in pixels for the selected field
-Fl_Int_Input* ip3_2b = new Fl_Int_Input(XG3_2B, YG3_2, WG3_2, HG3_2, "Width");
-ip3_2b->labelsize(FONT_SIZE);
-ip3_2b->align(FL_ALIGN_LEFT);
-ip3_2b->textsize(FONT_SIZE);
-ip3_2b->callback(cb_ip_width);
-ip3_2b->when(FL_WHEN_CHANGED);
-ip3_2b->tooltip("Type in the new value for the width of the selected field");
-width_input_ = ip3_2b;
-gp3->add(ip3_2b);
-table_group_ = gp3;
+	ip3_2a->callback(cb_ip_header);
+	ip3_2a->when(FL_WHEN_CHANGED);
+	ip3_2a->tooltip("Type in the new value for the header of the selected field");
+	header_input_ = ip3_2a;
+	gp3->add(ip3_2a);
+	// Input - width in pixels for the selected field
+	Fl_Int_Input* ip3_2b = new Fl_Int_Input(XG3_2B, YG3_2, WG3_2, HG3_2, "Width");
+	ip3_2b->labelsize(FONT_SIZE);
+	ip3_2b->align(FL_ALIGN_LEFT);
+	ip3_2b->textsize(FONT_SIZE);
+	ip3_2b->callback(cb_ip_width);
+	ip3_2b->when(FL_WHEN_CHANGED);
+	ip3_2b->tooltip("Type in the new value for the width of the selected field");
+	width_input_ = ip3_2b;
+	gp3->add(ip3_2b);
+	table_group_ = gp3;
 
-gp3->end();
+	gp3->end();
 
-Fl_Group::end();
-show();
+	Fl_Group::end();
+	show();
 
-update_widgets();
+	update_widgets();
 }
 
 // Used to write settings back
@@ -646,7 +646,6 @@ void fields_dialog::cb_bn_use_app(Fl_Widget* w, void* v) {
 	that->field_set_by_app_[app] = that->field_set_name_;
 	that->update_widgets();
 }
-
 
 // left-hand table clicked (fields in use)
 // Enable width and header to be edited (or not)

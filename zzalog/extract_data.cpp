@@ -31,7 +31,7 @@ extract_data::extract_data() :
 	book()
 	, use_mode_(NONE)
 {
-	// This book has extract data
+	// This book contains extract data
 	book_type_ = OT_EXTRACT;
 	extract_criteria_.clear();
 	mapping_.clear();
@@ -41,7 +41,7 @@ extract_data::extract_data() :
 // Destructor
 extract_data::~extract_data()
 {
-	// Same as book::delete_contents without deleting the records
+	// Same as book::delete_contents without deleting the records - these are wanted
 	clear();
 	modified(false);
 	filename_ = "";
@@ -61,7 +61,7 @@ int extract_data::criteria(search_criteria_t criteria, extract_data::extract_mod
 		}
 	}
 	else if (mode != use_mode_) {
-		status_->misc_status(ST_ERROR, "EXTRACT: A follow-on search has been requested but incompatible. Ignored!");
+		status_->misc_status(ST_ERROR, "EXTRACT: A follow-on search has been requested but is incompatible. Ignored!");
 		return -1;
 	}
 	// set criteria
@@ -115,7 +115,7 @@ void extract_data::extract_records() {
 		for (record_num_t ixe = 0; ixe < get_count(); ) {
 			// Compare record against these search criteria
 			if (!match_record(get_record(ixe, false))) {
-				// If it doesn't match, remove the record from this book
+				// If it doesn't match, remove the record pointer from this book
 				erase(begin() + ixe);
 				int ixb = mapping_[ixe];
 				mapping_.erase(mapping_.begin() + ixe);
@@ -168,7 +168,7 @@ void extract_data::reextract() {
 
 // clear criteria
 void extract_data::clear_criteria() {
-	// Clear the book without deleteing the records
+	// Clear the book without deleting the records
 	clear();
 	// Clear all the sets of criteria
 	extract_criteria_.clear();
@@ -181,7 +181,7 @@ void extract_data::clear_criteria() {
 	selection(-1, HT_EXTRACTION);
 }
 
-// Convert record index in this book to the index in the main log book
+// Convert item index in this book to the record index in the main log book
 inline record_num_t extract_data::record_number(record_num_t item_number) {
 	if (size() > 0) 
 		// Return the mapping from this book to the main book
@@ -189,7 +189,8 @@ inline record_num_t extract_data::record_number(record_num_t item_number) {
 	else return -1;
 }
 
-// Convert record index in the main log book to the index in this book
+// Convert record index in the main log book to the item index in this book
+// nearest = true will choose the closest item to the record number
 inline record_num_t extract_data::item_number(record_num_t record_number, bool nearest /*=false*/) {
 	// Return the mapping item from main book  to this book
 	if (size() == 0) {
@@ -203,21 +204,24 @@ inline record_num_t extract_data::item_number(record_num_t record_number, bool n
 		}
 	}
 	else {
-		record_num_t item_num = rev_mapping_[record_number];
-		if (nearest && record_number != mapping_[item_num]) {
+		// Try and find the mapping
+		auto it = rev_mapping_.find(record_number);
+		if (nearest && it == rev_mapping_.end()) {
 			// Need to find nearest mapping
-			// Binary search
+			// Get the bounds of the search (initially first and last items)
 			record_num_t lbound = 0;
 			record_num_t ubound = mapping_.size() - 1;
 			if (mapping_[lbound] > record_number) {
+				// Record is before first item - return the first item
 				return 0;
 			}
 			if (mapping_[ubound] < record_number) {
+				// Record is above the last item - return the last item
 				return ubound;
 			}
 			// Binary slice the array until found
-			// Keep comparing the record number between upper bound and lower bound
-			// until the gap between them is nil. then put it there.
+			// Keep comparing the record number between upper bound and lower bound and move one or 
+			// other of the bounds until they differ by one, then put it there.
 			record_num_t test;
 			while (ubound - 1 != lbound) {
 				// Compare with the half-way point 
@@ -231,10 +235,22 @@ inline record_num_t extract_data::item_number(record_num_t record_number, bool n
 					ubound = test;
 				}
 			}
-			return ubound;
+			// Return the closer of the two - use the higher if they are equidisstant
+			if (mapping_[ubound] - record_number <= record_number - mapping_[lbound]) {
+				return ubound;
+			}
+			else {
+				return lbound;
+			}
 		}
 		else {
-			return item_num;
+			// Return the exact mapping if it exists of -1 if it doesn't
+			if (it != rev_mapping_.end()) {
+				return it->second;
+			}
+			else {
+				return -1;
+			}
 		}
 	}
 }
@@ -317,7 +333,7 @@ string extract_data::comment() {
 	return result;
 }
 
-// Extract records that need sending to the named server (eQSL, LotW or mail)
+// Extract records that need sending to the named server (eQSL, LotW, mail or ClubLog)
 void extract_data::extract_qsl(extract_data::extract_mode_t server) {
 	string reason;
 	string field_name;
@@ -398,7 +414,7 @@ void extract_data::extract_qsl(extract_data::extract_mode_t server) {
 		criteria(new_criteria, server);
 	}
 	if (server == CARD) {
-		// Only those for which we have received a card (QSL_RCVD==Y)
+		// Only those for which we have received a card (QSL_RCVD==Y) - i.e. QSLL
 		new_criteria = {
 			/*search_cond_t condition*/ XC_FIELD,
 			/*bool by_regex*/ false,
@@ -439,13 +455,14 @@ void extract_data::extract_qsl(extract_data::extract_mode_t server) {
 		selection(0, HT_EXTRACTION);
 	}
 }
+
 // Extract records for special fixed criteria
 void extract_data::extract_special(extract_data::extract_mode_t reason) {
 	search_criteria_t new_criteria;
 	string reason_name;
 	switch (reason) {
 	case NO_NAME:
-		// Extract those records not sent to QSL server !(*QSL_SENT==Y) 
+		// Extract those records that have NAME field empty 
 		new_criteria = {
 			/*search_cond_t condition*/ XC_FIELD,
 			/*bool by_regex*/ false,
@@ -465,7 +482,7 @@ void extract_data::extract_special(extract_data::extract_mode_t reason) {
 		reason_name = "missing name";
 		break;
 	case NO_QTH:
-		// Extract those records not sent to QSL server !(*QSL_SENT==Y) 
+		// Extract those records that have QTH field empty
 		new_criteria = {
 			/*search_cond_t condition*/ XC_FIELD,
 			/*bool by_regex*/ false,
@@ -485,7 +502,7 @@ void extract_data::extract_special(extract_data::extract_mode_t reason) {
 		reason_name = "missing QTH";
 		break;
 	case LOCATOR:
-		// Extract those records not sent to QSL server !(*QSL_SENT==Y) 
+		// Extract those records with GRIDSQUARE empty or only 2 or 4 character locators 
 		new_criteria = {
 			/*search_cond_t condition*/ XC_FIELD,
 			/*bool by_regex*/ true,
@@ -529,8 +546,7 @@ void extract_data::extract_special(extract_data::extract_mode_t reason) {
 	}
 }
 
-
-// Upload the extracted data
+// Upload the extracted data to the appropriate QSL server (eQSL, LotW or ClubLog)
 void extract_data::upload() {
 	switch (use_mode_) {
 	case EQSL:
@@ -554,7 +570,7 @@ void extract_data::upload() {
 	clear_criteria();
 }
 
-// Change the selected record (& update any necessary controls)
+// Change the record selection (& update any necessary controls)
 void extract_data::selection(record_num_t num_item, hint_t hint /* = HT_SELECTED */, view* requester /* = nullptr */, record_num_t num_other /* = 0 */) {
 	// Set the current item in this view
 	if ((signed)num_item != -1) {
@@ -564,9 +580,9 @@ void extract_data::selection(record_num_t num_item, hint_t hint /* = HT_SELECTED
 	book_->selection(record_number(current_item_), hint, requester, num_other);
 }
 
-// Void extract records with this callsign
+// Extract all records for callsign
 void extract_data::extract_call(string callsign) {
-	// Extract those records not sent to QSL server !(*QSL_SENT==Y) 
+	// Extract those records where CALL matches callsign 
 	search_criteria_t	new_criteria = {
 		/*search_cond_t condition*/ XC_CALL,
 		/*bool by_regex*/ false,
@@ -589,7 +605,7 @@ void extract_data::extract_call(string callsign) {
 		status_->misc_status(ST_NOTE, "EXTRACT: Not worked this call before");
 	}
 	else {
-		// Records match
+		// Some records match
 		char format[] = "EXTRACT: Call work %d times before - see extract page";
 		char* message = new char[strlen(format) + 10];
 		sprintf(message, format, size());
@@ -644,7 +660,7 @@ void extract_data::sort_records(string field_name, bool reversed) {
 		// Compare each record with its immediate follower - swap if it's larger
 		for (record_num_t ix = 0; ix < size() - 1; ix++) {
 			if (spec_data_->datatype_indicator(field_name) == 'N') {
-				// Numeric field - compare the numeric value
+				// Numeric field - compare the numeric value - basically ignore white space
 				double item_1;
 				double item_2;
 				at(ix)->item(field_name, item_1);
@@ -669,7 +685,9 @@ void extract_data::sort_records(string field_name, bool reversed) {
 	}
 	snprintf(message, 100, "EXTRACT: Done - %d passes required", num_scans);
 	status_->misc_status(ST_OK, message);
-	status_->progress(nullptr, book_type());
+	// Note may have taken fewer passes than primed progress bar with - stop progress if it has
+	if (num_scans < (signed)size()) {
+		status_->progress("Taken fewer passes", book_type());
+	}
 	fl_cursor(FL_CURSOR_DEFAULT);
-
 }

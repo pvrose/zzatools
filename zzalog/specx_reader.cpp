@@ -391,10 +391,6 @@ bool specx_reader::end_record() {
 		dataset->column_names = column_headers_;
 		(*data_)[dataset_name_] = dataset;
 	}
-	//	// If the record has been deleted
-	//if (record_data_->find("Deleted") != record_data_->end() && record_data_->at("Deleted") == "true") {
-	//	record_name_ += " Deleted";
-	//}
 	dataset->data[record_name_] = record_data_;
 	record_data_ = nullptr;
 	int byte_count = (int)in_file_->tellg();

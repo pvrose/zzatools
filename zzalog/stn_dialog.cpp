@@ -47,6 +47,7 @@ stn_dialog::power_table::power_table(int X, int Y, int W, int  H, const char* la
 	when(FL_WHEN_RELEASE);
 }
 
+// Power table destructor
 stn_dialog::power_table::~power_table() {
 	// Delete the table 
 	clear();
@@ -95,7 +96,7 @@ void stn_dialog::power_table::draw_cell(TableContext context,  		// table cell d
 		return;
 
 	case CONTEXT_ROW_HEADER:
-		// Set row header
+		// Set row header - same character on each row - used to delete the row
 		fl_push_clip(X, Y, W, H);
 		fl_draw_box(FL_THIN_UP_BOX, X, Y, W, H, row_header_color());
 		fl_color(FL_RED);
@@ -178,6 +179,7 @@ void stn_dialog::power_table::cb_ip_drive(Fl_Widget* w, void* v) {
 			status_->misc_status(ST_WARNING, message);
 		}
 	}
+	// Ignore invalid characters in the drive input
 	catch (invalid_argument&) {}
 
 }
@@ -196,6 +198,7 @@ void stn_dialog::power_table::cb_ip_power(Fl_Widget* w, void* v) {
 		(*that->data_)[drive] = power;
 		that->redraw_table();
 	}
+	// Ignore invalid characters in the power input
 	catch (invalid_argument&) {}
 }
 
@@ -504,7 +507,7 @@ stn_dialog::qth_group::~qth_group() {
 	all_qths_.clear();
 }
 
-// Get initial data from settings
+// Get initial data from settings - additional ones for the QTH group
 void stn_dialog::qth_group::load_values() {
 	common_grp::load_values();
 
@@ -571,7 +574,7 @@ void stn_dialog::qth_group::load_values() {
 	current_qth_ = *all_qths_[selected_name_];
 }
 
-// create the form
+// create the form - additional widgets for QTH settings
 void stn_dialog::qth_group::create_form(int X, int Y) {
 	common_grp::create_form(X, Y);
 	const int R3 = h() - HBUTTON;
@@ -702,12 +705,12 @@ void stn_dialog::qth_group::save_item() {
 	*all_qths_[selected_name_] = current_qth_;
 }
 
-// Callsign callback
+// Callsign callback 
 void stn_dialog::qth_group::cb_ip_call(Fl_Widget* w, void* v) {
 	qth_group* that = ancestor_view<qth_group>(w);
 	qth_info_t* qth = &that->current_qth_;
 	cb_ip_upper(w, v);
-	// Parse callsign
+	// Parse callsign to get DXCC etc information
 	// Create dummy log entry to hold callsign
 	record dummy;
 	dummy.item("CALL", string(qth->callsign));
@@ -779,7 +782,7 @@ void stn_dialog::qth_group::cb_ip_upper(Fl_Widget* w, void* v) {
 	((intl_input*)w)->value(((string*)v)->c_str());
 }
 
-// Common group constructor
+// Rig group constructor
 stn_dialog::rig_group::rig_group(int X, int Y, int W, int H, const char* label) :
 	common_grp(X, Y, W, H, label) {
 	type_ = RIG;
@@ -984,7 +987,7 @@ void stn_dialog::rig_group::cb_ch_sel_band(Fl_Widget* w, void* v) {
 	that->redraw();
 }
 
-// Aerial group
+// Aerial group constructor
 stn_dialog::aerial_group::aerial_group(int X, int Y, int W, int H, const char* label) :
 	common_grp(X, Y, W, H, label) {
 	type_ = AERIAL;
@@ -1000,6 +1003,8 @@ stn_dialog::aerial_group::aerial_group(int X, int Y, int W, int H, const char* l
 	populate_choice();
 
 }
+
+// Destructor
 stn_dialog::aerial_group::~aerial_group() {}
 
 // create the form

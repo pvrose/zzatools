@@ -85,6 +85,7 @@ void qsl_form::load_default() {
 	};
 }
 
+// Load the QSL design data from the settings
 void qsl_form::load_data() {
 	// Get width and height of label
 	Fl_Preferences qsl_settings(settings_, "QSL Design");
@@ -92,11 +93,11 @@ void qsl_form::load_data() {
 	qsl_settings.get("Height", height_, 0);
 	qsl_settings.get("Unit", (int&)unit_, (int)MILLIMETER);
 	if (width_ == 0 || height_ == 0) {
-		// We have either width or height not defined
+		// We have either width or height not defined - so load the edfault data
 		load_default();
 	}
 	else {
-		// REad in the five sets of widget data
+		// Read in the five sets of widget data
 		tl_widgets_.clear();
 		Fl_Preferences tl_settings(qsl_settings, "Top Left");
 		int count = tl_settings.groups();
@@ -150,8 +151,8 @@ void qsl_form::create_form() {
 	int ly = y() + MARGIN;
 	int ry = y() + MARGIN;
 	// Draw lines of text both top left and top right
-	draw_lines(FL_ALIGN_LEFT, ly, tl_widgets_);
-	draw_lines(FL_ALIGN_RIGHT, ry, tr_widgets_);
+	draw_text(FL_ALIGN_LEFT, ly, tl_widgets_);
+	draw_text(FL_ALIGN_RIGHT, ry, tr_widgets_);
 	// Current y value to below the lower of the two
 	int curr_y = (ly > ry ? ly : ry) + GAP;
 	// Draw the central box
@@ -160,8 +161,8 @@ void qsl_form::create_form() {
 	// Current y below the central box
 	ly = curr_y;
 	ry = curr_y;
-	draw_lines(FL_ALIGN_LEFT, ly, bl_widgets_);
-	draw_lines(FL_ALIGN_RIGHT, ry, br_widgets_);
+	draw_text(FL_ALIGN_LEFT, ly, bl_widgets_);
+	draw_text(FL_ALIGN_RIGHT, ry, br_widgets_);
 	// Report an error if the required height is too big
 	curr_y = (ly > ry ? ly : ry) + MARGIN;
 	if (curr_y - y() > height) {
@@ -175,7 +176,7 @@ void qsl_form::create_form() {
 // Draw the lines of text for one of the four corners,
 // align indicates left or right, curr_y where to put it, widgets - the lines of text
 // returns with the latest y position in curr_y
-void qsl_form::draw_lines(Fl_Align align, int& curr_y, vector<qsl_form::qsl_widget>& widgets) {
+void qsl_form::draw_text(Fl_Align align, int& curr_y, vector<qsl_form::qsl_widget>& widgets) {
 	// dimensions in points
 	int width = to_points(width_);
 	for (auto it = widgets.begin(); it != widgets.end(); it++) {
@@ -250,7 +251,7 @@ void qsl_form::draw_table(int& curr_y) {
 	}
 }
 
-// Call back for all form widgets - this calls qsl_form's callback which can be set by an instancing class
+// Call back for all form widgets - this tells the qsl_design widget that the card is to be redrawn
 void qsl_form::cb_button(Fl_Widget* w, void* v) {
 	qsl_form* that = ancestor_view<qsl_form>(w);
 	((qsl_design*)that->designer_)->display_design_data((Fl_Button*)w, (qsl_widget*)v);

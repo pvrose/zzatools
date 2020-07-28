@@ -314,7 +314,7 @@ void rig_dialog::populate_rig_choice() {
 	}
 }
 
-// Populate manufacturer and model choices
+// Populate manufacturer and model choices - hierarchical menu: first manufacturer, then model
 void rig_dialog::populate_model_choice() {
 	// Get hamlib Model number and populate control with all model names
 	// See if we need to load back-ends - the handler is not hamlib or the rig isn't open
@@ -323,12 +323,13 @@ void rig_dialog::populate_model_choice() {
 	}
 	rig_model_choice_->clear();
 	char* target_pathname = nullptr;
-	// For each possible rig ids in hamlib (step by 100 as manufacturers are separated into groups)
+	// For each possible rig ids in hamlib
 	for (rig_model_t i = 1; i < 4000; i+=1) {
 		// Get the capabilities of this rig ID (at ID #xx01)
 		const rig_caps* capabilities = rig_get_caps(i);
 		if (capabilities != nullptr) {
 			// There is a rig - add the model name to that choice
+			// What is the status of the handler for this particular rig?
 			char status[16];
 			switch (capabilities->status) {
 			case RIG_STATUS_ALPHA:
@@ -349,11 +350,12 @@ void rig_dialog::populate_model_choice() {
 			}
 			// Generate the item pathname - e.g. Icom/IC-736 (untested)
 			char* temp = new char[strlen(status) + 10 + strlen(capabilities->model_name) + strlen(capabilities->mfg_name)];
+			// The '/' ensures all say Icom rigs are in a sub-menu to Icom
 			sprintf(temp, "%s/%s%s", capabilities->mfg_name, capabilities->model_name, status);
 			rig_model_choice_->add(temp);
 			if (strcmp(hamlib_model_.c_str(), (capabilities->model_name)) == 0 &&
 				strcmp(hamlib_mfr_.c_str(), (capabilities->mfg_name)) == 0) {
-				// Remember the pathname of the wanted menu item and the hamlib reference number
+				// We are adding the current selected rig, remember it's menu item value and hamlib reference number
 				target_pathname = new char[strlen(temp) + 1];
 				strcpy(target_pathname, temp);
 				model_id_ = i;
@@ -362,6 +364,7 @@ void rig_dialog::populate_model_choice() {
 	}
 	bool found = false;
 	// Go through all the menu items until we find our remembered pathname, and set the choice value to that item number
+	// We have to do it like this as the choice value when we added it may have changed.
 	for (int i = 0; i < rig_model_choice_->size() && !found && target_pathname; i++) {
 		char item_pathname[128];
 		rig_model_choice_->item_pathname(item_pathname, 127, &rig_model_choice_->menu()[i]);
@@ -374,6 +377,7 @@ void rig_dialog::populate_model_choice() {
 }
 
 // Rig handler radio button clicked
+// v contains a pointer to the radio button value 
 void rig_dialog::cb_rad_handler(Fl_Widget* w, void* v) {
 	rig_dialog* that = ancestor_view<rig_dialog>(w);
 	// Get the selected radio button into *v
@@ -383,6 +387,7 @@ void rig_dialog::cb_rad_handler(Fl_Widget* w, void* v) {
 }
 
 // Rig input choice selected
+// v is not used
 void rig_dialog::cb_ch_rig(Fl_Widget* w, void* v) {
 	rig_dialog* that = ancestor_view<rig_dialog>(w);
 	// First save hamlib values back to rig
@@ -405,6 +410,7 @@ void rig_dialog::cb_ch_rig(Fl_Widget* w, void* v) {
 }
 
 // Mode input choice selected
+// v is not used
 void rig_dialog::cb_ch_model(Fl_Widget* w, void* v) {
 	Fl_Choice* ch = (Fl_Choice*)w;
 	rig_dialog* that = ancestor_view<rig_dialog>(w);
@@ -439,6 +445,7 @@ void rig_dialog::cb_ch_model(Fl_Widget* w, void* v) {
 }
 
 // Override rig capabilities selected - repopulate the baud choice
+// v is a pointer to the override flag
 void rig_dialog::cb_ch_over(Fl_Widget* w, void* v) {
 	cb_value<Fl_Check_Button, bool>(w, v);
 	rig_dialog* that = ancestor_view<rig_dialog>(w);
@@ -446,6 +453,7 @@ void rig_dialog::cb_ch_over(Fl_Widget* w, void* v) {
 }
 
 // Select all ports in port choice
+// v is a pointer to the all ports flag
 void rig_dialog::cb_bn_all(Fl_Widget* w, void* v) {
 	cb_value<Fl_Check_Button, bool>(w, v);
 	rig_dialog* that = ancestor_view<rig_dialog>(w);
@@ -561,8 +569,7 @@ void rig_dialog::save_values() {
 	add_rig_if();
 }
 
-
-// POpulate the chice with the available ports
+// Populate the choice with the available ports
 void rig_dialog::populate_port_choice() {
 	port_if_choice_->clear();
 	port_if_choice_->add("NONE");
@@ -571,6 +578,7 @@ void rig_dialog::populate_port_choice() {
 	int num_ports = 1;
 	existing_ports_ = new string[1];
 	serial serial;
+	// Get the list of all ports or available (not in use) ports
 	while (!serial.available_ports(num_ports, existing_ports_, all_ports_, num_ports)) {
 		delete[] existing_ports_;
 		existing_ports_ = new string[num_ports];

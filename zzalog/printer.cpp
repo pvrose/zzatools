@@ -124,7 +124,6 @@ int printer::print_book() {
 				if (!error) error = start_page();
 				if (!error) print_page_header(page_number);
 			}
-			//Fl::wait();
 		}
 		else if (!error && i == navigation_book_->size()) {
 			// Draw thick line at the bottom
@@ -326,7 +325,6 @@ int printer::print_cards() {
 			else {
 				error = end_page();
 			}
-			//Fl::wait();
 		}
 	}
 	if (!error) end_job();
@@ -458,6 +456,7 @@ int printer::card_properties() {
 	return 0;
 }
 
+// Start the print job. Display user dialog and report abnormalities
 bool printer::start_printer(int& from_page, int& to_page) {
 	char* error_message = new char[256];;
 	memset(error_message, 0, 256);

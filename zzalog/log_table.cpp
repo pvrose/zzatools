@@ -99,8 +99,7 @@ log_table::~log_table()
 	clear();
 }
 
-// callback - called when mouse button is released but also at other times. The handle method
-// will have been called when the evnt happend allowing us to get full details of the event
+// callback - called when mouse button is released but also at other times.
 void log_table::cb_tab_log(Fl_Widget* w, void* v) {
 	// Get the row and field clicked
 	log_table* that = (log_table*)w;
@@ -134,14 +133,14 @@ void log_table::cb_tab_log(Fl_Widget* w, void* v) {
 		break;
 	case Fl_Table::CONTEXT_COL_HEADER:
 		that->done_edit();
-		if (that->last_event_ == FL_PUSH && that->last_button_ == FL_LEFT_MOUSE && that->last_clicks_) {
+		if (Fl::event() == FL_PUSH && Fl::event_button() == FL_LEFT_MOUSE && Fl::event_clicks()) {
 			// Left button double click on column header
 			that->dbl_click_column(col);
 		}
 		break;
 	case Fl_Table::CONTEXT_RC_RESIZE:
 		that->done_edit();
-		if (that->last_event_ == FL_DRAG && that->last_button_ == FL_LEFT_MOUSE && that->is_interactive_resize()) {
+		if (Fl::event() == FL_DRAG && Fl::event_button() == FL_LEFT_MOUSE && that->is_interactive_resize()) {
 			// A row or column has been resized
 			that->drag_column(col);
 		}
@@ -149,11 +148,13 @@ void log_table::cb_tab_log(Fl_Widget* w, void* v) {
 	}
 }
 
+// Callback from the edit input - Enter key has been typed
 void log_table::cb_input(Fl_Widget* w, void* v) {
 	log_table* that = ancestor_view<log_table>(w);
 	that->done_edit();
 }
 
+// Copy the data from the edit input, and start a new edit input to the left, right, above or below
 void log_table::edit_save(edit_input::edit_exit_t exit_type) {
 	// Deselect row being edited
 	select_row(edit_row_, 0);
@@ -329,6 +330,7 @@ int log_table::handle(int event) {
 
 // override of view::update(). view-specific actions on update
 void log_table::update(hint_t hint, unsigned int record_num_1, unsigned int record_num_2) {
+	record* this_record = my_book_->get_record(my_book_->item_number(record_num_1), false);
 	switch (hint) {
 	case HT_FORMAT:
 		// format has changed - it may be fields so update them
@@ -379,7 +381,7 @@ void log_table::draw_cell(TableContext context, int R, int C, int X, int Y, int 
 		// Put record number into header (left-most column)
 		fl_push_clip(X, Y, W, H);
 		{
-
+			// If the row is selected include the row header in the colouring
 			Fl_Color bg_colour = row_selected(R) ? selection_color() : row_header_color();
 			fl_color(bg_colour);
 			fl_rectf(X, Y, W, H);
@@ -388,6 +390,7 @@ void log_table::draw_cell(TableContext context, int R, int C, int X, int Y, int 
 			// Make this italic version of default font
 			Fl_Font save = fl_font();
 			fl_font(FONT | FL_ITALIC, FONT_SIZE);
+			// Display record number (starting at 1) in the row header
 			record_num_t item_number = (order_ == LAST_TO_FIRST) ? my_book_->size() - 1 - R : R;
 			text = to_string(my_book_->record_number(item_number) + 1);
 			fl_draw(text.c_str(), X, Y, W, H, FL_ALIGN_LEFT);
@@ -424,7 +427,7 @@ void log_table::draw_cell(TableContext context, int R, int C, int X, int Y, int 
 			!(edit_input_->visible() && R == edit_row_ && C == edit_col_)) {
 			fl_push_clip(X, Y, W, H);
 			{
-				// BG COLOR - fill the cell with a colour
+				// Selected rows will have table specific colour, the others will be white
 				Fl_Color bg_colour = row_selected(R) ? selection_color() : FL_WHITE;
 				fl_color(bg_colour);
 				fl_rectf(X, Y, W, H);
@@ -513,64 +516,72 @@ void log_table::edit_cell(int row, int col) {
 	intl_input* input = (intl_input*)edit_input_;
 	edit_row_ = row;
 	edit_col_ = col;
-//	set_selection(row, col, row, col);
 	// Get cell location
 	int X, Y, W, H;
 	find_cell(CONTEXT_CELL, row, col, X, Y, W, H);
-	// Open edit dialog - on top of cell
-	input->resize(X, Y, W, H);				// Move Fl_Input widget there
+	// Open edit dialog exactly the size and position of the cell
+	input->resize(X, Y, W, H);
 	input->value(text.c_str());
-	input->position(0, text.length());			// Select entire input field
-	input->show();					// Show the input widget, now that we've positioned it
+	// Select all the contents of the input
+	input->position(0, text.length());
+	// Make the widget visible and let it take focus even if the mouse isn't over it
+	input->show();
 	input->take_focus();
 	input->redraw();
-//	if (intl_dialog_) intl_dialog_->editor(edit_input_);
 	damage(FL_DAMAGE_ALL, X, Y, W, H);
 	redraw();
 }
 
-// Save the edit
+// Copy data from the edit input into the record
 void log_table::done_edit() {
 	if (edit_input_->visible()) {
 		// Get the record and field
 		record_num_t item_number = (order_ == LAST_TO_FIRST) ? my_book_->size() - 1 - edit_row_ : edit_row_;
 		record* record = my_book_->get_record(item_number, true);
 		field_info_t field_info = fields_[edit_col_];
-		string old_text = record->item(fields_[edit_col_].field);
+		string old_text = record->item(field_info.field);
 		string text = ((intl_input*)edit_input_)->value();
+		// Set the record item to the edit input value
 		record->item(field_info.field, text);
+		// Now implemnt book-specific actions
 		switch (my_book_->book_type()) {
 		case OT_MAIN:
 		case OT_EXTRACT:
-			// Update all views - including this
+			// Set book is modified if a new record
 			if (!my_book_->modified_record() && !my_book_->new_record()) {
 				if (!my_book_->new_record()) {
 					my_book_->modified_record(true);
 				}
 			}
 			else {
+				// This book has now been modified. Redraw it and tell menu to update enabled menu items
 				redraw();
 				book_->modified(true);
 				menu_->update_items();
 			}
-			// Update all views with the change
-			if (fields_[edit_col_].field == "GRIDSQUARE" || fields_[edit_col_].field == "DXCC") {
+			// Update all views with the change - GRIDSQUARE and DXCC are major changes that require DxAtlas to be redrawn, date/time the book to be reordered
+			if (field_info.field == "QSO_DATE" || field_info.field == "TIME_ON") {
+				// The book will tell all views
+				book_->selection(my_book_->record_number(item_number), HT_START_CHANGED);
+			}
+			else if (field_info.field == "GRIDSQUARE" || field_info.field == "DXCC") {
 				book_->selection(my_book_->record_number(item_number), HT_CHANGED);
 			}
 			else {
 				book_->selection(my_book_->record_number(item_number), HT_MINOR_CHANGE);
 			}
-			if (fields_[edit_col_].field == "CALL") {
+			if (field_info.field == "CALL") {
 				toolbar_->search_text(my_book_->record_number(item_number));
 			}
 			char message[200];
+			// Log the fact that a record has been interactively changed
 			snprintf(message, 200, "LOG: %s %s %s record changed %s from %s to %s",
 				record->item("QSO_DATE").c_str(),
 				record->item("TIME_ON").c_str(),
 				record->item("CALL").c_str(),
-				fields_[edit_col_].field.c_str(),
+				field_info.field.c_str(),
 				old_text.c_str(),
-				text.c_str());
+				record->item(field_info.field).c_str());
 			status_->misc_status(ST_LOG, message);
 			break;
 		case OT_IMPORT:
@@ -646,7 +657,8 @@ void log_table::dbl_click_column(int col) {
 		redraw();
 	}
 	else if (my_book_->book_type() == OT_EXTRACT) {
-		// Save record number of selected item
+		// Sorting on any other column is only available in extracted records
+		// Remember the record number
 		record_num_t selected_record = my_book_->record_number(my_book_->selection());
 		switch (order_) {
 		case FIRST_TO_LAST:
@@ -662,6 +674,7 @@ void log_table::dbl_click_column(int col) {
 				order_ = SORTED_UP;
 			}
 			else {
+				// Sort up the way on selected column
 				((extract_data*)my_book_)->reextract();
 				((extract_data*)my_book_)->sort_records(field_info.field, false);
 				order_ = SORTED_UP;

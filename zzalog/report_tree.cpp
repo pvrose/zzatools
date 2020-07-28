@@ -669,6 +669,7 @@ void report_tree::add_category(int level, report_cat_t category) {
 }
 
 // Click in the report
+// v is not used
 void report_tree::cb_tree_report(Fl_Widget* w, void* v) {
 	report_tree* that = (report_tree*)w;
 	Fl_Tree_Item* item = that->callback_item();

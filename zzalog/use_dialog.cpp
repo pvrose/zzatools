@@ -31,6 +31,7 @@ use_dialog::use_dialog(use_dialog_t type) :
 	// Set the item type and set attributes accordingly
 	all_items_.clear();
 	labelsize(FONT_SIZE);
+	// Set the settings path, item name and dialog label according to what we are wanting to use
 	switch (type_)
 	{
 	case UD_RIG:

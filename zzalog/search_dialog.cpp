@@ -486,6 +486,7 @@ void search_dialog::fail(string message) {
 }
 
 // callback - OK button clicked
+// v is not used
 void search_dialog::cb_bn_ok(Fl_Widget* w, void* v) {
 	search_dialog* that = ancestor_view<search_dialog>(w);
 	that->save_values();
@@ -494,6 +495,7 @@ void search_dialog::cb_bn_ok(Fl_Widget* w, void* v) {
 }
 
 // callback - Cancel button clicked
+// v is not used
 void search_dialog::cb_bn_cancel(Fl_Widget* w, void* v) {
 	search_dialog* that = ancestor_view<search_dialog>(w);
 	// Closes the dialog - returns FAIL

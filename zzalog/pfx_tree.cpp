@@ -202,7 +202,7 @@ void pfx_tree::populate_tree(bool activate) {
 			insert_parent(parent, *it);
 		}
 		else {
-			// Insert the prefix to the root of the tree (which will then be built down to it).
+			// Insert the prefix to the root of the tree (which will then be built down from it).
 			insert_child(nullptr, *it);
 		}
 		status_->progress(i, OT_PREFIX);
@@ -263,9 +263,9 @@ void pfx_tree::insert_parent(Fl_Tree_Item*& child, prefix* prefix) {
 	get_data(prefix, data);
 	// See if the prefix has already been added
 	child = get_item(nullptr, data[0]);
-	if (child == NULL) {
+	if (child == nullptr) {
 		// It hasn't...
-		if (prefix->parent_ != NULL) {
+		if (prefix->parent_ != nullptr) {
 			// Insert the parent
 			Fl_Tree_Item* parent = nullptr;
 			insert_parent(parent, prefix->parent_);
@@ -292,7 +292,7 @@ void pfx_tree::insert_parent(Fl_Tree_Item*& child, prefix* prefix) {
 	child->close();
 }
 
-// Scan the tree from the indicated item to get the item below it matches the text 
+// Scan the tree from the indicated item to get the item below that matches the text 
 Fl_Tree_Item* pfx_tree::get_item(Fl_Tree_Item* item, string text) {
 	// Look in the child items and return when we find it
 	Fl_Tree_Item* child;

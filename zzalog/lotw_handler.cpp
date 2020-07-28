@@ -116,7 +116,7 @@ bool lotw_handler::upload_lotw_log(book* book) {
 			char* command = new char[20 + new_filename.length() + tqsl_executable.length()];
 			sprintf(command, "\"%s\" -x -u -d %s", tqsl_executable.c_str(), new_filename.c_str());
 			status_->misc_status(ST_NOTE, "LOTW: Signing and uploading QSLs to LotW");
-			// Launch TQSL - signs and uploads data
+			// Launch TQSL - signs and uploads data: Note this is a blocking action
 			int result = system(command);
 			delete[] command;
 			// Analyse result received from TQSL - responses documented in TQSL help
@@ -163,7 +163,7 @@ bool lotw_handler::upload_lotw_log(book* book) {
 				ok = true;
 				break;
 			case 10:
-				status_->misc_status(ST_ERROR, "LOTW:command syntax error");
+				status_->misc_status(ST_ERROR, "LOTW: Command syntax error");
 				ok = false;
 				break;
 			case 11:
@@ -333,7 +333,7 @@ bool lotw_handler::validate_adif(stringstream* adif) {
 		return false;
 	}
 	else {
-		// It must be ADIF
+		// It should be ADIF
 		return true;
 	}
 }

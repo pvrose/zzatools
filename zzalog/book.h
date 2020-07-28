@@ -53,7 +53,8 @@ namespace zzalog {
 		HT_LOCATION,              // The home locations have changed
 		HT_MERGE_DETAILS,         // Additional details are available (e.g. from QRZ.com) - allow user to select which data to add
 		HT_RESET_ORDER,           // Reset order as first to last
-		HT_MEMORIES               // Read mmemories from rig
+		HT_MEMORIES,              // Read mmemories from rig
+		HT_START_CHANGED,         // The start date or time has changed
 	};
 
 	class view;

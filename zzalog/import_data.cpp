@@ -37,7 +37,7 @@ extern menu* menu_;
 extern scratchpad* scratchpad_;
 extern void add_rig_if();
 
-// Constructor
+// Constructor - this book is used to contain data being imported. It adds functionality to support this
 import_data::import_data() :
 	book()
 {
@@ -73,15 +73,16 @@ import_data::~import_data()
 	delete[] update_files_;
 }
 
-// Timer callback - Called every second so that a countdown can be displayed
+// Timer callback - Called every second between auto-updates so that a countdown can be displayed
 void import_data::cb_timer_imp(void* v) {
 	import_data* that = (import_data*)v;
 	time_t now;
 	time(&now);
+	// How many seconds still to go before we need to start an auto-update
 	double seconds = that->timer_period_ - difftime(now, that->timer_start_);
 	status_->progress((int)seconds, that->book_type());
 	if (seconds <= 0.0) {
-		// Countdown reached zero so update
+		// Countdown reached zero so start the auto-update
 		that->auto_update();
 	}
 	else {
@@ -90,7 +91,7 @@ void import_data::cb_timer_imp(void* v) {
 	}
 }
 
-// Start the auto update process
+// Prepare the auto update process
 bool import_data::start_auto_update() {
 	// Tell user
 	status_->misc_status(ST_NOTE, "IMPORT: Started");
@@ -109,15 +110,17 @@ bool import_data::start_auto_update() {
 		last_timestamps_ = new string[num_update_files_];
 		// For each auto-impor file
 		for (int i = 0; i < num_update_files_; i++) {
-			// Get the information
+			// Source names is the name of the group
 			sources_[i] = files_settings.group(i);
 			Fl_Preferences file_settings(files_settings, sources_[i].c_str());
+			// Filename
 			char * temp;
 			file_settings.get("Filename", temp, "");
 			update_files_[i] = temp;
 			free(temp);
+			// Empty the file after reading
 			file_settings.get("Empty On Read", empty_files_[i], false);
-			// Arbitrary previous timestamp
+			// Date last read - default is arbitrary - some time before I coded this
 			file_settings.get("Timestamp", temp, "20190601000000");
 			last_timestamps_[i] = temp;
 			free(temp);
@@ -135,7 +138,7 @@ bool import_data::start_auto_update() {
 	return true;
 }
 
-// Start an automatic (on timer) update from the defined locations
+// Start a read of files to auto update from
 void import_data::auto_update() {
 	// Report auto-update
 	status_->misc_status(ST_NOTE, "IMPORT: File load started");
@@ -150,6 +153,7 @@ void import_data::auto_update() {
 		bool failed = false;
 		char timestamp[16];
 #ifdef _WIN32
+		// Open the file to see when it was last written
 		int fd = _sopen(update_files_[i].c_str(), _O_RDONLY, _SH_DENYNO);
 		if (fd == -1) {
 			string message = "IMPORT: Error opening file " + update_files_[i] + ": " + string(strerror(errno));
@@ -166,6 +170,7 @@ void import_data::auto_update() {
 		// TODO: Code Posix version of the above
 #endif
 			if (timestamp > last_timestamps_[i]) {
+				// The file has been written since it was last read by this process
 				// Load data from the auto-import file - concatenating all files
 				char message[256];
 				sprintf(message, "IMPORT: Loading %s", sources_[i].c_str());
@@ -185,7 +190,7 @@ void import_data::auto_update() {
 		}
 	}
 	if (size()) {
-		// Tell user and merge records from the auto-import
+		// Merge records from the auto-import
 		update_mode_ = AUTO_IMPORT;
 		status_->misc_status(ST_NOTE, "IMPORT: merging data");
 		status_->progress(size(), book_type_, "records");
@@ -231,7 +236,9 @@ void import_data::merge_update() {
 	record* book_record = book_->get_record();
 	// Grid square may change (more accurate)
 	hint_t hint;
-	book_record->merge_records(import_record, false, &hint);
+	if (book_record->merge_records(import_record, false, &hint)) {
+		book_->modified(true, false);
+	}
 	if (pfx_data_->parse(book_record) == PR_CHANGED) {
 		book_->modified(true, false);
 	}
@@ -270,7 +277,7 @@ void import_data::repeat_auto_timer() {
 	Fl_Preferences update_settings(settings_, "Real Time Update");
 	update_settings.get("Polling Interval", timer_period_, AUTO_IP_DEF);
 
-	// Restart the timer
+	// Restart the timer - 1 second so get visual indication of the time counting down
 	Fl::repeat_timeout(1.0, cb_timer_imp, (void*)this);
 	// Tell user - display countdown so that the bar gets bigger as it counts down the seconds
 	status_->progress((int)timer_period_, OT_IMPORT, "seconds", true);
@@ -456,7 +463,7 @@ void import_data::update_book() {
 					}
 					book_->selection(offset, HT_IMPORT_QUERYNEW);
 				}
-				// Expected New record (merging logs) - Move from update log to main log. 
+				// Expected new record (merging logs) - Move from update log to main log. 
 				else if (!found_match && (update_mode_ == AUTO_IMPORT || update_mode_ == FILE_IMPORT)) {
 					// If Auto update or importing a file then record needs parsing etc.
 					import_record->update_timeoff();
@@ -497,11 +504,11 @@ void import_data::update_book() {
 	}
 }
 
-// Stop importing - about to do something else. Either crash or gracefully complete
+// Stop importing - about to do something else. Either immediately or gracefully complete
 void import_data::stop_update(logging_mode_t mode, bool immediate) {
 	// Turn auto-import off
 	Fl::remove_timeout(cb_timer_imp);
-	// If immediately crashing
+	// If immediately crashing - stop expecting further updates
 	if (immediate) {
 		update_mode_ = NONE;
 	}
@@ -518,7 +525,7 @@ void import_data::stop_update(logging_mode_t mode, bool immediate) {
 		break;
 	case NONE:
 	case WAIT_AUTO:
-		// 
+		// Empty this book (used for immediate stop)
 		delete_contents(true);
 		status_->progress("Auto-update stopped", OT_IMPORT);
 		close_pending_ = false;
@@ -704,6 +711,7 @@ void import_data::convert_update(record* record) {
 		// Received LotW update so need to set clublog status to M(odified) so it will get uploaded again
 		if (record->item("LOTW_QSLRDATE").length() && record->item("CLUBLOG_QSO_UPDATE_STATUS") == "Y") {
 			record->item("CLUBLOG_QSO_UPDATE_STATUS", string("M"));
+			number_clublog_++;
 		}
 	}
 
@@ -784,12 +792,14 @@ void import_data::merge_data() {
 	// Tell user
 	status_->misc_status(ST_NOTE, "IMPORT: Merging files started");
 	status_->progress(size(), book_type_, "records");
+	// Reset counts
 	number_to_import_ = size();
 	number_accepted_ = 0;
 	number_updated_ = 0;
 	number_checked_ = 0;
 	number_added_ = 0;
 	number_rejected_ = 0;
+	number_clublog_ = 0;
 	// Merge this book into main log book
 	update_book();
 	// If we have no user query - switch to main log view

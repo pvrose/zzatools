@@ -117,7 +117,7 @@ record::record(logging_mode_t type) {
 			item("TX_PWR", rig_if_->get_tx_power());
 		}
 		else {
-			// otherwise we enter it manually later.
+			// otherwise leave blank so that we enter it manually later.
 			item("FREQ", string(""));
 			item("MODE", string(""));
 			item("SUBMODE", string(""));
@@ -529,9 +529,9 @@ void record::item(string field, double& value) {
 			value = stod(item(field));
 		}
 		catch (invalid_argument&) {
-			// Special cases - convert LAT/LON to signed decimal degrees (using formatted = true)
+			// If it's not a valid decimal it may be in LAT/LON format
 			if (field == "LAT" || field == "LON" || field == "MY_LAT" || field == "MY_LON") {
-				// Get formated version
+				// Get formatted version
 				string item_value = item(field, true, true);
 				try {
 					value = stod(item_value);
@@ -608,7 +608,7 @@ void record::unparse() {
 	status_->misc_status(ST_LOG, message);
 }
 
-// Return laongitude and latitude
+// Return longitude and latitude
 lat_long_t record::location(bool my_station) {
 	location_t dummy;
 	return location(my_station, dummy);
@@ -653,7 +653,7 @@ lat_long_t record::location(bool my_station, location_t& source) {
 			string prefix_code = item("APP_ZZA_PFX");
 			if (prefix_code != "") {
 				prefix* prefix = pfx_data_->get_prefix(prefix_code);
-				if (prefix != NULL) {
+				if (prefix != nullptr) {
 					prefix_lat_long.latitude = prefix->latitude_;
 					prefix_lat_long.longitude = prefix->longitude_;
 				}
@@ -945,10 +945,11 @@ match_result_t record::match_records(record* record) {
 		bool within_30mins = abs(time_difference) <= (30.0 * 60.0);
 		bool is_swl = (item("SWL") == "Y");
 		bool other_swl = (record->item("SWL") == "Y");
-		// is_swl and time within 30 - SWL_MATCH
+		// Both records are SWL and match
 		if (is_swl && other_swl && swl_match && within_30mins) {
 			return MT_2XSWL_MATCH;
 		}
+		// is_swl and time within 30 - SWL_MATCH
 		else if (is_swl && !other_swl && swl_match && within_30mins) {
 			return MT_SWL_MATCH;
 		}
@@ -977,7 +978,7 @@ match_result_t record::match_records(record* record) {
 	}
 }
 
-// items match between records
+// compare the item between this record and supplied record
 bool record::items_match(record* record, string field_name) {
 	string lhs = item(field_name);
 	string rhs = record->item(field_name);
@@ -1042,6 +1043,7 @@ time_t record::timestamp(bool time_off /*= false*/) {
 		// Convert date and time to a tm struct
 		tm qso_time;
 		if (time_off) {
+			// Get end timestamp
 			if (item_exists("QSO_DATE_OFF")) {
 				// Use QSO_DATE_OFF if it exists
 				qso_time.tm_year = stoi(item("QSO_DATE_OFF").substr(0, 4)) - 1900;
@@ -1079,6 +1081,7 @@ time_t record::timestamp(bool time_off /*= false*/) {
 			}
 		}
 		else {
+			// Get start timestamp
 			qso_time.tm_year = stoi(item("QSO_DATE").substr(0, 4)) - 1900;
 			qso_time.tm_mon = stoi(item("QSO_DATE").substr(4, 2)) - 1;
 			qso_time.tm_mday = stoi(item("QSO_DATE").substr(6, 2));
@@ -1103,7 +1106,8 @@ time_t record::timestamp(bool time_off /*= false*/) {
 // Update the time the QSO finishes
 void record::update_timeoff() {
 	if (!is_header_ && item("TIME_OFF").length() == 0) {
-		// Only do this for a QSO record - get the start time and add 10 seconds
+		// TIME_OFF has no meaning in a header record
+		// Set TIME_OFF to TIME_ON plus 10 s.
 		chrono::system_clock::time_point time_on = chrono::system_clock::from_time_t(timestamp());
 		chrono::duration<int, ratio<1> > ten_seconds(10);
 		time_t time_off = chrono::system_clock::to_time_t(time_on + ten_seconds);

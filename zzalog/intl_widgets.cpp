@@ -10,6 +10,7 @@ intl_editor::intl_editor(int X, int Y, int W, int H, const char* label) :
 	Fl_Text_Editor(X, Y, W, H, label),
 	insert_mode_(true)
 {
+	// Define standard cursor
 	insert_mode(insert_mode_);
 	if (insert_mode_) {
 		cursor_style(Fl_Text_Display::NORMAL_CURSOR);
@@ -21,7 +22,7 @@ intl_editor::intl_editor(int X, int Y, int W, int H, const char* label) :
 
 // Event handler - handle event as normal then set the cursor depending on current insert mode
 int intl_editor::handle(int event) {
-	// Tell international character dialog to paste to this widget
+	// Tell international character dialog to paste to this widget as this is the most recent one to get focus
 	if (event == FL_FOCUS && intl_dialog_) {
 		intl_dialog_->editor(this);
 	}

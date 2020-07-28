@@ -130,7 +130,7 @@ bool qrz_handler::fetch_details() {
 	}
 }
 
-		// Decode session response
+// Decode session response
 bool qrz_handler::decode_session_response(istream& response) {
 	qrz_version_ = "";
 	xml_reader* reader = new xml_reader;
@@ -141,7 +141,7 @@ bool qrz_handler::decode_session_response(istream& response) {
 	return result;
 }
 
-// DEcode details response
+// Decode details response
 bool qrz_handler::decode_details_response(istream& response) {
 	xml_reader* reader = new xml_reader;
 	reader->parse(response);

@@ -109,8 +109,6 @@ namespace zzalog {
 		response_t adif_filename(string& filename);
 		// Download the data
 		response_t download_adif(string& filename, stringstream* adif);
-		// convert simple ADIF items to ADIF string
-		string adif_item(record* record, string fieldname);
 		// Generate list of adif fields
 		void adif_fields(set<string>& fields);
 		// Generate list of POST FORM fields

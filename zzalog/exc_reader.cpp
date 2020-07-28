@@ -9,21 +9,60 @@ using namespace zzalog;
 extern status* status_;
 extern bool closing_;
 
+/* XML structure
+
+<clublog>
+:
+:
+<exceptions>
+	<exception record='6002'>
+		<call>VE1ST/NA14</call>
+		<entity>CANADA</entity>
+		<adif>1</adif>
+		<cqz>4</cqz>
+		<cont>NA</cont>
+		<long>-97.14</long>
+		<lat>49.90</lat>
+	</exception>
+	:
+	:
+</exceptions>
+:
+:
+<invalid_operations>
+	<invalid record='489'>
+		<call>T88A</call>
+		<start>1995-05-01T00:00:00+00:00</start>
+		<end>1995-12-31T23:59:59+00:00</end>
+	</invalid>
+	:
+	:
+</invalid_operations>
+:
+:
+</clublog>
+
+
+*/
+
+// Constructor
 exc_reader::exc_reader() {
 	ignore_processing_ = false;
 	current_exception_ = nullptr;
 	current_invalid_ = nullptr;
 }
 
+// Destructor
 exc_reader::~exc_reader() {
 }
 
 // Overloadable XML handlers
-// Start 
+// Start element
 bool exc_reader::start_element(string name, map<string, string>* attributes) {
 	if (!ignore_processing_) {
 		elements_.push_back(name);
 		if (name == "entities" || name == "prefixes" || name == "zone_exceptions") {
+			// We are only interested in exception and invalid records
 			ignore_processing_ = true;
 		}
 		else if (name == "exception") {
@@ -36,18 +75,21 @@ bool exc_reader::start_element(string name, map<string, string>* attributes) {
 	return true;
 }
 
-// End
+// End element
 bool exc_reader::end_element(string name) {
 	if (ignore_processing_) {
+		// We stop ignoring
 		if (name == elements_.back()) {
 			ignore_processing_ = false;
 			elements_.pop_back();
 		}
 	}
 	else {
+		// Capture the exception or invalid record. Move the record to the database
 		string element = elements_.back();
 		elements_.pop_back();
 		if (element == "exception") {
+			// The records are stored as list of records mapped from the callsign
 			if (data_->entries_.find(current_exception_->call) == data_->entries_.end()) {
 				list<exc_entry*>* entries = new list<exc_entry*>;
 				(data_->entries_)[current_exception_->call] = *entries;
@@ -56,6 +98,7 @@ bool exc_reader::end_element(string name) {
 			current_exception_ = nullptr;
 		}
 		else if (element == "invalid") {
+			// The records are stored as list of records mapped from the callsign
 			if (data_->invalids_.find(current_invalid_->call) == data_->invalids_.end()) {
 				list<invalid*>* invalids = new list<invalid*>;
 				(data_->invalids_)[current_invalid_->call] = *invalids;
@@ -64,6 +107,7 @@ bool exc_reader::end_element(string name) {
 			current_invalid_ = nullptr;
 		}
 		else if (elements_.size() && elements_.back() == "exception") {
+			// Build up the exception record from the various child elements
 			if (element == "call") current_exception_->call = value_;
 			else if (element == "adif") current_exception_->adif_id = stoi(value_);
 			else if (element == "cqz") current_exception_->cq_zone = stoi(value_);
@@ -74,28 +118,31 @@ bool exc_reader::end_element(string name) {
 			else if (element == "end") current_exception_->end = convert_xml_datetime(value_);
 		}
 		else if (elements_.size() && elements_.back() == "invalid") {
+			// Build up the invalid record from the various child elements
 			if (element == "call") current_invalid_->call = value_;
 			else if (element == "start") current_invalid_->start = convert_xml_datetime(value_);
 			else if (element == "end") current_invalid_->end = convert_xml_datetime(value_);
 		}
 	}
 	if (elements_.size() <= 3) {
+		// Report progress only when the depth of elements is less than three.
 		int bytes = (int)file_->tellg();
 		status_->progress(bytes, OT_PREFIX);
 	}
 	return true;
 }
-// Special element
+
+// Special element - not expected
 bool exc_reader::declaration(xml_element::element_t element_type, string name, string content) {
 	return false;
 }
 
-// Processing instructio
+// Processing instruction - ignored
 bool exc_reader::processing_instr(string name, string content) {
 	return false;
 }
 
-// characters
+// characters - set the element value
 bool exc_reader::characters(string content) {
 	value_ = content;
 	return true;

@@ -52,7 +52,6 @@ void spec_tree::delete_tree() {
 	clear();
 }
 
-// methods
 // Populate the tree control with the data from the selected prefixes
 void spec_tree::populate_tree(bool activate) {
 	// Lengthy operation - so put the timer cursor on
@@ -65,7 +64,7 @@ void spec_tree::populate_tree(bool activate) {
 	root(root_item);
 	root_item->labelfont(item_labelfont() | FL_BOLD);
 	root_label("Specifications");
-	// Special treatment for PAS and SAS
+	// Special treatment for PAS, SAS and SUBMODE
 	pas_item_ = add("Primary_Administrative_Subdivision");
 	pas_item_->labelfont(item_labelfont() | FL_BOLD);
 	sas_item_ = add("Secondary_Administrative_Subdivision");
@@ -105,7 +104,7 @@ void spec_tree::insert_adif_spec(Fl_Tree_Item* parent, const spec_dataset& datas
 	bool submode = false;
 	// Hang item name.
 	Fl_Tree_Item* hang_item;
-	// If item needs hanging at PAS or SAS level
+	// If item needs hanging at PAS, SAS or SUBMODE level
 	if (parent == nullptr) {
 		if (name.substr(0, 7) == "Primary") {
 			hang_item = pas_item_;

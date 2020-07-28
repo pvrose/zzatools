@@ -75,10 +75,10 @@ void tabbed_forms::add_view(const char* label, field_ordering_t column_data, obj
 	VIEW* view = new VIEW(rx, ry, rw, rh, label, column_data);
 	// label - a bit bigger than text font size
 	view->labelsize(FONT_SIZE + 1);
-	// standard colour used to represent this view - its tab and selected record/item
+	// standard colour used to represent this view - its tab, selected record/item and progress bar
 	Fl_Color bg_colour = OBJECT_COLOURS.at(object);
 	view->selection_color(bg_colour);
-	// The colour for undrawn parst of the view - 25% colour, 75% white
+	// The colour for undrawn parts of the view - 25% colour, 75% white
 	view->color(fl_color_average(bg_colour, FL_WHITE, 0.25));
 	// Draw the label text in a contrasting colour
 	view->labelcolor(fl_contrast(FL_BLACK, bg_colour));
@@ -91,10 +91,11 @@ void tabbed_forms::add_view(const char* label, field_ordering_t column_data, obj
 	widgets_[object] = view;
 }
 
-// tell all views and others that record(s) have changed
+// tell all views and others that record(s) have changed and why
 void tabbed_forms::update_views(view* requester, hint_t hint, record_num_t record_1, record_num_t record_2) {
 	// Pass to each view in turn - note update() is a method in view.
 	for (auto ix = forms_.begin() ; ix != forms_.end() && !closing_; ix++) {
+		// If the requesting view is this view don't update it, it will have done its own updating
 		if (requester == (void*)0 || requester != ix->second) {
 			ix->second->update(hint, record_1, record_2);
 		}
@@ -112,10 +113,11 @@ void tabbed_forms::update_views(view* requester, hint_t hint, record_num_t recor
 // Activate or deactivate the named object - if selecting another log_view change the navigation_book_
 void tabbed_forms::activate_pane(object_t pane, bool active) {
 	if (active) {
-		// Switch to the specified view
+		// Make the pane active
 		if (!widgets_[pane]->active()) {
 			widgets_[pane]->activate();
 		}
+		// Select the pane
 		value(widgets_[pane]);
 		selection_color(value()->color());
 		switch (pane) {
@@ -171,9 +173,11 @@ view* tabbed_forms::get_view(object_t view_name) {
 // Callback - change selected colour when tab changes
 void tabbed_forms::cb_tab_change(Fl_Widget* w, void* v) {
 	Fl_Tabs* that = (Fl_Tabs*)w;
+	// Set the colour to that of the pane
 	that->selection_color(that->value()->color());
 	log_table* table = dynamic_cast<log_table*>(that->value());
 	if (table) {
+		// The pane is a log book viewer. Change the navigation controls to affect that pane
 		switch (table->get_book()->book_type()) {
 		case OT_MAIN:
 			navigation_book_ = book_;
@@ -188,7 +192,7 @@ void tabbed_forms::cb_tab_change(Fl_Widget* w, void* v) {
 	}
 }
 
-// Minimum width resizing
+// Minimum width resizing - sets to the largest minimum width of all the panes
 int tabbed_forms::min_w() {
 	int min_w = 0;
 	// For each view (as view) get its minimum width
@@ -198,7 +202,7 @@ int tabbed_forms::min_w() {
 	return min_w;
 }
 
-// Minimum height resizing
+// Minimum height resizing - sets to the larges minimum height of all the panes
 int tabbed_forms::min_h() {
 	int min_h = 0;
 	// For each view (as view) get its minimum height

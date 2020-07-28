@@ -53,7 +53,7 @@ namespace zzalog {
 	const basic_regex<char> REGEX_STRING("[\\x20-\\x7E]+");
 	// Sequence of Character + CR/LF
 	const basic_regex<char> REGEX_MULTILINE("([\\x20-\\x7E]|\\x0d\\x0a)+");
-	// Sequence of Character + CR/LF
+	// Sequence of Character + CR or LF
 	const basic_regex<char> REGEX_BAD_MULTILINE("([\\x20-\\x7E]|\\x0d|\\x0a)+");
 	// A sequence of IntlCharacter (UTF-8) 
 	const basic_regex<char> REGEX_INTL_STRING("([\\xF0-\\xFF][\\x80-\\xBF]{3}|[\\xE0-\\xEF][\\x80-\\xBF]{2}|[\\xC0-\\xDF][\\x80-\\xBF]|[\\x20-\\x7F]|[\\x80-\\xBF])+");

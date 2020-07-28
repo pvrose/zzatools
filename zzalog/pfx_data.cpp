@@ -350,9 +350,17 @@ bool pfx_data::all_prefixes(record* record, vector<prefix*>* prefixes, bool spec
 				if (type == PT_SPECIAL) {
 					entitys_prefixes.push_back(dxcc_prefix);
 				}
-				// If no children found - add the DXCC to the result
-				if (entitys_prefixes.size() == 0 && !special) {
-					entitys_prefixes.push_back(dxcc_prefix);
+				else {
+					// If no children found - add the DXCC to the result
+					if (entitys_prefixes.size() == 0 && !special) {
+						entitys_prefixes.push_back(dxcc_prefix);
+					}
+					else {
+						// More than one child found - add DXCC prefix - specific case for W
+						if (entitys_prefixes.size() > 1) {
+							entitys_prefixes.push_back(dxcc_prefix);
+						}
+					}
 				}
 			}
 			// Add this country's result to overall result
@@ -455,6 +463,13 @@ void pfx_data::get_children(vector<prefix*>& children, prefix* parent, unsigned 
 }
 
 // Return true if the callsign matches the pattern in the prefix table
+// NB this is not standard regex matching
+// # matches any numeric
+// @ matches any alphabetic
+// ? matches any character
+// A-Z, 0-9 only match that specific character
+// [] enclose a range of character, either a list (no separator) or - to indicate start and beginning of a series of consecutaive characters
+// . indicates that there should be no more characters in the callsign to match
 bool pfx_data::match_callsign(prefix* prefix, string& callsign) {
 	bool match = false;
 	for (unsigned int i = 0; i < prefix->patterns_.size() && !match; i++) {
@@ -649,17 +664,12 @@ bool pfx_data::update_dxcc(record* record, prefix*& in_prefix, bool& query, stri
 			record->item("DXCC", string(new_dxcc_code));
 			updated = true;
 		}
-		// Get parsed country name - preferably from ADIF enumerated type 
+		// Get parsed country name - preferably from spec_data, default to pfx database
 		if (record->item("COUNTRY") == "") {
 			// Get it from ADIF spec
-			spec_dataset* dxccs = spec_data_->dataset("DXCC_Entity_Code");
-			map<string, string>* dxcc_data = dxccs->data[record->item("DXCC")];
-			if (dxcc_data != nullptr) {
-				record->item("COUNTRY", (*dxcc_data)["Entity Name"]);
-			}
-			else {
-				record->item("COUNTRY", dxcc_prefix->name_);
-			}
+			int adif_id;
+			record->item("DXCC", adif_id);
+			record->item("COUNTRY", spec_data_->entity_name(adif_id));
 			updated = true;
 		}
 		// Get parsed state (Province) name

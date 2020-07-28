@@ -19,8 +19,6 @@ using namespace zzalog;
 using namespace zzalib;
 
 extern Fl_Single_Window* main_window_;
-//extern void add_sub_window(Fl_Window* w);
-//extern void remove_sub_window(Fl_Window* w);
 
 // Constructor
 settings::settings(int W, int H, const char* label, cfg_dialog_t active) :
@@ -169,16 +167,19 @@ void settings::cb_bn_cal(Fl_Widget* w, long arg) {
 	}
 }
 
+// Update all tabs that are selected record dependant
 void settings::update() {
 	for (auto it = updatable_views_.begin(); it != updatable_views_.end(); it++) {
 		(*it)->update();
 	}
 }
 
+// Return active flag
 bool settings::active() {
 	return active_;
 }
 
+// Clear active flag
 void settings::inactive() {
 	active_ = false;
 }

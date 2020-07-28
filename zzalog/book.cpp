@@ -465,6 +465,8 @@ void book::remember_record() {
 // Change the selected record (& update any necessary controls
 void book::selection(record_num_t num_item, hint_t hint /* = HT_SELECTED */, view* requester /* = nullptr */, record_num_t num_other /*= 0*/) {
 	record_num_t previous = current_item_;
+	record* this_record;
+	record_num_t new_record;
 	// Special case - -1 indicates no change to the selection
 	if ((signed)num_item != -1 && size()) {
 		current_item_ = num_item;
@@ -500,6 +502,13 @@ void book::selection(record_num_t num_item, hint_t hint /* = HT_SELECTED */, vie
 			// Update to this record
 			tabbed_view_->update_views(requester, hint, record_number(current_item_));
 		}
+		break;
+	case HT_START_CHANGED:
+		// The QSO start date has been changed. Re-order the book and tell everyone
+		this_record = get_record(current_item_, false);
+		erase(begin() + current_item_);
+		new_record = insert_record(this_record);
+		tabbed_view_->update_views(requester, HT_ALL, new_record);
 		break;
 	default:
 		if (!inhibit_view_update_) {
@@ -1331,3 +1340,4 @@ bool book::delete_enabled() {
 		return true;
 	}
 }
+

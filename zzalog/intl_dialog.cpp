@@ -14,7 +14,6 @@ using namespace zzalib;
 
 extern status* status_;
 extern Fl_Preferences* settings_;
-extern void add_sub_window(Fl_Window* w);
 
 // Constructs a window 
 intl_dialog::intl_dialog() :
@@ -130,7 +129,7 @@ void intl_dialog::cb_bn_save(Fl_Widget* w, void* v) {
 	}
 }
 
-// Callbacl - restore button - reload data
+// Callback - restore button - reload data
 void intl_dialog::cb_bn_restore(Fl_Widget* w, void* v) {
 	intl_dialog* that = ancestor_view<intl_dialog>(w);
 	if (!that->load_data()) {

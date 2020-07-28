@@ -9,13 +9,14 @@ using namespace zzalog;
 extern Fl_Preferences* settings_;
 extern spec_data* spec_data_;
 
+// Constructor - add selected fields (most common) from the spec database
 field_choice::field_choice(int X, int Y, int W, int H, const char* label) :
 	Fl_Choice(X, Y, W, H, label)
 {
 	repopulate(false, "");
 }
 
-
+// Destructor
 field_choice::~field_choice()
 {
 	clear();
@@ -40,7 +41,7 @@ void field_choice::repopulate(bool all_fields, string default_field) {
 		Fl_Preferences set_settings(fields_settings, field_set);
 		free(field_set);
 		if (set_settings.groups() > 0) {
-			// WE have said list so use it
+			// We have defined a list in settings so use that
 			for (int i = 0; i < set_settings.groups(); i++) {
 				Fl_Preferences field_settings(set_settings, set_settings.group(i));
 				char* name;

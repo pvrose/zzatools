@@ -159,6 +159,7 @@ status::status(int X, int Y, int W, int H, const char* label) :
 	}
 
 	status_settings.get("Minimum Level", (int&)min_level_, ST_NOTE);
+	// Update menu to change enables
 	menu_->status_level(min_level_);
 	menu_->append_file(append_log_);
 
@@ -179,6 +180,7 @@ status::~status()
 	progress_stack_.clear();
 }
 
+// Remove file viewer
 void status::null_file_viewer() {
 	delete status_file_viewer_;
 	status_file_viewer_ = nullptr;
@@ -247,10 +249,12 @@ void status::progress(int max_value, object_t object, const char* suffix, bool c
 	no_update_viewer = true;
 	// Initialise it
 	if (progress_items_.find(object) != progress_items_.end()) {
+		// We already have a progress bar process in place for this object
 		char message[100];
 		snprintf(message, 100, "PROGRESS: Already started progress for %s", OBJECT_NAMES.at(object));
 		misc_status(ST_ERROR, message);
 	} else {
+		// Start a new progress bar process - create the progress item (total expected count, objects being counted, up/down and what view it's for)
 		char message[100];
 		snprintf(message, 100, "PROGRESS: Starting %s - %d %s", OBJECT_NAMES.at(object), max_value, suffix);
 		misc_status(ST_LOG, message);
@@ -266,22 +270,23 @@ void status::progress(int max_value, object_t object, const char* suffix, bool c
 		item->suffix = new char[strlen(suffix) + 1];
 		strcpy(item->suffix, suffix);
 		progress_items_[object] = item;
+		// Push it onto the stack of progess bar processes
 		progress_stack_.push_back(object);
 		update_progress(object);
 	}
 }
 
-// Intialise progress bar - 
-// maximum value, purpose (used to set colour) and items counted
+// Update the progress bar for the specified object
 void status::update_progress(object_t object) {
 	if (progress_stack_.size() && progress_stack_.back() == object) {
+		// The progress bar is top of the stack - don't update the bar if it isn't
 		progress_item* item = progress_items_.at(object);
 		Fl_Color bar_colour = OBJECT_COLOURS.at(object);
 		// Set colours
 		progress_->color(OBJECT_COLOURS.at(OT_NONE), bar_colour);
 		progress_->labelcolor(FL_BLACK);
 		char label[100];
-		// Update progress 
+		// Update progress up or down
 		if (item->countdown) {
 			progress_->value((float)(item->max_value - item->value));
 		}
@@ -293,7 +298,7 @@ void status::update_progress(object_t object) {
 		// Set range (0:max_value)
 		progress_->minimum(0.0);
 		progress_->maximum((float)item->max_value);
-		// redraw and allow scheduler to effect the redrawing (only if value has gone up by > 1%)
+		// redraw and allow scheduler to effect the redrawing if value has gone up by > 1%
 		progress_->redraw();
 		if (item->value - prev_progress_ > item->max_value / 100) {
 			Fl::wait();
@@ -302,7 +307,7 @@ void status::update_progress(object_t object) {
 	}
 }
 
-// Update progress bar
+// Update progress bar to the new specified value
 void status::progress(int value, object_t object) {
 	if (progress_stack_.size()) {
 		if (progress_items_.find(object) == progress_items_.end()) {
@@ -314,16 +319,17 @@ void status::progress(int value, object_t object) {
 			progress_item* item = progress_items_.at(object);
 			item->value = value;
 			update_progress(object);
-			// If it's 100% (or 0% if counting down) delete item and draw the next in the stack - certain objects can overrun
+			// If it's 100% (or 0% if counting down) delete item and draw the next in the stack - certain objects can overrun (this will give an error)
 			if ((item->countdown && value <= 0) || (!item->countdown && value >= item->max_value)) {
 				char message[100];
 				snprintf(message, 100, "PROGRESS: %s finished (%d %s)", OBJECT_NAMES.at(object), item->max_value, item->suffix);
 				misc_status(ST_LOG, message);
+				// Remove the item from the stack - even if it's not top of the stack
 				delete item;
 				progress_items_.erase(object);
 				progress_stack_.remove(object);
 				if (progress_stack_.size()) {
-					// Revert to previous progress item
+					// Revert to previous progress item (current top-of-stack)
 					update_progress(progress_stack_.back());
 				}
 				else {
@@ -339,10 +345,11 @@ void status::progress(int value, object_t object) {
 	}
 }
 
-// Update progress bar witha message - e.g. cancelled and mark 100%
+// Update progress bar with a message - e.g. cancel it and display why cancelled
 void status::progress(const char* message, object_t object) {
 	if (progress_stack_.size()) {
 		if (progress_items_.find(object) == progress_items_.end()) {
+			// WE didn't start the bar in the first place
 			char msg[100];
 			snprintf(msg, 100, "PROGRESS: Haven't started progress %s", OBJECT_NAMES.at(object));
 			misc_status(ST_ERROR, msg);
@@ -352,6 +359,7 @@ void status::progress(const char* message, object_t object) {
 			char msg[100];
 			snprintf(msg, 100, "PROGRESS: %s abandoned %s (%d %s)", OBJECT_NAMES.at(object), message, item->value, item->suffix);
 			misc_status(ST_LOG, msg);
+			// Mark progress bar complete
 			if (item->countdown) {
 				progress(0, object);
 			}
@@ -363,6 +371,7 @@ void status::progress(const char* message, object_t object) {
 				progress_->redraw();
 			}
 		}
+		// Allow bar to be drawn
 		Fl::wait();
 	}
 }
@@ -380,9 +389,9 @@ void status::rig_status(rig_status_t status, const char* label) {
 }
 
 
-// Update miscellaneous status - set text and colour
+// Update miscellaneous status - set text and colour, log the status
 void status::misc_status(status_t status, const char* label) {
-	// If we are displaying the message
+	// If we are displaying the message at this level
 	if ((int)status >= (int)min_level_ ) {
 		// Set the fixed label and tool tip value. Set the text colour to contrast the button colour
 		Fl_Color colour = STATUS_COLOURS.at(status);
@@ -395,24 +404,20 @@ void status::misc_status(status_t status, const char* label) {
 		Fl::wait();
 	}
 
-#ifdef _DEBUG
-	// Add a marker to the memory leak report to indicate where we are - deliberately
-	// create a leak with the first 15 chars of label in
-	char* marker = new char[16];
-	strncpy(marker, label, 15);
-#endif
-
 	if (!file_unusable_) {
 		// Append the status to the file
 		// Try to open the file. Open and close it each message
 		if (append_log_) {
+			// Append the message to the log
 			report_file_ = new ofstream(report_filename_, ios::out | ios::app);
 		}
 		else {
+			// Create a new file and then append subsequent messages to it
 			report_file_ = new ofstream(report_filename_, ios::out | ios::trunc);
 			append_log_ = true;
 		}
 		if (!report_file_->good()) {
+			// File didn't open correctly
 			delete report_file_;
 			report_file_ = nullptr;
 			file_unusable_ = true;
@@ -424,8 +429,12 @@ void status::misc_status(status_t status, const char* label) {
 
 
 		if (report_file_) {
+			// File did open correctly
+			// Start each entry with a timestamp
 			string timestamp = now(true, "%Y/%m/%d %H:%M:%S");
 			char* message = new char[timestamp.length() + 10 + strlen(label)];
+			// X YYYY/MM/DD HH:MM:SS Message 
+			// X is a single letter indicating the message severity
 			sprintf(message, "%c %s %s\n", STATUS_CODES.at(status), timestamp.c_str(), label);
 			*report_file_ << message;
 			delete[] message;
@@ -435,6 +444,7 @@ void status::misc_status(status_t status, const char* label) {
 		}
 	}
 
+	// Depending on the severity: LOG, NOTE, OK, WARNING, ERROR, SEVERE or FATAL
 	switch(status) {
 	case ST_SEVERE:
 		// A severe error - ask the user whether to continue
@@ -451,13 +461,12 @@ void status::misc_status(status_t status, const char* label) {
 		// A fatal error - quit the application
 		fl_message("An unrecoverable error has occurred, closing down - check status log");
 		Fl::wait();
-		// Open status file viewer and update it : remove from list to be deleted when closing
+		// Open status file viewer and update it
 		cb_bn_misc(misc_status_, nullptr);
-		//remove_sub_window(status_file_viewer_->top_window());
 
+		// Close the application down
 		main_window_->do_callback();
 		break;
-		// TODO: This causes an exception once the viewer has been deleted but not set to nullptr
 	default:
 		// Redraw status file viewer
 		if (status_file_viewer_ && !no_update_viewer) {
@@ -482,7 +491,7 @@ void status::file_status(file_status_t status) {
 	Fl::wait();
 }
 
-// Text buffer constructot
+// Text buffer constructor
 text_buffer::text_buffer(int requestedSize, int preferredGapSize) :
 	Fl_Text_Buffer(requestedSize, preferredGapSize)
 {
@@ -490,6 +499,7 @@ text_buffer::text_buffer(int requestedSize, int preferredGapSize) :
 	transcoding_warning_action = nullptr;
 }
 
+// Text buffer desctructor
 text_buffer::~text_buffer() {
 }
 
@@ -500,21 +510,23 @@ text_display::text_display(int X, int Y, int W, int H, const char* label) :
 {
 }
 
+// Text display destructor
 text_display::~text_display() {
 }
 
 // Reload the file keeping the scroll position fixed - default was to start at line 0 again.
 void text_display::load(const char* filename) {
-	// Find current scroll position
+	// Find current scroll position and the total positions
 	int scroll_pos = this->mVScrollBar->value();
 	double scroll_max = this->mVScrollBar->maximum();
+	// Remove the existing text from  the buffer
 	buffer()->remove(0, buffer()->length());
 	if (filter_.length() == 0 || filter_ == " ") {
 		// No filter - load the whole file into the buffer
 		buffer()->insertfile(filename, 0);
 	}
 	else {
-		// Load only those lines that match the filter
+		// Load only those lines that match the filter - the filter will be what set of processes logged the messages
 		ifstream* file = new ifstream(filename, ios_base::in);
 		while (file->good()) {
 			string line;
@@ -528,9 +540,11 @@ void text_display::load(const char* filename) {
 		delete file;
 	}
 	if (scroll_pos == (int)scroll_max) {
+		// We had been scrolled at the end, so scroll to the new end
 		scroll((int)this->mVScrollBar->maximum(), 0);
 	}
 	else {
+		// Scroll to the previous scroll position
 		scroll(scroll_pos, 0);
 	}
 }
@@ -543,14 +557,16 @@ void viewer_window::cb_find(Fl_Widget* w, void* v) {
 	int pos = that->display_->insert_position();
 	int found;
 	if (that->direction_) {
+		// Find forward
 		found = that->display_->buffer()->search_forward(pos, that->search_.c_str(), &pos, that->match_case_);
 	}
 	else {
+		// Find backward start before the current occurrence
 		if ((unsigned)pos > that->search_.length()) { pos -= (that->search_.length() + 1); }
 		found = that->display_->buffer()->search_backward(pos, that->search_.c_str(), &pos, that->match_case_);
 	}
 	if (found) {
-		// Found a match; select and update the position...
+		// Found a match; select the text and update the position...
 		that->display_->buffer()->select(pos, pos + that->search_.length());
 		that->display_->insert_position(pos + that->search_.length());
 		that->display_->show_insert_position();
@@ -563,11 +579,12 @@ void viewer_window::cb_find(Fl_Widget* w, void* v) {
 void viewer_window::cb_ch_filter(Fl_Widget* w, void* v) {
 	cb_choice_text(w, v);
 	viewer_window* that = ancestor_view<viewer_window>(w);
+	// Reload the text display and set line colours
 	that->display_->load(that->filename_);
 	that->colour_buffer();
 }
 
-
+// Viewer window constructor
 viewer_window::viewer_window(int W, int H, const char* label)
 	: Fl_Window(W, H, label)
 	, filename_(nullptr)
@@ -575,27 +592,33 @@ viewer_window::viewer_window(int W, int H, const char* label)
 	draw_window();
 }
 
+// Viewer window destructor
 viewer_window::~viewer_window() {
 	delete[] filename_;
 }
 
+// Load the file into the test display in the window
 void viewer_window::load(const char* filename) {
 	display_->load(filename);
+	// Save filename
 	if (filename_) delete[] filename_;
 	filename_ = new char[strlen(filename) + 1];
 	strcpy(filename_, filename);
 }
 
+// Draw the window
 void viewer_window::draw_window() {
-	// now read it into the text buffer
+	// Create the text buffer
 	text_buffer* buffer = new text_buffer;
-	// And display it
+	// Set values for widgets
 	direction_ = 1;
 	match_case_ = 1;
+	// Find button
 	Fl_Button* bn_find = new Fl_Button(GAP, GAP, WBUTTON, HBUTTON, "Find");
 	bn_find->labelfont(FONT);
 	bn_find->labelsize(FONT_SIZE);
 	bn_find->callback(cb_find);
+	// Search text
 	intl_input* ip_search = new intl_input(bn_find->x() + bn_find->w() + GAP + (WLABEL / 2), GAP, WBUTTON, HBUTTON, "Text");
 	ip_search->labelfont(FONT);
 	ip_search->labelsize(FONT_SIZE);
@@ -604,14 +627,17 @@ void viewer_window::draw_window() {
 	ip_search->align(FL_ALIGN_LEFT);
 	ip_search->value(search_.c_str());
 	ip_search->callback(cb_value<intl_input, string>, &search_);
+	// Group for radio buttons
 	Fl_Group* grp = new Fl_Group(ip_search->x() + ip_search->w() + GAP, GAP, WBUTTON, HBUTTON);
 	grp->box(FL_NO_BOX);
+	// Backward radiobutton
 	Fl_Radio_Round_Button* bn_backward = new Fl_Radio_Round_Button(grp->x(), GAP, WBUTTON / 2, HBUTTON, "@<");
 	bn_backward->labelsize(FONT_SIZE);
 	bn_backward->box(FL_DOWN_BOX);
 	bn_backward->value(direction_ == 0);
 	radio_param_t* back_param = new radio_param_t(0, &direction_);
 	bn_backward->callback(cb_radio, back_param);
+	// Forward radio button
 	Fl_Radio_Round_Button* bn_forward = new Fl_Radio_Round_Button(grp->x() + bn_backward->w(), GAP, WBUTTON / 2, HBUTTON, "@>");
 	bn_forward->labelsize(FONT_SIZE);
 	bn_forward->box(FL_DOWN_BOX);
@@ -619,7 +645,7 @@ void viewer_window::draw_window() {
 	radio_param_t* for_param = new radio_param_t(1, &direction_);
 	bn_forward->callback(cb_radio, for_param);
 	grp->end();
-
+	// Match case indicator
 	Fl_Round_Button* bn_match = new Fl_Round_Button(grp->x() + grp->w() + GAP, GAP, WBUTTON, HBUTTON, "Match Case");
 	bn_match->box(FL_DOWN_BOX);
 	bn_match->labelsize(FONT_SIZE);
@@ -627,7 +653,7 @@ void viewer_window::draw_window() {
 	bn_match->value(match_case_);
 	bn_match->selection_color(FL_BLUE);
 	bn_match->callback(cb_value < Fl_Round_Button, int >, &match_case_);
-
+	// Filter choice
 	Fl_Choice* ch_filter = new Fl_Choice(bn_match->x() + bn_match->w() + GAP + WLABEL, GAP, WEDIT, HTEXT, "Filter");
 	ch_filter->labelfont(FONT);
 	ch_filter->labelsize(FONT_SIZE);
@@ -635,6 +661,7 @@ void viewer_window::draw_window() {
 	ch_filter->textsize(FONT_SIZE);
 	ch_filter->align(FL_ALIGN_LEFT);
 	ch_filter->clear();
+	// Add the hard-coded choice values
 	ch_filter->add(" ");
 	ch_filter->add("ADIF SPEC");
 	ch_filter->add("BACKUP");
@@ -680,6 +707,7 @@ void viewer_window::draw_window() {
 void status::cb_bn_misc(Fl_Widget* w, void* v) {
 	status* that = ancestor_view<status>(w);
 	if (!that->status_file_viewer_) {
+		// Create a file viewer
 		char* title = new char[that->report_filename_.length() + 30];
 		sprintf(title, "Status report file: %s", that->report_filename_.c_str());
 		that->status_file_viewer_ = new viewer_window(640, 480, title);
@@ -694,11 +722,13 @@ void status::cb_bn_misc(Fl_Widget* w, void* v) {
 
 // Format the display depending on the first characer of each line of text
 void viewer_window::colour_buffer() {
+	// Get the total number of characters in the buffer
 	Fl_Text_Buffer* buffer = display_->buffer();
 	int num_chars = buffer->length();
 	int cur_pos = 0;
 	const int num_styles = STATUS_CODES.size();
-	char* style = new char[num_chars];
+	// Create a buffer the same number of characters as the buffer to contain the style codes
+	char* style = new char[num_chars]; 
 	memset(style, 0, num_chars);
 	// Generate reverse look-up from status code to status
 	map<char, status_t> reverse_codes;
@@ -706,24 +736,31 @@ void viewer_window::colour_buffer() {
 		reverse_codes[pos->second] = pos->first;
 	}
 	char style_code;
+	// For all characters in the buffer
 	while (cur_pos < num_chars) {
+		// Get the current line
 		char* line = buffer->line_text(cur_pos);
 		if (strlen(line) > 0) {
+			// The line has length - get the message level - first character in the line
 			char level = line[0];
 			// Update style code if we have a valid line (some outputs have embedded new-lines)
 			if (reverse_codes.find(level) != reverse_codes.end()) {
 				style_code = reverse_codes.at(level) + 'A';
 			}
+			// Set the style code for all characters in this like
 			for (size_t i = 0; i <= strlen(line); i++) {
 				style[cur_pos + i] = style_code;
 			}
 		}
 		else {
+			// Default style code for a line with no text (for the new line character)
 			style[cur_pos] = 'A';
 		}
+		// Set position to start of next line
 		cur_pos += strlen(line) + 1;
 		free(line);
 	}
+	// Create the style buffer and use it to highlight the data
 	Fl_Text_Buffer* style_buffer = new Fl_Text_Buffer;
 	style_buffer->text(style);
 	display_->highlight_data(style_buffer, STATUS_STYLES, num_styles, 'I', nullptr, nullptr);
@@ -742,17 +779,13 @@ void status::min_level(status_t level) {
 	status_settings.set("Minimum Level", min_level_);
 }
 
-// Get the minimum status severtity level that is dosplayed
+// Get the minimum status severity level that is displayed
 status_t status::min_level() {
 	return min_level_;
 }
 
-// Status log display is closed
-void status::cb_text(Fl_Widget* w, void* v) {
-	//remove_sub_window((Fl_Window*)w);
-}
 
-// Set the append_log
+// Set the append_log 
 void status::append_log(bool append) {
 	append_log_ = append;
 	Fl_Preferences status_settings(settings_, "Status");

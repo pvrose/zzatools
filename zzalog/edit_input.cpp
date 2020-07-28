@@ -14,7 +14,6 @@ using namespace zzalib;
 
 extern intl_dialog* intl_dialog_;
 
-
 // Edit input - create the input to the supplied size
 edit_input::edit_input(int X, int Y, int W, int H) :
 	intl_input(X, Y, W, H) 
@@ -25,11 +24,12 @@ edit_input::edit_input(int X, int Y, int W, int H) :
 // Handler for mouse and keyboard events
 int edit_input::handle(int event) {
 	// Tell the international character dialog this input will accept pastes
-	intl_dialog_->editor(this);
 	// Get the parent table
 	log_table* table = ancestor_view<log_table>(this);
 	switch (event) {
 	case FL_FOCUS:
+		if (intl_dialog_) intl_dialog_->editor(this);
+		return true;
 	case FL_UNFOCUS:
 		// mouse coming in or going out of focus on this view
 		// tell FLTK we've acknowledged it so we can receive keyboard events (or not)

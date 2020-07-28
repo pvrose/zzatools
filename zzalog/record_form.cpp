@@ -40,6 +40,7 @@ extern book* navigation_book_;
 extern intl_dialog* intl_dialog_;
 extern qrz_handler* qrz_handler_;
 extern status* status_;
+extern book* book_;
 
 
 using namespace std;
@@ -528,7 +529,7 @@ void record_form::cb_tab_record(Fl_Widget* w, void* v) {
 		int row = table->callback_row();
 		int col = table->callback_col();
 		string field = table->field(row);
-		// How did we click?
+		// Which button did we click?
 		switch (Fl::event_button()) {
 		case FL_LEFT_MOUSE: {
 			// Left click - edit the field
@@ -552,7 +553,7 @@ void record_form::cb_tab_record(Fl_Widget* w, void* v) {
 				that->record_2_ != nullptr &&
 				that->saved_record_ != nullptr &&
 				col == 2) {
-				// Clicked column 2, prepare to restore original record value
+				// Clicked original value, prepare to restore original record value
 				text = that->saved_record_->item(field);
 				that->edit_mode_ = EM_ORIGINAL;
 			}
@@ -561,11 +562,10 @@ void record_form::cb_tab_record(Fl_Widget* w, void* v) {
 			that->modifying_ = true;
 			that->enable_widgets();
 			that->redraw();
-//			main_window_->flush();
 			break;
 		}
 		case FL_RIGHT_MOUSE: {
-			// Right click display tip
+			// Right click - display tip
 			string tip;
 			switch (table->callback_context()) {
 			case Fl_Table::CONTEXT_ROW_HEADER: {
@@ -600,6 +600,7 @@ void record_form::cb_tab_record(Fl_Widget* w, void* v) {
 }
 
 // Call when all_fields button is changed
+// v points to display_all_fields_
 void record_form::cb_bn_all_fields(Fl_Widget* w, void* v) {
 	record_form* that = ancestor_view<record_form>(w);
 	cb_value<Fl_Check_Button, bool>(w, v);
@@ -607,18 +608,21 @@ void record_form::cb_bn_all_fields(Fl_Widget* w, void* v) {
 }
 
 // Called when the field choice widget is clicked and released
+// v is not used
 void record_form::cb_ch_field(Fl_Widget* w, void* v) {
 	record_form* that = ancestor_view<record_form>(w);
 	Fl_Choice* choice = (Fl_Choice*)w;
 	char temp[128];
 	// Get the item clicked in the choice
 	if (choice->item_pathname(temp, sizeof(temp) - 1) == 0) {
-		// Get the value of the ite clicked and allow it to be edited
+		// Get the value of the item clicked and allow it to be edited
 		string field = &temp[1];
 		string text;
+		// If the log record exists - copy that
 		if (that->record_1_) {
 			text = that->record_1_->item(field, true);
 		}
+		// Otherwise use the query record
 		else if (that->record_2_) {
 			text = that->record_2_->item(field, true);
 		}
@@ -626,26 +630,27 @@ void record_form::cb_ch_field(Fl_Widget* w, void* v) {
 		that->modifying_ = true;
 		that->enable_widgets();
 		that->redraw();
-//		main_window_->flush();
 	}
 }
 
 // Called after typing in the editor
+// v is not used
 void record_form::cb_editor(Fl_Widget* w, void* v) {
 	record_form* that = ancestor_view<record_form>(w);
 	that->modifying_ = true;
 	that->enable_widgets();
 	that->redraw();
-//	main_window_->flush();
 }
 
 
 // Enum choice widget has its value changed - explain what the enum value means
+// v is not used
 void record_form::cb_ch_enum(Fl_Widget* w, void* v) {
 	record_form* that = ancestor_view<record_form>(w);
 	Fl_Choice* choice = (Fl_Choice*)w;
 	string enum_value = "";
 	char temp[128];
+	// Get the name of the item selected in the Fl_Choice
 	choice->item_pathname(temp, sizeof(temp) - 1);
 	// If there is a value get its text
 	if (temp[0] != 0) enum_value = &temp[1];
@@ -654,21 +659,24 @@ void record_form::cb_ch_enum(Fl_Widget* w, void* v) {
 	that->explain_enum(dataset, enum_value);
 	that->modifying_ = true;
 	that->enable_widgets();
-//	main_window_->flush();
 }
 
-// Use the txt in the text edit or selected enum choice value 
+// Use the text in the text edit or selected enum choice value 
+// v is not used
 void record_form::cb_bn_use(Fl_Widget* w, void* v) {
 	record_form* that = ancestor_view<record_form>(w);
 	// Update the record - get the fieldname in upper case - note item name in choice is prefixed with root symbol '/'
 	char temp[128];
+	// Get the name of current selected field-name in the Fl_Choice
 	that->field_choice_->item_pathname(temp, sizeof(temp) - 1);
 	string field = to_upper(string(&temp[1]));
 	// Get the new value from the text edit widget
 	if (field != "") {
 		// Get book to remember the record
 		that->my_book_->remember_record();
+		// Get the new value in the text buffer
 		string text = that->value_in_->buffer()->text();
+		// Get the selected value of the enum Fl_Choice
 		that->enum_choice_->item_pathname(temp, sizeof(temp) - 1);
 		string enum_value = "";
 		// Get the enumeation value if there is one if it exists
@@ -684,14 +692,20 @@ void record_form::cb_bn_use(Fl_Widget* w, void* v) {
 		}
 		// Redraw the list control
 		that->record_table_->set_records(that->record_1_, that->record_2_, that->saved_record_);
-		// Tell views a minor change
+		// Tell views what sort of change it is
 		if (!that->my_book_->new_record()) {
 			that->my_book_->modified_record(true);
 		}
-		if (field == "DXCC" || field == "GRIDSQUARE") {
+		if (field == "QSO_DATE" || field == "TIME_ON") {
+			// Tell the book the ordering of records has changed. Book will then let all views know.
+			book_->selection(that->my_book_->record_number(that->item_num_1_), HT_START_CHANGED);
+		}
+		else if (field == "DXCC" || field == "GRIDSQUARE") {
+			// Loction has changed - DxAtlas needs to redraw.
 			that->my_book_->selection(that->item_num_1_, HT_CHANGED, that);
 		}
 		else {
+			// Any other change
 			that->my_book_->selection(that->item_num_1_, HT_MINOR_CHANGE, that);
 		}
 
@@ -703,10 +717,10 @@ void record_form::cb_bn_use(Fl_Widget* w, void* v) {
 	// Clear value in buffer
 	that->value_in_->buffer()->text("");
 	that->enable_widgets();
-//	main_window_->flush();
 }
 
 // Clear edit value button has been clicked
+// v is not used
 void record_form::cb_bn_clear(Fl_Widget* w, void* v) {
 	record_form* that = ancestor_view<record_form>(w);
 	// Clear value in buffer
@@ -715,7 +729,6 @@ void record_form::cb_bn_clear(Fl_Widget* w, void* v) {
 	that->enum_choice_->value(0);
 	that->field_choice_->value(0);
 	that->enable_widgets();
-//	main_window_->flush();
 }
 
 // Use the txt in the text edit for a specific field
@@ -733,10 +746,13 @@ void record_form::cb_bn_quick(Fl_Widget* w, void* v) {
 	if (!that->my_book_->new_record()) {
 		that->my_book_->modified_record(true);
 	}
+	// Only a limited number of fileds are covered by the Quick button
 	if (field == "GRIDSQUARE") {
+		// Location has changed
 		that->my_book_->selection(that->item_num_1_, HT_CHANGED, that);
 	}
 	else {
+		// Any other change
 		that->my_book_->selection(that->item_num_1_, HT_MINOR_CHANGE, that);
 	}
 	// Clear value in buffer
@@ -744,7 +760,6 @@ void record_form::cb_bn_quick(Fl_Widget* w, void* v) {
 	// Clear modifying flag
 	that->modifying_ = false;
 	that->enable_widgets();
-//	main_window_->flush();
 }
 
 // Modify messages button has been pressed - save to settings
@@ -762,7 +777,6 @@ void record_form::cb_bn_modify(Fl_Widget* w, void* v) {
 void record_form::cb_bn_fetch(Fl_Widget* w, void* v) {
 	record_num_t record = *((record_num_t*)v);
 	// Put the card request onto the eQSL request queue - so that requests are made
-	// no more frequently than one every 10 seconds (eQSL requirement)
 	eqsl_handler_->enqueue_request(record, true);
 	eqsl_handler_->enable_fetch(eqsl_handler::EQ_START);
 }
@@ -777,7 +791,6 @@ void record_form::cb_bn_scale(Fl_Widget* w, void* v) {
 	Fl_Preferences display_settings(settings_, "Display");
 	display_settings.set("Image Scale", (int)that->scaling_image_);
 
-//	main_window_->flush();
 }
 
 // Set the QSL_RCVD and QSLRDATE values in current record
@@ -884,9 +897,10 @@ void record_form::cb_bn_edit(Fl_Widget* w, long v) {
 }
 
 // Find the possible matching record
+// v is not used
 void record_form::cb_bn_find(Fl_Widget* w, void* v) {
-	// The update will have supplied nearest candidate by time
 	record_form* that = ancestor_view<record_form>(w);
+	// The update provided both record numbers but we did not get the log record at the time
 	that->record_1_ = that->my_book_->get_record(that->item_num_1_, false);
 	// Remove saved record, as may need new one
 	delete that->saved_record_;
@@ -898,10 +912,11 @@ void record_form::cb_bn_find(Fl_Widget* w, void* v) {
 }
 
 // Find next possible matching record
+// v is not used
 void record_form::cb_bn_next(Fl_Widget* w, void* v) {
 	record_form* that = ancestor_view<record_form>(w);
 
-	if ((unsigned)that->item_num_1_ < that->my_book_->size()) {
+	if ((unsigned)that->item_num_1_ < that->my_book_->size() - 1) {
 		// We are not at the end of the book - display the next record
 		that->record_1_ = that->my_book_->get_record(++that->item_num_1_, true);
 		delete that->saved_record_;
@@ -928,7 +943,7 @@ void record_form::cb_bn_prev(Fl_Widget* w, void* v) {
 
 }
 
-// Upadte the form because a new record has been selected or the record has been changed
+// Update the form because a new record has been selected or the record has been changed
 void record_form::update(hint_t hint, record_num_t record_num_1, record_num_t record_num_2) {
 	// Convert record numbers into item numbers
 	record_num_t item_num_1 = my_book_->item_number(record_num_1);
@@ -944,6 +959,7 @@ void record_form::update(hint_t hint, record_num_t record_num_1, record_num_t re
 	case HT_NEW_DATA:
 	case HT_NO_DATA:
 	case HT_EXTRACTION:
+		// Any sort of change to the book or record
 		// Current selected item number may have changed - display the selected record
 		item_num_1_ = item_num_1;
 		item_num_2_ = -1;
@@ -963,6 +979,7 @@ void record_form::update(hint_t hint, record_num_t record_num_1, record_num_t re
 		update_form();
 		break;
 	case HT_STARTING:
+		// Starting a QSO.
 		// Current selected record number may have changed - display the record and allow editting
 		item_num_1_ = item_num_1;
 		item_num_2_ = -1;
@@ -977,6 +994,7 @@ void record_form::update(hint_t hint, record_num_t record_num_1, record_num_t re
 		update_form();
 		break;
 	case HT_IMPORT_QUERY:
+		// Import upload has detected a possible match
 		// display both the possible log entry and the queried record - allow addressing the query
 		item_num_1_ = item_num_1;
 		item_num_2_ = item_num_2;
@@ -991,6 +1009,7 @@ void record_form::update(hint_t hint, record_num_t record_num_1, record_num_t re
 		update_form();
 		break;
 	case HT_IMPORT_QUERYNEW:
+		// Import upload has not found a possible match
 		// Display just the queried record
 		item_num_1_ = item_num_1;
 		item_num_2_ = item_num_2;
@@ -1005,6 +1024,7 @@ void record_form::update(hint_t hint, record_num_t record_num_1, record_num_t re
 		update_form();
 		break;
 	case HT_DUPE_QUERY:
+		// Check dupe has found a possible pair of duplicate records
 		// Display the two possible duplicate records - allow addressing the dupe query
 		item_num_1_ = item_num_1;
 		item_num_2_ = item_num_2;
@@ -1019,6 +1039,7 @@ void record_form::update(hint_t hint, record_num_t record_num_1, record_num_t re
 		update_form();
 		break;
 	case HT_MERGE_DETAILS:
+		// Import upload has found a probable match
 		// display both the possible log entry and the queried record - allow addressing the query
 		item_num_1_ = item_num_1;
 		item_num_2_ = item_num_2;
@@ -1033,6 +1054,7 @@ void record_form::update(hint_t hint, record_num_t record_num_1, record_num_t re
 		update_form();
 		break;
 	case HT_FORMAT:
+		// The settings dialog may have change the order of the fields to display in the field table.
 		// Format and/or columns have changed - just redraw the form without changing records
 		update_form();
 		break;
@@ -1041,10 +1063,10 @@ void record_form::update(hint_t hint, record_num_t record_num_1, record_num_t re
 	redraw();
 }
 
-// Readrw the form after stuff has changed
+// Redraw the form after stuff has changed
 void record_form::update_form() {
 	if (record_1_ != nullptr) {
-		// A record to display - copy its details into the form
+		// A record to display - copy any saved card image to the image widget
 		if (keep_bn_->value() == false) {
 			// If we are not wanting to redisplay the existing QSL card try and display the eQSL card
 			selected_image_ = QI_EQSL;
@@ -1064,12 +1086,14 @@ void record_form::update_form() {
 	swl_message_in_->value(qsl_message);
 	free(qsl_message);
 
-	// Set question from import_data_
+	// Set the question from the Import upload process
 	question_out_->copy_label(query_message_.c_str());
 	if (query_message_.length()) {
+		// WE have such a message - highlight the fact by setting the widget background a light red
 		question_out_->color(fl_lighter(FL_RED));
 	}
 	else {
+		// No message, so set the background colour to the default
 		question_out_->color(FL_BACKGROUND_COLOR);
 	}
 
@@ -1080,7 +1104,6 @@ void record_form::update_form() {
 	enable_widgets();
 
 	redraw();
-//	main_window_->flush();
 
 }
 
@@ -1088,7 +1111,7 @@ void record_form::update_form() {
 void record_form::set_image() {
 	if (record_1_ != nullptr) {
 		if (selected_image_ != QI_GEN_CARD) {
-			// We have a record to display - get the card directory
+			// We want to display the received card image
 			char filename[256];
 			string directory;
 			char* temp;
@@ -1123,10 +1146,12 @@ void record_form::set_image() {
 				// Select the image type: eQSL or scanned in card (front or back)
 				switch (selected_image_) {
 				case QI_EQSL:
+					// Card image downloaded from eQSL
 					// Find the filename saved when card was downloaded - i.e. use same algorithm
 					strcpy(filename, eqsl_handler_->card_filename_l(record_1_).c_str());
 					break;
 				case QI_CARD_FRONT:
+					// Card image of a scanned-in paper QSL card (front - i.e. callsign side)
 					// File name e.g.= <root>\scans\<received date>\PA_GM3ZZA_P__<QSO date>.png
 					sprintf(filename, "%s\\Scans\\%s\\%s__%s",
 						directory.c_str(),
@@ -1135,6 +1160,7 @@ void record_form::set_image() {
 						record_1_->item("QSO_DATE").c_str());
 					break;
 				case QI_CARD_BACK:
+					// Card image of a scanned-in paper QSL card (back - i.e. QSO details side)
 					// File name e.g.= <root>\scans\<received date>\PA_GM3ZZA_P++<QSO date>.png
 					sprintf(filename, "%s\\Scans\\%s\\%s++%s",
 						directory.c_str(),
@@ -1151,6 +1177,7 @@ void record_form::set_image() {
 				image_ = nullptr;
 				// For each of coded image file types
 				if (selected_image_ == QI_EQSL) {
+					// Cards are downloaded from eQSL in PNG format
 					raw_image = new Fl_PNG_Image(filename);
 					if (raw_image->fail()) {
 						// File didn't load OK 
@@ -1161,6 +1188,9 @@ void record_form::set_image() {
 						else {
 							switch (raw_image->fail()) {
 							case Fl_Image::ERR_NO_IMAGE:
+								// No image file
+								full_name = "*** ERROR FILE NOT FOUND ***";
+								break;
 							case Fl_Image::ERR_FILE_ACCESS:
 								// Got a problem accessing file
 								full_name = "*** ERROR ACCESSING FILE: " + string(strerror(errno)) + " ***";
@@ -1178,6 +1208,7 @@ void record_form::set_image() {
 					delete raw_image;
 				}
 				else {
+					// Scanned-in paper card - could be any graphic format
 					for (int i = 0; i < num_types && !found_image; i++) {
 						full_name = string(filename) + file_types[i];
 						// Read files depending on file type
@@ -1202,6 +1233,9 @@ void record_form::set_image() {
 							else {
 								switch (raw_image->fail()) {
 								case Fl_Image::ERR_NO_IMAGE:
+									// No image file
+									full_name = "*** ERROR FILE NOT FOUND ***";
+									break;
 								case Fl_Image::ERR_FILE_ACCESS:
 									// Got a problem accessing file
 									full_name = "*** ERROR ACCESSING FILE: " + string(strerror(errno)) + " ***";
@@ -1242,7 +1276,7 @@ void record_form::set_image() {
 			}
 		}
 		else {
-			// Delete the image - we'll generate the QSL card later
+			// Display what a generated QSL card label looks like, we'll generate it later as it's drawn into the image widget
 			delete image_;
 			image_ = nullptr;
 		}
@@ -1252,6 +1286,7 @@ void record_form::set_image() {
 		delete image_;
 		image_ = nullptr;
 	}
+	// Got an image: draw it
 	draw_image();
 }
 
@@ -1280,7 +1315,7 @@ void record_form::set_image_buttons() {
 		gen_card_radio_->value(false);
 		break;
 	case QI_GEN_CARD:
-		// Display the back of a scanned-in paper card
+		// Display the generated design for a QSL card label
 		eqsl_radio_->value(false);
 		card_front_radio_->value(false);
 		card_back_radio_->value(false);
@@ -1310,7 +1345,7 @@ void record_form::draw_image() {
 			card_filename_out_->labelcolor(FL_BLACK);
 		}
 		else {
-			// Display a label instead in large letters - 36
+			// Display a label instead in large letters - 36 pt.
 			card_display_->copy_label(record_1_->item("CALL").c_str());
 			card_display_->labelsize(36);
 			card_display_->color(FL_WHITE);
@@ -1322,6 +1357,7 @@ void record_form::draw_image() {
 	case QI_GEN_CARD:
 		// Generate the QSL card (as to be printed)
 		if (record_1_ != nullptr) {
+			// Generate the QSL card label and add it to the display widget
 			qsl_form* card = new qsl_form(card_display_->x(), card_display_->y(), &record_1_, 1);
 			card_display_->color(FL_WHITE);
 			card_display_->align(FL_ALIGN_CENTER);
@@ -1348,6 +1384,7 @@ void record_form::enable_widgets() {
 	switch (use_mode_) {
 	case UM_DISPLAY:
 	case UM_MODIFIED:
+		// Activate buttons that we need to add or modify records
 		// Card display 
 		card_display_->activate();
 		card_filename_out_->activate();
@@ -1421,6 +1458,7 @@ void record_form::enable_widgets() {
 		}
 		break;
 	case UM_QSO:
+		// We are currently capturing a QSO on-air, only enable relevant widgets
 		// Card display 
 		card_display_->deactivate();
 		card_filename_out_->deactivate();
@@ -1465,6 +1503,7 @@ void record_form::enable_widgets() {
 		edit4_bn_->deactivate();
 		break;
 	case UM_QUERY:
+		// We are comparing two records. Enable widgets we need to merge the two.
 		// Card display 
 		card_display_->deactivate();
 		card_filename_out_->deactivate();
@@ -1622,7 +1661,7 @@ void record_form::enable_widgets() {
 	}
 }
 
-// Set the selecetd image to that provided
+// Set the selected image to that provided
 void record_form::set_selected_image(image_t value) {
 	selected_image_ = value;
 }
@@ -1638,7 +1677,7 @@ void record_form::set_edit_widgets(string field, string text) {
 		all_fields_bn_->value(true);
 		item = field_choice_->find_item(field.c_str());
 		if (item == nullptr) {
-			// Still not got it so error
+			// The field we are trying to access is not valid, program error?
 			status_->misc_status(ST_FATAL, string("LOG: " + field + " is not a valid field - application error").c_str());
 			field_choice_->value(0);
 		}

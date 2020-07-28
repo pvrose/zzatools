@@ -907,7 +907,7 @@ void menu::cb_mi_log_save(Fl_Widget* w, void* v) {
 }
 
 // Log->Delete/Cancel - v = true/false defines which
-// v is bool. false = cancel entry; true = delete record
+// v is bool. false = cancel new record; true = delete record
 void menu::cb_mi_log_del(Fl_Widget* w, void* v) {
 	// delete_record(true) - deliberately deleting a record
 	// delete_record(false) - only deletes if entering a new record (i.e. cancel)
@@ -1044,7 +1044,7 @@ void menu::cb_mi_oper_change(Fl_Widget* w, void* v) {
 		free(temp);
 	}
 	book_->modified(true);
-	// Update views with the mdoified record
+	// Update views with the modified record
 	book_->selection(-1, HT_MINOR_CHANGE);
 
 	Fl::delete_widget(dialog);
@@ -1168,8 +1168,8 @@ void menu::cb_mi_ext_disp(Fl_Widget* w, void* v) {
 
 }
 
-// Extract->eQSL/LotW/Card - specificall extract records for QSL use
-// v is enum extract_mode_t: EQSL, LOTW or CARD
+// Extract->eQSL/LotW/Card/ClubLog - specificall extract records for QSL use
+// v is enum extract_mode_t: EQSL, LOTW, CARD or CLUBLOG
 void menu::cb_mi_ext_qsl(Fl_Widget* w, void* v) {
 	menu* that = (menu*)w;
 	// v passes the particular option
@@ -1203,10 +1203,12 @@ void menu::cb_mi_ext_print(Fl_Widget* w, void* v) {
 	switch (that->qsl_type_) {
 	case extract_data::EQSL:
 	case extract_data::LOTW:
+		// Print in log-book form
 		ptr = new printer(OT_EXTRACT);
 		delete ptr;
 		break;
 	case extract_data::CARD:
+		// Print labels for cards
 		ptr = new printer(OT_CARD);
 		delete ptr;
 		break;
@@ -1214,6 +1216,7 @@ void menu::cb_mi_ext_print(Fl_Widget* w, void* v) {
 }
 
 // Extract->Mark sent
+// Update the extracted records with the fct that a QSL has been sent to the appropriate place
 // v is not used
 void menu::cb_mi_ext_mark(Fl_Widget* w, void* v) {
 	if (extract_records_->size()) {
@@ -1329,7 +1332,7 @@ void menu::cb_mi_info_qrz(Fl_Widget* w, void* v) {
 	record* record = book_->get_record();
 	menu* that = ancestor_view<menu>(w);
 	if (v != nullptr) {
-		// Open with the web browser
+		// Open with the web browser and fetch the page for the callsign
 		qrz_handler_->open_web_page(*(string*)v);
 	}
 	else {
@@ -1351,7 +1354,7 @@ void menu::cb_mi_info_qrz(Fl_Widget* w, void* v) {
 }
 
 // IC-7300 specific actions
-// v is viewtype
+// v is enum view_type: VT_NONE, VT_MEMORIES, VT_SCOPE_BANDS, VT_USER_BANDS, VT_CW_MESSAGES.
 void menu::cb_mi_ic7300(Fl_Widget* w, void* v) {
 	view_type type = (view_type)(long)v;
 	((ic7300_table*)tabbed_view_->get_view(OT_MEMORY))->type(type);
@@ -1381,6 +1384,7 @@ void menu::cb_mi_info_map(Fl_Widget* w, void* v) {
 		string format_coords = "\"%s\" http://google.com/maps/@%f,%f,25000m &";
 		string format_city = "\"%s\" http://google.com/maps/?q=%s&z=10 &";
 #endif
+		char message[128];
 		// Get browser from settings
 		string browser = that->get_browser();
 		if (browser.length() == 0) {
@@ -1392,19 +1396,21 @@ void menu::cb_mi_info_map(Fl_Widget* w, void* v) {
 			// ?q=City&z=10 - centre on city zoom level 10
 			url = new char[format_city.length() + city.length() + browser.length() + 10];
 			sprintf(url, format_city.c_str(), browser.c_str(), city.c_str());
+			snprintf(message, 128, "INFO: Launching Google maps for %s", city.c_str());
 		}
 		else if (source == LOC_GRID6 || source == LOC_GRID8 || source == LOC_LATLONG) {
 			// grid square is 6 or more characters 
 			// @%f,%f,25000m display 25 km around long/lat
 			url = new char[format_coords.length() + browser.length() + 30];
 			sprintf(url,format_coords.c_str(), browser.c_str(), location.latitude, location.longitude);
+			snprintf(message, 128, "INFO: Lunching Google maps for %s", locator.c_str());
 		}
 		else {
 			// Any thing else could be a random location somewhere up to 1 degree away.
 			status_->misc_status(ST_WARNING, "INFO: Insufficient QTH information in record to launch Google Maps");
 			return;
 		}
-		status_->misc_status(ST_NOTE, "INFO: Launching google maps");
+		status_->misc_status(ST_NOTE, message);
 		int result = system(url);
 		delete[] url;
 	}
@@ -1417,6 +1423,7 @@ void menu::cb_mi_info_web(Fl_Widget* w, void* v) {
 	record* record = book_->get_record();
 	menu* that = ancestor_view<menu>(w);
 	if (record != nullptr && record->item_exists("WEB")) {
+		// Website logged for contact
 		// Get browser from settings
 		string browser = that->get_browser();
 		if (browser.length() == 0) {
@@ -1431,9 +1438,16 @@ void menu::cb_mi_info_web(Fl_Widget* w, void* v) {
 		string website = record->item("WEB");
 		char* url = new char[website.length() + browser.length() + strlen(format) + 10];
 		sprintf(url, format, browser.c_str(), website.c_str());
-		status_->misc_status(ST_NOTE, "INFO: Opening QSO web-site");
+		char message[128];
+		snprintf(message, 128, "INFO: Opening website %s", website.c_str());
+		status_->misc_status(ST_NOTE, message);
 		int result = system(url);
 		delete[] url;
+	}
+	else {
+		char message[128];
+		snprintf(message, 128, "INFO: %s has no website logged", record->item("CALL").c_str());
+		status_->misc_status(ST_WARNING, message);
 	}
 }
 
@@ -1486,7 +1500,7 @@ void menu::enable(bool active) {
 	// For all menu items
 	for (int i = 0; i < size(); i++) {
 		if (active) {
-			// enable item
+			// enable item, specific ones will be disabled later
 			mode(i, mode(i) & ~FL_MENU_INACTIVE);
 		}
 		else {
@@ -1498,10 +1512,8 @@ void menu::enable(bool active) {
 		// Disable specific items that do not make sense in the current state of the app
 		update_items();
 	}
-	else if (toolbar_) {
-		// Disable buttons in the tool bar that map onto menu items
-		toolbar_->update_items();
-	}
+	// Enable/disable toolbar buttons that map onto menu items
+	if (toolbar_) toolbar_->update_items();
 }
 
 // Add recent files - add most recent 4 filenames to menu
@@ -1541,7 +1553,7 @@ void menu::logging(logging_mode_t mode) {
 	// Change the mode 
 	switch (mode) {
 	case LM_OFF_AIR:
-		// Tick On-Air only
+		// Tick Off-Air only
 		this->mode(index_offair, this->mode(index_offair) | FL_MENU_VALUE);
 		this->mode(index_onair, this->mode(index_onair) & ~FL_MENU_VALUE);
 		this->mode(index_import, this->mode(index_import) & ~FL_MENU_VALUE);
@@ -1560,15 +1572,15 @@ void menu::logging(logging_mode_t mode) {
 		break;
 	}
 	if (rig_if_) {
-		// Tick On-Air only
+		// Tick Connect only
 		this->mode(index_conn, this->mode(index_conn) | FL_MENU_VALUE);
 		this->mode(index_disc, this->mode(index_disc) & ~FL_MENU_VALUE);
 	} else {
-		// Tick On-Air only
+		// Tick Disconnect only
 		this->mode(index_conn, this->mode(index_conn) & ~FL_MENU_VALUE);
 		this->mode(index_disc, this->mode(index_disc) | FL_MENU_VALUE);
 	}
-	// Set logging mode for every-one to access
+	// Save logging mode for every-one to access
 	logging_mode_ = mode;
 }
 

@@ -65,8 +65,10 @@ using namespace std;
 using namespace zzalog;
 using namespace zzalib;
 
+// Global data items instanced in zzalib
 extern rig_if* rig_if_;
 extern ic7300* ic7300_;
+extern url_handler* url_handler_;
 
 // Top level data items - these are declared as externals in each .cpp that uses them
 book* book_ = nullptr;
@@ -85,7 +87,6 @@ lotw_handler* lotw_handler_ = nullptr;
 qrz_handler* qrz_handler_ = nullptr;
 Fl_RGB_Image* main_icon_ = nullptr;
 Fl_Single_Window* main_window_ = nullptr;
-extern url_handler* url_handler_;
 intl_dialog* intl_dialog_ = nullptr;
 band_view* band_view_ = nullptr;
 scratchpad* scratchpad_ = nullptr;
@@ -97,39 +98,37 @@ dxa_if* dxatlas_ = nullptr;
 bool read_only_ = false;
 // Recent files opened
 list<string> recent_files_;
-//// Any sub-windows opened
-//set<Fl_Window*> sub_windows_;
 
 // Forward declarations
 void backup_file(bool force, bool retrieve = false);
 void set_recent_file(string filename);
-//void remove_sub_window(Fl_Window* w);
-//void add_sub_window(Fl_Window* w);
 
 // Display the time in the local timezone rather than UTC
 bool use_local_ = false;
-// Flag to prevent double click on close button
+// Flag to prevent more than closure process at the same time
 bool closing_ = false;
 // Flag to mark everything loaded
 bool initialised_ = false;
 
-// This callback intercepts the close command and performs chacks and tidies up
+// This callback intercepts the close command and performs checks and tidies up
 // Updates recent files settings
 static void cb_bn_close(Fl_Widget* w, void*v) {
+	// The close button can only be clicked at certain times in the closure process
+	// when Fl::wait() is called.
 	if (closing_) {
 		status_->misc_status(ST_WARNING, "ZZALOG: Already closing!");
 	}
 	else {
 		closing_ = true;
 		status_->misc_status(ST_NOTE, "ZZALOG: Closing...");
-		// If rig connected close it - this will close the timer as well
+		// If rig connected close it - this will close the timer as well. Tell the scorebaord there
+		// is no longer a rig to read.
 		if (rig_if_) {
 			rig_if_->close();
 			scratchpad_->update();
 		}
 		// Delete band view
 		if (band_view_) {
-			//remove_sub_window(band_view_);
 			Fl::delete_widget(band_view_);
 			band_view_ = nullptr;
 		}
@@ -141,13 +140,15 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 			delete dxatlas_;
 			dxatlas_ = nullptr;
 		}
-		// Got incomplete QSO on the go
+		// Currently modifying a (potentially new) record
 		if (book_ && (book_->modified_record() || book_->new_record()) ) {
 			switch (fl_choice("You are currently modifying a record? Save or Quit?", "Save?", "Quit?", nullptr)) {
 			case 0:
+				// Save
 				book_->save_record();
 				break;
 			case 1:
+				// Quit - delete any new record
 				book_->delete_record(book_->new_record());
 				break;
 			}
@@ -157,10 +158,12 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 			if (!import_data_->update_complete()) {
 				switch (fl_choice("There is an import in process. Do you want to let it finish or abandon it?", "Finish?", "Abandon", nullptr)) {
 				case 0:
+					// Gracefully wait for import to complete
 					import_data_->stop_update(LM_OFF_AIR, false);
 					while (!import_data_->update_complete()) Fl::wait();
 					break;
 				case 1:
+					// Immediately stop the import
 					import_data_->stop_update(LM_OFF_AIR, true);
 					break;
 				}
@@ -170,9 +173,11 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 		if (eqsl_handler_ && eqsl_handler_->requests_queued()) {
 			switch (fl_choice("There are outstanding eQSL card image requests. Do you want to cancel download, wait or cancel exit?", "Cancel download", "Wait", "Cancel exit")) {
 			case 0:
+				// Cancel the download immediately
 				eqsl_handler_->enable_fetch(eqsl_handler::EQ_ABANDON);
 				break;
 			case 1:
+				// Wait for the request queue to empty
 				while (eqsl_handler_->requests_queued()) Fl::wait();
 				break;
 			case 2:
@@ -191,9 +196,11 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 			case 1:
 				// Save and Exit
 				if (read_only_) {
+					// Open the Save As dialog and save
 					menu::cb_mi_file_saveas(w, (void*)OT_MAIN);
 				}
 				else {
+					// Save the file
 					menu::cb_mi_file_save(w, (void*)OT_MAIN);
 				}
 				break;
@@ -216,11 +223,7 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 		window_settings.set("Width", main_window_->w());
 		window_settings.set("Height", main_window_->h());
 
-		// delete all additional windows created - note the status file viewer is one.
-		//for (auto it = sub_windows_.begin(); it != sub_windows_.end(); it++) {
-		//	(*it)->clear();
-		//	delete* it;
-		//}
+		// Hide all the open windows - this will allow Fl to close the app.
 		for (Fl_Window* w = Fl::first_window(); w; w = Fl::first_window()) w->hide();
 		status_->null_file_viewer();
 
@@ -312,6 +315,7 @@ void recent_files() {
 
 // read in the prefix and adif reference data
 void add_data() {
+	// Note closing can get set during any of the below actions.
 	if (!closing_) {
 		if (!club_handler_) club_handler_ = new club_handler;
 		// Get pfx_data
@@ -328,8 +332,8 @@ void add_data() {
 	// Add intl dialog
 	if (!closing_) {
 		intl_dialog_ = new intl_dialog;
+		// Don't show here - add a menu item to show it.
 	}
-	// Don't show here - add a menu item to show it.
 }
 
 // read in the log data
@@ -340,6 +344,7 @@ void add_book(char* arg) {
 		navigation_book_ = book_;
 		import_data_ = new import_data;
 		extract_records_ = new extract_data;
+		// Tell the views that a book now exists
 		tabbed_view_->books();
 		// Get filename and load the data
 		string log_file = get_file(arg);
@@ -350,6 +355,7 @@ void add_book(char* arg) {
 	}
 }
 
+// Update rig information in the various views - this is controlled by rig_if_.
 void cb_rig_timer() {
 	// There may be a race hazard involving flrig and zzalib when I try and close zzalib
 	if (!closing_) {
@@ -380,10 +386,12 @@ void cb_rig_timer() {
 	}
 }
 
+// Callback for rig_if_ to use to access spec_data_
 string cb_freq_to_band(double frequency) {
 	return spec_data_->band_for_freq(frequency);
 }
 
+// Callback for rig_if_ to use to display messages in statues_
 void cb_error_message(bool ok, const char* message) {
 	status_->misc_status(ok ? ST_NOTE : ST_ERROR, message);
 }
@@ -434,14 +442,14 @@ void add_rig_if() {
 			break;
 		}
 		if (rig_if_ == nullptr) {
-			// No handler defined - assume manual logging
+			// No handler defined - assume manual logging in real-time
 			status_->misc_status(ST_WARNING, "RIG: No handler - assume real-time logging, no rig");
 			menu_->logging(LM_ON_AIR);
 		}
 		else {
 			// Set callbacks
 			rig_if_->callback(cb_rig_timer, cb_freq_to_band, cb_error_message);
-			// Trya and open the connection to the rig
+			// Try and open the connection to the rig
 			bool done = false;
 			while (!done) {
 				if (rig_if_->open()) {
@@ -463,6 +471,7 @@ void add_rig_if() {
 							done = true;
 							menu_->logging(LM_IMPORTED);
 						}
+						// The first access to read the mode may fail
 						else if (!rig_if_->is_good()) {
 							char message[512];
 							sprintf(message, "RIG: Bad access - %s. Assume real-time logging, no rig", rig_if_->error_message().c_str());
@@ -475,22 +484,25 @@ void add_rig_if() {
 								scratchpad_->update();
 							}
 							status_->misc_status(ST_ERROR, message);
+							// Put the error message from the rig in the rig status box
 							status_->rig_status(RS_ERROR, error_message.c_str());
 							done = true;
 							// Change logging mode from IMPORTED to ON_AIR. otherwise leave as was
 							if (menu_->logging() == LM_IMPORTED) menu_->logging(LM_ON_AIR);
 						}
 						else {
-							// Access rig - timer will have been started by rig_if_->open()
+							// Rig seems OK - timer will have been started by rig_if_->open()
 							// Set rig timer callnack
 							char message[256];
 							snprintf(message, 256, "RIG: %s", rig_if_->success_message().c_str());
 							status_->misc_status(ST_OK, message);
+							// Get the operating condition from the rig
 							status_->rig_status(rig_if_->get_tx() ? RS_TX : RS_RX, rig_if_->rig_info().c_str());
 							done = true;
 							// Change logging mode to ON_AIR
 							menu_->logging(LM_ON_AIR);
 						}
+						// Note this is IC-7300 specific code
 						ic7300_table* mem_table = (ic7300_table*)(tabbed_view_->get_view(OT_MEMORY));
 						if (rig_if_ && rig_if_->rig_name() == "IC-7300") {
 							ic7300_ = new ic7300;
@@ -515,6 +527,7 @@ void add_rig_if() {
 				}
 			}
 		}
+		// Tell menu to update its items
 		menu_->update_items();
 		if (rig_if_ == nullptr) {
 			status_->rig_status(RS_OFF, "No rig present");
@@ -523,14 +536,15 @@ void add_rig_if() {
 	}
 }
 
+// Add the band plan window
 void add_band_view() {
 	if (!closing_) {
 		if (rig_if_) {
-			// Use actual rig frequency
+			// Use actual rig frequency 
 			band_view_ = new band_view(rig_if_->tx_frequency() / 1000.0, 400, 100, "Band plan");
 		}
 		else {
-			// Use frequency of selected record
+			// Use frequency of selected record if the book is not empty, else use 14.1 MHz
 			double frequency;
 			if (book_->size()) {
 				frequency = stod(book_->get_record()->item("FREQ")) * 1000.0;
@@ -579,11 +593,13 @@ void add_scratchpad() {
 		if (top < 0) top = 100;
 		if (left < 0) left = 100;
 		if (enabled) {
+			// Show the scratchpad at the saved position
 			scratchpad_->show();
 			scratchpad_->position(left, top);
 			status_->misc_status(ST_NOTE, "SCRATCHPAD: Opened");
 		}
 		else {
+			// Hide it
 			scratchpad_->hide();
 			status_->misc_status(ST_NOTE, "SCRATCHPAD: Closed");
 		}
@@ -657,9 +673,9 @@ void resize_window() {
 	// Get minimum resizing from all the children - horizontal limited by views and toolbar
 	int min_w = max(tabbed_view_->min_w(), toolbar_->min_w());
 	// Vertical limited by view, the bars remain a fixed height
-	int min_h = tabbed_view_->min_h() + status_->h() + toolbar_->h();
+	int min_h = tabbed_view_->min_h() + status_->h() + toolbar_->h() + menu_->h();
 	main_window_->size_range(min_w, min_h);
-	// Set the size to the setting or minimum
+	// Set the size to the setting or minimum specified by the view + bars if that's larger
 	main_window_->resize(left, top, max(min_w, width), max(min_h, height));
 }
 
@@ -692,26 +708,13 @@ void tidy() {
 	delete main_icon_;
 }
 
-//// Add free-standing windows to remeber to close them when we close the main window
-//void add_sub_window(Fl_Window* w) {
-//	// Don't add the same window twice!
-//	if (sub_windows_.find(w) == sub_windows_.end()) {
-//		sub_windows_.insert(w);
-//	}
-//}
-//
-//// Remove free-standing menu from list 
-//void remove_sub_window(Fl_Window* w) {
-//	sub_windows_.erase(w);
-//}
-
 // Add the icon
 void add_icon(const char* arg0) {
 #ifndef _WIN32
 	// set the default Icon
 	main_icon_ = new Fl_RGB_Image(ICON_MAIN, 16, 16, 4);
 #else
-	// On windows we have a separate icon file - never worked out how to get one into the file
+	// TODO: On windows we have a separate icon file - never worked out how to get one into the file
 	// Find the directory the app is loaded from and add the icon filename
 	const char* last_slash = strrchr(arg0, '\\');
 	int pos = last_slash - arg0;
@@ -721,6 +724,7 @@ void add_icon(const char* arg0) {
 	strcat(path, "\\zzalog.png");
 	main_icon_ = new Fl_PNG_Image(path);
 #endif
+	// Use the icon as the default for all windows
 	Fl_Window::default_icon(main_icon_);
 }
 

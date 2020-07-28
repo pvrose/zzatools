@@ -28,7 +28,7 @@ bool tsv_writer::store_book(book* book, ostream& out, set<string>* fields) {
 	else {
 		my_fields = fields;
 	}
-	// For each field - output field names separated by tab character
+	// Create the header record, for each field - output field names separated by tab character
 	for (auto it = my_fields->begin(); it != my_fields->end(); it++) {
 		if (it != my_fields->begin()) {
 			out << '\t';
@@ -47,6 +47,7 @@ bool tsv_writer::store_book(book* book, ostream& out, set<string>* fields) {
 ostream & tsv_writer::store_record(record* record, ostream& out, set<string>* fields) {
 	// For each field, output it separated by the tab character
 	for (auto it = fields->begin(); it != fields->end(); it++) {
+		// Add the tab character before all fields except the first one
 		if (it != fields->begin()) {
 			out << '\t';
 		}

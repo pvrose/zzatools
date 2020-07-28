@@ -119,8 +119,8 @@ namespace zzalog {
 		void read_settings(Fl_Preferences& settings, vector<qsl_widget>&, int count);
 		// Draw the form
 		void create_form();
-		// Draw one set of lines
-		void draw_lines(Fl_Align align, int& y, vector<qsl_widget>& widgets);
+		// Draw one set of lines of text
+		void draw_text(Fl_Align align, int& y, vector<qsl_widget>& widgets);
 		// Draw a table
 		void draw_table(int& y);
 		// Convert to points
