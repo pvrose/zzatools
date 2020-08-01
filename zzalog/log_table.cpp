@@ -29,6 +29,7 @@ extern menu* menu_;
 extern toolbar* toolbar_;
 extern status* status_;
 extern intl_dialog* intl_dialog_;
+extern time_t session_start_;
 
 // constructor - passes parameters  to the two base classes
 log_table::log_table(int X, int Y, int W, int H, const char* label, field_ordering_t app) :
@@ -427,14 +428,16 @@ void log_table::draw_cell(TableContext context, int R, int C, int X, int Y, int 
 			!(edit_input_->visible() && R == edit_row_ && C == edit_col_)) {
 			fl_push_clip(X, Y, W, H);
 			{
-				// Selected rows will have table specific colour, the others will be white
-				Fl_Color bg_colour = row_selected(R) ? selection_color() : FL_WHITE;
+				record_num_t item_number = (order_ == LAST_TO_FIRST) ? my_book_->size() - 1 - R : R;
+				record* this_record = my_book_->get_record(item_number, false);
+				// Selected rows will have table specific colour, others in currect sesson grey, rest white
+				Fl_Color default_bg_colour = difftime(this_record->timestamp(), session_start_) > 0.0 ? FL_GRAY : FL_WHITE;
+				Fl_Color bg_colour = row_selected(R) ? selection_color() : default_bg_colour;
 				fl_color(bg_colour);
 				fl_rectf(X, Y, W, H);
 
 				// TEXT - contrast its colour to the bg colour.
 				fl_color(fl_contrast(FL_BLACK, bg_colour));
-				record_num_t item_number = (order_ == LAST_TO_FIRST) ? my_book_->size() - 1 - R : R;
 				// get the formatted data from the field of the record
 				text = my_book_->get_record(item_number, false)->item(fields_[C].field, true);
 				fl_draw(text.c_str(), X + 1, Y, W - 1, H, FL_ALIGN_LEFT);

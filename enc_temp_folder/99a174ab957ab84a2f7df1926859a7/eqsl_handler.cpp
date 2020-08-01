@@ -625,6 +625,8 @@ bool eqsl_handler::requests_queued() {
 
 // Upload updates to eQSL.cc log
 bool eqsl_handler::upload_eqsl_log(book* book) {
+	// Takes time - show timer cursor
+	fl_cursor(FL_CURSOR_WAIT);
 	// Clear existing help dialog
 	if (help_dialog_) {
 		help_dialog_->value("");
@@ -642,8 +644,6 @@ bool eqsl_handler::upload_eqsl_log(book* book) {
 		delete[] message;
 		return false;
 	}
-	// Takes time - show timer cursor
-	fl_cursor(FL_CURSOR_WAIT);
 	bool ok = true;
 	// stream the book data 
 	// Add QSL or SWL message to the record

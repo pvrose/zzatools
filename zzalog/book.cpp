@@ -415,6 +415,13 @@ bool book::store_data(string filename, bool force, set<string>* fields) {
 			else {
 				ok = false;
 			}
+			if (book_type() == OT_MAIN) {
+				// Save session end time - flush settings
+				time_t today = time(nullptr);
+				void* p_today = &today;
+				settings_->set("Session End", &p_today, sizeof(time_t));
+				settings_->flush();
+			}
 			save_in_progress_ = false;
 		}
 		else {

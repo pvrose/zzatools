@@ -109,6 +109,8 @@ bool use_local_ = false;
 bool closing_ = false;
 // Flag to mark everything loaded
 bool initialised_ = false;
+// Time loaded
+time_t session_start_  = (time_t)0;
 
 // This callback intercepts the close command and performs checks and tidies up
 // Updates recent files settings
@@ -339,6 +341,18 @@ void add_data() {
 // read in the log data
 void add_book(char* arg) {
 	if (!closing_) {
+		// Check this is a new session
+		void* p_last = &session_start_;
+		time_t today = time(nullptr);
+		settings_->get("Session End", p_last, (const void*)&p_last, sizeof(time_t));
+		if (difftime(today, session_start_) > 1800.0) {
+			// It is > 30 minutes since we last saved a record - new session
+			session_start_ = today;
+			status_->misc_status(ST_NOTE, "ZZALOG: Starting new session");
+		}
+		else {
+			status_->misc_status(ST_NOTE, "ZZALOG: Less than 30 minutes since last session - resuming");
+		}
 		// Create the book options and set them in the forms
 		book_ = new book;
 		navigation_book_ = book_;
