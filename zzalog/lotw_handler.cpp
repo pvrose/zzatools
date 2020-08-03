@@ -9,7 +9,7 @@
 
 #include <cstdlib>
 
-#include <FL/Fl_File_Chooser.H>
+#include <FL/Fl_Native_File_Chooser.H>
 #include <FL/Fl_Preferences.H>
 #include <FL/Fl_Text_Display.H>
 #include <FL/Fl_Window.H>
@@ -45,21 +45,18 @@ bool lotw_handler::upload_lotw_log(book* book) {
 	bool ok;
 	lotw_settings.get("Export File", filename, "");
 	// Open a file chooser to get file to export to - allows user to cancel upload
-	Fl_File_Chooser* chooser = nullptr;
+	Fl_Native_File_Chooser* chooser = nullptr;
 	if (strlen(filename) == 0) {
-		chooser = new Fl_File_Chooser(filename, "ADI Files(*.adi)", Fl_File_Chooser::CREATE, "Please select file for sending to LotW");
-		chooser->callback(cb_chooser, &new_filename);
-		chooser->textfont(FONT);
-		chooser->textsize(FONT_SIZE);
-		chooser->show();
-		// Wait while the dialog is active (visible)
-		while (chooser->visible()) Fl::wait();
+		chooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_SAVE_FILE);
+		chooser->title("Please select file for sending to LotW");
+		chooser->filter("ADI Files\t*.adi");
+		ok = (chooser->show() == 0);
 	}
 	else {
 		new_filename = filename;
 	}
 	free(filename);
-	if (chooser != nullptr && !chooser->count()) {
+	if (chooser != nullptr && !ok) {
 		// User cancelled
 		status_->misc_status(ST_ERROR, "LOTW: No file selected, upload cancelled");
 		ok = false;
@@ -90,24 +87,23 @@ bool lotw_handler::upload_lotw_log(book* book) {
 			if (!tqsl_executable.length()) {
 #ifdef WIN32
 				// Create an Open dialog; the default file name extension is ".exe".
-				Fl_File_Chooser* chooser = new Fl_File_Chooser("", "Applications(*.exe)", Fl_File_Chooser::SINGLE, "Please locate TQSL executable");
+//				Fl_File_Chooser* chooser = new Fl_File_Chooser("", "Applications(*.exe)", Fl_File_Chooser::SINGLE, "Please locate TQSL executable");
+				Fl_Native_File_Chooser* chooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_FILE);
+				chooser->title("Please locate TQSL executable");
+				chooser->filter("Applications\t*.exe");
 #else
 				// TODO: POsix equivalent filename pattern
-				Fl_File_Chooser* chooser = new Fl_File_Chooser("", "Applications(*.exe)", Fl_File_Chooser::SINGLE, "Please locate TQSL executable");
+//				Fl_File_Chooser* chooser = new Fl_File_Chooser("", "Applications(*.exe)", Fl_File_Chooser::SINGLE, "Please locate TQSL executable");
 #endif
-				chooser->callback(cb_chooser, &tqsl_executable);
-				chooser->textfont(FONT);
-				chooser->textsize(FONT_SIZE);
 				chooser->show();
-				// Wait while the dialog is active (visible)
-				while (chooser->visible()) Fl::wait();
-				if (!chooser->count()) {
+				if (chooser->show() != 0) {
 					// No executable found - cancel upload
 					status_->misc_status(ST_ERROR, "LOTW: TQSL Execuatble not found, upload cancelled");
 					ok = false;
 				}
 				else {
 					// Set the value in the settings
+					tqsl_executable = chooser->filename();
 					datapath_settings.set("TQSL Executable", tqsl_executable.c_str());
 				}
 				delete chooser;

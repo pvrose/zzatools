@@ -50,7 +50,7 @@ main.cpp - application entry point
 #include <FL/Fl.H>
 #include <FL/fl_ask.H>
 #include <FL/Fl_Box.H>
-#include <FL/Fl_File_Chooser.H>
+#include <FL/Fl_Native_File_Chooser.H>
 #include <FL/Fl_Menu_Item.H>
 #include <FL/Fl_Tabs.H>
 #include <FL/Fl_Tooltip.H>
@@ -248,7 +248,7 @@ int cb_args(int argc, char** argv, int& i) {
 
 // Use supplied argument, or read the latest file from settings or open file chooser if that's an empty string
 string get_file(char * arg_filename) {
-	string result;
+	string result = "";
 	if (!arg_filename || !(*arg_filename)) {
 		// null argument or empty string - get the recent file settings group.
 		Fl_Preferences recent_settings(settings_, "Recent Files");
@@ -262,15 +262,11 @@ string get_file(char * arg_filename) {
 		else {
 			// No recent file - open the file chooser
 			free(filename);
-			Fl_File_Chooser* chooser = new Fl_File_Chooser("", "ADI Files(*.adi)\tADX Files (*.adx)", Fl_File_Chooser::SINGLE, "Select log file name");
-			chooser->callback(cb_chooser, &result);
-			chooser->textfont(FONT);
-			chooser->textsize(FONT_SIZE);
-			chooser->show();
-			// Wait while the dialog is active (visible)
-			while (chooser->visible()) Fl::wait();
-			if (!chooser->count()) {
-				result = "";
+			Fl_Native_File_Chooser* chooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_FILE);
+			chooser->title("Select log file name");
+			chooser->filter("ADI Files\t*.adi\nADX Files\t*.adx");
+			if (chooser->show() == 0) {
+				result = chooser->filename();
 			}
 			delete chooser;
 		}
@@ -834,13 +830,11 @@ void backup_file(bool force, bool retrieve) {
 		string backup = temp;
 		free(temp);
 		while (backup.length() == 0) {
-			Fl_File_Chooser* chooser = new Fl_File_Chooser("", "", Fl_File_Chooser::DIRECTORY, "Select directory for backup");
-			chooser->callback(cb_chooser, &backup);
-			chooser->textfont(FONT);
-			chooser->textsize(FONT_SIZE);
-			chooser->show();
-			// Wait while the dialog is active (visible)
-			while (chooser->visible()) Fl::wait();
+			Fl_Native_File_Chooser* chooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_DIRECTORY);
+			chooser->title("Select directory for backup");
+			if (chooser->show() == 0) {
+				backup = chooser->filename();
+			}
 		}
 		// ensure a '/' is appendded
 		if (backup.back() != '/' && backup.back() != '\\') {

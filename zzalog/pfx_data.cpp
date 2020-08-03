@@ -9,7 +9,7 @@
 
 #include <FL/fl_ask.H>
 #include <FL/Fl_Preferences.H>
-#include <FL/Fl_File_Chooser.H>
+#include <FL/Fl_Native_File_Chooser.H>
 
 using namespace zzalog;
 using namespace zzalib;
@@ -71,13 +71,13 @@ string pfx_data::get_file(bool force) {
 	// If the path is not in the settings
 	if (force || !datapath.get("Reference", temp, "")) {
 		// Open a chooser to get it
-		Fl_File_Chooser* chooser = new Fl_File_Chooser("", nullptr, Fl_File_Chooser::DIRECTORY,
-			"Select reference file directory");
-		chooser->callback(cb_chooser, &dirname);
-		chooser->textfont(FONT);
-		chooser->textsize(FONT_SIZE);
-		chooser->show();
-		while (chooser->visible()) Fl::wait();
+		//Fl_File_Chooser* chooser = new Fl_File_Chooser("", nullptr, Fl_File_Chooser::DIRECTORY,
+		//	"Select reference file directory");
+		Fl_Native_File_Chooser* chooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_DIRECTORY);
+		chooser->title("Select reference file directory");
+		if (chooser->show() == 0) {
+			dirname = chooser->filename();
+		}
 		delete chooser;
 		datapath.set("Reference", dirname.c_str());
 	}

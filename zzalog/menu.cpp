@@ -35,7 +35,7 @@
 #include <string>
 
 #include <FL/fl_ask.H>
-#include <FL/Fl_File_Chooser.H>
+#include <FL/Fl_Native_File_Chooser.H>
 #include <FL/Fl_Menu_Item.H>
 #include <FL/Fl_Single_Window.H>
 #include <FL/Fl_Preferences.H>
@@ -368,17 +368,14 @@ void menu::cb_mi_file_open(Fl_Widget* w, void* v) {
 		Fl_Preferences datapath_settings(settings_, "Datapath");
 		char* directory;
 		datapath_settings.get("Log Directory", directory, "");
-		Fl_File_Chooser* chooser = new Fl_File_Chooser(directory, "ADI Files(*.adi)\tADX Files (*.adx)", Fl_File_Chooser::SINGLE, "Select file name to load");
-		free(directory);
-		chooser->callback(cb_chooser, &filename);
-		chooser->textfont(FONT);
-		chooser->textsize(FONT_SIZE);
-		chooser->show();
-		// Wait while the dialog is active (visible)
-		while (chooser->visible()) Fl::wait();
-		if (!chooser->count()) {
-			filename = "";
+		Fl_Native_File_Chooser* chooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_FILE);
+		chooser->title("Select file name to load");
+		chooser->directory(directory);
+		chooser->filter("ADI Files\t*.adi\nADX Files\t*.adx");
+		if (chooser->show() == 0) {
+			filename = chooser->filename();
 		}
+		free(directory);
 		delete chooser;
 	}
 	else {
@@ -436,15 +433,12 @@ void menu::cb_mi_file_save(Fl_Widget* w, void* v) {
 // v is set to the enum object_t. OT_MAIN = save main book, OT_EXTRACT = save extracted records
 void menu::cb_mi_file_saveas(Fl_Widget* w, void* v) {
 	string filename = book_->filename();
-	Fl_File_Chooser* chooser = new Fl_File_Chooser(filename.c_str(), "ADI Files(*.adi)\tADX Files (*.adx)\tTSV files (*.{tsv,tab})", Fl_File_Chooser::CREATE, "Select file name to save");
-	chooser->callback(cb_chooser, &filename);
-	chooser->textfont(FONT);
-	chooser->textsize(FONT_SIZE);
-	chooser->show();
-	// Wait while the dialog is active (visible)
-	while (chooser->visible()) Fl::wait();
-	// Trial and error indicated that if Cancel is clicked, no files are selected.
-	if (chooser->count()) {
+	Fl_Native_File_Chooser* chooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_SAVE_FILE);
+	chooser->title("Select file name to save");
+	chooser->filter("ADI Files\t*.adi\nADX Files\t*.adx\nTSV Files\t*.{tsv,tab}");
+	chooser->preset_file(filename.c_str());
+	if (chooser->show() == 0) {
+		filename = chooser->filename();
 		// No file type - force it to .adi
 		string suffix = filename.substr(filename.length() - 4);
 		if (suffix != ".adi" && suffix != ".adx" && suffix != ".tsv" && suffix != ".tab") {
@@ -1075,14 +1069,12 @@ void menu::cb_mi_imp_file(Fl_Widget* w, void* v) {
 	datapath_settings.get("Log Directory", directory, "");
 		// Open file chooser
 	string filename;
-	Fl_File_Chooser* chooser = new Fl_File_Chooser(directory, "ADI Files(*.adi)\tADX Files (*.adx)", Fl_File_Chooser::SINGLE, "Select file name");
-	chooser->callback(cb_chooser, &filename);
-	chooser->textfont(FONT);
-	chooser->textsize(FONT_SIZE);
-	chooser->show();
-	// Wait while the dialog is active (visible)
-	while (chooser->visible()) Fl::wait();
-	if (chooser->count()) {
+	Fl_Native_File_Chooser* chooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_FILE);
+	chooser->title("Select file name");
+	chooser->directory(directory);
+	chooser->filter("ADI files\t*.adi\nADX Files\t*.adx");
+	if (chooser->show() == 0) {
+		filename = chooser->filename();
 		import_data_->load_data(filename);
 	}
 	delete chooser;
@@ -2001,16 +1993,15 @@ string menu::get_browser() {
 	free(temp);
 	if (!browser.length()) {
 		// User hasn't defined browser yet - open dialog to get it
-		Fl_File_Chooser* chooser = new Fl_File_Chooser("", "Applications(*.exe)", Fl_File_Chooser::SINGLE, "Please select your favoured web browser");
-		chooser->callback(cb_chooser, &browser);
-		chooser->textfont(FONT);
-		chooser->textsize(FONT_SIZE);
-		chooser->show();
-		// Wait while the dialog is active (visible)
-		while (chooser->visible()) Fl::wait();
-		if (!chooser->count()) {
+		Fl_Native_File_Chooser* chooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_FILE);
+		chooser->title("Please select your favoured web browser");
+		chooser->filter("Applications\t*.exe");
+		if (chooser->show() != 0) {
 			status_->misc_status(ST_WARNING, "INFO: No browser selected, abandoning");
 			return "";
+		}
+		else {
+			browser = chooser->filename();
 		}
 		delete chooser;
 	}

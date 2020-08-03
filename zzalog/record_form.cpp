@@ -18,7 +18,7 @@
 #include <string>
 #include <map>
 
-#include <FL/Fl_File_Chooser.H>
+#include <FL/Fl_Native_File_Chooser.H>
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Preferences.H>
 #include <FL/Fl_JPEG_Image.H>
@@ -1117,13 +1117,13 @@ void record_form::set_image() {
 			char* temp;
 			Fl_Preferences datapath(settings_, "Datapath");
 			if (!datapath.get("QSLs", temp, "")) {
-				Fl_File_Chooser* chooser = new Fl_File_Chooser("", nullptr, Fl_File_Chooser::DIRECTORY,
-					"Select QSL card directory");
-				chooser->callback(cb_chooser, &directory);
-				chooser->textfont(FONT);
-				chooser->textsize(FONT_SIZE);
-				chooser->show();
-				while (chooser->visible()) Fl::wait();
+				//Fl_File_Chooser* chooser = new Fl_File_Chooser("", nullptr, Fl_File_Chooser::DIRECTORY,
+				//	"Select QSL card directory");
+				Fl_Native_File_Chooser* chooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_DIRECTORY);
+				chooser->title("Select QSL card directory");
+				if (chooser->show() == 0) {
+					directory = chooser->filename();
+				}
 				delete chooser;
 				datapath.set("QSLs", directory.c_str());
 			}

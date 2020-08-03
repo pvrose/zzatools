@@ -9,7 +9,7 @@
 
 #include <FL/Fl_Preferences.H>
 #include <FL/Fl_Help_Dialog.H>
-#include <FL/Fl_File_Chooser.H>
+#include <FL/Fl_Native_File_Chooser.H>
 
 using namespace zzalog;
 using namespace zzalib;
@@ -206,13 +206,13 @@ void club_handler::get_reference(string& dir_name) {
 	// If the path is not in the settings
 	if (!datapath.get("Reference", temp, "")) {
 		// Open a chooser to get it
-		Fl_File_Chooser* chooser = new Fl_File_Chooser("", nullptr, Fl_File_Chooser::DIRECTORY,
-			"Select reference file directory");
-		chooser->callback(cb_chooser, &dir_name);
-		chooser->textfont(FONT);
-		chooser->textsize(FONT_SIZE);
-		chooser->show();
-		while (chooser->visible()) Fl::wait();
+		//Fl_File_Chooser* chooser = new Fl_File_Chooser("", nullptr, Fl_File_Chooser::DIRECTORY,
+		//	"Select reference file directory");
+		Fl_Native_File_Chooser* chooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_DIRECTORY);
+		chooser->title("Select reference file directory");
+		chooser->preset_file(temp);
+		while (chooser->show()) {}
+		dir_name = chooser->filename();
 		delete chooser;
 		datapath.set("Reference", dir_name.c_str());
 	}

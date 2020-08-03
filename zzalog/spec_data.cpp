@@ -17,7 +17,7 @@
 
 #include <FL/Fl_Preferences.H>
 #include <FL/fl_ask.H>
-#include <FL/Fl_File_Chooser.H>
+#include <FL/Fl_Native_File_Chooser.H>
 
 using namespace zzalog;
 using namespace zzalib;
@@ -92,16 +92,12 @@ string spec_data::get_path(bool force) {
 	// get the value from settings or force new browse
 	if (force || !datapath.get("Reference", dirname, "")) {
 		// We do not have one - so open chooser to get one
-		Fl_File_Chooser* chooser = new Fl_File_Chooser(dirname, nullptr, Fl_File_Chooser::DIRECTORY,
-			"Select reference file directory");
-		chooser->callback(cb_chooser, &directory_name);
-		chooser->textfont(FONT);
-		chooser->textsize(FONT_SIZE);
-		do {
-			// Show the dialog and wait for it to close - keep doing until not cancelled
-			chooser->show();
-			while (chooser->visible()) Fl::wait();
-		} while (!chooser->count());
+		//Fl_File_Chooser* chooser = new Fl_File_Chooser(dirname, nullptr, Fl_File_Chooser::DIRECTORY,
+		//	"Select reference file directory");
+		Fl_Native_File_Chooser* chooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_DIRECTORY);
+		chooser->directory(dirname);
+		while (chooser->show()) {}
+		directory_name = chooser->filename();
 		delete chooser;
 	}
 	else {

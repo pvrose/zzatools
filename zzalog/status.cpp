@@ -12,7 +12,7 @@
 #include <FL/Fl.H>
 #include <FL/Fl_Preferences.H>
 #include <FL/Fl_Single_Window.H>
-#include <FL/Fl_File_Chooser.H>
+#include <FL/Fl_Native_File_Chooser.H>
 #include <FL/Fl_Text_Display.H>
 #include <FL/Fl_Text_Buffer.H>
 #include <FL/fl_ask.H>
@@ -145,14 +145,12 @@ status::status(int X, int Y, int W, int H, const char* label) :
 	// If it's not in the settings, open file dialog, get it and set it.
 	while (report_filename_.length() == 0) {
 		// Create an Open dialog; the default file name extension is ".txt".
-		Fl_File_Chooser* chooser = new Fl_File_Chooser(report_filename_.c_str(), "Text Files(*.txt)\tAll Files (*.*)", Fl_File_Chooser::CREATE, "Select file name for status report");
-		chooser->callback(cb_chooser, &report_filename_);
-		chooser->textfont(FONT);
-		chooser->textsize(FONT_SIZE);
-		chooser->show();
-		// Wait while the dialog is active (visible)
-		while (chooser->visible()) Fl::wait();
-		if (chooser->count()) {
+		//Fl_File_Chooser* chooser = new Fl_File_Chooser(report_filename_.c_str(), "Text Files(*.txt)\tAll Files (*.*)", Fl_File_Chooser::CREATE, "Select file name for status report");
+		Fl_Native_File_Chooser* chooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_SAVE_FILE);
+		chooser->title("Select file name for status report");
+		chooser->filter("Text files\t*.txt");
+		if (chooser->show() == 0) {
+			report_filename_ = chooser->filename();
 			status_settings.set("Report File", report_filename_.c_str());
 		}
 		delete chooser;

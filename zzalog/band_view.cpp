@@ -12,7 +12,7 @@
 
 #include <FL/Fl_Preferences.H>
 #include <FL/Fl.H>
-#include <FL/Fl_File_Chooser.H>
+#include <FL/Fl_Native_File_Chooser.H>
 #include <FL/Fl_Slider.H>
 #include <FL/Fl_Counter.H>
 #include <FL/Fl_Output.H>
@@ -183,16 +183,13 @@ string band_view::get_path() {
 	// get the value from settings or force new browse
 	if (!datapath.get("Reference", dirname, "")) {
 		// We do not have one - so open chooser to get one
-		Fl_File_Chooser* chooser = new Fl_File_Chooser(dirname, nullptr, Fl_File_Chooser::DIRECTORY,
-			"Select reference file directory");
-		chooser->callback(cb_chooser, &directory_name);
-		chooser->textfont(FONT);
-		chooser->textsize(FONT_SIZE);
-		do {
-			// Show the dialog and wait for it to close - keep doing until not cancelled
-			chooser->show();
-			while (chooser->visible()) Fl::wait();
-		} while (!chooser->count());
+//		Fl_File_Chooser* chooser = new Fl_File_Chooser(dirname, nullptr, Fl_File_Chooser::DIRECTORY,
+//			"Select reference file directory");
+		Fl_Native_File_Chooser* chooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_DIRECTORY);
+		chooser->title("Select reference file directory");
+		chooser->preset_file(dirname);
+		while (chooser->show()) {}
+		directory_name = chooser->filename();
 		delete chooser;
 	}
 	else {

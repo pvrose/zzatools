@@ -18,7 +18,7 @@
 #include <FL/fl_ask.H>
 #include <FL/Fl_Preferences.H>
 #include <FL/fl_utf8.h>
-#include <FL/Fl_File_Chooser.H>
+#include <FL/Fl_Native_File_Chooser.H>
 #include <FL/Fl_Help_Dialog.H>
 
 using namespace zzalog;
@@ -220,13 +220,11 @@ string eqsl_handler::card_filename_l(record* record) {
 	free(temp);
 	// If the directory name is not defined, open a chooser to get it.
 	if (!qsl_directory.length()) {
-		Fl_File_Chooser* chooser = new Fl_File_Chooser(qsl_directory.c_str(), nullptr,
-			Fl_File_Chooser::DIRECTORY, "Select QSL card directory");
-		chooser->callback(cb_chooser, &qsl_directory);
-		chooser->textfont(FONT);
-		chooser->textsize(FONT_SIZE);
-		chooser->show();
-		while (chooser->visible()) Fl::wait();
+		Fl_Native_File_Chooser* chooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_DIRECTORY);
+		chooser->title("Select reference file directory");
+		chooser->preset_file(qsl_directory.c_str());
+		while (chooser->show()) {}
+		qsl_directory = chooser->filename();
 		datapath_settings.set("QSLs", qsl_directory.c_str());
 		delete chooser;
 	}

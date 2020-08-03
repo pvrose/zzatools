@@ -152,14 +152,11 @@ namespace zzalib {
 	static void cb_bn_browsefile(Fl_Widget* w, void* v) {
 		browser_data_t* data = (browser_data_t*)v;
 		// Open file chooser with supplied data
-		Fl_Native_File_Chooser* chooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_FILE);
+		Fl_Native_File_Chooser* chooser = new Fl_Native_File_Chooser();
 		chooser->title(data->message.c_str());
-		chooser->filter(data->pattern.c_str());
-		size_t pos = data->filename->find_last_of("/\\");
-		if (pos != string::npos) {
-			string dir_name = data->filename->substr(0, pos + 1);
-			chooser->directory(dir_name.c_str());
-		}
+		chooser->type(Fl_Native_File_Chooser::BROWSE_FILE);
+		chooser->preset_file(data->filename->c_str());
+		chooser->directory(data->filename->c_str());
 		switch (chooser->show()) {
 		case 0:
 			// If 1 file is selected - write filename to input widget
@@ -185,8 +182,9 @@ namespace zzalib {
 	static void cb_bn_browsedir(Fl_Widget* w, void* v) {
 		browser_data_t* data = (browser_data_t*)v;
 		// Open file chooser with supplied data
-		Fl_Native_File_Chooser* chooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_DIRECTORY);
+		Fl_Native_File_Chooser* chooser = new Fl_Native_File_Chooser();
 		chooser->title(data->message.c_str());
+		chooser->type(Fl_Native_File_Chooser::BROWSE_DIRECTORY);
 		chooser->directory(data->filename->c_str());
 		switch (chooser->show()) {
 		case 0:

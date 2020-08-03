@@ -253,7 +253,7 @@ void files_dialog::create_form(int X, int Y) {
 		// Button - opens a file browser to get the filename
 		bn_browse_auto[i] = new Fl_Button(X + COL5, Y + *ROW1[i], WBUTTON, HBUTTON, "Browse");
 		bn_browse_auto[i]->align(FL_ALIGN_INSIDE);
-		auto_data_[i] = { "Please enter a file to auto-import", "ADI Files(*.adi)\tADX Files (*.adx)", &auto_file_[i], &enable_auto_[i], in_auto_file[i], bn_auto_en[i] };
+		auto_data_[i] = { "Please enter a file to auto-import", "ADI Files\t*.adi\nADX Files\t*.adx", &auto_file_[i], &enable_auto_[i], in_auto_file[i], bn_auto_en[i] };
 		bn_browse_auto[i]->callback(cb_bn_browsefile, &(auto_data_[i]));
 		bn_browse_auto[i]->when(FL_WHEN_RELEASE);
 		bn_browse_auto[i]->labelsize(FONT_SIZE);
@@ -298,10 +298,10 @@ void files_dialog::create_form(int X, int Y) {
 	Fl_Button* bn_browse_tqsl = new Fl_Button(X + COL5, Y + ROW2_1, WBUTTON, HBUTTON, "Browse");
 	bn_browse_tqsl->align(FL_ALIGN_INSIDE);
 #ifdef _WIN32
-	tqsl_data_ = { "Please enter the TQSL executable", "Executable (*.exe)|*.exe|All Files (*.*)|*.*||", &tqsl_executable_, &enable_tqsl_, in_tqsl_file, bn_tqsl_en };
+	tqsl_data_ = { "Please enter the TQSL executable", "Executable\t*.exe", &tqsl_executable_, &enable_tqsl_, in_tqsl_file, bn_tqsl_en };
 #else
 	// TODO: Change the file pattern for Posix 
-	tqsl_data_ = { "Please enter the TQSL executable", "Executable (*.exe)|*.exe|All Files (*.*)|*.*||", &tqsl_executable_, &enable_tqsl_, in_tqsl_file, bn_tqsl_en };
+	tqsl_data_ = { "Please enter the TQSL executable", "Executable\*.exe", &tqsl_executable_, &enable_tqsl_, in_tqsl_file, bn_tqsl_en };
 #endif
 	bn_browse_tqsl->callback(cb_bn_browsefile, &tqsl_data_);
 	bn_browse_tqsl->when(FL_WHEN_RELEASE);
@@ -403,10 +403,10 @@ void files_dialog::create_form(int X, int Y) {
 	Fl_Button* bn_browse_web = new Fl_Button(X + COL5, Y + ROW6_1, WBUTTON, HBUTTON, "Browse");
 	bn_browse_web->align(FL_ALIGN_INSIDE);
 #ifdef _WIN32
-	web_data_ = { "Please enter the Web browser", "Executable (*.exe)|*.exe|All Files (*.*)|*.*||", &web_browser_, nullptr, in_web_file, nullptr };
+	web_data_ = { "Please enter the Web browser", "Executable\t*.exe", &web_browser_, nullptr, in_web_file, nullptr };
 #else
 	// TODO: Change file pattern for Posix executables
-	web_data_ = { "Please enter the Web browser", "Executable (*.exe)|*.exe|All Files (*.*)|*.*||", &web_browser_, nullptr, in_web_file, nullptr };
+	web_data_ = { "Please enter the Web browser", "Executable\t*.exe", &web_browser_, nullptr, in_web_file, nullptr };
 #endif
 	bn_browse_web->callback(cb_bn_browsefile, &web_data_);
 	bn_browse_web->when(FL_WHEN_RELEASE);
@@ -429,7 +429,7 @@ void files_dialog::create_form(int X, int Y) {
 	// Button - opens file browser
 	Fl_Button* bn_browse_status = new Fl_Button(X + COL5, Y + ROW7_1, WBUTTON, HBUTTON, "Browse");
 	bn_browse_status->align(FL_ALIGN_INSIDE);
-	status_data_ = { "Please enter the status log file", "Text (*txt)|*.txt|All Files (*.*)|*.*||", &status_log_file_, nullptr, in_status_file, nullptr };
+	status_data_ = { "Please enter the status log file", "Text\t*.txt", &status_log_file_, nullptr, in_status_file, nullptr };
 	bn_browse_status->callback(cb_bn_browsefile, &status_data_);
 	bn_browse_status->when(FL_WHEN_RELEASE);
 	bn_browse_status->labelsize(FONT_SIZE);
@@ -463,10 +463,10 @@ void files_dialog::create_form(int X, int Y) {
 	Fl_Button* bn_browse_unzip = new Fl_Button(X + COL5, Y + ROW8_1, WBUTTON, HBUTTON, "Browse");
 	bn_browse_unzip->align(FL_ALIGN_INSIDE);
 #ifdef _WIN32
-	unzipper_data_ = { "Please select the unzip tool", "Executable (*.exe)|*.exe|All Files (*.*)|*.*||", &unzipper_, nullptr, in_unzipper, nullptr };
+	unzipper_data_ = { "Please select the unzip tool", "Executable\t*.exe", &unzipper_, nullptr, in_unzipper, nullptr };
 #else
 	// TODO: Change file pattern for Posix executables
-	unzipper_data_ = { "Please select the unzip tool", "Executable (*.exe)|*.exe|All Files (*.*)|*.*||", &unzipper_, nullptr, in_web_file, nullptr };
+	unzipper_data_ = { "Please select the unzip tool", "Executable\t*.exe", &unzipper_, nullptr, in_web_file, nullptr };
 #endif
 	bn_browse_unzip->callback(cb_bn_browsefile, &unzipper_data_);
 	bn_browse_unzip->when(FL_WHEN_RELEASE);
