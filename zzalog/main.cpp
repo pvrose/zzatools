@@ -374,11 +374,11 @@ void cb_rig_timer() {
 			band_view_->update(rig_if_->tx_frequency() / 1000.0);
 		}
 		// Update scratchpad
+		string freq = rig_if_->get_frequency(true);
 		if (scratchpad_) {
 			string mode;
 			string submode;
 			rig_if_->get_string_mode(mode, submode);
-			string freq = rig_if_->get_frequency(true);
 			string power = rig_if_->get_tx_power();
 			if (submode.length()) {
 				scratchpad_->rig_update(freq, submode, power);
@@ -387,11 +387,17 @@ void cb_rig_timer() {
 				scratchpad_->rig_update(freq, mode, power);
 			}
 		}
-		if (rig_if_->get_tx() == true) {
-			status_->rig_status(RS_TX, rig_if_->rig_info().c_str());
+		// Update rig status
+		if (!band_view_ || band_view_->in_band(rig_if_->tx_frequency()/1000.0)) {
+			if (rig_if_->get_tx() == true) {
+				status_->rig_status(RS_TX, rig_if_->rig_info().c_str());
+			}
+			else {
+				status_->rig_status(RS_RX, rig_if_->rig_info().c_str());
+			}
 		}
 		else {
-			status_->rig_status(RS_RX, rig_if_->rig_info().c_str());
+			status_->rig_status(RS_ERROR, rig_if_->rig_info().c_str());
 		}
 	}
 }
@@ -507,7 +513,12 @@ void add_rig_if() {
 							snprintf(message, 256, "RIG: %s", rig_if_->success_message().c_str());
 							status_->misc_status(ST_OK, message);
 							// Get the operating condition from the rig
-							status_->rig_status(rig_if_->get_tx() ? RS_TX : RS_RX, rig_if_->rig_info().c_str());
+							if (!band_view_ || band_view_->in_band(rig_if_->tx_frequency())) {
+								status_->rig_status(rig_if_->get_tx() ? RS_TX : RS_RX, rig_if_->rig_info().c_str());
+							}
+							else {
+								status_->rig_status(RS_ERROR, rig_if_->rig_info().c_str());
+							}
 							done = true;
 							// Change logging mode to ON_AIR
 							menu_->logging(LM_ON_AIR);
@@ -835,12 +846,15 @@ void backup_file(bool force, bool retrieve) {
 			if (chooser->show() == 0) {
 				backup = chooser->filename();
 			}
+			delete chooser;
 		}
-		// ensure a '/' is appendded
-		if (backup.back() != '/' && backup.back() != '\\') {
-			backup += '/';
-		}
+		// Save the result of the chooser
 		backup_settings.set("Path", backup.c_str());
+
+		// ensure a '\' is appendded
+		if (backup.back() != '/' && backup.back() != '\\') {
+			backup += '\\';
+		}
 		// Get source filename
 		string source = book_->filename(true);
 		// Create backup filename - use back-up directory and current file-name

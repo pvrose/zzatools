@@ -337,7 +337,7 @@ int band_view::draw_scale() {
 	return horiz_y + 5;
 }
 
-// Draw a red line for the rig frequency
+// Draw a red or blue line for the rig frequency
 int band_view::draw_frequency(int pos_y) {
 	// now draw a bigger tick at the frequency
 	// Work out where to draw it - get number of pixels away fromm mid-point.
@@ -351,9 +351,13 @@ int band_view::draw_frequency(int pos_y) {
 	Fl_Color old_colour = fl_color();
 	if (in_band(rig_frequency_)) {
 		fl_color(FL_BLUE);
+		((Fl_Counter*)w_freq_slider_)->textcolor(FL_BLACK);
+		((Fl_Counter*)w_freq_slider_)->textfont(FONT);
 	}
 	else {
 		fl_color(FL_RED);
+		((Fl_Counter*)w_freq_slider_)->textcolor(FL_RED);
+		((Fl_Counter*)w_freq_slider_)->textfont(FONT | FL_BOLD);
 	}
 	// Draw a red or blue line across scale and plans
 	fl_line(curr_x, GAP, curr_x, pos_y);

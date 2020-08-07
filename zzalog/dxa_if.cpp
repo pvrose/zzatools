@@ -234,6 +234,7 @@ void dxa_if::create_form() {
 	ch12->add("By logged mode");
 	ch12->add("By award mode");
 	ch12->add("By distance");
+	ch12->add("By date");
 	ch12->value((int)atlas_colour_);
 	// Choice - where to centre the map
 	Fl_Choice* ch13 = new Fl_Choice(ch12->x(), ch12->y() + ch12->h() + HTEXT, ch12->w(), ch12->h(), "Centre on...");
@@ -1337,6 +1338,13 @@ void dxa_if::allocate_colours() {
 			colours_used_.push_back(value);
 		}
 		break;
+	case AC_DAYS:
+		for (int i = 0; i < 10; i++) {
+			string value = to_string(i) + " days";
+			colours_used_.push_back(value);
+		}
+		colours_used_.push_back(">=10 days");
+		break;
 	}
 }
 
@@ -1383,6 +1391,8 @@ void dxa_if::draw_pins() {
 			easternmost_ = home_long_;
 			northernmost_ = home_lat_;
 			southernmost_ = home_lat_;
+			// Get most recent date (for AC_DAYS)
+			time_t last_time = time(nullptr);
 
 			// Clear records displayed
 			records_displayed_.clear();
@@ -1458,6 +1468,14 @@ void dxa_if::draw_pins() {
 								break;
 							case AC_DISTANCE:
 								use_item = (colour_text == get_distance(record));
+								break;
+							case AC_DAYS:
+								if (colour_layer < 10) {
+									use_item = (((long)difftime(last_time, record->timestamp()) / (24 * 3600)) == colour_layer);
+								}
+								else {
+									use_item = (((long)difftime(last_time, record->timestamp()) / (24 * 3600)) >= colour_layer);
+								}
 								break;
 							}
 	

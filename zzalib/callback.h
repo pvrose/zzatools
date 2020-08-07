@@ -191,7 +191,7 @@ namespace zzalib {
 		switch (chooser->show()) {
 		case 0:
 			// If 1 file is selected - write filename to input widget
-			*data->filename = string(chooser->directory());
+			*data->filename = string(chooser->filename());
 			(data->input_w)->value(data->filename->c_str());
 			if (data->enable != nullptr) {
 				// If a check widget and bool is supplied, set it

@@ -52,7 +52,8 @@ namespace zzalog {
 			AC_BANDS,      // Seperate colour per band
 			AC_LOGMODE,    // Separate colour per logged (ADIF-defined) mode/submode
 			AC_AWARDMODE,  // Separate colour per DXCC defined mode
-			AC_DISTANCE    // Separate colour per distance bands (every 1000 km)
+			AC_DISTANCE,   // Separate colour per distance bands (every 1000 km)
+			AC_DAYS,       // Separate colour per recent days   
 		};
 		// Centre map position
 		enum centre_t {
