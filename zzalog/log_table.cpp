@@ -31,6 +31,9 @@ extern status* status_;
 extern intl_dialog* intl_dialog_;
 extern time_t session_start_;
 
+Fl_Font log_table::font_;
+Fl_Fontsize log_table::fontsize_;
+
 // constructor - passes parameters  to the two base classes
 log_table::log_table(int X, int Y, int W, int H, const char* label, field_ordering_t app) :
   Fl_Table_Row(X, Y, W, H, label)
@@ -46,6 +49,12 @@ log_table::log_table(int X, int Y, int W, int H, const char* label, field_orderi
 	application_ = FO_MAINLOG;
 	rows_per_page_ = 0;
 	order_ = FIRST_TO_LAST;
+
+	// These are static, but will get to the same value each time
+	Fl_Preferences user_settings(settings_, "User Settings");
+	Fl_Preferences log_settings(user_settings, "Log Table");
+	log_settings.get("Font Name", (int&)font_, FONT);
+	log_settings.get("Font Size", (int&)fontsize_, FONT_SIZE);
 	begin();
 	// Create cell input widget, zero size, hide it
 	edit_input_ = new edit_input(x() + w() / 2, y() + h() / 2, 100, 20);
@@ -67,6 +76,8 @@ log_table::log_table(int X, int Y, int W, int H, const char* label, field_orderi
 	col_header_color(FL_GRAY);
 	row_header(true);
 	row_header_color(FL_GRAY);
+	fl_font(font_, fontsize_);
+	int row_height = fl_height() + 2;
 	when(FL_WHEN_RELEASE | FL_WHEN_CHANGED);
 	callback((Fl_Callback*)log_table::cb_tab_log, (void*)nullptr);
 	application_ = app;
@@ -79,7 +90,7 @@ log_table::log_table(int X, int Y, int W, int H, const char* label, field_orderi
 		col_width(i, fields_[i].width);
 	}
 	// number of rows - available internal height / default row height
-	rows_per_page_ = Fl_Table_Row::tih / (ROW_HEIGHT);
+	rows_per_page_ = Fl_Table_Row::tih / (row_height);
 	// Reverse order
 	Fl_Preferences display_settings(settings_, "Display");
 	display_settings.get("Recent First", (int&)order_, FIRST_TO_LAST);
@@ -87,7 +98,7 @@ log_table::log_table(int X, int Y, int W, int H, const char* label, field_orderi
 	// Set minimum resizing - width 1/3
 	min_w_ = w() / 3;
 	// Set minimum resizing - height 6 rows (plus col. header)
-	min_h_ = (ROW_HEIGHT) * 7;
+	min_h_ = (row_height) * 7;
 	resizable(this);
 
 }
@@ -342,6 +353,8 @@ void log_table::update(hint_t hint, unsigned int record_num_1, unsigned int reco
 		for (unsigned int i = 0; i < fields_.size(); i++) {
 			col_width(i, fields_[i].width);
 		}
+		// font size may have changed
+		adjust_row_sizes();
 		break;
 	case HT_RESET_ORDER:
 		// Reset order to FIRST_TO_LAST
@@ -352,7 +365,7 @@ void log_table::update(hint_t hint, unsigned int record_num_1, unsigned int reco
 		// set the number of rows
 		rows(my_book_->get_count());
 		// Rows must exist before the following has an effect
-		row_height_all(ROW_HEIGHT);
+		adjust_row_sizes();
 		// select specified record
 		current_item_num_ = my_book_->item_number(record_num_1);
 		if (order_ == LAST_TO_FIRST) {
@@ -363,6 +376,16 @@ void log_table::update(hint_t hint, unsigned int record_num_1, unsigned int reco
 		break;
 	}
 }
+
+// Adjust the row height and row header width to match the font used
+void log_table::adjust_row_sizes() {
+	fl_font(font_ | FL_ITALIC, fontsize_);
+	int height = fl_height() + 2;
+	row_height_all(height);
+	int header_width = 0;
+	fl_measure("99999 ", header_width, height);
+	row_header_width(header_width);
+}
  
 // Override of Fl_Table_Row method to provide data and formats for each cell
 void log_table::draw_cell(TableContext context, int R, int C, int X, int Y, int W, int H) {
@@ -371,7 +394,7 @@ void log_table::draw_cell(TableContext context, int R, int C, int X, int Y, int 
 
 	case CONTEXT_STARTPAGE:
 		// Set the table font
-		fl_font(FONT, FONT_SIZE);
+		fl_font(font_, fontsize_);
 		return;
 
 	case CONTEXT_ENDPAGE:
@@ -390,12 +413,12 @@ void log_table::draw_cell(TableContext context, int R, int C, int X, int Y, int 
 			fl_color(fl_contrast(FL_BLACK, bg_colour));
 			// Make this italic version of default font
 			Fl_Font save = fl_font();
-			fl_font(FONT | FL_ITALIC, FONT_SIZE);
+			fl_font(font_ | FL_ITALIC, fontsize_);
 			// Display record number (starting at 1) in the row header
 			record_num_t item_number = (order_ == LAST_TO_FIRST) ? my_book_->size() - 1 - R : R;
 			text = to_string(my_book_->record_number(item_number) + 1);
 			fl_draw(text.c_str(), X, Y, W, H, FL_ALIGN_LEFT);
-			fl_font(save, FONT_SIZE);
+			fl_font(save, fontsize_);
 			// BORDER - mid grey
 			fl_color(color());
 			// draw top and right edges only
@@ -735,4 +758,10 @@ void log_table::drag_column(int C) {
 		Fl_Preferences field_settings(field_set_settings, field_set_settings.group(C));
 		field_settings.set("Width", new_width);
 	}
+}
+
+// Set log font values
+void log_table::set_font(Fl_Font font, Fl_Fontsize size) {
+	font_ = font;
+	fontsize_ = size;
 }

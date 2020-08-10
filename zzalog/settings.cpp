@@ -5,6 +5,7 @@
 #include "stn_dialog.h"
 #include "fields_dialog.h"
 #include "qsl_design.h"
+#include "user_dialog.h"
 #include "config_tree.h"
 
 #include "../zzalib/utils.h"
@@ -27,7 +28,7 @@ settings::settings(int W, int H, const char* label, cfg_dialog_t active) :
 	, active_(true)
 {
 	updatable_views_.clear();
-	// Create the set of tabs
+	// Create the set of tabs - leave enough space beneath for OK etc buttons.
 	Fl_Tabs* tabs = new Fl_Tabs(0, 0, W, H - HBUTTON - GAP);
 	tabs->labelsize(FONT_SIZE);
 	border(true);
@@ -70,6 +71,11 @@ settings::settings(int W, int H, const char* label, cfg_dialog_t active) :
 	qsl->tooltip("Allows the simple design of QSL labels");
 	// Add to the list of updatable views
 	updatable_views_.insert(qsl);
+	// User settings - allows user to control cetain aspects of the displayed information
+	user_dialog* user = new user_dialog(rx, ry, rw, rh, "User settings");
+	user->labelsize(FONT_SIZE);
+	user->selection_color(fl_lighter(FL_YELLOW));
+	user->tooltip("Allows limited configuration of fonts and tip timeouts");
 
 	// Lastly - a tree display showing all settings
 	config_tree* all_settings = new config_tree(rx, ry, rw, rh, "All Settings");
@@ -97,6 +103,9 @@ settings::settings(int W, int H, const char* label, cfg_dialog_t active) :
 		break;
 	case DLG_QSL:
 		tabs->value(qsl);
+		break;
+	case DLG_USER:
+		tabs->value(user);
 		break;
 	case DLG_ALL:
 		tabs->value(all_settings);
@@ -131,7 +140,6 @@ settings::settings(int W, int H, const char* label, cfg_dialog_t active) :
 	callback(cb_bn_cal, (long)CA_CANCEL);
 
 	show();
-	//add_sub_window(this);
 }
 
 // Destructor
@@ -151,12 +159,10 @@ void settings::cb_bn_cal(Fl_Widget* w, long arg) {
 	case CA_OK:
 		// Save values in active tab, close the config window
 		active_tab->do_callback(active_tab);
-		//remove_sub_window(that);
 		Fl::delete_widget(that);
 		break;
 	case CA_CANCEL:
 		// Close the config window
-		//remove_sub_window(that);
 		Fl::delete_widget(that);
 		break;
 	case CA_SAVE:

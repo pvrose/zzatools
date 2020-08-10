@@ -281,10 +281,19 @@ string get_file(char * arg_filename) {
 
 // Add some global properties
 void add_properties() {
+	Fl_Preferences user_settings(settings_, "User Settings");
+	// Tooltip settings
+	Fl_Preferences tip_settings(user_settings, "Tooltip");
+	Fl_Font font;
+	Fl_Fontsize size;
+	float duration;
+	tip_settings.get("Duration", duration, (float)TIP_SHOW);
+	tip_settings.get("Font Name", font, FONT);
+	tip_settings.get("Font Size", size, FONT_SIZE);
 	// Default tooltip properties
-	Fl_Tooltip::size(FONT_SIZE);
-	Fl_Tooltip::font(FONT);
-	Fl_Tooltip::delay((float)TIP_SHOW);
+	Fl_Tooltip::size(size);
+	Fl_Tooltip::font(font);
+	Fl_Tooltip::delay(duration);
 	// Default message properties
 	fl_message_size_ = FONT_SIZE;
 	fl_message_font_ = FONT;

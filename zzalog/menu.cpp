@@ -70,6 +70,7 @@ namespace zzalog {
 	{ "&Station", 0, menu::cb_mi_settings, (void*)settings::DLG_STATION },
 	{ "&Fields", 0, menu::cb_mi_settings, (void*)settings::DLG_COLUMN },
 	{ "&QSL Design", 0, menu::cb_mi_settings, (void*)settings::DLG_QSL },
+	{ "&User fonts etc", 0, menu::cb_mi_settings, (void*)settings::DLG_USER },
 	{ "All", 0, menu::cb_mi_settings, (void*)settings::DLG_ALL },
 	{ 0 },
 
@@ -522,7 +523,6 @@ void menu::cb_mi_settings(Fl_Widget* w, void* v) {
 	if (!config_) {
 		// Open the config and wait for it to close
 		config_ = new settings(WCONFIG, HCONFIG, "Configuration", active);
-		while (config_->active()) Fl::wait();
 		config_ = nullptr;
 	}
 }

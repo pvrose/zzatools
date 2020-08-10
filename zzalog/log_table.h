@@ -37,6 +37,8 @@ namespace zzalog {
 
 		// Get the edit_input to pass save events
 		void edit_save(edit_input::edit_exit_t exit_type);
+		// Set font and fontsize
+		static void set_font(Fl_Font font, Fl_Fontsize size);
 
 		// Returns the name and attributes of the fields currently being displayed
 		vector<field_info_t>& fields();
@@ -63,6 +65,8 @@ namespace zzalog {
 		void drag_column(int C);
 		// Select and go to item
 		void display_current();
+		// Adjust row height and header width to fit font
+		void adjust_row_sizes();
 
 		// Protected attributes:
 	protected:
@@ -95,6 +99,9 @@ namespace zzalog {
 		// Edit row
 		unsigned int edit_row_;
 		unsigned int edit_col_;
+		// Table font and size
+		static Fl_Font font_;
+		static Fl_Fontsize fontsize_;
 	};
 
 }
