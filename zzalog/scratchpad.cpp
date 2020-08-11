@@ -95,13 +95,21 @@ int spad_editor::handle(int event) {
 	return intl_editor::handle(event);
 }
 
+const int HG = (6 * HBUTTON) + (4 * HTEXT) + (2 * GAP);
+
 // Constructor for scratchpad
 scratchpad::scratchpad() :
-	win_dialog(480, 200, "Scratchpad")
+	win_dialog(WEDITOR + (2 * WBUTTON) + GAP + (2 * EDGE), HG + (2 * GAP), "Scratchpad")
 	, buffer_(nullptr)
 	, record_(nullptr)
 	, field_("")
 {
+	// These are static, but will get to the same value each time
+	Fl_Preferences user_settings(settings_, "User Settings");
+	Fl_Preferences log_settings(user_settings, "Scratchpad");
+	log_settings.get("Font Name", (int&)font_, FONT);
+	log_settings.get("Font Size", (int&)fontsize_, FONT_SIZE);
+	
 	border(true);
 	create_form();
 	status_->misc_status(ST_OK, "SCRATCHPAD: Created");
@@ -118,7 +126,6 @@ scratchpad::~scratchpad()
 
 // Create form
 void scratchpad::create_form() {
-	const int WEDITOR = w() - EDGE - WBUTTON - WBUTTON - GAP - EDGE;
 	const int HEDITOR = h() - EDGE - EDGE;
 	const int C2 = EDGE + WEDITOR + GAP;
 	const int C3 = C2 + WBUTTON;
@@ -128,13 +135,19 @@ void scratchpad::create_form() {
 	buffer_ = new Fl_Text_Buffer(1024);
 	editor_ = new spad_editor(EDGE, EDGE, WEDITOR, HEDITOR);
 	editor_->buffer(buffer_);
-	editor_->textsize(FONT_SIZE);
-	editor_->textfont(FONT);
+	editor_->textsize(fontsize_);
+	editor_->textfont(font_);
 	// The callback will be explicitly done in the handle routine of the editor
 	editor_->when(FL_WHEN_NEVER);
+	// Allways wrap at a word boundary
+	editor_->wrap_mode(Fl_Text_Display::WRAP_AT_BOUNDS, 0);
 
 	// Create the buttons - see labels and tooltips for more information
 	int curr_y = EDGE;
+	// First we create an invisible group
+	Fl_Group* g = new Fl_Group(C2, curr_y, w() - C2, HG);
+	g->box(FL_NO_BOX);
+
 	bn_start_ = new Fl_Button(C2, curr_y, WBUTTON, HBUTTON, "Start");
 	bn_start_->labelsize(FONT_SIZE);
 	bn_start_->labelfont(FONT);
@@ -268,10 +281,11 @@ void scratchpad::create_form() {
 	bn_cancel_->tooltip("Cancel the record");
 	bn_cancel_->callback(cb_cancel);
 
-	// Resize if now too big
-	curr_y = max(curr_y + HBUTTON + EDGE, h());
-	size(w(), curr_y);
-	editor_->size(editor_->w(), curr_y - EDGE - EDGE);
+	g->resizable(nullptr);
+	g->end();
+
+	size_range(w() - WEDITOR / 2, h());
+	resizable(editor_);
 	end();
 	show();
 
@@ -509,6 +523,18 @@ void scratchpad::update() {
 	ip_freq_->value(prev_record->item("FREQ").c_str());
 	ip_power_->value(prev_record->item("TX_PWR").c_str());
 	ch_mode_->value(ch_mode_->find_index(prev_record->item("MODE", true).c_str()));
-	if (band_view_) band_view_->update(stod(prev_record->item("FREQ")) * 1000.0);
+	if (band_view_ && prev_record->item_exists("FREQ")) band_view_->update(stod(prev_record->item("FREQ")) * 1000.0);
+	redraw();
+}
+
+// Set font etc.
+void scratchpad::set_font(Fl_Font font, Fl_Fontsize size) {
+	font_ = font;
+	fontsize_ = size;
+	// Change the font in the editor
+	editor_->textsize(fontsize_);
+	editor_->textfont(font_);
+	// And ask it to recalculate the wrap positions
+	editor_->wrap_mode(Fl_Text_Display::WRAP_AT_BOUNDS, 0);
 	redraw();
 }

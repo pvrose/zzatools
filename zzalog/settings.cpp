@@ -31,6 +31,7 @@ settings::settings(int W, int H, const char* label, cfg_dialog_t active) :
 	// Create the set of tabs - leave enough space beneath for OK etc buttons.
 	Fl_Tabs* tabs = new Fl_Tabs(0, 0, W, H - HBUTTON - GAP);
 	tabs->labelsize(FONT_SIZE);
+	tabs->callback(cb_tab);
 	border(true);
 	int rx = 0;
 	int ry = 0;
@@ -39,10 +40,10 @@ settings::settings(int W, int H, const char* label, cfg_dialog_t active) :
 	// get client area 
 	tabs->client_area(rx, ry, rw, rh, 0);
 	// Rig settings
-	rig_dialog* rig = new rig_dialog(rx, ry, rw, rh, "Rig");
+	rig_dialog* rig = new rig_dialog(rx, ry, rw, rh, "CAT");
 	rig->labelsize(FONT_SIZE);
 	rig->selection_color(fl_lighter(FL_YELLOW));
-	rig->tooltip("Allows the configuration of the rig interface; selection of app and its settings");
+	rig->tooltip("Allows the configuration of the rig CAT interface; selection of app and its settings");
 	// File location settings
 	files_dialog* files = new files_dialog(rx, ry, rw, rh, "File Locations");
 	files->labelsize(FONT_SIZE);
@@ -133,11 +134,12 @@ settings::settings(int W, int H, const char* label, cfg_dialog_t active) :
 	cancel_bn->callback(cb_bn_cal, (long)CA_CANCEL);
 	cancel_bn->tooltip("Cancel changes and close dialog");
 	add(cancel_bn);
+	callback(cb_bn_cal, (long)CA_CANCEL);
+	set_label(active);
 
 	end();
 	resizable(nullptr);
 
-	callback(cb_bn_cal, (long)CA_CANCEL);
 
 	show();
 }
@@ -169,6 +171,56 @@ void settings::cb_bn_cal(Fl_Widget* w, long arg) {
 		// Save values in active tab - recreate all_settings view
 		active_tab->do_callback(active_tab);
 		((config_tree*)that->settings_view_)->create_tree();
+		break;
+	}
+}
+
+// Callback on changing tab
+void settings::cb_tab(Fl_Widget* w, void* v) {
+	settings* that = ancestor_view<settings>(w);
+	Fl_Tabs* tabs = (Fl_Tabs*)that->child(0);
+	Fl_Widget* tab = tabs->value();
+	cfg_dialog_t ix;
+	if (dynamic_cast<rig_dialog*>(tab)) ix = DLG_RIG;
+	else if (dynamic_cast<files_dialog*>(tab)) ix = DLG_FILES;
+	else if (dynamic_cast<web_dialog*>(tab)) ix = DLG_WEB;
+	else if (dynamic_cast<stn_dialog*>(tab)) ix = DLG_STATION;
+	else if (dynamic_cast<fields_dialog*>(tab)) ix = DLG_COLUMN;
+	else if (dynamic_cast<qsl_design*>(tab)) ix = DLG_QSL;
+	else if (dynamic_cast<user_dialog*>(tab)) ix = DLG_USER;
+	else if (dynamic_cast<config_tree*>(tab)) ix = DLG_ALL;
+	else ix = DLG_X;
+	that->set_label(ix);
+}
+
+void settings::set_label(settings::cfg_dialog_t active) {
+	switch (active) {
+	case DLG_RIG:
+		label("Configuration: Define CAT interface and parameters");
+		break;
+	case DLG_FILES:
+		label("Configuration: Define location of various data files");
+		break;
+	case DLG_WEB:
+		label("Configuration: Define web locations of QSL and other services");
+		break;
+	case DLG_STATION:
+		label("Configuration: Define available rigs, aerials and locations");
+		break;
+	case DLG_COLUMN:
+		label("Configuration: Define the fields to be displayed in various views");
+		break;
+	case DLG_QSL:
+		label("Configuration: Design QSL card label");
+		break;
+	case DLG_USER:
+		label("Configuration: Define the way certain items are viewed");
+		break;
+	case DLG_ALL:
+		label("Configuration: Display all options in tree format");
+		break;
+	case DLG_X:
+		label("Configuration");
 		break;
 	}
 }

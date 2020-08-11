@@ -97,7 +97,7 @@ string rig_if::rig_info() {
 	rig_info += rig_name_;
 	// Valid rig - get data from it. TX frequency
 	if (is_split()) {
-		rig_info += " TX:" + get_frequency(true) + " Mhz";
+		rig_info += " TX:" + get_frequency(true) + " MHz";
 		rig_info += " RX:" + get_frequency(false) + " MHz";
 	}
 	else {

@@ -26,15 +26,15 @@ namespace zzalog {
 	protected:
 		// Callback for log_font browser
 		static void cb_br_logfont(Fl_Widget* w, void* v);
-		// Callback for log fontsize browser
-		static void cb_br_logsize(Fl_Widget* w, void* v);
 		// Callback for top font browser
 		static void cb_br_tipfont(Fl_Widget* w, void* v);
-		// Callback for tip fontsize browser
-		static void cb_br_tipsize(Fl_Widget* w, void* v);
+		// Call back for spad_font browser
+		static void cb_br_spadfont(Fl_Widget* w, void* v);
+		// Callback for all size browsers
+		static void cb_br_size(Fl_Widget* w, void* v);
 		// Populate font and size browsers
-		void populate_font(Fl_Hold_Browser* b);
-		void populate_size(Fl_Hold_Browser* b, Fl_Font* font, Fl_Fontsize* size);
+		void populate_font(Fl_Hold_Browser* b, const Fl_Font* font);
+		void populate_size(Fl_Hold_Browser* b, const Fl_Font* font, const Fl_Fontsize* size);
 
 		// Font for log_table contents
 		Fl_Font log_font_;
@@ -46,6 +46,10 @@ namespace zzalog {
 		Fl_Font tip_font_;
 		// and its size
 		Fl_Fontsize tip_size_;
+		// Font for scratchpad editor 
+		Fl_Font spad_font_;
+		// and its size
+		Fl_Fontsize spad_size_;
 
 
 	};

@@ -668,13 +668,10 @@ lat_long_t record::location(bool my_station, location_t& source) {
 					side = 1.0;
 					break;
 				}
-				// Test to see if the prefix lat/long is within the 4-character gridsquare
+				// Test to see if the prefix lat/long is within the 2- or 4-character gridsquare
 				if (!isnan(prefix_lat_long.longitude) &&
 					!isnan(prefix_lat_long.latitude)) {
-					if ((isnan(lat_long.longitude) ||
-						isnan(lat_long.longitude)) &&
-						abs(lat_long.longitude - prefix_lat_long.longitude) < side &&
-						abs(lat_long.latitude - prefix_lat_long.latitude) < (side * 0.5)) {
+					if (latlong_to_grid(prefix_lat_long, value_1.length()) == value_1) {
 						// If so use it instead of GRIDSQUARE
 						lat_long = prefix_lat_long;
 					}

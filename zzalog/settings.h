@@ -30,7 +30,8 @@ namespace zzalog {
 			DLG_ADIF,
 			DLG_QSL,
 			DLG_USER,
-			DLG_ALL
+			DLG_ALL,
+			DLG_X
 		};
 
 	public:
@@ -39,6 +40,8 @@ namespace zzalog {
 
 		// callbacks
 		static void cb_bn_cal(Fl_Widget* w, long arg);
+		// Tab released
+		static void cb_tab(Fl_Widget* w, void* v);
 
 		void update();
 		// Test whether any we've had OK or Cancel
@@ -48,6 +51,8 @@ namespace zzalog {
 
 		// protected methods
 	protected:
+		void set_label(cfg_dialog_t active);
+
 		// protected attributes
 	protected:
 		// The currently active dialog

@@ -57,6 +57,8 @@ namespace zzalog {
 		static void cb_save(Fl_Widget* w, void* v);
 		// Callback - cancel button
 		static void cb_cancel(Fl_Widget* w, void* v);
+		// Set font
+		void set_font(Fl_Font font, Fl_Fontsize size);
 
 		// Actions attached to the various buttons and keyboard shortcuts
 		enum actions {
@@ -105,6 +107,13 @@ namespace zzalog {
 		record* record_;
 		// The fieldname
 		string field_;
+
+		// Scratchpad editor font
+		Fl_Font font_;
+		Fl_Fontsize fontsize_;
+
+		const static int WEDITOR = 400;
+
 	};
 
 }
