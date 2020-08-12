@@ -48,6 +48,8 @@ namespace zzalib {
 	const double FAST_RIG_MIN = 0.02;
 	const double FAST_RIG_DEF = 1.0;
 
+	static bool hamlib_be_loaded_ = false;
+
 
 	// This class is the base class for rig handlers. 
 	class rig_if

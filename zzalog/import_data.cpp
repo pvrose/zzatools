@@ -381,6 +381,9 @@ void import_data::update_book() {
 							status_->misc_status(ST_LOG, message);
 							is_updated = true;
 							number_updated_++;
+							if (record->item("CLUBLOG_QSO_UPLOAD_STATUS") == "M") {
+								number_clublog_++;
+							}
 						}
 						number_accepted_++;
 						// For eQSL.cc request the eQSL e-card. These are queued not to overwhelm eQSL.cc
@@ -707,14 +710,6 @@ void import_data::convert_update(record* record) {
 		// Delete QSLMSG
 		record->item("QSLMSG", string(""));
 	}
-	else if (update_mode_ == LOTW_UPDATE) {
-		// Received LotW update so need to set clublog status to M(odified) so it will get uploaded again
-		if (record->item("LOTW_QSLRDATE").length() && record->item("CLUBLOG_QSO_UPDATE_STATUS") == "Y") {
-			record->item("CLUBLOG_QSO_UPDATE_STATUS", string("M"));
-			number_clublog_++;
-		}
-	}
-
 }
 
 // Returns that there is no update in progress

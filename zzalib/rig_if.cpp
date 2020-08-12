@@ -362,6 +362,7 @@ rig_hamlib::rig_hamlib()
 
 	// Initialise the rig database in hamlib
 	rig_load_all_backends();
+	hamlib_be_loaded_ = true;
 
 	// set handler name
 	handler_ = "Hamlib";

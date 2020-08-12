@@ -23,6 +23,7 @@ using namespace std;
 extern Fl_Preferences* settings_;
 extern rig_if* rig_if_;
 extern status* status_;
+extern bool hamlib_be_status_;
 void add_rig_if();
 
 // Constructor
@@ -318,8 +319,9 @@ void rig_dialog::populate_rig_choice() {
 void rig_dialog::populate_model_choice() {
 	// Get hamlib Model number and populate control with all model names
 	// See if we need to load back-ends - the handler is not hamlib or the rig isn't open
-	if (dynamic_cast<rig_hamlib*>(rig_if_) == nullptr || !rig_if_->is_open()) {
+	if (!hamlib_be_loaded_) {
 		rig_load_all_backends();
+		hamlib_be_loaded_ = true;
 	}
 	rig_model_choice_->clear();
 	char* target_pathname = nullptr;

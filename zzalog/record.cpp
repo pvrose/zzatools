@@ -796,9 +796,16 @@ bool record::merge_records(record* record, bool allow_loc_mismatch /* = false */
 			}
 		}
 		else if (field_name == "EQSL_QSL_RCVD" ||
-			field_name == "LOTW_QSL_RCVD" ||
 			field_name == "QSL_RCVD") {
 			// QSL received - need to replace N with Y
+			is_qsl_rcvd = true;
+		}
+		else if (field_name == "LOTW_QSL_RCVD") {
+			// Change club log upload status
+			if (item("CLUBLOG_QSO_UPLOAD_STATUS") == "Y") {
+				item("CLUBLOG_QSO_UPLOAD_STATUS", string("M"));
+				merged = true;
+			}
 			is_qsl_rcvd = true;
 		}
 		else if (field_name == "TIME_OFF" ||
