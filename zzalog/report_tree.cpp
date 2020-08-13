@@ -21,7 +21,7 @@ extern book* book_;
 extern extract_data* extract_records_;
 extern pfx_data* pfx_data_;
 extern spec_data* spec_data_;
-extern tabbed_forms* tabbed_view_;
+extern tabbed_forms* tabbed_forms_;
 extern status* status_;
 extern menu* menu_;
 extern Fl_Preferences* settings_;
@@ -37,10 +37,16 @@ report_tree::report_tree(int X, int Y, int W, int H, const char* label, field_or
 	, add_states_(false)
 {
 	map_order_.clear();
+
+	Fl_Preferences user_settings(settings_, "User Settings");
+	Fl_Preferences tree_settings(user_settings, "Tree Views");
+	tree_settings.get("Font Name", (int&)font_, FONT);
+	tree_settings.get("Font Size", (int&)fontsize_, FONT_SIZE);
+
 	// Set tree properties
 	sortorder(FL_TREE_SORT_ASCENDING);
-	item_labelfont(FONT);
-	item_labelsize(FONT_SIZE);
+	item_labelfont(font_);
+	item_labelsize(fontsize_);
 	// Get initial filter
 	Fl_Preferences report_settings(settings_, "Report");
 	report_settings.get("Filter", (int&)filter_, RF_NONE);
@@ -101,6 +107,12 @@ void report_tree::update(hint_t hint, unsigned int record_num_1, unsigned int re
 	case HT_DUPE_DELETED:
 	case HT_NEW_DATA:
 		// Always re-populate as a substantial change has been made
+		populate_tree(false);
+		break;
+	case HT_FORMAT:
+		// Re-populate as font have have cghanged
+		item_labelfont(font_);
+		item_labelsize(fontsize_);
 		populate_tree(false);
 		break;
 	}
@@ -533,7 +545,7 @@ void report_tree::populate_tree(bool activate) {
 		}
 		if (activate) {
 			// Switch the view to this one
-			tabbed_view_->activate_pane(OT_REPORT, true);
+			tabbed_forms_->activate_pane(OT_REPORT, true);
 		}
 	}
 	// Update the status pane if this is the active view
@@ -679,7 +691,7 @@ void report_tree::cb_tree_report(Fl_Widget* w, void* v) {
 		// If we select a record, then select that record in the book
 		if ((long)item->user_data() >= 0) {
 			that->get_book()->selection((record_num_t)(long)item->user_data());
-			tabbed_view_->activate_pane(OT_RECORD, true);
+			tabbed_forms_->activate_pane(OT_RECORD, true);
 			return;
 		}
 		cb_tree(w, v);
@@ -688,4 +700,10 @@ void report_tree::cb_tree_report(Fl_Widget* w, void* v) {
 		cb_tree(w, v);
 		break;
 	}
+}
+
+// Set log font values
+void report_tree::set_font(Fl_Font font, Fl_Fontsize size) {
+	font_ = font;
+	fontsize_ = size;
 }

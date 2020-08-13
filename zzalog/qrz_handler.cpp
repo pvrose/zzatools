@@ -19,7 +19,7 @@ using namespace zzalog;
 using namespace zzalib;
 
 extern status* status_;
-extern tabbed_forms* tabbed_view_;
+extern tabbed_forms* tabbed_forms_;
 extern url_handler* url_handler_;
 extern book* navigation_book_;
 extern menu* menu_;
@@ -156,7 +156,7 @@ bool qrz_handler::query_merge() {
 	merge_done_ = false;
 	// Get the record view to merge data
 	navigation_book_->selection(-1, HT_MERGE_DETAILS);
-	tabbed_view_->activate_pane(OT_RECORD, true);
+	tabbed_forms_->activate_pane(OT_RECORD, true);
 	while (!merge_done_) Fl::wait();
 	status_->misc_status(ST_OK, "QRZ: Update complete");
 	return false;

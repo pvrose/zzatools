@@ -30,6 +30,8 @@ namespace zzalog {
 		static void cb_br_tipfont(Fl_Widget* w, void* v);
 		// Call back for spad_font browser
 		static void cb_br_spadfont(Fl_Widget* w, void* v);
+		// Call back for tree views
+		static void cb_br_treefont(Fl_Widget* w, void* v);
 		// Callback for all size browsers
 		static void cb_br_size(Fl_Widget* w, void* v);
 		// Populate font and size browsers
@@ -50,6 +52,10 @@ namespace zzalog {
 		Fl_Font spad_font_;
 		// and its size
 		Fl_Fontsize spad_size_;
+		// Font for tree-based views
+		Fl_Font tree_font_;
+		// and its size
+		Fl_Fontsize tree_size_;
 
 
 	};

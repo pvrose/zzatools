@@ -13,7 +13,7 @@
 using namespace zzalog;
 using namespace zzalib;
 
-extern tabbed_forms* tabbed_view_;
+extern tabbed_forms* tabbed_forms_;
 extern status* status_;
 extern book* navigation_book_;
 extern Fl_Preferences* settings_;
@@ -175,7 +175,7 @@ void printer::calculate_properties() {
 // get field properties
 void printer::book_properties() {
 	// we only support printing from log_table views
-	log_table* form = (log_table*)tabbed_view_->get_view(type_);
+	log_table* form = (log_table*)tabbed_forms_->get_view(type_);
 	// Copy fields from log table
 	fields_.clear();
 	fields_.insert(fields_.end(), form->fields().begin(), form->fields().end());

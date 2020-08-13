@@ -36,7 +36,7 @@ extern book* book_;
 extern extract_data* extract_records_;
 extern book* navigation_book_;
 extern status* status_;
-extern tabbed_forms* tabbed_view_;
+extern tabbed_forms* tabbed_forms_;
 extern spec_data* spec_data_;
 
 // Constructor
@@ -642,7 +642,7 @@ HRESULT dxa_if::cb_map_clicked(float latitude, float longitude) {
 		sprintf(text, format, s_lat.c_str(), s_lon.c_str(), gridsquare.c_str());
 		header->header(string(text));
 		extract_records_->header(header);
-		tabbed_view_->activate_pane(OT_EXTRACT, true);
+		tabbed_forms_->activate_pane(OT_EXTRACT, true);
 	}
 	for (auto it = records_displayed_.begin(); it != records_displayed_.end(); it++) {
 		// For all records beging displayed - get those that are within a small distance 
@@ -678,13 +678,13 @@ HRESULT dxa_if::cb_map_clicked(float latitude, float longitude) {
 		sprintf(message, "DXATLAS: %d stations found", num_found);
 		status_->misc_status(ST_NOTE, message);
 		book_->selection(display_num);
-		if (tabbed_view_) {
+		if (tabbed_forms_) {
 			// Open the appropriate view
 			if (qso_display_ != AQ_SEARCH) {
-				tabbed_view_->activate_pane(OT_EXTRACT, true);
+				tabbed_forms_->activate_pane(OT_EXTRACT, true);
 			}
 			else {
-				tabbed_view_->activate_pane(OT_RECORD, true);
+				tabbed_forms_->activate_pane(OT_RECORD, true);
 			}
 		}
 	}

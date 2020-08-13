@@ -29,7 +29,7 @@ extern book* book_;
 extern Fl_Preferences* settings_;
 extern pfx_data* pfx_data_;
 extern spec_data* spec_data_;
-extern tabbed_forms* tabbed_view_;
+extern tabbed_forms* tabbed_forms_;
 extern eqsl_handler* eqsl_handler_;
 extern lotw_handler* lotw_handler_;
 extern rig_if* rig_if_;
@@ -480,7 +480,6 @@ void import_data::update_book() {
 					}
 
 					book_->insert_record_at(offset, import_record);
-					number_updated_++;
 					number_added_++;
 					accept_update();
 					is_updated = true;
@@ -498,7 +497,7 @@ void import_data::update_book() {
 		}
 		// If we are dropping out to present a query - activate record view
 		if (update_in_progress_) {
-			tabbed_view_->activate_pane(OT_RECORD, true);
+			tabbed_forms_->activate_pane(OT_RECORD, true);
 		}
 		// Leaving after completing update so tidy up and select most recent record
 		if (!update_in_progress_) {
@@ -563,7 +562,7 @@ void import_data::finish_update(bool merged /*= true*/) {
 		else {
 			book_->selection(book_->size() - 1, HT_SELECTED);
 		}
-		tabbed_view_->activate_pane(OT_MAIN, true);
+		tabbed_forms_->activate_pane(OT_MAIN, true);
 	}
 	// Restart auto-timer if we aren't waiting to stop it - restarting timer will change update_mode
 	if (update_mode_ == AUTO_IMPORT && !close_pending_) {
@@ -772,7 +771,7 @@ bool import_data::download_data(import_data::update_mode_t server) {
 			process_lotw_header();
 		}
 		// Switch the view to the import view and select forst record
-		tabbed_view_->activate_pane(OT_IMPORT, true);
+		tabbed_forms_->activate_pane(OT_IMPORT, true);
 		selection(record_number(0));
 		merge_data();
 	}
@@ -799,7 +798,7 @@ void import_data::merge_data() {
 	update_book();
 	// If we have no user query - switch to main log view
 	if (!update_in_progress_) {
-		tabbed_view_->activate_pane(OT_MAIN, true);
+		tabbed_forms_->activate_pane(OT_MAIN, true);
 	}
 }
 
@@ -811,7 +810,7 @@ bool import_data::load_data(string filename) {
 	}
 	bool result = book::load_data(filename);
 	if (result) {
-		tabbed_view_->activate_pane(OT_IMPORT, true);
+		tabbed_forms_->activate_pane(OT_IMPORT, true);
 		selection(record_number(0));
 	}
 	return result;

@@ -8,6 +8,7 @@
 #include "../zzalib/callback.h"
 
 #include <FL/fl_draw.H>
+#include <FL/Fl_Preferences.H>
 
 using namespace zzalog;
 using namespace zzalib;
@@ -16,7 +17,8 @@ extern pfx_data* pfx_data_;
 extern extract_data* extract_records_;
 extern book* book_;
 extern status* status_;
-extern tabbed_forms* tabbed_view_;
+extern tabbed_forms* tabbed_forms_;
+extern Fl_Preferences* settings_;
 
 // Constructor
 pfx_tree::pfx_tree(int X, int Y, int W, int H, const char* label, field_ordering_t app) :
@@ -30,13 +32,19 @@ pfx_tree::pfx_tree(int X, int Y, int W, int H, const char* label, field_ordering
 	record_num_ = 0;
 	prefixes_.clear();
 
+	Fl_Preferences user_settings(settings_, "User Settings");
+	Fl_Preferences tree_settings(user_settings, "Tree Views");
+	tree_settings.get("Font Name", (int&)font_, FONT);
+	tree_settings.get("Font Size", (int&)fontsize_, FONT_SIZE);
+
 	// Set tree parameters
 	sortorder(FL_TREE_SORT_ASCENDING);
-	item_labelfont(FONT);
-	item_labelsize(FONT_SIZE);
+	item_labelfont(font_);
+	item_labelsize(fontsize_);
 	items_ = RI_CODE;
 	filter_ = RF_ALL;
 	callback(cb_tree);
+
 
 	// Minimum resizing
 	min_w_ = w() / 3; // One third the width
@@ -66,7 +74,6 @@ void pfx_tree::update(hint_t hint, unsigned int record_num_1, unsigned int recor
 	case HT_DELETED:
 	case HT_DUPE_DELETED:
 	case HT_INSERTED:
-	case HT_FORMAT:
 	case HT_IMPORT_QUERY:
 	case HT_IMPORT_QUERYNEW:
 	case HT_DUPE_QUERY:
@@ -77,7 +84,12 @@ void pfx_tree::update(hint_t hint, unsigned int record_num_1, unsigned int recor
 			populate_tree(false);
 		}
 		break;
-
+	case HT_FORMAT:
+		// Repopulate as font may have changed
+		item_labelfont(font_);
+		item_labelsize(fontsize_);
+		populate_tree(false);
+		break;
 	default:
 		// Do nothing
 		break;
@@ -212,7 +224,7 @@ void pfx_tree::populate_tree(bool activate) {
 	// Restore cursor
 	fl_cursor(FL_CURSOR_DEFAULT);
 	if (filter_ != RF_NONE && activate) {
-		tabbed_view_->activate_pane(OT_PREFIX, true);
+		tabbed_forms_->activate_pane(OT_PREFIX, true);
 	}
 }
 
@@ -540,3 +552,8 @@ void pfx_tree::add_details(bool enable) {
 	redraw();
 }	
 
+// Set log font values
+void pfx_tree::set_font(Fl_Font font, Fl_Fontsize size) {
+	font_ = font;
+	fontsize_ = size;
+}

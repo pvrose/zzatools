@@ -31,6 +31,8 @@ namespace zzalog {
 		// methods
 		// Populate the tree control with the data from the selected prefixes
 		void populate_tree(bool activate);
+		// Change font
+		void set_font(Fl_Font font, Fl_Fontsize size);
 
 
 	protected:
@@ -44,6 +46,9 @@ namespace zzalog {
 		Fl_Tree_Item* sas_item_;
 		// Hang point for submodes
 		Fl_Tree_Item* sub_item_;
+		// Font and size
+		Fl_Font font_;
+		Fl_Fontsize fontsize_;
 
 
 	};

@@ -101,6 +101,8 @@ namespace zzalog {
 		void add_filter(report_filter_t filter);
 		// Add Type
 		void add_category(int level, report_cat_t category);
+		// Change font
+		void set_font(Fl_Font font, Fl_Fontsize size);
 
 		// Callback - select item
 		static void cb_tree_report(Fl_Widget* w, void* v);
@@ -119,6 +121,9 @@ namespace zzalog {
 		record_num_t selection_;
 		// Add statesin break down of DXCC
 		bool add_states_;
+		// Font and size
+		Fl_Font font_;
+		Fl_Fontsize fontsize_;
 
 	};
 

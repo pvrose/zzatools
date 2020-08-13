@@ -3,6 +3,10 @@
 #include "log_table.h"
 #include "book.h"
 #include "scratchpad.h"
+#include "pfx_tree.h"
+#include "report_tree.h"
+#include "spec_tree.h"
+#include "tabbed_forms.h"
 
 #include <FL/Fl_Tooltip.H>
 #include <FL/Fl_Preferences.H>
@@ -16,6 +20,7 @@ using namespace zzalib;
 extern Fl_Preferences* settings_;
 extern book* book_;
 extern scratchpad* scratchpad_;
+extern tabbed_forms* tabbed_forms_;
 
 user_dialog::user_dialog(int X, int Y, int W, int H, const char* label) :
 	page_dialog(X, Y, W, H, label) 
@@ -26,6 +31,8 @@ user_dialog::user_dialog(int X, int Y, int W, int H, const char* label) :
 	tip_duration_ = Fl_Tooltip::delay();
 	tip_font_ = Fl_Tooltip::font();
 	tip_size_ = Fl_Tooltip::size();
+	spad_font_ = FONT;
+	spad_size_ = FONT_SIZE;
 
 	do_creation(X, Y);
 }
@@ -48,6 +55,10 @@ void user_dialog::load_values() {
 	Fl_Preferences spad_settings(user_settings, "Scratchpad");
 	spad_settings.get("Font Name", (int&)spad_font_, FONT);
 	spad_settings.get("Font Size", (int&)spad_size_, FONT_SIZE);
+	// Tree views
+	Fl_Preferences tree_settings(user_settings, "Tree Views");
+	tree_settings.get("Font Name", (int&)tree_font_, FONT);
+	tree_settings.get("Font Size", (int&)tree_size_, FONT_SIZE);
 }
 
 // Used to create the form
@@ -158,7 +169,7 @@ void user_dialog::create_form(int X, int Y) {
 	br5->labelsize(FONT_SIZE);
 	br5->textsize(FONT_SIZE);
 	br5->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
-	br5->tooltip("Please select the font used in the cells in all log table views");
+	br5->tooltip("Please select the font used in the cells in all scratchpad");
 	populate_font(br5, &spad_font_);
 	// Add font size browser
 	pos_x += br5->w();
@@ -169,7 +180,7 @@ void user_dialog::create_form(int X, int Y) {
 	br6->textsize(FONT_SIZE);
 	br6->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
 	br6->callback(cb_br_size, &spad_size_);
-	br6->tooltip("Please select the font size used in the cells in all log table views");
+	br6->tooltip("Please select the font size used in the cells in scratchpad");
 	br5->callback(cb_br_spadfont, br6);
 	populate_size(br6, &spad_font_, &spad_size_);
 	// End group - fit to size
@@ -178,6 +189,43 @@ void user_dialog::create_form(int X, int Y) {
 	pos_x = br6->x() + br6->w() + GAP;
 	g3->size(pos_x - g3->x(), pos_y - g3->y());
 	g3->end();
+
+	// Group 3 - scratchpad
+	pos_y += GAP;
+	pos_x = g2->x();
+	Fl_Group* g4 = new Fl_Group(pos_x, pos_y, 0, 10, "Tree views");
+	g4->labelfont(FONT);
+	g4->labelsize(FONT_SIZE);
+	g4->align(FL_ALIGN_TOP_LEFT | FL_ALIGN_INSIDE);
+	g4->box(FL_THIN_DOWN_BOX);
+	// Add font browser
+	pos_x += GAP;
+	pos_y += HTEXT;
+	Fl_Hold_Browser* br7 = new Fl_Hold_Browser(pos_x, pos_y, WEDIT, HMLIN, "Font");
+	br7->labelfont(FONT);
+	br7->labelsize(FONT_SIZE);
+	br7->textsize(FONT_SIZE);
+	br7->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
+	br7->tooltip("Please select the font used in the cells in all tree views");
+	populate_font(br7, &tree_font_);
+	// Add font size browser
+	pos_x += br7->w();
+	Fl_Hold_Browser* br8 = new Fl_Hold_Browser(pos_x, pos_y, WBUTTON, HMLIN, "Size");
+	br8->labelfont(FONT);
+	br8->labelsize(FONT_SIZE);
+	br8->textfont(FONT);
+	br8->textsize(FONT_SIZE);
+	br8->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
+	br8->callback(cb_br_size, &tree_size_);
+	br8->tooltip("Please select the font size used in the cells in all tree views");
+	br7->callback(cb_br_treefont, br8);
+	populate_size(br8, &tree_font_, &tree_size_);
+	// End group - fit to size
+	g4->resizable(nullptr);
+	pos_y = br8->y() + br8->h() + GAP;
+	pos_x = br8->x() + br8->w() + GAP;
+	g4->size(pos_x - g4->x(), pos_y - g4->y());
+	g4->end();
 
 	end();
 	show();
@@ -207,6 +255,14 @@ void user_dialog::save_values() {
 	spad_settings.set("Font Size", (int&)spad_size_);
 	// Tell the log views
 	scratchpad_->set_font(spad_font_, spad_size_);
+	// Tree view settings
+	Fl_Preferences tree_settings(user_settings, "Tree Views");
+	tree_settings.set("Font Name", (int&)tree_font_);
+	tree_settings.set("Font Size", (int&)tree_size_);
+	((pfx_tree*)tabbed_forms_->get_view(OT_PREFIX))->set_font(tree_font_, tree_size_);
+	((report_tree*)tabbed_forms_->get_view(OT_REPORT))->set_font(tree_font_, tree_size_);
+	((spec_tree*)tabbed_forms_->get_view(OT_ADIF))->set_font(tree_font_, tree_size_);
+
 	// Now tell all views to update formats
 	book_->selection(-1, HT_FORMAT);
 }
@@ -230,7 +286,7 @@ void user_dialog::cb_br_size(Fl_Widget* w, void* v) {
 	*(Fl_Fontsize*)v = stoi(size_br->text(line));
 }
 
-// Callback for top font browser
+// Callback for tp font browser
 void user_dialog::cb_br_tipfont(Fl_Widget* w, void* v) {
 	user_dialog* that = ancestor_view<user_dialog>(w);
 	Fl_Hold_Browser* font_br = (Fl_Hold_Browser*)w;
@@ -238,12 +294,20 @@ void user_dialog::cb_br_tipfont(Fl_Widget* w, void* v) {
 	that->populate_size((Fl_Hold_Browser*)v, &that->tip_font_, &that->tip_size_);
 }
 
-// Callback for top font browser
+// Callback for scratchpad font browser
 void user_dialog::cb_br_spadfont(Fl_Widget* w, void* v) {
 	user_dialog* that = ancestor_view<user_dialog>(w);
 	Fl_Hold_Browser* font_br = (Fl_Hold_Browser*)w;
 	that->spad_font_ = (Fl_Font)font_br->value() - 1;
 	that->populate_size((Fl_Hold_Browser*)v, &that->spad_font_, &that->spad_size_);
+}
+
+// Callback for tree view font browser
+void user_dialog::cb_br_treefont(Fl_Widget* w, void* v) {
+	user_dialog* that = ancestor_view<user_dialog>(w);
+	Fl_Hold_Browser* font_br = (Fl_Hold_Browser*)w;
+	that->tree_font_ = (Fl_Font)font_br->value() - 1;
+	that->populate_size((Fl_Hold_Browser*)v, &that->tree_font_, &that->tree_size_);
 }
 
 

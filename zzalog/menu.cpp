@@ -254,7 +254,7 @@ extern pfx_data* pfx_data_;
 extern spec_data* spec_data_;
 extern rig_if *rig_if_;
 extern status* status_;
-extern tabbed_forms* tabbed_view_;
+extern tabbed_forms* tabbed_forms_;
 extern url_handler* url_handler_;
 extern Fl_Single_Window* main_window_;
 extern Fl_Preferences* settings_;
@@ -334,7 +334,7 @@ void menu::cb_mi_file_new(Fl_Widget* w, void* v) {
 	// Clear any extracted data as there are no records to reference
 	extract_records_->clear_criteria();
 	set_recent_file("");
-	tabbed_view_->activate_pane(OT_MAIN, true);
+	tabbed_forms_->activate_pane(OT_MAIN, true);
 	book_->navigate(NV_FIRST);
 }
 
@@ -396,7 +396,7 @@ void menu::cb_mi_file_open(Fl_Widget* w, void* v) {
 		if (book_->load_data(filename)) {
 			// Set off-air logging, clear any search results, select last entry
 			that->logging(LM_OFF_AIR);
-			tabbed_view_->activate_pane(OT_MAIN, true);
+			tabbed_forms_->activate_pane(OT_MAIN, true);
 			book_->navigate(NV_LAST);
 			// Set the filename in the window title and recent file list
 			main_window_label(filename);
@@ -819,7 +819,7 @@ void menu::cb_mi_log_mode(Fl_Widget* w, void* v) {
 		break;
 	case LM_IMPORTED:
 		// Reset navigation mode
-		tabbed_view_->activate_pane(OT_MAIN, true);
+		tabbed_forms_->activate_pane(OT_MAIN, true);
 		// start import_process
 		status_->misc_status(ST_NOTE, "LOG: Mode set to auto-import from data modems");
 		import_data_->start_auto_update();
@@ -875,14 +875,14 @@ void menu::cb_mi_log_view(Fl_Widget* w, void* v) {
 void menu::cb_mi_log_new(Fl_Widget* w, void* v) {
 	menu* that = ancestor_view<menu>(w);
 	// Force main log book
-	tabbed_view_->activate_pane(OT_MAIN, true);
+	tabbed_forms_->activate_pane(OT_MAIN, true);
 	// Create a new record - on or off-air
 	book_->new_record(that->logging());
 	// Open log view
 	switch (that->editting_view_) {
 	case OT_MAIN:
 	case OT_RECORD:
-		tabbed_view_->activate_pane(that->editting_view_, true);
+		tabbed_forms_->activate_pane(that->editting_view_, true);
 		break;
 	case OT_SCRATCH:
 		if (!scratchpad_) {
@@ -1100,7 +1100,7 @@ void menu::cb_mi_imp_merge(Fl_Widget* w, void* v) {
 void menu::cb_mi_imp_cancel(Fl_Widget* w, void* v) {
 	// Delete the import records
 	import_data_->delete_contents(false);
-	tabbed_view_->activate_pane(OT_MAIN, true);
+	tabbed_forms_->activate_pane(OT_MAIN, true);
 	navigation_book_->selection(0, HT_ALL);
 }
 
@@ -1109,7 +1109,7 @@ void menu::cb_mi_imp_cancel(Fl_Widget* w, void* v) {
 // clear the criteria and display the log book
 void menu::cb_mi_ext_clr(Fl_Widget* w, void* v) {
 	extract_records_->clear_criteria();
-	tabbed_view_->activate_pane(OT_MAIN, true);
+	tabbed_forms_->activate_pane(OT_MAIN, true);
 	navigation_book_->selection(0, HT_EXTRACTION);
 }
 
@@ -1126,7 +1126,7 @@ void menu::cb_mi_ext_crit(Fl_Widget* w, void* v) {
 		if (extract_records_->criteria(criteria)) {
 			// Successful
 			do_extract = false;
-			tabbed_view_->activate_pane(OT_EXTRACT, true);
+			tabbed_forms_->activate_pane(OT_EXTRACT, true);
 			navigation_book_->selection(0, HT_EXTRACTION);
 		}
 		else {
@@ -1142,7 +1142,7 @@ void menu::cb_mi_ext_crit(Fl_Widget* w, void* v) {
 void menu::cb_mi_ext_redo(Fl_Widget* w, void* v) {
 	extract_records_->reextract();
 	// Display the extraction
-	tabbed_view_->activate_pane(OT_EXTRACT, true);
+	tabbed_forms_->activate_pane(OT_EXTRACT, true);
 	navigation_book_->selection(0, HT_EXTRACTION);
 }
 
@@ -1167,7 +1167,7 @@ void menu::cb_mi_ext_qsl(Fl_Widget* w, void* v) {
 	// v passes the particular option
 	that->qsl_type_ = (extract_data::extract_mode_t)(long)v;
 	extract_records_->extract_qsl(that->qsl_type_);
-	tabbed_view_->activate_pane(OT_EXTRACT, true);
+	tabbed_forms_->activate_pane(OT_EXTRACT, true);
 }
 
 // Extract->Quick->* - one-click for specific searches
@@ -1177,14 +1177,14 @@ void menu::cb_mi_ext_special(Fl_Widget* w, void* v) {
 	// v passes the particular option
 	extract_data::extract_mode_t reason = (extract_data::extract_mode_t)(long)v;
 	extract_records_->extract_special(reason);
-	tabbed_view_->activate_pane(OT_EXTRACT, true);
+	tabbed_forms_->activate_pane(OT_EXTRACT, true);
 }
 
 // Extract->Upload - upload to the server the data was extracted for
 // v is not used
 void menu::cb_mi_ext_upload(Fl_Widget* w, void* v) {
 	extract_records_->upload();
-	tabbed_view_->activate_pane(OT_MAIN, true);
+	tabbed_forms_->activate_pane(OT_MAIN, true);
 }
 
 // Extract->Print - print 
@@ -1257,8 +1257,8 @@ void menu::cb_mi_ext_mark(Fl_Widget* w, void* v) {
 void menu::cb_mi_ref_filter(Fl_Widget* w, void* v) {
 	// v contains the particular filter
 	report_filter_t filter = (report_filter_t)(long)v;
-	((pfx_tree*)tabbed_view_->get_view(OT_PREFIX))->set_filter(filter);
-	tabbed_view_->activate_pane(OT_PREFIX, true);
+	((pfx_tree*)tabbed_forms_->get_view(OT_PREFIX))->set_filter(filter);
+	tabbed_forms_->activate_pane(OT_PREFIX, true);
 }
 
 // Reference->Prefix->Items - used to set the items  to display
@@ -1266,8 +1266,8 @@ void menu::cb_mi_ref_filter(Fl_Widget* w, void* v) {
 void menu::cb_mi_ref_items(Fl_Widget* w, void* v) {
 	// v defineds the items to dispaly
 	report_item_t items = (report_item_t)(long)v;
-	((pfx_tree*)tabbed_view_->get_view(OT_PREFIX))->set_items(items);
-	tabbed_view_->activate_pane(OT_PREFIX, true);
+	((pfx_tree*)tabbed_forms_->get_view(OT_PREFIX))->set_items(items);
+	tabbed_forms_->activate_pane(OT_PREFIX, true);
 }
 
 // Reference->Prefix->Add details - Add or remove the details from the prefix record
@@ -1277,8 +1277,8 @@ void menu::cb_mi_ref_details(Fl_Widget* w, void* v) {
 	Fl_Menu_* menu = (Fl_Menu_*)w;
 	const Fl_Menu_Item* item = menu->mvalue();
 	bool value = item->value();
-	((pfx_tree*)tabbed_view_->get_view(OT_PREFIX))->add_details(value);
-	tabbed_view_->activate_pane(OT_PREFIX, true);
+	((pfx_tree*)tabbed_forms_->get_view(OT_PREFIX))->add_details(value);
+	tabbed_forms_->activate_pane(OT_PREFIX, true);
 }
 
 // Reference->Reload Data - reload the specification data
@@ -1304,8 +1304,8 @@ void menu::cb_mi_ref_reload(Fl_Widget* w, void* v) {
 void menu::cb_mi_rep_filter(Fl_Widget* w, void* v) {
 	// v has the filter
 	report_filter_t filter = (report_filter_t)(long)v;
-	((report_tree*)tabbed_view_->get_view(OT_REPORT))->add_filter(filter);
-	tabbed_view_->activate_pane(OT_REPORT, true);
+	((report_tree*)tabbed_forms_->get_view(OT_REPORT))->add_filter(filter);
+	tabbed_forms_->activate_pane(OT_REPORT, true);
 }
 
 // Report->Levelx - set report level n to category
@@ -1314,8 +1314,8 @@ void menu::cb_mi_rep_level(Fl_Widget* w, void* v) {
 	long params = (long)v;
 	report_cat_t category = (report_cat_t)(params & 0xFF);
 	int level = params >> 8;
-	((report_tree*)tabbed_view_->get_view(OT_REPORT))->add_category(level, category);
-	tabbed_view_->activate_pane(OT_REPORT, true);
+	((report_tree*)tabbed_forms_->get_view(OT_REPORT))->add_category(level, category);
+	tabbed_forms_->activate_pane(OT_REPORT, true);
 }
 
 // Information->QRZ.com - query QRZ.com about the selected contact
@@ -1349,7 +1349,7 @@ void menu::cb_mi_info_qrz(Fl_Widget* w, void* v) {
 // v is enum view_type: VT_NONE, VT_MEMORIES, VT_SCOPE_BANDS, VT_USER_BANDS, VT_CW_MESSAGES.
 void menu::cb_mi_ic7300(Fl_Widget* w, void* v) {
 	view_type type = (view_type)(long)v;
-	((ic7300_table*)tabbed_view_->get_view(OT_MEMORY))->type(type);
+	((ic7300_table*)tabbed_forms_->get_view(OT_MEMORY))->type(type);
 	menu* that = ancestor_view<menu>(w);
 	that->update_items();
 }
@@ -1776,7 +1776,7 @@ void menu::update_items() {
 		bool save_enabled = book_->save_enabled();
 		bool delete_enabled = book_->delete_enabled();
 		bool web_enabled = book_ && book_->get_record() && book_->get_record()->item_exists("WEB");
-		view_type memory = ((ic7300_table*)tabbed_view_->get_view(OT_MEMORY))->type();
+		view_type memory = ((ic7300_table*)tabbed_forms_->get_view(OT_MEMORY))->type();
 		// Get all relevant menu item indices
 		int index_save = find_index("&File/&Save");
 		int index_saveas = find_index("&File/Save &As");

@@ -75,7 +75,7 @@ book* book_ = nullptr;
 import_data* import_data_ = nullptr;
 extract_data* extract_records_ = nullptr;
 book* navigation_book_ = nullptr;
-tabbed_forms* tabbed_view_ = nullptr;
+tabbed_forms* tabbed_forms_ = nullptr;
 menu* menu_ = nullptr;
 toolbar* toolbar_ = nullptr;
 status* status_ = nullptr;
@@ -328,13 +328,13 @@ void add_data() {
 		// Get pfx_data
 		pfx_data_ = new pfx_data;
 		// Draw the prefix data
-		((pfx_tree*)tabbed_view_->get_view(OT_PREFIX))->populate_tree(false);
+		((pfx_tree*)tabbed_forms_->get_view(OT_PREFIX))->populate_tree(false);
 	}
 	if (!closing_) {
 		// add ADIF data.
 		spec_data_ = new spec_data;
 		// Draw the ADIF data
-		((spec_tree*)tabbed_view_->get_view(OT_ADIF))->populate_tree(false);
+		((spec_tree*)tabbed_forms_->get_view(OT_ADIF))->populate_tree(false);
 	}
 	// Add intl dialog
 	if (!closing_) {
@@ -364,7 +364,7 @@ void add_book(char* arg) {
 		import_data_ = new import_data;
 		extract_records_ = new extract_data;
 		// Tell the views that a book now exists
-		tabbed_view_->books();
+		tabbed_forms_->books();
 		// Get filename and load the data
 		string log_file = get_file(arg);
 
@@ -490,6 +490,9 @@ void add_rig_if() {
 					else {
 						// Connect to rig OK - see if we are a digital mode
 						if ((rig_if_->mode() == GM_DIGL || rig_if_->mode() == GM_DIGU) && import_data_->start_auto_update()) {
+							char message[256];
+							snprintf(message, 256, "RIG: %s", rig_if_->success_message().c_str());
+							status_->misc_status(ST_OK, message);
 							// start auto-data mode so we import the log written by the mode app
 							status_->misc_status(ST_WARNING, "RIG: Data mode - assume logging by data modem app");
 							// Change logging mode to IMPORTED as will be using a data-modem
@@ -533,7 +536,7 @@ void add_rig_if() {
 							menu_->logging(LM_ON_AIR);
 						}
 						// Note this is IC-7300 specific code
-						ic7300_table* mem_table = (ic7300_table*)(tabbed_view_->get_view(OT_MEMORY));
+						ic7300_table* mem_table = (ic7300_table*)(tabbed_forms_->get_view(OT_MEMORY));
 						if (rig_if_ && rig_if_->rig_name() == "IC-7300") {
 							ic7300_ = new ic7300;
 							rig_if_->update_clock();
@@ -680,8 +683,8 @@ void add_widgets(int& curr_y) {
 	toolbar_->update_items();
 	curr_y += toolbar_->h();
 	// The main views - this is a set of tabs with each view
-	tabbed_view_ = new tabbed_forms(0, curr_y, WIDTH, HEIGHT - curr_y);
-	main_window_->add(tabbed_view_);
+	tabbed_forms_ = new tabbed_forms(0, curr_y, WIDTH, HEIGHT - curr_y);
+	main_window_->add(tabbed_forms_);
 	// Display the main window. Don't show it until it's been resized
 	main_window_->end();
 }
@@ -699,11 +702,11 @@ void resize_window() {
 	window_settings.get("Width", width, WIDTH);
 	window_settings.get("Height", height, HEIGHT);
 	// Only allow the views to resize fully - the bars will resize horizontally
-	main_window_->resizable(tabbed_view_);
+	main_window_->resizable(tabbed_forms_);
 	// Get minimum resizing from all the children - horizontal limited by views and toolbar
-	int min_w = max(tabbed_view_->min_w(), toolbar_->min_w());
+	int min_w = max(tabbed_forms_->min_w(), toolbar_->min_w());
 	// Vertical limited by view, the bars remain a fixed height
-	int min_h = tabbed_view_->min_h() + status_->h() + toolbar_->h() + menu_->h();
+	int min_h = tabbed_forms_->min_h() + status_->h() + toolbar_->h() + menu_->h();
 	main_window_->size_range(min_w, min_h);
 	// Set the size to the setting or minimum specified by the view + bars if that's larger
 	main_window_->resize(left, top, max(min_w, width), max(min_h, height));
@@ -729,7 +732,7 @@ void tidy() {
 	delete intl_dialog_;
 	delete spec_data_;
 	delete pfx_data_;
-	delete tabbed_view_;
+	delete tabbed_forms_;
 	delete toolbar_;
 	delete status_;
 	delete menu_;

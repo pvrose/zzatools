@@ -55,6 +55,8 @@ namespace zzalog {
 		void set_items(report_item_t items);
 		// Add details
 		void add_details(bool enable);
+		// Change font
+		void set_font(Fl_Font font, Fl_Fontsize size);
 
 		// attributes
 		// Filter for reference data
@@ -67,6 +69,10 @@ namespace zzalog {
 		int record_num_;
 		// list of prefixes selected by filter
 		vector<prefix*> prefixes_;
+		// Font and size
+		Fl_Font font_;
+		Fl_Fontsize fontsize_;
+
 	};
 
 }

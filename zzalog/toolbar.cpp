@@ -25,7 +25,7 @@ extern menu* menu_;
 extern book* navigation_book_;
 extern book* book_;
 extern extract_data* extract_records_;
-extern tabbed_forms* tabbed_view_;
+extern tabbed_forms* tabbed_forms_;
 extern pfx_data* pfx_data_;
 extern status* status_;
 extern Fl_Single_Window* main_window_;
@@ -378,7 +378,7 @@ void toolbar::cb_bn_search(Fl_Widget* w, void* v) {
 				// select the record that was found
 				found = true;
 				navigation_book_->selection(i, HT_SELECTED);
-				tabbed_view_->activate_pane(OT_RECORD, true);
+				tabbed_forms_->activate_pane(OT_RECORD, true);
 				// Remember the record found
 				that->record_num_ = i + 1;
 			}

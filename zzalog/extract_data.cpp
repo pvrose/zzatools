@@ -19,7 +19,7 @@ using namespace zzalog;
 extern book* book_;
 extern book* navigation_book_;
 extern pfx_data* pfx_data_;
-extern tabbed_forms* tabbed_view_;
+extern tabbed_forms* tabbed_forms_;
 extern status* status_;
 extern eqsl_handler* eqsl_handler_;
 extern lotw_handler* lotw_handler_;
@@ -176,7 +176,7 @@ void extract_data::clear_criteria() {
 	delete_contents(true);
 	use_mode_ = NONE;
 	// Set navigation book to main log
-	tabbed_view_->activate_pane(OT_MAIN, true);
+	tabbed_forms_->activate_pane(OT_MAIN, true);
 	// Cause the views to be redrawn
 	selection(-1, HT_EXTRACTION);
 }
@@ -433,13 +433,13 @@ void extract_data::extract_qsl(extract_data::extract_mode_t server) {
 		};
 		criteria(new_criteria, server);
 		sort_records("CALL", false);
-		tabbed_view_->update_views(nullptr, HT_RESET_ORDER, 0);
+		tabbed_forms_->update_views(nullptr, HT_RESET_ORDER, 0);
 
 	}
 	if (size() == 0) {
 		// No records match these criteria
 		status_->misc_status(ST_WARNING, "EXTRACT: No records to upload!");
-		tabbed_view_->activate_pane(OT_MAIN, true);
+		tabbed_forms_->activate_pane(OT_MAIN, true);
 		// Select most recent QSO
 		book_->selection(book_->size() - 1, HT_EXTRACTION);
 	}
@@ -450,7 +450,7 @@ void extract_data::extract_qsl(extract_data::extract_mode_t server) {
 		sprintf(message, format, size(), reason.c_str());
 		status_->misc_status(ST_OK, message);
 		delete[] message;
-		tabbed_view_->activate_pane(OT_EXTRACT, true);
+		tabbed_forms_->activate_pane(OT_EXTRACT, true);
 		// Select first extracted record
 		selection(0, HT_EXTRACTION);
 	}
@@ -529,7 +529,7 @@ void extract_data::extract_special(extract_data::extract_mode_t reason) {
 	if (size() == 0) {
 		// No records match these criteria
 		status_->misc_status(ST_WARNING, "EXTRACT: No records match quick extract");
-		tabbed_view_->activate_pane(OT_MAIN, true);
+		tabbed_forms_->activate_pane(OT_MAIN, true);
 		// Select most recent QSO
 		book_->selection(book_->size() - 1, HT_EXTRACTION);
 	}
@@ -540,7 +540,7 @@ void extract_data::extract_special(extract_data::extract_mode_t reason) {
 		sprintf(message, format, size(), reason_name.c_str());
 		status_->misc_status(ST_OK, message);
 		delete[] message;
-		tabbed_view_->activate_pane(OT_EXTRACT, true);
+		tabbed_forms_->activate_pane(OT_EXTRACT, true);
 		// Select first extracted record
 		selection(0, HT_EXTRACTION);
 	}
@@ -613,7 +613,7 @@ void extract_data::extract_call(string callsign) {
 		delete[] message;
 		// Select first record in list and display the extraction page
 		selection(0, HT_EXTRACTION);
-		tabbed_view_->activate_pane(OT_EXTRACT, true);
+		tabbed_forms_->activate_pane(OT_EXTRACT, true);
 	}
 
 }

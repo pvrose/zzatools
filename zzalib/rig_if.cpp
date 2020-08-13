@@ -465,7 +465,7 @@ bool rig_hamlib::open() {
 	}
 
 	if (opened_ok_) {
-		success_message_ = "RIG: hamlib connection " + mfg_name_ + "/" + rig_name_ + " on port " + port_name_ + " opened OK";
+		success_message_ = "hamlib connection " + mfg_name_ + "/" + rig_name_ + " on port " + port_name_ + " opened OK";
 	}
 
 	// Set timer
@@ -712,7 +712,7 @@ bool rig_flrig::open() {
 	}
 
 	if (opened_ok_) {
-		success_message_ = "RIG: FlRig connection " + host_name + ":" + to_string(port_num) + " opened OK";
+		success_message_ = "FlRig connection " + host_name + ":" + to_string(port_num) + " opened OK";
 	}
 	// Base implementation sets timer
 	return rig_if::open();

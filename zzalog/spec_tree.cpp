@@ -10,13 +10,15 @@
 #include <vector>
 
 #include <FL/fl_draw.H>
+#include <FL/Fl_Preferences.H>
 
 using namespace zzalog;
 using namespace zzalib;
 
 extern spec_data* spec_data_;
-extern tabbed_forms* tabbed_view_;
+extern tabbed_forms* tabbed_forms_;
 extern status* status_;
+extern Fl_Preferences* settings_;
 
 using namespace std;
 
@@ -29,9 +31,14 @@ spec_tree::spec_tree(int X, int Y, int W, int H, const char* label, field_orderi
 	, sub_item_(nullptr)
 {
 	// Tree parameters
+	Fl_Preferences user_settings(settings_, "User Settings");
+	Fl_Preferences tree_settings(user_settings, "Tree Views");
+	tree_settings.get("Font Name", (int&)font_, FONT);
+	tree_settings.get("Font Size", (int&)fontsize_, FONT_SIZE);
+
 	sortorder(FL_TREE_SORT_ASCENDING);
-	item_labelfont(FONT);
-	item_labelsize(FONT_SIZE);
+	item_labelfont(font_);
+	item_labelsize(fontsize_);
 	// Call back standard tree callback
 	callback(cb_tree);
 }
@@ -44,7 +51,17 @@ spec_tree::~spec_tree()
 
 // inherited from view
 void spec_tree::update(hint_t hint, unsigned int record_num_1, unsigned int record_num_2) {
-	// Default do nothing
+	switch (hint) {
+	case HT_FORMAT:
+		// May have change font - redraw
+		item_labelfont(font_);
+		item_labelsize(fontsize_);
+		populate_tree(false);
+		break;
+	default:
+		// Do nothing
+		break;
+	}
 }
 
 // Delete the tree
@@ -94,7 +111,7 @@ void spec_tree::populate_tree(bool activate) {
 	fl_cursor(FL_CURSOR_DEFAULT);
 	// Tell tabbed view to activate this view
 	if (activate) {
-		tabbed_view_->activate_pane(OT_ADIF, true);
+		tabbed_forms_->activate_pane(OT_ADIF, true);
 	}
 }
 
@@ -258,3 +275,9 @@ void spec_tree::insert_adif_spec(Fl_Tree_Item* parent, const spec_dataset& datas
 	hang_item->close();
 }
 
+
+// Set log font values
+void spec_tree::set_font(Fl_Font font, Fl_Fontsize size) {
+	font_ = font;
+	fontsize_ = size;
+}

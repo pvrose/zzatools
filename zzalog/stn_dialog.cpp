@@ -25,7 +25,7 @@ using namespace zzalib;
 extern Fl_Preferences* settings_;
 extern pfx_data* pfx_data_;
 extern status* status_;
-extern tabbed_forms* tabbed_view_;
+extern tabbed_forms* tabbed_forms_;
 extern rig_if* rig_if_;
 
 // Power table constructor
@@ -665,7 +665,7 @@ void stn_dialog::qth_group::save_values() {
 		item_settings.set("State", qth->state.c_str());
 	}
 	// Redraw views that need a location
-	tabbed_view_->update_views(nullptr, HT_LOCATION, -1);
+	tabbed_forms_->update_views(nullptr, HT_LOCATION, -1);
 }
 
 // Update QTH related fields

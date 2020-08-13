@@ -32,7 +32,7 @@ using namespace std;
 // Global data items
 extern status* status_;
 extern menu* menu_;
-extern tabbed_forms* tabbed_view_;
+extern tabbed_forms* tabbed_forms_;
 extern spec_data* spec_data_;
 extern pfx_data* pfx_data_;
 extern Fl_Preferences* settings_;
@@ -488,7 +488,7 @@ void book::selection(record_num_t num_item, hint_t hint /* = HT_SELECTED */, vie
 	case HT_IMPORT_QUERYNEW:
 	case HT_DUPE_QUERY:
 		// Query against first record in import_data or identified record
-		tabbed_view_->update_views(requester, hint, record_number(current_item_), num_other);
+		tabbed_forms_->update_views(requester, hint, record_number(current_item_), num_other);
 		break;
 	case HT_CHANGED:
 	case HT_MINOR_CHANGE:
@@ -496,7 +496,7 @@ void book::selection(record_num_t num_item, hint_t hint /* = HT_SELECTED */, vie
 			// Set modified flag
 			modified(true);
 			// Update to this record
-			tabbed_view_->update_views(requester, hint, record_number(current_item_));
+			tabbed_forms_->update_views(requester, hint, record_number(current_item_));
 		}
 		break;
 	case HT_INSERTED:
@@ -507,7 +507,7 @@ void book::selection(record_num_t num_item, hint_t hint /* = HT_SELECTED */, vie
 			// Set modified flag
 			modified(true);
 			// Update to this record
-			tabbed_view_->update_views(requester, hint, record_number(current_item_));
+			tabbed_forms_->update_views(requester, hint, record_number(current_item_));
 		}
 		break;
 	case HT_START_CHANGED:
@@ -515,11 +515,11 @@ void book::selection(record_num_t num_item, hint_t hint /* = HT_SELECTED */, vie
 		this_record = get_record(current_item_, false);
 		erase(begin() + current_item_);
 		new_record = insert_record(this_record);
-		tabbed_view_->update_views(requester, HT_ALL, new_record);
+		tabbed_forms_->update_views(requester, HT_ALL, new_record);
 		break;
 	default:
 		if (!inhibit_view_update_) {
-			tabbed_view_->update_views(requester, hint, record_number(current_item_));
+			tabbed_forms_->update_views(requester, hint, record_number(current_item_));
 		}
 		break;
 	}
@@ -1166,7 +1166,7 @@ void book::check_dupes(bool restart) {
 	}
 	else {
 		// Activate record view
-		tabbed_view_->activate_pane(OT_RECORD, true);
+		tabbed_forms_->activate_pane(OT_RECORD, true);
 	}
 	enable_save(old_save_enabled);
 }

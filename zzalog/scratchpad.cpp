@@ -27,7 +27,7 @@ using namespace zzalib;
 extern book* book_;
 extern pfx_data* pfx_data_;
 extern status* status_;
-extern tabbed_forms* tabbed_view_;
+extern tabbed_forms* tabbed_forms_;
 extern menu* menu_;
 extern Fl_Preferences* settings_;
 extern intl_dialog* intl_dialog_;
@@ -343,7 +343,7 @@ void scratchpad::cb_action(Fl_Widget* w, void* v) {
 	that->record_->item(field, text);
 	that->buffer_->unselect();
 	// Update views
-	tabbed_view_->update_views(nullptr, HT_MINOR_CHANGE, book_->size() - 1);
+	tabbed_forms_->update_views(nullptr, HT_MINOR_CHANGE, book_->size() - 1);
 	// Give the editor the focus
 	that->editor_->take_focus();
 	// We may have changed the state
@@ -420,7 +420,7 @@ void scratchpad::cb_start(Fl_Widget* w, void* v) {
 			that->record_->item("SUBMODE", string(""));
 		}
 		that->record_->item("TX_PWR", string(that->ip_power_->value()));
-		tabbed_view_->update_views(nullptr, HT_CHANGED, book_->size() - 1);
+		tabbed_forms_->update_views(nullptr, HT_CHANGED, book_->size() - 1);
 	}
 	that->enable_widgets();
 }
@@ -442,7 +442,7 @@ void scratchpad::cb_ip_freq(Fl_Widget* w, void* v) {
 		}
 		// Update views
 		band_view_->update(freq);
-		tabbed_view_->update_views(nullptr, HT_MINOR_CHANGE, book_->size() - 1);
+		tabbed_forms_->update_views(nullptr, HT_MINOR_CHANGE, book_->size() - 1);
 	}
 }
 
@@ -462,7 +462,7 @@ void scratchpad::cb_ch_mode(Fl_Widget* w, void* v) {
 			that->record_->item("SUBMODE", string(""));
 		}
 		// Update views
-		tabbed_view_->update_views(nullptr, HT_CHANGED, book_->size() - 1);
+		tabbed_forms_->update_views(nullptr, HT_CHANGED, book_->size() - 1);
 	}
 }
 
@@ -475,7 +475,7 @@ void scratchpad::cb_ip_power(Fl_Widget* w, void* v) {
 		cb_value<Fl_Input, string>(w, &value);
 		that->record_->item("TX_PWR", value);
 		// Update views
-		tabbed_view_->update_views(nullptr, HT_MINOR_CHANGE, book_->size() - 1);
+		tabbed_forms_->update_views(nullptr, HT_MINOR_CHANGE, book_->size() - 1);
 	}
 }
 
