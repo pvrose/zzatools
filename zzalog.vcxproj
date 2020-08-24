@@ -94,7 +94,7 @@
       <TargetMachine>MachineX86</TargetMachine>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>libcurl.lib;libssh2_a.lib;nghttp2.lib;libssl.lib;libcrypto.lib;oldap32_a.lib;olber32_a.lib;zlib_a.lib;libhamlib.lib;fltkd.lib;fltk_jpegd.lib;fltk_pngd.lib;fltk_zd.lib;fltk_imagesd.lib;fltk_gld.lib;fltk_formsd.lib;zzalib.lib;comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libcurl.lib;libssh2_a.lib;nghttp2.lib;libssl.lib;libcrypto.lib;oldap32_a.lib;olber32_a.lib;zlib_a.lib;libhamlib.lib;fltkd.lib;fltk_jpegd.lib;fltk_pngd.lib;fltk_zd.lib;fltk_imagesd.lib;fltk_gld.lib;fltk_formsd.lib;zzalib.lib;comctl32.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <HeapReserveSize>2000000</HeapReserveSize>
@@ -114,7 +114,7 @@
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>libcurl.lib;libssh2_a.lib;nghttp2.lib;libssl.lib;libcrypto.lib;oldap32_a.lib;olber32_a.lib;zlib_a.lib;libhamlib.lib;fltk.lib;fltk_jpeg.lib;fltk_png.lib;fltk_z.lib;fltk_images.lib;fltk_gl.lib;fltk_forms.lib;zzalib.lib;comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libcurl.lib;libssh2_a.lib;nghttp2.lib;libssl.lib;libcrypto.lib;oldap32_a.lib;olber32_a.lib;zlib_a.lib;libhamlib.lib;fltk.lib;fltk_jpeg.lib;fltk_png.lib;fltk_z.lib;fltk_images.lib;fltk_gl.lib;fltk_forms.lib;zzalib.lib;comctl32.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <HeapReserveSize>2000000</HeapReserveSize>
     </Link>
   </ItemDefinitionGroup>
@@ -186,6 +186,7 @@
     <ClCompile Include="zzalog\use_dialog.cpp" />
     <ClCompile Include="zzalog\view.cpp" />
     <ClCompile Include="zzalog\web_dialog.cpp" />
+    <ClCompile Include="zzalog\wsjtx_handler.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="zzalog\about_dialog.h" />
@@ -252,6 +253,7 @@
     <ClInclude Include="zzalog\version.h" />
     <ClInclude Include="zzalog\view.h" />
     <ClInclude Include="zzalog\web_dialog.h" />
+    <ClInclude Include="zzalog\wsjtx_handler.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="zzalog\zzalog.rc" />

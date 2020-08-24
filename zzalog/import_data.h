@@ -33,7 +33,8 @@ namespace zzalog {
 			EQSL_UPDATE,     // Book contains data downloaded from eQSL.cc
 			LOTW_UPDATE,     // Book contains data downloaded from arrl.org/lotw
 			WAIT_AUTO,       // Book is reserved for the next auto-import session
-			READ_AUTO        // Data is being read - we can interrupt the process
+			READ_AUTO,       // Data is being read - we can interrupt the process
+			DATAGRAM,        // Book contains data received from WSJT-X datagram
 		};
 
 	public:
@@ -71,6 +72,8 @@ namespace zzalog {
 		bool load_data(string filename);
 		// Number of update files
 		int number_update_files();
+		// Load from a data stream
+		void load_stream(stringstream& adif, update_mode_t mode);
 
 	protected:
 		// repeat the auto-import timer

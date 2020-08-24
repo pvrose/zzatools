@@ -29,6 +29,7 @@
 #include "calendar.h"
 #include "qrz_handler.h"
 #include "ic7300_table.h"
+#include "wsjtx_handler.h"
 
 #include <sstream>
 #include <list>
@@ -161,6 +162,7 @@ namespace zzalog {
 	{ "&File", 0, menu::cb_mi_imp_file, nullptr },
 	{ "Download e&QSL", 0, menu::cb_mi_download, (void*)(long)import_data::EQSL_UPDATE },
 	{ "Download &LotW", 0, menu::cb_mi_download, (void*)(long)import_data::LOTW_UPDATE, FL_MENU_DIVIDER },
+	{ "&WSJT-X UDP", 0, menu::cb_mi_imp_wsjtx, nullptr, FL_MENU_DIVIDER },
 	{ "&Merge", 0, menu::cb_mi_imp_merge, nullptr, FL_MENU_DIVIDER },
 	{ "&Cancel", 0, menu::cb_mi_imp_cancel, nullptr },
 	{ 0 },
@@ -264,7 +266,9 @@ extern intl_dialog* intl_dialog_;
 extern toolbar* toolbar_;
 extern scratchpad* scratchpad_;
 extern qrz_handler* qrz_handler_;
+extern wsjtx_handler* wsjtx_handler_;
 settings* config_ = nullptr;
+
 
 extern void add_rig_if();
 extern void add_data();
@@ -1088,6 +1092,20 @@ void menu::cb_mi_download(Fl_Widget* w, void* v) {
 	import_data_->download_data((import_data::update_mode_t)(long)v);
 }
 
+// Import->WSJT-X - start the WSJT-X listener for logging datagrams
+void menu::cb_mi_imp_wsjtx(Fl_Widget* w, void* v) {
+	if (wsjtx_handler_ && !wsjtx_handler_->has_server()) {
+		// Restart wsjt-x listener
+		wsjtx_handler_->run_server();
+	}
+	else if (!wsjtx_handler_) {
+		// Create new listener
+		wsjtx_handler_ = new wsjtx_handler;
+	}
+	// else a valid wsjt-x listener is running
+}
+
+
 // Import->Merge - merge what has just been downloaded
 // v is not used
 void menu::cb_mi_imp_merge(Fl_Widget* w, void* v) {
@@ -1776,6 +1794,7 @@ void menu::update_items() {
 		bool save_enabled = book_->save_enabled();
 		bool delete_enabled = book_->delete_enabled();
 		bool web_enabled = book_ && book_->get_record() && book_->get_record()->item_exists("WEB");
+		bool listening_wsjtx = wsjtx_handler_ && wsjtx_handler_->has_server();
 		view_type memory = ((ic7300_table*)tabbed_forms_->get_view(OT_MEMORY))->type();
 		// Get all relevant menu item indices
 		int index_save = find_index("&File/&Save");
@@ -1796,6 +1815,7 @@ void menu::update_items() {
 		int index_spad = find_index("&Log/Scratc&hpad");
 		int index_change = find_index("&Operating/C&hange");
 		int index_extract = find_index("E&xtract");
+		int index_wsjtx = find_index("&Import/&WSJT-X UDP");
 		int index_ref = find_index("&Reference");
 		int index_rep = find_index("Re&port");
 		int index_ic7300_none = find_index("I&C-7300/&None");
@@ -1939,6 +1959,13 @@ void menu::update_items() {
 		}
 		// Update logging commands and rig status
 		logging(logging());
+		// Update Import->WSJT-X UDP
+		if (listening_wsjtx) {
+			mode(index_wsjtx, mode(index_wsjtx) | FL_MENU_INACTIVE);
+		}
+		else {
+			mode(index_wsjtx, mode(index_wsjtx) & ~FL_MENU_INACTIVE);
+		}
 		// Memory table
 		switch (memory) {
 		case VT_NONE:

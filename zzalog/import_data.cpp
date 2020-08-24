@@ -456,7 +456,7 @@ void import_data::update_book() {
 				}
 				// Unexpected new record (update from log) - set flags to display new record - 
 				// user will either accept, reject or search for match
-				if (!found_match && !cancel_update && update_mode_ != AUTO_IMPORT && update_mode_ != FILE_IMPORT) {
+				if (!found_match && !cancel_update && update_mode_ != AUTO_IMPORT && update_mode_ != FILE_IMPORT && update_mode_ != DATAGRAM) {
 					update_in_progress_ = true;
 					update_is_new_ = true;
 					match_question_ = "Cannot find matching record - click ""Accept"" to add to log.";
@@ -467,7 +467,7 @@ void import_data::update_book() {
 					book_->selection(offset, HT_IMPORT_QUERYNEW);
 				}
 				// Expected new record (merging logs) - Move from update log to main log. 
-				else if (!found_match && (update_mode_ == AUTO_IMPORT || update_mode_ == FILE_IMPORT)) {
+				else if (!found_match && (update_mode_ == AUTO_IMPORT || update_mode_ == FILE_IMPORT || update_mode_ == DATAGRAM)) {
 					// If Auto update or importing a file then record needs parsing etc.
 					import_record->update_timeoff();
 					if (update_mode_ == AUTO_IMPORT) {
@@ -556,7 +556,7 @@ void import_data::finish_update(bool merged /*= true*/) {
 		}
 		status_->misc_status(ST_OK, message);
 		status_->progress(size(), book_type_);
-		if (number_updated_) {
+		if (number_updated_ || number_added_) {
 			book_->selection(book_->size() - 1, HT_ALL);
 		}
 		else {
@@ -762,23 +762,32 @@ bool import_data::download_data(import_data::update_mode_t server) {
 	if (result) {
 		// Go the start of the stream again
 		adif.seekg(0, adif.beg);
-		// This download data will be ADI format - load the stream into this book
-		adi_reader* reader = new adi_reader();
-		reader->load_book(this, adif);
-		delete reader;
-		if (server == LOTW_UPDATE) {
-			// Process the LotW header 
-			process_lotw_header();
-		}
-		// Switch the view to the import view and select forst record
-		tabbed_forms_->activate_pane(OT_IMPORT, true);
-		selection(record_number(0));
-		merge_data();
+		// Load the stream
+		load_stream(adif, server);
 	}
 	else {
 		update_mode_ = NONE;
 	}
 	return result;
+}
+
+// Load from a data stream
+void import_data::load_stream(stringstream& adif, import_data::update_mode_t server) {
+	if (server == DATAGRAM) {
+		update_mode_ = server;
+	}
+	// This download data will be ADI format - load the stream into this book
+	adi_reader* reader = new adi_reader();
+	reader->load_book(this, adif);
+	delete reader;
+	if (server == LOTW_UPDATE) {
+		// Process the LotW header 
+		process_lotw_header();
+	}
+	// Switch the view to the import view and select forst record
+	tabbed_forms_->activate_pane(OT_IMPORT, true);
+	selection(record_number(0));
+	merge_data();
 }
 
 // Merge data

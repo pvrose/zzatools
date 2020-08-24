@@ -39,6 +39,7 @@ main.cpp - application entry point
 #include "qrz_handler.h"
 #include "club_handler.h"
 #include "ic7300_table.h"
+#include "wsjtx_handler.h"
 
 // C/C++ header files
 #include <ctime>
@@ -91,6 +92,7 @@ intl_dialog* intl_dialog_ = nullptr;
 band_view* band_view_ = nullptr;
 scratchpad* scratchpad_ = nullptr;
 club_handler* club_handler_ = nullptr;
+wsjtx_handler* wsjtx_handler_ = nullptr;
 #ifdef _WIN32
 dxa_if* dxatlas_ = nullptr;
 #endif
@@ -127,7 +129,9 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 		// is no longer a rig to read.
 		if (rig_if_) {
 			rig_if_->close();
-			scratchpad_->update();
+			if (scratchpad_) {
+				scratchpad_->update();
+			}
 		}
 		// Delete band view
 		if (band_view_) {
@@ -211,6 +215,11 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 				closing_ = false;
 				return;
 			}
+		}
+
+		// Shutdown the WSJT-X server
+		if (wsjtx_handler_) {
+			wsjtx_handler_->close_socket();
 		}
 
 		// Back up the book
@@ -607,6 +616,10 @@ void add_qsl_handlers() {
 		if (qrz_handler_ == nullptr) qrz_handler_ = new qrz_handler;
 		// ClubLog handler
 		if (club_handler_ == nullptr) club_handler_ = new club_handler;
+		// WSJT-X server
+		if (wsjtx_handler_ == nullptr) {
+			wsjtx_handler_ = new wsjtx_handler;
+		}
 	}
 }
 
@@ -719,6 +732,7 @@ void tidy() {
 	fl_message_title_default(nullptr);
 	delete scratchpad_;
 	delete dxatlas_;
+	delete wsjtx_handler_;
 	delete club_handler_;
 	delete qrz_handler_;
 	delete lotw_handler_;
@@ -824,6 +838,8 @@ int main(int argc, char** argv)
 		// Only do this if we haven't tried to close
 		menu_->enable(true);
 		menu_->redraw();
+		// Start WSJT-X server
+		wsjtx_handler_->run_server();
 		// Run the application until it is closed
 		code = Fl::run();
 	}

@@ -107,6 +107,8 @@ namespace zzalog {
 		static void cb_mi_imp_merge(Fl_Widget* w, void* v);
 		// Import->Cancel
 		static void cb_mi_imp_cancel(Fl_Widget* w, void* v);
+		// Import->WSJTX UDP
+		static void cb_mi_imp_wsjtx(Fl_Widget* w, void* v);
 		// Reference->Prefix->Clear/All/Extracted/Selected
 		static void cb_mi_ref_filter(Fl_Widget* w, void* v);
 		// Reference->Prefix->Items
