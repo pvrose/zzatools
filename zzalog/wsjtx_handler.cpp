@@ -147,6 +147,8 @@ int wsjtx_handler::rcv_dgram() {
 	FD_SET(server_, &set_sockets);
 
 	bool got_data = false;
+	// Number of retries
+	unsigned int number_retries = 0;
 	// WSJT-X currently has the the heartbeat set to 15 s, add 1 for luck
 	//timeval to_16s = { 16, 0 };
 	//while (!got_data) {
@@ -205,9 +207,15 @@ int wsjtx_handler::rcv_dgram() {
 			wait_flag_ = true;
 			Fl::add_timeout(2.0, cb_timer_wait, (void*)&wait_flag_); 
 			while (wait_flag_) Fl::wait();
+			number_retries++;
+			if (number_retries > 15) {
+				status_->misc_status(ST_WARNING, "WSJTX: WSJT-X is not present - closing server");
+				return 1;
+			}
 		}
 		else {
 			handle_error("Unable to read from client");
+			return 1;
 		}
 		Fl::wait();
 	}
@@ -304,7 +312,12 @@ int wsjtx_handler::handle_log(char* const dgram, const int len) {
 	printf("%s\n", id.c_str());
 	stringstream adif;
 	adif.str(id);
+	// Stop any extant update and wait for it to complete
+	import_data_->stop_update(LM_OFF_AIR, false);
+	while (!import_data_->update_complete()) Fl::wait();
 	import_data_->load_stream(adif, import_data::update_mode_t::DATAGRAM);
+	// Wait for the import to finish
+	while (import_data_->size()) Fl::wait();
 	status_->misc_status(ST_NOTE, "WSJTX: Logged QSO");
 	return 0;
 }

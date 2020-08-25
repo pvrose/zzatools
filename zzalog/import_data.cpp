@@ -470,12 +470,9 @@ void import_data::update_book() {
 				else if (!found_match && (update_mode_ == AUTO_IMPORT || update_mode_ == FILE_IMPORT || update_mode_ == DATAGRAM)) {
 					// If Auto update or importing a file then record needs parsing etc.
 					import_record->update_timeoff();
-					if (update_mode_ == AUTO_IMPORT) {
+					if (update_mode_ == AUTO_IMPORT || update_mode_ == FILE_IMPORT || update_mode_ == DATAGRAM) {
 						pfx_data_->parse(import_record);
-					}
-					spec_data_->validate(import_record, -1);
-					// If auto updating add station details
-					if (update_mode_ == AUTO_IMPORT) {
+						spec_data_->validate(import_record, -1);
 						import_record->user_details();
 					}
 
@@ -519,6 +516,7 @@ void import_data::stop_update(logging_mode_t mode, bool immediate) {
 	case FILE_IMPORT:
 	case EQSL_UPDATE:
 	case LOTW_UPDATE:
+	case DATAGRAM:
 		// Set gradual stopping - will stop when update currently in progress completes
 		next_logging_mode_ = mode;
 		close_pending_ = true;
@@ -784,7 +782,7 @@ void import_data::load_stream(stringstream& adif, import_data::update_mode_t ser
 		// Process the LotW header 
 		process_lotw_header();
 	}
-	// Switch the view to the import view and select forst record
+	// Switch the view to the import view and select first record
 	tabbed_forms_->activate_pane(OT_IMPORT, true);
 	selection(record_number(0));
 	merge_data();
