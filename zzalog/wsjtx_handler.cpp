@@ -1,4 +1,4 @@
-#include "wsjtx_handler.h"
+﻿#include "wsjtx_handler.h"
 #include "status.h"
 #include "version.h"
 #include "import_data.h"
@@ -173,10 +173,6 @@ int wsjtx_handler::rcv_dgram() {
 		int len_client_addr = sizeof(client_addr_);
 		bytes_rcvd = recvfrom(server_, buffer, buffer_len, 0, (SOCKADDR*)&client_addr_, &len_client_addr);
 		if (bytes_rcvd > 0) {
-			char message[256];
-			getpeername(server_, (SOCKADDR*)&client_addr_, &len_client_addr);
-			snprintf(message, 256, "WSJTX: %d bytes received from %s:%d", bytes_rcvd, inet_ntoa(client_addr_.sin_addr), htons(client_addr_.sin_port));
-			status_->misc_status(ST_LOG, message);
 			string ts = now(false, "%H:%M:%S");
 			char* pos = buffer;
 			pos = get_uint(pos, &magic_number_);
@@ -193,6 +189,11 @@ int wsjtx_handler::rcv_dgram() {
 			case 0:
 				// Heartbeat
 				return handle_hbeat(buffer, bytes_rcvd);
+			case 1:
+				// Status
+				return handle_status(buffer, bytes_rcvd);
+			case 2:
+				return handle_decode(buffer, bytes_rcvd);
 			case 6:
 				return handle_close(buffer, bytes_rcvd);
 			case 12:
@@ -278,7 +279,7 @@ void wsjtx_handler::print_hbeat(char* const dgram) {
 	pos = get_utf8(pos, &id);
 	printf("Version %s, ", id.c_str());
 	pos = get_utf8(pos, &id);
-	printf("Revision %s\n", id.c_str());
+	printf("Revision %s", id.c_str());
 }
 
 int wsjtx_handler::send_dgram(const char* dgram, const int len) {
@@ -322,6 +323,140 @@ int wsjtx_handler::handle_log(char* const dgram, const int len) {
 	return 0;
 }
 
+// handle decode
+/*Decode        Out       2                      quint32
+* Id(unique key)        utf8
+* New                    bool
+* Time                   QTime
+* snr                    qint32
+* Delta time(S)         float(serialized as double)
+* Delta frequency(Hz)   quint32
+* Mode                   utf8
+* Message                utf8
+* Low confidence         bool
+* Off air                bool
+*
+13:01 : 12 : MN : adbccbda, sch : 2, Type 2 :
+	00 00 00 06 57 53 4a 54 2d 58 
+	01 
+	02 cb 06 e0 
+	00 00 00 13 
+	bf e0 00 00 00 00 00 00 
+	00 00 04 25 
+	00 00 00 01 7e 
+	00 00 00 10 47 4d 34 46 56 4d 20 4f 48 36 4e 4d 59 20 37 33 00 00
+	*/
+int wsjtx_handler::handle_decode(char* const dgram, const int len) {
+	printf("Decode: ");
+	string sv;
+	char* pos = get_utf8(dgram + 12, &sv);
+	printf("ID: %s,", sv.c_str());
+	bool bv;
+	pos = get_bool(pos, &bv);
+	printf("New: %d, ", bv);
+	uint32_t iv;
+	pos = get_uint(pos, &iv);
+	printf("Time: %08x, ", iv);
+	pos = get_uint(pos, &iv);
+	printf("dB: %d, ", iv);
+	double dv;
+	pos = get_double(pos, &dv);
+	printf("DT: %f, ", dv);
+	pos = get_uint(pos, &iv);
+	printf("Freq: %d, ", iv);
+	pos = get_utf8(pos, &sv);
+	printf("Mode: %s, ", sv.c_str());
+	pos = get_utf8(pos, &sv);
+	printf("Message: %s, ", sv.c_str());
+	pos = get_bool(pos, &bv);
+	printf("Conf: %d, ", bv);
+	pos = get_bool(pos, &bv);
+	printf("Off air: %d", bv);
+	return 0;
+}
+
+// handle status
+/* Status        Out       1                      quint32
+* Id(unique key)        utf8
+* Dial Frequency(Hz)    quint64
+* Mode                   utf8
+* DX call                utf8
+* Report                 utf8
+* Tx Mode                utf8
+* Tx Enabled             bool
+* Transmitting           bool
+* Decoding               bool
+* Rx DF                  quint32
+* Tx DF                  quint32
+* DE call                utf8
+* DE grid                utf8
+* DX grid                utf8
+* Tx Watchdog            bool
+* Sub - mode               utf8
+* Fast mode              bool
+* Special Operation Mode quint8
+* Frequency Tolerance    quint32
+* T / R Period             quint32
+* Configuration Name     utf8
+15:47:50: MN: adbccbda, sch: 2, Type 1:
+00 00 00 06 57 53 4a 54 2d 58 00 00 00 00 01 14
+3e c0 00 00 00 03 4a 54 39 00 00 00 06 47 53 33
+5a 5a 41 00 00 00 03 2d 31 35 00 00 00 03 4a 54
+39 00 00 01 00 00 02 e7 00 00 05 dc 00 00 00 06
+47 4d 33 5a 5a 41 00 00 00 06 49 4f 38 35 46 55
+ff ff ff ff 00 ff ff ff ff 00 00 ff ff ff ff ff
+ff ff ff 00 00 00 07 44 65 66 61 75 6c 74*/
+int wsjtx_handler::handle_status(char* const dgram, const int len) {
+	printf("Status: ");
+	char* pos = dgram;
+	string id;
+	pos = get_utf8(dgram + 12, &id);
+	printf("Id: %s, ", id.c_str());
+	uint64_t freq;
+	pos = get_uint64(pos, &freq);
+	printf("Freq: %lld, ", freq);
+	pos = get_utf8(pos, &id);
+	printf("Mode: %s, ", id.c_str());
+	pos = get_utf8(pos, &id);
+	printf("DX Call %s, ", id.c_str());
+	pos = get_utf8(pos, &id);
+	printf("Rpt: %s, ", id.c_str());
+	pos = get_utf8(pos, &id);
+	printf("TX Mode: %s, ", id.c_str());
+	bool bv;
+	pos = get_bool(pos, &bv); printf("TX En: %d, ", bv);
+	pos = get_bool(pos, &bv); printf("TX: %d, ", bv);
+	pos = get_bool(pos, &bv); printf("Dec: %d, ", bv);
+	uint32_t iv;
+	pos = get_uint(pos, &iv); printf("RX DF: %d, ", iv);
+	pos = get_uint(pos, &iv); printf("TX DF: %d, ", iv);
+	pos = get_utf8(pos, &id); printf("Call: %s, ", id.c_str());
+	pos = get_utf8(pos, &id); printf("Grid: %s, ", id.c_str());
+	pos = get_utf8(pos, &id); printf("DX Grid: %s, ", id.c_str());
+	pos = get_bool(pos, &bv); printf("TX WD: %d, ", bv);
+	pos = get_utf8(pos, &id); printf("Sub: %s, ", id.c_str());
+	pos = get_bool(pos, &bv); printf("Fast: %d, ", bv);
+	uint8_t i8v;
+	pos = get_uint8(pos, &i8v); printf("Spec op mode: %d, ", i8v);
+	pos = get_uint(pos, &iv); printf("DF: %d, ", iv);
+	pos = get_uint(pos, &iv); printf("T/R: %d, ", iv);
+	pos = get_utf8(pos, &id); printf("Conf name: %s, ", id.c_str());
+	return 0;
+}
+
+
+// Get an integer from the first 4 bytes of dgram 
+char* wsjtx_handler::get_bool(char* dgram, bool* bv) {
+	*bv = *dgram ? true : false;
+	return dgram + 1;
+}
+
+// Get an integer from the first 4 bytes of dgram 
+char* wsjtx_handler::get_uint8(char* dgram, uint8_t* i) {
+	*i = *dgram;
+	return dgram + 1;
+}
+
 // Get an integer from the first 4 bytes of dgram 
 char* wsjtx_handler::get_uint(char* dgram, unsigned int* i) {
 	*i = 0;
@@ -331,17 +466,37 @@ char* wsjtx_handler::get_uint(char* dgram, unsigned int* i) {
 	return dgram + 4;
 }
 
+// Get 64-bit unsigned integer
+char* wsjtx_handler::get_uint64(char* dgram, uint64_t* i) {
+	*i = 0LL;
+	for (int ix = 0; ix < 8; ix++) {
+		*i = (*i << 8) + (*(dgram + ix) & 0xff);
+	}
+	return dgram + 8;
+}
+
+// Get double 
+char* wsjtx_handler::get_double(char* dgram, double* d) {
+	// I'm making the assumption that the double has been directly serialised in its bit pattern
+	uint64_t uv;
+	char* pos = get_uint64(dgram, &uv);
+	double* dv = reinterpret_cast<double*>(&uv);
+	*d = *dv;
+	return dgram + 8;
+}
+
 // Get a string from the QByteArray (4 byte length + that number of bytes)
 char* wsjtx_handler::get_utf8(char* dgram, string* s) {
 	unsigned int len;
 	char* pos = get_uint(dgram, &len);
 	if (len == ~(0)) {
-		*s = "";
+		*s = "(null)";
+		return pos;
 	}
 	else {
 		*s = string(pos, len);
+		return pos + len;
 	}
-	return pos + len;
 }
 
 // Put an integer as 4 bytes in the first 4 bytes of dgram

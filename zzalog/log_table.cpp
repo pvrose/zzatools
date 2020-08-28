@@ -65,6 +65,17 @@ log_table::log_table(int X, int Y, int W, int H, const char* label, field_orderi
 	edit_input_->textfont(FONT);
 	edit_input_->textsize(FONT_SIZE);
 	add(edit_input_);
+	// Create menu button for the edit_input, 
+	edit_menu_ = new Fl_Menu_Button(0, 0, WBUTTON, HBUTTON, nullptr);
+	// Popup means the button isn't drawn, but it is clickable
+	edit_menu_->type(Fl_Menu_Button::POPUP3);
+	edit_menu_->textsize(FONT_SIZE);
+	edit_menu_->box(FL_UP_BOX);
+	edit_menu_->add("&UPPER", 0, cb_menu, (void*)UPPER);
+	edit_menu_->add("&lower", 0, cb_menu, (void*)LOWER);
+	edit_menu_->add("&Mixed", 0, cb_menu, (void*)MIXED);
+	edit_menu_->hide();
+	add(edit_menu_);
 	end();
 	alt_gr_ = false;
 
@@ -166,6 +177,41 @@ void log_table::cb_input(Fl_Widget* w, void* v) {
 	that->done_edit();
 }
 
+// Callback when right click in edit_menu_ - convert selected text to upper, lower or mixed-case
+// Also called for OK and Cancel buttons and on certain keyboard events
+// TODO - Properly handle conversion of multi-byte characters
+void log_table::cb_menu(Fl_Widget* w, void* v) {
+	// Get the enclosing log_table
+	log_table* that = ancestor_view<log_table>(w);
+	// Get the position of the word to change
+	unsigned int p = that->edit_input_->position();
+	unsigned int m = p;
+	unsigned int l = strlen(that->edit_input_->value());
+	char* value = new char[l + 1];
+	strcpy(value, that->edit_input_->value());
+	while (m > 0 && value[m] != ' ') m--;
+	while (p < l && value[p] != ' ') p++;
+	// Depending on the menu item pressed convert case appropriately
+	switch ((edit_menu_t)(long)v) {
+	case UPPER:
+		for (unsigned int i = m; i < p; i++)
+			value[i] = toupper(value[i]);
+		break;
+	case LOWER:
+		for (unsigned int i = m; i < p; i++)
+			value[i] = tolower(value[i]);
+		break;
+	case MIXED:
+		value[m] = toupper(value[m]);
+		for (unsigned int i = m + 1; i < p; i++)
+			value[i] = tolower(value[i]);
+		break;
+	}
+	that->edit_input_->value(value);
+	// Rehide edit_menu_
+	w->hide();
+}
+
 // Copy the data from the edit input, and start a new edit input to the left, right, above or below
 void log_table::edit_save(edit_input::edit_exit_t exit_type) {
 	// Deselect row being edited
@@ -221,8 +267,16 @@ void log_table::edit_save(edit_input::edit_exit_t exit_type) {
 	if ((unsigned)r1 >= edit_row_ || (unsigned)r2 <= edit_row_) {
 		top_row(edit_row_);
 	}
-
 }
+
+// Open edit menu 
+void log_table::open_edit_menu() {
+	// Put it bottom right of the edit input
+	edit_menu_->position(edit_input_->x() + edit_input_->w(), edit_input_->y() + edit_input_->h());
+	edit_menu_->show();
+	edit_menu_->popup();
+}
+
 // event handler - remember the event and call widget's handle
 int log_table::handle(int event) {
 	last_event_ = event;
@@ -616,6 +670,7 @@ void log_table::done_edit() {
 			break;
 		}
 		edit_input_->hide();
+		edit_menu_->hide();
 	}
 }
 

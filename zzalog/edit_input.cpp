@@ -34,6 +34,16 @@ int edit_input::handle(int event) {
 		// mouse coming in or going out of focus on this view
 		// tell FLTK we've acknowledged it so we can receive keyboard events (or not)
 		return true;
+	case FL_PUSH:
+		// Mouse pushed - return true to received the release
+		return true;
+	case FL_RELEASE:
+		// On right button drop down menu to change case
+		if (Fl::event_button() == FL_RIGHT_MOUSE) {
+			table->open_edit_menu();
+			return true;
+		}
+		return false;
 	case FL_KEYBOARD:
 		switch (Fl::event_key()) {
 		case FL_Tab:
@@ -63,4 +73,5 @@ int edit_input::handle(int event) {
 	}
 	return Fl_Input::handle(event);
 }
+
 

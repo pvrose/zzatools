@@ -545,12 +545,27 @@ void import_data::finish_update(bool merged /*= true*/) {
 	if (merged && size() == 0) {
 		char message[256];
 		if (update_mode_ == LOTW_UPDATE) {
-			sprintf(message, "IMPORT: %d records read, %d checked, %d updated, %d accepted, %d added, %d rejected, %d changed ClubLog",
+			sprintf(message, "IMPORT: LOTW %d records read, %d checked, %d updated, %d accepted, %d added, %d rejected, %d changed ClubLog",
 				number_to_import_, number_checked_, number_updated_, number_accepted_, number_added_, number_rejected_, number_clublog_);
 		}
 		else {
-			sprintf(message, "IMPORT: %d records read, %d checked, %d updated, %d accepted, %d added, %d rejected",
-				number_to_import_, number_checked_, number_updated_, number_accepted_, number_added_, number_rejected_);
+			string source;
+			switch (update_mode_) {
+			case AUTO_IMPORT:
+				source = "AUTO";
+				break;
+			case EQSL_UPDATE:
+				source = "EQSL";
+				break;
+			case FILE_IMPORT:
+				source = "FILE";
+				break;
+			case DATAGRAM:
+				source = "UDP";
+				break;
+			}
+			sprintf(message, "IMPORT: %s %d records read, %d checked, %d updated, %d accepted, %d added, %d rejected",
+				source.c_str(), number_to_import_, number_checked_, number_updated_, number_accepted_, number_added_, number_rejected_);
 		}
 		status_->misc_status(ST_OK, message);
 		status_->progress(size(), book_type_);

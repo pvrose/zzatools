@@ -20,9 +20,9 @@ namespace zzalog {
 			SAVE_UP,        // Save data and open item in above record
 			SAVE_DOWN       // Save data and open item in below record
 		};
-
 		edit_input(int X, int Y, int W, int H);
 		virtual int handle(int event);
+
 	};
 
 }

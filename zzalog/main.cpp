@@ -359,8 +359,8 @@ void add_book(char* arg) {
 		void* p_last = &session_start_;
 		time_t today = time(nullptr);
 		settings_->get("Session End", p_last, (const void*)&p_last, sizeof(time_t));
-		if (difftime(today, session_start_) > 1800.0) {
-			// It is > 30 minutes since we last saved a record - new session
+		if (difftime(today, session_start_) > 3600.0) {
+			// It is > 60 minutes since we last saved a record - new session
 			session_start_ = today;
 			status_->misc_status(ST_NOTE, "ZZALOG: Starting new session");
 		}

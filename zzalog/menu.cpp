@@ -1813,7 +1813,7 @@ void menu::update_items() {
 		int index_parser = find_index("&Log/&Parse record");
 		int index_bulk = find_index("&Log/&Bulk changes");
 		int index_spad = find_index("&Log/Scratc&hpad");
-		int index_change = find_index("&Operating/C&hange");
+		int index_change = find_index("&Operating/C&hange QSO && Set Next");
 		int index_extract = find_index("E&xtract");
 		int index_wsjtx = find_index("&Import/&WSJT-X UDP");
 		int index_ref = find_index("&Reference");

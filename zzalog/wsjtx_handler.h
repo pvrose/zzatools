@@ -2,6 +2,7 @@
 #define __WSJTX_HANDLER__
 
 #include <string>
+#include <cstdint>
 #include <WinSock2.h>
 
 using namespace std;
@@ -36,10 +37,22 @@ namespace zzalog {
 		int handle_close(char* const dgram, const int len);
 		// handle default datagrams
 		int handle_default(char* const dgram, const int len);
+		// handle decode
+		int handle_decode(char* const dgram, const int len);
+		// handle status
+		int handle_status(char* const dgram, const int len);
 		// Get the utf8 from the dgram
 		char* get_utf8(char* dgram, string* s);
 		// Get 32-bit unsigned integer
 		char* get_uint(char* dgram, unsigned int* i);
+		// Get 64-bit unsigned integer
+		char* get_uint64(char* dgram, uint64_t* i);
+		// Get bool
+		char* get_bool(char* dgram, bool* b);
+		// Get 8-bit unsigned int
+		char* get_uint8(char* dgram, uint8_t* i);
+		// Get double
+		char* get_double(char* dgram, double* d);
 		// Add the utf8 to the dgram
 		char* put_utf8(char* dgram, string s);
 		// Add 32-but unsigned integer
