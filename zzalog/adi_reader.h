@@ -27,12 +27,11 @@ namespace zzalog {
 	public:
 		// load data to book - data is read off the input stream and forms an array of records in book
 		bool load_book(book* book, istream& in);
-
-		// protected methods
-	protected:
 		// Load data to an individual record, failure is reported in result
 		istream & load_record(record* record, istream& in, load_result_t& result);
 
+		// protected methods
+	protected:
 		// protected attributes
 	protected:
 		book * my_book_;

@@ -8,6 +8,7 @@ utils.h - Utility methods
 #include "utils.h"
 #include "drawing.h"
 
+#include <FL/fl_ask.H>
 #include <FL/fl_draw.H>
 #include <FL/Fl_Multiline_Output.H>
 #include <FL/Fl_Tooltip.H>
@@ -830,4 +831,22 @@ string zzalib::hex_to_string(string data) {
 		result += to_ascii(data, ix);
 	}
 	return result;
+}
+
+// Default message function
+void zzalib::default_error_message(zzalib::status_t level, const char* message) {
+	switch (level) {
+	case ST_NONE:             // Uninitialised
+	case ST_LOG:              // Only log the message, do not display it in status
+	case ST_NOTE:             // An information message
+	case ST_OK:               // Task successful
+	case ST_WARNING:          // A warning message
+		fl_message(message);
+		break;
+	case ST_ERROR:            // An error has been signaled
+	case ST_SEVERE:           // A sever error that will result in reduced capability
+	case ST_FATAL:             // A fatal (non-recoverable) error has been signaled
+		fl_alert(message);
+		break;
+	}
 }

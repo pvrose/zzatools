@@ -84,6 +84,7 @@ rpc_data_item::~rpc_data_item()
 		}
 		array_->clear();
 		delete array_;
+		break;
 	case XRT_STRUCT:
 		// For each element in a structure
 		for (auto it = struct_->begin(); it != struct_->end(); it++) {
@@ -92,6 +93,7 @@ rpc_data_item::~rpc_data_item()
 		}
 		struct_->clear();
 		delete struct_;
+		break;
 	}
 }
 

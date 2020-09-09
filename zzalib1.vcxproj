@@ -30,6 +30,7 @@
     <ClInclude Include="zzalib\rpc_data_item.h" />
     <ClInclude Include="zzalib\rpc_handler.h" />
     <ClInclude Include="zzalib\serial.h" />
+    <ClInclude Include="zzalib\socket_server.h" />
     <ClInclude Include="zzalib\url_handler.h" />
     <ClInclude Include="zzalib\utils.h" />
     <ClInclude Include="zzalib\win_dialog.h" />
@@ -45,6 +46,7 @@
     <ClCompile Include="zzalib\rpc_data_item.cpp" />
     <ClCompile Include="zzalib\rpc_handler.cpp" />
     <ClCompile Include="zzalib\serial.cpp" />
+    <ClCompile Include="zzalib\socket_server.cpp" />
     <ClCompile Include="zzalib\url_handler.cpp" />
     <ClCompile Include="zzalib\utils.cpp" />
     <ClCompile Include="zzalib\win_dialog.cpp" />
@@ -125,7 +127,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_WARNINGS;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_WARNINGS;_WINSOCK_DEPRECATED_NO_WARNINGS;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>C:\Users\pvros\Documents\dev\fltk-1.4.x-20200320-0a38e2e3\build;C:\Users\pvros\Documents\dev\hamlib-w32-3.3\include;C:\Users\pvros\Documents\dev\curl-7.65.1\include;C:\Users\pvros\Documents\dev\fltk-1.4.x-20200320-0a38e2e3;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -160,7 +162,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_WARNINGS;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_WARNINGS;_WINSOCK_DEPRECATED_NO_WARNINGS;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>C:\Users\pvros\Documents\dev\fltk-1.4.x-20200320-0a38e2e3\build;C:\Users\pvros\Documents\dev\hamlib-w32-3.3\include;C:\Users\pvros\Documents\dev\curl-7.65.1\include;C:\Users\pvros\Documents\dev\fltk-1.4.x-20200320-0a38e2e3;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>

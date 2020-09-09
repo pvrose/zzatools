@@ -262,6 +262,8 @@ namespace zzalog {
 		vector<bool> colour_enables_;
 		// Pin size
 		int pin_size_;
+		// Time records were selected
+		time_t last_time_;
 
 		Fl_Group* colour_grp_;
 		// Colour buttons - instanced in colour_win_

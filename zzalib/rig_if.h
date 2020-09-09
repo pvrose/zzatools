@@ -7,6 +7,7 @@
 #include "rpc_handler.h"
 #include "power_matrix.h"
 #include "callback.h"
+#include "utils.h"
 
 // hamlib icludes
 #include "hamlib/rig.h"
@@ -110,7 +111,7 @@ namespace zzalib {
 		void update_clock();
 
 		// Callback to set certain functions (timer callback, freq to band conversion, error message
-		void callback(void (*function)(), string(*spec_func)(double), void(*mess_func)(bool, const char*));
+		void callback(void (*function)(), string(*spec_func)(double), void(*mess_func)(status_t, const char*));
 
 
 		// Protected methods
@@ -137,8 +138,7 @@ namespace zzalib {
 		// Access spec for 
 		string(*freq_to_band_)(double frequency);
 		// Display message
-		void(*error)(bool ok, const char* message);
-		static void default_error_message(bool ok, const char* message);
+		void(*error)(status_t ok, const char* message);
 		// bool
 		bool have_freq_to_band_;
 

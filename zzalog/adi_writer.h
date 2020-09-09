@@ -26,6 +26,8 @@ namespace zzalog {
 	public:
 		// write book to output stream
 		bool store_book(book* book, ostream& out, set<string>* fields = nullptr);
+		// Convert record to ADIF format text and send to the output stream
+		void to_adif(record* record, ostream& out, set<string>* fields = nullptr);
 
 		// protected methods
 	protected:
@@ -33,8 +35,6 @@ namespace zzalog {
 		ostream & store_record(record* record, ostream& out, load_result_t& result, set<string>* fields = nullptr);
 		// Convert item to ADIF format text and send to the output stream
 		void item_to_adif(record* record, string field, ostream& out);
-		// Convert record to ADIF format text and send to the output stream
-		void to_adif(record* record, ostream& out, set<string>* fields = nullptr);
 
 	};
 

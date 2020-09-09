@@ -4,6 +4,7 @@
 #include "rpc_data_item.h"
 #include "xml_element.h"
 #include "xml_writer.h"
+#include "socket_server.h"
 
 #include <string>
 #include <istream>
@@ -20,10 +21,24 @@ namespace zzalib {
 	class rpc_handler
 	{
 	public:
+		// The only codes implemented
+		enum http_code {
+			OK = 200,
+			BAD_REQUEST = 400
+		};
+		// Handler for client (or both)
 		rpc_handler(string host_name, int port_num_, string resource_name);
+		// Handler for server
+		rpc_handler(int port_name, string resource_name);
 		~rpc_handler();
 		// Generate XML for the request and decode XML for the response
 		bool do_request(string method_name, rpc_data_item::rpc_list* params, rpc_data_item* response);
+		// Packet handler
+		static int rcv_request(stringstream& ss);
+		// Run server
+		void run_server();
+		// Callback to action request
+		void callback(int(*request)(string method, rpc_data_item::rpc_list& params, rpc_data_item& response), void(*message)(status_t, const char*));
 
 	protected:
 		// Generate the RPC request XML
@@ -39,10 +54,27 @@ namespace zzalib {
 		// Decode the individual XML element 
 		bool decode_xml_element(rpc_element_t Type, xml_element* pElement, string& method_name, rpc_data_item::rpc_list* items);
 		bool decode_xml_element(rpc_element_t Type, xml_element* pElement, rpc_data_item* item, bool& fault);
+		// Actually handle the request
+		int handle_request(stringstream& ss);
+		// Callback for log handler
+		int(*action_request)(string method, rpc_data_item::rpc_list& params, rpc_data_item& response);
+		// Callback for message handler
+		void(*cb_message)(status_t status, const char* message);
+		// Remove header - returns true if successful and payload is valid
+		bool strip_header(stringstream& message, stringstream& payload);
+		// Add header
+		bool add_header(http_code code, stringstream& payload, stringstream& message);
+
 		// The resource name
 		string resource_;
 		// The host name
 		string host_name_;
+		// HTML server
+		socket_server* server_;
+		// Server port
+		int server_port_;
+		// Pointer back to sel
+		static rpc_handler* that_;
 
 	};
 

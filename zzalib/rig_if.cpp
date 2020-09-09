@@ -56,7 +56,7 @@ bool rig_if::open() {
 		return true;
 	}
 	else {
-		error(false, "RIG: Failed to open rig");
+		error(ST_ERROR, "RIG: Failed to open rig");
 		return false;
 	}
 }
@@ -214,7 +214,7 @@ void rig_if::cb_timer_rig(void* v) {
 		}
 		if (!rig_if_->is_good()) {
 			// Rig connected and broken - SLOW
-			rig_if_->error(false, "RIG: Rig disconnected - setting slow polling period");
+			rig_if_->error(ST_WARNING, "RIG: Rig disconnected - setting slow polling period");
 			rig_settings.get("Slow Polling Interval", timer_value, SLOW_RIG_DEF);
 		}
 	}
@@ -230,7 +230,7 @@ void rig_if::get_string_mode(string& mode, string& submode) {
 	submode = "";
 	switch (rig_mode) {
 	case GM_INVALID:
-		error(false, "RIG: Invalid mode got from rig");
+		error(ST_ERROR, "RIG: Invalid mode got from rig");
 		return;
 	case GM_DIGL:
 		mode = "DATA L";
@@ -270,7 +270,7 @@ string rig_if::success_message() {
 // on_timer - callback on rig timer
 // freq_to_band - callback to convert frequency to band
 // error - callback for outputing error message
-void rig_if::callback(void(*function)(), string(*spec_func)(double), void(*mess_func)(bool, const char*)) {
+void rig_if::callback(void(*function)(), string(*spec_func)(double), void(*mess_func)(status_t, const char*)) {
 	on_timer_ = function;
 	freq_to_band_ = spec_func;
 	error = mess_func;
@@ -282,15 +282,6 @@ void rig_if::callback(void(*function)(), string(*spec_func)(double), void(*mess_
 	}
 }
 
-// Default message function
-void rig_if::default_error_message(bool ok, const char* message) {
-	if (ok) {
-		fl_message(message);
-	}
-	else {
-		fl_alert(message);
-	}
-}
 
 // Change power lookup
 void rig_if::change_lookup() {
@@ -333,7 +324,7 @@ void rig_if::update_clock() {
 		ic7300_->send_command(command, sub_command, data, ok);
 		char message[200];
 		snprintf(message, 200, "RIG: Updated rig clock to %04d %08d", time, date);
-		error(true, message);
+		error(ST_NOTE, message);
 	}
 }
 
@@ -645,7 +636,7 @@ const char* rig_hamlib::error_text(rig_errcode_e code) {
 
 // Raw message - not implemented
 string rig_hamlib::raw_message(string message) {
-	error(false, "RIG: Hamlib does not support sending raw messages");
+	error(ST_ERROR, "RIG: Hamlib does not support sending raw messages");
 	return "";
 };
 

@@ -1110,6 +1110,7 @@ void dxa_if::create_colour_buttons() {
 // Is the point displayed
 bool dxa_if::is_displayed(record_num_t record_num) {
 	string selected_by;
+	long days_old;
 	record* record = book_->get_record(record_num, false);
 	if (record == nullptr) {
 		return false;
@@ -1134,6 +1135,15 @@ bool dxa_if::is_displayed(record_num_t record_num) {
 		// Get the distance
 		selected_by = get_distance(record);
 		break;
+	case AC_DAYS:
+		// Get days ago
+		days_old = (long)difftime(last_time_, record->timestamp()) / (24 * 3600);
+		if (days_old >= 10) {
+			selected_by = ">=10 days";
+		}
+		else {
+			selected_by = to_string(days_old) + " days";
+		}
 	}
 	// Get the colour index for this
 	int colour_num = -1;
@@ -1392,7 +1402,7 @@ void dxa_if::draw_pins() {
 			northernmost_ = home_lat_;
 			southernmost_ = home_lat_;
 			// Get most recent date (for AC_DAYS)
-			time_t last_time = time(nullptr);
+			last_time_ = time(nullptr);
 
 			// Clear records displayed
 			records_displayed_.clear();
@@ -1471,10 +1481,10 @@ void dxa_if::draw_pins() {
 								break;
 							case AC_DAYS:
 								if (colour_layer < 10) {
-									use_item = (((long)difftime(last_time, record->timestamp()) / (24 * 3600)) == colour_layer);
+									use_item = (((long)difftime(last_time_, record->timestamp()) / (24 * 3600)) == colour_layer);
 								}
 								else {
-									use_item = (((long)difftime(last_time, record->timestamp()) / (24 * 3600)) >= colour_layer);
+									use_item = (((long)difftime(last_time_, record->timestamp()) / (24 * 3600)) >= colour_layer);
 								}
 								break;
 							}

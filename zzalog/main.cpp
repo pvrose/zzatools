@@ -40,6 +40,7 @@ main.cpp - application entry point
 #include "club_handler.h"
 #include "ic7300_table.h"
 #include "wsjtx_handler.h"
+#include "fllog_emul.h"
 
 // C/C++ header files
 #include <ctime>
@@ -93,6 +94,8 @@ band_view* band_view_ = nullptr;
 scratchpad* scratchpad_ = nullptr;
 club_handler* club_handler_ = nullptr;
 wsjtx_handler* wsjtx_handler_ = nullptr;
+fllog_emul* fllog_emul_ = nullptr;
+
 #ifdef _WIN32
 dxa_if* dxatlas_ = nullptr;
 #endif
@@ -215,11 +218,6 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 				closing_ = false;
 				return;
 			}
-		}
-
-		// Shutdown the WSJT-X server
-		if (wsjtx_handler_) {
-			wsjtx_handler_->close_socket();
 		}
 
 		// Back up the book
@@ -426,8 +424,8 @@ string cb_freq_to_band(double frequency) {
 }
 
 // Callback for rig_if_ to use to display messages in statues_
-void cb_error_message(bool ok, const char* message) {
-	status_->misc_status(ok ? ST_NOTE : ST_ERROR, message);
+void cb_error_message(status_t level, const char* message) {
+	status_->misc_status(level, message);
 }
 
 // Create the rig interface handler and connect to the rig.
@@ -620,6 +618,8 @@ void add_qsl_handlers() {
 		if (wsjtx_handler_ == nullptr) {
 			wsjtx_handler_ = new wsjtx_handler;
 		}
+		// FLLOG emulator
+		if (fllog_emul_ == nullptr) fllog_emul_ = new fllog_emul;
 	}
 }
 
@@ -840,6 +840,7 @@ int main(int argc, char** argv)
 		menu_->redraw();
 		// Start WSJT-X server
 		wsjtx_handler_->run_server();
+//		fllog_emul_->run_server();
 		// Run the application until it is closed
 		code = Fl::run();
 	}

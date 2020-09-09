@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<adif version="3.1.0" status="Released" created="2019-05-14T22:55:58Z">
+<adif version="3.1.1" status="Released" created="2020-08-28T20:10:07Z">
   <dataTypes>
     <header>
       <value>Data Type Name</value>
@@ -982,9 +982,21 @@
       </record>
       <record>
         <value name="Enumeration Name">Band</value>
+        <value name="Band">8m</value>
+        <value name="Lower Freq (MHz)">40</value>
+        <value name="Upper Freq (MHz)">45</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Band</value>
         <value name="Band">6m</value>
         <value name="Lower Freq (MHz)">50</value>
         <value name="Upper Freq (MHz)">54</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Band</value>
+        <value name="Band">5m</value>
+        <value name="Lower Freq (MHz)">54.000001</value>
+        <value name="Upper Freq (MHz)">69.9</value>
       </record>
       <record>
         <value name="Enumeration Name">Band</value>
@@ -1190,6 +1202,11 @@
         <value name="Enumeration Name">Contest_ID</value>
         <value name="Contest-ID">ARRL-10</value>
         <value name="Description">ARRL 10 Meter Contest</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Contest_ID</value>
+        <value name="Contest-ID">ARRL-10-GHZ</value>
+        <value name="Description">ARRL 10 GHz and Up Contest</value>
       </record>
       <record>
         <value name="Enumeration Name">Contest_ID</value>
@@ -2194,6 +2211,11 @@
         <value name="Enumeration Name">Contest_ID</value>
         <value name="Contest-ID">WV-QSO-PARTY</value>
         <value name="Description">West Virginia QSO Party</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Contest_ID</value>
+        <value name="Contest-ID">WW-DIGI</value>
+        <value name="Description">World Wide Digi DX Contest</value>
       </record>
       <record>
         <value name="Enumeration Name">Contest_ID</value>
@@ -4966,7 +4988,7 @@
       <record>
         <value name="Enumeration Name">Mode</value>
         <value name="Mode">MFSK</value>
-        <value name="Submodes">FSQCALL,FT4,JS8,MFSK4,MFSK8,MFSK11,MFSK16,MFSK22,MFSK31,MFSK32,MFSK64,MFSK128</value>
+        <value name="Submodes">FSQCALL,FST4,FT4,JS8,MFSK4,MFSK8,MFSK11,MFSK16,MFSK22,MFSK31,MFSK32,MFSK64,MFSK128</value>
       </record>
       <record>
         <value name="Enumeration Name">Mode</value>
@@ -18459,6 +18481,12 @@
         <value name="Submode">FSQCALL</value>
         <value name="Mode">MFSK</value>
         <value name="Description">FSQCall protocol used with FSQ (Fast Simple QSO) transmission mode</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
+        <value name="Submode">FST4</value>
+        <value name="Mode">MFSK</value>
+        <value name="Description">This is a digital mode supported by the WSJT-X software</value>
       </record>
       <record>
         <value name="Enumeration Name">Submode</value>

@@ -2,6 +2,7 @@
 #include "url_handler.h"
 #include "xml_writer.h"
 #include "xml_reader.h"
+#include "utils.h"
 #include "../zzalib/utils.h"
 
 #include <sstream>
@@ -14,12 +15,28 @@ using namespace std;
 using namespace zzalib;
 
 extern url_handler* url_handler_;
+rpc_handler* rpc_handler::that_ = nullptr;
+extern void cb_error_message(status_t level, const char* message);
 
 // Constructor
 rpc_handler::rpc_handler(string host_name, int port_num, string resource_name)
 {
 	host_name_ = host_name + ':' + to_string(port_num);
+	server_port_ = port_num;
 	resource_ = resource_name;
+	cb_message = default_error_message;
+	server_ = nullptr;
+}
+
+// Constructor for a server-only
+rpc_handler::rpc_handler(int port_num, string resource_name) {
+	// For completion only - not used in server_only
+	host_name_ = "127.0.0.1";
+	server_port_ = port_num;
+	resource_ = resource_name;
+	cb_message = default_error_message;
+	that_ = this;
+	server_ = nullptr;
 }
 
 // Destructor
@@ -214,6 +231,8 @@ bool rpc_handler::write_item(xml_writer* writer, rpc_data_item* item) {
 		}
 		xml_ok &= writer->end_element("struct");
 	}
+
+	xml_ok &= writer->end_element("value");
 	return xml_ok;
 }
 
@@ -252,9 +271,10 @@ bool rpc_handler::decode_request(istream& request_xml, string& method_name, rpc_
 		return false;
 	}
 	else {
-		delete reader;
 		// Decode XML starting at outer XML element and iterate down
-		return decode_xml_element(XRP_METHODCALL, top_element, method_name, params);
+		bool result = decode_xml_element(XRP_METHODCALL, top_element, method_name, params);
+		delete reader;
+		return result;
 	}
 }
 
@@ -268,24 +288,15 @@ bool rpc_handler::decode_xml_element(rpc_element_t element_type, xml_element* el
 	switch (element_type) {
 	case XRP_METHODCALL:
 		// Expect two elements <methodName> and <params>
-		if (element->count() == 2) {
+		if (element->count() > 0) {
 			// For each element
-			for (int i = 0; i < 2 && xml_ok; i++) {
+			for (int i = 0; i < element->count() && xml_ok; i++) {
 				// Get the element
 				child_element = element->child(i);
 				child_name = child_element->name();
 				// Element is <methodName>
 				if (child_name == "methodName") {
-					// Get the element
-					rpc_data_item* name_item = new rpc_data_item;
-					xml_ok = decode_xml_element(XRP_METHODNAME, child_element, name_item, dummy);
-					if (xml_ok) {
-						method_name = name_item->get_string();
-					}
-					else {
-						method_name = "";
-						error_message = "Failed to decode request method name";
-					}
+					method_name = child_element->content();
 				}
 				else if (child_name == "params") {
 					// Get the element
@@ -300,7 +311,7 @@ bool rpc_handler::decode_xml_element(rpc_element_t element_type, xml_element* el
 		}
 		else {
 			xml_ok = false;
-			error_message = "Expected two elements - got " + to_string(element->count());
+			error_message = "Expected one or two elements - got " + to_string(element->count());
 		}
 		break;
 	case XRP_PARAMS:
@@ -686,4 +697,122 @@ bool rpc_handler::decode_xml_element(rpc_element_t element_type, xml_element* el
 	return xml_ok;
 }
 
+// Run the HTTP server
+void rpc_handler::run_server() {
+	if (server_) {
+		server_->run_server();
+	}
+	else {
+		server_ = new socket_server(socket_server::HTTP, server_port_);
+		server_->callback(rcv_request, cb_error_message);
+		server_->run_server();
+	}
+}
 
+// Static callback - calls the one in this class
+int rpc_handler::rcv_request(stringstream& ss) { 
+	return that_->handle_request(ss);
+}
+
+// Handle request - decode it, action it and send response
+int rpc_handler::handle_request(stringstream& ss) {
+	stringstream payload;
+	if (strip_header(ss, payload)) {
+		// Decode request
+		string method_name = "";
+		rpc_data_item::rpc_list params;
+		rpc_data_item response;
+		decode_request(payload, method_name, &params);
+		// Get response
+		int error = action_request(method_name, params, response);
+		// Convert to XML
+		stringstream xml;
+		generate_response(error, &response, xml);
+		// Add header
+		stringstream resp;
+		add_header(OK, xml, resp);
+		// Send to server
+		return server_->send_response(resp);
+	}
+	else {
+		// Not a post or not to the RPC server supported - send "bad request" back to client
+		stringstream error_response;
+		stringstream dummy;
+		dummy.str("");
+		add_header(BAD_REQUEST, dummy, error_response);
+		return server_->send_response(error_response);
+	}
+}
+
+// Callback to action request 
+void rpc_handler::callback(int(*request)(string method, rpc_data_item::rpc_list& params, rpc_data_item& response), void(*message)(status_t, const char*)) {
+	action_request = request;
+	cb_message = message;
+}
+
+// Check and parse HTML header - returns start of payload
+bool rpc_handler::strip_header(stringstream& message, stringstream& payload) {
+	message.seekg(0, ios::beg);
+	streampos start = message.tellg();
+	string line;
+	// First line - e.g. POST <resource>....
+	getline(message, line);
+	vector<string> words;
+	split_line(line, words, ' ');
+	if (words[0] != "POST" || words[1] != resource_) {
+		return false;
+	}
+	else {
+		// Find the payload length
+		while (to_upper(words[0]) != "CONTENT-LENGTH:") {
+			getline(message, line);
+			split_line(line, words, ' ');
+		}
+		long payload_sz = stoi(words[1]);
+		// Now go on to the payload indicated by an empty line
+		while (line != "" && line != "\r") {
+			getline(message, line);
+		}
+		// Now copy payload to output stream
+		streampos pos_pl = message.tellg();
+		string s = message.str();
+		payload.str(s.substr((size_t)(pos_pl - start)));
+		return true;
+	}
+}
+
+// Add the apropriate header
+bool rpc_handler::add_header(http_code code, stringstream& payload, stringstream& resp) {
+	string pl = payload.str();
+	int len_pl = pl.length();
+	switch (code) {
+	case OK:
+		//  HTTP/1.1 200 OK
+		//	Date : Sat, 06 Oct 2001 23:20:04 GMT
+		//	Server : Apache.1.3.12 (Unix)
+		//	Connection : close
+		//	Content-Type : text/xml
+		//	Content-Length : 124
+		resp << "HTTP/1.1 " << code << " OK\r\n";
+		resp << "Date: " << now(false, "%a %d %b %Y %X GMT") << "\r\n";
+		resp << "Server: ZZALIB " << LIBRARY_VERSION << "\r\n";
+		resp << "Connection: close\r\n";
+		resp << "Content-Type: text/xml\r\n";
+		resp << "Content-Length: " << len_pl << "\r\n";
+		resp << "\r\n";
+		while (payload.good()) {
+			string line;
+			getline(payload, line);
+ 			resp << line << "\r";
+		}
+		break;
+	case BAD_REQUEST:
+		resp << "HTTP/1.1 " << code << " BAD REQUEST\r\n";
+		resp << "Date: " << now(false, "%a %d %b %Y %X GMT") << "\r\n";
+		resp << "Server: ZZALIB " << LIBRARY_VERSION << "\r\n";
+		resp << "Connection: close\r\n";
+		resp << "\r\n";
+		break;
+	}
+	return true;
+}

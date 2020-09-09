@@ -24,10 +24,24 @@ namespace zzalib {
 		double longitude;   // longitude (positive = E)
 	};
 
+	// The status of the various messages
+	enum status_t {
+		ST_NONE,             // Uninitialised
+		ST_LOG,              // Only log the message, do not display it in status
+		ST_NOTE,             // An information message
+		ST_OK,               // Task successful
+		ST_WARNING,          // A warning message
+		ST_ERROR,            // An error has been signaled
+		ST_SEVERE,           // A sever error that will result in reduced capability
+		ST_FATAL             // A fatal (non-recoverable) error has been signaled
+	};
+
+
+
 	// Tip display - 2 seconds
 	const double TIP_SHOW = 2.0;
 	// Library version
-	const string LIBRARY_VERSION = "1.0.13";
+	const string LIBRARY_VERSION = "1.0.14";
 
 	// Split a text line into separate "words" on separator
 	void split_line(const string& line, vector<string>& words, const char separator);
@@ -88,6 +102,8 @@ namespace zzalib {
 	string string_to_hex(string, bool escape = false);
 	// Convert string to hex
 	string hex_to_string(string);
+	// Default error message
+	void default_error_message(status_t level, const char* message);
 
 
 	// template function to find the enclosing widget of class WIDGET
