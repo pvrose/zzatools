@@ -51,8 +51,6 @@ socket_server::~socket_server() {
 // Close the socket and clean up winsock
 void socket_server::close_server() {
 	closing_ = true;
-	Fl::remove_timeout(cb_timer_acc, this);
-	Fl::remove_timeout(cb_timer_rcv, this);
 	if (server_ != INVALID_SOCKET) {
 		printf("Closing....");
 		SOCKADDR_IN server_addr;
@@ -223,6 +221,7 @@ int socket_server::rcv_packet() {
 	int pos_payload = 0;
 	double wait_time = 0.0;
 	int len_client_addr = sizeof(client_addr_);
+	printf("Listening %s: ", protocol_ == UDP ? "UDP" : "HTTP");
 	switch (protocol_) {
 	case UDP:
 		bytes_rcvd = recvfrom(server_, buffer, buffer_len, 0, (SOCKADDR*)&client_addr_, &len_client_addr);
@@ -232,6 +231,7 @@ int socket_server::rcv_packet() {
 		break;
 	}
 	if (bytes_rcvd > 0) {
+		printf("Got payload\n");
 		string s(buffer, bytes_rcvd);
 		ss << s;
 		do_request(ss);
@@ -239,13 +239,10 @@ int socket_server::rcv_packet() {
 		wait_time = 0.01;
 	}
 	else if (WSAGetLastError() == WSAEWOULDBLOCK) {
-		// Wait one seconds before trying again - wait_repeat_ will get cleared in the 
-		wait_time = 1.0;
-	}
-	else if (WSAGetLastError() == WSAENOTSOCK && closing_) {
-		// We can get here through a race between closing and turning the timers off
-		return 1;
-	}
+		printf("Would block\n");
+		// Wait two seconds before trying again - wait_repeat_ will get cleared in the 
+		wait_time = 2.0;
+	} 
 	else {
 		handle_error("Unable to read from client");
 		return 1;

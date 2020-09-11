@@ -51,8 +51,6 @@ socket_server::~socket_server() {
 // Close the socket and clean up winsock
 void socket_server::close_server() {
 	closing_ = true;
-	Fl::remove_timeout(cb_timer_acc, this);
-	Fl::remove_timeout(cb_timer_rcv, this);
 	if (server_ != INVALID_SOCKET) {
 		printf("Closing....");
 		SOCKADDR_IN server_addr;
@@ -125,9 +123,42 @@ int socket_server::create_server() {
 		status(ST_OK, message);
 	}
 
+	// TODO - need to implement this and then use Client socket for receiving TCP/IP
+	if (protocol_ == HTTP) {
+		result = listen(server_, SOMAXCONN);
+		if (result == SOCKET_ERROR) {
+			handle_error("Unable to establich connection");
+			return result;
+		}
+		else {
+			getsockname(server_, (SOCKADDR*)&server_addr, &len_server_addr);
+			snprintf(message, 256, "SOCKET: Listening socket %s:%d", inet_ntoa(server_addr.sin_addr), htons(server_addr.sin_port));
+			status(ST_OK, message);
+		}
+
+#ifdef _WIN32
+		unsigned long nonblocking = 1;
+		if (server_ != INVALID_SOCKET && ioctlsocket(server_, FIONBIO, &nonblocking)) {
+			handle_error("Unable to make socket non-blocking");
+			return 1;
+		}
+#endif
+		int len_client_addr = sizeof(client_addr_);
+		client_ = accept(server_, (SOCKADDR*)&client_addr_, &len_client_addr);
+		if (client_ == INVALID_SOCKET) {
+			handle_error("Unable to accept connection");
+			return 1;
+		}
+		else {
+			snprintf(message, 256, "SOCKET: Accepted socket %s:%d", inet_ntoa(client_addr_.sin_addr), htons(client_addr_.sin_port));
+			status(ST_OK, message);
+		}
+	}
+
+
 #ifdef _WIN32
 	unsigned long nonblocking = 1;
-	if (server_ != INVALID_SOCKET && ioctlsocket(server_, FIONBIO, &nonblocking)) {
+	if (client_ != INVALID_SOCKET && ioctlsocket(client_, FIONBIO, &nonblocking)) {
 		handle_error("Unable to make socket non-blocking");
 		return 1;
 	}
@@ -141,69 +172,9 @@ int socket_server::create_server() {
 	return (fcntl(fd, F_SETFL, flags) == 0) ? 0 : 1;
 #endif
 
-	// Set socket into listening mode and wait to get a client
-	if (protocol_ == HTTP) {
-		result = listen(server_, SOMAXCONN);
-		if (result == SOCKET_ERROR) {
-			handle_error("Unable to establich connection");
-			return result;
-		}
-		else {
-			getsockname(server_, (SOCKADDR*)&server_addr, &len_server_addr);
-			snprintf(message, 256, "SOCKET: Listening socket %s:%d", inet_ntoa(server_addr.sin_addr), htons(server_addr.sin_port));
-			status(ST_OK, message);
-		}
-
-		client_ = INVALID_SOCKET;
-		if (accept_client()) {
-			return 1;
-		}
-
-		// Make the client non-blocking as well
-#ifdef _WIN32
-		unsigned long nonblocking = 1;
-		if (client_ != INVALID_SOCKET && ioctlsocket(client_, FIONBIO, &nonblocking)) {
-			handle_error("Unable to make socket non-blocking");
-			return 1;
-		}
-#else
-		// TODO find fnctl.h
-		int flags = fcntl(client_, F_GETFL, 0);
-		// TODO add status call
-		if (flags == -1) return false;
-		flags = (flags | O_NONBLOCK);
-		// TODO add status call if fail
-		return (fcntl(fd, F_SETFL, flags) == 0) ? 0 : 1;
-#endif
-	}
 	return 0;
 }
 
-// Accept any client asking to connect, use non-blocking call to avoid locking out other code
-int socket_server::accept_client() {
-	char message[256];
-	int len_client_addr = sizeof(client_addr_);
-	client_ = accept(server_, (SOCKADDR*)&client_addr_, &len_client_addr);
-	if (client_ == INVALID_SOCKET) {
-		if (WSAGetLastError() == WSAEWOULDBLOCK) {
-			status(ST_LOG, "SOCKET: No client socket to accept");
-			// Non-blocking accept would have blocked - let other events get handled and try again
-			Fl::wait();
-			Fl::add_timeout(0.1, cb_timer_acc, this);
-			return 0;
-		}
-		else {
-			handle_error("Unable to accept connection");
-			return 1;
-		}
-	}
-	else {
-		snprintf(message, 256, "SOCKET: Accepted socket %s:%d", inet_ntoa(client_addr_.sin_addr), htons(client_addr_.sin_port));
-		status(ST_OK, message);
-		return 0;
-	}
-
-}
 const int MAX_SOCKET = 10240;
 
 int socket_server::rcv_packet() {
@@ -223,6 +194,7 @@ int socket_server::rcv_packet() {
 	int pos_payload = 0;
 	double wait_time = 0.0;
 	int len_client_addr = sizeof(client_addr_);
+	printf("Listening %s: ", protocol_ == UDP ? "UDP" : "HTTP");
 	switch (protocol_) {
 	case UDP:
 		bytes_rcvd = recvfrom(server_, buffer, buffer_len, 0, (SOCKADDR*)&client_addr_, &len_client_addr);
@@ -232,6 +204,7 @@ int socket_server::rcv_packet() {
 		break;
 	}
 	if (bytes_rcvd > 0) {
+		printf("Got payload\n");
 		string s(buffer, bytes_rcvd);
 		ss << s;
 		do_request(ss);
@@ -239,13 +212,10 @@ int socket_server::rcv_packet() {
 		wait_time = 0.01;
 	}
 	else if (WSAGetLastError() == WSAEWOULDBLOCK) {
-		// Wait one seconds before trying again - wait_repeat_ will get cleared in the 
-		wait_time = 1.0;
-	}
-	else if (WSAGetLastError() == WSAENOTSOCK && closing_) {
-		// We can get here through a race between closing and turning the timers off
-		return 1;
-	}
+		printf("Would block\n");
+		// Wait two seconds before trying again - wait_repeat_ will get cleared in the 
+		wait_time = 2.0;
+	} 
 	else {
 		handle_error("Unable to read from client");
 		return 1;
@@ -253,7 +223,12 @@ int socket_server::rcv_packet() {
 	// Allow event queue to dissipate
 	Fl::wait();
 	// Now see if we have another 
-	Fl::add_timeout(wait_time, cb_timer_rcv, this);
+	if (protocol_ == UDP) {
+		Fl::add_timeout(wait_time, cb_timer_udp, this);
+	}
+	else {
+		Fl::add_timeout(wait_time, cb_timer_http, this);
+	}
 
 	return 0;
 }
@@ -271,11 +246,9 @@ int socket_server::send_response(istream& response) {
 	while (response.good()) {
 		string line;
 		getline(response, line);
+		dump(line);
 		data += line + '\n';
 	}
-#ifdef _DEBUG
-	dump(data);
-#endif
 
 	// Send the response packet
 	int result;
@@ -293,15 +266,13 @@ int socket_server::send_response(istream& response) {
 }
 
 // Call back to restart attempt to restart datagram
-void socket_server::cb_timer_rcv(void* v) {
+void socket_server::cb_timer_udp(void* v) {
 	socket_server* that = (socket_server*)v;
 	that->rcv_packet();
 }
-
-// Callback to restart attempt to accept client
-void socket_server::cb_timer_acc(void* v) {
+void socket_server::cb_timer_http(void* v) {
 	socket_server* that = (socket_server*)v;
-	that->accept_client();
+	that->rcv_packet();
 }
 
 // Has a server

@@ -29,6 +29,7 @@ wsjtx_handler::wsjtx_handler()
 	that_ = this;
 	server_ = nullptr;
 	run_server();
+	last_decode_time_ = 0;
 }
 
 
@@ -50,7 +51,6 @@ int wsjtx_handler::rcv_dgram(stringstream & ss) {
 	magic_number_ = get_uint32(ss);
 	schema_ = get_uint32(ss);
 	uint32_t dgram_type = get_uint32(ss);
-	printf("\n%s: MN: %08x, sch: %d, ", ts.c_str(), magic_number_, schema_);
 	if (magic_number_ != expected_magic_ || schema_ < minimum_schema_) {
 		char message[256];
 		snprintf(message, 256, "datagram had wrong magic number (%08x) or unsupported schema (%d)", magic_number_, schema_);
@@ -76,23 +76,17 @@ int wsjtx_handler::rcv_dgram(stringstream & ss) {
 	return 0;
 }
 
-// For now print the raw hex of the datagram
+// 
 int wsjtx_handler::handle_default(stringstream& ss, uint32_t type) {
-	printf("Type %d: \n", type);
-	int i = 0;
-	while (ss.good()) {
-		unsigned char c;
-		ss >> c;
-		printf("%02x ", c);
-		i++;
-		if (i % 16 == 15) printf("\n");
-	}
+	char message[128];
+	snprintf(message, 128, "WSJT-X: Ignored type %d datagram", type);
+	status_->misc_status(ST_LOG, message);
 	return 0;
 }
 
-// For now print heartbeat message
+// 
 int wsjtx_handler::handle_hbeat(stringstream& ss) {
-	print_hbeat(ss);
+	status_->misc_status(ST_LOG, "WSJT-X: Received heartbeat");
 	send_hbeat();
 	return 0;
 }
@@ -112,174 +106,111 @@ int wsjtx_handler::send_hbeat() {
 	// Add the revision ""
 	put_uint32(ss, (uint32_t)(~0));
 	
-	// Now go back to the start of the stream to print debug
-	ss.seekg(0, ios::beg);
-	string ts = now(false, "%H:%M:%S");
-	magic_number_ = get_uint32(ss);
-	schema_ = get_uint32(ss);
-	uint32_t dummy = get_uint32(ss);
-	printf("\n%s: MN: %08x, sch: %d, ", ts.c_str(), magic_number_, schema_);
-	print_hbeat(ss);
-
+	// Now go back to the start of the stream to send it
 	ss.seekg(0, ios::beg);
 	return server_->send_response(ss);
 }
 
-void wsjtx_handler::print_hbeat(stringstream& ss) {
-	printf("Heartbeat: ");
-	string id = get_utf8(ss);
-	printf("Id: %s, ", id.c_str());
-	uint32_t schema = get_uint32(ss);
-	printf("Max schema %d, ", schema);
-	id = get_utf8(ss);
-	printf("Version %s, ", id.c_str());
-	id = get_utf8(ss);
-	printf("Revision %s", id.c_str());
-}
-
-// For now print close message and close the socket (indirectly by returning 1)
+// For now print close message 
 int wsjtx_handler::handle_close(stringstream& ss) {
-	printf("Close: ");
-	string id;
-	id = get_utf8(ss);
-	printf("Id: %s\n", id.c_str());
+	status_->misc_status(ST_NOTE, "WSJT-X: Received Close");
 	server_->close_server();
-	delete server_;
-	server_ = nullptr;
 	return 1;
 }
 
 // Handle the logged ADIF datagram.
 int wsjtx_handler::handle_log(stringstream& ss) {
-	printf("Logged ADIF: ");
-	string id = get_utf8(ss);
-	printf("Id: %s\n", id.c_str());
-	id = get_utf8(ss);
-	printf("%s\n", id.c_str());
-
+	status_->misc_status(ST_LOG, "WSJT-X: Received Log ADIF datagram");
+	// Ignore Id filed
+	string utf8 = get_utf8(ss);
+	// Get ADIF string
+	utf8 = get_utf8(ss);
+	// Convert it to a record
 	stringstream adif;
-	adif.str(id);
+	adif.str(utf8);
 	// Stop any extant update and wait for it to complete
 	import_data_->stop_update(LM_OFF_AIR, false);
 	while (!import_data_->update_complete()) Fl::wait();
 	import_data_->load_stream(adif, import_data::update_mode_t::DATAGRAM);
 	// Wait for the import to finish
 	while (import_data_->size()) Fl::wait();
-	status_->misc_status(ST_NOTE, "WSJTX: Logged QSO");
+	status_->misc_status(ST_NOTE, "WSJT-X: Logged QSO");
 	return 0;
 }
 
 // handle decode
-/*Decode        Out       2                      quint32
-* Id(unique key)        utf8
-* New                    bool
-* Time                   QTime
-* snr                    qint32
-* Delta time(S)         float(serialized as double)
-* Delta frequency(Hz)   quint32
-* Mode                   utf8
-* Message                utf8
-* Low confidence         bool
-* Off air                bool
-*
-13:01 : 12 : MN : adbccbda, sch : 2, Type 2 :
-	00 00 00 06 57 53 4a 54 2d 58 
-	01 
-	02 cb 06 e0 
-	00 00 00 13 
-	bf e0 00 00 00 00 00 00 
-	00 00 04 25 
-	00 00 00 01 7e 
-	00 00 00 10 47 4d 34 46 56 4d 20 4f 48 36 4e 4d 59 20 37 33 00 00
-	*/
 int wsjtx_handler::handle_decode(stringstream& ss) {
-	printf("Decode: ");
 	string sv = get_utf8(ss);
-	printf("ID: %s,", sv.c_str());
 	bool bv = get_bool(ss);
-	printf("New: %d, ", bv);
 	uint32_t iv = get_uint32(ss);
-	printf("Time: %08x, ", iv);
+	if (iv != last_decode_time_) {
+		char message[128];
+		snprintf(message, 128, "WSJT-X: Received %d decodes in %08x.", decodes_rcvd_, last_decode_time_);
+		status_->misc_status(ST_LOG, message);
+		last_decode_time_ = iv;
+		decodes_rcvd_ = 1;
+	}
+	else {
+		decodes_rcvd_++;
+	}
 	iv = get_uint32(ss);
-	printf("dB: %d, ", iv);
 	double dv = get_double(ss);
-	printf("DT: %f, ", dv);
 	iv = get_uint32(ss);
-	printf("Freq: %d, ", iv);
 	sv = get_utf8(ss);
-	printf("Mode: %s, ", sv.c_str());
 	sv = get_utf8(ss);
-	printf("Message: %s, ", sv.c_str());
 	bv = get_bool(ss);
-	printf("Conf: %d, ", bv);
 	bv = get_bool(ss);
-	printf("Off air: %d", bv);
 	return 0;
 }
 
 // handle status
-/* Status        Out       1                      quint32
-* Id(unique key)        utf8
-* Dial Frequency(Hz)    quint64
-* Mode                   utf8
-* DX call                utf8
-* Report                 utf8
-* Tx Mode                utf8
-* Tx Enabled             bool
-* Transmitting           bool
-* Decoding               bool
-* Rx DF                  quint32
-* Tx DF                  quint32
-* DE call                utf8
-* DE grid                utf8
-* DX grid                utf8
-* Tx Watchdog            bool
-* Sub - mode               utf8
-* Fast mode              bool
-* Special Operation Mode quint8
-* Frequency Tolerance    quint32
-* T / R Period             quint32
-* Configuration Name     utf8
-15:47:50: MN: adbccbda, sch: 2, Type 1:
-00 00 00 06 57 53 4a 54 2d 58 00 00 00 00 01 14
-3e c0 00 00 00 03 4a 54 39 00 00 00 06 47 53 33
-5a 5a 41 00 00 00 03 2d 31 35 00 00 00 03 4a 54
-39 00 00 01 00 00 02 e7 00 00 05 dc 00 00 00 06
-47 4d 33 5a 5a 41 00 00 00 06 49 4f 38 35 46 55
-ff ff ff ff 00 ff ff ff ff 00 00 ff ff ff ff ff
-ff ff ff 00 00 00 07 44 65 66 61 75 6c 74*/
 int wsjtx_handler::handle_status(stringstream& ss) {
-	printf("Status: ");
+	status_->misc_status(ST_LOG, "WSJT-X: Received status datagram");
 	string id;
+	// ID
 	id = get_utf8(ss);
-	printf("Id: %s, ", id.c_str());
+	// Frequency
 	uint64_t freq = get_uint64(ss);
-	printf("Freq: %lld, ", freq);
+	// Mode
 	id = get_utf8(ss);
-	printf("Mode: %s, ", id.c_str());
+	// DX Call
 	id = get_utf8(ss);
-	printf("DX Call %s, ", id.c_str());
 	id = get_utf8(ss);
-	printf("Rpt: %s, ", id.c_str());
+	// Report 
 	id = get_utf8(ss);
-	printf("TX Mode: %s, ", id.c_str());
+	// Transmit mode
 	bool bv;
-	bv = get_bool(ss); printf("TX En: %d, ", bv);
-	bv = get_bool(ss); printf("TX: %d, ", bv);
-	bv = get_bool(ss); printf("Dec: %d, ", bv);
+	// Transmit enabled
+	bv = get_bool(ss);
+	// Transmit
+	bv = get_bool(ss);
+	// Decoding
+	bv = get_bool(ss);
 	uint32_t iv;
-	iv = get_uint32(ss); printf("RX DF: %d, ", iv);
-	iv = get_uint32(ss); printf("TX DF: %d, ", iv);
-	id = get_utf8(ss); printf("Call: %s, ", id.c_str());
-	id = get_utf8(ss); printf("Grid: %s, ", id.c_str());
-	id = get_utf8(ss); printf("DX Grid: %s, ", id.c_str());
-	bv = get_bool(ss); printf("TX WD: %d, ", bv);
-	id = get_utf8(ss); printf("Sub: %s, ", id.c_str());
-	bv = get_bool(ss); printf("Fast: %d, ", bv);
-	uint8_t i8v = get_uint8(ss); printf("Spec op mode: %d, ", i8v);
-	iv = get_uint32(ss); printf("DF: %d, ", iv);
-	iv = get_uint32(ss); printf("T/R: %d, ", iv);
-	id = get_utf8(ss); printf("Conf name: %s, ", id.c_str());
+	// Received frequency - delta from VFO
+	iv = get_uint32(ss);
+	// Transmit frequency
+	iv = get_uint32(ss);
+	// My call
+	id = get_utf8(ss);
+	// My grid
+	id = get_utf8(ss);
+	// DX Grid
+	id = get_utf8(ss);
+	// Transmit ?
+	bv = get_bool(ss);
+	// Submode
+	id = get_utf8(ss);
+	// FAst decode
+	bv = get_bool(ss); 
+	// Special operation mode
+	uint8_t i8v = get_uint8(ss); 
+	// ???
+	iv = get_uint32(ss); 
+	// ????
+	iv = get_uint32(ss);
+	// Configuration name
+	id = get_utf8(ss); 
 	return 0;
 }
 

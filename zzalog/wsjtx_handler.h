@@ -67,9 +67,6 @@ namespace zzalog {
 		// Add 32-but unsigned integer
 		void put_uint32(stringstream& os, const unsigned int i);
 
-		// Print heartbeat
-		void print_hbeat(stringstream& os);
-
 		// Timer to wait a couple of seconds between trying to read a datagram
 		static void cb_timer_wait(void* v);
 
@@ -86,6 +83,10 @@ namespace zzalog {
 		uint32_t minimum_schema_ = 2;
 		// Received first datagram
 		bool received_datagram_;
+		// Last decode received
+		uint32_t last_decode_time_;
+		// Number decodes received
+		unsigned int decodes_rcvd_;
 	};
 
 }

@@ -40,6 +40,8 @@ namespace zzalib {
 
 		// Receive a datagram from WSJT-X
 		int rcv_packet();
+		// Accept the client
+		int accept_client();
 		// Error handler
 		void handle_error(const char* phase);
 		// Send request - set by call-back
@@ -50,8 +52,9 @@ namespace zzalib {
 		// Open socket and create server
 		int create_server();
 		// Timer to wait before testing receive
-		static void cb_timer_udp(void* v);
-		static void cb_timer_http(void* v);
+		static void cb_timer_rcv(void* v);
+		// Timer to wait before trying to accept again
+		static void cb_timer_acc(void* v);
 		// Diagnostic data
 		void dump(string line);
 		// Server socket
