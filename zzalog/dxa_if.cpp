@@ -1604,7 +1604,7 @@ void dxa_if::draw_pins() {
 			if (count != records_to_display_.size()) {
 				char message[100];
 				snprintf(message, 100, "DXATLAS: %d record(s) not displayed", records_to_display_.size() - count);
-				status_->misc_status(ST_ERROR, message);
+				status_->misc_status(ST_WARNING, message);
 				for (size_t i = 0; i < colours_used_.size(); i++) {
 					snprintf(message, 100, "DXATLAS: %s - %d records", colours_used_[i].c_str(), colour_count[i]);
 					status_->misc_status(ST_LOG, message);

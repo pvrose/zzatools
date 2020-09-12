@@ -4,6 +4,7 @@
 #include "status.h"
 #include "../zzalib/callback.h"
 #include "exc_data.h"
+#include "book.h"
 
 #include <sstream>
 
@@ -18,6 +19,7 @@ using namespace std;
 extern url_handler* url_handler_;
 extern Fl_Preferences* settings_;
 extern status* status_;
+extern book* book_;
 
 // Constructor 
 club_handler::club_handler() {
@@ -66,6 +68,9 @@ bool club_handler::upload_log(book* book) {
 				(*it)->item("CLUBLOG_QSO_UPLOAD_DATE", today);
 				(*it)->item("CLUBLOG_QSO_UPLOAD_STATUS", string("Y"));
 			}
+			// Force the book to save itself with these changes
+			book_->modified(true);
+			book_->enable_save(true);
 		}
 		fl_cursor(FL_CURSOR_DEFAULT);
 		return ok;

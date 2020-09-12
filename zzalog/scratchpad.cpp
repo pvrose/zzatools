@@ -517,13 +517,22 @@ void scratchpad::rig_update(string frequency, string mode, string power) {
 
 // Get frequency, power and mode from previous record not rig
 void scratchpad::update() {
-	record* prev_record = book_->get_record();
-	// Assume as it's a logged record, the frequency is valid
-	ip_freq_->textcolor(FL_BLACK);
-	ip_freq_->value(prev_record->item("FREQ").c_str());
-	ip_power_->value(prev_record->item("TX_PWR").c_str());
-	ch_mode_->value(ch_mode_->find_index(prev_record->item("MODE", true).c_str()));
-	if (band_view_ && prev_record->item_exists("FREQ")) band_view_->update(stod(prev_record->item("FREQ")) * 1000.0);
+	if (book_->size()) {
+		record* prev_record = book_->get_record();
+		// Assume as it's a logged record, the frequency is valid
+		ip_freq_->textcolor(FL_BLACK);
+		ip_freq_->value(prev_record->item("FREQ").c_str());
+		ip_power_->value(prev_record->item("TX_PWR").c_str());
+		ch_mode_->value(ch_mode_->find_index(prev_record->item("MODE", true).c_str()));
+		if (band_view_ && prev_record->item_exists("FREQ")) band_view_->update(stod(prev_record->item("FREQ")) * 1000.0);
+	}
+	else {
+		// No default
+		ip_freq_->textcolor(FL_RED);
+		ip_freq_->value("0");
+		ip_power_->value("0");
+		ch_mode_->value(0);
+	}
 	redraw();
 }
 

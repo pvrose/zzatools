@@ -300,7 +300,7 @@ void wsjtx_handler::cb_timer_wait(void* v) {
 }
 
 bool wsjtx_handler::has_server() {
-	return (server_ != nullptr);
+	return (server_ != nullptr && server_->has_server());
 }
 
 void wsjtx_handler::run_server() {
