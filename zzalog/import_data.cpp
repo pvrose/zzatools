@@ -318,10 +318,9 @@ void import_data::update_book() {
 			// Get first QSO in update log
 			record* import_record = at(0);
 			// Skip records prior to last in log if we are automatically merging from e.g. fldigi
+			// NB. Assumes that the modem program logs TIME_OFF. Using tIME_ON can introduce a race condition
 			string qso_timestamp = import_record->item("QSO_DATE_OFF") +
 				import_record->item("TIME_OFF");
-			// TODO: If we encounter a modem program that does not log TIME_OFF, we may have to use 
-			// TIME_ON, but this could introduce a race hazard. 
 			// If we have no seconds - force it to the last second of the minute so that it will be checked
 			if (qso_timestamp.length() == 12) {
 				qso_timestamp += "59";

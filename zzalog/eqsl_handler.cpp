@@ -229,16 +229,9 @@ string eqsl_handler::card_filename_l(record* record) {
 		delete chooser;
 	}
 	char save_filename[2048];
-	// If we've got an eQSL timestamp - used as eQSL may have different TIME_ON to us
-	// TODO: check this is still a possible error condition
-	string existing_timestamp = record->item("APP_ZZA_EQSL_TS");
 	// Create file name e.g. <dir-name>/20M/PSK/GM3ZZA_202007201424.png
-	if (existing_timestamp.length() == 0) {
-		sprintf(save_filename, "%s/%s/%s/%s__%s%s.png", qsl_directory.c_str(), band.c_str(), mode.c_str(), card_call.c_str(), qso_date.c_str(), time_on.substr(0, 4).c_str());
-	}
-	else {
-		sprintf(save_filename, "%s/%s/%s/%s__%s.png", qsl_directory.c_str(), band.c_str(), mode.c_str(), card_call.c_str(), existing_timestamp.c_str());
-	}
+	// NB we used to have APP_ZZA_EQSL_TS as thetimestamp from the eQSL record, but we now do this after merging the data.
+	sprintf(save_filename, "%s/%s/%s/%s__%s%s.png", qsl_directory.c_str(), band.c_str(), mode.c_str(), card_call.c_str(), qso_date.c_str(), time_on.substr(0, 4).c_str());
 	return save_filename;
 }
 
@@ -734,7 +727,6 @@ bool eqsl_handler::upload_eqsl_log(book* book) {
 							bad_records.insert(parse_warning(warning_text));
 						}
 						warning = true;
-						// TODO: parse warning to identify QSO
 						status = ER_SKIPPED;
 						num_warnings++;
 					}

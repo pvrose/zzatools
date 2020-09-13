@@ -286,16 +286,7 @@ bool adx_reader::characters(string content) {
 		case AET_HEADER:
 		case AET_RECORD:
 		case AET_RECORDS:
-			// TODO: review whether this is necessary as it takes 25% of CPU LOG
-			//// Expect white space
-			//if (!regex_match(content.c_str(), REGEX_WHITE_SPACE)) {
-			//	char* temp = new char[40 + content.length()];
-			//	sprintf(temp, "Data %s where white-space expected.", content.c_str());
-			//	string error_msg = temp;
-			//	if (!report_error(error_msg, TRUE)) {
-			//		return false;
-			//	}
-			//}
+			// WE ought to check that we just have white space here, but it's too CPU-intensive and not strictly necessary
 			break;
 		case AET_APP:
 		case AET_FIELD:

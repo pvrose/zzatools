@@ -126,7 +126,6 @@ namespace zzalib {
 	static void cb_value_tm(Fl_Widget* w, void* v) {
 		const char* value = ((WIDGET*)w)->value();
 		tm* target = (tm*)v;
-		// TODO allow configured display format
 		string_to_tm(string(value), *target, "%Y%m%d");
 	}
 	// Callback to get a radio value from a set of radio buttons

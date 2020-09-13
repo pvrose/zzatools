@@ -686,7 +686,7 @@ void log_table::describe_cell(int item, int col) {
 		item_number = my_book_->size() - 1 - item;
 		break;
 	default:
-		// TODO: How do we handle record numbers in sorted data
+		// NB. We do not map items numbers to record numbers for sorted displays
 		tip = "Cannot provide tip for sorted displays!";
 		break;
 	}

@@ -654,7 +654,8 @@ void extract_data::sort_records(string field_name, bool reversed) {
 	status_->misc_status(ST_NOTE, message);
 	status_->progress(size(), book_type(), "Sorting passes");
 	// Repeat until we no longer swap anything
-	// TODO: Implement more efficient sort algorithm, but if size() is relatively small. Current 2K+ records takes a couple of seconds
+	// NB: We may have to implement more efficient sort algorithm, if size() increases much.
+	// Current 2K+ records takes a couple of seconds
 	while (count > 0) {
 		count = 0;
 		// Compare each record with its immediate follower - swap if it's larger

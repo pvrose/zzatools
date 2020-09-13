@@ -907,8 +907,7 @@ match_result_t record::match_records(record* record) {
 			field_name == "QSLRDATE" ||
 			field_name == "QSL_RCVD" ||
 			field_name == "QSLSDATE" ||
-			field_name == "QSL_SENT" ||
-			field_name == "APP_ZZA_EQSL_TS") {
+			field_name == "QSL_SENT") {
 		}
 		else if (
 			// Band, mode MUST match

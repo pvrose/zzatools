@@ -81,7 +81,7 @@ string ic7300::send_command(unsigned char command, string sub_command, string da
 				}
 			}
 			else {
-				// TODO - Do we need to consider supporting case where the rig is configured not to reflect command?
+				// Currently do not support the case where the rig is configured not to reflect command?
 				fl_alert("Unexpected response: %s\n%s\nCMD = %s", response.c_str(), string_to_hex(response).c_str(), to_send.c_str());
 				return response;
 			}

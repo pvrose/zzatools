@@ -761,7 +761,7 @@ void add_icon(const char* arg0) {
 	// set the default Icon
 	main_icon_ = new Fl_RGB_Image(ICON_MAIN, 16, 16, 4);
 #else
-	// TODO: On windows we have a separate icon file - never worked out how to get one into the file
+	// NB: On windows we have a separate icon file - never worked out how to get one into the file
 	// Find the directory the app is loaded from and add the icon filename
 	const char* last_slash = strrchr(arg0, '\\');
 	int pos = last_slash - arg0;

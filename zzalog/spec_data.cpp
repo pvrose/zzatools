@@ -711,11 +711,11 @@ error_t spec_data::check_number(const string&  data, const string&  field, const
 	// Get the ADIF field parameters. Minimum and Maximum values - uses largest +/- value if blank
 	map<string, string>* fields = dataset("Fields")->data.at(field);
 	double min_value = -DBL_MAX;
-	if (fields->find("Minimum Value") != fields->end()) {
+	if (fields->find("Minimum Value") != fields->end() && fields->at("Minimum Value").length()) {
 		min_value = stod(fields->at("Minimum Value"));
 	}
 	double max_value = DBL_MAX;
-	if (fields->find("Maximum Value") != fields->end()) {
+	if (fields->find("Maximum Value") != fields->end() && fields->at("Maximum Value").length()) {
 		max_value = stod(fields->at("Maximum Value"));
 	}
 	// Check the value is within range
@@ -895,14 +895,16 @@ error_t spec_data::check_enumeration(const string& data, const string& field, co
 	}
 	else if (field == "CONT" || field == "MY_CONT") {
 		// Check that the continent is correct for the DXCC.
-		int dxcc_code;
+		int dxcc_code = 0;
 		if (field.length() == 7) {
 			// MY_CONT
-			dxcc_code = stoi(record_->item("MY_DXCC"));
+			if (record_->item("MY_DXCC").length())
+				dxcc_code = stoi(record_->item("MY_DXCC"));
 		}
 		else {
 			// CONT
-			dxcc_code = stoi(record_->item("DXCC"));
+			if (record_->item("DXCC").length())
+				dxcc_code = stoi(record_->item("DXCC"));
 		}
 		if (dxcc_code) {
 			// Get the prefix entry for the DXCC code
@@ -1111,7 +1113,6 @@ error_t spec_data::check_datatype(const string&  data, const string&  field, con
 		spec_dataset* enumeration_data = dataset(enumeration_name);
 		// Special case for undefined Secondary_Administrative_Subdivision, Sponsored Award and any other enumerations not given - not able to check
 		if (enumeration_data == nullptr) {
-			// TODO: Code SAS enumerations 
 			return VE_FIELD_UNSUPPORTED;
 		}
 		// Get the enumeration entry for the particular value
@@ -1243,7 +1244,6 @@ error_t spec_data::check_datatype(const string&  data, const string&  field, con
 						}
 						else return VE_OK;
 					}
-  				    // TODO: Be more explicit "These do not match the test strings"
 					case 'I': {
 						// International string
 						error_t error = check_format(data, field, datatype, REGEX_INTL_STRING);
@@ -2174,7 +2174,6 @@ void spec_data::add_my_appdefs() {
 	string my_appdefs[] = {
 		"APP_ZZA_PFX",
 		"APP_ZZA_QTH",
-		"APP_ZZA_EQSL_TS",
 		"APP_ZZA_EQSL_MSG",
 		"APP_ZZA_ERROR",
 		"APP_LOTW_NUMREC",

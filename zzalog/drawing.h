@@ -64,7 +64,8 @@ namespace zzalog {
 	};
 
 	// Colour palette used in DxAtlas legend and band plan
-	// TODO: DxAtlas only has a limited palette of colours for drawing
+	// DxAtlas only has a limited palette of colours for drawing - 
+	// so after about 12 colours used these are not seen in the actual colours
 	const Fl_Color ZLG_PALETTE[] =
 	{ fl_rgb_color(0,0,0),
 	fl_rgb_color(255,255,255),fl_rgb_color(0,255,0),fl_rgb_color(0,0,255),

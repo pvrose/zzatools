@@ -129,25 +129,6 @@ void pfx_dlg_table::draw_cell(TableContext context, int R, int C, int X, int Y,	
 
 }
 
-//// TODO: We shouldn't need to do this use Fl::event() etc inst
-//// Inherited from Fl_Widget
-//int pfx_dlg_table::handle(int event) {
-//	last_event_ = event;
-//	last_button_ = Fl::event_button();
-//	last_clicks_ = Fl::event_clicks();
-//	return Fl_Table_Row::handle(event);
-//}
-//
-//// Returns last event
-//int pfx_dlg_table::event() { return last_event_; }
-//
-//// Returns last button
-//int pfx_dlg_table::button() { return last_button_; }
-//
-//// Returns last click state
-//int pfx_dlg_table::clicks() { return last_clicks_; }
-//
-
 // Dialog constructor
 pfx_dialog::pfx_dialog() :
 	win_dialog(500, 200, "Prefix Selection")

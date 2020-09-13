@@ -195,7 +195,7 @@ bool url_handler::post_form(string url, vector<field_pair> fields, istream* req,
 
 	/* check for errors */
 	if (result != CURLE_OK) {
-		// TODO: This doesn't clean up all the memory
+		// NB: This doesn't clean up all the memory
 		// Reset the operation and clean up
 		curl_easy_reset(curl_);
 		curl_easy_cleanup(curl_);

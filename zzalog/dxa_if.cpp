@@ -1162,7 +1162,8 @@ bool dxa_if::is_displayed(record_num_t record_num) {
 }
 
 // Convert FLTK colour value to DXATLAS: colour value 
-// TODO: Not all zzalog values are supported
+// NB. Although DXATLAS uses a 24-bit value to represent colour, it only has a
+// limites palette.
 DxAtlas::EnumColor dxa_if::convert_colour(Fl_Color colour) {
 	unsigned char red;
 	unsigned char blue;
