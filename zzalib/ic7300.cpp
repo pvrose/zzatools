@@ -1,6 +1,7 @@
 #include "ic7300.h"
 #include "rig_if.h"
 
+
 using namespace zzalib;
 
 extern rig_if* rig_if_;
@@ -9,7 +10,7 @@ ic7300* ic7300_;
 ic7300::ic7300() :
 given_warning_(false)
 {
-
+	message = default_error_message;
 }
 
 ic7300::~ic7300() {
@@ -25,6 +26,7 @@ string ic7300::send_command(unsigned char command, string sub_command, bool& ok)
 // Send command with data
 string ic7300::send_command(unsigned char command, string sub_command, string data, bool& ok) {
 	ok = true;
+	char mess[256];
 	// Only access if we have a rig connected
 	if (rig_if_) {
 		// THis is hard-coded for default IC-7300 (address 0x94)
@@ -41,7 +43,8 @@ string ic7300::send_command(unsigned char command, string sub_command, string da
 		if (raw_data.substr(0, 2) != "FE") {
 			// If this is the first warning
 			if (!given_warning_) {
-				fl_alert("Response not from IC-7300: %s", raw_data.c_str());
+				snprintf(mess, 256,"RIG: Response not from IC-7300: %s", raw_data.c_str());
+				message(ST_WARNING, mess);
 				given_warning_ = true;
 			}
 			ok = false;
@@ -52,7 +55,8 @@ string ic7300::send_command(unsigned char command, string sub_command, string da
 		if (response.length() == 0) {
 			// TRansceiver has not responded at all
 			if (!given_warning_) {
-				fl_alert("Receieved no response from transceiver\nCMD = %s", to_send.c_str());
+				snprintf(mess, 256, "RIG: Receieved no response from transceiver\nCMD = %s", to_send.c_str());
+				message(ST_WARNING, mess);
 				given_warning_ = true;
 			}
 			ok = false;
@@ -66,7 +70,8 @@ string ic7300::send_command(unsigned char command, string sub_command, string da
 				if (response.length() == 6 && response[4] > '\xf0') {
 					if (response[4] == '\xfa') {
 						// Got NAK response from transceiver
-						fl_alert("Received a NAK response from transceiver\nCMD = %s", to_send.c_str());
+						snprintf(mess, 256, "RIG: Received a NAK response from transceiver\nCMD = %s", to_send.c_str());
+						message(ST_ERROR, mess);
 						ok = false;
 						return "";
 					}
@@ -82,7 +87,7 @@ string ic7300::send_command(unsigned char command, string sub_command, string da
 			}
 			else {
 				// Currently do not support the case where the rig is configured not to reflect command?
-				fl_alert("Unexpected response: %s\n%s\nCMD = %s", response.c_str(), string_to_hex(response).c_str(), to_send.c_str());
+				snprintf(mess, 256, "RIG: Unexpected response: %s\n%s\nCMD = %s", response.c_str(), string_to_hex(response).c_str(), to_send.c_str());
 				return response;
 			}
 		}
@@ -91,4 +96,8 @@ string ic7300::send_command(unsigned char command, string sub_command, string da
 		ok = false;
 		return "NO RIG";
 	}
+}
+
+void ic7300::callback(void (*mess_func)(status_t, const char*)) {
+	message = mess_func;
 }

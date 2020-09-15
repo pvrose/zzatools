@@ -70,6 +70,8 @@ namespace zzalog {
 		bool auto_empty_[AUTO_COUNT];
 		// callback data for the auto-import browse buttons
 		browser_data_t auto_data_[AUTO_COUNT];
+		// Timestamps for files - not editable here
+		string auto_ts_[AUTO_COUNT];
 		// callback data for the TQSL executable browse button
 		browser_data_t tqsl_data_;
 		// callback data for the eQSL card directory browse button

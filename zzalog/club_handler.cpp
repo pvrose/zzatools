@@ -76,6 +76,7 @@ bool club_handler::upload_log(book* book) {
 		return ok;
 	}
 	else {
+		fl_cursor(FL_CURSOR_DEFAULT);
 		status_->misc_status(ST_WARNING, "CLUBLOG: No data to upload!");
 		return false;
 	}

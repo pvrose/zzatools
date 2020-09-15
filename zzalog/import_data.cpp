@@ -50,8 +50,8 @@ import_data::import_data() :
 	update_is_new_ = false;
 	update_mode_ = NONE;
 	number_to_import_ = 0;
-	number_updated_ = 0;
-	number_accepted_ = 0;
+	number_modified_ = 0;
+	number_matched_ = 0;
 	number_checked_ = 0;
 	number_added_ = 0;
 	number_rejected_ = 0;
@@ -195,8 +195,8 @@ void import_data::auto_update() {
 		status_->misc_status(ST_NOTE, "IMPORT: merging data");
 		status_->progress(size(), book_type_, "records");
 		number_checked_ = 0;
-		number_accepted_ = 0;
-		number_updated_ = 0;
+		number_matched_ = 0;
+		number_modified_ = 0;
 		number_added_ = 0;
 		number_rejected_ = 0;
 		number_clublog_ = 0;
@@ -249,7 +249,7 @@ void import_data::merge_update() {
 	book_->selection(-1, hint);
 	// Delete the record from this book
 	discard_update(false);
-	number_accepted_++;
+	number_matched_++;
 }
 
 // Add the update record to the log - called by record_form
@@ -379,12 +379,12 @@ void import_data::update_book() {
 								record->item("BAND").c_str(), record->item("MODE").c_str());
 							status_->misc_status(ST_LOG, message);
 							is_updated = true;
-							number_updated_++;
+							number_modified_++;
 							if (record->item("CLUBLOG_QSO_UPLOAD_STATUS") == "M") {
 								number_clublog_++;
 							}
 						}
-						number_accepted_++;
+						number_matched_++;
 						// For eQSL.cc request the eQSL e-card. These are queued not to overwhelm eQSL.cc
 						if (update_mode_ == EQSL_UPDATE) {
 							eqsl_handler_->enqueue_request(test_record);
@@ -415,9 +415,9 @@ void import_data::update_book() {
 						found_match = true;
 						if (record->merge_records(import_record, update_mode_ == LOTW_UPDATE)) {
 							is_updated = true;
-							number_updated_++;
+							number_modified_++;
 						}
-						number_accepted_++;
+						number_matched_++;
 						// Fetch e-card from eQSL.cc
 						if (update_mode_ == EQSL_UPDATE) {
 							eqsl_handler_->enqueue_request(test_record);
@@ -449,8 +449,7 @@ void import_data::update_book() {
 					is_updated = true;
 					found_match = true;
 					matched_record_num = offset;
-					number_updated_++;
-					number_accepted_++;
+					number_added_++;
 					had_swl_match = false;
 				}
 				// Unexpected new record (update from log) - set flags to display new record - 
@@ -544,8 +543,8 @@ void import_data::finish_update(bool merged /*= true*/) {
 	if (merged && size() == 0) {
 		char message[256];
 		if (update_mode_ == LOTW_UPDATE) {
-			sprintf(message, "IMPORT: LOTW %d records read, %d checked, %d updated, %d accepted, %d added, %d rejected, %d changed ClubLog",
-				number_to_import_, number_checked_, number_updated_, number_accepted_, number_added_, number_rejected_, number_clublog_);
+			sprintf(message, "IMPORT: LOTW %d records read, %d checked, %d modified, %d matched, %d added, %d rejected, %d changed ClubLog",
+				number_to_import_, number_checked_, number_modified_, number_matched_, number_added_, number_rejected_, number_clublog_);
 		}
 		else {
 			string source;
@@ -563,12 +562,12 @@ void import_data::finish_update(bool merged /*= true*/) {
 				source = "UDP";
 				break;
 			}
-			sprintf(message, "IMPORT: %s %d records read, %d checked, %d updated, %d accepted, %d added, %d rejected",
-				source.c_str(), number_to_import_, number_checked_, number_updated_, number_accepted_, number_added_, number_rejected_);
+			sprintf(message, "IMPORT: %s %d records read, %d checked, %d modified, %d matched, %d added, %d rejected",
+				source.c_str(), number_to_import_, number_checked_, number_modified_, number_matched_, number_added_, number_rejected_);
 		}
 		status_->misc_status(ST_OK, message);
 		status_->progress(size(), book_type_);
-		if (number_updated_ || number_added_) {
+		if (number_modified_ || number_added_) {
 			book_->selection(book_->size() - 1, HT_ALL);
 		}
 		else {
@@ -612,7 +611,7 @@ void import_data::finish_update(bool merged /*= true*/) {
 	book_->enable_save(true);
 	close_pending_ = false;
 	update_mode_ = NONE;
-	number_updated_ = 0;
+	number_modified_ = 0;
 }
 
 // Where an update has come from a QSL server, some ADIF fields are renamed to the viewpoiint of this 
@@ -809,8 +808,8 @@ void import_data::merge_data() {
 	status_->progress(size(), book_type_, "records");
 	// Reset counts
 	number_to_import_ = size();
-	number_accepted_ = 0;
-	number_updated_ = 0;
+	number_matched_ = 0;
+	number_modified_ = 0;
 	number_checked_ = 0;
 	number_added_ = 0;
 	number_rejected_ = 0;

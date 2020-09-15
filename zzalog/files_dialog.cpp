@@ -81,6 +81,9 @@ void files_dialog::load_values() {
 		file_settings.get("Empty On Read", temp_bool, false);
 		auto_empty_[i] = temp_bool;
 		enable_auto_[i] = true;
+		file_settings.get("Timestamp", temp_string, "20190601000000");
+		auto_ts_[i] = temp_string;
+		free(temp_string);
 	}
 	// If less files than the default dialog provision, add default data
 	for (int i = num_files; i < AUTO_COUNT; i++) {
@@ -482,10 +485,10 @@ void files_dialog::create_form(int X, int Y) {
 // save values to the settings
 void files_dialog::save_values() {
 	Fl_Preferences rtu_settings(settings_, "Real Time Update");
-	Fl_Preferences files_settings(rtu_settings, "Files");
 	// Clean up first
-	files_settings.clear();
+	rtu_settings.clear();
 	// Auto Import files
+	Fl_Preferences files_settings(rtu_settings, "Files");
 	int file_ix = 0;
 	// For all the possible auto-import data
 	for (int i = 0; i < AUTO_COUNT; i++) {
@@ -494,6 +497,7 @@ void files_dialog::save_values() {
 			Fl_Preferences file_settings(files_settings, auto_src_[i].c_str());
 			file_settings.set("Filename", auto_file_[i].c_str());
 			file_settings.set("Empty On Read", auto_empty_[i]);
+			file_settings.set("Timestamp", auto_ts_[i].c_str());
 			file_ix++;
 		}
 	}

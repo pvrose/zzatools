@@ -80,7 +80,9 @@ void spec_tree::populate_tree(bool activate) {
 	Fl_Tree_Item* root_item = new Fl_Tree_Item(this);
 	root(root_item);
 	root_item->labelfont(item_labelfont() | FL_BOLD);
-	root_label("Specifications");
+	char spec_label[128];
+	snprintf(spec_label, 128, "Specifications: version %s", spec_data_->adif_version().c_str());
+	root_label(spec_label);
 	// Special treatment for PAS, SAS and SUBMODE
 	pas_item_ = add("Primary_Administrative_Subdivision");
 	pas_item_->labelfont(item_labelfont() | FL_BOLD);

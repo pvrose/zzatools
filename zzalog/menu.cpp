@@ -1094,15 +1094,14 @@ void menu::cb_mi_download(Fl_Widget* w, void* v) {
 
 // Import->WSJT-X - start the WSJT-X listener for logging datagrams
 void menu::cb_mi_imp_wsjtx(Fl_Widget* w, void* v) {
+	if (!wsjtx_handler_) {
+		// Create new listener
+		wsjtx_handler_ = new wsjtx_handler;
+	}
 	if (wsjtx_handler_ && !wsjtx_handler_->has_server()) {
 		// Restart wsjt-x listener
 		wsjtx_handler_->run_server();
 	}
-	else if (!wsjtx_handler_) {
-		// Create new listener
-		wsjtx_handler_ = new wsjtx_handler;
-	}
-	// else a valid wsjt-x listener is running
 }
 
 

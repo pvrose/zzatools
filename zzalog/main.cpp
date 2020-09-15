@@ -354,16 +354,21 @@ void add_data() {
 void add_book(char* arg) {
 	if (!closing_) {
 		// Check this is a new session
-		void* p_last = &session_start_;
+		void* p_last = new time_t;
+		*(time_t*)p_last = session_start_;
 		time_t today = time(nullptr);
-		settings_->get("Session End", p_last, (const void*)&p_last, sizeof(time_t));
+		settings_->get("Session End", p_last, p_last, sizeof(time_t));
+		session_start_ = *(time_t*)p_last;
 		if (difftime(today, session_start_) > 3600.0) {
 			// It is > 60 minutes since we last saved a record - new session
 			session_start_ = today;
 			status_->misc_status(ST_NOTE, "ZZALOG: Starting new session");
 		}
 		else {
-			status_->misc_status(ST_NOTE, "ZZALOG: Less than 30 minutes since last session - resuming");
+			// Restore previous session's start time
+			settings_->get("Session Start", p_last, p_last, sizeof(time_t));
+			session_start_ = *(time_t*)p_last;
+			status_->misc_status(ST_NOTE, "ZZALOG: Less than 60 minutes since last session - resuming");
 		}
 		// Create the book options and set them in the forms
 		book_ = new book;
@@ -546,6 +551,7 @@ void add_rig_if() {
 						ic7300_table* mem_table = (ic7300_table*)(tabbed_forms_->get_view(OT_MEMORY));
 						if (rig_if_ && rig_if_->rig_name() == "IC-7300") {
 							ic7300_ = new ic7300;
+							ic7300_->callback(cb_error_message);
 							rig_if_->update_clock();
 							mem_table->type(mem_table->type());
 						}
@@ -793,6 +799,15 @@ void print_args(int argc, char** argv) {
 	status_->misc_status(ST_LOG, message);
 }
 
+// Save session time - flush settings
+void save_session_details() {
+	time_t today = time(nullptr);
+	void* p_today = &today;
+	settings_->set("Session End", p_today, sizeof(time_t));
+	settings_->set("Session Start", (void*)&session_start_, sizeof(time_t));
+	settings_->flush();
+}
+
 // The main app entry point
 int main(int argc, char** argv)
 {
@@ -830,20 +845,21 @@ int main(int argc, char** argv)
 	add_scratchpad();
 	// Add DxAtlas interface
 	add_dxatlas();
-	// enable menu
 	int code = 0;
 	// We are now initialised
 	initialised_ = true;
 	if (!closing_) {
 		// Only do this if we haven't tried to close
-		menu_->enable(true);
-		menu_->redraw();
 		// Start WSJT-X server
 		wsjtx_handler_->run_server();
 //		fllog_emul_->run_server();
+		// enable menu
+		menu_->enable(true);
+		menu_->redraw();
 		// Run the application until it is closed
 		code = Fl::run();
 	}
+	save_session_details();
 	// Delete everything we've created
 	tidy();
 	return code;

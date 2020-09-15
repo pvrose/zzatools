@@ -2,6 +2,7 @@
 #include "status.h"
 #include "version.h"
 #include "import_data.h"
+#include "menu.h"
 #include "../zzalib/utils.h"
 
 #include <stdio.h>
@@ -19,6 +20,7 @@ using namespace zzalib;
 extern status* status_;
 extern import_data* import_data_;
 extern void cb_error_message(status_t level, const char* message);
+extern menu* menu_;
 
 wsjtx_handler* wsjtx_handler::that_ = nullptr;
 
@@ -115,6 +117,7 @@ int wsjtx_handler::send_hbeat() {
 int wsjtx_handler::handle_close(stringstream& ss) {
 	status_->misc_status(ST_NOTE, "WSJT-X: Received Close");
 	server_->close_server();
+	menu_->update_items();
 	return 1;
 }
 
@@ -304,13 +307,14 @@ bool wsjtx_handler::has_server() {
 }
 
 void wsjtx_handler::run_server() {
-	if (server_) {
-		server_->run_server();
-	}
-	else {
+	if (!server_) {
 		server_ = new socket_server(socket_server::UDP, 2237);
 		server_->callback(rcv_request, cb_error_message);
 	}
+	if (!server_->has_server()) {
+		server_->run_server();
+	}
+	menu_->update_items();
 }
 
 void wsjtx_handler::close_server() {

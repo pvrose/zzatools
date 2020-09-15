@@ -1,6 +1,8 @@
 #ifndef __IC7300__
 #define __IC7300__
 
+#include "utils.h"
+
 #include <string>
 
 using namespace std;
@@ -16,10 +18,12 @@ namespace zzalib {
 		// Send command
 		string send_command(unsigned char command, string sub_command, bool& ok);
 		string send_command(unsigned char command, string sub_command, string data, bool& ok);
+		void callback(void(*mess_func)(status_t, const char*));
 
 	protected:
 		// Flag to prevent multiple warnings
 		bool given_warning_;
+		void (*message)(status_t, const char*);
 
 	};
 

@@ -94,17 +94,18 @@ namespace zzalog {
 		update_mode_t update_mode_;
 		// Number of records in import
 		int number_to_import_;
-		// The number of records in an import update
-		int number_updated_;
-		// The number of records that have been accepted in an import update
-		int number_accepted_;
+		// The number of records that have been modified as a result of inport
+		int number_modified_;
+		// The number of records that matched in an import update
+		int number_matched_;
 		// The number of records checked
 		int number_checked_;
-		// The number of ew records added
+		// The number of new records added
 		int number_added_;
 		// The number of rejected
 		int number_rejected_;
-		// The number of records with clublog modified
+		// The number of records with clublog data modified
+		// as a result of LotW QSL information update
 		int number_clublog_;
 		// Number of filed being imported 
 		int num_update_files_;
