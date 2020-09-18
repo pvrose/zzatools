@@ -670,7 +670,7 @@ HRESULT dxa_if::cb_map_clicked(float latitude, float longitude) {
 	}
 	if (!num_found) {
 		// Do nothing except update status
-		status_->misc_status(ST_ERROR, "DXATLAS: No stations found");
+		status_->misc_status(ST_WARNING, "DXATLAS: No stations found");
 	}
 	else {
 		// Send how many found to the status
@@ -1611,6 +1611,9 @@ void dxa_if::draw_pins() {
 					status_->misc_status(ST_LOG, message);
 				}
 				status_->progress("Not all records displayed", OT_DXATLAS);
+			}
+			else {
+				status_->progress("No records to display", OT_DXATLAS);
 			}
 		}
 		catch (exception& /*e*/) {

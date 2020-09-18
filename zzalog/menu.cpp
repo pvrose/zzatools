@@ -553,7 +553,8 @@ void menu::cb_mi_nav_date(Fl_Widget* w, void* v) {
 	cal->value(date.c_str());
 	cal->callback(calendar::cb_cal_close, &cb_data);
 	cal->show();
-	while (cal->active()) Fl::wait();
+	Fl_Widget_Tracker wt(cal);
+	while (wt.exists()) Fl::wait();
 	// now fiind the selected date
 	if (navigation_book_ != nullptr) {
 		navigation_book_->go_date(date);

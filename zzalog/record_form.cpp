@@ -697,8 +697,16 @@ void record_form::cb_bn_use(Fl_Widget* w, void* v) {
 			that->my_book_->modified_record(true);
 		}
 		if (field == "QSO_DATE" || field == "TIME_ON") {
-			// Tell the book the ordering of records has changed. Book will then let all views know.
-			book_->selection(that->my_book_->record_number(that->item_num_1_), HT_START_CHANGED);
+		// This will result in a whole-scale redraw
+		// so only update views if not in the middle of a query
+			switch (that->use_mode_) {
+			case UM_DISPLAY:
+			case UM_QSO:
+			case UM_MODIFIED:
+				// Tell the book the ordering of records has changed. Book will then let all views know.
+				book_->selection(that->my_book_->record_number(that->item_num_1_), HT_START_CHANGED);
+				break;
+			}
 		}
 		else if (field == "DXCC" || field == "GRIDSQUARE") {
 			// Loction has changed - DxAtlas needs to redraw.

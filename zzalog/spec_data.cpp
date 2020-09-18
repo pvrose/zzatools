@@ -96,6 +96,7 @@ string spec_data::get_path(bool force) {
 		//	"Select reference file directory");
 		Fl_Native_File_Chooser* chooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_DIRECTORY);
 		chooser->directory(dirname);
+		chooser->title("Select reference file directory");
 		while (chooser->show()) {}
 		directory_name = chooser->filename();
 		delete chooser;
@@ -1090,8 +1091,8 @@ error_t spec_data::check_datatype(const string&  data, const string&  field, con
 	if (is_enumeration) {
 		// Check in enumeration database - note for subdivisions the database is ....[DXCC]
 		string enumeration_name;
-		if (datatype == "Primary_Administrative_Subdivision" ||
-			datatype == "Secondary_Administrative_Subdivision") {
+		size_t pos_dxcc = datatype.find("[DXCC]");
+		if (pos_dxcc != string::npos) {
 			string dxcc_code_field;
 			if (field == "STATE" || field == "CNTY") {
 				dxcc_code_field = "DXCC";
@@ -1103,8 +1104,9 @@ error_t spec_data::check_datatype(const string&  data, const string&  field, con
 				// datatype is a subdivision which is only allowed for STATE etc.
 				return VE_FIELD_UNSUPPORTED;
 			}
-			// Postpend DXCC code to enumertion name
-			enumeration_name = datatype + "[" + record_->item(dxcc_code_field) + "]";
+			// Replace "DXCC" with its value
+			enumeration_name = datatype;
+			enumeration_name.replace(pos_dxcc + 1, 4, record_->item(dxcc_code_field));
 		}
 		else {
 			enumeration_name = datatype;
@@ -1478,6 +1480,7 @@ void spec_data::handle_error(error_t error_code, const string&  data, const stri
 		// Get the validate settings
 		Fl_Preferences adif_settings(settings_, "ADIF");
 		Fl_Preferences validate_settings(adif_settings, "Validate");
+		status_t status = ST_ERROR;
 		// Implement
 		// Report errors and try to correct, default to ask the user if not able to.
 		report_error(error_code, display_item, datatype, field);
@@ -1486,13 +1489,18 @@ void spec_data::handle_error(error_t error_code, const string&  data, const stri
 				error_code != VE_VALUE_INTL && ask_correction(field)) {
 				record_corrected_ = true;
 				field_corrected_ = true;
+				status = ST_NOTE;
+			}
+			else if (error_code == VE_VALUE_INTL) {
+				status = ST_WARNING;
 			}
 		}
 		else {
 			record_corrected_ = true;
 			field_corrected_ = true;
+			status = ST_NOTE;
 		}
-		report_correction(field, display_item);
+		report_correction(field, display_item, status);
 	}
 }
 
@@ -1972,11 +1980,10 @@ bool spec_data::ask_correction(const string& field)
 }
 
 // Report correction
-void spec_data::report_correction(const string&  field, const string&  data)
+void spec_data::report_correction(const string&  field, const string&  data, status_t status)
 {
 	if (correction_message_.length() != 0) {
 		// Build report text and write it to report
-		status_t status = field_corrected_ ? ST_NOTE : ST_ERROR;
 		status_->misc_status(status, ("VALIDATE: " + report_timestamp(field, data) + correction_message_).c_str());
 	}
 

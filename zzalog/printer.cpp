@@ -336,6 +336,12 @@ int printer::print_cards() {
 	}
 	else {
 		status_->misc_status(ST_OK, "PRINTER: Done!");
+		// Set QSL_SENT to Q to indicate it has been printed
+		for (auto it = navigation_book_->begin(); it != navigation_book_->end(); it++) {
+			char message[128];
+			snprintf(message, 128, "PRINTER: Setting %s %s QSL_SENT to Q", (*it)->item("QSO_DATE").c_str(), (*it)->item("CALL").c_str());
+			(*it)->item("QSL_SENT", string("Q"));
+		}
 	}
 	return error;
 }

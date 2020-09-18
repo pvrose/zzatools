@@ -432,7 +432,7 @@ void extract_data::extract_qsl(extract_data::extract_mode_t server) {
 			/*string pattern;*/ "Y"
 		};
 		criteria(new_criteria, server);
-		sort_records("CALL", false);
+		sort_records("DXCC", false);
 		tabbed_forms_->update_views(nullptr, HT_RESET_ORDER, 0);
 
 	}

@@ -199,7 +199,7 @@ namespace zzalog {
 		// User-correct error 
 		bool ask_correction(const string& field);
 		// Report correction
-		void report_correction(const string&  field, const string&  data);
+		void report_correction(const string&  field, const string&  data, status_t status);
 		// Remove CR and LF characters
 		string convert_ml_string(const string& data);
 		// Generate report timestamp and fault
