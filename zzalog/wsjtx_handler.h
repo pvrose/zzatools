@@ -87,6 +87,10 @@ namespace zzalog {
 		uint32_t last_decode_time_;
 		// Number decodes received
 		unsigned int decodes_rcvd_;
+		// New heartbeat received
+		bool new_heartbeat_;
+		// Number status received
+		unsigned int status_rcvd_;
 	};
 
 }

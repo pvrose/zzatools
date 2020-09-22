@@ -38,6 +38,7 @@ extern book* navigation_book_;
 extern status* status_;
 extern tabbed_forms* tabbed_forms_;
 extern spec_data* spec_data_;
+extern time_t session_start_;
 
 // Constructor
 dxa_if::dxa_if() :
@@ -201,6 +202,7 @@ void dxa_if::create_form() {
 	ch11->add("QSOs on recent days");
 	ch11->add("Recent QSOs");
 	ch11->add("Year to date");
+	ch11->add("This session");
 	ch11->value((int)qso_display_);
 	ch11->tooltip("Select which QSOs to display");
 	// Input - Number of days or QSOs
@@ -1240,6 +1242,12 @@ void dxa_if::get_records() {
 			}
 		}
 		break;
+	case AQ_SESSION:
+		if (book_->size()) {
+			for (size_t i = book_->size() - 1; book_->get_record(i, false)->timestamp() >= session_start_; i--) {
+				record_nums.insert(i);
+			}
+		}
 	}
 
 	// now see if QSOs, DXCCs or zones
@@ -1612,7 +1620,7 @@ void dxa_if::draw_pins() {
 				}
 				status_->progress("Not all records displayed", OT_DXATLAS);
 			}
-			else {
+			else if (count == 0) {
 				status_->progress("No records to display", OT_DXATLAS);
 			}
 		}

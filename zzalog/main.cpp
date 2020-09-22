@@ -350,26 +350,36 @@ void add_data() {
 	}
 }
 
+// Get session start from the current time or previous session start if that is within 1 hour
+void set_session_start() {
+	// Check this is a new session
+	void* p_last = new time_t;
+	*(time_t*)p_last = session_start_;
+	time_t today = time(nullptr);
+	settings_->get("Session End", p_last, p_last, sizeof(time_t));
+	session_start_ = *(time_t*)p_last;
+	char action[100];
+	if (difftime(today, session_start_) > 3600.0) {
+		// It is > 60 minutes since we last saved a record - new session
+		session_start_ = today;
+		strcpy(action, "Starting new session");
+	}
+	else {
+		// Restore previous session's start time
+		settings_->get("Session Start", p_last, p_last, sizeof(time_t));
+		session_start_ = *(time_t*)p_last;
+		strcpy(action, "Resuming session");
+	}
+	char stime[100];
+	tm* start_time = gmtime(&session_start_);
+	strftime(stime, 100, "%Y%m%d %H%M%S", start_time);
+	char message[256];
+	snprintf(message, 256, "ZZALOG: %s %s", action, stime);
+}
+
 // read in the log data
 void add_book(char* arg) {
 	if (!closing_) {
-		// Check this is a new session
-		void* p_last = new time_t;
-		*(time_t*)p_last = session_start_;
-		time_t today = time(nullptr);
-		settings_->get("Session End", p_last, p_last, sizeof(time_t));
-		session_start_ = *(time_t*)p_last;
-		if (difftime(today, session_start_) > 3600.0) {
-			// It is > 60 minutes since we last saved a record - new session
-			session_start_ = today;
-			status_->misc_status(ST_NOTE, "ZZALOG: Starting new session");
-		}
-		else {
-			// Restore previous session's start time
-			settings_->get("Session Start", p_last, p_last, sizeof(time_t));
-			session_start_ = *(time_t*)p_last;
-			status_->misc_status(ST_NOTE, "ZZALOG: Less than 60 minutes since last session - resuming");
-		}
 		// Create the book options and set them in the forms
 		book_ = new book;
 		navigation_book_ = book_;
@@ -832,6 +842,8 @@ int main(int argc, char** argv)
 	main_window_->show(argc, argv);
 	// Read in reference data - uses progress
 	add_data();
+	// Set the session start time (one of this or previous start time)
+	set_session_start();
 	// Read in log book data - uses progress - use supplied argument for filename
 	add_book(argc == 1 ? nullptr : argv[argc - 1]);
 	// Connect to the rig

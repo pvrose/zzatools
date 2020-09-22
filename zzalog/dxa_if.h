@@ -44,7 +44,8 @@ namespace zzalog {
 			AQ_SEARCH,     // Display extracted records
 			AQ_DAYS,       // Display most recent days
 			AQ_QSOS,       // Display most recent QSOs
-			AQ_YEAR        // Year to date
+			AQ_YEAR,       // Year to date
+			AQ_SESSION     // This session
 		};
 		// DX Atlas - Colour selection radio button
 		enum colour_bn_t {

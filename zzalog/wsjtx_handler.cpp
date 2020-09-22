@@ -32,6 +32,7 @@ wsjtx_handler::wsjtx_handler()
 	server_ = nullptr;
 	run_server();
 	last_decode_time_ = 0;
+	new_heartbeat_ = false;
 }
 
 
@@ -89,6 +90,7 @@ int wsjtx_handler::handle_default(stringstream& ss, uint32_t type) {
 // 
 int wsjtx_handler::handle_hbeat(stringstream& ss) {
 	status_->misc_status(ST_LOG, "WSJT-X: Received heartbeat");
+	new_heartbeat_ = true;
 	send_hbeat();
 	return 0;
 }
@@ -148,7 +150,7 @@ int wsjtx_handler::handle_decode(stringstream& ss) {
 	uint32_t iv = get_uint32(ss);
 	if (iv != last_decode_time_) {
 		char message[128];
-		snprintf(message, 128, "WSJT-X: Received %d decodes in %08x.", decodes_rcvd_, last_decode_time_);
+		snprintf(message, 128, "WSJT-X: Received %d decodes at time %d.", decodes_rcvd_, last_decode_time_);
 		status_->misc_status(ST_LOG, message);
 		last_decode_time_ = iv;
 		decodes_rcvd_ = 1;
@@ -168,7 +170,15 @@ int wsjtx_handler::handle_decode(stringstream& ss) {
 
 // handle status
 int wsjtx_handler::handle_status(stringstream& ss) {
-	status_->misc_status(ST_LOG, "WSJT-X: Received status datagram");
+	if (new_heartbeat_) {
+		char message[128];
+		snprintf(message, 128, "WSJT-X: Received %d status reports in last heartbeat", status_rcvd_);
+		status_rcvd_ = 1;
+		new_heartbeat_ = false;
+	}
+	else {
+		status_rcvd_++;
+	}
 	string id;
 	// ID
 	id = get_utf8(ss);
