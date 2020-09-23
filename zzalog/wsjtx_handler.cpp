@@ -33,6 +33,7 @@ wsjtx_handler::wsjtx_handler()
 	run_server();
 	last_decode_time_ = 0;
 	new_heartbeat_ = false;
+	status_rcvd_ = 0;
 }
 
 
@@ -173,6 +174,7 @@ int wsjtx_handler::handle_status(stringstream& ss) {
 	if (new_heartbeat_) {
 		char message[128];
 		snprintf(message, 128, "WSJT-X: Received %d status reports in last heartbeat", status_rcvd_);
+		status_->misc_status(ST_LOG, message);
 		status_rcvd_ = 1;
 		new_heartbeat_ = false;
 	}
