@@ -429,7 +429,7 @@ void status::misc_status(status_t status, const char* label) {
 		if (report_file_) {
 			// File did open correctly
 			// Start each entry with a timestamp
-			string timestamp = now(true, "%Y/%m/%d %H:%M:%S");
+			string timestamp = now(false, "%Y/%m/%d %H:%M:%S");
 			char* message = new char[timestamp.length() + 10 + strlen(label)];
 			// X YYYY/MM/DD HH:MM:SS Message 
 			// X is a single letter indicating the message severity

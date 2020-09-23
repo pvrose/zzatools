@@ -150,8 +150,13 @@ int wsjtx_handler::handle_decode(stringstream& ss) {
 	bool bv = get_bool(ss);
 	uint32_t iv = get_uint32(ss);
 	if (iv != last_decode_time_) {
+		double seconds = iv / 1000.0;
+		unsigned int minutes = seconds / 60;
+		seconds = seconds - (minutes * 60.0);
+		unsigned hours = minutes / 60;
+		minutes = minutes - (hours * 60);
 		char message[128];
-		snprintf(message, 128, "WSJT-X: Received %d decodes at time %d.", decodes_rcvd_, last_decode_time_);
+		snprintf(message, 128, "WSJT-X: Received %d decodes at time %d:%d:%g.", decodes_rcvd_, hours, minutes, seconds);
 		status_->misc_status(ST_LOG, message);
 		last_decode_time_ = iv;
 		decodes_rcvd_ = 1;
