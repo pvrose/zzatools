@@ -864,7 +864,7 @@ int main(int argc, char** argv)
 		// Only do this if we haven't tried to close
 		// Start WSJT-X server
 		wsjtx_handler_->run_server();
-//		fllog_emul_->run_server();
+		//fllog_emul_->run_server();
 		// enable menu
 		menu_->enable(true);
 		menu_->redraw();

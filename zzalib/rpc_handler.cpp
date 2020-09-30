@@ -82,6 +82,7 @@ bool rpc_handler::generate_request(
 ) {
 	// The XML writer to generate XML
 	xml_writer* writer = new xml_writer;
+	writer->indent(xml_writer::INDENT, 1);
 
 	// Start writing XML - 
 	bool xml_ok = writer->process_instr("xml", "version = \"1.0\"");
@@ -725,6 +726,7 @@ int rpc_handler::handle_request(stringstream& ss) {
 		decode_request(payload, method_name, &params);
 		// Get response
 		int error = action_request(method_name, params, response);
+		if (error) return 1;
 		// Convert to XML
 		stringstream xml;
 		generate_response(error, &response, xml);
@@ -796,14 +798,13 @@ bool rpc_handler::add_header(http_code code, stringstream& payload, stringstream
 		resp << "HTTP/1.1 " << code << " OK\r\n";
 		resp << "Date: " << now(false, "%a %d %b %Y %X GMT") << "\r\n";
 		resp << "Server: ZZALIB " << LIBRARY_VERSION << "\r\n";
-		resp << "Connection: close\r\n";
 		resp << "Content-Type: text/xml\r\n";
 		resp << "Content-Length: " << len_pl << "\r\n";
 		resp << "\r\n";
 		while (payload.good()) {
 			string line;
 			getline(payload, line);
- 			resp << line << "\r";
+ 			resp << line << "\n";
 		}
 		break;
 	case BAD_REQUEST:

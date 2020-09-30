@@ -154,10 +154,15 @@ int socket_server::create_server() {
 			status(ST_OK, message);
 		}
 
-		client_ = INVALID_SOCKET;
-		if (accept_client()) {
-			return 1;
-		}
+		//// Now wait until we see a client
+		//client_ = INVALID_SOCKET;
+		//int result = 2;
+		//while (client_ == INVALID_SOCKET && result == 2) {
+		//	result = accept_client();
+		//}
+		//if (result == 1) {
+		//	return 1;
+		//}
 
 		// Make the client non-blocking as well
 #ifdef _WIN32
@@ -186,11 +191,10 @@ int socket_server::accept_client() {
 	client_ = accept(server_, (SOCKADDR*)&client_addr_, &len_client_addr);
 	if (client_ == INVALID_SOCKET) {
 		if (WSAGetLastError() == WSAEWOULDBLOCK) {
-			status(ST_LOG, "SOCKET: No client socket to accept");
+			//status(ST_LOG, "SOCKET: No client socket to accept");
 			// Non-blocking accept would have blocked - let other events get handled and try again
 			Fl::wait();
-			Fl::add_timeout(0.1, cb_timer_acc, this);
-			return 0;
+			return 2;
 		}
 		else {
 			handle_error("Unable to accept connection");
@@ -215,6 +219,18 @@ int socket_server::rcv_packet() {
 	FD_ZERO(&set_sockets);
 	FD_SET(server_, &set_sockets);
 
+	// Now wait until we see a client
+	if (protocol_ == HTTP) {
+		client_ = INVALID_SOCKET;
+		int result = 2;
+		while (client_ == INVALID_SOCKET && result == 2) {
+			result = accept_client();
+		}
+		if (result == 1) {
+			return 1;
+		}
+	}
+
 	bool packet_complete = false;
 	stringstream ss;
 	int payload_size = 0;
@@ -232,6 +248,9 @@ int socket_server::rcv_packet() {
 		break;
 	}
 	if (bytes_rcvd > 0) {
+#ifdef _DEBUG
+		dump(string(buffer, buffer_len));
+#endif
 		string s(buffer, bytes_rcvd);
 		ss << s;
 		do_request(ss);
