@@ -74,6 +74,8 @@ namespace zzalog {
 		int number_update_files();
 		// Load from a data stream
 		void load_stream(stringstream& adif, update_mode_t mode);
+		// Import process is auto-update or timer set for one
+		bool is_auto_update();
 
 	protected:
 		// repeat the auto-import timer

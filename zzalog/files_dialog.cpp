@@ -16,6 +16,7 @@ using namespace zzalog;
 using namespace zzalib;
 
 extern Fl_Preferences* settings_;
+extern import_data* import_data_;
 
 // Constructor
 files_dialog::files_dialog(int X, int Y, int W, int H, const char* label) :
@@ -485,10 +486,10 @@ void files_dialog::create_form(int X, int Y) {
 // save values to the settings
 void files_dialog::save_values() {
 	Fl_Preferences rtu_settings(settings_, "Real Time Update");
-	// Clean up first
-	rtu_settings.clear();
 	// Auto Import files
 	Fl_Preferences files_settings(rtu_settings, "Files");
+	// Delete existing files information
+	files_settings.clear();
 	int file_ix = 0;
 	// For all the possible auto-import data
 	for (int i = 0; i < AUTO_COUNT; i++) {
@@ -539,6 +540,13 @@ void files_dialog::save_values() {
 	// Clublog
 	clublog_settings.set("Unzip Command", unzipper_.c_str());
 	clublog_settings.set("Unzip Switches", unzip_switches_.c_str());
+
+	// Restart any auto-update in case the files have changed
+	if (import_data_->is_auto_update()) {
+		import_data_->stop_update(LM_IMPORTED, false);
+		while (!import_data_->update_complete()) Fl::wait();
+		import_data_->start_auto_update();
+	}
 
 }
 

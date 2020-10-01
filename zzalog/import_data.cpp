@@ -610,7 +610,10 @@ void import_data::finish_update(bool merged /*= true*/) {
 	// Allow the book to save (and save if modified)
 	book_->enable_save(true);
 	close_pending_ = false;
-	update_mode_ = NONE;
+	// repeat_auto_timer has already set mode to WAIT_AUTO
+	if (update_mode_ != WAIT_AUTO) {
+		update_mode_ = NONE;
+	}
 	number_modified_ = 0;
 }
 
@@ -850,4 +853,16 @@ void import_data::process_lotw_header() {
 // Number of update files
 int import_data::number_update_files() {
 	return num_update_files_;
+}
+
+// Current process is either auto-update or timer set to start one
+bool import_data::is_auto_update() {
+	switch (update_mode_) {
+	case AUTO_IMPORT:
+	case WAIT_AUTO:
+	case READ_AUTO:
+		return true;
+	default:
+		return false;
+	}
 }
