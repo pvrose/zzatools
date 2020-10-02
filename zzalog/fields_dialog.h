@@ -36,6 +36,9 @@ namespace zzalog {
 		// get current row
 		int row();
 
+		// Protected methods
+	protected:
+
 	protected:
 		// The fields being displayed
 		vector<field_info_t>* fields_;

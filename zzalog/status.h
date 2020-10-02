@@ -183,6 +183,9 @@ namespace zzalog {
 		void append_log(bool append);
 		// Set file viewer to nullptr
 		void null_file_viewer();
+		// Get status_file_viewer
+		Fl_Window* file_viewer();
+
 		// Callbacks
 		// Clock button callback
 		static void cb_bn_clock(Fl_Widget* bn, void* v);

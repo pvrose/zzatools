@@ -41,6 +41,7 @@ main.cpp - application entry point
 #include "ic7300_table.h"
 #include "wsjtx_handler.h"
 #include "fllog_emul.h"
+#include "resource.h"
 
 // C/C++ header files
 #include <ctime>
@@ -62,6 +63,8 @@ main.cpp - application entry point
 #include <FL/Fl_Preferences.H>
 #include <FL/Fl_PNG_Image.H>
 #include <FL/fl_draw.H>
+// included to allow windows specifics to be called
+#include <FL/platform.H>
 
 using namespace std;
 using namespace zzalog;
@@ -116,6 +119,8 @@ bool closing_ = false;
 bool initialised_ = false;
 // Time loaded
 time_t session_start_  = (time_t)0;
+// Close caused by an SEVERE or FATAL error
+bool close_by_error_ = false;
 
 // This callback intercepts the close command and performs checks and tidies up
 // Updates recent files settings
@@ -234,7 +239,10 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 
 		// Hide all the open windows - this will allow Fl to close the app.
 		for (Fl_Window* w = Fl::first_window(); w; w = Fl::first_window()) w->hide();
-		status_->null_file_viewer();
+		// Leave the status file viewer visible if a severe or fatal error forced the shutdown.
+		if (close_by_error_ && status_->file_viewer()) {
+			status_->file_viewer()->show();
+		}
 
 		// Exit and close application
 		Fl_Single_Window::default_callback((Fl_Window*)w, v);
@@ -352,7 +360,7 @@ void add_data() {
 
 // Get session start from the current time or previous session start if that is within 1 hour
 void set_session_start() {
-	// Check this is a new session
+	// Check this is to be a new session
 	void* p_last = new time_t;
 	*(time_t*)p_last = session_start_;
 	time_t today = time(nullptr);
@@ -781,11 +789,16 @@ void add_icon(const char* arg0) {
 	// Find the directory the app is loaded from and add the icon filename
 	const char* last_slash = strrchr(arg0, '\\');
 	int pos = last_slash - arg0;
+	// Create a new c-string with the directory name
 	char* path = new char[pos + 16];
 	strncpy(path, arg0, pos);
-	*(path + pos) = 0;
+	*(path + pos) = '\0';
+	// And append "\zzalog.png"
 	strcat(path, "\\zzalog.png");
 	main_icon_ = new Fl_PNG_Image(path);
+	//// This is the way to get an icon compiled with VS into the icon.
+	//// However include zzalog.rc breaks Fl_ToolTip
+	//main_icon_ = LoadIcon(fl_display, MAKEINTRESOURCE(IDI_ICON1));
 #endif
 	// Use the icon as the default for all windows
 	Fl_Window::default_icon(main_icon_);
@@ -871,6 +884,7 @@ int main(int argc, char** argv)
 		// Run the application until it is closed
 		code = Fl::run();
 	}
+	// Save the start and end times of the session (not just this call)
 	save_session_details();
 	// Delete everything we've created
 	tidy();

@@ -27,9 +27,8 @@ extern void add_rig_if();
 extern Fl_Single_Window* main_window_;
 extern status* status_;
 extern bool read_only_;
-//extern void add_sub_window(Fl_Window* w);
-//extern void remove_sub_window(Fl_Window* w);
 extern scratchpad* scratchpad_;
+extern bool close_by_error_;
 
 // Constructor
 status::status(int X, int Y, int W, int H, const char* label) :
@@ -443,27 +442,36 @@ void status::misc_status(status_t status, const char* label) {
 	}
 
 	// Depending on the severity: LOG, NOTE, OK, WARNING, ERROR, SEVERE or FATAL
+	// Beep on the last three.
 	switch(status) {
 	case ST_SEVERE:
+		// Open status file viewer and update it.
+		cb_bn_misc(misc_status_, nullptr);
+		fl_beep(FL_BEEP_ERROR);
 		// A severe error - ask the user whether to continue
 		if (fl_choice("An error that resulted in reduced functionality occurred:\n%s\n\nDo you want to try to continue or quit?", "Continue", "Quit", nullptr, label, report_filename_.c_str()) == 1) {
 			// Call the exit handler
 			Fl::wait();
-			// Open status file viewer and update it.
-			cb_bn_misc(misc_status_, nullptr);
-			//remove_sub_window(status_file_viewer_->top_window());
+			// Set the flag to continue showing the file viewer after all other windows have been hidden.
+			close_by_error_ = true;
 			main_window_->do_callback();
 		}
 		break;
 	case ST_FATAL:
+		// Open status file viewer and update it. Set the flag to keep it displayed after other windows have been hidden
+		cb_bn_misc(misc_status_, nullptr);
+		fl_beep(FL_BEEP_ERROR);
 		// A fatal error - quit the application
 		fl_message("An unrecoverable error has occurred, closing down - check status log");
 		Fl::wait();
-		// Open status file viewer and update it
-		cb_bn_misc(misc_status_, nullptr);
-
+		close_by_error_ = true;
 		// Close the application down
 		main_window_->do_callback();
+		break;
+	case ST_ERROR:
+		// Override bar on updating viewer
+		cb_bn_misc(misc_status_, nullptr);
+		fl_beep(FL_BEEP_ERROR);
 		break;
 	default:
 		// Redraw status file viewer
@@ -751,8 +759,8 @@ void viewer_window::colour_buffer() {
 			}
 		}
 		else {
-			// Default style code for a line with no text (for the new line character)
-			style[cur_pos] = 'A';
+			// Default style code for a line with no text (for the new line character) - use previous line's
+			style[cur_pos] = style_code;
 		}
 		// Set position to start of next line
 		cur_pos += strlen(line) + 1;
@@ -795,4 +803,9 @@ void status::cb_fv_close(Fl_Widget* w, void* v) {
 	status* that = (status*)v;;
 	Fl::delete_widget(that->status_file_viewer_);
 	that->status_file_viewer_ = nullptr;
+}
+
+// Return the file viewer
+Fl_Window* status::file_viewer() {
+	return status_file_viewer_;
 }

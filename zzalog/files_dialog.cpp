@@ -48,6 +48,7 @@ files_dialog::files_dialog(int X, int Y, int W, int H, const char* label) :
 	status_data_ = { "", "", nullptr, nullptr, nullptr, nullptr };
 	unzipper_data_ = { "", "", nullptr, nullptr, nullptr, nullptr };
 	auto_poll_ = nan("");
+	autos_changed_ = false;
 
 	// initialise and create form
 	load_values();
@@ -228,20 +229,20 @@ void files_dialog::create_form(int X, int Y) {
 	for (int i = 0; i < AUTO_COUNT; i++) {
 		// Check box - enable this file in auto-import
 		bn_auto_en[i] = new Fl_Check_Button(X + COL1, Y + *ROW1[i], WRADIO, HBUTTON);
-		bn_auto_en[i]->callback(cb_value<Fl_Check_Button, bool>, &(enable_auto_[i]));
+		bn_auto_en[i]->callback(cb_value_auto<Fl_Check_Button, bool>, &(enable_auto_[i]));
 		bn_auto_en[i]->when(FL_WHEN_CHANGED);
 		bn_auto_en[i]->value(enable_auto_[i]);
 		bn_auto_en[i]->tooltip("Enable this auto-import");
 		// Input - file name for auto-import
 		in_auto_file[i] = new intl_input(X + COL2, Y + *ROW1[i], WEDIT, HTEXT);
-		in_auto_file[i]->callback(cb_value<intl_input, string>, &(auto_file_[i]));
+		in_auto_file[i]->callback(cb_value_auto<intl_input, string>, &(auto_file_[i]));
 		in_auto_file[i]->when(FL_WHEN_CHANGED);
 		in_auto_file[i]->textsize(FONT_SIZE);
 		in_auto_file[i]->value(auto_file_[i].c_str());
 		in_auto_file[i]->tooltip("File name for auto-import");
 		// Input - name of application generating the auto-import
 		in_auto_src[i] = new intl_input(X + COL3, Y + *ROW1[i], WBUTTON, HTEXT);
-		in_auto_src[i]->callback(cb_value<intl_input, string>, &(auto_src_[i]));
+		in_auto_src[i]->callback(cb_value_auto<intl_input, string>, &(auto_src_[i]));
 		in_auto_src[i]->when(FL_WHEN_CHANGED);
 		in_auto_src[i]->textsize(FONT_SIZE);
 		in_auto_src[i]->value(auto_src_[i].c_str());
@@ -249,7 +250,7 @@ void files_dialog::create_form(int X, int Y) {
 		// Button - file will be cleared after auto-import
 		bn_auto_mt[i] = new Fl_Check_Button(X + COL4, Y + *ROW1[i], WRADIO, HBUTTON, "Empty");
 		bn_auto_mt[i]->align(FL_ALIGN_RIGHT);
-		bn_auto_mt[i]->callback(cb_value<Fl_Check_Button, bool>, &(auto_empty_[i]));
+		bn_auto_mt[i]->callback(cb_value_auto<Fl_Check_Button, bool>, &(auto_empty_[i]));
 		bn_auto_mt[i]->when(FL_WHEN_CHANGED);
 		bn_auto_mt[i]->labelsize(FONT_SIZE);
 		bn_auto_mt[i]->value(auto_empty_[i]);
@@ -541,15 +542,26 @@ void files_dialog::save_values() {
 	clublog_settings.set("Unzip Command", unzipper_.c_str());
 	clublog_settings.set("Unzip Switches", unzip_switches_.c_str());
 
-	// Restart any auto-update in case the files have changed
-	if (import_data_->is_auto_update()) {
+	// Restart any auto-update if any of the information may have changed
+	if (autos_changed_ && import_data_->is_auto_update()) {
 		import_data_->stop_update(LM_IMPORTED, false);
 		while (!import_data_->update_complete()) Fl::wait();
 		import_data_->start_auto_update();
+		// Clear ths flag in case "Save" not "OK" was clicked to get here
+		autos_changed_ = false;
 	}
 
 }
 
+// Method provided as needed to overload the page_dialog version
 void files_dialog::enable_widgets() {
 	// does nothing
+}
+
+// Special version of cb_value callback that also sets auto_changed_
+template<class WIDGET, class DATA>
+void files_dialog::cb_value_auto(Fl_Widget* w, void* v) {
+	cb_value<WIDGET, DATA>(w, v);
+	files_dialog* that = ancestor_view<files_dialog>(w);
+	that->autos_changed_ = true;
 }

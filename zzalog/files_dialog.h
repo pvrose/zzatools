@@ -28,6 +28,9 @@ namespace zzalog {
 		~files_dialog();
 
 	protected:
+		// Special version of cb_value to set auto_changed_
+		template <class WIDGET, class DATA>
+		static void cb_value_auto(Fl_Widget* w, void* v);
 		// Load the settings data
 		virtual void load_values();
 		// create the form
@@ -88,6 +91,8 @@ namespace zzalog {
 		browser_data_t unzipper_data_;
 		// Poll interval (in seconds) for auto-importing
 		double auto_poll_;
+		// The specification of auto-import has changed
+		bool autos_changed_;
 
 
 	};
