@@ -169,7 +169,8 @@ status::status(int X, int Y, int W, int H, const char* label) :
 status::~status()
 {
 	clear();
-	delete status_file_viewer_;
+	if (!close_by_error_) delete status_file_viewer_;
+	if (report_file_) report_file_->close();
 	for (auto it = progress_items_.begin(); it != progress_items_.end(); it++) {
 		delete (it->second);
 	}
@@ -329,14 +330,6 @@ void status::progress(int value, object_t object) {
 					// Revert to previous progress item (current top-of-stack)
 					update_progress(progress_stack_.back());
 				}
-				else {
-					// Allow viewer to be updated
-					no_update_viewer = false;
-					// Redraw status file viewer
-					if (status_file_viewer_) {
-						cb_bn_misc(misc_status_, nullptr);
-					}
-				}
 			}
 		}
 	}
@@ -401,6 +394,13 @@ void status::misc_status(status_t status, const char* label) {
 		Fl::wait();
 	}
 
+	// Start each entry with a timestamp
+	string timestamp = now(false, "%Y/%m/%d %H:%M:%S");
+	char* message = new char[timestamp.length() + 10 + strlen(label)];
+	// X YYYY/MM/DD HH:MM:SS Message 
+	// X is a single letter indicating the message severity
+	sprintf(message, "%c %s %s\n", STATUS_CODES.at(status), timestamp.c_str(), label);
+
 	if (!file_unusable_) {
 		// Append the status to the file
 		// Try to open the file. Open and close it each message
@@ -418,35 +418,32 @@ void status::misc_status(status_t status, const char* label) {
 			delete report_file_;
 			report_file_ = nullptr;
 			file_unusable_ = true;
-			char* message = new char[report_filename_.length() + 50];
-			sprintf(message, "STATUS: Failed to open status report file %s", report_filename_.c_str());
-			misc_status(ST_ERROR, message);
-			delete[] message;
+			fl_alert("STATUS: Failed to open status report file %s", report_filename_.c_str());
 		}
-
 
 		if (report_file_) {
 			// File did open correctly
-			// Start each entry with a timestamp
-			string timestamp = now(false, "%Y/%m/%d %H:%M:%S");
-			char* message = new char[timestamp.length() + 10 + strlen(label)];
-			// X YYYY/MM/DD HH:MM:SS Message 
-			// X is a single letter indicating the message severity
-			sprintf(message, "%c %s %s\n", STATUS_CODES.at(status), timestamp.c_str(), label);
 			*report_file_ << message;
-			delete[] message;
-			report_file_->close();
-			delete report_file_;
-			report_file_ = nullptr;
 		}
 	}
+
+	// Now add the line to the file viewer
+	if (!status_file_viewer_) {
+		// Create a file viewer if it doesn't exist
+		char* title = new char[report_filename_.length() + 30];
+		sprintf(title, "Status report file: %s", report_filename_.c_str());
+		status_file_viewer_ = new viewer_window(640, 480, title);
+		status_file_viewer_->callback(cb_fv_close, this);
+		status_file_viewer_->hide();
+	}
+	status_file_viewer_->append(message);
 
 	// Depending on the severity: LOG, NOTE, OK, WARNING, ERROR, SEVERE or FATAL
 	// Beep on the last three.
 	switch(status) {
 	case ST_SEVERE:
 		// Open status file viewer and update it.
-		cb_bn_misc(misc_status_, nullptr);
+		status_file_viewer_->show();
 		fl_beep(FL_BEEP_ERROR);
 		// A severe error - ask the user whether to continue
 		if (fl_choice("An error that resulted in reduced functionality occurred:\n%s\n\nDo you want to try to continue or quit?", "Continue", "Quit", nullptr, label, report_filename_.c_str()) == 1) {
@@ -459,7 +456,7 @@ void status::misc_status(status_t status, const char* label) {
 		break;
 	case ST_FATAL:
 		// Open status file viewer and update it. Set the flag to keep it displayed after other windows have been hidden
-		cb_bn_misc(misc_status_, nullptr);
+		status_file_viewer_->show();
 		fl_beep(FL_BEEP_ERROR);
 		// A fatal error - quit the application
 		fl_message("An unrecoverable error has occurred, closing down - check status log");
@@ -470,14 +467,10 @@ void status::misc_status(status_t status, const char* label) {
 		break;
 	case ST_ERROR:
 		// Override bar on updating viewer
-		cb_bn_misc(misc_status_, nullptr);
+		status_file_viewer_->show();
 		fl_beep(FL_BEEP_ERROR);
 		break;
 	default:
-		// Redraw status file viewer
-		if (status_file_viewer_ && !no_update_viewer) {
-			cb_bn_misc(misc_status_, nullptr);
-		}
 		break;
 	}
 }
@@ -521,30 +514,14 @@ text_display::~text_display() {
 }
 
 // Reload the file keeping the scroll position fixed - default was to start at line 0 again.
-void text_display::load(const char* filename) {
+void text_display::append(const char* line) {
 	// Find current scroll position and the total positions
 	int scroll_pos = this->mVScrollBar->value();
 	double scroll_max = this->mVScrollBar->maximum();
-	// Remove the existing text from  the buffer
-	buffer()->remove(0, buffer()->length());
-	if (filter_.length() == 0 || filter_ == " ") {
-		// No filter - load the whole file into the buffer
-		buffer()->insertfile(filename, 0);
-	}
-	else {
-		// Load only those lines that match the filter - the filter will be what set of processes logged the messages
-		ifstream* file = new ifstream(filename, ios_base::in);
-		while (file->good()) {
-			string line;
-			getline(*file, line);
-			if ((line.length() > 22 + filter_.length()) && (line.substr(22, filter_.length()) == filter_)) {
-				buffer()->append(line.c_str());
-				buffer()->append("\n");
-			}
-		}
-		file->close();
-		delete file;
-	}
+	// append line to end of buffer
+	if (filter_.length() == 0 || filter_ == " " || (strlen(line) > 22 + filter_.length()) && (strncmp(line + 22, filter_.c_str(), filter_.length()) == 0)) {
+		buffer()->append(line);
+	} 
 	if (scroll_pos == (int)scroll_max) {
 		// We had been scrolled at the end, so scroll to the new end
 		scroll((int)this->mVScrollBar->maximum(), 0);
@@ -586,30 +563,30 @@ void viewer_window::cb_ch_filter(Fl_Widget* w, void* v) {
 	cb_choice_text(w, v);
 	viewer_window* that = ancestor_view<viewer_window>(w);
 	// Reload the text display and set line colours
-	that->display_->load(that->filename_);
+	text_buffer* buffer = (text_buffer*)that->display_->buffer();
+	buffer->remove(0, buffer->length());
+	for (auto it = that->original_lines_.begin(); it != that->original_lines_.end(); it++) {
+		that->display_->append(*it);
+	}
 	that->colour_buffer();
 }
 
 // Viewer window constructor
 viewer_window::viewer_window(int W, int H, const char* label)
 	: Fl_Window(W, H, label)
-	, filename_(nullptr)
 {
 	draw_window();
 }
 
 // Viewer window destructor
 viewer_window::~viewer_window() {
-	delete[] filename_;
 }
 
 // Load the file into the test display in the window
-void viewer_window::load(const char* filename) {
-	display_->load(filename);
-	// Save filename
-	if (filename_) delete[] filename_;
-	filename_ = new char[strlen(filename) + 1];
-	strcpy(filename_, filename);
+void viewer_window::append(const char* line) {
+	display_->append(line);
+	colour_buffer();
+	original_lines_.push_back(line);
 }
 
 // Draw the window
@@ -712,17 +689,8 @@ void viewer_window::draw_window() {
 // Callback opens a text browser
 void status::cb_bn_misc(Fl_Widget* w, void* v) {
 	status* that = ancestor_view<status>(w);
-	if (!that->status_file_viewer_) {
-		// Create a file viewer
-		char* title = new char[that->report_filename_.length() + 30];
-		sprintf(title, "Status report file: %s", that->report_filename_.c_str());
-		that->status_file_viewer_ = new viewer_window(640, 480, title);
-		that->status_file_viewer_->callback(cb_fv_close, that);
-	}
 	// Reload the viewer and force the window to be shown - it may have been closed
-	that->status_file_viewer_->load(that->report_filename_.c_str());
 	that->status_file_viewer_->show();
-	that->status_file_viewer_->colour_buffer();
 	that->status_file_viewer_->redraw();
 }
 

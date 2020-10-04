@@ -8,6 +8,7 @@
 #include <string>
 #include <fstream>
 #include <list>
+#include <vector>
 
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Progress.H>
@@ -109,7 +110,7 @@ namespace zzalog {
 		text_display(int X, int Y, int W, int H, const char* label = nullptr);
 		~text_display();
 
-		void load(const char* filename);
+		void append(const char* line);
 
 		// Text filter
 		string filter_;
@@ -122,7 +123,7 @@ namespace zzalog {
 		viewer_window(int W, int Y, const char* label);
 		~viewer_window();
 
-		void load(const char* filename);
+		void append(const char* line);
 
 		void draw_window();
 
@@ -142,10 +143,10 @@ namespace zzalog {
 		int direction_;
 		// Whether to match case
 		int match_case_;
-		// Filename
-		char* filename_;
-
+		// The raw data - for restoring to buffer
+		vector<const char*> original_lines_;
 	};
+
 	// A progress stack entry
 	struct progress_item {
 		int max_value;

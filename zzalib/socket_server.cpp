@@ -104,7 +104,14 @@ int socket_server::create_server() {
 		return 1;
 	}
 	else {
-		status(ST_LOG, "SOCKET: Created socket");
+		switch (protocol_) {
+		case UDP:
+			status(ST_LOG, "SOCKET: Created UDP socket");
+			break;
+		case HTTP:
+			status(ST_LOG, "SOCKET: Created HTTP socket");
+			break;
+		}
 	}
 
 	// Define the port we listen on and addresses we listen for

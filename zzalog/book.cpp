@@ -281,26 +281,30 @@ bool book::load_data(string filename)
 bool book::store_data(string filename, bool force, set<string>* fields) {
 	bool ok = false;
 	if (save_in_progress_) {
-		status_->misc_status(ST_LOG, "LOG: Ignoring request to store log as currently doing so");
+		// Race hazard - can instigate a second store before finished this one
+		status_->misc_status(ST_WARNING, "LOG: Ignoring request to store log as currently doing so");
 	}
 	else {
 		if (book_type_ == OT_MAIN || book_type_ == OT_EXTRACT) {
 			// can only write out main log or extracted records
-			// Race hazard - can instigate a second store before finished this one
 			save_in_progress_ = true;
 			// First parse and validate if necessary
 			if (modified() == true || force) {
-				// Only write out if modified or force is set (for 
-				// The book has a header so update header specific items
-				if (header_) {
+				// Only write out if modified or force is set
+				if (!header_) {
+					// No header then create one.
+					header_ = new record;
+					header_->header(" ");
+				} else {
 					// Add a single space comment if there is not an existing comment.
 					if (header_->header().length() == 0) {
 						header_->header(" ");
 					}
-					header_->item("PROGRAMID", PROGRAM_ID);
-					header_->item("PROGRAMVERSION", PROGRAM_VERSION);
-					header_->item("ADIF_VER", spec_data_->adif_version());
 				}
+				// Update header specific items
+				header_->item("PROGRAMID", PROGRAM_ID);
+				header_->item("PROGRAMVERSION", PROGRAM_VERSION);
+				header_->item("ADIF_VER", spec_data_->adif_version());
 
 				// use supplied filename (for Save As) or remembered filename (for Save)
 				if (filename != "") {

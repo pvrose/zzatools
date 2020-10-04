@@ -90,7 +90,6 @@ spec_data* spec_data_ = nullptr;
 eqsl_handler* eqsl_handler_ = nullptr;
 lotw_handler* lotw_handler_ = nullptr;
 qrz_handler* qrz_handler_ = nullptr;
-Fl_RGB_Image* main_icon_ = nullptr;
 Fl_Single_Window* main_window_ = nullptr;
 intl_dialog* intl_dialog_ = nullptr;
 band_view* band_view_ = nullptr;
@@ -776,14 +775,13 @@ void tidy() {
 	delete menu_;
 	delete main_window_;
 	delete settings_;
-	delete main_icon_;
 }
 
 // Add the icon
 void add_icon(const char* arg0) {
 #ifndef _WIN32
 	// set the default Icon
-	main_icon_ = new Fl_RGB_Image(ICON_MAIN, 16, 16, 4);
+	Fl_window::default_icon(new Fl_RGB_Image(ICON_MAIN, 16, 16, 4));
 #else
 	// NB: On windows we have a separate icon file - never worked out how to get one into the file
 	// Find the directory the app is loaded from and add the icon filename
@@ -795,13 +793,11 @@ void add_icon(const char* arg0) {
 	*(path + pos) = '\0';
 	// And append "\zzalog.png"
 	strcat(path, "\\zzalog.png");
-	main_icon_ = new Fl_PNG_Image(path);
+	Fl_Window::default_icon(new Fl_PNG_Image(path));
 	//// This is the way to get an icon compiled with VS into the icon.
 	//// However include zzalog.rc breaks Fl_ToolTip
-	//main_icon_ = LoadIcon(fl_display, MAKEINTRESOURCE(IDI_ICON1));
+	//main_window_->icon((const void*)LoadIcon(fl_display, MAKEINTRESOURCE(IDI_ICON1)));
 #endif
-	// Use the icon as the default for all windows
-	Fl_Window::default_icon(main_icon_);
 }
 
 // Display the arguments in the status log
