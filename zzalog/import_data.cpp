@@ -755,6 +755,7 @@ bool import_data::download_data(import_data::update_mode_t server) {
 		result = eqsl_handler_->download_eqsl_log(&adif);
 #ifdef _DEBUG
 		// Give developer a choice of whether to downloag eQSL images
+		fl_beep(FL_BEEP_QUESTION);
 		if (fl_choice("You are in debug mode. Do you want to download eQSL images?", "YES", "NO", nullptr) == 1) {
 			eqsl_handler_->debug_enable(false);
 		}

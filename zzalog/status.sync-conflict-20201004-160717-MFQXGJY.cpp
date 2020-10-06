@@ -330,6 +330,14 @@ void status::progress(int value, object_t object) {
 					// Revert to previous progress item (current top-of-stack)
 					update_progress(progress_stack_.back());
 				}
+				else {
+					// Allow viewer to be updated
+					no_update_viewer = false;
+					// Redraw status file viewer
+					if (status_file_viewer_) {
+						cb_bn_misc(misc_status_, nullptr);
+					}
+				}
 			}
 		}
 	}
@@ -434,7 +442,6 @@ void status::misc_status(status_t status, const char* label) {
 		sprintf(title, "Status report file: %s", report_filename_.c_str());
 		status_file_viewer_ = new viewer_window(640, 480, title);
 		status_file_viewer_->callback(cb_fv_close, this);
-		status_file_viewer_->hide();
 	}
 	status_file_viewer_->append(message);
 
@@ -585,8 +592,6 @@ viewer_window::~viewer_window() {
 // Load the file into the test display in the window
 void viewer_window::append(const char* line) {
 	display_->append(line);
-	colour_buffer();
-	original_lines_.push_back(line);
 }
 
 // Draw the window
@@ -680,9 +685,6 @@ void viewer_window::draw_window() {
 	display_->show();
 	display_->end();
 	ch_filter->callback(cb_ch_filter, &(display_->filter_));
-
-	resizable(display_);
-	size_range(w(), h());
 
 	end();
 	show();

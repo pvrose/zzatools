@@ -176,9 +176,10 @@ prefix* pfx_data::get_prefix(record* record, bool special) {
 		return *(possibles.begin());
 		break;
 	default:
-		// More than one prefix matched - so open the dialog to query the user
+		// More than one prefix matched - so open the dialog to query the user and beep
 		pfx_dialog dialog;
 		dialog.set_data(&possibles, record->item("CALL"));
+		fl_beep(FL_BEEP_QUESTION);
 		if (dialog.display() == BN_OK) {
 			// User selected one to match
 			prefix* prefix = dialog.get_prefix();
@@ -643,6 +644,7 @@ bool pfx_data::update_dxcc(record* record, prefix*& in_prefix, bool& query, stri
 			if (dxcc_pfx_code != dxcc_num) {
 				if (query_error && dxcc_pfx_code != 0) {
 					// Ask if OK to use logged code
+					fl_beep(FL_BEEP_QUESTION);
 					if (fl_choice("%s: Logged DXCC does not equal parsed DXCC, Retain Logged DXCC?", fl_yes, fl_no, "", callsign.c_str()) == 1) {
 						char new_dxcc_code[16];
 						sprintf(new_dxcc_code, "%d", dxcc_pfx_code);
@@ -698,6 +700,7 @@ bool pfx_data::update_dxcc(record* record, prefix*& in_prefix, bool& query, stri
 			// Ask user if it's OK that location is 1000 km from prefix centre
 			// and flag QSO for update if it's not
 			if (query_error && distance > 1000.0) {
+				fl_beep(FL_BEEP_QUESTION);
 				if (fl_choice("%s: distance from station to prefix centre is > 1000 km (%0.0f km) - is it valid?",
 					fl_yes, fl_no, "", callsign.c_str(), distance) == 1) {
 					query = true;

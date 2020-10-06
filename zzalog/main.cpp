@@ -155,6 +155,7 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 		}
 		// Currently modifying a (potentially new) record
 		if (book_ && (book_->modified_record() || book_->new_record()) ) {
+			fl_beep(FL_BEEP_QUESTION);
 			switch (fl_choice("You are currently modifying a record? Save or Quit?", "Save?", "Quit?", nullptr)) {
 			case 0:
 				// Save
@@ -169,6 +170,7 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 		// Wait for auto-import of files to complete
 		if (import_data_) {
 			if (!import_data_->update_complete()) {
+				fl_beep(FL_BEEP_QUESTION);
 				switch (fl_choice("There is an import in process. Do you want to let it finish or abandon it?", "Finish?", "Abandon", nullptr)) {
 				case 0:
 					// Gracefully wait for import to complete
@@ -184,6 +186,7 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 		}
 		// Wait for eQSL card downloads - user can cancel
 		if (eqsl_handler_ && eqsl_handler_->requests_queued()) {
+			fl_beep(FL_BEEP_QUESTION);
 			switch (fl_choice("There are outstanding eQSL card image requests. Do you want to cancel download, wait or cancel exit?", "Cancel download", "Wait", "Cancel exit")) {
 			case 0:
 				// Cancel the download immediately
@@ -202,6 +205,7 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 
 		// Check the book needs saving
 		if (book_ && book_->modified()) {
+			fl_beep(FL_BEEP_QUESTION);
 			switch (fl_choice("Book has been modified. Do you want to save and exit, exit or cancel exit?", "Exit", "Save && Exit", "Cancel Exit")) {
 			case 0:
 				// Exit
@@ -895,6 +899,7 @@ void backup_file(bool force, bool retrieve) {
 	backup_settings.get("Enable", settings_force, false);
 	if (!force && !retrieve) {
 		if (!settings_force) {
+			fl_beep(FL_BEEP_QUESTION);
 			if (fl_choice("Backup is currently disabled, do you want to enable it?", "Yes", "No", nullptr) == 0) {
 				settings_force = true;
 			}

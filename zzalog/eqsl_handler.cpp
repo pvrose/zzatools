@@ -79,6 +79,7 @@ void eqsl_handler::cb_timer_deq(void* v) {
 		switch (response) {
 		case ER_FAILED:
 			// Failed - ask if retry
+			fl_beep(FL_BEEP_QUESTION);
 			switch (fl_choice("eQSL download failed, do you want try again or cancel all", fl_yes, fl_cancel, fl_no)) {
 			case 0:
 				// Do nothing
@@ -108,6 +109,7 @@ void eqsl_handler::cb_timer_deq(void* v) {
 			break;
 		case ER_HTML_ERR:
 			// HTML error
+			fl_beep(FL_BEEP_QUESTION);
 			switch (fl_choice("Internet access failed, do you want to try again or cancel all?", fl_yes, fl_cancel, fl_no)) {
 			case 0:
 				// Yes - do nothing

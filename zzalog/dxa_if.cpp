@@ -439,11 +439,33 @@ void dxa_if::enable_widgets() {
 	// Centre choice - enable if rectangular projection
 	if (atlas_) {
 		DxAtlas::IDxMapPtr map = atlas_->GetMap();
-		if (map->GetProjection() == DxAtlas::PRJ_RECTANGULAR) {
-			centre_ch_->activate();
-		}
-		else {
-			centre_ch_->deactivate();
+		Fl_Choice* ch = (Fl_Choice*)centre_ch_;
+		switch (map->GetProjection()) {
+		case DxAtlas::PRJ_RECTANGULAR:
+			// Set all choice items active
+			ch->activate();
+			for (int ix = 0; ix < ch->size() - 1; ix++) {
+				ch->mode(ix, ch->mode(ix) & ~FL_MENU_INACTIVE);
+			}
+			break;
+		case DxAtlas::PRJ_AZIMUTHAL:
+			// Set only HOME (Zoom to group) or ZERO (zoom out)
+			ch->activate();
+			for (int ix = 0; ix < ch->size() - 1; ix++) {
+				switch ((centre_t)ix) {
+				case HOME:
+				case ZERO:
+					ch->mode(ix, ch->mode(ix) & ~FL_MENU_INACTIVE);
+					break;
+				default:
+					ch->mode(ix, ch->mode(ix) | FL_MENU_INACTIVE);
+					break;
+				}
+			}
+			break;
+		default:
+			ch->deactivate();
+			break;
 		}
 	}
 	// Enable colour buttons
@@ -1410,6 +1432,8 @@ void dxa_if::draw_pins() {
 			easternmost_ = home_long_;
 			northernmost_ = home_lat_;
 			southernmost_ = home_lat_;
+			// Set smallest distance to a practicable limit to avoid zero divide if no pins to draw
+			furthest_ = 100.0;
 			// Get most recent date (for AC_DAYS)
 			last_time_ = time(nullptr);
 
@@ -1527,6 +1551,12 @@ void dxa_if::draw_pins() {
 										point.parray = point_data;
 										(void)SafeArrayPutElement(point_array, &index_2, &point);
 										index_2++;
+										// Adjust furthest away;
+										int distance = 0;
+										record->item("DISTANCE", distance);
+										if (distance > furthest_) {
+											furthest_ = distance;
+										}
 										// Add it to the set of records being displayed
 										records_displayed_.insert(record_num);
 									}
@@ -1576,8 +1606,13 @@ void dxa_if::draw_pins() {
 			call_layer_->BrushColor = DxAtlas::clWhite;
 
 			// now centre on selected record
-			if (map->GetProjection() == DxAtlas::PRJ_RECTANGULAR) {
+			switch(map->GetProjection()) {
+			case DxAtlas::PRJ_RECTANGULAR:
 				centre_map();
+				break;
+			case DxAtlas::PRJ_AZIMUTHAL:
+				zoom_azimuthal();
+				break;
 			}
 
 			// Set the colours of the buttons to match that of the points on the map - and a paler one for unused colours
@@ -1740,6 +1775,23 @@ void dxa_if::zoom_centre(lat_long_t centre, bool full) {
 		map->PutZoom((float)min(zoom_long, zoom_lat) * 0.95f);
 	}
 	zoom_value_ = map->GetZoom();
+}
+
+// Zoom the map in azimuthal mode
+void dxa_if::zoom_azimuthal() {
+	DxAtlas::IDxMapPtr map = atlas_->GetMap();
+	float zoom;
+	switch (centre_mode_) {
+	case HOME:
+		// Zoom in to just the displayed QSOs
+		zoom = ((EARTH_RADIUS * PI) / (float)furthest_) * 0.95;
+		map->PutZoom(zoom);
+		break;
+	case ZERO:
+		// Zoom full size
+		map->PutZoom(1.0);
+		break;
+	}
 }
 
 // Centre the map according to the settings

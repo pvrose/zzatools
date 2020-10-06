@@ -93,6 +93,7 @@ bool book::load_data(string filename)
 		choice_t choice = SAVE;
 		if (modified()) {
 			// If the current data is modified, ask the user if it should be saved first
+			fl_beep(FL_BEEP_QUESTION);
 			choice = (choice_t)fl_choice("Current file is modified - do you want to save the changes?", "Save", "Don't Save", "Cancel");
 			if (choice == SAVE) {
 				store_data();

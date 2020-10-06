@@ -184,6 +184,8 @@ namespace zzalog {
 		void centre_map(lat_long_t centre);
 		// Zoom to centre
 		void zoom_centre(lat_long_t centre, bool full);
+		// Zoom azimuth
+		void zoom_azimuthal();
 		// Label colour group
 		void label_colour_grp();
 		// Get distance in 1000 km bands
@@ -251,6 +253,7 @@ namespace zzalog {
 		double easternmost_;
 		double northernmost_;
 		double southernmost_;
+		int furthest_;
 		// Map properties
 		int prefixes_;
 		int cq_zones_;

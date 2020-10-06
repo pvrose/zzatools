@@ -98,6 +98,7 @@ bool xml_reader::report_error(string message, bool can_accept) {
 	bool accepted = false;
 	// Offer the user the option of continuing
 	if (can_accept || report_errors_to_screen_) {
+		fl_beep(FL_BEEP_QUESTION);
 		int choice = fl_choice("XML Issue: %s at line %d. Continue yes/no?", "Continue?", "Quit?", nullptr, message.c_str(), line_num_);
 		accepted = (choice == 0);
 	}

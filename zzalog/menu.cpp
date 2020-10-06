@@ -316,6 +316,7 @@ void menu::cb_mi_file_new(Fl_Widget* w, void* v) {
 	}
 	while (!import_data_->update_complete()) Fl::wait();
 	if (book_->modified_record() | book_->new_record()) {
+		fl_beep(FL_BEEP_QUESTION);
 		switch (fl_choice("You are currently modifying a record? Save or Quit?", "Save?", "Quit?", nullptr)) {
 		case 0:
 			book_->save_record();
@@ -326,6 +327,7 @@ void menu::cb_mi_file_new(Fl_Widget* w, void* v) {
 		}
 	}
 	if (book_->modified()) {
+		fl_beep(FL_BEEP_QUESTION);
 		if (fl_choice("Book has been modified, do you want to save?", "Yes", "No", nullptr) == 0) {
 			book_->store_data();
 		}
@@ -351,6 +353,7 @@ void menu::cb_mi_file_open(Fl_Widget* w, void* v) {
 	while (!import_data_->update_complete()) Fl::wait();
 
 	if (book_->modified()) {
+		fl_beep(FL_BEEP_QUESTION);
 		if (fl_choice("Book has been modified, do you want to save?", "Yes", "No", nullptr) == 0) {
 			// Do File->Save first
 			cb_mi_file_save(w, v);
@@ -417,6 +420,7 @@ void menu::cb_mi_file_save(Fl_Widget* w, void* v) {
 	while (!import_data_->update_complete()) Fl::wait();
 	// Get the main book to store itself as long as it wasn't opened read-only
 	if (read_only_) {
+		fl_beep(FL_BEEP_QUESTION);
 		if (fl_choice("File was opened read-only - save as new file?", "OK", "No", nullptr) == 0) {
 			cb_mi_file_saveas(w, v);
 		}
@@ -775,6 +779,7 @@ void menu::cb_mi_log_mode(Fl_Widget* w, void* v) {
 		book_->enable_save(true);
 		// Currently entering a QSO - ask Save or Quit
 		if (book_->modified_record() || book_->new_record()) {
+			fl_beep(FL_BEEP_QUESTION);
 			switch (fl_choice("You are currently modifying a record? Save or Quit?", "Save?", "Quit?", nullptr)) {
 			case 0:
 				book_->save_record();
@@ -788,6 +793,7 @@ void menu::cb_mi_log_mode(Fl_Widget* w, void* v) {
 	case LM_ON_AIR:
 		// Currently entering a QSO - ask Save or Quit
 		if (book_->modified_record() || book_->new_record()) {
+			fl_beep(FL_BEEP_QUESTION);
 			switch (fl_choice("You are currently modifying a record? Save or Quit?", "Save?", "Quit?", nullptr)) {
 			case 0:
 				book_->save_record();
@@ -852,6 +858,7 @@ void menu::cb_mi_log_radio(Fl_Widget* w, void* v) {
 	case true:
 		// Currently entering a QSO - ask Save or Quit
 		if (book_->modified_record() || book_->new_record()) {
+			fl_beep(FL_BEEP_QUESTION);
 			switch (fl_choice("You are currently modifying a record? Save or Quit?", "Save?", "Quit?", nullptr)) {
 			case 0:
 				book_->save_record();

@@ -75,6 +75,7 @@ bool qrz_handler::open_session() {
 		if (decode_session_response(response)) {
 			if (non_subscriber_) {
 				// User is not a subscriber - ask whether to continue
+				fl_beep(FL_BEEP_QUESTION);
 				if (fl_choice("You are not a subscriber to the QRZ XML Database so will only receive limited info.\n"
 					"Do you wish to continue or use the standard web page?", "Continue", "Use Web Page", nullptr) == 1) {
 					use_xml_database_ = false;
