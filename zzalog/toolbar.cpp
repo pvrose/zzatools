@@ -294,6 +294,7 @@ toolbar::toolbar(int X, int Y, int W, int H, const char* label) :
 	bn = new Fl_Button(curr_x, Y, H, H, "DX?");
 	bn->callback(cb_bn_explain);
 	bn->when(FL_WHEN_RELEASE);
+	bn->tooltip("Parse the call");
 	bn->labelfont(FONT);
 	bn->labelsize(FONT_SIZE);
 	add(bn);
@@ -428,52 +429,11 @@ void toolbar::cb_bn_explain(Fl_Widget* w, void* v) {
 	toolbar* that = ancestor_view<toolbar>(w);
 	// Create a temporary record to parse theh callsign
 	record* tip_record = new record(LM_ON_AIR);
-	vector<prefix*> prefixes;
-	char temp[1024];
 	string message = "";
 	// Set the callsign in the temporary record
 	tip_record->item("CALL", that->search_text_);
 	// Parse the temporary record
-	if (pfx_data_->all_prefixes(tip_record, &prefixes, false)) {
-		// We have at least one result - add appropriate heading to tip
-		if (prefixes.size() > 1) {
-			sprintf(temp, "%d Possible prefixes found\n", prefixes.size());
-		}
-		else {
-			strcpy(temp, "Prefix found \n");
-		}
-		message += temp;
-		// For each prefix found
-		for (size_t i = 0; i < prefixes.size(); i++) {
-			// Get the prefix and its associated DXCC entity prefix
-			prefix* pfx = prefixes[i];
-			prefix* dxcc_pfx = pfx;
-			while (dxcc_pfx->parent_ != nullptr) dxcc_pfx = dxcc_pfx->parent_;
-			// Add explanation of DXCC entity
-			sprintf(temp, "DXCC %s - %s\n", dxcc_pfx->nickname_.c_str(), dxcc_pfx->name_.c_str());
-			message += temp;
-			if (pfx->parent_ != nullptr) {
-				// If prefix wasn't DXCC - add prefix explanation
-				sprintf(temp, "+ Prefix %s - %s\n", pfx->nickname_.c_str(), pfx->name_.c_str());
-				message += temp;
-			}
-			// Add any special information - add the DXCC entity code to our dummy record to speed up the search
-			string dxcc_code = to_string(pfx->dxcc_code_);
-			tip_record->item("DXCC", dxcc_code);
-			vector<prefix*> specials;
-			if (pfx_data_->all_prefixes(tip_record, &specials, true)) {
-				// Add the special call explanation
-				for (auto it = specials.begin(); it != specials.end(); it++) {
-					sprintf(temp, "+ Prefix %s - %s\n", (*it)->nickname_.c_str(), (*it)->name_.c_str());
-					message += temp;
-				}
-			}
-		}
-	} 
-	else {
-		// No prefixes found that match
-		message = "No prefixes found\n";
-	}
+	message = pfx_data_->get_tip(tip_record);
 	// Create a tooltip window at the explain button (in w) X and Y
 	Fl_Window* tw = ::tip_window(message, main_window_->x_root() + w->x(), main_window_->y_root() + w->y());
 	// Set the timeout on the tooltip

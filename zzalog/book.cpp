@@ -38,6 +38,7 @@ extern pfx_data* pfx_data_;
 extern Fl_Preferences* settings_;
 extern Fl_Single_Window* main_window_;
 extern band_view* band_view_;
+extern book* book_;
 extern bool read_only_;
 extern void main_window_label(string text);
 
@@ -859,7 +860,10 @@ void book::delete_record(bool force) {
 			status_->misc_status(ST_NOTE, text);
 			delete_in_progress_ = true;
 			menu_->update_items();
-			// Remove the current record from the book
+			// Remove the current record from both the book_ and the extract_data_
+			if (book_type_ == OT_EXTRACT) {
+				book_->erase(book_->begin() + record_number(current_item_));
+			} 
 			erase(begin() + current_item_);
 			new_record_ = false;
 			modified_record_ = false;

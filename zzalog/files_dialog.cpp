@@ -55,6 +55,8 @@ files_dialog::files_dialog(int X, int Y, int W, int H, const char* label) :
 	create_form(X, Y);
 	// Call back for the OK button
 	callback(cb_bn_ok);
+	// Enable vertical scrolling
+	type(FL_VERTICAL);
 }
 
 // Destructor
@@ -151,6 +153,11 @@ void files_dialog::load_values() {
 	status_log_file_ = temp_string;
 	free(temp_string);
 
+	// WSJT-X directory
+	datapath_settings.get("WSJT-X", temp_string, "");
+	wsjtx_directory_ = temp_string;
+	free(temp_string);
+
 	// Unzip command and switches
 	clublog_settings.get("Unzip Command", temp_string, "C:/Program Files (X86)/7-Zip/7z.exe");
 	unzipper_ = temp_string;
@@ -205,14 +212,18 @@ void files_dialog::create_form(int X, int Y) {
 	const int GRP7 = GRP6 + HGRP6;
 	const int ROW7_1 = GRP7 + HTEXT;
 	const int HGRP7 = ROW7_1 - GRP7 + max(HBUTTON, HTEXT) + GAP;
+	// Group 7A, row 1
+	const int GRP7A = GRP7 + HGRP7;
+	const int ROW7A_1 = GRP7A + HTEXT;
+	const int HGRP7A = ROW7A_1 - GRP7A + max(HBUTTON, HTEXT) + GAP;
 	// Group 8, row 1
-	const int GRP8 = GRP7 + HGRP7;
+	const int GRP8 = GRP7A + HGRP7A;
 	const int ROW8_1 = GRP8 + HTEXT;
 	const int HGRP8 = ROW8_1 - GRP8 + max(HBUTTON, HTEXT) + GAP;
 
 
 	// Bottom of required dialog
-	const int YMAX = GRP7 + HGRP7 + EDGE;
+	const int YMAX = GRP8 + HGRP8 + EDGE;
 	
 	Fl_Group* grp_auto = new Fl_Group (X + XGRP, Y + GRP1, XMAX, HGRP1, "Auto-import files");
 	grp_auto->labelsize(FONT_SIZE);
@@ -442,6 +453,28 @@ void files_dialog::create_form(int X, int Y) {
 
 	grp_status->end();
 
+	Fl_Group* grp_wsjtx = new Fl_Group(X + XGRP, Y + GRP7A, XMAX, HGRP7A, "WSJT-X directory");
+	grp_wsjtx->labelsize(FONT_SIZE);
+	grp_wsjtx->box(FL_THIN_DOWN_BOX);
+	grp_wsjtx->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
+	// Input - status log file name
+	intl_input* in_wsjtx_file = new intl_input(X + COL2, Y + ROW7A_1, WEDIT + GAP + WBUTTON + GAP + WBUTTON, HTEXT);
+	in_wsjtx_file->callback(cb_value<intl_input, string>, &wsjtx_directory_);
+	in_wsjtx_file->when(FL_WHEN_CHANGED);
+	in_wsjtx_file->textsize(FONT_SIZE);
+	in_wsjtx_file->value(wsjtx_directory_.c_str());
+	in_wsjtx_file->tooltip("Location of WSJT-X directory");
+	// Button - opens file browser
+	Fl_Button* bn_browse_wsjtx = new Fl_Button(X + COL5, Y + ROW7A_1, WBUTTON, HBUTTON, "Browse");
+	bn_browse_wsjtx->align(FL_ALIGN_INSIDE);
+	wsjtx_data_ = { "Please enter the WSJT-X directory", "Text\t*.txt", &wsjtx_directory_, nullptr, in_wsjtx_file, nullptr };
+	bn_browse_wsjtx->callback(cb_bn_browsedir, &wsjtx_data_);
+	bn_browse_wsjtx->when(FL_WHEN_RELEASE);
+	bn_browse_wsjtx->labelsize(FONT_SIZE);
+	bn_browse_wsjtx->tooltip("Opens a file browsewr to locate the status file");
+
+	grp_wsjtx->end();
+
 	Fl_Group* grp_unzip = new Fl_Group(X + XGRP, Y + GRP8, XMAX, HGRP8, "Unzip executable");
 	grp_unzip->labelsize(FONT_SIZE);
 	grp_unzip->box(FL_THIN_DOWN_BOX);
@@ -537,6 +570,9 @@ void files_dialog::save_values() {
 
 	// Status log file
 	status_settings.set("Report File", status_log_file_.c_str());
+
+	// WSJT-X directory
+	datapath_settings.set("WSJT-X", wsjtx_directory_.c_str());
 
 	// Clublog
 	clublog_settings.set("Unzip Command", unzipper_.c_str());

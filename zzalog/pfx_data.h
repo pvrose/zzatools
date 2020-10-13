@@ -97,6 +97,8 @@ namespace zzalog {
 		bool update_bearing(record* record);
 		// Return callsign parse type
 		parse_t get_parse_type(string& callsign);
+		// Generate tip text for parsing a call
+		string get_tip(record* record);
 
 		//protected methods
 	protected:

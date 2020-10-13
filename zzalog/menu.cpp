@@ -159,11 +159,12 @@ namespace zzalog {
 
 	// Log import operations
 	{ "&Import", 0, 0, 0, FL_SUBMENU },
-	{ "&File", 0, menu::cb_mi_imp_file, nullptr },
+	{ "&File", 0, menu::cb_mi_imp_file, (void*)(long)import_data::FILE_IMPORT },
+	{ "File && Chec&k", 0, menu::cb_mi_imp_file, (void*)(long)import_data::FILE_UPDATE },
 	{ "Download e&QSL", 0, menu::cb_mi_download, (void*)(long)import_data::EQSL_UPDATE },
 	{ "Download &LotW", 0, menu::cb_mi_download, (void*)(long)import_data::LOTW_UPDATE, FL_MENU_DIVIDER },
 	{ "&WSJT-X UDP", 0, menu::cb_mi_imp_wsjtx, nullptr, FL_MENU_DIVIDER },
-	{ "&Merge", 0, menu::cb_mi_imp_merge, nullptr, FL_MENU_DIVIDER },
+	{ "&Merge", 0, menu::cb_mi_imp_merge, (void*)(long)import_data::FILE_IMPORT },
 	{ "&Cancel", 0, menu::cb_mi_imp_cancel, nullptr },
 	{ 0 },
 
@@ -530,7 +531,7 @@ void menu::cb_mi_settings(Fl_Widget* w, void* v) {
 	settings::cfg_dialog_t active = (settings::cfg_dialog_t)(long)v;
 	if (!config_) {
 		// Open the config and wait for it to close
-		config_ = new settings(WCONFIG, HCONFIG, "Configuration", active);
+		config_ = new settings(WCONFIG, HCONFIG + 100, "Configuration", active);
 		config_ = nullptr;
 	}
 }
@@ -1070,7 +1071,7 @@ void menu::cb_mi_oper_set(Fl_Widget* w, void* v) {
 }
 
 // Import->File
-// v is not used
+// v defines subsequent load type (FILE_IMPORT or FILE_UPDATE
 void menu::cb_mi_imp_file(Fl_Widget* w, void* v) {
 	// Cancel any existing update
 	import_data_->stop_update(LM_OFF_AIR, false);
@@ -1087,7 +1088,9 @@ void menu::cb_mi_imp_file(Fl_Widget* w, void* v) {
 	chooser->filter("ADI files\t*.adi\nADX Files\t*.adx");
 	if (chooser->show() == 0) {
 		filename = chooser->filename();
-		import_data_->load_data(filename);
+		// Get subsequent merge type
+		import_data::update_mode_t mode = (import_data::update_mode_t)(long)v;
+		import_data_->load_data(filename, mode);
 	}
 	delete chooser;
 	free(directory);

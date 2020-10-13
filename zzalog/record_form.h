@@ -51,7 +51,8 @@ namespace zzalog {
 			QI_EQSL,            // Downloaded eQSL image
 			QI_CARD_FRONT,      // Scanned-in front of a card
 			QI_CARD_BACK,       // Scanned-in back of a card
-			QI_GEN_CARD         // Generated QSL card
+			QI_GEN_CARD,        // Generated QSL card
+			QI_TEXT             // Display an Fl_Text_Display
 		};
 
 
@@ -122,6 +123,10 @@ namespace zzalog {
 		void set_enum_choice(string enumeration_type, string text);
 		// explain the enumeration value
 		void explain_enum(spec_dataset* dataset, string enumeration_value);
+		// Parse WSJT-X ALL.txt
+		bool parse_all_txt();
+		// Copy line to record
+		void copy_all_txt(string text, record* record);
 
 	protected:
 		// widgets
@@ -208,6 +213,8 @@ namespace zzalog {
 		string current_field_;
 		// Display all fields
 		bool display_all_fields_;
+		// Text display
+		Fl_Text_Display* text_display_;
 	};
 
 }

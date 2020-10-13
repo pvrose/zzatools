@@ -761,6 +761,7 @@ bool record::merge_records(record* record, bool allow_loc_mismatch /* = false */
 		string merge_data = it->second;
 		// Get my value for the field
 		string my_data = item(field_name);
+		bool item_match = items_match(record, field_name);
 		bool is_location = false;
 		bool is_grid_4_to_6 = false;
 		bool is_qsl_rcvd = false;
@@ -811,10 +812,20 @@ bool record::merge_records(record* record, bool allow_loc_mismatch /* = false */
 		else if (field_name == "TIME_OFF" ||
 			field_name == "QSO_DATE_OFF") {
 			// Update from the other record - erstwhile bug overwrote previous import
-			if (!items_match(record, field_name)) {
+			if (!item_match) {
 				item(field_name, merge_data);
 				merged = true;
 			}
+			// Match but merge data is more accurate
+			else if (field_name == "TIME_OFF" && merge_data.length() > my_data.length()) {
+				item(field_name, merge_data);
+				merged = true;
+			}
+		}
+		else if (item_match  && (field_name == "TIME_ON" || field_name == "FREQ" || field_name == "RX_FREQ") && merge_data.length() > my_data.length()) {
+			// Merge data is more accurate
+			item(field_name, merge_data);
+			merged = true;
 		}
 		else {
 			// All other fields
@@ -998,8 +1009,9 @@ bool record::items_match(record* record, string field_name) {
 		// Fields are equal or either is blank
 		return true;
 	}
-	else if (field_name == "GRIDSQUARE" || field_name == "MY_GRIDSQUARE") {
-		// Special case for GRIDSQUARE - 
+	// Special cases
+	else if (field_name == "GRIDSQUARE" || field_name == "MY_GRIDSQUARE" || field_name == "FREQ" || field_name == "RX_FREQ") {
+		// Special case for GRIDSQUARE and FREQ
 		// they compare if they are equal for the length
 		// of the shorter.
 		int iLength = min(lhs.length(), rhs.length());
@@ -1035,9 +1047,7 @@ bool record::items_match(record* record, string field_name) {
 		}
 
 	}
-	else {
-		return false;
-	}
+	return false;
 }
 
 // get the date and time as a time_t object

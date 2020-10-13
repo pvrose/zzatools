@@ -175,7 +175,7 @@ void import_data::auto_update() {
 				char message[256];
 				sprintf(message, "IMPORT: Loading %s", sources_[i].c_str());
 				status_->misc_status(ST_NOTE, message);
-				load_data(update_files_[i]);
+				load_data(update_files_[i], AUTO_IMPORT);
 				// Remember the earliest of the files that has changed
 				if (last_timestamps_[i] < last_timestamp_) {
 					last_timestamp_ = last_timestamps_[i];
@@ -258,17 +258,18 @@ void import_data::save_update() {
 	record* import_record = at(0);
 	if (pfx_data_->parse(import_record) == PR_CHANGED) {
 	}
+	// Need to copy it over before calling the next two to get the record number
 	int record_number = book_->insert_record(import_record);
+	accept_update();
+	number_added_++;
+	book_->selection(record_number, HT_INSERTED);
+
 	if (spec_data_->validate(import_record, record_number)) {
 	}
-	// This may result in the card beng fetched twice
+	// This may result in the card being fetched twice
 	if (update_mode_ == EQSL_UPDATE) {
 		eqsl_handler_->enqueue_request(record_number);
 	}
-	// Copy record to the main log
-	book_->insert_record(import_record);
-	accept_update();
-	book_->selection(record_number, HT_INSERTED);
 }
 
 // repeat the auto-import timer
@@ -827,15 +828,20 @@ void import_data::merge_data() {
 }
 
 // overload of book::load_data, sets the update mode and if successful switches view to import view
-bool import_data::load_data(string filename) {
+bool import_data::load_data(string filename, update_mode_t mode) {
 	// This breaks auto-update
 	if (update_mode_ != READ_AUTO) {
-		update_mode_ = FILE_IMPORT;
+		update_mode_ = mode;
 	}
 	bool result = book::load_data(filename);
 	if (result) {
 		tabbed_forms_->activate_pane(OT_IMPORT, true);
 		selection(record_number(0));
+	}
+	else {
+		// Read failed, delete any records that may have been loaded and tidy up.
+		clear();
+		finish_update();
 	}
 	return result;
 }

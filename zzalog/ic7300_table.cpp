@@ -24,16 +24,13 @@ ic7300_table::ic7300_table(int X, int Y, int W, int H, const char* label, field_
 Fl_Table_Row(X, Y, W, H, label)
 , view()
 {
-	Fl_Preferences view_settings(settings_, "View");
-	view_settings.get("Type", (int&)type_, VT_MEMORIES);
+	type_ = VT_NONE;
 	show();
 }
 
 // Destructor
 ic7300_table::~ic7300_table() {
 	delete_items();
-	Fl_Preferences view_settings(settings_, "View");
-	view_settings.set("Type", (int)type_);
 
 }
 

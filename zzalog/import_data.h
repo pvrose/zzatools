@@ -29,7 +29,8 @@ namespace zzalog {
 		enum update_mode_t {
 			NONE,            // Book has no data
 			AUTO_IMPORT,     // Book contains data being auto-imported 
-			FILE_IMPORT,     // Book contains data manually loaded from a file
+			FILE_IMPORT,     // Book contains data manually loaded from a file (assume new records are correct)
+			FILE_UPDATE,     // Book contains data to be merged from a file (i.e. check it exists)
 			EQSL_UPDATE,     // Book contains data downloaded from eQSL.cc
 			LOTW_UPDATE,     // Book contains data downloaded from arrl.org/lotw
 			WAIT_AUTO,       // Book is reserved for the next auto-import session
@@ -69,7 +70,7 @@ namespace zzalog {
 		// Merge the data into book_
 		void merge_data();
 		// load data for import
-		bool load_data(string filename);
+		bool load_data(string filename, update_mode_t mode);
 		// Number of update files
 		int number_update_files();
 		// Load from a data stream

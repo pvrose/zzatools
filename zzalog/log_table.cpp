@@ -10,6 +10,7 @@
 #include "menu.h"
 #include "toolbar.h"
 #include "status.h"
+#include "pfx_data.h"
 
 #include <FL/fl_draw.H>
 #include <FL/Fl_Preferences.H>
@@ -30,6 +31,7 @@ extern toolbar* toolbar_;
 extern status* status_;
 extern intl_dialog* intl_dialog_;
 extern time_t session_start_;
+extern pfx_data* pfx_data_;
 
 Fl_Font log_table::font_;
 Fl_Fontsize log_table::fontsize_;
@@ -151,6 +153,10 @@ void log_table::cb_tab_log(Fl_Widget* w, void* v) {
 				that->describe_cell(row, col);
 				break;
 			}
+			break;
+		case FL_PUSH:
+			// Select the row clicked
+			that->my_book_->selection(item_num, HT_SELECTED, that);
 			break;
 		}
 		break;
@@ -695,7 +701,12 @@ void log_table::describe_cell(int item, int col) {
 		record* record = my_book_->get_record(item_number, true);
 		field_info_t field_info = fields_[col];
 		// get the tip
-		tip = spec_data_->get_tip(field_info.field, record);
+		if (field_info.field == "CALL") {
+			tip = pfx_data_->get_tip(record);
+		}
+		else {
+			tip = spec_data_->get_tip(field_info.field, record);
+		}
 	}
 	// display it in a window that will time-out. Position the window where the mouse clicked
 	Fl_Window* tw = ::tip_window(tip, last_rootx_, last_rooty_);

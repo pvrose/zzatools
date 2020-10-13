@@ -401,7 +401,7 @@ void status::misc_status(status_t status, const char* label) {
 	// X is a single letter indicating the message severity
 	sprintf(message, "%c %s %s\n", STATUS_CODES.at(status), timestamp.c_str(), label);
 
-	if (!file_unusable_) {
+	if (!report_file_) {
 		// Append the status to the file
 		// Try to open the file. Open and close it each message
 		if (append_log_) {
@@ -409,9 +409,8 @@ void status::misc_status(status_t status, const char* label) {
 			report_file_ = new ofstream(report_filename_, ios::out | ios::app);
 		}
 		else {
-			// Create a new file and then append subsequent messages to it
+			// Create a new file 
 			report_file_ = new ofstream(report_filename_, ios::out | ios::trunc);
-			append_log_ = true;
 		}
 		if (!report_file_->good()) {
 			// File didn't open correctly
@@ -421,10 +420,10 @@ void status::misc_status(status_t status, const char* label) {
 			fl_alert("STATUS: Failed to open status report file %s", report_filename_.c_str());
 		}
 
-		if (report_file_) {
-			// File did open correctly
-			*report_file_ << message;
-		}
+	}
+	if (report_file_) {
+		// File did open correctly
+		*report_file_ << message;
 	}
 
 	// Now add the line to the file viewer

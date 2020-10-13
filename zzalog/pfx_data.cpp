@@ -954,3 +954,49 @@ void pfx_data::great_circle(lat_long_t source, lat_long_t destination, double& b
 	distance = EARTH_RADIUS * acos(cos_angle);
 }
 
+string pfx_data::get_tip(record* record) {
+	vector<prefix*> prefixes;
+	char temp[1024];
+	string message;
+	if (all_prefixes(record, &prefixes, false)) {
+		// We have at least one result - add appropriate heading to tip
+		if (prefixes.size() > 1) {
+			sprintf(temp, "%s: %d Possible prefixes found\n", record->item("CALL").c_str(), prefixes.size());
+		}
+		else {
+			sprintf(temp, "%s: Prefix found \n", record->item("CALL").c_str());
+		}
+		message += temp;
+		// For each prefix found
+		for (size_t i = 0; i < prefixes.size(); i++) {
+			// Get the prefix and its associated DXCC entity prefix
+			prefix* pfx = prefixes[i];
+			prefix* dxcc_pfx = pfx;
+			while (dxcc_pfx->parent_ != nullptr) dxcc_pfx = dxcc_pfx->parent_;
+			// Add explanation of DXCC entity
+			sprintf(temp, "DXCC %s - %s\n", dxcc_pfx->nickname_.c_str(), dxcc_pfx->name_.c_str());
+			message += temp;
+			if (pfx->parent_ != nullptr) {
+				// If prefix wasn't DXCC - add prefix explanation
+				sprintf(temp, "+ Prefix %s - %s\n", pfx->nickname_.c_str(), pfx->name_.c_str());
+				message += temp;
+			}
+			// Add any special information - add the DXCC entity code to our dummy record to speed up the search
+			string dxcc_code = to_string(pfx->dxcc_code_);
+			record->item("DXCC", dxcc_code);
+			vector<prefix*> specials;
+			if (all_prefixes(record, &specials, true)) {
+				// Add the special call explanation
+				for (auto it = specials.begin(); it != specials.end(); it++) {
+					sprintf(temp, "+ Prefix %s - %s\n", (*it)->nickname_.c_str(), (*it)->name_.c_str());
+					message += temp;
+				}
+			}
+		}
+	}
+	else {
+		// No prefixes found that match
+		message = "No prefixes found\n";
+	}
+	return message;
+}

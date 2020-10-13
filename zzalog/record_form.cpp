@@ -56,6 +56,7 @@ enum edit_action_t {
 	REJECT,       // Reject imported entry
 	ADD,          // Add imported entry
 	MERGE,        // Merge log and import query
+	FIND_WSJTX,   // Find in WSJT-X ALL.Txt file
 	KEEP_LOG,     // Keep existing log version of duplicate entry
 	KEEP_DUPE,    // Replace log with duplicate version
 	MERGE_DUPE,   // Merge log and duplicate records
@@ -877,7 +878,17 @@ void record_form::cb_bn_edit(Fl_Widget* w, long v) {
 		// Queried duplicate record is not a duplicate, keep both it and the original record
 		navigation_book_->accept_dupe();
 		break;
+	case FIND_WSJTX:
+		// Find details of the QSO in WSJT-X ALL.txh file
+		if (that->parse_all_txt()) {
+			that->record_table_->set_records(that->record_1_, that->record_2_, nullptr);
+			that->enable_widgets();
+			// Drop out to allow user to chose again - do I need to disable this button?
+			return;
+		}
+		else break;
 	}
+
 	// delete pointer to query record
 	that->record_2_ = nullptr;
 	that->item_num_2_ = -1;
@@ -1371,6 +1382,15 @@ void record_form::draw_image() {
 			card_display_->align(FL_ALIGN_CENTER);
 			card_display_->add(card);
 		}
+		break;
+	case QI_TEXT:
+		// Generate a text display for parse_all_text() to use
+		text_display_ = new Fl_Text_Display(card_display_->x(), card_display_->y(), card_display_->w(), card_display_->h(), nullptr);
+		text_display_->textcolor(FL_BLACK);
+		text_display_->textfont(FL_COURIER);
+		text_display_->textsize(12);
+		card_display_->add(text_display_);
+		break;
 	}
 	card_display_->redraw();
 }
@@ -1512,7 +1532,7 @@ void record_form::enable_widgets() {
 		break;
 	case UM_QUERY:
 		// We are comparing two records. Enable widgets we need to merge the two.
-		// Card display 
+		// Card display - NB activated below in certain circumstances 
 		card_display_->deactivate();
 		card_filename_out_->deactivate();
 		keep_bn_->deactivate();
@@ -1560,17 +1580,34 @@ void record_form::enable_widgets() {
 		edit2_bn_->color(fl_darker(FL_YELLOW));
 		edit2_bn_->tooltip("Merge log and import query records");
 		edit2_bn_->callback(cb_bn_edit, (long)MERGE);
-		edit2_bn_->activate();
-		edit3_bn_->label("Add query");
+		if (record_1_) {
+			edit2_bn_->activate();
+		}
+		else {
+			edit2_bn_->deactivate();
+		}
+		edit3_bn_->label("Add");
 		edit3_bn_->color(FL_GREEN);
 		edit3_bn_->tooltip("Add query record to log");
 		edit3_bn_->callback(cb_bn_edit, (long)ADD);
 		edit3_bn_->activate();
-		edit4_bn_->label("4");
-		edit4_bn_->color(FL_BACKGROUND_COLOR);
-		edit4_bn_->tooltip("");
-		edit4_bn_->callback(cb_bn_edit, (long)NONE);
-		edit4_bn_->deactivate();
+		// If this record is a WSJT-X mode and we don't have a possible match set button 4 to look inn ALL.txt
+		if (record_2_ && (record_2_->item("MODE") == "JT65" || record_2_->item("MODE") == "JT9" || record_2_->item("MODE") == "FT8" || record_2_->item("MODE") == "FT4")) {
+			// Need to activate display
+			card_display_->activate();
+			edit4_bn_->label("Find text");
+			edit4_bn_->color(FL_YELLOW);
+			edit4_bn_->tooltip("Find record in WSJT-X ALL.txt file");
+			edit4_bn_->callback(cb_bn_edit, (long)FIND_WSJTX);
+			edit4_bn_->activate();
+		}
+		else {
+			edit4_bn_->label("4");
+			edit4_bn_->color(FL_BACKGROUND_COLOR);
+			edit4_bn_->tooltip("");
+			edit4_bn_->callback(cb_bn_edit, (long)NONE);
+			edit4_bn_->deactivate();
+		}
 		break;
 	case UM_DUPEQUERY:
 		// Card display 
@@ -1771,3 +1808,170 @@ void record_form::explain_enum(spec_dataset* dataset, string enum_value) {
 
 }
 
+// Create a text display for the found records in all.txt and return the equivalent record
+bool record_form::parse_all_txt() {
+	Fl_Preferences datapath_settings(settings_, "Datapath");
+	char* temp;
+	datapath_settings.get("WSJT-X", temp, "");
+	string filename = string(temp) + "/all.txt";
+	ifstream inf(filename.c_str());
+	// This will take a while so display the timer cursor
+	fl_cursor(FL_CURSOR_WAIT);
+	// calculate the file size and initialise the progress bar
+	streampos startpos = inf.tellg();
+	inf.seekg(0, ios::end);
+	streampos endpos = inf.tellg();
+	long file_size = (long)(endpos - startpos);
+	status_->misc_status(ST_NOTE, "LOG: Starting to parse all.txt");
+	status_->progress(file_size, OT_RECORD, "bytes");
+	// reposition back to beginning
+	inf.seekg(0, ios::beg);
+	bool start_copying = false;
+	bool stop_copying = false;
+	// Get search items from record
+	string my_call = record_2_->item("STATION_CALLSIGN", true, true);
+	string their_call = record_2_->item("CALL");
+	string datestamp = record_2_->item("QSO_DATE").substr(2);
+	string timestamp = record_2_->item("TIME_ON");
+	string mode = record_2_->item("MODE");
+	// Mark QSO incomplete 
+	record_2_->item("QSO_COMPLETE", string("N"));
+	// Draw the text buffer
+	selected_image_ = QI_TEXT;
+	draw_image();
+	Fl_Text_Buffer* buffer = new Fl_Text_Buffer;
+	text_display_->buffer(buffer);
+	streamsize count = 0;
+	// Now read the file - search for the QSO start time
+	while (inf.good() && !stop_copying) {
+		string line;
+		getline(inf, line);
+		count += inf.gcount();
+		status_->progress(count, OT_RECORD);
+
+		// Does the line contain sought date, time, both calls and "Tx" or "Transmitting"
+		if (line.substr(0, 6) == datestamp &&
+			line.substr(7, 6) == timestamp &&
+			(line.find("Transmitting") != string::npos || line.find("Tx")) &&
+			line.find(my_call) != string::npos &&
+			line.find(their_call) != string::npos &&
+			line.find(mode) != string::npos) {
+			start_copying = true;
+		}
+		if (start_copying) {
+			if (line.find(my_call) != string::npos &&
+				line.find(their_call) != string::npos) {
+				// It has both calls - copy to buffer, and parse for QSO details (report, grid and QSO completion
+				buffer->append(line.c_str());
+				buffer->append("\n");
+				copy_all_txt(line, record_2_);
+			}
+			else if (line.find(my_call) == string::npos &&
+				line.find(their_call) == string::npos) {
+				// It has neither call - ignore
+			}
+			else {
+				// It has one or the other call - indicates QSO complete
+				stop_copying = true;
+			}
+		}
+	}
+	if (stop_copying) {
+		status_->progress("Found record!", OT_RECORD);
+		// If we are complete then say so
+		if (record_2_->item("QSO_COMPLETE") != "N" && record_2_->item("QSO_COMPLETE") != "?") {
+			return true;
+		}
+	}
+	return false;
+}
+
+// Copy the text line back to the record - look to see whether it's transmit or receive and then 
+void record_form::copy_all_txt(string text, record* record) {
+	bool tx_record;
+	// After this initial processing pos will point to the start og the QSO decode string - look for old-style transmit record
+	size_t pos = text.find("Transmitting");
+	if (pos != string::npos) {
+		pos = text.find(record->item("MODE"));
+		pos += record->item("MODE").length() + 3;
+		tx_record = true;
+		// Nothing else to get from this record
+	}
+	else {
+		// Now see if it's a new-style Tx record
+		pos = text.find("Tx");
+		if (pos != string::npos) {
+			// Get frequency of transmission - including audio offset
+			string freq = text.substr(14, 9);
+			// Replace leading spaces with zeroes
+			for (size_t i = 0; freq[i] == ' '; i++) {
+				freq[i] = '0';
+			}
+			string freq_offset = text.substr(43, 4);
+			// Replace leading spaces with zeroes
+			for (size_t i = 0; freq_offset[i] == ' '; i++) {
+				freq_offset[i] = '0';
+			}
+			double frequency = stod(freq) + (stod(freq_offset) / 1000000.0);
+			record->item("FREQ", to_string(frequency));
+			pos = 48;
+			tx_record = true;
+		}
+		else {
+			// Look for a new-style Rx record
+			pos = text.find("Rx");
+			if (pos != string::npos) {
+				pos = 48;
+				tx_record = false;
+			}
+			else {
+				// Default to old-style Rx record
+				pos = 24;
+				tx_record = false;
+			}
+		}
+	}
+	// Now parse the exchange
+	vector<string> words;
+	zzalib::split_line(text.substr(pos), words, ' ');
+	string report = words.back();
+	if (report == "RR73" || report == "RRR") {
+		// If we've seen the R-00 then mark the QSO complete, otherwise mark in provisional until we see the 73
+		if (record->item("QSO_COMPLETE") == "?") {
+			record->item("QSO_COMPLETE", string(""));
+		}
+		else if (record->item("QSO_COMPLETE") == "N") {
+			record->item("QSO_COMPLETE", string("?"));
+		}
+	}
+	else if (report == "73") {
+		// A 73 definitely indicates QSO compplete
+		record->item("QSO_COMPLETE", string(""));
+	}
+	else if (report[0] == 'R') {
+		// The first of the rogers
+		if (record->item("QSO_COMPLETE") == "N") {
+			record->item("QSO_COMPLETE", string("?"));
+		}
+		// Update reports if they've not been provided
+		if (tx_record && !record->item_exists("RST_SENT")) {
+			record->item("RST_SENT", report.substr(1));
+		}
+		else if (!tx_record && !record->item_exists("RST_RCVD")) {
+			record->item("RST_RCVD", report.substr(1));
+		}
+	}
+	else if (!tx_record && !record->item_exists("GRIDSQUARE")) {
+			// Update gridsquare if it's not been provided
+			record->item("GRIDSQUARE", report);
+	}
+	else if (report[0] == '-' || (report[0] >= '0' && report[0] <= '9')) {
+		// Numeric report
+		if (tx_record && !record->item_exists("RST_SENT")) {
+			record->item("RST_SENT", report);
+		}
+		else if (!tx_record && !record->item_exists("RST_RCVD")) {
+			record->item("RST_RCVD", report);
+		}
+	}
+}

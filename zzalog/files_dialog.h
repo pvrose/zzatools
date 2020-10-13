@@ -61,6 +61,8 @@ namespace zzalog {
 		string backup_directory_;
 		// Status log file
 		string status_log_file_;
+		// All.txt file
+		string wsjtx_directory_;
 		// Names of the modem applications providiing auto-import data
 		string auto_src_[AUTO_COUNT];
 		// Default web-browser location
@@ -87,6 +89,8 @@ namespace zzalog {
 		browser_data_t web_data_;
 		// callback data for the status log file browse button
 		browser_data_t status_data_;
+		// callback data for all.txt file
+		browser_data_t wsjtx_data_;
 		// callback data for the unzipper command
 		browser_data_t unzipper_data_;
 		// Poll interval (in seconds) for auto-importing

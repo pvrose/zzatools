@@ -231,7 +231,7 @@ string eqsl_handler::card_filename_l(record* record) {
 		delete chooser;
 	}
 	char save_filename[2048];
-	// Create file name e.g. <dir-name>/20M/PSK/GM3ZZA_202007201424.png
+	// Create file name e.g. <dir-name>/20M/PSK/GM3ZZA__202007201424.png
 	// NB we used to have APP_ZZA_EQSL_TS as thetimestamp from the eQSL record, but we now do this after merging the data.
 	sprintf(save_filename, "%s/%s/%s/%s__%s%s.png", qsl_directory.c_str(), band.c_str(), mode.c_str(), card_call.c_str(), qso_date.c_str(), time_on.substr(0, 4).c_str());
 	return save_filename;
@@ -769,7 +769,8 @@ bool eqsl_handler::upload_eqsl_log(book* book) {
 			help_dialog_->value(response.str().c_str());
 			help_dialog_->show();
 		}
-		// now update book - 
+		// now update book - don't try and save after each record
+		book_->enable_save(false);
 		for (size_t pos = 0; pos < book->size(); pos++) {
 			record* record = book->get_record(pos, false);
 			bool dont_update = false;
