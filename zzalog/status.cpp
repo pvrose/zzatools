@@ -266,6 +266,7 @@ void status::progress(int max_value, object_t object, const char* suffix, bool c
 		}
 		item->countdown = countdown;
 		item->suffix = new char[strlen(suffix) + 1];
+		item->prev_value = 0;
 		strcpy(item->suffix, suffix);
 		progress_items_[object] = item;
 		// Push it onto the stack of progess bar processes
@@ -296,11 +297,11 @@ void status::update_progress(object_t object) {
 		// Set range (0:max_value)
 		progress_->minimum(0.0);
 		progress_->maximum((float)item->max_value);
-		// redraw and allow scheduler to effect the redrawing if value has gone up by > 1%
+		// redraw and allow scheduler to effect the redrawing if value has gone up by > 1% or is at start or finish
 		progress_->redraw();
-		if (item->value - prev_progress_ > item->max_value / 100) {
+		if (item->value == 0 || item->value == item->max_value || item->value - item->prev_value > item->max_value / 100) {
 			Fl::wait();
-			prev_progress_ = item->value;
+			item->prev_value = item->value;
 		}
 	}
 }

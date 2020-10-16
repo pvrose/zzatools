@@ -1846,7 +1846,7 @@ bool record_form::parse_all_txt() {
 	while (inf.good() && !stop_copying) {
 		string line;
 		getline(inf, line);
-		count += inf.gcount();
+		count += line.length() + 1;
 		status_->progress(count, OT_RECORD);
 
 		// Does the line contain sought date, time, both calls and "Tx" or "Transmitting"
@@ -1883,6 +1883,9 @@ bool record_form::parse_all_txt() {
 			return true;
 		}
 	}
+	char message[100];
+	snprintf(message, 100, "LOG: Cannot find contact with %s in WSJT-X text.all file.", their_call.c_str());
+	status_->misc_status(ST_WARNING, message);
 	return false;
 }
 

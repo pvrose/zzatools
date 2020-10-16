@@ -153,6 +153,7 @@ namespace zzalog {
 		int value;
 		char* suffix;
 		bool countdown;
+		int prev_value;
 	};
 
 	// This class provides the status bar and manages access to the various status information
@@ -236,8 +237,6 @@ namespace zzalog {
 		map<object_t, progress_item*> progress_items_;
 		// Report file unusable
 		bool file_unusable_;
-		// Previous reported progress
-		int prev_progress_;
 		// Do not update file viewer
 		bool no_update_viewer;
 
