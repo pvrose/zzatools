@@ -215,6 +215,8 @@ namespace zzalog {
 		bool display_all_fields_;
 		// Text display
 		Fl_Text_Display* text_display_;
+		// Finished searching all.txt
+		bool enable_all_search_;
 	};
 
 }

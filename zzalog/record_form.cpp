@@ -116,6 +116,7 @@ record_form::record_form(int X, int Y, int W, int H, const char* label, field_or
 	, edit_mode_(EM_ORIGINAL)
 	, current_field_("")
 	, modifying_(false)
+	, enable_all_search_(false)
 
 {
 	// widget positioning
@@ -882,11 +883,11 @@ void record_form::cb_bn_edit(Fl_Widget* w, long v) {
 		// Find details of the QSO in WSJT-X ALL.txh file
 		if (that->parse_all_txt()) {
 			that->record_table_->set_records(that->record_1_, that->record_2_, nullptr);
-			that->enable_widgets();
-			// Drop out to allow user to chose again - do I need to disable this button?
-			return;
 		}
-		else break;
+		that->enable_all_search_ = false;
+		that->enable_widgets();
+		// Drop out to allow user to chose again 
+		return;
 	}
 
 	// delete pointer to query record
@@ -1040,6 +1041,7 @@ void record_form::update(hint_t hint, record_num_t record_num_1, record_num_t re
 		edit_mode_ = EM_ORIGINAL;
 		query_message_ = import_data_->match_question();
 		is_enumeration_ = false;
+		enable_all_search_ = true;
 		update_form();
 		break;
 	case HT_DUPE_QUERY:
@@ -1390,6 +1392,8 @@ void record_form::draw_image() {
 		text_display_->textfont(FL_COURIER);
 		text_display_->textsize(12);
 		card_display_->add(text_display_);
+		card_filename_out_->label("The records found that match the query");
+		card_filename_out_->labelcolor(FL_BLACK);
 		break;
 	}
 	card_display_->redraw();
@@ -1592,14 +1596,22 @@ void record_form::enable_widgets() {
 		edit3_bn_->callback(cb_bn_edit, (long)ADD);
 		edit3_bn_->activate();
 		// If this record is a WSJT-X mode and we don't have a possible match set button 4 to look inn ALL.txt
-		if (record_2_ && (record_2_->item("MODE") == "JT65" || record_2_->item("MODE") == "JT9" || record_2_->item("MODE") == "FT8" || record_2_->item("MODE") == "FT4")) {
+		if (record_2_ && 
+			(record_2_->item("MODE") == "JT65" || record_2_->item("MODE") == "JT9" || record_2_->item("MODE") == "FT8" || record_2_->item("MODE") == "FT4")) {
 			// Need to activate display
 			card_display_->activate();
+			card_filename_out_->activate();
 			edit4_bn_->label("Find text");
 			edit4_bn_->color(FL_YELLOW);
 			edit4_bn_->tooltip("Find record in WSJT-X ALL.txt file");
-			edit4_bn_->callback(cb_bn_edit, (long)FIND_WSJTX);
-			edit4_bn_->activate();
+			if (enable_all_search_) {
+				edit4_bn_->callback(cb_bn_edit, (long)FIND_WSJTX);
+				edit4_bn_->activate();
+			}
+			else {
+				edit4_bn_->callback(cb_bn_edit, (long)NONE);
+				edit4_bn_->deactivate();
+			}
 		}
 		else {
 			edit4_bn_->label("4");
@@ -1814,18 +1826,18 @@ bool record_form::parse_all_txt() {
 	char* temp;
 	datapath_settings.get("WSJT-X", temp, "");
 	string filename = string(temp) + "/all.txt";
-	ifstream inf(filename.c_str());
+	ifstream* all_file = new ifstream(filename.c_str());
 	// This will take a while so display the timer cursor
 	fl_cursor(FL_CURSOR_WAIT);
 	// calculate the file size and initialise the progress bar
-	streampos startpos = inf.tellg();
-	inf.seekg(0, ios::end);
-	streampos endpos = inf.tellg();
+	streampos startpos = all_file->tellg();
+	all_file->seekg(0, ios::end);
+	streampos endpos = all_file->tellg();
 	long file_size = (long)(endpos - startpos);
 	status_->misc_status(ST_NOTE, "LOG: Starting to parse all.txt");
 	status_->progress(file_size, OT_RECORD, "bytes");
 	// reposition back to beginning
-	inf.seekg(0, ios::beg);
+	all_file->seekg(0, ios::beg);
 	bool start_copying = false;
 	bool stop_copying = false;
 	// Get search items from record
@@ -1841,11 +1853,11 @@ bool record_form::parse_all_txt() {
 	draw_image();
 	Fl_Text_Buffer* buffer = new Fl_Text_Buffer;
 	text_display_->buffer(buffer);
-	streamsize count = 0;
+	int count = 0;
 	// Now read the file - search for the QSO start time
-	while (inf.good() && !stop_copying) {
+	while (all_file->good() && !stop_copying) {
 		string line;
-		getline(inf, line);
+		getline(*all_file, line);
 		count += line.length() + 1;
 		status_->progress(count, OT_RECORD);
 
@@ -1880,9 +1892,11 @@ bool record_form::parse_all_txt() {
 		status_->progress("Found record!", OT_RECORD);
 		// If we are complete then say so
 		if (record_2_->item("QSO_COMPLETE") != "N" && record_2_->item("QSO_COMPLETE") != "?") {
+			all_file->close();
 			return true;
 		}
 	}
+	all_file->close();
 	char message[100];
 	snprintf(message, 100, "LOG: Cannot find contact with %s in WSJT-X text.all file.", their_call.c_str());
 	status_->misc_status(ST_WARNING, message);
