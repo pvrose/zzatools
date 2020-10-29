@@ -880,6 +880,13 @@ void book::delete_record(bool force) {
 		}
 	}
 	else if (modified_record_) {
+		// Update status bar and menu items
+		char text[128];
+		sprintf(text, "LOG: Canceling edit record %s %s %s",
+			get_record()->item("QSO_DATE").c_str(),
+			get_record()->item("TIME_ON").c_str(),
+			get_record()->item("CALL").c_str());
+		status_->misc_status(ST_NOTE, text);
 		// Cancel record edit.
 		*get_record() = *old_record_;
 		delete old_record_;

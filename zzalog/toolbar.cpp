@@ -140,6 +140,15 @@ toolbar::toolbar(int X, int Y, int W, int H, const char* label) :
 	bn->image(new Fl_RGB_Image(ICON_DEL_QSO, 16, 16, 4));
 	bn->tooltip("Delete QSO record");
 	add(bn);
+	curr_x += H;
+	// Log->Retime Record
+	bn = new Fl_Button(curr_x, Y, H, H, 0);
+	bn->callback(cb_bn_menu, (void*)"&Log/Re&time record");
+	bn->when(FL_WHEN_RELEASE);
+	bn->image(new Fl_RGB_Image(ICON_RETIME_QSO, 16, 16, 4));
+	bn->tooltip("Reset QSO TIME_OFF");
+	add(bn);
+
 	curr_x += H + TOOL_GAP;
 	// Import->Download->eQSL
 	bn = new Fl_Button(curr_x, Y, H, H, 0);

@@ -75,6 +75,8 @@ namespace zzalog {
 		static void cb_mi_log_spad(Fl_Widget* w, void* v);
 		// Log->New View->Main,Record,Scratchpad
 		static void cb_mi_log_view(Fl_Widget* w, void* v);
+		// Log->Retime QSO
+		static void cb_mi_log_retime(Fl_Widget* w, void* v);
 		// Log->Change->Rig/Aerial/QTH
 		static void cb_mi_oper_change(Fl_Widget* w, void* v);
 		// Log->Set->Rig/Aerial/QTH

@@ -107,6 +107,7 @@ namespace zzalog {
 	{ 0 },
 	{ "&New record", 0, menu::cb_mi_log_new, nullptr },
 	{ "&Save record", 0, menu::cb_mi_log_save, nullptr },
+	{ "Re&time record", 0, menu::cb_mi_log_retime, nullptr },
 	{ "&Cancel", 0, menu::cb_mi_log_del, (void*)false },
 	{ "&Delete record", 0, menu::cb_mi_log_del, (void*)true, FL_MENU_DIVIDER },
 	{ "&Parse record", 0, menu::cb_mi_parse_qso, 0 },
@@ -919,6 +920,29 @@ void menu::cb_mi_log_del(Fl_Widget* w, void* v) {
 	// delete_record(true) - deliberately deleting a record
 	// delete_record(false) - only deletes if entering a new record (i.e. cancel)
 	navigation_book_->delete_record((bool)(long)v);
+}
+
+// Log->Retime record - reset TIME_OFF
+// v is not used
+void menu::cb_mi_log_retime(Fl_Widget* w, void* v) {
+	record* this_record = navigation_book_->get_record();
+	string old_time = this_record->item("TIME_OFF");
+	string time = now(false, "%H%M%S");
+	this_record->item("TIME_OFF", time);
+	char message[200];
+	snprintf(message, 200, "LOG: %s %s %s record changed %s from %s to %s",
+		this_record->item("QSO_DATE").c_str(),
+		this_record->item("TIME_ON").c_str(),
+		this_record->item("CALL").c_str(),
+		"TIME_OFF",
+		old_time.c_str(),
+		time.c_str());
+	status_->misc_status(ST_NOTE, message);
+	book_->modified_record(true);
+	book_->modified(true);
+	tabbed_forms_->update_views(nullptr, HT_CHANGED, navigation_book_->selection());
+	menu* that = ancestor_view<menu>(w);
+	that->update_items();
 }
 
 // Log->Bulk Change - Do the same mod on all records

@@ -124,7 +124,7 @@ namespace zzalog {
 		// explain the enumeration value
 		void explain_enum(spec_dataset* dataset, string enumeration_value);
 		// Parse WSJT-X ALL.txt
-		bool parse_all_txt();
+		bool parse_all_txt(record* record);
 		// Copy line to record
 		void copy_all_txt(string text, record* record);
 

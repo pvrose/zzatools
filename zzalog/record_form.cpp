@@ -881,8 +881,17 @@ void record_form::cb_bn_edit(Fl_Widget* w, long v) {
 		break;
 	case FIND_WSJTX:
 		// Find details of the QSO in WSJT-X ALL.txh file
-		if (that->parse_all_txt()) {
-			that->record_table_->set_records(that->record_1_, that->record_2_, nullptr);
+		switch (that->use_mode_) {
+		case UM_QUERY:
+			if (that->parse_all_txt(that->record_2_)) {
+				that->record_table_->set_records(that->record_1_, that->record_2_, nullptr);
+			}
+			break;
+		default:
+			if (that->parse_all_txt(that->record_1_)) {
+				that->record_table_->set_records(that->record_1_, that->record_2_, nullptr);
+			}
+			break;
 		}
 		that->enable_all_search_ = false;
 		that->enable_widgets();
@@ -996,6 +1005,7 @@ void record_form::update(hint_t hint, record_num_t record_num_1, record_num_t re
 		edit_mode_ = EM_ORIGINAL;
 		query_message_ = "";
 		is_enumeration_ = false;
+		enable_all_search_ = true;
 		update_form();
 		break;
 	case HT_STARTING:
@@ -1011,6 +1021,7 @@ void record_form::update(hint_t hint, record_num_t record_num_1, record_num_t re
 		edit_mode_ = EM_ORIGINAL;
 		query_message_ = "";
 		is_enumeration_ = false;
+		enable_all_search_ = false;
 		update_form();
 		break;
 	case HT_IMPORT_QUERY:
@@ -1025,6 +1036,7 @@ void record_form::update(hint_t hint, record_num_t record_num_1, record_num_t re
 		use_mode_ = UM_QUERY;
 		edit_mode_ = EM_ORIGINAL;
 		query_message_ = import_data_->match_question();
+		enable_all_search_ = true;
 		is_enumeration_ = false;
 		update_form();
 		break;
@@ -1057,6 +1069,7 @@ void record_form::update(hint_t hint, record_num_t record_num_1, record_num_t re
 		edit_mode_ = EM_ORIGINAL;
 		query_message_ = my_book_->match_question();
 		is_enumeration_ = false;
+		enable_all_search_ = false;
 		update_form();
 		break;
 	case HT_MERGE_DETAILS:
@@ -1072,6 +1085,7 @@ void record_form::update(hint_t hint, record_num_t record_num_1, record_num_t re
 		edit_mode_ = EM_ORIGINAL;
 		query_message_ = qrz_handler_->get_merge_message();
 		is_enumeration_ = false;
+		enable_all_search_ = false;
 		update_form();
 		break;
 	case HT_FORMAT:
@@ -1455,11 +1469,6 @@ void record_form::enable_widgets() {
 			edit3_bn_->tooltip("Revert to original record");
 			edit3_bn_->callback(cb_bn_edit, (long)REVERT);
 			edit3_bn_->activate();
-			edit4_bn_->label("4");
-			edit4_bn_->color(FL_BACKGROUND_COLOR);
-			edit4_bn_->tooltip("");
-			edit4_bn_->callback(cb_bn_edit, (long)NONE);
-			edit4_bn_->deactivate();
 			// Quick QSL entry
 			quick_grp_->activate();
 		}
@@ -1480,13 +1489,33 @@ void record_form::enable_widgets() {
 			edit3_bn_->tooltip("");
 			edit3_bn_->callback(cb_bn_edit, (long)NONE);
 			edit3_bn_->deactivate();
+			// Quick QSL entry
+			quick_grp_->deactivate();
+		}
+		// If this record is a WSJT-X mode and we don't have a possible match set button 4 to look inn ALL.txt
+		if (record_1_ &&
+			(record_1_->item("MODE") == "JT65" || record_1_->item("MODE") == "JT9" || record_1_->item("MODE") == "FT8" || record_1_->item("MODE") == "FT4")) {
+			// Need to activate display
+			card_display_->activate();
+			card_filename_out_->activate();
+			edit4_bn_->label("Find text");
+			edit4_bn_->color(FL_YELLOW);
+			edit4_bn_->tooltip("Find record in WSJT-X ALL.txt file");
+			if (enable_all_search_) {
+				edit4_bn_->callback(cb_bn_edit, (long)FIND_WSJTX);
+				edit4_bn_->activate();
+			}
+			else {
+				edit4_bn_->callback(cb_bn_edit, (long)NONE);
+				edit4_bn_->deactivate();
+			}
+		}
+		else {
 			edit4_bn_->label("4");
 			edit4_bn_->color(FL_BACKGROUND_COLOR);
 			edit4_bn_->tooltip("");
 			edit4_bn_->callback(cb_bn_edit, (long)NONE);
 			edit4_bn_->deactivate();
-			// Quick QSL entry
-			quick_grp_->deactivate();
 		}
 		break;
 	case UM_QSO:
@@ -1821,7 +1850,7 @@ void record_form::explain_enum(spec_dataset* dataset, string enum_value) {
 }
 
 // Create a text display for the found records in all.txt and return the equivalent record
-bool record_form::parse_all_txt() {
+bool record_form::parse_all_txt(record* record) {
 	Fl_Preferences datapath_settings(settings_, "Datapath");
 	char* temp;
 	datapath_settings.get("WSJT-X", temp, "");
@@ -1841,13 +1870,13 @@ bool record_form::parse_all_txt() {
 	bool start_copying = false;
 	bool stop_copying = false;
 	// Get search items from record
-	string my_call = record_2_->item("STATION_CALLSIGN", true, true);
-	string their_call = record_2_->item("CALL");
-	string datestamp = record_2_->item("QSO_DATE").substr(2);
-	string timestamp = record_2_->item("TIME_ON");
-	string mode = record_2_->item("MODE");
+	string my_call = record->item("STATION_CALLSIGN", true, true);
+	string their_call = record->item("CALL");
+	string datestamp = record->item("QSO_DATE").substr(2);
+	string timestamp = record->item("TIME_ON");
+	string mode = record->item("MODE");
 	// Mark QSO incomplete 
-	record_2_->item("QSO_COMPLETE", string("N"));
+	record->item("QSO_COMPLETE", string("N"));
 	// Draw the text buffer
 	selected_image_ = QI_TEXT;
 	draw_image();
@@ -1876,7 +1905,7 @@ bool record_form::parse_all_txt() {
 				// It has both calls - copy to buffer, and parse for QSO details (report, grid and QSO completion
 				buffer->append(line.c_str());
 				buffer->append("\n");
-				copy_all_txt(line, record_2_);
+				copy_all_txt(line, record);
 			}
 			else if (line.find(my_call) == string::npos &&
 				line.find(their_call) == string::npos) {
@@ -1891,7 +1920,7 @@ bool record_form::parse_all_txt() {
 	if (stop_copying) {
 		status_->progress("Found record!", OT_RECORD);
 		// If we are complete then say so
-		if (record_2_->item("QSO_COMPLETE") != "N" && record_2_->item("QSO_COMPLETE") != "?") {
+		if (record->item("QSO_COMPLETE") != "N" && record->item("QSO_COMPLETE") != "?") {
 			all_file->close();
 			return true;
 		}
@@ -1899,6 +1928,7 @@ bool record_form::parse_all_txt() {
 	all_file->close();
 	char message[100];
 	snprintf(message, 100, "LOG: Cannot find contact with %s in WSJT-X text.all file.", their_call.c_str());
+	status_->progress("Did not find record", OT_RECORD);
 	status_->misc_status(ST_WARNING, message);
 	return false;
 }
