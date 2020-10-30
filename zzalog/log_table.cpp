@@ -189,28 +189,41 @@ void log_table::cb_input(Fl_Widget* w, void* v) {
 void log_table::cb_menu(Fl_Widget* w, void* v) {
 	// Get the enclosing log_table
 	log_table* that = ancestor_view<log_table>(w);
-	// Get the position of the word to change
-	unsigned int p = that->edit_input_->position();
-	unsigned int m = p;
 	unsigned int l = strlen(that->edit_input_->value());
+	bool mixed_upper;
 	char* value = new char[l + 1];
 	strcpy(value, that->edit_input_->value());
-	while (m > 0 && value[m] != ' ') m--;
-	while (p < l && value[p] != ' ') p++;
 	// Depending on the menu item pressed convert case appropriately
 	switch ((edit_menu_t)(long)v) {
 	case UPPER:
-		for (unsigned int i = m; i < p; i++)
+		for (unsigned int i = 0; i < l; i++)
 			value[i] = toupper(value[i]);
 		break;
 	case LOWER:
-		for (unsigned int i = m; i < p; i++)
+		for (unsigned int i = 0; i < l; i++)
 			value[i] = tolower(value[i]);
 		break;
 	case MIXED:
-		value[m] = toupper(value[m]);
-		for (unsigned int i = m + 1; i < p; i++)
-			value[i] = tolower(value[i]);
+		mixed_upper = true;
+		for (unsigned int i = 0; i < l; i++) {
+			if (mixed_upper) {
+				value[i] = toupper(value[i]);
+			}
+			else {
+				value[i] = tolower(value[i]);
+			}
+			switch (value[i]) {
+			case ' ':
+			case '-':
+			case '.':
+				// Allow upper case after some punctuation
+				mixed_upper = true;
+				break;
+			default:
+				mixed_upper = false;
+				break;
+			}
+		}
 		break;
 	}
 	that->edit_input_->value(value);
