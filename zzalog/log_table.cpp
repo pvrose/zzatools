@@ -189,30 +189,37 @@ void log_table::cb_input(Fl_Widget* w, void* v) {
 void log_table::cb_menu(Fl_Widget* w, void* v) {
 	// Get the enclosing log_table
 	log_table* that = ancestor_view<log_table>(w);
-	unsigned int l = strlen(that->edit_input_->value());
+	// Get the source string 
+	const char* src = that->edit_input_->value();
+	unsigned int l = strlen(src);
 	bool mixed_upper;
-	char* value = new char[l + 1];
-	strcpy(value, that->edit_input_->value());
+	int len;
+	// Destination string should be upto 3 times the length of the source
+	char* dst = new char[l * 3];
+	memset(dst, 0, l * 3);
+	char* dst2 = dst;
 	// Depending on the menu item pressed convert case appropriately
 	switch ((edit_menu_t)(long)v) {
 	case UPPER:
-		for (unsigned int i = 0; i < l; i++)
-			value[i] = toupper(value[i]);
+		fl_utf_toupper((unsigned char*)src, l, dst);
 		break;
 	case LOWER:
-		for (unsigned int i = 0; i < l; i++)
-			value[i] = tolower(value[i]);
+		fl_utf_tolower((unsigned char*)src, l, dst);
 		break;
 	case MIXED:
 		mixed_upper = true;
-		for (unsigned int i = 0; i < l; i++) {
+		for (unsigned int i = 0; i < l; ) {
+			unsigned int ucs = fl_utf8decode(src + i, src + l, &len);
+			i += len;
+			unsigned int new_ucs;
 			if (mixed_upper) {
-				value[i] = toupper(value[i]);
+				new_ucs = fl_toupper(ucs);
 			}
 			else {
-				value[i] = tolower(value[i]);
+				new_ucs = fl_tolower(ucs);
 			}
-			switch (value[i]) {
+			dst += fl_utf8encode(new_ucs, dst);
+			switch (ucs) {
 			case ' ':
 			case '-':
 			case '.':
@@ -226,7 +233,7 @@ void log_table::cb_menu(Fl_Widget* w, void* v) {
 		}
 		break;
 	}
-	that->edit_input_->value(value);
+	that->edit_input_->value(dst2);
 	// Rehide edit_menu_
 	w->hide();
 }
