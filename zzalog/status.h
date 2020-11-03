@@ -35,7 +35,8 @@ namespace zzalog {
 		RS_OFF,              // The rig is off or disconnected
 		RS_ERROR,            // An error with the rig occured
 		RS_RX,               // The rig is connected and in RX mode
-		RS_TX                // The rig is connected and in TX mode
+		RS_TX,               // The rig is connected and in TX mode
+		RS_HIGH              // The rig is in TX mode but SWR is too high
 	};
 
 	// Default colours for status bars
@@ -88,7 +89,8 @@ namespace zzalog {
 		{ RS_OFF, FL_YELLOW },
 		{ RS_ERROR, fl_color_average(FL_RED, FL_YELLOW, 0.5)},
 		{ RS_RX, FL_GREEN },
-		{ RS_TX, FL_RED }
+		{ RS_TX, FL_RED },
+		{ RS_HIGH, fl_darker(FL_RED) }
 	};
 
 	// 

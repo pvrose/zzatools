@@ -328,6 +328,17 @@ void rig_if::update_clock() {
 	}
 }
 
+bool  rig_if::check_swr() {
+	double swr = swr_meter();
+	if (swr > 1.5) {
+		char message[200];
+		snprintf(message, 200, "RIG: SWR is %.1f", swr);
+		error(ST_ERROR, message);
+		return false;
+	}
+	return true;
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////////////
 //    H a M L I B implementation
@@ -570,6 +581,17 @@ int rig_hamlib::s_meter() {
 	else {
 		// Default to S0 (S9 is -73 dBm)
 		return -54;
+	}
+}
+
+// Return SWR value
+double rig_hamlib::swr_meter() {
+	value_t meter_value;
+	if ((error_code_ = rig_get_level(rig_, RIG_VFO_CURR, RIG_LEVEL_SWR, &meter_value)) == RIG_OK) {
+		return meter_value.f;
+	}
+	else {
+		return 1.0;
 	}
 }
 
@@ -816,6 +838,30 @@ int rig_flrig::s_meter() {
 	}
 }
 
+// Return SWR meter reading
+double rig_flrig::swr_meter() {
+	if (ic7300_) {
+		bool ok;
+		char command = '\x15';
+		string subcommand = "\x12";
+		string data = ic7300_->send_command(command, subcommand, ok);
+		if (ok) {
+			unsigned int value = data[0] * 256 + data[1];
+			double swr;
+			if (value <= 48) {
+				swr = (value * 0.5 / 48) + 1.0;
+			}
+			else if (value <= 80) {
+				swr = ((value - 48) * 0.5 / 32) + 1.5;
+			} else {
+				swr = ((value - 80) * 1.0 / 40) + 2.0;
+			}
+			return swr;
+		}
+	}
+	// Not IC7300 or not OK - return 1.0.
+	return 1.0;
+}
 // Return the most recent error message
 string rig_flrig::error_message() {
 	return error_message_;

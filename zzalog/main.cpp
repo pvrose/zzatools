@@ -432,7 +432,12 @@ void cb_rig_timer() {
 		// Update rig status
 		if (!band_view_ || band_view_->in_band(rig_if_->tx_frequency()/1000.0)) {
 			if (rig_if_->get_tx() == true) {
-				status_->rig_status(RS_TX, rig_if_->rig_info().c_str());
+				if (rig_if_->check_swr()) {
+					status_->rig_status(RS_TX, rig_if_->rig_info().c_str());
+				}
+				else {
+					status_->rig_status(RS_HIGH, rig_if_->rig_info().c_str());
+				}
 			}
 			else {
 				status_->rig_status(RS_RX, rig_if_->rig_info().c_str());
@@ -441,6 +446,8 @@ void cb_rig_timer() {
 		else {
 			status_->rig_status(RS_ERROR, rig_if_->rig_info().c_str());
 		}
+		// Check SWR
+
 	}
 }
 

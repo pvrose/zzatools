@@ -81,6 +81,8 @@ namespace zzalib {
 		virtual string raw_message(string message) = 0;
 		// Get TX mode
 		virtual bool get_tx() = 0;
+		// Get SWR meter
+		virtual double swr_meter() = 0;
 
 		// Error Code is not OK.
 		virtual bool is_good() = 0;
@@ -109,6 +111,8 @@ namespace zzalib {
 		void change_lookup();
 		// Update rig clock
 		void update_clock();
+		// Check SWR
+		bool check_swr();
 
 		// Callback to set certain functions (timer callback, freq to band conversion, error message
 		void callback(void (*function)(), string(*spec_func)(double), void(*mess_func)(status_t, const char*));
@@ -176,6 +180,8 @@ namespace zzalib {
 		virtual string raw_message(string message);
 		// Get TX mode
 		virtual bool get_tx();
+		// Get SWR meter
+		virtual double swr_meter();
 
 		// Error Code is not OK.
 		virtual bool is_good();
@@ -233,6 +239,8 @@ namespace zzalib {
 		virtual string raw_message(string message);
 		// Get TX mode
 		virtual bool get_tx();
+		// Get SWR meter
+		virtual double swr_meter();
 
 		// Error Code is not OK.
 		virtual bool is_good();
