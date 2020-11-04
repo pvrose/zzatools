@@ -145,6 +145,8 @@ namespace zzalib {
 		void(*error)(status_t ok, const char* message);
 		// bool
 		bool have_freq_to_band_;
+		// have reported high SWR
+		bool reported_hi_swr_;
 
 
 	};

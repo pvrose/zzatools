@@ -35,6 +35,7 @@ rig_if::rig_if()
 	freq_to_band_ = nullptr;
 	error = default_error_message;
 	have_freq_to_band_ = false;
+	reported_hi_swr_ = false;
 }
 
 // Base class destructor
@@ -331,11 +332,15 @@ void rig_if::update_clock() {
 bool  rig_if::check_swr() {
 	double swr = swr_meter();
 	if (swr > 1.5) {
-		char message[200];
-		snprintf(message, 200, "RIG: SWR is %.1f", swr);
-		error(ST_ERROR, message);
+		if (!reported_hi_swr_) {
+			char message[200];
+			snprintf(message, 200, "RIG: SWR is %.1f", swr);
+			error(ST_ERROR, message);
+			reported_hi_swr_ = true;
+		}
 		return false;
 	}
+	reported_hi_swr_ = false;
 	return true;
 }
 
@@ -846,7 +851,7 @@ double rig_flrig::swr_meter() {
 		string subcommand = "\x12";
 		string data = ic7300_->send_command(command, subcommand, ok);
 		if (ok) {
-			unsigned int value = data[0] * 256 + data[1];
+			unsigned int value = data[2] * 256 + data[3];
 			double swr;
 			if (value <= 48) {
 				swr = (value * 0.5 / 48) + 1.0;
