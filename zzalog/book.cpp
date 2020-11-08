@@ -470,7 +470,6 @@ void book::remember_record() {
 // Change the selected record (& update any necessary controls
 void book::selection(record_num_t num_item, hint_t hint /* = HT_SELECTED */, view* requester /* = nullptr */, record_num_t num_other /*= 0*/) {
 	record_num_t previous = current_item_;
-	record* this_record;
 	record_num_t new_record;
 	// Special case - -1 indicates no change to the selection
 	if ((signed)num_item != -1 && size()) {
@@ -479,6 +478,8 @@ void book::selection(record_num_t num_item, hint_t hint /* = HT_SELECTED */, vie
 	}
 	else {
 	}
+	record* this_record = get_record(current_item_, false);
+	record_num_t record_num = record_number(current_item_);
 	bool force_save = false;
 	// update turned off during certain activities
 	switch (hint) {
@@ -486,7 +487,7 @@ void book::selection(record_num_t num_item, hint_t hint /* = HT_SELECTED */, vie
 	case HT_IMPORT_QUERYNEW:
 	case HT_DUPE_QUERY:
 		// Query against first record in import_data or identified record
-		tabbed_forms_->update_views(requester, hint, record_number(current_item_), num_other);
+		tabbed_forms_->update_views(requester, hint, record_num, num_other);
 		break;
 	case HT_CHANGED:
 	case HT_MINOR_CHANGE:
@@ -494,7 +495,7 @@ void book::selection(record_num_t num_item, hint_t hint /* = HT_SELECTED */, vie
 			// Set modified flag
 			modified(true);
 			// Update to this record
-			tabbed_forms_->update_views(requester, hint, record_number(current_item_));
+			tabbed_forms_->update_views(requester, hint, record_num);
 		}
 		break;
 	case HT_INSERTED:
@@ -505,7 +506,7 @@ void book::selection(record_num_t num_item, hint_t hint /* = HT_SELECTED */, vie
 			// Set modified flag
 			modified(true);
 			// Update to this record
-			tabbed_forms_->update_views(requester, hint, record_number(current_item_));
+			tabbed_forms_->update_views(requester, hint, record_num);
 		}
 		break;
 	case HT_START_CHANGED:
@@ -518,11 +519,11 @@ void book::selection(record_num_t num_item, hint_t hint /* = HT_SELECTED */, vie
 		break;
 	default:
 		if (!inhibit_view_update_) {
-			tabbed_forms_->update_views(requester, hint, record_number(current_item_));
+			tabbed_forms_->update_views(requester, hint, record_num);
 		}
 		break;
 	}
-	if (force_save || (num_item != previous && !read_only_ && save_enabled_ && modified())) {
+	if (force_save || (current_item_ != previous && !read_only_ && save_enabled_ && modified() && !save_in_progress_)) {
 #ifndef _DEBUG
 		store_data();
 #endif // _DEBUG
