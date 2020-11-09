@@ -851,7 +851,7 @@ double rig_flrig::swr_meter() {
 		string subcommand = "\x12";
 		string data = ic7300_->send_command(command, subcommand, ok);
 		if (ok) {
-			unsigned int value = data[2] * 256 + data[3];
+			unsigned int value = bcd_to_int(data.substr(2, 2), false);
 			double swr;
 			if (value <= 48) {
 				swr = (value * 0.5 / 48) + 1.0;

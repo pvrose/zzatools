@@ -11,6 +11,7 @@
 #include "spec_data.h"
 #include "../zzalib/rig_if.h"
 #include "band_view.h"
+#include "extract_data.h"
 
 #include <regex>
 
@@ -34,6 +35,7 @@ extern intl_dialog* intl_dialog_;
 extern spec_data* spec_data_;
 extern rig_if* rig_if_;
 extern band_view* band_view_;
+extern extract_data* extract_records_;
 extern void add_scratchpad();
 
 // Constructor for scratchpad editor
@@ -88,6 +90,10 @@ int spad_editor::handle(int event) {
 		case FL_F + 8:
 			// F8 - discard record
 			scratchpad::cb_cancel(this, nullptr);
+			return true;
+		case FL_F + 9:
+			// F9 - Check worked before
+			scratchpad::cb_wkb4(this, nullptr);
 			return true;
 		}
 	}
@@ -154,40 +160,46 @@ void scratchpad::create_form() {
 	bn_start_->tooltip("Create a new record");
 	bn_start_->callback(cb_start);
 
+	Fl_Button* bn_wb4 = new Fl_Button(C3, curr_y, WBUTTON, HBUTTON, "F9 - B4?");
+	bn_wb4->labelsize(FONT_SIZE);
+	bn_wb4->labelfont(FONT);
+	bn_wb4->tooltip("Display previous QSOs");
+	bn_wb4->callback(cb_wkb4);
+
 	curr_y += HBUTTON + GAP;
-	Fl_Button* bn_call = new Fl_Button(C2, curr_y, WBUTTON, HBUTTON, "Call");
+	Fl_Button* bn_call = new Fl_Button(C2, curr_y, WBUTTON, HBUTTON, "F1 - Call");
 	bn_call->labelsize(FONT_SIZE);
 	bn_call->labelfont(FONT);
 	bn_call->tooltip("Copy selected text to callsign field");
 	bn_call->callback(cb_action, (void*)WRITE_CALL);
 
-	Fl_Button* bn_name = new Fl_Button(C3, curr_y, WBUTTON, HBUTTON, "Name");
+	Fl_Button* bn_name = new Fl_Button(C3, curr_y, WBUTTON, HBUTTON, "F2 - Name");
 	bn_name->labelsize(FONT_SIZE);
 	bn_name->labelfont(FONT);
 	bn_name->tooltip("Copy selected text to name field");
 	bn_name->callback(cb_action, (void*)WRITE_NAME);
 
 	curr_y += HBUTTON;
-	Fl_Button* bn_qth = new Fl_Button(C2, curr_y, WBUTTON, HBUTTON, "QTH");
+	Fl_Button* bn_qth = new Fl_Button(C2, curr_y, WBUTTON, HBUTTON, "F3 - QTH");
 	bn_qth->labelsize(FONT_SIZE);
 	bn_qth->labelfont(FONT);
 	bn_qth->tooltip("Copy selected text to QTH field");
 	bn_qth->callback(cb_action, (void*)WRITE_QTH);
 
-	Fl_Button* bn_grid = new Fl_Button(C3, curr_y, WBUTTON, HBUTTON, "Gridsquare");
+	Fl_Button* bn_grid = new Fl_Button(C3, curr_y, WBUTTON, HBUTTON, "F4 - Grid");
 	bn_grid->labelsize(FONT_SIZE);
 	bn_grid->labelfont(FONT);
 	bn_grid->tooltip("Copy selected text to gridsquare field");
 	bn_grid->callback(cb_action, (void*)WRITE_GRID);
 
 	curr_y += HBUTTON;
-	Fl_Button* bn_rst_sent = new Fl_Button(C2, curr_y, WBUTTON, HBUTTON, "RST Sent");
+	Fl_Button* bn_rst_sent = new Fl_Button(C2, curr_y, WBUTTON, HBUTTON, "F5 - Sent");
 	bn_rst_sent->labelsize(FONT_SIZE);
 	bn_rst_sent->labelfont(FONT);
 	bn_rst_sent->tooltip("Copy selected text to RST sent field");
 	bn_rst_sent->callback(cb_action, (void*)WRITE_RST_SENT);
 
-	Fl_Button* bn_rst_rcvd = new Fl_Button(C3, curr_y, WBUTTON, HBUTTON, "RST Rcvd");
+	Fl_Button* bn_rst_rcvd = new Fl_Button(C3, curr_y, WBUTTON, HBUTTON, "F6 - Rcvd");
 	bn_rst_rcvd->labelsize(FONT_SIZE);
 	bn_rst_rcvd->labelfont(FONT);
 	bn_rst_rcvd->tooltip("Copy selected text to RST Received field");
@@ -269,13 +281,13 @@ void scratchpad::create_form() {
 	ip_power_->value(power.c_str()); 
 	curr_y += HTEXT + GAP;
 
-	bn_save_ = new Fl_Button(C2, curr_y, WBUTTON, HBUTTON, "Save");
+	bn_save_ = new Fl_Button(C2, curr_y, WBUTTON, HBUTTON, "F7 - Save");
 	bn_save_->labelsize(FONT_SIZE);
 	bn_save_->labelfont(FONT);
 	bn_save_->tooltip("Save the record");
 	bn_save_->callback(cb_save);
 
-	bn_cancel_ = new Fl_Button(C3, curr_y, WBUTTON, HBUTTON, "Cancel");
+	bn_cancel_ = new Fl_Button(C3, curr_y, WBUTTON, HBUTTON);
 	bn_cancel_->labelsize(FONT_SIZE);
 	bn_cancel_->labelfont(FONT);
 	bn_cancel_->tooltip("Cancel the record");
@@ -348,6 +360,12 @@ void scratchpad::cb_action(Fl_Widget* w, void* v) {
 	that->editor_->take_focus();
 	// We may have changed the state
 	that->enable_widgets();
+}
+
+void scratchpad::cb_wkb4(Fl_Widget* w, void* v) {
+	scratchpad* that = ancestor_view<scratchpad>(w);
+	string text = that->buffer_->selection_text();
+	extract_records_->extract_call(text);
 }
 
 // Save the record and reset the state to no record
@@ -485,13 +503,13 @@ void scratchpad::enable_widgets() {
 		// Allow save and cancel as we have a record
 		bn_save_->activate();
 		bn_cancel_->activate();
-		bn_cancel_->label("Cancel");
+		bn_cancel_->label("F8 - Cancel");
 		bn_start_->deactivate();
 	}
 	else {
 		bn_save_->deactivate();
 		bn_cancel_->activate();
-		bn_cancel_->label("Clear");
+		bn_cancel_->label("F8 - Clear");
 		bn_start_->activate();
 	}
  }
