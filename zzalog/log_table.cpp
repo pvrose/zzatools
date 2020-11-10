@@ -32,6 +32,7 @@ extern status* status_;
 extern intl_dialog* intl_dialog_;
 extern time_t session_start_;
 extern pfx_data* pfx_data_;
+extern bool in_current_session(record*);
 
 Fl_Font log_table::font_;
 Fl_Fontsize log_table::fontsize_;
@@ -534,7 +535,7 @@ void log_table::draw_cell(TableContext context, int R, int C, int X, int Y, int 
 				record_num_t item_number = (order_ == LAST_TO_FIRST) ? my_book_->size() - 1 - R : R;
 				record* this_record = my_book_->get_record(item_number, false);
 				// Selected rows will have table specific colour, others in currect sesson grey, rest white
-				Fl_Color default_bg_colour = difftime(this_record->timestamp(), session_start_) > 0.0 ? FL_GRAY : FL_WHITE;
+				Fl_Color default_bg_colour = in_current_session(this_record) ? FL_GRAY : FL_WHITE;
 				Fl_Color bg_colour = row_selected(R) ? selection_color() : default_bg_colour;
 				fl_color(bg_colour);
 				fl_rectf(X, Y, W, H);

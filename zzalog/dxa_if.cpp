@@ -39,6 +39,7 @@ extern status* status_;
 extern tabbed_forms* tabbed_forms_;
 extern spec_data* spec_data_;
 extern time_t session_start_;
+extern bool in_current_session(record*);
 
 // Constructor
 dxa_if::dxa_if() :
@@ -1266,7 +1267,7 @@ void dxa_if::get_records() {
 		break;
 	case AQ_SESSION:
 		if (book_->size()) {
-			for (size_t i = book_->size() - 1; book_->get_record(i, false)->timestamp() >= session_start_; i--) {
+			for (size_t i = book_->size() - 1; in_current_session(book_->get_record(i, false)); i--) {
 				record_nums.insert(i);
 			}
 		}
