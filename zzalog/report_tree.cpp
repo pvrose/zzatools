@@ -35,6 +35,11 @@ report_tree::report_tree(int X, int Y, int W, int H, const char* label, field_or
 	, filter_(RF_NONE)
 	, selection_(0)
 	, add_states_(false)
+	, entities_(0)
+	, entities_eqsl_(0)
+	, entities_lotw_(0)
+	, entities_card_(0)
+	, entities_any_(0)
 {
 	map_order_.clear();
 
@@ -130,6 +135,7 @@ void report_tree::add_record(record_num_t record_num, report_map_entry_t* entry)
 	string map_key = "";
 	string state_code;
 	string dxcc_code;
+	string zone_code;
 	// Get record
 	record* record = get_book()->get_record(record_num, false);
 	// Entry type is valid
@@ -211,6 +217,41 @@ void report_tree::add_record(record_num_t record_num, report_map_entry_t* entry)
 			// Get the mode from the record
 			map_key = record->item("MODE", true);
 			break;
+		case RC_CQ_ZONE:
+			// CQ Zone from the record
+			zone_code = record->item("CQZ");
+			switch (zone_code.length()) {
+			case 0: 
+				map_key = "CQ Zone not specified";
+				break;
+			case 1:
+				map_key = "CQ Zone  " + zone_code;
+				break;
+			case 2:
+				map_key = "CQ Zone " + zone_code;
+				break;
+			default:
+				map_key = "Invalid CQ Zone";
+				break;
+			}
+			break;
+		case RC_ITU_ZONE:
+			zone_code = record->item("ITUZ");
+			switch (zone_code.length()) {
+			case 0:
+				map_key = "ITU Zone not specified";
+				break;
+			case 1:
+				map_key = "ITU Zone  " + zone_code;
+				break;
+			case 2:
+				map_key = "ITU Zone " + zone_code;
+				break;
+			default:
+				map_key = "Invalid ITU Zone";
+				break;
+			}
+			break;
 		}
 	}
 	if ((size_t)entry->entry_type < adj_order_.size()) {
@@ -291,6 +332,12 @@ void report_tree::copy_map_to_tree(report_map_t* this_map, Fl_Tree_Item* item, i
 		case RC_MODE:
 			label_colour = FL_DARK_RED;
 			break;
+		case RC_CQ_ZONE:
+			label_colour = FL_DARK_BLUE;
+			break;
+		case RC_ITU_ZONE:
+			label_colour = FL_DARK_YELLOW;
+			break;
 		}
 
 		if (next_entry->record_list != nullptr) {
@@ -346,6 +393,14 @@ void report_tree::copy_map_to_tree(report_map_t* this_map, Fl_Tree_Item* item, i
 		num_any += count_any;
 		// Only mark progress if top-level map
 		if (item == nullptr) {
+			if ((adj_order_[0] == RC_DXCC && map_key.substr(0, 7) != "{ SWL }" && map_key.substr(0,2) != "00") ||
+			adj_order_[0] == RC_CQ_ZONE || adj_order_[0] == RC_ITU_ZONE) {
+				if (count_records) entities_++;
+				if (count_eqsl) entities_eqsl_++;
+				if (count_lotw) entities_lotw_++;
+				if (count_card) entities_card_++;
+				if (count_eqsl || count_lotw || count_card) entities_any_++;
+			}
 			status_->progress(count, OT_REPORT);
 		}
 	}
@@ -451,6 +506,12 @@ void report_tree::create_map() {
 	case RC_MODE:
 		field_name = "MODE";
 		break;
+	case RC_CQ_ZONE:
+		field_name = "CQZ";
+		break;
+	case RC_ITU_ZONE:
+		field_name = "ITUZ";
+		break;
 	}
 
 	if (selection != nullptr) {
@@ -502,6 +563,11 @@ void report_tree::populate_tree(bool activate) {
 	// Only if there's a reference table set up.
 	// Delete existing data, clear the tree control and recreate the data
 	delete_map(&map_);
+	entities_ = 0;
+	entities_eqsl_ = 0;
+	entities_lotw_ = 0;
+	entities_card_ = 0;
+	entities_any_ = 0;
 	clear();
 	if (adj_order_.size() > 0) {
 		// Generate the map of records
@@ -539,7 +605,27 @@ void report_tree::populate_tree(bool activate) {
 				filter = "Selected";
 				break;
 			}
-			sprintf(text, "Total: %d QSOs (%s) - Confirmed %d (%d eQSL, %d LotW, %d Card)", count_records, filter.c_str(), num_any, num_eqsl, num_lotw, num_card);
+			switch (adj_order_[0]) {
+			case RC_DXCC:
+				// Display QSO and total entity counts
+				sprintf(text, "Total: %d QSOs (%s) - Confirmed %d (%d eQSL, %d LotW, %d Card); %d Entities - Confirmed %d (%d eQSL, %d LotW, %d Card)",
+					count_records, filter.c_str(), num_any, num_eqsl, num_lotw, num_card,
+					entities_, entities_any_, entities_eqsl_, entities_lotw_, entities_card_);
+				break;
+			case RC_CQ_ZONE:
+			case RC_ITU_ZONE:
+				// Display QSO and total entity counts
+				sprintf(text, "Total: %d QSOs (%s) - Confirmed %d (%d eQSL, %d LotW, %d Card); %d Zones - Confirmed %d (%d eQSL, %d LotW, %d Card)",
+					count_records, filter.c_str(), num_any, num_eqsl, num_lotw, num_card,
+					entities_, entities_any_, entities_eqsl_, entities_lotw_, entities_card_);
+				break;
+			default:
+				// Display just QSO counts
+				sprintf(text, "Total: %d QSOs (%s) - Confirmed %d (%d eQSL, %d LotW, %d Card)",
+					count_records, filter.c_str(), num_any, num_eqsl, num_lotw, num_card);
+				break;
+			}
+
 			root_item->label(text);
 
 		}

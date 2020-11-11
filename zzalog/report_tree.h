@@ -37,12 +37,14 @@ namespace zzalog {
 		RI_LAST                   // enum upper bound
 	};
 
-	// Report category items
+	// Report category items - maximum 8-bit number
 	enum report_cat_t {
 		RC_DXCC = 1,                  // DXCC
 		RC_PAS = 3,                   // DXCC plus primary adminstrative subdivision (State)
 		RC_BAND = 4,                  // Band
 		RC_MODE = 8,                  // Mode
+		RC_CQ_ZONE = 16,              // CQ Zone
+		RC_ITU_ZONE = 32,             // ITU Zone
 		RC_EMPTY = 0                  // Level not used
 	};
 
@@ -124,6 +126,12 @@ namespace zzalog {
 		// Font and size
 		Fl_Font font_;
 		Fl_Fontsize fontsize_;
+		// Country tallies
+		int entities_;
+		int entities_eqsl_;
+		int entities_lotw_;
+		int entities_card_;
+		int entities_any_;
 
 	};
 
