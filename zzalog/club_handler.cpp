@@ -68,6 +68,8 @@ bool club_handler::upload_log(book* book) {
 				(*it)->item("CLUBLOG_QSO_UPLOAD_DATE", today);
 				(*it)->item("CLUBLOG_QSO_UPLOAD_STATUS", string("Y"));
 			}
+			// Go back to last entry in book.
+			book_->selection(book_->size() - 1, HT_SELECTED);
 			// Force the book to save itself with these changes
 			book_->modified(true);
 			book_->enable_save(true);

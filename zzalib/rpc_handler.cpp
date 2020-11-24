@@ -7,6 +7,7 @@
 
 #include <sstream>
 #include <iostream>
+#include <map>
 
 
 #include <FL/fl_ask.H>
@@ -37,6 +38,8 @@ rpc_handler::rpc_handler(int port_num, string resource_name) {
 	cb_message = default_error_message;
 	that_ = this;
 	server_ = nullptr;
+	add_method({ "system.listMethods", "s:s", "List of methods available" }, list_methods);
+	add_method({ "system.methodHelp", "s:s", "Help text for method" }, method_help);
 }
 
 // Destructor
@@ -724,9 +727,15 @@ int rpc_handler::handle_request(stringstream& ss) {
 		rpc_data_item::rpc_list params;
 		rpc_data_item response;
 		decode_request(payload, method_name, &params);
-		// Get response
-		int error = action_request(method_name, params, response);
-		if (error) return 1;
+		int error;
+		// Does method exist
+		if (method_list_.find(method_name) == method_list_.end()) {
+			error = 1;
+		}
+		else {
+			// It does, so do it
+			error = method_list_.at(method_name).callback(params, response);
+		}
 		// Convert to XML
 		stringstream xml;
 		generate_response(error, &response, xml);
@@ -747,8 +756,7 @@ int rpc_handler::handle_request(stringstream& ss) {
 }
 
 // Callback to action request 
-void rpc_handler::callback(int(*request)(string method, rpc_data_item::rpc_list& params, rpc_data_item& response), void(*message)(status_t, const char*)) {
-	action_request = request;
+void rpc_handler::callback(void(*message)(status_t, const char*)) {
 	cb_message = message;
 }
 
@@ -817,3 +825,46 @@ bool rpc_handler::add_header(http_code code, stringstream& payload, stringstream
 	}
 	return true;
 }
+
+// Add server method
+void rpc_handler::add_method(method_entry method, int(*callback)(rpc_data_item::rpc_list& params, rpc_data_item& response)) {
+	method_list_[method.name] = { method.signature, method.help_text, callback };
+}
+
+// system.listMethods
+int rpc_handler::list_methods(rpc_data_item::rpc_list& params, rpc_data_item& response) {
+	rpc_data_item::rpc_array* array = new rpc_data_item::rpc_array;
+	for (auto it = that_->method_list_.begin(); it != that_->method_list_.end(); it++) {
+		rpc_data_item* name = new rpc_data_item;
+		name->set(it->first, XRT_STRING);
+		array->push_back(name);
+	}
+	response.set(array);
+	return 0;
+}
+
+int rpc_handler::method_help(rpc_data_item::rpc_list& params, rpc_data_item& response) {
+	if (params.size() == 1) {
+		rpc_data_item* item_0 = params.front();
+		string method_name = item_0->get_string();
+		if (that_->method_list_.find(method_name) != that_->method_list_.end()) {
+			string help_text = that_->method_list_.at(method_name).help_text;
+			response.set(help_text, XRT_STRING);
+			return 0;
+		}
+		that_->generate_error(-1, "Unknown method name", response);
+		return 1;
+	}
+	that_->generate_error(-2, "Invalid number of paarmeters", response);
+	return 1;
+}
+
+void rpc_handler::generate_error(int code, string message, rpc_data_item & response) {
+	rpc_data_item error_code;
+	error_code.set(-2, XRT_INT);
+	rpc_data_item error_msg;
+	error_msg.set("Incorrect number of parameters", XRT_STRING);
+	rpc_data_item::rpc_struct fault_resp = { { "code", &error_code }, { "message", &error_msg } };
+	response.set(&fault_resp);
+}
+

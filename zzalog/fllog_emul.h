@@ -21,22 +21,18 @@ namespace zzalog {
 		~fllog_emul();
 		// Start the server
 		void run_server();
-		// request back from the RPC handler
-		static int cb_do_request(string method_name, rpc_data_item::rpc_list& params, rpc_data_item& response);
 
 	protected:
-		// Non-static version
-		int do_request(string method_name, rpc_data_item::rpc_list& params, rpc_data_item& response);
 		// Get ADIF string for first record with callsign
-		int get_record(rpc_data_item::rpc_list& params, rpc_data_item& response);
+		static int get_record(rpc_data_item::rpc_list& params, rpc_data_item& response);
 		// Check duplicate - replies true (exact match), possible (callsign matches), false (not a match
-		int check_dup(rpc_data_item::rpc_list& params, rpc_data_item& response);
+		static int check_dup(rpc_data_item::rpc_list& params, rpc_data_item& response);
 		// Add new record
-		int add_record(rpc_data_item::rpc_list& params, rpc_data_item& response);
+		static int add_record(rpc_data_item::rpc_list& params, rpc_data_item& response);
 		// Update fileds in current selection
-		int update_record(rpc_data_item::rpc_list& params, rpc_data_item& response);
+		static int update_record(rpc_data_item::rpc_list& params, rpc_data_item& response);
 		// List methods - string returns list of methods suppported
-		int list_methods(rpc_data_item::rpc_list& params, rpc_data_item& response);
+		static int list_methods(rpc_data_item::rpc_list& params, rpc_data_item& response);
 
 		// Generate error resposne
 		void generate_error(int code, string message, rpc_data_item& response);
@@ -45,6 +41,12 @@ namespace zzalog {
 		record* current_record_;
 		// RPC handler
 		rpc_handler* rpc_handler_;
+
+		list<rpc_handler::method_entry> method_list_;
+		
+		// The only instance
+		static fllog_emul* that_;
+
 
 	};
 

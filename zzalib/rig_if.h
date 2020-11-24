@@ -147,6 +147,8 @@ namespace zzalib {
 		bool have_freq_to_band_;
 		// have reported high SWR
 		bool reported_hi_swr_;
+		// last band read
+		string previous_band_;
 
 
 	};

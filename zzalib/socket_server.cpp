@@ -297,7 +297,7 @@ int socket_server::send_response(istream& response) {
 	while (response.good()) {
 		string line;
 		getline(response, line);
-		data += line + '\n';
+		data += line + "\n";
 	}
 #ifdef _DEBUG
 	dump(data);

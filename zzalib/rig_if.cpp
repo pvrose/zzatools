@@ -340,6 +340,13 @@ bool  rig_if::check_swr() {
 		}
 		return false;
 	}
+	if (have_freq_to_band_ && freq_to_band_(tx_frequency()) != previous_band_) {
+		previous_band_ = freq_to_band_(tx_frequency());
+		reported_hi_swr_ = false;
+	}
+	else {
+		reported_hi_swr_ = false;
+	}
 	reported_hi_swr_ = false;
 	return true;
 }

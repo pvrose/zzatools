@@ -10,6 +10,7 @@
 #include <istream>
 #include <ostream>
 #include <regex>
+#include <map>
 
 namespace zzalib {
 	// 
@@ -26,6 +27,10 @@ namespace zzalib {
 			OK = 200,
 			BAD_REQUEST = 400
 		};
+		struct method_entry {
+			string name; string signature; string help_text;
+		};
+
 		// Handler for client (or both)
 		rpc_handler(string host_name, int port_num_, string resource_name);
 		// Handler for server
@@ -37,10 +42,19 @@ namespace zzalib {
 		static int rcv_request(stringstream& ss);
 		// Run server
 		void run_server();
-		// Callback to action request
-		void callback(int(*request)(string method, rpc_data_item::rpc_list& params, rpc_data_item& response), void(*message)(status_t, const char*));
+		// Add server method
+		void add_method(method_entry method, int(*callback)(rpc_data_item::rpc_list& params, rpc_data_item& response));
+		// Add message callback
+		void callback(void(*message)(status_t, const char*));
 
 	protected:
+		struct method_def {
+			string signature;
+			string help_text;
+			int(*callback)(rpc_data_item::rpc_list& params, rpc_data_item& response);
+		};
+
+
 		// Generate the RPC request XML
 		bool generate_request(string method_name, rpc_data_item::rpc_list* params, ostream& request_xml);
 		// Generate an RPC Respose
@@ -56,8 +70,14 @@ namespace zzalib {
 		bool decode_xml_element(rpc_element_t Type, xml_element* pElement, rpc_data_item* item, bool& fault);
 		// Actually handle the request
 		int handle_request(stringstream& ss);
-		// Callback for log handler
-		int(*action_request)(string method, rpc_data_item::rpc_list& params, rpc_data_item& response);
+		// Rserved methods
+		static int list_methods(rpc_data_item::rpc_list& params, rpc_data_item& response);
+		static int method_help(rpc_data_item::rpc_list& params, rpc_data_item& response);
+
+		// Generate error resposne
+		void generate_error(int code, string message, rpc_data_item& response);
+
+
 		// Callback for message handler
 		void(*cb_message)(status_t status, const char* message);
 		// Remove header - returns true if successful and payload is valid
@@ -75,6 +95,8 @@ namespace zzalib {
 		int server_port_;
 		// Pointer back to sel
 		static rpc_handler* that_;
+		// The method definitions
+		map<string, method_def> method_list_;
 
 	};
 

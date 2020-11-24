@@ -20,8 +20,11 @@ extern extract_data* extract_records_;
 extern book* book_;
 extern spec_data* spec_data_;
 
+fllog_emul* fllog_emul::that_ = nullptr;
+
 fllog_emul::fllog_emul() {
 	rpc_handler_ = nullptr;
+	that_ = this;
 }
 
 void fllog_emul::run_server() {
@@ -29,38 +32,22 @@ void fllog_emul::run_server() {
 		// TODO Provisionally hard-coded, make part of configuration
 		rpc_handler_ = new rpc_handler(8421, "/RPC2");
 	}
-	rpc_handler_->callback(cb_do_request, cb_error_message);
+	// Set up callbacks to handle these
+	rpc_handler_->callback(cb_error_message);
+	method_list_.push_back({ "log.add_record", "s:s", "adds new ADIF-RECORD" });
+	rpc_handler_->add_method(method_list_.back(), add_record);
+	method_list_.push_back({ "log.get_record",    "s:s", "returns ADIF-RECORD for CALL" });
+	rpc_handler_->add_method(method_list_.back(), get_record);
+	method_list_.push_back({ "log.update_record", "s:s", "updates current record with specified ADIF-RECORD" });
+	rpc_handler_->add_method(method_list_.back(), update_record);
+	method_list_.push_back({ "log.check_dup",     "s:s", "return true/false/possible for ADIF record" });
+	rpc_handler_->add_method(method_list_.back(), check_dup);
+	method_list_.push_back({ "log.list_methods",  "s:s", "return this list" });
+	rpc_handler_->add_method(method_list_.back(), list_methods);
+
 	rpc_handler_->run_server();
 }
 
-// Callback from rpc_handler.server
-int fllog_emul::cb_do_request(string method_name, rpc_data_item::rpc_list& params, rpc_data_item& response) {
-	return fllog_emul_->do_request(method_name, params, response);
-}
-
-// Non-static version
-int fllog_emul::do_request(string method_name, rpc_data_item::rpc_list& params, rpc_data_item& response) {
-	if (method_name == "log.get_record") {
-		return get_record(params, response);
-	}
-	else if (method_name == "log.check_dup") {
-		return check_dup(params, response);
-	}
-	else if (method_name == "log.add_record") {
-		return add_record(params, response);
-	}
-	else if (method_name == "log.update_record") {
-		return update_record(params, response);
-	}
-	else if (method_name == "log.list_methods" || method_name == "system.listMethods") {
-		return list_methods(params, response);
-	}
-	else {
-		// Unsupported method
-		generate_error(-1, "Unsuppported method: " + method_name, response);
-		return 1;
-	}
-}
 
 void fllog_emul::generate_error(int code, string message, rpc_data_item& response) {
 	rpc_data_item error_code;
@@ -79,10 +66,10 @@ int fllog_emul::get_record(rpc_data_item::rpc_list& params, rpc_data_item& respo
 		extract_records_->extract_call(callsign);
 		printf("get_record %s %d records found\n", callsign.c_str(), extract_records_->size());
 		if (extract_records_->size()) {
-			current_record_ = extract_records_->get_record(0, true);
+			that_->current_record_ = extract_records_->get_record(0, true);
 			adi_writer* writer = new adi_writer;
 			stringstream ss;
-			writer->to_adif(current_record_, ss);
+			writer->to_adif(that_->current_record_, ss);
 			response.set(ss.str(), XRT_STRING);
 			delete writer;
 		}
@@ -92,7 +79,7 @@ int fllog_emul::get_record(rpc_data_item::rpc_list& params, rpc_data_item& respo
 		return 0;
 	}
 	else {
-		generate_error(-2, "Wrong number of parameters in call", response);
+		that_->generate_error(-2, "Wrong number of parameters in call", response);
 		return 1;
 	}
 }
@@ -125,30 +112,30 @@ int fllog_emul::check_dup(rpc_data_item::rpc_list& params, rpc_data_item& respon
 			bool found = false;
 			record_num_t item_num;
 			for (item_num = 0; item_num < extract_records_->size() && !found; item_num++) {
-				current_record_ = extract_records_->get_record(0, false);
+				that_->current_record_ = extract_records_->get_record(0, false);
 				time_t now = time(nullptr);
 				found = true;
 				// Now check for exact match 
-				if (mode != "0" && current_record_->item("MODE", true) != to_upper(mode)) {
+				if (mode != "0" && that_->current_record_->item("MODE", true) != to_upper(mode)) {
 					// different mode (note this includes submode)
 					found = false;
 				}
-				else if (span > 0 && difftime(now, current_record_->timestamp(true)) > (span * 60)) {
+				else if (span > 0 && difftime(now, that_->current_record_->timestamp(true)) > (span * 60)) {
 					// More that span minutes ago
 					found = false;
 				}
 				else if (freq > 0) {
 					// Different frequency - need to check if this is exact frequency
-					string band = current_record_->item("BAND");
+					string band = that_->current_record_->item("BAND");
 					if (spec_data_->band_for_freq((double)freq / 1000000) != band) {
 						found = false;
 					}
 				}
-				else if (state != "0" && current_record_->item("STATE") != to_upper(state)) {
+				else if (state != "0" && that_->current_record_->item("STATE") != to_upper(state)) {
 					// Different state
 					found = false;
 				}
-				else if (rst_in != "0" && current_record_->item("RST_RCVD") != to_upper(rst_in)) {
+				else if (rst_in != "0" && that_->current_record_->item("RST_RCVD") != to_upper(rst_in)) {
 					// Different RST
 					found = false;
 				}
@@ -156,13 +143,13 @@ int fllog_emul::check_dup(rpc_data_item::rpc_list& params, rpc_data_item& respon
 			if (found) {
 				// Exact match - set selection
 				printf(" Exact match\n");
-				current_record_ = extract_records_->get_record(item_num, true);
+				that_->current_record_ = extract_records_->get_record(item_num, true);
 				response.set("true", XRT_STRING);
 			}
 			else {
 				// Callsign matches - select the first one
 				printf(" Callsign match\n");
-				current_record_ = extract_records_->get_record(0, true);
+				that_->current_record_ = extract_records_->get_record(0, true);
 				response.set("possible", XRT_STRING);
 			}
 		}
@@ -174,7 +161,7 @@ int fllog_emul::check_dup(rpc_data_item::rpc_list& params, rpc_data_item& respon
 		return 0;
 	}
 	else {
-		generate_error(-2, "Wrong number of parameters in call", response);
+		that_->generate_error(-2, "Wrong number of parameters in call", response);
 		return 1;
 	}
 }
@@ -189,13 +176,13 @@ int fllog_emul::add_record(rpc_data_item::rpc_list& params, rpc_data_item& respo
 		printf("add_record: %s", item->get_string().c_str());
 		adi_reader* reader = new adi_reader();
 		load_result_t dummy;
-		current_record_ = new record();
-		reader->load_record(current_record_, ss, dummy);
-		book_->insert_record(current_record_);
+		that_->current_record_ = new record();
+		reader->load_record(that_->current_record_, ss, dummy);
+		book_->insert_record(that_->current_record_);
 		return 0;
 	}
 	else {
-		generate_error(-2, "Wrong number of parameters in call", response);
+		that_->generate_error(-2, "Wrong number of parameters in call", response);
 		return 1;
 	}
 }
@@ -212,11 +199,11 @@ int fllog_emul::update_record(rpc_data_item::rpc_list& params, rpc_data_item& re
 		load_result_t dummy;
 		record* changes = new record();
 		reader->load_record(changes, ss, dummy);
-		current_record_->merge_records(changes);
+		that_->current_record_->merge_records(changes);
 		return 0;
 	}
 	else {
-		generate_error(-2, "Wrong number of parameters in call", response);
+		that_->generate_error(-2, "Wrong number of parameters in call", response);
 		return 1;
 	}
 
@@ -227,18 +214,8 @@ int fllog_emul::list_methods(rpc_data_item::rpc_list& params, rpc_data_item& res
 	if (params.size() == 0) {
 		// Copied nearly verbatim from fllog
 		printf("list_methods\n");
-		struct entry {
-			string name; string signature; string help;
-		};
-		list<entry> method_list= {
-			{ "log.add_record",    "s:s", "adds new ADIF-RECORD" },
-			{ "log.get_record",    "s:s", "returns ADIF-RECORD for CALL" },
-			{ "log.update_record", "s:s", "updates current record with specified ADIF-RECORD" },
-			{ "log.check_dup",     "s:s", "return true/false/possible for ADIF record" },
-			{ "log.list_methods",  "s:s", "return this list" }
-		};
 		rpc_data_item::rpc_array* array = new rpc_data_item::rpc_array;
-		for (auto it = method_list.begin(); it != method_list.end(); it++) {
+		for (auto it = that_->that_->method_list_.begin(); it != that_->method_list_.end(); it++) {
 			rpc_data_item::rpc_struct* method_data = new rpc_data_item::rpc_struct;
 			method_data->clear();
 			rpc_data_item* name = new rpc_data_item;
@@ -248,7 +225,7 @@ int fllog_emul::list_methods(rpc_data_item::rpc_list& params, rpc_data_item& res
 			sig->set(it->signature, XRT_STRING);
 			(*method_data)["signature"] = sig;
 			rpc_data_item* help = new rpc_data_item;
-			help->set(it->help, XRT_STRING);
+			help->set(it->help_text, XRT_STRING);
 			(*method_data)["help"] = help;
 			rpc_data_item* method_obj = new rpc_data_item;
 			method_obj->set(method_data);
@@ -258,7 +235,7 @@ int fllog_emul::list_methods(rpc_data_item::rpc_list& params, rpc_data_item& res
 		return 0;
 	}
 	else {
-		generate_error(-2, "Wrong number of parameters in call", response);
+		that_->generate_error(-2, "Wrong number of parameters in call", response);
 		return 1;
 	}
 
