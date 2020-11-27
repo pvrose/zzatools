@@ -33,6 +33,7 @@ namespace zzalog {
 	enum field_ordering_t {
 		FO_MAINLOG,          // Main log
 		FO_EXTRACTLOG,       // Extract log
+		FO_DXATLAS,          // DxAtlas records
 		FO_QSOVIEW,          // QSO View
 		FO_IMPORTLOG,        // Records for import
 		FO_EXPORTTSV,        // Export tab-separated-file

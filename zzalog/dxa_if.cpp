@@ -34,6 +34,7 @@ using namespace zzalib;
 extern Fl_Preferences* settings_;
 extern book* book_;
 extern extract_data* extract_records_;
+extern extract_data* dxatlas_records_;
 extern book* navigation_book_;
 extern status* status_;
 extern tabbed_forms* tabbed_forms_;
@@ -1440,6 +1441,7 @@ void dxa_if::draw_pins() {
 
 			// Clear records displayed
 			records_displayed_.clear();
+			dxatlas_records_->clear_criteria();
 			int* colour_count = new int[colours_used_.size()];
 			for (size_t i = 0; i < colours_used_.size(); i++) {
 				colour_count[i] = 0;
@@ -1560,6 +1562,7 @@ void dxa_if::draw_pins() {
 										}
 										// Add it to the set of records being displayed
 										records_displayed_.insert(record_num);
+										dxatlas_records_->add_record(record_num);
 									}
 								}
 								count += 1;
@@ -1643,6 +1646,10 @@ void dxa_if::draw_pins() {
 			for (auto it = colours_used.begin(); it != colours_used.end(); it++) {
 				(button_map_.at(*it))->activate();
 			}
+
+			// Now display the list of records
+			book_->selection(*(records_displayed_.begin()));
+			tabbed_forms_->activate_pane(OT_DXATLAS, true);
 
 			// Report finished
 			status_->misc_status(ST_OK, "DXATLAS: Update done!");

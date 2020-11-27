@@ -468,9 +468,8 @@ void book::remember_record() {
 }
 
 // Change the selected record (& update any necessary controls
-void book::selection(record_num_t num_item, hint_t hint /* = HT_SELECTED */, view* requester /* = nullptr */, record_num_t num_other /*= 0*/) {
+record_num_t book::selection(record_num_t num_item, hint_t hint /* = HT_SELECTED */, view* requester /* = nullptr */, record_num_t num_other /*= 0*/) {
 	record_num_t previous = current_item_;
-	record_num_t new_record;
 	// Special case - -1 indicates no change to the selection
 	if ((signed)num_item != -1 && size()) {
 		current_item_ = num_item;
@@ -513,9 +512,9 @@ void book::selection(record_num_t num_item, hint_t hint /* = HT_SELECTED */, vie
 		// The QSO start date has been changed. Re-order the book and tell everyone
 		this_record = get_record(current_item_, false);
 		erase(begin() + current_item_);
-		new_record = insert_record(this_record);
+		record_num = insert_record(this_record);
 		modified(true);
-		tabbed_forms_->update_views(requester, HT_ALL, new_record);
+		tabbed_forms_->update_views(requester, HT_ALL, record_num);
 		break;
 	default:
 		if (!inhibit_view_update_) {
@@ -530,6 +529,7 @@ void book::selection(record_num_t num_item, hint_t hint /* = HT_SELECTED */, vie
 	}
 	// Update menu item activeness
 	menu_->update_items();
+	return record_num;
 }
 
 // Get the current selected item
@@ -1062,6 +1062,11 @@ record_num_t book::search(search_criteria_t* criteria, bool reset_search) {
 
 // returns the current usage of the book
 object_t book::book_type() { return book_type_; }
+
+// Sets the book type
+void book::book_type(object_t value) {
+	book_type_ = value;
+}
 
 // Add the band and mode to the lists of used bands and modes if not already there
 void book::add_band_mode(record* record) {

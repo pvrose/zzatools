@@ -172,6 +172,10 @@ void extract_data::clear_criteria() {
 	clear();
 	// Clear all the sets of criteria
 	extract_criteria_.clear();
+	// Clear the mappings
+	mapping_.clear();
+	rev_mapping_.clear();
+	current_item_ = 0;
 	// now tidy up this book
 	delete_contents(true);
 	use_mode_ = NONE;
@@ -571,13 +575,13 @@ void extract_data::upload() {
 }
 
 // Change the record selection (& update any necessary controls)
-void extract_data::selection(record_num_t num_item, hint_t hint /* = HT_SELECTED */, view* requester /* = nullptr */, record_num_t num_other /* = 0 */) {
+record_num_t extract_data::selection(record_num_t num_item, hint_t hint /* = HT_SELECTED */, view* requester /* = nullptr */, record_num_t num_other /* = 0 */) {
 	// Set the current item in this view
 	if ((signed)num_item != -1) {
 		current_item_ = num_item;
 	}
 	// And select the same record in the main log view
-	book_->selection(record_number(current_item_), hint, requester, num_other);
+	return book_->selection(record_number(current_item_), hint, requester, num_other);
 }
 
 // Extract all records for callsign
@@ -621,12 +625,10 @@ void extract_data::extract_call(string callsign) {
 // Add the record to the extract list
 void extract_data::add_record(record_num_t record_num) {
 	record* record = book_->get_record(record_num, false);
-	push_back(record);
-	int ixe = size() - 1;
-	// Add to both ways mappings
-	mapping_.insert(mapping_.begin() + ixe, record_num);
-	rev_mapping_[record_num] = ixe;
-
+	record_num_t insert_point = get_insert_point(record);
+	insert_record_at(insert_point, record);
+	mapping_.insert(mapping_.begin() + insert_point, record_num);
+	rev_mapping_[record_num] = insert_point;
 }
 
 // Swap two records
@@ -679,6 +681,38 @@ void extract_data::sort_records(string field_name, bool reversed) {
 					swap_records(ix, ix + 1);
 					count++;
 				}
+			}
+		}
+		num_scans++;
+		status_->progress(num_scans, book_type());
+	}
+	snprintf(message, 100, "EXTRACT: Done - %d passes required", num_scans);
+	status_->misc_status(ST_OK, message);
+	// Note may have taken fewer passes than primed progress bar with - stop progress if it has
+	if (num_scans < (signed)size()) {
+		status_->progress("Taken fewer passes", book_type());
+	}
+	fl_cursor(FL_CURSOR_DEFAULT);
+}
+
+void extract_data::correct_record_order() {
+	fl_cursor(FL_CURSOR_WAIT);
+	record_num_t count = size();
+	int num_scans = 0;
+	char message[100];
+	snprintf(message, 100, "EXTRACT: Starting sorting %d records on date/time", size());
+	status_->misc_status(ST_NOTE, message);
+	status_->progress(size(), book_type(), "Sorting passes");
+	// Repeat until we no longer swap anything
+	// NB: We may have to implement more efficient sort algorithm, if size() increases much.
+	// Current 2K+ records takes a couple of seconds
+	while (count > 0) {
+		count = 0;
+		// Compare each record with its immediate follower - swap if it's larger
+		for (record_num_t ix = 0; ix < size() - 1; ix++) {
+			if (*at(ix) > *at(ix + 1)) {
+				swap_records(ix, ix + 1);
+				count++;
 			}
 		}
 		num_scans++;

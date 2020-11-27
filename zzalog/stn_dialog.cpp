@@ -879,7 +879,7 @@ void stn_dialog::rig_group::create_form(int X, int Y) {
 // Save values in settings
 void stn_dialog::rig_group::save_values() {
 	common_grp::save_values();
-	rig_if_->change_lookup();
+	if (rig_if_) rig_if_->change_lookup();
 	// Deleting the matrix saves its settings
 	delete matrix_;
 	matrix_ = nullptr;

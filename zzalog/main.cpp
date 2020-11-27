@@ -79,6 +79,7 @@ extern url_handler* url_handler_;
 book* book_ = nullptr;
 import_data* import_data_ = nullptr;
 extract_data* extract_records_ = nullptr;
+extract_data* dxatlas_records_ = nullptr;
 book* navigation_book_ = nullptr;
 tabbed_forms* tabbed_forms_ = nullptr;
 menu* menu_ = nullptr;
@@ -396,6 +397,8 @@ void add_book(char* arg) {
 		navigation_book_ = book_;
 		import_data_ = new import_data;
 		extract_records_ = new extract_data;
+		dxatlas_records_ = new extract_data;
+		dxatlas_records_->book_type(OT_DXATLAS);
 		// Tell the views that a book now exists
 		tabbed_forms_->books();
 		// Get filename and load the data

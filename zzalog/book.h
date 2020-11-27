@@ -86,8 +86,8 @@ namespace zzalog {
 		void save_record();
 		// Delete the current record
 		void delete_record(bool force);
-		// Change the selected record (& update any necessary controls)
-		virtual void selection(record_num_t num_record, hint_t hint = HT_SELECTED, view* requester = nullptr, record_num_t num_other = 0);
+		// Change the selected record (& update any necessary controls) - returns the new record number if the book gets reordered
+		virtual record_num_t selection(record_num_t num_record, hint_t hint = HT_SELECTED, view* requester = nullptr, record_num_t num_other = 0);
 		// Get the current selection
 		record_num_t selection();
 		// Insert a record in its chronological position 
@@ -128,6 +128,8 @@ namespace zzalog {
 		bool match_int(string test, string value);
 		// get book type
 		object_t book_type();
+		// set book type
+		void book_type(object_t);
 		// get used bands
 		set<string>& used_bands();
 		// get used modes

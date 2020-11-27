@@ -67,7 +67,7 @@ namespace zzalog {
 		// Open an editor and change fields
 		void edit_cell(int R, int C);
 		// Finish edit
-		void done_edit();
+		void done_edit(bool keep_row);
 		// Open a tooltip to describe the cells content
 		void describe_cell(int item, int C);
 		// Handle a double click on the column header

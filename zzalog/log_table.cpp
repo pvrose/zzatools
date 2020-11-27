@@ -142,7 +142,7 @@ void log_table::cb_tab_log(Fl_Widget* w, void* v) {
 			that->my_book_->selection(item_num, HT_SELECTED, that);
 			switch (that->last_button_) {
 			case FL_LEFT_MOUSE:
-				that->done_edit();
+				that->done_edit(false);
 				// Left button - double click edit cell
 				if (Fl::event_clicks()) {
 					that->edit_cell(row, col);
@@ -150,7 +150,7 @@ void log_table::cb_tab_log(Fl_Widget* w, void* v) {
 				break;
 			case FL_RIGHT_MOUSE:
 				// Right button - display tooltip explaining the field
-				that->done_edit();
+				that->done_edit(false);
 				that->describe_cell(row, col);
 				break;
 			}
@@ -162,14 +162,14 @@ void log_table::cb_tab_log(Fl_Widget* w, void* v) {
 		}
 		break;
 	case Fl_Table::CONTEXT_COL_HEADER:
-		that->done_edit();
+		that->done_edit(false);
 		if (Fl::event() == FL_PUSH && Fl::event_button() == FL_LEFT_MOUSE && Fl::event_clicks()) {
 			// Left button double click on column header
 			that->dbl_click_column(col);
 		}
 		break;
 	case Fl_Table::CONTEXT_RC_RESIZE:
-		that->done_edit();
+		that->done_edit(false);
 		if (Fl::event() == FL_DRAG && Fl::event_button() == FL_LEFT_MOUSE && that->is_interactive_resize()) {
 			// A row or column has been resized
 			that->drag_column(col);
@@ -181,7 +181,7 @@ void log_table::cb_tab_log(Fl_Widget* w, void* v) {
 // Callback from the edit input - Enter key has been typed
 void log_table::cb_input(Fl_Widget* w, void* v) {
 	log_table* that = ancestor_view<log_table>(w);
-	that->done_edit();
+	that->done_edit(false);
 }
 
 // Callback when right click in edit_menu_ - convert selected text to upper, lower or mixed-case
@@ -246,7 +246,7 @@ void log_table::edit_save(edit_input::edit_exit_t exit_type) {
 	switch (exit_type) {
 	case edit_input::edit_exit_t::SAVE_PREV:
 		// Save and edit previous column
-		done_edit();
+		done_edit(true);
 		if (edit_col_ > 0) {
 			edit_cell(edit_row_, --edit_col_);
 		}
@@ -256,7 +256,7 @@ void log_table::edit_save(edit_input::edit_exit_t exit_type) {
 		break;
 	case edit_input::edit_exit_t::SAVE_NEXT:
 		// Save and edit next column
-		done_edit();
+		done_edit(true);
 		if (edit_col_ < fields_.size() - 1) {
 			edit_cell(edit_row_, ++edit_col_);
 		}
@@ -266,7 +266,7 @@ void log_table::edit_save(edit_input::edit_exit_t exit_type) {
 		break;
 	case edit_input::edit_exit_t::SAVE_UP:
 		// Save and edit same column in previous record
-		done_edit();
+		done_edit(false);
 		if (edit_row_ > 0) {
 			edit_cell(--edit_row_, edit_col_);
 		}
@@ -276,7 +276,7 @@ void log_table::edit_save(edit_input::edit_exit_t exit_type) {
 		break;
 	case edit_input::edit_exit_t::SAVE_DOWN:
 		// Save and edit smae column in next record
-		done_edit();
+		done_edit(false);
 		if (edit_row_ < my_book_->size() - 1) {
 			edit_cell(++edit_row_, edit_col_);
 		}
@@ -640,7 +640,7 @@ void log_table::edit_cell(int row, int col) {
 }
 
 // Copy data from the edit input into the record
-void log_table::done_edit() {
+void log_table::done_edit(bool keep_row) {
 	if (edit_input_->visible()) {
 		// Get the record and field
 		record_num_t item_number = (order_ == LAST_TO_FIRST) ? my_book_->size() - 1 - edit_row_ : edit_row_;
@@ -669,7 +669,20 @@ void log_table::done_edit() {
 			// Update all views with the change - GRIDSQUARE and DXCC are major changes that require DxAtlas to be redrawn, date/time the book to be reordered
 			if (field_info.field == "QSO_DATE" || field_info.field == "TIME_ON") {
 				// The book will tell all views
-				book_->selection(my_book_->record_number(item_number), HT_START_CHANGED);
+				record_num_t new_record = book_->selection(my_book_->record_number(item_number), HT_START_CHANGED);
+				if (keep_row && my_book_->book_type() == OT_MAIN) {
+					switch (order_) {
+					case FIRST_TO_LAST:
+						edit_row_ = new_record;
+						break;
+					case LAST_TO_FIRST:
+						edit_row_ = my_book_->size() - 1 - new_record;
+						break;
+					default:
+						// Do not set edit_row_
+						break;
+					}
+				}
 			}
 			else if (field_info.field == "GRIDSQUARE" || field_info.field == "DXCC") {
 				book_->selection(my_book_->record_number(item_number), HT_CHANGED);
@@ -753,9 +766,7 @@ void log_table::dbl_click_column(int col) {
 		case SORTED_UP:
 		case SORTED_DOWN:
 			// Revert to FIRST_TO_LAST
-			if (my_book_->book_type() == OT_EXTRACT) {
-				((extract_data*)my_book_)->reextract();
-			}
+			((extract_data*)my_book_)->correct_record_order();
 			order_ = FIRST_TO_LAST;
 			break;
 		}
@@ -769,7 +780,7 @@ void log_table::dbl_click_column(int col) {
 		// Redraw the window
 		redraw();
 	}
-	else if (my_book_->book_type() == OT_EXTRACT) {
+	else if (my_book_->book_type() == OT_EXTRACT || my_book_->book_type() == OT_DXATLAS) {
 		// Sorting on any other column is only available in extracted records
 		// Remember the record number
 		record_num_t selected_record = my_book_->record_number(my_book_->selection());
@@ -788,7 +799,7 @@ void log_table::dbl_click_column(int col) {
 			}
 			else {
 				// Sort up the way on selected column
-				((extract_data*)my_book_)->reextract();
+				//((extract_data*)my_book_)->reextract();
 				((extract_data*)my_book_)->sort_records(field_info.field, false);
 				order_ = SORTED_UP;
 			}
@@ -801,7 +812,7 @@ void log_table::dbl_click_column(int col) {
 			}
 			else {
 				// Sort on new field only (up the way)
-				((extract_data*)my_book_)->reextract();
+				//((extract_data*)my_book_)->reextract();
 				((extract_data*)my_book_)->sort_records(field_info.field, false);
 				order_ = SORTED_UP;
 			}

@@ -20,6 +20,7 @@ extern book* book_;
 extern book* navigation_book_;
 extern extract_data* extract_records_;
 extern import_data* import_data_;
+extern extract_data* dxatlas_records_;
 extern toolbar* toolbar_;
 extern dxa_if* dxatlas_;
 extern settings* config_;
@@ -41,6 +42,10 @@ tabbed_forms::tabbed_forms(int X, int Y, int W, int H, const char* label) :
 	add_view<log_table>("Records for import", FO_IMPORTLOG, OT_IMPORT, "Displays all the records currently being imported");
 	// Extracted data - subset of records for search or exporting
 	add_view<log_table>("Extracted records", FO_EXTRACTLOG, OT_EXTRACT, "Displays the records extracted according to the current criteria");
+#ifdef _WIN32
+	// Records displayed in DxAtlas
+	add_view<log_table>("Records in DxAtlas", FO_DXATLAS, OT_DXATLAS, "Displays the records being displayed in DxAtlas");
+#endif
 	// Prefix reference data
 	add_view<pfx_tree>("Prefix Reference", FO_LAST, OT_PREFIX, "Displays the prefix reference data in tree format");
 	// ADIF reference data
@@ -161,6 +166,8 @@ void tabbed_forms::books() {
 		case OT_IMPORT:
 			ix->second->set_book(import_data_);
 			break;
+		case OT_DXATLAS:
+			ix->second->set_book(dxatlas_records_);
 		}
 	}
 }

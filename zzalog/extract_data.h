@@ -53,13 +53,15 @@ namespace zzalog {
 		void sort_records(string field_name, bool reverse);
 		// Special extract (NO_NAME, NO_QTH, LOCATOR_4)
 		void extract_special(extract_mode_t reason);
+		// Correct record order
+		void correct_record_order();
 
 		// return the real record number
 		virtual record_num_t record_number(record_num_t item);
 		// return the virtual record number
 		virtual record_num_t item_number(record_num_t record, bool nearest = false);
 		// Change the selected record (& update any necessary controls)
-		virtual void selection(record_num_t num_record, hint_t hint = HT_SELECTED, view* requester = nullptr, record_num_t num_other = 0);
+		virtual record_num_t selection(record_num_t num_record, hint_t hint = HT_SELECTED, view* requester = nullptr, record_num_t num_other = 0);
 
 
 	protected:
