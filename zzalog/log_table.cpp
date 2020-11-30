@@ -474,12 +474,20 @@ void log_table::draw_cell(TableContext context, int R, int C, int X, int Y, int 
 	switch (context) {
 
 	case CONTEXT_STARTPAGE:
-		// Set the table font
+		// set the default font for the page
 		fl_font(font_, fontsize_);
 		return;
 
 	case CONTEXT_ENDPAGE:
-		// Do nothing
+		// Code trying to write text into the top-left corner
+		//// Set the font for the header header
+		//fl_font(font_ | FL_ITALIC, fontsize_);
+		//// Set the col header row header crossing point
+		//fl_color(col_header_color());
+		//fl_rectf(0, 0, row_header_width(), col_header_height());
+		//// Text color
+		//fl_color(FL_BLACK);
+		//fl_draw("QSO No.", 0, 0, row_header_width(), col_header_height(), FL_ALIGN_CENTER);
 		return;
 
 	case CONTEXT_ROW_HEADER:

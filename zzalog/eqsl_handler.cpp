@@ -132,11 +132,11 @@ void eqsl_handler::cb_timer_deq(void* v) {
 		// Set the timeout again if the queue is still not empty and fetches are enabled
 		if (!request_queue->empty() && that->empty_queue_enable_) {
 			// Let user know
-			sprintf(message, "EQSL: %d card requests pending", request_queue->size());
-			status_->misc_status(ST_NOTE, message);
-			// Now peek the queue and select the front request so user sees the QSO being request
 			request = request_queue->front();
+			// Now peek the queue and select the front request so user sees the QSO being request
 			book_->selection(request.record_num);
+			sprintf(message, "EQSL: %d card requests pending - next request %s", request_queue->size(), book_->get_record()->item("CALL").c_str());
+			status_->misc_status(ST_NOTE, message);
 
 			switch (response) {
 			case ER_SKIPPED:

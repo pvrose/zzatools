@@ -1435,7 +1435,7 @@ void dxa_if::draw_pins() {
 			northernmost_ = home_lat_;
 			southernmost_ = home_lat_;
 			// Set smallest distance to a practicable limit to avoid zero divide if no pins to draw
-			furthest_ = 100.0;
+			furthest_ = 100;
 			// Get most recent date (for AC_DAYS)
 			last_time_ = time(nullptr);
 
@@ -1648,8 +1648,10 @@ void dxa_if::draw_pins() {
 			}
 
 			// Now display the list of records
-			book_->selection(*(records_displayed_.begin()));
-			tabbed_forms_->activate_pane(OT_DXATLAS, true);
+			if (records_displayed_.size()) {
+				book_->selection(*(records_displayed_.begin()));
+				tabbed_forms_->activate_pane(OT_DXATLAS, true);
+			}
 
 			// Report finished
 			status_->misc_status(ST_OK, "DXATLAS: Update done!");
@@ -1792,7 +1794,7 @@ void dxa_if::zoom_azimuthal() {
 	switch (centre_mode_) {
 	case HOME:
 		// Zoom in to just the displayed QSOs
-		zoom = ((EARTH_RADIUS * PI) / (float)furthest_) * 0.95;
+		zoom = (float)((EARTH_RADIUS * PI) / (float)furthest_) * 0.95;
 		map->PutZoom(zoom);
 		break;
 	case ZERO:
