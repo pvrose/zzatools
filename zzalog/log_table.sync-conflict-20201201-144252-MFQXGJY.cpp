@@ -114,7 +114,6 @@ log_table::log_table(int X, int Y, int W, int H, const char* label, field_orderi
 	// Set minimum resizing - height 6 rows (plus col. header)
 	min_h_ = (row_height) * 7;
 	resizable(this);
-	adjust_row_sizes();
 
 }
 
@@ -466,8 +465,7 @@ void log_table::adjust_row_sizes() {
 	row_height_all(height);
 	int w1 = 0;
 	int w2 = 0;
-	int sz = 1;
-	if (book_) sz = book_->size() + 1;
+	int sz = book_->size() + 1;
 	string max_number = to_string(sz) + ' ';
 	fl_measure(max_number.c_str(), w1, height);
 	fl_measure("QSO No.", w2, height);
@@ -484,21 +482,20 @@ void log_table::draw_cell(TableContext context, int R, int C, int X, int Y, int 
 		fl_font(font_, fontsize_);
 		return;
 
-	case CONTEXT_ENDPAGE: 
-	{
+	case CONTEXT_ENDPAGE: {
 		// Code trying to write text into the top-left corner
 		// Set the font for the header header
 		fl_font(fl_font() | FL_ITALIC, fontsize_);
 		// Set the col header row header crossing point
 		fl_color(col_header_color());
-		int X1 = Fl_Table_Row::wix;
-		int Y1 = Fl_Table_Row::wiy;
-		int W1 = row_header_width();
-		int H1 = col_header_height();
-		fl_draw_box(FL_BORDER_BOX, X1, Y1, W1, H1, col_header_color());
+		int X1 = x();
+		int Y1 = y();
+		int X2 = X1 + row_header_width();
+		int Y2 = Y1 + col_header_height();
+		fl_draw_box(FL_BORDER_BOX, X1, Y1, X2, Y2, col_header_color());
 		// Text color
 		fl_color(FL_BLACK);
-		fl_draw("QSO No.", X1, Y1, W1, H1, FL_ALIGN_CENTER);
+		fl_draw("QSO No.", X1, Y1, row_header_width(), col_header_height(), FL_ALIGN_CENTER);
 
 		return;
 	}

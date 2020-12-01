@@ -2224,27 +2224,29 @@ void spec_data::process_modes() {
 string spec_data::describe_enumeration(spec_dataset* dataset, string value) {
 	// Get the selected explanation - default to Not Available
 	string enum_text = "";
-	auto items = dataset->data.find(value);
-	if (items != dataset->data.end()) {
-		// For each item in the dataset explanation for this enumeratiom
-		for (auto item = (items->second)->begin(); item != (items->second)->end(); item++) {
-			if (item->first != "Enumeration Name" &&
-				item->first != "Import-only" &&
-				item->first != "Comments" &&
-				item->first != "ADIF Version" &&
-				item->first != "ADIF Status" &&
-				item->second != "") {
-				// Add salient information to the explanation
-				char* line = new char[item->first.length() + item->second.length() + 10];
-				sprintf(line, "%s: %s\n", item->first.c_str(), item->second.c_str());
-				enum_text += string(line);
-				delete[] line;
+	if (dataset) {
+		auto items = dataset->data.find(value);
+		if (items != dataset->data.end()) {
+			// For each item in the dataset explanation for this enumeratiom
+			for (auto item = (items->second)->begin(); item != (items->second)->end(); item++) {
+				if (item->first != "Enumeration Name" &&
+					item->first != "Import-only" &&
+					item->first != "Comments" &&
+					item->first != "ADIF Version" &&
+					item->first != "ADIF Status" &&
+					item->second != "") {
+					// Add salient information to the explanation
+					char* line = new char[item->first.length() + item->second.length() + 10];
+					sprintf(line, "%s: %s\n", item->first.c_str(), item->second.c_str());
+					enum_text += string(line);
+					delete[] line;
+				}
 			}
 		}
 	}
 	if (enum_text == "") {
 		// There is no explanation
-		enum_text = "No data available";
+		enum_text = "No data available\n";
 	}
 	return enum_text;
 }
