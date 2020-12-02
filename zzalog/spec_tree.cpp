@@ -81,7 +81,7 @@ void spec_tree::populate_tree(bool activate) {
 	root(root_item);
 	root_item->labelfont(item_labelfont() | FL_BOLD);
 	char spec_label[128];
-	snprintf(spec_label, 128, "Specifications: version %s", spec_data_->adif_version().c_str());
+	snprintf(spec_label, 128, "ADIF Specification version %s", spec_data_->adif_version().c_str());
 	root_label(spec_label);
 	// Special treatment for PAS, SAS and SUBMODE
 	pas_item_ = add("Primary_Administrative_Subdivision");
@@ -220,7 +220,13 @@ void spec_tree::insert_adif_spec(Fl_Tree_Item* parent, const spec_dataset& datas
 							// For all enumeration values
 							for (auto it = enum_dataset->data.begin(); it != enum_dataset->data.end(); it++) {
 								// Hang "Value: Description" under the column name
-								string enum_desc = (*it->second)[desc_title];
+								string enum_desc;
+								if ((*it->second).find(column_text) == (*it->second).end()) {
+									enum_desc = (*it->second)[desc_title];
+								}
+								else {
+									enum_desc = (*it->second)[column_text];
+								}
 								// Special treatment to get entity codes in numeric order
 								if (column_text == "DXCC_Entity_Code") {
 									switch (it->first.length()) {

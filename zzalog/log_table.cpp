@@ -92,6 +92,7 @@ log_table::log_table(int X, int Y, int W, int H, const char* label, field_orderi
 	row_header_color(FL_GRAY);
 	fl_font(font_, fontsize_);
 	int row_height = fl_height() + 2;
+	adjust_row_sizes();
 	when(FL_WHEN_RELEASE | FL_WHEN_CHANGED);
 	callback((Fl_Callback*)log_table::cb_tab_log, (void*)nullptr);
 	application_ = app;
@@ -114,8 +115,6 @@ log_table::log_table(int X, int Y, int W, int H, const char* label, field_orderi
 	// Set minimum resizing - height 6 rows (plus col. header)
 	min_h_ = (row_height) * 7;
 	resizable(this);
-	adjust_row_sizes();
-
 }
 
 // Destructor
