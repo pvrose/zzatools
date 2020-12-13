@@ -71,7 +71,7 @@ namespace zzalog {
 	{ "&Station", 0, menu::cb_mi_settings, (void*)settings::DLG_STATION },
 	{ "&Fields", 0, menu::cb_mi_settings, (void*)settings::DLG_COLUMN },
 	{ "&QSL Design", 0, menu::cb_mi_settings, (void*)settings::DLG_QSL },
-	{ "&User fonts etc", 0, menu::cb_mi_settings, (void*)settings::DLG_USER },
+	{ "&User settings", 0, menu::cb_mi_settings, (void*)settings::DLG_USER },
 	{ "All", 0, menu::cb_mi_settings, (void*)settings::DLG_ALL },
 	{ 0 },
 

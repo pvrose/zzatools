@@ -7,6 +7,7 @@
 #include "report_tree.h"
 #include "spec_tree.h"
 #include "tabbed_forms.h"
+#include "../zzalib/rig_if.h"
 
 #include <FL/Fl_Tooltip.H>
 #include <FL/Fl_Preferences.H>
@@ -21,6 +22,7 @@ extern Fl_Preferences* settings_;
 extern book* book_;
 extern scratchpad* scratchpad_;
 extern tabbed_forms* tabbed_forms_;
+extern rig_if* rig_if_;
 
 user_dialog::user_dialog(int X, int Y, int W, int H, const char* label) :
 	page_dialog(X, Y, W, H, label) 
@@ -33,6 +35,9 @@ user_dialog::user_dialog(int X, int Y, int W, int H, const char* label) :
 	tip_size_ = Fl_Tooltip::size();
 	spad_font_ = FONT;
 	spad_size_ = FONT_SIZE;
+	date_format_ = DATE_YYYYMMDD;
+	time_format_ = TIME_HHMMSS;
+	freq_format_ = FREQ_MHz;
 
 	do_creation(X, Y);
 }
@@ -59,6 +64,11 @@ void user_dialog::load_values() {
 	Fl_Preferences tree_settings(user_settings, "Tree Views");
 	tree_settings.get("Font Name", (int&)tree_font_, FONT);
 	tree_settings.get("Font Size", (int&)tree_size_, FONT_SIZE);
+	// Formats
+	Fl_Preferences display_settings(settings_, "Display");
+	display_settings.get("Frequency", (int&)freq_format_, FREQ_MHz);
+	display_settings.get("Date", (int&)date_format_, DATE_YYYYMMDD);
+	display_settings.get("Time", (int&)time_format_, TIME_HHMMSS);
 }
 
 // Used to create the form
@@ -227,6 +237,58 @@ void user_dialog::create_form(int X, int Y) {
 	g4->size(pos_x - g4->x(), pos_y - g4->y());
 	g4->end();
 
+	// Group 5 - user formats
+	pos_y = GAP + EDGE;
+	pos_x = g1->x() + g1->w() + GAP;
+	Fl_Group* g5 = new Fl_Group(pos_x, pos_y, 0, 10, "User Formats");
+	g5->labelfont(FONT);
+	g5->labelsize(FONT_SIZE);
+	g5->align(FL_ALIGN_TOP_LEFT | FL_ALIGN_INSIDE);
+	g5->box(FL_THIN_DOWN_BOX);
+	// Add choices - frequency 
+	pos_x += GAP;
+	pos_y += HTEXT + FONT_SIZE;
+	Fl_Choice* ch1 = new Fl_Choice(pos_x, pos_y, WEDIT, HBUTTON, "Frequency");
+	ch1->align(FL_ALIGN_LEFT | FL_ALIGN_TOP);
+	ch1->labelfont(FONT);
+	ch1->labelsize(FONT_SIZE);
+	ch1->textfont(FONT);
+	ch1->textsize(FONT_SIZE);
+	ch1->callback(cb_value<Fl_Choice, display_freq_t>, (void*)&freq_format_);
+	ch1->when(FL_WHEN_RELEASE);
+	populate_freq(ch1, freq_format_);
+
+	// Add Date choice
+	pos_y += ch1->h() + HTEXT;
+	Fl_Choice* ch2 = new Fl_Choice(pos_x, pos_y, WEDIT, HBUTTON, "Date");
+	ch2->align(FL_ALIGN_LEFT | FL_ALIGN_TOP);
+	ch2->labelfont(FONT);
+	ch2->labelsize(FONT_SIZE);
+	ch2->textfont(FONT);
+	ch2->textsize(FONT_SIZE);
+	ch2->callback(cb_value<Fl_Choice, display_date_t>, (void*)&date_format_);
+	ch2->when(FL_WHEN_RELEASE);
+	populate_date(ch2, date_format_);
+
+	// Add Time choice
+	pos_y += ch2->h() + HTEXT;
+	Fl_Choice* ch3 = new Fl_Choice(pos_x, pos_y, WEDIT, HBUTTON, "Date");
+	ch3->align(FL_ALIGN_LEFT | FL_ALIGN_TOP);
+	ch3->labelfont(FONT);
+	ch3->labelsize(FONT_SIZE);
+	ch3->textfont(FONT);
+	ch3->textsize(FONT_SIZE);
+	ch3->callback(cb_value<Fl_Choice, display_time_t>, (void*)&time_format_);
+	ch3->when(FL_WHEN_RELEASE);
+	populate_time(ch3, time_format_);
+
+	// End group - fit to size
+	g5->resizable(nullptr);
+	pos_y = ch3->y() + ch3->h() + GAP;
+	pos_x = ch3->x() + ch3->w() + GAP;
+	g5->size(pos_x - g5->x(), pos_y - g5->y());
+	g5->end();
+
 	end();
 	show();
 }
@@ -262,6 +324,11 @@ void user_dialog::save_values() {
 	((pfx_tree*)tabbed_forms_->get_view(OT_PREFIX))->set_font(tree_font_, tree_size_);
 	((report_tree*)tabbed_forms_->get_view(OT_REPORT))->set_font(tree_font_, tree_size_);
 	((spec_tree*)tabbed_forms_->get_view(OT_ADIF))->set_font(tree_font_, tree_size_);
+
+	Fl_Preferences display_settings(settings_, "Display");
+	display_settings.set("Frequency", (int)freq_format_);
+	display_settings.set("Date", (int)date_format_);
+	display_settings.set("Time", (int)time_format_);
 
 	// Now tell all views to update formats
 	book_->selection(-1, HT_FORMAT);
@@ -360,4 +427,43 @@ void user_dialog::populate_size(Fl_Hold_Browser* br, const Fl_Font* font, const 
 			br->value(select);
 		}
 	}
+}
+
+// Populate frequency
+void user_dialog::populate_freq(Fl_Choice* ch, display_freq_t format) {
+	string freq = "14.000000";
+	if (rig_if_) {
+		freq = rig_if_->get_frequency(false);
+	}
+	ch->clear();
+	char temp[25];
+	for (int i = 0; i < (int)FREQ_END; i++) {
+		snprintf(temp, 25, "%d: %s", i, record::format_freq((display_freq_t)i, freq).c_str());
+		ch->add(temp);
+	}
+	ch->value((int)format);
+}
+
+// Populate date TODO - need to identify 12_12_2020 from 12_12_2020
+void user_dialog::populate_date(Fl_Choice* ch, display_date_t format) {
+	string date = now(false, "%Y%m%d");
+	ch->clear();
+	char temp[25];
+	for (int i = 0; i < (int)DATE_END; i++) {
+		snprintf(temp, 25, "%d: %s", i, record::format_date((display_date_t)i, date).c_str());
+		ch->add(temp);
+	}
+	ch->value((int)format);
+}
+
+// Populate time
+void user_dialog::populate_time(Fl_Choice* ch, display_time_t format) {
+	string time = now(false, "%H%M%S");
+	ch->clear();
+	char temp[25];
+	for (int i = 0; i < (int)TIME_END; i++) {
+		snprintf(temp, 25, "%d: %s", i, record::format_time((display_time_t)i, time).c_str());
+		ch->add(temp);
+	}
+	ch->value((int)format);
 }

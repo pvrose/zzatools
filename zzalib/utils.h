@@ -41,12 +41,12 @@ namespace zzalib {
 	// Tip display - 2 seconds
 	const double TIP_SHOW = 2.0;
 	// Library version
-	const string LIBRARY_VERSION = "1.0.22";
+	const string LIBRARY_VERSION = "1.0.23";
 
 	// Split a text line into separate "words" on separator
 	void split_line(const string& line, vector<string>& words, const char separator);
 	// Converts display format text to a tm object for reformatting
-	void string_to_tm(string text, tm& time, string format);
+	bool string_to_tm(string text, tm& time, string format);
 	// Convert a string e.g. 00-06:08 to an array of UINTs {0,1,2,3,4,5,6,8}
 	void string_to_ints(string& text, vector<unsigned int>& ints);
 	// get the time in specific fomat

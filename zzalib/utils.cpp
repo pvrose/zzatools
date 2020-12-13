@@ -18,6 +18,7 @@ utils.h - Utility methods
 #include <exception>
 #include <stdexcept>
 #include <vector>
+#include <map>
 #include <ctime>
 
 using namespace std;
@@ -60,7 +61,7 @@ void zzalib::split_line(const string& line, vector<string>& words, const char se
 }
 
 // Converts display format text to a tm object for reformatting
-void zzalib::string_to_tm(string source, tm& time, string format) {
+bool zzalib::string_to_tm(string source, tm& time, string format) {
 	bool escaped = false;
 	// Default YMD to 19700101 to avoid assertion when only setting time
 	time.tm_year = 70;
@@ -104,6 +105,28 @@ void zzalib::string_to_tm(string source, tm& time, string format) {
 						time.tm_mon = stoi(source.substr(parse_point, 2)) - 1;
 						parse_point += 2;
 						break;
+					case 'b': {
+						// %b: 3 letter month
+						// Get the locale's month names by generating twelve dates and seeing what %b returns
+						map<string, int> month_map;
+						tm date;
+						date.tm_year = 70;
+						date.tm_mday = 1;
+						date.tm_hour = 0;
+						date.tm_min = 0;
+						date.tm_sec = 0;
+						date.tm_isdst = false;
+						for (int i = 0; i < 12; i++) {
+							date.tm_mon = i;
+							char name[4];
+							strftime(name, 4, "%b", &date);
+							month_map[string(name)] = i;
+						}
+						// Now look the month up - use .at() to deliverately force an exception
+						time.tm_mon = month_map.at(source.substr(parse_point, 3));
+						parse_point += 3;
+						break;
+					}
 					case 'd':
 						// %d: 2 digit day
 						time.tm_mday = stoi(source.substr(parse_point, 2));
@@ -151,6 +174,8 @@ void zzalib::string_to_tm(string source, tm& time, string format) {
 			}
 		}
 	}
+	if (bad_value) return false;
+	return true;
 }
 
 // Convert a string e.g. 00-06:08 to an array of UINTs {0,1,2,3,4,5,6,8}

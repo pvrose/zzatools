@@ -75,34 +75,6 @@ record::record(logging_mode_t type) {
 		item("CALL", string(""));
 		// If rig is connected - get information from rig
 		if (rig_if_ != nullptr) {
-			frequency_t freq_format;
-			Fl_Preferences log_settings(settings_, "Log");
-			// Get the logging precision from settings and set text format accordingly.
-			log_settings.get("Frequency Precision", (int&)freq_format, FREQ_Hz);
-			string item_format;
-			switch (freq_format) {
-			case FREQ_Hz:
-				item_format = "%0.6f";
-				break;
-			case FREQ_Hz10:
-				item_format = "%0.5f";
-				break;
-			case FREQ_Hz100:
-				item_format = "%0.4f";
-				break;
-			case FREQ_kHz:
-				item_format = "%0.3f";
-				break;
-			case FREQ_kHz10:
-				item_format = "%0.2f";
-				break;
-			case FREQ_kHz100:
-				item_format = "%0.1f";
-				break;
-			case FREQ_MHz:
-				item_format = "%0.0f";
-				break;
-			}
 			// Get frequency, mode and transmit power from rig
 			item("FREQ", rig_if_->get_frequency(true));
 			if (rig_if_->is_split()) {
@@ -246,6 +218,10 @@ void record::item(string field, string value, bool formatted/* = false*/) {
 			}
 			else if (datatype == "Enumeration") {
 				upper_value = to_upper(value);
+			}
+			else if (datatype == "Date") {
+				// Do not convert to upper case to preserve lower-case month names
+				upper_value = value;
 			} else {
 				upper_value = value;
 			}
@@ -262,17 +238,39 @@ void record::item(string field, string value, bool formatted/* = false*/) {
 			char type_indicator = spec_data_->datatype_indicator(field);
 			double as_d = 0.0;
 			int as_i = 0;
+			Fl_Preferences display_settings(settings_, "Display");
 			switch (type_indicator) {
-			case 'D':
-			case 'T':
+			case 'D': {
+				// Date type
+				display_date_t format;
+				display_settings.get("Date", (int&)format, DATE_YYYYMMDD);
+				formatted_value = unformat_date(format, upper_value);
+				break;
+			}
+			case 'T': {
+				bool ok = false;
+				// Time type
+				display_time_t format;
+				display_settings.get("Time", (int&)format, TIME_HHMMSS);
+				formatted_value = unformat_time(format, upper_value);
+				break;
+				break;
+			}
 			case 'N':
 			case 'S':
 			case 'I':
 			case 'M': 
 			case 'G':
 			case 'B':
-				// String leave as is
-				formatted_value = upper_value;
+				if (field == "FREQ" || field == "FREQ_RX") {
+					display_freq_t format;
+					display_settings.get("Frequency", (int&)format, FREQ_MHz);
+					formatted_value = unformat_freq(format, upper_value);
+				}
+				else {
+					// No formatting
+					formatted_value = upper_value;
+				}
 				break;
 			case 'E':
 				// Enumeration: convert to uppercase
@@ -443,22 +441,40 @@ string record::item(string field, bool formatted/* = false*/, bool indirect/* = 
 		else {
 			// Get display settings
 			Fl_Preferences display_settings(settings_, "Display");
+
 			// Get the type indicator of the field
 			char type_indicator = spec_data_->datatype_indicator(field);
 			double as_d = 0.0;
 			char as_c[15];
 			switch (type_indicator) {
-			case ' ':
-			case 'D':
-			case 'T':
+			case 'D': {
+				display_date_t format;
+				display_settings.get("Date", (int&)format, DATE_YYYYMMDD);
+				result = format_date(format, unformatted_value);
+				break;
+			}
+			case 'T': {
+				display_time_t format;
+				display_settings.get("Time", (int&)format, TIME_HHMMSS);
+				result = format_time(format, unformatted_value);
+				break;
+			}
 			case 'N':
+			case ' ':
 			case 'S':
 			case 'I':
-			case 'M': 
+			case 'M':
 			case 'G':
 			case 'B':
-				// No formatting
-				result = unformatted_value;
+				if (field == "FREQ" || field == "FREQ_RX") {
+					display_freq_t format;
+					display_settings.get("Frequency", (int&)format, FREQ_MHz);
+					result = format_freq(format, unformatted_value);
+				}
+				else {
+					// No formatting
+					result = unformatted_value;
+				}
 				break;
 			case 'E':
 				// Special case for MODE - use SUBMODE if it exists
@@ -1203,4 +1219,164 @@ bool record::user_details() {
 	item("PROP_MODE", string(mode));
 	free(mode);
 	return modified;
+}
+
+string record::format_freq(display_freq_t format, string value) {
+	double frequency = stod(value);
+	char temp[25];
+	switch (format) {
+	case FREQ_Hz:
+		snprintf(temp, 25, "%.0f", frequency * 1000000);
+		break;
+	case FREQ_kHz:
+		snprintf(temp, 25, "%.3f", frequency * 1000);
+		break;
+	case FREQ_MHz:
+		snprintf(temp, 25, "%.6f", frequency);
+		break;
+	}
+	return string(temp);
+}
+
+string record::format_date(display_date_t format, string value) {
+	// Convert date to display format
+	tm date;
+	// Get start timestamp
+	date.tm_year = stoi(value.substr(0, 4)) - 1900;
+	date.tm_mon = stoi(value.substr(4, 2)) - 1;
+	date.tm_mday = stoi(value.substr(6, 2));
+	date.tm_hour = 0;
+	date.tm_min = 0;
+	date.tm_sec = 0;
+	date.tm_isdst = false;
+	char temp[20];
+	switch (format) {
+	case DATE_YYYYMMDD:
+		strftime(temp, 20, "%Y%m%d", &date);
+		break;
+	case DATE_YYYY_MM_DD:
+		strftime(temp, 20, "%Y_%m_%d", &date);
+		break;
+	case DATE_DD_MM_YYYY:
+		strftime(temp, 20, "%d_%m_%Y", &date);
+		break;
+	case DATE_MM_DD_YYYY:
+		strftime(temp, 20, "%m_%d_%Y", &date);
+		break;
+	case DATE_DD_MON_YYYY:
+		strftime(temp, 20, "%d-%b-%Y", &date);
+		break;
+	}
+	return string(temp);
+}
+
+string record::format_time(display_time_t format, string value) {
+	tm date;
+	date.tm_year = 70;
+	date.tm_mon = 0;
+	date.tm_mday = 1;
+	date.tm_hour = stoi(value.substr(0, 2));
+	date.tm_min = stoi(value.substr(2, 2));
+	if (value.length() == 6) {
+		date.tm_sec = stoi(value.substr(4, 2));
+	}
+	else {
+		date.tm_sec = 0;
+	}
+	date.tm_isdst = false;
+	char temp[20];
+	switch (format) {
+	case TIME_HHMMSS:
+		strftime(temp, 20, "%H%M%S", &date);
+		break;
+	case TIME_HHMM:
+		strftime(temp, 20, "%H%M", &date);
+		break;
+	case TIME_HH_MM_SS:
+		strftime(temp, 20, "%H:%M:%S", &date);
+		break;
+	case TIME_HH_MM:
+		strftime(temp, 20, "%H:%M", &date);
+		break;
+	}
+	return string(temp);
+}
+
+string record::unformat_freq(display_freq_t format, string value) {
+	double frequency = stod(value);
+	char temp[25];
+	switch (format) {
+	case FREQ_Hz:
+		snprintf(temp, 25, "%.6f", frequency / 1000000);
+		break;
+	case FREQ_kHz:
+		snprintf(temp, 25, "%.6f", frequency / 1000);
+		break;
+	case FREQ_MHz:
+		snprintf(temp, 25, "%.6f", frequency);
+		break;
+	}
+	return string(temp);
+}
+
+string record::unformat_date(display_date_t format, string value) {
+	tm date;
+	bool ok;
+	switch (format) {
+	case DATE_YYYYMMDD:
+		ok = string_to_tm(value, date, "%Y%m%d");
+		break;
+	case DATE_YYYY_MM_DD:
+		ok = string_to_tm(value, date, "%Y_%m_%d");
+		break;
+	case DATE_DD_MM_YYYY:
+		ok = string_to_tm(value, date, "%d_%m_%Y");
+		break;
+	case DATE_MM_DD_YYYY:
+		ok = string_to_tm(value, date, "%m_%d_%Y");
+		break;
+	case DATE_DD_MON_YYYY:
+		ok = string_to_tm(value, date, "%d-%b-%YYYY");
+		break;
+	}
+	char temp[9];
+	strftime(temp, 9, "%Y%m%d", &date);
+	if (!ok) {
+		char message[120];
+		snprintf(message, 120, "LOG: Invalid date %s for display format", value.c_str());
+		status_->misc_status(ST_ERROR, message);
+	}
+	return string(temp);
+}
+
+string record::unformat_time(display_time_t format, string value) {
+	string temp;
+	bool ok = false;
+	switch (format) {
+	case TIME_HHMMSS:
+	case TIME_HHMM:
+		switch (value.length()) {
+		case 4:
+		case 6:
+			temp = value;
+			ok = true;
+			break;
+		}
+		break;
+	case TIME_HH_MM_SS:
+		if (value.length() == 8) {
+			temp = value.substr(0, 2) + value.substr(3, 2) + value.substr(6, 2);
+		}
+		break;
+	case TIME_HH_MM:
+		if (value.length() == 5) {
+			temp = value.substr(0, 2) + value.substr(3, 2);
+		}
+	}
+	if (!ok) {
+		char message[120];
+		snprintf(message, 120, "LOG: Invalid time %s for display format", value.c_str());
+		status_->misc_status(ST_ERROR, message);
+	}
+	return string(temp);
 }

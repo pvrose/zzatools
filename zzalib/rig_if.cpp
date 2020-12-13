@@ -120,13 +120,6 @@ string rig_if::rig_info() {
 
 // Return the transmit or receive frequency
 string rig_if::get_frequency(bool tx) {
-	// get settings 
-	Fl_Preferences log_settings(settings_, "Log");
-
-	// Set the frquency display unit and precision
-	frequency_t log_format;
-	string format;
-	log_settings.get("Frequency Precision", (int&)log_format, (int)FREQ_Hz);
 	// Read the frequency (in MHz)
 	double frequency;
 	if (tx) {
@@ -135,36 +128,8 @@ string rig_if::get_frequency(bool tx) {
 	else {
 		frequency = rx_frequency() / 1000000.0;
 	}
-
-	// Depending on configured precision - get the relevant format
-	switch (log_format) {
-	case FREQ_Hz:
-		format = "%0.6f";
-		break;
-	case FREQ_Hz10:
-		format = "%0.5f";
-		break;
-	case FREQ_Hz100:
-		format = "%0.4f";
-		break;
-	case FREQ_kHz:
-		format = "%0.3f";
-		break;
-	case FREQ_kHz10:
-		format = "%0.2f";
-		break;
-	case FREQ_kHz100:
-		format = "%0.1f";
-		break;
-	case FREQ_MHz:
-		format = "%0.0f";
-		break;
-	default:
-		format = "%0d";
-	}
-	// Format the text for the display
-	char text[100];
-	sprintf(text, format.c_str(), frequency);
+	char text[15];
+	sprintf(text, "%0.6f", frequency);
 
 	return text;
 
