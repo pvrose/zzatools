@@ -441,7 +441,12 @@ void user_dialog::populate_freq(Fl_Choice* ch, display_freq_t format) {
 		snprintf(temp, 25, "%d: %s", i, record::format_freq((display_freq_t)i, freq).c_str());
 		ch->add(temp);
 	}
-	ch->value((int)format);
+	if (format < FREQ_END) {
+		ch->value((int)format);
+	}
+	else {
+		ch->value(0);
+	}
 }
 
 // Populate date TODO - need to identify 12_12_2020 from 12_12_2020
@@ -453,7 +458,12 @@ void user_dialog::populate_date(Fl_Choice* ch, display_date_t format) {
 		snprintf(temp, 25, "%d: %s", i, record::format_date((display_date_t)i, date).c_str());
 		ch->add(temp);
 	}
-	ch->value((int)format);
+	if (format < DATE_END) {
+		ch->value((int)format);
+	}
+	else {
+		ch->value(0);
+	}
 }
 
 // Populate time
@@ -465,5 +475,10 @@ void user_dialog::populate_time(Fl_Choice* ch, display_time_t format) {
 		snprintf(temp, 25, "%d: %s", i, record::format_time((display_time_t)i, time).c_str());
 		ch->add(temp);
 	}
-	ch->value((int)format);
+	if (format < TIME_END) {
+		ch->value((int)format);
+	}
+	else {
+		ch->value(0);
+	}
 }

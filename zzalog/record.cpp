@@ -1234,6 +1234,9 @@ string record::format_freq(display_freq_t format, string value) {
 	case FREQ_MHz:
 		snprintf(temp, 25, "%.6f", frequency);
 		break;
+	default:
+		strcpy(temp, "Invalid");
+		break;
 	}
 	return string(temp);
 }
@@ -1265,6 +1268,9 @@ string record::format_date(display_date_t format, string value) {
 		break;
 	case DATE_DD_MON_YYYY:
 		strftime(temp, 20, "%d-%b-%Y", &date);
+		break;
+	default:
+		strcpy(temp, "Invalid");
 		break;
 	}
 	return string(temp);
@@ -1298,6 +1304,9 @@ string record::format_time(display_time_t format, string value) {
 	case TIME_HH_MM:
 		strftime(temp, 20, "%H:%M", &date);
 		break;
+	default:
+		strcpy(temp, "Invalid");
+		break;
 	}
 	return string(temp);
 }
@@ -1314,6 +1323,9 @@ string record::unformat_freq(display_freq_t format, string value) {
 		break;
 	case FREQ_MHz:
 		snprintf(temp, 25, "%.6f", frequency);
+		break;
+	default:
+		strcpy(temp, "Invalid");
 		break;
 	}
 	return string(temp);
@@ -1337,6 +1349,9 @@ string record::unformat_date(display_date_t format, string value) {
 		break;
 	case DATE_DD_MON_YYYY:
 		ok = string_to_tm(value, date, "%d-%b-%YYYY");
+		break;
+	default:
+		value = "Invalid";
 		break;
 	}
 	char temp[9];
@@ -1372,6 +1387,10 @@ string record::unformat_time(display_time_t format, string value) {
 		if (value.length() == 5) {
 			temp = value.substr(0, 2) + value.substr(3, 2);
 		}
+		break;
+	default:
+		temp = "Invalid";
+		break;
 	}
 	if (!ok) {
 		char message[120];
