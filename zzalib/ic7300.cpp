@@ -86,8 +86,11 @@ string ic7300::send_command(unsigned char command, string sub_command, string da
 				}
 			}
 			else {
-				// Currently do not support the case where the rig is configured not to reflect command?
+				// Currently do not support the case where the rig is configured not to reflect command? 
+				// This will also trap corrupted responses
 				snprintf(mess, 256, "RIG: Unexpected response: %s\n%s\nCMD = %s", response.c_str(), string_to_hex(response).c_str(), to_send.c_str());
+				message(ST_ERROR, mess);
+				ok = false;
 				return response;
 			}
 		}
