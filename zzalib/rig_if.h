@@ -49,9 +49,6 @@ namespace zzalib {
 	const double FAST_RIG_MIN = 0.02;
 	const double FAST_RIG_DEF = 1.0;
 
-	static bool hamlib_be_loaded_ = false;
-
-
 	// This class is the base class for rig handlers. 
 	class rig_if
 	{
@@ -75,8 +72,10 @@ namespace zzalib {
 		virtual double rx_frequency() = 0;
 		// Return S-meter reading (S9+/-dB)
 		virtual int s_meter() = 0;
+		// Return the power_meter reading
+		virtual double pwr_meter() = 0;
 		// Return the most recent error message
-		virtual string error_message() = 0;
+		virtual string error_message(string func_name) = 0;
 		// Send a raw message
 		virtual string raw_message(string message) = 0;
 		// Get TX mode
@@ -131,6 +130,8 @@ namespace zzalib {
 		bool opened_ok_;
 		// Handler name
 		string handler_;
+		// Handler type
+		rig_handler_t handler_t_;
 		// Text error message
 		string error_message_;
 		// Text success message
@@ -149,6 +150,7 @@ namespace zzalib {
 		bool reported_hi_swr_;
 		// last band read
 		string previous_band_;
+
 
 
 	};
@@ -178,8 +180,10 @@ namespace zzalib {
 		virtual double rx_frequency();
 		// Return S-meter reading (S9+/-dB)
 		virtual int s_meter();
+		// Return power meter reading
+		virtual double pwr_meter();
 		// Return the most recent error message
-		virtual string error_message();
+		virtual string error_message(string func_name);
 		// Return raw message
 		virtual string raw_message(string message);
 		// Get TX mode
@@ -237,8 +241,10 @@ namespace zzalib {
 		virtual double rx_frequency();
 		// Return S-meter reading (S9+/-dB)
 		virtual int s_meter();
+		// Return the power meter reading
+		virtual double pwr_meter();
 		// Return the most recent error message
-		virtual string error_message();
+		virtual string error_message(string func_name);
 		// Return raw message
 		virtual string raw_message(string message);
 		// Get TX mode

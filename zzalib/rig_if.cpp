@@ -9,7 +9,6 @@
 #include <FL/Fl_Window.H>
 
 using namespace zzalib;
-using namespace zzalib;
 
 extern Fl_Preferences* settings_;
 rig_if* rig_if_;
@@ -27,6 +26,7 @@ rig_if::rig_if()
 	mfg_name_ = "";
 	opened_ok_ = false;
 	handler_ = "";
+	handler_t_ = RIG_NONE;
 	error_message_ = "";
 	// Power lookup table
 	power_lookup_ = new power_matrix;
@@ -137,7 +137,7 @@ string rig_if::get_frequency(bool tx) {
 
 // Return the power
 string rig_if::get_tx_power() {
-	double tx_power = power();
+	double tx_power = pwr_meter();
 	char text[100];
 	sprintf(text, "%g", tx_power);
 
@@ -178,9 +178,8 @@ void rig_if::cb_timer_rig(void* v) {
 				rig_if_->on_timer_();
 			}
 		}
-		if (!rig_if_->is_good()) {
+		if (!rig_if_ || !rig_if_->is_good()) {
 			// Rig connected and broken - SLOW
-			rig_if_->error(ST_WARNING, "RIG: Rig disconnected - setting slow polling period");
 			rig_settings.get("Slow Polling Interval", timer_value, SLOW_RIG_DEF);
 		}
 	}
@@ -258,7 +257,7 @@ void rig_if::change_lookup() {
 
 void rig_if::update_clock() {
 	// Only implemented for IC-7300
-	if (rig_name() == "IC-7300" && ic7300_) {
+	if (rig_name() == "IC-7300" && ic7300_ && handler_t_ == RIG_FLRIG) {
 		// Get current time
 		time_t now = time(nullptr);
 		// convert to struct in UTC
@@ -339,12 +338,10 @@ rig_hamlib::rig_hamlib()
 	error_message_ = "";
 	baud_rate_ = 0;
 
-	// Initialise the rig database in hamlib
-	rig_load_all_backends();
-	hamlib_be_loaded_ = true;
 
 	// set handler name
 	handler_ = "Hamlib";
+	handler_t_ = RIG_HAMLIB;
 
 }
 
@@ -402,9 +399,10 @@ bool rig_hamlib::open() {
 
 	// Search through the rig database until we find the required rig.
 	model_id_ = -1;
+	const rig_caps* capabilities = nullptr;
 	for (rig_model_t i = 0; i < 4000 && model_id_ == -1; i++) {
 		// Read each rig's capabilities
-		const rig_caps* capabilities = rig_get_caps(i);
+		capabilities = rig_get_caps(i);
 		try {
 			if (capabilities != nullptr) {
 				// Not all numbers represent a rig as the mapping is sparse
@@ -417,7 +415,7 @@ bool rig_hamlib::open() {
 	}
 	// Get the rig interface
 	rig_ = rig_init(model_id_);
-	if (rig_ != nullptr) {
+	if (rig_ != nullptr && capabilities->port_type == RIG_PORT_SERIAL) {
 		// Successful - set up the serial port parameters
 		strcpy(rig_->state.rigport.pathname, port_name_.c_str());
 		rig_->state.rigport.parm.serial.rate = baud_rate_;
@@ -444,7 +442,12 @@ bool rig_hamlib::open() {
 	}
 
 	if (opened_ok_) {
-		success_message_ = "hamlib connection " + mfg_name_ + "/" + rig_name_ + " on port " + port_name_ + " opened OK";
+		if (capabilities->port_type == RIG_PORT_SERIAL) {
+			success_message_ = "hamlib connection " + mfg_name_ + "/" + rig_name_ + " on port " + port_name_ + " opened OK";
+		}
+		else {
+			success_message_ = "hamlib connection " + mfg_name_ + "/" + rig_name_ + " opened OK";
+		}
 	}
 
 	// Set timer
@@ -462,18 +465,15 @@ string& rig_hamlib::rig_name() {
 
 // Read TX frequency in Hz
 double rig_hamlib::tx_frequency() {
-	vfo_t vfo_id;
 	freq_t frequency_hz;
 	// Get ID of transmit VFO and read its value
-	if ((error_code_ = rig_get_vfo(rig_, &vfo_id)) == RIG_OK) {
-		error_code_ = rig_get_freq(rig_, vfo_id, &frequency_hz);
+	if ((error_code_ = rig_get_freq(rig_, RIG_VFO_TX, &frequency_hz)) == RIG_OK) {
+		return frequency_hz;
 	}
 	else {
-		// Return not-a-number as wasn't read
-		frequency_hz = nan("");
-
+		error(ST_ERROR, error_message("tx_frequency").c_str());
+		return nan("");
 	}
-	return frequency_hz;
 }
 
 // Read mode from rig
@@ -500,10 +500,10 @@ rig_mode_t rig_hamlib::mode() {
 		if (mode & RIG_MODE_FM) {
 			return GM_FM;
 		}
-		if (mode & RIG_MODE_RTTY) {
+		if (mode & (RIG_MODE_RTTY | RIG_MODE_PKTLSB)) {
 			return GM_DIGL;
 		}
-		if (mode & RIG_MODE_RTTYR) {
+		if (mode & (RIG_MODE_RTTYR | RIG_MODE_PKTUSB)) {
 			return GM_DIGU;
 		}
 		else {
@@ -513,6 +513,7 @@ rig_mode_t rig_hamlib::mode() {
 	}
 	else {
 		// Failed to access rig
+		error(ST_ERROR, error_message("mode").c_str());
 		return GM_INVALID;
 	}
 }
@@ -520,10 +521,11 @@ rig_mode_t rig_hamlib::mode() {
 // Return drive level * 100% power
 double rig_hamlib::drive() {
 	value_t drive_level;
-	if ((error_code_ = rig_get_level(rig_, RIG_VFO_CURR, rig_level_e::RIG_LEVEL_RFPOWER, &drive_level)) == RIG_OK) {
+	if ((error_code_ = rig_get_level(rig_, RIG_VFO_CURR, RIG_LEVEL_RFPOWER, &drive_level)) == RIG_OK) {
 		return drive_level.f * 100;
 	}
 	else {
+		error(ST_ERROR, error_message("drive").c_str());
 		return nan("");
 	}
 }
@@ -532,18 +534,24 @@ double rig_hamlib::drive() {
 bool rig_hamlib::is_split() {
 	vfo_t TxVFO;
 	split_t split;
-	error_code_ = rig_get_split_vfo(rig_, RIG_VFO_CURR, &split, &TxVFO);
-	return (split == split_t::RIG_SPLIT_ON);
+	if ((error_code_ = rig_get_split_vfo(rig_, RIG_VFO_CURR, &split, &TxVFO)) == RIG_OK) {
+		return (split == split_t::RIG_SPLIT_ON);
+	}
+	else {
+		error(ST_ERROR, error_message("is_split").c_str());
+		return false;
+	}
 }
 
 // Get separate receive frequency
 double rig_hamlib::rx_frequency() {
 	freq_t frequency_hz;
 	// VFO A is always receive VFO
-	if ((error_code_ = rig_get_freq(rig_, RIG_VFO_A, &frequency_hz)) == RIG_OK) {
+	if ((error_code_ = rig_get_freq(rig_, RIG_VFO_CURR, &frequency_hz)) == RIG_OK) {
 		return frequency_hz;
 	}
 	else {
+		error(ST_ERROR, error_message("rx_frequency").c_str());
 		return nan("");
 	}
 }
@@ -557,7 +565,22 @@ int rig_hamlib::s_meter() {
 	}
 	else {
 		// Default to S0 (S9 is -73 dBm)
+		error(ST_ERROR, error_message("s_meter").c_str());
 		return -54;
+	}
+}
+
+// Return power meter reading (Watts)
+double rig_hamlib::pwr_meter() {
+	value_t meter_value;
+	if ((error_code_ = rig_get_level(rig_, RIG_VFO_CURR, RIG_LEVEL_RFPOWER_METER_WATTS, &meter_value)) == RIG_OK) {
+		// hamlib returns relative to S9. 
+		return meter_value.f;
+	}
+	else {
+		// Default to S0 (S9 is -73 dBm)
+		error(ST_ERROR, error_message("pwr_meter").c_str());
+		return nan("");
 	}
 }
 
@@ -568,18 +591,19 @@ double rig_hamlib::swr_meter() {
 		return meter_value.f;
 	}
 	else {
-		return 1.0;
+		error(ST_ERROR, error_message("swr_meter").c_str());
+		return nan("");
 	}
 }
 
 // Return the most recent error message
-string rig_hamlib::error_message() {
+string rig_hamlib::error_message(string func_name) {
 	const char* hamlib_error = error_text((rig_errcode_e)abs(error_code_));
 	if (hamlib_error == nullptr) {
-		error_message_ = "Hamlib: (No error details)";
+		error_message_ = "RIG: Hamlib: " + func_name + " (No error details)";
 	}
 	else {
-		error_message_ = "Hamlib: " + string(hamlib_error);
+		error_message_ = "RIG: Hamlib: " + func_name + " " + string(hamlib_error);
 	}
 	return error_message_;
 }
@@ -660,6 +684,7 @@ rig_flrig::rig_flrig()
 	rig_name_ = "";
 	error_message_ = "";
 	handler_ = "Flrig";
+	handler_t_ = RIG_FLRIG;
 	rpc_handler_ = nullptr;
 }
 
@@ -729,6 +754,7 @@ double rig_flrig::rx_frequency() {
 	}
 	else {
 		// Failed return NAN
+		error(ST_ERROR, error_message("rx_frequency").c_str());
 		return nan("");
 	}
 }
@@ -753,6 +779,7 @@ rig_mode_t rig_flrig::mode() {
 	}
 	else {
 		// Request failed
+		error(ST_ERROR, error_message("mode").c_str());
 		return GM_INVALID;
 	}
 }
@@ -764,6 +791,7 @@ double rig_flrig::drive() {
 		return (double)response.get_int();
 	}
 	else {
+		error(ST_ERROR, error_message("drive").c_str());
 		return nan("");
 	}
 }
@@ -775,6 +803,7 @@ bool rig_flrig::is_split() {
 		return (bool)response.get_int();
 	}
 	else {
+		error(ST_ERROR, error_message("is_split").c_str());
 		return false;
 	}
 }
@@ -789,6 +818,7 @@ double rig_flrig::tx_frequency() {
 				return (double)response.get_int();
 			}
 			else {
+				error(ST_ERROR, error_message("tx_frequency").c_str());
 				return nan("");
 			}
 		}
@@ -798,6 +828,7 @@ double rig_flrig::tx_frequency() {
 		return (double)response.get_int();
 	}
 	else {
+		error(ST_ERROR, error_message("tx_frequency").c_str());
 		return nan("");
 	}
 }
@@ -811,7 +842,22 @@ int rig_flrig::s_meter() {
 	}
 	else {
 		// Default return S0
+		error(ST_ERROR, error_message("s_meter").c_str());
 		return -54;
+	}
+}
+
+// Return power-meter reading (S9+/-dB)
+double rig_flrig::pwr_meter() {
+	rpc_data_item response;
+	if (do_request("rig.get_pwrmeter", nullptr, &response)) {
+		// It looks like 0 = S0 so convert to dB below S9
+		return (double)response.get_int();
+	}
+	else {
+		// Default return S0
+		error(ST_ERROR, error_message("pwr_meter").c_str());
+		return nan("");
 	}
 }
 
@@ -837,11 +883,13 @@ double rig_flrig::swr_meter() {
 		}
 	}
 	// Not IC7300 or not OK - return 1.0.
-	return 1.0;
+	error(ST_ERROR, error_message("swr_meter").c_str());
+	return nan("");
 }
+
 // Return the most recent error message
-string rig_flrig::error_message() {
-	return error_message_;
+string rig_flrig::error_message(string func_name) {
+	return "FlRig: " + func_name + " " + error_message_;
 }
 
 // Error Code is not OK.
@@ -877,7 +925,7 @@ string rig_flrig::raw_message(string message) {
 	param.set(message, XRT_STRING);
 	params.clear();
 	params.push_back(&param);
-	if (do_request("rig.cat_string", &params, &response)) {
+	if (do_request("rig.cat_priority", &params, &response)) {
 		return response.get_string();
 	}
 	else {

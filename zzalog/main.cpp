@@ -42,6 +42,7 @@ main.cpp - application entry point
 #include "wsjtx_handler.h"
 #include "fllog_emul.h"
 #include "resource.h"
+#include "hamlib/rig.h"
 
 // C/C++ header files
 #include <ctime>
@@ -470,7 +471,7 @@ void add_rig_if() {
 		fl_cursor(FL_CURSOR_WAIT);
 		delete rig_if_;
 		// Get the handler from the settings
-		rig_handler_t handler;
+		rig_handler_t handler = RIG_NONE;
 		Fl_Preferences rig_settings(settings_, "Rig");
 		rig_settings.get("Handler", (int&)handler, RIG_FLRIG);
 		Fl_Preferences stations_settings(settings_, "Stations");
@@ -545,10 +546,10 @@ void add_rig_if() {
 						// The first access to read the mode may fail
 						else if (!rig_if_->is_good()) {
 							char message[512];
-							sprintf(message, "RIG: Bad access - %s. Assume real-time logging, no rig", rig_if_->error_message().c_str());
+							sprintf(message, "RIG: Bad access - %s. Assume real-time logging, no rig", rig_if_->error_message("Open").c_str());
 							// Problem with rig_if when making first access, close it to stop timer and clean up 
 							rig_if_->close();
-							string error_message = rig_if_->error_message();
+							string error_message = rig_if_->error_message("");
 							delete rig_if_;
 							rig_if_ = nullptr;
 							if (scratchpad_) {
@@ -595,7 +596,7 @@ void add_rig_if() {
 					// Rig hadn't opened - set off-air logging
 					char temp[128] = "RIG: failed to open - no information";
 					if (rig_if_) {
-						snprintf(temp, sizeof(temp), "RIG: failed to open - %s", rig_if_->error_message().c_str());
+						snprintf(temp, sizeof(temp), "RIG: failed to open - %s", rig_if_->error_message("Open").c_str());
 					}
 					delete rig_if_;
 					rig_if_ = nullptr;
@@ -876,6 +877,7 @@ int main(int argc, char** argv)
 	add_book(argc == 1 ? nullptr : argv[argc - 1]);
 	// Connect to the rig
 	rig_if_ = nullptr;
+	rig_load_all_backends();
 	add_rig_if();
 	// Add band-plan 
 	add_band_view();

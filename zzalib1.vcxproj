@@ -109,7 +109,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <LibraryPath>C:\Users\pvros\Documents\dev\curl-7.65.1\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>C:\Users\pvros\Documents\dev\curl-7.65.1\lib;C:\cygwin\usr\local\bin;C:\cygwin\home\pvros\dev\Hamlib-master\src;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -130,7 +130,7 @@
       <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_WARNINGS;_WINSOCK_DEPRECATED_NO_WARNINGS;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>C:\Users\pvros\Documents\dev\fltk-1.4.x-20200320-0a38e2e3\build;C:\Users\pvros\Documents\dev\hamlib-w32-3.3\include;C:\Users\pvros\Documents\dev\curl-7.65.1\include;C:\Users\pvros\Documents\dev\fltk-1.4.x-20200320-0a38e2e3;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\pvros\Documents\dev\fltk-1.4.x-20200320-0a38e2e3\build;C:\Users\pvros\Documents\dev\curl-7.65.1\include;C:\Users\pvros\Documents\dev\fltk-1.4.x-20200320-0a38e2e3;C:\cygwin\home\pvros\dev\Hamlib\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
     </ClCompile>
     <Link>
@@ -165,7 +165,7 @@
       <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_WARNINGS;_WINSOCK_DEPRECATED_NO_WARNINGS;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>C:\Users\pvros\Documents\dev\fltk-1.4.x-20200320-0a38e2e3\build;C:\Users\pvros\Documents\dev\hamlib-w32-3.3\include;C:\Users\pvros\Documents\dev\curl-7.65.1\include;C:\Users\pvros\Documents\dev\fltk-1.4.x-20200320-0a38e2e3;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\pvros\Documents\dev\fltk-1.4.x-20200320-0a38e2e3\build;C:\Users\pvros\Documents\dev\curl-7.65.1\include;C:\Users\pvros\Documents\dev\fltk-1.4.x-20200320-0a38e2e3;C:\cygwin\home\pvros\dev\Hamlib\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
