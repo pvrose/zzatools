@@ -180,7 +180,9 @@ void extract_data::clear_criteria() {
 	delete_contents(true);
 	use_mode_ = NONE;
 	// Set navigation book to main log
-	tabbed_forms_->activate_pane(OT_MAIN, true);
+	if (book_type_ != OT_DXATLAS) {
+		tabbed_forms_->activate_pane(OT_MAIN, true);
+	}
 	// Cause the views to be redrawn
 	selection(-1, HT_EXTRACTION);
 }

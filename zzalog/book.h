@@ -55,6 +55,7 @@ namespace zzalog {
 		HT_RESET_ORDER,           // Reset order as first to last
 		HT_MEMORIES,              // Read mmemories from rig
 		HT_START_CHANGED,         // The start date or time has changed
+		HT_DXATLAS,               // DxAtlas selection has changed
 	};
 
 	class view;

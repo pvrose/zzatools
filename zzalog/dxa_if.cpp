@@ -1649,8 +1649,7 @@ void dxa_if::draw_pins() {
 
 			// Now display the list of records
 			if (records_displayed_.size()) {
-				book_->selection(*(records_displayed_.begin()));
-				tabbed_forms_->activate_pane(OT_DXATLAS, true);
+				book_->selection(*(records_displayed_.begin()), HT_DXATLAS);
 			}
 
 			// Report finished
@@ -1757,6 +1756,7 @@ void dxa_if::update(hint_t hint) {
 		// HT_DUPE_QUERY,            // Query whether records are duplicates
 		// HT_FORMAT,                // Formats or Columns have changed (LOGVIEW and EXTRACTVIEW)
 		// HT_STARTING,              // Record is being created as HT_INSERTED but don't include it
+		// HT_DXATLAS                // Change originated here - avoid endless loop
 		// Do nothing 
 		break;
 	}
