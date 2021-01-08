@@ -71,6 +71,8 @@ namespace zzalog {
 		// SWL message
 		bool eqsl_use_swl_msg_;
 		string eqsl_swl_msg_;
+		// Upload QSOs as logged
+		bool eqsl_upload_qso_;
 
 		// LotW attributes
 
@@ -81,6 +83,8 @@ namespace zzalog {
 		// user name/password
 		string lotw_username_;
 		string lotw_password_;
+		// Upload QSOs as logged
+		bool lotw_upload_qso_;
 
 		// QRZ.com attributes
 
@@ -101,6 +105,8 @@ namespace zzalog {
 		string club_username_;
 		// Number of days between downloads
 		int club_interval_;
+		// Upload QSOs as logged
+		bool club_upload_qso_;
 
 	};
 

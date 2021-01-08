@@ -1432,16 +1432,16 @@ void dxa_if::draw_pins() {
 			// Set the bounds for zooming - always include the home location, these will get when stations are further W, E, N or S
 			westernmost_ = home_long_;
 			easternmost_ = home_long_;
+			// Get most recent date (for AC_DAYS)
 			northernmost_ = home_lat_;
 			southernmost_ = home_lat_;
 			// Set smallest distance to a practicable limit to avoid zero divide if no pins to draw
 			furthest_ = 100;
-			// Get most recent date (for AC_DAYS)
 			last_time_ = time(nullptr);
 
 			// Clear records displayed
 			records_displayed_.clear();
-			dxatlas_records_->clear_criteria();
+			dxatlas_records_->clear_criteria(false);
 			int* colour_count = new int[colours_used_.size()];
 			for (size_t i = 0; i < colours_used_.size(); i++) {
 				colour_count[i] = 0;

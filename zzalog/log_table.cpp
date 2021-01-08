@@ -194,6 +194,7 @@ void log_table::cb_menu(Fl_Widget* w, void* v) {
 	const char* src = that->edit_input_->value();
 	unsigned int l = strlen(src);
 	bool mixed_upper;
+	bool prev_upper;
 	int len;
 	// Destination string should be upto 3 times the length of the source
 	char* dst = new char[l * 3];
@@ -209,6 +210,7 @@ void log_table::cb_menu(Fl_Widget* w, void* v) {
 		break;
 	case MIXED:
 		mixed_upper = true;
+		prev_upper = true;
 		for (unsigned int i = 0; i < l; ) {
 			unsigned int ucs = fl_utf8decode(src + i, src + l, &len);
 			i += len;
@@ -225,9 +227,15 @@ void log_table::cb_menu(Fl_Widget* w, void* v) {
 			case '-':
 			case '.':
 				// Allow upper case after some punctuation
+				prev_upper = mixed_upper;
 				mixed_upper = true;
 				break;
+			case '\'':
+				// Keep case prior to apostrophe
+				mixed_upper = prev_upper;
+				break;
 			default:
+				prev_upper = mixed_upper;
 				mixed_upper = false;
 				break;
 			}

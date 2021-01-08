@@ -871,18 +871,20 @@ double rig_flrig::swr_meter() {
 		if (ok) {
 			unsigned int value = bcd_to_int(data.substr(2, 2), false);
 			double swr;
+			// 0 = 1:1.0; 48 = 1:1.5; 80 = 1:2.0; 120 = 1:3.0
+			// Linearly interpolate and extrapolate
 			if (value <= 48) {
-				swr = (value * 0.5 / 48) + 1.0;
+				swr = ((double)value * 0.5 / 48.0) + 1.0;
 			}
 			else if (value <= 80) {
-				swr = ((value - 48) * 0.5 / 32) + 1.5;
+				swr = ((double)(value - 48) * 0.5 / 32.0) + 1.5;
 			} else {
-				swr = ((value - 80) * 1.0 / 40) + 2.0;
+				swr = ((double)(value - 80) * 1.0 / 40.0) + 2.0;
 			}
 			return swr;
 		}
 	}
-	// Not IC7300 or not OK - return 1.0.
+	// Not IC7300 or not OK - return nan.
 	error(ST_ERROR, error_message("swr_meter").c_str());
 	return nan("");
 }
@@ -926,9 +928,16 @@ string rig_flrig::raw_message(string message) {
 	params.clear();
 	params.push_back(&param);
 	if (do_request("rig.cat_priority", &params, &response)) {
-		return response.get_string();
+		if (response.get_string() == "OK") {
+			if (do_request("rig.cat_string", &params, &response)) {
+				return response.get_string();
+			}
+		}
+		error_message_ = "Raw message failed to execute command";
+		return "";
 	}
 	else {
+		error_message_ = "Raw message failed to get priority";
 		return "";
 	}
 }

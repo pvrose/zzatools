@@ -88,6 +88,7 @@ void web_dialog::load_values() {
 	eqsl_settings.get("Last Accessed", temp, "");
 	eqsl_last_got_ = temp;
 	free(temp);
+	eqsl_settings.get("Upload per QSO", (int&)eqsl_upload_qso_, false);
 	// LotW settings
 	lotw_settings.get("Enable", (int&)lotw_enable_, false);
 	lotw_settings.get("User", temp, "");
@@ -99,6 +100,7 @@ void web_dialog::load_values() {
 	lotw_settings.get("Last Accessed", temp, "");
 	lotw_last_got_ = temp;
 	free(temp);
+	lotw_settings.get("Upload per QSO", (int&)lotw_upload_qso_, false);
 
 	// QRZ.com User/Password
 	qrz_settings.get("Enable", (int&)qrz_enable_, false);
@@ -129,6 +131,7 @@ void web_dialog::load_values() {
 	club_password_ = temp;
 	free(temp);
 	club_settings.get("Interval", club_interval_, 7);
+	club_settings.get("Upload per QSO", (int&)club_upload_qso_, false);
 
 }
 
@@ -139,7 +142,9 @@ void web_dialog::create_form(int X, int Y) {
 	const int GRP1 = EDGE;
 	const int R1_1 = GRP1 + GAP + HTEXT;
 	const int H1_1 = HBUTTON;
-	const int R1_2 = R1_1 + H1_1 + GAP;
+	const int R1_1A = R1_1 + H1_1;
+	const int H1_1A = HBUTTON;
+	const int R1_2 = R1_1A + H1_1A + GAP;
 	const int H1_2 = HBUTTON;
 	const int R1_3 = R1_2 + H1_2 + GAP;
 	const int H1_3 = HBUTTON;
@@ -149,7 +154,9 @@ void web_dialog::create_form(int X, int Y) {
 	const int GRP2 = GRP1 + HGRP1 + GAP;
 	const int R2_1 = GRP2 + GAP + HTEXT;
 	const int H2_1 = HBUTTON;
-	const int HGRP2 = R2_1 + H2_1 + GAP - GRP2;
+	const int R2_1A = R2_1 + H2_1;
+	const int H2_1A = HBUTTON;
+	const int HGRP2 = R2_1A + H2_1A + GAP - GRP2;
 
 	// Group 3 QRZ.com widgets
 	const int GRP3 = GRP2 + HGRP2 + GAP;
@@ -163,7 +170,9 @@ void web_dialog::create_form(int X, int Y) {
 	const int GRP4 = GRP3 + HGRP3 + GAP;
 	const int R4_1 = GRP4 + GAP + HTEXT;
 	const int H4_1 = HBUTTON;
-	const int R4_2 = R4_1 + H4_1 + HTEXT;
+	const int R4_1A = R4_1 + H4_1;
+	const int H4_1A = HBUTTON;
+	const int R4_2 = R4_1A + H4_1A + HTEXT;
 	const int H4_2 = HTEXT;
 	const int HGRP4 = R4_2 + H4_2 + GAP - GRP4;
 
@@ -247,6 +256,16 @@ void web_dialog::create_form(int X, int Y) {
 	in1_1_5->callback(cb_value<Fl_Secret_Input, string>, &eqsl_password_);
 	in1_1_5->when(FL_WHEN_CHANGED);
 	in1_1_5->tooltip("Enter password for eQSL.cc");
+
+	// Row 1A Col 1 - Update evry QSO
+	Fl_Check_Button* bn1_1A_1 = new Fl_Check_Button(X + C1, Y + R1_1A, W1, H1_1A, "Update each QSO");
+	bn1_1A_1->align(FL_ALIGN_RIGHT);
+	bn1_1A_1->labelfont(FONT);
+	bn1_1A_1->labelsize(FONT_SIZE);
+	bn1_1A_1->value(eqsl_upload_qso_);
+	bn1_1A_1->callback(cb_value < Fl_Check_Button, bool>, &eqsl_upload_qso_);
+	bn1_1A_1->when(FL_WHEN_CHANGED);
+	bn1_1A_1->tooltip("Upload each QSO as it is logged");
 
 	// Row 2 Col 1 - QSO Message enable
 	Fl_Check_Button* bn1_2_1 = new Fl_Check_Button(X + C1, Y + R1_2, W1, H1_2, "Use QSO Message");
@@ -341,6 +360,16 @@ void web_dialog::create_form(int X, int Y) {
 	in2_1_5->callback(cb_value<Fl_Secret_Input, string>, &lotw_password_);
 	in2_1_5->when(FL_WHEN_CHANGED);
 	in2_1_5->tooltip("Enter password for Logbook of the World");
+
+	// Row 1A Col 1 - Update evry QSO
+	Fl_Check_Button* bn2_1A_1 = new Fl_Check_Button(X + C1, Y + R2_1A, W1, H2_1A, "Update each QSO");
+	bn2_1A_1->align(FL_ALIGN_RIGHT);
+	bn2_1A_1->labelfont(FONT);
+	bn2_1A_1->labelsize(FONT_SIZE);
+	bn2_1A_1->value(lotw_upload_qso_);
+	bn2_1A_1->callback(cb_value < Fl_Check_Button, bool>, &lotw_upload_qso_);
+	bn2_1A_1->when(FL_WHEN_CHANGED);
+	bn2_1A_1->tooltip("Upload each QSO as it is logged");
 
 	// Create the list of widgets to be disabled when eQSL disabled
 	grp_lotw_ = gp2;
@@ -443,6 +472,16 @@ void web_dialog::create_form(int X, int Y) {
 	in4_2_2->when(FL_WHEN_CHANGED);
 	in4_2_2->tooltip("Specify the days between updating the exception file");
 
+	// Row 1A Col 1 - Update evry QSO
+	Fl_Check_Button* bn4_1A_1 = new Fl_Check_Button(X + C1, Y + R4_1A, W1, H4_1A, "Update each QSO");
+	bn4_1A_1->align(FL_ALIGN_RIGHT);
+	bn4_1A_1->labelfont(FONT);
+	bn4_1A_1->labelsize(FONT_SIZE);
+	bn4_1A_1->value(club_upload_qso_);
+	bn4_1A_1->callback(cb_value < Fl_Check_Button, bool>, &club_upload_qso_);
+	bn4_1A_1->when(FL_WHEN_CHANGED);
+	bn4_1A_1->tooltip("Upload each QSO as it is logged");
+
 
 	grp_club_ = gp4;
 	gp4->end();
@@ -464,11 +503,13 @@ void web_dialog::save_values() {
 	eqsl_settings.set("User", eqsl_username_.c_str());
 	eqsl_settings.set("Password", eqsl_password_.c_str());
 	eqsl_settings.set("Last Accessed", eqsl_last_got_.c_str());
+	eqsl_settings.set("Upload per QSO", eqsl_upload_qso_);
 	// LotW settings
 	lotw_settings.set("Enable", lotw_enable_);
 	lotw_settings.set("User", lotw_username_.c_str());
 	lotw_settings.set("Password", lotw_password_.c_str());
 	lotw_settings.set("Last Accessed", lotw_last_got_.c_str());
+	lotw_settings.set("Upload per QSO", lotw_upload_qso_);
 	// QRZ.com Settings
 	qrz_settings.set("Enable", qrz_enable_);
 	qrz_settings.set("User", qrz_username_.c_str());
@@ -486,6 +527,7 @@ void web_dialog::save_values() {
 	club_settings.set("Email", club_username_.c_str());
 	club_settings.set("Password", club_password_.c_str());
 	club_settings.set("Interval", club_interval_);
+	club_settings.set("Upload per QSO", club_upload_qso_);
 }
 
 // Enable widgets after enabling/disabling stuff

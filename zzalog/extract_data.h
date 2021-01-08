@@ -40,7 +40,7 @@ namespace zzalog {
 		// Reextract data as things may have changed
 		void reextract();
 		// Clear the serach criteria
-		void clear_criteria();
+		void clear_criteria(bool redraw = true);
 		// Extract for specific criteria - QSL uploads
 		void extract_qsl(extract_mode_t server);
 		// Upload data - on saved server

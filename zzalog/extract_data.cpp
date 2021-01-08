@@ -167,7 +167,7 @@ void extract_data::reextract() {
 }
 
 // clear criteria
-void extract_data::clear_criteria() {
+void extract_data::clear_criteria(bool redraw) {
 	// Clear the book without deleting the records
 	clear();
 	// Clear all the sets of criteria
@@ -180,11 +180,11 @@ void extract_data::clear_criteria() {
 	delete_contents(true);
 	use_mode_ = NONE;
 	// Set navigation book to main log
-	if (book_type_ != OT_DXATLAS) {
+	if (redraw) {
 		tabbed_forms_->activate_pane(OT_MAIN, true);
+		// Cause the views to be redrawn
+		selection(-1, HT_EXTRACTION);
 	}
-	// Cause the views to be redrawn
-	selection(-1, HT_EXTRACTION);
 }
 
 // Convert item index in this book to the record index in the main log book
