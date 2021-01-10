@@ -851,3 +851,217 @@ void eqsl_handler::debug_enable(bool value) {
 }
 
 
+// Upload single QSO to eQSL.cc
+bool eqsl_handler::upload_single_qso(record_num_t record_num) {
+	Fl_Preferences qsl_settings(settings_, "QSL");
+	Fl_Preferences eqsl_settings(qsl_settings, "eQSL");
+	int upload_qso;
+	eqsl_settings.get("Upload per QSO", upload_qso, false);
+	if (upload_qso) {
+		// Clear existing help dialog
+		if (help_dialog_) {
+			help_dialog_->value("");
+		}
+		// Get login details
+		string username;
+		string password;
+		string qsl_message;
+		string swl_message;
+		string error_message;
+		response_t status = ER_OK;
+		if (!user_details(&username, &password, nullptr, &qsl_message, &swl_message)) {
+			char* message = new char[50 + username.length() + password.length()];
+			sprintf(message, "EQSL: User or password is missing: U=%s, P=%s", username.c_str(), password.c_str());
+			status_->misc_status(ST_ERROR, message);
+			delete[] message;
+			return false;
+		}
+		bool ok = true;
+		// URL to upload a single QSO (ref eQSL.cc)
+		char url[] = "http://www.eqsl.cc/qslcard/ImportADIF.cfm?ADIFData=";
+		char header_format[2048];
+		char header_data[2048];
+		record* header = book_->header();
+		bool passed = true;
+		if (header != nullptr) {
+			// Add user and password to URL with header comment...
+			strcpy(header_format, "Upload %s %s <EQSL_USER:%d>%s <EQSL_PSWD:%d>%s <EOH>");
+			sprintf(header_data, header_format,
+				header->item("ADIF_VER").c_str(),
+				header->item("PROGRAMID").c_str(),
+				username.length(),
+				username.c_str(),
+				password.length(),
+				password.c_str());
+		}
+		else {
+			// ...or without header comment
+			strcpy(header_format, "Upload <EQSL_USER:%d>%s <EQSL_PSWD:%d>%s <EOH>");
+			sprintf(header_data, header_format,
+				username.length(),
+				username.c_str(),
+				password.length(),
+				password.c_str());
+		}
+		bool upload_failed = false;
+		// Count of records successfully uploaded
+		int num_successful = 0;
+		status = ER_OK;
+		// Merge info from record into QSL message
+		record* record = book_->get_record(record_num, false);
+		// Add QSL_MSG field depending on QSO or SWL report
+		string this_message;
+		if (record->item("SWL") == "Y") {
+			this_message = record->item_merge(swl_message);
+		}
+		else {
+			this_message = record->item_merge(qsl_message);
+		}
+		bool update = false;
+		// Only upload valid records or reply to SWL reports
+		if (record->is_valid() || record->item("SWL") == "Y") {
+			// Generate URL parameters for QSL
+			char qsl_data[2048];
+			sprintf(qsl_data, "%s %s %s %s %s %s <QSLMSG:%d>%s <EOR>",
+				adi_writer::item_to_adif(record, "CALL").c_str(),
+				adi_writer::item_to_adif(record, "QSO_DATE").c_str(),
+				adi_writer::item_to_adif(record, "TIME_ON").c_str(),
+				adi_writer::item_to_adif(record, "BAND").c_str(),
+				adi_writer::item_to_adif(record, "MODE").c_str(),
+				adi_writer::item_to_adif(record, "RST_SENT").c_str(),
+				this_message.length(),
+				this_message.c_str()
+			);
+			// Concatenate components of full URL
+			string full_url = url + escape_url(string(header_data) + string(qsl_data));
+			stringstream response;
+			// Send URL with QSO details and download response
+			if (url_handler_->read_url(full_url, &response)) {
+				// Successfully downloaded
+				string warning_text = "";
+				string text_line;
+				bool valid_response = false;
+				bool uploaded = false;
+				// Get to the start of the response 
+				response.seekg(response.beg);
+				// Examine each line of response until a fail seen
+				while (!response.eof() && !upload_failed) {
+					getline(response, text_line);
+					if (valid_response) {
+						// We have seen the signature comment so can start interpreting text
+						string ack_signature = "Information: From:";
+						string error_signature = "Error:";
+						string warning_signature = "Warning";
+						// Information: From: - indicates the QSO was uploaded OK.
+						if (text_line.find(ack_signature) != string::npos) {
+							uploaded = true;
+							num_successful++;
+						}
+						// Error: - a fatal error in the sURL sent, e.g. User wrong
+						else if (text_line.find(error_signature) != string::npos) {
+							error_message = text_line;
+							status = ER_FAILED;
+						}
+						// Warning: The sURL was OK, but the QSO was not updated - e.g. duplicate
+						else if (text_line.find(warning_signature) != string::npos) {
+							warning_text = text_line;
+							error_message = text_line;
+							status = ER_SKIPPED;
+						}
+					}
+					// Signature comment for successful access
+					string valid_signature = "<!-- Reply form eQSL.cc ADIF Real-time Interface -->";
+					if (text_line.find(valid_signature) != string::npos) {
+						valid_response = true;
+					}
+				};
+				if (valid_response) {
+					if (uploaded) {
+						// If uploaded OK, Update QSO with EQSL sent information
+						record->item("EQSL_QSLSDATE", now(false, "%Y%m%d"));
+						record->item("EQSL_QSL_SENT", string("Y"));
+						update = true;
+					}
+					else if (upload_failed) {
+						// Upload failed
+						error_message = "Unexplained error";
+						status = ER_FAILED;
+						passed = false;
+					}
+					else {
+						// If marked duplicate may need to update if we had not logged it previously
+						if (warning_text.find("Duplicate") != warning_text.npos) {
+							if (record->item("EQSL_QSLSDATE") == "") {
+								record->item("EQSL_QSLSDATE", now(false, "%Y%m%d"));
+								update = true;
+							}
+							if (record->item("EQSL_QSL_SENT") != "Y") {
+								record->item("EQSL_QSL_SENT", string("Y"));
+								update = true;
+							}
+						}
+					}
+				}
+				else {
+					// Did not detect the eQSL.cc signature in the returned page
+					passed = false;
+					error_message = "Error: Unable to process reply from eQSL.cc";
+					status = ER_FAILED;
+
+				}
+			}
+			else {
+				status = ER_HTML_ERR;
+			}
+			// Stopped  editing record
+			if (update) {
+				book_->modified(true);
+			}
+			// Display error or warning message and display received page
+			if (status != ER_OK) {
+
+				char* message = new char[256];
+				snprintf(message, 256, "EQSL: %s", error_message.c_str());
+				switch (status) {
+				case ER_SKIPPED:
+					// Warning message 
+					status_->misc_status(ST_WARNING, message);
+					break;
+				case ER_FAILED:
+					// Error message
+					status_->misc_status(ST_ERROR, message);
+					break;
+				}
+				// Display the response in a help dialog
+				response.seekg(response.beg);
+				if (help_dialog_) {
+					string help_text = help_dialog_->value();
+					help_text += '\n' + response.str();
+					help_dialog_->value(help_text.c_str());
+				}
+				else {
+					help_dialog_ = new Fl_Help_Dialog;
+					help_dialog_->value(response.str().c_str());
+					help_dialog_->show();
+				}
+			}
+		}
+		// now update book
+		book_->enable_save(true);
+
+		// Update status with succesful uploads and remove extracted records
+		if (passed) {
+			char ok_message[256];
+			sprintf(ok_message, "EQSL: %s %s %s QSL uploaded",
+				record->item("QSO_DATE").c_str(),
+				record->item("TIME_ON").c_str(),
+				record->item("CALL").c_str());
+			status_->misc_status(ST_OK, ok_message);
+		}
+
+		return passed;
+	}
+
+	return false;
+
+}

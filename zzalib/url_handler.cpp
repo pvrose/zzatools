@@ -148,12 +148,6 @@ bool url_handler::post_form(string url, vector<field_pair> fields, istream* req,
 	curl_mime* form = nullptr;
 	curl_mimepart* field = nullptr;
 
-	// Get the request length
-	streampos startpos = req->tellg();
-	req->seekg(0, ios::end);
-	streampos endpos = req->tellg();
-	long req_length = (long)(endpos - startpos);
-	req->seekg(0, ios::beg);
 
 	// Specify the URL
 	curl_easy_setopt(curl_, CURLOPT_URL, url.c_str());
@@ -171,6 +165,12 @@ bool url_handler::post_form(string url, vector<field_pair> fields, istream* req,
 			curl_mime_data(field, (*it).value.c_str(), (*it).value.length());
 		}
 		else {
+			// Get the request length
+			streampos startpos = req->tellg();
+			req->seekg(0, ios::end);
+			streampos endpos = req->tellg();
+			long req_length = (long)(endpos - startpos);
+			req->seekg(0, ios::beg);
 			// Use the specified input stream
 			curl_mime_data_cb(field, req_length, cb_read, nullptr, nullptr, req);
 		}

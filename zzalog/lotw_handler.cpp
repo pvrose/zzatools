@@ -5,6 +5,7 @@
 #include "book.h"
 #include "../zzalib/url_handler.h"
 #include "../zzalib/callback.h"
+#include "extract_data.h"
 
 
 #include <cstdlib>
@@ -51,11 +52,12 @@ bool lotw_handler::upload_lotw_log(book* book) {
 		chooser->title("Please select file for sending to LotW");
 		chooser->filter("ADI Files\t*.adi");
 		ok = (chooser->show() == 0);
+		new_filename = chooser->filename();
 	}
 	else {
 		new_filename = filename;
+		free(filename);
 	}
-	free(filename);
 	if (chooser != nullptr && !ok) {
 		// User cancelled
 		status_->misc_status(ST_ERROR, "LOTW: No file selected, upload cancelled");
@@ -95,7 +97,6 @@ bool lotw_handler::upload_lotw_log(book* book) {
 				// TODO: POsix equivalent filename pattern
 //				Fl_File_Chooser* chooser = new Fl_File_Chooser("", "Applications(*.exe)", Fl_File_Chooser::SINGLE, "Please locate TQSL executable");
 #endif
-				chooser->show();
 				if (chooser->show() != 0) {
 					// No executable found - cancel upload
 					status_->misc_status(ST_ERROR, "LOTW: TQSL Execuatble not found, upload cancelled");
@@ -108,68 +109,70 @@ bool lotw_handler::upload_lotw_log(book* book) {
 				}
 				delete chooser;
 			}
-			// Generate TQSL command line - note the executable may have spaces in its filename
-			char* command = new char[20 + new_filename.length() + tqsl_executable.length()];
-			sprintf(command, "\"%s\" -x -u -d %s", tqsl_executable.c_str(), new_filename.c_str());
-			status_->misc_status(ST_NOTE, "LOTW: Signing and uploading QSLs to LotW");
-			// Launch TQSL - signs and uploads data: Note this is a blocking action
-			int result = system(command);
-			delete[] command;
-			// Analyse result received from TQSL - responses documented in TQSL help
-			string default_message = "LOTW: Unknown response";
-			switch (result) {
-			case 0:
-				status_->misc_status(ST_OK, "LOTW: all qsos submitted were signed and uploaded");
-				ok = true;
-				break;
-			case 1:
-				status_->misc_status(ST_WARNING, "LOTW: cancelled by user");
-				ok = false;
-				break;
-			case 2:
-				status_->misc_status(ST_ERROR, "LOTW: rejected by LoTW");
-				ok = false;
-				break;
-			case 3:
-				status_->misc_status(ST_ERROR, "LOTW: unexpected response from TQSL server");
-				ok = false;
-				break;
-			case 4:
-				status_->misc_status(ST_ERROR, "LOTW: TQSL error");
-				ok = false;
-				break;
-			case 5:
-				status_->misc_status(ST_ERROR, "LOTW: TQSLlib error");
-				ok = false;
-				break;
-			case 6:
-				status_->misc_status(ST_ERROR, "LOTW: unable to open input file");
-				ok = false;
-				break;
-			case 7:
-				status_->misc_status(ST_ERROR, "LOTW: unable to open output file");
-				ok = false;
-				break;
-			case 8:
-				status_->misc_status(ST_WARNING, "LOTW: No QSOs were processed since some QSOs were duplicates or out of date range");
-				ok = false;
-				break;
-			case 9:
-				status_->misc_status(ST_WARNING, "LOTW: Some QSOs were processed, and some QSOs were ignored because they were duplicates or out of date range");
-				ok = true;
-				break;
-			case 10:
-				status_->misc_status(ST_ERROR, "LOTW: Command syntax error");
-				ok = false;
-				break;
-			case 11:
-				status_->misc_status(ST_ERROR, "LOTW: LoTW Connection error (no network or LoTW is unreachable)");
-				ok = false;
-				break;
-			default:
-				status_->misc_status(ST_ERROR, default_message.c_str());
-				ok = false;
-				break;
+			if (ok) {
+				// Generate TQSL command line - note the executable may have spaces in its filename
+				char* command = new char[20 + new_filename.length() + tqsl_executable.length()];
+				sprintf(command, "\"%s\" -x -u -d %s", tqsl_executable.c_str(), new_filename.c_str());
+				status_->misc_status(ST_NOTE, "LOTW: Signing and uploading QSLs to LotW");
+				// Launch TQSL - signs and uploads data: Note this is a blocking action
+				int result = system(command);
+				delete[] command;
+				// Analyse result received from TQSL - responses documented in TQSL help
+				string default_message = "LOTW: Unknown response";
+				switch (result) {
+				case 0:
+					status_->misc_status(ST_OK, "LOTW: all qsos submitted were signed and uploaded");
+					ok = true;
+					break;
+				case 1:
+					status_->misc_status(ST_WARNING, "LOTW: cancelled by user");
+					ok = false;
+					break;
+				case 2:
+					status_->misc_status(ST_ERROR, "LOTW: rejected by LoTW");
+					ok = false;
+					break;
+				case 3:
+					status_->misc_status(ST_ERROR, "LOTW: unexpected response from TQSL server");
+					ok = false;
+					break;
+				case 4:
+					status_->misc_status(ST_ERROR, "LOTW: TQSL error");
+					ok = false;
+					break;
+				case 5:
+					status_->misc_status(ST_ERROR, "LOTW: TQSLlib error");
+					ok = false;
+					break;
+				case 6:
+					status_->misc_status(ST_ERROR, "LOTW: unable to open input file");
+					ok = false;
+					break;
+				case 7:
+					status_->misc_status(ST_ERROR, "LOTW: unable to open output file");
+					ok = false;
+					break;
+				case 8:
+					status_->misc_status(ST_WARNING, "LOTW: No QSOs were processed since some QSOs were duplicates or out of date range");
+					ok = false;
+					break;
+				case 9:
+					status_->misc_status(ST_WARNING, "LOTW: Some QSOs were processed, and some QSOs were ignored because they were duplicates or out of date range");
+					ok = true;
+					break;
+				case 10:
+					status_->misc_status(ST_ERROR, "LOTW: Command syntax error");
+					ok = false;
+					break;
+				case 11:
+					status_->misc_status(ST_ERROR, "LOTW: LoTW Connection error (no network or LoTW is unreachable)");
+					ok = false;
+					break;
+				default:
+					status_->misc_status(ST_ERROR, default_message.c_str());
+					ok = false;
+					break;
+				}
 			}
 			if (ok) {
 				// Good response received
@@ -186,11 +189,6 @@ bool lotw_handler::upload_lotw_log(book* book) {
 					}
 				}
 				book_->modified(updated);
-#ifndef _DEBUG
-				if (book_->save_enabled() && book_->modified()) {
-					book_->store_data();
-				}
-#endif
 			}
 		}
 		else {
@@ -199,6 +197,11 @@ bool lotw_handler::upload_lotw_log(book* book) {
 			ok = false;
 		}
 	}
+#ifndef _DEBUG
+	if (book_->save_enabled() && book_->modified()) {
+		book_->store_data();
+	}
+#endif
 	delete chooser;
 	fl_cursor(FL_CURSOR_DEFAULT);
 	return ok;
@@ -332,4 +335,30 @@ bool lotw_handler::validate_adif(stringstream* adif) {
 		// It should be ADIF
 		return true;
 	}
+}
+
+// Upload single QSO
+bool lotw_handler::upload_single_qso(record_num_t record_num) {
+	Fl_Preferences qsl_settings(settings_, "QSL");
+	Fl_Preferences lotw_settings(qsl_settings, "LotW");
+	int upload_qso;
+	lotw_settings.get("Upload per QSO", upload_qso, false);
+	if (upload_qso) {
+		// Create book with single record
+		extract_data* one_qso = new extract_data;
+		one_qso->add_record(record_num);
+		if (upload_lotw_log(one_qso)) {
+			record* this_record = book_->get_record(record_num, false);
+			char ok_message[256];
+			sprintf(ok_message, "LOTW: %s %s %s QSL uploaded",
+				this_record->item("QSO_DATE").c_str(),
+				this_record->item("TIME_ON").c_str(),
+				this_record->item("CALL").c_str());
+			status_->misc_status(ST_OK, ok_message);
+			delete one_qso;
+			return true;
+		} 
+		delete one_qso;
+	}
+	return false;
 }

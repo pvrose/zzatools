@@ -110,7 +110,9 @@ namespace zzalog {
 		// The number of records with clublog data modified
 		// as a result of LotW QSL information update
 		int number_clublog_;
-		// Number of filed being imported 
+		// The number of SWL records added
+		int number_swl_;
+		// Number of files being imported 
 		int num_update_files_;
 		// Names of the files
 		string* update_files_;
@@ -132,6 +134,8 @@ namespace zzalog {
 		double timer_period_;
 		// Original value of book_->enable_save_
 		bool old_enable_save_;
+		// Last added record number
+		record_num_t last_added_number_;
 
 	};
 

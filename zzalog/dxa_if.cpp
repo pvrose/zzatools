@@ -1794,7 +1794,7 @@ void dxa_if::zoom_azimuthal() {
 	switch (centre_mode_) {
 	case HOME:
 		// Zoom in to just the displayed QSOs
-		zoom = (float)((EARTH_RADIUS * PI) / (float)furthest_) * 0.95;
+		zoom = (float)((EARTH_RADIUS * PI) / furthest_ * 0.95);
 		map->PutZoom(zoom);
 		break;
 	case ZERO:

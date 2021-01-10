@@ -23,6 +23,8 @@ namespace zzalog {
 		bool upload_lotw_log(book* book);
 		// download the data from LotW
 		bool download_lotw_log(stringstream* adif);
+		// Upload single QSO
+		bool upload_single_qso(record_num_t record_num);
 
 	protected:
 		// get user details

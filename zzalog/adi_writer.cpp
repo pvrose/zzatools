@@ -72,7 +72,7 @@ ostream& adi_writer::store_record(record* record, ostream& out, load_result_t& r
 }
 
 // Convert item to ADIF format text and send to the output stream
-void adi_writer::item_to_adif(record* record, string field, ostream& out) {
+string adi_writer::item_to_adif(record* record, string field) {
 	string value;
 	string adif_text = "";
 	unsigned int len_value;
@@ -120,9 +120,10 @@ void adi_writer::item_to_adif(record* record, string field, ostream& out) {
 			sprintf(temp, "<%s:%d>%s ", field.c_str(), len_value, value.c_str());
 		}
 		// output the ADIF format text to the stream
-		out << temp << endl;
+		return string(temp);
 		delete[] temp;
 	}
+	return "";
 }
 
 // Convert record to ADIF format text
@@ -147,13 +148,14 @@ void adi_writer::to_adif(record* record, ostream& out, set<string>* fields /* = 
 				if (!record->item_exists(non_intl_field)) {
 					// ..._INTL exists and other doesn't - output it as non_intl
 					record->change_field_name(field, non_intl_field);
-					item_to_adif(record, non_intl_field, out);
+					out << item_to_adif(record, non_intl_field);
 				} // else if both exists don't output _INTL
 			}
 			else {
 				// send the field to the output stream
-				item_to_adif(record, field, out);
+				out << item_to_adif(record, field);
 			}
+			out << endl;
 		}
 	}
 	if (record->is_header()) {

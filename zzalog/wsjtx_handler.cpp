@@ -151,9 +151,9 @@ int wsjtx_handler::handle_decode(stringstream& ss) {
 	uint32_t iv = get_uint32(ss);
 	if (iv != last_decode_time_) {
 		double seconds = iv / 1000.0;
-		unsigned int minutes = seconds / 60;
+		unsigned int minutes = (unsigned int)seconds / 60;
 		seconds = seconds - (minutes * 60.0);
-		unsigned hours = minutes / 60;
+		unsigned int hours = minutes / 60;
 		minutes = minutes - (hours * 60);
 		char message[128];
 		snprintf(message, 128, "WSJT-X: Received %d decodes at time %02d:%02d:%02.3f.", decodes_rcvd_, hours, minutes, seconds);

@@ -185,8 +185,9 @@ bool xml_reader::process_attr(istream& is, map<string, string>*& attributes) {
 // Ignore white space
 bool xml_reader::ignore_white_space(istream& is) {
 	bool cr = false;
+	bool ok = true;
 	bool white_space = true;
-	while (white_space) {
+	while (white_space && ok) {
 		char c = is.get();
 		switch (c) {
 		case ' ':
@@ -194,7 +195,7 @@ bool xml_reader::ignore_white_space(istream& is) {
 			// Space or tab - continue search
 			cr = false;
 			white_space = true;
-			is.good();
+			ok = is.good();
 			break;
 		case '\r':
 			// CR - note the fact
@@ -207,7 +208,7 @@ bool xml_reader::ignore_white_space(istream& is) {
 			if (cr) {
 				cr = false;
 				white_space = true;
-				is.good();
+				ok = is.good();
 			}
 			else {
 				cr = false;
@@ -384,7 +385,7 @@ bool xml_reader::process_end_tag(istream& is) {
 			ok = false;
 		}
 		if (ok) {
-			is.good();
+			ok = is.good();
 			end_element(name);
 		}
 	}
@@ -625,7 +626,7 @@ time_t xml_reader::convert_xml_datetime(string value) {
 	long tz_hour = stoi(value.substr(20, 2));
 	long tz_min = stoi(value.substr(23, 2));
 	double seconds = (3600.0 * tz_hour) + (60.0 * tz_min);
-	long adjust = seconds / resolution;
+	long adjust = (long)(seconds / resolution);
 	time_t result = _mkgmtime(&tv);
 	if (subtract) {
 		result -= adjust;

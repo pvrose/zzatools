@@ -6,6 +6,7 @@
 #include "scratchpad.h"
 #include "eqsl_handler.h"
 #include "lotw_handler.h"
+#include "club_handler.h"
 #include "../zzalib/rig_if.h"
 #include "../zzalib/utils.h"
 #include "menu.h"
@@ -32,6 +33,7 @@ extern spec_data* spec_data_;
 extern tabbed_forms* tabbed_forms_;
 extern eqsl_handler* eqsl_handler_;
 extern lotw_handler* lotw_handler_;
+extern club_handler* club_handler_;
 extern rig_if* rig_if_;
 extern menu* menu_;
 extern scratchpad* scratchpad_;
@@ -56,6 +58,7 @@ import_data::import_data() :
 	number_added_ = 0;
 	number_rejected_ = 0;
 	number_clublog_ = 0;
+	number_swl_ = 0;
 	num_update_files_ = 0;
 	update_files_ = nullptr;
 	empty_files_ = nullptr;
@@ -64,6 +67,7 @@ import_data::import_data() :
 	close_pending_ = false;
 	next_logging_mode_ = LM_OFF_AIR;
 	timer_period_ = nan("");
+	last_added_number_ = 0;
 }
 
 // Destructor
@@ -165,7 +169,7 @@ void import_data::auto_update() {
 			struct _stat status;
 			int result = _fstat(fd, &status);
 			strftime(timestamp, 16, "%Y%m%d%H%M%S", gmtime(&status.st_mtime));
-			close(fd);
+			_close(fd);
 #else
 		// TODO: Code Posix version of the above
 #endif
@@ -200,6 +204,7 @@ void import_data::auto_update() {
 		number_added_ = 0;
 		number_rejected_ = 0;
 		number_clublog_ = 0;
+		number_swl_ = 0;
 		number_to_import_ = size();
 		update_book();
 	}
@@ -262,6 +267,7 @@ void import_data::save_update() {
 	int record_number = book_->insert_record(import_record);
 	accept_update();
 	number_added_++;
+	last_added_number_ = record_number;
 	book_->selection(record_number, HT_INSERTED);
 
 	if (spec_data_->validate(import_record, record_number)) {
@@ -450,7 +456,7 @@ void import_data::update_book() {
 					is_updated = true;
 					found_match = true;
 					matched_record_num = offset;
-					number_added_++;
+					number_swl_++;
 					had_swl_match = false;
 				}
 				// Unexpected new record (update from log) - set flags to display new record - 
@@ -477,6 +483,7 @@ void import_data::update_book() {
 
 					book_->insert_record_at(offset, import_record);
 					number_added_++;
+					last_added_number_ = offset;
 					accept_update();
 					is_updated = true;
 				}
@@ -544,8 +551,8 @@ void import_data::finish_update(bool merged /*= true*/) {
 	if (merged && size() == 0) {
 		char message[256];
 		if (update_mode_ == LOTW_UPDATE) {
-			sprintf(message, "IMPORT: LOTW %d records read, %d checked, %d modified, %d matched, %d added, %d rejected, %d changed ClubLog",
-				number_to_import_, number_checked_, number_modified_, number_matched_, number_added_, number_rejected_, number_clublog_);
+			sprintf(message, "IMPORT: LOTW %d records read, %d checked, %d modified, %d matched, %d added, %d SWLs added, %d rejected, %d changed ClubLog",
+				number_to_import_, number_checked_, number_modified_, number_matched_, number_added_, number_swl_, number_rejected_, number_clublog_);
 		}
 		else {
 			string source;
@@ -563,16 +570,24 @@ void import_data::finish_update(bool merged /*= true*/) {
 				source = "UDP";
 				break;
 			}
-			sprintf(message, "IMPORT: %s %d records read, %d checked, %d modified, %d matched, %d added, %d rejected",
-				source.c_str(), number_to_import_, number_checked_, number_modified_, number_matched_, number_added_, number_rejected_);
+			sprintf(message, "IMPORT: %s %d records read, %d checked, %d modified, %d matched, %d added, %d SWLs added, %d rejected",
+				source.c_str(), number_to_import_, number_checked_, number_modified_, number_matched_, number_added_, number_swl_, number_rejected_);
 		}
 		status_->misc_status(ST_OK, message);
 		status_->progress(size(), book_type_);
-		if (number_modified_ || number_added_) {
+		if (number_modified_ || number_added_ || number_swl_) {
+			// Some records have been changed or added
 			book_->selection(book_->size() - 1, HT_ALL);
 		}
 		else {
+			// No change, select the latest record.
 			book_->selection(book_->size() - 1, HT_SELECTED);
+		}
+		if (number_added_ == 1) {
+			// One new record added from whatever source, send latest QSO to QSL servers
+			if (!upload_qso(last_added_number_)) {
+				status_->misc_status(ST_WARNING, "IMPORT: Upload to one or more QSL sites failed");
+			}
 		}
 		tabbed_forms_->activate_pane(OT_MAIN, true);
 	}
@@ -819,6 +834,8 @@ void import_data::merge_data() {
 	number_added_ = 0;
 	number_rejected_ = 0;
 	number_clublog_ = 0;
+	number_swl_ = 0;
+	last_added_number_ = 0;
 	// Merge this book into main log book
 	update_book();
 	// If we have no user query - switch to main log view

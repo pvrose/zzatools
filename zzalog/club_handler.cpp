@@ -48,7 +48,7 @@ bool club_handler::upload_log(book* book) {
 		ss.seekg(ss.beg);
 		// Get the parameters and make available for the HTTP POST FORM
 		vector<url_handler::field_pair> fields;
-		generate_form(fields);
+		generate_form(fields, false);
 		stringstream resp;
 		// Post the form
 		bool ok;
@@ -85,7 +85,7 @@ bool club_handler::upload_log(book* book) {
 }
 
 // Generate the fields in the form
-void club_handler::generate_form(vector<url_handler::field_pair>& fields) {
+void club_handler::generate_form(vector<url_handler::field_pair>& fields, bool single_qso) {
 	// Read the settings that define user's access 
 	Fl_Preferences qsl_settings(settings_, "QSL");
 	Fl_Preferences clublog_settings(qsl_settings, "ClubLog");
@@ -107,8 +107,14 @@ void club_handler::generate_form(vector<url_handler::field_pair>& fields) {
 	current_settings.get("Callsign", callsign, "");
 	fields.push_back({ "callsign", callsign, "", "" });
 	free(callsign);
-	// Set file to empty string to use the supplied data stream
-	fields.push_back({ "file", "", "clublog.adi", "application/octet-stream" });
+	if (single_qso) {
+		// Get string ADIF
+		fields.push_back({ "adif", single_qso_, "", "" });
+	}
+	else {
+		// Set file to empty string to use the supplied data stream
+		fields.push_back({ "file", "", "clublog.adi", "application/octet-stream" });
+	}
 	// Hard-coded API Key for this application
 	fields.push_back({ "api", api_key_, "", "" });
 }
@@ -228,5 +234,61 @@ void club_handler::get_reference(string& dir_name) {
 		dir_name = temp;
 	}
 	if (temp) free(temp);
+}
 
+// Upload the single specified QSO in real time
+bool club_handler::upload_single_qso(record_num_t record_num) {
+	Fl_Preferences qsl_settings(settings_, "QSL");
+	Fl_Preferences club_settings(qsl_settings, "ClubLog");
+	int upload_qso;
+	club_settings.get("Upload per QSO", upload_qso, false);
+	if (upload_qso) {
+
+		record* this_record = book_->get_record(record_num, false);
+		set<string> adif_fields;
+		generate_adif(adif_fields);
+		single_qso_ = to_adif(this_record, adif_fields);
+		// Get the parameters and make available for the HTTP POST FORM
+		vector<url_handler::field_pair> fields;
+		generate_form(fields, true);
+		stringstream resp;
+		// Post the form
+		bool ok;
+		if (!url_handler_->post_form("https://clublog.org/realtime.php", fields, nullptr, &resp)) {
+			// Display error message received from post
+			char* message = new char[resp.str().length() + 30];
+			sprintf(message, "CLUBLOG: Upload failed - %s", resp.str().c_str());
+			status_->misc_status(ST_ERROR, message);
+			ok = false;
+		}
+		else {
+			// Update all records sent with the fact that they have been uploaded and when
+			char message[200];
+			snprintf(message, 200, "CLUBLOG: Upload %s %s %s successful",
+				this_record->item("QSO_DATE").c_str(),
+				this_record->item("TIME_ON").c_str(),
+				this_record->item("CALL").c_str());
+			status_->misc_status(ST_OK, message);
+			ok = true;
+			string today = now(false, "%Y%m%d");
+			this_record->item("CLUBLOG_QSO_UPLOAD_DATE", today);
+			this_record->item("CLUBLOG_QSO_UPLOAD_STATUS", string("Y"));
+			// Go back to last entry in book.
+			book_->selection(record_num, HT_SELECTED);
+			// Force the book to save itself with these changes
+			book_->modified(true);
+			book_->enable_save(true);
+		}
+		return ok;
+	}
+	return false;
+}
+
+string club_handler::to_adif(record* this_record, set<string> &fields) {
+	string result = "";
+	for (auto it = fields.begin(); it != fields.end(); it++) {
+		result += adi_writer::item_to_adif(this_record, *it) + " ";
+	}
+	result += " <EOR>";
+	return result;
 }

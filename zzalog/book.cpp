@@ -15,6 +15,9 @@
 #include "../zzalib/utils.h"
 #include "intl_widgets.h"
 #include "band_view.h"
+#include "eqsl_handler.h"
+#include "lotw_handler.h"
+#include "club_handler.h"
 
 // C/C++ header files
 #include <ctime>
@@ -39,6 +42,9 @@ extern Fl_Preferences* settings_;
 extern Fl_Single_Window* main_window_;
 extern band_view* band_view_;
 extern book* book_;
+extern eqsl_handler* eqsl_handler_;
+extern lotw_handler* lotw_handler_;
+extern club_handler* club_handler_;
 extern bool read_only_;
 extern void main_window_label(string text);
 
@@ -808,6 +814,10 @@ void book::save_record() {
 		current_item_ = correct_record_position(current_item_);
 	}
 
+	if (new_record_ && book_type() == OT_MAIN) {
+		upload_qso(record_number(current_item_));
+	}
+
 	// Modified by parsing and validation
 	bool record_modified = false;
 	// check whether record has changed - when parsed
@@ -1363,3 +1373,10 @@ bool book::delete_enabled() {
 	}
 }
 
+// Upload the latest QSO imported to eQSL, LotW and Clublog
+bool book::upload_qso(record_num_t record_num) {
+	bool ok = eqsl_handler_->upload_single_qso(record_num);
+	if (!lotw_handler_->upload_single_qso(record_num)) ok = false;
+	if (!club_handler_->upload_single_qso(record_num)) ok = false;
+	return ok;
+}

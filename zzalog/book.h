@@ -189,6 +189,8 @@ namespace zzalog {
 		bool save_enabled();
 		// Delete enabled
 		bool delete_enabled();
+		// Upload single QSO
+		bool upload_qso(record_num_t record);
 
 		// Protected attributes
 	protected:

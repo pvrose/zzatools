@@ -90,6 +90,8 @@ namespace zzalog {
 		string card_filename_l(record* record);
 		// Set/Clear debug_enabled_
 		void debug_enable(bool value);
+		// Upload single record
+		bool upload_single_qso(record_num_t record_num);
 
 	protected:
 		// call backs
