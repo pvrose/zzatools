@@ -805,20 +805,16 @@ bool rpc_handler::add_header(http_code code, stringstream& payload, stringstream
 		//	Content-Length : 124
 		resp << "HTTP/1.1 " << code << " OK\r\n";
 		resp << "Date: " << now(false, "%a %d %b %Y %X GMT") << "\r\n";
-		resp << "Server: ZZALIB " << LIBRARY_VERSION << "\r\n";
+		resp << "Server: ZZALIB." << LIBRARY_VERSION << "\r\n";
 		resp << "Content-Type: text/xml\r\n";
 		resp << "Content-Length: " << len_pl << "\r\n";
 		resp << "\r\n";
-		while (payload.good()) {
-			string line;
-			getline(payload, line);
- 			resp << line << "\n";
-		}
+		resp << pl << "\r\n";
 		break;
 	case BAD_REQUEST:
 		resp << "HTTP/1.1 " << code << " BAD REQUEST\r\n";
 		resp << "Date: " << now(false, "%a %d %b %Y %X GMT") << "\r\n";
-		resp << "Server: ZZALIB " << LIBRARY_VERSION << "\r\n";
+		resp << "Server: ZZALIB." << LIBRARY_VERSION << "\r\n";
 		resp << "Connection: close\r\n";
 		resp << "\r\n";
 		break;

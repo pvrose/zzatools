@@ -38,6 +38,8 @@ string ic7300::send_command(unsigned char command, string sub_command, string da
 		string to_send = string_to_hex(cmd, true);
 		// Send the message
 		string raw_data = rig_if_->raw_message(to_send);
+		snprintf(mess, 256, "DEBUG: Received response from IC-7300: %s", raw_data.c_str());
+		message(ST_LOG, mess);
 
 		// Ignore reflected data
 		if (raw_data.substr(0, 2) != "FE") {
@@ -55,7 +57,7 @@ string ic7300::send_command(unsigned char command, string sub_command, string da
 		if (response.length() == 0) {
 			// TRansceiver has not responded at all
 			if (!given_warning_) {
-				snprintf(mess, 256, "RIG: Receieved no response from transceiver\nCMD = %s", to_send.c_str());
+				snprintf(mess, 256, "RIG: Receieved no response from transceiver - CMD = %s", to_send.c_str());
 				message(ST_WARNING, mess);
 				given_warning_ = true;
 			}
@@ -63,35 +65,35 @@ string ic7300::send_command(unsigned char command, string sub_command, string da
 			return "";
 		}
 		else {
-			// For data - strip off reflected command if its present
+			// For data - strip off reflected command if its present - note I have seen command returned multiple times
 			int discard = cmd.length();
-			if (response.substr(0, discard) == cmd.substr(0, discard)) {
+			while (response.substr(0, discard) == cmd) {
 				response = response.substr(discard);
-				if (response.length() == 6 && response[4] > '\xf0') {
-					if (response[4] == '\xfa') {
-						// Got NAK response from transceiver
-						snprintf(mess, 256, "RIG: Received a NAK response from transceiver\nCMD = %s", to_send.c_str());
-						message(ST_ERROR, mess);
-						ok = false;
-						return "";
-					}
-					else {
-						// Got ACK response from transceiver, but no data
-						return ("");
-					}
+			}
+			if (response.length() == 6 && response[4] > '\xf0') {
+				if (response[4] == '\xfa') {
+					// Got NAK response from transceiver
+					snprintf(mess, 256, "RIG: Received a NAK response from transceiver - CMD = %s", to_send.c_str());
+					message(ST_ERROR, mess);
+					ok = false;
+					return "";
 				}
 				else {
-					// Discard the CI-V preamble/postamble - xFExFEx94xF0 data xFD
-					return response.substr(4, response.length() - 5);
+					// Got ACK response from transceiver, but no data
+					return ("");
 				}
 			}
 			else {
-				// Currently do not support the case where the rig is configured not to reflect command? 
-				// This will also trap corrupted responses
-				snprintf(mess, 256, "RIG: Unexpected response: %s: CMD = %s", string_to_hex(response).c_str(), to_send.c_str());
-				message(ST_ERROR, mess);
-				ok = false;
-				return response;
+				string expected = "\xFE\xFE\xE0\x94";
+				if (response.substr(0, 4) == expected) {
+					// Discard the CI-V preamble/postamble - xFExFEx94xF0 data xFD
+					return response.substr(4, response.length() - 5);
+				}
+				else {
+					// Not addressed to this
+					snprintf(mess, 256, "RIG: Received a response for another node - CMD = %s RESP = %s", to_send.c_str(), response.c_str());
+					return "";
+				}
 			}
 		}
 	}

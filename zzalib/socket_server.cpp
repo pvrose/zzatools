@@ -292,24 +292,20 @@ int socket_server::send_response(istream& response) {
 	int resp_size = (int)endpos - (int)startpos;
 	response.seekg(0, ios::beg);
 	// 
-	string data = "";
-	data.reserve(resp_size);
-	while (response.good()) {
-		string line;
-		getline(response, line);
-		data += line + "\n";
-	}
+	char* buffer = new char[resp_size + 1];
+	memset(buffer, '\0', resp_size + 1);
+	response.read(buffer, resp_size);
 #ifdef _DEBUG
-	dump(data);
+	dump(string(buffer));
 #endif
 
 	// Send the response packet
 	int result;
 	if (protocol_ == UDP) {
-		result = sendto(server_, data.c_str(), resp_size, 0, (SOCKADDR*)&client_addr_, sizeof(client_addr_));
+		result = sendto(server_, buffer, resp_size, 0, (SOCKADDR*)&client_addr_, sizeof(client_addr_));
 	}
 	else {
-		result = send(client_, data.c_str(), resp_size, 0);
+		result = send(client_, buffer, resp_size, 0);
 	}
 	if (result == SOCKET_ERROR) {
 		handle_error("Unable to send to");

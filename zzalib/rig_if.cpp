@@ -870,6 +870,7 @@ double rig_flrig::swr_meter() {
 		string data = ic7300_->send_command(command, subcommand, ok);
 		if (ok) {
 			unsigned int value = bcd_to_int(data.substr(2, 2), false);
+			char mess[256];
 			double swr;
 			// 0 = 1:1.0; 48 = 1:1.5; 80 = 1:2.0; 120 = 1:3.0
 			// Linearly interpolate and extrapolate
@@ -881,6 +882,8 @@ double rig_flrig::swr_meter() {
 			} else {
 				swr = ((double)(value - 80) * 1.0 / 40.0) + 2.0;
 			}
+			snprintf(mess, 256, "DEBUG: Value received from rig - %d, SWR = %g", value, swr);
+			error(ST_LOG, mess);
 			return swr;
 		}
 	}

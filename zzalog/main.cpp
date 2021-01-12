@@ -891,13 +891,16 @@ int main(int argc, char** argv)
 	// We are now initialised
 	initialised_ = true;
 	if (!closing_) {
+		// Enable menu so that we can do thigs while waiting for Fllog client to appear
+		menu_->enable(true);
+		menu_->redraw();
 		// Only do this if we haven't tried to close
 		// Start WSJT-X server
 		wsjtx_handler_->run_server();
+		// TODO: Fldigi locks up when server responds to its first request
+		// TODO: We don't exit run_server
 		//fllog_emul_->run_server();
 		// enable menu
-		menu_->enable(true);
-		menu_->redraw();
 		// Run the application until it is closed
 		code = Fl::run();
 	}

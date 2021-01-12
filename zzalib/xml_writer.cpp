@@ -142,7 +142,7 @@ bool xml_writer::write_element(xml_element* element, ostream& os, int level) {
 // output any indentation to the stream
 bool xml_writer::write_indent(ostream& os, int level) {
 	if (style_ == INDENT || style_ == TAB_INDENT || style_ == LINE_FEED) {
-		os << '\n';
+		os << "\r\n";
 		for (int i = 0; i < indent_depth_ * level; i++) {
 			os << indent_char_;
 		}
