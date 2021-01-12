@@ -882,8 +882,8 @@ double rig_flrig::swr_meter() {
 			} else {
 				swr = ((double)(value - 80) * 1.0 / 40.0) + 2.0;
 			}
-			snprintf(mess, 256, "DEBUG: Value received from rig - %d, SWR = %g", value, swr);
-			error(ST_LOG, mess);
+//			snprintf(mess, 256, "DEBUG: Value received from rig - %d, SWR = %g", value, swr);
+//			error(ST_LOG, mess);
 			return swr;
 		}
 	}

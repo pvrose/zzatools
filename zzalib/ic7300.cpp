@@ -38,8 +38,8 @@ string ic7300::send_command(unsigned char command, string sub_command, string da
 		string to_send = string_to_hex(cmd, true);
 		// Send the message
 		string raw_data = rig_if_->raw_message(to_send);
-		snprintf(mess, 256, "DEBUG: Received response from IC-7300: %s", raw_data.c_str());
-		message(ST_LOG, mess);
+//		snprintf(mess, 256, "DEBUG: Received response from IC-7300: %s", raw_data.c_str());
+//		message(ST_LOG, mess);
 
 		// Ignore reflected data
 		if (raw_data.substr(0, 2) != "FE") {
