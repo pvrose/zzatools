@@ -43,6 +43,7 @@ namespace zzalog {
 	const map<status_t, Fl_Color> STATUS_COLOURS = {
 		{ ST_NONE, FL_LIGHT2 },
 		{ ST_LOG, FL_GRAY },
+		{ ST_DEBUG, fl_lighter(FL_MAGENTA) },
 		{ ST_NOTE, fl_lighter(FL_CYAN) },
 		{ ST_OK, fl_lighter(FL_GREEN) },
 		{ ST_WARNING, FL_YELLOW },
@@ -53,26 +54,28 @@ namespace zzalog {
 
 	// Code - letters witten to log file to indicate severity of the logged status
 	const map<status_t, char> STATUS_CODES = {
-	{ ST_NONE, ' '},
-	{ ST_LOG, 'L'},
-	{ ST_NOTE, 'N'},
-	{ ST_OK, 'D'},
-	{ ST_WARNING, 'W'},
-	{ ST_ERROR, 'E'},
-	{ ST_SEVERE, 'S'},
-	{ ST_FATAL, 'F'}
+		{ ST_NONE, ' '},
+		{ ST_LOG, 'L'},
+		{ ST_DEBUG, 'B' },
+		{ ST_NOTE, 'N'},
+		{ ST_OK, 'D'},
+		{ ST_WARNING, 'W'},
+		{ ST_ERROR, 'E'},
+		{ ST_SEVERE, 'S'},
+		{ ST_FATAL, 'F'}
 	};
 
 	// Styles used by Fl_Text_Display to control font and colour 
 	const Fl_Text_Display::Style_Table_Entry STATUS_STYLES[] = {        // Style label and status
 		{ fl_gray_ramp(4), FL_COURIER_ITALIC, 12, 0 },                  // A - ST_NONE
 		{ fl_gray_ramp(4), FL_COURIER, 12, 0 },                         // B - ST_LOG
-		{ FL_BLACK, FL_COURIER, 12, 0 },                                // C - ST_NOTE
-		{ fl_darker(FL_GREEN), FL_COURIER, 12, 0},                      // D - ST_OK
-		{ fl_color_average(FL_RED, FL_YELLOW, 0.5), FL_COURIER, 12, 0}, // E - ST_WARNING
-		{ FL_RED, FL_COURIER, 12, 0} ,                                  // F - ST_ERROR
-		{ fl_darker(FL_RED), FL_COURIER, 12, 0 },                       // G - ST_SEVERE
-		{ fl_darker(FL_RED), FL_COURIER_BOLD, 12, 0}                    // H - ST_FATAL
+		{ FL_MAGENTA, FL_COURIER, 12, 0 },                              // C - ST_DEBUG
+		{ FL_BLACK, FL_COURIER, 12, 0 },                                // D - ST_NOTE
+		{ fl_darker(FL_GREEN), FL_COURIER, 12, 0},                      // E - ST_OK
+		{ fl_color_average(FL_RED, FL_YELLOW, 0.5), FL_COURIER, 12, 0}, // G - ST_WARNING
+		{ FL_RED, FL_COURIER, 12, 0} ,                                  // H - ST_ERROR
+		{ fl_darker(FL_RED), FL_COURIER, 12, 0 },                       // I - ST_SEVERE
+		{ fl_darker(FL_RED), FL_COURIER_BOLD, 12, 0}                    // J - ST_FATAL
 	};
 
 	// Default colours for file status

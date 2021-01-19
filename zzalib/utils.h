@@ -28,6 +28,7 @@ namespace zzalib {
 	enum status_t {
 		ST_NONE,             // Uninitialised
 		ST_LOG,              // Only log the message, do not display it in status
+		ST_DEBUG,            // Debug message
 		ST_NOTE,             // An information message
 		ST_OK,               // Task successful
 		ST_WARNING,          // A warning message
@@ -41,7 +42,7 @@ namespace zzalib {
 	// Tip display - 2 seconds
 	const double TIP_SHOW = 2.0;
 	// Library version
-	const string LIBRARY_VERSION = "1.0.28";
+	const string LIBRARY_VERSION = "1.0.29";
 
 	// Split a text line into separate "words" on separator
 	void split_line(const string& line, vector<string>& words, const char separator);

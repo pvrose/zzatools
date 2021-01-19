@@ -65,14 +65,15 @@ log_table::log_table(int X, int Y, int W, int H, const char* label, field_orderi
 	edit_input_->hide();
 	edit_input_->callback(cb_input, nullptr);
 	edit_input_->when(FL_WHEN_ENTER_KEY_ALWAYS);
-	edit_input_->textfont(FONT);
-	edit_input_->textsize(FONT_SIZE);
+	edit_input_->textfont(font_);
+	edit_input_->textsize(fontsize_);
 	add(edit_input_);
 	// Create menu button for the edit_input, 
 	edit_menu_ = new Fl_Menu_Button(0, 0, WBUTTON, HBUTTON, nullptr);
 	// Popup means the button isn't drawn, but it is clickable
 	edit_menu_->type(Fl_Menu_Button::POPUP3);
 	edit_menu_->textsize(FONT_SIZE);
+	edit_menu_->textfont(FONT);
 	edit_menu_->box(FL_UP_BOX);
 	edit_menu_->add("&UPPER", 0, cb_menu, (void*)UPPER);
 	edit_menu_->add("&lower", 0, cb_menu, (void*)LOWER);
@@ -657,6 +658,8 @@ void log_table::edit_cell(int row, int col) {
 	// Open edit dialog exactly the size and position of the cell
 	input->resize(X, Y, W, H);
 	input->value(text.c_str());
+	input->textfont(font_);
+	input->textsize(fontsize_);
 	// Select all the contents of the input
 	input->position(0, text.length());
 	// Make the widget visible and let it take focus even if the mouse isn't over it

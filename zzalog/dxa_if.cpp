@@ -594,19 +594,23 @@ void dxa_if::cb_ch_locn(Fl_Widget* w, void* v) {
 // Map centre choice widget selected
 void dxa_if::cb_ch_centre(Fl_Widget* w, void* v) {
 	dxa_if* that = ancestor_view<dxa_if>(w);
-	DxAtlas::IDxMapPtr map = that->atlas_->GetMap();
-	if (map->GetProjection() == DxAtlas::PRJ_RECTANGULAR) {
-		cb_value<Fl_Choice, int>(w, &that->centre_mode_);
-		that->centre_map();
+	if (that->atlas_) {
+		DxAtlas::IDxMapPtr map = that->atlas_->GetMap();
+		if (map->GetProjection() == DxAtlas::PRJ_RECTANGULAR) {
+			cb_value<Fl_Choice, int>(w, &that->centre_mode_);
+			that->centre_map();
+		}
 	}
 }
 
 // Map centre choice widget selected
 void dxa_if::cb_bn_centre(Fl_Widget* w, void* v) {
 	dxa_if* that = ancestor_view<dxa_if>(w);
-	DxAtlas::IDxMapPtr map = that->atlas_->GetMap();
-	if (map->GetProjection() == DxAtlas::PRJ_RECTANGULAR) {
-		that->centre_map();
+	if (that->atlas_) {
+		DxAtlas::IDxMapPtr map = that->atlas_->GetMap();
+		if (map->GetProjection() == DxAtlas::PRJ_RECTANGULAR) {
+			that->centre_map();
+		}
 	}
 }
 
