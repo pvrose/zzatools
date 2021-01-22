@@ -1,4 +1,4 @@
-#include "rig_if.h"
+﻿#include "rig_if.h"
 #include "formats.h"
 #include "../zzalib/utils.h"
 #include "../zzalib/ic7300.h"
@@ -653,7 +653,7 @@ const char* rig_hamlib::error_text(rig_errcode_e code) {
 	case RIG_EDOM:
 		return "Argument out of domain of func";
 	default:
-		return nullptr;
+		return "Error not defined";
 	}
 };
 
@@ -871,17 +871,15 @@ double rig_flrig::swr_meter() {
 		if (ok) {
 			unsigned int value = bcd_to_int(data.substr(2, 2), false);
 			char mess[256];
-			double swr;
-			// 0 = 1:1.0; 48 = 1:1.5; 80 = 1:2.0; 120 = 1:3.0
-			// Linearly interpolate and extrapolate
-			if (value <= 48) {
-				swr = ((double)value * 0.5 / 48.0) + 1.0;
+			// reflection coefficient (ρ) - assume this is linear wrt value - supplied values infer it is
+			// 0: SWR = 1 (ρ = 0), 48: SWR = 1.5 (ρ = 0.2), 80: SWR = 2 (ρ = 0.33), 120: SWR = 3 (ρ = 0.5)
+			// implies value = 240 / ρ.
+			if (value > 240) {
+				value = 240;
 			}
-			else if (value <= 80) {
-				swr = ((double)(value - 48) * 0.5 / 32.0) + 1.5;
-			} else {
-				swr = ((double)(value - 80) * 1.0 / 40.0) + 2.0;
-			}
+			double rho = value / 240.0;
+			// SWR = (1 + ρ) / (1 - ρ) 
+			double swr = (1.0 + rho) / (1 - rho);
 //			snprintf(mess, 256, "DEBUG: Value received from rig - %d, SWR = %g", value, swr);
 //			error(ST_LOG, mess);
 			return swr;
@@ -894,7 +892,7 @@ double rig_flrig::swr_meter() {
 
 // Return the most recent error message
 string rig_flrig::error_message(string func_name) {
-	return "FlRig: " + func_name + " " + error_message_;
+	return "RIG: FlRig: " + func_name + " " + error_message_;
 }
 
 // Error Code is not OK.

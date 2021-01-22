@@ -425,6 +425,8 @@ void status::misc_status(status_t status, const char* label) {
 	if (report_file_) {
 		// File did open correctly
 		*report_file_ << message;
+		// So that file is upto date on a crash
+		report_file_->flush();
 	}
 
 	// Now add the line to the file viewer
