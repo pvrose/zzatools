@@ -91,6 +91,14 @@ string rig_if::get_smeter() {
 	return text;
 }
 
+// Convert SWR meter into display formet
+string rig_if::get_swr_meter() {
+	double swr = swr_meter();
+	char text[100];
+	snprintf(text, 100, "1:%.1f", swr);
+	return text;
+}
+
 // Returns the string displaying the rig information for the rig status
 // e.g. Hamlib: TS-2000 14.123456 MHz 10 W USB S9+20
 string rig_if::rig_info() {
@@ -115,6 +123,7 @@ string rig_if::rig_info() {
 		rig_info += " " + mode;
 	}
 	rig_info += " " + get_smeter();
+	rig_info += " " + get_swr_meter();
 	return rig_info;
 }
 

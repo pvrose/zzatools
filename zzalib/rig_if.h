@@ -102,6 +102,8 @@ namespace zzalib {
 		string get_tx_power();
 		// return S-meter reading
 		string get_smeter();
+		// Return SWR meter
+		string get_swr_meter();
 		// Return open message
 		string success_message();
 		// Convert drive-level to power

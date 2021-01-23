@@ -85,7 +85,7 @@ string ic7300::send_command(unsigned char command, string sub_command, string da
 			}
 			else {
 				string expected = "\xFE\xFE\xE0\x94";
-				if (response.substr(0, 4) == expected) {
+				if (response.length() >= 4 && response.substr(0, 4) == expected) {
 					// Discard the CI-V preamble/postamble - xFExFEx94xF0 data xFD
 					return response.substr(4, response.length() - 5);
 				}

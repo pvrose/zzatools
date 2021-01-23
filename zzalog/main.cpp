@@ -388,6 +388,9 @@ void set_session_start() {
 	strftime(stime, 100, "%Y%m%d %H%M%S", start_time);
 	char message[256];
 	snprintf(message, 256, "ZZALOG: %s %s", action, stime);
+	// Save session start as it's annoying forgetting it after a crash
+	settings_->set("Session Start", (void*)&session_start_, sizeof(time_t));
+	settings_->flush();
 }
 
 // read in the log data
