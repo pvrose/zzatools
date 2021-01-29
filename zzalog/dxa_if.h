@@ -94,6 +94,8 @@ namespace zzalog {
 		dxa_if();
 		virtual ~dxa_if();
 
+		virtual int handle(int event);
+
 		// Public methods
 		// Standard methods inherited from page_dialog - need to be written for each
 		// Load values from settings_
@@ -279,6 +281,7 @@ namespace zzalog {
 		Fl_Widget* lon_dms_op_;
 		Fl_Widget* centre_ch_;
 		Fl_Widget* pz_w_;
+		Fl_Widget* qso_count_;
 
 		// Map of colour "names" to buttons.
 		map<string, Fl_Widget*> button_map_;

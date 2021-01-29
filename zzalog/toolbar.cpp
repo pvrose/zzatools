@@ -11,6 +11,7 @@
 #include "drawing.h"
 #include "intl_widgets.h"
 #include "extract_data.h"
+#include "main_window.h"
 
 #include <FL/Fl_Button.H>
 #include <FL/Fl_RGB_Image.H>
@@ -28,7 +29,7 @@ extern extract_data* extract_records_;
 extern tabbed_forms* tabbed_forms_;
 extern pfx_data* pfx_data_;
 extern status* status_;
-extern Fl_Single_Window* main_window_;
+extern main_window* main_window_;
 
 // Constructor
 toolbar::toolbar(int X, int Y, int W, int H, const char* label) :

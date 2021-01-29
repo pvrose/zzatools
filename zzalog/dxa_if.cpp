@@ -14,6 +14,7 @@
 #include "spec_data.h"
 #include "drawing.h"
 #include "pfx_data.h"
+#include "menu.h"
 
 #include <set>
 #include <iostream>
@@ -40,6 +41,7 @@ extern status* status_;
 extern tabbed_forms* tabbed_forms_;
 extern spec_data* spec_data_;
 extern time_t session_start_;
+extern menu* menu_;
 extern bool in_current_session(record*);
 
 // Constructor
@@ -126,6 +128,21 @@ dxa_if::~dxa_if()
 	disconnect_dxatlas(false);
 }
 
+// Handle FL_HIDE and FL_SHOW to get menu to update otself
+int dxa_if::handle(int event) {
+
+	switch (event) {
+	case FL_HIDE:
+	case FL_SHOW:
+		// Get menu to update Windows controls
+		menu_->update_windows_items();
+		break;
+	}
+
+	return Fl_Window::handle(event);
+}
+
+
 // Public methods
 
 // Load values from settings_
@@ -207,6 +224,7 @@ void dxa_if::create_form() {
 	ch11->add("This session");
 	ch11->value((int)qso_display_);
 	ch11->tooltip("Select which QSOs to display");
+	qso_count_ = ch11;
 	// Input - Number of days or QSOs
 	Fl_Int_Input* ip11 = new Fl_Int_Input(ch11->x(), ch11->y() + ch11->h(), ch11->w(), HTEXT);
 	ip11->textfont(FONT);
@@ -1671,6 +1689,10 @@ void dxa_if::draw_pins() {
 			else if (count == 0) {
 				status_->progress("No records to display", OT_DXATLAS);
 			}
+
+			char label[30];
+			snprintf(label, 30, "%d QSOs displayed", count);
+			((Fl_Choice*)qso_count_)->copy_label(label);
 		}
 		catch (exception& /*e*/) {
 			status_->misc_status(ST_SEVERE, "DXATLAS: Error detected during update");

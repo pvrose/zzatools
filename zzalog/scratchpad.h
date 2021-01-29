@@ -42,6 +42,8 @@ namespace zzalog {
 		scratchpad();
 		~scratchpad();
 
+		virtual int handle(int event);
+
 		// Callback - close button
 		static void cb_close(Fl_Widget* w, void* v);
 

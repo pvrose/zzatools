@@ -128,6 +128,8 @@ namespace zzalog {
 		viewer_window(int W, int Y, const char* label);
 		~viewer_window();
 
+		virtual int handle(int event);
+
 		void append(const char* line);
 
 		void draw_window();

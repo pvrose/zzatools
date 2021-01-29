@@ -4,6 +4,7 @@
 #include "../zzalib/callback.h"
 #include "drawing.h"
 #include "spec_data.h"
+#include "menu.h"
 
 #include <fstream>
 #include <istream>
@@ -26,6 +27,7 @@ using namespace zzalib;
 extern Fl_Preferences* settings_;
 extern status* status_;
 extern spec_data* spec_data_;
+extern menu* menu_;
 
 // Constructor - calls the Window constructor 
 band_view::band_view(double frequency, int W, int H, const char* label) :
@@ -528,6 +530,10 @@ int band_view::handle(int event) {
 			display_info(x_frequency(curr_x), Fl::event_x_root(), Fl::event_y_root());
 			return true;
 		}
+	case FL_HIDE:
+	case FL_SHOW:
+		menu_->update_windows_items();
+		break;
 	}
 	return Fl_Window::handle(event);
 }

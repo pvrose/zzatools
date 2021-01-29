@@ -6,6 +6,7 @@
 #include "menu.h"
 #include "intl_widgets.h"
 #include "scratchpad.h"
+#include "main_window.h"
 
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Radio_Round_Button.H>
@@ -24,7 +25,7 @@ extern Fl_Preferences* settings_;
 extern rig_if* rig_if_;
 extern menu* menu_;
 extern void add_rig_if();
-extern Fl_Single_Window* main_window_;
+extern main_window* main_window_;
 extern status* status_;
 extern bool read_only_;
 extern scratchpad* scratchpad_;
@@ -583,6 +584,21 @@ viewer_window::viewer_window(int W, int H, const char* label)
 // Viewer window destructor
 viewer_window::~viewer_window() {
 }
+
+// Handle FL_HIDE and FL_SHOW to get menu to update otself
+int viewer_window::handle(int event) {
+
+	switch (event) {
+	case FL_HIDE:
+	case FL_SHOW:
+		// Get menu to update Windows controls
+		menu_->update_windows_items();
+		break;
+	}
+
+	return Fl_Window::handle(event);
+}
+
 
 // Load the file into the test display in the window
 void viewer_window::append(const char* line) {

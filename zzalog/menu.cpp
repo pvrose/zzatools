@@ -30,6 +30,9 @@
 #include "qrz_handler.h"
 #include "ic7300_table.h"
 #include "wsjtx_handler.h"
+#include "band_view.h"
+#include "dxa_if.h"
+#include "main_window.h"
 
 #include <sstream>
 #include <list>
@@ -43,7 +46,35 @@
 #include <FL/Fl_Help_Dialog.H>
 #include <FL/Fl_Tooltip.H>
 
+using namespace zzalog;
+using namespace zzalib;
+
+extern book* book_;
+extern import_data* import_data_;
+extern extract_data* extract_records_;
+extern book* navigation_book_;
+extern pfx_data* pfx_data_;
+extern spec_data* spec_data_;
+extern rig_if* rig_if_;
+extern status* status_;
+extern tabbed_forms* tabbed_forms_;
+extern url_handler* url_handler_;
+extern main_window* main_window_;
+extern Fl_Preferences* settings_;
+extern bool read_only_;
+extern list<string> recent_files_;
+extern intl_dialog* intl_dialog_;
+extern toolbar* toolbar_;
+extern scratchpad* scratchpad_;
+extern qrz_handler* qrz_handler_;
+extern wsjtx_handler* wsjtx_handler_;
+extern band_view* band_view_;
+extern dxa_if* dxatlas_;
+settings* config_ = nullptr;
+
 namespace zzalog {
+
+
 	// The default menu - set of menu items
 	Fl_Menu_Item menu_items[] = {
 		// File operations
@@ -73,6 +104,13 @@ namespace zzalog {
 	{ "&QSL Design", 0, menu::cb_mi_settings, (void*)settings::DLG_QSL },
 	{ "&User settings", 0, menu::cb_mi_settings, (void*)settings::DLG_USER },
 	{ "All", 0, menu::cb_mi_settings, (void*)settings::DLG_ALL },
+	{ 0 },
+
+	// Windows viewing
+	{ "&Windows", 0, 0, 0, FL_SUBMENU },
+	{ "&Show All", 0, menu::cb_mi_windows_all, (void*)true },
+	{ "&Hide All", 0, menu::cb_mi_windows_all, (void*)false },
+	// Extra items to be added here
 	{ 0 },
 
 	// Log navigation
@@ -252,31 +290,6 @@ namespace zzalog {
 	{ 0 }
 	};
 }
-
-using namespace zzalog;
-using namespace zzalib;
-
-extern book* book_;
-extern import_data* import_data_;
-extern extract_data* extract_records_;
-extern book* navigation_book_;
-extern pfx_data* pfx_data_;
-extern spec_data* spec_data_;
-extern rig_if *rig_if_;
-extern status* status_;
-extern tabbed_forms* tabbed_forms_;
-extern url_handler* url_handler_;
-extern Fl_Single_Window* main_window_;
-extern Fl_Preferences* settings_;
-extern bool read_only_;
-extern list<string> recent_files_;
-extern intl_dialog* intl_dialog_;
-extern toolbar* toolbar_;
-extern scratchpad* scratchpad_;
-extern qrz_handler* qrz_handler_;
-extern wsjtx_handler* wsjtx_handler_;
-settings* config_ = nullptr;
-
 
 extern void add_rig_if();
 extern void add_data();
@@ -541,6 +554,54 @@ void menu::cb_mi_settings(Fl_Widget* w, void* v) {
 		config_ = new settings(WCONFIG, HCONFIG + 100, "Configuration", active);
 		config_ = nullptr;
 	}
+}
+
+// Windows->Show All|Hide All
+// v is bool. false = hide all, true = show all
+void menu::cb_mi_windows_all(Fl_Widget* w, void* v) {
+	bool show_all = (bool)(long)v;
+	menu* that = ancestor_view<menu>(w);
+	if (show_all) {
+		main_window_->show();
+		status_->file_viewer()->show();
+		scratchpad_->show();
+#ifdef _WIN32
+		dxatlas_->show();
+#endif
+		band_view_->show();
+		intl_dialog_->show();
+	}
+	else {
+		// Minimise the main window rather than hide it. When all windows are hidden we end the app
+		main_window_->iconize();
+		status_->file_viewer()->hide();
+		scratchpad_->hide();
+#ifdef _WIN32
+		dxatlas_->hide();
+#endif
+		band_view_->hide();
+		intl_dialog_->hide();
+	}
+	that->update_windows_items();
+}
+
+// Windows->Other
+// v is Fl_Window*. points to the specified windowa
+void menu::cb_mi_windows(Fl_Widget* w, void* v) {
+	menu* that = ancestor_view<menu>(w);
+	Fl_Window* win = (Fl_Window*)v;
+	if (win) {
+		if (win == main_window_ && win->visible()) {
+			win->iconize();
+		}
+		else if (win->visible()) {
+			win->hide();
+		}
+		else {
+			win->show();
+		}
+	}
+	that->update_windows_items();
 }
 
 // Navigate->First,Previous,Next,Last callbacks
@@ -2078,8 +2139,94 @@ void menu::update_items() {
 		}
 	}
 	redraw();
+	update_windows_items();
 	// Update toolbar to reflect active state of menu items
 	toolbar_->update_items();
+}
+
+// Add windows user data
+void menu::add_windows_items() {
+	// Get indices to &Windows
+	int index = find_index("&Windows/&Hide All");
+	insert(index, "&Windows/&Main", 0, cb_mi_windows, main_window_, FL_MENU_TOGGLE);
+	insert(index, "&Windows/S&tatus Viewer", 0, cb_mi_windows, status_->file_viewer(), FL_MENU_TOGGLE);
+	insert(index, "&Windows/S&cratchpad", 0, cb_mi_windows, scratchpad_, FL_MENU_TOGGLE);
+#ifdef _WIN32
+	insert(index, "&Windows/&DxAtlas Control", 0, cb_mi_windows, dxatlas_, FL_MENU_TOGGLE);
+#endif
+	insert(index, "&Windows/&Band View", 0, cb_mi_windows, band_view_, FL_MENU_TOGGLE);
+	insert(index, "&Windows/&International Chars", 0, cb_mi_windows, intl_dialog_, FL_MENU_TOGGLE);
+}
+
+// Update Windows sub-menu
+void menu::update_windows_items() {
+	// Get indices to menu items
+	int index_main = find_index("&Windows/&Main");
+	int index_status = find_index("&Windows/S&tatus Viewer");
+	int index_spad = find_index("&Windows/S&cratchpad");
+#ifdef _WIN32
+	int index_dxatlas = find_index("&Windows/&DxAtlas Control");
+#endif
+	int index_band = find_index("&Windows/&Band View");
+	int index_intl = find_index("&Windows/&International Chars");
+
+	if (main_window_ && index_main != -1) {
+		if (main_window_->visible()) {
+			mode(index_main, mode(index_main) | FL_MENU_VALUE);
+		}
+		else {
+			mode(index_main, mode(index_main) & ~FL_MENU_VALUE);
+		}
+	}
+
+	if (status_ && status_->file_viewer() && index_status != -1) {
+		if (status_->file_viewer()->visible()) {
+			mode(index_status, mode(index_status) | FL_MENU_VALUE);
+		}
+		else {
+			mode(index_status, mode(index_status) & ~FL_MENU_VALUE);
+		}
+	}
+
+	if (scratchpad_ && index_spad != -1) {
+		if (scratchpad_->visible()) {
+			mode(index_spad, mode(index_spad) | FL_MENU_VALUE);
+		}
+		else {
+			mode(index_spad, mode(index_spad) & ~FL_MENU_VALUE);
+		}
+	}
+
+#ifdef _WIN32
+	if (dxatlas_ && index_dxatlas != -1) {
+		if (dxatlas_->visible()) {
+			mode(index_dxatlas, mode(index_dxatlas) | FL_MENU_VALUE);
+		}
+		else {
+			mode(index_dxatlas, mode(index_dxatlas) & ~FL_MENU_VALUE);
+		}
+	}
+#endif
+
+	if (band_view_ && index_band != -1) {
+		if (band_view_->visible()) {
+			mode(index_band, mode(index_band) | FL_MENU_VALUE);
+		}
+		else {
+			mode(index_band, mode(index_band) & ~FL_MENU_VALUE);
+		}
+	}
+
+	if (intl_dialog_ && index_intl != -1) {
+		if (intl_dialog_->visible()) {
+			mode(index_intl, mode(index_intl) | FL_MENU_VALUE);
+		}
+		else {
+			mode(index_intl, mode(index_intl) & ~FL_MENU_VALUE);
+		}
+	}
+
+	redraw();
 }
 
 // Get the browser form settings or if not ask user

@@ -11,6 +11,7 @@
 #include "toolbar.h"
 #include "status.h"
 #include "pfx_data.h"
+#include "main_window.h"
 
 #include <FL/fl_draw.H>
 #include <FL/Fl_Preferences.H>
@@ -25,7 +26,7 @@ using namespace zzalib;
 extern Fl_Preferences* settings_;
 extern spec_data* spec_data_;
 extern book* book_;
-extern Fl_Single_Window* main_window_;
+extern main_window* main_window_;
 extern menu* menu_;
 extern toolbar* toolbar_;
 extern status* status_;

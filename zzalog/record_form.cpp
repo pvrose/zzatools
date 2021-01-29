@@ -13,6 +13,7 @@
 #include "qsl_form.h"
 #include "qrz_handler.h"
 #include "status.h"
+#include "main_window.h"
 
 #include <array>
 #include <string>
@@ -35,7 +36,7 @@ extern import_data* import_data_;
 extern eqsl_handler* eqsl_handler_;
 extern Fl_Preferences* settings_;
 extern menu* menu_;
-extern Fl_Single_Window* main_window_;
+extern main_window* main_window_;
 extern book* navigation_book_;
 extern intl_dialog* intl_dialog_;
 extern qrz_handler* qrz_handler_;

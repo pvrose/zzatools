@@ -130,6 +130,21 @@ scratchpad::~scratchpad()
 	status_->misc_status(ST_NOTE, "SCRATCHPAD: Deleted");
 }
 
+// Handle FL_HIDE and FL_SHOW to get menu to update otself
+int scratchpad::handle(int event) {
+
+	switch (event) {
+	case FL_HIDE:
+	case FL_SHOW:
+		// Get menu to update Windows controls
+		menu_->update_windows_items();
+		break;
+	}
+
+	return win_dialog::handle(event);
+}
+
+
 // Create form
 void scratchpad::create_form() {
 	const int HEDITOR = h() - EDGE - EDGE;

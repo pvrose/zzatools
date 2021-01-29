@@ -14,12 +14,9 @@
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Return_Button.H>
 #include <FL/Fl_Tabs.H>
-#include <FL/Fl_Single_Window.H>
 
 using namespace zzalog;
 using namespace zzalib;
-
-extern Fl_Single_Window* main_window_;
 
 // Constructor
 settings::settings(int W, int H, const char* label, cfg_dialog_t active) :

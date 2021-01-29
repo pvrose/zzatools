@@ -18,6 +18,7 @@
 #include "eqsl_handler.h"
 #include "lotw_handler.h"
 #include "club_handler.h"
+#include "main_window.h"
 
 // C/C++ header files
 #include <ctime>
@@ -39,7 +40,7 @@ extern tabbed_forms* tabbed_forms_;
 extern spec_data* spec_data_;
 extern pfx_data* pfx_data_;
 extern Fl_Preferences* settings_;
-extern Fl_Single_Window* main_window_;
+extern main_window* main_window_;
 extern band_view* band_view_;
 extern book* book_;
 extern eqsl_handler* eqsl_handler_;

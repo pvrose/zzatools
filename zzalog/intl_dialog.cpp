@@ -2,6 +2,7 @@
 #include "../zzalib/utils.h"
 #include "status.h"
 #include "../zzalib/callback.h"
+#include "menu.h"
 
 #include <FL/Fl_Preferences.H>
 #include <FL/Fl_Button.H>
@@ -14,6 +15,7 @@ using namespace zzalib;
 
 extern status* status_;
 extern Fl_Preferences* settings_;
+extern menu* menu_;
 
 // Constructs a window 
 intl_dialog::intl_dialog() :
@@ -119,6 +121,20 @@ void intl_dialog::add_buttons(int width) {
 intl_dialog::~intl_dialog()
 {
 	clear();
+}
+
+// Handle FL_HIDE and FL_SHOW to get menu to update otself
+int intl_dialog::handle(int event) {
+
+	switch (event) {
+	case FL_HIDE:
+	case FL_SHOW:
+		// Get menu to update Windows controls
+		menu_->update_windows_items();
+		break;
+	}
+
+	return win_dialog::handle(event);
 }
 
 // Callback - save button - save data to a file

@@ -26,6 +26,8 @@ namespace zzalog {
 		intl_dialog();
 		virtual ~intl_dialog();
 
+		virtual int handle(int event);
+
 		// Set the widget that receives the paste command
 		void editor(Fl_Widget* w);
 		// REturns the widget that recives the paste command

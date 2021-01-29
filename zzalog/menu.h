@@ -39,6 +39,10 @@ namespace zzalog {
 		static void cb_mi_file_backup(Fl_Widget* w, void* v);
 		// Settings->any
 		static void cb_mi_settings(Fl_Widget* w, void* v);
+		// Windows->all
+		static void cb_mi_windows_all(Fl_Widget* w, void* v);
+		// Windows->others
+		static void cb_mi_windows(Fl_Widget* w, void* v);
 		// Navigate->First,Previous,Next,Last callbacks
 		static void cb_mi_navigate(Fl_Widget* w, void* v);
 		// Navigate->Date
@@ -160,6 +164,10 @@ namespace zzalog {
 		void update_items();
 		// Get the browser form settings or if not ask user
 		string get_browser();
+		// Update windows menu items
+		void update_windows_items();
+		// Add userdate to windows items
+		void add_windows_items();
 
 	protected:
 		// Current logging mode

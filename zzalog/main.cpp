@@ -43,6 +43,7 @@ main.cpp - application entry point
 #include "fllog_emul.h"
 #include "resource.h"
 #include "hamlib/rig.h"
+#include "main_window.h"
 
 // C/C++ header files
 #include <ctime>
@@ -92,7 +93,7 @@ spec_data* spec_data_ = nullptr;
 eqsl_handler* eqsl_handler_ = nullptr;
 lotw_handler* lotw_handler_ = nullptr;
 qrz_handler* qrz_handler_ = nullptr;
-Fl_Single_Window* main_window_ = nullptr;
+main_window* main_window_ = nullptr;
 intl_dialog* intl_dialog_ = nullptr;
 band_view* band_view_ = nullptr;
 scratchpad* scratchpad_ = nullptr;
@@ -713,7 +714,7 @@ void main_window_label(string text) {
 // Create the main window
 void create_window() {
 	// Create the main window
-	main_window_ = new Fl_Single_Window(WIDTH, HEIGHT);
+	main_window_ = new main_window(WIDTH, HEIGHT);
 	main_window_label("");
 	// add callback to intercept close command
 	main_window_->callback(cb_bn_close);
@@ -894,7 +895,9 @@ int main(int argc, char** argv)
 	// We are now initialised
 	initialised_ = true;
 	if (!closing_) {
+		// Now we have created everything add the windows items to the menu
 		// Enable menu so that we can do thigs while waiting for Fllog client to appear
+		menu_->add_windows_items();
 		menu_->enable(true);
 		menu_->redraw();
 		// Only do this if we haven't tried to close
