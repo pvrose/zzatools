@@ -878,20 +878,26 @@ double rig_flrig::swr_meter() {
 		string subcommand = "\x12";
 		string data = ic7300_->send_command(command, subcommand, ok);
 		if (ok) {
-			unsigned int value = bcd_to_int(data.substr(2, 2), false);
 			char mess[256];
-			// reflection coefficient (ρ) - assume this is linear wrt value - supplied values infer it is
-			// 0: SWR = 1 (ρ = 0), 48: SWR = 1.5 (ρ = 0.2), 80: SWR = 2 (ρ = 0.33), 120: SWR = 3 (ρ = 0.5)
-			// implies value = 240 / ρ.
-			if (value > 240) {
-				value = 240;
+			if (data.length() >= 4) {
+				unsigned int value = bcd_to_int(data.substr(2, 2), false);
+				// reflection coefficient (ρ) - assume this is linear wrt value - supplied values infer it is
+				// 0: SWR = 1 (ρ = 0), 48: SWR = 1.5 (ρ = 0.2), 80: SWR = 2 (ρ = 0.33), 120: SWR = 3 (ρ = 0.5)
+				// implies value = 240 / ρ.
+				if (value > 240) {
+					value = 240;
+				}
+				double rho = value / 240.0;
+				// SWR = (1 + ρ) / (1 - ρ) 
+				double swr = (1.0 + rho) / (1 - rho);
+				//			snprintf(mess, 256, "DEBUG: Value received from rig - %d, SWR = %g", value, swr);
+				//			error(ST_LOG, mess);
+				return swr;
 			}
-			double rho = value / 240.0;
-			// SWR = (1 + ρ) / (1 - ρ) 
-			double swr = (1.0 + rho) / (1 - rho);
-//			snprintf(mess, 256, "DEBUG: Value received from rig - %d, SWR = %g", value, swr);
-//			error(ST_LOG, mess);
-			return swr;
+			else {
+				snprintf(mess, 256, "RIG: Insufficient data received from transceiver - %d bytes", data.length());
+				error(ST_ERROR, mess);
+			}
 		}
 	}
 	// Not IC7300 or not OK - return nan.

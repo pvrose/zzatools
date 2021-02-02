@@ -38,8 +38,8 @@ string ic7300::send_command(unsigned char command, string sub_command, string da
 		string to_send = string_to_hex(cmd, true);
 		// Send the message
 		string raw_data = rig_if_->raw_message(to_send);
-//		snprintf(mess, 256, "DEBUG: Received response from IC-7300: %s", raw_data.c_str());
-//		message(ST_LOG, mess);
+		//snprintf(mess, 256, "DEBUG: Received response from IC-7300: %s", raw_data.c_str());
+		//message(ST_LOG, mess);
 
 		// Ignore reflected data
 		if (raw_data.substr(0, 2) != "FE") {
@@ -67,9 +67,15 @@ string ic7300::send_command(unsigned char command, string sub_command, string da
 		else {
 			// For data - strip off reflected command if its present - note I have seen command returned multiple times
 			int discard = cmd.length();
+			int number_discards = 0;
 			while (response.substr(0, discard) == cmd) {
 				response = response.substr(discard);
+				number_discards++;
 			}
+			//if (number_discards > 1) {
+			//	snprintf(mess, 256, "RIG: Discarded %d copies of the reflected command %s", number_discards, hex_to_string(cmd).c_str());
+			//	message(ST_DEBUG, mess);
+			//}
 			if (response.length() == 6 && response[4] > '\xf0') {
 				if (response[4] == '\xfa') {
 					// Got NAK response from transceiver
@@ -79,7 +85,9 @@ string ic7300::send_command(unsigned char command, string sub_command, string da
 					return "";
 				}
 				else {
-					// Got ACK response from transceiver, but no data
+					//// Got ACK response from transceiver, but no data
+					//snprintf(mess, 256, "RIG: Received an ACK response from transceiver - CMD = %s", to_send.c_str());
+					//message(ST_DEBUG, mess);
 					return ("");
 				}
 			}
@@ -87,6 +95,7 @@ string ic7300::send_command(unsigned char command, string sub_command, string da
 				string expected = "\xFE\xFE\xE0\x94";
 				if (response.length() >= 4 && response.substr(0, 4) == expected) {
 					// Discard the CI-V preamble/postamble - xFExFEx94xF0 data xFD
+					snprintf(mess, 256, "RIG: Received response %s from transceiver - CMD = %s", hex_to_string(response.substr(4)).c_str(), to_send.c_str());
 					return response.substr(4, response.length() - 5);
 				}
 				else {

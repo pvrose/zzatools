@@ -239,43 +239,47 @@ int socket_server::rcv_packet() {
 	}
 
 	bool packet_complete = false;
-	stringstream ss;
 	int payload_size = 0;
 	string resource = "";
 	string function = "";
 	int pos_payload = 0;
 	double wait_time = 0.0;
 	int len_client_addr = sizeof(client_addr_);
-	switch (protocol_) {
-	case UDP:
-		bytes_rcvd = recvfrom(server_, buffer, buffer_len, 0, (SOCKADDR*)&client_addr_, &len_client_addr);
-		break;
-	case HTTP:
-		bytes_rcvd = recv(client_, buffer, buffer_len, 0);
-		break;
-	}
-	if (bytes_rcvd > 0) {
+	do {
+		// Keep processing packets while they keep coming
+		switch (protocol_) {
+		case UDP:
+			bytes_rcvd = recvfrom(server_, buffer, buffer_len, 0, (SOCKADDR*)&client_addr_, &len_client_addr);
+			break;
+		case HTTP:
+			bytes_rcvd = recv(client_, buffer, buffer_len, 0);
+			break;
+		}
+		if (bytes_rcvd > 0) {
 #ifdef _DEBUG
-		dump(string(buffer, buffer_len));
+			dump(string(buffer, buffer_len));
 #endif
-		string s(buffer, bytes_rcvd);
-		ss << s;
-		do_request(ss);
-		// Receiving data - set wait time short
-		wait_time = 0.01;
-	}
-	else if (WSAGetLastError() == WSAEWOULDBLOCK) {
-		// Wait one seconds before trying again - wait_repeat_ will get cleared in the 
-		wait_time = 1.0;
-	}
-	else if (WSAGetLastError() == WSAENOTSOCK && closing_) {
-		// We can get here through a race between closing and turning the timers off
-		return 1;
-	}
-	else {
-		handle_error("Unable to read from client");
-		return 1;
-	}
+			stringstream ss;
+			string s(buffer, bytes_rcvd);
+			ss.clear();
+			ss << s;
+			do_request(ss);
+			// Receiving data - set wait time short
+			wait_time = 0;
+		}
+		else if (WSAGetLastError() == WSAEWOULDBLOCK) {
+			// Wait one seconds before trying again - wait_repeat_ will get cleared in the 
+			wait_time = 0;
+		}
+		else if (WSAGetLastError() == WSAENOTSOCK && closing_) {
+			// We can get here through a race between closing and turning the timers off
+			return 1;
+		}
+		else {
+			handle_error("Unable to read from client");
+			return 1;
+		}
+	} while (bytes_rcvd > 0);
 	// Allow event queue to dissipate
 	Fl::wait();
 	// Now see if we have another 

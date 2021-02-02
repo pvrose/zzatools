@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <WS2tcpip.h>
 #include <sstream>
+#include <iostream>
 #ifndef _WIN32
 #include <fnctl.h>
 #endif
@@ -34,6 +35,7 @@ wsjtx_handler::wsjtx_handler()
 	last_decode_time_ = 0;
 	new_heartbeat_ = false;
 	status_rcvd_ = 0;
+	decodes_rcvd_ = 0;
 }
 
 
@@ -61,6 +63,8 @@ int wsjtx_handler::rcv_dgram(stringstream & ss) {
 		status_->misc_status(ST_WARNING, message);
 		return 1;
 	}
+	//ts += ":" + to_string(dgram_type) + '\n';
+	//cout << ts;
 	switch (dgram_type) {
 	case 0:
 		// Heartbeat
