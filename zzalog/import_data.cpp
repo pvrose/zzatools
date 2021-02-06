@@ -624,7 +624,6 @@ void import_data::finish_update(bool merged /*= true*/) {
 		scratchpad_->update();
 	}
 	// Allow the book to save (and save if modified)
-	book_->enable_save(true);
 	close_pending_ = false;
 	// repeat_auto_timer has already set mode to WAIT_AUTO
 	if (update_mode_ != WAIT_AUTO) {
@@ -761,6 +760,7 @@ bool import_data::download_data(import_data::update_mode_t server) {
 	stop_update(LM_IMPORTED, false);
 	while (!update_complete()) Fl::wait();
 	// Disable saving each record
+	old_enable_save_ = book_->save_enabled();
 	book_->enable_save(false);
 	switch (server) {
 	case EQSL_UPDATE: 

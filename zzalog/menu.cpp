@@ -845,7 +845,6 @@ void menu::cb_mi_log_mode(Fl_Widget* w, void* v) {
 	// Stop current logging mode
 	switch (that->logging_mode_) {
 	case LM_OFF_AIR:
-		book_->enable_save(true);
 		// Currently entering a QSO - ask Save or Quit
 		if (book_->modified_record() || book_->new_record()) {
 			fl_beep(FL_BEEP_QUESTION);

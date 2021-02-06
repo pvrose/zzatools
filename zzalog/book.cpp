@@ -1376,8 +1376,10 @@ bool book::delete_enabled() {
 
 // Upload the latest QSO imported to eQSL, LotW and Clublog
 bool book::upload_qso(record_num_t record_num) {
+	bool old_save_enabled = save_enabled_;
 	bool ok = eqsl_handler_->upload_single_qso(record_num);
 	if (!lotw_handler_->upload_single_qso(record_num)) ok = false;
 	if (!club_handler_->upload_single_qso(record_num)) ok = false;
+	enable_save(old_save_enabled);
 	return ok;
 }

@@ -35,6 +35,7 @@ eqsl_handler::eqsl_handler()
 	, dequeue_parameter_({ &request_queue_, this })
 	, help_dialog_(nullptr)
 	, debug_enabled_(true)
+	, save_enabled_(true)
 {
 }
 
@@ -57,7 +58,7 @@ void eqsl_handler::enqueue_request(record_num_t record_num, bool force /*=false*
 		char message[512];
 		sprintf(message, "EQSL: %d Card requests pending", request_queue_.size());
 		status_->misc_status(ST_NOTE, message);
-		// Disable saving
+		save_enabled_ = book_->save_enabled();
 		book_->enable_save(false);
 	}
 }
@@ -158,7 +159,7 @@ void eqsl_handler::cb_timer_deq(void* v) {
 				status_->misc_status(ST_OK, "EQSL: Card fetching done!");
 			}
 			// Re-enable saving
-			book_->enable_save(true);
+			book_->enable_save(that->save_enabled_);
 		}
 	}
 }
@@ -774,6 +775,7 @@ bool eqsl_handler::upload_eqsl_log(book* book) {
 			help_dialog_->show();
 		}
 		// now update book - don't try and save after each record
+		save_enabled_ = book_->save_enabled();
 		book_->enable_save(false);
 		for (size_t pos = 0; pos < book->size(); pos++) {
 			record* record = book->get_record(pos, false);
@@ -792,7 +794,7 @@ bool eqsl_handler::upload_eqsl_log(book* book) {
 				record->item("EQSL_QSL_SENT", string("Y"));
 			}
 		}
-		book_->enable_save(true);
+		book_->enable_save(save_enabled_);
 
 		// Update status with succesful uploads and remove extracted records
 		if (num_errors || num_warnings) {
@@ -918,6 +920,7 @@ bool eqsl_handler::upload_single_qso(record_num_t record_num) {
 			this_message = record->item_merge(qsl_message);
 		}
 		bool update = false;
+		save_enabled_ = book_->save_enabled();
 		// Only upload valid records or reply to SWL reports
 		if (record->is_valid() || record->item("SWL") == "Y") {
 			// Generate URL parameters for QSL
@@ -1047,7 +1050,7 @@ bool eqsl_handler::upload_single_qso(record_num_t record_num) {
 			}
 		}
 		// now update book
-		book_->enable_save(true);
+		book_->enable_save(save_enabled_);
 
 		// Update status with succesful uploads and remove extracted records
 		if (passed) {

@@ -133,7 +133,8 @@ namespace zzalog {
 		string username_;
 		// Password
 		string password_;
-
+		// Book saving ebaled
+		bool save_enabled_;
 	};
 
 }

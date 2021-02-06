@@ -913,23 +913,20 @@ double rig_flrig::swr_meter() {
 		// 100 = 1:∞
 		unsigned int value = response.get_int();
 		double rho;
-		// Attempt to unpick flrig's tweaking - see above
+		// Attempt to unpick flrig's tweaking - it's converted 1.5 to 12.5%, 2 to 25%, 3 to 50%, infinity to 100%
 		// But keeps the linearity between these points in reflection coefficient
 		if (value >= 50) {
 			// Between 50 and 100 - treat it as %-age reflected power
 			rho = value / 100.0;
 		}
 		else if (value >= 25) {
-			// rho = 1/3 + interpolate between 0.33 and 0.5 (1/6)
-			rho = (1.0 / 3.0) + ((1.0 / 6.0) * ((double)value - 25.0) / 25.0);
+			rho = (1.0 / 3.0) + (((double)value - 25.0) / 25.0);
 		}
 		else if (value >= 13) {
-			// rho = 0.2 + interpolate between 0.2 and 0.33 (2/15)
-			rho = (0.2) + ((2.0 / 15.0) * ((double)value - 12.5) / 12.5);
+			rho = (0.2) + (((double)value - 12.5) / 12.5);
 		}
 		else {
-			// rho = interpolate between 0 and 0.2
-			rho = (0.2 * (double)value / 12.5);
+			rho = ((double)value / 12.5);
 		}
 		// SWR = (1 + ρ) / (1 - ρ) 
 		double swr = (1.0 + rho) / (1.0 - rho);

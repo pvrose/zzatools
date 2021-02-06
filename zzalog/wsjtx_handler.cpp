@@ -154,7 +154,7 @@ int wsjtx_handler::handle_decode(stringstream& ss) {
 	bool bv = get_bool(ss);
 	uint32_t iv = get_uint32(ss);
 	if (iv != last_decode_time_) {
-		double seconds = iv / 1000.0;
+		double seconds = last_decode_time_ / 1000.0;
 		unsigned int minutes = (unsigned int)seconds / 60;
 		seconds = seconds - (minutes * 60.0);
 		unsigned int hours = minutes / 60;
