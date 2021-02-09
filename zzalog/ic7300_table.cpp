@@ -130,6 +130,7 @@ void ic7300_table::draw_cell(TableContext context, int R, int C, int X, int Y,
 void ic7300_table::open_view(view_type type) {
 	// Use egg-timer cursor
 	fl_cursor(FL_CURSOR_WAIT);
+	status_->misc_status(ST_NOTE, "RIG: Starting to get rig memories");
 	// delete the existing set of itesm
 	items_valid_ = false;
 	delete_items();

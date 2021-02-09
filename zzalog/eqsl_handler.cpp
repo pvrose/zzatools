@@ -1049,8 +1049,6 @@ bool eqsl_handler::upload_single_qso(record_num_t record_num) {
 				}
 			}
 		}
-		// now update book
-		book_->enable_save(save_enabled_);
 
 		// Update status with succesful uploads and remove extracted records
 		if (passed) {
