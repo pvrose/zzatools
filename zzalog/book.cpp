@@ -140,7 +140,9 @@ bool book::load_data(string filename)
 					adi_reader* reader = new adi_reader;
 					input_.open(filename.c_str(), fstream::in);
 					// Load the book
-					status_->file_status(FS_LOADING);
+					if (book_type_ == OT_MAIN) {
+						status_->file_status(FS_LOADING);
+					}
 					if (!reader->load_book(this, input_)) {
 						// Error while reading book
 						char message[256];
@@ -431,7 +433,9 @@ bool book::store_data(string filename, bool force, set<string>* fields) {
 		}
 		else {
 			// Cannot write an imported file
-			status_->misc_status(ST_ERROR, "LOG: An import type of book cannot be written to a file");
+			char message[256];
+			snprintf(message, 256, "LOG: Attempting to write %s - this book is not writeable", (filename == "" ? filename_.c_str() : filename.c_str()));
+			status_->misc_status(ST_ERROR, message);
 			ok = false;
 		}
 	}
@@ -1377,6 +1381,7 @@ bool book::delete_enabled() {
 // Upload the latest QSO imported to eQSL, LotW and Clublog
 bool book::upload_qso(record_num_t record_num) {
 	bool old_save_enabled = save_enabled_;
+	enable_save(false);
 	bool ok = eqsl_handler_->upload_single_qso(record_num);
 	if (!lotw_handler_->upload_single_qso(record_num)) ok = false;
 	if (!club_handler_->upload_single_qso(record_num)) ok = false;

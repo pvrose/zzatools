@@ -835,6 +835,9 @@ void print_args(int argc, char** argv) {
 	}
 	strcat(message, "Started");
 	status_->misc_status(ST_LOG, message);
+	strcpy(message, "ZZALOG: ");
+	strcat(message, main_window_->label());
+	status_->misc_status(ST_LOG, message);
 }
 
 // Save session time - flush settings

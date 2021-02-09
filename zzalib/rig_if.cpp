@@ -106,24 +106,26 @@ string rig_if::rig_info() {
 	rig_info += rig_name_;
 	// Valid rig - get data from it. TX frequency
 	if (is_split()) {
-		rig_info += " TX:" + get_frequency(true) + " MHz";
-		rig_info += " RX:" + get_frequency(false) + " MHz";
+		if (is_good()) rig_info += " TX:" + get_frequency(true) + " MHz";
+		if (is_good()) rig_info += " RX:" + get_frequency(false) + " MHz";
 	}
 	else {
-		rig_info += " " + get_frequency(true) + " MHz";
+		if (is_good()) rig_info += " " + get_frequency(true) + " MHz";
 	}
-	rig_info += " " + get_tx_power() + " W";
+	if (is_good()) rig_info += " " + get_tx_power() + " W";
 	string mode;
 	string submode;
-	get_string_mode(mode, submode);
-	if (submode.length()) {
-		rig_info += " " + mode + "(" + submode + ")";
+	if (is_good()) {
+		get_string_mode(mode, submode);
+		if (submode.length()) {
+			rig_info += " " + mode + "(" + submode + ")";
+		}
+		else {
+			rig_info += " " + mode;
+		}
 	}
-	else {
-		rig_info += " " + mode;
-	}
-	rig_info += " " + get_smeter();
-	rig_info += " " + get_swr_meter();
+	if (is_good()) rig_info += " " + get_smeter();
+	if (is_good()) rig_info += " " + get_swr_meter();
 	return rig_info;
 }
 
@@ -695,6 +697,7 @@ rig_flrig::rig_flrig()
 	handler_ = "Flrig";
 	handler_t_ = RIG_FLRIG;
 	rpc_handler_ = nullptr;
+	error_ = true;
 }
 
 // Destructor
@@ -733,6 +736,7 @@ bool rig_flrig::open() {
 	}
 	else {
 		opened_ok_ = true;
+		error_ = false;
 	}
 
 	if (opened_ok_) {
@@ -750,6 +754,8 @@ string& rig_flrig::rig_name() {
 	}
 	else {
 		// Failed: return empty string
+		error(ST_ERROR, error_message("rig_name").c_str());
+		error_ = true;
 		rig_name_ = "";
 	}
 	return rig_name_;
@@ -764,6 +770,7 @@ double rig_flrig::rx_frequency() {
 	else {
 		// Failed return NAN
 		error(ST_ERROR, error_message("rx_frequency").c_str());
+		error_ = true;
 		return nan("");
 	}
 }
@@ -789,6 +796,7 @@ rig_mode_t rig_flrig::mode() {
 	else {
 		// Request failed
 		error(ST_ERROR, error_message("mode").c_str());
+		error_ = true;
 		return GM_INVALID;
 	}
 }
@@ -801,6 +809,7 @@ double rig_flrig::drive() {
 	}
 	else {
 		error(ST_ERROR, error_message("drive").c_str());
+		error_ = true;
 		return nan("");
 	}
 }
@@ -813,6 +822,7 @@ bool rig_flrig::is_split() {
 	}
 	else {
 		error(ST_ERROR, error_message("is_split").c_str());
+		error_ = true;
 		return false;
 	}
 }
@@ -828,18 +838,23 @@ double rig_flrig::tx_frequency() {
 			}
 			else {
 				error(ST_ERROR, error_message("tx_frequency").c_str());
+				error_ = true;
 				return nan("");
 			}
 		}
 	} 
-	// Return VFO A if either not split or VFO B is the TX frequency
-	if (do_request("rig.get_vfoA", nullptr, &response)) {
-		return (double)response.get_int();
+	if (is_good()) {
+		// Return VFO A if either not split or VFO B is the TX frequency
+		if (do_request("rig.get_vfoA", nullptr, &response)) {
+			return (double)response.get_int();
+		}
+		else {
+			error(ST_ERROR, error_message("tx_frequency").c_str());
+			error_ = true;
+			return nan("");
+		}
 	}
-	else {
-		error(ST_ERROR, error_message("tx_frequency").c_str());
-		return nan("");
-	}
+	return nan("");
 }
 
 // Return S-meter reading (S9+/-dB)
@@ -852,6 +867,7 @@ int rig_flrig::s_meter() {
 	else {
 		// Default return S0
 		error(ST_ERROR, error_message("s_meter").c_str());
+		error_ = true;
 		return -54;
 	}
 }
@@ -866,6 +882,7 @@ double rig_flrig::pwr_meter() {
 	else {
 		// Default return S0
 		error(ST_ERROR, error_message("pwr_meter").c_str());
+		error_ = true;
 		return nan("");
 	}
 }
@@ -933,14 +950,15 @@ double rig_flrig::swr_meter() {
 		}
 		// SWR = (1 + ρ) / (1 - ρ) 
 		double swr = (1.0 + rho) / (1.0 - rho);
-		char mess[256];
-		snprintf(mess, 256, "DEBUG: Value received from rig - %d, ρ = %g, SWR = %g", value, rho,  swr);
-		error(ST_DEBUG, mess);
+		//char mess[256];
+		//snprintf(mess, 256, "DEBUG: Value received from rig - %d, ρ = %g, SWR = %g", value, rho,  swr);
+		//error(ST_DEBUG, mess);
 		return swr;
 	}
 	else {
 		// Default return S0
 		error(ST_ERROR, error_message("swr_meter").c_str());
+		error_ = true;
 		return nan("");
 	}
 
@@ -953,7 +971,7 @@ string rig_flrig::error_message(string func_name) {
 
 // Error Code is not OK.
 bool rig_flrig::is_good() {
-	return opened_ok_;
+	return opened_ok_ && !error_;
 }
 
 // close the connection
@@ -969,6 +987,7 @@ bool rig_flrig::do_request(string method_name, rpc_data_item::rpc_list* params, 
 		// Failed to make the request
 		error_message_ = "Request failed";
 		opened_ok_ = false;
+		error_ = true;
 		return false;
 	}
 	else {
@@ -1006,6 +1025,8 @@ bool rig_flrig::get_tx() {
 		return response.get_int() != 0;
 	}
 	else {
+		error(ST_ERROR, error_message("get_tx").c_str());
+		error_ = true;
 		return false;
 	}
 }

@@ -406,7 +406,7 @@ void report_tree::copy_map_to_tree(report_map_t* this_map, Fl_Tree_Item* item, i
 	}
 	// Only display this on top-level map
 	if (item == nullptr) {
-		status_->misc_status(ST_OK, "LOG: Display done!");
+		status_->misc_status(ST_OK, "LOG: Report display done!");
 	}
 }
 
@@ -485,7 +485,7 @@ void report_tree::create_map() {
 		delete_map(&map_);
 		return;
 	}
-	status_->misc_status(ST_NOTE, "LOG: Analysis started");
+	status_->misc_status(ST_NOTE, "LOG: Report selection started");
 	status_->progress(get_book()->size(), OT_REPORT, "records");
 	// Get current selected record so we can find all records with the same report item
 	record* selection = book_->get_record();
@@ -530,7 +530,7 @@ void report_tree::create_map() {
 		status_->progress(i, OT_REPORT);
 	}
 	status_->progress(get_book()->size(), OT_REPORT);
-	status_->misc_status(ST_OK, "LOG: Analysis done!");
+	status_->misc_status(ST_OK, "LOG: Report selection done!");
 }
 
 // Delete the map in a specific map entry
@@ -587,7 +587,7 @@ void report_tree::populate_tree(bool activate) {
 			// Copy the map to the tree - starting by adding top level entries to the root
 			// This then iterates down to the record entries
 			// Initialise progress bar
-			status_->misc_status(ST_NOTE, "LOG: Display started");
+			status_->misc_status(ST_NOTE, "LOG: Report display started");
 			status_->progress(map_.next_entry->size(), OT_REPORT, "entries");
 			copy_map_to_tree(map_.next_entry, nullptr, count_records, num_eqsl, num_lotw, num_card, num_any);
 			
@@ -642,7 +642,7 @@ void report_tree::populate_tree(bool activate) {
 
 // Update the status pane
 void report_tree::update_status() {
-	string text = "LOG: ";
+	string text = "LOG: Report contents: ";
 	bool error = false;
 	// Select on report type - add the description
 	switch (filter_) {
@@ -701,31 +701,31 @@ void report_tree::add_category(int level, report_cat_t category) {
 	case 1:
 		// Changing first level - clear others
 		if (map_order_.size() > 1) {
-			status_->misc_status(ST_WARNING, "LOG: Changing level 1 removes levels 2 and 3");
+			status_->misc_status(ST_WARNING, "LOG: Report: changing level 1 removes levels 2 and 3");
 		} 
 		break;
 	case 2:
 		// Changing second level - see status messages for action
 		if (map_order_.size() == 0) {
-			status_->misc_status(ST_ERROR, "LOG: Cannot change level 2 as level 1 has not been defined");
+			status_->misc_status(ST_ERROR, "LOG: Report: cannot change level 2 as level 1 has not been defined");
 			valid = false;
 		}
 		else if (map_order_[0] & category) {
-			status_->misc_status(ST_ERROR, "LOG: Cannot have the same category at more than 1 level");
+			status_->misc_status(ST_ERROR, "LOG: Report: cannot have the same category at more than 1 level");
 			valid = false;
 		}
 		else if (map_order_.size() > 2) {
-			status_->misc_status(ST_WARNING, "LOG: Changing level 2 removes level 3");
+			status_->misc_status(ST_WARNING, "LOG: Report: changing level 2 removes level 3");
 		}
 		break;
 	case 3:
 		// Changing third level - see status messages for action
 		if (map_order_.size() < 2) {
-			status_->misc_status(ST_ERROR, "LOG: Cannot change level 3 as level 2 has not been defined");
+			status_->misc_status(ST_ERROR, "LOG: Report: cannot change level 3 as level 2 has not been defined");
 			valid = false;
 		}
 		else if (map_order_[0] & category || map_order_[1] & category) {
-			status_->misc_status(ST_ERROR, "LOG: Cannot have the same category at more than 1 level");
+			status_->misc_status(ST_ERROR, "LOG: Report: cannot have the same category at more than 1 level");
 			valid = false;
 		}
 		break;

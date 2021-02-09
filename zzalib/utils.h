@@ -42,7 +42,7 @@ namespace zzalib {
 	// Tip display - 2 seconds
 	const double TIP_SHOW = 2.0;
 	// Library version
-	const string LIBRARY_VERSION = "1.0.34";
+	const string LIBRARY_VERSION = "1.0.35";
 
 	// Split a text line into separate "words" on separator
 	void split_line(const string& line, vector<string>& words, const char separator);

@@ -268,7 +268,7 @@ namespace zzalib {
 		// The RPC reader/writer
 		rpc_handler* rpc_handler_;
 		// Error code
-		unsigned long error_code_;
+		bool error_;
 
 	};
 
