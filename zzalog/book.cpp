@@ -1132,6 +1132,12 @@ bool book::new_record() { return new_record_; }
 // Set save_enabled_ (and save if modified)
 void book::enable_save(bool enable) {
 	save_enabled_ = enable;
+	if (enable) {
+		status_->misc_status(ST_DEBUG, "LOG: Enabling log-book save!");
+	}
+	else {
+		status_->misc_status(ST_DEBUG, "LOG: Disabling log-book save!");
+	}
 #ifndef _DEBUG
 	if (enable && !read_only_) {
 		store_data();

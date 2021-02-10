@@ -585,7 +585,7 @@ void import_data::finish_update(bool merged /*= true*/) {
 		}
 		if (number_added_ == 1) {
 			// One new record added from whatever source, send latest QSO to QSL servers
-			if (!upload_qso(last_added_number_)) {
+			if (!book_->upload_qso(last_added_number_)) {
 				status_->misc_status(ST_WARNING, "IMPORT: Upload to one or more QSL sites failed");
 			}
 		}
