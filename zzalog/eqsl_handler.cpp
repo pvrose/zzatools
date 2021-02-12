@@ -58,8 +58,6 @@ void eqsl_handler::enqueue_request(record_num_t record_num, bool force /*=false*
 		char message[512];
 		sprintf(message, "EQSL: %d Card requests pending", request_queue_.size());
 		status_->misc_status(ST_NOTE, message);
-		save_enabled_ = book_->save_enabled();
-		book_->enable_save(false);
 	}
 }
 
@@ -158,8 +156,6 @@ void eqsl_handler::cb_timer_deq(void* v) {
 			else {
 				status_->misc_status(ST_OK, "EQSL: Card fetching done!");
 			}
-			// Re-enable saving
-			book_->enable_save(that->save_enabled_);
 		}
 	}
 }

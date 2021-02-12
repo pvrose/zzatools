@@ -68,6 +68,7 @@ import_data::import_data() :
 	next_logging_mode_ = LM_OFF_AIR;
 	timer_period_ = nan("");
 	last_added_number_ = 0;
+	old_enable_save_ = true;
 }
 
 // Destructor
@@ -759,9 +760,6 @@ bool import_data::download_data(import_data::update_mode_t server) {
 	// Tidy up import book - complete any existing update
 	stop_update(LM_IMPORTED, false);
 	while (!update_complete()) Fl::wait();
-	// Disable saving each record
-	old_enable_save_ = book_->save_enabled();
-	book_->enable_save(false);
 	switch (server) {
 	case EQSL_UPDATE: 
 		// Fetch inbox from eQSL.cc into local stream, stop fetching eQSL cards until merge complete
@@ -795,6 +793,7 @@ bool import_data::download_data(import_data::update_mode_t server) {
 		adif.seekg(0, adif.beg);
 		// Load the stream
 		load_stream(adif, server);
+
 	}
 	else {
 		update_mode_ = NONE;

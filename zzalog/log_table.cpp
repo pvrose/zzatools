@@ -53,6 +53,9 @@ log_table::log_table(int X, int Y, int W, int H, const char* label, field_orderi
 	application_ = FO_MAINLOG;
 	rows_per_page_ = 0;
 	order_ = FIRST_TO_LAST;
+	tip_window_ = nullptr;
+	tip_root_x_ = 0;
+	tip_root_y_ = 0;
 
 	// These are static, but will get to the same value each time
 	Fl_Preferences user_settings(settings_, "User Settings");
@@ -249,6 +252,16 @@ void log_table::cb_menu(Fl_Widget* w, void* v) {
 	w->hide();
 }
 
+// Remove the tip_window
+// v points to this 
+void log_table::cb_tip_timer(void* v) {
+	log_table* that = (log_table*)v;
+	if (that->tip_window_) {
+		Fl::delete_widget(that->tip_window_);
+		that->tip_window_ = nullptr;
+	}
+}
+
 // Copy the data from the edit input, and start a new edit input to the left, right, above or below
 void log_table::edit_save(edit_input::edit_exit_t exit_type) {
 	// Deselect row being edited
@@ -426,6 +439,16 @@ int log_table::handle(int event) {
 			return true;
 		}
 		break;
+	case FL_MOVE:
+		// If we have moved more than 5 pixels away from where the tip windows is displayed - remove it
+		if (tip_window_) {
+			if (abs(last_rootx_ - tip_root_x_) > 10 || abs(last_rooty_ - tip_root_y_) > 10) {
+				Fl::delete_widget(tip_window_);
+				tip_window_ = nullptr;
+				Fl::remove_timeout(cb_tip_timer);
+				return true;
+			}
+		}
 	}
 	// We haven't handled the event
 	return Fl_Table_Row::handle(event);
@@ -775,9 +798,17 @@ void log_table::describe_cell(int item, int col) {
 		}
 	}
 	// display it in a window that will time-out. Position the window where the mouse clicked
-	Fl_Window* tw = ::tip_window(tip, last_rootx_, last_rooty_);
+	if (tip_window_) {
+		Fl::remove_timeout(cb_tip_timer);
+		Fl::delete_widget(tip_window_);
+		tip_window_ = nullptr;
+	}
+	// Remember tip position
+	tip_root_x_ = last_rootx_;
+	tip_root_y_ = last_rooty_;
+	tip_window_ = ::tip_window(tip, tip_root_x_, tip_root_y_);
 	// Set a timeout to remove the tip window
-	Fl::add_timeout(Fl_Tooltip::delay(), cb_timer_tip, tw);
+	Fl::add_timeout(Fl_Tooltip::delay(), cb_tip_timer, this);
 }
 
 // Column header was double clicked - if it was for a date/time field reverse direction of display

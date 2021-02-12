@@ -60,6 +60,8 @@ namespace zzalog {
 		};
 		// call back on endit menu
 		static void cb_menu(Fl_Widget* w, void* v);
+		// call back for tooltip
+		static void cb_tip_timer(void* v);
 		
 
 		// Read fields
@@ -115,6 +117,11 @@ namespace zzalog {
 		// Table font and size
 		static Fl_Font font_;
 		static Fl_Fontsize fontsize_;
+		// Tooltip window for explaining field contents
+		Fl_Window* tip_window_;
+		// Tooltip position
+		int tip_root_x_;
+		int tip_root_y_;
 	};
 
 }
