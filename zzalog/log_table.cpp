@@ -252,16 +252,6 @@ void log_table::cb_menu(Fl_Widget* w, void* v) {
 	w->hide();
 }
 
-// Remove the tip_window
-// v points to this 
-void log_table::cb_tip_timer(void* v) {
-	log_table* that = (log_table*)v;
-	if (that->tip_window_) {
-		Fl::delete_widget(that->tip_window_);
-		that->tip_window_ = nullptr;
-	}
-}
-
 // Copy the data from the edit input, and start a new edit input to the left, right, above or below
 void log_table::edit_save(edit_input::edit_exit_t exit_type) {
 	// Deselect row being edited
@@ -440,12 +430,11 @@ int log_table::handle(int event) {
 		}
 		break;
 	case FL_MOVE:
-		// If we have moved more than 5 pixels away from where the tip windows is displayed - remove it
+		// If we have moved more than 10 pixels away from where the tip windows is displayed - remove it
 		if (tip_window_) {
 			if (abs(last_rootx_ - tip_root_x_) > 10 || abs(last_rooty_ - tip_root_y_) > 10) {
 				Fl::delete_widget(tip_window_);
 				tip_window_ = nullptr;
-				Fl::remove_timeout(cb_tip_timer);
 				return true;
 			}
 		}
@@ -799,16 +788,14 @@ void log_table::describe_cell(int item, int col) {
 	}
 	// display it in a window that will time-out. Position the window where the mouse clicked
 	if (tip_window_) {
-		Fl::remove_timeout(cb_tip_timer);
 		Fl::delete_widget(tip_window_);
 		tip_window_ = nullptr;
 	}
 	// Remember tip position
-	tip_root_x_ = last_rootx_;
-	tip_root_y_ = last_rooty_;
+	tip_root_x_ = last_rootx_ - 5;
+	tip_root_y_ = last_rooty_ - 5;
 	tip_window_ = ::tip_window(tip, tip_root_x_, tip_root_y_);
-	// Set a timeout to remove the tip window
-	Fl::add_timeout(Fl_Tooltip::delay(), cb_tip_timer, this);
+	tip_window_->show();
 }
 
 // Column header was double clicked - if it was for a date/time field reverse direction of display

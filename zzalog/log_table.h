@@ -60,9 +60,7 @@ namespace zzalog {
 		};
 		// call back on endit menu
 		static void cb_menu(Fl_Widget* w, void* v);
-		// call back for tooltip
-		static void cb_tip_timer(void* v);
-		
+	
 
 		// Read fields
 		void get_fields();
