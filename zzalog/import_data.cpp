@@ -302,7 +302,11 @@ void import_data::update_book() {
 	else {
 		// Prevent view update with every record imported
 		inhibit_view_update_ = true;
-		old_enable_save_ = book_->save_enabled();
+		if (!update_in_progress_) {
+			// This is the first time through this method - save the current state of save enabled
+			// If we allow this to happen each time we end up with it completely disabled
+			old_enable_save_ = book_->save_enabled();
+		}
 		book_->enable_save(false);
 		// Clear flags
 		update_in_progress_ = false;
