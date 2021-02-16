@@ -37,13 +37,14 @@ lotw_handler::~lotw_handler()
 
 // Export extracted records, sign them and upload to LotW
 bool lotw_handler::upload_lotw_log(book* book) {
+	status_->misc_status(ST_DEBUG, "LOTW: uploading extracted data");
 	fl_cursor(FL_CURSOR_WAIT);
 	// Get LotW settings
 	Fl_Preferences qsl_settings(settings_, "QSL");
 	Fl_Preferences lotw_settings(qsl_settings, "LotW");
 	char* filename;
 	string new_filename = "";
-	bool ok;
+	bool ok = true;
 	lotw_settings.get("Export File", filename, "");
 	// Open a file chooser to get file to export to - allows user to cancel upload
 	Fl_Native_File_Chooser* chooser = nullptr;
@@ -65,6 +66,9 @@ bool lotw_handler::upload_lotw_log(book* book) {
 	}
 	else {
 		// Update settings
+		char message[256];
+		snprintf(message, 256, "LOTW: Writing file %s", new_filename.c_str());
+		status_->misc_status(ST_DEBUG, message);
 		lotw_settings.set("Export File", new_filename.c_str());
 		// Set the fields to export 
 		set<string> fields;
@@ -99,7 +103,7 @@ bool lotw_handler::upload_lotw_log(book* book) {
 #endif
 				if (chooser->show() != 0) {
 					// No executable found - cancel upload
-					status_->misc_status(ST_ERROR, "LOTW: TQSL Execuatble not found, upload cancelled");
+					status_->misc_status(ST_ERROR, "LOTW: TQSL Executable not found, upload cancelled");
 					ok = false;
 				}
 				else {

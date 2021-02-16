@@ -561,7 +561,9 @@ void extract_data::upload() {
 		}
 		break;
 	case LOTW:
-		lotw_handler_->upload_lotw_log(this);
+		if (lotw_handler_->upload_lotw_log(this)) {
+			status_->misc_status(ST_OK, "EXTRACT: LotW upload successful!");
+		}
 		break;
 	case CLUBLOG:
 		if (club_handler_->upload_log(this)) {
