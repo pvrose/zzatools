@@ -920,6 +920,7 @@ void menu::cb_mi_log_radio(Fl_Widget* w, void* v) {
 			import_data_->stop_update(that->logging(), false);
 			while (!import_data_->update_complete()) Fl::wait(0);
 			that->logging(LM_OFF_AIR);
+			// Scratchpad updates band_view
 			scratchpad_->update();
 		}
 		break;

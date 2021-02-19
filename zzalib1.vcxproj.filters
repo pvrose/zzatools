@@ -61,6 +61,9 @@
     <ClInclude Include="zzalib\socket_server.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="zzalib\versionh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="zzalib\rig_if.cpp" />

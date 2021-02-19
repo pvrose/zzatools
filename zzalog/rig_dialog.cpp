@@ -50,6 +50,8 @@ rig_dialog::rig_dialog(int X, int Y, int W, int H, const char* label) :
 	, show_all_ports_(nullptr)
 	, all_ports_(false)
 	, existing_ports_(nullptr)
+	, swr_warn_level_(1.5)
+	, swr_error_level_(2.0)
 {
 	actual_rigs_.clear();
 	for (int i = 0; i < 4; i++) ip_address_[i] = 0;
@@ -77,13 +79,13 @@ void rig_dialog::create_form(int X, int Y) {
 	const int W1_POLL = WRADIO + WLABEL;
 	const int C2_POLL = C2_RIG;
 	const int W2_POLL = WSMEDIT;
-	const int W_POLL = C2_POLL + W2_POLL + GAP - X_POLL; 
+	const int W_POLL = C2_POLL + W2_POLL + GAP - X_POLL;
+	const int X_SWR = X + XLEFT;
+	const int C2_SWR = C2_RIG;
+	const int W2_SWR = WSMEDIT;
 	const int WALL = max(W_RIG, W_POLL);
 
-	const int Y_OMNI = Y + YTOP;
-	const int Y1_OMNI = Y_OMNI + GAP;
-	const int H_OMNI = HTEXT + GAP + GAP;
-	const int Y_HAMLIB = Y_OMNI + H_OMNI;
+	const int Y_HAMLIB = Y + YTOP;
 	const int Y1_HAMLIB = Y_HAMLIB + GAP;
 	const int H_HAMLIB = (4 * HTEXT) + GAP + GAP;
 	const int Y_FLRIG = Y_HAMLIB + H_HAMLIB;
@@ -94,10 +96,14 @@ void rig_dialog::create_form(int X, int Y) {
 	const int H_NORIG = HTEXT + GAP + GAP;
 	const int Y_POLL = Y_NORIG + H_NORIG;
 	const int Y1_POLL = Y_POLL + GAP;
-	const int H_POLL = GAP + (3 * HTEXT) + GAP;
+	const int H_POLL = (3 * HTEXT) + GAP;
+
+	const int Y_SWR = Y_POLL + H_POLL;
+	const int Y1_SWR = Y_SWR + GAP;
+	const int H_SWR = (3 * HTEXT) + GAP;
 
 	// Group for rig radio buttons: selects the handler type
-	Fl_Group* rig_if_grp = new Fl_Group(X_RIG_RAD, Y_OMNI, WRADIO + WLABEL + GAP, H_OMNI + H_HAMLIB + H_FLRIG + H_NORIG);
+	Fl_Group* rig_if_grp = new Fl_Group(X_RIG_RAD, Y_HAMLIB, WRADIO + WLABEL + GAP, H_HAMLIB + H_FLRIG + H_NORIG);
 	handler_radio_params_ = new radio_param_t[4];
 
 	// Radio - Select Hamlib
@@ -273,6 +279,38 @@ void rig_dialog::create_form(int X, int Y) {
 	poll_slow_spin->callback(cb_value<Fl_Spinner, double>, &slow_poll_interval_);
 	poll_slow_spin->when(FL_WHEN_CHANGED);
 	poll_grp->end();
+
+	Fl_Group* swr_grp = new Fl_Group(X_SWR, Y_SWR, WALL, H_SWR, "SWR Alarm values");
+	swr_grp->labelsize(FONT_SIZE);
+	swr_grp->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
+	swr_grp->box(FL_DOWN_FRAME);
+	// Spinner to select warning value
+	swr_warn_ = new Fl_Spinner(C2_SWR, Y_SWR + HTEXT, W2_SWR, HTEXT, "Warning");
+	swr_warn_->align(FL_ALIGN_LEFT);
+	swr_warn_->labelsize(FONT_SIZE);
+	swr_warn_->textsize(FONT_SIZE);
+	swr_warn_->tooltip("Select the SWR value when a warning message will be displayed");
+	swr_warn_->type(FL_FLOAT_INPUT);
+	swr_warn_->minimum(1.3);
+	swr_warn_->maximum(3.0);
+	swr_warn_->step(0.1);
+	swr_warn_->value(swr_warn_level_);
+	swr_warn_->callback(cb_ctr_warn, &swr_warn_level_);
+	swr_warn_->when(FL_WHEN_CHANGED);
+
+	// Spinner to select warning value
+	swr_error_ = new Fl_Spinner(C2_SWR, Y_SWR + HTEXT + HTEXT, W2_SWR, HTEXT, "Error");
+	swr_error_->align(FL_ALIGN_LEFT);
+	swr_error_->labelsize(FONT_SIZE);
+	swr_error_->textsize(FONT_SIZE);
+	swr_error_->tooltip("Select the SWR value when an error message will sound");
+	swr_error_->type(FL_FLOAT_INPUT);
+	swr_error_->minimum(swr_warn_level_);
+	swr_error_->maximum(5.0);
+	swr_error_->step(0.1);
+	swr_error_->value(swr_error_level_);
+	swr_error_->callback(cb_value<Fl_Spinner, double>, &swr_error_level_);
+	swr_error_->when(FL_WHEN_CHANGED);
 
 	Fl_Group::end();
 }
@@ -456,6 +494,19 @@ void rig_dialog::cb_bn_all(Fl_Widget* w, void* v) {
 	that->populate_port_choice();
 }
 
+// Changed the SWR wrning level
+// v is a pointer to the warning level
+void rig_dialog::cb_ctr_warn(Fl_Widget* w, void* v) {
+	// Get the warning level
+	cb_value<Fl_Spinner, double>(w, v);
+	rig_dialog* that = ancestor_view<rig_dialog>(w);
+	// Adjust error value spinner minimum to be the warning and change the value 
+	if (that->swr_error_->value() < that->swr_warn_level_) {
+		that->swr_error_->value(that->swr_warn_level_);
+	}
+	that->swr_error_->minimum(that->swr_warn_level_);
+}
+
 // Get the settings to preload the widget values
 void rig_dialog::load_values() {
 	// Get the handler-independent settings
@@ -518,6 +569,9 @@ void rig_dialog::load_values() {
 	flrig_settings.get("Resource", temp, "/RPC2");
 	ip_resource_ = temp;
 	free(temp);
+	// SWR Settings
+	rig_settings.get("SWR Warning Level", swr_warn_level_, 1.5);
+	rig_settings.get("SWR Error Level", swr_error_level_, 2.0);
 
 }
 
@@ -560,6 +614,9 @@ void rig_dialog::save_values() {
 		flrig_settings.set("Resource", ip_resource_.c_str());
 
 	}
+	// SWR Settings
+	rig_settings.set("SWR Warning Level", swr_warn_level_);
+	rig_settings.set("SWR Error Level", swr_error_level_);
 
 	// restart rig interface
 	add_rig_if();

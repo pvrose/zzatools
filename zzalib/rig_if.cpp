@@ -304,25 +304,36 @@ void rig_if::update_clock() {
 	}
 }
 
+// Check SWR value - error if > error level, warning if > warning level (got from settings)
+// Only check once per transmission period
 bool  rig_if::check_swr() {
+	Fl_Preferences rig_settings(settings_, "Rig");
+	double warn_level;
+	double error_level;
+	// SWR Settings
+	rig_settings.get("SWR Warning Level", warn_level, 1.5);
+	rig_settings.get("SWR Error Level", error_level, 2.0);
 	double swr = swr_meter();
-	if (swr > 1.5) {
-		if (!reported_hi_swr_) {
-			char message[200];
-			snprintf(message, 200, "RIG: SWR is %.1f", swr);
-			error(ST_ERROR, message);
-			reported_hi_swr_ = true;
-		}
+	if (swr > error_level && !reported_hi_swr_) {
+		char message[200];
+		snprintf(message, 200, "RIG: SWR is %.1f", swr);
+		error(ST_ERROR, message);
+		reported_hi_swr_ = true;
 		return false;
+	}
+	else if (swr > warn_level) {
+		char message[200];
+		snprintf(message, 200, "RIG: SWR is %.1f", swr);
+		error(ST_WARNING, message);
+		return true;
 	}
 	if (have_freq_to_band_ && freq_to_band_(tx_frequency()) != previous_band_) {
 		previous_band_ = freq_to_band_(tx_frequency());
 		reported_hi_swr_ = false;
 	}
-	else {
+	if (!get_tx()) {
 		reported_hi_swr_ = false;
 	}
-	reported_hi_swr_ = false;
 	return true;
 }
 

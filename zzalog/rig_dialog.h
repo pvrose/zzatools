@@ -11,6 +11,7 @@
 #include <FL/Fl_Widget.H>
 #include <FL/Fl_Choice.H>
 #include <FL/Fl_Int_Input.H>
+#include <FL/Fl_Spinner.H>
 
 using namespace std;
 using namespace zzalib;
@@ -65,6 +66,8 @@ namespace zzalog {
 		static void cb_ch_over(Fl_Widget* w, void* v);
 		// Callback all ports
 		static void cb_bn_all(Fl_Widget* w, void* v);
+		// Callback - SWR warning level
+		static void cb_ctr_warn(Fl_Widget* w, void* v);
 
 		// attributes
 	protected:
@@ -114,6 +117,9 @@ namespace zzalog {
 		// The available ports
 		bool all_ports_;
 		string* existing_ports_;
+		// SWR warning and error levels
+		double swr_warn_level_;
+		double swr_error_level_;
 
 		// The handler radio button parameters
 		radio_param_t* handler_radio_params_;
@@ -129,6 +135,8 @@ namespace zzalog {
 		Fl_Choice* rig_choice_;
 		Fl_Check_Button* override_check_;
 		Fl_Check_Button* show_all_ports_;
+		Fl_Spinner* swr_warn_;
+		Fl_Spinner* swr_error_;
 
 	};
 

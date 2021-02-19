@@ -37,6 +37,7 @@ extern rig_if* rig_if_;
 extern band_view* band_view_;
 extern extract_data* extract_records_;
 extern void add_scratchpad();
+extern double prev_freq_;
 
 // Constructor for scratchpad editor
 spad_editor::spad_editor(int x, int y, int w, int h) :
@@ -475,6 +476,7 @@ void scratchpad::cb_ip_freq(Fl_Widget* w, void* v) {
 		}
 		// Update views
 		band_view_->update(freq);
+		prev_freq_ = freq;
 		tabbed_forms_->update_views(nullptr, HT_MINOR_CHANGE, book_->size() - 1);
 	}
 }
@@ -557,7 +559,11 @@ void scratchpad::update() {
 		ip_freq_->value(prev_record->item("FREQ").c_str());
 		ip_power_->value(prev_record->item("TX_PWR").c_str());
 		ch_mode_->value(ch_mode_->find_index(prev_record->item("MODE", true).c_str()));
-		if (band_view_ && prev_record->item_exists("FREQ")) band_view_->update(stod(prev_record->item("FREQ")) * 1000.0);
+		if (band_view_ && prev_record->item_exists("FREQ")) {
+			double freq = stod(prev_record->item("FREQ")) * 1000.0;
+			band_view_->update(freq);
+			prev_freq_ = freq;
+		}
 	}
 	else {
 		// No default

@@ -33,6 +33,7 @@
     <ClInclude Include="zzalib\socket_server.h" />
     <ClInclude Include="zzalib\url_handler.h" />
     <ClInclude Include="zzalib\utils.h" />
+    <ClInclude Include="zzalib\versionh.h" />
     <ClInclude Include="zzalib\win_dialog.h" />
     <ClInclude Include="zzalib\xml_element.h" />
     <ClInclude Include="zzalib\xml_reader.h" />

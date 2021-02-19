@@ -123,6 +123,8 @@ bool initialised_ = false;
 time_t session_start_  = (time_t)0;
 // Close caused by an SEVERE or FATAL error
 bool close_by_error_ = false;
+// Previous frequency
+double prev_freq_ = 0.0;
 
 // This callback intercepts the close command and performs checks and tidies up
 // Updates recent files settings
@@ -419,9 +421,13 @@ void add_book(char* arg) {
 void cb_rig_timer() {
 	// There may be a race hazard involving flrig and zzalib when I try and close zzalib
 	if (!closing_) {
-		// Band view may not have been created yet
+		// Band view may not have been created yet - only update if frequency has changed to remove annoying flicker
 		if (band_view_) {
-			band_view_->update(rig_if_->tx_frequency() / 1000.0);
+			double frequency = rig_if_->tx_frequency() / 1000.0;
+			if (frequency != prev_freq_) {
+				band_view_->update(frequency);
+			}
+			prev_freq_ = frequency;
 		}
 		// Update scratchpad
 		string freq = rig_if_->get_frequency(true);

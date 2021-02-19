@@ -4,6 +4,7 @@
 #include "icons.h"
 #include "version.h"
 #include "../zzalib/utils.h"
+#include "../zzalib/versionh.h"
 
 #include "hamlib/rig.h"
 
