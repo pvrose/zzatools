@@ -299,6 +299,21 @@ bool book::store_data(string filename, bool force, set<string>* fields) {
 		if (book_type_ == OT_MAIN || book_type_ == OT_EXTRACT) {
 			// can only write out main log or extracted records
 			save_in_progress_ = true;
+			// Check we are not in the middle of modifying a record 
+			if (new_record()) {
+				// Clear this first to avoid iteration through this question
+				fl_beep(FL_BEEP_QUESTION);
+				switch (fl_choice("You are currently adding a record? Save or Quit?", "Save?", "Quit?", nullptr)) {
+				case 0:
+					break;
+				case 1:
+					// Quit - delete any new record
+					delete_record(new_record());
+					break;
+				}
+				new_record_ = false;
+			}
+
 			// First parse and validate if necessary
 			if (modified() == true || force) {
 				// Only write out if modified or force is set
@@ -420,6 +435,7 @@ bool book::store_data(string filename, bool force, set<string>* fields) {
 				if (ok && book_type_ == OT_MAIN) {
 					// As file has been stored, clear modified flag
 					modified(false);
+					modified_record(false);
 					// File was closed in the fail paths
 					file.close();
 					// Update file name on window label

@@ -14,6 +14,8 @@
 #endif
 
 #include <FL/Fl.H>
+#include <FL/Fl_Preferences.H>
+#include <FL/fl_ask.H>
 
 using namespace zzalog;
 using namespace zzalib;
@@ -22,6 +24,7 @@ extern status* status_;
 extern import_data* import_data_;
 extern void cb_error_message(status_t level, const char* message);
 extern menu* menu_;
+extern Fl_Preferences* settings_;
 
 wsjtx_handler* wsjtx_handler::that_ = nullptr;
 
@@ -32,10 +35,18 @@ wsjtx_handler::wsjtx_handler()
 	that_ = this;
 	server_ = nullptr;
 	run_server();
-	last_decode_time_ = 0;
 	new_heartbeat_ = false;
 	status_rcvd_ = 0;
-	decodes_rcvd_ = 0;
+	// Get logged callsign from settings
+	Fl_Preferences station_settings(settings_, "Stations");
+	char* current_stn;
+	station_settings.get("Current", current_stn, "");
+	Fl_Preferences current_settings(station_settings, current_stn);
+	char* temp;
+	current_settings.get("Callsign", temp, "");
+	my_call_ = temp;
+	free(temp);
+	free(current_stn);
 }
 
 
@@ -150,96 +161,96 @@ int wsjtx_handler::handle_log(stringstream& ss) {
 
 // handle decode
 int wsjtx_handler::handle_decode(stringstream& ss) {
-	string sv = get_utf8(ss);
-	bool bv = get_bool(ss);
-	uint32_t iv = get_uint32(ss);
-	if (iv != last_decode_time_) {
-		double seconds = last_decode_time_ / 1000.0;
-		unsigned int minutes = (unsigned int)seconds / 60;
-		seconds = seconds - (minutes * 60.0);
-		unsigned int hours = minutes / 60;
-		minutes = minutes - (hours * 60);
-		char message[128];
-		snprintf(message, 128, "WSJT-X: Received %d decodes at time %02d:%02d:%02.3f.", decodes_rcvd_, hours, minutes, seconds);
-		status_->misc_status(ST_LOG, message);
-		last_decode_time_ = iv;
-		decodes_rcvd_ = 1;
+	decode_dg decode;
+	decode.id = get_utf8(ss);
+	decode.new_decode = get_bool(ss);
+	decode.time = get_uint32(ss);
+	decode.snr = get_uint32(ss);
+	decode.d_time = get_double(ss);
+	decode.d_freq = get_uint32(ss);
+	decode.mode = get_utf8(ss);
+	decode.message = get_utf8(ss);
+	decode.low_confidence = get_bool(ss);
+	decode.off_air = get_bool(ss);
+	// display ID, time and message
+	double seconds = decode.time / 1000.0;
+	unsigned int minutes = (unsigned int)seconds / 60;
+	seconds = seconds - (minutes * 60.0);
+	unsigned int hours = minutes / 60;
+	minutes = minutes - (hours * 60);
+	char message[256];
+	snprintf(message, 256, "WSJT-X: Decode %s %02d:%02d:%02.3f: %s", decode.id.c_str(), hours, minutes, seconds, decode.message.c_str());
+	// Change display if addressed to user
+	vector<string> words;
+	split_line(decode.message, words, ' ');
+	if (words[0] == my_call_) {
+		// Display in status bar and beep if message addressed to user
+		status_->misc_status(ST_WARNING, message);
+		fl_beep(FL_BEEP_NOTIFICATION);
 	}
 	else {
-		decodes_rcvd_++;
+		// Just write to status log
+		status_->misc_status(ST_LOG, message);
 	}
-	iv = get_uint32(ss);
-	double dv = get_double(ss);
-	iv = get_uint32(ss);
-	sv = get_utf8(ss);
-	sv = get_utf8(ss);
-	bv = get_bool(ss);
-	bv = get_bool(ss);
 	return 0;
 }
 
 // handle status
 int wsjtx_handler::handle_status(stringstream& ss) {
-	if (new_heartbeat_) {
-		char message[128];
-		snprintf(message, 128, "WSJT-X: Received %d status reports in last heartbeat", status_rcvd_);
-		status_->misc_status(ST_LOG, message);
-		status_rcvd_ = 1;
-		new_heartbeat_ = false;
-	}
-	else {
-		status_rcvd_++;
-	}
-	string id;
+	status_dg status;
 	// ID
-	id = get_utf8(ss);
+	status.id = get_utf8(ss);
 	// Frequency
-	uint64_t freq = get_uint64(ss);
+	status.dial_freq = get_uint64(ss);
 	// Mode
-	id = get_utf8(ss);
+	status.mode = get_utf8(ss);
 	// DX Call
-	id = get_utf8(ss);
-	id = get_utf8(ss);
+	status.dx_call = get_utf8(ss);
 	// Report 
-	id = get_utf8(ss);
+	status.report = get_utf8(ss);
 	// Transmit mode
-	bool bv;
+	status.tx_mode = get_utf8(ss);
 	// Transmit enabled
-	bv = get_bool(ss);
+	status.tx_eanbled = get_bool(ss);
 	// Transmit
-	bv = get_bool(ss);
+	status.transmitting = get_bool(ss);
 	// Decoding
-	bv = get_bool(ss);
-	uint32_t iv;
+	status.decoding = get_bool(ss);
 	// Received frequency - delta from VFO
-	iv = get_uint32(ss);
+	status.rx_offset = get_uint32(ss);
 	// Transmit frequency
-	iv = get_uint32(ss);
+	status.tx_offset = get_uint32(ss);
 	// My call
-	id = get_utf8(ss);
+	status.own_call = get_utf8(ss);
 	// My grid
-	id = get_utf8(ss);
+	status.own_grid = get_utf8(ss);
 	// DX Grid
-	id = get_utf8(ss);
+	status.dx_grid = get_utf8(ss);
 	// Transmit ?
-	bv = get_bool(ss);
+	status.tx_watchdog = get_bool(ss);
 	// Submode
-	id = get_utf8(ss);
+	status.submode = get_utf8(ss);
 	// FAst decode
-	bv = get_bool(ss); 
+	status.fast_mode = get_bool(ss); 
 	// Special operation mode
-	uint8_t i8v = get_uint8(ss); 
-	// ???
-	iv = get_uint32(ss); 
+	status.special_op = get_uint8(ss); 
+	// Frequency tolerance
+	status.freq_tolerance = get_uint32(ss); 
 	// ????
-	iv = get_uint32(ss);
+	status.tx_rx_period = get_uint32(ss);
 	// Configuration name
-	id = get_utf8(ss); 
+	status.config_name = get_utf8(ss); 
+	if (prev_status_.dx_call != status.dx_call) {
+		char message[256];
+		snprintf(message, 256, "WSJT-X: Status %s %s %s %s %d",
+			status.id.c_str(), status.dx_call.c_str(), status.dx_grid.c_str(), status.report.c_str(), status.rx_offset);
+		status_->misc_status(ST_NOTE, message);
+	}
+	prev_status_ = status;
 	return 0;
 }
 
-
-// Get an bool from the first  bytes of dgram 
+// Get an bool from the first byte of dgram 
 bool wsjtx_handler::get_bool(stringstream& ss) {
 	unsigned char c;
 	ss.get((char&)c);
@@ -247,7 +258,7 @@ bool wsjtx_handler::get_bool(stringstream& ss) {
 	return b;
 }
 
-// Get an integer from the first 4 bytes of dgram 
+// Get an integer from the first byte of dgram 
 uint8_t wsjtx_handler::get_uint8(stringstream& ss) {
 	unsigned char c;
 	ss.get((char&)c);

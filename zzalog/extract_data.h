@@ -69,6 +69,8 @@ namespace zzalog {
 		void extract_records();
 		// Generate description extract criterion for use in the header comment
 		string comment();
+		// Short form comment for status log
+		string short_comment();
 		// Swap two records
 		void swap_records(record_num_t record_num_1, record_num_t record_num_2);
 

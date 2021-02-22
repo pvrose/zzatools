@@ -77,6 +77,8 @@ int extract_data::criteria(search_criteria_t criteria, extract_data::extract_mod
 
 // Add all records that match in main log to this log
 void extract_data::extract_records() {
+	status_->misc_status(ST_NOTE, "EXTRACT: Started");
+	status_->misc_status(ST_NOTE, short_comment().c_str());
 	switch (criteria_->combi_mode) {
 	case XM_NEW:
 		// new results - remove existing results
@@ -151,11 +153,16 @@ void extract_data::extract_records() {
 		}
 		break;
 	}
+	char message[100];
+	snprintf(message, 100, "EXTRACT: %d records extracted", size());
+	status_->misc_status(ST_OK, message);
 	navigation_book_ = this;
+
 }
 
 // Repeat the extractions
 void extract_data::reextract() {
+	status_->misc_status(ST_NOTE, "EXTRACT: Re-extracting existing criteria");
 	// Clear the book without deleting the records
 	clear();
 	// For all sets of criteria in the history stack
@@ -168,6 +175,7 @@ void extract_data::reextract() {
 
 // clear criteria
 void extract_data::clear_criteria(bool redraw) {
+	status_->misc_status(ST_NOTE, "EXTRACT: Clearing all criteria");
 	// Clear the book without deleting the records
 	clear();
 	// Clear all the sets of criteria
@@ -275,7 +283,7 @@ string extract_data::comment() {
 			result += "Prefix ";
 			break;
 		case XC_CQZ:
-			result += "CZ Zone ";
+			result += "CQ Zone ";
 			break;
 		case XC_ITUZ:
 			result += "ITU Zone ";
@@ -335,6 +343,81 @@ string extract_data::comment() {
 	}
 	else {
 		result = "No extract criteria are defined.\n";
+	}
+	return result;
+}
+
+// Describe the search criteria so it can be added to the header comment
+string extract_data::short_comment() {
+	string result;
+	if (criteria_) {
+		result = "EXTRACT: ";
+		// And whether results are new, anded or ored
+		switch (criteria_->combi_mode) {
+		case XM_AND:
+			result += "& ";
+			break;
+		case XM_OR:
+			result += "| ";
+			break;
+		}
+		// Only select those which didn't match
+		if (criteria_->negate_results) result += "¬ ";
+		// Add the main condition
+		switch (criteria_->condition) {
+		case XC_DXCC:
+			result += "DX";
+			break;
+		case XC_GEO:
+			result += "PX";
+			break;
+		case XC_CQZ:
+			result += "CQ";
+			break;
+		case XC_ITUZ:
+			result += "ITU";
+			break;
+		case XC_CONT:
+			result += "CONT";
+			break;
+		case XC_SQ2:
+		case XC_SQ4:
+			result += "LOC";
+			break;
+		case XC_CALL:
+			result += "CALL";
+			break;
+		case XC_UNFILTERED:
+			result += "ALL";
+			break;
+		case XC_FIELD:
+			result += criteria_->field_name;
+			break;
+		}
+		if (criteria_->condition != XC_UNFILTERED) {
+			if (criteria_->by_regex) {
+				// Add if using regular expression matching
+				result += "~" + criteria_->pattern;
+			}
+			else {
+				// Or exact matching
+				result += "=" + criteria_->pattern;
+			}
+		}
+		result += " ";
+		if (criteria_->by_dates) {
+			// Date-range restricted
+			result += " (" + criteria_->from_date += ":" + criteria_->to_date + ") ";
+		}
+		// Band and Mode
+		result += "On " + criteria_->band + " " + criteria_->mode + " ";
+		// Confirmation status
+		if (criteria_->confirmed_eqsl) result += "eQSL ";
+		if (criteria_->confirmed_lotw) result += "LotW ";
+		if (criteria_->confirmed_card) result += "Card ";
+	}
+	else {
+		result = "EXTRACT: No criteria are defined.";
 	}
 	return result;
 }

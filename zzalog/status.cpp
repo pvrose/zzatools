@@ -684,8 +684,10 @@ void viewer_window::draw_window() {
 	ch_filter->add("QRZ");
 	ch_filter->add("RIG");
 	ch_filter->add("SCRATCHPAD");
+	ch_filter->add("SOCKET");
 	ch_filter->add("STATUS");
 	ch_filter->add("VALIDATE");
+	ch_filter->add("WSJT-X");
 	ch_filter->add("ZZALOG");
 
 	// Create the text display and set its parameters

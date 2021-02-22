@@ -31,6 +31,80 @@ namespace zzalog {
 
 	protected:
 
+		struct decode_dg {
+			string id;
+			bool new_decode;
+			uint32_t time;
+			int32_t snr;
+			double d_time;
+			uint32_t d_freq;
+			string mode;
+			string message;
+			bool low_confidence;
+			bool off_air;
+
+			decode_dg() {
+				id = "";
+				new_decode = false;
+				time = 0;
+				snr = 0;
+				d_time = 0.0;
+				d_freq = 0;
+				mode = "";
+				message = "";
+				low_confidence = false;
+				off_air = false;
+			}
+		};
+
+		struct status_dg {
+			/*Status        Out       1                      quint32
+				* Id(unique key)        utf8
+				* Dial Frequency(Hz)    quint64
+				* Mode                   utf8
+				* DX call                utf8
+				* Report                 utf8
+				* Tx Mode                utf8
+				* Tx Enabled             bool
+				* Transmitting           bool
+				* Decoding               bool
+				* Rx DF                  quint32
+				* Tx DF                  quint32
+				* DE call                utf8
+				* DE grid                utf8
+				* DX grid                utf8
+				* Tx Watchdog            bool
+				* Sub - mode               utf8
+				* Fast mode              bool
+				* Special Operation Mode quint8
+				* Frequency Tolerance    quint32
+				* T / R Period             quint32
+				* Configuration Name     utf8
+				*
+			*/
+			string id;
+			uint64_t dial_freq;
+			string mode;
+			string dx_call;
+			string report;
+			string tx_mode;
+			bool tx_eanbled;
+			bool transmitting;
+			bool decoding;
+			uint32_t rx_offset;
+			uint32_t tx_offset;
+			string own_call;
+			string own_grid;
+			string dx_grid;
+			bool tx_watchdog;
+			string submode;
+			bool fast_mode;
+			uint8_t special_op;
+			uint32_t freq_tolerance;
+			uint32_t tx_rx_period;
+			string config_name;
+		};
+
 		// Receive a datagram from WSJT-X
 		static int rcv_request(stringstream& os);
 		// Receive a datagram from WSJT-X
@@ -83,14 +157,14 @@ namespace zzalog {
 		uint32_t minimum_schema_ = 2;
 		// Received first datagram
 		bool received_datagram_;
-		// Last decode received
-		uint32_t last_decode_time_;
-		// Number decodes received
-		unsigned int decodes_rcvd_;
 		// New heartbeat received
 		bool new_heartbeat_;
 		// Number status received
 		unsigned int status_rcvd_;
+		// My call
+		string my_call_;
+		// Previous status datagram
+		status_dg prev_status_;
 	};
 
 }
