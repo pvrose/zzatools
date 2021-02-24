@@ -887,10 +887,16 @@ void record_form::cb_bn_edit(Fl_Widget* w, long v) {
 			if (that->parse_all_txt(that->record_2_)) {
 				that->record_table_->set_records(that->record_1_, that->record_2_, nullptr);
 			}
+			else {
+				that->set_selected_image(QI_EQSL);
+			}
 			break;
 		default:
 			if (that->parse_all_txt(that->record_1_)) {
 				that->record_table_->set_records(that->record_1_, that->record_2_, nullptr);
+			}
+			else {
+				that->set_selected_image(QI_EQSL);
 			}
 			break;
 		}
@@ -1356,6 +1362,13 @@ void record_form::set_image_buttons() {
 		card_front_radio_->value(false);
 		card_back_radio_->value(false);
 		gen_card_radio_->value(true);
+		break;
+	default:
+		// Display the generated design for a QSL card label
+		eqsl_radio_->value(false);
+		card_front_radio_->value(false);
+		card_back_radio_->value(false);
+		gen_card_radio_->value(false);
 		break;
 	}
 }
@@ -1879,7 +1892,8 @@ bool record_form::parse_all_txt(record* record) {
 	// Mark QSO incomplete 
 	record->item("QSO_COMPLETE", string("N"));
 	// Draw the text buffer
-	selected_image_ = QI_TEXT;
+	set_selected_image(QI_TEXT);
+	set_image_buttons();
 	draw_image();
 	Fl_Text_Buffer* buffer = new Fl_Text_Buffer;
 	text_display_->buffer(buffer);
@@ -1931,6 +1945,7 @@ bool record_form::parse_all_txt(record* record) {
 	snprintf(message, 100, "LOG: Cannot find contact with %s in WSJT-X text.all file.", their_call.c_str());
 	status_->progress("Did not find record", OT_RECORD);
 	status_->misc_status(ST_WARNING, message);
+	fl_cursor(FL_CURSOR_DEFAULT);
 	return false;
 }
 

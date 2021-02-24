@@ -105,7 +105,6 @@ int wsjtx_handler::handle_default(stringstream& ss, uint32_t type) {
 
 // 
 int wsjtx_handler::handle_hbeat(stringstream& ss) {
-	status_->misc_status(ST_LOG, "WSJT-X: Received heartbeat");
 	new_heartbeat_ = true;
 	send_hbeat();
 	return 0;
@@ -179,18 +178,17 @@ int wsjtx_handler::handle_decode(stringstream& ss) {
 	unsigned int hours = minutes / 60;
 	minutes = minutes - (hours * 60);
 	char message[256];
-	snprintf(message, 256, "WSJT-X: Decode %s %02d:%02d:%02.3f: %s", decode.id.c_str(), hours, minutes, seconds, decode.message.c_str());
+	snprintf(message, 256, "WSJT-X: Decode %02d:%02d:%02f: %s", hours, minutes, seconds, decode.message.c_str());
 	// Change display if addressed to user
 	vector<string> words;
 	split_line(decode.message, words, ' ');
+	// Debug - not trapping my call
+	snprintf(message, 256, "WSJT-X: My call %s DX call %s", my_call_.c_str(), words[0].c_str());
+	status_->misc_status(ST_DEBUG, message);
 	if (words[0] == my_call_) {
 		// Display in status bar and beep if message addressed to user
 		status_->misc_status(ST_WARNING, message);
 		fl_beep(FL_BEEP_NOTIFICATION);
-	}
-	else {
-		// Just write to status log
-		status_->misc_status(ST_LOG, message);
 	}
 	return 0;
 }
@@ -240,10 +238,10 @@ int wsjtx_handler::handle_status(stringstream& ss) {
 	status.tx_rx_period = get_uint32(ss);
 	// Configuration name
 	status.config_name = get_utf8(ss); 
-	if (prev_status_.dx_call != status.dx_call) {
+	if (prev_status_.dx_call != status.dx_call && status.dx_call != "" && status.dx_call != "(null)") {
 		char message[256];
-		snprintf(message, 256, "WSJT-X: Status %s %s %s %s %d",
-			status.id.c_str(), status.dx_call.c_str(), status.dx_grid.c_str(), status.report.c_str(), status.rx_offset);
+		snprintf(message, 256, "WSJT-X: Status %s(%s) S/N:%sdB RX:%dHz",
+			status.dx_call.c_str(), status.dx_grid.c_str(), status.report.c_str(), status.rx_offset);
 		status_->misc_status(ST_NOTE, message);
 	}
 	prev_status_ = status;
