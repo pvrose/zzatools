@@ -132,21 +132,21 @@ log_table::~log_table()
 
 // callback - called when mouse button is released but also at other times.
 void log_table::cb_tab_log(Fl_Widget* w, void* v) {
-	// Get the row and field clicked
+	// Get the item number and field clicked
 	log_table* that = (log_table*)w;
 	int row = that->callback_row();
 	record_num_t item_num = that->order_ == LAST_TO_FIRST ? that->my_book_->size() - 1 - row : row;
 	int col = that->callback_col();
 	switch (that->callback_context()) {
 	case Fl_Table::CONTEXT_CELL:
-		// Confirm that it is the button being released
-		// tell all views that selection has changed
+		// Mouse clicked within the cell
 		switch (Fl::event()) {
 		case FL_RELEASE:
-			// Select the row clicked
+			// Select the item at the row that was clicked
 			that->my_book_->selection(item_num, HT_SELECTED, that);
 			switch (that->last_button_) {
 			case FL_LEFT_MOUSE:
+				// Tidy up any edit in progress
 				that->done_edit(false);
 				// Left button - double click edit cell
 				if (Fl::event_clicks()) {
@@ -167,6 +167,7 @@ void log_table::cb_tab_log(Fl_Widget* w, void* v) {
 		}
 		break;
 	case Fl_Table::CONTEXT_COL_HEADER:
+		// Column header clicked - conditionally sorts the display
 		that->done_edit(false);
 		if (Fl::event() == FL_PUSH && Fl::event_button() == FL_LEFT_MOUSE && Fl::event_clicks()) {
 			// Left button double click on column header
@@ -174,6 +175,7 @@ void log_table::cb_tab_log(Fl_Widget* w, void* v) {
 		}
 		break;
 	case Fl_Table::CONTEXT_RC_RESIZE:
+		// Row or column resized
 		that->done_edit(false);
 		if (Fl::event() == FL_DRAG && Fl::event_button() == FL_LEFT_MOUSE && that->is_interactive_resize()) {
 			// A row or column has been resized
@@ -191,7 +193,6 @@ void log_table::cb_input(Fl_Widget* w, void* v) {
 
 // Callback when right click in edit_menu_ - convert selected text to upper, lower or mixed-case
 // Also called for OK and Cancel buttons and on certain keyboard events
-// TODO - Properly handle conversion of multi-byte characters
 void log_table::cb_menu(Fl_Widget* w, void* v) {
 	// Get the enclosing log_table
 	log_table* that = ancestor_view<log_table>(w);
@@ -200,25 +201,30 @@ void log_table::cb_menu(Fl_Widget* w, void* v) {
 	unsigned int l = strlen(src);
 	bool mixed_upper;
 	bool prev_upper;
-	int len;
-	// Destination string should be upto 3 times the length of the source
+	int num_utf8_bytes;
+	// Destination string could be upto 3 times the length of the source
 	char* dst = new char[l * 3];
 	memset(dst, 0, l * 3);
 	char* dst2 = dst;
 	// Depending on the menu item pressed convert case appropriately
 	switch ((edit_menu_t)(long)v) {
 	case UPPER:
+		// Convert entire string to upper case
 		fl_utf_toupper((unsigned char*)src, l, dst);
 		break;
 	case LOWER:
+		// Convert entire string to lower case
 		fl_utf_tolower((unsigned char*)src, l, dst);
 		break;
 	case MIXED:
 		mixed_upper = true;
 		prev_upper = true;
 		for (unsigned int i = 0; i < l; ) {
-			unsigned int ucs = fl_utf8decode(src + i, src + l, &len);
-			i += len;
+			// Get the next UTF-8 character 
+			unsigned int ucs = fl_utf8decode(src + i, src + l, &num_utf8_bytes);
+			// Step to the next UTF-8 character
+			i += num_utf8_bytes;
+			// Convert case
 			unsigned int new_ucs;
 			if (mixed_upper) {
 				new_ucs = fl_toupper(ucs);
@@ -226,12 +232,13 @@ void log_table::cb_menu(Fl_Widget* w, void* v) {
 			else {
 				new_ucs = fl_tolower(ucs);
 			}
+			// Convert UTF-8 character to bytes, store it and step destination pointer
 			dst += fl_utf8encode(new_ucs, dst);
 			switch (ucs) {
 			case ' ':
 			case '-':
 			case '.':
-				// Allow upper case after some punctuation
+				// Force upper case after some punctuation
 				prev_upper = mixed_upper;
 				mixed_upper = true;
 				break;
@@ -240,6 +247,7 @@ void log_table::cb_menu(Fl_Widget* w, void* v) {
 				mixed_upper = prev_upper;
 				break;
 			default:
+				// Force lower case
 				prev_upper = mixed_upper;
 				mixed_upper = false;
 				break;
@@ -325,6 +333,7 @@ int log_table::handle(int event) {
 	last_button_ = Fl::event_button();
 	last_clicks_ = Fl::event_clicks();
 	int real_event;
+	// Some keyboards share arrow keys and Home/End/PgUp/PgDn - use AltGr to differentiate
 	if (alt_gr_) {
 		switch (Fl::event_key()) {
 		case FL_Left:
@@ -408,7 +417,7 @@ int log_table::handle(int event) {
 			}
 			return true;
 		case FL_Page_Down:
-			// PGDN - Go down one page (--- do. ---) - NB the bang
+			// PGDN - Go down one page
 			if (order_ == LAST_TO_FIRST) {
 				// The greater of record 0 or one page above where we are (record numbers are unsigned (size_t))
 				my_book_->selection(max(0, (signed)my_book_->selection() - rows_per_page_));
@@ -419,18 +428,23 @@ int log_table::handle(int event) {
 			}
 			return true;
 		case FL_Alt_R:
+			// Remember AltGR is pressed
 			alt_gr_ = true;
 			return true;
 		}
 		break;
 	case FL_KEYUP:
 		if (Fl::event_key() == FL_Alt_R) {
+			// Forget AltGr is pressed
 			alt_gr_ = false;
 			return true;
 		}
 		break;
 	case FL_MOVE:
 		// If we have moved more than 10 pixels away from where the tip windows is displayed - remove it
+		// Note we will only see this once the mouse has left the tip window
+		// There is a race hazard between seeing this event and showing the tip window, so we do need to 
+		// check how far the mouse has moved
 		if (tip_window_) {
 			if (abs(last_rootx_ - tip_root_x_) > 10 || abs(last_rooty_ - tip_root_y_) > 10) {
 				Fl::delete_widget(tip_window_);
@@ -482,15 +496,18 @@ void log_table::update(hint_t hint, unsigned int record_num_1, unsigned int reco
 
 // Adjust the row height and row header width to match the font used
 void log_table::adjust_row_sizes() {
+	// Assume that italic may be larger than roman - add 2 pixels margin around the text
 	fl_font(font_ | FL_ITALIC, fontsize_);
 	int height = fl_height() + 2;
 	row_height_all(height);
 	int w1 = 0;
 	int w2 = 0;
 	int sz = 1;
+	// Get the largest number record - and find its size
 	if (book_) sz = book_->size() + 1;
 	string max_number = to_string(sz) + ' ';
 	fl_measure(max_number.c_str(), w1, height);
+	// Get the size of the row header "column header" and set the width to the larger of the two
 	fl_measure("QSO No.", w2, height);
 	row_header_width(max(w1, w2));
 }
@@ -576,7 +593,7 @@ void log_table::draw_cell(TableContext context, int R, int C, int X, int Y, int 
 			{
 				record_num_t item_number = (order_ == LAST_TO_FIRST) ? my_book_->size() - 1 - R : R;
 				record* this_record = my_book_->get_record(item_number, false);
-				// Selected rows will have table specific colour, others in currect sesson grey, rest white
+				// Selected rows will have table specific colour, others in current sesson grey, rest white
 				Fl_Color default_bg_colour = in_current_session(this_record) ? FL_GRAY : FL_WHITE;
 				Fl_Color bg_colour = row_selected(R) ? selection_color() : default_bg_colour;
 				fl_color(bg_colour);
@@ -598,6 +615,7 @@ void log_table::draw_cell(TableContext context, int R, int C, int X, int Y, int 
 		return;
 		
 	case CONTEXT_RC_RESIZE:
+		// Resize the edit input if the cell it's above is being resized
 		if (edit_input_->visible()) {
 			find_cell(CONTEXT_TABLE, edit_row_, edit_col_, X, Y, W, H);
 			edit_input_->resize(X, Y, W, H);
@@ -623,7 +641,7 @@ void log_table::get_fields() {
 		fields_.clear();
 		Fl_Preferences field_set_settings(fields_settings, field_set_name);
 		num_fields = field_set_settings.groups();
-		// now get the field data for the field_set
+		// now get the field data for each field in the set
 		for (int j = 0; j < num_fields; j++) {
 			Fl_Preferences field_settings(field_set_settings, field_set_settings.group(j));
 			field_info_t field;
@@ -639,7 +657,7 @@ void log_table::get_fields() {
 		}
 		free(field_set_name);
 	}
-	// If the field_set is empty
+	// If the field_set is empty - use the default set
 	if (num_fields == 0) {
 		// For each field in the default field set
 		for (unsigned int i = 0; DEFAULT_FIELDS[i].field.size() > 0; i++) {
@@ -713,6 +731,7 @@ void log_table::done_edit(bool keep_row) {
 			// Update all views with the change - GRIDSQUARE and DXCC are major changes that require DxAtlas to be redrawn, date/time the book to be reordered
 			if (field_info.field == "QSO_DATE" || field_info.field == "TIME_ON") {
 				// The book will tell all views
+				// the changed start time may cause the book to get reordered - move the edit point accordingly
 				record_num_t new_record = book_->selection(my_book_->record_number(item_number), HT_START_CHANGED);
 				if (keep_row && my_book_->book_type() == OT_MAIN) {
 					switch (order_) {
@@ -729,9 +748,11 @@ void log_table::done_edit(bool keep_row) {
 				}
 			}
 			else if (field_info.field == "GRIDSQUARE" || field_info.field == "DXCC") {
+				// Location may have changed
 				book_->selection(my_book_->record_number(item_number), HT_CHANGED);
 			}
 			else {
+				// Minor change - not important for DxAtlas
 				book_->selection(my_book_->record_number(item_number), HT_MINOR_CHANGE);
 			}
 			if (field_info.field == "CALL") {
@@ -753,6 +774,7 @@ void log_table::done_edit(bool keep_row) {
 			redraw();
 			break;
 		}
+		// Make these invivible as done with them
 		edit_input_->hide();
 		edit_menu_->hide();
 	}
@@ -760,7 +782,7 @@ void log_table::done_edit(bool keep_row) {
 
 // Display a tooltip describing the field item and validating the value
 void log_table::describe_cell(int item, int col) {
-	int item_number;
+	int item_number = item;
 	string tip = "";
 	switch (order_) {
 	case FIRST_TO_LAST:
@@ -778,7 +800,7 @@ void log_table::describe_cell(int item, int col) {
 		// Get the field item under the mouse
 		record* record = my_book_->get_record(item_number, true);
 		field_info_t field_info = fields_[col];
-		// get the tip
+		// get the tip - for Call parse the call and provide prefix info, otherwise the ADIF description
 		if (field_info.field == "CALL") {
 			tip = pfx_data_->get_tip(record);
 		}
@@ -786,8 +808,10 @@ void log_table::describe_cell(int item, int col) {
 			tip = spec_data_->get_tip(field_info.field, record);
 		}
 	}
-	// display it in a window that will time-out. Position the window where the mouse clicked
+	// display it in a window. Position the window where the mouse clicked
+	// The window will close when the mouse is moved far enough off it.
 	if (tip_window_) {
+		// Delete existing tip window
 		Fl::delete_widget(tip_window_);
 		tip_window_ = nullptr;
 	}
@@ -830,6 +854,7 @@ void log_table::dbl_click_column(int col) {
 		// Redraw the window
 		redraw();
 	}
+	// TODO: Condider whether this should be in an inherited class
 	else if (my_book_->book_type() == OT_EXTRACT || my_book_->book_type() == OT_DXATLAS) {
 		// Sorting on any other column is only available in extracted records
 		// Remember the record number

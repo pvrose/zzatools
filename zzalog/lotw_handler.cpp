@@ -52,6 +52,7 @@ bool lotw_handler::upload_lotw_log(book* book) {
 		chooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_SAVE_FILE);
 		chooser->title("Please select file for sending to LotW");
 		chooser->filter("ADI Files\t*.adi");
+		// No file selected indicates user cancelled
 		ok = (chooser->show() == 0);
 		new_filename = chooser->filename();
 	}
@@ -93,7 +94,6 @@ bool lotw_handler::upload_lotw_log(book* book) {
 			if (!tqsl_executable.length()) {
 #ifdef WIN32
 				// Create an Open dialog; the default file name extension is ".exe".
-//				Fl_File_Chooser* chooser = new Fl_File_Chooser("", "Applications(*.exe)", Fl_File_Chooser::SINGLE, "Please locate TQSL executable");
 				Fl_Native_File_Chooser* chooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_FILE);
 				chooser->title("Please locate TQSL executable");
 				chooser->filter("Applications\t*.exe");
@@ -116,6 +116,7 @@ bool lotw_handler::upload_lotw_log(book* book) {
 			if (ok) {
 				// Generate TQSL command line - note the executable may have spaces in its filename
 				char* command = new char[20 + new_filename.length() + tqsl_executable.length()];
+				// TODO: Check command format in Linux
 				sprintf(command, "\"%s\" -x -u -d %s", tqsl_executable.c_str(), new_filename.c_str());
 				status_->misc_status(ST_NOTE, "LOTW: Signing and uploading QSLs to LotW");
 				// Launch TQSL - signs and uploads data: Note this is a blocking action
@@ -182,6 +183,7 @@ bool lotw_handler::upload_lotw_log(book* book) {
 				// Good response received
 				bool updated = false;
 				// For each entry extracted for signing - add that is has been sent and when
+				// Note for duplicates this will correct for the fact that these fields had wrongly been set
 				for (auto it = book->begin(); it != book->end(); it++) {
 					if ((*it)->item("LOTW_QSLSDATE") == "") {
 						(*it)->item("LOTW_QSLSDATE", now(false, "%Y%m%d"));
@@ -250,7 +252,7 @@ bool lotw_handler::download_lotw_log(stringstream* adif) {
 		}
 	}
 	else {
-		// See whatever has been downloaded
+		// It's neither ADIF nor HTML: display whatever has been downloaded
 		adif->seekg(adif->beg);
 		if (adif->peek() != EOF) {
 			// Data has been downloaded - display it a text browser

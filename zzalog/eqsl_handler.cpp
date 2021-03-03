@@ -51,6 +51,7 @@ eqsl_handler::~eqsl_handler()
 
 // Put the image request on to the queue 
 void eqsl_handler::enqueue_request(record_num_t record_num, bool force /*=false*/) {
+	// eQSL requests can be disabled when compiled with _DEBUG
 	if (debug_enabled_) {
 		// Enqueue request
 		request_queue_.push(request_t(record_num, force));
@@ -68,7 +69,7 @@ void eqsl_handler::cb_timer_deq(void* v) {
 	queue_t* request_queue = param->queue;
 	eqsl_handler* that = param->handler;
 	if (!request_queue->empty() && that->empty_queue_enable_) {
-		// send the next eQSL request in the queue - but leave it in the queue
+		// send the next eQSL request in the queue - but leave it in the queue until we've seen the response
 		request_t request = request_queue->front();
 		// Let user know what we are doing
 		char message[512];
@@ -83,7 +84,7 @@ void eqsl_handler::cb_timer_deq(void* v) {
 			fl_beep(FL_BEEP_QUESTION);
 			switch (fl_choice("eQSL download failed, do you want try again or cancel all", fl_yes, fl_cancel, fl_no)) {
 			case 0:
-				// Do nothing
+				// Try again - leave the request on the queue
 				break;
 			case 1:
 				// Cancel - delete all requests in the queue
@@ -113,7 +114,7 @@ void eqsl_handler::cb_timer_deq(void* v) {
 			fl_beep(FL_BEEP_QUESTION);
 			switch (fl_choice("Internet access failed, do you want to try again or cancel all?", fl_yes, fl_cancel, fl_no)) {
 			case 0:
-				// Yes - do nothing
+				// Yes - leave on queue
 				break;
 			case 1:
 				// Cancel - delete all requests in the queue
@@ -132,7 +133,7 @@ void eqsl_handler::cb_timer_deq(void* v) {
 		if (!request_queue->empty() && that->empty_queue_enable_) {
 			// Let user know
 			request = request_queue->front();
-			// Now peek the queue and select the front request so user sees the QSO being request
+			// Now peek the queue and select the front request so user sees the QSO being requested
 			book_->selection(request.record_num);
 			sprintf(message, "EQSL: %d card requests pending - next request %s", request_queue->size(), book_->get_record()->item("CALL").c_str());
 			status_->misc_status(ST_NOTE, message);

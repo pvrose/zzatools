@@ -149,7 +149,7 @@ record_form::record_form(int X, int Y, int W, int H, const char* label, field_or
 	// Card image and its filename
 	int curr_x = X + XLEFT;
 	int curr_y = Y + YTOP;
-	// Box - for the display of a card image or if no cardd exists the callsign in large text
+	// Box - for the display of a card image or if no card exists the callsign in large text
 	card_display_ = new Fl_Group(curr_x, curr_y, WCARD, HCARD);
 	card_display_->box(FL_UP_BOX);
 	card_display_->tooltip("The card image is displayed here!");
@@ -504,7 +504,6 @@ record_form::~record_form()
 	delete b;
 	field_choice_->clear();
 	enum_choice_->clear();
-
 }
 
 // Call-backs
@@ -522,6 +521,7 @@ void record_form::cb_rad_card(Fl_Widget* w, void* v) {
 }
 
 // Called when a cell is clicked in the record table
+// v is unused
 void record_form::cb_tab_record(Fl_Widget* w, void* v) {
 	record_form* that = ancestor_view<record_form>(w);
 	record_table* table = (record_table*)w;
@@ -645,7 +645,6 @@ void record_form::cb_editor(Fl_Widget* w, void* v) {
 	that->redraw();
 }
 
-
 // Enum choice widget has its value changed - explain what the enum value means
 // v is not used
 void record_form::cb_ch_enum(Fl_Widget* w, void* v) {
@@ -747,7 +746,7 @@ void record_form::cb_bn_clear(Fl_Widget* w, void* v) {
 void record_form::cb_bn_quick(Fl_Widget* w, void* v) {
 	record_form* that = ancestor_view<record_form>(w);
 	string field = (char*)v;
-	// Remeber the record
+	// Remember the record
 	that->my_book_->remember_record();
 	// Set the text edit value to the selected item
 	string value = that->value_in_->buffer()->text();
@@ -845,7 +844,7 @@ void record_form::cb_bn_edit(Fl_Widget* w, long v) {
 		that->use_mode_ = UM_DISPLAY;
 		break;
 	case REVERT:
-		//copy saved record back to original record
+		// Copy saved record back to original record
 		that->my_book_->delete_record(false);
 		break;
 	case CANCEL:
@@ -976,7 +975,6 @@ void record_form::cb_bn_prev(Fl_Widget* w, void* v) {
 	}
 	that->enable_widgets();
 	that->redraw();
-
 }
 
 // Update the form because a new record has been selected or the record has been changed
@@ -1153,7 +1151,7 @@ void record_form::update_form() {
 void record_form::set_image() {
 	if (record_1_ != nullptr) {
 		if (selected_image_ != QI_GEN_CARD) {
-			// We want to display the received card image
+			// We want to display the received card (eQSL or scanned image)
 			char filename[256];
 			string directory;
 			char* temp;
@@ -1295,6 +1293,7 @@ void record_form::set_image() {
 							found_image = true;
 							// Resize the image to fit the control
 							if (scaling_image_) {
+								// Resize keeping original height/width ratio
 								float scale_w = (float)raw_image->w() / (float)card_display_->w();
 								float scale_h = (float)raw_image->h() / (float)card_display_->h();
 								if (scale_w < scale_h) {
@@ -1305,6 +1304,7 @@ void record_form::set_image() {
 								}
 							}
 							else {
+								// Stretch image to fit entire box
 								image_ = raw_image->copy(card_display_->w(), card_display_->h());
 							}
 						}
@@ -1411,6 +1411,9 @@ void record_form::draw_image() {
 			card_display_->color(FL_WHITE);
 			card_display_->align(FL_ALIGN_CENTER);
 			card_display_->add(card);
+			char label[128];
+			snprintf(label, 128, "Generated QSL label for %s", record_1_->item("CALL").c_str());
+			card_filename_out_->copy_label(label);
 		}
 		break;
 	case QI_TEXT:
@@ -1431,7 +1434,7 @@ void record_form::draw_image() {
 void record_form::enable_widgets() {
 	// Field modification controls
 	field_choice_->activate();
-	// Enable/disable enumeration choice and field-nam widgets
+	// Enable/disable enumeration choice and field-name widgets
 	if (is_enumeration_) {
 		value_in_->activate();
 		enum_choice_->activate();
@@ -1465,7 +1468,7 @@ void record_form::enable_widgets() {
 		previous_bn_->deactivate();
 		next_bn_->deactivate();
 		// Start QSO - from EDIT and QSO
-		// Variable editing butttons
+		// Variable editing butttons - edit4_bn_ is treated below
 		if (modifying_ || use_mode_ == UM_MODIFIED) {
 			// Modiying a record: Restart, Save, Revert
 			edit1_bn_->label("Restart");
@@ -1506,7 +1509,7 @@ void record_form::enable_widgets() {
 			// Quick QSL entry
 			quick_grp_->deactivate();
 		}
-		// If this record is a WSJT-X mode and we don't have a possible match set button 4 to look inn ALL.txt
+		// If this record is a WSJT-X mode and we don't have a possible match set button 4 to look in ALL.txt
 		if (record_1_ &&
 			(record_1_->item("MODE") == "JT65" || record_1_->item("MODE") == "JT9" || record_1_->item("MODE") == "FT8" || record_1_->item("MODE") == "FT4")) {
 			// Need to activate display
@@ -1739,14 +1742,17 @@ void record_form::enable_widgets() {
 		edit2_bn_->label("2");
 		edit2_bn_->color(FL_BACKGROUND_COLOR);
 		edit2_bn_->tooltip("");
+		edit2_bn_->callback(cb_bn_edit, (long)NONE);
 		edit2_bn_->deactivate();
 		edit3_bn_->label("3");
 		edit3_bn_->color(FL_BACKGROUND_COLOR);
 		edit3_bn_->tooltip("");
+		edit3_bn_->callback(cb_bn_edit, (long)NONE);
 		edit3_bn_->deactivate();
 		edit4_bn_->label("4");
 		edit4_bn_->color(FL_BACKGROUND_COLOR);
 		edit4_bn_->tooltip("");
+		edit4_bn_->callback(cb_bn_edit, (long)NONE);
 		edit4_bn_->deactivate();
 		break;
 	}
@@ -1949,7 +1955,7 @@ bool record_form::parse_all_txt(record* record) {
 	return false;
 }
 
-// Copy the text line back to the record - look to see whether it's transmit or receive and then 
+// Copy details from the line of text into the record
 void record_form::copy_all_txt(string text, record* record) {
 	bool tx_record;
 	// After this initial processing pos will point to the start og the QSO decode string - look for old-style transmit record

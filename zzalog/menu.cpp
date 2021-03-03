@@ -297,9 +297,6 @@ extern void main_window_label(string text);
 extern void backup_file(bool force, bool retrieve = false);
 extern void set_recent_file(string filename);
 extern void add_scratchpad();
-//extern void remove_sub_window(Fl_Window* win);
-//extern void add_sub_window(Fl_Window* win);
-
 
 // Constructor
 menu::menu(int X, int Y, int W, int H, const char* label) :
@@ -586,7 +583,7 @@ void menu::cb_mi_windows_all(Fl_Widget* w, void* v) {
 }
 
 // Windows->Other
-// v is Fl_Window*. points to the specified windowa
+// v is Fl_Window* and points to the specified window
 void menu::cb_mi_windows(Fl_Widget* w, void* v) {
 	menu* that = ancestor_view<menu>(w);
 	Fl_Window* win = (Fl_Window*)v;
@@ -615,7 +612,7 @@ void menu::cb_mi_navigate(Fl_Widget* w, void* v) {
 	}
 }
 
-// Navigate->Date: OPens a cendar window
+// Navigate->Date: Opens a calendar window
 // v is ignored
 void menu::cb_mi_nav_date(Fl_Widget* w, void* v) {
 	menu* that = ancestor_view<menu>(w);
@@ -911,6 +908,7 @@ void menu::cb_mi_log_radio(Fl_Widget* w, void* v) {
 	menu* that = ancestor_view<menu>(w);
 	switch ((bool)(long)v) {
 	case false:
+		// Disconnect radio
 		if (rig_if_) {
 			status_->misc_status(ST_NOTE, "RIG: Closing rig connection by user");
 			// Close rig
@@ -925,6 +923,7 @@ void menu::cb_mi_log_radio(Fl_Widget* w, void* v) {
 		}
 		break;
 	case true:
+		// Connect radio
 		// Currently entering a QSO - ask Save or Quit
 		if (book_->modified_record() || book_->new_record()) {
 			fl_beep(FL_BEEP_QUESTION);
@@ -981,7 +980,7 @@ void menu::cb_mi_log_save(Fl_Widget* w, void* v) {
 	navigation_book_->save_record();
 }
 
-// Log->Delete/Cancel - v = true/false defines which
+// Log->Delete/Cancel
 // v is bool. false = cancel new record; true = delete record
 void menu::cb_mi_log_del(Fl_Widget* w, void* v) {
 	// delete_record(true) - deliberately deleting a record
@@ -989,7 +988,7 @@ void menu::cb_mi_log_del(Fl_Widget* w, void* v) {
 	navigation_book_->delete_record((bool)(long)v);
 }
 
-// Log->Retime record - reset TIME_OFF
+// Log->Retime record - reset TIME_OFF to now
 // v is not used
 void menu::cb_mi_log_retime(Fl_Widget* w, void* v) {
 	record* this_record = navigation_book_->get_record();
@@ -1148,7 +1147,7 @@ void menu::cb_mi_oper_change(Fl_Widget* w, void* v) {
 	Fl::delete_widget(dialog);
 }
 
-// Log->Change->Rig/Aerial/QTH - open a dialog to specify new rig/aerial/QTH to use
+// Log->Set->Rig/Aerial/QTH - open a dialog to specify new rig/aerial/QTH to use
 // v is enum use_dialog_t: UD_RIG, UD_AERIAL, UD_QTH or UD_PROP
 void menu::cb_mi_oper_set(Fl_Widget* w, void* v) {
 	use_dialog_t type = (use_dialog_t)(long)v;
@@ -1205,7 +1204,6 @@ void menu::cb_mi_imp_wsjtx(Fl_Widget* w, void* v) {
 		wsjtx_handler_->run_server();
 	}
 }
-
 
 // Import->Merge - merge what has just been downloaded
 // v is not used
@@ -1540,7 +1538,7 @@ void menu::cb_mi_info_web(Fl_Widget* w, void* v) {
 		if (browser.length() == 0) {
 			return;
 		}
-		// Open browser with QRZ.com URL 
+		// Open browser with URL from WEB field in record
 #ifdef _WIN32
 		char format[] = "start \"%s\" %s";
 #else
@@ -1768,7 +1766,7 @@ void menu::report_mode(vector<report_cat_t> report_mode, report_filter_t filter)
 				mode(index_ituzones, mode(index_modes) & ~FL_MENU_VALUE);
 				break;
 			case RC_CQ_ZONE:
-				// Set Modes only
+				// Set CQ Zones only
 				mode(index_entities, mode(index_entities) & ~FL_MENU_VALUE);
 				mode(index_states, mode(index_states) & ~FL_MENU_VALUE);
 				mode(index_bands, mode(index_bands) & ~FL_MENU_VALUE);
@@ -1777,7 +1775,7 @@ void menu::report_mode(vector<report_cat_t> report_mode, report_filter_t filter)
 				mode(index_ituzones, mode(index_modes) & ~FL_MENU_VALUE);
 				break;
 			case RC_ITU_ZONE:
-				// Set Modes only
+				// Set ITU Zones only
 				mode(index_entities, mode(index_entities) & ~FL_MENU_VALUE);
 				mode(index_states, mode(index_states) & ~FL_MENU_VALUE);
 				mode(index_bands, mode(index_bands) & ~FL_MENU_VALUE);

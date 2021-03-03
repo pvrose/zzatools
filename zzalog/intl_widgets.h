@@ -19,6 +19,8 @@ namespace zzalog {
 	public:
 		// Constructor
 		intl_editor(int X, int Y, int W, int H, const char* label = "");
+		virtual ~intl_editor();
+
 		// Event handler - handle event as normal then set the cursor depending on current insert mode
 		int handle(int event);
 	};
@@ -30,6 +32,7 @@ namespace zzalog {
 	public:
 		// Constructor
 		intl_input(int X, int Y, int W, int H, const char* label = nullptr);
+		virtual ~intl_input();
 
 		// Event handler
 		int handle(int event);

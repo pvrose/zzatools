@@ -356,18 +356,20 @@ Fl_Window* zzalib::tip_window(const string& tip, int x_root, int y_root) {
 
 // Create an upper-case version of a string
 string zzalib::to_upper(const string& data) {
-	string upper(data.length(), 0);
-	// For the length of the string convert ech character to upper case
-	for (size_t i = 0; i < data.length(); i++) upper[i] = toupper(data[i]);
-	return upper;
+	size_t len = data.length();
+	char* result = new char[3 * len + 1];
+	memset(result, 0, 3 * len + 1);
+	fl_utf_toupper((unsigned char*)data.c_str(), len, result);
+	return string(result);
 }
 
 // Create an lower-case version of a string
 string zzalib::to_lower(const string& data) {
-	string lower(data.length(), 0);
-	// For the length of the string convert ech character to lower case
-	for (size_t i = 0; i < data.length(); i++) lower[i] = tolower(data[i]);
-	return lower;
+	size_t len = data.length();
+	char* result = new char[3 * len + 1];
+	memset(result, 0, 3 * len + 1);
+	fl_utf_tolower((unsigned char*)data.c_str(), len, result);
+	return string(result);
 }
 
 // Search for any characters in match (assume its zero-terminated)

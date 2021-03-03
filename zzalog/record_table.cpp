@@ -75,7 +75,7 @@ void record_table::draw_cell(TableContext context, int R, int C, int X, int Y, i
 				}
 				else if ((field_name == "TIME_ON" || field_name == "QSO_DATE") &&
 					abs(difftime(log_record_->timestamp(), query_record_->timestamp())) < 300.0) {
-					// Time off matches within 5 minutes
+					// Time on matches within 5 minutes
 					fl_color(FL_DARK_YELLOW);
 				}
 				else if ((field_name == "TIME_OFF" || field_name == "QSO_DATE_OFF") &&

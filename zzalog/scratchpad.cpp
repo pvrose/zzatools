@@ -125,6 +125,7 @@ scratchpad::scratchpad() :
 // Destructor - delete dynamic objects and save position
 scratchpad::~scratchpad()
 {
+	// Save the window location
 	Fl_Preferences spad_settings(settings_, "Scratchpad");
 	spad_settings.set("Top", this->y_root());
 	spad_settings.set("Left", this->x_root());
@@ -170,12 +171,14 @@ void scratchpad::create_form() {
 	Fl_Group* g = new Fl_Group(C2, curr_y, w() - C2, HG);
 	g->box(FL_NO_BOX);
 
+	// Button - start QSO
 	bn_start_ = new Fl_Button(C2, curr_y, WBUTTON, HBUTTON, "Start");
 	bn_start_->labelsize(FONT_SIZE);
 	bn_start_->labelfont(FONT);
 	bn_start_->tooltip("Create a new record");
 	bn_start_->callback(cb_start);
 
+	// Button - query worked before?
 	Fl_Button* bn_wb4 = new Fl_Button(C3, curr_y, WBUTTON, HBUTTON, "F9 - B4?");
 	bn_wb4->labelsize(FONT_SIZE);
 	bn_wb4->labelfont(FONT);
@@ -183,12 +186,14 @@ void scratchpad::create_form() {
 	bn_wb4->callback(cb_wkb4);
 
 	curr_y += HBUTTON + GAP;
+	// Button - copy call to record
 	Fl_Button* bn_call = new Fl_Button(C2, curr_y, WBUTTON, HBUTTON, "F1 - Call");
 	bn_call->labelsize(FONT_SIZE);
 	bn_call->labelfont(FONT);
 	bn_call->tooltip("Copy selected text to callsign field");
 	bn_call->callback(cb_action, (void*)WRITE_CALL);
 
+	// Button - copy name to record
 	Fl_Button* bn_name = new Fl_Button(C3, curr_y, WBUTTON, HBUTTON, "F2 - Name");
 	bn_name->labelsize(FONT_SIZE);
 	bn_name->labelfont(FONT);
@@ -196,12 +201,14 @@ void scratchpad::create_form() {
 	bn_name->callback(cb_action, (void*)WRITE_NAME);
 
 	curr_y += HBUTTON;
+	// Button - copy QTH to record
 	Fl_Button* bn_qth = new Fl_Button(C2, curr_y, WBUTTON, HBUTTON, "F3 - QTH");
 	bn_qth->labelsize(FONT_SIZE);
 	bn_qth->labelfont(FONT);
 	bn_qth->tooltip("Copy selected text to QTH field");
 	bn_qth->callback(cb_action, (void*)WRITE_QTH);
 
+	// Button - copy grid to record
 	Fl_Button* bn_grid = new Fl_Button(C3, curr_y, WBUTTON, HBUTTON, "F4 - Grid");
 	bn_grid->labelsize(FONT_SIZE);
 	bn_grid->labelfont(FONT);
@@ -209,12 +216,14 @@ void scratchpad::create_form() {
 	bn_grid->callback(cb_action, (void*)WRITE_GRID);
 
 	curr_y += HBUTTON;
+	// Button - copy RS(T/Q) sent to record
 	Fl_Button* bn_rst_sent = new Fl_Button(C2, curr_y, WBUTTON, HBUTTON, "F5 - Sent");
 	bn_rst_sent->labelsize(FONT_SIZE);
 	bn_rst_sent->labelfont(FONT);
 	bn_rst_sent->tooltip("Copy selected text to RST sent field");
 	bn_rst_sent->callback(cb_action, (void*)WRITE_RST_SENT);
 
+	// Button - copy RS(T/Q) received to record
 	Fl_Button* bn_rst_rcvd = new Fl_Button(C3, curr_y, WBUTTON, HBUTTON, "F6 - Rcvd");
 	bn_rst_rcvd->labelsize(FONT_SIZE);
 	bn_rst_rcvd->labelfont(FONT);
@@ -222,6 +231,7 @@ void scratchpad::create_form() {
 	bn_rst_rcvd->callback(cb_action, (void*)WRITE_RST_RCVD);
 
 	curr_y += HBUTTON;
+	// Button - copy selected field to record
 	Fl_Button* bn_field = new Fl_Button(C2, curr_y, WBUTTON, HBUTTON, "Field");
 	bn_field->labelsize(FONT_SIZE);
 	bn_field->labelfont(FONT);
@@ -229,6 +239,7 @@ void scratchpad::create_form() {
 	bn_field->callback(cb_action, (void*)WRITE_FIELD);
 
 	curr_y += HBUTTON;
+	// Choice - allow specified field to be selected
 	field_choice* ch_field = new field_choice(C2, curr_y, WBUTTON + WBUTTON, HTEXT);
 	ch_field->textfont(FONT);
 	ch_field->textsize(FONT_SIZE);
@@ -237,6 +248,7 @@ void scratchpad::create_form() {
 
 	curr_y += HTEXT;
 	const int W2A = WBUTTON * 3 / 2;
+	// Input - allows user to manually enter frequency
 	ip_freq_ = new Fl_Input(C2A, curr_y, W2A, HTEXT, "Freq");
 	ip_freq_->textfont(FONT);
 	ip_freq_->textsize(FONT_SIZE);
@@ -247,6 +259,7 @@ void scratchpad::create_form() {
 	ip_freq_->callback(cb_ip_freq);
 
 	curr_y += HTEXT;
+	// Choice - allows user to select mode of operation
 	ch_mode_ = new Fl_Choice(C2A, curr_y, W2A, HTEXT, "Mode");
 	ch_mode_->textfont(FONT);
 	ch_mode_->textsize(FONT_SIZE);
@@ -257,6 +270,7 @@ void scratchpad::create_form() {
 	ch_mode_->callback(cb_ch_mode);
 
 	curr_y += HTEXT;
+	// Input - allows user to manually enter power
 	ip_power_ = new Fl_Input(C2A, curr_y, W2A, HTEXT, "Power");
 	ip_power_->textfont(FONT);
 	ip_power_->textsize(FONT_SIZE);
@@ -278,16 +292,19 @@ void scratchpad::create_form() {
 		rig_if_->get_string_mode(mode, submode);
 	}
 	else if (record_) {
+		// Get data from current record (if there is one)
 		frequency = record_->item("FREQ");
 		power = record_->item("TX_PWR");
 		mode = record_->item("MODE", true);
 	}
 	else if (prev_record) {
+		// Get data from previous record (if there is one)
 		frequency = prev_record->item("FREQ");
 		power = prev_record->item("TX_PWR");
 		mode = prev_record->item("MODE", true);
 	}
 	else {
+		// Default to 14.235 MHz USB 100W
 		frequency = "14.250";
 		power = "100";
 		mode = "USB";
@@ -297,12 +314,14 @@ void scratchpad::create_form() {
 	ip_power_->value(power.c_str()); 
 	curr_y += HTEXT + GAP;
 
+	// Button - save the record
 	bn_save_ = new Fl_Button(C2, curr_y, WBUTTON, HBUTTON, "F7 - Save");
 	bn_save_->labelsize(FONT_SIZE);
 	bn_save_->labelfont(FONT);
 	bn_save_->tooltip("Save the record");
 	bn_save_->callback(cb_save);
 
+	// Button - cancel the record
 	bn_cancel_ = new Fl_Button(C3, curr_y, WBUTTON, HBUTTON);
 	bn_cancel_->labelsize(FONT_SIZE);
 	bn_cancel_->labelfont(FONT);
@@ -312,6 +331,7 @@ void scratchpad::create_form() {
 	g->resizable(nullptr);
 	g->end();
 
+	// Allow the window to be resized down to half the editor width and keep the buttons the same size
 	size_range(w() - WEDITOR / 2, h());
 	resizable(editor_);
 	end();
@@ -334,7 +354,7 @@ void scratchpad::cb_action(Fl_Widget* w, void* v) {
 	if (that->record_ == nullptr) {
 		cb_start(w, nullptr);
 	}
-	// Get the field to write from the button action
+	// Get the field to write from the button action. Default update is a minor change
 	hint_t hint = HT_MINOR_CHANGE;
 	switch (action) {
 	case WRITE_CALL:
@@ -378,6 +398,8 @@ void scratchpad::cb_action(Fl_Widget* w, void* v) {
 	that->enable_widgets();
 }
 
+// Have we worked before? Loads previous contacts in extract view
+// v is unused
 void scratchpad::cb_wkb4(Fl_Widget* w, void* v) {
 	scratchpad* that = ancestor_view<scratchpad>(w);
 	string text = that->buffer_->selection_text();
@@ -398,7 +420,7 @@ void scratchpad::cb_save(Fl_Widget* w, void* v) {
 	string power;
 	cb_value<Fl_Input, string>(that->ip_power_, &power);
 	that->record_->item("TX_PWR", power);
-	// Save the record - should update viewsg
+	// Save the record - should update views
 	book_->save_record();
 	that->record_ = nullptr;
 	that->buffer_->text("");
@@ -464,6 +486,7 @@ void scratchpad::cb_start(Fl_Widget* w, void* v) {
 void scratchpad::cb_ip_freq(Fl_Widget* w, void* v) {
 	scratchpad* that = ancestor_view<scratchpad>(w);
 	if (that->record_) {
+		// Input is in MHz - keep as that for record, convert to kHz for band check
 		string value;
 		cb_value<Fl_Input, string>(w, &value);
 		double freq = stod(value) * 1000;
@@ -486,6 +509,7 @@ void scratchpad::cb_ip_freq(Fl_Widget* w, void* v) {
 void scratchpad::cb_ch_mode(Fl_Widget* w, void* v) {
 	scratchpad* that = ancestor_view<scratchpad>(w);
 	if (that->record_) {
+		// Value in choice is a sub-mode
 		string value;
 		cb_choice_text(w, &value);
 		if (spec_data_->is_submode(value)) {
@@ -524,6 +548,7 @@ void scratchpad::enable_widgets() {
 		bn_start_->deactivate();
 	}
 	else {
+		// Allow start and clear as we do not have a record
 		bn_save_->deactivate();
 		bn_cancel_->activate();
 		bn_cancel_->label("F8 - Clear");

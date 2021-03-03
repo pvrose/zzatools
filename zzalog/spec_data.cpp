@@ -28,7 +28,6 @@ extern book* book_;
 extern pfx_data* pfx_data_;
 extern status* status_;
 
-
 // Default constructor
 spec_data::spec_data()
 	: adif_version_("")
@@ -274,7 +273,7 @@ bool spec_data::is_submode(string mode) {
 	}
 }
 
-// Get DataSet
+// Get named dataSet
 spec_dataset* spec_data::dataset(string name) {
 	// Try and get the dataset
 	auto it = find(name);
@@ -288,7 +287,7 @@ spec_dataset* spec_data::dataset(string name) {
 	}
 }
 
-// Get Adif Vesrions
+// Get Adif version
 string spec_data::adif_version() {
 	return adif_version_;
 }
@@ -1897,7 +1896,7 @@ bool spec_data::auto_correction(error_t error_code, const string&  data, const s
 			return true;
 		}
 		else if (field == "CQZ" || field == "ITUZ" || field == "CONT" || field == "COUNTRY" ||
-			field == "MY_CQZ" || field == "MY_ITUZ" | field == "MY_CONT" || field == "MY_COUNTRY") {
+			field == "MY_CQZ" || field == "MY_ITUZ" || field == "MY_CONT" || field == "MY_COUNTRY") {
 			// These fields should be reparsed - if we can
 			if (record_->item("DXCC").length()) {
 				record_->item(field, string(""));

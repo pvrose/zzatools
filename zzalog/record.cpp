@@ -23,6 +23,7 @@ record.cpp - Individual record data item: implementation file
 
 #include <FL/fl_ask.H>
 #include <FL/Fl_Preferences.H>
+#include <FL/fl_utf8.h>
 
 using namespace std;
 using namespace zzalog;
@@ -186,6 +187,7 @@ void record::item(string field, string value, bool formatted/* = false*/) {
 		field == "COUNTRY" ||
 		field == "MY_COUNTRY" ||
 		field == "APP_ZZA_PFX") {
+		// Force upper case for these fields
 		upper_value = to_upper(value);
 	}
 	else {
@@ -217,12 +219,14 @@ void record::item(string field, string value, bool formatted/* = false*/) {
 				}
 			}
 			else if (datatype == "Enumeration") {
+				// Treat all enumerations as upper case. ADIF can accept either
 				upper_value = to_upper(value);
 			}
 			else if (datatype == "Date") {
 				// Do not convert to upper case to preserve lower-case month names
 				upper_value = value;
 			} else {
+				// Default leave as is
 				upper_value = value;
 			}
 		}
@@ -803,7 +807,7 @@ bool record::merge_records(record* record, bool allow_loc_mismatch /* = false */
 			// RR73 is used in JT exchanges
 			if (merge_data != "RR73" || 
 				fl_choice("Location in record is RR73 - please confirm?", fl_ok, fl_cancel, "") == 0) {
-				// Grid not is good (RR73 confirmed by user)
+				// Grid is good (RR73 confirmed by user)
 				is_location = true;
 				// Updating a 4-character grid with a 6-character one and the first 4 agree
 				if (my_data.length() < merge_data.length() && merge_data.substr(0, my_data.length()) == my_data) {
@@ -1221,6 +1225,7 @@ bool record::user_details() {
 	return modified;
 }
 
+// Convert frequency from ADIF (MHz) to display format
 string record::format_freq(display_freq_t format, string value) {
 	double frequency = stod(value);
 	char temp[25];
@@ -1241,6 +1246,7 @@ string record::format_freq(display_freq_t format, string value) {
 	return string(temp);
 }
 
+// Convert date from ADIF (YYYYMMDD) to display format
 string record::format_date(display_date_t format, string value) {
 	// Convert date to display format
 	tm date;
@@ -1276,6 +1282,7 @@ string record::format_date(display_date_t format, string value) {
 	return string(temp);
 }
 
+// Convert time from ADIF (HHMM or HHMMSS) to display format
 string record::format_time(display_time_t format, string value) {
 	tm date;
 	date.tm_year = 70;
@@ -1311,6 +1318,7 @@ string record::format_time(display_time_t format, string value) {
 	return string(temp);
 }
 
+// Convert frequency from display format to ADIF (MHz)
 string record::unformat_freq(display_freq_t format, string value) {
 	double frequency = stod(value);
 	char temp[25];
@@ -1331,6 +1339,7 @@ string record::unformat_freq(display_freq_t format, string value) {
 	return string(temp);
 }
 
+// Convert date from display format to ADIF (YYYYMMDD)
 string record::unformat_date(display_date_t format, string value) {
 	tm date;
 	bool ok;
@@ -1364,6 +1373,7 @@ string record::unformat_date(display_date_t format, string value) {
 	return string(temp);
 }
 
+// Convert time from display format to ADIF (HHMMSS or HHMM)
 string record::unformat_time(display_time_t format, string value) {
 	string temp;
 	bool ok = false;
@@ -1381,15 +1391,17 @@ string record::unformat_time(display_time_t format, string value) {
 	case TIME_HH_MM_SS:
 		if (value.length() == 8) {
 			temp = value.substr(0, 2) + value.substr(3, 2) + value.substr(6, 2);
+			ok = true;
 		}
 		break;
 	case TIME_HH_MM:
 		if (value.length() == 5) {
 			temp = value.substr(0, 2) + value.substr(3, 2);
+			ok = true;
 		}
 		break;
 	default:
-		temp = "Invalid";
+		temp = "";
 		break;
 	}
 	if (!ok) {

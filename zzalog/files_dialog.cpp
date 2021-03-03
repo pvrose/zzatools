@@ -73,8 +73,8 @@ void files_dialog::load_values() {
 	int num_files = files_settings.groups();
 	int temp_bool = false;
 	char * temp_string;
-	// For each auto-imprt file
-	for (int i = 0; i < num_files; i++) {
+	// For each auto-import file - prevent a manual edit creating more files than we can handle
+	for (int i = 0; i < num_files && i < AUTO_COUNT; i++) {
 		// Get name of app from the name of the settings group
 		auto_src_[i] = files_settings.group(i);
 		Fl_Preferences file_settings(files_settings, i);

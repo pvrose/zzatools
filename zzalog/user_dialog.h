@@ -10,6 +10,8 @@
 using namespace zzalib;
 
 namespace zzalog {
+	// This class provides a dialog so that the user may modify the way certain
+	// features (fonts, data formats etc) may be displayed 
 	class user_dialog : public page_dialog
 	{
 	public:

@@ -258,7 +258,7 @@ prefix* pfx_dialog::get_prefix() {
 	}
 }
 
-// Get numbered prefix
+// Get specific prefix
 prefix* pfx_dialog::get_prefix(size_t prefix_num) {
 	if (prefix_num < prefixes_->size()) {
 		return (*prefixes_)[prefix_num];

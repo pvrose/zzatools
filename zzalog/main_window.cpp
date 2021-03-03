@@ -12,7 +12,7 @@ main_window::main_window(int W, int H, const char* label) :
 
 main_window::~main_window() {}
 
-// Handle FL_HIDE and FL_SHOW to get menu to update otself
+// Handle FL_HIDE and FL_SHOW to get menu to update itself
 int main_window::handle(int event) {
 
 	switch (event) {

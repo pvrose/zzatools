@@ -648,7 +648,7 @@ void import_data::convert_update(record* record) {
 		bool override = false;
 		bool ignore = false;
 		// Sometimes need to compare different fields - RST_SENT vs RST_RCVD
-		// To avoid the name being switched back, a '!' is prepended to the field anme in some cases
+		// To avoid the name being switched back, a '!' is prepended to the field name in some cases
 		switch (update_mode_) {
 		// Update from eQSL - contact SENT => user RCVD
 		case EQSL_UPDATE:

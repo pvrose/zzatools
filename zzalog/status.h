@@ -123,17 +123,18 @@ namespace zzalog {
 
 	};
 
+	// This class provides the window in which to display the status log
 	class viewer_window : public Fl_Window {
 	public:
 		viewer_window(int W, int Y, const char* label);
 		~viewer_window();
 
 		virtual int handle(int event);
-
+		// Add a line to the window
 		void append(const char* line);
-
+		// Draw the window
 		void draw_window();
-
+		// Apply colours to the various levels of message
 		void colour_buffer();
 
 	protected:

@@ -12,6 +12,8 @@ using namespace zzalib;
 
 namespace zzalog {
 
+	// This class provides the interface to handle UDP datagrams as a server to the
+	// WSJT-X client(s)
 	class wsjtx_handler
 	{
 
@@ -26,7 +28,7 @@ namespace zzalog {
 		// Close servver
 		void close_server();
 
-
+		// Used in static methods to point to the single instance of this class
 		static wsjtx_handler* that_;
 
 	protected:
@@ -141,9 +143,6 @@ namespace zzalog {
 		// Add 32-but unsigned integer
 		void put_uint32(stringstream& os, const unsigned int i);
 
-		// Timer to wait a couple of seconds between trying to read a datagram
-		static void cb_timer_wait(void* v);
-
 		// Socket server
 		socket_server* server_;
 
@@ -163,6 +162,8 @@ namespace zzalog {
 		unsigned int status_rcvd_;
 		// My call
 		string my_call_;
+		// My bracketed call
+		string my_bracketed_call_;
 		// Previous status datagram
 		status_dg prev_status_;
 	};

@@ -42,6 +42,7 @@ namespace zzalog {
 
 		// protected attributes
 	protected:
+		// The version of the book being displayed in the view
 		book * my_book_;
 		// Minimum resizeing capability
 		int min_w_;

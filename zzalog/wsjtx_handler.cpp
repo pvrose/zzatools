@@ -28,7 +28,6 @@ extern Fl_Preferences* settings_;
 
 wsjtx_handler* wsjtx_handler::that_ = nullptr;
 
-
 // Constructor: 
 wsjtx_handler::wsjtx_handler()
 {
@@ -39,16 +38,17 @@ wsjtx_handler::wsjtx_handler()
 	status_rcvd_ = 0;
 	// Get logged callsign from settings
 	Fl_Preferences station_settings(settings_, "Stations");
+	Fl_Preferences qths_settings(station_settings, "QTHs");
 	char* current_stn;
-	station_settings.get("Current", current_stn, "");
-	Fl_Preferences current_settings(station_settings, current_stn);
+	qths_settings.get("Current", current_stn, "");
+	Fl_Preferences current_settings(qths_settings, current_stn);
 	char* temp;
 	current_settings.get("Callsign", temp, "");
 	my_call_ = temp;
+	my_bracketed_call_ = "<" + my_call_ + ">";
 	free(temp);
 	free(current_stn);
 }
-
 
 // Destructor
 wsjtx_handler::~wsjtx_handler() {
@@ -63,19 +63,20 @@ int wsjtx_handler::rcv_request(stringstream& ss) {
 	return that_->rcv_dgram(ss);
 }
 
+// Receive the datagram. Decide which one an go to the individual decode methods
 int wsjtx_handler::rcv_dgram(stringstream & ss) {
-	string ts = now(false, "%H:%M:%S");
+	// The first few objects are fixed for all datagrams
 	magic_number_ = get_uint32(ss);
 	schema_ = get_uint32(ss);
 	uint32_t dgram_type = get_uint32(ss);
+	// Check the magic number and schema are supported
 	if (magic_number_ != expected_magic_ || schema_ < minimum_schema_) {
 		char message[256];
 		snprintf(message, 256, "datagram had wrong magic number (%08x) or unsupported schema (%d)", magic_number_, schema_);
 		status_->misc_status(ST_WARNING, message);
 		return 1;
 	}
-	//ts += ":" + to_string(dgram_type) + '\n';
-	//cout << ts;
+	// Select method to interpret datagram
 	switch (dgram_type) {
 	case 0:
 		// Heartbeat
@@ -95,7 +96,7 @@ int wsjtx_handler::rcv_dgram(stringstream & ss) {
 	return 0;
 }
 
-// 
+// Ignore the datagrams that do not interest us
 int wsjtx_handler::handle_default(stringstream& ss, uint32_t type) {
 	char message[128];
 	snprintf(message, 128, "WSJT-X: Ignored type %d datagram", type);
@@ -103,13 +104,14 @@ int wsjtx_handler::handle_default(stringstream& ss, uint32_t type) {
 	return 0;
 }
 
-// 
+// Handle the heartbeat - send one back
 int wsjtx_handler::handle_hbeat(stringstream& ss) {
 	new_heartbeat_ = true;
 	send_hbeat();
 	return 0;
 }
 
+// Send a heartbeat
 int wsjtx_handler::send_hbeat() {
 	stringstream ss;
 	// Add the magic number, schema and function number
@@ -130,7 +132,7 @@ int wsjtx_handler::send_hbeat() {
 	return server_->send_response(ss);
 }
 
-// For now print close message 
+// Close datagram: shut the server down 
 int wsjtx_handler::handle_close(stringstream& ss) {
 	status_->misc_status(ST_NOTE, "WSJT-X: Received Close");
 	server_->close_server();
@@ -138,7 +140,7 @@ int wsjtx_handler::handle_close(stringstream& ss) {
 	return 1;
 }
 
-// Handle the logged ADIF datagram.
+// Handle the logged ADIF datagram. Send it to the logger
 int wsjtx_handler::handle_log(stringstream& ss) {
 	status_->misc_status(ST_LOG, "WSJT-X: Received Log ADIF datagram");
 	// Ignore Id filed
@@ -158,7 +160,7 @@ int wsjtx_handler::handle_log(stringstream& ss) {
 	return 0;
 }
 
-// handle decode
+// handle decode - display and beep if it contains the user's callsign
 int wsjtx_handler::handle_decode(stringstream& ss) {
 	decode_dg decode;
 	decode.id = get_utf8(ss);
@@ -178,14 +180,12 @@ int wsjtx_handler::handle_decode(stringstream& ss) {
 	unsigned int hours = minutes / 60;
 	minutes = minutes - (hours * 60);
 	char message[256];
-	snprintf(message, 256, "WSJT-X: Decode %02d:%02d:%02f: %s", hours, minutes, seconds, decode.message.c_str());
+	snprintf(message, 256, "WSJT-X: Decode %02d:%02d:%02.0f: %s", hours, minutes, seconds, decode.message.c_str());
 	// Change display if addressed to user
 	vector<string> words;
 	split_line(decode.message, words, ' ');
-	// Debug - not trapping my call
-	snprintf(message, 256, "WSJT-X: My call %s DX call %s", my_call_.c_str(), words[0].c_str());
-	status_->misc_status(ST_DEBUG, message);
-	if (words[0] == my_call_) {
+	// Display if this is my call or my hashed call
+	if (words[0] == my_call_ || words[0] == my_bracketed_call_) {
 		// Display in status bar and beep if message addressed to user
 		status_->misc_status(ST_WARNING, message);
 		fl_beep(FL_BEEP_NOTIFICATION);
@@ -193,8 +193,13 @@ int wsjtx_handler::handle_decode(stringstream& ss) {
 	return 0;
 }
 
-// handle status
+// handle status - display it if the DX Call has changed - indicates that user
+// has called a new station
 int wsjtx_handler::handle_status(stringstream& ss) {
+	// Debug code
+	string datagram = ss.str();
+	status_->misc_status(ST_DEBUG, to_hex(datagram).c_str());
+
 	status_dg status;
 	// ID
 	status.id = get_utf8(ss);
@@ -238,7 +243,7 @@ int wsjtx_handler::handle_status(stringstream& ss) {
 	status.tx_rx_period = get_uint32(ss);
 	// Configuration name
 	status.config_name = get_utf8(ss); 
-	if (prev_status_.dx_call != status.dx_call && status.dx_call != "" && status.dx_call != "(null)") {
+	if (prev_status_.dx_call != status.dx_call && status.dx_call != "") {
 		char message[256];
 		snprintf(message, 256, "WSJT-X: Status %s(%s) S/N:%sdB RX:%dHz",
 			status.dx_call.c_str(), status.dx_grid.c_str(), status.report.c_str(), status.rx_offset);
@@ -248,7 +253,7 @@ int wsjtx_handler::handle_status(stringstream& ss) {
 	return 0;
 }
 
-// Get an bool from the first byte of dgram 
+// Get an bool from the next byte of datagram 
 bool wsjtx_handler::get_bool(stringstream& ss) {
 	unsigned char c;
 	ss.get((char&)c);
@@ -256,7 +261,7 @@ bool wsjtx_handler::get_bool(stringstream& ss) {
 	return b;
 }
 
-// Get an integer from the first byte of dgram 
+// Get an unsigned integer from the next byte of datagram 
 uint8_t wsjtx_handler::get_uint8(stringstream& ss) {
 	unsigned char c;
 	ss.get((char&)c);
@@ -264,7 +269,7 @@ uint8_t wsjtx_handler::get_uint8(stringstream& ss) {
 	return i;
 }
 
-// Get an integer from the first 4 bytes of dgram 
+// Get an unsigned integer from the next 4 bytes of dgram 
 uint32_t wsjtx_handler::get_uint32(stringstream& ss) {
 	unsigned char c = 0;
 	uint32_t i = 0;
@@ -275,7 +280,7 @@ uint32_t wsjtx_handler::get_uint32(stringstream& ss) {
 	return i;
 }
 
-// Get 64-bit unsigned integer
+// Get 64-bit unsigned integer from the next 8 bytes of datagram 
 uint64_t wsjtx_handler::get_uint64(stringstream& ss) {
 	unsigned char c = 0;
 	uint64_t i = 0LL;
@@ -286,7 +291,7 @@ uint64_t wsjtx_handler::get_uint64(stringstream& ss) {
 	return i;
 }
 
-// Get double 
+// Get double from the next 8-bytes of datagram
 double wsjtx_handler::get_double(stringstream& ss) {
 	// I'm making the assumption that the double has been directly serialised in its bit pattern
 	uint64_t uv = get_uint64(ss);
@@ -296,21 +301,25 @@ double wsjtx_handler::get_double(stringstream& ss) {
 
 // Get a string from the QByteArray (4 byte length + that number of bytes)
 string wsjtx_handler::get_utf8(stringstream& ss) {
+	// Get 4-byte length
 	uint32_t len = get_uint32(ss);
 	if (len == ~(0)) {
-		return "(null)";
+		// Length is all 1's - represents a null string
+		return "";
 	}
 	else {
+		// Create a string long enough to receive the data
 		string s;
 		s.resize(len + 1, 0);
 		for (uint32_t i = 0; i < len; i++) {
+			// Copy the string 1 byte at a timme
 			ss.get(s[i]);
 		}
 		return s;
 	}
 }
 
-// Put an integer as 4 bytes in the first 4 bytes of dgram
+// Put an integer as 4 bytes in the next 4 bytes of dgram
 void wsjtx_handler::put_uint32(stringstream& ss, uint32_t i) {
 	for (int ix = 24; ix >= 0; ix-=8) {
 		unsigned char c = (i >> ix) & 0xFF;
@@ -326,16 +335,12 @@ void wsjtx_handler::put_utf8(stringstream& ss, string s) {
 	}
 }
 
-// Call back to restart attempt to restart datagram
-void wsjtx_handler::cb_timer_wait(void* v) {
-	bool* flag = (bool*)v;
-	*flag = false;
-}
-
+// Return that the server is there
 bool wsjtx_handler::has_server() {
 	return (server_ != nullptr && server_->has_server());
 }
 
+// Start the server
 void wsjtx_handler::run_server() {
 	if (!server_) {
 		server_ = new socket_server(socket_server::UDP, 2237);
@@ -347,6 +352,7 @@ void wsjtx_handler::run_server() {
 	menu_->update_items();
 }
 
+// Close the server
 void wsjtx_handler::close_server() {
 	if (server_) {
 		server_->close_server();

@@ -21,6 +21,7 @@ extern menu* menu_;
 intl_dialog::intl_dialog() :
 	win_dialog(640, 480, "International character set")
 {
+	editor_ = nullptr;
 	// Get the file name
 	string directory = get_path();
 	filename_ = directory + "intl_chars.txt";

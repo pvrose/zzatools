@@ -96,11 +96,13 @@ dxa_if::dxa_if() :
 		call_layer_ = nullptr;
 		DxAtlas::ICustomLayersPtr pin_layers = map->GetCustomLayers();
 		pin_layers->Clear();
-		// Add pins
+		// Find home location
 		if (book_->size()) {
+			// Get home location from a record in the book
 			selected_locn_ = book_->get_record()->location(false);
 		}
 		else {
+			// Default to 0N 0E
 			selected_locn_ = { 0.0, 0.0 };
 		}
 		enable_widgets();
@@ -128,7 +130,7 @@ dxa_if::~dxa_if()
 	disconnect_dxatlas(false);
 }
 
-// Handle FL_HIDE and FL_SHOW to get menu to update otself
+// Handle FL_HIDE and FL_SHOW to get menu to update itself
 int dxa_if::handle(int event) {
 
 	switch (event) {
@@ -172,7 +174,7 @@ void dxa_if::load_values() {
 	dxatlas_settings.get("Projection", (int&)projection_, DxAtlas::PRJ_RECTANGULAR);
 	dxatlas_settings.get("Pin Size", pin_size_, 3);
 
-	// Get stations details - QTH locations used to mark hone location on map
+	// Get stations details - QTH locations used to mark home location on map
 	Fl_Preferences stations_settings(settings_, "Stations");
 	char* temp;
 	// All QTH settings
@@ -301,7 +303,7 @@ void dxa_if::create_form() {
 	pz11->align(FL_ALIGN_TOP);
 	pz_w_ = pz11;
 
-	// Button - Start stop
+	// Button - Start or stop
 	Fl_Button* bn12 = new Fl_Button(ch12->x(), ch13->y() + ch13->h() + GAP, WBUTTON, HBUTTON, "Start");
 	bn12->labelfont(FONT);
 	bn12->labelsize(FONT_SIZE);
@@ -447,6 +449,7 @@ void dxa_if::enable_widgets() {
 	else {
 		most_recent_ip_->deactivate();
 	}
+	// Start or stop button
 	if (atlas_ == nullptr) {
 		start_stop_bn_->label("Start");
 		start_stop_bn_->color(FL_GREEN);
@@ -537,7 +540,7 @@ void dxa_if::cb_ip_number(Fl_Widget* w, void* v) {
 	that->draw_pins();
 }
 
-// Colour by radio button selected - redraw pins using new colour spec
+// Colour choice value selected - redraw pins using new colour spec
 void dxa_if::cb_ch_colour(Fl_Widget* w, void* v) {
 	dxa_if* that = ancestor_view<dxa_if>(w);
 	// get value
@@ -561,7 +564,7 @@ void dxa_if::cb_ch_swlen(Fl_Widget* w, void* v) {
 	that->draw_pins();
 }
 
-// Open DxAtlas
+// Open or Close DxAtlas
 void dxa_if::cb_bn_start_stop(Fl_Widget* w, void* v) {
 	dxa_if* that = ancestor_view<dxa_if>(w);
 	// Connect to DXATLAS: if not already
@@ -621,7 +624,7 @@ void dxa_if::cb_ch_centre(Fl_Widget* w, void* v) {
 	}
 }
 
-// Map centre choice widget selected
+// Re-centre map button selected
 void dxa_if::cb_bn_centre(Fl_Widget* w, void* v) {
 	dxa_if* that = ancestor_view<dxa_if>(w);
 	if (that->atlas_) {
@@ -632,7 +635,7 @@ void dxa_if::cb_bn_centre(Fl_Widget* w, void* v) {
 	}
 }
 
-// Colour button selected
+// One of the colour buttons selected - enable/disable that colour
 void dxa_if::cb_bn_colour(Fl_Widget* w, void* v) {
 	dxa_if* that = ancestor_view<dxa_if>(w);
 	int number = (int)v;
@@ -646,7 +649,7 @@ void dxa_if::cb_bn_colour(Fl_Widget* w, void* v) {
 	that->draw_pins();
 }
 
-// Set all or celar all selected
+// Set all or clear all selected
 void dxa_if::cb_bn_all(Fl_Widget* w, void* v) {
 	dxa_if* that = ancestor_view<dxa_if>(w);
 	bool enable = (long)v;
@@ -698,7 +701,6 @@ HRESULT dxa_if::cb_map_clicked(float latitude, float longitude) {
 		record_num = *it;
 		disp_record = book_->get_record(record_num, false);
 		lat_long_t lat_long = disp_record->location(false);
-		float tolerance = (float)5.0 / zoom_value_;
 		float d_lat = (float)lat_long.latitude - latitude;
 		float d_long = (float)lat_long.longitude - longitude;
 		float diff = sqrtf((d_lat * d_lat) + (d_long * d_long));
@@ -780,7 +782,7 @@ HRESULT dxa_if::cb_mouse_moved(float latitude, float longitude) {
 		pt_lat = (float)0.0;
 		pt_text.SetString(" ");
 
-		// Start by having ridiculous closest point (As far away as we can consider
+		// Start by having ridiculous closest point (As far away as we can consider)
 		record_num_t closest_num = -1;
 		float closest_diff = 360.0;
 		float allowed_diff = (float)5.0 / zoom_value_;
@@ -846,19 +848,20 @@ HRESULT dxa_if::cb_mouse_moved(float latitude, float longitude) {
 	return S_OK;
 }
 
-// Map changed callback
+// Map changed callback - if projection changed it will affect which widgets are enabled
 HRESULT dxa_if::cb_map_changed(DxAtlas::EnumMapChange change) {
 	if (change == DxAtlas::EnumMapChange::MC_PROJECTION && atlas_ && !is_my_change_) {
 		projection_ = atlas_->GetMap()->GetProjection();
 		enable_widgets();
 		if (projection_ == DxAtlas::EnumProjection::PRJ_RECTANGULAR) {
+			// Rectangular projection so center the map appropriately
 			centre_map();
 		}
 	}
 	return S_OK;
 }
 
-// Exit requested - disconnect from DxAtlas and tidy it up.
+// DxAtlas closing - disconnect from DxAtlas and tidy it up.
 HRESULT dxa_if::cb_exit_requested() {
 	disconnect_dxatlas(true);
 	return S_OK;
@@ -984,12 +987,10 @@ void dxa_if::disconnect_dxatlas(bool dxatlas_exit) {
 		map->GetCustomLayers()->Clear();
 		map->EndUpdate();
 		call_layer_ = nullptr;
-		// Tell the interface we no longer support the callback
+		// Tell the interface we no longer support the callbacks
 		IDispEventSimpleImpl<2, dxa_if, & __uuidof(DxAtlas::IDxAtlasEvents)>::DispEventUnadvise(atlas_);
 		atlas_ = nullptr;
 		is_my_change_ = false;
-		// Maybe allow FLTK scheduler to let DxAtlas do its stuff
-		//Fl::wait(0.1);
 		status_->misc_status(ST_WARNING, "DXATLAS: Disconnected");
 		if (dxatlas_exit) {
 			enable_widgets();
@@ -1211,7 +1212,7 @@ bool dxa_if::is_displayed(record_num_t record_num) {
 
 // Convert FLTK colour value to DXATLAS: colour value 
 // NB. Although DXATLAS uses a 24-bit value to represent colour, it only has a
-// limites palette.
+// limited palette.
 DxAtlas::EnumColor dxa_if::convert_colour(Fl_Color colour) {
 	unsigned char red;
 	unsigned char blue;
@@ -1258,10 +1259,11 @@ void dxa_if::get_records() {
 			// Always insert the last record
 			record_nums.insert(last_record_num);
 			record_num_t i = last_record_num - 1;
+			double most_recent_seconds = (time_t)most_recent_count_ * 24 * 60 * 60;
 			// Go backwards until the time difference is > n days.
 			for (; (signed)i >= 0 && !done; i--) {
 				// Compare the time difference (in seconds)
-				if (difftime(last_date, book_->get_record(i, false)->timestamp()) <= (time_t)most_recent_count_ * 24 * 60 * 60) {
+				if (difftime(last_date, book_->get_record(i, false)->timestamp()) <= most_recent_seconds) {
 					record_nums.insert(i);
 				}
 				else {
@@ -1526,7 +1528,7 @@ void dxa_if::draw_pins() {
 								use_item = (colour_text == record->item("BAND"));
 								break;
 							case AC_LOGMODE:
-								// select record if it's the ADIF mode we are drawing
+								// select record if it's the ADIF submode we are drawing
 								use_item = (colour_text == record->item("MODE", true));
 								break;
 							case AC_AWARDMODE:
@@ -1810,6 +1812,7 @@ void dxa_if::zoom_centre(lat_long_t centre, bool full) {
 		// now zoom by the smaller of these with 5% margin
 		map->PutZoom((float)min(zoom_long, zoom_lat) * 0.95f);
 	}
+	// Read the actual amount zoomed
 	zoom_value_ = map->GetZoom();
 }
 
@@ -1967,7 +1970,7 @@ void dxa_if::pz_widget::draw() {
 	int y_centre = y() + (h() / 2);
 	// Limit the drawing to the widget
 	fl_push_clip(x(), y(), w(), h());
-	// Fill in first
+	// Create the solid coloured dot - value() supplies the radious of the dot.
 	fl_color(color());
 	fl_pie(x_centre - value(), y_centre - value(), value() + value(), value() + value(), 0.0, 360.0);
 	// Draw the outer circle over it.

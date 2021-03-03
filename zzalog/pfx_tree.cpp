@@ -32,6 +32,7 @@ pfx_tree::pfx_tree(int X, int Y, int W, int H, const char* label, field_ordering
 	record_num_ = 0;
 	prefixes_.clear();
 
+	// Get settings
 	Fl_Preferences user_settings(settings_, "User Settings");
 	Fl_Preferences tree_settings(user_settings, "Tree Views");
 	tree_settings.get("Font Name", (int&)font_, FONT);

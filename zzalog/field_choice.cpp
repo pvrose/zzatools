@@ -22,7 +22,7 @@ field_choice::~field_choice()
 	clear();
 }
 
-// Repulate the choice with all or most popular field names
+// Repopulate the choice with all or most popular field names
 void field_choice::repopulate(bool all_fields, string default_field) {
 	clear();
 	if (all_fields) {

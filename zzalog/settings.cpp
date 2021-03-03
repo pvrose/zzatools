@@ -176,6 +176,7 @@ void settings::cb_bn_cal(Fl_Widget* w, long arg) {
 void settings::cb_tab(Fl_Widget* w, void* v) {
 	settings* that = ancestor_view<settings>(w);
 	Fl_Tabs* tabs = (Fl_Tabs*)that->child(0);
+	// value() returns the selected widget. We need to test which widget it is.
 	Fl_Widget* tab = tabs->value();
 	cfg_dialog_t ix;
 	if (dynamic_cast<rig_dialog*>(tab)) ix = DLG_RIG;
@@ -187,6 +188,7 @@ void settings::cb_tab(Fl_Widget* w, void* v) {
 	else if (dynamic_cast<user_dialog*>(tab)) ix = DLG_USER;
 	else if (dynamic_cast<config_tree*>(tab)) ix = DLG_ALL;
 	else ix = DLG_X;
+	// Change the label of the tabs to the appropriate value for the selected widget
 	that->set_label(ix);
 }
 

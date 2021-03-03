@@ -107,11 +107,14 @@ void tabbed_forms::update_views(view* requester, hint_t hint, record_num_t recor
 	}
 	// Update all the other objects that use the current selection
 	if (record_1 != -1) {
+		// Add the current record's callsign to the search box in the tool bar
 		toolbar_->search_text(record_1);
 	} 
 #ifdef _WIN32
+	// Update DxAtlas
 	if (dxatlas_) dxatlas_->update(hint);
 #endif
+	// Update the settngs config dialog
 	if (config_) config_->update();
 }
 
@@ -178,6 +181,7 @@ view* tabbed_forms::get_view(object_t view_name) {
 }
 
 // Callback - change selected colour when tab changes
+// v is unused
 void tabbed_forms::cb_tab_change(Fl_Widget* w, void* v) {
 	Fl_Tabs* that = (Fl_Tabs*)w;
 	// Set the colour to that of the pane

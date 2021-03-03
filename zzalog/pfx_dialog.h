@@ -52,7 +52,7 @@ namespace zzalog {
 
 	};
 
-	// This class provides a dialog whereby the user selects one of the prefixes that callsign parsing
+	// This class provides a dialog whereby the user selects one of the possible prefixes that callsign parsing
 	// has detected for the callsign
 	class pfx_dialog : public win_dialog
 

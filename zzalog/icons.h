@@ -4,7 +4,7 @@
 namespace zzalog {
 	// This file provides all the icons used. These are all defined as 16*16 4-byte RGBA values.
 
-	// RGBA Red Opaque - =
+// RGBA Red Opaque - =
 #define ZZRE "\xFF\0\0\xFF"
 // RGBA Yellow Opaque - 
 #define ZZYL "\xFF\xFF\0\xFF"

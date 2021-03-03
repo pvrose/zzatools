@@ -20,13 +20,16 @@ extern extract_data* extract_records_;
 extern book* book_;
 extern spec_data* spec_data_;
 
+// Static - only one instance of this class supported
 fllog_emul* fllog_emul::that_ = nullptr;
 
+// Constructor
 fllog_emul::fllog_emul() {
 	rpc_handler_ = nullptr;
 	that_ = this;
 }
 
+// Start and run the RPC Server
 void fllog_emul::run_server() {
 	if (!rpc_handler_) {
 		// TODO Provisionally hard-coded, make part of configuration
@@ -48,7 +51,7 @@ void fllog_emul::run_server() {
 	rpc_handler_->run_server();
 }
 
-
+// Generate an XML-RPC error response
 void fllog_emul::generate_error(int code, string message, rpc_data_item& response) {
 	rpc_data_item error_code;
 	error_code.set(code, XRT_INT);

@@ -12,6 +12,8 @@
 
 using namespace std;
 
+// TODO: Why can't this be in zzalib?
+
 namespace zzalog {
 
 	// text is column header

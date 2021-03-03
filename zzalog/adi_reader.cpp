@@ -211,6 +211,7 @@ istream& adi_reader::load_record(record* in_record, istream& in, load_result_t& 
 							my_book_->modified(true, false);
 							bad_field = field;
 						}
+						// Report if an error case has been seen
 						char message[200];
 						switch (validity) {
 						case IGNORED_APP:

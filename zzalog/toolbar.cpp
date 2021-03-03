@@ -31,7 +31,7 @@ extern pfx_data* pfx_data_;
 extern status* status_;
 extern main_window* main_window_;
 
-// Constructor
+// Constructor - most buttons invoke a menu item
 toolbar::toolbar(int X, int Y, int W, int H, const char* label) :
 	Fl_Group(X, Y, W, H, label)
 	, search_text_("")
@@ -280,11 +280,12 @@ toolbar::toolbar(int X, int Y, int W, int H, const char* label) :
 	ip->value(search_text_.c_str());
 	ip->textsize(FONT_SIZE);
 	ip->textfont(FONT);
+	ip->tooltip("Enter will search for the callsign typed");
 	add(ip);
 	// Make it visible to load the text up
 	ip_search_ = ip;
 	curr_x += WSMEDIT;
-	// Button to search in log for above callsign
+	// Button to look for the next occurence log for above callsign
 	bn = new Fl_Button(curr_x, Y, H, H, "@2->");
 	bn->callback(cb_bn_search, (void*)false);
 	bn->when(FL_WHEN_RELEASE);
@@ -343,7 +344,8 @@ toolbar::~toolbar()
 	clear();
 }
 
-// Button callback - v provides the label of the desired menu item
+// Button callback - 
+// v provides the label of the desired menu item
 void toolbar::cb_bn_menu(Fl_Widget*w, void*v) {
 	// Get the menu item
 	char* item_name = (char*)v;
@@ -361,7 +363,7 @@ void toolbar::cb_bn_menu(Fl_Widget*w, void*v) {
 		}
 	}
 	else {
-		// If the menu items does not exists
+		// If the menu item does not exists - programming error
 		sprintf(message, "MENU: Unable to find the menu item - %s", (char*)v);
 		status_->misc_status(ST_FATAL, message);
 		delete[] message;
@@ -428,6 +430,7 @@ void toolbar::cb_bn_search(Fl_Widget* w, void* v) {
 }
 
 // Callback to extract all the records for the callsign in the search text box
+// v is not used
 void toolbar::cb_bn_extract(Fl_Widget* w, void* v) {
 	toolbar* that = ancestor_view<toolbar>(w);
 	cb_value<intl_input, string>((Fl_Widget*)that->ip_search_, (void*)& that->search_text_);
@@ -435,6 +438,7 @@ void toolbar::cb_bn_extract(Fl_Widget* w, void* v) {
 }
 
 // Open a tooltip that displays the parse results for the callsign in the search text box
+// v is not used
 void toolbar::cb_bn_explain(Fl_Widget* w, void* v) {
 	toolbar* that = ancestor_view<toolbar>(w);
 	// Create a temporary record to parse theh callsign
@@ -478,11 +482,15 @@ void toolbar::update_items() {
 		if (w->callback() == &cb_bn_menu) {
 			const Fl_Menu_Item* cb = menu_->find_item((char*)w->user_data());
 			if (cb == nullptr) {
-				// Menu item does not exist - deactivate the toolbar button
-				if (status_) status_->misc_status(ST_SEVERE, "MENU: Broken menu item");
+				// Menu item does not exist - deactivate the toolbar button and report
+				if (status_) {
+					char message[128];
+					snprintf(message, 128, "MENU: Broken menu item %s", (char*)w->user_data());
+					status_->misc_status(ST_SEVERE, message);
+				}
 				w->deactivate();
 			} else if (cb->active()) {
-				// It exists and ia active, activate the toolbar button
+				// It exists and is active, activate the toolbar button
 				w->activate();
 			}
 			else {

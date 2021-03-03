@@ -26,7 +26,6 @@ extern status* status_;
 extern menu* menu_;
 extern Fl_Preferences* settings_;
 
-
 // Constructor
 report_tree::report_tree(int X, int Y, int W, int H, const char* label, field_ordering_t app) :
 	Fl_Tree(X, Y, W, H, label),

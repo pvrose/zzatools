@@ -7,6 +7,7 @@ using namespace std;
 
 namespace zzalog {
 
+	// This calss inherits from Fl_Single_Window and is the main application window
 	class main_window :
 		public Fl_Single_Window
 	{

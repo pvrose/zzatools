@@ -52,6 +52,7 @@ namespace zzalog {
 		istream& load(istream& in);
 	};
 
+	// This class provides a wrapper for all  the callsign exception data in cty.xml
 	class exc_data
 	{
 	public:

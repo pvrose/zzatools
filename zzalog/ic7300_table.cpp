@@ -475,6 +475,7 @@ void ic7300_table::draw_scope_bands_view() {
 	}
 
 	// Set row headers
+	// TODO: Add fourth register per firmware 1.40
 	row_headers_[0] = "0.03~1.6MHz";
 	row_headers_[1] = "";
 	row_headers_[2] = "";

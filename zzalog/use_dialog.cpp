@@ -68,6 +68,7 @@ use_dialog::~use_dialog()
 }
 
 // OK button callback - save data and close dialog
+// v is unused
 void use_dialog::cb_bn_ok(Fl_Widget* w, void* v) {
 	use_dialog* that = ancestor_view<use_dialog>(w);
 	that->save_data();
@@ -76,6 +77,7 @@ void use_dialog::cb_bn_ok(Fl_Widget* w, void* v) {
 }
 
 // Cancel button callback - cloase dialog without saving
+// v is unused
 void use_dialog::cb_bn_cancel(Fl_Widget* w, void* v) {
 	use_dialog* that = ancestor_view<use_dialog>(w);
 	that->do_button(BN_CANCEL);

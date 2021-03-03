@@ -782,6 +782,7 @@ void extract_data::sort_records(string field_name, bool reversed) {
 	fl_cursor(FL_CURSOR_DEFAULT);
 }
 
+// Undo the above sort 
 void extract_data::correct_record_order() {
 	fl_cursor(FL_CURSOR_WAIT);
 	record_num_t count = size();

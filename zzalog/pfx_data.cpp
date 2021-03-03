@@ -7,6 +7,8 @@
 #include "status.h"
 #include "../zzalib/callback.h"
 
+#include <cctype>
+
 #include <FL/fl_ask.H>
 #include <FL/Fl_Preferences.H>
 #include <FL/Fl_Native_File_Chooser.H>
@@ -107,7 +109,7 @@ prefix* pfx_data::get_prefix(string nickname) {
 	}
 }
 
-// Reaturns the prefix data based on the DXCC code
+// Returns the prefix data based on the DXCC code
 prefix* pfx_data::get_prefix(unsigned int dxcc_code) {
 	if (find(dxcc_code) != end()) {
 		return at(dxcc_code);
@@ -118,7 +120,7 @@ prefix* pfx_data::get_prefix(unsigned int dxcc_code) {
 	}
 }
 
-//Returns the prefix data based on DXCC code and state/province code
+// Returns the prefix data based on DXCC code and state/province code
 prefix* pfx_data::get_prefix(unsigned int dxcc_code, string state) {
 	// First get the DXCC prefix
 	if (find(dxcc_code) != end()) {
@@ -313,8 +315,6 @@ bool pfx_data::all_prefixes(record* record, vector<prefix*>* prefixes, bool spec
 		do_parse = false;
 		break;
 	}
-	int iRound = 0;
-	// Continue 3 rounds or until parsed - 
 	if (do_parse) {
 		// Search the whole countries table
 		bool parsed = false;
@@ -490,11 +490,11 @@ bool pfx_data::match_callsign(prefix* prefix, string& callsign) {
 			switch (test_char) {
 			case '#':
 				// # - matches any numeric character
-				call_matches &= (i2 < callsign.length()) && callsign[i2] >= '0' && callsign[i2] <= '9';
+				call_matches &= (i2 < callsign.length()) && isdigit(callsign[i2]);
 				break;
 			case '@':
 				// @ - matches any alphabetic character
-				call_matches &= (i2 < callsign.length()) && callsign[i2] >= 'A' && callsign[i2] <= 'Z';
+				call_matches &= (i2 < callsign.length()) && isalpha(callsign[i2]);
 				break;
 			case '?':
 				// ? - matches any character
@@ -529,12 +529,12 @@ bool pfx_data::match_callsign(prefix* prefix, string& callsign) {
 						break;
 					case '#':
 						// # - matches any numeric character
-						match_in_parenthesis |= (i2 < callsign.length()) && callsign[i2] >= '0' && callsign[i2] <= '9';
+						match_in_parenthesis |= (i2 < callsign.length()) && isdigit(callsign[i2]);
 						i1++;
 						break;
 					case '@':
 						// @ - matches any alphabetic character
-						match_in_parenthesis |= (i2 < callsign.length()) && callsign[i2] >= 'A' && callsign[i2] <= 'Z';
+						match_in_parenthesis |= (i2 < callsign.length()) && isalpha(callsign[i2]);
 						i1++;
 						break;
 					case '?':
@@ -954,6 +954,7 @@ void pfx_data::great_circle(lat_long_t source, lat_long_t destination, double& b
 	distance = EARTH_RADIUS * acos(cos_angle);
 }
 
+// Get the tip explaining parsing of the callsign
 string pfx_data::get_tip(record* record) {
 	vector<prefix*> prefixes;
 	char temp[1024];

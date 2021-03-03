@@ -20,6 +20,12 @@ intl_editor::intl_editor(int X, int Y, int W, int H, const char* label) :
 	}
 };
 
+intl_editor::~intl_editor() {
+	if (intl_dialog_) {
+		intl_dialog_->editor(nullptr);
+	}
+}
+
 // Event handler - handle event as normal then set the cursor depending on current insert mode
 int intl_editor::handle(int event) {
 	// Tell international character dialog to paste to this widget as this is the most recent one to get focus
@@ -50,6 +56,12 @@ int intl_editor::handle(int event) {
 // Version of Fl_Input - constructor
 intl_input::intl_input(int X, int Y, int W, int H, const char* label) :
 	Fl_Input(X, Y, W, H, label) {};
+
+intl_input::~intl_input() {
+	if (intl_dialog_) {
+		intl_dialog_->editor(nullptr);
+	}
+}
 
 // Event handler
 int intl_input::handle(int event) {

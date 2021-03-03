@@ -161,9 +161,10 @@ void qsl_design::create_form(int X, int Y) {
 	gp1->box(FL_DOWN_BOX);
 	gp1->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 
-	// Row 1 - radio buttons
+	// Row 1 - radio buttons to select size units
 	Fl_Group* radio_gp1 = new Fl_Group(XGRP1, Y_11, WGRP1, HBUTTON);
 	radio_gp1->box(FL_NO_BOX);
+	// Radio to select inches
 	Fl_Radio_Light_Button* radio111 = new Fl_Radio_Light_Button(X_111, Y_11, WBUTTON, HBUTTON, "inch");
 	radio111->value(current_design_->unit() == qsl_form::INCH);
 	radio111->labelfont(FONT);
@@ -172,6 +173,7 @@ void qsl_design::create_form(int X, int Y) {
 	radio111->align(FL_ALIGN_RIGHT | FL_ALIGN_INSIDE);
 	radio111->callback(cb_radio_dim, (void*)qsl_form::INCH);
 	radio111->tooltip("Measurements in inches");
+	// Radio to select millimetres
 	Fl_Radio_Light_Button* radio112 = new Fl_Radio_Light_Button(X_112, Y_11, WBUTTON, HBUTTON, "mm");
 	radio112->value(current_design_->unit() == qsl_form::MILLIMETER);
 	radio112->labelfont(FONT);
@@ -180,6 +182,7 @@ void qsl_design::create_form(int X, int Y) {
 	radio112->align(FL_ALIGN_RIGHT | FL_ALIGN_INSIDE);
 	radio112->callback(cb_radio_dim, (void*)qsl_form::MILLIMETER);
 	radio112->tooltip("Measurements in millimetres");
+	// Radio to select points
 	Fl_Radio_Light_Button* radio113 = new Fl_Radio_Light_Button(X_113, Y_11, WBUTTON, HBUTTON, "point");
 	radio113->value(current_design_->unit() == qsl_form::POINT);
 	radio113->labelfont(FONT);
@@ -190,6 +193,7 @@ void qsl_design::create_form(int X, int Y) {
 	radio113->tooltip("Measurements in printer points");
 	radio_gp1->end();
 	// Row 2 - width parameters
+	// Input to set number of columns to print
 	Fl_Value_Input* vip121 = new Fl_Value_Input(X_121, Y_12, WBUTTON, HBUTTON, "Columns");
 	vip121->value(num_cols_);
 	vip121->labelfont(FONT);
@@ -200,6 +204,7 @@ void qsl_design::create_form(int X, int Y) {
 	vip121->callback(cb_value<Fl_Value_Input, int>, &num_cols_);
 	vip121->when(FL_WHEN_ENTER_KEY);
 	vip121->tooltip("Please specify the number of columns when printing");
+	// Input to specify the width of the label
 	Fl_Value_Input* vip122 = new Fl_Value_Input(X_122, Y_12, WBUTTON, HBUTTON, "Width");
 	vip122->value(current_design_->width());
 	vip122->labelfont(FONT);
@@ -210,6 +215,7 @@ void qsl_design::create_form(int X, int Y) {
 	vip122->callback(cb_vip_sized, (void*)WIDTH);
 	vip122->when(FL_WHEN_ENTER_KEY);
 	vip122->tooltip("Please specify the width of the label in the selected unit");
+	// Input to specify the position ofthe left edge of culmn 1
 	Fl_Value_Input* vip123 = new Fl_Value_Input(X_123, Y_12, WBUTTON, HBUTTON, "Position");
 	vip123->value(col_left_);
 	vip123->labelfont(FONT);
@@ -220,6 +226,7 @@ void qsl_design::create_form(int X, int Y) {
 	vip123->callback(cb_value<Fl_Value_Input, double>, &col_left_);
 	vip123->when(FL_WHEN_ENTER_KEY);
 	vip123->tooltip("Please specify the position of the first column");
+	// Input to specify the gap between columns
 	Fl_Value_Input* vip124 = new Fl_Value_Input(X_124, Y_12, WBUTTON, HBUTTON, "Spacing");
 	vip124->value(col_width_);
 	vip124->labelfont(FONT);
@@ -231,6 +238,7 @@ void qsl_design::create_form(int X, int Y) {
 	vip124->when(FL_WHEN_ENTER_KEY);
 	vip124->tooltip("Please specify the spacing between columns");
 	// Row 2A - height parameters
+	// Input to specify the number of rows of labels to print
 	Fl_Value_Input* vip12A1 = new Fl_Value_Input(X_121, Y_12A, WBUTTON, HBUTTON, "Rows");
 	vip12A1->value(num_rows_);
 	vip12A1->labelfont(FONT);
@@ -241,6 +249,7 @@ void qsl_design::create_form(int X, int Y) {
 	vip12A1->callback(cb_value<Fl_Value_Input, int>, &num_rows_);
 	vip12A1->when(FL_WHEN_ENTER_KEY);
 	vip12A1->tooltip("Please specify the number of rows when printing");
+	// Input to specify the height of each label
 	Fl_Value_Input* vip12A2 = new Fl_Value_Input(X_122, Y_12A, WBUTTON, HBUTTON, "Height");
 	vip12A2->value(current_design_->height());
 	vip12A2->labelfont(FONT);
@@ -251,6 +260,7 @@ void qsl_design::create_form(int X, int Y) {
 	vip12A2->callback(cb_vip_sized, (void*)HEIGHT);
 	vip12A2->when(FL_WHEN_ENTER_KEY);
 	vip12A2->tooltip("Please specify the width of the label in the selected label");
+	// Input to specify the top of the first label
 	Fl_Value_Input* vip12A3 = new Fl_Value_Input(X_123, Y_12A, WBUTTON, HBUTTON, "Position");
 	vip12A3->value(row_top_);
 	vip12A3->labelfont(FONT);
@@ -261,6 +271,7 @@ void qsl_design::create_form(int X, int Y) {
 	vip12A3->callback(cb_value<Fl_Value_Input, double>, &row_top_);
 	vip12A3->when(FL_WHEN_ENTER_KEY);
 	vip12A3->tooltip("Please specify the position of the first row");
+	// Input to specify the gap between each row
 	Fl_Value_Input* vip12A4 = new Fl_Value_Input(X_124, Y_12A, WBUTTON, HBUTTON, "Spacing");
 	vip12A4->value(row_height_);
 	vip12A4->labelfont(FONT);
@@ -272,6 +283,7 @@ void qsl_design::create_form(int X, int Y) {
 	vip12A4->when(FL_WHEN_ENTER_KEY);
 	vip12A4->tooltip("Please specify the spacing between rows");
 	// Row 3 - TL and TR values
+	// Input to specify the number of print rows in the top-left corner of the label
 	Fl_Value_Input* vip131 = new Fl_Value_Input(X_121, Y_13, WBUTTON, HBUTTON, "TL Rows");
 	vip131->value(current_design_->set_size(qsl_form::TOP_LEFT));
 	vip131->labelfont(FONT);
@@ -282,6 +294,7 @@ void qsl_design::create_form(int X, int Y) {
 	vip131->callback(cb_vip_sizeu, (void*)TL_SIZE);
 	vip131->when(FL_WHEN_ENTER_KEY);
 	vip131->tooltip("Please specify the number of lines in the text at the top-left quadrant of the label");
+	// Input to specify  the number of print  rows in the top-right corner of the label
 	Fl_Value_Input* vip132 = new Fl_Value_Input(X_122, Y_13, WBUTTON, HBUTTON, "TR Rows");
 	vip132->value(current_design_->set_size(qsl_form::TOP_RIGHT));
 	vip132->labelfont(FONT);
@@ -293,6 +306,7 @@ void qsl_design::create_form(int X, int Y) {
 	vip132->when(FL_WHEN_ENTER_KEY);
 	vip132->tooltip("Please specify the number of lines in the text at the top-right quadrant of the label");
 	// Row 4 - Table values
+	// Input to specify the number of rows in the central table
 	Fl_Value_Input* vip133 = new Fl_Value_Input(X_123, Y_13, WBUTTON, HBUTTON, "Tab. rows");
 	vip133->value(current_design_->table_rows());
 	vip133->labelfont(FONT);
@@ -303,6 +317,7 @@ void qsl_design::create_form(int X, int Y) {
 	vip133->callback(cb_vip_sizeu, (void*)TAB_ROWS);
 	vip133->when(FL_WHEN_ENTER_KEY);
 	vip133->tooltip("Please specify the number of rows in the central table");
+	// Input to specify the number of columns in the central table
 	Fl_Value_Input* vip141 = new Fl_Value_Input(X_121, Y_14, WBUTTON, HBUTTON, "Tab. cols");
 	vip141->value(current_design_->table_cols());
 	vip141->labelfont(FONT);
@@ -314,6 +329,7 @@ void qsl_design::create_form(int X, int Y) {
 	vip141->when(FL_WHEN_ENTER_KEY);
 	vip141->tooltip("Please specify the number of columns in the central table");
 	// Row 3 - BL and BR values
+	// Input to specify the number of print rows in the boton-left corner
 	Fl_Value_Input* vip142 = new Fl_Value_Input(X_122, Y_14, WBUTTON, HBUTTON, "BL Rows");
 	vip142->value(current_design_->set_size(qsl_form::BOTTOM_LEFT));
 	vip142->labelfont(FONT);
@@ -324,6 +340,7 @@ void qsl_design::create_form(int X, int Y) {
 	vip142->callback(cb_vip_sizeu, (void*)BL_SIZE);
 	vip142->when(FL_WHEN_ENTER_KEY);
 	vip142->tooltip("Please specify the number of lines in the text at the bottom-left quadrant of the label");
+	// Input to specify the number of print rows in the bottom-right corner
 	Fl_Value_Input* vip143 = new Fl_Value_Input(X_123, Y_14, WBUTTON, HBUTTON, "BR rows");
 	vip143->value(current_design_->set_size(qsl_form::BOTTOM_RIGHT));
 	vip143->labelfont(FONT);
@@ -343,6 +360,7 @@ void qsl_design::create_form(int X, int Y) {
 	gp2->box(FL_DOWN_BOX);
 	gp2->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 	// Row 1 - text value, colour selector
+	// Input to define the text to use for the field
 	ip_text_ = new intl_input(X_211, Y_21, WEDIT, HBUTTON, "Text");
 	ip_text_->value(current_data_->text.c_str());
 	ip_text_->labelfont(FONT);
@@ -354,6 +372,7 @@ void qsl_design::create_form(int X, int Y) {
 	ip_text_->callback(cb_ip_text);
 	ip_text_->when(FL_WHEN_ENTER_KEY);
 	ip_text_->tooltip("Please specify the text to appear in the selected line");
+	// Input to open a colour browser for this text
 	bn_colour_ = new Fl_Button(X_212, Y_21, WRADIO, HBUTTON, "Colour");
 	bn_colour_->labelfont(FONT);
 	bn_colour_->labelsize(FONT_SIZE);
@@ -362,6 +381,7 @@ void qsl_design::create_form(int X, int Y) {
 	bn_colour_->color(current_data_->colour);
 	bn_colour_->tooltip("Please specify the colour for the text in the selected line");
 	// Row 2 - font an size browsers
+	// Browser to supply the required font
 	br_font_ = new Fl_Hold_Browser(X_213, Y_21, WEDIT, HMLIN, "Font");
 	br_font_->labelfont(FONT);
 	br_font_->labelsize(FONT_SIZE);
@@ -369,6 +389,7 @@ void qsl_design::create_form(int X, int Y) {
 	br_font_->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
 	br_font_->callback(cb_br_font);
 	br_font_->tooltip("Please specify the font to use for the selected line");
+	// Brower to supply the required fontsize for the text
 	br_size_ = new Fl_Hold_Browser(X_214, Y_21, WBUTTON, HMLIN, "Size");
 	br_size_->textsize(FONT_SIZE);
 	br_size_->textfont(FONT);
@@ -384,7 +405,7 @@ void qsl_design::create_form(int X, int Y) {
 	gp3->labelsize(FONT_SIZE);
 	gp3->box(FL_DOWN_BOX);
 	gp3->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
-	// Row 1 position 1 - Enable button
+	// Row 1 position 1 - Enable button to print Bureau address label
 	Fl_Light_Button* bn_use_add = new Fl_Light_Button(X_311, Y_31, WBUTTON, HBUTTON, "Enable");
 	bn_use_add->labelfont(FONT);
 	bn_use_add->labelsize(FONT_SIZE);
@@ -393,6 +414,7 @@ void qsl_design::create_form(int X, int Y) {
 	bn_use_add->value(include_address_label_);
 	bn_use_add->tooltip("Print the address label after printing all QSL cards");
 	// Row 1 position 2 - Show/Hide button
+	// Button to show or hide the bureau address
 	bn_show_add_ = new Fl_Light_Button(X_312, Y_31, WBUTTON, HBUTTON, "Show");
 	bn_show_add_->labelfont(FONT);
 	bn_show_add_->labelsize(FONT_SIZE);
@@ -400,7 +422,7 @@ void qsl_design::create_form(int X, int Y) {
 	bn_show_add_->callback(cb_bn_show_add, &show_address_);
 	bn_show_add_->value(show_address_);
 	bn_show_add_->label(show_address_ ? "Hide" : "Show");
-	// Row 2 position 1 - text editor
+	// Row 2 position 1 - text editor for bureau address
 	editor_ = new intl_editor(X_321, Y_32, WEDIT, HMLIN * 2);
 	Fl_Text_Buffer* buffer = new Fl_Text_Buffer(1024);
 	for (unsigned int i = 0; i < num_lines_; i++) {
@@ -410,7 +432,7 @@ void qsl_design::create_form(int X, int Y) {
 	editor_->buffer(buffer);
 	editor_->textfont(FONT);
 	editor_->textsize(FONT_SIZE);
-	// Row 2 position 2 - font chooser
+	// Row 2 position 2 - font chooser for bureau address
 	br_font_add_ = new Fl_Hold_Browser(X_213, Y_32, WEDIT, HMLIN, "Font");
 	br_font_add_->labelfont(FONT);
 	br_font_add_->labelsize(FONT_SIZE);
@@ -418,6 +440,7 @@ void qsl_design::create_form(int X, int Y) {
 	br_font_add_->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
 	br_font_add_->callback(cb_br_font_add);
 	br_font_add_->tooltip("Please specify the font to use for the text");
+	// Browser to select fontsize
 	br_size_add_ = new Fl_Hold_Browser(X_214, Y_32, WBUTTON, HMLIN, "Size");
 	br_size_add_->textsize(FONT_SIZE);
 	br_size_add_->textfont(FONT);
@@ -474,9 +497,10 @@ void qsl_design::save_values() {
 
 }
 
-// This is required by page_dialog and intended to enable/dsiable widgets depending on data values
+// This is required by page_dialog and intended to enable/disable widgets depending on data values
 // using it here to change the appearance of the dialog 
 void qsl_design::enable_widgets() {
+	// Change the appearance of some widgets to reflect the values chosen
 	ip_text_->textcolor(current_data_->colour);
 	ip_text_->value(current_data_->text.c_str());
 	bn_colour_->color(current_data_->colour);
@@ -500,6 +524,7 @@ void qsl_design::enable_widgets() {
 }
 
 // Call back to read a value input into a double
+// v indicates which input: height or width
 void qsl_design::cb_vip_sized(Fl_Widget* w, void* v) {
 	qsl_design* that = ancestor_view<qsl_design>(w);
 	float value = (float)((Fl_Value_Input*)w)->value();
@@ -515,6 +540,7 @@ void qsl_design::cb_vip_sized(Fl_Widget* w, void* v) {
 }
 
 // Call back to read a value input into an unsigned
+// v indicates which font size button: top-left, top-right, bottom-left or bottom-right, or the table rows or columns 
 void qsl_design::cb_vip_sizeu(Fl_Widget* w, void* v) {
 	qsl_design* that = ancestor_view<qsl_design>(w);
 	unsigned int value = (unsigned int)((Fl_Value_Input*)w)->value();
@@ -541,6 +567,7 @@ void qsl_design::cb_vip_sizeu(Fl_Widget* w, void* v) {
 }
 
 // Callback when text value changed 
+// vi is unused
 void qsl_design::cb_ip_text(Fl_Widget* w, void* v) {
 	qsl_design* that = ancestor_view<qsl_design>(w);
 	string value;
@@ -549,6 +576,7 @@ void qsl_design::cb_ip_text(Fl_Widget* w, void* v) {
 }
 
 // Callback when font value changed
+// v is unused
 void qsl_design::cb_br_font(Fl_Widget* w, void* v) {
 	qsl_design* that = ancestor_view<qsl_design>(w);
 	Fl_Hold_Browser* font_br = (Fl_Hold_Browser*)w;
@@ -558,6 +586,7 @@ void qsl_design::cb_br_font(Fl_Widget* w, void* v) {
 }
 
 // Callback when font size changed
+/// v is unused
 void qsl_design::cb_br_size(Fl_Widget* w, void* v) {
 	qsl_design* that = ancestor_view<qsl_design>(w);
 	Fl_Hold_Browser* size_br = (Fl_Hold_Browser*)w;
@@ -567,6 +596,7 @@ void qsl_design::cb_br_size(Fl_Widget* w, void* v) {
 }
 
 // Call back when colour button changed
+// v is unused
 void qsl_design::cb_bn_colour(Fl_Widget* w, void* v) {
 	qsl_design* that = ancestor_view<qsl_design>(w);
 	Fl_Color value = fl_show_colormap(that->current_data_->colour);
@@ -581,7 +611,8 @@ void qsl_design::cb_radio_dim(Fl_Widget* w, void* v) {
 	that->card_window_->size(that->current_design_->w(), that->current_design_->h());
 }
 
-// Change to the font browser
+// Change to the address font browser
+// v is unused
 void qsl_design::cb_br_font_add(Fl_Widget* w, void* v) {
 	qsl_design* that = ancestor_view<qsl_design>(w);
 	Fl_Hold_Browser* font_br = (Fl_Hold_Browser*)w;
@@ -589,7 +620,8 @@ void qsl_design::cb_br_font_add(Fl_Widget* w, void* v) {
 	if (that->show_address_) that->redraw_address();
 }
 
-// change to the font size
+// change to the address font size
+// v is unused
 void qsl_design::cb_br_size_add(Fl_Widget* w, void* v) {
 	qsl_design* that = ancestor_view<qsl_design>(w);
 	Fl_Hold_Browser* size_br = (Fl_Hold_Browser*)w;
@@ -600,6 +632,7 @@ void qsl_design::cb_br_size_add(Fl_Widget* w, void* v) {
 }
 
 // Set address label parameters
+// v is unused
 void qsl_design::cb_bn_address(Fl_Widget* w, void* v) {
 	cb_value<Fl_Light_Button, bool>(w, v);
 	qsl_design* that = ancestor_view<qsl_design>(w);
@@ -608,6 +641,7 @@ void qsl_design::cb_bn_address(Fl_Widget* w, void* v) {
 }
 
 // Show/Hide address label in window
+// v is unused
 void qsl_design::cb_bn_show_add(Fl_Widget* w, void* v) {
 	cb_value<Fl_Light_Button, bool>(w, v);
 	qsl_design* that = ancestor_view<qsl_design>(w);
@@ -660,7 +694,7 @@ void qsl_design::populate_size(Fl_Hold_Browser* br) {
 	if (num_sizes) {
 		// We have some sizes
 		if (sizes[0] == 0) {
-			// Scaleable font - so any size available 
+			// First is 0 and the last is largest font, so select all from 1 to largest font
 			for (int i = 1; i < max(64, sizes[num_sizes - 1]); i++) {
 				char buff[20];
 				sprintf(buff, "%d", i);

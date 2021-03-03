@@ -21,7 +21,7 @@ const float IN_TO_POINT = 72.0f;
 
 namespace zzalog {
 
-	// THis class defines the current QSL design for printing and displaying
+	// This class defines the current QSL design for printing and displaying
 	class qsl_form : public Fl_Group
 	{
 	public:

@@ -115,12 +115,12 @@ void set_recent_file(string filename);
 
 // Display the time in the local timezone rather than UTC
 bool use_local_ = false;
-// Flag to prevent more than closure process at the same time
+// Flag to prevent more than one closure process at the same time
 bool closing_ = false;
 // Flag to mark everything loaded
 bool initialised_ = false;
 // Time loaded
-time_t session_start_  = (time_t)0;
+time_t session_start_ = (time_t)0;
 // Close caused by an SEVERE or FATAL error
 bool close_by_error_ = false;
 // Previous frequency
@@ -150,10 +150,12 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 			Fl::delete_widget(band_view_);
 			band_view_ = nullptr;
 		}
+		// Delete scratchpad
 		if (scratchpad_) {
 			delete scratchpad_;
 			scratchpad_ = nullptr;
 		}
+		// Close DxAtlas connection
 		if (dxatlas_) {
 			delete dxatlas_;
 			dxatlas_ = nullptr;
@@ -161,7 +163,7 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 		// Currently modifying a (potentially new) record
 		if (book_ && (book_->modified_record() || book_->new_record()) ) {
 			fl_beep(FL_BEEP_QUESTION);
-			switch (fl_choice("You are currently modifying a record? Save or Quit?", "Save?", "Quit?", nullptr)) {
+			switch (fl_choice("You are currently modifying a record? Save or Quit?", "Save", "Quit", nullptr)) {
 			case 0:
 				// Save
 				book_->save_record();
@@ -176,7 +178,7 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 		if (import_data_) {
 			if (!import_data_->update_complete()) {
 				fl_beep(FL_BEEP_QUESTION);
-				switch (fl_choice("There is an import in process. Do you want to let it finish or abandon it?", "Finish?", "Abandon", nullptr)) {
+				switch (fl_choice("There is an import in process. Do you want to let it finish or abandon it?", "Finish", "Abandon", nullptr)) {
 				case 0:
 					// Gracefully wait for import to complete
 					import_data_->stop_update(LM_OFF_AIR, false);
@@ -273,10 +275,9 @@ int cb_args(int argc, char** argv, int& i) {
 string get_file(char * arg_filename) {
 	string result = "";
 	if (!arg_filename || !(*arg_filename)) {
-		// null argument or empty string - get the recent file settings group.
+		// null argument or empty string - get the most recent file. (Recent Files->File1 in settings)
 		Fl_Preferences recent_settings(settings_, "Recent Files");
 		char *filename;
-		// get the most recent file
 		if (recent_settings.get("File1", filename, "")) {
 			// return the obtained filename
 			result = string(filename);
@@ -313,7 +314,7 @@ void add_properties() {
 	tip_settings.get("Duration", duration, (float)TIP_SHOW);
 	tip_settings.get("Font Name", font, FONT);
 	tip_settings.get("Font Size", size, FONT_SIZE);
-	// Default tooltip properties
+	// Set the default tooltip properties
 	Fl_Tooltip::size(size);
 	Fl_Tooltip::font(font);
 	Fl_Tooltip::delay(duration);
@@ -350,13 +351,13 @@ void add_data() {
 		if (!club_handler_) club_handler_ = new club_handler;
 		// Get pfx_data
 		pfx_data_ = new pfx_data;
-		// Draw the prefix data
+		// Draw the prefix data view
 		((pfx_tree*)tabbed_forms_->get_view(OT_PREFIX))->populate_tree(false);
 	}
 	if (!closing_) {
-		// add ADIF data.
+		// add ADIF specification data.
 		spec_data_ = new spec_data;
-		// Draw the ADIF data
+		// Draw the specification view
 		((spec_tree*)tabbed_forms_->get_view(OT_ADIF))->populate_tree(false);
 	}
 	// Add intl dialog
@@ -368,7 +369,7 @@ void add_data() {
 
 // Get session start from the current time or previous session start if that is within 1 hour
 void set_session_start() {
-	// Check this is to be a new session
+	// Check this is to be a new session (> 1hour after previous session ended
 	void* p_last = new time_t;
 	*(time_t*)p_last = session_start_;
 	time_t today = time(nullptr);
@@ -386,12 +387,13 @@ void set_session_start() {
 		session_start_ = *(time_t*)p_last;
 		strcpy(action, "Resuming session");
 	}
+	// Display the start time in the status log
 	char stime[100];
 	tm* start_time = gmtime(&session_start_);
 	strftime(stime, 100, "%Y%m%d %H%M%S", start_time);
 	char message[256];
 	snprintf(message, 256, "ZZALOG: %s %s", action, stime);
-	// Save session start as it's annoying forgetting it after a crash
+	// Save session start as it's annoying losing it after an application fail
 	settings_->set("Session Start", (void*)&session_start_, sizeof(time_t));
 	settings_->flush();
 }
@@ -419,7 +421,7 @@ void add_book(char* arg) {
 
 // Update rig information in the various views - this is controlled by rig_if_.
 void cb_rig_timer() {
-	// There may be a race hazard involving flrig and zzalib when I try and close zzalib
+	// There may be a race hazard involving flrig and zzalog when I try and close zzalog
 	if (!closing_) {
 		// Band view may not have been created yet - only update if frequency has changed to remove annoying flicker
 		if (band_view_) {
@@ -445,19 +447,24 @@ void cb_rig_timer() {
 		}
 		// Update rig status
 		if (!band_view_ || band_view_->in_band(rig_if_->tx_frequency()/1000.0)) {
+			// We are at a valid frequency
 			if (rig_if_->get_tx() == true) {
 				if (rig_if_->check_swr()) {
+					// Transmit, low SWR
 					status_->rig_status(RS_TX, rig_if_->rig_info().c_str());
 				}
 				else {
+					// Transmit, high SWR
 					status_->rig_status(RS_HIGH, rig_if_->rig_info().c_str());
 				}
 			}
 			else {
+				// Receive
 				status_->rig_status(RS_RX, rig_if_->rig_info().c_str());
 			}
 		}
 		else {
+			// Out of band or not known
 			status_->rig_status(RS_ERROR, rig_if_->rig_info().c_str());
 		}
 		// Check SWR
@@ -542,7 +549,7 @@ void add_rig_if() {
 						if (menu_->logging() == LM_IMPORTED) menu_->logging(LM_ON_AIR);
 					}
 					else {
-						// Connect to rig OK - see if we are a digital mode
+						// Connect to rig OK - see if we are a digital mode and if so start auto-import process
 						if ((rig_if_->mode() == GM_DIGL || rig_if_->mode() == GM_DIGU) && import_data_->start_auto_update()) {
 							char message[256];
 							snprintf(message, 256, "RIG: %s", rig_if_->success_message().c_str());
@@ -709,7 +716,7 @@ void add_dxatlas() {
 
 // Set the text in the main window label
 void main_window_label(string text) {
-	// e.g. ZZALOG 3.0.0: <filename>
+	// e.g. ZZALOG 3.0.0: <filename> - PROGRAM_VERSION includes (Debug) if compiled under _DEBUG
 	string label = PROGRAM_ID + " " + PROGRAM_VERSION;
 	if (text.length()) {
 		label += ": " + text;
@@ -738,7 +745,7 @@ void add_widgets(int& curr_y) {
 	status_ = new status(0, curr_y, WIDTH, TOOL_HEIGHT);
 	main_window_->add(status_);
 	curr_y += status_->h();
-	// Toolbar - image buttons representing a number of menu items - disable all menu related items
+	// Toolbar - image buttons representing a number of menu and other commands - disable all menu related buttons
 	toolbar_ = new toolbar(0, curr_y, WIDTH, TOOL_HEIGHT);
 	main_window_->add(toolbar_);
 	toolbar_->update_items();
@@ -888,7 +895,7 @@ int main(int argc, char** argv)
 	set_session_start();
 	// Read in log book data - uses progress - use supplied argument for filename
 	add_book(argc == 1 ? nullptr : argv[argc - 1]);
-	// Connect to the rig
+	// Connect to the rig - load all hamlib backends once only here
 	rig_if_ = nullptr;
 	rig_load_all_backends();
 	add_rig_if();
@@ -911,9 +918,10 @@ int main(int argc, char** argv)
 		menu_->redraw();
 		// Only do this if we haven't tried to close
 		// Start WSJT-X server
+		// TODO: Run this in a separate thread. We will need to set up a postbox to log records from it.
 		wsjtx_handler_->run_server();
 		// TODO: Fldigi locks up when server responds to its first request
-		// TODO: We don't exit run_server
+		// TODO: We don't exit run_server - again run in a separate thread
 		//fllog_emul_->run_server();
 		// enable menu
 		// Run the application until it is closed

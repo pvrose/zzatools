@@ -197,7 +197,7 @@ bool specx_reader::start_header() {
 	}
 }
 
-// Start header value
+// Start header or record value
 bool specx_reader::start_value(map<string, string>* attributes) {
 	switch (elements_.back()) {
 	case SXE_HEADER:

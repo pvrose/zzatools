@@ -145,7 +145,6 @@ status::status(int X, int Y, int W, int H, const char* label) :
 	// If it's not in the settings, open file dialog, get it and set it.
 	while (report_filename_.length() == 0) {
 		// Create an Open dialog; the default file name extension is ".txt".
-		//Fl_File_Chooser* chooser = new Fl_File_Chooser(report_filename_.c_str(), "Text Files(*.txt)\tAll Files (*.*)", Fl_File_Chooser::CREATE, "Select file name for status report");
 		Fl_Native_File_Chooser* chooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_SAVE_FILE);
 		chooser->title("Select file name for status report");
 		chooser->filter("Text files\t*.txt");
@@ -380,7 +379,6 @@ void status::rig_status(rig_status_t status, const char* label) {
 	Fl::wait();
 }
 
-
 // Update miscellaneous status - set text and colour, log the status
 void status::misc_status(status_t status, const char* label) {
 	// If we are displaying the message at this level
@@ -426,8 +424,6 @@ void status::misc_status(status_t status, const char* label) {
 	if (report_file_) {
 		// File did open correctly
 		*report_file_ << message;
-		// So that file is upto date on a crash
-//		report_file_->flush();
 	}
 
 	// Now add the line to the file viewer
@@ -469,7 +465,7 @@ void status::misc_status(status_t status, const char* label) {
 		main_window_->do_callback();
 		break;
 	case ST_ERROR:
-		// Override bar on updating viewer
+		// Open status file viewer and continue
 		status_file_viewer_->show();
 		fl_beep(FL_BEEP_ERROR);
 		break;
@@ -536,6 +532,7 @@ void text_display::append(const char* line) {
 }
 
 // Call back for find/find again
+// v is a bool: true for find again, false for find new
 void viewer_window::cb_find(Fl_Widget* w, void* v) {
 	viewer_window* that = ancestor_view<viewer_window>(w);
 	bool repeat = (long)v;
@@ -562,6 +559,7 @@ void viewer_window::cb_find(Fl_Widget* w, void* v) {
 }
 
 // Call back for filter
+// v is a pointer to display_->filter_
 void viewer_window::cb_ch_filter(Fl_Widget* w, void* v) {
 	cb_choice_text(w, v);
 	viewer_window* that = ancestor_view<viewer_window>(w);
@@ -710,6 +708,7 @@ void viewer_window::draw_window() {
 }
 
 // Callback opens a text browser
+// v is unused
 void status::cb_bn_misc(Fl_Widget* w, void* v) {
 	status* that = ancestor_view<status>(w);
 	// Reload the viewer and force the window to be shown - it may have been closed

@@ -185,7 +185,7 @@ string qrz_handler::generate_details_uri(string callsign) {
 	return result;
 }
 
-// Fetch user details - returns false if not enabled or wither username or password are blank strings
+// Fetch user details - returns false if not enabled or whether username or password are blank strings
 bool qrz_handler::user_details() {
 	Fl_Preferences qsl_settings(settings_, "QSL");
 	Fl_Preferences qrz_settings(qsl_settings, "QRZ");
@@ -374,6 +374,7 @@ bool qrz_handler::has_session() {
 	}
 }
 
+// Non-subscriber access to QRZ.com web interface
 void qrz_handler::open_web_page(string callsign) {
 	// If we have a selected record - get browser executable from settings
 	string browser = menu_->get_browser();

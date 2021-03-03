@@ -53,7 +53,7 @@ spec_tree::~spec_tree()
 void spec_tree::update(hint_t hint, unsigned int record_num_1, unsigned int record_num_2) {
 	switch (hint) {
 	case HT_FORMAT:
-		// May have change font - redraw
+		// May have changed font - redraw
 		item_labelfont(font_);
 		item_labelsize(fontsize_);
 		populate_tree(false);
@@ -282,7 +282,6 @@ void spec_tree::insert_adif_spec(Fl_Tree_Item* parent, const spec_dataset& datas
 	}
 	hang_item->close();
 }
-
 
 // Set log font values
 void spec_tree::set_font(Fl_Font font, Fl_Fontsize size) {

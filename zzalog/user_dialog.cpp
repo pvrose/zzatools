@@ -77,6 +77,7 @@ void user_dialog::create_form(int X, int Y) {
 	// Group 1 - log_table
 	int pos_x = GAP + EDGE;
 	int pos_y = GAP + EDGE;
+	// Log table 
 	Fl_Group* g1 = new Fl_Group(pos_x, pos_y, 0, 10, "Log Table");
 	g1->labelfont(FONT);
 	g1->labelsize(FONT_SIZE);
@@ -85,6 +86,7 @@ void user_dialog::create_form(int X, int Y) {
 	// Add font browser
 	pos_x += GAP;
 	pos_y += HTEXT;
+	// Browser to select font
 	Fl_Hold_Browser* br1 = new Fl_Hold_Browser(pos_x, pos_y, WEDIT, HMLIN, "Font");
 	br1->labelfont(FONT);
 	br1->labelsize(FONT_SIZE);
@@ -200,7 +202,7 @@ void user_dialog::create_form(int X, int Y) {
 	g3->size(pos_x - g3->x(), pos_y - g3->y());
 	g3->end();
 
-	// Group 3 - scratchpad
+	// Group 3 - tree views (report, prefix and specification)
 	pos_y += GAP;
 	pos_x = g2->x();
 	Fl_Group* g4 = new Fl_Group(pos_x, pos_y, 0, 10, "Tree views");
@@ -272,7 +274,7 @@ void user_dialog::create_form(int X, int Y) {
 
 	// Add Time choice
 	pos_y += ch2->h() + HTEXT;
-	Fl_Choice* ch3 = new Fl_Choice(pos_x, pos_y, WEDIT, HBUTTON, "Date");
+	Fl_Choice* ch3 = new Fl_Choice(pos_x, pos_y, WEDIT, HBUTTON, "Time");
 	ch3->align(FL_ALIGN_LEFT | FL_ALIGN_TOP);
 	ch3->labelfont(FONT);
 	ch3->labelsize(FONT_SIZE);
@@ -338,6 +340,7 @@ void user_dialog::save_values() {
 void user_dialog::enable_widgets() {}
 
 // Callback for log_font browser
+// v is unused
 void user_dialog::cb_br_logfont(Fl_Widget* w, void* v) {
 	user_dialog* that = ancestor_view<user_dialog>(w);
 	Fl_Hold_Browser* font_br = (Fl_Hold_Browser*)w;
@@ -346,6 +349,7 @@ void user_dialog::cb_br_logfont(Fl_Widget* w, void* v) {
 }
 
 // Callback for all size browsers
+// v is a pointer to the size variable
 void user_dialog::cb_br_size(Fl_Widget* w, void* v) {
 	user_dialog* that = ancestor_view<user_dialog>(w);
 	Fl_Hold_Browser* size_br = (Fl_Hold_Browser*)w;
@@ -353,7 +357,8 @@ void user_dialog::cb_br_size(Fl_Widget* w, void* v) {
 	*(Fl_Fontsize*)v = stoi(size_br->text(line));
 }
 
-// Callback for tp font browser
+// Callback for tooltip font browser
+// v is unused
 void user_dialog::cb_br_tipfont(Fl_Widget* w, void* v) {
 	user_dialog* that = ancestor_view<user_dialog>(w);
 	Fl_Hold_Browser* font_br = (Fl_Hold_Browser*)w;
@@ -362,6 +367,7 @@ void user_dialog::cb_br_tipfont(Fl_Widget* w, void* v) {
 }
 
 // Callback for scratchpad font browser
+// v is unused
 void user_dialog::cb_br_spadfont(Fl_Widget* w, void* v) {
 	user_dialog* that = ancestor_view<user_dialog>(w);
 	Fl_Hold_Browser* font_br = (Fl_Hold_Browser*)w;
@@ -370,13 +376,13 @@ void user_dialog::cb_br_spadfont(Fl_Widget* w, void* v) {
 }
 
 // Callback for tree view font browser
+// v is unused
 void user_dialog::cb_br_treefont(Fl_Widget* w, void* v) {
 	user_dialog* that = ancestor_view<user_dialog>(w);
 	Fl_Hold_Browser* font_br = (Fl_Hold_Browser*)w;
 	that->tree_font_ = (Fl_Font)font_br->value() - 1;
 	that->populate_size((Fl_Hold_Browser*)v, &that->tree_font_, &that->tree_size_);
 }
-
 
 // Populate the font browser
 void user_dialog::populate_font(Fl_Hold_Browser* br, const Fl_Font* font) {
@@ -437,6 +443,7 @@ void user_dialog::populate_freq(Fl_Choice* ch, display_freq_t format) {
 	}
 	ch->clear();
 	char temp[25];
+	// Display the current frequency in the selected format
 	for (int i = 0; i < (int)FREQ_END; i++) {
 		snprintf(temp, 25, "%d: %s", i, record::format_freq((display_freq_t)i, freq).c_str());
 		ch->add(temp);
@@ -449,9 +456,13 @@ void user_dialog::populate_freq(Fl_Choice* ch, display_freq_t format) {
 	}
 }
 
-// Populate date TODO - need to identify 12_12_2020 from 12_12_2020
+// Populate date choice
 void user_dialog::populate_date(Fl_Choice* ch, display_date_t format) {
 	string date = now(false, "%Y%m%d");
+	// Avoid dates where the month and day are the same
+	if (now(false, "%m") == now(false, "%d")) {
+		date = "20201231";
+	}
 	ch->clear();
 	char temp[25];
 	for (int i = 0; i < (int)DATE_END; i++) {
@@ -466,7 +477,7 @@ void user_dialog::populate_date(Fl_Choice* ch, display_date_t format) {
 	}
 }
 
-// Populate time
+// Populate time choice
 void user_dialog::populate_time(Fl_Choice* ch, display_time_t format) {
 	string time = now(false, "%H%M%S");
 	ch->clear();

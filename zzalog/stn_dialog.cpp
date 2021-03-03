@@ -158,6 +158,7 @@ void stn_dialog::power_table::redraw_table() {
 }
 
 // Callbacks for drive input
+// v is a pointer to std::pair drive->power
 void stn_dialog::power_table::cb_ip_drive(Fl_Widget* w, void* v) {
 	// Get pointers to the divers objects
 	power_table* that = ancestor_view<power_table>(w);
@@ -185,6 +186,7 @@ void stn_dialog::power_table::cb_ip_drive(Fl_Widget* w, void* v) {
 }
 
 // Callback for power input
+// v is a pointer to a std::pair drive->power 
 void stn_dialog::power_table::cb_ip_power(Fl_Widget* w, void* v) {
 	// Get pointers to the divers objects
 	power_table* that = ancestor_view<power_table>(w);
@@ -437,6 +439,7 @@ void stn_dialog::common_grp::cb_bn_del(Fl_Widget* w, void* v) {
 }
 
 // button callback - all/active items
+// v is unused
 void stn_dialog::common_grp::cb_bn_all(Fl_Widget* w, void* v) {
 	common_grp* that = ancestor_view<common_grp>(w);
 	that->display_all_items_ = ((Fl_Light_Button*)w)->value();
@@ -444,6 +447,7 @@ void stn_dialog::common_grp::cb_bn_all(Fl_Widget* w, void* v) {
 }
 
 // button callback - active/deactive
+// v is unused
 void stn_dialog::common_grp::cb_bn_activ8(Fl_Widget* w, void* v) {
 	common_grp* that = ancestor_view<common_grp>(w);
 	// Set the item active or inactive dependant on state of light button
@@ -454,6 +458,7 @@ void stn_dialog::common_grp::cb_bn_activ8(Fl_Widget* w, void* v) {
 }
 
 // choice callback
+// v is unused
 void stn_dialog::common_grp::cb_ch_stn(Fl_Widget* w, void* v) {
 	// Input_Choice is a descendant of common_grp
 	Fl_Input_Choice* ch = ancestor_view<Fl_Input_Choice>(w);
@@ -477,8 +482,6 @@ void stn_dialog::common_grp::cb_ch_stn(Fl_Widget* w, void* v) {
 	}
 	that->redraw();
 }
-
-
 
 // QTH group constructor
 stn_dialog::qth_group::qth_group(int X, int Y, int W, int H, const char* label) :
@@ -706,6 +709,7 @@ void stn_dialog::qth_group::save_item() {
 }
 
 // Callsign callback 
+// v is pointer to the callsign field of the QTH structure
 void stn_dialog::qth_group::cb_ip_call(Fl_Widget* w, void* v) {
 	qth_group* that = ancestor_view<qth_group>(w);
 	qth_info_t* qth = &that->current_qth_;
@@ -776,6 +780,7 @@ void stn_dialog::qth_group::cb_ip_call(Fl_Widget* w, void* v) {
 }
 
 // Callback that converts what is typed to upper-case
+// v is pointer to the field in the QTH structure
 void stn_dialog::qth_group::cb_ip_upper(Fl_Widget* w, void* v) {
 	cb_value<intl_input, string>(w, v);
 	*(string*)v = to_upper(*(string*)v);
@@ -925,11 +930,13 @@ void stn_dialog::rig_group::update_item() {
 	redraw();
 }
 
+// Add the rig items
 void stn_dialog::rig_group::add_item() {
 	// Create default pwoer matrix
 	update_item();
 }
 
+// Delete the rig items
 void stn_dialog::rig_group::delete_item(string item) {
 	if (matrix_ != nullptr) {
 		matrix_->delete_rig();
@@ -939,6 +946,7 @@ void stn_dialog::rig_group::delete_item(string item) {
 }
 
 // Callback - add band
+// v is unused
 void stn_dialog::rig_group::cb_bn_add_band(Fl_Widget* w, void* v) {
 	rig_group* that = ancestor_view<rig_group>(w);
 	that->selected_band_ = to_upper(that->selected_band_);
@@ -951,6 +959,7 @@ void stn_dialog::rig_group::cb_bn_add_band(Fl_Widget* w, void* v) {
 }
 
 // Call back delete band
+// v is unused
 void stn_dialog::rig_group::cb_bn_del_band(Fl_Widget* w, void* v) {
 	rig_group* that = ancestor_view<rig_group>(w);
 	Fl_Input_Choice* ch = (Fl_Input_Choice*)that->ch_band_;
@@ -962,6 +971,7 @@ void stn_dialog::rig_group::cb_bn_del_band(Fl_Widget* w, void* v) {
 }
 
 // Add a power point
+// v is unused
 void stn_dialog::rig_group::cb_bn_add_power(Fl_Widget* w, void* v) {
 	rig_group* that = ancestor_view<rig_group>(w);
 	((power_table*)that->table_)->add_row();
@@ -969,6 +979,7 @@ void stn_dialog::rig_group::cb_bn_add_power(Fl_Widget* w, void* v) {
 }
 
 // Select the band
+// v is unused
 void stn_dialog::rig_group::cb_ch_sel_band(Fl_Widget* w, void* v) {
 	// Input_Choice is a descendant of common_grp
 	Fl_Input_Choice* ch = ancestor_view<Fl_Input_Choice>(w);

@@ -23,11 +23,11 @@ edit_input::edit_input(int X, int Y, int W, int H) :
 
 // Handler for mouse and keyboard events
 int edit_input::handle(int event) {
-	// Tell the international character dialog this input will accept pastes
 	// Get the parent table
 	log_table* table = ancestor_view<log_table>(this);
 	switch (event) {
 	case FL_FOCUS:
+		// Tell the international character dialog this input will accept pastes
 		if (intl_dialog_) intl_dialog_->editor(this);
 		return true;
 	case FL_UNFOCUS:
@@ -35,7 +35,7 @@ int edit_input::handle(int event) {
 		// tell FLTK we've acknowledged it so we can receive keyboard events (or not)
 		return true;
 	case FL_PUSH:
-		// Mouse pushed - return true to received the release
+		// Mouse pushed - return true to receive the release event
 		return true;
 	case FL_RELEASE:
 		// On right button drop down menu to change case

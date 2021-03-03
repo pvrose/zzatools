@@ -57,7 +57,7 @@ void config_tree::add_leaf(Fl_Tree_Item* parent, string label, string value) {
 
 // Add a branch node - adds all the children as well 
 void config_tree::add_branch(Fl_Tree_Item* parent, Fl_Preferences* settings) {
-	Fl_Tree_Item* branch;
+	Fl_Tree_Item* branch = nullptr;
 	if (parent != nullptr) {
 		// Add the branch with the name of the settings group
 		branch = parent->add(prefs(), settings->name());
