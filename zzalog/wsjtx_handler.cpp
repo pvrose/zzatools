@@ -197,8 +197,8 @@ int wsjtx_handler::handle_decode(stringstream& ss) {
 // has called a new station
 int wsjtx_handler::handle_status(stringstream& ss) {
 	// Debug code
-	string datagram = ss.str();
-	status_->misc_status(ST_DEBUG, to_hex(datagram).c_str());
+	//string datagram = ss.str();
+	//status_->misc_status(ST_DEBUG, to_hex(datagram).c_str());
 
 	status_dg status;
 	// ID

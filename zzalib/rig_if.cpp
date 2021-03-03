@@ -269,11 +269,14 @@ void rig_if::change_lookup() {
 void rig_if::update_clock() {
 	// Only implemented for IC-7300
 	if (rig_name() == "IC-7300" && ic7300_ && handler_t_ == RIG_FLRIG) {
+		char message[200];
 		// Get current time
 		time_t now = time(nullptr);
 		// convert to struct in UTC
 		tm* figures = gmtime(&now);
 		// And repeat until seconds reads 00
+		snprintf(message, 200, "RIG: Waiting %d seconds to update clock", 60 - figures->tm_sec);
+		error(ST_NOTE, message);
 		while (figures->tm_sec) {
 			now = time(nullptr);
 			figures = gmtime(&now);
@@ -298,9 +301,8 @@ void rig_if::update_clock() {
 		data = int_to_bcd(0, 3, false);
 		sub_command[2] = '\x96';
 		ic7300_->send_command(command, sub_command, data, ok);
-		char message[200];
 		snprintf(message, 200, "RIG: Updated rig clock to %04d %08d", time, date);
-		error(ST_NOTE, message);
+		error(ST_OK, message);
 	}
 }
 
