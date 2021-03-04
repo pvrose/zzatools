@@ -280,6 +280,7 @@ void rig_if::update_clock() {
 		while (figures->tm_sec) {
 			now = time(nullptr);
 			figures = gmtime(&now);
+			Fl::wait();
 		}
 		// Convert date and time to integers. 20200317, 1514
 		int date = (figures->tm_year + 1900) * 10000 + (figures->tm_mon + 1) * 100 + figures->tm_mday;

@@ -585,6 +585,9 @@ void add_rig_if() {
 							char message[256];
 							snprintf(message, 256, "RIG: %s", rig_if_->success_message().c_str());
 							status_->misc_status(ST_OK, message);
+							// Get the rig name and update current rig with it
+							strcpy(rig_name, rig_if_->rig_name().c_str());
+							rig_settings.set("Current", rig_name);
 							// Get the operating condition from the rig
 							if (!band_view_ || band_view_->in_band(rig_if_->tx_frequency())) {
 								status_->rig_status(rig_if_->get_tx() ? RS_TX : RS_RX, rig_if_->rig_info().c_str());
@@ -598,7 +601,7 @@ void add_rig_if() {
 						}
 						// Note this is IC-7300 specific code
 						ic7300_table* mem_table = (ic7300_table*)(tabbed_forms_->get_view(OT_MEMORY));
-						if (rig_if_ && rig_if_->rig_name() == "IC-7300") {
+						if (rig_if_ && strcmp(rig_name, "IC-7300") == 0) {
 							ic7300_ = new ic7300;
 							ic7300_->callback(cb_error_message);
 							rig_if_->update_clock();

@@ -865,6 +865,12 @@ void book::save_record() {
 		}
 	}
 
+	// Update session end - if we crash before we close down, we may fail to remember session properly
+	time_t today = time(nullptr);
+	void* p_today = &today;
+	settings_->set("Session End", p_today, sizeof(time_t));
+	settings_->flush();
+
 	// Do not automatically save when in debug mode as there may be a bug in the application corrupting the log
 #ifndef _DEBUG
 	if (save_enabled_ && !read_only_) {
