@@ -1805,6 +1805,10 @@ void record_form::set_edit_widgets(string field, string text) {
 		// Populate the enumeartion choice if we are an enumeration
 		set_enum_choice(enumeration_type, text);
 	}
+	else if (field == "MY_RIG" || field == "MY_ANTENNA") {
+		// Treat these if they were enumerations
+		set_enum_choice(field, text);
+	}
 	else {
 		// Enable the text value and disable the enum value controls
 		enum_choice_->deactivate();
@@ -1822,41 +1826,59 @@ void record_form::set_enum_choice(string enumeration_type, string text) {
 	// delete existing menu
 	enum_choice_->clear();
 
-	// Get all the enumeration values and populate drop-down list
-	spec_dataset* dataset = spec_data_->dataset(enumeration_type);
 	int enum_index = 0;
-	auto it = dataset->data.begin();
-	char prev = 0;
-	// Add null entry to list
-	enum_choice_->add("", 0, (Fl_Callback*)nullptr);
-	// Look at each enumeration values
-	while (it != dataset->data.end()) {
-		// Get first letter of the value
-		char curr = it->first[0];
-		int index;
-		if (curr == prev) {
-			// Add the enumeration value to the menu
-			index = enum_choice_->add(it->first.c_str(), 0, (Fl_Callback*)nullptr);
-			prev = curr;
+
+	if (enumeration_type == "MY_RIG" || enumeration_type == "MY_ANTENNA") {
+		// Get the list of allowable values from settings
+		Fl_Preferences station_settings(settings_, "Stations");
+		string setting_path;
+		if (enumeration_type == "MY_RIG") setting_path = "Rigs";
+		else setting_path = "Aerials";
+		Fl_Preferences kit_settings(station_settings, setting_path.c_str());
+		int num_items = kit_settings.groups();
+		for (int i = 0; i < num_items; i++) {
+			enum_choice_->add(kit_settings.group(i));
+			if (strcmp(text.c_str(), kit_settings.group(i)) == 0) {
+				enum_index = i;
+			}
+		}
+	}
+	else {
+		// Get all the enumeration values and populate drop-down list
+		spec_dataset* dataset = spec_data_->dataset(enumeration_type);
+		auto it = dataset->data.begin();
+		char prev = 0;
+		// Add null entry to list
+		enum_choice_->add("", 0, (Fl_Callback*)nullptr);
+		// Look at each enumeration values
+		while (it != dataset->data.end()) {
+			// Get first letter of the value
+			char curr = it->first[0];
+			int index;
+			if (curr == prev) {
+				// Add the enumeration value to the menu
+				index = enum_choice_->add(it->first.c_str(), 0, (Fl_Callback*)nullptr);
+				prev = curr;
+			}
+			else {
+				// Add the enumeration value with its initial letter as a short-cut
+				index = enum_choice_->add(it->first.c_str(), it->first[0], (Fl_Callback*)nullptr);
+			}
+			// 
+			if (it->first == text) enum_index = index;
+			it++;
+		}
+
+		// If text is "" then we need to explain the first entry on the list, otherwise use text
+		if (text == "") {
+			explain_enum(dataset, dataset->data.begin()->first);
 		}
 		else {
-			// Add the enumeration value with its initial letter as a short-cut
-			index = enum_choice_->add(it->first.c_str(), it->first[0], (Fl_Callback*)nullptr);
+			explain_enum(dataset, text);
 		}
-		// 
-		if (it->first == text) enum_index = index;
-		it++;
 	}
 	// If the data is not in the drop-down list set it to first entry
 	enum_choice_->value(enum_index);
-
-	// If text is "" then we need to explain the first entry on the list, otherwise use text
-	if (text == "") {
-		explain_enum(dataset, dataset->data.begin()->first);
-	}
-	else {
-		explain_enum(dataset, text);
-	}
 
 }
 

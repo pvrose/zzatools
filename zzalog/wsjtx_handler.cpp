@@ -197,8 +197,7 @@ int wsjtx_handler::handle_decode(stringstream& ss) {
 // has called a new station
 int wsjtx_handler::handle_status(stringstream& ss) {
 	// Debug code
-	//string datagram = ss.str();
-	//status_->misc_status(ST_DEBUG, to_hex(datagram).c_str());
+	string datagram = ss.str();
 
 	status_dg status;
 	// ID
@@ -248,6 +247,7 @@ int wsjtx_handler::handle_status(stringstream& ss) {
 		snprintf(message, 256, "WSJT-X: Status %s(%s) S/N:%sdB RX:%dHz",
 			status.dx_call.c_str(), status.dx_grid.c_str(), status.report.c_str(), status.rx_offset);
 		status_->misc_status(ST_NOTE, message);
+		status_->misc_status(ST_DEBUG, ("WSJT-X: " + to_hex(datagram)).c_str());
 	}
 	prev_status_ = status;
 	return 0;
