@@ -282,6 +282,7 @@ void rig_if::update_clock() {
 			figures = gmtime(&now);
 			Fl::wait();
 		}
+		error(ST_OK, "RIG: Updating clock");
 		// Convert date and time to integers. 20200317, 1514
 		int date = (figures->tm_year + 1900) * 10000 + (figures->tm_mon + 1) * 100 + figures->tm_mday;
 		int time = figures->tm_hour * 100 + figures->tm_min;
@@ -294,16 +295,25 @@ void rig_if::update_clock() {
 		sub_command[1] = '\x00';
 		sub_command[2] = '\x94';
 		ic7300_->send_command(command, sub_command, data, ok);
-		// Set time - x1A x05 x00 x95 time in BCD
-		data = int_to_bcd(time, 2, false);
-		sub_command[2] = '\x95';
-		ic7300_->send_command(command, sub_command, data, ok);
-		// Set UTC off-set - UTC + 0000 - x1A x05 x00 x96 x00 x00 x00 (TZ=UTC)
-		data = int_to_bcd(0, 3, false);
-		sub_command[2] = '\x96';
-		ic7300_->send_command(command, sub_command, data, ok);
-		snprintf(message, 200, "RIG: Updated rig clock to %04d %08d", time, date);
-		error(ST_OK, message);
+		if (ok) {
+			// Set time - x1A x05 x00 x95 time in BCD
+			data = int_to_bcd(time, 2, false);
+			sub_command[2] = '\x95';
+			ic7300_->send_command(command, sub_command, data, ok);
+		}
+		if (ok) {
+			// Set UTC off-set - UTC + 0000 - x1A x05 x00 x96 x00 x00 x00 (TZ=UTC)
+			data = int_to_bcd(0, 3, false);
+			sub_command[2] = '\x96';
+			ic7300_->send_command(command, sub_command, data, ok);
+		}
+		if (ok) {
+			snprintf(message, 200, "RIG: Updated rig clock to %04d %08d", time, date);
+			error(ST_OK, message);
+		}
+		else {
+			error(ST_ERROR, "RIG: Failed to update rig clock");
+		}
 	}
 }
 

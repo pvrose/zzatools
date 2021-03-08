@@ -242,12 +242,14 @@ int wsjtx_handler::handle_status(stringstream& ss) {
 	status.tx_rx_period = get_uint32(ss);
 	// Configuration name
 	status.config_name = get_utf8(ss); 
-	if (prev_status_.dx_call != status.dx_call && status.dx_call != "") {
-		char message[256];
-		snprintf(message, 256, "WSJT-X: Status %s(%s) S/N:%sdB RX:%dHz",
-			status.dx_call.c_str(), status.dx_grid.c_str(), status.report.c_str(), status.rx_offset);
-		status_->misc_status(ST_NOTE, message);
-		status_->misc_status(ST_DEBUG, ("WSJT-X: " + to_hex(datagram)).c_str());
+	if (status.dx_call.length()) {
+		if (prev_status_.dx_call != status.dx_call) {
+			char message[256];
+			snprintf(message, 256, "WSJT-X: Status %s(%s) S/N:%sdB RX:%dHz",
+				status.dx_call.c_str(), status.dx_grid.c_str(), status.report.c_str(), status.rx_offset);
+			status_->misc_status(ST_NOTE, message);
+			status_->misc_status(ST_DEBUG, ("WSJT-X: " + to_hex(datagram)).c_str());
+		}
 	}
 	prev_status_ = status;
 	return 0;
@@ -309,11 +311,13 @@ string wsjtx_handler::get_utf8(stringstream& ss) {
 	}
 	else {
 		// Create a string long enough to receive the data
-		string s;
-		s.resize(len + 1, 0);
+		string s = "";
+		s.reserve(len + 1);
 		for (uint32_t i = 0; i < len; i++) {
 			// Copy the string 1 byte at a timme
-			ss.get(s[i]);
+			char c;
+			ss.get(c);
+			s += c;
 		}
 		return s;
 	}
