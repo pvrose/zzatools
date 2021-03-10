@@ -187,8 +187,7 @@ int wsjtx_handler::handle_decode(stringstream& ss) {
 	// Display if this is my call or my hashed call
 	if (words[0] == my_call_ || words[0] == my_bracketed_call_) {
 		// Display in status bar and beep if message addressed to user
-		status_->misc_status(ST_WARNING, message);
-		fl_beep(FL_BEEP_NOTIFICATION);
+		status_->misc_status(ST_NOTIFY, message);
 	}
 	return 0;
 }
@@ -248,7 +247,7 @@ int wsjtx_handler::handle_status(stringstream& ss) {
 			snprintf(message, 256, "WSJT-X: Status %s(%s) S/N:%sdB RX:%dHz",
 				status.dx_call.c_str(), status.dx_grid.c_str(), status.report.c_str(), status.rx_offset);
 			status_->misc_status(ST_NOTE, message);
-			status_->misc_status(ST_DEBUG, ("WSJT-X: " + to_hex(datagram)).c_str());
+			//status_->misc_status(ST_DEBUG, ("WSJT-X: " + to_hex(datagram)).c_str());
 		}
 	}
 	prev_status_ = status;

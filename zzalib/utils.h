@@ -32,6 +32,7 @@ namespace zzalib {
 		ST_NOTE,             // An information message
 		ST_OK,               // Task successful
 		ST_WARNING,          // A warning message
+		ST_NOTIFY,           // A notification to the user
 		ST_ERROR,            // An error has been signaled
 		ST_SEVERE,           // A sever error that will result in reduced capability
 		ST_FATAL             // A fatal (non-recoverable) error has been signaled

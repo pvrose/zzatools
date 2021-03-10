@@ -47,6 +47,7 @@ namespace zzalog {
 		{ ST_NOTE, fl_lighter(FL_CYAN) },
 		{ ST_OK, fl_lighter(FL_GREEN) },
 		{ ST_WARNING, FL_YELLOW },
+		{ ST_NOTIFY, fl_darker(FL_YELLOW) },
 		{ ST_ERROR, fl_lighter(FL_RED) },
 		{ ST_SEVERE, fl_darker(FL_RED) },
 		{ ST_FATAL, FL_BLACK }
@@ -60,6 +61,7 @@ namespace zzalog {
 		{ ST_NOTE, 'N'},
 		{ ST_OK, 'D'},
 		{ ST_WARNING, 'W'},
+		{ ST_NOTIFY, 'Y'},
 		{ ST_ERROR, 'E'},
 		{ ST_SEVERE, 'S'},
 		{ ST_FATAL, 'F'}
@@ -73,9 +75,10 @@ namespace zzalog {
 		{ FL_BLACK, FL_COURIER, 12, 0 },                                // D - ST_NOTE
 		{ fl_darker(FL_GREEN), FL_COURIER, 12, 0},                      // E - ST_OK
 		{ fl_color_average(FL_RED, FL_YELLOW, 0.5), FL_COURIER, 12, 0}, // G - ST_WARNING
-		{ FL_RED, FL_COURIER, 12, 0} ,                                  // H - ST_ERROR
-		{ fl_darker(FL_RED), FL_COURIER, 12, 0 },                       // I - ST_SEVERE
-		{ fl_darker(FL_RED), FL_COURIER_BOLD, 12, 0}                    // J - ST_FATAL
+		{ fl_darker(FL_YELLOW), FL_COURIER, 12, 0},                     // H - ST_NOTIFY
+		{ FL_RED, FL_COURIER, 12, 0} ,                                  // I - ST_ERROR
+		{ fl_darker(FL_RED), FL_COURIER, 12, 0 },                       // J - ST_SEVERE
+		{ fl_darker(FL_RED), FL_COURIER_BOLD, 12, 0}                    // K - ST_FATAL
 	};
 
 	// Default colours for file status

@@ -469,6 +469,11 @@ void status::misc_status(status_t status, const char* label) {
 		status_file_viewer_->show();
 		fl_beep(FL_BEEP_ERROR);
 		break;
+	case ST_NOTIFY:
+		// Open status file viewer, beep and continue
+		status_file_viewer_->show();
+		fl_beep(FL_BEEP_NOTIFICATION);
+		break;
 	default:
 		break;
 	}
