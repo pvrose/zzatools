@@ -992,6 +992,10 @@ void menu::cb_mi_log_del(Fl_Widget* w, void* v) {
 // v is not used
 void menu::cb_mi_log_retime(Fl_Widget* w, void* v) {
 	record* this_record = navigation_book_->get_record();
+	if (!this_record) {
+		status_->misc_status(ST_ERROR, "LOG: Do not have a current record to retime");
+		return;
+	}
 	string old_time = this_record->item("TIME_OFF");
 	string time = now(false, "%H%M%S");
 	this_record->item("TIME_OFF", time);

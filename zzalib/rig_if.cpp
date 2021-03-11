@@ -36,6 +36,8 @@ rig_if::rig_if()
 	error = default_error_message;
 	have_freq_to_band_ = false;
 	reported_hi_swr_ = false;
+	// Make this a daft value
+	last_tx_power_ = 0.0;
 }
 
 // Base class destructor
@@ -149,6 +151,15 @@ string rig_if::get_frequency(bool tx) {
 // Return the power
 string rig_if::get_tx_power() {
 	double tx_power = pwr_meter();
+	if (tx_power == 0.0) {
+		// If metered power is zero use the last actual value read
+		// May need to tweak this to be less than a small number
+		tx_power = last_tx_power_;
+	}
+	else {
+		// Otherwise remember this value as the last value read
+		last_tx_power_ = tx_power;
+	}
 	char text[100];
 	sprintf(text, "%g", tx_power);
 
