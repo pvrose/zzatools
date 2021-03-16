@@ -77,6 +77,8 @@ int extract_data::criteria(search_criteria_t criteria, extract_data::extract_mod
 
 // Add all records that match in main log to this log
 void extract_data::extract_records() {
+	record_num_t count = 0;
+	char message[100];
 	status_->misc_status(ST_NOTE, "EXTRACT: Started");
 	status_->misc_status(ST_NOTE, short_comment().c_str());
 	switch (criteria_->combi_mode) {
@@ -105,8 +107,10 @@ void extract_data::extract_records() {
 				// Add to both ways mappings
 				mapping_.insert(mapping_.begin() + ixe, ixb);
 				rev_mapping_[ixb] = ixe;
+				count += 1;
 			}
 		}
+		snprintf(message, 100, "EXTRACT: %d records extracted, %d total", count, size());
 		break;
 	case XM_AND:
 		// Logical AND between existing and new criteria - i.e. only those that match both
@@ -122,6 +126,7 @@ void extract_data::extract_records() {
 				int ixb = mapping_[ixe];
 				mapping_.erase(mapping_.begin() + ixe);
 				rev_mapping_.erase(ixb);
+				count += 1;
 			}
 			else {
 				// Remap reverse mapping to the new index in this book.
@@ -129,6 +134,7 @@ void extract_data::extract_records() {
 				ixe++;
 			}
 		}
+		snprintf(message, 100, "EXTRACT: %d records deleted, %d total", count, size());
 		break;
 	case XM_OR: 
 		// Logical OR between existing search and new criteria - i.e. those that match either
@@ -148,13 +154,13 @@ void extract_data::extract_records() {
 					insert_record_at(ixe, test_record);
 					mapping_.insert(mapping_.begin() + ixe, ixb);
 					rev_mapping_[ixb] = ixe;
+					count += 1;
 				}
 			}
 		}
+		snprintf(message, 100, "EXTRACT: %d records added, %d total", count, size());
 		break;
 	}
-	char message[100];
-	snprintf(message, 100, "EXTRACT: %d records extracted", size());
 	status_->misc_status(ST_OK, message);
 	navigation_book_ = this;
 

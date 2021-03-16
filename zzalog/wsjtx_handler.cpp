@@ -242,7 +242,7 @@ int wsjtx_handler::handle_status(stringstream& ss) {
 	// Configuration name
 	status.config_name = get_utf8(ss); 
 	if (status.dx_call.length()) {
-		if (prev_status_.dx_call != status.dx_call) {
+		if (prev_status_.dx_call != status.dx_call || prev_status_.dx_grid != status.dx_grid) {
 			char message[256];
 			snprintf(message, 256, "WSJT-X: Status %s(%s) S/N:%sdB RX:%dHz",
 				status.dx_call.c_str(), status.dx_grid.c_str(), status.report.c_str(), status.rx_offset);

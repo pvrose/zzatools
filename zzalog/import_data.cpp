@@ -588,13 +588,14 @@ void import_data::finish_update(bool merged /*= true*/) {
 			// No change, select the latest record.
 			book_->selection(book_->size() - 1, HT_SELECTED);
 		}
+		// Switch to main now the QSO has been copied
+		tabbed_forms_->activate_pane(OT_MAIN, true);
 		if (number_added_ == 1) {
 			// One new record added from whatever source, send latest QSO to QSL servers
 			if (!book_->upload_qso(last_added_number_)) {
 				status_->misc_status(ST_WARNING, "IMPORT: Upload to one or more QSL sites failed");
 			}
 		}
-		tabbed_forms_->activate_pane(OT_MAIN, true);
 	}
 	// Restart auto-timer if we aren't waiting to stop it - restarting timer will change update_mode
 	if (update_mode_ == AUTO_IMPORT && !close_pending_) {
