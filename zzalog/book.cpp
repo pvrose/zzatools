@@ -71,6 +71,7 @@ book::book()
 	, save_in_progress_(false)
 	, delete_in_progress_(false)
 	, old_record_(nullptr)
+	, been_modified_(false)
 {
 	used_bands_.clear();
 	used_modes_.clear();
@@ -744,6 +745,9 @@ void book::go_date(string date) {
 void book::modified(bool value, bool update_progress /*= true*/) {
 	// Set the flag
 	modified_ = value;
+	if (modified_) {
+		been_modified_ = true;
+	}
 	if (book_type_ == OT_MAIN) {
 		// Only change file status for main book
 		if (modified_) {
@@ -1415,4 +1419,9 @@ bool book::upload_qso(record_num_t record_num) {
 	if (!club_handler_->upload_single_qso(record_num)) ok = false;
 	enable_save(old_save_enabled);
 	return ok;
+}
+
+// Return the been_modified_ flag
+bool book::been_modified() {
+	return been_modified_;
 }

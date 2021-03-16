@@ -157,6 +157,8 @@ namespace zzalog {
 		void edit_header();
 		// Remember record
 		void remember_record();
+		// Book has been modified
+		bool been_modified();
 		// Call back for closing edit window
 		static void cb_close_edith(Fl_Widget* w, void* v);
 		// Callback to close edit window without updating header
@@ -244,6 +246,8 @@ namespace zzalog {
 		int number_dupes_removed_;
 		// Number of duplicates accepted
 		int number_dupes_kept_;
+		// Book has been modified
+		bool been_modified_;
 	};
 
 }

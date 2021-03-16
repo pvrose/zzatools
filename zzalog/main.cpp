@@ -236,8 +236,11 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 		}
 
 		// Back up the book
-		if (book_ && initialised_) {
+		if (book_ && book_->been_modified()) {
 			backup_file(false);
+		}
+		else {
+			status_->misc_status(ST_NOTE, "ZZALOG: Book has not been modified, skipping backup");
 		}
 
 		// Save the window position
