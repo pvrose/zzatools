@@ -489,7 +489,7 @@ void toolbar::update_items() {
 					status_->misc_status(ST_SEVERE, message);
 				}
 				w->deactivate();
-			} else if (cb->active()) {
+			} else if (cb->active() && !(cb->radio() && cb->value())) {
 				// It exists and is active, activate the toolbar button
 				w->activate();
 			}

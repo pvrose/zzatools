@@ -2,7 +2,7 @@
 #include "../zzalib/callback.h"
 #include "field_choice.h"
 #include "intl_widgets.h"
-//#include "spec_data.h"
+#include "spec_data.h"
 
 #include <set>
 #include <string>
@@ -11,12 +11,14 @@
 #include <FL/Fl_Radio_Round_Button.H>
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Box.H>
+#include <FL/Fl_Preferences.H>
 
 using namespace std;
 using namespace zzalog;
 using namespace zzalib;
 
-// extern spec_data* spec_data_;
+extern spec_data* spec_data_;
+extern Fl_Preferences* settings_;
 
 // Constructor - calls the dialog constructor with placeholders for size
 change_dialog::change_dialog(const char* label) :
@@ -43,11 +45,14 @@ void change_dialog::create_form() {
 	const int C2 = C1 + W1 + GAP;
 	const int W2 = WSMEDIT;
 	const int WG = C2 + W2 - XG;
-	const int W4 = WBUTTON;
-	const int C4 = WG - W4;
 	const int W3 = WBUTTON;
-	const int C3 = C4 - W3 - GAP;
-	const int WALL = XG + WG + EDGE;
+	const int C3 = XG;
+	const int W4 = WBUTTON;
+	const int C4 = C3 + W3 + GAP;
+	const int W5 = WBUTTON;
+	const int C5 = C4 + W4 + GAP;
+	const int WB = C5 + W5 - XG;
+	const int WALL = XG + max(WG, WB) + EDGE;
 	const int YG = EDGE;
 	const int R1 = YG + GAP;
 	const int H1 = HTEXT;
@@ -127,7 +132,7 @@ void change_dialog::create_form() {
 	int ix = 0;
 	ch12->value(0);
 	old_field_name_ = ch12->text();
-	ch12->callback(cb_text<field_choice, string>, (void*)&old_field_name_);
+	ch12->callback(cb_ch_old_field, (void*)&old_field_name_);
 	ch12->when(FL_WHEN_RELEASE);
 	ch12->tooltip("Select the current name of the field");
 
@@ -153,6 +158,16 @@ void change_dialog::create_form() {
 	ip42->tooltip("Enter the value to apply");
 	w_text_ = ip42;
 
+	// Alternate enumeration vale
+	Fl_Choice* ch52 = new Fl_Choice(C2, R5, W2, H5, "Enum. Value");
+	ch52->labelsize(FONT_SIZE);
+	ch52->textsize(FONT_SIZE);
+	ch52->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
+	ch52->callback(cb_choice_text, (void*)&new_text_);
+	ch52->when(FL_WHEN_CHANGED | FL_WHEN_NOT_CHANGED);
+	ch52->tooltip("Select the enumerated value to apply");
+	w_enum_ = ch52;
+
 	gp1->end();
 
 	// OK button
@@ -162,16 +177,25 @@ void change_dialog::create_form() {
 	bn63->callback(cb_bn_ok);
 	bn63->when(FL_WHEN_RELEASE);
 	bn63->color(fl_lighter(FL_GREEN));
-	bn63->tooltip("Make the changes");
+	bn63->tooltip("Make the changes and close");
 
-	// Cancel button
-	Fl_Button* bn64 = new Fl_Button(C4, R6, W4, H6, "Cancel");
+	// Action button
+	Fl_Button* bn64 = new Fl_Button(C4, R6, W3, H6, "Action");
 	bn64->box(FL_UP_BOX);
 	bn64->labelsize(FONT_SIZE);
-	bn64->callback(cb_bn_cancel);
+	bn64->callback(cb_bn_action);
 	bn64->when(FL_WHEN_RELEASE);
-	bn64->color(fl_lighter(FL_RED));
-	bn64->tooltip("Cancel changes");
+	bn64->color(fl_lighter(FL_BLUE));
+	bn64->tooltip("Make the changes and close");
+
+	// Cancel button
+	Fl_Button* bn65 = new Fl_Button(C5, R6, W5, H6, "Cancel");
+	bn65->box(FL_UP_BOX);
+	bn65->labelsize(FONT_SIZE);
+	bn65->callback(cb_bn_cancel);
+	bn65->when(FL_WHEN_RELEASE);
+	bn65->color(fl_lighter(FL_RED));
+	bn65->tooltip("Cancel changes");
 
 	// 
 	end();
@@ -196,6 +220,12 @@ void change_dialog::cb_bn_ok(Fl_Widget* w, void* v) {
 	that->do_button(BN_OK);
 }
 
+// callback - action button
+void change_dialog::cb_bn_action(Fl_Widget* w, void* v) {
+	change_dialog* that = ancestor_view<change_dialog>(w);
+	that->do_button(BN_SPARE);
+}
+
 // callback - cancel button
 void change_dialog::cb_bn_cancel(Fl_Widget* w, void* v) {
 	change_dialog* that = ancestor_view<change_dialog>(w);
@@ -209,22 +239,91 @@ void change_dialog::cb_radio_action(Fl_Widget* w, void* v) {
 	that->enable_widgets();
 }
 
+// callback - old field name choice
+void change_dialog::cb_ch_old_field(Fl_Widget* w, void* v) {
+	change_dialog* that = ancestor_view<change_dialog>(w);
+	cb_text<Fl_Choice, string>(w, v);
+	that->enable_widgets();
+}
+
 // Enable widgets - enables/disables widgets depending on which action is selected
 void change_dialog::enable_widgets() {
 	switch (action_) {
 	case RENAME_FIELD:
 		w_field_name_->activate();
 		w_text_->deactivate();
+		w_enum_->deactivate();
 		break;
 	case DELETE_FIELD:
 		w_field_name_->deactivate();
 		w_text_->deactivate();
+		w_enum_->deactivate();
 		break;
 	case ADD_FIELD:
 	case CHANGE_FIELD:
 		w_field_name_->deactivate();
-		w_text_->activate();
+		string enumeration = spec_data_->enumeration_name(old_field_name_, nullptr);
+		if (enumeration.length()) {
+			// populate the enum choice with values of the enumeration
+			populate_enum(enumeration);
+			w_text_->deactivate();
+			w_enum_->activate();
+		}
+		else if (old_field_name_ == "MY_RIG" || old_field_name_ == "MY_ANTENNA" || old_field_name_ == "APP_ZZA_QTH") {
+			
+			// populate the enumeartion choice with values from settings
+			populate_enum(old_field_name_);
+			w_text_->deactivate();
+			w_enum_->activate();
+		}
+		else {
+			w_text_->activate();
+			w_enum_->deactivate();
+		}
 		break;
 	}
 	redraw();
+}
+
+// Populate enumeration choice
+void change_dialog::populate_enum(string name) {
+	Fl_Choice* ch = (Fl_Choice*)w_enum_;
+	ch->clear();
+	ch->add("", 0, nullptr);
+	if (name == "MY_RIG" || name == "MY_ANTENNA" || name == "APP_ZZA_QTH") {
+		// Add the list of possible values from the appropriate settings
+		Fl_Preferences station_settings(settings_, "Stations");
+		string setting_path;
+		if (name == "MY_RIG") setting_path = "Rigs";
+		else if (name == "MY_ANTENNA") setting_path = "Aerials";
+		else if (name == "APP_ZZA_QTH") setting_path = "QTHs";
+		Fl_Preferences kit_settings(station_settings, setting_path.c_str());
+		int num_items = kit_settings.groups();
+		for (int i = 0; i < num_items; i++) {
+			ch->add(kit_settings.group(i));
+		}
+	}
+	else {
+		// Add the list of possible values from the data for the enumeration
+		spec_dataset* dataset = spec_data_->dataset(name);
+		auto it = dataset->data.begin();
+		char prev = 0;
+		// Look at each enumeration values
+		while (it != dataset->data.end()) {
+			// Get first letter of the value
+			char curr = it->first[0];
+			if (curr == prev) {
+				// Add the enumeration value to the menu
+				ch->add(it->first.c_str(), 0, (Fl_Callback*)nullptr);
+				prev = curr;
+			}
+			else {
+				// Add the enumeration value with its initial letter as a short-cut
+				ch->add(it->first.c_str(), it->first[0], (Fl_Callback*)nullptr);
+			}
+			// 
+			it++;
+		}
+	}
+	ch->value(0);
 }

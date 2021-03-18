@@ -35,12 +35,18 @@ namespace zzalog {
 		static void cb_bn_ok(Fl_Widget* w, void* v);
 		// Cancel button call back
 		static void cb_bn_cancel(Fl_Widget* w, void* v);
+		// Action button callback
+		static void cb_bn_action(Fl_Widget* w, void* v);
 		// Action radio buttons callback
 		static void cb_radio_action(Fl_Widget* w, void* v);
+		// Old field name choice
+		static void cb_ch_old_field(Fl_Widget* w, void* v);
 
 	protected:
 		// Enable widgets
 		void enable_widgets();
+		// Update enumeration choice
+		void populate_enum(string name);
 		// Original field name
 		string old_field_name_;
 		// Action selected
@@ -60,6 +66,7 @@ namespace zzalog {
 		// Widgets that need to be accessed
 		Fl_Widget* w_field_name_;
 		Fl_Widget* w_text_;
+		Fl_Widget* w_enum_;
 
 	};
 

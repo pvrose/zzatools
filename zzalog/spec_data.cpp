@@ -653,7 +653,7 @@ string spec_data::enumeration_name(const string& field_name, record* record) {
 			string enumeration_name = it_field->second->at("Enumeration");
 			if (enumeration_name.substr(0, 7) != "Submode") {
 				int open = enumeration_name.find('[');
-				if (open != string::npos) {
+				if (open != string::npos && record) {
 					int close = enumeration_name.find(']');
 					string index = enumeration_name.substr(open + 1, close - open - 1);
 					enumeration_name = enumeration_name.substr(0, open) + '[' + record->item(index) + ']';

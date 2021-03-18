@@ -1805,7 +1805,7 @@ void record_form::set_edit_widgets(string field, string text) {
 		// Populate the enumeartion choice if we are an enumeration
 		set_enum_choice(enumeration_type, text);
 	}
-	else if (field == "MY_RIG" || field == "MY_ANTENNA") {
+	else if (field == "MY_RIG" || field == "MY_ANTENNA" || field == "APP_ZZA_QTH") {
 		// Treat these if they were enumerations
 		set_enum_choice(field, text);
 	}
@@ -1828,14 +1828,16 @@ void record_form::set_enum_choice(string enumeration_type, string text) {
 
 	int enum_index = 0;
 
-	if (enumeration_type == "MY_RIG" || enumeration_type == "MY_ANTENNA") {
+	if (enumeration_type == "MY_RIG" || enumeration_type == "MY_ANTENNA" || enumeration_type == "APP_ZZA_QTH") {
 		// Get the list of allowable values from settings
 		Fl_Preferences station_settings(settings_, "Stations");
 		string setting_path;
 		if (enumeration_type == "MY_RIG") setting_path = "Rigs";
-		else setting_path = "Aerials";
+		else if (enumeration_type == "MY_ANTENNA") setting_path = "Aerials";
+		else if (enumeration_type == "APP_ZZA_QTH") setting_path = "QTHs";
 		Fl_Preferences kit_settings(station_settings, setting_path.c_str());
 		int num_items = kit_settings.groups();
+		enum_choice_->add("", 0, (Fl_Callback*)nullptr);
 		for (int i = 0; i < num_items; i++) {
 			enum_choice_->add(kit_settings.group(i));
 			if (strcmp(text.c_str(), kit_settings.group(i)) == 0) {

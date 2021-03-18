@@ -1020,57 +1020,83 @@ void menu::cb_mi_log_retime(Fl_Widget* w, void* v) {
 void menu::cb_mi_log_bulk(Fl_Widget* w, void* v) {
 	// Open dialog to allow user to define change
 	change_dialog* dialog = new change_dialog("Bulk change fields");
-	if (dialog->display() == BN_OK) {
-		change_action_t action = CHANGE_FIELD;
-		string old_field_name = "";
-		string new_field_name = "";
-		string new_text = "";
-		int num_changed = 0;
-		fl_cursor(FL_CURSOR_WAIT);
-		// get action
-		dialog->get_data(action, old_field_name, new_field_name, new_text);
-		status_->progress(navigation_book_->size(), navigation_book_->book_type(), "records");
-		status_->misc_status(ST_NOTE, "LOG: Bulk change started");
-		// For each record in selected book
-		for (record_num_t i = 0; i < navigation_book_->size(); i++) {
-			record* record = navigation_book_->get_record(i, false);
+	bool repeat = true;
+	while (repeat) {
+		button_t result = dialog->display();
+		if (result != BN_CANCEL) {
+			change_action_t action = CHANGE_FIELD;
+			string old_field_name = "";
+			string new_field_name = "";
+			string new_text = "";
+			int num_changed = 0;
+			fl_cursor(FL_CURSOR_WAIT);
+			// get action
+			dialog->get_data(action, old_field_name, new_field_name, new_text);
+			status_->progress(navigation_book_->size(), navigation_book_->book_type(), "records");
+			status_->misc_status(ST_NOTE, "LOG: Bulk change started");
+			// For each record in selected book
+			for (record_num_t i = 0; i < navigation_book_->size(); i++) {
+				record* record = navigation_book_->get_record(i, false);
 
-			switch (action) {
-			case RENAME_FIELD:
-				// Change the field_name from old to new
-				record->change_field_name(old_field_name, new_field_name);
-				book_->modified(true);
-				num_changed++;
-				break;
-			case DELETE_FIELD:
-				// Delete the field with this name
-				record->item(old_field_name, string(""));
-				book_->modified(true);
-				num_changed++;
-				break;
-			case ADD_FIELD:
-				// Add a field with this name and value
-				if (record->item(old_field_name) == "") {
+				switch (action) {
+				case RENAME_FIELD:
+					// Change the field_name from old to new
+					record->change_field_name(old_field_name, new_field_name);
+					book_->modified(true);
+					num_changed++;
+					break;
+				case DELETE_FIELD:
+					// Delete the field with this name
+					record->item(old_field_name, string(""));
+					book_->modified(true);
+					num_changed++;
+					break;
+				case ADD_FIELD:
+					// Add a field with this name and value
+					if (record->item(old_field_name) == "") {
+						record->item(old_field_name, new_text);
+						book_->modified(true);
+						num_changed++;
+					}
+					break;
+				case CHANGE_FIELD:
+					// Change the field to this value - adding the field if necessary
 					record->item(old_field_name, new_text);
 					book_->modified(true);
 					num_changed++;
+					break;
 				}
+				status_->progress(i + 1, navigation_book_->book_type());
+			}
+			// Generate message
+			char message[256];
+			switch (action) {
+			case RENAME_FIELD:
+				snprintf(message, 256, "LOG: Bulk Change done, %d records: Field %s renamed as %s",
+					num_changed, old_field_name.c_str(), new_field_name.c_str());
+				break;
+			case DELETE_FIELD:
+				snprintf(message, 256, "LOG: Bulk Change dome, %d records: Field %s deleted",
+					num_changed, old_field_name.c_str());
+				break;
+			case ADD_FIELD:
+				snprintf(message, 256, "LOG: Bulk_Change done: %d/%d records: Field %s changed from no value to %s",
+					num_changed, navigation_book_->size(), old_field_name.c_str(), new_text.c_str());
 				break;
 			case CHANGE_FIELD:
-				// Change the field to this value - adding the field if necessary
-				record->item(old_field_name, new_text);
-				book_->modified(true);
-				num_changed++;
+				snprintf(message, 256, "LOG: Bulk Change done, %d records: Field %s set to %s",
+					num_changed, old_field_name.c_str(), new_text.c_str());
 				break;
 			}
-			status_->progress(i + 1, navigation_book_->book_type());
+			status_->misc_status(ST_OK, message);
+			// Get all views to update
+			book_->selection(book_->selection(), HT_ALL);
+			fl_cursor(FL_CURSOR_DEFAULT);
 		}
-		// Get all views to update
-		book_->selection(book_->selection(), HT_ALL);
-		char message[100];
-		snprintf(message, 100, "LOG: Bulk change done, %d records modified.", num_changed);
-		status_->misc_status(ST_OK, message);
-		fl_cursor(FL_CURSOR_DEFAULT);
+		// If OK or CANCEL we close the dialog
+		if (result != BN_SPARE) {
+			repeat = false;
+		}
 	}
 	Fl::delete_widget(dialog);
 }
