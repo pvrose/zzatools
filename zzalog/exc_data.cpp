@@ -236,7 +236,7 @@ ostream& exc_data::store(ostream& out) {
 	}
 	out << num_exceptions << '\t' << num_invalids << endl;
 	int i = 0;
-	status_->progress(num_exceptions + num_invalids, OT_PREFIX, "records");
+	status_->progress(num_exceptions + num_invalids, OT_PREFIX, "Storing Exception data", "records");
 	// now the individual exception entries
 	for (auto it = entries_.begin(); it != entries_.end() && out.good(); it++) {
 		list<exc_entry*>* data_list = &(it->second);
@@ -301,7 +301,7 @@ istream& exc_data::load(istream& in) {
 	string dummy;
 	getline(in, dummy);
 	int record_num = 0;
-	status_->progress(num_exceptions + num_invalids, OT_PREFIX, "records");
+	status_->progress(num_exceptions + num_invalids, OT_PREFIX, "Loading Exception data", "records");
 	// Read all the eception records
 	for (int i = 0; i < num_exceptions && in.good(); i++) {
 		exc_entry* entry = new exc_entry;

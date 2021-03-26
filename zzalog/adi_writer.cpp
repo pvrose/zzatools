@@ -39,7 +39,7 @@ bool adi_writer::store_book(book* out_book, ostream& out, set<string>* fields /*
 
 	// configure progress bar - progress is counted by number of records processed
 	status_->misc_status(ST_NOTE, "LOG: Started writing ADI");
-	status_->progress(out_book->size() + 1, out_book->book_type(), "records");
+	status_->progress(out_book->size() + 1, out_book->book_type(), "Storing ADIF", "records");
 	// For all records and while the output is successful
 	if (out_book->header()) {
 		store_record(out_book->header(), out, result, nullptr);

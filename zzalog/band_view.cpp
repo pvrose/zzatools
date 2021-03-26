@@ -101,7 +101,7 @@ bool band_view::load_data() {
 	file.seekg(0, ios::beg);
 	// Initialise progress
 	status_->misc_status(ST_NOTE, ("BAND: Loading band-plan data"));
-	status_->progress((int)(currpos - startpos), OT_BAND, "bytes");
+	status_->progress((int)(currpos - startpos), OT_BAND, "Reading band-plan file", "bytes");
 	// Read and ignore first line
 	string line;
 	getline(file, line);

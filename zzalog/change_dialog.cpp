@@ -186,7 +186,7 @@ void change_dialog::create_form() {
 	bn64->callback(cb_bn_action);
 	bn64->when(FL_WHEN_RELEASE);
 	bn64->color(fl_lighter(FL_BLUE));
-	bn64->tooltip("Make the changes and close");
+	bn64->tooltip("Make the changes and don't close");
 
 	// Cancel button
 	Fl_Button* bn65 = new Fl_Button(C5, R6, W5, H6, "Cancel");

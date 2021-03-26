@@ -189,7 +189,7 @@ void ic7300_table::draw_memory_view() {
 	}
 
 	bool ok = true;
-	status_->progress(rows(), OT_MEMORY, " memories", false);
+	status_->progress(rows(), OT_MEMORY, "Reading data from IC-7300", " memories", false);
 	status_->misc_status(ST_NOTE, "RIG: Starting memory fetch");
 	// Create the memory list
 	for (int i = 1; i <= rows(); i++) {
@@ -520,7 +520,7 @@ void ic7300_table::draw_scope_bands_view() {
 	headers_[1] = "Upper edge MHz";
 	// For each scope edge register
 	bool ok = true;
-	status_->progress(rows(), OT_MEMORY, " Scope bands", false);
+	status_->progress(rows(), OT_MEMORY, "Reading data from IC-7300", " Scope bands", false);
 	status_->misc_status(ST_NOTE, "RIG: Starting scope band fetch");
 	for (int r = 0; r < rows(); r++) {
 		string* item = new string[cols()];
@@ -590,7 +590,7 @@ void ic7300_table::draw_user_bands_view() {
 	if (ok) {
 		string* tx_bands = new string[num_txbands];
 		string* user_bands = new string[num_userbands];
-		status_->progress(num_txbands + num_userbands, OT_MEMORY, "user bands", false);
+		status_->progress(num_txbands + num_userbands, OT_MEMORY, "Reading data from IC-7300", "user bands", false);
 		// Read all the hardware defined bands
 		for (int i = 0; i < num_txbands && ok; i++) {
 			sub_command[0] = 1;
@@ -716,7 +716,7 @@ void ic7300_table::draw_message_view() {
 	headers_[0] = "Count-up Trigger";
 	headers_[1] = "Data";
 
-	status_->progress(rows(), OT_MEMORY, "messages", false);
+	status_->progress(rows(), OT_MEMORY, "Reading data from IC-7300", "messages", false);
 	status_->misc_status(ST_NOTE, "RIG: Starting message fetch");
 
 	bool ok = true;

@@ -28,8 +28,6 @@ rig_if::rig_if()
 	handler_ = "";
 	handler_t_ = RIG_NONE;
 	error_message_ = "";
-	// Power lookup table
-	power_lookup_ = new power_matrix;
 	// Default action
 	on_timer_ = nullptr;
 	freq_to_band_ = nullptr;
@@ -166,20 +164,6 @@ string rig_if::get_tx_power() {
 	return text;
 }
 
-// Convert the drive-level to a power - using lookup table
-double rig_if::power() {
-	double my_drive = drive();
-	double my_freq = tx_frequency();
-	// Get the band
-	if (have_freq_to_band_) {
-		string band = freq_to_band_(my_freq / 1000000);
-		return power_lookup_->power(band, (int)my_drive);
-	}
-	else {
-		return my_drive;
-	}
-}
-
 // Rig timer callback
 void rig_if::cb_timer_rig(void* v) {
 	Fl::lock();
@@ -266,14 +250,6 @@ void rig_if::callback(void(*function)(), string(*spec_func)(double), void(*mess_
 	}
 	else {
 		have_freq_to_band_ = false;
-	}
-}
-
-
-// Change power lookup
-void rig_if::change_lookup() {
-	if (power_lookup_) {
-		power_lookup_->re_initialise();
 	}
 }
 

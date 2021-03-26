@@ -3,7 +3,6 @@
 
 
 #include "../zzalib/page_dialog.h"
-#include "../zzalib/power_matrix.h"
 
 #include <string>
 #include <vector>
@@ -11,6 +10,7 @@
 
 #include <FL/Fl_Widget.H>
 #include <FL/Fl_Table.H>
+#include <FL/Fl_Browser.H>
 #include <FL/Fl_Preferences.H>
 #include <FL/Fl_Int_Input.H>
 
@@ -47,37 +47,6 @@ namespace zzalog {
 			string itu_zone;       // MY_ITU_ZONE
 			string continent;      // MY_CONT
 			string iota;           // MY_IOTA
-		};
-
-		// This class provides a table view for use in the rig configuration
-		class power_table : public Fl_Table {
-		public:
-			power_table(int X = 0, int Y = 0, int W = 0, int  H = 0, const char* label = nullptr);
-			~power_table();
-
-			// Add a new empty row
-			void add_row();
-			// Add the power mapping
-			void add_data(power_lut* data);
-
-
-		protected:
-			void draw_cell(TableContext context,  		// table cell drawing
-				int R = 0, int C = 0, int X = 0, int Y = 0, int W = 0, int H = 0);
-			void redraw_table();
-			// Callbacks for drive input
-			static void cb_ip_drive(Fl_Widget* w, void* v);
-			// Callback for power input
-			static void cb_ip_power(Fl_Widget* w, void* v);
-			// Callback for clicking in the table
-			static void cb_tab(Fl_Widget* w, void* v);
-
-			// drive->power mapping
-			power_lut* data_;
-			// Array of drive widgets
-			vector<Fl_Widget*> drive_widgets_;
-			// 
-
 		};
 
 		// This class provides individual grouping for rig, aerial and QTH.
@@ -192,21 +161,21 @@ namespace zzalog {
 				UPPER
 			};
 			struct { const char* label; void* v; input_type type; int row; int col; } qth_params_[15] = {
-				{ "Callsign", (void*)&(current_qth_.callsign), CALL, 1, 0 },
-				{ "Name", (void*)&(current_qth_.name), MIXED, 2, 0 },
-				{ "Street", (void*)&(current_qth_.street), MIXED, 3, 0 },
-				{ "Town", (void*)&(current_qth_.town), MIXED, 4, 0 },
-				{ "County", (void*)&(current_qth_.county), MIXED, 5, 0 },
-				{ "Country", (void*)&(current_qth_.country), MIXED, 6, 0 },
-				{ "Postcode", (void*)&(current_qth_.postcode), MIXED, 7, 0 },
-				{ "Locator", (void*)&(current_qth_.locator), UPPER, 0, 1 },
-				{ "DXCC Id", (void*)&(current_qth_.dxcc_id), INTEGER, 1, 1 },
-				{ "DXCC Name", (void*)&(current_qth_.dxcc_name), MIXED, 2, 1 },
-				{ "State", (void*)&(current_qth_.state), UPPER, 3, 1 },
-				{ "CQ Zone", (void*)&(current_qth_.cq_zone), INTEGER, 4, 1 },
-				{ "ITU Zone", (void*)&(current_qth_.itu_zone), INTEGER, 5, 1 },
-				{ "Continent", (void*)&(current_qth_.continent), UPPER, 6, 1 },
-				{ "IOTA", (void*)&(current_qth_.iota), UPPER, 7, 1 }
+				{ "Callsign", (void*)&(current_qth_.callsign), CALL, 0, 0 },
+				{ "Name", (void*)&(current_qth_.name), MIXED, 1, 0 },
+				{ "Street", (void*)&(current_qth_.street), MIXED, 2, 0 },
+				{ "Town", (void*)&(current_qth_.town), MIXED, 3, 0 },
+				{ "County", (void*)&(current_qth_.county), MIXED, 4, 0 },
+				{ "Country", (void*)&(current_qth_.country), MIXED, 0, 1 },
+				{ "Postcode", (void*)&(current_qth_.postcode), MIXED, 1, 1 },
+				{ "Locator", (void*)&(current_qth_.locator), UPPER, 2, 1 },
+				{ "DXCC Id", (void*)&(current_qth_.dxcc_id), INTEGER, 3, 1 },
+				{ "DXCC Name", (void*)&(current_qth_.dxcc_name), MIXED, 4, 1 },
+				{ "State", (void*)&(current_qth_.state), UPPER, 0, 2 },
+				{ "CQ Zone", (void*)&(current_qth_.cq_zone), INTEGER, 1, 2 },
+				{ "ITU Zone", (void*)&(current_qth_.itu_zone), INTEGER, 2, 2 },
+				{ "Continent", (void*)&(current_qth_.continent), UPPER, 3, 2 },
+				{ "IOTA", (void*)&(current_qth_.iota), UPPER, 4, 2 }
 			};
 		};
 
@@ -230,33 +199,6 @@ namespace zzalog {
 			// save values
 			virtual void save_values();
 
-
-
-		protected:
-			// Update Power matrix fields
-			virtual void update_item();
-			// Add a new item
-			virtual void add_item();
-			// Delete an item
-			virtual void delete_item(string item);
-
-			// Callback - add banc
-			static void cb_bn_add_band(Fl_Widget* w, void* v);
-			// Callback - add power level
-			static void cb_bn_add_power(Fl_Widget* w, void* v);
-			// Callback - delete band
-			static void cb_bn_del_band(Fl_Widget* w, void* v);
-			// Callback - band selected
-			static void cb_ch_sel_band(Fl_Widget* w, void* v);
-
-			// The power matrix
-			power_matrix* matrix_;
-			// The matrix widget
-			Fl_Widget* table_;
-			// The band choice
-			Fl_Widget* ch_band_;
-			// The band selected
-			string selected_band_;
 		};
 
 		// This class provides individual grouping for aerials. It inherits from common group
@@ -272,8 +214,7 @@ namespace zzalog {
 			virtual void create_form(int X, int Y);
 		};
 
-
-		// stn_dialog
+	// stn_dialog
 	public:
 		stn_dialog(int X, int Y, int W, int H, const char* label);
 		virtual ~stn_dialog();

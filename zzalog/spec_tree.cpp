@@ -91,7 +91,7 @@ void spec_tree::populate_tree(bool activate) {
 	sub_item_ = add("Submode");
 	sub_item_->labelfont(item_labelfont() | FL_BOLD);
 	status_->misc_status(ST_NOTE, "ADIF SPEC: Display started");
-	status_->progress(spec_data_->size(), OT_ADIF, "datasets");
+	status_->progress(spec_data_->size(), OT_ADIF, "Converting ADIF specification database into report tree", "datasets");
 	// Add all the datasets
 	int i = 0;
 	for (auto it = spec_data_->begin(); it != spec_data_->end(); it++, i++) {

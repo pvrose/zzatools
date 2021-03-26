@@ -265,7 +265,7 @@ bool club_handler::upload_single_qso(record_num_t record_num) {
 		else {
 			// Update all records sent with the fact that they have been uploaded and when
 			char message[200];
-			snprintf(message, 200, "CLUBLOG: %s %s %s QSL updated",
+			snprintf(message, 200, "CLUBLOG: %s %s %s QSL uploaded",
 				this_record->item("QSO_DATE").c_str(),
 				this_record->item("TIME_ON").c_str(),
 				this_record->item("CALL").c_str());

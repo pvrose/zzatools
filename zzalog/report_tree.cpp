@@ -485,7 +485,7 @@ void report_tree::create_map() {
 		return;
 	}
 	status_->misc_status(ST_NOTE, "LOG: Report selection started");
-	status_->progress(get_book()->size(), OT_REPORT, "records");
+	status_->progress(get_book()->size(), OT_REPORT, "Converting log into a report tree", "records");
 	// Get current selected record so we can find all records with the same report item
 	record* selection = book_->get_record();
 	report_cat_t category = adj_order_[0];
@@ -587,7 +587,7 @@ void report_tree::populate_tree(bool activate) {
 			// This then iterates down to the record entries
 			// Initialise progress bar
 			status_->misc_status(ST_NOTE, "LOG: Report display started");
-			status_->progress(map_.next_entry->size(), OT_REPORT, "entries");
+			status_->progress(map_.next_entry->size(), OT_REPORT, "Displaying the log analysis tree", "entries");
 			copy_map_to_tree(map_.next_entry, nullptr, count_records, num_eqsl, num_lotw, num_card, num_any);
 			
 			// Add the root label

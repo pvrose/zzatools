@@ -50,8 +50,9 @@ namespace zzalog {
 	const basic_regex<char> REGEX_COMPROVING("[A-Z0-9]+/[A-Z0-9]+/[APM]");
 	//PT_COMPMARINE,   // Composite and /MM
 	const basic_regex<char> REGEX_COMPMARINE("[A-Z0-9]+/[A-Z0-9]+/MM");
-	//PT_SPECIAL,      // Callsign is prefix + > 1 number (plain only)
+	//PT_SPECIAL,      // Callsign is prefix + > 1 number (plain only) or 4 or more suffix letters - Note these two require regex_search
 	const basic_regex<char> REGEX_SPECIAL("^([BFGIKMNRUW][0-9][0-9]|[A-Z2-9][A-Z0-9][0-9][0-9])");
+	const basic_regex<char> REGEX_SPECIAL4("[A-Z]{4,}$");
 	//PT_AREA,         // Callsign has /n indicating a different call-area in same entity - e.g. W1ABC/2
 	const basic_regex<char> REGEX_AREA("[A-Z0-9]+/[0-9]");
 	//PT_AREAROVING,   // Area and roving

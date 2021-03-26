@@ -47,7 +47,7 @@ bool specx_reader::load_data(spec_data* data, istream& in, string& version) {
 	in.seekg(0, ios::beg);
 	// Initialsie the progress
 	status_->misc_status(ST_NOTE, "ADIF SPEC: Started");
-	status_->progress(file_size, OT_ADIF, "bytes");
+	status_->progress(file_size, OT_ADIF, "Converting XML into ADIF specification database", "bytes");
 	// Call the XML parser - calls back to the overides herein
 	if (parse(in)) {
 		// Read successful - complete progress
@@ -390,6 +390,11 @@ bool specx_reader::end_record() {
 		dataset = new spec_dataset;
 		dataset->column_names = column_headers_;
 		(*data_)[dataset_name_] = dataset;
+	}
+	// Append a note if the record status is Deleted
+	auto it = record_data_->find("Deleted");
+	if (it != record_data_->end() && it->second == "true") {
+		record_name_ += " Deleted";
 	}
 	dataset->data[record_name_] = record_data_;
 	record_data_ = nullptr;

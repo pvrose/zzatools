@@ -1001,7 +1001,12 @@ void backup_file(bool force, bool retrieve) {
 		int length = (int)in.tellg();
 		const int increment = 8000;
 		in.seekg(0, in.beg);
-		status_->progress(length, OT_MAIN, "bytes");
+		if (retrieve) {
+			status_->progress(length, OT_MAIN, "Copying data from backup", "bytes");
+		}
+		else {
+			status_->progress(length, OT_MAIN, "Copying data to backup", "bytes");
+		}
 		ofstream out(retrieve ? source : backup);
 		bool ok = in.good() && out.good();
 		char buffer[increment];

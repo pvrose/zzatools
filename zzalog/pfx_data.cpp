@@ -348,18 +348,20 @@ bool pfx_data::all_prefixes(record* record, vector<prefix*>* prefixes, bool spec
 				}
 				// Add the DXCC if it looks like a special call (at least two numbers after country) 
 				// as geography based on first number may not be valid
-				if (type == PT_SPECIAL) {
-					entitys_prefixes.push_back(dxcc_prefix);
-				}
-				else {
-					// If no children found - add the DXCC to the result
-					if (entitys_prefixes.size() == 0 && !special) {
+				if (!special) {
+					if (type == PT_SPECIAL) {
 						entitys_prefixes.push_back(dxcc_prefix);
 					}
 					else {
-						// More than one child found - add DXCC prefix - specific case for W
-						if (entitys_prefixes.size() > 1) {
+						// If no children found - add the DXCC to the result
+						if (entitys_prefixes.size() == 0) {
 							entitys_prefixes.push_back(dxcc_prefix);
+						}
+						else {
+							// More than one child found - add DXCC prefix - specific case for W
+							if (entitys_prefixes.size() > 1) {
+								entitys_prefixes.push_back(dxcc_prefix);
+							}
 						}
 					}
 				}
@@ -376,8 +378,8 @@ bool pfx_data::all_prefixes(record* record, vector<prefix*>* prefixes, bool spec
 parse_t pfx_data::get_parse_type(string& callsign) {
 	// Test basic callsign just letters and numbers
 	if (regex_match(callsign, REGEX_PLAIN)) {
-		// prefix plus > 1 number
-		if (regex_search(callsign, REGEX_SPECIAL)) {
+		// prefix plus > 1 number or 4 or more letters in the suffix
+		if (regex_search(callsign, REGEX_SPECIAL) || regex_search(callsign, REGEX_SPECIAL4)) {
 			return PT_SPECIAL;
 		}
 		else {
@@ -983,7 +985,7 @@ string pfx_data::get_tip(record* record) {
 				message += temp;
 			}
 			// Add any special information - add the DXCC entity code to our dummy record to speed up the search
-			string dxcc_code = to_string(pfx->dxcc_code_);
+			string dxcc_code = to_string(dxcc_pfx->dxcc_code_);
 			record->item("DXCC", dxcc_code);
 			vector<prefix*> specials;
 			if (all_prefixes(record, &specials, true)) {

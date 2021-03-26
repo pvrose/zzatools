@@ -191,7 +191,7 @@ bool pfx_reader::load_data(pfx_data& prefixes, string filename) {
 	// reposition back to beginning
 	file.seekg(0, ios::beg);
 	status_->misc_status(ST_NOTE, "PREFIX: Started");
-	status_->progress(file_size_, OT_PREFIX, "bytes");
+	status_->progress(file_size_, OT_PREFIX, "Loading prefix data", "bytes");
 
 	string line;
 	byte_count_ = 0;

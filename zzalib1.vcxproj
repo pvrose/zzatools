@@ -25,7 +25,6 @@
     <ClInclude Include="zzalib\ic7300.h" />
     <ClInclude Include="zzalib\page_dialog.h" />
     <ClInclude Include="zzalib\pch.h" />
-    <ClInclude Include="zzalib\power_matrix.h" />
     <ClInclude Include="zzalib\rig_if.h" />
     <ClInclude Include="zzalib\rpc_data_item.h" />
     <ClInclude Include="zzalib\rpc_handler.h" />
@@ -42,7 +41,6 @@
   <ItemGroup>
     <ClCompile Include="zzalib\ic7300.cpp" />
     <ClCompile Include="zzalib\page_dialog.cpp" />
-    <ClCompile Include="zzalib\power_matrix.cpp" />
     <ClCompile Include="zzalib\rig_if.cpp" />
     <ClCompile Include="zzalib\rpc_data_item.cpp" />
     <ClCompile Include="zzalib\rpc_handler.cpp" />

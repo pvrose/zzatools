@@ -27,8 +27,6 @@ namespace zzalib {
 		void do_button(button_t button);
 
 	protected:
-		// Waiting for OK or CANCEL to be pressed
-		bool pending_button_;
 		// Which button
 		button_t button_;
 

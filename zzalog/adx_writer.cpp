@@ -49,7 +49,7 @@ bool adx_writer::store_book(book* book, ostream& os) {
 	else {
 		// configure progress widget
 		status_->misc_status(ST_NOTE, "LOG: XML Generation started");
-		status_->progress(book->size(), book->book_type(), "records");
+		status_->progress(book->size(), book->book_type(), "Converting ADIF to XML", "records");
 		// Write the outer element - will iteratively write sub-elements
 		ok &= write_element(AET_NONE);
 		if (ok) {
@@ -67,7 +67,7 @@ bool adx_writer::store_book(book* book, ostream& os) {
 	// now write the destination to a file.
 	if (ok) {
 		status_->misc_status(ST_NOTE, "LOG: XML Storing started");
-		status_->progress(book->size(), book->book_type(), "records");
+		status_->progress(book->size(), book->book_type(), "Storing XML", "records");
 		ok &= data(os);
 	}
 	if (ok) {

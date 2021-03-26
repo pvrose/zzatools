@@ -1394,7 +1394,7 @@ error_t spec_data::check_datatype(const string&  data, const string&  field, con
 }
 
 // Validate a specific field
-bool spec_data::validate(const string& field, const string& data, bool inhibit_report /* = false */)
+error_t spec_data::validate(const string& field, const string& data, bool inhibit_report /* = false */)
 {
 	// Temporarily inhibit error reporting 
 	inhibit_error_report_ = inhibit_report;
@@ -1458,14 +1458,7 @@ bool spec_data::validate(const string& field, const string& data, bool inhibit_r
 	if (inhibit_report) {
 		record_ = saved_record_;
 	}
-	if (error == VE_OK) {
-		// No error found in field
-		return true;
-	}
-	else {
-		// Error found
-		return false;
-	}
+	return error;
 }
 
 // Handle the error
@@ -2002,7 +1995,7 @@ bool spec_data::validate(record* record, record_num_t number)
 	for (auto it = record_->begin(); it != record_->end() && !abandon_validation_; it++) {
 		string field = it->first;
 		string data = it->second;
-		if (!validate(field, data)) {
+		if (validate(field, data) != VE_OK) {
 			// Increment field error count
 			error_count_++;
 			error = true;
@@ -2123,12 +2116,57 @@ string spec_data::get_tip(const string& field, record* record) {
 			tip += describe_enumeration(dataset, data);
 		}
 		// now check if contents valid
-		if (validate(field, data, true)) {
-			tip += "Contents Valid\n";
+		switch(validate(field, data, true)) {
+		case VE_OK:
+			tip += "Contents Valid";
+			break;
+		case VE_TYPE_UNKNOWN:               // Datatype or enumeration type not known
+			tip += "Unknown data type or enumeration";
+			break;
+		case VE_FIELD_UNKNOWN:              // Field name is not known
+			tip += "Unknown field";
+			break;
+		case VE_FIELD_INPUT_ONLY:           // Field is import only - to be modified
+			tip += "Deprecated field";
+			break;
+		case VE_FIELD_UNSUPPORTED:          // Field cannot yet be validated
+			tip += "No data to validate field";
+			break;
+		case VE_VALUE_INPUT_ONLY: // value is Import Only - to be modified
+			tip += "Deprecated value";
+			break;
+		case VE_VALUE_OUT_OF_RANGE:        // value is < minimum or > maximum values
+			tip += "Value is out of range";
+			break;
+		case VE_VALUE_FORMAT_ERROR:         // value is not formatted correctly for data type
+			tip += "Value has incorrect format";
+			break;
+		case VE_VALUE_FORMAT_WARNING:       // string value does not have the recommended format
+			tip += "Value does not have recommended format";
+			break;
+		case VE_VALUE_INVALID:              // enumeration value is not valid
+			tip += "Value is not valid for the enumeration";
+			break;
+		case VE_VALUE_NOT_RECOMMENDED:      // string value not recommended for interoperability
+			tip += "Value is not recommended for interoperability";
+			break;
+		case VE_VALUE_INCOMPATIBLE:         // string value is incompatible with another field
+			tip += "Value is incompatible with another field";
+			break;
+		case VE_VALUE_OUTDATED:             // string value has been removed from valid list
+			tip += "Value is no longer valid";
+			break;
+		case VE_VALUE_MULTILINE:            // string value includes \n and \r when not multiline
+			tip += "Value has invalid line breaks";
+			break;
+		case VE_VALUE_INTL:                 // string value includes non-ASCII characters
+			tip += "Value has invalid non-ASCII characters";
+			break;
+		case VE_VALUE_UNCHECKABLE:          // string value cannot be checked for compatibility
+			tip += "No data to check compatibility with other fields";
+			break;
 		}
-		else {
-			tip += "*** Contents Not Valid***\n";
-		}
+		tip += '\n';
 
 		return tip;
 	}
@@ -2235,10 +2273,16 @@ string spec_data::describe_enumeration(spec_dataset* dataset, string value) {
 					item->first != "ADIF Status" &&
 					item->second != "") {
 					// Add salient information to the explanation
-					char* line = new char[item->first.length() + item->second.length() + 10];
-					sprintf(line, "%s: %s\n", item->first.c_str(), item->second.c_str());
+					char line[256];
+					if (item->first == "DXCC Entity Code") {
+						int dxcc = stoi(item->second);
+						string dxcc_name = entity_name(dxcc);
+						snprintf(line, 256, "%s: %s (%s)\n", item->first.c_str(), item->second.c_str(), dxcc_name.c_str());
+					}
+					else {
+						snprintf(line, 256, "%s: %s\n", item->first.c_str(), item->second.c_str());
+					}
 					enum_text += string(line);
-					delete[] line;
 				}
 			}
 		}

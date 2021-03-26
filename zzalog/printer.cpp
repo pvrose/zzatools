@@ -92,7 +92,7 @@ int printer::print_book() {
 	calculate_properties();
 	// Initialise progress - switch to display device and back again
 	Fl_Display_Device::display_device()->set_current();
-	status_->progress(min(to_page + 1 - from_page, number_pages_), type_, "pages");
+	status_->progress(min(to_page + 1 - from_page, number_pages_), type_, "Printing log", "pages");
 	set_current();
 	// Get field data and calculate field widths
 	book_properties();
@@ -293,7 +293,7 @@ int printer::print_cards() {
 	// calculate basic properies - row height etc.
 	// Initialise progress - switch to display device and back again
 	Fl_Display_Device::display_device()->set_current();
-	status_->progress(min(to_page + 1 - from_page, number_pages_), type_, "pages");
+	status_->progress(min(to_page + 1 - from_page, number_pages_), type_, "Printing QSL labels", "pages");
 	set_current();
 	// For each record
 	int page_number = from_page;

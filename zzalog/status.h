@@ -162,6 +162,7 @@ namespace zzalog {
 	struct progress_item {
 		int max_value;
 		int value;
+		char* description;
 		char* suffix;
 		bool countdown;
 		int prev_value;
@@ -176,7 +177,7 @@ namespace zzalog {
 		~status();
 
 		// Initialise progress
-		void progress(int max_value, object_t object, const char* suffix, bool countdown = false);
+		void progress(int max_value, object_t object, const char* description, const char* suffix, bool countdown = false);
 		// UPdate progress
 		void progress(int value, object_t object);
 		// Update progress with a text message and mark 100%

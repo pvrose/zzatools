@@ -147,7 +147,7 @@ namespace zzalog {
 		// Validate a record - returns TRUE if record corrected
 		bool validate(record* record, record_num_t number);
 		// Validate the data in the field
-		bool validate(const string&  field_name, const string& data, bool inhibit_report = false);
+		error_t validate(const string&  field_name, const string& data, bool inhibit_report = false);
 		// initialise the choice widget with the ADIF filed names
 		void initialise_field_choice(Fl_Choice* ch, const string dataset_name = "Fields", const string default_field = "");
 		// Set the loaded filename

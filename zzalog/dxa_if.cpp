@@ -1259,7 +1259,7 @@ void dxa_if::get_records() {
 			// Always insert the last record
 			record_nums.insert(last_record_num);
 			record_num_t i = last_record_num - 1;
-			double most_recent_seconds = (time_t)most_recent_count_ * 24 * 60 * 60;
+			double most_recent_seconds = (double)most_recent_count_ * 24 * 60 * 60;
 			// Go backwards until the time difference is > n days.
 			for (; (signed)i >= 0 && !done; i--) {
 				// Compare the time difference (in seconds)
@@ -1451,7 +1451,7 @@ void dxa_if::draw_pins() {
 			pin_layers->Clear();
 			map->EndUpdate();
 			status_->misc_status(ST_NOTE, "DXATLAS: Update started");
-			status_->progress(records_to_display_.size(), OT_DXATLAS, "records");
+			status_->progress(records_to_display_.size(), OT_DXATLAS, "Displaying records on DxAtlas", "records");
 			int count = 0;
 			// Set the bounds for zooming - always include the home location, these will get when stations are further W, E, N or S
 			westernmost_ = home_long_;

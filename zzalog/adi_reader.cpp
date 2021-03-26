@@ -265,7 +265,7 @@ bool adi_reader::load_book(book* book, istream& in) {
 	streampos endpos = in.tellg();
 	file_size_ = (long)(endpos - startpos);
 	status_->misc_status(ST_NOTE, "LOG: Started reading ADI");
-	status_->progress(file_size_, book->book_type(), "bytes");
+	status_->progress(file_size_, book->book_type(), "Loading ADIF", "bytes");
 	// reposition back to beginning
 	in.seekg(0, ios::beg);
 	// Initialise progress counters

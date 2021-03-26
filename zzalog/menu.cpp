@@ -738,7 +738,7 @@ void menu::cb_mi_parse_log(Fl_Widget* w, void* v) {
 		int item_number = 0;
 		// Initialise progress
 		status_->misc_status(ST_NOTE, "LOG: Started parsing");
-		status_->progress(num_items, navigation_book_->book_type(), "records");
+		status_->progress(num_items, navigation_book_->book_type(), "Parsing log", "records");
 		// For all records in selected book
 		for (int i = 0; i < num_items && !abandon;) {
 			record* record = navigation_book_->get_record(i, false);
@@ -806,7 +806,7 @@ void menu::cb_mi_valid8_log(Fl_Widget* w, void* v) {
 	bool changed = false;
 	// Initialse progress
 	status_->misc_status(ST_NOTE, "VALIDATE: Started");
-	status_->progress(num_items, navigation_book_->book_type(), "records");
+	status_->progress(num_items, navigation_book_->book_type(), "Validating log", "records");
 	spec_data_->reset_continue();
 	// For each record in selected book unless user has indicated to quit
 	for (int i = 0; i < num_items && spec_data_->do_continue(); ) {
@@ -1032,7 +1032,7 @@ void menu::cb_mi_log_bulk(Fl_Widget* w, void* v) {
 			fl_cursor(FL_CURSOR_WAIT);
 			// get action
 			dialog->get_data(action, old_field_name, new_field_name, new_text);
-			status_->progress(navigation_book_->size(), navigation_book_->book_type(), "records");
+			status_->progress(navigation_book_->size(), navigation_book_->book_type(), "Changing data in bulk", "records");
 			status_->misc_status(ST_NOTE, "LOG: Bulk change started");
 			// For each record in selected book
 			for (record_num_t i = 0; i < navigation_book_->size(); i++) {
@@ -1360,7 +1360,7 @@ void menu::cb_mi_ext_print(Fl_Widget* w, void* v) {
 void menu::cb_mi_ext_mark(Fl_Widget* w, void* v) {
 	if (extract_records_->size()) {
 		char message[200];
-		status_->progress(extract_records_->size(), OT_EXTRACT, "records", false);
+		status_->progress(extract_records_->size(), OT_EXTRACT, "Marking data as sent", "records", false);
 		int count = 0;
 		menu* that = (menu*)w;
 		string date_name;

@@ -747,7 +747,7 @@ void extract_data::sort_records(string field_name, bool reversed) {
 	char message[100];
 	snprintf(message, 100, "EXTRACT: Starting sorting %d records on %s", size(), field_name.c_str());
 	status_->misc_status(ST_NOTE, message);
-	status_->progress(size(), book_type(), "Sorting passes");
+	status_->progress(size(), book_type(), "Sorting log", "Sorting passes");
 	// Repeat until we no longer swap anything
 	// NB: We may have to implement more efficient sort algorithm, if size() increases much.
 	// Current 2K+ records takes a couple of seconds
@@ -796,7 +796,7 @@ void extract_data::correct_record_order() {
 	char message[100];
 	snprintf(message, 100, "EXTRACT: Starting sorting %d records on date/time", size());
 	status_->misc_status(ST_NOTE, message);
-	status_->progress(size(), book_type(), "Sorting passes");
+	status_->progress(size(), book_type(), "Undoing custom sort", "Sorting passes");
 	// Repeat until we no longer swap anything
 	// NB: We may have to implement more efficient sort algorithm, if size() increases much.
 	// Current 2K+ records takes a couple of seconds

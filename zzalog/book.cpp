@@ -1182,7 +1182,7 @@ void book::check_dupes(bool restart) {
 		duplicate_item_ = 0;
 		// Only check N - 1 entries against the next entry
 		status_->misc_status(ST_NOTE, "LOG: Duplicate checking started");
-		status_->progress(size() - 1, book_type(), "duplicates");
+		status_->progress(size() - 1, book_type(), "Checking log for duplicates", "duplicates");
 		inhibit_view_update_ = true;
 		number_dupes_kept_ = 0;
 		number_dupes_removed_ = 0;

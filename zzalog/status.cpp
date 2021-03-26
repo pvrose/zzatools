@@ -242,7 +242,7 @@ void status::cb_bn_rig(Fl_Widget* bn, void* v) {
 }
 
 // Add a progress item to the stack
-void status::progress(int max_value, object_t object, const char* suffix, bool countdown /*= false*/) {
+void status::progress(int max_value, object_t object, const char* description, const char* suffix, bool countdown /*= false*/) {
 	// Turrn off file viewer update to improve performance
 	no_update_viewer = true;
 	// Initialise it
@@ -254,7 +254,7 @@ void status::progress(int max_value, object_t object, const char* suffix, bool c
 	} else {
 		// Start a new progress bar process - create the progress item (total expected count, objects being counted, up/down and what view it's for)
 		char message[100];
-		snprintf(message, 100, "PROGRESS: Starting %s - %d %s", OBJECT_NAMES.at(object), max_value, suffix);
+		snprintf(message, 100, "PROGRESS: Starting %s - %d %s", description, max_value, suffix);
 		misc_status(ST_LOG, message);
 		progress_item* item = new progress_item;
 		item->max_value = max_value;
@@ -266,8 +266,10 @@ void status::progress(int max_value, object_t object, const char* suffix, bool c
 		}
 		item->countdown = countdown;
 		item->suffix = new char[strlen(suffix) + 1];
+		item->description = new char[strlen(description) + 1];
 		item->prev_value = 0;
 		strcpy(item->suffix, suffix);
+		strcpy(item->description, description);
 		progress_items_[object] = item;
 		// Push it onto the stack of progess bar processes
 		progress_stack_.push_back(object);
@@ -321,7 +323,7 @@ void status::progress(int value, object_t object) {
 			// If it's 100% (or 0% if counting down) delete item and draw the next in the stack - certain objects can overrun (this will give an error)
 			if ((item->countdown && value <= 0) || (!item->countdown && value >= item->max_value)) {
 				char message[100];
-				snprintf(message, 100, "PROGRESS: %s finished (%d %s)", OBJECT_NAMES.at(object), item->max_value, item->suffix);
+				snprintf(message, 100, "PROGRESS: %s finished (%d %s)", item->description, item->max_value, item->suffix);
 				misc_status(ST_LOG, message);
 				// Remove the item from the stack - even if it's not top of the stack
 				delete item;
@@ -717,6 +719,13 @@ void viewer_window::draw_window() {
 void status::cb_bn_misc(Fl_Widget* w, void* v) {
 	status* that = ancestor_view<status>(w);
 	// Reload the viewer and force the window to be shown - it may have been closed
+	if (!that->status_file_viewer_) {
+		// Create a file viewer if it doesn't exist
+		char* title = new char[that->report_filename_.length() + 30];
+		sprintf(title, "Status report file: %s", that->report_filename_.c_str());
+		that->status_file_viewer_ = new viewer_window(640, 480, title);
+		that->status_file_viewer_->callback(cb_fv_close, that);
+	}
 	that->status_file_viewer_->show();
 	that->status_file_viewer_->redraw();
 }

@@ -205,7 +205,7 @@ void pfx_tree::populate_tree(bool activate) {
 
 	// Initial status
 	status_->misc_status(ST_NOTE, "PREFIX: Display started");
-	status_->progress(prefixes_.size(), OT_PREFIX, "prefixes");
+	status_->progress(prefixes_.size(), OT_PREFIX, "Displaying prefix data", "prefixes");
 	// For all prefixes that we want to display
 	int i = 0;
 	for (auto it = prefixes_.begin(); it != prefixes_.end(); it++, i++) {

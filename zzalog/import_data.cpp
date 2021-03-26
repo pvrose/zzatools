@@ -198,7 +198,7 @@ void import_data::auto_update() {
 		// Merge records from the auto-import
 		update_mode_ = AUTO_IMPORT;
 		status_->misc_status(ST_NOTE, "IMPORT: merging data");
-		status_->progress(size(), book_type_, "records");
+		status_->progress(size(), book_type_, "Merging data from auto-import file", "records");
 		number_checked_ = 0;
 		number_matched_ = 0;
 		number_modified_ = 0;
@@ -288,7 +288,7 @@ void import_data::repeat_auto_timer() {
 	// Restart the timer - 1 second so get visual indication of the time counting down
 	Fl::repeat_timeout(1.0, cb_timer_imp, (void*)this);
 	// Tell user - display countdown so that the bar gets bigger as it counts down the seconds
-	status_->progress((int)timer_period_, OT_IMPORT, "seconds", true);
+	status_->progress((int)timer_period_, OT_IMPORT, "Waiting for auto-import timer", "seconds", true);
 	time(&timer_start_);
 	update_mode_ = WAIT_AUTO;
 }
@@ -829,7 +829,7 @@ void import_data::load_stream(stringstream& adif, import_data::update_mode_t ser
 void import_data::merge_data() {
 	// Tell user
 	status_->misc_status(ST_NOTE, "IMPORT: Merging files started");
-	status_->progress(size(), book_type_, "records");
+	status_->progress(size(), book_type_, "Merging data from file", "records");
 	// Reset counts
 	number_to_import_ = size();
 	number_matched_ = 0;

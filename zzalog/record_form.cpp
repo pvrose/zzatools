@@ -1908,7 +1908,7 @@ bool record_form::parse_all_txt(record* record) {
 	streampos endpos = all_file->tellg();
 	long file_size = (long)(endpos - startpos);
 	status_->misc_status(ST_NOTE, "LOG: Starting to parse all.txt");
-	status_->progress(file_size, OT_RECORD, "bytes");
+	status_->progress(file_size, OT_RECORD, "Looking for queried call in WSJT-X data", "bytes");
 	// reposition back to beginning
 	all_file->seekg(0, ios::beg);
 	bool start_copying = false;

@@ -28,202 +28,6 @@ extern status* status_;
 extern tabbed_forms* tabbed_forms_;
 extern rig_if* rig_if_;
 
-// Power table constructor
-stn_dialog::power_table::power_table(int X, int Y, int W, int  H, const char* label) :
-	Fl_Table(X, Y, W, H, label)
-{
-	drive_widgets_.clear();
-	// Set table properties
-	col_header(true);
-	col_resize(false);
-	col_header_height(ROW_HEIGHT);
-	row_header(true);
-	row_header_width(ROW_HEIGHT);
-	cols(2);
-	col_width_all(WBUTTON);
-	end();
-	data_ = nullptr;
-	callback(cb_tab);
-	when(FL_WHEN_RELEASE);
-}
-
-// Power table destructor
-stn_dialog::power_table::~power_table() {
-	// Delete the table 
-	clear();
-}
-
-// Add a new empty row
-void stn_dialog::power_table::add_row() {
-	// Add a new row at -1 - we will try and not write out -1
-	(*data_)[-1] = -1;
-	redraw_table();
-}
-
-// Add the power mapping
-void stn_dialog::power_table::add_data(power_lut* data) {
-	// Copy new data
-	data_ = data;
-	redraw_table();
-}
-
-// Overloaded method to draw each cell
-void stn_dialog::power_table::draw_cell(TableContext context,  		// table cell drawing
-	int R, int C, int X, int Y, int W, int H) {
-	switch (context) {
-	case CONTEXT_STARTPAGE:
-		fl_font(FONT, FONT_SIZE);		// font used by all headers
-		break;
-
-	case CONTEXT_COL_HEADER:
-		// Set column headers
-		fl_push_clip(X, Y, W, H);
-		{
-			static char s[40];
-			switch (C) {
-			case 0:
-				strcpy(s, "Drive");
-				break;
-			case 1:
-				strcpy(s, "Power");
-				break;
-			}
-			fl_draw_box(FL_THIN_UP_BOX, X, Y, W, H, col_header_color());
-			fl_color(FL_BLACK);
-			fl_draw(s, X, Y, W, H, FL_ALIGN_CENTER);
-		}
-		fl_pop_clip();
-		return;
-
-	case CONTEXT_ROW_HEADER:
-		// Set row header - same character on each row - used to delete the row
-		fl_push_clip(X, Y, W, H);
-		fl_draw_box(FL_THIN_UP_BOX, X, Y, W, H, row_header_color());
-		fl_color(FL_RED);
-		fl_draw("@1+", X, Y, W, H, FL_ALIGN_CENTER);
-		fl_pop_clip();
-		return;
-
-	case CONTEXT_CELL:
-		return;		// fltk handles drawing the widgets
-
-	default:
-		return;
-	}
-}
-
-// Redraw the power table
-void stn_dialog::power_table::redraw_table() {
-	clear();
-	begin();
-	cols(2);
-	col_width_all(WBUTTON);
-	rows(data_->size());
-	row_height_all(ROW_HEIGHT);
-	drive_widgets_.clear();
-	// Row number
-	int r = 0;
-	for (auto it = data_->begin(); it != data_->end(); it++, r++) {
-		// Cell positions
-		int X, Y, W, H;
-		// Drive cell input
-		find_cell(CONTEXT_TABLE, r, 0, X, Y, W, H);
-		// Add input for drive
-		Fl_Int_Input* ip0 = new Fl_Int_Input(X, Y, W, H);
-		// pass the pointer to the iterator dereference
-		ip0->callback(cb_ip_drive, (void*)&(*it));
-		ip0->when(FL_WHEN_CHANGED);
-		ip0->textfont(FONT);
-		ip0->textsize(FONT_SIZE);
-		if (it->first >= 0) {
-			ip0->value(to_string(it->first).c_str());
-		}
-		// Remember the widgets by row number for use in delete
-		drive_widgets_.push_back(ip0);
-		// Power cell input
-		find_cell(CONTEXT_TABLE, r, 1, X, Y, W, H);
-		// Add input for drive
-		Fl_Float_Input* ip1 = new Fl_Float_Input(X, Y, W, H);
-		// pass the pointer to the iterator dereference
-		ip1->callback(cb_ip_power, (void*)&(*it));
-		ip1->when(FL_WHEN_CHANGED);
-		ip1->textfont(FONT);
-		ip1->textsize(FONT_SIZE);
-		if (it->second >= 0) {
-			ip1->value(to_string(it->second).c_str());
-		}
-	}
-	redraw();
-	end();
-}
-
-// Callbacks for drive input
-// v is a pointer to std::pair drive->power
-void stn_dialog::power_table::cb_ip_drive(Fl_Widget* w, void* v) {
-	// Get pointers to the divers objects
-	power_table* that = ancestor_view<power_table>(w);
-	power_lut::value_type* it = (power_lut::value_type *)v;
-	Fl_Int_Input* ip = (Fl_Int_Input*)w;
-	// Get the new drive level and old power level and create a new 
-	try {
-		int drive = stoi(ip->value());
-		// If this drive does not exist add it and delete the oiginal
-		if (that->data_->find(drive) == that->data_->end()) {
-			double power = it->second;
-			(*that->data_)[drive] = power;
-			that->data_->erase(it->first);
-			that->redraw_table();
-		}
-		else {
-			char message[100];
-			sprintf(message, "STATION: A cell with drive level %d exists - change ignored!", drive);
-			status_->misc_status(ST_WARNING, message);
-		}
-	}
-	// Ignore invalid characters in the drive input
-	catch (invalid_argument&) {}
-
-}
-
-// Callback for power input
-// v is a pointer to a std::pair drive->power 
-void stn_dialog::power_table::cb_ip_power(Fl_Widget* w, void* v) {
-	// Get pointers to the divers objects
-	power_table* that = ancestor_view<power_table>(w);
-	power_lut::value_type* it = (power_lut::value_type*)v;
-	Fl_Float_Input* ip = (Fl_Float_Input*)w;
-	// Get the new power level and change the value of the entry
-	int drive = it->first;
-	double power;
-	try {
-		power = stod(ip->value());
-		(*that->data_)[drive] = power;
-		that->redraw_table();
-	}
-	// Ignore invalid characters in the power input
-	catch (invalid_argument&) {}
-}
-
-// Call back for mouse release
-void stn_dialog::power_table::cb_tab(Fl_Widget* w, void* v) {
-	power_table* tab = (power_table*)w;
-	switch (tab->callback_context()) {
-	case Fl_Table::CONTEXT_ROW_HEADER: {
-		// Get the value in the widget and erase it - erase -1 if there was a null string
-		Fl_Int_Input* ip = (Fl_Int_Input*)tab->drive_widgets_[tab->callback_row()];
-		if (strcmp(ip->value(), "") != 0) {
-			int drive = stoi(ip->value());
-			tab->data_->erase(drive);
-		}
-		else {
-			tab->data_->erase(-1);
-		}
-		break;
-	}
-	}
-	tab->redraw_table();
-}
-
 // constructor that does no constructing other than set the group up.
 stn_dialog::common_grp::common_grp(int X, int Y, int W, int H, const char* label)
 	: Fl_Group(X, Y, W, H, label)
@@ -580,23 +384,26 @@ void stn_dialog::qth_group::load_values() {
 // create the form - additional widgets for QTH settings
 void stn_dialog::qth_group::create_form(int X, int Y) {
 	common_grp::create_form(X, Y);
-	const int R3 = h() - HBUTTON;
+	const int R3 = h() + GAP;
 	const int H3 = HBUTTON;
-	const int HALL = R3 + 8 * H3;
+	const int HALL = R3 + 5 * H3 + GAP;
 	const int C1C = GAP + WLABEL;
-	const int W1C = WEDIT;
+	const int W1C = WSMEDIT;
 	const int C2C = C1C + W1C + GAP + WLABEL;
-	const int W2C = WEDIT;
-	const int C3 = C2C + W2C + GAP;
-	const int W3 = WBUTTON;
-	const int WALL = max(C3 + W3 + GAP, w());
+	const int W2C = WSMEDIT;
+	const int C3C = C2C + W2C + GAP + WLABEL;
+	const int W3C = WSMEDIT;
+	const int WALL = C3C + W3C + GAP;
+
+	const int COL[3] = { C1C, C2C, C3C };
 
 	// Additional widgets for QTHs - for each widget
 	for (int i = 0; i < 15; i++) {
 		// Create an input
 		Fl_Input* ip3;
 		// X-position
-		int x = qth_params_[i].col == 1 ? X + C2C : X + C1C;
+		
+		int x = COL[qth_params_[i].col];
 		// Y-position
 		int y = Y + R3 + qth_params_[i].row * H3;
 		switch (qth_params_[i].type) {
@@ -792,9 +599,6 @@ stn_dialog::rig_group::rig_group(int X, int Y, int W, int H, const char* label) 
 	common_grp(X, Y, W, H, label) {
 	type_ = RIG;
 	settings_name_ = "Rigs";
-	matrix_ = nullptr;
-	table_ = nullptr;
-	ch_band_ = nullptr;
 
 	// Read settings
 	load_values();
@@ -809,7 +613,6 @@ stn_dialog::rig_group::rig_group(int X, int Y, int W, int H, const char* label) 
 
 // Destructor
 stn_dialog::rig_group::~rig_group() {
-	delete matrix_;
 }
 
 // Get initial data from settings
@@ -820,63 +623,6 @@ void stn_dialog::rig_group::load_values() {
 // create the form
 void stn_dialog::rig_group::create_form(int X, int Y) {
 	common_grp::create_form(X, Y);
-	const int C3 = w() + GAP;
-	const int R1 = Y + HTEXT;
-	const int R2 = R1 + HBUTTON;
-	const int R3 = R2 + HBUTTON;
-	const int R4 = R3 + HBUTTON +GAP;
-	const int W3 = WBUTTON;
-	const int C4 = C3 + W3 + GAP;
-	// 2 Columns, 1 row header and 1 scroll-bar
-	const int W4 = 2 * WBUTTON + Fl::scrollbar_size() + 5 + ROW_HEIGHT;
-	const int H4 = 7 * ROW_HEIGHT;
-	const int W = C4 + W4 + GAP;
-	const int H = max(h(), max(R1 + H4 + GAP - Y, R4 + HBUTTON + GAP - Y));
-
-	// Band choice
-	Fl_Input_Choice* ch3 = new Fl_Input_Choice(C3, R1, W3, HBUTTON, "Band");
-	ch3->labelsize(FONT_SIZE);
-	ch3->textsize(FONT_SIZE);
-	ch3->align(FL_ALIGN_TOP);
-	ch3->callback(cb_value<Fl_Input_Choice, string>, (void*)&selected_band_);
-	ch3->when(FL_WHEN_RELEASE);
-	ch3->tooltip("Select band to display or type in a new one");
-	ch_band_ = ch3;
-
-	// Add band
-	Fl_Button* bn32 = new Fl_Button(C3, R2, W3, HBUTTON, "Add/Modify");
-	bn32->labelsize(FONT_SIZE);
-	bn32->callback(cb_bn_add_band);
-	bn32->when(FL_WHEN_RELEASE);
-	bn32->tooltip("Add the new band - ignored if not new");
-	bn32->color(fl_lighter(FL_BLUE));
-
-	// Delete band
-	Fl_Button* bn33 = new Fl_Button(C3, R3, W3, HBUTTON, "Delete");
-	bn33->labelsize(FONT_SIZE);
-	bn33->callback(cb_bn_del_band);
-	bn33->when(FL_WHEN_RELEASE);
-	bn33->tooltip("Delete the selected band");
-	bn33->color(fl_lighter(FL_RED));
-
-	// Add power point
-	Fl_Button* bn34 = new Fl_Button(C3, R4, W3, HBUTTON, "Add power");
-	bn34->labelsize(FONT_SIZE);
-	bn34->callback(cb_bn_add_power);
-	bn34->when(FL_WHEN_RELEASE);
-	bn34->tooltip("Add a new power point to  the drive/power mappting");
-	bn34->color(FL_YELLOW);
-
-	// Add power point
-	// Power table
-	power_table* tab = new power_table(C4, R1, W4, H4, "Power levels");
-	tab->labelsize(FONT_SIZE);
-	tab->align(FL_ALIGN_TOP);
-	tab->tooltip("Use buttons on left to add and the red cross to delete entries");
-	table_ = tab;
-	
-	resizable(nullptr);
-	size(W, H);
 	show();
 	end();
 }
@@ -884,119 +630,8 @@ void stn_dialog::rig_group::create_form(int X, int Y) {
 // Save values in settings
 void stn_dialog::rig_group::save_values() {
 	common_grp::save_values();
-	if (rig_if_) rig_if_->change_lookup();
-	// Deleting the matrix saves its settings
-	delete matrix_;
-	matrix_ = nullptr;
 }
 
-// Update rig related fields
-void stn_dialog::rig_group::update_item() {
-	// Get the band choice widget and clear it's menu and value
-	Fl_Input_Choice* w = (Fl_Input_Choice*)ch_band_;
-	w->menubutton()->clear();
-	w->input()->value("");
-	// Deleting the matrix saves its settings
-	delete matrix_;
-	// Get the rig name
-	matrix_ = new power_matrix;
-	matrix_->initialise(selected_name_);
-	// Gat the bands
-	vector<string> bands = matrix_->bands();
-	power_table* tab = (power_table*)table_;
-	Fl_Input_Choice* ch = (Fl_Input_Choice*)ch_band_;
-	bool selected = false;
-	// For each band
-	for (auto it = bands.begin(); it != bands.end(); it++) {
-		// Add the menu item with the selected callback
-		w->menubutton()->add((*it).c_str(), 0, cb_ch_sel_band);
-		w->menubutton()->labelsize(FONT_SIZE);
-		if (*it == selected_band_) {
-			selected = true;
-		}
-	}
-	if (selected) {
-		// If we have the current selection set it as the value in the choice
-		w->value(selected_band_.c_str());
-	}
-	else {
-		// Otherwise at it to the first item in the menu, and change the slected value
-		w->value(0);
-		selected_band_ = w->value();
-	}
-	// Send the data to the table
-	power_lut* map = matrix_->get_map(selected_band_);
-	tab->add_data(map);
-	redraw();
-}
-
-// Add the rig items
-void stn_dialog::rig_group::add_item() {
-	// Create default pwoer matrix
-	update_item();
-}
-
-// Delete the rig items
-void stn_dialog::rig_group::delete_item(string item) {
-	if (matrix_ != nullptr) {
-		matrix_->delete_rig();
-		delete matrix_;
-		matrix_ = nullptr;
-	}
-}
-
-// Callback - add band
-// v is unused
-void stn_dialog::rig_group::cb_bn_add_band(Fl_Widget* w, void* v) {
-	rig_group* that = ancestor_view<rig_group>(w);
-	that->selected_band_ = to_upper(that->selected_band_);
-	// Add a basic map if the band doesn't yet exist
-	if (that->matrix_->get_map(that->selected_band_) == nullptr) {
-		that->matrix_->add_band(that->selected_band_);
-	}
-	((power_table*)that->table_)->add_data(that->matrix_->get_map(that->selected_band_));
-	that->update_item();
-}
-
-// Call back delete band
-// v is unused
-void stn_dialog::rig_group::cb_bn_del_band(Fl_Widget* w, void* v) {
-	rig_group* that = ancestor_view<rig_group>(w);
-	Fl_Input_Choice* ch = (Fl_Input_Choice*)that->ch_band_;
-	that->selected_band_ = to_upper(that->selected_band_);
-	// delete if there is > 1 band
-	if (that->matrix_->delete_band(that->selected_band_)) {
-		that->update_item();
-	}
-}
-
-// Add a power point
-// v is unused
-void stn_dialog::rig_group::cb_bn_add_power(Fl_Widget* w, void* v) {
-	rig_group* that = ancestor_view<rig_group>(w);
-	((power_table*)that->table_)->add_row();
-	that->redraw();
-}
-
-// Select the band
-// v is unused
-void stn_dialog::rig_group::cb_ch_sel_band(Fl_Widget* w, void* v) {
-	// Input_Choice is a descendant of common_grp
-	Fl_Input_Choice* ch = ancestor_view<Fl_Input_Choice>(w);
-	rig_group* that = ancestor_view<rig_group>(ch);
-	if (ch->menubutton()->changed()) {
-		// Get the new item from the menu
-		that->selected_band_ = ch->menubutton()->text();
-		// Update the shared choice value
-		ch->value(that->selected_band_.c_str());
-		that->update_item();
-	}
-	else {
-		// A new item has been typed in the input field
-		that->selected_band_ = ch->input()->value();
-	}
-	that->redraw();
-}
 
 // Aerial group constructor
 stn_dialog::aerial_group::aerial_group(int X, int Y, int W, int H, const char* label) :

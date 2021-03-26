@@ -5581,6 +5581,16 @@
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">PM</value>
+        <value name="Primary Administrative Subdivision">Perm`</value>
+        <value name="DXCC Entity Code">54</value>
+        <value name="Oblast #">140</value>
+        <value name="CQ Zone">17</value>
+        <value name="ITU Zone">30</value>
+        <value name="Comments">for contacts made on or after 2005-12-01; Permskaya oblast(European Russia)</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">PM</value>
         <value name="Primary Administrative Subdivision">Permskaya Kraj</value>
         <value name="DXCC Entity Code">15</value>
         <value name="Oblast #">140</value>
@@ -5705,6 +5715,16 @@
         <value name="Oblast #">90</value>
         <value name="CQ Zone">17</value>
         <value name="ITU Zone">20</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">KO</value>
+        <value name="Primary Administrative Subdivision">Republic of Komi</value>
+        <value name="DXCC Entity Code">54</value>
+        <value name="Oblast #">90</value>
+        <value name="CQ Zone">17</value>
+        <value name="ITU Zone">20</value>
+        <value name="Comments">At some time moved to European Russia</value>
       </record>
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>

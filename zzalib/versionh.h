@@ -7,7 +7,7 @@ using namespace std;
 namespace zzalib {
 
 	// Library version
-	const string LIBRARY_VERSION = "1.0.42";
+	const string LIBRARY_VERSION = "1.0.43";
 
 }
 #endif

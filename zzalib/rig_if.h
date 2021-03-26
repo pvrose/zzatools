@@ -5,7 +5,6 @@
 
 #include "rpc_data_item.h"
 #include "rpc_handler.h"
-#include "power_matrix.h"
 #include "callback.h"
 #include "utils.h"
 
@@ -106,10 +105,6 @@ namespace zzalib {
 		string get_swr_meter();
 		// Return open message
 		string success_message();
-		// Convert drive-level to power
-		double power();
-		// Change power_loopup
-		void change_lookup();
 		// Update rig clock
 		void update_clock();
 		// Check SWR
@@ -138,8 +133,6 @@ namespace zzalib {
 		string error_message_;
 		// Text success message
 		string success_message_;
-		// The power lookup matrix
-		power_matrix* power_lookup_;
 		// On timer callback to update
 		void(*on_timer_)();
 		// Access spec for 
