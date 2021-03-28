@@ -349,12 +349,12 @@ toolbar::~toolbar()
 void toolbar::cb_bn_menu(Fl_Widget*w, void*v) {
 	// Get the menu item
 	char* item_name = (char*)v;
-	const Fl_Menu_Item* cb = menu_->find_item(item_name);
+	const Fl_Menu_Item* item = menu_->find_item(item_name);
 	char* message = new char[strlen((char*)v) + 50];
 	// If the menu item exists - invoke its callback if it can be picked
-	if (cb != nullptr) {
-		if (cb->active()) {
-			cb->do_callback(menu_);
+	if (item != nullptr) {
+		if (item->active()) {
+			item->do_callback(menu_);
 		}
 		else {
 			// log that inactive menu item selected
@@ -365,9 +365,9 @@ void toolbar::cb_bn_menu(Fl_Widget*w, void*v) {
 	else {
 		// If the menu item does not exists - programming error
 		sprintf(message, "MENU: Unable to find the menu item - %s", (char*)v);
-		status_->misc_status(ST_FATAL, message);
-		delete[] message;
+		status_->misc_status(ST_SEVERE, message);
 	}
+	delete[] message;
 }
 
 // Search the log for the next occurence of the callsign
@@ -480,8 +480,8 @@ void toolbar::update_items() {
 		Fl_Widget* w = child(i);
 		// If it has the menu item callback, then set the widget active as the menu item is
 		if (w->callback() == &cb_bn_menu) {
-			const Fl_Menu_Item* cb = menu_->find_item((char*)w->user_data());
-			if (cb == nullptr) {
+			const Fl_Menu_Item* item = menu_->find_item((char*)w->user_data());
+			if (item == nullptr) {
 				// Menu item does not exist - deactivate the toolbar button and report
 				if (status_) {
 					char message[128];
@@ -489,12 +489,12 @@ void toolbar::update_items() {
 					status_->misc_status(ST_SEVERE, message);
 				}
 				w->deactivate();
-			} else if (cb->active() && !(cb->radio() && cb->value())) {
-				// It exists and is active, activate the toolbar button
+			} else if (item->active() && !(item->radio() && item->value())) {
+				// It exists, is active and not a selected radio item, activate the toolbar button
 				w->activate();
 			}
 			else {
-				// It exists and is inactive, deactivate the toolbar button
+				// It exists, is inactive or a selected radio item, deactivate the toolbar button
 				w->deactivate();
 			}
 		}
