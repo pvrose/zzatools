@@ -868,9 +868,9 @@ void save_session_details() {
 	settings_->flush();
 }
 
-// Returns true if record is within current session or at most 10 minutes before to allow late opening of ZZALOG.
+// Returns true if record is within current session.
 bool in_current_session(record* this_record) {
-	return difftime(this_record->timestamp(), session_start_) > -600.0;
+	return difftime(this_record->timestamp(), session_start_) >= 0;
 }
 
 // The main app entry point

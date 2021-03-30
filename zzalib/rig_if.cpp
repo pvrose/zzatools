@@ -36,6 +36,7 @@ rig_if::rig_if()
 	reported_hi_swr_ = false;
 	// Make this a daft value
 	last_tx_power_ = 0.0;
+	last_tx_swr_ = 1.0;
 }
 
 // Base class destructor
@@ -71,13 +72,19 @@ void rig_if::close() {
 // Convert s-meter reading into display format
 string rig_if::get_smeter() {
 	int smeter = s_meter();
+	if (get_tx()) {
+		smeter = last_rx_smeter_;
+	}
+	else {
+		last_rx_smeter_ = smeter;
+	}
 	char text[100];
 	// SMeter value is relative to S9
 	// Smeter value 0 indicates S9,
 	// 1 S-point is 6 dB
 	if (smeter < -54) {
 		// Below S0
-		sprintf(text, " S0%dsB", 54 + smeter);
+		sprintf(text, " S0%ddB", 54 + smeter);
 	}
 	else if (smeter <= 0) {
 		// Below S9 - convert to S points (6dB per S-point
@@ -94,6 +101,12 @@ string rig_if::get_smeter() {
 // Convert SWR meter into display formet
 string rig_if::get_swr_meter() {
 	double swr = swr_meter();
+	if (!get_tx()) {
+		swr = last_tx_swr_;
+	}
+	else {
+		last_tx_swr_ = swr;
+	}
 	char text[100];
 	snprintf(text, 100, "1:%.1f", swr);
 	return text;
@@ -149,7 +162,7 @@ string rig_if::get_frequency(bool tx) {
 // Return the power
 string rig_if::get_tx_power() {
 	double tx_power = pwr_meter();
-	if (tx_power == 0.0) {
+	if (!get_tx()) {
 		// If metered power is zero use the last actual value read
 		// May need to tweak this to be less than a small number
 		tx_power = last_tx_power_;
@@ -166,7 +179,6 @@ string rig_if::get_tx_power() {
 
 // Rig timer callback
 void rig_if::cb_timer_rig(void* v) {
-	Fl::lock();
 	// Update the label in the rig button 
 	// Get polling intervals from settings
 	Fl_Preferences rig_settings(settings_, "Rig");
@@ -191,7 +203,6 @@ void rig_if::cb_timer_rig(void* v) {
 	}
 	// repeat the timer
 	Fl::repeat_timeout(timer_value, cb_timer_rig, v);
-	Fl::unlock();
 }
 
 // Converts rig mode to string

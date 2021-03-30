@@ -147,6 +147,10 @@ namespace zzalib {
 		string previous_band_;
 		// Most recent transmitted power
 		double last_tx_power_;
+		// Most recent transmitted SWR
+		double last_tx_swr_;
+		// Most recent received S-meter
+		int last_rx_smeter_;
 	};
 
 	// THis class implements the hamlib specific methods of the base class

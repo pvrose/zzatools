@@ -70,6 +70,7 @@ extern qrz_handler* qrz_handler_;
 extern wsjtx_handler* wsjtx_handler_;
 extern band_view* band_view_;
 extern dxa_if* dxatlas_;
+extern time_t session_start_;
 settings* config_ = nullptr;
 
 namespace zzalog {
@@ -173,6 +174,8 @@ namespace zzalog {
 	{ "&QTH", 0, menu::cb_mi_oper_set, (void*)UD_QTH },
 	{ "&Prop mode", 0, menu::cb_mi_oper_set, (void*)UD_PROP },
 	{ 0 },
+	{ "&Start Session", 0, menu::cb_mi_oper_start, (void*)1L },
+	{ "&Clear Session", 0, menu::cb_mi_oper_start, (void*)0L },
 	{ 0 },
 
 	// Log Extract and export operations
@@ -1189,6 +1192,34 @@ void menu::cb_mi_oper_set(Fl_Widget* w, void* v) {
 	book_->modified(true);
 	Fl::delete_widget(dialog);
 }
+
+// Operate->Start Session
+// v is long: 0 is now, 1 is selected QSO
+void menu::cb_mi_oper_start(Fl_Widget* w, void* v) {
+	long mode = (long)v;
+	switch (mode) {
+	case 0:
+		session_start_ = time(nullptr);
+		break;
+	case 1:
+		// Get selected record timestamp 
+		record * start = book_->get_record();
+		session_start_ = start->timestamp();
+		break;
+	}
+	settings_->set("Session Start", &session_start_, sizeof(time_t));
+	settings_->flush();
+	// Display the start time in the status log
+	char stime[100];
+	tm* start_time = gmtime(&session_start_);
+	strftime(stime, 100, "%Y/%m/%d %H:%M:%S", start_time);
+	char message[256];
+	snprintf(message, 256, "ZZALOG: Setting session start at %s", stime);
+	status_->misc_status(ST_NOTE, message);
+	tabbed_forms_->update_views(nullptr, HT_FORMAT, -1);
+}
+
+
 
 // Import->File
 // v defines subsequent load type (FILE_IMPORT or FILE_UPDATE

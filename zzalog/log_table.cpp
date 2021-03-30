@@ -472,6 +472,7 @@ void log_table::update(hint_t hint, unsigned int record_num_1, unsigned int reco
 		}
 		// font size may have changed
 		adjust_row_sizes();
+		redraw();
 		break;
 	case HT_RESET_ORDER:
 		// Reset order to FIRST_TO_LAST

@@ -85,6 +85,8 @@ namespace zzalog {
 		static void cb_mi_oper_change(Fl_Widget* w, void* v);
 		// Log->Set->Rig/Aerial/QTH
 		static void cb_mi_oper_set(Fl_Widget* w, void* v);
+		// Operate->Start Session
+		static void cb_mi_oper_start(Fl_Widget* w, void* v);
 		// Log->Edit Header
 		static void cb_mi_log_edith(Fl_Widget* w, void* v);
 		// Extract->Clear

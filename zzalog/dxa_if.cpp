@@ -1776,13 +1776,22 @@ void dxa_if::update(hint_t hint) {
 		draw_pins();
 		break;
 		
+	case HT_FORMAT:
+		// We may have changed session start
+		if (qso_display_ == AQ_SESSION) {
+			// Data has changed 
+			enable_widgets();
+			get_records();
+			get_colours(false);
+			draw_pins();
+		}
+		break;
 
 	default:
 		// HT_MINOR_CHANGE,          // Invalidate the record, but not location, band or mode - don't redraw
 		// HT_IMPORT_QUERY,          // Import record cannot be processed without user intervention - 
 		// HT_IMPORT_QUERYNEW,       // Query whether mismatch is a new record
 		// HT_DUPE_QUERY,            // Query whether records are duplicates
-		// HT_FORMAT,                // Formats or Columns have changed (LOGVIEW and EXTRACTVIEW)
 		// HT_STARTING,              // Record is being created as HT_INSERTED but don't include it
 		// HT_DXATLAS                // Change originated here - avoid endless loop
 		// Do nothing 
