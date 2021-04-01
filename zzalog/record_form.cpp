@@ -1913,8 +1913,16 @@ bool record_form::parse_all_txt(record* record) {
 	all_file->seekg(0, ios::beg);
 	bool start_copying = false;
 	bool stop_copying = false;
+	// Get user callsign from settings
+	Fl_Preferences stations_settings(settings_, "Stations");
+	Fl_Preferences qths_settings(stations_settings, "QTHs");
+	char* qth;
+	qths_settings.get("Current", qth, "");
+	Fl_Preferences qth_settings(qths_settings, qth);
+	qth_settings.get("Callsign", temp, "");
+	string my_call = temp;
+	delete[] temp;
 	// Get search items from record
-	string my_call = record->item("STATION_CALLSIGN", true, true);
 	string their_call = record->item("CALL");
 	string datestamp = record->item("QSO_DATE").substr(2);
 	string timestamp = record->item("TIME_ON");

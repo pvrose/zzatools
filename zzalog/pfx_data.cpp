@@ -181,7 +181,7 @@ prefix* pfx_data::get_prefix(record* record, bool special) {
 		// More than one prefix matched - so open the dialog to query the user and beep
 		pfx_dialog dialog;
 		dialog.set_data(&possibles, record->item("CALL"));
-		fl_beep(FL_BEEP_QUESTION);
+		status_->misc_status(ST_NOTIFY, "PREFIX - Please select the prefix for this QSO");
 		if (dialog.display() == BN_OK) {
 			// User selected one to match
 			prefix* prefix = dialog.get_prefix();

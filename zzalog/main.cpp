@@ -617,7 +617,7 @@ void add_rig_if() {
 					}
 				}
 				else {
-					// Rig hadn't opened - set off-air logging
+					// Rig hadn't opened
 					char temp[128] = "RIG: failed to open - no information";
 					if (rig_if_) {
 						snprintf(temp, sizeof(temp), "RIG: failed to open - %s", rig_if_->error_message("Open").c_str());

@@ -311,8 +311,8 @@ menu::menu(int X, int Y, int W, int H, const char* label) :
 	add_recent_files();
 	// default text size - just larger than default font size
 	textsize(FONT_SIZE + 1);
-	// This will get set to either ON_AIR or IMPORT if a rig gets connected depending on whether the rig is in a digital mode.
-	logging(LM_OFF_AIR);
+    // Default to on-air (w/ or w/o rig)
+	logging(LM_ON_AIR);
 	criteria_ = nullptr;
 	Fl_Preferences spad_settings(settings_, "Scratchpad");
 	spad_settings.get("Edit view", (int&)editting_view_, OT_REPORT);
