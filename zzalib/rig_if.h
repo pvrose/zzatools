@@ -109,6 +109,8 @@ namespace zzalib {
 		void update_clock();
 		// Check SWR
 		bool check_swr();
+		// Check power
+		bool check_power();
 
 		// Callback to set certain functions (timer callback, freq to band conversion, error message
 		void callback(void (*function)(), string(*spec_func)(double), void(*mess_func)(status_t, const char*));
@@ -149,6 +151,10 @@ namespace zzalib {
 		double last_tx_power_;
 		// Most recent transmitted SWR
 		double last_tx_swr_;
+		// Number of TX power samples
+		int num_pwr_samples_;
+		// Total power sampled
+		double sigma_tx_power_;
 		// Most recent received S-meter
 		int last_rx_smeter_;
 	};

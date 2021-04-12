@@ -83,6 +83,9 @@ void rig_dialog::create_form(int X, int Y) {
 	const int X_SWR = X + XLEFT;
 	const int C2_SWR = C2_RIG;
 	const int W2_SWR = WSMEDIT;
+	const int X_PWR = X + XLEFT;
+	const int C2_PWR = C2_RIG;
+	const int W2_PWR = WSMEDIT;
 	const int WALL = max(W_RIG, W_POLL);
 
 	const int Y_HAMLIB = Y + YTOP;
@@ -101,6 +104,10 @@ void rig_dialog::create_form(int X, int Y) {
 	const int Y_SWR = Y_POLL + H_POLL;
 	const int Y1_SWR = Y_SWR + GAP;
 	const int H_SWR = (3 * HTEXT) + GAP;
+
+	const int Y_PWR = Y_SWR + H_SWR;
+	const int Y1_PWR = Y_PWR + GAP;
+	const int H_PWR = (2 * HTEXT) + GAP;
 
 	// Group for rig radio buttons: selects the handler type
 	Fl_Group* rig_if_grp = new Fl_Group(X_RIG_RAD, Y_HAMLIB, WRADIO + WLABEL + GAP, H_HAMLIB + H_FLRIG + H_NORIG);
@@ -311,6 +318,26 @@ void rig_dialog::create_form(int X, int Y) {
 	swr_error_->value(swr_error_level_);
 	swr_error_->callback(cb_value<Fl_Spinner, double>, &swr_error_level_);
 	swr_error_->when(FL_WHEN_CHANGED);
+	swr_grp->end();
+
+	Fl_Group* pwr_grp = new Fl_Group(X_PWR, Y_PWR, WALL, H_PWR, "PWR Alarm values");
+	pwr_grp->labelsize(FONT_SIZE);
+	pwr_grp->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
+	pwr_grp->box(FL_DOWN_FRAME);
+	// Spinner to select warning value
+	pwr_warn_ = new Fl_Spinner(C2_PWR, Y_PWR + HTEXT, W2_PWR, HTEXT, "Warning");
+	pwr_warn_->align(FL_ALIGN_LEFT);
+	pwr_warn_->labelsize(FONT_SIZE);
+	pwr_warn_->textsize(FONT_SIZE);
+	pwr_warn_->tooltip("Select the power level (averaged over a transmission) when a warning will sound");
+	pwr_warn_->type(FL_FLOAT_INPUT);
+	pwr_warn_->minimum(10);
+	pwr_warn_->maximum(400);
+	pwr_warn_->step(5);
+	pwr_warn_->value(power_warn_level_);
+	pwr_warn_->callback(cb_value<Fl_Spinner, double>, &power_warn_level_);
+	pwr_warn_->when(FL_WHEN_CHANGED);
+
 
 	Fl_Group::end();
 }
@@ -572,6 +599,8 @@ void rig_dialog::load_values() {
 	// SWR Settings
 	rig_settings.get("SWR Warning Level", swr_warn_level_, 1.5);
 	rig_settings.get("SWR Error Level", swr_error_level_, 2.0);
+	// Power settings
+	rig_settings.get("Power Warning Level", power_warn_level_, 50);
 
 }
 
@@ -617,6 +646,8 @@ void rig_dialog::save_values() {
 	// SWR Settings
 	rig_settings.set("SWR Warning Level", swr_warn_level_);
 	rig_settings.set("SWR Error Level", swr_error_level_);
+	// Power Settings
+	rig_settings.set("Power Warning Level", power_warn_level_);
 
 	// restart rig interface
 	add_rig_if();

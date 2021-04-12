@@ -120,6 +120,8 @@ namespace zzalog {
 		// SWR warning and error levels
 		double swr_warn_level_;
 		double swr_error_level_;
+		// Power warning level
+		double power_warn_level_;
 
 		// The handler radio button parameters
 		radio_param_t* handler_radio_params_;
@@ -137,6 +139,7 @@ namespace zzalog {
 		Fl_Check_Button* show_all_ports_;
 		Fl_Spinner* swr_warn_;
 		Fl_Spinner* swr_error_;
+		Fl_Spinner* pwr_warn_;
 
 	};
 

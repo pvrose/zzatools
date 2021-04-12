@@ -166,10 +166,17 @@ string rig_if::get_tx_power() {
 		// If metered power is zero use the last actual value read
 		// May need to tweak this to be less than a small number
 		tx_power = last_tx_power_;
+		if (num_pwr_samples_) {
+			check_power();
+		}
+		sigma_tx_power_ = 0.0;
+		num_pwr_samples_ = 0;
 	}
 	else {
 		// Otherwise remember this value as the last value read
 		last_tx_power_ = tx_power;
+		num_pwr_samples_++;
+		sigma_tx_power_ += tx_power;
 	}
 	char text[100];
 	sprintf(text, "%g", tx_power);
@@ -346,6 +353,25 @@ bool  rig_if::check_swr() {
 		reported_hi_swr_ = false;
 	}
 	return true;
+}
+
+// Check power level - only when TX ended
+bool rig_if::check_power() {
+	Fl_Preferences rig_settings_(settings_, "Rig");
+	double power_warn_level;
+	rig_settings_.get("Power Warning Level", power_warn_level, 50.0);
+	double power = sigma_tx_power_ / num_pwr_samples_;
+	if (power > power_warn_level) {
+		char message[200];
+		snprintf(message, 200, "RIG: Average power was %.0f", power);
+		error(ST_NOTIFY, message);
+		reported_hi_swr_ = true;
+		return false;
+
+	}
+	else {
+		return true;
+	}
 }
 
 
