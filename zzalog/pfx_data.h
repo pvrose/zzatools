@@ -59,14 +59,6 @@ namespace zzalog {
 	const basic_regex<char> REGEX_AREAROVING("[A-Z0-9]+/[0-9]/[APM]");
 	//PT_UNPARSED      // None of the above
 
-	// π to maximum precision in double - let the compiler take the strain
-	const double PI = 3.14159265358979323846264338327950288419716939937510;
-	// Conversion factors - angle
-	const double DEGREE_RADIAN = PI / 180.0;
-	const double RADIAN_DEGREE = 180.0 / PI;
-	// radius of earth in kilometers - yes I know the earth is an oblate sphere
-	const double EARTH_RADIUS = 6371.0088;
-
 
 	// This class is a container for the reference prefix database. It maps DXCC code number to
 	// a prefix definition structure with all the information for that DXCC.
@@ -121,8 +113,6 @@ namespace zzalog {
 		bool update_continent(record* record, prefix* prefix, bool& query, string& reason);
 		// Update DXCC, CONT, CQZ and ITUZ based on callsign - unless already set in ADIF
 		bool update_geography(record* record, bool &query, string& reason, bool query_error = true);
-		// Calculate the great circle bearing and distance between two locations on the Earth's surface
-		void great_circle(lat_long_t source, lat_long_t destination, double& bearing, double& distance);
 
 		// protected attributes
 	protected:

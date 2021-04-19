@@ -456,7 +456,7 @@ void ic7300_table::draw_memory_view() {
 // Scope band edges view
 void ic7300_table::draw_scope_bands_view() {
 	// Define table parameters
-	rows(39);
+	rows(52);
 	cols(2);
 	items_ = new string * [rows()];
 	headers_ = new string[cols()];
@@ -476,45 +476,24 @@ void ic7300_table::draw_scope_bands_view() {
 
 	// Set row headers
 	// TODO: Add fourth register per firmware 1.40
+	for (int i = 0; i < rows(); i++) {
+		if (i % 4) {
+			row_headers_[i] = "";
+		}
+	}
 	row_headers_[0] = "0.03~1.6MHz";
-	row_headers_[1] = "";
-	row_headers_[2] = "";
-	row_headers_[3] = "1.6~2.0MHz";
-	row_headers_[4] = "";
-	row_headers_[5] = "";
-	row_headers_[6] = "2.0~6.0MHz";
-	row_headers_[7] = "";
-	row_headers_[8] = "";
-	row_headers_[9] = "6.0~8.0MHz";
-	row_headers_[10] = "";
-	row_headers_[11] = "";
-	row_headers_[12] = "8.0~11.0MHz";
-	row_headers_[13] = "";
-	row_headers_[14] = "";
-	row_headers_[15] = "11.0~15.0MHz";
-	row_headers_[16] = "";
-	row_headers_[17] = "";
-	row_headers_[18] = "15.0~20.0MHz";
-	row_headers_[19] = "";
-	row_headers_[20] = "";
-	row_headers_[21] = "20.0~22.0MHz";
-	row_headers_[22] = "";
-	row_headers_[23] = "";
-	row_headers_[24] = "22.0~26.0MHz";
-	row_headers_[25] = "";
-	row_headers_[26] = "";
-	row_headers_[27] = "26.0~30.0MHz";
-	row_headers_[28] = "";
-	row_headers_[29] = "";
-	row_headers_[30] = "30.0~45.0MHz";
-	row_headers_[31] = "";
-	row_headers_[32] = "";
-	row_headers_[33] = "45.0~60.0MHz";
-	row_headers_[34] = "";
-	row_headers_[35] = "";
-	row_headers_[36] = "60.0~74.8MHz";
-	row_headers_[37] = "";
-	row_headers_[38] = "";
+	row_headers_[4] = "1.6~2.0MHz";
+	row_headers_[8] = "2.0~6.0MHz";
+	row_headers_[12] = "6.0~8.0MHz";
+	row_headers_[16] = "8.0~11.0MHz";
+	row_headers_[20] = "11.0~15.0MHz";
+	row_headers_[24] = "15.0~20.0MHz";
+	row_headers_[28] = "20.0~22.0MHz";
+	row_headers_[32] = "22.0~26.0MHz";
+	row_headers_[36] = "26.0~30.0MHz";
+	row_headers_[40] = "30.0~45.0MHz";
+	row_headers_[44] = "45.0~60.0MHz";
+	row_headers_[48] = "60.0~74.8MHz";
 	// Column headers
 	headers_[0] = "Lower edge MHz";
 	headers_[1] = "Upper edge MHz";
@@ -526,8 +505,23 @@ void ic7300_table::draw_scope_bands_view() {
 		string* item = new string[cols()];
 		if (ok) {
 			status_->progress(r + 1, OT_MEMORY);
-			// First scope band edge is at 1A/050112 and rest increment from there
-			int address = 112 + r;
+			// First scope band edge is at 1A/050112 and second and third increment from there
+			// Fourth scope band edge is at 1A/050204 and increements from there
+			int address;
+			switch (r % 4) {
+			case 0:
+				address = 112 + (r / 4) * 3;
+				break;
+			case 1:
+				address = 112 + (r / 4) * 3 + 1;
+				break;
+			case 2:
+				address = 112 + (r / 4) * 3 + 2;
+				break;
+			case 3:
+				address = 204 + (r / 4);
+				break;
+			}
 			string subcommand = (char)'\x05' + int_to_bcd(address, 2, false);
 			// Fetch it
 			string data = ic7300_->send_command('\x1a', subcommand.c_str(), ok).substr(4);

@@ -5,6 +5,7 @@
 #include "drawing.h"
 #include "spec_data.h"
 #include "menu.h"
+#include "book.h"
 
 #include <fstream>
 #include <istream>
@@ -28,6 +29,7 @@ extern Fl_Preferences* settings_;
 extern status* status_;
 extern spec_data* spec_data_;
 extern menu* menu_;
+extern book* book_;
 
 // Constructor - calls the Window constructor 
 band_view::band_view(double frequency, int W, int H, const char* label) :
@@ -216,6 +218,14 @@ void band_view::update(double frequency) {
 		((Fl_Counter*)w_freq_slider_)->value(frequency_);
 	}
 	redraw();
+}
+
+// Update the frequency from the specified record
+void band_view::update(record_num_t record_num) {
+	record* this_record = book_->get_record(record_num, false);
+	double frequency;
+	this_record->item("FREQ", frequency);
+	update(frequency);
 }
 
 // Create the form view
@@ -533,7 +543,7 @@ int band_view::handle(int event) {
 	case FL_HIDE:
 	case FL_SHOW:
 		menu_->update_windows_items();
-		break;
+		return true;
 	}
 	return Fl_Window::handle(event);
 }

@@ -1,6 +1,6 @@
-/*
+﻿/*
 ZZALOG - Amateur Radio Log
-� - Copyright 2017, Philip Rose, GM3ZZA
+© - Copyright 2017, Philip Rose, GM3ZZA
 All Rights Reserved
 
 utils.h - various utility methods
@@ -42,6 +42,13 @@ namespace zzalib {
 
 	// Tip display - 2 seconds
 	const double TIP_SHOW = 2.0;
+	// π to maximum precision in double - let the compiler take the strain
+	const double PI = 3.14159265358979323846264338327950288419716939937510;
+	// Conversion factors - angle
+	const double DEGREE_RADIAN = PI / 180.0;
+	const double RADIAN_DEGREE = 180.0 / PI;
+	// radius of earth in kilometers - yes I know the earth is an oblate sphere
+	const double EARTH_RADIUS = 6371.0088;
 
 	// Split a text line into separate "words" on separator
 	void split_line(const string& line, vector<string>& words, const char separator);
@@ -72,7 +79,7 @@ namespace zzalib {
 	string escape_url(string text);
 	// Escape characters - add a '\' before any characters in escapees
 	string escape_string(const string text, const string escapees);
-	// Convert floating degree value to � ' " (degree, minute, second)
+	// Convert floating degree value to ° ' " (degree, minute, second)
 	string degrees_to_dms(float value, bool is_lat);
 	// Convert lat long pair to gridsquare
 	string latlong_to_grid(lat_long_t location, int num_chars);
@@ -104,6 +111,8 @@ namespace zzalib {
 	string hex_to_string(string);
 	// Default error message
 	void default_error_message(status_t level, const char* message);
+	// Calculate the great circle bearing and distance between two locations on the Earth's surface
+	void great_circle(lat_long_t source, lat_long_t destination, double& bearing, double& distance);
 
 
 	// template function to find the enclosing widget of class WIDGET

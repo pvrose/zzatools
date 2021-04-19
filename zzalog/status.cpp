@@ -378,7 +378,6 @@ void status::rig_status(rig_status_t status, const char* label) {
 	rig_status_->labelcolor(fl_contrast(FL_BLACK, colour));
 	rig_status_->copy_tooltip(label);
 	rig_status_->redraw();
-	Fl::wait();
 }
 
 // Update miscellaneous status - set text and colour, log the status

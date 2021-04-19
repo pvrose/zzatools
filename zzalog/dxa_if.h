@@ -10,6 +10,7 @@
 
 #include <set>
 #include <string>
+#include <regex>
 
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Widget.H>
@@ -108,6 +109,10 @@ namespace zzalog {
 		void enable_widgets();
 		// something has changed in the book - usually record 1 is to be selected, record_2 usage per view
 		void update(hint_t hint);
+		// Set DX location
+		void set_dx_loc(string location);
+		// Clear DX location
+		void clear_dx_loc();
 		// Callbacks
 
 		// QSOs choice

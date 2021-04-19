@@ -138,7 +138,7 @@ int dxa_if::handle(int event) {
 	case FL_SHOW:
 		// Get menu to update Windows controls
 		menu_->update_windows_items();
-		break;
+		return true;
 	}
 
 	return Fl_Window::handle(event);
@@ -1671,10 +1671,10 @@ void dxa_if::draw_pins() {
 				(button_map_.at(*it))->activate();
 			}
 
-			// Now display the list of records
-			if (records_displayed_.size()) {
-				book_->selection(*(records_displayed_.begin()), HT_DXATLAS);
-			}
+			//// Now display the list of records
+			//if (records_displayed_.size()) {
+			//	book_->selection(*(records_displayed_.begin()), HT_DXATLAS);
+			//}
 
 			// Report finished
 			status_->misc_status(ST_OK, "DXATLAS: Update done!");
@@ -1964,6 +1964,33 @@ string dxa_if::get_distance(record* this_record) {
 	distance = (((distance - 1) / 1000) + 1) * 1000;
 	string result = "<" + to_string(distance) + "km";
 	return result;
+}
+
+// Add the Dx location and include it in the displayed group
+// TODO: This doesn't guarantee it's the station being worked
+void dxa_if::set_dx_loc(string location) {
+	lat_long_t lat_long = grid_to_latlong(location);
+	DxAtlas::IDxMapPtr map = atlas_->GetMap();
+	if (!map->GetDxVisible()) {
+		map->PutDxLatitude(lat_long.latitude);
+		map->PutDxLongitude(lat_long.longitude);
+		map->PutDxVisible(true);
+		if (lat_long.latitude > northernmost_) northernmost_ = lat_long.latitude;
+		if (lat_long.latitude < southernmost_) southernmost_ = lat_long.latitude;
+		if (lat_long.longitude > easternmost_) easternmost_ = lat_long.longitude;
+		if (lat_long.longitude < westernmost_) westernmost_ = lat_long.longitude;
+		double bearing;
+		double distance;
+		great_circle({ home_lat_, home_long_ }, lat_long, bearing, distance);
+		if (distance > furthest_) furthest_ = distance;
+		centre_map();
+	}
+}
+
+// REmove the Dx Location
+void dxa_if::clear_dx_loc() {
+	DxAtlas::IDxMapPtr map = atlas_->GetMap();
+	map->PutDxVisible(false);
 }
 
 // Create a widget to contain the pin size indication - draw a null box with a circle the correct size (denoted by value)

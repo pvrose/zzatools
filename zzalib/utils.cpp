@@ -877,3 +877,36 @@ void zzalib::default_error_message(zzalib::status_t level, const char* message) 
 		break;
 	}
 }
+
+// Calculate the great circle bearing and distance between two locations on the Earth's surface
+void zzalib::great_circle(lat_long_t source, lat_long_t destination, double& bearing, double& distance)
+{
+	// difference in longitude in radians
+	double d_long = (destination.longitude - source.longitude) * DEGREE_RADIAN;
+	double cos_d_long = cos(d_long);
+	double sin_d_long = sin(d_long);
+	// Latitudes in radians
+	double src_latitude = source.latitude * DEGREE_RADIAN;
+	double dest_latitude = destination.latitude * DEGREE_RADIAN;
+	double cos_s_lat = cos(src_latitude);
+	double sin_s_lat = sin(src_latitude);
+	double tan_d_lat = tan(dest_latitude);
+	double cos_t_lat = cos(dest_latitude);
+	double sin_t_lat = sin(dest_latitude);
+
+	// bearing (azimuth)
+	// tan(a) = ( sin(l2-l1) / ( cos(ph1).tan(ph2) - sin(ph1).cos(l2-l1) )
+	// l(ambda) - longitude, ph(i) - latitude
+	// calculate denominator and use atan2 to get correct quadrant
+	double denominator = ((cos_s_lat * tan_d_lat) - (sin_s_lat * cos_d_long));
+	bearing = atan2(sin_d_long, denominator) * RADIAN_DEGREE;
+	// Convert from -180->0 to +180->+360
+	if (bearing < 0.0) bearing += 360.0;
+
+	// Great circle distance
+	// s = angle at centre of sphere
+	// cos(s) = ( sin(ph1).sin(ph2) + cos(ph1).cos(ph2).cos(l2-l1) )
+	double cos_angle = (sin_s_lat * sin_t_lat) + (cos_s_lat * cos_t_lat * cos_d_long);
+	// Convert to distance = radius * angle in radians
+	distance = EARTH_RADIUS * acos(cos_angle);
+}

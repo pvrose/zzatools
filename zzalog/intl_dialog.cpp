@@ -132,7 +132,7 @@ int intl_dialog::handle(int event) {
 	case FL_SHOW:
 		// Get menu to update Windows controls
 		menu_->update_windows_items();
-		break;
+		return true;
 	}
 
 	return win_dialog::handle(event);

@@ -181,6 +181,7 @@ bool club_handler::unzip_exception(string filename) {
 	sprintf(cmd_format, "\"%s\" %s", cmd_executable, switch_format);
 	char cmd[200];
 	snprintf(cmd, 199, cmd_format, filename.c_str(), ref_dir.c_str());
+
 	delete[] cmd_format;
 	free(cmd_executable);
 	free(switch_format);

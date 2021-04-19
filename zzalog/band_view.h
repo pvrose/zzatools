@@ -1,6 +1,8 @@
 #ifndef __BAND_VIEW__
 #define __BAND_VIEW__
 
+#include "record.h"
+
 #include <string>
 #include <vector>
 #include <map>
@@ -52,6 +54,8 @@ namespace zzalog {
 
 		// Redraw the view with the current frequency
 		void update(double frequency);
+		// Redraw the view from the selected record
+		void update(record_num_t record_num);
 
 		// Redeclaration of draw
 		virtual void draw();

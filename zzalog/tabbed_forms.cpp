@@ -12,6 +12,9 @@
 #include "toolbar.h"
 #include "dxa_if.h"
 #include "settings.h"
+#include "../zzalib/rig_if.h"
+#include "band_view.h"
+#include "scratchpad.h"
 
 using namespace zzalog;
 using namespace zzalib;
@@ -25,6 +28,9 @@ extern toolbar* toolbar_;
 extern dxa_if* dxatlas_;
 extern settings* config_;
 extern bool closing_;
+extern rig_if* rig_if_;
+extern band_view* band_view_;
+extern scratchpad* scratchpad_;
 
 // Constructor
 tabbed_forms::tabbed_forms(int X, int Y, int W, int H, const char* label) :
@@ -116,6 +122,12 @@ void tabbed_forms::update_views(view* requester, hint_t hint, record_num_t recor
 #endif
 	// Update the settngs config dialog
 	if (config_) config_->update();
+	// Update band view
+	if (!rig_if_ && band_view_) {
+		band_view_->update(record_1);
+	}
+	// Update scratchpad
+	if (scratchpad_) scratchpad_->update();
 }
 
 // Activate or deactivate the named object - if selecting another log_view change the navigation_book_

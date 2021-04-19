@@ -162,7 +162,7 @@ string rig_if::get_frequency(bool tx) {
 // Return the power
 string rig_if::get_tx_power() {
 	double tx_power = pwr_meter();
-	if (!get_tx()) {
+	if (tx_power == 0.0) {
 		// If metered power is zero use the last actual value read
 		// May need to tweak this to be less than a small number
 		tx_power = last_tx_power_;

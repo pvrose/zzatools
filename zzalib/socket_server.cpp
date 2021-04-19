@@ -280,8 +280,8 @@ int socket_server::rcv_packet() {
 			return 1;
 		}
 	} while (bytes_rcvd > 0);
-	// Allow event queue to dissipate
-	Fl::wait();
+	//// Allow event queue to dissipate
+	//Fl::wait();
 	// Now see if we have another 
 	Fl::add_timeout(wait_time, cb_timer_rcv, this);
 

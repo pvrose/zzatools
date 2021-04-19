@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<adif version="3.1.1" status="Released" created="2020-08-28T20:10:07Z">
+<adif version="3.1.2" status="Released" created="2021-04-17T15:19:21Z">
   <dataTypes>
     <header>
       <value>Data Type Name</value>
@@ -76,7 +76,7 @@
     <record>
       <value name="Data Type Name">IntlString</value>
       <value name="Data Type Indicator">I</value>
-      <value name="Description">a sequence of International Characters</value>
+      <value name="Description">a sequence of International Characters. Fields of type IntlString must only be used in ADX files</value>
     </record>
     <record>
       <value name="Data Type Name">MultilineString</value>
@@ -86,7 +86,7 @@
     <record>
       <value name="Data Type Name">IntlMultilineString</value>
       <value name="Data Type Indicator">G</value>
-      <value name="Description">a sequence of International Characters and line breaks</value>
+      <value name="Description">a sequence of International Characters and line breaks. Fields of type IntlMultilineString must only be used in ADX files</value>
     </record>
     <record>
       <value name="Data Type Name">Enumeration</value>
@@ -305,7 +305,7 @@
         <value name="Enumeration Name">ARRL_Section</value>
         <value name="Abbreviation">ME</value>
         <value name="Section Name">Maine</value>
-        <value name="DXCC Entity Code">1</value>
+        <value name="DXCC Entity Code">291</value>
       </record>
       <record>
         <value name="Enumeration Name">ARRL_Section</value>
@@ -1080,12 +1080,12 @@
         <value name="Enumeration Name">Band</value>
         <value name="Band">2.5mm</value>
         <value name="Lower Freq (MHz)">119980</value>
-        <value name="Upper Freq (MHz)">120020</value>
+        <value name="Upper Freq (MHz)">123000</value>
       </record>
       <record>
         <value name="Enumeration Name">Band</value>
         <value name="Band">2mm</value>
-        <value name="Lower Freq (MHz)">142000</value>
+        <value name="Lower Freq (MHz)">134000</value>
         <value name="Upper Freq (MHz)">149000</value>
       </record>
       <record>
@@ -4929,7 +4929,7 @@
       <record>
         <value name="Enumeration Name">Mode</value>
         <value name="Mode">DOMINO</value>
-        <value name="Submodes">DOMINOEX,DOMINOF</value>
+        <value name="Submodes">DOM-M,DOM4,DOM5,DOM8,DOM11,DOM16,DOM22,DOM44,DOM88,DOMINOEX,DOMINOF</value>
       </record>
       <record>
         <value name="Enumeration Name">Mode</value>
@@ -4955,7 +4955,7 @@
       <record>
         <value name="Enumeration Name">Mode</value>
         <value name="Mode">HELL</value>
-        <value name="Submodes">FMHELL,FSKHELL,HELL80,HFSK,PSKHELL</value>
+        <value name="Submodes">FMHELL,FSKHELL,HELL80,HELLX5,HELLX9,HFSK,PSKHELL,SLOWHELL</value>
       </record>
       <record>
         <value name="Enumeration Name">Mode</value>
@@ -4988,7 +4988,7 @@
       <record>
         <value name="Enumeration Name">Mode</value>
         <value name="Mode">MFSK</value>
-        <value name="Submodes">FSQCALL,FST4,FT4,JS8,MFSK4,MFSK8,MFSK11,MFSK16,MFSK22,MFSK31,MFSK32,MFSK64,MFSK128</value>
+        <value name="Submodes">FSQCALL,FST4,FST4W,FT4,JS8,JTMS,MFSK4,MFSK8,MFSK11,MFSK16,MFSK22,MFSK31,MFSK32,MFSK64,MFSK64L,MFSK128 MFSK128L,Q65</value>
       </record>
       <record>
         <value name="Enumeration Name">Mode</value>
@@ -5025,7 +5025,7 @@
       <record>
         <value name="Enumeration Name">Mode</value>
         <value name="Mode">PSK</value>
-        <value name="Submodes">FSK31,PSK10,PSK31,PSK63,PSK63F,PSK125,PSK250,PSK500,PSK1000,PSKAM10,PSKAM31,PSKAM50,PSKFEC31,QPSK31,QPSK63,QPSK125,QPSK250,QPSK500,SIM31</value>
+        <value name="Submodes">8PSK125,8PSK125F,8PSK125FL,8PSK250,8PSK250F,8PSK250FL,8PSK500,8PSK500F,8PSK1000,8PSK1000F,8PSK1200F,FSK31,PSK10,PSK31,PSK63,PSK63F,PSK63RC4,PSK63RC5,PSK63RC10,PSK63RC20,PSK63RC32,PSK125,PSK125C12,PSK125R,PSK125RC10,PSK125RC12,PSK125RC16,PSK125RC4,PSK125RC5,PSK250,PSK250C6,PSK250R,PSK250RC2,PSK250RC3,PSK250RC5,PSK250RC6,PSK250RC7,PSK500,PSK500C2,PSK500C4,PSK500R,PSK500RC2,PSK500RC3,PSK500RC4,PSK800C2,PSK800RC2,PSK1000,PSK1000C2,PSK1000R,PSK1000RC2,PSKAM10,PSKAM31,PSKAM50,PSKFEC31,QPSK31,QPSK63,QPSK125,QPSK250,QPSK500,SIM31</value>
       </record>
       <record>
         <value name="Enumeration Name">Mode</value>
@@ -5071,16 +5071,17 @@
       <record>
         <value name="Enumeration Name">Mode</value>
         <value name="Mode">THOR</value>
+        <value name="Submodes">THOR-M,THOR4,THOR5,THOR8,THOR11,THOR16,THOR22,THOR25X4,THOR50X1,THOR50X2,THOR100</value>
       </record>
       <record>
         <value name="Enumeration Name">Mode</value>
         <value name="Mode">THRB</value>
-        <value name="Submodes">THRBX</value>
+        <value name="Submodes">THRBX,THRBX1,THRBX2,THRBX4,THROB1,THROB2,THROB4</value>
       </record>
       <record>
         <value name="Enumeration Name">Mode</value>
         <value name="Mode">TOR</value>
-        <value name="Submodes">AMTORFEC,GTOR</value>
+        <value name="Submodes">AMTORFEC,GTOR,NAVTEX,SITORB</value>
       </record>
       <record>
         <value name="Enumeration Name">Mode</value>
@@ -5581,16 +5582,6 @@
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">PM</value>
-        <value name="Primary Administrative Subdivision">Perm`</value>
-        <value name="DXCC Entity Code">54</value>
-        <value name="Oblast #">140</value>
-        <value name="CQ Zone">17</value>
-        <value name="ITU Zone">30</value>
-        <value name="Comments">for contacts made on or after 2005-12-01; Permskaya oblast(European Russia)</value>
-      </record>
-      <record>
-        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
-        <value name="Code">PM</value>
         <value name="Primary Administrative Subdivision">Permskaya Kraj</value>
         <value name="DXCC Entity Code">15</value>
         <value name="Oblast #">140</value>
@@ -5715,16 +5706,6 @@
         <value name="Oblast #">90</value>
         <value name="CQ Zone">17</value>
         <value name="ITU Zone">20</value>
-      </record>
-      <record>
-        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
-        <value name="Code">KO</value>
-        <value name="Primary Administrative Subdivision">Republic of Komi</value>
-        <value name="DXCC Entity Code">54</value>
-        <value name="Oblast #">90</value>
-        <value name="CQ Zone">17</value>
-        <value name="ITU Zone">20</value>
-        <value name="Comments">At some time moved to European Russia</value>
       </record>
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
@@ -18453,6 +18434,61 @@
       </header>
       <record>
         <value name="Enumeration Name">Submode</value>
+        <value name="Submode">8PSK125</value>
+        <value name="Mode">PSK</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
+        <value name="Submode">8PSK125F</value>
+        <value name="Mode">PSK</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
+        <value name="Submode">8PSK125FL</value>
+        <value name="Mode">PSK</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
+        <value name="Submode">8PSK250</value>
+        <value name="Mode">PSK</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
+        <value name="Submode">8PSK250F</value>
+        <value name="Mode">PSK</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
+        <value name="Submode">8PSK250FL</value>
+        <value name="Mode">PSK</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
+        <value name="Submode">8PSK500</value>
+        <value name="Mode">PSK</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
+        <value name="Submode">8PSK500F</value>
+        <value name="Mode">PSK</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
+        <value name="Submode">8PSK1000</value>
+        <value name="Mode">PSK</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
+        <value name="Submode">8PSK1000F</value>
+        <value name="Mode">PSK</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
+        <value name="Submode">8PSK1200F</value>
+        <value name="Mode">PSK</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
         <value name="Submode">AMTORFEC</value>
         <value name="Mode">TOR</value>
       </record>
@@ -18470,6 +18506,51 @@
         <value name="Enumeration Name">Submode</value>
         <value name="Submode">CHIP128</value>
         <value name="Mode">CHIP</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
+        <value name="Submode">DOM-M</value>
+        <value name="Mode">DOMINO</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
+        <value name="Submode">DOM4</value>
+        <value name="Mode">DOMINO</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
+        <value name="Submode">DOM5</value>
+        <value name="Mode">DOMINO</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
+        <value name="Submode">DOM8</value>
+        <value name="Mode">DOMINO</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
+        <value name="Submode">DOM11</value>
+        <value name="Mode">DOMINO</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
+        <value name="Submode">DOM16</value>
+        <value name="Mode">DOMINO</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
+        <value name="Submode">DOM22</value>
+        <value name="Mode">DOMINO</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
+        <value name="Submode">DOM44</value>
+        <value name="Mode">DOMINO</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
+        <value name="Submode">DOM88</value>
+        <value name="Mode">DOMINO</value>
       </record>
       <record>
         <value name="Enumeration Name">Submode</value>
@@ -18510,6 +18591,12 @@
       </record>
       <record>
         <value name="Enumeration Name">Submode</value>
+        <value name="Submode">FST4W</value>
+        <value name="Mode">MFSK</value>
+        <value name="Description">This is a digital mode supported by the WSJT-X software that is for quasi-beacon transmissions of WSPR-style messages</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
         <value name="Submode">FT4</value>
         <value name="Mode">MFSK</value>
         <value name="Description">FT4 is a digital mode designed specifically for radio contesting</value>
@@ -18522,6 +18609,16 @@
       <record>
         <value name="Enumeration Name">Submode</value>
         <value name="Submode">HELL80</value>
+        <value name="Mode">HELL</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
+        <value name="Submode">HELLX5</value>
+        <value name="Mode">HELL</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
+        <value name="Submode">HELLX9</value>
         <value name="Mode">HELL</value>
       </record>
       <record>
@@ -18692,6 +18789,11 @@
       </record>
       <record>
         <value name="Enumeration Name">Submode</value>
+        <value name="Submode">JTMS</value>
+        <value name="Mode">MFSK</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
         <value name="Submode">LSB</value>
         <value name="Mode">SSB</value>
         <value name="Description">Amplitude modulated voice telephony, lower-sideband, suppressed-carrier</value>
@@ -18738,8 +18840,23 @@
       </record>
       <record>
         <value name="Enumeration Name">Submode</value>
+        <value name="Submode">MFSK64L</value>
+        <value name="Mode">MFSK</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
         <value name="Submode">MFSK128</value>
         <value name="Mode">MFSK</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
+        <value name="Submode">MFSK128L</value>
+        <value name="Mode">MFSK</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
+        <value name="Submode">NAVTEX</value>
+        <value name="Mode">TOR</value>
       </record>
       <record>
         <value name="Enumeration Name">Submode</value>
@@ -18834,7 +18951,57 @@
       </record>
       <record>
         <value name="Enumeration Name">Submode</value>
+        <value name="Submode">PSK63RC10</value>
+        <value name="Mode">PSK</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
+        <value name="Submode">PSK63RC20</value>
+        <value name="Mode">PSK</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
+        <value name="Submode">PSK63RC32</value>
+        <value name="Mode">PSK</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
+        <value name="Submode">PSK63RC4</value>
+        <value name="Mode">PSK</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
+        <value name="Submode">PSK63RC5</value>
+        <value name="Mode">PSK</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
         <value name="Submode">PSK125</value>
+        <value name="Mode">PSK</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
+        <value name="Submode">PSK125RC10</value>
+        <value name="Mode">PSK</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
+        <value name="Submode">PSK125RC12</value>
+        <value name="Mode">PSK</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
+        <value name="Submode">PSK125RC16</value>
+        <value name="Mode">PSK</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
+        <value name="Submode">PSK125RC4</value>
+        <value name="Mode">PSK</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
+        <value name="Submode">PSK125RC5</value>
         <value name="Mode">PSK</value>
       </record>
       <record>
@@ -18844,12 +19011,62 @@
       </record>
       <record>
         <value name="Enumeration Name">Submode</value>
+        <value name="Submode">PSK250RC2</value>
+        <value name="Mode">PSK</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
+        <value name="Submode">PSK250RC3</value>
+        <value name="Mode">PSK</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
+        <value name="Submode">PSK250RC5</value>
+        <value name="Mode">PSK</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
+        <value name="Submode">PSK250RC6</value>
+        <value name="Mode">PSK</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
+        <value name="Submode">PSK250RC7</value>
+        <value name="Mode">PSK</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
         <value name="Submode">PSK500</value>
         <value name="Mode">PSK</value>
       </record>
       <record>
         <value name="Enumeration Name">Submode</value>
+        <value name="Submode">PSK500RC2</value>
+        <value name="Mode">PSK</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
+        <value name="Submode">PSK500RC3</value>
+        <value name="Mode">PSK</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
+        <value name="Submode">PSK500RC4</value>
+        <value name="Mode">PSK</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
+        <value name="Submode">PSK800RC2</value>
+        <value name="Mode">PSK</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
         <value name="Submode">PSK1000</value>
+        <value name="Mode">PSK</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
+        <value name="Submode">PSK1000RC2</value>
         <value name="Mode">PSK</value>
       </record>
       <record>
@@ -18881,6 +19098,11 @@
         <value name="Enumeration Name">Submode</value>
         <value name="Submode">QPSK31</value>
         <value name="Mode">PSK</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
+        <value name="Submode">Q65</value>
+        <value name="Mode">MFSK</value>
       </record>
       <record>
         <value name="Enumeration Name">Submode</value>
@@ -18949,7 +19171,102 @@
       </record>
       <record>
         <value name="Enumeration Name">Submode</value>
+        <value name="Submode">SITORB</value>
+        <value name="Mode">TOR</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
+        <value name="Submode">SLOWHELL</value>
+        <value name="Mode">HELL</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
+        <value name="Submode">THOR-M</value>
+        <value name="Mode">THOR</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
+        <value name="Submode">THOR4</value>
+        <value name="Mode">THOR</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
+        <value name="Submode">THOR5</value>
+        <value name="Mode">THOR</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
+        <value name="Submode">THOR8</value>
+        <value name="Mode">THOR</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
+        <value name="Submode">THOR11</value>
+        <value name="Mode">THOR</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
+        <value name="Submode">THOR16</value>
+        <value name="Mode">THOR</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
+        <value name="Submode">THOR22</value>
+        <value name="Mode">THOR</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
+        <value name="Submode">THOR25X4</value>
+        <value name="Mode">THOR</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
+        <value name="Submode">THOR50X1</value>
+        <value name="Mode">THOR</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
+        <value name="Submode">THOR50X2</value>
+        <value name="Mode">THOR</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
+        <value name="Submode">THOR100</value>
+        <value name="Mode">THOR</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
         <value name="Submode">THRBX</value>
+        <value name="Mode">THRB</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
+        <value name="Submode">THRBX1</value>
+        <value name="Mode">THRB</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
+        <value name="Submode">THRBX2</value>
+        <value name="Mode">THRB</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
+        <value name="Submode">THRBX4</value>
+        <value name="Mode">THRB</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
+        <value name="Submode">THROB1</value>
+        <value name="Mode">THRB</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
+        <value name="Submode">THROB2</value>
+        <value name="Mode">THRB</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
+        <value name="Submode">THROB4</value>
         <value name="Mode">THRB</value>
       </record>
       <record>
@@ -19800,7 +20117,7 @@
     <record>
       <value name="Field Name">TIME_OFF</value>
       <value name="Data Type">Time</value>
-      <value name="Description">HHMM or HHMMSS in UTC in the absence of &lt;QSO_DATE_OFF&gt;, the QSO duration is less than 24 hours</value>
+      <value name="Description">HHMM or HHMMSS in UTC in the absence of &lt;QSO_DATE_OFF&gt;, the QSO duration is less than 24 hours. For example, the following is a QSO starting at 14 July 2020 23:55 and finishing at 15 July 2020 01:00: &lt;QSO_DATE:8&gt;20200714 &lt;TIME_ON:4&gt;2355 &lt;TIME_OFF:4&gt;0100</value>
     </record>
     <record>
       <value name="Field Name">TIME_ON</value>

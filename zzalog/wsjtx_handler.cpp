@@ -4,11 +4,13 @@
 #include "import_data.h"
 #include "menu.h"
 #include "../zzalib/utils.h"
+#include "dxa_if.h"
 
 #include <stdio.h>
 #include <WS2tcpip.h>
 #include <sstream>
 #include <iostream>
+#include <regex>
 #ifndef _WIN32
 #include <fnctl.h>
 #endif
@@ -19,12 +21,14 @@
 
 using namespace zzalog;
 using namespace zzalib;
+using namespace std;
 
 extern status* status_;
 extern import_data* import_data_;
 extern void cb_error_message(status_t level, const char* message);
 extern menu* menu_;
 extern Fl_Preferences* settings_;
+extern dxa_if* dxatlas_;
 
 wsjtx_handler* wsjtx_handler::that_ = nullptr;
 
@@ -150,6 +154,8 @@ int wsjtx_handler::handle_log(stringstream& ss) {
 	// Convert it to a record
 	stringstream adif;
 	adif.str(utf8);
+	// Clear DX locator flag
+	dxatlas_->clear_dx_loc();
 	// Stop any extant update and wait for it to complete
 	import_data_->stop_update(LM_OFF_AIR, false);
 	while (!import_data_->update_complete()) Fl::wait();
@@ -186,6 +192,10 @@ int wsjtx_handler::handle_decode(stringstream& ss) {
 	split_line(decode.message, words, ' ');
 	// Display if this is my call or my hashed call
 	if (words[0] == my_call_ || words[0] == my_bracketed_call_) {
+		// If this is my_call their_call grid add to DxAtlas map as DX location
+		if (regex_match(words[2], basic_regex<char>("[A-R][A-R][0-9][0-9]")) && words[2] != "RR73") {
+			dxatlas_->set_dx_loc(words[2]);
+		}
 		// Display in status bar and beep if message addressed to user
 		status_->misc_status(ST_NOTIFY, message);
 	}
