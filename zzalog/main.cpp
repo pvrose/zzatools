@@ -125,6 +125,8 @@ time_t session_start_ = (time_t)0;
 bool close_by_error_ = false;
 // Previous frequency
 double prev_freq_ = 0.0;
+// Sessions is a resumption
+bool resuming_ = false;
 
 // This callback intercepts the close command and performs checks and tidies up
 // Updates recent files settings
@@ -383,12 +385,14 @@ void set_session_start() {
 		session_start_ = today;
 		strcpy(action, "Starting new session");
 		settings_->set("Session Start", &today, sizeof(time_t));
+		resuming_ = false;
 	}
 	else {
 		// Restore previous session's start time
 		settings_->get("Session Start", p_last, &today, sizeof(time_t));
 		session_start_ = *(time_t*)p_last;
 		strcpy(action, "Resuming session");
+		resuming_ = true;
 	}
 	// Set session end now and flush to ensure it has been altered
 	settings_->set("Session End", &today, sizeof(time_t));
@@ -608,8 +612,11 @@ void add_rig_if() {
 						if (rig_if_ && strcmp(rig_name, "IC-7300") == 0) {
 							ic7300_ = new ic7300;
 							ic7300_->callback(cb_error_message);
-							rig_if_->update_clock();
-							mem_table->type(mem_table->type());
+							// Only update clock and read memories if new session as we want to resume as quickly as possible (after a crash)
+							if (!resuming_) {
+								rig_if_->update_clock();
+								mem_table->type(mem_table->type());
+							}
 						}
 						else {
 							mem_table->type(VT_NONE);
