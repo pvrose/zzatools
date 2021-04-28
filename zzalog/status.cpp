@@ -299,10 +299,11 @@ void status::update_progress(object_t object) {
 		// Set range (0:max_value)
 		progress_->minimum(0.0);
 		progress_->maximum((float)item->max_value);
-		// redraw and allow scheduler to effect the redrawing if value has gone up by > 1% or is at start or finish
-		progress_->redraw();
 		if (item->value == 0 || item->value == item->max_value || item->value - item->prev_value > item->max_value / 100) {
-			Fl::wait();
+			// redraw and allow scheduler to effect the redrawing if value has gone up by > 1% or is at start or finish
+			progress_->redraw();
+			// Without the below we don't see the progress bar move
+			//Fl::wait();
 			item->prev_value = item->value;
 		}
 	}
@@ -364,8 +365,6 @@ void status::progress(const char* message, object_t object) {
 				progress_->redraw();
 			}
 		}
-		// Allow bar to be drawn
-		Fl::wait();
 	}
 }
 
@@ -391,8 +390,6 @@ void status::misc_status(status_t status, const char* label) {
 		misc_status_->labelcolor(fl_contrast(FL_BLACK, colour));
 		misc_status_->copy_tooltip(label);
 		misc_status_->redraw();
-
-		Fl::wait();
 	}
 
 	// Start each entry with a timestamp
@@ -447,8 +444,6 @@ void status::misc_status(status_t status, const char* label) {
 		fl_beep(FL_BEEP_ERROR);
 		// A severe error - ask the user whether to continue
 		if (fl_choice("An error that resulted in reduced functionality occurred:\n%s\n\nDo you want to try to continue or quit?", "Continue", "Quit", nullptr, label, report_filename_.c_str()) == 1) {
-			// Call the exit handler
-			Fl::wait();
 			// Set the flag to continue showing the file viewer after all other windows have been hidden.
 			close_by_error_ = true;
 			main_window_->do_callback();
@@ -460,7 +455,6 @@ void status::misc_status(status_t status, const char* label) {
 		fl_beep(FL_BEEP_ERROR);
 		// A fatal error - quit the application
 		fl_message("An unrecoverable error has occurred, closing down - check status log");
-		Fl::wait();
 		close_by_error_ = true;
 		// Close the application down
 		main_window_->do_callback();
@@ -492,7 +486,6 @@ void status::file_status(file_status_t status) {
 	}
 	file_status_->color(colour, colour);
 	file_status_->redraw();
-	Fl::wait();
 }
 
 // Text buffer constructor

@@ -527,6 +527,25 @@ void extract_data::extract_qsl(extract_data::extract_mode_t server) {
 			/*string pattern;*/ "Y"
 		};
 		criteria(new_criteria, server);
+		// Ignore those with QSL_SENT==I (ignore)
+		new_criteria = {
+			/*search_cond_t condition*/ XC_FIELD,
+			/*bool by_regex*/ false,
+			/*bool by_dates*/ false,
+			/*string from_date*/"",
+			/*string to_date;*/"",
+			/*string band;*/ "Any",
+			/*string mode;*/ "Any",
+			/*bool confirmed_eqsl;*/ false,
+			/*bool confirmed_lotw;*/ false,
+			/*bool confirmed_card;*/ false,
+			/*search_combi_t combi_mode;*/ XM_AND,
+			/*bool negate_results;*/ true,
+			/*string field_name; */ "QSL_SENT",
+			/*string pattern;*/ "I"
+		};
+		criteria(new_criteria, server);
+
 		sort_records("DXCC", false);
 		tabbed_forms_->update_views(nullptr, HT_RESET_ORDER, 0);
 

@@ -73,6 +73,7 @@ void rig_if::close() {
 string rig_if::get_smeter() {
 	int smeter = s_meter();
 	if (get_tx()) {
+		// Remember SWR value for display
 		smeter = last_rx_smeter_;
 	}
 	else {
@@ -102,7 +103,9 @@ string rig_if::get_smeter() {
 string rig_if::get_swr_meter() {
 	double swr = swr_meter();
 	if (!get_tx()) {
+		// Remember last SWR for display and clear reported flag to report it next transmission
 		swr = last_tx_swr_;
+		reported_hi_swr_ = false;
 	}
 	else {
 		last_tx_swr_ = swr;
@@ -336,21 +339,14 @@ bool  rig_if::check_swr() {
 		char message[200];
 		snprintf(message, 200, "RIG: SWR is %.1f", swr);
 		error(ST_ERROR, message);
-		reported_hi_swr_ = true;
 		return false;
 	}
 	else if (swr > warn_level) {
 		char message[200];
 		snprintf(message, 200, "RIG: SWR is %.1f", swr);
 		error(ST_WARNING, message);
+		// Clear reported flag when we go back to receive
 		return true;
-	}
-	if (have_freq_to_band_ && freq_to_band_(tx_frequency()) != previous_band_) {
-		previous_band_ = freq_to_band_(tx_frequency());
-		reported_hi_swr_ = false;
-	}
-	if (!get_tx()) {
-		reported_hi_swr_ = false;
 	}
 	return true;
 }

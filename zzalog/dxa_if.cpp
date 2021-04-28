@@ -1107,7 +1107,7 @@ void dxa_if::create_colour_buttons() {
 	}
 	// Clear button map (name to widget)
 	button_map_.clear();
-	// get FLTK scheduler delete them
+	// get FLTK scheduler to delete them
 	Fl::wait();
 	colour_bns_.clear();
 	colour_enables_.clear();

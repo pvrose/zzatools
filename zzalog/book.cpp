@@ -153,7 +153,7 @@ bool book::load_data(string filename)
 							// Display message in main window title and update views that there's no or partial data
 							main_window_label("[load failed]");
 							selection(0, HT_NO_DATA);
-							Fl::wait();
+							//Fl::wait();
 						}
 						delete reader;
 						ok = false;
@@ -210,7 +210,7 @@ bool book::load_data(string filename)
 							// Update title bar and tell views
 							main_window_label("[load failed]");
 							selection(0, HT_NO_DATA);
-							Fl::wait();
+							//Fl::wait();
 						}
 						delete reader;
 						ok = false;
@@ -232,7 +232,7 @@ bool book::load_data(string filename)
 								status_->file_status(FS_SAVED);
 							}
 							// Parse and validate
-							Fl::wait();
+							//Fl::wait();
 						}
 						delete reader;
 						ok = true;

@@ -200,7 +200,6 @@ int socket_server::accept_client() {
 		if (WSAGetLastError() == WSAEWOULDBLOCK) {
 			//status(ST_LOG, "SOCKET: No client socket to accept");
 			// Non-blocking accept would have blocked - let other events get handled and try again
-			Fl::wait();
 			return 2;
 		}
 		else {
@@ -280,8 +279,6 @@ int socket_server::rcv_packet() {
 			return 1;
 		}
 	} while (bytes_rcvd > 0);
-	//// Allow event queue to dissipate
-	//Fl::wait();
 	// Now see if we have another 
 	Fl::add_timeout(wait_time, cb_timer_rcv, this);
 

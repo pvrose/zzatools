@@ -190,15 +190,15 @@ int wsjtx_handler::handle_decode(stringstream& ss) {
 	// Change display if addressed to user
 	vector<string> words;
 	split_line(decode.message, words, ' ');
-	// Display if this is my call or my hashed call
-	if (words[0] == my_call_ || words[0] == my_bracketed_call_) {
-		// If this is my_call their_call grid add to DxAtlas map as DX location
-		if (regex_match(words[2], basic_regex<char>("[A-R][A-R][0-9][0-9]")) && words[2] != "RR73") {
-			dxatlas_->set_dx_loc(words[2]);
-		}
-		// Display in status bar and beep if message addressed to user
-		status_->misc_status(ST_NOTIFY, message);
-	}
+	//// Display if this is my call or my hashed call
+	//if (words[0] == my_call_ || words[0] == my_bracketed_call_) {
+	//	// If this is my_call their_call grid add to DxAtlas map as DX location
+	//	if (regex_match(words[2], basic_regex<char>("[A-R][A-R][0-9][0-9]")) && words[2] != "RR73") {
+	//		dxatlas_->set_dx_loc(words[2]);
+	//	}
+	//	// Display in status bar and beep if message addressed to user
+	//	status_->misc_status(ST_NOTIFY, message);
+	//}
 	return 0;
 }
 
@@ -251,14 +251,8 @@ int wsjtx_handler::handle_status(stringstream& ss) {
 	status.tx_rx_period = get_uint32(ss);
 	// Configuration name
 	status.config_name = get_utf8(ss); 
-	if (status.dx_call.length()) {
-		if (prev_status_.dx_call != status.dx_call || prev_status_.dx_grid != status.dx_grid) {
-			char message[256];
-			snprintf(message, 256, "WSJT-X: Status %s(%s) S/N:%sdB RX:%dHz",
-				status.dx_call.c_str(), status.dx_grid.c_str(), status.report.c_str(), status.rx_offset);
-			status_->misc_status(ST_NOTE, message);
-			//status_->misc_status(ST_DEBUG, ("WSJT-X: " + to_hex(datagram)).c_str());
-		}
+	if (status.dx_call.length() && status.dx_grid.length() && status.transmitting) {
+		dxatlas_->set_dx_loc(status.dx_grid);
 	}
 	prev_status_ = status;
 	return 0;
