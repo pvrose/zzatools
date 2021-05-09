@@ -777,8 +777,10 @@ record* book::new_record(logging_mode_t mode) {
 	record* new_record = new record(mode);
 	// put it in the book 
 	record_num_t pos_record;
-	if (mode == LM_ON_AIR) {
-		// On-air logging - insert against date/time (which should be at the end
+	if (mode != LM_OFF_AIR) {
+		// On-air logging - insert against date/time (which should be at the end)
+		// We may have been using modem s/w and changed to On-air logging.
+		menu_->logging(LM_ON_AIR);
 		pos_record = insert_record(new_record);
 		char message[256];
 		sprintf(message, "LOG: New record at %s %s",
@@ -791,7 +793,8 @@ record* book::new_record(logging_mode_t mode) {
 		pos_record = append_record(new_record);
 	}
 	// Set the appropriate flags
-	logging_mode_ = mode;
+	if (mode != LM_OFF_AIR) logging_mode_ = LM_ON_AIR;
+	else logging_mode_ = mode;
 	new_record_ = true;
 	// Select the new record and tell all views
 	selection(pos_record, HT_STARTING);

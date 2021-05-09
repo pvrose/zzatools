@@ -180,6 +180,13 @@ prefix* pfx_data::get_prefix(record* record, bool special) {
 	default:
 		// More than one prefix matched - so open the dialog to query the user and beep
 		pfx_dialog dialog;
+		// Move the dialog to the centre of the screen
+		int x, y, w, h;
+		Fl::screen_xywh(x, y, w, h);
+		x = x + (w / 2) - (dialog.w() / 2);
+		y = y + (h / 2) - (dialog.h() / 2);
+		dialog.position(x, y);
+		// Set the possible prefixes and the call
 		dialog.set_data(&possibles, record->item("CALL"));
 		status_->misc_status(ST_NOTIFY, "PREFIX - Please select the prefix for this QSO");
 		if (dialog.display() == BN_OK) {

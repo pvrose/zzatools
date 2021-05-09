@@ -1154,6 +1154,7 @@ void dxa_if::create_colour_buttons() {
 	size(w(), colour_grp_->y() + colour_grp_->h() + GAP + EDGE);
 	size_range(w(), h());
 	show();
+	redraw();
 }
 
 // Is the point displayed
@@ -1701,6 +1702,7 @@ void dxa_if::draw_pins() {
 			status_->progress("Errored", OT_DXATLAS);
 			disconnect_dxatlas(false);
 		}
+		redraw();
 		fl_cursor(FL_CURSOR_DEFAULT);
 	}
 }
@@ -1967,24 +1969,21 @@ string dxa_if::get_distance(record* this_record) {
 }
 
 // Add the Dx location and include it in the displayed group
-// TODO: This doesn't guarantee it's the station being worked
 void dxa_if::set_dx_loc(string location) {
 	lat_long_t lat_long = grid_to_latlong(location);
 	DxAtlas::IDxMapPtr map = atlas_->GetMap();
-	if (!map->GetDxVisible()) {
-		map->PutDxLatitude(lat_long.latitude);
-		map->PutDxLongitude(lat_long.longitude);
-		map->PutDxVisible(true);
-		if (lat_long.latitude > northernmost_) northernmost_ = lat_long.latitude;
-		if (lat_long.latitude < southernmost_) southernmost_ = lat_long.latitude;
-		if (lat_long.longitude > easternmost_) easternmost_ = lat_long.longitude;
-		if (lat_long.longitude < westernmost_) westernmost_ = lat_long.longitude;
-		double bearing;
-		double distance;
-		great_circle({ home_lat_, home_long_ }, lat_long, bearing, distance);
-		if (distance > furthest_) furthest_ = distance;
-		centre_map();
-	}
+	map->PutDxLatitude((float)lat_long.latitude);
+	map->PutDxLongitude((float)lat_long.longitude);
+	map->PutDxVisible(true);
+	if (lat_long.latitude > northernmost_) northernmost_ = lat_long.latitude;
+	if (lat_long.latitude < southernmost_) southernmost_ = lat_long.latitude;
+	if (lat_long.longitude > easternmost_) easternmost_ = lat_long.longitude;
+	if (lat_long.longitude < westernmost_) westernmost_ = lat_long.longitude;
+	double bearing;
+	double distance;
+	great_circle({ home_lat_, home_long_ }, lat_long, bearing, distance);
+	if (distance > furthest_) furthest_ = (int)distance;
+	centre_map();
 }
 
 // REmove the Dx Location

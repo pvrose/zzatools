@@ -5,12 +5,15 @@
 #include "menu.h"
 #include "../zzalib/utils.h"
 #include "dxa_if.h"
+#include "prefix.h"
+#include "pfx_data.h"
 
 #include <stdio.h>
 #include <WS2tcpip.h>
 #include <sstream>
 #include <iostream>
 #include <regex>
+#include <vector>
 #ifndef _WIN32
 #include <fnctl.h>
 #endif
@@ -29,6 +32,7 @@ extern void cb_error_message(status_t level, const char* message);
 extern menu* menu_;
 extern Fl_Preferences* settings_;
 extern dxa_if* dxatlas_;
+extern pfx_data* pfx_data_;
 
 wsjtx_handler* wsjtx_handler::that_ = nullptr;
 
@@ -252,7 +256,18 @@ int wsjtx_handler::handle_status(stringstream& ss) {
 	// Configuration name
 	status.config_name = get_utf8(ss); 
 	if (status.dx_call.length() && status.dx_grid.length() && status.transmitting) {
+		// Use the actual grid loaction
 		dxatlas_->set_dx_loc(status.dx_grid);
+	}
+	else if (status.dx_call.length() && status.transmitting) {
+		// Get the grid location of the prefix centre - only if 1 prefix matches the callsign.
+		record* dx_record = new record;
+		dx_record->item("CALL", status.dx_call);
+		vector<prefix*> prefixes;
+		if (pfx_data_->all_prefixes(dx_record, &prefixes, false) && prefixes.size() == 1) {
+			lat_long_t location = { prefixes[0]->latitude_, prefixes[0]->longitude_ };
+			dxatlas_->set_dx_loc(latlong_to_grid(location, 6));
+		}
 	}
 	prev_status_ = status;
 	return 0;

@@ -1248,75 +1248,93 @@ string record::format_freq(display_freq_t format, string value) {
 
 // Convert date from ADIF (YYYYMMDD) to display format
 string record::format_date(display_date_t format, string value) {
+	
 	// Convert date to display format
 	tm date;
 	// Get start timestamp
-	date.tm_year = stoi(value.substr(0, 4)) - 1900;
-	date.tm_mon = stoi(value.substr(4, 2)) - 1;
-	date.tm_mday = stoi(value.substr(6, 2));
-	date.tm_hour = 0;
-	date.tm_min = 0;
-	date.tm_sec = 0;
-	date.tm_isdst = false;
-	char temp[20];
-	switch (format) {
-	case DATE_YYYYMMDD:
-		strftime(temp, 20, "%Y%m%d", &date);
-		break;
-	case DATE_YYYY_MM_DD:
-		strftime(temp, 20, "%Y_%m_%d", &date);
-		break;
-	case DATE_DD_MM_YYYY:
-		strftime(temp, 20, "%d_%m_%Y", &date);
-		break;
-	case DATE_MM_DD_YYYY:
-		strftime(temp, 20, "%m_%d_%Y", &date);
-		break;
-	case DATE_DD_MON_YYYY:
-		strftime(temp, 20, "%d-%b-%Y", &date);
-		break;
-	default:
-		strcpy(temp, "Invalid");
-		break;
+	if (value.length() >= 8) {
+		date.tm_year = stoi(value.substr(0, 4)) - 1900;
+		date.tm_mon = stoi(value.substr(4, 2)) - 1;
+		date.tm_mday = stoi(value.substr(6, 2));
+		date.tm_hour = 0;
+		date.tm_min = 0;
+		date.tm_sec = 0;
+		date.tm_isdst = false;
+		char temp[20];
+		switch (format) {
+		case DATE_YYYYMMDD:
+			strftime(temp, 20, "%Y%m%d", &date);
+			break;
+		case DATE_YYYY_MM_DD:
+			strftime(temp, 20, "%Y_%m_%d", &date);
+			break;
+		case DATE_DD_MM_YYYY:
+			strftime(temp, 20, "%d_%m_%Y", &date);
+			break;
+		case DATE_MM_DD_YYYY:
+			strftime(temp, 20, "%m_%d_%Y", &date);
+			break;
+		case DATE_DD_MON_YYYY:
+			strftime(temp, 20, "%d-%b-%Y", &date);
+			break;
+		default:
+			strcpy(temp, "Invalid");
+			break;
+		}
+		return string(temp);
 	}
-	return string(temp);
+	else {
+		char message[100];
+		snprintf(message, 100, "LOG: Invalid date %s", value.c_str());
+		status_->misc_status(ST_ERROR, message);
+		return "";
+	}
 }
 
 // Convert time from ADIF (HHMM or HHMMSS) to display format
 string record::format_time(display_time_t format, string value) {
 	tm date;
-	date.tm_year = 70;
-	date.tm_mon = 0;
-	date.tm_mday = 1;
-	date.tm_hour = stoi(value.substr(0, 2));
-	date.tm_min = stoi(value.substr(2, 2));
-	if (value.length() == 6) {
-		date.tm_sec = stoi(value.substr(4, 2));
+	if (value.length() >= 4) {
+		date.tm_year = 70;
+		date.tm_mon = 0;
+		date.tm_mday = 1;
+		date.tm_hour = stoi(value.substr(0, 2));
+		date.tm_min = stoi(value.substr(2, 2));
+		if (value.length() == 6) {
+			date.tm_sec = stoi(value.substr(4, 2));
+		}
+		else {
+			date.tm_sec = 0;
+		}
+		date.tm_isdst = false;
+		char temp[20];
+		switch (format) {
+		case TIME_HHMMSS:
+			strftime(temp, 20, "%H%M%S", &date);
+			break;
+		case TIME_HHMM:
+			strftime(temp, 20, "%H%M", &date);
+			break;
+		case TIME_HH_MM_SS:
+			strftime(temp, 20, "%H:%M:%S", &date);
+			break;
+		case TIME_HH_MM:
+			strftime(temp, 20, "%H:%M", &date);
+			break;
+		default:
+			strcpy(temp, "Invalid");
+			break;
+		}
+		return string(temp);
 	}
 	else {
-		date.tm_sec = 0;
+		char message[100];
+		snprintf(message, 100, "LOG: Invalid time %s", value.c_str());
+		status_->misc_status(ST_ERROR, message);
+		return "";
 	}
-	date.tm_isdst = false;
-	char temp[20];
-	switch (format) {
-	case TIME_HHMMSS:
-		strftime(temp, 20, "%H%M%S", &date);
-		break;
-	case TIME_HHMM:
-		strftime(temp, 20, "%H%M", &date);
-		break;
-	case TIME_HH_MM_SS:
-		strftime(temp, 20, "%H:%M:%S", &date);
-		break;
-	case TIME_HH_MM:
-		strftime(temp, 20, "%H:%M", &date);
-		break;
-	default:
-		strcpy(temp, "Invalid");
-		break;
-	}
-	return string(temp);
 }
+
 
 // Convert frequency from display format to ADIF (MHz)
 string record::unformat_freq(display_freq_t format, string value) {

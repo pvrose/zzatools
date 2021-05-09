@@ -339,6 +339,7 @@ bool  rig_if::check_swr() {
 		char message[200];
 		snprintf(message, 200, "RIG: SWR is %.1f", swr);
 		error(ST_ERROR, message);
+		reported_hi_swr_ = true;
 		return false;
 	}
 	else if (swr > warn_level) {
@@ -361,7 +362,6 @@ bool rig_if::check_power() {
 		char message[200];
 		snprintf(message, 200, "RIG: Average power was %.0f", power);
 		error(ST_NOTIFY, message);
-		reported_hi_swr_ = true;
 		return false;
 
 	}
