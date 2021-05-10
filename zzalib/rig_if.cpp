@@ -37,6 +37,8 @@ rig_if::rig_if()
 	// Make this a daft value
 	last_tx_power_ = 0.0;
 	last_tx_swr_ = 1.0;
+	sigma_tx_power_ = 0.0;
+	num_pwr_samples_ = 0;
 }
 
 // Base class destructor
@@ -357,13 +359,18 @@ bool rig_if::check_power() {
 	Fl_Preferences rig_settings_(settings_, "Rig");
 	double power_warn_level;
 	rig_settings_.get("Power Warning Level", power_warn_level, 50.0);
-	double power = sigma_tx_power_ / num_pwr_samples_;
-	if (power > power_warn_level) {
-		char message[200];
-		snprintf(message, 200, "RIG: Average power was %.0f", power);
-		error(ST_NOTIFY, message);
-		return false;
+	if (num_pwr_samples_ > 0) {
+		double power = sigma_tx_power_ / num_pwr_samples_;
+		if (power > power_warn_level) {
+			char message[200];
+			snprintf(message, 200, "RIG: Average power was %.0f", power);
+			error(ST_NOTIFY, message);
+			return false;
 
+		}
+		else {
+			return true;
+		}
 	}
 	else {
 		return true;

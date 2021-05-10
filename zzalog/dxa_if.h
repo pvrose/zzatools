@@ -115,6 +115,8 @@ namespace zzalog {
 		void clear_dx_loc();
 		// Callbacks
 
+		// Callback - close button
+		static void cb_close(Fl_Widget* w, void* v);
 		// QSOs choice
 		static void cb_ch_qsos(Fl_Widget* w, void* v);
 		// Colour mode choice

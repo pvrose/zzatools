@@ -86,6 +86,8 @@ dxa_if::dxa_if() :
 	// Create the form
 	create_form();
 	enable_widgets();
+	// Add close callback
+	callback(cb_close);
 	// Connect to DXATLAS:
 	connect_dxatlas();
 	// If successful
@@ -134,8 +136,12 @@ dxa_if::~dxa_if()
 int dxa_if::handle(int event) {
 
 	switch (event) {
-	case FL_HIDE:
 	case FL_SHOW:
+		if (atlas_ == nullptr) {
+			connect_dxatlas();
+			update(HT_LOCATION);
+		}
+	case FL_HIDE:
 		// Get menu to update Windows controls
 		menu_->update_windows_items();
 		return true;
@@ -669,6 +675,22 @@ void dxa_if::cb_sl_pinsize(Fl_Widget* w, void* v) {
 	that->enable_widgets();
 	that->draw_pins();
 }
+
+// Close button clicked
+// v is not used
+void dxa_if::cb_close(Fl_Widget* w, void* v) {
+	// It is the window that raised this callback
+	dxa_if* that = (dxa_if*)w;
+	// If we are editing does the user want to save or cancel?
+	if (that->atlas_ != nullptr) {
+		that->disconnect_dxatlas(false);
+	}
+	// update menu item
+	that->hide();
+	menu_->update_windows_items();
+
+}
+
 
 // Call back from DXATLAS: when the mouse has been clicked on the map - show selected QSO or QSOs
 // If we are displaying extracted records then only show the last record in the record view.

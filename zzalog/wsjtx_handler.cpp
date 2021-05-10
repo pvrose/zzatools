@@ -261,12 +261,17 @@ int wsjtx_handler::handle_status(stringstream& ss) {
 	}
 	else if (status.dx_call.length() && status.transmitting) {
 		// Get the grid location of the prefix centre - only if 1 prefix matches the callsign.
-		record* dx_record = new record;
+		record* dx_record = new record(LM_ON_AIR);
 		dx_record->item("CALL", status.dx_call);
 		vector<prefix*> prefixes;
 		if (pfx_data_->all_prefixes(dx_record, &prefixes, false) && prefixes.size() == 1) {
 			lat_long_t location = { prefixes[0]->latitude_, prefixes[0]->longitude_ };
 			dxatlas_->set_dx_loc(latlong_to_grid(location, 6));
+		}
+		else {
+			char message[100];
+			snprintf(message, 100, "WSJT-X: Cannot parse %s - %d matching prefixes found", status.dx_call.c_str(), prefixes.size());
+			status_->misc_status(ST_WARNING, message);
 		}
 	}
 	prev_status_ = status;
