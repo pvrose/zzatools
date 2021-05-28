@@ -12,6 +12,7 @@
 #include "../zzalib/rig_if.h"
 #include "band_view.h"
 #include "extract_data.h"
+#include "dxa_if.h"
 
 #include <regex>
 
@@ -36,6 +37,7 @@ extern spec_data* spec_data_;
 extern rig_if* rig_if_;
 extern band_view* band_view_;
 extern extract_data* extract_records_;
+extern dxa_if* dxatlas_;
 extern void add_scratchpad();
 extern double prev_freq_;
 
@@ -390,6 +392,10 @@ void scratchpad::cb_action(Fl_Widget* w, void* v) {
 	while (isspace(text[text.length() - 1])) text = text.substr(0, text.length() - 1);
 	that->record_->item(field, text);
 	that->buffer_->unselect();
+	// Set DX location on DxAtlas
+	if (action == WRITE_GRID) {
+		dxatlas_->set_dx_loc(to_upper(text));
+	}
 	// Update views
 	tabbed_forms_->update_views(nullptr, HT_MINOR_CHANGE, book_->size() - 1);
 	// Give the editor the focus
@@ -425,6 +431,7 @@ void scratchpad::cb_save(Fl_Widget* w, void* v) {
 	that->record_ = nullptr;
 	that->buffer_->text("");
 	that->enable_widgets();
+	dxatlas_->clear_dx_loc();
 }
 
 // Cancel the edit and reset the state to no record
@@ -435,6 +442,7 @@ void scratchpad::cb_cancel(Fl_Widget* w, void* v) {
 	that->record_ = nullptr;
 	that->buffer_->text("");
 	that->enable_widgets();
+	dxatlas_->clear_dx_loc();
 }
 
 // Close button clicked - check editing or not

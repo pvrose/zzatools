@@ -666,7 +666,7 @@ lat_long_t record::location(bool my_station, location_t& source) {
 		}
 		// Get the lat/long of the centre of the grid-square 
 		lat_long = grid_to_latlong(value_1);
-		// 2 or 4 character grid square - use centre of grid square or centre of prefix area if that is inside the gridsquare
+		// 2 or 4 character grid square - use centre of grid square
 		if (value_1.length() <= 4) {
 			// Get prefix coordinates
 			lat_long_t prefix_lat_long = { nan(""), nan("") };
@@ -687,14 +687,6 @@ lat_long_t record::location(bool my_station, location_t& source) {
 				case 4:
 					side = 1.0;
 					break;
-				}
-				// Test to see if the prefix lat/long is within the 2- or 4-character gridsquare
-				if (!isnan(prefix_lat_long.longitude) &&
-					!isnan(prefix_lat_long.latitude)) {
-					if (latlong_to_grid(prefix_lat_long, value_1.length()) == value_1) {
-						// If so use it instead of GRIDSQUARE
-						lat_long = prefix_lat_long;
-					}
 				}
 			}
 			else {

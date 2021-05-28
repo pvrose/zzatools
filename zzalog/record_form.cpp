@@ -224,7 +224,7 @@ record_form::record_form(int X, int Y, int W, int H, const char* label, field_or
 	gen_card_radio_->callback(cb_rad_card, (void*)QI_GEN_CARD);
 	gen_card_radio_->when(FL_WHEN_RELEASE);
 	gen_card_radio_->labelsize(FONT_SIZE);
-	gen_card_radio_->tooltip("Select image scanned of paper card back");
+	gen_card_radio_->tooltip("Select generated label for card");
 	curr_y += HBUTTON;
 
 	// Button - Fetch the card image from eQSL.cc
@@ -241,7 +241,7 @@ record_form::record_form(int X, int Y, int W, int H, const char* label, field_or
 	log_card_bn_->callback(cb_bn_log_card, &record_1_);
 	log_card_bn_->when(FL_WHEN_RELEASE);
 	curr_y += HBUTTON;
-	// Button - Scale or streth
+	// Button - Scale or stretch
 	scale_bn_ = new Fl_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Scale image");
 	scale_bn_->labelsize(FONT_SIZE);
 	scale_bn_->tooltip("Scale - keep in proportion");
@@ -311,7 +311,7 @@ record_form::record_form(int X, int Y, int W, int H, const char* label, field_or
 	field_choice_->when(FL_WHEN_RELEASE | FL_WHEN_NOT_CHANGED);
 
 	curr_y += HTEXT;
-	// Text editor - new value of field
+	// Text editor - new value of field or explanation of the enumerated value
 	value_in_ = new intl_editor(curr_x, curr_y, WEDIT, HMLIN, "Value");
 	value_in_->align(FL_ALIGN_LEFT);
 	value_in_->labelsize(FONT_SIZE);
@@ -388,7 +388,7 @@ record_form::record_form(int X, int Y, int W, int H, const char* label, field_or
 	edit4_bn_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "4");
 	edit4_bn_->labelsize(FONT_SIZE);
 
-	// Quick entry button - copies the entry field directlt to the specified item
+	// Quick entry button - copies the entry field directly to the specified item
 	curr_x = X + XQGRP;
 	curr_y = Y + YQGRP;
 	quick_grp_ = new Fl_Group(curr_x, curr_y, GAP + WBUTTON + WBUTTON + GAP, GAP + (5 * HBUTTON) + GAP, "Quick editting");
@@ -756,7 +756,7 @@ void record_form::cb_bn_quick(Fl_Widget* w, void* v) {
 	if (!that->my_book_->new_record()) {
 		that->my_book_->modified_record(true);
 	}
-	// Only a limited number of fileds are covered by the Quick button
+	// Only a limited number of fields are covered by the Quick button
 	if (field == "GRIDSQUARE") {
 		// Location has changed
 		that->my_book_->selection(that->item_num_1_, HT_CHANGED, that);
@@ -1364,7 +1364,7 @@ void record_form::set_image_buttons() {
 		gen_card_radio_->value(true);
 		break;
 	default:
-		// Display the generated design for a QSL card label
+		// Shouldn't get here
 		eqsl_radio_->value(false);
 		card_front_radio_->value(false);
 		card_back_radio_->value(false);

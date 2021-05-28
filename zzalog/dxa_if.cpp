@@ -635,6 +635,7 @@ void dxa_if::cb_bn_centre(Fl_Widget* w, void* v) {
 	dxa_if* that = ancestor_view<dxa_if>(w);
 	if (that->atlas_) {
 		DxAtlas::IDxMapPtr map = that->atlas_->GetMap();
+		that->clear_dx_loc();
 		if (map->GetProjection() == DxAtlas::PRJ_RECTANGULAR) {
 			that->centre_map();
 		}
@@ -1724,6 +1725,12 @@ void dxa_if::draw_pins() {
 			status_->progress("Errored", OT_DXATLAS);
 			disconnect_dxatlas(false);
 		}
+		// Copy to saved copies
+		northernsave_ = northernmost_;
+		southernsave_ = southernmost_;
+		westernsave_ = westernmost_;
+		easternsave_ = easternmost_;
+		furthestsave_ = furthest_;
 		redraw();
 		fl_cursor(FL_CURSOR_DEFAULT);
 	}
@@ -1992,11 +1999,19 @@ string dxa_if::get_distance(record* this_record) {
 
 // Add the Dx location and include it in the displayed group
 void dxa_if::set_dx_loc(string location) {
+	clear_dx_loc();
 	lat_long_t lat_long = grid_to_latlong(location);
 	DxAtlas::IDxMapPtr map = atlas_->GetMap();
 	map->PutDxLatitude((float)lat_long.latitude);
 	map->PutDxLongitude((float)lat_long.longitude);
 	map->PutDxVisible(true);
+	// Save current map limits
+	northernsave_ = northernmost_;
+	southernsave_ = southernmost_;
+	westernsave_ = westernmost_;
+	easternsave_ = easternmost_;
+	furthestsave_ = furthest_;
+	// Adjust map limits to include dx location
 	if (lat_long.latitude > northernmost_) northernmost_ = lat_long.latitude;
 	if (lat_long.latitude < southernmost_) southernmost_ = lat_long.latitude;
 	if (lat_long.longitude > easternmost_) easternmost_ = lat_long.longitude;
@@ -2012,6 +2027,13 @@ void dxa_if::set_dx_loc(string location) {
 void dxa_if::clear_dx_loc() {
 	DxAtlas::IDxMapPtr map = atlas_->GetMap();
 	map->PutDxVisible(false);
+	// Restore map limits without DX location
+	northernmost_ = northernsave_;
+	southernmost_ = southernsave_;
+	westernmost_ = westernsave_;
+	easternmost_ = easternsave_;
+	furthest_ = furthestsave_;
+	centre_map();
 }
 
 // Create a widget to contain the pin size indication - draw a null box with a circle the correct size (denoted by value)

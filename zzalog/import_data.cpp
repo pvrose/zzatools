@@ -590,6 +590,8 @@ void import_data::finish_update(bool merged /*= true*/) {
 		}
 		// Switch to main now the QSO has been copied
 		tabbed_forms_->activate_pane(OT_MAIN, true);
+		// Allow any updates to be displayed before we do anything else
+		Fl::wait();
 		if (number_added_ == 1) {
 			// One new record added from whatever source, send latest QSO to QSL servers
 			if (!book_->upload_qso(last_added_number_)) {

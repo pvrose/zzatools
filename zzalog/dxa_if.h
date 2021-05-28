@@ -263,6 +263,12 @@ namespace zzalog {
 		double northernmost_;
 		double southernmost_;
 		int furthest_;
+		// Without DX Location
+		double westernsave_;
+		double easternsave_;
+		double northernsave_;
+		double southernsave_;
+		int furthestsave_;
 		// Map properties
 		int prefixes_;
 		int cq_zones_;

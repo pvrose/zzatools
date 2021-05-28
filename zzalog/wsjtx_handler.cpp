@@ -144,6 +144,7 @@ int wsjtx_handler::send_hbeat() {
 int wsjtx_handler::handle_close(stringstream& ss) {
 	status_->misc_status(ST_NOTE, "WSJT-X: Received Close");
 	server_->close_server();
+	dxatlas_->clear_dx_loc();
 	menu_->update_items();
 	return 1;
 }
