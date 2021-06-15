@@ -81,10 +81,14 @@ report_tree::report_tree(int X, int Y, int W, int H, const char* label, field_or
 }
 
 // Destructor
-report_tree::~report_tree()
+void report_tree::delete_all()
 {
 	delete_tree();
 	delete_map(&map_);
+}
+
+report_tree::~report_tree() {
+	delete_all();
 }
 
 // Overloaded view update method
@@ -124,6 +128,10 @@ void report_tree::update(hint_t hint, unsigned int record_num_1, unsigned int re
 
 // Delete the tree
 void report_tree::delete_tree() {
+	// TODO: clear() doesn't appear to delete the Fl_Menu_Items
+	//Fl_Tree_Item* root_item = root();
+	//delete_children(root_item);
+	//delete root_item;
 	clear();
 	map_order_.clear();
 }
@@ -301,7 +309,7 @@ void report_tree::add_record(record_num_t record_num, report_map_entry_t* entry)
 void report_tree::copy_map_to_tree(report_map_t* this_map, Fl_Tree_Item* item, int& num_records, int& num_eqsl, int& num_lotw, int& num_card, int &num_any) {
 	report_map_entry_t* next_entry;
 	string map_key;
-	char text[1024];
+	char* text = new char[1024];
 	// Default format for a branch node on the tree 
 	char format[] = "%s %d QSOs - Confirmed %d (%d eQSL, %d LotW, %d Card)";
 	size_t count = 1;
@@ -407,6 +415,7 @@ void report_tree::copy_map_to_tree(report_map_t* this_map, Fl_Tree_Item* item, i
 	if (item == nullptr) {
 		status_->misc_status(ST_OK, "LOG: Report display done!");
 	}
+	delete[] text;
 }
 
 // Copy the list of records in a map entry to the tree control
@@ -414,7 +423,7 @@ void report_tree::copy_records_to_tree(record_list_t* record_list, Fl_Tree_Item*
 	if (record_list != nullptr) {
 		// We have records to copy - return the number of recordsf
 		num_records = record_list->size();
-		char text[1024];
+		char* text = new char[1024];
 		// For each entry in the record list
 		for (auto it = record_list->begin(); it != record_list->end(); it++) {
 			// Get the record
@@ -464,6 +473,7 @@ void report_tree::copy_records_to_tree(record_list_t* record_list, Fl_Tree_Item*
 			record_item->labelcolor(FL_BLUE);
 			record_item->labelfont(item_labelfont() | FL_ITALIC);
 		}
+		delete[] text;
 	}
 }
 
@@ -561,7 +571,7 @@ void report_tree::populate_tree(bool activate) {
 	fl_cursor(FL_CURSOR_WAIT);
 	// Only if there's a reference table set up.
 	// Delete existing data, clear the tree control and recreate the data
-	delete_map(&map_);
+	delete_all();
 	entities_ = 0;
 	entities_eqsl_ = 0;
 	entities_lotw_ = 0;

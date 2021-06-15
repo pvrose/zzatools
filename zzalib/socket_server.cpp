@@ -272,16 +272,18 @@ int socket_server::rcv_packet() {
 		}
 		else if (WSAGetLastError() == WSAENOTSOCK && closing_) {
 			// We can get here through a race between closing and turning the timers off
+			delete[] buffer;
 			return 1;
 		}
 		else {
 			handle_error("Unable to read from client");
+			delete[] buffer;
 			return 1;
 		}
 	} while (bytes_rcvd > 0);
 	// Now see if we have another 
 	Fl::add_timeout(wait_time, cb_timer_rcv, this);
-
+	delete[] buffer;
 	return 0;
 }
 

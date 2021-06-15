@@ -113,6 +113,7 @@ bool book::load_data(string filename)
 			if (book_type_ == OT_MAIN) {
 				delete_contents(true);
 			}
+
 			// not called File->New
 			if (filename.length() != 0) {
 				// remember filename and tell ADIF spec database

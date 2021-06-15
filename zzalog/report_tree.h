@@ -59,9 +59,10 @@ namespace zzalog {
 
 		// inherited from view
 		virtual void update(hint_t hint, unsigned int record_num_1, unsigned int record_num_2 = 0);
+		// Delete all items
+		void delete_all();
 		// Delete the tree
 		void delete_tree();
-
 		// Basic record list - list of record numbers
 		typedef list<record_num_t> record_list_t;
 		// Basic entry for a map

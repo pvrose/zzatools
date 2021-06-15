@@ -360,7 +360,9 @@ string zzalib::to_upper(const string& data) {
 	char* result = new char[3 * len + 1];
 	memset(result, 0, 3 * len + 1);
 	fl_utf_toupper((unsigned char*)data.c_str(), len, result);
-	return string(result);
+	string ret_value(result);
+	delete[] result;
+	return ret_value;
 }
 
 // Create an lower-case version of a string
@@ -369,7 +371,9 @@ string zzalib::to_lower(const string& data) {
 	char* result = new char[3 * len + 1];
 	memset(result, 0, 3 * len + 1);
 	fl_utf_tolower((unsigned char*)data.c_str(), len, result);
-	return string(result);
+	string ret_value(result);
+	delete[] result;
+	return ret_value;
 }
 
 // Search for any characters in match (assume its zero-terminated)
