@@ -12,6 +12,7 @@
 #include "status.h"
 #include "pfx_data.h"
 #include "main_window.h"
+#include "dxa_if.h"
 
 #include <FL/fl_draw.H>
 #include <FL/Fl_Preferences.H>
@@ -33,6 +34,7 @@ extern status* status_;
 extern intl_dialog* intl_dialog_;
 extern time_t session_start_;
 extern pfx_data* pfx_data_;
+extern dxa_if* dxatlas_;
 extern bool in_current_session(record*);
 
 Fl_Font log_table::font_;
@@ -758,6 +760,26 @@ void log_table::done_edit(bool keep_row) {
 			}
 			if (field_info.field == "CALL") {
 				toolbar_->search_text(my_book_->record_number(item_number));
+			}
+			// Set DX location in DX Atlas
+			if (my_book_->new_record()) {
+				if (field_info.field == "GRIDSQUARE") {
+					// WE have an actual gridsquare - read back from record to get in upper case
+					dxatlas_->set_dx_loc(record->item("GRIDSQUARE"));
+				}
+				else if (field_info.field == "CALL") {
+					// Get the grid location of the prefix centre - only if 1 prefix matches the callsign.
+					vector<prefix*> prefixes;
+					if (pfx_data_->all_prefixes(record, &prefixes, false) && prefixes.size() == 1) {
+						lat_long_t location = { prefixes[0]->latitude_, prefixes[0]->longitude_ };
+						dxatlas_->set_dx_loc(latlong_to_grid(location, 6));
+					}
+					else {
+						char message[100];
+						snprintf(message, 100, "WSJT-X: Cannot parse %s - %d matching prefixes found", text.c_str(), prefixes.size());
+						status_->misc_status(ST_WARNING, message);
+					}
+				}
 			}
 			char message[200];
 			// Log the fact that a record has been interactively changed

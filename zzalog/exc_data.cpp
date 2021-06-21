@@ -49,6 +49,25 @@ void exc_data::delete_contents() {
 		list_entries->clear();
 	}
 	entries_.clear();
+	// Delete all the invali entries
+	for (auto it1 = invalids_.begin(); it1 != invalids_.end(); it1++) {
+		list<invalid*>* list_invalids = &(it1->second);
+		for (auto it2 = list_invalids->begin(); it2 != list_invalids->end(); it2++) {
+			delete (*it2);
+		}
+		list_invalids->clear();
+	}
+	invalids_.clear();
+	// Delete all the exception entries
+	for (auto it1 = zones_.begin(); it1 != zones_.end(); it1++) {
+		list<zone_exc*>* list_zones = &(it1->second);
+		for (auto it2 = list_zones->begin(); it2 != list_zones->end(); it2++) {
+			delete (*it2);
+		}
+		list_zones->clear();
+	}
+	zones_.clear();
+	// Delete all the invalid entries
 }
 
 // Return the exc_data entry for the record (call and date) - nullptr if one doesn't exist
@@ -127,6 +146,33 @@ bool exc_data::is_invalid(record* record) {
 		}
 		// Does not match any of the timeframes
 		return false;
+	}
+
+}
+
+// Is the call  in the list of zone_exceptions - return 0 if not and the zone if it is
+unsigned int exc_data::cq_zone(record* record) {
+	string call = record->item("CALL");
+	time_t timestamp = record->timestamp();
+	if (zones_.find(call) == zones_.end()) {
+		// The call is not mentioned at all
+		return 0;
+	}
+	else {
+		list<zone_exc*>* list_zones = &(zones_.at(call));
+		// Exceptions are time limited - return the entry if the call was in the appropriate time-period
+		for (auto it = list_zones->begin(); it != list_zones->end(); it++) {
+			zone_exc* zone = *it;
+			if ((zone->end == -1 || zone->end > timestamp) &&
+				(zone->start == -1 || timestamp > zone->start)) {
+				char message[160];
+				snprintf(message, 160, "EXCEPTION: Contact %s at %s %s is in zone %d", call.c_str(), record->item("QSO_DATE").c_str(), record->item("TIME_ON").c_str(), zone->cq_zone);
+				status_->misc_status(ST_NOTE, message);
+				return zone->cq_zone;
+			}
+		}
+		// Does not match any of the timeframes
+		return 0;
 	}
 
 }
@@ -228,13 +274,17 @@ ostream& exc_data::store(ostream& out) {
 	// First number of exceptions and invalids
 	int num_exceptions = 0;
 	int num_invalids = 0;
+	int num_zones = 0;
 	for (auto it = entries_.begin(); it != entries_.end(); it++) {
 		num_exceptions += it->second.size();
 	}
 	for (auto it = invalids_.begin(); it != invalids_.end(); it++) {
 		num_invalids += it->second.size();
 	}
-	out << num_exceptions << '\t' << num_invalids << endl;
+	for (auto it = zones_.begin(); it != zones_.end(); it++) {
+		num_zones += it->second.size();
+	}
+	out << num_exceptions << '\t' << num_invalids << '\t' << num_zones << endl;
 	int i = 0;
 	status_->progress(num_exceptions + num_invalids, OT_PREFIX, "Storing Exception data", "records");
 	// now the individual exception entries
@@ -250,6 +300,15 @@ ostream& exc_data::store(ostream& out) {
 	// Individual invalid entries
 	for (auto it = invalids_.begin(); it != invalids_.end() && out.good(); it++) {
 		list<invalid*>* data_list = &(it->second);
+		for (auto it2 = data_list->begin(); it2 != data_list->end(); it2++) {
+			(*it2)->store(out);
+			i++;
+			status_->progress(i, OT_PREFIX);
+		}
+	}
+	// Individual zone entries
+	for (auto it = zones_.begin(); it != zones_.end() && out.good(); it++) {
+		list<zone_exc*>* data_list = &(it->second);
 		for (auto it2 = data_list->begin(); it2 != data_list->end(); it2++) {
 			(*it2)->store(out);
 			i++;
@@ -290,6 +349,15 @@ ostream& invalid::store(ostream& out) {
 	return out;
 }
 
+// Store the individual cq_zone record to the output stream
+ostream& zone_exc::store(ostream& out) {
+	out << call << '\t';
+	out << cq_zone << '\t';
+	out << start << '\t';
+	out << end << endl;
+	return out;
+}
+
 // Read TSV data from the input stream into the database
 istream& exc_data::load(istream& in) {
 	// Get the number of each records - for progress reporting more than anything else
@@ -297,11 +365,13 @@ istream& exc_data::load(istream& in) {
 	in >> num_exceptions;
 	int num_invalids;
 	in >> num_invalids;
+	int num_zones;
+	in >> num_zones;
 	// Read to the end of line
 	string dummy;
 	getline(in, dummy);
 	int record_num = 0;
-	status_->progress(num_exceptions + num_invalids, OT_PREFIX, "Loading Exception data", "records");
+	status_->progress(num_exceptions + num_invalids + num_zones, OT_PREFIX, "Loading Exception data", "records");
 	// Read all the eception records
 	for (int i = 0; i < num_exceptions && in.good(); i++) {
 		exc_entry* entry = new exc_entry;
@@ -326,8 +396,20 @@ istream& exc_data::load(istream& in) {
 		record_num++;
 		status_->progress(record_num, OT_PREFIX);
 	}
+	// Read all the zone exception records
+	for (int i = 0; i < num_zones && in.good(); i++) {
+		zone_exc* entry = new zone_exc;
+		entry->load(in);
+		if (zones_.find(entry->call) == zones_.end()) {
+			list<zone_exc*>* list_data = new list<zone_exc*>;
+			zones_[entry->call] = *list_data;
+		}
+		zones_.at(entry->call).push_back(entry);
+		record_num++;
+		status_->progress(record_num, OT_PREFIX);
+	}
 	// Something bad happened, either an error in reading the file, or the number of records read differs from what was expected
-	if (!(in.good() || in.eof()) || record_num != num_invalids + num_exceptions) {
+	if (!(in.good() || in.eof()) || record_num != num_invalids + num_exceptions +num_zones) {
 		status_->progress("Read failed!", OT_PREFIX);
 	}
 	return in;
@@ -354,3 +436,22 @@ istream& invalid::load(istream& in) {
 	return in;
 }
 
+// Read an individual invalid record from the input stream
+istream& zone_exc::load(istream& in) {
+	in >> call;
+	in >> cq_zone;
+	in >> start;
+	in >> end;
+	return in;
+}
+
+bool exc_data::reload_data() {
+	string filename = get_filename();
+	// Exception list has expired or didn't exist
+	status_->misc_status(ST_NOTE, "EXCEPTION: Downloading exception file on request");
+	club_handler_->download_exception();
+	filename.replace(filename.length() - 3, 3, "xml");
+// Load the exception data
+	load_data(filename);
+	return true;
+}

@@ -53,6 +53,8 @@ namespace zzalog {
 		void set_filter(report_filter_t filter);
 		// Set the items to display - from menu
 		void set_items(report_item_t items);
+		// Get the items
+		report_item_t get_items();
 		// Add details
 		void add_details(bool enable);
 		// Change font

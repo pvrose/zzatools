@@ -92,6 +92,8 @@ namespace zzalog {
 		parse_t get_parse_type(string& callsign);
 		// Generate tip text for parsing a call
 		string get_tip(record* record);
+		// Get exceptions
+		exc_data* get_exceptions();
 
 		//protected methods
 	protected:

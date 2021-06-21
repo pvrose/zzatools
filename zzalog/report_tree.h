@@ -34,6 +34,9 @@ namespace zzalog {
 		RI_CQ_ZONE,               // CQ Zone
 		RI_ITU_ZONE,              // ITU Zone
 		RI_ADIF,                  // ADIF Specification data
+		RI_EXCEPTION = 8,         // Exception records
+		RI_INVALID = 16,          // Invalid records
+		RI_ZONE_EXC = 32,         // Zone exception records
 		RI_LAST                   // enum upper bound
 	};
 

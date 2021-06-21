@@ -864,7 +864,7 @@ L01|7469|-3577|Juan de Nova;Europa|FT#E|39|53|AF|Indian/Reunion|124||19600625||F
 M0201|7261|-4019|Europa I.||||||||||FT#E|29
 M0201|7694|-3071|Juan de Nova I.|FT#J|||||||||FT#J|29
 01|-14198|-6053|Juan Fernandez Is.|CE0Z|12|14|SA|America/Santiago|125||||C[A-E]0[IZ],X[QR]0[IZ],3G0[IZ],CE0Z/|1,3
-01|3815|9837|Kaliningradskaya Obl.|UA2F|15|29|EU|Europe/Kaliningrad|126|KA|||[RU]2[FK],R@2[FK],U[A-I]2[FK],UA2F/|1,11,12
+01|3815|9837|Kaliningradskaya Obl.|UA2F|15|29|EU|Europe/Kaliningrad|126|KA|||[RU]2[FK],R@2[FK],U[A-I]2[FK],UA2F/,[RU]##|1,11,12
 -0301|||1-st category|UA#@|||||||||R#@@.,R[ACDFGJ-OQT-Z]#@@.,U[A-I]#@@.,R[ACDFGJ-OQT-Z]#@.,U[A-I]#@.|
 -0301|||2-nd category|UA#@@@|||||||||R#@@@.,R[ACDFGJ-OQT-Z]#@@@.,UA#@@@.|
 -0301|||3-rd category|UB#@@@|||||||||U[BCDFG]#@@@.|

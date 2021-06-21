@@ -13,6 +13,7 @@ namespace zzalog {
 	class exc_data;
 	struct exc_entry;
 	struct invalid;
+	struct zone_exc;
 
 	// This class reads the XML cty.xml file obtained from Clublog
 	class exc_reader :
@@ -51,6 +52,7 @@ namespace zzalog {
 		// Current elements
 		exc_entry* current_exception_;
 		invalid* current_invalid_;
+		zone_exc* current_zone_exc_;
 		// The data being read
 		exc_data* data_;
 		// Value of element

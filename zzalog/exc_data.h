@@ -52,6 +52,23 @@ namespace zzalog {
 		istream& load(istream& in);
 	};
 
+	// Zone exception
+	struct zone_exc {
+		string call;
+		unsigned short cq_zone;
+		time_t start;
+		time_t end;
+
+		zone_exc() {
+			call = "";
+			cq_zone = 0;
+			start = -1;
+			end = -1;
+		}
+		ostream& store(ostream& out);
+		istream& load(istream& in);
+	};
+
 	// This class provides a wrapper for all  the callsign exception data in cty.xml
 	class exc_data
 	{
@@ -65,10 +82,15 @@ namespace zzalog {
 		bool data_valid(string filename);
 		// Load data 
 		bool load_data(string filename);
+		// Reload data
+		bool reload_data();
 		// Return invalid operation
 		bool is_invalid(record* record);
+		// Return changed CQ Zone
+		unsigned int cq_zone(record* record);
 		// Allow the reader to access the data directlt
 		friend class exc_reader;
+		friend class pfx_tree;
 		ostream& store(ostream& out);
 		istream& load(istream& in);
 
@@ -82,6 +104,8 @@ namespace zzalog {
 		map < string, list<exc_entry*> > entries_;
 		// Invalid operations 
 		map<string, list<invalid*> > invalids_;
+		// Zone exceptions
+		map < string, list<zone_exc*> > zones_;
 		// File created
 		string file_created_;
 

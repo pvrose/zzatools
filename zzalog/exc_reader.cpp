@@ -40,6 +40,18 @@ extern bool closing_;
 </invalid_operations>
 :
 :
+<zone_exceptions>
+	<zone_exception record='59'>
+		<call>KD6WW/VY0</call>
+		<zone>1</zone>
+		<start>2003-07-30T00:00:00+00:00</start>
+		<end>2003-07-31T23:59:59+00:00</end>
+	</zone_exception>
+	:
+	:
+</zone_exceptions>
+:
+:
 </clublog>
 
 
@@ -50,6 +62,7 @@ exc_reader::exc_reader() {
 	ignore_processing_ = false;
 	current_exception_ = nullptr;
 	current_invalid_ = nullptr;
+	current_zone_exc_ = nullptr;
 }
 
 // Destructor
@@ -61,7 +74,7 @@ exc_reader::~exc_reader() {
 bool exc_reader::start_element(string name, map<string, string>* attributes) {
 	if (!ignore_processing_) {
 		elements_.push_back(name);
-		if (name == "entities" || name == "prefixes" || name == "zone_exceptions") {
+		if (name == "entities" || name == "prefixes") {
 			// We are only interested in exception and invalid records
 			ignore_processing_ = true;
 		}
@@ -70,6 +83,9 @@ bool exc_reader::start_element(string name, map<string, string>* attributes) {
 		}
 		else if (name == "invalid") {
 			current_invalid_ = new invalid;
+		}
+		else if (name == "zone_exception") {
+			current_zone_exc_ = new zone_exc;
 		}
 	}
 	return true;
@@ -106,6 +122,15 @@ bool exc_reader::end_element(string name) {
 			data_->invalids_.at(current_invalid_->call).push_back(current_invalid_);
 			current_invalid_ = nullptr;
 		}
+		else if (element == "zone_exception") {
+			// The records are stored as list of records mapped from the callsign
+			if (data_->zones_.find(current_zone_exc_->call) == data_->zones_.end()) {
+				list<zone_exc*>* zones = new list<zone_exc*>;
+				(data_->zones_)[current_zone_exc_->call] = *zones;
+			}
+			data_->zones_.at(current_zone_exc_->call).push_back(current_zone_exc_);
+			current_zone_exc_ = nullptr;
+		}
 		else if (elements_.size() && elements_.back() == "exception") {
 			// Build up the exception record from the various child elements
 			if (element == "call") current_exception_->call = value_;
@@ -122,6 +147,13 @@ bool exc_reader::end_element(string name) {
 			if (element == "call") current_invalid_->call = value_;
 			else if (element == "start") current_invalid_->start = convert_xml_datetime(value_);
 			else if (element == "end") current_invalid_->end = convert_xml_datetime(value_);
+		}
+		else if (elements_.size() && elements_.back() == "zone_exception") {
+			// Build up the exception record from the various child elements
+			if (element == "call") current_zone_exc_->call = value_;
+			else if (element == "cqz") current_zone_exc_->cq_zone = stoi(value_);
+			else if (element == "start") current_zone_exc_->start = convert_xml_datetime(value_);
+			else if (element == "end") current_zone_exc_->end = convert_xml_datetime(value_);
 		}
 	}
 	if (elements_.size() <= 3) {

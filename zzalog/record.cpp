@@ -1220,7 +1220,7 @@ bool record::user_details() {
 // Convert frequency from ADIF (MHz) to display format
 string record::format_freq(display_freq_t format, string value) {
 	double frequency = stod(value);
-	char temp[25];
+	char temp[25] = "";
 	switch (format) {
 	case FREQ_Hz:
 		snprintf(temp, 25, "%.0f", frequency * 1000000);
@@ -1252,28 +1252,32 @@ string record::format_date(display_date_t format, string value) {
 		date.tm_min = 0;
 		date.tm_sec = 0;
 		date.tm_isdst = false;
-		char temp[20];
-		switch (format) {
-		case DATE_YYYYMMDD:
-			strftime(temp, 20, "%Y%m%d", &date);
-			break;
-		case DATE_YYYY_MM_DD:
-			strftime(temp, 20, "%Y_%m_%d", &date);
-			break;
-		case DATE_DD_MM_YYYY:
-			strftime(temp, 20, "%d_%m_%Y", &date);
-			break;
-		case DATE_MM_DD_YYYY:
-			strftime(temp, 20, "%m_%d_%Y", &date);
-			break;
-		case DATE_DD_MON_YYYY:
-			strftime(temp, 20, "%d-%b-%Y", &date);
-			break;
-		default:
-			strcpy(temp, "Invalid");
-			break;
+		char temp[20] = "";
+		if (date.tm_mon < 13 && date.tm_mday <= days_in_month(&date)) {
+			switch (format) {
+			case DATE_YYYYMMDD:
+				strftime(temp, 20, "%Y%m%d", &date);
+				break;
+			case DATE_YYYY_MM_DD:
+				strftime(temp, 20, "%Y_%m_%d", &date);
+				break;
+			case DATE_DD_MM_YYYY:
+				strftime(temp, 20, "%d_%m_%Y", &date);
+				break;
+			case DATE_MM_DD_YYYY:
+				strftime(temp, 20, "%m_%d_%Y", &date);
+				break;
+			case DATE_DD_MON_YYYY:
+				strftime(temp, 20, "%d-%b-%Y", &date);
+				break;
+			}
+			return string(temp);
+		} else {
+			char message[100];
+			snprintf(message, 100, "LOG: Invalid date %s", value.c_str());
+			status_->misc_status(ST_ERROR, message);
+			return "";
 		}
-		return string(temp);
 	}
 	else {
 		char message[100];
@@ -1299,25 +1303,30 @@ string record::format_time(display_time_t format, string value) {
 			date.tm_sec = 0;
 		}
 		date.tm_isdst = false;
-		char temp[20];
-		switch (format) {
-		case TIME_HHMMSS:
-			strftime(temp, 20, "%H%M%S", &date);
-			break;
-		case TIME_HHMM:
-			strftime(temp, 20, "%H%M", &date);
-			break;
-		case TIME_HH_MM_SS:
-			strftime(temp, 20, "%H:%M:%S", &date);
-			break;
-		case TIME_HH_MM:
-			strftime(temp, 20, "%H:%M", &date);
-			break;
-		default:
-			strcpy(temp, "Invalid");
-			break;
+		char temp[20] = "";
+		if (date.tm_hour < 24 && date.tm_min < 60 && date.tm_sec < 61) {
+			switch (format) {
+			case TIME_HHMMSS:
+				strftime(temp, 20, "%H%M%S", &date);
+				break;
+			case TIME_HHMM:
+				strftime(temp, 20, "%H%M", &date);
+				break;
+			case TIME_HH_MM_SS:
+				strftime(temp, 20, "%H:%M:%S", &date);
+				break;
+			case TIME_HH_MM:
+				strftime(temp, 20, "%H:%M", &date);
+				break;
+			}
+			return string(temp);
 		}
-		return string(temp);
+		else {
+			char message[100];
+			snprintf(message, 100, "LOG: Invalid time %s", value.c_str());
+			status_->misc_status(ST_ERROR, message);
+			return "";
+		}
 	}
 	else {
 		char message[100];

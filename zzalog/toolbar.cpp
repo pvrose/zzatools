@@ -275,8 +275,8 @@ toolbar::toolbar(int X, int Y, int W, int H, const char* label) :
 	search_text_ = "";
 	record_num_ = -1;
 	intl_input* ip = new intl_input(curr_x, Y, WSMEDIT, H, 0);
-	ip->callback(cb_bn_search, (void*)true);
-	ip->when(FL_WHEN_ENTER_KEY);
+	ip->callback(cb_value<intl_input, string>, &search_text_);
+	ip->when(FL_WHEN_CHANGED);
 	ip->value(search_text_.c_str());
 	ip->textsize(FONT_SIZE);
 	ip->textfont(FONT);
@@ -374,7 +374,6 @@ void toolbar::cb_bn_menu(Fl_Widget*w, void*v) {
 // v indicates whether to start a new search (true) or resume (false)
 void toolbar::cb_bn_search(Fl_Widget* w, void* v) {
 	toolbar* that = ancestor_view<toolbar>(w);
-	cb_value<intl_input, string>((Fl_Widget*)that->ip_search_, (void*)&that->search_text_);
 	bool reset = (bool)(long)v;
 	if (reset) {
 		that->record_num_ = 0;
@@ -445,7 +444,7 @@ void toolbar::cb_bn_explain(Fl_Widget* w, void* v) {
 	record* tip_record = new record(LM_ON_AIR);
 	string message = "";
 	// Set the callsign in the temporary record
-	tip_record->item("CALL", that->search_text_);
+	tip_record->item("CALL", to_upper(that->search_text_));
 	// Parse the temporary record
 	message = pfx_data_->get_tip(tip_record);
 	// Create a tooltip window at the explain button (in w) X and Y

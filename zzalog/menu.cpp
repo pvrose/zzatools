@@ -2,6 +2,7 @@
 #include "book.h"
 #include "record.h"
 #include "pfx_data.h"
+#include "exc_data.h"
 #include "spec_data.h"
 #include "settings.h"
 #include "tabbed_forms.h"
@@ -221,8 +222,11 @@ namespace zzalog {
 	{ "&Prefix", 0, menu::cb_mi_ref_items, (void*)RI_NICK, FL_MENU_RADIO },
 	{ "&Name", 0, menu::cb_mi_ref_items, (void*)RI_NAME, FL_MENU_RADIO | FL_MENU_DIVIDER },
 	{ "Add &details", 0, menu::cb_mi_ref_details, nullptr, FL_MENU_TOGGLE },
-	{ 0 },
 	{ "&Reload data", 0, menu::cb_mi_ref_reload, 0},
+	{ 0 },
+	{ "E&xception data", 0, 0, 0, FL_SUBMENU },
+	{ "&Reload data", 0, menu::cb_mi_ref_relexc, 0 },
+	{ 0 },
 	{ 0 },
 
 	// Log analysis reports
@@ -980,6 +984,7 @@ void menu::cb_mi_log_new(Fl_Widget* w, void* v) {
 // Log->Save - save current record
 // v is not used
 void menu::cb_mi_log_save(Fl_Widget* w, void* v) {
+	dxatlas_->clear_dx_loc();
 	navigation_book_->save_record();
 }
 
@@ -1459,7 +1464,7 @@ void menu::cb_mi_ref_details(Fl_Widget* w, void* v) {
 	tabbed_forms_->activate_pane(OT_PREFIX, true);
 }
 
-// Reference->Reload Data - reload the specification data
+// Reference->Prefix->Reload Data - reload the specification data
 // v is not used
 void menu::cb_mi_ref_reload(Fl_Widget* w, void* v) {
 	// Turn rig timer off in case it fires while we are reloading
@@ -1475,6 +1480,12 @@ void menu::cb_mi_ref_reload(Fl_Widget* w, void* v) {
 	if (rig_if_ && rig_if_->is_open()) {
 		Fl::add_timeout(0.0, rig_if::cb_timer_rig);
 	}
+}
+
+// Reference->Exceptions->Reload Data
+// v is not used
+void menu::cb_mi_ref_relexc(Fl_Widget* w, void* v) {
+	pfx_data_->get_exceptions()->reload_data();
 }
 
 // Report->Clear etc. - set the report filter
@@ -2008,7 +2019,6 @@ void menu::update_items() {
 		int index_change = find_index("&Operating/C&hange QSO && Set Next");
 		int index_extract = find_index("E&xtract");
 		int index_wsjtx = find_index("&Import/&WSJT-X UDP");
-		int index_ref = find_index("&Reference");
 		int index_rep = find_index("Re&port");
 		int index_ic7300_none = find_index("I&C-7300/&None");
 		int index_memories = find_index("I&C-7300/&Memories");
@@ -2042,7 +2052,6 @@ void menu::update_items() {
 			mode(index_print, mode(index_print) | FL_MENU_INACTIVE);
 			mode(index_change, mode(index_change) | FL_MENU_INACTIVE);
 			mode(index_extract, mode(index_extract) | FL_MENU_INACTIVE);
-			mode(index_ref, mode(index_ref) | FL_MENU_INACTIVE);
 			mode(index_rep, mode(index_rep) | FL_MENU_INACTIVE);
 			mode(index_info, mode(index_info) | FL_MENU_INACTIVE);
 			for (int i = index_parser; i <= index_bulk; i++) {
@@ -2055,7 +2064,6 @@ void menu::update_items() {
 			mode(index_print, mode(index_print) & ~FL_MENU_INACTIVE);
 			mode(index_change, mode(index_change) & ~FL_MENU_INACTIVE);
 			mode(index_extract, mode(index_extract) & ~FL_MENU_INACTIVE);
-			mode(index_ref, mode(index_ref) & ~FL_MENU_INACTIVE);
 			mode(index_rep, mode(index_rep) & ~FL_MENU_INACTIVE);
 			mode(index_info, mode(index_info) & ~FL_MENU_INACTIVE);
 			for (int i = index_parser; i <= index_bulk; i++) {

@@ -1999,9 +1999,11 @@ string dxa_if::get_distance(record* this_record) {
 
 // Add the Dx location and include it in the displayed group
 void dxa_if::set_dx_loc(string location) {
+	DxAtlas::IDxMapPtr map = atlas_->GetMap();
+	// To avoid flicker while changing Dx Location
+	map->BeginUpdate();
 	clear_dx_loc();
 	lat_long_t lat_long = grid_to_latlong(location);
-	DxAtlas::IDxMapPtr map = atlas_->GetMap();
 	map->PutDxLatitude((float)lat_long.latitude);
 	map->PutDxLongitude((float)lat_long.longitude);
 	map->PutDxVisible(true);
@@ -2021,6 +2023,7 @@ void dxa_if::set_dx_loc(string location) {
 	great_circle({ home_lat_, home_long_ }, lat_long, bearing, distance);
 	if (distance > furthest_) furthest_ = (int)distance;
 	centre_map();
+	map->EndUpdate();
 }
 
 // REmove the Dx Location

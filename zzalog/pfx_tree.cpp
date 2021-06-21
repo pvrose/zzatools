@@ -6,6 +6,7 @@
 #include "status.h"
 #include "tabbed_forms.h"
 #include "../zzalib/callback.h"
+#include "exc_data.h"
 
 #include <FL/fl_draw.H>
 #include <FL/Fl_Preferences.H>
@@ -177,6 +178,11 @@ void pfx_tree::populate_tree(bool activate) {
 	case RI_NICK:
 		item_desc = "Prefix (DXCC code: Name)";
 		break;
+	default:
+		if (items_ & (RI_EXCEPTION | RI_INVALID | RI_ZONE_EXC)) {
+			item_desc = "Exception records";
+		}
+		break;
 	}
 	// What records are displayed
 	switch (filter_) {
@@ -192,22 +198,30 @@ void pfx_tree::populate_tree(bool activate) {
 	case RF_NONE:
 		filter_desc = " ... No records";
 		break;
+	default:
+		filter_desc = "";
+		break;
 	}
 	// Fields are inluded or not
-	if (include_fields_) {
-		detail_desc = " ... Full information";
+	if (items_ & (RI_EXCEPTION | RI_INVALID | RI_ZONE_EXC)) {
+		detail_desc = "";
 	}
 	else {
-		detail_desc = " ... Prefixes only";
+		if (include_fields_) {
+			detail_desc = " ... Full information";
+		}
+		else {
+			detail_desc = " ... Prefixes only";
+		}
 	}
 	// Set it
 	root_label(string(item_desc + filter_desc + detail_desc).c_str());
 
 	// Initial status
 	status_->misc_status(ST_NOTE, "PREFIX: Display started");
-	status_->progress(prefixes_.size(), OT_PREFIX, "Displaying prefix data", "prefixes");
 	// For all prefixes that we want to display
 	int i = 0;
+	status_->progress(prefixes_.size(), OT_PREFIX, "Displaying prefix data", "prefixes");
 	for (auto it = prefixes_.begin(); it != prefixes_.end(); it++, i++) {
 		if (bottom_up) {
 			// Get the prefix and affix to the end of the tree - which will then be built up onto it.
@@ -546,6 +560,11 @@ void pfx_tree::set_items(report_item_t items) {
 	redraw();
 }
 
+// Get items
+report_item_t pfx_tree::get_items() {
+	return items_;
+}
+
 // Add details
 void pfx_tree::add_details(bool enable) {
 	include_fields_ = enable;
@@ -558,3 +577,4 @@ void pfx_tree::set_font(Fl_Font font, Fl_Fontsize size) {
 	font_ = font;
 	fontsize_ = size;
 }
+

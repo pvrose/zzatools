@@ -123,8 +123,10 @@ namespace zzalog {
 		static void cb_mi_ref_items(Fl_Widget* w, void* v);
 		// Reference->Prefix->Add details
 		static void cb_mi_ref_details(Fl_Widget* w, void* v);
-		// Reference->Reload data
+		// Reference->Prefix->Reload data
 		static void cb_mi_ref_reload(Fl_Widget* w, void* v);
+		// Reference->Exceptions->Reload Data
+		static void cb_mi_ref_relexc(Fl_Widget* w, void* v);
 		// Report->Clear/All/Extracted?Selected
 		static void cb_mi_rep_filter(Fl_Widget* w, void* v);
 		// Report->Levelx
