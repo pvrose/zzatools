@@ -55,6 +55,8 @@ namespace zzalog {
 		static void cb_mi_parse_qso(Fl_Widget* w, void* v);
 		// Log->Unparse QSO
 		static void cb_mi_unparse_qso(Fl_Widget* w, void* v);
+		// Log->Reparse QSO
+		static void cb_mi_reparse_qso(Fl_Widget* w, void* v);
 		// Log->Parse Log
 		static void cb_mi_parse_log(Fl_Widget* w, void* v);
 		// Log->Validate QSO

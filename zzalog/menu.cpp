@@ -152,6 +152,7 @@ namespace zzalog {
 	{ "&Delete record", 0, menu::cb_mi_log_del, (void*)true, FL_MENU_DIVIDER },
 	{ "&Parse record", 0, menu::cb_mi_parse_qso, 0 },
 	{ "&Unparse record", 0, menu::cb_mi_unparse_qso, 0 },
+	{ "R&eparse record", 0, menu::cb_mi_reparse_qso, 0 },
 	{ "&Validate record", 0, menu::cb_mi_valid8_qso, 0, FL_MENU_DIVIDER },
 	{ "Pa&rse log", 0, menu::cb_mi_parse_log, 0 },
 	{ "Val&idate log", 0, menu::cb_mi_valid8_log, 0, FL_MENU_DIVIDER },
@@ -729,6 +730,13 @@ void menu::cb_mi_unparse_qso(Fl_Widget* w, void* v) {
 	record->unparse();
 	navigation_book_->selection(-1, HT_CHANGED);
 	book_->modified(true);
+}
+
+// Log->Reparse QSO - Unparse followed by parse
+// v is not used
+void menu::cb_mi_reparse_qso(Fl_Widget* w, void* v) {
+	cb_mi_unparse_qso(w, v);
+	cb_mi_parse_qso(w, v);
 }
 
 // Log ->Parse Log - parse all records in selected book

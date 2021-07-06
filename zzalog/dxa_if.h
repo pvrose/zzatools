@@ -46,7 +46,13 @@ namespace zzalog {
 			AQ_DAYS,       // Display most recent days
 			AQ_QSOS,       // Display most recent QSOs
 			AQ_YEAR,       // Year to date
-			AQ_SESSION     // This session
+			AQ_SESSION,    // This session
+		};
+		// DX Atlas - record confirmation
+		enum qsl_bn_t {
+			AL_ALL,        // Display all irrespective of QSL status
+			AL_DXCC,       // Display records with LotW or Card QSLs (eligible for DXCC)
+			AL_EQSL,       // Display records with eQSL.cc QSLs
 		};
 		// DX Atlas - Colour selection radio button
 		enum colour_bn_t {
@@ -199,11 +205,15 @@ namespace zzalog {
 		void label_colour_grp();
 		// Get distance in 1000 km bands
 		string get_distance(record* this_record);
+		// Check QSL status and add to list of records
+		void check_qsl(record_num_t record_num, set<int>& record_list);
 
 
 	protected:
 		// Radio button valur for QSOs to display
 		qsos_bn_t qso_display_;
+		// Radio button value to filter QSOs by QSL status
+		qsl_bn_t qsl_status_;
 		// Selector for how to colour pins by - enum
 		colour_bn_t atlas_colour_;
 		//!! DX Atlas automation object

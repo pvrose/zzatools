@@ -158,6 +158,7 @@ void dxa_if::load_values() {
 	// Get Configuration
 	Fl_Preferences dxatlas_settings(settings_, "DXATLAS:");
 	dxatlas_settings.get("QSOs Displayed", (int&)qso_display_, AQ_NONE);
+	dxatlas_settings.get("QSL Status", (int&)qsl_status_, AL_ALL);
 	dxatlas_settings.get("Most Recent Count", (int&)most_recent_count_, 1);
 	dxatlas_settings.get("Coloured By", (int&)atlas_colour_, AC_BANDS);
 	dxatlas_settings.get("Centre Latitude", centre_lat_, 0.0);
@@ -219,7 +220,7 @@ void dxa_if::create_form() {
 	ch11->labelsize(FONT_SIZE);
 	ch11->textfont(FONT);
 	ch11->textsize(FONT_SIZE);
-	ch11->callback(cb_ch_qsos);
+	ch11->callback(cb_ch_qsos, &qso_display_);
 	ch11->when(FL_WHEN_RELEASE);
 	ch11->clear();
 	ch11->add("None");
@@ -233,8 +234,24 @@ void dxa_if::create_form() {
 	ch11->value((int)qso_display_);
 	ch11->tooltip("Select which QSOs to display");
 	qso_count_ = ch11;
+	// Choice - QSL Status
+	Fl_Choice* ch11a = new Fl_Choice(ch11->x(), ch11->y() + ch11->h(), ch11->w(), HTEXT);
+	ch11a->align(FL_ALIGN_LEFT | FL_ALIGN_TOP);
+	ch11a->labelfont(FONT);
+	ch11a->labelsize(FONT_SIZE);
+	ch11a->textfont(FONT);
+	ch11a->textsize(FONT_SIZE);
+	ch11a->callback(cb_ch_qsos, &qsl_status_);
+	ch11a->when(FL_WHEN_RELEASE);
+	ch11a->clear();
+	ch11a->add("All matching records");
+	ch11a->add("Confirmed for DXCC");
+	ch11a->add("Confirmed for eQSL.cc");
+	ch11a->value((int)qsl_status_);
+	ch11a->tooltip("Select QSL Status to filter above selection");
+
 	// Input - Number of days or QSOs
-	Fl_Int_Input* ip11 = new Fl_Int_Input(ch11->x(), ch11->y() + ch11->h(), ch11->w(), HTEXT);
+	Fl_Int_Input* ip11 = new Fl_Int_Input(ch11a->x(), ch11a->y() + ch11a->h(), ch11a->w(), HTEXT);
 	ip11->textfont(FONT);
 	ip11->textsize(FONT_SIZE);
 	ip11->callback(cb_ip_number);
@@ -289,7 +306,7 @@ void dxa_if::create_form() {
 	ch13->value((int)centre_mode_);
 	centre_ch_ = ch13;
 	// Slider - pin size
-	Fl_Slider* sl10 = new Fl_Slider(ch11->x(), ch13->y() + ch13->h() + GAP, ch11->w() - HBUTTON, HBUTTON, "Pin size");
+	Fl_Slider* sl10 = new Fl_Slider(ch11->x(), max(bn11->y() + bn11->h(), ch13->y() + ch13->h()) + GAP, ch11->w() - HBUTTON, HBUTTON, "Pin size");
 	sl10->type(FL_HORIZONTAL);
 	sl10->labelfont(FONT);
 	sl10->labelsize(FONT_SIZE);
@@ -325,7 +342,7 @@ void dxa_if::create_form() {
 	bn13->color(FL_YELLOW);
 	bn13->tooltip("Recentre the DxAtlas window");
 
-	int next_y = max(bn11->y() + bn11->h(), bn12->y() + bn12->h());
+	int next_y = max(sl10->y() + sl10->h(), bn12->y() + bn12->h());
 	// Choice - provides all user's locations (in settings)
 	Fl_Choice* ch21 = new Fl_Choice(ch11->x(), next_y + HTEXT, WSMEDIT, HBUTTON, "Location");
 	ch21->labelfont(FONT);
@@ -423,6 +440,7 @@ void dxa_if::save_values() {
 	// Get Configuration
 	Fl_Preferences dxatlas_settings(settings_, "DXATLAS:");
 	dxatlas_settings.set("QSOs Displayed", qso_display_);
+	dxatlas_settings.set("QSL Status", qsl_status_);
 	dxatlas_settings.set("Most Recent Count", (signed)most_recent_count_);
 	dxatlas_settings.set("Coloured By", atlas_colour_);
 	dxatlas_settings.set("Centre Latitude", centre_lat_);
@@ -527,7 +545,7 @@ void dxa_if::update_loc_widgets() {
 void dxa_if::cb_ch_qsos(Fl_Widget* w, void* v) {
 	dxa_if* that = ancestor_view<dxa_if>(w);
 	// get value of radio button
-	cb_value<Fl_Choice, int>(w, (void*)&that->qso_display_);
+	cb_value<Fl_Choice, int>(w, v);
 	// Redraw the data
 	that->enable_widgets();
 	that->get_records();
@@ -1259,7 +1277,7 @@ void dxa_if::get_records() {
 	case AQ_ALL:
 		// Get all record numbers
 		for (record_num_t i = 0; i < book_->size(); i++) {
-			record_nums.insert(i);
+			check_qsl(i, record_nums);
 		}
 		break;
 	case AQ_CURRENT:
@@ -1288,7 +1306,7 @@ void dxa_if::get_records() {
 			for (; (signed)i >= 0 && !done; i--) {
 				// Compare the time difference (in seconds)
 				if (difftime(last_date, book_->get_record(i, false)->timestamp()) <= most_recent_seconds) {
-					record_nums.insert(i);
+					check_qsl(i, record_nums);
 				}
 				else {
 					// We guarantee the book is in time order
@@ -1301,7 +1319,7 @@ void dxa_if::get_records() {
 	case AQ_QSOS:
 		// The most recent N QSOs
 		for (size_t i = book_->size() - 1, j = 0; j < most_recent_count_; i--, j++) {
-			record_nums.insert(i);
+			check_qsl(i, record_nums);
 		}
 		break;
 
@@ -1310,16 +1328,17 @@ void dxa_if::get_records() {
 		if (book_->size()) {
 			string this_year = now(false, "%Y");
 			for (size_t i = book_->size() - 1; book_->get_record(i, false)->item("QSO_DATE").substr(0, 4) == this_year; i--) {
-				record_nums.insert(i);
+				check_qsl(i, record_nums);
 			}
 		}
 		break;
 	case AQ_SESSION:
 		if (book_->size()) {
 			for (size_t i = book_->size() - 1; in_current_session(book_->get_record(i, false)); i--) {
-				record_nums.insert(i);
+				check_qsl(i, record_nums);
 			}
 		}
+		break;
 	}
 
 	// now see if QSOs, DXCCs or zones
@@ -1343,6 +1362,26 @@ void dxa_if::get_records() {
 		status_->misc_status(ST_WARNING, "DXATLAS: Not connected - change has been remembered");
 	}
 	fl_cursor(FL_CURSOR_DEFAULT);
+}
+
+// Check QSL status and add to record list
+void dxa_if::check_qsl(record_num_t record_num, set<int>& record_list) {
+	record* test_record = book_->get_record(record_num, false);
+	switch (qsl_status_) {
+	case AL_ALL:
+		record_list.insert(record_num);
+		break;
+	case AL_DXCC:
+		if (test_record->item("LOTW_QSL_RCVD") == "Y" || test_record->item("QSL_RCVD") == "Y") {
+			record_list.insert(record_num);
+		}
+		break;
+	case AL_EQSL:
+		if (test_record->item("EQSL_QSL_RCVD") == "Y") {
+			record_list.insert(record_num);
+		}
+		break;
+	}
 }
 
 // Allocate colours - and reset filter

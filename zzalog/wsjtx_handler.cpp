@@ -275,6 +275,10 @@ int wsjtx_handler::handle_status(stringstream& ss) {
 			status_->misc_status(ST_WARNING, message);
 		}
 	}
+	else if (!status.dx_call.length()) {
+		// Can clear the Dx Location by clearing the DX Call field
+		dxatlas_->clear_dx_loc();
+	}
 	prev_status_ = status;
 	return 0;
 }
