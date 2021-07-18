@@ -61,6 +61,8 @@ namespace zzalog {
 		static void cb_cancel(Fl_Widget* w, void* v);
 		// Callback - Worked B4? button
 		static void cb_wkb4(Fl_Widget* w, void* v);
+		// Callback - Parse callsign
+		static void cb_parse(Fl_Widget* w, void* v);
 		// Set font
 		void set_font(Fl_Font font, Fl_Fontsize size);
 

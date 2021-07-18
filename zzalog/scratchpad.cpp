@@ -22,6 +22,7 @@
 #include <FL/Fl_Preferences.H>
 #include <FL/Fl_Input.H>
 #include <FL/Fl_Hold_Browser.H>
+#include <FL/Fl_Tooltip.H>
 
 using namespace zzalog;
 using namespace zzalib;
@@ -98,13 +99,17 @@ int spad_editor::handle(int event) {
 			// F9 - Check worked before
 			scratchpad::cb_wkb4(this, nullptr);
 			return true;
+		case FL_F + 10:
+			// F10 - Parse callsign
+			scratchpad::cb_parse(this, nullptr);
+			return true;
 		}
 	}
 	// Not handled the event - pass up the inheritance
 	return intl_editor::handle(event);
 }
 
-const int HG = (6 * HBUTTON) + (4 * HTEXT) + (2 * GAP);
+const int HG = (7 * HBUTTON) + (4 * HTEXT) + (2 * GAP);
 
 // Constructor for scratchpad
 scratchpad::scratchpad() :
@@ -186,6 +191,14 @@ void scratchpad::create_form() {
 	bn_wb4->labelfont(FONT);
 	bn_wb4->tooltip("Display previous QSOs");
 	bn_wb4->callback(cb_wkb4);
+
+	curr_y += HBUTTON;
+	// Button - parse callsign
+	Fl_Button* bn_parse = new Fl_Button(C3, curr_y, WBUTTON, HBUTTON, "F10 - Parse");
+	bn_parse->labelsize(FONT_SIZE);
+	bn_parse->labelfont(FONT);
+	bn_parse->tooltip("Parse selection as a callsign");
+	bn_parse->callback(cb_parse);
 
 	curr_y += HBUTTON + GAP;
 	// Button - copy call to record
@@ -410,6 +423,25 @@ void scratchpad::cb_wkb4(Fl_Widget* w, void* v) {
 	scratchpad* that = ancestor_view<scratchpad>(w);
 	string text = that->buffer_->selection_text();
 	extract_records_->extract_call(text);
+}
+
+// Parse selected text as callsign
+// // v is unused
+void scratchpad::cb_parse(Fl_Widget* w, void* v) {
+	scratchpad* that = ancestor_view<scratchpad>(w);
+	string text = that->buffer_->selection_text();
+	// Create a temporary record to parse theh callsign
+	record* tip_record = new record(LM_ON_AIR);
+	string message = "";
+	// Set the callsign in the temporary record
+	tip_record->item("CALL", to_upper(text));
+	// Parse the temporary record
+	message = pfx_data_->get_tip(tip_record);
+	// Create a tooltip window at the parse button (in w) X and Y
+	Fl_Window* tw = ::tip_window(message, that->x_root() + w->x() + w->w() / 2, that->y_root() + w->y() + w->h()/2);
+	// Set the timeout on the tooltip
+	Fl::add_timeout(Fl_Tooltip::delay(), cb_timer_tip, tw);
+	delete tip_record;
 }
 
 // Save the record and reset the state to no record
