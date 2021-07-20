@@ -258,7 +258,7 @@ int wsjtx_handler::handle_status(stringstream& ss) {
 	status.config_name = get_utf8(ss); 
 	if (status.dx_call.length() && status.dx_grid.length() && status.transmitting) {
 		// Use the actual grid loaction
-		dxatlas_->set_dx_loc(status.dx_grid);
+		dxatlas_->set_dx_loc(status.dx_grid, status.dx_call);
 	}
 	else if (status.dx_call.length() && status.transmitting) {
 		// Get the grid location of the prefix centre - only if 1 prefix matches the callsign.
@@ -267,7 +267,7 @@ int wsjtx_handler::handle_status(stringstream& ss) {
 		vector<prefix*> prefixes;
 		if (pfx_data_->all_prefixes(dx_record, &prefixes, false) && prefixes.size() == 1) {
 			lat_long_t location = { prefixes[0]->latitude_, prefixes[0]->longitude_ };
-			dxatlas_->set_dx_loc(latlong_to_grid(location, 6));
+			dxatlas_->set_dx_loc(latlong_to_grid(location, 6), status.dx_call);
 		}
 		else {
 			char message[100];

@@ -7,6 +7,7 @@
 #include "record.h"
 #include "fields.h"
 #include "view.h"
+#include "../zzalib/utils.h"
 
 #include <set>
 #include <string>
@@ -66,6 +67,7 @@ namespace zzalog {
 		// Centre map position
 		enum centre_t {
 			HOME,          // Home location
+			DX,            // DX location
 			SELECTED,      // Selected QSO
 			GROUP,         // Centre of chosen QSOs
 			ZERO,          // zero longitude/latitude
@@ -116,7 +118,7 @@ namespace zzalog {
 		// something has changed in the book - usually record 1 is to be selected, record_2 usage per view
 		void update(hint_t hint);
 		// Set DX location
-		void set_dx_loc(string location);
+		void set_dx_loc(string location, string callsign);
 		// Clear DX location
 		void clear_dx_loc();
 		// Callbacks
@@ -207,6 +209,8 @@ namespace zzalog {
 		string get_distance(record* this_record);
 		// Check QSL status and add to list of records
 		void check_qsl(record_num_t record_num, set<int>& record_list);
+		// Add label
+		HRESULT add_label(lat_long_t location, string label);
 
 
 	protected:

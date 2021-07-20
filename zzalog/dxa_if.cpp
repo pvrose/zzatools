@@ -293,6 +293,7 @@ void dxa_if::create_form() {
 	ch13->callback(cb_ch_centre);
 	ch13->clear();
 	ch13->add("Home Location");
+	ch13->add("DX Location");
 	ch13->add("Selected QSO");
 	ch13->add("In group");
 	ch13->add("At 0°N 0°E");
@@ -784,44 +785,17 @@ HRESULT dxa_if::cb_map_clicked(float latitude, float longitude) {
 
 // Callback from DXATLAS: that the mouse position has changed
 HRESULT dxa_if::cb_mouse_moved(float latitude, float longitude) {
+	HRESULT result = S_OK;
 	if (call_layer_ != nullptr && !is_my_change_) {
 		// 
-		_variant_t pt_lat, pt_long, pt_text;
-		_variant_t label, labels;
-
-		pt_lat.ChangeType(VT_R4);
-		pt_long.ChangeType(VT_R4);
-
-		label.vt = VT_ARRAY | VT_VARIANT;
-		labels.vt = VT_ARRAY | VT_VARIANT;
 
 		DxAtlas::IDxMapPtr map = atlas_->GetMap();
 		// We are going to change the map - let callbacks know and start building bulk change.
 		is_my_change_ = true;
 		map->BeginUpdate();
 
-		//create array of labels - 1 dimensional
-		SAFEARRAYBOUND rgsabound[1];
-		rgsabound[0].lLbound = 0;
-		rgsabound[0].cElements = 1;
-
-		// Create an array of data (3 data items, longitude, latitude and callsign
-		SAFEARRAY * points = SafeArrayCreate(VT_VARIANT, 1, rgsabound);
-		if (points == nullptr) {
-			status_->misc_status(ST_SEVERE, "DXATLAS: Fatal error in callback");
-			return E_ABORT;
-		}
-		rgsabound[0].cElements = 3;
-		SAFEARRAY* point = SafeArrayCreate(VT_VARIANT, 1, rgsabound);
-		if (point == nullptr) {
-			status_->misc_status(ST_SEVERE, "DXATLAS: Fatal error in callback");
-			return E_ABORT;
-		}
-		// Default data will not display anything - 
-		// if mouseover is not enabled or no record found close enough
-		pt_long = (float)0.0;
-		pt_lat = (float)0.0;
-		pt_text.SetString(" ");
+		lat_long_t location = { 0.0, 0.0 };
+		string text = " ";
 
 		// Start by having ridiculous closest point (As far away as we can consider)
 		record_num_t closest_num = -1;
@@ -852,41 +826,21 @@ HRESULT dxa_if::cb_mouse_moved(float latitude, float longitude) {
 		if (closest_num != -1) {
 			record* record = book_->get_record(closest_num, false);
 			if (record != nullptr) {
-				lat_long_t lat_long = record->location(false);
+				location = record->location(false);
 
 				// Only add if the location is valid
-				if (!isnan(lat_long.latitude) && !isnan(lat_long.longitude)) {
-					//calculate attributes
-					pt_long = (float)lat_long.longitude;
-					pt_lat = (float)lat_long.latitude;
-					pt_text.SetString(record->item("CALL").c_str());
+				if (!isnan(location.latitude) && !isnan(location.longitude)) {
+					text = record->item("CALL");
 				}
 			}
 		}
 
-		//set attributes for point
-		long ix = 0;
-		(void)SafeArrayPutElement(point, &ix, &pt_long);
-		ix = 1; (void)SafeArrayPutElement(point, &ix, &pt_lat);
-		ix = 2; (void)SafeArrayPutElement(point, &ix, &pt_text);
-		//add point to the array
-		ix = 0; label.parray = point;
-		(void)SafeArrayPutElement(points, &ix, &label);
-		//put data into the layer
-		labels.parray = points;
-		try {
-			call_layer_->SetData(labels);
-		}
-		catch (_com_error* e) {
-			char error[256];
-			sprintf(error, "DXATLAS: Got error displaying data : %s", e->ErrorMessage());
-			status_->misc_status(ST_ERROR, error);
-		}
+		result = add_label(location, text);
 		//now allow repainting
 		map->EndUpdate();
 		is_my_change_ = false;
 	}
-	return S_OK;
+	return result;
 }
 
 // Map changed callback - if projection changed it will affect which widgets are enabled
@@ -1696,12 +1650,13 @@ void dxa_if::draw_pins() {
 			call_layer_->PenColor = DxAtlas::clNavy;
 			call_layer_->BrushColor = DxAtlas::clWhite;
 
-			// now centre on selected record
+			// now centre on selected record - home location if azimuthal view
 			switch(map->GetProjection()) {
 			case DxAtlas::PRJ_RECTANGULAR:
 				centre_map();
 				break;
 			case DxAtlas::PRJ_AZIMUTHAL:
+				centre_map(grid_to_latlong(locator_));
 				zoom_azimuthal();
 				break;
 			}
@@ -1926,6 +1881,17 @@ void dxa_if::centre_map() {
 		centre_map(centre);
 		zoom_centre(centre, false);
 		break;
+	case DX:
+		// Centre on DX location - only if being displayed
+	{
+		DxAtlas::IDxMapPtr map = atlas_->GetMap();
+		if (map->GetDxVisible()) {
+			centre = { (double)map->GetDxLatitude(), (double)map->GetDxLongitude() };
+			centre_map(centre);
+			zoom_centre(centre, false);
+		}
+		break;
+	}
 	case SELECTED:
 		// Centre on the selected record
 		centre = selected_locn_;
@@ -2037,7 +2003,7 @@ string dxa_if::get_distance(record* this_record) {
 }
 
 // Add the Dx location and include it in the displayed group
-void dxa_if::set_dx_loc(string location) {
+void dxa_if::set_dx_loc(string location, string callsign) {
 	DxAtlas::IDxMapPtr map = atlas_->GetMap();
 	// To avoid flicker while changing Dx Location
 	map->BeginUpdate();
@@ -2046,6 +2012,7 @@ void dxa_if::set_dx_loc(string location) {
 	map->PutDxLatitude((float)lat_long.latitude);
 	map->PutDxLongitude((float)lat_long.longitude);
 	map->PutDxVisible(true);
+	add_label(lat_long, callsign);
 	// Save current map limits
 	northernsave_ = northernmost_;
 	southernsave_ = southernmost_;
@@ -2069,6 +2036,7 @@ void dxa_if::set_dx_loc(string location) {
 void dxa_if::clear_dx_loc() {
 	DxAtlas::IDxMapPtr map = atlas_->GetMap();
 	map->PutDxVisible(false);
+	add_label({ 0.0, 0.0 }, " ");
 	// Restore map limits without DX location
 	northernmost_ = northernsave_;
 	southernmost_ = southernsave_;
@@ -2078,6 +2046,61 @@ void dxa_if::clear_dx_loc() {
 	centre_map();
 }
 
+HRESULT dxa_if::add_label(lat_long_t location, string text) {
+	_variant_t pt_lat, pt_long, pt_text;
+	_variant_t label, labels;
+
+	pt_lat.ChangeType(VT_R4);
+	pt_long.ChangeType(VT_R4);
+
+	label.vt = VT_ARRAY | VT_VARIANT;
+	labels.vt = VT_ARRAY | VT_VARIANT;
+	//calculate attributes
+	pt_long = (float)location.longitude;
+	pt_lat = (float)location.latitude;
+	pt_text.SetString(text.c_str());
+
+	//create array of labels - 1 dimensional
+	SAFEARRAYBOUND rgsabound[1];
+	rgsabound[0].lLbound = 0;
+	rgsabound[0].cElements = 1;
+
+	// Create an array of data (3 data items, longitude, latitude and callsign
+	SAFEARRAY* points = SafeArrayCreate(VT_VARIANT, 1, rgsabound);
+	if (points == nullptr) {
+		status_->misc_status(ST_SEVERE, "DXATLAS: Fatal error in callback");
+		return E_ABORT;
+	}
+	rgsabound[0].cElements = 3;
+	SAFEARRAY* point = SafeArrayCreate(VT_VARIANT, 1, rgsabound);
+	if (point == nullptr) {
+		status_->misc_status(ST_SEVERE, "DXATLAS: Fatal error in callback");
+		return E_ABORT;
+	}
+
+	//set attributes for point
+	long ix = 0;
+	(void)SafeArrayPutElement(point, &ix, &pt_long);
+	ix = 1; (void)SafeArrayPutElement(point, &ix, &pt_lat);
+	ix = 2; (void)SafeArrayPutElement(point, &ix, &pt_text);
+	//add point to the array
+	ix = 0; label.parray = point;
+	(void)SafeArrayPutElement(points, &ix, &label);
+	//put data into the layer
+	labels.parray = points;
+	try {
+		call_layer_->SetData(labels);
+	}
+	catch (_com_error* e) {
+		char error[256];
+		sprintf(error, "DXATLAS: Got error displaying data : %s", e->ErrorMessage());
+		status_->misc_status(ST_ERROR, error);
+		return S_OK;
+	}
+
+	return S_OK;
+
+}
 // Create a widget to contain the pin size indication - draw a null box with a circle the correct size (denoted by value)
 dxa_if::pz_widget::pz_widget(int X, int Y, int W, int H) :
 	Fl_Widget(X, Y, W, H, nullptr)
@@ -2108,5 +2131,7 @@ void dxa_if::pz_widget::value(int v) {
 }
 
 int dxa_if::pz_widget::value() { return value_; }
+
+
 
 #endif // _WIN32

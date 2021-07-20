@@ -407,7 +407,7 @@ void scratchpad::cb_action(Fl_Widget* w, void* v) {
 	that->buffer_->unselect();
 	// Set DX location on DxAtlas
 	if (action == WRITE_GRID) {
-		dxatlas_->set_dx_loc(to_upper(text));
+		dxatlas_->set_dx_loc(to_upper(text), that->record_->item("CALL"));
 	}
 	// Update views
 	tabbed_forms_->update_views(nullptr, HT_MINOR_CHANGE, book_->size() - 1);
