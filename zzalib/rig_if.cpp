@@ -912,8 +912,14 @@ double rig_flrig::tx_frequency() {
 int rig_flrig::s_meter() {
 	rpc_data_item response;
 	if (do_request("rig.get_smeter", nullptr, &response)) {
-		// It looks like 0 = S0 so convert to dB below S9
-		return response.get_int() - 54;
+		// 0 = S0, 50 = S9, 100 = S9 + 60
+		int value = response.get_int() - 50;
+		if (value <= 0) {
+			return value * 54 / 50;
+		}
+		else {
+			return value * 60 / 50;
+		}
 	}
 	else {
 		// Default return S0
@@ -927,7 +933,7 @@ int rig_flrig::s_meter() {
 double rig_flrig::pwr_meter() {
 	rpc_data_item response;
 	if (do_request("rig.get_pwrmeter", nullptr, &response)) {
-		// It looks like 0 = S0 so convert to dB below S9
+		// linear 0 to 100 W
 		return (double)response.get_int();
 	}
 	else {
