@@ -731,7 +731,7 @@ void log_table::done_edit(bool keep_row) {
 				book_->modified(true);
 				menu_->update_items();
 			}
-			// Update all views with the change - GRIDSQUARE and DXCC are major changes that require DxAtlas to be redrawn, date/time the book to be reordered
+			// Update all views with the change - fields that change location are major changes that require DxAtlas to be redrawn, date/time the book to be reordered
 			if (field_info.field == "QSO_DATE" || field_info.field == "TIME_ON") {
 				// The book will tell all views
 				// the changed start time may cause the book to get reordered - move the edit point accordingly
@@ -750,7 +750,7 @@ void log_table::done_edit(bool keep_row) {
 					}
 				}
 			}
-			else if (field_info.field == "GRIDSQUARE" || field_info.field == "DXCC") {
+			else if (field_info.field == "GRIDSQUARE" || field_info.field == "DXCC" || field_info.field == "STATE" || field_info.field == "APP_ZZA_PFX") {
 				// Location may have changed
 				book_->selection(my_book_->record_number(item_number), HT_CHANGED);
 			}

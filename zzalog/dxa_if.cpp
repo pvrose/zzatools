@@ -1102,8 +1102,8 @@ void dxa_if::create_colour_buttons() {
 	}
 	// Clear button map (name to widget)
 	button_map_.clear();
-	// get FLTK scheduler to delete them
-	Fl::wait();
+	//// get FLTK scheduler to delete them
+	//Fl::wait();
 	colour_bns_.clear();
 	colour_enables_.clear();
 	// Hide the window so it can be resized
@@ -1747,6 +1747,9 @@ void dxa_if::get_colours(bool reset) {
 
 // something has changed in the book that requires DxAtlas to redraw
 void dxa_if::update(hint_t hint) {
+	char message[100];
+	snprintf(message, 100, "DXATLAS: Update called with hint %d", (int)hint);
+	status_->misc_status(ST_DEBUG, message);
 	switch(hint) {
 	case HT_ALL:
 	case HT_CHANGED:
@@ -2036,7 +2039,7 @@ void dxa_if::set_dx_loc(string location, string callsign) {
 void dxa_if::clear_dx_loc() {
 	DxAtlas::IDxMapPtr map = atlas_->GetMap();
 	map->PutDxVisible(false);
-	add_label({ 0.0, 0.0 }, " ");
+	call_layer_->PutVisible(false);
 	// Restore map limits without DX location
 	northernmost_ = northernsave_;
 	southernmost_ = southernsave_;
@@ -2090,6 +2093,7 @@ HRESULT dxa_if::add_label(lat_long_t location, string text) {
 	labels.parray = points;
 	try {
 		call_layer_->SetData(labels);
+		call_layer_->PutVisible(true);
 	}
 	catch (_com_error* e) {
 		char error[256];

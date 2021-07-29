@@ -710,7 +710,7 @@ void record_form::cb_bn_use(Fl_Widget* w, void* v) {
 				break;
 			}
 		}
-		else if (field == "DXCC" || field == "GRIDSQUARE") {
+		else if (field == "DXCC" || field == "GRIDSQUARE" || field == "STATE" || field == "APP_ZZA_PFX") {
 			// Loction has changed - DxAtlas needs to redraw.
 			that->my_book_->selection(that->item_num_1_, HT_CHANGED, that);
 		}

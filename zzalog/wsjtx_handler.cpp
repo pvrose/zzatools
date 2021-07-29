@@ -265,7 +265,9 @@ int wsjtx_handler::handle_status(stringstream& ss) {
 		record* dx_record = new record(LM_ON_AIR);
 		dx_record->item("CALL", status.dx_call);
 		vector<prefix*> prefixes;
-		if (pfx_data_->all_prefixes(dx_record, &prefixes, false) && prefixes.size() == 1) {
+		// Get prefix(es), If only 1 and the DXCC Code != 0 (i.e. not /MM)
+		if (pfx_data_->all_prefixes(dx_record, &prefixes, false) && prefixes.size() == 1 &&
+			prefixes[0]->dxcc_code_ != 0) {
 			lat_long_t location = { prefixes[0]->latitude_, prefixes[0]->longitude_ };
 			dxatlas_->set_dx_loc(latlong_to_grid(location, 6), status.dx_call);
 		}
