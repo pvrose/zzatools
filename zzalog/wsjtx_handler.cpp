@@ -266,10 +266,16 @@ int wsjtx_handler::handle_status(stringstream& ss) {
 		dx_record->item("CALL", status.dx_call);
 		vector<prefix*> prefixes;
 		// Get prefix(es), If only 1 and the DXCC Code != 0 (i.e. not /MM)
-		if (pfx_data_->all_prefixes(dx_record, &prefixes, false) && prefixes.size() == 1 &&
-			prefixes[0]->dxcc_code_ != 0) {
-			lat_long_t location = { prefixes[0]->latitude_, prefixes[0]->longitude_ };
-			dxatlas_->set_dx_loc(latlong_to_grid(location, 6), status.dx_call);
+		if (pfx_data_->all_prefixes(dx_record, &prefixes, false) && prefixes.size() == 1) {
+			if (prefixes[0]->dxcc_code_ != 0) {
+				lat_long_t location = { prefixes[0]->latitude_, prefixes[0]->longitude_ };
+				dxatlas_->set_dx_loc(latlong_to_grid(location, 6), status.dx_call);
+			}
+			else {
+				char message[100];
+				snprintf(message, 100, "WSJT-X: Cannot locate %s - not in a DXCC entity", status.dx_call.c_str());
+				status_->misc_status(ST_WARNING, message);
+			}
 		}
 		else {
 			char message[100];
