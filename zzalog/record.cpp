@@ -166,17 +166,24 @@ void record::delete_contents() {
 }
 
 // Set an item pair.
+// Return true if successful, false if not
 void record::item(string field, string value, bool formatted/* = false*/) {
-	// Certain fields - always log in upper case
-	if (field == "CALL" && item("CALL").length() && !value.length() && 
-		fl_choice("You are deleting a callsign, are you sure?", "Yes", "No", nullptr) == 1) {
-		status_->misc_status(ST_FATAL, "LOG: Unexpected deletion of a callsign");
+	// Check we are not deleting an important field - crash the program if this was unintentional
+	char message[256];
+	snprintf(message, 256, "You are deleting %s, are you sure", field.c_str());
+	if ((field == "CALL" || field == "QSO_DATE" || field == "QSO_DATE_OFF" || field == "TIME_ON" ||
+		field == "TIME_OFF" || field == "FREQ" || field == "MODE" || field == "SUBMODE") &&
+		item(field).length() && !value.length() &&
+		fl_choice(message, "Yes", "No", nullptr) == 1) {
+		snprintf(message, 256, "Unexpected deletion of the field, %s", field.c_str());
+		status_->misc_status(ST_FATAL, message);
 		return;
 	}
+	// Certain fields - always log in upper case
 	string upper_value;
 	if (field == "CALL" ||
 		field == "CONT" ||
-		field == "EQ_CALL" ||
+		field == "MY_CALL" ||
 		field == "GRIDSQUARE" ||
 		field == "MY_GRIDSQUARE" ||
 		field == "OPERATOR" ||

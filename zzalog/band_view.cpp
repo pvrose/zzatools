@@ -337,8 +337,10 @@ int band_view::draw_scale() {
 		// See if we draw a major or minor tick
 		if ((long long)(frequency * 1000) % (int)(khz_per_major_ * 1000) == 0) {
 			// major tick - long tick and draw label
-			freqy_to_text(frequency, text);
-			fl_draw(90, text, curr_x, text_y);
+			if (abs(frequency - rig_frequency_) >= khz_per_minor_) {
+				freqy_to_text(frequency, text);
+				fl_draw(90, text, curr_x, text_y);
+			}
 			fl_line(curr_x, ltick_y, curr_x, horiz_y);
 		}
 		else {

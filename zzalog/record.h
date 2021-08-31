@@ -102,7 +102,7 @@ namespace zzalog {
 
 		// Public methods
 	public:
-		// Set an item pair
+		// Set an item pair returns true if succeeded
 		void item(string field, string value, bool formatted = false);
 		// Get an item - as string
 		string item(string field, bool formatted = false, bool indirect = false);

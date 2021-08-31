@@ -399,7 +399,25 @@ void scratchpad::cb_action(Fl_Widget* w, void* v) {
 		break;
 	}
 	// Get the highlighted text from the editor buffer and write it to the selected field, unhighlight the text
-	string text = that->buffer_->selection_text();
+	char* raw_text = nullptr;
+	string text;
+	if (that->buffer_->selected()) {
+		raw_text = that->buffer_->selection_text();
+		text = raw_text;
+	}
+	else {
+		int end_pos = that->editor_->insert_position();
+		int start_pos = that->buffer_->word_start(end_pos - 1);
+		if (start_pos < end_pos) {
+			that->buffer_->select(start_pos, end_pos);
+			that->redraw();
+			raw_text = that->buffer_->selection_text();
+			text = raw_text;
+		}
+	}
+	if (raw_text) {
+		free(raw_text);
+	}
 	// Remove leading and trailing white space
 	while (isspace(text[0])) text = text.substr(1);
 	while (isspace(text[text.length() - 1])) text = text.substr(0, text.length() - 1);
@@ -470,11 +488,13 @@ void scratchpad::cb_save(Fl_Widget* w, void* v) {
 // v is not used
 void scratchpad::cb_cancel(Fl_Widget* w, void* v) {
 	scratchpad* that = ancestor_view<scratchpad>(w);
-	book_->delete_record(false);
-	that->record_ = nullptr;
+	if (that->record_) {
+		book_->delete_record(false);
+		that->record_ = nullptr;
+		dxatlas_->clear_dx_loc();
+	}
 	that->buffer_->text("");
 	that->enable_widgets();
-	dxatlas_->clear_dx_loc();
 }
 
 // Close button clicked - check editing or not
@@ -517,6 +537,15 @@ void scratchpad::cb_start(Fl_Widget* w, void* v) {
 		}
 		that->record_->item("TX_PWR", string(that->ip_power_->value()));
 		tabbed_forms_->update_views(nullptr, HT_CHANGED, book_->size() - 1);
+	}
+	// Get the highlighted text from the editor buffer and write it to the field "CALL", unhighlight the text
+	if (that->buffer_->selected()) {
+		string text = that->buffer_->selection_text();
+		// Remove leading and trailing white space
+		while (isspace(text[0])) text = text.substr(1);
+		while (isspace(text[text.length() - 1])) text = text.substr(0, text.length() - 1);
+		that->record_->item("CALL", text);
+		that->buffer_->unselect();
 	}
 	that->enable_widgets();
 }

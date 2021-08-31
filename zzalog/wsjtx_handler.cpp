@@ -272,15 +272,19 @@ int wsjtx_handler::handle_status(stringstream& ss) {
 				dxatlas_->set_dx_loc(latlong_to_grid(location, 6), status.dx_call);
 			}
 			else {
+				// Not a DXCC entity - clear any existing DX Location
 				char message[100];
 				snprintf(message, 100, "WSJT-X: Cannot locate %s - not in a DXCC entity", status.dx_call.c_str());
 				status_->misc_status(ST_WARNING, message);
+				dxatlas_->clear_dx_loc();
 			}
 		}
 		else {
+			// Too many prefixes to automatically parse - clear any existing DX Location
 			char message[100];
 			snprintf(message, 100, "WSJT-X: Cannot parse %s - %d matching prefixes found", status.dx_call.c_str(), prefixes.size());
 			status_->misc_status(ST_WARNING, message);
+			dxatlas_->clear_dx_loc();
 		}
 	}
 	else if (!status.dx_call.length()) {
