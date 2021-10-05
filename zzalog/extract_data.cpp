@@ -9,6 +9,7 @@
 #include "lotw_handler.h"
 #include "spec_data.h"
 #include "club_handler.h"
+#include "search_dialog.h"
 
 #include <sstream>
 
@@ -312,14 +313,8 @@ string extract_data::comment() {
 			break;
 		}
 		if (criteria_->condition != XC_UNFILTERED) {
-			if (criteria_->by_regex) {
-				// Add if using regular expression matching
-				result += "matches regex " + criteria_->pattern + ".\n";
-			}
-			else {
-				// Or exact matching
-				result += "= " + criteria_->pattern + ".\n";
-			}
+			// Add condition label
+			result += " " + comparator_labels_[(int)criteria_->comparator] + " " + criteria_->pattern + ".\n";
 		}
 		if (criteria_->by_dates) {
 			// Date-range restricted
@@ -332,8 +327,6 @@ string extract_data::comment() {
 		if (criteria_->confirmed_lotw) result += "Confirmed LotW; ";
 		if (criteria_->confirmed_card) result += "Confirmed Card; ";
 		result += '\n';
-		// Only select those which didn't match
-		if (criteria_->negate_results) result += "Results negated. ";
 		// And whether results are new, anded or ored
 		switch (criteria_->combi_mode) {
 		case XM_NEW:
@@ -368,7 +361,6 @@ string extract_data::short_comment() {
 			break;
 		}
 		// Only select those which didn't match
-		if (criteria_->negate_results) result += "¬ ";
 		// Add the main condition
 		switch (criteria_->condition) {
 		case XC_DXCC:
@@ -401,14 +393,8 @@ string extract_data::short_comment() {
 			break;
 		}
 		if (criteria_->condition != XC_UNFILTERED) {
-			if (criteria_->by_regex) {
-				// Add if using regular expression matching
-				result += "~" + criteria_->pattern;
-			}
-			else {
-				// Or exact matching
-				result += "=" + criteria_->pattern;
-			}
+			// Add if using regular expression matching
+			result += " " + comparator_labels_[(int)criteria_->comparator] +  " " + criteria_->pattern;
 		}
 		result += " ";
 		if (criteria_->by_dates) {
@@ -455,7 +441,7 @@ void extract_data::extract_qsl(extract_data::extract_mode_t server) {
 	// Extract those records not sent to QSL server !(*QSL_SENT==Y) 
 	search_criteria_t	new_criteria = {
 		/*search_cond_t condition*/ XC_FIELD,
-		/*bool by_regex*/ false,
+		/*search_comp_t comparator*/ XP_NE,
 		/*bool by_dates*/ false,
 		/*string from_date*/"",
 		/*string to_date;*/"",
@@ -465,7 +451,6 @@ void extract_data::extract_qsl(extract_data::extract_mode_t server) {
 		/*bool confirmed_lotw;*/ false,
 		/*bool confirmed_card;*/ false,
 		/*search_combi_t combi_mode;*/ XM_NEW,
-		/*bool negate_results;*/ true,
 		/*string field_name; */ field_name,
 		/*string pattern;*/ "Y"
 	};
@@ -473,7 +458,7 @@ void extract_data::extract_qsl(extract_data::extract_mode_t server) {
 	// Only send those whose QSO is complete !(QSO_COMPLETE==N)
 	new_criteria = {
 		/*search_cond_t condition*/ XC_FIELD,
-		/*bool by_regex*/ false,
+		/*search_comp_t comparator*/ XP_NE,
 		/*bool by_dates*/ false,
 		/*string from_date*/"",
 		/*string to_date;*/"",
@@ -483,7 +468,6 @@ void extract_data::extract_qsl(extract_data::extract_mode_t server) {
 		/*bool confirmed_lotw;*/ false,
 		/*bool confirmed_card;*/ false,
 		/*search_combi_t combi_mode;*/ XM_AND,
-		/*bool negate_results;*/ true,
 		/*string field_name; */ "QSO_COMPLETE",
 		/*string pattern;*/ "N"
 	};
@@ -492,7 +476,7 @@ void extract_data::extract_qsl(extract_data::extract_mode_t server) {
 		// Only send those to which are QSOs !(SWL==Y)
 		new_criteria = {
 			/*search_cond_t condition*/ XC_FIELD,
-			/*bool by_regex*/ false,
+			/*search_comp_t comparator*/ XP_NE,
 			/*bool by_dates*/ false,
 			/*string from_date*/"",
 			/*string to_date;*/"",
@@ -502,7 +486,6 @@ void extract_data::extract_qsl(extract_data::extract_mode_t server) {
 			/*bool confirmed_lotw;*/ false,
 			/*bool confirmed_card;*/ false,
 			/*search_combi_t combi_mode;*/ XM_AND,
-			/*bool negate_results;*/ true,
 			/*string field_name; */ "SWL",
 			/*string pattern;*/ "Y"
 		};
@@ -512,7 +495,7 @@ void extract_data::extract_qsl(extract_data::extract_mode_t server) {
 		// Only those for which we have received a card (QSL_RCVD==Y) - i.e. QSLL
 		new_criteria = {
 			/*search_cond_t condition*/ XC_FIELD,
-			/*bool by_regex*/ false,
+			/*search_comp_t comparator*/ XP_EQ,
 			/*bool by_dates*/ false,
 			/*string from_date*/"",
 			/*string to_date;*/"",
@@ -522,7 +505,6 @@ void extract_data::extract_qsl(extract_data::extract_mode_t server) {
 			/*bool confirmed_lotw;*/ false,
 			/*bool confirmed_card;*/ false,
 			/*search_combi_t combi_mode;*/ XM_AND,
-			/*bool negate_results;*/ false,
 			/*string field_name; */ "QSL_RCVD",
 			/*string pattern;*/ "Y"
 		};
@@ -530,7 +512,7 @@ void extract_data::extract_qsl(extract_data::extract_mode_t server) {
 		// Ignore those with QSL_SENT==I (ignore)
 		new_criteria = {
 			/*search_cond_t condition*/ XC_FIELD,
-			/*bool by_regex*/ false,
+			/*search_comp_t comparator*/ XP_NE,
 			/*bool by_dates*/ false,
 			/*string from_date*/"",
 			/*string to_date;*/"",
@@ -540,7 +522,6 @@ void extract_data::extract_qsl(extract_data::extract_mode_t server) {
 			/*bool confirmed_lotw;*/ false,
 			/*bool confirmed_card;*/ false,
 			/*search_combi_t combi_mode;*/ XM_AND,
-			/*bool negate_results;*/ true,
 			/*string field_name; */ "QSL_SENT",
 			/*string pattern;*/ "I"
 		};
@@ -579,7 +560,7 @@ void extract_data::extract_special(extract_data::extract_mode_t reason) {
 		// Extract those records that have NAME field empty 
 		new_criteria = {
 			/*search_cond_t condition*/ XC_FIELD,
-			/*bool by_regex*/ false,
+			/*search_comp_t comparator*/ XP_EQ,
 			/*bool by_dates*/ false,
 			/*string from_date*/"",
 			/*string to_date;*/"",
@@ -589,7 +570,6 @@ void extract_data::extract_special(extract_data::extract_mode_t reason) {
 			/*bool confirmed_lotw;*/ false,
 			/*bool confirmed_card;*/ false,
 			/*search_combi_t combi_mode;*/ XM_NEW,
-			/*bool negate_results;*/ false,
 			/*string field_name; */ "NAME",
 			/*string pattern;*/ ""
 		};
@@ -599,7 +579,7 @@ void extract_data::extract_special(extract_data::extract_mode_t reason) {
 		// Extract those records that have QTH field empty
 		new_criteria = {
 			/*search_cond_t condition*/ XC_FIELD,
-			/*bool by_regex*/ false,
+			/*search_comp_t comparator*/ XP_EQ,
 			/*bool by_dates*/ false,
 			/*string from_date*/"",
 			/*string to_date;*/"",
@@ -609,7 +589,6 @@ void extract_data::extract_special(extract_data::extract_mode_t reason) {
 			/*bool confirmed_lotw;*/ false,
 			/*bool confirmed_card;*/ false,
 			/*search_combi_t combi_mode;*/ XM_NEW,
-			/*bool negate_results;*/ false,
 			/*string field_name; */ "QTH",
 			/*string pattern;*/ ""
 		};
@@ -619,7 +598,7 @@ void extract_data::extract_special(extract_data::extract_mode_t reason) {
 		// Extract those records with GRIDSQUARE empty or only 2 or 4 character locators 
 		new_criteria = {
 			/*search_cond_t condition*/ XC_FIELD,
-			/*bool by_regex*/ true,
+			/*search_comp_t comparator*/ XP_NE,
 			/*bool by_dates*/ false,
 			/*string from_date*/"",
 			/*string to_date;*/"",
@@ -629,7 +608,6 @@ void extract_data::extract_special(extract_data::extract_mode_t reason) {
 			/*bool confirmed_lotw;*/ false,
 			/*bool confirmed_card;*/ false,
 			/*search_combi_t combi_mode;*/ XM_NEW,
-			/*bool negate_results;*/ true,
 			/*string field_name; */ "GRIDSQUARE",
 			/*string pattern;*/ "[A-R]{2}[0-9]{2}[A-X]{2}([0-9]{2})?"
 		};
@@ -701,7 +679,7 @@ void extract_data::extract_call(string callsign) {
 	// Extract those records where CALL matches callsign 
 	search_criteria_t	new_criteria = {
 		/*search_cond_t condition*/ XC_CALL,
-		/*bool by_regex*/ false,
+		/*search_comp_t comparator*/ XP_EQ,
 		/*bool by_dates*/ false,
 		/*string from_date*/"",
 		/*string to_date;*/"",
@@ -711,7 +689,6 @@ void extract_data::extract_call(string callsign) {
 		/*bool confirmed_lotw;*/ false,
 		/*bool confirmed_card;*/ false,
 		/*search_combi_t combi_mode;*/ XM_NEW,
-		/*bool negate_results;*/ false,
 		/*string field_name; */ "",
 		/*string pattern;*/ callsign
 	};

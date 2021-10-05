@@ -37,13 +37,15 @@ namespace zzalog {
 			UM_QUERY,           // Querying an import (possible match and import record displayed)
 			UM_DUPEQUERY,       // Querying a duplicate (the two records are displated)
 			UM_MERGEDETAILS,    // Allowing user to merge additional data from another database
+			UM_MANUAL_QUERY,    // Querying manually supplied data
 		};
 
 		// What the source of the data in record is.
 		enum edit_mode_t {
 			EM_ORIGINAL,        // Original log record
 			EM_EDIT,            // Supplied by editing
-			EM_QUERY            // Supplied by query record
+			EM_QUERY,           // Supplied by query record
+			EM_MANUAL           // Manually supplied data
 		};
 
 		// The specific image required - determines the file location of the image file

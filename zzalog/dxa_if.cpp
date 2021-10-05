@@ -74,6 +74,7 @@ dxa_if::dxa_if() :
 	, bearing_distance_(false)
 	, projection_(DxAtlas::PRJ_RECTANGULAR)
 	, pin_size_(3)
+	, selected_locn_({ 0.0, 0.0 })
 {
 	records_to_display_.clear();
 	colours_used_.clear();
@@ -141,6 +142,7 @@ int dxa_if::handle(int event) {
 			connect_dxatlas();
 			update(HT_LOCATION);
 		}
+		break;
 	case FL_HIDE:
 		// Get menu to update Windows controls
 		menu_->update_windows_items();
@@ -1829,28 +1831,33 @@ void dxa_if::update(hint_t hint) {
 
 // Centre the map on the specified location
 void dxa_if::centre_map(lat_long_t centre) {
-	DxAtlas::IDxMapPtr map = atlas_->GetMap();
-	map->PutCenterLatitude((float)centre.latitude);
-	map->PutCenterLongitude((float)centre.longitude);
-	centre_lat_ = map->GetCenterLatitude();
-	centre_long_ = map->GetCenterLongitude();
+	if (!isnan(centre.latitude) && !isnan(centre.longitude)) {
+		DxAtlas::IDxMapPtr map = atlas_->GetMap();
+		map->PutCenterLatitude((float)centre.latitude);
+		map->PutCenterLongitude((float)centre.longitude);
+		centre_lat_ = map->GetCenterLatitude();
+		centre_long_ = map->GetCenterLongitude();
+	}
 }
 
 // Zoom the map on the specified centre to cover whole world (full) or just drawn points
 void dxa_if::zoom_centre(lat_long_t centre, bool full) {
-	DxAtlas::IDxMapPtr map = atlas_->GetMap();
-	if (full) {
-		// Zoom whole map
-		map->PutZoom(1);
-	} else {
-		// Zoom to include all records - get the furthermost from the centre E/W and N/S
-		double zoom_long = 180. / (max(easternmost_ - centre.longitude, centre.longitude - westernmost_));
-		double zoom_lat = 90. / (max(northernmost_ - centre.latitude, centre.latitude - southernmost_));
-		// now zoom by the smaller of these with 5% margin
-		map->PutZoom((float)min(zoom_long, zoom_lat) * 0.95f);
+	if (!isnan(centre.latitude) && !isnan(centre.longitude)) {
+		DxAtlas::IDxMapPtr map = atlas_->GetMap();
+		if (full) {
+			// Zoom whole map
+			map->PutZoom(1);
+		}
+		else {
+			// Zoom to include all records - get the furthermost from the centre E/W and N/S
+			double zoom_long = 180. / (max(easternmost_ - centre.longitude, centre.longitude - westernmost_));
+			double zoom_lat = 90. / (max(northernmost_ - centre.latitude, centre.latitude - southernmost_));
+			// now zoom by the smaller of these with 5% margin
+			map->PutZoom((float)min(zoom_long, zoom_lat) * 0.95f);
+		}
+		// Read the actual amount zoomed
+		zoom_value_ = map->GetZoom();
 	}
-	// Read the actual amount zoomed
-	zoom_value_ = map->GetZoom();
 }
 
 // Zoom the map in azimuthal mode

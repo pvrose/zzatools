@@ -62,7 +62,10 @@ enum edit_action_t {
 	KEEP_DUPE,    // Replace log with duplicate version
 	MERGE_DUPE,   // Merge log and duplicate records
 	KEEP_BOTH,    // Keep both log and duplicate records
-	MERGE_DONE    // Merge additional details
+	MERGE_DONE,   // Merge additional details
+	ENTER,        // Manually enter details for a query
+	ADD_MANUAL,   // Add the record queried manually
+	CLEAR_MANUAL, // Clear the manual query
 };
 
 // Constructor
@@ -903,6 +906,23 @@ void record_form::cb_bn_edit(Fl_Widget* w, long v) {
 		that->enable_widgets();
 		// Drop out to allow user to chose again 
 		return;
+	case ENTER:
+		// Manually enter data for a query
+		that->record_1_ = new record(LM_OFF_AIR);
+		that->use_mode_ = UM_MANUAL_QUERY;
+		that->enable_all_search_ = true;
+		break;
+	case ADD_MANUAL:
+		// Add the manual query
+		that->my_book_->insert_record(that->record_1_);
+		that->record_1_ = that->my_book_->get_record();
+		that->use_mode_ = UM_DISPLAY;
+		break;
+	case CLEAR_MANUAL:
+		// Delete  the manual query
+		that->record_1_ = that->my_book_->get_record();
+		that->use_mode_ = UM_DISPLAY;
+		break;
 	}
 
 	// delete pointer to query record
@@ -1496,11 +1516,11 @@ void record_form::enable_widgets() {
 			edit1_bn_->tooltip("Start a new QSO");
 			edit1_bn_->callback(cb_bn_edit, (long)START);
 			edit1_bn_->activate();
-			edit2_bn_->label("2");
-			edit2_bn_->color(FL_BACKGROUND_COLOR);
-			edit2_bn_->tooltip("");
-			edit2_bn_->callback(cb_bn_edit, (long)NONE);
-			edit2_bn_->deactivate();
+			edit2_bn_->label("Enter");
+			edit2_bn_->color(fl_lighter(FL_GREEN));
+			edit2_bn_->tooltip("Manually enter details for a query");
+			edit2_bn_->callback(cb_bn_edit, (long)ENTER);
+			edit2_bn_->activate();
 			edit3_bn_->label("3");
 			edit3_bn_->color(FL_BACKGROUND_COLOR);
 			edit3_bn_->tooltip("");
@@ -1642,8 +1662,95 @@ void record_form::enable_widgets() {
 		edit3_bn_->callback(cb_bn_edit, (long)ADD);
 		edit3_bn_->activate();
 		// If this record is a WSJT-X mode and we don't have a possible match set button 4 to look inn ALL.txt
-		if (record_2_ && 
+		if (record_2_ &&
 			(record_2_->item("MODE") == "JT65" || record_2_->item("MODE") == "JT9" || record_2_->item("MODE") == "FT8" || record_2_->item("MODE") == "FT4")) {
+			// Need to activate display
+			card_display_->activate();
+			card_filename_out_->activate();
+			edit4_bn_->label("Find text");
+			edit4_bn_->color(FL_YELLOW);
+			edit4_bn_->tooltip("Find record in WSJT-X ALL.txt file");
+			if (enable_all_search_) {
+				edit4_bn_->callback(cb_bn_edit, (long)FIND_WSJTX);
+				edit4_bn_->activate();
+			}
+			else {
+				edit4_bn_->callback(cb_bn_edit, (long)NONE);
+				edit4_bn_->deactivate();
+			}
+		}
+		else {
+			edit4_bn_->label("4");
+			edit4_bn_->color(FL_BACKGROUND_COLOR);
+			edit4_bn_->tooltip("");
+			edit4_bn_->callback(cb_bn_edit, (long)NONE);
+			edit4_bn_->deactivate();
+		}
+		break;
+	case UM_MANUAL_QUERY:
+		// We are comparing two records. Enable widgets we need to merge the two.
+		// Card display - NB activated below in certain circumstances 
+		card_display_->deactivate();
+		card_filename_out_->deactivate();
+		keep_bn_->deactivate();
+		eqsl_radio_->deactivate();
+		card_front_radio_->deactivate();
+		card_back_radio_->deactivate();
+		fetch_bn_->deactivate();
+		log_card_bn_->deactivate();
+		// Query question
+		question_out_->activate();
+		// QSL message
+		qsl_message_in_->deactivate();
+		swl_message_in_->deactivate();
+		modify_message_bn_->deactivate();
+		// Quick QSL entry
+		quick_grp_->activate();
+		// Enable find if no log record on view
+		if (record_1_ == nullptr) {
+			find_bn_->activate();
+		}
+		else {
+			find_bn_->deactivate();
+		}
+		// Enable Show Next only if not last entry in log
+		if ((unsigned)item_num_1_ < my_book_->size() - 1) {
+			next_bn_->activate();
+		}
+		else {
+			next_bn_->deactivate();
+		}
+		// Enable Show Previous only if not first record in log
+		if ((unsigned)item_num_1_ > 1) {
+			previous_bn_->activate();
+		}
+		else {
+			previous_bn_->deactivate();
+		}
+		// Allocate spare buttons: Query: Reject, Merge, Add
+		edit1_bn_->label("Cancel");
+		edit1_bn_->color(fl_lighter(FL_RED));
+		edit1_bn_->tooltip("Cancel manual query");
+		edit1_bn_->callback(cb_bn_edit, (long)CLEAR_MANUAL);
+		edit1_bn_->activate();
+		edit2_bn_->label("Add");
+		edit2_bn_->color(FL_GREEN);
+		edit2_bn_->tooltip("Add manual query");
+		edit2_bn_->callback(cb_bn_edit, (long)ADD_MANUAL);
+		if (record_1_) {
+			edit2_bn_->activate();
+		}
+		else {
+			edit2_bn_->deactivate();
+		}
+		edit3_bn_->label("3");
+		edit3_bn_->color(FL_BACKGROUND_COLOR);
+		edit3_bn_->tooltip("Add query record to log");
+		edit3_bn_->callback(cb_bn_edit, (long)NONE);
+		edit3_bn_->deactivate();
+		// If this record is a WSJT-X mode and we don't have a possible match set button 4 to look inn ALL.txt
+		if (record_1_ &&
+			(record_1_->item("MODE") == "JT65" || record_1_->item("MODE") == "JT9" || record_1_->item("MODE") == "FT8" || record_1_->item("MODE") == "FT4")) {
 			// Need to activate display
 			card_display_->activate();
 			card_filename_out_->activate();
@@ -1945,7 +2052,7 @@ bool record_form::parse_all_txt(record* record) {
 
 		// Does the line contain sought date, time, both calls and "Tx" or "Transmitting"
 		if (line.substr(0, 6) == datestamp &&
-			line.substr(7, 6) == timestamp &&
+			line.substr(7, 4) == timestamp.substr(0,4) &&
 			(line.find("Transmitting") != string::npos || line.find("Tx")) &&
 			line.find(my_call) != string::npos &&
 			line.find(their_call) != string::npos &&
@@ -1967,6 +2074,7 @@ bool record_form::parse_all_txt(record* record) {
 			else {
 				// It has one or the other call - indicates QSO complete
 				stop_copying = true;
+				record->item("QSO_COMPLETE", string(""));
 			}
 		}
 	}
@@ -1975,6 +2083,7 @@ bool record_form::parse_all_txt(record* record) {
 		// If we are complete then say so
 		if (record->item("QSO_COMPLETE") != "N" && record->item("QSO_COMPLETE") != "?") {
 			all_file->close();
+			fl_cursor(FL_CURSOR_DEFAULT);
 			return true;
 		}
 	}

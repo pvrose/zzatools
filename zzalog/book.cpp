@@ -959,12 +959,7 @@ record_num_t book::correct_record_position(record_num_t current_pos) {
 bool book::match_record(record* record) {
 	// Two level matching
 	bool match = basic_match(record) && refine_match(record);
-	if (criteria_->negate_results) {
-		return !match;
-	}
-	else {
-		return match;
-	}
+	return match;
 }
 
 // Returns whether a record matches the basic search condition.
@@ -977,51 +972,51 @@ bool book::basic_match(record* record) {
 		return true;
 	case XC_CALL:
 		// match by callsign
-		return match_string(criteria_->pattern, criteria_->by_regex, record->item("CALL"));
+		return match_string(criteria_->pattern, criteria_->comparator, record->item("CALL"));
 		break;
 	case XC_CONT:
 		// match by continent
-		return match_string(criteria_->pattern, false, record->item("CONT"));
+		return match_string(criteria_->pattern, criteria_->comparator, record->item("CONT"));
 		break;
 	case XC_CQZ:
 		// match by CQ Zone number
-		return match_int(criteria_->pattern, record->item("CQZ"));
+		return match_int(criteria_->pattern, criteria_->comparator, record->item("CQZ"));
 		break;
 	case XC_DXCC:
 		// all numeric so its a DXCC code
-		return match_int(criteria_->pattern, record->item("DXCC"));
+		return match_int(criteria_->pattern, criteria_->comparator, record->item("DXCC"));
 		break;
 	case XC_FIELD:
 		// match by a specified field
-		return match_string(criteria_->pattern, criteria_->by_regex, record->item(criteria_->field_name));
+		return match_string(criteria_->pattern, criteria_->comparator, record->item(criteria_->field_name));
 		break;
 	case XC_GEO: {
 		// match by the "geography" - based on default prefix for that region
 		prefix* prefix = pfx_data_->get_prefix(record->item("APP_ZZA_PFX"));
 		bool match = false;
 		while (!match && prefix != nullptr && prefix->parent_ != nullptr) {
-			return match_string(criteria_->pattern, criteria_->by_regex, prefix->nickname_);
+			return match_string(criteria_->pattern, criteria_->comparator, prefix->nickname_);
 			prefix = prefix->parent_;
 		}
 		break;
 	}
 	case XC_ITUZ:
 		// match by ITU zone number
-		return match_int(criteria_->pattern, record->item("ITUZ"));
+		return match_int(criteria_->pattern, criteria_->comparator, record->item("ITUZ"));
 		break;
 	case XC_SQ2:
 		// match by first two characters of locator
 		// condition too short
 		if (criteria_->pattern.length() < 2) break;
 		// gridsquare in record too short
-		if (!criteria_->by_regex && record->item("GRIDSQUARE").length() < 2) break;
-		return match_string(criteria_->pattern.substr(0, 2), criteria_->by_regex, record->item("GRIDSQUARE").substr(0, 2));
+		if (criteria_->comparator != XP_REGEX && record->item("GRIDSQUARE").length() < 2) break;
+		return match_string(criteria_->pattern.substr(0, 2), criteria_->comparator, record->item("GRIDSQUARE").substr(0, 2));
 		break;
 	case XC_SQ4:
 		// match by first 4 charactes of locator
 		if (criteria_->pattern.length() < 4) break;
-		if (!criteria_->by_regex && record->item("GRIDSQUARE").length() < 4) break;
-		return match_string(criteria_->pattern.substr(0, 4), criteria_->by_regex, record->item("GRIDSQUARE").substr(0, 4));
+		if (criteria_->comparator != XP_REGEX && record->item("GRIDSQUARE").length() < 4) break;
+		return match_string(criteria_->pattern.substr(0, 4), criteria_->comparator, record->item("GRIDSQUARE").substr(0, 4));
 		break;
 	}
 	// we should never get here
@@ -1062,19 +1057,43 @@ bool book::refine_match(record* record) {
 }
 
 // string item matches taking whether to use regex or not.
-bool book::match_string(string test, bool is_regex, string value) {
-	if (is_regex) {
-		basic_regex<char> regex(to_upper(test));
+bool book::match_string(string test, search_comp_t comparator, string value) {
+	basic_regex<char> regex(to_upper(test));
+	switch (comparator) {
+	case XP_REGEX:
 		return regex_match(to_upper(value), regex);
-	}
-	else {
-		return (to_upper(test) == to_upper(value));
+	case XP_NE:
+		return (to_upper(value) != to_upper(test));
+	case XP_LT:
+		return (to_upper(value) < to_upper(test));
+	case XP_LE:
+		return (to_upper(value) <= to_upper(test));
+	case XP_EQ:
+		return (to_upper(value) == to_upper(test));
+	case XP_GE:
+		return (to_upper(value) >= to_upper(test));
+	case XP_GT:
+		return (to_upper(value) > to_upper(test));
 	}
 }
 
 // tnteger item matching - ignores things like leading zeros and trailing non numeric characters
-bool book::match_int(string test, string value) {
+bool book::match_int(string value, search_comp_t comparator, string test) {
 	try {
+		switch (comparator) {
+		case XP_NE:
+			return (value.length() > 0 && test.length() > 0 && stoi(value) != stoi(test));
+		case XP_LT:
+			return (value.length() > 0 && test.length() > 0 && stoi(value) < stoi(test));
+		case XP_LE:
+			return (value.length() > 0 && test.length() > 0 && stoi(value) <= stoi(test));
+		case XP_EQ:
+			return (value.length() > 0 && test.length() > 0 && stoi(value) == stoi(test));
+		case XP_GE:
+			return (value.length() > 0 && test.length() > 0 && stoi(value) >= stoi(test));
+		case XP_GT:
+			return (value.length() > 0 && test.length() > 0 && stoi(value) > stoi(test));
+		}
 		return (test.length() > 0 && value.length() > 0 && stoi(test) == stoi(value));
 	} 
 	// Not an integer value so mismatch

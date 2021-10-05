@@ -58,7 +58,7 @@ intl_input::intl_input(int X, int Y, int W, int H, const char* label) :
 	Fl_Input(X, Y, W, H, label) {};
 
 intl_input::~intl_input() {
-	if (intl_dialog_) {
+	if (intl_dialog_ && intl_dialog_->visible()) {
 		intl_dialog_->editor(nullptr);
 	}
 }

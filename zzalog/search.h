@@ -31,10 +31,21 @@ namespace zzalog {
 		XM_OR = 2              // merge the two sets of extractions
 	};
 
+	// extract comparison operator
+	enum search_comp_t : int {
+		XP_REGEX,              // Compare by regular expression
+		XP_NE,                 // Compare if not equal
+		XP_LT,                 // Compare if less than
+		XP_LE,                 // Compare if less than or equal
+		XP_EQ,                 // Compare if equal
+		XP_GE,                 // Compare if greater than or equal
+		XP_GT,                 // Compare if greater than
+	};
+
 	// extract criteria data structure
 	struct search_criteria_t {
-		search_cond_t condition;       // Match condi 
-		bool by_regex;                  // use regular expression matching
+		search_cond_t condition;        // Match condi 
+		search_comp_t comparator;       // How to compare data
 		bool by_dates;                  // match records between two dates inclusively
 		string from_date;               // Start date 
 		string to_date;                 // End date
@@ -44,13 +55,12 @@ namespace zzalog {
 		bool confirmed_lotw;            // match only records confirmed by LotW
 		bool confirmed_card;            // match only records confirmed by card
 		search_combi_t combi_mode;     // Combination mode
-		bool negate_results;            // use records that do not match criteria
 		string field_name;              // Field name for criterion = FIELD
 		string pattern;                 // Matching pattern
 
 		search_criteria_t() :
 			condition(XC_DXCC),
-			by_regex(false),
+			comparator(XP_EQ),
 			by_dates(false),
 			from_date(""),
 			to_date(""),
@@ -60,12 +70,11 @@ namespace zzalog {
 			confirmed_lotw(false),
 			confirmed_card(false),
 			combi_mode(XM_NEW),
-			negate_results(false),
 			field_name(""),
 			pattern("") {};
-		search_criteria_t(search_cond_t a, bool b, bool c, string d, string e, string f, string g, bool h, bool i, bool j, search_combi_t k, bool l, string m, string n) :
+		search_criteria_t(search_cond_t a, search_comp_t b, bool c, string d, string e, string f, string g, bool h, bool i, bool j, search_combi_t k, string m, string n) :
 			condition(a),
-			by_regex(b),
+			comparator(b),
 			by_dates(c),
 			from_date(d),
 			to_date(e),
@@ -75,7 +84,6 @@ namespace zzalog {
 			confirmed_lotw(i),
 			confirmed_card(j),
 			combi_mode(k),
-			negate_results(l),
 			field_name(m),
 			pattern(n) {};
 	};

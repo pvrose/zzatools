@@ -45,7 +45,9 @@ search_dialog::search_dialog() :
 	// Group 1 - conditions
 	// rows 1-2   o radio o radio o radio o radio
 	// rows 3     o radio o radio [ text ]
-	// row  4     # bn    [ text ]
+	// rows 4     o radio o radio o radio o radio
+	// row 5      <space> o radio o radio o radio
+	// row 6      [ text ]
 	const int C11 = XG + GAP;
 	const int C12 = C11 + WBN;
 	const int C13 = C12 + WBN;
@@ -55,8 +57,9 @@ search_dialog::search_dialog() :
 	const int R11 = YG1 + HTEXT;
 	const int R12 = R11 + HBN;
 	const int R13 = R12 + HBN;
-	const int R14 = R13 + HBN + GAP;
-	const int HG1 = R14 + HBN + GAP - YG1;
+	const int R14 = R13 + HBN;
+	const int R15 = R14 + HBN + GAP;
+	const int HG1 = R15 + HBN + GAP - YG1;
 	// Group 2 - Refinement
 	const int YG2 = YG1 + HG1 + GAP;
 	// row 1 # Date  [From]v [To  ]v
@@ -93,14 +96,12 @@ search_dialog::search_dialog() :
 	// Group 3
 	const int YG3 = YG2 + HG2 + GAP;
 	// row 1 - o New o AND o OR
-	// row 2 - # negate
 	const int R31 = YG3 + HTEXT;
-	const int R32 = R31 + HBN + GAP;
 	const int C31 = XG + GAP;
 	const int C32 = C31 + WBN;
 	const int C33 = C32 + WBN;
 	const int WG3 = C33 + WBN + GAP - XG;
-	const int HG3 = R32 + HBUTTON + GAP - YG3;
+	const int HG3 = R31 + HBUTTON + GAP - YG3;
 
 	// Ungrouped OK and Cancel buttons
 	const int W = XG + max(WG1, max(WG2, WG3)) + EDGE;
@@ -149,17 +150,29 @@ search_dialog::search_dialog() :
 	ch12->tooltip("Select field to search on");
 	ch12->callback(cb_text<Fl_Choice, string>, (void*)&criteria_->field_name);
 	ch12->when(FL_WHEN_RELEASE);
-	// Check - Use regular expression mapping
-	Fl_Light_Button* bn13 = new Fl_Light_Button(C11, R14, WBUTTON, HBUTTON, "Regex");
-	bn13->labelsize(FONT_SIZE);
-	bn13->align(FL_ALIGN_RIGHT | FL_ALIGN_INSIDE);
-	bn13->callback(cb_value<Fl_Light_Button, bool>, (void*)&criteria_->by_regex);
-	bn13->color(FL_YELLOW, FL_RED);
-	bn13->value(criteria_->by_regex);
-	bn13->tooltip("Use regular expression matching");
-	bn13->when(FL_WHEN_RELEASE);
+	// Position of the 7 comparator buttons
+	const int col2[7] = { C11, (C11 + C12)/2, C12, (C12 + C13)/2, C13, (C13 + C14)/2, C14 };
+	const int row2[7] = { R14, R14, R14, R14, R14, R14, R14 };
+	// Radio: regex or comparator
+	for (int i = 0; i < 7; i++) {
+		Fl_Radio_Round_Button* bn13 = new Fl_Radio_Round_Button(col2[i], row2[i], WBN/2, HBN, comparator_labels_[i].c_str());
+		bn13->labelsize(FONT_SIZE);
+		bn13->box(FL_THIN_UP_BOX);
+		bn13->align(FL_ALIGN_RIGHT | FL_ALIGN_INSIDE);
+		bn13->value(criteria_->comparator == i);
+		bn13->color(fl_lighter(FL_YELLOW));
+		char* temp = new char[128];
+		sprintf(temp, "Use %s to compare records", comparator_labels_[i].c_str());
+		bn13->copy_tooltip(temp);
+		delete[] temp;
+		comparator_params_[i].attribute = (int*)&criteria_->comparator;
+		bn13->callback(cb_radio, (void*)&comparator_params_[i]);
+		bn13->when(FL_WHEN_RELEASE);
+
+	}
 	// Input - text to match
-	intl_input* ip14 = new intl_input(C12, R14, WEDIT, HTEXT, "Search text");
+	intl_input* ip14 = new intl_input(C11, R15
+		, WEDIT, HTEXT, "Search text");
 	ip14->labelsize(FONT_SIZE);
 	ip14->textsize(FONT_SIZE);
 	ip14->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
@@ -329,17 +342,6 @@ search_dialog::search_dialog() :
 		}
 	}
 
-	// Row 2 - negate button
-	// Check - Extract records that do NOT match the condition
-	Fl_Light_Button* bn32 = new Fl_Light_Button(C31, R32, WBN, HBUTTON, "Negate\nresults");
-	bn32->labelsize(FONT_SIZE);
-	bn32->align(FL_ALIGN_RIGHT | FL_ALIGN_INSIDE);
-	bn32->selection_color(FL_RED);
-	bn32->value(criteria_->negate_results);
-	bn32->callback(cb_value<Fl_Light_Button, bool>, (void*)&criteria_->negate_results);
-	bn32->when(FL_WHEN_RELEASE);
-	bn32->tooltip("Extract records that do not match the condition");
-
 	gp3->end();
 
 	// Box - Fail message
@@ -383,11 +385,10 @@ void search_dialog::load_values() {
 	Fl_Preferences search_settings(settings_, "Search");
 	char * temp;
 	search_settings.get("By Dates", (int&)criteria_->by_dates, false);
-	search_settings.get("By Regular Expression", (int&)criteria_->by_regex, false);
+	search_settings.get("By Comparison", (int&)criteria_->comparator, XP_EQ);
 	search_settings.get("Confirmed Card", (int&)criteria_->confirmed_card, false);
 	search_settings.get("Confirmed eQSL", (int&)criteria_->confirmed_eqsl, false);
 	search_settings.get("Confirmed LotW", (int&)criteria_->confirmed_lotw, false);
-	search_settings.get("Negate Results", (int&)criteria_->negate_results, false);
 	search_settings.get("From Date", temp, "");
 	criteria_->from_date = temp;
 	free(temp);
@@ -417,7 +418,7 @@ void search_dialog::save_values() {
 	case XC_DXCC:
 		// special case - DXCC and pattern not numeric
 		criteria_->pattern = to_upper(criteria_->pattern);
-		if (!criteria_->by_regex) {
+		if (!criteria_->comparator != XP_REGEX) {
 			string::size_type dummy;
 			int dxcc_id;
 			// Match by DXCC - either code number of nickname (default prefix)
@@ -450,11 +451,10 @@ void search_dialog::save_values() {
 	// Save criteria in settings
 	Fl_Preferences search_settings(settings_, "Search");
 	search_settings.set("By Dates", criteria_->by_dates);
-	search_settings.set("By Regular Expression", criteria_->by_regex);
+	search_settings.set("By Comparison", criteria_->comparator);
 	search_settings.set("Confirmed Card", criteria_->confirmed_card);
 	search_settings.set("Confirmed eQSL", criteria_->confirmed_eqsl);
 	search_settings.set("Confirmed LotW", criteria_->confirmed_lotw);
-	search_settings.set("Negate Results", criteria_->negate_results);
 	search_settings.set("From Date", criteria_->from_date.c_str());
 	search_settings.set("To Date", criteria_->to_date.c_str());
 	search_settings.set("Combine Extract", criteria_->combi_mode);

@@ -1,4 +1,4 @@
-#ifndef __EXTRACT_DIALOG__
+﻿#ifndef __EXTRACT_DIALOG__
 #define __EXTRACT_DIALOG__
 
 #include "../zzalib/win_dialog.h"
@@ -12,6 +12,11 @@ using namespace std;
 using namespace zzalib;
 
 namespace zzalog {
+
+	// Labels for the comparison mode labels
+	static const string comparator_labels_[7] = {
+		"~", "/=", "<", "<=", "=", ">=", ">"
+	};
 
 	// This class provides a dialog to generate a search or extract condition
 	class search_dialog :
@@ -31,6 +36,7 @@ namespace zzalog {
 		static void cb_bn_ok(Fl_Widget* w, void* v);
 		// Cancel button clicked
 		static void cb_bn_cancel(Fl_Widget* w, void* v);
+
 
 	protected:
 		// Load previous criteria from settings
@@ -65,6 +71,17 @@ namespace zzalog {
 			{ XM_NEW, nullptr },
 			{ XM_AND, nullptr },
 			{ XM_OR, nullptr }
+		};
+		// Radio button callback parameters - comparison mode
+		radio_param_t comparator_params_[7] =
+		{
+			{XP_REGEX, nullptr},
+			{XP_NE, nullptr},
+			{XP_LT, nullptr},
+			{XP_LE, nullptr},
+			{XP_EQ, nullptr},
+			{XP_GE, nullptr},
+			{XP_GT, nullptr},
 		};
 		// Labels for the condition radio buttons 
 		const string condition_labels_[10] =

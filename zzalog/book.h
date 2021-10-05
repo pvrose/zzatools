@@ -124,9 +124,9 @@ namespace zzalog {
 		// refine match - by date band and mode
 		bool refine_match(record* record);
 		// item matching - string
-		bool match_string(string test, bool is_regex, string value);
+		bool match_string(string test, search_comp_t comparator, string value);
 		// item matching - integer
-		bool match_int(string test, string value);
+		bool match_int(string test, search_comp_t comparator, string value);
 		// get book type
 		object_t book_type();
 		// set book type
