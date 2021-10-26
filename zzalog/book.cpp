@@ -1074,10 +1074,12 @@ bool book::match_string(string test, search_comp_t comparator, string value) {
 		return (to_upper(value) >= to_upper(test));
 	case XP_GT:
 		return (to_upper(value) > to_upper(test));
+	default:
+		return false;
 	}
 }
 
-// tnteger item matching - ignores things like leading zeros and trailing non numeric characters
+// integer item matching - ignores things like leading zeros and trailing non numeric characters
 bool book::match_int(string value, search_comp_t comparator, string test) {
 	try {
 		switch (comparator) {

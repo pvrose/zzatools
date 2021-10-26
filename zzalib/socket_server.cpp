@@ -148,7 +148,7 @@ int socket_server::create_server() {
 	return (fcntl(fd, F_SETFL, flags) == 0) ? 0 : 1;
 #endif
 
-	// Set socket into listening mode and wait to get a client
+	// Set socket into listening mode 
 	if (protocol_ == HTTP) {
 		result = listen(server_, SOMAXCONN);
 		if (result == SOCKET_ERROR) {
@@ -161,21 +161,11 @@ int socket_server::create_server() {
 			status(ST_OK, message);
 		}
 
-		//// Now wait until we see a client
-		//client_ = INVALID_SOCKET;
-		//int result = 2;
-		//while (client_ == INVALID_SOCKET && result == 2) {
-		//	result = accept_client();
-		//}
-		//if (result == 1) {
-		//	return 1;
-		//}
-
 		// Make the client non-blocking as well
 #ifdef _WIN32
 		unsigned long nonblocking = 1;
 		if (client_ != INVALID_SOCKET && ioctlsocket(client_, FIONBIO, &nonblocking)) {
-			handle_error("Unable to make socket non-blocking");
+			handle_error("Unable to make client socket non-blocking");
 			return 1;
 		}
 #else
@@ -192,7 +182,7 @@ int socket_server::create_server() {
 }
 
 // Accept any client asking to connect, use non-blocking call to avoid locking out other code
-int socket_server::accept_client() {
+socket_server::client_status socket_server::accept_client() {
 	char message[256];
 	int len_client_addr = sizeof(client_addr_);
 	client_ = accept(server_, (SOCKADDR*)&client_addr_, &len_client_addr);
@@ -200,17 +190,17 @@ int socket_server::accept_client() {
 		if (WSAGetLastError() == WSAEWOULDBLOCK) {
 			//status(ST_LOG, "SOCKET: No client socket to accept");
 			// Non-blocking accept would have blocked - let other events get handled and try again
-			return 2;
+			return BLOCK;
 		}
 		else {
 			handle_error("Unable to accept connection");
-			return 1;
+			return NG;
 		}
 	}
 	else {
 		snprintf(message, 256, "SOCKET: Accepted socket %s:%d", inet_ntoa(client_addr_.sin_addr), htons(client_addr_.sin_port));
 		status(ST_OK, message);
-		return 0;
+		return OK;
 	}
 
 }
@@ -228,11 +218,11 @@ int socket_server::rcv_packet() {
 	// Now wait until we see a client
 	if (protocol_ == HTTP) {
 		client_ = INVALID_SOCKET;
-		int result = 2;
-		while (client_ == INVALID_SOCKET && result == 2) {
+		client_status result = BLOCK;
+		while (client_ == INVALID_SOCKET && result == BLOCK) {
 			result = accept_client();
 		}
-		if (result == 1) {
+		if (result == NG) {
 			return 1;
 		}
 	}
@@ -267,7 +257,7 @@ int socket_server::rcv_packet() {
 			wait_time = 0;
 		}
 		else if (WSAGetLastError() == WSAEWOULDBLOCK) {
-			// Wait one seconds before trying again - wait_repeat_ will get cleared in the 
+			// Try again immediately  
 			wait_time = 0;
 		}
 		else if (WSAGetLastError() == WSAENOTSOCK && closing_) {
@@ -281,7 +271,7 @@ int socket_server::rcv_packet() {
 			return 1;
 		}
 	} while (bytes_rcvd > 0);
-	// Now see if we have another 
+	// Now see if we have another - the timer goes on the scheduling queue so other tasks will get in
 	Fl::add_timeout(wait_time, cb_timer_rcv, this);
 	delete[] buffer;
 	return 0;

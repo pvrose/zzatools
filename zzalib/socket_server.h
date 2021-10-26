@@ -38,10 +38,16 @@ namespace zzalib {
 
 	protected:
 
+		enum client_status {
+			OK = 0,
+			NG = 1,
+			BLOCK = 2
+		};
+
 		// Receive a datagram from WSJT-X
 		int rcv_packet();
 		// Accept the client
-		int accept_client();
+		client_status accept_client();
 		// Error handler
 		void handle_error(const char* phase);
 		// Send request - set by call-back
@@ -63,6 +69,9 @@ namespace zzalib {
 		SOCKET client_;
 		// Current client address
 		SOCKADDR_IN client_addr_;
+		// Previous client address
+		string prev_addr_;
+		int prev_port_;
 		// Host IP address e.g. 127.0.0.1
 		string host_id_;
 		// port number

@@ -267,7 +267,13 @@ int wsjtx_handler::handle_status(stringstream& ss) {
 		vector<prefix*> prefixes;
 		// Get prefix(es), If only 1 and the DXCC Code != 0 (i.e. not /MM)
 		if (pfx_data_->all_prefixes(dx_record, &prefixes, false) && prefixes.size() == 1) {
-			if (prefixes[0]->dxcc_code_ != 0) {
+			// Get DXCC prefix record for the DXCC number
+			prefix* dxcc_prefix = prefixes[0];
+			while (dxcc_prefix->parent_ != nullptr) {
+				dxcc_prefix = dxcc_prefix->parent_;
+			}
+			if (dxcc_prefix->dxcc_code_ != 0) {
+				// Use the actual prefixes location rather than the DXCC's
 				lat_long_t location = { prefixes[0]->latitude_, prefixes[0]->longitude_ };
 				dxatlas_->set_dx_loc(latlong_to_grid(location, 6), status.dx_call);
 			}
