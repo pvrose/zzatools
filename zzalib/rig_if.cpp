@@ -277,7 +277,10 @@ void rig_if::callback(void(*function)(), string(*spec_func)(double), void(*mess_
 }
 
 void rig_if::cb_timer_sync(void* v) {
-	tm* figures = (tm*)v;
+	// Get current time
+	time_t now = time(nullptr);
+	// convert to struct in UTC
+	tm* figures = gmtime(&now);
 	char message[200];
 	rig_if_->error(ST_OK, "RIG: Updating clock");
 	// Convert date and time to integers. 20200317, 1514
