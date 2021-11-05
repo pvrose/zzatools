@@ -92,6 +92,8 @@ namespace zzalib {
 		string rig_info();
 		// Rig timer callback
 		static void cb_timer_rig(void* v);
+		// Rig update clock timeout
+		static void cb_timer_sync(void* v);
 
 		// return mode/submode
 		void get_string_mode(string& mode, string& submode);

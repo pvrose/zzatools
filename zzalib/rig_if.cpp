@@ -276,6 +276,44 @@ void rig_if::callback(void(*function)(), string(*spec_func)(double), void(*mess_
 	}
 }
 
+void rig_if::cb_timer_sync(void* v) {
+	tm* figures = (tm*)v;
+	char message[200];
+	rig_if_->error(ST_OK, "RIG: Updating clock");
+	// Convert date and time to integers. 20200317, 1514
+	int date = (figures->tm_year + 1900) * 10000 + (figures->tm_mon + 1) * 100 + figures->tm_mday;
+	int time = figures->tm_hour * 100 + figures->tm_min;
+	// Generate set date command x1A x05 x00 x94 date in BCD
+	string data = int_to_bcd(date, 4, false);
+	char command = '\x1a';
+	bool ok;
+	string sub_command = "   ";
+	sub_command[0] = '\x05';
+	sub_command[1] = '\x00';
+	sub_command[2] = '\x94';
+	ic7300_->send_command(command, sub_command, data, ok);
+	if (ok) {
+		// Set time - x1A x05 x00 x95 time in BCD
+		data = int_to_bcd(time, 2, false);
+		sub_command[2] = '\x95';
+		ic7300_->send_command(command, sub_command, data, ok);
+	}
+	if (ok) {
+		// Set UTC off-set - UTC + 0000 - x1A x05 x00 x96 x00 x00 x00 (TZ=UTC)
+		data = int_to_bcd(0, 3, false);
+		sub_command[2] = '\x96';
+		ic7300_->send_command(command, sub_command, data, ok);
+	}
+	if (ok) {
+		snprintf(message, 200, "RIG: Updated rig clock to %04d %08d", time, date);
+		rig_if_->error(ST_OK, message);
+	}
+	else {
+		rig_if_->error(ST_ERROR, "RIG: Failed to update rig clock");
+	}
+
+}
+
 void rig_if::update_clock() {
 	// Only implemented for IC-7300
 	if (rig_name() == "IC-7300" && ic7300_ && handler_t_ == RIG_FLRIG) {
@@ -287,43 +325,8 @@ void rig_if::update_clock() {
 		// And repeat until seconds reads 00
 		snprintf(message, 200, "RIG: Waiting %d seconds to update clock", 60 - figures->tm_sec);
 		error(ST_NOTE, message);
-		while (figures->tm_sec) {
-			now = time(nullptr);
-			figures = gmtime(&now);
-			Fl::wait();
-		}
-		error(ST_OK, "RIG: Updating clock");
-		// Convert date and time to integers. 20200317, 1514
-		int date = (figures->tm_year + 1900) * 10000 + (figures->tm_mon + 1) * 100 + figures->tm_mday;
-		int time = figures->tm_hour * 100 + figures->tm_min;
-		// Generate set date command x1A x05 x00 x94 date in BCD
-		string data = int_to_bcd(date, 4, false);
-		char command = '\x1a';
-		bool ok;
-		string sub_command = "   ";  
-		sub_command[0] = '\x05';
-		sub_command[1] = '\x00';
-		sub_command[2] = '\x94';
-		ic7300_->send_command(command, sub_command, data, ok);
-		if (ok) {
-			// Set time - x1A x05 x00 x95 time in BCD
-			data = int_to_bcd(time, 2, false);
-			sub_command[2] = '\x95';
-			ic7300_->send_command(command, sub_command, data, ok);
-		}
-		if (ok) {
-			// Set UTC off-set - UTC + 0000 - x1A x05 x00 x96 x00 x00 x00 (TZ=UTC)
-			data = int_to_bcd(0, 3, false);
-			sub_command[2] = '\x96';
-			ic7300_->send_command(command, sub_command, data, ok);
-		}
-		if (ok) {
-			snprintf(message, 200, "RIG: Updated rig clock to %04d %08d", time, date);
-			error(ST_OK, message);
-		}
-		else {
-			error(ST_ERROR, "RIG: Failed to update rig clock");
-		}
+		int seconds = figures->tm_sec ? 60 - figures->tm_sec : 0;
+		Fl::add_timeout((double)seconds, cb_timer_sync, figures);
 	}
 }
 

@@ -613,8 +613,9 @@ void add_rig_if() {
 							ic7300_ = new ic7300;
 							ic7300_->callback(cb_error_message);
 							// Only update clock and read memories if new session as we want to resume as quickly as possible (after a crash)
+							// Update clock now uses a timeout callback
+							rig_if_->update_clock();
 							if (!resuming_) {
-								rig_if_->update_clock();
 								mem_table->type(mem_table->type());
 							}
 						}
