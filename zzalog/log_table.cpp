@@ -130,6 +130,8 @@ log_table::~log_table()
 	// Remove data items
 	fields_.clear();
 	clear();
+	// The destructor for this uses itself
+	edit_input_ = nullptr;
 }
 
 // callback - called when mouse button is released but also at other times.

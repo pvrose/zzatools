@@ -125,8 +125,8 @@ prefix* pfx_data::get_prefix(unsigned int dxcc_code, string state) {
 	// First get the DXCC prefix
 	if (find(dxcc_code) != end()) {
 		prefix* dxcc_prefix = at(dxcc_code);
-		// DXCC record is also supplied state
-		if (dxcc_prefix->state_ == state) {
+		// DXCC record is also supplied state - if state isn't provided but DXCC has a state
+		if (dxcc_prefix->state_ == state || state == "") {
 			return dxcc_prefix;
 		}
 		else {
@@ -355,6 +355,7 @@ bool pfx_data::all_prefixes(record* record, vector<prefix*>* prefixes, bool spec
 				}
 				// Add the DXCC if it looks like a special call (at least two numbers after country) 
 				// as geography based on first number may not be valid
+				// Also the case for USA as they can now use callsign outside 
 				if (!special) {
 					if (type == PT_SPECIAL) {
 						entitys_prefixes.push_back(dxcc_prefix);
@@ -365,8 +366,8 @@ bool pfx_data::all_prefixes(record* record, vector<prefix*>* prefixes, bool spec
 							entitys_prefixes.push_back(dxcc_prefix);
 						}
 						else {
-							// More than one child found - add DXCC prefix - specific case for W
-							if (entitys_prefixes.size() > 1) {
+							// More than one child found - add DXCC prefix - specific case for W. Note W6 returns only one prefix
+							if (entitys_prefixes.size() > 1 || dxcc_code == 291) {
 								entitys_prefixes.push_back(dxcc_prefix);
 							}
 						}
