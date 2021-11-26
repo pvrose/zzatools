@@ -52,6 +52,9 @@ rig_dialog::rig_dialog(int X, int Y, int W, int H, const char* label) :
 	, existing_ports_(nullptr)
 	, swr_warn_level_(1.5)
 	, swr_error_level_(2.0)
+	, ssb_power_warn_level_(95.0)
+	, cw_power_warn_level_(95.0)
+	, data_power_warn_level_(50.0)
 {
 	actual_rigs_.clear();
 	for (int i = 0; i < 4; i++) ip_address_[i] = 0;
@@ -86,6 +89,9 @@ void rig_dialog::create_form(int X, int Y) {
 	const int X_PWR = X + XLEFT;
 	const int C2_PWR = C2_RIG;
 	const int W2_PWR = WSMEDIT;
+	const int X_VDD = X + XLEFT;
+	const int C2_VDD = C2_RIG;
+	const int W2_VDD = WSMEDIT;
 	const int WALL = max(W_RIG, W_POLL);
 
 	const int Y_HAMLIB = Y + YTOP;
@@ -106,8 +112,15 @@ void rig_dialog::create_form(int X, int Y) {
 	const int H_SWR = (3 * HTEXT) + GAP;
 
 	const int Y_PWR = Y_SWR + H_SWR;
-	const int Y1_PWR = Y_PWR + GAP;
-	const int H_PWR = (2 * HTEXT) + GAP;
+	const int Y1_PWR = Y_PWR + HTEXT;
+	const int Y2_PWR = Y1_PWR + HTEXT;
+	const int Y3_PWR = Y2_PWR + HTEXT;
+	const int H_PWR = (4 * HTEXT) + GAP;
+
+	const int Y_VDD = Y_PWR + H_PWR;
+	const int Y1_VDD = Y_VDD + HTEXT;
+	const int Y2_VDD = Y1_VDD + HTEXT;
+	const int H_VDD = (3 * HTEXT) + GAP;
 
 	// Group for rig radio buttons: selects the handler type
 	Fl_Group* rig_if_grp = new Fl_Group(X_RIG_RAD, Y_HAMLIB, WRADIO + WLABEL + GAP, H_HAMLIB + H_FLRIG + H_NORIG);
@@ -325,19 +338,78 @@ void rig_dialog::create_form(int X, int Y) {
 	pwr_grp->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 	pwr_grp->box(FL_DOWN_FRAME);
 	// Spinner to select warning value
-	pwr_warn_ = new Fl_Spinner(C2_PWR, Y_PWR + HTEXT, W2_PWR, HTEXT, "Warning");
-	pwr_warn_->align(FL_ALIGN_LEFT);
-	pwr_warn_->labelsize(FONT_SIZE);
-	pwr_warn_->textsize(FONT_SIZE);
-	pwr_warn_->tooltip("Select the power level (averaged over a transmission) when a warning will sound");
-	pwr_warn_->type(FL_FLOAT_INPUT);
-	pwr_warn_->minimum(10);
-	pwr_warn_->maximum(400);
-	pwr_warn_->step(5);
-	pwr_warn_->value(power_warn_level_);
-	pwr_warn_->callback(cb_value<Fl_Spinner, double>, &power_warn_level_);
-	pwr_warn_->when(FL_WHEN_CHANGED);
+	ssb_pwr_warn_ = new Fl_Spinner(C2_PWR, Y1_PWR, W2_PWR, HTEXT, "SSB");
+	ssb_pwr_warn_->align(FL_ALIGN_LEFT);
+	ssb_pwr_warn_->labelsize(FONT_SIZE);
+	ssb_pwr_warn_->textsize(FONT_SIZE);
+	ssb_pwr_warn_->tooltip("Select the SSBpower level (averaged over a transmission) when a warning will sound");
+	ssb_pwr_warn_->type(FL_FLOAT_INPUT);
+	ssb_pwr_warn_->minimum(10);
+	ssb_pwr_warn_->maximum(400);
+	ssb_pwr_warn_->step(5);
+	ssb_pwr_warn_->value(ssb_power_warn_level_);
+	ssb_pwr_warn_->callback(cb_value<Fl_Spinner, double>, &ssb_power_warn_level_);
+	ssb_pwr_warn_->when(FL_WHEN_CHANGED);
+	// Spinner to select warning value
+	cw_pwr_warn_ = new Fl_Spinner(C2_PWR, Y2_PWR, W2_PWR, HTEXT, "CW");
+	cw_pwr_warn_->align(FL_ALIGN_LEFT);
+	cw_pwr_warn_->labelsize(FONT_SIZE);
+	cw_pwr_warn_->textsize(FONT_SIZE);
+	cw_pwr_warn_->tooltip("Select the CW power level (averaged over a transmission) when a warning will sound");
+	cw_pwr_warn_->type(FL_FLOAT_INPUT);
+	cw_pwr_warn_->minimum(10);
+	cw_pwr_warn_->maximum(400);
+	cw_pwr_warn_->step(5);
+	cw_pwr_warn_->value(cw_power_warn_level_);
+	cw_pwr_warn_->callback(cb_value<Fl_Spinner, double>, &cw_power_warn_level_);
+	cw_pwr_warn_->when(FL_WHEN_CHANGED);
+	// Spinner to select warning value
+	data_pwr_warn_ = new Fl_Spinner(C2_PWR, Y3_PWR, W2_PWR, HTEXT, "Data");
+	data_pwr_warn_->align(FL_ALIGN_LEFT);
+	data_pwr_warn_->labelsize(FONT_SIZE);
+	data_pwr_warn_->textsize(FONT_SIZE);
+	data_pwr_warn_->tooltip("Select the data power level (averaged over a transmission) when a warning will sound");
+	data_pwr_warn_->type(FL_FLOAT_INPUT);
+	data_pwr_warn_->minimum(10);
+	data_pwr_warn_->maximum(400);
+	data_pwr_warn_->step(5);
+	data_pwr_warn_->value(data_power_warn_level_);
+	data_pwr_warn_->callback(cb_value<Fl_Spinner, double>, &data_power_warn_level_);
+	data_pwr_warn_->when(FL_WHEN_CHANGED);
+	pwr_grp->end();
 
+	Fl_Group* vdd_grp = new Fl_Group(X_VDD, Y_VDD, WALL, H_VDD, "Vdd Alarm values");
+	vdd_grp->labelsize(FONT_SIZE);
+	vdd_grp->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
+	vdd_grp->box(FL_DOWN_FRAME);
+
+	// Spinner to select Vdd error level
+	vdd_min_ = new Fl_Spinner(C2_VDD, Y1_VDD, W2_VDD, HTEXT, "Minimum Level");
+	vdd_min_->align(FL_ALIGN_LEFT);
+	vdd_min_->labelsize(FONT_SIZE);
+	vdd_min_->textsize(FONT_SIZE);
+	vdd_min_->tooltip("Select the Vdd level below which an error will sound");
+	vdd_min_->type(FL_FLOAT_INPUT);
+	vdd_min_->minimum(10);
+	vdd_min_->maximum(16);
+	vdd_min_->step(0.1);
+	vdd_min_->value(vdd_min_level_);
+	vdd_min_->callback(cb_value<Fl_Spinner, double>, &vdd_min_level_);
+	vdd_min_->when(FL_WHEN_CHANGED);
+	vdd_max_ = new Fl_Spinner(C2_VDD, Y2_VDD, W2_VDD, HTEXT, "Maximum Level");
+	vdd_max_->align(FL_ALIGN_LEFT);
+	vdd_max_->labelsize(FONT_SIZE);
+	vdd_max_->textsize(FONT_SIZE);
+	vdd_max_->tooltip("Select the Vdd level above which an error will sound");
+	vdd_max_->type(FL_FLOAT_INPUT);
+	vdd_max_->minimum(10);
+	vdd_max_->maximum(16);
+	vdd_max_->step(0.1);
+	vdd_max_->value(vdd_max_level_);
+	vdd_max_->callback(cb_value<Fl_Spinner, double>, &vdd_max_level_);
+	vdd_max_->when(FL_WHEN_CHANGED);
+
+	vdd_grp->end();
 
 	Fl_Group::end();
 }
@@ -600,7 +672,12 @@ void rig_dialog::load_values() {
 	rig_settings.get("SWR Warning Level", swr_warn_level_, 1.5);
 	rig_settings.get("SWR Error Level", swr_error_level_, 2.0);
 	// Power settings
-	rig_settings.get("Power Warning Level", power_warn_level_, 50);
+	rig_settings.get("SSB Power Warning Level", ssb_power_warn_level_, 95);
+	rig_settings.get("CW Power Warning Level", cw_power_warn_level_, 95);
+	rig_settings.get("Data Power Warning Level", data_power_warn_level_, 50);
+	// Vdd settings
+	rig_settings.get("Voltage Minimum Level", vdd_min_level_, (13.8 * 0.85));
+	rig_settings.get("Voltage Maximum Level", vdd_max_level_, (13.8 * 1.15));
 
 }
 
@@ -647,7 +724,12 @@ void rig_dialog::save_values() {
 	rig_settings.set("SWR Warning Level", swr_warn_level_);
 	rig_settings.set("SWR Error Level", swr_error_level_);
 	// Power Settings
-	rig_settings.set("Power Warning Level", power_warn_level_);
+	rig_settings.set("SSB Power Warning Level", ssb_power_warn_level_);
+	rig_settings.set("CW Power Warning Level", cw_power_warn_level_);
+	rig_settings.set("Data Power Warning Level", data_power_warn_level_);
+	// Vdd Settings
+	rig_settings.set("Voltage Minimum Level", vdd_min_level_);
+	rig_settings.set("Voltage Maximum Level", vdd_max_level_);
 
 	// restart rig interface
 	add_rig_if();

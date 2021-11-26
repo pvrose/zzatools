@@ -67,6 +67,19 @@ namespace zzalog {
 		{ ST_FATAL, 'F'}
 	};
 
+	// Description for filter
+	const map<status_t, string> STATUS_TEXTS = {
+		{ ST_NONE, "All"},
+		{ ST_LOG, "Information"},
+		{ ST_DEBUG, "Debug info"},
+		{ ST_NOTE, "Action starting"},
+		{ ST_OK, "Action complete"},
+		{ ST_WARNING, "Warnings"},
+		{ ST_NOTIFY, "Notifications"},
+		{ ST_ERROR, "Recoverable errors"},
+		{ ST_SEVERE, "Severe errors"},
+		{ ST_FATAL, "Irrecoverable errors"}
+	};
 	// Styles used by Fl_Text_Display to control font and colour 
 	const Fl_Text_Display::Style_Table_Entry STATUS_STYLES[] = {        // Style label and status
 		{ fl_gray_ramp(4), FL_COURIER_ITALIC, 12, 0 },                  // A - ST_NONE
@@ -122,6 +135,8 @@ namespace zzalog {
 
 		// Text filter
 		string filter_;
+		// Status filter
+		status_t status_filter_;
 
 
 	};
@@ -145,6 +160,8 @@ namespace zzalog {
 		static void cb_find(Fl_Widget* w, void* v);
 		// Filter choice button
 		static void cb_ch_filter(Fl_Widget* w, void* v);
+		// Status filter 
+		static void cb_ch_status(Fl_Widget* w, void* v);
 
 		// Display widget
 		text_display* display_;

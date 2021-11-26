@@ -159,8 +159,6 @@ int wsjtx_handler::handle_log(stringstream& ss) {
 	// Convert it to a record
 	stringstream adif;
 	adif.str(utf8);
-	// Clear DX locator flag
-	dxatlas_->clear_dx_loc();
 	// Stop any extant update and wait for it to complete
 	import_data_->stop_update(LM_OFF_AIR, false);
 	while (!import_data_->update_complete()) Fl::wait();
@@ -168,6 +166,8 @@ int wsjtx_handler::handle_log(stringstream& ss) {
 	// Wait for the import to finish
 	while (import_data_->size()) Fl::wait();
 	status_->misc_status(ST_NOTE, "WSJT-X: Logged QSO");
+	// Clear DX locator flag
+	dxatlas_->clear_dx_loc();
 	return 0;
 }
 

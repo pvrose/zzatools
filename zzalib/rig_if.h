@@ -81,6 +81,8 @@ namespace zzalib {
 		virtual bool get_tx() = 0;
 		// Get SWR meter
 		virtual double swr_meter() = 0;
+		// Get Voltage meter
+		virtual double vdd_meter() = 0;
 
 		// Error Code is not OK.
 		virtual bool is_good() = 0;
@@ -113,6 +115,10 @@ namespace zzalib {
 		bool check_swr();
 		// Check power
 		bool check_power();
+		// Check voltage
+		bool check_voltage();
+		// Maximum power during QSO
+		double max_power();
 
 		// Callback to set certain functions (timer callback, freq to band conversion, error message
 		void callback(void (*function)(), string(*spec_func)(double), void(*mess_func)(status_t, const char*));
@@ -159,6 +165,8 @@ namespace zzalib {
 		double sigma_tx_power_;
 		// Most recent received S-meter
 		int last_rx_smeter_;
+		// Maximum power during QSO
+		double max_power_;
 	};
 
 	// THis class implements the hamlib specific methods of the base class
@@ -196,6 +204,8 @@ namespace zzalib {
 		virtual bool get_tx();
 		// Get SWR meter
 		virtual double swr_meter();
+		// Get Voltage meter
+		virtual double vdd_meter();
 
 		// Error Code is not OK.
 		virtual bool is_good();
@@ -257,6 +267,8 @@ namespace zzalib {
 		virtual bool get_tx();
 		// Get SWR meter
 		virtual double swr_meter();
+		// Get Voltage meter
+		virtual double vdd_meter();
 
 		// Error Code is not OK.
 		virtual bool is_good();

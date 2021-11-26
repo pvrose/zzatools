@@ -182,11 +182,21 @@ string rig_if::get_tx_power() {
 		last_tx_power_ = tx_power;
 		num_pwr_samples_++;
 		sigma_tx_power_ += tx_power;
+		// Get max power
+		if (tx_power > max_power_)
+			max_power_ = tx_power;
 	}
 	char text[100];
 	sprintf(text, "%g", tx_power);
 
 	return text;
+}
+
+// Return maximu power - and reset it to 0.0
+double rig_if::max_power() {
+	double result = max_power_;
+	max_power_ = 0.0;
+	return result;
 }
 
 // Rig timer callback
@@ -377,6 +387,26 @@ bool rig_if::check_power() {
 		else {
 			return true;
 		}
+	}
+	else {
+		return true;
+	}
+}
+
+// Check voltage level
+bool rig_if::check_voltage() {
+	Fl_Preferences rig_settings(settings_, "Rig");
+	double min_voltage_level;
+	double max_voltage_level;
+	rig_settings.get("Voltage Minimum Level", min_voltage_level, (13.8 * 0.85));
+	rig_settings.get("Voltage Maximum Level", min_voltage_level, (13.8 * 1.15));
+	double vdd = vdd_meter();
+	// Check voltage - ignore if vdd_meter has returned NaN
+	if (!isnan(vdd) && (vdd < min_voltage_level || vdd > max_voltage_level)) {
+		char message[200];
+		snprintf(message, 200, "RIG: Current Vdd is %.0f", vdd);
+		error(ST_ERROR, message);
+		return false;
 	}
 	else {
 		return true;
@@ -648,6 +678,18 @@ double rig_hamlib::pwr_meter() {
 	else {
 		// Default to S0 (S9 is -73 dBm)
 		error(ST_ERROR, error_message("pwr_meter").c_str());
+		return nan("");
+	}
+}
+
+// Return Vdd meter reading (Volts)
+double rig_hamlib::vdd_meter() {
+	value_t meter_value;
+	if ((error_code_ = rig_get_level(rig_, RIG_VFO_CURR, RIG_LEVEL_VD_METER, &meter_value)) == RIG_OK) {
+		return meter_value.f;
+	}
+	else {
+	error(ST_ERROR, error_message("pwr_meter").c_str());
 		return nan("");
 	}
 }
@@ -948,6 +990,38 @@ double rig_flrig::pwr_meter() {
 		error_ = true;
 		return nan("");
 	}
+}
+
+// Return Vdd meter reading
+double rig_flrig::vdd_meter() {
+	if (ic7300_) {
+		bool ok;
+		char command = '\x15';
+		string subcommand = "\x15";
+		string data = ic7300_->send_command(command, subcommand, ok);
+		if (ok) {
+			char mess[256];
+			if (data.length() >= 4) {
+				// *(0000=0 V, 0013=10 V, 0241=16 V)
+				unsigned int value = bcd_to_int(data.substr(2, 2), false);
+				if (value < 13) {
+					value = 13;
+				}
+				if (value > 241) value = 241;
+				// interpolate between 10.0 V and 16.0 V
+				double vdd = (double)(value - 13) / (double)(241 - 13) * 6.0 + 10.0;
+				return vdd;
+			}
+			else {
+				snprintf(mess, 256, "RIG: Insufficient data received from transceiver - %d bytes", data.length());
+				error(ST_ERROR, mess);
+			}
+		}
+	}
+	// Not IC7300 or not OK - return nan.
+	error(ST_ERROR, error_message("swr_meter").c_str());
+	return nan("");
+
 }
 
 // Return SWR meter reading

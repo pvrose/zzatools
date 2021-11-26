@@ -504,6 +504,7 @@ text_buffer::~text_buffer() {
 text_display::text_display(int X, int Y, int W, int H, const char* label) :
 	Fl_Text_Display(X, Y, W, H, label)
 	, filter_("")
+	, status_filter_(ST_NONE)
 {
 }
 
@@ -516,9 +517,11 @@ void text_display::append(const char* line) {
 	// Find current scroll position and the total positions
 	int scroll_pos = this->mVScrollBar->value();
 	double scroll_max = this->mVScrollBar->maximum();
-	// append line to end of buffer
+	// append line to end of buffer if both filters match
 	if (filter_.length() == 0 || filter_ == " " || (strlen(line) > 22 + filter_.length()) && (strncmp(line + 22, filter_.c_str(), filter_.length()) == 0)) {
-		buffer()->append(line);
+		if (status_filter_ == ST_NONE || line[0] == STATUS_CODES.at(status_filter_)) {
+			buffer()->append(line);
+		}
 	} 
 	if (scroll_pos == (int)scroll_max) {
 		// We had been scrolled at the end, so scroll to the new end
@@ -558,9 +561,23 @@ void viewer_window::cb_find(Fl_Widget* w, void* v) {
 }
 
 // Call back for filter
-// v is a pointer to display_->filter_
+// v is a pointer to display_->filter_ 
 void viewer_window::cb_ch_filter(Fl_Widget* w, void* v) {
 	cb_choice_text(w, v);
+	viewer_window* that = ancestor_view<viewer_window>(w);
+	// Reload the text display and set line colours
+	text_buffer* buffer = (text_buffer*)that->display_->buffer();
+	buffer->remove(0, buffer->length());
+	for (auto it = that->original_lines_.begin(); it != that->original_lines_.end(); it++) {
+		that->display_->append(*it);
+	}
+	that->colour_buffer();
+}
+
+// Call back for filter
+// v is a pointer to display_->status_filter_
+void viewer_window::cb_ch_status(Fl_Widget* w, void* v) {
+	cb_value_enum<Fl_Choice, status_t>(w, v);
 	viewer_window* that = ancestor_view<viewer_window>(w);
 	// Reload the text display and set line colours
 	text_buffer* buffer = (text_buffer*)that->display_->buffer();
@@ -652,7 +669,7 @@ void viewer_window::draw_window() {
 	bn_match->selection_color(FL_BLUE);
 	bn_match->callback(cb_value < Fl_Round_Button, int >, &match_case_);
 	// Filter choice
-	Fl_Choice* ch_filter = new Fl_Choice(bn_match->x() + bn_match->w() + GAP + WLABEL, GAP, WEDIT, HTEXT, "Filter");
+	Fl_Choice* ch_filter = new Fl_Choice(bn_match->x() + bn_match->w() + GAP + WLABEL, GAP, WSMEDIT, HTEXT, "Topic");
 	ch_filter->labelfont(FONT);
 	ch_filter->labelsize(FONT_SIZE);
 	ch_filter->textfont(FONT);
@@ -686,6 +703,21 @@ void viewer_window::draw_window() {
 	ch_filter->add("VALIDATE");
 	ch_filter->add("WSJT-X");
 	ch_filter->add("ZZALOG");
+	// Filter severity
+	Fl_Choice* ch_severity = new Fl_Choice(ch_filter->x() + ch_filter->w() + GAP + WLABEL, GAP, WSMEDIT, HTEXT, "Severity");
+	ch_severity->labelfont(FONT);
+	ch_severity->labelsize(FONT_SIZE);
+	ch_severity->textfont(FONT);
+	ch_severity->textsize(FONT_SIZE);
+	ch_severity->align(FL_ALIGN_LEFT);
+	ch_severity->clear();
+	// Add the hard-coded choice values
+	for (int i = (int)ST_NONE; i <= (int)ST_FATAL; i++) {
+		ch_severity->add(STATUS_TEXTS.at((status_t)i).c_str());
+	}
+	ch_severity->value((int)ST_NONE);
+	resizable(nullptr);
+	size(max(w(), ch_severity->x() + ch_severity->w() + GAP), h());
 
 	// Create the text display and set its parameters
 	display_ = new text_display(GAP, grp->y() + grp->h() + GAP, w() - GAP - GAP, h() - grp->y() - grp->h() - GAP - GAP);
@@ -697,6 +729,7 @@ void viewer_window::draw_window() {
 	display_->show();
 	display_->end();
 	ch_filter->callback(cb_ch_filter, &(display_->filter_));
+	ch_severity->callback(cb_ch_status, &(display_->status_filter_));
 
 	resizable(display_);
 	size_range(w(), h());

@@ -19,6 +19,7 @@
 #include "lotw_handler.h"
 #include "club_handler.h"
 #include "main_window.h"
+#include "../zzalib/rig_if.h"
 
 // C/C++ header files
 #include <ctime>
@@ -46,6 +47,7 @@ extern book* book_;
 extern eqsl_handler* eqsl_handler_;
 extern lotw_handler* lotw_handler_;
 extern club_handler* club_handler_;
+extern rig_if* rig_if_;
 extern bool read_only_;
 extern void main_window_label(string text);
 
@@ -827,6 +829,9 @@ void book::save_record() {
 	status_->misc_status(ST_NOTE, text);
 	// Add to used bands and modes
 	add_band_mode(get_record());
+	// Update TX_PWR
+	snprintf(text, 128, "%d", (int)rig_if_->max_power());
+	get_record()->item("TX_PWR", text);
 	// Check within band
 	double freq;
 	get_record()->item("FREQ", freq);
