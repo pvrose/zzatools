@@ -7,6 +7,7 @@
 #include "dxa_if.h"
 #include "prefix.h"
 #include "pfx_data.h"
+#include "toolbar.h"
 
 #include <stdio.h>
 #include <WS2tcpip.h>
@@ -33,6 +34,7 @@ extern menu* menu_;
 extern Fl_Preferences* settings_;
 extern dxa_if* dxatlas_;
 extern pfx_data* pfx_data_;
+extern toolbar* toolbar_;
 
 wsjtx_handler* wsjtx_handler::that_ = nullptr;
 
@@ -259,6 +261,7 @@ int wsjtx_handler::handle_status(stringstream& ss) {
 	if (status.dx_call.length() && status.dx_grid.length() && status.transmitting) {
 		// Use the actual grid loaction
 		dxatlas_->set_dx_loc(status.dx_grid, status.dx_call);
+		toolbar_->search_text(status.dx_call);
 	}
 	else if (status.dx_call.length() && status.transmitting) {
 		// Get the grid location of the prefix centre - only if 1 prefix matches the callsign.
@@ -292,6 +295,7 @@ int wsjtx_handler::handle_status(stringstream& ss) {
 			status_->misc_status(ST_WARNING, message);
 			dxatlas_->clear_dx_loc();
 		}
+		toolbar_->search_text(status.dx_call);
 	}
 	else if (!status.dx_call.length()) {
 		// Can clear the Dx Location by clearing the DX Call field

@@ -31,6 +31,8 @@ namespace zzalog {
 		int min_w();
 		// Add selected callsign as default input
 		void search_text(int record_num);
+		// Set search text to a specific calllsign
+		void search_text(string callsign);
 		// Update button status
 		void update_items();
 

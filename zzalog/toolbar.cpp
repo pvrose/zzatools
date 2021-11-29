@@ -471,6 +471,13 @@ void toolbar::search_text(int record_num) {
 	redraw();
 }
 
+// Set the search text to a specific callsign
+void toolbar::search_text(string callsign) {
+	search_text_ = callsign;
+	((intl_input*)ip_search_)->value(search_text_.c_str());
+	redraw();
+}
+
 // Update items - activate those that are linked to active menu items
 void toolbar::update_items() {
 	int num_children = children();
