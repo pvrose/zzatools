@@ -14,7 +14,7 @@ win_dialog::win_dialog(int W, int H, const char * label) :
 // Destructor
 win_dialog::~win_dialog()
 {
-	clear();
+	//clear();
 }
 
 // Show the dialog and wait for OK or Cancel (or any bespoke buttons) to be clicked

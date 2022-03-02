@@ -907,8 +907,10 @@ int main(int argc, char** argv)
 	main_window_->show(argc, argv);
 	// Read in reference data - uses progress
 	add_data();
+	Fl::wait();
 	// Read in log book data - uses progress - use supplied argument for filename
 	add_book(argc == 1 ? nullptr : argv[argc - 1]);
+	Fl::wait();
 	// Connect to the rig - load all hamlib backends once only here
 	rig_if_ = nullptr;
 	rig_load_all_backends();
@@ -932,7 +934,6 @@ int main(int argc, char** argv)
 		menu_->redraw();
 		// Only do this if we haven't tried to close
 		// Start WSJT-X server
-		// TODO: Run this in a separate thread. We will need to set up a postbox to log records from it.
 		wsjtx_handler_->run_server();
 		// TODO: Fldigi locks up when server responds to its first request
 		// TODO: We don't exit run_server - again run in a separate thread

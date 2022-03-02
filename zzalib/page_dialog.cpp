@@ -26,7 +26,7 @@ void page_dialog::do_creation(int X, int Y) {
 // Default destructor
 page_dialog::~page_dialog()
 {
-	clear();
+	//clear();
 }
 
 // Default OK button - save confiuguation in settings

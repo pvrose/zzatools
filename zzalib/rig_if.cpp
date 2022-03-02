@@ -399,7 +399,7 @@ bool rig_if::check_voltage() {
 	double min_voltage_level;
 	double max_voltage_level;
 	rig_settings.get("Voltage Minimum Level", min_voltage_level, (13.8 * 0.85));
-	rig_settings.get("Voltage Maximum Level", min_voltage_level, (13.8 * 1.15));
+	rig_settings.get("Voltage Maximum Level", max_voltage_level, (13.8 * 1.15));
 	double vdd = vdd_meter();
 	// Check voltage - ignore if vdd_meter has returned NaN
 	if (!isnan(vdd) && (vdd < min_voltage_level || vdd > max_voltage_level)) {

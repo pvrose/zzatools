@@ -301,9 +301,9 @@ void status::update_progress(object_t object) {
 		progress_->maximum((float)item->max_value);
 		if (item->value == 0 || item->value == item->max_value || item->value - item->prev_value > item->max_value / 100) {
 			// redraw and allow scheduler to effect the redrawing if value has gone up by > 1% or is at start or finish
-			progress_->redraw();
 			// Without the below we don't see the progress bar move
-			//Fl::wait();
+			redraw();
+			Fl::wait();
 			item->prev_value = item->value;
 		}
 	}

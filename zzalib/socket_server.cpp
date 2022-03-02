@@ -257,7 +257,8 @@ int socket_server::rcv_packet() {
 			wait_time = 0;
 		}
 		else if (WSAGetLastError() == WSAEWOULDBLOCK) {
-			// Try again immediately  
+			// Try again immediately after letting FLTK in
+			Fl::wait();
 			wait_time = 0;
 		}
 		else if (WSAGetLastError() == WSAENOTSOCK && closing_) {

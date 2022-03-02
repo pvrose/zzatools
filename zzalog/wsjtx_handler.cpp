@@ -397,10 +397,12 @@ bool wsjtx_handler::has_server() {
 // Start the server
 void wsjtx_handler::run_server() {
 	if (!server_) {
+		status_->misc_status(ST_NOTE, "WSJT-X: Creating new socket");
 		server_ = new socket_server(socket_server::UDP, 2237);
 		server_->callback(rcv_request, cb_error_message);
 	}
 	if (!server_->has_server()) {
+		status_->misc_status(ST_NOTE, "WSJT-X: Starting socket");
 		server_->run_server();
 	}
 	menu_->update_items();
@@ -409,6 +411,7 @@ void wsjtx_handler::run_server() {
 // Close the server
 void wsjtx_handler::close_server() {
 	if (server_) {
+		status_->misc_status(ST_OK, "WSJT-X: Clocking socket");
 		server_->close_server();
 		delete server_;
 		server_ = nullptr;
