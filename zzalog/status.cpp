@@ -5,8 +5,8 @@
 #include "../zzalib/callback.h"
 #include "menu.h"
 #include "intl_widgets.h"
-#include "scratchpad.h"
 #include "main_window.h"
+#include "dashboard.h"
 
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Radio_Round_Button.H>
@@ -27,8 +27,8 @@ extern menu* menu_;
 extern void add_rig_if();
 extern main_window* main_window_;
 extern status* status_;
+extern dashboard* dashboard_;
 extern bool read_only_;
-extern scratchpad* scratchpad_;
 extern bool close_by_error_;
 
 // Constructor
@@ -236,7 +236,7 @@ void status::cb_bn_rig(Fl_Widget* bn, void* v) {
 		// Close the rig
 		rig_if_->close();
 		that->misc_status(ST_WARNING, "RIG: Closing rig connection");
-		scratchpad_->update();
+		dashboard_->update();
 	}
 	bn->redraw();
 }
@@ -299,7 +299,8 @@ void status::update_progress(object_t object) {
 		// Set range (0:max_value)
 		progress_->minimum(0.0);
 		progress_->maximum((float)item->max_value);
-		if (item->value == 0 || item->value == item->max_value || item->value - item->prev_value > item->max_value / 100) {
+		if (item->value == 0 || item->value == item->max_value ||
+			(item->value - item->prev_value) > (item->max_value / 100)) {
 			// redraw and allow scheduler to effect the redrawing if value has gone up by > 1% or is at start or finish
 			// Without the below we don't see the progress bar move
 			redraw();

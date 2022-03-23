@@ -35,7 +35,9 @@ namespace zzalog {
 	// Logging mode - used when initialising a record
 	enum logging_mode_t {
 		LM_OFF_AIR,     // Off-line logging (w/o radio)
-		LM_ON_AIR,      // Real -time logging (w/ or w/o radio)
+		LM_ON_AIR_CAT,  // Real -time logging - data from radio
+		LM_ON_AIR_COPY, // Real-time logging - data from selected QSO
+		LM_ON_AIR_TIME, // Real-time logging - date/time only
 		LM_IMPORTED,    // Import from modem software (w/ or w/o radio)
 	};
 	
@@ -92,7 +94,7 @@ namespace zzalog {
 		// Default constructor
 		record();
 		// Constructor that pre-populates certain fields
-		record(logging_mode_t type);
+		record(logging_mode_t type, record* copy_from);
 		// Copy constructor
 		record(const record& rhs);
 		// Assignment operator

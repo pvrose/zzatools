@@ -14,7 +14,7 @@
 #include "settings.h"
 #include "../zzalib/rig_if.h"
 #include "band_view.h"
-#include "scratchpad.h"
+#include "dashboard.h"
 
 using namespace zzalog;
 using namespace zzalib;
@@ -30,7 +30,7 @@ extern settings* config_;
 extern bool closing_;
 extern rig_if* rig_if_;
 extern band_view* band_view_;
-extern scratchpad* scratchpad_;
+extern dashboard* dashboard_;
 
 // Constructor
 tabbed_forms::tabbed_forms(int X, int Y, int W, int H, const char* label) :
@@ -126,8 +126,8 @@ void tabbed_forms::update_views(view* requester, hint_t hint, record_num_t recor
 	if (!rig_if_ && band_view_) {
 		band_view_->update(record_1);
 	}
-	// Update scratchpad
-	if (scratchpad_) scratchpad_->update();
+	// Update dashboard
+	if (dashboard_) dashboard_->update();
 }
 
 // Activate or deactivate the named object - if selecting another log_view change the navigation_book_

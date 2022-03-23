@@ -59,43 +59,34 @@ record::record()
 }
 
 // Constructor that pre-populates certain fields depending on the logging mode
-record::record(logging_mode_t type) {
+record::record(logging_mode_t type, record* copy_from) {
 	// Reset record
 	delete_contents();
 	
+	string mode;
+	string submode;
+	string timestamp = now(false, "%Y%m%d%H%M%S");
+
 	switch (type) {
-	case LM_ON_AIR: {
-		// Interactive mode - start QSO 
+	case LM_ON_AIR_CAT:
+		// Interactive mode - start QSO - update fields from radio 
 		// Get current date and time in UTC
-		string timestamp = now(false, "%Y%m%d%H%M%S");
-		item("QSO_DATE", timestamp.substr(0,8));
+		item("QSO_DATE", timestamp.substr(0, 8));
 		// Time as HHMMSS - always log seconds.
-		item("TIME_ON", timestamp.substr(8));  
+		item("TIME_ON", timestamp.substr(8));
 		item("QSO_DATE_OFF", string(""));
 		item("TIME_OFF", string(""));
 		item("CALL", string(""));
-		// If rig is connected - get information from rig
-		if (rig_if_ != nullptr) {
-			// Get frequency, mode and transmit power from rig
-			item("FREQ", rig_if_->get_frequency(true));
-			if (rig_if_->is_split()) {
-				item("FREQ_RX", rig_if_->get_frequency(false));
-			}
-			// Get mode - NB USB/LSB need further processing
-			string mode;
-			string submode;
-			rig_if_->get_string_mode(mode, submode);
-			item("MODE", mode);
-			item("SUBMODE", submode);
-			item("TX_PWR", rig_if_->get_tx_power());
+		// Get frequency, mode and transmit power from rig
+		item("FREQ", rig_if_->get_frequency(true));
+		if (rig_if_->is_split()) {
+			item("FREQ_RX", rig_if_->get_frequency(false));
 		}
-		else {
-			// otherwise leave blank so that we enter it manually later.
-			item("FREQ", string(""));
-			item("MODE", string(""));
-			item("SUBMODE", string(""));
-			item("TX_PWR", string(""));
-		}
+		// Get mode - NB USB/LSB need further processing
+		rig_if_->get_string_mode(mode, submode);
+		item("MODE", mode);
+		item("SUBMODE", submode);
+		item("TX_PWR", rig_if_->get_tx_power());
 		// initialise fields
 		item("RX_PWR", string(""));
 		item("RST_SENT", string(""));
@@ -104,7 +95,52 @@ record::record(logging_mode_t type) {
 		item("QTH", string(""));
 		item("GRIDSQUARE", string(""));
 		break;
-	}
+	case LM_ON_AIR_COPY:
+		// Interactive mode - start QSO - date/time only
+		// Get current date and time in UTC
+		item("QSO_DATE", timestamp.substr(0, 8));
+		// Time as HHMMSS - always log seconds.
+		item("TIME_ON", timestamp.substr(8));
+		item("QSO_DATE_OFF", string(""));
+		item("TIME_OFF", string(""));
+		item("CALL", string(""));
+		// otherwise leave blank so that we enter it manually later.
+		item("FREQ", copy_from->item("FREQ"));
+		item("FREQ_RX", copy_from->item("FREQ_RX"));
+		item("MODE", copy_from->item("MODE"));
+		item("SUBMODE", copy_from->item("SUBMODE"));
+		item("TX_PWR", copy_from->item("TX_PWR"));
+		// initialise fields
+		item("RX_PWR", string(""));
+		item("RST_SENT", string(""));
+		item("RST_RCVD", string(""));
+		item("NAME", string(""));
+		item("QTH", string(""));
+		item("GRIDSQUARE", string(""));
+		break;
+	case LM_ON_AIR_TIME: 
+		// Interactive mode - start QSO - date/time only
+		// Get current date and time in UTC
+		item("QSO_DATE", timestamp.substr(0, 8));
+		// Time as HHMMSS - always log seconds.
+		item("TIME_ON", timestamp.substr(8));
+		item("QSO_DATE_OFF", string(""));
+		item("TIME_OFF", string(""));
+		item("CALL", string(""));
+		// otherwise leave blank so that we enter it manually later.
+		item("FREQ", string(""));
+		item("FREQ_RX", string(""));
+		item("MODE", string(""));
+		item("SUBMODE", string(""));
+		item("TX_PWR", string(""));
+		// initialise fields
+		item("RX_PWR", string(""));
+		item("RST_SENT", string(""));
+		item("RST_RCVD", string(""));
+		item("NAME", string(""));
+		item("QTH", string(""));
+		item("GRIDSQUARE", string(""));
+		break;
 	case LM_OFF_AIR:
 	case LM_IMPORTED:
 		// Just initialise to empty strings
@@ -114,6 +150,7 @@ record::record(logging_mode_t type) {
 		item("TIME_OFF", string(""));
 		item("CALL", string(""));
 		item("FREQ", string(""));
+		item("FREQ_RX", string(""));
 		item("MODE", string(""));
 		item("TX_PWR", string(""));
 		item("RX_PWR", string(""));
@@ -124,6 +161,8 @@ record::record(logging_mode_t type) {
 		item("GRIDSQUARE", string(""));
 		break;
 	}
+	// Add rig, antenna and QTH details
+	user_details();
 }
 
 // Copy constructor
@@ -841,7 +880,7 @@ bool record::merge_records(record* record, bool allow_loc_mismatch /* = false */
 				merged = true;
 			}
 		}
-		else if (item_match  && (field_name == "TIME_ON" || field_name == "FREQ" || field_name == "RX_FREQ") && merge_data.length() > my_data.length()) {
+		else if (item_match  && (field_name == "TIME_ON" || field_name == "FREQ" || field_name == "FREQ_RX") && merge_data.length() > my_data.length()) {
 			// Merge data is more accurate
 			item(field_name, merge_data);
 			merged = true;
@@ -1029,7 +1068,7 @@ bool record::items_match(record* record, string field_name) {
 		return true;
 	}
 	// Special cases
-	else if (field_name == "GRIDSQUARE" || field_name == "MY_GRIDSQUARE" || field_name == "FREQ" || field_name == "RX_FREQ") {
+	else if (field_name == "GRIDSQUARE" || field_name == "MY_GRIDSQUARE" || field_name == "FREQ" || field_name == "FREQ_RX") {
 		// Special case for GRIDSQUARE and FREQ
 		// they compare if they are equal for the length
 		// of the shorter.
@@ -1159,7 +1198,7 @@ void record::end_record(logging_mode_t mode) {
 		// Always update MY_RIG ets.
 		user_details();
 		// On-air logging add date/time off
-		if (mode == LM_ON_AIR) {
+		if (mode == LM_ON_AIR_CAT || mode == LM_ON_AIR_TIME || mode == LM_ON_AIR_COPY) {
 			if (item("TIME_OFF") == "") {
 				// Add end date/time - current time of interactive entering
 				// Get current date and time in UTC

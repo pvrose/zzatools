@@ -34,7 +34,6 @@ main.cpp - application entry point
 #include "drawing.h"
 #include "intl_dialog.h"
 #include "band_view.h"
-#include "scratchpad.h"
 #include "dxa_if.h"
 #include "qrz_handler.h"
 #include "club_handler.h"
@@ -44,6 +43,7 @@ main.cpp - application entry point
 #include "resource.h"
 #include "hamlib/rig.h"
 #include "main_window.h"
+#include "dashboard.h"
 
 // C/C++ header files
 #include <ctime>
@@ -96,10 +96,10 @@ qrz_handler* qrz_handler_ = nullptr;
 main_window* main_window_ = nullptr;
 intl_dialog* intl_dialog_ = nullptr;
 band_view* band_view_ = nullptr;
-scratchpad* scratchpad_ = nullptr;
 club_handler* club_handler_ = nullptr;
 wsjtx_handler* wsjtx_handler_ = nullptr;
 fllog_emul* fllog_emul_ = nullptr;
+dashboard* dashboard_ = nullptr;
 
 #ifdef _WIN32
 dxa_if* dxatlas_ = nullptr;
@@ -143,8 +143,8 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 		// is no longer a rig to read.
 		if (rig_if_) {
 			rig_if_->close();
-			if (scratchpad_) {
-				scratchpad_->update();
+			if (dashboard_) {
+				dashboard_->update();
 			}
 		}
 		// Delete band view
@@ -153,9 +153,9 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 			band_view_ = nullptr;
 		}
 		// Delete scratchpad
-		if (scratchpad_) {
-			delete scratchpad_;
-			scratchpad_ = nullptr;
+		if (dashboard_) {
+			delete dashboard_;
+			dashboard_ = nullptr;
 		}
 		// Close DxAtlas connection
 		if (dxatlas_) {
@@ -428,7 +428,7 @@ void add_book(char* arg) {
 }
 
 // Update rig information in the various views - this is controlled by rig_if_.
-void cb_rig_timer() {
+void update_rig_status() {
 	// There may be a race hazard involving flrig and zzalog when I try and close zzalog
 	if (!closing_) {
 		// Band view may not have been created yet - only update if frequency has changed to remove annoying flicker
@@ -441,18 +441,19 @@ void cb_rig_timer() {
 		}
 		// Update scratchpad
 		string freq = rig_if_->get_frequency(true);
-		if (scratchpad_) {
+		if (dashboard_) {
 			string mode;
 			string submode;
 			rig_if_->get_string_mode(mode, submode);
 			string power = rig_if_->get_tx_power();
 			if (submode.length()) {
-				scratchpad_->rig_update(freq, submode, power);
+				dashboard_->rig_update(freq, submode, power);
 			}
 			else {
-				scratchpad_->rig_update(freq, mode, power);
+				dashboard_->rig_update(freq, mode, power);
 			}
 		}
+		// update_rig_status
 		// Update rig status
 		if (!band_view_ || band_view_->in_band(rig_if_->tx_frequency()/1000.0)) {
 			// We are at a valid frequency
@@ -475,7 +476,15 @@ void cb_rig_timer() {
 			// Out of band or not known
 			status_->rig_status(RS_ERROR, rig_if_->rig_info().c_str());
 		}
-		// Check SWR
+		// if rig crashed - delete it
+		if (!rig_if_ || !rig_if_->is_good()) {
+			delete rig_if_;
+			rig_if_ = nullptr;
+		}
+		// Update dashboard - display widgets
+		if (dashboard_) {
+			dashboard_->update();
+		}
 
 	}
 }
@@ -538,11 +547,11 @@ void add_rig_if() {
 		if (rig_if_ == nullptr) {
 			// No handler defined - assume manual logging in real-time
 			status_->misc_status(ST_WARNING, "RIG: No handler - assume real-time logging, no rig");
-			menu_->logging(LM_ON_AIR);
+			if (dashboard_) dashboard_->logging_mode(LM_ON_AIR_COPY);
 		}
 		else {
 			// Set callbacks
-			rig_if_->callback(cb_rig_timer, cb_freq_to_band, cb_error_message);
+			rig_if_->callback(update_rig_status, cb_freq_to_band, cb_error_message);
 			// Try and open the connection to the rig
 			bool done = false;
 			while (!done) {
@@ -554,7 +563,7 @@ void add_rig_if() {
 						status_->misc_status(ST_ERROR, "RIG: No handler - assume real-time logging, no rig");
 						done = true;
 						// Change logging mode from IMPORTED to ON_AIR. otherwise leave as was
-						if (menu_->logging() == LM_IMPORTED) menu_->logging(LM_ON_AIR);
+						if (dashboard_ && dashboard_->logging_mode() == LM_IMPORTED) dashboard_->logging_mode(LM_ON_AIR_COPY);
 					}
 					else {
 						// Connect to rig OK - see if we are a digital mode and if so start auto-import process
@@ -566,7 +575,7 @@ void add_rig_if() {
 							status_->misc_status(ST_WARNING, "RIG: Data mode - assume logging by data modem app");
 							// Change logging mode to IMPORTED as will be using a data-modem
 							done = true;
-							menu_->logging(LM_IMPORTED);
+							if (dashboard_) dashboard_->logging_mode(LM_IMPORTED);
 						}
 						// The first access to read the mode may fail
 						else if (!rig_if_->is_good()) {
@@ -577,15 +586,15 @@ void add_rig_if() {
 							string error_message = rig_if_->error_message("");
 							delete rig_if_;
 							rig_if_ = nullptr;
-							if (scratchpad_) {
-								scratchpad_->update();
+							if (dashboard_) {
+								dashboard_->update();
 							}
 							status_->misc_status(ST_ERROR, message);
 							// Put the error message from the rig in the rig status box
 							status_->rig_status(RS_ERROR, error_message.c_str());
 							done = true;
 							// Change logging mode from IMPORTED to ON_AIR. otherwise leave as was
-							if (menu_->logging() == LM_IMPORTED) menu_->logging(LM_ON_AIR);
+							if (dashboard_ && dashboard_->logging_mode() == LM_IMPORTED) dashboard_->logging_mode(LM_ON_AIR_COPY);
 						}
 						else {
 							// Rig seems OK - timer will have been started by rig_if_->open()
@@ -603,9 +612,13 @@ void add_rig_if() {
 							else {
 								status_->rig_status(RS_ERROR, rig_if_->rig_info().c_str());
 							}
+							if (dashboard_) {
+								dashboard_->update();
+								dashboard_->logging_mode(LM_ON_AIR_CAT);
+							}
 							done = true;
 							// Change logging mode to ON_AIR
-							menu_->logging(LM_ON_AIR);
+						if (dashboard_)	dashboard_->logging_mode(LM_ON_AIR_CAT);
 						}
 						// Note this is IC-7300 specific code
 						ic7300_table* mem_table = (ic7300_table*)(tabbed_forms_->get_view(OT_MEMORY));
@@ -693,31 +706,61 @@ void add_qsl_handlers() {
 	}
 }
 
-// Add a scratchpad
-void add_scratchpad() {
+//// Add a scratchpad
+//void add_scratchpad() {
+//	if (!closing_) {
+//		if (!dashboard_) {
+//			dashboard_ = new scratchpad;
+//		}
+//		int enabled;
+//		int top;
+//		int left;
+//		Fl_Preferences spad_settings(settings_, "Scratchpad");
+//		spad_settings.get("Enabled", enabled, (int)false);
+//		spad_settings.get("Top", top, 100);
+//		spad_settings.get("Left", left, 100);
+//		if (top < 0) top = 100;
+//		if (left < 0) left = 100;
+//		if (enabled) {
+//			// Show the scratchpad at the saved position
+//			dashboard_->show();
+//			dashboard_->position(left, top);
+//			status_->misc_status(ST_NOTE, "SCRATCHPAD: Opened");
+//		}
+//		else {
+//			// Hide it
+//			dashboard_->hide();
+//			status_->misc_status(ST_NOTE, "SCRATCHPAD: Closed");
+//		}
+//	}
+//}
+
+// Add operating dashboard
+void add_dashboard() {
 	if (!closing_) {
-		if (!scratchpad_) {
-			scratchpad_ = new scratchpad;
+		if (!dashboard_) {
+			dashboard_ = new dashboard(10, 10, "Operating Dashboard");
 		}
+		// Get the Operation window
 		int enabled;
 		int top;
 		int left;
-		Fl_Preferences spad_settings(settings_, "Scratchpad");
-		spad_settings.get("Enabled", enabled, (int)false);
-		spad_settings.get("Top", top, 100);
-		spad_settings.get("Left", left, 100);
+		Fl_Preferences dash_settings(settings_, "Dashboard");
+		dash_settings.get("Left", left, 100);
+		dash_settings.get("Top", top, 100);
+		dash_settings.get("Enabled", enabled, true);
 		if (top < 0) top = 100;
 		if (left < 0) left = 100;
 		if (enabled) {
 			// Show the scratchpad at the saved position
-			scratchpad_->show();
-			scratchpad_->position(left, top);
-			status_->misc_status(ST_NOTE, "SCRATCHPAD: Opened");
+			dashboard_->show();
+			dashboard_->position(left, top);
+			status_->misc_status(ST_NOTE, "DASHBOARD: Opened");
 		}
 		else {
 			// Hide it
-			scratchpad_->hide();
-			status_->misc_status(ST_NOTE, "SCRATCHPAD: Closed");
+			dashboard_->hide();
+			status_->misc_status(ST_NOTE, "DASHBOARD: Closed");
 		}
 	}
 }
@@ -800,7 +843,8 @@ void tidy() {
 	// Tidy memory - this is not perfect
 	// From inspection of the code - calling this a second time frees the memory
 	fl_message_title_default(nullptr);
-	delete scratchpad_;
+	delete dashboard_;
+	delete dashboard_;
 	delete dxatlas_;
 	delete wsjtx_handler_;
 	delete club_handler_;
@@ -919,8 +963,10 @@ int main(int argc, char** argv)
 	add_band_view();
 	// Add qsl_handlers - note add_rig_if() may have added URL handler
 	add_qsl_handlers();
-	// Add scratchpad
-	add_scratchpad();
+	//// Add scratchpad
+	//add_scratchpad();
+	// Add dashboard
+	add_dashboard();
 	// Add DxAtlas interface
 	add_dxatlas();
 	int code = 0;

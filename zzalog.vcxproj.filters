@@ -111,12 +111,6 @@
     <ClCompile Include="zzalog\report_tree.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="zzalog\rig_dialog.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\scratchpad.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="zzalog\search_dialog.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -135,7 +129,7 @@
     <ClCompile Include="zzalog\status.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="zzalog\stn_dialog.cpp">
+    <ClCompile Include="zzalog\dashboard.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="zzalog\tabbed_forms.cpp">
@@ -193,6 +187,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="zzalog\main_window.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zzalog\qth_dialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zzalog\alarm_dial.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -308,12 +308,6 @@
     <ClInclude Include="zzalog\resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="zzalog\rig_dialog.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\scratchpad.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="zzalog\search.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -335,7 +329,7 @@
     <ClInclude Include="zzalog\status.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="zzalog\stn_dialog.h">
+    <ClInclude Include="zzalog\dashboard.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="zzalog\tabbed_forms.h">
@@ -396,6 +390,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="zzalog\main_window.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zzalog\qth_dialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zzalog\alarm_dial.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

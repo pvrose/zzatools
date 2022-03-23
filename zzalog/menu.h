@@ -63,10 +63,6 @@ namespace zzalog {
 		static void cb_mi_valid8_qso(Fl_Widget* w, void* v);
 		// Log->Validate Log
 		static void cb_mi_valid8_log(Fl_Widget* w, void* v);
-		// Log->Mode->Off-air,On-air,Import
-		static void cb_mi_log_mode(Fl_Widget* w, void* v);
-		// Log->Mode->Radio Disc/Conn
-		static void cb_mi_log_radio(Fl_Widget* w, void* v);
 		// Log->New
 		static void cb_mi_log_new(Fl_Widget* w, void* v);
 		// Log->Save
@@ -77,18 +73,12 @@ namespace zzalog {
 		static void cb_mi_log_bulk(Fl_Widget* w, void* v);
 		// Log->Check Duplicates
 		static void cb_mi_log_dupes(Fl_Widget* w, void* v);
-		// Log->Scrathpad
-		static void cb_mi_log_spad(Fl_Widget* w, void* v);
 		// Log->New View->Main,Record,Scratchpad
 		static void cb_mi_log_view(Fl_Widget* w, void* v);
 		// Log->Retime QSO
 		static void cb_mi_log_retime(Fl_Widget* w, void* v);
-		// Log->Change->Rig/Aerial/QTH
-		static void cb_mi_oper_change(Fl_Widget* w, void* v);
-		// Log->Set->Rig/Aerial/QTH
-		static void cb_mi_oper_set(Fl_Widget* w, void* v);
-		// Operate->Start Session
-		static void cb_mi_oper_start(Fl_Widget* w, void* v);
+		// Log->Start/Stop Session
+		static void cb_mi_log_start(Fl_Widget* w, void* v);
 		// Log->Edit Header
 		static void cb_mi_log_edith(Fl_Widget* w, void* v);
 		// Extract->Clear
@@ -152,10 +142,6 @@ namespace zzalog {
 		// Help->Show Intl
 		static void cb_mi_help_intl(Fl_Widget* w, void * v);
 
-		// Set logging mode
-		void logging(logging_mode_t mode);
-		// Returns logging mode
-		logging_mode_t logging();
 		// Enable/disable menu
 		void enable(bool active);
 		// Set report mode
@@ -176,8 +162,6 @@ namespace zzalog {
 		void add_windows_items();
 
 	protected:
-		// Current logging mode
-		logging_mode_t logging_mode_;
 		// search criteria - remembered
 		search_criteria_t* criteria_;
 		// Enabled

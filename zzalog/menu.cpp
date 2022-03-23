@@ -26,7 +26,6 @@
 #include "../zzalib/page_dialog.h"
 #include "intl_dialog.h"
 #include "toolbar.h"
-#include "scratchpad.h"
 #include "calendar.h"
 #include "qrz_handler.h"
 #include "ic7300_table.h"
@@ -34,6 +33,7 @@
 #include "band_view.h"
 #include "dxa_if.h"
 #include "main_window.h"
+#include "dashboard.h"
 
 #include <sstream>
 #include <list>
@@ -66,12 +66,12 @@ extern bool read_only_;
 extern list<string> recent_files_;
 extern intl_dialog* intl_dialog_;
 extern toolbar* toolbar_;
-extern scratchpad* scratchpad_;
 extern qrz_handler* qrz_handler_;
 extern wsjtx_handler* wsjtx_handler_;
 extern band_view* band_view_;
 extern dxa_if* dxatlas_;
 extern time_t session_start_;
+extern dashboard* dashboard_;
 settings* config_ = nullptr;
 
 namespace zzalog {
@@ -81,220 +81,190 @@ namespace zzalog {
 	Fl_Menu_Item menu_items[] = {
 		// File operations
 	{ "&File", 0, 0, 0, FL_SUBMENU },
-	{ "&New", 0, menu::cb_mi_file_new, 0 },
-	{ "&Open", 0, menu::cb_mi_file_open, 0 },
-	{ "Rea&d", 0, menu::cb_mi_file_open, (void*)-1L },
-	{ "&Save", 0, menu::cb_mi_file_save, (void*)OT_MAIN },
-	{ "Save &As", 0, menu::cb_mi_file_saveas, (void*)OT_MAIN },
-	{ "&Close", 0, menu::cb_mi_file_close, 0 },
-	{ "Au&to Save", 0, menu::cb_mi_file_auto, 0, FL_MENU_TOGGLE | FL_MENU_DIVIDER },
-	{ "&Print", 0, menu::cb_mi_file_print, (void*)OT_MAIN, FL_MENU_DIVIDER },
-	{ "&Recent", 0, 0, 0, FL_SUBMENU | FL_MENU_DIVIDER },
-	// Extra menu items are dynamically inserted here 
-	{ 0 },
-	{ "&Backup", 0, menu::cb_mi_file_backup, (void*)false },
-	{ "Retrie&ve", 0, menu::cb_mi_file_backup, (void*)true },
-	{ 0 },
+		{ "&New", 0, menu::cb_mi_file_new, 0 },
+		{ "&Open", 0, menu::cb_mi_file_open, 0 },
+		{ "Rea&d", 0, menu::cb_mi_file_open, (void*)-1L },
+		{ "&Save", 0, menu::cb_mi_file_save, (void*)OT_MAIN },
+		{ "Save &As", 0, menu::cb_mi_file_saveas, (void*)OT_MAIN },
+		{ "&Close", 0, menu::cb_mi_file_close, 0 },
+		{ "Au&to Save", 0, menu::cb_mi_file_auto, 0, FL_MENU_TOGGLE | FL_MENU_DIVIDER },
+		{ "&Print", 0, menu::cb_mi_file_print, (void*)OT_MAIN, FL_MENU_DIVIDER },
+		{ "&Recent", 0, 0, 0, FL_SUBMENU | FL_MENU_DIVIDER },
+		// Extra menu items are dynamically inserted here 
+			{ 0 },
+		{ "&Backup", 0, menu::cb_mi_file_backup, (void*)false },
+		{ "Retrie&ve", 0, menu::cb_mi_file_backup, (void*)true },
+		{ 0 },
 
 	// Settings operations
 	{ "&Settings", 0, 0, 0, FL_SUBMENU },
-	{ "&Rig", 0, menu::cb_mi_settings, (void*)settings::DLG_RIG },
-	{ "Fi&les", 0, menu::cb_mi_settings, (void*)settings::DLG_FILES },
-	{ "&Web", 0, menu::cb_mi_settings, (void*)settings::DLG_WEB },
-	{ "&Station", 0, menu::cb_mi_settings, (void*)settings::DLG_STATION },
-	{ "&Fields", 0, menu::cb_mi_settings, (void*)settings::DLG_COLUMN },
-	{ "&QSL Design", 0, menu::cb_mi_settings, (void*)settings::DLG_QSL },
-	{ "&User settings", 0, menu::cb_mi_settings, (void*)settings::DLG_USER },
-	{ "All", 0, menu::cb_mi_settings, (void*)settings::DLG_ALL },
-	{ 0 },
+		{ "Fi&les", 0, menu::cb_mi_settings, (void*)settings::DLG_FILES },
+		{ "&Web", 0, menu::cb_mi_settings, (void*)settings::DLG_WEB },
+		{ "QT&H", 0, menu::cb_mi_settings, (void*)settings::DLG_QTH },
+		{ "&Fields", 0, menu::cb_mi_settings, (void*)settings::DLG_COLUMN },
+		{ "&QSL Design", 0, menu::cb_mi_settings, (void*)settings::DLG_QSL },
+		{ "&User settings", 0, menu::cb_mi_settings, (void*)settings::DLG_USER },
+		{ "&All", 0, menu::cb_mi_settings, (void*)settings::DLG_ALL },
+		{ 0 },
 
 	// Windows viewing
 	{ "&Windows", 0, 0, 0, FL_SUBMENU },
-	{ "&Show All", 0, menu::cb_mi_windows_all, (void*)true },
-	{ "&Hide All", 0, menu::cb_mi_windows_all, (void*)false },
-	// Extra items to be added here
-	{ 0 },
+		{ "&Show All", 0, menu::cb_mi_windows_all, (void*)true },
+		{ "&Hide All", 0, menu::cb_mi_windows_all, (void*)false },
+		// Extra items to be added here
+		{ 0 },
 
 	// Log navigation
 	{ "&Navigate", 0, 0, 0, FL_SUBMENU },
-	{ "&First", 0, menu::cb_mi_navigate, (void*)(NV_FIRST) },
-	{ "&Previous", 0, menu::cb_mi_navigate, (void*)(NV_PREV) },
-	{ "Ne&xt", 0, menu::cb_mi_navigate, (void*)(NV_NEXT) },
-	{ "&Last", 0, menu::cb_mi_navigate, (void*)(NV_LAST) },
-	{ "&Date", 0, menu::cb_mi_nav_date	, nullptr },
-	{ "&Record No.", 0, menu::cb_mi_nav_recnum, nullptr },
-	{ "F&ind", 0, 0, 0, FL_SUBMENU | FL_MENU_DIVIDER },
-	{ "&New", 0, menu::cb_mi_nav_find, (void*)true },
-	{ "Ne&xt", 0, menu::cb_mi_nav_find, (void*)false },
-	{ 0 },
+		{ "&First", 0, menu::cb_mi_navigate, (void*)(NV_FIRST) },
+		{ "&Previous", 0, menu::cb_mi_navigate, (void*)(NV_PREV) },
+		{ "Ne&xt", 0, menu::cb_mi_navigate, (void*)(NV_NEXT) },
+		{ "&Last", 0, menu::cb_mi_navigate, (void*)(NV_LAST) },
+		{ "&Date", 0, menu::cb_mi_nav_date	, nullptr },
+		{ "&Record No.", 0, menu::cb_mi_nav_recnum, nullptr },
+		{ "F&ind", 0, 0, 0, FL_SUBMENU | FL_MENU_DIVIDER },
+			{ "&New", 0, menu::cb_mi_nav_find, (void*)true },
+			{ "Ne&xt", 0, menu::cb_mi_nav_find, (void*)false },
+			{ 0 },
+		{ 0 },
 
 	// Log operation
-	{ 0 },
 	{ "&Log", 0, 0, 0, FL_SUBMENU },
-	{ "&Mode", 0, 0, 0, FL_SUBMENU | FL_MENU_DIVIDER },
-	{ "O&ff-air", 0, menu::cb_mi_log_mode, (void*)(LM_OFF_AIR) , FL_MENU_RADIO | FL_MENU_VALUE },
-	{ "O&n-air", 0, menu::cb_mi_log_mode, (void*)(LM_ON_AIR), FL_MENU_RADIO },
-	{ "&Import", 0, menu::cb_mi_log_mode, (void*)(LM_IMPORTED), FL_MENU_RADIO },
-	{ 0 },
-	{ "&Rig", 0, 0, 0, FL_SUBMENU },
-	{ "&Disconnect", 0, menu::cb_mi_log_radio, (void*)(false), FL_MENU_RADIO | FL_MENU_VALUE },
-	{ "&Connect", 0, menu::cb_mi_log_radio, (void*)(true), FL_MENU_RADIO },
-	{ 0 },
-	{ "&Use View", 0, 0, 0, FL_SUBMENU | FL_MENU_DIVIDER },
-	{ "Main &Log", 0, menu::cb_mi_log_view, (void*)(OT_MAIN), FL_MENU_RADIO | FL_MENU_VALUE },
-	{ "&Report View", 0, menu::cb_mi_log_view, (void*)(OT_REPORT), FL_MENU_RADIO  },
-	{ "&Scratchpad", 0, menu::cb_mi_log_view, (void*)(OT_SCRATCH), FL_MENU_RADIO  },
-	{ 0 },
-	{ "&New record", 0, menu::cb_mi_log_new, nullptr },
-	{ "&Save record", 0, menu::cb_mi_log_save, nullptr },
-	{ "Re&time record", 0, menu::cb_mi_log_retime, nullptr },
-	{ "&Cancel", 0, menu::cb_mi_log_del, (void*)false },
-	{ "&Delete record", 0, menu::cb_mi_log_del, (void*)true, FL_MENU_DIVIDER },
-	{ "&Parse record", 0, menu::cb_mi_parse_qso, 0 },
-	{ "&Unparse record", 0, menu::cb_mi_unparse_qso, 0 },
-	{ "R&eparse record", 0, menu::cb_mi_reparse_qso, 0 },
-	{ "&Validate record", 0, menu::cb_mi_valid8_qso, 0, FL_MENU_DIVIDER },
-	{ "Pa&rse log", 0, menu::cb_mi_parse_log, 0 },
-	{ "Val&idate log", 0, menu::cb_mi_valid8_log, 0, FL_MENU_DIVIDER },
-	{ "&Bulk changes", 0, menu::cb_mi_log_bulk, 0 },
-	{ "Chec&k Duplicates", 0, menu::cb_mi_log_dupes, 0 },
-	{ "Edit &Header", 0, menu::cb_mi_log_edith, 0 },
-	{ "Scratc&hpad", 0, menu::cb_mi_log_spad, 0, FL_MENU_TOGGLE },
-	{ 0 },
-
-	// Operating method
-	{ "&Operating", 0, 0, 0, FL_SUBMENU },
-	{ "C&hange QSO && Set Next", 0, 0, 0, FL_SUBMENU },
-	{ "Ri&g", 0, menu::cb_mi_oper_change, (void*)UD_RIG },
-	{ "&Aerial", 0, menu::cb_mi_oper_change, (void*)UD_AERIAL },
-	{ "&QTH", 0, menu::cb_mi_oper_change, (void*)UD_QTH },
-	{ "&Prop mode", 0, menu::cb_mi_oper_change, (void*)UD_PROP },
-	{ 0 },
-	{ "Se&t Next", 0, 0, 0, FL_SUBMENU },
-	{ "Ri&g", 0, menu::cb_mi_oper_set, (void*)UD_RIG },
-	{ "&Aerial", 0, menu::cb_mi_oper_set, (void*)UD_AERIAL },
-	{ "&QTH", 0, menu::cb_mi_oper_set, (void*)UD_QTH },
-	{ "&Prop mode", 0, menu::cb_mi_oper_set, (void*)UD_PROP },
-	{ 0 },
-	{ "&Start Session", 0, menu::cb_mi_oper_start, (void*)1L },
-	{ "&Clear Session", 0, menu::cb_mi_oper_start, (void*)0L },
-	{ 0 },
+		{ "&New record", 0, menu::cb_mi_log_new, nullptr },
+		{ "&Save record", 0, menu::cb_mi_log_save, nullptr },
+		{ "Re&time record", 0, menu::cb_mi_log_retime, nullptr },
+		{ "&Cancel", 0, menu::cb_mi_log_del, (void*)false },
+		{ "&Delete record", 0, menu::cb_mi_log_del, (void*)true, FL_MENU_DIVIDER },
+		{ "&Parse record", 0, menu::cb_mi_parse_qso, 0 },
+		{ "&Unparse record", 0, menu::cb_mi_unparse_qso, 0 },
+		{ "R&eparse record", 0, menu::cb_mi_reparse_qso, 0 },
+		{ "&Validate record", 0, menu::cb_mi_valid8_qso, 0, FL_MENU_DIVIDER },
+		{ "Pa&rse log", 0, menu::cb_mi_parse_log, 0 },
+		{ "Val&idate log", 0, menu::cb_mi_valid8_log, 0, FL_MENU_DIVIDER },
+		{ "&Bulk changes", 0, menu::cb_mi_log_bulk, 0 },
+		{ "Chec&k Duplicates", 0, menu::cb_mi_log_dupes, 0 },
+		{ "Edit &Header", 0, menu::cb_mi_log_edith, 0 },
+		{ "S&ession", 0, 0, 0, FL_SUBMENU },
+			{ "&Start Session", 0, menu::cb_mi_log_start, (void*)1L },
+			{ "Sto&p Session", 0, menu::cb_mi_log_start, (void*)0L },
+			{ 0 },
+		{ 0 },
 
 	// Log Extract and export operations
 	{ "E&xtract", 0, 0, 0, FL_SUBMENU },
-	{ "Clea&r", 0, menu::cb_mi_ext_clr, 0 },
-	{ "&Criteria", 0, menu::cb_mi_ext_crit, 0 },
-	{ "Re&do", 0, menu::cb_mi_ext_redo, 0 },
-	{ "&Quick", 0, 0, 0, FL_SUBMENU },
-	{ "No &Name", 0, menu::cb_mi_ext_special, (void*)extract_data::NO_NAME },
-	{ "No &QTH", 0, menu::cb_mi_ext_special, (void*)extract_data::NO_QTH },
-	{ "Small &Locator", 0, menu::cb_mi_ext_special, (void*)extract_data::LOCATOR },
-	{ 0 },
-	{ "&Display", 0, menu::cb_mi_ext_disp, 0, FL_MENU_DIVIDER },
-	{ "e&QSL", 0, menu::cb_mi_ext_qsl, (void*)extract_data::EQSL },
-	{ "&LotW", 0, menu::cb_mi_ext_qsl, (void*)extract_data::LOTW },
-	{ "Car&d", 0, menu::cb_mi_ext_qsl, (void*)extract_data::CARD },
-	{ "Club&Log", 0, menu::cb_mi_ext_qsl, (void*)extract_data::CLUBLOG, FL_MENU_DIVIDER },
-	{ "&Save", 0, menu::cb_mi_file_saveas, (void*)OT_EXTRACT },
-	{ "&Upload", 0, menu::cb_mi_ext_upload, 0 },
-	{ "&Print", 0, menu::cb_mi_ext_print, 0 },
-	{ "&Mark sent", 0, menu::cb_mi_ext_mark, 0 },
-	{ 0 },
+		{ "Clea&r", 0, menu::cb_mi_ext_clr, 0 },
+		{ "&Criteria", 0, menu::cb_mi_ext_crit, 0 },
+		{ "Re&do", 0, menu::cb_mi_ext_redo, 0 },
+		{ "&Quick", 0, 0, 0, FL_SUBMENU },
+			{ "No &Name", 0, menu::cb_mi_ext_special, (void*)extract_data::NO_NAME },
+			{ "No &QTH", 0, menu::cb_mi_ext_special, (void*)extract_data::NO_QTH },
+			{ "Small &Locator", 0, menu::cb_mi_ext_special, (void*)extract_data::LOCATOR },
+			{ 0 },
+		{ "&Display", 0, menu::cb_mi_ext_disp, 0, FL_MENU_DIVIDER },
+		{ "e&QSL", 0, menu::cb_mi_ext_qsl, (void*)extract_data::EQSL },
+		{ "&LotW", 0, menu::cb_mi_ext_qsl, (void*)extract_data::LOTW },
+		{ "Car&d", 0, menu::cb_mi_ext_qsl, (void*)extract_data::CARD },
+		{ "Club&Log", 0, menu::cb_mi_ext_qsl, (void*)extract_data::CLUBLOG, FL_MENU_DIVIDER },
+		{ "&Save", 0, menu::cb_mi_file_saveas, (void*)OT_EXTRACT },
+		{ "&Upload", 0, menu::cb_mi_ext_upload, 0 },
+		{ "&Print", 0, menu::cb_mi_ext_print, 0 },
+		{ "&Mark sent", 0, menu::cb_mi_ext_mark, 0 },
+		{ 0 },
 
 	// Log import operations
 	{ "&Import", 0, 0, 0, FL_SUBMENU },
-	{ "&File", 0, menu::cb_mi_imp_file, (void*)(long)import_data::FILE_IMPORT },
-	{ "File && Chec&k", 0, menu::cb_mi_imp_file, (void*)(long)import_data::FILE_UPDATE },
-	{ "Download e&QSL", 0, menu::cb_mi_download, (void*)(long)import_data::EQSL_UPDATE },
-	{ "Download &LotW", 0, menu::cb_mi_download, (void*)(long)import_data::LOTW_UPDATE, FL_MENU_DIVIDER },
-	{ "&WSJT-X UDP", 0, menu::cb_mi_imp_wsjtx, nullptr, FL_MENU_DIVIDER },
-	{ "&Merge", 0, menu::cb_mi_imp_merge, (void*)(long)import_data::FILE_IMPORT },
-	{ "&Cancel", 0, menu::cb_mi_imp_cancel, nullptr },
-	{ 0 },
+		{ "&File", 0, menu::cb_mi_imp_file, (void*)(long)import_data::FILE_IMPORT },
+		{ "File && Chec&k", 0, menu::cb_mi_imp_file, (void*)(long)import_data::FILE_UPDATE },
+		{ "Download e&QSL", 0, menu::cb_mi_download, (void*)(long)import_data::EQSL_UPDATE },
+		{ "Download &LotW", 0, menu::cb_mi_download, (void*)(long)import_data::LOTW_UPDATE, FL_MENU_DIVIDER },
+		{ "&WSJT-X UDP", 0, menu::cb_mi_imp_wsjtx, nullptr, FL_MENU_DIVIDER },
+		{ "&Merge", 0, menu::cb_mi_imp_merge, (void*)(long)import_data::FILE_IMPORT },
+		{ "&Cancel", 0, menu::cb_mi_imp_cancel, nullptr },
+		{ 0 },
 
 	// Prefix reference
-	{ "&Reference", 0, 0, 0, FL_SUBMENU },
-	{ "&Prefix", 0, 0, 0, FL_SUBMENU },
-	{ "&Clear", 0, menu::cb_mi_ref_filter, (void*)RF_NONE, FL_MENU_RADIO },
-	{ "&All", 0, menu::cb_mi_ref_filter, (void*)RF_ALL, FL_MENU_RADIO | FL_MENU_VALUE },
-	{ "E&xtracted", 0, menu::cb_mi_ref_filter, (void*)RF_EXTRACTED, FL_MENU_RADIO },
-	{ "&Selected record", 0, menu::cb_mi_ref_filter, (void*)RF_SELECTED, FL_MENU_RADIO | FL_MENU_DIVIDER },
-	{ "&Code", 0, menu::cb_mi_ref_items, (void*)RI_CODE,  FL_MENU_RADIO | FL_MENU_VALUE },
-	{ "&Prefix", 0, menu::cb_mi_ref_items, (void*)RI_NICK, FL_MENU_RADIO },
-	{ "&Name", 0, menu::cb_mi_ref_items, (void*)RI_NAME, FL_MENU_RADIO | FL_MENU_DIVIDER },
-	{ "Add &details", 0, menu::cb_mi_ref_details, nullptr, FL_MENU_TOGGLE },
-	{ "&Reload data", 0, menu::cb_mi_ref_reload, 0},
-	{ 0 },
-	{ "E&xception data", 0, 0, 0, FL_SUBMENU },
-	{ "&Reload data", 0, menu::cb_mi_ref_relexc, 0 },
-	{ 0 },
-	{ 0 },
+		{ "&Reference", 0, 0, 0, FL_SUBMENU },
+			{ "&Prefix", 0, 0, 0, FL_SUBMENU },
+			{ "&Clear", 0, menu::cb_mi_ref_filter, (void*)RF_NONE, FL_MENU_RADIO },
+			{ "&All", 0, menu::cb_mi_ref_filter, (void*)RF_ALL, FL_MENU_RADIO | FL_MENU_VALUE },
+			{ "E&xtracted", 0, menu::cb_mi_ref_filter, (void*)RF_EXTRACTED, FL_MENU_RADIO },
+			{ "&Selected record", 0, menu::cb_mi_ref_filter, (void*)RF_SELECTED, FL_MENU_RADIO | FL_MENU_DIVIDER },
+			{ "&Code", 0, menu::cb_mi_ref_items, (void*)RI_CODE,  FL_MENU_RADIO | FL_MENU_VALUE },
+			{ "&Prefix", 0, menu::cb_mi_ref_items, (void*)RI_NICK, FL_MENU_RADIO },
+			{ "&Name", 0, menu::cb_mi_ref_items, (void*)RI_NAME, FL_MENU_RADIO | FL_MENU_DIVIDER },
+			{ "Add &details", 0, menu::cb_mi_ref_details, nullptr, FL_MENU_TOGGLE },
+			{ "&Reload data", 0, menu::cb_mi_ref_reload, 0},
+			{ 0 },
+		{ "E&xception data", 0, 0, 0, FL_SUBMENU },
+			{ "&Reload data", 0, menu::cb_mi_ref_relexc, 0 },
+			{ 0 },
+		{ 0 },
 
 	// Log analysis reports
 	{ "Re&port", 0, 0, 0, FL_SUBMENU },
-	{ "&Clear", 0, menu::cb_mi_rep_filter, (void*)RF_NONE, FL_MENU_RADIO },
-	{ "&All", 0, menu::cb_mi_rep_filter, (void*)RF_ALL, FL_MENU_RADIO | FL_MENU_VALUE },
-	{ "E&xtracted", 0, menu::cb_mi_rep_filter, (void*)RF_EXTRACTED, FL_MENU_RADIO },
-	{ "&Selected record", 0, menu::cb_mi_rep_filter, (void*)RF_SELECTED, FL_MENU_RADIO | FL_MENU_DIVIDER },
-	{ "Level &1", 0, 0, 0, FL_SUBMENU },
-	{ "&Entities", 0, menu::cb_mi_rep_level, (void*)((1 << 8) + RC_DXCC), FL_MENU_RADIO },
-	{ "Entities/&States", 0, menu::cb_mi_rep_level, (void*)((1 << 8) + RC_PAS), FL_MENU_RADIO | FL_MENU_VALUE },
-	{ "&Bands", 0, menu::cb_mi_rep_level, (void*)((1 << 8) + RC_BAND), FL_MENU_RADIO },
-	{ "&Modes", 0, menu::cb_mi_rep_level, (void*)((1 << 8) + RC_MODE), FL_MENU_RADIO },
-	{ "&CQ Zones", 0, menu::cb_mi_rep_level, (void*)((1 << 8) + RC_CQ_ZONE), FL_MENU_RADIO },
-	{ "&ITU Zones", 0, menu::cb_mi_rep_level, (void*)((1 << 8) + RC_ITU_ZONE), FL_MENU_RADIO },
-	{ 0 },
-	{ "Level &2", 0, 0, 0, FL_SUBMENU },
-	{ "&Entities", 0, menu::cb_mi_rep_level, (void*)((2 << 8) + RC_DXCC), FL_MENU_RADIO },
-	{ "Entities/&States", 0, menu::cb_mi_rep_level, (void*)((2 << 8) + RC_PAS), FL_MENU_RADIO },
-	{ "&Bands", 0, menu::cb_mi_rep_level, (void*)((2 << 8) + RC_BAND), FL_MENU_RADIO },
-	{ "&Modes", 0, menu::cb_mi_rep_level, (void*)((2 << 8) + RC_MODE), FL_MENU_RADIO },
-	{ "&CQ Zones", 0, menu::cb_mi_rep_level, (void*)((2 << 8) + RC_CQ_ZONE), FL_MENU_RADIO },
-	{ "&ITU Zones", 0, menu::cb_mi_rep_level, (void*)((2 << 8) + RC_ITU_ZONE), FL_MENU_RADIO },
-	{ "&Nothing", 0, menu::cb_mi_rep_level, (void*)((2 << 8) + RC_EMPTY), FL_MENU_RADIO | FL_MENU_VALUE },
-	{ 0 },
-	{ "Level &3", 0, 0, 0, FL_SUBMENU },
-	{ "&Entities", 0, menu::cb_mi_rep_level, (void*)((3 << 8) + RC_DXCC), FL_MENU_RADIO },
-	{ "Entities/&States", 0, menu::cb_mi_rep_level, (void*)((3 << 8) + RC_PAS), FL_MENU_RADIO },
-	{ "&Bands", 0, menu::cb_mi_rep_level, (void*)((3 << 8) + RC_BAND), FL_MENU_RADIO },
-	{ "&Modes", 0, menu::cb_mi_rep_level, (void*)((3 << 8) + RC_MODE), FL_MENU_RADIO },
-	{ "&CQ Zones", 0, menu::cb_mi_rep_level, (void*)((3 << 8) + RC_CQ_ZONE), FL_MENU_RADIO },
-	{ "&ITU Zones", 0, menu::cb_mi_rep_level, (void*)((3 << 8) + RC_ITU_ZONE), FL_MENU_RADIO },
-	{ "&Nothing", 0, menu::cb_mi_rep_level, (void*)((3 << 8) + RC_EMPTY), FL_MENU_RADIO | FL_MENU_VALUE },
-	{ 0 },
-	{ 0 },
+		{ "&Clear", 0, menu::cb_mi_rep_filter, (void*)RF_NONE, FL_MENU_RADIO },
+		{ "&All", 0, menu::cb_mi_rep_filter, (void*)RF_ALL, FL_MENU_RADIO | FL_MENU_VALUE },
+		{ "E&xtracted", 0, menu::cb_mi_rep_filter, (void*)RF_EXTRACTED, FL_MENU_RADIO },
+		{ "&Selected record", 0, menu::cb_mi_rep_filter, (void*)RF_SELECTED, FL_MENU_RADIO | FL_MENU_DIVIDER },
+		{ "Level &1", 0, 0, 0, FL_SUBMENU },
+			{ "&Entities", 0, menu::cb_mi_rep_level, (void*)((1 << 8) + RC_DXCC), FL_MENU_RADIO },
+			{ "Entities/&States", 0, menu::cb_mi_rep_level, (void*)((1 << 8) + RC_PAS), FL_MENU_RADIO | FL_MENU_VALUE },
+			{ "&Bands", 0, menu::cb_mi_rep_level, (void*)((1 << 8) + RC_BAND), FL_MENU_RADIO },
+			{ "&Modes", 0, menu::cb_mi_rep_level, (void*)((1 << 8) + RC_MODE), FL_MENU_RADIO },
+			{ "&CQ Zones", 0, menu::cb_mi_rep_level, (void*)((1 << 8) + RC_CQ_ZONE), FL_MENU_RADIO },
+			{ "&ITU Zones", 0, menu::cb_mi_rep_level, (void*)((1 << 8) + RC_ITU_ZONE), FL_MENU_RADIO },
+			{ 0 },
+		{ "Level &2", 0, 0, 0, FL_SUBMENU },
+			{ "&Entities", 0, menu::cb_mi_rep_level, (void*)((2 << 8) + RC_DXCC), FL_MENU_RADIO },
+			{ "Entities/&States", 0, menu::cb_mi_rep_level, (void*)((2 << 8) + RC_PAS), FL_MENU_RADIO },
+			{ "&Bands", 0, menu::cb_mi_rep_level, (void*)((2 << 8) + RC_BAND), FL_MENU_RADIO },
+			{ "&Modes", 0, menu::cb_mi_rep_level, (void*)((2 << 8) + RC_MODE), FL_MENU_RADIO },
+			{ "&CQ Zones", 0, menu::cb_mi_rep_level, (void*)((2 << 8) + RC_CQ_ZONE), FL_MENU_RADIO },
+			{ "&ITU Zones", 0, menu::cb_mi_rep_level, (void*)((2 << 8) + RC_ITU_ZONE), FL_MENU_RADIO },
+			{ "&Nothing", 0, menu::cb_mi_rep_level, (void*)((2 << 8) + RC_EMPTY), FL_MENU_RADIO | FL_MENU_VALUE },
+			{ 0 },
+		{ "Level &3", 0, 0, 0, FL_SUBMENU },
+			{ "&Entities", 0, menu::cb_mi_rep_level, (void*)((3 << 8) + RC_DXCC), FL_MENU_RADIO },
+			{ "Entities/&States", 0, menu::cb_mi_rep_level, (void*)((3 << 8) + RC_PAS), FL_MENU_RADIO },
+			{ "&Bands", 0, menu::cb_mi_rep_level, (void*)((3 << 8) + RC_BAND), FL_MENU_RADIO },
+			{ "&Modes", 0, menu::cb_mi_rep_level, (void*)((3 << 8) + RC_MODE), FL_MENU_RADIO },
+			{ "&CQ Zones", 0, menu::cb_mi_rep_level, (void*)((3 << 8) + RC_CQ_ZONE), FL_MENU_RADIO },
+			{ "&ITU Zones", 0, menu::cb_mi_rep_level, (void*)((3 << 8) + RC_ITU_ZONE), FL_MENU_RADIO },
+			{ "&Nothing", 0, menu::cb_mi_rep_level, (void*)((3 << 8) + RC_EMPTY), FL_MENU_RADIO | FL_MENU_VALUE },
+			{ 0 },
+		{ 0 },
 
 	// Accessing IC-7300 specific features
 	{ "I&C-7300", 0, 0, 0, FL_SUBMENU },
-	{ "&None", 0, menu::cb_mi_ic7300, (void*)VT_NONE, FL_MENU_RADIO },
-	{ "&Memories", 0, menu::cb_mi_ic7300, (void*)VT_MEMORIES, FL_MENU_RADIO },
-	{ "&Scope bands", 0, menu::cb_mi_ic7300, (void*)VT_SCOPE_BANDS, FL_MENU_RADIO },
-	{ "&User bands", 0, menu::cb_mi_ic7300, (void*)VT_USER_BANDS, FL_MENU_RADIO },
-	{ "&CW messages", 0, menu::cb_mi_ic7300, (void*)VT_CW_MESSAGES, FL_MENU_RADIO },
-	{ 0 },
+		{ "&None", 0, menu::cb_mi_ic7300, (void*)VT_NONE, FL_MENU_RADIO },
+		{ "&Memories", 0, menu::cb_mi_ic7300, (void*)VT_MEMORIES, FL_MENU_RADIO },
+		{ "&Scope bands", 0, menu::cb_mi_ic7300, (void*)VT_SCOPE_BANDS, FL_MENU_RADIO },
+		{ "&User bands", 0, menu::cb_mi_ic7300, (void*)VT_USER_BANDS, FL_MENU_RADIO },
+		{ "&CW messages", 0, menu::cb_mi_ic7300, (void*)VT_CW_MESSAGES, FL_MENU_RADIO },
+		{ 0 },
 
 	// Web-based information
 	{ "&Information", 0, 0, 0, FL_SUBMENU },
-	{ "&QRZ.com", 0, menu::cb_mi_info_qrz },
-	{ "Google &Maps", 0, menu::cb_mi_info_map },
-	{ "QSO &Web-site", 0, menu::cb_mi_info_web },
-	{ 0 },
+		{ "&QRZ.com", 0, menu::cb_mi_info_qrz },
+		{ "Google &Maps", 0, menu::cb_mi_info_map },
+		{ "QSO &Web-site", 0, menu::cb_mi_info_web },
+		{ 0 },
 
 	// Program help features
 	{ "&Help", 0, 0, 0, FL_SUBMENU },
-	{ "&About", 0, menu::cb_mi_help_abt },
-	{ "&Status", 0, 0, 0, FL_SUBMENU },
-	{ "View &Status", 0, menu::cb_mi_help_view, nullptr, FL_MENU_DIVIDER },
-	{ "&Note", 0, menu::cb_mi_help_level, (void*)ST_NOTE, FL_MENU_RADIO | FL_MENU_VALUE },
-	{ "&Done", 0, menu::cb_mi_help_level, (void*)ST_OK, FL_MENU_RADIO },
-	{ "&Warning", 0, menu::cb_mi_help_level, (void*)ST_WARNING, FL_MENU_RADIO },
-	{ "&Error", 0, menu::cb_mi_help_level, (void*)ST_ERROR, FL_MENU_RADIO },
-	{ "Se&vere", 0, menu::cb_mi_help_level, (void*)ST_SEVERE, FL_MENU_RADIO },
-	{ "&Fatal", 0, menu::cb_mi_help_level, (void*)ST_FATAL, FL_MENU_RADIO | FL_MENU_DIVIDER},
-	{ "&Append File", 0 , menu::cb_mi_help_append, 0, FL_MENU_TOGGLE},
-	{ 0 },
-	{ "&Intl", 0, menu::cb_mi_help_intl, nullptr, FL_MENU_TOGGLE },
-	{ 0 },
+		{ "&About", 0, menu::cb_mi_help_abt },
+		{ "&Status", 0, 0, 0, FL_SUBMENU },
+			{ "View &Status", 0, menu::cb_mi_help_view, nullptr, FL_MENU_DIVIDER },
+			{ "&Note", 0, menu::cb_mi_help_level, (void*)ST_NOTE, FL_MENU_RADIO | FL_MENU_VALUE },
+			{ "&Done", 0, menu::cb_mi_help_level, (void*)ST_OK, FL_MENU_RADIO },
+			{ "&Warning", 0, menu::cb_mi_help_level, (void*)ST_WARNING, FL_MENU_RADIO },
+			{ "&Error", 0, menu::cb_mi_help_level, (void*)ST_ERROR, FL_MENU_RADIO },
+			{ "Se&vere", 0, menu::cb_mi_help_level, (void*)ST_SEVERE, FL_MENU_RADIO },
+			{ "&Fatal", 0, menu::cb_mi_help_level, (void*)ST_FATAL, FL_MENU_RADIO | FL_MENU_DIVIDER},
+			{ "&Append File", 0 , menu::cb_mi_help_append, 0, FL_MENU_TOGGLE},
+			{ 0 },
+		{ "&Intl", 0, menu::cb_mi_help_intl, nullptr, FL_MENU_TOGGLE },
+		{ 0 },
 	{ 0 }
 	};
 }
@@ -304,7 +274,6 @@ extern void add_data();
 extern void main_window_label(string text);
 extern void backup_file(bool force, bool retrieve = false);
 extern void set_recent_file(string filename);
-extern void add_scratchpad();
 
 // Constructor
 menu::menu(int X, int Y, int W, int H, const char* label) :
@@ -316,8 +285,6 @@ menu::menu(int X, int Y, int W, int H, const char* label) :
 	add_recent_files();
 	// default text size - just larger than default font size
 	textsize(FONT_SIZE + 1);
-    // Default to on-air (w/ or w/o rig)
-	logging(LM_ON_AIR);
 	criteria_ = nullptr;
 	Fl_Preferences spad_settings(settings_, "Scratchpad");
 	spad_settings.get("Edit view", (int&)editting_view_, OT_REPORT);
@@ -337,8 +304,8 @@ menu::~menu()
 void menu::cb_mi_file_new(Fl_Widget* w, void* v) {
 	menu* that = ancestor_view<menu>(w);
 	// Gracefully stop any import in progress - restart with ON_AIR logging - if no rig will drop to OFF_AIR
-	if (that->logging() == LM_IMPORTED) {
-		import_data_->stop_update(LM_ON_AIR, false);
+	if (dashboard_->logging_mode() == LM_IMPORTED) {
+		import_data_->stop_update(LM_ON_AIR_CAT, false);
 	}
 	while (!import_data_->update_complete()) Fl::wait();
 	if (book_->modified_record() | book_->new_record()) {
@@ -428,7 +395,7 @@ void menu::cb_mi_file_open(Fl_Widget* w, void* v) {
 		// get book to load it.
 		if (book_->load_data(filename)) {
 			// Set off-air logging, clear any search results, select last entry
-			that->logging(LM_OFF_AIR);
+			dashboard_->logging_mode(LM_OFF_AIR);
 			tabbed_forms_->activate_pane(OT_MAIN, true);
 			book_->navigate(NV_LAST);
 			// Set the filename in the window title and recent file list
@@ -568,8 +535,8 @@ void menu::cb_mi_windows_all(Fl_Widget* w, void* v) {
 	menu* that = ancestor_view<menu>(w);
 	if (show_all) {
 		main_window_->show();
+		dashboard_->show();
 		status_->file_viewer()->show();
-		scratchpad_->show();
 #ifdef _WIN32
 		dxatlas_->show();
 #endif
@@ -579,8 +546,8 @@ void menu::cb_mi_windows_all(Fl_Widget* w, void* v) {
 	else {
 		// Minimise the main window rather than hide it. When all windows are hidden we end the app
 		main_window_->iconize();
+		dashboard_->hide();
 		status_->file_viewer()->hide();
-		scratchpad_->hide();
 #ifdef _WIN32
 		dxatlas_->hide();
 #endif
@@ -847,116 +814,116 @@ void menu::cb_mi_valid8_log(Fl_Widget* w, void* v) {
 	fl_cursor(FL_CURSOR_DEFAULT);
 }
 
-// Log->Mode->Off-air,On-air,Import - change logging mode
-// v is enum logging_mode_t to select logging mode
-void menu::cb_mi_log_mode(Fl_Widget* w, void* v) {
-	menu* that = ancestor_view<menu>(w);
-	// v has new logging mode
-	logging_mode_t next_mode = (logging_mode_t)(long)v;
-
-	// Stop current logging mode
-	switch (that->logging_mode_) {
-	case LM_OFF_AIR:
-		// Currently entering a QSO - ask Save or Quit
-		if (book_->modified_record() || book_->new_record()) {
-			fl_beep(FL_BEEP_QUESTION);
-			switch (fl_choice("You are currently modifying a record? Save or Quit?", "Save?", "Quit?", nullptr)) {
-			case 0:
-				book_->save_record();
-				break;
-			case 1:
-				book_->delete_record(false);
-				break;
-			}
-		}
-		break;
-	case LM_ON_AIR:
-		// Currently entering a QSO - ask Save or Quit
-		if (book_->modified_record() || book_->new_record()) {
-			fl_beep(FL_BEEP_QUESTION);
-			switch (fl_choice("You are currently modifying a record? Save or Quit?", "Save?", "Quit?", nullptr)) {
-			case 0:
-				book_->save_record();
-				break;
-			case 1:
-				book_->delete_record(false);
-				break;
-			}
-		}
-		// We can be importing while on-air.
-	case LM_IMPORTED:
-		// Stop importing - and wait for it to finish
-		import_data_->stop_update(next_mode, false);
-		while (!import_data_->update_complete()) Fl::wait();
-		status_->progress("Import cancelled!", OT_IMPORT);
-		if (next_mode == LM_IMPORTED) {
-			next_mode = LM_OFF_AIR;
-		}
-		break;
-	}
-
-	// Start new logging mode
-	that->logging(next_mode);
-	switch (that->logging_mode_) {
-	case LM_OFF_AIR:
-		// Let user have mode and stop auto-save
-		status_->misc_status(ST_NOTE, "LOG: Mode set to off-air logging");
-		book_->enable_save(false);
-		// Update enabled menu items
-		that->update_items();
-		break;
-	case LM_ON_AIR:
-		status_->misc_status(ST_NOTE, "LOG: Mode set to real-time (on-air) logging");
-		break;
-	case LM_IMPORTED:
-		// Reset navigation mode
-		tabbed_forms_->activate_pane(OT_MAIN, true);
-		// start import_process
-		status_->misc_status(ST_NOTE, "LOG: Mode set to auto-import from data modems");
-		import_data_->start_auto_update();
-		break;
-	}
-}
-
-// Set radio disconnected or connected
-void menu::cb_mi_log_radio(Fl_Widget* w, void* v) {
-	menu* that = ancestor_view<menu>(w);
-	switch ((bool)(long)v) {
-	case false:
-		// Disconnect radio
-		if (rig_if_) {
-			status_->misc_status(ST_NOTE, "RIG: Closing rig connection by user");
-			// Close rig
-			rig_if_->close();
-			delete rig_if_;
-			rig_if_ = nullptr;
-			import_data_->stop_update(that->logging(), false);
-			while (!import_data_->update_complete()) Fl::wait(0);
-			that->logging(LM_OFF_AIR);
-			// Scratchpad updates band_view
-			scratchpad_->update();
-		}
-		break;
-	case true:
-		// Connect radio
-		// Currently entering a QSO - ask Save or Quit
-		if (book_->modified_record() || book_->new_record()) {
-			fl_beep(FL_BEEP_QUESTION);
-			switch (fl_choice("You are currently modifying a record? Save or Quit?", "Save?", "Quit?", nullptr)) {
-			case 0:
-				book_->save_record();
-				break;
-			case 1:
-				book_->delete_record(false);
-				break;
-			}
-		}
-		if (!rig_if_) {
-			add_rig_if();
-		}
-		break;
-	}
-}
+//// Log->Mode->Off-air,On-air,Import - change logging mode
+//// v is enum logging_mode_t to select logging mode
+//void menu::cb_mi_log_mode(Fl_Widget* w, void* v) {
+//	menu* that = ancestor_view<menu>(w);
+//	// v has new logging mode
+//	logging_mode_t next_mode = (logging_mode_t)(long)v;
+//
+//	// Stop current logging mode
+//	switch (that->logging_mode_) {
+//	case LM_OFF_AIR:
+//		// Currently entering a QSO - ask Save or Quit
+//		if (book_->modified_record() || book_->new_record()) {
+//			fl_beep(FL_BEEP_QUESTION);
+//			switch (fl_choice("You are currently modifying a record? Save or Quit?", "Save?", "Quit?", nullptr)) {
+//			case 0:
+//				book_->save_record();
+//				break;
+//			case 1:
+//				book_->delete_record(false);
+//				break;
+//			}
+//		}
+//		break;
+//	case LM_ON_AIR:
+//		// Currently entering a QSO - ask Save or Quit
+//		if (book_->modified_record() || book_->new_record()) {
+//			fl_beep(FL_BEEP_QUESTION);
+//			switch (fl_choice("You are currently modifying a record? Save or Quit?", "Save?", "Quit?", nullptr)) {
+//			case 0:
+//				book_->save_record();
+//				break;
+//			case 1:
+//				book_->delete_record(false);
+//				break;
+//			}
+//		}
+//		// We can be importing while on-air.
+//	case LM_IMPORTED:
+//		// Stop importing - and wait for it to finish
+//		import_data_->stop_update(next_mode, false);
+//		while (!import_data_->update_complete()) Fl::wait();
+//		status_->progress("Import cancelled!", OT_IMPORT);
+//		if (next_mode == LM_IMPORTED) {
+//			next_mode = LM_OFF_AIR;
+//		}
+//		break;
+//	}
+//
+//	// Start new logging mode
+//	that->logging(next_mode);
+//	switch (that->logging_mode_) {
+//	case LM_OFF_AIR:
+//		// Let user have mode and stop auto-save
+//		status_->misc_status(ST_NOTE, "LOG: Mode set to off-air logging");
+//		book_->enable_save(false);
+//		// Update enabled menu items
+//		that->update_items();
+//		break;
+//	case LM_ON_AIR:
+//		status_->misc_status(ST_NOTE, "LOG: Mode set to real-time (on-air) logging");
+//		break;
+//	case LM_IMPORTED:
+//		// Reset navigation mode
+//		tabbed_forms_->activate_pane(OT_MAIN, true);
+//		// start import_process
+//		status_->misc_status(ST_NOTE, "LOG: Mode set to auto-import from data modems");
+//		import_data_->start_auto_update();
+//		break;
+//	}
+//}
+//
+//// Set radio disconnected or connected
+//void menu::cb_mi_log_radio(Fl_Widget* w, void* v) {
+//	menu* that = ancestor_view<menu>(w);
+//	switch ((bool)(long)v) {
+//	case false:
+//		// Disconnect radio
+//		if (rig_if_) {
+//			status_->misc_status(ST_NOTE, "RIG: Closing rig connection by user");
+//			// Close rig
+//			rig_if_->close();
+//			delete rig_if_;
+//			rig_if_ = nullptr;
+//			import_data_->stop_update(that->logging(), false);
+//			while (!import_data_->update_complete()) Fl::wait(0);
+//			that->logging(LM_OFF_AIR);
+//			// Scratchpad updates band_view
+//			dashboard_->update();
+//		}
+//		break;
+//	case true:
+//		// Connect radio
+//		// Currently entering a QSO - ask Save or Quit
+//		if (book_->modified_record() || book_->new_record()) {
+//			fl_beep(FL_BEEP_QUESTION);
+//			switch (fl_choice("You are currently modifying a record? Save or Quit?", "Save?", "Quit?", nullptr)) {
+//			case 0:
+//				book_->save_record();
+//				break;
+//			case 1:
+//				book_->delete_record(false);
+//				break;
+//			}
+//		}
+//		if (!rig_if_) {
+//			add_rig_if();
+//		}
+//		break;
+//	}
+//}
 
 // Log->Use View->
 // v is which view
@@ -972,7 +939,7 @@ void menu::cb_mi_log_new(Fl_Widget* w, void* v) {
 	// Force main log book
 	tabbed_forms_->activate_pane(OT_MAIN, true);
 	// Create a new record - on or off-air
-	book_->new_record(that->logging());
+	book_->new_record(dashboard_->logging_mode());
 	// Open log view
 	switch (that->editting_view_) {
 	case OT_MAIN:
@@ -980,10 +947,7 @@ void menu::cb_mi_log_new(Fl_Widget* w, void* v) {
 		tabbed_forms_->activate_pane(that->editting_view_, true);
 		break;
 	case OT_SCRATCH:
-		if (!scratchpad_) {
-			add_scratchpad();
-		}
-		scratchpad_->show();
+		dashboard_->show();
 		break;
 	}
 }
@@ -1129,86 +1093,73 @@ void menu::cb_mi_log_edith(Fl_Widget* w, void* v) {
 	navigation_book_->edit_header();
 }
 
-// Log->Scratchpad
-// v is unsued
-void menu::cb_mi_log_spad(Fl_Widget* w, void* v) {
-	// Get the value of the checked menu item
-	Fl_Menu_* menu = (Fl_Menu_*)w;
-	const Fl_Menu_Item* item = menu->mvalue();
-	bool value = item->value();
-	// Remeber it
-	Fl_Preferences spad_settings(settings_, "Scratchpad");
-	spad_settings.set("Enabled", (int)value);
-	add_scratchpad();
-}
-
-// Log->Change->Rig/Aerial/QTH - open a dialog to specify new rig/aerial/QTH to use
-// v is enum use_dialog_t: UD_RIG, UD_AERIAL, UD_QTH, UD_PROP
-void menu::cb_mi_oper_change(Fl_Widget* w, void* v) {
-	use_dialog_t type = (use_dialog_t)(long)v;
-	// Open dialog for the type - dialog changes settings
-	use_dialog* dialog = new use_dialog(type);
-	if (dialog->display() == BN_OK) {
-		string path;
-		switch (type) {
-		case UD_RIG:
-			path = "Rigs";
-			break;
-		case UD_AERIAL:
-			path = "Aerials";
-			break;
-		case UD_QTH:
-			path = "QTHs";
-			break;
-		case UD_PROP:
-			path = "Propagation Mode";
-			break;
-		}
-		// get the modified settings
-		Fl_Preferences station_settings(settings_, "Stations");
-		Fl_Preferences use_settings(station_settings, path.c_str());
-		char * temp;
-		use_settings.get("Current", temp, "");
-		// Change the field in the current record 
-		switch (type)
-		{
-		case UD_RIG:
-			book_->get_record()->item("MY_RIG", string(temp));
-			break;
-		case UD_AERIAL:
-			book_->get_record()->item("MY_ANTENNA", string(temp));
-			break;
-		case UD_QTH:
-			book_->get_record()->item("APP_ZZA_QTH", string(temp));
-			break;
-		case UD_PROP:
-			book_->get_record()->item("PROP_MODE", string(temp));
-		}
-		free(temp);
-	}
-	book_->modified(true);
-	// Update views with the modified record
-	book_->selection(-1, HT_MINOR_CHANGE);
-
-	Fl::delete_widget(dialog);
-}
-
-// Log->Set->Rig/Aerial/QTH - open a dialog to specify new rig/aerial/QTH to use
-// v is enum use_dialog_t: UD_RIG, UD_AERIAL, UD_QTH or UD_PROP
-void menu::cb_mi_oper_set(Fl_Widget* w, void* v) {
-	use_dialog_t type = (use_dialog_t)(long)v;
-	// Open dialog for the type - dialog changes settings
-	use_dialog* dialog = new use_dialog(type);
-	if (dialog->display() != BN_OK) {
-		status_->misc_status(ST_WARNING, "LOG: Set rig or aerial or QTH cancelled by user");
-	}
-	book_->modified(true);
-	Fl::delete_widget(dialog);
-}
+//// Log->Change->Rig/Aerial/QTH - open a dialog to specify new rig/aerial/QTH to use
+//// v is enum use_dialog_t: UD_RIG, UD_AERIAL, UD_QTH, UD_PROP
+//void menu::cb_mi_oper_change(Fl_Widget* w, void* v) {
+//	use_dialog_t type = (use_dialog_t)(long)v;
+//	// Open dialog for the type - dialog changes settings
+//	use_dialog* dialog = new use_dialog(type);
+//	if (dialog->display() == BN_OK) {
+//		string path;
+//		switch (type) {
+//		case UD_RIG:
+//			path = "Rigs";
+//			break;
+//		case UD_AERIAL:
+//			path = "Aerials";
+//			break;
+//		case UD_QTH:
+//			path = "QTHs";
+//			break;
+//		case UD_PROP:
+//			path = "Propagation Mode";
+//			break;
+//		}
+//		// get the modified settings
+//		Fl_Preferences station_settings(settings_, "Stations");
+//		Fl_Preferences use_settings(station_settings, path.c_str());
+//		char * temp;
+//		use_settings.get("Current", temp, "");
+//		// Change the field in the current record 
+//		switch (type)
+//		{
+//		case UD_RIG:
+//			book_->get_record()->item("MY_RIG", string(temp));
+//			break;
+//		case UD_AERIAL:
+//			book_->get_record()->item("MY_ANTENNA", string(temp));
+//			break;
+//		case UD_QTH:
+//			book_->get_record()->item("APP_ZZA_QTH", string(temp));
+//			break;
+//		case UD_PROP:
+//			book_->get_record()->item("PROP_MODE", string(temp));
+//		}
+//		free(temp);
+//	}
+//	book_->modified(true);
+//	// Update views with the modified record
+//	book_->selection(-1, HT_MINOR_CHANGE);
+//
+//	Fl::delete_widget(dialog);
+//}
+//
+//// Log->Set->Rig/Aerial/QTH - open a dialog to specify new rig/aerial/QTH to use
+//// v is enum use_dialog_t: UD_RIG, UD_AERIAL, UD_QTH or UD_PROP
+//void menu::cb_mi_oper_set(Fl_Widget* w, void* v) {
+//	use_dialog_t type = (use_dialog_t)(long)v;
+//	// Open dialog for the type - dialog changes settings
+//	use_dialog* dialog = new use_dialog(type);
+//	if (dialog->display() != BN_OK) {
+//		status_->misc_status(ST_WARNING, "LOG: Set rig or aerial or QTH cancelled by user");
+//	}
+//	book_->modified(true);
+//	Fl::delete_widget(dialog);
+//}
 
 // Operate->Start Session
 // v is long: 0 is now, 1 is selected QSO
-void menu::cb_mi_oper_start(Fl_Widget* w, void* v) {
+void menu::cb_mi_log_start(Fl_Widget* w, void* v) {
 	long mode = (long)v;
 	switch (mode) {
 	case 0:
@@ -1231,8 +1182,6 @@ void menu::cb_mi_oper_start(Fl_Widget* w, void* v) {
 	status_->misc_status(ST_NOTE, message);
 	tabbed_forms_->update_views(nullptr, HT_FORMAT, -1);
 }
-
-
 
 // Import->File
 // v defines subsequent load type (FILE_IMPORT or FILE_UPDATE
@@ -1732,52 +1681,6 @@ void menu::add_recent_files() {
 	}
 }
 
-// set the menu to the state of the logging mode - check mark the appropriate menu item
-void menu::logging(logging_mode_t mode) {
-	int index_conn = find_index("&Log/&Rig/&Connect");
-	int index_disc = find_index("&Log/&Rig/&Disconnect");
-	int index_offair = find_index("&Log/&Mode/O&ff-air");
-	int index_onair = find_index("&Log/&Mode/O&n-air");
-	int index_import = find_index("&Log/&Mode/&Import");
-	// Change the mode 
-	switch (mode) {
-	case LM_OFF_AIR:
-		// Tick Off-Air only
-		this->mode(index_offair, this->mode(index_offair) | FL_MENU_VALUE);
-		this->mode(index_onair, this->mode(index_onair) & ~FL_MENU_VALUE);
-		this->mode(index_import, this->mode(index_import) & ~FL_MENU_VALUE);
-		break;
-	case LM_ON_AIR:
-		// Tick On-Air only
-		this->mode(index_offair, this->mode(index_offair) & ~FL_MENU_VALUE);
-		this->mode(index_onair, this->mode(index_onair) | FL_MENU_VALUE);
-		this->mode(index_import, this->mode(index_import) & ~FL_MENU_VALUE);
-		break;
-	case LM_IMPORTED:
-		// Tick Import only
-		this->mode(index_offair, this->mode(index_offair) & ~FL_MENU_VALUE);
-		this->mode(index_onair, this->mode(index_onair) & ~FL_MENU_VALUE);
-		this->mode(index_import, this->mode(index_import) | FL_MENU_VALUE);
-		break;
-	}
-	if (rig_if_) {
-		// Tick Connect only
-		this->mode(index_conn, this->mode(index_conn) | FL_MENU_VALUE);
-		this->mode(index_disc, this->mode(index_disc) & ~FL_MENU_VALUE);
-	} else {
-		// Tick Disconnect only
-		this->mode(index_conn, this->mode(index_conn) & ~FL_MENU_VALUE);
-		this->mode(index_disc, this->mode(index_disc) | FL_MENU_VALUE);
-	}
-	// Save logging mode for every-one to access
-	logging_mode_ = mode;
-}
-
-// returns the logging mode
-logging_mode_t menu::logging() {
-	return logging_mode_;
-}
-
 // Set check marks on the menu to represent the actual report tree mode and filter
 void menu::report_mode(vector<report_cat_t> report_mode, report_filter_t filter) {
 	// Set the Report->Level N->* menu items
@@ -2165,8 +2068,6 @@ void menu::update_items() {
 		else {
 			mode(index_web, mode(index_web) | FL_MENU_INACTIVE);
 		}
-		// Update logging commands and rig status
-		logging(logging());
 		// Update Import->WSJT-X UDP
 		if (listening_wsjtx) {
 			mode(index_wsjtx, mode(index_wsjtx) | FL_MENU_INACTIVE);
@@ -2224,8 +2125,8 @@ void menu::add_windows_items() {
 	// Get indices to &Windows
 	int index = find_index("&Windows/&Hide All");
 	insert(index, "&Windows/&Main", 0, cb_mi_windows, main_window_, FL_MENU_TOGGLE);
+	insert(index, "&Windows/Das&hboard", 0, cb_mi_windows, dashboard_, FL_MENU_TOGGLE);
 	insert(index, "&Windows/S&tatus Viewer", 0, cb_mi_windows, status_->file_viewer(), FL_MENU_TOGGLE);
-	insert(index, "&Windows/S&cratchpad", 0, cb_mi_windows, scratchpad_, FL_MENU_TOGGLE);
 #ifdef _WIN32
 	insert(index, "&Windows/&DxAtlas Control", 0, cb_mi_windows, dxatlas_, FL_MENU_TOGGLE);
 #endif
@@ -2237,8 +2138,8 @@ void menu::add_windows_items() {
 void menu::update_windows_items() {
 	// Get indices to menu items
 	int index_main = find_index("&Windows/&Main");
+	int index_oper = find_index("&Windows/Das&hboard");
 	int index_status = find_index("&Windows/S&tatus Viewer");
-	int index_spad = find_index("&Windows/S&cratchpad");
 #ifdef _WIN32
 	int index_dxatlas = find_index("&Windows/&DxAtlas Control");
 #endif
@@ -2254,21 +2155,21 @@ void menu::update_windows_items() {
 		}
 	}
 
+	if (dashboard_ && index_oper != -1) {
+		if (dashboard_->visible()) {
+			mode(index_oper, mode(index_oper) | FL_MENU_VALUE);
+		}
+		else {
+			mode(index_oper, mode(index_oper) & ~FL_MENU_VALUE);
+		}
+	}
+
 	if (status_ && status_->file_viewer() && index_status != -1) {
 		if (status_->file_viewer()->visible()) {
 			mode(index_status, mode(index_status) | FL_MENU_VALUE);
 		}
 		else {
 			mode(index_status, mode(index_status) & ~FL_MENU_VALUE);
-		}
-	}
-
-	if (scratchpad_ && index_spad != -1) {
-		if (scratchpad_->visible()) {
-			mode(index_spad, mode(index_spad) | FL_MENU_VALUE);
-		}
-		else {
-			mode(index_spad, mode(index_spad) & ~FL_MENU_VALUE);
 		}
 	}
 

@@ -22,10 +22,9 @@ namespace zzalog {
 		// The tab types in the settings dialog
 		enum cfg_dialog_t {
 			DLG_FORMAT,
-			DLG_RIG,
 			DLG_FILES,
 			DLG_WEB,
-			DLG_STATION,
+			DLG_QTH,
 			DLG_COLUMN,
 			DLG_ADIF,
 			DLG_QSL,

@@ -1,0 +1,414 @@
+#ifndef __STN_DIALOG__
+#define __STN_DIALOG__
+
+
+#include "../zzalib/callback.h"
+#include "../zzalib/rig_if.h"
+#include "record.h"
+#include "intl_widgets.h"
+#include "alarm_dial.h"
+
+#include <string>
+#include <vector>
+#include <map>
+#include <list>
+#include <set>
+
+#include <FL/Fl_Widget.H>
+#include <FL/Fl_Table.H>
+#include <FL/Fl_Browser.H>
+#include <FL/Fl_Preferences.H>
+#include <FL/Fl_Int_Input.H>
+#include <FL/Fl_Group.H>
+#include <FL/Fl_Radio_Round_Button.H>
+#include <FL/Fl_Choice.H>
+#include <FL/Fl_Check_Button.H>
+#include <FL/Fl_Input.H>
+#include <FL/Fl_Spinner.H>
+#include <FL/Fl_Button.H>
+
+using namespace std;
+using namespace zzalib;
+
+namespace zzalog {
+
+	// Version of intl_editor that handles events such as clicking on words
+	class spad_editor :
+		public intl_editor
+	{
+	public:
+		spad_editor(int x, int y, int w, int h);
+		~spad_editor();
+
+		int handle(int event);
+
+	protected:
+
+	};
+
+	// This class provides the dialog to chage the current station settings: rig, antenna and QTH
+	class dashboard :
+		public Fl_Window
+	{
+		// A bit of a misnomer - but the category of settings
+		enum equipment_t {
+			RIG,
+			ANTENNA,
+			NONE
+		};
+
+		// Use item destination
+		enum use_item_t {
+			SELECTED_ONLY,
+			SELECTED_NEW,
+			NEW_ONLY
+		};
+
+		// This class provides individual grouping for rig, antenna.
+		class common_grp :
+			public Fl_Group
+		{
+
+		public:
+
+			common_grp(int X, int Y, int W, int H, const char* label);
+			virtual ~common_grp();
+
+			// get settings
+			virtual void load_values();
+			// create the form
+			virtual void create_form(int X, int Y);
+			// enable/disable widgets
+			virtual void enable_widgets() {};
+			// save values
+			virtual void save_values();
+			// button callback - add
+			static void cb_bn_add(Fl_Widget* w, void* v);
+			// button callback - delete
+			static void cb_bn_del(Fl_Widget* w, void* v);
+			// button callback - all/active items
+			static void cb_bn_all(Fl_Widget* w, void* v);
+			// button callback - active/deactive
+			static void cb_bn_activ8(Fl_Widget* w, void* v);
+			// choice callback
+			static void cb_ch_stn(Fl_Widget* w, void* v);
+			// Multi-browser callback
+			static void cb_mb_bands(Fl_Widget* w, void* v);
+			// Item
+			static void cb_ch_item(Fl_Widget* w, void* v);
+
+		protected:
+			// Add an item
+			virtual void add_item();
+			// Delete item
+			virtual void delete_item(string item);
+			// Update derived fields
+			virtual void update_item();
+			// Save derived fields
+			virtual void save_item();
+			// Choice widget
+			Fl_Widget* choice_;
+			// Active widget
+			Fl_Widget* active_;
+			// Band select widget
+			Fl_Widget* band_browser_;
+			// selected item
+			int selected_item_;
+			// all items - active/inactive
+			list<string> all_items_;
+			// current item active
+			bool item_active_;
+			// display all items
+			bool display_all_items_;
+			// The settings
+			Fl_Preferences* my_settings_;
+
+		public:
+			// (re)populate the choice widget
+			void populate_choice();
+			// Populate band widget
+			void populate_band();
+			// type
+			equipment_t type_;
+			// in text for Fl_Preference
+			string settings_name_;
+		};
+
+
+	// dashboard
+	public:
+		dashboard(int W, int H, const char* label);
+		virtual ~dashboard();
+
+		// Override to tell menu when it opens and closes
+		virtual int handle(int event);
+
+		// get settings - rely on individual groups to do it
+		virtual void load_values();
+		// create the form
+		virtual void create_form(int X, int Y);
+		// enable/disable widgets - rely on individual groups to do it
+		virtual void enable_widgets();
+		// save values
+		virtual void save_values();
+		// Get bands and order them
+		void order_bands();
+
+		// Callback for rig handler selection (radio)
+		static void cb_rad_handler(Fl_Widget* w, void* v);
+		// Callback - model choice
+		static void cb_ch_model(Fl_Widget* w, void* v);
+		// Callback - hamlib serial ports
+		static void cb_ch_port(Fl_Widget* w, void* v);
+		// Callback - hamlib baudrate
+		static void cb_ch_baud(Fl_Widget* w, void* v);
+		// Callback override caps
+		static void cb_ch_over(Fl_Widget* w, void* v);
+		// Callback all ports
+		static void cb_bn_all(Fl_Widget* w, void* v);
+		// Callback - flrig IP address
+		static void cb_ip_ipa(Fl_Widget* w, void* v);
+		// Callback - flrig port number
+		static void cb_ip_portn(Fl_Widget* w, void* v);
+		// Callback  flrig resource indicator
+		static void cb_ip_resource(Fl_Widget* w, void* v);
+		// Callback - SWR alarm
+		static void cb_alarm_swr(Fl_Widget* w, void* v);
+		// Callback - Power alarm
+		static void cb_alarm_pwr(Fl_Widget* w, void* v);
+		// Callback - Vdd alarm
+		static void cb_alarm_vdd(Fl_Widget* w, void* v);
+		// Callback - Polling intervals
+		static void cb_ctr_pollfast(Fl_Widget* w, void* v);
+		static void cb_ctr_pollslow(Fl_Widget* w, void* v);
+		// Callback - Connect button
+		static void cb_bn_connect(Fl_Widget* w, void* v);
+		// Callback - use rig/ant buttons
+		static void cb_bn_use_items(Fl_Widget* w, void* v);
+		// Callback - close button
+		static void cb_close(Fl_Widget* w, void* v);
+		// Call back - general button action
+		static void cb_action(Fl_Widget* w, void* v);
+		// Callback - start button
+		static void cb_start(Fl_Widget* w, void* v);
+		// Callback - save button
+		static void cb_save(Fl_Widget* w, void* v);
+		// Callback - cancel button
+		static void cb_cancel(Fl_Widget* w, void* v);
+		// Callback - Worked B4? button
+		static void cb_wkb4(Fl_Widget* w, void* v);
+		// Callback - Parse callsign
+		static void cb_parse(Fl_Widget* w, void* v);
+		// Callback - frequency input
+		static void cb_ip_freq(Fl_Widget* w, void* v);
+		// Callback - band choice
+		static void cb_ch_mode(Fl_Widget* w, void* v);
+		// Callback - power input
+		static void cb_ip_power(Fl_Widget* w, void* v);
+
+		// Set font
+		void set_font(Fl_Font font, Fl_Fontsize size);
+
+		// Actions attached to the various buttons and keyboard shortcuts
+		enum actions {
+			WRITE_CALL,
+			WRITE_NAME,
+			WRITE_QTH,
+			WRITE_GRID,
+			WRITE_RST_SENT,
+			WRITE_RST_RCVD,
+			WRITE_FIELD
+		};
+
+		//populate port choice
+		void populate_port_choice();
+		// Populate model choice
+		void populate_model_choice();
+		//Populate baud rate choice
+		void populate_baud_choice();
+		// Populate QTH choice
+		void populate_qth_choice();
+		// Get logging mode
+		logging_mode_t logging_mode();
+		// Set logging mode
+		void logging_mode(logging_mode_t mode);
+		// Called when rig is read
+		void rig_update(string frequency, string mode, string power);
+		// Called when rig is closed
+		void update();
+
+	protected:
+		// Create the various widgets sets
+		void create_use_widgets(int &curr_x, int &curr_y);
+		void create_spad_widgets(int& curr_x, int& curr_y);
+		void create_cat_widgets(int& curr_x, int& curr_y);
+		void create_alarm_widgets(int& curr_x, int& curr_y);
+
+		// Enable the various sets of widgets
+		void enable_use_widgets();
+		void enable_spad_widgets();
+		void enable_cat_widgets();
+		void enable_alarm_widgets();
+
+		// Set of bands in frequency order
+		list<string> ordered_bands_;
+		// Display all ports
+		bool all_ports_;
+		// Hamlib parameters 
+		struct hamlib_data {
+			// Manufacturer
+			string mfr;
+			// Model
+			string model;
+			// Portname
+			string port_name;
+			// Baud rate
+			string baud_rate = "9600";
+			// Model ID - as knoen by hamlib
+			int model_id;
+			// Override caps
+			bool override_caps = false;
+		};
+		// Flrig parameters
+		struct flrig_data {
+			// IP address
+			string ip_address;
+			// Port name
+			int port;
+			// Resurce
+			string resource;
+		};
+		// Alarm parameters
+		struct alarm_data {
+			float swr_warning;
+			float swr_error;
+			float power_warning;
+			float voltage_minimum;
+			float voltage_maximum;
+		};
+		// Rig parameters
+		struct rig_data {
+			// Rig currently in use
+			bool active;
+			// Bands supported by rig
+			list<string> intended_bands;
+			// CAT handler
+			rig_handler_t handler;
+			// Polling intervals
+			double fast_poll_interval;
+			double slow_poll_interval;
+			// Hamlib data
+			hamlib_data hamlib_params;
+			// Flrig data
+			flrig_data flrig_params;
+			// Alarm data
+			alarm_data alarms;
+		};
+		// Antenna parameters
+		struct antenna_data {
+			// Antenna currently in use
+			bool active;
+			//Bands supported
+			list<string> intended_bands;
+		};
+		map<string, rig_data> rig_info_;
+		map <string, antenna_data> antenna_info_;
+		// Logging mode
+		logging_mode_t logging_mode_;
+		// Selecetd CAT but not connecyed
+		bool wait_connect_;
+		// Widgets have been xcreated
+		bool created_;
+		// Selected equipment
+		string selected_qth_;
+		string selected_rig_;
+		string selected_antenna_;
+		// Next name
+		string next_qth_;
+		string next_rig_;
+		string next_antenna_;
+		// Avaiable QTHs
+		set<string> all_qths_;
+		enum { SWR_OK, SWR_WARNING, SWR_ERROR } previous_swr_alarm_, current_swr_alarm_;
+		enum { POWER_OK, POWER_WARNING } previous_pwr_alarm_, current_pwr_alarm_;
+		enum { VDD_UNDER, VDD_OK, VDD_OVER } previous_vdd_alarm_, current_vdd_alarm_;
+
+		// Groups
+		common_grp* rig_grp_;
+		common_grp* antenna_grp_;
+		Fl_Group* hamlib_grp_;
+		Fl_Group* flrig_grp_;
+		Fl_Group* norig_grp_;
+		Fl_Group* cat_grp_;
+		Fl_Group* cat_sel_grp_;
+		Fl_Group* alarms_grp_;
+		// widgets
+		// Hamlib widgets to revalue when rig selected changes
+		Fl_Widget* mfr_choice_;
+		Fl_Widget* rig_model_choice_;
+		Fl_Widget* port_if_choice_;
+		Fl_Widget* baud_rate_choice_;
+		Fl_Widget* rig_choice_;
+		Fl_Widget* override_check_;
+		Fl_Widget* show_all_ports_;
+
+		Fl_Choice* ch_qth_;
+
+		// The text items
+		Fl_Text_Buffer* buffer_;
+		// The editor
+		spad_editor* editor_;
+		// Save button
+		Fl_Button* bn_save_;
+		// Cancel button
+		Fl_Button* bn_cancel_;
+		// Start button
+		Fl_Button* bn_start_;
+		// Frequency input
+		Fl_Input* ip_freq_;
+		// Mode choice
+		Fl_Choice* ch_mode_;
+		// Power input
+		Fl_Input* ip_power_;
+		// Group for freq/power/mode
+		Fl_Group* grp_fpm_;
+		// Logging mode
+		Fl_Choice* ch_logmode_;
+		Fl_Radio_Round_Button* bn_nocat_;
+		Fl_Radio_Round_Button* bn_hamlib_;
+		Fl_Radio_Round_Button* bn_flrig_;
+		Fl_Choice* ch_model_;
+		Fl_Choice* ch_mfr_;
+		Fl_Check_Button* bn_useall_;
+		Fl_Choice* ch_baudrate_;
+		Fl_Check_Button* bn_override_;
+		Fl_Input* ip_ipaddress_;
+		Fl_Int_Input* ip_portrnum_;
+		intl_input* ip_resource_;
+		Fl_Spinner* ctr_pollfast_;
+		Fl_Spinner* ctr_pollslow_;
+		alarm_dial* dial_swr_;
+		alarm_dial* dial_pwr_;
+		alarm_dial* dial_vdd_;
+		Fl_Button* connect_bn_;
+		Fl_Widget* ant_rig_box_;
+
+		// The record being entered or used
+		record* record_;
+		// The fieldname
+		string field_;
+		// Record is new recorde
+		bool enterring_record_;
+
+		// Scratchpad editor font
+		Fl_Font font_;
+		Fl_Fontsize fontsize_;
+
+		const static int WEDITOR = 400;
+
+
+	};
+
+}
+#endif
+

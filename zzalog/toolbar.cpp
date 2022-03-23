@@ -12,6 +12,8 @@
 #include "intl_widgets.h"
 #include "extract_data.h"
 #include "main_window.h"
+#include "dashboard.h"
+#include "import_data.h"
 
 #include <FL/Fl_Button.H>
 #include <FL/Fl_RGB_Image.H>
@@ -30,6 +32,8 @@ extern tabbed_forms* tabbed_forms_;
 extern pfx_data* pfx_data_;
 extern status* status_;
 extern main_window* main_window_;
+extern dashboard* dashboard_;
+extern import_data* import_data_;
 
 // Constructor - most buttons invoke a menu item
 toolbar::toolbar(int X, int Y, int W, int H, const char* label) :
@@ -199,25 +203,18 @@ toolbar::toolbar(int X, int Y, int W, int H, const char* label) :
 	bn->tooltip("Upload extracted records");
 	add(bn);
 	curr_x += H + TOOL_GAP;
-	// Log->Mode->On-air
+	// TODO: Now in Operation not menu.....
+	// Connect/disconnect rig
 	bn = new Fl_Button(curr_x, Y, H, H, 0);
-	bn->callback(cb_bn_menu, (void*)"&Log/&Rig/&Connect");
+	bn->callback(cb_bn_rig, nullptr);
 	bn->when(FL_WHEN_RELEASE);
 	bn->image(new Fl_RGB_Image(ICON_RIG_ON, 16, 16, 4));
-	bn->tooltip("Switch to on-air mode (connect rig)");
-	add(bn);
-	curr_x += H;
-	// Log->Mode->Off-air
-	bn = new Fl_Button(curr_x, Y, H, H, 0);
-	bn->callback(cb_bn_menu, (void*)"&Log/&Rig/&Disconnect");
-	bn->when(FL_WHEN_RELEASE);
-	bn->image(new Fl_RGB_Image(ICON_RIG_OFF, 16, 16, 4));
-	bn->tooltip("Switch to off-air mode (disconnect rig)");
+	bn->tooltip("Connect or disconnect rig");
 	add(bn);
 	curr_x += H;
 	// Log->Mode->Import
 	bn = new Fl_Button(curr_x, Y, H, H, 0);
-	bn->callback(cb_bn_menu, (void*)"&Log/&Mode/&Import");
+	bn->callback(cb_bn_import, nullptr);
 	bn->when(FL_WHEN_RELEASE);
 	bn->image(new Fl_RGB_Image(ICON_IMPORT, 16, 16, 4));
 	bn->tooltip("Switch to auto-import data mode (disconnects rig and gets data from other apps)");
@@ -441,7 +438,7 @@ void toolbar::cb_bn_extract(Fl_Widget* w, void* v) {
 void toolbar::cb_bn_explain(Fl_Widget* w, void* v) {
 	toolbar* that = ancestor_view<toolbar>(w);
 	// Create a temporary record to parse theh callsign
-	record* tip_record = new record(LM_ON_AIR);
+	record* tip_record = new record(LM_OFF_AIR, nullptr);
 	string message = "";
 	// Set the callsign in the temporary record
 	tip_record->item("CALL", to_upper(that->search_text_));
@@ -452,6 +449,18 @@ void toolbar::cb_bn_explain(Fl_Widget* w, void* v) {
 	// Set the timeout on the tooltip
 	Fl::add_timeout(Fl_Tooltip::delay(), cb_timer_tip, tw);
 	delete tip_record;
+}
+
+// Set logging mode
+// v is not used
+void toolbar::cb_bn_import(Fl_Widget* w, void* v) {
+	import_data_->start_auto_update();
+}
+
+// Connect or disconnect rig
+// v is not used
+void toolbar::cb_bn_rig(Fl_Widget* w, void* v) {
+	dashboard::cb_bn_connect(dashboard_, nullptr);
 }
 
 // Return the minimum width required
@@ -502,6 +511,19 @@ void toolbar::update_items() {
 			else {
 				// It exists, is inactive or a selected radio item, deactivate the toolbar button
 				w->deactivate();
+			}
+		}
+		else if (w->callback() == &dashboard::cb_bn_connect) {
+			if (w->user_data() && dashboard_ && dashboard_->logging_mode() == LM_ON_AIR_CAT) {
+				w->deactivate();
+			}
+			else if (!w->user_data() && dashboard_ && dashboard_->logging_mode() != LM_ON_AIR_CAT) {
+				w->deactivate();
+			}
+			else if (!dashboard_) {
+				w->deactivate();
+			} else {
+				w->activate();
 			}
 		}
 	}

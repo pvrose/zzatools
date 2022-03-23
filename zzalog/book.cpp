@@ -20,6 +20,7 @@
 #include "club_handler.h"
 #include "main_window.h"
 #include "../zzalib/rig_if.h"
+#include "dashboard.h"
 
 // C/C++ header files
 #include <ctime>
@@ -48,6 +49,7 @@ extern eqsl_handler* eqsl_handler_;
 extern lotw_handler* lotw_handler_;
 extern club_handler* club_handler_;
 extern rig_if* rig_if_;
+extern dashboard* dashboard_;
 extern bool read_only_;
 extern void main_window_label(string text);
 
@@ -558,6 +560,8 @@ record_num_t book::selection(record_num_t num_item, hint_t hint /* = HT_SELECTED
 		store_data();
 #endif // _DEBUG
 	}
+	// Update dashboard
+	if(dashboard_) dashboard_->update();
 	// Update menu item activeness
 	menu_->update_items();
 	return record_num;
@@ -777,13 +781,13 @@ bool book::modified() {
 // Create a new record and start editing it.
 record* book::new_record(logging_mode_t mode) {
 	// Create new QSO record with default fields for the logging mode
-	record* new_record = new record(mode);
+	record* new_record = new record(mode, get_record());
 	// put it in the book 
 	record_num_t pos_record;
 	if (mode != LM_OFF_AIR) {
 		// On-air logging - insert against date/time (which should be at the end)
 		// We may have been using modem s/w and changed to On-air logging.
-		menu_->logging(LM_ON_AIR);
+		dashboard_->logging_mode(rig_if_ ? LM_ON_AIR_CAT : LM_ON_AIR_COPY);
 		pos_record = insert_record(new_record);
 		char message[256];
 		sprintf(message, "LOG: New record at %s %s",
@@ -796,7 +800,9 @@ record* book::new_record(logging_mode_t mode) {
 		pos_record = append_record(new_record);
 	}
 	// Set the appropriate flags
-	if (mode != LM_OFF_AIR) logging_mode_ = LM_ON_AIR;
+	if (mode != LM_OFF_AIR)
+		if (rig_if_) logging_mode_ = LM_ON_AIR_CAT;
+		else logging_mode_ = LM_ON_AIR_COPY;
 	else logging_mode_ = mode;
 	new_record_ = true;
 	// Select the new record and tell all views
@@ -829,9 +835,11 @@ void book::save_record() {
 	status_->misc_status(ST_NOTE, text);
 	// Add to used bands and modes
 	add_band_mode(get_record());
-	// Update TX_PWR
-	snprintf(text, 128, "%d", (int)rig_if_->max_power());
-	get_record()->item("TX_PWR", text);
+	// Update TX_PWR - if we are connected to a rig and hven't already set it (e.g. scratchpad)
+	if (rig_if_ && get_record()->item("TX_PWR") != "") {
+		snprintf(text, 128, "%d", (int)rig_if_->max_power());
+		get_record()->item("TX_PWR", text);
+	}
 	// Check within band
 	double freq;
 	get_record()->item("FREQ", freq);

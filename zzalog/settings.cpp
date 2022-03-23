@@ -1,8 +1,8 @@
 #include "settings.h"
-#include "rig_dialog.h"
+#include "dashboard.h"
 #include "files_dialog.h"
 #include "web_dialog.h"
-#include "stn_dialog.h"
+#include "qth_dialog.h"
 #include "fields_dialog.h"
 #include "qsl_design.h"
 #include "user_dialog.h"
@@ -36,11 +36,6 @@ settings::settings(int W, int H, const char* label, cfg_dialog_t active) :
 	int rh = 0;
 	// get client area 
 	tabs->client_area(rx, ry, rw, rh, 0);
-	// Rig settings
-	rig_dialog* rig = new rig_dialog(rx, ry, rw, rh, "CAT");
-	rig->labelsize(FONT_SIZE);
-	rig->selection_color(fl_lighter(FL_YELLOW));
-	rig->tooltip("Allows the configuration of the rig CAT interface; selection of app and its settings");
 	// File location settings
 	files_dialog* files = new files_dialog(rx, ry, rw, rh, "File Locations");
 	files->labelsize(FONT_SIZE);
@@ -51,11 +46,11 @@ settings::settings(int W, int H, const char* label, cfg_dialog_t active) :
 	aweb->labelsize(FONT_SIZE);
 	aweb->selection_color(fl_lighter(FL_YELLOW));
 	aweb->tooltip("Allows the setting of user details for the various on-line services");
-	// Station settings: rig, aerial and QTH details
-	stn_dialog* stn = new stn_dialog(rx, ry, rw, rh, "Station");
-	stn->labelsize(FONT_SIZE);
-	stn->selection_color(fl_lighter(FL_YELLOW));
-	stn->tooltip("Allows the definition of the various fields describing station location");
+	// QTH settings: QTH details
+	qth_dialog* qth = new qth_dialog(rx, ry, rw, rh, "QTH");
+	qth->labelsize(FONT_SIZE);
+	qth->selection_color(fl_lighter(FL_YELLOW));
+	qth->tooltip("Allows the definition of the various fields describing station location (QTH)");
 	// Fields settings - fields to display as columns in log views, first few rows in record view
 	// and fields to export to TSV files
 	fields_dialog* fields = new fields_dialog(rx, ry, rw, rh, "Fields");
@@ -84,17 +79,14 @@ settings::settings(int W, int H, const char* label, cfg_dialog_t active) :
 	settings_view_ = all_settings;
 	// Activate the required dialog
 	switch (active) {
-	case DLG_RIG:
-		tabs->value(rig);
-		break;
 	case DLG_FILES:
 		tabs->value(files);
 		break;
 	case DLG_WEB:
 		tabs->value(aweb);
 		break;
-	case DLG_STATION:
-		tabs->value(stn);
+	case DLG_QTH:
+		tabs->value(qth);
 		break;
 	case DLG_COLUMN:
 		tabs->value(fields);
@@ -134,10 +126,9 @@ settings::settings(int W, int H, const char* label, cfg_dialog_t active) :
 	callback(cb_bn_cal, (long)CA_CANCEL);
 	set_label(active);
 
-	end();
 	resizable(nullptr);
 
-
+	end();
 	show();
 }
 
@@ -179,10 +170,9 @@ void settings::cb_tab(Fl_Widget* w, void* v) {
 	// value() returns the selected widget. We need to test which widget it is.
 	Fl_Widget* tab = tabs->value();
 	cfg_dialog_t ix;
-	if (dynamic_cast<rig_dialog*>(tab)) ix = DLG_RIG;
-	else if (dynamic_cast<files_dialog*>(tab)) ix = DLG_FILES;
+	if (dynamic_cast<files_dialog*>(tab)) ix = DLG_FILES;
 	else if (dynamic_cast<web_dialog*>(tab)) ix = DLG_WEB;
-	else if (dynamic_cast<stn_dialog*>(tab)) ix = DLG_STATION;
+	else if (dynamic_cast<qth_dialog*>(tab)) ix = DLG_QTH;
 	else if (dynamic_cast<fields_dialog*>(tab)) ix = DLG_COLUMN;
 	else if (dynamic_cast<qsl_design*>(tab)) ix = DLG_QSL;
 	else if (dynamic_cast<user_dialog*>(tab)) ix = DLG_USER;
@@ -194,17 +184,14 @@ void settings::cb_tab(Fl_Widget* w, void* v) {
 
 void settings::set_label(settings::cfg_dialog_t active) {
 	switch (active) {
-	case DLG_RIG:
-		label("Configuration: Define CAT interface and parameters");
-		break;
 	case DLG_FILES:
 		label("Configuration: Define location of various data files");
 		break;
 	case DLG_WEB:
 		label("Configuration: Define web locations of QSL and other services");
 		break;
-	case DLG_STATION:
-		label("Configuration: Define available rigs, aerials and locations");
+	case DLG_QTH:
+		label("Configuration: Define details of a operating location (working QTH)");
 		break;
 	case DLG_COLUMN:
 		label("Configuration: Define the fields to be displayed in various views");
@@ -219,7 +206,7 @@ void settings::set_label(settings::cfg_dialog_t active) {
 		label("Configuration: Display all options in tree format");
 		break;
 	case DLG_X:
-		label("Configuration");
+		label("Configuration: *** UNKNOWN ***");
 		break;
 	}
 }

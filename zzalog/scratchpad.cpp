@@ -13,6 +13,7 @@
 #include "band_view.h"
 #include "extract_data.h"
 #include "dxa_if.h"
+#include "dashboard.h"
 
 #include <regex>
 
@@ -39,6 +40,7 @@ extern rig_if* rig_if_;
 extern band_view* band_view_;
 extern extract_data* extract_records_;
 extern dxa_if* dxatlas_;
+extern dashboard* dashboard_;
 extern void add_scratchpad();
 extern double prev_freq_;
 
@@ -449,7 +451,7 @@ void scratchpad::cb_parse(Fl_Widget* w, void* v) {
 	scratchpad* that = ancestor_view<scratchpad>(w);
 	string text = that->buffer_->selection_text();
 	// Create a temporary record to parse theh callsign
-	record* tip_record = new record(LM_ON_AIR);
+	record* tip_record = new record(rig_if_ ? LM_ON_AIR_CAT : LM_ON_AIR_TIME);
 	string message = "";
 	// Set the callsign in the temporary record
 	tip_record->item("CALL", to_upper(text));
@@ -522,7 +524,7 @@ void scratchpad::cb_close(Fl_Widget* w, void* v) {
 // v is not used
 void scratchpad::cb_start(Fl_Widget* w, void* v) {
 	scratchpad* that = ancestor_view<scratchpad>(w);
-	that->record_ = book_->new_record(menu_->logging());
+	that->record_ = book_->new_record(dashboard_->logging_mode());
 	if (rig_if_) {
 		that->record_->item("FREQ", string(that->ip_freq_->value()));
 		string mode;

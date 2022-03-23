@@ -14,6 +14,7 @@
 #include "qrz_handler.h"
 #include "status.h"
 #include "main_window.h"
+#include "dashboard.h"
 
 #include <array>
 #include <string>
@@ -42,7 +43,7 @@ extern intl_dialog* intl_dialog_;
 extern qrz_handler* qrz_handler_;
 extern status* status_;
 extern book* book_;
-
+extern dashboard* dashboard_;
 
 using namespace std;
 
@@ -832,13 +833,13 @@ void record_form::cb_bn_edit(Fl_Widget* w, long v) {
 	switch (action) {
 	case START:
 		// Start a new record
-		that->my_book_->new_record(menu_->logging());
+		that->my_book_->new_record(dashboard_->logging_mode());
 		that->use_mode_ = UM_QSO;
 		break;
 	case RESTART:
 		// Save current record and start a new one
 		that->my_book_->save_record();
-		that->my_book_->new_record(menu_->logging());
+		that->my_book_->new_record(dashboard_->logging_mode());
 		that->use_mode_ = UM_QSO;
 		break;
 	case SAVE:
@@ -908,7 +909,7 @@ void record_form::cb_bn_edit(Fl_Widget* w, long v) {
 		return;
 	case ENTER:
 		// Manually enter data for a query
-		that->record_1_ = new record(LM_OFF_AIR);
+		that->record_1_ = new record(LM_OFF_AIR, nullptr);
 		that->use_mode_ = UM_MANUAL_QUERY;
 		that->enable_all_search_ = true;
 		break;

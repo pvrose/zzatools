@@ -11,7 +11,7 @@
 using namespace zzalib;
 
 extern Fl_Preferences* settings_;
-rig_if* rig_if_;
+rig_if* rig_if_ = nullptr;
 extern ic7300* ic7300_;
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -44,6 +44,7 @@ rig_if::rig_if()
 // Base class destructor
 rig_if::~rig_if()
 {
+	close();
 }
 
 // Returns if the rig opened OK
@@ -69,6 +70,7 @@ bool rig_if::open() {
 void rig_if::close() {
 	// Timeout must be removed before rig connection is closed otherwise it could fire while the connection is closing
 	Fl::remove_timeout(cb_timer_rig);
+	Fl::remove_timeout(cb_timer_sync);
 }
 
 // Convert s-meter reading into display format

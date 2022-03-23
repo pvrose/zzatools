@@ -3,13 +3,13 @@
 #include "spec_data.h"
 #include "tabbed_forms.h"
 #include "status.h"
-#include "scratchpad.h"
 #include "eqsl_handler.h"
 #include "lotw_handler.h"
 #include "club_handler.h"
 #include "../zzalib/rig_if.h"
 #include "../zzalib/utils.h"
 #include "menu.h"
+#include "dashboard.h"
 
 #include <sstream>
 #include <ctime>
@@ -36,7 +36,7 @@ extern lotw_handler* lotw_handler_;
 extern club_handler* club_handler_;
 extern rig_if* rig_if_;
 extern menu* menu_;
-extern scratchpad* scratchpad_;
+extern dashboard* dashboard_;
 extern void add_rig_if();
 
 // Constructor - this book is used to contain data being imported. It adds functionality to support this
@@ -132,7 +132,7 @@ bool import_data::start_auto_update() {
 		}
 		// Start auto_update
 		auto_update();
-		menu_->logging(LM_IMPORTED);
+		if (dashboard_) dashboard_->logging_mode(LM_IMPORTED);
 	}
 	else {
 		// No files to update - tell calling routine to open rig again and also change flag in menu
@@ -614,7 +614,7 @@ void import_data::finish_update(bool merged /*= true*/) {
 	// We are waiting to finish the update
 	if (close_pending_) {
 		// Change logging mode 
-		menu_->logging(next_logging_mode_);
+		dashboard_->logging_mode(next_logging_mode_);
 		// Stop timer
 		Fl::remove_timeout(cb_timer_imp);
 		// Delete the update files
@@ -629,7 +629,7 @@ void import_data::finish_update(bool merged /*= true*/) {
 	}
 	// If we are not connected to a rig
 	if (!rig_if_) {
-		scratchpad_->update();
+		dashboard_->update();
 	}
 	// Allow the book to save (and save if modified)
 	close_pending_ = false;

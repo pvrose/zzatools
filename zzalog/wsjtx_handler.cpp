@@ -265,7 +265,7 @@ int wsjtx_handler::handle_status(stringstream& ss) {
 	}
 	else if (status.dx_call.length() && status.transmitting) {
 		// Get the grid location of the prefix centre - only if 1 prefix matches the callsign.
-		record* dx_record = new record(LM_ON_AIR);
+		record* dx_record = new record(LM_OFF_AIR, nullptr);
 		dx_record->item("CALL", status.dx_call);
 		vector<prefix*> prefixes;
 		// Get prefix(es), If only 1 and the DXCC Code != 0 (i.e. not /MM)
