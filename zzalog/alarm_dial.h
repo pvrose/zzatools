@@ -51,7 +51,6 @@ namespace zzalog {
         double angle_of(double v);
         void draw_alarm(double v);
         void draw_ticks();
-        void draw_numbers(int X, int Y, int W, int H);
         double value_of(double angle);
     };
 

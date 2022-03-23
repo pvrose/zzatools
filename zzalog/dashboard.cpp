@@ -1583,7 +1583,7 @@ void dashboard::enable_alarm_widgets() {
 		char message[200];
 		switch (current_swr_alarm_) {
 		case SWR_ERROR:
-			dial_swr_->color(fl_lighter(FL_RED));
+			dial_swr_->color(fl_lighter(fl_lighter(FL_RED)));
 			snprintf(message, 200, "DASH: SWR %g > %g", dial_swr_->Fl_Line_Dial::value(), dial_swr_->alarm2());
 			status_->misc_status(ST_ERROR, message);
 			break;
@@ -1606,12 +1606,12 @@ void dashboard::enable_alarm_widgets() {
 		switch (current_pwr_alarm_) {
 		case POWER_OK:
 			dial_pwr_->color(FL_WHITE);
-			snprintf(message, 200, "DIAL: Power %g OK", dial_pwr_->Fl_Line_Dial::value());
+			snprintf(message, 200, "DASH: Power %g OK", dial_pwr_->Fl_Line_Dial::value());
 			status_->misc_status(ST_OK, message);
 			break;
 		case POWER_WARNING:
 			dial_pwr_->color(FL_YELLOW);
-			snprintf(message, 200, "DIAL: Power %g > %g", dial_pwr_->Fl_Line_Dial::value(), dial_pwr_->alarm1());
+			snprintf(message, 200, "DASH: Power %g > %g", dial_pwr_->Fl_Line_Dial::value(), dial_pwr_->alarm1());
 			status_->misc_status(ST_WARNING, message);
 			break;
 		}
@@ -1622,7 +1622,7 @@ void dashboard::enable_alarm_widgets() {
 		char message[200];
 		switch (current_vdd_alarm_) {
 		case VDD_UNDER:
-			dial_vdd_->color(fl_lighter(FL_RED));
+			dial_vdd_->color(fl_lighter(fl_lighter(FL_RED)));
 			snprintf(message, 200, "DASH: Vdd %g < %g", dial_vdd_->Fl_Line_Dial::value(), dial_vdd_->alarm1());
 			status_->misc_status(ST_ERROR, message);
 			break;
@@ -1632,7 +1632,7 @@ void dashboard::enable_alarm_widgets() {
 			status_->misc_status(ST_OK, message);
 			break;
 		case VDD_OVER:
-			dial_vdd_->color(fl_lighter(FL_RED));
+			dial_vdd_->color(fl_lighter(fl_lighter(FL_RED)));
 			snprintf(message, 200, "DASH: Vdd %g > %g", dial_vdd_->Fl_Line_Dial::value(), dial_vdd_->alarm2());
 			status_->misc_status(ST_ERROR, message);
 			break;

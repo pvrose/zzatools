@@ -1,13 +1,17 @@
 #include "alarm_dial.h"
+#include "status.h"
 
 #include <cmath>
 
 #include <algorithm>
+#include <iostream>
 
 #include <FL/fl_draw.H>
 #include <FL/math.h>
 
 using namespace zzalog;
+
+extern status* status_;
 
 alarm_dial::alarm_dial(int X, int Y, int W, int H, const char* l) :
     Fl_Line_Dial(X, Y, W, H, l)
@@ -47,8 +51,6 @@ void alarm_dial::draw(int X, int Y, int W, int H) {
     if (!isnan(phi_2)) draw_alarm(phi_2);
 
     fl_pop_matrix();
-
-    draw_numbers(X, Y, W, H);
 
 }
 
@@ -237,30 +239,24 @@ void alarm_dial::draw_ticks() {
         fl_begin_loop();
         {
             fl_vertex(-0.3, 0.3); // arbitrary just inside the below
-            fl_vertex(-0.35, 0.35); // radius(0.5) * sqrt(0.5)
+            fl_vertex(-0.35, 0.35); // 0.5(radius) * sqrt(0.5)
         }
         fl_end_loop();
-        fl_pop_matrix();
-    }
-}
-
-void alarm_dial::draw_numbers(int X, int Y, int W, int H) {
-    double ox = X + W / 2 - 0.5;
-    double oy = Y + H / 2 - 0.5;
-    if (active_r()) fl_color(FL_BLACK);
-    else fl_color(fl_inactive(FL_BLACK));
-    for (double d = minimum(); d <= maximum(); d += step() * 10.0) {
-        double angle = angle_of(d);
-        double rangle = angle * M_PI / 180;
         char text[5];
         snprintf(text, 5, "%g", d);
         int tx;
         int ty;
-        fl_measure(text, tx, ty);
-        double dx = (-sin(rangle) * (double)(W * 0.3 + tx /2));
-        double dy = (cos(rangle) * (double)(H * 0.3 + ty/2));
-        
-        fl_draw((int)(90-angle), text, (int)(ox + dx), (int)(oy + dy));
+        int tw;
+        int th;
+        fl_text_extents(text, tx, ty, tw, th);
+        double angle = M_PI / 180 * (90 - angle_of(d));
+        double dx = ((ty / 2) * sin(angle));
+        double dy = ((ty / 2) * cos(angle));
+        double px = fl_transform_x(-0.3, 0.3) - dx;
+        double py = fl_transform_y(-0.3, 0.3) - dy;
+
+        fl_draw((int)(90 - angle_of(d)), text, (int)(px), (int)(py));
+        fl_pop_matrix();
     }
 }
 
