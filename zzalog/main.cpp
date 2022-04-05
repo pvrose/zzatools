@@ -458,14 +458,14 @@ void update_rig_status() {
 		if (!band_view_ || band_view_->in_band(rig_if_->tx_frequency()/1000.0)) {
 			// We are at a valid frequency
 			if (rig_if_->get_tx() == true) {
-				if (rig_if_->check_swr()) {
+				//if (rig_if_->check_swr()) {
 					// Transmit, low SWR
 					status_->rig_status(RS_TX, rig_if_->rig_info().c_str());
-				}
-				else {
-					// Transmit, high SWR
-					status_->rig_status(RS_HIGH, rig_if_->rig_info().c_str());
-				}
+				//}
+				//else {
+				//	// Transmit, high SWR
+				//	status_->rig_status(RS_HIGH, rig_if_->rig_info().c_str());
+				//}
 			}
 			else {
 				// Receive
@@ -506,12 +506,12 @@ void add_rig_if() {
 		delete rig_if_;
 		// Get the handler from the settings
 		rig_handler_t handler = RIG_NONE;
-		Fl_Preferences rig_settings(settings_, "Rig");
-		rig_settings.get("Handler", (int&)handler, RIG_FLRIG);
 		Fl_Preferences stations_settings(settings_, "Stations");
 		Fl_Preferences rigs_settings(stations_settings, "Rigs");
 		char* rig_name;
 		rigs_settings.get("Current", rig_name, "");
+		Fl_Preferences rig_settings(rigs_settings, rig_name);
+		rig_settings.get("Handler", (int&)handler, RIG_NONE);
 		char temp[256];
 		char handler_name[8];
 		switch (handler) {
@@ -537,7 +537,7 @@ void add_rig_if() {
 			rig_if_ = new rig_flrig;
 			break;
 		case RIG_NONE:
-			status_->misc_status(ST_NOTE, "RIG: Not connecting one");
+			status_->misc_status(ST_NOTE, "RIG: No CAT available, so cannot connect");
 			rig_if_ = nullptr;
 			break;
 		default:
@@ -550,6 +550,8 @@ void add_rig_if() {
 			if (dashboard_) dashboard_->logging_mode(LM_ON_AIR_COPY);
 		}
 		else {
+			// Tell the rig where to find its settings
+			rig_if_->get_settings();
 			// Set callbacks
 			rig_if_->callback(update_rig_status, cb_freq_to_band, cb_error_message);
 			// Try and open the connection to the rig
@@ -612,13 +614,12 @@ void add_rig_if() {
 							else {
 								status_->rig_status(RS_ERROR, rig_if_->rig_info().c_str());
 							}
+							// Change logging mode to ON_AIR
 							if (dashboard_) {
 								dashboard_->update();
 								dashboard_->logging_mode(LM_ON_AIR_CAT);
 							}
 							done = true;
-							// Change logging mode to ON_AIR
-						if (dashboard_)	dashboard_->logging_mode(LM_ON_AIR_CAT);
 						}
 						// Note this is IC-7300 specific code
 						ic7300_table* mem_table = (ic7300_table*)(tabbed_forms_->get_view(OT_MEMORY));
@@ -959,14 +960,14 @@ int main(int argc, char** argv)
 	rig_if_ = nullptr;
 	rig_load_all_backends();
 	add_rig_if();
+	// Add dashboard
+	add_dashboard();
 	// Add band-plan 
 	add_band_view();
 	// Add qsl_handlers - note add_rig_if() may have added URL handler
 	add_qsl_handlers();
 	//// Add scratchpad
 	//add_scratchpad();
-	// Add dashboard
-	add_dashboard();
 	// Add DxAtlas interface
 	add_dxatlas();
 	int code = 0;

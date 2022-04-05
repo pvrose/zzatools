@@ -39,6 +39,9 @@ rig_if::rig_if()
 	last_tx_swr_ = 1.0;
 	sigma_tx_power_ = 0.0;
 	num_pwr_samples_ = 0;
+	inhibit_repeated_errors = false;
+
+	get_settings();
 }
 
 // Base class destructor
@@ -174,7 +177,7 @@ string rig_if::get_tx_power() {
 		// May need to tweak this to be less than a small number
 		tx_power = last_tx_power_;
 		if (num_pwr_samples_) {
-			check_power();
+			//check_power();
 		}
 		sigma_tx_power_ = 0.0;
 		num_pwr_samples_ = 0;
@@ -201,28 +204,36 @@ double rig_if::max_power() {
 	return result;
 }
 
+// Get settings
+void rig_if::get_settings() {
+	Fl_Preferences stn_settings(settings_, "Stations");
+	Fl_Preferences rigs_settings(stn_settings, "Rigs");
+	char* rig_name;
+	rigs_settings.get("Current", rig_name, "");
+	rig_settings_ = new Fl_Preferences(rigs_settings, rig_name);
+
+}
+
 // Rig timer callback
 void rig_if::cb_timer_rig(void* v) {
-	// Update the label in the rig button 
 	// Get polling intervals from settings
-	Fl_Preferences rig_settings(settings_, "Rig");
 	double timer_value = 0.0;
 	// Set the status and get the polling interval for the current state of the rig
 	if (rig_if_ == nullptr) {
 		// Rig not set up - DLOW
-		rig_settings.get("Slow Polling Interval", timer_value, SLOW_RIG_DEF);
+		rig_if_->rig_settings_->get("Slow Polling Interval", timer_value, SLOW_RIG_DEF);
 	}
 	else {
 		if (rig_if_->is_good()) {
 			// Rig connected and is working - FAST
-			rig_settings.get("Polling Interval", timer_value, FAST_RIG_DEF);
+			rig_if_->rig_settings_->get("Polling Interval", timer_value, FAST_RIG_DEF);
 			if (rig_if_->on_timer_) {
 				rig_if_->on_timer_();
 			}
 		}
 		if (!rig_if_ || !rig_if_->is_good()) {
 			// Rig connected and broken - SLOW
-			rig_settings.get("Slow Polling Interval", timer_value, SLOW_RIG_DEF);
+			rig_if_->rig_settings_->get("Slow Polling Interval", timer_value, SLOW_RIG_DEF);
 		}
 	}
 	// repeat the timer
@@ -345,75 +356,72 @@ void rig_if::update_clock() {
 	}
 }
 
-// Check SWR value - error if > error level, warning if > warning level (got from settings)
-// Only check once per transmission period
-bool  rig_if::check_swr() {
-	Fl_Preferences rig_settings(settings_, "Rig");
-	double warn_level;
-	double error_level;
-	// SWR Settings
-	rig_settings.get("SWR Warning Level", warn_level, 1.5);
-	rig_settings.get("SWR Error Level", error_level, 2.0);
-	double swr = swr_meter();
-	if (swr > error_level && !reported_hi_swr_) {
-		char message[200];
-		snprintf(message, 200, "RIG: SWR is %.1f", swr);
-		error(ST_ERROR, message);
-		reported_hi_swr_ = true;
-		return false;
-	}
-	else if (swr > warn_level) {
-		char message[200];
-		snprintf(message, 200, "RIG: SWR is %.1f", swr);
-		error(ST_WARNING, message);
-		// Clear reported flag when we go back to receive
-		return true;
-	}
-	return true;
-}
-
-// Check power level - only when TX ended
-bool rig_if::check_power() {
-	Fl_Preferences rig_settings_(settings_, "Rig");
-	double power_warn_level;
-	rig_settings_.get("Power Warning Level", power_warn_level, 50.0);
-	if (num_pwr_samples_ > 0) {
-		double power = sigma_tx_power_ / num_pwr_samples_;
-		if (power > power_warn_level) {
-			char message[200];
-			snprintf(message, 200, "RIG: Average power was %.0f", power);
-			error(ST_NOTIFY, message);
-			return false;
-
-		}
-		else {
-			return true;
-		}
-	}
-	else {
-		return true;
-	}
-}
-
-// Check voltage level
-bool rig_if::check_voltage() {
-	Fl_Preferences rig_settings(settings_, "Rig");
-	double min_voltage_level;
-	double max_voltage_level;
-	rig_settings.get("Voltage Minimum Level", min_voltage_level, (13.8 * 0.85));
-	rig_settings.get("Voltage Maximum Level", max_voltage_level, (13.8 * 1.15));
-	double vdd = vdd_meter();
-	// Check voltage - ignore if vdd_meter has returned NaN
-	if (!isnan(vdd) && (vdd < min_voltage_level || vdd > max_voltage_level)) {
-		char message[200];
-		snprintf(message, 200, "RIG: Current Vdd is %.0f", vdd);
-		error(ST_ERROR, message);
-		return false;
-	}
-	else {
-		return true;
-	}
-}
+//// Check SWR value - error if > error level, warning if > warning level (got from settings)
+//// Only check once per transmission period
+//bool  rig_if::check_swr() {
+//	double warn_level;
+//	double error_level;
+//	// SWR Settings
+//	rig_settings_->get("SWR Warning Level", warn_level, 1.5);
+//	rig_settings_->get("SWR Error Level", error_level, 2.0);
+//	double swr = swr_meter();
+//	if (swr > error_level && !reported_hi_swr_) {
+//		char message[200];
+//		snprintf(message, 200, "RIG: SWR is %.1f", swr);
+//		error(ST_ERROR, message);
+//		reported_hi_swr_ = true;
+//		return false;
+//	}
+//	else if (swr > warn_level) {
+//		char message[200];
+//		snprintf(message, 200, "RIG: SWR is %.1f", swr);
+//		error(ST_WARNING, message);
+//		// Clear reported flag when we go back to receive
+//		return true;
+//	}
+//	return true;
+//}
+//
+//// Check power level - only when TX ended
+//bool rig_if::check_power() {
+//	double power_warn_level;
+//	rig_settings_->get("Power Warning Level", power_warn_level, 50.0);
+//	if (num_pwr_samples_ > 0) {
+//		double power = sigma_tx_power_ / num_pwr_samples_;
+//		if (power > power_warn_level) {
+//			char message[200];
+//			snprintf(message, 200, "RIG: Average power was %.0f", power);
+//			error(ST_NOTIFY, message);
+//			return false;
+//
+//		}
+//		else {
+//			return true;
+//		}
+//	}
+//	else {
+//		return true;
+//	}
+//}
+//
+//// Check voltage level
+//bool rig_if::check_voltage() {
+//	double min_voltage_level;
+//	double max_voltage_level;
+//	rig_settings_->get("Voltage Minimum Level", min_voltage_level, (13.8 * 0.85));
+//	rig_settings_->get("Voltage Maximum Level", max_voltage_level, (13.8 * 1.15));
+//	double vdd = vdd_meter();
+//	// Check voltage - ignore if vdd_meter has returned NaN
+//	if (!isnan(vdd) && (vdd < min_voltage_level || vdd > max_voltage_level)) {
+//		char message[200];
+//		snprintf(message, 200, "RIG: Current Vdd is %.0f", vdd);
+//		error(ST_ERROR, message);
+//		return false;
+//	}
+//	else {
+//		return true;
+//	}
+//}
 
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -477,8 +485,8 @@ bool rig_hamlib::open() {
 	}
 
 	// Read hamlib configuration - manufacturer,  model, port and baud-rate
-	Fl_Preferences rig_settings(settings_, "Rig");
-	Fl_Preferences hamlib_settings(rig_settings, "Hamlib");
+	get_settings();
+	Fl_Preferences hamlib_settings(rig_settings_, "Hamlib");
 	Fl_Preferences stations_settings(settings_, "Stations");
 	Fl_Preferences rigs_settings(stations_settings, "Rigs");
 
@@ -792,6 +800,7 @@ bool rig_hamlib::get_tx() {
 ///////////////////////////////////////////////////////////////////////////////////////
 // Constructor
 rig_flrig::rig_flrig()
+	: rig_if()
 {
 	rig_name_ = "";
 	error_message_ = "";
@@ -812,9 +821,9 @@ rig_flrig::~rig_flrig()
 
 // Opens the RPC server associated with the rig
 bool rig_flrig::open() {
+	get_settings();
 	// Default host name and port number
-	Fl_Preferences rig_settings(settings_, "Rig");
-	Fl_Preferences flrig_settings(rig_settings, "Flrig");
+	Fl_Preferences flrig_settings(rig_settings_, "Flrig");
 	char *temp;
 	// Default indicates server is on same computer as running zzalib
 	flrig_settings.get("Host", temp, "127.0.0.1");
@@ -1021,7 +1030,10 @@ double rig_flrig::vdd_meter() {
 		}
 	}
 	// Not IC7300 or not OK - return nan.
-	error(ST_ERROR, error_message("swr_meter").c_str());
+	if (!inhibit_repeated_errors) {
+		error(ST_ERROR, error_message("vdd_meter - Cannot read (Not supported rig or see above)").c_str());
+		inhibit_repeated_errors = true;
+	}
 	return nan("");
 
 }

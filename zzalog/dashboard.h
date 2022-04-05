@@ -64,14 +64,80 @@ namespace zzalog {
 			NEW_ONLY
 		};
 
+		// Hamlib parameters 
+		struct hamlib_data {
+			// Manufacturer
+			string mfr = "";
+			// Model
+			string model = "";
+			// Portname
+			string port_name = "";
+			// Baud rate
+			string baud_rate = "9600";
+			// Model ID - as knoen by hamlib
+			int model_id = -1;
+			// Override caps
+			bool override_caps = false;
+		};
+		// Flrig parameters
+		struct flrig_data {
+			// IP address
+			string ip_address = "127.0.0.1";
+			// Port name
+			int port = 12345;
+			// Resurce
+			string resource = "/RPC2";
+		};
+		// Alarm parameters
+		struct alarm_data {
+			double swr_warning = 1.5;
+			double swr_error = 2.5;
+			double power_warning = 95;
+			double voltage_minimum = 13.8 * 0.85;
+			double voltage_maximum = 13.8 * 1.15;
+		};
+		// Rig parameters (from handler onwards - rig only)
+		struct rig_xdata {
+			// Rig currently in use
+			bool active = false;
+			// Bands supported by rig
+			vector<string> intended_bands;
+			// CAT handler
+			rig_handler_t handler = RIG_NONE;
+			// Polling intervals
+			double fast_poll_interval = 1.0;
+			double slow_poll_interval = 60.0;
+			// Hamlib data
+			hamlib_data hamlib_params;
+			// Flrig data
+			flrig_data flrig_params;
+			// Alarm data
+			alarm_data alarms;
+		};
+		// Antenna parameters
+		struct item_data {
+			// Antenna currently in use
+			bool active = false;
+			//Bands supported
+			vector<string> intended_bands;
+			// Rig-only data
+			rig_xdata rig_data;
+
+			item_data() {
+				intended_bands.clear();
+			}
+		};
+
+
 		// This class provides individual grouping for rig, antenna.
 		class common_grp :
 			public Fl_Group
 		{
 
+
 		public:
 
-			common_grp(int X, int Y, int W, int H, const char* label);
+			common_grp(int X, int Y, int W, int H, const char* label, equipment_t type);
 			virtual ~common_grp();
 
 			// get settings
@@ -98,14 +164,6 @@ namespace zzalog {
 			static void cb_ch_item(Fl_Widget* w, void* v);
 
 		protected:
-			// Add an item
-			virtual void add_item();
-			// Delete item
-			virtual void delete_item(string item);
-			// Update derived fields
-			virtual void update_item();
-			// Save derived fields
-			virtual void save_item();
 			// Choice widget
 			Fl_Widget* choice_;
 			// Active widget
@@ -113,21 +171,30 @@ namespace zzalog {
 			// Band select widget
 			Fl_Widget* band_browser_;
 			// selected item
-			int selected_item_;
-			// all items - active/inactive
+			int item_no_;
+			// all items 
 			list<string> all_items_;
-			// current item active
-			bool item_active_;
 			// display all items
 			bool display_all_items_;
+			// Item name
+			string my_name_;
+			string next_name_;
 			// The settings
 			Fl_Preferences* my_settings_;
+			// Map per item name to item data
+			map<string, item_data> item_info_;
 
 		public:
 			// (re)populate the choice widget
 			void populate_choice();
 			// Populate band widget
 			void populate_band();
+			// return rig_info
+			item_data& info();
+			// return current name
+			string& name();
+			// return naext name
+			string& next();
 			// type
 			equipment_t type_;
 			// in text for Fl_Preference
@@ -254,65 +321,6 @@ namespace zzalog {
 		list<string> ordered_bands_;
 		// Display all ports
 		bool all_ports_;
-		// Hamlib parameters 
-		struct hamlib_data {
-			// Manufacturer
-			string mfr;
-			// Model
-			string model;
-			// Portname
-			string port_name;
-			// Baud rate
-			string baud_rate = "9600";
-			// Model ID - as knoen by hamlib
-			int model_id;
-			// Override caps
-			bool override_caps = false;
-		};
-		// Flrig parameters
-		struct flrig_data {
-			// IP address
-			string ip_address;
-			// Port name
-			int port;
-			// Resurce
-			string resource;
-		};
-		// Alarm parameters
-		struct alarm_data {
-			float swr_warning;
-			float swr_error;
-			float power_warning;
-			float voltage_minimum;
-			float voltage_maximum;
-		};
-		// Rig parameters
-		struct rig_data {
-			// Rig currently in use
-			bool active;
-			// Bands supported by rig
-			list<string> intended_bands;
-			// CAT handler
-			rig_handler_t handler;
-			// Polling intervals
-			double fast_poll_interval;
-			double slow_poll_interval;
-			// Hamlib data
-			hamlib_data hamlib_params;
-			// Flrig data
-			flrig_data flrig_params;
-			// Alarm data
-			alarm_data alarms;
-		};
-		// Antenna parameters
-		struct antenna_data {
-			// Antenna currently in use
-			bool active;
-			//Bands supported
-			list<string> intended_bands;
-		};
-		map<string, rig_data> rig_info_;
-		map <string, antenna_data> antenna_info_;
 		// Logging mode
 		logging_mode_t logging_mode_;
 		// Selecetd CAT but not connecyed
@@ -321,12 +329,8 @@ namespace zzalog {
 		bool created_;
 		// Selected equipment
 		string selected_qth_;
-		string selected_rig_;
-		string selected_antenna_;
 		// Next name
 		string next_qth_;
-		string next_rig_;
-		string next_antenna_;
 		// Avaiable QTHs
 		set<string> all_qths_;
 		enum { SWR_OK, SWR_WARNING, SWR_ERROR } previous_swr_alarm_, current_swr_alarm_;
@@ -377,14 +381,6 @@ namespace zzalog {
 		Fl_Radio_Round_Button* bn_nocat_;
 		Fl_Radio_Round_Button* bn_hamlib_;
 		Fl_Radio_Round_Button* bn_flrig_;
-		Fl_Choice* ch_model_;
-		Fl_Choice* ch_mfr_;
-		Fl_Check_Button* bn_useall_;
-		Fl_Choice* ch_baudrate_;
-		Fl_Check_Button* bn_override_;
-		Fl_Input* ip_ipaddress_;
-		Fl_Int_Input* ip_portrnum_;
-		intl_input* ip_resource_;
 		Fl_Spinner* ctr_pollfast_;
 		Fl_Spinner* ctr_pollslow_;
 		alarm_dial* dial_swr_;

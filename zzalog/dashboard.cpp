@@ -19,6 +19,7 @@
 #include "tabbed_forms.h"
 #include "import_data.h"
 #include "alarm_dial.h"
+#include "../zzalib//utils.h"
 
 #include <set>
 
@@ -56,17 +57,30 @@ extern import_data* import_data_;
 void add_rig_if();
 extern double prev_freq_;
 
-// constructor that does no constructing other than set the group up.
-dashboard::common_grp::common_grp(int X, int Y, int W, int H, const char* label)
+// constructor 
+dashboard::common_grp::common_grp(int X, int Y, int W, int H, const char* label, equipment_t type)
 	: Fl_Group(X, Y, W, H, label)
     , active_(nullptr)
 	, choice_(nullptr)
+	, band_browser_(nullptr)
 	, display_all_items_(false)
-	, item_active_(false)
 	, my_settings_(nullptr)
-	, selected_item_(0)
-	, type_(NONE)
+	, item_no_(0)
+	, type_(type)
+	, my_name_("")
+	, next_name_("")
+
 {
+	if (type_ == ANTENNA) {
+		settings_name_ = "Aerials";
+	}
+	else {
+		settings_name_ = "Rigs";
+	}
+	all_items_.clear();
+	load_values();
+	create_form(X, Y);
+	end();
 }
 
 // Destructor
@@ -77,118 +91,105 @@ dashboard::common_grp::~common_grp() {
 
 // Get initial data from settings
 void dashboard::common_grp::load_values() {
-	dashboard* dash = ancestor_view<dashboard>(this);
 	// Get the settings for the named group
 	Fl_Preferences stations_settings(settings_, "Stations");
 	my_settings_ = new Fl_Preferences(stations_settings, settings_name_.c_str());
 	// Number of items described in settings
 	int num_items = my_settings_->groups();
 	// Get the current item
-	char * current_item;
+	char * text;
 	int display_all;
-	my_settings_->get("Current", current_item, "");
-	if (type_ == ANTENNA) {
-		dash->selected_antenna_ = current_item;
-	}
-	else {
-		dash->selected_rig_ = current_item;
-	}
-	free(current_item);
+	my_settings_->get("Current", text, "");
+	my_name_ = text;
+	free(text);
+	my_settings_->get("Next", text, "");
+	next_name_ = text;
+	free(text);
 	// Get whether to offer all or just the active ones
 	my_settings_->get("Display All", display_all, (int)false);
 	display_all_items_ = (bool)display_all;
 	all_items_.clear();
+	string bands;
 	// For each item in the Antenna or rig settings
 	for (int i = 0; i < num_items; i++) {
 		// Get that item's settings
 		string name = my_settings_->group(i);
-		all_items_.push_back(name);
-		if (type_ == ANTENNA) {
-			// Antenna has just active flag and bands it is intended for
+		if (name.length()) {
 			Fl_Preferences item_settings(*my_settings_, name.c_str());
-			antenna_data& info = dash->antenna_info_[name];
-			// Active flag
-			int active;
-			item_settings.get("Active", active, (int)false);
-			info.active = (bool)active;
-			// Get the intended bands
-			Fl_Preferences band_settings(item_settings, "Intended Bands");
-			int num_bands = band_settings.entries();
-			info.intended_bands.clear();
-			// Read all the bands intended to be used with this rig/antenna
-			for (int i = 0; i < num_bands; i++) {
-				// Get the band name
-				string band = band_settings.entry(i);
-				info.intended_bands.push_back(band);
-			}
-		}
-		else {
-			Fl_Preferences item_settings(*my_settings_, name.c_str());
-			rig_data& info = dash->rig_info_[name];
-			// Active flag
-			int active;
-			item_settings.get("Active", active, (int)false);
-			info.active = (bool)active;
-			// Get the intended bands
-			Fl_Preferences band_settings(item_settings, "Intended Bands");
-			int num_bands = band_settings.entries();
-			info.intended_bands.clear();
-			// Read all the bands intended to be used with this rig/antenna
-			for (int i = 0; i < num_bands; i++) {
-				// Get the band name
-				string band = band_settings.entry(i);
-				info.intended_bands.push_back(band);
-			}
-			// Get the CAT interface parameters
-			item_settings.get("Handler", (int&)info.handler, RIG_NONE);
-			item_settings.get("Polling Interval", info.fast_poll_interval, FAST_RIG_DEF);
-			item_settings.get("Slow Polling Interval", info.slow_poll_interval, SLOW_RIG_DEF);
-			// Hamlib settings
-			Fl_Preferences hamlib_settings(item_settings, "Hamlib");
 			char* temp;
-			// Get the hamlib settings: Mfr/Model, serial port and baudrate
-			hamlib_settings.get("Manufacturer", temp, "Hamlib");
-			info.hamlib_params.mfr = temp;
-			free(temp);
-			hamlib_settings.get("Rig Model", temp, "Dummy");
-			info.hamlib_params.model = temp;
-			free(temp);
-			hamlib_settings.get("Port", temp, "COM6");
-			info.hamlib_params.port_name = temp;
-			free(temp);
-			hamlib_settings.get("Baud Rate", temp, "9600");
-			info.hamlib_params.baud_rate = temp;
-			free(temp);
-			hamlib_settings.get("Override Rig Caps", (int&)info.hamlib_params.override_caps, false);
+			all_items_.push_back(name);
+			item_data& info = item_info_[name];
+			switch (type_) {
+			case RIG:
+				// Get the CAT interface parameters
+				item_settings.get("Handler", (int&)info.rig_data.handler, RIG_NONE);
+				item_settings.get("Polling Interval", info.rig_data.fast_poll_interval, FAST_RIG_DEF);
+				item_settings.get("Slow Polling Interval", info.rig_data.slow_poll_interval, SLOW_RIG_DEF);
+				{
+					// Hamlib settings
+					Fl_Preferences hamlib_settings(item_settings, "Hamlib");
+					// Get the hamlib settings: Mfr/Model, serial port and baudrate
+					hamlib_settings.get("Manufacturer", temp, "Hamlib");
+					info.rig_data.hamlib_params.mfr = temp;
+					free(temp);
+					hamlib_settings.get("Rig Model", temp, "Dummy");
+					info.rig_data.hamlib_params.model = temp;
+					free(temp);
+					hamlib_settings.get("Port", temp, "COM6");
+					info.rig_data.hamlib_params.port_name = temp;
+					free(temp);
+					hamlib_settings.get("Baud Rate", temp, "9600");
+					info.rig_data.hamlib_params.baud_rate = temp;
+					free(temp);
+					hamlib_settings.get("Override Rig Caps", (int&)info.rig_data.hamlib_params.override_caps, false);
 
-			// Flrig settings
-			Fl_Preferences flrig_settings(item_settings, "Flrig");
-			// Get the Flrig settings: Host IP address, IP port and IP resource
-			flrig_settings.get("Host", temp, "127.0.0.1");
-			info.flrig_params.ip_address = temp;
-			free(temp);
-			flrig_settings.get("Port", info.flrig_params.port, 12345);
-			flrig_settings.get("Resource", temp, "/RPC2");
-			info.flrig_params.resource = temp;
-			free(temp);
+					// Flrig settings
+					Fl_Preferences flrig_settings(item_settings, "Flrig");
+					// Get the Flrig settings: Host IP address, IP port and IP resource
+					flrig_settings.get("Host", temp, "127.0.0.1");
+					info.rig_data.flrig_params.ip_address = temp;
+					free(temp);
+					flrig_settings.get("Port", info.rig_data.flrig_params.port, 12345);
+					flrig_settings.get("Resource", temp, "/RPC2");
+					info.rig_data.flrig_params.resource = temp;
+					free(temp);
 
-			// Alarm settings
-			Fl_Preferences alarm_settings(item_settings, "Alarms");
-			// SWR Settings - warning and error levels
-			alarm_settings.get("SWR Warning Level", info.alarms.swr_warning, 1.5);
-			alarm_settings.get("SWR Error Level", info.alarms.swr_error, 2.0);
-			// Power settings - warning levels
-			// TODO: Add mode specific settings
-			alarm_settings.get("Power Warning Level", info.alarms.power_warning, 95);
-			// Vdd settings - error if above or below 10% of nominal (13.8V)
-			alarm_settings.get("Voltage Minimum Level", info.alarms.voltage_minimum, (float)(13.8 * 0.85));
-			alarm_settings.get("Voltage Maximum Level", info.alarms.voltage_maximum, (float)(13.8 * 1.15));
+					// Alarm settings
+					Fl_Preferences alarm_settings(item_settings, "Alarms");
+					// SWR Settings - warning and error levels
+					alarm_settings.get("SWR Warning Level", info.rig_data.alarms.swr_warning, 1.5);
+					alarm_settings.get("SWR Error Level", info.rig_data.alarms.swr_error, 2.0);
+					// Power settings - warning levels
+					// TODO: Add mode specific settings
+					alarm_settings.get("Power Warning Level", info.rig_data.alarms.power_warning, 95);
+					// Vdd settings - error if above or below 10% of nominal (13.8V)
+					alarm_settings.get("Voltage Minimum Level", info.rig_data.alarms.voltage_minimum, (float)(13.8 * 0.85));
+					alarm_settings.get("Voltage Maximum Level", info.rig_data.alarms.voltage_maximum, (float)(13.8 * 1.15));
+				}
 
+				// Carry onto next - no break
+
+			case ANTENNA:
+				// Antenna has just active flag and bands it is intended for
+				// Active flag
+				int active;
+				item_settings.get("Active", active, (int)false);
+				info.active = (bool)active;
+				// Get the intended bands
+				char* temp;
+				item_settings.get("Intended Bands", temp, "");
+				bands = temp;
+				free(temp);
+				split_line(bands, info.intended_bands, ';');
+				break;
+			// 
+			}
 		}
 	}
 }
 
 // create the form
+// Note this assumes the appropriate common_grp is the active group
 void dashboard::common_grp::create_form(int X, int Y) {
 	// widget positions - rows
 	const int R1 = HTEXT;
@@ -210,8 +211,8 @@ void dashboard::common_grp::create_form(int X, int Y) {
 
 	dashboard* dash = ancestor_view<dashboard>(this);
 
-	// Explicitly call begin to ensure that we haven't had too many ends.
-	begin();
+	//// Explicitly call begin to ensure that we haven't had too many ends.
+	//begin();
 	// resize the group accordingly
 	resizable(nullptr);
 	resize(X, Y, WALL, HALL);
@@ -224,14 +225,11 @@ void dashboard::common_grp::create_form(int X, int Y) {
 	// Choice to select or add new antenna or rig
 	Fl_Input_Choice* ch1_1 = new Fl_Input_Choice(X + C1, Y + R1, W1A, H1);
 	ch1_1->textsize(FONT_SIZE);
-	if (type_ == ANTENNA) {
-		ch1_1->callback(cb_ch_item, (void*)&(dash->selected_antenna_));
-	}
-	else {
-		ch1_1->callback(cb_ch_item, (void*)&(dash->selected_rig_));
-	}
-//	ch1_1->when(FL_WHEN_CHANGED);
+	ch1_1->callback(cb_ch_stn, nullptr);
+	ch1_1->when(FL_WHEN_CHANGED);
 	ch1_1->tooltip("Select item");
+	ch1_1->menubutton()->textfont(FONT);
+	ch1_1->menubutton()->textsize(FONT_SIZE);
 	choice_ = ch1_1;
 
 	// Row 2
@@ -284,9 +282,6 @@ void dashboard::common_grp::create_form(int X, int Y) {
 	populate_choice();
 	populate_band();
 
-	end();
-	show();
-
 }
 
 // Save values in settings
@@ -296,123 +291,104 @@ void dashboard::common_grp::save_values() {
 	// Clear to remove deleted entries
 	my_settings_->clear();
 
-	if (type_ == ANTENNA) {
-		my_settings_->set("Current", dash->next_antenna_.c_str());
-	}
-	else {
-		my_settings_->set("Current", dash->next_rig_.c_str());
-	}
+	my_settings_->set("Current", my_name_.c_str());
+	my_settings_->set("Next", next_name_.c_str());
+
 	my_settings_->set("Display All", display_all_items_);
 	int index = 0;
 	// For each item
-	if (type_ == ANTENNA) {
-		for (auto it = dash->antenna_info_.begin(); it != dash->antenna_info_.end(); it++) {
-			// Get that item's settings
-			string name = (*it).first;
-			Fl_Preferences item_settings(*my_settings_, name.c_str());
-			antenna_data& info = dash->antenna_info_[name];
+	for (auto it = item_info_.begin(); it != item_info_.end(); it++) {
+		string name = (*it).first;
+		item_data& info = (*it).second;
+		Fl_Preferences item_settings(my_settings_, name.c_str());
+
+		switch(type_) {
+		case RIG: {
 			item_settings.set("Active", info.active);
 			// set the intended bands
-			Fl_Preferences band_settings(item_settings, "Intended Bands");
+			string bands = "";
 			// Store all the bands intended to be used with this rig/antenna
 			for (auto itb = info.intended_bands.begin(); itb != info.intended_bands.end(); itb++) {
-				band_settings.set((*itb).c_str(), "");
+				bands += *itb + ';';
 			}
+			item_settings.set("Intended Bands", bands.c_str());
+			item_settings.set("Handler", info.rig_data.handler);
+			item_settings.set("Polling Interval", info.rig_data.fast_poll_interval);
+			item_settings.set("Slow Polling Interval", info.rig_data.slow_poll_interval);
+			// Read all the groups
+			// Hamlib settings
+			Fl_Preferences hamlib_settings(item_settings, "Hamlib");
+			hamlib_settings.set("Manufacturer", info.rig_data.hamlib_params.mfr.c_str());
+			hamlib_settings.set("Rig Model", info.rig_data.hamlib_params.model.c_str());
+			hamlib_settings.set("Port", info.rig_data.hamlib_params.port_name.c_str());
+			hamlib_settings.set("Baud Rate", info.rig_data.hamlib_params.baud_rate.c_str());
+			hamlib_settings.set("Override Rig Caps", info.rig_data.hamlib_params.override_caps);
+			// Flrig settings
+			Fl_Preferences flrig_settings(item_settings, "Flrig");
+			flrig_settings.set("Host", info.rig_data.flrig_params.ip_address.c_str());
+			flrig_settings.set("Port", info.rig_data.flrig_params.port);
+			flrig_settings.set("Resource", info.rig_data.flrig_params.resource.c_str());
+			// Alarm settings
+			Fl_Preferences alarm_settings(item_settings, "Alarms");
+			// SWR Settings
+			alarm_settings.set("SWR Warning Level", info.rig_data.alarms.swr_warning);
+			alarm_settings.set("SWR Error Level", info.rig_data.alarms.swr_error);
+			// Power settings
+			alarm_settings.set("Power Warning Level", info.rig_data.alarms.power_warning);
+			// Vdd settings
+			alarm_settings.set("Voltage Minimum Level", info.rig_data.alarms.voltage_minimum);
+			alarm_settings.set("Voltage Maximum Level", info.rig_data.alarms.voltage_maximum);
+
+			// NO BREAK
+		}
+		case ANTENNA:
+			item_settings.set("Active", info.active);
+			// set the intended bands
+			string bands = "";
+			// Store all the bands intended to be used with this rig/antenna
+			for (auto itb = info.intended_bands.begin(); itb != info.intended_bands.end(); itb++) {
+				bands += *itb + ';';
+			}
+			item_settings.set("Intended Bands", bands.c_str());
+			break;
 		}
 	}
-	else {
-		for (auto it = dash->rig_info_.begin(); it != dash->rig_info_.end(); it++) {
-			string name = (*it).first;
-			Fl_Preferences item_settings(*my_settings_, name.c_str());
-			rig_data& info = dash->rig_info_[name];
-			item_settings.set("Active", info.active);
-			// set the intended bands
-			Fl_Preferences band_settings(item_settings, "Intended Bands");
-			// Store all the bands intended to be used with this rig/antenna
-			for (auto itb = info.intended_bands.begin(); itb != info.intended_bands.end(); itb++) {
-				band_settings.set((*itb).c_str(), "");
-			}
-			item_settings.set("Handler", info.handler);
-			item_settings.set("Polling Interval", info.fast_poll_interval);
-			item_settings.set("Slow Polling Interval", info.slow_poll_interval);
-				// Read all the groups
-				// Hamlib settings
-				Fl_Preferences hamlib_settings(item_settings, "Hamlib");
-				hamlib_settings.set("Manufacturer", info.hamlib_params.mfr.c_str());
-				hamlib_settings.set("Rig Model", info.hamlib_params.model.c_str());
-				hamlib_settings.set("Port", info.hamlib_params.port_name.c_str());
-				hamlib_settings.set("Baud Rate", info.hamlib_params.baud_rate.c_str());
-				hamlib_settings.set("Override Rig Caps", info.hamlib_params.override_caps);
-
-				// Flrig settings
-				Fl_Preferences flrig_settings(item_settings, "Flrig");
-				flrig_settings.set("Host", info.flrig_params.ip_address.c_str());
-				flrig_settings.set("Port", info.flrig_params.port);
-				flrig_settings.set("Resource", info.flrig_params.resource.c_str());
-
-				// Alarm settings
-				Fl_Preferences alarm_settings(item_settings, "Alarms");
-				// SWR Settings
-				alarm_settings.set("SWR Warning Level", info.alarms.swr_warning);
-				alarm_settings.set("SWR Error Level", info.alarms.swr_error);
-				// Power settings
-				alarm_settings.set("Power Warning Level", info.alarms.power_warning);
-				// Vdd settings
-				alarm_settings.set("Voltage Minimum Level", info.alarms.voltage_minimum);
-				alarm_settings.set("Voltage Maximum Level", info.alarms.voltage_maximum);
-
-			}
-		}
 }
 
 // Populate the item selector
 void dashboard::common_grp::populate_choice() {
 	Fl_Input_Choice* w = (Fl_Input_Choice*)choice_;
-	dashboard* dash = ancestor_view<dashboard>(w);
-	string name = type_ == ANTENNA ? dash->selected_antenna_ : dash->selected_rig_;
 	w->clear();
-	w->value("");
 	int index = 0;
 	bool sel_found = false;
 	// For each item
 	for (auto it = all_items_.begin(); it != all_items_.end(); it++) {
 		// Chack if the antenna or rig is in active use
-		bool active;
-		if (type_ == ANTENNA) {
-			antenna_data& info = dash->antenna_info_[*it];
-			active = info.active;
-		}
-		else {
-			rig_data& info = dash->rig_info_[*it];
-			active = info.active;
-		}
-		if (active || display_all_items_) {
+		item_data& info = item_info_[(*it)];
+		if (info.active || display_all_items_) {
 			// If item is currently active or we want to display both active and inactive items
 			// Add the item name to the choice
-			w->add((*it).c_str());
-			if (*it == name) {
-				// If it's the current selection, show it as such
-				w->value((*it).c_str());
-				((Fl_Light_Button*)active_)->value(active);
-				selected_item_ = index;
-				sel_found = true;
+			if ((*it).length()) {
+				w->add((*it).c_str());
+				if (*it == my_name_) {
+					// If it's the current selection, show it as such
+					w->value((*it).c_str());
+					((Fl_Light_Button*)active_)->value(info.active);
+					item_no_ = index;
+					sel_found = true;
+				}
+				index++;
 			}
-			index++;
 		}
 	}
-	if (!sel_found) {
+	if (!sel_found && my_name_.length()) {
 		// Selected item not found. Add it to the various lists
-		w->add(name.c_str());
-		if (type_ == ANTENNA) {
-			dash->antenna_info_[name].active = true;
-		}
-		else {
-			dash->rig_info_[name].active = true;
-		}
+		w->add(my_name_.c_str());
+		w->value(my_name_.c_str());
+		item_info_[my_name_].active = true;
 	}
 	w->textsize(FONT_SIZE);
 	w->textfont(FONT);
-	update_item();
 }
 
 // Populate the band selection widget
@@ -425,64 +401,31 @@ void dashboard::common_grp::populate_band() {
 	for (auto it = dash->ordered_bands_.begin(); it != dash->ordered_bands_.end(); it++) {
 		mb->add((*it).c_str());
 	}
-	if (type_ == ANTENNA) {
-		antenna_data& info = dash->antenna_info_[dash->selected_antenna_];
-		auto it = info.intended_bands.begin();
-		int i = 0;
-		// Select all the bands the antenna is meant to be used for
-		while (it != info.intended_bands.end() && i != dash->ordered_bands_.size()) {
-			// Note text(i) can be null if it hasn't been set
-			if (mb->text(i) && *it == mb->text(i)) {
-				mb->select(i);
-				it++;
-			}
-			i++;
+	item_data& info = item_info_[my_name_];
+	auto it = info.intended_bands.begin();
+	int i = 0;
+	// Select all the bands the antenna is meant to be used for
+	while (it != info.intended_bands.end() && i != dash->ordered_bands_.size()) {
+		// Note text(i) can be null if it hasn't been set
+		if (mb->text(i) && *it == mb->text(i)) {
+			mb->select(i);
+			it++;
 		}
-	}
-	else {
-		rig_data& info = dash->rig_info_[dash->selected_rig_];
-		auto it = info.intended_bands.begin();
-		int i = 0;
-		// Select all the bands the rig is meant to be used for
-		while (it != info.intended_bands.end() && i != dash->ordered_bands_.size()) {
-			// Note text(i) can be null if it hasn't been set
-			if (mb->text(i) && *it == mb->text(i)) {
-				mb->select(i);
-				it++;
-			}
-			i++;
-		}
+		i++;
 	}
 }
-
-// Update QTH related fields
-void dashboard::common_grp::update_item() { }
-
-// Add an item 
-void dashboard::common_grp::add_item() { }
-
-// Delete an item
-void dashboard::common_grp::delete_item(string item) { }
-
-// Save an item
-void dashboard::common_grp::save_item() { }
 
 // button callback - add
 // Add the text value of the choice to the list of items - new name is typed into the choice
 void dashboard::common_grp::cb_bn_add(Fl_Widget* w, void* v) {
 	common_grp* that = ancestor_view<common_grp>(w);
-	dashboard* dash = ancestor_view<dashboard>(that);
 	// Get the value in the choice
 	string new_item = ((Fl_Input_Choice*)that->choice_)->value();
 	// Set it active (and add it if it's not there)
 	that->all_items_.push_back(new_item);
-	if (that->type_ == ANTENNA) {
-		dash->selected_antenna_ = new_item;
-	}
-	else {
-		dash->selected_rig_ = new_item;
-	}
-	that->add_item();
+
+	that->my_name_ = new_item;
+	that->item_info_[new_item].active = true;
 	that->populate_choice();
 	that->redraw();
 }
@@ -490,20 +433,13 @@ void dashboard::common_grp::cb_bn_add(Fl_Widget* w, void* v) {
 // button callback - delete
 void dashboard::common_grp::cb_bn_del(Fl_Widget* w, void* v) {
 	common_grp* that = ancestor_view<common_grp>(w);
-	dashboard* dash = ancestor_view<dashboard>(that);
 	// Get the selected item name
 	string item = ((Fl_Input_Choice*)that->choice_)->menubutton()->text();
 	// Remove the item
 	that->all_items_.remove(item);
 	// TODO: For now display the first element
-	if (that->type_ == ANTENNA) {
-		dash->selected_antenna_ = *(that->all_items_.begin());
-	}
-	else {
-		dash->selected_rig_ = *(that->all_items_.begin());
-	}
+	that->my_name_ = *(that->all_items_.begin());
 	// Delete the item
-	that->delete_item(item);
 	that->populate_choice();
 	that->redraw();
 }
@@ -520,14 +456,9 @@ void dashboard::common_grp::cb_bn_all(Fl_Widget* w, void* v) {
 // v is unused
 void dashboard::common_grp::cb_bn_activ8(Fl_Widget* w, void* v) {
 	common_grp* that = ancestor_view<common_grp>(w);
-	dashboard* dash = ancestor_view<dashboard>(that);
 	// Set the item active or inactive dependant on state of light button
 	bool activate = ((Fl_Light_Button*)w)->value();
-	if (that->type_ == ANTENNA) {
-		dash->antenna_info_[dash->selected_antenna_].active = activate;
-	} else {
-		dash->rig_info_[dash->selected_rig_].active = activate;
-	}
+	that->item_info_[that->my_name_].active = activate;
 	that->populate_choice();
 	that->redraw();
 }
@@ -538,37 +469,21 @@ void dashboard::common_grp::cb_ch_stn(Fl_Widget* w, void* v) {
 	// Input_Choice is a descendant of common_grp
 	Fl_Input_Choice* ch = ancestor_view<Fl_Input_Choice>(w); 
 	common_grp* that = ancestor_view<common_grp>(ch);
-	dashboard* dash = ancestor_view <dashboard>(that);
-	string* name = nullptr;
-	bool* active = nullptr;
-	if (that->type_ == ANTENNA) {
-		name = &dash->selected_antenna_;
-		active = &dash->antenna_info_[*name].active;
-	}
-	else {
-		name = &dash->selected_rig_;
-		active = &dash->rig_info_[*name].active;
-	}
-	*name = ch->menubutton()->text();
 	if (ch->menubutton()->changed()) {
-		// Save current selection
-		that->save_item();
 		// Get the new item from the menu
-		that->selected_item_ = ch->menubutton()->value();
+		that->item_no_ = ch->menubutton()->value();
+		that->my_name_ = ch->menubutton()->text();
+		item_data& info = that->item_info_[that->my_name_];
+		info.active = true;
 		// Update the shared choice value
-		ch->value(name->c_str());
+		ch->value(that->my_name_.c_str());
 		// Update the active button
-	
-		((Fl_Light_Button*)that->active_)->value(*active);
-		that->update_item();
+		((Fl_Light_Button*)that->active_)->value(info.active);
+		that->populate_band();
 	}
 	else {
-		// A new item has been typed in the input field
-		*name = ch->input()->value();
-		*active = true;
-		that->selected_item_ = -1;
+		// A new item is being typed in the input field - use ADD button to process it
 	}
-	that->redraw();
 }
 
 // Multi-browser callback
@@ -576,25 +491,18 @@ void dashboard::common_grp::cb_ch_stn(Fl_Widget* w, void* v) {
 void dashboard::common_grp::cb_mb_bands(Fl_Widget* w, void* v) {
 	Fl_Multi_Browser* mb = ancestor_view<Fl_Multi_Browser>(w);
 	common_grp* that = ancestor_view<common_grp>(mb);
-	dashboard* dash = ancestor_view<dashboard>(that);
-	list<string>* bands;
 	// Get the list of bands the selected antenna or rig is meant for
-	if (that->type_ == ANTENNA) {
-		bands = &dash->antenna_info_[dash->selected_antenna_].intended_bands;
-	}
-	else {
-		bands = &dash->rig_info_[dash->selected_rig_].intended_bands;
-	}
+	vector<string>& bands = that->item_info_[that->my_name_].intended_bands;
 	// Clear the list and add the bands currently selected in the browser
-	bands->clear();
+	bands.clear();
 	for (int i = 0; i < mb->size(); i++) {
 		if (mb->selected(i)) {
-			bands->push_back(mb->text(i));
+			bands.push_back(mb->text(i));
 		}
 	}
 	that->redraw();
 	that->save_values();
-	dash->enable_widgets();
+	((dashboard*)that->parent())->enable_widgets();
 }
 
 // Item choice call back
@@ -603,15 +511,33 @@ void dashboard::common_grp::cb_ch_item(Fl_Widget* w, void* v) {
 	Fl_Input_Choice* ipch = ancestor_view<Fl_Input_Choice>(w);
 	cb_value<Fl_Input_Choice, string>(ipch, v);
 	common_grp* that = ancestor_view<common_grp>(w);
+	that->save_values();
 	that->populate_band();
+}
+
+string& dashboard::common_grp::name() {
+	return my_name_;
+}
+
+string& dashboard::common_grp::next() {
+	return next_name_;
+}
+
+dashboard::item_data& dashboard::common_grp::info() {
+	return item_info_[my_name_];
 }
 
 // The main dialog constructor
 dashboard::dashboard(int W, int H, const char* label) :
 	Fl_Window(W, H, label)
+	, rig_grp_(nullptr)
+	, antenna_grp_(nullptr)
 	, hamlib_grp_(nullptr)
 	, flrig_grp_(nullptr)
 	, norig_grp_(nullptr)
+	, cat_grp_(nullptr)
+	, cat_sel_grp_(nullptr)
+	, alarms_grp_(nullptr)
 	, baud_rate_choice_(nullptr)
 	, mfr_choice_(nullptr)
 	, override_check_(nullptr)
@@ -619,6 +545,11 @@ dashboard::dashboard(int W, int H, const char* label) :
 	, rig_model_choice_(nullptr)
 	, port_if_choice_(nullptr)
 	, show_all_ports_(nullptr)
+	, ch_qth_(nullptr)
+	, buffer_(nullptr)
+	, editor_(nullptr)
+	, bn_save_(nullptr)
+	, bn_cancel_(nullptr)
 	, logging_mode_(LM_OFF_AIR)
 	, wait_connect_(true)
 	, created_(false)
@@ -631,14 +562,20 @@ dashboard::dashboard(int W, int H, const char* label) :
 	, previous_swr_alarm_(SWR_OK)
 	, previous_pwr_alarm_(POWER_OK)
 	, previous_vdd_alarm_(VDD_OK)
+	, current_swr_alarm_(SWR_OK)
+	, current_pwr_alarm_(POWER_OK)
+	, current_vdd_alarm_(VDD_OK)
+	, selected_qth_("")
+	, next_qth_("")
 {
+	ordered_bands_.clear();
+	all_qths_.clear();
+
 	load_values();
 
 	create_form(0,0);
 
 	update();
-
-	enable_widgets();
 
 	end();
 	show();
@@ -666,8 +603,6 @@ int dashboard::handle(int event) {
 
 // create the form
 void dashboard::create_form(int X, int Y) {
-
-	this->begin();
 
 	// Used to evaluate total width and height of the window
 	int max_x = X;
@@ -700,8 +635,6 @@ void dashboard::create_form(int X, int Y) {
 
 	this->resizable(nullptr);
 	this->size(max_x + GAP - X, max_y + GAP - Y);
-	this->end();
-
 	created_ = true;
 }
 
@@ -942,29 +875,25 @@ void dashboard::create_spad_widgets(int& curr_x, int& curr_y) {
 }
 
 // Antenna and Rig ("Use") widgets
+// assumes dashboard is the current active group
 void dashboard::create_use_widgets(int& curr_x, int& curr_y) {
 
 	int max_w = 0;
 	int max_h = 0;
 
 	// Antenna group of widgets
-	antenna_grp_ = new common_grp(curr_x, curr_y, 10, 10, "Antennas");
-	antenna_grp_->type_ = ANTENNA;
-	antenna_grp_->settings_name_ = "Antennas";
+	antenna_grp_ = new common_grp(curr_x, curr_y, 10, 10, "Antennas", ANTENNA);
 	antenna_grp_->tooltip("Allows the antennas to be specified");
-	antenna_grp_->load_values();
-	// Aerial group of widgets
-	antenna_grp_->create_form(antenna_grp_->x(), antenna_grp_->y());
+	antenna_grp_->end();
+	antenna_grp_->show();
 	max_w = max(max_w, antenna_grp_->x() + antenna_grp_->w() - curr_x);
 	max_h = max(max_h, antenna_grp_->y() + antenna_grp_->h() - curr_y);
 
 	// Rig group of widgets
-	rig_grp_ = new common_grp(curr_x, antenna_grp_->y(), 10, 10, "Rigs");
-	rig_grp_->type_ = RIG;
-	rig_grp_->settings_name_ = "Rigs";
+	rig_grp_ = new common_grp(antenna_grp_->x() + antenna_grp_->w() + GAP, antenna_grp_->y(), 10, 10, "Rigs", RIG);
 	rig_grp_->tooltip("Allows the rigs to be specified");
-	rig_grp_->load_values();
-	rig_grp_->create_form(antenna_grp_->x() + antenna_grp_->w() + GAP, antenna_grp_->y());
+	rig_grp_->end();
+	rig_grp_->show();
 	max_w = max(max_w, rig_grp_->x() + rig_grp_->w() - curr_x);
 	max_h = max(max_h, rig_grp_->y() + rig_grp_->h() - curr_y);
 
@@ -1050,7 +979,7 @@ void dashboard::create_cat_widgets(int& curr_x, int& curr_y) {
 	bn_nocat_->when(FL_WHEN_RELEASE);
 	bn_nocat_->labelsize(FONT_SIZE);
 	bn_nocat_->tooltip("Select no rig interface handler");
-	bn_nocat_->value(rig_info_[selected_rig_].handler == RIG_NONE);
+	bn_nocat_->value(rig_grp_->info().rig_data.handler == RIG_NONE);
 	// Radio - Select Hamlib
 	bn_hamlib_ = new Fl_Radio_Round_Button(bn_nocat_->x(), bn_nocat_->y() + bn_nocat_->h(), WRADIO, HTEXT, "Hamlib");
 	bn_hamlib_->align(FL_ALIGN_RIGHT);
@@ -1058,7 +987,7 @@ void dashboard::create_cat_widgets(int& curr_x, int& curr_y) {
 	bn_hamlib_->when(FL_WHEN_RELEASE);
 	bn_hamlib_->labelsize(FONT_SIZE);
 	bn_hamlib_->tooltip("Select Hamlib as the rig interface handler");
-	bn_hamlib_->value(rig_info_[selected_rig_].handler == RIG_HAMLIB);
+	bn_hamlib_->value(rig_grp_->info().rig_data.handler == RIG_HAMLIB);
 	// Radio - Select Flrig
 	bn_flrig_ = new Fl_Radio_Round_Button(bn_hamlib_->x(), bn_hamlib_->y() + bn_hamlib_->h(), WRADIO, HTEXT, "FlRig");
 	bn_flrig_->align(FL_ALIGN_RIGHT);
@@ -1066,7 +995,7 @@ void dashboard::create_cat_widgets(int& curr_x, int& curr_y) {
 	bn_flrig_->when(FL_WHEN_RELEASE);
 	bn_flrig_->labelsize(FONT_SIZE);
 	bn_flrig_->tooltip("Select Flrig as the rig interface handler");
-	bn_flrig_->value(rig_info_[selected_rig_].handler == RIG_FLRIG);
+	bn_flrig_->value(rig_grp_->info().rig_data.handler == RIG_FLRIG);
 
 	cat_sel_grp_->resizable(nullptr);
 	cat_sel_grp_->size((GAP * 3 / 2) + WRADIO, bn_flrig_->y() + bn_flrig_->h() + GAP - cat_sel_grp_->y());
@@ -1095,47 +1024,47 @@ void dashboard::create_cat_widgets(int& curr_x, int& curr_y) {
 	populate_model_choice();
 
 	// Choice port name
-	ch_mfr_ = new Fl_Choice(ch_model_->x(), ch_model_->y() + ch_model_->h(), WBUTTON, HTEXT, "Port");
-	ch_mfr_->align(FL_ALIGN_LEFT);
-	ch_mfr_->labelsize(FONT_SIZE);
-	ch_mfr_->textsize(FONT_SIZE);
-	ch_mfr_->callback(cb_ch_port, nullptr);
-	ch_mfr_->tooltip("Select the comms port to use");
-	port_if_choice_ = ch_mfr_;
+	Fl_Choice* ch_mfr = new Fl_Choice(ch_model_->x(), ch_model_->y() + ch_model_->h(), WBUTTON, HTEXT, "Port");
+	ch_mfr->align(FL_ALIGN_LEFT);
+	ch_mfr->labelsize(FONT_SIZE);
+	ch_mfr->textsize(FONT_SIZE);
+	ch_mfr->callback(cb_ch_port, nullptr);
+	ch_mfr->tooltip("Select the comms port to use");
+	port_if_choice_ = ch_mfr;
 
 	// Use all ports
-	bn_useall_ = new Fl_Check_Button(ch_mfr_->x() + ch_mfr_->w(), ch_mfr_->y(), HBUTTON, HBUTTON, "All");
-	bn_useall_->align(FL_ALIGN_RIGHT);
-	bn_useall_->labelfont(FONT);
-	bn_useall_->labelsize(FONT_SIZE);
-	bn_useall_->tooltip("Select all existing ports, not just those available");
-	bn_useall_->callback(cb_bn_all, &all_ports_);
-	show_all_ports_ = bn_useall_;
+	Fl_Check_Button* bn_useall = new Fl_Check_Button(ch_mfr->x() + ch_mfr->w(), ch_mfr->y(), HBUTTON, HBUTTON, "All");
+	bn_useall->align(FL_ALIGN_RIGHT);
+	bn_useall->labelfont(FONT);
+	bn_useall->labelsize(FONT_SIZE);
+	bn_useall->tooltip("Select all existing ports, not just those available");
+	bn_useall->callback(cb_bn_all, &all_ports_);
+	show_all_ports_ = bn_useall;
 	populate_port_choice();
 
 	// Baud rate input 
-	Fl_Choice* ch_baudrate_ = new Fl_Choice(ch_model_->x(), ch_mfr_->y() + ch_mfr_->h(), WBUTTON, HTEXT, "Baud rate");
-	ch_baudrate_->align(FL_ALIGN_LEFT);
-	ch_baudrate_->labelsize(FONT_SIZE);
-	ch_baudrate_->textsize(FONT_SIZE);
-	ch_baudrate_->tooltip("Enter baud rate");
-	ch_baudrate_->callback(cb_ch_baud, nullptr);
-	baud_rate_choice_ = ch_baudrate_;
+	Fl_Choice* ch_baudrate = new Fl_Choice(ch_model_->x(), ch_mfr->y() + ch_mfr->h(), WBUTTON, HTEXT, "Baud rate");
+	ch_baudrate->align(FL_ALIGN_LEFT);
+	ch_baudrate->labelsize(FONT_SIZE);
+	ch_baudrate->textsize(FONT_SIZE);
+	ch_baudrate->tooltip("Enter baud rate");
+	ch_baudrate->callback(cb_ch_baud, nullptr);
+	baud_rate_choice_ = ch_baudrate;
 
 	// Override capabilities (as coded in hamlib)
-	Fl_Check_Button* bn_override_ = new Fl_Check_Button(ch_baudrate_->x() + ch_baudrate_->w(), ch_baudrate_->y(), HBUTTON, HBUTTON, "Override\ncapability");
-	bn_override_->align(FL_ALIGN_RIGHT);
-	bn_override_->labelsize(FONT_SIZE);
-	bn_override_->tooltip("Allow full baud rate selection");
-	bn_override_->callback(cb_ch_over, nullptr);
-	override_check_ = bn_override_;
+	Fl_Check_Button* bn_override = new Fl_Check_Button(ch_baudrate->x() + ch_baudrate->w(), ch_baudrate->y(), HBUTTON, HBUTTON, "Override\ncapability");
+	bn_override->align(FL_ALIGN_RIGHT);
+	bn_override->labelsize(FONT_SIZE);
+	bn_override->tooltip("Allow full baud rate selection");
+	bn_override->callback(cb_ch_over, nullptr);
+	override_check_ = bn_override;
 
 	populate_baud_choice();
 
 	hamlib_grp_->resizable(nullptr);
 	hamlib_grp_->size(max(ch_model_->x() + ch_model_->w(),
-		max(bn_useall_->x() + bn_useall_->w(), bn_override_->x() + bn_override_->w())) + GAP - hamlib_grp_->x(),
-		bn_override_->y() + bn_override_->h() + GAP - hamlib_grp_->y());
+		max(bn_useall->x() + bn_useall->w(), bn_override->x() + bn_override->w())) + GAP - hamlib_grp_->x(),
+		bn_override->y() + bn_override->h() + GAP - hamlib_grp_->y());
 
 	hamlib_grp_->end();
 
@@ -1149,37 +1078,37 @@ void dashboard::create_cat_widgets(int& curr_x, int& curr_y) {
 	flrig_grp_->box(FL_NO_BOX);
 
 	// IP v4 address
-	ip_ipaddress_ = new Fl_Input(flrig_grp_->x() + WLLABEL, flrig_grp_->y() + HTEXT, WSMEDIT, HBUTTON, "IP Address");
-	ip_ipaddress_->align(FL_ALIGN_LEFT);
-	ip_ipaddress_->labelsize(FONT_SIZE);
-	ip_ipaddress_->textsize(FONT_SIZE);
-	ip_ipaddress_->tooltip("The IP address of the Flrig server");
-	ip_ipaddress_->value(rig_info_[selected_rig_].flrig_params.ip_address.c_str());
-	ip_ipaddress_->callback(cb_ip_ipa, nullptr);
-	ip_ipaddress_->when(FL_WHEN_ENTER_KEY_ALWAYS);
+	Fl_Input* ip_ipaddress = new Fl_Input(flrig_grp_->x() + WLLABEL, flrig_grp_->y() + HTEXT, WSMEDIT, HBUTTON, "IP Address");
+	ip_ipaddress->align(FL_ALIGN_LEFT);
+	ip_ipaddress->labelsize(FONT_SIZE);
+	ip_ipaddress->textsize(FONT_SIZE);
+	ip_ipaddress->tooltip("The IP address of the Flrig server");
+	ip_ipaddress->value(rig_grp_->info().rig_data.flrig_params.ip_address.c_str());
+	ip_ipaddress->callback(cb_ip_ipa, nullptr);
+	ip_ipaddress->when(FL_WHEN_ENTER_KEY_ALWAYS);
 
 	// IPv4 port number
-	ip_portrnum_ = new Fl_Int_Input(ip_ipaddress_->x(), ip_ipaddress_->y() + ip_ipaddress_->h(), WBUTTON, HTEXT, "Port");
-	ip_portrnum_->align(FL_ALIGN_LEFT);
-	ip_portrnum_->labelsize(FONT_SIZE);
-	ip_portrnum_->textsize(FONT_SIZE);
-	ip_portrnum_->tooltip("The IP port number of the Flrig server");
-	ip_portrnum_->value(to_string(rig_info_[selected_rig_].flrig_params.port).c_str());
-	ip_portrnum_->callback(cb_ip_portn);
-	ip_portrnum_->when(FL_WHEN_ENTER_KEY_ALWAYS);
+	Fl_Input* ip_portnum = new Fl_Int_Input(ip_ipaddress->x(), ip_ipaddress->y() + ip_ipaddress->h(), WBUTTON, HTEXT, "Port");
+	ip_portnum->align(FL_ALIGN_LEFT);
+	ip_portnum->labelsize(FONT_SIZE);
+	ip_portnum->textsize(FONT_SIZE);
+	ip_portnum->tooltip("The IP port number of the Flrig server");
+	ip_portnum->value(to_string(rig_grp_->info().rig_data.flrig_params.port).c_str());
+	ip_portnum->callback(cb_ip_portn);
+	ip_portnum->when(FL_WHEN_ENTER_KEY_ALWAYS);
 
 	// XML-RPC resource name
-	intl_input* ip_resource_ = new intl_input(ip_portrnum_->x(), ip_portrnum_->y() + ip_portrnum_->h(), WBUTTON, HTEXT, "Resource");
-	ip_resource_->align(FL_ALIGN_LEFT);
-	ip_resource_->labelsize(FONT_SIZE);
-	ip_resource_->textsize(FONT_SIZE);
-	ip_resource_->tooltip("The resource ID of the Flrig server");
-	ip_resource_->value(rig_info_[selected_rig_].flrig_params.resource.c_str());
-	ip_resource_->callback(cb_ip_resource, nullptr);
-	ip_resource_->when(FL_WHEN_ENTER_KEY_ALWAYS);
+	intl_input* ip_resource = new intl_input(ip_portnum->x(), ip_portnum->y() + ip_portnum->h(), WBUTTON, HTEXT, "Resource");
+	ip_resource->align(FL_ALIGN_LEFT);
+	ip_resource->labelsize(FONT_SIZE);
+	ip_resource->textsize(FONT_SIZE);
+	ip_resource->tooltip("The resource ID of the Flrig server");
+	ip_resource->value(rig_grp_->info().rig_data.flrig_params.resource.c_str());
+	ip_resource->callback(cb_ip_resource, nullptr);
+	ip_resource->when(FL_WHEN_ENTER_KEY_ALWAYS);
 
 	flrig_grp_->resizable(nullptr);
-	flrig_grp_->size(max(ip_ipaddress_->x() + ip_ipaddress_->w(), max(ip_portrnum_->x() + ip_portrnum_->w(), ip_resource_->x() + ip_resource_->w())) + GAP - flrig_grp_->x(), ip_resource_->y() + ip_resource_->h() + GAP - flrig_grp_->y());
+	flrig_grp_->size(max(ip_ipaddress->x() + ip_ipaddress->w(), max(ip_portnum->x() + ip_portnum->w(), ip_resource->x() + ip_resource->w())) + GAP - flrig_grp_->x(), ip_resource->y() + ip_resource->h() + GAP - flrig_grp_->y());
 	flrig_grp_->end();
 
 	// No rig group
@@ -1216,7 +1145,7 @@ void dashboard::create_cat_widgets(int& curr_x, int& curr_y) {
 	ctr_pollfast_->minimum(FAST_RIG_MIN);
 	ctr_pollfast_->maximum(FAST_RIG_MAX);
 	ctr_pollfast_->step(0.01);
-	ctr_pollfast_->value(rig_info_[selected_rig_].fast_poll_interval);
+	ctr_pollfast_->value(rig_grp_->info().rig_data.fast_poll_interval);
 	ctr_pollfast_->callback(cb_ctr_pollfast);
 	ctr_pollfast_->when(FL_WHEN_CHANGED);
 
@@ -1230,7 +1159,7 @@ void dashboard::create_cat_widgets(int& curr_x, int& curr_y) {
 	ctr_pollslow_->minimum(SLOW_RIG_MIN);
 	ctr_pollslow_->maximum(SLOW_RIG_MAX);
 	ctr_pollslow_->step(0.5);
-	ctr_pollslow_->value(rig_info_[selected_rig_].slow_poll_interval);
+	ctr_pollslow_->value(rig_grp_->info().rig_data.slow_poll_interval);
 	ctr_pollslow_->callback(cb_ctr_pollslow);
 	ctr_pollslow_->when(FL_WHEN_CHANGED);
 
@@ -1239,7 +1168,7 @@ void dashboard::create_cat_widgets(int& curr_x, int& curr_y) {
 	poll_grp->end();
 
 	// Display hamlib ot flrig settings as selected
-	switch (rig_info_[selected_rig_].handler) {
+	switch (rig_grp_->info().rig_data.handler) {
 	case RIG_NONE:
 		norig_grp_->show();
 		hamlib_grp_->hide();
@@ -1295,8 +1224,8 @@ void dashboard::create_alarm_widgets(int& curr_x, int& curr_y) {
 	dial_swr_->step(0.1);
 	dial_swr_->alarm_color(FL_RED);
 	dial_swr_->color2(FL_BLACK);
-	dial_swr_->alarms(rig_info_[selected_rig_].alarms.swr_warning,
-		rig_info_[selected_rig_].alarms.swr_error);
+	dial_swr_->alarms(rig_grp_->info().rig_data.alarms.swr_warning,
+		rig_grp_->info().rig_data.alarms.swr_error);
 	dial_swr_->value(rig_if_ ? rig_if_->swr_meter() : 1.0);
 	dial_swr_->callback(cb_alarm_swr, nullptr);
 
@@ -1309,7 +1238,7 @@ void dashboard::create_alarm_widgets(int& curr_x, int& curr_y) {
 	dial_pwr_->minimum(0.0);
 	dial_pwr_->maximum(100.0);
 	dial_pwr_->step(1);
-	dial_pwr_->alarms(rig_info_[selected_rig_].alarms.power_warning, nan(""));
+	dial_pwr_->alarms(rig_grp_->info().rig_data.alarms.power_warning, nan(""));
 	dial_pwr_->value(rig_if_ ? rig_if_->pwr_meter() : 0.0);
 	dial_pwr_->callback(cb_alarm_pwr, nullptr);
 
@@ -1322,8 +1251,8 @@ void dashboard::create_alarm_widgets(int& curr_x, int& curr_y) {
 	dial_vdd_->minimum(10.0);
 	dial_vdd_->maximum(20.0);
 	dial_vdd_->step(0.1);
-	dial_vdd_->alarms(rig_info_[selected_rig_].alarms.voltage_minimum,
-		rig_info_[selected_rig_].alarms.voltage_maximum);
+	dial_vdd_->alarms(rig_grp_->info().rig_data.alarms.voltage_minimum,
+		rig_grp_->info().rig_data.alarms.voltage_maximum);
 	dial_vdd_->value(rig_if_ ? rig_if_->vdd_meter() : 10.0);
 	dial_vdd_->callback(cb_alarm_vdd, nullptr);
 
@@ -1350,11 +1279,6 @@ void dashboard::load_values() {
 	log_settings.get("Font Size", (int&)fontsize_, FONT_SIZE);
 
 	Fl_Preferences stations_settings(settings_, "Stations");
-	Fl_Preferences rigs_settings(stations_settings, "Rigs");
-
-	char* temp;
-	rigs_settings.get("Current", temp, "");
-	selected_rig_ = temp;
 
 	// Dashboard configuration
 	Fl_Preferences dash_settings(settings_, "Dashboard");
@@ -1458,7 +1382,7 @@ void dashboard::enable_use_widgets() {
 		}
 		string rig_band = spec_data_->band_for_freq(frequency / 1000000.0);
 		// Check if band supported by rig
-		list<string> bands = rig_info_[selected_rig_].intended_bands;
+		vector<string> bands = rig_grp_->info().rig_data.intended_bands;
 		bool found = false;
 		for (auto it = bands.begin(); it != bands.end() && !found; it++) {
 			if (*it == rig_band) {
@@ -1474,7 +1398,7 @@ void dashboard::enable_use_widgets() {
 		else {
 			found = false;
 			// Check if band supported by antenna
-			list<string> bands = antenna_info_[selected_antenna_].intended_bands;
+			vector<string> bands = antenna_grp_->info().intended_bands;
 			for (auto it = bands.begin(); it != bands.end() && !found; it++) {
 				if (*it == rig_band) {
 					found = true;
@@ -1495,8 +1419,8 @@ void dashboard::enable_use_widgets() {
 	else {
 		// No band selected - check that antenna and rig have at least one #
 		// band they are both meant for.
-		list<string> r_bands = rig_info_[selected_rig_].intended_bands;
-		list<string> a_bands = antenna_info_[selected_antenna_].intended_bands;
+		vector<string> r_bands = rig_grp_->info().rig_data.intended_bands;
+		vector<string> a_bands = antenna_grp_->info().intended_bands;
 		bool found = false;
 		for (auto itr = r_bands.begin(); itr != r_bands.end() && !found; itr++) {
 			for (auto ita = a_bands.begin(); ita != a_bands.end() && !found; ita++) {
@@ -1523,7 +1447,7 @@ void dashboard::enable_cat_widgets() {
 
 	// CAT control widgets
 	// TODO update CAT widgets
-	if (rig_info_[selected_rig_].handler == RIG_HAMLIB) {
+	if (rig_grp_->info().rig_data.handler == RIG_HAMLIB) {
 		hamlib_grp_->activate();
 		hamlib_grp_->show();
 	}
@@ -1531,7 +1455,7 @@ void dashboard::enable_cat_widgets() {
 		hamlib_grp_->deactivate();
 		hamlib_grp_->hide();
 	}
-	if (rig_info_[selected_rig_].handler == RIG_FLRIG) {
+	if (rig_grp_->info().rig_data.handler == RIG_FLRIG) {
 		flrig_grp_->activate();
 		flrig_grp_->show();
 	}
@@ -1539,7 +1463,7 @@ void dashboard::enable_cat_widgets() {
 		flrig_grp_->deactivate();
 		flrig_grp_->hide();
 	}
-	if (rig_info_[selected_rig_].handler == RIG_NONE) {
+	if (rig_grp_->info().rig_data.handler == RIG_NONE) {
 		norig_grp_->activate();
 		norig_grp_->show();
 	}
@@ -1554,7 +1478,7 @@ void dashboard::enable_cat_widgets() {
 		connect_bn_->label("Connected");
 	}
 	else {
-		switch (rig_info_[selected_rig_].handler) {
+		switch (rig_grp_->info().rig_data.handler) {
 		case RIG_HAMLIB:
 		case RIG_FLRIG:
 			if (wait_connect_) {
@@ -1578,66 +1502,73 @@ void dashboard::enable_cat_widgets() {
 // Enable the alarm widgets
 void dashboard::enable_alarm_widgets() {
 
-	// SWR widget - set colour and raise alarm
-	if (previous_swr_alarm_ != current_swr_alarm_) {
-		char message[200];
-		switch (current_swr_alarm_) {
-		case SWR_ERROR:
-			dial_swr_->color(fl_lighter(fl_lighter(FL_RED)));
-			snprintf(message, 200, "DASH: SWR %g > %g", dial_swr_->Fl_Line_Dial::value(), dial_swr_->alarm2());
-			status_->misc_status(ST_ERROR, message);
-			break;
-		case SWR_WARNING:
-			dial_swr_->color(FL_YELLOW);
-			snprintf(message, 200, "DASH: SWR %g > %g", dial_swr_->Fl_Line_Dial::value(), dial_swr_->alarm1());
-			status_->misc_status(ST_WARNING, message);
-			break;
-		case SWR_OK:
-			dial_swr_->color(FL_WHITE);
-			snprintf(message, 200, "DASH: SWR %g OK", dial_swr_->Fl_Line_Dial::value());
-			status_->misc_status(ST_OK, message);
-			break;
+	if (rig_if_) {
+		alarms_grp_->activate();
+
+		// SWR widget - set colour and raise alarm
+		if (previous_swr_alarm_ != current_swr_alarm_) {
+			char message[200];
+			switch (current_swr_alarm_) {
+			case SWR_ERROR:
+				dial_swr_->color(fl_lighter(fl_lighter(FL_RED)));
+				snprintf(message, 200, "DASH: SWR %g > %g", dial_swr_->Fl_Line_Dial::value(), dial_swr_->alarm2());
+				status_->misc_status(ST_ERROR, message);
+				break;
+			case SWR_WARNING:
+				dial_swr_->color(FL_YELLOW);
+				snprintf(message, 200, "DASH: SWR %g > %g", dial_swr_->Fl_Line_Dial::value(), dial_swr_->alarm1());
+				status_->misc_status(ST_WARNING, message);
+				break;
+			case SWR_OK:
+				dial_swr_->color(FL_WHITE);
+				snprintf(message, 200, "DASH: SWR %g OK", dial_swr_->Fl_Line_Dial::value());
+				status_->misc_status(ST_OK, message);
+				break;
+			}
+		}
+
+		// Power widget - set colour and raise alarm
+		if (previous_pwr_alarm_ != current_pwr_alarm_) {
+			char message[200];
+			switch (current_pwr_alarm_) {
+			case POWER_OK:
+				dial_pwr_->color(FL_WHITE);
+				snprintf(message, 200, "DASH: Power %g OK", dial_pwr_->Fl_Line_Dial::value());
+				status_->misc_status(ST_OK, message);
+				break;
+			case POWER_WARNING:
+				dial_pwr_->color(FL_YELLOW);
+				snprintf(message, 200, "DASH: Power %g > %g", dial_pwr_->Fl_Line_Dial::value(), dial_pwr_->alarm1());
+				status_->misc_status(ST_WARNING, message);
+				break;
+			}
+		}
+
+		// Vdd (PA drain voltage) widget - set colour and raise alarm
+		if (previous_vdd_alarm_ != current_vdd_alarm_) {
+			char message[200];
+			switch (current_vdd_alarm_) {
+			case VDD_UNDER:
+				dial_vdd_->color(fl_lighter(fl_lighter(FL_RED)));
+				snprintf(message, 200, "DASH: Vdd %g < %g", dial_vdd_->Fl_Line_Dial::value(), dial_vdd_->alarm1());
+				status_->misc_status(ST_ERROR, message);
+				break;
+			case VDD_OK:
+				dial_vdd_->color(FL_WHITE);
+				snprintf(message, 200, "DASH: Vdd %g OK", dial_vdd_->Fl_Line_Dial::value());
+				status_->misc_status(ST_OK, message);
+				break;
+			case VDD_OVER:
+				dial_vdd_->color(fl_lighter(fl_lighter(FL_RED)));
+				snprintf(message, 200, "DASH: Vdd %g > %g", dial_vdd_->Fl_Line_Dial::value(), dial_vdd_->alarm2());
+				status_->misc_status(ST_ERROR, message);
+				break;
+
+			}
 		}
 	}
-
-	// Power widget - set colour and raise alarm
-	if (previous_pwr_alarm_ != current_pwr_alarm_) {
-		char message[200];
-		switch (current_pwr_alarm_) {
-		case POWER_OK:
-			dial_pwr_->color(FL_WHITE);
-			snprintf(message, 200, "DASH: Power %g OK", dial_pwr_->Fl_Line_Dial::value());
-			status_->misc_status(ST_OK, message);
-			break;
-		case POWER_WARNING:
-			dial_pwr_->color(FL_YELLOW);
-			snprintf(message, 200, "DASH: Power %g > %g", dial_pwr_->Fl_Line_Dial::value(), dial_pwr_->alarm1());
-			status_->misc_status(ST_WARNING, message);
-			break;
-		}
-	}
-
-	// Vdd (PA drain voltage) widget - set colour and raise alarm
-	if (previous_vdd_alarm_ != current_vdd_alarm_) {
-		char message[200];
-		switch (current_vdd_alarm_) {
-		case VDD_UNDER:
-			dial_vdd_->color(fl_lighter(fl_lighter(FL_RED)));
-			snprintf(message, 200, "DASH: Vdd %g < %g", dial_vdd_->Fl_Line_Dial::value(), dial_vdd_->alarm1());
-			status_->misc_status(ST_ERROR, message);
-			break;
-		case VDD_OK:
-			dial_vdd_->color(FL_WHITE);
-			snprintf(message, 200, "DASH: Vdd %g OK", dial_vdd_->Fl_Line_Dial::value());
-			status_->misc_status(ST_OK, message);
-			break;
-		case VDD_OVER:
-			dial_vdd_->color(fl_lighter(fl_lighter(FL_RED)));
-			snprintf(message, 200, "DASH: Vdd %g > %g", dial_vdd_->Fl_Line_Dial::value(), dial_vdd_->alarm2());
-			status_->misc_status(ST_ERROR, message);
-			break;
-
-		}
+	else {
+		alarms_grp_->deactivate();
 	}
 }
 
@@ -1710,7 +1641,7 @@ void dashboard::populate_model_choice() {
 			// The '/' ensures all rigs from same manufacturer are in a sub-menu to Icom
 			sprintf(temp, "%s/%s%s", capabilities->mfg_name, capabilities->model_name, status);
 			ch->add(temp);
-			hamlib_data* hlinfo = &rig_info_[selected_rig_].hamlib_params;
+			hamlib_data* hlinfo = &rig_grp_->info().rig_data.hamlib_params;
 			if (strcmp(hlinfo->model.c_str(), (capabilities->model_name)) == 0 &&
 				strcmp(hlinfo->mfr.c_str(), (capabilities->mfg_name)) == 0) {
 				// We are adding the current selected rig, remember it's menu item value and hamlib reference number
@@ -1741,7 +1672,7 @@ void dashboard::cb_rad_handler(Fl_Widget* w, void* v) {
 	// Get the selected radio button
 	rig_handler_t handler = (rig_handler_t)(long)v;
 
-	that->rig_info_[that->selected_rig_].handler = handler;
+	that->rig_grp_->info().rig_data.handler = handler;
 
 	// Disconnect radio as we are changing handler
 	if (rig_if_) {
@@ -1761,7 +1692,7 @@ void dashboard::cb_rad_handler(Fl_Widget* w, void* v) {
 void dashboard::cb_ch_model(Fl_Widget* w, void* v) {
 	Fl_Choice* ch = (Fl_Choice*)w;
 	dashboard* that = ancestor_view<dashboard>(w);
-	hamlib_data* info = &that->rig_info_[that->selected_rig_].hamlib_params;
+	hamlib_data* info = &that->rig_grp_->info().rig_data.hamlib_params;
 	// Get the full item name - e.g. Icom/IC-736 (untested)
 	char path[128];
 	ch->item_pathname(path, sizeof(path) - 1);
@@ -1796,7 +1727,7 @@ void dashboard::cb_ch_model(Fl_Widget* w, void* v) {
 // v is unused
 void dashboard::cb_ch_port(Fl_Widget* w, void* v) {
 	dashboard* that = ancestor_view<dashboard>(w);
-	hamlib_data* info = &that->rig_info_[that->selected_rig_].hamlib_params;
+	hamlib_data* info = &that->rig_grp_->info().rig_data.hamlib_params;
 	cb_text<Fl_Choice, string>(w, (void*)&info->port_name);
 }
 
@@ -1804,7 +1735,7 @@ void dashboard::cb_ch_port(Fl_Widget* w, void* v) {
 // v is unused
 void dashboard::cb_ch_baud(Fl_Widget* w, void* v) {
 	dashboard* that = ancestor_view<dashboard>(w);
-	hamlib_data* info = &that->rig_info_[that->selected_rig_].hamlib_params;
+	hamlib_data* info = &that->rig_grp_->info().rig_data.hamlib_params;
 	cb_text<Fl_Choice, string>(w, (void*)&info->baud_rate);
 }
 
@@ -1812,7 +1743,7 @@ void dashboard::cb_ch_baud(Fl_Widget* w, void* v) {
 // v is uused
 void dashboard::cb_ch_over(Fl_Widget* w, void* v) {
 	dashboard* that = ancestor_view<dashboard>(w);
-	hamlib_data* info = &that->rig_info_[that->selected_rig_].hamlib_params;
+	hamlib_data* info = &that->rig_grp_->info().rig_data.hamlib_params;
 	cb_value<Fl_Check_Button, bool>(w, (void*)&info->override_caps);
 	that->populate_baud_choice();
 }
@@ -1829,7 +1760,7 @@ void dashboard::cb_bn_all(Fl_Widget* w, void* v) {
 // v is unused
 void dashboard::cb_ip_ipa(Fl_Widget* w, void* v) {
 	dashboard* that = ancestor_view<dashboard>(w);
-	flrig_data* info = &that->rig_info_[that->selected_rig_].flrig_params;
+	flrig_data* info = &that->rig_grp_->info().rig_data.flrig_params;
 	cb_value<Fl_Input, string>(w, (void*)&info->ip_address);
 }
 
@@ -1837,7 +1768,7 @@ void dashboard::cb_ip_ipa(Fl_Widget* w, void* v) {
 // v is unused
 void dashboard::cb_ip_portn(Fl_Widget* w, void* v) {
 	dashboard* that = ancestor_view<dashboard>(w);
-	flrig_data* info = &that->rig_info_[that->selected_rig_].flrig_params;
+	flrig_data* info = &that->rig_grp_->info().rig_data.flrig_params;
 	cb_value_int<Fl_Int_Input>(w, (void*)&info->port);
 }
 
@@ -1845,7 +1776,7 @@ void dashboard::cb_ip_portn(Fl_Widget* w, void* v) {
 // v is unused
 void dashboard::cb_ip_resource(Fl_Widget* w, void* v) {
 	dashboard* that = ancestor_view<dashboard>(w);
-	flrig_data* info = &that->rig_info_[that->selected_rig_].flrig_params;
+	flrig_data* info = &that->rig_grp_->info().rig_data.flrig_params;
 	cb_value<intl_input, string>(w, (void*)&info->resource);
 }
 
@@ -1912,7 +1843,7 @@ void dashboard::cb_alarm_vdd(Fl_Widget* w, void* v) {
 void dashboard::cb_ctr_pollfast(Fl_Widget* w, void* v) {
 	// Get the warning level
 	dashboard* that = ancestor_view<dashboard>(w);
-	cb_value<Fl_Spinner, double>(w, &that->rig_info_[that->selected_rig_].fast_poll_interval);
+	cb_value<Fl_Spinner, double>(w, &that->rig_grp_->info().rig_data.fast_poll_interval);
 }
 
 // Changed the fast polling interval
@@ -1920,14 +1851,15 @@ void dashboard::cb_ctr_pollfast(Fl_Widget* w, void* v) {
 void dashboard::cb_ctr_pollslow(Fl_Widget* w, void* v) {
 	// Get the warning level
 	dashboard* that = ancestor_view<dashboard>(w);
-	cb_value<Fl_Spinner, double>(w, &that->rig_info_[that->selected_rig_].slow_poll_interval);
+	cb_value<Fl_Spinner, double>(w, &that->rig_grp_->info().rig_data.slow_poll_interval);
 }
 
 // Pressed the connect button
 // v is not used
 void dashboard::cb_bn_connect(Fl_Widget* w, void* v) {
 	dashboard* that = ancestor_view<dashboard>(w);
-	switch (that->rig_info_[that->selected_rig_].handler) {
+	that->save_values();
+	switch (that->rig_grp_->info().rig_data.handler) {
 	case RIG_HAMLIB:
 	case RIG_FLRIG:
 		if (rig_if_) {
@@ -1962,26 +1894,26 @@ void dashboard::cb_bn_use_items(Fl_Widget* w, void* v) {
 	switch (use) {
 	case SELECTED_ONLY:
 		// Update selected record only with antenna and rig
-		sel_record->item("MY_RIG", that->selected_rig_);
-		sel_record->item("MY_ANTENNA", that->selected_antenna_);
+		sel_record->item("MY_RIG", that->rig_grp_->name());
+		sel_record->item("MY_ANTENNA", that->antenna_grp_->name());
 		sel_record->item("APP_ZZA_QTH", that->selected_qth_);
 		tabbed_forms_->update_views(nullptr, HT_MINOR_CHANGE, book_->selection());
 		break;
 	case SELECTED_NEW:
 		// Update selected and subsequent records with antenna and rig
-		sel_record->item("MY_RIG", that->selected_rig_);
-		sel_record->item("MY_ANTENNA", that->selected_antenna_);
+		sel_record->item("MY_RIG", that->rig_grp_->name());
+		sel_record->item("MY_ANTENNA", that->antenna_grp_->name());
 		sel_record->item("APP_ZZA_QTH", that->selected_qth_);
 		tabbed_forms_->update_views(nullptr, HT_MINOR_CHANGE, book_->selection());
-		that->next_rig_ = that->selected_rig_;
-		that->next_antenna_ = that->selected_antenna_;
+		that->rig_grp_->next() = that->rig_grp_->name();
+		that->antenna_grp_->next() = that->antenna_grp_->name();
 		that->next_qth_ = that->selected_qth_;
 		break;
 	case NEW_ONLY:
 		// Set subsequent records with antenna and rig
 		sel_record->user_details();
-		that->next_rig_ = that->selected_rig_;
-		that->next_antenna_ = that->selected_antenna_;
+		that->rig_grp_->next() = that->rig_grp_->name();
+		that->antenna_grp_->next() = that->antenna_grp_->name();
 		that->next_qth_ = that->selected_qth_;
 		break;
 	}
@@ -2259,7 +2191,7 @@ void dashboard::populate_port_choice() {
 		status_->misc_status(ST_LOG, message);
 		ch->add(port);
 		// Set the value to the list of ports
-		if (strcmp(port, rig_info_[selected_rig_].hamlib_params.port_name.c_str()) == 0) {
+		if (strcmp(port, rig_grp_->info().rig_data.hamlib_params.port_name.c_str()) == 0) {
 			ch->value(i);
 		}
 	}
@@ -2270,12 +2202,12 @@ void dashboard::populate_baud_choice() {
 	Fl_Choice* ch = (Fl_Choice*)baud_rate_choice_;
 	ch->clear();
 	// Override rig's capabilities?
-	bool override_caps = rig_info_[selected_rig_].hamlib_params.override_caps;
+	bool override_caps = rig_grp_->info().rig_data.hamlib_params.override_caps;
 	Fl_Button* bn = (Fl_Button*)override_check_;
 	bn->value(override_caps);
 
 	// Get the baud-rates supported by the rig
-	const rig_caps* caps = rig_get_caps(rig_info_[selected_rig_].hamlib_params.model_id);
+	const rig_caps* caps = rig_get_caps(rig_grp_->info().rig_data.hamlib_params.model_id);
 	int min_baud_rate = 300;
 	int max_baud_rate = 460800;
 	if (caps) {
@@ -2295,7 +2227,7 @@ void dashboard::populate_baud_choice() {
 		if (override_caps || (rate >= min_baud_rate && rate <= max_baud_rate)) {
 			// capabilities overridden or within the range supported by capabilities
 			ch->add(to_string(rate).c_str());
-			if (to_string(rate) == rig_info_[selected_rig_].hamlib_params.baud_rate) {
+			if (to_string(rate) == rig_grp_->info().rig_data.hamlib_params.baud_rate) {
 				ch->value(index);
 				index++;
 			}
@@ -2367,9 +2299,9 @@ void dashboard::update() {
 			prev_freq_ = freq;
 		}
 
-		selected_antenna_ = prev_record->item("MY_ANTENNA");
+		antenna_grp_->name() = prev_record->item("MY_ANTENNA");
 		antenna_grp_->populate_choice();
-		selected_rig_ = prev_record->item("MY_RIG");
+		rig_grp_->name() = prev_record->item("MY_RIG");
 		rig_grp_->populate_choice();
 	}
 	else {
@@ -2378,11 +2310,10 @@ void dashboard::update() {
 		ip_freq_->value("0");
 		ip_power_->value("0");
 		ch_mode_->value(0);
-		selected_antenna_ = "";
-		selected_rig_ = "";
+		antenna_grp_->name() = "";
+		rig_grp_->name() = "";
 	}
 	enable_widgets();
-	redraw();
 }
 
 // Set font etc.

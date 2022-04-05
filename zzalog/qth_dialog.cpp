@@ -394,32 +394,35 @@ void qth_dialog::save_values() {
 	// For each item
 	for (auto it = all_items_.begin(); it != all_items_.end(); it++) {
 		// Get item settings
-		Fl_Preferences item_settings(*my_settings_, it->first.c_str());
-		item_settings.set("Active", it->second);
-
+		if (it->first.length()) {
+			Fl_Preferences item_settings(*my_settings_, it->first.c_str());
+			item_settings.set("Active", it->second);
+		}
 		index++;
 	}
 	// For each item
 	for (auto it = all_items_.begin(); it != all_items_.end(); it++) {
-		// Get item settings
-		Fl_Preferences item_settings(*my_settings_, it->first.c_str());
-		// For QTH there are additional data to save
-		qth_info_t* qth = all_qths_[it->first];
-		item_settings.set("Callsign", qth->callsign.c_str());
-		item_settings.set("Operator Name", qth->name.c_str());
-		item_settings.set("Street", qth->street.c_str());
-		item_settings.set("Town", qth->town.c_str());
-		item_settings.set("County", qth->county.c_str());
-		item_settings.set("Post Code", qth->postcode.c_str());
-		item_settings.set("Country", qth->country.c_str());
-		item_settings.set("Continent", qth->continent.c_str());
-		item_settings.set("Locator", qth->locator.c_str());
-		item_settings.set("IOTA", qth->iota.c_str());
-		item_settings.set("DXCC Id", qth->dxcc_id.c_str());
-		item_settings.set("DXCC Name", qth->dxcc_name.c_str());
-		item_settings.set("CQ Zone", qth->cq_zone.c_str());
-		item_settings.set("ITU Zone", qth->itu_zone.c_str());
-		item_settings.set("State", qth->state.c_str());
+		if (it->first.length()) {
+			// Get item settings
+			Fl_Preferences item_settings(*my_settings_, it->first.c_str());
+			// For QTH there are additional data to save
+			qth_info_t* qth = all_qths_[it->first];
+			item_settings.set("Callsign", qth->callsign.c_str());
+			item_settings.set("Operator Name", qth->name.c_str());
+			item_settings.set("Street", qth->street.c_str());
+			item_settings.set("Town", qth->town.c_str());
+			item_settings.set("County", qth->county.c_str());
+			item_settings.set("Post Code", qth->postcode.c_str());
+			item_settings.set("Country", qth->country.c_str());
+			item_settings.set("Continent", qth->continent.c_str());
+			item_settings.set("Locator", qth->locator.c_str());
+			item_settings.set("IOTA", qth->iota.c_str());
+			item_settings.set("DXCC Id", qth->dxcc_id.c_str());
+			item_settings.set("DXCC Name", qth->dxcc_name.c_str());
+			item_settings.set("CQ Zone", qth->cq_zone.c_str());
+			item_settings.set("ITU Zone", qth->itu_zone.c_str());
+			item_settings.set("State", qth->state.c_str());
+		}
 	}
 	// Redraw views that need a location
 	tabbed_forms_->update_views(nullptr, HT_LOCATION, -1);
