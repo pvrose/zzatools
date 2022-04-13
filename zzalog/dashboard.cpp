@@ -185,6 +185,12 @@ void dashboard::common_grp::load_values() {
 			// 
 			}
 		}
+		else {
+			// Default to no handler - hopefully can ignore the rest
+			if (type_ == RIG) {
+				item_info_[""].rig_data.handler = RIG_NONE;
+			}
+		}
 	}
 }
 
@@ -469,6 +475,7 @@ void dashboard::common_grp::cb_ch_stn(Fl_Widget* w, void* v) {
 	// Input_Choice is a descendant of common_grp
 	Fl_Input_Choice* ch = ancestor_view<Fl_Input_Choice>(w); 
 	common_grp* that = ancestor_view<common_grp>(ch);
+	dashboard* dash = ancestor_view<dashboard>(that);
 	if (ch->menubutton()->changed()) {
 		// Get the new item from the menu
 		that->item_no_ = ch->menubutton()->value();
@@ -480,6 +487,7 @@ void dashboard::common_grp::cb_ch_stn(Fl_Widget* w, void* v) {
 		// Update the active button
 		((Fl_Light_Button*)that->active_)->value(info.active);
 		that->populate_band();
+		dash->enable_widgets();
 	}
 	else {
 		// A new item is being typed in the input field - use ADD button to process it
@@ -567,6 +575,8 @@ dashboard::dashboard(int W, int H, const char* label) :
 	, current_vdd_alarm_(VDD_OK)
 	, selected_qth_("")
 	, next_qth_("")
+	, last_tx_swr_(1.0)
+	, last_tx_pwr_(0.0)
 {
 	ordered_bands_.clear();
 	all_qths_.clear();
@@ -1450,26 +1460,32 @@ void dashboard::enable_cat_widgets() {
 	if (rig_grp_->info().rig_data.handler == RIG_HAMLIB) {
 		hamlib_grp_->activate();
 		hamlib_grp_->show();
+		bn_hamlib_->value(true);
 	}
 	else {
 		hamlib_grp_->deactivate();
 		hamlib_grp_->hide();
+		bn_hamlib_->value(false);
 	}
 	if (rig_grp_->info().rig_data.handler == RIG_FLRIG) {
 		flrig_grp_->activate();
 		flrig_grp_->show();
+		bn_flrig_->value(true);
 	}
 	else {
 		flrig_grp_->deactivate();
 		flrig_grp_->hide();
+		bn_flrig_->value(false);
 	}
 	if (rig_grp_->info().rig_data.handler == RIG_NONE) {
 		norig_grp_->activate();
 		norig_grp_->show();
+		bn_nocat_->value(true);
 	}
 	else {
 		norig_grp_->deactivate();
 		norig_grp_->hide();
+		bn_nocat_->value(false);
 	}
 
 	// Connect button
@@ -1510,21 +1526,27 @@ void dashboard::enable_alarm_widgets() {
 			char message[200];
 			switch (current_swr_alarm_) {
 			case SWR_ERROR:
-				dial_swr_->color(fl_lighter(fl_lighter(FL_RED)));
+				dial_swr_->color2(FL_RED);
 				snprintf(message, 200, "DASH: SWR %g > %g", dial_swr_->Fl_Line_Dial::value(), dial_swr_->alarm2());
 				status_->misc_status(ST_ERROR, message);
 				break;
 			case SWR_WARNING:
-				dial_swr_->color(FL_YELLOW);
+				dial_swr_->color2(fl_color_average(FL_RED, FL_YELLOW, 0.33));
 				snprintf(message, 200, "DASH: SWR %g > %g", dial_swr_->Fl_Line_Dial::value(), dial_swr_->alarm1());
 				status_->misc_status(ST_WARNING, message);
 				break;
 			case SWR_OK:
-				dial_swr_->color(FL_WHITE);
+				dial_swr_->color2(FL_BLACK);
 				snprintf(message, 200, "DASH: SWR %g OK", dial_swr_->Fl_Line_Dial::value());
 				status_->misc_status(ST_OK, message);
 				break;
 			}
+		}
+		if (rig_if_->get_tx()) {
+			dial_swr_->activate();
+		}
+		else {
+			dial_swr_->deactivate();
 		}
 
 		// Power widget - set colour and raise alarm
@@ -1532,16 +1554,22 @@ void dashboard::enable_alarm_widgets() {
 			char message[200];
 			switch (current_pwr_alarm_) {
 			case POWER_OK:
-				dial_pwr_->color(FL_WHITE);
+				dial_pwr_->color2(FL_BLACK);
 				snprintf(message, 200, "DASH: Power %g OK", dial_pwr_->Fl_Line_Dial::value());
 				status_->misc_status(ST_OK, message);
 				break;
 			case POWER_WARNING:
-				dial_pwr_->color(FL_YELLOW);
+				dial_pwr_->color2(fl_color_average(FL_RED, FL_YELLOW, 0.33));
 				snprintf(message, 200, "DASH: Power %g > %g", dial_pwr_->Fl_Line_Dial::value(), dial_pwr_->alarm1());
 				status_->misc_status(ST_WARNING, message);
 				break;
 			}
+		}
+		if (rig_if_->get_tx()) {
+			dial_pwr_->activate();
+		}
+		else {
+			dial_pwr_->deactivate();
 		}
 
 		// Vdd (PA drain voltage) widget - set colour and raise alarm
@@ -1549,17 +1577,17 @@ void dashboard::enable_alarm_widgets() {
 			char message[200];
 			switch (current_vdd_alarm_) {
 			case VDD_UNDER:
-				dial_vdd_->color(fl_lighter(fl_lighter(FL_RED)));
+				dial_vdd_->color2(FL_RED);
 				snprintf(message, 200, "DASH: Vdd %g < %g", dial_vdd_->Fl_Line_Dial::value(), dial_vdd_->alarm1());
 				status_->misc_status(ST_ERROR, message);
 				break;
 			case VDD_OK:
-				dial_vdd_->color(FL_WHITE);
+				dial_vdd_->color2(FL_BLACK);
 				snprintf(message, 200, "DASH: Vdd %g OK", dial_vdd_->Fl_Line_Dial::value());
 				status_->misc_status(ST_OK, message);
 				break;
 			case VDD_OVER:
-				dial_vdd_->color(fl_lighter(fl_lighter(FL_RED)));
+				dial_vdd_->color2(FL_RED);
 				snprintf(message, 200, "DASH: Vdd %g > %g", dial_vdd_->Fl_Line_Dial::value(), dial_vdd_->alarm2());
 				status_->misc_status(ST_ERROR, message);
 				break;
@@ -1788,6 +1816,15 @@ void dashboard::cb_alarm_swr(Fl_Widget* w, void* v) {
 	double val = dial->Fl_Line_Dial::value();
 	double error = dial->alarm2();
 	double warn = dial->alarm1();
+	// If in receive mode, use last value read in TX mode
+	if (!rig_if_->get_tx()) {
+		val = that->last_tx_swr_;
+		dial->Fl_Line_Dial::value(val);
+	}
+	else {
+		that->last_tx_swr_ = val;
+	}
+	// Check against error or warning levels
 	that->previous_swr_alarm_ = that->current_swr_alarm_;
 	if (val > error) {
 		that->current_swr_alarm_ = SWR_ERROR;
@@ -1808,6 +1845,15 @@ void dashboard::cb_alarm_pwr(Fl_Widget* w, void* v) {
 	dashboard* that = ancestor_view<dashboard>(dial);
 	double val = dial->Fl_Line_Dial::value();
 	double warn = dial->alarm1();
+	// If in receive mode, use last value read in TX mode
+	if (!rig_if_->get_tx()) {
+		val = that->last_tx_pwr_;
+		dial->Fl_Line_Dial::value(val);
+	}
+	else {
+		that->last_tx_pwr_ = val;
+	}
+	// Check against warning level
 	that->previous_pwr_alarm_ = that->current_pwr_alarm_;
 	if (val > warn) {
 		that->current_pwr_alarm_ = POWER_WARNING;
@@ -1825,6 +1871,7 @@ void dashboard::cb_alarm_vdd(Fl_Widget* w, void* v) {
 	double val = dial->Fl_Line_Dial::value();
 	double max = dial->alarm2();
 	double min = dial->alarm1();
+	// Check against error levels
 	that->previous_vdd_alarm_ = that->current_vdd_alarm_;
 	if (val > max) {
 		that->current_vdd_alarm_ = VDD_OVER;
@@ -2279,14 +2326,36 @@ void dashboard::rig_update(string frequency, string mode, string power) {
 
 // Get QSO information from previous record not rig
 void dashboard::update() {
-	// Get present values for voliable data from rig
+	// Get freq etc from QSO or rig
+	// Get present values data from rig
 	if (rig_if_) {
 		dial_swr_->value(rig_if_->swr_meter());
 		dial_pwr_->value(rig_if_->pwr_meter());
 		dial_vdd_->value(rig_if_->vdd_meter());
+		ip_freq_->value(rig_if_->get_frequency(true).c_str());
+		ip_power_->value(rig_if_->get_tx_power().c_str());
+		string mode;
+		string submode;
+		rig_if_->get_string_mode(mode, submode);
+		ch_mode_->value(ch_mode_->find_index(submode.c_str()));
+		if (band_view_) {
+			double freq = stod(rig_if_->get_frequency(true)) * 1000.0;
+			if (band_view_->in_band(freq)) {
+				ip_freq_->textcolor(FL_BLACK);
+			}
+			else {
+				ip_freq_->textcolor(FL_RED);
+			}
+			band_view_->update(freq);
+			prev_freq_ = freq;
+		}
+		string rig_name = rig_if_->rig_name();
+		if (rig_name != rig_grp_->name()) {
+			rig_grp_->name() = rig_name;
+			rig_grp_->populate_choice();
+		}
 	}
-	// Get freq etc from QSO or rig
-	if (book_->size()) {
+	else if (book_->size()) {
 		record* prev_record = book_->get_record();
 		// Assume as it's a logged record, the frequency is valid
 		ip_freq_->textcolor(FL_BLACK);

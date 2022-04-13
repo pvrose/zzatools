@@ -247,7 +247,13 @@ bool rpc_handler::decode_response(istream& response_xml, rpc_data_item* response
 	reader->parse(response_xml);
 	// Get the outer XML: element - it should be <methodResponse>
 	xml_element* top_element = reader->element();
-	if (top_element == nullptr || top_element->name() != "methodResponse") {
+	if (top_element == nullptr) {
+		// Currently this happens when closing
+		cb_error_message(ST_ERROR, "RPC: null XML received!");
+		delete reader;
+		return false;
+	} 
+	else if (top_element->name() != "methodResponse") {
 		// Bad or incorrect XML received
 		fl_alert("XML_RPC: XML reader has not decoded XML or top-level != methodResponse");
 		delete reader;

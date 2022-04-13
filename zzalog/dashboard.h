@@ -144,8 +144,6 @@ namespace zzalog {
 			virtual void load_values();
 			// create the form
 			virtual void create_form(int X, int Y);
-			// enable/disable widgets
-			virtual void enable_widgets() {};
 			// save values
 			virtual void save_values();
 			// button callback - add
@@ -333,9 +331,13 @@ namespace zzalog {
 		string next_qth_;
 		// Avaiable QTHs
 		set<string> all_qths_;
+		// Keep track of alarm activation to avoid too many alarms for the same violation
 		enum { SWR_OK, SWR_WARNING, SWR_ERROR } previous_swr_alarm_, current_swr_alarm_;
 		enum { POWER_OK, POWER_WARNING } previous_pwr_alarm_, current_pwr_alarm_;
 		enum { VDD_UNDER, VDD_OK, VDD_OVER } previous_vdd_alarm_, current_vdd_alarm_;
+		// Reemeber last tx SWR and Power readings to display during receive
+		double last_tx_swr_;
+		double last_tx_pwr_;
 
 		// Groups
 		common_grp* rig_grp_;
