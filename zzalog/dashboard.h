@@ -270,6 +270,8 @@ namespace zzalog {
 		static void cb_ch_mode(Fl_Widget* w, void* v);
 		// Callback - power input
 		static void cb_ip_power(Fl_Widget* w, void* v);
+		// Callback - 1s timer
+		static void cb_timer_clock(void* v);
 
 		// Set font
 		void set_font(Fl_Font font, Fl_Fontsize size);
@@ -308,12 +310,14 @@ namespace zzalog {
 		void create_spad_widgets(int& curr_x, int& curr_y);
 		void create_cat_widgets(int& curr_x, int& curr_y);
 		void create_alarm_widgets(int& curr_x, int& curr_y);
+		void create_clock_widgets(int& curr_x, int& curr_y);
 
 		// Enable the various sets of widgets
 		void enable_use_widgets();
 		void enable_spad_widgets();
 		void enable_cat_widgets();
 		void enable_alarm_widgets();
+		void enable_clock_widgets();
 
 		// Set of bands in frequency order
 		list<string> ordered_bands_;
@@ -348,6 +352,7 @@ namespace zzalog {
 		Fl_Group* cat_grp_;
 		Fl_Group* cat_sel_grp_;
 		Fl_Group* alarms_grp_;
+		Fl_Group* clock_grp_;
 		// widgets
 		// Hamlib widgets to revalue when rig selected changes
 		Fl_Widget* mfr_choice_;
@@ -390,6 +395,8 @@ namespace zzalog {
 		alarm_dial* dial_vdd_;
 		Fl_Button* connect_bn_;
 		Fl_Widget* ant_rig_box_;
+		Fl_Button* bn_time_;
+		Fl_Button* bn_date_;
 
 		// The record being entered or used
 		record* record_;

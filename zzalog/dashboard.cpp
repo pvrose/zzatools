@@ -34,6 +34,7 @@
 #include <FL/Fl_Multi_Browser.H>
 #include <FL/Fl_Help_View.H>
 #include <FL/Fl_Spinner.H>
+#include <FL/Fl_Output.H>
 #include <FL/fl_ask.H>
 #include <FL/Fl_Tooltip.H>
 
@@ -594,6 +595,7 @@ dashboard::dashboard(int W, int H, const char* label) :
 // Destructor
 dashboard::~dashboard()
 {
+	Fl::remove_timeout(cb_timer_clock, nullptr);
 	save_values();
 }
 
@@ -639,7 +641,14 @@ void dashboard::create_form(int X, int Y) {
 
 	curr_x += GAP;
 	curr_y = save_y;
+	int save_x = curr_x;
 	create_alarm_widgets(curr_x, curr_y);
+	max_x = max(max_x, curr_x);
+	max_y = max(max_y, curr_y);
+
+	curr_x = save_x;
+	curr_y += GAP;
+	create_clock_widgets(curr_x, curr_y);
 	max_x = max(max_x, curr_x);
 	max_y = max(max_y, curr_y);
 
@@ -1270,11 +1279,52 @@ void dashboard::create_alarm_widgets(int& curr_x, int& curr_y) {
 
 	alarms_grp_->size(dial_swr_->w() + dial_pwr_->w() + dial_vdd_->w() + (GAP * 4), dial_swr_->h() + GAP + HTEXT);
 	max_w = max(max_w, alarms_grp_->x() + alarms_grp_->w() - curr_x);
-	max_h = max(max_w, alarms_grp_->y() + alarms_grp_->h() - curr_y);
+	max_h = max(max_h, alarms_grp_->y() + alarms_grp_->h() - curr_y);
 	alarms_grp_->end();
 
 	curr_x += max_w;
 	curr_y += max_h;
+
+}
+
+// Create widgets to hold current tima and date (UTC)
+void dashboard::create_clock_widgets(int& curr_x, int& curr_y) {
+	int max_w = 0;
+	int max_h = 0;
+
+	clock_grp_ = new Fl_Group(curr_x, curr_y, 10, 10, "Clock - UTC");
+	clock_grp_->labelfont(FONT);
+	clock_grp_->labelsize(FONT_SIZE);
+	clock_grp_->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
+	clock_grp_->box(FL_BORDER_BOX);
+
+	bn_time_ = new Fl_Button(clock_grp_->x() + GAP, clock_grp_->y() + HTEXT, 250, 100);
+	bn_time_->color(FL_BLACK);
+	bn_time_->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE);
+	bn_time_->labelfont(FONT | FL_BOLD);
+	bn_time_->labelsize(5 * FONT_SIZE);
+	bn_time_->labelcolor(FL_YELLOW);
+	bn_time_->box(FL_FLAT_BOX);
+
+	bn_date_ = new Fl_Button(bn_time_->x(), bn_time_->y() + bn_time_->h(), bn_time_->w(), HTEXT * 3 / 2);
+	bn_date_->color(FL_BLACK);
+	bn_date_->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE);
+	bn_date_->labelfont(FONT);
+	bn_date_->labelsize(FONT_SIZE * 3 / 2);
+	bn_date_->labelcolor(FL_YELLOW);
+	bn_date_->box(FL_FLAT_BOX);
+
+	clock_grp_->resizable(nullptr);
+	clock_grp_->size(2 * GAP + bn_time_->w(), GAP + HTEXT + bn_time_->h() + bn_date_->h());
+	max_w = clock_grp_->w();
+	max_h = clock_grp_->h();
+	clock_grp_->end();
+
+	curr_x += max_w;
+	curr_y += max_h;
+
+	// Start clock timer
+	Fl::add_timeout(0, cb_timer_clock, this);
 
 }
 
@@ -1349,6 +1399,7 @@ void dashboard::enable_widgets() {
 	enable_cat_widgets();
 	enable_use_widgets();
 	enable_alarm_widgets();
+	enable_clock_widgets();
 
 }
 
@@ -1531,7 +1582,7 @@ void dashboard::enable_alarm_widgets() {
 				status_->misc_status(ST_ERROR, message);
 				break;
 			case SWR_WARNING:
-				dial_swr_->color2(fl_color_average(FL_RED, FL_YELLOW, 0.33));
+				dial_swr_->color2(fl_color_average(FL_RED, FL_YELLOW, 0.33f));
 				snprintf(message, 200, "DASH: SWR %g > %g", dial_swr_->Fl_Line_Dial::value(), dial_swr_->alarm1());
 				status_->misc_status(ST_WARNING, message);
 				break;
@@ -1559,7 +1610,7 @@ void dashboard::enable_alarm_widgets() {
 				status_->misc_status(ST_OK, message);
 				break;
 			case POWER_WARNING:
-				dial_pwr_->color2(fl_color_average(FL_RED, FL_YELLOW, 0.33));
+				dial_pwr_->color2(fl_color_average(FL_RED, FL_YELLOW, 0.33f));
 				snprintf(message, 200, "DASH: Power %g > %g", dial_pwr_->Fl_Line_Dial::value(), dial_pwr_->alarm1());
 				status_->misc_status(ST_WARNING, message);
 				break;
@@ -1599,6 +1650,9 @@ void dashboard::enable_alarm_widgets() {
 		alarms_grp_->deactivate();
 	}
 }
+
+// Place holder for noe
+void dashboard::enable_clock_widgets() {}
 
 // Read the list of bands from the ADIF specification and put them in frequency order
 void dashboard::order_bands() {
@@ -2243,6 +2297,26 @@ void dashboard::populate_port_choice() {
 		}
 	}
 }
+
+// Clock timer callback - received every UTC_TIMER seconds
+void dashboard::cb_timer_clock(void* v) {
+	// Update the label in the clock button which is passed as the parameter
+	dashboard* dash = (dashboard*)v;
+	time_t now = time(nullptr);
+	tm* value = gmtime(&now);
+	char result[100];
+	// convert to C string, then C++ string
+	strftime(result, 99, "%H:%M:%S", value);
+	dash->bn_time_->copy_label(result);
+	// Convert date
+	strftime(result, 99, "%A %d %B %Y", value);
+	dash->bn_date_->copy_label(result);
+
+	dash->clock_grp_->redraw();
+
+	Fl::repeat_timeout(UTC_TIMER, cb_timer_clock, v);
+}
+
 
 // Populate the baud rate choice menu
 void dashboard::populate_baud_choice() {
