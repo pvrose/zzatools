@@ -1463,3 +1463,8 @@ bool book::upload_qso(record_num_t record_num) {
 bool book::been_modified() {
 	return been_modified_;
 }
+
+// return entrring new record
+bool book::enterring_record() {
+	return new_record_ || modified_record_;
+}

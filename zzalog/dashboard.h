@@ -397,6 +397,7 @@ namespace zzalog {
 		Fl_Widget* ant_rig_box_;
 		Fl_Button* bn_time_;
 		Fl_Button* bn_date_;
+		Fl_Button* bn_local_;
 
 		// The record being entered or used
 		record* record_;

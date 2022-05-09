@@ -958,6 +958,7 @@ void menu::cb_mi_log_new(Fl_Widget* w, void* v) {
 void menu::cb_mi_log_save(Fl_Widget* w, void* v) {
 	dxatlas_->clear_dx_loc();
 	navigation_book_->save_record();
+	dashboard_->update();
 }
 
 // Log->Delete/Cancel
@@ -966,6 +967,7 @@ void menu::cb_mi_log_del(Fl_Widget* w, void* v) {
 	// delete_record(true) - deliberately deleting a record
 	// delete_record(false) - only deletes if entering a new record (i.e. cancel)
 	navigation_book_->delete_record((bool)(long)v);
+	dashboard_->update();
 }
 
 // Log->Retime record - reset TIME_OFF to now

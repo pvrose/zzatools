@@ -1298,7 +1298,7 @@ void dashboard::create_clock_widgets(int& curr_x, int& curr_y) {
 	clock_grp_->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 	clock_grp_->box(FL_BORDER_BOX);
 
-	bn_time_ = new Fl_Button(clock_grp_->x() + GAP, clock_grp_->y() + HTEXT, 250, 100);
+	bn_time_ = new Fl_Button(clock_grp_->x() + GAP, clock_grp_->y() + HTEXT, 250, 3 * HTEXT);
 	bn_time_->color(FL_BLACK);
 	bn_time_->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE);
 	bn_time_->labelfont(FONT | FL_BOLD);
@@ -1314,8 +1314,18 @@ void dashboard::create_clock_widgets(int& curr_x, int& curr_y) {
 	bn_date_->labelcolor(FL_YELLOW);
 	bn_date_->box(FL_FLAT_BOX);
 
+	bn_local_ = new Fl_Button(bn_date_->x(), bn_date_->y() + bn_date_->h(), bn_date_->w(), HTEXT * 3 / 2);
+	bn_local_->color(FL_BLACK);
+	bn_local_->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE);
+	bn_local_->labelfont(FONT);
+	bn_local_->labelsize(FONT_SIZE * 3 / 2);
+	bn_local_->labelcolor(FL_RED);
+	bn_local_->box(FL_FLAT_BOX);
+
+
+
 	clock_grp_->resizable(nullptr);
-	clock_grp_->size(2 * GAP + bn_time_->w(), GAP + HTEXT + bn_time_->h() + bn_date_->h());
+	clock_grp_->size(2 * GAP + bn_time_->w(), GAP + HTEXT + bn_time_->h() + bn_date_->h() + bn_local_->h());
 	max_w = clock_grp_->w();
 	max_h = clock_grp_->h();
 	clock_grp_->end();
@@ -1443,7 +1453,7 @@ void dashboard::enable_use_widgets() {
 		}
 		string rig_band = spec_data_->band_for_freq(frequency / 1000000.0);
 		// Check if band supported by rig
-		vector<string> bands = rig_grp_->info().rig_data.intended_bands;
+		vector<string> bands = rig_grp_->info().intended_bands;
 		bool found = false;
 		for (auto it = bands.begin(); it != bands.end() && !found; it++) {
 			if (*it == rig_band) {
@@ -2156,6 +2166,7 @@ void dashboard::cb_cancel(Fl_Widget* w, void* v) {
 		dxatlas_->clear_dx_loc();
 	}
 	that->buffer_->text("");
+	that->enterring_record_ = false;
 	that->enable_widgets();
 }
 
@@ -2311,6 +2322,10 @@ void dashboard::cb_timer_clock(void* v) {
 	// Convert date
 	strftime(result, 99, "%A %d %B %Y", value);
 	dash->bn_date_->copy_label(result);
+	// Convert local time
+	value = localtime(&now);
+	strftime(result, 99, "%T %Z", value);
+	dash->bn_local_->copy_label(result);
 
 	dash->clock_grp_->redraw();
 
@@ -2456,6 +2471,7 @@ void dashboard::update() {
 		antenna_grp_->name() = "";
 		rig_grp_->name() = "";
 	}
+	enterring_record_ = book_->enterring_record();
 	enable_widgets();
 }
 

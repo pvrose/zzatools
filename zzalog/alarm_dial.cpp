@@ -28,6 +28,17 @@ alarm_dial::~alarm_dial() {}
 void alarm_dial::draw(int X, int Y, int W, int H) {
     // Draw the main dial and value hand
     Fl_Line_Dial::draw(X, Y, W, H);
+ 
+    // Redraw the value hand - to override the black outline
+    if (active_r()) fl_color(selection_color());
+    else fl_color(fl_inactive(selection_color()));
+    fl_begin_polygon();
+    fl_vertex(0.0, 0.0);
+    fl_vertex(-0.04, 0.0);
+    fl_vertex(-0.25, 0.25);
+    fl_vertex(0.0, 0.04);
+    fl_end_polygon();
+
     // Now draw the alarm hands - algorith copied from Fl_Dial
     X += Fl::box_dx(box());
     Y += Fl::box_dy(box());

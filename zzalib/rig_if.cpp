@@ -79,13 +79,6 @@ void rig_if::close() {
 // Convert s-meter reading into display format
 string rig_if::get_smeter() {
 	int smeter = s_meter();
-	if (get_tx()) {
-		// Remember SWR value for display
-		smeter = last_rx_smeter_;
-	}
-	else {
-		last_rx_smeter_ = smeter;
-	}
 	char text[100];
 	// SMeter value is relative to S9
 	// Smeter value 0 indicates S9,
@@ -109,14 +102,6 @@ string rig_if::get_smeter() {
 // Convert SWR meter into display formet
 string rig_if::get_swr_meter() {
 	double swr = swr_meter();
-	if (!get_tx()) {
-		// Remember last SWR for display and clear reported flag to report it next transmission
-		swr = last_tx_swr_;
-		reported_hi_swr_ = false;
-	}
-	else {
-		last_tx_swr_ = swr;
-	}
 	char text[100];
 	snprintf(text, 100, "1:%.1f", swr);
 	return text;
@@ -974,10 +959,17 @@ int rig_flrig::s_meter() {
 		// 0 = S0, 50 = S9, 100 = S9 + 60
 		int value = response.get_int() - 50;
 		if (value <= 0) {
-			return value * 54 / 50;
+			value = value * 54 / 50;
 		}
 		else {
-			return value * 60 / 50;
+			value = value * 60 / 50;
+		}
+		if (get_tx()) {
+			return last_rx_smeter_;
+		}
+		else {
+			last_rx_smeter_ = value;
+			return last_rx_smeter_;
 		}
 	}
 	else {
@@ -993,7 +985,14 @@ double rig_flrig::pwr_meter() {
 	rpc_data_item response;
 	if (do_request("rig.get_pwrmeter", nullptr, &response)) {
 		// linear 0 to 100 W
-		return (double)response.get_int();
+		double power = (double)response.get_int();
+		if (power == 0.0) {
+			return last_tx_power_;
+		}
+		else {
+			last_tx_power_ = power;
+			return last_tx_power_;
+		}
 	}
 	else {
 		// Default return S0
@@ -1072,6 +1071,9 @@ double rig_flrig::swr_meter() {
 	//error(ST_ERROR, error_message("swr_meter").c_str());
 	//return nan("");
 	rpc_data_item response;
+	if (!get_tx()) {
+		return last_tx_swr_;
+	}
 	if (do_request("rig.get_swrmeter", nullptr, &response)) {
 		// It matches the SWR meter display widget in flrig
 		// 0 = 1:1
@@ -1104,6 +1106,7 @@ double rig_flrig::swr_meter() {
 		//char mess[256];
 		//snprintf(mess, 256, "DEBUG: Value received from rig - %d, ρ = %g, SWR = %g", value, rho,  swr);
 		//error(ST_DEBUG, mess);
+		last_tx_swr_ = swr;
 		return swr;
 	}
 	else {
