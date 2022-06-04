@@ -872,6 +872,11 @@ void book::save_record() {
 		record_modified = true;
 	}
 
+	// Now update rig, antenna and QTH to next value
+	if (dashboard_) {
+		dashboard_->save_next_values();
+	}
+
 	// If new or changed then update the fact and let every one know
 	if (record_modified || new_record_ || modified_record_) {
 		modified(true);
@@ -1455,6 +1460,8 @@ bool book::upload_qso(record_num_t record_num) {
 	bool ok = eqsl_handler_->upload_single_qso(record_num);
 	if (!lotw_handler_->upload_single_qso(record_num)) ok = false;
 	if (!club_handler_->upload_single_qso(record_num)) ok = false;
+	// Clear flag as already handled new record features
+	new_record_ = false;
 	enable_save(old_save_enabled);
 	return ok;
 }

@@ -14,6 +14,7 @@
 #include <sstream>
 
 #include <FL/fl_ask.H>
+#include <FL/Fl_Preferences.H>
 
 using namespace zzalog;
 
@@ -26,6 +27,7 @@ extern eqsl_handler* eqsl_handler_;
 extern lotw_handler* lotw_handler_;
 extern club_handler* club_handler_;
 extern spec_data* spec_data_;
+extern Fl_Preferences* settings_;
 
 // Constructor
 extract_data::extract_data() :
@@ -454,6 +456,7 @@ void extract_data::extract_qsl(extract_data::extract_mode_t server) {
 		/*string field_name; */ field_name,
 		/*string pattern;*/ "Y"
 	};
+	status_->misc_status(ST_NOTE, "EXTRACT: Extracting QSOs not sent already");
 	criteria(new_criteria, server);
 	// Only send those whose QSO is complete !(QSO_COMPLETE==N)
 	new_criteria = {
@@ -471,6 +474,7 @@ void extract_data::extract_qsl(extract_data::extract_mode_t server) {
 		/*string field_name; */ "QSO_COMPLETE",
 		/*string pattern;*/ "N"
 	};
+	status_->misc_status(ST_NOTE, "EXTRACT: Removing incomplete QSOs");
 	criteria(new_criteria, server);
 	if (server == LOTW || server == CLUBLOG) {
 		// Only send those to which are QSOs !(SWL==Y)
@@ -489,6 +493,7 @@ void extract_data::extract_qsl(extract_data::extract_mode_t server) {
 			/*string field_name; */ "SWL",
 			/*string pattern;*/ "Y"
 		};
+		status_->misc_status(ST_NOTE, "EXTRACT: Removing replies to SWL reports");
 		criteria(new_criteria, server);
 	}
 	if (server == CARD) {
@@ -508,6 +513,7 @@ void extract_data::extract_qsl(extract_data::extract_mode_t server) {
 			/*string field_name; */ "QSL_RCVD",
 			/*string pattern;*/ "Y"
 		};
+		status_->misc_status(ST_NOTE, "EXTRACT: Extracting replies to received cards");
 		criteria(new_criteria, server);
 		// Ignore those with QSL_SENT==I (ignore)
 		new_criteria = {
@@ -525,12 +531,40 @@ void extract_data::extract_qsl(extract_data::extract_mode_t server) {
 			/*string field_name; */ "QSL_SENT",
 			/*string pattern;*/ "I"
 		};
+		status_->misc_status(ST_NOTE, "EXTRACT: Removing QSOs marked  ignore QSL");
 		criteria(new_criteria, server);
 
 		sort_records("DXCC", false);
 		tabbed_forms_->update_views(nullptr, HT_RESET_ORDER, 0);
 
 	}
+	// Now check that they are all for the current station
+	Fl_Preferences station_settings(settings_, "Stations");
+	Fl_Preferences qths_settings(station_settings, "QTHs");
+	char* temp;
+	qths_settings.get("Current", temp, nullptr);
+	Fl_Preferences current_settings(qths_settings, temp);
+	current_settings.get("Callsign", temp, "");
+	string station(temp);
+	free(temp);
+	new_criteria = {
+		/*search_cond_t condition*/ XC_FIELD,
+		/*search_comp_t comparator*/ XP_EQ,
+		/*bool by_dates*/ false,
+		/*string from_date*/"",
+		/*string to_date;*/"",
+		/*string band;*/ "Any",
+		/*string mode;*/ "Any",
+		/*bool confirmed_eqsl;*/ false,
+		/*bool confirmed_lotw;*/ false,
+		/*bool confirmed_card;*/ false,
+		/*search_combi_t combi_mode;*/ XM_AND,
+		/*string field_name; */ "STATION_CALLSIGN",
+		/*string pattern;*/ station
+	};
+	status_->misc_status(ST_NOTE, "EXTRACT: Removing QSOs for a different home callsign");
+	criteria(new_criteria, server);
+
 	if (size() == 0) {
 		// No records match these criteria
 		status_->misc_status(ST_WARNING, "EXTRACT: No records to upload!");

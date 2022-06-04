@@ -1227,39 +1227,64 @@ string record::item_merge(string data, bool indirect /*=false*/) {
 	return result;
 }
 
-// Set MY_RIG, MY_ANTENNA, APP_ZZA_QTH and PROP_MODE from the current settings
+// Set MY_RIG, MY_ANTENNA, APP_ZZA_QTH and STATION_CALLSIGN from the current settings
 bool record::user_details() {
 	// Add rig & QTH details - note this is current location only
 	Fl_Preferences stations_settings(settings_, "Stations");
 	Fl_Preferences rigs_settings(stations_settings, "Rigs");
 	Fl_Preferences aerials_settings(stations_settings, "Aerials");
 	Fl_Preferences qths_settings(stations_settings, "QTHs");
-	Fl_Preferences prop_settings(stations_settings, "Propagation Mode");
 	bool modified = false;
+	char message[256];
 	// Get rig
 	char * rig;
 	rigs_settings.get("Current", rig, "");
-	if (string(rig) != item("MY_RIG")) modified = true;
-	item("MY_RIG", string(rig));
+	if (item("MY_RIG").length()) {
+		snprintf(message, 256, "LOG: MY_RIG already set to %s, ignoring current value %s", item("MY_RIG").c_str(), rig);
+		status_->misc_status(ST_WARNING, message);
+	}
+	else {
+		item("MY_RIG", string(rig));
+		modified = true;
+	}
 	free(rig);
 	// Get aerial
 	char * aerial;
 	aerials_settings.get("Current", aerial, "");
-	if (string(aerial) != item("MY_ANTENNA")) modified = true;
-	item("MY_ANTENNA", string(aerial));
+	if (item("MY_ANTENNA").length()) {
+		snprintf(message, 256, "LOG: MY_ANTENNA already set to %s, ignoring current value %s", item("MY_ANTENNA").c_str(), aerial);
+		status_->misc_status(ST_WARNING, message);
+	}
+	else {
+		item("MY_ANTENNA", string(aerial));
+		modified = true;
+	}
 	free(aerial);
 	// Get QTH
 	char * qth;
 	qths_settings.get("Current", qth, "");
-	if (string(qth) != item("APP_ZZA_QTH")) modified = true;
-	item("APP_ZZA_QTH", string(qth));
+	if (item("APP_ZZA_QTH").length()) {
+		snprintf(message, 256, "LOG: APP_ZZA_QTH already set to %s, ignoring current value %s", item("APP_ZZA_QTH").c_str(), qth);
+		status_->misc_status(ST_WARNING, message);
+	}
+	else {
+		item("APP_ZZA_QTH", string(qth));
+		modified = true;
+	}
+	Fl_Preferences current_settings(qths_settings, qth);
 	free(qth);
-	// Get propagation mode
-	char* mode;
-	prop_settings.get("Current", mode, "");
-	if (string(mode) != item("PROP_MODE")) modified = true;
-	item("PROP_MODE", string(mode));
-	free(mode);
+	// Get callsign
+	char* callsign;
+	current_settings.get("Callsign", callsign, "");
+	if (item("STATION_CALLSIGN").length()) {
+		snprintf(message, 256, "LOG: STATION_CALLSIGN already set to %s, ignoring current value %s", item("STATION_CALLSIGN").c_str(), callsign);
+		status_->misc_status(ST_WARNING, message);
+	}
+	else {
+		item("STATION_CALLSIGN", string(callsign));
+		modified = true;
+	}
+
 	return modified;
 }
 

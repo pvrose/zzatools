@@ -193,6 +193,8 @@ namespace zzalog {
 			string& name();
 			// return naext name
 			string& next();
+			// SAve next value
+			void save_next_value();
 			// type
 			equipment_t type_;
 			// in text for Fl_Preference
@@ -303,6 +305,8 @@ namespace zzalog {
 		void rig_update(string frequency, string mode, string power);
 		// Called when rig is closed
 		void update();
+		// Save next QSO values
+		void save_next_values();
 
 	protected:
 		// Create the various widgets sets

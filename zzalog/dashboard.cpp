@@ -299,7 +299,6 @@ void dashboard::common_grp::save_values() {
 	my_settings_->clear();
 
 	my_settings_->set("Current", my_name_.c_str());
-	my_settings_->set("Next", next_name_.c_str());
 
 	my_settings_->set("Display All", display_all_items_);
 	int index = 0;
@@ -360,6 +359,11 @@ void dashboard::common_grp::save_values() {
 			break;
 		}
 	}
+}
+
+// Save next value
+void dashboard::common_grp::save_next_value() {
+	my_settings_->set("Current", next_name_.c_str());
 }
 
 // Populate the item selector
@@ -1396,6 +1400,17 @@ void dashboard::save_values() {
 	// Set the selected QTH
 	Fl_Preferences qths_settings(stations_settings, "QTHs");
 	qths_settings.set("Current", selected_qth_.c_str());
+}
+
+// Write next QSO values
+void dashboard::save_next_values() {
+	Fl_Preferences stations_settings(settings_, "Stations");
+	rig_grp_->save_next_value();
+	antenna_grp_->save_next_value();
+
+	// Set the selected QTH
+	Fl_Preferences qths_settings(stations_settings, "QTHs");
+	qths_settings.set("Current", next_qth_.c_str());
 }
 
 // Enable the widgets - activate the group associated with each rig handler when that

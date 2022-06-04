@@ -860,6 +860,14 @@ bool pfx_data::update_geography(record* record, bool &query, string& reason, boo
 				call.c_str());
 			status_->misc_status(ST_WARNING, message);
 		}
+		else {
+			sprintf(message, "LOG: %s %s %s - parsed as %s",
+				date.c_str(),
+				time.c_str(),
+				call.c_str(),
+				prefix->name_.c_str());
+			status_->misc_status(ST_DEBUG, message);
+		}
 		// Enter QSO changed in status log message
 		if (changed) {
 			sprintf(message, "LOG: %s %s %s - record changed: %s",

@@ -81,6 +81,7 @@ bool lotw_handler::upload_lotw_log(book* book) {
 		fields.insert("MODE");
 		fields.insert("SUBMODE");
 		fields.insert("RST_SENT");
+		fields.insert("STATION_CALLSIGN");
 		// Write the book (only the above fields)
 		if (book->store_data(string(new_filename), true, &fields)) {
 			// Get the TQSL (an app that signs the upload) executable
@@ -114,14 +115,20 @@ bool lotw_handler::upload_lotw_log(book* book) {
 				delete chooser;
 			}
 			if (ok) {
+				// Get QTHs/Current/Callsign
+				Fl_Preferences qths_settings(settings_, "QTHs");
+				Fl_Preferences current_settings(qths_settings, "Current");
+				char* callsign;
+				current_settings.get("Callsign", callsign, "");
 				// Generate TQSL command line - note the executable may have spaces in its filename
-				char* command = new char[20 + new_filename.length() + tqsl_executable.length()];
+				char* command = new char[256];
 				// TODO: Check command format in Linux
-				sprintf(command, "\"%s\" -x -u -d %s", tqsl_executable.c_str(), new_filename.c_str());
+				snprintf(command, 256, "\"%s\" -x -u -d %s -c %s", tqsl_executable.c_str(), new_filename.c_str(), callsign);
 				status_->misc_status(ST_NOTE, "LOTW: Signing and uploading QSLs to LotW");
 				// Launch TQSL - signs and uploads data: Note this is a blocking action
 				int result = system(command);
 				delete[] command;
+				free(callsign);
 				// Analyse result received from TQSL - responses documented in TQSL help
 				string default_message = "LOTW: Unknown response";
 				switch (result) {
@@ -353,6 +360,7 @@ bool lotw_handler::upload_single_qso(record_num_t record_num) {
 		// Create book with single record
 		extract_data* one_qso = new extract_data;
 		one_qso->add_record(record_num);
+		// TODO: Check QSO is from QTHs/Current/Callsign
 		if (upload_lotw_log(one_qso)) {
 			record* this_record = book_->get_record(record_num, false);
 			char ok_message[256];

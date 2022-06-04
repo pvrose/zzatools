@@ -27,9 +27,17 @@ alarm_dial::~alarm_dial() {}
 // from Fl_Dial::draw(X. Y. W. H)
 void alarm_dial::draw(int X, int Y, int W, int H) {
     // Draw the main dial and value hand
-    Fl_Line_Dial::draw(X, Y, W, H);
- 
-    // Redraw the value hand - to override the black outline
+    if (damage() & FL_DAMAGE_ALL) draw_box(box(), X, Y, W, H, color());
+    X += Fl::box_dx(box());
+    Y += Fl::box_dy(box());
+    W -= Fl::box_dw(box());
+    H -= Fl::box_dh(box());
+    // Draw the value hand - copied from Fl_Dial
+    double angle = (angle2() - angle1()) * (Fl_Dial::value() - minimum()) / (maximum() - minimum()) + angle1();
+    fl_push_matrix();
+    fl_translate(X + W / 2 - .5, Y + H / 2 - .5);
+    fl_scale(W - 1, H - 1);
+    fl_rotate(45 - angle);
     if (active_r()) fl_color(selection_color());
     else fl_color(fl_inactive(selection_color()));
     fl_begin_polygon();
@@ -38,12 +46,9 @@ void alarm_dial::draw(int X, int Y, int W, int H) {
     fl_vertex(-0.25, 0.25);
     fl_vertex(0.0, 0.04);
     fl_end_polygon();
+    fl_pop_matrix();
 
     // Now draw the alarm hands - algorith copied from Fl_Dial
-    X += Fl::box_dx(box());
-    Y += Fl::box_dy(box());
-    W -= Fl::box_dw(box());
-    H -= Fl::box_dh(box());
     double phi_min = angle1();
     double phi_max = angle2();
 

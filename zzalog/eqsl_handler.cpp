@@ -410,10 +410,25 @@ bool eqsl_handler::user_details(
 	// Get username and password for building url to fetch card
 	Fl_Preferences qsl_settings(settings_, "QSL");
 	Fl_Preferences eqsl_settings(qsl_settings, "eQSL");
+	Fl_Preferences stations_settings(settings_, "Stations");
+	Fl_Preferences qths_settings(stations_settings, "QTHs");
+	char* current;
+	qths_settings.get("Current", current, "");
+	Fl_Preferences current_settings(qths_settings, current);
+	free(current);
+
 	char * temp;
 	if (username != nullptr) {
 		eqsl_settings.get("User", temp, "");
 		*username = temp;
+		free(temp);
+		current_settings.get("Callsign", temp, "");
+		if (strcmp(username->c_str(), temp)) {
+			char message[128];
+			snprintf(message, 128, "EQSL: Station call %s differs from username %s", temp, username->c_str());
+			status_->misc_status(ST_WARNING, message);
+			*username = temp;
+		}
 		free(temp);
 	}
 	if (password != nullptr) {
@@ -640,6 +655,15 @@ bool eqsl_handler::upload_eqsl_log(book* book) {
 	// Takes time - show timer cursor
 	fl_cursor(FL_CURSOR_WAIT);
 	bool ok = true;
+	// For book - use STATION_CALLSIGN of first QSO
+	record* this_record = book_->get_record(0, false);
+	string station = this_record->item("STATION_CALLSIGN", true, true);
+	if (station.length() && station != username_) {
+		char message[100];
+		snprintf(message, 100, "EQSL: Using %s instead of username %s", station.c_str(), username_.c_str());
+		status_->misc_status(ST_WARNING, message);
+		username_ = station;
+	}
 	// stream the book data 
 	// Add QSL or SWL message to the record
 	for (size_t pos = 0; pos < book->size(); pos++) {
@@ -876,6 +900,15 @@ bool eqsl_handler::upload_single_qso(record_num_t record_num) {
 			return false;
 		}
 		bool ok = true;
+		// For single QSO - use STATION_CALLSIGN
+		record* this_record = book_->get_record(record_num, false);
+		string station = this_record->item("STATION_CALLSIGN", true, true);
+		if (station.length() && station != username) {
+			char message[100];
+			snprintf(message, 100, "EQSL: Station call %s differs from username %s", station.c_str(), username.c_str());
+			status_->misc_status(ST_WARNING, message);
+			username = station;
+		}
 		// URL to upload a single QSO (ref eQSL.cc)
 		char url[] = "http://www.eqsl.cc/qslcard/ImportADIF.cfm?ADIFData=";
 		char header_format[2048];
@@ -907,28 +940,27 @@ bool eqsl_handler::upload_single_qso(record_num_t record_num) {
 		int num_successful = 0;
 		status = ER_OK;
 		// Merge info from record into QSL message
-		record* record = book_->get_record(record_num, false);
 		// Add QSL_MSG field depending on QSO or SWL report
 		string this_message;
-		if (record->item("SWL") == "Y") {
-			this_message = record->item_merge(swl_message);
+		if (this_record->item("SWL") == "Y") {
+			this_message = this_record->item_merge(swl_message);
 		}
 		else {
-			this_message = record->item_merge(qsl_message);
+			this_message = this_record->item_merge(qsl_message);
 		}
 		bool update = false;
 		save_enabled_ = book_->save_enabled();
 		// Only upload valid records or reply to SWL reports
-		if (record->is_valid() || record->item("SWL") == "Y") {
+		if (this_record->is_valid() || this_record->item("SWL") == "Y") {
 			// Generate URL parameters for QSL
 			char qsl_data[2048];
 			sprintf(qsl_data, "%s %s %s %s %s %s <QSLMSG:%d>%s <EOR>",
-				adi_writer::item_to_adif(record, "CALL").c_str(),
-				adi_writer::item_to_adif(record, "QSO_DATE").c_str(),
-				adi_writer::item_to_adif(record, "TIME_ON").c_str(),
-				adi_writer::item_to_adif(record, "BAND").c_str(),
-				adi_writer::item_to_adif(record, "MODE").c_str(),
-				adi_writer::item_to_adif(record, "RST_SENT").c_str(),
+				adi_writer::item_to_adif(this_record, "CALL").c_str(),
+				adi_writer::item_to_adif(this_record, "QSO_DATE").c_str(),
+				adi_writer::item_to_adif(this_record, "TIME_ON").c_str(),
+				adi_writer::item_to_adif(this_record, "BAND").c_str(),
+				adi_writer::item_to_adif(this_record, "MODE").c_str(),
+				adi_writer::item_to_adif(this_record, "RST_SENT").c_str(),
 				this_message.length(),
 				this_message.c_str()
 			);
@@ -978,8 +1010,8 @@ bool eqsl_handler::upload_single_qso(record_num_t record_num) {
 				if (valid_response) {
 					if (uploaded) {
 						// If uploaded OK, Update QSO with EQSL sent information
-						record->item("EQSL_QSLSDATE", now(false, "%Y%m%d"));
-						record->item("EQSL_QSL_SENT", string("Y"));
+						this_record->item("EQSL_QSLSDATE", now(false, "%Y%m%d"));
+						this_record->item("EQSL_QSL_SENT", string("Y"));
 						update = true;
 					}
 					else if (upload_failed) {
@@ -991,12 +1023,12 @@ bool eqsl_handler::upload_single_qso(record_num_t record_num) {
 					else {
 						// If marked duplicate may need to update if we had not logged it previously
 						if (warning_text.find("Duplicate") != warning_text.npos) {
-							if (record->item("EQSL_QSLSDATE") == "") {
-								record->item("EQSL_QSLSDATE", now(false, "%Y%m%d"));
+							if (this_record->item("EQSL_QSLSDATE") == "") {
+								this_record->item("EQSL_QSLSDATE", now(false, "%Y%m%d"));
 								update = true;
 							}
-							if (record->item("EQSL_QSL_SENT") != "Y") {
-								record->item("EQSL_QSL_SENT", string("Y"));
+							if (this_record->item("EQSL_QSL_SENT") != "Y") {
+								this_record->item("EQSL_QSL_SENT", string("Y"));
 								update = true;
 							}
 						}
@@ -1051,9 +1083,9 @@ bool eqsl_handler::upload_single_qso(record_num_t record_num) {
 		if (passed) {
 			char ok_message[256];
 			sprintf(ok_message, "EQSL: %s %s %s QSL uploaded",
-				record->item("QSO_DATE").c_str(),
-				record->item("TIME_ON").c_str(),
-				record->item("CALL").c_str());
+				this_record->item("QSO_DATE").c_str(),
+				this_record->item("TIME_ON").c_str(),
+				this_record->item("CALL").c_str());
 			status_->misc_status(ST_OK, ok_message);
 		}
 

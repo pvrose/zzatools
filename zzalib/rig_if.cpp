@@ -652,8 +652,12 @@ double rig_hamlib::rx_frequency() {
 // Return S-meter reading (relative to S9)
 int rig_hamlib::s_meter() {
 	value_t meter_value;
-	if ((error_code_ = rig_get_level(rig_, RIG_VFO_CURR, RIG_LEVEL_STRENGTH, &meter_value)) == RIG_OK) {
+	if (get_tx()) {
+		return last_rx_smeter_;
+	}
+	else if ((error_code_ = rig_get_level(rig_, RIG_VFO_CURR, RIG_LEVEL_STRENGTH, &meter_value)) == RIG_OK) {
 		// hamlib returns relative to S9. 
+		last_rx_smeter_ = meter_value.i;
 		return meter_value.i;
 	}
 	else {
@@ -666,8 +670,12 @@ int rig_hamlib::s_meter() {
 // Return power meter reading (Watts)
 double rig_hamlib::pwr_meter() {
 	value_t meter_value;
-	if ((error_code_ = rig_get_level(rig_, RIG_VFO_CURR, RIG_LEVEL_RFPOWER_METER_WATTS, &meter_value)) == RIG_OK) {
+	if (!get_tx()) {
+		return last_tx_power_;
+	}
+	else if ((error_code_ = rig_get_level(rig_, RIG_VFO_CURR, RIG_LEVEL_RFPOWER_METER_WATTS, &meter_value)) == RIG_OK) {
 		// hamlib returns relative to S9. 
+		last_tx_power_ = meter_value.f;
 		return meter_value.f;
 	}
 	else {
@@ -692,7 +700,11 @@ double rig_hamlib::vdd_meter() {
 // Return SWR value
 double rig_hamlib::swr_meter() {
 	value_t meter_value;
+	if (!get_tx()) {
+		return last_tx_swr_;
+	}
 	if ((error_code_ = rig_get_level(rig_, RIG_VFO_CURR, RIG_LEVEL_SWR, &meter_value)) == RIG_OK) {
+		last_tx_swr_ = meter_value.f;
 		return meter_value.f;
 	}
 	else {
@@ -955,7 +967,10 @@ double rig_flrig::tx_frequency() {
 // Return S-meter reading (S9+/-dB)
 int rig_flrig::s_meter() {
 	rpc_data_item response;
-	if (do_request("rig.get_smeter", nullptr, &response)) {
+	if (get_tx()) {
+		return last_rx_smeter_;
+	} 
+	else if (do_request("rig.get_smeter", nullptr, &response)) {
 		// 0 = S0, 50 = S9, 100 = S9 + 60
 		int value = response.get_int() - 50;
 		if (value <= 0) {
@@ -964,13 +979,8 @@ int rig_flrig::s_meter() {
 		else {
 			value = value * 60 / 50;
 		}
-		if (get_tx()) {
-			return last_rx_smeter_;
-		}
-		else {
-			last_rx_smeter_ = value;
-			return last_rx_smeter_;
-		}
+		last_rx_smeter_ = value;
+		return last_rx_smeter_;
 	}
 	else {
 		// Default return S0
