@@ -32,7 +32,7 @@ extern import_data* import_data_;
 extern void cb_error_message(status_t level, const char* message);
 extern menu* menu_;
 extern Fl_Preferences* settings_;
-extern dxa_if* dxatlas_;
+extern dxa_if* dxa_if_;
 extern pfx_data* pfx_data_;
 extern toolbar* toolbar_;
 
@@ -146,7 +146,7 @@ int wsjtx_handler::send_hbeat() {
 int wsjtx_handler::handle_close(stringstream& ss) {
 	status_->misc_status(ST_NOTE, "WSJT-X: Received Close");
 	server_->close_server();
-	dxatlas_->clear_dx_loc();
+	dxa_if_->clear_dx_loc();
 	menu_->update_items();
 	return 1;
 }
@@ -169,7 +169,7 @@ int wsjtx_handler::handle_log(stringstream& ss) {
 	while (import_data_->size()) Fl::wait();
 	status_->misc_status(ST_NOTE, "WSJT-X: Logged QSO");
 	// Clear DX locator flag
-	dxatlas_->clear_dx_loc();
+	dxa_if_->clear_dx_loc();
 	return 0;
 }
 
@@ -201,7 +201,7 @@ int wsjtx_handler::handle_decode(stringstream& ss) {
 	//if (words[0] == my_call_ || words[0] == my_bracketed_call_) {
 	//	// If this is my_call their_call grid add to DxAtlas map as DX location
 	//	if (regex_match(words[2], basic_regex<char>("[A-R][A-R][0-9][0-9]")) && words[2] != "RR73") {
-	//		dxatlas_->set_dx_loc(words[2]);
+	//		dxa_if_->set_dx_loc(words[2]);
 	//	}
 	//	// Display in status bar and beep if message addressed to user
 	//	status_->misc_status(ST_NOTIFY, message);
@@ -260,7 +260,7 @@ int wsjtx_handler::handle_status(stringstream& ss) {
 	status.config_name = get_utf8(ss); 
 	if (status.dx_call.length() && status.dx_grid.length() && status.transmitting) {
 		// Use the actual grid loaction
-		dxatlas_->set_dx_loc(status.dx_grid, status.dx_call);
+		dxa_if_->set_dx_loc(status.dx_grid, status.dx_call);
 		toolbar_->search_text(status.dx_call);
 	}
 	else if (status.dx_call.length() && status.transmitting) {
@@ -278,14 +278,14 @@ int wsjtx_handler::handle_status(stringstream& ss) {
 			if (dxcc_prefix->dxcc_code_ != 0) {
 				// Use the actual prefixes location rather than the DXCC's
 				lat_long_t location = { prefixes[0]->latitude_, prefixes[0]->longitude_ };
-				dxatlas_->set_dx_loc(latlong_to_grid(location, 6), status.dx_call);
+				dxa_if_->set_dx_loc(latlong_to_grid(location, 6), status.dx_call);
 			}
 			else {
 				// Not a DXCC entity - clear any existing DX Location
 				char message[100];
 				snprintf(message, 100, "WSJT-X: Cannot locate %s - not in a DXCC entity", status.dx_call.c_str());
 				status_->misc_status(ST_WARNING, message);
-				dxatlas_->clear_dx_loc();
+				dxa_if_->clear_dx_loc();
 			}
 		}
 		else {
@@ -293,13 +293,13 @@ int wsjtx_handler::handle_status(stringstream& ss) {
 			char message[100];
 			snprintf(message, 100, "WSJT-X: Cannot parse %s - %d matching prefixes found", status.dx_call.c_str(), prefixes.size());
 			status_->misc_status(ST_WARNING, message);
-			dxatlas_->clear_dx_loc();
+			dxa_if_->clear_dx_loc();
 		}
 		toolbar_->search_text(status.dx_call);
 	}
 	else if (!status.dx_call.length()) {
 		// Can clear the Dx Location by clearing the DX Call field
-		dxatlas_->clear_dx_loc();
+		dxa_if_->clear_dx_loc();
 	}
 	prev_status_ = status;
 	return 0;

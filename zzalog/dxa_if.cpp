@@ -183,6 +183,11 @@ void dxa_if::load_values() {
 	dxatlas_settings.get("Projection", (int&)projection_, DxAtlas::PRJ_RECTANGULAR);
 	dxatlas_settings.get("Pin Size", pin_size_, 3);
 
+	update_location_details();
+}
+
+// Update location details
+void dxa_if::update_location_details() {
 	// Get stations details - QTH locations used to mark home location on map
 	Fl_Preferences stations_settings(settings_, "Stations");
 	char* temp;
@@ -202,6 +207,8 @@ void dxa_if::load_values() {
 	}
 	// Get home location from gridsquare in float and string form
 	home_location();
+
+
 
 }
 
@@ -356,13 +363,9 @@ void dxa_if::create_form() {
 	ch21->callback(cb_ch_locn, &location_name_);
 	ch21->when(FL_WHEN_RELEASE);
 	ch21->clear();
-	for (size_t i = 0; i < locations_.size(); i++) {
-		int index = ch21->add(locations_[i].c_str());
-		if (locations_[i] == location_name_) {
-			ch21->value(index);
-		}
-	}
 	ch21->tooltip("Specify the location to use as home location");
+	location_ch_ = ch21;
+
 	// Output - the locator grid square for the selected location
 	Fl_Output* op21 = new Fl_Output(ch21->x(), ch21->y() + ch21->h(), WSMEDIT, HBUTTON);
 	op21->labelfont(FONT);
@@ -396,6 +399,8 @@ void dxa_if::create_form() {
 	op23->color(group1->color());
 	op23->tooltip("The longitude of the current home location");
 	lon_dms_op_ = op23;
+
+	update_location();
 
 	// Resize group by size of choices
 	const int WGRP_1 = ch12->x() + ch12->w() + GAP;
@@ -437,6 +442,18 @@ void dxa_if::create_form() {
 	this->position(window_left_, window_top_);
 	this->show();
 };
+
+// Populate locations choice and associated widgets
+void dxa_if::update_location() {
+	update_location_details();
+	for (size_t i = 0; i < locations_.size(); i++) {
+		int index = ((Fl_Choice*)location_ch_)->add(locations_[i].c_str());
+		if (locations_[i] == location_name_) {
+			((Fl_Choice*)location_ch_)->value(index);
+		}
+	}
+	update_loc_widgets();
+}
 
 // Used to write settings back
 void dxa_if::save_values() {
@@ -1801,7 +1818,7 @@ void dxa_if::update(hint_t hint) {
 	case HT_LOCATION:
 		// The home location may have changed - redraw pins as we may need to re-zoom
 		load_values();
-		update_loc_widgets();
+		update_location();
 		draw_home_flag();
 		draw_pins();
 		break;

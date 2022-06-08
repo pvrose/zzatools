@@ -34,7 +34,7 @@ extern status* status_;
 extern intl_dialog* intl_dialog_;
 extern time_t session_start_;
 extern pfx_data* pfx_data_;
-extern dxa_if* dxatlas_;
+extern dxa_if* dxa_if_;
 extern bool in_current_session(record*);
 
 Fl_Font log_table::font_;
@@ -767,14 +767,14 @@ void log_table::done_edit(bool keep_row) {
 			if (my_book_->new_record()) {
 				if (field_info.field == "GRIDSQUARE") {
 					// WE have an actual gridsquare - read back from record to get in upper case
-					dxatlas_->set_dx_loc(record->item("GRIDSQUARE"), record->item("CALL"));
+					dxa_if_->set_dx_loc(record->item("GRIDSQUARE"), record->item("CALL"));
 				}
 				else if (field_info.field == "CALL") {
 					// Get the grid location of the prefix centre - only if 1 prefix matches the callsign.
 					vector<prefix*> prefixes;
 					if (pfx_data_->all_prefixes(record, &prefixes, false) && prefixes.size() == 1) {
 						lat_long_t location = { prefixes[0]->latitude_, prefixes[0]->longitude_ };
-						dxatlas_->set_dx_loc(latlong_to_grid(location, 6), record->item("CALL"));
+						dxa_if_->set_dx_loc(latlong_to_grid(location, 6), record->item("CALL"));
 					}
 					else {
 						char message[100];

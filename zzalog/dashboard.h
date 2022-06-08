@@ -307,6 +307,11 @@ namespace zzalog {
 		void update();
 		// Save next QSO values
 		void save_next_values();
+		// Update locations
+		void update_locations();
+		// Load locations
+		void load_locations();
+
 
 	protected:
 		// Create the various widgets sets

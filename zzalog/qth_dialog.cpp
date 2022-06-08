@@ -8,6 +8,8 @@
 #include "status.h"
 #include "tabbed_forms.h"
 #include "intl_widgets.h"
+#include "dashboard.h"
+#include "dxa_if.h"
 
 #include <set>
 
@@ -27,6 +29,8 @@ extern pfx_data* pfx_data_;
 extern status* status_;
 extern tabbed_forms* tabbed_forms_;
 extern rig_if* rig_if_;
+extern dashboard* dashboard_;
+extern dxa_if* dxa_if_;
 
 const char* SETTINGS_NAME = "Stations";
 const char* QTH_SETTINGS_NAME = "QTHs";
@@ -426,6 +430,7 @@ void qth_dialog::save_values() {
 	}
 	// Redraw views that need a location
 	tabbed_forms_->update_views(nullptr, HT_LOCATION, -1);
+
 }
 
 // Update QTH related fields

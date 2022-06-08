@@ -102,7 +102,7 @@ fllog_emul* fllog_emul_ = nullptr;
 dashboard* dashboard_ = nullptr;
 
 #ifdef _WIN32
-dxa_if* dxatlas_ = nullptr;
+dxa_if* dxa_if_ = nullptr;
 #endif
 // Readonly flag on command-line
 bool read_only_ = false;
@@ -158,9 +158,9 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 			dashboard_ = nullptr;
 		}
 		// Close DxAtlas connection
-		if (dxatlas_) {
-			delete dxatlas_;
-			dxatlas_ = nullptr;
+		if (dxa_if_) {
+			delete dxa_if_;
+			dxa_if_ = nullptr;
 		}
 		// Currently modifying a (potentially new) record
 		if (book_ && (book_->modified_record() || book_->new_record()) ) {
@@ -768,8 +768,8 @@ void add_dashboard() {
 
 // Add DxAtlas control window
 void add_dxatlas() {
-	if (!closing_ && dxatlas_ == nullptr) {
-		dxatlas_ = new dxa_if();
+	if (!closing_ && dxa_if_ == nullptr) {
+		dxa_if_ = new dxa_if();
 	}
 }
 
@@ -846,7 +846,7 @@ void tidy() {
 	fl_message_title_default(nullptr);
 	delete dashboard_;
 	delete dashboard_;
-	delete dxatlas_;
+	delete dxa_if_;
 	delete wsjtx_handler_;
 	delete club_handler_;
 	delete qrz_handler_;

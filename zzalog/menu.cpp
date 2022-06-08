@@ -69,7 +69,7 @@ extern toolbar* toolbar_;
 extern qrz_handler* qrz_handler_;
 extern wsjtx_handler* wsjtx_handler_;
 extern band_view* band_view_;
-extern dxa_if* dxatlas_;
+extern dxa_if* dxa_if_;
 extern time_t session_start_;
 extern dashboard* dashboard_;
 settings* config_ = nullptr;
@@ -538,7 +538,7 @@ void menu::cb_mi_windows_all(Fl_Widget* w, void* v) {
 		dashboard_->show();
 		status_->file_viewer()->show();
 #ifdef _WIN32
-		dxatlas_->show();
+		dxa_if_->show();
 #endif
 		band_view_->show();
 		intl_dialog_->show();
@@ -549,7 +549,7 @@ void menu::cb_mi_windows_all(Fl_Widget* w, void* v) {
 		dashboard_->hide();
 		status_->file_viewer()->hide();
 #ifdef _WIN32
-		dxatlas_->hide();
+		dxa_if_->hide();
 #endif
 		band_view_->hide();
 		intl_dialog_->hide();
@@ -956,7 +956,7 @@ void menu::cb_mi_log_new(Fl_Widget* w, void* v) {
 // Log->Save - save current record
 // v is not used
 void menu::cb_mi_log_save(Fl_Widget* w, void* v) {
-	dxatlas_->clear_dx_loc();
+	dxa_if_->clear_dx_loc();
 	navigation_book_->save_record();
 	dashboard_->update();
 }
@@ -2130,7 +2130,7 @@ void menu::add_windows_items() {
 	insert(index, "&Windows/Das&hboard", 0, cb_mi_windows, dashboard_, FL_MENU_TOGGLE);
 	insert(index, "&Windows/S&tatus Viewer", 0, cb_mi_windows, status_->file_viewer(), FL_MENU_TOGGLE);
 #ifdef _WIN32
-	insert(index, "&Windows/&DxAtlas Control", 0, cb_mi_windows, dxatlas_, FL_MENU_TOGGLE);
+	insert(index, "&Windows/&DxAtlas Control", 0, cb_mi_windows, dxa_if_, FL_MENU_TOGGLE);
 #endif
 	insert(index, "&Windows/&Band View", 0, cb_mi_windows, band_view_, FL_MENU_TOGGLE);
 	insert(index, "&Windows/&International Chars", 0, cb_mi_windows, intl_dialog_, FL_MENU_TOGGLE);
@@ -2176,8 +2176,8 @@ void menu::update_windows_items() {
 	}
 
 #ifdef _WIN32
-	if (dxatlas_ && index_dxatlas != -1) {
-		if (dxatlas_->visible()) {
+	if (dxa_if_ && index_dxatlas != -1) {
+		if (dxa_if_->visible()) {
 			mode(index_dxatlas, mode(index_dxatlas) | FL_MENU_VALUE);
 		}
 		else {

@@ -51,7 +51,7 @@ extern spec_data* spec_data_;
 extern book* book_;
 extern extract_data* extract_records_;
 extern menu* menu_;
-extern dxa_if* dxatlas_;
+extern dxa_if* dxa_if_;
 extern band_view* band_view_;
 extern tabbed_forms* tabbed_forms_;
 extern import_data* import_data_;
@@ -958,14 +958,14 @@ void dashboard::create_use_widgets(int& curr_x, int& curr_y) {
 	Fl_Button* w21 = new Fl_Button(w20->x(), w20->y() + w20->h(), WBUTTON * 2, HBUTTON, "Use in current and next");
 	w21->labelfont(FONT);
 	w21->labelsize(FONT_SIZE);
-	w21->callback(cb_bn_use_items, (void*)(long)SELECTED_ONLY);
+	w21->callback(cb_bn_use_items, (void*)(long)SELECTED_NEW);
 	w21->tooltip("Use rig and antenna in current QSO and following");
 
 	// Use in subsequent QSOs
 	Fl_Button* w22 = new Fl_Button(w21->x(), w21->y() + w21->h(), WBUTTON * 2, HBUTTON, "Use in next only");
 	w22->labelfont(FONT);
 	w22->labelsize(FONT_SIZE);
-	w22->callback(cb_bn_use_items, (void*)(long)SELECTED_ONLY);
+	w22->callback(cb_bn_use_items, (void*)(long)NEW_ONLY);
 	w22->tooltip("Use rig and antenna in following QSOs");
 
 	max_w = max(max_w, w22->x() + w22->w() - curr_x);
@@ -1365,6 +1365,13 @@ void dashboard::load_values() {
 	if (!rig_if_ && new_lm == LM_ON_AIR_CAT) new_lm = LM_ON_AIR_COPY;
 	logging_mode((logging_mode_t)new_lm);
 
+	load_locations();
+
+}
+
+void dashboard::load_locations() {
+	Fl_Preferences stations_settings(settings_, "Stations");
+
 	// Get the settings for the list of QTHs
 	Fl_Preferences qths_settings(stations_settings, "QTHs");
 	// Number of items described in settings
@@ -1381,6 +1388,7 @@ void dashboard::load_values() {
 		string name = qths_settings.group(i);
 		all_qths_.insert(name);
 	}
+
 }
 
 // Write values back to settings - write the three groups back separately
@@ -1525,7 +1533,15 @@ void dashboard::enable_use_widgets() {
 		}
 	}
 	mlo->textcolor(fl_contrast(FL_BLACK, mlo->color()));
+	// Update QTH chice
+	populate_qth_choice();
 
+}
+
+// Update just the Locations widget from settings
+void dashboard::update_locations() {
+	load_locations();
+	populate_qth_choice();
 }
 
 // Enable CAT Connection widgets
@@ -2112,7 +2128,7 @@ void dashboard::cb_action(Fl_Widget* w, void* v) {
 	that->buffer_->unselect();
 	// Set DX location on DxAtlas
 	if (action == WRITE_GRID) {
-		dxatlas_->set_dx_loc(to_upper(text), that->record_->item("CALL"));
+		dxa_if_->set_dx_loc(to_upper(text), that->record_->item("CALL"));
 	}
 	// Update views
 	tabbed_forms_->update_views(nullptr, HT_MINOR_CHANGE, book_->size() - 1);
@@ -2168,7 +2184,7 @@ void dashboard::cb_save(Fl_Widget* w, void* v) {
 	that->enterring_record_ = false;
 	that->buffer_->text("");
 	that->enable_widgets();
-	dxatlas_->clear_dx_loc();
+	dxa_if_->clear_dx_loc();
 }
 
 // Cancel the edit and reset the state to no record
@@ -2178,7 +2194,7 @@ void dashboard::cb_cancel(Fl_Widget* w, void* v) {
 	if (that->enterring_record_) {
 		book_->delete_record(false);
 		that->record_ = book_->get_record();
-		dxatlas_->clear_dx_loc();
+		dxa_if_->clear_dx_loc();
 	}
 	that->buffer_->text("");
 	that->enterring_record_ = false;
@@ -2487,6 +2503,7 @@ void dashboard::update() {
 		rig_grp_->name() = "";
 	}
 	enterring_record_ = book_->enterring_record();
+	update_locations();
 	enable_widgets();
 }
 

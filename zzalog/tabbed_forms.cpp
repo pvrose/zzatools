@@ -25,7 +25,7 @@ extern extract_data* extract_records_;
 extern import_data* import_data_;
 extern extract_data* dxatlas_records_;
 extern toolbar* toolbar_;
-extern dxa_if* dxatlas_;
+extern dxa_if* dxa_if_;
 extern settings* config_;
 extern bool closing_;
 extern rig_if* rig_if_;
@@ -118,7 +118,7 @@ void tabbed_forms::update_views(view* requester, hint_t hint, record_num_t recor
 	} 
 #ifdef _WIN32
 	// Update DxAtlas
-	if (dxatlas_) dxatlas_->update(hint);
+	if (dxa_if_) dxa_if_->update(hint);
 #endif
 	// Update the settngs config dialog
 	if (config_) config_->update();

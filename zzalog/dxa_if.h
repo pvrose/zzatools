@@ -167,6 +167,8 @@ namespace zzalog {
 
 		// Get button Colour
 		Fl_Color button_colour(int button_num);
+		// Populate location choice
+		void update_location();
 
 	protected:
 		// Get details of the home location for the selected record
@@ -211,6 +213,8 @@ namespace zzalog {
 		void check_qsl(record_num_t record_num, set<int>& record_list);
 		// Add label
 		HRESULT add_label(lat_long_t location, string label);
+		// Update location details
+		void update_location_details();
 
 
 	protected:
@@ -303,6 +307,7 @@ namespace zzalog {
 		vector<Fl_Widget*> colour_bns_;
 		Fl_Widget* most_recent_ip_;
 		Fl_Widget* start_stop_bn_;
+		Fl_Widget* location_ch_;
 		Fl_Widget* locator_op_;
 		Fl_Widget* lat_dms_op_;
 		Fl_Widget* lon_dms_op_;
