@@ -117,7 +117,10 @@ bool lotw_handler::upload_lotw_log(book* book) {
 			if (ok) {
 				// Get QTHs/Current/Callsign
 				Fl_Preferences qths_settings(settings_, "QTHs");
-				Fl_Preferences current_settings(qths_settings, "Current");
+				char* current;
+				qths_settings.get("Current", current, "");
+				Fl_Preferences current_settings(qths_settings, current);
+				free(current);
 				char* callsign;
 				current_settings.get("Callsign", callsign, "");
 				// Generate TQSL command line - note the executable may have spaces in its filename

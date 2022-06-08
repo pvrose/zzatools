@@ -904,8 +904,12 @@ bool eqsl_handler::upload_single_qso(record_num_t record_num) {
 		record* this_record = book_->get_record(record_num, false);
 		string station = this_record->item("STATION_CALLSIGN", true, true);
 		if (station.length() && station != username) {
-			char message[100];
-			snprintf(message, 100, "EQSL: Station call %s differs from username %s", station.c_str(), username.c_str());
+			char message[200];
+			snprintf(message, 200, "EQSL: %s:%s %s: Station call %s differs from username %s",
+				this_record->item("QSO_TIME").c_str(),
+				this_record->item("TIME_ON").c_str(),
+				this_record->item("CALL").c_str(),
+				station.c_str(), username.c_str());
 			status_->misc_status(ST_WARNING, message);
 			username = station;
 		}
