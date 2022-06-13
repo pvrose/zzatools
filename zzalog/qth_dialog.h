@@ -26,7 +26,6 @@ namespace zzalog {
 
 		// Station location details - ADIF field name
 		struct qth_info_t {
-			string callsign;       // STATION_CALLSIGN
 			string name;           // MY_NAME
 			string street;         // MY_STREET
 			string town;           // MY_CITY
@@ -66,8 +65,6 @@ namespace zzalog {
 		static void cb_bn_activ8(Fl_Widget* w, void* v);
 		// choice callback
 		static void cb_ch_stn(Fl_Widget* w, void* v);
-		// callsign callback - update other fields
-		static void cb_ip_call(Fl_Widget* w, void* v);
 		// upper case callback
 		static void cb_ip_upper(Fl_Widget* w, void* v);
 
@@ -109,13 +106,11 @@ namespace zzalog {
 
 		// Parameters for each of the QTH input widgets
 		enum input_type {
-			CALL,
 			INTEGER,
 			MIXED,
 			UPPER
 		};
-		struct { const char* label; void* v; input_type type; int row; int col; } qth_params_[15] = {
-			{ "Callsign", (void*)&(current_qth_.callsign), CALL, 0, 0 },
+		struct { const char* label; void* v; input_type type; int row; int col; } qth_params_[14] = {
 			{ "Name", (void*)&(current_qth_.name), MIXED, 1, 0 },
 			{ "Street", (void*)&(current_qth_.street), MIXED, 2, 0 },
 			{ "Town", (void*)&(current_qth_.town), MIXED, 3, 0 },

@@ -1,4 +1,4 @@
-#include "dashboard.h"
+#include "qso_manager.h"
 #include "../zzalib/callback.h"
 #include "../zzalib/rig_if.h"
 #include "../zzalib/serial.h"
@@ -57,9 +57,10 @@ extern tabbed_forms* tabbed_forms_;
 extern import_data* import_data_;
 void add_rig_if();
 extern double prev_freq_;
+extern bool read_only_;
 
 // constructor 
-dashboard::common_grp::common_grp(int X, int Y, int W, int H, const char* label, equipment_t type)
+qso_manager::common_grp::common_grp(int X, int Y, int W, int H, const char* label, item_t type)
 	: Fl_Group(X, Y, W, H, label)
     , active_(nullptr)
 	, choice_(nullptr)
@@ -72,11 +73,19 @@ dashboard::common_grp::common_grp(int X, int Y, int W, int H, const char* label,
 	, next_name_("")
 
 {
-	if (type_ == ANTENNA) {
+	switch (type_) {
+	case ANTENNA: {
 		settings_name_ = "Aerials";
+		break;
 	}
-	else {
+	case RIG: {
 		settings_name_ = "Rigs";
+		break;
+	}
+	case CALLSIGN: {
+		settings_name_ = "Callsigns";
+		break;
+	}
 	}
 	all_items_.clear();
 	load_values();
@@ -85,13 +94,13 @@ dashboard::common_grp::common_grp(int X, int Y, int W, int H, const char* label,
 }
 
 // Destructor
-dashboard::common_grp::~common_grp() {
+qso_manager::common_grp::~common_grp() {
 	// Release all memory
 	all_items_.clear();
 }
 
 // Get initial data from settings
-void dashboard::common_grp::load_values() {
+void qso_manager::common_grp::load_values() {
 	// Get the settings for the named group
 	Fl_Preferences stations_settings(settings_, "Stations");
 	my_settings_ = new Fl_Preferences(stations_settings, settings_name_.c_str());
@@ -171,6 +180,7 @@ void dashboard::common_grp::load_values() {
 				// Carry onto next - no break
 
 			case ANTENNA:
+			{
 				// Antenna has just active flag and bands it is intended for
 				// Active flag
 				int active;
@@ -183,7 +193,17 @@ void dashboard::common_grp::load_values() {
 				free(temp);
 				split_line(bands, info.intended_bands, ';');
 				break;
-			// 
+				//
+			}
+			case CALLSIGN:
+			{
+				// Active flag
+				int active;
+				item_settings.get("Active", active, (int)false);
+				info.active = (bool)active;
+				info.intended_bands.clear();
+				break;
+			}
 			}
 		}
 		else {
@@ -197,7 +217,7 @@ void dashboard::common_grp::load_values() {
 
 // create the form
 // Note this assumes the appropriate common_grp is the active group
-void dashboard::common_grp::create_form(int X, int Y) {
+void qso_manager::common_grp::create_form(int X, int Y) {
 	// widget positions - rows
 	const int R1 = HTEXT;
 	const int H1 = HBUTTON;
@@ -207,7 +227,7 @@ void dashboard::common_grp::create_form(int X, int Y) {
 	const int H3 = HBUTTON;
 	const int R4 = R3 + H3 + max(GAP, HTEXT);
 	const int H4 = HMLIN;
-	const int HALL = R4 + H4 + GAP;
+	const int HALL = (type_ == CALLSIGN) ? R3 + H3 + GAP : R4 + H4 + GAP;
 	// widget positions - columns
 	const int C1 = GAP;
 	const int W1B = WBUTTON;
@@ -216,7 +236,7 @@ void dashboard::common_grp::create_form(int X, int Y) {
 	const int W1A = col1 + W2B - C1;
 	const int WALL = C1 + W1A + GAP;
 
-	dashboard* dash = ancestor_view<dashboard>(this);
+	qso_manager* dash = ancestor_view<qso_manager>(this);
 
 	//// Explicitly call begin to ensure that we haven't had too many ends.
 	//begin();
@@ -248,6 +268,7 @@ void dashboard::common_grp::create_form(int X, int Y) {
 	bn2_1->callback(cb_bn_all);
 	bn2_1->when(FL_WHEN_RELEASE);
 	bn2_1->tooltip("Show all items (not just active ones)");
+
 	// This antenna or rig is in active use
 	Fl_Light_Button* bn2_2 = new Fl_Light_Button(X + col1, Y + R2, W2B, H2, "Active");
 	// set it when the selected_item is active
@@ -275,25 +296,37 @@ void dashboard::common_grp::create_form(int X, int Y) {
 	bn3_2->when(FL_WHEN_RELEASE);
 	bn3_2->tooltip("Delete the item");
 
-	// Row 4
-	// Bands the antenna or rig was designed for 
-	Fl_Multi_Browser* mb4_1 = new Fl_Multi_Browser(X + C1, Y + R4, W1A, H4, "Intended Bands");
-	mb4_1->labelsize(FONT_SIZE);
-	mb4_1->align(FL_ALIGN_TOP);
-	mb4_1->textsize(FONT_SIZE);
-	mb4_1->callback(cb_mb_bands);
-	mb4_1->tooltip("Select the bands that the antenna is intended to be operated with");
-	band_browser_ = mb4_1;
+	switch(type_) {
+	case RIG:
+	case ANTENNA:
+	{
+		// Row 4
+		// Bands the antenna or rig was designed for 
+		Fl_Multi_Browser* mb4_1 = new Fl_Multi_Browser(X + C1, Y + R4, W1A, H4, "Intended Bands");
+		mb4_1->labelsize(FONT_SIZE);
+		mb4_1->align(FL_ALIGN_TOP);
+		mb4_1->textsize(FONT_SIZE);
+		mb4_1->callback(cb_mb_bands);
+		mb4_1->tooltip("Select the bands that the antenna is intended to be operated with");
+		band_browser_ = mb4_1;
 
-	// Now we have created all the data we can populate the choice widgets
-	populate_choice();
-	populate_band();
+		// Now we have created all the data we can populate the choice widgets
+		populate_choice();
+		populate_band();
+		break;
+	}
+	case CALLSIGN:
+	{
+		populate_choice();
+		break;
+	}
+	}
 
 }
 
 // Save values in settings
-void dashboard::common_grp::save_values() {
-	dashboard* dash = ancestor_view<dashboard>(this);
+void qso_manager::common_grp::save_values() {
+	qso_manager* dash = ancestor_view<qso_manager>(this);
 
 	// Clear to remove deleted entries
 	my_settings_->clear();
@@ -308,14 +341,16 @@ void dashboard::common_grp::save_values() {
 		item_data& info = (*it).second;
 		Fl_Preferences item_settings(my_settings_, name.c_str());
 
-		switch(type_) {
+		switch (type_) {
 		case RIG: {
 			item_settings.set("Active", info.active);
 			// set the intended bands
 			string bands = "";
 			// Store all the bands intended to be used with this rig/antenna
 			for (auto itb = info.intended_bands.begin(); itb != info.intended_bands.end(); itb++) {
-				bands += *itb + ';';
+				if ((*itb).length()) {
+					bands += *itb + ';';
+				}
 			}
 			item_settings.set("Intended Bands", bands.c_str());
 			item_settings.set("Handler", info.rig_data.handler);
@@ -345,9 +380,9 @@ void dashboard::common_grp::save_values() {
 			alarm_settings.set("Voltage Minimum Level", info.rig_data.alarms.voltage_minimum);
 			alarm_settings.set("Voltage Maximum Level", info.rig_data.alarms.voltage_maximum);
 
-			// NO BREAK
+			break;
 		}
-		case ANTENNA:
+		case ANTENNA: {
 			item_settings.set("Active", info.active);
 			// set the intended bands
 			string bands = "";
@@ -358,16 +393,22 @@ void dashboard::common_grp::save_values() {
 			item_settings.set("Intended Bands", bands.c_str());
 			break;
 		}
+		case CALLSIGN: {
+			// No additional data
+			break;
+		}
+		}
 	}
 }
 
 // Save next value
-void dashboard::common_grp::save_next_value() {
+void qso_manager::common_grp::save_next_value() {
 	my_settings_->set("Current", next_name_.c_str());
+	my_name_ = next_name_;
 }
 
 // Populate the item selector
-void dashboard::common_grp::populate_choice() {
+void qso_manager::common_grp::populate_choice() {
 	Fl_Input_Choice* w = (Fl_Input_Choice*)choice_;
 	w->clear();
 	int index = 0;
@@ -403,10 +444,10 @@ void dashboard::common_grp::populate_choice() {
 }
 
 // Populate the band selection widget
-void dashboard::common_grp::populate_band() {
+void qso_manager::common_grp::populate_band() {
 	// Get pointers to the widget to be populated and the top-level dialog
 	Fl_Multi_Browser* mb = (Fl_Multi_Browser*)band_browser_;
-	dashboard* dash = ancestor_view<dashboard>(mb);
+	qso_manager* dash = ancestor_view<qso_manager>(mb);
 	mb->clear();
 	// Add all the possible bands (according to latest ADIF specification)
 	for (auto it = dash->ordered_bands_.begin(); it != dash->ordered_bands_.end(); it++) {
@@ -428,7 +469,7 @@ void dashboard::common_grp::populate_band() {
 
 // button callback - add
 // Add the text value of the choice to the list of items - new name is typed into the choice
-void dashboard::common_grp::cb_bn_add(Fl_Widget* w, void* v) {
+void qso_manager::common_grp::cb_bn_add(Fl_Widget* w, void* v) {
 	common_grp* that = ancestor_view<common_grp>(w);
 	// Get the value in the choice
 	string new_item = ((Fl_Input_Choice*)that->choice_)->value();
@@ -442,7 +483,7 @@ void dashboard::common_grp::cb_bn_add(Fl_Widget* w, void* v) {
 }
 
 // button callback - delete
-void dashboard::common_grp::cb_bn_del(Fl_Widget* w, void* v) {
+void qso_manager::common_grp::cb_bn_del(Fl_Widget* w, void* v) {
 	common_grp* that = ancestor_view<common_grp>(w);
 	// Get the selected item name
 	string item = ((Fl_Input_Choice*)that->choice_)->menubutton()->text();
@@ -457,7 +498,7 @@ void dashboard::common_grp::cb_bn_del(Fl_Widget* w, void* v) {
 
 // button callback - all/active items
 // v is unused
-void dashboard::common_grp::cb_bn_all(Fl_Widget* w, void* v) {
+void qso_manager::common_grp::cb_bn_all(Fl_Widget* w, void* v) {
 	common_grp* that = ancestor_view<common_grp>(w);
 	that->display_all_items_ = ((Fl_Light_Button*)w)->value();
 	that->populate_choice();
@@ -465,7 +506,7 @@ void dashboard::common_grp::cb_bn_all(Fl_Widget* w, void* v) {
 
 // button callback - active/deactive
 // v is unused
-void dashboard::common_grp::cb_bn_activ8(Fl_Widget* w, void* v) {
+void qso_manager::common_grp::cb_bn_activ8(Fl_Widget* w, void* v) {
 	common_grp* that = ancestor_view<common_grp>(w);
 	// Set the item active or inactive dependant on state of light button
 	bool activate = ((Fl_Light_Button*)w)->value();
@@ -476,11 +517,11 @@ void dashboard::common_grp::cb_bn_activ8(Fl_Widget* w, void* v) {
 
 // choice callback
 // v is unused
-void dashboard::common_grp::cb_ch_stn(Fl_Widget* w, void* v) {
+void qso_manager::common_grp::cb_ch_stn(Fl_Widget* w, void* v) {
 	// Input_Choice is a descendant of common_grp
 	Fl_Input_Choice* ch = ancestor_view<Fl_Input_Choice>(w); 
 	common_grp* that = ancestor_view<common_grp>(ch);
-	dashboard* dash = ancestor_view<dashboard>(that);
+	qso_manager* dash = ancestor_view<qso_manager>(that);
 	if (ch->menubutton()->changed()) {
 		// Get the new item from the menu
 		that->item_no_ = ch->menubutton()->value();
@@ -491,7 +532,12 @@ void dashboard::common_grp::cb_ch_stn(Fl_Widget* w, void* v) {
 		ch->value(that->my_name_.c_str());
 		// Update the active button
 		((Fl_Light_Button*)that->active_)->value(info.active);
-		that->populate_band();
+		switch (that->type_) {
+		case RIG:
+		case ANTENNA:
+			that->populate_band();
+			break;
+		}
 		dash->enable_widgets();
 	}
 	else {
@@ -501,7 +547,7 @@ void dashboard::common_grp::cb_ch_stn(Fl_Widget* w, void* v) {
 
 // Multi-browser callback
 // v is usused
-void dashboard::common_grp::cb_mb_bands(Fl_Widget* w, void* v) {
+void qso_manager::common_grp::cb_mb_bands(Fl_Widget* w, void* v) {
 	Fl_Multi_Browser* mb = ancestor_view<Fl_Multi_Browser>(w);
 	common_grp* that = ancestor_view<common_grp>(mb);
 	// Get the list of bands the selected antenna or rig is meant for
@@ -515,12 +561,12 @@ void dashboard::common_grp::cb_mb_bands(Fl_Widget* w, void* v) {
 	}
 	that->redraw();
 	that->save_values();
-	((dashboard*)that->parent())->enable_widgets();
+	((qso_manager*)that->parent())->enable_widgets();
 }
 
 // Item choice call back
 // v is value selected
-void dashboard::common_grp::cb_ch_item(Fl_Widget* w, void* v) {
+void qso_manager::common_grp::cb_ch_item(Fl_Widget* w, void* v) {
 	Fl_Input_Choice* ipch = ancestor_view<Fl_Input_Choice>(w);
 	cb_value<Fl_Input_Choice, string>(ipch, v);
 	common_grp* that = ancestor_view<common_grp>(w);
@@ -528,20 +574,20 @@ void dashboard::common_grp::cb_ch_item(Fl_Widget* w, void* v) {
 	that->populate_band();
 }
 
-string& dashboard::common_grp::name() {
+string& qso_manager::common_grp::name() {
 	return my_name_;
 }
 
-string& dashboard::common_grp::next() {
+string& qso_manager::common_grp::next() {
 	return next_name_;
 }
 
-dashboard::item_data& dashboard::common_grp::info() {
+qso_manager::item_data& qso_manager::common_grp::info() {
 	return item_info_[my_name_];
 }
 
 // The main dialog constructor
-dashboard::dashboard(int W, int H, const char* label) :
+qso_manager::qso_manager(int W, int H, const char* label) :
 	Fl_Window(W, H, label)
 	, rig_grp_(nullptr)
 	, antenna_grp_(nullptr)
@@ -566,11 +612,10 @@ dashboard::dashboard(int W, int H, const char* label) :
 	, logging_mode_(LM_OFF_AIR)
 	, wait_connect_(true)
 	, created_(false)
-	, record_(nullptr)
+	, current_qso_(nullptr)
 	, field_("")
 	, font_(FONT)
 	, fontsize_(FONT_SIZE)
-	, enterring_record_(false)
 	, all_ports_(false)
 	, previous_swr_alarm_(SWR_OK)
 	, previous_pwr_alarm_(POWER_OK)
@@ -597,14 +642,14 @@ dashboard::dashboard(int W, int H, const char* label) :
 }
 
 // Destructor
-dashboard::~dashboard()
+qso_manager::~qso_manager()
 {
 	Fl::remove_timeout(cb_timer_clock, nullptr);
 	save_values();
 }
 
 // Handle FL_HIDE and FL_SHOW to get menu to update itself
-int dashboard::handle(int event) {
+int qso_manager::handle(int event) {
 
 	switch (event) {
 	case FL_HIDE:
@@ -618,7 +663,7 @@ int dashboard::handle(int event) {
 }
 
 // create the form
-void dashboard::create_form(int X, int Y) {
+void qso_manager::create_form(int X, int Y) {
 
 	// Used to evaluate total width and height of the window
 	int max_x = X;
@@ -662,7 +707,7 @@ void dashboard::create_form(int X, int Y) {
 }
 
 // Create scratchpad widgets
-void dashboard::create_spad_widgets(int& curr_x, int& curr_y) {
+void qso_manager::create_spad_widgets(int& curr_x, int& curr_y) {
 	int max_w = 0;
 	int max_h = 0;
 
@@ -854,14 +899,16 @@ void dashboard::create_spad_widgets(int& curr_x, int& curr_y) {
 		rig_if_->get_string_mode(mode, submode);
 		break;
 	case LM_ON_AIR_COPY:
-		if (record_) {
+	{
+		record* selected_qso = book_->get_record();
+		if (selected_qso) {
 			// Get data from current record (if there is one)
-			frequency = record_->item("FREQ");
-			power = record_->item("TX_PWR");
-			mode = record_->item("MODE", true);
+			frequency = selected_qso->item("FREQ");
+			power = selected_qso->item("TX_PWR");
+			mode = selected_qso->item("MODE", true);
 		}
 		break;
-		mode = "USB";
+	}
 	}
 	ip_freq_->value(frequency.c_str());
 	spec_data_->initialise_field_choice(ch_mode_, "Combined", mode);
@@ -898,8 +945,8 @@ void dashboard::create_spad_widgets(int& curr_x, int& curr_y) {
 }
 
 // Antenna and Rig ("Use") widgets
-// assumes dashboard is the current active group
-void dashboard::create_use_widgets(int& curr_x, int& curr_y) {
+// assumes qso_manager is the current active group
+void qso_manager::create_use_widgets(int& curr_x, int& curr_y) {
 
 	int max_w = 0;
 	int max_h = 0;
@@ -920,8 +967,26 @@ void dashboard::create_use_widgets(int& curr_x, int& curr_y) {
 	max_w = max(max_w, rig_grp_->x() + rig_grp_->w() - curr_x);
 	max_h = max(max_h, rig_grp_->y() + rig_grp_->h() - curr_y);
 
+	// Box to contain antenna-rig connectivity
+	Fl_Help_View* w19 = new Fl_Help_View(antenna_grp_->x(), curr_y + max_h + GAP, max_w, HMLIN);
+	w19->box(FL_FLAT_BOX);
+	w19->labelfont(FONT);
+	w19->labelsize(FONT_SIZE);
+	w19->textfont(FONT);
+	w19->textsize(FONT_SIZE);
+	ant_rig_box_ = w19;
+	max_h += w19->h() + GAP;
+
+	// Callsign group
+	callsign_grp_ = new common_grp(rig_grp_->x() + rig_grp_->w() + GAP, antenna_grp_->y(), 10, 10, "Callsigns", CALLSIGN);
+	callsign_grp_->tooltip("Select the station callsign for this QSO");
+	callsign_grp_->end(); 
+	callsign_grp_->show();
+	max_w = max(max_w, callsign_grp_->x() + callsign_grp_->w() - curr_x);
+	max_h = max(max_h, callsign_grp_->y() + callsign_grp_->h() - curr_y);
+
 	// QTH choice
-	Fl_Group* gqth = new Fl_Group(rig_grp_->x() + rig_grp_->w() + GAP, rig_grp_->y(), 10, 10, "QTH");
+	Fl_Group* gqth = new Fl_Group(callsign_grp_->x(), callsign_grp_->y() + callsign_grp_->h() + GAP, 10, 10, "QTH");
 	gqth->labelfont(FONT);
 	gqth->labelsize(FONT_SIZE);
 	gqth->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
@@ -931,24 +996,16 @@ void dashboard::create_use_widgets(int& curr_x, int& curr_y) {
 	ch_qth_->textfont(FONT);
 	ch_qth_->textsize(FONT_SIZE);
 	ch_qth_->callback(cb_choice_text, &selected_qth_);
+
 	populate_qth_choice();
 
 	gqth->resizable(nullptr);
 	gqth->size(GAP + ch_qth_->w() + GAP, HTEXT + ch_qth_->h() + GAP);
 	gqth->end();
 
-	// Box to contain antenna-rig connectivity
-	Fl_Help_View* w19 = new Fl_Help_View(rig_grp_->x() + rig_grp_->w() + GAP, gqth->y() + gqth->h() + GAP, WBUTTON * 2, HMLIN);
-	w19->box(FL_FLAT_BOX);
-	w19->labelfont(FONT);
-	w19->labelsize(FONT_SIZE);
-	w19->textfont(FONT);
-	w19->textsize(FONT_SIZE);
-	ant_rig_box_ = w19;
-
 	// Use rig/antenna buttons
 	// Only use the selected antenna and rig in the current QSPO
-	Fl_Button* w20 = new Fl_Button(w19->x(), w19->y() + w19->h() + GAP, WBUTTON * 2, HBUTTON, "Use in current only");
+	Fl_Button* w20 = new Fl_Button(gqth->x(), gqth->y() + gqth->h() + GAP, WBUTTON * 2, HBUTTON, "Use in current only");
 	w20->labelfont(FONT);
 	w20->labelsize(FONT_SIZE);
 	w20->callback(cb_bn_use_items, (void*)(long)SELECTED_ONLY);
@@ -976,7 +1033,7 @@ void dashboard::create_use_widgets(int& curr_x, int& curr_y) {
 }
 
 // CAT settings widgets
-void dashboard::create_cat_widgets(int& curr_x, int& curr_y) {
+void qso_manager::create_cat_widgets(int& curr_x, int& curr_y) {
 
 	int max_w = 0;
 	int max_h = 0;
@@ -1225,7 +1282,7 @@ void dashboard::create_cat_widgets(int& curr_x, int& curr_y) {
 }
 
 // Alarm widgets
-void dashboard::create_alarm_widgets(int& curr_x, int& curr_y) {
+void qso_manager::create_alarm_widgets(int& curr_x, int& curr_y) {
 
 	int max_w = 0;
 	int max_h = 0;
@@ -1292,7 +1349,7 @@ void dashboard::create_alarm_widgets(int& curr_x, int& curr_y) {
 }
 
 // Create widgets to hold current tima and date (UTC)
-void dashboard::create_clock_widgets(int& curr_x, int& curr_y) {
+void qso_manager::create_clock_widgets(int& curr_x, int& curr_y) {
 	int max_w = 0;
 	int max_h = 0;
 
@@ -1343,7 +1400,7 @@ void dashboard::create_clock_widgets(int& curr_x, int& curr_y) {
 }
 
 // Load values
-void dashboard::load_values() {
+void qso_manager::load_values() {
 	order_bands();
 
 	// These are static, but will get to the same value each time
@@ -1369,7 +1426,7 @@ void dashboard::load_values() {
 
 }
 
-void dashboard::load_locations() {
+void qso_manager::load_locations() {
 	Fl_Preferences stations_settings(settings_, "Stations");
 
 	// Get the settings for the list of QTHs
@@ -1380,6 +1437,7 @@ void dashboard::load_locations() {
 	char* current_item;
 	qths_settings.get("Current", current_item, "");
 	selected_qth_ = current_item;
+	next_qth_ = selected_qth_;
 	free(current_item);
 	all_qths_.clear();
 	// For each item in the settings
@@ -1392,7 +1450,7 @@ void dashboard::load_locations() {
 }
 
 // Write values back to settings - write the three groups back separately
-void dashboard::save_values() {
+void qso_manager::save_values() {
 
 	// Save window position
 	Fl_Preferences dash_settings(settings_, "Dashboard");
@@ -1404,6 +1462,7 @@ void dashboard::save_values() {
 	Fl_Preferences stations_settings(settings_, "Stations");
 	rig_grp_->save_values();
 	antenna_grp_->save_values();
+	callsign_grp_->save_values();
 
 	// Set the selected QTH
 	Fl_Preferences qths_settings(stations_settings, "QTHs");
@@ -1411,7 +1470,7 @@ void dashboard::save_values() {
 }
 
 // Write next QSO values
-void dashboard::save_next_values() {
+void qso_manager::save_next_values() {
 	Fl_Preferences stations_settings(settings_, "Stations");
 	rig_grp_->save_next_value();
 	antenna_grp_->save_next_value();
@@ -1419,11 +1478,13 @@ void dashboard::save_next_values() {
 	// Set the selected QTH
 	Fl_Preferences qths_settings(stations_settings, "QTHs");
 	qths_settings.set("Current", next_qth_.c_str());
+	// and copy next to current
+	selected_qth_ = next_qth_;
 }
 
 // Enable the widgets - activate the group associated with each rig handler when that
 // handler is enabled
-void dashboard::enable_widgets() {
+void qso_manager::enable_widgets() {
 
 	// Not all widgets may exist yet!
 	if (!created_) return;
@@ -1437,12 +1498,12 @@ void dashboard::enable_widgets() {
 }
 
 // Enable scratchpad widgets
-void dashboard::enable_spad_widgets() {
+void qso_manager::enable_spad_widgets() {
 
-	// Scratchpad widgets
+	// Scratchpad widgets - logging mode
 	ch_logmode_->value(logging_mode_);
 
-	if (enterring_record_) {
+	if (current_qso_) {
 		// Allow save and cancel as we have a record
 		bn_save_->activate();
 		bn_cancel_->activate();
@@ -1460,11 +1521,11 @@ void dashboard::enable_spad_widgets() {
 }
 
 // Enable Antenna and rig setting widgets
-void dashboard::enable_use_widgets() {
+void qso_manager::enable_use_widgets() {
 
 	// Antenna/rig compatibility
 	Fl_Help_View* mlo = (Fl_Help_View*)ant_rig_box_;
-	if (rig_if_ || record_) {
+	if (rig_if_ || current_qso_) {
 		// We have either a CAT connection or a previous record to cop
 		double frequency;
 		// Get logging mode frequency
@@ -1472,7 +1533,7 @@ void dashboard::enable_use_widgets() {
 			frequency = rig_if_->tx_frequency();
 		}
 		else {
-			record_->item("FREQ", frequency);
+			current_qso_->item("FREQ", frequency);
 		}
 		string rig_band = spec_data_->band_for_freq(frequency / 1000000.0);
 		// Check if band supported by rig
@@ -1535,17 +1596,16 @@ void dashboard::enable_use_widgets() {
 	mlo->textcolor(fl_contrast(FL_BLACK, mlo->color()));
 	// Update QTH chice
 	populate_qth_choice();
-
 }
 
 // Update just the Locations widget from settings
-void dashboard::update_locations() {
+void qso_manager::update_locations() {
 	load_locations();
 	populate_qth_choice();
 }
 
 // Enable CAT Connection widgets
-void dashboard::enable_cat_widgets() {
+void qso_manager::enable_cat_widgets() {
 
 	// CAT control widgets
 	// TODO update CAT widgets
@@ -1608,7 +1668,7 @@ void dashboard::enable_cat_widgets() {
 }
 
 // Enable the alarm widgets
-void dashboard::enable_alarm_widgets() {
+void qso_manager::enable_alarm_widgets() {
 
 	if (rig_if_) {
 		alarms_grp_->activate();
@@ -1693,10 +1753,10 @@ void dashboard::enable_alarm_widgets() {
 }
 
 // Place holder for noe
-void dashboard::enable_clock_widgets() {}
+void qso_manager::enable_clock_widgets() {}
 
 // Read the list of bands from the ADIF specification and put them in frequency order
-void dashboard::order_bands() {
+void qso_manager::order_bands() {
 	// List of bands - in string order of name of the bands (e.g. 10M or 3CM)
 	spec_dataset* band_dataset = spec_data_->dataset("Band");
 	ordered_bands_.clear();
@@ -1728,7 +1788,7 @@ void dashboard::order_bands() {
 }
 
 // Populate manufacturer and model choices - hierarchical menu: first manufacturer, then model
-void dashboard::populate_model_choice() {
+void qso_manager::populate_model_choice() {
 	Fl_Choice* ch = (Fl_Choice*)rig_model_choice_;
 	// Get hamlib Model number and populate control with all model names
 	ch->clear();
@@ -1790,8 +1850,8 @@ void dashboard::populate_model_choice() {
 
 // Rig handler radio button clicked
 // v contains the radio button value 
-void dashboard::cb_rad_handler(Fl_Widget* w, void* v) {
-	dashboard* that = ancestor_view<dashboard>(w);
+void qso_manager::cb_rad_handler(Fl_Widget* w, void* v) {
+	qso_manager* that = ancestor_view<qso_manager>(w);
 	// Get the selected radio button
 	rig_handler_t handler = (rig_handler_t)(long)v;
 
@@ -1812,9 +1872,9 @@ void dashboard::cb_rad_handler(Fl_Widget* w, void* v) {
 
 // Model input choice selected
 // v is not used
-void dashboard::cb_ch_model(Fl_Widget* w, void* v) {
+void qso_manager::cb_ch_model(Fl_Widget* w, void* v) {
 	Fl_Choice* ch = (Fl_Choice*)w;
-	dashboard* that = ancestor_view<dashboard>(w);
+	qso_manager* that = ancestor_view<qso_manager>(w);
 	hamlib_data* info = &that->rig_grp_->info().rig_data.hamlib_params;
 	// Get the full item name - e.g. Icom/IC-736 (untested)
 	char path[128];
@@ -1848,24 +1908,24 @@ void dashboard::cb_ch_model(Fl_Widget* w, void* v) {
 
 // Callback selecting port
 // v is unused
-void dashboard::cb_ch_port(Fl_Widget* w, void* v) {
-	dashboard* that = ancestor_view<dashboard>(w);
+void qso_manager::cb_ch_port(Fl_Widget* w, void* v) {
+	qso_manager* that = ancestor_view<qso_manager>(w);
 	hamlib_data* info = &that->rig_grp_->info().rig_data.hamlib_params;
 	cb_text<Fl_Choice, string>(w, (void*)&info->port_name);
 }
 
 // Callback selecting baud-rate
 // v is unused
-void dashboard::cb_ch_baud(Fl_Widget* w, void* v) {
-	dashboard* that = ancestor_view<dashboard>(w);
+void qso_manager::cb_ch_baud(Fl_Widget* w, void* v) {
+	qso_manager* that = ancestor_view<qso_manager>(w);
 	hamlib_data* info = &that->rig_grp_->info().rig_data.hamlib_params;
 	cb_text<Fl_Choice, string>(w, (void*)&info->baud_rate);
 }
 
 // Override rig capabilities selected - repopulate the baud choice
 // v is uused
-void dashboard::cb_ch_over(Fl_Widget* w, void* v) {
-	dashboard* that = ancestor_view<dashboard>(w);
+void qso_manager::cb_ch_over(Fl_Widget* w, void* v) {
+	qso_manager* that = ancestor_view<qso_manager>(w);
 	hamlib_data* info = &that->rig_grp_->info().rig_data.hamlib_params;
 	cb_value<Fl_Check_Button, bool>(w, (void*)&info->override_caps);
 	that->populate_baud_choice();
@@ -1873,41 +1933,41 @@ void dashboard::cb_ch_over(Fl_Widget* w, void* v) {
 
 // Select "display all ports" in port choice
 // v is a pointer to the all ports flag
-void dashboard::cb_bn_all(Fl_Widget* w, void* v) {
+void qso_manager::cb_bn_all(Fl_Widget* w, void* v) {
 	cb_value<Fl_Check_Button, bool>(w, v);
-	dashboard* that = ancestor_view<dashboard>(w);
+	qso_manager* that = ancestor_view<qso_manager>(w);
 	that->populate_port_choice();
 }
 
 // Select Flrig server IP Address
 // v is unused
-void dashboard::cb_ip_ipa(Fl_Widget* w, void* v) {
-	dashboard* that = ancestor_view<dashboard>(w);
+void qso_manager::cb_ip_ipa(Fl_Widget* w, void* v) {
+	qso_manager* that = ancestor_view<qso_manager>(w);
 	flrig_data* info = &that->rig_grp_->info().rig_data.flrig_params;
 	cb_value<Fl_Input, string>(w, (void*)&info->ip_address);
 }
 
 // Select Flrig server port number
 // v is unused
-void dashboard::cb_ip_portn(Fl_Widget* w, void* v) {
-	dashboard* that = ancestor_view<dashboard>(w);
+void qso_manager::cb_ip_portn(Fl_Widget* w, void* v) {
+	qso_manager* that = ancestor_view<qso_manager>(w);
 	flrig_data* info = &that->rig_grp_->info().rig_data.flrig_params;
 	cb_value_int<Fl_Int_Input>(w, (void*)&info->port);
 }
 
 // Selecte Flrig resource ID
 // v is unused
-void dashboard::cb_ip_resource(Fl_Widget* w, void* v) {
-	dashboard* that = ancestor_view<dashboard>(w);
+void qso_manager::cb_ip_resource(Fl_Widget* w, void* v) {
+	qso_manager* that = ancestor_view<qso_manager>(w);
 	flrig_data* info = &that->rig_grp_->info().rig_data.flrig_params;
 	cb_value<intl_input, string>(w, (void*)&info->resource);
 }
 
 // Changed the SWR wrning level
 // v is unused
-void dashboard::cb_alarm_swr(Fl_Widget* w, void* v) {
+void qso_manager::cb_alarm_swr(Fl_Widget* w, void* v) {
 	alarm_dial* dial = ancestor_view<alarm_dial>(w);
-	dashboard* that = ancestor_view<dashboard>(dial);
+	qso_manager* that = ancestor_view<qso_manager>(dial);
 	double val = dial->Fl_Line_Dial::value();
 	double error = dial->alarm2();
 	double warn = dial->alarm1();
@@ -1935,9 +1995,9 @@ void dashboard::cb_alarm_swr(Fl_Widget* w, void* v) {
 
 // Changed the power level
 // v is unused
-void dashboard::cb_alarm_pwr(Fl_Widget* w, void* v) {
+void qso_manager::cb_alarm_pwr(Fl_Widget* w, void* v) {
 	alarm_dial* dial = ancestor_view<alarm_dial>(w);
-	dashboard* that = ancestor_view<dashboard>(dial);
+	qso_manager* that = ancestor_view<qso_manager>(dial);
 	double val = dial->Fl_Line_Dial::value();
 	double warn = dial->alarm1();
 	// If in receive mode, use last value read in TX mode
@@ -1960,9 +2020,9 @@ void dashboard::cb_alarm_pwr(Fl_Widget* w, void* v) {
 }
 
 // Changed the drain voltage
-void dashboard::cb_alarm_vdd(Fl_Widget* w, void* v) {
+void qso_manager::cb_alarm_vdd(Fl_Widget* w, void* v) {
 	alarm_dial* dial = ancestor_view<alarm_dial>(w);
-	dashboard* that = ancestor_view<dashboard>(dial);
+	qso_manager* that = ancestor_view<qso_manager>(dial);
 	double val = dial->Fl_Line_Dial::value();
 	double max = dial->alarm2();
 	double min = dial->alarm1();
@@ -1982,24 +2042,24 @@ void dashboard::cb_alarm_vdd(Fl_Widget* w, void* v) {
 
 // Changed the fast polling interval
 // v is not used
-void dashboard::cb_ctr_pollfast(Fl_Widget* w, void* v) {
+void qso_manager::cb_ctr_pollfast(Fl_Widget* w, void* v) {
 	// Get the warning level
-	dashboard* that = ancestor_view<dashboard>(w);
+	qso_manager* that = ancestor_view<qso_manager>(w);
 	cb_value<Fl_Spinner, double>(w, &that->rig_grp_->info().rig_data.fast_poll_interval);
 }
 
 // Changed the fast polling interval
 // v is not used
-void dashboard::cb_ctr_pollslow(Fl_Widget* w, void* v) {
+void qso_manager::cb_ctr_pollslow(Fl_Widget* w, void* v) {
 	// Get the warning level
-	dashboard* that = ancestor_view<dashboard>(w);
+	qso_manager* that = ancestor_view<qso_manager>(w);
 	cb_value<Fl_Spinner, double>(w, &that->rig_grp_->info().rig_data.slow_poll_interval);
 }
 
 // Pressed the connect button
 // v is not used
-void dashboard::cb_bn_connect(Fl_Widget* w, void* v) {
-	dashboard* that = ancestor_view<dashboard>(w);
+void qso_manager::cb_bn_connect(Fl_Widget* w, void* v) {
+	qso_manager* that = ancestor_view<qso_manager>(w);
 	that->save_values();
 	switch (that->rig_grp_->info().rig_data.handler) {
 	case RIG_HAMLIB:
@@ -2029,15 +2089,16 @@ void dashboard::cb_bn_connect(Fl_Widget* w, void* v) {
 
 // Callback for use items button
 // v is use_item_t
-void dashboard::cb_bn_use_items(Fl_Widget* w, void* v) {
+void qso_manager::cb_bn_use_items(Fl_Widget* w, void* v) {
 	use_item_t use = (use_item_t)(long)v;
-	dashboard* that = ancestor_view<dashboard>(w);
+	qso_manager* that = ancestor_view<qso_manager>(w);
 	record* sel_record = book_->get_record();
 	switch (use) {
 	case SELECTED_ONLY:
 		// Update selected record only with antenna and rig
 		sel_record->item("MY_RIG", that->rig_grp_->name());
 		sel_record->item("MY_ANTENNA", that->antenna_grp_->name());
+		sel_record->item("STATION_CALLSIGN", that->callsign_grp_->name());
 		sel_record->item("APP_ZZA_QTH", that->selected_qth_);
 		tabbed_forms_->update_views(nullptr, HT_MINOR_CHANGE, book_->selection());
 		break;
@@ -2046,6 +2107,7 @@ void dashboard::cb_bn_use_items(Fl_Widget* w, void* v) {
 		sel_record->item("MY_RIG", that->rig_grp_->name());
 		sel_record->item("MY_ANTENNA", that->antenna_grp_->name());
 		sel_record->item("APP_ZZA_QTH", that->selected_qth_);
+		sel_record->item("SELECTED_CALLSIGN", that->callsign_grp_->name());
 		tabbed_forms_->update_views(nullptr, HT_MINOR_CHANGE, book_->selection());
 		that->rig_grp_->next() = that->rig_grp_->name();
 		that->antenna_grp_->next() = that->antenna_grp_->name();
@@ -2056,6 +2118,7 @@ void dashboard::cb_bn_use_items(Fl_Widget* w, void* v) {
 		sel_record->user_details();
 		that->rig_grp_->next() = that->rig_grp_->name();
 		that->antenna_grp_->next() = that->antenna_grp_->name();
+		that->callsign_grp_->next() = that->callsign_grp_->name();
 		that->next_qth_ = that->selected_qth_;
 		break;
 	}
@@ -2063,13 +2126,13 @@ void dashboard::cb_bn_use_items(Fl_Widget* w, void* v) {
 
 // One of the write field buttons has been activated
 // v provides the specific action 
-void dashboard::cb_action(Fl_Widget* w, void* v) {
+void qso_manager::cb_action(Fl_Widget* w, void* v) {
 	actions action = (actions)(long)v;
-	dashboard* that = ancestor_view<dashboard>(w);
+	qso_manager* that = ancestor_view<qso_manager>(w);
 
 	string field;
 	// Create a record if we haven't started editing one
-	if (!that->enterring_record_) {
+	if (!that->current_qso_) {
 		cb_start(w, nullptr);
 	}
 	// Get the field to write from the button action. Default update is a minor change
@@ -2124,11 +2187,11 @@ void dashboard::cb_action(Fl_Widget* w, void* v) {
 	// Remove leading and trailing white space
 	while (isspace(text[0])) text = text.substr(1);
 	while (isspace(text[text.length() - 1])) text = text.substr(0, text.length() - 1);
-	that->record_->item(field, text);
+	that->current_qso_->item(field, text);
 	that->buffer_->unselect();
 	// Set DX location on DxAtlas
 	if (action == WRITE_GRID) {
-		dxa_if_->set_dx_loc(to_upper(text), that->record_->item("CALL"));
+		dxa_if_->set_dx_loc(to_upper(text), that->current_qso_->item("CALL"));
 	}
 	// Update views
 	tabbed_forms_->update_views(nullptr, HT_MINOR_CHANGE, book_->size() - 1);
@@ -2140,19 +2203,19 @@ void dashboard::cb_action(Fl_Widget* w, void* v) {
 
 // Have we worked before? Loads previous contacts in extract view
 // v is unused
-void dashboard::cb_wkb4(Fl_Widget* w, void* v) {
-	dashboard* that = ancestor_view<dashboard>(w);
+void qso_manager::cb_wkb4(Fl_Widget* w, void* v) {
+	qso_manager* that = ancestor_view<qso_manager>(w);
 	string text = that->buffer_->selection_text();
 	extract_records_->extract_call(text);
 }
 
 // Parse selected text as callsign
 // // v is unused
-void dashboard::cb_parse(Fl_Widget* w, void* v) {
-	dashboard* that = ancestor_view<dashboard>(w);
+void qso_manager::cb_parse(Fl_Widget* w, void* v) {
+	qso_manager* that = ancestor_view<qso_manager>(w);
 	string text = that->buffer_->selection_text();
 	// Create a temporary record to parse the callsign
-	record* tip_record = new record(that->logging_mode_, nullptr);
+	record* tip_record = that->dummy_qso();
 	string message = "";
 	// Set the callsign in the temporary record
 	tip_record->item("CALL", to_upper(text));
@@ -2167,21 +2230,10 @@ void dashboard::cb_parse(Fl_Widget* w, void* v) {
 
 // Save the record and reset the state to no record
 // v is not used
-void dashboard::cb_save(Fl_Widget* w, void* v) {
-	dashboard* that = ancestor_view<dashboard>(w);
-	// Save frequency mode and TX_PWR if that didn't change
-	string freq;
-	cb_value<Fl_Input, string>(that->ip_freq_, &freq);
-	that->record_->item("FREQ", freq);
-	string mode;
-	cb_choice_text(that->ch_mode_, &mode);
-	that->record_->item("MODE", mode);
-	string power;
-	cb_value<Fl_Input, string>(that->ip_power_, &power);
-	that->record_->item("TX_PWR", power);
+void qso_manager::cb_save(Fl_Widget* w, void* v) {
+	qso_manager* that = ancestor_view<qso_manager>(w);
 	// Save the record - should update views
-	book_->save_record();
-	that->enterring_record_ = false;
+	that->end_qso();
 	that->buffer_->text("");
 	that->enable_widgets();
 	dxa_if_->clear_dx_loc();
@@ -2189,25 +2241,24 @@ void dashboard::cb_save(Fl_Widget* w, void* v) {
 
 // Cancel the edit and reset the state to no record
 // v is not used
-void dashboard::cb_cancel(Fl_Widget* w, void* v) {
-	dashboard* that = ancestor_view<dashboard>(w);
-	if (that->enterring_record_) {
+void qso_manager::cb_cancel(Fl_Widget* w, void* v) {
+	qso_manager* that = ancestor_view<qso_manager>(w);
+	if (that->current_qso_) {
 		book_->delete_record(false);
-		that->record_ = book_->get_record();
 		dxa_if_->clear_dx_loc();
 	}
 	that->buffer_->text("");
-	that->enterring_record_ = false;
+	that->current_qso_ = nullptr;
 	that->enable_widgets();
 }
 
 // Close button clicked - check editing or not
 // v is not used
-void dashboard::cb_close(Fl_Widget* w, void* v) {
+void qso_manager::cb_close(Fl_Widget* w, void* v) {
 	// It is the window that raised this callback
-	dashboard* that = (dashboard*)w;
+	qso_manager* that = (qso_manager*)w;
 	// If we are editing does the user want to save or cancel?
-	if (that->record_ != nullptr) {
+	if (that->current_qso_ != nullptr) {
 		if (fl_choice("Entering a record - save or cancel?", "Cancel", "Save", nullptr) == 1) {
 			cb_save(w, v);
 		}
@@ -2215,7 +2266,7 @@ void dashboard::cb_close(Fl_Widget* w, void* v) {
 			cb_cancel(w, v);
 		}
 	}
-	// Mark dashboard disabled, hide it and update menu item
+	// Mark qso_manager disabled, hide it and update menu item
 	Fl_Preferences spad_settings(settings_, "Scratchpad");
 	spad_settings.set("Enabled", (int)false);
 	menu_->update_items();
@@ -2223,32 +2274,16 @@ void dashboard::cb_close(Fl_Widget* w, void* v) {
 
 // Start button - create a new record
 // v is not used
-void dashboard::cb_start(Fl_Widget* w, void* v) {
-	dashboard* that = ancestor_view<dashboard>(w);
-	that->record_ = book_->new_record(that->logging_mode());
-	that->enterring_record_ = true;
-	if (that->logging_mode_) {
-		that->record_->item("FREQ", string(that->ip_freq_->value()));
-		string mode;
-		cb_choice_text(that->ch_mode_, &mode);
-		if (spec_data_->is_submode(mode)) {
-			that->record_->item("SUBMODE", mode);
-			that->record_->item("MODE", spec_data_->mode_for_submode(mode));
-		}
-		else {
-			that->record_->item("MODE", mode);
-			that->record_->item("SUBMODE", string(""));
-		}
-		that->record_->item("TX_PWR", string(that->ip_power_->value()));
-		tabbed_forms_->update_views(nullptr, HT_CHANGED, book_->size() - 1);
-	}
+void qso_manager::cb_start(Fl_Widget* w, void* v) {
+	qso_manager* that = ancestor_view<qso_manager>(w);
+	that->current_qso_ = that->start_qso();
 	// Get the highlighted text from the editor buffer and write it to the field "CALL", unhighlight the text
 	if (that->buffer_->selected()) {
 		string text = that->buffer_->selection_text();
 		// Remove leading and trailing white space
 		while (isspace(text[0])) text = text.substr(1);
 		while (isspace(text[text.length() - 1])) text = text.substr(0, text.length() - 1);
-		that->record_->item("CALL", text);
+		that->current_qso_->item("CALL", text);
 		that->buffer_->unselect();
 	}
 	that->enable_widgets();
@@ -2256,14 +2291,14 @@ void dashboard::cb_start(Fl_Widget* w, void* v) {
 
 // Frequency input
 // v is not used
-void dashboard::cb_ip_freq(Fl_Widget* w, void* v) {
-	dashboard* that = ancestor_view<dashboard>(w);
-	if (that->record_) {
+void qso_manager::cb_ip_freq(Fl_Widget* w, void* v) {
+	qso_manager* that = ancestor_view<qso_manager>(w);
+	if (that->current_qso_) {
 		// Input is in MHz - keep as that for record, convert to kHz for band check
 		string value;
 		cb_value<Fl_Input, string>(w, &value);
 		double freq = stod(value) * 1000;
-		that->record_->item("FREQ", value);
+		that->current_qso_->item("FREQ", value);
 		if (band_view_ && !band_view_->in_band(freq)) {
 			((Fl_Input*)w)->textcolor(FL_RED);
 		}
@@ -2279,19 +2314,19 @@ void dashboard::cb_ip_freq(Fl_Widget* w, void* v) {
 
 // Mode choice
 // v is not used
-void dashboard::cb_ch_mode(Fl_Widget* w, void* v) {
-	dashboard* that = ancestor_view<dashboard>(w);
-	if (that->record_) {
+void qso_manager::cb_ch_mode(Fl_Widget* w, void* v) {
+	qso_manager* that = ancestor_view<qso_manager>(w);
+	if (that->current_qso_) {
 		// Value in choice is a sub-mode
 		string value;
 		cb_choice_text(w, &value);
 		if (spec_data_->is_submode(value)) {
-			that->record_->item("SUBMODE", value);
-			that->record_->item("MODE", spec_data_->mode_for_submode(value));
+			that->current_qso_->item("SUBMODE", value);
+			that->current_qso_->item("MODE", spec_data_->mode_for_submode(value));
 		}
 		else {
-			that->record_->item("MODE", value);
-			that->record_->item("SUBMODE", string(""));
+			that->current_qso_->item("MODE", value);
+			that->current_qso_->item("SUBMODE", string(""));
 		}
 		// Update views
 		tabbed_forms_->update_views(nullptr, HT_CHANGED, book_->size() - 1);
@@ -2300,19 +2335,19 @@ void dashboard::cb_ch_mode(Fl_Widget* w, void* v) {
 
 // Power input
 // v is not used
-void dashboard::cb_ip_power(Fl_Widget* w, void* v) {
-	dashboard* that = ancestor_view<dashboard>(w);
-	if (that->record_) {
+void qso_manager::cb_ip_power(Fl_Widget* w, void* v) {
+	qso_manager* that = ancestor_view<qso_manager>(w);
+	if (that->current_qso_) {
 		string value;
 		cb_value<Fl_Input, string>(w, &value);
-		that->record_->item("TX_PWR", value);
+		that->current_qso_->item("TX_PWR", value);
 		// Update views
 		tabbed_forms_->update_views(nullptr, HT_MINOR_CHANGE, book_->size() - 1);
 	}
 }
 
 // Populate the choice with the available ports
-void dashboard::populate_port_choice() {
+void qso_manager::populate_port_choice() {
 	Fl_Choice* ch = (Fl_Choice*)port_if_choice_;
 	ch->clear();
 	ch->add("NONE");
@@ -2341,9 +2376,9 @@ void dashboard::populate_port_choice() {
 }
 
 // Clock timer callback - received every UTC_TIMER seconds
-void dashboard::cb_timer_clock(void* v) {
+void qso_manager::cb_timer_clock(void* v) {
 	// Update the label in the clock button which is passed as the parameter
-	dashboard* dash = (dashboard*)v;
+	qso_manager* dash = (qso_manager*)v;
 	time_t now = time(nullptr);
 	tm* value = gmtime(&now);
 	char result[100];
@@ -2365,7 +2400,7 @@ void dashboard::cb_timer_clock(void* v) {
 
 
 // Populate the baud rate choice menu
-void dashboard::populate_baud_choice() {
+void qso_manager::populate_baud_choice() {
 	Fl_Choice* ch = (Fl_Choice*)baud_rate_choice_;
 	ch->clear();
 	// Override rig's capabilities?
@@ -2403,7 +2438,7 @@ void dashboard::populate_baud_choice() {
 }
 
 // Populate QTH choice
-void dashboard::populate_qth_choice() {
+void qso_manager::populate_qth_choice() {
 	ch_qth_->clear();
 	int index = 0;
 	for (auto it = all_qths_.begin(); it != all_qths_.end(); it++, index++) {
@@ -2412,21 +2447,246 @@ void dashboard::populate_qth_choice() {
 			ch_qth_->value(index);
 		}
 	}
+	Fl_Preferences stations_settings(settings_, "Stations");
+	Fl_Preferences qths_settings(stations_settings, "QTHs");
+	Fl_Preferences qth_settings(qths_settings, selected_qth_.c_str());
 }
 
 // Return the logging mode
-logging_mode_t dashboard::logging_mode() {
+qso_manager::logging_mode_t qso_manager::logging_mode() {
 	return logging_mode_;
 }
 
 // Set the logging mode
-void dashboard::logging_mode(logging_mode_t mode) {
+void qso_manager::logging_mode(logging_mode_t mode) {
 	logging_mode_ = mode;
 	enable_widgets();
 }
 
+// Start QSO
+record* qso_manager::start_qso() {
+	if (current_qso_) {
+		char message[128];
+		snprintf(message, 128, "QSO: Already entring QSO %s %s %s", 
+			current_qso_->item("QSO_DATE").c_str(),
+			current_qso_->item("TIME_ON").c_str(),
+			current_qso_->item("CALL").c_str());
+		status_->misc_status(ST_ERROR, message);
+		return current_qso_;
+	}
+	current_qso_ = new record;
+	string mode;
+	string submode;
+	string timestamp = now(false, "%Y%m%d%H%M%S");
+	record* copy_from = book_->get_record();
+
+	switch (logging_mode_) {
+	case LM_IMPORTED:
+		// No pre-population
+		break;
+	case LM_OFF_AIR:
+		// Prepopulate rig, antenna, QTH and callsign
+		current_qso_->item("STATION_CALLSIGN", callsign_grp_->next());
+		current_qso_->item("MY_RIG", rig_grp_->next());
+		current_qso_->item("MY_ANTENNA", antenna_grp_->next());
+		current_qso_->item("APP_ZZA_QTH", next_qth_);
+		break;
+	case LM_ON_AIR_CAT:
+		// Interactive mode - start QSO - update fields from radio 
+		// Get current date and time in UTC
+		current_qso_->item("QSO_DATE", timestamp.substr(0, 8));
+		// Time as HHMMSS - always log seconds.
+		current_qso_->item("TIME_ON", timestamp.substr(8));
+		current_qso_->item("QSO_DATE_OFF", string(""));
+		current_qso_->item("TIME_OFF", string(""));
+		current_qso_->item("CALL", string(""));
+		// Get frequency, mode and transmit power from rig
+		current_qso_->item("FREQ", rig_if_->get_frequency(true));
+		if (rig_if_->is_split()) {
+			current_qso_->item("FREQ_RX", rig_if_->get_frequency(false));
+		}
+		// Get mode - NB USB/LSB need further processing
+		rig_if_->get_string_mode(mode, submode);
+		current_qso_->item("MODE", mode);
+		current_qso_->item("SUBMODE", submode);
+		current_qso_->item("TX_PWR", rig_if_->get_tx_power());
+		// initialise fields
+		current_qso_->item("RX_PWR", string(""));
+		current_qso_->item("RST_SENT", string(""));
+		current_qso_->item("RST_RCVD", string(""));
+		current_qso_->item("NAME", string(""));
+		current_qso_->item("QTH", string(""));
+		current_qso_->item("GRIDSQUARE", string(""));
+		// Prepopulate rig, antenna, QTH and callsign
+		current_qso_->item("STATION_CALLSIGN", callsign_grp_->next());
+		current_qso_->item("MY_RIG", rig_grp_->next());
+		current_qso_->item("MY_ANTENNA", antenna_grp_->next());
+		current_qso_->item("APP_ZZA_QTH", next_qth_);
+		break;
+	case LM_ON_AIR_COPY:
+		// Interactive mode - start QSO - date/time only
+		// Get current date and time in UTC
+		current_qso_->item("QSO_DATE", timestamp.substr(0, 8));
+		// Time as HHMMSS - always log seconds.
+		current_qso_->item("TIME_ON", timestamp.substr(8));
+		current_qso_->item("QSO_DATE_OFF", string(""));
+		current_qso_->item("TIME_OFF", string(""));
+		current_qso_->item("CALL", string(""));
+		// otherwise leave blank so that we enter it manually later.
+		current_qso_->item("FREQ", copy_from->item("FREQ"));
+		current_qso_->item("FREQ_RX", copy_from->item("FREQ_RX"));
+		current_qso_->item("MODE", copy_from->item("MODE"));
+		current_qso_->item("SUBMODE", copy_from->item("SUBMODE"));
+		current_qso_->item("TX_PWR", copy_from->item("TX_PWR"));
+		// initialise fields
+		current_qso_->item("RX_PWR", string(""));
+		current_qso_->item("RST_SENT", string(""));
+		current_qso_->item("RST_RCVD", string(""));
+		current_qso_->item("NAME", string(""));
+		current_qso_->item("QTH", string(""));
+		current_qso_->item("GRIDSQUARE", string(""));
+		// Prepopulate rig, antenna, QTH and callsign
+		current_qso_->item("STATION_CALLSIGN", callsign_grp_->next());
+		current_qso_->item("MY_RIG", rig_grp_->next());
+		current_qso_->item("MY_ANTENNA", antenna_grp_->next());
+		current_qso_->item("APP_ZZA_QTH", next_qth_);
+		break;
+	case LM_ON_AIR_TIME:
+		// Interactive mode - start QSO - date/time only
+		// Get current date and time in UTC
+		current_qso_->item("QSO_DATE", timestamp.substr(0, 8));
+		// Time as HHMMSS - always log seconds.
+		current_qso_->item("TIME_ON", timestamp.substr(8));
+		current_qso_->item("QSO_DATE_OFF", string(""));
+		current_qso_->item("TIME_OFF", string(""));
+		current_qso_->item("CALL", string(""));
+		// otherwise leave blank so that we enter it manually later.
+		current_qso_->item("FREQ", string(""));
+		current_qso_->item("FREQ_RX", string(""));
+		current_qso_->item("MODE", string(""));
+		current_qso_->item("SUBMODE", string(""));
+		current_qso_->item("TX_PWR", string(""));
+		// initialise fields
+		current_qso_->item("RX_PWR", string(""));
+		current_qso_->item("RST_SENT", string(""));
+		current_qso_->item("RST_RCVD", string(""));
+		current_qso_->item("NAME", string(""));
+		current_qso_->item("QTH", string(""));
+		current_qso_->item("GRIDSQUARE", string(""));
+		// Prepopulate rig, antenna, QTH and callsign
+		current_qso_->item("STATION_CALLSIGN", callsign_grp_->next());
+		current_qso_->item("MY_RIG", rig_grp_->next());
+		current_qso_->item("MY_ANTENNA", antenna_grp_->next());
+		current_qso_->item("APP_ZZA_QTH", next_qth_);
+		break;
+	}
+
+	// Add to book
+	book_->insert_record(current_qso_);
+
+	// Return created record
+	return current_qso_;
+}
+
+// Dummy QSO - only current date and time
+record* qso_manager::dummy_qso() {
+	record* dummy = new record;
+	string timestamp = now(false, "%Y%m%d%H%M%S");
+	// Get current date and time in UTC
+	dummy->item("QSO_DATE", timestamp.substr(0, 8));
+	// Time as HHMMSS - always log seconds.
+	dummy->item("TIME_ON", timestamp.substr(8));
+	dummy->item("QSO_DATE_OFF", string(""));
+	dummy->item("TIME_OFF", string(""));
+	dummy->item("CALL", string(""));
+	// otherwise leave blank so that we enter it manually later.
+	dummy->item("FREQ", string(""));
+	dummy->item("FREQ_RX", string(""));
+	dummy->item("MODE", string(""));
+	dummy->item("SUBMODE", string(""));
+	dummy->item("TX_PWR", string(""));
+	// initialise fields
+	dummy->item("RX_PWR", string(""));
+	dummy->item("RST_SENT", string(""));
+	dummy->item("RST_RCVD", string(""));
+	dummy->item("NAME", string(""));
+	dummy->item("QTH", string(""));
+	dummy->item("GRIDSQUARE", string(""));
+	// Prepopulate rig, antenna, QTH and callsign
+	dummy->item("STATION_CALLSIGN", callsign_grp_->next());
+	dummy->item("MY_RIG", rig_grp_->next());
+	dummy->item("MY_ANTENNA", antenna_grp_->next());
+	dummy->item("APP_ZZA_QTH", next_qth_);
+
+	return dummy;
+}
+
+// End QSO - add time off
+void qso_manager::end_qso() {
+	// get current book item number
+	record_num_t item_number = book_->selection();
+	record_num_t record_number = book_->record_number(item_number);
+	// On-air logging add date/time off
+	switch (logging_mode_) {
+	case LM_ON_AIR_CAT:
+	case LM_ON_AIR_COPY:
+	case LM_ON_AIR_TIME:
+		if (current_qso_->item("TIME_OFF") == "") {
+			// Add end date/time - current time of interactive entering
+			// Get current date and time in UTC
+			string timestamp = now(false, "%Y%m%d%H%M%S");
+			current_qso_->item("QSO_DATE_OFF", timestamp.substr(0, 8));
+			// Time as HHMMSS - always log seconds.
+			current_qso_->item("TIME_OFF", timestamp.substr(8));
+		}
+		break;
+	case LM_OFF_AIR:
+		book_->correct_record_position(item_number);
+		break;
+	}
+	book_->upload_qso(record_number);
+
+	// Modified by parsing and validation
+	bool record_modified = false;
+	// check whether record has changed - when parsed
+	if (pfx_data_->parse(current_qso_)) {
+		record_modified = true;
+	}
+
+	// check whether record has changed - when validated
+	if (spec_data_->validate(current_qso_, item_number)) {
+		record_modified = true;
+	}
+
+	// Now update rig, antenna and QTH to next value
+	save_next_values();
+
+	// If new or changed then update the fact and let every one know
+	book_->modified(true);
+	book_->selection(item_number, HT_INSERTED);
+
+
+	// Update session end - if we crash before we close down, we may fail to remember session properly
+	time_t today = time(nullptr);
+	void* p_today = &today;
+	settings_->set("Session End", p_today, sizeof(time_t));
+	settings_->flush();
+
+	// Do not automatically save when in debug mode as there may be a bug in the application corrupting the log
+#ifndef _DEBUG
+	if (!read_only_) {
+		book_->store_data();
+	}
+#endif // _DEBUG
+}
+
+// Return true if we have a current QSO
+bool qso_manager::qso_in_progress() {
+	return current_qso_ != nullptr;
+}
+
 // Called when rig is read to update values here
-void dashboard::rig_update(string frequency, string mode, string power) {
+void qso_manager::rig_update(string frequency, string mode, string power) {
 	ip_freq_->value(frequency.c_str());
 	double freq = stod(frequency) * 1000;
 	// If the frequency is outside a ham-band, display in red else in black
@@ -2445,7 +2705,7 @@ void dashboard::rig_update(string frequency, string mode, string power) {
 }
 
 // Get QSO information from previous record not rig
-void dashboard::update() {
+void qso_manager::update() {
 	// Get freq etc from QSO or rig
 	// Get present values data from rig
 	if (rig_if_) {
@@ -2502,13 +2762,12 @@ void dashboard::update() {
 		antenna_grp_->name() = "";
 		rig_grp_->name() = "";
 	}
-	enterring_record_ = book_->enterring_record();
 	update_locations();
 	enable_widgets();
 }
 
 // Set font etc.
-void dashboard::set_font(Fl_Font font, Fl_Fontsize size) {
+void qso_manager::set_font(Fl_Font font, Fl_Fontsize size) {
 	font_ = font;
 	fontsize_ = size;
 	// Change the font in the editor
@@ -2519,17 +2778,17 @@ void dashboard::set_font(Fl_Font font, Fl_Fontsize size) {
 	redraw();
 }
 
-// Constructor for dashboard editor
+// Constructor for qso_manager editor
 spad_editor::spad_editor(int x, int y, int w, int h) :
 	intl_editor(x, y, w, h)
 {
 }
 
-// Destructor for dashboard editor
+// Destructor for qso_manager editor
 spad_editor::~spad_editor() {
 }
 
-// Handler of any event coming from the dashboard editor
+// Handler of any event coming from the qso_manager editor
 int spad_editor::handle(int event) {
 	switch (event) {
 	case FL_FOCUS:
@@ -2542,43 +2801,43 @@ int spad_editor::handle(int event) {
 		switch (Fl::event_key()) {
 		case FL_F + 1:
 			// F1 - copy selected text to CALL field
-			dashboard::cb_action(this, (void*)dashboard::WRITE_CALL);
+			qso_manager::cb_action(this, (void*)qso_manager::WRITE_CALL);
 			return true;
 		case FL_F + 2:
 			// F2 - copy selected text to NAME field
-			dashboard::cb_action(this, (void*)dashboard::WRITE_NAME);
+			qso_manager::cb_action(this, (void*)qso_manager::WRITE_NAME);
 			return true;
 		case FL_F + 3:
 			// F3 - copy selected text to QTH field
-			dashboard::cb_action(this, (void*)dashboard::WRITE_QTH);
+			qso_manager::cb_action(this, (void*)qso_manager::WRITE_QTH);
 			return true;
 		case FL_F + 4:
 			// F4 - copy selected text to RST_RCVD field
-			dashboard::cb_action(this, (void*)dashboard::WRITE_RST_RCVD);
+			qso_manager::cb_action(this, (void*)qso_manager::WRITE_RST_RCVD);
 			return true;
 		case FL_F + 5:
 			// F5 - copy selected text to RST_SENT field
-			dashboard::cb_action(this, (void*)dashboard::WRITE_RST_SENT);
+			qso_manager::cb_action(this, (void*)qso_manager::WRITE_RST_SENT);
 			return true;
 		case FL_F + 6:
 			// F6 - copy selected text to GRIDSQUARE field
-			dashboard::cb_action(this, (void*)dashboard::WRITE_GRID);
+			qso_manager::cb_action(this, (void*)qso_manager::WRITE_GRID);
 			return true;
 		case FL_F + 7:
 			// F7 - save record
-			dashboard::cb_save(this, nullptr);
+			qso_manager::cb_save(this, nullptr);
 			return true;
 		case FL_F + 8:
 			// F8 - discard record
-			dashboard::cb_cancel(this, nullptr);
+			qso_manager::cb_cancel(this, nullptr);
 			return true;
 		case FL_F + 9:
 			// F9 - Check worked before
-			dashboard::cb_wkb4(this, nullptr);
+			qso_manager::cb_wkb4(this, nullptr);
 			return true;
 		case FL_F + 10:
 			// F10 - Parse callsign
-			dashboard::cb_parse(this, nullptr);
+			qso_manager::cb_parse(this, nullptr);
 			return true;
 		}
 	}

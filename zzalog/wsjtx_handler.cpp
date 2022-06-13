@@ -8,6 +8,7 @@
 #include "prefix.h"
 #include "pfx_data.h"
 #include "toolbar.h"
+#include "qso_manager.h"
 
 #include <stdio.h>
 #include <WS2tcpip.h>
@@ -35,6 +36,7 @@ extern Fl_Preferences* settings_;
 extern dxa_if* dxa_if_;
 extern pfx_data* pfx_data_;
 extern toolbar* toolbar_;
+extern qso_manager* qso_manager_;
 
 wsjtx_handler* wsjtx_handler::that_ = nullptr;
 
@@ -48,16 +50,12 @@ wsjtx_handler::wsjtx_handler()
 	status_rcvd_ = 0;
 	// Get logged callsign from settings
 	Fl_Preferences station_settings(settings_, "Stations");
-	Fl_Preferences qths_settings(station_settings, "QTHs");
-	char* current_stn;
-	qths_settings.get("Current", current_stn, "");
-	Fl_Preferences current_settings(qths_settings, current_stn);
-	char* temp;
-	current_settings.get("Callsign", temp, "");
-	my_call_ = temp;
+	Fl_Preferences callsigns_settings(station_settings, "Callsigns");
+	char* callsign;
+	callsigns_settings.get("Current", callsign, "");
+	my_call_ = callsign;
 	my_bracketed_call_ = "<" + my_call_ + ">";
-	free(temp);
-	free(current_stn);
+	free(callsign);
 }
 
 // Destructor
@@ -162,7 +160,7 @@ int wsjtx_handler::handle_log(stringstream& ss) {
 	stringstream adif;
 	adif.str(utf8);
 	// Stop any extant update and wait for it to complete
-	import_data_->stop_update(LM_OFF_AIR, false);
+	import_data_->stop_update(qso_manager::LM_OFF_AIR, false);
 	while (!import_data_->update_complete()) Fl::wait();
 	import_data_->load_stream(adif, import_data::update_mode_t::DATAGRAM);
 	// Wait for the import to finish
@@ -265,7 +263,7 @@ int wsjtx_handler::handle_status(stringstream& ss) {
 	}
 	else if (status.dx_call.length() && status.transmitting) {
 		// Get the grid location of the prefix centre - only if 1 prefix matches the callsign.
-		record* dx_record = new record(LM_OFF_AIR, nullptr);
+		record* dx_record = qso_manager_->dummy_qso();
 		dx_record->item("CALL", status.dx_call);
 		vector<prefix*> prefixes;
 		// Get prefix(es), If only 1 and the DXCC Code != 0 (i.e. not /MM)

@@ -81,10 +81,10 @@ namespace zzalog {
 		record* get_record();
 		// Set the numbered record and optionally select it
 		record* get_record(record_num_t item_num, bool set_selected);
-		// Create a new record
-		record* new_record(logging_mode_t mode);
-		// Save the current record
-		void save_record();
+		//// Create a new record
+		//record* new_record(logging_mode_t mode);
+		//// Save the current record
+		//void save_record();
 		// Delete the current record
 		void delete_record(bool force);
 		// Change the selected record (& update any necessary controls) - returns the new record number if the book gets reordered
@@ -216,8 +216,8 @@ namespace zzalog {
 		adif_format_t format_;
 		// inhibit views being updated when selection changes
 		bool inhibit_view_update_;
-		// current logging mode
-		logging_mode_t logging_mode_;
+		//// current logging mode
+		//logging_mode_t logging_mode_;
 		// New record being created
 		bool new_record_;
 		// Modifying an existing one

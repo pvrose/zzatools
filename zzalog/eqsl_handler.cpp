@@ -411,23 +411,20 @@ bool eqsl_handler::user_details(
 	Fl_Preferences qsl_settings(settings_, "QSL");
 	Fl_Preferences eqsl_settings(qsl_settings, "eQSL");
 	Fl_Preferences stations_settings(settings_, "Stations");
-	Fl_Preferences qths_settings(stations_settings, "QTHs");
-	char* current;
-	qths_settings.get("Current", current, "");
-	Fl_Preferences current_settings(qths_settings, current);
-	free(current);
+	Fl_Preferences callsigns_settings(stations_settings, "Callsigns");
+	char* callsign;
+	callsigns_settings.get("Current", callsign, "");
 
 	char * temp;
 	if (username != nullptr) {
 		eqsl_settings.get("User", temp, "");
 		*username = temp;
 		free(temp);
-		current_settings.get("Callsign", temp, "");
-		if (strcmp(username->c_str(), temp)) {
+		if (strcmp(username->c_str(), callsign)) {
 			char message[128];
-			snprintf(message, 128, "EQSL: Station call %s differs from username %s", temp, username->c_str());
+			snprintf(message, 128, "EQSL: Station call %s differs from username %s", callsign, username->c_str());
 			status_->misc_status(ST_WARNING, message);
-			*username = temp;
+			*username = callsign;
 		}
 		free(temp);
 	}

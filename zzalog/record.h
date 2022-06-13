@@ -32,15 +32,6 @@ namespace zzalog {
 		MT_2XSWL_MATCH       // An SWL report matches an existing SWL report
 	};
 
-	// Logging mode - used when initialising a record
-	enum logging_mode_t {
-		LM_OFF_AIR,     // Off-line logging (w/o radio)
-		LM_ON_AIR_CAT,  // Real -time logging - data from radio
-		LM_ON_AIR_COPY, // Real-time logging - data from selected QSO
-		LM_ON_AIR_TIME, // Real-time logging - date/time only
-		LM_IMPORTED,    // Import from modem software (w/ or w/o radio)
-	};
-	
 	// Location source
 	enum location_t {
 		LOC_NONE,        // not derived
@@ -93,8 +84,8 @@ namespace zzalog {
 	public:
 		// Default constructor
 		record();
-		// Constructor that pre-populates certain fields
-		record(logging_mode_t type, record* copy_from);
+		//// Constructor that pre-populates certain fields
+		//record(logging_mode_t type, record* copy_from);
 		// Copy constructor
 		record(const record& rhs);
 		// Assignment operator
@@ -140,8 +131,8 @@ namespace zzalog {
 		void update_timeoff();
 		// change the field name
 		void change_field_name(string from, string to);
-		// End record by adding certain fields
-		void end_record(logging_mode_t mode);
+		//// End record by adding certain fields
+		//void end_record(logging_mode_t mode);
 		// Write to an item merging data from other items
 		string item_merge(string data, bool indirect = false);
 		// get the timestamp

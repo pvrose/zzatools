@@ -2,7 +2,7 @@
 #define __IMPORT_DATA__
 
 #include "book.h"
-
+#include "qso_manager.h"
 
 #include <string>
 #include <vector>
@@ -62,7 +62,7 @@ namespace zzalog {
 		// Start or continue analysing the update data
 		void update_book();
 		// Stop importing
-		void stop_update(logging_mode_t mode, bool immediate);
+		void stop_update(qso_manager::logging_mode_t, bool immediate);
 		// is update complete
 		bool update_complete();
 		// download data from QSL server
@@ -126,8 +126,6 @@ namespace zzalog {
 		string last_timestamp_;
 		// Close is pending
 		bool close_pending_;
-		// Logging mode to enacy after close
-		logging_mode_t next_logging_mode_;
 		// Start of timer
 		time_t timer_start_;
 		// Timer period
@@ -136,6 +134,8 @@ namespace zzalog {
 		bool old_enable_save_;
 		// Last added record number
 		record_num_t last_added_number_;
+		// Next logging mode
+		qso_manager::logging_mode_t next_logging_mode_;
 
 	};
 

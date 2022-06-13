@@ -6,7 +6,7 @@
 #include "report_tree.h"
 #include "spec_tree.h"
 #include "tabbed_forms.h"
-#include "dashboard.h"
+#include "qso_manager.h"
 #include "../zzalib/rig_if.h"
 
 #include <FL/Fl_Tooltip.H>
@@ -20,7 +20,7 @@ using namespace zzalib;
 
 extern Fl_Preferences* settings_;
 extern book* book_;
-extern dashboard* dashboard_;
+extern qso_manager* qso_manager_;
 extern tabbed_forms* tabbed_forms_;
 extern rig_if* rig_if_;
 
@@ -318,7 +318,7 @@ void user_dialog::save_values() {
 	spad_settings.set("Font Name", (int&)spad_font_);
 	spad_settings.set("Font Size", (int&)spad_size_);
 	// Tell the log views
-	dashboard_->set_font(spad_font_, spad_size_);
+	qso_manager_->set_font(spad_font_, spad_size_);
 	// Tree view settings
 	Fl_Preferences tree_settings(user_settings, "Tree Views");
 	tree_settings.set("Font Name", (int&)tree_font_);

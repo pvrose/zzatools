@@ -183,7 +183,7 @@
     <ClCompile Include="zzalog\spec_data.cpp" />
     <ClCompile Include="zzalog\spec_tree.cpp" />
     <ClCompile Include="zzalog\status.cpp" />
-    <ClCompile Include="zzalog\dashboard.cpp" />
+    <ClCompile Include="zzalog\qso_manager.cpp" />
     <ClCompile Include="zzalog\tabbed_forms.cpp" />
     <ClCompile Include="zzalog\toolbar.cpp" />
     <ClCompile Include="zzalog\tsv_writer.cpp" />
@@ -251,7 +251,7 @@
     <ClInclude Include="zzalog\spec_data.h" />
     <ClInclude Include="zzalog\spec_tree.h" />
     <ClInclude Include="zzalog\status.h" />
-    <ClInclude Include="zzalog\dashboard.h" />
+    <ClInclude Include="zzalog\qso_manager.h" />
     <ClInclude Include="zzalog\tabbed_forms.h" />
     <ClInclude Include="zzalog\toolbar.h" />
     <ClInclude Include="zzalog\tsv_writer.h" />

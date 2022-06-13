@@ -14,7 +14,7 @@
 #include "qrz_handler.h"
 #include "status.h"
 #include "main_window.h"
-#include "dashboard.h"
+#include "qso_manager.h"
 
 #include <array>
 #include <string>
@@ -43,7 +43,7 @@ extern intl_dialog* intl_dialog_;
 extern qrz_handler* qrz_handler_;
 extern status* status_;
 extern book* book_;
-extern dashboard* dashboard_;
+extern qso_manager* qso_manager_;
 
 using namespace std;
 
@@ -833,18 +833,18 @@ void record_form::cb_bn_edit(Fl_Widget* w, long v) {
 	switch (action) {
 	case START:
 		// Start a new record
-		that->my_book_->new_record(dashboard_->logging_mode());
+		qso_manager_->start_qso();
 		that->use_mode_ = UM_QSO;
 		break;
 	case RESTART:
 		// Save current record and start a new one
-		that->my_book_->save_record();
-		that->my_book_->new_record(dashboard_->logging_mode());
+		qso_manager_->end_qso();
+		qso_manager_->start_qso();
 		that->use_mode_ = UM_QSO;
 		break;
 	case SAVE:
 		// Save current record
-		that->my_book_->save_record();
+		qso_manager_->end_qso();
 		that->use_mode_ = UM_DISPLAY;
 		break;
 	case REVERT:
@@ -909,7 +909,7 @@ void record_form::cb_bn_edit(Fl_Widget* w, long v) {
 		return;
 	case ENTER:
 		// Manually enter data for a query
-		that->record_1_ = new record(LM_OFF_AIR, nullptr);
+		that->record_1_ = qso_manager_->dummy_qso();
 		that->use_mode_ = UM_MANUAL_QUERY;
 		that->enable_all_search_ = true;
 		break;
@@ -2023,13 +2023,11 @@ bool record_form::parse_all_txt(record* record) {
 	bool stop_copying = false;
 	// Get user callsign from settings
 	Fl_Preferences stations_settings(settings_, "Stations");
-	Fl_Preferences qths_settings(stations_settings, "QTHs");
-	char* qth;
-	qths_settings.get("Current", qth, "");
-	Fl_Preferences qth_settings(qths_settings, qth);
-	qth_settings.get("Callsign", temp, "");
-	string my_call = temp;
-	delete[] temp;
+	Fl_Preferences callsigns_settings(stations_settings, "Callsigns");
+	char* callsign;
+	callsigns_settings.get("Current", callsign, "");
+	string my_call = callsign;
+	delete[] callsign;
 	// Get search items from record
 	string their_call = record->item("CALL");
 	string datestamp = record->item("QSO_DATE").substr(2);

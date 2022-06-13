@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<adif version="3.1.2" status="Released" created="2021-04-17T15:19:21Z">
+<adif version="3.1.3" status="Released" created="2022-06-10T23:47:50Z">
   <dataTypes>
     <header>
       <value>Data Type Name</value>
@@ -113,6 +113,10 @@
     <record>
       <value name="Data Type Name">SOTARef</value>
       <value name="Description">a sequence of Characters representing an International SOTA Reference. The sequence comprises: an ITU prefix if applicable, a SOTA subdivision a / Character a SOTA Reference Number Examples: W2/WE-003 G/LD-003</value>
+    </record>
+    <record>
+      <value name="Data Type Name">WWFFRef</value>
+      <value name="Description">a sequence of case-insensitive Characters representing an International WWFF (World Wildlife Flora &amp; Fauna) reference in the form xxFF-nnnn comprising 8 to 11 characters where: xx is the WWFF national program and is 1 to 4 characters in length. FF- is two F characters followed by a dash character. nnnn represents the unique number within the national program and is 4 characters in length with leading zeros. Examples: KFF-4655 3DAFF-0002</value>
     </record>
   </dataTypes>
   <enumerations>
@@ -1621,6 +1625,11 @@
       </record>
       <record>
         <value name="Enumeration Name">Contest_ID</value>
+        <value name="Contest-ID">K1USN-SST</value>
+        <value name="Description">K1USN Slow Speed Test</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Contest_ID</value>
         <value name="Contest-ID">KS-QSO-PARTY</value>
         <value name="Description">Kansas QSO Party</value>
       </record>
@@ -2008,7 +2017,7 @@
       <record>
         <value name="Enumeration Name">Contest_ID</value>
         <value name="Contest-ID">SPAR-WINTER-FD</value>
-        <value name="Description">SPAR Winter Field Day</value>
+        <value name="Description">SPAR Winter Field Day(2016 and earlier)</value>
       </record>
       <record>
         <value name="Enumeration Name">Contest_ID</value>
@@ -2154,8 +2163,18 @@
       </record>
       <record>
         <value name="Enumeration Name">Contest_ID</value>
+        <value name="Contest-ID">VT-QSO-PARTY</value>
+        <value name="Description">Vermont QSO Party</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Contest_ID</value>
         <value name="Contest-ID">WA-QSO-PARTY</value>
         <value name="Description">Washington QSO Party</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Contest_ID</value>
+        <value name="Contest-ID">WFD</value>
+        <value name="Description">Winter Field Day (2017 and later)</value>
       </record>
       <record>
         <value name="Enumeration Name">Contest_ID</value>
@@ -4901,11 +4920,6 @@
       </record>
       <record>
         <value name="Enumeration Name">Mode</value>
-        <value name="Mode">C4FM</value>
-        <value name="Description">C4FM 4-level FSK Technology</value>
-      </record>
-      <record>
-        <value name="Enumeration Name">Mode</value>
         <value name="Mode">CHIP</value>
         <value name="Submodes">CHIP64,CHIP128</value>
       </record>
@@ -4925,6 +4939,7 @@
       <record>
         <value name="Enumeration Name">Mode</value>
         <value name="Mode">DIGITALVOICE</value>
+        <value name="Submodes">C4FM,DMR,DSTAR</value>
       </record>
       <record>
         <value name="Enumeration Name">Mode</value>
@@ -4933,7 +4948,8 @@
       </record>
       <record>
         <value name="Enumeration Name">Mode</value>
-        <value name="Mode">DSTAR</value>
+        <value name="Mode">DYNAMIC</value>
+        <value name="Submodes">VARA HF,VARA SATELLITE,VARA FM 1200,VARA FM 9600</value>
       </record>
       <record>
         <value name="Enumeration Name">Mode</value>
@@ -5111,6 +5127,12 @@
       </record>
       <record>
         <value name="Enumeration Name">Mode</value>
+        <value name="Mode">C4FM</value>
+        <value name="Description">C4FM 4-level FSK Technology Imported QSOs with &lt;MODE:4&gt;C4FM&gt; must be exported as: &lt;MODE:12&gt;DIGITALVOICE &lt;SUBMODE:4&gt;C4FM</value>
+        <value name="Import-only">true</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Mode</value>
         <value name="Mode">CHIP64</value>
         <value name="Import-only">true</value>
       </record>
@@ -5122,6 +5144,12 @@
       <record>
         <value name="Enumeration Name">Mode</value>
         <value name="Mode">DOMINOF</value>
+        <value name="Import-only">true</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Mode</value>
+        <value name="Mode">DSTAR</value>
+        <value name="Description">Digital Smart Technologies for Amateur Radio Imported QSOs with &lt;MODE:5&gt;DSTAR must be exported as: &lt;MODE:12&gt;DIGITALVOICE &lt;SUBMODE:5&gt;DSTAR</value>
         <value name="Import-only">true</value>
       </record>
       <record>
@@ -7308,6 +7336,18 @@
         <value name="Primary Administrative Subdivision">Ulsan</value>
         <value name="DXCC Entity Code">137</value>
         <value name="Comments">Ulsan Gwanq'yeogsi</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">T</value>
+        <value name="Primary Administrative Subdivision">Sejong</value>
+        <value name="DXCC Entity Code">137</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">IS</value>
+        <value name="Primary Administrative Subdivision">Special Island</value>
+        <value name="DXCC Entity Code">137</value>
       </record>
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
@@ -14744,7 +14784,7 @@
       </record>
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
-        <value name="Code">L</value>
+        <value name="Code">M</value>
         <value name="Primary Administrative Subdivision">Skåne län</value>
         <value name="DXCC Entity Code">284</value>
       </record>
@@ -15424,7 +15464,7 @@
         <value name="Primary Administrative Subdivision">Minnesota</value>
         <value name="DXCC Entity Code">291</value>
         <value name="CQ Zone">04</value>
-        <value name="ITU Zone">07</value>
+        <value name="ITU Zone">07/08</value>
       </record>
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
@@ -15457,6 +15497,192 @@
         <value name="DXCC Entity Code">291</value>
         <value name="CQ Zone">04</value>
         <value name="ITU Zone">07</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">AH</value>
+        <value name="Primary Administrative Subdivision">Anhui</value>
+        <value name="DXCC Entity Code">318</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">BJ</value>
+        <value name="Primary Administrative Subdivision">Beijing</value>
+        <value name="DXCC Entity Code">318</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">CQ</value>
+        <value name="Primary Administrative Subdivision">Chongqing</value>
+        <value name="DXCC Entity Code">318</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">FJ</value>
+        <value name="Primary Administrative Subdivision">Fujian</value>
+        <value name="DXCC Entity Code">318</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">GD</value>
+        <value name="Primary Administrative Subdivision">Guangdong</value>
+        <value name="DXCC Entity Code">318</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">GS</value>
+        <value name="Primary Administrative Subdivision">Gansu</value>
+        <value name="DXCC Entity Code">318</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">GX</value>
+        <value name="Primary Administrative Subdivision">Guangxi Zhuangzu</value>
+        <value name="DXCC Entity Code">318</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">GZ</value>
+        <value name="Primary Administrative Subdivision">Guizhou</value>
+        <value name="DXCC Entity Code">318</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">HA</value>
+        <value name="Primary Administrative Subdivision">Henan</value>
+        <value name="DXCC Entity Code">318</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">HB</value>
+        <value name="Primary Administrative Subdivision">Hubei</value>
+        <value name="DXCC Entity Code">318</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">HE</value>
+        <value name="Primary Administrative Subdivision">Hebei</value>
+        <value name="DXCC Entity Code">318</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">HI</value>
+        <value name="Primary Administrative Subdivision">Hainan</value>
+        <value name="DXCC Entity Code">318</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">HL</value>
+        <value name="Primary Administrative Subdivision">Heilongjiang</value>
+        <value name="DXCC Entity Code">318</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">HN</value>
+        <value name="Primary Administrative Subdivision">Hunan</value>
+        <value name="DXCC Entity Code">318</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">JL</value>
+        <value name="Primary Administrative Subdivision">Jilin</value>
+        <value name="DXCC Entity Code">318</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">JS</value>
+        <value name="Primary Administrative Subdivision">Jiangsu</value>
+        <value name="DXCC Entity Code">318</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">JX</value>
+        <value name="Primary Administrative Subdivision">Jiangxi</value>
+        <value name="DXCC Entity Code">318</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">LN</value>
+        <value name="Primary Administrative Subdivision">Liaoning</value>
+        <value name="DXCC Entity Code">318</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">NM</value>
+        <value name="Primary Administrative Subdivision">Nei Mongol</value>
+        <value name="DXCC Entity Code">318</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">NX</value>
+        <value name="Primary Administrative Subdivision">Ningxia Huizu</value>
+        <value name="DXCC Entity Code">318</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">QH</value>
+        <value name="Primary Administrative Subdivision">Qinghai</value>
+        <value name="DXCC Entity Code">318</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">SC</value>
+        <value name="Primary Administrative Subdivision">Sichuan</value>
+        <value name="DXCC Entity Code">318</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">SD</value>
+        <value name="Primary Administrative Subdivision">Shandong</value>
+        <value name="DXCC Entity Code">318</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">SH</value>
+        <value name="Primary Administrative Subdivision">Shanghai</value>
+        <value name="DXCC Entity Code">318</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">SN</value>
+        <value name="Primary Administrative Subdivision">Shaanxi</value>
+        <value name="DXCC Entity Code">318</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">SX</value>
+        <value name="Primary Administrative Subdivision">Shanxi</value>
+        <value name="DXCC Entity Code">318</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">TJ</value>
+        <value name="Primary Administrative Subdivision">Tianjin</value>
+        <value name="DXCC Entity Code">318</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">XJ</value>
+        <value name="Primary Administrative Subdivision">Xinjiang Uygur</value>
+        <value name="DXCC Entity Code">318</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">XZ</value>
+        <value name="Primary Administrative Subdivision">Xizang</value>
+        <value name="DXCC Entity Code">318</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">YN</value>
+        <value name="Primary Administrative Subdivision">Yunnan</value>
+        <value name="DXCC Entity Code">318</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">ZJ</value>
+        <value name="Primary Administrative Subdivision">Zhejiang</value>
+        <value name="DXCC Entity Code">318</value>
       </record>
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
@@ -17677,6 +17903,11 @@
       </record>
       <record>
         <value name="Enumeration Name">Propagation_Mode</value>
+        <value name="Enumeration">GWAVE</value>
+        <value name="Description">Ground Wave</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Propagation_Mode</value>
         <value name="Enumeration">INTERNET</value>
         <value name="Description">Internet-assisted</value>
       </record>
@@ -17689,6 +17920,11 @@
         <value name="Enumeration Name">Propagation_Mode</value>
         <value name="Enumeration">IRL</value>
         <value name="Description">IRLP</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Propagation_Mode</value>
+        <value name="Enumeration">LOS</value>
+        <value name="Description">Line of Sight (includes transmission through obstacles such as walls)</value>
       </record>
       <record>
         <value name="Enumeration Name">Propagation_Mode</value>
@@ -18499,6 +18735,12 @@
       </record>
       <record>
         <value name="Enumeration Name">Submode</value>
+        <value name="Submode">C4FM</value>
+        <value name="Mode">DIGITALVOICE</value>
+        <value name="Description">C4FM 4-level FSK See the Propagation_Mode enumeration section for examples of representing C4FM voice transmissions.</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
         <value name="Submode">CHIP64</value>
         <value name="Mode">CHIP</value>
       </record>
@@ -18506,6 +18748,12 @@
         <value name="Enumeration Name">Submode</value>
         <value name="Submode">CHIP128</value>
         <value name="Mode">CHIP</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
+        <value name="Submode">DMR</value>
+        <value name="Mode">DIGITALVOICE</value>
+        <value name="Description">Digital Mobile Radio See the Propagation_Mode enumeration section for examples of representing DMR voice transmissions.</value>
       </record>
       <record>
         <value name="Enumeration Name">Submode</value>
@@ -18561,6 +18809,12 @@
         <value name="Enumeration Name">Submode</value>
         <value name="Submode">DOMINOF</value>
         <value name="Mode">DOMINO</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
+        <value name="Submode">DSTAR</value>
+        <value name="Mode">DIGITALVOICE</value>
+        <value name="Description">Digital Smart Technologies for Amateur Radio See the Propagation_Mode enumeration section for examples of representing DSTAR voice transmissions.</value>
       </record>
       <record>
         <value name="Enumeration Name">Submode</value>
@@ -19275,6 +19529,30 @@
         <value name="Mode">SSB</value>
         <value name="Description">Amplitude modulated voice telephony, upper-sideband, suppressed-carrier</value>
       </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
+        <value name="Submode">VARA HF</value>
+        <value name="Mode">DYNAMIC</value>
+        <value name="Description">Channel adaptive high-speed modem for HF</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
+        <value name="Submode">VARA SATELLITE</value>
+        <value name="Mode">DYNAMIC</value>
+        <value name="Description">Channel adaptive high-speed modem for satellite operations</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
+        <value name="Submode">VARA FM 1200</value>
+        <value name="Mode">DYNAMIC</value>
+        <value name="Description">Channel adaptive high-speed modem for FM transceivers</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
+        <value name="Submode">VARA FM 9600</value>
+        <value name="Mode">DYNAMIC</value>
+        <value name="Description">Channel adaptive high-speed modem for FM transceivers</value>
+      </record>
     </enumeration>
   </enumerations>
   <fields>
@@ -19665,6 +19943,12 @@
       <value name="Description">the logging station's antenna</value>
     </record>
     <record>
+      <value name="Field Name">MY_ARRL_SECT</value>
+      <value name="Data Type">Enumeration</value>
+      <value name="Enumeration">ARRL_Section</value>
+      <value name="Description">the logging station's ARRL section</value>
+    </record>
+    <record>
       <value name="Field Name">MY_CITY</value>
       <value name="Data Type">String</value>
       <value name="Description">the logging station's city</value>
@@ -19825,6 +20109,11 @@
       <value name="Field Name">MY_VUCC_GRIDS</value>
       <value name="Data Type">GridSquareList</value>
       <value name="Description">two or four adjacent Maidenhead grid locators, each four characters long, representing the logging station's grid squares that the contacted station may claim for the ARRL VUCC award program. E.g. EN98,FM08,EM97,FM07</value>
+    </record>
+    <record>
+      <value name="Field Name">MY_WWFF_REF</value>
+      <value name="Data Type">WWFFRef</value>
+      <value name="Description">the logging station's WWFF (World Wildlife Flora &amp; Fauna) reference</value>
     </record>
     <record>
       <value name="Field Name">NAME</value>
@@ -20156,6 +20445,11 @@
       <value name="Field Name">WEB</value>
       <value name="Data Type">String</value>
       <value name="Description">the contacted station's URL</value>
+    </record>
+    <record>
+      <value name="Field Name">WWFF_REF</value>
+      <value name="Data Type">WWFFRef</value>
+      <value name="Description">the contacted station's WWFF (World Wildlife Flora &amp; Fauna) reference</value>
     </record>
   </fields>
 </adif>

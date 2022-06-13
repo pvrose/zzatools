@@ -91,11 +91,7 @@ void club_handler::generate_form(vector<url_handler::field_pair>& fields, bool s
 	Fl_Preferences qsl_settings(settings_, "QSL");
 	Fl_Preferences clublog_settings(qsl_settings, "ClubLog");
 	Fl_Preferences stations_settings(settings_, "Stations");
-	Fl_Preferences qths_settings(stations_settings, "QTHs");
-	char* current;
-	qths_settings.get("Current", current, "");
-	Fl_Preferences current_settings(qths_settings, current);
-	free(current);
+	Fl_Preferences callsigns_settings(stations_settings, "Callsigns");
 	char* email;
 	clublog_settings.get("Email", email, "");
 	fields.push_back({"email", email, "", ""});
@@ -105,7 +101,7 @@ void club_handler::generate_form(vector<url_handler::field_pair>& fields, bool s
 	fields.push_back({ "password", password, "", "" });
 	free(password);
 	char* callsign;
-	current_settings.get("Callsign", callsign, "");
+	callsigns_settings.get("Current", callsign, "");
 	fields.push_back({ "callsign", callsign, "", "" });
 	free(callsign);
 	if (single_qso) {

@@ -540,11 +540,9 @@ void extract_data::extract_qsl(extract_data::extract_mode_t server) {
 	}
 	// Now check that they are all for the current station
 	Fl_Preferences station_settings(settings_, "Stations");
-	Fl_Preferences qths_settings(station_settings, "QTHs");
+	Fl_Preferences callsigns_settings(station_settings, "Callsigns");
 	char* temp;
-	qths_settings.get("Current", temp, nullptr);
-	Fl_Preferences current_settings(qths_settings, temp);
-	current_settings.get("Callsign", temp, "");
+	callsigns_settings.get("Current", temp, nullptr);
 	string station(temp);
 	free(temp);
 	new_criteria = {

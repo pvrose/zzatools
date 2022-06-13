@@ -12,7 +12,7 @@
 #include "intl_widgets.h"
 #include "extract_data.h"
 #include "main_window.h"
-#include "dashboard.h"
+#include "qso_manager.h"
 #include "import_data.h"
 
 #include <FL/Fl_Button.H>
@@ -32,7 +32,7 @@ extern tabbed_forms* tabbed_forms_;
 extern pfx_data* pfx_data_;
 extern status* status_;
 extern main_window* main_window_;
-extern dashboard* dashboard_;
+extern qso_manager* qso_manager_;
 extern import_data* import_data_;
 
 // Constructor - most buttons invoke a menu item
@@ -438,7 +438,7 @@ void toolbar::cb_bn_extract(Fl_Widget* w, void* v) {
 void toolbar::cb_bn_explain(Fl_Widget* w, void* v) {
 	toolbar* that = ancestor_view<toolbar>(w);
 	// Create a temporary record to parse theh callsign
-	record* tip_record = new record(LM_OFF_AIR, nullptr);
+	record* tip_record = qso_manager_->dummy_qso();
 	string message = "";
 	// Set the callsign in the temporary record
 	tip_record->item("CALL", to_upper(that->search_text_));
@@ -460,7 +460,7 @@ void toolbar::cb_bn_import(Fl_Widget* w, void* v) {
 // Connect or disconnect rig
 // v is not used
 void toolbar::cb_bn_rig(Fl_Widget* w, void* v) {
-	dashboard::cb_bn_connect(dashboard_, nullptr);
+	qso_manager::cb_bn_connect(qso_manager_, nullptr);
 }
 
 // Return the minimum width required
@@ -513,14 +513,14 @@ void toolbar::update_items() {
 				w->deactivate();
 			}
 		}
-		else if (w->callback() == &dashboard::cb_bn_connect) {
-			if (w->user_data() && dashboard_ && dashboard_->logging_mode() == LM_ON_AIR_CAT) {
+		else if (w->callback() == &qso_manager::cb_bn_connect) {
+			if (w->user_data() && qso_manager_ && qso_manager_->logging_mode() == qso_manager::LM_ON_AIR_CAT) {
 				w->deactivate();
 			}
-			else if (!w->user_data() && dashboard_ && dashboard_->logging_mode() != LM_ON_AIR_CAT) {
+			else if (!w->user_data() && qso_manager_ && qso_manager_->logging_mode() != qso_manager::LM_ON_AIR_CAT) {
 				w->deactivate();
 			}
-			else if (!dashboard_) {
+			else if (!qso_manager_) {
 				w->deactivate();
 			} else {
 				w->activate();

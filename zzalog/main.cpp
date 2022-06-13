@@ -43,7 +43,7 @@ main.cpp - application entry point
 #include "resource.h"
 #include "hamlib/rig.h"
 #include "main_window.h"
-#include "dashboard.h"
+#include "qso_manager.h"
 
 // C/C++ header files
 #include <ctime>
@@ -99,7 +99,7 @@ band_view* band_view_ = nullptr;
 club_handler* club_handler_ = nullptr;
 wsjtx_handler* wsjtx_handler_ = nullptr;
 fllog_emul* fllog_emul_ = nullptr;
-dashboard* dashboard_ = nullptr;
+qso_manager* qso_manager_ = nullptr;
 
 #ifdef _WIN32
 dxa_if* dxa_if_ = nullptr;
@@ -143,8 +143,8 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 		// is no longer a rig to read.
 		if (rig_if_) {
 			rig_if_->close();
-			if (dashboard_) {
-				dashboard_->update();
+			if (qso_manager_) {
+				qso_manager_->update();
 			}
 		}
 		// Delete band view
@@ -153,9 +153,9 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 			band_view_ = nullptr;
 		}
 		// Delete scratchpad
-		if (dashboard_) {
-			delete dashboard_;
-			dashboard_ = nullptr;
+		if (qso_manager_) {
+			delete qso_manager_;
+			qso_manager_ = nullptr;
 		}
 		// Close DxAtlas connection
 		if (dxa_if_) {
@@ -168,7 +168,7 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 			switch (fl_choice("You are currently modifying a record? Save or Quit?", "Save", "Quit", nullptr)) {
 			case 0:
 				// Save
-				book_->save_record();
+				qso_manager_->end_qso();
 				break;
 			case 1:
 				// Quit - delete any new record
@@ -183,12 +183,12 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 				switch (fl_choice("There is an import in process. Do you want to let it finish or abandon it?", "Finish", "Abandon", nullptr)) {
 				case 0:
 					// Gracefully wait for import to complete
-					import_data_->stop_update(LM_OFF_AIR, false);
+					import_data_->stop_update(qso_manager::LM_OFF_AIR, false);
 					while (!import_data_->update_complete()) Fl::wait();
 					break;
 				case 1:
 					// Immediately stop the import
-					import_data_->stop_update(LM_OFF_AIR, true);
+					import_data_->stop_update(qso_manager::LM_OFF_AIR, true);
 					break;
 				}
 			}
@@ -441,16 +441,16 @@ void update_rig_status() {
 		}
 		// Update scratchpad
 		string freq = rig_if_->get_frequency(true);
-		if (dashboard_) {
+		if (qso_manager_) {
 			string mode;
 			string submode;
 			rig_if_->get_string_mode(mode, submode);
 			string power = rig_if_->get_tx_power();
 			if (submode.length()) {
-				dashboard_->rig_update(freq, submode, power);
+				qso_manager_->rig_update(freq, submode, power);
 			}
 			else {
-				dashboard_->rig_update(freq, mode, power);
+				qso_manager_->rig_update(freq, mode, power);
 			}
 		}
 		// update_rig_status
@@ -481,9 +481,9 @@ void update_rig_status() {
 			delete rig_if_;
 			rig_if_ = nullptr;
 		}
-		// Update dashboard - display widgets
-		if (dashboard_) {
-			dashboard_->update();
+		// Update qso_manager - display widgets
+		if (qso_manager_) {
+			qso_manager_->update();
 		}
 
 	}
@@ -547,7 +547,7 @@ void add_rig_if() {
 		if (rig_if_ == nullptr) {
 			// No handler defined - assume manual logging in real-time
 			status_->misc_status(ST_WARNING, "RIG: No handler - assume real-time logging, no rig");
-			if (dashboard_) dashboard_->logging_mode(LM_ON_AIR_COPY);
+			if (qso_manager_) qso_manager_->logging_mode(qso_manager::LM_ON_AIR_COPY);
 		}
 		else {
 			// Tell the rig where to find its settings
@@ -565,7 +565,7 @@ void add_rig_if() {
 						status_->misc_status(ST_ERROR, "RIG: No handler - assume real-time logging, no rig");
 						done = true;
 						// Change logging mode from IMPORTED to ON_AIR. otherwise leave as was
-						if (dashboard_ && dashboard_->logging_mode() == LM_IMPORTED) dashboard_->logging_mode(LM_ON_AIR_COPY);
+						if (qso_manager_ && qso_manager_->logging_mode() == qso_manager::LM_IMPORTED) qso_manager_->logging_mode(qso_manager::LM_ON_AIR_COPY);
 					}
 					else {
 						// Connect to rig OK - see if we are a digital mode and if so start auto-import process
@@ -577,7 +577,7 @@ void add_rig_if() {
 							status_->misc_status(ST_WARNING, "RIG: Data mode - assume logging by data modem app");
 							// Change logging mode to IMPORTED as will be using a data-modem
 							done = true;
-							if (dashboard_) dashboard_->logging_mode(LM_IMPORTED);
+							if (qso_manager_) qso_manager_->logging_mode(qso_manager::LM_IMPORTED);
 						}
 						// The first access to read the mode may fail
 						else if (!rig_if_->is_good()) {
@@ -588,15 +588,15 @@ void add_rig_if() {
 							string error_message = rig_if_->error_message("");
 							delete rig_if_;
 							rig_if_ = nullptr;
-							if (dashboard_) {
-								dashboard_->update();
+							if (qso_manager_) {
+								qso_manager_->update();
 							}
 							status_->misc_status(ST_ERROR, message);
 							// Put the error message from the rig in the rig status box
 							status_->rig_status(RS_ERROR, error_message.c_str());
 							done = true;
 							// Change logging mode from IMPORTED to ON_AIR. otherwise leave as was
-							if (dashboard_ && dashboard_->logging_mode() == LM_IMPORTED) dashboard_->logging_mode(LM_ON_AIR_COPY);
+							if (qso_manager_ && qso_manager_->logging_mode() == qso_manager::LM_IMPORTED) qso_manager_->logging_mode(qso_manager::LM_ON_AIR_COPY);
 						}
 						else {
 							// Rig seems OK - timer will have been started by rig_if_->open()
@@ -615,9 +615,9 @@ void add_rig_if() {
 								status_->rig_status(RS_ERROR, rig_if_->rig_info().c_str());
 							}
 							// Change logging mode to ON_AIR
-							if (dashboard_) {
-								dashboard_->update();
-								dashboard_->logging_mode(LM_ON_AIR_CAT);
+							if (qso_manager_) {
+								qso_manager_->update();
+								qso_manager_->logging_mode(qso_manager::LM_ON_AIR_CAT);
 							}
 							done = true;
 						}
@@ -710,8 +710,8 @@ void add_qsl_handlers() {
 //// Add a scratchpad
 //void add_scratchpad() {
 //	if (!closing_) {
-//		if (!dashboard_) {
-//			dashboard_ = new scratchpad;
+//		if (!qso_manager_) {
+//			qso_manager_ = new scratchpad;
 //		}
 //		int enabled;
 //		int top;
@@ -724,23 +724,23 @@ void add_qsl_handlers() {
 //		if (left < 0) left = 100;
 //		if (enabled) {
 //			// Show the scratchpad at the saved position
-//			dashboard_->show();
-//			dashboard_->position(left, top);
+//			qso_manager_->show();
+//			qso_manager_->position(left, top);
 //			status_->misc_status(ST_NOTE, "SCRATCHPAD: Opened");
 //		}
 //		else {
 //			// Hide it
-//			dashboard_->hide();
+//			qso_manager_->hide();
 //			status_->misc_status(ST_NOTE, "SCRATCHPAD: Closed");
 //		}
 //	}
 //}
 
-// Add operating dashboard
+// Add operating qso_manager
 void add_dashboard() {
 	if (!closing_) {
-		if (!dashboard_) {
-			dashboard_ = new dashboard(10, 10, "Operating Dashboard");
+		if (!qso_manager_) {
+			qso_manager_ = new qso_manager(10, 10, "Operating Dashboard");
 		}
 		// Get the Operation window
 		int enabled;
@@ -754,13 +754,13 @@ void add_dashboard() {
 		if (left < 0) left = 100;
 		if (enabled) {
 			// Show the scratchpad at the saved position
-			dashboard_->show();
-			dashboard_->position(left, top);
+			qso_manager_->show();
+			qso_manager_->position(left, top);
 			status_->misc_status(ST_NOTE, "DASHBOARD: Opened");
 		}
 		else {
 			// Hide it
-			dashboard_->hide();
+			qso_manager_->hide();
 			status_->misc_status(ST_NOTE, "DASHBOARD: Closed");
 		}
 	}
@@ -844,8 +844,8 @@ void tidy() {
 	// Tidy memory - this is not perfect
 	// From inspection of the code - calling this a second time frees the memory
 	fl_message_title_default(nullptr);
-	delete dashboard_;
-	delete dashboard_;
+	delete qso_manager_;
+	delete qso_manager_;
 	delete dxa_if_;
 	delete wsjtx_handler_;
 	delete club_handler_;
@@ -960,7 +960,7 @@ int main(int argc, char** argv)
 	rig_if_ = nullptr;
 	rig_load_all_backends();
 	add_rig_if();
-	// Add dashboard
+	// Add qso_manager
 	add_dashboard();
 	// Add band-plan 
 	add_band_view();

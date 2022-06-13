@@ -33,7 +33,7 @@
 #include "band_view.h"
 #include "dxa_if.h"
 #include "main_window.h"
-#include "dashboard.h"
+#include "qso_manager.h"
 
 #include <sstream>
 #include <list>
@@ -71,7 +71,7 @@ extern wsjtx_handler* wsjtx_handler_;
 extern band_view* band_view_;
 extern dxa_if* dxa_if_;
 extern time_t session_start_;
-extern dashboard* dashboard_;
+extern qso_manager* qso_manager_;
 settings* config_ = nullptr;
 
 namespace zzalog {
@@ -304,15 +304,15 @@ menu::~menu()
 void menu::cb_mi_file_new(Fl_Widget* w, void* v) {
 	menu* that = ancestor_view<menu>(w);
 	// Gracefully stop any import in progress - restart with ON_AIR logging - if no rig will drop to OFF_AIR
-	if (dashboard_->logging_mode() == LM_IMPORTED) {
-		import_data_->stop_update(LM_ON_AIR_CAT, false);
+	if (qso_manager_->logging_mode() == qso_manager::LM_IMPORTED) {
+		import_data_->stop_update(qso_manager::LM_ON_AIR_CAT, false);
 	}
 	while (!import_data_->update_complete()) Fl::wait();
 	if (book_->modified_record() | book_->new_record()) {
 		fl_beep(FL_BEEP_QUESTION);
 		switch (fl_choice("You are currently modifying a record? Save or Quit?", "Save?", "Quit?", nullptr)) {
 		case 0:
-			book_->save_record();
+			qso_manager_->end_qso();
 			break;
 		case 1:
 			book_->delete_record(false);
@@ -342,7 +342,7 @@ void menu::cb_mi_file_new(Fl_Widget* w, void* v) {
 void menu::cb_mi_file_open(Fl_Widget* w, void* v) {
 	menu* that = ancestor_view<menu>(w);
 	// Stop any import occurring
-	import_data_->stop_update(LM_OFF_AIR, false);
+	import_data_->stop_update(qso_manager::LM_OFF_AIR, false);
 	while (!import_data_->update_complete()) Fl::wait();
 
 	if (book_->modified()) {
@@ -395,7 +395,7 @@ void menu::cb_mi_file_open(Fl_Widget* w, void* v) {
 		// get book to load it.
 		if (book_->load_data(filename)) {
 			// Set off-air logging, clear any search results, select last entry
-			dashboard_->logging_mode(LM_OFF_AIR);
+			qso_manager_->logging_mode(qso_manager::LM_OFF_AIR);
 			tabbed_forms_->activate_pane(OT_MAIN, true);
 			book_->navigate(NV_LAST);
 			// Set the filename in the window title and recent file list
@@ -409,7 +409,7 @@ void menu::cb_mi_file_open(Fl_Widget* w, void* v) {
 // File->Save
 // v is set to 0 to represent object_t = OT_MAIN
 void menu::cb_mi_file_save(Fl_Widget* w, void* v) {
-	import_data_->stop_update(LM_OFF_AIR, false);
+	import_data_->stop_update(qso_manager::LM_OFF_AIR, false);
 	while (!import_data_->update_complete()) Fl::wait();
 	// Get the main book to store itself as long as it wasn't opened read-only
 	if (read_only_) {
@@ -450,7 +450,7 @@ void menu::cb_mi_file_saveas(Fl_Widget* w, void* v) {
 		ifstream* check = new ifstream(filename.c_str());
 		if (check->fail() || fl_choice("File exists, do you want to over-write", "OK", "No", nullptr) == 0) {
 			// Stop any current import
-			import_data_->stop_update(LM_OFF_AIR, false);
+			import_data_->stop_update(qso_manager::LM_OFF_AIR, false);
 			while (!import_data_->update_complete()) Fl::wait();
 			// Get the book to save
 			book* b = nullptr;
@@ -481,7 +481,7 @@ void menu::cb_mi_file_saveas(Fl_Widget* w, void* v) {
 // v is not used
 void menu::cb_mi_file_close(Fl_Widget* w, void* v) {
 	// Gracefully stop import
-	import_data_->stop_update(LM_OFF_AIR, false);
+	import_data_->stop_update(qso_manager::LM_OFF_AIR, false);
 	while (!import_data_->update_complete()) Fl::wait();
 	main_window_->do_callback();
 }
@@ -535,7 +535,7 @@ void menu::cb_mi_windows_all(Fl_Widget* w, void* v) {
 	menu* that = ancestor_view<menu>(w);
 	if (show_all) {
 		main_window_->show();
-		dashboard_->show();
+		qso_manager_->show();
 		status_->file_viewer()->show();
 #ifdef _WIN32
 		dxa_if_->show();
@@ -546,7 +546,7 @@ void menu::cb_mi_windows_all(Fl_Widget* w, void* v) {
 	else {
 		// Minimise the main window rather than hide it. When all windows are hidden we end the app
 		main_window_->iconize();
-		dashboard_->hide();
+		qso_manager_->hide();
 		status_->file_viewer()->hide();
 #ifdef _WIN32
 		dxa_if_->hide();
@@ -814,117 +814,6 @@ void menu::cb_mi_valid8_log(Fl_Widget* w, void* v) {
 	fl_cursor(FL_CURSOR_DEFAULT);
 }
 
-//// Log->Mode->Off-air,On-air,Import - change logging mode
-//// v is enum logging_mode_t to select logging mode
-//void menu::cb_mi_log_mode(Fl_Widget* w, void* v) {
-//	menu* that = ancestor_view<menu>(w);
-//	// v has new logging mode
-//	logging_mode_t next_mode = (logging_mode_t)(long)v;
-//
-//	// Stop current logging mode
-//	switch (that->logging_mode_) {
-//	case LM_OFF_AIR:
-//		// Currently entering a QSO - ask Save or Quit
-//		if (book_->modified_record() || book_->new_record()) {
-//			fl_beep(FL_BEEP_QUESTION);
-//			switch (fl_choice("You are currently modifying a record? Save or Quit?", "Save?", "Quit?", nullptr)) {
-//			case 0:
-//				book_->save_record();
-//				break;
-//			case 1:
-//				book_->delete_record(false);
-//				break;
-//			}
-//		}
-//		break;
-//	case LM_ON_AIR:
-//		// Currently entering a QSO - ask Save or Quit
-//		if (book_->modified_record() || book_->new_record()) {
-//			fl_beep(FL_BEEP_QUESTION);
-//			switch (fl_choice("You are currently modifying a record? Save or Quit?", "Save?", "Quit?", nullptr)) {
-//			case 0:
-//				book_->save_record();
-//				break;
-//			case 1:
-//				book_->delete_record(false);
-//				break;
-//			}
-//		}
-//		// We can be importing while on-air.
-//	case LM_IMPORTED:
-//		// Stop importing - and wait for it to finish
-//		import_data_->stop_update(next_mode, false);
-//		while (!import_data_->update_complete()) Fl::wait();
-//		status_->progress("Import cancelled!", OT_IMPORT);
-//		if (next_mode == LM_IMPORTED) {
-//			next_mode = LM_OFF_AIR;
-//		}
-//		break;
-//	}
-//
-//	// Start new logging mode
-//	that->logging(next_mode);
-//	switch (that->logging_mode_) {
-//	case LM_OFF_AIR:
-//		// Let user have mode and stop auto-save
-//		status_->misc_status(ST_NOTE, "LOG: Mode set to off-air logging");
-//		book_->enable_save(false);
-//		// Update enabled menu items
-//		that->update_items();
-//		break;
-//	case LM_ON_AIR:
-//		status_->misc_status(ST_NOTE, "LOG: Mode set to real-time (on-air) logging");
-//		break;
-//	case LM_IMPORTED:
-//		// Reset navigation mode
-//		tabbed_forms_->activate_pane(OT_MAIN, true);
-//		// start import_process
-//		status_->misc_status(ST_NOTE, "LOG: Mode set to auto-import from data modems");
-//		import_data_->start_auto_update();
-//		break;
-//	}
-//}
-//
-//// Set radio disconnected or connected
-//void menu::cb_mi_log_radio(Fl_Widget* w, void* v) {
-//	menu* that = ancestor_view<menu>(w);
-//	switch ((bool)(long)v) {
-//	case false:
-//		// Disconnect radio
-//		if (rig_if_) {
-//			status_->misc_status(ST_NOTE, "RIG: Closing rig connection by user");
-//			// Close rig
-//			rig_if_->close();
-//			delete rig_if_;
-//			rig_if_ = nullptr;
-//			import_data_->stop_update(that->logging(), false);
-//			while (!import_data_->update_complete()) Fl::wait(0);
-//			that->logging(LM_OFF_AIR);
-//			// Scratchpad updates band_view
-//			dashboard_->update();
-//		}
-//		break;
-//	case true:
-//		// Connect radio
-//		// Currently entering a QSO - ask Save or Quit
-//		if (book_->modified_record() || book_->new_record()) {
-//			fl_beep(FL_BEEP_QUESTION);
-//			switch (fl_choice("You are currently modifying a record? Save or Quit?", "Save?", "Quit?", nullptr)) {
-//			case 0:
-//				book_->save_record();
-//				break;
-//			case 1:
-//				book_->delete_record(false);
-//				break;
-//			}
-//		}
-//		if (!rig_if_) {
-//			add_rig_if();
-//		}
-//		break;
-//	}
-//}
-
 // Log->Use View->
 // v is which view
 void menu::cb_mi_log_view(Fl_Widget* w, void* v) {
@@ -939,7 +828,7 @@ void menu::cb_mi_log_new(Fl_Widget* w, void* v) {
 	// Force main log book
 	tabbed_forms_->activate_pane(OT_MAIN, true);
 	// Create a new record - on or off-air
-	book_->new_record(dashboard_->logging_mode());
+	qso_manager_->start_qso();
 	// Open log view
 	switch (that->editting_view_) {
 	case OT_MAIN:
@@ -947,7 +836,7 @@ void menu::cb_mi_log_new(Fl_Widget* w, void* v) {
 		tabbed_forms_->activate_pane(that->editting_view_, true);
 		break;
 	case OT_SCRATCH:
-		dashboard_->show();
+		qso_manager_->show();
 		break;
 	}
 }
@@ -957,8 +846,8 @@ void menu::cb_mi_log_new(Fl_Widget* w, void* v) {
 // v is not used
 void menu::cb_mi_log_save(Fl_Widget* w, void* v) {
 	dxa_if_->clear_dx_loc();
-	navigation_book_->save_record();
-	dashboard_->update();
+	qso_manager_->end_qso();
+	qso_manager_->update();
 }
 
 // Log->Delete/Cancel
@@ -967,7 +856,7 @@ void menu::cb_mi_log_del(Fl_Widget* w, void* v) {
 	// delete_record(true) - deliberately deleting a record
 	// delete_record(false) - only deletes if entering a new record (i.e. cancel)
 	navigation_book_->delete_record((bool)(long)v);
-	dashboard_->update();
+	qso_manager_->update();
 }
 
 // Log->Retime record - reset TIME_OFF to now
@@ -1189,7 +1078,7 @@ void menu::cb_mi_log_start(Fl_Widget* w, void* v) {
 // v defines subsequent load type (FILE_IMPORT or FILE_UPDATE
 void menu::cb_mi_imp_file(Fl_Widget* w, void* v) {
 	// Cancel any existing update
-	import_data_->stop_update(LM_OFF_AIR, false);
+	import_data_->stop_update(qso_manager::LM_OFF_AIR, false);
 	while (!import_data_->update_complete()) Fl::wait();
 	// Get data directory
 	char* directory;
@@ -2127,7 +2016,7 @@ void menu::add_windows_items() {
 	// Get indices to &Windows
 	int index = find_index("&Windows/&Hide All");
 	insert(index, "&Windows/&Main", 0, cb_mi_windows, main_window_, FL_MENU_TOGGLE);
-	insert(index, "&Windows/Das&hboard", 0, cb_mi_windows, dashboard_, FL_MENU_TOGGLE);
+	insert(index, "&Windows/Das&hboard", 0, cb_mi_windows, qso_manager_, FL_MENU_TOGGLE);
 	insert(index, "&Windows/S&tatus Viewer", 0, cb_mi_windows, status_->file_viewer(), FL_MENU_TOGGLE);
 #ifdef _WIN32
 	insert(index, "&Windows/&DxAtlas Control", 0, cb_mi_windows, dxa_if_, FL_MENU_TOGGLE);
@@ -2157,8 +2046,8 @@ void menu::update_windows_items() {
 		}
 	}
 
-	if (dashboard_ && index_oper != -1) {
-		if (dashboard_->visible()) {
+	if (qso_manager_ && index_oper != -1) {
+		if (qso_manager_->visible()) {
 			mode(index_oper, mode(index_oper) | FL_MENU_VALUE);
 		}
 		else {

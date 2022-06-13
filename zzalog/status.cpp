@@ -6,7 +6,7 @@
 #include "menu.h"
 #include "intl_widgets.h"
 #include "main_window.h"
-#include "dashboard.h"
+#include "qso_manager.h"
 
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Radio_Round_Button.H>
@@ -27,7 +27,7 @@ extern menu* menu_;
 extern void add_rig_if();
 extern main_window* main_window_;
 extern status* status_;
-extern dashboard* dashboard_;
+extern qso_manager* qso_manager_;
 extern bool read_only_;
 extern bool close_by_error_;
 
@@ -236,7 +236,7 @@ void status::cb_bn_rig(Fl_Widget* bn, void* v) {
 		// Close the rig
 		rig_if_->close();
 		that->misc_status(ST_WARNING, "RIG: Closing rig connection");
-		dashboard_->update();
+		qso_manager_->update();
 	}
 	bn->redraw();
 }

@@ -24,6 +24,7 @@
 #include <FL/Fl_Choice.H>
 #include <FL/Fl_Check_Button.H>
 #include <FL/Fl_Input.H>
+#include <FL/Fl_Output.H>
 #include <FL/Fl_Spinner.H>
 #include <FL/Fl_Button.H>
 
@@ -47,13 +48,26 @@ namespace zzalog {
 	};
 
 	// This class provides the dialog to chage the current station settings: rig, antenna and QTH
-	class dashboard :
+	class qso_manager :
 		public Fl_Window
 	{
+		// Logging mode - used when initialising a record
+	public:
+		enum logging_mode_t {
+			LM_FOR_PARSING, // Use current time
+			LM_OFF_AIR,     // Off-line logging (w/o radio)
+			LM_ON_AIR_CAT,  // Real -time logging - data from radio
+			LM_ON_AIR_COPY, // Real-time logging - data from selected QSO
+			LM_ON_AIR_TIME, // Real-time logging - date/time only
+			LM_IMPORTED,    // Import from modem software (w/ or w/o radio)
+		};
+
+	protected:
 		// A bit of a misnomer - but the category of settings
-		enum equipment_t {
+		enum item_t {
 			RIG,
 			ANTENNA,
+			CALLSIGN,
 			NONE
 		};
 
@@ -137,7 +151,7 @@ namespace zzalog {
 
 		public:
 
-			common_grp(int X, int Y, int W, int H, const char* label, equipment_t type);
+			common_grp(int X, int Y, int W, int H, const char* label, item_t type);
 			virtual ~common_grp();
 
 			// get settings
@@ -196,16 +210,16 @@ namespace zzalog {
 			// SAve next value
 			void save_next_value();
 			// type
-			equipment_t type_;
+			item_t type_;
 			// in text for Fl_Preference
 			string settings_name_;
 		};
 
 
-	// dashboard
+	// qso_manager
 	public:
-		dashboard(int W, int H, const char* label);
-		virtual ~dashboard();
+		qso_manager(int W, int H, const char* label);
+		virtual ~qso_manager();
 
 		// Override to tell menu when it opens and closes
 		virtual int handle(int event);
@@ -311,6 +325,14 @@ namespace zzalog {
 		void update_locations();
 		// Load locations
 		void load_locations();
+		// Start QSO
+		record* start_qso();
+		// Create a dummy qso - eg for parsing a callsign
+		record* dummy_qso();
+		// End QSO
+		void end_qso();
+		// QSO i n progress
+		bool qso_in_progress();
 
 
 	protected:
@@ -355,6 +377,7 @@ namespace zzalog {
 		// Groups
 		common_grp* rig_grp_;
 		common_grp* antenna_grp_;
+		common_grp* callsign_grp_;
 		Fl_Group* hamlib_grp_;
 		Fl_Group* flrig_grp_;
 		Fl_Group* norig_grp_;
@@ -409,11 +432,9 @@ namespace zzalog {
 		Fl_Button* bn_local_;
 
 		// The record being entered or used
-		record* record_;
+		record* current_qso_;
 		// The fieldname
 		string field_;
-		// Record is new recorde
-		bool enterring_record_;
 
 		// Scratchpad editor font
 		Fl_Font font_;

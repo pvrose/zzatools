@@ -58,113 +58,6 @@ record::record()
 	delete_contents();
 }
 
-// Constructor that pre-populates certain fields depending on the logging mode
-record::record(logging_mode_t type, record* copy_from) {
-	// Reset record
-	delete_contents();
-	
-	string mode;
-	string submode;
-	string timestamp = now(false, "%Y%m%d%H%M%S");
-
-	switch (type) {
-	case LM_ON_AIR_CAT:
-		// Interactive mode - start QSO - update fields from radio 
-		// Get current date and time in UTC
-		item("QSO_DATE", timestamp.substr(0, 8));
-		// Time as HHMMSS - always log seconds.
-		item("TIME_ON", timestamp.substr(8));
-		item("QSO_DATE_OFF", string(""));
-		item("TIME_OFF", string(""));
-		item("CALL", string(""));
-		// Get frequency, mode and transmit power from rig
-		item("FREQ", rig_if_->get_frequency(true));
-		if (rig_if_->is_split()) {
-			item("FREQ_RX", rig_if_->get_frequency(false));
-		}
-		// Get mode - NB USB/LSB need further processing
-		rig_if_->get_string_mode(mode, submode);
-		item("MODE", mode);
-		item("SUBMODE", submode);
-		item("TX_PWR", rig_if_->get_tx_power());
-		// initialise fields
-		item("RX_PWR", string(""));
-		item("RST_SENT", string(""));
-		item("RST_RCVD", string(""));
-		item("NAME", string(""));
-		item("QTH", string(""));
-		item("GRIDSQUARE", string(""));
-		break;
-	case LM_ON_AIR_COPY:
-		// Interactive mode - start QSO - date/time only
-		// Get current date and time in UTC
-		item("QSO_DATE", timestamp.substr(0, 8));
-		// Time as HHMMSS - always log seconds.
-		item("TIME_ON", timestamp.substr(8));
-		item("QSO_DATE_OFF", string(""));
-		item("TIME_OFF", string(""));
-		item("CALL", string(""));
-		// otherwise leave blank so that we enter it manually later.
-		item("FREQ", copy_from->item("FREQ"));
-		item("FREQ_RX", copy_from->item("FREQ_RX"));
-		item("MODE", copy_from->item("MODE"));
-		item("SUBMODE", copy_from->item("SUBMODE"));
-		item("TX_PWR", copy_from->item("TX_PWR"));
-		// initialise fields
-		item("RX_PWR", string(""));
-		item("RST_SENT", string(""));
-		item("RST_RCVD", string(""));
-		item("NAME", string(""));
-		item("QTH", string(""));
-		item("GRIDSQUARE", string(""));
-		break;
-	case LM_ON_AIR_TIME: 
-		// Interactive mode - start QSO - date/time only
-		// Get current date and time in UTC
-		item("QSO_DATE", timestamp.substr(0, 8));
-		// Time as HHMMSS - always log seconds.
-		item("TIME_ON", timestamp.substr(8));
-		item("QSO_DATE_OFF", string(""));
-		item("TIME_OFF", string(""));
-		item("CALL", string(""));
-		// otherwise leave blank so that we enter it manually later.
-		item("FREQ", string(""));
-		item("FREQ_RX", string(""));
-		item("MODE", string(""));
-		item("SUBMODE", string(""));
-		item("TX_PWR", string(""));
-		// initialise fields
-		item("RX_PWR", string(""));
-		item("RST_SENT", string(""));
-		item("RST_RCVD", string(""));
-		item("NAME", string(""));
-		item("QTH", string(""));
-		item("GRIDSQUARE", string(""));
-		break;
-	case LM_OFF_AIR:
-	case LM_IMPORTED:
-		// Just initialise to empty strings
-		item("QSO_DATE", string(""));
-		item("TIME_ON", string(""));
-		item("QSO_DATE_OFF", string(""));
-		item("TIME_OFF", string(""));
-		item("CALL", string(""));
-		item("FREQ", string(""));
-		item("FREQ_RX", string(""));
-		item("MODE", string(""));
-		item("TX_PWR", string(""));
-		item("RX_PWR", string(""));
-		item("RST_SENT", string(""));
-		item("RST_RCVD", string(""));
-		item("NAME", string(""));
-		item("QTH", string(""));
-		item("GRIDSQUARE", string(""));
-		break;
-	}
-	// Add rig, antenna and QTH details
-	user_details();
-}
-
 // Copy constructor
 record::record(const record& rhs) {
 	// Uses assignment operator
@@ -394,13 +287,7 @@ string record::item(string field, bool formatted/* = false*/, bool indirect/* = 
 			Fl_Preferences qths_settings(stations_settings, "QTHs");
 			qth_name = item("APP_ZZA_QTH", false, false);
 			Fl_Preferences qth_settings(qths_settings, qth_name.c_str());
-			if (field == "STATION_CALLSIGN" || field == "OPERATOR") {
-				// Get station callsign
-				qth_settings.get("Callsign", temp, "QX1XXX");
-				result = temp; 
-				free(temp);
-			}
-			else if (field == "MY_NAME") {
+			if (field == "MY_NAME") {
 				// Get operator's name
 				qth_settings.get("Operator Name", temp, "John Doe");
 				result = temp;
@@ -1192,25 +1079,6 @@ void record::update_timeoff() {
 	}
 }
 
-// End record by adding certain fields 
-void record::end_record(logging_mode_t mode) {
-	if (!is_header_) {
-		// Always update MY_RIG ets.
-		user_details();
-		// On-air logging add date/time off
-		if (mode == LM_ON_AIR_CAT || mode == LM_ON_AIR_TIME || mode == LM_ON_AIR_COPY) {
-			if (item("TIME_OFF") == "") {
-				// Add end date/time - current time of interactive entering
-				// Get current date and time in UTC
-				string timestamp = now(false, "%Y%m%d%H%M%S");
-				item("QSO_DATE_OFF", timestamp.substr(0, 8));
-				// Time as HHMMSS - always log seconds.
-				item("TIME_OFF", timestamp.substr(8));
-			}
-		}
-	}
-}
-
 // merge data from a number of items - equivalent to a mail-merge 
 // replace <FIELD> with the value of that field.
 string record::item_merge(string data, bool indirect /*=false*/) {
@@ -1233,6 +1101,7 @@ bool record::user_details() {
 	Fl_Preferences stations_settings(settings_, "Stations");
 	Fl_Preferences rigs_settings(stations_settings, "Rigs");
 	Fl_Preferences aerials_settings(stations_settings, "Aerials");
+	Fl_Preferences callsigns_settings(stations_settings, "Callsigns");
 	Fl_Preferences qths_settings(stations_settings, "QTHs");
 	bool modified = false;
 	char message[256];
@@ -1275,7 +1144,7 @@ bool record::user_details() {
 	free(qth);
 	// Get callsign
 	char* callsign;
-	current_settings.get("Callsign", callsign, "");
+	callsigns_settings.get("Current", callsign, "");
 	if (item("STATION_CALLSIGN").length()) {
 		snprintf(message, 256, "LOG: STATION_CALLSIGN already set to %s, ignoring current value %s", item("STATION_CALLSIGN").c_str(), callsign);
 		status_->misc_status(ST_WARNING, message);

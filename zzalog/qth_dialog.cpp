@@ -8,7 +8,7 @@
 #include "status.h"
 #include "tabbed_forms.h"
 #include "intl_widgets.h"
-#include "dashboard.h"
+#include "qso_manager.h"
 #include "dxa_if.h"
 
 #include <set>
@@ -29,7 +29,7 @@ extern pfx_data* pfx_data_;
 extern status* status_;
 extern tabbed_forms* tabbed_forms_;
 extern rig_if* rig_if_;
-extern dashboard* dashboard_;
+extern qso_manager* qso_manager_;
 extern dxa_if* dxa_if_;
 
 const char* SETTINGS_NAME = "Stations";
@@ -206,9 +206,6 @@ void qth_dialog::load_values() {
 		// Get the QTH details
 		qth_info_t* qth = new qth_info_t;
 		char* temp;
-		item_settings.get("Callsign", temp, "");
-		qth->callsign = temp;
-		free(temp);
 		item_settings.get("Operator Name", temp, "");
 		qth->name = temp;
 		free(temp);
@@ -352,12 +349,6 @@ void qth_dialog::create_form(int X, int Y) {
 			ip3 = new Fl_Int_Input(x, y, W1C, H3, qth_params_[i].label);
 			ip3->callback(cb_value<Fl_Int_Input, string>, qth_params_[i].v);
 			break;
-		case CALL:
-			// Widget is for text input
-			ip3 = new intl_input(x, y, W1C, H3, qth_params_[i].label);
-			// Entering callsign will fill or clear the other fields
-			ip3->callback(cb_ip_call, qth_params_[i].v);
-			break;
 		case MIXED:
 			// Widget is for text input
 			ip3 = new intl_input(x, y, W1C, H3, qth_params_[i].label);
@@ -411,7 +402,6 @@ void qth_dialog::save_values() {
 			Fl_Preferences item_settings(*my_settings_, it->first.c_str());
 			// For QTH there are additional data to save
 			qth_info_t* qth = all_qths_[it->first];
-			item_settings.set("Callsign", qth->callsign.c_str());
 			item_settings.set("Operator Name", qth->name.c_str());
 			item_settings.set("Street", qth->street.c_str());
 			item_settings.set("Town", qth->town.c_str());
@@ -468,77 +458,6 @@ void qth_dialog::delete_item(string item) {
 // Save an item
 void qth_dialog::save_item() {
 	*all_qths_[selected_name_] = current_qth_;
-}
-
-// Callsign callback 
-// v is pointer to the callsign field of the QTH structure
-void qth_dialog::cb_ip_call(Fl_Widget* w, void* v) {
-	qth_dialog* that = ancestor_view<qth_dialog>(w);
-	qth_info_t* qth = &that->current_qth_;
-	cb_ip_upper(w, v);
-	// Parse callsign to get DXCC etc information
-	// Create dummy log entry to hold callsign
-	record dummy;
-	dummy.item("CALL", string(qth->callsign));
-	string timestamp = now(false, "%Y%m%d%H%M%S");
-	dummy.item("QSO_DATE", timestamp.substr(0, 8));
-	// Get the prefix and track up to the DXCC prefix
-	prefix* prefix = pfx_data_->get_prefix(&dummy, false);
-	// Get CQZone - if > 1 supplied then message for now
-	if (prefix->cq_zones_.size() > 1) {
-		string message = "STATION: Multiple CQ Zones: ";
-		for (unsigned int i = 0; i < prefix->cq_zones_.size(); i++) {
-			string zone = to_string(prefix->cq_zones_[i]);
-			message += zone;
-		}
-		status_->misc_status(ST_WARNING, message.c_str());
-		qth->cq_zone = "";
-	}
-	else {
-		// Set it in the QTH
-		qth->cq_zone = to_string(prefix->cq_zones_[0]);
-	}
-	// Get ITUZone - if > 1 supplied then message for now
-	if (prefix->itu_zones_.size() > 1) {
-		string message = "STATION: Multiple ITU Zones: ";
-		for (unsigned int i = 0; i < prefix->itu_zones_.size(); i++) {
-			string zone = to_string(prefix->itu_zones_[i]);
-			message += zone;
-		}
-		status_->misc_status(ST_WARNING, message.c_str());
-		qth->itu_zone = "";
-	}
-	else {
-		// Set it in the QTH
-		qth->itu_zone = to_string(prefix->itu_zones_[0]);
-	}
-	// Get Continent - if > 1 supplied then message for now
-	if (prefix->continents_.size() > 1) {
-		string message = "STATION: Multiple Continents: ";
-		for (unsigned int i = 0; i < prefix->continents_.size(); i++) {
-			message += prefix->continents_[i] + "; ";
-		}
-		status_->misc_status(ST_WARNING, message.c_str());
-		qth->continent = "";
-	}
-	else {
-		// Set it in the QTH
-		qth->continent = prefix->continents_[0];
-	}
-	qth->state = prefix->state_;
-	// Track up to DXCC prefix record
-	while (prefix->parent_ != nullptr) {
-		prefix = prefix->parent_;
-	}
-	// Fill in DXCC fields
-	qth->dxcc_id = to_string(prefix->dxcc_code_);
-	qth->dxcc_name = prefix->nickname_ + ": " + prefix->name_;
-
-	// update the fields - first create the item if it does not yet exist
-	that->add_item();
-	*that->all_qths_[that->selected_name_] = *qth;
-	that->update_item();
-	that->redraw();
 }
 
 // Callback that converts what is typed to upper-case

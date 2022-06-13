@@ -1,5 +1,5 @@
 #include "settings.h"
-#include "dashboard.h"
+#include "qso_manager.h"
 #include "files_dialog.h"
 #include "web_dialog.h"
 #include "qth_dialog.h"

@@ -129,7 +129,7 @@
     <ClCompile Include="zzalog\status.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="zzalog\dashboard.cpp">
+    <ClCompile Include="zzalog\qso_manager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="zzalog\tabbed_forms.cpp">
@@ -329,7 +329,7 @@
     <ClInclude Include="zzalog\status.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="zzalog\dashboard.h">
+    <ClInclude Include="zzalog\qso_manager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="zzalog\tabbed_forms.h">
