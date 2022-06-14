@@ -426,7 +426,6 @@ bool eqsl_handler::user_details(
 			status_->misc_status(ST_WARNING, message);
 			*username = callsign;
 		}
-		free(temp);
 	}
 	if (password != nullptr) {
 		eqsl_settings.get("Password", temp, "");

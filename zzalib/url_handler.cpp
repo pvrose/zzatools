@@ -164,7 +164,7 @@ bool url_handler::post_form(string url, vector<field_pair> fields, istream* req,
 			// We have specified a non-empty string so use that
 			curl_mime_data(field, (*it).value.c_str(), (*it).value.length());
 		}
-		else {
+		else if (req != nullptr) {
 			// Get the request length
 			streampos startpos = req->tellg();
 			req->seekg(0, ios::end);
@@ -173,6 +173,9 @@ bool url_handler::post_form(string url, vector<field_pair> fields, istream* req,
 			req->seekg(0, ios::beg);
 			// Use the specified input stream
 			curl_mime_data_cb(field, req_length, cb_read, nullptr, nullptr, req);
+		}
+		else {
+			// TODO: Report error
 		}
 		// Add a filename - if supplied
 		if ((*it).filename.length()) {

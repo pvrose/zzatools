@@ -48,7 +48,7 @@ bool club_handler::upload_log(book* book) {
 		ss.seekg(ss.beg);
 		// Get the parameters and make available for the HTTP POST FORM
 		vector<url_handler::field_pair> fields;
-		generate_form(fields, false);
+		generate_form(fields, nullptr);
 		stringstream resp;
 		// Post the form
 		bool ok;
@@ -86,7 +86,7 @@ bool club_handler::upload_log(book* book) {
 }
 
 // Generate the fields in the form
-void club_handler::generate_form(vector<url_handler::field_pair>& fields, bool single_qso) {
+void club_handler::generate_form(vector<url_handler::field_pair>& fields, record* the_qso) {
 	// Read the settings that define user's access 
 	Fl_Preferences qsl_settings(settings_, "QSL");
 	Fl_Preferences clublog_settings(qsl_settings, "ClubLog");
@@ -100,15 +100,20 @@ void club_handler::generate_form(vector<url_handler::field_pair>& fields, bool s
 	clublog_settings.get("Password", password, "");
 	fields.push_back({ "password", password, "", "" });
 	free(password);
-	char* callsign;
-	callsigns_settings.get("Current", callsign, "");
-	fields.push_back({ "callsign", callsign, "", "" });
-	free(callsign);
-	if (single_qso) {
+	if (the_qso != nullptr) {
+		// get logging callsign from QSO record
+		string callsign;
+		the_qso->item("STATION_CALLSIGN", callsign);
+		fields.push_back({ "callsign", callsign.c_str(), "", "" });
 		// Get string ADIF
 		fields.push_back({ "adif", single_qso_, "", "" });
 	}
 	else {
+		// Get callsign from settings
+		char* callsign;
+		callsigns_settings.get("Current", callsign, "");
+		fields.push_back({ "callsign", callsign, "", "" });
+		free(callsign);
 		// Set file to empty string to use the supplied data stream
 		fields.push_back({ "file", "", "clublog.adi", "application/octet-stream" });
 	}
@@ -248,7 +253,7 @@ bool club_handler::upload_single_qso(record_num_t record_num) {
 		single_qso_ = to_adif(this_record, adif_fields);
 		// Get the parameters and make available for the HTTP POST FORM
 		vector<url_handler::field_pair> fields;
-		generate_form(fields, true);
+		generate_form(fields, this_record);
 		stringstream resp;
 		// Post the form
 		bool ok;

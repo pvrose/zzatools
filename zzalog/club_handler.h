@@ -28,7 +28,7 @@ namespace zzalog {
 
 	protected:
 		// Generate the fields for posting the log
-		void generate_form(vector<zzalib::url_handler::field_pair>& fields, bool single_qso);
+		void generate_form(vector<zzalib::url_handler::field_pair>& fields, record* the_qso);
 		// Get names of ADIF fields to export
 		void generate_adif(set < string > &fields);
 		// Unzip the downloaded  exceptions file

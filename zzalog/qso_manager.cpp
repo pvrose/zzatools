@@ -725,6 +725,7 @@ void qso_manager::create_spad_widgets(int& curr_x, int& curr_y) {
 	ch_logmode_->textfont(FONT);
 	ch_logmode_->textsize(FONT_SIZE);
 	ch_logmode_->align(FL_ALIGN_LEFT);
+	ch_logmode_->add("Current date and time - used for parsing only");
 	ch_logmode_->add("All fields blank");
 	ch_logmode_->add("Current date and time, data from CAT");
 	ch_logmode_->add("Current date and time, data from selected QSO");
@@ -1012,14 +1013,14 @@ void qso_manager::create_use_widgets(int& curr_x, int& curr_y) {
 	w20->tooltip("Use rig and antenna in current QSO");
 
 	// Use in the current QSO and any subsequent ones (until changed)
-	Fl_Button* w21 = new Fl_Button(w20->x(), w20->y() + w20->h(), WBUTTON * 2, HBUTTON, "Use in current and next");
+	Fl_Button* w21 = new Fl_Button(w20->x(), w20->y() + w20->h(), WBUTTON * 2, HBUTTON, "Use in this and subseq.");
 	w21->labelfont(FONT);
 	w21->labelsize(FONT_SIZE);
 	w21->callback(cb_bn_use_items, (void*)(long)SELECTED_NEW);
 	w21->tooltip("Use rig and antenna in current QSO and following");
 
 	// Use in subsequent QSOs
-	Fl_Button* w22 = new Fl_Button(w21->x(), w21->y() + w21->h(), WBUTTON * 2, HBUTTON, "Use in next only");
+	Fl_Button* w22 = new Fl_Button(w21->x(), w21->y() + w21->h(), WBUTTON * 2, HBUTTON, "Use in subsequent");
 	w22->labelfont(FONT);
 	w22->labelsize(FONT_SIZE);
 	w22->callback(cb_bn_use_items, (void*)(long)NEW_ONLY);
@@ -2107,7 +2108,7 @@ void qso_manager::cb_bn_use_items(Fl_Widget* w, void* v) {
 		sel_record->item("MY_RIG", that->rig_grp_->name());
 		sel_record->item("MY_ANTENNA", that->antenna_grp_->name());
 		sel_record->item("APP_ZZA_QTH", that->selected_qth_);
-		sel_record->item("SELECTED_CALLSIGN", that->callsign_grp_->name());
+		sel_record->item("STATION_CALLSIGN", that->callsign_grp_->name());
 		tabbed_forms_->update_views(nullptr, HT_MINOR_CHANGE, book_->selection());
 		that->rig_grp_->next() = that->rig_grp_->name();
 		that->antenna_grp_->next() = that->antenna_grp_->name();

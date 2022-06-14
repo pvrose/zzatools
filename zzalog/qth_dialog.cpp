@@ -335,7 +335,7 @@ void qth_dialog::create_form(int X, int Y) {
 	bn2_3->tooltip("Delete the item");
 
 	// Additional widgets for QTHs - for each widget
-	for (int i = 0; i < 15; i++) {
+	for (int i = 0; i < NUM_QTH_PARAMS; i++) {
 		// Create an input
 		Fl_Input* ip3;
 		// X-position
@@ -363,10 +363,9 @@ void qth_dialog::create_form(int X, int Y) {
 		ip3->labelsize(FONT_SIZE);
 		ip3->textsize(FONT_SIZE);
 		ip3->when(FL_WHEN_RELEASE);
-		char* temp = new char[128];
-		sprintf(temp, "Enter new value for %s", qth_params_[i].label);
+		char temp[128];
+		snprintf(temp, 128, "Enter new value for %s", qth_params_[i].label);
 		ip3->copy_tooltip(temp);
-		delete[] temp;
 		qth_info_[i] = ip3;
 	}
 
@@ -428,7 +427,7 @@ void qth_dialog::update_item() {
 	// Get the current selection
 	current_qth_ = *all_qths_[selected_name_];
 	// For each QTH input widget
-	for (int i = 0; i < 15; i++) {
+	for (int i = 0; i < NUM_QTH_PARAMS; i++) {
 		// Set the text in the widget
 		((intl_input*)qth_info_[i])->value(((string*)qth_params_[i].v)->c_str());
 		// Put a reference to the value location

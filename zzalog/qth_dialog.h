@@ -110,7 +110,8 @@ namespace zzalog {
 			MIXED,
 			UPPER
 		};
-		struct { const char* label; void* v; input_type type; int row; int col; } qth_params_[14] = {
+#define NUM_QTH_PARAMS 14
+		struct { const char* label; void* v; input_type type; int row; int col; } qth_params_[NUM_QTH_PARAMS] = {
 			{ "Name", (void*)&(current_qth_.name), MIXED, 1, 0 },
 			{ "Street", (void*)&(current_qth_.street), MIXED, 2, 0 },
 			{ "Town", (void*)&(current_qth_.town), MIXED, 3, 0 },
