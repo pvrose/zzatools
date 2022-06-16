@@ -102,8 +102,7 @@ void club_handler::generate_form(vector<url_handler::field_pair>& fields, record
 	free(password);
 	if (the_qso != nullptr) {
 		// get logging callsign from QSO record
-		string callsign;
-		the_qso->item("STATION_CALLSIGN", callsign);
+		string callsign = the_qso->item("STATION_CALLSIGN");
 		fields.push_back({ "callsign", callsign.c_str(), "", "" });
 		// Get string ADIF
 		fields.push_back({ "adif", single_qso_, "", "" });

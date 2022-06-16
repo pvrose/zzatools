@@ -2245,7 +2245,7 @@ void qso_manager::cb_save(Fl_Widget* w, void* v) {
 void qso_manager::cb_cancel(Fl_Widget* w, void* v) {
 	qso_manager* that = ancestor_view<qso_manager>(w);
 	if (that->current_qso_) {
-		book_->delete_record(false);
+		book_->delete_record(true);
 		dxa_if_->clear_dx_loc();
 	}
 	that->buffer_->text("");
@@ -2487,10 +2487,10 @@ record* qso_manager::start_qso() {
 		break;
 	case LM_OFF_AIR:
 		// Prepopulate rig, antenna, QTH and callsign
-		current_qso_->item("STATION_CALLSIGN", callsign_grp_->next());
-		current_qso_->item("MY_RIG", rig_grp_->next());
-		current_qso_->item("MY_ANTENNA", antenna_grp_->next());
-		current_qso_->item("APP_ZZA_QTH", next_qth_);
+		current_qso_->item("STATION_CALLSIGN", callsign_grp_->name());
+		current_qso_->item("MY_RIG", rig_grp_->name());
+		current_qso_->item("MY_ANTENNA", antenna_grp_->name());
+		current_qso_->item("APP_ZZA_QTH", selected_qth_);
 		break;
 	case LM_ON_AIR_CAT:
 		// Interactive mode - start QSO - update fields from radio 
@@ -2519,10 +2519,10 @@ record* qso_manager::start_qso() {
 		current_qso_->item("QTH", string(""));
 		current_qso_->item("GRIDSQUARE", string(""));
 		// Prepopulate rig, antenna, QTH and callsign
-		current_qso_->item("STATION_CALLSIGN", callsign_grp_->next());
-		current_qso_->item("MY_RIG", rig_grp_->next());
-		current_qso_->item("MY_ANTENNA", antenna_grp_->next());
-		current_qso_->item("APP_ZZA_QTH", next_qth_);
+		current_qso_->item("STATION_CALLSIGN", callsign_grp_->name());
+		current_qso_->item("MY_RIG", rig_grp_->name());
+		current_qso_->item("MY_ANTENNA", antenna_grp_->name());
+		current_qso_->item("APP_ZZA_QTH", selected_qth_);
 		break;
 	case LM_ON_AIR_COPY:
 		// Interactive mode - start QSO - date/time only
@@ -2547,10 +2547,10 @@ record* qso_manager::start_qso() {
 		current_qso_->item("QTH", string(""));
 		current_qso_->item("GRIDSQUARE", string(""));
 		// Prepopulate rig, antenna, QTH and callsign
-		current_qso_->item("STATION_CALLSIGN", callsign_grp_->next());
-		current_qso_->item("MY_RIG", rig_grp_->next());
-		current_qso_->item("MY_ANTENNA", antenna_grp_->next());
-		current_qso_->item("APP_ZZA_QTH", next_qth_);
+		current_qso_->item("STATION_CALLSIGN", callsign_grp_->name());
+		current_qso_->item("MY_RIG", rig_grp_->name());
+		current_qso_->item("MY_ANTENNA", antenna_grp_->name());
+		current_qso_->item("APP_ZZA_QTH", selected_qth_);
 		break;
 	case LM_ON_AIR_TIME:
 		// Interactive mode - start QSO - date/time only
@@ -2575,15 +2575,18 @@ record* qso_manager::start_qso() {
 		current_qso_->item("QTH", string(""));
 		current_qso_->item("GRIDSQUARE", string(""));
 		// Prepopulate rig, antenna, QTH and callsign
-		current_qso_->item("STATION_CALLSIGN", callsign_grp_->next());
-		current_qso_->item("MY_RIG", rig_grp_->next());
-		current_qso_->item("MY_ANTENNA", antenna_grp_->next());
-		current_qso_->item("APP_ZZA_QTH", next_qth_);
+		current_qso_->item("STATION_CALLSIGN", callsign_grp_->name());
+		current_qso_->item("MY_RIG", rig_grp_->name());
+		current_qso_->item("MY_ANTENNA", antenna_grp_->name());
+		current_qso_->item("APP_ZZA_QTH", selected_qth_);
 		break;
 	}
 
 	// Add to book
-	book_->insert_record(current_qso_);
+	record_num_t new_record_num = book_->append_record(current_qso_);
+	book_->selection(book_->item_number(new_record_num));
+	// Notify other views
+	tabbed_forms_->update_views(nullptr, HT_INSERTED, new_record_num);
 
 	// Return created record
 	return current_qso_;
@@ -2645,7 +2648,6 @@ void qso_manager::end_qso() {
 		book_->correct_record_position(item_number);
 		break;
 	}
-	book_->upload_qso(record_number);
 
 	// Modified by parsing and validation
 	bool record_modified = false;
@@ -2661,6 +2663,11 @@ void qso_manager::end_qso() {
 
 	// Now update rig, antenna and QTH to next value
 	save_next_values();
+	// Upload QSO to QSL servers
+	book_->upload_qso(record_number);
+	// Update this view
+	current_qso_ = nullptr;
+	enable_widgets();
 
 	// If new or changed then update the fact and let every one know
 	book_->modified(true);
@@ -2753,6 +2760,7 @@ void qso_manager::update() {
 		antenna_grp_->populate_choice();
 		rig_grp_->name() = prev_record->item("MY_RIG");
 		rig_grp_->populate_choice();
+		callsign_grp_->name() = prev_record->item("STATION_CALLSIGN");
 	}
 	else {
 		// No default
