@@ -2,7 +2,6 @@
 #include "qso_manager.h"
 #include "files_dialog.h"
 #include "web_dialog.h"
-#include "qth_dialog.h"
 #include "fields_dialog.h"
 #include "qsl_design.h"
 #include "user_dialog.h"
@@ -46,11 +45,6 @@ settings::settings(int W, int H, const char* label, cfg_dialog_t active) :
 	aweb->labelsize(FONT_SIZE);
 	aweb->selection_color(fl_lighter(FL_YELLOW));
 	aweb->tooltip("Allows the setting of user details for the various on-line services");
-	// QTH settings: QTH details
-	qth_dialog* qth = new qth_dialog(rx, ry, rw, rh, "QTH");
-	qth->labelsize(FONT_SIZE);
-	qth->selection_color(fl_lighter(FL_YELLOW));
-	qth->tooltip("Allows the definition of the various fields describing station location (QTH)");
 	// Fields settings - fields to display as columns in log views, first few rows in record view
 	// and fields to export to TSV files
 	fields_dialog* fields = new fields_dialog(rx, ry, rw, rh, "Fields");
@@ -84,9 +78,6 @@ settings::settings(int W, int H, const char* label, cfg_dialog_t active) :
 		break;
 	case DLG_WEB:
 		tabs->value(aweb);
-		break;
-	case DLG_QTH:
-		tabs->value(qth);
 		break;
 	case DLG_COLUMN:
 		tabs->value(fields);
@@ -172,7 +163,6 @@ void settings::cb_tab(Fl_Widget* w, void* v) {
 	cfg_dialog_t ix;
 	if (dynamic_cast<files_dialog*>(tab)) ix = DLG_FILES;
 	else if (dynamic_cast<web_dialog*>(tab)) ix = DLG_WEB;
-	else if (dynamic_cast<qth_dialog*>(tab)) ix = DLG_QTH;
 	else if (dynamic_cast<fields_dialog*>(tab)) ix = DLG_COLUMN;
 	else if (dynamic_cast<qsl_design*>(tab)) ix = DLG_QSL;
 	else if (dynamic_cast<user_dialog*>(tab)) ix = DLG_USER;
@@ -189,9 +179,6 @@ void settings::set_label(settings::cfg_dialog_t active) {
 		break;
 	case DLG_WEB:
 		label("Configuration: Define web locations of QSL and other services");
-		break;
-	case DLG_QTH:
-		label("Configuration: Define details of a operating location (working QTH)");
 		break;
 	case DLG_COLUMN:
 		label("Configuration: Define the fields to be displayed in various views");

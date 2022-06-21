@@ -115,19 +115,17 @@ bool lotw_handler::upload_lotw_log(book* book) {
 				delete chooser;
 			}
 			if (ok) {
-				// Get Callsigns/Current
-				Fl_Preferences callsigns_settings(settings_, "Callsigns");
-				char* callsign;
-				callsigns_settings.get("Current", callsign, "");
+				// Get Callsign from first (maybe only) record in book
+				record* record_0 = book->get_record(0, false);
+				string callsign = record_0->item("STATION_CALLSIGN");
 				// Generate TQSL command line - note the executable may have spaces in its filename
 				char* command = new char[256];
 				// TODO: Check command format in Linux
-				snprintf(command, 256, "\"%s\" -x -u -d %s -c %s", tqsl_executable.c_str(), new_filename.c_str(), callsign);
+				snprintf(command, 256, "\"%s\" -x -u -d %s -c %s", tqsl_executable.c_str(), new_filename.c_str(), callsign.c_str());
 				status_->misc_status(ST_NOTE, "LOTW: Signing and uploading QSLs to LotW");
 				// Launch TQSL - signs and uploads data: Note this is a blocking action
 				int result = system(command);
 				delete[] command;
-				free(callsign);
 				// Analyse result received from TQSL - responses documented in TQSL help
 				string default_message = "LOTW: Unknown response";
 				switch (result) {

@@ -19,6 +19,7 @@
 #include "tabbed_forms.h"
 #include "import_data.h"
 #include "alarm_dial.h"
+#include "qth_dialog.h"
 #include "../zzalib//utils.h"
 
 #include <set>
@@ -62,15 +63,13 @@ extern bool read_only_;
 // constructor 
 qso_manager::common_grp::common_grp(int X, int Y, int W, int H, const char* label, item_t type)
 	: Fl_Group(X, Y, W, H, label)
-    , active_(nullptr)
 	, choice_(nullptr)
 	, band_browser_(nullptr)
-	, display_all_items_(false)
+	, settings_name_("")
 	, my_settings_(nullptr)
 	, item_no_(0)
 	, type_(type)
 	, my_name_("")
-	, next_name_("")
 
 {
 	switch (type_) {
@@ -84,6 +83,10 @@ qso_manager::common_grp::common_grp(int X, int Y, int W, int H, const char* labe
 	}
 	case CALLSIGN: {
 		settings_name_ = "Callsigns";
+		break;
+	}
+	case QTH: {
+		settings_name_ = "QTHs";
 		break;
 	}
 	}
@@ -108,16 +111,9 @@ void qso_manager::common_grp::load_values() {
 	int num_items = my_settings_->groups();
 	// Get the current item
 	char * text;
-	int display_all;
 	my_settings_->get("Current", text, "");
 	my_name_ = text;
 	free(text);
-	my_settings_->get("Next", text, "");
-	next_name_ = text;
-	free(text);
-	// Get whether to offer all or just the active ones
-	my_settings_->get("Display All", display_all, (int)false);
-	display_all_items_ = (bool)display_all;
 	all_items_.clear();
 	string bands;
 	// For each item in the Antenna or rig settings
@@ -182,10 +178,6 @@ void qso_manager::common_grp::load_values() {
 			case ANTENNA:
 			{
 				// Antenna has just active flag and bands it is intended for
-				// Active flag
-				int active;
-				item_settings.get("Active", active, (int)false);
-				info.active = (bool)active;
 				// Get the intended bands
 				char* temp;
 				item_settings.get("Intended Bands", temp, "");
@@ -197,12 +189,12 @@ void qso_manager::common_grp::load_values() {
 			}
 			case CALLSIGN:
 			{
-				// Active flag
-				int active;
-				item_settings.get("Active", active, (int)false);
-				info.active = (bool)active;
 				info.intended_bands.clear();
 				break;
+			}
+			case QTH:
+			{
+				info.intended_bands.clear();
 			}
 			}
 		}
@@ -227,7 +219,7 @@ void qso_manager::common_grp::create_form(int X, int Y) {
 	const int H3 = HBUTTON;
 	const int R4 = R3 + H3 + max(GAP, HTEXT);
 	const int H4 = HMLIN;
-	const int HALL = (type_ == CALLSIGN) ? R3 + H3 + GAP : R4 + H4 + GAP;
+	const int HALL = (type_ == CALLSIGN || type_ == QTH) ? R3 + H3 + GAP : R4 + H4 + GAP;
 	// widget positions - columns
 	const int C1 = GAP;
 	const int W1B = WBUTTON;
@@ -249,8 +241,20 @@ void qso_manager::common_grp::create_form(int X, int Y) {
 	box(FL_BORDER_BOX);
 
 	// Row 1
+	// Output to display name feom settings
+	Fl_Output* op2_1 = new Fl_Output(X + C1, Y + R1, W1A, H1);
+	op2_1->box(FL_NO_BOX);
+	op2_1->color(FL_BACKGROUND_COLOR);
+	op2_1->labelsize(FONT_SIZE);
+	op2_1->labelfont(FONT);
+	op2_1->textfont(FONT | FL_BOLD);
+	op2_1->textsize(FONT_SIZE);
+	op2_1->tooltip("Value in settings");
+	op_settings_ = op2_1;
+
+	// Row 2
 	// Choice to select or add new antenna or rig
-	Fl_Input_Choice* ch1_1 = new Fl_Input_Choice(X + C1, Y + R1, W1A, H1);
+	Fl_Input_Choice* ch1_1 = new Fl_Input_Choice(X + C1, Y + R2, W1A, H2);
 	ch1_1->textsize(FONT_SIZE);
 	ch1_1->callback(cb_ch_stn, nullptr);
 	ch1_1->when(FL_WHEN_CHANGED);
@@ -258,32 +262,13 @@ void qso_manager::common_grp::create_form(int X, int Y) {
 	ch1_1->menubutton()->textfont(FONT);
 	ch1_1->menubutton()->textsize(FONT_SIZE);
 	choice_ = ch1_1;
-
-	// Row 2
-	// Button to decide to display all items or only active ones
-	Fl_Light_Button* bn2_1 = new Fl_Light_Button(X + C1, Y + R2, W1B, H2, "Show All");
-	bn2_1->value(display_all_items_);
-	bn2_1->selection_color(FL_GREEN);
-	bn2_1->labelsize(FONT_SIZE);
-	bn2_1->callback(cb_bn_all);
-	bn2_1->when(FL_WHEN_RELEASE);
-	bn2_1->tooltip("Show all items (not just active ones)");
-
-	// This antenna or rig is in active use
-	Fl_Light_Button* bn2_2 = new Fl_Light_Button(X + col1, Y + R2, W2B, H2, "Active");
-	// set it when the selected_item is active
-	bn2_2->labelsize(FONT_SIZE);
-	bn2_2->selection_color(FL_GREEN);
-	bn2_2->callback(cb_bn_activ8);
-	bn2_2->when(FL_WHEN_RELEASE);
-	bn2_2->tooltip("Set/Clear that the item is active");
-	active_ = bn2_2;
-
+	
 	// Row 3
 	// Add or modify this antenna or rig
 	Fl_Button* bn3_1 = new Fl_Button(X + C1, Y + R3, W1B, H3, (type_ != ANTENNA) ? "Add/Modify" : "Add");
 	bn3_1->labelsize(FONT_SIZE);
 	bn3_1->color(fl_lighter(FL_BLUE));
+	bn3_1->labelcolor(FL_YELLOW);
 	bn3_1->callback(cb_bn_add);
 	bn3_1->when(FL_WHEN_RELEASE);
 	bn3_1->tooltip(type_ != ANTENNA ? "Add or modify the selected item" : "Add a new item - type in the selector");
@@ -292,6 +277,7 @@ void qso_manager::common_grp::create_form(int X, int Y) {
 	Fl_Button* bn3_2 = new Fl_Button(X + col1, Y + R3, W2B, H2, "Remove");
 	bn3_2->labelsize(FONT_SIZE);
 	bn3_2->color(fl_lighter(FL_RED));
+	bn3_2->labelcolor(FL_YELLOW);
 	bn3_2->callback(cb_bn_del);
 	bn3_2->when(FL_WHEN_RELEASE);
 	bn3_2->tooltip("Delete the item");
@@ -316,11 +302,13 @@ void qso_manager::common_grp::create_form(int X, int Y) {
 		break;
 	}
 	case CALLSIGN:
+	case QTH:
 	{
 		populate_choice();
 		break;
 	}
 	}
+	enable_widgets();
 
 }
 
@@ -329,11 +317,16 @@ void qso_manager::common_grp::save_values() {
 	qso_manager* dash = ancestor_view<qso_manager>(this);
 
 	// Clear to remove deleted entries
-	my_settings_->clear();
+	switch (type_) {
+	case QTH:
+		break;
+	default:
+		my_settings_->clear();
+		break;
+	}
 
 	my_settings_->set("Current", my_name_.c_str());
 
-	my_settings_->set("Display All", display_all_items_);
 	int index = 0;
 	// For each item
 	for (auto it = item_info_.begin(); it != item_info_.end(); it++) {
@@ -343,7 +336,6 @@ void qso_manager::common_grp::save_values() {
 
 		switch (type_) {
 		case RIG: {
-			item_settings.set("Active", info.active);
 			// set the intended bands
 			string bands = "";
 			// Store all the bands intended to be used with this rig/antenna
@@ -383,7 +375,6 @@ void qso_manager::common_grp::save_values() {
 			break;
 		}
 		case ANTENNA: {
-			item_settings.set("Active", info.active);
 			// set the intended bands
 			string bands = "";
 			// Store all the bands intended to be used with this rig/antenna
@@ -393,18 +384,14 @@ void qso_manager::common_grp::save_values() {
 			item_settings.set("Intended Bands", bands.c_str());
 			break;
 		}
-		case CALLSIGN: {
-			// No additional data
+		case CALLSIGN:
+		case QTH:
+		{
+			// No additional data - in QTH case save by separate dialog
 			break;
 		}
 		}
 	}
-}
-
-// Save next value
-void qso_manager::common_grp::save_next_value() {
-	my_settings_->set("Current", next_name_.c_str());
-	my_name_ = next_name_;
 }
 
 // Populate the item selector
@@ -417,27 +404,23 @@ void qso_manager::common_grp::populate_choice() {
 	for (auto it = all_items_.begin(); it != all_items_.end(); it++) {
 		// Chack if the antenna or rig is in active use
 		item_data& info = item_info_[(*it)];
-		if (info.active || display_all_items_) {
-			// If item is currently active or we want to display both active and inactive items
-			// Add the item name to the choice
-			if ((*it).length()) {
-				w->add((*it).c_str());
-				if (*it == my_name_) {
-					// If it's the current selection, show it as such
-					w->value((*it).c_str());
-					((Fl_Light_Button*)active_)->value(info.active);
-					item_no_ = index;
-					sel_found = true;
-				}
-				index++;
+		// If item is currently active or we want to display both active and inactive items
+		// Add the item name to the choice
+		if ((*it).length()) {
+			w->add((*it).c_str());
+			if (*it == my_name_) {
+				// If it's the current selection, show it as such
+				w->value((*it).c_str());
+				item_no_ = index;
+				sel_found = true;
 			}
+			index++;
 		}
 	}
 	if (!sel_found && my_name_.length()) {
 		// Selected item not found. Add it to the various lists
 		w->add(my_name_.c_str());
 		w->value(my_name_.c_str());
-		item_info_[my_name_].active = true;
 	}
 	w->textsize(FONT_SIZE);
 	w->textfont(FONT);
@@ -467,19 +450,61 @@ void qso_manager::common_grp::populate_band() {
 	}
 }
 
+// Enable widgets
+void qso_manager::common_grp::enable_widgets() {
+	// Set value and style of settings ouput widget
+	char* next_value;
+	Fl_Output* op = (Fl_Output*)op_settings_;
+	my_settings_->get("Current", next_value, "");
+	op->value(next_value);
+	if (strcmp(next_value, my_name_.c_str())) {
+		op->textcolor(FL_RED);
+		op->textfont(FONT | FL_ITALIC);
+	}
+	else {
+		op->textcolor(FL_BLACK);
+		op->textfont(FONT | FL_BOLD);
+	}
+	free(next_value);
+	// Set values into choice
+	Fl_Input_Choice* ch = (Fl_Input_Choice*)choice_;
+	ch->value(my_name_.c_str());
+}
+
 // button callback - add
 // Add the text value of the choice to the list of items - new name is typed into the choice
 void qso_manager::common_grp::cb_bn_add(Fl_Widget* w, void* v) {
 	common_grp* that = ancestor_view<common_grp>(w);
 	// Get the value in the choice
 	string new_item = ((Fl_Input_Choice*)that->choice_)->value();
-	// Set it active (and add it if it's not there)
-	that->all_items_.push_back(new_item);
+	// Open the QTH dialog
+	button_t result = BN_OK;
+	switch (that->type_) {
+	case QTH:
+	{
+		qth_dialog* dialog = new qth_dialog(new_item);
+		result = dialog->display();
+	}
+	}
+	switch (result) {
+	case BN_OK:
+	{
+		// Set it active (and add it if it's not there)
+		that->all_items_.push_back(new_item);
 
-	that->my_name_ = new_item;
-	that->item_info_[new_item].active = true;
-	that->populate_choice();
-	that->redraw();
+		that->my_name_ = new_item;
+		that->enable_widgets();
+		that->populate_choice();
+		tabbed_forms_->update_views(nullptr, HT_LOCATION, -1);
+
+		that->redraw();
+		break;
+	}
+	case BN_CANCEL:
+	{
+		break;
+	}
+	}
 }
 
 // button callback - delete
@@ -496,25 +521,6 @@ void qso_manager::common_grp::cb_bn_del(Fl_Widget* w, void* v) {
 	that->redraw();
 }
 
-// button callback - all/active items
-// v is unused
-void qso_manager::common_grp::cb_bn_all(Fl_Widget* w, void* v) {
-	common_grp* that = ancestor_view<common_grp>(w);
-	that->display_all_items_ = ((Fl_Light_Button*)w)->value();
-	that->populate_choice();
-}
-
-// button callback - active/deactive
-// v is unused
-void qso_manager::common_grp::cb_bn_activ8(Fl_Widget* w, void* v) {
-	common_grp* that = ancestor_view<common_grp>(w);
-	// Set the item active or inactive dependant on state of light button
-	bool activate = ((Fl_Light_Button*)w)->value();
-	that->item_info_[that->my_name_].active = activate;
-	that->populate_choice();
-	that->redraw();
-}
-
 // choice callback
 // v is unused
 void qso_manager::common_grp::cb_ch_stn(Fl_Widget* w, void* v) {
@@ -527,11 +533,8 @@ void qso_manager::common_grp::cb_ch_stn(Fl_Widget* w, void* v) {
 		that->item_no_ = ch->menubutton()->value();
 		that->my_name_ = ch->menubutton()->text();
 		item_data& info = that->item_info_[that->my_name_];
-		info.active = true;
 		// Update the shared choice value
 		ch->value(that->my_name_.c_str());
-		// Update the active button
-		((Fl_Light_Button*)that->active_)->value(info.active);
 		switch (that->type_) {
 		case RIG:
 		case ANTENNA:
@@ -578,12 +581,12 @@ string& qso_manager::common_grp::name() {
 	return my_name_;
 }
 
-string& qso_manager::common_grp::next() {
-	return next_name_;
-}
-
 qso_manager::item_data& qso_manager::common_grp::info() {
 	return item_info_[my_name_];
+}
+
+void qso_manager::common_grp::update_settings_name() {
+	my_settings_->set("Current", my_name_.c_str());
 }
 
 // The main dialog constructor
@@ -604,7 +607,6 @@ qso_manager::qso_manager(int W, int H, const char* label) :
 	, rig_model_choice_(nullptr)
 	, port_if_choice_(nullptr)
 	, show_all_ports_(nullptr)
-	, ch_qth_(nullptr)
 	, buffer_(nullptr)
 	, editor_(nullptr)
 	, bn_save_(nullptr)
@@ -623,13 +625,10 @@ qso_manager::qso_manager(int W, int H, const char* label) :
 	, current_swr_alarm_(SWR_OK)
 	, current_pwr_alarm_(POWER_OK)
 	, current_vdd_alarm_(VDD_OK)
-	, selected_qth_("")
-	, next_qth_("")
 	, last_tx_swr_(1.0)
 	, last_tx_pwr_(0.0)
 {
 	ordered_bands_.clear();
-	all_qths_.clear();
 
 	load_values();
 
@@ -986,48 +985,50 @@ void qso_manager::create_use_widgets(int& curr_x, int& curr_y) {
 	max_w = max(max_w, callsign_grp_->x() + callsign_grp_->w() - curr_x);
 	max_h = max(max_h, callsign_grp_->y() + callsign_grp_->h() - curr_y);
 
-	// QTH choice
-	Fl_Group* gqth = new Fl_Group(callsign_grp_->x(), callsign_grp_->y() + callsign_grp_->h() + GAP, 10, 10, "QTH");
-	gqth->labelfont(FONT);
-	gqth->labelsize(FONT_SIZE);
-	gqth->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
-	gqth->box(FL_BORDER_BOX);
+	// QTH group
+	qth_grp_ = new common_grp(callsign_grp_->x(), callsign_grp_->y() + callsign_grp_->h() + GAP, 10, 10, "QTHs", QTH);
+	qth_grp_->tooltip("Select the location for this QSO");
+	qth_grp_->end();
+	qth_grp_->show();
 
-	ch_qth_ = new Fl_Choice(gqth->x() + GAP, gqth->y() + HTEXT, WSMEDIT, HTEXT);
-	ch_qth_->textfont(FONT);
-	ch_qth_->textsize(FONT_SIZE);
-	ch_qth_->callback(cb_choice_text, &selected_qth_);
+	max_w = max(max_w, qth_grp_->x() + qth_grp_->w() - curr_x);
+	max_h = max(max_h, qth_grp_->y() + qth_grp_->h() - curr_y);
 
-	populate_qth_choice();
-
-	gqth->resizable(nullptr);
-	gqth->size(GAP + ch_qth_->w() + GAP, HTEXT + ch_qth_->h() + GAP);
-	gqth->end();
+	Fl_Group* guse = new Fl_Group(callsign_grp_->x() + callsign_grp_->w() + GAP, antenna_grp_->y(), 10, 10, "Use in QSOs");
+	guse->labelfont(FONT);
+	guse->labelsize(FONT_SIZE);
+	guse->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
+	guse->box(FL_BORDER_BOX);
 
 	// Use rig/antenna buttons
 	// Only use the selected antenna and rig in the current QSPO
-	Fl_Button* w20 = new Fl_Button(gqth->x(), gqth->y() + gqth->h() + GAP, WBUTTON * 2, HBUTTON, "Use in current only");
+	Fl_Button* w20 = new Fl_Button(guse->x() + GAP, guse->y() + HTEXT, WBUTTON, HBUTTON, "Now");
 	w20->labelfont(FONT);
 	w20->labelsize(FONT_SIZE);
 	w20->callback(cb_bn_use_items, (void*)(long)SELECTED_ONLY);
-	w20->tooltip("Use rig and antenna in current QSO");
+	w20->tooltip("Use items in current QSO");
 
 	// Use in the current QSO and any subsequent ones (until changed)
-	Fl_Button* w21 = new Fl_Button(w20->x(), w20->y() + w20->h(), WBUTTON * 2, HBUTTON, "Use in this and subseq.");
+	Fl_Button* w21 = new Fl_Button(w20->x(), w20->y() + w20->h(), WBUTTON, HBUTTON, "Now/Next");
 	w21->labelfont(FONT);
 	w21->labelsize(FONT_SIZE);
 	w21->callback(cb_bn_use_items, (void*)(long)SELECTED_NEW);
-	w21->tooltip("Use rig and antenna in current QSO and following");
+	w21->tooltip("Use items in current QSO and future QSOs");
 
 	// Use in subsequent QSOs
-	Fl_Button* w22 = new Fl_Button(w21->x(), w21->y() + w21->h(), WBUTTON * 2, HBUTTON, "Use in subsequent");
+	Fl_Button* w22 = new Fl_Button(w21->x(), w21->y() + w21->h(), WBUTTON, HBUTTON, "Next");
 	w22->labelfont(FONT);
 	w22->labelsize(FONT_SIZE);
 	w22->callback(cb_bn_use_items, (void*)(long)NEW_ONLY);
-	w22->tooltip("Use rig and antenna in following QSOs");
+	w22->tooltip("Use items in future QSOs");
 
-	max_w = max(max_w, w22->x() + w22->w() - curr_x);
-	max_h = max(max_h, w22->y() + w22->h() - curr_y);
+	guse->resizable(nullptr);
+	guse->size(GAP + w20->w() + GAP, HTEXT + w20->h() + w21->h() + w22->h() + GAP);
+	guse->end();
+
+	max_w = max(max_w, guse->x() + guse->w() - curr_x);
+	max_h = max(max_h, guse->y() + guse->h() - curr_y);
+
 	curr_x += max_w;
 	curr_y += max_h;
 
@@ -1434,18 +1435,10 @@ void qso_manager::load_locations() {
 	Fl_Preferences qths_settings(stations_settings, "QTHs");
 	// Number of items described in settings
 	int num_items = qths_settings.groups();
-	// Get the current item
-	char* current_item;
-	qths_settings.get("Current", current_item, "");
-	selected_qth_ = current_item;
-	next_qth_ = selected_qth_;
-	free(current_item);
-	all_qths_.clear();
 	// For each item in the settings
 	for (int i = 0; i < num_items; i++) {
 		// Get that item's settings
 		string name = qths_settings.group(i);
-		all_qths_.insert(name);
 	}
 
 }
@@ -1464,23 +1457,7 @@ void qso_manager::save_values() {
 	rig_grp_->save_values();
 	antenna_grp_->save_values();
 	callsign_grp_->save_values();
-
-	// Set the selected QTH
-	Fl_Preferences qths_settings(stations_settings, "QTHs");
-	qths_settings.set("Current", selected_qth_.c_str());
-}
-
-// Write next QSO values
-void qso_manager::save_next_values() {
-	Fl_Preferences stations_settings(settings_, "Stations");
-	rig_grp_->save_next_value();
-	antenna_grp_->save_next_value();
-
-	// Set the selected QTH
-	Fl_Preferences qths_settings(stations_settings, "QTHs");
-	qths_settings.set("Current", next_qth_.c_str());
-	// and copy next to current
-	selected_qth_ = next_qth_;
+	qth_grp_->save_values();
 }
 
 // Enable the widgets - activate the group associated with each rig handler when that
@@ -1523,6 +1500,11 @@ void qso_manager::enable_spad_widgets() {
 
 // Enable Antenna and rig setting widgets
 void qso_manager::enable_use_widgets() {
+
+	antenna_grp_->enable_widgets();
+	rig_grp_->enable_widgets();
+	callsign_grp_->enable_widgets();
+	qth_grp_->enable_widgets();
 
 	// Antenna/rig compatibility
 	Fl_Help_View* mlo = (Fl_Help_View*)ant_rig_box_;
@@ -1595,14 +1577,11 @@ void qso_manager::enable_use_widgets() {
 		}
 	}
 	mlo->textcolor(fl_contrast(FL_BLACK, mlo->color()));
-	// Update QTH chice
-	populate_qth_choice();
 }
 
 // Update just the Locations widget from settings
 void qso_manager::update_locations() {
 	load_locations();
-	populate_qth_choice();
 }
 
 // Enable CAT Connection widgets
@@ -2094,33 +2073,37 @@ void qso_manager::cb_bn_use_items(Fl_Widget* w, void* v) {
 	use_item_t use = (use_item_t)(long)v;
 	qso_manager* that = ancestor_view<qso_manager>(w);
 	record* sel_record = book_->get_record();
+	Fl_Preferences stations_settings(settings_, "Stations");
+	Fl_Preferences qths_settings(stations_settings, "QTHs");
 	switch (use) {
 	case SELECTED_ONLY:
 		// Update selected record only with antenna and rig
 		sel_record->item("MY_RIG", that->rig_grp_->name());
 		sel_record->item("MY_ANTENNA", that->antenna_grp_->name());
 		sel_record->item("STATION_CALLSIGN", that->callsign_grp_->name());
-		sel_record->item("APP_ZZA_QTH", that->selected_qth_);
+		sel_record->item("APP_ZZA_QTH", that->qth_grp_->name());
 		tabbed_forms_->update_views(nullptr, HT_MINOR_CHANGE, book_->selection());
 		break;
 	case SELECTED_NEW:
 		// Update selected and subsequent records with antenna and rig
 		sel_record->item("MY_RIG", that->rig_grp_->name());
 		sel_record->item("MY_ANTENNA", that->antenna_grp_->name());
-		sel_record->item("APP_ZZA_QTH", that->selected_qth_);
+		sel_record->item("APP_ZZA_QTH", that->qth_grp_->name());
 		sel_record->item("STATION_CALLSIGN", that->callsign_grp_->name());
+		that->rig_grp_->update_settings_name();
+		that->antenna_grp_->update_settings_name();
+		that->callsign_grp_->update_settings_name();
+		that->qth_grp_->update_settings_name();
 		tabbed_forms_->update_views(nullptr, HT_MINOR_CHANGE, book_->selection());
-		that->rig_grp_->next() = that->rig_grp_->name();
-		that->antenna_grp_->next() = that->antenna_grp_->name();
-		that->next_qth_ = that->selected_qth_;
 		break;
 	case NEW_ONLY:
 		// Set subsequent records with antenna and rig
 		sel_record->user_details();
-		that->rig_grp_->next() = that->rig_grp_->name();
-		that->antenna_grp_->next() = that->antenna_grp_->name();
-		that->callsign_grp_->next() = that->callsign_grp_->name();
-		that->next_qth_ = that->selected_qth_;
+		that->rig_grp_->update_settings_name();
+		that->antenna_grp_->update_settings_name();
+		that->callsign_grp_->update_settings_name();
+		that->qth_grp_->update_settings_name();
+		tabbed_forms_->update_views(nullptr, HT_MINOR_CHANGE, book_->selection());
 		break;
 	}
 }
@@ -2438,21 +2421,6 @@ void qso_manager::populate_baud_choice() {
 	}
 }
 
-// Populate QTH choice
-void qso_manager::populate_qth_choice() {
-	ch_qth_->clear();
-	int index = 0;
-	for (auto it = all_qths_.begin(); it != all_qths_.end(); it++, index++) {
-		ch_qth_->add((*it).c_str());
-		if (*it == selected_qth_) {
-			ch_qth_->value(index);
-		}
-	}
-	Fl_Preferences stations_settings(settings_, "Stations");
-	Fl_Preferences qths_settings(stations_settings, "QTHs");
-	Fl_Preferences qth_settings(qths_settings, selected_qth_.c_str());
-}
-
 // Return the logging mode
 qso_manager::logging_mode_t qso_manager::logging_mode() {
 	return logging_mode_;
@@ -2490,7 +2458,7 @@ record* qso_manager::start_qso() {
 		current_qso_->item("STATION_CALLSIGN", callsign_grp_->name());
 		current_qso_->item("MY_RIG", rig_grp_->name());
 		current_qso_->item("MY_ANTENNA", antenna_grp_->name());
-		current_qso_->item("APP_ZZA_QTH", selected_qth_);
+		current_qso_->item("APP_ZZA_QTH", qth_grp_->name());
 		break;
 	case LM_ON_AIR_CAT:
 		// Interactive mode - start QSO - update fields from radio 
@@ -2522,7 +2490,7 @@ record* qso_manager::start_qso() {
 		current_qso_->item("STATION_CALLSIGN", callsign_grp_->name());
 		current_qso_->item("MY_RIG", rig_grp_->name());
 		current_qso_->item("MY_ANTENNA", antenna_grp_->name());
-		current_qso_->item("APP_ZZA_QTH", selected_qth_);
+		current_qso_->item("APP_ZZA_QTH", qth_grp_->name());
 		break;
 	case LM_ON_AIR_COPY:
 		// Interactive mode - start QSO - date/time only
@@ -2550,7 +2518,7 @@ record* qso_manager::start_qso() {
 		current_qso_->item("STATION_CALLSIGN", callsign_grp_->name());
 		current_qso_->item("MY_RIG", rig_grp_->name());
 		current_qso_->item("MY_ANTENNA", antenna_grp_->name());
-		current_qso_->item("APP_ZZA_QTH", selected_qth_);
+		current_qso_->item("APP_ZZA_QTH", qth_grp_->name());
 		break;
 	case LM_ON_AIR_TIME:
 		// Interactive mode - start QSO - date/time only
@@ -2578,7 +2546,7 @@ record* qso_manager::start_qso() {
 		current_qso_->item("STATION_CALLSIGN", callsign_grp_->name());
 		current_qso_->item("MY_RIG", rig_grp_->name());
 		current_qso_->item("MY_ANTENNA", antenna_grp_->name());
-		current_qso_->item("APP_ZZA_QTH", selected_qth_);
+		current_qso_->item("APP_ZZA_QTH", qth_grp_->name());
 		break;
 	}
 
@@ -2616,11 +2584,6 @@ record* qso_manager::dummy_qso() {
 	dummy->item("NAME", string(""));
 	dummy->item("QTH", string(""));
 	dummy->item("GRIDSQUARE", string(""));
-	// Prepopulate rig, antenna, QTH and callsign
-	dummy->item("STATION_CALLSIGN", callsign_grp_->next());
-	dummy->item("MY_RIG", rig_grp_->next());
-	dummy->item("MY_ANTENNA", antenna_grp_->next());
-	dummy->item("APP_ZZA_QTH", next_qth_);
 
 	return dummy;
 }
@@ -2661,8 +2624,6 @@ void qso_manager::end_qso() {
 		record_modified = true;
 	}
 
-	// Now update rig, antenna and QTH to next value
-	save_next_values();
 	// Upload QSO to QSL servers
 	book_->upload_qso(record_number);
 	// Update this view

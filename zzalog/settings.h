@@ -24,7 +24,6 @@ namespace zzalog {
 			DLG_FORMAT,
 			DLG_FILES,
 			DLG_WEB,
-			DLG_QTH,
 			DLG_COLUMN,
 			DLG_ADIF,
 			DLG_QSL,

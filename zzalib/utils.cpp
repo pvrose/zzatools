@@ -395,7 +395,7 @@ size_t zzalib::find(const char* data, size_t length, const char* match) {
 
 // Search for single character match
 size_t zzalib::find(const char* data, size_t length, const char match) {
-	int pos = 0;
+	int pos = length;
 	bool found = false;
 	// Compare each char in data with match
 	// pos should get set to the position that matches (or length if none do

@@ -1,6 +1,7 @@
 #include "qth_dialog.h"
 #include "../zzalib/callback.h"
 #include "../zzalib/rig_if.h"
+#include "../zzalib/utils.h"
 
 #include "record.h"
 #include "pfx_data.h"
@@ -32,346 +33,306 @@ extern rig_if* rig_if_;
 extern qso_manager* qso_manager_;
 extern dxa_if* dxa_if_;
 
-const char* SETTINGS_NAME = "Stations";
-const char* QTH_SETTINGS_NAME = "QTHs";
-
-// Populate the item selector
-void qth_dialog::populate_choice() {
-	Fl_Input_Choice* w = (Fl_Input_Choice*)choice_;
-	w->menubutton()->clear();
-	w->input()->value("");
-	int index = 0;
-	// For each item
-	for (auto it = all_items_.begin(); it != all_items_.end(); it++) {
-		if (it->second || display_all_items_) {
-			// If item is currently active or we want to display both active and inactive items
-			// Add the item name to the choice
-			w->menubutton()->add(it->first.c_str(), 0, cb_ch_stn);
-			if (it->first == selected_name_) {
-				// If it's the current selection, show it as such
-				w->value(index);
-				((Fl_Light_Button*)active_)->value(it->second);
-				selected_item_ = index;
-			}
-			index++;
-		}
-	}
-	w->menubutton()->textsize(FONT_SIZE);
-	w->menubutton()->textfont(FONT);
-	update_item();
-}
-
-// button callback - add
-// Add the text value of the choice to the list of items - new name is typed into the choice
-void qth_dialog::cb_bn_add(Fl_Widget* w, void* v) {
-	qth_dialog* that = ancestor_view<qth_dialog>(w);
-	// Get the value in the choice
-	string new_item = ((Fl_Input_Choice*)that->choice_)->value();
-	// Set it active (and add it if it's not there)
-	that->all_items_[new_item] = true;
-	that->selected_name_ = new_item;
-	that->add_item();
-	that->populate_choice();
-	that->redraw();
-}
-
-// button callback - delete
-void qth_dialog::cb_bn_del(Fl_Widget* w, void* v) {
-	qth_dialog* that = ancestor_view<qth_dialog>(w);
-	// Get the selected item name
-	string item = ((Fl_Input_Choice*)that->choice_)->menubutton()->text();
-	// get the name to show in its stead - if first name then use second else the previous one.
-	auto it = that->all_items_.find(item);
-	if (it == that->all_items_.begin()) {
-		it++;
-	}
-	else {
-		it--;
-	}
-	// Select the instead item - unless we are deleting the only one.
-	if (it != that->all_items_.end()) {
-		that->selected_name_ = it->first;
-	}
-	else {
-		that->selected_name_ = "";
-	}
-	// Delete the item
-	that->all_items_.erase(that->all_items_.find(item));
-	that->delete_item(item);
-	that->populate_choice();
-	that->redraw();
-}
-
-// button callback - all/active items
-// v is unused
-void qth_dialog::cb_bn_all(Fl_Widget* w, void* v) {
-	qth_dialog* that = ancestor_view<qth_dialog>(w);
-	that->display_all_items_ = ((Fl_Light_Button*)w)->value();
-	that->populate_choice();
-}
-
-// button callback - active/deactive
-// v is unused
-void qth_dialog::cb_bn_activ8(Fl_Widget* w, void* v) {
-	qth_dialog* that = ancestor_view<qth_dialog>(w);
-	// Set the item active or inactive dependant on state of light button
-	bool activate = ((Fl_Light_Button*)w)->value();
-	that->all_items_[that->selected_name_] = activate;
-	that->populate_choice();
-	that->redraw();
-}
-
-// choice callback
-// v is unused
-void qth_dialog::cb_ch_stn(Fl_Widget* w, void* v) {
-	// Input_Choice is a descendant of qth_dialog
-	Fl_Input_Choice* ch = ancestor_view<Fl_Input_Choice>(w);
-	qth_dialog* that = ancestor_view<qth_dialog>(ch);
-	if (ch->menubutton()->changed()) {
-		// Save current selection
-		that->save_item();
-		// Get the new item from the menu
-		that->selected_name_ = ch->menubutton()->text();
-		that->selected_item_ = ch->menubutton()->value();
-		// Update the shared choice value
-		ch->value(that->selected_name_.c_str());
-		// Update the active button
-		((Fl_Light_Button*)that->active_)->value(that->all_items_[that->selected_name_]);
-		that->update_item();
-	}
-	else {
-		// A new item has been typed in the input field
-		that->selected_name_ = ch->input()->value();
-		that->selected_item_ = -1;
-	}
-	that->redraw();
-}
-
 // QTH group constructor
-qth_dialog::qth_dialog(int X, int Y, int W, int H, const char* label) :
-	page_dialog(X, Y, W, H, label) {
+qth_dialog::qth_dialog(string qth_name) :
+	win_dialog(10, 10)
+{
+	qth_name_ = qth_name;
+
+	// Get settings
+	Fl_Preferences stations_settings(settings_, "Stations");
+	Fl_Preferences qths_settings(stations_settings, "QTHs");
+	bool exists = qths_settings.groupExists(qth_name_.c_str());
+	my_settings_ = new Fl_Preferences(qths_settings, qth_name_.c_str());
+
+	// Create window
+	string label;
+	if (exists) {
+		label = "Add QTH: " + qth_name_;
+	}
+	else {
+		label = "Modify QTH: " + qth_name_;
+	}
+	copy_label(label.c_str());
+
 	// Read settings
 	load_values();
 	// Create the form
-	create_form(X, Y);
+	create_form(0, 0);
 	// Enable widgets
 	enable_widgets();
-	// populate the choice an set and pass parameters to callback
-	// must be done after all widgets created
-	populate_choice();
-	// now populate the other items
-	add_item();
-	update_item();
 }
 
 // Destructor
 qth_dialog::~qth_dialog() {
-	for (auto it = all_qths_.begin(); it != all_qths_.end(); it++) {
-		delete it->second;
-	}
-	all_qths_.clear();
 }
 
 // Get initial data from settings - additional ones for the QTH group
 void qth_dialog::load_values() {
-	// Get the settings for the named group
-	Fl_Preferences stations_settings(settings_, SETTINGS_NAME);
-	my_settings_ = new Fl_Preferences(stations_settings, QTH_SETTINGS_NAME);
-	// Number of items described in settings
-	int num_items = my_settings_->groups();
-	// Get the current item
-	char* current_item;
-	int display_all;
-	my_settings_->get("Current", current_item, "");
-	selected_name_ = current_item;
-	free(current_item);
-	// Get whether to offer all or just the active ones
-	my_settings_->get("Display All", display_all, (int)false);
-	display_all_items_ = (bool)display_all;
-	// For each item in the settings
-	for (int i = 0; i < num_items; i++) {
-		// Get that item's settings
-		string name = my_settings_->group(i);
-		Fl_Preferences item_settings(*my_settings_, name.c_str());
-		int active;
-		item_settings.get("Active", active, (int)false);
-		all_items_[string(name)] = (bool)active;
-	}
-
-	// For each item in the settings
-	for (int i = 0; i < num_items; i++) {
-		// Get that item's settings
-		string name = my_settings_->group(i);
-		Fl_Preferences item_settings(*my_settings_, name.c_str());
-		// Get the QTH details
-		qth_info_t* qth = new qth_info_t;
-		char* temp;
-		item_settings.get("Operator Name", temp, "");
-		qth->name = temp;
-		free(temp);
-		item_settings.get("Street", temp, "");
-		qth->street = temp;
-		free(temp);
-		item_settings.get("Town", temp, "");
-		qth->town = temp;
-		free(temp);
-		item_settings.get("County", temp, "");
-		qth->county = temp;
-		free(temp);
-		item_settings.get("Country", temp, "");
-		qth->country = temp;
-		free(temp);
-		item_settings.get("Postcode", temp, "");
-		qth->postcode = temp;
-		free(temp);
-		item_settings.get("Locator", temp, "");
-		qth->locator = temp;
-		free(temp);
-		item_settings.get("DXCC Id", temp, "");
-		qth->dxcc_id = temp;
-		free(temp);
-		item_settings.get("DXCC Name", temp, "");
-		qth->dxcc_name = temp;
-		free(temp);
-		item_settings.get("State", temp, "");
-		qth->state = temp;
-		free(temp);
-		item_settings.get("CQ Zone", temp, "");
-		qth->cq_zone = temp;
-		free(temp);
-		item_settings.get("ITU Zone", temp, "");
-		qth->itu_zone = temp;
-		free(temp);
-		item_settings.get("Continent", temp, "");
-		qth->continent = temp;
-
-		free(temp);
-		item_settings.get("IOTA", temp, "");
-		qth->iota = temp;
-		free(temp);
-		all_qths_[string(name)] = qth;
-	}
-	// Get the current QTH settings
-	current_qth_ = *all_qths_[selected_name_];
+	// Get the QTH details
+	char* temp;
+	my_settings_->get("Operator Name", temp, "");
+	current_qth_.name = temp;
+	free(temp);
+	my_settings_->get("Street", temp, "");
+	current_qth_.street = temp;
+	free(temp);
+	my_settings_->get("District", temp, "");
+	current_qth_.area = temp;
+	free(temp);
+	my_settings_->get("City", temp, "");
+	current_qth_.city = temp;
+	free(temp);
+	my_settings_->get("Postcode", temp, "");
+	current_qth_.postcode = temp;
+	free(temp);
+	my_settings_->get("Locator", temp, "");
+	current_qth_.locator = temp;
+	free(temp);
+	my_settings_->get("DXCC Name", temp, "");
+	current_qth_.dxcc_name = temp;
+	free(temp);
+	my_settings_->get("DXCC Id", temp, "");
+	current_qth_.dxcc_id = temp;
+	free(temp);
+	my_settings_->get("State", temp, "");
+	current_qth_.state = temp;
+	free(temp);
+	my_settings_->get("County", temp, "");
+	current_qth_.county = temp;
+	free(temp);
+	my_settings_->get("CQ Zone", temp, "");
+	current_qth_.cq_zone = temp;
+	free(temp);
+	my_settings_->get("ITU Zone", temp, "");
+	current_qth_.itu_zone = temp;
+	free(temp);
+	my_settings_->get("Continent", temp, "");
+	current_qth_.continent = temp;
+	free(temp);
+	my_settings_->get("IOTA", temp, "");
+	current_qth_.iota = temp;
+	free(temp);
 }
 
 // create the form - additional widgets for QTH settings
 void qth_dialog::create_form(int X, int Y) {
-	// widget positions - rows
-	const int R1 = HTEXT;
-	const int H1 = HBUTTON;
-	const int R2 = R1 + H1 + GAP;
-	const int H2 = HBUTTON;
-	const int R3 = R2 + H2 + GAP;
-	const int H3 = HBUTTON;
-	const int HALL = R3 + 5 * H3 + GAP;
-
-	// widget positions - columns
-	const int C1A = GAP;
-	const int W1A = WEDIT;
-	const int C1B = GAP;
-	const int W1B = WBUTTON;
-	const int C2B = C1B + W1B + GAP;
-	const int W2B = WBUTTON;
-	const int C3 = max(C1A + W1A, C2B + W2B) + GAP;
-	const int W3 = WBUTTON;
-	// Second row of columns
-	const int C1C = GAP + WLABEL;
-	const int W1C = WSMEDIT;
-	const int C2C = C1C + W1C + GAP + WLABEL;
-	const int W2C = WSMEDIT;
-	const int C3C = C2C + W2C + GAP + WLABEL;
-	const int W3C = WSMEDIT;
-	const int WALL = max (C3 + W3 + GAP, C3C + W3C + GAP);
-
-	const int COL[3] = { C1C, C2C, C3C };
 
 	// Explicitly call begin to ensure that we haven't had too many ends.
 	begin();
 
 	labelsize(FONT_SIZE);
-	align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
-	box(FL_THIN_DOWN_BOX);
-	// Row 1
-	// item selection choice
-	Fl_Input_Choice* ch1_1 = new Fl_Input_Choice(X + C1A, Y + R1, W1A, H1);
-	ch1_1->textsize(FONT_SIZE);
-	ch1_1->callback(cb_value<Fl_Input_Choice, string>, (void*)&selected_name_);
-	ch1_1->when(FL_WHEN_RELEASE);
-	ch1_1->tooltip("Select item");
-	choice_ = ch1_1;
-	// Add/Modify button
-	Fl_Button* bn1_3 = new Fl_Button(X + C3, Y + R1, W3, H1, "Add/Modify");
-	bn1_3->labelsize(FONT_SIZE);
-	bn1_3->color(fl_lighter(FL_BLUE));
-	bn1_3->callback(cb_bn_add);
-	bn1_3->when(FL_WHEN_RELEASE);
-	bn1_3->tooltip("Add or modify the selected item");
 
-	// Row 2
-	// all items
-	Fl_Light_Button* bn2_1 = new Fl_Light_Button(X + C1B, Y + R2, W1B, H2, "Show All");
-	bn2_1->value(display_all_items_);
-	bn2_1->selection_color(FL_GREEN);
-	bn2_1->labelsize(FONT_SIZE);
-	bn2_1->callback(cb_bn_all);
-	bn2_1->when(FL_WHEN_RELEASE);
-	bn2_1->tooltip("Show all items (not just active ones)");
-	// item is active
-	Fl_Light_Button* bn2_2 = new Fl_Light_Button(X + C2B, Y + R2, W2B, H2, "Active");
-	// set it when the selected_item is active
-	bn2_2->labelsize(FONT_SIZE);
-	bn2_2->selection_color(FL_GREEN);
-	bn2_2->callback(cb_bn_activ8);
-	bn2_2->when(FL_WHEN_RELEASE);
-	bn2_2->tooltip("Set/Clear that the item is active");
-	active_ = bn2_2;
-	// Delete button
-	Fl_Button* bn2_3 = new Fl_Button(X + C3, Y + R2, W3, H2, "Delete");
-	bn2_3->labelsize(FONT_SIZE);
-	bn2_3->color(fl_lighter(FL_RED));
-	bn2_3->callback(cb_bn_del);
-	bn2_3->when(FL_WHEN_RELEASE);
-	bn2_3->tooltip("Delete the item");
+	const int WIP = WBUTTON * 2;
 
-	// Additional widgets for QTHs - for each widget
-	for (int i = 0; i < NUM_QTH_PARAMS; i++) {
-		// Create an input
-		Fl_Input* ip3;
-		// X-position
+	// Column 1: Opeartor name and address
+	int curr_x = X + GAP;
+	int curr_y = Y + HTEXT;
+	int max_w = curr_x - X;
+	int max_h = curr_y - Y;
+	// Operator name
+	ip_name_ = new Fl_Input(curr_x, curr_y, WIP, HBUTTON, "Op. Name");
+	ip_name_->labelsize(FONT_SIZE);
+	ip_name_->labelfont(FONT);
+	ip_name_->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
+	ip_name_->textfont(FONT);
+	ip_name_->textsize(FONT_SIZE);
+	ip_name_->when(FL_WHEN_RELEASE);
+	ip_name_->value(current_qth_.name.c_str());
+	ip_name_->callback(cb_value<Fl_Input, string>, (void*)&current_qth_.name);
+	ip_name_->tooltip("Enter operator name");
+	// Address line 1 (
+	curr_y += HBUTTON + HTEXT;
+	ip_address1_ = new Fl_Input(curr_x, curr_y, WIP, HBUTTON, "Street");
+	ip_address1_->labelsize(FONT_SIZE);
+	ip_address1_->labelfont(FONT);
+	ip_address1_->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
+	ip_address1_->textfont(FONT);
+	ip_address1_->textsize(FONT_SIZE);
+	ip_address1_->when(FL_WHEN_RELEASE);
+	ip_address1_->value(current_qth_.street.c_str());
+	ip_address1_->callback(cb_value<Fl_Input, string>, (void*)&current_qth_.street);
+	ip_address1_->tooltip("Enter Street address - forms MY_STREET");
+	// Address line 2
+	curr_y += HBUTTON + HTEXT;
+	ip_address2_ = new Fl_Input(curr_x, curr_y, WIP, HBUTTON, "Area");
+	ip_address2_->labelsize(FONT_SIZE);
+	ip_address2_->labelfont(FONT);
+	ip_address2_->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
+	ip_address2_->textfont(FONT);
+	ip_address2_->textsize(FONT_SIZE);
+	ip_address2_->when(FL_WHEN_RELEASE);
+	ip_address2_->value(current_qth_.area.c_str());
+	ip_address2_->callback(cb_value<Fl_Input, string>, (void*)&current_qth_.area);
+	ip_address2_->tooltip("Enter area within town/city - ignored in ADIF");
+	// Address line 3
+	curr_y += HBUTTON + HTEXT;
+	ip_address3_ = new Fl_Input(curr_x, curr_y, WIP, HBUTTON, "Town/City");
+	ip_address3_->labelsize(FONT_SIZE);
+	ip_address3_->labelfont(FONT);
+	ip_address3_->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
+	ip_address3_->textfont(FONT);
+	ip_address3_->textsize(FONT_SIZE);
+	ip_address3_->when(FL_WHEN_RELEASE);
+	ip_address3_->value(current_qth_.city.c_str());
+	ip_address3_->callback(cb_value<Fl_Input, string>, (void*)&current_qth_.city);
+	ip_address3_->tooltip("Enter town/city - forms MY_CITY");
+	// Address line 4
+	curr_y += HBUTTON + HTEXT;
+	ip_address4_ = new Fl_Input(curr_x, curr_y, WIP, HBUTTON, "Postal code");
+	ip_address4_->labelsize(FONT_SIZE);
+	ip_address4_->labelfont(FONT);
+	ip_address4_->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
+	ip_address4_->textfont(FONT);
+	ip_address4_->textsize(FONT_SIZE);
+	ip_address4_->when(FL_WHEN_RELEASE);
+	ip_address4_->value(current_qth_.postcode.c_str());
+	ip_address4_->callback(cb_ip_upper, (void*)&current_qth_.postcode);
+	ip_address4_->tooltip("Enter Postcode - forms MY_POSTCODE");
 
-		int x = COL[qth_params_[i].col];
-		// Y-position
-		int y = Y + R3 + qth_params_[i].row * H3;
-		switch (qth_params_[i].type) {
-		case INTEGER:
-			// Widget is for integer input only
-			ip3 = new Fl_Int_Input(x, y, W1C, H3, qth_params_[i].label);
-			ip3->callback(cb_value<Fl_Int_Input, string>, qth_params_[i].v);
-			break;
-		case MIXED:
-			// Widget is for text input
-			ip3 = new intl_input(x, y, W1C, H3, qth_params_[i].label);
-			ip3->callback(cb_value<intl_input, string>, qth_params_[i].v);
-			break;
-		case UPPER:
-			// Widget to only accept upper case
-			ip3 = new intl_input(x, y, W1C, H3, qth_params_[i].label);
-			ip3->callback(cb_ip_upper, qth_params_[i].v);
-			break;
-		}
-		ip3->labelsize(FONT_SIZE);
-		ip3->textsize(FONT_SIZE);
-		ip3->when(FL_WHEN_RELEASE);
-		char temp[128];
-		snprintf(temp, 128, "Enter new value for %s", qth_params_[i].label);
-		ip3->copy_tooltip(temp);
-		qth_info_[i] = ip3;
-	}
+	max_h += 5 * (HBUTTON + HTEXT);
+	max_w += WIP + GAP;
+	curr_y = Y + HTEXT;
+	curr_x += WIP + GAP;
+
+	// Locator
+	ip_locator_ = new Fl_Input(curr_x, curr_y, WIP, HBUTTON, "Locator");
+	ip_locator_->labelsize(FONT_SIZE);
+	ip_locator_->labelfont(FONT);
+	ip_locator_->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
+	ip_locator_->textfont(FONT);
+	ip_locator_->textsize(FONT_SIZE);
+	ip_locator_->when(FL_WHEN_RELEASE);
+	ip_locator_->value(current_qth_.locator.c_str());
+	ip_locator_->callback(cb_ip_upper, (void*)&current_qth_.locator);
+	ip_locator_->tooltip("Enter grid locator");
+	// DXCC name (
+	curr_y += HBUTTON + HTEXT;
+	ip_dxcc_ = new Fl_Input(curr_x, curr_y, WIP, HBUTTON, "DXCC Entity");
+	ip_dxcc_->labelsize(FONT_SIZE);
+	ip_dxcc_->labelfont(FONT);
+	ip_dxcc_->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
+	ip_dxcc_->textfont(FONT);
+	ip_dxcc_->textsize(FONT_SIZE);
+	ip_dxcc_->when(FL_WHEN_RELEASE);
+	ip_dxcc_->value(current_qth_.dxcc_name.c_str());
+	ip_dxcc_->callback(cb_ip_cty, (void*)&current_qth_.dxcc_name);
+	ip_dxcc_->tooltip("Enter DXCC Entity - used to generate MY_COUNTRY");
+	// DXCC Reference id. number
+	curr_y += HBUTTON + HTEXT;
+	ip_dxcc_adif_ = new Fl_Int_Input(curr_x, curr_y, WIP, HBUTTON, "DXCC Id.");
+	ip_dxcc_adif_->labelsize(FONT_SIZE);
+	ip_dxcc_adif_->labelfont(FONT);
+	ip_dxcc_adif_->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
+	ip_dxcc_adif_->textfont(FONT);
+	ip_dxcc_adif_->textsize(FONT_SIZE);
+	ip_dxcc_adif_->when(FL_WHEN_RELEASE);
+	ip_dxcc_adif_->value(current_qth_.dxcc_id.c_str());
+	ip_dxcc_adif_->callback(cb_value<Fl_Input, string>, (void*)&current_qth_.dxcc_id);
+	ip_dxcc_adif_->tooltip("Enter DXCC Id - forms MY_DXCC");
+	// Primry Admin. Subdivision (E.g. US State)
+	curr_y += HBUTTON + HTEXT;
+	ip_admin1_ = new Fl_Input(curr_x, curr_y, WIP, HBUTTON, "1st Level");
+	ip_admin1_->labelsize(FONT_SIZE);
+	ip_admin1_->labelfont(FONT);
+	ip_admin1_->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
+	ip_admin1_->textfont(FONT);
+	ip_admin1_->textsize(FONT_SIZE);
+	ip_admin1_->when(FL_WHEN_RELEASE);
+	ip_admin1_->value(current_qth_.state.c_str());
+	ip_admin1_->callback(cb_value<Fl_Input, string>, (void*)&current_qth_.state);
+	ip_admin1_->tooltip("Enter first level sub-division - eg US State - forms MY_STATE");
+	// Secondary Admin. subdivision (e.g. US County)
+	curr_y += HBUTTON + HTEXT;
+	ip_admin2_ = new Fl_Input(curr_x, curr_y, WIP, HBUTTON, "2nd level");
+	ip_admin2_->labelsize(FONT_SIZE);
+	ip_admin2_->labelfont(FONT);
+	ip_admin2_->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
+	ip_admin2_->textfont(FONT);
+	ip_admin2_->textsize(FONT_SIZE);
+	ip_admin2_->when(FL_WHEN_RELEASE);
+	ip_admin2_->value(current_qth_.county.c_str());
+	ip_admin2_->callback(cb_value<Fl_Input, string>, (void*)&current_qth_.county);
+	ip_admin2_->tooltip("Enter second level sub-division - eg US County - forms MY_COUNTY");
+
+	max_h = max(max_h, Y + HTEXT + 5 * (HBUTTON + HTEXT));
+	max_w += WIP + GAP;
+	curr_y = Y + HTEXT;
+	curr_x += WIP + GAP;
+
+	// CQ Zone
+	ip_cq_zone_ = new Fl_Int_Input(curr_x, curr_y, WIP, HBUTTON, "CQ Zone");
+	ip_cq_zone_->labelsize(FONT_SIZE);
+	ip_cq_zone_->labelfont(FONT);
+	ip_cq_zone_->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
+	ip_cq_zone_->textfont(FONT);
+	ip_cq_zone_->textsize(FONT_SIZE);
+	ip_cq_zone_->when(FL_WHEN_RELEASE);
+	ip_cq_zone_->value(current_qth_.cq_zone.c_str());
+	ip_cq_zone_->callback(cb_value<Fl_Input, string>, (void*)&current_qth_.cq_zone);
+	ip_cq_zone_->tooltip("Enter CQ Zone - forms MY_CQ_ZONE");
+	// ITU Zone
+	curr_y += HBUTTON + HTEXT;
+	ip_itu_zone_ = new Fl_Int_Input(curr_x, curr_y, WIP, HBUTTON, "ITU Zone");
+	ip_itu_zone_->labelsize(FONT_SIZE);
+	ip_itu_zone_->labelfont(FONT);
+	ip_itu_zone_->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
+	ip_itu_zone_->textfont(FONT);
+	ip_itu_zone_->textsize(FONT_SIZE);
+	ip_itu_zone_->when(FL_WHEN_RELEASE);
+	ip_itu_zone_->value(current_qth_.itu_zone.c_str());
+	ip_itu_zone_->callback(cb_value<Fl_Input, string>, (void*)&current_qth_.itu_zone);
+	ip_itu_zone_->tooltip("Enter ITU Zone - forms MY_ITU_ZONE");
+	// Continent
+	curr_y += HBUTTON + HTEXT;
+	ip_cont_ = new Fl_Input(curr_x, curr_y, WIP, HBUTTON, "Continent");
+	ip_cont_->labelsize(FONT_SIZE);
+	ip_cont_->labelfont(FONT);
+	ip_cont_->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
+	ip_cont_->textfont(FONT);
+	ip_cont_->textsize(FONT_SIZE);
+	ip_cont_->when(FL_WHEN_RELEASE);
+	ip_cont_->value(current_qth_.continent.c_str());
+	ip_cont_->callback(cb_ip_upper, (void*)&current_qth_.continent);
+	ip_cont_->tooltip("Enter continent (2-char) - forms MY_CONT");
+	// Address line 4
+	curr_y += HBUTTON + HTEXT;
+	ip_iota_ = new Fl_Input(curr_x, curr_y, WIP, HBUTTON, "IOTA");
+	ip_iota_->labelsize(FONT_SIZE);
+	ip_iota_->labelfont(FONT);
+	ip_iota_->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
+	ip_iota_->textfont(FONT);
+	ip_iota_->textsize(FONT_SIZE);
+	ip_iota_->when(FL_WHEN_RELEASE);
+	ip_iota_->value(current_qth_.iota.c_str());
+	ip_iota_->callback(cb_ip_upper, (void*)&current_qth_.iota);
+	ip_iota_->tooltip("Enter IOTA Reference - forms MY_IOTA");
+
+	max_h = max(max_h, Y + HTEXT + 4 * (HBUTTON + HTEXT)) + GAP;
+	max_w += WIP + GAP;
+	curr_y = Y + max_h;
+	curr_x = X + GAP;
+
+	// OK Button
+	Fl_Button* bn_ok = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "OK");
+	bn_ok->labelsize(FONT_SIZE);
+	bn_ok->callback(cb_bn_ok);
+	bn_ok->when(FL_WHEN_RELEASE);
+	bn_ok->tooltip("Accept changes");
+	// Cancel button
+	curr_x += WBUTTON + GAP;
+	Fl_Button* bn_cancel = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Cancel");
+	bn_cancel->labelsize(FONT_SIZE);
+	bn_cancel->callback(cb_bn_cancel);
+	bn_cancel->when(FL_WHEN_RELEASE);
+	bn_cancel->tooltip("Cancel changes");
+
+	max_w = max(max_w, bn_cancel->x() + bn_cancel->w() + GAP);
+	max_h += GAP + HBUTTON + GAP;
 
 	// resize the group accordingly
 	resizable(nullptr);
-	size(WALL, HALL);
+	size(max_w, max_h);
 	show();
 	end();
 }
@@ -380,83 +341,40 @@ void qth_dialog::create_form(int X, int Y) {
 void qth_dialog::save_values() {
 	// Clear to remove deleted entries
 	my_settings_->clear();
-	*all_qths_[selected_name_] = current_qth_;
-
-	my_settings_->set("Current", selected_name_.c_str());
-	my_settings_->set("Display All", display_all_items_);
-	int index = 0;
-	// For each item
-	for (auto it = all_items_.begin(); it != all_items_.end(); it++) {
-		// Get item settings
-		if (it->first.length()) {
-			Fl_Preferences item_settings(*my_settings_, it->first.c_str());
-			item_settings.set("Active", it->second);
-		}
-		index++;
-	}
-	// For each item
-	for (auto it = all_items_.begin(); it != all_items_.end(); it++) {
-		if (it->first.length()) {
-			// Get item settings
-			Fl_Preferences item_settings(*my_settings_, it->first.c_str());
-			// For QTH there are additional data to save
-			qth_info_t* qth = all_qths_[it->first];
-			item_settings.set("Operator Name", qth->name.c_str());
-			item_settings.set("Street", qth->street.c_str());
-			item_settings.set("Town", qth->town.c_str());
-			item_settings.set("County", qth->county.c_str());
-			item_settings.set("Post Code", qth->postcode.c_str());
-			item_settings.set("Country", qth->country.c_str());
-			item_settings.set("Continent", qth->continent.c_str());
-			item_settings.set("Locator", qth->locator.c_str());
-			item_settings.set("IOTA", qth->iota.c_str());
-			item_settings.set("DXCC Id", qth->dxcc_id.c_str());
-			item_settings.set("DXCC Name", qth->dxcc_name.c_str());
-			item_settings.set("CQ Zone", qth->cq_zone.c_str());
-			item_settings.set("ITU Zone", qth->itu_zone.c_str());
-			item_settings.set("State", qth->state.c_str());
-		}
-	}
-	// Redraw views that need a location
-	tabbed_forms_->update_views(nullptr, HT_LOCATION, -1);
+	// Get the QTH details
+	my_settings_->set("Operator Name", current_qth_.name.c_str());
+	my_settings_->set("Street", current_qth_.street.c_str());
+	my_settings_->set("District", current_qth_.area.c_str());
+	my_settings_->set("City", current_qth_.city.c_str());
+	my_settings_->set("Postcode", current_qth_.postcode.c_str());
+	my_settings_->set("Locator", current_qth_.locator.c_str());
+	my_settings_->set("DXCC Name", current_qth_.dxcc_name.c_str());
+	my_settings_->set("DXCC Id", current_qth_.dxcc_id.c_str());
+	my_settings_->set("State", current_qth_.state.c_str());
+	my_settings_->set("County", current_qth_.county.c_str());
+	my_settings_->set("CQ Zone", current_qth_.cq_zone.c_str());
+	my_settings_->set("ITU Zone", current_qth_.itu_zone.c_str());
+	my_settings_->set("Continent", current_qth_.continent.c_str());
+	my_settings_->set("IOTA", current_qth_.iota.c_str());
 
 }
 
-// Update QTH related fields
-void qth_dialog::update_item() {
-	// Get the current selection
-	current_qth_ = *all_qths_[selected_name_];
-	// For each QTH input widget
-	for (int i = 0; i < NUM_QTH_PARAMS; i++) {
-		// Set the text in the widget
-		((intl_input*)qth_info_[i])->value(((string*)qth_params_[i].v)->c_str());
-		// Put a reference to the value location
-		((intl_input*)qth_info_[i])->user_data(qth_params_[i].v);
-	}
-}
-
-// Add an item
-void qth_dialog::add_item() {
-	// For QTHs - see if it's new
-	if (all_qths_.find(selected_name_) == all_qths_.end()) {
-		// Create a new QTH
-		qth_info_t* qth = new qth_info_t;
-		all_qths_[selected_name_] = qth;
-	}
-	else {
-		// Copy current QTH value to this entry
-		*all_qths_[selected_name_] = current_qth_;
-	}
-}
-
-// Deleta an item
-void qth_dialog::delete_item(string item) {
-	all_qths_.erase(all_qths_.find(item));
-}
-
-// Save an item
-void qth_dialog::save_item() {
-	*all_qths_[selected_name_] = current_qth_;
+// Add values
+void qth_dialog::enable_widgets() {
+	ip_name_->value(current_qth_.name.c_str());
+	ip_address1_->value(current_qth_.street.c_str());
+	ip_address2_->value(current_qth_.area.c_str());
+	ip_address3_->value(current_qth_.city.c_str());
+	ip_address4_->value(current_qth_.postcode.c_str());
+	ip_locator_->value(current_qth_.locator.c_str());
+	ip_dxcc_->value(current_qth_.dxcc_name.c_str());
+	ip_dxcc_adif_->value(current_qth_.dxcc_id.c_str());
+	ip_admin1_->value(current_qth_.state.c_str());
+	ip_admin2_->value(current_qth_.county.c_str());
+	ip_cq_zone_->value(current_qth_.cq_zone.c_str());
+	ip_itu_zone_->value(current_qth_.itu_zone.c_str());
+	ip_cont_->value(current_qth_.continent.c_str());
+	ip_iota_->value(current_qth_.iota.c_str());
 }
 
 // Callback that converts what is typed to upper-case
@@ -467,3 +385,79 @@ void qth_dialog::cb_ip_upper(Fl_Widget* w, void* v) {
 	((intl_input*)w)->value(((string*)v)->c_str());
 }
 
+// DXCC callback 
+// v is pointer to the callsign field of the QTH structure
+void qth_dialog::cb_ip_cty(Fl_Widget* w, void* v) {
+	qth_dialog* that = ancestor_view<qth_dialog>(w);
+	qth_info_t* qth = &that->current_qth_;
+	cb_value<Fl_Input, string>(w, v);
+	string* value = (string*)v;
+	// Find prefix
+	size_t pos = zzalib::find(value->c_str(), value->length(), ':');
+	// No colon found
+	string nickname = value->substr(0, pos);
+	// Get the prefix and track up to the DXCC prefix
+	prefix* prefix = pfx_data_->get_prefix(nickname);
+	// Get CQZone - if > 1 supplied then message for now
+	if (prefix->cq_zones_.size() > 1) {
+		string message = "STATION: Multiple CQ Zones: ";
+		for (unsigned int i = 0; i < prefix->cq_zones_.size(); i++) {
+			string zone = to_string(prefix->cq_zones_[i]);
+			message += zone;
+		}
+		status_->misc_status(ST_WARNING, message.c_str());
+		qth->cq_zone = "";
+	}
+	else {
+		// Set it in the QTH
+		qth->cq_zone = to_string(prefix->cq_zones_[0]);
+	}
+	// Get ITUZone - if > 1 supplied then message for now
+	if (prefix->itu_zones_.size() > 1) {
+		string message = "STATION: Multiple ITU Zones: ";
+		for (unsigned int i = 0; i < prefix->itu_zones_.size(); i++) {
+			string zone = to_string(prefix->itu_zones_[i]);
+			message += zone;
+		}
+		status_->misc_status(ST_WARNING, message.c_str());
+		qth->itu_zone = "";
+	}
+	else {
+		// Set it in the QTH
+		qth->itu_zone = to_string(prefix->itu_zones_[0]);
+	}
+	// Get Continent - if > 1 supplied then message for now
+	if (prefix->continents_.size() > 1) {
+		string message = "STATION: Multiple Continents: ";
+		for (unsigned int i = 0; i < prefix->continents_.size(); i++) {
+			message += prefix->continents_[i] + "; ";
+		}
+		status_->misc_status(ST_WARNING, message.c_str());
+		qth->continent = "";
+	}
+	else {
+		// Set it in the QTH
+		qth->continent = prefix->continents_[0];
+	}
+	qth->state = prefix->state_;
+	// Track up to DXCC prefix record
+	while (prefix->parent_ != nullptr) {
+		prefix = prefix->parent_;
+	}
+	// Fill in DXCC fields
+	qth->dxcc_id = to_string(prefix->dxcc_code_);
+	qth->dxcc_name = prefix->nickname_ + ": " + prefix->name_;
+
+	that->redraw();
+}
+
+void qth_dialog::cb_bn_ok(Fl_Widget * w, void* v) {
+	qth_dialog* that = ancestor_view<qth_dialog>(w);
+	that->save_values();
+	that->do_button(BN_OK);
+}
+
+void qth_dialog::cb_bn_cancel(Fl_Widget* w, void* v) {
+	qth_dialog* that = ancestor_view<qth_dialog>(w);
+	that->do_button(BN_CANCEL);
+}

@@ -68,6 +68,7 @@ namespace zzalog {
 			RIG,
 			ANTENNA,
 			CALLSIGN,
+			QTH,
 			NONE
 		};
 
@@ -112,8 +113,6 @@ namespace zzalog {
 		};
 		// Rig parameters (from handler onwards - rig only)
 		struct rig_xdata {
-			// Rig currently in use
-			bool active = false;
 			// Bands supported by rig
 			vector<string> intended_bands;
 			// CAT handler
@@ -130,8 +129,6 @@ namespace zzalog {
 		};
 		// Antenna parameters
 		struct item_data {
-			// Antenna currently in use
-			bool active = false;
 			//Bands supported
 			vector<string> intended_bands;
 			// Rig-only data
@@ -160,14 +157,12 @@ namespace zzalog {
 			virtual void create_form(int X, int Y);
 			// save values
 			virtual void save_values();
+			// Enable widgets
+			virtual void enable_widgets();
 			// button callback - add
 			static void cb_bn_add(Fl_Widget* w, void* v);
 			// button callback - delete
 			static void cb_bn_del(Fl_Widget* w, void* v);
-			// button callback - all/active items
-			static void cb_bn_all(Fl_Widget* w, void* v);
-			// button callback - active/deactive
-			static void cb_bn_activ8(Fl_Widget* w, void* v);
 			// choice callback
 			static void cb_ch_stn(Fl_Widget* w, void* v);
 			// Multi-browser callback
@@ -178,19 +173,16 @@ namespace zzalog {
 		protected:
 			// Choice widget
 			Fl_Widget* choice_;
-			// Active widget
-			Fl_Widget* active_;
 			// Band select widget
 			Fl_Widget* band_browser_;
+			// Current item value
+			Fl_Widget* op_settings_;
 			// selected item
 			int item_no_;
 			// all items 
 			list<string> all_items_;
-			// display all items
-			bool display_all_items_;
 			// Item name
 			string my_name_;
-			string next_name_;
 			// The settings
 			Fl_Preferences* my_settings_;
 			// Map per item name to item data
@@ -205,14 +197,12 @@ namespace zzalog {
 			item_data& info();
 			// return current name
 			string& name();
-			// return naext name
-			string& next();
-			// SAve next value
-			void save_next_value();
 			// type
 			item_t type_;
 			// in text for Fl_Preference
 			string settings_name_;
+			// Set current settings to name
+			void update_settings_name();
 		};
 
 
@@ -309,8 +299,6 @@ namespace zzalog {
 		void populate_model_choice();
 		//Populate baud rate choice
 		void populate_baud_choice();
-		// Populate QTH choice
-		void populate_qth_choice();
 		// Get logging mode
 		logging_mode_t logging_mode();
 		// Set logging mode
@@ -319,8 +307,6 @@ namespace zzalog {
 		void rig_update(string frequency, string mode, string power);
 		// Called when rig is closed
 		void update();
-		// Save next QSO values
-		void save_next_values();
 		// Update locations
 		void update_locations();
 		// Load locations
@@ -360,12 +346,6 @@ namespace zzalog {
 		bool wait_connect_;
 		// Widgets have been xcreated
 		bool created_;
-		// Selected equipment
-		string selected_qth_;
-		// Next name
-		string next_qth_;
-		// Avaiable QTHs
-		set<string> all_qths_;
 		// Keep track of alarm activation to avoid too many alarms for the same violation
 		enum { SWR_OK, SWR_WARNING, SWR_ERROR } previous_swr_alarm_, current_swr_alarm_;
 		enum { POWER_OK, POWER_WARNING } previous_pwr_alarm_, current_pwr_alarm_;
@@ -378,6 +358,7 @@ namespace zzalog {
 		common_grp* rig_grp_;
 		common_grp* antenna_grp_;
 		common_grp* callsign_grp_;
+		common_grp* qth_grp_;
 		Fl_Group* hamlib_grp_;
 		Fl_Group* flrig_grp_;
 		Fl_Group* norig_grp_;
@@ -394,8 +375,6 @@ namespace zzalog {
 		Fl_Widget* rig_choice_;
 		Fl_Widget* override_check_;
 		Fl_Widget* show_all_ports_;
-
-		Fl_Choice* ch_qth_;
 
 		// The text items
 		Fl_Text_Buffer* buffer_;
@@ -442,9 +421,8 @@ namespace zzalog {
 
 		const static int WEDITOR = 400;
 
-
 	};
-
 }
+
 #endif
 
