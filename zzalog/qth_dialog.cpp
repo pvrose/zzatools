@@ -448,6 +448,8 @@ void qth_dialog::cb_ip_cty(Fl_Widget* w, void* v) {
 	qth->dxcc_id = to_string(prefix->dxcc_code_);
 	qth->dxcc_name = prefix->nickname_ + ": " + prefix->name_;
 
+	// Update other widgets
+	that->enable_widgets();
 	that->redraw();
 }
 

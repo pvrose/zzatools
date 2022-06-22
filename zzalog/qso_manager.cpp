@@ -243,11 +243,11 @@ void qso_manager::common_grp::create_form(int X, int Y) {
 	// Row 1
 	// Output to display name feom settings
 	Fl_Output* op2_1 = new Fl_Output(X + C1, Y + R1, W1A, H1);
-	op2_1->box(FL_NO_BOX);
+	op2_1->box(FL_FLAT_BOX);
 	op2_1->color(FL_BACKGROUND_COLOR);
 	op2_1->labelsize(FONT_SIZE);
 	op2_1->labelfont(FONT);
-	op2_1->textfont(FONT | FL_BOLD);
+	//op2_1->textfont(FONT | FL_BOLD); // Font and colour are set in enable_widgets()
 	op2_1->textsize(FONT_SIZE);
 	op2_1->tooltip("Value in settings");
 	op_settings_ = op2_1;
@@ -265,13 +265,13 @@ void qso_manager::common_grp::create_form(int X, int Y) {
 	
 	// Row 3
 	// Add or modify this antenna or rig
-	Fl_Button* bn3_1 = new Fl_Button(X + C1, Y + R3, W1B, H3, (type_ != ANTENNA) ? "Add/Modify" : "Add");
+	Fl_Button* bn3_1 = new Fl_Button(X + C1, Y + R3, W1B, H3, "Add/Modify");
 	bn3_1->labelsize(FONT_SIZE);
 	bn3_1->color(fl_lighter(FL_BLUE));
 	bn3_1->labelcolor(FL_YELLOW);
 	bn3_1->callback(cb_bn_add);
 	bn3_1->when(FL_WHEN_RELEASE);
-	bn3_1->tooltip(type_ != ANTENNA ? "Add or modify the selected item" : "Add a new item - type in the selector");
+	bn3_1->tooltip("Add or modify the selected item - opens new dialog");
 
 	// Remove this antenna or rig
 	Fl_Button* bn3_2 = new Fl_Button(X + col1, Y + R3, W2B, H2, "Remove");
@@ -456,7 +456,6 @@ void qso_manager::common_grp::enable_widgets() {
 	char* next_value;
 	Fl_Output* op = (Fl_Output*)op_settings_;
 	my_settings_->get("Current", next_value, "");
-	op->value(next_value);
 	if (strcmp(next_value, my_name_.c_str())) {
 		op->textcolor(FL_RED);
 		op->textfont(FONT | FL_ITALIC);
@@ -465,6 +464,8 @@ void qso_manager::common_grp::enable_widgets() {
 		op->textcolor(FL_BLACK);
 		op->textfont(FONT | FL_BOLD);
 	}
+	op->value(next_value);
+	op->redraw();
 	free(next_value);
 	// Set values into choice
 	Fl_Input_Choice* ch = (Fl_Input_Choice*)choice_;
