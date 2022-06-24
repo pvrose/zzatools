@@ -497,7 +497,7 @@ void extract_data::extract_qsl(extract_data::extract_mode_t server) {
 		criteria(new_criteria, server);
 	}
 	if (server == CARD) {
-		// Only those for which we have received a card (QSL_RCVD==Y) - i.e. QSLL
+		// Only those for which we intend to send a card (QSL_SENT==Q - Queued)
 		new_criteria = {
 			/*search_cond_t condition*/ XC_FIELD,
 			/*search_comp_t comparator*/ XP_EQ,
@@ -510,10 +510,10 @@ void extract_data::extract_qsl(extract_data::extract_mode_t server) {
 			/*bool confirmed_lotw;*/ false,
 			/*bool confirmed_card;*/ false,
 			/*search_combi_t combi_mode;*/ XM_AND,
-			/*string field_name; */ "QSL_RCVD",
-			/*string pattern;*/ "Y"
+			/*string field_name; */ "QSL_SENT",
+			/*string pattern;*/ "Q"
 		};
-		status_->misc_status(ST_NOTE, "EXTRACT: Extracting replies to received cards");
+		status_->misc_status(ST_NOTE, "EXTRACT: Extracting queued cards only");
 		criteria(new_criteria, server);
 		// Ignore those with QSL_SENT==I (ignore)
 		new_criteria = {

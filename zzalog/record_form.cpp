@@ -808,12 +808,16 @@ void record_form::cb_bn_scale(Fl_Widget* w, void* v) {
 }
 
 // Set the QSL_RCVD and QSLRDATE values in current record
+// Set QSL_SENT to QUEUED if not already set
 // v is unused
 void record_form::cb_bn_log_card(Fl_Widget* w, void* v) {
 	record_form* that = ancestor_view<record_form>(w);
 	string today = now(false, "%Y%m%d");
 	that->record_1_->item("QSLRDATE", today);
 	that->record_1_->item("QSL_RCVD", string("Y"));
+	if (!that->record_1_->item("QSL_SENT").length()) {
+		that->record_1_->item("QSL_SENT", string("Q"));
+	}
 	// Redraw the list table and notify views of a minor change
 	that->record_table_->set_records(that->record_1_, that->record_2_, that->saved_record_);
 	that->my_book_->selection(that->item_num_1_, HT_MINOR_CHANGE, that);
