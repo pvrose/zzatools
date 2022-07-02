@@ -152,11 +152,6 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 			Fl::delete_widget(band_view_);
 			band_view_ = nullptr;
 		}
-		// Delete scratchpad
-		if (qso_manager_) {
-			delete qso_manager_;
-			qso_manager_ = nullptr;
-		}
 		// Close DxAtlas connection
 		if (dxa_if_) {
 			delete dxa_if_;
@@ -175,6 +170,11 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 				book_->delete_record(book_->new_record());
 				break;
 			}
+		}
+		// Delete scratchpad
+		if (qso_manager_) {
+			delete qso_manager_;
+			qso_manager_ = nullptr;
 		}
 		// Wait for auto-import of files to complete
 		if (import_data_) {
@@ -670,7 +670,7 @@ void add_band_view() {
 		else {
 			// Use frequency of selected record if the book is not empty, else use 14.1 MHz
 			double frequency;
-			if (book_->size()) {
+			if (book_->size() && book_->get_record() && book_->get_record()->item("FREQ").length()) {
 				frequency = stod(book_->get_record()->item("FREQ")) * 1000.0;
 			}
 			else {

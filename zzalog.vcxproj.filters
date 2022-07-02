@@ -195,6 +195,9 @@
     <ClCompile Include="zzalog\alarm_dial.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="zzalog\qsl_html_view.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="zzalog\about_dialog.h">
@@ -396,6 +399,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="zzalog\alarm_dial.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zzalog\qsl_html_view.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

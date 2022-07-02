@@ -2590,22 +2590,24 @@ record* qso_manager::dummy_qso() {
 }
 
 // End QSO - add time off
+// TODO: Can be called without current_qso_ - needs to be set by something.
 void qso_manager::end_qso() {
 	// get current book item number
 	record_num_t item_number = book_->selection();
 	record_num_t record_number = book_->record_number(item_number);
+	record* qso = book_->get_record();
 	// On-air logging add date/time off
 	switch (logging_mode_) {
 	case LM_ON_AIR_CAT:
 	case LM_ON_AIR_COPY:
 	case LM_ON_AIR_TIME:
-		if (current_qso_->item("TIME_OFF") == "") {
+		if (qso->item("TIME_OFF") == "") {
 			// Add end date/time - current time of interactive entering
 			// Get current date and time in UTC
 			string timestamp = now(false, "%Y%m%d%H%M%S");
-			current_qso_->item("QSO_DATE_OFF", timestamp.substr(0, 8));
+			qso->item("QSO_DATE_OFF", timestamp.substr(0, 8));
 			// Time as HHMMSS - always log seconds.
-			current_qso_->item("TIME_OFF", timestamp.substr(8));
+			qso->item("TIME_OFF", timestamp.substr(8));
 		}
 		break;
 	case LM_OFF_AIR:
@@ -2616,12 +2618,12 @@ void qso_manager::end_qso() {
 	// Modified by parsing and validation
 	bool record_modified = false;
 	// check whether record has changed - when parsed
-	if (pfx_data_->parse(current_qso_)) {
+	if (pfx_data_->parse(qso)) {
 		record_modified = true;
 	}
 
 	// check whether record has changed - when validated
-	if (spec_data_->validate(current_qso_, item_number)) {
+	if (spec_data_->validate(qso, item_number)) {
 		record_modified = true;
 	}
 
