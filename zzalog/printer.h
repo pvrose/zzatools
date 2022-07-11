@@ -76,13 +76,9 @@ namespace zzalog {
 		double col_width_;
 		double row_top_;
 		double row_height_;
-		// Address label parameters
-		bool print_label_;
-		Fl_Font font_add_;
-		Fl_Fontsize size_add_;
-		char* address_;
-
-
+		// Callsign specific
+		int max_number_qsos_;
+		string card_filename_;
 	};
 
 }

@@ -1033,7 +1033,7 @@ double rig_flrig::vdd_meter() {
 				return vdd;
 			}
 			else {
-				snprintf(mess, 256, "RIG: Insufficient data received from transceiver - %d bytes", data.length());
+				snprintf(mess, 256, "RIG: vdd_meter - Insufficient data received from transceiver - %d bytes", data.length());
 				error(ST_ERROR, mess);
 			}
 		}

@@ -247,8 +247,7 @@ void qso_manager::common_grp::create_form(int X, int Y) {
 	op2_1->color(FL_BACKGROUND_COLOR);
 	op2_1->labelsize(FONT_SIZE);
 	op2_1->labelfont(FONT);
-	//op2_1->textfont(FONT | FL_BOLD); // Font and colour are set in enable_widgets()
-	op2_1->textsize(FONT_SIZE);
+	//op2_1->textfont(FONT | FL_BOLD); // Font, size and colour are set in enable_widgets()
 	op2_1->tooltip("Value in settings");
 	op_settings_ = op2_1;
 
@@ -458,11 +457,13 @@ void qso_manager::common_grp::enable_widgets() {
 	my_settings_->get("Current", next_value, "");
 	if (strcmp(next_value, my_name_.c_str())) {
 		op->textcolor(FL_RED);
-		op->textfont(FONT | FL_ITALIC);
+		op->textfont(FONT | FL_BOLD | FL_ITALIC);
+		op->textsize(FONT_SIZE + 2);
 	}
 	else {
 		op->textcolor(FL_BLACK);
 		op->textfont(FONT | FL_BOLD);
+		op->textsize(FONT_SIZE + 2);
 	}
 	op->value(next_value);
 	op->redraw();
@@ -841,6 +842,7 @@ void qso_manager::create_spad_widgets(int& curr_x, int& curr_y) {
 	ch_field->textsize(FONT_SIZE);
 	ch_field->tooltip("Select the field you want the selected text to be written to");
 	ch_field->callback(cb_text<Fl_Choice, string>, (void*)&field_);
+	ch_field->repopulate(true, "");
 
 	y += HTEXT + GAP;
 	// Group for frequency, power and mode
@@ -2596,6 +2598,8 @@ void qso_manager::end_qso() {
 	record_num_t item_number = book_->selection();
 	record_num_t record_number = book_->record_number(item_number);
 	record* qso = book_->get_record();
+	// Modified by parsing and validation
+	bool record_modified = false;
 	// On-air logging add date/time off
 	switch (logging_mode_) {
 	case LM_ON_AIR_CAT:
@@ -2608,15 +2612,15 @@ void qso_manager::end_qso() {
 			qso->item("QSO_DATE_OFF", timestamp.substr(0, 8));
 			// Time as HHMMSS - always log seconds.
 			qso->item("TIME_OFF", timestamp.substr(8));
+			record_modified = true;
 		}
 		break;
 	case LM_OFF_AIR:
 		book_->correct_record_position(item_number);
+		record_modified = true;
 		break;
 	}
 
-	// Modified by parsing and validation
-	bool record_modified = false;
 	// check whether record has changed - when parsed
 	if (pfx_data_->parse(qso)) {
 		record_modified = true;
@@ -2634,9 +2638,10 @@ void qso_manager::end_qso() {
 	enable_widgets();
 
 	// If new or changed then update the fact and let every one know
-	book_->modified(true);
-	book_->selection(item_number, HT_INSERTED);
-
+	if (record_modified) {
+		book_->modified(true);
+		book_->selection(item_number, HT_INSERTED);
+	}
 
 	// Update session end - if we crash before we close down, we may fail to remember session properly
 	time_t today = time(nullptr);

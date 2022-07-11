@@ -12,20 +12,18 @@ void qsl_html_view::value(const char* val, record** records, int num_records) {
 	// Creat a new string 3x the size to contain processed HTML
 	int val_length = strlen(val);
 	char* dval = new char[val_length * 3];
+	memset(dval, 0, val_length);
 
 	// Pointers to current processing position
 	// Source string
 	const char* spos = val;
 	// Destination string
 	char* dpos = dval;
-	// Repeat position in source string
-	const char* rpos = spos;
 	// Temporary pointer 
 	const char* tpos;
 
 	int cur_record = 0;
 	bool not_done = true;
-	bool increment_record = false;
 	string field_name;
 	string field_val;
 
@@ -44,41 +42,29 @@ void qsl_html_view::value(const char* val, record** records, int num_records) {
 			} else {
 				// Copy field value to destination
 				// move source and destination postitions accordingly
-				field_name = string(spos + 1, (tpos - spos - 2));
-				field_val = records[cur_record]->item(field_name, true, true);
-				strcpy(dpos, field_val.c_str());
-				dpos += field_val.length();
-				spos = tpos + 1;
-				// Individual QSO record
-				if (field_name == "QSO_DATE") {
-					increment_record = true;
-				}
-			}
-			break;
-		case '<':
-			if (strncmp(spos, "TR", 2) == 0) {
-				// Is it <TR....? - table row start - remember source position
-				rpos = spos;
-			}
-			else if (strncmp(spos, "/TR", 3) == 0) {
-				// Is it </TR.. = table row end - if we are processing QSO data....
-				if (increment_record) {
-					if (cur_record == num_records) {
-						cur_record = 0;
-						increment_record = false;
-					}
-					else {
-						// Incement record number, reset source to beginning of row
+				bool multiple_qsos = (*(spos + 1) == '*');
+				if (multiple_qsos) {
+					while (cur_record < num_records) {
+						field_name = string(spos + 2, (tpos - spos - 1));
+						field_val = records[cur_record]->item(field_name, true, true);
+						strcpy(dpos, field_val.c_str()); 
 						cur_record++;
-						increment_record = false;
-						spos = rpos;
+						if (cur_record == num_records) {
+							strcpy(dpos, "<BR>");
+							dpos += 4 + field_val.length();
+						}
+						else {
+							dpos += field_val.length();
+						}
 					}
+				} else {
+					field_name = string(spos + 1, (tpos - spos - 1));
+					field_val = records[cur_record]->item(field_name, true, true);
+					strcpy(dpos, field_val.c_str());
+					dpos += field_val.length();
 				}
+				spos = tpos + 1;
 			}
-			// Copy source to destination and step both
-			*dpos = *spos;
-			spos++;
-			dpos++;
 			break;
 		default:
 			// Copy source to destination and step both
@@ -88,6 +74,7 @@ void qsl_html_view::value(const char* val, record** records, int num_records) {
 			break;
 		}
 	}
-	// TODO - 
 	// copy destination to help_view 
+	Fl_Help_View::value(dval);
+	show();
 }

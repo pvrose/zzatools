@@ -3,6 +3,7 @@
 
 #include "record.h"
 #include "drawing.h"
+#include "qsl_html_view.h"
 #include <string>
 #include <vector>
 
@@ -14,7 +15,7 @@
 using namespace std;
 using namespace zzalib;
 
-// mm to points conversion: 1" = 72pt = 24.4 mm
+// mm to points conversion: 1" = 72pt = 25.4 mm
 const float MM_TO_POINT = 72.0f / 25.4f;
 // inch to points - 1" = 72 pt
 const float IN_TO_POINT = 72.0f;
@@ -32,53 +33,53 @@ namespace zzalog {
 			POINT       // = 1/72 in.
 		};
 
-		// Data for an individual widget (item of text on the card)
-		struct qsl_widget {
-			string text;
-			Fl_Color colour;
-			int font_size;
-			Fl_Font font;
+		//// Data for an individual widget (item of text on the card)
+		//struct qsl_widget {
+		//	string text;
+		//	Fl_Color colour;
+		//	int font_size;
+		//	Fl_Font font;
 
-			qsl_widget() :
-				text(""),
-				colour(FL_BLACK),
-				font_size(FONT_SIZE),
-				font(FONT) {};
-			qsl_widget(string t, Fl_Color c, int s, Fl_Font f) :
-				text(t),
-				colour(c),
-				font_size(s),
-				font(f) {};
-		};
+		//	qsl_widget() :
+		//		text(""),
+		//		colour(FL_BLACK),
+		//		font_size(FONT_SIZE),
+		//		font(FONT) {};
+		//	qsl_widget(string t, Fl_Color c, int s, Fl_Font f) :
+		//		text(t),
+		//		colour(c),
+		//		font_size(s),
+		//		font(f) {};
+		//};
 
-		// Widget set position
-		enum widget_set {
-			TOP_LEFT,
-			TOP_RIGHT,
-			TABLE,
-			BOTTOM_LEFT,
-			BOTTOM_RIGHT
-		};
+		//// Widget set position
+		//enum widget_set {
+		//	TOP_LEFT,
+		//	TOP_RIGHT,
+		//	TABLE,
+		//	BOTTOM_LEFT,
+		//	BOTTOM_RIGHT
+		//};
 
-		// Default margin
-		const int MARGIN = 10;
+		//// Default margin
+		//const int MARGIN = 10;
 
 	public:
 		// Constructor provides X and Y position (W and H set from design data) and current records to display in card format
 		qsl_form(int x, int y, record** records, int num_records);
 		~qsl_form();
-		// Resize widget set - number of lines of text
-		void resize_set(widget_set set, int rows);
-		// Resize table - rows x columns
-		void resize_table(int rows, int cols);
-		// Change widget text
-		void update_text(qsl_widget* widget, string value);
-		// Change widget font
-		void update_font(qsl_widget* widget, Fl_Font value);
-		// Change size of font used
-		void update_size(qsl_widget* widget, int value);
-		// Change the text colour
-		void update_colour(qsl_widget* widget, Fl_Color value);
+		//// Resize widget set - number of lines of text
+		//void resize_set(widget_set set, int rows);
+		//// Resize table - rows x columns
+		//void resize_table(int rows, int cols);
+		//// Change widget text
+		//void update_text(qsl_widget* widget, string value);
+		//// Change widget font
+		//void update_font(qsl_widget* widget, Fl_Font value);
+		//// Change size of font used
+		//void update_size(qsl_widget* widget, int value);
+		//// Change the text colour
+		//void update_colour(qsl_widget* widget, Fl_Color value);
 		// Return unit
 		dim_unit unit();
 		// Set unit
@@ -91,68 +92,68 @@ namespace zzalog {
 		float height();
 		// Set height
 		void height(float heigth);
-		// Return size
-		int set_size(widget_set set);
-		// Return number of rows
-		int table_rows();
-		// Return number of columns
-		int table_cols();
+		//// Return size
+		//int set_size(widget_set set);
+		//// Return number of rows
+		//int table_rows();
+		//// Return number of columns
+		//int table_cols();
 		// Size error drawing card
 		bool size_error();
 
-		// Save data
-		void save_data();
-		// Write one set of settings
-		void write_settings(Fl_Preferences& settings, vector<qsl_form::qsl_widget>&);
-		// Set the designer
-		void designer(Fl_Group* designer);
+		//// Save data
+		//void save_data();
+		//// Write one set of settings
+		//void write_settings(Fl_Preferences& settings, vector<qsl_form::qsl_widget>&);
+		//// Set the designer
+		//void designer(Fl_Group* designer);
 
 
 	protected:
-		// Callbacks - when clicking any item in the form
-		static void cb_button(Fl_Widget* w, void* v);
+		//// Callbacks - when clicking any item in the form
+		//static void cb_button(Fl_Widget* w, void* v);
 		// Get the widget data
 		void load_data();
-		// Default data initialise
-		void load_default();
-		// Get one set of settings
-		void read_settings(Fl_Preferences& settings, vector<qsl_widget>&, int count);
+		//// Default data initialise
+		//void load_default();
+		//// Get one set of settings
+		//void read_settings(Fl_Preferences& settings, vector<qsl_widget>&, int count);
 		// Draw the form
-		void create_form();
-		// Draw one set of lines of text
-		void draw_text(Fl_Align align, int& y, vector<qsl_widget>& widgets);
-		// Draw a table
-		void draw_table(int& y);
+		void create_form(int X, int Y);
+		//// Draw one set of lines of text
+		//void draw_text(Fl_Align align, int& y, vector<qsl_widget>& widgets);
+		//// Draw a table
+		//void draw_table(int& y);
 		// Convert to points
 		int to_points(float value);
-		// Update the widget sets
-		void update();
-
-
-
+		//// Update the widget sets
+		//void update();
 
 	protected:
-		// The card design interface
-		Fl_Group* designer_;
+		//// The card design interface
+		//Fl_Group* designer_;
 		// The records to be printed
 		record** records_;
 		// Number of them
 		int num_records_;
-		// Width of all instances of qsl_card
+		// Width of each instance of qsl_card
 		float width_;
-		// Height of all instances of qsl_card
+		// Height of each instance of qsl_card
 		float height_;
 		// Unit of width and height
 		dim_unit unit_;
-		// The widgets 
-		vector<qsl_widget> tl_widgets_;
-		vector<qsl_widget> tr_widgets_;
-		vector<vector<qsl_widget> > tab_widgets_;
-		vector<qsl_widget> bl_widgets_;
-		vector<qsl_widget> br_widgets_;
+		//// The widgets 
+		//vector<qsl_widget> tl_widgets_;
+		//vector<qsl_widget> tr_widgets_;
+		//vector<vector<qsl_widget> > tab_widgets_;
+		//vector<qsl_widget> bl_widgets_;
+		//vector<qsl_widget> br_widgets_;
 		// Size error
 		bool size_error_;
-
+		// HTML Filename
+		string filename_;
+		// The QSL card HTML view
+		qsl_html_view* card_view_;
 	};
 
 }

@@ -4,6 +4,8 @@
 #include "../zzalib/utils.h"
 #include "import_data.h"
 #include "intl_widgets.h"
+#include "qsl_design.h"
+#include "main_window.h"
 
 #include <FL/Fl_Preferences.H>
 #include <FL/Fl_Group.H>
@@ -17,6 +19,7 @@ using namespace zzalib;
 
 extern Fl_Preferences* settings_;
 extern import_data* import_data_;
+extern main_window* main_window_;
 
 // Constructor
 files_dialog::files_dialog(int X, int Y, int W, int H, const char* label) :
@@ -40,6 +43,7 @@ files_dialog::files_dialog(int X, int Y, int W, int H, const char* label) :
 	status_log_file_ = "";
 	web_browser_ = "";
 	unzipper_ = "";
+	qsl_template_ = "";
 	tqsl_data_ = { "", "", nullptr, nullptr, nullptr, nullptr };
 	card_data_ = { "", "", nullptr, nullptr, nullptr, nullptr };
 	ref_data_data_ = { "", "", nullptr, nullptr, nullptr, nullptr };
@@ -47,6 +51,10 @@ files_dialog::files_dialog(int X, int Y, int W, int H, const char* label) :
 	web_data_ = { "", "", nullptr, nullptr, nullptr, nullptr };
 	status_data_ = { "", "", nullptr, nullptr, nullptr, nullptr };
 	unzipper_data_ = { "", "", nullptr, nullptr, nullptr, nullptr };
+	template_data_ = { "", "", nullptr, nullptr, nullptr, nullptr };
+
+	bn_params_ = nullptr;
+
 	auto_poll_ = nan("");
 	autos_changed_ = false;
 
@@ -105,6 +113,9 @@ void files_dialog::load_values() {
 	Fl_Preferences backup_settings(settings_, "Backup");
 	Fl_Preferences status_settings(settings_, "Status");
 	Fl_Preferences clublog_settings(qsl_settings, "ClubLog");
+	Fl_Preferences qsld_settings(settings_, "QSL Design");
+	Fl_Preferences stations_settings(settings_, "Stations");
+	Fl_Preferences callsigns_settings(stations_settings, "Callsigns");
 
 	// TQSL Executable
 	lotw_settings.get("Enable", (int&)enable_tqsl_, false);
@@ -165,6 +176,17 @@ void files_dialog::load_values() {
 	clublog_settings.get("Unzip Switches", temp_string, "e %s -o%s -y");
 	unzip_switches_ = temp_string;
 	free(temp_string);
+
+	// Callsign for QSL template
+	callsigns_settings.get("Current", temp_string, "");
+	Fl_Preferences call_settings(qsld_settings, temp_string);
+	station_callsign_ = temp_string;
+	free(temp_string);
+	// QSL Template
+	call_settings.get("Filename", temp_string, "");
+	qsl_template_ = temp_string;
+	free(temp_string);
+
 }
 
 // create the form
@@ -220,7 +242,10 @@ void files_dialog::create_form(int X, int Y) {
 	const int GRP8 = GRP7A + HGRP7A;
 	const int ROW8_1 = GRP8 + HTEXT;
 	const int HGRP8 = ROW8_1 - GRP8 + max(HBUTTON, HTEXT) + GAP;
-
+	// Group 9, row1
+	const int GRP9 = GRP8 + HGRP8;
+	const int ROW9_1 = GRP9 + HTEXT;
+	const int HGRP9 = ROW9_1 - GRP9 + max(HBUTTON, HTEXT) + GAP;
 
 	// Bottom of required dialog
 	const int YMAX = GRP8 + HGRP8 + EDGE;
@@ -467,7 +492,7 @@ void files_dialog::create_form(int X, int Y) {
 	// Button - opens file browser
 	Fl_Button* bn_browse_wsjtx = new Fl_Button(X + COL5, Y + ROW7A_1, WBUTTON, HBUTTON, "Browse");
 	bn_browse_wsjtx->align(FL_ALIGN_INSIDE);
-	wsjtx_data_ = { "Please enter the WSJT-X directory", "Text\t*.txt", &wsjtx_directory_, nullptr, in_wsjtx_file, nullptr };
+	wsjtx_data_ = { "Please enter the WSJT-X directory", "", &wsjtx_directory_, nullptr, in_wsjtx_file, nullptr };
 	bn_browse_wsjtx->callback(cb_bn_browsedir, &wsjtx_data_);
 	bn_browse_wsjtx->when(FL_WHEN_RELEASE);
 	bn_browse_wsjtx->labelsize(FONT_SIZE);
@@ -513,6 +538,39 @@ void files_dialog::create_form(int X, int Y) {
 
 	grp_unzip->end();
 
+	string qsl_label = "QSL Template: - " + station_callsign_;
+	Fl_Group* grp_qsld = new Fl_Group(X + XGRP, Y + GRP9, XMAX, HGRP9);
+	grp_qsld->copy_label(qsl_label.c_str());
+	grp_qsld->labelsize(FONT_SIZE);
+	grp_qsld->box(FL_THIN_DOWN_BOX);
+	grp_qsld->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
+	// Input - QSL Template file name
+	intl_input* in_qsl_template = new intl_input(X + COL2, Y + ROW9_1, WEDIT + GAP + WBUTTON + GAP + WBUTTON, HTEXT);
+	in_qsl_template->callback(cb_value<intl_input, string>, &qsl_template_);
+	in_qsl_template->when(FL_WHEN_CHANGED);
+	in_qsl_template->textsize(FONT_SIZE);
+	in_qsl_template->value(qsl_template_.c_str());
+	in_qsl_template->tooltip("Location of WSJT-X directory");
+	// Button - opens file browser
+	Fl_Button* bn_browse_qsld = new Fl_Button(X + COL5, Y + ROW9_1, WBUTTON, HBUTTON, "Browse");
+	bn_browse_qsld->align(FL_ALIGN_INSIDE);
+	template_data_ = { "Please enter the QSL Template", "HTML\t*.{htm,html}", &qsl_template_, nullptr, in_qsl_template, nullptr };
+	bn_browse_qsld->callback(cb_bn_browsefile, &template_data_);
+	bn_browse_qsld->when(FL_WHEN_RELEASE);
+	bn_browse_qsld->labelsize(FONT_SIZE);
+	bn_browse_qsld->tooltip("Opens a file browser to locate the QSL template file");
+	// Button - open dimansions dialog
+	Fl_Button* bn_qsl_dim = new Fl_Button(X + COL6, Y + ROW9_1, WBUTTON, HBUTTON, "Params");
+	bn_qsl_dim->align(FL_ALIGN_INSIDE);
+	bn_qsl_dim->callback(cb_bn_qslt, nullptr);
+	bn_qsl_dim->labelsize(FONT_SIZE);
+	bn_qsl_dim->when(FL_WHEN_RELEASE);
+	bn_qsl_dim->tooltip("Opens dialog to set label size and printer details");
+	bn_params_ = bn_qsl_dim;
+
+	grp_qsld->end();
+
+
 	Fl_Group::end();
 
 }
@@ -545,6 +603,10 @@ void files_dialog::save_values() {
 	Fl_Preferences backup_settings(settings_, "Backup");
 	Fl_Preferences status_settings(settings_, "Status");
 	Fl_Preferences clublog_settings(qsl_settings, "ClubLog");
+	Fl_Preferences qsld_settings(settings_, "QSL Design");
+	Fl_Preferences stations_settings(settings_, "Stations");
+	Fl_Preferences calls_settings(stations_settings, "Callsigns");
+	Fl_Preferences call_settings(qsld_settings, station_callsign_.c_str());
 
 	// TQSL Executable
 	lotw_settings.set("Enable", enable_tqsl_);
@@ -578,6 +640,10 @@ void files_dialog::save_values() {
 	clublog_settings.set("Unzip Command", unzipper_.c_str());
 	clublog_settings.set("Unzip Switches", unzip_switches_.c_str());
 
+
+	// QSL Template
+	call_settings.set("Filename", qsl_template_.c_str());
+
 	// Restart any auto-update if any of the information may have changed
 	if (autos_changed_ && import_data_->is_auto_update()) {
 		import_data_->stop_update(qso_manager::LM_IMPORTED, false);
@@ -600,4 +666,12 @@ void files_dialog::cb_value_auto(Fl_Widget* w, void* v) {
 	cb_value<WIDGET, DATA>(w, v);
 	files_dialog* that = ancestor_view<files_dialog>(w);
 	that->autos_changed_ = true;
+}
+
+// Callback to open dialog
+void files_dialog::cb_bn_qslt(Fl_Widget* w, void* v) {
+	files_dialog* that = ancestor_view<files_dialog>(w);
+	int target_x = main_window_->x_root() + that->bn_params_->x();
+	int target_y = main_window_->y_root() + that->bn_params_->y();
+	qsl_design* dialog = new qsl_design(target_x, target_y, 0, 0, "QSL Label Parameters");
 }

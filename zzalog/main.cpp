@@ -845,7 +845,6 @@ void tidy() {
 	// From inspection of the code - calling this a second time frees the memory
 	fl_message_title_default(nullptr);
 	delete qso_manager_;
-	delete qso_manager_;
 	delete dxa_if_;
 	delete wsjtx_handler_;
 	delete club_handler_;

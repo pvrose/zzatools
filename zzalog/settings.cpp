@@ -51,13 +51,6 @@ settings::settings(int W, int H, const char* label, cfg_dialog_t active) :
 	fields->labelsize(FONT_SIZE);
 	fields->selection_color(fl_lighter(FL_YELLOW));
 	fields->tooltip("Allows the specification of which fields to display in the various applications");
-	// QSL Design - allows user to modify the QSL design
-	qsl_design* qsl = new qsl_design(rx, ry, rw, rh, "QSL Design");
-	qsl->labelsize(FONT_SIZE);
-	qsl->selection_color(fl_lighter(FL_YELLOW));
-	qsl->tooltip("Allows the simple design of QSL labels");
-	// Add to the list of updatable views
-	updatable_views_.insert(qsl);
 	// User settings - allows user to control cetain aspects of the displayed information
 	user_dialog* user = new user_dialog(rx, ry, rw, rh, "User settings");
 	user->labelsize(FONT_SIZE);
@@ -81,9 +74,6 @@ settings::settings(int W, int H, const char* label, cfg_dialog_t active) :
 		break;
 	case DLG_COLUMN:
 		tabs->value(fields);
-		break;
-	case DLG_QSL:
-		tabs->value(qsl);
 		break;
 	case DLG_USER:
 		tabs->value(user);
@@ -164,7 +154,6 @@ void settings::cb_tab(Fl_Widget* w, void* v) {
 	if (dynamic_cast<files_dialog*>(tab)) ix = DLG_FILES;
 	else if (dynamic_cast<web_dialog*>(tab)) ix = DLG_WEB;
 	else if (dynamic_cast<fields_dialog*>(tab)) ix = DLG_COLUMN;
-	else if (dynamic_cast<qsl_design*>(tab)) ix = DLG_QSL;
 	else if (dynamic_cast<user_dialog*>(tab)) ix = DLG_USER;
 	else if (dynamic_cast<config_tree*>(tab)) ix = DLG_ALL;
 	else ix = DLG_X;
@@ -182,9 +171,6 @@ void settings::set_label(settings::cfg_dialog_t active) {
 		break;
 	case DLG_COLUMN:
 		label("Configuration: Define the fields to be displayed in various views");
-		break;
-	case DLG_QSL:
-		label("Configuration: Design QSL card label");
 		break;
 	case DLG_USER:
 		label("Configuration: Define the way certain items are viewed");

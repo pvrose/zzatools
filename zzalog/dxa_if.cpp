@@ -1896,108 +1896,111 @@ void dxa_if::zoom_azimuthal() {
 
 // Centre the map according to the settings
 void dxa_if::centre_map() {
-	lat_long_t centre;
-	double save_n;
-	double save_s;
-	double save_w;
-	double save_e;
-	switch (centre_mode_) {
-	case HOME:
-		// Centre on the home location
-		centre = { (double)home_lat_, (double)home_long_ };
-		centre_map(centre);
-		zoom_centre(centre, false);
-		break;
-	case DX:
-		// Centre on DX location - only if being displayed
-	{
-		DxAtlas::IDxMapPtr map = atlas_->GetMap();
-		if (map->GetDxVisible()) {
-			centre = { (double)map->GetDxLatitude(), (double)map->GetDxLongitude() };
+	// Only recentre if projection is rectanguar
+	if (projection_ == DxAtlas::EnumProjection::PRJ_RECTANGULAR) {
+		lat_long_t centre;
+		double save_n;
+		double save_s;
+		double save_w;
+		double save_e;
+		switch (centre_mode_) {
+		case HOME:
+			// Centre on the home location
+			centre = { (double)home_lat_, (double)home_long_ };
 			centre_map(centre);
 			zoom_centre(centre, false);
-		}
-		break;
-	}
-	case SELECTED:
-		// Centre on the selected record
-		centre = selected_locn_;
-		centre_map(centre);
-		zoom_centre(centre, false);
-		break;
-	case GROUP:
-		// Centre so that the group is displayed evenly
-		centre = { (northernmost_ + southernmost_) * 0.5, (westernmost_ + easternmost_) * 0.5 };
-		centre_map(centre);
-		zoom_centre(centre, false);
-		break;
-	case ZERO:
-		// Centre at 0 N 0 W
-		centre = { 0.0, 0.0 };
-		centre_map(centre);
-		zoom_centre(centre, true);
-		break;
-	default:
-		// Display an entire continent
-		save_n = northernmost_;
-		save_s = southernmost_;
-		save_w = westernmost_;
-		save_e = easternmost_;
-		switch (centre_mode_) {
-		case EU:
-			northernmost_ = 60.0;
-			southernmost_ = 35.0;
-			westernmost_ = -30.0;
-			easternmost_ = 65.0;
 			break;
-		case AS:
-			northernmost_ = 80.0;
-			southernmost_ = -10.0;
-			westernmost_ = 20.0;
-			easternmost_ = 205.0;
-			break;
-		case AF:
-			northernmost_ = 40.0;
-			southernmost_ = -35.0;
-			westernmost_ = -25.0;
-			easternmost_ = 55.0;
-			break;
-		case NA:
-			northernmost_ = 80.0;
-			southernmost_ = 10.0;
-			westernmost_ = -155.0;
-			easternmost_ = -20.0;
-			break;
-		case SA:
-			northernmost_ = 15.0;
-			southernmost_ = -55.0;
-			westernmost_ = -95.0;
-			easternmost_ = -30.0;
-			break;
-		case OC:
-			northernmost_ = 30.0;
-			southernmost_ = -55.0;
-			westernmost_ = 120.0;
-			easternmost_ = 245.0;
-			break;
-		case AN:
-			northernmost_ = -40.0;
-			southernmost_ = -90.0;
-			westernmost_ = -180.0;
-			easternmost_ = 180.0;
+		case DX:
+			// Centre on DX location - only if being displayed
+		{
+			DxAtlas::IDxMapPtr map = atlas_->GetMap();
+			if (map->GetDxVisible()) {
+				centre = { (double)map->GetDxLatitude(), (double)map->GetDxLongitude() };
+				centre_map(centre);
+				zoom_centre(centre, false);
+			}
 			break;
 		}
-		centre = { (northernmost_ + southernmost_) * 0.5, (westernmost_ + easternmost_) * 0.5 };
-		centre_map(centre);
-		zoom_centre(centre, false);
-		// Restore bounds
-		northernmost_ = save_n;
-		southernmost_ = save_s;
-		westernmost_ = save_w;
-		easternmost_ = save_e;
-		break;
+		case SELECTED:
+			// Centre on the selected record
+			centre = selected_locn_;
+			centre_map(centre);
+			zoom_centre(centre, false);
+			break;
+		case GROUP:
+			// Centre so that the group is displayed evenly
+			centre = { (northernmost_ + southernmost_) * 0.5, (westernmost_ + easternmost_) * 0.5 };
+			centre_map(centre);
+			zoom_centre(centre, false);
+			break;
+		case ZERO:
+			// Centre at 0 N 0 W
+			centre = { 0.0, 0.0 };
+			centre_map(centre);
+			zoom_centre(centre, true);
+			break;
+		default:
+			// Display an entire continent
+			save_n = northernmost_;
+			save_s = southernmost_;
+			save_w = westernmost_;
+			save_e = easternmost_;
+			switch (centre_mode_) {
+			case EU:
+				northernmost_ = 60.0;
+				southernmost_ = 35.0;
+				westernmost_ = -30.0;
+				easternmost_ = 65.0;
+				break;
+			case AS:
+				northernmost_ = 80.0;
+				southernmost_ = -10.0;
+				westernmost_ = 20.0;
+				easternmost_ = 205.0;
+				break;
+			case AF:
+				northernmost_ = 40.0;
+				southernmost_ = -35.0;
+				westernmost_ = -25.0;
+				easternmost_ = 55.0;
+				break;
+			case NA:
+				northernmost_ = 80.0;
+				southernmost_ = 10.0;
+				westernmost_ = -155.0;
+				easternmost_ = -20.0;
+				break;
+			case SA:
+				northernmost_ = 15.0;
+				southernmost_ = -55.0;
+				westernmost_ = -95.0;
+				easternmost_ = -30.0;
+				break;
+			case OC:
+				northernmost_ = 30.0;
+				southernmost_ = -55.0;
+				westernmost_ = 120.0;
+				easternmost_ = 245.0;
+				break;
+			case AN:
+				northernmost_ = -40.0;
+				southernmost_ = -90.0;
+				westernmost_ = -180.0;
+				easternmost_ = 180.0;
+				break;
+			}
+			centre = { (northernmost_ + southernmost_) * 0.5, (westernmost_ + easternmost_) * 0.5 };
+			centre_map(centre);
+			zoom_centre(centre, false);
+			// Restore bounds
+			northernmost_ = save_n;
+			southernmost_ = save_s;
+			westernmost_ = save_w;
+			easternmost_ = save_e;
+			break;
+		}
+		save_values();
 	}
-	save_values();
 }
 
 // Change the text on the dialog depending on the colour-by selection

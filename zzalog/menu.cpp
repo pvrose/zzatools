@@ -101,7 +101,6 @@ namespace zzalog {
 		{ "Fi&les", 0, menu::cb_mi_settings, (void*)settings::DLG_FILES },
 		{ "&Web", 0, menu::cb_mi_settings, (void*)settings::DLG_WEB },
 		{ "&Fields", 0, menu::cb_mi_settings, (void*)settings::DLG_COLUMN },
-		{ "&QSL Design", 0, menu::cb_mi_settings, (void*)settings::DLG_QSL },
 		{ "&User settings", 0, menu::cb_mi_settings, (void*)settings::DLG_USER },
 		{ "&All", 0, menu::cb_mi_settings, (void*)settings::DLG_ALL },
 		{ 0 },

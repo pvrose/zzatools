@@ -10,7 +10,7 @@ namespace zzalog {
 	class qsl_html_view : public Fl_Help_View
 	{
 	public:
-		qsl_html_view(int X, int Y, int W, int H, const char* l);
+		qsl_html_view(int X, int Y, int W, int H, const char* l = nullptr);
 		void value(const char* val, record** records, int num_records);
 
 	};

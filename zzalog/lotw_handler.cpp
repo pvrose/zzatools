@@ -83,7 +83,7 @@ bool lotw_handler::upload_lotw_log(book* book) {
 		fields.insert("RST_SENT");
 		fields.insert("STATION_CALLSIGN");
 		// Write the book (only the above fields)
-		if (book->store_data(string(new_filename), true, &fields)) {
+		if (book->size() && book->store_data(string(new_filename), true, &fields)) {
 			// Get the TQSL (an app that signs the upload) executable
 			string tqsl_executable;
 			char* temp;
@@ -202,10 +202,17 @@ bool lotw_handler::upload_lotw_log(book* book) {
 			}
 		}
 		else {
-			// Extraction of data failed
-			status_->misc_status(ST_ERROR, "LOTW: Failed to create upload file, upload cancelled");
-			ok = false;
+			if (book->size()) {
+				// Extraction of data failed
+				status_->misc_status(ST_ERROR, "LOTW: Failed to create upload file, upload cancelled");
+				ok = false;
+			}
+			else {
+				status_->misc_status(ST_ERROR, "LOTW: No records to upload, upload abandoned");
+				ok = false;
+			}
 		}
+
 	}
 #ifndef _DEBUG
 	if (book_->save_enabled() && book_->modified() && book_->save_enabled()) {
