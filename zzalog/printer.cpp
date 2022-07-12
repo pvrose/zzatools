@@ -357,13 +357,15 @@ int printer::print_page_cards(size_t &item_num) {
 		}
 		while (num_records > 0) {
 			int print_records = num_records > max_number_qsos_ ? max_number_qsos_ : num_records;
-			record** records = new record * [num_records];
-			for (int i = 0; i < num_records; i++) {
+			record** records = new record * [print_records];
+			for (int i = 0; i < print_records; i++) {
 				records[i] = navigation_book_->get_record(item_num + i, false);
 			}
 			qsl_form* qsl = new qsl_form(cwin_x_ + ((card % num_cols_) * card_w_), cwin_y_ + (((card / num_cols_) % num_rows_) * card_h_), records, print_records);
 			item_num += print_records;
-			num_records -= max_number_qsos_;
+			num_records -= print_records;
+			// If did not print all with this callsign create a new label to print
+			if (num_records) card++;
 		}
 	}
 	win->end();

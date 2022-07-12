@@ -23,6 +23,7 @@ extern status* status_;
 // Constructor
 qsl_form::qsl_form(int X, int Y, record** records, int num_records) :
 	Fl_Group(X, Y, 0, 0) {
+	box(FL_NO_BOX);
 	load_data();
 	// Get record
 	records_ = records;
@@ -78,6 +79,7 @@ void qsl_form::create_form(int X, int Y) {
 	int length = (int)ifile.tellg();
 	ifile.seekg(0, ifile.beg);
 	char* buffer = new char[length];
+	memset(buffer, 0, length);
 	ifile.read(buffer, length);
 	if (!ifile.eof()) {
 		snprintf(message, 256, "QSL: Failed to read %s", filename_.c_str());
@@ -94,6 +96,7 @@ void qsl_form::create_form(int X, int Y) {
 	resizable(nullptr);
 	size(card_view_->w(), card_view_->h());
 	show();
+	end();
 }
 
 // Return unit

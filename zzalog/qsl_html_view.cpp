@@ -5,7 +5,7 @@ using namespace zzalog;
 qsl_html_view::qsl_html_view(int X, int Y, int W, int H, const char* l) :
 	Fl_Help_View(X, Y, W, H, l)
 {
-
+	box(FL_NO_BOX);
 }
 
 void qsl_html_view::value(const char* val, record** records, int num_records) {
@@ -43,13 +43,14 @@ void qsl_html_view::value(const char* val, record** records, int num_records) {
 				// Copy field value to destination
 				// move source and destination postitions accordingly
 				bool multiple_qsos = (*(spos + 1) == '*');
+				cur_record = 0;
 				if (multiple_qsos) {
 					while (cur_record < num_records) {
-						field_name = string(spos + 2, (tpos - spos - 1));
+						field_name = string(spos + 2, (tpos - spos - 2));
 						field_val = records[cur_record]->item(field_name, true, true);
 						strcpy(dpos, field_val.c_str()); 
 						cur_record++;
-						if (cur_record == num_records) {
+						if (cur_record < num_records) {
 							strcpy(dpos, "<BR>");
 							dpos += 4 + field_val.length();
 						}
