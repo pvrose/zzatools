@@ -152,7 +152,7 @@ void qsl_design::create_form(int X, int Y) {
 	vip121->textsize(FONT_SIZE);
 	vip121->align(FL_ALIGN_LEFT);
 	vip121->callback(cb_value<Fl_Value_Input, int>, &num_cols_);
-	vip121->when(FL_WHEN_ENTER_KEY);
+//	vip121->when(FL_WHEN_ENTER_KEY);
 	vip121->tooltip("Please specify the number of columns when printing");
 	// Input to specify the width of the label
 	Fl_Value_Input* vip122 = new Fl_Value_Input(X_122, Y_12, WBUTTON, HBUTTON, "Width");
@@ -163,7 +163,7 @@ void qsl_design::create_form(int X, int Y) {
 	vip122->textsize(FONT_SIZE);
 	vip122->align(FL_ALIGN_LEFT);
 	vip122->callback(cb_value<Fl_Value_Input, double>, &width_);
-	vip122->when(FL_WHEN_ENTER_KEY);
+//	vip122->when(FL_WHEN_ENTER_KEY);
 	vip122->tooltip("Please specify the width of the label in the selected unit");
 	// Input to specify the position ofthe left edge of culmn 1
 	Fl_Value_Input* vip123 = new Fl_Value_Input(X_123, Y_12, WBUTTON, HBUTTON, "Position");
@@ -174,7 +174,7 @@ void qsl_design::create_form(int X, int Y) {
 	vip123->textsize(FONT_SIZE);
 	vip123->align(FL_ALIGN_LEFT);
 	vip123->callback(cb_value<Fl_Value_Input, double>, &col_left_);
-	vip123->when(FL_WHEN_ENTER_KEY);
+//	vip123->when(FL_WHEN_ENTER_KEY);
 	vip123->tooltip("Please specify the position of the first column");
 	// Input to specify the gap between columns
 	Fl_Value_Input* vip124 = new Fl_Value_Input(X_124, Y_12, WBUTTON, HBUTTON, "Spacing");
@@ -185,7 +185,7 @@ void qsl_design::create_form(int X, int Y) {
 	vip124->textsize(FONT_SIZE);
 	vip124->align(FL_ALIGN_LEFT);
 	vip124->callback(cb_value<Fl_Value_Input, double>, &col_width_);
-	vip124->when(FL_WHEN_ENTER_KEY);
+//	vip124->when(FL_WHEN_ENTER_KEY);
 	vip124->tooltip("Please specify the spacing between columns");
 	// Row 2A - height parameters
 	// Input to specify the number of rows of labels to print
@@ -197,7 +197,7 @@ void qsl_design::create_form(int X, int Y) {
 	vip12A1->textsize(FONT_SIZE);
 	vip12A1->align(FL_ALIGN_LEFT);
 	vip12A1->callback(cb_value<Fl_Value_Input, int>, &num_rows_);
-	vip12A1->when(FL_WHEN_ENTER_KEY);
+//	vip12A1->when(FL_WHEN_ENTER_KEY);
 	vip12A1->tooltip("Please specify the number of rows when printing");
 	// Input to specify the height of each label
 	Fl_Value_Input* vip12A2 = new Fl_Value_Input(X_122, Y_13, WBUTTON, HBUTTON, "Height");
@@ -208,7 +208,7 @@ void qsl_design::create_form(int X, int Y) {
 	vip12A2->textsize(FONT_SIZE);
 	vip12A2->align(FL_ALIGN_LEFT);
 	vip12A2->callback(cb_value<Fl_Value_Input, double>, &height_);
-	vip12A2->when(FL_WHEN_ENTER_KEY);
+//	vip12A2->when(FL_WHEN_ENTER_KEY);
 	vip12A2->tooltip("Please specify the width of the label in the selected label");
 	// Input to specify the top of the first label
 	Fl_Value_Input* vip12A3 = new Fl_Value_Input(X_123, Y_13, WBUTTON, HBUTTON, "Position");
@@ -219,7 +219,7 @@ void qsl_design::create_form(int X, int Y) {
 	vip12A3->textsize(FONT_SIZE);
 	vip12A3->align(FL_ALIGN_LEFT);
 	vip12A3->callback(cb_value<Fl_Value_Input, double>, &row_top_);
-	vip12A3->when(FL_WHEN_ENTER_KEY);
+//	vip12A3->when(FL_WHEN_ENTER_KEY);
 	vip12A3->tooltip("Please specify the position of the first row");
 	// Input to specify the gap between each row
 	Fl_Value_Input* vip12A4 = new Fl_Value_Input(X_124, Y_13, WBUTTON, HBUTTON, "Spacing");
@@ -230,7 +230,7 @@ void qsl_design::create_form(int X, int Y) {
 	vip12A4->textsize(FONT_SIZE);
 	vip12A4->align(FL_ALIGN_LEFT);
 	vip12A4->callback(cb_value<Fl_Value_Input, double>, &row_height_);
-	vip12A4->when(FL_WHEN_ENTER_KEY);
+//	vip12A4->when(FL_WHEN_ENTER_KEY);
 	vip12A4->tooltip("Please specify the spacing between rows");
 	// Input to specify the (max) number of QSOs per QSL
 	Fl_Value_Input* vip141 = new Fl_Value_Input(X_141, Y_14, WBUTTON, HBUTTON, "QSOs/Card");
@@ -241,7 +241,7 @@ void qsl_design::create_form(int X, int Y) {
 	vip141->textsize(FONT_SIZE);
 	vip141->align(FL_ALIGN_LEFT);
 	vip141->callback(cb_value<Fl_Value_Input, int>, &number_qsos_);
-	vip141->when(FL_WHEN_ENTER_KEY);
+//	vip141->when(FL_WHEN_ENTER_KEY);
 	vip141->tooltip("Please specify the number of QSOs per Card");
 
 	gp1->end();

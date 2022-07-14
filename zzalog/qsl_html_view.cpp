@@ -50,12 +50,10 @@ void qsl_html_view::value(const char* val, record** records, int num_records) {
 						field_val = records[cur_record]->item(field_name, true, true);
 						strcpy(dpos, field_val.c_str()); 
 						cur_record++;
+						dpos += field_val.length();
 						if (cur_record < num_records) {
 							strcpy(dpos, "<BR>");
-							dpos += 4 + field_val.length();
-						}
-						else {
-							dpos += field_val.length();
+							dpos += 4;
 						}
 					}
 				} else {
