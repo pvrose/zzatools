@@ -5,7 +5,7 @@ using namespace zzalog;
 qsl_html_view::qsl_html_view(int X, int Y, int W, int H, const char* l) :
 	Fl_Help_View(X, Y, W, H, l)
 {
-	box(FL_NO_BOX);
+	box(FL_FLAT_BOX);
 }
 
 void qsl_html_view::value(const char* val, record** records, int num_records) {
