@@ -360,6 +360,16 @@ bool lotw_handler::upload_single_qso(record_num_t record_num) {
 	Fl_Preferences lotw_settings(qsl_settings, "LotW");
 	int upload_qso;
 	lotw_settings.get("Upload per QSO", upload_qso, false);
+	record* this_record = book_->get_record(record_num, false);
+	if (this_record->item("LOTW_SENT") == "Y") {
+		char message[128];
+		snprintf(message, 128, "LOTW: QSO %s %s %s already uploaded - not uploading",
+			this_record->item("QSO_DATE").c_str(),
+			this_record->item("TIME_ON").c_str(),
+			this_record->item("CALL").c_str());
+		status_->misc_status(ST_WARNING, message);
+		upload_qso = false;
+	}
 	if (upload_qso) {
 		// Create book with single record
 		extract_data* one_qso = new extract_data;

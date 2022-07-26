@@ -876,6 +876,16 @@ bool eqsl_handler::upload_single_qso(record_num_t record_num) {
 	Fl_Preferences eqsl_settings(qsl_settings, "eQSL");
 	int upload_qso;
 	eqsl_settings.get("Upload per QSO", upload_qso, false);
+	record* this_record = book_->get_record(record_num, false);
+	if (this_record->item("EQSL_SENT") == "Y") {
+		char message[128];
+		snprintf(message, 128, "EQSL: QSO %s %s %s already uploaded - not uploading",
+			this_record->item("QSO_DATE").c_str(),
+			this_record->item("TIME_ON").c_str(),
+			this_record->item("CALL").c_str());
+		status_->misc_status(ST_WARNING, message);
+		upload_qso = false;
+	}
 	if (upload_qso) {
 		// Clear existing help dialog
 		if (help_dialog_) {
@@ -897,7 +907,6 @@ bool eqsl_handler::upload_single_qso(record_num_t record_num) {
 		}
 		bool ok = true;
 		// For single QSO - use STATION_CALLSIGN
-		record* this_record = book_->get_record(record_num, false);
 		string station = this_record->item("STATION_CALLSIGN", true, true);
 		if (station.length() && station != username) {
 			char message[200];

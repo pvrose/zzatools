@@ -971,7 +971,7 @@ void qso_manager::create_use_widgets(int& curr_x, int& curr_y) {
 	max_h = max(max_h, rig_grp_->y() + rig_grp_->h() - curr_y);
 
 	// Box to contain antenna-rig connectivity
-	Fl_Help_View* w19 = new Fl_Help_View(antenna_grp_->x(), curr_y + max_h + GAP, max_w, HMLIN);
+	Fl_Help_View* w19 = new Fl_Help_View(antenna_grp_->x(), curr_y + max_h + GAP, max_w, HBUTTON * 2);
 	w19->box(FL_FLAT_BOX);
 	w19->labelfont(FONT);
 	w19->labelsize(FONT_SIZE);
@@ -1560,7 +1560,7 @@ void qso_manager::enable_use_widgets() {
 	else {
 		// No band selected - check that antenna and rig have at least one #
 		// band they are both meant for.
-		vector<string> r_bands = rig_grp_->info().rig_data.intended_bands;
+		vector<string> r_bands = rig_grp_->info().intended_bands;
 		vector<string> a_bands = antenna_grp_->info().intended_bands;
 		bool found = false;
 		for (auto itr = r_bands.begin(); itr != r_bands.end() && !found; itr++) {
@@ -2179,9 +2179,13 @@ void qso_manager::cb_action(Fl_Widget* w, void* v) {
 	// Set DX location on DxAtlas
 	if (action == WRITE_GRID) {
 		dxa_if_->set_dx_loc(to_upper(text), that->current_qso_->item("CALL"));
+		// Update views - location changed
+		tabbed_forms_->update_views(nullptr, HT_CHANGED, book_->size() - 1);
 	}
-	// Update views
-	tabbed_forms_->update_views(nullptr, HT_MINOR_CHANGE, book_->size() - 1);
+	else {
+		// Update views - not location changed
+		tabbed_forms_->update_views(nullptr, HT_MINOR_CHANGE, book_->size() - 1);
+	}
 	// Give the editor the focus
 	that->editor_->take_focus();
 	// We may have changed the state
@@ -2272,6 +2276,8 @@ void qso_manager::cb_start(Fl_Widget* w, void* v) {
 		while (isspace(text[text.length() - 1])) text = text.substr(0, text.length() - 1);
 		that->current_qso_->item("CALL", text);
 		that->buffer_->unselect();
+		// Update views - changed
+		tabbed_forms_->update_views(nullptr, HT_MINOR_CHANGE, book_->size() - 1);
 	}
 	that->enable_widgets();
 }
