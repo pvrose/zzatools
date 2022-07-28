@@ -908,7 +908,7 @@ bool eqsl_handler::upload_single_qso(record_num_t record_num) {
 		bool ok = true;
 		// For single QSO - use STATION_CALLSIGN
 		string station = this_record->item("STATION_CALLSIGN", true, true);
-		if (station.length() && station != username) {
+		if (station.length() && station != to_upper(username)) {
 			char message[200];
 			snprintf(message, 200, "EQSL: %s:%s %s: Station call %s differs from username %s",
 				this_record->item("QSO_TIME").c_str(),

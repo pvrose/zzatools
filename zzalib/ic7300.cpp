@@ -95,7 +95,7 @@ string ic7300::send_command(unsigned char command, string sub_command, string da
 				string expected = "\xFE\xFE\xE0\x94";
 				if (response.length() >= 4 && response.substr(0, 4) == expected) {
 					// Discard the CI-V preamble/postamble - xFExFEx94xF0 data xFD
-					snprintf(mess, 256, "RIG: Received response %s from transceiver - CMD = %s", hex_to_string(response.substr(4)).c_str(), to_send.c_str());
+					snprintf(mess, 256, "RIG: Received response %s from transceiver - CMD = %s", string_to_hex(response.substr(4)).c_str(), to_send.c_str());
 					return response.substr(4, response.length() - 5);
 				}
 				else {

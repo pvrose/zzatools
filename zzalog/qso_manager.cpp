@@ -1575,7 +1575,7 @@ void qso_manager::enable_use_widgets() {
 		}
 		else {
 			// Antenna intended for a band the rig is capabl of
-			mlo->color(FL_BLUE);
+			mlo->color(FL_DARK_GREEN);
 			mlo->value("Antenna is intended for a band the rig is capable of");
 		}
 	}
@@ -2700,7 +2700,13 @@ void qso_manager::update() {
 		string mode;
 		string submode;
 		rig_if_->get_string_mode(mode, submode);
-		ch_mode_->value(ch_mode_->find_index(submode.c_str()));
+		// Set to SUBMODE if exists else MODE
+		if (submode.length()) {
+			ch_mode_->value(ch_mode_->find_index(submode.c_str()));
+		}
+		else {
+			ch_mode_->value(ch_mode_->find_index(mode.c_str()));
+		}
 		if (band_view_) {
 			double freq = stod(rig_if_->get_frequency(true)) * 1000.0;
 			if (band_view_->in_band(freq)) {
