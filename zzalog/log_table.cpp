@@ -923,6 +923,11 @@ void log_table::dbl_click_column(int col) {
 		my_book_->selection(my_book_->item_number(selected_record));
 		redraw();
 	}
+	else {
+		char message[128];
+		snprintf(message, 128, "LOG: Sort on %s not available with this log type. Sort ignored", field_info.field.c_str());
+		status_->misc_status(ST_WARNING, message);
+	}
 }
 
 // Select and go to item 

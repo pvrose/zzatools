@@ -96,11 +96,13 @@ string ic7300::send_command(unsigned char command, string sub_command, string da
 				if (response.length() >= 4 && response.substr(0, 4) == expected) {
 					// Discard the CI-V preamble/postamble - xFExFEx94xF0 data xFD
 					snprintf(mess, 256, "RIG: Received response %s from transceiver - CMD = %s", string_to_hex(response.substr(4)).c_str(), to_send.c_str());
+					message(ST_DEBUG, mess);
 					return response.substr(4, response.length() - 5);
 				}
 				else {
 					// Not addressed to this
 					snprintf(mess, 256, "RIG: Received a response for another node - CMD = %s RESP = %s", to_send.c_str(), response.c_str());
+					message(ST_DEBUG, mess);
 					return "";
 				}
 			}
