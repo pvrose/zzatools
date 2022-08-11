@@ -33,19 +33,19 @@ using namespace zzalib;
 
 namespace zzalog {
 
-	// Version of intl_editor that handles events such as clicking on words
-	class spad_editor :
-		public intl_editor
-	{
-	public:
-		spad_editor(int x, int y, int w, int h);
-		~spad_editor();
+	//// Version of intl_editor that handles events such as clicking on words
+	//class spad_editor :
+	//	public intl_editor
+	//{
+	//public:
+	//	spad_editor(int x, int y, int w, int h);
+	//	~spad_editor();
 
-		int handle(int event);
+	//	int handle(int event);
 
-	protected:
+	//protected:
 
-	};
+	//};
 
 	// This class provides the dialog to chage the current station settings: rig, antenna and QTH
 	class qso_manager :
@@ -205,6 +205,128 @@ namespace zzalog {
 			void update_settings_name();
 		};
 
+		// Class for QSO group of widgets
+		class qso_group :
+			public Fl_Group
+		{
+			friend class qso_manager;
+
+		public:
+			qso_group(int X, int Y, int W, int H, const char* l);
+			~qso_group();
+
+			// get settings
+			void load_values();
+			// Create form
+			void create_form(int X, int Y);
+			// Enable/disab;e widgets
+			void enable_widgets();
+			// save value
+			void save_values();
+
+			// Callbacks
+		protected:
+			// Select contest mode
+			static void cb_contest(Fl_Widget* w, void* v);
+			// Start QSO - If not started: set start time/date; copy per logging mode; add any set fields. If started: add any set fields
+			static void cb_start_qso(Fl_Widget* w, void* v);
+			// Log QSO - If not started: as cb_start_qso. Also: save QSO
+			static void cb_log_qso(Fl_Widget* w, void* v);
+			// Cancel QSO - delete QSO; clear fields
+			static void cb_cancel_qso(Fl_Widget* w, void* v);
+			// Callback - Worked B4? button
+			static void cb_wkb4(Fl_Widget* w, void* v);
+			// Callback - Parse callsign
+			static void cb_parse(Fl_Widget* w, void* v);
+			// Field input - v: field name
+			static void cb_inp_field(Fl_Widget* w, void* v);
+			// Field choice - v: widget no. X1 to X7
+			static void cb_field(Fl_Widget* w, void* v);
+			// Callback - frequency input
+			static void cb_ip_freq(Fl_Widget* w, void* v);
+			// Callback - band choice
+			static void cb_ch_mode(Fl_Widget* w, void* v);
+			// Callback - power input
+			static void cb_ip_power(Fl_Widget* w, void* v);
+			// Initialise setial number
+			static void cb_init_serno(Fl_Widget* w, void* v);
+			// Increment serial number
+			static void cb_inc_serno(Fl_Widget* w, void* v);
+			// Decrement serial number
+			static void cb_dec_serno(Fl_Widget* w, void* v);
+
+			// Add contests
+			void populate_contests(Fl_Choice* ch);
+			// Update fields
+			void update_fields();
+
+			// Logging mode
+			logging_mode_t logging_mode_;
+			// Current record
+			record* current_qso_;
+			// Contest - "" = No contest
+			string contest_;
+			// Contest exchange details
+			struct exchange {
+				string tx;
+				string rx;
+			};
+			// Contest settings
+			map < string, exchange > exchanges_;
+			
+			// Serial number
+			int serial_num_;
+			static const int NUMBER_FIELDS = 7;
+			// Loggable field names
+			string field_name_[NUMBER_FIELDS];
+			// Loggable field values
+			string callsign_;
+			string field_val_[NUMBER_FIELDS];
+			string notes_;
+
+			// Widgets
+
+			// Log button
+			Fl_Button* bn_log_qso_;
+			// Cancel button
+			Fl_Button* bn_cancel_qso_;
+			// Start button
+			Fl_Button* bn_start_qso_;
+			// Worked before button
+			Fl_Button* bn_wkd_b4_;
+			// Parse button
+			Fl_Button* bn_parse_;
+			// Frequency input
+			Fl_Input* ip_freq_;
+			// Mode choice
+			Fl_Choice* ch_mode_;
+			// Power input
+			Fl_Input* ip_power_;
+			// Group for freq/power/mode
+			Fl_Group* grp_fpm_;
+			// Logging mode
+			Fl_Choice* ch_logmode_;
+			// Contest mode
+			Fl_Choice* ch_contest_;
+			// TX Exchange
+			Fl_Output* op_exchange_;
+			// Initialise serial number
+			Fl_Button* bn_init_serno_;
+			// Increment serial number
+			Fl_Button* bn_inc_serno_;
+			// Decrement serial number
+			Fl_Button* bn_dec_serno_;
+			// Callsign
+			Fl_Input* ip_call_;
+			// Notes
+			Fl_Input* ip_notes_;
+			// Field choices
+			Fl_Choice* ch_field_[NUMBER_FIELDS];
+			// field inputs
+			Fl_Input* ip_field_[NUMBER_FIELDS];
+
+		};
+
 
 	// qso_manager
 	public:
@@ -258,29 +380,8 @@ namespace zzalog {
 		static void cb_bn_use_items(Fl_Widget* w, void* v);
 		// Callback - close button
 		static void cb_close(Fl_Widget* w, void* v);
-		// Call back - general button action
-		static void cb_action(Fl_Widget* w, void* v);
-		// Callback - start button
-		static void cb_start(Fl_Widget* w, void* v);
-		// Callback - save button
-		static void cb_save(Fl_Widget* w, void* v);
-		// Callback - cancel button
-		static void cb_cancel(Fl_Widget* w, void* v);
-		// Callback - Worked B4? button
-		static void cb_wkb4(Fl_Widget* w, void* v);
-		// Callback - Parse callsign
-		static void cb_parse(Fl_Widget* w, void* v);
-		// Callback - frequency input
-		static void cb_ip_freq(Fl_Widget* w, void* v);
-		// Callback - band choice
-		static void cb_ch_mode(Fl_Widget* w, void* v);
-		// Callback - power input
-		static void cb_ip_power(Fl_Widget* w, void* v);
 		// Callback - 1s timer
 		static void cb_timer_clock(void* v);
-
-		// Set font
-		void set_font(Fl_Font font, Fl_Fontsize size);
 
 		// Actions attached to the various buttons and keyboard shortcuts
 		enum actions {
@@ -311,27 +412,25 @@ namespace zzalog {
 		void update_locations();
 		// Load locations
 		void load_locations();
+		// QSO i n progress
+		bool qso_in_progress();
 		// Start QSO
 		record* start_qso();
 		// Create a dummy qso - eg for parsing a callsign
 		record* dummy_qso();
 		// End QSO
 		void end_qso();
-		// QSO i n progress
-		bool qso_in_progress();
 
 
 	protected:
 		// Create the various widgets sets
 		void create_use_widgets(int &curr_x, int &curr_y);
-		void create_spad_widgets(int& curr_x, int& curr_y);
 		void create_cat_widgets(int& curr_x, int& curr_y);
 		void create_alarm_widgets(int& curr_x, int& curr_y);
 		void create_clock_widgets(int& curr_x, int& curr_y);
 
 		// Enable the various sets of widgets
 		void enable_use_widgets();
-		void enable_spad_widgets();
 		void enable_cat_widgets();
 		void enable_alarm_widgets();
 		void enable_clock_widgets();
@@ -340,8 +439,6 @@ namespace zzalog {
 		list<string> ordered_bands_;
 		// Display all ports
 		bool all_ports_;
-		// Logging mode
-		logging_mode_t logging_mode_;
 		// Selecetd CAT but not connecyed
 		bool wait_connect_;
 		// Widgets have been xcreated
@@ -359,6 +456,7 @@ namespace zzalog {
 		common_grp* antenna_grp_;
 		common_grp* callsign_grp_;
 		common_grp* qth_grp_;
+		qso_group* qso_group_;
 		Fl_Group* hamlib_grp_;
 		Fl_Group* flrig_grp_;
 		Fl_Group* norig_grp_;
@@ -376,26 +474,10 @@ namespace zzalog {
 		Fl_Widget* override_check_;
 		Fl_Widget* show_all_ports_;
 
-		// The text items
-		Fl_Text_Buffer* buffer_;
-		// The editor
-		spad_editor* editor_;
-		// Save button
-		Fl_Button* bn_save_;
-		// Cancel button
-		Fl_Button* bn_cancel_;
-		// Start button
-		Fl_Button* bn_start_;
-		// Frequency input
-		Fl_Input* ip_freq_;
-		// Mode choice
-		Fl_Choice* ch_mode_;
-		// Power input
-		Fl_Input* ip_power_;
-		// Group for freq/power/mode
-		Fl_Group* grp_fpm_;
-		// Logging mode
-		Fl_Choice* ch_logmode_;
+		//// The text items
+		//Fl_Text_Buffer* buffer_;
+		//// The editor
+		//spad_editor* editor_;
 		Fl_Radio_Round_Button* bn_nocat_;
 		Fl_Radio_Round_Button* bn_hamlib_;
 		Fl_Radio_Round_Button* bn_flrig_;
@@ -409,11 +491,6 @@ namespace zzalog {
 		Fl_Button* bn_time_;
 		Fl_Button* bn_date_;
 		Fl_Button* bn_local_;
-
-		// The record being entered or used
-		record* current_qso_;
-		// The fieldname
-		string field_;
 
 		// Scratchpad editor font
 		Fl_Font font_;

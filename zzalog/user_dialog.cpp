@@ -313,12 +313,12 @@ void user_dialog::save_values() {
 	Fl_Tooltip::delay(tip_duration_);
 	Fl_Tooltip::font(tip_font_);
 	Fl_Tooltip::size(tip_size_);
-	// Scratchpad settings
-	Fl_Preferences spad_settings(user_settings, "Scratchpad");
-	spad_settings.set("Font Name", (int&)spad_font_);
-	spad_settings.set("Font Size", (int&)spad_size_);
-	// Tell the log views
-	qso_manager_->set_font(spad_font_, spad_size_);
+	//// Scratchpad settings
+	//Fl_Preferences spad_settings(user_settings, "Scratchpad");
+	//spad_settings.set("Font Name", (int&)spad_font_);
+	//spad_settings.set("Font Size", (int&)spad_size_);
+	//// Tell the log views
+	//qso_manager_->set_font(spad_font_, spad_size_);
 	// Tree view settings
 	Fl_Preferences tree_settings(user_settings, "Tree Views");
 	tree_settings.set("Font Name", (int&)tree_font_);
