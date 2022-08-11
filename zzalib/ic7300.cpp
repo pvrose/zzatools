@@ -58,14 +58,14 @@ string ic7300::send_command(unsigned char command, string sub_command, string da
 		bool response_found = false;
 		while (!response_found && src - start < len) {
 			// Skip leading xFE
-			while (src - start < len && *src == '\fe') {
+			while (src - start < len && *src == '\xfe') {
 				src++;
 			}
 			if (src - start < len) {
 				if (*src == cmd[2] && src[1] == cmd[3]) {
 					// command repeated
 					src += 2;
-					while (*src != '\fd') {
+					while (*src != '\xfd') {
 						src++;
 					}
 					src++;
