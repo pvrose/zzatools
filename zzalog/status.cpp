@@ -48,6 +48,7 @@ status::status(int X, int Y, int W, int H, const char* label) :
 	, rig_in_progress_(false)
 	, file_unusable_(false)
 	, no_update_viewer(false)
+	, display_debug_messages_(false)
 {
 	// Initialise attributes
 	progress_stack_.clear();
@@ -383,7 +384,7 @@ void status::rig_status(rig_status_t status, const char* label) {
 // Update miscellaneous status - set text and colour, log the status
 void status::misc_status(status_t status, const char* label) {
 	// If we are displaying the message at this level
-	if ((int)status >= (int)min_level_ ) {
+	if ((int)status >= (int)min_level_ && (status != ST_DEBUG || display_debug_messages_)) {
 		// Set the fixed label and tool tip value. Set the text colour to contrast the button colour
 		Fl_Color colour = STATUS_COLOURS.at(status);
 		misc_status_->copy_label(label);
@@ -421,7 +422,7 @@ void status::misc_status(status_t status, const char* label) {
 
 	}
 	if (report_file_) {
-		// File did open correctly
+		// File did open correctly - write all message to file
 		*report_file_ << message;
 	}
 
@@ -434,7 +435,7 @@ void status::misc_status(status_t status, const char* label) {
 		status_file_viewer_->callback(cb_fv_close, this);
 		status_file_viewer_->hide();
 	}
-	status_file_viewer_->append(message);
+	if (status != ST_DEBUG || display_debug_messages_) status_file_viewer_->append(message);
 
 	// Depending on the severity: LOG, NOTE, OK, WARNING, ERROR, SEVERE or FATAL
 	// Beep on the last three.
@@ -838,4 +839,12 @@ void status::cb_fv_close(Fl_Widget* w, void* v) {
 // Return the file viewer
 Fl_Window* status::file_viewer() {
 	return status_file_viewer_;
+}
+
+// Display debug
+void status::display_debug(bool value) {
+	display_debug_messages_ = value;
+}
+bool status::display_debug() {
+	return display_debug_messages_;
 }

@@ -141,6 +141,8 @@ namespace zzalog {
 		static void cb_mi_help_append(Fl_Widget* w, void* v);
 		// Help->Show Intl
 		static void cb_mi_help_intl(Fl_Widget* w, void * v);
+		// Help->Status->Display Debug
+		static void cb_mi_help_ddebug(Fl_Widget* w, void* v);
 
 		// Enable/disable menu
 		void enable(bool active);

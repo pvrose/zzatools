@@ -762,12 +762,13 @@ void qso_manager::qso_group::create_form(int X, int Y) {
 	const int NUMBER_COLS = 2;
 	int col2 = 0;
 	for (int ia = 0; ia < NUMBER_FIELDS; ia++) {
-		ch_field_[ia] = new Fl_Choice(curr_x, curr_y, WBUTTON * 2, HBUTTON);
+		ch_field_[ia] = new field_choice(curr_x, curr_y, WBUTTON * 2, HBUTTON);
 		ch_field_[ia]->textfont(FONT);
 		ch_field_[ia]->textsize(FONT_SIZE);
 		ch_field_[ia]->tooltip("Specify the field to provide");
 		ch_field_[ia]->callback(cb_field, (void*)ia);
-		spec_data_->initialise_field_choice(ch_field_[ia]);
+		ch_field_[ia]->set_dataset("Fields");
+		ch_field_[ia]->value(field_name_[ia].c_str());
 		curr_x += ch_field_[ia]->w();
 
 		ip_field_[ia] = new Fl_Input(curr_x, curr_y, WBUTTON, HBUTTON);
@@ -877,7 +878,7 @@ void qso_manager::qso_group::create_form(int X, int Y) {
 	curr_y += ip_freq_->h();
 	// Choice - allows user to select mode of operation
 	// Refelcts current mode per logging mode
-	ch_mode_ = new Fl_Choice(curr_x, curr_y, WBUTTON, HTEXT, "Mode");
+	ch_mode_ = new field_choice(curr_x, curr_y, WBUTTON, HTEXT, "Mode");
 	ch_mode_->textfont(FONT);
 	ch_mode_->textsize(FONT_SIZE);
 	ch_mode_->labelfont(FONT);
@@ -928,7 +929,7 @@ void qso_manager::qso_group::create_form(int X, int Y) {
 	}
 	}
 	ip_freq_->value(frequency.c_str());
-	spec_data_->initialise_field_choice(ch_mode_, "Combined", mode);
+	ch_mode_->set_dataset("Combined", mode);
 	ip_power_->value(power.c_str());
 
 	max_h = max(max_h, curr_y);
@@ -987,7 +988,7 @@ void qso_manager::qso_group::enable_widgets() {
 	for (size_t i = 0; i < rx_fields.size() && i < NUMBER_FIELDS; i++) {
 		// Set the field name in specified exchange fields and disallow editing
 		field_name_[i] = rx_fields[i];
-		ch_field_[i]->value(ch_field_[i]->find_index(field_name_[i].c_str()));
+		ch_field_[i]->value(field_name_[i].c_str());
 		ch_field_[i]->deactivate();
 		ch_field_[i]->textcolor(FL_BLACK);
 		// Get the value from the current qso
@@ -1002,7 +1003,7 @@ void qso_manager::qso_group::enable_widgets() {
 	}
 	// Allo them to be edited
 	for (int i = rx_fields.size(); i < NUMBER_FIELDS; i++) {
-		ch_field_[i]->value(ch_field_[i]->find_index(field_name_[i].c_str()));
+		ch_field_[i]->value(field_name_[i].c_str());
 		ch_field_[i]->activate();
 		// Get the value from the current qso
 		string value;
@@ -2783,8 +2784,7 @@ void qso_manager::rig_update(string frequency, string mode, string power) {
 	// Power in watts
 	qso_group_->ip_power_->value(power.c_str());
 	// Mode - index into choice
-	int index = qso_group_->ch_mode_->find_index(mode.c_str());
-	qso_group_->ch_mode_->value(index);
+	qso_group_->ch_mode_->value(mode.c_str());
 	redraw();
 }
 
@@ -2803,10 +2803,10 @@ void qso_manager::update() {
 		rig_if_->get_string_mode(mode, submode);
 		// Set to SUBMODE if exists else MODE
 		if (submode.length()) {
-			qso_group_->ch_mode_->value(qso_group_->ch_mode_->find_index(submode.c_str()));
+			qso_group_->ch_mode_->value(submode.c_str());
 		}
 		else {
-			qso_group_->ch_mode_->value(qso_group_->ch_mode_->find_index(mode.c_str()));
+			qso_group_->ch_mode_->value(mode.c_str());
 		}
 		if (band_view_) {
 			double freq = stod(rig_if_->get_frequency(true)) * 1000.0;
@@ -2831,7 +2831,7 @@ void qso_manager::update() {
 		qso_group_->ip_freq_->textcolor(FL_BLACK);
 		qso_group_->ip_freq_->value(prev_record->item("FREQ").c_str());
 		qso_group_->ip_power_->value(prev_record->item("TX_PWR").c_str());
-		qso_group_->ch_mode_->value(qso_group_->ch_mode_->find_index(prev_record->item("MODE", true).c_str()));
+		qso_group_->ch_mode_->value(prev_record->item("MODE", true).c_str());
 		if (band_view_ && prev_record->item_exists("FREQ")) {
 			double freq = stod(prev_record->item("FREQ")) * 1000.0;
 			band_view_->update(freq);

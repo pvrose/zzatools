@@ -2039,41 +2039,6 @@ string spec_data::convert_ml_string(const string& data) {
 	return return_data;
 }
 
-// Called by some views and dialogs to populate an Fl_Choice widget with a list of all fields
-void spec_data::initialise_field_choice(Fl_Choice* ch, string dataset_name /* = "Fields" */, string default_field /*= ""*/) {
-	// Get the Fields dataset
-	spec_dataset* dataset = spec_data::dataset(dataset_name);
-	// Initialise
-	auto it = dataset->data.begin();
-	int num_fields = dataset->data.size();
-	ch->clear();
-	// Add a blank entry to allow deletion of enumeration
-	ch->add("", 0, (Fl_Callback*)nullptr);
-	char prev = 0;
-	int default_value = 0;
-	// For all dataset
-	for (int i = 1; it != dataset->data.end(); i++) {
-		char curr = it->first[0];
-		if (curr != prev) {
-			// If this is the first entry starting with this letter use this as a short-cut to reduce need for scrolling
-			ch->add(it->first.c_str(), curr, (Fl_Callback*)nullptr);
-			prev = curr;
-		}
-		else {
-			// Just add the entry without a short-cut.
-			ch->add(it->first.c_str(), 0, (Fl_Callback*)nullptr);
-		}
-		it++;
-	}
-	int index = ch->find_index(default_field.c_str());
-	if (index == -1) {
-		ch->value(0);
-	}
-	else {
-		ch->value(index);
-	}
-}
-
 // Generate a timestamp of the QSO for the report listing - QSO <date> <time> <call> <field> (<data>)
 string spec_data::report_timestamp(string field, string data) {
 	string timestamp = "QSO " +

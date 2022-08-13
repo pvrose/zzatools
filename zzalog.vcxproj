@@ -189,7 +189,6 @@
     <ClCompile Include="zzalog\toolbar.cpp" />
     <ClCompile Include="zzalog\tsv_writer.cpp" />
     <ClCompile Include="zzalog\user_dialog.cpp" />
-    <ClCompile Include="zzalog\use_dialog.cpp" />
     <ClCompile Include="zzalog\view.cpp" />
     <ClCompile Include="zzalog\web_dialog.cpp" />
     <ClCompile Include="zzalog\wsjtx_handler.cpp" />
@@ -258,7 +257,6 @@
     <ClInclude Include="zzalog\toolbar.h" />
     <ClInclude Include="zzalog\tsv_writer.h" />
     <ClInclude Include="zzalog\user_dialog.h" />
-    <ClInclude Include="zzalog\use_dialog.h" />
     <ClInclude Include="zzalog\version.h" />
     <ClInclude Include="zzalog\view.h" />
     <ClInclude Include="zzalog\web_dialog.h" />

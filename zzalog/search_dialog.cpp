@@ -145,7 +145,7 @@ search_dialog::search_dialog() :
 	}
 	// Choice - Field-name choice
 	field_choice* ch12 = new field_choice(C13, R13, WCHOICE, HTEXT);
-	ch12->repopulate(true, criteria_->field_name);
+	ch12->set_dataset("Fields",criteria_->field_name);
 	ch12->textsize(FONT_SIZE);
 	ch12->tooltip("Select field to search on");
 	ch12->callback(cb_text<Fl_Choice, string>, (void*)&criteria_->field_name);

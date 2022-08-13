@@ -957,7 +957,7 @@ bool dxa_if::connect_dxatlas() {
 			}
 		}
 	}
-	if (opened_ok) {
+	if (opened_ok && atlas_ != nullptr) {
 		// Initialise the map and make DXATLAS: visible
 		enable_widgets();
 		initialise_map();

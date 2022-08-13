@@ -295,16 +295,6 @@ record_form::record_form(int X, int Y, int W, int H, const char* label, field_or
 	curr_x += GAP + WLABEL;
 	curr_y += GAP;
 
-	// Check button 
-	all_fields_bn_ = new Fl_Check_Button(curr_x, curr_y, WRADIO, HRADIO, "All fields");
-	all_fields_bn_->align(FL_ALIGN_RIGHT);
-	all_fields_bn_->labelsize(FONT_SIZE);
-	all_fields_bn_->labelfont(FONT);
-	all_fields_bn_->tooltip("Selects whether to have all fields in the below selection");
-	all_fields_bn_->callback(cb_bn_all_fields, (void*)&display_all_fields_);
-	all_fields_bn_->when(FL_WHEN_RELEASE);
-	curr_y += all_fields_bn_->h();
-
 	// Choice - field name to be edited
 	field_choice_ = new field_choice(curr_x, curr_y, WEDIT, HTEXT, "Field");
 	field_choice_->align(FL_ALIGN_LEFT);
@@ -606,14 +596,6 @@ void record_form::cb_tab_record(Fl_Widget* w, void* v) {
 	}
 }
 
-// Call when all_fields button is changed
-// v points to display_all_fields_
-void record_form::cb_bn_all_fields(Fl_Widget* w, void* v) {
-	record_form* that = ancestor_view<record_form>(w);
-	cb_value<Fl_Check_Button, bool>(w, v);
-	((field_choice*)that->field_choice_)->repopulate(that->display_all_fields_, that->current_field_);
-}
-
 // Called when the field choice widget is clicked and released
 // v is not used
 void record_form::cb_ch_field(Fl_Widget* w, void* v) {
@@ -741,7 +723,7 @@ void record_form::cb_bn_clear(Fl_Widget* w, void* v) {
 	that->value_in_->buffer()->text("");
 	// Clear enum and field choices
 	that->enum_choice_->value(0);
-	that->field_choice_->value(0);
+	that->field_choice_->value("");
 	that->enable_widgets();
 }
 
@@ -1887,24 +1869,7 @@ void record_form::set_selected_image(image_t value) {
 // Set either the text value or enumeration value control
 void record_form::set_edit_widgets(string field, string text) {
 	// Get the field item
-	const Fl_Menu_Item* item = field_choice_->find_item(field.c_str());
-	if (item == nullptr) {
-		// If it doesn't exist try all fields
-		display_all_fields_ = true;
-		((field_choice*)field_choice_)->repopulate(true, field);
-		all_fields_bn_->value(true);
-		item = field_choice_->find_item(field.c_str());
-		if (item == nullptr) {
-			// The field we are trying to access is not valid, program error?
-			status_->misc_status(ST_FATAL, string("LOG: " + field + " is not a valid field - application error").c_str());
-			field_choice_->value(0);
-		}
-		field_choice_->value(field_choice_->find_index(item));
-	}
-	else {
-		// else get selected
-		field_choice_->value(field_choice_->find_index(item));
-	}
+	field_choice_->set_dataset("Fields", field);
 
 	// Set the data in the edit info controls
 	value_in_->buffer()->text(text.c_str());

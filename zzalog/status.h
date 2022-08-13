@@ -216,6 +216,9 @@ namespace zzalog {
 		void null_file_viewer();
 		// Get status_file_viewer
 		Fl_Window* file_viewer();
+		// Debug display
+		void display_debug(bool value);
+		bool display_debug();
 
 		// Callbacks
 		// Clock button callback
@@ -268,6 +271,8 @@ namespace zzalog {
 		bool file_unusable_;
 		// Do not update file viewer
 		bool no_update_viewer;
+		// Display debug status lines
+		bool display_debug_messages_;
 
 	};
 

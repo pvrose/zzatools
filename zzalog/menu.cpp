@@ -16,7 +16,6 @@
 #include "extract_data.h"
 #include "search_dialog.h"
 #include "change_dialog.h"
-#include "use_dialog.h"
 #include "about_dialog.h"
 #include "pfx_tree.h"
 #include "spec_tree.h"
@@ -260,6 +259,7 @@ namespace zzalog {
 			{ "Se&vere", 0, menu::cb_mi_help_level, (void*)ST_SEVERE, FL_MENU_RADIO },
 			{ "&Fatal", 0, menu::cb_mi_help_level, (void*)ST_FATAL, FL_MENU_RADIO | FL_MENU_DIVIDER},
 			{ "&Append File", 0 , menu::cb_mi_help_append, 0, FL_MENU_TOGGLE},
+			{ "Display De&bug", 0, menu::cb_mi_help_ddebug, 0, FL_MENU_TOGGLE},
 			{ 0 },
 		{ "&Intl", 0, menu::cb_mi_help_intl, nullptr, FL_MENU_TOGGLE },
 		{ 0 },
@@ -982,70 +982,6 @@ void menu::cb_mi_log_edith(Fl_Widget* w, void* v) {
 	navigation_book_->edit_header();
 }
 
-//// Log->Change->Rig/Aerial/QTH - open a dialog to specify new rig/aerial/QTH to use
-//// v is enum use_dialog_t: UD_RIG, UD_AERIAL, UD_QTH, UD_PROP
-//void menu::cb_mi_oper_change(Fl_Widget* w, void* v) {
-//	use_dialog_t type = (use_dialog_t)(long)v;
-//	// Open dialog for the type - dialog changes settings
-//	use_dialog* dialog = new use_dialog(type);
-//	if (dialog->display() == BN_OK) {
-//		string path;
-//		switch (type) {
-//		case UD_RIG:
-//			path = "Rigs";
-//			break;
-//		case UD_AERIAL:
-//			path = "Aerials";
-//			break;
-//		case UD_QTH:
-//			path = "QTHs";
-//			break;
-//		case UD_PROP:
-//			path = "Propagation Mode";
-//			break;
-//		}
-//		// get the modified settings
-//		Fl_Preferences station_settings(settings_, "Stations");
-//		Fl_Preferences use_settings(station_settings, path.c_str());
-//		char * temp;
-//		use_settings.get("Current", temp, "");
-//		// Change the field in the current record 
-//		switch (type)
-//		{
-//		case UD_RIG:
-//			book_->get_record()->item("MY_RIG", string(temp));
-//			break;
-//		case UD_AERIAL:
-//			book_->get_record()->item("MY_ANTENNA", string(temp));
-//			break;
-//		case UD_QTH:
-//			book_->get_record()->item("APP_ZZA_QTH", string(temp));
-//			break;
-//		case UD_PROP:
-//			book_->get_record()->item("PROP_MODE", string(temp));
-//		}
-//		free(temp);
-//	}
-//	book_->modified(true);
-//	// Update views with the modified record
-//	book_->selection(-1, HT_MINOR_CHANGE);
-//
-//	Fl::delete_widget(dialog);
-//}
-//
-//// Log->Set->Rig/Aerial/QTH - open a dialog to specify new rig/aerial/QTH to use
-//// v is enum use_dialog_t: UD_RIG, UD_AERIAL, UD_QTH or UD_PROP
-//void menu::cb_mi_oper_set(Fl_Widget* w, void* v) {
-//	use_dialog_t type = (use_dialog_t)(long)v;
-//	// Open dialog for the type - dialog changes settings
-//	use_dialog* dialog = new use_dialog(type);
-//	if (dialog->display() != BN_OK) {
-//		status_->misc_status(ST_WARNING, "LOG: Set rig or aerial or QTH cancelled by user");
-//	}
-//	book_->modified(true);
-//	Fl::delete_widget(dialog);
-//}
-
 // Operate->Start Session
 // v is long: 0 is now, 1 is selected QSO
 void menu::cb_mi_log_start(Fl_Widget* w, void* v) {
@@ -1498,6 +1434,16 @@ void menu::cb_mi_help_view(Fl_Widget* w, void* v) {
 // v is enum status_t: minimum display level
 void menu::cb_mi_help_level(Fl_Widget* w, void* v) {
 	status_->min_level((status_t)(long)v);
+}
+
+// Help->Status->Display Debug
+// v is unused
+void menu::cb_mi_help_ddebug(Fl_Widget* w, void* v) {
+	// Get the value of the checked menu item
+	Fl_Menu_* menu = (Fl_Menu_*)w;
+	const Fl_Menu_Item* item = menu->mvalue();
+	bool value = item->value();
+	status_->display_debug(value);
 }
 
 // Help->Status->Append File

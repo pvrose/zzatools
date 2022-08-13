@@ -7,6 +7,7 @@
 #include "spec_data.h"
 #include "fields.h"
 #include "intl_widgets.h"
+#include "field_choice.h"
 
 #include <FL/Fl_Box.H>
 #include <FL/Fl_Button.H>
@@ -105,8 +106,6 @@ namespace zzalog {
 		static void cb_bn_next(Fl_Widget* w, void* v);
 		// get previous and update
 		static void cb_bn_prev(Fl_Widget* w, void* v);
-		// all or limited fields
-		static void cb_bn_all_fields(Fl_Widget* w, void* v);
 
 		// methods
 		// update the form from the provided data
@@ -156,7 +155,7 @@ namespace zzalog {
 		// Editing info 
 		Fl_Group* editting_grp_;
 		Fl_Check_Button* all_fields_bn_;
-		Fl_Choice* field_choice_;
+		field_choice* field_choice_;
 		intl_editor* value_in_;
 		Fl_Choice* enum_choice_;
 		// Quick entry buttons

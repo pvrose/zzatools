@@ -141,9 +141,6 @@
     <ClCompile Include="zzalog\tsv_writer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="zzalog\use_dialog.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="zzalog\view.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -342,9 +339,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="zzalog\tsv_writer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\use_dialog.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="zzalog\view.h">

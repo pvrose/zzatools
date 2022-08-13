@@ -1,6 +1,8 @@
 #ifndef __FIELD_CHOICE__
 #define __FIELD_CHOICE__
 
+#include "spec_data.h"
+
 #include <string>
 #include <FL/Fl_Choice.H>
 
@@ -14,8 +16,16 @@ namespace zzalog {
 	public:
 		field_choice(int X, int Y, int W, int H, const char* label = nullptr);
 		~field_choice();
-		// Repopulate the choice with either all fields or the most common ones and select the default feld.
-		void repopulate(bool all_fields, string default_field);
+
+		// Set dataset
+		void set_dataset(string dataset_name, string default = "");
+		// Override value methods for fundamental string
+		const char* value();
+		void value(const char* field);
+
+	protected:
+		spec_dataset* dataset_;
+
 	};
 
 }

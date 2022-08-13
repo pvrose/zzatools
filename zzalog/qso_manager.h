@@ -7,6 +7,7 @@
 #include "record.h"
 #include "intl_widgets.h"
 #include "alarm_dial.h"
+#include "field_choice.h"
 
 #include <string>
 #include <vector>
@@ -299,7 +300,7 @@ namespace zzalog {
 			// Frequency input
 			Fl_Input* ip_freq_;
 			// Mode choice
-			Fl_Choice* ch_mode_;
+			field_choice* ch_mode_;
 			// Power input
 			Fl_Input* ip_power_;
 			// Group for freq/power/mode
@@ -321,7 +322,7 @@ namespace zzalog {
 			// Notes
 			Fl_Input* ip_notes_;
 			// Field choices
-			Fl_Choice* ch_field_[NUMBER_FIELDS];
+			field_choice* ch_field_[NUMBER_FIELDS];
 			// field inputs
 			Fl_Input* ip_field_[NUMBER_FIELDS];
 
