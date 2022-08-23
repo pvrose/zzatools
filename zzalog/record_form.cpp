@@ -317,7 +317,7 @@ record_form::record_form(int X, int Y, int W, int H, const char* label, field_or
 	value_in_->buffer(buff);
 	curr_y += HMLIN;
 	// Choice - list of values for an enumeration field
-	enum_choice_ = new Fl_Choice(curr_x, curr_y, WEDIT, HTEXT, "Enum");
+	enum_choice_ = new field_choice(curr_x, curr_y, WEDIT, HTEXT, "Enum");
 	enum_choice_->align(FL_ALIGN_LEFT);
 	enum_choice_->labelsize(FONT_SIZE);
 	enum_choice_->textsize(FONT_SIZE);
@@ -635,13 +635,8 @@ void record_form::cb_editor(Fl_Widget* w, void* v) {
 // v is not used
 void record_form::cb_ch_enum(Fl_Widget* w, void* v) {
 	record_form* that = ancestor_view<record_form>(w);
-	Fl_Choice* choice = (Fl_Choice*)w;
-	string enum_value = "";
-	char temp[128];
-	// Get the name of the item selected in the Fl_Choice
-	choice->item_pathname(temp, sizeof(temp) - 1);
-	// If there is a value get its text
-	if (temp[0] != 0) enum_value = &temp[1];
+	field_choice* choice = (field_choice*)w;
+	string enum_value = choice->value();
 	// Get the enum specification dataset and display the value's meaning
 	spec_dataset* dataset = spec_data_->dataset(that->current_enum_type_);
 	that->explain_enum(dataset, enum_value);
@@ -1896,14 +1891,13 @@ void record_form::set_edit_widgets(string field, string text) {
 // Populate the enum choice with valid values for that enumeration and select the 
 // specific value
 void record_form::set_enum_choice(string enumeration_type, string text) {
+	string set_value = text;
 	current_enum_type_ = enumeration_type;
 	// Set enumeration, disable test and enable enum value controls
 	is_enumeration_ = true;
 	enum_choice_->activate();
 	// delete existing menu
 	enum_choice_->clear();
-
-	int enum_index = 0;
 
 	if (enumeration_type == "MY_RIG" || enumeration_type == "MY_ANTENNA" || enumeration_type == "APP_ZZA_QTH") {
 		// Get the list of allowable values from settings
@@ -1916,48 +1910,40 @@ void record_form::set_enum_choice(string enumeration_type, string text) {
 		int num_items = kit_settings.groups();
 		enum_choice_->add("", 0, (Fl_Callback*)nullptr);
 		for (int i = 0; i < num_items; i++) {
-			enum_choice_->add(kit_settings.group(i));
-			if (strcmp(text.c_str(), kit_settings.group(i)) == 0) {
-				enum_index = i;
-			}
+			if (strlen(kit_settings.group(i)) == 0) {
+				enum_choice_->add("");
+			} else {
+				char value[128];
+				snprintf(value, 128, "%c/%s", kit_settings.group(i)[0], kit_settings.group(i));
+				enum_choice_->add(value);
+			} 
 		}
 	}
 	else {
 		// Get all the enumeration values and populate drop-down list
 		spec_dataset* dataset = spec_data_->dataset(enumeration_type);
 		auto it = dataset->data.begin();
-		char prev = 0;
 		// Add null entry to list
 		enum_choice_->add("", 0, (Fl_Callback*)nullptr);
 		// Look at each enumeration values
 		while (it != dataset->data.end()) {
 			// Get first letter of the value
-			char curr = it->first[0];
 			int index;
-			if (curr == prev) {
-				// Add the enumeration value to the menu
-				index = enum_choice_->add(it->first.c_str(), 0, (Fl_Callback*)nullptr);
-				prev = curr;
-			}
-			else {
-				// Add the enumeration value with its initial letter as a short-cut
-				index = enum_choice_->add(it->first.c_str(), it->first[0], (Fl_Callback*)nullptr);
-			}
-			// 
-			if (it->first == text) enum_index = index;
+			char value[128];
+			snprintf(value, 128, "%c/%s", it->first[0], it->first.c_str());
+			// Add the enumeration value to the menu
+			index = enum_choice_->add(value, 0, (Fl_Callback*)nullptr);
 			it++;
 		}
 
 		// If text is "" then we need to explain the first entry on the list, otherwise use text
 		if (text == "") {
-			explain_enum(dataset, dataset->data.begin()->first);
+			set_value = dataset->data.begin()->first;
 		}
-		else {
-			explain_enum(dataset, text);
-		}
+		explain_enum(dataset, set_value);
 	}
 	// If the data is not in the drop-down list set it to first entry
-	enum_choice_->value(enum_index);
+	enum_choice_->value(set_value.c_str());
 
 }
 

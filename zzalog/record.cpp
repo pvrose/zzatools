@@ -218,9 +218,16 @@ void record::item(string field, string value, bool formatted/* = false*/) {
 			case 'E':
 				// Enumeration: convert to uppercase
 				formatted_value = to_upper(upper_value);
-				if (field == "MODE" && spec_data_->is_submode(formatted_value)) {
-					item("SUBMODE", formatted_value, formatted);
-					formatted_value = spec_data_->mode_for_submode(formatted_value);
+				if (field == "MODE") {
+					if (spec_data_->is_submode(formatted_value)) {
+						// Set submode to this value and the mode to its parent mode
+						item("SUBMODE", formatted_value, formatted);
+						formatted_value = spec_data_->mode_for_submode(formatted_value);
+					}
+					else {
+						// set submode to ""
+						item("SUBMODE", string(""));
+					}
 				}
 				break;
 			case 'L':

@@ -140,7 +140,6 @@ namespace zzalog {
 			}
 		};
 
-
 		// This class provides individual grouping for rig, antenna.
 		class common_grp :
 			public Fl_Group
@@ -227,8 +226,6 @@ namespace zzalog {
 
 			// Callbacks
 		protected:
-			// Select contest mode
-			static void cb_contest(Fl_Widget* w, void* v);
 			// Start QSO - If not started: set start time/date; copy per logging mode; add any set fields. If started: add any set fields
 			static void cb_start_qso(Fl_Widget* w, void* v);
 			// Log QSO - If not started: as cb_start_qso. Also: save QSO
@@ -239,10 +236,10 @@ namespace zzalog {
 			static void cb_wkb4(Fl_Widget* w, void* v);
 			// Callback - Parse callsign
 			static void cb_parse(Fl_Widget* w, void* v);
-			// Field input - v: field name
-			static void cb_inp_field(Fl_Widget* w, void* v);
-			// Field choice - v: widget no. X1 to X7
-			static void cb_field(Fl_Widget* w, void* v);
+			//// Field input - v: field name
+			//static void cb_inp_field(Fl_Widget* w, void* v);
+			//// Field choice - v: widget no. X1 to X7
+			//static void cb_field(Fl_Widget* w, void* v);
 			// Callback - frequency input
 			static void cb_ip_freq(Fl_Widget* w, void* v);
 			// Callback - band choice
@@ -255,35 +252,59 @@ namespace zzalog {
 			static void cb_inc_serno(Fl_Widget* w, void* v);
 			// Decrement serial number
 			static void cb_dec_serno(Fl_Widget* w, void* v);
+			// Define contest exchange format
+			static void cb_def_format(Fl_Widget* w, void* v);
+			// Start/Stop contest mode
+			static void cb_ena_contest(Fl_Widget* w, void* v);
+			// Pause contest mode
+			static void cb_pause_contest(Fl_Widget* w, void* v);
+			// Exchange format choice
+			static void cb_format(Fl_Widget* w, void* v);
+			// Add exchange button
+			static void cb_add_exch(Fl_Widget* w, void* v);
 
-			// Add contests
-			void populate_contests(Fl_Choice* ch);
+			// Add contest exchanges
+			void populate_exch_fmt();
 			// Update fields
 			void update_fields();
+			// Initialise fields
+			void initialise_fields();
+			// Add new format - return format index
+			int add_format_id(string id);
+			// Add new format definition 
+			void add_format_def(int ix, bool tx);
 
 			// Logging mode
 			logging_mode_t logging_mode_;
 			// Current record
 			record* current_qso_;
-			// Contest - "" = No contest
-			string contest_;
-			// Contest exchange details
-			struct exchange {
-				string tx;
-				string rx;
-			};
-			// Contest settings
-			map < string, exchange > exchanges_;
+			// Contest ID
+			string contest_id_;
+			// Contest exchange format index
+			int exch_fmt_ix_;
+			// And its id
+			string exch_fmt_id_;
+			// Exchanges: format ID, TX and RX fields
+			static const int MAX_CONTEST_TYPES = 100;
+			string ef_ids_[MAX_CONTEST_TYPES];
+			string ef_txs_[MAX_CONTEST_TYPES];
+			string ef_rxs_[MAX_CONTEST_TYPES];
+			int max_ef_index_;
+			// Adding an exchange
+			enum field_mode_t {
+				NO_CONTEST = 0,  // Normal non-contest logging behaviour
+				CONTEST,         // Normal contest logging behaviour
+				PAUSED,          // Log non-contest within contest logging
+				NEW,             // A new format id is selected
+				DEFINE,          // Define new contest exchange definition
+				EDIT             // Edit contest exchange definition
+			} field_mode_;
 			
 			// Serial number
 			int serial_num_;
-			static const int NUMBER_FIELDS = 7;
 			// Loggable field names
-			string field_name_[NUMBER_FIELDS];
-			// Loggable field values
-			string callsign_;
-			string field_val_[NUMBER_FIELDS];
-			string notes_;
+			static const int NUMBER_FIELDS = 11;
+
 
 			// Widgets
 
@@ -307,16 +328,27 @@ namespace zzalog {
 			Fl_Group* grp_fpm_;
 			// Logging mode
 			Fl_Choice* ch_logmode_;
-			// Contest mode
-			Fl_Choice* ch_contest_;
-			// TX Exchange
-			Fl_Output* op_exchange_;
+			// Contest ID
+			field_choice* ch_contest_id_;
+			// Contest exchange
+			Fl_Input_Choice* ch_format_;
+			// Add exchange
+			Fl_Button* bn_add_exch_;
+			// Define exchanges
+			Fl_Button* bn_define_tx_;
+			Fl_Button* bn_define_rx_;
+			// TX Serial number
+			Fl_Output* op_serno_;
 			// Initialise serial number
 			Fl_Button* bn_init_serno_;
 			// Increment serial number
 			Fl_Button* bn_inc_serno_;
 			// Decrement serial number
 			Fl_Button* bn_dec_serno_;
+			// Pause contest
+			Fl_Light_Button* bn_pause_;
+			// Enable contest
+			Fl_Light_Button* bn_enable_;
 			// Callsign
 			Fl_Input* ip_call_;
 			// Notes
@@ -326,6 +358,32 @@ namespace zzalog {
 			// field inputs
 			Fl_Input* ip_field_[NUMBER_FIELDS];
 
+		};
+
+		class clock_group :
+			public Fl_Group
+
+		{
+			friend class qso_manager;
+
+			clock_group(int X, int Y, int W, int H, const char* l);
+			~clock_group();
+
+			// get settings
+			void load_values();
+			// Create form
+			void create_form(int X, int Y);
+			// Enable/disab;e widgets
+			void enable_widgets();
+			// save value
+			void save_values();
+
+			// Callback - 1s timer
+			static void cb_timer_clock(void* v);
+
+			Fl_Button* bn_time_;
+			Fl_Button* bn_date_;
+			Fl_Button* bn_local_;
 		};
 
 
@@ -381,8 +439,6 @@ namespace zzalog {
 		static void cb_bn_use_items(Fl_Widget* w, void* v);
 		// Callback - close button
 		static void cb_close(Fl_Widget* w, void* v);
-		// Callback - 1s timer
-		static void cb_timer_clock(void* v);
 
 		// Actions attached to the various buttons and keyboard shortcuts
 		enum actions {
@@ -416,7 +472,7 @@ namespace zzalog {
 		// QSO i n progress
 		bool qso_in_progress();
 		// Start QSO
-		record* start_qso();
+		record* start_qso(bool add_to_book = true);
 		// Create a dummy qso - eg for parsing a callsign
 		record* dummy_qso();
 		// End QSO
@@ -428,13 +484,11 @@ namespace zzalog {
 		void create_use_widgets(int &curr_x, int &curr_y);
 		void create_cat_widgets(int& curr_x, int& curr_y);
 		void create_alarm_widgets(int& curr_x, int& curr_y);
-		void create_clock_widgets(int& curr_x, int& curr_y);
 
 		// Enable the various sets of widgets
 		void enable_use_widgets();
 		void enable_cat_widgets();
 		void enable_alarm_widgets();
-		void enable_clock_widgets();
 
 		// Set of bands in frequency order
 		list<string> ordered_bands_;
@@ -464,7 +518,7 @@ namespace zzalog {
 		Fl_Group* cat_grp_;
 		Fl_Group* cat_sel_grp_;
 		Fl_Group* alarms_grp_;
-		Fl_Group* clock_grp_;
+		clock_group* clock_group_;
 		// widgets
 		// Hamlib widgets to revalue when rig selected changes
 		Fl_Widget* mfr_choice_;
@@ -489,9 +543,6 @@ namespace zzalog {
 		alarm_dial* dial_vdd_;
 		Fl_Button* connect_bn_;
 		Fl_Widget* ant_rig_box_;
-		Fl_Button* bn_time_;
-		Fl_Button* bn_date_;
-		Fl_Button* bn_local_;
 
 		// Scratchpad editor font
 		Fl_Font font_;

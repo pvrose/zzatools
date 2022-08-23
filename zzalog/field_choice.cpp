@@ -44,16 +44,16 @@ void field_choice::set_dataset(string dataset_name, string default_field /* = ""
 
 // Get the character string at the selected item
 const char* field_choice::value() {
-	char* result;
+	char* result = new char[128];
 	char temp[128];
-	item_pathname(temp, sizeof(temp) - 1);
+	item_pathname(temp, 128);
 	// If there is a value get its leaf text.
-	if (temp[0] != 0) {
-		char* last_slash = strrchr(temp, '/');
-		result = &last_slash[1];
+	if (strlen(temp) && temp[0] != 0) {
+		const char* last_slash = strrchr(temp, '/');
+		strcpy(result, last_slash + 1);
 	}
 	else {
-		result = temp;
+		strcpy(result, temp);
 	}
 	return result;
 }

@@ -942,6 +942,7 @@ bool dxa_if::connect_dxatlas() {
 				// And if that fails, say oops and hide this view
 				status_->misc_status(ST_ERROR, "DXATLAS: Unable to connect to DxAtlas.");
 				opened_ok = false;
+				atlas_ = nullptr;
 			}
 		}
 
@@ -954,6 +955,7 @@ bool dxa_if::connect_dxatlas() {
 				// And if that fails, say oops and hide this view
 				status_->misc_status(ST_ERROR, "DXATLAS: Exception in DxAtlas.");
 				opened_ok = false;
+				atlas_ = nullptr;
 			}
 		}
 	}

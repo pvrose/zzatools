@@ -596,14 +596,17 @@ qso_manager::qso_group::qso_group(int X, int Y, int W, int H, const char* l) :
 	Fl_Group(X, Y, W, H, l)
 	, current_qso_(nullptr)
 	, logging_mode_(LM_OFF_AIR)
+	, contest_id_("")
+	, exch_fmt_ix_(0)
+	, exch_fmt_id_("")
+	, max_ef_index_(0)
+	, field_mode_(NO_CONTEST)
 {
-	exchanges_.clear();
 	load_values();
 }
 
 // Destructor
 qso_manager::qso_group::~qso_group() {
-
 }
 
 // Load values
@@ -622,44 +625,33 @@ void qso_manager::qso_group::load_values() {
 
 	// Contest definitions
 	Fl_Preferences contest_settings(dash_settings, "Contests");
-	// 
-	bool has_non_contest = false;
-	exchanges_.clear();
-	unsigned int num_contests = contest_settings.groups();
+	contest_settings.get("Next Serial Number", serial_num_, 0);
+	contest_settings.get("Contest Mode", (int&)field_mode_, false);
 	char* temp;
-	// Get current contest - default = none
-	contest_settings.get("Current", temp, "NONE");
-	contest_ = temp;
+	contest_settings.get("Contest ID", temp, "");
+	contest_id_ = temp;
 	free(temp);
-	// Get last serial number sent (if not a contest use 0)
-	if (contest_ == "NONE") {
-		serial_num_ = 0;
-	}
-	else {
-		contest_settings.get("Last Serial Number", serial_num_, 0);
-		serial_num_++;
-	}
-	if (num_contests > 0) {
-		// Already have contests set, read them
-		for (unsigned int i = 0; i < num_contests; i++) {
-			const char* name = contest_settings.group(i);
-			if (strcmp(name, "NONE") == 0) {
-				has_non_contest = true;
-			}
-			Fl_Preferences one_setting(contest_settings, name);
-			char* exchange;
-			one_setting.get("TX", exchange, "RST_SENT,STX");
-			exchanges_[string(name)].tx = string(exchange);
-			free(exchange);
-			one_setting.get("RX", exchange, "RSR_RCVD,SRX");
-			exchanges_[string(name)].rx = string(exchange);
-			free(exchange);
-		}
-	}
-	// Add non-contest exchange
-	if (!has_non_contest) {
-		exchanges_["NONE"].tx = "RST_SENT,MY_NAME,MY_CITY";
-		exchanges_["NONE"].rx = "RST_SENT,RST_RCVD,NAME,QTH";
+	contest_settings.get("Exchange Format", exch_fmt_ix_, 0);
+	// Contest exchnage formats
+	Fl_Preferences format_settings(contest_settings, "Formats");
+	unsigned int num_formats = format_settings.groups();
+	max_ef_index_ = num_formats;
+	// Already have contests set, read them
+	//	Format ID (nickname)
+	//		Index: n
+	//		TX: Transmit fields
+	//		RX: Receive fields
+	for (unsigned int i = 0; i < num_formats; i++) {
+		Fl_Preferences one_setting(format_settings, format_settings.group(i));
+		int index;
+		one_setting.get("Index", index, 0);
+		ef_ids_[index] = format_settings.group(i);
+		one_setting.get("TX", temp, "RST_SENT,STX");
+		ef_txs_[index] = string(temp);
+		free(temp);
+		one_setting.get("RX", temp, "RST_RCVD,SRX");
+		ef_rxs_[index] = string(temp);
+		free(temp);
 	}
 }
 
@@ -667,6 +659,8 @@ void qso_manager::qso_group::load_values() {
 void qso_manager::qso_group::create_form(int X, int Y) {
 	int max_w = 0;
 	int max_h = 0;
+
+	begin();
 
 	Fl_Group* g = new Fl_Group(X, Y, 0, 0, "QSO Data Entry");
 	g->labelfont(FONT);
@@ -691,125 +685,290 @@ void qso_manager::qso_group::create_form(int X, int Y) {
 	ch_logmode_->callback(cb_value<Fl_Choice, logging_mode_t>, &logging_mode_);
 	ch_logmode_->tooltip("Select the logging mode - i.e. how to initialise a new QSO record");
 
-	int curr_y = ch_logmode_->y() + ch_logmode_->h() + GAP;
-	int curr_x = ch_logmode_->x();
+	int curr_y = ch_logmode_->y() + ch_logmode_->h() + GAP;;
 	int top = ch_logmode_->y() + ch_logmode_->h();
 	int left = x() + GAP;
+	int curr_x = left;
+
+	Fl_Group* g_contest = new Fl_Group(curr_x, curr_y, 0, 0, "Contest");
+	g_contest->labelfont(FONT);
+	g_contest->labelsize(FONT_SIZE);
+	g_contest->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
+	g_contest->box(FL_BORDER_BOX);
+
+	curr_x += GAP;
+	curr_y += HTEXT;
+
+	bn_enable_ = new Fl_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Enable");
+	bn_enable_->labelfont(FONT);
+	bn_enable_->labelsize(FONT_SIZE);
+	bn_enable_->value(field_mode_ != NO_CONTEST);
+	bn_enable_->color2(FL_GREEN);
+	bn_enable_->callback(cb_ena_contest, nullptr);
+	bn_enable_->tooltip("Enable contest operation - resets contest parameters");
+
+	curr_x += bn_enable_->w() + GAP;
+
+	// Pause contest button
+	bn_pause_ = new Fl_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Pause");
+	bn_pause_->labelfont(FONT);
+	bn_pause_->labelsize(FONT_SIZE);
+	bn_pause_->value(field_mode_ == PAUSED);
+	bn_pause_->color2(FL_RED);
+	bn_pause_->callback(cb_pause_contest, nullptr);
+	bn_pause_->tooltip("Pause contest, i.e. keep parameters when resume");
+
+	curr_x += bn_pause_->w() + GAP + (WLABEL * 3 / 2);
+
+	// Contest ID - used for logging
+	ch_contest_id_ = new field_choice(curr_x, curr_y, WBUTTON * 2, HBUTTON, "CONTEST_ID");
+	ch_contest_id_->labelfont(FONT);
+	ch_contest_id_->labelsize(FONT_SIZE);
+	ch_contest_id_->textfont(FONT);
+	ch_contest_id_->textsize(FONT_SIZE);
+	ch_contest_id_->set_dataset("Contest_ID");
+	ch_contest_id_->value(contest_id_.c_str());
+	ch_contest_id_->callback(cb_value<field_choice, string>, &contest_id_);
+	ch_contest_id_->tooltip("Select the ID for the contest (for logging)");
+
+	max_w = max(max_w, curr_x + ch_contest_id_->w() + GAP - x());
+	curr_x = g_contest->x() + GAP + WLABEL;
+	curr_y += ch_contest_id_->h();
 
 	// Choice widget to select the required exchanges
-	ch_contest_ = new Fl_Choice(curr_x, curr_y, WBUTTON + WBUTTON, HBUTTON, "Contest");
-	ch_contest_->labelfont(FONT);
-	ch_contest_->labelsize(FONT_SIZE);
-	ch_contest_->textfont(FONT);
-	ch_contest_->textsize(FONT_SIZE);
-	ch_contest_->align(FL_ALIGN_LEFT);
-	populate_contests(ch_contest_);
-	ch_contest_->callback(cb_contest, &contest_);
+	ch_format_ = new Fl_Input_Choice(curr_x, curr_y, WBUTTON + WBUTTON, HBUTTON, "Exch.");
+	ch_format_->labelfont(FONT);
+	ch_format_->labelsize(FONT_SIZE);
+	ch_format_->textfont(FONT);
+	ch_format_->textsize(FONT_SIZE);
+	ch_format_->value(exch_fmt_id_.c_str());
+	ch_format_->align(FL_ALIGN_LEFT);
+	ch_format_->callback(cb_format, nullptr);
+	ch_format_->when(FL_WHEN_RELEASE);
+	ch_format_->tooltip("Select existing exchange format or type in new (click \"Add\" to add)");
+	populate_exch_fmt();
 
-	curr_x = ch_contest_->x() + ch_contest_->w() + GAP;
+	curr_x += ch_format_->w();
+
+	// Add exchange button
+	bn_add_exch_ = new Fl_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Add");
+	bn_add_exch_->labelfont(FONT);
+	bn_add_exch_->labelsize(FONT_SIZE);
+	bn_add_exch_->value(field_mode_ == EDIT);
+	bn_add_exch_->callback(cb_add_exch, nullptr);
+	bn_add_exch_->color2(FL_RED);
+	bn_add_exch_->tooltip("Add new exchange format - choose fields and click \"TX\" or \"RX\" to create them");
+	
+	curr_x += bn_add_exch_->w() + GAP;
+
+	// Define contest exchanges
+	bn_define_tx_ = new Fl_Button(curr_x, curr_y, WBUTTON/2, HBUTTON, "TX");
+	bn_define_tx_->labelfont(FONT);
+	bn_define_tx_->labelsize(FONT_SIZE);
+	bn_define_tx_->callback(cb_def_format, (void*)true);
+	bn_define_tx_->tooltip("Use the specified fields as contest exchange on transmit");
+
+	curr_x += bn_define_tx_->w();
+
+	// Define contest
+	bn_define_rx_ = new Fl_Button(curr_x, curr_y, WBUTTON/2, HBUTTON, "RX");
+	bn_define_rx_->labelfont(FONT);
+	bn_define_rx_->labelsize(FONT_SIZE);
+	bn_define_rx_->callback(cb_def_format, (void*)false);
+	bn_define_rx_->tooltip("Use the specified fields as contest exchange on receive");
+
+	curr_x += bn_define_rx_->w() +GAP;
 
 	// Serial number control buttons - Initialise to 001
-	bn_init_serno_ = new Fl_Button(curr_x, curr_y, WBUTTON * 2 / 3, HBUTTON, "001");
-	bn_init_serno_->labelfont(FONT | FL_BOLD);
+	bn_init_serno_ = new Fl_Button(curr_x, curr_y, WBUTTON / 2, HBUTTON, "@|<");
+	bn_init_serno_->labelfont(FONT);
 	bn_init_serno_->labelsize(FONT_SIZE);
 	bn_init_serno_->callback(cb_init_serno, nullptr);
 	bn_init_serno_->tooltip("Reset the contest serial number counter to \"001\"");
 
-	curr_x = bn_init_serno_->x() + bn_init_serno_->w();
+	curr_x += bn_init_serno_->w();
 
 	// Serial number control buttons - Decrement
-	bn_dec_serno_ = new Fl_Button(curr_x, curr_y, WBUTTON * 2 / 3, HBUTTON, "-");
-	bn_dec_serno_->labelfont(FONT | FL_BOLD);
+	bn_dec_serno_ = new Fl_Button(curr_x, curr_y, WBUTTON / 2, HBUTTON, "@<");
+	bn_dec_serno_->labelfont(FONT);
 	bn_dec_serno_->labelsize(FONT_SIZE + 2);
 	bn_dec_serno_->callback(cb_dec_serno, nullptr);
 	bn_dec_serno_->tooltip("Decrement the contest serial number counter by 1");
 
-	curr_x = bn_dec_serno_->x() + bn_dec_serno_->w();
+	curr_x += bn_dec_serno_->w();
 
 	// Serial number control buttons - Decrement
-	bn_inc_serno_ = new Fl_Button(curr_x, curr_y, WBUTTON * 2 / 3, HBUTTON, "-");
-	bn_inc_serno_->labelfont(FONT | FL_BOLD);
+	bn_inc_serno_ = new Fl_Button(curr_x, curr_y, WBUTTON / 2, HBUTTON, "@>");
+	bn_inc_serno_->labelfont(FONT);
 	bn_inc_serno_->labelsize(FONT_SIZE + 2);
 	bn_inc_serno_->callback(cb_inc_serno, nullptr);
 	bn_inc_serno_->tooltip("Increment the contest serial number counter by 1");
 
-	curr_x = bn_inc_serno_->x() + bn_inc_serno_->w() + GAP;
+	curr_x += bn_inc_serno_->w() + GAP + WLABEL;
 
 	// Transmitted contest exchange
-	op_exchange_ = new Fl_Output(curr_x, curr_y, WBUTTON * 2, HBUTTON);
-	op_exchange_->textfont(FONT);
-	op_exchange_->textsize(FONT_SIZE);
-	op_exchange_->tooltip("This is the exchange you should be sending");
+	op_serno_ = new Fl_Output(curr_x, curr_y, WBUTTON, HBUTTON, "Serial");
+	op_serno_->align(FL_ALIGN_LEFT);
+	op_serno_->labelfont(FONT);
+	op_serno_->labelsize(FONT_SIZE);
+	op_serno_->textfont(FONT);
+	op_serno_->textsize(FONT_SIZE);
+	op_serno_->tooltip("This is the serial number you should be sending");
 
-	max_w = max(max_w, op_exchange_->x() + op_exchange_->w());
-	curr_x = left + WBUTTON + WBUTTON;
-	curr_y += op_exchange_->h() + GAP;
+	curr_x += op_serno_->w() + GAP;
+	curr_y += op_serno_->h() + GAP;
+
+	g_contest->resizable(nullptr);
+	g_contest->size(curr_x - g_contest->x(), curr_y - g_contest->y());
+	g_contest->end();
+
+	curr_x += GAP;
+
+	max_w = max(max_w, curr_x - x());
+	curr_y += GAP;
 	int col2_y = curr_y;
+	const int WNAME = WBUTTON * 9 / 5;
+	const int WVALUE = WBUTTON * 6 / 5;
+	const int WFIELD = WNAME + WVALUE + GAP;
+	const int HFIELD = HBUTTON;
+	curr_x = left + WNAME;
+
+	// Input - allows user to manually enter frequency
+	// Reflects current frequency per logging mde
+	ip_freq_ = new Fl_Input(curr_x, curr_y, WVALUE, HFIELD, "FREQ");
+	ip_freq_->textfont(FONT);
+	ip_freq_->textsize(FONT_SIZE);
+	ip_freq_->labelfont(FONT);
+	ip_freq_->labelsize(FONT_SIZE);
+	ip_freq_->align(FL_ALIGN_LEFT);
+	ip_freq_->tooltip("Enter frequency of operation, if different");
+	ip_freq_->callback(cb_ip_freq);
+
+	curr_x += WFIELD;
+
+	// Choice - allows user to select mode of operation
+	// Refelcts current mode per logging mode
+	ch_mode_ = new field_choice(curr_x, curr_y, WVALUE, HFIELD, "MODE");
+	ch_mode_->textfont(FONT);
+	ch_mode_->textsize(FONT_SIZE);
+	ch_mode_->labelfont(FONT);
+	ch_mode_->labelsize(FONT_SIZE);
+	ch_mode_->align(FL_ALIGN_LEFT);
+	ch_mode_->tooltip("Select mode of operatio, if different");
+	ch_mode_->callback(cb_ch_mode);
+
+	curr_x += WFIELD; 
+
+	// Input - allows user to manually enter power
+	// Refelcts current power per logging mode
+	ip_power_ = new Fl_Input(curr_x, curr_y, WVALUE, HFIELD, "TX_PWR");
+	ip_power_->textfont(FONT);
+	ip_power_->textsize(FONT_SIZE);
+	ip_power_->labelfont(FONT);
+	ip_power_->labelsize(FONT_SIZE);
+	ip_power_->align(FL_ALIGN_LEFT);
+	ip_power_->tooltip("Enter transmit power, if different");
+	ip_power_->callback(cb_ip_power);
+
+	curr_x += WVALUE;
+	max_w = max(max_w, curr_x);
+	curr_y += HFIELD;
+
+	string frequency = "";
+	string power = "";
+	string mode = "";
+	string submode;
+	// Get frequency, power and mode per logging mode
+	switch (logging_mode_) {
+	case LM_ON_AIR_CAT:
+		// Get data from rig
+		frequency = rig_if_->get_frequency(true);
+		power = rig_if_->get_tx_power();
+		rig_if_->get_string_mode(mode, submode);
+		break;
+	case LM_ON_AIR_COPY:
+	{
+		record* selected_qso = book_->get_record();
+		if (selected_qso) {
+			// Get data from current record (if there is one)
+			frequency = selected_qso->item("FREQ");
+			power = selected_qso->item("TX_PWR");
+			mode = selected_qso->item("MODE", true);
+		}
+		break;
+	}
+	}
+	ip_freq_->value(frequency.c_str());
+	ch_mode_->set_dataset("Combined", mode);
+	ip_power_->value(power.c_str());
+
+	curr_x = left + WNAME;
 
 	//Callsign entry field
-	ip_call_ = new Fl_Input(curr_x, curr_y, WBUTTON, HBUTTON, "CALL");
+	ip_call_ = new Fl_Input(curr_x, curr_y, WVALUE, HBUTTON, "CALL");
 	ip_call_->labelfont(FONT);
 	ip_call_->labelsize(FONT_SIZE);
 	ip_call_->textfont(FONT);
 	ip_call_->textsize(FONT_SIZE);
-	ip_call_->callback(cb_value<Fl_Input, string>, &callsign_);
-	ip_call_->value(callsign_.c_str());
+	//ip_call_->callback(cb_value<Fl_Input, string>, &callsign_);
+	//ip_call_->value(callsign_.c_str());
 	ip_call_->tooltip("Input the call of the contact");
 
-	curr_x += ip_call_->w() + GAP;
-
-	// Field1 choice and entry - array of 7 items
-	const int NUMBER_COLS = 2;
-	int col2 = 0;
+	curr_x = left + WFIELD;
+		
+	// Field1 choice and entry - array of 11 items
+	const int NUMBER_COLS = 3;
 	for (int ia = 0; ia < NUMBER_FIELDS; ia++) {
-		ch_field_[ia] = new field_choice(curr_x, curr_y, WBUTTON * 2, HBUTTON);
+		ch_field_[ia] = new field_choice(curr_x, curr_y, WNAME, HFIELD);
 		ch_field_[ia]->textfont(FONT);
 		ch_field_[ia]->textsize(FONT_SIZE);
+		ch_field_[ia]->align(FL_ALIGN_RIGHT);
 		ch_field_[ia]->tooltip("Specify the field to provide");
-		ch_field_[ia]->callback(cb_field, (void*)ia);
+		//ch_field_[ia]->callback(cb_field, (void*)ia);
 		ch_field_[ia]->set_dataset("Fields");
-		ch_field_[ia]->value(field_name_[ia].c_str());
-		curr_x += ch_field_[ia]->w();
 
-		ip_field_[ia] = new Fl_Input(curr_x, curr_y, WBUTTON, HBUTTON);
+		curr_x += WNAME;
+
+		ip_field_[ia] = new Fl_Input(curr_x, curr_y, WVALUE, HFIELD);
 		ip_field_[ia]->textfont(FONT);
 		ip_field_[ia]->textsize(FONT_SIZE);
 		ip_field_[ia]->tooltip("Specify the value of field");
-		ip_field_[ia]->callback(cb_inp_field, (void*)ia);
-		ip_field_[ia]->value(field_val_[ia].c_str());
+		//ip_field_[ia]->callback(cb_inp_field, (void*)ia);
 		if (ia % NUMBER_COLS == NUMBER_COLS - 2) {
 			// Start new line of widgets
-			col2 = max(col2, ip_field_[ia]->x() + ip_field_[ia]->w());
 			curr_x = left;
-			curr_y += ip_field_[ia]->h();
+			curr_y += HFIELD;
 		}
 		else {
-			curr_x += ip_field_[ia]->w() + GAP;
+			curr_x += WVALUE + GAP;
 		}
 	}
 
-	max_w = max(max_w, col2);
+	curr_x = left + (NUMBER_COLS * WFIELD);
+	// Adjust logging mode choice
+	ch_logmode_->size(curr_x - ch_logmode_->x(), ch_logmode_->h());
+
+	max_w = max(max_w, curr_x);
 
 	// nOtes input
-	if (curr_x != left) {
-		curr_x = left;
-		curr_y += HBUTTON;
-	}
-	curr_x += WBUTTON;
+	curr_x = left + WNAME;
 	
-	ip_notes_ = new Fl_Input(curr_x, curr_y, col2 - curr_x, HBUTTON, "NOTES");
+	ip_notes_ = new Fl_Input(curr_x, curr_y, WFIELD * NUMBER_COLS - WNAME - GAP, HBUTTON, "NOTES");
 	ip_notes_->labelfont(FONT);
 	ip_notes_->labelsize(FONT_SIZE);
 	ip_notes_->textfont(FONT);
 	ip_notes_->textsize(FONT_SIZE);
-	ip_notes_->callback(cb_value<Fl_Input, string>, &notes_);
-	ip_notes_->value(notes_.c_str());
+	//ip_notes_->callback(cb_value<Fl_Input, string>, &notes_);
+	//ip_notes_->value(notes_.c_str());
 	ip_notes_->tooltip("Add any notes for the QSO");
+
+	curr_x = left + WLABEL;
+	curr_y += HBUTTON;
+
 
 	// QSO start/stop
 	curr_x = left;
-	curr_y += ip_notes_->h() + GAP;
-	max_w = max(max_w, ip_notes_->x() + ip_notes_->w());
+	curr_y += GAP;
 
 	bn_start_qso_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Start");
 	bn_start_qso_->labelfont(FONT);
@@ -854,85 +1013,11 @@ void qso_manager::qso_group::create_form(int X, int Y) {
 
 	max_w = max(max_w, bn_parse_->x() + bn_parse_->w());
 	curr_x = left;
-	curr_y += bn_parse_->h();
+	curr_y += HBUTTON;
 
 	// end of column 1 widgets
 	max_h = curr_y + GAP;
 
-	// Column 2:
-	curr_x = col2 + WLABEL;
-	curr_y = col2_y;
-		
-	// Input - allows user to manually enter frequency
-	// Reflects current frequency per logging mde
-	ip_freq_ = new Fl_Input(curr_x, curr_y, WBUTTON, HTEXT, "Freq");
-	ip_freq_->textfont(FONT);
-	ip_freq_->textsize(FONT_SIZE);
-	ip_freq_->labelfont(FONT);
-	ip_freq_->labelsize(FONT_SIZE);
-	ip_freq_->align(FL_ALIGN_LEFT);
-	ip_freq_->tooltip("Enter frequency of operation, if different");
-	ip_freq_->callback(cb_ip_freq);
-
-	max_w = ip_freq_->x() + ip_freq_->w();
-	curr_y += ip_freq_->h();
-	// Choice - allows user to select mode of operation
-	// Refelcts current mode per logging mode
-	ch_mode_ = new field_choice(curr_x, curr_y, WBUTTON, HTEXT, "Mode");
-	ch_mode_->textfont(FONT);
-	ch_mode_->textsize(FONT_SIZE);
-	ch_mode_->labelfont(FONT);
-	ch_mode_->labelsize(FONT_SIZE);
-	ch_mode_->align(FL_ALIGN_LEFT);
-	ch_mode_->tooltip("Select mode of operatio, if different");
-	ch_mode_->callback(cb_ch_mode);
-
-	max_w = max(max_w, ch_mode_->x() + ch_mode_->w());
-	curr_y += ch_mode_->h();
-	// Input - allows user to manually enter power
-	// Refelcts current power per logging mode
-	ip_power_ = new Fl_Input(curr_x, curr_y, WBUTTON, HTEXT, "Power");
-	ip_power_->textfont(FONT);
-	ip_power_->textsize(FONT_SIZE);
-	ip_power_->labelfont(FONT);
-	ip_power_->labelsize(FONT_SIZE);
-	ip_power_->align(FL_ALIGN_LEFT);
-	ip_power_->tooltip("Enter transmit power, if different");
-	ip_power_->callback(cb_ip_power);
-	max_w = max(max_w, ip_power_->x() + ip_power_->w());
-	curr_y += ip_power_->h();
-
-	ch_logmode_->size(max_w - ch_logmode_->x(), ch_logmode_->h());
-
-	string frequency = "";
-	string power = "";
-	string mode = "";
-	string submode;
-	// Get frequency, power and mode per logging mode
-	switch (logging_mode_) {
-	case LM_ON_AIR_CAT:
-		// Get data from rig
-		frequency = rig_if_->get_frequency(true);
-		power = rig_if_->get_tx_power();
-		rig_if_->get_string_mode(mode, submode);
-		break;
-	case LM_ON_AIR_COPY:
-	{
-		record* selected_qso = book_->get_record();
-		if (selected_qso) {
-			// Get data from current record (if there is one)
-			frequency = selected_qso->item("FREQ");
-			power = selected_qso->item("TX_PWR");
-			mode = selected_qso->item("MODE", true);
-		}
-		break;
-	}
-	}
-	ip_freq_->value(frequency.c_str());
-	ch_mode_->set_dataset("Combined", mode);
-	ip_power_->value(power.c_str());
-
-	max_h = max(max_h, curr_y);
 	g->resizable(nullptr);
 	g->size(max_w, max_h);
 	g->end();
@@ -941,120 +1026,199 @@ void qso_manager::qso_group::create_form(int X, int Y) {
 	size(max_w, max_h);
 	end();
 
+	initialise_fields();
 }
 
 // Enable QSO widgets
 void qso_manager::qso_group::enable_widgets() {
 	// Get exchange data
-	vector<string> tx_fields;
-	split_line(exchanges_[contest_].tx, tx_fields, ',');
-	// Set contest value
-	ch_contest_->value(ch_contest_->find_index(contest_.c_str()));
-	// Normal operation - hide contest specific widgets
-	if (contest_ == "NONE") {
-		op_exchange_->deactivate();
-		bn_init_serno_-> deactivate();
-		bn_inc_serno_->deactivate();
-		bn_dec_serno_->activate();
+	if (exch_fmt_ix_ < MAX_CONTEST_TYPES && field_mode_ == CONTEST) {
+		char text[10];
+		snprintf(text, 10, "%03d", serial_num_);
+		op_serno_->value(text);
 	}
 	else {
-		op_exchange_->activate();
-		string exchange = "";
-		for (size_t i = 0; i < tx_fields.size(); i++) {
-			if (tx_fields[i] == "RST_SENT") {
-				exchange += "59(9) ";
-			}
-			else if (tx_fields[i] == "STX") {
-				char text[10];
-				snprintf(text, 10, "%03d ", serial_num_);
-				exchange += string(text);
-			}
-			else if (current_qso_) {
-				exchange += current_qso_->item(tx_fields[i]) + ' ';
-			}
-			else {
-				exchange += "*?*";
-			}
-		}
-		op_exchange_->value(exchange.c_str());
+		op_serno_->value("");
+	}
+	// Basic contest on/off widgets 
+	switch (field_mode_) {
+	case NO_CONTEST:
+		op_serno_->deactivate();
+		bn_pause_->deactivate();
+		ch_contest_id_->deactivate();
+		ch_format_->deactivate();
+		bn_init_serno_->deactivate();
+		bn_inc_serno_->deactivate();
+		bn_dec_serno_->deactivate();
+		break;
+	default:
+		op_serno_->activate();
+		bn_pause_->activate();
+		ch_contest_id_->activate();
+		ch_format_->activate();
 		bn_init_serno_->activate();
 		bn_inc_serno_->activate();
 		bn_dec_serno_->activate();
 	}
-	// Enable/disable QSO fields
-	ip_call_->value(callsign_.c_str());
-	vector<string> rx_fields;
-	split_line(exchanges_[contest_].rx, rx_fields, ',');
-	for (size_t i = 0; i < rx_fields.size() && i < NUMBER_FIELDS; i++) {
-		// Set the field name in specified exchange fields and disallow editing
-		field_name_[i] = rx_fields[i];
-		ch_field_[i]->value(field_name_[i].c_str());
-		ch_field_[i]->deactivate();
-		ch_field_[i]->textcolor(FL_BLACK);
-		// Get the value from the current qso
-		string value;
-		if (current_qso_) {
-			value = current_qso_->item(field_name_[i]);
-		}
-		else {
-			value = "";
-		}
-		ip_field_[i]->value(value.c_str());
+	// Mode dependent
+	switch(field_mode_) {
+	case NEW:
+		bn_add_exch_->activate();
+		bn_add_exch_->label("Add");
+		bn_define_rx_->deactivate();
+		bn_define_tx_->deactivate();
+		break;
+	case DEFINE:
+	case EDIT:
+		bn_add_exch_->activate();
+		bn_add_exch_->label("Save");
+		bn_define_rx_->activate();
+		bn_define_tx_->activate();
+		break;
+	case CONTEST:
+		bn_add_exch_->activate();
+		bn_add_exch_->label("Edit");
+		bn_define_rx_->deactivate();
+		bn_define_tx_->deactivate();
+		break;
+	default:
+		bn_add_exch_->deactivate();
+		bn_add_exch_->label(nullptr);
+		bn_define_rx_->deactivate();
+		bn_define_tx_->deactivate();
+		break;
 	}
-	// Allo them to be edited
-	for (int i = rx_fields.size(); i < NUMBER_FIELDS; i++) {
-		ch_field_[i]->value(field_name_[i].c_str());
-		ch_field_[i]->activate();
-		// Get the value from the current qso
-		string value;
-		if (current_qso_) {
-			value = current_qso_->item(field_name_[i]);
-		}
-		else {
-			value = "";
-		}
-		ip_field_[i]->value(value.c_str());
-	}
-	ip_notes_->value(notes_.c_str());
 	// Start/Log/cancel buttons
 	if (current_qso_) {
 		bn_start_qso_->label("Update");
 		bn_log_qso_->activate();
+		bn_log_qso_->label("Log");
 		bn_cancel_qso_->activate();
 	}
 	else {
 		bn_start_qso_->label("Start");
-		bn_log_qso_->deactivate();
+		bn_log_qso_->activate();
+		bn_log_qso_->label("Start/Log");
 		bn_cancel_qso_->deactivate();
 	}
 	redraw();
 }
 
-
 // Update the fields in the record
 void qso_manager::qso_group::update_fields() {
-	if (current_qso_) {
-		// WRite (and read back) field values
-		current_qso_->item("CALL", callsign_);
-		callsign_ = current_qso_->item("CALL");
-		for (int i = 0; i < NUMBER_FIELDS; i++) {
-			if (field_name_[i].length()) {
-				current_qso_->item(field_name_[i], field_val_[i]);
-				field_val_[i] = current_qso_->item(field_name_[i]);
-			}
+if (current_qso_) {
+	// WRite (and read back) field values
+	current_qso_->item("CALL", string(ip_call_->value()));
+	ip_call_->value(current_qso_->item("CALL").c_str());
+	for (int i = 0; i < NUMBER_FIELDS; i++) {
+		string field = ch_field_[i]->value();
+		string value = ip_field_[i]->value();
+		if (field.length()) {
+			current_qso_->item(field, value);
+			ip_field_[i]->value(current_qso_->item(field).c_str());
 		}
-
-		current_qso_->item("NOTES", notes_);
-		enable_widgets();
-		// Notify other views
-		tabbed_forms_->update_views(nullptr, HT_INSERTED, book_->size() - 1);
 	}
+
+	current_qso_->item("NOTES", string(ip_notes_->value()));
+	ip_notes_->value(current_qso_->item("NOTES").c_str());
+	enable_widgets();
+	// Notify other views
+	tabbed_forms_->update_views(nullptr, HT_INSERTED, book_->size() - 1);
+}
 }
 
-// Select contest mode
-void qso_manager::qso_group::cb_contest(Fl_Widget* w, void* v) {
+// Set contest enable/disable
+// v - not used
+void qso_manager::qso_group::cb_ena_contest(Fl_Widget* w, void* v) {
 	qso_group* that = ancestor_view<qso_group>(w);
-	cb_choice_text(w, v);
+	bool enable = false;
+	cb_value<Fl_Light_Button, bool>(w, &enable);
+
+	if (enable) {
+		that->serial_num_ = 1;
+		that->field_mode_ = CONTEST;
+	}
+	else {
+		that->field_mode_ = NO_CONTEST;
+	}
+	that->initialise_fields();
+	that->enable_widgets();
+}
+
+// Pause contest mode
+void qso_manager::qso_group::cb_pause_contest(Fl_Widget* w, void* v) {
+	qso_group* that = ancestor_view<qso_group>(w);
+	bool pause = false;
+	cb_value<Fl_Light_Button, bool>(w, &pause);
+
+	if (pause) {
+		that->field_mode_ = PAUSED;
+	}
+	else {
+		that->field_mode_ = CONTEST;
+	}
+	that->initialise_fields();
+	that->enable_widgets();
+}
+
+// Set exchange format
+// v is exchange
+void qso_manager::qso_group::cb_format(Fl_Widget* w, void* v) {
+	qso_group* that = ancestor_view<qso_group>(w);
+	Fl_Input_Choice* ch = (Fl_Input_Choice*)w;
+	// Get format ID
+	that->exch_fmt_id_ = ch->value();
+	// Get source
+	if (ch->menubutton()->changed()) {
+		// Selected menu item
+		that->exch_fmt_ix_ = ch->menubutton()->value();
+		that->field_mode_ = CONTEST; // Should already be so
+		that->initialise_fields();
+	}
+	else {
+		that->field_mode_ = NEW;
+	}
+	that->enable_widgets();
+}
+
+// Add exchange format
+// v is unused
+void qso_manager::qso_group::cb_add_exch(Fl_Widget* w, void* v) {
+	qso_group* that = ancestor_view<qso_group>(w);
+	bool update = false;
+	cb_value<Fl_Light_Button, bool>(w, &update);
+	if (update) {
+		// Switch to update format definitions
+		switch (that->field_mode_) {
+		case NEW:
+			// Adding a new format - add it to the list
+			that->exch_fmt_ix_ = that->add_format_id(that->exch_fmt_id_);
+			that->field_mode_ = DEFINE;
+			that->initialise_fields();
+			break;
+		case CONTEST:
+			// Editing an existing format
+			that->field_mode_ = EDIT;
+			that->initialise_fields();
+			break;
+		}
+		that->enable_widgets();
+	} else {
+		// Start/Resume contest
+		that->field_mode_ = CONTEST;
+		that->populate_exch_fmt();
+		that->initialise_fields();
+	}
+	that->enable_widgets();
+}
+
+// Define contest exchange
+// v - bool TX or RX
+void qso_manager::qso_group::cb_def_format(Fl_Widget* w, void* v) {
+	qso_group* that = ancestor_view<qso_group>(w);
+	bool tx = (bool)(long)v;
+	that->add_format_def(that->exch_fmt_ix_, tx);
+	that->initialise_fields();
 	that->enable_widgets();
 }
 
@@ -1075,11 +1239,8 @@ void qso_manager::qso_group::cb_log_qso(Fl_Widget* w, void* v) {
 	qso_manager* mgr = (qso_manager*)that->parent();
 	that->update_fields();
 	mgr->end_qso();
-	that->callsign_ = "";
-	that->notes_ = "";
-	for (int i = 0; i < NUMBER_FIELDS; i++) {
-		that->field_val_[i] = "";
-	}
+	that->serial_num_++;
+	that->initialise_fields();
 	that->enable_widgets();
 }
 
@@ -1090,11 +1251,12 @@ void qso_manager::qso_group::cb_cancel_qso(Fl_Widget* w, void* v) {
 		book_->delete_record(true);
 		dxa_if_->clear_dx_loc();
 	}
+	that->initialise_fields();
 	that->current_qso_ = nullptr;
-	that->callsign_ = "";
-	that->notes_ = "";
+	that->ip_call_->value("");
+	that->ip_notes_->value("");
 	for (int i = 0; i < NUMBER_FIELDS; i++) {
-		that->field_val_[i] = "";
+		that->ip_field_[i]->value("");
 	}
 	that->enable_widgets();
 }
@@ -1102,7 +1264,7 @@ void qso_manager::qso_group::cb_cancel_qso(Fl_Widget* w, void* v) {
 // Callback - Worked B4? button
 void qso_manager::qso_group::cb_wkb4(Fl_Widget* w, void* v) {
 	qso_group* that = ancestor_view<qso_group>(w);
-	extract_records_->extract_call(that->callsign_);
+	extract_records_->extract_call(string(that->ip_call_->value()));
 }
 
 // Callback - Parse callsign
@@ -1113,7 +1275,7 @@ void qso_manager::qso_group::cb_parse(Fl_Widget* w, void* v) {
 	record* tip_record = mgr->dummy_qso();
 	string message = "";
 	// Set the callsign in the temporary record
-	tip_record->item("CALL", to_upper(that->callsign_));
+	tip_record->item("CALL", string(that->ip_call_->value()));
 	// Parse the temporary record
 	message = pfx_data_->get_tip(tip_record);
 	// Create a tooltip window at the parse button (in w) X and Y
@@ -1145,21 +1307,21 @@ void qso_manager::qso_group::cb_dec_serno(Fl_Widget* w, void* v) {
 	that->enable_widgets();
 }
 
-// Field input - 
-// v: widget number
-void qso_manager::qso_group::cb_inp_field(Fl_Widget* w, void* v) {
-	qso_group* that = ancestor_view<qso_group>(w);
-	int n = (int)(long)v;
-	cb_value<Fl_Input, string>(w, &(that->field_val_[n]));
-}
-
-// Field choice - 
-// v: widget no. X1 to X7
-void qso_manager::qso_group::cb_field(Fl_Widget* w, void* v) {
-	qso_group* that = ancestor_view<qso_group>(w);
-	int n = (int)(long)v;
-	cb_choice_text(w, &(that->field_name_[n]));
-}
+//// Field input - 
+//// v: widget number
+//void qso_manager::qso_group::cb_inp_field(Fl_Widget* w, void* v) {
+//	qso_group* that = ancestor_view<qso_group>(w);
+//	int n = (int)(long)v;
+//	cb_value<Fl_Input, string>(w, &(that->field_val_[n]));
+//}
+//
+//// Field choice - 
+//// v: widget no. X1 to X7
+//void qso_manager::qso_group::cb_field(Fl_Widget* w, void* v) {
+//	qso_group* that = ancestor_view<qso_group>(w);
+//	int n = (int)(long)v;
+//	cb_choice_text(w, &(that->field_name_[n]));
+//}
 
 // Callback - frequency input
 // v - not used
@@ -1225,23 +1387,278 @@ void qso_manager::qso_group::save_values() {
 	// Contest definitions
 	Fl_Preferences contest_settings(dash_settings, "Contests");
 	contest_settings.clear();
-	contest_settings.set("Current", contest_.c_str());
-	contest_settings.set("Last Serial Number", serial_num_);
+	contest_settings.set("Next Serial Number", serial_num_);
+	contest_settings.set("Contest Mode", (int)field_mode_);
+	contest_settings.set("Contest ID", contest_id_.c_str());
+	contest_settings.set("Exchange Format", exch_fmt_ix_);
 	// Exchanges
-	for (auto it = exchanges_.begin(); it != exchanges_.end(); it++) {
-		Fl_Preferences one_setting(contest_settings, it->first.c_str());
-		one_setting.set("TX", it->second.tx.c_str());
-		one_setting.set("RX", it->second.rx.c_str());
+	Fl_Preferences format_settings(contest_settings, "Formats");
+	for (int ix = 0; ix < max_ef_index_; ix++) {
+		Fl_Preferences one_settings(format_settings, ef_ids_[ix].c_str());
+		one_settings.set("Index", (signed)ix);
+		one_settings.set("TX", ef_txs_[ix].c_str());
+		one_settings.set("RX", ef_rxs_[ix].c_str());
 	}
 }
 
 // Add contests
-void qso_manager::qso_group::populate_contests(Fl_Choice* ch) {
-	ch->clear();
-	for (auto it = exchanges_.begin(); it != exchanges_.end(); it++) {
-		ch->add(it->first.c_str());
+void qso_manager::qso_group::populate_exch_fmt() {
+	for (int ix = 0; ix < max_ef_index_; ix++) {
+		ch_format_->add(ef_ids_[ix].c_str());
 	}
 }
+
+// Initialise fields from format definitions
+void qso_manager::qso_group::initialise_fields() {
+	string preset_fields;
+	string tx_fields;
+	bool lock_preset;
+	bool new_fields;
+	switch (field_mode_) {
+	case NO_CONTEST:
+	case PAUSED:
+		// Non -contest mode
+		preset_fields = "RST_SENT,RST_RCVD,NAME,QTH";
+
+		new_fields = true;
+		lock_preset = false;
+		break;
+	case CONTEST:
+		// Contest mode
+		preset_fields = ef_txs_[exch_fmt_ix_] + "," + ef_rxs_[exch_fmt_ix_];
+		new_fields = true;
+		lock_preset = true;
+		break;
+	case NEW:
+		// Do not change existing
+		preset_fields = "";
+		new_fields = false;
+		lock_preset = true;
+		break;
+	case DEFINE:
+		// Define new exchange - provide base RS/Serno
+		preset_fields = "RST_RCVD,SRX";
+		new_fields = true;
+		lock_preset = false;
+		break;
+	case EDIT:
+		// Unlock existing definition 
+		preset_fields = "";
+		new_fields = false;
+		lock_preset = false;
+		break;
+	}
+	// Now set fields
+	vector<string> field_names;
+	split_line(preset_fields, field_names, ',');
+	size_t ix = 0;
+	for (ix = 0; ix < field_names.size(); ix++) {
+		if (new_fields) {
+			ch_field_[ix]->value(field_names[ix].c_str());
+		}
+		if (lock_preset) {
+			ch_field_[ix]->deactivate();
+		}
+		else {
+			ch_field_[ix]->activate();
+		}
+	}
+	for (; ix < NUMBER_FIELDS; ix++) {
+		ch_field_[ix]->value("");
+		ch_field_[ix]->activate();
+	}
+	// Default Contest TX values
+	if (field_mode_ == CONTEST) {
+		// Create a dummy QSO to get "stuff"
+		qso_manager* boss = ancestor_view<qso_manager>(parent());
+		record* dummy_qso;
+		// Start QSO refers to other widgets within qso_manager
+		if (boss->created_) {
+			dummy_qso = boss->start_qso(false);
+		}
+		else {
+			dummy_qso = boss->dummy_qso();
+		}
+		dummy_qso->user_details();
+
+		vector<string> tx_fields;
+		split_line(ef_txs_[exch_fmt_ix_], tx_fields, ',');
+		for (size_t i = 0; i < tx_fields.size(); i++) {
+			if (tx_fields[i] == "RST_SENT") {
+				string contest_mode = spec_data_->dxcc_mode(dummy_qso->item("MODE"));
+				if (contest_mode == "CW" || contest_mode == "DATA") {
+					ip_field_[i]->value("599");
+				}
+				else {
+					ip_field_[i]->value("59");
+				}
+			}
+			else if (tx_fields[i] == "STX") {
+				char text[10];
+				snprintf(text, 10, "%03d", serial_num_);
+				ip_field_[i]->value(text);
+			}
+			else {
+				ip_field_[i]->value(dummy_qso->item(tx_fields[i]).c_str());
+			}
+		}
+		ip_call_->value("");
+		ip_notes_->value("");
+		for (size_t i = tx_fields.size(); i < NUMBER_FIELDS; i++) {
+			ip_field_[i]->value("");
+		}
+	}
+	else {
+		ip_call_->value("");
+		ip_notes_->value("");
+		for (int i = 0; i < NUMBER_FIELDS; i++) {
+			ip_field_[i]->value("");
+		}
+	}
+}
+
+// Add new format - return format index
+int qso_manager::qso_group::add_format_id(string id) {
+	// Add the string to the choice
+	ch_format_->add(id.c_str());
+	int index = ch_format_->menubutton()->find_index(id.c_str());
+	// Add the format id to the array
+	ef_ids_[index] = id;
+	max_ef_index_ = index + 1;
+	// Return the index
+	return index;
+}
+
+// Add new format definition 
+void qso_manager::qso_group::add_format_def(int ix, bool tx) {
+	// Get the string from the field choices
+	string defn = "";
+	for (int i = 0; i < NUMBER_FIELDS; i++) {
+		const char* field = ch_field_[i]->value();
+		if (strlen(field)) {
+			if (i > 0) {
+				defn += ",";
+			}
+			defn += field;
+		}
+	}
+	// Add the format definition to the array
+	if (tx) {
+		ef_txs_[ix] = defn;
+	}
+	else {
+		ef_rxs_[ix] = defn;
+	}
+}
+
+// Clock group - constructor
+qso_manager::clock_group::clock_group
+	(int X, int Y, int W, int H, const char* l) :
+	Fl_Group(X, Y, W, H, l)
+{
+	load_values();
+}
+
+// Clock group destructor
+qso_manager::clock_group::~clock_group() {
+	Fl::remove_timeout(cb_timer_clock, nullptr);
+	save_values();
+}
+
+// get settings
+void qso_manager::clock_group::load_values() {
+	// No code
+}
+
+// Create form
+void qso_manager::clock_group::create_form(int X, int Y) {
+
+	Fl_Group* g = new Fl_Group(X, Y, 10, 10, "Clock - UTC");
+	g->labelfont(FONT);
+	g->labelsize(FONT_SIZE);
+	g->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
+	g->box(FL_BORDER_BOX);
+
+	int curr_x = g->x() + GAP;
+	int curr_y = g->y() + HTEXT;
+
+	const int WCLOCKS = 250;
+
+	bn_time_ = new Fl_Button(curr_x, curr_y, WCLOCKS, 3 * HTEXT);
+	bn_time_->color(FL_BLACK);
+	bn_time_->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE);
+	bn_time_->labelfont(FONT | FL_BOLD);
+	bn_time_->labelsize(5 * FONT_SIZE);
+	bn_time_->labelcolor(FL_YELLOW);
+	bn_time_->box(FL_FLAT_BOX);
+
+	curr_y += bn_time_->h();
+
+	bn_date_ = new Fl_Button(curr_x, curr_y, WCLOCKS, HTEXT * 3 / 2);
+	bn_date_->color(FL_BLACK);
+	bn_date_->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE);
+	bn_date_->labelfont(FONT);
+	bn_date_->labelsize(FONT_SIZE * 3 / 2);
+	bn_date_->labelcolor(FL_YELLOW);
+	bn_date_->box(FL_FLAT_BOX);
+
+	curr_y += bn_date_->h();
+
+	bn_local_ = new Fl_Button(curr_x, curr_y, WCLOCKS, HTEXT * 3 / 2);
+	bn_local_->color(FL_BLACK);
+	bn_local_->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE);
+	bn_local_->labelfont(FONT);
+	bn_local_->labelsize(FONT_SIZE * 3 / 2);
+	bn_local_->labelcolor(FL_RED);
+	bn_local_->box(FL_FLAT_BOX);
+
+	curr_x += GAP + WCLOCKS;
+	curr_y += bn_local_->h() + GAP;
+
+	g->resizable(nullptr);
+	g->size(curr_x - g->x(), curr_y - g->y());
+	g->end();
+
+	resizable(nullptr);
+	size(g->w(), g->h());
+	show();
+	end();
+
+	// Start clock timer
+	Fl::add_timeout(0, cb_timer_clock, this);
+}
+
+// Enable/disab;e widgets
+void qso_manager::clock_group::enable_widgets() {
+	// NO CODE
+}
+
+// save value
+void qso_manager::clock_group::save_values() {
+	// No code
+}
+
+// Callback - 1s timer
+void qso_manager::clock_group::cb_timer_clock(void* v) {
+	// Update the label in the clock button which is passed as the parameter
+	clock_group* that = (clock_group*)v;
+	time_t now = time(nullptr);
+	tm* value = gmtime(&now);
+	char result[100];
+	// convert to C string, then C++ string
+	strftime(result, 99, "%H:%M:%S", value);
+	that->bn_time_->copy_label(result);
+	// Convert date
+	strftime(result, 99, "%A %d %B %Y", value);
+	that->bn_date_->copy_label(result);
+	// Convert local time
+	value = localtime(&now);
+	strftime(result, 99, "%T %Z", value);
+	that->bn_local_->copy_label(result);
+
+	Fl::repeat_timeout(UTC_TIMER, cb_timer_clock, v);
+}
+
 
 // The main dialog constructor
 qso_manager::qso_manager(int W, int H, const char* label) :
@@ -1290,7 +1707,6 @@ qso_manager::qso_manager(int W, int H, const char* label) :
 // Destructor
 qso_manager::~qso_manager()
 {
-	Fl::remove_timeout(cb_timer_clock, nullptr);
 	save_values();
 }
 
@@ -1347,7 +1763,10 @@ void qso_manager::create_form(int X, int Y) {
 
 	curr_x = save_x;
 	curr_y += GAP;
-	create_clock_widgets(curr_x, curr_y);
+	clock_group_ = new clock_group(curr_x, curr_y, 0, 0, nullptr);
+	clock_group_->create_form(curr_x, curr_y);
+	curr_x += clock_group_->w();
+	curr_y += clock_group_->h();
 	max_x = max(max_x, curr_x);
 	max_y = max(max_y, curr_y);
 
@@ -1532,14 +1951,14 @@ void qso_manager::create_use_widgets(int& curr_x, int& curr_y) {
 	max_h = max(max_h, rig_grp_->y() + rig_grp_->h() - curr_y);
 
 	// Box to contain antenna-rig connectivity
-	Fl_Help_View* w19 = new Fl_Help_View(antenna_grp_->x(), curr_y + max_h + GAP, max_w, HBUTTON * 2);
+	Fl_Help_View* w19 = new Fl_Help_View(antenna_grp_->x(), curr_y + max_h + GAP, max_w, HBUTTON);
 	w19->box(FL_FLAT_BOX);
 	w19->labelfont(FONT);
 	w19->labelsize(FONT_SIZE);
 	w19->textfont(FONT);
 	w19->textsize(FONT_SIZE);
 	ant_rig_box_ = w19;
-	max_h += w19->h() + GAP;
+	int max_h1 = max_h + w19->h();
 
 	// Callsign group
 	callsign_grp_ = new common_grp(rig_grp_->x() + rig_grp_->w() + GAP, antenna_grp_->y(), 10, 10, "Callsigns", CALLSIGN);
@@ -1547,7 +1966,7 @@ void qso_manager::create_use_widgets(int& curr_x, int& curr_y) {
 	callsign_grp_->end(); 
 	callsign_grp_->show();
 	max_w = max(max_w, callsign_grp_->x() + callsign_grp_->w() - curr_x);
-	max_h = max(max_h, callsign_grp_->y() + callsign_grp_->h() - curr_y);
+	int max_h2 = callsign_grp_->y() + callsign_grp_->h() - curr_y;
 
 	// QTH group
 	qth_grp_ = new common_grp(callsign_grp_->x(), callsign_grp_->y() + callsign_grp_->h() + GAP, 10, 10, "QTHs", QTH);
@@ -1556,7 +1975,12 @@ void qso_manager::create_use_widgets(int& curr_x, int& curr_y) {
 	qth_grp_->show();
 
 	max_w = max(max_w, qth_grp_->x() + qth_grp_->w() - curr_x);
-	max_h = max(max_h, qth_grp_->y() + qth_grp_->h() - curr_y);
+	max_h2 += qth_grp_->h();
+
+	int h19 = w19->h() + max_h2 - max_h1;
+	max_h1 = min(max_h1, max_h2);
+	w19->size(w19->w(), h19);
+	max_h = max(max_h1, max_h2);
 
 	Fl_Group* guse = new Fl_Group(callsign_grp_->x() + callsign_grp_->w() + GAP, antenna_grp_->y(), 10, 10, "Use in QSOs");
 	guse->labelfont(FONT);
@@ -1594,7 +2018,7 @@ void qso_manager::create_use_widgets(int& curr_x, int& curr_y) {
 	max_h = max(max_h, guse->y() + guse->h() - curr_y);
 
 	curr_x += max_w;
-	curr_y += max_h;
+	curr_y += max_h + GAP;
 
 }
 
@@ -1914,57 +2338,6 @@ void qso_manager::create_alarm_widgets(int& curr_x, int& curr_y) {
 
 }
 
-// Create widgets to hold current tima and date (UTC)
-void qso_manager::create_clock_widgets(int& curr_x, int& curr_y) {
-	int max_w = 0;
-	int max_h = 0;
-
-	clock_grp_ = new Fl_Group(curr_x, curr_y, 10, 10, "Clock - UTC");
-	clock_grp_->labelfont(FONT);
-	clock_grp_->labelsize(FONT_SIZE);
-	clock_grp_->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
-	clock_grp_->box(FL_BORDER_BOX);
-
-	bn_time_ = new Fl_Button(clock_grp_->x() + GAP, clock_grp_->y() + HTEXT, 250, 3 * HTEXT);
-	bn_time_->color(FL_BLACK);
-	bn_time_->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE);
-	bn_time_->labelfont(FONT | FL_BOLD);
-	bn_time_->labelsize(5 * FONT_SIZE);
-	bn_time_->labelcolor(FL_YELLOW);
-	bn_time_->box(FL_FLAT_BOX);
-
-	bn_date_ = new Fl_Button(bn_time_->x(), bn_time_->y() + bn_time_->h(), bn_time_->w(), HTEXT * 3 / 2);
-	bn_date_->color(FL_BLACK);
-	bn_date_->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE);
-	bn_date_->labelfont(FONT);
-	bn_date_->labelsize(FONT_SIZE * 3 / 2);
-	bn_date_->labelcolor(FL_YELLOW);
-	bn_date_->box(FL_FLAT_BOX);
-
-	bn_local_ = new Fl_Button(bn_date_->x(), bn_date_->y() + bn_date_->h(), bn_date_->w(), HTEXT * 3 / 2);
-	bn_local_->color(FL_BLACK);
-	bn_local_->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE);
-	bn_local_->labelfont(FONT);
-	bn_local_->labelsize(FONT_SIZE * 3 / 2);
-	bn_local_->labelcolor(FL_RED);
-	bn_local_->box(FL_FLAT_BOX);
-
-
-
-	clock_grp_->resizable(nullptr);
-	clock_grp_->size(2 * GAP + bn_time_->w(), GAP + HTEXT + bn_time_->h() + bn_date_->h() + bn_local_->h());
-	max_w = clock_grp_->w();
-	max_h = clock_grp_->h();
-	clock_grp_->end();
-
-	curr_x += max_w;
-	curr_y += max_h;
-
-	// Start clock timer
-	Fl::add_timeout(0, cb_timer_clock, this);
-
-}
-
 // Load values
 void qso_manager::load_values() {
 	order_bands();
@@ -2008,10 +2381,12 @@ void qso_manager::save_values() {
 	dash_settings.set("Logging Mode", logging_mode());
 
 	Fl_Preferences stations_settings(settings_, "Stations");
+	qso_group_->save_values();
 	rig_grp_->save_values();
 	antenna_grp_->save_values();
 	callsign_grp_->save_values();
 	qth_grp_->save_values();
+	clock_group_->save_values();
 }
 
 // Enable the widgets - activate the group associated with each rig handler when that
@@ -2025,7 +2400,6 @@ void qso_manager::enable_widgets() {
 	enable_cat_widgets();
 	enable_use_widgets();
 	enable_alarm_widgets();
-	enable_clock_widgets();
 
 }
 
@@ -2262,9 +2636,6 @@ void qso_manager::enable_alarm_widgets() {
 		alarms_grp_->deactivate();
 	}
 }
-
-// Place holder for noe
-void qso_manager::enable_clock_widgets() {}
 
 // Read the list of bands from the ADIF specification and put them in frequency order
 void qso_manager::order_bands() {
@@ -2689,30 +3060,6 @@ void qso_manager::populate_port_choice() {
 	}
 }
 
-// Clock timer callback - received every UTC_TIMER seconds
-void qso_manager::cb_timer_clock(void* v) {
-	// Update the label in the clock button which is passed as the parameter
-	qso_manager* dash = (qso_manager*)v;
-	time_t now = time(nullptr);
-	tm* value = gmtime(&now);
-	char result[100];
-	// convert to C string, then C++ string
-	strftime(result, 99, "%H:%M:%S", value);
-	dash->bn_time_->copy_label(result);
-	// Convert date
-	strftime(result, 99, "%A %d %B %Y", value);
-	dash->bn_date_->copy_label(result);
-	// Convert local time
-	value = localtime(&now);
-	strftime(result, 99, "%T %Z", value);
-	dash->bn_local_->copy_label(result);
-
-	dash->clock_grp_->redraw();
-
-	Fl::repeat_timeout(UTC_TIMER, cb_timer_clock, v);
-}
-
-
 // Populate the baud rate choice menu
 void qso_manager::populate_baud_choice() {
 	Fl_Choice* ch = (Fl_Choice*)baud_rate_choice_;
@@ -2785,7 +3132,6 @@ void qso_manager::rig_update(string frequency, string mode, string power) {
 	qso_group_->ip_power_->value(power.c_str());
 	// Mode - index into choice
 	qso_group_->ch_mode_->value(mode.c_str());
-	redraw();
 }
 
 // Get QSO information from previous record not rig
@@ -2858,18 +3204,9 @@ void qso_manager::update() {
 }
 
 // Start QSO
-record* qso_manager::start_qso() {
+record* qso_manager::start_qso(bool add_to_book) {
 
-	if (qso_group_->current_qso_) {
-		char message[128];
-		snprintf(message, 128, "QSO: Already entring QSO %s %s %s",
-			qso_group_->current_qso_->item("QSO_DATE").c_str(),
-			qso_group_->current_qso_->item("TIME_ON").c_str(),
-			qso_group_->current_qso_->item("CALL").c_str());
-		status_->misc_status(ST_ERROR, message);
-		return qso_group_->current_qso_;
-	}
-	qso_group_->current_qso_ = new record;
+	record* new_record = new record;
 	string mode;
 	string submode;
 	string timestamp = now(false, "%Y%m%d%H%M%S");
@@ -2881,109 +3218,111 @@ record* qso_manager::start_qso() {
 		break;
 	case LM_OFF_AIR:
 		// Prepopulate rig, antenna, QTH and callsign
-		qso_group_->current_qso_->item("STATION_CALLSIGN", callsign_grp_->name());
-		qso_group_->current_qso_->item("MY_RIG", rig_grp_->name());
-		qso_group_->current_qso_->item("MY_ANTENNA", antenna_grp_->name());
-		qso_group_->current_qso_->item("APP_ZZA_QTH", qth_grp_->name());
+		new_record->item("STATION_CALLSIGN", callsign_grp_->name());
+		new_record->item("MY_RIG", rig_grp_->name());
+		new_record->item("MY_ANTENNA", antenna_grp_->name());
+		new_record->item("APP_ZZA_QTH", qth_grp_->name());
 		break;
 	case LM_ON_AIR_CAT:
 		// Interactive mode - start QSO - update fields from radio 
 		// Get current date and time in UTC
-		qso_group_->current_qso_->item("QSO_DATE", timestamp.substr(0, 8));
+		new_record->item("QSO_DATE", timestamp.substr(0, 8));
 		// Time as HHMMSS - always log seconds.
-		qso_group_->current_qso_->item("TIME_ON", timestamp.substr(8));
-		qso_group_->current_qso_->item("QSO_DATE_OFF", string(""));
-		qso_group_->current_qso_->item("TIME_OFF", string(""));
-		qso_group_->current_qso_->item("CALL", string(""));
+		new_record->item("TIME_ON", timestamp.substr(8));
+		new_record->item("QSO_DATE_OFF", string(""));
+		new_record->item("TIME_OFF", string(""));
+		new_record->item("CALL", string(""));
 		// Get frequency, mode and transmit power from rig
-		qso_group_->current_qso_->item("FREQ", rig_if_->get_frequency(true));
+		new_record->item("FREQ", rig_if_->get_frequency(true));
 		if (rig_if_->is_split()) {
-			qso_group_->current_qso_->item("FREQ_RX", rig_if_->get_frequency(false));
+			new_record->item("FREQ_RX", rig_if_->get_frequency(false));
 		}
 		// Get mode - NB USB/LSB need further processing
 		rig_if_->get_string_mode(mode, submode);
-		qso_group_->current_qso_->item("MODE", mode);
-		qso_group_->current_qso_->item("SUBMODE", submode);
-		qso_group_->current_qso_->item("TX_PWR", rig_if_->get_tx_power());
+		new_record->item("MODE", mode);
+		new_record->item("SUBMODE", submode);
+		new_record->item("TX_PWR", rig_if_->get_tx_power());
 		// initialise fields
-		qso_group_->current_qso_->item("RX_PWR", string(""));
-		qso_group_->current_qso_->item("RST_SENT", string(""));
-		qso_group_->current_qso_->item("RST_RCVD", string(""));
-		qso_group_->current_qso_->item("NAME", string(""));
-		qso_group_->current_qso_->item("QTH", string(""));
-		qso_group_->current_qso_->item("GRIDSQUARE", string(""));
+		new_record->item("RX_PWR", string(""));
+		new_record->item("RST_SENT", string(""));
+		new_record->item("RST_RCVD", string(""));
+		new_record->item("NAME", string(""));
+		new_record->item("QTH", string(""));
+		new_record->item("GRIDSQUARE", string(""));
 		// Prepopulate rig, antenna, QTH and callsign
-		qso_group_->current_qso_->item("STATION_CALLSIGN", callsign_grp_->name());
-		qso_group_->current_qso_->item("MY_RIG", rig_grp_->name());
-		qso_group_->current_qso_->item("MY_ANTENNA", antenna_grp_->name());
-		qso_group_->current_qso_->item("APP_ZZA_QTH", qth_grp_->name());
+		new_record->item("STATION_CALLSIGN", callsign_grp_->name());
+		new_record->item("MY_RIG", rig_grp_->name());
+		new_record->item("MY_ANTENNA", antenna_grp_->name());
+		new_record->item("APP_ZZA_QTH", qth_grp_->name());
 		break;
 	case LM_ON_AIR_COPY:
 		// Interactive mode - start QSO - date/time only
 		// Get current date and time in UTC
-		qso_group_->current_qso_->item("QSO_DATE", timestamp.substr(0, 8));
+		new_record->item("QSO_DATE", timestamp.substr(0, 8));
 		// Time as HHMMSS - always log seconds.
-		qso_group_->current_qso_->item("TIME_ON", timestamp.substr(8));
-		qso_group_->current_qso_->item("QSO_DATE_OFF", string(""));
-		qso_group_->current_qso_->item("TIME_OFF", string(""));
-		qso_group_->current_qso_->item("CALL", string(""));
+		new_record->item("TIME_ON", timestamp.substr(8));
+		new_record->item("QSO_DATE_OFF", string(""));
+		new_record->item("TIME_OFF", string(""));
+		new_record->item("CALL", string(""));
 		// otherwise leave blank so that we enter it manually later.
-		qso_group_->current_qso_->item("FREQ", copy_from->item("FREQ"));
-		qso_group_->current_qso_->item("FREQ_RX", copy_from->item("FREQ_RX"));
-		qso_group_->current_qso_->item("MODE", copy_from->item("MODE"));
-		qso_group_->current_qso_->item("SUBMODE", copy_from->item("SUBMODE"));
-		qso_group_->current_qso_->item("TX_PWR", copy_from->item("TX_PWR"));
+		new_record->item("FREQ", copy_from->item("FREQ"));
+		new_record->item("FREQ_RX", copy_from->item("FREQ_RX"));
+		new_record->item("MODE", copy_from->item("MODE"));
+		new_record->item("SUBMODE", copy_from->item("SUBMODE"));
+		new_record->item("TX_PWR", copy_from->item("TX_PWR"));
 		// initialise fields
-		qso_group_->current_qso_->item("RX_PWR", string(""));
-		qso_group_->current_qso_->item("RST_SENT", string(""));
-		qso_group_->current_qso_->item("RST_RCVD", string(""));
-		qso_group_->current_qso_->item("NAME", string(""));
-		qso_group_->current_qso_->item("QTH", string(""));
-		qso_group_->current_qso_->item("GRIDSQUARE", string(""));
+		new_record->item("RX_PWR", string(""));
+		new_record->item("RST_SENT", string(""));
+		new_record->item("RST_RCVD", string(""));
+		new_record->item("NAME", string(""));
+		new_record->item("QTH", string(""));
+		new_record->item("GRIDSQUARE", string(""));
 		// Prepopulate rig, antenna, QTH and callsign
-		qso_group_->current_qso_->item("STATION_CALLSIGN", callsign_grp_->name());
-		qso_group_->current_qso_->item("MY_RIG", rig_grp_->name());
-		qso_group_->current_qso_->item("MY_ANTENNA", antenna_grp_->name());
-		qso_group_->current_qso_->item("APP_ZZA_QTH", qth_grp_->name());
+		new_record->item("STATION_CALLSIGN", callsign_grp_->name());
+		new_record->item("MY_RIG", rig_grp_->name());
+		new_record->item("MY_ANTENNA", antenna_grp_->name());
+		new_record->item("APP_ZZA_QTH", qth_grp_->name());
 		break;
 	case LM_ON_AIR_TIME:
 		// Interactive mode - start QSO - date/time only
 		// Get current date and time in UTC
-		qso_group_->current_qso_->item("QSO_DATE", timestamp.substr(0, 8));
+		new_record->item("QSO_DATE", timestamp.substr(0, 8));
 		// Time as HHMMSS - always log seconds.
-		qso_group_->current_qso_->item("TIME_ON", timestamp.substr(8));
-		qso_group_->current_qso_->item("QSO_DATE_OFF", string(""));
-		qso_group_->current_qso_->item("TIME_OFF", string(""));
-		qso_group_->current_qso_->item("CALL", string(""));
+		new_record->item("TIME_ON", timestamp.substr(8));
+		new_record->item("QSO_DATE_OFF", string(""));
+		new_record->item("TIME_OFF", string(""));
+		new_record->item("CALL", string(""));
 		// otherwise leave blank so that we enter it manually later.
-		qso_group_->current_qso_->item("FREQ", string(""));
-		qso_group_->current_qso_->item("FREQ_RX", string(""));
-		qso_group_->current_qso_->item("MODE", string(""));
-		qso_group_->current_qso_->item("SUBMODE", string(""));
-		qso_group_->current_qso_->item("TX_PWR", string(""));
+		new_record->item("FREQ", string(""));
+		new_record->item("FREQ_RX", string(""));
+		new_record->item("MODE", string(""));
+		new_record->item("SUBMODE", string(""));
+		new_record->item("TX_PWR", string(""));
 		// initialise fields
-		qso_group_->current_qso_->item("RX_PWR", string(""));
-		qso_group_->current_qso_->item("RST_SENT", string(""));
-		qso_group_->current_qso_->item("RST_RCVD", string(""));
-		qso_group_->current_qso_->item("NAME", string(""));
-		qso_group_->current_qso_->item("QTH", string(""));
-		qso_group_->current_qso_->item("GRIDSQUARE", string(""));
+		new_record->item("RX_PWR", string(""));
+		new_record->item("RST_SENT", string(""));
+		new_record->item("RST_RCVD", string(""));
+		new_record->item("NAME", string(""));
+		new_record->item("QTH", string(""));
+		new_record->item("GRIDSQUARE", string(""));
 		// Prepopulate rig, antenna, QTH and callsign
-		qso_group_->current_qso_->item("STATION_CALLSIGN", callsign_grp_->name());
-		qso_group_->current_qso_->item("MY_RIG", rig_grp_->name());
-		qso_group_->current_qso_->item("MY_ANTENNA", antenna_grp_->name());
-		qso_group_->current_qso_->item("APP_ZZA_QTH", qth_grp_->name());
+		new_record->item("STATION_CALLSIGN", callsign_grp_->name());
+		new_record->item("MY_RIG", rig_grp_->name());
+		new_record->item("MY_ANTENNA", antenna_grp_->name());
+		new_record->item("APP_ZZA_QTH", qth_grp_->name());
 		break;
 	}
 
 	// Add to book
-	record_num_t new_record_num = book_->append_record(qso_group_->current_qso_);
-	book_->selection(book_->item_number(new_record_num));
-	// Notify other views
-	tabbed_forms_->update_views(nullptr, HT_INSERTED, new_record_num);
+	if (add_to_book) {
+		record_num_t new_record_num = book_->append_record(new_record);
+		book_->selection(book_->item_number(new_record_num));
+		// Notify other views
+		tabbed_forms_->update_views(nullptr, HT_INSERTED, new_record_num);
+	}
 
 	// Return created record
-	return qso_group_->current_qso_;
+	return new_record;
 }
 
 // End QSO - add time off

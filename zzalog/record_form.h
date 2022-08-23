@@ -157,7 +157,7 @@ namespace zzalog {
 		Fl_Check_Button* all_fields_bn_;
 		field_choice* field_choice_;
 		intl_editor* value_in_;
-		Fl_Choice* enum_choice_;
+		field_choice* enum_choice_;
 		// Quick entry buttons
 		Fl_Group* quick_grp_;
 		Fl_Button* call_bn_;

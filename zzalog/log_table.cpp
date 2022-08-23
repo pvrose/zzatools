@@ -716,7 +716,7 @@ void log_table::done_edit(bool keep_row) {
 		string old_text = record->item(field_info.field);
 		string text = ((intl_input*)edit_input_)->value();
 		// Set the record item to the edit input value
-		record->item(field_info.field, text);
+		record->item(field_info.field, text, true);
 		// Now implemnt book-specific actions
 		switch (my_book_->book_type()) {
 		case OT_MAIN:
