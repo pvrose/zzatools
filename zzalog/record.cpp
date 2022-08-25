@@ -817,7 +817,7 @@ void record::change_field_name(string from, string to) {
 // records are potential duplicates - returns result
 	//MT_NOMATCH,          // No matching record found in log
 	//MT_EXACT,            // An exact match found in log
-	//MT_PROBABLE,         // A close match - same band/date/call but time out by upto 30 minutes
+	//MT_PROBABLE,         // A close match - same band/date/call but time out by upto 30 minutes or mode
 	//MT_POSSIBLE,         // call found but something important differs
 	//MT_LOC_MISMATCH,     // A close match but a location field differs
 	//MT_SWL_MATCH,        // An SWL report that is a close match to existing activity
@@ -987,6 +987,11 @@ bool record::items_match(record* record, string field_name) {
 	else if (field_name == "MODE" || field_name == "SUBMODE") {
 		// Special case for MODE - check against SUBMODE as well (both ways)
 		if (lhs == to_upper(record->item("SUBMODE")) || lhs == to_upper(record->item("MODE"))) {
+			return true;
+		}
+		// The case where the input record has deprecated MODE against existing record SUBMODE
+		else if (field_name == "MODE" &&
+			to_upper(item("SUBMODE")) == rhs) {
 			return true;
 		}
 		else if (field_name == "MODE" && 

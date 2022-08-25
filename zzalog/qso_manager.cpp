@@ -2628,7 +2628,6 @@ void qso_manager::enable_alarm_widgets() {
 				snprintf(message, 200, "DASH: Vdd %g > %g", dial_vdd_->Fl_Line_Dial::value(), dial_vdd_->alarm2());
 				status_->misc_status(ST_ERROR, message);
 				break;
-
 			}
 		}
 	}
