@@ -265,8 +265,10 @@ namespace zzalog {
 
 			// Add contest exchanges
 			void populate_exch_fmt();
-			// Update fields
-			void update_fields();
+			// Update fields in record
+			void update_record();
+			// Copy fields from record
+			void copy_record();
 			// Initialise fields
 			void initialise_fields();
 			// Add new format - return format index

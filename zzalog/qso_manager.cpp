@@ -653,6 +653,8 @@ void qso_manager::qso_group::load_values() {
 		ef_rxs_[index] = string(temp);
 		free(temp);
 	}
+	// Set active contest format ID
+	exch_fmt_id_ = ef_ids_[exch_fmt_ix_];
 }
 
 // Create qso_group
@@ -703,7 +705,7 @@ void qso_manager::qso_group::create_form(int X, int Y) {
 	bn_enable_->labelfont(FONT);
 	bn_enable_->labelsize(FONT_SIZE);
 	bn_enable_->value(field_mode_ != NO_CONTEST);
-	bn_enable_->color2(FL_GREEN);
+	bn_enable_->selection_color(FL_GREEN);
 	bn_enable_->callback(cb_ena_contest, nullptr);
 	bn_enable_->tooltip("Enable contest operation - resets contest parameters");
 
@@ -714,7 +716,7 @@ void qso_manager::qso_group::create_form(int X, int Y) {
 	bn_pause_->labelfont(FONT);
 	bn_pause_->labelsize(FONT_SIZE);
 	bn_pause_->value(field_mode_ == PAUSED);
-	bn_pause_->color2(FL_RED);
+	bn_pause_->selection_color(FL_RED);
 	bn_pause_->callback(cb_pause_contest, nullptr);
 	bn_pause_->tooltip("Pause contest, i.e. keep parameters when resume");
 
@@ -741,6 +743,8 @@ void qso_manager::qso_group::create_form(int X, int Y) {
 	ch_format_->labelsize(FONT_SIZE);
 	ch_format_->textfont(FONT);
 	ch_format_->textsize(FONT_SIZE);
+	ch_format_->menubutton()->textfont(FONT);
+	ch_format_->menubutton()->textsize(FONT_SIZE);
 	ch_format_->value(exch_fmt_id_.c_str());
 	ch_format_->align(FL_ALIGN_LEFT);
 	ch_format_->callback(cb_format, nullptr);
@@ -756,7 +760,7 @@ void qso_manager::qso_group::create_form(int X, int Y) {
 	bn_add_exch_->labelsize(FONT_SIZE);
 	bn_add_exch_->value(field_mode_ == EDIT);
 	bn_add_exch_->callback(cb_add_exch, nullptr);
-	bn_add_exch_->color2(FL_RED);
+	bn_add_exch_->selection_color(FL_RED);
 	bn_add_exch_->tooltip("Add new exchange format - choose fields and click \"TX\" or \"RX\" to create them");
 	
 	curr_x += bn_add_exch_->w() + GAP;
@@ -1105,26 +1109,40 @@ void qso_manager::qso_group::enable_widgets() {
 }
 
 // Update the fields in the record
-void qso_manager::qso_group::update_fields() {
-if (current_qso_) {
-	// WRite (and read back) field values
-	current_qso_->item("CALL", string(ip_call_->value()));
-	ip_call_->value(current_qso_->item("CALL").c_str());
-	for (int i = 0; i < NUMBER_FIELDS; i++) {
-		string field = ch_field_[i]->value();
-		string value = ip_field_[i]->value();
-		if (field.length()) {
-			current_qso_->item(field, value);
-			ip_field_[i]->value(current_qso_->item(field).c_str());
+void qso_manager::qso_group::update_record() {
+	if (current_qso_) {
+		// WRite (and read back) field values
+		current_qso_->item("CALL", string(ip_call_->value()));
+		ip_call_->value(current_qso_->item("CALL").c_str());
+		for (int i = 0; i < NUMBER_FIELDS; i++) {
+			string field = ch_field_[i]->value();
+			string value = ip_field_[i]->value();
+			if (field.length()) {
+				current_qso_->item(field, value);
+				ip_field_[i]->value(current_qso_->item(field).c_str());
+			}
 		}
-	}
 
-	current_qso_->item("NOTES", string(ip_notes_->value()));
-	ip_notes_->value(current_qso_->item("NOTES").c_str());
-	enable_widgets();
-	// Notify other views
-	tabbed_forms_->update_views(nullptr, HT_INSERTED, book_->size() - 1);
+		current_qso_->item("NOTES", string(ip_notes_->value()));
+		ip_notes_->value(current_qso_->item("NOTES").c_str());
+		enable_widgets();
+		// Notify other views
+		tabbed_forms_->update_views(nullptr, HT_INSERTED, book_->size() - 1);
+	}
 }
+
+// Copy record to the fields - reverse of above
+void qso_manager::qso_group::copy_record() {
+	if (current_qso_) {
+		ip_call_->value(current_qso_->item("CALL").c_str());
+		for (int i = 0; i < NUMBER_FIELDS; i++) {
+			string field = ch_field_[i]->value();
+			if (field.length()) {
+				ip_field_[i]->value(current_qso_->item(field).c_str());
+			}
+		}
+		ip_notes_->value(current_qso_->item("NOTES").c_str());
+	}
 }
 
 // Set contest enable/disable
@@ -1229,7 +1247,7 @@ void qso_manager::qso_group::cb_start_qso(Fl_Widget* w, void* v) {
 	if (that->current_qso_ == nullptr) {
 		that->current_qso_ = mgr->start_qso();
 	}
-	that->update_fields();
+	that->update_record();
 	that->enable_widgets();
 }
 
@@ -1237,7 +1255,7 @@ void qso_manager::qso_group::cb_start_qso(Fl_Widget* w, void* v) {
 void qso_manager::qso_group::cb_log_qso(Fl_Widget* w, void* v) {
 	qso_group* that = ancestor_view<qso_group>(w);
 	qso_manager* mgr = (qso_manager*)that->parent();
-	that->update_fields();
+	that->update_record();
 	mgr->end_qso();
 	that->serial_num_++;
 	that->initialise_fields();
@@ -1306,22 +1324,6 @@ void qso_manager::qso_group::cb_dec_serno(Fl_Widget* w, void* v) {
 	that->serial_num_--;
 	that->enable_widgets();
 }
-
-//// Field input - 
-//// v: widget number
-//void qso_manager::qso_group::cb_inp_field(Fl_Widget* w, void* v) {
-//	qso_group* that = ancestor_view<qso_group>(w);
-//	int n = (int)(long)v;
-//	cb_value<Fl_Input, string>(w, &(that->field_val_[n]));
-//}
-//
-//// Field choice - 
-//// v: widget no. X1 to X7
-//void qso_manager::qso_group::cb_field(Fl_Widget* w, void* v) {
-//	qso_group* that = ancestor_view<qso_group>(w);
-//	int n = (int)(long)v;
-//	cb_choice_text(w, &(that->field_name_[n]));
-//}
 
 // Callback - frequency input
 // v - not used
@@ -1467,6 +1469,8 @@ void qso_manager::qso_group::initialise_fields() {
 		ch_field_[ix]->value("");
 		ch_field_[ix]->activate();
 	}
+	// Set contest format
+	ch_format_->value(exch_fmt_id_.c_str());
 	// Default Contest TX values
 	if (field_mode_ == CONTEST) {
 		// Create a dummy QSO to get "stuff"
@@ -2293,7 +2297,7 @@ void qso_manager::create_alarm_widgets(int& curr_x, int& curr_y) {
 	dial_swr_->maximum(5.0);
 	dial_swr_->step(0.1);
 	dial_swr_->alarm_color(FL_RED);
-	dial_swr_->color2(FL_BLACK);
+	dial_swr_->selection_color(FL_BLACK);
 	dial_swr_->alarms(rig_grp_->info().rig_data.alarms.swr_warning,
 		rig_grp_->info().rig_data.alarms.swr_error);
 	dial_swr_->value(rig_if_ ? rig_if_->swr_meter() : 1.0);
@@ -2563,17 +2567,17 @@ void qso_manager::enable_alarm_widgets() {
 			char message[200];
 			switch (current_swr_alarm_) {
 			case SWR_ERROR:
-				dial_swr_->color2(FL_RED);
+				dial_swr_->selection_color(FL_RED);
 				snprintf(message, 200, "DASH: SWR %g > %g", dial_swr_->Fl_Line_Dial::value(), dial_swr_->alarm2());
 				status_->misc_status(ST_ERROR, message);
 				break;
 			case SWR_WARNING:
-				dial_swr_->color2(fl_color_average(FL_RED, FL_YELLOW, 0.33f));
+				dial_swr_->selection_color(fl_color_average(FL_RED, FL_YELLOW, 0.33f));
 				snprintf(message, 200, "DASH: SWR %g > %g", dial_swr_->Fl_Line_Dial::value(), dial_swr_->alarm1());
 				status_->misc_status(ST_WARNING, message);
 				break;
 			case SWR_OK:
-				dial_swr_->color2(FL_BLACK);
+				dial_swr_->selection_color(FL_BLACK);
 				snprintf(message, 200, "DASH: SWR %g OK", dial_swr_->Fl_Line_Dial::value());
 				status_->misc_status(ST_OK, message);
 				break;
@@ -2591,12 +2595,12 @@ void qso_manager::enable_alarm_widgets() {
 			char message[200];
 			switch (current_pwr_alarm_) {
 			case POWER_OK:
-				dial_pwr_->color2(FL_BLACK);
+				dial_pwr_->selection_color(FL_BLACK);
 				snprintf(message, 200, "DASH: Power %g OK", dial_pwr_->Fl_Line_Dial::value());
 				status_->misc_status(ST_OK, message);
 				break;
 			case POWER_WARNING:
-				dial_pwr_->color2(fl_color_average(FL_RED, FL_YELLOW, 0.33f));
+				dial_pwr_->selection_color(fl_color_average(FL_RED, FL_YELLOW, 0.33f));
 				snprintf(message, 200, "DASH: Power %g > %g", dial_pwr_->Fl_Line_Dial::value(), dial_pwr_->alarm1());
 				status_->misc_status(ST_WARNING, message);
 				break;
@@ -2614,17 +2618,17 @@ void qso_manager::enable_alarm_widgets() {
 			char message[200];
 			switch (current_vdd_alarm_) {
 			case VDD_UNDER:
-				dial_vdd_->color2(FL_RED);
+				dial_vdd_->selection_color(FL_RED);
 				snprintf(message, 200, "DASH: Vdd %g < %g", dial_vdd_->Fl_Line_Dial::value(), dial_vdd_->alarm1());
 				status_->misc_status(ST_ERROR, message);
 				break;
 			case VDD_OK:
-				dial_vdd_->color2(FL_BLACK);
+				dial_vdd_->selection_color(FL_BLACK);
 				snprintf(message, 200, "DASH: Vdd %g OK", dial_vdd_->Fl_Line_Dial::value());
 				status_->misc_status(ST_OK, message);
 				break;
 			case VDD_OVER:
-				dial_vdd_->color2(FL_RED);
+				dial_vdd_->selection_color(FL_RED);
 				snprintf(message, 200, "DASH: Vdd %g > %g", dial_vdd_->Fl_Line_Dial::value(), dial_vdd_->alarm2());
 				status_->misc_status(ST_ERROR, message);
 				break;
@@ -3137,7 +3141,7 @@ void qso_manager::rig_update(string frequency, string mode, string power) {
 void qso_manager::update() {
 	// Get freq etc from QSO or rig
 	// Get present values data from rig
-	if (rig_if_) {
+	if (!qso_in_progress() && rig_if_) {
 		dial_swr_->value(rig_if_->swr_meter());
 		dial_pwr_->value(rig_if_->pwr_meter());
 		dial_vdd_->value(rig_if_->vdd_meter());
@@ -3172,6 +3176,9 @@ void qso_manager::update() {
 	}
 	else if (book_->size()) {
 		record* prev_record = book_->get_record();
+		if (qso_in_progress() && prev_record == qso_group_->current_qso_) {
+			qso_group_->copy_record();
+		}
 		// Assume as it's a logged record, the frequency is valid
 		qso_group_->ip_freq_->textcolor(FL_BLACK);
 		qso_group_->ip_freq_->value(prev_record->item("FREQ").c_str());

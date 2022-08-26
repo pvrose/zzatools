@@ -559,8 +559,6 @@ record_num_t book::selection(record_num_t num_item, hint_t hint /* = HT_SELECTED
 		store_data();
 #endif // _DEBUG
 	}
-	// Update qso_manager
-	if(qso_manager_) qso_manager_->update();
 	// Update menu item activeness
 	menu_->update_items();
 	return record_num;
