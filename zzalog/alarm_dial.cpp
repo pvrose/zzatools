@@ -27,7 +27,8 @@ alarm_dial::~alarm_dial() {}
 // from Fl_Dial::draw(X. Y. W. H)
 void alarm_dial::draw(int X, int Y, int W, int H) {
     // Draw the main dial and value hand
-    if (damage() & FL_DAMAGE_ALL) draw_box(box(), X, Y, W, H, color());
+    // TODO - Currently cannot assess how to be more specific with damage
+    if (damage() /* & FL_DAMAGE_ALL */) draw_box(box(), X, Y, W, H, color());
     X += Fl::box_dx(box());
     Y += Fl::box_dy(box());
     W -= Fl::box_dw(box());

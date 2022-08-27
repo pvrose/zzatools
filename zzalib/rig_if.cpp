@@ -1043,7 +1043,9 @@ double rig_flrig::vdd_meter() {
 		error(ST_ERROR, error_message("vdd_meter - Cannot read (Not supported rig or see above)").c_str());
 		inhibit_repeated_errors = true;
 	}
-	return nan("");
+	// Temporary to debug downstream
+	int random_vdd = rand() % 200 + 1300;
+	return (double)random_vdd / 100.0;
 
 }
 
