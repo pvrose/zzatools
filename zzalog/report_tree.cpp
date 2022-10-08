@@ -38,6 +38,7 @@ report_tree::report_tree(int X, int Y, int W, int H, const char* label, field_or
 	, entities_eqsl_(0)
 	, entities_lotw_(0)
 	, entities_card_(0)
+	, entities_dxcc_(0)
 	, entities_any_(0)
 {
 	map_order_.clear();
@@ -133,7 +134,6 @@ void report_tree::delete_tree() {
 	//delete_children(root_item);
 	//delete root_item;
 	clear();
-	map_order_.clear();
 }
 
 // methods
@@ -306,12 +306,12 @@ void report_tree::add_record(record_num_t record_num, report_map_entry_t* entry)
 }
 
 // Copy the map to the tree control and totalise record counts
-void report_tree::copy_map_to_tree(report_map_t* this_map, Fl_Tree_Item* item, int& num_records, int& num_eqsl, int& num_lotw, int& num_card, int &num_any) {
+void report_tree::copy_map_to_tree(report_map_t* this_map, Fl_Tree_Item* item, int& num_records, int& num_eqsl, int& num_lotw, int& num_card, int& num_dxcc, int &num_any) {
 	report_map_entry_t* next_entry;
 	string map_key;
 	char* text = new char[1024];
 	// Default format for a branch node on the tree 
-	char format[] = "%s %d QSOs - Confirmed %d (%d eQSL, %d LotW, %d Card)";
+	char format[] = "%s %d QSOs - Confirmed %d (%d eQSL, %d LotW, %d Card, %d DXCC)";
 	size_t count = 1;
 	// For all entries at this level of the map
 	for (auto it = this_map->begin(); it != this_map->end(); it++, count++) {
@@ -320,6 +320,7 @@ void report_tree::copy_map_to_tree(report_map_t* this_map, Fl_Tree_Item* item, i
 		int count_eqsl = 0;
 		int count_lotw = 0;
 		int count_card = 0;
+		int count_dxcc = 0;  // For LotW OR Card
 		int count_any = 0;
 		// Get entry in the map
 		map_key = it->first;
@@ -351,7 +352,7 @@ void report_tree::copy_map_to_tree(report_map_t* this_map, Fl_Tree_Item* item, i
 			// There is a valid record list in the entry
 			// Hang a placeholder text line on the trees - key won't change so unlikely to affect sort order
 			count_records = next_entry->record_list->size();
-			sprintf(text, format, map_key.c_str(), count_records, 0, 0, 0);
+			sprintf(text, format, map_key.c_str(), count_records, 0, 0, 0, 0, 0);
 
 			Fl_Tree_Item* next_item;
 			if (item == nullptr) {
@@ -361,9 +362,9 @@ void report_tree::copy_map_to_tree(report_map_t* this_map, Fl_Tree_Item* item, i
 				next_item = item->add(prefs(), text);
 			}
 			// Copy the record list to the tree - adding the count of records to the totals
-			copy_records_to_tree(next_entry->record_list, next_item, count_records, count_eqsl, count_lotw, count_card, count_any);
+			copy_records_to_tree(next_entry->record_list, next_item, count_records, count_eqsl, count_lotw, count_card, count_dxcc, count_any);
 			// Update the text with actual total record counts
-			sprintf(text, format, map_key.c_str(), count_records, count_any, count_eqsl, count_lotw, count_card);
+			sprintf(text, format, map_key.c_str(), count_records, count_any, count_eqsl, count_lotw, count_card, count_dxcc);
 			next_item->label(text);
 			// Item data set to say it isn't a record entry
 			next_item->user_data((void*)(long)-1);
@@ -372,7 +373,7 @@ void report_tree::copy_map_to_tree(report_map_t* this_map, Fl_Tree_Item* item, i
 		}
 		if (next_entry->next_entry != nullptr) {
 			// There is a valid map in the entry - hang a placeholder text on the tree 
-			sprintf(text, format, map_key.c_str(), 0, 0, 0, 0);
+			sprintf(text, format, map_key.c_str(), 0, 0, 0, 0, 0, 0);
 			Fl_Tree_Item* next_item;
 			if (item == nullptr) {
 				// Top-level - need to escape slash characters
@@ -383,9 +384,9 @@ void report_tree::copy_map_to_tree(report_map_t* this_map, Fl_Tree_Item* item, i
 				next_item = item->add(prefs(), text);
 			}
 			// Copy the next level down of the map to the tree
-			copy_map_to_tree(next_entry->next_entry, next_item, count_records, count_eqsl, count_lotw, count_card, count_any);
+			copy_map_to_tree(next_entry->next_entry, next_item, count_records, count_eqsl, count_lotw, count_card, count_dxcc, count_any);
 			// Update the text with actual total record counts
-			sprintf(text, format, map_key.c_str(), count_records, count_any, count_eqsl, count_lotw, count_card);
+			sprintf(text, format, map_key.c_str(), count_records, count_any, count_eqsl, count_lotw, count_card, count_dxcc);
 			next_item->label(text);
 			// Item data set to say it isn't a record entry
 			next_item->user_data((void*)(long)-1);
@@ -397,6 +398,7 @@ void report_tree::copy_map_to_tree(report_map_t* this_map, Fl_Tree_Item* item, i
 		num_eqsl += count_eqsl;
 		num_lotw += count_lotw;
 		num_card += count_card;
+		num_dxcc += count_dxcc;
 		num_any += count_any;
 		// Only mark progress if top-level map
 		if (item == nullptr) {
@@ -406,6 +408,7 @@ void report_tree::copy_map_to_tree(report_map_t* this_map, Fl_Tree_Item* item, i
 				if (count_eqsl) entities_eqsl_++;
 				if (count_lotw) entities_lotw_++;
 				if (count_card) entities_card_++;
+				if (count_card || count_lotw) entities_dxcc_++;
 				if (count_eqsl || count_lotw || count_card) entities_any_++;
 			}
 			status_->progress(count, OT_REPORT);
@@ -419,7 +422,7 @@ void report_tree::copy_map_to_tree(report_map_t* this_map, Fl_Tree_Item* item, i
 }
 
 // Copy the list of records in a map entry to the tree control
-void report_tree::copy_records_to_tree(record_list_t* record_list, Fl_Tree_Item* item, int& num_records, int& num_eqsl, int& num_lotw, int& num_card, int& num_any) {
+void report_tree::copy_records_to_tree(record_list_t* record_list, Fl_Tree_Item* item, int& num_records, int& num_eqsl, int& num_lotw, int& num_card, int& num_dxcc, int& num_any) {
 	if (record_list != nullptr) {
 		// We have records to copy - return the number of recordsf
 		num_records = record_list->size();
@@ -435,6 +438,7 @@ void report_tree::copy_records_to_tree(record_list_t* record_list, Fl_Tree_Item*
 			string card_text = "";
 			string confirmed = "Unconfirmed";
 			int is_confirmed = 0;
+			int is_dxcc = 0;
 			// eQSL confirmed
 			if (record->item("EQSL_QSL_RCVD") == "Y") {
 				eqsl_text = "eQSL";
@@ -447,6 +451,7 @@ void report_tree::copy_records_to_tree(record_list_t* record_list, Fl_Tree_Item*
 				lotw_text = "LotW";
 				confirmed = "Confirmed";
 				is_confirmed = 1;
+				is_dxcc = 1;
 				num_lotw++;
 			}
 			// Card confirmed
@@ -454,10 +459,12 @@ void report_tree::copy_records_to_tree(record_list_t* record_list, Fl_Tree_Item*
 				card_text = "Card";
 				confirmed = "Confirmed";
 				is_confirmed = 1;
+				is_dxcc = 1;
 				num_card++;
 			}
 			// Totalise the number of confirmed
 			num_any += is_confirmed;
+			num_dxcc += is_dxcc;
 			// Display record summary - GM3ZZA: 20170729 16554 - Confirmed eQSL LotW Card
 			sprintf(text, "%s: %s %s %s %s - %s %s %s %s",
 				record->item("CALL").c_str(),
@@ -576,6 +583,7 @@ void report_tree::populate_tree(bool activate) {
 	entities_eqsl_ = 0;
 	entities_lotw_ = 0;
 	entities_card_ = 0;
+	entities_dxcc_ = 0;
 	entities_any_ = 0;
 	clear();
 	if (adj_order_.size() > 0) {
@@ -587,6 +595,7 @@ void report_tree::populate_tree(bool activate) {
 			int num_eqsl = 0;
 			int num_lotw = 0;
 			int num_card = 0;
+			int num_dxcc = 0;
 			int num_any = 0;
 			// Define a custom root item so we can label it later
 			Fl_Tree_Item* root_item = new Fl_Tree_Item(this);
@@ -598,7 +607,7 @@ void report_tree::populate_tree(bool activate) {
 			// Initialise progress bar
 			status_->misc_status(ST_NOTE, "LOG: Report display started");
 			status_->progress(map_.next_entry->size(), OT_REPORT, "Displaying the log analysis tree", "entries");
-			copy_map_to_tree(map_.next_entry, nullptr, count_records, num_eqsl, num_lotw, num_card, num_any);
+			copy_map_to_tree(map_.next_entry, nullptr, count_records, num_eqsl, num_lotw, num_card, num_dxcc, num_any);
 			
 			// Add the root label
 			char text[1028];
@@ -617,21 +626,21 @@ void report_tree::populate_tree(bool activate) {
 			switch (adj_order_[0]) {
 			case RC_DXCC:
 				// Display QSO and total entity counts
-				sprintf(text, "Total: %d QSOs (%s) - Confirmed %d (%d eQSL, %d LotW, %d Card); %d Entities - Confirmed %d (%d eQSL, %d LotW, %d Card)",
-					count_records, filter.c_str(), num_any, num_eqsl, num_lotw, num_card,
-					entities_, entities_any_, entities_eqsl_, entities_lotw_, entities_card_);
+				sprintf(text, "Total: %d QSOs (%s) - Confirmed %d (%d eQSL, %d LotW, %d Card, %d DXCC); %d Entities - Confirmed %d (%d eQSL, %d LotW, %d Card, %d DXCC)",
+					count_records, filter.c_str(), num_any, num_eqsl, num_lotw, num_card, num_dxcc,
+					entities_, entities_any_, entities_eqsl_, entities_lotw_, entities_card_, entities_dxcc_);
 				break;
 			case RC_CQ_ZONE:
 			case RC_ITU_ZONE:
 				// Display QSO and total entity counts
-				sprintf(text, "Total: %d QSOs (%s) - Confirmed %d (%d eQSL, %d LotW, %d Card); %d Zones - Confirmed %d (%d eQSL, %d LotW, %d Card)",
-					count_records, filter.c_str(), num_any, num_eqsl, num_lotw, num_card,
-					entities_, entities_any_, entities_eqsl_, entities_lotw_, entities_card_);
+				sprintf(text, "Total: %d QSOs (%s) - Confirmed %d (%d eQSL, %d LotW, %d Card, %d DXCC); %d Zones - Confirmed %d (%d eQSL, %d LotW, %d Card, %d DXCC)",
+					count_records, filter.c_str(), num_any, num_eqsl, num_lotw, num_card, num_dxcc,
+					entities_, entities_any_, entities_eqsl_, entities_lotw_, entities_card_, entities_dxcc_);
 				break;
 			default:
 				// Display just QSO counts
-				sprintf(text, "Total: %d QSOs (%s) - Confirmed %d (%d eQSL, %d LotW, %d Card)",
-					count_records, filter.c_str(), num_any, num_eqsl, num_lotw, num_card);
+				sprintf(text, "Total: %d QSOs (%s) - Confirmed %d (%d eQSL, %d LotW, %d Card, %d DXCC)",
+					count_records, filter.c_str(), num_any, num_eqsl, num_lotw, num_card, num_dxcc);
 				break;
 			}
 

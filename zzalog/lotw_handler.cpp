@@ -360,6 +360,9 @@ bool lotw_handler::upload_single_qso(record_num_t record_num) {
 	Fl_Preferences lotw_settings(qsl_settings, "LotW");
 	int upload_qso;
 	lotw_settings.get("Upload per QSO", upload_qso, false);
+	if (upload_qso == false) {
+		status_->misc_status(ST_WARNING, "LOTW: Uploading per QSO is disabled.");
+	}
 	record* this_record = book_->get_record(record_num, false);
 	if (this_record->item("LOTW_SENT") == "Y") {
 		char message[128];

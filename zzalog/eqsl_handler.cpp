@@ -876,6 +876,9 @@ bool eqsl_handler::upload_single_qso(record_num_t record_num) {
 	Fl_Preferences eqsl_settings(qsl_settings, "eQSL");
 	int upload_qso;
 	eqsl_settings.get("Upload per QSO", upload_qso, false);
+	if (upload_qso == false) {
+		status_->misc_status(ST_WARNING, "EQSL: Uploading per QSO is disabled.");
+	}
 	record* this_record = book_->get_record(record_num, false);
 	if (this_record->item("EQSL_SENT") == "Y") {
 		char message[128];

@@ -840,6 +840,7 @@ bool pfx_data::update_bearing(record* record) {
 bool pfx_data::update_geography(record* record, bool &query, string& reason, bool query_error /*= true*/) {
 	bool changed = false;
 	prefix* prefix = nullptr;
+	char message[256];
 	if (record->item("CALL") != "" && record->item("SWL") != "Y") {
 		// Only parse valid QSOs
 		changed = update_dxcc(record, prefix, query, reason, query_error);
@@ -851,17 +852,16 @@ bool pfx_data::update_geography(record* record, bool &query, string& reason, boo
 		string date = record->item("QSO_DATE");
 		string time = record->item("TIME_ON");
 		string call = record->item("CALL");
-		char* message = new char[50 + date.length() + time.length() + call.length()];
 		// Update status with a warning
 		if (prefix == nullptr) {
-			sprintf(message, "LOG: %s %s %s - unable to identify prefix",
+			snprintf(message, 256, "LOG: %s %s %s - unable to identify prefix",
 				date.c_str(),
 				time.c_str(),
 				call.c_str());
 			status_->misc_status(ST_WARNING, message);
 		}
 		else {
-			sprintf(message, "LOG: %s %s %s - parsed as %s",
+			snprintf(message, 256, "LOG: %s %s %s - parsed as %s",
 				date.c_str(),
 				time.c_str(),
 				call.c_str(),
@@ -870,14 +870,13 @@ bool pfx_data::update_geography(record* record, bool &query, string& reason, boo
 		}
 		// Enter QSO changed in status log message
 		if (changed) {
-			sprintf(message, "LOG: %s %s %s - record changed: %s",
+			snprintf(message, 256, "LOG: %s %s %s - record changed: %s",
 				date.c_str(),
 				time.c_str(),
 				call.c_str(),
 				reason.c_str());
 			status_->misc_status(ST_LOG, message);
 		}
-		delete[] message;
 	}
 	return changed;
 }

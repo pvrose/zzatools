@@ -244,6 +244,9 @@ bool club_handler::upload_single_qso(record_num_t record_num) {
 	Fl_Preferences club_settings(qsl_settings, "ClubLog");
 	int upload_qso;
 	club_settings.get("Upload per QSO", upload_qso, false);
+	if (upload_qso == false) {
+		status_->misc_status(ST_WARNING, "CLUBLOG: Uploading per QSO is disabled.");
+	}
 	record* this_record = book_->get_record(record_num, false);
 	if (this_record->item("CLUBLOG_QSO_UPLOAD_STATUS") == "Y") {
 		char message[128];

@@ -92,9 +92,9 @@ namespace zzalog {
 		// Add record details to a specific map entry
 		void add_record(record_num_t iRecord, report_map_entry_t* entry);
 		// Copy the map to the tree control
-		void copy_map_to_tree(report_map_t* pMap, Fl_Tree_Item* item, int& num_records, int& num_eqsl, int& num_lotw, int& num_card, int &num_any);
+		void copy_map_to_tree(report_map_t* pMap, Fl_Tree_Item* item, int& num_records, int& num_eqsl, int& num_lotw, int& num_card, int& num_dxcc, int &num_any);
 		// Copy the list of records at a map entry to the tree control
-		void copy_records_to_tree(record_list_t* pRecords, Fl_Tree_Item* item, int& num_records, int& num_eqsl, int& num_lotw, int& num_card, int& num_any);
+		void copy_records_to_tree(record_list_t* pRecords, Fl_Tree_Item* item, int& num_records, int& num_eqsl, int& num_lotw, int& num_card, int& num_dxcc, int& num_any);
 		// Create the map top-down
 		void create_map();
 		// Delete the map in a specific map entry
@@ -135,6 +135,7 @@ namespace zzalog {
 		int entities_eqsl_;
 		int entities_lotw_;
 		int entities_card_;
+		int entities_dxcc_;
 		int entities_any_;
 
 	};

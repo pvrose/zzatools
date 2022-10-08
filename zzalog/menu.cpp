@@ -1762,7 +1762,6 @@ void menu::update_items() {
 		int index_parser = find_index("&Log/&Parse record");
 		int index_bulk = find_index("&Log/&Bulk changes");
 		int index_spad = find_index("&Log/Scratc&hpad");
-		int index_change = find_index("&Operating/C&hange QSO && Set Next");
 		int index_extract = find_index("E&xtract");
 		int index_wsjtx = find_index("&Import/&WSJT-X UDP");
 		int index_rep = find_index("Re&port");
@@ -1776,7 +1775,6 @@ void menu::update_items() {
 		int index_use_log = find_index("&Log/&Use View/Main &Log");
 		int index_use_form = find_index("&Log/&Use View/&Report View");
 		int index_use_spad = find_index("&Log/&Use View/&Scratchpad");
-		int index_auto_enable = find_index("&Import/&Enable Auto-Update");
 		int index_append_log = find_index("&Help/&Status/&Append File");
 		// Enable/Disable save 
 		if (modified) {
@@ -1796,7 +1794,6 @@ void menu::update_items() {
 			// Disallow log/record modification etc. if the file is empty
 			mode(index_saveas, mode(index_saveas) | FL_MENU_INACTIVE);
 			mode(index_print, mode(index_print) | FL_MENU_INACTIVE);
-			mode(index_change, mode(index_change) | FL_MENU_INACTIVE);
 			mode(index_extract, mode(index_extract) | FL_MENU_INACTIVE);
 			mode(index_rep, mode(index_rep) | FL_MENU_INACTIVE);
 			mode(index_info, mode(index_info) | FL_MENU_INACTIVE);
@@ -1808,7 +1805,6 @@ void menu::update_items() {
 			// Allow log/modification etc if the file has records
 			mode(index_saveas, mode(index_saveas) & ~FL_MENU_INACTIVE);
 			mode(index_print, mode(index_print) & ~FL_MENU_INACTIVE);
-			mode(index_change, mode(index_change) & ~FL_MENU_INACTIVE);
 			mode(index_extract, mode(index_extract) & ~FL_MENU_INACTIVE);
 			mode(index_rep, mode(index_rep) & ~FL_MENU_INACTIVE);
 			mode(index_info, mode(index_info) & ~FL_MENU_INACTIVE);
