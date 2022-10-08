@@ -7,8 +7,6 @@
 
 using namespace zzalib;
 
-extern bool closing_;
-
 // Constructor
 xml_reader::xml_reader()
 	: prolog_(nullptr)
@@ -42,7 +40,7 @@ xml_reader::~xml_reader()
 bool xml_reader::parse(istream& is) {
 	bool ok = true;
 	// Process alternately character data and tags
-	while (is.good() && ok && !closing_) {
+	while (is.good() && ok) {
 		ok = process_chars(is);
 		if (ok) ok = process_tag(is);
 	}
@@ -140,6 +138,11 @@ bool xml_reader::process_name(istream& is, string& name) {
 // Looks at the parse point and gets the next NAME = VALUE pair
 // Moves the parse point to after the attribute and adjusts the search length
 bool xml_reader::process_attr(istream& is, map<string, string>*& attributes) {
+	// Create attributes
+	if (attributes == nullptr) {
+		attributes = new map<string, string>;
+		attributes->clear();
+	}
 	bool ok = true;
 	// Skip white space
 	if (ok) ok = ignore_white_space(is);
@@ -170,10 +173,6 @@ bool xml_reader::process_attr(istream& is, map<string, string>*& attributes) {
 					ok = false;
 				} else {
 					// Add attribute, creating the attributes if necessary
-					if (attributes == nullptr) {
-						attributes = new map<string, string>;
-						attributes->clear();
-					}
 					(*attributes)[name] = value;
 				}
 			}
@@ -401,7 +400,7 @@ bool xml_reader::process_end_tag(istream& is) {
 // Leave stream after >
 bool xml_reader::process_start_tag(istream& is) {
 	string name;
-	map<string, string>* attributes = nullptr;
+	map<string, string>* attributes = new map<string, string>;
 	bool ok = true;
 	// Gat name
 	ok &= process_name(is, name);

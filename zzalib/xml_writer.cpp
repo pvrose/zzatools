@@ -90,7 +90,7 @@ bool xml_writer::write_element(xml_element* element, ostream& os, int level) {
 				temp = new char[16 + it->first.length() + it->second.length()];
 				char quote;
 				// If it has a " in the value use ' as quote else use "
-				if (it->second.find('\"')) {
+				if (it->second.find('\"') != it->second.npos) {
 					quote = '\'';
 				}
 				else {

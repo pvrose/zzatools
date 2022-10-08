@@ -9,11 +9,11 @@ This file contains solution wide drawing constants
 
 namespace zzalib {
 
-	// Default font-size to use
+	// Default font-size to use (& override FLTK defaults?)
 	const int DEFAULT_SIZE = 10;
 	const Fl_Fontsize FONT_SIZE = DEFAULT_SIZE;
 	const Fl_Font FONT = FL_HELVETICA;
-
+	
 	// Main window default sizes
 	const unsigned int MENU_HEIGHT = 30;
 	const unsigned int TOOL_HEIGHT = 20;

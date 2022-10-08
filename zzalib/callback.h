@@ -158,12 +158,18 @@ namespace zzalib {
 		if (pos != string::npos) {
 			string dir_name = data->filename->substr(0, pos + 1);
 			chooser->directory(dir_name.c_str());
+			chooser->preset_file(data->filename->substr(pos + 1).c_str());
+		}
+		else {
+			chooser->preset_file(data->filename->c_str());
 		}
 		switch (chooser->show()) {
 		case 0:
 			// If 1 file is selected - write filename to input widget
 			*data->filename = string(chooser->filename());
-			(data->input_w)->value(data->filename->c_str());
+			if (data->input_w != nullptr) {
+				(data->input_w)->value(data->filename->c_str());
+			}
 			if (data->enable != nullptr) {
 				// If a check widget and bool is supplied, set it
 				*(data->enable) = true;
