@@ -194,32 +194,32 @@ string rpc_data_item::print_item() {
 	switch (type_) {
 	case XRT_BOOLEAN:
 		// Display 0 or 1
-		sprintf(temp, "Boolean: %1d\n", i_);
+		snprintf(temp, 1024, "Boolean: %1d\n", i_);
 		result = temp;
 		break;
 	case XRT_INT:
 		// Integer
-		sprintf(temp, "Int: %d\n", i_);
+		snprintf(temp, 1024, "Int: %d\n", i_);
 		result = temp;
 		break;
 	case XRT_DOUBLE:
 		// Double
-		sprintf(temp, "Double: %f\n", d_);
+		snprintf(temp, 1024, "Double: %f\n", d_);
 		result = temp;
 		break;
 	case XRT_STRING:
 		// String
-		sprintf(temp, "String: %s\n", s_.c_str());
+		snprintf(temp, 1024, "String: %s\n", s_.c_str());
 		result = temp;
 		break;
 	case XRT_DATETIME:
 		// Date/Time as string
-		sprintf(temp, "Date/Time: %s\n", s_.c_str());
+		snprintf(temp, 1024, "Date/Time: %s\n", s_.c_str());
 		result = temp;
 		break;
 	case XRT_BYTES:
 		// Base64 encoding as string
-		sprintf(temp, "Base64: %s\n", encode_base_64(s_).c_str());
+		snprintf(temp, 1024, "Base64: %s\n", encode_base_64(s_).c_str());
 		result = temp;
 		break;
 	case XRT_ARRAY:
@@ -237,7 +237,7 @@ string rpc_data_item::print_item() {
 		for (auto it = struct_->begin(); it != struct_->end(); it++) {
 			string key = it->first;
 			rpc_data_item* item = it->second;
-			sprintf(temp, "Name: %s\nValue: ", key.c_str());
+			snprintf(temp, 1024, "Name: %s\nValue: ", key.c_str());
 			result += temp;
 			result += item->print_item();
 		}

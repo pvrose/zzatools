@@ -46,8 +46,7 @@ namespace zzalog {
 		RC_PAS = 3,                   // DXCC plus primary adminstrative subdivision (State)
 		RC_BAND = 4,                  // Band
 		RC_MODE = 8,                  // Mode
-		RC_CQ_ZONE = 16,              // CQ Zone
-		RC_ITU_ZONE = 32,             // ITU Zone
+		RC_CUSTOM = 16,               // Custom - select ADIF field
 		RC_EMPTY = 0                  // Level not used
 	};
 
@@ -106,7 +105,7 @@ namespace zzalog {
 		// Select records
 		void add_filter(report_filter_t filter);
 		// Add Type
-		void add_category(int level, report_cat_t category);
+		void add_category(int level, report_cat_t category, string custom_field);
 		// Change font
 		void set_font(Fl_Font font, Fl_Fontsize size);
 
@@ -137,6 +136,8 @@ namespace zzalog {
 		int entities_card_;
 		int entities_dxcc_;
 		int entities_any_;
+		// Custom field name
+		string custom_field_;
 
 	};
 

@@ -105,7 +105,7 @@ corr_dialog::corr_dialog(record* record, const string& field, const string& mess
 	// Drop-down choice provides all possible field names
 	field_choice* ch1 = new field_choice(COL2, ROW3, WEDIT, HTEXT);
 	ch1->textsize(FONT_SIZE);
-	ch1->callback(cb_choice_text, (void*)&change_field_name_);
+	ch1->callback(cb_value<field_choice, string>, (void*)&change_field_name_);
 	ch1->when(FL_WHEN_CHANGED);
 	ch1->tooltip("Name to change field to");
 	// Action choice - add another field
@@ -118,7 +118,7 @@ corr_dialog::corr_dialog(record* record, const string& field, const string& mess
 	// Drop-down choice provides all possible field names
 	field_choice* ch2 = new field_choice(COL2, ROW4, WEDIT, HTEXT);
 	ch2->textsize(FONT_SIZE);
-	ch2->callback(cb_choice_text, (void*)&add_field_name_);
+	ch2->callback(cb_value<field_choice, string>, (void*)&add_field_name_);
 	ch2->when(FL_WHEN_CHANGED);
 	ch2->tooltip("Field to add");
 	// Input - data to use in the additional field

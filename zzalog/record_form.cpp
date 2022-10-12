@@ -50,6 +50,7 @@ using namespace std;
 // Actions for non-dedicated buttons
 enum edit_action_t {
 	NONE,         // No action
+	EDIT_THIS,    // Edit the current displayed entry
 	START,        // Start a new entry
 	RESTART,      // Save current entry and start a new one
 	SAVE,         // Save current entry
@@ -303,6 +304,7 @@ record_form::record_form(int X, int Y, int W, int H, const char* label, field_or
 	field_choice_->tooltip("Select the field to add/edit");
 	field_choice_->callback(cb_ch_field);
 	field_choice_->when(FL_WHEN_RELEASE | FL_WHEN_NOT_CHANGED);
+
 
 	curr_y += HTEXT;
 	// Text editor - new value of field or explanation of the enumerated value
@@ -600,26 +602,21 @@ void record_form::cb_tab_record(Fl_Widget* w, void* v) {
 // v is not used
 void record_form::cb_ch_field(Fl_Widget* w, void* v) {
 	record_form* that = ancestor_view<record_form>(w);
-	Fl_Choice* choice = (Fl_Choice*)w;
-	char temp[128];
-	// Get the item clicked in the choice
-	if (choice->item_pathname(temp, sizeof(temp) - 1) == 0) {
-		// Get the value of the item clicked and allow it to be edited
-		string field = &temp[1];
-		string text;
-		// If the log record exists - copy that
-		if (that->record_1_) {
-			text = that->record_1_->item(field, true);
-		}
-		// Otherwise use the query record
-		else if (that->record_2_) {
-			text = that->record_2_->item(field, true);
-		}
-		that->set_edit_widgets(field, text);
-		that->modifying_ = true;
-		that->enable_widgets();
-		that->redraw();
+	string field;
+	cb_value<field_choice, string>(w, &field);
+	string text;
+	// If the log record exists - copy that
+	if (that->record_1_) {
+		text = that->record_1_->item(field, true);
 	}
+	// Otherwise use the query record
+	else if (that->record_2_) {
+		text = that->record_2_->item(field, true);
+	}
+	that->set_edit_widgets(field, text);
+	that->modifying_ = true;
+	that->enable_widgets();
+	that->redraw();
 }
 
 // Called after typing in the editor
@@ -650,9 +647,8 @@ void record_form::cb_bn_use(Fl_Widget* w, void* v) {
 	record_form* that = ancestor_view<record_form>(w);
 	// Update the record - get the fieldname in upper case - note item name in choice is prefixed with root symbol '/'
 	char temp[128];
-	// Get the name of current selected field-name in the Fl_Choice
-	that->field_choice_->item_pathname(temp, sizeof(temp) - 1);
-	string field = to_upper(string(&temp[1]));
+	// Get the name of current selected field-name in the field_choice
+	string field = to_upper(that->field_choice_->value());
 	// Get the new value from the text edit widget
 	if (field != "") {
 		// Get book to remember the record
@@ -816,17 +812,25 @@ void record_form::cb_bn_edit(Fl_Widget* w, long v) {
 		// Start a new record
 		qso_manager_->start_qso();
 		that->use_mode_ = UM_QSO;
+		that->set_edit_widgets("", "");
 		break;
 	case RESTART:
 		// Save current record and start a new one
 		qso_manager_->end_qso();
 		qso_manager_->start_qso();
 		that->use_mode_ = UM_QSO;
+		that->set_edit_widgets("", "");
 		break;
 	case SAVE:
 		// Save current record
 		qso_manager_->end_qso();
 		that->use_mode_ = UM_DISPLAY;
+		break;
+	case EDIT_THIS:
+		// Allow the current record to be edited
+		that->use_mode_ = UM_QSO;
+		that->set_edit_widgets("", "");
+		that->modifying_ = true;
 		break;
 	case REVERT:
 		// Copy saved record back to original record
@@ -1503,11 +1507,11 @@ void record_form::enable_widgets() {
 			edit2_bn_->tooltip("Manually enter details for a query");
 			edit2_bn_->callback(cb_bn_edit, (long)ENTER);
 			edit2_bn_->activate();
-			edit3_bn_->label("3");
-			edit3_bn_->color(FL_BACKGROUND_COLOR);
-			edit3_bn_->tooltip("");
-			edit3_bn_->callback(cb_bn_edit, (long)NONE);
-			edit3_bn_->deactivate();
+			edit3_bn_->label("Edit");
+			edit3_bn_->color(FL_YELLOW);
+			edit3_bn_->tooltip("Allow manual edits to existing QSO");
+			edit3_bn_->callback(cb_bn_edit, (long)EDIT_THIS);
+			edit3_bn_->activate();
 			// Quick QSL entry
 			quick_grp_->deactivate();
 		}

@@ -143,7 +143,7 @@ void change_dialog::create_form() {
 	ix = 0;
 	ch22->value(0);
 	new_field_name_ = ch22->text();
-	ch22->callback(cb_text<field_choice, string>, (void*)&new_field_name_);
+	ch22->callback(cb_value<field_choice, string>, (void*)&new_field_name_);
 	ch22->when(FL_WHEN_RELEASE);
 	ch22->tooltip("Select the name to change it to");
 	w_field_name_ = ch22;
@@ -242,7 +242,7 @@ void change_dialog::cb_radio_action(Fl_Widget* w, void* v) {
 // callback - old field name choice
 void change_dialog::cb_ch_old_field(Fl_Widget* w, void* v) {
 	change_dialog* that = ancestor_view<change_dialog>(w);
-	cb_text<Fl_Choice, string>(w, v);
+	cb_value<field_choice, string>(w, v);
 	that->enable_widgets();
 }
 

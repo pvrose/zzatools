@@ -62,10 +62,9 @@ bool xml_writer::data(ostream& os) {
 
 // Write the prolog - <?xml ...attributes?>
 bool xml_writer::write_prolog(xml_element* prolog, ostream& os) {
-	char * temp = new char[10 + prolog->name().length() + prolog->content().length()];
-	sprintf(temp, "<?%s %s?>", prolog->name().c_str(), prolog->content().c_str());
+	char temp[1024];
+	snprintf(temp, 1024, "<?%s %s?>", prolog->name().c_str(), prolog->content().c_str());
 	os << temp;
-	delete[] temp;
 	return true;
 }
 
@@ -75,19 +74,16 @@ bool xml_writer::write_element(xml_element* element, ostream& os, int level) {
 	switch (element->type()) {
 	case xml_element::ELEMENT: {
 		// Element 
-		char * temp;
+		char temp[1024];
 		// Add indent
 		bool ok = write_indent(os, level);
 		// Output start of start tag <NAME
-		temp = new char[8 + element->name().length()];
-		sprintf(temp, "<%s", element->name().c_str());
+		snprintf(temp, 1024, "<%s", element->name().c_str());
 		os << temp;
-		delete[] temp;
 		// If there are any attributes
 		if (element->attributes() != nullptr) {
 			// For each attribute
 			for (auto it = element->attributes()->begin(); it != element->attributes()->end(); it++) {
-				temp = new char[16 + it->first.length() + it->second.length()];
 				char quote;
 				// If it has a " in the value use ' as quote else use "
 				if (it->second.find('\"') != it->second.npos) {
@@ -96,9 +92,8 @@ bool xml_writer::write_element(xml_element* element, ostream& os, int level) {
 				else {
 					quote = '\"';
 				}
-				sprintf(temp, " %s=%c%s%c", it->first.c_str(), quote, it->second.c_str(), quote);
+				snprintf(temp, 1024, " %s=%c%s%c", it->first.c_str(), quote, it->second.c_str(), quote);
 				os << temp;
-				delete[] temp;
 			}
 		}
 		if (element->content().length() == 0 && element->count() == 0) {
@@ -118,10 +113,8 @@ bool xml_writer::write_element(xml_element* element, ostream& os, int level) {
 			}
 			// Add any character content
 			string escaped = escape_string(element->content());
-			temp = new char[10 + escaped.length() + element->name().length()];
-			sprintf(temp, "%s</%s>", escaped.c_str(), element->name().c_str());
+			snprintf(temp, 1024, "%s</%s>", escaped.c_str(), element->name().c_str());
 			os << temp;
-			delete[] temp;
 		}
 		// If writing XML to file display progress every 100 elements at any level
 		num_written_++;

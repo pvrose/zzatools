@@ -10,6 +10,7 @@
 #include "../zzalib/callback.h"
 #include "../zzalib/utils.h"
 #include "menu.h"
+#include "field_choice.h"
 
 #include <FL/fl_draw.H>
 #include <FL/Fl_Preferences.H>
@@ -40,6 +41,7 @@ report_tree::report_tree(int X, int Y, int W, int H, const char* label, field_or
 	, entities_card_(0)
 	, entities_dxcc_(0)
 	, entities_any_(0)
+	, custom_field_("")
 {
 	map_order_.clear();
 
@@ -141,8 +143,9 @@ void report_tree::delete_tree() {
 void report_tree::add_record(record_num_t record_num, report_map_entry_t* entry) {
 	string map_key = "";
 	string state_code;
-	string dxcc_code;
-	string zone_code;
+	int dxcc;
+	string dxcc_name;
+	string custom_code;
 	// Get record
 	record* record = get_book()->get_record(record_num, false);
 	// Entry type is valid
@@ -150,6 +153,13 @@ void report_tree::add_record(record_num_t record_num, report_map_entry_t* entry)
 	if (entry->entry_type != -1 && (size_t)entry->entry_type < adj_order_.size()) {
 		// The user wants to display this entry type
 		report_cat_t category = adj_order_[entry->entry_type];
+		report_cat_t next_category;
+		if (adj_order_.size() > (unsigned)entry->entry_type + 1) {
+			next_category = adj_order_[entry->entry_type + 1];
+		}
+		else {
+			next_category = category;
+		}
 		switch (category) {
 		case RC_DXCC:
 			// DXCC map
@@ -159,17 +169,20 @@ void report_tree::add_record(record_num_t record_num, report_map_entry_t* entry)
 			}
 			else {
 				// Set key to "GM: Scotland" - get the DXCC code for the record
-				int dxcc_code;
-				record->item("DXCC", dxcc_code);
+				record->item("DXCC", dxcc);
 				// Get the prefix information
-				prefix* prefix = pfx_data_->get_prefix(dxcc_code);
+				prefix* prefix = pfx_data_->get_prefix(dxcc);
 				spec_dataset* dxcc_dataset = spec_data_->dataset("DXCC_Entity_Code");
 				map<string, string>* dxcc_data;
 				auto it = dxcc_dataset->data.find(record->item("DXCC"));
 				if (it != dxcc_dataset->data.end()) {
 					// We have an entry for the DXCC s0 build the label
 					dxcc_data = it->second;
-					map_key = prefix->nickname_ + " " + (*dxcc_data)["Entity Name"];
+					dxcc_name = (*dxcc_data)["Entity Name"];
+					map_key = prefix->nickname_ + " " + dxcc_name;
+					if (next_category == RC_PAS && spec_data_->has_states(dxcc)) {
+						map_key += " (with states)";
+					}
 				}
 				else {
 					// We cannot find the DXCC entry
@@ -180,11 +193,12 @@ void report_tree::add_record(record_num_t record_num, report_map_entry_t* entry)
 		case RC_PAS:
 			// Primary Administrative Subdivision - get the PAS and DXCC from the record
 			state_code = record->item("STATE");
-			dxcc_code = record->item("DXCC");
+			record->item("DXCC", dxcc);
+
 			// STATE map
 			if (state_code == "") {
 				// PAS not specified
-				if (spec_data_->has_states(dxcc_code)) {
+				if (spec_data_->has_states(dxcc)) {
 					map_key = "?? *** State unspecified ***";
 				}
 				else {
@@ -194,7 +208,7 @@ void report_tree::add_record(record_num_t record_num, report_map_entry_t* entry)
 			}
 			else {
 				// Get the PAS dataset
-				string pas_name = "Primary_Administrative_Subdivision[" + dxcc_code + "]";
+				string pas_name = "Primary_Administrative_Subdivision[" + to_string(dxcc) + "]";
 				spec_dataset* state_dataset = spec_data_->dataset(pas_name);
 				map<string, string>* state_data;
 				if (state_dataset == nullptr) {
@@ -224,39 +238,15 @@ void report_tree::add_record(record_num_t record_num, report_map_entry_t* entry)
 			// Get the mode from the record
 			map_key = record->item("MODE", true);
 			break;
-		case RC_CQ_ZONE:
-			// CQ Zone from the record
-			zone_code = record->item("CQZ");
-			switch (zone_code.length()) {
-			case 0: 
-				map_key = "CQ Zone not specified";
-				break;
-			case 1:
-				map_key = "CQ Zone  " + zone_code;
-				break;
-			case 2:
-				map_key = "CQ Zone " + zone_code;
-				break;
-			default:
-				map_key = "Invalid CQ Zone";
-				break;
+		case RC_CUSTOM:
+			// Custom from the record
+			custom_code = record->item(custom_field_);
+			if (custom_field_.length()) {
+				if (custom_code.length()) map_key = custom_field_ + " = " + custom_code;
+				else map_key = custom_field_ + " Not specified";
 			}
-			break;
-		case RC_ITU_ZONE:
-			zone_code = record->item("ITUZ");
-			switch (zone_code.length()) {
-			case 0:
-				map_key = "ITU Zone not specified";
-				break;
-			case 1:
-				map_key = "ITU Zone  " + zone_code;
-				break;
-			case 2:
-				map_key = "ITU Zone " + zone_code;
-				break;
-			default:
-				map_key = "Invalid ITU Zone";
-				break;
+			else {
+				map_key = "Custom field not specified";
 			}
 			break;
 		}
@@ -340,11 +330,8 @@ void report_tree::copy_map_to_tree(report_map_t* this_map, Fl_Tree_Item* item, i
 		case RC_MODE:
 			label_colour = FL_DARK_RED;
 			break;
-		case RC_CQ_ZONE:
+		case RC_CUSTOM:
 			label_colour = FL_DARK_BLUE;
-			break;
-		case RC_ITU_ZONE:
-			label_colour = FL_DARK_YELLOW;
 			break;
 		}
 
@@ -403,7 +390,7 @@ void report_tree::copy_map_to_tree(report_map_t* this_map, Fl_Tree_Item* item, i
 		// Only mark progress if top-level map
 		if (item == nullptr) {
 			if ((adj_order_[0] == RC_DXCC && map_key.substr(0, 7) != "{ SWL }" && map_key.substr(0,2) != "00") ||
-			adj_order_[0] == RC_CQ_ZONE || adj_order_[0] == RC_ITU_ZONE) {
+			adj_order_[0] == RC_CUSTOM) {
 				if (count_records) entities_++;
 				if (count_eqsl) entities_eqsl_++;
 				if (count_lotw) entities_lotw_++;
@@ -522,11 +509,8 @@ void report_tree::create_map() {
 	case RC_MODE:
 		field_name = "MODE";
 		break;
-	case RC_CQ_ZONE:
-		field_name = "CQZ";
-		break;
-	case RC_ITU_ZONE:
-		field_name = "ITUZ";
+	case RC_CUSTOM:
+		field_name = custom_field_;
 		break;
 	}
 
@@ -630,10 +614,9 @@ void report_tree::populate_tree(bool activate) {
 					count_records, filter.c_str(), num_any, num_eqsl, num_lotw, num_card, num_dxcc,
 					entities_, entities_any_, entities_eqsl_, entities_lotw_, entities_card_, entities_dxcc_);
 				break;
-			case RC_CQ_ZONE:
-			case RC_ITU_ZONE:
+			case RC_CUSTOM:
 				// Display QSO and total entity counts
-				sprintf(text, "Total: %d QSOs (%s) - Confirmed %d (%d eQSL, %d LotW, %d Card, %d DXCC); %d Zones - Confirmed %d (%d eQSL, %d LotW, %d Card, %d DXCC)",
+				sprintf(text, "Total: %d QSOs (%s) - Confirmed %d (%d eQSL, %d LotW, %d Card, %d DXCC); %d Items - Confirmed %d (%d eQSL, %d LotW, %d Card, %d DXCC)",
 					count_records, filter.c_str(), num_any, num_eqsl, num_lotw, num_card, num_dxcc,
 					entities_, entities_any_, entities_eqsl_, entities_lotw_, entities_card_, entities_dxcc_);
 				break;
@@ -711,7 +694,7 @@ void report_tree::add_filter(report_filter_t filter) {
 }
 
 // Add category and redraw
-void report_tree::add_category(int level, report_cat_t category) {
+void report_tree::add_category(int level, report_cat_t category, string custom) {
 	// Check validity
 	bool valid = true;
 	// Depending on level we have different actions
@@ -755,6 +738,11 @@ void report_tree::add_category(int level, report_cat_t category) {
 		switch (category) {
 		case RC_EMPTY:
 			// We have already removed it above
+			break;
+		case RC_CUSTOM:
+			custom_field_ = custom;
+			// Add the new level
+			map_order_.push_back(category);
 			break;
 		default:
 			// Add the new level

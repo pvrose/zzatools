@@ -148,7 +148,7 @@ search_dialog::search_dialog() :
 	ch12->set_dataset("Fields",criteria_->field_name);
 	ch12->textsize(FONT_SIZE);
 	ch12->tooltip("Select field to search on");
-	ch12->callback(cb_text<Fl_Choice, string>, (void*)&criteria_->field_name);
+	ch12->callback(cb_value<field_choice, string>, (void*)&criteria_->field_name);
 	ch12->when(FL_WHEN_RELEASE);
 	// Position of the 7 comparator buttons
 	const int col2[7] = { C11, (C11 + C12)/2, C12, (C12 + C13)/2, C13, (C13 + C14)/2, C14 };

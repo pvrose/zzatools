@@ -334,7 +334,7 @@ bool xml_reader::process_decl(istream& is) {
 	}
 	if (!ok) {
 		char message[256];
-		sprintf(message, "Invalid declaration statement Name %s Content %s> encountered", name.c_str(), content.c_str());
+		snprintf(message, 256, "Invalid declaration statement Name %s Content %s> encountered", name.c_str(), content.c_str());
 		report_error(message, false);
 	}
 	return ok;
@@ -365,7 +365,7 @@ bool xml_reader::process_process(istream& is) {
 	}
 	if (!ok) {
 		char message[256];
-		sprintf(message, "Error with process instruction name = %s", name.c_str());
+		snprintf(message, 256, "Error with process instruction name = %s", name.c_str());
 		report_error(message, false);
 	}
 	return ok;
@@ -390,7 +390,7 @@ bool xml_reader::process_end_tag(istream& is) {
 	}
 	if (!ok) {
 		char message[256];
-		sprintf(message, "Error with end-tag %s", name.c_str());
+		snprintf(message, 256, "Error with end-tag %s", name.c_str());
 		report_error(message, false);
 	}
 	return ok;
@@ -427,7 +427,7 @@ bool xml_reader::process_start_tag(istream& is) {
 	else
 	{
 		char message[256];
-		sprintf(message, "Error processing start-tag %s", name.c_str());
+		snprintf(message, 256, "Error processing start-tag %s", name.c_str());
 		report_error(message, false);
 		ok = false;
 	}
@@ -526,7 +526,7 @@ bool xml_reader::end_element(string name) {
 		// Check ths is the end tag for the equivalent start tag - names match
 		if (current_element_->name() != name) {
 			char message[256];
-			sprintf(message, "End tag %s has name mis-match with start tag %s", name.c_str(), current_element_->name().c_str());
+			snprintf(message, 256, "End tag %s has name mis-match with start tag %s", name.c_str(), current_element_->name().c_str());
 			report_error(message, false);
 			return false;
 		}
@@ -539,7 +539,7 @@ bool xml_reader::end_element(string name) {
 	else {
 		// A singleton end tag at the top level
 		char message[256];
-		sprintf(message, "End tag %s has no start tag to match against", name.c_str());
+		snprintf(message, 256, "End tag %s has no start tag to match against", name.c_str());
 		report_error(message, false);
 		return false;
 	}
@@ -562,7 +562,7 @@ bool xml_reader::declaration(xml_element::element_t type, string name, string co
 	}
 	else {
 		char message[256];
-		sprintf(message, "declaration %s %s not yet handled by default processor", name.c_str(), content.c_str());
+		snprintf(message, 256, "declaration %s %s not yet handled by default processor", name.c_str(), content.c_str());
 		report_error(message, false);
 		return false;
 	}
@@ -572,7 +572,7 @@ bool xml_reader::declaration(xml_element::element_t type, string name, string co
 bool xml_reader::process_instr(string name, string content) {
 	if (name != "xml") {
 		char message[256];
-		sprintf(message, "Processing instruction %s %s not yet handled by default processor", name.c_str(), content.c_str());
+		snprintf(message, 256, "Processing instruction %s %s not yet handled by default processor", name.c_str(), content.c_str());
 		report_error(message, false);
 		return false;
 	}

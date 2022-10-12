@@ -208,16 +208,14 @@ namespace zzalog {
 			{ "Entities/&States", 0, menu::cb_mi_rep_level, (void*)((1 << 8) + RC_PAS), FL_MENU_RADIO | FL_MENU_VALUE },
 			{ "&Bands", 0, menu::cb_mi_rep_level, (void*)((1 << 8) + RC_BAND), FL_MENU_RADIO },
 			{ "&Modes", 0, menu::cb_mi_rep_level, (void*)((1 << 8) + RC_MODE), FL_MENU_RADIO },
-			{ "&CQ Zones", 0, menu::cb_mi_rep_level, (void*)((1 << 8) + RC_CQ_ZONE), FL_MENU_RADIO },
-			{ "&ITU Zones", 0, menu::cb_mi_rep_level, (void*)((1 << 8) + RC_ITU_ZONE), FL_MENU_RADIO },
+			{ "&Custom", 0, menu::cb_mi_rep_level, (void*)((1 << 8) + RC_CUSTOM), FL_MENU_RADIO },
 			{ 0 },
 		{ "Level &2", 0, 0, 0, FL_SUBMENU },
 			{ "&Entities", 0, menu::cb_mi_rep_level, (void*)((2 << 8) + RC_DXCC), FL_MENU_RADIO },
 			{ "Entities/&States", 0, menu::cb_mi_rep_level, (void*)((2 << 8) + RC_PAS), FL_MENU_RADIO },
 			{ "&Bands", 0, menu::cb_mi_rep_level, (void*)((2 << 8) + RC_BAND), FL_MENU_RADIO },
 			{ "&Modes", 0, menu::cb_mi_rep_level, (void*)((2 << 8) + RC_MODE), FL_MENU_RADIO },
-			{ "&CQ Zones", 0, menu::cb_mi_rep_level, (void*)((2 << 8) + RC_CQ_ZONE), FL_MENU_RADIO },
-			{ "&ITU Zones", 0, menu::cb_mi_rep_level, (void*)((2 << 8) + RC_ITU_ZONE), FL_MENU_RADIO },
+			{ "&Custom", 0, menu::cb_mi_rep_level, (void*)((2 << 8) + RC_CUSTOM), FL_MENU_RADIO },
 			{ "&Nothing", 0, menu::cb_mi_rep_level, (void*)((2 << 8) + RC_EMPTY), FL_MENU_RADIO | FL_MENU_VALUE },
 			{ 0 },
 		{ "Level &3", 0, 0, 0, FL_SUBMENU },
@@ -225,8 +223,7 @@ namespace zzalog {
 			{ "Entities/&States", 0, menu::cb_mi_rep_level, (void*)((3 << 8) + RC_PAS), FL_MENU_RADIO },
 			{ "&Bands", 0, menu::cb_mi_rep_level, (void*)((3 << 8) + RC_BAND), FL_MENU_RADIO },
 			{ "&Modes", 0, menu::cb_mi_rep_level, (void*)((3 << 8) + RC_MODE), FL_MENU_RADIO },
-			{ "&CQ Zones", 0, menu::cb_mi_rep_level, (void*)((3 << 8) + RC_CQ_ZONE), FL_MENU_RADIO },
-			{ "&ITU Zones", 0, menu::cb_mi_rep_level, (void*)((3 << 8) + RC_ITU_ZONE), FL_MENU_RADIO },
+			{ "&Custom", 0, menu::cb_mi_rep_level, (void*)((3 << 8) + RC_CUSTOM), FL_MENU_RADIO },
 			{ "&Nothing", 0, menu::cb_mi_rep_level, (void*)((3 << 8) + RC_EMPTY), FL_MENU_RADIO | FL_MENU_VALUE },
 			{ 0 },
 		{ 0 },
@@ -1283,9 +1280,17 @@ void menu::cb_mi_rep_filter(Fl_Widget* w, void* v) {
 // v contains two bytes { level, category }
 void menu::cb_mi_rep_level(Fl_Widget* w, void* v) {
 	long params = (long)v;
+	string custom_field = "";
 	report_cat_t category = (report_cat_t)(params & 0xFF);
 	int level = params >> 8;
-	((report_tree*)tabbed_forms_->get_view(OT_REPORT))->add_category(level, category);
+	if (category == RC_CUSTOM) {
+		// TODO - replace with custom dialog that uses field_choice
+		const char* custom = fl_input("Select Custom field name");
+		if (custom) {
+			custom_field = custom;
+		}
+	}
+	((report_tree*)tabbed_forms_->get_view(OT_REPORT))->add_category(level, category, custom_field);
 	tabbed_forms_->activate_pane(OT_REPORT, true);
 }
 
@@ -1530,10 +1535,8 @@ void menu::report_mode(vector<report_cat_t> report_mode, report_filter_t filter)
 		int index_bands = find_index(item_label);
 		sprintf(item_label, "Re&port/Level &%d/&Modes", i);
 		int index_modes = find_index(item_label);
-		sprintf(item_label, "Re&port/Level &%d/&CQ Zones", i);
-		int index_cqzones = find_index(item_label);
-		sprintf(item_label, "Re&port/Level &%d/&ITU Zones", i);
-		int index_ituzones = find_index(item_label);
+		sprintf(item_label, "Re&port/Level &%d/&Custom", i);
+		int index_custom = find_index(item_label);
 		int index_nothing = -1;
 		// Nothing is not an option for Level1
 		if (i > 1) {
@@ -1553,8 +1556,7 @@ void menu::report_mode(vector<report_cat_t> report_mode, report_filter_t filter)
 				mode(index_states, mode(index_states) & ~FL_MENU_VALUE);
 				mode(index_bands, mode(index_bands) & ~FL_MENU_VALUE);
 				mode(index_modes, mode(index_modes) & ~FL_MENU_VALUE);
-				mode(index_cqzones, mode(index_cqzones) & ~FL_MENU_VALUE);
-				mode(index_ituzones, mode(index_modes) & ~FL_MENU_VALUE);
+				mode(index_custom, mode(index_custom) & ~FL_MENU_VALUE);
 				break;
 			case RC_PAS:
 				// Set Entities/States only
@@ -1562,8 +1564,7 @@ void menu::report_mode(vector<report_cat_t> report_mode, report_filter_t filter)
 				mode(index_states, mode(index_states) | FL_MENU_VALUE);
 				mode(index_bands, mode(index_bands) & ~FL_MENU_VALUE);
 				mode(index_modes, mode(index_modes) & ~FL_MENU_VALUE);
-				mode(index_cqzones, mode(index_cqzones) & ~FL_MENU_VALUE);
-				mode(index_ituzones, mode(index_modes) & ~FL_MENU_VALUE);
+				mode(index_custom, mode(index_custom) & ~FL_MENU_VALUE);
 				break;
 			case RC_BAND:
 				// Set Bands only
@@ -1571,8 +1572,7 @@ void menu::report_mode(vector<report_cat_t> report_mode, report_filter_t filter)
 				mode(index_states, mode(index_states) & ~FL_MENU_VALUE);
 				mode(index_bands, mode(index_bands) | FL_MENU_VALUE);
 				mode(index_modes, mode(index_modes) & ~FL_MENU_VALUE);
-				mode(index_cqzones, mode(index_cqzones) & ~FL_MENU_VALUE);
-				mode(index_ituzones, mode(index_modes) & ~FL_MENU_VALUE);
+				mode(index_custom, mode(index_custom) & ~FL_MENU_VALUE);
 				break;
 			case RC_MODE:
 				// Set Modes only
@@ -1580,26 +1580,15 @@ void menu::report_mode(vector<report_cat_t> report_mode, report_filter_t filter)
 				mode(index_states, mode(index_states) & ~FL_MENU_VALUE);
 				mode(index_bands, mode(index_bands) & ~FL_MENU_VALUE);
 				mode(index_modes, mode(index_modes) | FL_MENU_VALUE);
-				mode(index_cqzones, mode(index_cqzones) & ~FL_MENU_VALUE);
-				mode(index_ituzones, mode(index_modes) & ~FL_MENU_VALUE);
+				mode(index_custom, mode(index_custom) & ~FL_MENU_VALUE);
 				break;
-			case RC_CQ_ZONE:
+			case RC_CUSTOM:
 				// Set CQ Zones only
 				mode(index_entities, mode(index_entities) & ~FL_MENU_VALUE);
 				mode(index_states, mode(index_states) & ~FL_MENU_VALUE);
 				mode(index_bands, mode(index_bands) & ~FL_MENU_VALUE);
 				mode(index_modes, mode(index_modes) & ~FL_MENU_VALUE);
-				mode(index_cqzones, mode(index_cqzones) | FL_MENU_VALUE);
-				mode(index_ituzones, mode(index_modes) & ~FL_MENU_VALUE);
-				break;
-			case RC_ITU_ZONE:
-				// Set ITU Zones only
-				mode(index_entities, mode(index_entities) & ~FL_MENU_VALUE);
-				mode(index_states, mode(index_states) & ~FL_MENU_VALUE);
-				mode(index_bands, mode(index_bands) & ~FL_MENU_VALUE);
-				mode(index_modes, mode(index_modes) & ~FL_MENU_VALUE);
-				mode(index_cqzones, mode(index_cqzones) & ~FL_MENU_VALUE);
-				mode(index_ituzones, mode(index_modes) | FL_MENU_VALUE);
+				mode(index_custom, mode(index_custom) | FL_MENU_VALUE);
 				break;
 			}
 		}
@@ -1610,8 +1599,7 @@ void menu::report_mode(vector<report_cat_t> report_mode, report_filter_t filter)
 			mode(index_states, mode(index_states) & ~FL_MENU_VALUE);
 			mode(index_bands, mode(index_bands) & ~FL_MENU_VALUE);
 			mode(index_modes, mode(index_entities) & ~FL_MENU_VALUE);
-			mode(index_cqzones, mode(index_cqzones) & ~FL_MENU_VALUE);
-			mode(index_ituzones, mode(index_modes) & ~FL_MENU_VALUE);
+			mode(index_custom, mode(index_custom) & ~FL_MENU_VALUE);
 
 		}
 	}

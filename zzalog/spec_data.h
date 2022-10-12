@@ -143,7 +143,7 @@ namespace zzalog {
 		// Get enumeration name
 		string enumeration_name(const string& field, record* record);
 		// The DXCC has ADIF defined primary administrative districts
-		bool has_states(string dxcc_name);
+		bool has_states(int dxcc);
 		// Validate a record - returns TRUE if record corrected
 		bool validate(record* record, record_num_t number);
 		// Validate the data in the field

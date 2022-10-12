@@ -85,15 +85,15 @@ string rig_if::get_smeter() {
 	// 1 S-point is 6 dB
 	if (smeter < -54) {
 		// Below S0
-		sprintf(text, " S0%ddB", 54 + smeter);
+		snprintf(text, 100, " S0%ddB", 54 + smeter);
 	}
 	else if (smeter <= 0) {
 		// Below S9 - convert to S points (6dB per S-point
-		sprintf(text, " S%1d", (54 + smeter) / 6);
+		snprintf(text, 100, " S%1d", (54 + smeter) / 6);
 	}
 	else {
 		// S9+
-		sprintf(text, " S9+%ddB", smeter);
+		snprintf(text, 100, " S9+%ddB", smeter);
 	}
 
 	return text;
@@ -148,7 +148,7 @@ string rig_if::get_frequency(bool tx) {
 		frequency = rx_frequency() / 1000000.0;
 	}
 	char text[15];
-	sprintf(text, "%0.6f", frequency);
+	snprintf(text, 15, "%0.6f", frequency);
 
 	return text;
 
@@ -177,7 +177,7 @@ string rig_if::get_tx_power() {
 			max_power_ = tx_power;
 	}
 	char text[100];
-	sprintf(text, "%g", tx_power);
+	snprintf(text, 100, "%g", tx_power);
 
 	return text;
 }

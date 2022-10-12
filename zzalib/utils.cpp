@@ -462,7 +462,7 @@ string zzalib::escape_url(string url)
 		else {
 			// Relace with %nnx
 			char escape[5];
-			sprintf(escape, "%%%02x", c);
+			snprintf(escape, 5, "%%%02x", c);
 			result += escape;
 		}
 	}
@@ -502,10 +502,9 @@ string zzalib::degrees_to_dms(float value, bool is_latitude) {
 	// Get additional minutes
 	num_minutes = num_minutes % 60;
 	// Now format the text 
-	char* temp = new char[20]; // I count 11 but add a bit
-	sprintf(temp, "%d°%d'%.1f\"%c", num_degrees, num_minutes, num_seconds, value < 0 ? (is_latitude ? 'S' : 'W') : (is_latitude ? 'N' : 'E'));
+	char temp[20]; // I count 11 but add a bit
+	snprintf(temp, 20, "%d°%d'%.1f\"%c", num_degrees, num_minutes, num_seconds, value < 0 ? (is_latitude ? 'S' : 'W') : (is_latitude ? 'N' : 'E'));
 	text = temp;
-	delete[] temp;
 	return text;
 }
 

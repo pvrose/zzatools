@@ -681,9 +681,9 @@ string spec_data::enumeration_name(const string& field_name, record* record) {
 }
 
 // The DXCC has ADIF defined primary administrative districts
-bool spec_data::has_states(string dxcc_name) {
+bool spec_data::has_states(int dxcc) {
 	// Look up DXCC name in list of DXCCs with "states".
-	if (dataset("Primary_Administrative_Subdivision[" + dxcc_name + "]")) {
+	if (dataset("Primary_Administrative_Subdivision[" + to_string(dxcc) + "]")) {
 		return true;
 	}
 	else {
