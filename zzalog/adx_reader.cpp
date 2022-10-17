@@ -157,7 +157,7 @@ bool adx_reader::end_element(string name) {
 		}
 		else {
 			// Copy the ADIF item to the current record
-			record_->item(field_name_, value_);
+			record_->item(field_name_, value_, false, false);
 		}
 	}
 	else if (element_name == "APP") {
@@ -169,7 +169,7 @@ bool adx_reader::end_element(string name) {
 		else {
 			if (!ignore_app_) {
 				// Copy the ADIF item to the current record
-				record_->item(field_name_, value_);
+				record_->item(field_name_, value_, false, false);
 			}
 		}
 	}
@@ -182,12 +182,12 @@ bool adx_reader::end_element(string name) {
 		// Add to the user defined fields list in ADIF database
 		ok = spec_data_->add_userdef(id, value_, datatype_[0], available_values_);
 		// Copy the ADIF item to the current record (header)
-		record_->item(field_name_, value_);
+		record_->item(field_name_, value_, false, false);
 	}
 	else if (element_name == "USERDEF" && element_type == AET_USERDEFR && record_ != nullptr) {
 		// USERDEF element within a RECORD element
 		// Add item to the record
-		record_->item(field_name_, value_);
+		record_->item(field_name_, value_, false, false);
 	}
 	else if (element_name == "USERDEF") {
 		// Unexpecetd elsewhere

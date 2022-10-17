@@ -93,13 +93,14 @@ void record::delete_contents() {
 	is_header_ = false;
 	header_comment_ = "";
 	is_incomplete_ = false;
+	is_dirty_ = false;
 	// Delete items
 	clear();
 }
 
 // Set an item pair.
 // Return true if successful, false if not
-void record::item(string field, string value, bool formatted/* = false*/) {
+void record::item(string field, string value, bool formatted/* = false*/, bool dirty /*=true*/) {
 	// Check we are not deleting an important field - crash the program if this was unintentional
 	char message[256];
 	snprintf(message, 256, "You are deleting %s, are you sure", field.c_str());
@@ -170,9 +171,9 @@ void record::item(string field, string value, bool formatted/* = false*/) {
 			}
 		}
 	}
+	string formatted_value;
 	if (formatted) {
 		// Convert from the displayed format to ADIF format
-		string formatted_value;
 		if (upper_value == "") {
 			// empty string gives empty string
 			formatted_value = "";
@@ -267,13 +268,26 @@ void record::item(string field, string value, bool formatted/* = false*/) {
 				break;
 			}
 		}
-		// Set in item
-		(*this)[field] = formatted_value;
 	}
 	else {
 	 // Use the data directly in the item
-	 (*this)[field] = upper_value;
+		formatted_value = upper_value;
 	}
+	// SEt dirty flag if contents are changing
+	if (dirty) {
+		string orig_value;
+		if (find(field) != end()) {
+			orig_value = at(field);
+		}
+		else {
+			orig_value = "";
+		}
+		if (orig_value != formatted_value) {
+			is_dirty_ = true;
+		}
+	}
+	// Set in item
+	(*this)[field] = formatted_value;
 }
 
 // Get an item - as string
@@ -1382,3 +1396,9 @@ string record::unformat_time(display_time_t format, string value) {
 	}
 	return string(temp);
 }
+
+// Return dirtty flag
+bool record::is_dirty() { return is_dirty_; }
+
+// Clear dirty flag
+void record::clean() { is_dirty_ = false; }

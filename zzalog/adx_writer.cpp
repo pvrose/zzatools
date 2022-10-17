@@ -26,6 +26,7 @@ adx_writer::adx_writer()
 	, field_name_("")
 	, value_("")
 	, type_indicator_(' ')
+	, clean_records_(false)
 {
 }
 
@@ -35,8 +36,9 @@ adx_writer::~adx_writer()
 }
 
 // Generate XML for the records in book and send them to the output stream
-bool adx_writer::store_book(book* book, ostream& os) {
+bool adx_writer::store_book(book* book, ostream& os, bool clean) {
 	bool ok = true;
+	clean_records_ = clean;
 	// Takes time so display the timer cursor
 	fl_cursor(FL_CURSOR_WAIT);
 
@@ -62,6 +64,7 @@ bool adx_writer::store_book(book* book, ostream& os) {
 			status_->progress("Process failed", book->book_type());
 		}
 	}
+	clean_records_ = false;
 
 	fl_cursor(FL_CURSOR_DEFAULT);
 	// now write the destination to a file.
@@ -222,7 +225,9 @@ bool adx_writer::write_element(adx_element_t element) {
 			record_ = my_book_->get_record(i, false);
 			// Write RECORD element
 			ok &= write_element(AET_RECORD);
-			string write_type;
+			if (clean_records_) {
+				record_->clean();
+			}
 			// Update progress every record
 			status_->progress(i, my_book_->book_type());
 		}

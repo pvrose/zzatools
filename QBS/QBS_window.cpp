@@ -38,6 +38,8 @@ QBS_window::QBS_window(int W, int H, const char* L, const char* filename) :
 }
 
 QBS_window::~QBS_window() {
+	settings_.set("CSV Directory", csv_directory_.c_str());
+	settings_.set("Filename", qbs_filename_.c_str());
 }
 
 // Window close: clear data, and call default closure

@@ -167,6 +167,8 @@ void log_table::cb_tab_log(Fl_Widget* w, void* v) {
 		case FL_PUSH:
 			// Select the row clicked
 			that->my_book_->selection(item_num, HT_SELECTED, that);
+			// Keep the focus
+			that->take_focus();
 			break;
 		}
 		break;
@@ -435,6 +437,13 @@ int log_table::handle(int event) {
 			// Remember AltGR is pressed
 			alt_gr_ = true;
 			return true;
+		case 'v':
+			// CTRL-V
+			if (Fl::event_key(FL_Control_L) || Fl::event_key(FL_Control_R)) {
+				// Treat as paste clipboard
+				Fl::paste(*main_window_, 1);
+				return true;
+			}
 		}
 		break;
 	case FL_KEYUP:
@@ -601,13 +610,19 @@ void log_table::draw_cell(TableContext context, int R, int C, int X, int Y, int 
 				// Selected rows will have table specific colour, others in current sesson grey, rest white
 				Fl_Color default_bg_colour = in_current_session(this_record) ? FL_GRAY : FL_WHITE;
 				Fl_Color bg_colour = row_selected(R) ? selection_color() : default_bg_colour;
+				if (this_record->is_dirty()) bg_colour = fl_lighter(bg_colour);
 				fl_color(bg_colour);
 				fl_rectf(X, Y, W, H);
 
 				// TEXT - contrast its colour to the bg colour.
-				fl_color(fl_contrast(FL_BLACK, bg_colour));
+				if (this_record->is_dirty()) {
+					fl_color(FL_RED);
+				}
+				else {
+					fl_color(fl_contrast(FL_BLACK, bg_colour));
+				}
 				// get the formatted data from the field of the record
-				text = my_book_->get_record(item_number, false)->item(fields_[C].field, true);
+				text = this_record->item(fields_[C].field, true);
 				fl_draw(text.c_str(), X + 1, Y, W - 1, H, FL_ALIGN_LEFT);
 
 				// BORDER - unselected colour

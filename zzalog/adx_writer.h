@@ -22,7 +22,7 @@ namespace zzalog {
 		adx_writer();
 		~adx_writer();
 		// Generate XML for the records in book and send them to the output stream
-		bool store_book(book* book, ostream& os);
+		bool store_book(book* book, ostream& os, bool clean);
 		// Generate an individual element of the type given
 		bool write_element(adx_element_t element);
 
@@ -37,6 +37,8 @@ namespace zzalog {
 		string value_;
 		// Its data type
 		char type_indicator_;
+		// Clean records
+		bool clean_records_;
 
 
 	};

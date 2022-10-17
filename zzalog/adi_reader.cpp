@@ -203,7 +203,7 @@ istream& adi_reader::load_record(record* in_record, istream& in, load_result_t& 
 								value = to_upper(value);
 							}
 							// Add the item to the record
-							in_record->item(field, value);
+							in_record->item(field, value, false, false);
 						}
 						else {
 

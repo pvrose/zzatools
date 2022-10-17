@@ -142,8 +142,7 @@ int wsjtx_handler::send_hbeat() {
 
 // Close datagram: shut the server down 
 int wsjtx_handler::handle_close(stringstream& ss) {
-	status_->misc_status(ST_NOTE, "WSJT-X: Received Close");
-	server_->close_server();
+	status_->misc_status(ST_NOTE, "WSJT-X: Received Closing down");
 	dxa_if_->clear_dx_loc();
 	menu_->update_items();
 	return 1;
@@ -409,9 +408,6 @@ void wsjtx_handler::run_server() {
 // Close the server
 void wsjtx_handler::close_server() {
 	if (server_) {
-		status_->misc_status(ST_OK, "WSJT-X: Clocking socket");
-		server_->close_server();
-		delete server_;
-		server_ = nullptr;
+		status_->misc_status(ST_OK, "WSJT-X: Application closing");
 	}
 }

@@ -96,7 +96,7 @@ namespace zzalog {
 		// Public methods
 	public:
 		// Set an item pair returns true if succeeded
-		void item(string field, string value, bool formatted = false);
+		void item(string field, string value, bool formatted = false, bool dirty = true);
 		// Get an item - as string
 		string item(string field, bool formatted = false, bool indirect = false);
 		// get an item - as an integer
@@ -148,6 +148,10 @@ namespace zzalog {
 		static string unformat_freq(display_freq_t format, string value);
 		static string unformat_date(display_date_t format, string value);
 		static string unformat_time(display_time_t format, string value);
+		// Record is dirty
+		bool is_dirty();
+		// Clear dirty marker
+		void clean();
 
 		// protected methods
 	protected:
@@ -162,6 +166,8 @@ namespace zzalog {
 		string header_comment_;
 		// incomplete record read
 		bool is_incomplete_;
+		// Record is dirty
+		bool is_dirty_;
 
 		// Expecting a header record
 		static bool expecting_header_;

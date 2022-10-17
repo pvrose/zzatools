@@ -16,6 +16,7 @@ using namespace std;
 // Data structures
 
 typedef map<string /* call */, int /*count*/> count_data;
+typedef map<string /*name */, string /* value */> call_info;
 
 struct recycle_data {
 	int sum_recycled;            // Number of cards recycled from batch
@@ -51,22 +52,6 @@ struct box_data {
 		recycle_info = new recycle_data;
 		counts = new count_data;
 		counts->clear();
-	}
-};
-
-struct call_data {
-	int rsgb_id;
-	string info;
-	string name;
-	string e_mail;
-	string address;
-
-	call_data() {
-		rsgb_id = -1;
-		info = "";
-		name = "";
-		e_mail = "";
-		address = "";
 	}
 };
 
@@ -106,7 +91,7 @@ protected:
 	// Disposal queue head - next to be recycled
 	int head_;
 	// CAllsign data
-	map<string, call_data> ham_info_;
+	map<string, call_info> ham_info_;
 	// Raw data
 	vector<action_data*> actions_;
 
@@ -234,7 +219,8 @@ public:
 	// Add ham-data
 	int ham_data(
 		string call,                // Callsign
-		call_data info             // Call data
+		string name,                // Call info name
+		string value                // Call info value
 	);
 
 	// Log the action
@@ -248,8 +234,10 @@ public:
 	);
 	void log_action(
 		command_t command,
+		string date,
 		string call,
-		call_data& ham_info
+		string name,
+		string value
 	);
 
 	// Trace boxes
@@ -261,9 +249,9 @@ protected:
 		int box_num             // box being disposed
 	);
 
-	// enquote data
-	string enquote(string text);
 	// Print box summary
 	void box_summary(int box, ostream& os);
+	// Print SASE summary
+	void sase_summary(ostream& os);
 
 };

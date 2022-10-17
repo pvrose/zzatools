@@ -174,6 +174,7 @@ namespace zzalog {
 		{ "File && Chec&k", 0, menu::cb_mi_imp_file, (void*)(long)import_data::FILE_UPDATE },
 		{ "Download e&QSL", 0, menu::cb_mi_download, (void*)(long)import_data::EQSL_UPDATE },
 		{ "Download &LotW", 0, menu::cb_mi_download, (void*)(long)import_data::LOTW_UPDATE, FL_MENU_DIVIDER },
+		{ "Clip&board", 0, menu::cb_mi_imp_clipb, nullptr },
 		{ "&WSJT-X UDP", 0, menu::cb_mi_imp_wsjtx, nullptr, FL_MENU_DIVIDER },
 		{ "&Merge", 0, menu::cb_mi_imp_merge, (void*)(long)import_data::FILE_IMPORT },
 		{ "&Cancel", 0, menu::cb_mi_imp_cancel, nullptr },
@@ -1048,6 +1049,11 @@ void menu::cb_mi_imp_wsjtx(Fl_Widget* w, void* v) {
 		// Restart wsjt-x listener
 		wsjtx_handler_->run_server();
 	}
+}
+
+// Import->Clipboard - send FL_PASTE eveny to main_window to handle paste
+void menu::cb_mi_imp_clipb(Fl_Widget* w, void* v) {
+	Fl::paste(*main_window_, 1);
 }
 
 // Import->Merge - merge what has just been downloaded

@@ -27,13 +27,13 @@ enum command_t : char {
 	COMMENT = '#'                // Used for comments
 };
 
-enum subcommand_t : char {
-	RSGB = 'R',                  // RSGB number
-	INFO = 'I',                  // Notes/information
-	NAME = 'N',                  // Name
-	EMAIL = 'E',                 // e-Mail
-	POSTAL = 'P'                 // POstal address
-};
+//enum subcommand_t : char {
+//	RSGB = 'R',                  // RSGB number
+//	INFO = 'I',                  // Notes/information
+//	NAME = 'N',                  // Name
+//	EMAIL = 'E',                 // e-Mail
+//	POSTAL = 'P'                 // POstal address
+//};
 
 enum process_mode_t {
 	INITIAL,                     // Initial

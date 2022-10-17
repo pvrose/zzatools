@@ -1,13 +1,19 @@
 #include "main_window.h"
 #include "menu.h"
+#include "import_data.h"
+#include <sstream>
 
 using namespace zzalog;
 
 extern menu* menu_;
+extern import_data* import_data_;
+extern status* status_;
 
 main_window::main_window(int W, int H, const char* label) :
 	Fl_Single_Window(W, H, label)
 {
+	//// Set up window to receive clipboard pastes
+	//Fl::paste(*this, 1);
 }
 
 main_window::~main_window() {}
@@ -20,6 +26,22 @@ int main_window::handle(int event) {
 	case FL_SHOW:
 		// Get menu to update Windows controls
 		menu_->update_windows_items();
+		return true;
+	case FL_PASTE:
+		// Get data from paste
+		string data = Fl::event_text();
+		stringstream adif;
+		adif.str(data);
+		// Stop any extant update and wait for it to complete
+		import_data_->stop_update(qso_manager::LM_OFF_AIR, false);
+		while (!import_data_->update_complete()) Fl::wait();
+		import_data_->load_stream(adif, import_data::update_mode_t::DATAGRAM);
+		int num_records = import_data_->size();
+		// Wait for the import to finish
+		while (import_data_->size()) Fl::wait();
+		char message[100];
+		snprintf(message, 100, "LOG: %d records copied from clipboard", num_records);
+		status_->misc_status(ST_NOTE, message);
 		return true;
 	}
 

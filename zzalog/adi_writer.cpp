@@ -23,6 +23,7 @@ extern spec_data* spec_data_;
 // Default constructor
 adi_writer::adi_writer()
 {
+	clean_records_ = false;
 }
 
 // Default constructor
@@ -31,11 +32,12 @@ adi_writer::~adi_writer()
 }
 
 // write book to output stream. If fields is not null then only the specified fields
-bool adi_writer::store_book(book* out_book, ostream& out, set<string>* fields /* = nullptr */) {
+bool adi_writer::store_book(book* out_book, ostream& out, bool clean, set<string>* fields /* = nullptr */) {
 	// Takes a finite time so put the timer cursor up.
 	fl_cursor(FL_CURSOR_WAIT);
 	load_result_t result = LR_GOOD;
 	int count = 0;
+	clean_records_ = clean;
 
 	// configure progress bar - progress is counted by number of records processed
 	status_->misc_status(ST_NOTE, "LOG: Started writing ADI");
@@ -59,6 +61,7 @@ bool adi_writer::store_book(book* out_book, ostream& out, set<string>* fields /*
 		status_->misc_status(ST_ERROR, "LOG: Writing failed");
 		status_->progress("Write failed", out_book->book_type());
 	}
+	clean_records_ = false;
 	// restore the cursor
 	fl_cursor(FL_CURSOR_DEFAULT);
 	return result;
@@ -68,6 +71,7 @@ bool adi_writer::store_book(book* out_book, ostream& out, set<string>* fields /*
 ostream& adi_writer::store_record(record* record, ostream& out, load_result_t& result, set<string>* fields /* = nullptr */) {
 	// convert to text
 	to_adif(record, out, fields);
+	if (clean_records_) record->clean();
 	return out;
 }
 

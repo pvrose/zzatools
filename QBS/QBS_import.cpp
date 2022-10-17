@@ -11,6 +11,7 @@
 using namespace zzalib;
 using namespace std;
 
+
 QBS_import::QBS_import() {
 	clear_maps();
 }
@@ -185,27 +186,14 @@ bool QBS_import::read_call(bool card, string line) {
 		string call = values[0];
 		clog << call << "              " << '\r';
 		if (call.length() > 6) clog << endl;
-		call_data& info = calls_[call];
+		call_info& info = calls_[call];
 		for (unsigned int ix = 1; ix != values.size() && ix < columns_.size(); ix++) {
 			string column = to_upper(columns_[ix]);
 			string& value = values[ix];
 			map<string, vector<int>>& row = card ? card_matrix_[call] : sase_matrix_[call];
 			// read the call information
-			if (column == "RSGB") {
-				try { info.rsgb_id = stoi(value); }
-				catch (exception e) { info.rsgb_id = 0; }
-			}
-			else if (column == "INFO") {
-				info.info = value;
-			}
-			else if (column == "NAME") {
-				info.name = value;
-			}
-			else if (column == "E-MAIL") {
-				info.e_mail = value;
-			}
-			else if (column == "ADDRESS") {
-				info.address = value;
+			if (column[0] != '2') {
+				if (value.length() > 0)	info[column] = value;
 			}
 			else if (column.length() > 8) {
 				string batch = column.substr(0, 7);
@@ -228,7 +216,7 @@ bool QBS_import::read_call(bool card, string line) {
 					dirn = KEPT;
 					break;
 				}
-				row[batch][dirn] = count;
+				if (count != 0) row[batch][dirn] = count;
 			}
 		}
 	}
@@ -280,7 +268,6 @@ bool QBS_import::copy_data() {
 				clog << " --- INITIAL BATCH" << endl;
 				for (auto it = calls_.begin(); it != calls_.end(); it++) {
 					const string& call = (*it).first;
-					data_->ham_data(call, calls_[call]);
 					value = count(true, call, batch_names_[0], RECYCLED);
 					if (value != 0) {
 						data_->discard_inherits(date, call, value);
@@ -299,9 +286,13 @@ bool QBS_import::copy_data() {
 					if (value != 0) {
 						data_->keep_cards(box, date, call, value);
 					}
-					value = count(false, call, batch, KEPT);
+					value = count(false, call, batch_names_[0], KEPT);
 					if (value != 0) {
 						data_->receive_sases(date, call, value);
+					}
+					value = count(false, call, batch, SENT);
+					if (value != 0) {
+						data_->use_sases(date, call, value);
 					}
 				}
 				break;
@@ -320,6 +311,10 @@ bool QBS_import::copy_data() {
 					value = count(true, call, batch, KEPT);
 					if (value != 0) {
 						data_->keep_cards(box, date, call, value);
+					}
+					value = count(false, call, batch, RECEIVED);
+					if (value != 0) {
+						data_->receive_sases(date, call, value);
 					}
 					value = count(false, call, batch, SENT);
 					if (value != 0) {
@@ -355,6 +350,12 @@ bool QBS_import::copy_data() {
 				"Current " << curr << " Tail " << tail << "Head " << head << endl;
 			data_->trace_boxes(cerr);
 			break;
+		}
+	}
+	for (auto it = calls_.begin(); it != calls_.end(); it++) {
+		string call = (*it).first;
+		for (auto it_i = (*it).second.begin(); it_i != (*it).second.end(); it_i++) {
+			data_->ham_data(call, (*it_i).first, (*it_i).second);
 		}
 	}
 	return true;

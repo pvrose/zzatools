@@ -38,7 +38,9 @@ about_dialog::about_dialog() :
 	const int R1 = YG;
 
 	// Draw the two text boxes - first program ID and versions
-	string program_id = PROGRAM_ID + " " + PROGRAM_VERSION + "\n using ADIF Version " + spec_data_->adif_version() +
+	string program_id = PROGRAM_ID + " " + PROGRAM_VERSION + "\n" +
+		"Compiled " __DATE__ " " __TIME__ "\n" +
+		"using ADIF Version " + spec_data_->adif_version() +
 		"\n hamlib version " + rig_version() + 
 		"\n FLTK version " + to_string(FL_MAJOR_VERSION) + "." + to_string(FL_MINOR_VERSION) + "." + to_string(FL_PATCH_VERSION) + 
 		"\n zzalib version " + zzalib::LIBRARY_VERSION;
