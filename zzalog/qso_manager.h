@@ -465,8 +465,10 @@ namespace zzalog {
 		void logging_mode(logging_mode_t mode);
 		// Called when rig is read
 		void rig_update(string frequency, string mode, string power);
-		// Called when rig is closed
-		void update();
+		// Called when rig is changed
+		void update_rig();
+		// Called when QSO is changed
+		void update_qso();
 		// Update locations
 		void update_locations();
 		// Load locations

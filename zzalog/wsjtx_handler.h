@@ -5,6 +5,7 @@
 
 #include <string>
 #include <cstdint>
+#include <map>
 #include <WinSock2.h>
 
 using namespace std;
@@ -166,6 +167,8 @@ namespace zzalog {
 		string my_bracketed_call_;
 		// Previous status datagram
 		status_dg prev_status_;
+		// Grid locations worked
+		map<string, string> grid_cache_;
 	};
 
 }

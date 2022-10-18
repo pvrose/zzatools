@@ -1035,6 +1035,14 @@ void qso_manager::qso_group::create_form(int X, int Y) {
 
 // Enable QSO widgets
 void qso_manager::qso_group::enable_widgets() {
+	// Disable log mode menu item from CAT if no CAT
+	if (rig_if_ == nullptr) {
+		ch_logmode_->mode(LM_ON_AIR_CAT, ch_logmode_->mode(LM_ON_AIR_CAT) | FL_MENU_INACTIVE);
+	}
+	else {
+		ch_logmode_->mode(LM_ON_AIR_CAT, ch_logmode_->mode(LM_ON_AIR_CAT) & ~FL_MENU_INACTIVE);
+	}
+	ch_logmode_->redraw();
 	// Get exchange data
 	if (exch_fmt_ix_ < MAX_CONTEST_TYPES && field_mode_ == CONTEST) {
 		char text[10];
@@ -1064,6 +1072,13 @@ void qso_manager::qso_group::enable_widgets() {
 		bn_inc_serno_->activate();
 		bn_dec_serno_->activate();
 	}
+	op_serno_->redraw();
+	bn_pause_->redraw();
+	ch_contest_id_->redraw();
+	ch_format_->redraw();
+	bn_init_serno_->redraw();
+	bn_inc_serno_->redraw();
+	bn_dec_serno_->redraw();
 	// Mode dependent
 	switch(field_mode_) {
 	case NEW:
@@ -1092,6 +1107,10 @@ void qso_manager::qso_group::enable_widgets() {
 		bn_define_tx_->deactivate();
 		break;
 	}
+	bn_add_exch_->redraw();
+	bn_add_exch_->redraw();
+	bn_define_rx_->redraw();
+	bn_define_tx_->redraw();
 	// Start/Log/cancel buttons
 	if (current_qso_) {
 		bn_start_qso_->label("Update");
@@ -1105,7 +1124,10 @@ void qso_manager::qso_group::enable_widgets() {
 		bn_log_qso_->label("Start/Log");
 		bn_cancel_qso_->deactivate();
 	}
-	redraw();
+	bn_start_qso_->redraw();
+	bn_log_qso_->redraw();
+	bn_log_qso_->redraw();
+	bn_cancel_qso_->redraw();
 }
 
 // Update the fields in the record
@@ -1702,7 +1724,8 @@ qso_manager::qso_manager(int W, int H, const char* label) :
 
 	create_form(0,0);
 
-	update();
+	update_rig();
+	update_qso();
 
 	end();
 	show();
@@ -3138,13 +3161,24 @@ void qso_manager::rig_update(string frequency, string mode, string power) {
 }
 
 // Get QSO information from previous record not rig
-void qso_manager::update() {
+void qso_manager::update_rig() {
 	// Get freq etc from QSO or rig
 	// Get present values data from rig
-	if (!qso_in_progress() && rig_if_) {
+	switch (qso_group_->logging_mode_) {
+	case LM_IMPORTED:
+	case LM_OFF_AIR:
+	case LM_ON_AIR_TIME:
+		// Do nothing
+		break;
+	case LM_ON_AIR_CAT: {
 		dial_swr_->value(rig_if_->swr_meter());
 		dial_pwr_->value(rig_if_->pwr_meter());
 		dial_vdd_->value(rig_if_->vdd_meter());
+		string rig_name = rig_if_->rig_name();
+		if (rig_name != rig_grp_->name()) {
+			rig_grp_->name() = rig_name;
+			rig_grp_->populate_choice();
+		}
 		qso_group_->ip_freq_->value(rig_if_->get_frequency(true).c_str());
 		qso_group_->ip_power_->value(rig_if_->get_tx_power().c_str());
 		string mode;
@@ -3168,19 +3202,24 @@ void qso_manager::update() {
 			band_view_->update(freq);
 			prev_freq_ = freq;
 		}
-		string rig_name = rig_if_->rig_name();
-		if (rig_name != rig_grp_->name()) {
-			rig_grp_->name() = rig_name;
-			rig_grp_->populate_choice();
-		}
+		break;
 	}
-	else if (book_->size()) {
+	case LM_ON_AIR_COPY: {
 		record* prev_record = book_->get_record();
 		if (qso_in_progress() && prev_record == qso_group_->current_qso_) {
 			qso_group_->copy_record();
 		}
-		// Assume as it's a logged record, the frequency is valid
-		qso_group_->ip_freq_->textcolor(FL_BLACK);
+		// Assume as it's a logged record, the frequency is valid - NOT!
+		if (band_view_) {
+			double freq = stod(prev_record->item("FREQ")) * 1000.0;
+			if (band_view_->in_band(freq)) {
+				qso_group_->ip_freq_->textcolor(FL_BLACK);
+			}
+			else {
+				qso_group_->ip_freq_->textcolor(FL_RED);
+			}
+			prev_freq_ = freq;
+		}
 		qso_group_->ip_freq_->value(prev_record->item("FREQ").c_str());
 		qso_group_->ip_power_->value(prev_record->item("TX_PWR").c_str());
 		qso_group_->ch_mode_->value(prev_record->item("MODE", true).c_str());
@@ -3194,9 +3233,9 @@ void qso_manager::update() {
 		antenna_grp_->populate_choice();
 		rig_grp_->name() = prev_record->item("MY_RIG");
 		rig_grp_->populate_choice();
-		callsign_grp_->name() = prev_record->item("STATION_CALLSIGN");
+		break;
 	}
-	else {
+	default:
 		// No default
 		qso_group_->ip_freq_->textcolor(FL_RED);
 		qso_group_->ip_freq_->value("0");
@@ -3205,8 +3244,18 @@ void qso_manager::update() {
 		antenna_grp_->name() = "";
 		rig_grp_->name() = "";
 	}
-	update_locations();
-	enable_widgets();
+}
+
+void qso_manager::update_qso() {
+	record* prev_record = book_->get_record();
+	if (qso_in_progress() && prev_record == qso_group_->current_qso_) {
+		qso_group_->copy_record();
+		antenna_grp_->name() = prev_record->item("MY_ANTENNA");
+		antenna_grp_->populate_choice();
+		rig_grp_->name() = prev_record->item("MY_RIG");
+		rig_grp_->populate_choice();
+		callsign_grp_->name() = prev_record->item("STATION_CALLSIGN");
+	}
 }
 
 // Start QSO

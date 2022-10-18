@@ -628,7 +628,7 @@ void import_data::finish_update(bool merged /*= true*/) {
 	}
 	// If we are not connected to a rig
 	if (!rig_if_) {
-		qso_manager_->update();
+		qso_manager_->update_rig();
 	}
 	// Allow the book to save (and save if modified)
 	close_pending_ = false;

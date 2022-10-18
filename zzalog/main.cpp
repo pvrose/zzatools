@@ -144,7 +144,7 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 		if (rig_if_) {
 			rig_if_->close();
 			if (qso_manager_) {
-				qso_manager_->update();
+				qso_manager_->update_rig();
 			}
 		}
 		// Delete band view
@@ -483,7 +483,7 @@ void update_rig_status() {
 		}
 		// Update qso_manager - display widgets
 		if (qso_manager_) {
-			qso_manager_->update();
+			qso_manager_->update_rig();
 		}
 
 	}
@@ -589,7 +589,7 @@ void add_rig_if() {
 							delete rig_if_;
 							rig_if_ = nullptr;
 							if (qso_manager_) {
-								qso_manager_->update();
+								qso_manager_->update_rig();
 							}
 							status_->misc_status(ST_ERROR, message);
 							// Put the error message from the rig in the rig status box
@@ -616,7 +616,7 @@ void add_rig_if() {
 							}
 							// Change logging mode to ON_AIR
 							if (qso_manager_) {
-								qso_manager_->update();
+								qso_manager_->update_rig();
 								qso_manager_->logging_mode(qso_manager::LM_ON_AIR_CAT);
 							}
 							done = true;

@@ -127,7 +127,7 @@ void tabbed_forms::update_views(view* requester, hint_t hint, record_num_t recor
 		band_view_->update(record_1);
 	}
 	// Update qso_manager - avoid recursion
-	if (qso_manager_) qso_manager_->update();
+	if (qso_manager_) qso_manager_->update_qso();
 }
 
 // Activate or deactivate the named object - if selecting another log_view change the navigation_book_

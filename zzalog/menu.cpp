@@ -843,7 +843,7 @@ void menu::cb_mi_log_new(Fl_Widget* w, void* v) {
 void menu::cb_mi_log_save(Fl_Widget* w, void* v) {
 	dxa_if_->clear_dx_loc();
 	qso_manager_->end_qso();
-	qso_manager_->update();
+	qso_manager_->update_rig();
 }
 
 // Log->Delete/Cancel
@@ -852,7 +852,7 @@ void menu::cb_mi_log_del(Fl_Widget* w, void* v) {
 	// delete_record(true) - deliberately deleting a record
 	// delete_record(false) - only deletes if entering a new record (i.e. cancel)
 	navigation_book_->delete_record((bool)(long)v);
-	qso_manager_->update();
+	qso_manager_->update_rig();
 }
 
 // Log->Retime record - reset TIME_OFF to now

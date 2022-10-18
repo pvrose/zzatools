@@ -237,7 +237,7 @@ void status::cb_bn_rig(Fl_Widget* bn, void* v) {
 		// Close the rig
 		rig_if_->close();
 		that->misc_status(ST_WARNING, "RIG: Closing rig connection");
-		qso_manager_->update();
+		qso_manager_->update_rig();
 	}
 	bn->redraw();
 }

@@ -473,6 +473,18 @@ int log_table::handle(int event) {
 // override of view::update(). view-specific actions on update
 void log_table::update(hint_t hint, unsigned int record_num_1, unsigned int record_num_2) {
 	record* this_record = my_book_->get_record(my_book_->item_number(record_num_1), false);
+	// Hide any edit input 
+	if (edit_input_->visible()) {
+		record* old_record = my_book_->get_record(edit_row_, false);
+		char message[256];
+		snprintf(message, 256, "LOG: Editing record %s %s %s - field %s: Abandoned due to external update",
+			old_record->item("QSO_DATE").c_str(),
+			old_record->item("TIME_ON").c_str(),
+			old_record->item("CALL").c_str(),
+			fields_[edit_col_].field.c_str());
+		status_->misc_status(ST_WARNING, message);
+		edit_input_->hide();
+	}
 	switch (hint) {
 	case HT_FORMAT:
 		// format has changed - it may be fields so update them
@@ -769,11 +781,11 @@ void log_table::done_edit(bool keep_row) {
 			}
 			else if (field_info.field == "GRIDSQUARE" || field_info.field == "DXCC" || field_info.field == "STATE" || field_info.field == "APP_ZZA_PFX") {
 				// Location may have changed
-				book_->selection(my_book_->record_number(item_number), HT_CHANGED);
+				book_->selection(my_book_->record_number(item_number), HT_CHANGED, this);
 			}
 			else {
 				// Minor change - not important for DxAtlas
-				book_->selection(my_book_->record_number(item_number), HT_MINOR_CHANGE);
+				book_->selection(my_book_->record_number(item_number), HT_MINOR_CHANGE, this);
 			}
 			if (field_info.field == "CALL") {
 				toolbar_->search_text(my_book_->record_number(item_number));

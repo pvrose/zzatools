@@ -132,7 +132,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="zzalog\about_dialog.cpp" />
+    <ClCompile Include="zzalog\about_dialog.cpp">
+      <ScanSourceForModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ScanSourceForModuleDependencies>
+    </ClCompile>
     <ClCompile Include="zzalog\adi_reader.cpp" />
     <ClCompile Include="zzalog\adi_writer.cpp" />
     <ClCompile Include="zzalog\adx_reader.cpp" />
