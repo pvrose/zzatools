@@ -378,7 +378,9 @@ void qso_manager::common_grp::save_values() {
 			string bands = "";
 			// Store all the bands intended to be used with this rig/antenna
 			for (auto itb = info.intended_bands.begin(); itb != info.intended_bands.end(); itb++) {
-				bands += *itb + ';';
+				if ((*itb).length()) {
+					bands += *itb + ';';
+				}
 			}
 			item_settings.set("Intended Bands", bands.c_str());
 			break;

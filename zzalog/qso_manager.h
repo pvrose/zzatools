@@ -114,8 +114,6 @@ namespace zzalog {
 		};
 		// Rig parameters (from handler onwards - rig only)
 		struct rig_xdata {
-			// Bands supported by rig
-			vector<string> intended_bands;
 			// CAT handler
 			rig_handler_t handler = RIG_NONE;
 			// Polling intervals
