@@ -7,6 +7,7 @@
 #include "qsl_form.h"
 
 #include <vector>
+#include <string>
 
 #include <FL/Fl_Printer.H>
 #include <FL/Fl.H>
@@ -58,6 +59,8 @@ namespace zzalog {
 		int printable_height_;
 		// field data
 		vector<field_info_t> fields_;
+		// Page title
+		string page_title_;
 		// Object being printed
 		object_t type_;
 		// Dimensions of QSL card window

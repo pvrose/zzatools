@@ -77,6 +77,14 @@ int printer::print_book() {
 	char message[256];
 	sprintf(message, "PRINTER: Starting print, %d records", navigation_book_->size());
 	status_->misc_status(ST_NOTE, message);
+	// Get page title for log print
+	if (navigation_book_->size() > 0) {
+		record* record_0 = navigation_book_->get_record(0, false);
+		string callsign = record_0->item("STATION_CALLSIGN") + ": ";
+		const char* temp = fl_input("Please specify the page title", callsign.c_str());
+		if (temp != nullptr) page_title_ = temp;
+		else page_title_ = callsign;
+	}
 	int from_page;
 	int to_page;
 	if (!start_printer(from_page, to_page)) {
@@ -199,7 +207,7 @@ void printer::print_page_header(int page_number) {
 	current_y_ = fl_height() - fl_descent();
 	// Add the page title
 	char title[1024];
-	sprintf(title, "Log: %s - Page %d of %d", navigation_book_->filename(false).c_str(), page_number, number_pages_);
+	sprintf(title, "Log: %s - Page %d of %d", page_title_.c_str(), page_number, number_pages_);
 	// Position it centrally
 	fl_draw(title, ((printable_width_ - (int)fl_width(title)) / 2), current_y_);
 	// Draw a line beneath the pagetitle

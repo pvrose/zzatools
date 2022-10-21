@@ -571,17 +571,25 @@ void log_table::draw_cell(TableContext context, int R, int C, int X, int Y, int 
 		// Put record number into header (left-most column)
 		fl_push_clip(X, Y, W, H);
 		{
+			record_num_t item_number = (order_ == LAST_TO_FIRST) ? my_book_->size() - 1 - R : R;
+			record* this_record = my_book_->get_record(item_number, false);
 			// If the row is selected include the row header in the colouring
 			Fl_Color bg_colour = row_selected(R) ? selection_color() : row_header_color();
+			if (this_record->is_dirty()) bg_colour = fl_lighter(bg_colour);
 			fl_color(bg_colour);
 			fl_rectf(X, Y, W, H);
+
 			// TEXT - contrast its colour to the bg colour.
-			fl_color(fl_contrast(FL_BLACK, bg_colour));
+			if (this_record->is_dirty()) {
+				fl_color(FL_RED);
+			}
+			else {
+				fl_color(fl_contrast(FL_BLUE, bg_colour));
+			}
 			// Make this italic version of default font
 			Fl_Font save = fl_font();
-			fl_font(font_ | FL_ITALIC, fontsize_);
+			fl_font(font_ | FL_BOLD_ITALIC, fontsize_);
 			// Display record number (starting at 1) in the row header
-			record_num_t item_number = (order_ == LAST_TO_FIRST) ? my_book_->size() - 1 - R : R;
 			text = to_string(my_book_->record_number(item_number) + 1);
 			fl_draw(text.c_str(), X, Y, W, H, FL_ALIGN_LEFT);
 			fl_font(save, fontsize_);

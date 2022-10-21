@@ -863,13 +863,24 @@ HRESULT dxa_if::cb_mouse_moved(float latitude, float longitude) {
 }
 
 // Map changed callback - if projection changed it will affect which widgets are enabled
+// If view has change the zoom will need to be recalculated
 HRESULT dxa_if::cb_map_changed(DxAtlas::EnumMapChange change) {
-	if (change == DxAtlas::EnumMapChange::MC_PROJECTION && atlas_ && !is_my_change_) {
-		projection_ = atlas_->GetMap()->GetProjection();
-		enable_widgets();
-		if (projection_ == DxAtlas::EnumProjection::PRJ_RECTANGULAR) {
-			// Rectangular projection so center the map appropriately
-			centre_map();
+	if (atlas_ && !is_my_change_) {
+		switch (change) {
+		case DxAtlas::EnumMapChange::MC_PROJECTION:  // Projection has changed
+			projection_ = atlas_->GetMap()->GetProjection();
+			enable_widgets();
+			if (projection_ == DxAtlas::EnumProjection::PRJ_RECTANGULAR) {
+				// Rectangular projection so center the map appropriately
+				centre_map();
+			}
+			break;
+		case DxAtlas::EnumMapChange::MC_VIEW:        // View (& therefore height/width proportion)
+			if (projection_ == DxAtlas::EnumProjection::PRJ_RECTANGULAR) {
+				// Rectangular projection so center the map appropriately
+				centre_map();
+			}
+			break;
 		}
 	}
 	return S_OK;
@@ -1868,11 +1879,34 @@ void dxa_if::zoom_centre(lat_long_t centre, bool full) {
 			map->PutZoom(1);
 		}
 		else {
+			// Zoom is only considered by DxAtlas on the longitude (width) of the window
+			// The window height is not taken into consideration. That is to say, if the
+			// window is resized, the map is adjusted to fit the required width OK, but not the 
+			// required height. map->GetWidth() and map->GetHeight() are available but 
+			// there is not an obvious way of getting a baseline optimum width/height ratio
+			//  
+			// However by eye, it looks like the pixel/degree ratio (dpp) is the same for both
+			// longitude and latitude - so the optimum width:height ratio is 2:1
+			//
 			// Zoom to include all records - get the furthermost from the centre E/W and N/S
-			double zoom_long = 180. / (max(easternmost_ - centre.longitude, centre.longitude - westernmost_));
-			double zoom_lat = 90. / (max(northernmost_ - centre.latitude, centre.latitude - southernmost_));
+			// First calculate the necessary zoom to include all longitude values
+			double required_long = 2 * (max(easternmost_ - centre.longitude, centre.longitude - westernmost_));
+			double zoom_long = 360. / required_long;
+			double target_dpp = required_long / double(map->GetWidth());
+			// Now check if it will fit all the latitude values
+			double required_lat = 2 * (max(northernmost_ - centre.latitude, centre.latitude - southernmost_));
+			double zoomed_lat = target_dpp * double(map->GetHeight());
+			float zoom;
+			if (zoomed_lat >= required_lat) {
+				// It will fit - decrease zoom by 5% margin
+				zoom = zoom_long * 0.95;
+			}
+			else {
+				// Decrease zoom by mismatch (and a further 5%)
+				zoom = zoom_long * (zoomed_lat / required_lat) * 0.95;
+			}
 			// now zoom by the smaller of these with 5% margin
-			map->PutZoom((float)min(zoom_long, zoom_lat) * 0.95f);
+			map->PutZoom(zoom);
 		}
 		// Read the actual amount zoomed
 		zoom_value_ = map->GetZoom();
