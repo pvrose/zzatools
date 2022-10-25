@@ -37,18 +37,23 @@ enum command_t : char {
 
 enum process_mode_t {
 	INITIAL,                     // Initial
-	IMPORT,                      // Importing CSV file
-	READING,                     // Reading existing QBS file
 	DORMANT,                     // Waiting to receive a batch
 	ACTIVE                       // Received a batch - allow dialogs
 };
 
+enum reading_mode_t {
+	IMPORT,
+	READING,
+	WRITING
+};
+
 enum action_t {
 	NONE = 0,                    // No action
-	RECEIVE_BATCH,               // Receive a batch of cards (from bureau)
+	NEW_BATCH,                   // Receive a new batch of cards (from bureau)
+	SORT_CARDS,                  // Receive cards per batch
 	RECEIVE_CARD,                // Receive individual cards 
 	RECEIVE_SASE,                // Receive envelopes
-	SEND_CARDS,                  // stuff envelopes
+	STUFF_CARDS,                 // stuff envelopes
 	DISPOSE_CARDS,               // Mark cards for recycling
 	POST_CARDS,                  // Post stuffed envelopes
 	RECYCLE_CARDS,               // Recycle cards
@@ -56,7 +61,6 @@ enum action_t {
 };
 
 enum navigate_t {
-	SUMM,               // display sum of all items
 	PREV_MAJOR,         // major step back
 	PREV_MINOR,         // minor step back
 	NEXT_MAJOR,         // major step forward

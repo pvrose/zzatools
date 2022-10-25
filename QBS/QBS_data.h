@@ -68,7 +68,11 @@ struct action_data {
 enum special_box_t {
 	IN_BOX = -1,                
 	OUT_BOX = -2,
-	KEEP_BOX = -3
+	KEEP_BOX = -3,
+	SASE_BOX = -4,
+	RCVD_BOX = -5,
+	SENT_BOX = -6,
+	DISP_BOX = -7
 };
 
 class QBS_data {
@@ -92,12 +96,17 @@ protected:
 	int head_;
 	// CAllsign data
 	map<string, call_info> ham_info_;
+	// "List" of calls (overall tally of cards for call)
+	count_data received_box_;
+	count_data sent_box_;
+	count_data disposed_box_;
 	// Raw data
 	vector<action_data*> actions_;
 
 	// Processing mode
 	process_mode_t mode_;
-	process_mode_t process_mode_;
+	reading_mode_t reading_mode_;
+	action_t action_read_;
 
 	// Filename
 	string filename_;
@@ -135,21 +144,32 @@ public:
 	// Get call in box - - return next one after this
 	string get_next_call(int box_num, string call);
 	string get_prev_call(int box_num, string call);
+	string get_first_call(int box_num);
+	string get_last_call(int box_num);
+	// Get the count for a particular box
+	count_data* get_count_data(int box_num);
 	// Get recycle data
 	recycle_data& get_recycle_data(int box_num);
 	// Set window
 	void set_window(QBS_window* w);
+	// Get action
+	action_t get_action();
 
 	// Load QBS file
-	bool read_qbs(string filename);
+	bool read_qbs(string& filename);
 	// Load and parse .CSV files
-	bool import_cvs(string directory);
+	bool import_cvs(string& directory);
 	// Open QBS file for writing
 	bool wopen_qbs(string& filename);
+	// Close QBS fule
+	bool close_qbs();
 
 	inline QBS_window* window() {
 		return window_;
 	}
+
+	// Next batch ID
+	string next_batch();
 	
 
 public:
@@ -179,7 +199,7 @@ public:
 		int value                   // num of envelopes
 	);
 	// send cards in envelopes
-	int send_cards(
+	int stuff_cards(
 		int box_num,                // box number
 		string date,                // date actioned
 		string call,                // callsign

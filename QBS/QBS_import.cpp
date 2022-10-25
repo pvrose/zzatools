@@ -259,13 +259,10 @@ bool QBS_import::copy_data() {
 		switch (dirn) {
 		case RECEIVED:
 			data_->new_batch(box, date, batch);
-			clog << "RECEIVED " << batch << ' ' << date;
 			switch (box) {
 			case 0:
-				clog << " --- NOT PROCESSED" << endl;
 				break;
 			case 1:
-				clog << " --- INITIAL BATCH" << endl;
 				for (auto it = calls_.begin(); it != calls_.end(); it++) {
 					const string& call = (*it).first;
 					value = count(true, call, batch_names_[0], RECYCLED);
@@ -280,7 +277,7 @@ bool QBS_import::copy_data() {
 					}
 					value = count(true, call, batch, SENT);
 					if (value != 0) {
-						data_->send_cards(box, date, call, value);
+						data_->stuff_cards(box, date, call, value);
 					}
 					value = count(true, call, batch, KEPT);
 					if (value != 0) {
@@ -297,16 +294,15 @@ bool QBS_import::copy_data() {
 				}
 				break;
 			default:
-				clog << endl;
 				// Card processing
 				for (auto it = calls_.begin(); it != calls_.end(); it++) {
 					const string& call = (*it).first;
-					// TODo we need to consider IN_BOX and KEEP_BOX
+					// Move IN_BOX, KEEP_BOX and received cards to current box
 					value = count(true, call, batch, RECEIVED);
 					data_->receive_cards(box, date, call, value);
 					value = count(true, call, batch, SENT);
 					if (value != 0) {
-						data_->send_cards(box, date, call, value);
+						data_->stuff_cards(box, date, call, value);
 					}
 					value = count(true, call, batch, KEPT);
 					if (value != 0) {
@@ -324,26 +320,19 @@ bool QBS_import::copy_data() {
 				break;
 			}
 			data_->totalise_cards(box, date);
-			data_->trace_boxes(clog);
 			break;
 		case SENT:
-			clog << "SENT      " << batch << ' ' << date;
 			switch (box) {
 			case 0:
-				clog << " --- NOT PROCESSED" << endl;
 				break;
 			default:
-				clog << endl;
 				data_->post_cards(date);
 				data_->dispose_cards(date);
-				data_->trace_boxes(clog);
 				break;
 			}
 			break;
 		case RECYCLED:
-			clog << "RECYCLED  " << batch << ' ' << date << endl;
 			data_->recycle_cards(date, weight);
-			data_->trace_boxes(clog);
 			break;
 		default:
 			cerr << "Unexpected processing action at " << date << ' ' << dirn <<

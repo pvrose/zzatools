@@ -35,9 +35,12 @@ public:
     QBS_window(int W, int H, const char* L, const char* filename);
     virtual ~QBS_window();
     // Respond to QBS_data mode
-    void update_actions(process_mode_t mode);
+    void update_actions();
     void update_import(float loaded);
     void update_qbs(int loaded);
+    // Update filename
+    void filename(const char* value);
+    void directory(const char* value);
 
 protected:
 
@@ -58,22 +61,26 @@ protected:
     // navigation buttons - v used to pass user data of type navigate_t
     static void cb_nav_batch(Fl_Widget* w, void* v);
     static void cb_nav_call(Fl_Widget* w, void* v);
+    // Reset button
+    static void cb_reset(Fl_Widget* w, void* v);
 
     // Specify the widgets
     void create_form();
 
     // Configure widgets
-    void update_rcv_batch();
+    void update_new_batch();
+    void update_sort_cards();
     void update_rcv_card();
     void update_rcv_sase();
-    void update_send_cards();
+    void update_stuff_cards();
     void update_dispose_cards();
     void update_post_cards();
     void update_recycle_cards();
     void update_dispose_sase();
     void update_batches();
     void update_calls();
-
+    // Call whatever update is needed per action
+    void update_whatever();
 
     // Display top20
     void display_top20();
@@ -93,18 +100,19 @@ protected:
     Fl_Button* bn_brf_csv_;
     browser_data_t csv_browser_;
 
-
     // widgets - process group
     Fl_Group* g_process_;
     Fl_Group* g_proc_bns_;
-    Fl_Radio_Button* bn_rcv_batch_;
-    radio_param_t rp_rcv_batch_;
+    Fl_Radio_Button* bn_new_batch_;
+    radio_param_t rp_new_batch_;
+    Fl_Radio_Button* bn_sort_cards_;
+    radio_param_t rp_sort_cards_;
     Fl_Radio_Button* bn_rcv_card_;
     radio_param_t rp_rcv_card_;
     Fl_Radio_Button* bn_rcv_sase_;
     radio_param_t rp_rcv_sase_;
-    Fl_Radio_Button* bn_send_cards_;
-    radio_param_t rp_send_cards_;
+    Fl_Radio_Button* bn_stuff_cards_;
+    radio_param_t rp_stuff_cards_;
     Fl_Radio_Button* bn_dispose_cards_;
     radio_param_t rp_dispose_cards_;
     Fl_Radio_Button* bn_post_cards_;
@@ -118,14 +126,12 @@ protected:
     Fl_Button* bn_b_navb_;
     Fl_Button* bn_b_navf_;
     Fl_Button* bn_b_navff_;
-    Fl_Button* bn_b_sumall_;
     Fl_Button* bn_b_action_;
     Fl_Input* ip_call_;
     Fl_Button* bn_c_navbb_;
     Fl_Button* bn_c_navb_;
     Fl_Button* bn_c_navf_;
     Fl_Button* bn_c_navff_;
-    Fl_Button* bn_c_sumall_;
     Fl_Button* bn_c_action_;
     Fl_Box* bx_current_;
     Fl_Box* bx_change_;
@@ -139,6 +145,7 @@ protected:
     int index_keep_;
     int index_outbox_;
     int index_weight_;
+    Fl_Button* bn_reset_;
 
     // Command selection
     action_t action_;
@@ -150,5 +157,7 @@ protected:
     int selected_box_;
     // Current callsign
     string call_;
+    // Batch operation finished
+    bool batch_op_done_;
 };
 

@@ -25,11 +25,19 @@ QBS_data::QBS_data()
 	tail_ = -1;
 	head_ = -1;
 	mode_ = INITIAL;
-	process_mode_ = INITIAL;
+	reading_mode_ = IMPORT;
+	action_read_ = NONE;
+	window_ = nullptr;
 }
 
 // Destructor - write data, tidy up
 QBS_data::~QBS_data() {
+	file_.close();
+}
+
+bool QBS_data::close_qbs() {
+	file_.close();
+	return true;
 }
 
 // Inherit cards to current box
@@ -53,6 +61,7 @@ int QBS_data::receive_cards(
 	string call,                // callsign
 	int value                   // num of cards
 ) {
+	received_box_[call] += value;
 	// Check box number valid
 	if (box_num != IN_BOX && box_num != boxes_.size() - 1) {
 		char message[100];
@@ -62,13 +71,13 @@ int QBS_data::receive_cards(
 		return 0;
 	}
 	else {
-		log_action(CARDS, box_num, date, call, value, 0);
 		if (box_num == IN_BOX) {
+			action_read_ = RECEIVE_CARD;
 			// Add cards to in-box
 			in_box_[call] += value;
-			return value;
 		}
 		else {
+			action_read_ = SORT_CARDS;
 			// Initialisation of diposal queue
 			if (box_num == 1) {
 				tail_ = 1;
@@ -86,8 +95,9 @@ int QBS_data::receive_cards(
 			if (value > 0) {
 				(*boxes_[box_num]).recycle_info->count_received += 1;
 			}
-			return value;
 		}
+		log_action(CARDS, box_num, date, call, value, 0);
+		return value;
 	}
 }
 
@@ -97,7 +107,8 @@ int QBS_data::new_batch(
 	string date,                // date created
 	string batch                // batch "name" - e.g. "2022 Q4"
 ) {
-	if (mode_ == DORMANT) mode_ = ACTIVE;
+	mode_ = ACTIVE;
+	action_read_ = NEW_BATCH;
 	// Check if box number is valid
 	if (box_num != boxes_.size()) {
 		char message[100];
@@ -108,12 +119,12 @@ int QBS_data::new_batch(
 	}
 	else {
 		// Create the new box and associare it with the batch name
-		log_action(BATCH, box_num, date, batch, 0, 0);
 		box_data* box = new box_data;
 		box->id = batch;
 		box->date_received = date;
 		int num = boxes_.size();
 		boxes_.push_back(box);
+		log_action(BATCH, box_num, date, batch, 0, 0);
 		return num;
 	}
 }
@@ -125,6 +136,7 @@ int QBS_data::receive_sases(
 	int value                   // num of envelopes
 ) {
 	if (value < 0) {
+		action_read_ = DISPOSE_SASE;
 		// Deleting envelopes
 		int avail = sases_[call];
 		if (avail < value) {
@@ -143,6 +155,7 @@ int QBS_data::receive_sases(
 		}
 	}
 	else {
+		action_read_ = RECEIVE_SASE;
 		// Adding envelopes
 		sases_[call] += value;
 		log_action(SASES, -1, date, call, value, 0);
@@ -151,14 +164,15 @@ int QBS_data::receive_sases(
 }
 
 // Send cards in envelopes
-int QBS_data::send_cards(
+int QBS_data::stuff_cards(
 	int box_num,                // box number
 	string date,                // date actioned
 	string call,                // callsign
 	int value                   // num of cards
 ) {
 	// Process valid boxes
-	int sent;
+	int sent = 0;
+	sent_box_[call] += value;
 	if (box_num == KEEP_BOX) {
 		if (mode_ != IMPORT && keep_box_[call] < value) {
 			// Send all cards available
@@ -175,7 +189,24 @@ int QBS_data::send_cards(
 		keep_box_[call] -= sent;
 		out_box_[call] += sent;
 	}
+	else if (box_num == IN_BOX) {
+		if (mode_ != IMPORT && in_box_[call] < value) {
+			// Send all cards available
+			sent = in_box_[call];
+			char message[100];
+			snprintf(message, 100, "O: %s insufficient cards in IN box - %d v %d",
+				call.c_str(), sent, value);
+			cerr << message << endl;
+		}
+		else {
+			// Send specified value
+			sent = value;
+		}
+		in_box_[call] -= sent;
+		out_box_[call] += sent;
+	}
 	else if (box_num < (signed)boxes_.size() && box_num >= head_) {
+		action_read_ = STUFF_CARDS;
 		// Sending box number 
 		box_data& box = *boxes_[box_num];
 		sent = (*box.counts)[call];
@@ -243,22 +274,29 @@ int QBS_data::keep_cards(
 		return 0;
 	}
 	else {
+		// Assume keep box is empty as receive_cards will have emptied it
 		box_data& box = *boxes_[box_num];
 		int rcvd = (*box.counts)[call];
-		int kept = keep_box_[call];
-		// TODO needs to take into account existing KEPT 
-		if (mode_ != IMPORT && kept + rcvd < value) {
+		if (mode_ != IMPORT && rcvd == 0) {
+			// Received box will not have been updated with inbox or keep_box
+			// Move in box and keep box to received box
+			(*box.counts)[call] += (in_box_[call] + keep_box_[call]);
+			in_box_[call] = 0;
+			keep_box_[call] = 0;
+			rcvd = (*box.counts)[call];
+		}
+		if (mode_ != IMPORT && rcvd < value) {
 			char message[100];
 			snprintf(message, 100, "K: %s insufficient cards in box %d - %d v %d",
-				call.c_str(), box_num, kept, value);
+				call.c_str(), box_num, rcvd, value);
 			cerr << message << endl;
+			return 0;
 		}
+		// Move cards from current box to keep box
 		keep_box_[call] = value;
-		if (value >= kept) {
-			(*box.counts)[call] -= (value - kept);
-		}
+		(*box.counts)[call] -= value;
 		log_action(KEEP, box_num, date, call, value, 0);
-		return kept;
+		return value;
 	}
 }
 
@@ -266,7 +304,8 @@ int QBS_data::keep_cards(
 int QBS_data::post_cards(
 	string date                 // date actioned
 ) {
-	if (mode_ == ACTIVE) mode_ = DORMANT;
+	mode_ = DORMANT;
+	action_read_ = POST_CARDS;
 	int box = boxes_.size() - 1;
 	int cards = 0;
 	for (auto it = out_box_.begin(); it != out_box_.end(); it++) {
@@ -281,6 +320,7 @@ int QBS_data::post_cards(
 int QBS_data::dispose_cards(
 	string date                 // date actioned
 ) {
+	action_read_ = DISPOSE_CARDS;
 	int nbox = boxes_.size() - 1;
 	box_data& box = *boxes_[nbox];
 	int cards = 0;
@@ -305,12 +345,14 @@ int QBS_data::recycle_cards(
 	string date,                // date actioned
 	float weight                // weight of cards
 ) {
+	action_read_ = RECYCLE_CARDS;
 	int cards = 0;
 	int calls = 0;
 	box_data& box = *boxes_[head_];
 
 	for (auto it = (*box.counts).begin();
 		it != (*box.counts).end(); it++) {
+		disposed_box_[(*it).first] += (*it).second;
 		cards += (*it).second;
 		if ((*it).second > 0) calls++;
 	}
@@ -365,10 +407,17 @@ int QBS_data::get_count(int box_num, string call) {
 		}
 	case KEEP_BOX:
 		if (keep_box_.find(call) == keep_box_.end()) {
-			return -1;
+			return 0;
 		}
 		else {
 			return keep_box_[call];
+		}
+	case SASE_BOX:
+		if (sases_.find(call) == sases_.end()) {
+			return 0;
+		}
+		else {
+			return sases_[call];
 		}
 	default:
 		if (box_num >= (signed)boxes_.size() || box_num < 0) {
@@ -403,26 +452,54 @@ int QBS_data::get_head() {
 // Get batch name for box_number
 string QBS_data::get_batch(int box_num) {
 	if (box_num < 0 || box_num >= (signed)boxes_.size()) {
-		return "Invalid";
+		if (box_num == (signed)boxes_.size()) {
+			return next_batch();
+		}
+		else {
+			return "Invalid";
+		}
 	}
 	else {
 		return boxes_[box_num]->id;
 	}
 }
 
+// Return the set of counts for a particular box (or all cards)
+count_data* QBS_data::get_count_data(int box_num) {
+	if (box_num < 0 || box_num >= (signed)boxes_.size()) {
+		switch (box_num) {
+		case RCVD_BOX: return &received_box_;
+		case SENT_BOX: return &sent_box_;
+		case DISP_BOX: return &disposed_box_;
+		case IN_BOX: return &in_box_;
+		case OUT_BOX: return &out_box_;
+		case KEEP_BOX: return &keep_box_;
+		case SASE_BOX: return &sases_;
+		default: return nullptr;
+		}
+	}
+	else {
+		return boxes_[box_num]->counts;
+	}
+
+}
+
 // Get call in box - - return next one after this
 // box_num invalid - return ""
 // last call supplied - return ""
 string QBS_data::get_next_call(int box_num, string call) {
-	if (box_num < 0 || box_num >= (signed)boxes_.size()) {
+	count_data* calls = get_count_data(box_num);;
+	if (calls == nullptr) {
 		return "";
-	}
-	else {
-		auto it = boxes_[box_num]->counts->begin();
-		while ((*it).first <= call) {
+	} else {
+		auto it = calls->find(call);
+		if (it == calls->end()) {
+			it = calls->begin();
+		}
+		else {
 			it++;
 		}
-		if (it == boxes_[box_num]->counts->end()) {
+		if (it == calls->end()) {
 			return "";
 		}
 		else {
@@ -435,16 +512,18 @@ string QBS_data::get_next_call(int box_num, string call) {
 // box_num invalid - return ""
 // last call supplied - return ""
 string QBS_data::get_prev_call(int box_num, string call) {
-	if (box_num < 0 || box_num >= (signed)boxes_.size()) {
+	count_data* calls = get_count_data(box_num);
+	if (calls == nullptr) {
 		return "";
 	}
 	else {
-		// use rbegin//rend to search from the end looking for the previous call
-		auto it = boxes_[box_num]->counts->rbegin();
-		while ((*it).first >= call) {
-			it++;
+		auto it = calls->find(call);
+		// If at the beginning go back to end
+		if (it == calls->begin()) {
+			it = calls->end();
 		}
-		if (it == boxes_[box_num]->counts->rend()) {
+		it--;
+		if (it == calls->begin()) {
 			return "";
 		}
 		else {
@@ -452,6 +531,30 @@ string QBS_data::get_prev_call(int box_num, string call) {
 		}
 	}
 };
+
+// Return the first callsign in the box
+string QBS_data::get_first_call(int box_num) {
+	count_data* calls = get_count_data(box_num);
+	auto it = calls->begin();
+	if (it == calls->end()) {
+		return "";
+	}
+	else {
+		return (*it).first;
+	}
+}
+
+// Return the last callsign in the box
+string QBS_data::get_last_call(int box_num) {
+	count_data* calls = get_count_data(box_num);
+	auto it = calls->rbegin();
+	if (it == calls->rend()) {
+		return "";
+	}
+	else {
+		return (*it).first;
+	}
+}
 
 // Get recycle data
 recycle_data& QBS_data::get_recycle_data(int box_num) {
@@ -471,25 +574,25 @@ recycle_data& QBS_data::get_recycle_data(int box_num) {
 // Connect to parent window and tell it the status
 void QBS_data::set_window(QBS_window* w) {
 	window_ = w;
-	window_->update_actions(mode_);
+	window_->update_actions();
 	window_->update_import(0);
 	window_->update_qbs(0);
 }
 
 // Load CSV files
 // return true if load successful
-bool QBS_data::import_cvs(string directory) {
-	mode_ = IMPORT;
+bool QBS_data::import_cvs(string& directory) {
+	reading_mode_ = IMPORT;
 	clog << "Importing CSV files from " << directory << endl;
 	bool result = false;
 	if (wopen_qbs(filename_)) {
 		QBS_import* reader = new QBS_import;
 		if (reader->load_data(this, directory.c_str())) {
 			result = true;
-			mode_ = DORMANT;
+			reading_mode_ = WRITING;
 		}
 	}
-	window_->update_actions(mode_);
+	window_->update_actions();
 	return result;
 }
 
@@ -525,6 +628,7 @@ bool QBS_data::wopen_qbs(string& filename) {
 		clog << filename << endl;
 		file_.open(filename, ios::trunc | ios::out);
 		if (file_.good()) {
+			window_->filename(filename_.c_str());
 			ok = true;
 		}
 		else {
@@ -535,9 +639,9 @@ bool QBS_data::wopen_qbs(string& filename) {
 	return ok;
 }
 
-bool QBS_data::read_qbs(string filename) {
+bool QBS_data::read_qbs(string& filename) {
 	// Turn off logging as 
-	mode_ = READING;
+	reading_mode_ = READING;
 	int box;
 	string date;
 	string call;
@@ -564,110 +668,112 @@ bool QBS_data::read_qbs(string filename) {
 		value = 0;
 		check = 0;
 		getline(file_, line);
-		split_line(line, words, '\t');
-		if (words[0].length() == 1) command = (command_t)words[0][0];
-		else command = (command_t)' ';
-		switch (command) {
-		case INHERIT:
-			date = words[1];
-			call = words[2];
-			value = stoi(words[3]);
-			check = discard_inherits(date, call, value);
-			break;
-		case CARDS:
-			date = words[1];
-			box = stoi(words[2]);
-			call = words[3];
-			value = stoi(words[4]);
-			check = receive_cards(box, date, call, value);
-			break;
-		case BATCH:
-			date = words[1];
-			box = stoi(words[2]);
-			batch = words[3];
-			check = new_batch(box, date, batch);
-			do_check = false;
-			break;
-		case SASES:
-			date = words[1];
-			call = words[2];
-			value = stoi(words[3]);
-			check = receive_sases(date, call, value);
-			break;
-		case OUTPUT:
-			date = words[1];
-			box = stoi(words[2]);
-			call = words[3];
-			value = stoi(words[4]);
-			check = send_cards(box, date, call, value);
-			break;
-		case USE:
-			date = words[1];
-			call = words[2];
-			value = stoi(words[3]);
-			check = use_sases(date, call, value);
-			break;
-		case KEEP:
-			date = words[1];
-			box = stoi(words[2]);
-			call = words[3];
-			value = stoi(words[4]);
-			check = keep_cards(box, date, call, value);
-			break;
-		case POST:
-			date = words[1];
-			box = stoi(words[2]);
-			value = stoi(words[3]);
-			check = post_cards(date);
-			trace_boxes(cout);
-			break;
-		case DISPOSE:
-			date = words[1];
-			box = stoi(words[2]);
-			value = stoi(words[3]);
-			check = dispose_cards(date);
-			break;
-		case RECYCLE:
-			date = words[1];
-			box = stoi(words[2]);
-			value = stoi(words[3]);
-			f_value = stof(words[4]);
-			check = recycle_cards(date, f_value);
-			break;
-		case TOTALISE:
-			date = words[1];
-			box = stoi(words[2]);
-			value = stoi(words[3]);
-			check = totalise_cards(box, date);
-			break;
-		case HAM_INFO:
-			date = words[1];
-			call = words[2];
-			i_name = words[3];
-			i_value = words[4];
-			check = ham_data(call, i_name, i_value);
-			do_check = false;
-			break;
-		case COMMENT:
-			getline(file_, line);
-			// TODO what to do with comments - just ignore
-			break;
-		default:
-			cerr << " Invalid command " << (char)command << endl;
+		if (file_.good()) {
+			split_line(line, words, '\t');
+			if (words[0].length() == 1) command = (command_t)words[0][0];
+			else command = (command_t)' ';
+			switch (command) {
+			case INHERIT:
+				date = words[1];
+				call = words[2];
+				value = stoi(words[3]);
+				check = discard_inherits(date, call, value);
+				break;
+			case CARDS:
+				date = words[1];
+				box = stoi(words[2]);
+				call = words[3];
+				value = stoi(words[4]);
+				check = receive_cards(box, date, call, value);
+				break;
+			case BATCH:
+				date = words[1];
+				box = stoi(words[2]);
+				batch = words[3];
+				check = new_batch(box, date, batch);
+				do_check = false;
+				break;
+			case SASES:
+				date = words[1];
+				call = words[2];
+				value = stoi(words[3]);
+				check = receive_sases(date, call, value);
+				break;
+			case OUTPUT:
+				date = words[1];
+				box = stoi(words[2]);
+				call = words[3];
+				value = stoi(words[4]);
+				check = stuff_cards(box, date, call, value);
+				break;
+			case USE:
+				date = words[1];
+				call = words[2];
+				value = stoi(words[3]);
+				check = use_sases(date, call, value);
+				break;
+			case KEEP:
+				date = words[1];
+				box = stoi(words[2]);
+				call = words[3];
+				value = stoi(words[4]);
+				check = keep_cards(box, date, call, value);
+				break;
+			case POST:
+				date = words[1];
+				box = stoi(words[2]);
+				value = stoi(words[3]);
+				check = post_cards(date);
+				break;
+			case DISPOSE:
+				date = words[1];
+				box = stoi(words[2]);
+				value = stoi(words[3]);
+				check = dispose_cards(date);
+				break;
+			case RECYCLE:
+				date = words[1];
+				box = stoi(words[2]);
+				value = stoi(words[3]);
+				f_value = stof(words[4]);
+				check = recycle_cards(date, f_value);
+				break;
+			case TOTALISE:
+				date = words[1];
+				box = stoi(words[2]);
+				value = stoi(words[3]);
+				check = totalise_cards(box, date);
+				break;
+			case HAM_INFO:
+				date = words[1];
+				call = words[2];
+				i_name = words[3];
+				i_value = words[4];
+				check = ham_data(call, i_name, i_value);
+				do_check = false;
+				break;
+			case COMMENT:
+				getline(file_, line);
+				// TODO what to do with comments - just ignore
+				break;
+			default:
+				cerr << " Invalid command " << (char)command << endl;
+				cerr << "  Line " << line_num << ": " << line << endl;
+				break;
+			}
+			if (do_check && check != value) {
+				cerr << " Value mismatch reading " <<
+					(char)command << ' ' << date << ' ' << call << " Expected = " << check << " Read = " << value << endl;
+				cerr << "  Line " << line_num << ": " << line << endl;
+			}
+			line_num++;
 		}
-		if (do_check && check != value) {
-			cerr << " Value mismatch reading " << 
-				(char)command << ' ' << date << ' ' << call << " Expected = " << check << " Read = " << value << endl;
-			cerr << "  Line " << line_num << ": " << line << endl;
-		}
-		line_num++;
 	} 
 	if (file_.eof()) {
+		reading_mode_ = WRITING;
 		file_.close();
-		file_.open(filename, ios::ate);
-		mode_ = DORMANT;
-		if (file_.good()) return true;
-		else return false;
+		file_.open(filename, ios::out | ios::app);
+		return true;
 	}
 	else {
 		return false;
@@ -683,7 +789,32 @@ void QBS_data::log_action(
 	int i_value,
 	float f_value
 ) {
-	if (mode_ != READING && file_.good()) {
+	// Trace commands
+	switch (command) {
+	case BATCH:
+		clog << "New batch - box #" << box_num << ": " << id << endl;
+		break;
+	case POST:
+		clog << "POST:    ";
+		trace_boxes(clog);
+		break;
+	case RECYCLE:
+		clog << "RECYCLE: ";
+		trace_boxes(clog);
+		break;
+	case DISPOSE:
+		clog << "DISPOSE: ";
+		trace_boxes(clog);
+		break;
+	case CARDS:
+	case SASES:
+	case OUTPUT:
+		clog << command << ':' << id << '\t';
+		trace_boxes(clog);
+		break;
+	}
+	// Log commands for rereading
+	if (reading_mode_ != READING && (file_.eof() || file_.good())) {
 		switch (command) {
 		case INHERIT:
 		case SASES:
@@ -713,7 +844,7 @@ void QBS_data::log_action(
 			cerr << "Invalid command " << command << '\t' << date << box_num << '\t' << '\t' << id << endl;
 			break;
 		}
-		if (!file_.good()) {
+		if (!file_.good() && !file_.eof()) {
 			cerr << "Write file failed" << endl;
 		}
 	}
@@ -726,7 +857,7 @@ void QBS_data::log_action(
 	string name,
 	string value
 ) {
-	if (file_.good() && mode_ != READING) {
+	if (file_.good() && reading_mode_ != READING) {
 		switch (command) {
 		case HAM_INFO:
 			file_ << command << '\t' << date << '\t' << call << '\t' << name << '\t' << value << endl;
@@ -814,4 +945,26 @@ void QBS_data::trace_boxes(ostream& os) {
 	if (head_ > 0) box_summary(head_ - 1, os);
 	sase_summary(os);
 	os << endl;
+}
+
+// Calculate the next batch
+string QBS_data::next_batch() {
+	string batch = get_batch(get_current());
+	int year = stoi(batch.substr(0, 4));
+	int qtr = stoi(batch.substr(6, 1));
+	if (qtr >= 4) {
+		qtr = 1;
+		year++;
+	}
+	else {
+		qtr++;
+	}
+	char temp[10];
+	snprintf(temp, 10, "%4d Q%1d", year, qtr);
+	return string(temp);
+}
+
+// Get the reading action
+action_t QBS_data::get_action() {
+	return action_read_;
 }

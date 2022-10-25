@@ -15,7 +15,8 @@ QBS_window::QBS_window(int W, int H, const char* L, const char* filename) :
 	Fl_Single_Window(W, H, L),
 	settings_(Fl_Preferences::USER, VENDOR.c_str(), PROGRAM_ID.c_str()),
 	data_(nullptr),
-	qbs_filename_(filename)
+	qbs_filename_(filename),
+	batch_op_done_(false)
 {
 	data_ = new QBS_data;
 	// Get CSV directory name from settings
@@ -35,18 +36,32 @@ QBS_window::QBS_window(int W, int H, const char* L, const char* filename) :
 	end();
 	// Now allow the data to be processed
 	data_->set_window(this);
+	callback(cb_close);
 }
 
 QBS_window::~QBS_window() {
-	settings_.set("CSV Directory", csv_directory_.c_str());
-	settings_.set("Filename", qbs_filename_.c_str());
+}
+
+// Update filename
+void QBS_window::filename(const char* value) {
+	qbs_filename_ = value;
+}
+
+// Update directry
+void QBS_window::directory(const char* value) {
+	csv_directory_ = value;
 }
 
 // Window close: clear data, and call default closure
 void QBS_window::cb_close(Fl_Widget* w, void* v) {
+	
 	QBS_window* that = ancestor_view<QBS_window>(w);
-	delete that->data_;
+	that->data_->close_qbs();
+	that->settings_.set("CSV Directory", that->csv_directory_.c_str());
+	that->settings_.set("Filename", that->qbs_filename_.c_str());
+	that->settings_.flush();
 	Fl_Single_Window::default_callback((Fl_Window*)w, v);
+	delete that->data_;
 	return;
 }
 
@@ -145,10 +160,10 @@ void QBS_window::create_form() {
 	max_x = max(max_x, curr_x);
 
 	curr_y += HBUTTON + GAP;
-	curr_x += bn_brf_qbs_->w() + GAP;
+
 	// End of group
 	g_input_->resizable(nullptr);
-	g_input_->size(curr_x - g_input_->x(), curr_y - g_input_->y());
+	g_input_->size(max_x - g_input_->x(), curr_y - g_input_->y());
 	g_input_->end();
 
 	// Process group
@@ -166,17 +181,9 @@ void QBS_window::create_form() {
 	// Buttons
 	curr_x = g_proc_bns_->x() + GAP;
 	curr_y = g_proc_bns_->y() + GAP;
-	const int WPBUTTON = WBUTTON * 2;
-	// Receive batch 
-	bn_rcv_batch_ = new Fl_Radio_Button(curr_x, curr_y, WPBUTTON, HBUTTON, "Receive Batch");
-	bn_rcv_batch_->labelfont(FONT);
-	bn_rcv_batch_->labelsize(FONT_SIZE);
-	bn_rcv_batch_->value(action_ == RECEIVE_BATCH);
-	rp_rcv_batch_ = radio_param_t(RECEIVE_BATCH, (int*)&action_);
-	bn_rcv_batch_->callback(cb_process, &rp_rcv_batch_);
-	curr_y += HBUTTON;
 
-	// Receive cards 
+	const int WPBUTTON = WBUTTON * 2;
+	// Receive card 
 	bn_rcv_card_ = new Fl_Radio_Button(curr_x, curr_y, WPBUTTON, HBUTTON, "Receive Card");
 	bn_rcv_card_->labelfont(FONT);
 	bn_rcv_card_->labelsize(FONT_SIZE);
@@ -194,13 +201,40 @@ void QBS_window::create_form() {
 	bn_rcv_sase_->callback(cb_process, &rp_rcv_sase_);
 	curr_y += HBUTTON;
 
+	// Receive batch 
+	bn_dispose_sase_ = new Fl_Radio_Button(curr_x, curr_y, WPBUTTON, HBUTTON, "Dispose SASE");
+	bn_dispose_sase_->labelfont(FONT);
+	bn_dispose_sase_->labelsize(FONT_SIZE);
+	bn_dispose_sase_->value(action_ == DISPOSE_SASE);
+	rp_dispose_sase_ = radio_param_t(DISPOSE_SASE, (int*)&action_);
+	bn_dispose_sase_->callback(cb_process, &rp_dispose_sase_);
+	curr_y += HBUTTON + GAP;
+
+	// Receive batch 
+	bn_new_batch_ = new Fl_Radio_Button(curr_x, curr_y, WPBUTTON, HBUTTON, "New Batch");
+	bn_new_batch_->labelfont(FONT);
+	bn_new_batch_->labelsize(FONT_SIZE);
+	bn_new_batch_->value(action_ == NEW_BATCH);
+	rp_new_batch_ = radio_param_t(NEW_BATCH, (int*)&action_);
+	bn_new_batch_->callback(cb_process, &rp_new_batch_);
+	curr_y += HBUTTON;
+
+	// Receive cards (in batch)
+	bn_sort_cards_ = new Fl_Radio_Button(curr_x, curr_y, WPBUTTON, HBUTTON, "Sort received cards");
+	bn_sort_cards_->labelfont(FONT);
+	bn_sort_cards_->labelsize(FONT_SIZE);
+	bn_sort_cards_->value(action_ == SORT_CARDS);
+	rp_sort_cards_ = radio_param_t(SORT_CARDS, (int*)&action_);
+	bn_sort_cards_->callback(cb_process, &rp_sort_cards_);
+	curr_y += HBUTTON;
+
 	// Move cards in envelopes to outtray
-	bn_send_cards_ = new Fl_Radio_Button(curr_x, curr_y, WPBUTTON, HBUTTON, "Move cards to out-tray");
-	bn_send_cards_->labelfont(FONT);
-	bn_send_cards_->labelsize(FONT_SIZE);
-	bn_send_cards_->value(action_ == SEND_CARDS);
-	rp_send_cards_ = radio_param_t(SEND_CARDS, (int*)&action_);
-	bn_send_cards_->callback(cb_process, &rp_send_cards_);
+	bn_stuff_cards_ = new Fl_Radio_Button(curr_x, curr_y, WPBUTTON, HBUTTON, "Stuff cards in SASEs");
+	bn_stuff_cards_->labelfont(FONT);
+	bn_stuff_cards_->labelsize(FONT_SIZE);
+	bn_stuff_cards_->value(action_ == STUFF_CARDS);
+	rp_stuff_cards_ = radio_param_t(STUFF_CARDS, (int*)&action_);
+	bn_stuff_cards_->callback(cb_process, &rp_stuff_cards_);
 	curr_y += HBUTTON;
 
 	// Dispose cards - mark for recycling
@@ -228,17 +262,15 @@ void QBS_window::create_form() {
 	bn_recycle_cards_->value(action_ == RECYCLE_CARDS);
 	rp_recycle_cards_ = radio_param_t(RECYCLE_CARDS, (int*)&action_);
 	bn_recycle_cards_->callback(cb_process, &rp_recycle_cards_);
-	curr_y += HBUTTON;
-
-	// Receive batch 
-	bn_dispose_sase_ = new Fl_Radio_Button(curr_x, curr_y, WPBUTTON, HBUTTON, "Dispose SASE");
-	bn_dispose_sase_->labelfont(FONT);
-	bn_dispose_sase_->labelsize(FONT_SIZE);
-	bn_dispose_sase_->value(action_ == DISPOSE_SASE);
-	rp_dispose_sase_ = radio_param_t(DISPOSE_SASE, (int*)&action_);
-	bn_dispose_sase_->callback(cb_process, &rp_dispose_sase_);
 	curr_y += HBUTTON + GAP;
+
+	bn_reset_ = new Fl_Button(curr_x, curr_y, WPBUTTON, HBUTTON, "Reset");
+	bn_reset_->labelcolor(FL_RED);
+	bn_reset_->labelfont(FONT | FL_BOLD_ITALIC);
+	bn_reset_->callback(cb_reset, nullptr);
+
 	curr_x += WPBUTTON;
+	curr_y += HBUTTON + GAP;
 
 	g_proc_bns_->resizable(nullptr);
 	g_proc_bns_->size(curr_x - g_proc_bns_->x(), curr_y - g_proc_bns_->y());
@@ -266,14 +298,11 @@ void QBS_window::create_form() {
 	bn_b_navb_->callback(cb_nav_batch, (void*)(long)PREV_MINOR);
 	curr_x += bn_b_navb_->w();
 	bn_b_navf_ = new Fl_Button(curr_x, curr_y, HBUTTON, HBUTTON, "@>");
-	bn_b_navf_->callback(cb_nav_batch, (void*)(long)NEXT_MAJOR);
+	bn_b_navf_->callback(cb_nav_batch, (void*)(long)NEXT_MINOR);
 	curr_x += bn_b_navf_->w();
 	bn_b_navff_ = new Fl_Button(curr_x, curr_y, HBUTTON, HBUTTON, "@>|");
-	bn_b_navff_->callback(cb_nav_batch, (void*)(long)NEXT_MINOR);
-	curr_x += bn_b_navff_->w();
-	bn_b_sumall_ = new Fl_Button(curr_x, curr_y, HBUTTON, HBUTTON, "@+");
-	bn_b_sumall_->callback(cb_nav_batch, (void*)(long)SUMM);
-	curr_x += bn_b_sumall_->w() + GAP;
+	bn_b_navff_->callback(cb_nav_batch, (void*)(long)NEXT_MAJOR);
+	curr_x += bn_b_navff_->w() + GAP;
 	
 	// Batch action button
 	bn_b_action_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "New");
@@ -295,6 +324,7 @@ void QBS_window::create_form() {
 	ip_call_->textfont(FONT);
 	ip_call_->textsize(FONT_SIZE);
 	ip_call_->callback(cb_input_call, &call_);
+	ip_call_->when(FL_WHEN_CHANGED);
 
 	// Batch navigation buttons
 	curr_x += ip_call_->w();
@@ -305,15 +335,13 @@ void QBS_window::create_form() {
 	bn_c_navb_->callback(cb_nav_call, (void*)(long)PREV_MINOR);
 	curr_x += bn_c_navb_->w();
 	bn_c_navf_ = new Fl_Button(curr_x, curr_y, HBUTTON, HBUTTON, "@>");
-	bn_c_navf_->callback(cb_nav_call, (void*)(long)NEXT_MAJOR);
+	bn_c_navf_->callback(cb_nav_call, (void*)(long)NEXT_MINOR);
 	curr_x += bn_c_navf_->w();
 	bn_c_navff_ = new Fl_Button(curr_x, curr_y, HBUTTON, HBUTTON, "@>>");
-	bn_c_navff_->callback(cb_nav_call, (void*)(long)NEXT_MINOR);
+	bn_c_navff_->callback(cb_nav_call, (void*)(long)NEXT_MAJOR);
 	curr_x += bn_c_navff_->w();
-	bn_c_sumall_ = new Fl_Button(curr_x, curr_y, HBUTTON, HBUTTON, "@+");
-	bn_c_sumall_->callback(cb_nav_call, (void*)(long)SUMM);
-	curr_x += bn_c_sumall_->w() + GAP;
 
+	curr_x += GAP;
 	// Call action button
 	bn_c_action_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Execute");
 	bn_c_action_->labelfont(FONT);
@@ -379,12 +407,12 @@ void QBS_window::create_form() {
 	return;
 }
 
-// RECEIVE_BATCH
+// RECEIVE_NEW_BATCH
 // Enable the defiinition of a new box for the batch, then all
 // the movement of cards from the in-box and the newly received cards into
 // the new box
-void QBS_window::update_rcv_batch() {
-	g_process_->label("Receive cards from Bureau");
+void QBS_window::update_new_batch() {
+	g_process_->label("Receive new batch from Bureau");
 	// Batch output
 	op_batch_->activate();
 	selected_box_ = data_->get_current();
@@ -395,20 +423,80 @@ void QBS_window::update_rcv_batch() {
 	bn_b_navb_->deactivate();
 	bn_b_navff_->deactivate();
 	bn_b_navf_->deactivate();
-	bn_b_sumall_->deactivate();
 	// Button action
-	bn_b_action_->activate();
-	bn_b_action_->label("Create");
+	bn_b_action_->label("New box");
+	if (batch_op_done_) bn_b_action_->deactivate();
+	else bn_b_action_->activate();
 	// Call input - get first call in box
+	ip_call_->deactivate();
+	// Call navigation buttons -
+	bn_c_navbb_->deactivate();
+	bn_c_navb_->deactivate();
+	bn_c_navf_->deactivate();
+	bn_c_navff_->deactivate();
+	// Action button
+	bn_c_action_->deactivate();
+	// Column headers
+	bx_current_->deactivate();
+	bx_current_->label("Existing");
+	bx_change_->deactivate();
+	bx_change_->label("Add");
+	// Count inputs IN-BOX
+	int ix = 0;
+	op_value_[ix]->deactivate();
+	op_value_[ix]->label("IN");
+	op_value_[ix]->value(data_->get_count(IN_BOX, call_));
+	ip_delta_[ix]->deactivate();
+	index_inbox_ = ix;
+	ix++;
+	// Count inputs KEEP BOX
+	op_value_[ix]->deactivate();
+	op_value_[ix]->label("KEEP");
+	op_value_[ix]->value(data_->get_count(KEEP_BOX, call_));
+	ip_delta_[ix]->deactivate();
+	index_keep_ = ix;
+	ix++;
+	// New cards in batch - eg "2022 Q4 (C)"
+	op_value_[ix]->deactivate();
+	char temp[12];
+	snprintf(temp, 12, "%s -C", op_batch_->value());
+	op_value_[ix]->copy_label(temp);
+	op_value_[ix]->value(0);
+	ip_delta_[ix]->deactivate();
+	ip_delta_[ix]->value(0);
+	index_curr_ = ix;
+	for (ix++; ix < NUM_COUNTS; ix++) {
+		op_value_[ix]->deactivate();
+		ip_delta_[ix]->deactivate();
+	}
+	return;
+}
+
+// RECEIVE_CARDS(BATCH)
+// Enable the defiinition of a new box for the batch, then all
+// the movement of cards from the in-box and the newly received cards into
+// the new box
+void QBS_window::update_sort_cards() {
+	g_process_->label("Receive cards from Bureau");
+	// Batch output
+	op_batch_->activate();
+	selected_box_ = data_->get_current();
+	op_batch_->value(data_->get_batch(selected_box_).c_str());
+	// Batch navigation buttons
+	bn_b_navbb_->deactivate();
+	bn_b_navb_->deactivate();
+	bn_b_navff_->deactivate();
+	bn_b_navf_->deactivate();
+	// Button action
+	bn_b_action_->label("");
+	bn_b_action_->deactivate();
 	ip_call_->activate();
-	call_ = data_->get_next_call(IN_BOX, "");
 	ip_call_->value(call_.c_str());
 	// Call navigation buttons -
 	bn_c_navbb_->activate();
 	bn_c_navb_->activate();
 	bn_c_navf_->activate();
 	bn_c_navff_->activate();
-	bn_c_sumall_->deactivate();
 	// Action button
 	bn_c_action_->activate();
 	bn_c_action_->label("Add cards");
@@ -420,17 +508,24 @@ void QBS_window::update_rcv_batch() {
 	// Count inputs IN-BOX
 	int ix = 0;
 	op_value_[ix]->activate();
-	op_value_[ix]->label("IN-BOX");
+	op_value_[ix]->label("IN");
 	op_value_[ix]->value(data_->get_count(IN_BOX, call_));
 	ip_delta_[ix]->deactivate();
 	index_inbox_ = ix;
+	ix++;
+	// Count inputs KEEP BOX
+	op_value_[ix]->activate();
+	op_value_[ix]->label("KEEP");
+	op_value_[ix]->value(data_->get_count(KEEP_BOX, call_));
+	ip_delta_[ix]->deactivate();
+	index_keep_ = ix;
 	ix++;
 	// New cards in batch - eg "2022 Q4 (C)"
 	op_value_[ix]->activate();
 	char temp[12];
 	snprintf(temp, 12, "%s -C", op_batch_->value());
 	op_value_[ix]->copy_label(temp);
-	op_value_[ix]->value(0);
+	op_value_[ix]->value(data_->get_count(data_->get_current(), call_));
 	ip_delta_[ix]->activate();
 	ip_delta_[ix]->value(0);
 	index_curr_ = ix;
@@ -441,31 +536,30 @@ void QBS_window::update_rcv_batch() {
 	return;
 }
 
-// RECEIVE_CARD
+
+// RECEIVE_CARD(SINGLE)
 // Add any cards received from elsewhere than the bireau to be 
 // stored in the in-box
 void QBS_window::update_rcv_card() {
 	g_process_->label("Receive individual cards - returns, mis-sorts etc");
 	// Batch output
 	op_batch_->activate();
+	selected_box_ = data_->get_current();
 	op_batch_->value(data_->get_batch(selected_box_).c_str());
 	// Batch navigation buttons
 	bn_b_navbb_->deactivate();
 	bn_b_navb_->deactivate();
 	bn_b_navff_->deactivate();
 	bn_b_navf_->deactivate();
-	bn_b_sumall_->deactivate();
 	// Button action
 	bn_b_action_->deactivate();
 	// Call input - get first call in box
 	ip_call_->activate();
-	ip_call_->value("");
 	// Call navigation buttons -
 	bn_c_navbb_->activate();
 	bn_c_navb_->activate();
 	bn_c_navf_->activate();
 	bn_c_navff_->activate();
-	bn_c_sumall_->deactivate();
 	// Action button
 	bn_c_action_->activate();
 	bn_c_action_->label("Log cards");
@@ -500,18 +594,15 @@ void QBS_window::update_rcv_sase() {
 	bn_b_navb_->deactivate();
 	bn_b_navff_->deactivate();
 	bn_b_navf_->deactivate();
-	bn_b_sumall_->deactivate();
 	// Button action
 	bn_b_action_->deactivate();
 	// Call input - get first call in box
 	ip_call_->activate();
-	call_ = data_->get_next_call(SASES, "");
 	// Call navigation buttons -
 	bn_c_navbb_->activate();
 	bn_c_navb_->activate();
 	bn_c_navf_->activate();
 	bn_c_navff_->activate();
-	bn_c_sumall_->deactivate();
 	// Action button
 	bn_c_action_->activate();
 	bn_c_action_->label("Add SASEs");
@@ -524,7 +615,7 @@ void QBS_window::update_rcv_sase() {
 	int ix = 0;
 	op_value_[ix]->activate();
 	op_value_[ix]->label("SASES");
-	op_value_[ix]->value(data_->get_count(IN_BOX, call_));
+	op_value_[ix]->value(data_->get_count(SASE_BOX, call_));
 	ip_delta_[ix]->activate();
 	ip_delta_[ix]->value(0);
 	index_inbox_ = ix;
@@ -538,7 +629,7 @@ void QBS_window::update_rcv_sase() {
 // SEND_CARDS
 // Any cards in kept boxes (current and those in the disposal queue) to
 // be put into envelopes and left in the out box.
-void QBS_window::update_send_cards() {
+void QBS_window::update_stuff_cards() {
 	g_process_->label("Stuff cards in envelopes and move to out-tray");
 	// Batch output
 	op_batch_->activate();
@@ -548,18 +639,15 @@ void QBS_window::update_send_cards() {
 	bn_b_navb_->deactivate();
 	bn_b_navff_->deactivate();
 	bn_b_navf_->deactivate();
-	bn_b_sumall_->deactivate();
 	// Button action
 	bn_b_action_->deactivate();
 	// Call input - get first call in box
 	ip_call_->activate();
-	call_ = data_->get_next_call(selected_box_, "");
 	// Call navigation buttons -
 	bn_c_navbb_->activate();
 	bn_c_navb_->activate();
 	bn_c_navf_->activate();
 	bn_c_navff_->activate();
-	bn_c_sumall_->deactivate();
 	// Action button
 	bn_c_action_->activate();
 	bn_c_action_->label("Move cards");
@@ -567,7 +655,7 @@ void QBS_window::update_send_cards() {
 	bx_current_->activate();
 	bx_current_->label("Existing");
 	bx_change_->activate();
-	bx_change_->label("After");
+	bx_change_->label("Use");
 	// Count inputs KEEP
 	int ix = 0;
 	op_value_[ix]->activate();
@@ -576,6 +664,13 @@ void QBS_window::update_send_cards() {
 	ip_delta_[ix]->activate();
 	ip_delta_[ix]->value(0);
 	index_keep_ = ix;
+	ix++;
+	op_value_[ix]->activate();
+	op_value_[ix]->label("IN-BOX");
+	op_value_[ix]->value(data_->get_count(IN_BOX, call_));
+	ip_delta_[ix]->activate();
+	ip_delta_[ix]->value(0);
+	index_inbox_ = ix;
 	// Now output all the bins
 	int curr = data_->get_current();
 	int tail = data_->get_tail();
@@ -596,7 +691,7 @@ void QBS_window::update_send_cards() {
 			snprintf(temp, 12, "%s T", data_->get_batch(box).c_str());
 		}
 		else {
-			snprintf(temp, 12, "%s", data_->get_batch(box).c_str());
+			snprintf(temp, 12, "%s  ", data_->get_batch(box).c_str());
 		}
 		op_value_[ix]->copy_label(temp);
 		op_value_[ix]->value(data_->get_count(box, call_));
@@ -613,9 +708,10 @@ void QBS_window::update_send_cards() {
 	ip_delta_[ix]->deactivate();
 	ip_delta_[ix]->value(0);
 	index_outbox_ = ix;
+	ix++;
 	op_value_[ix]->activate();
 	op_value_[ix]->label("SASEs used");
-	op_value_[ix]->value(0);
+	op_value_[ix]->value(data_->get_count(SASE_BOX, call_));
 	ip_delta_[ix]->activate();
 	ip_delta_[ix]->value(0);
 	index_sase_ = ix;
@@ -634,16 +730,15 @@ void QBS_window::update_dispose_cards() {
 	// Batch output
 	op_batch_->activate();
 	selected_box_ = data_->get_current();
-	selected_box_++;
 	op_batch_->value(data_->get_batch(selected_box_).c_str());
 	// Batch navigation buttons
 	bn_b_navbb_->deactivate();
 	bn_b_navb_->deactivate();
 	bn_b_navff_->deactivate();
 	bn_b_navf_->deactivate();
-	bn_b_sumall_->deactivate();
 	// Button action
-	bn_b_action_->activate();
+	if (batch_op_done_) bn_b_action_->deactivate();
+	else bn_b_action_->activate();
 	bn_b_action_->label("Dispose");
 	// Call input - get first call in box
 	ip_call_->deactivate();
@@ -652,7 +747,6 @@ void QBS_window::update_dispose_cards() {
 	bn_c_navb_->deactivate();
 	bn_c_navf_->deactivate();
 	bn_c_navff_->deactivate();
-	bn_c_sumall_->deactivate();
 	// Action button
 	bn_c_action_->deactivate();
 	bn_c_action_->label("");
@@ -676,16 +770,15 @@ void QBS_window::update_post_cards() {
 	// Batch output
 	op_batch_->activate();
 	selected_box_ = data_->get_current();
-	selected_box_++;
 	op_batch_->value(data_->get_batch(selected_box_).c_str());
 	// Batch navigation buttons
 	bn_b_navbb_->deactivate();
 	bn_b_navb_->deactivate();
 	bn_b_navff_->deactivate();
 	bn_b_navf_->deactivate();
-	bn_b_sumall_->deactivate();
 	// Button action
-	bn_b_action_->activate();
+	if (batch_op_done_) bn_b_action_->deactivate();
+	else bn_b_action_->activate();
 	bn_b_action_->label("Post");
 	// Call input - get first call in box
 	ip_call_->deactivate();
@@ -694,7 +787,6 @@ void QBS_window::update_post_cards() {
 	bn_c_navb_->deactivate();
 	bn_c_navf_->deactivate();
 	bn_c_navff_->deactivate();
-	bn_c_sumall_->deactivate();
 	// Action button
 	bn_c_action_->deactivate();
 	bn_c_action_->label("");
@@ -714,7 +806,7 @@ void QBS_window::update_post_cards() {
 // RECYCLE CARDS
 // Cards in the box at the head of the disposal queue are to be recycled
 void QBS_window::update_recycle_cards() {
-	g_process_->label("Mark current batch for disposal");
+	g_process_->label("Mark head of disposal queue for recycling");
 	// Batch output
 	op_batch_->activate();
 	op_batch_->value(data_->get_batch(data_->get_head()).c_str());
@@ -723,9 +815,9 @@ void QBS_window::update_recycle_cards() {
 	bn_b_navb_->deactivate();
 	bn_b_navff_->deactivate();
 	bn_b_navf_->deactivate();
-	bn_b_sumall_->deactivate();
 	// Button action
-	bn_b_action_->activate();
+	if (batch_op_done_) bn_b_action_->deactivate();
+	else bn_b_action_->activate();
 	bn_b_action_->label("Recycle");
 	// Call input - get first call in box
 	ip_call_->deactivate();
@@ -734,7 +826,6 @@ void QBS_window::update_recycle_cards() {
 	bn_c_navb_->deactivate();
 	bn_c_navf_->deactivate();
 	bn_c_navff_->deactivate();
-	bn_c_sumall_->deactivate();
 	// Action button
 	bn_c_action_->deactivate();
 	bn_c_action_->label("");
@@ -797,18 +888,15 @@ void QBS_window::update_dispose_sase() {
 	bn_b_navb_->deactivate();
 	bn_b_navff_->deactivate();
 	bn_b_navf_->deactivate();
-	bn_b_sumall_->deactivate();
 	// Button action
 	bn_b_action_->deactivate();
 	// Call input - get first call in box
 	ip_call_->activate();
-	call_ = data_->get_next_call(SASES, "");
 	// Call navigation buttons -
 	bn_c_navbb_->activate();
 	bn_c_navb_->activate();
 	bn_c_navf_->activate();
 	bn_c_navff_->activate();
-	bn_c_sumall_->deactivate();
 	// Action button
 	bn_c_action_->activate();
 	bn_c_action_->label("Discard SASEs");
@@ -821,7 +909,7 @@ void QBS_window::update_dispose_sase() {
 	int ix = 0;
 	op_value_[ix]->activate();
 	op_value_[ix]->label("SASES");
-	op_value_[ix]->value(data_->get_count(IN_BOX, call_));
+	op_value_[ix]->value(data_->get_count(SASE_BOX, call_));
 	ip_delta_[ix]->activate();
 	ip_delta_[ix]->value(0);
 	index_sase_ = ix;
@@ -835,11 +923,11 @@ void QBS_window::update_dispose_sase() {
 
 // Depending on the current processin phase allow/disallow the command
 // buttons;
-void QBS_window::update_actions(process_mode_t mode) {
+void QBS_window::update_actions() {
+	process_mode_t mode = data_->mode();
+	selected_box_ = data_->get_current();
 	switch (mode) {
 	case INITIAL:
-	case IMPORT:
-	case READING:
 		// Not yet processing cards
 		g_process_->deactivate();
 		g_input_->activate();
@@ -849,10 +937,15 @@ void QBS_window::update_actions(process_mode_t mode) {
 		// receiving cards or envelopes
 		g_process_->activate();
 		g_input_->deactivate();
-		bn_rcv_batch_->activate();
+		op_batch_->deactivate();
+		update_batches();
+		ip_call_->deactivate();
+		update_calls();
+		bn_new_batch_->activate();
+		bn_sort_cards_->deactivate();
 		bn_rcv_card_->activate();
 		bn_rcv_sase_->activate();
-		bn_send_cards_->deactivate();
+		bn_stuff_cards_->deactivate();
 		bn_dispose_cards_->deactivate();
 		bn_post_cards_->deactivate();
 		bn_recycle_cards_->activate();
@@ -863,10 +956,11 @@ void QBS_window::update_actions(process_mode_t mode) {
 		// except that to start a new batch (must finish this one first!)
 		g_process_->activate();
 		g_input_->deactivate();
-		bn_rcv_batch_->deactivate();
+		bn_new_batch_->deactivate();
+		bn_sort_cards_->activate();
 		bn_rcv_card_->activate();
 		bn_rcv_sase_->activate();
-		bn_send_cards_->activate();
+		bn_stuff_cards_->activate();
 		bn_dispose_cards_->activate();
 		bn_post_cards_->activate();
 		bn_recycle_cards_->activate();
@@ -899,12 +993,18 @@ void QBS_window::update_batches() {
 			bn_b_navff_->activate();
 		}
 	}
+	else {
+		bn_b_navbb_->deactivate();
+		bn_b_navb_->deactivate();
+		bn_b_navf_->deactivate();
+		bn_b_navff_->deactivate();
+	}
 }
 
 // Update calls
 void QBS_window::update_calls() {
-	if (op_batch_->active()) {
-		op_batch_->value(call_.c_str());
+	if (ip_call_->active()) {
+		ip_call_->value(call_.c_str());
 		if (call_ == data_->get_prev_call(selected_box_, call_)) {
 			bn_c_navbb_->deactivate();
 			bn_c_navb_->deactivate();
@@ -923,6 +1023,12 @@ void QBS_window::update_calls() {
 			bn_c_navf_->activate();
 			bn_c_navff_->activate();
 		}
+	}
+	else {
+		bn_c_navbb_->deactivate();
+		bn_c_navb_->deactivate();
+		bn_c_navf_->deactivate();
+		bn_c_navff_->deactivate();
 	}
 }
 
@@ -976,12 +1082,28 @@ void QBS_window::update_qbs(int loaded) {
 	return;
 }
 
+// Call the appropriate update_... for the current action
+void QBS_window::update_whatever() {
+	switch (action_) {
+	case NEW_BATCH: update_new_batch(); break;
+	case SORT_CARDS: update_sort_cards(); break;
+	case RECEIVE_CARD: update_rcv_card(); break;
+	case RECEIVE_SASE: update_rcv_sase(); break;
+	case STUFF_CARDS: update_stuff_cards(); break;
+	case DISPOSE_CARDS: update_dispose_cards(); break;
+	case DISPOSE_SASE: update_dispose_sase(); break;
+	case POST_CARDS: update_post_cards(); break;
+	case RECYCLE_CARDS: update_recycle_cards(); break;
+	}
+}
+
 // Callback - import CSV data - pass the current directory to the data to 
 // start redaing it
 void QBS_window::cb_import(Fl_Widget* w, void* v) {
 	QBS_window* that = ancestor_view<QBS_window>(w);
 	that->update_import(0);
 	that->data_->import_cvs(that->csv_directory_);
+	that->update_import(1);
 	return;
 }
 
@@ -989,7 +1111,12 @@ void QBS_window::cb_import(Fl_Widget* w, void* v) {
 void QBS_window::cb_read_qbs(Fl_Widget* w, void* v) {
 	QBS_window* that = ancestor_view<QBS_window>(w);
 	that->update_qbs(false);
-	that->data_->read_qbs(that->qbs_filename_);
+	if (that->data_->read_qbs(that->qbs_filename_)) {
+		that->update_qbs(true);
+		that->action_ = that->data_->get_action();
+		that->update_actions();
+		that->update_whatever();
+	}
 	return;
 }
 
@@ -1000,29 +1127,42 @@ void QBS_window::cb_process(Fl_Widget* w, void* v) {
 	// Get radio value - to action_
 	cb_radio(w, v);
 	// depending on action_ value configure the widgets accordingly
+	that->batch_op_done_ = false;
 	switch (that->action_) {
-	case RECEIVE_BATCH:
-		that->update_rcv_batch();
+	case NEW_BATCH:
+		that->call_ = "";
+		that->update_new_batch();
+		break;
+	case SORT_CARDS:
+		that->call_ = that->data_->get_first_call(RCVD_BOX);
+		that->update_sort_cards();
 		break;
 	case RECEIVE_CARD:
+		that->call_ = that->data_->get_first_call(RCVD_BOX);
 		that->update_rcv_card();
 		break;
 	case RECEIVE_SASE:
+		that->call_ = that->data_->get_first_call(RCVD_BOX);
 		that->update_rcv_sase();
 		break;
-	case SEND_CARDS:
-		that->update_send_cards();
+	case STUFF_CARDS:
+		that->call_ = that->data_->get_first_call(that->selected_box_);
+		that->update_stuff_cards();
 		break;
 	case DISPOSE_CARDS:
+		that->call_ = "";
 		that->update_dispose_cards();
 		break;
 	case POST_CARDS:
+		that->call_ = "";
 		that->update_post_cards();
 		break;
 	case RECYCLE_CARDS:
+		that->call_ = "";
 		that->update_recycle_cards();
 		break;
 	case DISPOSE_SASE:
+		that->call_ = that->data_->get_first_call(RCVD_BOX);
 		that->update_dispose_sase();
 		break;
 	}
@@ -1040,23 +1180,22 @@ void QBS_window::cb_exec_batch(Fl_Widget* w, void* v) {
 	string batch = that->op_batch_->value();
 	float weight = (float)that->ip_delta_[that->index_weight_]->value();
 	switch (that->action_) {
-	case RECEIVE_BATCH:
+	case NEW_BATCH:
 		that->data_->new_batch(that->selected_box_, date, batch);
-		that->update_rcv_batch();
 		break;
 	case POST_CARDS:
 		that->data_->post_cards(date);
-		that->update_post_cards();
 		break;
 	case DISPOSE_CARDS:
 		that->data_->dispose_cards(date);
-		that->update_dispose_cards();
 		break;
 	case RECYCLE_CARDS:
 		that->data_->recycle_cards(date, weight);
-		that->update_recycle_cards();
 		break;
 	}
+	that->batch_op_done_ = true;
+	w->deactivate();
+	that->update_actions();
 	return;
 }
 
@@ -1070,18 +1209,15 @@ void QBS_window::cb_exec_batch(Fl_Widget* w, void* v) {
 void QBS_window::cb_exec_call(Fl_Widget* w, void* v) {
 	QBS_window* that = ancestor_view<QBS_window>(w);
 	string date = now(true, DATE_FORMAT);
-	string call = that->ip_call_->value();
+	string call = that->call_;
 	int num_cards = 0;
 	int num_sases = 0;
 	switch (that->action_) {
-	case RECEIVE_BATCH:
-		num_cards = (int)that->ip_delta_[that->index_inbox_]->value();
-		// Remove them from inbox
-		that->data_->receive_cards(IN_BOX, date, call, -(num_cards));
-		// Add them and the current ones to current_box
-		num_cards += (int)that->ip_delta_[that->index_curr_]->value();
+	case SORT_CARDS:
+		// Take the number of cards, add in the in and keep boxes 
+		num_cards = (int)that->ip_delta_[that->index_curr_]->value();
 		that->data_->receive_cards(that->selected_box_, date, call, num_cards);
-		that->update_rcv_batch();
+		that->update_sort_cards();
 		break;
 	case RECEIVE_CARD:
 		num_cards = (int)that->ip_delta_[that->index_inbox_]->value();
@@ -1098,10 +1234,12 @@ void QBS_window::cb_exec_call(Fl_Widget* w, void* v) {
 		that->data_->receive_sases(date, call, -(num_sases));
 		that->update_dispose_sase();
 		break;
-	case SEND_CARDS:
+	case STUFF_CARDS:
 		// Send those in keep
 		num_cards = (int)that->ip_delta_[that->index_keep_]->value();
-		that->data_->send_cards(KEEP_BOX, date, call, num_cards);
+		that->data_->stuff_cards(KEEP_BOX, date, call, num_cards);
+		num_cards = (int)that->ip_delta_[that->index_inbox_]->value();
+		that->data_->stuff_cards(IN_BOX, date, call, num_cards);
 		// From HEAD to CURR - send cards
 		int curr = that->data_->get_current();
 		int head = that->data_->get_head();
@@ -1109,14 +1247,14 @@ void QBS_window::cb_exec_call(Fl_Widget* w, void* v) {
 		int ix = that->index_head_;
 		while (ix >= that->index_curr_ && box <= curr) {
 			num_cards = (int)that->ip_delta_[ix]->value();
-			that->data_->send_cards(box, date, call, num_cards);
+			that->data_->stuff_cards(box, date, call, num_cards);
 			ix--;
-			box++;
+			if (box < curr) box++;
 		}
 		// Use SASEs
 		num_sases = (int)that->ip_delta_[that->index_sase_]->value();
 		that->data_->use_sases(date, call, num_sases);
-		that->update_send_cards();
+		that->update_stuff_cards();
 		break;
 	}
 }
@@ -1124,7 +1262,27 @@ void QBS_window::cb_exec_call(Fl_Widget* w, void* v) {
 // Call back - call input
 // TODO: Check call exists etc
 void QBS_window::cb_input_call(Fl_Widget* w, void* v) {
+	QBS_window* that = ancestor_view<QBS_window>(w);
 	cb_value<Fl_Input, string>(w, v);
+	string* call = (string*)v;
+	*call = to_upper(*call);
+	switch (that->action_) {
+	case SORT_CARDS:
+		that->update_sort_cards();
+		break;
+	case RECEIVE_CARD:
+		that->update_rcv_card();
+		break;
+	case RECEIVE_SASE:
+		that->update_rcv_sase();
+		break;
+	case DISPOSE_SASE:
+		that->update_dispose_sase();
+		break;
+	case STUFF_CARDS:
+		that->update_stuff_cards();
+		break;
+	}
 }
 
 // Callback navigate batch
@@ -1132,9 +1290,6 @@ void QBS_window::cb_nav_batch(Fl_Widget* w, void* v) {
 	QBS_window* that = ancestor_view<QBS_window>(w);
 	navigate_t nav_action = (navigate_t)(long)v;
 	switch (nav_action) {
-	case SUMM:
-		cout << "Batch summation not yet implemented" << endl;
-		break;
 	case PREV_MAJOR:
 		// Go to first box
 		that->selected_box_ = 0;
@@ -1161,6 +1316,7 @@ void QBS_window::cb_nav_batch(Fl_Widget* w, void* v) {
 		that->selected_box_ = that->data_->get_current();
 		break;
 	}
+	that->update_whatever();
 	that->update_batches();
 	return;
 }
@@ -1171,32 +1327,40 @@ void QBS_window::cb_nav_call(Fl_Widget* w, void* v) {
 	navigate_t nav_action = (navigate_t)(long)v;
 	string call = that->call_;
 	string pfx = call.substr(0, 3);
+	int box = that->action_ == SORT_CARDS ? RCVD_BOX : that->selected_box_;
 	switch (nav_action) {
-	case SUMM:
-		cout << "Batch summation not yet implemented" << endl;
-		break;
 	case PREV_MAJOR:
-		while (call.substr(0, 3) == pfx) {
-			call = that->data_->get_prev_call(that->selected_box_, call);
+		while (call.length() > 3 && call.substr(0, 3) == pfx) {
+			call = that->data_->get_prev_call(box, call);
 		}
 		that->call_ = call;
 		break;
 	case PREV_MINOR:
-		that->call_ = that->data_->get_prev_call(that->selected_box_, call);
+		that->call_ = that->data_->get_prev_call(box, call);
 		break;
 	case NEXT_MAJOR:
-		while (call.substr(0, 3) == pfx) {
-			call = that->data_->get_next_call(that->selected_box_, call);
+		while (call.length() > 3 && call.substr(0, 3) == pfx) {
+			call = that->data_->get_next_call(box, call);
 		}
-		call = that->data_->get_next_call(that->selected_box_, call);
 		that->call_ = call;
 		break;
 	case NEXT_MINOR:
-		that->call_ = that->data_->get_next_call(that->selected_box_, call);
+		that->call_ = that->data_->get_next_call(box, call);
 		break;
 	}
+	that->update_whatever();
 	that->update_calls();
 	return;
+}
+
+// Return applicaton to reset state
+void QBS_window::cb_reset(Fl_Widget* w, void* v) {
+	clog << "+++++++++++++++++++++++ RESET ++++++++++++++++++++++++" << endl;
+	QBS_window* that = ancestor_view<QBS_window>(w);
+	delete that->data_;
+	that->data_ = new QBS_data;
+	// Now allow the data to be processed
+	that->data_->set_window(that);
 }
 
 // Display top 20
