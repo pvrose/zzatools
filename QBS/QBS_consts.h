@@ -57,7 +57,10 @@ enum action_t {
 	DISPOSE_CARDS,               // Mark cards for recycling
 	POST_CARDS,                  // Post stuffed envelopes
 	RECYCLE_CARDS,               // Recycle cards
-	DISPOSE_SASE                 // Recycle envelopes
+	DISPOSE_SASE,                // Recycle envelopes
+	SUMMARY_BATCH,               // Produce batch summary report
+	SUMMARY_CALL,                // Produce call summary Sreport
+	HISTORY_CALL                 // Produce call history report
 };
 
 enum navigate_t {

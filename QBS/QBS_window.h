@@ -15,11 +15,19 @@
 #include <FL/Fl_Value_Input.H>
 #include <FL/Fl_Value_Output.H>
 #include <FL/Fl_Button.H>
-#include <FL/Fl_Light_Button.H>
+#include <FL/Fl_Radio_Light_Button.H>
 #include <FL/Fl_Radio_Button.H>
 
 
 using namespace std;
+
+// SEverity level used for message
+enum severity_t {
+    NOT_ERROR = 0,
+    WARNING,
+    ERROR,
+    SEVERE
+};
 
 // Forward instantiation otherwise we have circular use of .h files
 class QBS_data;
@@ -63,7 +71,7 @@ protected:
     static void cb_nav_call(Fl_Widget* w, void* v);
     // Reset button
     static void cb_reset(Fl_Widget* w, void* v);
-
+ 
     // Specify the widgets
     void create_form();
 
@@ -79,12 +87,12 @@ protected:
     void update_dispose_sase();
     void update_batches();
     void update_calls();
+    void update_batch_summary();
+    void update_call_summary();
+    void update_call_history();
     // Call whatever update is needed per action
     void update_whatever();
-
-    // Display top20
-    void display_top20();
-
+ 
     // Various data items accessible by most classes
     Fl_Preferences settings_;
     QBS_data* data_;
@@ -103,24 +111,34 @@ protected:
     // widgets - process group
     Fl_Group* g_process_;
     Fl_Group* g_proc_bns_;
-    Fl_Radio_Button* bn_new_batch_;
-    radio_param_t rp_new_batch_;
-    Fl_Radio_Button* bn_sort_cards_;
-    radio_param_t rp_sort_cards_;
-    Fl_Radio_Button* bn_rcv_card_;
+
+    Fl_Radio_Light_Button* bn_rcv_card_;
     radio_param_t rp_rcv_card_;
-    Fl_Radio_Button* bn_rcv_sase_;
+    Fl_Radio_Light_Button* bn_rcv_sase_;
     radio_param_t rp_rcv_sase_;
-    Fl_Radio_Button* bn_stuff_cards_;
+ 
+    Fl_Radio_Light_Button* bn_new_batch_;
+    radio_param_t rp_new_batch_;
+    Fl_Radio_Light_Button* bn_sort_cards_;
+    radio_param_t rp_sort_cards_;
+    Fl_Radio_Light_Button* bn_stuff_cards_;
     radio_param_t rp_stuff_cards_;
-    Fl_Radio_Button* bn_dispose_cards_;
+    Fl_Radio_Light_Button* bn_dispose_cards_;
     radio_param_t rp_dispose_cards_;
-    Fl_Radio_Button* bn_post_cards_;
+    Fl_Radio_Light_Button* bn_post_cards_;
     radio_param_t rp_post_cards_;
-    Fl_Radio_Button* bn_recycle_cards_;
+    Fl_Radio_Light_Button* bn_recycle_cards_;
     radio_param_t rp_recycle_cards_;
-    Fl_Radio_Button* bn_dispose_sase_;
+    Fl_Radio_Light_Button* bn_dispose_sase_;
     radio_param_t rp_dispose_sase_;
+
+    Fl_Radio_Light_Button* bn_summ_batch_;
+    radio_param_t rp_summ_batch_;
+    Fl_Radio_Light_Button* bn_summ_call_;
+    radio_param_t rp_summ_call_;
+    Fl_Radio_Light_Button* bn_hist_call_;
+    radio_param_t rp_hist_call_;
+
     Fl_Output* op_batch_;
     Fl_Button* bn_b_navbb_;
     Fl_Button* bn_b_navb_;
@@ -157,7 +175,7 @@ protected:
     int selected_box_;
     // Current callsign
     string call_;
-    // Batch operation finished
+    // Batch operation finished - disables batch execute button
     bool batch_op_done_;
 };
 

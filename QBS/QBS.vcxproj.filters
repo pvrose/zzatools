@@ -27,6 +27,9 @@
     <ClInclude Include="QBS_import.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="QBS_reporter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="QBS_data.cpp">
@@ -39,6 +42,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="QBS_import.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="QBS_reporter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

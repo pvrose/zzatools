@@ -1,11 +1,13 @@
 #include "QBS_data.h"
 #include "QBS_import.h"
+#include "QBS_reporter.h"
 #include "../zzalib/utils.h"
 #include "../zzalib/callback.h"
 
 #include <string>
 #include <fstream>
 #include <iostream>
+#include <sstream>
 #include <vector>
 
 #include <FL/Fl_Preferences.H>
@@ -51,6 +53,7 @@ int QBS_data::discard_inherits(
 	log_action(INHERIT, 0, date, call, value, 0);
 	// add cards to current box
 	(*(*boxes_[0]).counts)[call] += value;
+	(*(*boxes_[0]).received)[call] += value;
 	return value;
 }
 
@@ -84,13 +87,16 @@ int QBS_data::receive_cards(
 				head_ = 0;
 			}
 			// Move in-box to current
+
 			(*(*boxes_[box_num]).counts)[call] += in_box_[call];
+			(*(*boxes_[box_num]).received)[call] += in_box_[call];
 			in_box_[call] = 0;
 			// Add kept cards to current
 			(*(*boxes_[box_num]).counts)[call] += keep_box_[call];
 			keep_box_[call] = 0;
 			// add cards to current box and totals
 			(*(*boxes_[box_num]).counts)[call] += value;
+			(*(*boxes_[box_num]).received)[call] += value;
 			(*boxes_[box_num]).recycle_info->sum_received += value;
 			if (value > 0) {
 				(*boxes_[box_num]).recycle_info->count_received += 1;
@@ -222,7 +228,11 @@ int QBS_data::stuff_cards(
 			// Send specified amount
 			sent = value;
 		}
+		// Sdd to the various tallies
 		(*box.counts)[call] -= sent;
+		(*box.sent)[call] += sent;
+		box.recycle_info->sum_sent += sent;
+		if (sent > 0) box.recycle_info->count_sent++;
 		out_box_[call] += sent;
 	}
 	else {
@@ -360,7 +370,7 @@ int QBS_data::recycle_cards(
 	box.recycle_info->sum_recycled = cards;
 	box.recycle_info->weight_kg = weight;
 	log_action(RECYCLE, head_, date, "", cards, weight);
-	disposal_report(head_);
+	evaluate_top20(head_);
 	head_++;
 	return cards;
 }
@@ -872,12 +882,30 @@ void QBS_data::log_action(
 	}
 }
 
-//TODO - design and implement disposal report
-int QBS_data::disposal_report(
-	int box_num
-) {
-//	cerr << "Disposal report for box " << box_num << " not yet implemented " << endl;
-	return false;
+// Sort calls according to number of cards recycled
+void QBS_data::evaluate_top20(
+	int box_num) {
+	box_data* box = boxes_[box_num];
+	list<string>& top20 = box->recycle_info->top_20;
+	top20.clear();
+	// Go through the calls still in the box
+	for (auto count = box->counts->begin(); count != box->counts->end(); count++) {
+		const string& call = (*count).first;
+		const int& value = (*count).second;
+		bool inserted = false;
+		// Go through the top20 so far and insert the new value where it has 
+		// become grater than the top20 value 
+		for (auto t20 = top20.begin(); t20 != top20.end() && !inserted; t20++) {
+			if (value > (*box->counts)[(*t20)]) {
+				top20.insert(t20, call);
+				inserted = true;
+			}
+		}
+		// And if it is not larger than any existing top 20 stick it on the end
+		if (!inserted) {
+			top20.push_back(call);
+		}
+	}
 }
 
 void QBS_data::box_summary(int box, ostream& os) {
@@ -967,4 +995,162 @@ string QBS_data::next_batch() {
 // Get the reading action
 action_t QBS_data::get_action() {
 	return action_read_;
+}
+
+// Display the batch summary
+void QBS_data::display_batch_summary(int box_num) {
+	const box_data & box = *boxes_[box_num];
+	stringstream ss;
+	// Heading: BATCH#nn: 2022 Q4
+	ss << "<H1><U>BATCH #" << box_num << ":- " << box.id << "</U></H1>" << endl;
+	ss << "<TABLE>" << endl;
+	ss << "<TR><TD>Received: </TD><TD>" << box.date_received << "</TD></TR>" << endl;
+	if (box.date_sent.length() == 0) {
+		ss << "<TR><TD>Sent:</TD><TD>NOT SENT</TD></TR>" << endl;
+	}
+	else {
+		ss << "<TR><TD>Sent:</TD><TD>" << box.date_sent << "</TD></TR>" << endl;
+	}
+	if (box.date_recycled.length() == 0) {
+		ss << "<TR><TD>Recycled:</TD><TD>NOT RECYCLED</TD></TR>" << endl;
+	}
+	else {
+		ss << "<TR><TD>Recycled:</TD><TD>" << box.date_recycled << "</TD></TR>" << endl;
+	}
+	ss << "</TABLE>" << endl;
+	// Cards & calls received
+	ss << "<TABLE BORDER=1>" << endl;
+	ss << "<TR><TD><&NBSP></TD><TD>Cards</TD><TD>Calls</TD></TR>" << endl;
+	ss << "<TR><TD>Received</TD><TD>" <<
+		box.recycle_info->sum_received << "</TD><TD>" <<
+		box.recycle_info->count_received << "</TD></TR>" << endl;
+	ss << "<TR><TD>Sent</TD><TD>" << box.recycle_info->sum_sent << "(" <<
+		100 * box.recycle_info->sum_sent / box.recycle_info->sum_received << "%)</TD><TD>" <<
+		box.recycle_info->count_sent << "(" <<
+		100 * box.recycle_info->count_sent / box.recycle_info->count_received << "%)</TD></TR>" << endl;
+	ss << "<TR><TD>Recycled</TD><TD>" << box.recycle_info->sum_recycled << "(" <<
+		100 * box.recycle_info->sum_recycled / box.recycle_info->sum_received << "%)</TD><TD>" <<
+		box.recycle_info->count_recycled << "(" <<
+		100 * box.recycle_info->count_recycled / box.recycle_info->count_received << "%)</TD></TR>" << endl;
+	ss << "<TR><TD>Weight (kg)</TD><TD>" <<
+		box.recycle_info->weight_kg << "</TD></TR>" << endl;
+	ss << "<TR><TD>(g/card)</TD><TD>" <<
+		1000.0 * box.recycle_info->weight_kg / box.recycle_info->sum_recycled <<
+		"</TD></TR>" << endl;
+	ss << "</TABLE>" << endl;
+	// Top 20
+	ss << endl;
+	ss << "<H2>Top 20 Recycled</H2>" << endl;
+	ss << "<TABLE BORDER=1>" << endl;
+	ss << "<TR><TD>Rank</TD><TD>Callsign</TD><TD>count</TD></TR>" << endl;
+	bool done = false;
+	int pos = 1;
+	int prev_count = 0;
+	int top20_recycled = 0;
+	for (auto t20 = box.recycle_info->top_20.begin();
+		t20 != box.recycle_info->top_20.end() && !done; t20++, pos++) {
+		const string& call = (*t20);
+		const int count = (*box.counts)[call];
+		if (count == prev_count) {
+			ss << "<TR><TD>=</TD><TD>" << call << "</TD><TD>" << count << "</TD></TR>" << endl;
+		}
+		else if (pos > 20 || count == 0) {
+			done = true;
+		} else{
+			ss << "<TR><TD>" << pos << "</TD><TD>" << call << "</TD><TD>" << count << "</TD></TR>" << endl;
+		}
+		if (!done) top20_recycled += count;
+		prev_count = count;
+	}
+	if (box.recycle_info->sum_recycled != 0) {
+		ss << "<TR><TD>% total</TD><TD></TD><TD>" <<
+			100 * top20_recycled / box.recycle_info->sum_recycled << "</TD></TR>" << endl;
+	}
+	ss << "</TABLE>" << endl;
+	if (pos < 20) {
+		ss << "Less than 20 calls were recycled</BR>" << endl;
+	}
+	// Display in a window
+	QBS_reporter* rep = new QBS_reporter(300, 300, "Batch Summary Report");
+	rep->text(ss.str().c_str());
+	rep->show();
+}
+
+void QBS_data::display_call_summary(string call) {
+	stringstream ss;
+	ss << "<H1><U>" << call << "</U></H1>" << endl;
+	// Get box information
+	int box = get_current();
+	ss << "<H2>Summary</H2>" << endl;
+	ss << "<TABLE BORDER=1>" << endl;
+	ss << "<TR><TD>Batch</TD><TD>Num. Cards</TD></TR>" << endl;
+	while (box >= get_head()) {
+		ss << "<TR><TD>" << get_batch(box) << "</TD><TD>" <<
+			get_count(box, call) << "</TD>";
+		if (box == get_current()) ss << "<TD>(Current)</TD>" << endl;
+		else if (box == get_head()) ss << "<TD>(For recycling)</TD>" << endl;
+		else ss << "<TD>(Pending)</TD>" << endl;
+		ss << "</TR>" << endl;
+		box--;
+	}
+	// SASEs
+	ss << "<TR><TD>SASEs held</TD><TD>" << get_count(SASE_BOX, call) << 
+		"</TD></TR>" << endl;
+	// Display in a window
+	QBS_reporter* rep = new QBS_reporter(300, 300, "Call Summary Report");
+	rep->text(ss.str().c_str());
+	rep->show();
+}
+
+void QBS_data::display_call_history(string call) {
+	stringstream ss;
+	ss << "<H1><U>" << call << "</U></H1>" << endl;
+	ss << "<H2>Card history</H2>" << endl;
+	ss << "<TABLE BORDER=1 >" << endl;
+	ss << "<TR><TD>Batch</TD><TD>Received</TD><TD>Sent</TD><TD>Recycled</TD><TD>Notes</TD></TR>" << endl;
+	int sum_rcvd = 0;
+	int sum_sent = 0;
+	int sum_recy = 0;
+	for (int b = 0; b <= get_current(); b++) {
+		box_data* box = boxes_[b];
+		ss << "<TR>";
+		ss << "<TD>" << box->id << "</TD>";
+		ss << "<TD>" << (*box->received)[call] << "</TD>";
+		sum_rcvd += (*box->received)[call];
+		ss << "<TD>" << (*box->sent)[call] << "</TD>";
+		sum_sent += (*box->sent)[call];
+		if (b < get_head()) {
+			ss << "<TD>" << (*box->counts)[call] << "</TD>";
+			sum_recy += (*box->counts)[call];
+		}
+		else {
+			ss << "<TD>-</TD>";
+		}
+		if (b == get_current()) ss << "<TD>Current</TD>";
+		else if (b == get_head()) ss << "<TD>Head</TD>";
+		ss << "</TR>" << endl;
+	}
+	ss << "<TR>";
+	ss << "<TD>Total<TD>" << sum_rcvd << "</TD>";
+	ss << "<TD>" << sum_sent;
+	if (sum_rcvd > 0) ss << " (" << 100 * sum_sent / sum_rcvd << "%)";
+	ss << "</TD>";
+	ss << "<TD>" << sum_recy;
+	if (sum_rcvd > 0) ss << " (" << 100 * sum_recy / sum_rcvd << "%)";
+	ss << "</TD></TR>" << endl;
+	ss << "</TABLE>" << endl;
+	ss << "<H2>Notes:</H2>" << endl;
+	ss << "<TABLE BORDER=2 WIDTH=90%>" << endl;
+	if (ham_info_.find(call) != ham_info_.end()) {
+		call_info& info = ham_info_.at(call);
+		for (auto i = info.begin(); i != info.end(); i++) {
+			ss << "<TR><TD>" << (*i).first << 
+				"</TD><TD>" << (*i).second << "</TD></TR>" << endl;
+		}
+	}
+	ss << "</TABLE>" << endl;
+	// Display in a window
+	QBS_reporter* rep = new QBS_reporter(300, 300, "Call History Report");
+	rep->text(ss.str().c_str());
+	rep->show();
 }

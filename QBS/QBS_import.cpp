@@ -247,7 +247,7 @@ bool QBS_import::copy_data() {
 	clog << "Copying data...." << endl;
 	for (auto d = dates_.begin(); d != dates_.end(); d++) {
 		event_t& event = (*d).second;
-		const string& date = (*d).first;
+		const string& date = (*d).first + "(E)";
 		string batch = event.batch;
 		int box = boxes_[batch];
 		direction_t dirn = event.in_out;

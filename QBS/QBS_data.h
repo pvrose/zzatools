@@ -5,7 +5,7 @@
 #include <string>
 #include <ctime>
 #include <map>
-#include <vector>
+#include <list>
 #include <fstream>
 #include <iostream>
 
@@ -20,19 +20,23 @@ typedef map<string /*name */, string /* value */> call_info;
 
 struct recycle_data {
 	int sum_recycled;            // Number of cards recycled from batch
+	int sum_sent;                // Number of cards sent to ham
 	int sum_received;            // Total number of cards in batch
 	int count_recycled;          // Number of calls recycled
+	int count_sent;              // Number of hamd to whom sent
 	int count_received;          // Number of calls received
 	float weight_kg;             // Weight (in kg) of cards recycled
-	array<string, 20>* top_20;   // Top 20 callsigns recycled
+	list<string> top_20;       // Top 20 callsigns recycled
 
 	recycle_data() {
 		sum_recycled = 0;
+		sum_sent = 0;
 		sum_received = 0;
 		count_recycled = 0;
+		count_sent = 0;
 		count_received = 0;
 		weight_kg = 0.0F;
-		top_20 = nullptr;
+		top_20.clear();
 	}
 };
 
@@ -43,6 +47,8 @@ struct box_data {
 	string date_recycled;        //
 	recycle_data* recycle_info;  // Info for this box once disposed
 	count_data* counts;          // Number of cards held or disposed
+	count_data* sent;            // Number of cards sent
+	count_data* received;        // Number of cards received
 
 	box_data() {
 		id = "Unknown";
@@ -52,6 +58,10 @@ struct box_data {
 		recycle_info = new recycle_data;
 		counts = new count_data;
 		counts->clear();
+		sent = new count_data;
+		sent->clear();
+		received = new count_data;
+		received->clear();
 	}
 };
 
@@ -263,9 +273,14 @@ public:
 	// Trace boxes
 	void trace_boxes(ostream& os);
 
+	// Display batch summary
+	void display_batch_summary(int box_num);
+	void display_call_summary(string call);
+	void display_call_history(string call);
+
 protected:
 	// Prepare disposal report
-	int disposal_report(
+	void evaluate_top20(
 		int box_num             // box being disposed
 	);
 

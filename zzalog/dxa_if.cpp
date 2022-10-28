@@ -1899,11 +1899,11 @@ void dxa_if::zoom_centre(lat_long_t centre, bool full) {
 			float zoom;
 			if (zoomed_lat >= required_lat) {
 				// It will fit - decrease zoom by 5% margin
-				zoom = zoom_long * 0.95;
+				zoom = zoom_long * 0.95F;
 			}
 			else {
 				// Decrease zoom by mismatch (and a further 5%)
-				zoom = zoom_long * (zoomed_lat / required_lat) * 0.95;
+				zoom = zoom_long * (zoomed_lat / required_lat) * 0.95F;
 			}
 			// now zoom by the smaller of these with 5% margin
 			map->PutZoom(zoom);

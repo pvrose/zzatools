@@ -148,12 +148,14 @@
     <ClInclude Include="QBS_consts.h" />
     <ClInclude Include="QBS_data.h" />
     <ClInclude Include="QBS_import.h" />
+    <ClInclude Include="QBS_reporter.h" />
     <ClInclude Include="QBS_window.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="QBS_data.cpp" />
     <ClCompile Include="QBS_import.cpp" />
     <ClCompile Include="QBS_main.cpp" />
+    <ClCompile Include="QBS_reporter.cpp" />
     <ClCompile Include="QBS_window.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
