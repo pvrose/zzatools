@@ -30,11 +30,14 @@ QBS_data::QBS_data()
 	reading_mode_ = IMPORT;
 	action_read_ = NONE;
 	window_ = nullptr;
+	reporter_ = new QBS_reporter(300, 300, "Report window");
+	reporter_->hide();
 }
 
 // Destructor - write data, tidy up
 QBS_data::~QBS_data() {
 	file_.close();
+	delete reporter_;
 }
 
 bool QBS_data::close_qbs() {
@@ -1071,9 +1074,9 @@ void QBS_data::display_batch_summary(int box_num) {
 		ss << "Less than 20 calls were recycled</BR>" << endl;
 	}
 	// Display in a window
-	QBS_reporter* rep = new QBS_reporter(300, 300, "Batch Summary Report");
-	rep->text(ss.str().c_str());
-	rep->show();
+	reporter_->label("Batch Summary Report");
+	reporter_->text(ss.str().c_str());
+	reporter_->show();
 }
 
 void QBS_data::display_call_summary(string call) {
@@ -1084,7 +1087,8 @@ void QBS_data::display_call_summary(string call) {
 	ss << "<H2>Summary</H2>" << endl;
 	ss << "<TABLE BORDER=1>" << endl;
 	ss << "<TR><TD>Batch</TD><TD>Num. Cards</TD></TR>" << endl;
-	while (box >= get_head()) {
+	ss << "<TR><TD>IN-BOX</TD><TD>" << get_count(IN_BOX, call) << "</TD></TR>" << endl;
+		while (box >= get_head()) {
 		ss << "<TR><TD>" << get_batch(box) << "</TD><TD>" <<
 			get_count(box, call) << "</TD>";
 		if (box == get_current()) ss << "<TD>(Current)</TD>" << endl;
@@ -1097,9 +1101,9 @@ void QBS_data::display_call_summary(string call) {
 	ss << "<TR><TD>SASEs held</TD><TD>" << get_count(SASE_BOX, call) << 
 		"</TD></TR>" << endl;
 	// Display in a window
-	QBS_reporter* rep = new QBS_reporter(300, 300, "Call Summary Report");
-	rep->text(ss.str().c_str());
-	rep->show();
+	reporter_->label("Call Summary Report");
+	reporter_->text(ss.str().c_str());
+	reporter_->show();
 }
 
 void QBS_data::display_call_history(string call) {
@@ -1150,7 +1154,7 @@ void QBS_data::display_call_history(string call) {
 	}
 	ss << "</TABLE>" << endl;
 	// Display in a window
-	QBS_reporter* rep = new QBS_reporter(300, 300, "Call History Report");
-	rep->text(ss.str().c_str());
-	rep->show();
+	reporter_->label("Call History Report");
+	reporter_->text(ss.str().c_str());
+	reporter_->show();
 }

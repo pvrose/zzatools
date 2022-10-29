@@ -13,5 +13,7 @@ public:
 
 protected:
     Fl_Help_View* display_;
+
+    static void cb_hide(Fl_Widget* w);
 };
 

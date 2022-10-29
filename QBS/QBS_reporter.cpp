@@ -2,8 +2,7 @@
 
 QBS_reporter::QBS_reporter(int W, int H, const char* L) :
 	Fl_Window(W, H, L) {
-	// No border, always on top
-	set_non_modal();
+	callback(cb_hide);
 	// Add display
 	display_ = new Fl_Help_View(0, 0, w(), h());
 	display_->box(FL_FLAT_BOX);
@@ -18,4 +17,8 @@ QBS_reporter::~QBS_reporter() {
 
 void QBS_reporter::text(const char* value) {
 	display_->value(value);
+}
+
+void QBS_reporter::cb_hide(Fl_Widget* w) {
+	w->hide();
 }

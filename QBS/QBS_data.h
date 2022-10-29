@@ -1,6 +1,7 @@
 #pragma once
 #include "QBS_window.h"
 #include "QBS_consts.h"
+#include "QBS_reporter.h"
 
 #include <string>
 #include <ctime>
@@ -124,6 +125,8 @@ protected:
 	string csv_dirname_;
 	// Window
 	QBS_window* window_;
+	// REprting window
+	QBS_reporter* reporter_;
 	// Dummy recycle data
 	recycle_data recycle_dummy_;
 	// Input/Output file
