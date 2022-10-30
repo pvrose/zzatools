@@ -805,10 +805,10 @@ HRESULT dxa_if::cb_map_clicked(float latitude, float longitude) {
 // Callback from DXATLAS: that the mouse position has changed
 HRESULT dxa_if::cb_mouse_moved(float latitude, float longitude) {
 	HRESULT result = S_OK;
-	if (call_layer_ != nullptr && !is_my_change_) {
-		// 
-
-		DxAtlas::IDxMapPtr map = atlas_->GetMap();
+	DxAtlas::IDxMapPtr map = atlas_->GetMap();
+	// If we have a call layer and are not in the process of changing it
+	// or displaying th location of the DX station
+	if (call_layer_ != nullptr && !is_my_change_ && !map->GetDxVisible()) {
 		// We are going to change the map - let callbacks know and start building bulk change.
 		is_my_change_ = true;
 		map->BeginUpdate();
@@ -1899,11 +1899,11 @@ void dxa_if::zoom_centre(lat_long_t centre, bool full) {
 			float zoom;
 			if (zoomed_lat >= required_lat) {
 				// It will fit - decrease zoom by 5% margin
-				zoom = zoom_long * 0.95F;
+				zoom = (float)(zoom_long * 0.95);
 			}
 			else {
 				// Decrease zoom by mismatch (and a further 5%)
-				zoom = zoom_long * (zoomed_lat / required_lat) * 0.95F;
+				zoom = (float)(zoom_long * (zoomed_lat / required_lat) * 0.95);
 			}
 			// now zoom by the smaller of these with 5% margin
 			map->PutZoom(zoom);

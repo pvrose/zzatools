@@ -260,15 +260,23 @@ namespace zzalog {
 			static void cb_format(Fl_Widget* w, void* v);
 			// Add exchange button
 			static void cb_add_exch(Fl_Widget* w, void* v);
+			// Logging mode
+			static void cb_logging_mode(Fl_Widget* w, void* v);
 
 			// Add contest exchanges
 			void populate_exch_fmt();
 			// Update fields in record
 			void update_record();
 			// Copy fields from record
-			void copy_record();
+			void update_fields();
 			// Initialise fields
 			void initialise_fields();
+			// Copy from an existing record
+			void copy_record(record* old_record);
+			// Copy fields from CAT
+			void copy_cat();
+			// Clear QSO fields
+			void clear_qso();
 			// Add new format - return format index
 			int add_format_id(string id);
 			// Add new format definition 

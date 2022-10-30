@@ -686,7 +686,7 @@ void qso_manager::qso_group::create_form(int X, int Y) {
 	ch_logmode_->add("Current date and time, no other data");
 	ch_logmode_->add("QSO set by external application");
 	ch_logmode_->value(logging_mode_);
-	ch_logmode_->callback(cb_value<Fl_Choice, logging_mode_t>, &logging_mode_);
+	ch_logmode_->callback(cb_logging_mode, &logging_mode_);
 	ch_logmode_->tooltip("Select the logging mode - i.e. how to initialise a new QSO record");
 
 	int curr_y = ch_logmode_->y() + ch_logmode_->h() + GAP;;
@@ -1156,7 +1156,7 @@ void qso_manager::qso_group::update_record() {
 }
 
 // Copy record to the fields - reverse of above
-void qso_manager::qso_group::copy_record() {
+void qso_manager::qso_group::update_fields() {
 	if (current_qso_) {
 		ip_call_->value(current_qso_->item("CALL").c_str());
 		for (int i = 0; i < NUMBER_FIELDS; i++) {
@@ -1166,6 +1166,69 @@ void qso_manager::qso_group::copy_record() {
 			}
 		}
 		ip_notes_->value(current_qso_->item("NOTES").c_str());
+	}
+}
+
+// Copy from an existing record (or 
+void qso_manager::qso_group::copy_record(record* old_record) {
+	if (current_qso_) {
+		for (auto f = old_record->begin(); f != old_record->end(); f++) {
+			// Copy non-null field to current record
+			if (current_qso_->item((*f).first).length() == 0) {
+				current_qso_->item((*f).first, (*f).second, false, true);
+			}
+		}
+		update_fields();
+	}
+	else {
+		// Copy FREQ, MODE, TX_PWR, CALL
+		ip_freq_->value(old_record->item("FREQ").c_str());
+		ch_mode_->value(old_record->item("MODE", true).c_str());
+		ip_power_->value(old_record->item("TX_PWR").c_str());
+	}
+}
+
+// Copy fields from CAT
+void qso_manager::qso_group::copy_cat() {
+	// Get frequency, mode and transmit power from rig
+	ip_freq_->value(rig_if_->get_frequency(true).c_str());
+	// Get mode - NB USB/LSB need further processing
+	string mode;
+	string submode;
+	rig_if_->get_string_mode(mode, submode);
+	if (mode == "DATA L" || mode == "DATA U") ch_mode_->value("");
+	else if (submode == "") ch_mode_->value(mode.c_str());
+	else ch_mode_->value(submode.c_str());
+	ip_power_->value(rig_if_->get_tx_power().c_str());
+}
+
+// Clear fields
+void qso_manager::qso_group::clear_qso() {
+	ip_freq_->color(FL_RED);
+	ip_freq_->value("0");
+	ch_mode_->value(0);
+	ip_power_->value("0");
+	ip_call_->value("");
+	for (int i = 0; i < NUMBER_FIELDS; i++) {
+		ip_field_[i]->value("");
+	}
+	ip_notes_->value("");
+}
+
+// Select logging mode
+void qso_manager::qso_group::cb_logging_mode(Fl_Widget* w, void* v) {
+	cb_value<Fl_Choice, logging_mode_t>(w, v);
+	qso_group* that = ancestor_view<qso_group>(w);
+	switch (that->logging_mode_) {
+	case LM_ON_AIR_CAT:
+		that->copy_cat();
+		break;
+	case LM_ON_AIR_COPY:
+		that->copy_record(book_->get_record());
+		break;
+	default:
+		that->clear_qso();
+		break;
 	}
 }
 
@@ -3209,7 +3272,7 @@ void qso_manager::update_rig() {
 	case LM_ON_AIR_COPY: {
 		record* prev_record = book_->get_record();
 		if (qso_in_progress() && prev_record == qso_group_->current_qso_) {
-			qso_group_->copy_record();
+			qso_group_->update_fields();
 		}
 		// Assume as it's a logged record, the frequency is valid - NOT!
 		if (band_view_) {
@@ -3248,15 +3311,21 @@ void qso_manager::update_rig() {
 	}
 }
 
+// Called whenever another view updates a record (or selects a new one)
 void qso_manager::update_qso() {
 	record* prev_record = book_->get_record();
 	if (qso_in_progress() && prev_record == qso_group_->current_qso_) {
-		qso_group_->copy_record();
+		// Update the view if another view changes the record
+		qso_group_->update_fields();
 		antenna_grp_->name() = prev_record->item("MY_ANTENNA");
 		antenna_grp_->populate_choice();
 		rig_grp_->name() = prev_record->item("MY_RIG");
 		rig_grp_->populate_choice();
 		callsign_grp_->name() = prev_record->item("STATION_CALLSIGN");
+	}
+	else if (qso_group_->current_qso_ == nullptr) {
+		// Not actively recording a QSO, update displayed fields
+		qso_group_->copy_record(prev_record);
 	}
 }
 

@@ -645,27 +645,23 @@ void record_form::cb_ch_enum(Fl_Widget* w, void* v) {
 // v is not used
 void record_form::cb_bn_use(Fl_Widget* w, void* v) {
 	record_form* that = ancestor_view<record_form>(w);
-	// Update the record - get the fieldname in upper case - note item name in choice is prefixed with root symbol '/'
-	char temp[128];
+	// Update the record - get the fieldname in upper case 
 	// Get the name of current selected field-name in the field_choice
 	string field = to_upper(that->field_choice_->value());
 	// Get the new value from the text edit widget
 	if (field != "") {
 		// Get book to remember the record
 		that->my_book_->remember_record();
-		// Get the new value in the text buffer
-		string text = that->value_in_->buffer()->text();
-		// Get the selected value of the enum Fl_Choice
-		that->enum_choice_->item_pathname(temp, sizeof(temp) - 1);
-		string enum_value = "";
-		// Get the enumeation value if there is one if it exists
-		if (temp[0] != 0) enum_value = &temp[1];
 
 		if (that->is_enumeration_) {
+			// Get the selected value of the enum Fl_Choice
+			string enum_value = that->enum_choice_->value();
 			// Get the enumerated value if there was one
 			that->record_1_->item(field, enum_value);
 		}
 		else {
+			// Get the new value in the text buffer
+			string text = that->value_in_->buffer()->text();
 			// Get the text itself
 			that->record_1_->item(field, text);
 		}
@@ -1881,7 +1877,7 @@ void record_form::set_edit_widgets(string field, string text) {
 		// Populate the enumeartion choice if we are an enumeration
 		set_enum_choice(enumeration_type, text);
 	}
-	else if (field == "MY_RIG" || field == "MY_ANTENNA" || field == "APP_ZZA_QTH") {
+	else if (field == "MY_RIG" || field == "MY_ANTENNA" || field == "APP_ZZA_QTH" || field == "STATION_CALLSIGN") {
 		// Treat these if they were enumerations
 		set_enum_choice(field, text);
 	}
@@ -1903,13 +1899,15 @@ void record_form::set_enum_choice(string enumeration_type, string text) {
 	// delete existing menu
 	enum_choice_->clear();
 
-	if (enumeration_type == "MY_RIG" || enumeration_type == "MY_ANTENNA" || enumeration_type == "APP_ZZA_QTH") {
+	if (enumeration_type == "MY_RIG" || enumeration_type == "MY_ANTENNA" ||
+		enumeration_type == "APP_ZZA_QTH" || enumeration_type == "STATION_CALLSIGN") {
 		// Get the list of allowable values from settings
 		Fl_Preferences station_settings(settings_, "Stations");
 		string setting_path;
 		if (enumeration_type == "MY_RIG") setting_path = "Rigs";
 		else if (enumeration_type == "MY_ANTENNA") setting_path = "Aerials";
 		else if (enumeration_type == "APP_ZZA_QTH") setting_path = "QTHs";
+		else if (enumeration_type == "STATION_CALLSIGN") setting_path = "Callsigns";
 		Fl_Preferences kit_settings(station_settings, setting_path.c_str());
 		int num_items = kit_settings.groups();
 		enum_choice_->add("", 0, (Fl_Callback*)nullptr);

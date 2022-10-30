@@ -575,12 +575,12 @@ void log_table::draw_cell(TableContext context, int R, int C, int X, int Y, int 
 			record* this_record = my_book_->get_record(item_number, false);
 			// If the row is selected include the row header in the colouring
 			Fl_Color bg_colour = row_selected(R) ? selection_color() : row_header_color();
-			if (this_record->is_dirty()) bg_colour = fl_lighter(bg_colour);
+			if (this_record && this_record->is_dirty()) bg_colour = fl_lighter(bg_colour);
 			fl_color(bg_colour);
 			fl_rectf(X, Y, W, H);
 
 			// TEXT - contrast its colour to the bg colour.
-			if (this_record->is_dirty()) {
+			if (this_record && this_record->is_dirty()) {
 				fl_color(FL_RED);
 			}
 			else {
@@ -630,12 +630,12 @@ void log_table::draw_cell(TableContext context, int R, int C, int X, int Y, int 
 				// Selected rows will have table specific colour, others in current sesson grey, rest white
 				Fl_Color default_bg_colour = in_current_session(this_record) ? FL_GRAY : FL_WHITE;
 				Fl_Color bg_colour = row_selected(R) ? selection_color() : default_bg_colour;
-				if (this_record->is_dirty()) bg_colour = fl_lighter(bg_colour);
+				if (this_record && this_record->is_dirty()) bg_colour = fl_lighter(bg_colour);
 				fl_color(bg_colour);
 				fl_rectf(X, Y, W, H);
 
 				// TEXT - contrast its colour to the bg colour.
-				if (this_record->is_dirty()) {
+				if (this_record && this_record->is_dirty()) {
 					fl_color(FL_RED);
 				}
 				else {

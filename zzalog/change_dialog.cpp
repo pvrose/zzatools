@@ -269,7 +269,8 @@ void change_dialog::enable_widgets() {
 			w_text_->deactivate();
 			w_enum_->activate();
 		}
-		else if (old_field_name_ == "MY_RIG" || old_field_name_ == "MY_ANTENNA" || old_field_name_ == "APP_ZZA_QTH") {
+		else if (old_field_name_ == "MY_RIG" || old_field_name_ == "MY_ANTENNA" ||
+			old_field_name_ == "APP_ZZA_QTH" || old_field_name_ == "STATION_CALLSIGN") {
 			
 			// populate the enumeartion choice with values from settings
 			populate_enum(old_field_name_);
@@ -290,13 +291,14 @@ void change_dialog::populate_enum(string name) {
 	Fl_Choice* ch = (Fl_Choice*)w_enum_;
 	ch->clear();
 	ch->add("", 0, nullptr);
-	if (name == "MY_RIG" || name == "MY_ANTENNA" || name == "APP_ZZA_QTH") {
+	if (name == "MY_RIG" || name == "MY_ANTENNA" || name == "APP_ZZA_QTH" || name == "STATION_CALLSIGN") {
 		// Add the list of possible values from the appropriate settings
 		Fl_Preferences station_settings(settings_, "Stations");
 		string setting_path;
 		if (name == "MY_RIG") setting_path = "Rigs";
 		else if (name == "MY_ANTENNA") setting_path = "Aerials";
 		else if (name == "APP_ZZA_QTH") setting_path = "QTHs";
+		else if (name == "STATION_CALLSIGN") setting_path = "Callsigns";
 		Fl_Preferences kit_settings(station_settings, setting_path.c_str());
 		int num_items = kit_settings.groups();
 		for (int i = 0; i < num_items; i++) {

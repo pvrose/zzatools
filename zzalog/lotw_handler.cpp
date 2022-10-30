@@ -215,7 +215,7 @@ bool lotw_handler::upload_lotw_log(book* book) {
 
 	}
 #ifndef _DEBUG
-	if (book_->save_enabled() && book_->modified() && book_->save_enabled()) {
+	if (book_->save_enabled() && book_->modified()) {
 		book_->store_data();
 	}
 #endif

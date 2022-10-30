@@ -338,7 +338,6 @@ toolbar::~toolbar()
 			delete child(i)->deimage();
 		}
 	}
-	clear();
 }
 
 // Button callback - 

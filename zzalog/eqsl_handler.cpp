@@ -654,7 +654,7 @@ bool eqsl_handler::upload_eqsl_log(book* book) {
 	// For book - use STATION_CALLSIGN of first QSO
 	record* this_record = book_->get_record(0, false);
 	string station = this_record->item("STATION_CALLSIGN", true, true);
-	if (station.length() && station != username_) {
+	if (station.length() && station != to_upper(username_)) {
 		char message[100];
 		snprintf(message, 100, "EQSL: Using %s instead of username %s", station.c_str(), username_.c_str());
 		status_->misc_status(ST_WARNING, message);
@@ -821,6 +821,11 @@ bool eqsl_handler::upload_eqsl_log(book* book) {
 		}
 
 	}
+#ifndef _DEBUG
+	if (book_->save_enabled() && book_->modified()) {
+		book_->store_data();
+	}
+#endif
 	fl_cursor(FL_CURSOR_DEFAULT);
 	return status == ER_OK;
 }
