@@ -461,7 +461,7 @@ bool book::store_data(string filename, bool force, set<string>* fields) {
 		}
 	}
 	// Update menu item activeness
-	tabbed_forms_->update_views(nullptr, HT_ALL, 0);
+	//tabbed_forms_->update_views(nullptr, HT_ALL, 0);
 	menu_->update_items();
 	return ok;
 }
