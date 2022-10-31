@@ -3236,36 +3236,43 @@ void qso_manager::update_rig() {
 		// Do nothing
 		break;
 	case LM_ON_AIR_CAT: {
-		dial_swr_->value(rig_if_->swr_meter());
-		dial_pwr_->value(rig_if_->pwr_meter());
-		dial_vdd_->value(rig_if_->vdd_meter());
-		string rig_name = rig_if_->rig_name();
-		if (rig_name != rig_grp_->name()) {
-			rig_grp_->name() = rig_name;
-			rig_grp_->populate_choice();
-		}
-		qso_group_->ip_freq_->value(rig_if_->get_frequency(true).c_str());
-		qso_group_->ip_power_->value(rig_if_->get_tx_power().c_str());
-		string mode;
-		string submode;
-		rig_if_->get_string_mode(mode, submode);
-		// Set to SUBMODE if exists else MODE
-		if (submode.length()) {
-			qso_group_->ch_mode_->value(submode.c_str());
-		}
-		else {
-			qso_group_->ch_mode_->value(mode.c_str());
-		}
-		if (band_view_) {
-			double freq = stod(rig_if_->get_frequency(true)) * 1000.0;
-			if (band_view_->in_band(freq)) {
-				qso_group_->ip_freq_->textcolor(FL_BLACK);
+		if (rig_if_) {
+			dial_swr_->value(rig_if_->swr_meter());
+			dial_pwr_->value(rig_if_->pwr_meter());
+			dial_vdd_->value(rig_if_->vdd_meter());
+			string rig_name = rig_if_->rig_name();
+			if (rig_name != rig_grp_->name()) {
+				rig_grp_->name() = rig_name;
+				rig_grp_->populate_choice();
+			}
+			qso_group_->ip_freq_->value(rig_if_->get_frequency(true).c_str());
+			qso_group_->ip_power_->value(rig_if_->get_tx_power().c_str());
+			string mode;
+			string submode;
+			rig_if_->get_string_mode(mode, submode);
+			// Set to SUBMODE if exists else MODE
+			if (submode.length()) {
+				qso_group_->ch_mode_->value(submode.c_str());
 			}
 			else {
-				qso_group_->ip_freq_->textcolor(FL_RED);
+				qso_group_->ch_mode_->value(mode.c_str());
 			}
-			band_view_->update(freq);
-			prev_freq_ = freq;
+			if (band_view_) {
+				double freq = stod(rig_if_->get_frequency(true)) * 1000.0;
+				if (band_view_->in_band(freq)) {
+					qso_group_->ip_freq_->textcolor(FL_BLACK);
+				}
+				else {
+					qso_group_->ip_freq_->textcolor(FL_RED);
+				}
+				band_view_->update(freq);
+				prev_freq_ = freq;
+			}
+		}
+		else {
+			// We have now disconnected rig - disable selecting this logging mode
+			qso_group_->logging_mode_ = LM_ON_AIR_TIME;
+			enable_widgets();
 		}
 		break;
 	}

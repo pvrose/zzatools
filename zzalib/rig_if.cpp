@@ -190,13 +190,12 @@ double rig_if::max_power() {
 }
 
 // Get settings
-void rig_if::get_settings() {
+Fl_Preferences* rig_if::get_settings() {
 	Fl_Preferences stn_settings(settings_, "Stations");
 	Fl_Preferences rigs_settings(stn_settings, "Rigs");
 	char* rig_name;
 	rigs_settings.get("Current", rig_name, "");
-	rig_settings_ = new Fl_Preferences(rigs_settings, rig_name);
-
+	return new Fl_Preferences(rigs_settings, rig_name);
 }
 
 // Rig timer callback
@@ -206,19 +205,19 @@ void rig_if::cb_timer_rig(void* v) {
 	// Set the status and get the polling interval for the current state of the rig
 	if (rig_if_ == nullptr) {
 		// Rig not set up - DLOW
-		rig_if_->rig_settings_->get("Slow Polling Interval", timer_value, SLOW_RIG_DEF);
+		get_settings()->get("Slow Polling Interval", timer_value, SLOW_RIG_DEF);
 	}
 	else {
 		if (rig_if_->is_good()) {
 			// Rig connected and is working - FAST
-			rig_if_->rig_settings_->get("Polling Interval", timer_value, FAST_RIG_DEF);
+			get_settings()->get("Polling Interval", timer_value, FAST_RIG_DEF);
 			if (rig_if_->on_timer_) {
 				rig_if_->on_timer_();
 			}
 		}
 		if (!rig_if_ || !rig_if_->is_good()) {
 			// Rig connected and broken - SLOW
-			rig_if_->rig_settings_->get("Slow Polling Interval", timer_value, SLOW_RIG_DEF);
+			get_settings()->get("Slow Polling Interval", timer_value, SLOW_RIG_DEF);
 		}
 	}
 	// repeat the timer
@@ -471,7 +470,7 @@ bool rig_hamlib::open() {
 
 	// Read hamlib configuration - manufacturer,  model, port and baud-rate
 	get_settings();
-	Fl_Preferences hamlib_settings(rig_settings_, "Hamlib");
+	Fl_Preferences hamlib_settings(get_settings(), "Hamlib");
 	Fl_Preferences stations_settings(settings_, "Stations");
 	Fl_Preferences rigs_settings(stations_settings, "Rigs");
 
@@ -820,7 +819,7 @@ rig_flrig::~rig_flrig()
 bool rig_flrig::open() {
 	get_settings();
 	// Default host name and port number
-	Fl_Preferences flrig_settings(rig_settings_, "Flrig");
+	Fl_Preferences flrig_settings(get_settings(), "Flrig");
 	char *temp;
 	// Default indicates server is on same computer as running zzalib
 	flrig_settings.get("Host", temp, "127.0.0.1");

@@ -120,7 +120,7 @@ namespace zzalib {
 		// Maximum power during QSO
 		double max_power();
 		// Settings
-		void get_settings();
+		static Fl_Preferences* get_settings();
 
 		// Callback to set certain functions (timer callback, freq to band conversion, error message
 		void callback(void (*function)(), string(*spec_func)(double), void(*mess_func)(status_t, const char*));
@@ -169,8 +169,6 @@ namespace zzalib {
 		int last_rx_smeter_;
 		// Maximum power during QSO
 		double max_power_;
-		// Settings
-		Fl_Preferences* rig_settings_;
 		// Stop incessane errors
 		bool inhibit_repeated_errors;
 	};
