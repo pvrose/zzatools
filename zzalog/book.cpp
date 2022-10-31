@@ -460,8 +460,8 @@ bool book::store_data(string filename, bool force, set<string>* fields) {
 			ok = false;
 		}
 	}
-	// Update menu item activeness
-	//tabbed_forms_->update_views(nullptr, HT_ALL, 0);
+	// Update menu item activeness - redraw log tables to remove modified hue
+	tabbed_forms_->update_views(nullptr, HT_FORMAT, 0);
 	menu_->update_items();
 	return ok;
 }
