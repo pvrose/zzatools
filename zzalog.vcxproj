@@ -22,29 +22,29 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{966FAF00-273A-4788-B38E-C080D6688B78}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -66,12 +66,12 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <LibraryPath>C:\Users\pvros\Documents\dev\deps\lib;C:\Users\pvros\Documents\dev\fltk-master\build\lib\Debug;C:\Users\pvros\Documents\dev\curl-7.65.1\builds\libcurl-vc15-x86-release-dll-ipv6-sspi-winssl\lib;C:\Users\pvros\Documents\dev\zzatools\Debug;C:\Program Files %28x86%29\hamlib-w32-4.2\lib\msvc;C:\cygwin\home\pvros\dev\Hamlib-master\src;$(LibraryPath)</LibraryPath>
+    <LibraryPath>C:\Users\pvros\Documents\dev\deps\lib;C:\Users\pvros\Documents\dev\fltk-master\build\lib\Debug;C:\Users\pvros\Documents\dev\curl-7.65.1\builds\libcurl-vc15-x86-release-dll-ipv6-sspi-winssl\lib;C:\Users\pvros\Documents\dev\zzatools\Debug;$(LibraryPath);C:\Program Files %28x86%29\hamlib-w32-4.5\lib;C:\Program Files %28x86%29\hamlib-w32-4.5\lib\msvc;C:\Program Files %28x86%29\hamlib-w32-4.5\lib\msvc</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\pvros\Documents\dev\deps\lib;C:\Users\pvros\Documents\dev\fltk-master\build\lib\Release;C:\Users\pvros\Documents\dev\curl-7.65.1\builds\libcurl-vc15-x86-release-dll-ipv6-sspi-winssl\lib;C:\Users\pvros\Documents\dev\zzatools\Release;C:\Program Files %28x86%29\hamlib-w32-4.2\lib\msvc;$(LibraryPath)</LibraryPath>
+    <LibraryPath>C:\Users\pvros\Documents\dev\deps\lib;C:\Users\pvros\Documents\dev\fltk-master\build\lib\Release;C:\Users\pvros\Documents\dev\curl-7.65.1\builds\libcurl-vc15-x86-release-dll-ipv6-sspi-winssl\lib;C:\Users\pvros\Documents\dev\zzatools\Release;$(LibraryPath);C:\Program Files %28x86%29\hamlib-w32-4.5\lib;C:\Program Files %28x86%29\hamlib-w32-4.5\lib\msvc;C:\Program Files %28x86%29\hamlib-w32-4.5\lib\msvc</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LibraryPath>C:\Users\pvros\Documents\dev\deps\lib;C:\Users\pvros\Documents\dev\fltk-1.4.x-20200320-0a38e2e3\build\lib\Debug;C:\cygwin\usr\local\bin;C:\Users\pvros\Documents\dev\curl-7.65.1\builds\libcurl-vc15-x86-release-dll-ipv6-sspi-winssl\lib;C:\Users\pvros\Documents\dev\zzatools\Debug;$(LibraryPath)</LibraryPath>
@@ -83,7 +83,7 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>C:\Users\pvros\Documents\dev\curl-7.65.1\builds\libcurl-vc15-x86-release-dll-ipv6-sspi-winssl\include;C:\Users\pvros\Documents\dev\deps\include;C:\Users\pvros\Documents\dev\fltk-master;C:\cygwin\home\pvros\dev\Hamlib\include;C:\Users\pvros\Documents\dev\fltk-master\build</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\pvros\Documents\dev\curl-7.65.1\builds\libcurl-vc15-x86-release-dll-ipv6-sspi-winssl\include;C:\Users\pvros\Documents\dev\deps\include;C:\Users\pvros\Documents\dev\fltk-master;C:\Users\pvros\Documents\dev\fltk-master\build;C:\Program Files %28x86%29\hamlib-w32-4.5\include</AdditionalIncludeDirectories>
       <AssemblerOutput>NoListing</AssemblerOutput>
       <ExpandAttributedSource>false</ExpandAttributedSource>
       <ShowIncludes>false</ShowIncludes>
@@ -107,7 +107,7 @@
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalIncludeDirectories>C:\Users\pvros\Documents\dev\curl-7.65.1\builds\libcurl-vc15-x86-release-dll-ipv6-sspi-winssl\include;C:\Users\pvros\Documents\dev\deps\include;C:\Users\pvros\Documents\dev\fltk-master\build;C:\Program Files %28x86%29\hamlib-w32-4.2\include;C:\Users\pvros\Documents\dev\fltk-master</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\pvros\Documents\dev\curl-7.65.1\builds\libcurl-vc15-x86-release-dll-ipv6-sspi-winssl\include;C:\Users\pvros\Documents\dev\deps\include;C:\Users\pvros\Documents\dev\fltk-master\build;C:\Users\pvros\Documents\dev\fltk-master;%(AdditionalIncludeDirectories);C:\Program Files %28x86%29\hamlib-w32-4.5\include</AdditionalIncludeDirectories>
       <AssemblerOutput>NoListing</AssemblerOutput>
       <UseUnicodeForAssemblerListing>false</UseUnicodeForAssemblerListing>
     </ClCompile>
@@ -119,6 +119,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>libcurl.lib;libssh2_a.lib;nghttp2.lib;libssl.lib;libcrypto.lib;oldap32_a.lib;olber32_a.lib;zlib_a.lib;fltk.lib;fltk_jpeg.lib;fltk_png.lib;fltk_z.lib;fltk_images.lib;fltk_gl.lib;fltk_forms.lib;zzalib.lib;comctl32.lib;Ws2_32.lib;libhamlib-4.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <HeapReserveSize>2000000</HeapReserveSize>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -196,6 +197,7 @@
     <ClCompile Include="zzalog\wsjtx_handler.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="packages\pthreads.2.9.1.4\build\native\include\pthread.h" />
     <ClInclude Include="zzalog\about_dialog.h" />
     <ClInclude Include="zzalog\adi_reader.h" />
     <ClInclude Include="zzalog\adi_writer.h" />
@@ -273,7 +275,19 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </Image>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="packages\pthreads.redist.2.9.1.4\build\native\pthreads.redist.targets" Condition="Exists('packages\pthreads.redist.2.9.1.4\build\native\pthreads.redist.targets')" />
+    <Import Project="packages\pthreads.2.9.1.4\build\native\pthreads.targets" Condition="Exists('packages\pthreads.2.9.1.4\build\native\pthreads.targets')" />
   </ImportGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('packages\pthreads.redist.2.9.1.4\build\native\pthreads.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\pthreads.redist.2.9.1.4\build\native\pthreads.redist.targets'))" />
+    <Error Condition="!Exists('packages\pthreads.2.9.1.4\build\native\pthreads.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\pthreads.2.9.1.4\build\native\pthreads.targets'))" />
+  </Target>
 </Project>

@@ -79,6 +79,8 @@ namespace zzalib {
 	string escape_url(string text);
 	// Escape characters - add a '\' before any characters in escapees
 	string escape_string(const string text, const string escapees);
+	// Unescape characters - remove '\'
+	string unescape_string(const string text);
 	// Convert floating degree value to ° ' " (degree, minute, second)
 	string degrees_to_dms(float value, bool is_lat);
 	// Convert lat long pair to gridsquare

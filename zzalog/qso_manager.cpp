@@ -70,7 +70,6 @@ qso_manager::common_grp::common_grp(int X, int Y, int W, int H, const char* labe
 	, item_no_(0)
 	, type_(type)
 	, my_name_("")
-
 {
 	switch (type_) {
 	case ANTENNA: {
@@ -408,10 +407,12 @@ void qso_manager::common_grp::populate_choice() {
 		// If item is currently active or we want to display both active and inactive items
 		// Add the item name to the choice
 		if ((*it).length()) {
-			w->add((*it).c_str());
+			// Escape any slash character 
+			const char* v = escape_string(*it, "/").c_str();
+			w->add(v);
 			if (*it == my_name_) {
 				// If it's the current selection, show it as such
-				w->value((*it).c_str());
+				w->value(v);
 				item_no_ = index;
 				sel_found = true;
 			}
@@ -456,6 +457,7 @@ void qso_manager::common_grp::enable_widgets() {
 	// Set value and style of settings ouput widget
 	char* next_value;
 	Fl_Output* op = (Fl_Output*)op_settings_;
+	qso_manager* dash = ancestor_view<qso_manager>(this);
 	my_settings_->get("Current", next_value, "");
 	if (strcmp(next_value, my_name_.c_str())) {
 		op->textcolor(FL_RED);
@@ -471,16 +473,20 @@ void qso_manager::common_grp::enable_widgets() {
 	op->redraw();
 	free(next_value);
 	// Set values into choice
-	Fl_Input_Choice* ch = (Fl_Input_Choice*)choice_;
-	ch->value(my_name_.c_str());
+	if (!dash->items_changed_) {
+		Fl_Input_Choice* ch = (Fl_Input_Choice*)choice_;
+		ch->value(my_name_.c_str());
+	}
 }
 
 // button callback - add
 // Add the text value of the choice to the list of items - new name is typed into the choice
 void qso_manager::common_grp::cb_bn_add(Fl_Widget* w, void* v) {
 	common_grp* that = ancestor_view<common_grp>(w);
+	qso_manager* dash = ancestor_view<qso_manager>(w);
 	// Get the value in the choice
 	string new_item = ((Fl_Input_Choice*)that->choice_)->value();
+	dash->items_changed_ = true;
 	// Open the QTH dialog
 	button_t result = BN_OK;
 	switch (that->type_) {
@@ -509,6 +515,7 @@ void qso_manager::common_grp::cb_bn_add(Fl_Widget* w, void* v) {
 		break;
 	}
 	}
+
 }
 
 // button callback - delete
@@ -550,6 +557,7 @@ void qso_manager::common_grp::cb_ch_stn(Fl_Widget* w, void* v) {
 	else {
 		// A new item is being typed in the input field - use ADD button to process it
 	}
+	dash->items_changed_ = true;
 }
 
 // Multi-browser callback
@@ -1865,6 +1873,8 @@ void qso_manager::create_form(int X, int Y) {
 	this->resizable(nullptr);
 	this->size(max_x + GAP - X, max_y + GAP - Y);
 	created_ = true;
+
+	enable_widgets();
 }
 
 //// Create scratchpad widgets
@@ -2102,8 +2112,15 @@ void qso_manager::create_use_widgets(int& curr_x, int& curr_y) {
 	w22->callback(cb_bn_use_items, (void*)(long)NEW_ONLY);
 	w22->tooltip("Use items in future QSOs");
 
+	// Use in subsequent QSOs
+	Fl_Button* w23 = new Fl_Button(w22->x(), w22->y() + w22->h(), WBUTTON, HBUTTON, "Cancel");
+	w23->labelfont(FONT);
+	w23->labelsize(FONT_SIZE);
+	w23->callback(cb_bn_use_items, (void*)(long)CANCEL_USE);
+	w23->tooltip("Cancel selection");
+
 	guse->resizable(nullptr);
-	guse->size(GAP + w20->w() + GAP, HTEXT + w20->h() + w21->h() + w22->h() + GAP);
+	guse->size(GAP + w20->w() + GAP, HTEXT + w20->h() + w21->h() + w21->h() + + w22->h() + GAP);
 	guse->end();
 
 	max_w = max(max_w, guse->x() + guse->w() - curr_x);
@@ -3098,7 +3115,11 @@ void qso_manager::cb_bn_use_items(Fl_Widget* w, void* v) {
 		that->qth_grp_->update_settings_name();
 		tabbed_forms_->update_views(nullptr, HT_MINOR_CHANGE, book_->selection());
 		break;
+	case CANCEL_USE:
+		// Do nothing except clear in use flag
+		break;
 	}
+	that->items_changed_ = false;
 }
 
 
@@ -3316,6 +3337,7 @@ void qso_manager::update_rig() {
 		antenna_grp_->name() = "";
 		rig_grp_->name() = "";
 	}
+	enable_use_widgets();
 }
 
 // Called whenever another view updates a record (or selects a new one)

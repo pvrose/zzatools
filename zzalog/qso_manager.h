@@ -77,7 +77,8 @@ namespace zzalog {
 		enum use_item_t {
 			SELECTED_ONLY,
 			SELECTED_NEW,
-			NEW_ONLY
+			NEW_ONLY,
+			CANCEL_USE
 		};
 
 		// Hamlib parameters 
@@ -515,6 +516,8 @@ namespace zzalog {
 		// Reemeber last tx SWR and Power readings to display during receive
 		double last_tx_swr_;
 		double last_tx_pwr_;
+		// Typing into choice - prevent it being overwritten
+		bool items_changed_;
 
 		// Groups
 		common_grp* rig_grp_;

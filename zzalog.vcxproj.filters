@@ -398,6 +398,9 @@
     <ClInclude Include="zzalog\qsl_html_view.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="packages\pthreads.2.9.1.4\build\native\include\pthread.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="zzalog\zzalog.ico">
@@ -408,5 +411,8 @@
     <ResourceCompile Include="zzalog\zzalog.rc">
       <Filter>Source Files</Filter>
     </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>

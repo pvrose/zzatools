@@ -858,6 +858,8 @@ void tidy() {
 	delete import_data_;
 	delete book_;
 	delete intl_dialog_;
+	// This will be used in toolbar_
+	intl_dialog_ = nullptr;
 	delete spec_data_;
 	delete pfx_data_;
 	delete tabbed_forms_;

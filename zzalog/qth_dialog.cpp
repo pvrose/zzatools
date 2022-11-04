@@ -392,62 +392,72 @@ void qth_dialog::cb_ip_cty(Fl_Widget* w, void* v) {
 	qth_info_t* qth = &that->current_qth_;
 	cb_value<Fl_Input, string>(w, v);
 	string* value = (string*)v;
-	// Find prefix
+	// Find prefix - either GM or GM:SCOTLAND
 	size_t pos = zzalib::find(value->c_str(), value->length(), ':');
 	// No colon found
 	string nickname = value->substr(0, pos);
 	// Get the prefix and track up to the DXCC prefix
 	prefix* prefix = pfx_data_->get_prefix(nickname);
-	// Get CQZone - if > 1 supplied then message for now
-	if (prefix->cq_zones_.size() > 1) {
-		string message = "STATION: Multiple CQ Zones: ";
-		for (unsigned int i = 0; i < prefix->cq_zones_.size(); i++) {
-			string zone = to_string(prefix->cq_zones_[i]);
-			message += zone;
+	if (prefix) {
+		// Get CQZone - if > 1 supplied then message for now
+		if (prefix->cq_zones_.size() > 1) {
+			string message = "STATION: Multiple CQ Zones: ";
+			for (unsigned int i = 0; i < prefix->cq_zones_.size(); i++) {
+				string zone = to_string(prefix->cq_zones_[i]);
+				message += zone;
+			}
+			status_->misc_status(ST_WARNING, message.c_str());
+			qth->cq_zone = "";
 		}
-		status_->misc_status(ST_WARNING, message.c_str());
+		else {
+			// Set it in the QTH
+			qth->cq_zone = to_string(prefix->cq_zones_[0]);
+		}
+		// Get ITUZone - if > 1 supplied then message for now
+		if (prefix->itu_zones_.size() > 1) {
+			string message = "STATION: Multiple ITU Zones: ";
+			for (unsigned int i = 0; i < prefix->itu_zones_.size(); i++) {
+				string zone = to_string(prefix->itu_zones_[i]);
+				message += zone;
+			}
+			status_->misc_status(ST_WARNING, message.c_str());
+			qth->itu_zone = "";
+		}
+		else {
+			// Set it in the QTH
+			qth->itu_zone = to_string(prefix->itu_zones_[0]);
+		}
+		// Get Continent - if > 1 supplied then message for now
+		if (prefix->continents_.size() > 1) {
+			string message = "STATION: Multiple Continents: ";
+			for (unsigned int i = 0; i < prefix->continents_.size(); i++) {
+				message += prefix->continents_[i] + "; ";
+			}
+			status_->misc_status(ST_WARNING, message.c_str());
+			qth->continent = "";
+		}
+		else {
+			// Set it in the QTH
+			qth->continent = prefix->continents_[0];
+		}
+		qth->state = prefix->state_;
+		// Track up to DXCC prefix record
+		while (prefix->parent_ != nullptr) {
+			prefix = prefix->parent_;
+		}
+		// Fill in DXCC fields
+		qth->dxcc_id = to_string(prefix->dxcc_code_);
+		qth->dxcc_name = prefix->nickname_ + ": " + prefix->name_;
+	}
+	else {
+		// Not a valid nickname - set fields to blurgh
 		qth->cq_zone = "";
-	}
-	else {
-		// Set it in the QTH
-		qth->cq_zone = to_string(prefix->cq_zones_[0]);
-	}
-	// Get ITUZone - if > 1 supplied then message for now
-	if (prefix->itu_zones_.size() > 1) {
-		string message = "STATION: Multiple ITU Zones: ";
-		for (unsigned int i = 0; i < prefix->itu_zones_.size(); i++) {
-			string zone = to_string(prefix->itu_zones_[i]);
-			message += zone;
-		}
-		status_->misc_status(ST_WARNING, message.c_str());
 		qth->itu_zone = "";
-	}
-	else {
-		// Set it in the QTH
-		qth->itu_zone = to_string(prefix->itu_zones_[0]);
-	}
-	// Get Continent - if > 1 supplied then message for now
-	if (prefix->continents_.size() > 1) {
-		string message = "STATION: Multiple Continents: ";
-		for (unsigned int i = 0; i < prefix->continents_.size(); i++) {
-			message += prefix->continents_[i] + "; ";
-		}
-		status_->misc_status(ST_WARNING, message.c_str());
 		qth->continent = "";
+		qth->state = "";
+		qth->dxcc_id = "";
+		qth->dxcc_name = "";
 	}
-	else {
-		// Set it in the QTH
-		qth->continent = prefix->continents_[0];
-	}
-	qth->state = prefix->state_;
-	// Track up to DXCC prefix record
-	while (prefix->parent_ != nullptr) {
-		prefix = prefix->parent_;
-	}
-	// Fill in DXCC fields
-	qth->dxcc_id = to_string(prefix->dxcc_code_);
-	qth->dxcc_name = prefix->nickname_ + ": " + prefix->name_;
-
 	// Update other widgets
 	that->enable_widgets();
 	that->redraw();

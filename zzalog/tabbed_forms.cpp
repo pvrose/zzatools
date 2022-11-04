@@ -37,7 +37,6 @@ tabbed_forms::tabbed_forms(int X, int Y, int W, int H, const char* label) :
 	Fl_Tabs(X, Y, W, H, label)
 {	
 	forms_.clear();
-	widgets_.clear();
 	labelsize(FONT_SIZE);
 	// create the views -
 	// Full log view - displays selected items of all records
@@ -61,7 +60,7 @@ tabbed_forms::tabbed_forms(int X, int Y, int W, int H, const char* label) :
 	// Memory tble view
 	add_view<ic7300_table>("Rig memories", FO_LAST, OT_MEMORY, "Displays the currently defiend memories in the rig (if supported)");
 	// Documented workround (see Fl_Tabs) to keep label heights constant
-	resizable(widgets_[OT_MAIN]);
+	resizable(forms_[OT_MAIN].w);
 	// Set the callback for changing tabs
 	callback(cb_tab_change);
 	// Set the selected label colour the same as the view being selected
@@ -98,17 +97,22 @@ void tabbed_forms::add_view(const char* label, field_ordering_t column_data, obj
 	// Add the view to the Fl_Tabs widget
 	add(view);
 	// map the object type to the particular instance of view and Fl_Widget (they inherit both)
-	forms_[object] = view;
-	widgets_[object] = view;
+	forms_[object] = { view, view };
 }
 
 // tell all views and others that record(s) have changed and why
 void tabbed_forms::update_views(view* requester, hint_t hint, record_num_t record_1, record_num_t record_2) {
+	// Remeber the records to update non-visible views when they become visible
+	last_record_1 = record_1;
+	last_record_2 = record_2;
 	// Pass to each view in turn - note update() is a method in view.
-	for (auto ix = forms_.begin() ; ix != forms_.end() && !closing_; ix++) {
+	for (auto fx = forms_.begin() ; fx != forms_.end() && !closing_; fx++) {
 		// If the requesting view is this view don't update it, it will have done its own updating
-		if (requester == (void*)0 || requester != ix->second) {
-			ix->second->update(hint, record_1, record_2);
+		if (requester == (void*)0 || requester != fx->second.v) {
+			// Only update a view that is visible
+			if (fx->second.w->visible()) {
+				fx->second.v->update(hint, record_1, record_2);
+			}
 		}
 	}
 	// Update all the other objects that use the current selection
@@ -132,13 +136,18 @@ void tabbed_forms::update_views(view* requester, hint_t hint, record_num_t recor
 
 // Activate or deactivate the named object - if selecting another log_view change the navigation_book_
 void tabbed_forms::activate_pane(object_t pane, bool active) {
+	view* v = forms_[pane].v;
+	Fl_Widget* w = forms_[pane].w;
 	if (active) {
 		// Make the pane active
-		if (!widgets_[pane]->active()) {
-			widgets_[pane]->activate();
+
+		if (!w->active()) {
+			w->activate();
 		}
-		// Select the pane
-		value(widgets_[pane]);
+		// Update and Select the pane
+		v->update(HT_ALL, last_record_1, last_record_2);
+		w->redraw();
+		value(w);
 		selection_color(value()->color());
 		switch (pane) {
 		case OT_MAIN:
@@ -155,11 +164,14 @@ void tabbed_forms::activate_pane(object_t pane, bool active) {
 	else {
 		// "Hide" the object by switching to the main log
 		if (pane != OT_MAIN) {
-			value(widgets_[OT_MAIN]);
+			view* vm = forms_[OT_MAIN].v;
+			Fl_Widget* wm = forms_[OT_MAIN].w;
+			vm->update(HT_ALL, last_record_1, last_record_2);
+			value(wm);
 			selection_color(value()->color());
 			navigation_book_ = book_;
 		}
-		widgets_[pane]->deactivate();
+		w->deactivate();
 	}
 }
 
@@ -167,35 +179,36 @@ void tabbed_forms::activate_pane(object_t pane, bool active) {
 void tabbed_forms::books() {
 	// For each view (as view)
 	for (auto ix = forms_.begin(); ix != forms_.end(); ix++) {
+		view* v = ix->second.v;
 		// Set the particular book into each view
 		switch (ix->first) {
 		case OT_MAIN:
-			ix->second->set_book(book_);
+			v->set_book(book_);
 			break;
 		case OT_RECORD:
-			ix->second->set_book(navigation_book_);
+			v->set_book(navigation_book_);
 			break;
 		case OT_EXTRACT:
-			ix->second->set_book(extract_records_);
+			v->set_book(extract_records_);
 			break;
 		case OT_IMPORT:
-			ix->second->set_book(import_data_);
+			v->set_book(import_data_);
 			break;
 		case OT_DXATLAS:
-			ix->second->set_book(dxatlas_records_);
+			v->set_book(dxatlas_records_);
 		}
 	}
 }
 
 // Returns the specified view
 view* tabbed_forms::get_view(object_t view_name) {
-	return forms_[view_name];
+	return forms_[view_name].v;
 }
 
 // Callback - change selected colour when tab changes
 // v is unused
 void tabbed_forms::cb_tab_change(Fl_Widget* w, void* v) {
-	Fl_Tabs* that = (Fl_Tabs*)w;
+	tabbed_forms* that = (tabbed_forms*)w;
 	// Set the colour to that of the pane
 	that->selection_color(that->value()->color());
 	log_table* table = dynamic_cast<log_table*>(that->value());
@@ -213,24 +226,26 @@ void tabbed_forms::cb_tab_change(Fl_Widget* w, void* v) {
 			break;
 		}
 	}
+	view* as_view = dynamic_cast<view*>(that->value());
+	as_view->update(HT_ALL, that->last_record_1, that->last_record_2);
 }
 
 // Minimum width resizing - sets to the largest minimum width of all the panes
 int tabbed_forms::min_w() {
-	int min_w = 0;
+	int result = 0;
 	// For each view (as view) get its minimum width
 	for (auto ix = forms_.begin(); ix != forms_.end(); ix++) {
-		min_w = max(min_w, ix->second->min_w());
+		result = max(result, ix->second.v->min_w());
 	}
-	return min_w;
+	return result;
 }
 
 // Minimum height resizing - sets to the larges minimum height of all the panes
 int tabbed_forms::min_h() {
-	int min_h = 0;
+	int result = 0;
 	// For each view (as view) get its minimum height
 	for (auto ix = forms_.begin(); ix != forms_.end(); ix++) {
-		min_h = max(min_h, ix->second->min_h());
+		result = max(result, ix->second.v->min_h());
 	}
-	return min_h;
+	return result;
 }

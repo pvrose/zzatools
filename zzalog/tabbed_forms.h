@@ -39,9 +39,14 @@ namespace zzalog {
 		template <class VIEW>
 		void add_view(const char* label, field_ordering_t column_data, object_t object, const char* tooltip);
 		// the contained forms as views
-		map<object_t, view*> forms_;
-		// The contained forms as widgets
-		map<object_t, Fl_Widget*> widgets_;
+		struct view_ptrs {
+			view* v;
+			Fl_Widget* w;
+		};
+		map<object_t, view_ptrs> forms_;
+		// Last records updated
+		record_num_t last_record_1;
+		record_num_t last_record_2;
 	};
 
 }

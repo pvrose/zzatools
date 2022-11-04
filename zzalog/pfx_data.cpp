@@ -100,8 +100,9 @@ void pfx_data::add_pfx_to_nickname(prefix* prefix) {
 
 // Returns the prefix data based on its nickname
 prefix* pfx_data::get_prefix(string nickname) {
-	if (prefixes_by_nickname_.find(nickname) != prefixes_by_nickname_.end()) {
-		return prefixes_by_nickname_[nickname];
+	string n = to_upper(nickname);
+	if (prefixes_by_nickname_.find(n) != prefixes_by_nickname_.end()) {
+		return prefixes_by_nickname_[n];
 	}
 	else {
 		// It's not there return nullptr
@@ -959,7 +960,7 @@ string pfx_data::get_tip(record* record) {
 			prefix* dxcc_pfx = pfx;
 			while (dxcc_pfx->parent_ != nullptr) dxcc_pfx = dxcc_pfx->parent_;
 			// Add explanation of DXCC entity
-			sprintf(temp, "DXCC %s - %s\n", dxcc_pfx->nickname_.c_str(), dxcc_pfx->name_.c_str());
+			sprintf(temp, "\nDXCC %s - %s\n", dxcc_pfx->nickname_.c_str(), dxcc_pfx->name_.c_str());
 			message += temp;
 			if (pfx->parent_ != nullptr) {
 				// If prefix wasn't DXCC - add prefix explanation

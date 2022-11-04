@@ -2062,13 +2062,13 @@ string spec_data::get_tip(const string& field, record* record) {
 		// If the field is valid - get the entry for the field
 		map<string, string>* field_data = fields->data[field];
 		// Start building the tip string
-		string tip = "Field: " + field + "\n";
+		string tip = "Field: " + field + "\n\n";
 		string text;
 		string data = record->item(field);
 		char line[1024];
 		// Entry description
 		text = (*field_data)["Description"];
-		sprintf(line, "Description: %s\n", text.c_str());
+		sprintf(line, "Description: %s\n\n", text.c_str());
 		tip += line;
 		// Entry data type
 		text = (*field_data)["Data Type"];
@@ -2251,6 +2251,7 @@ string spec_data::describe_enumeration(spec_dataset* dataset, string value) {
 				}
 			}
 		}
+		enum_text += "\n";
 	}
 	if (enum_text == "") {
 		// There is no explanation

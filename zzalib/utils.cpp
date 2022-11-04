@@ -485,6 +485,21 @@ string zzalib::escape_string(const string text, const string escapees) {
 	return result;
 }
 
+// Unescape characters - remove the '\' before ant character
+string zzalib::unescape_string(const string text) {
+	// Create a string at least as long as the supplied string
+	string result = "";
+	result.reserve(text.length());
+	// For the length of the string
+	for (size_t i = 0; i < text.length(); i++) {
+		// If the character is '\' do not copy it
+		if (text[i] != '\\') {
+			result += text[i];
+		}
+	}
+	return result;
+}
+
 // Convert a floating point degree value to ° ' " N/E/S/W
 string zzalib::degrees_to_dms(float value, bool is_latitude) {
 	int num_degrees;
