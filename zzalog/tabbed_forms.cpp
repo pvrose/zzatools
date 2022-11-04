@@ -109,9 +109,19 @@ void tabbed_forms::update_views(view* requester, hint_t hint, record_num_t recor
 	for (auto fx = forms_.begin() ; fx != forms_.end() && !closing_; fx++) {
 		// If the requesting view is this view don't update it, it will have done its own updating
 		if (requester == (void*)0 || requester != fx->second.v) {
-			// Only update a view that is visible
-			if (fx->second.w->visible()) {
+			switch (fx->first) {
+			case OT_MAIN:
+			case OT_EXTRACT:
+			case OT_RECORD:
+				// Always update these views
 				fx->second.v->update(hint, record_1, record_2);
+				break;
+			default:
+				// Only update a view that is visible
+				if (fx->second.w->visible()) {
+					fx->second.v->update(hint, record_1, record_2);
+				}
+				break;
 			}
 		}
 	}
@@ -122,12 +132,12 @@ void tabbed_forms::update_views(view* requester, hint_t hint, record_num_t recor
 	} 
 #ifdef _WIN32
 	// Update DxAtlas
-	if (dxa_if_) dxa_if_->update(hint);
+	if (dxa_if_ && dxa_if_->visible()) dxa_if_->update(hint);
 #endif
 	// Update the settngs config dialog
 	if (config_) config_->update();
 	// Update band view
-	if (!rig_if_ && band_view_) {
+	if (!rig_if_ && band_view_ && band_view_->visible()) {
 		band_view_->update(record_1);
 	}
 	// Update qso_manager - avoid recursion

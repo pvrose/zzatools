@@ -105,6 +105,9 @@ namespace zzalog {
 
 		virtual int handle(int event);
 
+		// Extend this to include whether the DxAtlas instance is there and is visible
+		virtual unsigned int visible();
+
 		// Public methods
 		// Standard methods inherited from page_dialog - need to be written for each
 		// Load values from settings_

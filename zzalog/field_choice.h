@@ -25,6 +25,8 @@ namespace zzalog {
 
 	protected:
 		spec_dataset* dataset_;
+		// Drop down list is hierarchic
+		bool hierarchic_;
 
 	};
 

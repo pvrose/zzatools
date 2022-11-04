@@ -282,6 +282,8 @@ namespace zzalog {
 			int add_format_id(string id);
 			// Add new format definition 
 			void add_format_def(int ix, bool tx);
+			// Update frequency output
+			void update_frequency(string freq);
 
 			// Logging mode
 			logging_mode_t logging_mode_;

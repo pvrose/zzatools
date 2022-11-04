@@ -9,9 +9,13 @@ using namespace zzalog;
 extern Fl_Preferences* settings_;
 extern spec_data* spec_data_;
 
+// Lists greater than this will be hierarchic - e.g. "A/ADDRESS" else not so "ADDRESS"
+const int HIERARCHIC_LIMIT = 12;
+
 // Constructor - add selected fields (most common) from the spec database
 field_choice::field_choice(int X, int Y, int W, int H, const char* label) :
 	Fl_Choice(X, Y, W, H, label)
+	, hierarchic_(true)
 {
 }
 
@@ -31,13 +35,25 @@ void field_choice::set_dataset(string dataset_name, string default_field /* = ""
 
 	// For all dataset
 	auto it = dataset_->data.begin();
-	for (int i = 1; it != dataset_->data.end(); i++) {
-		char curr = it->first[0];
-		// generate tree A/ADDRESS etc
-		char entry[128];
-		snprintf(entry, 128, "%c/%s", curr, it->first.c_str());
-		add(entry, 0, (Fl_Callback*)nullptr);
-		it++;
+	if (dataset_->data.size() > HIERARCHIC_LIMIT) {
+		hierarchic_ = true;
+		for (int i = 1; it != dataset_->data.end(); i++) {
+			char curr = it->first[0];
+			// generate tree A/ADDRESS etc
+			char entry[128];
+			snprintf(entry, 128, "%c/%s", curr, it->first.c_str());
+			add(entry, 0, (Fl_Callback*)nullptr);
+			it++;
+		}
+	}
+	else {
+		hierarchic_ = false;
+		for (int i = 1; it != dataset_->data.end(); i++) {
+			char curr = it->first[0];
+			// generate tree A/ADDRESS etc
+			add(it->first.c_str(), 0, (Fl_Callback*)nullptr);
+			it++;
+		}
 	}
 	value(default_field.c_str());
 }
@@ -48,7 +64,7 @@ const char* field_choice::value() {
 	char temp[128];
 	item_pathname(temp, 128);
 	// If there is a value get its leaf text.
-	if (strlen(temp) && temp[0] != 0) {
+	if (hierarchic_ && strlen(temp) && temp[0] != 0) {
 		const char* last_slash = strrchr(temp, '/');
 		strcpy(result, last_slash + 1);
 	}

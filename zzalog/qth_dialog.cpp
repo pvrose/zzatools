@@ -113,6 +113,9 @@ void qth_dialog::load_values() {
 	my_settings_->get("IOTA", temp, "");
 	current_qth_.iota = temp;
 	free(temp);
+	my_settings_->get("Description", temp, "");
+	current_qth_.description = temp;
+	free(temp);
 }
 
 // create the form - additional widgets for QTH settings
@@ -308,10 +311,24 @@ void qth_dialog::create_form(int X, int Y) {
 	ip_iota_->callback(cb_ip_upper, (void*)&current_qth_.iota);
 	ip_iota_->tooltip("Enter IOTA Reference - forms MY_IOTA");
 
-	max_h = max(max_h, Y + HTEXT + 4 * (HBUTTON + HTEXT)) + GAP;
+	max_h = max(max_h, Y + HTEXT + 4 * (HBUTTON + HTEXT));
 	max_w += WIP + GAP;
 	curr_y = Y + max_h;
 	curr_x = X + GAP;
+
+	ip_description_ = new Fl_Input(curr_x, curr_y, WIP * 2 + GAP, HBUTTON, "Description");
+	ip_description_->labelsize(FONT_SIZE);
+	ip_description_->labelfont(FONT);
+	ip_description_->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
+	ip_description_->textfont(FONT);
+	ip_description_->textsize(FONT_SIZE);
+	ip_description_->when(FL_WHEN_RELEASE);
+	ip_description_->value(current_qth_.description.c_str());
+	ip_description_->callback(cb_value<Fl_Input, string>, (void*)&current_qth_.description);
+	ip_description_->tooltip("Enter Description");
+
+	curr_y = ip_description_->y() + ip_description_->h() + GAP;
+	max_h = curr_y;
 
 	// OK Button
 	Fl_Button* bn_ok = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "OK");
@@ -328,7 +345,7 @@ void qth_dialog::create_form(int X, int Y) {
 	bn_cancel->tooltip("Cancel changes");
 
 	max_w = max(max_w, bn_cancel->x() + bn_cancel->w() + GAP);
-	max_h += GAP + HBUTTON + GAP;
+	max_h += HBUTTON + GAP;
 
 	// resize the group accordingly
 	resizable(nullptr);
@@ -356,6 +373,7 @@ void qth_dialog::save_values() {
 	my_settings_->set("ITU Zone", current_qth_.itu_zone.c_str());
 	my_settings_->set("Continent", current_qth_.continent.c_str());
 	my_settings_->set("IOTA", current_qth_.iota.c_str());
+	my_settings_->set("Description", current_qth_.description.c_str());
 
 }
 
@@ -375,6 +393,7 @@ void qth_dialog::enable_widgets() {
 	ip_itu_zone_->value(current_qth_.itu_zone.c_str());
 	ip_cont_->value(current_qth_.continent.c_str());
 	ip_iota_->value(current_qth_.iota.c_str());
+	ip_description_->value(current_qth_.description.c_str());
 }
 
 // Callback that converts what is typed to upper-case

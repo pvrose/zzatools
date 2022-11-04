@@ -39,6 +39,7 @@ namespace zzalog {
 			string itu_zone;       // MY_ITU_ZONE
 			string continent;      // MY_CONT
 			string iota;           // MY_IOTA
+			string description;    // not ADIF
 		};
 
 	public:
@@ -87,6 +88,7 @@ namespace zzalog {
 		Fl_Int_Input* ip_itu_zone_;
 		Fl_Input* ip_cont_;
 		Fl_Input* ip_iota_;
+		Fl_Input* ip_description_;
 
 		// Parameters for each of the QTH input widgets
 		enum input_type {

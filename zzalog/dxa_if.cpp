@@ -2168,6 +2168,17 @@ HRESULT dxa_if::add_label(lat_long_t location, string text) {
 	return S_OK;
 
 }
+
+// Return whether this window is visible AND the DxAtlas map is visible
+unsigned int dxa_if::visible() {
+	unsigned int result = Fl_Widget::visible();
+	if (result != 0) {
+		DxAtlas::IDxMapPtr map = atlas_->GetMap();
+		if (map->GetVisible()) return result;
+	}
+	return 0;
+}
+
 // Create a widget to contain the pin size indication - draw a null box with a circle the correct size (denoted by value)
 dxa_if::pz_widget::pz_widget(int X, int Y, int W, int H) :
 	Fl_Widget(X, Y, W, H, nullptr)

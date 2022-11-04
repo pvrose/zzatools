@@ -260,7 +260,7 @@ void qso_manager::common_grp::create_form(int X, int Y) {
 	ch1_1->menubutton()->textfont(FONT);
 	ch1_1->menubutton()->textsize(FONT_SIZE);
 	choice_ = ch1_1;
-	
+
 	// Row 3
 	// Add or modify this antenna or rig
 	Fl_Button* bn3_1 = new Fl_Button(X + C1, Y + R3, W1B, H3, "Add/Modify");
@@ -408,7 +408,7 @@ void qso_manager::common_grp::populate_choice() {
 		// Add the item name to the choice
 		if ((*it).length()) {
 			// Escape any slash character 
-			const char* v = escape_string(*it, "/").c_str();
+			const char* v = escape_string(*it, "/\\&_").c_str();
 			w->add(v);
 			if (*it == my_name_) {
 				// If it's the current selection, show it as such
@@ -912,7 +912,7 @@ void qso_manager::qso_group::create_form(int X, int Y) {
 		break;
 	}
 	}
-	ip_freq_->value(frequency.c_str());
+	update_frequency(frequency);
 	ch_mode_->set_dataset("Combined", mode);
 	ip_power_->value(power.c_str());
 
@@ -1177,6 +1177,26 @@ void qso_manager::qso_group::update_fields() {
 	}
 }
 
+// Update frequency input
+void qso_manager::qso_group::update_frequency(string frequency) {
+	ip_freq_->value(frequency.c_str());
+	double freq;
+	try {
+		freq = stod(frequency) * 1000;
+	}
+	catch (exception e) {
+		freq = 0.0;
+	}
+	// If the frequency is outside a ham-band, display in red else in black
+	if (band_view_ && !band_view_->in_band(freq)) {
+		ip_freq_->textcolor(FL_RED);
+	}
+	else {
+		ip_freq_->textcolor(FL_BLACK);
+	}
+
+}
+
 // Copy from an existing record (or 
 void qso_manager::qso_group::copy_record(record* old_record) {
 	if (current_qso_) {
@@ -1189,8 +1209,8 @@ void qso_manager::qso_group::copy_record(record* old_record) {
 		update_fields();
 	}
 	else {
-		// Copy FREQ, MODE, TX_PWR, CALL
-		ip_freq_->value(old_record->item("FREQ").c_str());
+		// Copy FREQ, MODE, TX_PWR, CALL 
+		update_frequency(old_record->item("FREQ"));
 		ch_mode_->value(old_record->item("MODE", true).c_str());
 		ip_power_->value(old_record->item("TX_PWR").c_str());
 	}
@@ -1199,7 +1219,7 @@ void qso_manager::qso_group::copy_record(record* old_record) {
 // Copy fields from CAT
 void qso_manager::qso_group::copy_cat() {
 	// Get frequency, mode and transmit power from rig
-	ip_freq_->value(rig_if_->get_frequency(true).c_str());
+	update_frequency(rig_if_->get_frequency(true));
 	// Get mode - NB USB/LSB need further processing
 	string mode;
 	string submode;
@@ -1212,8 +1232,7 @@ void qso_manager::qso_group::copy_cat() {
 
 // Clear fields
 void qso_manager::qso_group::clear_qso() {
-	ip_freq_->color(FL_RED);
-	ip_freq_->value("0");
+	update_frequency("0");
 	ch_mode_->value(0);
 	ip_power_->value("0");
 	ip_call_->value("");
@@ -3231,15 +3250,7 @@ bool qso_manager::qso_in_progress() {
 
 // Called when rig is read to update values here
 void qso_manager::rig_update(string frequency, string mode, string power) {
-	qso_group_->ip_freq_->value(frequency.c_str());
-	double freq = stod(frequency) * 1000;
-	// If the frequency is outside a ham-band, display in red else in black
-	if (band_view_ && !band_view_->in_band(freq)) {
-		qso_group_->ip_freq_->textcolor(FL_RED);
-	}
-	else {
-		qso_group_->ip_freq_->textcolor(FL_BLACK);
-	}
+	qso_group_->update_frequency(frequency);
 	// Power in watts
 	qso_group_->ip_power_->value(power.c_str());
 	// Mode - index into choice
@@ -3266,7 +3277,7 @@ void qso_manager::update_rig() {
 				rig_grp_->name() = rig_name;
 				rig_grp_->populate_choice();
 			}
-			qso_group_->ip_freq_->value(rig_if_->get_frequency(true).c_str());
+			qso_group_->update_frequency(rig_if_->get_frequency(true));
 			qso_group_->ip_power_->value(rig_if_->get_tx_power().c_str());
 			string mode;
 			string submode;
@@ -3280,12 +3291,6 @@ void qso_manager::update_rig() {
 			}
 			if (band_view_) {
 				double freq = stod(rig_if_->get_frequency(true)) * 1000.0;
-				if (band_view_->in_band(freq)) {
-					qso_group_->ip_freq_->textcolor(FL_BLACK);
-				}
-				else {
-					qso_group_->ip_freq_->textcolor(FL_RED);
-				}
 				band_view_->update(freq);
 				prev_freq_ = freq;
 			}
@@ -3303,17 +3308,7 @@ void qso_manager::update_rig() {
 			qso_group_->update_fields();
 		}
 		// Assume as it's a logged record, the frequency is valid - NOT!
-		if (band_view_) {
-			double freq = stod(prev_record->item("FREQ")) * 1000.0;
-			if (band_view_->in_band(freq)) {
-				qso_group_->ip_freq_->textcolor(FL_BLACK);
-			}
-			else {
-				qso_group_->ip_freq_->textcolor(FL_RED);
-			}
-			prev_freq_ = freq;
-		}
-		qso_group_->ip_freq_->value(prev_record->item("FREQ").c_str());
+		qso_group_->update_frequency(prev_record->item("FREQ"));
 		qso_group_->ip_power_->value(prev_record->item("TX_PWR").c_str());
 		qso_group_->ch_mode_->value(prev_record->item("MODE", true).c_str());
 		if (band_view_ && prev_record->item_exists("FREQ")) {
@@ -3330,8 +3325,7 @@ void qso_manager::update_rig() {
 	}
 	default:
 		// No default
-		qso_group_->ip_freq_->textcolor(FL_RED);
-		qso_group_->ip_freq_->value("0");
+		qso_group_->update_frequency("0");
 		qso_group_->ip_power_->value("0");
 		qso_group_->ch_mode_->value(0);
 		antenna_grp_->name() = "";
