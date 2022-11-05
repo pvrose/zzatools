@@ -60,6 +60,8 @@ void add_rig_if();
 extern double prev_freq_;
 extern bool read_only_;
 
+const char* ESCAPEES = "&/\\_";
+
 // constructor 
 qso_manager::common_grp::common_grp(int X, int Y, int W, int H, const char* label, item_t type)
 	: Fl_Group(X, Y, W, H, label)
@@ -111,7 +113,7 @@ void qso_manager::common_grp::load_values() {
 	// Get the current item
 	char * text;
 	my_settings_->get("Current", text, "");
-	my_name_ = text;
+	my_name_ = unescape_string(text);
 	free(text);
 	all_items_.clear();
 	string bands;
@@ -122,8 +124,9 @@ void qso_manager::common_grp::load_values() {
 		if (name.length()) {
 			Fl_Preferences item_settings(*my_settings_, name.c_str());
 			char* temp;
-			all_items_.push_back(name);
-			item_data& info = item_info_[name];
+			string true_name = unescape_string(name);
+			all_items_.push_back(true_name);
+			item_data& info = item_info_[true_name];
 			switch (type_) {
 			case RIG:
 				// Get the CAT interface parameters
@@ -328,7 +331,7 @@ void qso_manager::common_grp::save_values() {
 	int index = 0;
 	// For each item
 	for (auto it = item_info_.begin(); it != item_info_.end(); it++) {
-		string name = (*it).first;
+		string name = escape_string((*it).first, ESCAPEES);
 		item_data& info = (*it).second;
 		Fl_Preferences item_settings(my_settings_, name.c_str());
 
@@ -408,11 +411,11 @@ void qso_manager::common_grp::populate_choice() {
 		// Add the item name to the choice
 		if ((*it).length()) {
 			// Escape any slash character 
-			const char* v = escape_string(*it, "/\\&_").c_str();
-			w->add(v);
+			string s = escape_string(*it, ESCAPEES);
+			w->add(s.c_str());
 			if (*it == my_name_) {
 				// If it's the current selection, show it as such
-				w->value(v);
+				w->value((*it).c_str());
 				item_no_ = index;
 				sel_found = true;
 			}
@@ -421,7 +424,7 @@ void qso_manager::common_grp::populate_choice() {
 	}
 	if (!sel_found && my_name_.length()) {
 		// Selected item not found. Add it to the various lists
-		w->add(my_name_.c_str());
+		w->add(escape_string(my_name_, ESCAPEES).c_str());
 		w->value(my_name_.c_str());
 	}
 	w->textsize(FONT_SIZE);
@@ -484,15 +487,13 @@ void qso_manager::common_grp::enable_widgets() {
 void qso_manager::common_grp::cb_bn_add(Fl_Widget* w, void* v) {
 	common_grp* that = ancestor_view<common_grp>(w);
 	qso_manager* dash = ancestor_view<qso_manager>(w);
-	// Get the value in the choice
-	string new_item = ((Fl_Input_Choice*)that->choice_)->value();
 	dash->items_changed_ = true;
 	// Open the QTH dialog
 	button_t result = BN_OK;
 	switch (that->type_) {
 	case QTH:
 	{
-		qth_dialog* dialog = new qth_dialog(new_item);
+		qth_dialog* dialog = new qth_dialog(that->my_name_);
 		result = dialog->display();
 	}
 	}
@@ -500,9 +501,8 @@ void qso_manager::common_grp::cb_bn_add(Fl_Widget* w, void* v) {
 	case BN_OK:
 	{
 		// Set it active (and add it if it's not there)
-		that->all_items_.push_back(new_item);
+		that->all_items_.push_back(that->my_name_);
 
-		that->my_name_ = new_item;
 		that->enable_widgets();
 		that->populate_choice();
 		tabbed_forms_->update_views(nullptr, HT_LOCATION, -1);
@@ -540,11 +540,11 @@ void qso_manager::common_grp::cb_ch_stn(Fl_Widget* w, void* v) {
 	common_grp* that = ancestor_view<common_grp>(ch);
 	qso_manager* dash = ancestor_view<qso_manager>(that);
 	if (ch->menubutton()->changed()) {
-		// Get the new item from the menu
+		// Get the new item from the menu - note menu has escaped '/' and '&'
 		that->item_no_ = ch->menubutton()->value();
-		that->my_name_ = ch->menubutton()->text();
+		that->my_name_ = unescape_string(ch->menubutton()->text());
 		item_data& info = that->item_info_[that->my_name_];
-		// Update the shared choice value
+		// Update the shared choice value to the unescaped version
 		ch->value(that->my_name_.c_str());
 		switch (that->type_) {
 		case RIG:
@@ -556,6 +556,9 @@ void qso_manager::common_grp::cb_ch_stn(Fl_Widget* w, void* v) {
 	}
 	else {
 		// A new item is being typed in the input field - use ADD button to process it
+		// New item has unescaped '/' and '&' characters
+		that->item_no_ = -1;
+		that->my_name_ = ch->value();
 	}
 	dash->items_changed_ = true;
 }
