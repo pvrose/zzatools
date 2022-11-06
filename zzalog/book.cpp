@@ -1000,7 +1000,16 @@ bool book::basic_match(record* record) {
 		break;
 	case XC_DXCC:
 		// all numeric so its a DXCC code
-		return match_int(criteria_->pattern, criteria_->comparator, record->item("DXCC"));
+		if (is_integer(criteria_->pattern)) {
+			return match_int(criteria_->pattern, criteria_->comparator, record->item("DXCC"));
+		}
+		else {
+			// Treat as a nickname
+			prefix* dxcc_pfx = pfx_data_->get_prefix(criteria_->pattern);
+			if (dxcc_pfx != nullptr && dxcc_pfx->dxcc_code_ != 0) {
+				return match_string(to_string(dxcc_pfx->dxcc_code_), criteria_->comparator, record->item("DXCC"));
+			}
+		}
 		break;
 	case XC_FIELD:
 		// match by a specified field
@@ -1098,27 +1107,30 @@ bool book::match_string(string test, search_comp_t comparator, string value) {
 // integer item matching - ignores things like leading zeros and trailing non numeric characters
 bool book::match_int(string value, search_comp_t comparator, string test) {
 	try {
-		switch (comparator) {
-		case XP_NE:
-			return (value.length() > 0 && test.length() > 0 && stoi(value) != stoi(test));
-		case XP_LT:
-			return (value.length() > 0 && test.length() > 0 && stoi(value) < stoi(test));
-		case XP_LE:
-			return (value.length() > 0 && test.length() > 0 && stoi(value) <= stoi(test));
-		case XP_EQ:
-			return (value.length() > 0 && test.length() > 0 && stoi(value) == stoi(test));
-		case XP_GE:
-			return (value.length() > 0 && test.length() > 0 && stoi(value) >= stoi(test));
-		case XP_GT:
-			return (value.length() > 0 && test.length() > 0 && stoi(value) > stoi(test));
-		}
-		return (test.length() > 0 && value.length() > 0 && stoi(test) == stoi(value));
-	} 
-	// Not an integer value so mismatch
+		return match_int(stoi(value), comparator, stoi(test));
+	}
 	catch (const invalid_argument&) {
 		return false;
 	}
+}
 
+// integer item matching - integer vs integer
+bool book::match_int(int value, search_comp_t comparator, int test) {
+	switch (comparator) {
+	case XP_NE:
+		return (value != test);
+	case XP_LT:
+		return (value < test);
+	case XP_LE:
+		return (value <= test);
+	case XP_EQ:
+		return (value == test);
+	case XP_GE:
+		return (value >= test);
+	case XP_GT:
+		return (value > test);
+	}
+	return (test == value);
 }
 
 // Returns the position of the next record that matches search criterion

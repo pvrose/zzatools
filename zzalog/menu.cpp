@@ -1087,13 +1087,12 @@ void menu::cb_mi_ext_clr(Fl_Widget* w, void* v) {
 void menu::cb_mi_ext_crit(Fl_Widget* w, void* v) {
 	// Open search dialog
 	search_dialog* dialog = new search_dialog;
-	bool do_extract = true;
-	while (do_extract && dialog->display() == BN_OK) {
+	while (dialog->display() == BN_OK) {
 		// Extract the records
 		search_criteria_t criteria = *dialog->criteria();
 		if (extract_records_->criteria(criteria)) {
-			// Successful
-			do_extract = false;
+			// Successful - clear fail message
+			dialog->fail("");
 			tabbed_forms_->activate_pane(OT_EXTRACT, true);
 			navigation_book_->selection(0, HT_EXTRACTION);
 		}

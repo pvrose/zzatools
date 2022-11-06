@@ -376,6 +376,16 @@ string zzalib::to_lower(const string& data) {
 	return ret_value;
 }
 
+// Check a while string is an integer
+bool zzalib::is_integer(const string& data) {
+	bool result = true;
+	const char* src = data.c_str();
+	while (*src != 0 && result) {
+		result = isdigit(*src++);
+	}
+	return result;
+}
+
 // Search for any characters in match (assume its zero-terminated)
 size_t zzalib::find(const char* data, size_t length, const char* match) {
 	size_t pos = length;

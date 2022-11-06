@@ -155,8 +155,6 @@ void tabbed_forms::activate_pane(object_t pane, bool active) {
 			w->activate();
 		}
 		// Update and Select the pane
-		v->update(HT_ALL, last_record_1, last_record_2);
-		w->redraw();
 		value(w);
 		selection_color(value()->color());
 		switch (pane) {
@@ -169,6 +167,14 @@ void tabbed_forms::activate_pane(object_t pane, bool active) {
 		case OT_IMPORT:
 			navigation_book_ = import_data_;
 			break;
+		case OT_RECORD:
+			// Do nothing when activating report pane
+			break;
+		default:
+			// Other panes may not have been updated
+			v->update(HT_ALL, last_record_1, last_record_2);
+			w->redraw();
+			break;
 		}
 	}
 	else {
@@ -176,7 +182,6 @@ void tabbed_forms::activate_pane(object_t pane, bool active) {
 		if (pane != OT_MAIN) {
 			view* vm = forms_[OT_MAIN].v;
 			Fl_Widget* wm = forms_[OT_MAIN].w;
-			vm->update(HT_ALL, last_record_1, last_record_2);
 			value(wm);
 			selection_color(value()->color());
 			navigation_book_ = book_;

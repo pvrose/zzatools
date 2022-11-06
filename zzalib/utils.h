@@ -70,6 +70,8 @@ namespace zzalib {
 	string to_upper(const string& data);
 	// Create lower version of a string
 	string to_lower(const string& data);
+	// Check the whole string is an integer
+	bool is_integer(const string& data);
 	// Limited string search - return the position of the sought char(s) or length if not present
 	size_t find(const char* data, size_t length, const char* match);
 	size_t find(const char* data, size_t length, const char match);

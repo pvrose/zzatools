@@ -127,6 +127,7 @@ namespace zzalog {
 		bool match_string(string test, search_comp_t comparator, string value);
 		// item matching - integer
 		bool match_int(string test, search_comp_t comparator, string value);
+		bool match_int(int test, search_comp_t comparator, int value);
 		// get book type
 		object_t book_type();
 		// set book type

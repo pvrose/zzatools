@@ -853,7 +853,7 @@ void log_table::describe_cell(int item, int col) {
 		break;
 	default:
 		// NB. We do not map items numbers to record numbers for sorted displays
-		tip = "Cannot provide tip for sorted displays!";
+		item_number = item;
 		break;
 	}
 	if (tip.length() == 0) {

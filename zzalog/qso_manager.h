@@ -202,6 +202,8 @@ namespace zzalog {
 			string settings_name_;
 			// Set current settings to name
 			void update_settings_name();
+			// Update name and selecton
+			void update_choice(string name);
 		};
 
 		// Class for QSO group of widgets

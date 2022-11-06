@@ -604,6 +604,14 @@ void qso_manager::common_grp::update_settings_name() {
 	my_settings_->set("Current", my_name_.c_str());
 }
 
+// Update name and reset choice values
+void qso_manager::common_grp::update_choice(string name) {
+	if (name.length()) {
+		my_name_ = name;
+		populate_choice();
+	}
+}
+
 // qso_group_
 qso_manager::qso_group::qso_group(int X, int Y, int W, int H, const char* l) :
 	Fl_Group(X, Y, W, H, l)
@@ -3096,7 +3104,7 @@ void qso_manager::cb_bn_connect(Fl_Widget* w, void* v) {
 		}
 		break;
 	}
-	that->enable_widgets();
+	that->update_rig();
 }
 
 // Callback for use items button
@@ -3343,15 +3351,18 @@ void qso_manager::update_qso() {
 	if (qso_in_progress() && prev_record == qso_group_->current_qso_) {
 		// Update the view if another view changes the record
 		qso_group_->update_fields();
-		antenna_grp_->name() = prev_record->item("MY_ANTENNA");
-		antenna_grp_->populate_choice();
-		rig_grp_->name() = prev_record->item("MY_RIG");
-		rig_grp_->populate_choice();
-		callsign_grp_->name() = prev_record->item("STATION_CALLSIGN");
+		antenna_grp_->update_choice(prev_record->item("MY_ANTENNA"));
+		rig_grp_->update_choice(prev_record->item("MY_RIG"));
+		callsign_grp_->update_choice(prev_record->item("STATION_CALLSIGN"));
+		qth_grp_->update_choice(prev_record->item("APP_ZZA_QTH"));
 	}
 	else if (qso_group_->current_qso_ == nullptr) {
 		// Not actively recording a QSO, update displayed fields
 		qso_group_->copy_record(prev_record);
+		antenna_grp_->update_choice(prev_record->item("MY_ANTENNA"));
+		rig_grp_->update_choice(prev_record->item("MY_RIG"));
+		callsign_grp_->update_choice(prev_record->item("STATION_CALLSIGN"));
+		qth_grp_->update_choice(prev_record->item("APP_ZZA_QTH"));
 	}
 }
 
