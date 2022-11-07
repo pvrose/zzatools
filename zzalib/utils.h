@@ -77,8 +77,10 @@ namespace zzalib {
 	size_t find(const char* data, size_t length, const char match);
 	size_t find_substr(const char* data, size_t length, const char* match, size_t len_substr);
 	size_t find_not(const char* data, size_t length, const char* match);
-	// Escape certain characters (when generating URLs
+	// Escape certain characters (when generating URLs)
+	string escape_hex(string text, bool allow, const char* chars);
 	string escape_url(string text);
+	string unescape_hex(string text);
 	// Escape characters - add a '\' before any characters in escapees
 	string escape_string(const string text, const string escapees);
 	// Unescape characters - remove '\'

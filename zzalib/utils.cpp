@@ -457,15 +457,16 @@ size_t zzalib::find_not(const char* data, size_t length, const char* match) {
 	return pos;
 }
 
-// Escape the non-usable characters in a url - not alphanumeric replace with %nnx 
-string zzalib::escape_url(string url)
+// Replace charatceters with %nnx if not in chars (allow) or in chars (~allow)
+string zzalib::escape_hex(string text, bool allow, const char* chars)
 {
 	string result = "";
 	// For the length of the string
-	for (size_t i = 0; i < url.length(); i++) {
-		char c = url[i];
-		// Is the character alphanumeric
-		if ((c >= '0' && c <= '9') || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')) {
+	for (size_t i = 0; i < text.length(); i++) {
+		char c = text[i];
+		// Is the character in the search string
+		const char* pos = strchr(chars, c);
+		if ((pos != nullptr && allow) || (pos == nullptr && !allow)) {
 			// Use it directly
 			result += c;
 		}
@@ -475,6 +476,39 @@ string zzalib::escape_url(string url)
 			snprintf(escape, 5, "%%%02x", c);
 			result += escape;
 		}
+	}
+	return result;
+}
+
+// Escape the non-usable characters in a url - not alphanumeric replace with %nnx 
+string zzalib::escape_url(string url) {
+	return escape_hex(url, true, "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
+}
+
+// Convert from %nn to ASCII character
+string zzalib::unescape_hex(string text) {
+	string result = "";
+	result.reserve(text.length());
+	const char* src = text.c_str();
+	// For the length of the string
+	while (*src) {
+		if (*src == '%') {
+			unsigned char c = 0;
+			src++;
+			if (*src >= '0' && *src <= '9') c += (*src - '0');
+			else  if (*src >= 'a' && *src <= 'f') c += (*src - 'a' + 10);
+			else if (*src >= 'A' && *src <= 'F') c += (*src - 'A' + 10);
+			c *= 16;
+			src++;
+			if (*src >= '0' && *src <= '9') c += (*src - '0');
+			else  if (*src >= 'a' && *src <= 'f') c += (*src - 'a' + 10);
+			else if (*src >= 'A' && *src <= 'F') c += (*src - 'A' + 10);
+			result += c;
+		}
+		else {
+			result += *src;
+		}
+		src++;
 	}
 	return result;
 }

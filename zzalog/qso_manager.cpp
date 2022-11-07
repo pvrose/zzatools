@@ -60,7 +60,46 @@ void add_rig_if();
 extern double prev_freq_;
 extern bool read_only_;
 
-const char* ESCAPEES = "&/\\_";
+// item_choice - converts "/" to "\/" and "&" to "&&"
+void qso_manager::common_grp::item_choice::add(const char* text) {
+	int len = strlen(text) * 2 + 1;
+	char* escaped = new char[len];
+	memset(escaped, 0, len);
+	const char* src = text;
+	char* dest = escaped;
+	while (*src) {
+		switch (*src) {
+		case '/':
+			*dest++ = '\\';
+			break;
+		case '&':
+			*dest++ = '&';
+			break;
+		}
+		*dest++ = *src++;
+	}
+	Fl_Input_Choice::add(escaped);
+	delete[] escaped;
+}
+
+// Strips out '\' and first '&' characters
+const char* qso_manager::common_grp::item_choice::text() {
+	const char* src = menubutton()->text();
+	int len = strlen(src) + 1;
+	char* unescaped = new char[len];
+	memset(unescaped, 0, len);
+	char* dest = unescaped;
+	while (*src) {
+		switch (*src) {
+		case '\\':
+		case '&':
+			src++;
+			break;
+		}
+		*dest++ = *src++;
+	}
+	return unescaped;
+}
 
 // constructor 
 qso_manager::common_grp::common_grp(int X, int Y, int W, int H, const char* label, item_t type)
@@ -109,14 +148,28 @@ void qso_manager::common_grp::load_values() {
 	Fl_Preferences stations_settings(settings_, "Stations");
 	my_settings_ = new Fl_Preferences(stations_settings, settings_name_.c_str());
 	// Number of items described in settings
-	int num_items = my_settings_->groups();
 	// Get the current item
 	char * text;
 	my_settings_->get("Current", text, "");
-	my_name_ = unescape_string(text);
+	my_name_ = text;
 	free(text);
 	all_items_.clear();
+	// Callsigns are kept as entries not groups
+	int num_entries = my_settings_->entries();
+	for (int i = 1; i < num_entries; i++) {
+		switch (type_) {
+		case CALLSIGN:
+		{
+			char name[10];
+			snprintf(name, 10, "Call%d", i);
+			my_settings_->get(name, text, "");
+			all_items_.push_back(string(text));
+		}
+		}
+	}
+
 	string bands;
+	int num_items = my_settings_->groups();
 	// For each item in the Antenna or rig settings
 	for (int i = 0; i < num_items; i++) {
 		// Get that item's settings
@@ -124,7 +177,7 @@ void qso_manager::common_grp::load_values() {
 		if (name.length()) {
 			Fl_Preferences item_settings(*my_settings_, name.c_str());
 			char* temp;
-			string true_name = unescape_string(name);
+			string true_name = unescape_hex(name);
 			all_items_.push_back(true_name);
 			item_data& info = item_info_[true_name];
 			switch (type_) {
@@ -255,7 +308,7 @@ void qso_manager::common_grp::create_form(int X, int Y) {
 
 	// Row 2
 	// Choice to select or add new antenna or rig
-	Fl_Input_Choice* ch1_1 = new Fl_Input_Choice(X + C1, Y + R2, W1A, H2);
+	item_choice* ch1_1 = new item_choice(X + C1, Y + R2, W1A, H2);
 	ch1_1->textsize(FONT_SIZE);
 	ch1_1->callback(cb_ch_stn, nullptr);
 	ch1_1->when(FL_WHEN_CHANGED);
@@ -326,17 +379,17 @@ void qso_manager::common_grp::save_values() {
 		break;
 	}
 
-	my_settings_->set("Current", my_name_.c_str());
+	my_settings_->set("Current", escape_hex(my_name_, false, "/%").c_str());
 
 	int index = 0;
 	// For each item
 	for (auto it = item_info_.begin(); it != item_info_.end(); it++) {
-		string name = escape_string((*it).first, ESCAPEES);
+		string name = (*it).first;
 		item_data& info = (*it).second;
-		Fl_Preferences item_settings(my_settings_, name.c_str());
 
 		switch (type_) {
 		case RIG: {
+			Fl_Preferences item_settings(my_settings_, name.c_str());
 			// set the intended bands
 			string bands = "";
 			// Store all the bands intended to be used with this rig/antenna
@@ -376,7 +429,7 @@ void qso_manager::common_grp::save_values() {
 			break;
 		}
 		case ANTENNA: {
-			// set the intended bands
+			Fl_Preferences item_settings(my_settings_, name.c_str());
 			string bands = "";
 			// Store all the bands intended to be used with this rig/antenna
 			for (auto itb = info.intended_bands.begin(); itb != info.intended_bands.end(); itb++) {
@@ -387,7 +440,14 @@ void qso_manager::common_grp::save_values() {
 			item_settings.set("Intended Bands", bands.c_str());
 			break;
 		}
-		case CALLSIGN:
+		case CALLSIGN: {
+			index++;
+			char id[10];
+			snprintf(id, 10, "Call%d", index);
+			my_settings_->set(id, name.c_str());
+			break;
+		}
+
 		case QTH:
 		{
 			// No additional data - in QTH case save by separate dialog
@@ -399,7 +459,7 @@ void qso_manager::common_grp::save_values() {
 
 // Populate the item selector
 void qso_manager::common_grp::populate_choice() {
-	Fl_Input_Choice* w = (Fl_Input_Choice*)choice_;
+	item_choice* w = (item_choice*)choice_;
 	w->clear();
 	int index = 0;
 	bool sel_found = false;
@@ -410,9 +470,7 @@ void qso_manager::common_grp::populate_choice() {
 		// If item is currently active or we want to display both active and inactive items
 		// Add the item name to the choice
 		if ((*it).length()) {
-			// Escape any slash character 
-			string s = escape_string(*it, ESCAPEES);
-			w->add(s.c_str());
+			w->add((*it).c_str());
 			if (*it == my_name_) {
 				// If it's the current selection, show it as such
 				w->value((*it).c_str());
@@ -424,7 +482,7 @@ void qso_manager::common_grp::populate_choice() {
 	}
 	if (!sel_found && my_name_.length()) {
 		// Selected item not found. Add it to the various lists
-		w->add(escape_string(my_name_, ESCAPEES).c_str());
+		w->add(my_name_.c_str());
 		w->value(my_name_.c_str());
 	}
 	w->textsize(FONT_SIZE);
@@ -477,7 +535,7 @@ void qso_manager::common_grp::enable_widgets() {
 	free(next_value);
 	// Set values into choice
 	if (!dash->items_changed_) {
-		Fl_Input_Choice* ch = (Fl_Input_Choice*)choice_;
+		item_choice* ch = (item_choice*)choice_;
 		ch->value(my_name_.c_str());
 	}
 }
@@ -522,7 +580,7 @@ void qso_manager::common_grp::cb_bn_add(Fl_Widget* w, void* v) {
 void qso_manager::common_grp::cb_bn_del(Fl_Widget* w, void* v) {
 	common_grp* that = ancestor_view<common_grp>(w);
 	// Get the selected item name
-	string item = ((Fl_Input_Choice*)that->choice_)->menubutton()->text();
+	string item = ((item_choice*)that->choice_)->text();
 	// Remove the item
 	that->all_items_.remove(item);
 	// TODO: For now display the first element
@@ -536,13 +594,13 @@ void qso_manager::common_grp::cb_bn_del(Fl_Widget* w, void* v) {
 // v is unused
 void qso_manager::common_grp::cb_ch_stn(Fl_Widget* w, void* v) {
 	// Input_Choice is a descendant of common_grp
-	Fl_Input_Choice* ch = ancestor_view<Fl_Input_Choice>(w); 
+	item_choice* ch = ancestor_view<item_choice>(w); 
 	common_grp* that = ancestor_view<common_grp>(ch);
 	qso_manager* dash = ancestor_view<qso_manager>(that);
 	if (ch->menubutton()->changed()) {
 		// Get the new item from the menu - note menu has escaped '/' and '&'
 		that->item_no_ = ch->menubutton()->value();
-		that->my_name_ = unescape_string(ch->menubutton()->text());
+		that->my_name_ = ch->text();
 		item_data& info = that->item_info_[that->my_name_];
 		// Update the shared choice value to the unescaped version
 		ch->value(that->my_name_.c_str());
@@ -585,8 +643,8 @@ void qso_manager::common_grp::cb_mb_bands(Fl_Widget* w, void* v) {
 // Item choice call back
 // v is value selected
 void qso_manager::common_grp::cb_ch_item(Fl_Widget* w, void* v) {
-	Fl_Input_Choice* ipch = ancestor_view<Fl_Input_Choice>(w);
-	cb_value<Fl_Input_Choice, string>(ipch, v);
+	item_choice* ipch = ancestor_view<item_choice>(w);
+	cb_value<item_choice, string>(ipch, v);
 	common_grp* that = ancestor_view<common_grp>(w);
 	that->save_values();
 	that->populate_band();

@@ -143,7 +143,17 @@ namespace zzalog {
 		class common_grp :
 			public Fl_Group
 		{
-
+			class item_choice :
+				public Fl_Input_Choice
+			{
+			public:
+				item_choice(int X, int Y, int W, int H, const char* L = nullptr) :
+					Fl_Input_Choice(X, Y, W, H, L) {}
+				// Add escaping '/' and '&' characters
+				void add(const char* label);
+				// Remove above escapes from menubutton::text()
+				const char* text();
+			};
 
 		public:
 
@@ -204,6 +214,7 @@ namespace zzalog {
 			void update_settings_name();
 			// Update name and selecton
 			void update_choice(string name);
+
 		};
 
 		// Class for QSO group of widgets
