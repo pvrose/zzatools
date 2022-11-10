@@ -121,6 +121,7 @@ bool closing_ = false;
 bool initialised_ = false;
 // Time loaded
 time_t session_start_ = (time_t)0;
+time_t previous_start_ = (time_t)0;
 // Close caused by an SEVERE or FATAL error
 bool close_by_error_ = false;
 // Previous frequency
@@ -380,6 +381,8 @@ void set_session_start() {
 	settings_->get("Session End", p_last, &today, sizeof(time_t));
 	time_t last_session_end = *(time_t*)p_last;
 	char action[100];
+	settings_->get("Session Start", p_last, &today, sizeof(time_t));
+	previous_start_ = *(time_t*)p_last;
 	if (difftime(today, last_session_end) > 3600.0) {
 		// It is > 60 minutes since we last saved a record - new session
 		session_start_ = today;
@@ -389,8 +392,7 @@ void set_session_start() {
 	}
 	else {
 		// Restore previous session's start time
-		settings_->get("Session Start", p_last, &today, sizeof(time_t));
-		session_start_ = *(time_t*)p_last;
+		session_start_ = previous_start_;
 		strcpy(action, "Resuming session");
 		resuming_ = true;
 	}

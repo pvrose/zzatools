@@ -97,6 +97,8 @@ namespace zzalog {
 		button_t button_;
 		// pending OK/CANCEL
 		bool pending_button_;
+		// List of repositionalble widgets
+		list<Fl_Widget*> rep_widgets_;
 	};
 
 }

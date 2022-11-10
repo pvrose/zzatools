@@ -75,6 +75,7 @@ dxa_if::dxa_if() :
 	, projection_(DxAtlas::PRJ_RECTANGULAR)
 	, pin_size_(3)
 	, selected_locn_({ 0.0, 0.0 })
+	, display_all_colours_(false)
 {
 	records_to_display_.clear();
 	colours_used_.clear();
@@ -418,6 +419,14 @@ void dxa_if::create_form() {
 	colour_grp_->labelfont(FONT);
 	colour_grp_->labelsize(FONT_SIZE);
 	colour_grp_->align(FL_ALIGN_TOP | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
+
+	Fl_Light_Button* bn_colour_all = new Fl_Light_Button(EDGE + GAP + WBUTTON, colour_grp_->y() + HTEXT, WBUTTON, HBUTTON, "All colours");
+	bn_colour_all->labelfont(FONT);
+	bn_colour_all->labelsize(FONT_SIZE);
+	bn_colour_all->align(FL_ALIGN_CENTER);
+	bn_colour_all->callback(cb_colour_all, &display_all_colours_);
+	bn_colour_all->selection_color(FL_RED);
+	bn_colour_all->value(display_all_colours_);
 	
 	Fl_Button* bn_set_all = new Fl_Button(EDGE + GAP+ WBUTTON + WBUTTON, colour_grp_->y() + HTEXT, WBUTTON, HBUTTON, "Set all");
 	bn_set_all->labelfont(FONT);
@@ -701,6 +710,14 @@ void dxa_if::cb_bn_all(Fl_Widget* w, void* v) {
 	for (size_t i = 0; i < that->colour_enables_.size(); i++) {
 		that->colour_enables_[i] = enable;
 	}
+	that->enable_widgets();
+	that->draw_pins();
+}
+
+// Use all colours selected
+void dxa_if::cb_colour_all(Fl_Widget* w, void* v) {
+	dxa_if* that = ancestor_view<dxa_if>(w);
+	cb_value<Fl_Light_Button, bool>(w, v);
 	that->enable_widgets();
 	that->draw_pins();
 }
@@ -1524,7 +1541,7 @@ void dxa_if::draw_pins() {
 			colours_used.clear();
 
 			// For all the wanted colours
-			for (int colour_layer = 0; colour_layer < (signed)colours_used_.size(); colour_layer++) {
+			for (int colour_layer = 0, real_colour = 0; colour_layer < (signed)colours_used_.size(); colour_layer++) {
 				// Get the text associated with this colour
 				string colour_text;
 				if (colour_layer < (signed)colours_used_.size()) {
@@ -1549,7 +1566,7 @@ void dxa_if::draw_pins() {
 					rgsabound[0].cElements = records_to_display_.size();
 
 					// The colour of points to display
-					DxAtlas::EnumColor colour = convert_colour(button_colour(colour_layer));
+					DxAtlas::EnumColor colour = convert_colour(button_colour(real_colour));
 
 					// Array to hold all the points
 					SAFEARRAY* point_array = SafeArrayCreate(VT_VARIANT, 1, rgsabound);
@@ -1668,6 +1685,10 @@ void dxa_if::draw_pins() {
 							status_->misc_status(ST_ERROR, error);
 						}
 					}
+					// If using the colour update the actual colour use
+					if (index_2 > 0 || display_all_colours_) {
+						real_colour++;
+					}
 					// now allow repainting
 					map->EndUpdate();
 				}
@@ -1695,14 +1716,16 @@ void dxa_if::draw_pins() {
 
 			// Set the colours of the buttons to match that of the points on the map - and a paler one for unused colours
 			bool set_pz_colour = false;
+			int real_colour = 0;
 			for (size_t i = 0; i < colour_bns_.size(); i++) {
+				int colour_index = display_all_colours_ ? i : real_colour;
+				Fl_Color inactive_colour = display_all_colours_ ? fl_color_average(button_colour(i), FL_WHITE, 0.5f) : FL_BACKGROUND_COLOR;
+				Fl_Color active_colour = button_colour(colour_index);
 				if (colours_used.find(colours_used_[i]) == colours_used.end()) {
-					Fl_Color inactive_colour = fl_color_average(button_colour(i), FL_WHITE, 0.5f);
 					colour_bns_[i]->color(inactive_colour);
 					colour_bns_[i]->labelcolor(fl_contrast(FL_BLACK, inactive_colour));
 				}
 				else {
-					Fl_Color active_colour = button_colour(i);
 					colour_bns_[i]->color(active_colour);
 					colour_bns_[i]->labelcolor(fl_contrast(FL_BLACK, active_colour));
 					// Set the pinsize colour to the first enabled colour
@@ -1710,6 +1733,7 @@ void dxa_if::draw_pins() {
 						set_pz_colour = true;
 						pz_w_->color(button_colour(i));
 					}
+					real_colour++;
 				}
 			}
 			// Now deactivate all colour buttons
@@ -2174,6 +2198,7 @@ unsigned int dxa_if::visible() {
 	unsigned int result = Fl_Widget::visible();
 	if (result != 0) {
 		DxAtlas::IDxMapPtr map = atlas_->GetMap();
+		if (map == nullptr) return 0;
 		if (map->GetVisible()) return result;
 	}
 	return 0;

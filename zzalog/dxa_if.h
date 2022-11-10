@@ -150,6 +150,8 @@ namespace zzalog {
 		static void cb_bn_all(Fl_Widget* w, void* v);
 		// Pin size slider
 		static void cb_sl_pinsize(Fl_Widget* w, void* v);
+		// Colour all button
+		static void cb_colour_all(Fl_Widget* w, void* v);
 
 
 	public:
@@ -304,6 +306,8 @@ namespace zzalog {
 		int pin_size_;
 		// Time records were selected
 		time_t last_time_;
+		// Display all colours (rather than just those in selected QSOs)
+		bool display_all_colours_;
 
 		Fl_Group* colour_grp_;
 		// Colour buttons - instanced in colour_win_

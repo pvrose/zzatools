@@ -129,6 +129,8 @@ void pfx_dlg_table::draw_cell(TableContext context, int R, int C, int X, int Y,	
 
 }
 
+const int PFXD_ROWS = 4;
+
 // Dialog constructor
 pfx_dialog::pfx_dialog() :
 	win_dialog(500, 200, "Prefix Selection")
@@ -136,6 +138,7 @@ pfx_dialog::pfx_dialog() :
 	, selection_(-1)
 {
 	prefixes_ = nullptr;
+	rep_widgets_.clear();
 
 	// output field to display callsign
 	int curr_x = EDGE;
@@ -146,7 +149,7 @@ pfx_dialog::pfx_dialog() :
 
 	// table to list the prefixes to be chosen from
 	curr_y += HTEXT + GAP;
-	table_ = new pfx_dlg_table(this, curr_x, curr_y, 400, 6 * (ROW_HEIGHT));
+	table_ = new pfx_dlg_table(this, curr_x, curr_y, 400, (PFXD_ROWS + 2) * (ROW_HEIGHT));
 	table_->labelsize(FONT_SIZE);
 	table_->callback((Fl_Callback*)pfx_dialog::cb_tab_pfx, (void*)this);
 
@@ -158,6 +161,7 @@ pfx_dialog::pfx_dialog() :
 	qrz_bn->callback(cb_bn_qrz);
 	qrz_bn->labelsize(FONT_SIZE);
 	qrz_bn->align(FL_ALIGN_INSIDE);
+	rep_widgets_.push_back(qrz_bn);
 
 	// button "OK" 
 	curr_x += WBUTTON;
@@ -166,6 +170,7 @@ pfx_dialog::pfx_dialog() :
 	ok_bn->labelsize(FONT_SIZE);
 	ok_bn->align(FL_ALIGN_INSIDE);
 	ok_bn->tooltip("Accept selected prefix");
+	rep_widgets_.push_back(ok_bn);
 
 	// button "Cancel" 
 	curr_x += WBUTTON;
@@ -174,6 +179,7 @@ pfx_dialog::pfx_dialog() :
 	cancel_bn->labelsize(FONT_SIZE);
 	cancel_bn->align(FL_ALIGN_INSIDE);
 	cancel_bn->tooltip("Cancel parsing");
+	rep_widgets_.push_back(cancel_bn);
 
 	curr_y += HBUTTON + EDGE;
 
@@ -192,6 +198,7 @@ pfx_dialog::pfx_dialog() :
 pfx_dialog::~pfx_dialog()
 {
 	// delete all child widgets and then the window
+	rep_widgets_.clear();
 	clear();
 }
 
@@ -245,6 +252,15 @@ void pfx_dialog::set_data(vector<prefix*>* prefixes, string callsign) {
 	table_->rows(this->prefixes_->size());
 	table_->row_height_all(ROW_HEIGHT);
 	table_->cols(4);
+	// Adjust height to include all rows
+	int num_rows = table_->rows();
+	int diff_height = ((table_->rows() - PFXD_ROWS) * ROW_HEIGHT);
+	table_->size(table_->w(), table_->h() + diff_height);
+	// Reposition all widgets below table_
+	for (auto it = rep_widgets_.begin(); it != rep_widgets_.end(); it++) {
+		(*it)->position((*it)->x(), (*it)->y() + diff_height);
+	}
+	size(w(), h() + diff_height);
 	redraw();
 }
 

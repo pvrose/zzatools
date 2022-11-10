@@ -1438,6 +1438,9 @@ void qso_manager::qso_group::cb_start_qso(Fl_Widget* w, void* v) {
 void qso_manager::qso_group::cb_log_qso(Fl_Widget* w, void* v) {
 	qso_group* that = ancestor_view<qso_group>(w);
 	qso_manager* mgr = (qso_manager*)that->parent();
+	if (that->current_qso_ == nullptr) {
+		that->current_qso_ = mgr->start_qso();
+	}
 	that->update_record();
 	mgr->end_qso();
 	that->serial_num_++;
