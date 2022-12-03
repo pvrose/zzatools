@@ -6,7 +6,7 @@
 using namespace std;
 using namespace zzalib;
 
-const string COPYRIGHT = "© Philip Rose GM3ZZA 2022";
+const string COPYRIGHT = "Â© Philip Rose GM3ZZA 2022";
 const string PROGRAM_ID = "QBS";
 const string PROG_ID = "QBS";
 const string VENDOR = "GM3ZZA";
@@ -60,12 +60,15 @@ enum action_t {
 	DISPOSE_SASE,                // Recycle envelopes
 	SUMMARY_BATCH,               // Produce batch summary report
 	SUMMARY_CALL,                // Produce call summary Sreport
-	HISTORY_CALL                 // Produce call history report
+	HISTORY_CALL,                // Produce call history report
+	EDIT_NOTES                   // Edit notes for call
 };
 
 enum navigate_t {
+	PREV_FIRST,         // Go to beginning
 	PREV_MAJOR,         // major step back
 	PREV_MINOR,         // minor step back
 	NEXT_MAJOR,         // major step forward
-	NEXT_MINOR          // minor step forward
+	NEXT_MINOR,         // minor step forward
+	NEXT_LAST           // Go to end
 };

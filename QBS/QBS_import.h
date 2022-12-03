@@ -80,7 +80,7 @@ protected:
     map <string, float> batch_weights_;
  
     // Holding call data
-    map <string, call_info> calls_;
+    call_info calls_;
 
     // File inputs
     ifstream in_;

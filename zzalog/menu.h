@@ -164,6 +164,8 @@ namespace zzalog {
 		void update_windows_items();
 		// Add userdate to windows items
 		void add_windows_items();
+		// Update QSL upload items
+		void update_upload_items();
 
 	protected:
 		// search criteria - remembered

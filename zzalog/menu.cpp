@@ -1961,6 +1961,7 @@ void menu::update_items() {
 	}
 	redraw();
 	update_windows_items();
+	update_upload_items();
 	// Update toolbar to reflect active state of menu items
 	toolbar_->update_items();
 }
@@ -2076,3 +2077,23 @@ string menu::get_browser() {
 	return browser;
 }
 
+// Do not allow a second upload to take place until the first has completed
+void menu::update_upload_items() {
+	int index_eqsl = find_index("E&xtract/e&QSL");
+	int index_lotw = find_index("E&xtract/&LotW");
+	int index_clog = find_index("E&xtract/Club&Log");
+	int index_upload = find_index("E&xtract/&Upload");
+
+	if (extract_records_->upload_in_progress()) {
+		mode(index_eqsl, mode(index_eqsl) | FL_MENU_INACTIVE);
+		mode(index_lotw, mode(index_lotw) | FL_MENU_INACTIVE);
+		mode(index_clog, mode(index_clog) | FL_MENU_INACTIVE);
+		mode(index_upload, mode(index_upload) & ~FL_MENU_INACTIVE);
+	}
+	else {
+		mode(index_eqsl, mode(index_eqsl) & ~FL_MENU_INACTIVE);
+		mode(index_lotw, mode(index_lotw) & ~FL_MENU_INACTIVE);
+		mode(index_clog, mode(index_clog) & ~FL_MENU_INACTIVE);
+		mode(index_upload, mode(index_upload) | FL_MENU_INACTIVE);
+	}
+}

@@ -55,6 +55,8 @@ namespace zzalog {
 		void extract_special(extract_mode_t reason);
 		// Correct record order
 		void correct_record_order();
+		// Upload in progress
+		bool upload_in_progress();
 
 		// return the real record number
 		virtual record_num_t record_number(record_num_t item);

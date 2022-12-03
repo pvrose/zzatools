@@ -850,3 +850,15 @@ void extract_data::correct_record_order() {
 	}
 	fl_cursor(FL_CURSOR_DEFAULT);
 }
+
+// Return whether an existing upload is in progress
+bool extract_data::upload_in_progress() {
+	switch (use_mode_) {
+	case EQSL:
+	case LOTW:
+	case CLUBLOG:
+		return true;
+	default:
+		return false;
+	}
+}

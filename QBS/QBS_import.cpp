@@ -11,6 +11,7 @@
 using namespace zzalib;
 using namespace std;
 
+extern const char* DATE_FORMAT;
 
 QBS_import::QBS_import() {
 	clear_maps();
@@ -186,14 +187,16 @@ bool QBS_import::read_call(bool card, string line) {
 		string call = values[0];
 		clog << call << "              " << '\r';
 		if (call.length() > 6) clog << endl;
-		call_info& info = calls_[call];
+		notes& notes = calls_[call];
+		string date = now(true, DATE_FORMAT) + "(E)";
 		for (unsigned int ix = 1; ix != values.size() && ix < columns_.size(); ix++) {
 			string column = to_upper(columns_[ix]);
 			string& value = values[ix];
 			map<string, vector<int>>& row = card ? card_matrix_[call] : sase_matrix_[call];
 			// read the call information
 			if (column[0] != '2') {
-				if (value.length() > 0)	info[column] = value;
+				note_data note = { date, column, value };
+				if (value.length() > 0)	notes.push_back(note);
 			}
 			else if (column.length() > 8) {
 				string batch = column.substr(0, 7);
@@ -344,7 +347,7 @@ bool QBS_import::copy_data() {
 	for (auto it = calls_.begin(); it != calls_.end(); it++) {
 		string call = (*it).first;
 		for (auto it_i = (*it).second.begin(); it_i != (*it).second.end(); it_i++) {
-			data_->ham_data(call, (*it_i).first, (*it_i).second);
+			data_->ham_data((*it_i).date, call, (*it_i).name, (*it_i).value);
 		}
 	}
 	return true;

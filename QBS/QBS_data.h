@@ -4,6 +4,7 @@
 #include "QBS_reporter.h"
 
 #include <string>
+#include <vector>
 #include <ctime>
 #include <map>
 #include <list>
@@ -17,7 +18,6 @@ using namespace std;
 // Data structures
 
 typedef map<string /* call */, int /*count*/> count_data;
-typedef map<string /*name */, string /* value */> call_info;
 
 struct recycle_data {
 	int sum_recycled;            // Number of cards recycled from batch
@@ -76,6 +76,15 @@ struct action_data {
 
 };
 
+struct note_data {
+	string date;                 // Date of note
+	string name;                 // Name of note
+	string value;                // Value of note
+};
+
+typedef vector<note_data> notes;
+typedef map<string, notes> call_info;
+
 enum special_box_t {
 	IN_BOX = -1,                
 	OUT_BOX = -2,
@@ -85,6 +94,8 @@ enum special_box_t {
 	SENT_BOX = -6,
 	DISP_BOX = -7
 };
+
+class QBS_window;
 
 class QBS_data {
 
@@ -106,7 +117,7 @@ protected:
 	// Disposal queue head - next to be recycled
 	int head_;
 	// CAllsign data
-	map<string, call_info> ham_info_;
+	call_info ham_info_;
 	// "List" of calls (overall tally of cards for call)
 	count_data received_box_;
 	count_data sent_box_;
@@ -167,6 +178,8 @@ public:
 	void set_window(QBS_window* w);
 	// Get action
 	action_t get_action();
+	// Get ham_info
+	notes* get_notes(string callsign);
 
 	// Load QBS file
 	bool read_qbs(string& filename);
@@ -251,6 +264,7 @@ public:
 	);
 	// Add ham-data
 	int ham_data(
+		string date,                // Date
 		string call,                // Callsign
 		string name,                // Call info name
 		string value                // Call info value

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "QBS_consts.h"
+#include "QBS_notes.h"
 #include "../zzalib/utils.h"
 #include "../zzalib/callback.h"
 
@@ -17,6 +18,7 @@
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Radio_Light_Button.H>
 #include <FL/Fl_Radio_Button.H>
+#include <FL/Fl_Table.H>
 
 
 using namespace std;
@@ -31,6 +33,7 @@ enum severity_t {
 
 // Forward instantiation otherwise we have circular use of .h files
 class QBS_data;
+class QBS_notes;
 
 /****************************************************
 *  QBS_window
@@ -85,11 +88,15 @@ protected:
     void update_post_cards();
     void update_recycle_cards();
     void update_dispose_sase();
-    void update_batches();
-    void update_calls();
+    void update_batches(bool enable_nav);
+    void update_calls(int box_num);
     void update_batch_summary();
     void update_call_summary();
     void update_call_history();
+    void update_edit_notes();
+    void hide_edit_notes();
+    void update_action_values();
+    void update_action_bn(Fl_Button* b, action_t a);
     // Call whatever update is needed per action
     void update_whatever();
  
@@ -132,6 +139,9 @@ protected:
     Fl_Radio_Light_Button* bn_dispose_sase_;
     radio_param_t rp_dispose_sase_;
 
+    Fl_Radio_Light_Button* bn_edit_notes_;
+    radio_param_t rp_edit_notes_;
+
     Fl_Radio_Light_Button* bn_summ_batch_;
     radio_param_t rp_summ_batch_;
     Fl_Radio_Light_Button* bn_summ_call_;
@@ -146,11 +156,14 @@ protected:
     Fl_Button* bn_b_navff_;
     Fl_Button* bn_b_action_;
     Fl_Input* ip_call_;
+    Fl_Button* bn_c_navbbb_;
     Fl_Button* bn_c_navbb_;
     Fl_Button* bn_c_navb_;
     Fl_Button* bn_c_navf_;
     Fl_Button* bn_c_navff_;
+    Fl_Button* bn_c_navfff_;
     Fl_Button* bn_c_action_;
+    Fl_Button* bn_nav_n_do_;
     Fl_Box* bx_current_;
     Fl_Box* bx_change_;
     static const int NUM_COUNTS = 10;
@@ -164,6 +177,13 @@ protected:
     int index_outbox_;
     int index_weight_;
     Fl_Button* bn_reset_;
+    Fl_Button* bn_close_;
+
+
+    QBS_notes* tab_old_notes_;
+    Fl_Output* op_note_date_;
+    Fl_Input* ip_note_name_;
+    Fl_Input* ip_note_value_;
 
     // Command selection
     action_t action_;
