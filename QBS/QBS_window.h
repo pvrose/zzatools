@@ -52,6 +52,8 @@ public:
     // Update filename
     void filename(const char* value);
     void directory(const char* value);
+    // Open batch log
+    void open_batch_log(string batch_name);
 
 protected:
 
@@ -103,6 +105,8 @@ protected:
     // Various data items accessible by most classes
     Fl_Preferences settings_;
     QBS_data* data_;
+    // Batch log
+    ofstream* blog_file_;
 
     // widgets - input group
     Fl_Group* g_input_;

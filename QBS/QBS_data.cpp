@@ -798,6 +798,7 @@ bool QBS_data::read_qbs(string& filename) {
 		reading_mode_ = WRITING;
 		file_.close();
 		file_.open(filename, ios::out | ios::app);
+		window_->open_batch_log(boxes_[get_current()]->id);
 		return true;
 	}
 	else {
@@ -1140,33 +1141,53 @@ void QBS_data::display_call_history(string call) {
 	int sum_rcvd = 0;
 	int sum_sent = 0;
 	int sum_recy = 0;
+	int qtr4_rcvd = 0;
+	int quarter_start = get_current() - 3;
+	if (quarter_start < 0) quarter_start = 0;
 	for (int b = 0; b <= get_current(); b++) {
 		box_data* box = boxes_[b];
+		int rcvd = (*box->received)[call];
+		int sent = (*box->sent)[call];
+		int recy = (*box->counts)[call];
 		ss << "<TR>";
 		ss << "<TD>" << box->id << "</TD>";
-		ss << "<TD>" << (*box->received)[call] << "</TD>";
-		sum_rcvd += (*box->received)[call];
-		ss << "<TD>" << (*box->sent)[call] << "</TD>";
-		sum_sent += (*box->sent)[call];
+		ss << "<TD>" << rcvd << "</TD>";
+		sum_rcvd += rcvd;
+		ss << "<TD>" << sent << "</TD>";
+		sum_sent += sent;
 		if (b < get_head()) {
-			ss << "<TD>" << (*box->counts)[call] << "</TD>";
-			sum_recy += (*box->counts)[call];
+			ss << "<TD>" << recy << "</TD>";
+			sum_recy += recy;
 		}
 		else {
 			ss << "<TD>-</TD>";
 		}
 		if (b == get_current()) ss << "<TD>Current</TD>";
-		else if (b == get_head()) ss << "<TD>For recycling</TD>";
+		else if (b == get_head()) ss << "<TD>Next recycling</TD>";
+		if (b >= quarter_start) {
+			qtr4_rcvd += rcvd;
+		}
 		ss << "</TR>" << endl;
 	}
 	ss << "<TR>";
-	ss << "<TD>Total<TD>" << sum_rcvd << "</TD>";
+	ss << "<TD>Total</TD><TD>" << sum_rcvd << "</TD>";
 	ss << "<TD>" << sum_sent;
 	if (sum_rcvd > 0) ss << " (" << 100 * sum_sent / sum_rcvd << "%)";
 	ss << "</TD>";
 	ss << "<TD>" << sum_recy;
 	if (sum_rcvd > 0) ss << " (" << 100 * sum_recy / sum_rcvd << "%)";
 	ss << "</TD></TR>" << endl;
+
+	ss << "<TR>";
+	ss.precision(1);
+	ss << fixed;
+	ss << "<TD>Average</TD><TD>" << double(sum_rcvd) / double(get_current() + 1) << "</TD>";
+	ss << "</TR>";
+
+	ss << "<TR>";
+	ss << "<TD> (last 4)</TD><TD>" << double(qtr4_rcvd) / double(get_current() + 1 - quarter_start) << "</TD>";
+	ss << "</TR>";
+
 	ss << "</TABLE>" << endl;
 	ss << "<H2>Notes:</H2>" << endl;
 	ss << "<TABLE BORDER=2 WIDTH=90%>" << endl;

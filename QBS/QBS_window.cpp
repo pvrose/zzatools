@@ -47,6 +47,7 @@ QBS_window::QBS_window(int W, int H, const char* L, const char* filename) :
 }
 
 QBS_window::~QBS_window() {
+	blog_file_->close();
 }
 
 // Update filename
@@ -1436,18 +1437,24 @@ void QBS_window::cb_exec_batch(Fl_Widget* w, void* v) {
 	case NEW_BATCH:
 		that->data_->new_batch(that->selected_box_, date, batch);
 		that->batch_op_done_ = true;
+		*that->blog_file_ << "Closing batch " << date << endl;
+		that->open_batch_log(batch);
+		*that->blog_file_ << "New batch " << batch << ": " << date << endl;
 		break;
 	case POST_CARDS:
 		that->data_->post_cards(date);
+		*that->blog_file_ << "Posting batch: " << date << endl;
 		that->batch_op_done_ = true;
 		break;
 	case DISPOSE_CARDS:
 		that->data_->dispose_cards(date);
+		*that->blog_file_ << "Marking batch for disposal: " << date << endl;
 		that->batch_op_done_ = true;
 		break;
 	case RECYCLE_CARDS: {
 		float weight = (float)that->ip_delta_[that->index_weight_]->value();
 		that->data_->recycle_cards(date, weight);
+		*that->blog_file_ << "Recyclng batch: " << weight << " kg " << date << endl;
 		that->batch_op_done_ = true;
 		break;
 	}
@@ -1475,33 +1482,40 @@ void QBS_window::cb_exec_call(Fl_Widget* w, void* v) {
 	string call = that->call_;
 	int num_cards = 0;
 	int num_sases = 0;
+	int sum_cards = 0;
 	switch (that->action_) {
 	case SORT_CARDS:
 		// Take the number of cards, add in the in and keep boxes 
 		num_cards = (int)that->ip_delta_[that->index_curr_]->value();
 		that->data_->receive_cards(that->selected_box_, date, call, num_cards);
+		*that->blog_file_ << "Received batch cards " << date << ": " << call << " " << num_cards << endl;
 		that->update_sort_cards();
 		break;
 	case RECEIVE_CARD:
 		num_cards = (int)that->ip_delta_[that->index_inbox_]->value();
 		that->data_->receive_cards(IN_BOX, date, call, num_cards);
+		*that->blog_file_ << "Received non-batch cards " << date << ": " << call << " " << num_cards << endl;
 		that->update_rcv_card();
 		break;
 	case RECEIVE_SASE:
 		num_sases = (int)that->ip_delta_[that->index_sase_]->value();
 		that->data_->receive_sases(date, call, num_sases);
+		*that->blog_file_ << "Received SASEs " << date << ": " << call << " " << num_sases << endl;
 		that->update_rcv_sase();
 		break;
 	case DISPOSE_SASE:
 		num_sases = (int)that->ip_delta_[that->index_sase_]->value();
 		that->data_->receive_sases(date, call, -(num_sases));
+		*that->blog_file_ << "Disposed " << date << ": " << call << " " << num_sases << endl;
 		that->update_dispose_sase();
 		break;
 	case STUFF_CARDS: {
 		// Send those in keep
 		num_cards = (int)that->ip_delta_[that->index_keep_]->value();
+		sum_cards += num_cards;
 		that->data_->stuff_cards(KEEP_BOX, date, call, num_cards);
 		num_cards = (int)that->ip_delta_[that->index_inbox_]->value();
+		sum_cards += num_cards;
 		that->data_->stuff_cards(IN_BOX, date, call, num_cards);
 		// From HEAD to CURR - send cards
 		int curr = that->data_->get_current();
@@ -1510,6 +1524,7 @@ void QBS_window::cb_exec_call(Fl_Widget* w, void* v) {
 		int ix = that->index_head_;
 		while (ix >= that->index_curr_ && box <= curr) {
 			num_cards = (int)that->ip_delta_[ix]->value();
+			sum_cards += num_cards;
 			that->data_->stuff_cards(box, date, call, num_cards);
 			ix--;
 			if (box < curr) box++;
@@ -1517,6 +1532,7 @@ void QBS_window::cb_exec_call(Fl_Widget* w, void* v) {
 		// Use SASEs
 		num_sases = (int)that->ip_delta_[that->index_sase_]->value();
 		that->data_->use_sases(date, call, num_sases);
+		*that->blog_file_ << "Stuffed cards " << date << ": " << call << " " << sum_cards << " cards in " << num_sases << " SASEs" << endl;
 		that->update_stuff_cards();
 		break;
 	}
@@ -1531,6 +1547,7 @@ void QBS_window::cb_exec_call(Fl_Widget* w, void* v) {
 		string name = that->ip_note_name_->value();
 		string value = that->ip_note_value_->value();
 		that->data_->ham_data(date, call, name, value);
+		*that->blog_file_ << "Added note " << date << ": " << call << " " << name << " = " << value << endl;
 		that->update_edit_notes();
 		break;
 	}
@@ -1670,5 +1687,16 @@ void QBS_window::cb_reset(Fl_Widget* w, void* v) {
 	that->data_ = new QBS_data;
 	// Now allow the data to be processed
 	that->data_->set_window(that);
+}
+
+// Open batch log
+void QBS_window::open_batch_log(string batch_name) {
+	if (blog_file_ != nullptr) {
+		blog_file_->close();
+		delete blog_file_;
+	}
+	string name = string(ip_csv_dir_->value()) + "/" + batch_name + ".log";
+	cout << "Opening " << name << endl;
+	blog_file_ = new ofstream(name.c_str(), ios::out | ios::app);
 }
 
