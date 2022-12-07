@@ -64,8 +64,9 @@ namespace zzalog {
 			AC_DISTANCE,   // Separate colour per distance bands (every 1000 km)
 			AC_DAYS,       // Separate colour per recent days   
 		};
-		// Centre map position
+		// Centre map position - NB menu items depend on this order
 		enum centre_t {
+			ASIS,          // Do not implicitly re-centre
 			HOME,          // Home location
 			DX,            // DX location
 			SELECTED,      // Selected QSO

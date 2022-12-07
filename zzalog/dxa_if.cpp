@@ -302,11 +302,14 @@ void dxa_if::create_form() {
 	ch13->textsize(FONT_SIZE);
 	ch13->callback(cb_ch_centre);
 	ch13->clear();
+	// NB: The following are in the same order as enum centre_t
+	ch13->add("Do not change");
 	ch13->add("Home Location");
 	ch13->add("DX Location");
 	ch13->add("Selected QSO");
 	ch13->add("In group");
 	ch13->add("At 0°N 0°E");
+	// centre_t = DUMMY is used for the sub-menu created by the below
 	ch13->add("Continent/Europe");
 	ch13->add("Continent/Asia");
 	ch13->add("Continent/Africa");
@@ -1964,6 +1967,9 @@ void dxa_if::centre_map() {
 		double save_w;
 		double save_e;
 		switch (centre_mode_) {
+		case ASIS:
+			// Do nothing
+			break;
 		case HOME:
 			// Centre on the home location
 			centre = { (double)home_lat_, (double)home_long_ };

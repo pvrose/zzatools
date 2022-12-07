@@ -130,7 +130,7 @@
       <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_WARNINGS;_WINSOCK_DEPRECATED_NO_WARNINGS;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>C:\Users\pvros\Documents\dev\fltk-1.4.x-20200320-0a38e2e3\build;C:\Users\pvros\Documents\dev\curl-7.65.1\include;C:\Users\pvros\Documents\dev\fltk-1.4.x-20200320-0a38e2e3;C:\Program Files %28x86%29\hamlib-w32-4.2\include;%(AdditionalIncludeDirectories);C:\Program Files %28x86%29\hamlib-w32-4.5\include;C:\Users\pvros\Documents\dev\zzatools\packages\pthreads.2.9.1.4\build\native\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\pvros\Documents\dev\fltk-1.4.x-20200320-0a38e2e3\build;C:\Users\pvros\Documents\dev\curl-7.65.1\include;C:\Users\pvros\Documents\dev\fltk-1.4.x-20200320-0a38e2e3;C:\Program Files %28x86%29\hamlib-w32-4.5\include;%(AdditionalIncludeDirectories);C:\Users\pvros\Documents\dev\zzatools\packages\pthreads.2.9.1.4\build\native\include</AdditionalIncludeDirectories>
       <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
     </ClCompile>
     <Link>
