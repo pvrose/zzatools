@@ -616,6 +616,7 @@ bool QBS_data::import_cvs(string& directory) {
 			reading_mode_ = WRITING;
 		}
 	}
+	window_->open_batch_log(boxes_[get_current()]->id);
 	window_->update_actions();
 	return result;
 }

@@ -203,8 +203,14 @@ bool QBS_import::read_call(bool card, string line) {
 				row[batch].resize(5);
 				direction_t dirn = DIRN_INVALID;
 				int count;
-				try { count = stoi(value); }
-				catch (exception e) { count = 0; }
+				if (value.length()) {
+					// Only try and convert to integer if it's got actual data (may be spaces though)
+					try { count = stoi(value); }
+					catch (exception e) { count = 0; }
+				}
+				else {
+					count = 0;
+				}
 				switch (column[8]) {
 				case 'S':
 					dirn = SENT;
