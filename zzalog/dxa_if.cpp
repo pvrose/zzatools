@@ -76,6 +76,7 @@ dxa_if::dxa_if() :
 	, pin_size_(3)
 	, selected_locn_({ 0.0, 0.0 })
 	, display_all_colours_(false)
+	, last_logged_call_("")
 {
 	records_to_display_.clear();
 	colours_used_.clear();
@@ -2100,32 +2101,36 @@ string dxa_if::get_distance(record* this_record) {
 
 // Add the Dx location and include it in the displayed group
 void dxa_if::set_dx_loc(string location, string callsign) {
-	DxAtlas::IDxMapPtr map = atlas_->GetMap();
-	// To avoid flicker while changing Dx Location
-	map->BeginUpdate();
-	clear_dx_loc();
-	lat_long_t lat_long = grid_to_latlong(location);
-	map->PutDxLatitude((float)lat_long.latitude);
-	map->PutDxLongitude((float)lat_long.longitude);
-	map->PutDxVisible(true);
-	add_label(lat_long, callsign);
-	// Save current map limits
-	northernsave_ = northernmost_;
-	southernsave_ = southernmost_;
-	westernsave_ = westernmost_;
-	easternsave_ = easternmost_;
-	furthestsave_ = furthest_;
-	// Adjust map limits to include dx location
-	if (lat_long.latitude > northernmost_) northernmost_ = lat_long.latitude;
-	if (lat_long.latitude < southernmost_) southernmost_ = lat_long.latitude;
-	if (lat_long.longitude > easternmost_) easternmost_ = lat_long.longitude;
-	if (lat_long.longitude < westernmost_) westernmost_ = lat_long.longitude;
-	double bearing;
-	double distance;
-	great_circle({ home_lat_, home_long_ }, lat_long, bearing, distance);
-	if (distance > furthest_) furthest_ = (int)distance;
-	centre_map();
-	map->EndUpdate();
+	if (callsign.length() > 0 && callsign != last_logged_call_) {
+		// only do this if a different call from before
+		DxAtlas::IDxMapPtr map = atlas_->GetMap();
+		// To avoid flicker while changing Dx Location
+		map->BeginUpdate();
+		clear_dx_loc();
+		lat_long_t lat_long = grid_to_latlong(location);
+		map->PutDxLatitude((float)lat_long.latitude);
+		map->PutDxLongitude((float)lat_long.longitude);
+		map->PutDxVisible(true);
+		add_label(lat_long, callsign);
+		// Save current map limits
+		northernsave_ = northernmost_;
+		southernsave_ = southernmost_;
+		westernsave_ = westernmost_;
+		easternsave_ = easternmost_;
+		furthestsave_ = furthest_;
+		// Adjust map limits to include dx location
+		if (lat_long.latitude > northernmost_) northernmost_ = lat_long.latitude;
+		if (lat_long.latitude < southernmost_) southernmost_ = lat_long.latitude;
+		if (lat_long.longitude > easternmost_) easternmost_ = lat_long.longitude;
+		if (lat_long.longitude < westernmost_) westernmost_ = lat_long.longitude;
+		double bearing;
+		double distance;
+		great_circle({ home_lat_, home_long_ }, lat_long, bearing, distance);
+		if (distance > furthest_) furthest_ = (int)distance;
+		centre_map();
+		map->EndUpdate();
+		last_logged_call_ = callsign;
+	}
 }
 
 // REmove the Dx Location

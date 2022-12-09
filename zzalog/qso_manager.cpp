@@ -3556,8 +3556,6 @@ void qso_manager::end_qso() {
 	record_num_t item_number = book_->selection();
 	record_num_t record_number = book_->record_number(item_number);
 	record* qso = book_->get_record();
-	// Modified by parsing and validation
-	bool record_modified = false;
 	// On-air logging add date/time off
 	switch (qso_group_->logging_mode_) {
 	case LM_ON_AIR_CAT:
@@ -3570,23 +3568,19 @@ void qso_manager::end_qso() {
 			qso->item("QSO_DATE_OFF", timestamp.substr(0, 8));
 			// Time as HHMMSS - always log seconds.
 			qso->item("TIME_OFF", timestamp.substr(8));
-			record_modified = true;
 		}
 		break;
 	case LM_OFF_AIR:
 		book_->correct_record_position(item_number);
-		record_modified = true;
 		break;
 	}
 
 	// check whether record has changed - when parsed
 	if (pfx_data_->parse(qso)) {
-		record_modified = true;
 	}
 
 	// check whether record has changed - when validated
 	if (spec_data_->validate(qso, item_number)) {
-		record_modified = true;
 	}
 
 	// Upload QSO to QSL servers
@@ -3596,10 +3590,8 @@ void qso_manager::end_qso() {
 	enable_widgets();
 
 	// If new or changed then update the fact and let every one know
-	if (record_modified) {
-		book_->modified(true);
-		book_->selection(item_number, HT_INSERTED);
-	}
+	book_->modified(true);
+	book_->selection(item_number, HT_INSERTED);
 
 	// Update session end - if we crash before we close down, we may fail to remember session properly
 	time_t today = time(nullptr);

@@ -309,6 +309,8 @@ namespace zzalog {
 		time_t last_time_;
 		// Display all colours (rather than just those in selected QSOs)
 		bool display_all_colours_;
+		// Last logged callsign - to avoid it popping up again
+		string last_logged_call_;
 
 		Fl_Group* colour_grp_;
 		// Colour buttons - instanced in colour_win_
