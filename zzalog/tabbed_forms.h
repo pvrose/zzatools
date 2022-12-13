@@ -45,8 +45,12 @@ namespace zzalog {
 		};
 		map<object_t, view_ptrs> forms_;
 		// Last records updated
-		record_num_t last_record_1;
-		record_num_t last_record_2;
+		record_num_t last_record_1_;
+		record_num_t last_record_2_;
+		// Last hint type (when switching between view) for query
+		hint_t last_hint_;
+		// Last book (switching in/out of different books) for query
+		book* last_book_;
 	};
 
 }

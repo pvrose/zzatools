@@ -103,8 +103,10 @@ void tabbed_forms::add_view(const char* label, field_ordering_t column_data, obj
 // tell all views and others that record(s) have changed and why
 void tabbed_forms::update_views(view* requester, hint_t hint, record_num_t record_1, record_num_t record_2) {
 	// Remeber the records to update non-visible views when they become visible
-	last_record_1 = record_1;
-	last_record_2 = record_2;
+	last_record_1_ = record_1;
+	last_record_2_ = record_2;
+	last_hint_ = hint;
+	last_book_ = navigation_book_;
 	// Pass to each view in turn - note update() is a method in view.
 	for (auto fx = forms_.begin() ; fx != forms_.end() && !closing_; fx++) {
 		// If the requesting view is this view don't update it, it will have done its own updating
@@ -168,14 +170,12 @@ void tabbed_forms::activate_pane(object_t pane, bool active) {
 			navigation_book_ = import_data_;
 			break;
 		case OT_RECORD:
-			// Do nothing when activating report pane
-			break;
-		default:
-			// Other panes may not have been updated
-			v->update(HT_ALL, last_record_1, last_record_2);
-			w->redraw();
+			navigation_book_ = last_book_;
 			break;
 		}
+		// Restore any query
+		v->update(last_hint_, last_record_1_, last_record_2_);
+		w->redraw();
 	}
 	else {
 		// "Hide" the object by switching to the main log
@@ -239,10 +239,13 @@ void tabbed_forms::cb_tab_change(Fl_Widget* w, void* v) {
 		case OT_IMPORT:
 			navigation_book_ = import_data_;
 			break;
+		case OT_RECORD:
+			navigation_book_ = that->last_book_;
+			break;
 		}
 	}
 	view* as_view = dynamic_cast<view*>(that->value());
-	as_view->update(HT_ALL, that->last_record_1, that->last_record_2);
+	as_view->update(that->last_hint_, that->last_record_1_, that->last_record_2_);
 }
 
 // Minimum width resizing - sets to the largest minimum width of all the panes

@@ -193,12 +193,12 @@ bool exc_reader::load_data(exc_data* data, istream& in, string& version) {
 	// reposition back to beginning
 	in.seekg(0, ios::beg);
 	// Initialsie the progress
-	status_->misc_status(ST_NOTE, "EXCEPTION: Started");
+	status_->misc_status(ST_NOTE, "EXCEPTION: Started extracting data");
 	status_->progress(file_size, OT_PREFIX, "Extracting Extraction data from XML", "bytes");
 	// Call the XML parser - calls back to the overides herein
 	if (parse(in)) {
 		// Read successful - complete progress
-		status_->misc_status(ST_OK, "EXCEPTION: Done!");
+		status_->misc_status(ST_OK, "EXCEPTION: Extraction done!");
 		status_->progress(file_size, OT_PREFIX);
 		version = timestamp_;
 		fl_cursor(FL_CURSOR_DEFAULT);
@@ -212,7 +212,7 @@ bool exc_reader::load_data(exc_data* data, istream& in, string& version) {
 	}
 	else {
 		// Read failed - report failure
-		status_->misc_status(ST_FATAL, "EXCEPTION: Failed");
+		status_->misc_status(ST_FATAL, "EXCEPTION: Extraction failed");
 		status_->progress("Load failed", OT_PREFIX);
 		fl_cursor(FL_CURSOR_DEFAULT);
 		return false;
