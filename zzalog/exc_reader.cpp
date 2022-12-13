@@ -194,7 +194,7 @@ bool exc_reader::load_data(exc_data* data, istream& in, string& version) {
 	in.seekg(0, ios::beg);
 	// Initialsie the progress
 	status_->misc_status(ST_NOTE, "EXCEPTION: Started extracting data");
-	status_->progress(file_size, OT_PREFIX, "Extracting Extraction data from XML", "bytes");
+	status_->progress(file_size, OT_PREFIX, "Extracting Exception data from XML", "bytes");
 	// Call the XML parser - calls back to the overides herein
 	if (parse(in)) {
 		// Read successful - complete progress
