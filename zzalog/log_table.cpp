@@ -146,8 +146,8 @@ void log_table::cb_tab_log(Fl_Widget* w, void* v) {
 		// Mouse clicked within the cell
 		switch (Fl::event()) {
 		case FL_RELEASE:
-			// Select the item at the row that was clicked
-			that->my_book_->selection(item_num, HT_SELECTED, that);
+			//// Select the item at the row that was clicked
+			//that->my_book_->selection(item_num, HT_SELECTED, that);
 			switch (that->last_button_) {
 			case FL_LEFT_MOUSE:
 				// Tidy up any edit in progress
@@ -155,6 +155,10 @@ void log_table::cb_tab_log(Fl_Widget* w, void* v) {
 				// Left button - double click edit cell
 				if (Fl::event_clicks()) {
 					that->edit_cell(row, col);
+				}
+				else {
+					// Select the item at the row that was clicked
+					that->my_book_->selection(item_num, HT_SELECTED, that);
 				}
 				break;
 			case FL_RIGHT_MOUSE:
@@ -165,8 +169,8 @@ void log_table::cb_tab_log(Fl_Widget* w, void* v) {
 			}
 			break;
 		case FL_PUSH:
-			// Select the row clicked
-			that->my_book_->selection(item_num, HT_SELECTED, that);
+			//// Select the row clicked
+			//that->my_book_->selection(item_num, HT_SELECTED, that);
 			// Keep the focus
 			that->take_focus();
 			break;

@@ -950,6 +950,15 @@ void dxa_if::home_location() {
 		home_lat_dms_ += " ±7.5\"";
 		home_long_dms_ += " ±15\"";
 		break;
+	case 10:
+		home_lat_dms_ += " ±0.3125\"";
+		home_long_dms_ += " ±0.625\"";
+		break;
+	case 12:
+		home_lat_dms_ += " ±0.03125\"";
+		home_long_dms_ += " ±0.0625\"";
+		break;
+
 	}
 }
 
@@ -1864,17 +1873,6 @@ void dxa_if::update(hint_t hint) {
 		draw_pins();
 		break;
 		
-	case HT_FORMAT:
-		// We may have changed session start
-		if (qso_display_ == AQ_SESSION) {
-			// Data has changed 
-			enable_widgets();
-			get_records();
-			get_colours(false);
-			draw_pins();
-		}
-		break;
-
 	default:
 		// HT_MINOR_CHANGE,          // Invalidate the record, but not location, band or mode - don't redraw
 		// HT_IMPORT_QUERY,          // Import record cannot be processed without user intervention - 
@@ -2137,7 +2135,8 @@ void dxa_if::set_dx_loc(string location, string callsign) {
 void dxa_if::clear_dx_loc() {
 	DxAtlas::IDxMapPtr map = atlas_->GetMap();
 	map->PutDxVisible(false);
-	call_layer_->PutVisible(false);
+	// Put in blank label at centre
+	add_label({ 0.0, 0.0 }, "");
 	// Restore map limits without DX location
 	northernmost_ = northernsave_;
 	southernmost_ = southernsave_;

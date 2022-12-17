@@ -280,7 +280,7 @@ namespace zzalog {
 			// Add contest exchanges
 			void populate_exch_fmt();
 			// Update fields in record
-			void update_record();
+			void update_record(bool update_view);
 			// Copy fields from record
 			void update_fields();
 			// Initialise fields
@@ -498,7 +498,7 @@ namespace zzalog {
 		// QSO i n progress
 		bool qso_in_progress();
 		// Start QSO
-		record* start_qso(bool add_to_book = true);
+		record* start_qso(bool add_to_book, bool update_view);
 		// Create a dummy qso - eg for parsing a callsign
 		record* dummy_qso();
 		// End QSO

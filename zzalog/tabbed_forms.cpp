@@ -102,48 +102,50 @@ void tabbed_forms::add_view(const char* label, field_ordering_t column_data, obj
 
 // tell all views and others that record(s) have changed and why
 void tabbed_forms::update_views(view* requester, hint_t hint, record_num_t record_1, record_num_t record_2) {
-	// Remeber the records to update non-visible views when they become visible
-	last_record_1_ = record_1;
-	last_record_2_ = record_2;
-	last_hint_ = hint;
-	last_book_ = navigation_book_;
-	// Pass to each view in turn - note update() is a method in view.
-	for (auto fx = forms_.begin() ; fx != forms_.end() && !closing_; fx++) {
-		// If the requesting view is this view don't update it, it will have done its own updating
-		if (requester == (void*)0 || requester != fx->second.v) {
-			switch (fx->first) {
-			case OT_MAIN:
-			case OT_EXTRACT:
-			case OT_RECORD:
-				// Always update these views
-				fx->second.v->update(hint, record_1, record_2);
-				break;
-			default:
-				// Only update a view that is visible
-				if (fx->second.w->visible()) {
+	if (hint != HT_IGNORE) {
+		// Remeber the records to update non-visible views when they become visible
+		last_record_1_ = record_1;
+		last_record_2_ = record_2;
+		last_hint_ = hint;
+		last_book_ = navigation_book_;
+		// Pass to each view in turn - note update() is a method in view.
+		for (auto fx = forms_.begin(); fx != forms_.end() && !closing_; fx++) {
+			// If the requesting view is this view don't update it, it will have done its own updating
+			if (requester == (void*)0 || requester != fx->second.v) {
+				switch (fx->first) {
+				case OT_MAIN:
+				case OT_EXTRACT:
+				case OT_RECORD:
+					// Always update these views
 					fx->second.v->update(hint, record_1, record_2);
+					break;
+				default:
+					// Only update a view that is visible
+					if (fx->second.w->visible()) {
+						fx->second.v->update(hint, record_1, record_2);
+					}
+					break;
 				}
-				break;
 			}
 		}
-	}
-	// Update all the other objects that use the current selection
-	if (record_1 != -1) {
-		// Add the current record's callsign to the search box in the tool bar
-		toolbar_->search_text(record_1);
-	} 
+		// Update all the other objects that use the current selection
+		if (record_1 != -1) {
+			// Add the current record's callsign to the search box in the tool bar
+			toolbar_->search_text(record_1);
+		}
 #ifdef _WIN32
-	// Update DxAtlas
-	if (dxa_if_ && dxa_if_->visible()) dxa_if_->update(hint);
+		// Update DxAtlas
+		if (dxa_if_ && dxa_if_->visible()) dxa_if_->update(hint);
 #endif
-	// Update the settngs config dialog
-	if (config_) config_->update();
-	// Update band view
-	if (!rig_if_ && band_view_ && band_view_->visible()) {
-		band_view_->update(record_1);
+		// Update the settngs config dialog
+		if (config_) config_->update();
+		// Update band view
+		if (!rig_if_ && band_view_ && band_view_->visible()) {
+			band_view_->update(record_1);
+		}
+		// Update qso_manager - avoid recursion
+		if (qso_manager_) qso_manager_->update_qso();
 	}
-	// Update qso_manager - avoid recursion
-	if (qso_manager_) qso_manager_->update_qso();
 }
 
 // Activate or deactivate the named object - if selecting another log_view change the navigation_book_

@@ -83,9 +83,9 @@ string ic7300::send_command(unsigned char command, string sub_command, string da
 							ok = false;
 							return "";
 						case '\xfb':
-							//// Got ACK response from transceiver, but no data
-							//snprintf(mess, 256, "RIG: Received an ACK response from transceiver - CMD = %s", to_send.c_str());
-							//message(ST_DEBUG, mess);
+							// Got ACK response from transceiver, but no data
+							snprintf(mess, 256, "RIG: Received an ACK response from transceiver - CMD = %s", to_send.c_str());
+							message(ST_DEBUG, mess);
 							return result;
 						case '\xfd':
 							snprintf(mess, 256, "RIG: Received response data %s - CMD = %s", string_to_hex(result).c_str(), to_send.c_str());

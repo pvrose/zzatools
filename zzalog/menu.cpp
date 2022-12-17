@@ -827,7 +827,7 @@ void menu::cb_mi_log_new(Fl_Widget* w, void* v) {
 	// Force main log book
 	tabbed_forms_->activate_pane(OT_MAIN, true);
 	// Create a new record - on or off-air
-	qso_manager_->start_qso();
+	qso_manager_->start_qso(true, true);
 	// Open log view
 	switch (that->editting_view_) {
 	case OT_MAIN:
@@ -1024,7 +1024,7 @@ void menu::cb_mi_log_start(Fl_Widget* w, void* v) {
 	char message[256];
 	snprintf(message, 256, "ZZALOG: Setting session start at %s", stime);
 	status_->misc_status(ST_NOTE, message);
-	tabbed_forms_->update_views(nullptr, HT_FORMAT, -1);
+	tabbed_forms_->update_views(nullptr, HT_ALL, -1);
 }
 
 // Import->File

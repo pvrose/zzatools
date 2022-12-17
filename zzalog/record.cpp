@@ -206,7 +206,14 @@ void record::item(string field, string value, bool formatted/* = false*/, bool d
 			case 'M': 
 			case 'G':
 			case 'B':
-				if (field == "FREQ" || field == "FREQ_RX") {
+				if (field == "GRIDSQUARE" || field == "MY_GRIDSQUARE") {
+					if (upper_value.length() > 8) {
+						// GRIDSQUARE limited to first 8 characters
+						item(field + "_EXT", upper_value.substr(8), formatted);
+						formatted_value = upper_value.substr(0, 8);
+					}
+				}
+				else if (field == "FREQ" || field == "FREQ_RX") {
 					display_freq_t format;
 					display_settings.get("Frequency", (int&)format, FREQ_MHz);
 					formatted_value = unformat_freq(format, upper_value);
@@ -355,8 +362,23 @@ string record::item(string field, bool formatted/* = false*/, bool indirect/* = 
 			else if (field == "MY_GRIDSQUARE") {
 				// Get operator's gridsquare
 				qth_settings.get("Locator", temp, "RR73TU");
-				result = temp;
+				if (strlen(temp) > 8) {
+					result = string(temp, 8);
+				}
+				else {
+					result = temp;
+				}
 				free(temp);
+			}
+			else if (field == "MY_GRIDSQAURE_EXT") {
+				// Get operator's gridsquare extenion
+				qth_settings.get("Locator", temp, "RR73TU");
+				if (strlen(temp) > 8) {
+					result = temp + 8;
+				}
+				else {
+					result = "";
+				}
 			}
 			else if (field == "MY_DXCC") {
 				// Get operator's DXCC entity code
@@ -424,7 +446,16 @@ string record::item(string field, bool formatted/* = false*/, bool indirect/* = 
 			case 'M':
 			case 'G':
 			case 'B':
-				if (field == "FREQ" || field == "FREQ_RX") {
+				if (field == "GRIDSQUARE" || field == "MY_GRIDSQUARE") {
+					// Concatenate base and extension fields
+					if (unformatted_value.length() < 8) {
+						result = unformatted_value;
+					} 
+					else if (item_exists(field + "_EXT")) {
+						result = unformatted_value + item(field + "_EXT", formatted, indirect);
+					}
+				}
+				else if (field == "FREQ" || field == "FREQ_RX") {
 					display_freq_t format;
 					display_settings.get("Frequency", (int&)format, FREQ_MHz);
 					result = format_freq(format, unformatted_value);

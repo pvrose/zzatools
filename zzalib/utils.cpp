@@ -567,11 +567,11 @@ string zzalib::degrees_to_dms(float value, bool is_latitude) {
 	return text;
 }
 
-// Convert latitude and longitode to 2, 4, 6 or 8 character grid square
+// Convert latitude and longitode to 2, 4, 6, 8, 10 or 12 character grid square
 string zzalib::latlong_to_grid(lat_long_t location, int num_chars) {
 	string result;
 	result.resize(num_chars, ' ');
-	// 'Normalise' location relative to 180W, 90S - i.e. AA00aa00
+	// 'Normalise' location relative to 180W, 90S - i.e. AA00aa00aa00
 	double norm_lat = location.latitude + 90.0;
 	double norm_long = location.longitude + 180.0;
 	double inc_lat = 10;
@@ -580,6 +580,7 @@ string zzalib::latlong_to_grid(lat_long_t location, int num_chars) {
 		switch (i) {
 		case 0:
 		case 4:
+		case 8:
 			result[i] = (int)trunc(norm_long / inc_long) + 'A';
 			result[i + 1] = (int)trunc(norm_lat / inc_lat) + 'A';
 			norm_long = fmod(norm_long, inc_long);
@@ -589,6 +590,7 @@ string zzalib::latlong_to_grid(lat_long_t location, int num_chars) {
 			break;
 		case 2:
 		case 6:
+		case 10:
 			result[i] = (int)trunc(norm_long / inc_long) + '0';
 			result[i + 1] = (int)trunc(norm_lat / inc_lat) + '0';
 			norm_long = fmod(norm_long, inc_long);
@@ -617,13 +619,15 @@ zzalib::lat_long_t zzalib::grid_to_latlong(string gridsquare) {
 			next_inc = inc / 10.0;
 			break;
 		case 4:
-			// Second two letters - 24 * 24 squares - 2.5 * 5 minutes degress
+		case 8:
+			// Second or third two letters - 24 * 24 squares - 2.5 * 5 minutes degress
 			cg = gridsquare[i] - 'A' - 12;
 			ct = gridsquare[i + 1] - 'A' -12;
 			next_inc = inc / 10.0;
 			break;
 		case 2:
 		case 6:
+		case 10:
 			// Numbers - 10 * 10 squares - 1 * 2 degress
 			cg = gridsquare[i] - '0' - 5;
 			ct = gridsquare[i + 1] - '0' - 5;

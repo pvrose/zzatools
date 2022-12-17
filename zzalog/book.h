@@ -56,6 +56,7 @@ namespace zzalog {
 		HT_MEMORIES,              // Read mmemories from rig
 		HT_START_CHANGED,         // The start date or time has changed
 		HT_DXATLAS,               // DxAtlas selection has changed
+		HT_IGNORE,                // Ignore the change
 	};
 
 	class view;

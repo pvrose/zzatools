@@ -1200,7 +1200,7 @@ void qso_manager::qso_group::enable_widgets() {
 	else {
 		bn_start_qso_->label("Start");
 		bn_log_qso_->activate();
-		bn_log_qso_->label("Start/Log");
+		bn_log_qso_->label("Start && log");
 		bn_cancel_qso_->deactivate();
 	}
 	bn_start_qso_->redraw();
@@ -1210,7 +1210,7 @@ void qso_manager::qso_group::enable_widgets() {
 }
 
 // Update the fields in the record
-void qso_manager::qso_group::update_record() {
+void qso_manager::qso_group::update_record(bool update_view) {
 	if (current_qso_) {
 		// WRite (and read back) field values
 		current_qso_->item("CALL", string(ip_call_->value()));
@@ -1227,8 +1227,8 @@ void qso_manager::qso_group::update_record() {
 		current_qso_->item("NOTES", string(ip_notes_->value()));
 		ip_notes_->value(current_qso_->item("NOTES").c_str());
 		enable_widgets();
-		// Notify other views
-		tabbed_forms_->update_views(nullptr, HT_INSERTED, book_->size() - 1);
+		// Notify other views - treat as MINOR_CHANGE so that DxAtlas is not updated - it will be when logged
+		if (update_view) tabbed_forms_->update_views(nullptr, HT_MINOR_CHANGE, book_->size() - 1);
 	}
 }
 
@@ -1428,9 +1428,9 @@ void qso_manager::qso_group::cb_start_qso(Fl_Widget* w, void* v) {
 	qso_group* that = ancestor_view<qso_group>(w);
 	qso_manager* mgr = (qso_manager*)that->parent();
 	if (that->current_qso_ == nullptr) {
-		that->current_qso_ = mgr->start_qso();
+		that->current_qso_ = mgr->start_qso(true, false);
 	}
-	that->update_record();
+	that->update_record(true);
 	that->enable_widgets();
 }
 
@@ -1439,9 +1439,9 @@ void qso_manager::qso_group::cb_log_qso(Fl_Widget* w, void* v) {
 	qso_group* that = ancestor_view<qso_group>(w);
 	qso_manager* mgr = (qso_manager*)that->parent();
 	if (that->current_qso_ == nullptr) {
-		that->current_qso_ = mgr->start_qso();
+		that->current_qso_ = mgr->start_qso(true, false);
 	}
-	that->update_record();
+	that->update_record(false);
 	mgr->end_qso();
 	that->serial_num_++;
 	that->initialise_fields();
@@ -1664,7 +1664,7 @@ void qso_manager::qso_group::initialise_fields() {
 		record* dummy_qso;
 		// Start QSO refers to other widgets within qso_manager
 		if (boss->created_) {
-			dummy_qso = boss->start_qso(false);
+			dummy_qso = boss->start_qso(false, false);
 		}
 		else {
 			dummy_qso = boss->dummy_qso();
@@ -3428,7 +3428,7 @@ void qso_manager::update_qso() {
 }
 
 // Start QSO
-record* qso_manager::start_qso(bool add_to_book) {
+record* qso_manager::start_qso(bool add_to_book, bool update_view) {
 
 	record* new_record = new record;
 	string mode;
@@ -3540,9 +3540,12 @@ record* qso_manager::start_qso(bool add_to_book) {
 	// Add to book
 	if (add_to_book) {
 		record_num_t new_record_num = book_->append_record(new_record);
-		book_->selection(book_->item_number(new_record_num));
-		// Notify other views
-		tabbed_forms_->update_views(nullptr, HT_INSERTED, new_record_num);
+		if (update_view) {
+			book_->selection(book_->item_number(new_record_num), HT_INSERTED);
+		}
+		else {
+			book_->selection(book_->item_number(new_record_num), HT_IGNORE);
+		}
 	}
 
 	// Return created record
@@ -3552,6 +3555,8 @@ record* qso_manager::start_qso(bool add_to_book) {
 // End QSO - add time off
 // TODO: Can be called without current_qso_ - needs to be set by something.
 void qso_manager::end_qso() {
+	bool old_save_enabled = book_->save_enabled();
+	book_->enable_save(false);
 	// get current book item number
 	record_num_t item_number = book_->selection();
 	record_num_t record_number = book_->record_number(item_number);
@@ -3593,18 +3598,14 @@ void qso_manager::end_qso() {
 	book_->modified(true);
 	book_->selection(item_number, HT_INSERTED);
 
+	book_->enable_save(old_save_enabled);
+
 	// Update session end - if we crash before we close down, we may fail to remember session properly
 	time_t today = time(nullptr);
 	void* p_today = &today;
 	settings_->set("Session End", p_today, sizeof(time_t));
 	settings_->flush();
 
-	// Do not automatically save when in debug mode as there may be a bug in the application corrupting the log
-#ifndef _DEBUG
-	if (!read_only_) {
-		book_->store_data();
-	}
-#endif // _DEBUG
 }
 
 // Dummy QSO - only current date and time

@@ -67,8 +67,9 @@ namespace zzalog {
 	const basic_regex<char> REGEX_LAT_LONG("[NESWnesw](0[0-9][0-9]|1[0-7][0-9]|180) [0-5][0-9]\\.[0-9]{3}");
 	// A signed integer
 	const basic_regex<char> REGEX_POS_INTEGER("[0-9]+");
-	// 2- 4- 6- or 8- character maidenhead locator
+	// 2- 4- 6- or 8- character maidenhead locator, extension to 10 or 12 characters
 	const basic_regex<char> REGEX_GRIDSQUARE("[a-rA-R]{2}(|[0-9]{2}(|[a-xA-X]{2}(|[0-9]{2})))");
+	const basic_regex<char> REGEX_GRIDSQUARE_EXT("[a-xA-X]{2}(|[0-9]{2})");
 	// A signed integer
 	const basic_regex<char> REGEX_INTEGER("-?[0-9]+");
 	// CC-XXX - CC is a valid Continent, XXX is a valid number 000-999
