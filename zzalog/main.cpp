@@ -709,35 +709,6 @@ void add_qsl_handlers() {
 	}
 }
 
-//// Add a scratchpad
-//void add_scratchpad() {
-//	if (!closing_) {
-//		if (!qso_manager_) {
-//			qso_manager_ = new scratchpad;
-//		}
-//		int enabled;
-//		int top;
-//		int left;
-//		Fl_Preferences spad_settings(settings_, "Scratchpad");
-//		spad_settings.get("Enabled", enabled, (int)false);
-//		spad_settings.get("Top", top, 100);
-//		spad_settings.get("Left", left, 100);
-//		if (top < 0) top = 100;
-//		if (left < 0) left = 100;
-//		if (enabled) {
-//			// Show the scratchpad at the saved position
-//			qso_manager_->show();
-//			qso_manager_->position(left, top);
-//			status_->misc_status(ST_NOTE, "SCRATCHPAD: Opened");
-//		}
-//		else {
-//			// Hide it
-//			qso_manager_->hide();
-//			status_->misc_status(ST_NOTE, "SCRATCHPAD: Closed");
-//		}
-//	}
-//}
-
 // Add operating qso_manager
 void add_dashboard() {
 	if (!closing_) {
@@ -758,12 +729,12 @@ void add_dashboard() {
 			// Show the scratchpad at the saved position
 			qso_manager_->show();
 			qso_manager_->position(left, top);
-			status_->misc_status(ST_NOTE, "DASHBOARD: Opened");
+			status_->misc_status(ST_NOTE, "DASH: Opened");
 		}
 		else {
 			// Hide it
 			qso_manager_->hide();
-			status_->misc_status(ST_NOTE, "DASHBOARD: Closed");
+			status_->misc_status(ST_NOTE, "DASH: Closed");
 		}
 	}
 }

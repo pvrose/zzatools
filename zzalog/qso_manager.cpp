@@ -734,6 +734,33 @@ void qso_manager::qso_group::load_values() {
 	}
 	// Set active contest format ID
 	exch_fmt_id_ = ef_ids_[exch_fmt_ix_];
+
+	// Read contest details from most recent QSO
+	record* prev_record = book_->get_record(book_->size() - 1, false);
+	string prev_contest = prev_record->item("CONTEST_ID");
+	char message[100];
+	if (field_mode_ != NO_CONTEST) {
+		if (prev_contest != contest_id_) {
+			snprintf(message, 100, "DASH: Contest ID in log (%s) differs from settings (%s)", prev_contest.c_str(), contest_id_.c_str());
+			status_->misc_status(ST_WARNING, message);
+		}
+		else {
+			// Get serial number from log
+			string serno = prev_record->item("STX");
+			if (serno.length() > 0) {
+				int sernum = stoi(serno);
+				if (sernum > serial_num_) {
+					snprintf(message, 100, "DASH: Contest serial in log (%d) greater than settings (%d) - using log", sernum, serial_num_);
+					status_->misc_status(ST_WARNING, message);
+					serial_num_ = sernum;
+				}
+				else {
+					snprintf(message, 100, "DASH: Contest serial in log (%d) less than settings (%d) - using settings", sernum, serial_num_);
+					status_->misc_status(ST_NOTE, message);
+				}
+			}
+		}
+	}
 }
 
 // Create qso_group
@@ -887,11 +914,11 @@ void qso_manager::qso_group::create_form(int X, int Y) {
 	bn_inc_serno_->callback(cb_inc_serno, nullptr);
 	bn_inc_serno_->tooltip("Increment the contest serial number counter by 1");
 
-	curr_x += bn_inc_serno_->w() + GAP + WLABEL;
+	curr_x += bn_inc_serno_->w();
 
 	// Transmitted contest exchange
 	op_serno_ = new Fl_Output(curr_x, curr_y, WBUTTON, HBUTTON, "Serial");
-	op_serno_->align(FL_ALIGN_LEFT);
+	op_serno_->align(FL_ALIGN_TOP);
 	op_serno_->labelfont(FONT);
 	op_serno_->labelsize(FONT_SIZE);
 	op_serno_->textfont(FONT);
@@ -1494,6 +1521,7 @@ void qso_manager::qso_group::cb_parse(Fl_Widget* w, void* v) {
 void qso_manager::qso_group::cb_init_serno(Fl_Widget* w, void* v) {
 	qso_group* that = ancestor_view<qso_group>(w);
 	that->serial_num_ = 1;
+	that->initialise_fields();
 	that->enable_widgets();
 }
 
@@ -1501,6 +1529,7 @@ void qso_manager::qso_group::cb_init_serno(Fl_Widget* w, void* v) {
 void qso_manager::qso_group::cb_inc_serno(Fl_Widget* w, void* v) {
 	qso_group* that = ancestor_view<qso_group>(w);
 	that->serial_num_++;
+	that->initialise_fields();
 	that->enable_widgets();
 }
 
@@ -1508,6 +1537,7 @@ void qso_manager::qso_group::cb_inc_serno(Fl_Widget* w, void* v) {
 void qso_manager::qso_group::cb_dec_serno(Fl_Widget* w, void* v) {
 	qso_group* that = ancestor_view<qso_group>(w);
 	that->serial_num_--;
+	that->initialise_fields();
 	that->enable_widgets();
 }
 

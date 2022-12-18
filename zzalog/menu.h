@@ -73,8 +73,6 @@ namespace zzalog {
 		static void cb_mi_log_bulk(Fl_Widget* w, void* v);
 		// Log->Check Duplicates
 		static void cb_mi_log_dupes(Fl_Widget* w, void* v);
-		// Log->New View->Main,Record,Scratchpad
-		static void cb_mi_log_view(Fl_Widget* w, void* v);
 		// Log->Retime QSO
 		static void cb_mi_log_retime(Fl_Widget* w, void* v);
 		// Log->Start/Stop Session
@@ -172,8 +170,6 @@ namespace zzalog {
 		search_criteria_t* criteria_;
 		// Enabled
 		bool active_enabled_;
-		// Current logging view
-		object_t editting_view_;
 		// Current extraction
 		extract_data::extract_mode_t qsl_type_;
 

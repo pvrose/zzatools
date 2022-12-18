@@ -285,8 +285,6 @@ menu::menu(int X, int Y, int W, int H, const char* label) :
 	// default text size - just larger than default font size
 	textsize(FONT_SIZE + 1);
 	criteria_ = nullptr;
-	Fl_Preferences spad_settings(settings_, "Scratchpad");
-	spad_settings.get("Edit view", (int&)editting_view_, OT_REPORT);
 	show();
 }
 
@@ -294,8 +292,6 @@ menu::menu(int X, int Y, int W, int H, const char* label) :
 menu::~menu()
 {
 	clear();
-	Fl_Preferences spad_settings(settings_, "Scratchpad");
-	spad_settings.set("Edit view", editting_view_);
 }
 
 // File->New
@@ -813,13 +809,6 @@ void menu::cb_mi_valid8_log(Fl_Widget* w, void* v) {
 	fl_cursor(FL_CURSOR_DEFAULT);
 }
 
-// Log->Use View->
-// v is which view
-void menu::cb_mi_log_view(Fl_Widget* w, void* v) {
-	menu* that = ancestor_view<menu>(w);
-	that->editting_view_ = (object_t)(long)v;
-}
-
 // Log->New - start a new record
 // v is not used
 void menu::cb_mi_log_new(Fl_Widget* w, void* v) {
@@ -828,16 +817,6 @@ void menu::cb_mi_log_new(Fl_Widget* w, void* v) {
 	tabbed_forms_->activate_pane(OT_MAIN, true);
 	// Create a new record - on or off-air
 	qso_manager_->start_qso(true, true);
-	// Open log view
-	switch (that->editting_view_) {
-	case OT_MAIN:
-	case OT_RECORD:
-		tabbed_forms_->activate_pane(that->editting_view_, true);
-		break;
-	case OT_SCRATCH:
-		qso_manager_->show();
-		break;
-	}
 }
 
 
@@ -1775,7 +1754,6 @@ void menu::update_items() {
 		int index_newr = find_index("&Log/&New record");
 		int index_parser = find_index("&Log/&Parse record");
 		int index_bulk = find_index("&Log/&Bulk changes");
-		int index_spad = find_index("&Log/Scratc&hpad");
 		int index_extract = find_index("E&xtract");
 		int index_wsjtx = find_index("&Import/&WSJT-X UDP");
 		int index_rep = find_index("Re&port");
@@ -1786,9 +1764,6 @@ void menu::update_items() {
 		int index_cw_mess = find_index("I&C-7300/&CW messages");
 		int index_info = find_index("&Information");
 		int index_web = find_index("&Information/QSO &Web-site");
-		int index_use_log = find_index("&Log/&Use View/Main &Log");
-		int index_use_form = find_index("&Log/&Use View/&Report View");
-		int index_use_spad = find_index("&Log/&Use View/&Scratchpad");
 		int index_append_log = find_index("&Help/&Status/&Append File");
 		// Enable/Disable save 
 		if (modified) {
@@ -1877,34 +1852,6 @@ void menu::update_items() {
 		}
 		else {
 			mode(index_delete, mode(index_delete) | FL_MENU_INACTIVE);
-		}
-		// Scratchpad
-		Fl_Preferences spad_settings(settings_, "Scratchpad");
-		int spad_enabled;
-		spad_settings.get("Enabled", spad_enabled, (int)false);
-		if (spad_enabled) {
-			mode(index_spad, mode(index_spad) | FL_MENU_VALUE);
-		}
-		else {
-			mode(index_spad, mode(index_spad) & ~FL_MENU_VALUE);
-		}
-		// Editting view
-		switch (editting_view_) {
-		case OT_MAIN:
-			mode(index_use_log, mode(index_use_log) | FL_MENU_VALUE);
-			mode(index_use_form, mode(index_use_form) & ~FL_MENU_VALUE);
-			mode(index_use_spad, mode(index_use_spad) & ~FL_MENU_VALUE);
-			break;
-		case OT_REPORT:
-			mode(index_use_log, mode(index_use_log) & ~FL_MENU_VALUE);
-			mode(index_use_form, mode(index_use_form) | FL_MENU_VALUE);
-			mode(index_use_spad, mode(index_use_spad) & ~FL_MENU_VALUE);
-			break;
-		case OT_SCRATCH:
-			mode(index_use_log, mode(index_use_log) & ~FL_MENU_VALUE);
-			mode(index_use_form, mode(index_use_form) & ~FL_MENU_VALUE);
-			mode(index_use_spad, mode(index_use_spad) | FL_MENU_VALUE);
-			break;
 		}
 		// Info->QSO WEb-site
 		if (web_enabled) {
