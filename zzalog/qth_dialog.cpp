@@ -330,6 +330,36 @@ void qth_dialog::create_form(int X, int Y) {
 	curr_y = ip_description_->y() + ip_description_->h() + GAP;
 	max_h = curr_y;
 
+	curr_y += HTEXT;
+	curr_x = X + GAP;
+
+	ip_latitude_ = new Fl_Float_Input(curr_x, curr_y, WIP, HBUTTON, "Latitude");
+	ip_latitude_->labelsize(FONT_SIZE);
+	ip_latitude_->labelfont(FONT);
+	ip_latitude_->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
+	ip_latitude_->textfont(FONT);
+	ip_latitude_->textsize(FONT_SIZE);
+	ip_latitude_->tooltip("Enter the latitude to convert (+ve = N, -ve = S)");
+	curr_x += ip_latitude_->w() + GAP;
+	ip_longitude_ = new Fl_Float_Input(curr_x, curr_y, WIP, HBUTTON, "Latitude");
+	ip_longitude_->labelsize(FONT_SIZE);
+	ip_longitude_->labelfont(FONT);
+	ip_longitude_->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
+	ip_longitude_->textfont(FONT);
+	ip_longitude_->textsize(FONT_SIZE);
+	ip_longitude_->tooltip("Enter the longiitude to convert (+ve = E, -ve = W)");
+	curr_x += ip_longitude_->w() + GAP;
+	Fl_Button* bn_convert = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Gridsquare");
+	bn_convert->labelsize(FONT_SIZE);
+	bn_convert->labelfont(FONT);
+	bn_convert->callback(cb_bn_convert, (void*)&current_qth_.locator);
+	bn_convert->tooltip("Update gridsquare based on latitude and longitude");
+
+	curr_y += ip_latitude_->h() + GAP;
+	max_w = max(max_w, bn_convert->x() + bn_convert->w() + GAP);
+	curr_x = X + GAP;
+	max_h = curr_y;
+
 	// OK Button
 	Fl_Button* bn_ok = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "OK");
 	bn_ok->labelsize(FONT_SIZE);
@@ -491,4 +521,46 @@ void qth_dialog::cb_bn_ok(Fl_Widget * w, void* v) {
 void qth_dialog::cb_bn_cancel(Fl_Widget* w, void* v) {
 	qth_dialog* that = ancestor_view<qth_dialog>(w);
 	that->do_button(BN_CANCEL);
+}
+
+// Convert lat and long fields to gridsquare
+void qth_dialog::cb_bn_convert(Fl_Widget* w, void* v) {
+	qth_dialog* that = ancestor_view<qth_dialog>(w);
+	string* grid = (string*)v;
+	const char* latitude = that->ip_latitude_->value();
+	const char* longitude = that->ip_longitude_->value();
+	// Convert to locatio pair
+	lat_long_t location; 
+	try {
+		location = { atof(latitude), atof(longitude) };
+	}
+	catch (exception e) {
+		location = { nan(""), nan("") };
+	}
+	// Get the number of decomal points
+	int lat_decimals = strlen(latitude) - zzalib::find(latitude, strlen(latitude), '.');
+	int long_decimals = strlen(longitude) - zzalib::find(longitude, strlen(longitude), '.');
+	int num_decimals = min(lat_decimals, long_decimals);
+	int num_chars;
+	switch (num_decimals) {
+	case 0:
+	case 1:
+		num_chars = 4;
+		break;
+	case 2:
+	case 3:
+		num_chars = 6;
+		break;
+	case 4:
+		num_chars = 8;
+		break;
+	case 5:
+		num_chars = 10;
+		break;
+	default:
+		num_chars = 12;
+		break;
+	}
+	*grid = latlong_to_grid(location, num_chars);
+	that->enable_widgets();
 }

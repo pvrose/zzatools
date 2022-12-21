@@ -13,6 +13,7 @@
 #include <FL/Fl_Browser.H>
 #include <FL/Fl_Preferences.H>
 #include <FL/Fl_Int_Input.H>
+#include <FL/Fl_Float_Input.H>
 
 using namespace std;
 using namespace zzalib;
@@ -63,6 +64,8 @@ namespace zzalog {
 		static void cb_ip_cty(Fl_Widget* w, void* v);
 		// upper case callback
 		static void cb_ip_upper(Fl_Widget* w, void* v);
+		// Convert lat/long to gridsquare
+		static void cb_bn_convert(Fl_Widget* w, void* v);
 
 	protected:
 
@@ -89,6 +92,9 @@ namespace zzalog {
 		Fl_Input* ip_cont_;
 		Fl_Input* ip_iota_;
 		Fl_Input* ip_description_;
+
+		Fl_Float_Input* ip_latitude_;
+		Fl_Float_Input* ip_longitude_;
 
 		// Parameters for each of the QTH input widgets
 		enum input_type {
