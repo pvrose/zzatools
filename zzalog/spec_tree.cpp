@@ -207,8 +207,8 @@ void spec_tree::insert_adif_spec(Fl_Tree_Item* parent, const spec_dataset& datas
 				string column_text = (*entry_data)[column];
 				if (column_text.length() > 0) {
 					// The data value is not an empty string
-					char line[1024];
-					sprintf(line, "%s: %s", column.c_str(), column_text.c_str());
+					char line[2048];
+					snprintf(line, 2048, "%s: %s", column.c_str(), column_text.c_str());
 					Fl_Tree_Item* column_item = entry_item->add(prefs(), line);
 					column_item->labelcolor(FL_BLUE);
 					if (column == "Enumeration") {
@@ -231,18 +231,18 @@ void spec_tree::insert_adif_spec(Fl_Tree_Item* parent, const spec_dataset& datas
 								if (column_text == "DXCC_Entity_Code") {
 									switch (it->first.length()) {
 									case 1:
-										sprintf(line, "  %s: %s", it->first.c_str(), enum_desc.c_str());
+										snprintf(line, 2048, "  %s: %s", it->first.c_str(), enum_desc.c_str());
 										break;
 									case 2:
-										sprintf(line, " %s: %s", it->first.c_str(), enum_desc.c_str());
+										snprintf(line, 2048, " %s: %s", it->first.c_str(), enum_desc.c_str());
 										break;
 									default:
-										sprintf(line, "%s: %s", it->first.c_str(), enum_desc.c_str());
+										snprintf(line, 2048, "%s: %s", it->first.c_str(), enum_desc.c_str());
 										break;
 									}
 								}
 								else {
-									sprintf(line, "%s: %s", it->first.c_str(), enum_desc.c_str());
+									snprintf(line, 2048, "%s: %s", it->first.c_str(), enum_desc.c_str());
 								}
 								Fl_Tree_Item* enum_item = column_item->add(prefs(), line);
 								enum_item->labelcolor(fl_darker(FL_RED));

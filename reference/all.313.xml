@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<adif version="3.1.4" status="Released" created="2022-12-06T22:03:52Z">
+<adif version="3.1.3" status="Released" created="2022-06-10T23:47:50Z">
   <dataTypes>
     <header>
       <value>Data Type Name</value>
@@ -91,15 +91,11 @@
     <record>
       <value name="Data Type Name">Enumeration</value>
       <value name="Data Type Indicator">E</value>
-      <value name="Description">an explicit list of legal case-insensitive values represented in ASCII set forth in set notation, e.g. {A, B, C, D}, or defined in a table, from which a single value may be selected.</value>
+      <value name="Description">an explicit list of legal case-insensitive values represented in ASCII set forth in set notation, e.g. {A, B, C, D}, or defined in a table</value>
     </record>
     <record>
       <value name="Data Type Name">GridSquare</value>
-      <value name="Description">a case-insensitive 2-character, 4-character, 6-character, or 8-character Maidenhead locator. Specific fields impose additional restrictions on the number of characters; see the field descriptions for the allowed numbers of characters.</value>
-    </record>
-    <record>
-      <value name="Data Type Name">GridSquareExt</value>
-      <value name="Description">For a 10-character Maidenhead locator, contains characters 9 and 10. For a 12-character Maidenhead locator, contains characters 9, 10, 11 and 12. Characters 9 and 10 are case-insensitive ASCII letters in the range A-X. Characters 11 and 12 are Digits in the range 0-9.</value>
+      <value name="Description">a case-insensitive 2-character, 4-character, 6-character, or 8-character Maidenhead locator</value>
     </record>
     <record>
       <value name="Data Type Name">GridSquareList</value>
@@ -109,14 +105,6 @@
       <value name="Data Type Name">Location</value>
       <value name="Data Type Indicator">L</value>
       <value name="Description">a sequence of 11 characters representing a latitude or longitude in XDDD MM.MMM format, where X is a directional Character from the set {E, W, N, S} DDD is a 3-Digit degrees specifier, where 0 &lt;= DDD &lt;= 180 [use leading zeroes] There is a single space character in between DDD and MM.MMM MM.MMM is an unsigned Number minutes specifier with its decimal point in the third position, where 00.000 &lt;= MM.MMM &lt;= 59.999 [use leading and trailing zeroes]</value>
-    </record>
-    <record>
-      <value name="Data Type Name">POTARef</value>
-      <value name="Description">a sequence of case-insensitive Characters representing a Parks on the Air park reference in the form xxxx-nnnnn[@yyyyyy] comprising 6 to 17 characters where: xxxx is the POTA national program and is 1 to 4 characters in length, typically the default callsign prefix of the national program (rather than the DX entity) nnnnn represents the unique number within the national program and is either 4 or 5 characters in length (use the exact format listed on the POTA website) yyyyyy **Optional** is the 4 to 6 character ISO 3166-2 code to differentiate which state/province/prefecture/primary administration location the contact represents, in the case that the park reference spans more than one location (such as a trail). Examples of the POTARef Data Type: ReferenceLocation K-5033Golden Hill State Forest K-100005-digit park numbers are reserved for future use VE-5082@CA-ABThe Great Trail of Canada (the Canadian Trailway) National Scenic Trail, within Alberta, Canada 8P-0012Chancery Lane Swamp National Park VK-0556Pieman River State Reserve K-4562@US-CAPacific Crest Trail, within California, USA Additional Notes on POTARef: A browsable and searchable list of all park references is available. A complete CSV file is available (generated nightly). For more information, visit the Parks on the Air documentation website.</value>
-    </record>
-    <record>
-      <value name="Data Type Name">POTARefList</value>
-      <value name="Description">a comma-delimited list of one or more POTARef items.</value>
     </record>
     <record>
       <value name="Data Type Name">SecondarySubdivisionList</value>
@@ -516,13 +504,6 @@
         <value name="Abbreviation">PAC</value>
         <value name="Section Name">Pacific</value>
         <value name="DXCC Entity Code">9,20,103,110,123,134,138,166,174,197,297,515</value>
-      </record>
-      <record>
-        <value name="Enumeration Name">ARRL_Section</value>
-        <value name="Abbreviation">PE</value>
-        <value name="Section Name">Prince Edward Island</value>
-        <value name="DXCC Entity Code">1</value>
-        <value name="From Date">2020-04-01Z</value>
       </record>
       <record>
         <value name="Enumeration Name">ARRL_Section</value>
@@ -1117,12 +1098,6 @@
         <value name="Lower Freq (MHz)">241000</value>
         <value name="Upper Freq (MHz)">250000</value>
       </record>
-      <record>
-        <value name="Enumeration Name">Band</value>
-        <value name="Band">submm</value>
-        <value name="Lower Freq (MHz)">300000</value>
-        <value name="Upper Freq (MHz)">7500000</value>
-      </record>
     </enumeration>
     <enumeration name="Contest_ID">
       <header>
@@ -1246,11 +1221,6 @@
         <value name="Enumeration Name">Contest_ID</value>
         <value name="Contest-ID">ARRL-222</value>
         <value name="Description">ARRL 222 MHz and Up Distance Contest</value>
-      </record>
-      <record>
-        <value name="Enumeration Name">Contest_ID</value>
-        <value name="Contest-ID">ARRL-DIGI</value>
-        <value name="Description">ARRL International Digital Contest</value>
       </record>
       <record>
         <value name="Enumeration Name">Contest_ID</value>
@@ -1484,16 +1454,6 @@
       </record>
       <record>
         <value name="Enumeration Name">Contest_ID</value>
-        <value name="Contest-ID">EA-MAJESTAD-CW</value>
-        <value name="Description">His Majesty The King of Spain CW Contest (2022 and later)</value>
-      </record>
-      <record>
-        <value name="Enumeration Name">Contest_ID</value>
-        <value name="Contest-ID">EA-MAJESTAD-SSB</value>
-        <value name="Description">His Majesty The King of Spain SSB Contest (2022 and later)</value>
-      </record>
-      <record>
-        <value name="Enumeration Name">Contest_ID</value>
         <value name="Contest-ID">EA-PSK63</value>
         <value name="Description">EA PSK63</value>
       </record>
@@ -1506,12 +1466,12 @@
       <record>
         <value name="Enumeration Name">Contest_ID</value>
         <value name="Contest-ID">EA-SMRE-CW</value>
-        <value name="Description">Su Majestad El Rey de España - CW (2021 and earlier)</value>
+        <value name="Description">Su Majestad El Rey de España - CW</value>
       </record>
       <record>
         <value name="Enumeration Name">Contest_ID</value>
         <value name="Contest-ID">EA-SMRE-SSB</value>
-        <value name="Description">Su Majestad El Rey de España - SSB (2021 and earlier)</value>
+        <value name="Description">Su Majestad El Rey de España - SSB</value>
       </record>
       <record>
         <value name="Enumeration Name">Contest_ID</value>
@@ -1627,11 +1587,6 @@
         <value name="Enumeration Name">Contest_ID</value>
         <value name="Contest-ID">IARU-HF</value>
         <value name="Description">IARU HF World Championship</value>
-      </record>
-      <record>
-        <value name="Enumeration Name">Contest_ID</value>
-        <value name="Contest-ID">ICWC-MST</value>
-        <value name="Description">ICWC Medium Speed Test</value>
       </record>
       <record>
         <value name="Enumeration Name">Contest_ID</value>
@@ -4984,7 +4939,7 @@
       <record>
         <value name="Enumeration Name">Mode</value>
         <value name="Mode">DIGITALVOICE</value>
-        <value name="Submodes">C4FM,DMR,DSTAR,FREEDV,M17</value>
+        <value name="Submodes">C4FM,DMR,DSTAR</value>
       </record>
       <record>
         <value name="Enumeration Name">Mode</value>
@@ -16613,160 +16568,6 @@
       </record>
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
-        <value name="Code">CHA</value>
-        <value name="Primary Administrative Subdivision">Changhua</value>
-        <value name="DXCC Entity Code">386</value>
-        <value name="Comments">county</value>
-      </record>
-      <record>
-        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
-        <value name="Code">CYI</value>
-        <value name="Primary Administrative Subdivision">Chiayi</value>
-        <value name="DXCC Entity Code">386</value>
-        <value name="Comments">city</value>
-      </record>
-      <record>
-        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
-        <value name="Code">CYQ</value>
-        <value name="Primary Administrative Subdivision">Chiayi</value>
-        <value name="DXCC Entity Code">386</value>
-        <value name="Comments">county</value>
-      </record>
-      <record>
-        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
-        <value name="Code">HSZ</value>
-        <value name="Primary Administrative Subdivision">Hsinchu</value>
-        <value name="DXCC Entity Code">386</value>
-        <value name="Comments">city</value>
-      </record>
-      <record>
-        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
-        <value name="Code">HSQ</value>
-        <value name="Primary Administrative Subdivision">Hsinchu</value>
-        <value name="DXCC Entity Code">386</value>
-        <value name="Comments">county</value>
-      </record>
-      <record>
-        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
-        <value name="Code">HUA</value>
-        <value name="Primary Administrative Subdivision">Hualien</value>
-        <value name="DXCC Entity Code">386</value>
-        <value name="Comments">county</value>
-      </record>
-      <record>
-        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
-        <value name="Code">KHH</value>
-        <value name="Primary Administrative Subdivision">Kaohsiung</value>
-        <value name="DXCC Entity Code">386</value>
-        <value name="Comments">special municipality</value>
-      </record>
-      <record>
-        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
-        <value name="Code">KEE</value>
-        <value name="Primary Administrative Subdivision">Keelung</value>
-        <value name="DXCC Entity Code">386</value>
-        <value name="Comments">city</value>
-      </record>
-      <record>
-        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
-        <value name="Code">KIN</value>
-        <value name="Primary Administrative Subdivision">Kinmen</value>
-        <value name="DXCC Entity Code">386</value>
-        <value name="Comments">county</value>
-      </record>
-      <record>
-        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
-        <value name="Code">LIE</value>
-        <value name="Primary Administrative Subdivision">Lienchiang</value>
-        <value name="DXCC Entity Code">386</value>
-        <value name="Comments">county</value>
-      </record>
-      <record>
-        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
-        <value name="Code">MIA</value>
-        <value name="Primary Administrative Subdivision">Miaoli</value>
-        <value name="DXCC Entity Code">386</value>
-        <value name="Comments">county</value>
-      </record>
-      <record>
-        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
-        <value name="Code">NAN</value>
-        <value name="Primary Administrative Subdivision">Nantou</value>
-        <value name="DXCC Entity Code">386</value>
-        <value name="Comments">county</value>
-      </record>
-      <record>
-        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
-        <value name="Code">NWT</value>
-        <value name="Primary Administrative Subdivision">New Taipei</value>
-        <value name="DXCC Entity Code">386</value>
-        <value name="Comments">special municipality</value>
-      </record>
-      <record>
-        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
-        <value name="Code">PEN</value>
-        <value name="Primary Administrative Subdivision">Penghu</value>
-        <value name="DXCC Entity Code">386</value>
-        <value name="Comments">county</value>
-      </record>
-      <record>
-        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
-        <value name="Code">PIF</value>
-        <value name="Primary Administrative Subdivision">Pingtung</value>
-        <value name="DXCC Entity Code">386</value>
-        <value name="Comments">county</value>
-      </record>
-      <record>
-        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
-        <value name="Code">TXG</value>
-        <value name="Primary Administrative Subdivision">Taichung</value>
-        <value name="DXCC Entity Code">386</value>
-        <value name="Comments">special municipality</value>
-      </record>
-      <record>
-        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
-        <value name="Code">TNN</value>
-        <value name="Primary Administrative Subdivision">Tainan</value>
-        <value name="DXCC Entity Code">386</value>
-        <value name="Comments">special municipality</value>
-      </record>
-      <record>
-        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
-        <value name="Code">TPE</value>
-        <value name="Primary Administrative Subdivision">Taipei</value>
-        <value name="DXCC Entity Code">386</value>
-        <value name="Comments">special municipality</value>
-      </record>
-      <record>
-        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
-        <value name="Code">TTT</value>
-        <value name="Primary Administrative Subdivision">Taitung</value>
-        <value name="DXCC Entity Code">386</value>
-        <value name="Comments">county</value>
-      </record>
-      <record>
-        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
-        <value name="Code">TAO</value>
-        <value name="Primary Administrative Subdivision">Taoyuan</value>
-        <value name="DXCC Entity Code">386</value>
-        <value name="Comments">special municipality</value>
-      </record>
-      <record>
-        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
-        <value name="Code">ILA</value>
-        <value name="Primary Administrative Subdivision">Yilan</value>
-        <value name="DXCC Entity Code">386</value>
-        <value name="Comments">county</value>
-      </record>
-      <record>
-        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
-        <value name="Code">YUN</value>
-        <value name="Primary Administrative Subdivision">Yunlin</value>
-        <value name="DXCC Entity Code">386</value>
-        <value name="Comments">county</value>
-      </record>
-      <record>
-        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">01</value>
         <value name="Primary Administrative Subdivision">Zagrebačka županija</value>
         <value name="DXCC Entity Code">497</value>
@@ -19022,12 +18823,6 @@
       </record>
       <record>
         <value name="Enumeration Name">Submode</value>
-        <value name="Submode">FREEDV</value>
-        <value name="Mode">DIGITALVOICE</value>
-        <value name="Description">Digital voice mode for HF radio implemented with open source</value>
-      </record>
-      <record>
-        <value name="Enumeration Name">Submode</value>
         <value name="Submode">FSK31</value>
         <value name="Mode">PSK</value>
       </record>
@@ -19256,12 +19051,6 @@
         <value name="Submode">LSB</value>
         <value name="Mode">SSB</value>
         <value name="Description">Amplitude modulated voice telephony, lower-sideband, suppressed-carrier</value>
-      </record>
-      <record>
-        <value name="Enumeration Name">Submode</value>
-        <value name="Submode">M17</value>
-        <value name="Mode">DIGITALVOICE</value>
-        <value name="Description">Digital radio protocol using the Codec 2 voice encoder</value>
       </record>
       <record>
         <value name="Enumeration Name">Submode</value>
@@ -19826,9 +19615,11 @@
       <value name="Maximum Value">120</value>
     </record>
     <record>
-      <value name="Field Name">ALTITUDE</value>
+      <value name="Field Name">A_INDEX</value>
       <value name="Data Type">Number</value>
-      <value name="Description">the height of the contacted station in meters relative to Mean Sea Level (MSL). For example 1.5 km is &lt;ALTITUDE:4&gt;1500 and 10.5 m is &lt;ALTITUDE:4&gt;10.5</value>
+      <value name="Description">the geomagnetic A index at the time of the QSO in the range 0 to 400 (inclusive)</value>
+      <value name="Minimum Value">0</value>
+      <value name="Maximum Value">400</value>
     </record>
     <record>
       <value name="Field Name">ANT_AZ</value>
@@ -19860,20 +19651,13 @@
       <value name="Field Name">AWARD_SUBMITTED</value>
       <value name="Data Type">SponsoredAwardList</value>
       <value name="Enumeration">Sponsored_Award</value>
-      <value name="Description">the list of awards submitted to a sponsor. note that this field might not be used in a QSO record. It might be used to convey information about a user's "Award Account" between an award sponsor and the user. For example, AA6YQ might submit a request for awards by sending the following: &lt;CALL:5&gt;AA6YQ &lt;AWARD_SUBMITTED:64&gt;ADIF_CENTURY_BASIC,ADIF_CENTURY_SILVER,ADIF_SPECTRUM_100-160m</value>
+      <value name="Description">the list of awards submitted to a sponsor. note that this field might not be used in a QSO record. It might be used to convey information about a user’s “Award Account” between an award sponsor and the user. For example, AA6YQ might submit a request for awards by sending the following: &lt;CALL:5&gt;AA6YQ &lt;AWARD_SUBMITTED:64&gt;ADIF_CENTURY_BASIC,ADIF_CENTURY_SILVER,ADIF_SPECTRUM_100-160m</value>
     </record>
     <record>
       <value name="Field Name">AWARD_GRANTED</value>
       <value name="Data Type">SponsoredAwardList</value>
       <value name="Enumeration">Sponsored_Award</value>
-      <value name="Description">the list of awards granted by a sponsor. note that this field might not be used in a QSO record. It might be used to convey information about a user's "Award Account" between an award sponsor and the user. For example, in response to a request "send me a list of the awards granted to AA6YQ", this might be received: &lt;CALL:5&gt;AA6YQ &lt;AWARD_GRANTED:64&gt;ADIF_CENTURY_BASIC,ADIF_CENTURY_SILVER,ADIF_SPECTRUM_100-160m</value>
-    </record>
-    <record>
-      <value name="Field Name">A_INDEX</value>
-      <value name="Data Type">Number</value>
-      <value name="Description">the geomagnetic A index at the time of the QSO in the range 0 to 400 (inclusive)</value>
-      <value name="Minimum Value">0</value>
-      <value name="Maximum Value">400</value>
+      <value name="Description">the list of awards granted by a sponsor. note that this field might not be used in a QSO record. It might be used to convey information about a user’s “Award Account” between an award sponsor and the user. For example, in response to a request “send me a list of the awards granted to AA6YQ”, this might be received: &lt;CALL:5&gt;AA6YQ &lt;AWARD_GRANTED:64&gt;ADIF_CENTURY_BASIC,ADIF_CENTURY_SILVER,ADIF_SPECTRUM_100-160m</value>
     </record>
     <record>
       <value name="Field Name">BAND</value>
@@ -19890,7 +19674,7 @@
     <record>
       <value name="Field Name">CALL</value>
       <value name="Data Type">String</value>
-      <value name="Description">the contacted station's callsign</value>
+      <value name="Description">the contacted station's Callsign</value>
     </record>
     <record>
       <value name="Field Name">CHECK</value>
@@ -20054,40 +19838,13 @@
     <record>
       <value name="Field Name">GRIDSQUARE</value>
       <value name="Data Type">GridSquare</value>
-      <value name="Description">the contacted station's 2-character, 4-character, 6-character, or 8-character Maidenhead Grid Square For 10 or 12 character locators, store the first 8 characters in GRIDSQUARE and the additional 2 or 4 characters in the GRIDSQUARE_EXT field</value>
-    </record>
-    <record>
-      <value name="Field Name">GRIDSQUARE_EXT</value>
-      <value name="Data Type">GridSquareExt</value>
-      <value name="Description">for a contacted station's 10-character Maidenhead locator, supplements the GRIDSQUARE field by containing characters 9 and 10. For a contacted station's 12-character Maidenhead locator, supplements the GRIDSQUARE field by containing characters 9, 10, 11 and 12. Characters 9 and 10 are case-insensitive ASCII letters in the range A-X. Characters 11 and 12 are Digits in the range 0 to 9. On export, the field length must be 2 or 4. On import, if the field length is greater than 4, the additional characters must be ignored. Example of exporting the 10-character locator FN01MH42BQ: &lt;GRIDSQUARE:8&gt;FN01MH42 &lt;GRIDSQUARE_EXT:2&gt;BQ</value>
+      <value name="Description">the contacted station's 2-character, 4-character, 6-character, or 8-character Maidenhead Grid Square</value>
     </record>
     <record>
       <value name="Field Name">GUEST_OP</value>
       <value name="Data Type">String</value>
       <value name="Description">import-only: use OPERATOR instead</value>
       <value name="Import-only">true</value>
-    </record>
-    <record>
-      <value name="Field Name">HAMLOGEU_QSO_UPLOAD_DATE</value>
-      <value name="Data Type">Date</value>
-      <value name="Description">the date the QSO was last uploaded to the HAMLOG.EU online service</value>
-    </record>
-    <record>
-      <value name="Field Name">HAMLOGEU_QSO_UPLOAD_STATUS</value>
-      <value name="Data Type">Enumeration</value>
-      <value name="Enumeration">QSO_Upload_Status</value>
-      <value name="Description">the upload status of the QSO on the HAMLOG.EU online service</value>
-    </record>
-    <record>
-      <value name="Field Name">HAMQTH_QSO_UPLOAD_DATE</value>
-      <value name="Data Type">Date</value>
-      <value name="Description">the date the QSO was last uploaded to the HamQTH.com online service</value>
-    </record>
-    <record>
-      <value name="Field Name">HAMQTH_QSO_UPLOAD_STATUS</value>
-      <value name="Data Type">Enumeration</value>
-      <value name="Enumeration">QSO_Upload_Status</value>
-      <value name="Description">the upload status of the QSO on the HamQTH.com online service</value>
     </record>
     <record>
       <value name="Field Name">HRDLOG_QSO_UPLOAD_DATE</value>
@@ -20176,11 +19933,6 @@
       <value name="Description">For Meteor Scatter QSOs, the name of the meteor shower in progress</value>
     </record>
     <record>
-      <value name="Field Name">MY_ALTITUDE</value>
-      <value name="Data Type">Number</value>
-      <value name="Description">the height of the logging station in meters relative to Mean Sea Level (MSL). For example 1.5 km is &lt;MY_ALTITUDE:4&gt;1500 and 10.5 m is &lt;MY_ALTITUDE:4&gt;10.5</value>
-    </record>
-    <record>
       <value name="Field Name">MY_ANTENNA</value>
       <value name="Data Type">String</value>
       <value name="Description">the logging station's antenna</value>
@@ -20246,12 +19998,7 @@
     <record>
       <value name="Field Name">MY_GRIDSQUARE</value>
       <value name="Data Type">GridSquare</value>
-      <value name="Description">the logging station's 2-character, 4-character, 6-character, or 8-character Maidenhead Grid Square For 10 or 12 character locators, store the first 8 characters in MY_GRIDSQUARE and the additional 2 or 4 characters in the MY_GRIDSQUARE_EXT field</value>
-    </record>
-    <record>
-      <value name="Field Name">MY_GRIDSQUARE_EXT</value>
-      <value name="Data Type">GridSquareExt</value>
-      <value name="Description">for a logging station's 10-character Maidenhead locator, supplements the MY_GRIDSQUARE field by containing characters 9 and 10. For a logging station's 12-character Maidenhead locator, supplements the MY_GRIDSQUARE field by containing characters 9, 10, 11 and 12. Characters 9 and 10 are case-insensitive ASCII letters in the range A-X. Characters 11 and 12 are Digits in the range 0 to 9. On export, the field length must be 2 or 4. On import, if the field length is greater than 4, the additional characters must be ignored. Example of exporting the 10-character locator FN01MH42BQ: &lt;MY_GRIDSQUARE:8&gt;FN01MH42 &lt;MY_GRIDSQUARE_EXT:2&gt;BQ</value>
+      <value name="Description">the logging station's 2-character, 4-character, 6-character, or 8-character Maidenhead Grid Square</value>
     </record>
     <record>
       <value name="Field Name">MY_IOTA</value>
@@ -20301,11 +20048,6 @@
       <value name="Field Name">MY_POSTAL_CODE_INTL</value>
       <value name="Data Type">IntlString</value>
       <value name="Description">the logging station's postal code</value>
-    </record>
-    <record>
-      <value name="Field Name">MY_POTA_REF</value>
-      <value name="Data Type">POTARefList</value>
-      <value name="Description">a comma-delimited list of one or more of the logging station's POTA (Parks on the Air) reference(s). Examples: &lt;MY_POTA_REF:6&gt;K-0059 &lt;MY_POTA_REF:7&gt;K-10000 &lt;MY_POTA_REF:40&gt;K-0817,K-4566,K-4576,K-4573,K-4578@US-WY</value>
     </record>
     <record>
       <value name="Field Name">MY_RIG</value>
@@ -20421,11 +20163,6 @@
       <value name="Description">the contacted station's WPX prefix</value>
     </record>
     <record>
-      <value name="Field Name">POTA_REF</value>
-      <value name="Data Type">POTARefList</value>
-      <value name="Description">a comma-delimited list of one or more of the contacted station's POTA (Parks on the Air) reference(s). Examples: &lt;POTA_REF:6&gt;K-5033 &lt;POTA_REF:13&gt;VE-5082@CA-AB &lt;POTA_REF:40&gt;K-0817,K-4566,K-4576,K-4573,K-4578@US-WY</value>
-    </record>
-    <record>
       <value name="Field Name">PRECEDENCE</value>
       <value name="Data Type">String</value>
       <value name="Description">contest precedence (e.g. for ARRL Sweepstakes)</value>
@@ -20482,7 +20219,7 @@
       <value name="Field Name">QSL_RCVD_VIA</value>
       <value name="Data Type">Enumeration</value>
       <value name="Enumeration">QSL_Via</value>
-      <value name="Description">if QSL_RCVD is set to 'Y' or 'V', the means by which the QSL was received by the logging station; otherwise, the means by which the logging station requested or intends to request that the QSL be conveyed. (Note: 'V' is import-only) use of M (manager) is import-only</value>
+      <value name="Description">if QSL_RCVD is set to 'Y' or 'V', the means by which the QSL was received by the logging station; otherwise, the means by which the logging station requested or intends to request that the QSL be conveyed. (Note: ‘V’ is import-only) use of M (manager) is import-only</value>
     </record>
     <record>
       <value name="Field Name">QSL_SENT</value>
@@ -20536,7 +20273,7 @@
       <value name="Field Name">REGION</value>
       <value name="Data Type">Enumeration</value>
       <value name="Enumeration">Region</value>
-      <value name="Description">the contacted station's WAE or CQ entity contained within a DXCC entity. the value None indicates that the WAE or CQ entity is the DXCC entity in the DXCC field. nothing can be inferred from the absence of the REGION field</value>
+      <value name="Description">the contacted station’s WAE or CQ entity contained within a DXCC entity. the value None indicates that the WAE or CQ entity is the DXCC entity in the DXCC field. nothing can be inferred from the absence of the REGION field</value>
     </record>
     <record>
       <value name="Field Name">RIG</value>
@@ -20561,13 +20298,13 @@
     <record>
       <value name="Field Name">RX_PWR</value>
       <value name="Data Type">Number</value>
-      <value name="Description">the contacted station's transmitter power in Watts with a value greater than or equal to 0</value>
+      <value name="Description">the contacted station's transmitter power in Watts with a value greater than 0</value>
       <value name="Minimum Value">0</value>
     </record>
     <record>
       <value name="Field Name">SAT_MODE</value>
       <value name="Data Type">String</value>
-      <value name="Description">satellite mode - a code representing the satellite's uplink band and downlink band</value>
+      <value name="Description">satellite mode</value>
     </record>
     <record>
       <value name="Field Name">SAT_NAME</value>
@@ -20679,7 +20416,7 @@
     <record>
       <value name="Field Name">TX_PWR</value>
       <value name="Data Type">Number</value>
-      <value name="Description">the logging station's power in Watts with a value greater than or equal to 0</value>
+      <value name="Description">the logging station's power in Watts with a value greater than 0</value>
       <value name="Minimum Value">0</value>
     </record>
     <record>
