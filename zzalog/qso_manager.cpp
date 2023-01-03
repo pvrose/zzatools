@@ -1304,7 +1304,7 @@ void qso_manager::qso_group::copy_record(record* old_record) {
 		}
 		update_fields();
 	}
-	else {
+	else if (old_record) {
 		// Copy FREQ, MODE, TX_PWR, CALL 
 		update_frequency(old_record->item("FREQ"));
 		ch_mode_->value(old_record->item("MODE", true).c_str());

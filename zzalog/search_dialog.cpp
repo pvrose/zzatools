@@ -57,7 +57,9 @@ search_dialog::search_dialog() :
 	const int R11 = YG1 + HTEXT;
 	const int R12 = R11 + HBN;
 	const int R13 = R12 + HBN;
+	const int HG1A = R13 + HBN;
 	const int R14 = R13 + HBN;
+	const int HG1B = R14 + HBN;
 	const int R15 = R14 + HBN + GAP;
 	const int HG1 = R15 + HBN + GAP - YG1;
 	// Group 2 - Refinement
@@ -124,6 +126,10 @@ search_dialog::search_dialog() :
 	gp1->box(FL_THIN_DOWN_BOX);
 	gp1->align(FL_ALIGN_TOP_LEFT | FL_ALIGN_INSIDE);
 	// Positions for the 10 radio buttons
+
+	// Group the field selection buttons
+	Fl_Group* gp1a = new Fl_Group(XG, YG1, WG1, HG1A);
+	gp1a->box(FL_FLAT_BOX);
 	const int col1[10] = { C11, C12, C13, C14, C11, C12, C13, C14, C11, C12 };
 	const int row1[10] = { R11, R11, R11, R11, R12, R12, R12, R12, R13, R13 };
 	// For each condition
@@ -150,6 +156,10 @@ search_dialog::search_dialog() :
 	ch12->tooltip("Select field to search on");
 	ch12->callback(cb_value<field_choice, string>, (void*)&criteria_->field_name);
 	ch12->when(FL_WHEN_RELEASE);
+	gp1a->end();
+	
+	Fl_Group* gp1b = new Fl_Group(XG, R14, WG1, HG1B);
+	gp1b->box(FL_FLAT_BOX);
 	// Position of the 7 comparator buttons
 	const int col2[7] = { C11, (C11 + C12)/2, C12, (C12 + C13)/2, C13, (C13 + C14)/2, C14 };
 	const int row2[7] = { R14, R14, R14, R14, R14, R14, R14 };
@@ -168,8 +178,8 @@ search_dialog::search_dialog() :
 		comparator_params_[i].attribute = (int*)&criteria_->comparator;
 		bn13->callback(cb_radio, (void*)&comparator_params_[i]);
 		bn13->when(FL_WHEN_RELEASE);
-
 	}
+	gp1b->end();
 	// Input - text to match
 	intl_input* ip14 = new intl_input(C11, R15
 		, WEDIT, HTEXT, "Search text");
