@@ -2,7 +2,6 @@
 #include "QBS_consts.h"
 #include "QBS_data.h"
 #include "QBS_window.h"
-#include "../zzalib/utils.h"
 
 #include <string>
 #include <iostream>
@@ -11,7 +10,7 @@
 using namespace zzalib;
 using namespace std;
 
-extern const char* DATE_FORMAT;
+const extern char* DATE_FORMAT;
 
 QBS_import::QBS_import() {
 	clear_maps();

@@ -66,12 +66,12 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <LibraryPath>C:\Users\pvros\Documents\dev\deps\lib;C:\Users\pvros\Documents\dev\fltk-master\build\lib\Debug;C:\Users\pvros\Documents\dev\curl-7.65.1\builds\libcurl-vc15-x86-release-dll-ipv6-sspi-winssl\lib;C:\Users\pvros\Documents\dev\zzatools\Debug;$(LibraryPath);C:\Program Files %28x86%29\hamlib-w32-4.5.3\lib;C:\Program Files %28x86%29\hamlib-w32-4.5\lib\msvc</LibraryPath>
+    <LibraryPath>C:\Users\pvros\Documents\dev\deps\lib;C:\Users\pvros\Documents\dev\fltk-master\build\lib\Debug;C:\Users\pvros\Documents\dev\curl-7.65.1\builds\libcurl-vc15-x86-release-dll-ipv6-sspi-winssl\lib;C:\Users\pvros\Documents\dev\zzatools\Debug;C:\Program Files %28x86%29\hamlib-w32-4.5.3\lib\msvc;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\pvros\Documents\dev\deps\lib;C:\Users\pvros\Documents\dev\fltk-master\build\lib\Release;C:\Users\pvros\Documents\dev\curl-7.65.1\builds\libcurl-vc15-x86-release-dll-ipv6-sspi-winssl\lib;C:\Users\pvros\Documents\dev\zzatools\Release;$(LibraryPath);C:\Program Files %28x86%29\hamlib-w32-4.5\lib;C:\Program Files %28x86%29\hamlib-w32-4.5\lib\msvc</LibraryPath>
+    <LibraryPath>C:\Users\pvros\Documents\dev\deps\lib;C:\Users\pvros\Documents\dev\fltk-master\build\lib\Release;C:\Users\pvros\Documents\dev\curl-7.65.1\builds\libcurl-vc15-x86-release-dll-ipv6-sspi-winssl\lib;C:\Users\pvros\Documents\dev\zzatools\Release;$(LibraryPath);C:\Program Files %28x86%29\hamlib-w32-4.5.3\lib;C:\Program Files %28x86%29\hamlib-w32-4.5\lib\msvc</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LibraryPath>C:\Users\pvros\Documents\dev\deps\lib;C:\Users\pvros\Documents\dev\fltk-1.4.x-20200320-0a38e2e3\build\lib\Debug;C:\cygwin\usr\local\bin;C:\Users\pvros\Documents\dev\curl-7.65.1\builds\libcurl-vc15-x86-release-dll-ipv6-sspi-winssl\lib;C:\Users\pvros\Documents\dev\zzatools\Debug;$(LibraryPath)</LibraryPath>
@@ -95,7 +95,7 @@
       <TargetMachine>MachineX86</TargetMachine>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>libcurl.lib;libssh2_a.lib;nghttp2.lib;libssl.lib;libcrypto.lib;oldap32_a.lib;olber32_a.lib;zlib_a.lib;libhamlib-4.lib;fltkd.lib;fltk_jpegd.lib;fltk_pngd.lib;fltk_zd.lib;fltk_imagesd.lib;fltk_gld.lib;fltk_formsd.lib;zzalib.lib;comctl32.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libcurl.lib;libssh2_a.lib;nghttp2.lib;libssl.lib;libcrypto.lib;oldap32_a.lib;olber32_a.lib;zlib_a.lib;libhamlib-4.lib;fltkd.lib;fltk_jpegd.lib;fltk_pngd.lib;fltk_zd.lib;fltk_imagesd.lib;fltk_gld.lib;fltk_formsd.lib;comctl32.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <HeapReserveSize>2000000</HeapReserveSize>
@@ -107,7 +107,7 @@
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalIncludeDirectories>C:\Users\pvros\Documents\dev\curl-7.65.1\builds\libcurl-vc15-x86-release-dll-ipv6-sspi-winssl\include;C:\Users\pvros\Documents\dev\deps\include;C:\Users\pvros\Documents\dev\fltk-master\build;C:\Users\pvros\Documents\dev\fltk-master;%(AdditionalIncludeDirectories);C:\Program Files %28x86%29\hamlib-w32-4.5\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\pvros\Documents\dev\curl-7.65.1\builds\libcurl-vc15-x86-release-dll-ipv6-sspi-winssl\include;C:\Users\pvros\Documents\dev\deps\include;C:\Users\pvros\Documents\dev\fltk-master\build;C:\Users\pvros\Documents\dev\fltk-master;%(AdditionalIncludeDirectories);C:\Program Files %28x86%29\hamlib-w32-4.5.3\include</AdditionalIncludeDirectories>
       <AssemblerOutput>NoListing</AssemblerOutput>
       <UseUnicodeForAssemblerListing>false</UseUnicodeForAssemblerListing>
     </ClCompile>
@@ -117,7 +117,7 @@
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>libcurl.lib;libssh2_a.lib;nghttp2.lib;libssl.lib;libcrypto.lib;oldap32_a.lib;olber32_a.lib;zlib_a.lib;fltk.lib;fltk_jpeg.lib;fltk_png.lib;fltk_z.lib;fltk_images.lib;fltk_gl.lib;fltk_forms.lib;zzalib.lib;comctl32.lib;Ws2_32.lib;libhamlib-4.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libcurl.lib;libssh2_a.lib;nghttp2.lib;libssl.lib;libcrypto.lib;oldap32_a.lib;olber32_a.lib;zlib_a.lib;fltk.lib;fltk_jpeg.lib;fltk_png.lib;fltk_z.lib;fltk_images.lib;fltk_gl.lib;fltk_forms.lib;comctl32.lib;Ws2_32.lib;libhamlib-4.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <HeapReserveSize>2000000</HeapReserveSize>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
@@ -133,6 +133,19 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="zzalib\ic7300.cpp" />
+    <ClCompile Include="zzalib\page_dialog.cpp" />
+    <ClCompile Include="zzalib\rig_if.cpp" />
+    <ClCompile Include="zzalib\rpc_data_item.cpp" />
+    <ClCompile Include="zzalib\rpc_handler.cpp" />
+    <ClCompile Include="zzalib\serial.cpp" />
+    <ClCompile Include="zzalib\socket_server.cpp" />
+    <ClCompile Include="zzalib\url_handler.cpp" />
+    <ClCompile Include="zzalib\utils.cpp" />
+    <ClCompile Include="zzalib\win_dialog.cpp" />
+    <ClCompile Include="zzalib\xml_element.cpp" />
+    <ClCompile Include="zzalib\xml_reader.cpp" />
+    <ClCompile Include="zzalib\xml_writer.cpp" />
     <ClCompile Include="zzalog\about_dialog.cpp">
       <ScanSourceForModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ScanSourceForModuleDependencies>
     </ClCompile>
@@ -198,6 +211,23 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="packages\pthreads.2.9.1.4\build\native\include\pthread.h" />
+    <ClInclude Include="zzalib\callback.h" />
+    <ClInclude Include="zzalib\drawing.h" />
+    <ClInclude Include="zzalib\formats.h" />
+    <ClInclude Include="zzalib\ic7300.h" />
+    <ClInclude Include="zzalib\page_dialog.h" />
+    <ClInclude Include="zzalib\pch.h" />
+    <ClInclude Include="zzalib\rig_if.h" />
+    <ClInclude Include="zzalib\rpc_data_item.h" />
+    <ClInclude Include="zzalib\rpc_handler.h" />
+    <ClInclude Include="zzalib\serial.h" />
+    <ClInclude Include="zzalib\socket_server.h" />
+    <ClInclude Include="zzalib\url_handler.h" />
+    <ClInclude Include="zzalib\utils.h" />
+    <ClInclude Include="zzalib\win_dialog.h" />
+    <ClInclude Include="zzalib\xml_element.h" />
+    <ClInclude Include="zzalib\xml_reader.h" />
+    <ClInclude Include="zzalib\xml_writer.h" />
     <ClInclude Include="zzalog\about_dialog.h" />
     <ClInclude Include="zzalog\adi_reader.h" />
     <ClInclude Include="zzalog\adi_writer.h" />
@@ -261,7 +291,6 @@
     <ClInclude Include="zzalog\toolbar.h" />
     <ClInclude Include="zzalog\tsv_writer.h" />
     <ClInclude Include="zzalog\user_dialog.h" />
-    <ClInclude Include="zzalog\version.h" />
     <ClInclude Include="zzalog\view.h" />
     <ClInclude Include="zzalog\web_dialog.h" />
     <ClInclude Include="zzalog\wsjtx_handler.h" />

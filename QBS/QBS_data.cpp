@@ -17,7 +17,7 @@ using namespace std;
 using namespace zzalib;
 
 extern Fl_Preferences* settings_;
-extern const char* DATE_FORMAT;
+extern char* DATE_FORMAT;
 
 // Constructor - read data
 QBS_data::QBS_data()

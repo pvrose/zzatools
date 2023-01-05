@@ -8,7 +8,7 @@
 using namespace zzalib;
 using namespace std;
 
-extern const char* DATE_FORMAT;
+const extern char* DATE_FORMAT;
 const Fl_Color COLOUR_ORANGE = 93; /* R=4/4, B=0/4, G = 5/7 */
 const Fl_Color COLOUR_ADHOC = fl_lighter(FL_CYAN);
 const Fl_Color COLOUR_BATCH = fl_lighter(COLOUR_ORANGE);

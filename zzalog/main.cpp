@@ -30,7 +30,6 @@ main.cpp - application entry point
 #include "spec_tree.h"
 #include "report_tree.h"
 #include "../zzalib/callback.h"
-#include "version.h"
 #include "drawing.h"
 #include "intl_dialog.h"
 #include "band_view.h"
@@ -71,6 +70,18 @@ main.cpp - application entry point
 using namespace std;
 using namespace zzalog;
 using namespace zzalib;
+
+// Program strings
+string COPYRIGHT = "© Philip Rose GM3ZZA 2018. All rights reserved.\n (Prefix data, DX Atlas & OmniRig interfaces © Alex Shovkoplyas, VE3NEA.)";
+string PROGRAM_ID = "ZZALOG";
+string PROG_ID = "ZLG";
+string VERSION = "3.2.45";
+#ifdef _DEBUG
+string PROGRAM_VERSION = VERSION + " (Debug)";
+#else
+string PROGRAM_VERSION = VERSION;
+#endif
+string VENDOR = "GM3ZZA";
 
 // Global data items instanced in zzalib
 extern rig_if* rig_if_;
@@ -290,7 +301,6 @@ string get_file(char * arg_filename) {
 			free(filename);
 		}
 		else {
-			// No recent file - open the file chooser
 			free(filename);
 			Fl_Native_File_Chooser* chooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_FILE);
 			chooser->title("Select log file name");
@@ -926,12 +936,13 @@ int main(int argc, char** argv)
 	main_window_->show(argc, argv);
 	// Read in reference data - uses progress
 	add_data();
-	Fl::wait();
+	Fl::check();
 	// Read in log book data - uses progress - use supplied argument for filename
 	add_book(argc == 1 ? nullptr : argv[argc - 1]);
-	Fl::wait();
+	Fl::check();
 	// Connect to the rig - load all hamlib backends once only here
 	rig_if_ = nullptr;
+	//rig_set_debug(RIG_DEBUG_TRACE);
 	rig_load_all_backends();
 	add_rig_if();
 	// Add qso_manager

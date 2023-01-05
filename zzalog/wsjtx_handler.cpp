@@ -1,6 +1,5 @@
 ﻿#include "wsjtx_handler.h"
 #include "status.h"
-#include "version.h"
 #include "import_data.h"
 #include "menu.h"
 #include "../zzalib/utils.h"
@@ -37,6 +36,8 @@ extern dxa_if* dxa_if_;
 extern pfx_data* pfx_data_;
 extern toolbar* toolbar_;
 extern qso_manager* qso_manager_;
+extern string PROGRAM_ID;
+extern string VERSION;
 
 wsjtx_handler* wsjtx_handler::that_ = nullptr;
 

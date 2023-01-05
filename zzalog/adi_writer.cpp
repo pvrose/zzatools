@@ -6,7 +6,6 @@
 #include "files.h"
 #include "spec_data.h"
 #include "../zzalib/utils.h"
-#include "version.h"
 
 #include <fstream>
 #include <ostream>
@@ -19,6 +18,8 @@ using namespace zzalib;
 
 extern status* status_;
 extern spec_data* spec_data_;
+extern string COPYRIGHT;
+extern string PROGRAM_ID;
 
 // Default constructor
 adi_writer::adi_writer()

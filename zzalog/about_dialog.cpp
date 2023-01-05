@@ -2,9 +2,7 @@
 
 #include "spec_data.h"
 #include "icons.h"
-#include "version.h"
 #include "../zzalib/utils.h"
-#include "../zzalib/versionh.h"
 
 #include "hamlib/rig.h"
 
@@ -18,6 +16,9 @@ using namespace zzalog;
 using namespace zzalib;
 
 extern spec_data* spec_data_;
+extern string PROGRAM_ID;
+extern string PROGRAM_VERSION;
+extern string COPYRIGHT;
 
 
 
@@ -41,9 +42,8 @@ about_dialog::about_dialog() :
 	string program_id = PROGRAM_ID + " " + PROGRAM_VERSION + "\n" +
 		"Compiled " __DATE__ " " __TIME__ "\n" +
 		"using ADIF Version " + spec_data_->adif_version() +
-		"\n hamlib version " + rig_version() + 
-		"\n FLTK version " + to_string(FL_MAJOR_VERSION) + "." + to_string(FL_MINOR_VERSION) + "." + to_string(FL_PATCH_VERSION) + 
-		"\n zzalib version " + zzalib::LIBRARY_VERSION;
+		"\n hamlib version " + rig_version() +
+		"\n FLTK version " + to_string(FL_MAJOR_VERSION) + "." + to_string(FL_MINOR_VERSION) + "." + to_string(FL_PATCH_VERSION);
 	string copyright = COPYRIGHT + "\n (Hamlib " + rig_copyright() + ")";
 	int w = W2;
 	int h = 0;

@@ -6,7 +6,6 @@
 #include "../zzalib/url_handler.h"
 #include "../zzalib/xml_reader.h"
 #include "menu.h"
-#include "version.h"
 
 #include <sstream>
 
@@ -24,6 +23,8 @@ extern url_handler* url_handler_;
 extern book* navigation_book_;
 extern menu* menu_;
 extern Fl_Preferences* settings_;
+extern string PROG_ID;
+extern string VERSION;
 
 // Constructor
 qrz_handler::qrz_handler() :
