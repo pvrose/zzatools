@@ -34,20 +34,6 @@ using namespace zzalib;
 
 namespace zzalog {
 
-	//// Version of intl_editor that handles events such as clicking on words
-	//class spad_editor :
-	//	public intl_editor
-	//{
-	//public:
-	//	spad_editor(int x, int y, int w, int h);
-	//	~spad_editor();
-
-	//	int handle(int event);
-
-	//protected:
-
-	//};
-
 	// This class provides the dialog to chage the current station settings: rig, antenna and QTH
 	class qso_manager :
 		public Fl_Window
@@ -95,15 +81,8 @@ namespace zzalog {
 			int model_id = -1;
 			// Override caps
 			bool override_caps = false;
-		};
-		// Flrig parameters
-		struct flrig_data {
-			// IP address
-			string ip_address = "127.0.0.1";
-			// Port name
-			int port = 12345;
-			// Resurce
-			string resource = "/RPC2";
+			// Port type
+			rig_port_t port_type = RIG_PORT_NONE;
 		};
 		// Alarm parameters
 		struct alarm_data {
@@ -115,15 +94,11 @@ namespace zzalog {
 		};
 		// Rig parameters (from handler onwards - rig only)
 		struct rig_xdata {
-			// CAT handler
-			rig_handler_t handler = RIG_NONE;
 			// Polling intervals
 			double fast_poll_interval = 1.0;
 			double slow_poll_interval = 60.0;
 			// Hamlib data
 			hamlib_data hamlib_params;
-			// Flrig data
-			flrig_data flrig_params;
 			// Alarm data
 			alarm_data alarms;
 		};
@@ -430,8 +405,6 @@ namespace zzalog {
 		// Get bands and order them
 		void order_bands();
 
-		// Callback for rig handler selection (radio)
-		static void cb_rad_handler(Fl_Widget* w, void* v);
 		// Callback - model choice
 		static void cb_ch_model(Fl_Widget* w, void* v);
 		// Callback - hamlib serial ports
@@ -442,12 +415,8 @@ namespace zzalog {
 		static void cb_ch_over(Fl_Widget* w, void* v);
 		// Callback all ports
 		static void cb_bn_all(Fl_Widget* w, void* v);
-		// Callback - flrig IP address
-		static void cb_ip_ipa(Fl_Widget* w, void* v);
-		// Callback - flrig port number
-		static void cb_ip_portn(Fl_Widget* w, void* v);
-		// Callback  flrig resource indicator
-		static void cb_ip_resource(Fl_Widget* w, void* v);
+		// Callback network port
+		static void cb_ip_port(Fl_Widget* w, void* v);
 		// Callback - SWR alarm
 		static void cb_alarm_swr(Fl_Widget* w, void* v);
 		// Callback - Power alarm
@@ -540,11 +509,9 @@ namespace zzalog {
 		common_grp* callsign_grp_;
 		common_grp* qth_grp_;
 		qso_group* qso_group_;
-		Fl_Group* hamlib_grp_;
-		Fl_Group* flrig_grp_;
-		Fl_Group* norig_grp_;
 		Fl_Group* cat_grp_;
-		Fl_Group* cat_sel_grp_;
+		Fl_Group* serial_grp_;
+		Fl_Group* network_grp_;
 		Fl_Group* alarms_grp_;
 		clock_group* clock_group_;
 		// widgets
@@ -552,6 +519,7 @@ namespace zzalog {
 		Fl_Widget* mfr_choice_;
 		Fl_Widget* rig_model_choice_;
 		Fl_Widget* port_if_choice_;
+		Fl_Widget* port_if_input_;
 		Fl_Widget* baud_rate_choice_;
 		Fl_Widget* rig_choice_;
 		Fl_Widget* override_check_;
@@ -561,9 +529,6 @@ namespace zzalog {
 		//Fl_Text_Buffer* buffer_;
 		//// The editor
 		//spad_editor* editor_;
-		Fl_Radio_Round_Button* bn_nocat_;
-		Fl_Radio_Round_Button* bn_hamlib_;
-		Fl_Radio_Round_Button* bn_flrig_;
 		Fl_Spinner* ctr_pollfast_;
 		Fl_Spinner* ctr_pollslow_;
 		alarm_dial* dial_swr_;

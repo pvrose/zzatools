@@ -22,10 +22,11 @@ extern string VERSION;
 extern string PROGRAM_ID;
 
 // Constructor
-rpc_handler::rpc_handler(string host_name, int port_num, string resource_name)
+rpc_handler::rpc_handler(string host_name, string resource_name)
 {
-	host_name_ = host_name + ':' + to_string(port_num);
-	server_port_ = port_num;
+	size_t pos = find(host_name.c_str(), host_name.length(), ':');
+	host_name_ = host_name.substr(0, pos);
+	server_port_ = stoi(host_name.substr(pos+1));
 	resource_ = resource_name;
 	cb_message = default_error_message;
 	server_ = nullptr;

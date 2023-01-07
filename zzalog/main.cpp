@@ -75,7 +75,7 @@ using namespace zzalib;
 string COPYRIGHT = "© Philip Rose GM3ZZA 2018. All rights reserved.\n (Prefix data, DX Atlas & OmniRig interfaces © Alex Shovkoplyas, VE3NEA.)";
 string PROGRAM_ID = "ZZALOG";
 string PROG_ID = "ZLG";
-string VERSION = "3.2.45";
+string VERSION = "3.2.46";
 #ifdef _DEBUG
 string PROGRAM_VERSION = VERSION + " (Debug)";
 #else
@@ -517,13 +517,12 @@ void add_rig_if() {
 		fl_cursor(FL_CURSOR_WAIT);
 		delete rig_if_;
 		// Get the handler from the settings
-		rig_handler_t handler = RIG_NONE;
+		rig_handler_t handler = RIG_HAMLIB;
 		Fl_Preferences stations_settings(settings_, "Stations");
 		Fl_Preferences rigs_settings(stations_settings, "Rigs");
 		char* rig_name;
 		rigs_settings.get("Current", rig_name, "");
 		Fl_Preferences rig_settings(rigs_settings, rig_name);
-		rig_settings.get("Handler", (int&)handler, RIG_NONE);
 		char temp[256];
 		char handler_name[8];
 		switch (handler) {

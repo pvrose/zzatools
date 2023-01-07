@@ -429,6 +429,7 @@ rig_hamlib::rig_hamlib()
 	error_code_ = 0;
 	error_message_ = "";
 	baud_rate_ = 0;
+	unsupported_function_ = false;
 
 
 	// set handler name
@@ -471,28 +472,23 @@ bool rig_hamlib::open() {
 	// Read hamlib configuration - manufacturer,  model, port and baud-rate
 	get_settings();
 	Fl_Preferences hamlib_settings(get_settings(), "Hamlib");
-	Fl_Preferences stations_settings(settings_, "Stations");
-	Fl_Preferences rigs_settings(stations_settings, "Rigs");
-
 	char* temp;
-	rigs_settings.get("Current", temp, "");
-	Fl_Preferences current_settings(hamlib_settings, temp);
-	free(temp);
-	current_settings.get("Rig Model", temp, "dummy");
+	hamlib_settings.get("Rig Model", temp, "dummy");
 	rig_name_ = temp;
 	free(temp);
-	current_settings.get("Manufacturer", temp, "Hamlib");
+	hamlib_settings.get("Manufacturer", temp, "Hamlib");
 	mfg_name_ = temp;
 	free(temp);
-	current_settings.get("Port", temp, "COM6");
+	hamlib_settings.get("Port", temp, "COM6");
 	port_name_ = temp;
 	free(temp);
-	current_settings.get("Baud Rate", baud_rate_, 9600);
+	hamlib_settings.get("Baud Rate", baud_rate_, 9600);
 
 	// Search through the rig database until we find the required rig.
 	model_id_ = -1;
 	const rig_caps* capabilities = nullptr;
-	for (rig_model_t i = 0; i < 4000 && model_id_ == -1; i++) {
+	rig_model_t max_rig_num = 40 * MAX_MODELS_PER_BACKEND;
+	for (rig_model_t i = 0; i < max_rig_num && model_id_ == -1; i++) {
 		// Read each rig's capabilities
 		capabilities = rig_get_caps(i);
 		try {
@@ -507,10 +503,18 @@ bool rig_hamlib::open() {
 	}
 	// Get the rig interface
 	rig_ = rig_init(model_id_);
-	if (rig_ != nullptr && capabilities->port_type == RIG_PORT_SERIAL) {
-		// Successful - set up the serial port parameters
-		strcpy(rig_->state.rigport.pathname, port_name_.c_str());
-		rig_->state.rigport.parm.serial.rate = baud_rate_;
+	if (rig_ != nullptr) {
+		switch (capabilities->port_type) {
+		case RIG_PORT_SERIAL:
+			// Successful - set up the serial port parameters
+			strcpy(rig_->state.rigport.pathname, port_name_.c_str());
+			rig_->state.rigport.parm.serial.rate = baud_rate_;
+			break;
+		case RIG_PORT_NETWORK:
+		case RIG_PORT_USB:
+			strcpy(rig_->state.rigport.pathname, port_name_.c_str());
+			break;
+		}
 	}
 
 	if (rig_ != nullptr) {
@@ -538,7 +542,7 @@ bool rig_hamlib::open() {
 			success_message_ = "hamlib connection " + mfg_name_ + "/" + rig_name_ + " on port " + port_name_ + " opened OK";
 		}
 		else {
-			success_message_ = "hamlib connection " + mfg_name_ + "/" + rig_name_ + " opened OK";
+			success_message_ = "hamlib connection " + mfg_name_ + "/" + rig_name_ + " (" + rig_get_info(rig_) + ") opened OK";
 		}
 	}
 
@@ -549,10 +553,11 @@ bool rig_hamlib::open() {
 // Return rig name
 string& rig_hamlib::rig_name() {
 	// Read capabilities to get manufacturer and model name
+	const char* info = rig_get_info(rig_);
 	rig_caps capabilities = *(rig_get_caps(model_id_));
 	rig_name_ = capabilities.model_name;
 	mfg_name_ = capabilities.mfg_name;
-	return rig_name_;
+	return string(info);
 }
 
 // Read TX frequency in Hz
@@ -691,7 +696,12 @@ double rig_hamlib::vdd_meter() {
 		return meter_value.f;
 	}
 	else {
-	error(ST_ERROR, error_message("pwr_meter").c_str());
+		if (abs(error_code_) != RIG_ENAVAIL || !unsupported_function_) {
+			error(ST_ERROR, error_message("vdd_meter").c_str());
+			if (abs(error_code_) == RIG_ENAVAIL) {
+				unsupported_function_ = true;
+			}
+		}
 		return nan("");
 	}
 }
@@ -822,17 +832,10 @@ bool rig_flrig::open() {
 	Fl_Preferences flrig_settings(get_settings(), "Flrig");
 	char *temp;
 	// Default indicates server is on same computer as running zzalib
-	flrig_settings.get("Host", temp, "127.0.0.1");
+	flrig_settings.get("Host", temp, "127.0.0.1:12345");
 	string host_name = temp;
 	free(temp);
-	int port_num;
-	// Default is same as hard-coded in Flrig
-	flrig_settings.get("Port", port_num, 12345);
-	// Default resource (hard-coded in flrig)
-	flrig_settings.get("Resource", temp, "/RPC2");
-	string resource = temp;
-	free(temp);
-	rpc_handler_ = new rpc_handler(host_name, port_num, resource);
+	rpc_handler_ = new rpc_handler(host_name, "/RPC2");
 	// If we have no rig name then assume it didn't open successfully
 	if (rpc_handler_ == nullptr || rig_name() == "") {
 		// Close it and release RPC handler
@@ -846,7 +849,7 @@ bool rig_flrig::open() {
 	}
 
 	if (opened_ok_) {
-		success_message_ = "FlRig connection " + host_name + ":" + to_string(port_num) + " opened OK";
+		success_message_ = "FlRig connection " + host_name + " opened OK";
 	}
 	// Base implementation sets timer
 	return rig_if::open();

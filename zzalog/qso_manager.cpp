@@ -62,24 +62,8 @@ extern bool read_only_;
 
 // item_choice - converts "/" to "\/" and "&" to "&&"
 void qso_manager::common_grp::item_choice::add(const char* text) {
-	int len = strlen(text) * 2 + 1;
-	char* escaped = new char[len];
-	memset(escaped, 0, len);
-	const char* src = text;
-	char* dest = escaped;
-	while (*src) {
-		switch (*src) {
-		case '/':
-			*dest++ = '\\';
-			break;
-		case '&':
-			*dest++ = '&';
-			break;
-		}
-		*dest++ = *src++;
-	}
-	Fl_Input_Choice::add(escaped);
-	delete[] escaped;
+	string escaped = escape_menu(text);
+	Fl_Input_Choice::add(escaped.c_str());
 }
 
 // Strips out '\' and first '&' characters
@@ -183,7 +167,6 @@ void qso_manager::common_grp::load_values() {
 			switch (type_) {
 			case RIG:
 				// Get the CAT interface parameters
-				item_settings.get("Handler", (int&)info.rig_data.handler, RIG_NONE);
 				item_settings.get("Polling Interval", info.rig_data.fast_poll_interval, FAST_RIG_DEF);
 				item_settings.get("Slow Polling Interval", info.rig_data.slow_poll_interval, SLOW_RIG_DEF);
 				{
@@ -203,17 +186,6 @@ void qso_manager::common_grp::load_values() {
 					info.rig_data.hamlib_params.baud_rate = temp;
 					free(temp);
 					hamlib_settings.get("Override Rig Caps", (int&)info.rig_data.hamlib_params.override_caps, false);
-
-					// Flrig settings
-					Fl_Preferences flrig_settings(item_settings, "Flrig");
-					// Get the Flrig settings: Host IP address, IP port and IP resource
-					flrig_settings.get("Host", temp, "127.0.0.1");
-					info.rig_data.flrig_params.ip_address = temp;
-					free(temp);
-					flrig_settings.get("Port", info.rig_data.flrig_params.port, 12345);
-					flrig_settings.get("Resource", temp, "/RPC2");
-					info.rig_data.flrig_params.resource = temp;
-					free(temp);
 
 					// Alarm settings
 					Fl_Preferences alarm_settings(item_settings, "Alarms");
@@ -255,9 +227,6 @@ void qso_manager::common_grp::load_values() {
 		}
 		else {
 			// Default to no handler - hopefully can ignore the rest
-			if (type_ == RIG) {
-				item_info_[""].rig_data.handler = RIG_NONE;
-			}
 		}
 	}
 }
@@ -399,7 +368,6 @@ void qso_manager::common_grp::save_values() {
 				}
 			}
 			item_settings.set("Intended Bands", bands.c_str());
-			item_settings.set("Handler", info.rig_data.handler);
 			item_settings.set("Polling Interval", info.rig_data.fast_poll_interval);
 			item_settings.set("Slow Polling Interval", info.rig_data.slow_poll_interval);
 			// Read all the groups
@@ -410,11 +378,6 @@ void qso_manager::common_grp::save_values() {
 			hamlib_settings.set("Port", info.rig_data.hamlib_params.port_name.c_str());
 			hamlib_settings.set("Baud Rate", info.rig_data.hamlib_params.baud_rate.c_str());
 			hamlib_settings.set("Override Rig Caps", info.rig_data.hamlib_params.override_caps);
-			// Flrig settings
-			Fl_Preferences flrig_settings(item_settings, "Flrig");
-			flrig_settings.set("Host", info.rig_data.flrig_params.ip_address.c_str());
-			flrig_settings.set("Port", info.rig_data.flrig_params.port);
-			flrig_settings.set("Resource", info.rig_data.flrig_params.resource.c_str());
 			// Alarm settings
 			Fl_Preferences alarm_settings(item_settings, "Alarms");
 			// SWR Settings
@@ -1885,11 +1848,9 @@ qso_manager::qso_manager(int W, int H, const char* label) :
 	Fl_Window(W, H, label)
 	, rig_grp_(nullptr)
 	, antenna_grp_(nullptr)
-	, hamlib_grp_(nullptr)
-	, flrig_grp_(nullptr)
-	, norig_grp_(nullptr)
 	, cat_grp_(nullptr)
-	, cat_sel_grp_(nullptr)
+	, serial_grp_(nullptr)
+	, network_grp_(nullptr)
 	, alarms_grp_(nullptr)
 	, baud_rate_choice_(nullptr)
 	, mfr_choice_(nullptr)
@@ -2265,54 +2226,8 @@ void qso_manager::create_cat_widgets(int& curr_x, int& curr_y) {
 	cat_grp_->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 	cat_grp_->box(FL_BORDER_BOX);
 
-
-	// CAT select group: radio button selecting CAT type
-	// o NO
-	// o Hamlib
-	// o Flrig
-	cat_sel_grp_ = new Fl_Group(curr_x, curr_y, 10, 10);
-
-	// Radio - Select No Rig
-	bn_nocat_ = new Fl_Radio_Round_Button(cat_sel_grp_->x() + GAP, cat_sel_grp_->y() + HTEXT, WRADIO, HTEXT, "None");
-	bn_nocat_->align(FL_ALIGN_RIGHT);
-	bn_nocat_->callback(cb_rad_handler, (void*)RIG_NONE);
-	bn_nocat_->when(FL_WHEN_RELEASE);
-	bn_nocat_->labelsize(FONT_SIZE);
-	bn_nocat_->tooltip("Select no rig interface handler");
-	bn_nocat_->value(rig_grp_->info().rig_data.handler == RIG_NONE);
-	// Radio - Select Hamlib
-	bn_hamlib_ = new Fl_Radio_Round_Button(bn_nocat_->x(), bn_nocat_->y() + bn_nocat_->h(), WRADIO, HTEXT, "Hamlib");
-	bn_hamlib_->align(FL_ALIGN_RIGHT);
-	bn_hamlib_->callback(cb_rad_handler, (void*)RIG_HAMLIB);
-	bn_hamlib_->when(FL_WHEN_RELEASE);
-	bn_hamlib_->labelsize(FONT_SIZE);
-	bn_hamlib_->tooltip("Select Hamlib as the rig interface handler");
-	bn_hamlib_->value(rig_grp_->info().rig_data.handler == RIG_HAMLIB);
-	// Radio - Select Flrig
-	bn_flrig_ = new Fl_Radio_Round_Button(bn_hamlib_->x(), bn_hamlib_->y() + bn_hamlib_->h(), WRADIO, HTEXT, "FlRig");
-	bn_flrig_->align(FL_ALIGN_RIGHT);
-	bn_flrig_->callback(cb_rad_handler, (void*)RIG_FLRIG);
-	bn_flrig_->when(FL_WHEN_RELEASE);
-	bn_flrig_->labelsize(FONT_SIZE);
-	bn_flrig_->tooltip("Select Flrig as the rig interface handler");
-	bn_flrig_->value(rig_grp_->info().rig_data.handler == RIG_FLRIG);
-
-	cat_sel_grp_->resizable(nullptr);
-	cat_sel_grp_->size((GAP * 3 / 2) + WRADIO, bn_flrig_->y() + bn_flrig_->h() + GAP - cat_sel_grp_->y());
-
-	cat_sel_grp_->end();
-
-	// Hamlib control grp
-	// RIG=====v
-	// PORTv  ALL*
-	// BAUDv  OVR*
-	hamlib_grp_ = new Fl_Group(cat_sel_grp_->x() + cat_sel_grp_->w(), cat_sel_grp_->y(), 10, 10);
-	hamlib_grp_->labelsize(FONT_SIZE);
-	hamlib_grp_->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
-	hamlib_grp_->box(FL_NO_BOX);
-
 	// Choice - Select the rig model (Manufacturer/Model)
-	Fl_Choice* ch_model_ = new Fl_Choice(hamlib_grp_->x() + WLLABEL, hamlib_grp_->y() + HTEXT, WSMEDIT, HTEXT, "Rig model");
+	Fl_Choice* ch_model_ = new Fl_Choice(cat_grp_->x() + WLABEL, cat_grp_->y() + HTEXT, WSMEDIT, HTEXT, "Rig");
 	ch_model_->align(FL_ALIGN_LEFT);
 	ch_model_->labelsize(FONT_SIZE);
 	ch_model_->textsize(FONT_SIZE);
@@ -2323,17 +2238,27 @@ void qso_manager::create_cat_widgets(int& curr_x, int& curr_y) {
 	// Populate the manufacturere and model choice widgets
 	populate_model_choice();
 
-	// Choice port name
-	Fl_Choice* ch_mfr = new Fl_Choice(ch_model_->x(), ch_model_->y() + ch_model_->h(), WBUTTON, HTEXT, "Port");
-	ch_mfr->align(FL_ALIGN_LEFT);
-	ch_mfr->labelsize(FONT_SIZE);
-	ch_mfr->textsize(FONT_SIZE);
-	ch_mfr->callback(cb_ch_port, nullptr);
-	ch_mfr->tooltip("Select the comms port to use");
-	port_if_choice_ = ch_mfr;
+	// Hamlib control grp
+	// RIG=====v
+	// PORTv  ALL*
+	// BAUDv  OVR*
+	serial_grp_ = new Fl_Group(cat_grp_->x() + GAP, ch_model_->y() + ch_model_->h() + GAP, 10, 10);
+	serial_grp_->labelsize(FONT_SIZE);
+	serial_grp_->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
+	serial_grp_->box(FL_NO_BOX);
+
+
+	// Choice port name - serial
+	Fl_Choice* ch_port = new Fl_Choice(ch_model_->x(), ch_model_->y() + ch_model_->h(), WBUTTON, HTEXT, "Port");
+	ch_port->align(FL_ALIGN_LEFT);
+	ch_port->labelsize(FONT_SIZE);
+	ch_port->textsize(FONT_SIZE);
+	ch_port->callback(cb_ch_port, nullptr);
+	ch_port->tooltip("Select the comms port to use");
+	port_if_choice_ = ch_port;
 
 	// Use all ports
-	Fl_Check_Button* bn_useall = new Fl_Check_Button(ch_mfr->x() + ch_mfr->w(), ch_mfr->y(), HBUTTON, HBUTTON, "All");
+	Fl_Check_Button* bn_useall = new Fl_Check_Button(ch_port->x() + ch_port->w(), ch_port->y(), HBUTTON, HBUTTON, "All");
 	bn_useall->align(FL_ALIGN_RIGHT);
 	bn_useall->labelfont(FONT);
 	bn_useall->labelsize(FONT_SIZE);
@@ -2343,7 +2268,7 @@ void qso_manager::create_cat_widgets(int& curr_x, int& curr_y) {
 	populate_port_choice();
 
 	// Baud rate input 
-	Fl_Choice* ch_baudrate = new Fl_Choice(ch_model_->x(), ch_mfr->y() + ch_mfr->h(), WBUTTON, HTEXT, "Baud rate");
+	Fl_Choice* ch_baudrate = new Fl_Choice(ch_model_->x(), ch_port->y() + ch_port->h(), WBUTTON, HTEXT, "Baud rate");
 	ch_baudrate->align(FL_ALIGN_LEFT);
 	ch_baudrate->labelsize(FONT_SIZE);
 	ch_baudrate->textsize(FONT_SIZE);
@@ -2361,66 +2286,38 @@ void qso_manager::create_cat_widgets(int& curr_x, int& curr_y) {
 
 	populate_baud_choice();
 
-	hamlib_grp_->resizable(nullptr);
-	hamlib_grp_->size(max(ch_model_->x() + ch_model_->w(),
-		max(bn_useall->x() + bn_useall->w(), bn_override->x() + bn_override->w())) + GAP - hamlib_grp_->x(),
-		bn_override->y() + bn_override->h() + GAP - hamlib_grp_->y());
+	serial_grp_->resizable(nullptr);
+	serial_grp_->size(max(ch_model_->x() + ch_model_->w(),
+		max(bn_useall->x() + bn_useall->w(), bn_override->x() + bn_override->w())) + GAP - serial_grp_->x(),
+		bn_override->y() + bn_override->h() + GAP - serial_grp_->y());
 
-	hamlib_grp_->end();
+	serial_grp_->end();
 
-	// Flrig group
-	// [IPA        ]
-	// [PORT#      ]
-	// [RES        ]
-	flrig_grp_ = new Fl_Group(hamlib_grp_->x(), hamlib_grp_->y(), 10, 10);
-	flrig_grp_->labelsize(FONT_SIZE);
-	flrig_grp_->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
-	flrig_grp_->box(FL_NO_BOX);
+	network_grp_ = new Fl_Group(serial_grp_->x(), serial_grp_->y(), 10, 10);
+	network_grp_->labelsize(FONT_SIZE);
+	network_grp_->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
+	network_grp_->box(FL_NO_BOX);
 
-	// IP v4 address
-	Fl_Input* ip_ipaddress = new Fl_Input(flrig_grp_->x() + WLLABEL, flrig_grp_->y() + HTEXT, WSMEDIT, HBUTTON, "IP Address");
-	ip_ipaddress->align(FL_ALIGN_LEFT);
-	ip_ipaddress->labelsize(FONT_SIZE);
-	ip_ipaddress->textsize(FONT_SIZE);
-	ip_ipaddress->tooltip("The IP address of the Flrig server");
-	ip_ipaddress->value(rig_grp_->info().rig_data.flrig_params.ip_address.c_str());
-	ip_ipaddress->callback(cb_ip_ipa, nullptr);
-	ip_ipaddress->when(FL_WHEN_ENTER_KEY_ALWAYS);
+	// Input port name - network
+	Fl_Input* ip_port = new Fl_Input(ch_model_->x(), ch_model_->y() + ch_model_->h(), WSMEDIT, HTEXT, "Port");
+	ip_port->align(FL_ALIGN_LEFT);
+	ip_port->labelsize(FONT_SIZE);
+	ip_port->textsize(FONT_SIZE);
+	ip_port->callback(cb_ip_port, nullptr);
+	ip_port->tooltip("Enter the network/USB port to use");
+	ip_port->value(rig_grp_->info().rig_data.hamlib_params.port_name.c_str());
+	port_if_input_ = ip_port;
 
-	// IPv4 port number
-	Fl_Input* ip_portnum = new Fl_Int_Input(ip_ipaddress->x(), ip_ipaddress->y() + ip_ipaddress->h(), WBUTTON, HTEXT, "Port");
-	ip_portnum->align(FL_ALIGN_LEFT);
-	ip_portnum->labelsize(FONT_SIZE);
-	ip_portnum->textsize(FONT_SIZE);
-	ip_portnum->tooltip("The IP port number of the Flrig server");
-	ip_portnum->value(to_string(rig_grp_->info().rig_data.flrig_params.port).c_str());
-	ip_portnum->callback(cb_ip_portn);
-	ip_portnum->when(FL_WHEN_ENTER_KEY_ALWAYS);
+	network_grp_->resizable(nullptr);
+	network_grp_->size(ip_port->x() + ip_port->w() + GAP - network_grp_->x(),
+		ip_port->y() + ip_port->h() + GAP - network_grp_->y());
 
-	// XML-RPC resource name
-	intl_input* ip_resource = new intl_input(ip_portnum->x(), ip_portnum->y() + ip_portnum->h(), WBUTTON, HTEXT, "Resource");
-	ip_resource->align(FL_ALIGN_LEFT);
-	ip_resource->labelsize(FONT_SIZE);
-	ip_resource->textsize(FONT_SIZE);
-	ip_resource->tooltip("The resource ID of the Flrig server");
-	ip_resource->value(rig_grp_->info().rig_data.flrig_params.resource.c_str());
-	ip_resource->callback(cb_ip_resource, nullptr);
-	ip_resource->when(FL_WHEN_ENTER_KEY_ALWAYS);
+	network_grp_->end();
 
-	flrig_grp_->resizable(nullptr);
-	flrig_grp_->size(max(ip_ipaddress->x() + ip_ipaddress->w(), max(ip_portnum->x() + ip_portnum->w(), ip_resource->x() + ip_resource->w())) + GAP - flrig_grp_->x(), ip_resource->y() + ip_resource->h() + GAP - flrig_grp_->y());
-	flrig_grp_->end();
-
-	// No rig group
-	// TEXT
-	norig_grp_ = new Fl_Group(hamlib_grp_->x(), hamlib_grp_->y(), WBUTTON, HTEXT);
-	norig_grp_->labelsize(FONT_SIZE);
-	norig_grp_->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
-	norig_grp_->box(FL_NO_BOX);
-	norig_grp_->end();
+	int max_y = max(serial_grp_->y() + serial_grp_->h(), network_grp_->y() + network_grp_->h());
 
 	// Connected status
-	connect_bn_ = new Fl_Button(bn_nocat_->x(), cat_sel_grp_->y() + cat_sel_grp_->h(), WBUTTON * 2, HBUTTON, "Connect...");
+	connect_bn_ = new Fl_Button(serial_grp_->x(), max_y + GAP, WBUTTON * 2, HBUTTON, "Connect...");
 	connect_bn_->labelfont(FONT);
 	connect_bn_->labelsize(FONT_SIZE);
 	connect_bn_->color(FL_YELLOW);
@@ -2430,13 +2327,13 @@ void qso_manager::create_cat_widgets(int& curr_x, int& curr_y) {
 	// Poll period group;
 // <>FAST
 // <>SLOW
-	Fl_Group* poll_grp = new Fl_Group(connect_bn_->x(), connect_bn_->y() + connect_bn_->h() + GAP, 10, 10, "Polling interval (s)");
+	Fl_Group* poll_grp = new Fl_Group(cat_grp_->x(), connect_bn_->y() + connect_bn_->h() + GAP, 10, 10, "Polling interval (s)");
 	poll_grp->labelsize(FONT_SIZE);
 	poll_grp->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 	poll_grp->box(FL_NO_BOX);
 
 	// Spinner to select fast polling rate (i.e. when still connected)
-	ctr_pollfast_ = new Fl_Spinner(poll_grp->x() + WLLABEL, poll_grp->y() + HTEXT, WSMEDIT, HTEXT, "Connected");
+	ctr_pollfast_ = new Fl_Spinner(poll_grp->x() + WLABEL, poll_grp->y() + HTEXT, WSMEDIT, HTEXT, "Conn'd");
 	ctr_pollfast_->align(FL_ALIGN_LEFT);
 	ctr_pollfast_->labelsize(FONT_SIZE);
 	ctr_pollfast_->textsize(FONT_SIZE);
@@ -2450,7 +2347,7 @@ void qso_manager::create_cat_widgets(int& curr_x, int& curr_y) {
 	ctr_pollfast_->when(FL_WHEN_CHANGED);
 
 	// Spinner to select slow polling rate (i.e. after disconnection to avoid excessive errors)
-	Fl_Spinner* ctr_pollslow_ = new Fl_Spinner(ctr_pollfast_->x(), ctr_pollfast_->y() + ctr_pollfast_->h(), WSMEDIT, HTEXT, "Disconnected");
+	Fl_Spinner* ctr_pollslow_ = new Fl_Spinner(ctr_pollfast_->x(), ctr_pollfast_->y() + ctr_pollfast_->h(), WSMEDIT, HTEXT, "Disconn'd");
 	ctr_pollslow_->align(FL_ALIGN_LEFT);
 	ctr_pollslow_->labelsize(FONT_SIZE);
 	ctr_pollslow_->textsize(FONT_SIZE);
@@ -2464,34 +2361,16 @@ void qso_manager::create_cat_widgets(int& curr_x, int& curr_y) {
 	ctr_pollslow_->when(FL_WHEN_CHANGED);
 
 	poll_grp->resizable(nullptr);
-	poll_grp->size(max(ctr_pollfast_->w(), ctr_pollslow_->w()) + WLLABEL + GAP, ctr_pollslow_->y() + ctr_pollslow_->h() + GAP - poll_grp->y());
+	poll_grp->size(max(ctr_pollfast_->w(), ctr_pollslow_->w()) + WLABEL + GAP, ctr_pollslow_->y() + ctr_pollslow_->h() + GAP - poll_grp->y());
 	poll_grp->end();
 
 	// Display hamlib ot flrig settings as selected
-	switch (rig_grp_->info().rig_data.handler) {
-	case RIG_NONE:
-		norig_grp_->show();
-		hamlib_grp_->hide();
-		flrig_grp_->hide();
-		break;
-	case RIG_HAMLIB:
-		norig_grp_->hide();
-		hamlib_grp_->show();
-		flrig_grp_->hide();
-		break;
-	case RIG_FLRIG:
-		norig_grp_->hide();
-		hamlib_grp_->hide();
-		flrig_grp_->show();
-		break;
-	}
+	enable_cat_widgets();
 
 	cat_grp_->resizable(nullptr);
 	cat_grp_->size(max(poll_grp->w(),
-		cat_sel_grp_->w() +
-		max(hamlib_grp_->w(),
-			max(flrig_grp_->w(), norig_grp_->w()))) + GAP,
-		poll_grp->y() + poll_grp->h() + GAP - cat_grp_->y());
+		max(serial_grp_->w(), network_grp_->w()) + GAP),
+		poll_grp->y() + poll_grp->h() - cat_grp_->y());
 	max_w = max(max_w, cat_grp_->x() + cat_grp_->w() - curr_x);
 	max_h = max(max_w, cat_grp_->y() + cat_grp_->h() - curr_y);
 	cat_grp_->end();
@@ -2723,36 +2602,26 @@ void qso_manager::update_locations() {
 void qso_manager::enable_cat_widgets() {
 
 	// CAT control widgets
-	// TODO update CAT widgets
-	if (rig_grp_->info().rig_data.handler == RIG_HAMLIB) {
-		hamlib_grp_->activate();
-		hamlib_grp_->show();
-		bn_hamlib_->value(true);
-	}
-	else {
-		hamlib_grp_->deactivate();
-		hamlib_grp_->hide();
-		bn_hamlib_->value(false);
-	}
-	if (rig_grp_->info().rig_data.handler == RIG_FLRIG) {
-		flrig_grp_->activate();
-		flrig_grp_->show();
-		bn_flrig_->value(true);
-	}
-	else {
-		flrig_grp_->deactivate();
-		flrig_grp_->hide();
-		bn_flrig_->value(false);
-	}
-	if (rig_grp_->info().rig_data.handler == RIG_NONE) {
-		norig_grp_->activate();
-		norig_grp_->show();
-		bn_nocat_->value(true);
-	}
-	else {
-		norig_grp_->deactivate();
-		norig_grp_->hide();
-		bn_nocat_->value(false);
+	switch (rig_grp_->info().rig_data.hamlib_params.port_type) {
+	case RIG_PORT_SERIAL:
+		serial_grp_->activate();
+		serial_grp_->show();
+		network_grp_->deactivate();
+		network_grp_->hide();
+		break;
+	case RIG_PORT_NETWORK:
+	case RIG_PORT_USB:
+		serial_grp_->deactivate();
+		serial_grp_->hide();
+		network_grp_->activate();
+		network_grp_->show();
+		break;
+	default:
+		serial_grp_->deactivate();
+		serial_grp_->hide();
+		network_grp_->deactivate();
+		network_grp_->hide();
+		break;
 	}
 
 	// Connect button
@@ -2761,9 +2630,12 @@ void qso_manager::enable_cat_widgets() {
 		connect_bn_->label("Connected");
 	}
 	else {
-		switch (rig_grp_->info().rig_data.handler) {
-		case RIG_HAMLIB:
-		case RIG_FLRIG:
+		switch (rig_grp_->info().rig_data.hamlib_params.port_type) {
+		case RIG_PORT_NONE:
+			connect_bn_->color(FL_BACKGROUND_COLOR);
+			connect_bn_->label("No CAT connection");
+			break;
+		default:
 			if (wait_connect_) {
 				connect_bn_->color(FL_YELLOW);
 				connect_bn_->label("... Connect");
@@ -2773,13 +2645,8 @@ void qso_manager::enable_cat_widgets() {
 				connect_bn_->label("Disconnected");
 			}
 			break;
-		case RIG_NONE:
-			connect_bn_->color(FL_BACKGROUND_COLOR);
-			connect_bn_->label("No CAT connection");
-			break;
 		}
 	}
-
 }
 
 // Enable the alarm widgets
@@ -2903,10 +2770,14 @@ void qso_manager::populate_model_choice() {
 	Fl_Choice* ch = (Fl_Choice*)rig_model_choice_;
 	// Get hamlib Model number and populate control with all model names
 	ch->clear();
+	// Get set to order the rigs
+	set<string> rig_list;
+	rig_list.clear();
 	char* target_pathname = nullptr;
+	char* name[1024];
 	// For each possible rig ids in hamlib
-	// TODO: Check maximum rig number
-	for (rig_model_t i = 1; i < 4000; i += 1) {
+	rig_model_t max_rig_num = 40 * MAX_MODELS_PER_BACKEND;
+	for (rig_model_t i = 1; i < max_rig_num; i += 1) {
 		// Get the capabilities of this rig ID (at ID #xx01)
 		const rig_caps* capabilities = rig_get_caps(i);
 		if (capabilities != nullptr) {
@@ -2933,8 +2804,10 @@ void qso_manager::populate_model_choice() {
 			// Generate the item pathname - e.g. "Icom/IC-736 (untested)"
 			char* temp = new char[strlen(status) + 10 + strlen(capabilities->model_name) + strlen(capabilities->mfg_name)];
 			// The '/' ensures all rigs from same manufacturer are in a sub-menu to Icom
-			sprintf(temp, "%s/%s%s", capabilities->mfg_name, capabilities->model_name, status);
-			ch->add(temp);
+			string mfg = escape_menu(capabilities->mfg_name);
+			string model = escape_menu(capabilities->model_name);
+			sprintf(temp, "%s/%s%s", mfg.c_str(), model.c_str(), status);
+			rig_list.insert(temp);
 			hamlib_data* hlinfo = &rig_grp_->info().rig_data.hamlib_params;
 			if (strcmp(hlinfo->model.c_str(), (capabilities->model_name)) == 0 &&
 				strcmp(hlinfo->mfr.c_str(), (capabilities->mfg_name)) == 0) {
@@ -2942,8 +2815,12 @@ void qso_manager::populate_model_choice() {
 				target_pathname = new char[strlen(temp) + 1];
 				strcpy(target_pathname, temp);
 				hlinfo->model_id = i;
+				hlinfo->port_type = capabilities->port_type;
 			}
 		}
+	}
+	for (auto ix = rig_list.begin(); ix != rig_list.end(); ix++) {
+		ch->add((*ix).c_str());
 	}
 	bool found = false;
 	// Go through all the menu items until we find our remembered pathname, and set the choice value to that item number
@@ -2957,28 +2834,6 @@ void qso_manager::populate_model_choice() {
 		}
 	}
 	delete[] target_pathname;
-}
-
-// Rig handler radio button clicked
-// v contains the radio button value 
-void qso_manager::cb_rad_handler(Fl_Widget* w, void* v) {
-	qso_manager* that = ancestor_view<qso_manager>(w);
-	// Get the selected radio button
-	rig_handler_t handler = (rig_handler_t)(long)v;
-
-	that->rig_grp_->info().rig_data.handler = handler;
-
-	// Disconnect radio as we are changing handler
-	if (rig_if_) {
-		delete rig_if_;
-		rig_if_ = nullptr;
-	}
-	// We have a handler - set flag that we are waiting to connect
-	if (handler != RIG_NONE) that->wait_connect_ = true;
-	// Enable the appropriate widget group for the selected handler
-	that->enable_widgets();
-	// Save selected interface
-	that->save_values();
 }
 
 // Model input choice selected
@@ -3010,11 +2865,13 @@ void qso_manager::cb_ch_model(Fl_Widget* w, void* v) {
 			if (strcmp(info->model.c_str(), (capabilities->model_name)) == 0 &&
 				strcmp(info->mfr.c_str(), (capabilities->mfg_name)) == 0) {
 				info->model_id = i;
+				info->port_type = capabilities->port_type;
 				found = true;
 			}
 		}
 	}
 	that->populate_baud_choice();
+	that->enable_cat_widgets();
 }
 
 // Callback selecting port
@@ -3023,6 +2880,14 @@ void qso_manager::cb_ch_port(Fl_Widget* w, void* v) {
 	qso_manager* that = ancestor_view<qso_manager>(w);
 	hamlib_data* info = &that->rig_grp_->info().rig_data.hamlib_params;
 	cb_text<Fl_Choice, string>(w, (void*)&info->port_name);
+}
+
+// Callback entering port
+// v is unused
+void qso_manager::cb_ip_port(Fl_Widget* w, void* v) {
+	qso_manager* that = ancestor_view<qso_manager>(w);
+	hamlib_data* info = &that->rig_grp_->info().rig_data.hamlib_params;
+	cb_value<Fl_Input, string>(w, (void*)&info->port_name);
 }
 
 // Callback selecting baud-rate
@@ -3048,30 +2913,6 @@ void qso_manager::cb_bn_all(Fl_Widget* w, void* v) {
 	cb_value<Fl_Check_Button, bool>(w, v);
 	qso_manager* that = ancestor_view<qso_manager>(w);
 	that->populate_port_choice();
-}
-
-// Select Flrig server IP Address
-// v is unused
-void qso_manager::cb_ip_ipa(Fl_Widget* w, void* v) {
-	qso_manager* that = ancestor_view<qso_manager>(w);
-	flrig_data* info = &that->rig_grp_->info().rig_data.flrig_params;
-	cb_value<Fl_Input, string>(w, (void*)&info->ip_address);
-}
-
-// Select Flrig server port number
-// v is unused
-void qso_manager::cb_ip_portn(Fl_Widget* w, void* v) {
-	qso_manager* that = ancestor_view<qso_manager>(w);
-	flrig_data* info = &that->rig_grp_->info().rig_data.flrig_params;
-	cb_value_int<Fl_Int_Input>(w, (void*)&info->port);
-}
-
-// Selecte Flrig resource ID
-// v is unused
-void qso_manager::cb_ip_resource(Fl_Widget* w, void* v) {
-	qso_manager* that = ancestor_view<qso_manager>(w);
-	flrig_data* info = &that->rig_grp_->info().rig_data.flrig_params;
-	cb_value<intl_input, string>(w, (void*)&info->resource);
 }
 
 // Changed the SWR wrning level
@@ -3172,28 +3013,16 @@ void qso_manager::cb_ctr_pollslow(Fl_Widget* w, void* v) {
 void qso_manager::cb_bn_connect(Fl_Widget* w, void* v) {
 	qso_manager* that = ancestor_view<qso_manager>(w);
 	that->save_values();
-	switch (that->rig_grp_->info().rig_data.handler) {
-	case RIG_HAMLIB:
-	case RIG_FLRIG:
-		if (rig_if_) {
-		// We are connected - set disconnected
-			delete rig_if_;
-			rig_if_ = nullptr;
-			that->wait_connect_ = true;
-		}
-		else {
-			// Wer are discooencted, so connect
-			add_rig_if();
-			that->wait_connect_ = false;
-		}
-		break;
-	case RIG_NONE:
-		if (rig_if_) {
-			delete rig_if_;;
-			rig_if_ = nullptr;
-			that->wait_connect_ = false;
-		}
-		break;
+	if (rig_if_) {
+	// We are connected - set disconnected
+		delete rig_if_;
+		rig_if_ = nullptr;
+		that->wait_connect_ = true;
+	}
+	else {
+		// Wer are discooencted, so connect
+		add_rig_if();
+		that->wait_connect_ = false;
 	}
 	that->update_rig();
 }
@@ -3374,11 +3203,6 @@ void qso_manager::update_rig() {
 			dial_swr_->value(rig_if_->swr_meter());
 			dial_pwr_->value(rig_if_->pwr_meter());
 			dial_vdd_->value(rig_if_->vdd_meter());
-			string rig_name = rig_if_->rig_name();
-			if (rig_name != rig_grp_->name()) {
-				rig_grp_->name() = rig_name;
-				rig_grp_->populate_choice();
-			}
 			qso_group_->update_frequency(rig_if_->get_frequency(true));
 			qso_group_->ip_power_->value(rig_if_->get_tx_power().c_str());
 			string mode;

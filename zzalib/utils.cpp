@@ -485,6 +485,26 @@ string zzalib::escape_url(string url) {
 	return escape_hex(url, true, "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
 }
 
+// Escape / and & for menu items
+string zzalib::escape_menu(string text) {
+	int len = text.length() * 2 + 1;
+	string dest = "";
+	dest.reserve(len);
+	const char* src = text.c_str();
+	while (*src) {
+		switch (*src) {
+		case '/':
+			dest += '\\';
+			break;
+		case '&':
+			dest += '&';
+			break;
+		}
+		dest += *src++;
+	}
+	return dest;
+}
+
 // Convert from %nn to ASCII character
 string zzalib::unescape_hex(string text) {
 	string result = "";

@@ -232,6 +232,8 @@ namespace zzalib {
 		rig_model_t model_id_;
 		// Numeric error code
 		int error_code_;
+		// Reported error code
+		bool unsupported_function_;
 	};
 
 	// This class is the flrig specific implementation of the base class.

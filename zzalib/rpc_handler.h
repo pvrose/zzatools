@@ -32,7 +32,7 @@ namespace zzalib {
 		};
 
 		// Handler for client (or both)
-		rpc_handler(string host_name, int port_num_, string resource_name);
+		rpc_handler(string host_name, string resource_name);
 		// Handler for server
 		rpc_handler(int port_name, string resource_name);
 		~rpc_handler();
