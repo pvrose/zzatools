@@ -5,6 +5,8 @@
 
 #include <string>
 #include <FL/Fl_Choice.H>
+#include <FL/Fl_Group.H>
+#include <FL/Fl_Input.H>
 
 using namespace std;
 
@@ -28,6 +30,38 @@ namespace zzalog {
 		// Drop down list is hierarchic
 		bool hierarchic_;
 
+	};
+
+	// This class is a combo between Fl_Input and field_choice (one or the other)
+	class field_input : public Fl_Group
+	{
+	public:
+		field_input(int X, int Y, int W, int H, const char* label = nullptr);
+		~field_input();
+
+		void field_name(const char* field_name);
+		const char* field_name();
+
+		// Overloaded value 
+		const char* value();
+		void value(const char* v);
+
+	protected:
+		// The two callbacks
+		static void cb_ip(Fl_Widget* w, void* v);
+		static void cb_ch(Fl_Widget* w, void* v);
+
+		// Activate the appropriate widget
+		Fl_Widget* show_widget(const char* name);
+		// Populate the choice
+		void populate_choice(const char* v);
+		// Process the field
+		Fl_Input* ip_;
+		field_choice* ch_;
+		// Name of field
+		const char* field_name_;
+		// VAlue
+		const char* value_;
 	};
 
 }

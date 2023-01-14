@@ -13,13 +13,11 @@
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Output.H>
 #include <FL/Fl_Input.H>
-#include <FL/Fl_Value_Input.H>
-#include <FL/Fl_Value_Output.H>
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Radio_Light_Button.H>
 #include <FL/Fl_Radio_Button.H>
 #include <FL/Fl_Table.H>
-
+#include <FL/Fl_Text_Display.H>
 
 using namespace std;
 
@@ -76,6 +74,8 @@ protected:
     static void cb_nav_call(Fl_Widget* w, void* v);
     // Reset button
     static void cb_reset(Fl_Widget* w, void* v);
+    // Enter in any input value widget
+    static void cb_ip_enter(Fl_Widget* w, void* v);
  
     // Specify the widgets
     void create_form();
@@ -86,6 +86,7 @@ protected:
     void update_rcv_card();
     void update_rcv_sase();
     void update_stuff_cards();
+    void update_keep_cards();
     void update_dispose_cards();
     void update_post_cards();
     void update_recycle_cards();
@@ -93,6 +94,7 @@ protected:
     void update_batches(bool enable_nav);
     void update_calls(int box_num);
     void update_batch_summary();
+    void update_batch_listing();
     void update_call_summary();
     void update_call_history();
     void update_edit_notes();
@@ -101,12 +103,16 @@ protected:
     void update_action_bn(Fl_Button* b, action_t a);
     // Call whatever update is needed per action
     void update_whatever();
- 
+    // Write batch log
+    void append_batch_log(const char* text);
+
     // Various data items accessible by most classes
     Fl_Preferences settings_;
     QBS_data* data_;
     // Batch log
     ofstream* blog_file_;
+    // Log display scroll position
+    int pos_batch_log_;
 
     // widgets - input group
     Fl_Group* g_input_;
@@ -134,6 +140,8 @@ protected:
     radio_param_t rp_sort_cards_;
     Fl_Radio_Light_Button* bn_stuff_cards_;
     radio_param_t rp_stuff_cards_;
+    Fl_Radio_Light_Button* bn_keep_cards_;
+    radio_param_t rp_keep_cards_;
     Fl_Radio_Light_Button* bn_dispose_cards_;
     radio_param_t rp_dispose_cards_;
     Fl_Radio_Light_Button* bn_post_cards_;
@@ -148,6 +156,8 @@ protected:
 
     Fl_Radio_Light_Button* bn_summ_batch_;
     radio_param_t rp_summ_batch_;
+    Fl_Radio_Light_Button* bn_list_batch_;
+    radio_param_t rp_list_batch_;
     Fl_Radio_Light_Button* bn_summ_call_;
     radio_param_t rp_summ_call_;
     Fl_Radio_Light_Button* bn_hist_call_;
@@ -171,8 +181,8 @@ protected:
     Fl_Box* bx_current_;
     Fl_Box* bx_change_;
     static const int NUM_COUNTS = 10;
-    Fl_Value_Output* op_value_[NUM_COUNTS];
-    Fl_Value_Input* ip_delta_[NUM_COUNTS];
+    Fl_Output* op_value_[NUM_COUNTS];
+    Fl_Input* ip_delta_[NUM_COUNTS];
     int index_inbox_;
     int index_sase_;
     int index_curr_;
@@ -189,6 +199,8 @@ protected:
     Fl_Input* ip_note_name_;
     Fl_Input* ip_note_value_;
 
+    Fl_Text_Display* td_log_;
+ 
     // Command selection
     action_t action_;
     // CSV file directory

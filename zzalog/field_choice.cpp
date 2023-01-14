@@ -86,3 +86,90 @@ void field_choice::value(const char* field) {
 	}
 }
 
+field_input::field_input(int X, int Y, int W, int H, const char* label = nullptr) :
+	Fl_Group(X, Y, W, H, label)
+	, field_name_("")
+
+{
+	ip_ = new Fl_Input(X, Y, W, H, nullptr);
+	ch_ = new field_choice(X, Y, W, H, nullptr);
+	end();
+
+	show_widget(field_name_);
+}
+
+field_input::~field_input() {}
+
+void field_input::field_name(const char* field_name) {
+	field_name_ = field_name;
+	show_widget(field_name_);
+}
+
+const char* field_input::field_name() {
+	return field_name_;
+}
+
+// Overloaded value 
+const char* field_input::value() {
+	return value_;
+}
+
+// Set the value into both wodgets
+void field_input::value(const char* v) {
+	value_ = v;
+	ip_->value(value_);
+	ch_->value(value_);
+}
+
+// The two callbacks - as Fl_Input
+void field_input::cb_ip(Fl_Widget* w, void* v) {
+	Fl_Input* ip = (Fl_Input*)w;
+	field_input* that = ancestor_view<field_input>(w);
+	that->value_ = ip->value();
+	that->do_callback();
+}
+// and as field_choice
+void field_input::cb_ch(Fl_Widget* w, void* v) {
+	field_choice* ch = (field_choice*)w;
+	field_input* that = ancestor_view<field_input>(w);
+	that->value_ = ch->value();
+	that->do_callback();
+}
+
+// Show the respective widget - use choice if it's an enumertaion, else use input.
+Fl_Widget* field_input::show_widget(const char* v) {
+	string field = v;
+	string enumeration = spec_data_->enumeration_name(field, nullptr);
+	if (enumeration.length() || field == "MY_RIG" || field == "MY_ANTENNA" || field == "APP_ZZA_QTH" || field == "STATION_CALLSIGN") {
+		ip_->hide();
+		ch_->show();
+		populate_choice(v);
+	}
+	else {
+		ip_->show();
+		ch_->hide();
+	}
+}
+
+// Populate the choice with enumeration values
+void field_input::populate_choice(const char* name) {
+	ch_->clear();
+	if (name == "MY_RIG" || name == "MY_ANTENNA" || name == "APP_ZZA_QTH" || name == "STATION_CALLSIGN") {
+		// Add the list of possible values from the appropriate settings
+		Fl_Preferences station_settings(settings_, "Stations");
+		string setting_path;
+		if (name == "MY_RIG") setting_path = "Rigs";
+		else if (name == "MY_ANTENNA") setting_path = "Aerials";
+		else if (name == "APP_ZZA_QTH") setting_path = "QTHs";
+		else if (name == "STATION_CALLSIGN") setting_path = "Callsigns";
+		Fl_Preferences kit_settings(station_settings, setting_path.c_str());
+		int num_items = kit_settings.groups();
+		for (int i = 0; i < num_items; i++) {
+			ch_->add(kit_settings.group(i));
+		}
+	}
+	else {
+		// Add the list of possible values from the data for the enumeration
+		ch_->set_dataset(field_name_);
+	}
+}

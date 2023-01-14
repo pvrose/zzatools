@@ -88,6 +88,9 @@ extern rig_if* rig_if_;
 extern ic7300* ic7300_;
 extern url_handler* url_handler_;
 
+// FLTK externals
+extern int FL_NORMAL_SIZE;
+
 // Top level data items - these are declared as externals in each .cpp that uses them
 book* book_ = nullptr;
 import_data* import_data_ = nullptr;
@@ -912,6 +915,8 @@ bool in_current_session(record* this_record) {
 // The main app entry point
 int main(int argc, char** argv)
 {
+	// Set default font size for all widgets
+	FL_NORMAL_SIZE = FONT_SIZE;
 	// Parse command-line arguments - accept FLTK standard arguments and custom ones (in cb_args)
 	int i = 1;
 	Fl::args(argc, argv, i, cb_args);

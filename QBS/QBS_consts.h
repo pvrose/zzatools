@@ -54,11 +54,13 @@ enum action_t {
 	RECEIVE_CARD,                // Receive individual cards 
 	RECEIVE_SASE,                // Receive envelopes
 	STUFF_CARDS,                 // stuff envelopes
+	KEEP_CARDS,                  // Keep cards for next batch
 	DISPOSE_CARDS,               // Mark cards for recycling
 	POST_CARDS,                  // Post stuffed envelopes
 	RECYCLE_CARDS,               // Recycle cards
 	DISPOSE_SASE,                // Recycle envelopes
 	SUMMARY_BATCH,               // Produce batch summary report
+	LIST_BATCH,                  // Produce batch listing
 	SUMMARY_CALL,                // Produce call summary Sreport
 	HISTORY_CALL,                // Produce call history report
 	EDIT_NOTES                   // Edit notes for call

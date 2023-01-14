@@ -133,11 +133,8 @@ void qso_manager::common_grp::load_values() {
 	my_settings_ = new Fl_Preferences(stations_settings, settings_name_.c_str());
 	// Number of items described in settings
 	// Get the current item
-	char * text;
-	my_settings_->get("Current", text, "");
-	my_name_ = text;
-	free(text);
 	all_items_.clear();
+	char* text;
 	// Callsigns are kept as entries not groups
 	int num_entries = my_settings_->entries();
 	for (int i = 1; i < num_entries; i++) {
@@ -148,6 +145,7 @@ void qso_manager::common_grp::load_values() {
 			snprintf(name, 10, "Call%d", i);
 			my_settings_->get(name, text, "");
 			all_items_.push_back(string(text));
+			free(text);
 		}
 		}
 	}
@@ -235,9 +233,7 @@ void qso_manager::common_grp::load_values() {
 // Note this assumes the appropriate common_grp is the active group
 void qso_manager::common_grp::create_form(int X, int Y) {
 	// widget positions - rows
-	const int R1 = HTEXT;
-	const int H1 = HBUTTON;
-	const int R2 = R1 + H1 + GAP;
+	const int R2 = HTEXT;
 	const int H2 = HBUTTON;
 	const int R3 = R2 + H2 + GAP;
 	const int H3 = HBUTTON;
@@ -265,16 +261,7 @@ void qso_manager::common_grp::create_form(int X, int Y) {
 	box(FL_BORDER_BOX);
 
 	// Row 1
-	// Output to display name feom settings
-	Fl_Output* op2_1 = new Fl_Output(X + C1, Y + R1, W1A, H1);
-	op2_1->box(FL_FLAT_BOX);
-	op2_1->color(FL_BACKGROUND_COLOR);
-	op2_1->labelsize(FONT_SIZE);
-	op2_1->labelfont(FONT);
-	//op2_1->textfont(FONT | FL_BOLD); // Font, size and colour are set in enable_widgets()
-	op2_1->tooltip("Value in settings");
-	op_settings_ = op2_1;
-
+	// removed
 	// Row 2
 	// Choice to select or add new antenna or rig
 	item_choice* ch1_1 = new item_choice(X + C1, Y + R2, W1A, H2);
@@ -347,8 +334,6 @@ void qso_manager::common_grp::save_values() {
 		my_settings_->clear();
 		break;
 	}
-
-	my_settings_->set("Current", escape_hex(my_name_, false, "/%").c_str());
 
 	int index = 0;
 	// For each item
@@ -480,21 +465,7 @@ void qso_manager::common_grp::populate_band() {
 void qso_manager::common_grp::enable_widgets() {
 	// Set value and style of settings ouput widget
 	char* next_value;
-	Fl_Output* op = (Fl_Output*)op_settings_;
 	qso_manager* dash = ancestor_view<qso_manager>(this);
-	my_settings_->get("Current", next_value, "");
-	if (strcmp(next_value, my_name_.c_str())) {
-		op->textcolor(FL_RED);
-		op->textfont(FONT | FL_BOLD | FL_ITALIC);
-		op->textsize(FONT_SIZE + 2);
-	}
-	else {
-		op->textcolor(FL_BLACK);
-		op->textfont(FONT | FL_BOLD);
-		op->textsize(FONT_SIZE + 2);
-	}
-	op->value(next_value);
-	op->redraw();
 	free(next_value);
 	// Set values into choice
 	if (!dash->items_changed_) {

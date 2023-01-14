@@ -68,7 +68,7 @@ void QBS_notes::draw_cell(TableContext context, int R, int C, int X, int Y, int 
 			fl_color(FL_BLACK);
             // Increment data pointer to the C'th item in the list
             note_data note = note_data{"", "", ""};
-            if (data_ != nullptr && ((notes*)data_)->size() > R) {
+            if (data_ != nullptr && ((notes*)data_)->size() > (unsigned)R) {
                 note = (*((notes*)data_))[R];
             }
             // Get the field per column

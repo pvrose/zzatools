@@ -43,6 +43,7 @@ namespace zzalog {
 		enum logging_mode_t {
 			LM_FOR_PARSING, // Use current time
 			LM_OFF_AIR,     // Off-line logging (w/o radio)
+			LM_OFF_AIR_EDIT,// Off-line edit existing QSOs
 			LM_ON_AIR_CAT,  // Real -time logging - data from radio
 			LM_ON_AIR_COPY, // Real-time logging - data from selected QSO
 			LM_ON_AIR_TIME, // Real-time logging - date/time only
@@ -59,13 +60,21 @@ namespace zzalog {
 			NONE
 		};
 
-		// Use item destination
-		enum use_item_t {
-			SELECTED_ONLY,
-			SELECTED_NEW,
-			NEW_ONLY,
-			CANCEL_USE
+		// Loggng state
+		enum logging_state_t {
+			QSO_INACTIVE,    // No QSO being edited
+			QSO_PENDING,     // Collecting data for QSO - not qctive
+			QSO_STARTED,     // QSO started
+			QSO_EDIT,        // Editing existing QSO
 		};
+
+		//// Use item destination
+		//enum use_item_t {
+		//	SELECTED_ONLY,
+		//	SELECTED_NEW,
+		//	NEW_ONLY,
+		//	CANCEL_USE
+		//};
 
 		// Hamlib parameters 
 		struct hamlib_data {
@@ -159,8 +168,6 @@ namespace zzalog {
 			Fl_Widget* choice_;
 			// Band select widget
 			Fl_Widget* band_browser_;
-			// Current item value
-			Fl_Widget* op_settings_;
 			// selected item
 			int item_no_;
 			// all items 
@@ -213,12 +220,16 @@ namespace zzalog {
 
 			// Callbacks
 		protected:
-			// Start QSO - If not started: set start time/date; copy per logging mode; add any set fields. If started: add any set fields
+			// Activate QSO logging
+			static void cb_activate(Fl_Widget* w, void* v);
+			// Start QSO (log first if already in IN_QSO)
 			static void cb_start_qso(Fl_Widget* w, void* v);
-			// Log QSO - If not started: as cb_start_qso. Also: save QSO
+			// Log QSO (start first if in QSO_PENDING)
 			static void cb_log_qso(Fl_Widget* w, void* v);
-			// Cancel QSO - delete QSO; clear fields
-			static void cb_cancel_qso(Fl_Widget* w, void* v);
+			// Quit QSO logging - delete QSO; clear fields
+			static void cb_quit_qso(Fl_Widget* w, void* v);
+			// Go edit mode
+			static void cb_edit_log(Fl_Widget* w, void* v);
 			// Callback - Worked B4? button
 			static void cb_wkb4(Fl_Widget* w, void* v);
 			// Callback - Parse callsign
@@ -306,13 +317,8 @@ namespace zzalog {
 
 
 			// Widgets
-
-			// Log button
-			Fl_Button* bn_log_qso_;
-			// Cancel button
-			Fl_Button* bn_cancel_qso_;
-			// Start button
-			Fl_Button* bn_start_qso_;
+			// Activate - go to PREP_QSO state
+			Fl_Button* bn_activate_;
 			// Worked before button
 			Fl_Button* bn_wkd_b4_;
 			// Parse button

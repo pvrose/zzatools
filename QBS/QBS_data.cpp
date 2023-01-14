@@ -1106,6 +1106,55 @@ void QBS_data::display_batch_summary(int box_num) {
 	reporter_->show();
 }
 
+// Display all calls in the batch and cards in each status
+void QBS_data::display_batch_listing(int box_num) {
+	const box_data& box = *boxes_[box_num];
+	stringstream ss;
+	// Heading: BATCH#nn: 2022 Q4
+	ss << "<H1><U>BATCH #" << box_num << ":- " << box.id << "</U></H1>" << endl;
+	ss << "<TABLE>" << endl;
+	ss << "<TR><TD>Received: </TD><TD>" << box.date_received << "</TD></TR>" << endl;
+	if (box.date_sent.length() == 0) {
+		ss << "<TR><TD>Sent:</TD><TD>NOT SENT</TD></TR>" << endl;
+	}
+	else {
+		ss << "<TR><TD>Sent:</TD><TD>" << box.date_sent << "</TD></TR>" << endl;
+	}
+	if (box.date_recycled.length() == 0) {
+		ss << "<TR><TD>Recycled:</TD><TD>NOT RECYCLED</TD></TR>" << endl;
+	}
+	else {
+		ss << "<TR><TD>Recycled:</TD><TD>" << box.date_recycled << "</TD></TR>" << endl;
+	}
+	ss << "<TR><TD>Number callsigns:</TD><TD>" << box.received->size() << "</TD></TR>" << endl;
+	ss << "</TABLE>" << endl;
+	ss << "<TABLE BORDER=1 >" << endl;
+	ss << "<TR><TD>Callsign</TD><TD>Received</TD><TD>Sent</TD><TD>Held/Recycled</TD></TR>" << endl;
+	for (auto it = box.received->begin(); it != box.received->end(); it++) {
+
+		int rcvd = (*it).second;
+		string call = (*it).first;
+		int sent = (*box.sent)[call];
+		int recy = (*box.counts)[call];
+		ss << "<TR>";
+		ss << "<TD>" << call << "</TD>";
+		ss << "<TD>" << rcvd << "</TD>";
+		ss << "<TD>" << sent << "</TD>";
+		ss << "<TD>" << recy << "</TD>";
+		ss << "</TR>" << endl;
+	}
+	ss << "<TR>";
+	ss << "<TD>Total</TD><TD>" << box.recycle_info->sum_received << "</TD>";
+	ss << "<TD>" << box.recycle_info->sum_sent << "</TD>";
+	ss << "<TD>" << box.recycle_info->sum_recycled << "</TD></TR>" << endl;
+
+	ss << "</TABLE>" << endl;
+	// Display in a window
+	reporter_->label("Block Report");
+	reporter_->text(ss.str().c_str());
+	reporter_->show();
+}
+
 void QBS_data::display_call_summary(string call) {
 	stringstream ss;
 	ss << "<H1><U>" << call << "</U></H1>" << endl;
