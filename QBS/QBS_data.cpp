@@ -393,6 +393,45 @@ int QBS_data::totalise_cards(
 	return box.recycle_info->sum_received;
 }
 
+
+// Adjust box 
+int QBS_data::adjust_cards(
+	int box_num,
+	string date,
+	string call,
+	int delta
+) {
+	switch (box_num) {
+	case IN_BOX:
+		in_box_[call] += delta;
+		break;
+	case OUT_BOX:
+		out_box_[call] += delta;
+		break;
+	case KEEP_BOX:
+		keep_box_[call] += delta;
+		break;
+	case SASE_BOX:
+		sases_[call] += delta;
+		break;
+	case RCVD_BOX:
+		received_box_[call] += delta;
+		break;
+	case SENT_BOX:
+		sent_box_[call] += delta;
+		break;
+	case DISP_BOX:
+		disposed_box_[call] += delta;
+		break;
+	default:
+		(*boxes_[box_num]->counts)[call] += delta;
+		(*boxes_[box_num]->received)[call] += delta;
+		break;
+	}
+	log_action(ADJUST, box_num, date, call, delta, 0.0);
+	return delta;
+}
+
 // Set ham-data
 int QBS_data::ham_data(
 	string date,
@@ -852,6 +891,7 @@ void QBS_data::log_action(
 		case CARDS:
 		case OUTPUT:
 		case KEEP:
+		case ADJUST:
 			if (i_value != 0) file_ << command << '\t' << date << '\t' << box_num << '\t' << id << '\t' << i_value << endl;
 			break;
 		case BATCH:

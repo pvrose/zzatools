@@ -86,13 +86,13 @@ typedef vector<note_data> notes;
 typedef map<string, notes> call_info;
 
 enum special_box_t {
-	IN_BOX = -1,                
-	OUT_BOX = -2,
-	KEEP_BOX = -3,
-	SASE_BOX = -4,
-	RCVD_BOX = -5,
-	SENT_BOX = -6,
-	DISP_BOX = -7
+	IN_BOX = -1,          // Box holding cards received outwith a batch      
+	OUT_BOX = -2,         // "Box" representing cards placed in SASEs for posting
+	KEEP_BOX = -3,        // "Box" representing cards removed from processed boxes 
+	SASE_BOX = -4,        // Box containing SASEs
+	RCVD_BOX = -5,        // "Box" representing ALL received cards
+	SENT_BOX = -6,        // "Box" representing cards placed in post-box
+	DISP_BOX = -7         // "Box" representing cards placed in recycling bin  
 };
 
 class QBS_window;
@@ -268,6 +268,13 @@ public:
 		string call,                // Callsign
 		string name,                // Call info name
 		string value                // Call info value
+	);
+	// Adjust box by value
+	int adjust_cards(
+		int box_num,                // Box number
+		string date,                // date actioned
+		string call,                // Callsign
+		int delta                   // Value to adjust by
 	);
 
 	// Log the action

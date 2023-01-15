@@ -98,6 +98,7 @@ protected:
     void update_call_summary();
     void update_call_history();
     void update_edit_notes();
+    void update_correct_data();
     void hide_edit_notes();
     void update_action_values();
     void update_action_bn(Fl_Button* b, action_t a);
@@ -113,6 +114,8 @@ protected:
     ofstream* blog_file_;
     // Log display scroll position
     int pos_batch_log_;
+    // Pre-populate inputs with defaults
+    bool default_inputs_;
 
     // widgets - input group
     Fl_Group* g_input_;
@@ -150,6 +153,8 @@ protected:
     radio_param_t rp_recycle_cards_;
     Fl_Radio_Light_Button* bn_dispose_sase_;
     radio_param_t rp_dispose_sase_;
+    Fl_Radio_Light_Button* bn_correction_;
+    radio_param_t rp_correction_;
 
     Fl_Radio_Light_Button* bn_edit_notes_;
     radio_param_t rp_edit_notes_;
@@ -178,6 +183,7 @@ protected:
     Fl_Button* bn_c_navfff_;
     Fl_Button* bn_c_action_;
     Fl_Button* bn_nav_n_do_;
+    Fl_Button* bn_use_defaults_;
     Fl_Box* bx_current_;
     Fl_Box* bx_change_;
     static const int NUM_COUNTS = 10;

@@ -24,7 +24,8 @@ enum command_t : char {
 	DISPOSE = 'D',               // Move cards to disposal queue
 	RECYCLE = 'R',               // Move cards from disposal queue to blue bin
 	HAM_INFO = 'H',              // Ham data
-	COMMENT = '#'                // Used for comments
+	COMMENT = '#',               // Used for comments
+	ADJUST = 'A'                 // Adjust number of cards
 };
 
 //enum subcommand_t : char {
@@ -63,7 +64,8 @@ enum action_t {
 	LIST_BATCH,                  // Produce batch listing
 	SUMMARY_CALL,                // Produce call summary Sreport
 	HISTORY_CALL,                // Produce call history report
-	EDIT_NOTES                   // Edit notes for call
+	EDIT_NOTES,                  // Edit notes for call
+	CORRECT_DATA,                // Allow correction of active card counts
 };
 
 enum navigate_t {
