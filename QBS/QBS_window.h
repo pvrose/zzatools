@@ -99,7 +99,7 @@ protected:
     void update_call_history();
     void update_edit_notes();
     void update_correct_data();
-    void hide_edit_notes();
+    void hide_edit_notes(bool info);
     void update_action_values();
     void update_action_bn(Fl_Button* b, action_t a);
     // Call whatever update is needed per action

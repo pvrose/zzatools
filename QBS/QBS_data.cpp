@@ -318,7 +318,6 @@ int QBS_data::keep_cards(
 int QBS_data::post_cards(
 	string date                 // date actioned
 ) {
-	mode_ = DORMANT;
 	action_read_ = POST_CARDS;
 	int box_num = boxes_.size() - 1;
 	box_data& box = *boxes_[box_num];
@@ -336,7 +335,9 @@ int QBS_data::post_cards(
 int QBS_data::dispose_cards(
 	string date                 // date actioned
 ) {
+	mode_ = DORMANT;
 	action_read_ = DISPOSE_CARDS;
+	window_->update_actions();
 	int nbox = boxes_.size() - 1;
 	box_data& box = *boxes_[nbox];
 	int cards = 0;

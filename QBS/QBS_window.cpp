@@ -238,20 +238,20 @@ void QBS_window::create_form() {
 	bn_keep_cards_->callback(cb_process, &rp_keep_cards_);
 	curr_y += HBUTTON;
 
-	// Dispose cards - mark for recycling
-	bn_dispose_cards_ = new Fl_Radio_Light_Button(curr_x, curr_y, WPBUTTON, HBUTTON, "Mark for recycling");
-	bn_dispose_cards_->color(COLOUR_BATCH);
-	bn_dispose_cards_->selection_color(FL_BLACK);
-	rp_dispose_cards_ = radio_param_t(DISPOSE_CARDS, (int*)&action_);
-	bn_dispose_cards_->callback(cb_process, &rp_dispose_cards_);
-	curr_y += HBUTTON;
-
-	// Receive batch 
+	// Empty out box 
 	bn_post_cards_ = new Fl_Radio_Light_Button(curr_x, curr_y, WPBUTTON, HBUTTON, "Post cards");
 	bn_post_cards_->color(COLOUR_BATCH);
 	bn_post_cards_->selection_color(FL_BLACK);
 	rp_post_cards_ = radio_param_t(POST_CARDS, (int*)&action_);
 	bn_post_cards_->callback(cb_process, &rp_post_cards_);
+	curr_y += HBUTTON;
+
+	// Dispose cards - mark for recycling
+	bn_dispose_cards_ = new Fl_Radio_Light_Button(curr_x, curr_y, WPBUTTON, HBUTTON, "Finish processing");
+	bn_dispose_cards_->color(COLOUR_BATCH);
+	bn_dispose_cards_->selection_color(FL_BLACK);
+	rp_dispose_cards_ = radio_param_t(DISPOSE_CARDS, (int*)&action_);
+	bn_dispose_cards_->callback(cb_process, &rp_dispose_cards_);
 	curr_y += HBUTTON;
 
 	// Receive batch 
@@ -450,10 +450,6 @@ void QBS_window::create_form() {
 	curr_y += GAP;
 	curr_x = col2 + WBUTTON + GAP;
 	max_x = max(max_x, curr_x);
-	int max_y = curr_y;
-
-	// Now create the notes widgets in the same place
-	curr_y = save_y + GAP;
 	curr_x = save_x + WLABEL;
 
 	// Create the full width of the above
@@ -462,7 +458,14 @@ void QBS_window::create_form() {
 	tab_old_notes_->align(FL_ALIGN_LEFT_TOP);
 	max_x = max(max_x, tab_old_notes_->x() + tab_old_notes_->w());
 	
-	curr_y += tab_old_notes_->h() + GAP;
+	curr_y += tab_old_notes_->h();
+
+	int max_y = curr_y;
+
+	// Now create the notes widgets in the same place
+	curr_y = save_y + GAP;
+	curr_x = save_x + WLABEL;
+
 	op_note_date_ = new Fl_Output(curr_x, curr_y, WNOTES, HBUTTON, "Date");
 	op_note_date_->align(FL_ALIGN_LEFT);
 	op_note_date_->color(FL_BACKGROUND_COLOR);
@@ -570,7 +573,7 @@ void QBS_window::update_new_batch() {
 		ip_delta_[ix]->hide();
 	}
 	// Hide the note widgets
-	hide_edit_notes();
+	hide_edit_notes(false);
 	return;
 }
 
@@ -584,7 +587,6 @@ void QBS_window::update_sort_cards() {
 	// Batch output
 	op_batch_->activate();
 	selected_box_ = data_->get_current();
-	op_batch_->value(data_->get_batch(selected_box_).c_str());
 	// Batch navigation buttons
 	update_batches(false);
 	// Button action
@@ -635,7 +637,7 @@ void QBS_window::update_sort_cards() {
 		ip_delta_[ix]->hide();
 	}
 	// Hide the note widgets
-	hide_edit_notes();
+	hide_edit_notes(true);
 	return;
 }
 
@@ -647,7 +649,6 @@ void QBS_window::update_keep_cards() {
 	// Batch output
 	op_batch_->activate();
 	selected_box_ = data_->get_current();
-	op_batch_->value(data_->get_batch(selected_box_).c_str());
 	// Batch navigation buttons
 	update_batches(false);
 	// Button action
@@ -691,7 +692,7 @@ void QBS_window::update_keep_cards() {
 		ip_delta_[ix]->hide();
 	}
 	// Hide the note widgets
-	hide_edit_notes();
+	hide_edit_notes(true);
 	return;
 }
 
@@ -705,7 +706,6 @@ void QBS_window::update_rcv_card() {
 	// Batch output
 	op_batch_->activate();
 	selected_box_ = data_->get_current();
-	op_batch_->value(data_->get_batch(selected_box_).c_str());
 	update_batches(false);
 	// Button action
 	bn_b_action_->deactivate();
@@ -737,7 +737,7 @@ void QBS_window::update_rcv_card() {
 		ip_delta_[ix]->hide();
 	}
 	// Hide the note widgets
-	hide_edit_notes();
+	hide_edit_notes(true);
 	return;
 }
 
@@ -748,6 +748,7 @@ void QBS_window::update_rcv_sase() {
 	g_process_->label("Receive SASEs");
 	// Batch output
 	op_batch_->deactivate();
+	selected_box_ = data_->get_current();
 	update_batches(false);
 	// Button action
 	bn_b_action_->deactivate();
@@ -778,7 +779,7 @@ void QBS_window::update_rcv_sase() {
 		ip_delta_[ix]->hide();
 	}
 	// Hide the note widgets
-	hide_edit_notes();
+	hide_edit_notes(true);
 	return;
 }
 
@@ -788,9 +789,9 @@ void QBS_window::update_rcv_sase() {
 void QBS_window::update_stuff_cards() {
 	char buff[32];
 	g_process_->label("Stuff cards in envelopes and move to out-tray");
+	selected_box_ = data_->get_current();
 	// Batch output
 	op_batch_->activate();
-	op_batch_->value(data_->get_batch(selected_box_).c_str());
 	update_batches(false);
 	// Button action
 	bn_b_action_->deactivate();
@@ -877,7 +878,7 @@ void QBS_window::update_stuff_cards() {
 		ip_delta_[ix]->hide();
 	}
 	// Hide the note widgets
-	hide_edit_notes();
+	hide_edit_notes(true);
 	return;
 }
 
@@ -888,7 +889,6 @@ void QBS_window::update_dispose_cards() {
 	// Batch output
 	op_batch_->activate();
 	selected_box_ = data_->get_current();
-	op_batch_->value(data_->get_batch(selected_box_).c_str());
 	update_batches(false);
 	// Button action
 	if (batch_op_done_) bn_b_action_->deactivate();
@@ -912,7 +912,7 @@ void QBS_window::update_dispose_cards() {
 		ip_delta_[ix]->hide();
 	}
 	// Hide the note widgets
-	hide_edit_notes();
+	hide_edit_notes(false);
 	return;
 }
 
@@ -923,7 +923,6 @@ void QBS_window::update_post_cards() {
 	// Batch output
 	op_batch_->activate();
 	selected_box_ = data_->get_current();
-	op_batch_->value(data_->get_batch(selected_box_).c_str());
 	update_batches(false);
 	// Button action
 	if (batch_op_done_) bn_b_action_->deactivate();
@@ -948,7 +947,7 @@ void QBS_window::update_post_cards() {
 		ip_delta_[ix]->hide();
 	}
 	// Hide the note widgets
-	hide_edit_notes();
+	hide_edit_notes(false);
 	return;
 }
 
@@ -959,7 +958,7 @@ void QBS_window::update_recycle_cards() {
 	g_process_->label("Mark head of disposal queue for recycling");
 	// Batch output
 	op_batch_->activate();
-	op_batch_->value(data_->get_batch(data_->get_head()).c_str());
+	selected_box_ = data_->get_head();
 	update_batches(false);
 	// Button action
 	if (batch_op_done_) bn_b_action_->deactivate();
@@ -1022,7 +1021,7 @@ void QBS_window::update_recycle_cards() {
 		ip_delta_[ix]->hide();
 	}
 	// Hide the note widgets
-	hide_edit_notes();
+	hide_edit_notes(false);
 	return;
 }
 
@@ -1065,7 +1064,7 @@ void QBS_window::update_dispose_sase() {
 		ip_delta_[ix]->hide();
 	}
 	// Hide the note widgets
-	hide_edit_notes();
+	hide_edit_notes(true);
 	return;
 }
 
@@ -1076,7 +1075,6 @@ void QBS_window::update_batch_summary() {
 	// Batch output
 	op_batch_->activate();
 	selected_box_ = data_->get_current();
-	op_batch_->value(data_->get_batch(selected_box_).c_str());
 	update_batches(true);
 	// Button action
 	bn_b_action_->activate();
@@ -1099,7 +1097,7 @@ void QBS_window::update_batch_summary() {
 		ip_delta_[ix]->hide();
 	}
 	// Hide the note widgets
-	hide_edit_notes();
+	hide_edit_notes(false);
 	return;
 }
 
@@ -1110,7 +1108,6 @@ void QBS_window::update_batch_listing() {
 	// Batch output
 	op_batch_->activate();
 	selected_box_ = data_->get_current();
-	op_batch_->value(data_->get_batch(selected_box_).c_str());
 	update_batches(true);
 	// Button action
 	bn_b_action_->activate();
@@ -1133,7 +1130,7 @@ void QBS_window::update_batch_listing() {
 		ip_delta_[ix]->hide();
 	}
 	// Hide the note widgets
-	hide_edit_notes();
+	hide_edit_notes(false);
 	return;
 }
 
@@ -1143,7 +1140,6 @@ void QBS_window::update_call_summary() {
 	g_process_->label("Report a summary of currently held cards for this call");
 	// Batch output
 	op_batch_->deactivate();
-	op_batch_->value("");
 	update_batches(false);
 	// Button action
 	bn_b_action_->deactivate();
@@ -1168,7 +1164,7 @@ void QBS_window::update_call_summary() {
 		ip_delta_[ix]->hide();
 	}
 	// Hide the note widgets
-	hide_edit_notes();
+	hide_edit_notes(false);
 	return;
 }
 
@@ -1178,7 +1174,6 @@ void QBS_window::update_call_history() {
 	g_process_->label("Report a history of all cards processed for this call");
 	// Batch output
 	op_batch_->deactivate();
-	op_batch_->value("");
 	update_batches(false);
 	// Button action
 	bn_b_action_->deactivate();
@@ -1203,7 +1198,7 @@ void QBS_window::update_call_history() {
 		ip_delta_[ix]->hide();
 	}
 	// Hide the note widgets
-	hide_edit_notes();
+	hide_edit_notes(false);
 	return;
 }
 
@@ -1212,7 +1207,6 @@ void QBS_window::update_edit_notes() {
 	g_process_->label("Add a note for the selected call");
 	// Batch output
 	op_batch_->deactivate();
-	op_batch_->value("");
 	update_batches(false);
 	// Button action
 	bn_b_action_->deactivate();
@@ -1244,6 +1238,8 @@ void QBS_window::update_edit_notes() {
 	ip_note_name_->value("");
 	ip_note_value_->show();
 	ip_note_value_->value("");
+	tab_old_notes_->show();
+	tab_old_notes_->set_data(data_->get_notes(call_));
 	return;
 
 }
@@ -1256,7 +1252,6 @@ void QBS_window::update_correct_data() {
 	g_process_->label("Correct card counts in active boxes");
 	// Batch output
 	op_batch_->activate();
-	op_batch_->value(data_->get_batch(selected_box_).c_str());
 	update_batches(false);
 	// Button action
 	bn_b_action_->deactivate();
@@ -1335,17 +1330,23 @@ void QBS_window::update_correct_data() {
 		ip_delta_[ix]->hide();
 	}
 	// Hide the note widgets
-	hide_edit_notes();
+	hide_edit_notes(true);
 	return;
 }
 
 
 // Hide the note dialog
-void QBS_window::hide_edit_notes() {
-	tab_old_notes_->hide();
-	op_note_date_->hide();
-	ip_note_name_->hide();
-	ip_note_value_->hide();
+void QBS_window::hide_edit_notes(bool info) {
+	if (info) {
+		tab_old_notes_->show();
+		tab_old_notes_->set_data(data_->get_notes(call_));
+	}
+	else {
+		tab_old_notes_->hide();
+		op_note_date_->hide();
+		ip_note_name_->hide();
+		ip_note_value_->hide();
+	}
 }
 
 // Depending on the current processin phase allow/disallow the command
@@ -1364,7 +1365,7 @@ void QBS_window::update_actions() {
 		}
 		bx_change_->hide();
 		bx_current_->hide();
-		hide_edit_notes();
+		hide_edit_notes(false);
 
 		g_input_->activate();
 		break;
@@ -1860,7 +1861,7 @@ void QBS_window::cb_exec_call(Fl_Widget* w, void* v) {
 		that->data_->adjust_cards(SASE_BOX, date, call, num_sases);
 		snprintf(log_msg, 256, "Correction %s: %s %d SASEs added\n", date.c_str(), call.c_str(), num_sases);
 		that->append_batch_log(log_msg);
-		that->update_stuff_cards();
+		that->update_correct_data();
 		break;
 	}
 
