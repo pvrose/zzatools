@@ -806,14 +806,14 @@ void record_form::cb_bn_edit(Fl_Widget* w, long v) {
 	switch (action) {
 	case START:
 		// Start a new record
-		qso_manager_->start_qso(true, true);
+		qso_manager_->start_qso();
 		that->use_mode_ = UM_QSO;
 		that->set_edit_widgets("", "");
 		break;
 	case RESTART:
 		// Save current record and start a new one
 		qso_manager_->end_qso();
-		qso_manager_->start_qso(true, true);
+		qso_manager_->start_qso();
 		that->use_mode_ = UM_QSO;
 		that->set_edit_widgets("", "");
 		break;

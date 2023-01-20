@@ -152,12 +152,12 @@ namespace zzalog {
 		bool is_dirty();
 		// Clear dirty marker
 		void clean();
-
-		// protected methods
-	protected:
 		// Delete all contents
 		void delete_contents();
 
+
+		// protected methods
+	protected:
 		// protected attributes
 	protected:
 		// record is a header

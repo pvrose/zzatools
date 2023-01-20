@@ -16,6 +16,7 @@ const int HIERARCHIC_LIMIT = 12;
 field_choice::field_choice(int X, int Y, int W, int H, const char* label) :
 	Fl_Choice(X, Y, W, H, label)
 	, hierarchic_(true)
+	, dataset_(nullptr)
 {
 }
 
@@ -69,7 +70,7 @@ const char* field_choice::value() {
 		strcpy(result, last_slash + 1);
 	}
 	else {
-		strcpy(result, temp);
+		strcpy(result, temp + 1);
 	}
 	return result;
 }
@@ -77,16 +78,26 @@ const char* field_choice::value() {
 // Select the item with the leaf name
 void field_choice::value(const char* field) {
 	if (field == nullptr || strlen(field) == 0) {
-		Fl_Choice::value(0);
+		Fl_Choice::value(-1);
 	}
 	else {
-		char actual[128];
-		snprintf(actual, 128, "%c/%s", field[0], field);
-		Fl_Choice::value(find_index(actual));
+		if (hierarchic_) {
+			char actual[128];
+			snprintf(actual, 128, "%c/%s", field[0], field);
+			Fl_Choice::value(find_index(actual));
+		}
+		else {
+			Fl_Choice::value(find_index(field));
+		}
 	}
 }
 
-field_input::field_input(int X, int Y, int W, int H, const char* label = nullptr) :
+// Set hierarchic value
+void field_choice::hierarchic(bool h) {
+	hierarchic_ = h;
+}
+
+field_input::field_input(int X, int Y, int W, int H, const char* label) :
 	Fl_Group(X, Y, W, H, label)
 	, field_name_("")
 
@@ -95,18 +106,18 @@ field_input::field_input(int X, int Y, int W, int H, const char* label = nullptr
 	ch_ = new field_choice(X, Y, W, H, nullptr);
 	end();
 
-	show_widget(field_name_);
+	show_widget();
 }
 
 field_input::~field_input() {}
 
 void field_input::field_name(const char* field_name) {
 	field_name_ = field_name;
-	show_widget(field_name_);
+	show_widget();
 }
 
 const char* field_input::field_name() {
-	return field_name_;
+	return field_name_.c_str();
 }
 
 // Overloaded value 
@@ -137,22 +148,28 @@ void field_input::cb_ch(Fl_Widget* w, void* v) {
 }
 
 // Show the respective widget - use choice if it's an enumertaion, else use input.
-Fl_Widget* field_input::show_widget(const char* v) {
-	string field = v;
-	string enumeration = spec_data_->enumeration_name(field, nullptr);
-	if (enumeration.length() || field == "MY_RIG" || field == "MY_ANTENNA" || field == "APP_ZZA_QTH" || field == "STATION_CALLSIGN") {
+Fl_Widget* field_input::show_widget() {
+	menu_data_ = spec_data_->enumeration_name(field_name_, nullptr);
+	if (menu_data_.length() || field_name_ == "MY_RIG" ||
+		field_name_ == "MY_ANTENNA" || field_name_ == "APP_ZZA_QTH" ||
+		field_name_ == "STATION_CALLSIGN") {
+		if (menu_data_.length() == 0) {
+			menu_data_ = field_name_;
+		}
 		ip_->hide();
 		ch_->show();
-		populate_choice(v);
+		populate_choice(menu_data_);
+		return ch_;
 	}
 	else {
 		ip_->show();
 		ch_->hide();
+		return ip_;
 	}
 }
 
 // Populate the choice with enumeration values
-void field_input::populate_choice(const char* name) {
+void field_input::populate_choice(string name) {
 	ch_->clear();
 	if (name == "MY_RIG" || name == "MY_ANTENNA" || name == "APP_ZZA_QTH" || name == "STATION_CALLSIGN") {
 		// Add the list of possible values from the appropriate settings
@@ -163,13 +180,38 @@ void field_input::populate_choice(const char* name) {
 		else if (name == "APP_ZZA_QTH") setting_path = "QTHs";
 		else if (name == "STATION_CALLSIGN") setting_path = "Callsigns";
 		Fl_Preferences kit_settings(station_settings, setting_path.c_str());
-		int num_items = kit_settings.groups();
-		for (int i = 0; i < num_items; i++) {
-			ch_->add(kit_settings.group(i));
+		if (name == "STATION_CALLSIGN") {
+			int num_items;
+			kit_settings.get("Number Callsigns", num_items, 0);
+			char temp[10];
+			char* value;
+			for (int i = 1; i <= num_items; i++) {
+				snprintf(temp, 10, "Call%d", i);
+				kit_settings.get(temp, value, "");
+				ch_->add(value);
+			}
+			free(value);
 		}
+		else {
+			int num_items = kit_settings.groups();
+			for (int i = 0; i < num_items; i++) {
+				ch_->add(kit_settings.group(i));
+			}
+		}
+		ch_->hierarchic(false);
 	}
 	else {
 		// Add the list of possible values from the data for the enumeration
-		ch_->set_dataset(field_name_);
+		ch_->set_dataset(name);
 	}
+}
+
+// Repopulate choice
+void field_input::reload_choice() {
+	// Remember current selection
+	const char* value = ch_->value();
+	// Add new list
+	populate_choice(menu_data_);
+	// Restore remebered value
+	ch_->value(value);
 }

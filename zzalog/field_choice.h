@@ -24,6 +24,8 @@ namespace zzalog {
 		// Override value methods for fundamental string
 		const char* value();
 		void value(const char* field);
+		// Set hierarchic
+		void hierarchic(bool h);
 
 	protected:
 		spec_dataset* dataset_;
@@ -46,22 +48,27 @@ namespace zzalog {
 		const char* value();
 		void value(const char* v);
 
+		// Reload choice
+		void reload_choice();
+
 	protected:
 		// The two callbacks
 		static void cb_ip(Fl_Widget* w, void* v);
 		static void cb_ch(Fl_Widget* w, void* v);
 
 		// Activate the appropriate widget
-		Fl_Widget* show_widget(const char* name);
+		Fl_Widget* show_widget();
 		// Populate the choice
-		void populate_choice(const char* v);
+		void populate_choice(string name);
 		// Process the field
 		Fl_Input* ip_;
 		field_choice* ch_;
 		// Name of field
-		const char* field_name_;
+		string field_name_;
 		// VAlue
 		const char* value_;
+		// Specific choice menu
+		string menu_data_;
 	};
 
 }

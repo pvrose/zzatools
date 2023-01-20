@@ -303,7 +303,7 @@ void menu::cb_mi_file_new(Fl_Widget* w, void* v) {
 		import_data_->stop_update(qso_manager::LM_ON_AIR_CAT, false);
 	}
 	while (!import_data_->update_complete()) Fl::wait();
-	if (book_->modified_record() | book_->new_record()) {
+	if (book_->modified_record() || book_->new_record()) {
 		fl_beep(FL_BEEP_QUESTION);
 		switch (fl_choice("You are currently modifying a record? Save or Quit?", "Save?", "Quit?", nullptr)) {
 		case 0:
@@ -816,7 +816,7 @@ void menu::cb_mi_log_new(Fl_Widget* w, void* v) {
 	// Force main log book
 	tabbed_forms_->activate_pane(OT_MAIN, true);
 	// Create a new record - on or off-air
-	qso_manager_->start_qso(true, true);
+	qso_manager_->start_qso();
 }
 
 
@@ -1810,7 +1810,7 @@ void menu::update_items() {
 			mode(index_last, mode(index_last) & ~FL_MENU_INACTIVE);
 			mode(index_find, mode(index_find) & ~FL_MENU_INACTIVE);
 		}
-		else if (last & !first) {
+		else if (last && !first) {
 			// Disable NAvigate->Next and Navigate->Last and enable others
 			mode(index_first, mode(index_first) & ~FL_MENU_INACTIVE);
 			mode(index_prev, mode(index_prev) & ~FL_MENU_INACTIVE);
@@ -1818,7 +1818,7 @@ void menu::update_items() {
 			mode(index_last, mode(index_last) | FL_MENU_INACTIVE);
 			mode(index_find, mode(index_find) & ~FL_MENU_INACTIVE);
 		}
-		else if (first & last) {
+		else if (first && last) {
 			// Only 1 record, disable all Navigate->* menu items
 			mode(index_first, mode(index_first) | FL_MENU_INACTIVE);
 			mode(index_prev, mode(index_prev) | FL_MENU_INACTIVE);
