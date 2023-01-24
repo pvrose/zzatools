@@ -189,8 +189,8 @@ void field_input::populate_choice(string name) {
 				snprintf(temp, 10, "Call%d", i);
 				kit_settings.get(temp, value, "");
 				ch_->add(value);
+				free(value);
 			}
-			free(value);
 		}
 		else {
 			int num_items = kit_settings.groups();
