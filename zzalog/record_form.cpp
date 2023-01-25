@@ -1982,7 +1982,7 @@ bool record_form::parse_all_txt(record* record) {
 	Fl_Preferences stations_settings(settings_, "Stations");
 	Fl_Preferences callsigns_settings(stations_settings, "Callsigns");
 	char* callsign;
-	callsigns_settings.get("Current", callsign, "");
+	callsigns_settings.get("Default", callsign, "");
 	string my_call = callsign;
 	delete[] callsign;
 	// Get search items from record

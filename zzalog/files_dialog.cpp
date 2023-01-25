@@ -178,7 +178,7 @@ void files_dialog::load_values() {
 	free(temp_string);
 
 	// Callsign for QSL template
-	callsigns_settings.get("Current", temp_string, "");
+	callsigns_settings.get("Default", temp_string, "");
 	Fl_Preferences call_settings(qsld_settings, temp_string);
 	station_callsign_ = temp_string;
 	free(temp_string);

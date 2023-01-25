@@ -612,7 +612,7 @@ qso_manager::item_data& qso_manager::common_grp::info() {
 
 
 void qso_manager::common_grp::update_settings_name() {
-	my_settings_->set("Current", my_name_.c_str());
+	my_settings_->set("Default", my_name_.c_str());
 }
 
 // Update name and reset choice values
@@ -627,6 +627,7 @@ void qso_manager::common_grp::update_choice(string name) {
 qso_manager::qso_group::qso_group(int X, int Y, int W, int H, const char* l) :
 	Fl_Group(X, Y, W, H, l)
 	, current_qso_(nullptr)
+	, original_qso_(nullptr)
 	, logging_mode_(LM_OFF_AIR)
 	, contest_id_("")
 	, exch_fmt_ix_(0)
@@ -1117,8 +1118,7 @@ void qso_manager::qso_group::enable_widgets() {
 		bn_start_->deactivate();
 		bn_save_->activate();
 		bn_cancel_->activate();
-		bn_edit_->activate();
-		bn_edit_->label("Update");
+		bn_edit_->deactivate();
 		for (int ix = 0; ix < NUMBER_TOTAL; ix++) {
 			if (ch_field_[ix]) ch_field_[ix]->activate();
 			ip_field_[ix]->activate();
@@ -1266,7 +1266,7 @@ void qso_manager::qso_group::copy_cat_to_display() {
 	field_ips_["TX_PWR"]->value(rig_if_->get_tx_power().c_str());
 	field_ips_["MY_RIG"]->value(mgr->rig_grp_->name().c_str());
 	field_ips_["MY_ANTENNA"]->value(mgr->antenna_grp_->name().c_str());
-	field_ips_["ZZA_APP_QTH"]->value(mgr->qth_grp_->name().c_str());
+	field_ips_["APP_ZZA_QTH"]->value(mgr->qth_grp_->name().c_str());
 	field_ips_["STATION_CALLSIGN"]->value(mgr->callsign_grp_->name().c_str());
 }
 
@@ -1877,13 +1877,16 @@ void qso_manager::qso_group::action_deactivate() {
 
 // Action EDIT - Transition from QSO_INACTIVE to QSO_EDIT
 void qso_manager::qso_group::action_edit() {
-	if (logging_state_ != QSO_INACTIVE || current_qso_ != nullptr) {
+	if (logging_state_ != QSO_INACTIVE || original_qso_ != nullptr ) {
 		status_->misc_status(ST_SEVERE, "Attempting to edit a QSO while inputing a QSO");
 		return;
 	}
 	// Copy current selection
 	current_rec_num_ = book_->selection();
-	current_qso_ = new record(*book_->get_record());
+	// Edit currently selected QSO
+	current_qso_ = book_->get_record();
+	// And save a copy of it
+	original_qso_ = new record(*current_qso_);
 	copy_qso_to_display();
 	logging_state_ = QSO_EDIT;
 	enable_widgets();
@@ -1899,10 +1902,9 @@ void qso_manager::qso_group::action_save_edit() {
 		status_->misc_status(ST_SEVERE, "Mismatch between selected QSO in book and QSO manager");
 		return;
 	}
-	// Copy edited record back to book
-	*book_->get_record() = *current_qso_;
-	delete current_qso_;
-	current_qso_ = nullptr;
+	// We no longer need to maintain the copy of the original QSO
+	delete original_qso_;
+	original_qso_ = nullptr;
 	logging_state_ = QSO_INACTIVE;
 	enable_widgets();
 }
@@ -1917,10 +1919,12 @@ void qso_manager::qso_group::action_cancel_edit() {
 		status_->misc_status(ST_SEVERE, "Mismatch between selected QSO in book and QSO manager");
 		return;
 	}
-	// Scrap edit
-	delete current_qso_;
-	current_qso_ = nullptr;
+	// Copy original back to the book
+	*book_->get_record() = *original_qso_;
+	delete original_qso_;
+	original_qso_ = nullptr;
 	logging_state_ = QSO_INACTIVE;
+	copy_qso_to_display();
 	enable_widgets();
 }
 
@@ -3080,66 +3084,70 @@ void qso_manager::cb_close(Fl_Widget* w, void* v) {
 
 // Populate the choice with the available ports
 void qso_manager::populate_port_choice() {
-	Fl_Choice* ch = (Fl_Choice*)port_if_choice_;
-	ch->clear();
-	ch->add("NONE");
-	ch->value(0);
-	int num_ports = 1;
-	string* existing_ports = new string[1];
-	serial serial;
-	// Get the list of all ports or available (not in use) ports
-	while (!serial.available_ports(num_ports, existing_ports, all_ports_, num_ports)) {
-		delete[] existing_ports;
-		existing_ports = new string[num_ports];
-	}
-	// now for the returned ports
-	for (int i = 0; i < num_ports; i++) {
-		// Add the name onto the choice drop-down list
-		char message[100];
-		const char* port = existing_ports[i].c_str();
-		snprintf(message, sizeof(message), "RIG: Found port %s", port);
-		status_->misc_status(ST_LOG, message);
-		ch->add(port);
-		// Set the value to the list of ports
-		if (strcmp(port, rig_grp_->info().rig_data.hamlib_params.port_name.c_str()) == 0) {
-			ch->value(i);
+	if (rig_grp_->info().rig_data.hamlib_params.port_type == RIG_PORT_SERIAL) {
+		Fl_Choice* ch = (Fl_Choice*)port_if_choice_;
+		ch->clear();
+		ch->add("NONE");
+		ch->value(0);
+		int num_ports = 1;
+		string* existing_ports = new string[1];
+		serial serial;
+		// Get the list of all ports or available (not in use) ports
+		while (!serial.available_ports(num_ports, existing_ports, all_ports_, num_ports)) {
+			delete[] existing_ports;
+			existing_ports = new string[num_ports];
+		}
+		// now for the returned ports
+		for (int i = 0; i < num_ports; i++) {
+			// Add the name onto the choice drop-down list
+			char message[100];
+			const char* port = existing_ports[i].c_str();
+			snprintf(message, sizeof(message), "RIG: Found port %s", port);
+			status_->misc_status(ST_LOG, message);
+			ch->add(port);
+			// Set the value to the list of ports
+			if (strcmp(port, rig_grp_->info().rig_data.hamlib_params.port_name.c_str()) == 0) {
+				ch->value(i);
+			}
 		}
 	}
 }
 
 // Populate the baud rate choice menu
 void qso_manager::populate_baud_choice() {
-	Fl_Choice* ch = (Fl_Choice*)baud_rate_choice_;
-	ch->clear();
-	// Override rig's capabilities?
-	bool override_caps = rig_grp_->info().rig_data.hamlib_params.override_caps;
-	Fl_Button* bn = (Fl_Button*)override_check_;
-	bn->value(override_caps);
+	if (rig_grp_->info().rig_data.hamlib_params.port_type == RIG_PORT_SERIAL) {
+		Fl_Choice* ch = (Fl_Choice*)baud_rate_choice_;
+		ch->clear();
+		// Override rig's capabilities?
+		bool override_caps = rig_grp_->info().rig_data.hamlib_params.override_caps;
+		Fl_Button* bn = (Fl_Button*)override_check_;
+		bn->value(override_caps);
 
-	// Get the baud-rates supported by the rig
-	const rig_caps* caps = rig_get_caps(rig_grp_->info().rig_data.hamlib_params.model_id);
-	int min_baud_rate = 300;
-	int max_baud_rate = 460800;
-	if (caps) {
-		min_baud_rate = caps->serial_rate_min;
-		max_baud_rate = caps->serial_rate_max;
-	}
-	// Default baud-rates
-	const int baud_rates[] = { 300, 600, 1200, 2400, 4800, 9600, 19200, 38400, 57600, 115200, 230400, 460800 };
-	int num_rates = sizeof(baud_rates) / sizeof(int);
-	int index = 0;
-	ch->value(0);
-	// If no values add an empty value
-	if (num_rates == 0)	ch->add("");
-	// For all possible rates
-	for (int i = 0; i < num_rates; i++) {
-		int rate = baud_rates[i];
-		if (override_caps || (rate >= min_baud_rate && rate <= max_baud_rate)) {
-			// capabilities overridden or within the range supported by capabilities
-			ch->add(to_string(rate).c_str());
-			if (to_string(rate) == rig_grp_->info().rig_data.hamlib_params.baud_rate) {
-				ch->value(index);
-				index++;
+		// Get the baud-rates supported by the rig
+		const rig_caps* caps = rig_get_caps(rig_grp_->info().rig_data.hamlib_params.model_id);
+		int min_baud_rate = 300;
+		int max_baud_rate = 460800;
+		if (caps) {
+			min_baud_rate = caps->serial_rate_min;
+			max_baud_rate = caps->serial_rate_max;
+		}
+		// Default baud-rates
+		const int baud_rates[] = { 300, 600, 1200, 2400, 4800, 9600, 19200, 38400, 57600, 115200, 230400, 460800 };
+		int num_rates = sizeof(baud_rates) / sizeof(int);
+		int index = 0;
+		ch->value(0);
+		// If no values add an empty value
+		if (num_rates == 0)	ch->add("");
+		// For all possible rates
+		for (int i = 0; i < num_rates; i++) {
+			int rate = baud_rates[i];
+			if (override_caps || (rate >= min_baud_rate && rate <= max_baud_rate)) {
+				// capabilities overridden or within the range supported by capabilities
+				ch->add(to_string(rate).c_str());
+				if (to_string(rate) == rig_grp_->info().rig_data.hamlib_params.baud_rate) {
+					ch->value(index);
+					index++;
+				}
 			}
 		}
 	}
@@ -3160,8 +3168,8 @@ void qso_manager::logging_mode(logging_mode_t mode) {
 bool qso_manager::qso_in_progress() {
 	switch (qso_group_->logging_state_) {
 	case QSO_INACTIVE:
-	case QSO_EDIT:
 		return false;
+	case QSO_EDIT:
 	case QSO_PENDING:
 	case QSO_STARTED:
 		return true;
@@ -3232,10 +3240,6 @@ void qso_manager::update_qso() {
 	if (qso_in_progress() && prev_record == qso_group_->current_qso_) {
 		// Update the view if another view changes the record
 		qso_group_->copy_qso_to_display();
-		antenna_grp_->update_choice(prev_record->item("MY_ANTENNA"));
-		rig_grp_->update_choice(prev_record->item("MY_RIG"));
-		callsign_grp_->update_choice(prev_record->item("STATION_CALLSIGN"));
-		qth_grp_->update_choice(prev_record->item("APP_ZZA_QTH"));
 	}
 }
 

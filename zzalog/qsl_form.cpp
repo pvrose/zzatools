@@ -46,7 +46,7 @@ void qsl_form::load_data() {
 	Fl_Preferences stations_settings(settings_, "Stations");
 	Fl_Preferences calls_settings(stations_settings, "Callsigns");
 	char* temp;
-	calls_settings.get("Current", temp, "");
+	calls_settings.get("Default", temp, "");
 	Fl_Preferences call_settings(qsl_settings, temp);
 	call_settings.get("Width", width_, 0);
 	call_settings.get("Height", height_, 0);

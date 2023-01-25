@@ -110,7 +110,7 @@ void club_handler::generate_form(vector<url_handler::field_pair>& fields, record
 	else {
 		// Get callsign from settings
 		char* callsign;
-		callsigns_settings.get("Current", callsign, "");
+		callsigns_settings.get("Default", callsign, "");
 		fields.push_back({ "callsign", callsign, "", "" });
 		free(callsign);
 		// Set file to empty string to use the supplied data stream

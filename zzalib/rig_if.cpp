@@ -194,7 +194,7 @@ Fl_Preferences* rig_if::get_settings() {
 	Fl_Preferences stn_settings(settings_, "Stations");
 	Fl_Preferences rigs_settings(stn_settings, "Rigs");
 	char* rig_name;
-	rigs_settings.get("Current", rig_name, "");
+	rigs_settings.get("Default", rig_name, "");
 	return new Fl_Preferences(rigs_settings, rig_name);
 }
 
@@ -501,19 +501,26 @@ bool rig_hamlib::open() {
 		}
 		catch (exception*) {}
 	}
-	// Get the rig interface
-	rig_ = rig_init(model_id_);
-	if (rig_ != nullptr) {
-		switch (capabilities->port_type) {
-		case RIG_PORT_SERIAL:
-			// Successful - set up the serial port parameters
-			strcpy(rig_->state.rigport.pathname, port_name_.c_str());
-			rig_->state.rigport.parm.serial.rate = baud_rate_;
-			break;
-		case RIG_PORT_NETWORK:
-		case RIG_PORT_USB:
-			strcpy(rig_->state.rigport.pathname, port_name_.c_str());
-			break;
+	if (model_id_ == -1) {
+		// Rig not found in hamlib
+		error_message_ = "RIG: Hamlib " + rig_name_ + " not found in capabilities";
+		rig_ = nullptr;
+	}
+	else {
+		// Get the rig interface
+		rig_ = rig_init(model_id_);
+		if (rig_ != nullptr) {
+			switch (capabilities->port_type) {
+			case RIG_PORT_SERIAL:
+				// Successful - set up the serial port parameters
+				strcpy(rig_->state.rigport.pathname, port_name_.c_str());
+				rig_->state.rigport.parm.serial.rate = baud_rate_;
+				break;
+			case RIG_PORT_NETWORK:
+			case RIG_PORT_USB:
+				strcpy(rig_->state.rigport.pathname, port_name_.c_str());
+				break;
+			}
 		}
 	}
 

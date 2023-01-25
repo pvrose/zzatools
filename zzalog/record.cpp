@@ -1164,7 +1164,7 @@ bool record::user_details() {
 	char message[256];
 	// Get rig
 	char * rig;
-	rigs_settings.get("Current", rig, "");
+	rigs_settings.get("Default", rig, "");
 	if (item("MY_RIG").length()) {
 		snprintf(message, 256, "LOG: MY_RIG already set to %s, ignoring current value %s", item("MY_RIG").c_str(), rig);
 		status_->misc_status(ST_WARNING, message);
@@ -1176,7 +1176,7 @@ bool record::user_details() {
 	free(rig);
 	// Get aerial
 	char * aerial;
-	aerials_settings.get("Current", aerial, "");
+	aerials_settings.get("Default", aerial, "");
 	if (item("MY_ANTENNA").length()) {
 		snprintf(message, 256, "LOG: MY_ANTENNA already set to %s, ignoring current value %s", item("MY_ANTENNA").c_str(), aerial);
 		status_->misc_status(ST_WARNING, message);
@@ -1188,7 +1188,7 @@ bool record::user_details() {
 	free(aerial);
 	// Get QTH
 	char * qth;
-	qths_settings.get("Current", qth, "");
+	qths_settings.get("Default", qth, "");
 	if (item("APP_ZZA_QTH").length()) {
 		snprintf(message, 256, "LOG: APP_ZZA_QTH already set to %s, ignoring current value %s", item("APP_ZZA_QTH").c_str(), qth);
 		status_->misc_status(ST_WARNING, message);
@@ -1201,7 +1201,7 @@ bool record::user_details() {
 	free(qth);
 	// Get callsign
 	char* callsign;
-	callsigns_settings.get("Current", callsign, "");
+	callsigns_settings.get("Default", callsign, "");
 	if (item("STATION_CALLSIGN").length()) {
 		snprintf(message, 256, "LOG: STATION_CALLSIGN already set to %s, ignoring current value %s", item("STATION_CALLSIGN").c_str(), callsign);
 		status_->misc_status(ST_WARNING, message);

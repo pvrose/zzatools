@@ -85,6 +85,7 @@ void intl_dialog::add_buttons(int width) {
 	// Get size of array
 	int num_cols = width / HBUTTON;
 	int num_rows = ((symbols_.size() - 1) / num_cols) + 1;
+	// Max 4 bytes per UTF character plus terminal \0
 	char utf8[5];
 	int len;
 	// position of first button
@@ -94,11 +95,13 @@ void intl_dialog::add_buttons(int width) {
 	// For each row and column
 	for (int R = 0; R < num_rows; R++) {
 		for (int C = 0; C < num_cols && ucs != symbols_.end(); C++) {
-			// Get the character from the list 
+			// Get the next character from the list 
 			len = fl_utf8encode(*ucs, utf8);
 			utf8[len] = 0;
 			// Button - copy and paste the label on the button to the current editor
 			Fl_Button* bn = new Fl_Button(curr_x, curr_y, HBUTTON, HBUTTON);
+			// Fit the label font to approx 70%
+			bn->labelsize(HBUTTON * 14 / 20);
 			bn->copy_label(utf8);
 			bn->callback(cb_bn_use);
 			bn->tooltip("Copy and paste this character to the currently open editor");

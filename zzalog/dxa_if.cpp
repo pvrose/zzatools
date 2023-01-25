@@ -195,7 +195,7 @@ void dxa_if::update_location_details() {
 	char* temp;
 	// All QTH settings
 	Fl_Preferences qths_settings(stations_settings, "QTHs");
-	qths_settings.get("Current", temp, "");
+	qths_settings.get("Default", temp, "");
 	location_name_ = temp;
 	Fl_Preferences qth_settings(qths_settings, temp);
 	free(temp);
@@ -209,9 +209,6 @@ void dxa_if::update_location_details() {
 	}
 	// Get home location from gridsquare in float and string form
 	home_location();
-
-
-
 }
 
 // Used to create the form

@@ -413,7 +413,7 @@ bool eqsl_handler::user_details(
 	Fl_Preferences stations_settings(settings_, "Stations");
 	Fl_Preferences callsigns_settings(stations_settings, "Callsigns");
 	char* callsign;
-	callsigns_settings.get("Current", callsign, "");
+	callsigns_settings.get("Default", callsign, "");
 
 	char * temp;
 	if (username != nullptr) {

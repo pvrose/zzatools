@@ -306,6 +306,8 @@ namespace zzalog {
 			record* current_qso_;
 			// Selected record
 			record* selected_qso_;
+			// Saved current record
+			record* original_qso_;
 			// Current record number
 			record_num_t current_rec_num_;
 			// Contest ID

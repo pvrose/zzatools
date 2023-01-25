@@ -102,8 +102,10 @@ field_input::field_input(int X, int Y, int W, int H, const char* label) :
 	, field_name_("")
 
 {
-	ip_ = new Fl_Input(X, Y, W, H, nullptr);
+	ip_ = new intl_input(X, Y, W, H, nullptr);
+	ip_->callback(cb_ip);
 	ch_ = new field_choice(X, Y, W, H, nullptr);
+	ch_->callback(cb_ch);
 	end();
 
 	show_widget();

@@ -36,7 +36,7 @@ void qsl_design::load_values() {
 	Fl_Preferences stations_settings(settings_, "Stations");
 	Fl_Preferences callsigns_settings(stations_settings, "Callsigns");
 	char* temp;
-	callsigns_settings.get("Current", temp, "");
+	callsigns_settings.get("Default", temp, "");
 	Fl_Preferences call_settings(qsl_settings, temp);
 	string new_label = string(label()) + ": " + string(temp);
 	copy_label(new_label.c_str());
@@ -285,7 +285,7 @@ void qsl_design::save_values() {
 	Fl_Preferences stations_settings(settings_, "Stations");
 	Fl_Preferences callsigns_settings(stations_settings, "Callsigns");
 	char* temp;
-	callsigns_settings.get("Current", temp, "");
+	callsigns_settings.get("Default", temp, "");
 	Fl_Preferences call_settings(qsl_settings, temp);
 
 	call_settings.set("Unit", (int&)unit_);

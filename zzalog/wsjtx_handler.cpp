@@ -53,7 +53,7 @@ wsjtx_handler::wsjtx_handler()
 	Fl_Preferences station_settings(settings_, "Stations");
 	Fl_Preferences callsigns_settings(station_settings, "Callsigns");
 	char* callsign;
-	callsigns_settings.get("Current", callsign, "");
+	callsigns_settings.get("Default", callsign, "");
 	my_call_ = callsign;
 	my_bracketed_call_ = "<" + my_call_ + ">";
 	free(callsign);

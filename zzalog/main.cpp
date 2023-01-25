@@ -75,7 +75,7 @@ using namespace zzalib;
 string COPYRIGHT = "© Philip Rose GM3ZZA 2018. All rights reserved.\n (Prefix data, DX Atlas & OmniRig interfaces © Alex Shovkoplyas, VE3NEA.)";
 string PROGRAM_ID = "ZZALOG";
 string PROG_ID = "ZLG";
-string VERSION = "3.2.47";
+string VERSION = "3.2.48";
 #ifdef _DEBUG
 string PROGRAM_VERSION = VERSION + " (Debug)";
 #else
@@ -524,7 +524,7 @@ void add_rig_if() {
 		Fl_Preferences stations_settings(settings_, "Stations");
 		Fl_Preferences rigs_settings(stations_settings, "Rigs");
 		char* rig_name;
-		rigs_settings.get("Current", rig_name, "");
+		rigs_settings.get("Default", rig_name, "");
 		Fl_Preferences rig_settings(rigs_settings, rig_name);
 		char temp[256];
 		char handler_name[8];
@@ -620,7 +620,7 @@ void add_rig_if() {
 							status_->misc_status(ST_OK, message);
 							// Get the rig name and update current rig with it
 							strcpy(rig_name, rig_if_->rig_name().c_str());
-							rig_settings.set("Current", rig_name);
+							rig_settings.set("Default", rig_name);
 							// Get the operating condition from the rig
 							if (!band_view_ || band_view_->in_band(rig_if_->tx_frequency())) {
 								status_->rig_status(rig_if_->get_tx() ? RS_TX : RS_RX, rig_if_->rig_info().c_str());

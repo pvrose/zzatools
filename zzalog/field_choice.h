@@ -2,6 +2,7 @@
 #define __FIELD_CHOICE__
 
 #include "spec_data.h"
+#include "intl_widgets.h"
 
 #include <string>
 #include <FL/Fl_Choice.H>
@@ -61,7 +62,7 @@ namespace zzalog {
 		// Populate the choice
 		void populate_choice(string name);
 		// Process the field
-		Fl_Input* ip_;
+		intl_input* ip_;
 		field_choice* ch_;
 		// Name of field
 		string field_name_;

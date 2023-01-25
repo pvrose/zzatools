@@ -542,7 +542,7 @@ void extract_data::extract_qsl(extract_data::extract_mode_t server) {
 	Fl_Preferences station_settings(settings_, "Stations");
 	Fl_Preferences callsigns_settings(station_settings, "Callsigns");
 	char* temp;
-	callsigns_settings.get("Current", temp, nullptr);
+	callsigns_settings.get("Default", temp, nullptr);
 	string station(temp);
 	free(temp);
 	new_criteria = {
