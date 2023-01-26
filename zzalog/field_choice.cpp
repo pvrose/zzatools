@@ -100,6 +100,7 @@ void field_choice::hierarchic(bool h) {
 field_input::field_input(int X, int Y, int W, int H, const char* label) :
 	Fl_Group(X, Y, W, H, label)
 	, field_name_("")
+	, value_("")
 
 {
 	ip_ = new intl_input(X, Y, W, H, nullptr);

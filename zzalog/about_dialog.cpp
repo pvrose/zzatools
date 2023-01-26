@@ -19,6 +19,7 @@ extern spec_data* spec_data_;
 extern string PROGRAM_ID;
 extern string PROGRAM_VERSION;
 extern string COPYRIGHT;
+extern string TIMESTAMP;
 
 
 
@@ -40,7 +41,7 @@ about_dialog::about_dialog() :
 
 	// Draw the two text boxes - first program ID and versions
 	string program_id = PROGRAM_ID + " " + PROGRAM_VERSION + "\n" +
-		"Compiled " __DATE__ " " __TIME__ "\n" +
+		"Compiled " + TIMESTAMP + "\n" +
 		"using ADIF Version " + spec_data_->adif_version() +
 		"\n hamlib version " + rig_version() +
 		"\n FLTK version " + to_string(FL_MAJOR_VERSION) + "." + to_string(FL_MINOR_VERSION) + "." + to_string(FL_PATCH_VERSION);

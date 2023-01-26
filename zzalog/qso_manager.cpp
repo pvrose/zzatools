@@ -3223,11 +3223,6 @@ void qso_manager::update_rig() {
 				prev_freq_ = freq;
 			}
 		}
-
-		antenna_grp_->name() = prev_record->item("MY_ANTENNA");
-		antenna_grp_->populate_choice();
-		rig_grp_->name() = prev_record->item("MY_RIG");
-		rig_grp_->populate_choice();
 		break;
 	}
 	}
