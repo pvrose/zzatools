@@ -905,7 +905,7 @@ string book::filename(bool full /*=true*/) {
 //
 //}
 
-// delete the selected record - force set when explicitly deleting a record from the menu
+// delete the selected record - force set if not created the record through book API
 void book::delete_record(bool force) {
 	// Either entering a new record or user allows to delete a saved record
 	if (force || new_record_) {

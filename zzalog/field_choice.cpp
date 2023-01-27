@@ -125,7 +125,9 @@ const char* field_input::field_name() {
 
 // Overloaded value 
 const char* field_input::value() {
-	return value_;
+	if (ip_->visible()) return ip_->value();
+	else if (ch_->visible()) return ch_->value();
+	else return value_;
 }
 
 // Set the value into both wodgets
@@ -137,7 +139,7 @@ void field_input::value(const char* v) {
 
 // The two callbacks - as Fl_Input
 void field_input::cb_ip(Fl_Widget* w, void* v) {
-	Fl_Input* ip = (Fl_Input*)w;
+	intl_input* ip = (intl_input*)w;
 	field_input* that = ancestor_view<field_input>(w);
 	that->value_ = ip->value();
 	that->do_callback();

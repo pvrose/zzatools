@@ -568,6 +568,8 @@ void extract_data::extract_qsl(extract_data::extract_mode_t server) {
 		char message[128];
 		snprintf(message, 128, "EXTRACT: No records to upload for %s!", reason.c_str());
 		status_->misc_status(ST_WARNING, message);
+		// Clear the criteria - which also clears upload_in_progress
+		clear_criteria();
 		tabbed_forms_->activate_pane(OT_MAIN, true);
 		// Select most recent QSO
 		book_->selection(book_->size() - 1, HT_EXTRACTION);

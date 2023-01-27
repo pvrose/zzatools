@@ -257,6 +257,8 @@ namespace zzalog {
 			static void cb_add_exch(Fl_Widget* w, void* v);
 			// Logging mode
 			static void cb_logging_mode(Fl_Widget* w, void* v);
+			// Notes input field
+			static void cb_ip_notes(Fl_Widget* w, void* v);
 
 			// Add contest exchanges
 			void populate_exch_fmt();

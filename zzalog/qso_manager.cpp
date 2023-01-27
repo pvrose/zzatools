@@ -899,7 +899,8 @@ void qso_manager::qso_group::create_form(int X, int Y) {
 	curr_x = left;
 
 	// Fixed fields
-	// N rows of 3
+	// N rows of NUMBER_PER_ROW
+	const int NUMBER_PER_ROW = 4;
 	const int WCHOICE = WBUTTON * 3 / 2;
 	const int WINPUT = WBUTTON * 5 / 4;
 	for (int ix = 0; ix < NUMBER_TOTAL; ix++) {
@@ -923,7 +924,7 @@ void qso_manager::qso_group::create_form(int X, int Y) {
 			ip_field_[ix]->label(fixed_names_[ix].c_str());
 		}
 		curr_x += WINPUT + GAP;
-		if (ix % 3 == 2) {
+		if (ix % NUMBER_PER_ROW == (NUMBER_PER_ROW - 1)) {
 			max_w = max(max_w, curr_x - x());
 			curr_x = left;
 			curr_y += HBUTTON;
@@ -931,22 +932,18 @@ void qso_manager::qso_group::create_form(int X, int Y) {
 	}
 
 
-	// Adjust logging mode choice
-	ch_logmode_->size(max_w - ch_logmode_->x(), ch_logmode_->h());
-
 	max_w = max(max_w, curr_x);
 
 	// nOtes input
 	curr_x = left + WCHOICE;
 	curr_y += HBUTTON;
 	
-	ip_notes_ = new Fl_Input(curr_x, curr_y, max_w - curr_x, HBUTTON, "NOTES");
+	ip_notes_ = new intl_input(curr_x, curr_y, max_w - curr_x, HBUTTON, "NOTES");
 	ip_notes_->labelfont(FONT);
 	ip_notes_->labelsize(FONT_SIZE);
 	ip_notes_->textfont(FONT);
 	ip_notes_->textsize(FONT_SIZE);
-	//ip_notes_->callback(cb_value<Fl_Input, string>, &notes_);
-	//ip_notes_->value(notes_.c_str());
+	ip_notes_->callback(cb_ip_notes, nullptr);
 	ip_notes_->tooltip("Add any notes for the QSO");
 
 	curr_x = left + WLABEL;
@@ -1102,11 +1099,9 @@ void qso_manager::qso_group::enable_widgets() {
 	case QSO_INACTIVE:
 		bn_activate_->activate();
 		bn_start_->activate();
-		bn_start_->label("Start");
 		bn_save_->activate();
 		bn_cancel_->deactivate();
 		bn_edit_->activate();
-		bn_edit_->label("Edit");
 		for (int ix = 0; ix < NUMBER_TOTAL; ix++) {
 			if (ch_field_[ix]) ch_field_[ix]->deactivate();
 			ip_field_[ix]->deactivate();
@@ -1128,7 +1123,6 @@ void qso_manager::qso_group::enable_widgets() {
 	case QSO_PENDING:
 		bn_activate_->deactivate();
 		bn_start_->activate();
-		bn_start_->label("Start");
 		bn_save_->activate();
 		bn_cancel_->activate();
 		bn_edit_->deactivate();
@@ -1140,28 +1134,13 @@ void qso_manager::qso_group::enable_widgets() {
 		break;
 	case QSO_STARTED:
 		bn_activate_->deactivate();
-		bn_start_->activate();
-		bn_start_->label("Update");
+		bn_start_->deactivate();
 		bn_save_->activate();
 		bn_cancel_->activate();
 		bn_edit_->deactivate();
 		for (int ix = 0; ix < NUMBER_TOTAL; ix++) {
-			// Enable all variable fields
-			if (ix >= NUMBER_FIXED) {
-				ch_field_[ix]->activate();
-				ip_field_[ix]->activate();
-			} else {
-				// Disable certain fields
-				string f = fixed_names_[ix];
-				// Disable a limited number 
-				if (f == "MY_RIG" || f == "MY_ANTENNA" || f == "APP_ZZA_QTH" ||
-					f == "STATION_CALLSIIGN" || f == "QSO_DATE" || f == "TIME_ON") {
-					ip_field_[ix]->deactivate();
-				}
-				else {
-					ip_field_[ix]->activate();
-				}
-			}
+			if (ch_field_[ix]) ch_field_[ix]->activate();
+			ip_field_[ix]->activate();
 		}
 		ip_notes_->activate();
 		break;
@@ -1473,6 +1452,7 @@ void qso_manager::qso_group::cb_edit(Fl_Widget* w, void* v) {
 void qso_manager::qso_group::cb_wkb4(Fl_Widget* w, void* v) {
 	qso_group* that = ancestor_view<qso_group>(w);
 	extract_records_->extract_call(string(that->field_ips_["CALL"]->value()));
+	book_->selection(that->current_rec_num_, HT_SELECTED);
 }
 
 // Callback - Parse callsign
@@ -1529,8 +1509,8 @@ void qso_manager::qso_group::cb_ch_field(Fl_Widget* w, void* v) {
 
 }
 
-// Callback - frequency input
-// v - not used
+// Callback - general input
+// v - index of input widget
 void qso_manager::qso_group::cb_ip_field(Fl_Widget* w, void* v) {
 	qso_group* that = ancestor_view<qso_group>(w);
 	field_input* ip = (field_input*)w;
@@ -1555,6 +1535,16 @@ void qso_manager::qso_group::cb_ip_field(Fl_Widget* w, void* v) {
 			that->current_qso_->item("SUBMODE", string(""));
 		}
 	}
+	tabbed_forms_->update_views(nullptr, HT_MINOR_CHANGE, book_->size() - 1);
+}
+
+// Callback -notes input
+// v - not used
+void qso_manager::qso_group::cb_ip_notes(Fl_Widget* w, void* v) {
+	qso_group* that = ancestor_view<qso_group>(w);
+	string notes;
+	cb_value<intl_input, string>(w, &notes);
+	that->current_qso_->item("NOTES", notes);
 	tabbed_forms_->update_views(nullptr, HT_MINOR_CHANGE, book_->size() - 1);
 }
 
@@ -1857,7 +1847,7 @@ void qso_manager::qso_group::action_cancel() {
 		status_->misc_status(ST_SEVERE, "Mismatch between selected QSO in book and QSO manager");
 		return;
 	}
-	book_->delete_record(false);
+	book_->delete_record(true);
 	delete current_qso_;
 	current_qso_ = nullptr;
 	logging_state_ = QSO_INACTIVE;
@@ -1905,6 +1895,7 @@ void qso_manager::qso_group::action_save_edit() {
 	// We no longer need to maintain the copy of the original QSO
 	delete original_qso_;
 	original_qso_ = nullptr;
+	current_qso_ = nullptr;
 	logging_state_ = QSO_INACTIVE;
 	enable_widgets();
 }
@@ -2124,26 +2115,26 @@ void qso_manager::create_form(int X, int Y) {
 
 	curr_x = X + GAP;
 	curr_y += GAP;
-	create_use_widgets(curr_x, curr_y);
-	max_x = max(max_x, curr_x);
-	max_y = max(max_y, curr_y);
-
-	curr_x = X + GAP;
-	curr_y += GAP;
 	int save_y = curr_y;
-	create_cat_widgets(curr_x, curr_y);
+	create_use_widgets(curr_x, curr_y);
 	max_x = max(max_x, curr_x);
 	max_y = max(max_y, curr_y);
 
 	curr_x += GAP;
 	curr_y = save_y;
-	int save_x = curr_x;
+	create_cat_widgets(curr_x, curr_y);
+	max_x = max(max_x, curr_x);
+	max_y = max(max_y, curr_y);
+
+	curr_x = X + GAP;
+	curr_y = max_y + GAP;
+	save_y = curr_y;
 	create_alarm_widgets(curr_x, curr_y);
 	max_x = max(max_x, curr_x);
 	max_y = max(max_y, curr_y);
 
-	curr_x = save_x;
-	curr_y += GAP;
+	curr_x += GAP;
+	curr_y = save_y;;
 	clock_group_ = new clock_group(curr_x, curr_y, 0, 0, nullptr);
 	clock_group_->create_form(curr_x, curr_y);
 	curr_x += clock_group_->w();
@@ -2243,7 +2234,7 @@ void qso_manager::create_use_widgets(int& curr_x, int& curr_y) {
 	station_grp->resizable(nullptr);
 	station_grp->size(max_w, max_h);
 
-	curr_x = station_grp->x();
+	curr_x = station_grp->x() + station_grp->w();
 	curr_y = station_grp->y() + station_grp->h();
 
 }

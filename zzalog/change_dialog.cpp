@@ -131,7 +131,7 @@ void change_dialog::create_form() {
 	ch12->textsize(FONT_SIZE);
 	int ix = 0;
 	ch12->value(0);
-	old_field_name_ = ch12->text();
+	old_field_name_ = ch12->value();
 	ch12->callback(cb_ch_old_field, (void*)&old_field_name_);
 	ch12->when(FL_WHEN_RELEASE);
 	ch12->tooltip("Select the current name of the field");
@@ -142,7 +142,7 @@ void change_dialog::create_form() {
 	ch22->textsize(FONT_SIZE);
 	ix = 0;
 	ch22->value(0);
-	new_field_name_ = ch22->text();
+	new_field_name_ = ch22->value();
 	ch22->callback(cb_value<field_choice, string>, (void*)&new_field_name_);
 	ch22->when(FL_WHEN_RELEASE);
 	ch22->tooltip("Select the name to change it to");
