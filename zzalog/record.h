@@ -69,7 +69,6 @@ namespace zzalog {
 		TIME_END,
 	};
 
-
 	// The records are kept in a container with size_t as index
 	typedef size_t record_num_t;
 

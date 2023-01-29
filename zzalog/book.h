@@ -185,8 +185,8 @@ namespace zzalog {
 
 		// Protected methods
 		record_num_t correct_record_position(record_num_t current_pos);
-		// And band modes
-		void add_band_mode(record* record);
+		// And all data
+		void add_use_data(record* record);
 		// Enable/Disable auto-save
 		void enable_save(bool enable);
 		// Return its value
@@ -236,6 +236,14 @@ namespace zzalog {
 		set<string> used_modes_;
 		// used submodes
 		set<string> used_submodes_;
+		// Rig options used
+		set<string> used_rigs_;
+		// Antenna options used
+		set<string> used_antennas_;
+		// Callsigns used
+		set<string> used_callsigns_;
+		// QTHs used - with data
+		map<string, record*> used_qths_;
 		// Save enabled
 		bool save_enabled_;
 		// match query question
@@ -252,6 +260,7 @@ namespace zzalog {
 		int number_dupes_kept_;
 		// Book has been modified
 		bool been_modified_;
+
 	};
 
 }

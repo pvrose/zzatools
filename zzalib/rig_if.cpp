@@ -1,7 +1,6 @@
 ﻿#include "rig_if.h"
 #include "formats.h"
 #include "../zzalib/utils.h"
-#include "../zzalib/ic7300.h"
 
 #include <FL/Fl.H>
 #include <FL/Fl_Preferences.H>
@@ -12,7 +11,6 @@ using namespace zzalib;
 
 extern Fl_Preferences* settings_;
 rig_if* rig_if_ = nullptr;
-extern ic7300* ic7300_;
 
 ///////////////////////////////////////////////////////////////////////////////////////
 //    B A S E   C L A S S
@@ -73,7 +71,6 @@ bool rig_if::open() {
 void rig_if::close() {
 	// Timeout must be removed before rig connection is closed otherwise it could fire while the connection is closing
 	Fl::remove_timeout(cb_timer_rig);
-	Fl::remove_timeout(cb_timer_sync);
 }
 
 // Convert s-meter reading into display format
@@ -280,63 +277,6 @@ void rig_if::callback(void(*function)(), string(*spec_func)(double), void(*mess_
 	}
 	else {
 		have_freq_to_band_ = false;
-	}
-}
-
-void rig_if::cb_timer_sync(void* v) {
-	// Get current time
-	time_t now = time(nullptr);
-	// convert to struct in UTC
-	tm* figures = gmtime(&now);
-	char message[200];
-	rig_if_->error(ST_OK, "RIG: Updating clock");
-	// Convert date and time to integers. 20200317, 1514
-	int date = (figures->tm_year + 1900) * 10000 + (figures->tm_mon + 1) * 100 + figures->tm_mday;
-	int time = figures->tm_hour * 100 + figures->tm_min;
-	// Generate set date command x1A x05 x00 x94 date in BCD
-	string data = int_to_bcd(date, 4, false);
-	char command = '\x1a';
-	bool ok;
-	string sub_command = "   ";
-	sub_command[0] = '\x05';
-	sub_command[1] = '\x00';
-	sub_command[2] = '\x94';
-	ic7300_->send_command(command, sub_command, data, ok);
-	if (ok) {
-		// Set time - x1A x05 x00 x95 time in BCD
-		data = int_to_bcd(time, 2, false);
-		sub_command[2] = '\x95';
-		ic7300_->send_command(command, sub_command, data, ok);
-	}
-	if (ok) {
-		// Set UTC off-set - UTC + 0000 - x1A x05 x00 x96 x00 x00 x00 (TZ=UTC)
-		data = int_to_bcd(0, 3, false);
-		sub_command[2] = '\x96';
-		ic7300_->send_command(command, sub_command, data, ok);
-	}
-	if (ok) {
-		snprintf(message, 200, "RIG: Updated rig clock to %04d %08d", time, date);
-		rig_if_->error(ST_OK, message);
-	}
-	else {
-		rig_if_->error(ST_ERROR, "RIG: Failed to update rig clock");
-	}
-
-}
-
-void rig_if::update_clock() {
-	// Only implemented for IC-7300
-	if (rig_name() == "IC-7300" && ic7300_ && handler_t_ == RIG_FLRIG) {
-		char message[200];
-		// Get current time
-		time_t now = time(nullptr);
-		// convert to struct in UTC
-		tm* figures = gmtime(&now);
-		// And repeat until seconds reads 00
-		snprintf(message, 200, "RIG: Waiting %d seconds to update clock", 60 - figures->tm_sec);
-		error(ST_NOTE, message);
-		int seconds = figures->tm_sec ? 60 - figures->tm_sec : 0;
-		Fl::add_timeout((double)seconds, cb_timer_sync, figures);
 	}
 }
 
@@ -1023,30 +963,6 @@ double rig_flrig::pwr_meter() {
 
 // Return Vdd meter reading
 double rig_flrig::vdd_meter() {
-	if (ic7300_) {
-		bool ok;
-		char command = '\x15';
-		string subcommand = "\x15";
-		string data = ic7300_->send_command(command, subcommand, ok);
-		if (ok) {
-			char mess[256];
-			if (data.length() >= 4) {
-				// *(0000=0 V, 0013=10 V, 0241=16 V)
-				unsigned int value = bcd_to_int(data.substr(2, 2), false);
-				if (value < 13) {
-					value = 13;
-				}
-				if (value > 241) value = 241;
-				// interpolate between 10.0 V and 16.0 V
-				double vdd = (double)(value - 13) / (double)(241 - 13) * 6.0 + 10.0;
-				return vdd;
-			}
-			else {
-				snprintf(mess, 256, "RIG: vdd_meter - Insufficient data received from transceiver - %d bytes", data.length());
-				error(ST_WARNING, mess);
-			}
-		}
-	}
 	// Not IC7300 or not OK - return nan.
 	if (!inhibit_repeated_errors) {
 		error(ST_ERROR, error_message("vdd_meter - Cannot read (Not supported rig or see above)").c_str());

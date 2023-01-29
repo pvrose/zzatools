@@ -133,7 +133,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="zzalib\ic7300.cpp" />
     <ClCompile Include="zzalib\page_dialog.cpp" />
     <ClCompile Include="zzalib\rig_if.cpp" />
     <ClCompile Include="zzalib\rpc_data_item.cpp" />
@@ -177,7 +176,6 @@
     <ClCompile Include="zzalog\log_table.cpp" />
     <ClCompile Include="zzalog\lotw_handler.cpp" />
     <ClCompile Include="zzalog\main.cpp" />
-    <ClCompile Include="zzalog\ic7300_table.cpp" />
     <ClCompile Include="zzalog\main_window.cpp" />
     <ClCompile Include="zzalog\menu.cpp" />
     <ClCompile Include="zzalog\pfx_data.cpp" />
@@ -214,7 +212,6 @@
     <ClInclude Include="zzalib\callback.h" />
     <ClInclude Include="zzalib\drawing.h" />
     <ClInclude Include="zzalib\formats.h" />
-    <ClInclude Include="zzalib\ic7300.h" />
     <ClInclude Include="zzalib\page_dialog.h" />
     <ClInclude Include="zzalib\pch.h" />
     <ClInclude Include="zzalib\rig_if.h" />
@@ -260,7 +257,6 @@
     <ClInclude Include="zzalog\intl_widgets.h" />
     <ClInclude Include="zzalog\log_table.h" />
     <ClInclude Include="zzalog\lotw_handler.h" />
-    <ClInclude Include="zzalog\ic7300_table.h" />
     <ClInclude Include="zzalog\main_window.h" />
     <ClInclude Include="zzalog\menu.h" />
     <ClInclude Include="zzalog\pfx_data.h" />

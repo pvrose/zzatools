@@ -150,9 +150,6 @@
     <ClCompile Include="zzalog\qsl_form.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="zzalog\qsl_design.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="zzalog\intl_widgets.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -166,9 +163,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="zzalog\exc_reader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\ic7300_table.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="zzalog\edit_input.cpp">
@@ -193,9 +187,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="zzalog\qsl_html_view.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalib\ic7300.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="zzalib\page_dialog.cpp">
@@ -233,6 +224,9 @@
     </ClCompile>
     <ClCompile Include="zzalib\xml_writer.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zzalog\qsl_design.cpp">
+      <Filter>Header Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -389,9 +383,6 @@
     <ClInclude Include="zzalog\qsl_form.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="zzalog\qsl_design.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="zzalog\intl_widgets.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -405,9 +396,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="zzalog\exc_reader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\ic7300_table.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="zzalog\edit_input.h">
@@ -444,9 +432,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="zzalib\formats.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalib\ic7300.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="zzalib\page_dialog.h">
@@ -486,6 +471,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="zzalib\xml_writer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zzalog\qsl_design.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

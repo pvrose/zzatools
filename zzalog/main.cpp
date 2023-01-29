@@ -18,7 +18,6 @@ main.cpp - application entry point
 #include "toolbar.h"
 #include "spec_data.h"
 #include "../zzalib/rig_if.h"
-#include "../zzalib/ic7300.h"
 #include "status.h"
 #include "tabbed_forms.h"
 #include "import_data.h"
@@ -36,7 +35,6 @@ main.cpp - application entry point
 #include "dxa_if.h"
 #include "qrz_handler.h"
 #include "club_handler.h"
-#include "ic7300_table.h"
 #include "wsjtx_handler.h"
 #include "fllog_emul.h"
 #include "resource.h"
@@ -75,7 +73,7 @@ using namespace zzalib;
 string COPYRIGHT = "© Philip Rose GM3ZZA 2018. All rights reserved.\n (Prefix data, DX Atlas & OmniRig interfaces © Alex Shovkoplyas, VE3NEA.)";
 string PROGRAM_ID = "ZZALOG";
 string PROG_ID = "ZLG";
-string VERSION = "3.2.50";
+string VERSION = "3.3.0";
 string TIMESTAMP = __DATE__ + string(" ") + __TIME__;
 #ifdef _DEBUG
 string PROGRAM_VERSION = VERSION + " (Debug " + TIMESTAMP + ")";
@@ -86,7 +84,6 @@ string VENDOR = "GM3ZZA";
 
 // Global data items instanced in zzalib
 extern rig_if* rig_if_;
-extern ic7300* ic7300_;
 extern url_handler* url_handler_;
 
 // FLTK externals
@@ -635,21 +632,6 @@ void add_rig_if() {
 								qso_manager_->logging_mode(qso_manager::LM_ON_AIR_CAT);
 							}
 							done = true;
-						}
-						// Note this is IC-7300 specific code
-						ic7300_table* mem_table = (ic7300_table*)(tabbed_forms_->get_view(OT_MEMORY));
-						if (rig_if_ && strcmp(rig_name, "IC-7300") == 0) {
-							ic7300_ = new ic7300;
-							ic7300_->callback(cb_error_message);
-							// Only update clock and read memories if new session as we want to resume as quickly as possible (after a crash)
-							// Update clock now uses a timeout callback
-							rig_if_->update_clock();
-							if (!resuming_) {
-								mem_table->type(mem_table->type());
-							}
-						}
-						else {
-							mem_table->type(VT_NONE);
 						}
 					}
 				}

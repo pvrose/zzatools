@@ -1130,7 +1130,7 @@ void record::update_timeoff() {
 		// Convert to date YYYYMMDD and time HHMMSS and update record
 		strftime(temp, sizeof(temp), "%Y%m%d", gmtime(&time_off));
 		item("QSO_DATE_OFF", string(temp));
-		Fl_Preferences log_settings(settings_, "Log");
+		//Fl_Preferences log_settings(settings_, "Log");
 		strftime(temp, sizeof(temp), "%H%M%S", gmtime(&time_off));
 		item("TIME_OFF", string(temp));
 	}

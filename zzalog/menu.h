@@ -123,8 +123,6 @@ namespace zzalog {
 		static void cb_mi_rep_filter(Fl_Widget* w, void* v);
 		// Report->Levelx
 		static void cb_mi_rep_level(Fl_Widget* w, void* v);
-		// IC-7300->Memory/Scope bands/User bands/CW messages
-		static void cb_mi_ic7300(Fl_Widget* w, void* v);
 		// Information->QRZ.com
 		static void cb_mi_info_qrz(Fl_Widget* w, void* v);
 		// Information->Google maps

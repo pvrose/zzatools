@@ -27,7 +27,6 @@
 #include "toolbar.h"
 #include "calendar.h"
 #include "qrz_handler.h"
-#include "ic7300_table.h"
 #include "wsjtx_handler.h"
 #include "band_view.h"
 #include "dxa_if.h"
@@ -230,15 +229,6 @@ namespace zzalog {
 			{ "&Custom", 0, menu::cb_mi_rep_level, (void*)((3 << 8) + RC_CUSTOM), FL_MENU_RADIO },
 			{ "&Nothing", 0, menu::cb_mi_rep_level, (void*)((3 << 8) + RC_EMPTY), FL_MENU_RADIO | FL_MENU_VALUE },
 			{ 0 },
-		{ 0 },
-
-	// Accessing IC-7300 specific features
-	{ "I&C-7300", 0, 0, 0, FL_SUBMENU },
-		{ "&None", 0, menu::cb_mi_ic7300, (void*)VT_NONE, FL_MENU_RADIO },
-		{ "&Memories", 0, menu::cb_mi_ic7300, (void*)VT_MEMORIES, FL_MENU_RADIO },
-		{ "&Scope bands", 0, menu::cb_mi_ic7300, (void*)VT_SCOPE_BANDS, FL_MENU_RADIO },
-		{ "&User bands", 0, menu::cb_mi_ic7300, (void*)VT_USER_BANDS, FL_MENU_RADIO },
-		{ "&CW messages", 0, menu::cb_mi_ic7300, (void*)VT_CW_MESSAGES, FL_MENU_RADIO },
 		{ 0 },
 
 	// Web-based information
@@ -1326,15 +1316,6 @@ void menu::cb_mi_info_qrz(Fl_Widget* w, void* v) {
 	}
 }
 
-// IC-7300 specific actions
-// v is enum view_type: VT_NONE, VT_MEMORIES, VT_SCOPE_BANDS, VT_USER_BANDS, VT_CW_MESSAGES.
-void menu::cb_mi_ic7300(Fl_Widget* w, void* v) {
-	view_type type = (view_type)(long)v;
-	((ic7300_table*)tabbed_forms_->get_view(OT_MEMORY))->type(type);
-	menu* that = ancestor_view<menu>(w);
-	that->update_items();
-}
-
 // Information->Google Maps - open browser with Google maps centered on contact's QTH (where calculable)
 // v is not used
 void menu::cb_mi_info_map(Fl_Widget* w, void* v) {
@@ -1737,7 +1718,6 @@ void menu::update_items() {
 		bool delete_enabled = book_->delete_enabled();
 		bool web_enabled = book_ && book_->get_record() && book_->get_record()->item_exists("WEB");
 		bool listening_wsjtx = wsjtx_handler_ && wsjtx_handler_->has_server();
-		view_type memory = ((ic7300_table*)tabbed_forms_->get_view(OT_MEMORY))->type();
 		// Get all relevant menu item indices
 		int index_save = find_index("&File/&Save");
 		int index_saveas = find_index("&File/Save &As");
@@ -1757,11 +1737,6 @@ void menu::update_items() {
 		int index_extract = find_index("E&xtract");
 		int index_wsjtx = find_index("&Import/&WSJT-X UDP");
 		int index_rep = find_index("Re&port");
-		int index_ic7300_none = find_index("I&C-7300/&None");
-		int index_memories = find_index("I&C-7300/&Memories");
-		int index_scopes = find_index("I&C-7300/&Scope bands");
-		int index_users = find_index("I&C-7300/&User bands");
-		int index_cw_mess = find_index("I&C-7300/&CW messages");
 		int index_info = find_index("&Information");
 		int index_web = find_index("&Information/QSO &Web-site");
 		int index_append_log = find_index("&Help/&Status/&Append File");
@@ -1866,44 +1841,6 @@ void menu::update_items() {
 		}
 		else {
 			mode(index_wsjtx, mode(index_wsjtx) & ~FL_MENU_INACTIVE);
-		}
-		// Memory table
-		switch (memory) {
-		case VT_NONE:
-			mode(index_ic7300_none, mode(index_ic7300_none) | FL_MENU_VALUE);
-			mode(index_memories, mode(index_memories) & ~FL_MENU_VALUE);
-			mode(index_scopes, mode(index_scopes) & ~FL_MENU_VALUE);
-			mode(index_users, mode(index_users) & ~FL_MENU_VALUE);
-			mode(index_cw_mess, mode(index_cw_mess) & ~FL_MENU_VALUE);
-			break;
-		case VT_MEMORIES:
-			mode(index_ic7300_none, mode(index_ic7300_none) & ~FL_MENU_VALUE);
-			mode(index_memories, mode(index_memories) | FL_MENU_VALUE);
-			mode(index_scopes, mode(index_scopes) & ~FL_MENU_VALUE);
-			mode(index_users, mode(index_users) & ~FL_MENU_VALUE);
-			mode(index_cw_mess, mode(index_cw_mess) & ~FL_MENU_VALUE);
-			break;
-		case VT_SCOPE_BANDS:
-			mode(index_ic7300_none, mode(index_ic7300_none) & ~FL_MENU_VALUE);
-			mode(index_memories, mode(index_memories) & ~FL_MENU_VALUE);
-			mode(index_scopes, mode(index_scopes) | FL_MENU_VALUE);
-			mode(index_users, mode(index_users) & ~FL_MENU_VALUE);
-			mode(index_cw_mess, mode(index_cw_mess) & ~FL_MENU_VALUE);
-			break;
-		case VT_USER_BANDS:
-			mode(index_ic7300_none, mode(index_ic7300_none) & ~FL_MENU_VALUE);
-			mode(index_memories, mode(index_memories) & ~FL_MENU_VALUE);
-			mode(index_scopes, mode(index_scopes) & ~FL_MENU_VALUE);
-			mode(index_users, mode(index_users) | FL_MENU_VALUE);
-			mode(index_cw_mess, mode(index_cw_mess) & ~FL_MENU_VALUE);
-			break;
-		case VT_CW_MESSAGES:
-			mode(index_ic7300_none, mode(index_ic7300_none) & ~FL_MENU_VALUE);
-			mode(index_memories, mode(index_memories) & ~FL_MENU_VALUE);
-			mode(index_scopes, mode(index_scopes) & ~FL_MENU_VALUE);
-			mode(index_users, mode(index_users) & ~FL_MENU_VALUE);
-			mode(index_cw_mess, mode(index_cw_mess) | FL_MENU_VALUE);
-			break;
 		}
 	}
 	redraw();

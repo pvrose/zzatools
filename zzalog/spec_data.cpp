@@ -117,6 +117,7 @@ bool spec_data::load_data(bool force) {
 	field_names_.clear();
 	userdef_names_.clear();
 	appdef_names_.clear();
+	user_enums_.clear();
 	datatype_indicators_.clear();
 	this->clear();
 
@@ -591,6 +592,22 @@ void spec_data::delete_appdefs() {
 	appdef_names_.clear();
 }
 
+// Remove changes that added user defined enums
+void spec_data::delete_user_data() {
+	// Delete macros
+	macros_.clear();
+	// Get original and current datasets
+	spec_dataset* original = dataset("Original Fields");
+	if (original != nullptr) {
+		spec_dataset* current = dataset("Fields");
+		for (auto it = original->data.begin(); it != original->data.end(); it++) {
+			current->data[(*it).first] = (*it).second;
+		}
+	}
+	delete original;
+	erase("Original Fields");
+}
+
 // Return true if field is a user defined one.
 bool spec_data::is_userdef(string field_name) {
 	// For all items in the list of user defined names
@@ -678,6 +695,119 @@ string spec_data::enumeration_name(const string& field_name, record* record) {
 		// Field does not exist
 		return "";
 	}
+}
+
+// Add a user defined enumeration to an existing field definition
+// Used for MY_RIG, MY_ANTENNA, STATION_CALLSIGN
+bool spec_data::add_user_enum(string field, set<string> values) {
+	char message[128];
+	char enumeration_name[128];
+	snprintf(enumeration_name, 128, "User Enumeration %s", field.c_str());
+	string enum_name = enumeration_name;
+
+	// Get the field definition
+	spec_dataset* fields = dataset("Fields");
+	auto it_field = fields->data.find(field);
+	if (it_field != fields->data.end()) {
+		// If it's a valid field name
+		if (it_field->second->at("Data Type") == "Enumeration" && it_field->second->find("Enumeration") != it_field->second->end()) {
+			// Field is already defined as am enumeration
+			if (it_field->second->at("Enumeration") != enum_name) {
+				snprintf(message, 128, "ADIF SPEC: Field %s is already enum %s cannot change it to %s",
+					field.c_str(),
+					it_field->second->at("Enumeration").c_str(),
+					enumeration_name);
+				status_->misc_status(ST_ERROR, message);
+				return false;
+			}
+			else {
+				// Valid: Need to replace the existing enum dataset with the new one
+				snprintf(message, 128, "ADIF SPEC: Field %s replacing enum %s",
+					field.c_str(),
+					enumeration_name);
+				status_->misc_status(ST_WARNING, message);
+				delete dataset(enum_name);
+			}
+		}
+		else {
+			snprintf(message, 128, "ADIF SPEC: Field %s replacing type %s with %s",
+				field.c_str(),
+				it_field->second->at("Data Type").c_str(),
+				enumeration_name);
+			// Enumeration won't exist
+			spec_dataset* original_data = dataset("Original Fields");
+			if (original_data == nullptr) {
+				original_data = new spec_dataset;
+				(*this)["Original Fields"] = original_data;
+				original_data->column_names = fields->column_names;
+			}
+			original_data->data[field] = new map<string, string>(*(it_field->second));
+			(*it_field->second)["Enumeration"] = enum_name;
+			(*it_field->second)["Data Type"] = "Enumeration";
+			(*it_field->second)["ADIF Status"] = "Not approved";
+		}
+	}
+	else {
+		// Field does not exist
+		snprintf(message, 128, "ADIF SPEC: Trying to add an enumeration to field %s which doesn't exist", field.c_str());
+		status_->misc_status(ST_ERROR, message);
+		return false;
+	}
+	status_->misc_status(ST_WARNING, message);
+	// Add new dataset for the enumeration values
+	spec_dataset* dataset = new spec_dataset;
+	(*this)[enum_name] = dataset;
+	// Add column names
+	dataset->column_names.resize(3);
+	dataset->column_names[0] = "Comments";
+	dataset->column_names[1] = "ADIF Version";
+	dataset->column_names[2] = "ADIF Status";
+	// now create records for each enumeration value
+	for (auto it = values.begin(); it != values.end(); it++) {
+		auto temp_map = new map<string, string>;
+		(*temp_map)["Comments"] = "";
+		(*temp_map)["ADIF Version"] = "";
+		(*temp_map)["ADIF Status"] = "Not approved";
+		dataset->data[*it] = temp_map;
+	}
+	return true;
+}
+
+bool spec_data::add_user_macros(string field, macro_def macros) {
+	set<string> macro_names;
+	// Copy names from supplied map to a set
+	for (auto it = macros.begin(); it != macros.end(); it++) {
+		macro_names.insert((*it).first);
+	}
+	// Change the field to an enum
+	if (add_user_enum(field, macro_names)) {
+		// Now add the macros
+		macros_[field] = macros;
+		return true;
+	}
+	else {
+		return false;
+	}
+}
+
+record* spec_data::expand_macro(string field, string value) {
+	char message[128];
+	if (macros_.find(field) == macros_.end()) {
+		snprintf(message, 128, "ADIF SPEC: No macros defined for field %s", field.c_str());
+	}
+	else {
+		macro_def& field_macros = macros_.at(field);
+		if (field_macros.find(value) == field_macros.end()) {
+			snprintf(message, 128, "ADIF SPEC: Macro %s not defined for field %s",
+				value.c_str(),
+				field.c_str());
+		}
+		else {
+			return field_macros.at(value);
+		}
+	}
+	status_->misc_status(ST_ERROR, message);
+	return nullptr;
 }
 
 // The DXCC has ADIF defined primary administrative districts
@@ -1469,9 +1599,9 @@ void spec_data::handle_error(error_t error_code, const string&  data, const stri
 		// Only handle the error if we are not reporting it
 		// Get the display version of the data
 		string display_item = record_->item(field, true);
-		// Get the validate settings
-		Fl_Preferences adif_settings(settings_, "ADIF");
-		Fl_Preferences validate_settings(adif_settings, "Validate");
+		//// Get the validate settings
+		//Fl_Preferences adif_settings(settings_, "ADIF");
+		//Fl_Preferences validate_settings(adif_settings, "Validate");
 		status_t status = ST_ERROR;
 		// Implement
 		// Report errors and try to correct, default to ask the user if not able to.
@@ -1914,7 +2044,7 @@ bool spec_data::auto_correction(error_t error_code, const string&  data, const s
 				char temp[10];
 				strftime(temp, sizeof(temp), "%Y%m%d", gmtime(&new_off));
 				record_->item("QSO_DATE_OFF", string(temp));
-				Fl_Preferences log_settings(settings_, "Log");
+				//Fl_Preferences log_settings(settings_, "Log");
 				strftime(temp, sizeof(temp), "%H%M%S", gmtime(&new_off));
 				record_->item("TIME_OFF", string(temp));
 				correction_message_ = field + "=" + display_item + "auto-corrected to " +

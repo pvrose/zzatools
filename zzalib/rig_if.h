@@ -94,8 +94,6 @@ namespace zzalib {
 		string rig_info();
 		// Rig timer callback
 		static void cb_timer_rig(void* v);
-		// Rig update clock timeout
-		static void cb_timer_sync(void* v);
 
 		// return mode/submode
 		void get_string_mode(string& mode, string& submode);
@@ -109,8 +107,6 @@ namespace zzalib {
 		string get_swr_meter();
 		// Return open message
 		string success_message();
-		// Update rig clock
-		void update_clock();
 		//// Check SWR
 		//bool check_swr();
 		//// Check power

@@ -9,6 +9,7 @@
 #include "menu.h"
 #include "tabbed_forms.h"
 #include "spec_data.h"
+#include "spec_tree.h"
 #include "pfx_data.h"
 #include "prefix.h"
 #include "../zzalib/utils.h"
@@ -80,8 +81,11 @@ book::book()
 	used_bands_.clear();
 	used_modes_.clear();
 	used_submodes_.clear();
+	used_rigs_.clear();
+	used_antennas_.clear();
+	used_callsigns_.clear();
+	used_qths_.clear();
 	delete_contents(true);
-
 }
 
 // Destructor - iterative destroys contents
@@ -269,6 +273,12 @@ bool book::load_data(string filename)
 					status_->misc_status(ST_OK, message);
 					delete[] message;
 				}
+				// Add all the user specified enumerations
+				spec_data_->add_user_enum("MY_RIG", used_rigs_);
+				spec_data_->add_user_enum("MY_ANTENNA", used_antennas_);
+				spec_data_->add_user_enum("STATION_CALLSIGN", used_callsigns_);
+				spec_data_->add_user_macros("APP_ZZA_QTH", used_qths_);
+				((spec_tree*)tabbed_forms_->get_view(OT_ADIF))->populate_tree(false);
 			}
 			else { // filename.length() == 0 (File->New)
 				main_window_label("[No file loaded]");
@@ -617,6 +627,7 @@ void book::delete_contents(bool new_book) {
 	used_submodes_.clear();
 	if (new_book && book_type_ == OT_MAIN) {
 		// Delete all non-ADIF defined fields 
+		spec_data_->delete_user_data();
 		spec_data_->delete_appdefs();
 		spec_data_->delete_userdefs();
 		// Restore this app's app-defined fields
@@ -682,7 +693,7 @@ void book::insert_record_at(record_num_t pos_record, record* record) {
 	// get the iterator to the insert position
 	insert(begin() + pos_record, record);
 	// Update summary lookups
-	add_band_mode(record);
+	add_use_data(record);
 }
 
 // Navigate the log - i.e. go to specific position
@@ -1164,28 +1175,78 @@ void book::book_type(object_t value) {
 }
 
 // Add the band and mode to the lists of used bands and modes if not already there
-void book::add_band_mode(record* record) {
-	string band = record->item("BAND");
+void book::add_use_data(record* use_record) {
+	string band = use_record->item("BAND");
 	if (band == "") {
 		// Get the band from the frequency 
 		double freq = 0.0;
-		record->item("FREQ", freq);
+		use_record->item("FREQ", freq);
 		band = spec_data_->band_for_freq(freq);
-		record->item("BAND", band);
+		use_record->item("BAND", band);
 	}
 	if (band.length()) {
 		used_bands_.insert(band);
 	}
-	string mode = record->item("MODE");
+	string mode = use_record->item("MODE");
 	if (mode.length()) {
 		used_modes_.insert(mode);
 	}
-	string submode = record->item("SUBMODE");
+	string submode = use_record->item("SUBMODE");
 	if (!submode.length()) {
-		submode = record->item("MODE");
+		submode = use_record->item("MODE");
 	}
 	if (submode.length()) {
 		used_submodes_.insert(submode);
+	}
+	string rig = use_record->item("MY_RIG");
+	if (rig.length()) {
+		used_rigs_.insert(rig);
+	}
+	string antenna = use_record->item("MY_ANTENNA");
+	if (antenna.length()) {
+		used_antennas_.insert(antenna);
+	}
+	string callsign = use_record->item("STATION_CALLSIGN");
+	if (callsign.length()) {
+		used_callsigns_.insert(callsign);
+	}
+	string qth = use_record->item("APP_ZZA_QTH");
+	if (qth.length()) {
+		record* qth_data;
+		if (used_qths_.find(qth) == used_qths_.end()) {
+			qth_data = new record;
+			used_qths_[qth] = qth_data;
+		}
+		else {
+			qth_data = used_qths_.at(qth);
+		}
+		// Allow compiler to optimise this
+		static const set<string> qth_fields = {
+			"MY_NAME", "MY_STREET", "MY_CITY", "MY_POSTAL_CODE", "MY_GRIDSQUARE", "MY_COUNTRY",
+			"MY_DXCC", "MY_STATE", "MY_CNTY", "MY_CQ_ZONE", "MY_ITU_ZONE", "MY_CONT", "MY_IOTA"
+		};
+		for (auto it = qth_fields.begin(); it != qth_fields.end(); it++) {
+			string value = use_record->item(*it);
+			// If it is in supplied data
+			if (value.length()) {
+				string old_value = qth_data->item(*it);
+				// and if it's already captured - check it is the same
+				if (old_value.length() && old_value != value) {
+					char message[128];
+					snprintf(message, 128, "LOG: %s %s %s - problem importing record", 
+						use_record->item("QSO_DATE").c_str(),
+						use_record->item("TIME_ON").c_str(),
+						use_record->item("CALL").c_str());
+					status_->misc_status(ST_NOTE, message);
+					snprintf(message, 128, "LOG: QTH %s - Field %s existing %s new %s ignored", 
+						qth.c_str(), (*it).c_str(), old_value.c_str(), value.c_str());
+					status_->misc_status(ST_WARNING, message);
+				}
+				else if (old_value.length() == 0) {
+					qth_data->item(*it, value);
+				}
+			}
+		}
 	}
 }
 

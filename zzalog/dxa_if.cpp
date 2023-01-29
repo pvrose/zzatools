@@ -160,7 +160,7 @@ int dxa_if::handle(int event) {
 // Load values from settings_
 void dxa_if::load_values() {
 	// Get Configuration
-	Fl_Preferences dxatlas_settings(settings_, "DXATLAS:");
+	Fl_Preferences dxatlas_settings(settings_, "DX Atlas");
 	dxatlas_settings.get("QSOs Displayed", (int&)qso_display_, AQ_NONE);
 	dxatlas_settings.get("QSL Status", (int&)qsl_status_, AL_ALL);
 	dxatlas_settings.get("Most Recent Count", (int&)most_recent_count_, 1);
@@ -468,7 +468,7 @@ void dxa_if::update_location() {
 // Used to write settings back
 void dxa_if::save_values() {
 	// Get Configuration
-	Fl_Preferences dxatlas_settings(settings_, "DXATLAS:");
+	Fl_Preferences dxatlas_settings(settings_, "DX Atlas");
 	dxatlas_settings.set("QSOs Displayed", qso_display_);
 	dxatlas_settings.set("QSL Status", qsl_status_);
 	dxatlas_settings.set("Most Recent Count", (signed)most_recent_count_);

@@ -79,14 +79,14 @@ bool specx_reader::start_element(string name, map<string, string>* attributes) {
 	bool result = true;
 
 	// Check in order of the most comment element type - call appropriate start method
-	if (element_name == "VALUE") result = start_value(attributes) | result;
-	else if (element_name == "RECORD") result = start_record() | result;
-	else if (element_name == "ENUMERATION") result = start_enumeration(attributes) | result;
-	else if (element_name == "HEADER") result = start_header() | result;
-	else if (element_name == "ADIF") result = start_adif(attributes) | result;
-	else if (element_name == "DATATYPES") result = start_datatypes() | result;
-	else if (element_name == "ENUMERATIONS") result = start_enumerations() | result;
-	else if (element_name == "FIELDS") result = start_fields() | result;
+	if (element_name == "VALUE") result = start_value(attributes) || result;
+	else if (element_name == "RECORD") result = start_record() || result;
+	else if (element_name == "ENUMERATION") result = start_enumeration(attributes) || result;
+	else if (element_name == "HEADER") result = start_header() || result;
+	else if (element_name == "ADIF") result = start_adif(attributes) || result;
+	else if (element_name == "DATATYPES") result = start_datatypes() || result;
+	else if (element_name == "ENUMERATIONS") result = start_enumerations() || result;
+	else if (element_name == "FIELDS") result = start_fields() || result;
 	else {
 		char* message = new char[50 + element_name.length()];
 		sprintf(message, "SPEC_READ: Unexpected XML element %s encountered - ignored", element_name.c_str());
