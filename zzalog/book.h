@@ -198,6 +198,9 @@ namespace zzalog {
 		// enterring record
 		bool enterring_record();
 
+		// Find session start
+		void set_session_start();
+
 		// Protected attributes
 	protected:
 		// current selected item number

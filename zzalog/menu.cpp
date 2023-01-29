@@ -69,7 +69,6 @@ extern wsjtx_handler* wsjtx_handler_;
 extern band_view* band_view_;
 extern dxa_if* dxa_if_;
 extern time_t session_start_;
-extern time_t previous_start_;
 extern qso_manager* qso_manager_;
 settings* config_ = nullptr;
 
@@ -141,8 +140,7 @@ namespace zzalog {
 		{ "Chec&k Duplicates", 0, menu::cb_mi_log_dupes, 0 },
 		{ "Edit &Header", 0, menu::cb_mi_log_edith, 0 },
 		{ "S&ession", 0, 0, 0, FL_SUBMENU },
-			{ "&Continue Session", 0, menu:: cb_mi_log_start, (void*)2L },
-			{ "&Today", 0, menu::cb_mi_log_start, (void*)3L },
+			{ "&Today", 0, menu::cb_mi_log_start, (void*)2L },
 			{ "&Start Session", 0, menu::cb_mi_log_start, (void*)1L },
 			{ "Sto&p Session", 0, menu::cb_mi_log_start, (void*)0L },
 
@@ -966,11 +964,7 @@ void menu::cb_mi_log_start(Fl_Widget* w, void* v) {
 		session_start_ = start->timestamp();
 		break;
 	}
-	case 2:
-		// get selected record timestamp
-		session_start_ = previous_start_;
-		break;
-	case 3: {
+	case 2: {
 		// Get most recent QSO
 		record_num_t pos = book_->size() - 1;
 		record* start = book_->get_record(pos, false);

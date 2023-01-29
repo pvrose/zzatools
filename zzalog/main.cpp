@@ -133,7 +133,6 @@ bool closing_ = false;
 bool initialised_ = false;
 // Time loaded
 time_t session_start_ = (time_t)0;
-time_t previous_start_ = (time_t)0;
 // Close caused by an SEVERE or FATAL error
 bool close_by_error_ = false;
 // Previous frequency
@@ -384,40 +383,6 @@ void add_data() {
 	}
 }
 
-// Get session start from the current time or previous session start if that is within 1 hour
-void set_session_start() {
-	// Check this is to be a new session (> 1hour after previous session ended
-	time_t today = time(nullptr);
-	void* p_last = new time_t;
-	settings_->get("Session End", p_last, &today, sizeof(time_t));
-	time_t last_session_end = *(time_t*)p_last;
-	char action[100];
-	settings_->get("Session Start", p_last, &today, sizeof(time_t));
-	previous_start_ = *(time_t*)p_last;
-	if (difftime(today, last_session_end) > 3600.0) {
-		// It is > 60 minutes since we last saved a record - new session
-		session_start_ = today;
-		strcpy(action, "Starting new session");
-		settings_->set("Session Start", &today, sizeof(time_t));
-		resuming_ = false;
-	}
-	else {
-		// Restore previous session's start time
-		session_start_ = previous_start_;
-		strcpy(action, "Resuming session");
-		resuming_ = true;
-	}
-	// Set session end now and flush to ensure it has been altered
-	settings_->set("Session End", &today, sizeof(time_t));
-	settings_->flush();
-	// Display the start time in the status log
-	char stime[100];
-	tm* start_time = gmtime(&session_start_);
-	strftime(stime, 100, "%Y/%m/%d %H:%M:%S", start_time);
-	char message[256];
-	snprintf(message, 256, "ZZALOG: %s %s", action, stime);
-	status_->misc_status(ST_NOTE, message);
-}
 
 // read in the log data
 void add_book(char* arg) {
@@ -915,8 +880,6 @@ int main(int argc, char** argv)
 	int curr_y = 0;
 	add_widgets(curr_y);
 	print_args(argc, argv);
-	// Set the session start time (one of this or previous start time)
-	set_session_start();
 	// Resize the window
 	resize_window();
 	// now show the window
