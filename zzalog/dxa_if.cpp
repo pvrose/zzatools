@@ -2203,7 +2203,7 @@ HRESULT dxa_if::add_label(lat_long_t location, string text) {
 // Return whether this window is visible AND the DxAtlas map is visible
 unsigned int dxa_if::visible() {
 	unsigned int result = Fl_Widget::visible();
-	if (result != 0) {
+	if (result != 0 && atlas_) {
 		DxAtlas::IDxMapPtr map = atlas_->GetMap();
 		if (map == nullptr) return 0;
 		if (map->GetVisible()) return result;

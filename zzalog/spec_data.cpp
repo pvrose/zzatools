@@ -1614,6 +1614,10 @@ error_t spec_data::validate(const string& field, const string& data, bool inhibi
 						is_enumeration = true;
 						datatype = (*field_entry)["Enumeration"];
 					}
+					else if (datatype == "Dynamic") {
+						is_enumeration = true;
+						datatype = (*field_entry)["Enumeration"];
+					}
 					else {
 						is_enumeration = false;
 					}

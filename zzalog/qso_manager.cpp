@@ -490,6 +490,11 @@ void qso_manager::cat_group::enable_widgets() {
 			break;
 		}
 	}
+	//// Set values in CAT widgets
+	//// Sledge hammer approach
+	//populate_baud_choice();
+	//populate_model_choice();
+	//populate_port_choice();
 }
 
 // Populate manufacturer and model choices - hierarchical menu: first manufacturer, then model
@@ -501,7 +506,6 @@ void qso_manager::cat_group::populate_model_choice() {
 	map<string, rig_model_t> rig_ids;
 	rig_list.clear();
 	rig_ids.clear();
-	char* target_pathname = nullptr;
 	// For each possible rig ids in hamlib
 	rig_model_t max_rig_num = 40 * MAX_MODELS_PER_BACKEND;
 	for (rig_model_t i = 1; i < max_rig_num; i += 1) {
@@ -535,25 +539,23 @@ void qso_manager::cat_group::populate_model_choice() {
 			string model = escape_menu(capabilities->model_name);
 			snprintf(temp, 256, "%s/%s%s", mfg.c_str(), model.c_str(), status);
 			rig_list.insert(temp);
-			rig_ids[temp] = i;
+			rig_ids[temp] = capabilities->rig_model;
+			if (string(capabilities->mfg_name) == cat_data_->hamlib_params.mfr &&
+				string(capabilities->model_name) == cat_data_->hamlib_params.model) {
+				cat_data_->hamlib_params.model_id = capabilities->rig_model;
+			}
 		}
 	}
+	// Add the rigs in alphabetical order to the choice widget, set widget's value to intended
 	for (auto ix = rig_list.begin(); ix != rig_list.end(); ix++) {
 		string name = *ix;
-		ch->add(name.c_str(), 0, nullptr, (void*)rig_ids.at(name));
-	}
-	bool found = false;
-	// Go through all the menu items until we find our remembered pathname, and set the choice value to that item number
-	// We have to do it like this as the choice value when we added it may have changed.
-	for (int i = 0; i < ch->size() && !found && target_pathname; i++) {
-		char item_pathname[128];
-		ch->item_pathname(item_pathname, 127, &ch->menu()[i]);
-		if (strcmp(item_pathname, target_pathname) == 0) {
-			found = true;
-			ch->value(i);
+		rig_model_t id = rig_ids.at(name);
+		int pos = ch->add(name.c_str(), 0, nullptr, (void*)id);
+		if (id == cat_data_->hamlib_params.model_id) {
+			ch->value(pos);
 		}
 	}
-	delete[] target_pathname;
+	bool found = false;
 }
 
 // Populate the choice with the available ports
@@ -1397,9 +1399,9 @@ void qso_manager::qso_group::create_form(int X, int Y) {
 
 	// Fixed fields
 	// N rows of NUMBER_PER_ROW
-	const int NUMBER_PER_ROW = 4;
+	const int NUMBER_PER_ROW = 3;
 	const int WCHOICE = WBUTTON * 3 / 2;
-	const int WINPUT = WBUTTON * 5 / 4;
+	const int WINPUT = WBUTTON * 7 / 4;
 	for (int ix = 0; ix < NUMBER_TOTAL; ix++) {
 		if (ix >= NUMBER_FIXED) {
 			ch_field_[ix] = new field_choice(curr_x, curr_y, WCHOICE, HBUTTON);
@@ -1743,9 +1745,13 @@ void qso_manager::qso_group::copy_cat_to_qso() {
 	string mode;
 	string submode;
 	rig_if_->get_string_mode(mode, submode);
-	if (mode != "DATA L" && mode == "DATA U") {
+	if (mode != "DATA L" && mode != "DATA U") {
 		current_qso_->item("MODE", mode);
 		current_qso_->item("SUBMODE", submode);
+	}
+	else {
+		current_qso_->item("MODE", string(""));
+		current_qso_->item("SUBMODE", string(""));
 	}
 	current_qso_->item("TX_PWR", rig_if_->get_tx_power());
 
@@ -2246,6 +2252,7 @@ void qso_manager::qso_group::action_activate() {
 		copy_qso_to_qso(latest_qso, CF_RIG_ETC);
 		break;
 	case LM_ON_AIR_CAT:
+		copy_qso_to_qso(latest_qso, CF_RIG_ETC);
 		copy_cat_to_qso();
 		copy_clock_to_qso(now);
 		break;
@@ -3604,10 +3611,10 @@ void qso_manager::logging_mode(logging_mode_t mode) {
 // Return true if we have a current QSO
 bool qso_manager::qso_in_progress() {
 	switch (qso_group_->logging_state_) {
+	case QSO_PENDING:
 	case QSO_INACTIVE:
 		return false;
 	case QSO_EDIT:
-	case QSO_PENDING:
 	case QSO_STARTED:
 		return true;
 	}
@@ -3616,7 +3623,7 @@ bool qso_manager::qso_in_progress() {
 
 // Called when rig is read to update values here
 void qso_manager::rig_update(string frequency, string mode, string power) {
-	if (qso_group_->logging_state_ == QSO_PENDING) {
+	if (qso_group_->logging_state_ == QSO_PENDING && qso_group_->logging_mode_ == LM_ON_AIR_CAT) {
 		qso_group_->copy_cat_to_qso();
 	}
 }
@@ -3666,6 +3673,10 @@ void qso_manager::update_qso() {
 	if (qso_in_progress() && prev_record == qso_group_->current_qso_) {
 		// Update the view if another view changes the record
 		qso_group_->copy_qso_to_display(qso_group::CF_ALL);
+	}
+	else if (qso_group_->logging_state_ == QSO_PENDING) {
+		// Switch to selected record if in QSO_PENDING state
+		qso_group_->copy_qso_to_qso(book_->get_record(), qso_group::CF_NOTCLOCK);
 	}
 }
 

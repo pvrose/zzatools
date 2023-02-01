@@ -179,7 +179,8 @@ namespace zzalog {
 				CF_CAT = 2,
 				CF_CLOCK = 4,
 				CF_REST = 8,
-				CF_ALL = CF_RIG_ETC | CF_CAT | CF_REST
+				CF_ALL = CF_RIG_ETC | CF_CAT | CF_CLOCK | CF_REST,
+				CF_NOTCLOCK = CF_RIG_ETC | CF_CAT | CF_REST
 			};
 
 		public:
