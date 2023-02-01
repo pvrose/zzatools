@@ -115,8 +115,6 @@ namespace zzalib {
 		//bool check_voltage();
 		// Maximum power during QSO
 		double max_power();
-		// Settings
-		static Fl_Preferences* get_settings();
 
 		// Callback to set certain functions (timer callback, freq to band conversion, error message
 		void callback(void (*function)(), string(*spec_func)(double), void(*mess_func)(status_t, const char*));

@@ -123,6 +123,9 @@ record_form::record_form(int X, int Y, int W, int H, const char* label, field_or
 	, current_field_("")
 	, modifying_(false)
 	, enable_all_search_(false)
+	, all_fields_bn_(nullptr)
+	, display_all_fields_(nullptr)
+	, text_display_(nullptr)
 
 {
 	// widget positioning
@@ -1877,10 +1880,6 @@ void record_form::set_edit_widgets(string field, string text) {
 		// Populate the enumeartion choice if we are an enumeration
 		set_enum_choice(enumeration_type, text);
 	}
-	else if (field == "MY_RIG" || field == "MY_ANTENNA" || field == "APP_ZZA_QTH" || field == "STATION_CALLSIGN") {
-		// Treat these if they were enumerations
-		set_enum_choice(field, text);
-	}
 	else {
 		// Enable the text value and disable the enum value controls
 		enum_choice_->deactivate();
@@ -1899,29 +1898,29 @@ void record_form::set_enum_choice(string enumeration_type, string text) {
 	// delete existing menu
 	enum_choice_->clear();
 
-	if (enumeration_type == "MY_RIG" || enumeration_type == "MY_ANTENNA" ||
-		enumeration_type == "APP_ZZA_QTH" || enumeration_type == "STATION_CALLSIGN") {
-		// Get the list of allowable values from settings
-		Fl_Preferences station_settings(settings_, "Stations");
-		string setting_path;
-		if (enumeration_type == "MY_RIG") setting_path = "Rigs";
-		else if (enumeration_type == "MY_ANTENNA") setting_path = "Aerials";
-		else if (enumeration_type == "APP_ZZA_QTH") setting_path = "QTHs";
-		else if (enumeration_type == "STATION_CALLSIGN") setting_path = "Callsigns";
-		Fl_Preferences kit_settings(station_settings, setting_path.c_str());
-		int num_items = kit_settings.groups();
-		enum_choice_->add("", 0, (Fl_Callback*)nullptr);
-		for (int i = 0; i < num_items; i++) {
-			if (strlen(kit_settings.group(i)) == 0) {
-				enum_choice_->add("");
-			} else {
-				char value[128];
-				snprintf(value, 128, "%c/%s", kit_settings.group(i)[0], kit_settings.group(i));
-				enum_choice_->add(value);
-			} 
-		}
-	}
-	else {
+	//if (enumeration_type == "MY_RIG" || enumeration_type == "MY_ANTENNA" ||
+	//	enumeration_type == "APP_ZZA_QTH" || enumeration_type == "STATION_CALLSIGN") {
+	//	// Get the list of allowable values from settings
+	//	Fl_Preferences station_settings(settings_, "Stations");
+	//	string setting_path;
+	//	if (enumeration_type == "MY_RIG") setting_path = "Rigs";
+	//	else if (enumeration_type == "MY_ANTENNA") setting_path = "Aerials";
+	//	else if (enumeration_type == "APP_ZZA_QTH") setting_path = "QTHs";
+	//	else if (enumeration_type == "STATION_CALLSIGN") setting_path = "Callsigns";
+	//	Fl_Preferences kit_settings(station_settings, setting_path.c_str());
+	//	int num_items = kit_settings.groups();
+	//	enum_choice_->add("", 0, (Fl_Callback*)nullptr);
+	//	for (int i = 0; i < num_items; i++) {
+	//		if (strlen(kit_settings.group(i)) == 0) {
+	//			enum_choice_->add("");
+	//		} else {
+	//			char value[128];
+	//			snprintf(value, 128, "%c/%s", kit_settings.group(i)[0], kit_settings.group(i));
+	//			enum_choice_->add(value);
+	//		} 
+	//	}
+	//}
+	//else {
 		// Get all the enumeration values and populate drop-down list
 		spec_dataset* dataset = spec_data_->dataset(enumeration_type);
 		auto it = dataset->data.begin();
@@ -1943,7 +1942,7 @@ void record_form::set_enum_choice(string enumeration_type, string text) {
 			set_value = dataset->data.begin()->first;
 		}
 		explain_enum(dataset, set_value);
-	}
+	//}
 	// If the data is not in the drop-down list set it to first entry
 	enum_choice_->value(set_value.c_str());
 

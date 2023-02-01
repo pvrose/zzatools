@@ -504,6 +504,11 @@ record* book::get_record(record_num_t num_item, bool set_selected/* = true*/) {
 	}
 }
 
+// Get the last recod in book
+record* book::get_latest() {
+	return get_record(size() - 1, false);
+}
+
 // Copy the current record
 void book::remember_record() {
 	// Assume we are changing selection so if the record is unmodified save its contents

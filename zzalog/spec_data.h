@@ -102,8 +102,6 @@ namespace zzalog {
 	class spec_data : public map<string, spec_dataset*>
 	{
 	public:
-
-	public:
 		spec_data();
 		~spec_data();
 
@@ -176,6 +174,8 @@ namespace zzalog {
 		record* expand_macro(string field, string value);
 		// Remove user enums and macros - and restore originals
 		void delete_user_data();
+		// Add a new value to user enum
+		bool add_user_value(string field, string value);
 
 	// protected methods
 	protected:

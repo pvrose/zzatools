@@ -482,53 +482,14 @@ void add_rig_if() {
 	if (!closing_) {
 		fl_cursor(FL_CURSOR_WAIT);
 		delete rig_if_;
-		// Get the handler from the settings
-		rig_handler_t handler = RIG_HAMLIB;
-		Fl_Preferences stations_settings(settings_, "Stations");
-		Fl_Preferences rigs_settings(stations_settings, "Rigs");
-		char* rig_name;
-		rigs_settings.get("Default", rig_name, "");
-		Fl_Preferences rig_settings(rigs_settings, rig_name);
-		char temp[256];
-		char handler_name[8];
-		switch (handler) {
-		case RIG_HAMLIB:
-			strcpy(handler_name, "hamlib");
-			break;
-		case RIG_FLRIG:
-			strcpy(handler_name, "FlRig");
-			break;
-		}
-		if (handler != RIG_NONE) {
-			sprintf(temp, "RIG: Connecting %s (%s)", rig_name, handler_name);
-			status_->misc_status(ST_NOTE, temp);
-		}
-		// Create the appropriate interface handler
-		switch (handler) {
-		case RIG_HAMLIB:
-			rig_if_ = new rig_hamlib;
-			break;
-		case RIG_FLRIG:
-			// If the HTTP URL handler hasn't yet been created do so.
-			if (url_handler_ == nullptr) url_handler_ = new url_handler;
-			rig_if_ = new rig_flrig;
-			break;
-		case RIG_NONE:
-			status_->misc_status(ST_NOTE, "RIG: No CAT available, so cannot connect");
-			rig_if_ = nullptr;
-			break;
-		default:
-			rig_if_ = nullptr;
-			break;
-		}
+		status_->misc_status(ST_NOTE, "RIG: Connecting to hamlib...");
+		rig_if_ = new rig_hamlib;
 		if (rig_if_ == nullptr) {
 			// No handler defined - assume manual logging in real-time
-			status_->misc_status(ST_WARNING, "RIG: No handler - assume real-time logging, no rig");
+			status_->misc_status(ST_WARNING, "RIG: Cannot connect to hamlib, assume real-time logging, no rig");
 			if (qso_manager_) qso_manager_->logging_mode(qso_manager::LM_ON_AIR_COPY);
 		}
 		else {
-			// Tell the rig where to find its settings
-			rig_if_->get_settings();
 			// Set callbacks
 			rig_if_->callback(update_rig_status, cb_freq_to_band, cb_error_message);
 			// Try and open the connection to the rig
@@ -581,9 +542,6 @@ void add_rig_if() {
 							char message[256];
 							snprintf(message, 256, "RIG: %s", rig_if_->success_message().c_str());
 							status_->misc_status(ST_OK, message);
-							// Get the rig name and update current rig with it
-							strcpy(rig_name, rig_if_->rig_name().c_str());
-							rig_settings.set("Default", rig_name);
 							// Get the operating condition from the rig
 							if (!band_view_ || band_view_->in_band(rig_if_->tx_frequency())) {
 								status_->rig_status(rig_if_->get_tx() ? RS_TX : RS_RX, rig_if_->rig_info().c_str());

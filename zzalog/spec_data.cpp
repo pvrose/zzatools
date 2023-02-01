@@ -686,6 +686,12 @@ string spec_data::enumeration_name(const string& field_name, record* record) {
 			// No dataset exists
 			return  "";
 		}
+		else if (it_field->second->at("Data Type") == "Dynamic" && it_field->second->find("Enumeration") != it_field->second->end()) {
+			// Return the enumeration name
+			string enumeration_name = it_field->second->at("Enumeration");
+			if (dataset(enumeration_name) != nullptr) return enumeration_name;
+			else return "";
+		}
 		else {
 			// Field is not an enumeration
 			return "";
@@ -702,7 +708,7 @@ string spec_data::enumeration_name(const string& field_name, record* record) {
 bool spec_data::add_user_enum(string field, set<string> values) {
 	char message[128];
 	char enumeration_name[128];
-	snprintf(enumeration_name, 128, "User Enumeration %s", field.c_str());
+	snprintf(enumeration_name, 128, "Dynamic Enumeration %s", field.c_str());
 	string enum_name = enumeration_name;
 
 	// Get the field definition
@@ -712,24 +718,30 @@ bool spec_data::add_user_enum(string field, set<string> values) {
 		// If it's a valid field name
 		if (it_field->second->at("Data Type") == "Enumeration" && it_field->second->find("Enumeration") != it_field->second->end()) {
 			// Field is already defined as am enumeration
-			if (it_field->second->at("Enumeration") != enum_name) {
-				snprintf(message, 128, "ADIF SPEC: Field %s is already enum %s cannot change it to %s",
-					field.c_str(),
-					it_field->second->at("Enumeration").c_str(),
-					enumeration_name);
-				status_->misc_status(ST_ERROR, message);
-				return false;
-			}
-			else {
-				// Valid: Need to replace the existing enum dataset with the new one
-				snprintf(message, 128, "ADIF SPEC: Field %s replacing enum %s",
-					field.c_str(),
-					enumeration_name);
-				status_->misc_status(ST_WARNING, message);
-				delete dataset(enum_name);
-			}
+			snprintf(message, 128, "ADIF SPEC: Field %s is already enum %s cannot change it to %s",
+				field.c_str(),
+				it_field->second->at("Enumeration").c_str(),
+				enumeration_name);
+			status_->misc_status(ST_ERROR, message);
+			return false;
 		}
-		else {
+		else if (it_field->second->at("Data Type") == "Dynamic" && it_field->second->at("Enumeration") != enum_name) {
+			// Field is defined as a dynamic enumeration with a different name
+			snprintf(message, 128, "ADIF SPEC: Field %s is already enum %s cannot change it to %s",
+				field.c_str(),
+				it_field->second->at("Enumeration").c_str(),
+				enumeration_name);
+			status_->misc_status(ST_ERROR, message);
+			return false;
+		}
+		else if (it_field->second->at("Data Type") == "Dynamic" && it_field->second->at("Enumeration") == enum_name) {
+			snprintf(message, 128, "ADIF SPEC: Field %s is already enum %s - modifying it",
+				field.c_str(),
+				enumeration_name);
+			status_->misc_status(ST_WARNING, message);
+			delete dataset(enum_name);
+
+		} else {
 			snprintf(message, 128, "ADIF SPEC: Field %s replacing type %s with %s",
 				field.c_str(),
 				it_field->second->at("Data Type").c_str(),
@@ -743,7 +755,7 @@ bool spec_data::add_user_enum(string field, set<string> values) {
 			}
 			original_data->data[field] = new map<string, string>(*(it_field->second));
 			(*it_field->second)["Enumeration"] = enum_name;
-			(*it_field->second)["Data Type"] = "Enumeration";
+			(*it_field->second)["Data Type"] = "Dynamic";
 			(*it_field->second)["ADIF Status"] = "Not approved";
 		}
 	}
@@ -754,6 +766,16 @@ bool spec_data::add_user_enum(string field, set<string> values) {
 		return false;
 	}
 	status_->misc_status(ST_WARNING, message);
+	// Check that "Dynamic" is a member of Data Types
+	spec_dataset* types_dataset = dataset("Data Types");
+	if (types_dataset->data.find("Dynamic") == types_dataset->data.end()) {
+		map<string, string>* dynamic_data = new map<string, string>;
+		(*dynamic_data)["Comments"] = "Application defined dynamic enumeration";
+		(*dynamic_data)["Data Type Indicator"] = "E";
+		(*dynamic_data)["Data Type Name"] = "Dynamic";
+		(*dynamic_data)["Description"] = "A list of acceptable values for a field that can be added to dynamically";
+		types_dataset->data["Dynamic"] = dynamic_data;
+	}
 	// Add new dataset for the enumeration values
 	spec_dataset* dataset = new spec_dataset;
 	(*this)[enum_name] = dataset;
@@ -773,6 +795,33 @@ bool spec_data::add_user_enum(string field, set<string> values) {
 	return true;
 }
 
+// Add a new value to an existing user enumeration
+bool spec_data::add_user_value(string field, string value) {
+	char enumeration_name[128];
+	char message[128];
+	snprintf(enumeration_name, 128, "User Enumeration %s", field.c_str());
+	string enum_name = enumeration_name;
+	spec_dataset* enum_values = dataset(enum_name);
+	if (enum_values == nullptr) {
+		snprintf(message, 128, "ADIF SPEC: User enumeration for %s does not exist", field.c_str());
+		status_->misc_status(ST_ERROR, message);
+		return false;
+	}
+	if (enum_values->data.find(value) != enum_values->data.end()) {
+		snprintf(message, 128, "ADIF SPEC: %s already contains value %s", field.c_str(), value.c_str());
+		status_->misc_status(ST_ERROR, message);
+		return false;
+	}
+	auto temp_map = new map<string, string>;
+	(*temp_map)["Comments"] = "";
+	(*temp_map)["ADIF Version"] = "";
+	(*temp_map)["ADIF Status"] = "Not approved";
+	enum_values->data[field] = temp_map;
+	return true;
+}
+
+// Add a user enumeration that points to a macro definition (i.e. additional
+// fields inferred by that value)
 bool spec_data::add_user_macros(string field, macro_def macros) {
 	set<string> macro_names;
 	// Copy names from supplied map to a set

@@ -291,21 +291,21 @@ void change_dialog::populate_enum(string name) {
 	Fl_Choice* ch = (Fl_Choice*)w_enum_;
 	ch->clear();
 	ch->add("", 0, nullptr);
-	if (name == "MY_RIG" || name == "MY_ANTENNA" || name == "APP_ZZA_QTH" || name == "STATION_CALLSIGN") {
-		// Add the list of possible values from the appropriate settings
-		Fl_Preferences station_settings(settings_, "Stations");
-		string setting_path;
-		if (name == "MY_RIG") setting_path = "Rigs";
-		else if (name == "MY_ANTENNA") setting_path = "Aerials";
-		else if (name == "APP_ZZA_QTH") setting_path = "QTHs";
-		else if (name == "STATION_CALLSIGN") setting_path = "Callsigns";
-		Fl_Preferences kit_settings(station_settings, setting_path.c_str());
-		int num_items = kit_settings.groups();
-		for (int i = 0; i < num_items; i++) {
-			ch->add(kit_settings.group(i));
-		}
-	}
-	else {
+	//if (name == "MY_RIG" || name == "MY_ANTENNA" || name == "APP_ZZA_QTH" || name == "STATION_CALLSIGN") {
+	//	// Add the list of possible values from the appropriate settings
+	//	Fl_Preferences station_settings(settings_, "Stations");
+	//	string setting_path;
+	//	if (name == "MY_RIG") setting_path = "Rigs";
+	//	else if (name == "MY_ANTENNA") setting_path = "Aerials";
+	//	else if (name == "APP_ZZA_QTH") setting_path = "QTHs";
+	//	else if (name == "STATION_CALLSIGN") setting_path = "Callsigns";
+	//	Fl_Preferences kit_settings(station_settings, setting_path.c_str());
+	//	int num_items = kit_settings.groups();
+	//	for (int i = 0; i < num_items; i++) {
+	//		ch->add(kit_settings.group(i));
+	//	}
+	//}
+	//else {
 		// Add the list of possible values from the data for the enumeration
 		spec_dataset* dataset = spec_data_->dataset(name);
 		auto it = dataset->data.begin();
@@ -326,6 +326,6 @@ void change_dialog::populate_enum(string name) {
 			// 
 			it++;
 		}
-	}
+	//}
 	ch->value(0);
 }

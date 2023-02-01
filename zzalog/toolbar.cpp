@@ -459,7 +459,7 @@ void toolbar::cb_bn_import(Fl_Widget* w, void* v) {
 // Connect or disconnect rig
 // v is not used
 void toolbar::cb_bn_rig(Fl_Widget* w, void* v) {
-	qso_manager::cb_bn_connect(qso_manager_, nullptr);
+	qso_manager::cat_group::cb_bn_connect(qso_manager_, nullptr);
 }
 
 // Return the minimum width required
@@ -512,7 +512,7 @@ void toolbar::update_items() {
 				w->deactivate();
 			}
 		}
-		else if (w->callback() == &qso_manager::cb_bn_connect) {
+		else if (w->callback() == &qso_manager::cat_group::cb_bn_connect) {
 			if (w->user_data() && qso_manager_ && qso_manager_->logging_mode() == qso_manager::LM_ON_AIR_CAT) {
 				w->deactivate();
 			}

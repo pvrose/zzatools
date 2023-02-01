@@ -105,7 +105,7 @@ void record::item(string field, string value, bool formatted/* = false*/, bool d
 	char message[256];
 	snprintf(message, 256, "You are deleting %s, are you sure", field.c_str());
 	if ((field == "CALL" || field == "QSO_DATE" || field == "QSO_DATE_OFF" || field == "TIME_ON" ||
-		field == "TIME_OFF" || field == "FREQ" || field == "MODE" || field == "SUBMODE") &&
+		field == "TIME_OFF" || field == "FREQ" || field == "MODE") &&
 		item(field).length() && !value.length() &&
 		fl_choice(message, "Yes", "No", nullptr) == 1) {
 		snprintf(message, 256, "Unexpected deletion of the field, %s", field.c_str());
@@ -370,7 +370,7 @@ string record::item(string field, bool formatted/* = false*/, bool indirect/* = 
 				}
 				free(temp);
 			}
-			else if (field == "MY_GRIDSQAURE_EXT") {
+			else if (field == "MY_GRIDSQUARE_EXT") {
 				// Get operator's gridsquare extenion
 				qth_settings.get("Locator", temp, "RR73TU");
 				if (strlen(temp) > 8) {
@@ -1154,64 +1154,64 @@ string record::item_merge(string data, bool indirect /*=false*/) {
 
 // Set MY_RIG, MY_ANTENNA, APP_ZZA_QTH and STATION_CALLSIGN from the current settings
 bool record::user_details() {
-	// Add rig & QTH details - note this is current location only
-	Fl_Preferences stations_settings(settings_, "Stations");
-	Fl_Preferences rigs_settings(stations_settings, "Rigs");
-	Fl_Preferences aerials_settings(stations_settings, "Aerials");
-	Fl_Preferences callsigns_settings(stations_settings, "Callsigns");
-	Fl_Preferences qths_settings(stations_settings, "QTHs");
-	bool modified = false;
-	char message[256];
-	// Get rig
-	char * rig;
-	rigs_settings.get("Default", rig, "");
-	if (item("MY_RIG").length()) {
-		snprintf(message, 256, "LOG: MY_RIG already set to %s, ignoring current value %s", item("MY_RIG").c_str(), rig);
-		status_->misc_status(ST_WARNING, message);
-	}
-	else {
-		item("MY_RIG", string(rig));
-		modified = true;
-	}
-	free(rig);
-	// Get aerial
-	char * aerial;
-	aerials_settings.get("Default", aerial, "");
-	if (item("MY_ANTENNA").length()) {
-		snprintf(message, 256, "LOG: MY_ANTENNA already set to %s, ignoring current value %s", item("MY_ANTENNA").c_str(), aerial);
-		status_->misc_status(ST_WARNING, message);
-	}
-	else {
-		item("MY_ANTENNA", string(aerial));
-		modified = true;
-	}
-	free(aerial);
-	// Get QTH
-	char * qth;
-	qths_settings.get("Default", qth, "");
-	if (item("APP_ZZA_QTH").length()) {
-		snprintf(message, 256, "LOG: APP_ZZA_QTH already set to %s, ignoring current value %s", item("APP_ZZA_QTH").c_str(), qth);
-		status_->misc_status(ST_WARNING, message);
-	}
-	else {
-		item("APP_ZZA_QTH", string(qth));
-		modified = true;
-	}
-	Fl_Preferences current_settings(qths_settings, qth);
-	free(qth);
-	// Get callsign
-	char* callsign;
-	callsigns_settings.get("Default", callsign, "");
-	if (item("STATION_CALLSIGN").length()) {
-		snprintf(message, 256, "LOG: STATION_CALLSIGN already set to %s, ignoring current value %s", item("STATION_CALLSIGN").c_str(), callsign);
-		status_->misc_status(ST_WARNING, message);
-	}
-	else {
-		item("STATION_CALLSIGN", string(callsign));
-		modified = true;
-	}
+	//// Add rig & QTH details - note this is current location only
+	//Fl_Preferences stations_settings(settings_, "Stations");
+	//Fl_Preferences rigs_settings(stations_settings, "Rigs");
+	//Fl_Preferences aerials_settings(stations_settings, "Aerials");
+	//Fl_Preferences callsigns_settings(stations_settings, "Callsigns");
+	//Fl_Preferences qths_settings(stations_settings, "QTHs");
+	//bool modified = false;
+	//char message[256];
+	//// Get rig
+	//char * rig;
+	//rigs_settings.get("Default", rig, "");
+	//if (item("MY_RIG").length()) {
+	//	snprintf(message, 256, "LOG: MY_RIG already set to %s, ignoring current value %s", item("MY_RIG").c_str(), rig);
+	//	status_->misc_status(ST_WARNING, message);
+	//}
+	//else {
+	//	item("MY_RIG", string(rig));
+	//	modified = true;
+	//}
+	//free(rig);
+	//// Get aerial
+	//char * aerial;
+	//aerials_settings.get("Default", aerial, "");
+	//if (item("MY_ANTENNA").length()) {
+	//	snprintf(message, 256, "LOG: MY_ANTENNA already set to %s, ignoring current value %s", item("MY_ANTENNA").c_str(), aerial);
+	//	status_->misc_status(ST_WARNING, message);
+	//}
+	//else {
+	//	item("MY_ANTENNA", string(aerial));
+	//	modified = true;
+	//}
+	//free(aerial);
+	//// Get QTH
+	//char * qth;
+	//qths_settings.get("Default", qth, "");
+	//if (item("APP_ZZA_QTH").length()) {
+	//	snprintf(message, 256, "LOG: APP_ZZA_QTH already set to %s, ignoring current value %s", item("APP_ZZA_QTH").c_str(), qth);
+	//	status_->misc_status(ST_WARNING, message);
+	//}
+	//else {
+	//	item("APP_ZZA_QTH", string(qth));
+	//	modified = true;
+	//}
+	//Fl_Preferences current_settings(qths_settings, qth);
+	//free(qth);
+	//// Get callsign
+	//char* callsign;
+	//callsigns_settings.get("Default", callsign, "");
+	//if (item("STATION_CALLSIGN").length()) {
+	//	snprintf(message, 256, "LOG: STATION_CALLSIGN already set to %s, ignoring current value %s", item("STATION_CALLSIGN").c_str(), callsign);
+	//	status_->misc_status(ST_WARNING, message);
+	//}
+	//else {
+	//	item("STATION_CALLSIGN", string(callsign));
+	//	modified = true;
+	//}
 
-	return modified;
+	return false;
 }
 
 // Convert frequency from ADIF (MHz) to display format
@@ -1377,6 +1377,8 @@ string record::unformat_date(display_date_t format, string value) {
 		break;
 	default:
 		value = "Invalid";
+		ok = false;
+		date = tm();
 		break;
 	}
 	char temp[9];

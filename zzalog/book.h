@@ -82,6 +82,8 @@ namespace zzalog {
 		record* get_record();
 		// Set the numbered record and optionally select it
 		record* get_record(record_num_t item_num, bool set_selected);
+		// Get the most recent record
+		record* get_latest();
 		//// Create a new record
 		//record* new_record(logging_mode_t mode);
 		//// Save the current record
@@ -207,6 +209,8 @@ namespace zzalog {
 		record_num_t current_item_;
 		// Test duplicate item
 		record_num_t duplicate_item_;
+		// Newest record number
+		record_num_t newest_item_;
 		// Book type
 		object_t book_type_;
 		// modified flag
