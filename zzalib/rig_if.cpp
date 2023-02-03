@@ -128,7 +128,7 @@ string rig_if::rig_info() {
 		}
 	}
 	if (is_good()) rig_info += " " + get_smeter();
-	if (is_good()) rig_info += " " + get_swr_meter();
+	//if (is_good()) rig_info += " " + get_swr_meter();
 	return rig_info;
 }
 
