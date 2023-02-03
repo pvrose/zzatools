@@ -1194,27 +1194,29 @@ void qso_manager::qso_group::load_values() {
 	exch_fmt_id_ = ef_ids_[exch_fmt_ix_];
 
 	// Read contest details from most recent QSO
-	record* prev_record = book_->get_record(book_->size() - 1, false);
-	string prev_contest = prev_record->item("CONTEST_ID");
-	char message[100];
-	if (field_mode_ != NO_CONTEST) {
-		if (prev_contest != contest_id_) {
-			snprintf(message, 100, "DASH: Contest ID in log (%s) differs from settings (%s)", prev_contest.c_str(), contest_id_.c_str());
-			status_->misc_status(ST_WARNING, message);
-		}
-		else {
-			// Get serial number from log
-			string serno = prev_record->item("STX");
-			if (serno.length() > 0) {
-				int sernum = stoi(serno);
-				if (sernum > serial_num_) {
-					snprintf(message, 100, "DASH: Contest serial in log (%d) greater than settings (%d) - using log", sernum, serial_num_);
-					status_->misc_status(ST_WARNING, message);
-					serial_num_ = sernum;
-				}
-				else {
-					snprintf(message, 100, "DASH: Contest serial in log (%d) less than settings (%d) - using settings", sernum, serial_num_);
-					status_->misc_status(ST_NOTE, message);
+	if (book_->size()) {
+		record* prev_record = book_->get_record(book_->size() - 1, false);
+		string prev_contest = prev_record->item("CONTEST_ID");
+		char message[100];
+		if (field_mode_ != NO_CONTEST) {
+			if (prev_contest != contest_id_) {
+				snprintf(message, 100, "DASH: Contest ID in log (%s) differs from settings (%s)", prev_contest.c_str(), contest_id_.c_str());
+				status_->misc_status(ST_WARNING, message);
+			}
+			else {
+				// Get serial number from log
+				string serno = prev_record->item("STX");
+				if (serno.length() > 0) {
+					int sernum = stoi(serno);
+					if (sernum > serial_num_) {
+						snprintf(message, 100, "DASH: Contest serial in log (%d) greater than settings (%d) - using log", sernum, serial_num_);
+						status_->misc_status(ST_WARNING, message);
+						serial_num_ = sernum;
+					}
+					else {
+						snprintf(message, 100, "DASH: Contest serial in log (%d) less than settings (%d) - using settings", sernum, serial_num_);
+						status_->misc_status(ST_NOTE, message);
+					}
 				}
 			}
 		}
@@ -3933,3 +3935,42 @@ record* qso_manager::dummy_qso() {
 //	// Not handled the event - pass up the inheritance
 //	return intl_editor::handle(event);
 //}
+
+// Copy the sleected QSOs MY_RIG etc to the supplied qso record
+void qso_manager::update_import_qso(record* import_qso) {
+	record* use_qso;
+	string mode = import_qso->item("MODE");
+	string submode = import_qso->item("SUBMODE");
+	// If we have activated the QSO manager, then use active QSO as template
+	if (qso_group_->current_qso_) use_qso = qso_group_->current_qso_;
+	else {
+		// Otherwise look for the most recent QSO using the same mode
+		record_num_t record_num = book_->size() - 1;
+		use_qso = book_->get_record(record_num, false);
+		bool found = false;
+		while (use_qso && !found && record_num > 0) {
+			if (use_qso->item("MODE") == mode && use_qso->item("SUBMODE") == submode) {
+				found = true;
+			}
+			record_num--;
+		}
+		if (!found) {
+			// Fallback on selected QSO
+			use_qso = book_->get_record();
+		}
+	}
+	// If we have a QSO to copy from and one to copy to, copy these fields.
+	if (use_qso && import_qso) {
+		char message[128];
+		snprintf(message, 128, "IMPORT: Copying station data from %s %s %s %s",
+			use_qso->item("QSO_DATE").c_str(),
+			use_qso->item("TIME_ON").c_str(),
+			use_qso->item("CALL").c_str(),
+			use_qso->item("MODE").c_str());
+		status_->misc_status(ST_LOG, message);
+		import_qso->item("MY_RIG", use_qso->item("MY_RIG"));
+		import_qso->item("MY_ANTENNA", use_qso->item("MY_ANTENNA"));
+		import_qso->item("STATION_CALLSIGN", use_qso->item("STATION_CALLSIGN"));
+		import_qso->item("APP_ZZA_QTH", use_qso->item("APP_ZZA_QTH"));
+	}
+}

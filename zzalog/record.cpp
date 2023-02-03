@@ -15,6 +15,7 @@ record.cpp - Individual record data item: implementation file
 #include "view.h"
 #include "../zzalib/formats.h"
 #include "book.h"
+#include "qso_manager.h"
 
 #include <ctime>
 #include <chrono>
@@ -34,6 +35,7 @@ extern spec_data* spec_data_;
 extern Fl_Preferences* settings_;
 extern rig_if* rig_if_;
 extern status* status_;
+extern qso_manager* qso_manager_;
 
 // initialise the static variables
 bool record::expecting_header_ = true;
@@ -1210,8 +1212,8 @@ bool record::user_details() {
 	//	item("STATION_CALLSIGN", string(callsign));
 	//	modified = true;
 	//}
-
-	return false;
+	qso_manager_->update_import_qso(this);
+	return true;
 }
 
 // Convert frequency from ADIF (MHz) to display format

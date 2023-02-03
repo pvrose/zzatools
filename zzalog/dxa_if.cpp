@@ -2130,17 +2130,19 @@ void dxa_if::set_dx_loc(string location, string callsign) {
 
 // REmove the Dx Location
 void dxa_if::clear_dx_loc() {
-	DxAtlas::IDxMapPtr map = atlas_->GetMap();
-	map->PutDxVisible(false);
-	// Put in blank label at centre
-	add_label({ 0.0, 0.0 }, "");
-	// Restore map limits without DX location
-	northernmost_ = northernsave_;
-	southernmost_ = southernsave_;
-	westernmost_ = westernsave_;
-	easternmost_ = easternsave_;
-	furthest_ = furthestsave_;
-	centre_map();
+	if (atlas_) {
+		DxAtlas::IDxMapPtr map = atlas_->GetMap();
+		map->PutDxVisible(false);
+		// Put in blank label at centre
+		add_label({ 0.0, 0.0 }, "");
+		// Restore map limits without DX location
+		northernmost_ = northernsave_;
+		southernmost_ = southernsave_;
+		westernmost_ = westernsave_;
+		easternmost_ = easternsave_;
+		furthest_ = furthestsave_;
+		centre_map();
+	}
 }
 
 HRESULT dxa_if::add_label(lat_long_t location, string text) {

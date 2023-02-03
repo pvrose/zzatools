@@ -489,6 +489,8 @@ namespace zzalog {
 		virtual void enable_widgets();
 		// save values
 		virtual void save_values();
+		// Update record with MY_RIG etc. For use when importing 
+		void update_import_qso(record* import);
 
 		// Callback - close button
 		static void cb_close(Fl_Widget* w, void* v);
