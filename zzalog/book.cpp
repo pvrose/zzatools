@@ -278,7 +278,7 @@ bool book::load_data(string filename)
 				spec_data_->add_user_enum("MY_RIG", used_rigs_);
 				spec_data_->add_user_enum("MY_ANTENNA", used_antennas_);
 				spec_data_->add_user_enum("STATION_CALLSIGN", used_callsigns_);
-				spec_data_->add_user_macros("APP_ZZA_QTH", used_qths_);
+				spec_data_->add_user_macro("APP_ZZA_QTH", used_qths_);
 				set_session_start();
 				((spec_tree*)tabbed_forms_->get_view(OT_ADIF))->populate_tree(false);
 			}
@@ -1217,11 +1217,13 @@ void book::add_use_data(record* use_record) {
 	if (callsign.length()) {
 		used_callsigns_.insert(callsign);
 	}
+	// "APP_ZZA_QTH" inplies a macro substitition. Description gine in APP_ZZA_QTH_DESCR
 	string qth = use_record->item("APP_ZZA_QTH");
 	if (qth.length()) {
-		record* qth_data;
+		macro_defn* qth_data;
 		if (used_qths_.find(qth) == used_qths_.end()) {
-			qth_data = new record;
+			qth_data = new macro_defn;
+			qth_data->fields = new record;
 			used_qths_[qth] = qth_data;
 		}
 		else {
@@ -1230,13 +1232,14 @@ void book::add_use_data(record* use_record) {
 		// Allow compiler to optimise this
 		static const set<string> qth_fields = {
 			"MY_NAME", "MY_STREET", "MY_CITY", "MY_POSTAL_CODE", "MY_GRIDSQUARE", "MY_COUNTRY",
-			"MY_DXCC", "MY_STATE", "MY_CNTY", "MY_CQ_ZONE", "MY_ITU_ZONE", "MY_CONT", "MY_IOTA"
+			"MY_DXCC", "MY_STATE", "MY_CNTY", "MY_CQ_ZONE", "MY_ITU_ZONE", "MY_CONT", "MY_IOTA",
+			"APP_ZZA_QTH_DESCR"
 		};
 		for (auto it = qth_fields.begin(); it != qth_fields.end(); it++) {
 			string value = use_record->item(*it);
 			// If it is in supplied data
 			if (value.length()) {
-				string old_value = qth_data->item(*it);
+				string old_value = qth_data->fields->item(*it);
 				// and if it's already captured - check it is the same
 				if (old_value.length() && old_value != value) {
 					char message[128];
@@ -1250,10 +1253,11 @@ void book::add_use_data(record* use_record) {
 					status_->misc_status(ST_WARNING, message);
 				}
 				else if (old_value.length() == 0) {
-					qth_data->item(*it, value);
+					qth_data->fields->item(*it, value);
 				}
 			}
 		}
+		qth_data->description = use_record->item("APP_ZZA_QTH_DESCR");
 	}
 }
 

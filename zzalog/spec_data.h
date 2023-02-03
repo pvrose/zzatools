@@ -94,7 +94,11 @@ namespace zzalog {
 	};
 
 	// Macro definition set - macro name versions set of fields it represents
-	typedef map<string, record*> macro_def;
+	struct macro_defn {
+		record* fields;
+		string description;
+	};
+	typedef map<string, macro_defn*> macro_map;
 
 	// This class provides the ADIF specification reference database as a set of named datasets. 
 	// It provides the access to the database and methods to validate the ADIF data against the specification
@@ -168,14 +172,16 @@ namespace zzalog {
 		string entity_name(int dxcc);
 		// Add user defined enumeration for an existing field - return true if successful
 		bool add_user_enum(string field, set<string> values);
+		// Add user defined enumeration for an existing field - return true if successful
+		bool add_user_enum(string field, string value);
 		// Add app defined macro (use one field "APP_ZZA..." to represent several others)
-		bool add_user_macros(string field, macro_def macros);
+		bool add_user_macro(string field, macro_map macros);
+		// Add app defined macro (use one field "APP_ZZA..." to represent several others)
+		bool add_user_macro(string field, string name, macro_defn macro);
 		// Get the record fields for a mmacro 
 		record* expand_macro(string field, string value);
 		// Remove user enums and macros - and restore originals
 		void delete_user_data();
-		// Add a new value to user enum
-		bool add_user_value(string field, string value);
 
 	// protected methods
 	protected:
@@ -229,7 +235,7 @@ namespace zzalog {
 		// Quick lookup of datatype indicator
 		map<string, char> datatype_indicators_;
 		// Macro definitions
-		map <string, macro_def> macros_;
+		map<string, macro_map> macros_;
 		// Missing file already reported
 		bool error_reported_;
 		// Correction message

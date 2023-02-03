@@ -250,7 +250,7 @@ namespace zzalog {
 		// Callsigns used
 		set<string> used_callsigns_;
 		// QTHs used - with data
-		map<string, record*> used_qths_;
+		macro_map used_qths_;
 		// Save enabled
 		bool save_enabled_;
 		// match query question

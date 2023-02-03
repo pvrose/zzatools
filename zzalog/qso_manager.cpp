@@ -2395,6 +2395,7 @@ void qso_manager::qso_group::action_save_edit() {
 		return;
 	}
 	// We no longer need to maintain the copy of the original QSO
+	book_->modified(true);
 	delete original_qso_;
 	original_qso_ = nullptr;
 	current_qso_ = nullptr;

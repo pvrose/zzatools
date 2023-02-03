@@ -7,6 +7,7 @@
 #include "status.h"
 #include "corr_dialog.h"
 #include "../zzalib/callback.h"
+#include "adi_writer.h"
 
 #include <fstream>
 #include <ostream>
@@ -708,7 +709,7 @@ string spec_data::enumeration_name(const string& field_name, record* record) {
 bool spec_data::add_user_enum(string field, set<string> values) {
 	char message[128];
 	char enumeration_name[128];
-	snprintf(enumeration_name, 128, "Dynamic Enumeration %s", field.c_str());
+	snprintf(enumeration_name, 128, "Dynamic %s", field.c_str());
 	string enum_name = enumeration_name;
 
 	// Get the field definition
@@ -716,31 +717,32 @@ bool spec_data::add_user_enum(string field, set<string> values) {
 	auto it_field = fields->data.find(field);
 	if (it_field != fields->data.end()) {
 		// If it's a valid field name
-		if (it_field->second->at("Data Type") == "Enumeration" && it_field->second->find("Enumeration") != it_field->second->end()) {
+		if (it_field->second->at("Data Type") == "Enumeration") {
 			// Field is already defined as am enumeration
-			snprintf(message, 128, "ADIF SPEC: Field %s is already enum %s cannot change it to %s",
+			snprintf(message, 128, "ADIF SPEC: Field %s is an enumeration %s cannot change it to %s",
 				field.c_str(),
 				it_field->second->at("Enumeration").c_str(),
 				enumeration_name);
 			status_->misc_status(ST_ERROR, message);
 			return false;
 		}
-		else if (it_field->second->at("Data Type") == "Dynamic" && it_field->second->at("Enumeration") != enum_name) {
-			// Field is defined as a dynamic enumeration with a different name
-			snprintf(message, 128, "ADIF SPEC: Field %s is already enum %s cannot change it to %s",
+		else if (it_field->second->at("Data Type") == "Macro") {
+			// Field is already defined as am macro
+			snprintf(message, 128, "ADIF SPEC: Field %s is a macro %s cannot change it to %s",
 				field.c_str(),
 				it_field->second->at("Enumeration").c_str(),
 				enumeration_name);
 			status_->misc_status(ST_ERROR, message);
 			return false;
 		}
-		else if (it_field->second->at("Data Type") == "Dynamic" && it_field->second->at("Enumeration") == enum_name) {
-			snprintf(message, 128, "ADIF SPEC: Field %s is already enum %s - modifying it",
+		else if (it_field->second->at("Data Type") == "Dynamic") {
+			// Field is already defined as am macro
+			snprintf(message, 128, "ADIF SPEC: Field %s is a dynamic %s cannot change it to %s",
 				field.c_str(),
+				it_field->second->at("Enumeration").c_str(),
 				enumeration_name);
-			status_->misc_status(ST_WARNING, message);
-			delete dataset(enum_name);
-
+			status_->misc_status(ST_ERROR, message);
+			return false;
 		} else {
 			snprintf(message, 128, "ADIF SPEC: Field %s replacing type %s with %s",
 				field.c_str(),
@@ -773,7 +775,7 @@ bool spec_data::add_user_enum(string field, set<string> values) {
 		(*dynamic_data)["Comments"] = "Application defined dynamic enumeration";
 		(*dynamic_data)["Data Type Indicator"] = "E";
 		(*dynamic_data)["Data Type Name"] = "Dynamic";
-		(*dynamic_data)["Description"] = "A list of acceptable values for a field that can be added to dynamically";
+		(*dynamic_data)["Description"] = "Dynamic enumeration for field " + field;
 		types_dataset->data["Dynamic"] = dynamic_data;
 	}
 	// Add new dataset for the enumeration values
@@ -796,10 +798,10 @@ bool spec_data::add_user_enum(string field, set<string> values) {
 }
 
 // Add a new value to an existing user enumeration
-bool spec_data::add_user_value(string field, string value) {
+bool spec_data::add_user_enum(string field, string value) {
 	char enumeration_name[128];
 	char message[128];
-	snprintf(enumeration_name, 128, "User Enumeration %s", field.c_str());
+	snprintf(enumeration_name, 128, "Dynamic %s", field.c_str());
 	string enum_name = enumeration_name;
 	spec_dataset* enum_values = dataset(enum_name);
 	if (enum_values == nullptr) {
@@ -822,41 +824,131 @@ bool spec_data::add_user_value(string field, string value) {
 
 // Add a user enumeration that points to a macro definition (i.e. additional
 // fields inferred by that value)
-bool spec_data::add_user_macros(string field, macro_def macros) {
+bool spec_data::add_user_macro(string field, macro_map macros) {
 	set<string> macro_names;
 	// Copy names from supplied map to a set
 	for (auto it = macros.begin(); it != macros.end(); it++) {
 		macro_names.insert((*it).first);
 	}
-	// Change the field to an enum
-	if (add_user_enum(field, macro_names)) {
-		// Now add the macros
-		macros_[field] = macros;
-		return true;
+	char message[128];
+	char enumeration_name[128];
+	snprintf(enumeration_name, 128, "Macro %s", field.c_str());
+	string enum_name = enumeration_name;
+
+	// Get the field definition
+	spec_dataset* fields = dataset("Fields");
+	auto it_field = fields->data.find(field);
+	if (it_field != fields->data.end()) {
+		if (it_field->second->at("Data Type") == "Enumeration") {
+			// Field is already defined as am enumeration
+			snprintf(message, 128, "ADIF SPEC: Field %s is an enumeration %s cannot change it to %s",
+				field.c_str(),
+				it_field->second->at("Enumeration").c_str(),
+				enumeration_name);
+			status_->misc_status(ST_ERROR, message);
+			return false;
+		}
+		else if (it_field->second->at("Data Type") == "Macro") {
+			// Field is already defined as am macro
+			snprintf(message, 128, "ADIF SPEC: Field %s is a macro %s cannot change it to %s",
+				field.c_str(),
+				it_field->second->at("Enumeration").c_str(),
+				enumeration_name);
+			status_->misc_status(ST_ERROR, message);
+			return false;
+		}
+		else if (it_field->second->at("Data Type") == "Dynamic") {
+			// Field is already defined as am macro
+			snprintf(message, 128, "ADIF SPEC: Field %s is a dynamic %s cannot change it to %s",
+				field.c_str(),
+				it_field->second->at("Enumeration").c_str(),
+				enumeration_name);
+			status_->misc_status(ST_ERROR, message);
+			return false;
+		}
+		else {
+			snprintf(message, 128, "ADIF SPEC: Field %s replacing type %s with %s",
+				field.c_str(),
+				it_field->second->at("Data Type").c_str(),
+				enumeration_name);
+			// Enumeration won't exist
+			spec_dataset* original_data = dataset("Original Fields");
+			if (original_data == nullptr) {
+				original_data = new spec_dataset;
+				(*this)["Original Fields"] = original_data;
+				original_data->column_names = fields->column_names;
+			}
+			original_data->data[field] = new map<string, string>(*(it_field->second));
+			(*it_field->second)["Enumeration"] = enum_name;
+			(*it_field->second)["Data Type"] = "Macro";
+			(*it_field->second)["ADIF Status"] = "Not approved";
+		}
 	}
 	else {
+		// Field does not exist
+		snprintf(message, 128, "ADIF SPEC: Trying to add an enumeration to field %s which doesn't exist", field.c_str());
+		status_->misc_status(ST_ERROR, message);
 		return false;
 	}
+	status_->misc_status(ST_WARNING, message);
+	// Check that "Dynamic" is a member of Data Types
+	spec_dataset* types_dataset = dataset("Data Types");
+	if (types_dataset->data.find("Macro") == types_dataset->data.end()) {
+		map<string, string>* dynamic_data = new map<string, string>;
+		(*dynamic_data)["Comments"] = "Application defined dynamic enumeration";
+		(*dynamic_data)["Data Type Indicator"] = "E";
+		(*dynamic_data)["Data Type Name"] = "Macro";
+		(*dynamic_data)["Description"] = "Macro enumeration for field " + field;
+		types_dataset->data["Macro"] = dynamic_data;
+	}
+	// Add new dataset for the enumeration values
+	spec_dataset* dataset = new spec_dataset;
+	(*this)[enum_name] = dataset;
+	// Add column names
+	dataset->column_names.resize(5);
+	dataset->column_names[0] = "Comments";
+	dataset->column_names[1] = "Description";
+	dataset->column_names[2] = "Macro Definition";
+	dataset->column_names[3] = "ADIF Version";
+	dataset->column_names[4] = "ADIF Status";
+	// now create records for each enumeration value
+	for (auto it = macros.begin(); it != macros.end(); it++) {
+		auto temp_map = new map<string, string>;
+		string adif;
+		record* fields = (*it).second->fields;
+		for (auto f = fields->begin(); f != fields->end(); f++) {
+			adif += adi_writer::item_to_adif(fields, (*f).first);
+		}
+		(*temp_map)["Comments"] = "";
+		(*temp_map)["Description"] = (*it).second->description;
+		(*temp_map)["Macro Definition"] = adif;
+		(*temp_map)["ADIF Version"] = "";
+		(*temp_map)["ADIF Status"] = "Not approved";
+		dataset->data[(*it).first] = temp_map;
+	}
+	return true;
 }
 
 record* spec_data::expand_macro(string field, string value) {
 	char message[128];
 	if (macros_.find(field) == macros_.end()) {
 		snprintf(message, 128, "ADIF SPEC: No macros defined for field %s", field.c_str());
+		status_->misc_status(ST_ERROR, message);
+		return nullptr;
 	}
 	else {
-		macro_def& field_macros = macros_.at(field);
+		macro_map& field_macros = macros_.at(field);
 		if (field_macros.find(value) == field_macros.end()) {
 			snprintf(message, 128, "ADIF SPEC: Macro %s not defined for field %s",
 				value.c_str(),
 				field.c_str());
+			status_->misc_status(ST_ERROR, message);
+			return nullptr;
 		}
 		else {
-			return field_macros.at(value);
+			return field_macros.at(value)->fields;
 		}
 	}
-	status_->misc_status(ST_ERROR, message);
-	return nullptr;
 }
 
 // The DXCC has ADIF defined primary administrative districts
@@ -1610,11 +1702,7 @@ error_t spec_data::validate(const string& field, const string& data, bool inhibi
 				else {
 					// If it's an enumeration, use the enumeration name as the data type
 					bool is_enumeration;
-					if (datatype == "Enumeration") {
-						is_enumeration = true;
-						datatype = (*field_entry)["Enumeration"];
-					}
-					else if (datatype == "Dynamic") {
+					if (datatype == "Enumeration" || datatype == "Dynamic" || datatype == "Macro") {
 						is_enumeration = true;
 						datatype = (*field_entry)["Enumeration"];
 					}
@@ -2366,6 +2454,7 @@ void spec_data::add_my_appdefs() {
 	string my_appdefs[] = {
 		"APP_ZZA_PFX",
 		"APP_ZZA_QTH",
+		"APP_ZZA_QTH_DESCR",
 		"APP_ZZA_EQSL_MSG",
 		"APP_ZZA_ERROR",
 		"APP_LOTW_NUMREC",
