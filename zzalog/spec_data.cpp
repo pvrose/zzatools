@@ -796,6 +796,7 @@ bool spec_data::add_user_enum(string field, string value) {
 		(*temp_map)["ADIF Status"] = "Not approved";
 		enum_dataset->data[value] = temp_map;
 	}
+
 	return true;
 }
 

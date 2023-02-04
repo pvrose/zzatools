@@ -2052,7 +2052,7 @@ void qso_manager::qso_group::cb_ip_field(Fl_Widget* w, void* v) {
 			that->current_qso_->item("SUBMODE", string(""));
 		}
 	}
-	tabbed_forms_->update_views(nullptr, HT_MINOR_CHANGE, book_->size() - 1);
+	tabbed_forms_->update_views(nullptr, HT_MINOR_CHANGE, that->current_rec_num_);
 }
 
 // Callback -notes input
@@ -2325,6 +2325,8 @@ void qso_manager::qso_group::action_save() {
 	if (spec_data_->validate(current_qso_, item_number)) {
 	}
 
+	book_->add_use_data(current_qso_);
+
 	// Upload QSO to QSL servers
 	book_->upload_qso(current_rec_num_);
 	// Update this view
@@ -2395,6 +2397,7 @@ void qso_manager::qso_group::action_save_edit() {
 		return;
 	}
 	// We no longer need to maintain the copy of the original QSO
+	book_->add_use_data(current_qso_);
 	book_->modified(true);
 	delete original_qso_;
 	original_qso_ = nullptr;

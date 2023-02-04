@@ -40,6 +40,7 @@ extern status* status_;
 extern menu* menu_;
 extern tabbed_forms* tabbed_forms_;
 extern spec_data* spec_data_;
+extern spec_tree* spec_tree_;
 extern pfx_data* pfx_data_;
 extern Fl_Preferences* settings_;
 extern main_window* main_window_;
@@ -1206,28 +1207,40 @@ void book::add_use_data(record* use_record) {
 		used_submodes_.insert(submode);
 	}
 	string rig = use_record->item("MY_RIG");
+	bool update_spec = false;
 	if (rig.length()) {
-		used_rigs_.insert(rig);
-		spec_data_->add_user_enum("MY_RIG", rig);
+		if (used_rigs_.find(rig) == used_rigs_.end()) {
+			used_rigs_.insert(rig);
+			spec_data_->add_user_enum("MY_RIG", rig);
+			update_spec = true;
+		}
 	}
 	string antenna = use_record->item("MY_ANTENNA");
 	if (antenna.length()) {
-		used_antennas_.insert(antenna);
-		spec_data_->add_user_enum("MY_ANTENNA", antenna);
+		if (used_antennas_.find(antenna) == used_antennas_.end()) {
+			used_antennas_.insert(antenna);
+			spec_data_->add_user_enum("MY_ANTENNA", antenna);
+			update_spec = true;
+		}
 	}
 	string callsign = use_record->item("STATION_CALLSIGN");
 	if (callsign.length()) {
-		used_callsigns_.insert(callsign);
-		spec_data_->add_user_enum("STATION_CALLSIGN", callsign);
+		if (used_callsigns_.find(callsign) == used_callsigns_.end()) {
+			used_callsigns_.insert(callsign);
+			spec_data_->add_user_enum("STATION_CALLSIGN", callsign);
+			update_spec = true;
+		}
 	}
-	// "APP_ZZA_QTH" inplies a macro substitition. Description gine in APP_ZZA_QTH_DESCR
+	// "APP_ZZA_QTH" inplies a macro substitition. Description given in APP_ZZA_QTH_DESCR
 	string qth = use_record->item("APP_ZZA_QTH");
 	if (qth.length()) {
 		macro_defn* qth_data;
+		bool update_qth = false;
 		if (used_qths_.find(qth) == used_qths_.end()) {
 			qth_data = new macro_defn;
 			qth_data->fields = new record;
 			used_qths_[qth] = qth_data;
+			update_qth = true;
 		}
 		else {
 			qth_data = used_qths_.at(qth);
@@ -1246,22 +1259,33 @@ void book::add_use_data(record* use_record) {
 				// and if it's already captured - check it is the same
 				if (old_value.length() && old_value != value) {
 					char message[128];
-					snprintf(message, 128, "LOG: %s %s %s - problem importing record", 
+					snprintf(message, 128, "LOG: %s %s %s - new value differs from old",
 						use_record->item("QSO_DATE").c_str(),
 						use_record->item("TIME_ON").c_str(),
 						use_record->item("CALL").c_str());
 					status_->misc_status(ST_NOTE, message);
-					snprintf(message, 128, "LOG: QTH %s - Field %s existing %s new %s ignored", 
+					snprintf(message, 128, "LOG: QTH %s - Field %s replacing %s with %s",
 						qth.c_str(), (*it).c_str(), old_value.c_str(), value.c_str());
 					status_->misc_status(ST_WARNING, message);
+					qth_data->fields->item(*it, value);
+					update_qth = true;
 				}
 				else if (old_value.length() == 0) {
 					qth_data->fields->item(*it, value);
+					update_qth = true;
 				}
 			}
 		}
-		qth_data->description = use_record->item("APP_ZZA_QTH_DESCR");
-		spec_data_->add_user_macro("APP_ZZA_QTH", qth, *qth_data);
+		// description already forms part of qth_data no need to check it again
+		if (update_qth) {
+			// Update the spec data and then the spec ttree viewer
+			qth_data->description = use_record->item("APP_ZZA_QTH_DESCR");
+			spec_data_->add_user_macro("APP_ZZA_QTH", qth, *qth_data);
+			update_spec = true;
+		}
+		if (update_spec) {
+			((spec_tree*)tabbed_forms_->get_view(OT_ADIF))->update(HT_FORMAT, size() - 1);
+		}
 	}
 }
 
