@@ -693,6 +693,12 @@ string spec_data::enumeration_name(const string& field_name, record* record) {
 			if (dataset(enumeration_name) != nullptr) return enumeration_name;
 			else return "";
 		}
+		else if (it_field->second->at("Data Type") == "Macro" && it_field->second->find("Enumeration") != it_field->second->end()) {
+			// Return the enumeration name
+			string enumeration_name = it_field->second->at("Enumeration");
+			if (dataset(enumeration_name) != nullptr) return enumeration_name;
+			else return "";
+		}
 		else {
 			// Field is not an enumeration
 			return "";

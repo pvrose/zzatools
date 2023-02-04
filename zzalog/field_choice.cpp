@@ -39,10 +39,11 @@ void field_choice::set_dataset(string dataset_name, string default_field /* = ""
 	if (dataset_->data.size() > HIERARCHIC_LIMIT) {
 		hierarchic_ = true;
 		for (int i = 1; it != dataset_->data.end(); i++) {
-			char curr = it->first[0];
+			string text = escape_menu(it->first);
+			char curr = text[0];
 			// generate tree A/ADDRESS etc
 			char entry[128];
-			snprintf(entry, 128, "%c/%s", curr, it->first.c_str());
+			snprintf(entry, 128, "%c/%s", curr, text.c_str());
 			add(entry, 0, (Fl_Callback*)nullptr);
 			it++;
 		}
@@ -50,9 +51,7 @@ void field_choice::set_dataset(string dataset_name, string default_field /* = ""
 	else {
 		hierarchic_ = false;
 		for (int i = 1; it != dataset_->data.end(); i++) {
-			char curr = it->first[0];
-			// generate tree A/ADDRESS etc
-			add(it->first.c_str(), 0, (Fl_Callback*)nullptr);
+			add(escape_menu(it->first).c_str(), 0, (Fl_Callback*)nullptr);
 			it++;
 		}
 	}

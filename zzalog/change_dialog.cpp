@@ -159,7 +159,7 @@ void change_dialog::create_form() {
 	w_text_ = ip42;
 
 	// Alternate enumeration vale
-	Fl_Choice* ch52 = new Fl_Choice(C2, R5, W2, H5, "Enum. Value");
+	field_choice* ch52 = new field_choice(C2, R5, W2, H5, "Enum. Value");
 	ch52->labelsize(FONT_SIZE);
 	ch52->textsize(FONT_SIZE);
 	ch52->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
@@ -269,14 +269,6 @@ void change_dialog::enable_widgets() {
 			w_text_->deactivate();
 			w_enum_->activate();
 		}
-		else if (old_field_name_ == "MY_RIG" || old_field_name_ == "MY_ANTENNA" ||
-			old_field_name_ == "APP_ZZA_QTH" || old_field_name_ == "STATION_CALLSIGN") {
-			
-			// populate the enumeartion choice with values from settings
-			populate_enum(old_field_name_);
-			w_text_->deactivate();
-			w_enum_->activate();
-		}
 		else {
 			w_text_->activate();
 			w_enum_->deactivate();
@@ -288,44 +280,7 @@ void change_dialog::enable_widgets() {
 
 // Populate enumeration choice
 void change_dialog::populate_enum(string name) {
-	Fl_Choice* ch = (Fl_Choice*)w_enum_;
+	field_choice* ch = (field_choice*)w_enum_;
 	ch->clear();
-	ch->add("", 0, nullptr);
-	//if (name == "MY_RIG" || name == "MY_ANTENNA" || name == "APP_ZZA_QTH" || name == "STATION_CALLSIGN") {
-	//	// Add the list of possible values from the appropriate settings
-	//	Fl_Preferences station_settings(settings_, "Stations");
-	//	string setting_path;
-	//	if (name == "MY_RIG") setting_path = "Rigs";
-	//	else if (name == "MY_ANTENNA") setting_path = "Aerials";
-	//	else if (name == "APP_ZZA_QTH") setting_path = "QTHs";
-	//	else if (name == "STATION_CALLSIGN") setting_path = "Callsigns";
-	//	Fl_Preferences kit_settings(station_settings, setting_path.c_str());
-	//	int num_items = kit_settings.groups();
-	//	for (int i = 0; i < num_items; i++) {
-	//		ch->add(kit_settings.group(i));
-	//	}
-	//}
-	//else {
-		// Add the list of possible values from the data for the enumeration
-		spec_dataset* dataset = spec_data_->dataset(name);
-		auto it = dataset->data.begin();
-		char prev = 0;
-		// Look at each enumeration values
-		while (it != dataset->data.end()) {
-			// Get first letter of the value
-			char curr = it->first[0];
-			if (curr == prev) {
-				// Add the enumeration value to the menu
-				ch->add(it->first.c_str(), 0, (Fl_Callback*)nullptr);
-				prev = curr;
-			}
-			else {
-				// Add the enumeration value with its initial letter as a short-cut
-				ch->add(it->first.c_str(), it->first[0], (Fl_Callback*)nullptr);
-			}
-			// 
-			it++;
-		}
-	//}
-	ch->value(0);
+	ch->set_dataset(name);
 }
