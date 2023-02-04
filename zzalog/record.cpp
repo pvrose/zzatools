@@ -1154,8 +1154,8 @@ string record::item_merge(string data, bool indirect /*=false*/) {
 	return result;
 }
 
-// Set MY_RIG, MY_ANTENNA, APP_ZZA_QTH and STATION_CALLSIGN from the current settings
-bool record::user_details() {
+//// Set MY_RIG, MY_ANTENNA, APP_ZZA_QTH and STATION_CALLSIGN from the current settings
+//bool record::user_details() {
 	//// Add rig & QTH details - note this is current location only
 	//Fl_Preferences stations_settings(settings_, "Stations");
 	//Fl_Preferences rigs_settings(stations_settings, "Rigs");
@@ -1212,9 +1212,8 @@ bool record::user_details() {
 	//	item("STATION_CALLSIGN", string(callsign));
 	//	modified = true;
 	//}
-	qso_manager_->update_import_qso(this);
-	return true;
-}
+//	return true;
+//}
 
 // Convert frequency from ADIF (MHz) to display format
 string record::format_freq(display_freq_t format, string value) {

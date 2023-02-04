@@ -138,8 +138,6 @@ namespace zzalog {
 		time_t timestamp(bool time_off = false);
 		// items match between records
 		bool items_match(record* record, string field_name);
-		// Set user details - returns true if item gets modified
-		bool user_details();
 		// Formatting methos
 		static string format_freq(display_freq_t format, string value);
 		static string format_date(display_date_t format, string value);

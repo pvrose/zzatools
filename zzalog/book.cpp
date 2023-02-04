@@ -275,10 +275,10 @@ bool book::load_data(string filename)
 					delete[] message;
 				}
 				// Add all the user specified enumerations
-				spec_data_->add_user_enum("MY_RIG", used_rigs_);
-				spec_data_->add_user_enum("MY_ANTENNA", used_antennas_);
-				spec_data_->add_user_enum("STATION_CALLSIGN", used_callsigns_);
-				spec_data_->add_user_macro("APP_ZZA_QTH", used_qths_);
+				//spec_data_->add_user_enum("MY_RIG", used_rigs_);
+				//spec_data_->add_user_enum("MY_ANTENNA", used_antennas_);
+				//spec_data_->add_user_enum("STATION_CALLSIGN", used_callsigns_);
+				//spec_data_->add_user_macro("APP_ZZA_QTH", used_qths_);
 				set_session_start();
 				((spec_tree*)tabbed_forms_->get_view(OT_ADIF))->populate_tree(false);
 			}
@@ -1208,14 +1208,17 @@ void book::add_use_data(record* use_record) {
 	string rig = use_record->item("MY_RIG");
 	if (rig.length()) {
 		used_rigs_.insert(rig);
+		spec_data_->add_user_enum("MY_RIG", rig);
 	}
 	string antenna = use_record->item("MY_ANTENNA");
 	if (antenna.length()) {
 		used_antennas_.insert(antenna);
+		spec_data_->add_user_enum("MY_ANTENNA", antenna);
 	}
 	string callsign = use_record->item("STATION_CALLSIGN");
 	if (callsign.length()) {
 		used_callsigns_.insert(callsign);
+		spec_data_->add_user_enum("STATION_CALLSIGN", callsign);
 	}
 	// "APP_ZZA_QTH" inplies a macro substitition. Description gine in APP_ZZA_QTH_DESCR
 	string qth = use_record->item("APP_ZZA_QTH");
@@ -1258,6 +1261,7 @@ void book::add_use_data(record* use_record) {
 			}
 		}
 		qth_data->description = use_record->item("APP_ZZA_QTH_DESCR");
+		spec_data_->add_user_macro("APP_ZZA_QTH", qth, *qth_data);
 	}
 }
 

@@ -482,7 +482,7 @@ void import_data::update_book() {
 					if (update_mode_ == AUTO_IMPORT || update_mode_ == FILE_IMPORT || update_mode_ == DATAGRAM) {
 						pfx_data_->parse(import_record);
 						spec_data_->validate(import_record, -1);
-						import_record->user_details();
+						qso_manager_->update_import_qso(import_record);
 					}
 
 					book_->insert_record_at(offset, import_record);

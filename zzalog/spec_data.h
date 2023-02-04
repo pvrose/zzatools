@@ -171,11 +171,7 @@ namespace zzalog {
 		// Get entity name for DXCC Number
 		string entity_name(int dxcc);
 		// Add user defined enumeration for an existing field - return true if successful
-		bool add_user_enum(string field, set<string> values);
-		// Add user defined enumeration for an existing field - return true if successful
 		bool add_user_enum(string field, string value);
-		// Add app defined macro (use one field "APP_ZZA..." to represent several others)
-		bool add_user_macro(string field, macro_map macros);
 		// Add app defined macro (use one field "APP_ZZA..." to represent several others)
 		bool add_user_macro(string field, string name, macro_defn macro);
 		// Get the record fields for a mmacro 
@@ -235,7 +231,7 @@ namespace zzalog {
 		// Quick lookup of datatype indicator
 		map<string, char> datatype_indicators_;
 		// Macro definitions
-		map<string, macro_map> macros_;
+		map<string, macro_map*> macros_;
 		// Missing file already reported
 		bool error_reported_;
 		// Correction message
