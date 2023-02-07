@@ -79,6 +79,7 @@ book::book()
 	, delete_in_progress_(false)
 	, old_record_(nullptr)
 	, been_modified_(false)
+	, main_loading_(false)
 {
 	used_bands_.clear();
 	used_modes_.clear();
@@ -154,6 +155,7 @@ bool book::load_data(string filename)
 					// Load the book
 					if (book_type_ == OT_MAIN) {
 						status_->file_status(FS_LOADING);
+						main_loading_ = true;
 					}
 					if (!reader->load_book(this, input_)) {
 						// Error while reading book
@@ -171,6 +173,7 @@ bool book::load_data(string filename)
 					}
 					else {
 						if (book_type_ == OT_MAIN) {
+							main_loading_ = false;
 							// Display filename in title bar and update views there's new data
 							if (read_only_) {
 								main_window_label(filename + " [read-only]");
@@ -210,6 +213,7 @@ bool book::load_data(string filename)
 					// when seeking backwards passed NL.
 					input_.open(filename.c_str(), fstream::in | fstream::binary);
 					status_->file_status(FS_LOADING);
+					main_loading_ = true;
 					if (!input_.good() || !reader->load_book(this, input_)) {
 						// Failed to complete the load
 						char * message = new char[filename.length() + reader->information().length() + 100];
@@ -229,6 +233,7 @@ bool book::load_data(string filename)
 					else {
 						if (book_type_ == OT_MAIN) {
 							// Update title bar and tell views
+							main_loading_ = false;
 							if (read_only_) {
 								main_window_label(filename + " [read-only]");
 							}
@@ -645,6 +650,7 @@ void book::delete_contents(bool new_book) {
 	if (book_type_ == OT_MAIN) {
 		// Update status to empty
 		status_->file_status(FS_EMPTY);
+		main_loading_ = false;
 	}
 }
 
@@ -1283,7 +1289,7 @@ void book::add_use_data(record* use_record) {
 			spec_data_->add_user_macro("APP_ZZA_QTH", qth, *qth_data);
 			update_spec = true;
 		}
-		if (update_spec) {
+		if (update_spec && !main_loading_) {
 			((spec_tree*)tabbed_forms_->get_view(OT_ADIF))->update(HT_FORMAT, size() - 1);
 		}
 	}

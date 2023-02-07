@@ -267,6 +267,8 @@ namespace zzalog {
 		int number_dupes_kept_;
 		// Book has been modified
 		bool been_modified_;
+		// File loading
+		bool main_loading_;
 
 	};
 

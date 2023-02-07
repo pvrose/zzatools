@@ -448,7 +448,9 @@ bool rig_hamlib::open() {
 				break;
 			case RIG_PORT_NETWORK:
 			case RIG_PORT_USB:
-				strcpy(rig_->state.rigport.pathname, port_name_.c_str());
+				printf("ZZALOG: Setting port path=%s\n", port_name_.c_str());
+				int err = rig_set_conf(rig_, rig_token_lookup(rig_, "rig_pathname"), port_name_.c_str());
+				//strcpy(rig_->state.rigport.pathname, port_name_.c_str());
 				break;
 			}
 		}
@@ -456,6 +458,7 @@ bool rig_hamlib::open() {
 
 	if (rig_ != nullptr) {
 		// open rig connection over serial port
+		printf("ZZALOG: Opening rig\n");
 		error_code_ = rig_open(rig_);
 
 		if (error_code_ != RIG_OK) {
@@ -479,7 +482,8 @@ bool rig_hamlib::open() {
 			success_message_ = "hamlib connection " + mfg_name_ + "/" + rig_name_ + " on port " + port_name_ + " opened OK";
 		}
 		else {
-			success_message_ = "hamlib connection " + mfg_name_ + "/" + rig_name_ + " (" + rig_get_info(rig_) + ") opened OK";
+			success_message_ = "hamlib connection " + mfg_name_ + "/" + rig_name_ + " on port " + port_name_ + 
+				" (" + rig_get_info(rig_) + ") opened OK";
 		}
 	}
 

@@ -73,7 +73,7 @@ using namespace zzalib;
 string COPYRIGHT = "© Philip Rose GM3ZZA 2018. All rights reserved.\n (Prefix data, DX Atlas & OmniRig interfaces © Alex Shovkoplyas, VE3NEA.)";
 string PROGRAM_ID = "ZZALOG";
 string PROG_ID = "ZLG";
-string VERSION = "3.3.3";
+string VERSION = "3.3.4";
 string TIMESTAMP = __DATE__ + string(" ") + __TIME__;
 #ifdef _DEBUG
 string PROGRAM_VERSION = VERSION + " (Debug " + TIMESTAMP + ")";
@@ -850,7 +850,7 @@ int main(int argc, char** argv)
 	Fl::check();
 	// Connect to the rig - load all hamlib backends once only here
 	rig_if_ = nullptr;
-	rig_set_debug(RIG_DEBUG_ERR);
+	rig_set_debug(RIG_DEBUG_CACHE);
 	rig_load_all_backends();
 	add_rig_if();
 	// Add qso_manager

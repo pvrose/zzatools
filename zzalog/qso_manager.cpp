@@ -543,6 +543,7 @@ void qso_manager::cat_group::populate_model_choice() {
 			if (string(capabilities->mfg_name) == cat_data_->hamlib_params.mfr &&
 				string(capabilities->model_name) == cat_data_->hamlib_params.model) {
 				cat_data_->hamlib_params.model_id = capabilities->rig_model;
+				cat_data_->hamlib_params.port_type = capabilities->port_type;
 			}
 		}
 	}
