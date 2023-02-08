@@ -713,11 +713,18 @@ void qso_manager::cat_group::cb_ctr_pollslow(Fl_Widget* w, void* v) {
 	cb_value<Fl_Spinner, double>(w, &that->cat_data_->slow_poll_interval);
 }
 
-// Pressed the connect button
-// v is not used
+// Pressed the connect button - this is also called from toolbar
+// v is not used - allow for w to be qso_manager_
 void qso_manager::cat_group::cb_bn_connect(Fl_Widget* w, void* v) {
 	cat_group* that = ancestor_view<cat_group>(w);
-	qso_manager* mgr = ancestor_view<qso_manager>(that);
+	qso_manager* mgr;
+	if (that == nullptr) {
+		mgr = ancestor_view<qso_manager>(w);
+		that = mgr->cat_group_;
+	}
+	else {
+		mgr = (qso_manager*)that->parent();
+	}
 	that->save_values();
 	if (rig_if_) {
 		// We are connected - set disconnected
