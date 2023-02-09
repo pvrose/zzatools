@@ -15,6 +15,7 @@
 #include "drawing.h"
 #include "pfx_data.h"
 #include "menu.h"
+#include "qso_manager.h"
 
 #include <set>
 #include <iostream>
@@ -42,6 +43,7 @@ extern tabbed_forms* tabbed_forms_;
 extern spec_data* spec_data_;
 extern time_t session_start_;
 extern menu* menu_;
+extern qso_manager* qso_manager_;
 extern bool in_current_session(record*);
 
 // Constructor
@@ -82,7 +84,6 @@ dxa_if::dxa_if() :
 	colours_used_.clear();
 	colour_bns_.clear();
 	colour_enables_.clear();
-	locations_.clear();
 	button_map_.clear();
 
 	load_values();
@@ -191,22 +192,15 @@ void dxa_if::load_values() {
 // Update location details
 void dxa_if::update_location_details() {
 	// Get stations details - QTH locations used to mark home location on map
-	Fl_Preferences stations_settings(settings_, "Stations");
-	char* temp;
-	// All QTH settings
-	Fl_Preferences qths_settings(stations_settings, "QTHs");
-	qths_settings.get("Default", temp, "");
-	location_name_ = temp;
-	Fl_Preferences qth_settings(qths_settings, temp);
-	free(temp);
-	qth_settings.get("Locator", temp, "RR73TU");
-	locator_ = temp;
-	free(temp);
-	int num_qths = qths_settings.groups();
-	for (int i = 0; i < num_qths; i++) {
-		string location = qths_settings.group(i);
-		locations_.push_back(location);
+	location_name_ = qso_manager_->get_default(qso_manager::QTH);
+	record* qth_macro = spec_data_->expand_macro("APP_ZZA_QTH", location_name_);
+	if (qth_macro) {
+		locator_ = qth_macro->item("MY_GRIDSQUARE");
 	}
+	else {
+		locator_ = "";
+	}
+	if (locator_.length() == 0) locator_ = "RR73TU";
 	// Get home location from gridsquare in float and string form
 	home_location();
 }
@@ -355,21 +349,9 @@ void dxa_if::create_form() {
 	bn13->tooltip("Recentre the DxAtlas window");
 
 	int next_y = max(sl10->y() + sl10->h(), bn12->y() + bn12->h());
-	// Choice - provides all user's locations (in settings)
-	Fl_Choice* ch21 = new Fl_Choice(ch11->x(), next_y + HTEXT, WSMEDIT, HBUTTON, "Location");
-	ch21->labelfont(FONT);
-	ch21->labelsize(FONT_SIZE);
-	ch21->textfont(FONT);
-	ch21->textsize(FONT_SIZE);
-	ch21->align(FL_ALIGN_TOP | FL_ALIGN_LEFT);
-	ch21->callback(cb_ch_locn, &location_name_);
-	ch21->when(FL_WHEN_RELEASE);
-	ch21->clear();
-	ch21->tooltip("Specify the location to use as home location");
-	location_ch_ = ch21;
 
 	// Output - the locator grid square for the selected location
-	Fl_Output* op21 = new Fl_Output(ch21->x(), ch21->y() + ch21->h(), WSMEDIT, HBUTTON);
+	Fl_Output* op21 = new Fl_Output(ch11->x(), next_y + HTEXT, WSMEDIT, HBUTTON);
 	op21->labelfont(FONT);
 	op21->labelsize(FONT_SIZE);
 	op21->textfont(FONT);
@@ -380,7 +362,7 @@ void dxa_if::create_form() {
 	op21->tooltip("The grid-square of the current home location");
 	locator_op_ = op21;
 	// Output - the latitude of the location
-	Fl_Output* op22 = new Fl_Output(ch12->x(), ch21->y(), WSMEDIT, HBUTTON);
+	Fl_Output* op22 = new Fl_Output(op21->x(), op21->y() + op21->h(), WSMEDIT, HBUTTON);
 	op22->labelfont(FONT);
 	op22->labelsize(FONT_SIZE);
 	op22->textfont(FONT);
@@ -456,12 +438,6 @@ void dxa_if::create_form() {
 // Populate locations choice and associated widgets
 void dxa_if::update_location() {
 	update_location_details();
-	for (size_t i = 0; i < locations_.size(); i++) {
-		int index = ((Fl_Choice*)location_ch_)->add(locations_[i].c_str());
-		if (locations_[i] == location_name_) {
-			((Fl_Choice*)location_ch_)->value(index);
-		}
-	}
 	update_loc_widgets();
 }
 
@@ -644,26 +620,6 @@ void dxa_if::cb_bn_start_stop(Fl_Widget* w, void* v) {
 		that->disconnect_dxatlas(false);
 		that->enable_widgets();
 	}
-}
-
-// Location choice widget selected
-void dxa_if::cb_ch_locn(Fl_Widget* w, void* v) {
-	dxa_if* that = ancestor_view<dxa_if>(w);
-	// Get the location selected
-	that->location_name_ = ((Fl_Choice*)w)->mvalue()->label();
-	// Get the details of the new location from settings
-	Fl_Preferences stations_settings(settings_, "Stations");
-	Fl_Preferences qths_settings(stations_settings, "QTHs");
-	Fl_Preferences qth_settings(qths_settings, that->location_name_.c_str());
-	char * temp;
-	qth_settings.get("Locator", temp, "RR73TU");
-	that->locator_ = temp;
-	free(temp);
-	// Get home location from gridsquare in string form
-	that->home_location();
-	// Update the output widgets with the values of the new location
-	that->update_loc_widgets();
-	that->draw_home_flag();
 }
 
 // Map centre choice widget selected

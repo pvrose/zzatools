@@ -5,6 +5,7 @@
 #include "../zzalib/callback.h"
 #include "exc_data.h"
 #include "book.h"
+#include "qso_manager.h"
 
 #include <sstream>
 
@@ -20,6 +21,7 @@ extern url_handler* url_handler_;
 extern Fl_Preferences* settings_;
 extern status* status_;
 extern book* book_;
+extern qso_manager* qso_manager_;
 
 // Constructor 
 club_handler::club_handler() {
@@ -90,8 +92,6 @@ void club_handler::generate_form(vector<url_handler::field_pair>& fields, record
 	// Read the settings that define user's access 
 	Fl_Preferences qsl_settings(settings_, "QSL");
 	Fl_Preferences clublog_settings(qsl_settings, "ClubLog");
-	Fl_Preferences stations_settings(settings_, "Stations");
-	Fl_Preferences callsigns_settings(stations_settings, "Callsigns");
 	char* email;
 	clublog_settings.get("Email", email, "");
 	fields.push_back({"email", email, "", ""});
@@ -102,17 +102,15 @@ void club_handler::generate_form(vector<url_handler::field_pair>& fields, record
 	free(password);
 	if (the_qso != nullptr) {
 		// get logging callsign from QSO record
-		string callsign = the_qso->item("STATION_CALLSIGN");
+		string callsign = qso_manager_->get_default(qso_manager::CALLSIGN);
 		fields.push_back({ "callsign", callsign.c_str(), "", "" });
 		// Get string ADIF
 		fields.push_back({ "adif", single_qso_, "", "" });
 	}
 	else {
 		// Get callsign from settings
-		char* callsign;
-		callsigns_settings.get("Default", callsign, "");
-		fields.push_back({ "callsign", callsign, "", "" });
-		free(callsign);
+		string callsign = qso_manager_->get_default(qso_manager::CALLSIGN);
+		fields.push_back({ "callsign", callsign.c_str(), "", ""});
 		// Set file to empty string to use the supplied data stream
 		fields.push_back({ "file", "", "clublog.adi", "application/octet-stream" });
 	}

@@ -141,8 +141,6 @@ namespace zzalog {
 		static void cb_ch_swlen(Fl_Widget* w, void* v);
 		// Open 
 		static void cb_bn_start_stop(Fl_Widget* w, void* v);
-		// Location choice
-		static void cb_ch_locn(Fl_Widget* w, void* v);
 		// Number days/QSOs input
 		static void cb_ip_number(Fl_Widget* w, void* v);
 		// Colour button click
@@ -273,8 +271,6 @@ namespace zzalog {
 		// Position of colour window
 		int window_left_;
 		int window_top_;
-		// list of locations
-		vector<string> locations_;
 		// Zoom value
 		float zoom_value_;
 		// Centre mode
@@ -317,7 +313,6 @@ namespace zzalog {
 		vector<Fl_Widget*> colour_bns_;
 		Fl_Widget* most_recent_ip_;
 		Fl_Widget* start_stop_bn_;
-		Fl_Widget* location_ch_;
 		Fl_Widget* locator_op_;
 		Fl_Widget* lat_dms_op_;
 		Fl_Widget* lon_dms_op_;

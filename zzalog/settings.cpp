@@ -3,7 +3,6 @@
 #include "files_dialog.h"
 #include "web_dialog.h"
 #include "fields_dialog.h"
-#include "qsl_design.h"
 #include "user_dialog.h"
 #include "config_tree.h"
 

@@ -10,6 +10,7 @@
 #include "spec_data.h"
 #include "club_handler.h"
 #include "search_dialog.h"
+#include "qso_manager.h"
 
 #include <sstream>
 
@@ -28,6 +29,7 @@ extern lotw_handler* lotw_handler_;
 extern club_handler* club_handler_;
 extern spec_data* spec_data_;
 extern Fl_Preferences* settings_;
+extern qso_manager* qso_manager_;
 
 // Constructor
 extract_data::extract_data() :
@@ -539,12 +541,7 @@ void extract_data::extract_qsl(extract_data::extract_mode_t server) {
 
 	}
 	// Now check that they are all for the current station
-	Fl_Preferences station_settings(settings_, "Stations");
-	Fl_Preferences callsigns_settings(station_settings, "Callsigns");
-	char* temp;
-	callsigns_settings.get("Default", temp, nullptr);
-	string station(temp);
-	free(temp);
+	string station = qso_manager_->get_default(qso_manager::CALLSIGN);
 	new_criteria = {
 		/*search_cond_t condition*/ XC_FIELD,
 		/*search_comp_t comparator*/ XP_EQ,

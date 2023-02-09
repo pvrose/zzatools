@@ -3,6 +3,7 @@
 #include "../zzalib/callback.h"
 #include "../zzalib/utils.h"
 #include "settings.h"
+#include "qso_manager.h"
 
 #include <FL/Fl_Preferences.H>
 #include <FL/Fl_Group.H>
@@ -17,6 +18,7 @@ using namespace zzalog;
 using namespace zzalib;
 
 extern Fl_Preferences* settings_;
+extern qso_manager* qso_manager_;
 
 // Constructor - standard page dialog
 qsl_design::qsl_design(int X, int Y, int W, int H, const char* label) :
@@ -33,12 +35,9 @@ qsl_design::~qsl_design() {
 // Load the current design from the settings
 void qsl_design::load_values() {
 	Fl_Preferences qsl_settings(settings_, "QSL Design");
-	Fl_Preferences stations_settings(settings_, "Stations");
-	Fl_Preferences callsigns_settings(stations_settings, "Callsigns");
-	char* temp;
-	callsigns_settings.get("Default", temp, "");
-	Fl_Preferences call_settings(qsl_settings, temp);
-	string new_label = string(label()) + ": " + string(temp);
+	string callsign = qso_manager_->get_default(qso_manager::CALLSIGN);
+	Fl_Preferences call_settings(qsl_settings, callsign.c_str());
+	string new_label = string(label()) + ": " + callsign;
 	copy_label(new_label.c_str());
 		
 	call_settings.get("Unit", (int&)unit_, (int)qsl_form::MILLIMETER);
@@ -282,11 +281,8 @@ void qsl_design::create_form(int X, int Y) {
 // Save the new design
 void qsl_design::save_values() {
 	Fl_Preferences qsl_settings(settings_, "QSL Design");
-	Fl_Preferences stations_settings(settings_, "Stations");
-	Fl_Preferences callsigns_settings(stations_settings, "Callsigns");
-	char* temp;
-	callsigns_settings.get("Default", temp, "");
-	Fl_Preferences call_settings(qsl_settings, temp);
+	string callsign = qso_manager_->get_default(qso_manager::CALLSIGN);
+	Fl_Preferences call_settings(qsl_settings, callsign.c_str());
 
 	call_settings.set("Unit", (int&)unit_);
 	call_settings.set("Width", width_);

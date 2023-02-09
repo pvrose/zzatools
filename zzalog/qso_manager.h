@@ -49,7 +49,6 @@ namespace zzalog {
 			LM_IMPORTED,    // Import from modem software (w/ or w/o radio)
 		};
 
-	protected:
 		// A bit of a misnomer - but the category of settings
 		enum stn_item_t {
 			RIG = 1,
@@ -58,6 +57,8 @@ namespace zzalog {
 			QTH = 8,
 			NONE = 0
 		};
+
+	protected:
 
 		// Loggng state
 		enum logging_state_t {
@@ -238,6 +239,8 @@ namespace zzalog {
 			static void cb_logging_mode(Fl_Widget* w, void* v);
 			// Notes input field
 			static void cb_ip_notes(Fl_Widget* w, void* v);
+			// Edit QTH details
+			static void cb_bn_edit_qth(Fl_Widget* w, void* v);
 
 			// Add contest exchanges
 			void populate_exch_fmt();
@@ -276,6 +279,8 @@ namespace zzalog {
 			void action_save_edit();
 			// Cancel editing
 			void action_cancel_edit();
+			// Get default copy record
+			record* get_default_record();
 
 			// Logging mode
 			logging_mode_t logging_mode_;
@@ -338,6 +343,8 @@ namespace zzalog {
 			Fl_Button* bn_wkd_b4_;
 			// Parse button
 			Fl_Button* bn_parse_;
+			// Edit QTH
+			Fl_Button* bn_edit_qth_;
 			// Group for freq/power/mode
 			Fl_Group* grp_fpm_;
 			// Logging mode
@@ -524,6 +531,8 @@ namespace zzalog {
 		record* dummy_qso();
 		// End QSO
 		void end_qso();
+		// Get default value
+		string get_default(stn_item_t item);
 
 
 	protected:

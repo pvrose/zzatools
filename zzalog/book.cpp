@@ -280,13 +280,13 @@ bool book::load_data(string filename)
 					status_->misc_status(ST_OK, message);
 					delete[] message;
 				}
-				// Add all the user specified enumerations
-				//spec_data_->add_user_enum("MY_RIG", used_rigs_);
-				//spec_data_->add_user_enum("MY_ANTENNA", used_antennas_);
-				//spec_data_->add_user_enum("STATION_CALLSIGN", used_callsigns_);
-				//spec_data_->add_user_macro("APP_ZZA_QTH", used_qths_);
 				set_session_start();
-				((spec_tree*)tabbed_forms_->get_view(OT_ADIF))->populate_tree(false);
+				// Update spec_data
+				for (auto mx = used_qths_.begin(); mx != used_qths_.end(); mx++) {
+					spec_data_->add_user_macro("APP_ZZA_QTH", (*mx).first, *((*mx).second));
+				}
+				tabbed_forms_->update_views(nullptr, HT_ALL, size() - 1);
+
 			}
 			else { // filename.length() == 0 (File->New)
 				main_window_label("[No file loaded]");
@@ -1290,7 +1290,7 @@ void book::add_use_data(record* use_record) {
 			update_spec = true;
 		}
 		if (update_spec && !main_loading_) {
-			((spec_tree*)tabbed_forms_->get_view(OT_ADIF))->update(HT_FORMAT, size() - 1);
+			tabbed_forms_->update_views(nullptr, HT_FORMAT, size() - 1);
 		}
 	}
 }

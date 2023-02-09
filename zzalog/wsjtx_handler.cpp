@@ -49,14 +49,9 @@ wsjtx_handler::wsjtx_handler()
 	run_server();
 	new_heartbeat_ = false;
 	status_rcvd_ = 0;
-	// Get logged callsign from settings
-	Fl_Preferences station_settings(settings_, "Stations");
-	Fl_Preferences callsigns_settings(station_settings, "Callsigns");
-	char* callsign;
-	callsigns_settings.get("Default", callsign, "");
-	my_call_ = callsign;
+	// Get logged callsign from spec_data
+	my_call_ = qso_manager_->get_default(qso_manager::CALLSIGN);
 	my_bracketed_call_ = "<" + my_call_ + ">";
-	free(callsign);
 }
 
 // Destructor

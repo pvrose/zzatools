@@ -807,6 +807,7 @@ bool spec_data::add_user_macro(string field, string value, macro_defn macro) {
 	char enumeration_name[128];
 	snprintf(enumeration_name, 128, "Macro %s", field.c_str());
 	string enum_name = enumeration_name;
+	macro_changes_.clear();
 
 	// Get the field definition
 	spec_dataset* fields = dataset("Fields");
@@ -855,7 +856,7 @@ bool spec_data::add_user_macro(string field, string value, macro_defn macro) {
 		status_->misc_status(ST_ERROR, message);
 		return false;
 	}
-	// Check that "Dynamic" is a member of Data Types
+	// Check that "Dynamic" is a member of Data Types and create it if it isn't
 	spec_dataset* types_dataset = dataset("Data Types");
 	if (types_dataset->data.find("Macro") == types_dataset->data.end()) {
 		map<string, string>* dynamic_data = new map<string, string>;
@@ -878,10 +879,11 @@ bool spec_data::add_user_macro(string field, string value, macro_defn macro) {
 		macro_dataset->column_names[3] = "ADIF Version";
 		macro_dataset->column_names[4] = "ADIF Status";
 	}
-	// Get map for field provided
+	// Get map for field provided - create it if necessaruy
 	macro_map* this_map;
 	if (macros_.find(field) == macros_.end()) {
 		this_map = new macro_map;
+		macros_[field] = this_map;
 	}
 	else {
 		this_map = macros_.at(field);
@@ -889,13 +891,42 @@ bool spec_data::add_user_macro(string field, string value, macro_defn macro) {
 	// Copy fields from supplied macro definition
 	macro_defn* defn;
 	if (this_map->find(value) == this_map->end()) {
+		// A new macro definition - create it and add to the macro set
 		defn = new macro_defn;
 		defn->fields = new record;
+		(*this_map)[value] = defn;
 	}
 	else {
 		defn = this_map->at(value);
 	}
+	// Copy all the new fields being defined
 	for (auto it = macro.fields->begin(); it != macro.fields->end(); it++) {
+		string def_field = (*it).first;
+		if (defn->fields->item_exists(def_field)) {
+			if (defn->fields->item(def_field) != (*it).second) {
+				char message[128];
+				snprintf(message, 128, "ADIF SPEC: Macro %s(%s) already had field %s defined old = %s, new = %s",
+					field.c_str(),
+					value.c_str(),
+					def_field.c_str(),
+					defn->fields->item(def_field).c_str(),
+					(*it).second.c_str());
+				status_->misc_status(ST_WARNING, message);
+				macro_changes_.insert(def_field);
+			}
+		}
+		else {
+			if ((*it).second.length()) {
+				char message[128];
+				snprintf(message, 128, "ADIF SPEC: Macro %s(%s) defining field %s value %s",
+					field.c_str(),
+					value.c_str(),
+					def_field.c_str(),
+					(*it).second.c_str());
+				status_->misc_status(ST_NOTE, message);
+				macro_changes_.insert(def_field);
+			}
+		}
 		defn->fields->item((*it).first, (*it).second);
 	}
 
@@ -925,7 +956,11 @@ bool spec_data::add_user_macro(string field, string value, macro_defn macro) {
 
 record* spec_data::expand_macro(string field, string value) {
 	char message[128];
-	if (macros_.find(field) == macros_.end()) {
+	if (macros_.size() == 0) {
+		status_->misc_status(ST_NOTE, "ADIF SPEC: No macros defined yet");
+		return nullptr;
+	}
+	else if (macros_.find(field) == macros_.end()) {
 		snprintf(message, 128, "ADIF SPEC: No macros defined for field %s", field.c_str());
 		status_->misc_status(ST_ERROR, message);
 		return nullptr;
@@ -943,6 +978,11 @@ record* spec_data::expand_macro(string field, string value) {
 			return field_macros->at(value)->fields;
 		}
 	}
+}
+
+// Return macro changes since last update
+set<string> spec_data::get_macro_changes() {
+	return macro_changes_;
 }
 
 // The DXCC has ADIF defined primary administrative districts

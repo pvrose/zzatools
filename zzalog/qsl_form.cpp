@@ -2,8 +2,9 @@
 #include "record.h"
 #include "drawing.h"
 #include "../zzalib/utils.h"
-#include "qsl_design.h"
+//#include "qsl_design.h"
 #include "status.h"
+#include "qso_manager.h"
 
 using namespace zzalog;
 
@@ -19,6 +20,7 @@ using namespace std;
 
 extern Fl_Preferences* settings_;
 extern status* status_;
+extern qso_manager* qso_manager_;
 
 // Constructor
 qsl_form::qsl_form(int X, int Y, record** records, int num_records) :
@@ -42,12 +44,10 @@ qsl_form::~qsl_form() {
 // Load the QSL design data from the settings
 void qsl_form::load_data() {
 	// Get width and height of label
+	string callsign = qso_manager_->get_default(qso_manager::CALLSIGN);
 	Fl_Preferences qsl_settings(settings_, "QSL Design");
-	Fl_Preferences stations_settings(settings_, "Stations");
-	Fl_Preferences calls_settings(stations_settings, "Callsigns");
 	char* temp;
-	calls_settings.get("Default", temp, "");
-	Fl_Preferences call_settings(qsl_settings, temp);
+	Fl_Preferences call_settings(qsl_settings, callsign.c_str());
 	call_settings.get("Width", width_, 0);
 	call_settings.get("Height", height_, 0);
 	call_settings.get("Unit", (int&)unit_, (int)MILLIMETER);
@@ -56,7 +56,7 @@ void qsl_form::load_data() {
 	free(temp);
 	if (width_ == 0 || height_ == 0 || filename_.length() == 0) {
 		// We have either width or height not defined - so load the edfault data
-		status_->misc_status(ST_ERROR, "Insufficient information for QSL card");
+		status_->misc_status(ST_ERROR, "QSL: Insufficient information for QSL card");
 	}
 }
 

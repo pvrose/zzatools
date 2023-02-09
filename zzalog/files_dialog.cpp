@@ -6,6 +6,7 @@
 #include "intl_widgets.h"
 #include "qsl_design.h"
 #include "main_window.h"
+#include "qso_manager.h"
 
 #include <FL/Fl_Preferences.H>
 #include <FL/Fl_Group.H>
@@ -20,6 +21,7 @@ using namespace zzalib;
 extern Fl_Preferences* settings_;
 extern import_data* import_data_;
 extern main_window* main_window_;
+extern qso_manager* qso_manager_;
 
 // Constructor
 files_dialog::files_dialog(int X, int Y, int W, int H, const char* label) :
@@ -114,8 +116,8 @@ void files_dialog::load_values() {
 	Fl_Preferences status_settings(settings_, "Status");
 	Fl_Preferences clublog_settings(qsl_settings, "ClubLog");
 	Fl_Preferences qsld_settings(settings_, "QSL Design");
-	Fl_Preferences stations_settings(settings_, "Stations");
-	Fl_Preferences callsigns_settings(stations_settings, "Callsigns");
+	station_callsign_ = qso_manager_->get_default(qso_manager::CALLSIGN);
+	Fl_Preferences call_settings(qsld_settings, station_callsign_.c_str());
 
 	// TQSL Executable
 	lotw_settings.get("Enable", (int&)enable_tqsl_, false);
@@ -178,10 +180,6 @@ void files_dialog::load_values() {
 	free(temp_string);
 
 	// Callsign for QSL template
-	callsigns_settings.get("Default", temp_string, "");
-	Fl_Preferences call_settings(qsld_settings, temp_string);
-	station_callsign_ = temp_string;
-	free(temp_string);
 	// QSL Template
 	call_settings.get("Filename", temp_string, "");
 	qsl_template_ = temp_string;
@@ -604,8 +602,8 @@ void files_dialog::save_values() {
 	Fl_Preferences status_settings(settings_, "Status");
 	Fl_Preferences clublog_settings(qsl_settings, "ClubLog");
 	Fl_Preferences qsld_settings(settings_, "QSL Design");
-	Fl_Preferences stations_settings(settings_, "Stations");
-	Fl_Preferences calls_settings(stations_settings, "Callsigns");
+//	Fl_Preferences stations_settings(settings_, "Stations");
+//	Fl_Preferences calls_settings(stations_settings, "Callsigns");
 	Fl_Preferences call_settings(qsld_settings, station_callsign_.c_str());
 
 	// TQSL Executable

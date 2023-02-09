@@ -1507,7 +1507,15 @@ void qso_manager::qso_group::create_form(int X, int Y) {
 	bn_parse_->callback(cb_parse);
 	bn_parse_->tooltip("Display the DX details for this callsign");
 
-	max_w = max(max_w, bn_parse_->x() + bn_parse_->w());
+	curr_x += bn_parse_->w() + GAP;
+
+	bn_edit_qth_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Edit QTH");
+	bn_edit_qth_->callback(cb_bn_edit_qth);
+	bn_edit_qth_->tooltip("Edit the details of the QTH macro");
+
+	curr_x += bn_edit_qth_->w();
+
+	max_w = max(max_w, curr_x);
 	curr_x = left;
 	curr_y += HBUTTON;
 
@@ -1611,6 +1619,7 @@ void qso_manager::qso_group::enable_widgets() {
 		bn_save_->activate();
 		bn_cancel_->deactivate();
 		bn_edit_->activate();
+		bn_edit_qth_->deactivate();
 		for (int ix = 0; ix < NUMBER_TOTAL; ix++) {
 			if (ch_field_[ix]) ch_field_[ix]->deactivate();
 			ip_field_[ix]->deactivate();
@@ -1623,6 +1632,7 @@ void qso_manager::qso_group::enable_widgets() {
 		bn_save_->activate();
 		bn_cancel_->activate();
 		bn_edit_->deactivate();
+		bn_edit_qth_->activate();
 		for (int ix = 0; ix < NUMBER_TOTAL; ix++) {
 			if (ch_field_[ix]) ch_field_[ix]->activate();
 			ip_field_[ix]->activate();
@@ -1635,6 +1645,7 @@ void qso_manager::qso_group::enable_widgets() {
 		bn_save_->activate();
 		bn_cancel_->activate();
 		bn_edit_->deactivate();
+		bn_edit_qth_->deactivate();
 		for (int ix = 0; ix < NUMBER_TOTAL; ix++) {
 			if (ch_field_[ix]) ch_field_[ix]->activate();
 			ip_field_[ix]->activate();
@@ -1647,6 +1658,7 @@ void qso_manager::qso_group::enable_widgets() {
 		bn_save_->activate();
 		bn_cancel_->activate();
 		bn_edit_->deactivate();
+		bn_edit_qth_->activate();
 		for (int ix = 0; ix < NUMBER_TOTAL; ix++) {
 			if (ch_field_[ix]) ch_field_[ix]->activate();
 			ip_field_[ix]->activate();
@@ -1659,6 +1671,7 @@ void qso_manager::qso_group::enable_widgets() {
 	bn_save_->redraw();
 	bn_cancel_->redraw();
 	bn_edit_->redraw();
+	bn_edit_qth_->redraw();
 }
 
 // Update specific station item input
@@ -1999,6 +2012,31 @@ void qso_manager::qso_group::cb_parse(Fl_Widget* w, void* v) {
 	delete tip_record;
 }
 
+// Callback - Edit QTH
+void qso_manager::qso_group::cb_bn_edit_qth(Fl_Widget* w, void* v) {
+	qso_group* that = ancestor_view<qso_group>(w);
+	qso_manager* mgr = (qso_manager*)that->parent();
+	string qth = mgr->get_default(QTH);
+	// Open QTH dialog
+	qth_dialog* dlg = new qth_dialog(qth);
+	set<string> changed_fields;
+	record* macro;
+	record* current = that->get_default_record();
+	switch (dlg->display()) {
+	case BN_OK:
+		changed_fields = spec_data_->get_macro_changes();
+		macro = spec_data_->expand_macro("APP_ZZA_QTH", qth);
+		for (auto fx = changed_fields.begin(); fx != changed_fields.end(); fx++) {
+			current->item(*fx, macro->item(*fx));
+		}
+		that->enable_widgets();
+		break;
+	case BN_CANCEL:
+		break;
+	}
+	delete dlg;
+}
+
 // Reset contest serial number
 void qso_manager::qso_group::cb_init_serno(Fl_Widget* w, void* v) {
 	qso_group* that = ancestor_view<qso_group>(w);
@@ -2246,6 +2284,25 @@ void qso_manager::qso_group::add_format_def(int ix, bool tx) {
 	}
 }
 
+// Get default record to copy
+record* qso_manager::qso_group::get_default_record() {
+	switch (logging_state_) {
+	case QSO_INACTIVE:
+		switch (logging_mode_) {
+		case LM_OFF_AIR:
+		case LM_ON_AIR_CAT:
+		case LM_ON_AIR_TIME:
+			return book_->get_latest();
+		case LM_ON_AIR_COPY:
+			return book_->get_record();
+		default: 
+			return nullptr;
+		}
+	default:
+		return current_qso_;
+	}
+}
+
 // Action ACTIVATE: transition from QSO_INACTIVE to QSO_PENDING
 void qso_manager::qso_group::action_activate() {
 	if (logging_state_ != QSO_INACTIVE || current_qso_ != nullptr) {
@@ -2253,25 +2310,24 @@ void qso_manager::qso_group::action_activate() {
 		return;
 	}
 	current_qso_ = new record;
-	record* selected_qso = book_->get_record();
-	record* latest_qso = book_->get_latest();
 	time_t now = time(nullptr);
 	qso_manager* mgr = ancestor_view<qso_manager>(this);
+	record* source_record = get_default_record();
 	switch (logging_mode_) {
 	case LM_OFF_AIR:
-		copy_qso_to_qso(latest_qso, CF_RIG_ETC);
+		copy_qso_to_qso(source_record, CF_RIG_ETC);
 		break;
 	case LM_ON_AIR_CAT:
-		copy_qso_to_qso(latest_qso, CF_RIG_ETC);
+		copy_qso_to_qso(source_record, CF_RIG_ETC);
 		copy_cat_to_qso();
 		copy_clock_to_qso(now);
 		break;
 	case LM_ON_AIR_COPY:
-		copy_qso_to_qso(selected_qso, CF_RIG_ETC | CF_CAT);
+		copy_qso_to_qso(source_record, CF_RIG_ETC | CF_CAT);
 		copy_clock_to_qso(now);
 		break;
 	case LM_ON_AIR_TIME:
-		copy_qso_to_qso(latest_qso, CF_RIG_ETC);
+		copy_qso_to_qso(source_record, CF_RIG_ETC);
 		copy_clock_to_qso(now);
 		break;
 	}
@@ -2988,7 +3044,7 @@ void qso_manager::save_values() {
 	dash_settings.set("Enabled", (signed int)shown());
 	dash_settings.set("Logging Mode", logging_mode());
 
-	Fl_Preferences stations_settings(settings_, "Stations");
+//	Fl_Preferences stations_settings(settings_, "Stations");
 	qso_group_->save_values();
 	cat_group_->save_values();
 	clock_group_->save_values();
@@ -3984,5 +4040,27 @@ void qso_manager::update_import_qso(record* import_qso) {
 		import_qso->item("MY_ANTENNA", use_qso->item("MY_ANTENNA"));
 		import_qso->item("STATION_CALLSIGN", use_qso->item("STATION_CALLSIGN"));
 		import_qso->item("APP_ZZA_QTH", use_qso->item("APP_ZZA_QTH"));
+	}
+}
+
+// Get the default value of the station item
+string qso_manager::get_default(stn_item_t item) {
+	record* source = qso_group_->get_default_record();
+	if (source) {
+		switch (item) {
+		case RIG:
+			return source->item("MY_RIG");
+		case ANTENNA:
+			return source->item("MY_ANTENNA");
+		case CALLSIGN:
+			return source->item("STATION_CALLSIGN");
+		case QTH:
+			return source->item("APP_ZZA_QTH");
+		default:
+			return "";
+		}
+	}
+	else {
+		return"";
 	}
 }

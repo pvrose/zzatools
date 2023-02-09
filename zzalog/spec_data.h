@@ -174,6 +174,8 @@ namespace zzalog {
 		bool add_user_enum(string field, string value);
 		// Add app defined macro (use one field "APP_ZZA..." to represent several others)
 		bool add_user_macro(string field, string name, macro_defn macro);
+		// Get macro changes
+		set<string> get_macro_changes();
 		// Get the record fields for a mmacro 
 		record* expand_macro(string field, string value);
 		// Remove user enums and macros - and restore originals
@@ -232,6 +234,8 @@ namespace zzalog {
 		map<string, char> datatype_indicators_;
 		// Macro definitions
 		map<string, macro_map*> macros_;
+		// Fields that change in the last evocation of add_user_macro
+		set<string> macro_changes_;
 		// Missing file already reported
 		bool error_reported_;
 		// Correction message

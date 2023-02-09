@@ -4,6 +4,7 @@
 #include "status.h"
 #include "qsl_form.h"
 #include "../zzalib/drawing.h"
+#include "qso_manager.h"
 
 #include <FL/fl_ask.H>
 #include <FL/fl_draw.H>
@@ -17,6 +18,7 @@ extern tabbed_forms* tabbed_forms_;
 extern status* status_;
 extern book* navigation_book_;
 extern Fl_Preferences* settings_;
+extern qso_manager* qso_manager_;
 
 const int LINE_MARGIN = 1;
 const int LINE_WIDTH = 1;
@@ -80,7 +82,7 @@ int printer::print_book() {
 	// Get page title for log print
 	if (navigation_book_->size() > 0) {
 		record* record_0 = navigation_book_->get_record(0, false);
-		string callsign = record_0->item("STATION_CALLSIGN") + ": ";
+		string callsign = qso_manager_->get_default(qso_manager::CALLSIGN);
 		const char* temp = fl_input("Please specify the page title", callsign.c_str());
 		if (temp != nullptr) page_title_ = temp;
 		else page_title_ = callsign;

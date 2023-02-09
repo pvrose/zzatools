@@ -1978,12 +1978,7 @@ bool record_form::parse_all_txt(record* record) {
 	bool start_copying = false;
 	bool stop_copying = false;
 	// Get user callsign from settings
-	Fl_Preferences stations_settings(settings_, "Stations");
-	Fl_Preferences callsigns_settings(stations_settings, "Callsigns");
-	char* callsign;
-	callsigns_settings.get("Default", callsign, "");
-	string my_call = callsign;
-	delete[] callsign;
+	string my_call = qso_manager_->get_default(qso_manager::CALLSIGN);
 	// Get search items from record
 	string their_call = record->item("CALL");
 	string datestamp = record->item("QSO_DATE").substr(2);

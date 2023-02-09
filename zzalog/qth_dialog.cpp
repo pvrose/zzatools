@@ -11,6 +11,7 @@
 #include "intl_widgets.h"
 #include "qso_manager.h"
 #include "dxa_if.h"
+#include "spec_data.h"
 
 #include <set>
 
@@ -32,28 +33,20 @@ extern tabbed_forms* tabbed_forms_;
 extern rig_if* rig_if_;
 extern qso_manager* qso_manager_;
 extern dxa_if* dxa_if_;
+extern spec_data* spec_data_;
 
 // QTH group constructor
 qth_dialog::qth_dialog(string qth_name) :
 	win_dialog(10, 10)
 {
 	qth_name_ = qth_name;
-
-	// Get settings
-	Fl_Preferences stations_settings(settings_, "Stations");
-	Fl_Preferences qths_settings(stations_settings, "QTHs");
-	bool exists = qths_settings.groupExists(qth_name_.c_str());
-	my_settings_ = new Fl_Preferences(qths_settings, qth_name_.c_str());
+	changed_ = false;
+	qth_details_ = nullptr;
 
 	// Create window
-	string label;
-	if (exists) {
-		label = "Add QTH: " + qth_name_;
-	}
-	else {
-		label = "Modify QTH: " + qth_name_;
-	}
-	copy_label(label.c_str());
+	char label[100];
+	snprintf(label, 100, "QTH details - %s", qth_name_.c_str());
+	copy_label(label);
 
 	// Read settings
 	load_values();
@@ -65,57 +58,28 @@ qth_dialog::qth_dialog(string qth_name) :
 
 // Destructor
 qth_dialog::~qth_dialog() {
+	delete qth_details_;
 }
 
 // Get initial data from settings - additional ones for the QTH group
 void qth_dialog::load_values() {
 	// Get the QTH details
-	char* temp;
-	my_settings_->get("Operator Name", temp, "");
-	current_qth_.name = temp;
-	free(temp);
-	my_settings_->get("Street", temp, "");
-	current_qth_.street = temp;
-	free(temp);
-	my_settings_->get("District", temp, "");
-	current_qth_.area = temp;
-	free(temp);
-	my_settings_->get("City", temp, "");
-	current_qth_.city = temp;
-	free(temp);
-	my_settings_->get("Postcode", temp, "");
-	current_qth_.postcode = temp;
-	free(temp);
-	my_settings_->get("Locator", temp, "");
-	current_qth_.locator = temp;
-	free(temp);
-	my_settings_->get("DXCC Name", temp, "");
-	current_qth_.dxcc_name = temp;
-	free(temp);
-	my_settings_->get("DXCC Id", temp, "");
-	current_qth_.dxcc_id = temp;
-	free(temp);
-	my_settings_->get("State", temp, "");
-	current_qth_.state = temp;
-	free(temp);
-	my_settings_->get("County", temp, "");
-	current_qth_.county = temp;
-	free(temp);
-	my_settings_->get("CQ Zone", temp, "");
-	current_qth_.cq_zone = temp;
-	free(temp);
-	my_settings_->get("ITU Zone", temp, "");
-	current_qth_.itu_zone = temp;
-	free(temp);
-	my_settings_->get("Continent", temp, "");
-	current_qth_.continent = temp;
-	free(temp);
-	my_settings_->get("IOTA", temp, "");
-	current_qth_.iota = temp;
-	free(temp);
-	my_settings_->get("Description", temp, "");
-	current_qth_.description = temp;
-	free(temp);
+	qth_details_ = new record(*spec_data_->expand_macro("APP_ZZA_QTH", qth_name_));
+	current_qth_.name = qth_details_->item("MY_NAME");
+	current_qth_.street = qth_details_->item("MY_STREET");
+	current_qth_.city = qth_details_->item("MY_CITY");
+	current_qth_.postcode = qth_details_->item("MY_POSTAL_CODE");
+	current_qth_.locator = qth_details_->item("MY_GRIDSQUARE");
+	current_qth_.dxcc_name = qth_details_->item("MY_COUNTRY");
+	current_qth_.dxcc_id = qth_details_->item("MY_DXCC");
+	current_qth_.state = qth_details_->item("MY_STATE");
+	current_qth_.county = qth_details_->item("MY_CNTY");
+	current_qth_.cq_zone = qth_details_->item("MY_CQ_ZONE");
+	current_qth_.itu_zone = qth_details_->item("MY_ITU_ZONE");
+	//current_qth_.continent = qth_details_->item("MY_CONT");
+	current_qth_.iota = qth_details_->item("MY_IOTA");
+	current_qth_.description = qth_details_->item("APP_ZZA_QTH_DESCR");
+	original_qth_ = current_qth_;
 }
 
 // create the form - additional widgets for QTH settings
@@ -156,18 +120,6 @@ void qth_dialog::create_form(int X, int Y) {
 	ip_address1_->value(current_qth_.street.c_str());
 	ip_address1_->callback(cb_value<Fl_Input, string>, (void*)&current_qth_.street);
 	ip_address1_->tooltip("Enter Street address - forms MY_STREET");
-	// Address line 2
-	curr_y += HBUTTON + HTEXT;
-	ip_address2_ = new Fl_Input(curr_x, curr_y, WIP, HBUTTON, "Area");
-	ip_address2_->labelsize(FONT_SIZE);
-	ip_address2_->labelfont(FONT);
-	ip_address2_->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
-	ip_address2_->textfont(FONT);
-	ip_address2_->textsize(FONT_SIZE);
-	ip_address2_->when(FL_WHEN_RELEASE);
-	ip_address2_->value(current_qth_.area.c_str());
-	ip_address2_->callback(cb_value<Fl_Input, string>, (void*)&current_qth_.area);
-	ip_address2_->tooltip("Enter area within town/city - ignored in ADIF");
 	// Address line 3
 	curr_y += HBUTTON + HTEXT;
 	ip_address3_ = new Fl_Input(curr_x, curr_y, WIP, HBUTTON, "Town/City");
@@ -386,34 +338,31 @@ void qth_dialog::create_form(int X, int Y) {
 
 // Save values in settings
 void qth_dialog::save_values() {
-	// Clear to remove deleted entries
-	my_settings_->clear();
-	// Get the QTH details
-	my_settings_->set("Operator Name", current_qth_.name.c_str());
-	my_settings_->set("Street", current_qth_.street.c_str());
-	my_settings_->set("District", current_qth_.area.c_str());
-	my_settings_->set("City", current_qth_.city.c_str());
-	my_settings_->set("Postcode", current_qth_.postcode.c_str());
-	my_settings_->set("Locator", current_qth_.locator.c_str());
-	my_settings_->set("DXCC Name", current_qth_.dxcc_name.c_str());
-	my_settings_->set("DXCC Id", current_qth_.dxcc_id.c_str());
-	my_settings_->set("State", current_qth_.state.c_str());
-	my_settings_->set("County", current_qth_.county.c_str());
-	my_settings_->set("CQ Zone", current_qth_.cq_zone.c_str());
-	my_settings_->set("ITU Zone", current_qth_.itu_zone.c_str());
-	my_settings_->set("Continent", current_qth_.continent.c_str());
-	my_settings_->set("IOTA", current_qth_.iota.c_str());
-	my_settings_->set("Description", current_qth_.description.c_str());
-
+	// Note QTH structure only has == operator
+	if (!(current_qth_ == original_qth_)) {
+		changed_ = true;
+		qth_details_->item("MY_NAME", current_qth_.name);
+		qth_details_->item("MY_STREET", current_qth_.street);
+		qth_details_->item("MY_CITY", current_qth_.city);
+		qth_details_->item("MY_POSTAL_CODE", current_qth_.postcode);
+		qth_details_->item("MY_GRIDSQUARE", current_qth_.locator);
+		qth_details_->item("MY_COUNTRY", current_qth_.dxcc_name);
+		qth_details_->item("MY_DXCC", current_qth_.dxcc_id);
+		qth_details_->item("MY_STATE", current_qth_.state);
+		qth_details_->item("MY_CNTY", current_qth_.county);
+		qth_details_->item("MY_CQ_ZONE", current_qth_.cq_zone);
+		qth_details_->item("MY_ITU_ZONE", current_qth_.itu_zone);
+		//qth_details_->item("MY_CONT", current_qth_.continent);
+		qth_details_->item("MY_IOTA", current_qth_.iota);
+		spec_data_->add_user_macro("APP_ZZA_QTH", qth_name_, { qth_details_, current_qth_.description });
+	}
 }
 
 // Add values
 void qth_dialog::enable_widgets() {
 	ip_name_->value(current_qth_.name.c_str());
 	ip_address1_->value(current_qth_.street.c_str());
-	ip_address2_->value(current_qth_.area.c_str());
-	ip_address3_->value(current_qth_.city.c_str());
-	ip_address4_->value(current_qth_.postcode.c_str());
+	ip_address3_->value(current_qth_.postcode.c_str());
 	ip_locator_->value(current_qth_.locator.c_str());
 	ip_dxcc_->value(current_qth_.dxcc_name.c_str());
 	ip_dxcc_adif_->value(current_qth_.dxcc_id.c_str());
@@ -515,7 +464,9 @@ void qth_dialog::cb_ip_cty(Fl_Widget* w, void* v) {
 void qth_dialog::cb_bn_ok(Fl_Widget * w, void* v) {
 	qth_dialog* that = ancestor_view<qth_dialog>(w);
 	that->save_values();
-	that->do_button(BN_OK);
+	// If changed report OK else CANCEL
+	if (that->changed_) that->do_button(BN_OK);
+	else that->do_button(BN_CANCEL);
 }
 
 void qth_dialog::cb_bn_cancel(Fl_Widget* w, void* v) {

@@ -3,6 +3,7 @@
 #define __QTH_DIALOG__
 
 #include "../zzalib/win_dialog.h"
+#include "record.h"
 
 #include <string>
 #include <vector>
@@ -28,7 +29,6 @@ namespace zzalog {
 		struct qth_info_t {
 			string name;           // MY_NAME
 			string street;         // MY_STREET
-			string area;           // not ADIF
 			string city;           // MY_CITY
 			string postcode;       // MY_POSTAL_CODE
 			string locator;        // MY_GRIDSQUARE
@@ -40,7 +40,24 @@ namespace zzalog {
 			string itu_zone;       // MY_ITU_ZONE
 			string continent;      // MY_CONT
 			string iota;           // MY_IOTA
-			string description;    // not ADIF
+			string description;    // not ADIF - APP_ZZA_QTH_DESCR
+
+			bool operator==(qth_info_t rhs) {
+				return name == rhs.name &&
+					street == rhs.name &&
+					city == rhs.city &&
+					postcode == rhs.postcode &&
+					locator == rhs.locator &&
+					dxcc_name == rhs.dxcc_name &&
+					dxcc_id == rhs.dxcc_id &&
+					state == rhs.state &&
+					county == rhs.county &&
+					cq_zone == rhs.cq_zone &&
+					itu_zone == rhs.itu_zone &&
+					continent == rhs.continent &&
+					iota == rhs.iota &&
+					description == rhs.description;
+			}
 		};
 
 	public:
@@ -66,20 +83,23 @@ namespace zzalog {
 		static void cb_ip_upper(Fl_Widget* w, void* v);
 		// Convert lat/long to gridsquare
 		static void cb_bn_convert(Fl_Widget* w, void* v);
+		// 
 
 	protected:
 
 		// Current QTH
 		qth_info_t current_qth_;
+		qth_info_t original_qth_;
+		// QTH macro expansion
+		record* qth_details_;
 		// QTH name
 		string qth_name_;
-		// Settings
-		Fl_Preferences* my_settings_;
+		// Any field changed
+		bool changed_;
 
 		// All widgets
 		Fl_Input* ip_name_;
 		Fl_Input* ip_address1_;
-		Fl_Input* ip_address2_;
 		Fl_Input* ip_address3_;
 		Fl_Input* ip_address4_;
 		Fl_Input* ip_locator_;
