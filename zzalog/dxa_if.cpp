@@ -348,36 +348,42 @@ void dxa_if::create_form() {
 	bn13->color(FL_YELLOW);
 	bn13->tooltip("Recentre the DxAtlas window");
 
-	int next_y = max(sl10->y() + sl10->h(), bn12->y() + bn12->h());
+	int next_y = max(sl10->y() + sl10->h(), bn12->y() + bn12->h()) + HTEXT;
+
+	const int  HLOC = FL_NORMAL_SIZE + 2;
+	// Output - Home location name
+	Fl_Output* op20 = new Fl_Output(ch11->x() + WLABEL, next_y, WSMEDIT, HLOC, "Location");
+	op20->align(FL_ALIGN_LEFT);
+	op20->value(location_name_.c_str());
+	op20->box(FL_FLAT_BOX);
+	op20->color(group1->color());
+	op20->tooltip("The name of the current location as recorded in the log");
+	home_loc_op_ = op20;
+	next_y += HLOC;
 
 	// Output - the locator grid square for the selected location
-	Fl_Output* op21 = new Fl_Output(ch11->x(), next_y + HTEXT, WSMEDIT, HBUTTON);
-	op21->labelfont(FONT);
-	op21->labelsize(FONT_SIZE);
-	op21->textfont(FONT);
-	op21->textsize(FONT_SIZE);
+	Fl_Output* op21 = new Fl_Output(op20->x(), next_y, WSMEDIT, HLOC, "Locator");
+	op21->align(FL_ALIGN_LEFT);
 	op21->value(locator_.c_str());
 	op21->box(FL_FLAT_BOX);
 	op21->color(group1->color());
 	op21->tooltip("The grid-square of the current home location");
 	locator_op_ = op21;
+	next_y += HLOC;
+
 	// Output - the latitude of the location
-	Fl_Output* op22 = new Fl_Output(op21->x(), op21->y() + op21->h(), WSMEDIT, HBUTTON);
-	op22->labelfont(FONT);
-	op22->labelsize(FONT_SIZE);
-	op22->textfont(FONT);
-	op22->textsize(FONT_SIZE);
+	Fl_Output* op22 = new Fl_Output(op21->x(), next_y, WSMEDIT, HLOC, "Latitude");
+	op22->align(FL_ALIGN_LEFT);
 	op22->value(home_lat_dms_.c_str());
 	op22->box(FL_FLAT_BOX);
 	op22->color(group1->color());
 	op22->tooltip("The latitude of the current home location");
 	lat_dms_op_ = op22;
+	next_y += HLOC;
+
 	// Output - the longitude of the location
-	Fl_Output* op23 = new Fl_Output(op22->x(), op22->y() + op22->h(), WSMEDIT, HBUTTON);
-	op23->labelfont(FONT);
-	op23->labelsize(FONT_SIZE);
-	op23->textfont(FONT);
-	op23->textsize(FONT_SIZE);
+	Fl_Output* op23 = new Fl_Output(op22->x(), next_y, WSMEDIT, HLOC, "Longitude");
+	op23->align(FL_ALIGN_LEFT);
 	op23->value(home_long_dms_.c_str());
 	op23->box(FL_FLAT_BOX);
 	op23->color(group1->color());
@@ -539,6 +545,7 @@ void dxa_if::enable_widgets() {
 
 // Update location widgets
 void dxa_if::update_loc_widgets() {
+	((Fl_Output*)home_loc_op_)->value(location_name_.c_str());
 	((Fl_Output*)locator_op_)->value(locator_.c_str());
 	((Fl_Output*)lat_dms_op_)->value(home_lat_dms_.c_str());
 	((Fl_Output*)lon_dms_op_)->value(home_long_dms_.c_str());

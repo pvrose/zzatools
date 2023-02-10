@@ -1142,6 +1142,8 @@ qso_manager::qso_group::qso_group(int X, int Y, int W, int H, const char* l) :
 	, max_ef_index_(0)
 	, field_mode_(NO_CONTEST)
 	, logging_state_(QSO_INACTIVE)
+	, previous_locator_("")
+	, previous_qth_("")
 {
 	for (int ix = 0; ix < NUMBER_TOTAL; ix++) {
 		ip_field_[ix] = nullptr;
@@ -1726,6 +1728,8 @@ void qso_manager::qso_group::copy_qso_to_display(int flags) {
 			}
 		}
 		ip_notes_->value(current_qso_->item("NOTES").c_str());
+		// If QTH changes tell DXA-IF to update home_location
+		check_qth_changed();
 	}
 }
 
@@ -2029,6 +2033,7 @@ void qso_manager::qso_group::cb_bn_edit_qth(Fl_Widget* w, void* v) {
 		for (auto fx = changed_fields.begin(); fx != changed_fields.end(); fx++) {
 			current->item(*fx, macro->item(*fx));
 		}
+		that->check_qth_changed();
 		that->enable_widgets();
 		break;
 	case BN_CANCEL:
@@ -2097,6 +2102,9 @@ void qso_manager::qso_group::cb_ip_field(Fl_Widget* w, void* v) {
 			that->current_qso_->item("MODE", value);
 			that->current_qso_->item("SUBMODE", string(""));
 		}
+	}
+	else if (field == "APP_ZZA_QTH") {
+		that->check_qth_changed();
 	}
 	tabbed_forms_->update_views(nullptr, HT_MINOR_CHANGE, that->current_rec_num_);
 }
@@ -2303,6 +2311,19 @@ record* qso_manager::qso_group::get_default_record() {
 	}
 }
 
+// Check if QTH has changed and action change (redraw DxAtlas
+void qso_manager::qso_group::check_qth_changed() {
+	record* current = get_default_record();
+	if (current) {
+		if (current->item("MY_GRIDSQUARE", true) != previous_locator_ ||
+			current->item("APP_ZZA_QTH") != previous_qth_) {
+			previous_locator_ = current->item("MY_GRIDSQUARE", true);
+			previous_qth_ = current->item("APP_ZZA_QTH");
+			dxa_if_->update(HT_LOCATION);
+		}
+	}
+}
+
 // Action ACTIVATE: transition from QSO_INACTIVE to QSO_PENDING
 void qso_manager::qso_group::action_activate() {
 	if (logging_state_ != QSO_INACTIVE || current_qso_ != nullptr) {
@@ -2393,7 +2414,6 @@ void qso_manager::qso_group::action_save() {
 
 	// Upload QSO to QSL servers
 	book_->upload_qso(current_rec_num_);
-	// Update this view
 	current_qso_ = nullptr;
 	logging_state_ = QSO_INACTIVE;
 	enable_widgets();
@@ -2401,7 +2421,6 @@ void qso_manager::qso_group::action_save() {
 	// If new or changed then update the fact and let every one know
 	book_->modified(true);
 	book_->selection(item_number, HT_INSERTED);
-
 	book_->enable_save(old_save_enabled);
 }
 
@@ -2419,6 +2438,7 @@ void qso_manager::qso_group::action_cancel() {
 	delete current_qso_;
 	current_qso_ = nullptr;
 	logging_state_ = QSO_INACTIVE;
+	check_qth_changed();
 	enable_widgets();
 }
 

@@ -281,6 +281,8 @@ namespace zzalog {
 			void action_cancel_edit();
 			// Get default copy record
 			record* get_default_record();
+			// QTH has changed
+			void check_qth_changed();
 
 			// Logging mode
 			logging_mode_t logging_mode_;
@@ -327,6 +329,10 @@ namespace zzalog {
 				"MY_RIG", "MY_ANTENNA", "APP_ZZA_QTH", "STATION_CALLSIGN",
 				"QSO_DATE", "TIME_ON", "CALL", "FREQ", 
 				"MODE", "TX_PWR" };
+
+			// Previous value
+			string previous_qth_;
+			string previous_locator_;
 
 			// Widgets
 			// Activate - go to QSO_PENDING state

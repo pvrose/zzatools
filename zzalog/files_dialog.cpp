@@ -115,9 +115,6 @@ void files_dialog::load_values() {
 	Fl_Preferences backup_settings(settings_, "Backup");
 	Fl_Preferences status_settings(settings_, "Status");
 	Fl_Preferences clublog_settings(qsl_settings, "ClubLog");
-	Fl_Preferences qsld_settings(settings_, "QSL Design");
-	station_callsign_ = qso_manager_->get_default(qso_manager::CALLSIGN);
-	Fl_Preferences call_settings(qsld_settings, station_callsign_.c_str());
 
 	// TQSL Executable
 	lotw_settings.get("Enable", (int&)enable_tqsl_, false);
@@ -179,11 +176,6 @@ void files_dialog::load_values() {
 	unzip_switches_ = temp_string;
 	free(temp_string);
 
-	// Callsign for QSL template
-	// QSL Template
-	call_settings.get("Filename", temp_string, "");
-	qsl_template_ = temp_string;
-	free(temp_string);
 
 }
 
@@ -536,19 +528,26 @@ void files_dialog::create_form(int X, int Y) {
 
 	grp_unzip->end();
 
-	string qsl_label = "QSL Template: - " + station_callsign_;
-	Fl_Group* grp_qsld = new Fl_Group(X + XGRP, Y + GRP9, XMAX, HGRP9);
-	grp_qsld->copy_label(qsl_label.c_str());
+	Fl_Group* grp_qsld = new Fl_Group(X + XGRP, Y + GRP9, XMAX, HGRP9, "QSL Template: - ");
 	grp_qsld->labelsize(FONT_SIZE);
 	grp_qsld->box(FL_THIN_DOWN_BOX);
 	grp_qsld->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
+
+	field_input* ch_callsign = new field_input(grp_qsld->x() + WLABEL * 2, grp_qsld->y(), WSMEDIT, HBUTTON);
+	ch_callsign->value(station_callsign_.c_str());
+	ch_callsign->callback(cb_value<field_input, string>, &station_callsign_);
+	ch_callsign->field_name("STATION_CALLSIGN");
+	ch_callsign->tooltip("Select the callsign to change QSL template parameters for");
+
 	// Input - QSL Template file name
 	intl_input* in_qsl_template = new intl_input(X + COL2, Y + ROW9_1, WEDIT + GAP + WBUTTON + GAP + WBUTTON, HTEXT);
 	in_qsl_template->callback(cb_value<intl_input, string>, &qsl_template_);
 	in_qsl_template->when(FL_WHEN_CHANGED);
 	in_qsl_template->textsize(FONT_SIZE);
 	in_qsl_template->value(qsl_template_.c_str());
-	in_qsl_template->tooltip("Location of WSJT-X directory");
+	in_qsl_template->tooltip("Location of QSL Template file");
+	ip_qsl_template_ = in_qsl_template;
+
 	// Button - opens file browser
 	Fl_Button* bn_browse_qsld = new Fl_Button(X + COL5, Y + ROW9_1, WBUTTON, HBUTTON, "Browse");
 	bn_browse_qsld->align(FL_ALIGN_INSIDE);
@@ -570,6 +569,8 @@ void files_dialog::create_form(int X, int Y) {
 
 
 	Fl_Group::end();
+
+	enable_widgets();
 
 }
 
@@ -602,8 +603,6 @@ void files_dialog::save_values() {
 	Fl_Preferences status_settings(settings_, "Status");
 	Fl_Preferences clublog_settings(qsl_settings, "ClubLog");
 	Fl_Preferences qsld_settings(settings_, "QSL Design");
-//	Fl_Preferences stations_settings(settings_, "Stations");
-//	Fl_Preferences calls_settings(stations_settings, "Callsigns");
 	Fl_Preferences call_settings(qsld_settings, station_callsign_.c_str());
 
 	// TQSL Executable
@@ -655,7 +654,18 @@ void files_dialog::save_values() {
 
 // Method provided as needed to overload the page_dialog version
 void files_dialog::enable_widgets() {
-	// does nothing
+	Fl_Preferences qsld_settings(settings_, "QSL Design");
+	station_callsign_ = qso_manager_->get_default(qso_manager::CALLSIGN);
+	Fl_Preferences call_settings(qsld_settings, station_callsign_.c_str());
+
+	// Callsign for QSL template
+	// QSL Template
+	char* temp_string;
+	call_settings.get("Filename", temp_string, "");
+	qsl_template_ = temp_string;
+	((intl_input*)ip_qsl_template_)->value(temp_string);
+	free(temp_string);
+
 }
 
 // Special version of cb_value callback that also sets auto_changed_
@@ -671,5 +681,12 @@ void files_dialog::cb_bn_qslt(Fl_Widget* w, void* v) {
 	files_dialog* that = ancestor_view<files_dialog>(w);
 	int target_x = main_window_->x_root() + that->bn_params_->x();
 	int target_y = main_window_->y_root() + that->bn_params_->y();
-	qsl_design* dialog = new qsl_design(target_x, target_y, 0, 0, "QSL Label Parameters");
+	qsl_design* dialog = new qsl_design(target_x, target_y, 0, 0, that->station_callsign_.c_str());
+}
+
+// Callback for changing callsign
+void files_dialog::cb_ch_callsign(Fl_Widget* w, void* v) {
+	files_dialog* that = ancestor_view<files_dialog>(w);
+	cb_value<field_input, string>(w, v);
+	that->enable_widgets();
 }

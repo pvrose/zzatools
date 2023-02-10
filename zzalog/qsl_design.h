@@ -14,7 +14,7 @@ namespace zzalog {
 	{
 
 	public:
-		qsl_design(int X, int Y, int W, int H, const char* label);
+		qsl_design(int X, int Y, int W, int H, const char* callsign);
 		~qsl_design();
 
 	protected:
@@ -53,6 +53,8 @@ namespace zzalog {
 		double row_top_;
 		// Number of QSOs per card
 		int number_qsos_;
+		// Callsign to read parameters
+		string callsign_;
 
 	};
 

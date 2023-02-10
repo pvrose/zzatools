@@ -24,6 +24,10 @@ extern qso_manager* qso_manager_;
 qsl_design::qsl_design(int X, int Y, int W, int H, const char* label) :
 	Fl_Window(X, Y, W, H, label)
 {
+	callsign_ = label;
+	string new_label = "QSL Design parameters: " + callsign_;
+	copy_label(new_label.c_str());
+
 	load_values();
 	create_form(0, 0);
 }
@@ -32,13 +36,11 @@ qsl_design::qsl_design(int X, int Y, int W, int H, const char* label) :
 qsl_design::~qsl_design() {
 }
 
+
 // Load the current design from the settings
 void qsl_design::load_values() {
 	Fl_Preferences qsl_settings(settings_, "QSL Design");
-	string callsign = qso_manager_->get_default(qso_manager::CALLSIGN);
-	Fl_Preferences call_settings(qsl_settings, callsign.c_str());
-	string new_label = string(label()) + ": " + callsign;
-	copy_label(new_label.c_str());
+	Fl_Preferences call_settings(qsl_settings, callsign_.c_str());
 		
 	call_settings.get("Unit", (int&)unit_, (int)qsl_form::MILLIMETER);
 	call_settings.get("Width", width_, 99.1);

@@ -3,6 +3,7 @@
 
 #include "../zzalib/page_dialog.h"
 #include "intl_widgets.h"
+#include "field_choice.h"
 
 #include <string>
 
@@ -33,6 +34,8 @@ namespace zzalog {
 		static void cb_value_auto(Fl_Widget* w, void* v);
 		// Callback to displat QSL label dimensions dialog
 		static void cb_bn_qslt(Fl_Widget* w, void* v);
+		// Callback for callsign choice
+		static void cb_ch_callsign(Fl_Widget* w, void* v);
 		// Load the settings data
 		virtual void load_values();
 		// create the form
@@ -108,6 +111,9 @@ namespace zzalog {
 
 		// QSL Params widget
 		Fl_Widget* bn_params_;
+		// Callsign choice widget
+		Fl_Widget* ip_qsl_template_;
+
 
 
 	};
