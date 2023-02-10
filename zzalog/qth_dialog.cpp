@@ -362,7 +362,8 @@ void qth_dialog::save_values() {
 void qth_dialog::enable_widgets() {
 	ip_name_->value(current_qth_.name.c_str());
 	ip_address1_->value(current_qth_.street.c_str());
-	ip_address3_->value(current_qth_.postcode.c_str());
+	ip_address3_->value(current_qth_.city.c_str());
+	ip_address4_->value(current_qth_.postcode.c_str());
 	ip_locator_->value(current_qth_.locator.c_str());
 	ip_dxcc_->value(current_qth_.dxcc_name.c_str());
 	ip_dxcc_adif_->value(current_qth_.dxcc_id.c_str());
