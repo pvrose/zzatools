@@ -176,6 +176,14 @@ void files_dialog::load_values() {
 	unzip_switches_ = temp_string;
 	free(temp_string);
 
+	Fl_Preferences call_settings(qsl_settings, station_callsign_.c_str());
+
+	// Callsign for QSL template
+	station_callsign_ = qso_manager_->get_default(qso_manager::CALLSIGN);
+	// QSL Template
+	call_settings.get("Filename", temp_string, "");
+	qsl_template_ = temp_string;
+	free(temp_string);
 
 }
 
@@ -533,29 +541,29 @@ void files_dialog::create_form(int X, int Y) {
 	grp_qsld->box(FL_THIN_DOWN_BOX);
 	grp_qsld->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 
-	field_input* ch_callsign = new field_input(grp_qsld->x() + WLABEL * 2, grp_qsld->y(), WSMEDIT, HBUTTON);
-	ch_callsign->value(station_callsign_.c_str());
-	ch_callsign->callback(cb_value<field_input, string>, &station_callsign_);
-	ch_callsign->field_name("STATION_CALLSIGN");
-	ch_callsign->tooltip("Select the callsign to change QSL template parameters for");
+	ch_callsign_ = new field_input(grp_qsld->x() + WLABEL * 2, grp_qsld->y(), WSMEDIT, HBUTTON);
+	ch_callsign_->value(station_callsign_.c_str());
+	ch_callsign_->callback(cb_ch_callsign, &station_callsign_);
+	ch_callsign_->field_name("STATION_CALLSIGN");
+	ch_callsign_->tooltip("Select the callsign to change QSL template parameters for");
 
 	// Input - QSL Template file name
-	intl_input* in_qsl_template = new intl_input(X + COL2, Y + ROW9_1, WEDIT + GAP + WBUTTON + GAP + WBUTTON, HTEXT);
-	in_qsl_template->callback(cb_value<intl_input, string>, &qsl_template_);
-	in_qsl_template->when(FL_WHEN_CHANGED);
-	in_qsl_template->textsize(FONT_SIZE);
-	in_qsl_template->value(qsl_template_.c_str());
-	in_qsl_template->tooltip("Location of QSL Template file");
-	ip_qsl_template_ = in_qsl_template;
+	ip_qsl_template_ = new intl_input(X + COL2, Y + ROW9_1, WEDIT + GAP + WBUTTON + GAP + WBUTTON, HTEXT);
+	ip_qsl_template_->callback(cb_value<intl_input, string>, &qsl_template_);
+	ip_qsl_template_->when(FL_WHEN_CHANGED);
+	ip_qsl_template_->textsize(FONT_SIZE);
+	ip_qsl_template_->value(qsl_template_.c_str());
+	ip_qsl_template_->tooltip("Location of QSL Template file");
 
 	// Button - opens file browser
 	Fl_Button* bn_browse_qsld = new Fl_Button(X + COL5, Y + ROW9_1, WBUTTON, HBUTTON, "Browse");
 	bn_browse_qsld->align(FL_ALIGN_INSIDE);
-	template_data_ = { "Please enter the QSL Template", "HTML\t*.{htm,html}", &qsl_template_, nullptr, in_qsl_template, nullptr };
+	template_data_ = { "Please enter the QSL Template", "HTML\t*.{htm,html}", &qsl_template_, nullptr, ip_qsl_template_, nullptr };
 	bn_browse_qsld->callback(cb_bn_browsefile, &template_data_);
 	bn_browse_qsld->when(FL_WHEN_RELEASE);
 	bn_browse_qsld->labelsize(FONT_SIZE);
 	bn_browse_qsld->tooltip("Opens a file browser to locate the QSL template file");
+
 	// Button - open dimansions dialog
 	Fl_Button* bn_qsl_dim = new Fl_Button(X + COL6, Y + ROW9_1, WBUTTON, HBUTTON, "Params");
 	bn_qsl_dim->align(FL_ALIGN_INSIDE);
@@ -655,10 +663,10 @@ void files_dialog::save_values() {
 // Method provided as needed to overload the page_dialog version
 void files_dialog::enable_widgets() {
 	Fl_Preferences qsld_settings(settings_, "QSL Design");
-	station_callsign_ = qso_manager_->get_default(qso_manager::CALLSIGN);
 	Fl_Preferences call_settings(qsld_settings, station_callsign_.c_str());
 
 	// Callsign for QSL template
+	ch_callsign_->value(station_callsign_.c_str());
 	// QSL Template
 	char* temp_string;
 	call_settings.get("Filename", temp_string, "");

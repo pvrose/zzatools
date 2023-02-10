@@ -111,8 +111,10 @@ namespace zzalog {
 
 		// QSL Params widget
 		Fl_Widget* bn_params_;
-		// Callsign choice widget
-		Fl_Widget* ip_qsl_template_;
+		// Callsign choice
+		field_input* ch_callsign_;
+		// QSL template filename
+		intl_input* ip_qsl_template_;
 
 
 

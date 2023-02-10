@@ -211,17 +211,17 @@ void dxa_if::create_form() {
 	// now create the groups
 
 	// Group 1 - DxAtlas controls
-	Fl_Group* group1 = new Fl_Group(EDGE, EDGE, 10, 10);
+	Fl_Group* group1 = new Fl_Group(EDGE, EDGE, 10, 10, "Display");
 	group1->box(FL_THIN_DOWN_BOX);
-	group1->labelfont(FONT);
-	group1->labelsize(FONT_SIZE);
+	group1->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
+
+	int curr_x = group1->x() + GAP;
+	int curr_y = group1->y() + HTEXT + FL_NORMAL_SIZE;
+	int save_y = curr_y;
+
 	// Choice - which QSOs to display
-	Fl_Choice* ch11 = new Fl_Choice(group1->x() + GAP, group1->y() + HTEXT, WSMEDIT, HTEXT, "QSOs showing");
+	Fl_Choice* ch11 = new Fl_Choice(curr_x, curr_y, WSMEDIT, HTEXT, "QSOs showing");
 	ch11->align(FL_ALIGN_LEFT | FL_ALIGN_TOP);
-	ch11->labelfont(FONT);
-	ch11->labelsize(FONT_SIZE);
-	ch11->textfont(FONT);
-	ch11->textsize(FONT_SIZE);
 	ch11->callback(cb_ch_qsos, &qso_display_);
 	ch11->when(FL_WHEN_RELEASE);
 	ch11->clear();
@@ -236,13 +236,11 @@ void dxa_if::create_form() {
 	ch11->value((int)qso_display_);
 	ch11->tooltip("Select which QSOs to display");
 	qso_count_ = ch11;
+	curr_y += ch11->h();
+
 	// Choice - QSL Status
-	Fl_Choice* ch11a = new Fl_Choice(ch11->x(), ch11->y() + ch11->h(), ch11->w(), HTEXT);
+	Fl_Choice* ch11a = new Fl_Choice(curr_x, curr_y, WSMEDIT, HTEXT);
 	ch11a->align(FL_ALIGN_LEFT | FL_ALIGN_TOP);
-	ch11a->labelfont(FONT);
-	ch11a->labelsize(FONT_SIZE);
-	ch11a->textfont(FONT);
-	ch11a->textsize(FONT_SIZE);
 	ch11a->callback(cb_ch_qsos, &qsl_status_);
 	ch11a->when(FL_WHEN_RELEASE);
 	ch11a->clear();
@@ -251,31 +249,34 @@ void dxa_if::create_form() {
 	ch11a->add("Confirmed for eQSL.cc");
 	ch11a->value((int)qsl_status_);
 	ch11a->tooltip("Select QSL Status to filter above selection");
+	curr_y += ch11a->h();
 
 	// Input - Number of days or QSOs
-	Fl_Int_Input* ip11 = new Fl_Int_Input(ch11a->x(), ch11a->y() + ch11a->h(), ch11a->w(), HTEXT);
-	ip11->textfont(FONT);
-	ip11->textsize(FONT_SIZE);
+	Fl_Int_Input* ip11 = new Fl_Int_Input(curr_x, curr_y, WSMEDIT, HTEXT);
 	ip11->callback(cb_ip_number);
 	ip11->when(FL_WHEN_ENTER_KEY);
 	ip11->value(to_string(most_recent_count_).c_str());
 	ip11->tooltip("Enter the number of QSOs or days");
 	most_recent_ip_ = ip11;
+	curr_y += ip11->h();
+
 	// Check button - display SWLs
-	Fl_Check_Button* bn11 = new Fl_Check_Button(ch11->x(), ip11->y() + ip11->h(), WRADIO, HRADIO, "Include SWLs");
-	bn11->labelfont(FONT);
-	bn11->labelsize(FONT_SIZE);
+	Fl_Check_Button* bn11 = new Fl_Check_Button(curr_x, curr_y, WRADIO, HRADIO, "Include SWLs");
 	bn11->align(FL_ALIGN_RIGHT);
 	bn11->callback(cb_ch_swlen);
 	bn11->when(FL_WHEN_RELEASE);
 	bn11->tooltip("Include SWLs in display");
+	curr_x += ch11a->w() + GAP;
+	curr_y += bn11->h();
+
+	// Move to second column
+	int max_y = curr_y;
+	curr_y = save_y;
+	int save_x = curr_x;
+
 	// Choice - What to colour by
-	Fl_Choice* ch12 = new Fl_Choice(ch11->x() + ch11->w() + GAP, ch11->y(), ch11->w(), ch11->h(), "Colour pins by");
+	Fl_Choice* ch12 = new Fl_Choice(curr_x, curr_y, WSMEDIT, HTEXT, "Colour pins by");
 	ch12->align(FL_ALIGN_LEFT | FL_ALIGN_TOP);
-	ch12->labelfont(FONT);
-	ch12->labelsize(FONT_SIZE);
-	ch12->textfont(FONT);
-	ch12->textsize(FONT_SIZE);
 	ch12->callback(cb_ch_colour);
 	ch12->clear();
 	ch12->add("All black");
@@ -285,13 +286,11 @@ void dxa_if::create_form() {
 	ch12->add("By distance");
 	ch12->add("By date");
 	ch12->value((int)atlas_colour_);
+	curr_y += ch12->h() + HTEXT;
+
 	// Choice - where to centre the map
-	Fl_Choice* ch13 = new Fl_Choice(ch12->x(), ch12->y() + ch12->h() + HTEXT, ch12->w(), ch12->h(), "Centre on...");
+	Fl_Choice* ch13 = new Fl_Choice(curr_x, curr_y, WSMEDIT, HTEXT, "Centre on...");
 	ch13->align(FL_ALIGN_LEFT | FL_ALIGN_TOP);
-	ch13->labelfont(FONT);
-	ch13->labelsize(FONT_SIZE);
-	ch13->textfont(FONT);
-	ch13->textsize(FONT_SIZE);
 	ch13->callback(cb_ch_centre);
 	ch13->clear();
 	// NB: The following are in the same order as enum centre_t
@@ -311,121 +310,136 @@ void dxa_if::create_form() {
 	ch13->add("Continent/Antarctica");
 	ch13->value((int)centre_mode_);
 	centre_ch_ = ch13;
+
+	curr_x += ch12->w();
+	int max_x = curr_x;
+
+	curr_x = group1->x() + GAP;
+	curr_y += ch13->h();
+	max_y = max(max_y, curr_y);
+	curr_y = max_y + GAP;
+#
 	// Slider - pin size
-	Fl_Slider* sl10 = new Fl_Slider(ch11->x(), max(bn11->y() + bn11->h(), ch13->y() + ch13->h()) + GAP, ch11->w() - HBUTTON, HBUTTON, "Pin size");
+	Fl_Slider* sl10 = new Fl_Slider(curr_x, curr_y, WSMEDIT - HBUTTON, HBUTTON, "Pin size");
 	sl10->type(FL_HORIZONTAL);
-	sl10->labelfont(FONT);
-	sl10->labelsize(FONT_SIZE);
 	sl10->align(FL_ALIGN_LEFT | FL_ALIGN_TOP);
 	sl10->callback(cb_sl_pinsize, &pin_size_);
 	sl10->when(FL_WHEN_RELEASE);
 	sl10->range(3.0, HBUTTON / 2);
 	sl10->step(1);
 	sl10->value(pin_size_);
+	curr_x += sl10->w();
+
 	// Pinsize display
-	pz_widget* pz11 = new pz_widget(sl10->x() + sl10->w(), sl10->y(), HBUTTON, HBUTTON);
+	pz_widget* pz11 = new pz_widget(curr_x, curr_y, HBUTTON, HBUTTON);
 	pz11->value(pin_size_);
-	pz11->labelfont(FONT);
-	pz11->labelsize(FONT_SIZE);
 	pz11->copy_label(to_string(pin_size_).c_str());
 	pz11->color(FL_WHITE);
 	pz11->align(FL_ALIGN_TOP);
 	pz_w_ = pz11;
+	curr_x = save_x;
 
 	// Button - Start or stop
-	Fl_Button* bn12 = new Fl_Button(ch12->x(), ch13->y() + ch13->h() + GAP, WBUTTON, HBUTTON, "Start");
-	bn12->labelfont(FONT);
-	bn12->labelsize(FONT_SIZE);
+	Fl_Button* bn12 = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Start");
 	bn12->callback(cb_bn_start_stop);
 	bn12->color(FL_GREEN);
 	bn12->tooltip("Start or Stop current DxAtlas session");
 	start_stop_bn_ = bn12;
+	curr_x += bn12->w();
+
 	// Button - Recentre
-	Fl_Button* bn13 = new Fl_Button(bn12->x() + bn12->w(), bn12->y(), WBUTTON, HBUTTON, "Re-centre");
+	Fl_Button* bn13 = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Re-centre");
 	bn13->labelfont(FONT);
 	bn13->labelsize(FONT_SIZE);
 	bn13->callback(cb_bn_centre);
 	bn13->color(FL_YELLOW);
 	bn13->tooltip("Recentre the DxAtlas window");
-
-	int next_y = max(sl10->y() + sl10->h(), bn12->y() + bn12->h()) + HTEXT;
-
-	const int  HLOC = FL_NORMAL_SIZE + 2;
-	// Output - Home location name
-	Fl_Output* op20 = new Fl_Output(ch11->x() + WLABEL, next_y, WSMEDIT, HLOC, "Location");
-	op20->align(FL_ALIGN_LEFT);
-	op20->value(location_name_.c_str());
-	op20->box(FL_FLAT_BOX);
-	op20->color(group1->color());
-	op20->tooltip("The name of the current location as recorded in the log");
-	home_loc_op_ = op20;
-	next_y += HLOC;
-
-	// Output - the locator grid square for the selected location
-	Fl_Output* op21 = new Fl_Output(op20->x(), next_y, WSMEDIT, HLOC, "Locator");
-	op21->align(FL_ALIGN_LEFT);
-	op21->value(locator_.c_str());
-	op21->box(FL_FLAT_BOX);
-	op21->color(group1->color());
-	op21->tooltip("The grid-square of the current home location");
-	locator_op_ = op21;
-	next_y += HLOC;
-
-	// Output - the latitude of the location
-	Fl_Output* op22 = new Fl_Output(op21->x(), next_y, WSMEDIT, HLOC, "Latitude");
-	op22->align(FL_ALIGN_LEFT);
-	op22->value(home_lat_dms_.c_str());
-	op22->box(FL_FLAT_BOX);
-	op22->color(group1->color());
-	op22->tooltip("The latitude of the current home location");
-	lat_dms_op_ = op22;
-	next_y += HLOC;
-
-	// Output - the longitude of the location
-	Fl_Output* op23 = new Fl_Output(op22->x(), next_y, WSMEDIT, HLOC, "Longitude");
-	op23->align(FL_ALIGN_LEFT);
-	op23->value(home_long_dms_.c_str());
-	op23->box(FL_FLAT_BOX);
-	op23->color(group1->color());
-	op23->tooltip("The longitude of the current home location");
-	lon_dms_op_ = op23;
-
-	update_location();
+	curr_x += bn13->w();
+	curr_y += HBUTTON + GAP;
 
 	// Resize group by size of choices
-	const int WGRP_1 = ch12->x() + ch12->w() + GAP;
-	const int HGRP_1 = max(op21->y() + op21->h(), op23->y() + op23->h()) + GAP;
+	const int WGRP_1 = max(max_x, curr_x) - group1->x() + GAP;
+	const int HGRP_1 = curr_y - group1->y();
 	group1->resizable(nullptr);
 	group1->size(WGRP_1, HGRP_1);
 	group1->end();
 	// Size of window
 	const int WWIN = EDGE + WGRP_1 + EDGE;
 
+
+	curr_y = group1->y() + group1->h();
+
+	Fl_Group* loc_grp = new Fl_Group(x() + GAP, curr_y, 10, 10, "Home Location");
+	loc_grp->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
+	loc_grp->box(FL_THIN_DOWN_BOX);
+
+	curr_x = loc_grp->x() + GAP + WLABEL;
+	curr_y = loc_grp->y() + HTEXT;
+
+	const int  HLOC = FL_NORMAL_SIZE + 2;
+	// Output - Home location name
+	Fl_Output* op20 = new Fl_Output(curr_x, curr_y, WSMEDIT, HLOC, "Name");
+	op20->align(FL_ALIGN_LEFT);
+	op20->value(location_name_.c_str());
+	op20->box(FL_FLAT_BOX);
+	op20->color(group1->color());
+	op20->tooltip("The name of the current location as recorded in the log");
+	home_loc_op_ = op20;
+	curr_y += HLOC;
+
+	// Output - the locator grid square for the selected location
+	Fl_Output* op21 = new Fl_Output(curr_x, curr_y, WSMEDIT, HLOC, "Locator");
+	op21->align(FL_ALIGN_LEFT);
+	op21->value(locator_.c_str());
+	op21->box(FL_FLAT_BOX);
+	op21->color(group1->color());
+	op21->tooltip("The grid-square of the current home location");
+	locator_op_ = op21;
+	curr_y += HLOC;
+
+	// Output - the latitude of the location
+	Fl_Output* op22 = new Fl_Output(curr_x, curr_y, WSMEDIT, HLOC, "Latitude");
+	op22->align(FL_ALIGN_LEFT);
+	op22->value(home_lat_dms_.c_str());
+	op22->box(FL_FLAT_BOX);
+	op22->color(group1->color());
+	op22->tooltip("The latitude of the current home location");
+	lat_dms_op_ = op22;
+	curr_y += HLOC;
+
+	// Output - the longitude of the location
+	Fl_Output* op23 = new Fl_Output(curr_x, curr_y, WSMEDIT, HLOC, "Longitude");
+	op23->align(FL_ALIGN_LEFT);
+	op23->value(home_long_dms_.c_str());
+	op23->box(FL_FLAT_BOX);
+	op23->color(group1->color());
+	op23->tooltip("The longitude of the current home location");
+	lon_dms_op_ = op23;
+	curr_y += HLOC + GAP;
+
+	loc_grp->resizable(nullptr);
+	loc_grp->size(WGRP_1, curr_y - loc_grp->y());
+
+	update_location();
+	loc_grp->end();
+
 	// Group to contain the buttons displaying the colours
-	colour_grp_ = new Fl_Group(EDGE, HGRP_1 + GAP, WGRP_1, HTEXT);
+	colour_grp_ = new Fl_Group(EDGE, curr_y, WGRP_1, HTEXT);
 	label_colour_grp();
 	colour_grp_->box(FL_THIN_DOWN_BOX);
-	colour_grp_->labelfont(FONT);
-	colour_grp_->labelsize(FONT_SIZE);
 	colour_grp_->align(FL_ALIGN_TOP | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
 
 	Fl_Light_Button* bn_colour_all = new Fl_Light_Button(EDGE + GAP + WBUTTON, colour_grp_->y() + HTEXT, WBUTTON, HBUTTON, "All colours");
-	bn_colour_all->labelfont(FONT);
-	bn_colour_all->labelsize(FONT_SIZE);
 	bn_colour_all->align(FL_ALIGN_CENTER);
 	bn_colour_all->callback(cb_colour_all, &display_all_colours_);
 	bn_colour_all->selection_color(FL_RED);
 	bn_colour_all->value(display_all_colours_);
 	
 	Fl_Button* bn_set_all = new Fl_Button(EDGE + GAP+ WBUTTON + WBUTTON, colour_grp_->y() + HTEXT, WBUTTON, HBUTTON, "Set all");
-	bn_set_all->labelfont(FONT);
-	bn_set_all->labelsize(FONT_SIZE);
 	bn_set_all->align(FL_ALIGN_CENTER);
 	bn_set_all->callback(cb_bn_all, (void*)true);
 
 	Fl_Button* bn_clr_all = new Fl_Button(bn_set_all->x() + bn_set_all->w() , bn_set_all->y(), WBUTTON, HBUTTON, "Clear all");
-	bn_clr_all->labelfont(FONT);
-	bn_clr_all->labelsize(FONT_SIZE);
 	bn_clr_all->align(FL_ALIGN_CENTER);
 	bn_clr_all->callback(cb_bn_all, (void*)false);
 
