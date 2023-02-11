@@ -81,6 +81,10 @@ string PROGRAM_VERSION = VERSION + " (Debug " + TIMESTAMP + ")";
 string PROGRAM_VERSION = VERSION;
 #endif
 string VENDOR = "GM3ZZA";
+// Allow hamlib debug level to be set by -D
+#ifndef HAMLIB_DEGUG_LEVEL
+#define HAMLIB_DEBUG_LEVEL RIG_DEBUG_ERR
+#endif
 
 // Global data items instanced in zzalib
 extern rig_if* rig_if_;
@@ -850,7 +854,7 @@ int main(int argc, char** argv)
 	Fl::check();
 	// Connect to the rig - load all hamlib backends once only here
 	rig_if_ = nullptr;
-	rig_set_debug(RIG_DEBUG_CACHE);
+	rig_set_debug(HAMLIB_DEBUG_LEVEL);
 	rig_load_all_backends();
 	add_rig_if();
 	// Add qso_manager

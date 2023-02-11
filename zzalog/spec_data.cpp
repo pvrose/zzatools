@@ -892,6 +892,11 @@ bool spec_data::add_user_macro(string field, string value, macro_defn macro) {
 	macro_defn* defn;
 	if (this_map->find(value) == this_map->end()) {
 		// A new macro definition - create it and add to the macro set
+		char message[128];
+		snprintf(message, 128, "ADIF SPEC: Macro %s(%s) being created",
+			field.c_str(),
+			value.c_str());
+		status_->misc_status(ST_NOTE, message);
 		defn = new macro_defn;
 		defn->fields = new record;
 		(*this_map)[value] = defn;
@@ -899,35 +904,37 @@ bool spec_data::add_user_macro(string field, string value, macro_defn macro) {
 	else {
 		defn = this_map->at(value);
 	}
-	// Copy all the new fields being defined
-	for (auto it = macro.fields->begin(); it != macro.fields->end(); it++) {
-		string def_field = (*it).first;
-		if (defn->fields->item_exists(def_field)) {
-			if (defn->fields->item(def_field) != (*it).second) {
-				char message[128];
-				snprintf(message, 128, "ADIF SPEC: Macro %s(%s) already had field %s defined old = %s, new = %s",
-					field.c_str(),
-					value.c_str(),
-					def_field.c_str(),
-					defn->fields->item(def_field).c_str(),
-					(*it).second.c_str());
-				status_->misc_status(ST_WARNING, message);
-				macro_changes_.insert(def_field);
+	// Copy all the new fields being defined - skip if supplied fields is a nullptr
+	if (macro.fields) {
+		for (auto it = macro.fields->begin(); it != macro.fields->end(); it++) {
+			string def_field = (*it).first;
+			if (defn->fields->item_exists(def_field)) {
+				if (defn->fields->item(def_field) != (*it).second) {
+					char message[128];
+					snprintf(message, 128, "ADIF SPEC: Macro %s(%s) already had field %s defined old = %s, new = %s",
+						field.c_str(),
+						value.c_str(),
+						def_field.c_str(),
+						defn->fields->item(def_field).c_str(),
+						(*it).second.c_str());
+					status_->misc_status(ST_WARNING, message);
+					macro_changes_.insert(def_field);
+				}
 			}
-		}
-		else {
-			if ((*it).second.length()) {
-				char message[128];
-				snprintf(message, 128, "ADIF SPEC: Macro %s(%s) defining field %s value %s",
-					field.c_str(),
-					value.c_str(),
-					def_field.c_str(),
-					(*it).second.c_str());
-				status_->misc_status(ST_NOTE, message);
-				macro_changes_.insert(def_field);
+			else {
+				if ((*it).second.length()) {
+					char message[128];
+					snprintf(message, 128, "ADIF SPEC: Macro %s(%s) defining field %s value %s",
+						field.c_str(),
+						value.c_str(),
+						def_field.c_str(),
+						(*it).second.c_str());
+					status_->misc_status(ST_NOTE, message);
+					macro_changes_.insert(def_field);
+				}
 			}
+			defn->fields->item((*it).first, (*it).second);
 		}
-		defn->fields->item((*it).first, (*it).second);
 	}
 
 	// now add records for each macro definition

@@ -1429,6 +1429,7 @@ void qso_manager::qso_group::create_form(int X, int Y) {
 		ip_field_[ix]->align(FL_ALIGN_LEFT);
 		ip_field_[ix]->tooltip("Enter required value to log");
 		ip_field_[ix]->callback(cb_ip_field, (void*)ix);
+		ip_field_[ix]->input()->when(FL_WHEN_ENTER_KEY);
 		if (ix < NUMBER_FIXED) {
 			ip_field_[ix]->field_name(fixed_names_[ix].c_str());
 			field_ips_[fixed_names_[ix]] = ip_field_[ix];
@@ -2104,6 +2105,11 @@ void qso_manager::qso_group::cb_ip_field(Fl_Widget* w, void* v) {
 		}
 	}
 	else if (field == "APP_ZZA_QTH") {
+		// Send new value to spec_data to create an empty entry if it's a new one
+		if (!ip->menubutton()->changed()) {
+			macro_defn entry = { nullptr, "" };
+			spec_data_->add_user_macro(field, value, entry);
+		}
 		that->check_qth_changed();
 	}
 	tabbed_forms_->update_views(nullptr, HT_MINOR_CHANGE, that->current_rec_num_);
