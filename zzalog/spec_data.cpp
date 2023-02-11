@@ -893,7 +893,7 @@ bool spec_data::add_user_macro(string field, string value, macro_defn macro) {
 	if (this_map->find(value) == this_map->end()) {
 		// A new macro definition - create it and add to the macro set
 		char message[128];
-		snprintf(message, 128, "ADIF SPEC: Macro %s(%s) being created",
+		snprintf(message, 128, "ADIF SPEC: Macro %s.%s being created",
 			field.c_str(),
 			value.c_str());
 		status_->misc_status(ST_NOTE, message);
@@ -911,7 +911,7 @@ bool spec_data::add_user_macro(string field, string value, macro_defn macro) {
 			if (defn->fields->item_exists(def_field)) {
 				if (defn->fields->item(def_field) != (*it).second) {
 					char message[128];
-					snprintf(message, 128, "ADIF SPEC: Macro %s(%s) already had field %s defined old = %s, new = %s",
+					snprintf(message, 128, "ADIF SPEC: Macro %s.%s already had field %s defined old = %s, new = %s",
 						field.c_str(),
 						value.c_str(),
 						def_field.c_str(),
@@ -924,7 +924,7 @@ bool spec_data::add_user_macro(string field, string value, macro_defn macro) {
 			else {
 				if ((*it).second.length()) {
 					char message[128];
-					snprintf(message, 128, "ADIF SPEC: Macro %s(%s) defining field %s value %s",
+					snprintf(message, 128, "ADIF SPEC: Macro %s.%s defining field %s value %s",
 						field.c_str(),
 						value.c_str(),
 						def_field.c_str(),

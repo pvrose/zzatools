@@ -354,6 +354,7 @@ void qth_dialog::save_values() {
 		qth_details_->item("MY_ITU_ZONE", current_qth_.itu_zone);
 		//qth_details_->item("MY_CONT", current_qth_.continent);
 		qth_details_->item("MY_IOTA", current_qth_.iota);
+		qth_details_->item("APP_ZZA_QTH_DESCR", current_qth_.description);
 		spec_data_->add_user_macro("APP_ZZA_QTH", qth_name_, { qth_details_, current_qth_.description });
 	}
 }
@@ -365,7 +366,13 @@ void qth_dialog::enable_widgets() {
 	ip_address3_->value(current_qth_.city.c_str());
 	ip_address4_->value(current_qth_.postcode.c_str());
 	ip_locator_->value(current_qth_.locator.c_str());
-	ip_dxcc_->value(current_qth_.dxcc_name.c_str());
+	if (current_qth_.dxcc_id.length() && current_qth_.dxcc_name.length()) {
+		prefix* pfx = pfx_data_->get_prefix(stoi(current_qth_.dxcc_id));
+		ip_dxcc_->value((pfx->nickname_ + ":" + current_qth_.dxcc_name).c_str());
+	}
+	else {
+		ip_dxcc_->value(current_qth_.dxcc_name.c_str());
+	}
 	ip_dxcc_adif_->value(current_qth_.dxcc_id.c_str());
 	ip_admin1_->value(current_qth_.state.c_str());
 	ip_admin2_->value(current_qth_.county.c_str());
@@ -391,9 +398,8 @@ void qth_dialog::cb_ip_cty(Fl_Widget* w, void* v) {
 	qth_info_t* qth = &that->current_qth_;
 	cb_value<Fl_Input, string>(w, v);
 	string* value = (string*)v;
-	// Find prefix - either GM or GM:SCOTLAND
+	// Find prefix (nickname) - either GM or GM:SCOTLAND
 	size_t pos = zzalib::find(value->c_str(), value->length(), ':');
-	// No colon found
 	string nickname = value->substr(0, pos);
 	// Get the prefix and track up to the DXCC prefix
 	prefix* prefix = pfx_data_->get_prefix(nickname);
@@ -446,7 +452,7 @@ void qth_dialog::cb_ip_cty(Fl_Widget* w, void* v) {
 		}
 		// Fill in DXCC fields
 		qth->dxcc_id = to_string(prefix->dxcc_code_);
-		qth->dxcc_name = prefix->nickname_ + ": " + prefix->name_;
+		qth->dxcc_name = prefix->name_;
 	}
 	else {
 		// Not a valid nickname - set fields to blurgh

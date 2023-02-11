@@ -286,7 +286,9 @@ bool book::load_data(string filename)
 					spec_data_->add_user_macro("APP_ZZA_QTH", (*mx).first, *((*mx).second));
 				}
 				tabbed_forms_->update_views(nullptr, HT_ALL, size() - 1);
-
+				// TODO: Review how to update spec_data that is dependent on read in values 
+				// do the following for now
+				tabbed_forms_->update_views(nullptr, HT_FORMAT, size() - 1);
 			}
 			else { // filename.length() == 0 (File->New)
 				main_window_label("[No file loaded]");
