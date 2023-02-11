@@ -287,9 +287,7 @@ menu::~menu()
 void menu::cb_mi_file_new(Fl_Widget* w, void* v) {
 	menu* that = ancestor_view<menu>(w);
 	// Gracefully stop any import in progress - restart with ON_AIR logging - if no rig will drop to OFF_AIR
-	if (qso_manager_->logging_mode() == qso_manager::LM_IMPORTED) {
-		import_data_->stop_update(qso_manager::LM_ON_AIR_CAT, false);
-	}
+	import_data_->stop_update(false);
 	while (!import_data_->update_complete()) Fl::wait();
 	if (book_->modified_record() || book_->new_record()) {
 		fl_beep(FL_BEEP_QUESTION);
@@ -325,7 +323,7 @@ void menu::cb_mi_file_new(Fl_Widget* w, void* v) {
 void menu::cb_mi_file_open(Fl_Widget* w, void* v) {
 	menu* that = ancestor_view<menu>(w);
 	// Stop any import occurring
-	import_data_->stop_update(qso_manager::LM_OFF_AIR, false);
+	import_data_->stop_update(false);
 	while (!import_data_->update_complete()) Fl::wait();
 
 	if (book_->modified()) {
@@ -392,7 +390,7 @@ void menu::cb_mi_file_open(Fl_Widget* w, void* v) {
 // File->Save
 // v is set to 0 to represent object_t = OT_MAIN
 void menu::cb_mi_file_save(Fl_Widget* w, void* v) {
-	import_data_->stop_update(qso_manager::LM_OFF_AIR, false);
+	import_data_->stop_update(false);
 	while (!import_data_->update_complete()) Fl::wait();
 	// Get the main book to store itself as long as it wasn't opened read-only
 	if (read_only_) {
@@ -433,7 +431,7 @@ void menu::cb_mi_file_saveas(Fl_Widget* w, void* v) {
 		ifstream* check = new ifstream(filename.c_str());
 		if (check->fail() || fl_choice("File exists, do you want to over-write", "OK", "No", nullptr) == 0) {
 			// Stop any current import
-			import_data_->stop_update(qso_manager::LM_OFF_AIR, false);
+			import_data_->stop_update(false);
 			while (!import_data_->update_complete()) Fl::wait();
 			// Get the book to save
 			book* b = nullptr;
@@ -464,7 +462,7 @@ void menu::cb_mi_file_saveas(Fl_Widget* w, void* v) {
 // v is not used
 void menu::cb_mi_file_close(Fl_Widget* w, void* v) {
 	// Gracefully stop import
-	import_data_->stop_update(qso_manager::LM_OFF_AIR, false);
+	import_data_->stop_update(false);
 	while (!import_data_->update_complete()) Fl::wait();
 	main_window_->do_callback();
 }
@@ -994,7 +992,7 @@ void menu::cb_mi_log_start(Fl_Widget* w, void* v) {
 // v defines subsequent load type (FILE_IMPORT or FILE_UPDATE
 void menu::cb_mi_imp_file(Fl_Widget* w, void* v) {
 	// Cancel any existing update
-	import_data_->stop_update(qso_manager::LM_OFF_AIR, false);
+	import_data_->stop_update(false);
 	while (!import_data_->update_complete()) Fl::wait();
 	// Get data directory
 	char* directory;

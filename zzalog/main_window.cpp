@@ -33,7 +33,7 @@ int main_window::handle(int event) {
 		stringstream adif;
 		adif.str(data);
 		// Stop any extant update and wait for it to complete
-		import_data_->stop_update(qso_manager::LM_OFF_AIR, false);
+		import_data_->stop_update(false);
 		while (!import_data_->update_complete()) Fl::wait();
 		import_data_->load_stream(adif, import_data::update_mode_t::DATAGRAM);
 		int num_records = import_data_->size();

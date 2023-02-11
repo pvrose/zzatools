@@ -46,7 +46,7 @@ namespace zzalog {
 			LM_ON_AIR_CAT,  // Real -time logging - data from radio
 			LM_ON_AIR_COPY, // Real-time logging - data from selected QSO
 			LM_ON_AIR_TIME, // Real-time logging - date/time only
-			LM_IMPORTED,    // Import from modem software (w/ or w/o radio)
+			//LM_IMPORTED,    // Import from modem software (w/ or w/o radio)
 		};
 
 		// A bit of a misnomer - but the category of settings

@@ -1258,7 +1258,6 @@ void qso_manager::qso_group::create_form(int X, int Y) {
 	ch_logmode_->add("Current date and time, data from CAT");
 	ch_logmode_->add("Current date and time, data from selected QSO");
 	ch_logmode_->add("Current date and time, no other data");
-	ch_logmode_->add("QSO set by external application");
 	ch_logmode_->value(logging_mode_);
 	ch_logmode_->callback(cb_logging_mode, &logging_mode_);
 	ch_logmode_->tooltip("Select the logging mode - i.e. how to initialise a new QSO record");
@@ -3810,7 +3809,6 @@ void qso_manager::update_rig() {
 	// Get present values data from rig
 	if (qso_group_->logging_state_ == QSO_PENDING) {
 		switch (qso_group_->logging_mode_) {
-		case LM_IMPORTED:
 		case LM_OFF_AIR:
 		case LM_ON_AIR_TIME:
 			// Do nothing

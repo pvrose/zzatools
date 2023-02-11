@@ -131,7 +131,6 @@ bool import_data::start_auto_update() {
 		}
 		// Start auto_update
 		auto_update();
-		if (qso_manager_) qso_manager_->logging_mode(qso_manager::LM_IMPORTED);
 	}
 	else {
 		// No files to update - tell calling routine to open rig again and also change flag in menu
@@ -514,7 +513,7 @@ void import_data::update_book() {
 }
 
 // Stop importing - about to do something else. Either immediately or gracefully complete
-void import_data::stop_update(qso_manager::logging_mode_t mode, bool immediate) {
+void import_data::stop_update(bool immediate) {
 	// Turn auto-import off
 	Fl::remove_timeout(cb_timer_imp);
 	// If immediately crashing - stop expecting further updates
@@ -528,7 +527,6 @@ void import_data::stop_update(qso_manager::logging_mode_t mode, bool immediate) 
 	case LOTW_UPDATE:
 	case DATAGRAM:
 		// Set gradual stopping - will stop when update currently in progress completes
-		next_logging_mode_ = mode;
 		close_pending_ = true;
 		// Go back to updating book
 		if (size()) update_book();
@@ -612,8 +610,6 @@ void import_data::finish_update(bool merged /*= true*/) {
 	}
 	// We are waiting to finish the update
 	if (close_pending_) {
-		// Change logging mode 
-		qso_manager_->logging_mode(next_logging_mode_);
 		// Stop timer
 		Fl::remove_timeout(cb_timer_imp);
 		// Delete the update files
@@ -764,7 +760,7 @@ bool import_data::download_data(import_data::update_mode_t server) {
 	stringstream adif;
 	bool result = true;
 	// Tidy up import book - complete any existing update
-	stop_update(qso_manager::LM_IMPORTED, false);
+	stop_update(false);
 	while (!update_complete()) Fl::wait();
 	switch (server) {
 	case EQSL_UPDATE: 

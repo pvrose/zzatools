@@ -62,7 +62,7 @@ namespace zzalog {
 		// Start or continue analysing the update data
 		void update_book();
 		// Stop importing
-		void stop_update(qso_manager::logging_mode_t, bool immediate);
+		void stop_update(bool immediate);
 		// is update complete
 		bool update_complete();
 		// download data from QSL server
@@ -134,8 +134,6 @@ namespace zzalog {
 		bool old_enable_save_;
 		// Last added record number
 		record_num_t last_added_number_;
-		// Next logging mode
-		qso_manager::logging_mode_t next_logging_mode_;
 
 	};
 

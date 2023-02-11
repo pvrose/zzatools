@@ -199,12 +199,12 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 				switch (fl_choice("There is an import in process. Do you want to let it finish or abandon it?", "Finish", "Abandon", nullptr)) {
 				case 0:
 					// Gracefully wait for import to complete
-					import_data_->stop_update(qso_manager::LM_OFF_AIR, false);
+					import_data_->stop_update(false);
 					while (!import_data_->update_complete()) Fl::wait();
 					break;
 				case 1:
 					// Immediately stop the import
-					import_data_->stop_update(qso_manager::LM_OFF_AIR, true);
+					import_data_->stop_update(true);
 					break;
 				}
 			}
@@ -506,8 +506,6 @@ void add_rig_if() {
 						rig_if_ = nullptr;
 						status_->misc_status(ST_ERROR, "RIG: No handler - assume real-time logging, no rig");
 						done = true;
-						// Change logging mode from IMPORTED to ON_AIR. otherwise leave as was
-						if (qso_manager_ && qso_manager_->logging_mode() == qso_manager::LM_IMPORTED) qso_manager_->logging_mode(qso_manager::LM_ON_AIR_COPY);
 					}
 					else {
 						// Connect to rig OK - see if we are a digital mode and if so start auto-import process
@@ -519,7 +517,6 @@ void add_rig_if() {
 							status_->misc_status(ST_WARNING, "RIG: Data mode - assume logging by data modem app");
 							// Change logging mode to IMPORTED as will be using a data-modem
 							done = true;
-							if (qso_manager_) qso_manager_->logging_mode(qso_manager::LM_IMPORTED);
 						}
 						// The first access to read the mode may fail
 						else if (!rig_if_->is_good()) {
@@ -537,8 +534,6 @@ void add_rig_if() {
 							// Put the error message from the rig in the rig status box
 							status_->rig_status(RS_ERROR, error_message.c_str());
 							done = true;
-							// Change logging mode from IMPORTED to ON_AIR. otherwise leave as was
-							if (qso_manager_ && qso_manager_->logging_mode() == qso_manager::LM_IMPORTED) qso_manager_->logging_mode(qso_manager::LM_ON_AIR_COPY);
 						}
 						else {
 							// Rig seems OK - timer will have been started by rig_if_->open()

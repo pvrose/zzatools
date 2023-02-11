@@ -155,7 +155,7 @@ int wsjtx_handler::handle_log(stringstream& ss) {
 	stringstream adif;
 	adif.str(utf8);
 	// Stop any extant update and wait for it to complete
-	import_data_->stop_update(qso_manager::LM_OFF_AIR, false);
+	import_data_->stop_update(false);
 	while (!import_data_->update_complete()) Fl::wait();
 	import_data_->load_stream(adif, import_data::update_mode_t::DATAGRAM);
 	// Wait for the import to finish
