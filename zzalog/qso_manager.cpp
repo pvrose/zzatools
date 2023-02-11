@@ -4036,23 +4036,7 @@ void qso_manager::update_import_qso(record* import_qso) {
 	string mode = import_qso->item("MODE");
 	string submode = import_qso->item("SUBMODE");
 	// If we have activated the QSO manager, then use active QSO as template
-	if (qso_group_->current_qso_) use_qso = qso_group_->current_qso_;
-	else {
-		// Otherwise look for the most recent QSO using the same mode
-		record_num_t record_num = book_->size() - 1;
-		use_qso = book_->get_record(record_num, false);
-		bool found = false;
-		while (use_qso && !found && record_num > 0) {
-			if (use_qso->item("MODE") == mode && use_qso->item("SUBMODE") == submode) {
-				found = true;
-			}
-			record_num--;
-		}
-		if (!found) {
-			// Fallback on selected QSO
-			use_qso = book_->get_record();
-		}
-	}
+	use_qso = qso_group_->get_default_record();
 	// If we have a QSO to copy from and one to copy to, copy these fields.
 	if (use_qso && import_qso) {
 		char message[128];
