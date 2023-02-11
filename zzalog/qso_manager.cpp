@@ -1511,12 +1511,50 @@ void qso_manager::qso_group::create_form(int X, int Y) {
 	bn_parse_->tooltip("Display the DX details for this callsign");
 
 	curr_x += bn_parse_->w() + GAP;
+	max_w = max(max_w, curr_x);
+
+	curr_x = left;
+	curr_y += HBUTTON;
 
 	bn_edit_qth_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Edit QTH");
 	bn_edit_qth_->callback(cb_bn_edit_qth);
 	bn_edit_qth_->tooltip("Edit the details of the QTH macro");
 
 	curr_x += bn_edit_qth_->w();
+
+	grp_nav_ = new Fl_Group(curr_x, curr_y, 10, HBUTTON, "Navigate");
+	grp_nav_->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
+
+	curr_x += WBUTTON;
+
+	const int WHALF = WBUTTON / 2;
+	bn_nav_f_ = new Fl_Button(curr_x, curr_y, WHALF, HBUTTON, "@$->|");
+	bn_nav_f_->callback(cb_bn_navigate, (void*)NV_FIRST);
+	bn_nav_f_->tooltip("Select first record in book");
+
+	curr_x += bn_nav_f_->w();
+
+	bn_nav_p_ = new Fl_Button(curr_x, curr_y, WHALF, HBUTTON, "@<-");
+	bn_nav_p_->callback(cb_bn_navigate, (void*)NV_PREV);
+	bn_nav_p_->tooltip("Select previous record in book");
+
+	curr_x += bn_nav_p_->w();
+
+	bn_nav_n_ = new Fl_Button(curr_x, curr_y, WHALF, HBUTTON, "@->");
+	bn_nav_n_->callback(cb_bn_navigate, (void*)NV_NEXT);
+	bn_nav_n_->tooltip("Select next record in book");
+
+	curr_x += bn_nav_n_->w();
+
+	bn_nav_l_ = new Fl_Button(curr_x, curr_y, WHALF, HBUTTON, "@->|");
+	bn_nav_l_->callback(cb_bn_navigate, (void*)NV_LAST);
+	bn_nav_l_->tooltip("Select last record in book");
+
+	curr_x += bn_nav_l_->w();
+
+	grp_nav_->resizable(nullptr);
+	grp_nav_->size(curr_x - grp_nav_->x(), grp_nav_->h());
+	grp_nav_->end();
 
 	max_w = max(max_w, curr_x);
 	curr_x = left;
@@ -1623,6 +1661,7 @@ void qso_manager::qso_group::enable_widgets() {
 		bn_cancel_->deactivate();
 		bn_edit_->activate();
 		bn_edit_qth_->deactivate();
+		grp_nav_->activate();
 		for (int ix = 0; ix < NUMBER_TOTAL; ix++) {
 			if (ch_field_[ix]) ch_field_[ix]->deactivate();
 			ip_field_[ix]->deactivate();
@@ -1636,6 +1675,7 @@ void qso_manager::qso_group::enable_widgets() {
 		bn_cancel_->activate();
 		bn_edit_->deactivate();
 		bn_edit_qth_->activate();
+		grp_nav_->activate();
 		for (int ix = 0; ix < NUMBER_TOTAL; ix++) {
 			if (ch_field_[ix]) ch_field_[ix]->activate();
 			ip_field_[ix]->activate();
@@ -1649,6 +1689,7 @@ void qso_manager::qso_group::enable_widgets() {
 		bn_cancel_->activate();
 		bn_edit_->deactivate();
 		bn_edit_qth_->deactivate();
+		grp_nav_->activate();
 		for (int ix = 0; ix < NUMBER_TOTAL; ix++) {
 			if (ch_field_[ix]) ch_field_[ix]->activate();
 			ip_field_[ix]->activate();
@@ -1662,6 +1703,7 @@ void qso_manager::qso_group::enable_widgets() {
 		bn_cancel_->activate();
 		bn_edit_->deactivate();
 		bn_edit_qth_->activate();
+		grp_nav_->deactivate();
 		for (int ix = 0; ix < NUMBER_TOTAL; ix++) {
 			if (ch_field_[ix]) ch_field_[ix]->activate();
 			ip_field_[ix]->activate();
@@ -1697,7 +1739,8 @@ void qso_manager::qso_group::update_station_choices(stn_item_t station_item) {
 
 // Copy record to the fields - reverse of above
 void qso_manager::qso_group::copy_qso_to_display(int flags) {
-	if (current_qso_) {
+	record* source = get_default_record();
+	if (source) {
 		for (int i = 0; i < NUMBER_TOTAL; i++) {
 			string field;
 			if (i < NUMBER_FIXED) field = fixed_names_[i];
@@ -1725,10 +1768,10 @@ void qso_manager::qso_group::copy_qso_to_display(int flags) {
 				// The reason for a filter is to avoid unnecessary updates (and hence flicker)
 			}
 			if (copy && field.length()) {
-				ip_field_[i]->value(current_qso_->item(field, true).c_str());
+				ip_field_[i]->value(source->item(field, false, true).c_str());
 			}
 		}
-		ip_notes_->value(current_qso_->item("NOTES").c_str());
+		ip_notes_->value(source->item("NOTES").c_str());
 		// If QTH changes tell DXA-IF to update home_location
 		check_qth_changed();
 	}
@@ -2041,6 +2084,14 @@ void qso_manager::qso_group::cb_bn_edit_qth(Fl_Widget* w, void* v) {
 		break;
 	}
 	delete dlg;
+}
+
+// CAllback - navigate buttons
+// v - direction
+void qso_manager::qso_group::cb_bn_navigate(Fl_Widget* w, void* v) {
+	qso_group* that = ancestor_view<qso_group>(w);
+	navigate_t target = (navigate_t)(long)v;
+	that->action_navigate(target);
 }
 
 // Reset contest serial number
@@ -2471,29 +2522,34 @@ void qso_manager::qso_group::action_edit() {
 	current_qso_ = book_->get_record();
 	// And save a copy of it
 	original_qso_ = new record(*current_qso_);
-	copy_qso_to_display(CF_ALL);
 	logging_state_ = QSO_EDIT;
+	copy_qso_to_display(CF_ALL);
 	enable_widgets();
 }
 
 // Action SAVE EDIT - Transition from QSO_EDIT to QSO_INACTIVE while saving changes
 void qso_manager::qso_group::action_save_edit() {
-	if (logging_state_ != QSO_EDIT || current_qso_ == nullptr) {
-		status_->misc_status(ST_SEVERE, "Attempting to save a QSO when not editing one");
-		return;
+	if (*current_qso_ == *original_qso_) {
+		action_cancel_edit();
 	}
-	if (current_rec_num_ != book_->selection()) {
-		status_->misc_status(ST_SEVERE, "Mismatch between selected QSO in book and QSO manager");
-		return;
+	else {
+		if (logging_state_ != QSO_EDIT || current_qso_ == nullptr) {
+			status_->misc_status(ST_SEVERE, "Attempting to save a QSO when not editing one");
+			return;
+		}
+		if (current_rec_num_ != book_->selection()) {
+			status_->misc_status(ST_SEVERE, "Mismatch between selected QSO in book and QSO manager");
+			return;
+		}
+		// We no longer need to maintain the copy of the original QSO
+		book_->add_use_data(current_qso_);
+		book_->modified(true);
+		delete original_qso_;
+		original_qso_ = nullptr;
+		current_qso_ = nullptr;
+		logging_state_ = QSO_INACTIVE;
+		enable_widgets();
 	}
-	// We no longer need to maintain the copy of the original QSO
-	book_->add_use_data(current_qso_);
-	book_->modified(true);
-	delete original_qso_;
-	original_qso_ = nullptr;
-	current_qso_ = nullptr;
-	logging_state_ = QSO_INACTIVE;
-	enable_widgets();
 }
 
 // ACtion CANCEL EDIT - Transition from QSO_EDIT to QSO_INACTIVE scrapping changes
@@ -2513,6 +2569,30 @@ void qso_manager::qso_group::action_cancel_edit() {
 	logging_state_ = QSO_INACTIVE;
 	copy_qso_to_display(CF_ALL);
 	enable_widgets();
+}
+
+// Action navigate button
+void qso_manager::qso_group::action_navigate(int target) {
+	logging_state_t saved_state = logging_state_;
+	if (logging_state_ == QSO_EDIT) {
+		// Save current edit first
+		action_save_edit();
+	}
+	else if (logging_state_ == QSO_PENDING) {
+		// Cancel pending
+		action_deactivate();
+	}
+	// We should now be inactive - navigate to new QSO
+	book_->navigate((navigate_t)target);
+	// And restore state
+	switch (saved_state) {
+	case QSO_EDIT:
+		action_edit();
+		break;
+	case QSO_PENDING:
+		action_activate();
+		break;
+	}
 }
 
 // Clock group - constructor

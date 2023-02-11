@@ -241,6 +241,8 @@ namespace zzalog {
 			static void cb_ip_notes(Fl_Widget* w, void* v);
 			// Edit QTH details
 			static void cb_bn_edit_qth(Fl_Widget* w, void* v);
+			// Navigate buttons
+			static void cb_bn_navigate(Fl_Widget*, void* v);
 
 			// Add contest exchanges
 			void populate_exch_fmt();
@@ -279,6 +281,8 @@ namespace zzalog {
 			void action_save_edit();
 			// Cancel editing
 			void action_cancel_edit();
+			// Navigate
+			void action_navigate(int target);
 			// Get default copy record
 			record* get_default_record();
 			// QTH has changed
@@ -351,6 +355,12 @@ namespace zzalog {
 			Fl_Button* bn_parse_;
 			// Edit QTH
 			Fl_Button* bn_edit_qth_;
+			// Navigate buttons
+			Fl_Group* grp_nav_;
+			Fl_Button* bn_nav_f_;
+			Fl_Button* bn_nav_p_;
+			Fl_Button* bn_nav_n_;
+			Fl_Button* bn_nav_l_;
 			// Group for freq/power/mode
 			Fl_Group* grp_fpm_;
 			// Logging mode
