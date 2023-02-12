@@ -479,6 +479,7 @@ int log_table::handle(int event) {
 		break;
 	case FL_PUSH:
 		if (Fl::event_button() == FL_LEFT_MOUSE && qso_manager_->qso_in_progress())	return true;
+		break;
 	}
 	// We haven't handled the event
 	return Fl_Table_Row::handle(event);
