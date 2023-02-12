@@ -777,9 +777,6 @@ void add_icon(const char* arg0) {
 	// And append "\zzalog.png"
 	strcat(path, "\\zzalog.png");
 	Fl_Window::default_icon(new Fl_PNG_Image(path));
-	//// This is the way to get an icon compiled with VS into the icon.
-	//// However include zzalog.rc breaks Fl_ToolTip
-	//main_window_->icon((const void*)LoadIcon(fl_display, MAKEINTRESOURCE(IDI_ICON1)));
 #endif
 }
 
@@ -850,8 +847,6 @@ int main(int argc, char** argv)
 	add_band_view();
 	// Add qsl_handlers - note add_rig_if() may have added URL handler
 	add_qsl_handlers();
-	//// Add scratchpad
-	//add_scratchpad();
 	// Add DxAtlas interface
 	add_dxatlas();
 	int code = 0;

@@ -68,18 +68,6 @@ namespace zzalog {
 		// Constructor provides X and Y position (W and H set from design data) and current records to display in card format
 		qsl_form(int x, int y, record** records, int num_records);
 		~qsl_form();
-		//// Resize widget set - number of lines of text
-		//void resize_set(widget_set set, int rows);
-		//// Resize table - rows x columns
-		//void resize_table(int rows, int cols);
-		//// Change widget text
-		//void update_text(qsl_widget* widget, string value);
-		//// Change widget font
-		//void update_font(qsl_widget* widget, Fl_Font value);
-		//// Change size of font used
-		//void update_size(qsl_widget* widget, int value);
-		//// Change the text colour
-		//void update_colour(qsl_widget* widget, Fl_Color value);
 		// Return unit
 		dim_unit unit();
 		// Set unit
@@ -92,46 +80,18 @@ namespace zzalog {
 		float height();
 		// Set height
 		void height(float heigth);
-		//// Return size
-		//int set_size(widget_set set);
-		//// Return number of rows
-		//int table_rows();
-		//// Return number of columns
-		//int table_cols();
 		// Size error drawing card
 		bool size_error();
 
-		//// Save data
-		//void save_data();
-		//// Write one set of settings
-		//void write_settings(Fl_Preferences& settings, vector<qsl_form::qsl_widget>&);
-		//// Set the designer
-		//void designer(Fl_Group* designer);
-
-
 	protected:
-		//// Callbacks - when clicking any item in the form
-		//static void cb_button(Fl_Widget* w, void* v);
 		// Get the widget data
 		void load_data();
-		//// Default data initialise
-		//void load_default();
-		//// Get one set of settings
-		//void read_settings(Fl_Preferences& settings, vector<qsl_widget>&, int count);
 		// Draw the form
 		void create_form(int X, int Y);
-		//// Draw one set of lines of text
-		//void draw_text(Fl_Align align, int& y, vector<qsl_widget>& widgets);
-		//// Draw a table
-		//void draw_table(int& y);
 		// Convert to points
 		int to_points(float value);
-		//// Update the widget sets
-		//void update();
 
 	protected:
-		//// The card design interface
-		//Fl_Group* designer_;
 		// The records to be printed
 		record** records_;
 		// Number of them
@@ -142,12 +102,6 @@ namespace zzalog {
 		float height_;
 		// Unit of width and height
 		dim_unit unit_;
-		//// The widgets 
-		//vector<qsl_widget> tl_widgets_;
-		//vector<qsl_widget> tr_widgets_;
-		//vector<vector<qsl_widget> > tab_widgets_;
-		//vector<qsl_widget> bl_widgets_;
-		//vector<qsl_widget> br_widgets_;
 		// Size error
 		bool size_error_;
 		// HTML Filename

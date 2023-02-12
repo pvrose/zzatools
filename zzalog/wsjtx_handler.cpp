@@ -190,15 +190,6 @@ int wsjtx_handler::handle_decode(stringstream& ss) {
 	// Change display if addressed to user
 	vector<string> words;
 	split_line(decode.message, words, ' ');
-	//// Display if this is my call or my hashed call
-	//if (words[0] == my_call_ || words[0] == my_bracketed_call_) {
-	//	// If this is my_call their_call grid add to DxAtlas map as DX location
-	//	if (regex_match(words[2], basic_regex<char>("[A-R][A-R][0-9][0-9]")) && words[2] != "RR73") {
-	//		dxa_if_->set_dx_loc(words[2]);
-	//	}
-	//	// Display in status bar and beep if message addressed to user
-	//	status_->misc_status(ST_NOTIFY, message);
-	//}
 	return 0;
 }
 

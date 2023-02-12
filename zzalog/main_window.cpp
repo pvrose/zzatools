@@ -12,8 +12,6 @@ extern status* status_;
 main_window::main_window(int W, int H, const char* label) :
 	Fl_Single_Window(W, H, label)
 {
-	//// Set up window to receive clipboard pastes
-	//Fl::paste(*this, 1);
 }
 
 main_window::~main_window() {}

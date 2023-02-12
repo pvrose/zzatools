@@ -83,8 +83,6 @@ namespace zzalog {
 	public:
 		// Default constructor
 		record();
-		//// Constructor that pre-populates certain fields
-		//record(logging_mode_t type, record* copy_from);
 		// Copy constructor
 		record(const record& rhs);
 		// Assignment operator
@@ -130,8 +128,6 @@ namespace zzalog {
 		void update_timeoff();
 		// change the field name
 		void change_field_name(string from, string to);
-		//// End record by adding certain fields
-		//void end_record(logging_mode_t mode);
 		// Write to an item merging data from other items
 		string item_merge(string data, bool indirect = false);
 		// get the timestamp

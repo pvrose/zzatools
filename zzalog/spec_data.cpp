@@ -1781,9 +1781,6 @@ void spec_data::handle_error(error_t error_code, const string&  data, const stri
 		// Only handle the error if we are not reporting it
 		// Get the display version of the data
 		string display_item = record_->item(field, true);
-		//// Get the validate settings
-		//Fl_Preferences adif_settings(settings_, "ADIF");
-		//Fl_Preferences validate_settings(adif_settings, "Validate");
 		status_t status = ST_ERROR;
 		// Implement
 		// Report errors and try to correct, default to ask the user if not able to.

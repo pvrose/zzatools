@@ -804,38 +804,6 @@ bool book::modified() {
 	return modified_;
 }
 
-//// Create a new record and start editing it.
-//record* book::new_record(logging_mode_t mode) {
-//	// Create new QSO record with default fields for the logging mode
-//	record* new_record = new record(mode, get_record());
-//	// put it in the book 
-//	record_num_t pos_record;
-//	if (mode != LM_OFF_AIR) {
-//		// On-air logging - insert against date/time (which should be at the end)
-//		// We may have been using modem s/w and changed to On-air logging.
-//		qso_manager_->logging_mode(rig_if_ ? LM_ON_AIR_CAT : LM_ON_AIR_COPY);
-//		pos_record = insert_record(new_record);
-//		char message[256];
-//		sprintf(message, "LOG: New record at %s %s",
-//			new_record->item("QSO_DATE").c_str(),
-//			new_record->item("TIME_ON").c_str());
-//		status_->misc_status(ST_LOG, message);
-//	}
-//	else {
-//		// Off-air logging - insert at end as there is no timestamp in the record
-//		pos_record = append_record(new_record);
-//	}
-//	// Set the appropriate flags
-//	if (mode != LM_OFF_AIR)
-//		if (rig_if_) logging_mode_ = LM_ON_AIR_CAT;
-//		else logging_mode_ = LM_ON_AIR_COPY;
-//	else logging_mode_ = mode;
-//	new_record_ = true;
-//	// Select the new record and tell all views
-//	selection(pos_record, HT_STARTING);
-//
-//	return new_record;
-//}
 
 // return the filename
 string book::filename(bool full /*=true*/) {
@@ -849,88 +817,6 @@ string book::filename(bool full /*=true*/) {
 		return filename_.substr(pos + 1);
 	}
 }
-
-//// Mark the record saved and update the other views
-//void book::save_record() {
-//	// Update status bar
-//	char text[128];
-//	sprintf(text, "LOG: Saving record %s %s %s",
-//		get_record()->item("QSO_DATE").c_str(),
-//		get_record()->item("TIME_ON").c_str(),
-//		get_record()->item("CALL").c_str());
-//	status_->misc_status(ST_NOTE, text);
-//	// Add to used bands and modes
-//	add_band_mode(get_record());
-//	// Update TX_PWR - if we are connected to a rig and hven't already set it (e.g. scratchpad)
-//	if (rig_if_ && get_record()->item("TX_PWR") != "") {
-//		snprintf(text, 128, "%d", (int)rig_if_->max_power());
-//		get_record()->item("TX_PWR", text);
-//	}
-//	// Check within band
-//	double freq;
-//	get_record()->item("FREQ", freq);
-//	if (band_view_ && !band_view_->in_band(freq * 1000)) {
-//		sprintf(text, "LOG: Frequency %g MHz is out of band!", freq);
-//		status_->misc_status(ST_ERROR, text);
-//	}
-//
-//	if (new_record_ || modified_record_) {
-//		// Record entry was started by user - tidy up record
-//		get_record()->end_record(logging_mode_);
-//		// If this is a new record, it will already be in the book, it now needs to be moved to its correct
-//		// place.
-//		current_item_ = correct_record_position(current_item_);
-//	}
-//
-//	if (new_record_ && book_type() == OT_MAIN) {
-//		upload_qso(record_number(current_item_));
-//	}
-//
-//	// Modified by parsing and validation
-//	bool record_modified = false;
-//	// check whether record has changed - when parsed
-//	if (pfx_data_->parse(get_record())) {
-//		record_modified = true;
-//	}
-//		 
-//	// check whether record has changed - when validated
-//	if (spec_data_->validate(get_record(), selection())) {
-//		record_modified = true;
-//	}
-//
-//	// Now update rig, antenna and QTH to next value
-//	if (qso_manager_) {
-//		qso_manager_->save_next_values();
-//	}
-//
-//	// If new or changed then update the fact and let every one know
-//	if (record_modified || new_record_ || modified_record_) {
-//		modified(true);
-//		modified_record_ = false;
-//		if (new_record_) {
-//			// Turn this off before telling everyone
-//			new_record_ = false;
-//			selection(current_item_, HT_INSERTED);
-//		}
-//		else {
-//			selection(current_item_, HT_CHANGED);
-//		}
-//	}
-//
-//	// Update session end - if we crash before we close down, we may fail to remember session properly
-//	time_t today = time(nullptr);
-//	void* p_today = &today;
-//	settings_->set("Session End", p_today, sizeof(time_t));
-//	settings_->flush();
-//
-//	// Do not automatically save when in debug mode as there may be a bug in the application corrupting the log
-//#ifndef _DEBUG
-//	if (save_enabled_ && !read_only_) {
-//		store_data();
-//	}
-//#endif // _DEBUG
-//
-//}
 
 // delete the selected record - force set if not created the record through book API
 void book::delete_record(bool force) {

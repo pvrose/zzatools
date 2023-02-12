@@ -68,14 +68,6 @@ namespace zzalog {
 			QSO_EDIT,        // Editing existing QSO
 		};
 
-		//// Use item destination
-		//enum use_item_t {
-		//	SELECTED_ONLY,
-		//	SELECTED_NEW,
-		//	NEW_ONLY,
-		//	CANCEL_USE
-		//};
-
 		// Hamlib parameters 
 		struct hamlib_data {
 			// Manufacturer
@@ -104,68 +96,6 @@ namespace zzalog {
 			// Hamlib data
 			hamlib_data hamlib_params;
 		};
-
-		//// This class provides individual grouping for rig, antenna.
-		//class common_grp :
-		//	public Fl_Group
-		//{
-		//	class item_choice :
-		//		public Fl_Input_Choice
-		//	{
-		//	public:
-		//		item_choice(int X, int Y, int W, int H, const char* L = nullptr) :
-		//			Fl_Input_Choice(X, Y, W, H, L) {}
-		//		// Add escaping '/' and '&' characters
-		//		void add(const char* label);
-		//		// Remove above escapes from menubutton::text()
-		//		const char* text();
-		//	};
-
-		//public:
-
-		//	common_grp(int X, int Y, int W, int H, const char* label, stn_item_t type);
-		//	virtual ~common_grp();
-
-		//	// create the form
-		//	virtual void create_form(int X, int Y);
-		//	// Enable widgets
-		//	virtual void enable_widgets();
-		//	// button callback - add
-		//	static void cb_bn_add(Fl_Widget* w, void* v);
-		//	// button callback - delete
-		//	static void cb_bn_del(Fl_Widget* w, void* v);
-		//	// choice callback
-		//	static void cb_ch_stn(Fl_Widget* w, void* v);
-		//	// Multi-browser callback
-		//	static void cb_mb_bands(Fl_Widget* w, void* v);
-		//	// Item
-		//	static void cb_ch_item(Fl_Widget* w, void* v);
-
-		//protected:
-		//	// Choice widget
-		//	Fl_Widget* choice_;
-		//	// Band select widget
-		//	Fl_Widget* band_browser_;
-		//	// selected item
-		//	int item_no_;
-		//	// Item name
-		//	string my_name_;
-		//	// Field name
-		//	string my_field_;
-
-		//public:
-		//	// (re)populate the choice widget
-		//	void populate_choice();
-		//	// Populate band widget
-		//	void populate_band();
-		//	// return current name
-		//	string& name();
-		//	// type
-		//	stn_item_t station_item_;
-		//	// Update name and selecton
-		//	void update_choice(string name);
-
-		//};
 
 		// Class for QSO group of widgets
 		class qso_group :
@@ -460,10 +390,6 @@ namespace zzalog {
 			// Waiting connect
 			bool wait_connect_;
 
-			//// The text items
-			//Fl_Text_Buffer* buffer_;
-			//// The editor
-			//spad_editor* editor_;
 			Fl_Spinner* ctr_pollfast_;
 			Fl_Spinner* ctr_pollslow_;
 

@@ -1138,8 +1138,6 @@ void dxa_if::create_colour_buttons() {
 	}
 	// Clear button map (name to widget)
 	button_map_.clear();
-	//// get FLTK scheduler to delete them
-	//Fl::wait();
 	colour_bns_.clear();
 	colour_enables_.clear();
 	// Hide the window so it can be resized
@@ -1731,11 +1729,6 @@ void dxa_if::draw_pins() {
 			for (auto it = colours_used.begin(); it != colours_used.end(); it++) {
 				(button_map_.at(*it))->activate();
 			}
-
-			//// Now display the list of records
-			//if (records_displayed_.size()) {
-			//	book_->selection(*(records_displayed_.begin()), HT_DXATLAS);
-			//}
 
 			// Report finished
 			status_->misc_status(ST_OK, "DXATLAS: Update done!");

@@ -107,12 +107,6 @@ namespace zzalib {
 		string get_swr_meter();
 		// Return open message
 		string success_message();
-		//// Check SWR
-		//bool check_swr();
-		//// Check power
-		//bool check_power();
-		//// Check voltage
-		//bool check_voltage();
 		// Maximum power during QSO
 		double max_power();
 

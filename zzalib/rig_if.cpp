@@ -270,74 +270,6 @@ void rig_if::callback(void(*function)(), string(*spec_func)(double), void(*mess_
 	}
 }
 
-//// Check SWR value - error if > error level, warning if > warning level (got from settings)
-//// Only check once per transmission period
-//bool  rig_if::check_swr() {
-//	double warn_level;
-//	double error_level;
-//	// SWR Settings
-//	rig_settings_->get("SWR Warning Level", warn_level, 1.5);
-//	rig_settings_->get("SWR Error Level", error_level, 2.0);
-//	double swr = swr_meter();
-//	if (swr > error_level && !reported_hi_swr_) {
-//		char message[200];
-//		snprintf(message, 200, "RIG: SWR is %.1f", swr);
-//		error(ST_ERROR, message);
-//		reported_hi_swr_ = true;
-//		return false;
-//	}
-//	else if (swr > warn_level) {
-//		char message[200];
-//		snprintf(message, 200, "RIG: SWR is %.1f", swr);
-//		error(ST_WARNING, message);
-//		// Clear reported flag when we go back to receive
-//		return true;
-//	}
-//	return true;
-//}
-//
-//// Check power level - only when TX ended
-//bool rig_if::check_power() {
-//	double power_warn_level;
-//	rig_settings_->get("Power Warning Level", power_warn_level, 50.0);
-//	if (num_pwr_samples_ > 0) {
-//		double power = sigma_tx_power_ / num_pwr_samples_;
-//		if (power > power_warn_level) {
-//			char message[200];
-//			snprintf(message, 200, "RIG: Average power was %.0f", power);
-//			error(ST_NOTIFY, message);
-//			return false;
-//
-//		}
-//		else {
-//			return true;
-//		}
-//	}
-//	else {
-//		return true;
-//	}
-//}
-//
-//// Check voltage level
-//bool rig_if::check_voltage() {
-//	double min_voltage_level;
-//	double max_voltage_level;
-//	rig_settings_->get("Voltage Minimum Level", min_voltage_level, (13.8 * 0.85));
-//	rig_settings_->get("Voltage Maximum Level", max_voltage_level, (13.8 * 1.15));
-//	double vdd = vdd_meter();
-//	// Check voltage - ignore if vdd_meter has returned NaN
-//	if (!isnan(vdd) && (vdd < min_voltage_level || vdd > max_voltage_level)) {
-//		char message[200];
-//		snprintf(message, 200, "RIG: Current Vdd is %.0f", vdd);
-//		error(ST_ERROR, message);
-//		return false;
-//	}
-//	else {
-//		return true;
-//	}
-//}
-
-
 ///////////////////////////////////////////////////////////////////////////////////////
 //    H a M L I B implementation
 //
@@ -970,37 +902,6 @@ double rig_flrig::vdd_meter() {
 
 // Return SWR meter reading
 double rig_flrig::swr_meter() {
-	//if (ic7300_) {
-	//	bool ok;
-	//	char command = '\x15';
-	//	string subcommand = "\x12";
-	//	string data = ic7300_->send_command(command, subcommand, ok);
-	//	if (ok) {
-	//		char mess[256];
-	//		if (data.length() >= 4) {
-	//			unsigned int value = bcd_to_int(data.substr(2, 2), false);
-	//			// reflection coefficient (ρ) - assume this is linear wrt value - supplied values infer it is
-	//			// 0: SWR = 1 (ρ = 0), 48: SWR = 1.5 (ρ = 0.2), 80: SWR = 2 (ρ = 0.33), 120: SWR = 3 (ρ = 0.5)
-	//			// implies value = 240 / ρ.
-	//			if (value > 240) {
-	//				value = 240;
-	//			}
-	//			double rho = value / 240.0;
-	//			// SWR = (1 + ρ) / (1 - ρ) 
-	//			double swr = (1.0 + rho) / (1 - rho);
-	//			//			snprintf(mess, 256, "DEBUG: Value received from rig - %d, SWR = %g", value, swr);
-	//			//			error(ST_LOG, mess);
-	//			return swr;
-	//		}
-	//		else {
-	//			snprintf(mess, 256, "RIG: Insufficient data received from transceiver - %d bytes", data.length());
-	//			error(ST_ERROR, mess);
-	//		}
-	//	}
-	//}
-	//// Not IC7300 or not OK - return nan.
-	//error(ST_ERROR, error_message("swr_meter").c_str());
-	//return nan("");
 	rpc_data_item response;
 	if (!get_tx()) {
 		return last_tx_swr_;
@@ -1034,9 +935,6 @@ double rig_flrig::swr_meter() {
 		}
 		// SWR = (1 + ρ) / (1 - ρ) 
 		double swr = (1.0 + rho) / (1.0 - rho);
-		//char mess[256];
-		//snprintf(mess, 256, "DEBUG: Value received from rig - %d, ρ = %g, SWR = %g", value, rho,  swr);
-		//error(ST_DEBUG, mess);
 		last_tx_swr_ = swr;
 		return swr;
 	}

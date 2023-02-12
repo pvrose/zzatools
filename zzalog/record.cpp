@@ -1183,67 +1183,6 @@ string record::item_merge(string data, bool indirect /*=false*/) {
 	return result;
 }
 
-//// Set MY_RIG, MY_ANTENNA, APP_ZZA_QTH and STATION_CALLSIGN from the current settings
-//bool record::user_details() {
-	//// Add rig & QTH details - note this is current location only
-	//Fl_Preferences stations_settings(settings_, "Stations");
-	//Fl_Preferences rigs_settings(stations_settings, "Rigs");
-	//Fl_Preferences aerials_settings(stations_settings, "Aerials");
-	//Fl_Preferences callsigns_settings(stations_settings, "Callsigns");
-	//Fl_Preferences qths_settings(stations_settings, "QTHs");
-	//bool modified = false;
-	//char message[256];
-	//// Get rig
-	//char * rig;
-	//rigs_settings.get("Default", rig, "");
-	//if (item("MY_RIG").length()) {
-	//	snprintf(message, 256, "LOG: MY_RIG already set to %s, ignoring current value %s", item("MY_RIG").c_str(), rig);
-	//	status_->misc_status(ST_WARNING, message);
-	//}
-	//else {
-	//	item("MY_RIG", string(rig));
-	//	modified = true;
-	//}
-	//free(rig);
-	//// Get aerial
-	//char * aerial;
-	//aerials_settings.get("Default", aerial, "");
-	//if (item("MY_ANTENNA").length()) {
-	//	snprintf(message, 256, "LOG: MY_ANTENNA already set to %s, ignoring current value %s", item("MY_ANTENNA").c_str(), aerial);
-	//	status_->misc_status(ST_WARNING, message);
-	//}
-	//else {
-	//	item("MY_ANTENNA", string(aerial));
-	//	modified = true;
-	//}
-	//free(aerial);
-	//// Get QTH
-	//char * qth;
-	//qths_settings.get("Default", qth, "");
-	//if (item("APP_ZZA_QTH").length()) {
-	//	snprintf(message, 256, "LOG: APP_ZZA_QTH already set to %s, ignoring current value %s", item("APP_ZZA_QTH").c_str(), qth);
-	//	status_->misc_status(ST_WARNING, message);
-	//}
-	//else {
-	//	item("APP_ZZA_QTH", string(qth));
-	//	modified = true;
-	//}
-	//Fl_Preferences current_settings(qths_settings, qth);
-	//free(qth);
-	//// Get callsign
-	//char* callsign;
-	//callsigns_settings.get("Default", callsign, "");
-	//if (item("STATION_CALLSIGN").length()) {
-	//	snprintf(message, 256, "LOG: STATION_CALLSIGN already set to %s, ignoring current value %s", item("STATION_CALLSIGN").c_str(), callsign);
-	//	status_->misc_status(ST_WARNING, message);
-	//}
-	//else {
-	//	item("STATION_CALLSIGN", string(callsign));
-	//	modified = true;
-	//}
-//	return true;
-//}
-
 // Convert frequency from ADIF (MHz) to display format
 string record::format_freq(display_freq_t format, string value) {
 	double frequency = stod(value);
