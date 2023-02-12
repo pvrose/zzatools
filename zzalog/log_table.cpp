@@ -13,6 +13,7 @@
 #include "pfx_data.h"
 #include "main_window.h"
 #include "dxa_if.h"
+#include "qso_manager.h"
 
 #include <FL/fl_draw.H>
 #include <FL/Fl_Preferences.H>
@@ -35,6 +36,7 @@ extern intl_dialog* intl_dialog_;
 extern time_t session_start_;
 extern pfx_data* pfx_data_;
 extern dxa_if* dxa_if_;
+extern qso_manager* qso_manager_;
 extern bool in_current_session(record*);
 
 Fl_Font log_table::font_;
@@ -141,6 +143,7 @@ void log_table::cb_tab_log(Fl_Widget* w, void* v) {
 	int row = that->callback_row();
 	record_num_t item_num = that->order_ == LAST_TO_FIRST ? that->my_book_->size() - 1 - row : row;
 	int col = that->callback_col();
+	record_num_t save_num = that->current_item_num_;
 	switch (that->callback_context()) {
 	case Fl_Table::CONTEXT_CELL:
 		// Mouse clicked within the cell
@@ -148,6 +151,7 @@ void log_table::cb_tab_log(Fl_Widget* w, void* v) {
 		case FL_RELEASE:
 			switch (that->last_button_) {
 			case FL_LEFT_MOUSE:
+				// Select the item at the row that was clicked
 				// Tidy up any edit in progress
 				that->done_edit(false);
 				// Left button - double click edit cell
@@ -155,17 +159,16 @@ void log_table::cb_tab_log(Fl_Widget* w, void* v) {
 					that->edit_cell(row, col);
 				}
 				else {
-					// Select the item at the row that was clicked
 					that->my_book_->selection(item_num, HT_SELECTED, that);
 				}
-				break;
+			break;
 			case FL_RIGHT_MOUSE:
 				// Right button - display tooltip explaining the field
 				that->done_edit(false);
 				that->describe_cell(row, col);
 				break;
 			}
-			break;
+		break;
 		case FL_PUSH:
 			// Keep the focus
 			that->take_focus();
@@ -465,6 +468,17 @@ int log_table::handle(int event) {
 				return true;
 			}
 		}
+		break;
+	case FL_RELEASE:
+		if (Fl::event_button() == FL_LEFT_MOUSE) {
+			if (qso_manager_->qso_in_progress()) {
+				status_->misc_status(ST_WARNING, "LOG: Left mouse inhibited while editing or entering a QSO elsewhere");
+				return true;
+			}
+		}
+		break;
+	case FL_PUSH:
+		if (Fl::event_button() == FL_LEFT_MOUSE && qso_manager_->qso_in_progress())	return true;
 	}
 	// We haven't handled the event
 	return Fl_Table_Row::handle(event);
