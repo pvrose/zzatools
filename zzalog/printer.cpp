@@ -389,12 +389,8 @@ int printer::print_page_cards(size_t &item_num) {
 int printer::card_properties() {
 	Fl_Preferences qsl_settings(settings_, "QSL Design");
 	// Callsign specific settings
-	Fl_Preferences stations_settings(settings_, "Stations");
-	Fl_Preferences calls_settings(stations_settings, "Callsigns");
-	char* callsign;
-	calls_settings.get("Current", callsign, "");
-	Fl_Preferences call_settings(qsl_settings, callsign);
-	free(callsign);
+	string callsign = qso_manager_->get_default(qso_manager::CALLSIGN);
+	Fl_Preferences call_settings(qsl_settings, callsign.c_str());
 	char* filename;
 	call_settings.get("Filename", filename, "");
 	card_filename_ = filename;

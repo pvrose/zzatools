@@ -4,6 +4,7 @@
 #include "book.h"
 #include "status.h"
 #include "adi_writer.h"
+#include "qso_manager.h"
 
 #include "../zzalib/utils.h"
 #include "../zzalib/url_handler.h"
@@ -27,6 +28,7 @@ using namespace zzalib;
 extern book* book_;
 extern status* status_;
 extern Fl_Preferences* settings_;
+extern qso_manager* qso_manager_;
 extern zzalib::url_handler* url_handler_;
 
 // Constructor
@@ -410,19 +412,16 @@ bool eqsl_handler::user_details(
 	// Get username and password for building url to fetch card
 	Fl_Preferences qsl_settings(settings_, "QSL");
 	Fl_Preferences eqsl_settings(qsl_settings, "eQSL");
-	Fl_Preferences stations_settings(settings_, "Stations");
-	Fl_Preferences callsigns_settings(stations_settings, "Callsigns");
-	char* callsign;
-	callsigns_settings.get("Default", callsign, "");
+	string callsign = qso_manager_->get_default(qso_manager::CALLSIGN);
 
 	char * temp;
 	if (username != nullptr) {
 		eqsl_settings.get("User", temp, "");
 		*username = temp;
 		free(temp);
-		if (strcmp(username->c_str(), callsign)) {
+		if (*username == callsign) {
 			char message[128];
-			snprintf(message, 128, "EQSL: Station call %s differs from username %s", callsign, username->c_str());
+			snprintf(message, 128, "EQSL: Station call %s differs from username %s", callsign.c_str(), username->c_str());
 			status_->misc_status(ST_WARNING, message);
 			*username = callsign;
 		}
