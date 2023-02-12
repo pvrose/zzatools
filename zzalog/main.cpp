@@ -804,14 +804,6 @@ void print_args(int argc, char** argv) {
 	status_->misc_status(ST_NOTE, message);
 }
 
-// Save session finish time - flush settings
-void save_session_details() {
-	time_t today = time(nullptr);
-	void* p_today = &today;
-	settings_->set("Session End", p_today, sizeof(time_t));
-	settings_->flush();
-}
-
 // Returns true if record is within current session.
 bool in_current_session(record* this_record) {
 	return difftime(this_record->timestamp(), session_start_) >= 0;
@@ -881,8 +873,6 @@ int main(int argc, char** argv)
 		// Run the application until it is closed
 		code = Fl::run();
 	}
-	// Save the start and end times of the session (not just this call)
-	save_session_details();
 	// Delete everything we've created
 	tidy();
 	return code;

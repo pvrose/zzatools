@@ -952,6 +952,7 @@ void menu::cb_mi_log_edith(Fl_Widget* w, void* v) {
 // v is long: 0 is now, 1 is selected QSO
 void menu::cb_mi_log_start(Fl_Widget* w, void* v) {
 	long mode = (long)v;
+	record_num_t save_pos = book_->selection();
 	switch (mode) {
 	case 0:
 		session_start_ = time(nullptr);
@@ -976,8 +977,6 @@ void menu::cb_mi_log_start(Fl_Widget* w, void* v) {
 		break;
 	}
 	}
-	settings_->set("Session Start", &session_start_, sizeof(time_t));
-	settings_->flush();
 	// Display the start time in the status log
 	char stime[100];
 	tm* start_time = gmtime(&session_start_);
@@ -985,7 +984,7 @@ void menu::cb_mi_log_start(Fl_Widget* w, void* v) {
 	char message[256];
 	snprintf(message, 256, "ZZALOG: Setting session start at %s", stime);
 	status_->misc_status(ST_NOTE, message);
-	tabbed_forms_->update_views(nullptr, HT_ALL, -1);
+	tabbed_forms_->update_views(nullptr, HT_ALL, save_pos);
 }
 
 // Import->File

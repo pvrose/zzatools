@@ -1604,15 +1604,23 @@ void book::set_session_start() {
 	log_settings.get("Session Gap", session_gap_mins, 30.0);
 	// Start at end of book
 	bool found = false;
-	auto it = cbegin();
-	while (it != cend() || !found) {
-		time_t qso_time = (*it)->timestamp();
+	record_num_t rec_num = size() - 1;
+	session_start_ = get_record(rec_num, false)->timestamp();
+	while (rec_num > 0 && !found) {
+		time_t qso_time = get_record(rec_num, false)->timestamp();
 		if (difftime(session_start_, qso_time) < (session_gap_mins * 60.0)) {
 			session_start_ = qso_time;
 		}
 		else {
 			found = true;
 		}
-		it++;
+		rec_num--;
 	}
+	// Display the start time in the status log
+	char stime[100];
+	tm* start_time = gmtime(&session_start_);
+	strftime(stime, 100, "%Y/%m/%d %H:%M:%S", start_time);
+	char message[256];
+	snprintf(message, 256, "ZZALOG: Setting session start at %s", stime);
+	status_->misc_status(ST_NOTE, message);
 }
