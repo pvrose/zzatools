@@ -260,6 +260,7 @@ void import_data::merge_update() {
 void import_data::save_update() {
 	// Get parse and validation settings
 	record* import_record = at(0);
+	qso_manager_->update_import_qso(import_record);
 	if (pfx_data_->parse(import_record) == PR_CHANGED) {
 	}
 	// Need to copy it over before calling the next two to get the record number
