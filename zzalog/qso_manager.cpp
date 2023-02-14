@@ -909,7 +909,7 @@ void qso_manager::qso_group::create_form(int X, int Y) {
 		ip_field_[ix]->align(FL_ALIGN_LEFT);
 		ip_field_[ix]->tooltip("Enter required value to log");
 		ip_field_[ix]->callback(cb_ip_field, (void*)ix);
-		ip_field_[ix]->input()->when(FL_WHEN_ENTER_KEY);
+		ip_field_[ix]->input()->when(FL_WHEN_RELEASE_ALWAYS);
 		if (ix < NUMBER_FIXED) {
 			ip_field_[ix]->field_name(fixed_names_[ix].c_str());
 			field_ips_[fixed_names_[ix]] = ip_field_[ix];
