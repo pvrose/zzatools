@@ -737,7 +737,8 @@ void qso_manager::qso_group::create_form(int X, int Y) {
 	ch_logmode_->add("Current date and time - used for parsing only");
 	ch_logmode_->add("All fields blank");
 	ch_logmode_->add("Current date and time, data from CAT");
-	ch_logmode_->add("Current date and time, data from selected QSO");
+	ch_logmode_->add("Current date and time, data from selected QSO - including call");
+	ch_logmode_->add("Current date and time, data from selected QSO - excluding call");
 	ch_logmode_->add("Current date and time, no other data");
 	ch_logmode_->value(logging_mode_);
 	ch_logmode_->callback(cb_logging_mode, &logging_mode_);
@@ -1225,30 +1226,22 @@ void qso_manager::qso_group::copy_qso_to_display(int flags) {
 			string field;
 			if (i < NUMBER_FIXED) field = fixed_names_[i];
 			else field = ch_field_[i]->value();
-			bool copy = false;
-			if (flags == CF_ALL) copy = true;
-			else {
-				// Copy operating parameters
-				if (flags & CF_RIG_ETC) {
-					if (field == "MY_RIG" || field == "MY_ANTENNA" ||
-						field == "STATION_CALLSIGN" || field == "APP_ZZA_QTH") copy = true;
+			if (field.length()) {
+				if (flags == CF_ALL_FLAGS) {
+					// Copy all fields that have edit fields defined
+					ip_field_[i]->value(source->item(field, false, true).c_str());
 				}
-				// Copy Rig based parameters
-				if (flags & CF_CAT) {
-					if (field == "FREQ" || field == "BAND" || field == "TX_PWR" ||
-						field == "MODE" || field == "SUBMODE") copy = true;
+				else {
+					// Copy per flag bits
+					for (auto sf = COPY_SET.begin(); sf != COPY_SET.end(); sf++) {
+						copy_flags f = (*sf);
+						if (flags & f) {
+							for (auto fx = COPY_FIELDS.at(f).begin(); fx != COPY_FIELDS.at(f).end(); fx++) {
+								ip_field_[i]->value(source->item(field, false, true).c_str());
+							}
+						}
+					}
 				}
-				// Copy timestamp parameters
-				if (flags & CF_CLOCK) {
-					if (field == "QSO_DATE" || field == "QSO_DATE_OFF" ||
-						field == "TIME_ON" || field == "TIME_OFF") copy = true;
-				}
-				// TODO - check any other feilds that may need copying
-				// We could use a sledge-hammer approach and always copy evry field
-				// The reason for a filter is to avoid unnecessary updates (and hence flicker)
-			}
-			if (copy && field.length()) {
-				ip_field_[i]->value(source->item(field, false, true).c_str());
 			}
 		}
 		ip_notes_->value(source->item("NOTES").c_str());
@@ -1260,29 +1253,18 @@ void qso_manager::qso_group::copy_qso_to_display(int flags) {
 // Copy from an existing record: fields depend on flags set
 void qso_manager::qso_group::copy_qso_to_qso(record* old_record, int flags) {
 	if (current_qso_) {
-		if (flags == CF_ALL) {
-			*current_qso_ = *old_record;
-		}
-		else {
-			if (flags & CF_RIG_ETC) {
-				current_qso_->item("MY_RIG", old_record->item("MY_RIG"));
-				current_qso_->item("MY_ANTENNA", old_record->item("MY_ANTENNA"));
-				current_qso_->item("APP_ZZA_QTH", old_record->item("APP_ZZA_QTH"));
-				current_qso_->item("STATION_CALLSIGN", old_record->item("STATION_CALLSIGN"));
-			}
-			if (flags & CF_CAT) {
-				// Copy all the fields relevant to operating conditions
-				current_qso_->item("FREQ", old_record->item("FREQ"));
-				current_qso_->item("MODE", old_record->item("MODE"));
-				current_qso_->item("SUBMODE", old_record->item("SUBMODE"));
-				current_qso_->item("TX_PWR", old_record->item("TX_PWR"));
-			}
-			if (flags & CF_CLOCK) {
-				// Copy timestamps
-				current_qso_->item("QSO_DATE", old_record->item("QSO_DATE"));
-				current_qso_->item("TIME_ON", old_record->item("TIME_ON"));
-				current_qso_->item("QSO_DATE_OFF", old_record->item("QSO_DATE_OFF"));
-				current_qso_->item("TIME_OFF", old_record->item("TIME_OFF"));
+		// For all flag bits
+		for (auto sf = COPY_SET.begin(); sf != COPY_SET.end(); sf++) {
+			copy_flags f = (*sf);
+			for (auto fx = COPY_FIELDS.at(f).begin(); fx != COPY_FIELDS.at(f).end(); fx++) {
+				if (flags & f) {
+					// If it's set copy it
+					current_qso_->item((*fx), old_record->item((*fx)));
+				}
+				else {
+					// else clear it
+					current_qso_->item(string(""));
+				}
 			}
 		}
 		copy_qso_to_display(flags);
@@ -1324,7 +1306,7 @@ void qso_manager::qso_group::copy_clock_to_qso(time_t clock) {
 		current_qso_->item("QSO_DATE_OFF", string(""));
 		current_qso_->item("TIME_OFF", string(""));
 
-		copy_qso_to_display(CF_CLOCK);
+		copy_qso_to_display(CF_TIME);
 	}
 }
 
@@ -1339,7 +1321,7 @@ void qso_manager::qso_group::clear_display() {
 // Clear fields in current QSO
 void qso_manager::qso_group::clear_qso() {
 	current_qso_->delete_contents();
-	copy_qso_to_display(CF_ALL);
+	copy_qso_to_display(CF_QSO);
 }
 
 // Select logging mode
@@ -1839,6 +1821,7 @@ record* qso_manager::qso_group::get_default_record() {
 		case LM_ON_AIR_TIME:
 			return book_->get_latest();
 		case LM_ON_AIR_COPY:
+		case LM_ON_AIR_CLONE:
 			return book_->get_record();
 		default: 
 			return nullptr;
@@ -1873,23 +1856,32 @@ void qso_manager::qso_group::action_activate() {
 	record* source_record = get_default_record();
 	switch (logging_mode_) {
 	case LM_OFF_AIR:
+		// Just copy the station details
 		copy_qso_to_qso(source_record, CF_RIG_ETC);
 		break;
 	case LM_ON_AIR_CAT:
+		// Copy station details and get read rig details for band etc.
 		copy_qso_to_qso(source_record, CF_RIG_ETC);
 		copy_cat_to_qso();
 		copy_clock_to_qso(now);
 		break;
-	case LM_ON_AIR_COPY:
+	case LM_ON_AIR_CLONE:
+		// Clone the QSO - get station and band from original QSO
 		copy_qso_to_qso(source_record, CF_RIG_ETC | CF_CAT);
 		copy_clock_to_qso(now);
 		break;
+	case LM_ON_AIR_COPY:
+		// Copy the QSO - as abobe but also same callsign and details
+		copy_qso_to_qso(source_record, CF_RIG_ETC | CF_CAT | CF_CONTACT);
+		copy_clock_to_qso(now);
+		break;
 	case LM_ON_AIR_TIME:
+		// Copy the station details and set the current date/time.
 		copy_qso_to_qso(source_record, CF_RIG_ETC);
 		copy_clock_to_qso(now);
 		break;
 	}
-	copy_qso_to_display(CF_ALL);
+	copy_qso_to_display(CF_CONTACT);
 	logging_state_ = QSO_PENDING;
 	enable_widgets();
 }
@@ -1924,7 +1916,9 @@ void qso_manager::qso_group::action_save() {
 	switch (logging_mode_) {
 	case LM_ON_AIR_CAT:
 	case LM_ON_AIR_COPY:
+	case LM_ON_AIR_CLONE:
 	case LM_ON_AIR_TIME:
+		// All on-air modes - set cime-off to now
 		if (current_qso_->item("TIME_OFF") == "") {
 			// Add end date/time - current time of interactive entering
 			// Get current date and time in UTC
@@ -2003,7 +1997,7 @@ void qso_manager::qso_group::action_edit() {
 	// And save a copy of it
 	original_qso_ = new record(*current_qso_);
 	logging_state_ = QSO_EDIT;
-	copy_qso_to_display(CF_ALL);
+	copy_qso_to_display(CF_ALL_FLAGS);
 	enable_widgets();
 }
 
@@ -2047,7 +2041,7 @@ void qso_manager::qso_group::action_cancel_edit() {
 	delete original_qso_;
 	original_qso_ = nullptr;
 	logging_state_ = QSO_INACTIVE;
-	copy_qso_to_display(CF_ALL);
+	copy_qso_to_display(CF_ALL_FLAGS);
 	enable_widgets();
 }
 
@@ -2390,7 +2384,9 @@ void qso_manager::update_rig() {
 			}
 			break;
 		}
-		case LM_ON_AIR_COPY: {
+		case LM_ON_AIR_COPY:
+		case LM_ON_AIR_CLONE:
+		{
 			break;
 		}
 		}
@@ -2403,17 +2399,16 @@ void qso_manager::update_qso() {
 	record* prev_record = book_->get_record();
 	if (qso_in_progress() && prev_record == qso_group_->current_qso_) {
 		// Update the view if another view changes the record
-		qso_group_->copy_qso_to_display(qso_group::CF_ALL);
+		qso_group_->copy_qso_to_display(qso_group::CF_ALL_FLAGS);
 	}
 	else if (qso_group_->logging_state_ == QSO_PENDING) {
 		// Switch to selected record if in QSO_PENDING state
-		qso_group_->copy_qso_to_qso(book_->get_record(), qso_group::CF_NOTCLOCK);
+		qso_group_->copy_qso_to_qso(book_->get_record(), qso_group::CF_RIG_ETC | qso_group::CF_CAT);
 	}
 }
 
 // Start QSO
 void qso_manager::start_qso() {
-
 	switch (qso_group_->logging_state_) {
 	case QSO_INACTIVE:
 		qso_group_->action_activate();

@@ -45,6 +45,7 @@ namespace zzalog {
 			LM_OFF_AIR,     // Off-line logging (w/o radio)
 			LM_ON_AIR_CAT,  // Real -time logging - data from radio
 			LM_ON_AIR_COPY, // Real-time logging - data from selected QSO
+			LM_ON_AIR_CLONE,// Real-time logging - data from selected QSO (except CALL)
 			LM_ON_AIR_TIME, // Real-time logging - date/time only
 			//LM_IMPORTED,    // Import from modem software (w/ or w/o radio)
 		};
@@ -108,11 +109,23 @@ namespace zzalog {
 				CF_NONE = 0,
 				CF_RIG_ETC = 1,
 				CF_CAT = 2,
-				CF_CLOCK = 4,
-				CF_REST = 8,
-				CF_ALL = CF_RIG_ETC | CF_CAT | CF_CLOCK | CF_REST,
-				CF_NOTCLOCK = CF_RIG_ETC | CF_CAT | CF_REST
+				CF_TIME = 4,
+				CF_CONTACT = 8,
+				CF_REPORTS = 16,
+				CF_QSO = CF_RIG_ETC | CF_CAT | CF_TIME | CF_CONTACT,
+				CF_ALL_FLAGS = -1
 			};
+
+			const map < copy_flags, set<string> > COPY_FIELDS =
+			{
+				{ CF_RIG_ETC, { "MY_RIG", "MY_ANTENNA", "STATION_CALLSIGN", "APP_ZZA_QTH" } },
+				{ CF_CAT, { "MODE", "FREQ", "SUBMODE", "TX_PWR", "BAND"} },
+				{ CF_TIME, { "QSO_DATE", "QSO_DATE_OFF", "TIME_ON", "TIME_OFF" } },
+				{ CF_CONTACT, { "CALL", "NAME", "QTH", "DXCC", "STATE", "CNTY", "GRIDSQUARE", "CQ_ZONE", "ITU_ZONE" } },
+				{ CF_REPORTS, { "RST_SENT", "RST_RCVD", "SRX", "STX" }}
+			};
+
+			const set < copy_flags > COPY_SET = { CF_RIG_ETC, CF_CAT, CF_TIME, CF_CONTACT, CF_REPORTS };
 
 		public:
 			qso_group(int X, int Y, int W, int H, const char* l);
