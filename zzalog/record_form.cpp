@@ -119,7 +119,7 @@ record_form::record_form(int X, int Y, int W, int H, const char* label, field_or
 	, current_enum_type_("")
 	, selected_image_(QI_EQSL)
 	, image_(nullptr)
-	, edit_mode_(EM_ORIGINAL)
+	//, edit_mode_(EM_ORIGINAL)
 	, current_field_("")
 	, modifying_(false)
 	, enable_all_search_(false)
@@ -540,16 +540,17 @@ void record_form::cb_tab_record(Fl_Widget* w, void* v) {
 				// We have a base record and user clicked base record - enable editting the record
 				text = that->record_1_->item(field);
 				if (that->use_mode_ == UM_DISPLAY || that->use_mode_ == UM_MODIFIED) {
+					qso_manager_->edit_qso();
 					that->modifying_ = true;
 				}
-				that->edit_mode_ = EM_EDIT;
+				//that->edit_mode_ = EM_EDIT;
 			}
 			else if (that->record_2_ != nullptr && 
 				((that->record_1_ == nullptr && col == 0) ||
 				(that->record_1_ != nullptr && col == 1) ) ) {
 				// Copy the query data to editting widget, set editting mode
 				text = that->record_2_->item(field);
-				that->edit_mode_ = EM_QUERY;
+				//that->edit_mode_ = EM_QUERY;
 			}
 			else if (that->record_1_ != nullptr &&
 				that->record_2_ != nullptr &&
@@ -557,7 +558,7 @@ void record_form::cb_tab_record(Fl_Widget* w, void* v) {
 				col == 2) {
 				// Clicked original value, prepare to restore original record value
 				text = that->saved_record_->item(field);
-				that->edit_mode_ = EM_ORIGINAL;
+				//that->edit_mode_ = EM_ORIGINAL;
 			}
 			// Copy the selected text into the text and enum value controls
 			that->set_edit_widgets(field, text);
@@ -824,9 +825,11 @@ void record_form::cb_bn_edit(Fl_Widget* w, long v) {
 		// Save current record
 		qso_manager_->end_qso();
 		that->use_mode_ = UM_DISPLAY;
+		that->modifying_ = false;
 		break;
 	case EDIT_THIS:
 		// Allow the current record to be edited
+		qso_manager_->edit_qso();
 		that->use_mode_ = UM_QSO;
 		that->set_edit_widgets("", "");
 		that->modifying_ = true;
@@ -1012,7 +1015,7 @@ void record_form::update(hint_t hint, record_num_t record_num_1, record_num_t re
 			saved_record_ = nullptr;
 		}
 		use_mode_ = UM_DISPLAY;
-		edit_mode_ = EM_ORIGINAL;
+		//edit_mode_ = EM_ORIGINAL;
 		query_message_ = "";
 		is_enumeration_ = false;
 		enable_all_search_ = true;
@@ -1028,7 +1031,7 @@ void record_form::update(hint_t hint, record_num_t record_num_1, record_num_t re
 		delete saved_record_;
 		saved_record_ = new record(*record_1_);
 		use_mode_ = UM_QSO;
-		edit_mode_ = EM_ORIGINAL;
+		//edit_mode_ = EM_ORIGINAL;
 		query_message_ = "";
 		is_enumeration_ = false;
 		enable_all_search_ = false;
@@ -1044,7 +1047,7 @@ void record_form::update(hint_t hint, record_num_t record_num_1, record_num_t re
 		delete saved_record_;
 		saved_record_ = new record(*record_1_);
 		use_mode_ = UM_QUERY;
-		edit_mode_ = EM_ORIGINAL;
+		//edit_mode_ = EM_ORIGINAL;
 		query_message_ = import_data_->match_question();
 		enable_all_search_ = true;
 		is_enumeration_ = false;
@@ -1060,7 +1063,7 @@ void record_form::update(hint_t hint, record_num_t record_num_1, record_num_t re
 		delete saved_record_;
 		saved_record_ = nullptr;
 		use_mode_ = UM_QUERY;
-		edit_mode_ = EM_ORIGINAL;
+		//edit_mode_ = EM_ORIGINAL;
 		query_message_ = import_data_->match_question();
 		is_enumeration_ = false;
 		enable_all_search_ = true;
@@ -1076,7 +1079,7 @@ void record_form::update(hint_t hint, record_num_t record_num_1, record_num_t re
 		delete saved_record_;
 		saved_record_ = new record(*record_1_);
 		use_mode_ = UM_DUPEQUERY;
-		edit_mode_ = EM_ORIGINAL;
+		//edit_mode_ = EM_ORIGINAL;
 		query_message_ = my_book_->match_question();
 		is_enumeration_ = false;
 		enable_all_search_ = false;
@@ -1092,7 +1095,7 @@ void record_form::update(hint_t hint, record_num_t record_num_1, record_num_t re
 		delete saved_record_;
 		saved_record_ = new record(*record_1_);
 		use_mode_ = UM_MERGEDETAILS;
-		edit_mode_ = EM_ORIGINAL;
+		//edit_mode_ = EM_ORIGINAL;
 		query_message_ = qrz_handler_->get_merge_message();
 		is_enumeration_ = false;
 		enable_all_search_ = false;
@@ -1645,7 +1648,13 @@ void record_form::enable_widgets() {
 		edit3_bn_->color(FL_GREEN);
 		edit3_bn_->tooltip("Add query record to log");
 		edit3_bn_->callback(cb_bn_edit, (long)ADD);
-		edit3_bn_->activate();
+		// Activate add button, if we have a record to copy station details from
+		if (record_1_) {
+			edit3_bn_->activate();
+		}
+		else {
+			edit3_bn_->deactivate();
+		}
 		// If this record is a WSJT-X mode and we don't have a possible match set button 4 to look inn ALL.txt
 		if (record_2_ &&
 			(record_2_->item("MODE") == "JT65" || record_2_->item("MODE") == "JT9" || record_2_->item("MODE") == "FT8" || record_2_->item("MODE") == "FT4")) {

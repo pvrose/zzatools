@@ -1222,6 +1222,7 @@ void qso_manager::qso_group::update_station_choices(stn_item_t station_item) {
 void qso_manager::qso_group::copy_qso_to_display(int flags) {
 	record* source = get_default_record();
 	if (source) {
+		// For each field input
 		for (int i = 0; i < NUMBER_TOTAL; i++) {
 			string field;
 			if (i < NUMBER_FIXED) field = fixed_names_[i];
@@ -1237,7 +1238,7 @@ void qso_manager::qso_group::copy_qso_to_display(int flags) {
 						copy_flags f = (*sf);
 						if (flags & f) {
 							for (auto fx = COPY_FIELDS.at(f).begin(); fx != COPY_FIELDS.at(f).end(); fx++) {
-								ip_field_[i]->value(source->item(field, false, true).c_str());
+								if ((*fx) == field)	ip_field_[i]->value(source->item(field, false, true).c_str());
 							}
 						}
 					}
@@ -1713,8 +1714,7 @@ void qso_manager::qso_group::initialise_fields() {
 	split_line(preset_fields, field_names, ',');
 	size_t ix = 0;
 	int iy;
-	for (ix = 0; ix < field_names.size(); ix++) {
-		iy = ix + NUMBER_FIXED;
+	for (ix = 0, iy = NUMBER_FIXED; ix < field_names.size(); ix++, iy++) {
 		if (new_fields) {
 			ch_field_[iy]->value(field_names[ix].c_str());
 			ip_field_[iy]->field_name(field_names[ix].c_str());
@@ -1881,7 +1881,6 @@ void qso_manager::qso_group::action_activate() {
 		copy_clock_to_qso(now);
 		break;
 	}
-	copy_qso_to_display(CF_CONTACT);
 	logging_state_ = QSO_PENDING;
 	enable_widgets();
 }
@@ -2439,10 +2438,26 @@ void qso_manager::end_qso() {
 		qso_group_->action_save();
 		break;
 	case QSO_EDIT:
-		status_->misc_status(ST_ERROR, "CAnnot end a QSO while editing an existing one");
+		qso_group_->action_save_edit();
 		break;
 	}
 
+}
+
+// Edit QSO
+void qso_manager::edit_qso() {
+	switch (qso_group_->logging_state_) {
+	case QSO_INACTIVE:
+		qso_group_->action_edit();
+		break;
+	case QSO_PENDING:
+	case QSO_STARTED:
+		status_->misc_status(ST_ERROR, "Cannot edit a QSO when in on-air");
+		break;
+	case QSO_EDIT:
+		status_->misc_status(ST_ERROR, "Cannot edit another QSO while editing an existing one");
+		break;
+	}
 }
 
 // Dummy QSO - only current date and time

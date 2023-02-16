@@ -486,6 +486,8 @@ namespace zzalog {
 		record* dummy_qso();
 		// End QSO
 		void end_qso();
+		// Edit QSO
+		void edit_qso();
 		// Get default value
 		string get_default(stn_item_t item);
 

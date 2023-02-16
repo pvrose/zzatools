@@ -41,13 +41,13 @@ namespace zzalog {
 			UM_MANUAL_QUERY,    // Querying manually supplied data
 		};
 
-		// What the source of the data in record is.
-		enum edit_mode_t {
-			EM_ORIGINAL,        // Original log record
-			EM_EDIT,            // Supplied by editing
-			EM_QUERY,           // Supplied by query record
-			EM_MANUAL           // Manually supplied data
-		};
+		//// What the source of the data in record is.
+		//enum edit_mode_t {
+		//	EM_ORIGINAL,        // Original log record
+		//	EM_EDIT,            // Supplied by editing
+		//	EM_QUERY,           // Supplied by query record
+		//	EM_MANUAL           // Manually supplied data
+		//};
 
 		// The specific image required - determines the file location of the image file
 		enum image_t {
@@ -208,8 +208,8 @@ namespace zzalog {
 		Fl_Image* image_;
 		// Scale or stretch the image
 		bool scaling_image_;
-		// What the current edit value of a field is:
-		edit_mode_t edit_mode_;
+		//// What the current edit value of a field is:
+		//edit_mode_t edit_mode_;
 		// Current field
 		string current_field_;
 		// Display all fields
