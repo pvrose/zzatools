@@ -708,8 +708,10 @@ record_num_t book::get_insert_point(record* record) {
 void book::insert_record_at(record_num_t pos_record, record* record) {
 	// get the iterator to the insert position
 	insert(begin() + pos_record, record);
-	// Update summary lookups
-	add_use_data(record);
+	if (book_type_ == OT_MAIN) {
+		// Update summary lookups
+		add_use_data(record);
+	}
 }
 
 // Navigate the log - i.e. go to specific position

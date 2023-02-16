@@ -1904,6 +1904,10 @@ void dxa_if::zoom_centre(lat_long_t centre) {
 		map->PutZoom(zoom);
 		// Read the actual amount zoomed
 		zoom_value_ = map->GetZoom();
+		char msg[256];
+		snprintf(msg, 256, "DXATLAS: Zoom required S %f N %f W %f E %f, Z = %f obtained %f",
+			southernmost_, northernmost_, westernmost_, easternmost_, zoom, zoom_value_);
+		status_->misc_status(ST_NOTE, msg);
 	}
 }
 
@@ -1918,6 +1922,10 @@ void dxa_if::zoom_azimuthal() {
 	zoom = (float)((EARTH_RADIUS * PI) / furthest_) * 1.05F;
 	map->PutZoom(zoom);
 	zoom_value_ = map->GetZoom();
+	char msg[256];
+	snprintf(msg, 256, "DXATLAS: Zoom required distance %d km, Z = %f obtained %f",
+		furthest_, zoom, zoom_value_);
+	status_->misc_status(ST_NOTE, msg);
 }
 
 // Centre the map according to the settings
