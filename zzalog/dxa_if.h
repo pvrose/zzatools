@@ -206,7 +206,7 @@ namespace zzalog {
 		// On specific centre
 		void centre_map(lat_long_t centre);
 		// Zoom to centre
-		void zoom_centre(lat_long_t centre, bool full);
+		void zoom_centre(lat_long_t centre);
 		// Zoom azimuth
 		void zoom_azimuthal();
 		// Label colour group

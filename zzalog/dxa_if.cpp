@@ -318,7 +318,7 @@ void dxa_if::create_form() {
 	curr_y += ch13->h();
 	max_y = max(max_y, curr_y);
 	curr_y = max_y + GAP;
-#
+
 	// Slider - pin size
 	Fl_Slider* sl10 = new Fl_Slider(curr_x, curr_y, WSMEDIT - HBUTTON, HBUTTON, "Pin size");
 	sl10->type(FL_HORIZONTAL);
@@ -660,9 +660,16 @@ void dxa_if::cb_bn_centre(Fl_Widget* w, void* v) {
 	dxa_if* that = ancestor_view<dxa_if>(w);
 	if (that->atlas_) {
 		DxAtlas::IDxMapPtr map = that->atlas_->GetMap();
+		lat_long_t home = { that->home_lat_, that->home_long_ };
 		that->clear_dx_loc();
-		if (map->GetProjection() == DxAtlas::PRJ_RECTANGULAR) {
-			that->centre_map();
+		that->centre_map(home);
+		switch (map->GetProjection()) {
+		case DxAtlas::PRJ_RECTANGULAR:
+			that->zoom_centre(home);
+			break;
+		case DxAtlas::PRJ_AZIMUTHAL:
+			that->zoom_azimuthal();
+			break;
 		}
 	}
 }
@@ -1864,43 +1871,37 @@ void dxa_if::centre_map(lat_long_t centre) {
 }
 
 // Zoom the map on the specified centre to cover whole world (full) or just drawn points
-void dxa_if::zoom_centre(lat_long_t centre, bool full) {
+void dxa_if::zoom_centre(lat_long_t centre) {
 	if (!isnan(centre.latitude) && !isnan(centre.longitude)) {
 		DxAtlas::IDxMapPtr map = atlas_->GetMap();
-		if (full) {
-			// Zoom whole map
-			map->PutZoom(1);
+		// Zoom is only considered by DxAtlas on the longitude (width) of the window
+		// The window height is not taken into consideration. That is to say, if the
+		// window is resized, the map is adjusted to fit the required width OK, but not the 
+		// required height. map->GetWidth() and map->GetHeight() are available but 
+		// there is not an obvious way of getting a baseline optimum width/height ratio
+		//  
+		// However by eye, it looks like the pixel/degree ratio (dpp) is the same for both
+		// longitude and latitude - so the optimum width:height ratio is 2:1
+		//
+		// Zoom to include all records - get the furthermost from the centre E/W and N/S
+		// First calculate the necessary zoom to include all longitude values
+		double required_long = 2 * (max(easternmost_ - centre.longitude, centre.longitude - westernmost_));
+		double zoom_long = 360. / required_long;
+		double target_dpp = required_long / double(map->GetWidth());
+		// Now check if it will fit all the latitude values
+		double required_lat = 2 * (max(northernmost_ - centre.latitude, centre.latitude - southernmost_));
+		double zoomed_lat = target_dpp * double(map->GetHeight());
+		float zoom;
+		if (zoomed_lat >= required_lat) {
+			// It will fit - decrease zoom by 5% margin
+			zoom = (float)(zoom_long * 0.95);
 		}
 		else {
-			// Zoom is only considered by DxAtlas on the longitude (width) of the window
-			// The window height is not taken into consideration. That is to say, if the
-			// window is resized, the map is adjusted to fit the required width OK, but not the 
-			// required height. map->GetWidth() and map->GetHeight() are available but 
-			// there is not an obvious way of getting a baseline optimum width/height ratio
-			//  
-			// However by eye, it looks like the pixel/degree ratio (dpp) is the same for both
-			// longitude and latitude - so the optimum width:height ratio is 2:1
-			//
-			// Zoom to include all records - get the furthermost from the centre E/W and N/S
-			// First calculate the necessary zoom to include all longitude values
-			double required_long = 2 * (max(easternmost_ - centre.longitude, centre.longitude - westernmost_));
-			double zoom_long = 360. / required_long;
-			double target_dpp = required_long / double(map->GetWidth());
-			// Now check if it will fit all the latitude values
-			double required_lat = 2 * (max(northernmost_ - centre.latitude, centre.latitude - southernmost_));
-			double zoomed_lat = target_dpp * double(map->GetHeight());
-			float zoom;
-			if (zoomed_lat >= required_lat) {
-				// It will fit - decrease zoom by 5% margin
-				zoom = (float)(zoom_long * 0.95);
-			}
-			else {
-				// Decrease zoom by mismatch (and a further 5%)
-				zoom = (float)(zoom_long * (zoomed_lat / required_lat) * 0.95);
-			}
-			// now zoom by the smaller of these with 5% margin
-			map->PutZoom(zoom);
+			// Decrease zoom by mismatch (and a further 5%)
+			zoom = (float)(zoom_long * (zoomed_lat / required_lat) * 0.95);
 		}
+		// now zoom by the smaller of these with 5% margin
+		map->PutZoom(zoom);
 		// Read the actual amount zoomed
 		zoom_value_ = map->GetZoom();
 	}
@@ -1936,7 +1937,7 @@ void dxa_if::centre_map() {
 			// Centre on the home location
 			centre = { (double)home_lat_, (double)home_long_ };
 			centre_map(centre);
-			zoom_centre(centre, false);
+			zoom_centre(centre);
 			break;
 		case DX:
 			// Centre on DX location - only if being displayed
@@ -1945,7 +1946,7 @@ void dxa_if::centre_map() {
 			if (map->GetDxVisible()) {
 				centre = { (double)map->GetDxLatitude(), (double)map->GetDxLongitude() };
 				centre_map(centre);
-				zoom_centre(centre, false);
+				zoom_centre(centre);
 			}
 			break;
 		}
@@ -1953,19 +1954,19 @@ void dxa_if::centre_map() {
 			// Centre on the selected record
 			centre = selected_locn_;
 			centre_map(centre);
-			zoom_centre(centre, false);
+			zoom_centre(centre);
 			break;
 		case GROUP:
 			// Centre so that the group is displayed evenly
 			centre = { (northernmost_ + southernmost_) * 0.5, (westernmost_ + easternmost_) * 0.5 };
 			centre_map(centre);
-			zoom_centre(centre, false);
+			zoom_centre(centre);
 			break;
 		case ZERO:
 			// Centre at 0 N 0 W
 			centre = { 0.0, 0.0 };
 			centre_map(centre);
-			zoom_centre(centre, true);
+			zoom_centre(centre);
 			break;
 		default:
 			// Display an entire continent
@@ -2019,7 +2020,7 @@ void dxa_if::centre_map() {
 			}
 			centre = { (northernmost_ + southernmost_) * 0.5, (westernmost_ + easternmost_) * 0.5 };
 			centre_map(centre);
-			zoom_centre(centre, false);
+			zoom_centre(centre);
 			// Restore bounds
 			northernmost_ = save_n;
 			southernmost_ = save_s;
