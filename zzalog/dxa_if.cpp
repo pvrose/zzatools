@@ -1910,17 +1910,13 @@ void dxa_if::zoom_centre(lat_long_t centre, bool full) {
 void dxa_if::zoom_azimuthal() {
 	DxAtlas::IDxMapPtr map = atlas_->GetMap();
 	float zoom;
-	switch (centre_mode_) {
-	case HOME:
-		// Zoom in to just the displayed QSOs
-		zoom = (float)((EARTH_RADIUS * PI) / furthest_ * 0.95);
-		map->PutZoom(zoom);
-		break;
-	case ZERO:
-		// Zoom full size
-		map->PutZoom(1.0);
-		break;
-	}
+	// Zoom in to just the displayed QSOs
+	// Z=1.0 is full earth view, make Z = pi * R / furthest + 5%
+	// TODO: Account for width and height of DxAtlas by taking into account
+	//  bearing
+	zoom = (float)((EARTH_RADIUS * PI) / furthest_) * 1.05F;
+	map->PutZoom(zoom);
+	zoom_value_ = map->GetZoom();
 }
 
 // Centre the map according to the settings
