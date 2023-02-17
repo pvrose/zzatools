@@ -125,7 +125,19 @@ int field_input::handle(int event) {
 	}
 }
 
+const char* field_input::value() {
+	populate_case_choice();
+	return Fl_Input_Choice::value();
+}
 
+void field_input::value(const char* v) {
+	Fl_Input_Choice::value(v);
+	populate_case_choice();
+}
+
+void field_input::value(int i) {
+	Fl_Input_Choice::value(i);
+}
 
 void field_input::field_name(const char* field_name) {
 	field_name_ = field_name;
@@ -137,7 +149,9 @@ void field_input::field_name(const char* field_name) {
 		populate_choice(enum_name);
 		menubutton()->show();
 	}
-	else {
+	else if (is_string(field_name_)) {
+		populate_case_choice();
+	} else {
 		clear();
 		menubutton()->hide();
 	}
@@ -170,7 +184,86 @@ void field_input::populate_choice(string name) {
 	}
 }
 
+// Poulate case choice
+void field_input::populate_case_choice() {
+	clear();
+	const char* src = Fl_Input_Choice::value();
+	// Generate upper-, lower- and mixed-case versions of the input value
+	int len = strlen(src);
+	if (len > 0) {
+		char* dst = new char[len * 3];
+		// upper-case
+		memset(dst, 0, len * 3);
+		fl_utf_toupper((unsigned char*)src, len, dst);
+		add(dst);
+		// lower-case
+		memset(dst, 0, len * 3);
+		fl_utf_tolower((unsigned char*)src, len, dst);
+		add(dst);
+		// mixed-case
+		memset(dst, 0, len * 3);
+		bool mixed_upper = true;
+		bool prev_upper = true;
+		char* temp = dst;
+		for (unsigned int i = 0; i < (unsigned)len; ) {
+			int num_utf8_bytes;
+			// Get the next UTF-8 character 
+			unsigned int ucs = fl_utf8decode(src + i, src + len, &num_utf8_bytes);
+			// Step to the next UTF-8 character
+			i += num_utf8_bytes;
+			// Convert case
+			unsigned int new_ucs;
+			if (mixed_upper) {
+				new_ucs = fl_toupper(ucs);
+			}
+			else {
+				new_ucs = fl_tolower(ucs);
+			}
+			// Convert UTF-8 character to bytes, store it and step destination pointer
+			temp += fl_utf8encode(new_ucs, temp);
+			switch (ucs) {
+			case ' ':
+			case '-':
+			case '.':
+				// Force upper case after some punctuation
+				prev_upper = mixed_upper;
+				mixed_upper = true;
+				break;
+			case '\'':
+				// Keep case prior to apostrophe
+				mixed_upper = prev_upper;
+				break;
+			default:
+				// Force lower case
+				prev_upper = mixed_upper;
+				mixed_upper = false;
+				break;
+			}
+		}
+		add(dst);
+	}
+	else {
+		add("UPPER");
+		add("lower");
+		add("Mixed");
+	}
+}
+
 // Repopulate choice
 void field_input::reload_choice() {
 	field_name(field_name_.c_str());
+}
+
+// Field is a string type - allow case choice
+bool field_input::is_string(string field) {
+	char c = spec_data_->datatype_indicator(field);
+	switch (c) {
+	case 'S':
+	case 'M':
+	case 'I':
+	case 'G':
+		return true;
+	default:
+		return false;
+	}
 }

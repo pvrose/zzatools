@@ -46,6 +46,11 @@ namespace zzalog {
 
 		// Overload handle to set this as a recipient of int'l pastes
 		int handle(int event);
+		// Overload value
+		virtual const char* value();
+		// Make the others virtual as well
+		virtual void value(const char* val);
+		virtual void value(int i);
 
 		void field_name(const char* field_name);
 		const char* field_name();
@@ -56,6 +61,10 @@ namespace zzalog {
 
 		// Populate the choice
 		void populate_choice(string name);
+		// Populate a case choice
+		void populate_case_choice();
+		// Has a field that can have case changed
+		bool is_string(string field);
 		// Name of field
 		string field_name_;
 	};
