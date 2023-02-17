@@ -1,6 +1,7 @@
 #include "field_choice.h"
 #include "fields.h"
 #include "spec_data.h"
+#include "intl_dialog.h"
 #include "../zzalib/utils.h"
 
 #include <FL/Fl_Preferences.H>
@@ -8,6 +9,7 @@
 using namespace zzalog;
 
 extern spec_data* spec_data_;
+extern intl_dialog* intl_dialog_;
 
 // Lists greater than this will be hierarchic - e.g. "A/ADDRESS" else not so "ADDRESS"
 const int HIERARCHIC_LIMIT = 12;
@@ -103,7 +105,27 @@ field_input::field_input(int X, int Y, int W, int H, const char* label) :
 {
 }
 
-field_input::~field_input() {}
+field_input::~field_input() {
+	if (intl_dialog_ && intl_dialog_->visible()) {
+		intl_dialog_->editor(nullptr);
+	}
+}
+
+int field_input::handle(int event) {
+	// Tell international character dialog to paste to this widget
+	switch (event) {
+	case FL_FOCUS:
+		if (intl_dialog_) {
+			intl_dialog_->editor(this);
+		}
+		return true;
+	default:
+		// Do normal handling
+		return Fl_Input_Choice::handle(event);
+	}
+}
+
+
 
 void field_input::field_name(const char* field_name) {
 	field_name_ = field_name;

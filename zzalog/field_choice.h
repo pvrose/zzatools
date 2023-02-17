@@ -44,6 +44,9 @@ namespace zzalog {
 		field_input(int X, int Y, int W, int H, const char* label = nullptr);
 		~field_input();
 
+		// Overload handle to set this as a recipient of int'l pastes
+		int handle(int event);
+
 		void field_name(const char* field_name);
 		const char* field_name();
 
