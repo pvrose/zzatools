@@ -126,13 +126,13 @@ int field_input::handle(int event) {
 }
 
 const char* field_input::value() {
-	populate_case_choice();
+	if (is_string(field_name_)) populate_case_choice();
 	return Fl_Input_Choice::value();
 }
 
 void field_input::value(const char* v) {
 	Fl_Input_Choice::value(v);
-	populate_case_choice();
+	if (is_string(field_name_)) populate_case_choice();
 }
 
 void field_input::value(int i) {
@@ -151,6 +151,7 @@ void field_input::field_name(const char* field_name) {
 	}
 	else if (is_string(field_name_)) {
 		populate_case_choice();
+		menubutton()->show();
 	} else {
 		clear();
 		menubutton()->hide();
@@ -205,6 +206,7 @@ void field_input::populate_case_choice() {
 		bool mixed_upper = true;
 		bool prev_upper = true;
 		char* temp = dst;
+		// TODO move this to utils as replicated from log_table
 		for (unsigned int i = 0; i < (unsigned)len; ) {
 			int num_utf8_bytes;
 			// Get the next UTF-8 character 
@@ -243,6 +245,7 @@ void field_input::populate_case_choice() {
 		add(dst);
 	}
 	else {
+		// Default place-holders if no text in input
 		add("UPPER");
 		add("lower");
 		add("Mixed");

@@ -46,6 +46,8 @@ namespace zzalog {
 
 		// Overload handle to set this as a recipient of int'l pastes
 		int handle(int event);
+		// The value() methods of Fl_Input_Choice are not virtual, so need to make them 
+		// all virtual here otherwise the compiler cannot find them
 		// Overload value
 		virtual const char* value();
 		// Make the others virtual as well

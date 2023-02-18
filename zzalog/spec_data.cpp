@@ -758,6 +758,7 @@ bool spec_data::add_user_enum(string field, string value) {
 			(*it_field->second)["Enumeration"] = enum_name;
 			(*it_field->second)["Data Type"] = "Dynamic";
 			(*it_field->second)["ADIF Status"] = "Not approved";
+			datatype_indicators_[field] = 'Y';
 		}
 	}
 	else {
@@ -771,7 +772,7 @@ bool spec_data::add_user_enum(string field, string value) {
 	if (types_dataset->data.find("Dynamic") == types_dataset->data.end()) {
 		map<string, string>* dynamic_data = new map<string, string>;
 		(*dynamic_data)["Comments"] = "Application defined dynamic enumeration";
-		(*dynamic_data)["Data Type Indicator"] = "E";
+		(*dynamic_data)["Data Type Indicator"] = "Y";
 		(*dynamic_data)["Data Type Name"] = "Dynamic";
 		(*dynamic_data)["Description"] = "Dynamic enumeration for field " + field;
 		types_dataset->data["Dynamic"] = dynamic_data;
@@ -848,6 +849,7 @@ bool spec_data::add_user_macro(string field, string value, macro_defn macro) {
 			(*it_field->second)["Enumeration"] = enum_name;
 			(*it_field->second)["Data Type"] = "Macro";
 			(*it_field->second)["ADIF Status"] = "Not approved";
+			datatype_indicators_[field] = 'X';
 		}
 	}
 	else {
@@ -856,12 +858,12 @@ bool spec_data::add_user_macro(string field, string value, macro_defn macro) {
 		status_->misc_status(ST_ERROR, message);
 		return false;
 	}
-	// Check that "Dynamic" is a member of Data Types and create it if it isn't
+	// Check that "Macro" is a member of Data Types and create it if it isn't
 	spec_dataset* types_dataset = dataset("Data Types");
 	if (types_dataset->data.find("Macro") == types_dataset->data.end()) {
 		map<string, string>* dynamic_data = new map<string, string>;
-		(*dynamic_data)["Comments"] = "Application defined dynamic enumeration";
-		(*dynamic_data)["Data Type Indicator"] = "E";
+		(*dynamic_data)["Comments"] = "Application defined macro enumeration";
+		(*dynamic_data)["Data Type Indicator"] = "X";
 		(*dynamic_data)["Data Type Name"] = "Macro";
 		(*dynamic_data)["Description"] = "Macro enumeration for field " + field;
 		types_dataset->data["Macro"] = dynamic_data;
