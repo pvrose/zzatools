@@ -161,7 +161,6 @@
     <ClCompile Include="zzalog\config_tree.cpp" />
     <ClCompile Include="zzalog\corr_dialog.cpp" />
     <ClCompile Include="zzalog\dxa_if.cpp" />
-    <ClCompile Include="zzalog\edit_input.cpp" />
     <ClCompile Include="zzalog\eqsl_handler.cpp" />
     <ClCompile Include="zzalog\exc_data.cpp" />
     <ClCompile Include="zzalog\exc_reader.cpp" />

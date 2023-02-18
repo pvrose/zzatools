@@ -68,26 +68,26 @@ log_table::log_table(int X, int Y, int W, int H, const char* label, field_orderi
 	log_settings.get("Font Size", (int&)fontsize_, FONT_SIZE);
 	begin();
 	// Create cell input widget, zero size, hide it
-	edit_input_ = new edit_input(x() + w() / 2, y() + h() / 2, 100, 20);
+	edit_input_ = new field_input(x() + w() / 2, y() + h() / 2, 100, 20);
 	edit_input_->box(FL_DOWN_BOX);
 	edit_input_->hide();
 	edit_input_->callback(cb_input, nullptr);
-	edit_input_->when(FL_WHEN_ENTER_KEY_ALWAYS);
+	edit_input_->when(FL_WHEN_RELEASE);
 	edit_input_->textfont(font_);
 	edit_input_->textsize(fontsize_);
 	add(edit_input_);
-	// Create menu button for the edit_input, 
-	edit_menu_ = new Fl_Menu_Button(0, 0, WBUTTON, HBUTTON, nullptr);
-	// Popup means the button isn't drawn, but it is clickable
-	edit_menu_->type(Fl_Menu_Button::POPUP3);
-	edit_menu_->textsize(FONT_SIZE);
-	edit_menu_->textfont(FONT);
-	edit_menu_->box(FL_UP_BOX);
-	edit_menu_->add("&UPPER", 0, cb_menu, (void*)UPPER);
-	edit_menu_->add("&lower", 0, cb_menu, (void*)LOWER);
-	edit_menu_->add("&Mixed", 0, cb_menu, (void*)MIXED);
-	edit_menu_->hide();
-	add(edit_menu_);
+	//// Create menu button for the edit_input, 
+	//edit_menu_ = new Fl_Menu_Button(0, 0, WBUTTON, HBUTTON, nullptr);
+	//// Popup means the button isn't drawn, but it is clickable
+	//edit_menu_->type(Fl_Menu_Button::POPUP3);
+	//edit_menu_->textsize(FONT_SIZE);
+	//edit_menu_->textfont(FONT);
+	//edit_menu_->box(FL_UP_BOX);
+	//edit_menu_->add("&UPPER", 0, cb_menu, (void*)UPPER);
+	//edit_menu_->add("&lower", 0, cb_menu, (void*)LOWER);
+	//edit_menu_->add("&Mixed", 0, cb_menu, (void*)MIXED);
+	//edit_menu_->hide();
+	//add(edit_menu_);
 	end();
 	alt_gr_ = false;
 
@@ -197,84 +197,88 @@ void log_table::cb_tab_log(Fl_Widget* w, void* v) {
 // Callback from the edit input - Enter key has been typed
 void log_table::cb_input(Fl_Widget* w, void* v) {
 	log_table* that = ancestor_view<log_table>(w);
-	that->done_edit(false);
+	field_input* fi = (field_input*)w;
+	that->edit_save(fi->reason());
 }
 
-// Callback when right click in edit_menu_ - convert selected text to upper, lower or mixed-case
-// Also called for OK and Cancel buttons and on certain keyboard events
-void log_table::cb_menu(Fl_Widget* w, void* v) {
-	// Get the enclosing log_table
-	log_table* that = ancestor_view<log_table>(w);
-	// Get the source string 
-	const char* src = that->edit_input_->value();
-	unsigned int l = strlen(src);
-	bool mixed_upper;
-	bool prev_upper;
-	int num_utf8_bytes;
-	// Destination string could be upto 3 times the length of the source
-	char* dst = new char[l * 3];
-	memset(dst, 0, l * 3);
-	char* dst2 = dst;
-	// Depending on the menu item pressed convert case appropriately
-	switch ((edit_menu_t)(long)v) {
-	case UPPER:
-		// Convert entire string to upper case
-		fl_utf_toupper((unsigned char*)src, l, dst);
-		break;
-	case LOWER:
-		// Convert entire string to lower case
-		fl_utf_tolower((unsigned char*)src, l, dst);
-		break;
-	case MIXED:
-		mixed_upper = true;
-		prev_upper = true;
-		for (unsigned int i = 0; i < l; ) {
-			// Get the next UTF-8 character 
-			unsigned int ucs = fl_utf8decode(src + i, src + l, &num_utf8_bytes);
-			// Step to the next UTF-8 character
-			i += num_utf8_bytes;
-			// Convert case
-			unsigned int new_ucs;
-			if (mixed_upper) {
-				new_ucs = fl_toupper(ucs);
-			}
-			else {
-				new_ucs = fl_tolower(ucs);
-			}
-			// Convert UTF-8 character to bytes, store it and step destination pointer
-			dst += fl_utf8encode(new_ucs, dst);
-			switch (ucs) {
-			case ' ':
-			case '-':
-			case '.':
-				// Force upper case after some punctuation
-				prev_upper = mixed_upper;
-				mixed_upper = true;
-				break;
-			case '\'':
-				// Keep case prior to apostrophe
-				mixed_upper = prev_upper;
-				break;
-			default:
-				// Force lower case
-				prev_upper = mixed_upper;
-				mixed_upper = false;
-				break;
-			}
-		}
-		break;
-	}
-	that->edit_input_->value(dst2);
-	// Rehide edit_menu_
-	w->hide();
-}
+//// Callback when right click in edit_menu_ - convert selected text to upper, lower or mixed-case
+//// Also called for OK and Cancel buttons and on certain keyboard events
+//void log_table::cb_menu(Fl_Widget* w, void* v) {
+//	// Get the enclosing log_table
+//	log_table* that = ancestor_view<log_table>(w);
+//	// Get the source string 
+//	const char* src = that->edit_input_->value();
+//	unsigned int l = strlen(src);
+//	bool mixed_upper;
+//	bool prev_upper;
+//	int num_utf8_bytes;
+//	// Destination string could be upto 3 times the length of the source
+//	char* dst = new char[l * 3];
+//	memset(dst, 0, l * 3);
+//	char* dst2 = dst;
+//	// Depending on the menu item pressed convert case appropriately
+//	switch ((edit_menu_t)(long)v) {
+//	case UPPER:
+//		// Convert entire string to upper case
+//		fl_utf_toupper((unsigned char*)src, l, dst);
+//		break;
+//	case LOWER:
+//		// Convert entire string to lower case
+//		fl_utf_tolower((unsigned char*)src, l, dst);
+//		break;
+//	case MIXED:
+//		mixed_upper = true;
+//		prev_upper = true;
+//		for (unsigned int i = 0; i < l; ) {
+//			// Get the next UTF-8 character 
+//			unsigned int ucs = fl_utf8decode(src + i, src + l, &num_utf8_bytes);
+//			// Step to the next UTF-8 character
+//			i += num_utf8_bytes;
+//			// Convert case
+//			unsigned int new_ucs;
+//			if (mixed_upper) {
+//				new_ucs = fl_toupper(ucs);
+//			}
+//			else {
+//				new_ucs = fl_tolower(ucs);
+//			}
+//			// Convert UTF-8 character to bytes, store it and step destination pointer
+//			dst += fl_utf8encode(new_ucs, dst);
+//			switch (ucs) {
+//			case ' ':
+//			case '-':
+//			case '.':
+//				// Force upper case after some punctuation
+//				prev_upper = mixed_upper;
+//				mixed_upper = true;
+//				break;
+//			case '\'':
+//				// Keep case prior to apostrophe
+//				mixed_upper = prev_upper;
+//				break;
+//			default:
+//				// Force lower case
+//				prev_upper = mixed_upper;
+//				mixed_upper = false;
+//				break;
+//			}
+//		}
+//		break;
+//	}
+//	that->edit_input_->value(dst2);
+//	// Rehide edit_menu_
+//	w->hide();
+//}
 
 // Copy the data from the edit input, and start a new edit input to the left, right, above or below
-void log_table::edit_save(edit_input::edit_exit_t exit_type) {
+void log_table::edit_save(field_input::exit_reason_t exit_type) {
 	// Deselect row being edited
 	select_row(edit_row_, 0);
 	switch (exit_type) {
-	case edit_input::edit_exit_t::SAVE_PREV:
+	case field_input::exit_reason_t::IR_NULL:
+		done_edit(false);
+		break;
+	case field_input::exit_reason_t::IR_LEFT:
 		// Save and edit previous column
 		done_edit(true);
 		if (edit_col_ > 0) {
@@ -284,7 +288,7 @@ void log_table::edit_save(edit_input::edit_exit_t exit_type) {
 			status_->misc_status(ST_WARNING, "LOG: There is no cell to the left to edit.");
 		}
 		break;
-	case edit_input::edit_exit_t::SAVE_NEXT:
+	case field_input::exit_reason_t::IR_RIGHT:
 		// Save and edit next column
 		done_edit(true);
 		if (edit_col_ < fields_.size() - 1) {
@@ -294,7 +298,7 @@ void log_table::edit_save(edit_input::edit_exit_t exit_type) {
 			status_->misc_status(ST_WARNING, "LOG: There is no cell to the right to edit.");
 		}
 		break;
-	case edit_input::edit_exit_t::SAVE_UP:
+	case field_input::exit_reason_t::IR_UP:
 		// Save and edit same column in previous record
 		done_edit(false);
 		if (edit_row_ > 0) {
@@ -304,7 +308,7 @@ void log_table::edit_save(edit_input::edit_exit_t exit_type) {
 			status_->misc_status(ST_WARNING, "LOG: There is no cell upwards to edit.");
 		}
 		break;
-	case edit_input::edit_exit_t::SAVE_DOWN:
+	case field_input::exit_reason_t::IR_DOWN:
 		// Save and edit smae column in next record
 		done_edit(false);
 		if (edit_row_ < my_book_->size() - 1) {
@@ -326,13 +330,13 @@ void log_table::edit_save(edit_input::edit_exit_t exit_type) {
 	}
 }
 
-// Open edit menu 
-void log_table::open_edit_menu() {
-	// Put it bottom right of the edit input
-	edit_menu_->position(edit_input_->x() + edit_input_->w(), edit_input_->y() + edit_input_->h());
-	edit_menu_->show();
-	edit_menu_->popup();
-}
+//// Open edit menu 
+//void log_table::open_edit_menu() {
+//	// Put it bottom right of the edit input
+//	edit_menu_->position(edit_input_->x() + edit_input_->w(), edit_input_->y() + edit_input_->h());
+//	edit_menu_->show();
+//	edit_menu_->popup();
+//}
 
 // event handler - remember the event and call widget's handle
 int log_table::handle(int event) {
@@ -735,23 +739,24 @@ void log_table::edit_cell(int row, int col) {
 	record* record = my_book_->get_record(item_number, true);
 	field_info_t field_info = fields_[col];
 	string text = record->item(field_info.field, true);
-	intl_input* input = (intl_input*)edit_input_;
+	//intl_input* input = (intl_input*)edit_input_;
 	edit_row_ = row;
 	edit_col_ = col;
 	// Get cell location
 	int X, Y, W, H;
 	find_cell(CONTEXT_CELL, row, col, X, Y, W, H);
 	// Open edit dialog exactly the size and position of the cell
-	input->resize(X, Y, W, H);
-	input->value(text.c_str());
-	input->textfont(font_);
-	input->textsize(fontsize_);
+	edit_input_->field_name(field_info.field.c_str());
+	edit_input_->resize(X, Y, W, H);
+	edit_input_->value(text.c_str());
+	edit_input_->textfont(font_);
+	edit_input_->textsize(fontsize_);
 	// Select all the contents of the input
-	input->position(0, text.length());
+	edit_input_->input()->position(0, text.length());
 	// Make the widget visible and let it take focus even if the mouse isn't over it
-	input->show();
-	input->take_focus();
-	input->redraw();
+	edit_input_->show();
+	edit_input_->take_focus();
+	edit_input_->redraw();
 	damage(FL_DAMAGE_ALL, X, Y, W, H);
 	redraw();
 }
@@ -764,7 +769,7 @@ void log_table::done_edit(bool keep_row) {
 		record* record = my_book_->get_record(item_number, true);
 		field_info_t field_info = fields_[edit_col_];
 		string old_text = record->item(field_info.field);
-		string text = ((intl_input*)edit_input_)->value();
+		string text = edit_input_->value();
 		// Set the record item to the edit input value
 		record->item(field_info.field, text, true);
 		// Now implemnt book-specific actions
@@ -851,7 +856,6 @@ void log_table::done_edit(bool keep_row) {
 		}
 		// Make these invivible as done with them
 		edit_input_->hide();
-		edit_menu_->hide();
 	}
 }
 

@@ -36,6 +36,7 @@ namespace zzalog {
 
 	};
 
+
 	// This class provides an extension to Fl_Input_Choice to add the menu
 	// if the field is an enumeration
 	class field_input : public Fl_Input_Choice
@@ -57,6 +58,16 @@ namespace zzalog {
 		void field_name(const char* field_name);
 		const char* field_name();
 
+		// Get reason for leaving 
+		enum exit_reason_t {
+			IR_NULL,       // Normal behaviour - enter or lose focus
+			IR_RIGHT,      // Tab right
+			IR_LEFT,       // Tab left (Shift-tab)
+			IR_UP,         // Up key pressed
+			IR_DOWN        // Down key pressed
+		};
+		exit_reason_t reason();
+
 		void reload_choice();
 
 	protected:
@@ -69,6 +80,8 @@ namespace zzalog {
 		bool is_string(string field);
 		// Name of field
 		string field_name_;
+		// Get reason for leaving -1 - LEFT TAB, +1 - RIGHT TAB, 0 any other
+		exit_reason_t reason_;
 	};
 
 }

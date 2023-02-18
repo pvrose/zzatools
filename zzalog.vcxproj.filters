@@ -165,9 +165,6 @@
     <ClCompile Include="zzalog\exc_reader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="zzalog\edit_input.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="zzalog\user_dialog.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

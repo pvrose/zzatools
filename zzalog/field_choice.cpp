@@ -112,6 +112,7 @@ field_input::~field_input() {
 }
 
 int field_input::handle(int event) {
+	reason_ = IR_NULL;
 	// Tell international character dialog to paste to this widget
 	switch (event) {
 	case FL_FOCUS:
@@ -119,6 +120,30 @@ int field_input::handle(int event) {
 			intl_dialog_->editor(this);
 		}
 		return true;
+	case FL_KEYBOARD:
+		switch (Fl::event_key()) {
+		case FL_Tab:
+			// Tab key - save and open new edit 
+			if (Fl::event_state(FL_SHIFT)) {
+				// SHIFT-TAB - save and select cell to the left
+				reason_ = IR_LEFT;
+			}
+			else {
+				// TAB - save and select cell to right
+				reason_ = IR_RIGHT;
+			}
+			return Fl_Input_Choice::handle(event);
+		// TODO: Up and Down do not quit when used in QSO Manager
+		case FL_Up:
+			// Up arrow - save and select record above
+			reason_ = IR_UP;
+			return Fl_Input_Choice::handle(event);
+		case FL_Down:
+			// Down arrow - save and select record above
+			reason_ = IR_DOWN;
+			return Fl_Input_Choice::handle(event);
+		}
+		return Fl_Input_Choice::handle(event);
 	default:
 		// Do normal handling
 		return Fl_Input_Choice::handle(event);
@@ -270,3 +295,6 @@ bool field_input::is_string(string field) {
 		return false;
 	}
 }
+
+// Return reason
+field_input::exit_reason_t field_input::reason() { return reason_; }
