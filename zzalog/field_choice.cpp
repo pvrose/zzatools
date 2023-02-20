@@ -132,16 +132,19 @@ int field_input::handle(int event) {
 				// TAB - save and select cell to right
 				reason_ = IR_RIGHT;
 			}
-			return Fl_Input_Choice::handle(event);
+			do_callback();
+			return 1;
 		// TODO: Up and Down do not quit when used in QSO Manager
 		case FL_Up:
 			// Up arrow - save and select record above
 			reason_ = IR_UP;
-			return Fl_Input_Choice::handle(event);
+			do_callback();
+			return 1;
 		case FL_Down:
 			// Down arrow - save and select record above
 			reason_ = IR_DOWN;
-			return Fl_Input_Choice::handle(event);
+			do_callback();
+			return 1;
 		}
 		return Fl_Input_Choice::handle(event);
 	default:

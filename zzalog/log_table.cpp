@@ -72,7 +72,7 @@ log_table::log_table(int X, int Y, int W, int H, const char* label, field_orderi
 	edit_input_->box(FL_DOWN_BOX);
 	edit_input_->hide();
 	edit_input_->callback(cb_input, nullptr);
-	edit_input_->when(FL_WHEN_RELEASE);
+	edit_input_->input()->when(FL_WHEN_RELEASE);
 	edit_input_->textfont(font_);
 	edit_input_->textsize(fontsize_);
 	add(edit_input_);
@@ -755,7 +755,7 @@ void log_table::edit_cell(int row, int col) {
 	edit_input_->input()->position(0, text.length());
 	// Make the widget visible and let it take focus even if the mouse isn't over it
 	edit_input_->show();
-	edit_input_->take_focus();
+	edit_input_->input()->take_focus();
 	edit_input_->redraw();
 	damage(FL_DAMAGE_ALL, X, Y, W, H);
 	redraw();
