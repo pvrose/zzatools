@@ -123,6 +123,9 @@ int field_input::handle(int event) {
 	case FL_KEYBOARD:
 		// TODO: Compromise to use ALT/Nav keys 
 		switch (Fl::event_key()) {
+		case FL_Tab:
+			// Send to parent to handle
+			return 0;
 		case FL_Enter:
 			reason_ = IR_NULL;
 			do_callback();
