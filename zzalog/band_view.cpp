@@ -226,7 +226,7 @@ void band_view::update(record_num_t record_num) {
 		record* this_record = book_->get_record(record_num, false);
 		double frequency;
 		this_record->item("FREQ", frequency);
-		update(frequency);
+		update(frequency * 1000.0);
 	}
 }
 
