@@ -121,28 +121,38 @@ int field_input::handle(int event) {
 		}
 		return true;
 	case FL_KEYBOARD:
+		// TODO: Compromise to use ALT/Nav keys 
 		switch (Fl::event_key()) {
-		case FL_Tab:
-			// Tab key - save and open new edit 
-			if (Fl::event_state(FL_SHIFT)) {
-				// SHIFT-TAB - save and select cell to the left
+		case FL_Enter:
+			reason_ = IR_NULL;
+			do_callback();
+			return 1;
+		case FL_Left:
+			// ALT/Left
+			if (Fl::event_state(FL_ALT)) {
 				reason_ = IR_LEFT;
 			}
-			else {
-				// TAB - save and select cell to right
+			do_callback();
+			return 1;
+		case FL_Right:
+			// ALT/Right
+			if (Fl::event_state(FL_ALT)) {
 				reason_ = IR_RIGHT;
 			}
 			do_callback();
 			return 1;
-		// TODO: Up and Down do not quit when used in QSO Manager
 		case FL_Up:
-			// Up arrow - save and select record above
-			reason_ = IR_UP;
+			// ALT/Up
+			if (Fl::event_state(FL_ALT)) {
+				reason_ = IR_UP;
+			}
 			do_callback();
 			return 1;
 		case FL_Down:
-			// Down arrow - save and select record above
-			reason_ = IR_DOWN;
+			// ALT/Down
+			if (Fl::event_state(FL_ALT)) {
+				reason_ = IR_DOWN;
+			}
 			do_callback();
 			return 1;
 		}
