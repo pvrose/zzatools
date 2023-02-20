@@ -134,30 +134,30 @@ int field_input::handle(int event) {
 			// ALT/Left
 			if (Fl::event_state(FL_ALT)) {
 				reason_ = IR_LEFT;
+				do_callback();
+				return 1;
 			}
-			do_callback();
-			return 1;
 		case FL_Right:
 			// ALT/Right
 			if (Fl::event_state(FL_ALT)) {
 				reason_ = IR_RIGHT;
+				do_callback();
+				return 1;
 			}
-			do_callback();
-			return 1;
 		case FL_Up:
 			// ALT/Up
 			if (Fl::event_state(FL_ALT)) {
 				reason_ = IR_UP;
+				do_callback();
+				return 1;
 			}
-			do_callback();
-			return 1;
 		case FL_Down:
 			// ALT/Down
 			if (Fl::event_state(FL_ALT)) {
 				reason_ = IR_DOWN;
+				do_callback();
+				return 1;
 			}
-			do_callback();
-			return 1;
 		}
 		return Fl_Input_Choice::handle(event);
 	default:
