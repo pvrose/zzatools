@@ -186,6 +186,7 @@
     <ClCompile Include="zzalog\qsl_design.cpp" />
     <ClCompile Include="zzalog\qsl_form.cpp" />
     <ClCompile Include="zzalog\qsl_html_view.cpp" />
+    <ClCompile Include="zzalog\qsl_viewer.cpp" />
     <ClCompile Include="zzalog\qth_dialog.cpp" />
     <ClCompile Include="zzalog\record.cpp" />
     <ClCompile Include="zzalog\record_form.cpp" />
@@ -268,6 +269,7 @@
     <ClInclude Include="zzalog\qsl_design.h" />
     <ClInclude Include="zzalog\qsl_form.h" />
     <ClInclude Include="zzalog\qsl_html_view.h" />
+    <ClInclude Include="zzalog\qsl_viewer.h" />
     <ClInclude Include="zzalog\qth_dialog.h" />
     <ClInclude Include="zzalog\record.h" />
     <ClInclude Include="zzalog\record_form.h" />

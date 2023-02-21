@@ -186,6 +186,8 @@ namespace zzalog {
 			static void cb_bn_edit_qth(Fl_Widget* w, void* v);
 			// Navigate buttons
 			static void cb_bn_navigate(Fl_Widget*, void* v);
+			// View QSL button
+			static void cb_bn_view_qsl(Fl_Widget* w, void* v);
 
 			// Add contest exchanges
 			void populate_exch_fmt();
@@ -296,6 +298,8 @@ namespace zzalog {
 			Fl_Button* bn_wkd_b4_;
 			// Parse button
 			Fl_Button* bn_parse_;
+			// Open QSL Viewr window
+			Fl_Button* bn_view_qsl_;
 			// Edit QTH
 			Fl_Button* bn_edit_qth_;
 			// Navigate buttons

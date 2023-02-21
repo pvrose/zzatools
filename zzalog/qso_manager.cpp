@@ -21,6 +21,7 @@
 #include "alarm_dial.h"
 #include "qth_dialog.h"
 #include "../zzalib//utils.h"
+#include "qsl_viewer.h"
 
 #include <set>
 
@@ -992,6 +993,11 @@ void qso_manager::qso_group::create_form(int X, int Y) {
 	bn_parse_->tooltip("Display the DX details for this callsign");
 
 	curr_x += bn_parse_->w() + GAP;
+
+	bn_view_qsl_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "View QSL");
+	bn_view_qsl_->callback(cb_bn_view_qsl);
+	bn_view_qsl_->tooltip("Display QSL status");
+
 	max_w = max(max_w, curr_x);
 
 	curr_x = left;
@@ -1142,6 +1148,7 @@ void qso_manager::qso_group::enable_widgets() {
 		bn_cancel_->deactivate();
 		bn_edit_->activate();
 		bn_edit_qth_->deactivate();
+		bn_view_qsl_->deactivate();
 		grp_nav_->activate();
 		for (int ix = 0; ix < NUMBER_TOTAL; ix++) {
 			if (ch_field_[ix]) ch_field_[ix]->deactivate();
@@ -1156,6 +1163,7 @@ void qso_manager::qso_group::enable_widgets() {
 		bn_cancel_->activate();
 		bn_edit_->deactivate();
 		bn_edit_qth_->activate();
+		bn_view_qsl_->activate();
 		grp_nav_->activate();
 		for (int ix = 0; ix < NUMBER_TOTAL; ix++) {
 			if (ch_field_[ix]) ch_field_[ix]->activate();
@@ -1170,6 +1178,7 @@ void qso_manager::qso_group::enable_widgets() {
 		bn_cancel_->activate();
 		bn_edit_->deactivate();
 		bn_edit_qth_->deactivate();
+		bn_view_qsl_->deactivate();
 		grp_nav_->activate();
 		for (int ix = 0; ix < NUMBER_TOTAL; ix++) {
 			if (ch_field_[ix]) ch_field_[ix]->activate();
@@ -1184,6 +1193,7 @@ void qso_manager::qso_group::enable_widgets() {
 		bn_cancel_->activate();
 		bn_edit_->deactivate();
 		bn_edit_qth_->activate();
+		bn_view_qsl_->deactivate();
 		grp_nav_->deactivate();
 		for (int ix = 0; ix < NUMBER_TOTAL; ix++) {
 			if (ch_field_[ix]) ch_field_[ix]->activate();
@@ -1523,6 +1533,25 @@ void qso_manager::qso_group::cb_parse(Fl_Widget* w, void* v) {
 	delete tip_record;
 }
 
+// Callback - view QSL button
+void qso_manager::qso_group::cb_bn_view_qsl(Fl_Widget* w, void* v) {
+	qso_group* that = ancestor_view<qso_group>(w);
+	record* qso = that->current_qso_;
+	if (qso) {
+		char title[128];
+		snprintf(title, 128, "QSL Status: %s %s %s %s %s",
+			qso->item("CALL").c_str(),
+			qso->item("QSO_DATE").c_str(),
+			qso->item("TIME_ON").c_str(),
+			qso->item("BAND").c_str(),
+			qso->item("MODE", true, true).c_str());
+		qsl_viewer* qsl = new qsl_viewer(10, 10);
+		qsl->copy_label(title);
+		qsl->set_qso(qso, that->current_rec_num_);
+		qsl->show();
+	}
+}
+
 // Callback - Edit QTH
 void qso_manager::qso_group::cb_bn_edit_qth(Fl_Widget* w, void* v) {
 	qso_group* that = ancestor_view<qso_group>(w);
@@ -1638,6 +1667,7 @@ void qso_manager::qso_group::cb_ip_notes(Fl_Widget* w, void* v) {
 	that->current_qso_->item("NOTES", notes);
 	tabbed_forms_->update_views(nullptr, HT_MINOR_CHANGE, book_->size() - 1);
 }
+
 
 // Save the settings
 void qso_manager::qso_group::save_values() {

@@ -223,7 +223,10 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="zzalog\qsl_design.cpp">
-      <Filter>Header Files</Filter>
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zzalog\qsl_viewer.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -471,6 +474,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="zzalog\qsl_design.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zzalog\qsl_viewer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
