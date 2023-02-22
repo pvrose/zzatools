@@ -8,6 +8,7 @@
 #include "intl_widgets.h"
 #include "alarm_dial.h"
 #include "field_choice.h"
+#include "qsl_viewer.h"
 
 #include <string>
 #include <vector>
@@ -186,6 +187,8 @@ namespace zzalog {
 			static void cb_bn_edit_qth(Fl_Widget* w, void* v);
 			// Navigate buttons
 			static void cb_bn_navigate(Fl_Widget*, void* v);
+			// QSL Viewer closed
+			static void cb_qsl_viewer(Fl_Widget* w, void* v);
 			// View QSL button
 			static void cb_bn_view_qsl(Fl_Widget* w, void* v);
 
@@ -228,6 +231,8 @@ namespace zzalog {
 			void action_cancel_edit();
 			// Navigate
 			void action_navigate(int target);
+			// Update QSL viewer
+			void action_view_qsl();
 			// Get default copy record
 			record* get_default_record();
 			// QTH has changed
@@ -339,6 +344,8 @@ namespace zzalog {
 			field_choice* ch_field_[NUMBER_TOTAL];
 			// field inputs
 			field_input* ip_field_[NUMBER_TOTAL];
+			// QSL Viewer window
+			qsl_viewer* qsl_viewer_;
 
 		};
 

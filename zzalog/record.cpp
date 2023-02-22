@@ -315,131 +315,39 @@ string record::item(string field, bool formatted/* = false*/, bool indirect/* = 
 			string qth_name;
 			// Read APP_ZZA_QTH field and get the settings for that value 
 			qth_name = item("APP_ZZA_QTH", false, false);
-			record* macro = spec_data_->expand_macro("APP_ZZA_QTH", qth_name);
-			if (field == "MY_COUNTRY") {
-				int entity_id;
-				macro->item("MY_DXCC", entity_id);
-				spec_dataset* entities = spec_data_->dataset("DXCC_Entity_Code");
-				map<string, string>* entity_data = entities->data.at(to_string(entity_id));
-				result = entity_data->at("Entity Name");
-			}
-			else if (field == "MY_GRIDSQUARE") {
-				// Get operator's gridsquare
-				string grid = macro->item("MY_GRIDSQUARE");
-				if (grid.length() > 8) {
-					result = grid.substr(0, 8);
+			if (qth_name.length()) {
+				record* macro = spec_data_->expand_macro("APP_ZZA_QTH", qth_name);
+				if (field == "MY_COUNTRY") {
+					int entity_id;
+					macro->item("MY_DXCC", entity_id);
+					spec_dataset* entities = spec_data_->dataset("DXCC_Entity_Code");
+					map<string, string>* entity_data = entities->data.at(to_string(entity_id));
+					result = entity_data->at("Entity Name");
+				}
+				else if (field == "MY_GRIDSQUARE") {
+					// Get operator's gridsquare
+					string grid = macro->item("MY_GRIDSQUARE");
+					if (grid.length() > 8) {
+						result = grid.substr(0, 8);
+					}
+					else {
+						result = grid;
+					}
+				}
+				else if (field == "MY_GRIDSQUARE_EXT") {
+					// Get operator's gridsquare
+					string grid = macro->item("MY_GRIDSQUARE");
+					if (grid.length() > 8) {
+						result = grid.substr(8);
+					}
+					else {
+						result = "";
+					}
 				}
 				else {
-					result = grid;
+					result = macro->item(field);
 				}
 			}
-			else if (field == "MY_GRIDSQUARE_EXT") {
-				// Get operator's gridsquare
-				string grid = macro->item("MY_GRIDSQUARE");
-				if (grid.length() > 8) {
-					result = grid.substr(8);
-				}
-				else {
-					result = "";
-				}
-			}
-			else {
-				result = macro->item(field);
-			}
-			//if (field == "MY_NAME") {
-			//	// Get operator's name
-			//	qth_settings.get("Operator Name", temp, "John Doe");
-			//	result = temp;
-			//	free(temp);
-			//}
-			//else if (field == "MY_STREET") {
-			//	// Get operator'sstreet  address
-			//	qth_settings.get("Street", temp, "99 Any Street");
-			//	result = temp;
-			//	free(temp);
-			//}
-			//else if (field == "MY_CITY") {
-			//	// Get operator's home town
-			//	qth_settings.get("Town", temp, "Any Town");
-			//	result = temp;
-			//	free(temp);
-			//}
-			//else if (field == "MY_CNTY") {
-			//	// Get operator's county
-			//	qth_settings.get("County", temp, "nowhereshire");
-			//	result = temp;
-			//	free(temp);
-			//}
-			//else if (field == "MY_COUNTRY") {
-			//	// Get operator's country - from the DXCC Entity Code
-			//	int entity_id;
-			//	qth_settings.get("DXCC Id", entity_id, 0);
-			//	spec_dataset* entities = spec_data_->dataset("DXCC_Entity_Code");
-			//	map<string, string>* entity_data = entities->data.at(to_string(entity_id));
-			//	result = entity_data->at("Entity Name");
-			//}
-			//else if (field == "MY_POSTAL_CODE") {
-			//	// Get operator's post-code
-			//	qth_settings.get("Post Code", temp, "XX1 1XX");
-			//	result = temp;
-			//	free(temp);
-			//}
-			//else if (field == "MY_CONT") {
-			//	// Get operator's continent
-			//	qth_settings.get("Continent", temp, "XX");
-			//	result = temp;
-			//	free(temp);
-			//}
-			//else if (field == "MY_GRIDSQUARE") {
-			//	// Get operator's gridsquare
-			//	qth_settings.get("Locator", temp, "RR73TU");
-			//	if (strlen(temp) > 8) {
-			//		result = string(temp, 8);
-			//	}
-			//	else {
-			//		result = temp;
-			//	}
-			//	free(temp);
-			//}
-			//else if (field == "MY_GRIDSQUARE_EXT") {
-			//	// Get operator's gridsquare extenion
-			//	qth_settings.get("Locator", temp, "RR73TU");
-			//	if (strlen(temp) > 8) {
-			//		result = temp + 8;
-			//	}
-			//	else {
-			//		result = "";
-			//	}
-			//}
-			//else if (field == "MY_DXCC") {
-			//	// Get operator's DXCC entity code
-			//	int entity_id;
-			//	qth_settings.get("DXCC", entity_id, 0);
-			//	result = to_string(entity_id);
-			//	result = "";
-			//}
-			//else if (field == "MY_CQ_ZONE") {
-			//	// Get operator's CQ Zone
-			//	int zone_id;
-			//	qth_settings.get("CQ Zone", zone_id, 0);
-			//	result = to_string(zone_id);
-			//}
-			//else if (field == "MY_ITU_ZONE") {
-			//	// Get operator's ITU Zone
-			//	int zone_id;
-			//	qth_settings.get("ITU Zone", zone_id, 0);
-			//	result = to_string(zone_id);
-			//}
-			//else if (field == "MY_IOTA") {
-			//	// Get operator's IOTA number
-			//	qth_settings.get("IOTA", temp, "XX-001");
-			//	result = temp;
-			//	free(temp);
-			//}
-			//else {
-			//	// Otherwise it is still the empty string
-			//	result = "";
-			//}
 		}
 	}
 	else if (formatted) {

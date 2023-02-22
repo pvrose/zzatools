@@ -451,7 +451,7 @@ void qso_manager::cat_group::populate_port_choice() {
 			// Add the name onto the choice drop-down list
 			char message[100];
 			const char* port = existing_ports[i].c_str();
-			snprintf(message, sizeof(message), "RIG: Found port %s", port);
+			snprintf(message, sizeof(message), "DASH: Found port %s", port);
 			status_->misc_status(ST_LOG, message);
 			ch->add(port);
 			// Set the value to the list of ports
@@ -632,6 +632,9 @@ qso_manager::qso_group::qso_group(int X, int Y, int W, int H, const char* l) :
 		ch_field_[ix] = nullptr;
 	}
 	load_values();
+	qsl_viewer_ = new qsl_viewer(10, 10);
+	qsl_viewer_->callback(cb_qsl_viewer);
+	qsl_viewer_->hide();
 }
 
 // Destructor
@@ -1178,7 +1181,7 @@ void qso_manager::qso_group::enable_widgets() {
 		bn_cancel_->activate();
 		bn_edit_->deactivate();
 		bn_edit_qth_->deactivate();
-		bn_view_qsl_->deactivate();
+		bn_view_qsl_->activate();
 		grp_nav_->activate();
 		for (int ix = 0; ix < NUMBER_TOTAL; ix++) {
 			if (ch_field_[ix]) ch_field_[ix]->activate();
@@ -1537,19 +1540,15 @@ void qso_manager::qso_group::cb_parse(Fl_Widget* w, void* v) {
 void qso_manager::qso_group::cb_bn_view_qsl(Fl_Widget* w, void* v) {
 	qso_group* that = ancestor_view<qso_group>(w);
 	record* qso = that->current_qso_;
-	if (qso) {
-		char title[128];
-		snprintf(title, 128, "QSL Status: %s %s %s %s %s",
-			qso->item("CALL").c_str(),
-			qso->item("QSO_DATE").c_str(),
-			qso->item("TIME_ON").c_str(),
-			qso->item("BAND").c_str(),
-			qso->item("MODE", true, true).c_str());
-		qsl_viewer* qsl = new qsl_viewer(10, 10);
-		qsl->copy_label(title);
-		qsl->set_qso(qso, that->current_rec_num_);
-		qsl->show();
-	}
+	qsl_viewer* qsl = that->qsl_viewer_;
+	that->action_view_qsl();
+	if (qso) qsl->show();
+}
+
+// Callback - QSL viewer "closing" - make it hide instead
+void qso_manager::qso_group::cb_qsl_viewer(Fl_Widget* w, void* v) {
+	qsl_viewer* qsl = (qsl_viewer*)w;
+	if (qsl->visible()) qsl->hide();
 }
 
 // Callback - Edit QTH
@@ -1877,7 +1876,7 @@ void qso_manager::qso_group::check_qth_changed() {
 // Action ACTIVATE: transition from QSO_INACTIVE to QSO_PENDING
 void qso_manager::qso_group::action_activate() {
 	if (logging_state_ != QSO_INACTIVE || current_qso_ != nullptr) {
-		status_->misc_status(ST_SEVERE, "Attempting to activate a QSO when one is already active");
+		status_->misc_status(ST_SEVERE, "DASH: Attempting to activate a QSO when one is already active");
 		return;
 	}
 	current_qso_ = new record;
@@ -1918,7 +1917,7 @@ void qso_manager::qso_group::action_activate() {
 // Action START - transition from QSO_PENDING to QSO_STARTED
 void qso_manager::qso_group::action_start() {
 	if (logging_state_ != QSO_PENDING || current_qso_ == nullptr) {
-		status_->misc_status(ST_SEVERE, "Attempting to start a QSO while not pending");
+		status_->misc_status(ST_SEVERE, "DASH: Attempting to start a QSO while not pending");
 		return;
 	}
 	// Add to book
@@ -1931,11 +1930,11 @@ void qso_manager::qso_group::action_start() {
 // Action SAVE - transition from QSO_STARTED to QSO_INACTIVE while saving record
 void qso_manager::qso_group::action_save() {
 	if (logging_state_ != QSO_STARTED || current_qso_ == nullptr) {
-		status_->misc_status(ST_SEVERE, "Attempting to save a QSO when not inputing one");
+		status_->misc_status(ST_SEVERE, "DASH: Attempting to save a QSO when not inputing one");
 		return;
 	}
 	if (current_qso_ != book_->get_record()) {
-		status_->misc_status(ST_SEVERE, "Mismatch between selected QSO in book and QSO manager");
+		status_->misc_status(ST_SEVERE, "DASH: Mismatch between selected QSO in book and QSO manager");
 		return;
 	}
 	bool old_save_enabled = book_->save_enabled();
@@ -1987,11 +1986,11 @@ void qso_manager::qso_group::action_save() {
 // Action CANCEL - Transition from QSO_STARTED to QSO_INACTIVE without saving record
 void qso_manager::qso_group::action_cancel() {
 	if (logging_state_ != QSO_STARTED || current_qso_ == nullptr) {
-		status_->misc_status(ST_SEVERE, "Attempting to save a QSO when not inputing one");
+		status_->misc_status(ST_SEVERE, "DASH: Attempting to save a QSO when not inputing one");
 		return;
 	}
 	if (current_qso_ != book_->get_record()) {
-		status_->misc_status(ST_SEVERE, "Mismatch between selected QSO in book and QSO manager");
+		status_->misc_status(ST_SEVERE, "DASH: Mismatch between selected QSO in book and QSO manager");
 		return;
 	}
 	book_->delete_record(true);
@@ -2000,12 +1999,13 @@ void qso_manager::qso_group::action_cancel() {
 	logging_state_ = QSO_INACTIVE;
 	check_qth_changed();
 	enable_widgets();
+	qsl_viewer_->hide();
 }
 
 // Action DEACTIVATE - Transition from QSO_PENDING to QSO_INACTIVE
 void qso_manager::qso_group::action_deactivate() {
 	if (logging_state_ != QSO_PENDING || current_qso_ == nullptr) {
-		status_->misc_status(ST_SEVERE, "Attempting to deactivate when not pending");
+		status_->misc_status(ST_SEVERE, "DASH: Attempting to deactivate when not pending");
 	}
 	delete current_qso_;
 	current_qso_ = nullptr;
@@ -2016,7 +2016,7 @@ void qso_manager::qso_group::action_deactivate() {
 // Action EDIT - Transition from QSO_INACTIVE to QSO_EDIT
 void qso_manager::qso_group::action_edit() {
 	if (logging_state_ != QSO_INACTIVE || original_qso_ != nullptr ) {
-		status_->misc_status(ST_SEVERE, "Attempting to edit a QSO while inputing a QSO");
+		status_->misc_status(ST_SEVERE, "DASH: Attempting to edit a QSO while inputing a QSO");
 		return;
 	}
 	// Copy current selection
@@ -2032,46 +2032,42 @@ void qso_manager::qso_group::action_edit() {
 
 // Action SAVE EDIT - Transition from QSO_EDIT to QSO_INACTIVE while saving changes
 void qso_manager::qso_group::action_save_edit() {
-	if (*current_qso_ == *original_qso_) {
-		action_cancel_edit();
+	if (logging_state_ != QSO_EDIT || current_qso_ == nullptr) {
+		status_->misc_status(ST_SEVERE, "DASH: Attempting to save a QSO when not editing one");
+		return;
 	}
-	else {
-		if (logging_state_ != QSO_EDIT || current_qso_ == nullptr) {
-			status_->misc_status(ST_SEVERE, "Attempting to save a QSO when not editing one");
-			return;
-		}
-		if (current_rec_num_ != book_->selection()) {
-			status_->misc_status(ST_SEVERE, "Mismatch between selected QSO in book and QSO manager");
-			return;
-		}
-		// We no longer need to maintain the copy of the original QSO
-		book_->add_use_data(current_qso_);
-		book_->modified(true);
-		delete original_qso_;
-		original_qso_ = nullptr;
-		current_qso_ = nullptr;
-		logging_state_ = QSO_INACTIVE;
-		enable_widgets();
+	if (current_rec_num_ != book_->selection()) {
+		status_->misc_status(ST_WARNING, "DASH: Mismatch between selected QSO in book and QSO manager");
 	}
+	// We no longer need to maintain the copy of the original QSO
+	book_->add_use_data(current_qso_);
+	book_->modified(true);
+	delete original_qso_;
+	original_qso_ = nullptr;
+	current_qso_ = nullptr;
+	logging_state_ = QSO_INACTIVE;
+	enable_widgets();
 }
 
 // ACtion CANCEL EDIT - Transition from QSO_EDIT to QSO_INACTIVE scrapping changes
 void qso_manager::qso_group::action_cancel_edit() {
 	if (logging_state_ != QSO_EDIT || current_qso_ == nullptr) {
-		status_->misc_status(ST_SEVERE, "Attempting to save a QSO when not editing one");
+		status_->misc_status(ST_SEVERE, "DASH: Attempting to save a QSO when not editing one");
 		return;
 	}
 	if (current_rec_num_ != book_->selection()) {
-		status_->misc_status(ST_SEVERE, "Mismatch between selected QSO in book and QSO manager");
+		status_->misc_status(ST_SEVERE, "DASH: Mismatch between selected QSO in book and QSO manager");
 		return;
 	}
 	// Copy original back to the book
 	*book_->get_record() = *original_qso_;
 	delete original_qso_;
 	original_qso_ = nullptr;
+	current_qso_ = nullptr;
 	logging_state_ = QSO_INACTIVE;
 	copy_qso_to_display(CF_ALL_FLAGS);
 	enable_widgets();
+	qsl_viewer_->hide();
 }
 
 // Action navigate button
@@ -2091,10 +2087,32 @@ void qso_manager::qso_group::action_navigate(int target) {
 	switch (saved_state) {
 	case QSO_EDIT:
 		action_edit();
+		action_view_qsl();
 		break;
 	case QSO_PENDING:
 		action_activate();
+		action_view_qsl();
 		break;
+	}
+}
+
+// Action view qsl
+void qso_manager::qso_group::action_view_qsl() {
+	if (logging_state_ != QSO_EDIT && logging_state_ != QSO_PENDING) {
+		status_->misc_status(ST_SEVERE, "DASH: No QSO selected - cannot view QSL status");
+	} else if (current_qso_) {
+		char title[128];
+		snprintf(title, 128, "QSL Status: %s %s %s %s %s",
+			current_qso_->item("CALL").c_str(),
+			current_qso_->item("QSO_DATE").c_str(),
+			current_qso_->item("TIME_ON").c_str(),
+			current_qso_->item("BAND").c_str(),
+			current_qso_->item("MODE", true, true).c_str());
+		qsl_viewer_->copy_label(title);
+		qsl_viewer_->set_qso(current_qso_, current_rec_num_);
+		char msg[128];
+		snprintf(msg, 128, "DASH: %s", title);
+		status_->misc_status(ST_LOG, msg);
 	}
 }
 
@@ -2368,8 +2386,8 @@ bool qso_manager::qso_in_progress() {
 	switch (qso_group_->logging_state_) {
 	case QSO_PENDING:
 	case QSO_INACTIVE:
-		return false;
 	case QSO_EDIT:
+		return false;
 	case QSO_STARTED:
 		return true;
 	}
@@ -2425,14 +2443,24 @@ void qso_manager::update_rig() {
 
 // Called whenever another view updates a record (or selects a new one)
 void qso_manager::update_qso() {
-	record* prev_record = book_->get_record();
-	if (qso_in_progress() && prev_record == qso_group_->current_qso_) {
-		// Update the view if another view changes the record
-		qso_group_->copy_qso_to_display(qso_group::CF_ALL_FLAGS);
+	record* new_record = book_->get_record();
+	if (new_record == qso_group_->current_qso_) {
+		if (qso_group_->logging_state_ == QSO_STARTED ||
+			qso_group_->logging_state_ == QSO_EDIT) {
+			// Update the view if another view changes the record
+			qso_group_->copy_qso_to_display(qso_group::CF_ALL_FLAGS);
+		}
 	}
 	else if (qso_group_->logging_state_ == QSO_PENDING) {
 		// Switch to selected record if in QSO_PENDING state
 		qso_group_->copy_qso_to_qso(book_->get_record(), qso_group::CF_RIG_ETC | qso_group::CF_CAT);
+		qso_group_->action_view_qsl();
+	}
+	else if (qso_group_->logging_state_ == QSO_EDIT) {
+		// Selecting a new record - save the old one
+		qso_group_->action_save_edit();
+		qso_group_->action_edit();
+		qso_group_->action_view_qsl();
 	}
 }
 
@@ -2446,10 +2474,10 @@ void qso_manager::start_qso() {
 		qso_group_->action_start();
 		break;
 	case QSO_STARTED:
-		status_->misc_status(ST_ERROR, "Cannot start a QSO when one already started");
+		status_->misc_status(ST_ERROR, "DASH: Cannot start a QSO when one already started");
 		break;
 	case QSO_EDIT:
-		status_->misc_status(ST_ERROR, "Cannot start a QSO while editing an existing one");
+		status_->misc_status(ST_ERROR, "DASH: Cannot start a QSO while editing an existing one");
 		break;
 	}
 }
@@ -2459,7 +2487,7 @@ void qso_manager::start_qso() {
 void qso_manager::end_qso() {
 	switch (qso_group_->logging_state_) {
 	case QSO_INACTIVE:
-		status_->misc_status(ST_ERROR, "Cannot end a QSO that hasn't been started");
+		status_->misc_status(ST_ERROR, "DASH: Cannot end a QSO that hasn't been started");
 		break;
 	case QSO_PENDING:
 		qso_group_->action_start();
@@ -2482,10 +2510,10 @@ void qso_manager::edit_qso() {
 		break;
 	case QSO_PENDING:
 	case QSO_STARTED:
-		status_->misc_status(ST_ERROR, "Cannot edit a QSO when in on-air");
+		status_->misc_status(ST_ERROR, "DASH: Cannot edit a QSO when in on-air");
 		break;
 	case QSO_EDIT:
-		status_->misc_status(ST_ERROR, "Cannot edit another QSO while editing an existing one");
+		status_->misc_status(ST_ERROR, "DASH: Cannot edit another QSO while editing an existing one");
 		break;
 	}
 }
