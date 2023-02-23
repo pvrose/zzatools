@@ -1902,12 +1902,13 @@ void dxa_if::zoom_centre(lat_long_t centre) {
 		}
 		// now zoom by the smaller of these with 5% margin
 		map->PutZoom(zoom);
-		// Read the actual amount zoomed
-		zoom_value_ = map->GetZoom();
-		char msg[256];
-		snprintf(msg, 256, "DXATLAS: Zoom required S %f N %f W %f E %f, Z = %f obtained %f",
-			southernmost_, northernmost_, westernmost_, easternmost_, zoom, zoom_value_);
-		status_->misc_status(ST_NOTE, msg);
+		if (zoom != zoom_value_) {
+			char msg[256];
+			snprintf(msg, 256, "DXATLAS: Zoom required S %f N %f W %f E %f, Z = %f was %f",
+				southernmost_, northernmost_, westernmost_, easternmost_, zoom, zoom_value_);
+			status_->misc_status(ST_NOTE, msg);
+			zoom_value_ = map->GetZoom();
+		}
 	}
 }
 
@@ -1919,7 +1920,7 @@ void dxa_if::zoom_azimuthal() {
 	// Z=1.0 is full earth view, make Z = pi * R / furthest + 5%
 	// TODO: Account for width and height of DxAtlas by taking into account
 	//  bearing
-	zoom = (float)((EARTH_RADIUS * PI) / furthest_) * 1.05F;
+	zoom = (float)(EARTH_RADIUS * PI) / (float)furthest_ * 1.05F;
 	map->PutZoom(zoom);
 	zoom_value_ = map->GetZoom();
 	char msg[256];
