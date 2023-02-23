@@ -1160,11 +1160,13 @@ void book::add_use_data(record* use_record) {
 						use_record->item("TIME_ON").c_str(),
 						use_record->item("CALL").c_str());
 					status_->misc_status(ST_NOTE, message);
-					snprintf(message, 128, "LOG: QTH %s - Field %s replacing %s with %s",
-						qth.c_str(), (*it).c_str(), old_value.c_str(), value.c_str());
-					status_->misc_status(ST_WARNING, message);
-					qth_data->fields->item(*it, value);
-					update_qth = true;
+					if ((*it) != "MY_GRIDSQUARE" || value.length() > old_value.length() || value != old_value.substr(0, value.length())) {
+						snprintf(message, 128, "LOG: QTH %s - Field %s replacing %s with %s",
+							qth.c_str(), (*it).c_str(), old_value.c_str(), value.c_str());
+						status_->misc_status(ST_WARNING, message);
+						qth_data->fields->item(*it, value);
+						update_qth = true;
+					}
 				}
 				else if (old_value.length() == 0) {
 					qth_data->fields->item(*it, value);
