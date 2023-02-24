@@ -307,6 +307,8 @@ namespace zzalog {
 		bool display_all_colours_;
 		// Last logged callsign - to avoid it popping up again
 		string last_logged_call_;
+		// Last logged location
+		string last_logged_grid_;
 
 		Fl_Group* colour_grp_;
 		// Colour buttons - instanced in colour_win_

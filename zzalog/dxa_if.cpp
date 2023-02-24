@@ -865,22 +865,34 @@ HRESULT dxa_if::cb_mouse_moved(float latitude, float longitude) {
 }
 
 // Map changed callback - if projection changed it will affect which widgets are enabled
-// If view has change the zoom will need to be recalculated
+// If view has changed, the zoom will need to be recalculated
 HRESULT dxa_if::cb_map_changed(DxAtlas::EnumMapChange change) {
 	if (atlas_ && !is_my_change_) {
 		switch (change) {
 		case DxAtlas::EnumMapChange::MC_PROJECTION:  // Projection has changed
 			projection_ = atlas_->GetMap()->GetProjection();
 			enable_widgets();
-			if (projection_ == DxAtlas::EnumProjection::PRJ_RECTANGULAR) {
+			switch (projection_) {
+			case DxAtlas::EnumProjection::PRJ_RECTANGULAR:
 				// Rectangular projection so center the map appropriately
 				centre_map();
+				break;
+			case DxAtlas::EnumProjection::PRJ_AZIMUTHAL:
+				zoom_azimuthal();
+				break;
 			}
 			break;
 		case DxAtlas::EnumMapChange::MC_VIEW:        // View (& therefore height/width proportion)
-			if (projection_ == DxAtlas::EnumProjection::PRJ_RECTANGULAR) {
-				// Rectangular projection so center the map appropriately
-				centre_map();
+			if (atlas_->GetMap()->GetZoom() == zoom_value_) {
+				switch (projection_) {
+				case DxAtlas::EnumProjection::PRJ_RECTANGULAR:
+					// Rectangular projection so center the map appropriately
+					centre_map();
+					break;
+				case DxAtlas::EnumProjection::PRJ_AZIMUTHAL:
+					zoom_azimuthal();
+					break;
+				}
 			}
 			break;
 		}
@@ -1501,7 +1513,8 @@ void dxa_if::draw_pins() {
 			DxAtlas::IDxMapPtr map = atlas_->GetMap();
 			// It is necessary to have Begin/EndUpdate around deleting the existing data to
 			// allow DxAtlas to implement it before reapplying the data - this may be an artifice
-			// of FLTK scheduling
+			// of FLTK scheduling - inhibit callbacks from adjusting display
+			is_my_change_ = true;
 			map->BeginUpdate();
 			//delete all existing layers - set call_layer_ to nullptr to prevent callbacks from using it
 			call_layer_ = nullptr;
@@ -1694,6 +1707,8 @@ void dxa_if::draw_pins() {
 			pFont->put_Name(_com_util::ConvertStringToBSTR("Courier New"));
 			call_layer_->PenColor = DxAtlas::clNavy;
 			call_layer_->BrushColor = DxAtlas::clWhite;
+			// Let DxAtlas callbacks update view
+			is_my_change_ = false;
 
 			// now centre on selected record - home location if azimuthal view
 			switch(map->GetProjection()) {
@@ -1932,7 +1947,8 @@ void dxa_if::zoom_azimuthal() {
 // Centre the map according to the settings
 void dxa_if::centre_map() {
 	// Only recentre if projection is rectanguar
-	if (projection_ == DxAtlas::EnumProjection::PRJ_RECTANGULAR) {
+	switch (projection_) {
+	case DxAtlas::EnumProjection::PRJ_RECTANGULAR: {
 		lat_long_t centre;
 		double save_n;
 		double save_s;
@@ -2038,6 +2054,12 @@ void dxa_if::centre_map() {
 			break;
 		}
 		save_values();
+		break;
+	}
+	case DxAtlas::EnumProjection::PRJ_AZIMUTHAL: {
+		zoom_azimuthal();
+		break;
+	}
 	}
 }
 
@@ -2072,7 +2094,7 @@ string dxa_if::get_distance(record* this_record) {
 
 // Add the Dx location and include it in the displayed group
 void dxa_if::set_dx_loc(string location, string callsign) {
-	if (callsign.length() > 0 && callsign != last_logged_call_) {
+	if (callsign != last_logged_call_ || location != last_logged_grid_) {
 		// only do this if a different call from before
 		DxAtlas::IDxMapPtr map = atlas_->GetMap();
 		// To avoid flicker while changing Dx Location
@@ -2101,6 +2123,7 @@ void dxa_if::set_dx_loc(string location, string callsign) {
 		centre_map();
 		map->EndUpdate();
 		last_logged_call_ = callsign;
+		last_logged_grid_ = location;
 	}
 }
 
