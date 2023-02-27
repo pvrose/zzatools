@@ -266,3 +266,6 @@ __pycache__/
 /ÝÝÝÝÝÝÝÝÝÝÝÝÝÝÝÝÝÝÝÝÝÝÝÝÝÝÝÝÝÝÝÝÝÝÝÝÝÝÝÝÝÝÝÝÝÝÝÝÝÝÝÝàÀ±‡F}Í{à#
 /zzalog/twoway_map.h
 /twoway_map.cpp
+
+# GIT files as repository = development fielstore
+.git/
