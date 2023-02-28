@@ -66,7 +66,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <LibraryPath>C:\Users\pvros\Documents\dev\deps\lib;C:\Users\pvros\Documents\dev\fltk-master\build\lib\Debug;C:\Users\pvros\Documents\dev\curl-7.65.1\builds\libcurl-vc15-x86-release-dll-ipv6-sspi-winssl\lib;C:\Users\pvros\Documents\dev\zzatools\Debug;C:\Program Files %28x86%29\hamlib-w32-4.5.3\lib\msvc;$(LibraryPath)</LibraryPath>
+    <LibraryPath>C:\Users\pvros\Documents\dev\fltk-master\build\lib\Debug;C:\Users\pvros\Documents\dev\curl-7.65.1\builds\libcurl-vc15-x86-release-dll-ipv6-sspi-winssl\lib;C:\Users\pvros\Documents\dev\zzatools\Debug;C:\Program Files %28x86%29\hamlib-w32-4.5.3\lib\msvc;C:\Users\pvros\Documents\dev\deps\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -83,7 +83,7 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>C:\Users\pvros\Documents\dev\curl-7.65.1\builds\libcurl-vc15-x86-release-dll-ipv6-sspi-winssl\include;C:\Users\pvros\Documents\dev\deps\include;C:\Users\pvros\Documents\dev\fltk-master;C:\Users\pvros\Documents\dev\fltk-master\build;C:\Program Files %28x86%29\hamlib-w32-4.5.3\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\pvros\Documents\dev\curl-7.65.1\builds\libcurl-vc15-x86-release-dll-ipv6-sspi-winssl\include;C:\Users\pvros\Documents\dev\fltk-master;C:\Users\pvros\Documents\dev\fltk-master\build;C:\Program Files %28x86%29\hamlib-w32-4.5.3\include</AdditionalIncludeDirectories>
       <AssemblerOutput>NoListing</AssemblerOutput>
       <ExpandAttributedSource>false</ExpandAttributedSource>
       <ShowIncludes>false</ShowIncludes>
@@ -107,7 +107,7 @@
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalIncludeDirectories>C:\Users\pvros\Documents\dev\curl-7.65.1\builds\libcurl-vc15-x86-release-dll-ipv6-sspi-winssl\include;C:\Users\pvros\Documents\dev\deps\include;C:\Users\pvros\Documents\dev\fltk-master\build;C:\Users\pvros\Documents\dev\fltk-master;%(AdditionalIncludeDirectories);C:\Program Files %28x86%29\hamlib-w32-4.5.3\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\pvros\Documents\dev\curl-7.65.1\builds\libcurl-vc15-x86-release-dll-ipv6-sspi-winssl\include;C:\Users\pvros\Documents\dev\fltk-master\build;C:\Users\pvros\Documents\dev\fltk-master;%(AdditionalIncludeDirectories);C:\Program Files %28x86%29\hamlib-w32-4.5.3\include</AdditionalIncludeDirectories>
       <AssemblerOutput>NoListing</AssemblerOutput>
       <UseUnicodeForAssemblerListing>false</UseUnicodeForAssemblerListing>
     </ClCompile>
@@ -304,6 +304,7 @@
   <ItemGroup>
     <None Include="packages.config" />
     <None Include="reference\Prefix.lst" />
+    <None Include="zzalog\Makefile" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

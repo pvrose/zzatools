@@ -82,7 +82,7 @@ string PROGRAM_VERSION = VERSION;
 #endif
 string VENDOR = "GM3ZZA";
 // Allow hamlib debug level to be set by -D
-#ifndef HAMLIB_DEGUG_LEVEL
+#ifndef HAMLIB_DEBUG_LEVEL
 #define HAMLIB_DEBUG_LEVEL RIG_DEBUG_ERR
 #endif
 

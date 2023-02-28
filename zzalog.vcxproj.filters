@@ -493,5 +493,6 @@
   <ItemGroup>
     <None Include="packages.config" />
     <None Include="reference\Prefix.lst" />
+    <None Include="zzalog\Makefile" />
   </ItemGroup>
 </Project>
