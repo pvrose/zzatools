@@ -88,14 +88,14 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_WARNINGS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\pvros\Documents\dev\fltk-master;C:\Users\pvros\Documents\dev\fltk-master\build</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\pvros\Documents\dev\fltk-master;C:\Users\pvros\Documents\dev\fltk-master\build;C:\Users\pvros\Documents\dev\zzatools\QBS\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>fltkd.lib;zzalib.lib;Ws2_32.lib;comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>fltkd.lib;Ws2_32.lib;comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -104,16 +104,16 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_WARNINGS;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\pvros\Documents\dev\fltk-master;C:\Users\pvros\Documents\dev\fltk-master\build</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\pvros\Documents\dev\fltk-master;C:\Users\pvros\Documents\dev\fltk-master\build;C:\Users\pvros\Documents\dev\zzatools\QBS\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>fltk.lib;zzalib.lib;Ws2_32.lib;comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>fltk.lib;Ws2_32.lib;comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -145,20 +145,23 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="QBS_consts.h" />
-    <ClInclude Include="QBS_data.h" />
-    <ClInclude Include="QBS_import.h" />
-    <ClInclude Include="QBS_notes.h" />
-    <ClInclude Include="QBS_reporter.h" />
-    <ClInclude Include="QBS_window.h" />
+    <ClInclude Include="include\QBS_callback.h" />
+    <ClInclude Include="include\QBS_consts.h" />
+    <ClInclude Include="include\QBS_data.h" />
+    <ClInclude Include="include\QBS_import.h" />
+    <ClInclude Include="include\QBS_notes.h" />
+    <ClInclude Include="include\QBS_reporter.h" />
+    <ClInclude Include="include\QBS_utils.h" />
+    <ClInclude Include="include\QBS_window.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="QBS_data.cpp" />
-    <ClCompile Include="QBS_import.cpp" />
-    <ClCompile Include="QBS_main.cpp" />
-    <ClCompile Include="QBS_notes.cpp" />
-    <ClCompile Include="QBS_reporter.cpp" />
-    <ClCompile Include="QBS_window.cpp" />
+    <ClCompile Include="src\QBS_data.cpp" />
+    <ClCompile Include="src\QBS_import.cpp" />
+    <ClCompile Include="src\QBS_main.cpp" />
+    <ClCompile Include="src\QBS_notes.cpp" />
+    <ClCompile Include="src\QBS_reporter.cpp" />
+    <ClCompile Include="src\QBS_utils.cpp" />
+    <ClCompile Include="src\QBS_window.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -15,42 +15,51 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="QBS_data.h">
+    <ClInclude Include="include\QBS_data.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="QBS_window.h">
+    <ClInclude Include="include\QBS_window.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="QBS_consts.h">
+    <ClInclude Include="include\QBS_consts.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="QBS_import.h">
+    <ClInclude Include="include\QBS_import.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="QBS_reporter.h">
+    <ClInclude Include="include\QBS_reporter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="QBS_notes.h">
+    <ClInclude Include="include\QBS_notes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\QBS_callback.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\QBS_utils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="QBS_data.cpp">
+    <ClCompile Include="src\QBS_data.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="QBS_main.cpp">
+    <ClCompile Include="src\QBS_main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="QBS_window.cpp">
+    <ClCompile Include="src\QBS_window.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="QBS_import.cpp">
+    <ClCompile Include="src\QBS_import.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="QBS_reporter.cpp">
+    <ClCompile Include="src\QBS_reporter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="QBS_notes.cpp">
+    <ClCompile Include="src\QBS_notes.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\QBS_utils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

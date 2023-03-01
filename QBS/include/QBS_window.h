@@ -2,8 +2,8 @@
 
 #include "QBS_consts.h"
 #include "QBS_notes.h"
-#include "../zzalib/utils.h"
-#include "../zzalib/callback.h"
+#include "QBS_utils.h"
+#include "QBS_callback.h"
 
 #include <map>
 #include <string>

@@ -1,15 +1,34 @@
 #pragma once
 
-#include "../zzalib/drawing.h"
 #include <string>
 
 using namespace std;
-using namespace zzalib;
+//using namespace zzalib;
 
 const string COPYRIGHT = "© Philip Rose GM3ZZA 2022";
 const string PROGRAM_ID = "QBS";
 const string PROG_ID = "QBS";
 const string VENDOR = "GM3ZZA";
+
+// drawing constants
+const int EDGE = 10;
+const int HBUTTON = 20;
+const int WBUTTON = 60;
+const int XLEFT = EDGE;
+const int YTOP = EDGE;
+const int GAP = 10;
+const int HTEXT = 20;
+const int WRADIO = 15;
+const int HRADIO = WRADIO;
+const int WMESS = 200;
+const int WLABEL = 50;
+const int WLLABEL = 100;
+const int HMLIN = 3 * HTEXT;
+const int WEDIT = 3 * WBUTTON;
+const int WSMEDIT = 2 * WBUTTON;
+
+// Tip window dimensions
+const unsigned int TIP_WIDTH = 200;
 
 enum command_t : char {
 	INHERIT = 'I',               // Inherit cards (not sent or kept)     

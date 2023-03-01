@@ -1,8 +1,8 @@
 #include "QBS_data.h"
 #include "QBS_import.h"
 #include "QBS_reporter.h"
-#include "../zzalib/utils.h"
-#include "../zzalib/callback.h"
+#include "QBS_utils.h"
+#include "QBS_callback.h"
 
 #include <string>
 #include <fstream>
@@ -14,7 +14,6 @@
 #include <FL/Fl_Native_File_Chooser.H>
 
 using namespace std;
-using namespace zzalib;
 
 extern Fl_Preferences* settings_;
 extern char* DATE_FORMAT;

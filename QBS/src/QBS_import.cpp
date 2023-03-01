@@ -7,7 +7,6 @@
 #include <iostream>
 #include <fstream>
 
-using namespace zzalib;
 using namespace std;
 
 const extern char* DATE_FORMAT;

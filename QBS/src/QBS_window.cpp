@@ -1,11 +1,10 @@
 #include "QBS_window.h"
 #include "QBS_consts.h"
 #include "QBS_data.h"
-#include "../zzalib/callback.h"
+#include "QBS_callback.h"
 
 #include <iostream>
 
-using namespace zzalib;
 using namespace std;
 
 const extern char* DATE_FORMAT;
