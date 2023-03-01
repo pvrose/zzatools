@@ -19,6 +19,7 @@ utils.h - Utility methods
 #include <vector>
 #include <map>
 #include <ctime>
+#include <cmath>
 
 using namespace std;
 

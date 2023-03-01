@@ -5,6 +5,7 @@
 
 #include <string>
 #include <stdexcept>
+#include <cmath>
 
 #include <FL/Fl.H>
 #include <FL/Fl_Widget.H>
