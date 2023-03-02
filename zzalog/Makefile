@@ -1,5 +1,5 @@
 # Thanks to Job Vranish (https://spin.atomicobject.com/2016/08/26/makefile-c-projects/)
-TARGET_EXEC := zzalog.exe
+TARGET_EXEC := zzalog
 BUILD_TYPE := Release
 
 BUILD_DIR := ./build
