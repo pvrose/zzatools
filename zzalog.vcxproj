@@ -212,7 +212,6 @@
     <ClInclude Include="zzalog\include\callback.h" />
     <ClInclude Include="zzalog\include\formats.h" />
     <ClInclude Include="zzalog\include\page_dialog.h" />
-    <ClInclude Include="zzalib\pch.h" />
     <ClInclude Include="zzalog\include\rig_if.h" />
     <ClInclude Include="zzalog\include\rpc_data_item.h" />
     <ClInclude Include="zzalog\include\rpc_handler.h" />
@@ -273,7 +272,6 @@
     <ClInclude Include="zzalog\include\record_form.h" />
     <ClInclude Include="zzalog\include\record_table.h" />
     <ClInclude Include="zzalog\include\report_tree.h" />
-    <ClInclude Include="zzalog\include\resource.h" />
     <ClInclude Include="zzalog\include\search.h" />
     <ClInclude Include="zzalog\include\search_dialog.h" />
     <ClInclude Include="zzalog\include\settings.h" />
@@ -289,15 +287,6 @@
     <ClInclude Include="zzalog\include\view.h" />
     <ClInclude Include="zzalog\include\web_dialog.h" />
     <ClInclude Include="zzalog\include\wsjtx_handler.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="zzalog\zzalog.rc" />
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="zzalog\zzalog.ico">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </Image>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

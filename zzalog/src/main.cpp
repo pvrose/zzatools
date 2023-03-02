@@ -37,7 +37,6 @@ main.cpp - application entry point
 #include "club_handler.h"
 #include "wsjtx_handler.h"
 #include "fllog_emul.h"
-#include "resource.h"
 #include "hamlib/rig.h"
 #include "main_window.h"
 #include "qso_manager.h"
