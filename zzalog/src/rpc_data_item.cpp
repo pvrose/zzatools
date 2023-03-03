@@ -2,8 +2,7 @@
 #include "utils.h"
 
 #include <stdexcept>
-
-
+#include <cmath>
 
 // Constructor - sets default values
 rpc_data_item::rpc_data_item()

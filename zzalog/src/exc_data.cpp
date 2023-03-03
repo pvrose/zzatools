@@ -4,10 +4,15 @@
 #include "status.h"
 #include "callback.h"
 
-#include <io.h>
+#include <stdio.h>
 #include <fcntl.h>
 #include <fstream>
 #include <ctime>
+#ifndef _WIN32
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#endif
 
 #include <FL/Fl_Preferences.H>
 #include <FL/Fl_Native_File_Chooser.H>
@@ -102,13 +107,21 @@ exc_entry* exc_data::is_exception(record* record) {
 bool exc_data::data_valid(string filename) {
 #ifdef _WIN32
 	int fd = _sopen(filename.c_str(), _O_RDONLY, _SH_DENYNO);
+#else
+	int fd = open(filename.c_str(), O_RDONLY);
+#endif
 	if (fd == -1) {
 		// File doesn't exist
 		return false;
 	}
 	// Get file status
+#ifdef _WIN32
 	struct _stat status;
 	int result = _fstat(fd, &status);
+#else
+	struct stat status;
+	int result = fstat(fd, &status);
+#endif
 	time_t now;
 	time(&now);
 	if (difftime(now, status.st_mtime) > 7 * 24 * 3600) {
@@ -118,9 +131,6 @@ bool exc_data::data_valid(string filename) {
 	else {
 		return true;
 	}
-#else
-	// TODO: Code Posix version of the above
-#endif
 }
 
 // Is the call in the list of invalid calls - unauthorised DXpeditions

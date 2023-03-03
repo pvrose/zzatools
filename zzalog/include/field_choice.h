@@ -22,7 +22,7 @@ using namespace std;
 		~field_choice();
 
 		// Set dataset
-		void set_dataset(string dataset_name, string default = "");
+		void set_dataset(string dataset_name, string field = "");
 		// Override value methods for fundamental string
 		const char* value();
 		void value(const char* field);

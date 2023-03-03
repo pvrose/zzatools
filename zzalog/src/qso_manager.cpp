@@ -14,7 +14,9 @@
 #include "extract_data.h"
 #include "menu.h"
 #include "field_choice.h"
+#ifdef _WIN32
 #include "dxa_if.h"
+#endif
 #include "band_view.h"
 #include "tabbed_forms.h"
 #include "import_data.h"
@@ -53,7 +55,9 @@ extern spec_data* spec_data_;
 extern book* book_;
 extern extract_data* extract_records_;
 extern menu* menu_;
+#ifdef _WIN32
 extern dxa_if* dxa_if_;
+#endif
 extern band_view* band_view_;
 extern tabbed_forms* tabbed_forms_;
 extern import_data* import_data_;
@@ -1868,7 +1872,9 @@ void qso_manager::qso_group::check_qth_changed() {
 			current->item("APP_ZZA_QTH") != previous_qth_) {
 			previous_locator_ = current->item("MY_GRIDSQUARE", true);
 			previous_qth_ = current->item("APP_ZZA_QTH");
+#ifdef _WIN32
 			dxa_if_->update(HT_LOCATION);
+#endif
 		}
 	}
 }

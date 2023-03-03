@@ -6,10 +6,10 @@ BUILD_DIR := ./build
 SRC_DIRS := ./src
 EXEC_DIR = $(BUILD_DIR)/$(BUILD_TYPE)
 
-FLTK_DIR := /c/Users/pvros/dev/fltk
+FLTK_DIR := ~/ham_dev/fltk
 FLTK_BUILD := $(FLTK_DIR)/build/$(BUILD_TYPE)
-HAMLIB_DIR := /c/Users/pvros/dev/hamlib-4.5
-HAMLIB_BUILD := $(HAMLIB_DIR)/mingw64-inst
+HAMLIB_DIR := ~/ham_dev/hamlib/hamlib-4.5.4
+#HAMLIB_BUILD := $(HAMLIB_DIR)/mingw64-inst
 
 # Standard compilers and debuggers
 CC = gcc
@@ -34,21 +34,20 @@ TARFILE = $(TARGET_EXEC:.exe=.tgz)
 # Every folder in ./src will need to be passed to GCC so that it can find header files
 INC_DIRS := ./include
 INC_DIRS += $(FLTK_DIR) $(FLTK_BUILD)
-INC_DIRS += $(HAMLIB_BUILD)/include
+INC_DIRS += $(HAMLIB_DIR)/include
 
 # Add a prefix to INC_DIRS. So moduleA would become -ImoduleA. GCC understands this -I flag
 INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 
 # Set up libraries
-LIB_DIRS := $(FLTK_BUILD)/lib 
-LIB_DIRS += $(HAMLIB_BUILD)/lib
-LIBS := -l:libfltk.a -l:libfltk_gl.a -l:libfltk_images.a \
- -l:libfltk_jpeg.a -l:libfltk_png.a -l:libfltk_z.a -l:libfltk_forms.a\
- -l:libhamlib.dll.a -lgdiplus -lcomctl32 -lws2_32 \
- -lgdiplus -lkernel32 -luser32 -lgdi32 -lwinspool \
- -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32 \
- -lcurl
- LDFLAGS := $(addprefix -L,$(LIB_DIRS)) $(LIBS)
+# FLTK ld flags - created using `fltk-config --ldflags`
+FLTK_FLAGS := -L/usr/local/lib -lfltk -lfltk_images -lfltk_jpeg -lz -lpng -lm -lX11 -lpthread -lXft -lXrender -lm -lfontconfig -ldl
+# Hamlib flags
+HAMLIB_FLAGS := -L/usr/local/lib -lhamlib 
+# Curl flags
+CURL_FLAGS := -lcurl
+
+LDFLAGS := $(FLTK_FLAGS) $(HAMLIB_FLAGS) $(CURL_FLAGS)
 
 # The -MMD and -MP flags together generate Makefiles for us!
 # These files will have .d instead of .o as the output.
@@ -59,7 +58,7 @@ CFLAGS += -g
 # include debug data
 CXXFLAGS += -g
 # Avoid muliple definition of byte
-CXXFLAGS += -DWIN32_LEAN_AND_MEAN
+# CXXFLAGS += -DWIN32_LEAN_AND_MEAN
 
 # DEBUG_FLAG := -Og
 
@@ -97,6 +96,11 @@ debug: $(EXEC_DIR)/$(TARGET_EXEC)
 .PHONY: clean
 clean:
 	rm -r $(BUILD_DIR)
+
+# install
+.PHONY: install
+install: $(EXEC_DIR)/$(TARGET_EXEC)
+	cp $(EXEC_DIR)/$(TARGET_EXEC) $(INSTALL_DIR)
 
 # Include the .d makefiles. The - at the front suppresses the errors of missing
 # Makefiles. Initially, all the .d files will be missing, and we don't want those

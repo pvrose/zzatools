@@ -24,7 +24,9 @@ extern extract_data* extract_records_;
 extern import_data* import_data_;
 extern extract_data* dxatlas_records_;
 extern toolbar* toolbar_;
+#ifdef _WIN32
 extern dxa_if* dxa_if_;
+#endif
 extern settings* config_;
 extern bool closing_;
 extern rig_if* rig_if_;

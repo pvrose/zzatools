@@ -22,9 +22,6 @@
 #include <FL/Fl_Tooltip.H>
 #include <FL/Fl_Single_Window.H>
 
-
-
-
 extern Fl_Preferences* settings_;
 extern spec_data* spec_data_;
 extern book* book_;
@@ -35,7 +32,9 @@ extern status* status_;
 extern intl_dialog* intl_dialog_;
 extern time_t session_start_;
 extern pfx_data* pfx_data_;
+#ifdef _WIN32
 extern dxa_if* dxa_if_;
+#endif
 extern qso_manager* qso_manager_;
 extern bool in_current_session(record*);
 
@@ -752,7 +751,7 @@ void log_table::edit_cell(int row, int col) {
 	edit_input_->textfont(font_);
 	edit_input_->textsize(fontsize_);
 	// Select all the contents of the input
-	edit_input_->input()->position(0, text.length());
+	edit_input_->input()->insert_position(0, text.length());
 	// Make the widget visible and let it take focus even if the mouse isn't over it
 	edit_input_->show();
 	edit_input_->input()->take_focus();
@@ -818,6 +817,7 @@ void log_table::done_edit(bool keep_row) {
 			if (field_info.field == "CALL") {
 				toolbar_->search_text(my_book_->record_number(item_number));
 			}
+#ifdef _WIN32
 			// Set DX location in DX Atlas
 			if (my_book_->new_record()) {
 				if (field_info.field == "GRIDSQUARE") {
@@ -838,6 +838,7 @@ void log_table::done_edit(bool keep_row) {
 					}
 				}
 			}
+#endif
 			char message[200];
 			// Log the fact that a record has been interactively changed
 			snprintf(message, 200, "LOG: %s %s %s record changed %s from %s to %s",

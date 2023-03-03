@@ -5,6 +5,7 @@
 #include "prefix.h"
 #include "record.h"
 #include "fields.h"
+#include "report_tree.h"
 
 #include <string>
 #include <vector>
@@ -15,10 +16,6 @@
 
 using namespace std;
 
-
-
-	enum report_filter_t;
-	enum report_item_t;
 
 	// This class displays the prefix database in tree format
 	class pfx_tree :

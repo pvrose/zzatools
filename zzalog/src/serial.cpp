@@ -1,124 +1,24 @@
 #include "serial.h"
 
 #include <iostream>
+#include <string>
 
+#ifdef _WIN32
 // Note the code is Windows only - need Linux version
 #include <Windows.h>
+#else 
+#include <errno.h>
+#include <fcntl.h> 
+#include <termios.h>
+#include <unistd.h>
+#endif
 
 // Constructor - initialise "file" handle to port
 serial::serial() {
-	h_port_ = nullptr;
 };
 
 // Destrutor
 serial::~serial() {
-}
-
-// Open the named port at specified baud-rate. Monitor - open read-only
-bool serial::open_port(string port_name, unsigned int baud_rate, bool monitor, int rx_timeout) {
-	// Try to open the port //./COMn - return false if fail.
-	port_name_ = port_name;
-	int length = 5 + port_name.length();
-	char* device = new char[length];
-	snprintf(device, length, "//./%s", port_name.c_str());
-	DWORD access_mode;
-	if (monitor) {
-		access_mode = GENERIC_READ;
-	}
-	else {
-		access_mode = GENERIC_READ | GENERIC_WRITE;
-	}
-	// Open the port
-	h_port_ = CreateFile(device, access_mode, 0, 0, OPEN_EXISTING, 0, 0);
-	if (h_port_ == INVALID_HANDLE_VALUE) {
-		log_error("CreateFile");
-		return false;
-	}
-
-	// Now attempt to configure port
-	DCB control;
-	if (!GetCommState(h_port_, &control)) {
-		log_error("GetCommState");
-		CloseHandle(h_port_);
-		return false;
-	}
-
-	// Now set the required configuration - specified baud-rate, 8-bit, no parity, 1-stop. Port will carry binary mode data
-	control.DCBlength = sizeof(control);
-	control.BaudRate = baud_rate;
-	control.ByteSize = 8;
-	control.Parity = NOPARITY;
-	control.StopBits = ONESTOPBIT;
-	control.fBinary = true;
-	control.fDsrSensitivity = false;
-	control.fParity = false;
-	control.fOutX = false;
-	control.fInX = false;
-	control.fNull = false;
-	control.fAbortOnError = false;
-	control.fOutxCtsFlow = false;
-	control.fOutxDsrFlow = false;
-	control.fErrorChar = false;
-
-	if (!SetCommState(h_port_, &control)) {
-		log_error("SetCommState");
-		CloseHandle(h_port_);
-		return false;
-	}
-
-	// Set timeouts
-	COMMTIMEOUTS timeouts;
-	// Wait for RX_Timeout for any data to come back
-	timeouts.ReadIntervalTimeout = rx_timeout;
-	timeouts.ReadTotalTimeoutMultiplier = 0;
-	timeouts.ReadTotalTimeoutConstant = rx_timeout;
-	timeouts.WriteTotalTimeoutConstant = 0;
-	timeouts.WriteTotalTimeoutMultiplier = 0;
-
-	if (!SetCommTimeouts(h_port_, &timeouts)) {
-		log_error("SetCommTimeouts");
-		CloseHandle(h_port_);
-		return false;
-	}
-
-	return true;
-}
-
-// Copy data from the port to the supplied string
-bool serial::read_buffer(string& buffer) {
-	char data[1024];
-	DWORD bytes_read;
-	if (!ReadFile(h_port_, &data, sizeof(data), &bytes_read, nullptr)) {
-		log_error("ReadFile");
-		return false;
-	}
-	else {
-		buffer = string(data, (size_t)bytes_read);
-		return true;
-	}
-}
-
-// Write data from the supplied string to the port
-bool serial::write_buffer(string buffer) {
-	DWORD bytes_written;
-	if (!WriteFile(h_port_, buffer.c_str(), buffer.length(), &bytes_written, nullptr)) {
-		log_error("WriteFile");
-		return false;
-	}
-	return true;
-}
-
-// Display error message - got from system
-void serial::log_error(string method) {
-	DWORD error_code = GetLastError();
-	char message[1028];
-	FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, nullptr, error_code, 0, message, sizeof(message), nullptr);
-	cerr << method << " failed: " << message << '\n';
-}
-
-// Close the port
-void serial::close_port() {
-	CloseHandle(h_port_);
 }
 
 // Find all existing COM ports - upto COM255
@@ -157,7 +57,8 @@ bool serial::available_ports(int num_ports, string* ports, bool all_ports, int& 
 	}
 	return (actual_ports <= num_ports);
 #else
-	// Implement posix version
+	// Implement Linux version
+	return false;
 #endif
 
 }

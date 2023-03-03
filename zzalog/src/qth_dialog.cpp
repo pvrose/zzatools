@@ -10,7 +10,6 @@
 #include "tabbed_forms.h"
 #include "intl_widgets.h"
 #include "qso_manager.h"
-#include "dxa_if.h"
 #include "spec_data.h"
 
 #include <set>
@@ -32,7 +31,6 @@ extern status* status_;
 extern tabbed_forms* tabbed_forms_;
 extern rig_if* rig_if_;
 extern qso_manager* qso_manager_;
-extern dxa_if* dxa_if_;
 extern spec_data* spec_data_;
 
 // QTH group constructor

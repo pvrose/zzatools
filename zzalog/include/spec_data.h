@@ -18,7 +18,7 @@ using namespace std;
 
 
 	// validation status for each check
-	enum error_t {
+	enum valn_error_t {
 		VE_OK,                         // No problem
 		VE_TYPE_UNKNOWN,               // Datatype or enumeration type not known
 		VE_FIELD_UNKNOWN,              // Field name is not known

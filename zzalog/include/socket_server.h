@@ -5,7 +5,16 @@
 
 #include <string>
 #include <cstdint>
+#ifdef _WIN32
 #include <WinSock2.h>
+#else
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <unistd.h>
+#include <sys/socket.h>
+#define SOCKET int
+#define SOCKADDR_IN sockaddr_in
+#endif
 
 using namespace std;
 

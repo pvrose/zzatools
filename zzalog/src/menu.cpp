@@ -29,7 +29,9 @@
 #include "qrz_handler.h"
 #include "wsjtx_handler.h"
 #include "band_view.h"
+#ifdef _WIN32
 #include "dxa_if.h"
+#endif
 #include "main_window.h"
 #include "qso_manager.h"
 
@@ -67,7 +69,9 @@ extern toolbar* toolbar_;
 extern qrz_handler* qrz_handler_;
 extern wsjtx_handler* wsjtx_handler_;
 extern band_view* band_view_;
+#ifdef _WIN32
 extern dxa_if* dxa_if_;
+#endif
 extern time_t session_start_;
 extern qso_manager* qso_manager_;
 settings* config_ = nullptr;
@@ -808,7 +812,9 @@ void menu::cb_mi_log_new(Fl_Widget* w, void* v) {
 // Log->Save - save current record
 // v is not used
 void menu::cb_mi_log_save(Fl_Widget* w, void* v) {
+#ifdef _WIN32
 	dxa_if_->clear_dx_loc();
+#endif
 	qso_manager_->end_qso();
 	qso_manager_->update_rig();
 }

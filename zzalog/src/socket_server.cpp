@@ -1,18 +1,26 @@
 #include "socket_server.h"
 
 #include <stdio.h>
-#include <WS2tcpip.h>
 #include <sstream>
 #include <iostream>
 #include <vector>
 
-#ifndef _WIN32
-#include <fnctl.h>
+#ifdef _WIN32
+#include <WS2tcpip.h>
+#else
+#include <fcntl.h>
+#include <netinet/in.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/socket.h>
+#include <unistd.h>
+#define INVALID_SOCKET -1
+#define SOCKADDR sockaddr
+
 #endif
 
 #include <FL/Fl.H>
-
-
 
 // Constructor
 socket_server::socket_server(protocol_t protocol, int port_num) :
@@ -56,25 +64,33 @@ void socket_server::close_server() {
 	if (server_ != INVALID_SOCKET) {
 		printf("Closing....");
 		SOCKADDR_IN server_addr;
-		int len_server_addr = sizeof(server_addr);
+		unsigned int len_server_addr = sizeof(server_addr);
 		char message[256];
 		getsockname(server_, (SOCKADDR*)&server_addr, &len_server_addr);
+#ifdef _WIN32
 		snprintf(message, 256, "SOCKET: Closing socket %s:%d", inet_ntoa(server_addr.sin_addr), htons(server_addr.sin_port));
 		status(ST_OK, message);
 		closesocket(server_);
 		WSACleanup();
+#else 
+		snprintf(message, 256, "SOCKET: Closing socket %d:%d", server_addr.sin_addr, server_addr.sin_port);
+		status(ST_OK, message);
+		close(server_);
+#endif
 		server_ = INVALID_SOCKET;
 	}
 }
 
 // Create the server after initialising winsock and opening socket
 int socket_server::create_server() {
+	int result;
 	// Used for status messages
 	char message[256];
+#ifdef _WIN32
 
 	// Initailise Winsock
 	WSADATA ws_data;
-	int result = WSAStartup(MAKEWORD(2, 2), &ws_data);
+	result = WSAStartup(MAKEWORD(2, 2), &ws_data);
 	if (result) {
 		handle_error("Unable to initialise winsock");
 		return result;
@@ -88,8 +104,8 @@ int socket_server::create_server() {
 		handle_error(message);
 		return 1;
 	}
-
-
+#endif
+	
 	// Create the socket
 	switch (protocol_) {
 	case UDP:
@@ -116,19 +132,23 @@ int socket_server::create_server() {
 
 	// Define the port we listen on and addresses we listen for
 	SOCKADDR_IN server_addr;
-	int len_server_addr = sizeof(server_addr);
+	unsigned int len_server_addr = sizeof(server_addr);
 	server_addr.sin_family = AF_INET;
 	server_addr.sin_port = htons(port_num_);
 	server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 	// Associate the socket with this address data
 	result = bind(server_, (SOCKADDR*)&server_addr, len_server_addr);
-	if (result == SOCKET_ERROR) {
+	if (result < 0) {
 		handle_error("Unable to bind the socket");
 		return result;
 	}
 	else {
 		getsockname(server_, (SOCKADDR*)&server_addr, &len_server_addr);
+#ifdef _WIN32
 		snprintf(message, 256, "SOCKET: Connected socket %s:%d", inet_ntoa(server_addr.sin_addr), htons(server_addr.sin_port));
+#else
+		snprintf(message, 256, "SOCKET: Connected socket %d:%d", server_addr.sin_addr, server_addr.sin_port);
+#endif
 		status(ST_OK, message);
 	}
 
@@ -145,19 +165,23 @@ int socket_server::create_server() {
 	if (flags == -1) return false;
 	flags = (flags | O_NONBLOCK);
 	// TODO add status call if fail
-	return (fcntl(fd, F_SETFL, flags) == 0) ? 0 : 1;
+	return (fcntl(server_, F_SETFL, flags) == 0) ? 0 : 1;
 #endif
 
 	// Set socket into listening mode 
 	if (protocol_ == HTTP) {
 		result = listen(server_, SOMAXCONN);
-		if (result == SOCKET_ERROR) {
+		if (result < 0) {
 			handle_error("Unable to establich connection");
 			return result;
 		}
 		else {
 			getsockname(server_, (SOCKADDR*)&server_addr, &len_server_addr);
+#ifdef _WIN32
 			snprintf(message, 256, "SOCKET: Listening socket %s:%d", inet_ntoa(server_addr.sin_addr), htons(server_addr.sin_port));
+#else
+			snprintf(message, 256, "SOCKET: Listening socket %d:%d", server_addr.sin_addr, server_addr.sin_port);
+#endif
 			status(ST_OK, message);
 		}
 
@@ -175,7 +199,7 @@ int socket_server::create_server() {
 		if (flags == -1) return false;
 		flags = (flags | O_NONBLOCK);
 		// TODO add status call if fail
-		return (fcntl(fd, F_SETFL, flags) == 0) ? 0 : 1;
+		return (fcntl(client_, F_SETFL, flags) == 0) ? 0 : 1;
 #endif
 	}
 	return 0;
@@ -184,9 +208,10 @@ int socket_server::create_server() {
 // Accept any client asking to connect, use non-blocking call to avoid locking out other code
 socket_server::client_status socket_server::accept_client() {
 	char message[256];
-	int len_client_addr = sizeof(client_addr_);
+	unsigned int len_client_addr = sizeof(client_addr_);
 	client_ = accept(server_, (SOCKADDR*)&client_addr_, &len_client_addr);
 	if (client_ == INVALID_SOCKET) {
+#ifdef _WIN32
 		if (WSAGetLastError() == WSAEWOULDBLOCK) {
 			//status(ST_LOG, "SOCKET: No client socket to accept");
 			// Non-blocking accept would have blocked - let other events get handled and try again
@@ -196,9 +221,16 @@ socket_server::client_status socket_server::accept_client() {
 			handle_error("Unable to accept connection");
 			return NG;
 		}
+#else
+		return NG;
+#endif
 	}
 	else {
+#ifdef _WIN32
 		snprintf(message, 256, "SOCKET: Accepted socket %s:%d", inet_ntoa(client_addr_.sin_addr), htons(client_addr_.sin_port));
+#else
+		snprintf(message, 256, "SOCKET: Accepted socket %d:%d", client_addr_.sin_addr, client_addr_.sin_port);
+#endif
 		status(ST_OK, message);
 		return OK;
 	}
@@ -209,11 +241,13 @@ const int MAX_SOCKET = 10240;
 int socket_server::rcv_packet() {
 	char* buffer = new char[MAX_SOCKET];
 	int buffer_len = MAX_SOCKET;
-	int bytes_rcvd = 0;
+	unsigned int bytes_rcvd = 0;
+#ifdef _WIN32
 	// Generate a set of socket descriptors for use in select()
 	FD_SET set_sockets;
 	FD_ZERO(&set_sockets);
 	FD_SET(server_, &set_sockets);
+#endif
 
 	// Now wait until we see a client
 	if (protocol_ == HTTP) {
@@ -233,7 +267,7 @@ int socket_server::rcv_packet() {
 	string function = "";
 	int pos_payload = 0;
 	double wait_time = 0.0;
-	int len_client_addr = sizeof(client_addr_);
+	unsigned int len_client_addr = sizeof(client_addr_);
 	do {
 		// Keep processing packets while they keep coming
 		switch (protocol_) {
@@ -256,6 +290,7 @@ int socket_server::rcv_packet() {
 			// Receiving data - set wait time short
 			wait_time = 0;
 		}
+#ifdef _WIN32
 		else if (WSAGetLastError() == WSAEWOULDBLOCK) {
 			// Try again immediately after letting FLTK in
 			Fl::wait();
@@ -266,6 +301,7 @@ int socket_server::rcv_packet() {
 			delete[] buffer;
 			return 1;
 		}
+#endif
 		else {
 			handle_error("Unable to read from client");
 			delete[] buffer;
@@ -301,7 +337,7 @@ int socket_server::send_response(istream& response) {
 	else {
 		result = send(client_, buffer, resp_size, 0);
 	}
-	if (result == SOCKET_ERROR) {
+	if (result < 0) {
 		handle_error("Unable to send to");
 		return result;
 	}
@@ -328,6 +364,7 @@ bool socket_server::has_server() {
 // Handle error - display error message
 void socket_server::handle_error(const char* phase) {
 	char message[1028];
+#ifdef _WIN32
 	DWORD error_code = WSAGetLastError();
 	if (error_code) {
 		char error_msg[1028];
@@ -337,6 +374,9 @@ void socket_server::handle_error(const char* phase) {
 	else {
 		snprintf(message, 1028, "SOCKET: %s", phase);
 	}
+#else
+	snprintf(message, 1028, "SOCKET: %s", phase);
+#endif
 	status(ST_ERROR, message);
 	close_server();
 }
