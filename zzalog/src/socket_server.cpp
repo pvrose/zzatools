@@ -22,6 +22,12 @@
 
 #include <FL/Fl.H>
 
+#ifdef _WIN32 
+#define LEN_SOCKET_ADDR int
+#else
+#define LEN_SOCKET_ADDR unsigned int
+#endif
+
 // Constructor
 socket_server::socket_server(protocol_t protocol, int port_num) :
 	server_(INVALID_SOCKET),
@@ -64,7 +70,7 @@ void socket_server::close_server() {
 	if (server_ != INVALID_SOCKET) {
 		printf("Closing....");
 		SOCKADDR_IN server_addr;
-		unsigned int len_server_addr = sizeof(server_addr);
+		LEN_SOCKET_ADDR len_server_addr = sizeof(server_addr);
 		char message[256];
 		getsockname(server_, (SOCKADDR*)&server_addr, &len_server_addr);
 #ifdef _WIN32
@@ -132,7 +138,7 @@ int socket_server::create_server() {
 
 	// Define the port we listen on and addresses we listen for
 	SOCKADDR_IN server_addr;
-	unsigned int len_server_addr = sizeof(server_addr);
+	LEN_SOCKET_ADDR len_server_addr = sizeof(server_addr);
 	server_addr.sin_family = AF_INET;
 	server_addr.sin_port = htons(port_num_);
 	server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
@@ -208,7 +214,7 @@ int socket_server::create_server() {
 // Accept any client asking to connect, use non-blocking call to avoid locking out other code
 socket_server::client_status socket_server::accept_client() {
 	char message[256];
-	unsigned int len_client_addr = sizeof(client_addr_);
+	LEN_SOCKET_ADDR len_client_addr = sizeof(client_addr_);
 	client_ = accept(server_, (SOCKADDR*)&client_addr_, &len_client_addr);
 	if (client_ == INVALID_SOCKET) {
 #ifdef _WIN32
@@ -241,7 +247,7 @@ const int MAX_SOCKET = 10240;
 int socket_server::rcv_packet() {
 	char* buffer = new char[MAX_SOCKET];
 	int buffer_len = MAX_SOCKET;
-	unsigned int bytes_rcvd = 0;
+	int bytes_rcvd = 0;
 #ifdef _WIN32
 	// Generate a set of socket descriptors for use in select()
 	FD_SET set_sockets;
@@ -267,7 +273,7 @@ int socket_server::rcv_packet() {
 	string function = "";
 	int pos_payload = 0;
 	double wait_time = 0.0;
-	unsigned int len_client_addr = sizeof(client_addr_);
+	LEN_SOCKET_ADDR len_client_addr = sizeof(client_addr_);
 	do {
 		// Keep processing packets while they keep coming
 		switch (protocol_) {

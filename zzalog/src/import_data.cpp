@@ -13,12 +13,14 @@
 
 #include <sstream>
 #include <ctime>
-#include <stdio.h>
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #ifdef _WIN32
+#include <io.h>
 #include <share.h>
+#else
+#include <stdio.h>
 #endif
 
 #include <FL/Fl_Preferences.H>

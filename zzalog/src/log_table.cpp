@@ -751,7 +751,9 @@ void log_table::edit_cell(int row, int col) {
 	edit_input_->textfont(font_);
 	edit_input_->textsize(fontsize_);
 	// Select all the contents of the input
-	edit_input_->input()->insert_position(0, text.length());
+	// TODO Fl_Input::position() in this usage is deprecated in latest FLTK 
+	//      I should update to latest and use Fl_Input::insert_position() instead
+	edit_input_->input()->position(0, text.length());
 	// Make the widget visible and let it take focus even if the mouse isn't over it
 	edit_input_->show();
 	edit_input_->input()->take_focus();

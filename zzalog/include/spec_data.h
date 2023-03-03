@@ -153,7 +153,7 @@ using namespace std;
 		// Validate a record - returns TRUE if record corrected
 		bool validate(record* record, record_num_t number);
 		// Validate the data in the field
-		error_t validate(const string&  field_name, const string& data, bool inhibit_report = false);
+		valn_error_t validate(const string&  field_name, const string& data, bool inhibit_report = false);
 		// Set the loaded filename
 		void loaded_filename(string value);
 		// Get tip for the field and data
@@ -189,27 +189,27 @@ using namespace std;
 		// Combine mode and submode into single dataset
 		void process_modes();
 		// Check the data is the correct format for the field either against a regex for specific datatypes
-		error_t check_format(const string&  data, const string&  field, const string&  datatype, const basic_regex<char>& pattern);
+		valn_error_t check_format(const string&  data, const string&  field, const string&  datatype, const basic_regex<char>& pattern);
 		// Check that data is in the correct value range
-		error_t check_string(const string&  data, const string&  field, const string&  datatype);
+		valn_error_t check_string(const string&  data, const string&  field, const string&  datatype);
 		// Check the data is between to non-integer minimum and maximum values
-		error_t check_number(const string&  data, const string&  field, const string&  datatype);
+		valn_error_t check_number(const string&  data, const string&  field, const string&  datatype);
 		// Check the data is between two integer minimum and maximum values
-		error_t check_integer(const string&  data, const string&  field, const string&  datatype);
+		valn_error_t check_integer(const string&  data, const string&  field, const string&  datatype);
 		// Check that an enumeration is valid
-		error_t check_enumeration(const string& data, const string& field, const string& datatype);
+		valn_error_t check_enumeration(const string& data, const string& field, const string& datatype);
 		// Check that the data is a separated list of the specified datatype/enumeration
-		error_t check_list(const string&  data, const string&  field, const string&  datatype, bool bIsEnumeration, char cSeparator);
+		valn_error_t check_list(const string&  data, const string&  field, const string&  datatype, bool bIsEnumeration, char cSeparator);
 		// Check that the data is the specified datatype/enumeration
-		error_t check_datatype(const string&  data, const string&  field, const string&  datatype, bool bIsEnumeration);
+		valn_error_t check_datatype(const string&  data, const string&  field, const string&  datatype, bool bIsEnumeration);
 		// Check that time is valid
-		error_t check_time(const string& data, const string& field);
+		valn_error_t check_time(const string& data, const string& field);
 		// Handle a validation error
-		void handle_error(error_t error_code, const string&  data, const string&  datatype, const string&  field);
+		void handle_error(valn_error_t error_code, const string&  data, const string&  datatype, const string&  field);
 		// Report validation error
-		void report_error(error_t error_code, const string&  data, const string&  datatype, const string&  field);
+		void report_error(valn_error_t error_code, const string&  data, const string&  datatype, const string&  field);
 		// Auto-correct error returns TRUE if successful
-		bool auto_correction(error_t error_code, const string&  data, const string& sDisplayData, const string&  datatype, const string&  field);
+		bool auto_correction(valn_error_t error_code, const string&  data, const string& sDisplayData, const string&  datatype, const string&  field);
 		// User-correct error 
 		bool ask_correction(const string& field);
 		// Report correction

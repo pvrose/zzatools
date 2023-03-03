@@ -4,11 +4,13 @@
 #include "status.h"
 #include "callback.h"
 
-#include <stdio.h>
 #include <fcntl.h>
 #include <fstream>
 #include <ctime>
-#ifndef _WIN32
+#ifdef _WIN32
+#include <io.h>
+#else
+#include <stdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
