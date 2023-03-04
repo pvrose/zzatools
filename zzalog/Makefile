@@ -5,6 +5,7 @@ BUILD_TYPE := Release
 BUILD_DIR := ./build
 SRC_DIRS := ./src
 EXEC_DIR = $(BUILD_DIR)/$(BUILD_TYPE)
+INSTALL_DIR := /usr/local/bin
 
 FLTK_DIR := ~/ham_dev/fltk
 FLTK_BUILD := $(FLTK_DIR)/build/$(BUILD_TYPE)

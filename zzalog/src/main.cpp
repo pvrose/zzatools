@@ -818,6 +818,10 @@ int main(int argc, char** argv)
 {
 	// Set default font size for all widgets
 	FL_NORMAL_SIZE = FONT_SIZE;
+	// Set default Fil Chooser on non-windows
+#ifndef _WIN32
+	Fl::option(Fl::OPTION_FNFC_USES_ZENITY, true);
+#endif
 	// Parse command-line arguments - accept FLTK standard arguments and custom ones (in cb_args)
 	int i = 1;
 	Fl::args(argc, argv, i, cb_args);
