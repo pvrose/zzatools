@@ -159,6 +159,8 @@ using namespace std;
 		double max_power_;
 		// Stop incessane errors
 		bool inhibit_repeated_errors;
+		// Full rig name
+		string full_rig_name_;
 	};
 
 	// THis class implements the hamlib specific methods of the base class

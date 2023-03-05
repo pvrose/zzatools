@@ -426,11 +426,11 @@ bool rig_hamlib::open() {
 // Return rig name
 string& rig_hamlib::rig_name() {
 	// Read capabilities to get manufacturer and model name
-	const char* info = rig_get_info(rig_);
+	full_rig_name_ = rig_get_info(rig_);
 	rig_caps capabilities = *(rig_get_caps(model_id_));
 	rig_name_ = capabilities.model_name;
 	mfg_name_ = capabilities.mfg_name;
-	return string(info);
+	return full_rig_name_;
 }
 
 // Read TX frequency in Hz

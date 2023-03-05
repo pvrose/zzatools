@@ -6,7 +6,9 @@
 #include <string>
 #include <cstdint>
 #include <map>
+#ifdef _WIN32
 #include <WinSock2.h>
+#endif
 
 using namespace std;
 

@@ -15,6 +15,7 @@
 #include <regex>
 #include <chrono>
 #include <climits>
+#include <cfloat>
 
 #include <FL/Fl_Preferences.H>
 #include <FL/fl_ask.H>

@@ -6,6 +6,7 @@
 #include "win_dialog.h"
 #include <vector>
 #include <string>
+#include <list>
 
 #include <FL/Fl_Output.H>
 #include <FL/Fl_Choice.H>

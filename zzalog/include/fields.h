@@ -16,12 +16,12 @@ using namespace std;
 		string header;			// Text used for column headers in log table views
 		unsigned int width;		// Column width in log table views
 
-		field_info_t::field_info_t() :
+		field_info_t() :
 			field(""),
 			header(""),
 			width(0)
 		{}
-		field_info_t::field_info_t(string f, string h, unsigned int w) :
+		field_info_t(string f, string h, unsigned int w) :
 			field(f),
 			header(h),
 			width(w)

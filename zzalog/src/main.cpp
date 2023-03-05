@@ -32,7 +32,9 @@ main.cpp - application entry point
 #include "drawing.h"
 #include "intl_dialog.h"
 #include "band_view.h"
+#ifdef _WIN32
 #include "dxa_if.h"
+#endif
 #include "qrz_handler.h"
 #include "club_handler.h"
 #include "wsjtx_handler.h"
@@ -167,11 +169,13 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 			Fl::delete_widget(band_view_);
 			band_view_ = nullptr;
 		}
+#ifdef _WIN32
 		// Close DxAtlas connection
 		if (dxa_if_) {
 			delete dxa_if_;
 			dxa_if_ = nullptr;
 		}
+#endif
 		// Currently modifying a (potentially new) record
 		if (book_ && (book_->modified_record() || book_->new_record()) ) {
 			fl_beep(FL_BEEP_QUESTION);
@@ -657,9 +661,11 @@ void add_dashboard() {
 
 // Add DxAtlas control window
 void add_dxatlas() {
+#ifdef _WIN32
 	if (!closing_ && dxa_if_ == nullptr) {
 		dxa_if_ = new dxa_if();
 	}
+#endif
 }
 
 // Set the text in the main window label
@@ -734,7 +740,9 @@ void tidy() {
 	// From inspection of the code - calling this a second time frees the memory
 	fl_message_title_default(nullptr);
 	delete qso_manager_;
+#ifdef _WIN32
 	delete dxa_if_;
+#endif
 	delete wsjtx_handler_;
 	delete club_handler_;
 	delete qrz_handler_;
@@ -763,7 +771,7 @@ void tidy() {
 void add_icon(const char* arg0) {
 #ifndef _WIN32
 	// set the default Icon
-	Fl_window::default_icon(new Fl_RGB_Image(ICON_MAIN, 16, 16, 4));
+	Fl_Window::default_icon(new Fl_RGB_Image(ICON_MAIN, 16, 16, 4));
 #else
 	// NB: On windows we have a separate icon file - never worked out how to get one into the file
 	// Find the directory the app is loaded from and add the icon filename
