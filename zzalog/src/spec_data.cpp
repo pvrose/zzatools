@@ -1007,7 +1007,7 @@ bool spec_data::has_states(int dxcc) {
 }
 
 // Check that the data is a valid number between minimum and maximum values
-error_t spec_data::check_number(const string&  data, const string&  field, const string&  datatype)
+valn_error_t spec_data::check_number(const string&  data, const string&  field, const string&  datatype)
 {
 	// Convert the string to a double
 	size_t pos;
@@ -1045,7 +1045,7 @@ error_t spec_data::check_number(const string&  data, const string&  field, const
 }
 
 // Check the value is an integer between the minimum and maximum defined - also check if compatible with other fields
-error_t spec_data::check_integer(const string&  data, const string&  field, const string&  datatype)
+valn_error_t spec_data::check_integer(const string&  data, const string&  field, const string&  datatype)
 {
 	// Convert the data to an integer to check it's a valid integer value
 	size_t pos;
@@ -1150,7 +1150,7 @@ error_t spec_data::check_integer(const string&  data, const string&  field, cons
 }
 
 // Check that an enumeration is valid
-error_t spec_data::check_enumeration(const string& data, const string& field, const string& datatype) {
+valn_error_t spec_data::check_enumeration(const string& data, const string& field, const string& datatype) {
 	// Check that the enumeration value is correct for the record. Note we have already checked if the data is a valid member of the enumeration
 	// Specified by inference that it is a valid SOTA reference - check against the list of SOTA references
 	if (field == "SOTA_REF") {
@@ -1243,7 +1243,7 @@ error_t spec_data::check_enumeration(const string& data, const string& field, co
 }
 
 // Check the string has the right format if it needs it.
-error_t spec_data::check_string(const string&  data, const string&  field, const string&  datatype)
+valn_error_t spec_data::check_string(const string&  data, const string&  field, const string&  datatype)
 {
 	// ADIF_VER should to be x.y.z
 	if (field == "ADIF_VER") {
@@ -1258,7 +1258,7 @@ error_t spec_data::check_string(const string&  data, const string&  field, const
 	else if (field == "CREATED_TIMESTAMP") {
 		if (datatype == "String" && data.length() == 15) {
 			// Check date portion
-			error_t error = check_datatype(data.substr(0, 8), field, "Date", false);
+			valn_error_t error = check_datatype(data.substr(0, 8), field, "Date", false);
 			if (error == VE_OK) {
 				// If date OK check time portion
 				error = check_datatype(data.substr(9), field, "Time", false);
@@ -1344,7 +1344,7 @@ error_t spec_data::check_string(const string&  data, const string&  field, const
 }
 
 // Check that QSO_DATE/TIME_ON is less than QSO_DATE_OFF/TIME_OFF
-error_t spec_data::check_time(const string& data, const string& field) {
+valn_error_t spec_data::check_time(const string& data, const string& field) {
 	if (field == "TIME_OFF") {
 		if (record_->item_exists("QSO_DATE_OFF")) {
 			time_t on_ts = record_->timestamp(false);
@@ -1370,7 +1370,7 @@ error_t spec_data::check_time(const string& data, const string& field) {
 }
 
 // Check the format is correct for the data type by matching against a regular expression
-error_t spec_data::check_format(const string&  data, const string&  field, const string&  datatype, const basic_regex<char>& regex)
+valn_error_t spec_data::check_format(const string&  data, const string&  field, const string&  datatype, const basic_regex<char>& regex)
 {
 	if (regex_match(data.c_str(), regex)) {
 		// Matches - OK
@@ -1384,9 +1384,9 @@ error_t spec_data::check_format(const string&  data, const string&  field, const
 }
 
 // We have a separated list of datatype items - check each one in turn
-error_t spec_data::check_list(const string& data, const string&  field, const string&  datatype, bool is_enumeration, char separator)
+valn_error_t spec_data::check_list(const string& data, const string&  field, const string&  datatype, bool is_enumeration, char separator)
 {
-	error_t error = VE_OK;
+	valn_error_t error = VE_OK;
 	vector<string> items;
 	// Split the list into an array
 	split_line(data, items, separator);
@@ -1399,7 +1399,7 @@ error_t spec_data::check_list(const string& data, const string&  field, const st
 }
 
 // Check the datatype - format, value etc.
-error_t spec_data::check_datatype(const string&  data, const string&  field, const string&  datatype, bool is_enumeration)
+valn_error_t spec_data::check_datatype(const string&  data, const string&  field, const string&  datatype, bool is_enumeration)
 {
 	// Process enumerations - datatype contains the enumeration name.
 	if (is_enumeration) {
@@ -1481,7 +1481,7 @@ error_t spec_data::check_datatype(const string&  data, const string&  field, con
 				}
 				// If it has a data-type indicator then we can use a switch on the single char
 				if (indicator.length() == 1) {
-					error_t error;
+					valn_error_t error;
 					switch (indicator[0]) {
 					case 'B': {
 						// Boolean 
@@ -1514,7 +1514,7 @@ error_t spec_data::check_datatype(const string&  data, const string&  field, con
 					}
 					case 'S': {
 						// String (single-line, no intl characters)
-						error_t error;
+						valn_error_t error;
 						error = check_format(data, field, datatype, REGEX_STRING);
 						if (error != VE_OK && check_format(data, field, datatype, REGEX_BAD_MULTILINE) == VE_OK) {
 							// It's not valid as a string but is as a multi-line string
@@ -1548,7 +1548,7 @@ error_t spec_data::check_datatype(const string&  data, const string&  field, con
 					}
 					case 'M': {
 						// Multi-line string - no special value checking
-						error_t error;
+						valn_error_t error;
 						error = check_format(data, field, datatype, REGEX_MULTILINE);
 						if (error != VE_OK) {
 							if (check_format(data, field, datatype, REGEX_INTL_MULTILINE) == VE_OK) {
@@ -1562,7 +1562,7 @@ error_t spec_data::check_datatype(const string&  data, const string&  field, con
 					}
 					case 'I': {
 						// International string
-						error_t error = check_format(data, field, datatype, REGEX_INTL_STRING);
+						valn_error_t error = check_format(data, field, datatype, REGEX_INTL_STRING);
 						if (error != VE_OK && (check_format(data, field, datatype, REGEX_BAD_INTL_MULTILINE) == VE_OK)) {
 							// It's not OK as an intl string but is as a multi-line one - check value/format
 							error = check_string(data, field, datatype);
@@ -1596,7 +1596,7 @@ error_t spec_data::check_datatype(const string&  data, const string&  field, con
 				}
 				// next the most likely no-indicator fields
 				else  if (datatype == "PositiveInteger") {
-					error_t error = check_format(data, field, datatype, REGEX_POS_INTEGER);
+					valn_error_t error = check_format(data, field, datatype, REGEX_POS_INTEGER);
 					if (error == VE_OK) {
 						// Check it has a valid value for the field
 						return check_integer(data, field, datatype);
@@ -1612,7 +1612,7 @@ error_t spec_data::check_datatype(const string&  data, const string&  field, con
 				}
 				else if (datatype == "Integer") {
 					// Double-kill as check_integer also checks that it is an integer value
-					error_t error = check_format(data, field, datatype, REGEX_INTEGER);
+					valn_error_t error = check_format(data, field, datatype, REGEX_INTEGER);
 					if (error == VE_OK) {
 						// Check value is valid
 						return check_integer(data, field, datatype);
@@ -1623,7 +1623,7 @@ error_t spec_data::check_datatype(const string&  data, const string&  field, con
 				}
 				else if (datatype == "IOTARefNo") {
 					// Check regular expression and that continent is a valid enumeration value for Continent
-					error_t error = check_format(data, field, datatype, REGEX_IOTA);
+					valn_error_t error = check_format(data, field, datatype, REGEX_IOTA);
 					if (error == VE_OK) {
 						// OK - First 2 characters should be valid continent
 						return check_datatype(data.substr(0, 2), field, "Continent", true);
@@ -1691,7 +1691,7 @@ error_t spec_data::check_datatype(const string&  data, const string&  field, con
 			}
 			else {
 				// Colon, check the Credit value and the list of media.
-				error_t error = check_datatype(data.substr(0, pos_colon), field, "Credit", true);
+				valn_error_t error = check_datatype(data.substr(0, pos_colon), field, "Credit", true);
 				if (error == VE_OK) {
 					// Credit value OK, now check the list of QSL Media
 					return check_list(data.substr(pos_colon + 1), field, "QSL_Medium", true, '&');
@@ -1709,7 +1709,7 @@ error_t spec_data::check_datatype(const string&  data, const string&  field, con
 }
 
 // Validate a specific field
-error_t spec_data::validate(const string& field, const string& data, bool inhibit_report /* = false */)
+valn_error_t spec_data::validate(const string& field, const string& data, bool inhibit_report /* = false */)
 {
 	// Temporarily inhibit error reporting 
 	inhibit_error_report_ = inhibit_report;
@@ -1718,7 +1718,7 @@ error_t spec_data::validate(const string& field, const string& data, bool inhibi
 		saved_record_ = record_;
 		record_ = book_->get_record();
 	}
-	error_t error = VE_TOP;
+	valn_error_t error = VE_TOP;
 	string datatype = "Unknown";
 	// Get the fields dataset
 	spec_dataset* fields = dataset("Fields");
@@ -1777,7 +1777,7 @@ error_t spec_data::validate(const string& field, const string& data, bool inhibi
 }
 
 // Handle the error
-void spec_data::handle_error(error_t error_code, const string&  data, const string&  datatype, const string&  field)
+void spec_data::handle_error(valn_error_t error_code, const string&  data, const string&  datatype, const string&  field)
 {
 	if (!inhibit_error_report_) {
 		field_corrected_ = false;
@@ -1809,7 +1809,7 @@ void spec_data::handle_error(error_t error_code, const string&  data, const stri
 }
 
 // Report error - write to report file
-void spec_data::report_error(error_t error_code, const string&  data, const string&  datatype, const string&  field)
+void spec_data::report_error(valn_error_t error_code, const string&  data, const string&  datatype, const string&  field)
 {
 	status_t error_level = ST_SEVERE;
 	string incompat_field;
@@ -1946,7 +1946,7 @@ void spec_data::report_error(error_t error_code, const string&  data, const stri
 }
 
 // Auto-correct error returns true if successful
-bool spec_data::auto_correction(error_t error_code, const string&  data, const string& display_item, const string&  datatype, const string&  field)
+bool spec_data::auto_correction(valn_error_t error_code, const string&  data, const string& display_item, const string&  datatype, const string&  field)
 {
 	switch (error_code) {
 	case VE_OK:

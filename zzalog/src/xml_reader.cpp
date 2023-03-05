@@ -1,6 +1,7 @@
 #include "xml_reader.h"
 
 #include <regex>
+#include <ctime>
 
 #include <FL/fl_ask.H>
 #include <FL/Fl.H>
@@ -626,7 +627,11 @@ time_t xml_reader::convert_xml_datetime(string value) {
 	long tz_min = stoi(value.substr(23, 2));
 	double seconds = (3600.0 * tz_hour) + (60.0 * tz_min);
 	long adjust = (long)(seconds / resolution);
+#ifdef _WIN32
 	time_t result = _mkgmtime(&tv);
+#else
+	time_t result = timegm(&tv);
+#endif
 	if (subtract) {
 		result -= adjust;
 	}

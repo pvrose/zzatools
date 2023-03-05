@@ -74,7 +74,7 @@ using namespace std;
 string COPYRIGHT = "© Philip Rose GM3ZZA 2018. All rights reserved.\n (Prefix data, DX Atlas & OmniRig interfaces © Alex Shovkoplyas, VE3NEA.)";
 string PROGRAM_ID = "ZZALOG";
 string PROG_ID = "ZLG";
-string VERSION = "3.3.15B";
+string VERSION = "3.3.16";
 string TIMESTAMP = __DATE__ + string(" ") + __TIME__;
 #ifdef _DEBUG
 string PROGRAM_VERSION = VERSION + " (Debug " + TIMESTAMP + ")";
@@ -818,6 +818,10 @@ int main(int argc, char** argv)
 {
 	// Set default font size for all widgets
 	FL_NORMAL_SIZE = FONT_SIZE;
+	// Set default Fil Chooser on non-windows
+#ifndef _WIN32
+	Fl::option(Fl::OPTION_FNFC_USES_ZENITY, true);
+#endif
 	// Parse command-line arguments - accept FLTK standard arguments and custom ones (in cb_args)
 	int i = 1;
 	Fl::args(argc, argv, i, cb_args);

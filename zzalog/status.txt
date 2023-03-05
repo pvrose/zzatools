@@ -1,0 +1,24 @@
+N 2023/03/04 21:49:22 ZZALOG: zzalog Started
+N 2023/03/04 21:49:26 ZZALOG: ZZALOG 3.3.16
+N 2023/03/04 21:49:26 PREFIX: Started
+L 2023/03/04 21:49:26 PROGRESS: Starting Loading prefix data - 0 bytes
+E 2023/03/04 21:49:26 PREFIX: Failed
+L 2023/03/04 21:49:26 PROGRESS: OT_PREFIX abandoned Load failed (0 bytes)
+L 2023/03/04 21:49:26 PROGRESS: Loading prefix data finished (0 bytes)
+E 2023/03/04 21:49:26 PREFIX: Unable to load prefix reference - please reselect directory!
+F 2023/03/04 21:49:35 PREFIX: Load cancelled by user
+N 2023/03/04 21:49:41 ZZALOG: Closing...
+N 2023/03/04 21:49:41 ZZALOG: Book has not been modified, skipping backup
+N 2023/03/04 21:49:41 PREFIX: Started
+L 2023/03/04 21:49:41 PROGRESS: Starting Loading prefix data - 0 bytes
+E 2023/03/04 21:49:41 PREFIX: Failed
+L 2023/03/04 21:49:41 PROGRESS: OT_PREFIX abandoned Load failed (0 bytes)
+L 2023/03/04 21:49:41 PROGRESS: Loading prefix data finished (0 bytes)
+N 2023/03/04 21:49:41 EXCEPTION: Loading exception file /home/gm3zza/ham_dev/zzatools/reference/cty.tsv
+L 2023/03/04 21:49:41 PROGRESS: Starting Loading Exception data - 32884 records
+L 2023/03/04 21:50:26 PROGRESS: Loading Exception data finished (32884 records)
+D 2023/03/04 21:50:26 EXCEPTION: Loaded exception file /home/gm3zza/ham_dev/zzatools/reference/cty.tsv
+N 2023/03/04 21:50:26 PREFIX: Display started
+L 2023/03/04 21:50:26 PROGRESS: Starting Displaying prefix data - 0 prefixes
+L 2023/03/04 21:50:27 PROGRESS: Displaying prefix data finished (0 prefixes)
+D 2023/03/04 21:50:27 PREFIX: Display done!
