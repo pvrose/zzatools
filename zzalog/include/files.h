@@ -17,8 +17,8 @@ using namespace std;
 	};
 
 	// Default prefix database
-	const string PREFIX_FILE = "\\Prefix.lst";
+	const string PREFIX_FILE = "/Prefix.lst";
 
 	// Default specification database
-	const string ADIF_FILE = "\\all.xml";
+	const string ADIF_FILE = "/all.xml";
 #endif

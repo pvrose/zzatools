@@ -23,7 +23,7 @@ int main_window::handle(int event) {
 	case FL_HIDE:
 	case FL_SHOW:
 		// Get menu to update Windows controls
-		menu_->update_windows_items();
+		if(menu_) menu_->update_windows_items();
 		return true;
 	case FL_PASTE:
 		// Get data from paste
