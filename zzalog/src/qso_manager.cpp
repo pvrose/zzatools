@@ -1270,7 +1270,7 @@ void qso_manager::qso_group::copy_qso_to_display(int flags) {
 
 // Copy from an existing record: fields depend on flags set
 void qso_manager::qso_group::copy_qso_to_qso(record* old_record, int flags) {
-	if (current_qso_) {
+	if (current_qso_ && old_record) {
 		// For all flag bits
 		for (auto sf = COPY_SET.begin(); sf != COPY_SET.end(); sf++) {
 			copy_flags f = (*sf);
