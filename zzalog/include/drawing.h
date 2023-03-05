@@ -76,7 +76,7 @@ const int ROW_HEIGHT = DEFAULT_SIZE + 4;
 	};
 
 	// Names of the objects
-	const map<object_t, char*> OBJECT_NAMES = {
+	const map<object_t, const char*> OBJECT_NAMES = {
 		{ OT_NONE, "OT_NONE" },
 		{ OT_MAIN, "OT_MAIN" },
 		{ OT_EXTRACT, "OT_EXTRACT" },

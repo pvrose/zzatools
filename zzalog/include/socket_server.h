@@ -5,7 +5,11 @@
 
 #include <string>
 #include <cstdint>
+#ifdef _WIN32
 #include <WinSock2.h>
+#else
+#include <sys/socket.h>
+#endif
 
 using namespace std;
 
@@ -63,12 +67,14 @@ using namespace std;
 		static void cb_timer_acc(void* v);
 		// Diagnostic data
 		void dump(string line);
+		/* TODO Linux sockets
 		// Server socket
 		SOCKET server_;
 		// HTTP Client
 		SOCKET client_;
 		// Current client address
 		SOCKADDR_IN client_addr_;
+		*/
 		// Previous client address
 		string prev_addr_;
 		int prev_port_;

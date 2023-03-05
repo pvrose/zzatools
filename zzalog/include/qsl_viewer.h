@@ -2,7 +2,7 @@
 
 #include "record.h"
 
-#include <FL\Fl_Window.H>
+#include <FL/Fl_Window.H>
 #include <FL/Fl_Radio_Light_Button.H>
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Group.H>
