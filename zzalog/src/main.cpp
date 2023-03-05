@@ -833,14 +833,14 @@ int main(int argc, char** argv)
 	add_properties();
 	recent_files();
 
+	// now show the window
+	main_window_->show(argc, argv);
 	// add the various drawn items
 	int curr_y = 0;
 	add_widgets(curr_y);
 	print_args(argc, argv);
 	// Resize the window
 	resize_window();
-	// now show the window
-	main_window_->show(argc, argv);
 	// Read in reference data - uses progress
 	add_data();
 	Fl::check();
