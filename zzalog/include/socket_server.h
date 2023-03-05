@@ -8,7 +8,12 @@
 #ifdef _WIN32
 #include <WinSock2.h>
 #else
+#include <netinet/in.h>
 #include <sys/socket.h>
+#include <unistd.h>
+#include <sys/socket.h>
+#define SOCKET int
+#define SOCKADDR_IN sockaddr_in
 #endif
 
 using namespace std;
@@ -67,14 +72,12 @@ using namespace std;
 		static void cb_timer_acc(void* v);
 		// Diagnostic data
 		void dump(string line);
-		/* TODO Linux sockets
 		// Server socket
 		SOCKET server_;
 		// HTTP Client
 		SOCKET client_;
 		// Current client address
 		SOCKADDR_IN client_addr_;
-		*/
 		// Previous client address
 		string prev_addr_;
 		int prev_port_;

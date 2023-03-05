@@ -5,6 +5,7 @@ BUILD_TYPE := Release
 BUILD_DIR := ./build
 SRC_DIRS := ./src
 EXEC_DIR = $(BUILD_DIR)/$(BUILD_TYPE)
+INSTALL_DIR := /usr/local/bin
 
 FLTK_DIR := ~/ham_dev/fltk
 FLTK_BUILD := $(FLTK_DIR)/build/$(BUILD_TYPE)
@@ -41,11 +42,13 @@ INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 
 # Set up libraries
 # FLTK ld flags - created using `fltk-config --ldflags`
-FLTK_FLAGS := -L/usr/local/lib -lfltk -lm -lX11 -lpthread -lXft -lXrender -lm -lfontconfig -ldl
+FLTK_FLAGS := -L/usr/local/lib -lfltk -lfltk_images -lfltk_jpeg -lz -lpng -lm -lX11 -lpthread -lXft -lXrender -lm -lfontconfig -ldl
 # Hamlib flags
 HAMLIB_FLAGS := -L/usr/local/lib -lhamlib 
+# Curl flags
+CURL_FLAGS := -lcurl
 
-LDFLAGS := $(FLTK_FLAGS) $(HAMLIB_FLAGS) 
+LDFLAGS := $(FLTK_FLAGS) $(HAMLIB_FLAGS) $(CURL_FLAGS)
 
 # The -MMD and -MP flags together generate Makefiles for us!
 # These files will have .d instead of .o as the output.

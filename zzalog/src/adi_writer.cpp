@@ -9,6 +9,7 @@
 
 #include <fstream>
 #include <ostream>
+#include <cmath>
 
 #include <FL/Fl.H>
 #include <FL/fl_draw.H>

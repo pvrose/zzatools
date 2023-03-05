@@ -13,11 +13,15 @@
 
 #include <sstream>
 #include <ctime>
-#include <io.h>
 #include <fcntl.h>
-#include <sys\types.h>
-#include <sys\stat.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#ifdef _WIN32
+#include <io.h>
 #include <share.h>
+#else
+#include <stdio.h>
+#endif
 
 #include <FL/Fl_Preferences.H>
 #include <FL/Fl.H>
@@ -170,7 +174,19 @@ void import_data::auto_update() {
 			strftime(timestamp, 16, "%Y%m%d%H%M%S", gmtime(&status.st_mtime));
 			_close(fd);
 #else
-		// TODO: Code Posix version of the above
+		// Open the file to see when it was last written
+		int fd = open(update_files_[i].c_str(), O_RDONLY);
+		if (fd == -1) {
+			string message = "IMPORT: Error opening file " + update_files_[i] + ": " + string(strerror(errno));
+			status_->misc_status(ST_ERROR, message.c_str());
+			failed = true;
+
+		}
+		else {
+			struct stat status;
+			int result = fstat(fd, &status);
+			strftime(timestamp, 16, "%Y%m%d%H%M%S", gmtime(&status.st_mtime));
+			close(fd);
 #endif
 			if (timestamp > last_timestamps_[i]) {
 				// The file has been written since it was last read by this process

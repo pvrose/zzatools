@@ -340,7 +340,7 @@ void files_dialog::create_form(int X, int Y) {
 	tqsl_data_ = { "Please enter the TQSL executable", "Executable\t*.exe", &tqsl_executable_, &enable_tqsl_, in_tqsl_file, bn_tqsl_en };
 #else
 	// TODO: Change the file pattern for Posix 
-	tqsl_data_ = { "Please enter the TQSL executable", "Executable\*.exe", &tqsl_executable_, &enable_tqsl_, in_tqsl_file, bn_tqsl_en };
+	tqsl_data_ = { "Please enter the TQSL executable", "Executable\t*", &tqsl_executable_, &enable_tqsl_, in_tqsl_file, bn_tqsl_en };
 #endif
 	bn_browse_tqsl->callback(cb_bn_browsefile, &tqsl_data_);
 	bn_browse_tqsl->when(FL_WHEN_RELEASE);

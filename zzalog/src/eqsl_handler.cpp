@@ -276,6 +276,7 @@ bool eqsl_handler::card_file_valid(string& filename) {
 			return false;
 		}
 		file.close();
+		return true;
 	}
 }
 

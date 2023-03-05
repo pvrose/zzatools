@@ -10,13 +10,14 @@
 #include "qso_manager.h"
 
 #include <stdio.h>
-#include <WS2tcpip.h>
 #include <sstream>
 #include <iostream>
 #include <regex>
 #include <vector>
-#ifndef _WIN32
-#include <fnctl.h>
+#ifdef _WIN32
+#include <WS2tcpip.h>
+#else
+//#include <fnctl.h>
 #endif
 
 #include <FL/Fl.H>
@@ -32,7 +33,9 @@ extern import_data* import_data_;
 extern void cb_error_message(status_t level, const char* message);
 extern menu* menu_;
 extern Fl_Preferences* settings_;
+#ifdef _WIN32
 extern dxa_if* dxa_if_;
+#endif
 extern pfx_data* pfx_data_;
 extern toolbar* toolbar_;
 extern qso_manager* qso_manager_;
@@ -139,7 +142,9 @@ int wsjtx_handler::send_hbeat() {
 // Close datagram: shut the server down 
 int wsjtx_handler::handle_close(stringstream& ss) {
 	status_->misc_status(ST_NOTE, "WSJT-X: Received Closing down");
+#ifdef _WIN32
 	dxa_if_->clear_dx_loc();
+#endif
 	menu_->update_items();
 	return 1;
 }
@@ -161,8 +166,10 @@ int wsjtx_handler::handle_log(stringstream& ss) {
 	// Wait for the import to finish
 	while (import_data_->size()) Fl::wait();
 	status_->misc_status(ST_NOTE, "WSJT-X: Logged QSO");
+#ifdef _WIN32
 	// Clear DX locator flag
 	dxa_if_->clear_dx_loc();
+#endif
 	return 0;
 }
 
@@ -244,15 +251,19 @@ int wsjtx_handler::handle_status(stringstream& ss) {
 	status.config_name = get_utf8(ss); 
 	if (status.dx_call.length() && status.dx_grid.length() && status.transmitting) {
 		// Use the actual grid loaction - and put it into the cache
+#ifdef _WIN32
 		dxa_if_->set_dx_loc(status.dx_grid, status.dx_call);
+#endif
 		grid_cache_[status.dx_call] = status.dx_grid;
 		toolbar_->search_text(status.dx_call);
 	}
 	else if (status.dx_call.length() && status.transmitting) {
 		// Look in location cache
 		if (grid_cache_.find(status.dx_call) != grid_cache_.end()) {
+#ifdef _WIN32
 			// Use the remembered grid loaction
 			dxa_if_->set_dx_loc(grid_cache_[status.dx_call], status.dx_call);
+#endif
 			toolbar_->search_text(status.dx_call);
 		}
 		else {
@@ -270,14 +281,18 @@ int wsjtx_handler::handle_status(stringstream& ss) {
 				if (dxcc_prefix->dxcc_code_ != 0) {
 					// Use the actual prefixes location rather than the DXCC's
 					lat_long_t location = { prefixes[0]->latitude_, prefixes[0]->longitude_ };
+#ifdef _WIN32
 					dxa_if_->set_dx_loc(latlong_to_grid(location, 6), status.dx_call);
+#endif
 				}
 				else {
 					// Not a DXCC entity - clear any existing DX Location
 					char message[100];
 					snprintf(message, 100, "WSJT-X: Cannot locate %s - not in a DXCC entity", status.dx_call.c_str());
 					status_->misc_status(ST_WARNING, message);
+#ifdef _WIN32
 					dxa_if_->clear_dx_loc();
+#endif
 				}
 			}
 			else {
@@ -285,14 +300,18 @@ int wsjtx_handler::handle_status(stringstream& ss) {
 				char message[100];
 				snprintf(message, 100, "WSJT-X: Cannot parse %s - %d matching prefixes found", status.dx_call.c_str(), prefixes.size());
 				status_->misc_status(ST_WARNING, message);
+#ifdef _WIN32
 				dxa_if_->clear_dx_loc();
+#endif
 			}
 			toolbar_->search_text(status.dx_call);
 		}
 	}
 	else if (!status.dx_call.length()) {
+#ifdef _WIN32
 		// Can clear the Dx Location by clearing the DX Call field
 		dxa_if_->clear_dx_loc();
+#endif
 	}
 	prev_status_ = status;
 	return 0;
