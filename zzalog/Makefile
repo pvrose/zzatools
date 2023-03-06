@@ -41,10 +41,18 @@ INC_DIRS += $(HAMLIB_DIR)/include
 INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 
 # Set up libraries
-# FLTK ld flags - created using `fltk-config --ldflags`
-FLTK_FLAGS := -L/usr/local/lib -lfltk -lfltk_images -lfltk_jpeg -lz -lpng -lm -lX11 -lpthread -lXft -lXrender -lm -lfontconfig -ldl
+# FLTK ld flags - created using `fltk-config --use-images --ldflags`
+# 32-bit
+#FLTK_FLAGS := -L/usr/local/lib -lfltk -lfltk_images -lfltk_jpeg -lz -lpng -lm -lX11 -lpthread -lXft -lXrender -lm -lfontconfig -ldl
+# 64-bit 
+FLTK_FLAGS := -L/usr/local/lib/aarch64-linux-gnu \
+ -lfltk_images -lfltk_jpeg -lpng -lz -lfltk \
+ -lm -lX11 -lXext -lpthread -lXfixes -lXcursor -lXft \
+ -lXrender -lm -lfontconfig -ldl
+
+
 # Hamlib flags
-HAMLIB_FLAGS := -L/usr/local/lib -lhamlib 
+HAMLIB_FLAGS := -L/usr/local/lib -lhamlib -Wl,-rpath -Wl,/usr/local/lib
 # Curl flags
 CURL_FLAGS := -lcurl
 

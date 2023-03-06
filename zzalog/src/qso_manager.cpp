@@ -1617,7 +1617,7 @@ void qso_manager::qso_group::cb_dec_serno(Fl_Widget* w, void* v) {
 void qso_manager::qso_group::cb_ch_field(Fl_Widget* w, void* v) {
 	qso_group* that = ancestor_view<qso_group>(w);
 	field_choice* ch = (field_choice*)w;
-	int ix = (int)v;
+	int ix = (int)(long)v;
 	const char* field = ch->value();
 	that->ip_field_[ix]->field_name(field);	
 	that->ip_field_[ix]->value(that->current_qso_->item(field).c_str());

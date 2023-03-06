@@ -95,7 +95,7 @@ report_tree::~report_tree() {
 }
 
 // Overloaded view update method
-void report_tree::update(hint_t hint, unsigned int record_num_1, unsigned int record_num_2) {
+void report_tree::update(hint_t hint, record_num_t record_num_1, record_num_t record_num_2) {
 	// Only use record_num_1
 	selection_ = record_num_1;
 	switch (hint) {

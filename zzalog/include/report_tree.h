@@ -60,7 +60,7 @@ using namespace std;
 		~report_tree();
 
 		// inherited from view
-		virtual void update(hint_t hint, unsigned int record_num_1, unsigned int record_num_2 = 0);
+		virtual void update(hint_t hint, record_num_t record_num_1, record_num_t record_num_2 = 0);
 		// Delete all items
 		void delete_all();
 		// Delete the tree
