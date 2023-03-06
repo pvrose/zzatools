@@ -489,7 +489,7 @@ int log_table::handle(int event) {
 }
 
 // override of view::update(). view-specific actions on update
-void log_table::update(hint_t hint, unsigned int record_num_1, unsigned int record_num_2) {
+void log_table::update(hint_t hint, record_num_t record_num_1, record_num_t record_num_2) {
 	record* this_record = my_book_->get_record(my_book_->item_number(record_num_1), false);
 	// Hide any edit input 
 	if (edit_input_->visible()) {

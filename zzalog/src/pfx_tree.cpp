@@ -66,7 +66,7 @@ void pfx_tree::delete_tree() {
 }
 
 // inherited from view - redraw the view if necessary
-void pfx_tree::update(hint_t hint, unsigned int record_num_1, unsigned int record_num_2) {
+void pfx_tree::update(hint_t hint, record_num_t record_num_1, record_num_t record_num_2) {
 	// Select on hint type
 	switch (hint) {
 	case HT_SELECTED:
