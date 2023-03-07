@@ -870,8 +870,6 @@ int main(int argc, char** argv)
 		menu_->enable(true);
 		menu_->redraw();
 		// Only do this if we haven't tried to close
-		// Start WSJT-X server
-		wsjtx_handler_->run_server();
 		// TODO: Fldigi locks up when server responds to its first request
 		// TODO: We don't exit run_server - again run in a separate thread
 		//fllog_emul_->run_server();
