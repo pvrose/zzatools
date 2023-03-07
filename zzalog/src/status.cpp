@@ -305,7 +305,7 @@ void status::update_progress(object_t object) {
 			// redraw and allow scheduler to effect the redrawing if value has gone up by > 1% or is at start or finish
 			// Without the below we don't see the progress bar move
 			redraw();
-			Fl::wait();
+			Fl::check();
 			item->prev_value = item->value;
 		}
 	}
