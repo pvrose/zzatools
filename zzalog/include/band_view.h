@@ -99,6 +99,8 @@ using namespace std;
 		void display_info(double frequency, int x, int y);
 		// Convert x to frequency
 		double x_frequency(int x);
+		// Add title
+		void title();
 
 		// The current rig frequency
 		double rig_frequency_;

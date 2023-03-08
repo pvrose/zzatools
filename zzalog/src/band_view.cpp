@@ -72,6 +72,7 @@ band_view::band_view(double frequency, int W, int H, const char* label) :
 		char temp[128];
 		sprintf(temp, "%g kHz", khz_per_minor_);
 		((Fl_Output*)w_cycles_per_)->value(temp);
+		title();
 		show();
 		redraw();
 	}
@@ -217,6 +218,7 @@ void band_view::update(double frequency) {
 		recalculate(frequency);
 		((Fl_Counter*)w_freq_slider_)->value(frequency_);
 	}
+	title();
 	redraw();
 }
 
@@ -228,6 +230,8 @@ void band_view::update(record_num_t record_num) {
 		this_record->item("FREQ", frequency);
 		update(frequency * 1000.0);
 	}
+	title();
+	redraw();
 }
 
 // Create the form view
@@ -452,6 +456,10 @@ void band_view::draw() {
 	pos_y = draw_frequency(pos_y);
 	// Don't allow the window to be resized to smaller than this
 	size_range(pixel_rhs_ + GAP, pos_y + GAP);
+}
+
+// Add title
+void band_view::title() {
 	// Get band
 	string band = spec_data_->band_for_freq(rig_frequency_ / 1000.0);
 	string title = "Band plan " + band;
@@ -544,6 +552,7 @@ int band_view::handle(int event) {
 			display_info(x_frequency(curr_x), Fl::event_x_root(), Fl::event_y_root());
 			return true;
 		}
+		break;
 	case FL_HIDE:
 	case FL_SHOW:
 		menu_->update_windows_items();
