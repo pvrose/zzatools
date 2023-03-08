@@ -1154,10 +1154,13 @@ void book::add_use_data(record* use_record) {
 				// and if it's already captured - check it is the same
 				if (old_value.length() && old_value != value) {
 					char message[128];
-					snprintf(message, 128, "LOG: %s %s %s - new value differs from old",
+					snprintf(message, 128, "LOG: %s %s %s %s - new value  (%s) differs from old (%s)",
 						use_record->item("QSO_DATE").c_str(),
 						use_record->item("TIME_ON").c_str(),
-						use_record->item("CALL").c_str());
+						use_record->item("CALL").c_str(),
+						(*it).c_str(),
+						value.c_str(),
+						old_value.c_str());
 					status_->misc_status(ST_NOTE, message);
 					if ((*it) != "MY_GRIDSQUARE" || value.length() > old_value.length() || value != old_value.substr(0, value.length())) {
 						snprintf(message, 128, "LOG: QTH %s - Field %s replacing %s with %s",
