@@ -89,11 +89,10 @@ void socket_server::close_server() {
 
 // Create the server after initialising winsock and opening socket
 int socket_server::create_server() {
+#ifdef _WIN32
 	int result;
 	// Used for status messages
 	char message[256];
-#ifdef _WIN32
-
 	// Initailise Winsock
 	WSADATA ws_data;
 	result = WSAStartup(MAKEWORD(2, 2), &ws_data);
@@ -110,8 +109,7 @@ int socket_server::create_server() {
 		handle_error(message);
 		return 1;
 	}
-#endif
-	
+
 	// Create the socket
 	switch (protocol_) {
 	case UDP:
@@ -150,29 +148,15 @@ int socket_server::create_server() {
 	}
 	else {
 		getsockname(server_, (SOCKADDR*)&server_addr, &len_server_addr);
-#ifdef _WIN32
 		snprintf(message, 256, "SOCKET: Connected socket %s:%d", inet_ntoa(server_addr.sin_addr), htons(server_addr.sin_port));
-#else
-		snprintf(message, 256, "SOCKET: Connected socket %d:%d", server_addr.sin_addr, server_addr.sin_port);
-#endif
 		status(ST_OK, message);
 	}
 
-#ifdef _WIN32
 	unsigned long nonblocking = 1;
 	if (server_ != INVALID_SOCKET && ioctlsocket(server_, FIONBIO, &nonblocking)) {
 		handle_error("Unable to make socket non-blocking");
 		return 1;
 	}
-#else
-	// TODO find fnctl.h
-	int flags = fcntl(server_, F_GETFL, 0);
-	// TODO add status call
-	if (flags == -1) return false;
-	flags = (flags | O_NONBLOCK);
-	// TODO add status call if fail
-	return (fcntl(server_, F_SETFL, flags) == 0) ? 0 : 1;
-#endif
 
 	// Set socket into listening mode 
 	if (protocol_ == HTTP) {
@@ -183,32 +167,92 @@ int socket_server::create_server() {
 		}
 		else {
 			getsockname(server_, (SOCKADDR*)&server_addr, &len_server_addr);
-#ifdef _WIN32
 			snprintf(message, 256, "SOCKET: Listening socket %s:%d", inet_ntoa(server_addr.sin_addr), htons(server_addr.sin_port));
-#else
-			snprintf(message, 256, "SOCKET: Listening socket %d:%d", server_addr.sin_addr, server_addr.sin_port);
-#endif
 			status(ST_OK, message);
 		}
 
 		// Make the client non-blocking as well
-#ifdef _WIN32
 		unsigned long nonblocking = 1;
 		if (client_ != INVALID_SOCKET && ioctlsocket(client_, FIONBIO, &nonblocking)) {
 			handle_error("Unable to make client socket non-blocking");
 			return 1;
 		}
-#else
-		// TODO find fnctl.h
-		int flags = fcntl(client_, F_GETFL, 0);
-		// TODO add status call
-		if (flags == -1) return false;
-		flags = (flags | O_NONBLOCK);
-		// TODO add status call if fail
-		return (fcntl(client_, F_SETFL, flags) == 0) ? 0 : 1;
-#endif
 	}
 	return 0;
+#else //_WIN32
+	int result;
+	// Used for status messages
+	char message[256];
+	// Create the socket
+	switch (protocol_) {
+	case UDP:
+		server_ = socket(AF_INET, SOCK_DGRAM | SOCK_NONBLOCK, IPPROTO_UDP);
+		break;
+	case HTTP:
+		server_ = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, IPPROTO_TCP);
+		break;
+	}
+	if (server_ == INVALID_SOCKET) {
+		handle_error("Unable to create the socket");
+		return 1;
+	}
+	else {
+		switch (protocol_) {
+		case UDP:
+			status(ST_LOG, "SOCKET: Created UDP socket");
+			break;
+		case HTTP:
+			status(ST_LOG, "SOCKET: Created HTTP socket");
+			break;
+		}
+	}
+
+	// Define the port we listen on and addresses we listen for
+	SOCKADDR_IN server_addr;
+	LEN_SOCKET_ADDR len_server_addr = sizeof(server_addr);
+	server_addr.sin_family = AF_INET;
+	server_addr.sin_port = htons(port_num_);
+	server_addr.sin_addr.s_addr = INADDR_ANY;
+	// Associate the socket with this address data
+	result = bind(server_, (SOCKADDR*)&server_addr, len_server_addr);
+	if (result < 0) {
+		handle_error("Unable to bind the socket");
+		return result;
+	}
+	else {
+		getsockname(server_, (SOCKADDR*)&server_addr, &len_server_addr);
+		snprintf(message, 256, "SOCKET: Connected socket %s:%d", server_addr.sin_addr, htons(server_addr.sin_port));
+		status(ST_OK, message);
+	}
+
+	//unsigned long nonblocking = 1;
+	//if (server_ != INVALID_SOCKET && ioctlsocket(server_, FIONBIO, &nonblocking)) {
+		//handle_error("Unable to make socket non-blocking");
+		//return 1;
+	//}
+
+	// Set socket into listening mode 
+	if (protocol_ == HTTP) {
+		result = listen(server_, SOMAXCONN);
+		if (result < 0) {
+			handle_error("Unable to establich connection");
+			return result;
+		}
+		else {
+			getsockname(server_, (SOCKADDR*)&server_addr, &len_server_addr);
+			snprintf(message, 256, "SOCKET: Listening socket %s:%d", server_addr.sin_addr, htons(server_addr.sin_port));
+			status(ST_OK, message);
+		}
+
+		//// Make the client non-blocking as well
+		//unsigned long nonblocking = 1;
+		//if (client_ != INVALID_SOCKET && ioctlsocket(client_, FIONBIO, &nonblocking)) {
+			//handle_error("Unable to make client socket non-blocking");
+			//return 1;
+		//}
+	}
+	return 0;
+#endif
 }
 
 // Accept any client asking to connect, use non-blocking call to avoid locking out other code
@@ -233,9 +277,9 @@ socket_server::client_status socket_server::accept_client() {
 	}
 	else {
 #ifdef _WIN32
-		snprintf(message, 256, "SOCKET: Accepted socket %s:%d", inet_ntoa(client_addr_.sin_addr), htons(client_addr_.sin_port));
+		snprintf(message, 256, "SOCKET: Accepted socket %s:%d", client_addr_.sin_addr, htons(client_addr_.sin_port));
 #else
-		snprintf(message, 256, "SOCKET: Accepted socket %d:%d", client_addr_.sin_addr, client_addr_.sin_port);
+		snprintf(message, 256, "SOCKET: Accepted socket %d:%d", client_addr_.sin_addr, htons(client_addr_.sin_port));
 #endif
 		status(ST_OK, message);
 		return OK;
@@ -248,12 +292,14 @@ int socket_server::rcv_packet() {
 	char* buffer = new char[MAX_SOCKET];
 	int buffer_len = MAX_SOCKET;
 	int bytes_rcvd = 0;
-#ifdef _WIN32
 	// Generate a set of socket descriptors for use in select()
+#ifdef _WIN32
 	FD_SET set_sockets;
+#else
+	fd_set set_sockets;
+#endif
 	FD_ZERO(&set_sockets);
 	FD_SET(server_, &set_sockets);
-#endif
 
 	// Now wait until we see a client
 	if (protocol_ == HTTP) {
@@ -307,12 +353,17 @@ int socket_server::rcv_packet() {
 			delete[] buffer;
 			return 1;
 		}
-#endif
 		else {
 			handle_error("Unable to read from client");
 			delete[] buffer;
 			return 1;
 		}
+#else
+		else {
+			// Try again after checking for any fltk events
+			Fl::check();
+		}
+#endif
 	} while (bytes_rcvd > 0);
 	// Now see if we have another - the timer goes on the scheduling queue so other tasks will get in
 	Fl::add_timeout(wait_time, cb_timer_rcv, this);
