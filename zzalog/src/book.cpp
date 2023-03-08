@@ -1169,6 +1169,13 @@ void book::add_use_data(record* use_record) {
 						qth_data->fields->item(*it, value);
 						update_qth = true;
 					}
+					if ((*it) == "MY_GRIDSQUARE" && value.length() < old_value.length() && value == old_value.substr(0, value.length())) {
+						snprintf(message, 128, "LOG: QTH %s - Field %s=%s ignoring change to %s",
+							qth.c_str(), (*it).c_str(), old_value.c_str(), value.c_str());
+						status_->misc_status(ST_WARNING, message);
+						use_record->item((*it), old_value);
+						modified(true);
+					}
 				}
 				else if (old_value.length() == 0) {
 					qth_data->fields->item(*it, value);
