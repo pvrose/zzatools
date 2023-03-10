@@ -778,7 +778,7 @@ bool import_data::download_data(import_data::update_mode_t server) {
 	bool result = true;
 	// Tidy up import book - complete any existing update
 	stop_update(false);
-	while (!update_complete()) Fl::wait();
+	while (!update_complete()) Fl::check();
 	switch (server) {
 	case EQSL_UPDATE: 
 		// Fetch inbox from eQSL.cc into local stream, stop fetching eQSL cards until merge complete

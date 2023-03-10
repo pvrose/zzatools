@@ -24,7 +24,7 @@ button_t win_dialog::display() {
 	button_ = BN_CANCEL;
 	// now wait for OK or cancel to be clicked - using the FLTK scheduler ensures
 	// other tasks get a look-in
-	while (shown()) { Fl::wait(); }
+	while (shown()) { Fl::check(); }
 	return button_;
 }
 

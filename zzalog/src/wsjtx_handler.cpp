@@ -161,10 +161,10 @@ int wsjtx_handler::handle_log(stringstream& ss) {
 	adif.str(utf8);
 	// Stop any extant update and wait for it to complete
 	import_data_->stop_update(false);
-	while (!import_data_->update_complete()) Fl::wait();
+	while (!import_data_->update_complete()) Fl::check();
 	import_data_->load_stream(adif, import_data::update_mode_t::DATAGRAM);
 	// Wait for the import to finish
-	while (import_data_->size()) Fl::wait();
+	while (import_data_->size()) Fl::check();
 	status_->misc_status(ST_NOTE, "WSJT-X: Logged QSO");
 #ifdef _WIN32
 	// Clear DX locator flag

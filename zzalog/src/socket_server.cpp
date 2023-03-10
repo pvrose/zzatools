@@ -345,7 +345,7 @@ int socket_server::rcv_packet() {
 #ifdef _WIN32
 		else if (WSAGetLastError() == WSAEWOULDBLOCK) {
 			// Try again immediately after letting FLTK in
-			Fl::wait();
+			Fl::check();
 			wait_time = 0;
 		}
 		else if (WSAGetLastError() == WSAENOTSOCK && closing_) {

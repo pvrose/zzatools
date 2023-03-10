@@ -74,7 +74,7 @@ using namespace std;
 string COPYRIGHT = "© Philip Rose GM3ZZA 2018. All rights reserved.\n (Prefix data, DX Atlas & OmniRig interfaces © Alex Shovkoplyas, VE3NEA.)";
 string PROGRAM_ID = "ZZALOG";
 string PROG_ID = "ZLG";
-string VERSION = "3.3.17";
+string VERSION = "3.3.18";
 string TIMESTAMP = __DATE__ + string(" ") + __TIME__;
 #ifdef _DEBUG
 string PROGRAM_VERSION = VERSION + " (Debug " + TIMESTAMP + ")";
@@ -203,7 +203,7 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 				case 0:
 					// Gracefully wait for import to complete
 					import_data_->stop_update(false);
-					while (!import_data_->update_complete()) Fl::wait();
+					while (!import_data_->update_complete()) Fl::check();
 					break;
 				case 1:
 					// Immediately stop the import
@@ -222,7 +222,7 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 				break;
 			case 1:
 				// Wait for the request queue to empty
-				while (eqsl_handler_->requests_queued()) Fl::wait();
+				while (eqsl_handler_->requests_queued()) Fl::check();
 				break;
 			case 2:
 				// Cancel Exit - don't doing anything else

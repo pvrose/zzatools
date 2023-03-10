@@ -291,7 +291,7 @@ void menu::cb_mi_file_new(Fl_Widget* w, void* v) {
 	menu* that = ancestor_view<menu>(w);
 	// Gracefully stop any import in progress - restart with ON_AIR logging - if no rig will drop to OFF_AIR
 	import_data_->stop_update(false);
-	while (!import_data_->update_complete()) Fl::wait();
+	while (!import_data_->update_complete()) Fl::check();
 	if (book_->modified_record() || book_->new_record()) {
 		fl_beep(FL_BEEP_QUESTION);
 		switch (fl_choice("You are currently modifying a record? Save or Quit?", "Save?", "Quit?", nullptr)) {
@@ -327,7 +327,7 @@ void menu::cb_mi_file_open(Fl_Widget* w, void* v) {
 	menu* that = ancestor_view<menu>(w);
 	// Stop any import occurring
 	import_data_->stop_update(false);
-	while (!import_data_->update_complete()) Fl::wait();
+	while (!import_data_->update_complete()) Fl::check();
 
 	if (book_->modified()) {
 		fl_beep(FL_BEEP_QUESTION);
@@ -394,7 +394,7 @@ void menu::cb_mi_file_open(Fl_Widget* w, void* v) {
 // v is set to 0 to represent object_t = OT_MAIN
 void menu::cb_mi_file_save(Fl_Widget* w, void* v) {
 	import_data_->stop_update(false);
-	while (!import_data_->update_complete()) Fl::wait();
+	while (!import_data_->update_complete()) Fl::check();
 	// Get the main book to store itself as long as it wasn't opened read-only
 	if (read_only_) {
 		fl_beep(FL_BEEP_QUESTION);
@@ -435,7 +435,7 @@ void menu::cb_mi_file_saveas(Fl_Widget* w, void* v) {
 		if (check->fail() || fl_choice("File exists, do you want to over-write", "OK", "No", nullptr) == 0) {
 			// Stop any current import
 			import_data_->stop_update(false);
-			while (!import_data_->update_complete()) Fl::wait();
+			while (!import_data_->update_complete()) Fl::check();
 			// Get the book to save
 			book* b = nullptr;
 			object_t type = (object_t)(long)v;
@@ -466,7 +466,7 @@ void menu::cb_mi_file_saveas(Fl_Widget* w, void* v) {
 void menu::cb_mi_file_close(Fl_Widget* w, void* v) {
 	// Gracefully stop import
 	import_data_->stop_update(false);
-	while (!import_data_->update_complete()) Fl::wait();
+	while (!import_data_->update_complete()) Fl::check();
 	main_window_->do_callback();
 }
 
@@ -583,7 +583,7 @@ void menu::cb_mi_nav_date(Fl_Widget* w, void* v) {
 	cal->callback(calendar::cb_cal_close, &cb_data);
 	cal->show();
 	Fl_Widget_Tracker wt(cal);
-	while (wt.exists()) Fl::wait();
+	while (wt.exists()) Fl::check();
 	// now fiind the selected date
 	if (navigation_book_ != nullptr) {
 		navigation_book_->go_date(date);
@@ -997,7 +997,7 @@ void menu::cb_mi_log_start(Fl_Widget* w, void* v) {
 void menu::cb_mi_imp_file(Fl_Widget* w, void* v) {
 	// Cancel any existing update
 	import_data_->stop_update(false);
-	while (!import_data_->update_complete()) Fl::wait();
+	while (!import_data_->update_complete()) Fl::check();
 	// Get data directory
 	char* directory;
 	Fl_Preferences datapath_settings(settings_, "Datapath");

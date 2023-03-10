@@ -652,7 +652,7 @@ void files_dialog::save_values() {
 	// Restart any auto-update if any of the information may have changed
 	if (autos_changed_ && import_data_->is_auto_update()) {
 		import_data_->stop_update(false);
-		while (!import_data_->update_complete()) Fl::wait();
+		while (!import_data_->update_complete()) Fl::check();
 		import_data_->start_auto_update();
 		// Clear ths flag in case "Save" not "OK" was clicked to get here
 		autos_changed_ = false;
