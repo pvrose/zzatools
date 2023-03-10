@@ -1291,21 +1291,49 @@ void qso_manager::qso_group::copy_qso_to_qso(record* old_record, int flags) {
 
 // Copy fields from CAT and default rig etc.
 void qso_manager::qso_group::copy_cat_to_qso() {
-	current_qso_->item("FREQ", rig_if_->get_frequency(true));
-	// Get mode - NB USB/LSB need further processing
+	string freqy = rig_if_->get_frequency(true);
 	string mode;
 	string submode;
 	rig_if_->get_string_mode(mode, submode);
-	if (mode != "DATA L" && mode != "DATA U") {
-		current_qso_->item("MODE", mode);
-		current_qso_->item("SUBMODE", submode);
+	string tx_power = rig_if_->get_tx_power();
+	switch (logging_state_) {
+	case QSO_PENDING: {
+		// Load values from rig
+		current_qso_->item("FREQ", freqy);
+		// Get mode - NB USB/LSB need further processing
+		if (mode != "DATA L" && mode != "DATA U") {
+			current_qso_->item("MODE", mode);
+			current_qso_->item("SUBMODE", submode);
+		}
+		else {
+			current_qso_->item("MODE", string(""));
+			current_qso_->item("SUBMODE", string(""));
+		}
+		current_qso_->item("TX_PWR", tx_power);
+		break;
 	}
-	else {
-		current_qso_->item("MODE", string(""));
-		current_qso_->item("SUBMODE", string(""));
+	case QSO_STARTED: {
+		// Ignore values except TX_PWR which accumulates maximum value
+		char message[128];
+		if (current_qso_->item("FREQ") != freqy) {
+			snprintf(message, 128, "DASH: Rig frequency changed during QSO, New value %s ignored", freqy.c_str());
+			status_->misc_status(ST_WARNING, message);
+		}
+		if (current_qso_->item("MODE") != mode) {
+			snprintf(message, 128, "DASH: Rig mode changed during QSO, New value %s ignored", mode.c_str());
+			status_->misc_status(ST_WARNING, message);
+		}
+		if (current_qso_->item("SUBMODE") != submode) {
+			snprintf(message, 128, "DASH: Rig submode changed during QSO, New value %s ignored", submode.c_str());
+			status_->misc_status(ST_WARNING, message);
+		}
+		double current_power = 0.0;
+		current_qso_->item("TX_PWR", current_power);
+		double rig_power = atof(tx_power.c_str());
+		current_qso_->item("TX_PWR", to_string(max(current_power, rig_power)));
+		break;
 	}
-	current_qso_->item("TX_PWR", rig_if_->get_tx_power());
-
+	}
 	copy_qso_to_display(CF_CAT);
 }
 
@@ -2402,7 +2430,9 @@ bool qso_manager::qso_in_progress() {
 
 // Called when rig is read to update values here
 void qso_manager::rig_update(string frequency, string mode, string power) {
-	if (qso_group_->logging_state_ == QSO_PENDING && qso_group_->logging_mode_ == LM_ON_AIR_CAT) {
+	if ((qso_group_->logging_state_ == QSO_PENDING ||
+		qso_group_->logging_state_ == QSO_STARTED) &&
+		qso_group_->logging_mode_ == LM_ON_AIR_CAT) {
 		qso_group_->copy_cat_to_qso();
 	}
 }
