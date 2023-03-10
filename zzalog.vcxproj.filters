@@ -422,9 +422,6 @@
     <ClInclude Include="zzalog\include\callback.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="zzalog\include\drawing.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="zzalog\include\formats.h">
       <Filter>Header Files</Filter>
     </ClInclude>

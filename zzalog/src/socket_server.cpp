@@ -277,14 +277,13 @@ socket_server::client_status socket_server::accept_client() {
 	}
 	else {
 #ifdef _WIN32
-		snprintf(message, 256, "SOCKET: Accepted socket %s:%d", client_addr_.sin_addr, htons(client_addr_.sin_port));
+		snprintf(message, 256, "SOCKET: Accepted socket %s:%d", inet_ntoa(client_addr_.sin_addr), htons(client_addr_.sin_port));
 #else
 		snprintf(message, 256, "SOCKET: Accepted socket %d:%d", client_addr_.sin_addr, htons(client_addr_.sin_port));
 #endif
 		status(ST_OK, message);
 		return OK;
 	}
-
 }
 const int MAX_SOCKET = 10240;
 
