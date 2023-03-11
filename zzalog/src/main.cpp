@@ -769,22 +769,8 @@ void tidy() {
 
 // Add the icon
 void add_icon(const char* arg0) {
-#ifndef _WIN32
 	// set the default Icon
 	Fl_Window::default_icon(new Fl_RGB_Image(ICON_MAIN, 16, 16, 4));
-#else
-	// NB: On windows we have a separate icon file - never worked out how to get one into the file
-	// Find the directory the app is loaded from and add the icon filename
-	const char* last_slash = strrchr(arg0, '\\');
-	int pos = last_slash - arg0;
-	// Create a new c-string with the directory name
-	char* path = new char[pos + 16];
-	strncpy(path, arg0, pos);
-	*(path + pos) = '\0';
-	// And append "\zzalog.png"
-	strcat(path, "\\zzalog.png");
-	Fl_Window::default_icon(new Fl_PNG_Image(path));
-#endif
 }
 
 // Display the arguments in the status log
