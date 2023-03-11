@@ -490,7 +490,7 @@ void add_rig_if() {
 		fl_cursor(FL_CURSOR_WAIT);
 		delete rig_if_;
 		status_->misc_status(ST_NOTE, "RIG: Connecting to hamlib...");
-		rig_if_ = new rig_hamlib;
+		rig_if_ = new rig_if;
 		if (rig_if_ == nullptr) {
 			// No handler defined - assume manual logging in real-time
 			status_->misc_status(ST_WARNING, "RIG: Cannot connect to hamlib, assume real-time logging, no rig");

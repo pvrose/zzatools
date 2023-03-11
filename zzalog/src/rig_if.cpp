@@ -12,58 +12,9 @@
 extern Fl_Preferences* settings_;
 rig_if* rig_if_ = nullptr;
 
-///////////////////////////////////////////////////////////////////////////////////////
-//    B A S E   C L A S S
-//
-///////////////////////////////////////////////////////////////////////////////////////
-// Base class constructor
-rig_if::rig_if()
-{
-	// Initialise
-	rig_name_ = "";
-	mfg_name_ = "";
-	opened_ok_ = false;
-	handler_ = "";
-	handler_t_ = RIG_NONE;
-	error_message_ = "";
-	// Default action
-	on_timer_ = nullptr;
-	freq_to_band_ = nullptr;
-	error = default_error_message;
-	have_freq_to_band_ = false;
-	reported_hi_swr_ = false;
-	inhibit_repeated_errors = false;
-}
-
-// Base class destructor
-rig_if::~rig_if()
-{
-	close();
-}
-
 // Returns if the rig opened OK
 bool rig_if::is_open() {
 	return opened_ok_;
-}
-
-// Open rig - common aspects - to be called at the end of the implementation
-bool rig_if::open() {
-	// Add rig timer and timeout immediately to use the callback to update
-	// the status
-	if (opened_ok_) {
-		Fl::add_timeout(0.0, cb_timer_rig);
-		return true;
-	}
-	else {
-		error(ST_ERROR, "RIG: Failed to open rig");
-		return false;
-	}
-}
-
-// Common functionality on closing rig interface - to be called before the overrides
-void rig_if::close() {
-	// Timeout must be removed before rig connection is closed otherwise it could fire while the connection is closing
-	Fl::remove_timeout(cb_timer_rig);
 }
 
 // Convert s-meter reading into display format
@@ -100,8 +51,7 @@ string rig_if::get_swr_meter() {
 // Returns the string displaying the rig information for the rig status
 // e.g. Hamlib: TS-2000 14.123456 MHz 10 W USB S9+20
 string rig_if::rig_info() {
-	string rig_info = handler_ + ": ";
-	rig_info += rig_name_;
+	string rig_info = rig_info += rig_name_;
 	// Valid rig - get data from it. TX frequency
 	if (is_split()) {
 		if (is_good()) rig_info += " TX:" + get_frequency(true) + " MHz";
@@ -249,9 +199,20 @@ void rig_if::callback(void(*function)(), string(*spec_func)(double), void(*mess_
 // to muliplex accesses
 ///////////////////////////////////////////////////////////////////////////////////////
 // Constructor
-rig_hamlib::rig_hamlib() 
-: rig_if()
+rig_if::rig_if() 
 {
+	// Initialise
+	rig_name_ = "";
+	mfg_name_ = "";
+	opened_ok_ = false;
+	error_message_ = "";
+	// Default action
+	on_timer_ = nullptr;
+	freq_to_band_ = nullptr;
+	error = default_error_message;
+	have_freq_to_band_ = false;
+	reported_hi_swr_ = false;
+	inhibit_repeated_errors = false;
 	rig_ = nullptr;
 	model_id_ = 0;
 	port_name_ = "";
@@ -260,25 +221,20 @@ rig_hamlib::rig_hamlib()
 	error_message_ = "";
 	baud_rate_ = 0;
 	unsupported_function_ = false;
-
-
-	// set handler name
-	handler_ = "Hamlib";
-	handler_t_ = RIG_HAMLIB;
-
 }
 
 // Destructor
-rig_hamlib::~rig_hamlib()
+rig_if::~rig_if()
 {
 	// close the serial port
 	close();
 }
 
 // Clsoe the serial port
-void rig_hamlib::close() {
-	// Call base class  for common behaviour
-	rig_if::close();
+void rig_if::close() {
+
+	// Timeout must be removed before rig connection is closed otherwise it could fire while the connection is closing
+	Fl::remove_timeout(cb_timer_rig);
 
 	if (rig_ != nullptr) {
 		if (opened_ok_) {
@@ -293,7 +249,7 @@ void rig_hamlib::close() {
 }
 
 // Opens the connection associated with the rig
-bool rig_hamlib::open() {
+bool rig_if::open() {
 	// If changing rig type - delete any existing rig and create new one
 	if (rig_ != nullptr) {
 		close();
@@ -333,7 +289,7 @@ bool rig_hamlib::open() {
 	}
 	if (model_id_ == -1) {
 		// Rig not found in hamlib
-		error_message_ = "RIG: Hamlib " + rig_name_ + " not found in capabilities";
+		error_message_ = "RIG: " + rig_name_ + " not found in capabilities";
 		rig_ = nullptr;
 	}
 	else {
@@ -348,7 +304,7 @@ bool rig_hamlib::open() {
 				break;
 			case RIG_PORT_NETWORK:
 			case RIG_PORT_USB:
-				printf("ZZALOG: Setting port path=%s\n", port_name_.c_str());
+				printf("RIG: Setting port path=%s\n", port_name_.c_str());
 				int err = rig_set_conf(rig_, rig_token_lookup(rig_, "rig_pathname"), port_name_.c_str());
 				//strcpy(rig_->state.rigport.pathname, port_name_.c_str());
 				break;
@@ -358,7 +314,7 @@ bool rig_hamlib::open() {
 
 	if (rig_ != nullptr) {
 		// open rig connection over serial port
-		printf("ZZALOG: Opening rig\n");
+		printf("RIG: Opening rig\n");
 		error_code_ = rig_open(rig_);
 
 		if (error_code_ != RIG_OK) {
@@ -379,20 +335,27 @@ bool rig_hamlib::open() {
 
 	if (opened_ok_) {
 		if (capabilities->port_type == RIG_PORT_SERIAL) {
-			success_message_ = "hamlib connection " + mfg_name_ + "/" + rig_name_ + " on port " + port_name_ + " opened OK";
+			success_message_ = "Connection " + mfg_name_ + "/" + rig_name_ + " on port " + port_name_ + " opened OK";
 		}
 		else {
-			success_message_ = "hamlib connection " + mfg_name_ + "/" + rig_name_ + " on port " + port_name_ + 
+			success_message_ = "Connection " + mfg_name_ + "/" + rig_name_ + " on port " + port_name_ + 
 				" (" + rig_get_info(rig_) + ") opened OK";
 		}
 	}
 
-	// Set timer
-	return rig_if::open();
+	// the status
+	if (opened_ok_) {
+		Fl::add_timeout(0.0, cb_timer_rig);
+		return true;
+	}
+	else {
+		error(ST_ERROR, "RIG: Failed to open rig");
+		return false;
+	}
 }
 
 // Return rig name
-string& rig_hamlib::rig_name() {
+string& rig_if::rig_name() {
 	// Read capabilities to get manufacturer and model name
 	full_rig_name_ = rig_get_info(rig_);
 	rig_caps capabilities = *(rig_get_caps(model_id_));
@@ -402,7 +365,7 @@ string& rig_hamlib::rig_name() {
 }
 
 // Read TX frequency in Hz
-double rig_hamlib::tx_frequency() {
+double rig_if::tx_frequency() {
 	freq_t frequency_hz;
 	// Get ID of transmit VFO and read its value
 	if ((error_code_ = rig_get_freq(rig_, RIG_VFO_TX, &frequency_hz)) == RIG_OK) {
@@ -415,7 +378,7 @@ double rig_hamlib::tx_frequency() {
 }
 
 // Read mode from rig
-rig_mode_t rig_hamlib::mode() {
+rig_mode_t rig_if::mode() {
 	rmode_t mode;
 	shortfreq_t bandwidth;
 	if ((error_code_ = rig_get_mode(rig_, RIG_VFO_CURR, &mode, &bandwidth)) == RIG_OK) {
@@ -457,7 +420,7 @@ rig_mode_t rig_hamlib::mode() {
 }
 
 // Return drive level * 100% power
-double rig_hamlib::drive() {
+double rig_if::drive() {
 	value_t drive_level;
 	if ((error_code_ = rig_get_level(rig_, RIG_VFO_CURR, RIG_LEVEL_RFPOWER, &drive_level)) == RIG_OK) {
 		return drive_level.f * 100;
@@ -469,7 +432,7 @@ double rig_hamlib::drive() {
 }
 
 // Rig is working split TX/RX frequency
-bool rig_hamlib::is_split() {
+bool rig_if::is_split() {
 	vfo_t TxVFO;
 	split_t split;
 	if ((error_code_ = rig_get_split_vfo(rig_, RIG_VFO_CURR, &split, &TxVFO)) == RIG_OK) {
@@ -482,7 +445,7 @@ bool rig_hamlib::is_split() {
 }
 
 // Get separate receive frequency
-double rig_hamlib::rx_frequency() {
+double rig_if::rx_frequency() {
 	freq_t frequency_hz;
 	// VFO A is always receive VFO
 	if ((error_code_ = rig_get_freq(rig_, RIG_VFO_CURR, &frequency_hz)) == RIG_OK) {
@@ -495,7 +458,7 @@ double rig_hamlib::rx_frequency() {
 }
 
 // Return S-meter reading (relative to S9)
-int rig_hamlib::s_meter() {
+int rig_if::s_meter() {
 	value_t meter_value;
 	if ((error_code_ = rig_get_level(rig_, RIG_VFO_CURR, RIG_LEVEL_STRENGTH, &meter_value)) == RIG_OK) {
 		// hamlib returns relative to S9. 
@@ -509,7 +472,7 @@ int rig_hamlib::s_meter() {
 }
 
 // Return power meter reading (Watts)
-double rig_hamlib::pwr_meter() {
+double rig_if::pwr_meter() {
 	value_t meter_value;
 	if ((error_code_ = rig_get_level(rig_, RIG_VFO_CURR, RIG_LEVEL_RFPOWER_METER_WATTS, &meter_value)) == RIG_OK) {
 		// hamlib returns relative to S9. 
@@ -523,7 +486,7 @@ double rig_hamlib::pwr_meter() {
 }
 
 // Return Vdd meter reading (Volts)
-double rig_hamlib::vdd_meter() {
+double rig_if::vdd_meter() {
 	value_t meter_value;
 	if ((error_code_ = rig_get_level(rig_, RIG_VFO_CURR, RIG_LEVEL_VD_METER, &meter_value)) == RIG_OK) {
 		return meter_value.f;
@@ -540,7 +503,7 @@ double rig_hamlib::vdd_meter() {
 }
 
 // Return SWR value
-double rig_hamlib::swr_meter() {
+double rig_if::swr_meter() {
 	value_t meter_value;
 	if ((error_code_ = rig_get_level(rig_, RIG_VFO_CURR, RIG_LEVEL_SWR, &meter_value)) == RIG_OK) {
 		return meter_value.f;
@@ -552,24 +515,24 @@ double rig_hamlib::swr_meter() {
 }
 
 // Return the most recent error message
-string rig_hamlib::error_message(string func_name) {
+string rig_if::error_message(string func_name) {
 	const char* hamlib_error = error_text((rig_errcode_e)abs(error_code_));
 	if (hamlib_error == nullptr) {
-		error_message_ = "RIG: Hamlib: " + func_name + " (No error details)";
+		error_message_ = "RIG: " + func_name + " (No error details)";
 	}
 	else {
-		error_message_ = "RIG: Hamlib: " + func_name + " " + string(hamlib_error);
+		error_message_ = "RIG: " + func_name + " " + string(hamlib_error);
 	}
 	return error_message_;
 }
 
 // Error Code is OK.
-bool rig_hamlib::is_good() {
+bool rig_if::is_good() {
 	return opened_ok_ && error_code_ == RIG_OK;
 }
 
 // Return the text for the error code.
-const char* rig_hamlib::error_text(rig_errcode_e code) {
+const char* rig_if::error_text(rig_errcode_e code) {
 	switch (code) {
 	case RIG_OK:
 		return "No error, operation completed successfully";
@@ -612,17 +575,10 @@ const char* rig_hamlib::error_text(rig_errcode_e code) {
 	}
 };
 
-// Raw message - not implemented
-string rig_hamlib::raw_message(string message) {
-	error(ST_ERROR, "RIG: Hamlib does not support sending raw messages");
-	return "";
-};
-
 // Transmit mode
-bool rig_hamlib::get_tx() {
+bool rig_if::get_tx() {
 	// Get ID of transmit VFO and read its value
 	ptt_t ptt;
 	error_code_ = rig_get_ptt(rig_, RIG_VFO_CURR, &ptt);
 	return (ptt != RIG_PTT_OFF);
 }
-

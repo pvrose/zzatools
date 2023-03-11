@@ -16,8 +16,6 @@
 
 using namespace std;
 
-
-
 	// Encoding of result from reading the mode from the rig
 	enum rig_mode_t {
 		GM_INVALID = 0,
@@ -29,14 +27,6 @@ using namespace std;
 		GM_DIGL = '6',
 		GM_CWL = '7',
 		GM_DIGU = '9'
-	};
-
-	// Rig handler type
-	enum rig_handler_t : int {
-		RIG_HAMLIB,
-		RIG_FLRIG,
-		RIG_DIRECT,
-		RIG_NONE
 	};
 
 	// slow rig polling - 1s -> 10min (default 1 min)
@@ -53,41 +43,40 @@ using namespace std;
 	{
 	public:
 		rig_if();
-		virtual ~rig_if();
+		~rig_if();
 
 		// Opens the COM port associated with the rig
-		virtual bool open();
+		bool open();
 		// Return rig name
-		virtual string& rig_name() = 0;
+		string& rig_name();
 		// Read TX Frequency
-		virtual double tx_frequency() = 0;
+		double tx_frequency();
 		// Read mode from rig
-		virtual rig_mode_t mode() = 0;
-		// Return drive level
-		virtual double drive() = 0;
+		rig_mode_t mode();
+		// Return drive level * 100% power
+		double drive();
 		// Rig is working split TX/RX frequency
-		virtual bool is_split() = 0;
+		bool is_split();
 		// Get separate frequency
-		virtual double rx_frequency() = 0;
+		double rx_frequency();
 		// Return S-meter reading (S9+/-dB)
-		virtual int s_meter() = 0;
-		// Return the power_meter reading
-		virtual double pwr_meter() = 0;
+		int s_meter();
+		// Return power meter reading
+		double pwr_meter();
 		// Return the most recent error message
-		virtual string error_message(string func_name) = 0;
-		// Send a raw message
-		virtual string raw_message(string message) = 0;
+		string error_message(string func_name);
 		// Get TX mode
-		virtual bool get_tx() = 0;
+		bool get_tx();
 		// Get SWR meter
-		virtual double swr_meter() = 0;
+		double swr_meter();
 		// Get Voltage meter
-		virtual double vdd_meter() = 0;
+		double vdd_meter();
 
 		// Error Code is not OK.
-		virtual bool is_good() = 0;
+		bool is_good();
 		// close rig - may be null for some 
-		virtual void close();
+		void close();
+
 		// Port was successfully opened
 		bool is_open();
 		// Get the rig info to display
@@ -123,10 +112,6 @@ using namespace std;
 		string mfg_name_;
 		// Rig opened OK
 		bool opened_ok_;
-		// Handler name
-		string handler_;
-		// Handler type
-		rig_handler_t handler_t_;
 		// Text error message
 		string error_message_;
 		// Text success message
@@ -147,50 +132,6 @@ using namespace std;
 		bool inhibit_repeated_errors;
 		// Full rig name
 		string full_rig_name_;
-	};
-
-	// THis class implements the hamlib specific methods of the base class
-	// Hamlib is an standardised API on top of the divers implementations of rig CATs
-	// As it connects directly to the COM port, it only allows one client application.
-	class rig_hamlib : public rig_if
-	{
-	public:
-		rig_hamlib();
-		virtual ~rig_hamlib();
-
-		// Opens the COM port associated with the rig
-		virtual bool open();
-		// Return rig name
-		virtual string& rig_name();
-		// Read TX Frequency
-		virtual double tx_frequency();
-		// Read mode from rig
-		virtual rig_mode_t mode();
-		// Return drive level * 100% power
-		virtual double drive();
-		// Rig is working split TX/RX frequency
-		virtual bool is_split();
-		// Get separate frequency
-		virtual double rx_frequency();
-		// Return S-meter reading (S9+/-dB)
-		virtual int s_meter();
-		// Return power meter reading
-		virtual double pwr_meter();
-		// Return the most recent error message
-		virtual string error_message(string func_name);
-		// Return raw message
-		virtual string raw_message(string message);
-		// Get TX mode
-		virtual bool get_tx();
-		// Get SWR meter
-		virtual double swr_meter();
-		// Get Voltage meter
-		virtual double vdd_meter();
-
-		// Error Code is not OK.
-		virtual bool is_good();
-		// close rig - may be null for some 
-		virtual void close();
 
 		// Re-implement error message
 		const char* error_text(rig_errcode_e code);
@@ -210,63 +151,5 @@ using namespace std;
 		int error_code_;
 		// Reported error code
 		bool unsupported_function_;
-	};
-
-	// This class is the flrig specific implementation of the base class.
-	// flrig is an application that provides an XML-RPI server interface over HTTP,
-	// so that it allows multiple applications to share the COM interface to the rig
-	class rig_flrig :
-		public rig_if
-
-	{
-	public:
-		rig_flrig();
-		virtual ~rig_flrig();
-
-		// Opens the connection to flrig
-		virtual bool open();
-		// Return rig name
-		virtual string& rig_name();
-		// Read TX Frequency
-		virtual double tx_frequency();
-		// Read mode from rig
-		virtual rig_mode_t mode();
-		// Return drive level * 100% power
-		virtual double drive();
-		// Rig is working split TX/RX frequency
-		virtual bool is_split();
-		// Get separate frequency
-		virtual double rx_frequency();
-		// Return S-meter reading (S9+/-dB)
-		virtual int s_meter();
-		// Return the power meter reading
-		virtual double pwr_meter();
-		// Return the most recent error message
-		virtual string error_message(string func_name);
-		// Return raw message
-		virtual string raw_message(string message);
-		// Get TX mode
-		virtual bool get_tx();
-		// Get SWR meter
-		virtual double swr_meter();
-		// Get Voltage meter
-		virtual double vdd_meter();
-
-		// Error Code is not OK.
-		virtual bool is_good();
-		// close rig - may be null for some 
-		virtual void close();
-
-
-
-	protected:
-		// Perform an XML-RPC request 
-		bool do_request(string sMethodName, rpc_data_item::rpc_list* params, rpc_data_item* response);
-
-		// The RPC reader/writer
-		rpc_handler* rpc_handler_;
-		// Error code
-		bool error_;
-
 	};
 #endif
