@@ -107,8 +107,6 @@ using namespace std;
 		string get_swr_meter();
 		// Return open message
 		string success_message();
-		// Maximum power during QSO
-		double max_power();
 
 		// Callback to set certain functions (timer callback, freq to band conversion, error message
 		void callback(void (*function)(), string(*spec_func)(double), void(*mess_func)(status_t, const char*));
@@ -145,18 +143,6 @@ using namespace std;
 		bool reported_hi_swr_;
 		// last band read
 		string previous_band_;
-		// Most recent transmitted power
-		double last_tx_power_;
-		// Most recent transmitted SWR
-		double last_tx_swr_;
-		// Number of TX power samples
-		int num_pwr_samples_;
-		// Total power sampled
-		double sigma_tx_power_;
-		// Most recent received S-meter
-		int last_rx_smeter_;
-		// Maximum power during QSO
-		double max_power_;
 		// Stop incessane errors
 		bool inhibit_repeated_errors;
 		// Full rig name

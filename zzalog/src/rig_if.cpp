@@ -32,11 +32,6 @@ rig_if::rig_if()
 	error = default_error_message;
 	have_freq_to_band_ = false;
 	reported_hi_swr_ = false;
-	// Make this a daft value
-	last_tx_power_ = 0.0;
-	last_tx_swr_ = 1.0;
-	sigma_tx_power_ = 0.0;
-	num_pwr_samples_ = 0;
 	inhibit_repeated_errors = false;
 }
 
@@ -152,36 +147,9 @@ string rig_if::get_frequency(bool tx) {
 // Return the power
 string rig_if::get_tx_power() {
 	double tx_power = pwr_meter();
-	if (tx_power == 0.0) {
-		// If metered power is zero use the last actual value read
-		// May need to tweak this to be less than a small number
-		tx_power = last_tx_power_;
-		if (num_pwr_samples_) {
-			//check_power();
-		}
-		sigma_tx_power_ = 0.0;
-		num_pwr_samples_ = 0;
-	}
-	else {
-		// Otherwise remember this value as the last value read
-		last_tx_power_ = tx_power;
-		num_pwr_samples_++;
-		sigma_tx_power_ += tx_power;
-		// Get max power
-		if (tx_power > max_power_)
-			max_power_ = tx_power;
-	}
 	char text[100];
 	snprintf(text, 100, "%g", tx_power);
-
 	return text;
-}
-
-// Return maximu power - and reset it to 0.0
-double rig_if::max_power() {
-	double result = max_power_;
-	max_power_ = 0.0;
-	return result;
 }
 
 // Rig timer callback
@@ -529,12 +497,8 @@ double rig_hamlib::rx_frequency() {
 // Return S-meter reading (relative to S9)
 int rig_hamlib::s_meter() {
 	value_t meter_value;
-	if (get_tx()) {
-		return last_rx_smeter_;
-	}
-	else if ((error_code_ = rig_get_level(rig_, RIG_VFO_CURR, RIG_LEVEL_STRENGTH, &meter_value)) == RIG_OK) {
+	if ((error_code_ = rig_get_level(rig_, RIG_VFO_CURR, RIG_LEVEL_STRENGTH, &meter_value)) == RIG_OK) {
 		// hamlib returns relative to S9. 
-		last_rx_smeter_ = meter_value.i;
 		return meter_value.i;
 	}
 	else {
@@ -547,16 +511,12 @@ int rig_hamlib::s_meter() {
 // Return power meter reading (Watts)
 double rig_hamlib::pwr_meter() {
 	value_t meter_value;
-	if (!get_tx()) {
-		return last_tx_power_;
-	}
-	else if ((error_code_ = rig_get_level(rig_, RIG_VFO_CURR, RIG_LEVEL_RFPOWER_METER_WATTS, &meter_value)) == RIG_OK) {
+	if ((error_code_ = rig_get_level(rig_, RIG_VFO_CURR, RIG_LEVEL_RFPOWER_METER_WATTS, &meter_value)) == RIG_OK) {
 		// hamlib returns relative to S9. 
-		last_tx_power_ = meter_value.f;
 		return meter_value.f;
 	}
 	else {
-		// Default to S0 (S9 is -73 dBm)
+		// Default to nan
 		error(ST_ERROR, error_message("pwr_meter").c_str());
 		return nan("");
 	}
@@ -582,11 +542,7 @@ double rig_hamlib::vdd_meter() {
 // Return SWR value
 double rig_hamlib::swr_meter() {
 	value_t meter_value;
-	if (!get_tx()) {
-		return last_tx_swr_;
-	}
 	if ((error_code_ = rig_get_level(rig_, RIG_VFO_CURR, RIG_LEVEL_SWR, &meter_value)) == RIG_OK) {
-		last_tx_swr_ = meter_value.f;
 		return meter_value.f;
 	}
 	else {
@@ -670,346 +626,3 @@ bool rig_hamlib::get_tx() {
 	return (ptt != RIG_PTT_OFF);
 }
 
-
-///////////////////////////////////////////////////////////////////////////////////////
-//    F l R i g   implementation
-// 
-//  FLRig provides a shareable access to the rig and is supported by a number of 
-// digital modems (FLDigi and WSJT-X). It uses XML-RPC to access the API.
-///////////////////////////////////////////////////////////////////////////////////////
-// Constructor
-rig_flrig::rig_flrig()
-	: rig_if()
-{
-	rig_name_ = "";
-	error_message_ = "";
-	handler_ = "Flrig";
-	handler_t_ = RIG_FLRIG;
-	rpc_handler_ = nullptr;
-	error_ = true;
-}
-
-// Destructor
-rig_flrig::~rig_flrig()
-{
-	if (opened_ok_) {
-		close();
-		delete rpc_handler_;
-	}
-}
-
-// Opens the RPC server associated with the rig
-bool rig_flrig::open() {
-	Fl_Preferences cat_settings(settings_, "CAT");
-	// Default host name and port number
-	Fl_Preferences flrig_settings(cat_settings, "Flrig");
-	char *temp;
-	// Default indicates server is on same computer as running zzalib
-	flrig_settings.get("Host", temp, "127.0.0.1:12345");
-	string host_name = temp;
-	free(temp);
-	rpc_handler_ = new rpc_handler(host_name, "/RPC2");
-	// If we have no rig name then assume it didn't open successfully
-	if (rpc_handler_ == nullptr || rig_name() == "") {
-		// Close it and release RPC handler
-		opened_ok_ = false;
-		delete rpc_handler_;
-		rpc_handler_ = nullptr;
-	}
-	else {
-		opened_ok_ = true;
-		error_ = false;
-	}
-
-	if (opened_ok_) {
-		success_message_ = "FlRig connection " + host_name + " opened OK";
-	}
-	// Base implementation sets timer
-	return rig_if::open();
-}
-
-// Return rig name
-string& rig_flrig::rig_name() {
-	rpc_data_item response;
-	if (do_request("rig.get_xcvr", nullptr, &response)) {
-		rig_name_ = response.get_string();
-	}
-	else {
-		// Failed: return empty string
-		error(ST_ERROR, error_message("rig_name").c_str());
-		error_ = true;
-		rig_name_ = "";
-	}
-	return rig_name_;
-}
-
-// Read TX Frequency
-double rig_flrig::rx_frequency() {
-	rpc_data_item response;
-	if (do_request("rig.get_vfoA", nullptr, &response)) {
-		return response.get_double();
-	}
-	else {
-		// Failed return NAN
-		error(ST_ERROR, error_message("rx_frequency").c_str());
-		error_ = true;
-		return nan("");
-	}
-}
-
-// Read mode from rig
-rig_mode_t rig_flrig::mode() {
-	rpc_data_item response;
-	if (do_request("rig.get_mode", nullptr, &response)) {
-		// Convert to zlg data type
-		string mode_id = response.get_string();
-		if (mode_id == "AM") return GM_AM;
-		else if (mode_id == "USB") return GM_USB;
-		else if (mode_id == "LSB") return GM_LSB;
-		else if (mode_id == "CW") return GM_CWU;
-		else if (mode_id == "CW-R") return GM_CWL;
-		else if (mode_id == "FM") return GM_FM;
-		else if (mode_id == "FSK" || mode_id == "LSB-D") return GM_DIGL;
-		else if (mode_id == "FSK-R" || mode_id == "USB-D") return GM_DIGU;
-		else 
-			// Unsupported mode returned
-			return GM_INVALID;
-	}
-	else {
-		// Request failed
-		error(ST_ERROR, error_message("mode").c_str());
-		error_ = true;
-		return GM_INVALID;
-	}
-}
-
-// Return drive level
-double rig_flrig::drive() {
-	rpc_data_item response;
-	if (do_request("rig.get_power", nullptr, &response)) {
-		return (double)response.get_int();
-	}
-	else {
-		error(ST_ERROR, error_message("drive").c_str());
-		error_ = true;
-		return nan("");
-	}
-}
-
-// Rig is working split TX/RX frequency
-bool rig_flrig::is_split() {
-	rpc_data_item response;
-	if (do_request("rig.get_split", nullptr, &response)) {
-		return (bool)response.get_int();
-	}
-	else {
-		error(ST_ERROR, error_message("is_split").c_str());
-		error_ = true;
-		return false;
-	}
-}
-
-// Get separate frequency
-double rig_flrig::tx_frequency() {
-	rpc_data_item response;
-	if (is_split()) {
-		if (do_request("rig.get_AB", nullptr, &response) && response.get_int() == 0) {
-			// return VFO B 
-			if (do_request("rig.get_vfoB", nullptr, &response)) {
-				return (double)response.get_int();
-			}
-			else {
-				error(ST_ERROR, error_message("tx_frequency").c_str());
-				error_ = true;
-				return nan("");
-			}
-		}
-	} 
-	if (is_good()) {
-		// Return VFO A if either not split or VFO B is the TX frequency
-		if (do_request("rig.get_vfoA", nullptr, &response)) {
-			return (double)response.get_int();
-		}
-		else {
-			error(ST_ERROR, error_message("tx_frequency").c_str());
-			error_ = true;
-			return nan("");
-		}
-	}
-	return nan("");
-}
-
-// Return S-meter reading (S9+/-dB)
-int rig_flrig::s_meter() {
-	rpc_data_item response;
-	if (get_tx()) {
-		return last_rx_smeter_;
-	} 
-	else if (do_request("rig.get_smeter", nullptr, &response)) {
-		// 0 = S0, 50 = S9, 100 = S9 + 60
-		int value = response.get_int() - 50;
-		if (value <= 0) {
-			value = value * 54 / 50;
-		}
-		else {
-			value = value * 60 / 50;
-		}
-		last_rx_smeter_ = value;
-		return last_rx_smeter_;
-	}
-	else {
-		// Default return S0
-		error(ST_ERROR, error_message("s_meter").c_str());
-		error_ = true;
-		return -54;
-	}
-}
-
-// Return power-meter reading (S9+/-dB)
-double rig_flrig::pwr_meter() {
-	rpc_data_item response;
-	if (do_request("rig.get_pwrmeter", nullptr, &response)) {
-		// linear 0 to 100 W
-		double power = (double)response.get_int();
-		if (power == 0.0) {
-			return last_tx_power_;
-		}
-		else {
-			last_tx_power_ = power;
-			return last_tx_power_;
-		}
-	}
-	else {
-		// Default return S0
-		error(ST_ERROR, error_message("pwr_meter").c_str());
-		error_ = true;
-		return nan("");
-	}
-}
-
-// Return Vdd meter reading
-double rig_flrig::vdd_meter() {
-	// Not IC7300 or not OK - return nan.
-	if (!inhibit_repeated_errors) {
-		error(ST_ERROR, error_message("vdd_meter - Cannot read (Not supported rig or see above)").c_str());
-		inhibit_repeated_errors = true;
-	}
-	// Temporary to debug downstream
-	int random_vdd = rand() % 200 + 1300;
-	return (double)random_vdd / 100.0;
-
-}
-
-// Return SWR meter reading
-double rig_flrig::swr_meter() {
-	rpc_data_item response;
-	if (!get_tx()) {
-		return last_tx_swr_;
-	}
-	if (do_request("rig.get_swrmeter", nullptr, &response)) {
-		// It matches the SWR meter display widget in flrig
-		// 0 = 1:1
-		// 12(.5) = 1:1.5
-		// 25 = 1:2
-		// 50 = 1:3
-		// 100 = 1:∞
-		unsigned int value = response.get_int();
-		double rho;
-		// Attempt to unpick flrig's tweaking - see above
-		// But keeps the linearity between these points in reflection coefficient
-		if (value >= 50) {
-			// Between 50 and 100 - treat it as %-age reflected power
-			rho = value / 100.0;
-		}
-		else if (value >= 25) {
-			// rho = 1/3 + interpolate between 0.33 and 0.5 (1/6)
-			rho = (1.0 / 3.0) + ((1.0 / 6.0) * ((double)value - 25.0) / 25.0);
-		}
-		else if (value >= 13) {
-			// rho = 0.2 + interpolate between 0.2 and 0.33 (2/15)
-			rho = (0.2) + ((2.0 / 15.0) * ((double)value - 12.5) / 12.5);
-		}
-		else {
-			// rho = interpolate between 0 and 0.2
-			rho = (0.2 * (double)value / 12.5);
-		}
-		// SWR = (1 + ρ) / (1 - ρ) 
-		double swr = (1.0 + rho) / (1.0 - rho);
-		last_tx_swr_ = swr;
-		return swr;
-	}
-	else {
-		// Default return S0
-		error(ST_ERROR, error_message("swr_meter").c_str());
-		error_ = true;
-		return nan("");
-	}
-
-}
-
-// Return the most recent error message
-string rig_flrig::error_message(string func_name) {
-	return "RIG: FlRig: " + func_name + " " + error_message_;
-}
-
-// Error Code is not OK.
-bool rig_flrig::is_good() {
-	return opened_ok_ && !error_;
-}
-
-// close the connection
-void rig_flrig::close() {
-	// Call base class  for common behaviour
-	rig_if::close();
-	opened_ok_ = false;
-}
-
-// Do the specified request using RPC handler
-bool rig_flrig::do_request(string method_name, rpc_data_item::rpc_list* params, rpc_data_item* response) {
-	if (!rpc_handler_->do_request(method_name, params, response)) {
-		// Failed to make the request
-		error_message_ = "Request failed";
-		opened_ok_ = false;
-		error_ = true;
-		return false;
-	}
-	else {
-		return true;
-	}
-}
-
-// Do the raw message
-string rig_flrig::raw_message(string message) {
-	rpc_data_item param;
-	rpc_data_item::rpc_list params;
-	rpc_data_item response;
-	param.set(message, XRT_STRING);
-	params.clear();
-	params.push_back(&param);
-	if (do_request("rig.cat_priority", &params, &response)) {
-		if (response.get_string() == "OK") {
-			if (do_request("rig.cat_string", &params, &response)) {
-				return response.get_string();
-			}
-		}
-		error_message_ = "Raw message failed to execute command";
-		return "";
-	}
-	else {
-		error_message_ = "Raw message failed to get priority";
-		return "";
-	}
-}
-
-// Get PTT status
-bool rig_flrig::get_tx() {
-	rpc_data_item response;
-	if (do_request("rig.get_ptt", nullptr, &response)) {
-		return response.get_int() != 0;
-	}
-	else {
-		error(ST_ERROR, error_message("get_tx").c_str());
-		error_ = true;
-		return false;
-	}
-}
