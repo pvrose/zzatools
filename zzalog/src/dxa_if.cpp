@@ -79,6 +79,7 @@ dxa_if::dxa_if() :
 	, selected_locn_({ 0.0, 0.0 })
 	, display_all_colours_(false)
 	, last_logged_call_("")
+	, zoom_changed_(false)
 {
 	records_to_display_.clear();
 	colours_used_.clear();
@@ -663,6 +664,7 @@ void dxa_if::cb_bn_centre(Fl_Widget* w, void* v) {
 		lat_long_t home = { that->home_lat_, that->home_long_ };
 		that->clear_dx_loc();
 		that->centre_map(home);
+		that->zoom_changed_ = false;
 		switch (map->GetProjection()) {
 		case DxAtlas::PRJ_RECTANGULAR:
 			that->zoom_centre(home);
@@ -874,11 +876,9 @@ HRESULT dxa_if::cb_map_changed(DxAtlas::EnumMapChange change) {
 			enable_widgets();
 			switch (projection_) {
 			case DxAtlas::EnumProjection::PRJ_RECTANGULAR:
+			case DxAtlas::EnumProjection::PRJ_AZIMUTHAL:
 				// Rectangular projection so center the map appropriately
 				centre_map();
-				break;
-			case DxAtlas::EnumProjection::PRJ_AZIMUTHAL:
-				zoom_azimuthal();
 				break;
 			}
 			break;
@@ -886,13 +886,14 @@ HRESULT dxa_if::cb_map_changed(DxAtlas::EnumMapChange change) {
 			if (atlas_->GetMap()->GetZoom() == zoom_value_) {
 				switch (projection_) {
 				case DxAtlas::EnumProjection::PRJ_RECTANGULAR:
+				case DxAtlas::EnumProjection::PRJ_AZIMUTHAL:
 					// Rectangular projection so center the map appropriately
 					centre_map();
 					break;
-				case DxAtlas::EnumProjection::PRJ_AZIMUTHAL:
-					zoom_azimuthal();
-					break;
 				}
+			}
+			else {
+				zoom_changed_ = true;
 			}
 			break;
 		}
@@ -1002,6 +1003,7 @@ bool dxa_if::connect_dxatlas() {
 		atlas_->GetMap()->PutMouseMode(DxAtlas::MM_USER);
 		atlas_->GetMap()->PutActiveLabels(false);
 		status_->misc_status(ST_OK, "DXATLAS: Connected");
+		zoom_changed_ = false;
 	}
 	else {
 		status_->misc_status(ST_ERROR, "DXATLAS: failed to open");
@@ -1884,7 +1886,7 @@ void dxa_if::centre_map(lat_long_t centre) {
 
 // Zoom the map on the specified centre to cover whole world (full) or just drawn points
 void dxa_if::zoom_centre(lat_long_t centre) {
-	if (!isnan(centre.latitude) && !isnan(centre.longitude)) {
+	if (!isnan(centre.latitude) && !isnan(centre.longitude) && !zoom_changed_) {
 		DxAtlas::IDxMapPtr map = atlas_->GetMap();
 		// Zoom is only considered by DxAtlas on the longitude (width) of the window
 		// The window height is not taken into consideration. That is to say, if the
@@ -1915,10 +1917,6 @@ void dxa_if::zoom_centre(lat_long_t centre) {
 		// now zoom by the smaller of these with 5% margin
 		map->PutZoom(zoom);
 		if (zoom != zoom_value_) {
-			char msg[256];
-			snprintf(msg, 256, "DXATLAS: Zoom required S %f N %f W %f E %f, Z = %f was %f",
-				southernmost_, northernmost_, westernmost_, easternmost_, zoom, zoom_value_);
-			status_->misc_status(ST_NOTE, msg);
 			zoom_value_ = map->GetZoom();
 		}
 	}
@@ -1926,15 +1924,17 @@ void dxa_if::zoom_centre(lat_long_t centre) {
 
 // Zoom the map in azimuthal mode
 void dxa_if::zoom_azimuthal() {
-	DxAtlas::IDxMapPtr map = atlas_->GetMap();
-	float zoom;
-	// Zoom in to just the displayed QSOs
-	// Z=1.0 is full earth view, make Z = pi * R / furthest + 5%
-	// TODO: Account for width and height of DxAtlas by taking into account
-	//  bearing
-	zoom = (float)(EARTH_RADIUS * PI) / (float)furthest_ * 1.05F;
-	map->PutZoom(zoom);
-	zoom_value_ = map->GetZoom();
+	if (!zoom_changed_) {
+		DxAtlas::IDxMapPtr map = atlas_->GetMap();
+		float zoom;
+		// Zoom in to just the displayed QSOs
+		// Z=1.0 is full earth view, make Z = pi * R / furthest + 5%
+		// TODO: Account for width and height of DxAtlas by taking into account
+		//  bearing
+		zoom = (float)(EARTH_RADIUS * PI) / (float)furthest_ * 1.05F;
+		map->PutZoom(zoom);
+		zoom_value_ = map->GetZoom();
+	}
 }
 
 // Centre the map according to the settings

@@ -309,6 +309,8 @@ using namespace std;
 		string last_logged_call_;
 		// Last logged location
 		string last_logged_grid_;
+		// Zoom changed by use
+		bool zoom_changed_;
 
 		Fl_Group* colour_grp_;
 		// Colour buttons - instanced in colour_win_
