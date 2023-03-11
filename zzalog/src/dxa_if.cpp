@@ -1713,11 +1713,8 @@ void dxa_if::draw_pins() {
 			// now centre on selected record - home location if azimuthal view
 			switch(map->GetProjection()) {
 			case DxAtlas::PRJ_RECTANGULAR:
-				centre_map();
-				break;
 			case DxAtlas::PRJ_AZIMUTHAL:
-				centre_map(grid_to_latlong(locator_));
-				zoom_azimuthal();
+				centre_map();
 				break;
 			}
 
@@ -1938,10 +1935,6 @@ void dxa_if::zoom_azimuthal() {
 	zoom = (float)(EARTH_RADIUS * PI) / (float)furthest_ * 1.05F;
 	map->PutZoom(zoom);
 	zoom_value_ = map->GetZoom();
-	char msg[256];
-	snprintf(msg, 256, "DXATLAS: Zoom required distance %d km, Z = %f obtained %f",
-		furthest_, zoom, zoom_value_);
-	status_->misc_status(ST_NOTE, msg);
 }
 
 // Centre the map according to the settings
@@ -2057,6 +2050,7 @@ void dxa_if::centre_map() {
 		break;
 	}
 	case DxAtlas::EnumProjection::PRJ_AZIMUTHAL: {
+		centre_map({ (double)home_lat_, (double)home_long_ });
 		zoom_azimuthal();
 		break;
 	}
