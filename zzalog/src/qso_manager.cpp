@@ -722,40 +722,10 @@ void qso_manager::qso_group::load_values() {
 	}
 }
 
-// Create qso_group
-void qso_manager::qso_group::create_form(int X, int Y) {
-	int max_w = 0;
-	int max_h = 0;
-
-	begin();
-
-	Fl_Group* g = new Fl_Group(X, Y, 0, 0, "QSO Data Entry");
-	g->labelfont(FONT);
-	g->labelsize(FONT_SIZE);
-	g->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
-	g->box(FL_BORDER_BOX);
-
-	// Choice widget to select the reqiuired logging mode
-	ch_logmode_ = new Fl_Choice(x() + GAP + WLLABEL, y() + HTEXT, 8 * WBUTTON, HTEXT, "QSO initialisation");
-	ch_logmode_->labelfont(FONT);
-	ch_logmode_->labelsize(FONT_SIZE);
-	ch_logmode_->textfont(FONT);
-	ch_logmode_->textsize(FONT_SIZE);
-	ch_logmode_->align(FL_ALIGN_LEFT);
-	ch_logmode_->add("Current date and time - used for parsing only");
-	ch_logmode_->add("All fields blank");
-	ch_logmode_->add("Current date and time, data from CAT");
-	ch_logmode_->add("Current date and time, data from selected QSO - including call");
-	ch_logmode_->add("Current date and time, data from selected QSO - excluding call");
-	ch_logmode_->add("Current date and time, no other data");
-	ch_logmode_->value(logging_mode_);
-	ch_logmode_->callback(cb_logging_mode, &logging_mode_);
-	ch_logmode_->tooltip("Select the logging mode - i.e. how to initialise a new QSO record");
-
-	int curr_y = ch_logmode_->y() + ch_logmode_->h() + GAP;;
-	int top = ch_logmode_->y() + ch_logmode_->h();
-	int left = x() + GAP;
-	int curr_x = left;
+// Create contest group
+Fl_Group* qso_manager::qso_group::create_contest_group(int X, int Y) {
+	int curr_x = X;
+	int curr_y = Y;
 
 	Fl_Group* g_contest = new Fl_Group(curr_x, curr_y, 0, 0, "Contest");
 	g_contest->labelfont(FONT);
@@ -798,7 +768,7 @@ void qso_manager::qso_group::create_form(int X, int Y) {
 	ch_contest_id_->callback(cb_value<field_choice, string>, &contest_id_);
 	ch_contest_id_->tooltip("Select the ID for the contest (for logging)");
 
-	max_w = max(max_w, curr_x + ch_contest_id_->w() + GAP - x());
+	int max_w = curr_x + ch_contest_id_->w() + GAP - x();
 	curr_x = g_contest->x() + GAP + WLABEL;
 	curr_y += ch_contest_id_->h();
 
@@ -827,11 +797,11 @@ void qso_manager::qso_group::create_form(int X, int Y) {
 	bn_add_exch_->callback(cb_add_exch, nullptr);
 	bn_add_exch_->selection_color(FL_RED);
 	bn_add_exch_->tooltip("Add new exchange format - choose fields and click \"TX\" or \"RX\" to create them");
-	
+
 	curr_x += bn_add_exch_->w() + GAP;
 
 	// Define contest exchanges
-	bn_define_tx_ = new Fl_Button(curr_x, curr_y, WBUTTON/2, HBUTTON, "TX");
+	bn_define_tx_ = new Fl_Button(curr_x, curr_y, WBUTTON / 2, HBUTTON, "TX");
 	bn_define_tx_->labelfont(FONT);
 	bn_define_tx_->labelsize(FONT_SIZE);
 	bn_define_tx_->callback(cb_def_format, (void*)true);
@@ -840,13 +810,13 @@ void qso_manager::qso_group::create_form(int X, int Y) {
 	curr_x += bn_define_tx_->w();
 
 	// Define contest
-	bn_define_rx_ = new Fl_Button(curr_x, curr_y, WBUTTON/2, HBUTTON, "RX");
+	bn_define_rx_ = new Fl_Button(curr_x, curr_y, WBUTTON / 2, HBUTTON, "RX");
 	bn_define_rx_->labelfont(FONT);
 	bn_define_rx_->labelsize(FONT_SIZE);
 	bn_define_rx_->callback(cb_def_format, (void*)false);
 	bn_define_rx_->tooltip("Use the specified fields as contest exchange on receive");
 
-	curr_x += bn_define_rx_->w() +GAP;
+	curr_x += bn_define_rx_->w() + GAP;
 
 	// Serial number control buttons - Initialise to 001
 	bn_init_serno_ = new Fl_Button(curr_x, curr_y, WBUTTON / 2, HBUTTON, "@|<");
@@ -891,16 +861,25 @@ void qso_manager::qso_group::create_form(int X, int Y) {
 	g_contest->size(curr_x - g_contest->x(), curr_y - g_contest->y());
 	g_contest->end();
 
-	curr_x += GAP;
+	return g_contest;
+}
 
-	max_w = max(max_w, curr_x - x());
-	curr_y += GAP;
+Fl_Group* qso_manager::qso_group::create_entry_group(int X, int Y) {
+	int curr_x = X;
+	int curr_y = Y;
+
 	int col2_y = curr_y;
-	curr_x = left;
+	int max_w = 0;
 
+	Fl_Group* g = new Fl_Group(curr_x, curr_y, 0, 0, "Entry");
+	g->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
+	g->box(FL_BORDER_BOX);
+
+	curr_x += GAP;
+	curr_y += GAP;
 	// Fixed fields
 	// N rows of NUMBER_PER_ROW
-	const int NUMBER_PER_ROW = 3;
+	const int NUMBER_PER_ROW = 2;
 	const int WCHOICE = WBUTTON * 3 / 2;
 	const int WINPUT = WBUTTON * 7 / 4;
 	for (int ix = 0; ix < NUMBER_TOTAL; ix++) {
@@ -927,7 +906,7 @@ void qso_manager::qso_group::create_form(int X, int Y) {
 		curr_x += WINPUT + GAP;
 		if (ix % NUMBER_PER_ROW == (NUMBER_PER_ROW - 1)) {
 			max_w = max(max_w, curr_x - x());
-			curr_x = left;
+			curr_x = X + GAP;
 			curr_y += HBUTTON;
 		}
 	}
@@ -936,9 +915,9 @@ void qso_manager::qso_group::create_form(int X, int Y) {
 	max_w = max(max_w, curr_x);
 
 	// nOtes input
-	curr_x = left + WCHOICE;
+	curr_x = X + WCHOICE;
 	curr_y += HBUTTON;
-	
+
 	ip_notes_ = new intl_input(curr_x, curr_y, max_w - curr_x, HBUTTON, "NOTES");
 	ip_notes_->labelfont(FONT);
 	ip_notes_->labelsize(FONT_SIZE);
@@ -947,137 +926,136 @@ void qso_manager::qso_group::create_form(int X, int Y) {
 	ip_notes_->callback(cb_ip_notes, nullptr);
 	ip_notes_->tooltip("Add any notes for the QSO");
 
-	curr_x = left + WLABEL;
-	curr_y += HBUTTON;
-
-
-	// QSO start/stop
-	curr_x = left;
-	curr_y += GAP;
-
-	bn_activate_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Activate");
-	bn_activate_->callback(cb_activate);
-	bn_activate_->color(FL_CYAN);
-	bn_activate_->tooltip("Pre-load QSO fields based on logging mode");
-	curr_x += bn_activate_->w();
-
-	bn_start_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Start");
-	bn_start_->callback(cb_start);
-	bn_start_->color(FL_YELLOW);
-	bn_start_->tooltip("Start the QSO, after saving, and/or activating");
-	curr_x += bn_start_->w();
-
-	bn_save_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Save");
-	bn_save_->callback(cb_save);
-	bn_save_->color(FL_GREEN);
-	bn_save_->tooltip("Log the QSO, activate a new one");
-	curr_x += bn_save_->w();
-
-	bn_edit_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Edit");
-	bn_edit_->callback(cb_edit);
-	bn_edit_->color(FL_MAGENTA);
-	bn_edit_->tooltip("Edit the selected QSO");
-	curr_x += bn_edit_->w();
-
-	bn_cancel_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Cancel");
-	bn_cancel_->callback(cb_cancel);
-	bn_cancel_->color(fl_lighter(FL_RED));
-	bn_cancel_->tooltip("Cancel the current QSO entry or edit");
-	curr_x += bn_edit_->w() + GAP;
-
-	bn_wkd_b4_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "B4?");
-	bn_wkd_b4_->labelfont(FONT);
-	bn_wkd_b4_->labelsize(FONT_SIZE);
-	bn_wkd_b4_->callback(cb_wkb4);
-	bn_wkd_b4_->tooltip("Display all previous QSOs with this callsign");
-
-	curr_x += bn_wkd_b4_->w();
-
-	bn_parse_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "DX?");
-	bn_parse_->labelfont(FONT);
-	bn_parse_->labelsize(FONT_SIZE);
-	bn_parse_->callback(cb_parse);
-	bn_parse_->tooltip("Display the DX details for this callsign");
-
-	curr_x += bn_parse_->w() + GAP;
-
-	bn_view_qsl_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "View QSL");
-	bn_view_qsl_->callback(cb_bn_view_qsl);
-	bn_view_qsl_->tooltip("Display QSL status");
-
-	max_w = max(max_w, curr_x);
-
-	curr_x = left;
-	curr_y += HBUTTON;
-
-	bn_edit_qth_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Edit QTH");
-	bn_edit_qth_->callback(cb_bn_edit_qth);
-	bn_edit_qth_->tooltip("Edit the details of the QTH macro");
-
-	curr_x += bn_edit_qth_->w();
-
-	grp_nav_ = new Fl_Group(curr_x, curr_y, 10, HBUTTON, "Navigate");
-	grp_nav_->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
-
-	curr_x += WBUTTON;
-
-	const int WHALF = WBUTTON / 2;
-	bn_nav_f_ = new Fl_Button(curr_x, curr_y, WHALF, HBUTTON, "@$->|");
-	bn_nav_f_->callback(cb_bn_navigate, (void*)NV_FIRST);
-	bn_nav_f_->tooltip("Select first record in book");
-
-	curr_x += bn_nav_f_->w();
-
-	bn_nav_p_ = new Fl_Button(curr_x, curr_y, WHALF, HBUTTON, "@<-");
-	bn_nav_p_->callback(cb_bn_navigate, (void*)NV_PREV);
-	bn_nav_p_->tooltip("Select previous record in book");
-
-	curr_x += bn_nav_p_->w();
-
-	bn_nav_n_ = new Fl_Button(curr_x, curr_y, WHALF, HBUTTON, "@->");
-	bn_nav_n_->callback(cb_bn_navigate, (void*)NV_NEXT);
-	bn_nav_n_->tooltip("Select next record in book");
-
-	curr_x += bn_nav_n_->w();
-
-	bn_nav_l_ = new Fl_Button(curr_x, curr_y, WHALF, HBUTTON, "@->|");
-	bn_nav_l_->callback(cb_bn_navigate, (void*)NV_LAST);
-	bn_nav_l_->tooltip("Select last record in book");
-
-	curr_x += bn_nav_l_->w();
-
-	grp_nav_->resizable(nullptr);
-	grp_nav_->size(curr_x - grp_nav_->x(), grp_nav_->h());
-	grp_nav_->end();
-
-	max_w = max(max_w, curr_x);
-	curr_x = left;
-	curr_y += HBUTTON;
-
-	// end of column 1 widgets
-	max_h = curr_y + GAP;
-
+	curr_y += HBUTTON + GAP;
 	g->resizable(nullptr);
-	g->size(max_w, max_h);
+	g->size(max_w, curr_y - Y);
 	g->end();
 
+	return g;
+}
+
+// Query table
+Fl_Group* qso_manager::qso_group::create_query_group(int X, int Y) {
+
+	int curr_x = X;
+	int curr_y = Y;
+
+	Fl_Group* g = new Fl_Group(curr_x, curr_y, 0, 0, "Query");
+	g->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
+	g->box(FL_BORDER_BOX);
+
+	const int WTABLE = 420;
+	const int HTABLE = 0;
+
+	curr_x += GAP;
+	curr_y += HTEXT + HTEXT;
+
+	tab_query_ = new record_table(curr_x, curr_y, WTABLE, HTABLE, "Query Message goes here");
+	tab_query_->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
+
+	curr_x += WTABLE + GAP;
+	curr_y += HTABLE + GAP;
+
+	g->resizable(nullptr);
+	g->size(curr_x - X, curr_y - Y);
+	g->end();
+
+	return g;
+}
+
+// QSO control group
+Fl_Group* qso_manager::qso_group::create_button_group(int X, int Y) {
+	int curr_x = X;
+	int curr_y = Y;
+
+	Fl_Group* g = new Fl_Group(curr_x, curr_y, 0, 0, "Controls");
+	g->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
+	g->box(FL_BORDER_BOX);
+
+	curr_x += GAP;
+	curr_y += HTEXT;
+	int max_x = curr_x;
+
+	const int NUMBER_PER_ROW = 8;
+	for (int ix = 0; ix < MAX_ACTIONS; ix++) {
+		bn_action_[ix] = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "");
+		if ((ix + 1) % NUMBER_PER_ROW == 0 && ix < MAX_ACTIONS) {
+			curr_x += WBUTTON;
+			max_x = max(max_x, curr_x);
+			curr_x = X + GAP;
+			curr_y += HBUTTON;
+		}
+		else {
+			curr_x += WBUTTON;
+			max_x = max(max_x, curr_x);
+		}
+	}
+
+	max_x += GAP;
+	curr_y += GAP;
+	g->resizable(nullptr);
+	g->size(max_x - X, curr_y - Y);
+	g->end();
+
+	return g;
+}
+
+// Create qso_group
+void qso_manager::qso_group::create_form(int X, int Y) {
+	int max_w = 0;
+
+	begin();
+	align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
+	box(FL_BORDER_BOX);
+	label("QSO Data");
+
+	// Choice widget to select the reqiuired logging mode
+	ch_logmode_ = new Fl_Choice(x() + GAP + WLLABEL, y() + HTEXT, 8 * WBUTTON, HTEXT, "QSO initialisation");
+	ch_logmode_->labelfont(FONT);
+	ch_logmode_->labelsize(FONT_SIZE);
+	ch_logmode_->textfont(FONT);
+	ch_logmode_->textsize(FONT_SIZE);
+	ch_logmode_->align(FL_ALIGN_LEFT);
+	ch_logmode_->add("Current date and time - used for parsing only");
+	ch_logmode_->add("All fields blank");
+	ch_logmode_->add("Current date and time, data from CAT");
+	ch_logmode_->add("Current date and time, data from selected QSO - including call");
+	ch_logmode_->add("Current date and time, data from selected QSO - excluding call");
+	ch_logmode_->add("Current date and time, no other data");
+	ch_logmode_->value(logging_mode_);
+	ch_logmode_->callback(cb_logging_mode, &logging_mode_);
+	ch_logmode_->tooltip("Select the logging mode - i.e. how to initialise a new QSO record");
+
+	int curr_y = ch_logmode_->y() + ch_logmode_->h() + GAP;;
+	int top = ch_logmode_->y() + ch_logmode_->h();
+	int curr_x = X + GAP;
+
+	g_contest_ = create_contest_group(curr_x, curr_y);
+
+	max_w = max(max_w, g_contest_->x() + g_contest_->w() + GAP);
+	curr_y = g_contest_->y() + g_contest_->h() + GAP;
+
+	// One or the other of the two groups below will be shown at a time
+	g_entry_ = create_entry_group(curr_x, curr_y);
+	max_w = max(max_w, g_entry_->x() + g_entry_->w() + GAP);
+	g_query_ = create_query_group(curr_x, curr_y);
+	max_w = max(max_w, g_query_->x() + g_query_->w() + GAP);
+	curr_y = max(g_entry_->y() + g_entry_->h(), g_query_->y() + g_query_->h()) + GAP;
+
+	g_buttons_ = create_button_group(curr_x, curr_y);
+	max_w = max(max_w, g_buttons_->x() + g_buttons_->w() + GAP);
+	curr_y += g_buttons_->h() + GAP;
+
+	ch_logmode_->size(max_w - ch_logmode_->x() - GAP, ch_logmode_->h());
+
 	resizable(nullptr);
-	size(max_w, max_h);
+	size(max_w, curr_y - Y);
 	end();
 
 	initialise_fields();
 }
 
-// Enable QSO widgets
-void qso_manager::qso_group::enable_widgets() {
-	// Disable log mode menu item from CAT if no CAT
-	if (rig_if_ == nullptr) {
-		ch_logmode_->mode(LM_ON_AIR_CAT, ch_logmode_->mode(LM_ON_AIR_CAT) | FL_MENU_INACTIVE);
-	}
-	else {
-		ch_logmode_->mode(LM_ON_AIR_CAT, ch_logmode_->mode(LM_ON_AIR_CAT) & ~FL_MENU_INACTIVE);
-	}
-	ch_logmode_->redraw();
+void qso_manager::qso_group::enable_contest_widgets() {
 	// Get exchange data
 	if (exch_fmt_ix_ < MAX_CONTEST_TYPES && field_mode_ == CONTEST) {
 		char text[10];
@@ -1115,7 +1093,7 @@ void qso_manager::qso_group::enable_widgets() {
 	bn_inc_serno_->redraw();
 	bn_dec_serno_->redraw();
 	// Mode dependent
-	switch(field_mode_) {
+	switch (field_mode_) {
 	case NEW:
 		bn_add_exch_->activate();
 		bn_add_exch_->label("Add");
@@ -1146,75 +1124,104 @@ void qso_manager::qso_group::enable_widgets() {
 	bn_add_exch_->redraw();
 	bn_define_rx_->redraw();
 	bn_define_tx_->redraw();
-	// Start/Log/cancel buttons
+
+}
+
+// Enable field widgets
+void qso_manager::qso_group::enable_entry_widgets() {
 	switch (logging_state_) {
 	case QSO_INACTIVE:
-		bn_activate_->activate();
-		bn_start_->activate();
-		bn_save_->activate();
-		bn_cancel_->deactivate();
-		bn_edit_->activate();
-		bn_edit_qth_->deactivate();
-		bn_view_qsl_->deactivate();
-		grp_nav_->activate();
+		g_entry_->show();
 		for (int ix = 0; ix < NUMBER_TOTAL; ix++) {
 			if (ch_field_[ix]) ch_field_[ix]->deactivate();
 			ip_field_[ix]->deactivate();
 		}
 		ip_notes_->deactivate();
 		break;
-	case QSO_EDIT:
-		bn_activate_->deactivate();
-		bn_start_->deactivate();
-		bn_save_->activate();
-		bn_cancel_->activate();
-		bn_edit_->deactivate();
-		bn_edit_qth_->activate();
-		bn_view_qsl_->activate();
-		grp_nav_->activate();
-		for (int ix = 0; ix < NUMBER_TOTAL; ix++) {
-			if (ch_field_[ix]) ch_field_[ix]->activate();
-			ip_field_[ix]->activate();
-		}
-		ip_notes_->activate();
-		break;
 	case QSO_PENDING:
-		bn_activate_->deactivate();
-		bn_start_->activate();
-		bn_save_->activate();
-		bn_cancel_->activate();
-		bn_edit_->deactivate();
-		bn_edit_qth_->deactivate();
-		bn_view_qsl_->activate();
-		grp_nav_->activate();
-		for (int ix = 0; ix < NUMBER_TOTAL; ix++) {
+		g_entry_->show();
+			for (int ix = 0; ix < NUMBER_TOTAL; ix++) {
 			if (ch_field_[ix]) ch_field_[ix]->activate();
 			ip_field_[ix]->activate();
 		}
 		ip_notes_->activate();
 		break;
 	case QSO_STARTED:
-		bn_activate_->deactivate();
-		bn_start_->deactivate();
-		bn_save_->activate();
-		bn_cancel_->activate();
-		bn_edit_->deactivate();
-		bn_edit_qth_->activate();
-		bn_view_qsl_->deactivate();
-		grp_nav_->deactivate();
-		for (int ix = 0; ix < NUMBER_TOTAL; ix++) {
+		g_entry_->show();
+			for (int ix = 0; ix < NUMBER_TOTAL; ix++) {
 			if (ch_field_[ix]) ch_field_[ix]->activate();
 			ip_field_[ix]->activate();
 		}
 		ip_notes_->activate();
 		break;
+	case QSO_EDIT:
+		g_entry_->show();
+			for (int ix = 0; ix < NUMBER_TOTAL; ix++) {
+			if (ch_field_[ix]) ch_field_[ix]->activate();
+			ip_field_[ix]->activate();
+		}
+		ip_notes_->activate();
+		break;
+	default:
+		// Reserver=d for Query states
+		g_entry_->hide();
+		break;
 	}
-	bn_activate_->redraw();
-	bn_start_->redraw();
-	bn_save_->redraw();
-	bn_cancel_->redraw();
-	bn_edit_->redraw();
-	bn_edit_qth_->redraw();
+}
+
+// Enable query widgets
+void qso_manager::qso_group::enable_query_widgets() {
+	switch (logging_state_) {
+	case QSO_INACTIVE:
+	case QSO_PENDING:
+	case QSO_STARTED:
+	case QSO_EDIT:
+		g_query_->hide();
+		break;
+	default:
+		g_query_->show();
+		tab_query_->activate();
+		break;
+	}
+}
+
+// Enable action buttons
+void qso_manager::qso_group::enable_button_widgets() {
+	const list<button_type>& buttons = button_map_.at(logging_state_);
+	int ix = 0;
+	for (auto bn = buttons.begin(); bn != buttons.end() && ix < MAX_ACTIONS; bn++, ix++) {
+		const button_action& action = action_map_.at(*bn);
+		bn_action_[ix]->label(action.label);
+		bn_action_[ix]->tooltip(action.label);
+		bn_action_[ix]->color(action.colour);
+		bn_action_[ix]->callback(action.callback, action.userdata);
+		bn_action_[ix]->activate();
+	}
+	for (; ix < MAX_ACTIONS; ix++) {
+		bn_action_[ix]->label("");
+		bn_action_[ix]->tooltip("");
+		bn_action_[ix]->color(FL_BACKGROUND_COLOR);
+		bn_action_[ix]->callback((Fl_Callback*)nullptr);
+		bn_action_[ix]->deactivate();
+	}
+}
+
+// Enable QSO widgets
+void qso_manager::qso_group::enable_widgets() {
+	// Disable log mode menu item from CAT if no CAT
+	if (rig_if_ == nullptr) {
+		ch_logmode_->mode(LM_ON_AIR_CAT, ch_logmode_->mode(LM_ON_AIR_CAT) | FL_MENU_INACTIVE);
+	}
+	else {
+		ch_logmode_->mode(LM_ON_AIR_CAT, ch_logmode_->mode(LM_ON_AIR_CAT) & ~FL_MENU_INACTIVE);
+	}
+	ch_logmode_->redraw();
+
+	enable_contest_widgets();
+	enable_entry_widgets();
+	enable_query_widgets();
+	enable_button_widgets();
+
 }
 
 // Update specific station item input

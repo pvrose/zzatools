@@ -9,6 +9,8 @@
 #include "alarm_dial.h"
 #include "field_choice.h"
 #include "qsl_viewer.h"
+#include "record_table.h"
+#include "book.h"
 
 #include <string>
 #include <vector>
@@ -189,6 +191,17 @@ using namespace std;
 			// View QSL button
 			static void cb_bn_view_qsl(Fl_Widget* w, void* v);
 
+			// Individual group creates
+			Fl_Group* create_contest_group(int X, int Y);
+			Fl_Group* create_entry_group(int X, int Y);
+			Fl_Group* create_query_group(int X, int Y);
+			Fl_Group* create_button_group(int X, int Y);
+			// Individual enable
+			void enable_contest_widgets();
+			void enable_entry_widgets();
+			void enable_query_widgets();
+			void enable_button_widgets();
+
 			// Add contest exchanges
 			void populate_exch_fmt();
 			// Copy fields from record
@@ -281,35 +294,92 @@ using namespace std;
 				"QSO_DATE", "TIME_ON", "CALL", "FREQ", 
 				"MODE", "TX_PWR" };
 
+			enum button_type {
+				ACTIVATE,
+				START_QSO,
+				EDIT_QSO,
+				CANCEL_EDIT,
+				CANCEL_BROWSE,
+				CANCEL_QSO,
+				QUIT_QSO,
+				SAVE_QSO,
+				SAVE_EDIT,
+				WORKED_B4,
+				PARSE,
+				EDIT_QTH,
+				NAV_FIRST,
+				NAV_PREV,
+				NAV_NEXT,
+				NAV_LAST,
+				ADD_QUERY,
+				REJECT_QUERY,
+				MERGE_QUERY,
+				FIND_QSO,
+				BROWSE,
+				KEEP_DUPE_1,
+				KEEP_DUPE_2,
+				MERGE_DUPE,
+				KEEP_BOTH_DUPES,
+				MERGE_DATA,
+				VIEW_QSL,
+			};
+
+			const map<logging_state_t, list<button_type> > button_map_ =
+			{
+				{ QSO_INACTIVE, {ACTIVATE, START_QSO, EDIT_QSO, BROWSE } },
+				{ QSO_PENDING, { START_QSO, QUIT_QSO, EDIT_QTH, WORKED_B4, PARSE } },
+				{ QSO_STARTED, { SAVE_QSO, CANCEL_QSO, EDIT_QTH, WORKED_B4, PARSE } },
+				{ QSO_EDIT, { SAVE_EDIT, CANCEL_EDIT, NAV_FIRST, NAV_PREV, NAV_NEXT, NAV_LAST, WORKED_B4, VIEW_QSL } }
+				// TODO add the query button maps
+			};
+
+			// Size of longest list in the above
+			static const int MAX_ACTIONS = 8;
+
+			struct button_action {
+				const char* label;
+				const char* tooltip;
+				Fl_Color colour;
+				Fl_Callback* callback;
+				void* userdata;
+			};
+
+			const map<button_type, button_action> action_map_ = 
+			{
+				{ ACTIVATE, { "Activate", "Pre-load QSO fields based on logging mode", FL_CYAN, cb_activate, 0 } },
+				{ START_QSO, { "Start QSO", "Start the QSO, after saving, and/or activating", FL_YELLOW, cb_start, 0 } },
+				{ EDIT_QSO, { "Edit QSO", "Edit the selected QSO", FL_MAGENTA, cb_edit, 0 } },
+				{ BROWSE, { "Browse Log", "Browse the log without editing", FL_BACKGROUND_COLOR, nullptr, 0}}, // TODO
+				{ QUIT_QSO, { "Quit", "Quit entry mode", fl_lighter(FL_RED), cb_cancel, 0 } },
+				{ EDIT_QTH, { "Edit QTH", "Edit the details of the QTH macro", FL_BACKGROUND_COLOR, cb_bn_edit_qth, 0 } },
+				{ SAVE_QSO, { "Save QSO", "Log the QSO, activate a new one", FL_GREEN, cb_save, 0 } },
+				{ CANCEL_QSO, { "Quit QSO", "Cancel the current QSO entry", fl_lighter(FL_RED), cb_cancel, 0 } },
+				{ WORKED_B4, { "B4?", "Display all previous QSOs with this callsign", FL_BACKGROUND_COLOR, cb_wkb4, 0 } },
+				{ SAVE_EDIT, { "Save", "Copy changed record back to book", FL_GREEN, cb_save, 0}},
+				{ CANCEL_EDIT, { "Cancel Edit", "Cancel the current QSO edit", fl_lighter(FL_RED), cb_cancel, 0 } },
+				{ NAV_FIRST, { "@$->|", "Select first record in book", FL_YELLOW, cb_bn_navigate, (void*)NV_FIRST } },
+				{ NAV_PREV, { "@<-", "Select previous record in book", FL_YELLOW, cb_bn_navigate, (void*)NV_PREV } },
+				{ NAV_NEXT, { "@->", "Select next record in book", FL_YELLOW, cb_bn_navigate, (void*)NV_NEXT } },
+				{ NAV_LAST, { "@->|", "Select last record in book", FL_YELLOW, cb_bn_navigate, (void*)NV_LAST } },
+				{ VIEW_QSL, { "View QSL", "Display QSL status", FL_BACKGROUND_COLOR, cb_bn_view_qsl, 0 } },
+				{ PARSE, { "DX?", "Display the DX details for this callsign", FL_BACKGROUND_COLOR, cb_parse, 0 } }
+			};
+
 			// Previous value
 			string previous_qth_;
 			string previous_locator_;
+			// Query message
+			string query_message_;
 
 			// Widgets
-			// Activate - go to QSO_PENDING state
-			Fl_Button* bn_activate_;
-			// Start - go to QSO_STARTED state
-			Fl_Button* bn_start_;
-			// Save - log
-			Fl_Button* bn_save_;
-			// Cancel 
-			Fl_Button* bn_cancel_;
-			// Edit
-			Fl_Button* bn_edit_;
-			// Worked before button
-			Fl_Button* bn_wkd_b4_;
-			// Parse button
-			Fl_Button* bn_parse_;
-			// Open QSL Viewr window
-			Fl_Button* bn_view_qsl_;
-			// Edit QTH
-			Fl_Button* bn_edit_qth_;
-			// Navigate buttons
-			Fl_Group* grp_nav_;
-			Fl_Button* bn_nav_f_;
-			Fl_Button* bn_nav_p_;
-			Fl_Button* bn_nav_n_;
-			Fl_Button* bn_nav_l_;
+			// Contest group
+			Fl_Group* g_contest_;
+			// Entry group
+			Fl_Group* g_entry_;
+			// Query group
+			Fl_Group* g_query_;
+			// Button group
+			Fl_Group* g_buttons_;
 			// Group for freq/power/mode
 			Fl_Group* grp_fpm_;
 			// Logging mode
@@ -343,6 +413,10 @@ using namespace std;
 			field_input* ip_field_[NUMBER_TOTAL];
 			// QSL Viewer window
 			qsl_viewer* qsl_viewer_;
+			// Record table
+			record_table* tab_query_;
+			// Action buttos
+			Fl_Button* bn_action_[MAX_ACTIONS];
 
 		};
 
