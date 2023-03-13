@@ -639,6 +639,9 @@ qso_manager::qso_group::qso_group(int X, int Y, int W, int H, const char* l) :
 	qsl_viewer_ = new qsl_viewer(10, 10);
 	qsl_viewer_->callback(cb_qsl_viewer);
 	qsl_viewer_->hide();
+	// Initialise field input map
+	field_ip_map_.clear();
+
 }
 
 // Destructor
@@ -900,9 +903,14 @@ Fl_Group* qso_manager::qso_group::create_entry_group(int X, int Y) {
 		ip_field_[ix]->input()->when(FL_WHEN_RELEASE_ALWAYS);
 		if (ix < NUMBER_FIXED) {
 			ip_field_[ix]->field_name(fixed_names_[ix].c_str());
-			field_ips_[fixed_names_[ix]] = ip_field_[ix];
+			field_ip_map_[fixed_names_[ix]] = ix;
+			field_names_[ix] = fixed_names_[ix];
 			ip_field_[ix]->label(fixed_names_[ix].c_str());
 		}
+		else {
+			field_names_[ix] = "";
+		}
+		number_fields_in_use_ = NUMBER_FIXED;
 		curr_x += WINPUT + GAP;
 		if (ix % NUMBER_PER_ROW == (NUMBER_PER_ROW - 1)) {
 			max_w = max(max_w, curr_x - x());
@@ -945,13 +953,14 @@ Fl_Group* qso_manager::qso_group::create_query_group(int X, int Y) {
 	g->box(FL_BORDER_BOX);
 
 	const int WTABLE = 420;
-	const int HTABLE = 0;
+	const int HTABLE = 250;
 
 	curr_x += GAP;
-	curr_y += HTEXT + HTEXT;
+	curr_y += HTEXT;
 
 	tab_query_ = new record_table(curr_x, curr_y, WTABLE, HTABLE, "Query Message goes here");
 	tab_query_->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
+	tab_query_->callback(cb_tab_qso, nullptr);
 
 	curr_x += WTABLE + GAP;
 	curr_y += HTABLE + GAP;
@@ -1129,6 +1138,7 @@ void qso_manager::qso_group::enable_contest_widgets() {
 
 // Enable field widgets
 void qso_manager::qso_group::enable_entry_widgets() {
+	// Now enable disan=
 	switch (logging_state_) {
 	case QSO_INACTIVE:
 		g_entry_->show();
@@ -1139,26 +1149,16 @@ void qso_manager::qso_group::enable_entry_widgets() {
 		ip_notes_->deactivate();
 		break;
 	case QSO_PENDING:
-		g_entry_->show();
-			for (int ix = 0; ix < NUMBER_TOTAL; ix++) {
-			if (ch_field_[ix]) ch_field_[ix]->activate();
-			ip_field_[ix]->activate();
-		}
-		ip_notes_->activate();
-		break;
 	case QSO_STARTED:
-		g_entry_->show();
-			for (int ix = 0; ix < NUMBER_TOTAL; ix++) {
-			if (ch_field_[ix]) ch_field_[ix]->activate();
-			ip_field_[ix]->activate();
-		}
-		ip_notes_->activate();
-		break;
 	case QSO_EDIT:
 		g_entry_->show();
-			for (int ix = 0; ix < NUMBER_TOTAL; ix++) {
+		for (int ix = 0; ix <= number_fields_in_use_ && ix < NUMBER_TOTAL; ix++) {
 			if (ch_field_[ix]) ch_field_[ix]->activate();
 			ip_field_[ix]->activate();
+		}
+		for (int ix = number_fields_in_use_ + 1; ix < NUMBER_TOTAL; ix++) {
+			ch_field_[ix]->deactivate();
+			ip_field_[ix]->deactivate();
 		}
 		ip_notes_->activate();
 		break;
@@ -1178,6 +1178,7 @@ void qso_manager::qso_group::enable_query_widgets() {
 	case QSO_EDIT:
 		g_query_->hide();
 		break;
+	case QSO_BROWSE:
 	default:
 		g_query_->show();
 		tab_query_->activate();
@@ -1194,6 +1195,7 @@ void qso_manager::qso_group::enable_button_widgets() {
 		bn_action_[ix]->label(action.label);
 		bn_action_[ix]->tooltip(action.label);
 		bn_action_[ix]->color(action.colour);
+		bn_action_[ix]->labelcolor(fl_contrast(FL_FOREGROUND_COLOR, action.colour));
 		bn_action_[ix]->callback(action.callback, action.userdata);
 		bn_action_[ix]->activate();
 	}
@@ -1228,16 +1230,16 @@ void qso_manager::qso_group::enable_widgets() {
 void qso_manager::qso_group::update_station_choices(stn_item_t station_item) {
 	// Note can update multiple items as the flags are bit wise
 	if (station_item & RIG) {
-		field_ips_["MY_RIG"]->reload_choice();
+		ip_field_[field_ip_map_["MY_RIG"]]->reload_choice();
 	}
 	if (station_item & ANTENNA) {
-		field_ips_["MY_ANTENNA"]->reload_choice();
+		ip_field_[field_ip_map_["MY_ANTENNA"]]->reload_choice();
 	}
 	if (station_item & QTH) {
-		field_ips_["APP_ZZA_QTH"]->reload_choice();
+		ip_field_[field_ip_map_["APP_ZZA_QTH"]]->reload_choice();
 	}
 	if (station_item & CALLSIGN) {
-		field_ips_["STATION_CALLSIGN"]->reload_choice();
+		ip_field_[field_ip_map_["STATION_CALLSIGN"]]->reload_choice();
 	}
 	redraw();
 }
@@ -1536,6 +1538,9 @@ void qso_manager::qso_group::cb_cancel(Fl_Widget* w, void* v) {
 	case QSO_EDIT:
 		that->action_cancel_edit();
 		break;
+	case QSO_BROWSE:
+		that->action_cancel_browse();
+		break;
 	}
 }
 
@@ -1546,13 +1551,17 @@ void qso_manager::qso_group::cb_edit(Fl_Widget* w, void* v) {
 	case QSO_INACTIVE:
 		that->action_edit();
 		break;
+	case QSO_BROWSE:
+		that->action_cancel_browse();
+		that->action_edit();
+		break;
 	}
 }
 
 // Callback - Worked B4? button
 void qso_manager::qso_group::cb_wkb4(Fl_Widget* w, void* v) {
 	qso_group* that = ancestor_view<qso_group>(w);
-	extract_records_->extract_call(string(that->field_ips_["CALL"]->value()));
+	extract_records_->extract_call(string(that->ip_field_[that->field_ip_map_["CALL"]]->value()));
 	book_->selection(that->current_rec_num_, HT_SELECTED);
 }
 
@@ -1564,7 +1573,7 @@ void qso_manager::qso_group::cb_parse(Fl_Widget* w, void* v) {
 	record* tip_record = mgr->dummy_qso();
 	string message = "";
 	// Set the callsign in the temporary record
-	tip_record->item("CALL", string(that->field_ips_["CALL"]->value()));
+	tip_record->item("CALL", string(that->ip_field_[that->field_ip_map_["CALL"]]->value()));
 	// Parse the temporary record
 	message = pfx_data_->get_tip(tip_record);
 	// Create a tooltip window at the parse button (in w) X and Y
@@ -1624,6 +1633,18 @@ void qso_manager::qso_group::cb_bn_navigate(Fl_Widget* w, void* v) {
 	that->action_navigate(target);
 }
 
+// Callback - browse
+void qso_manager::qso_group::cb_bn_browse(Fl_Widget* w, void* v) {
+	qso_group* that = ancestor_view<qso_group>(w);
+	switch (that->logging_state_) {
+	case QSO_INACTIVE:
+		that->action_browse();
+		break;
+	default:
+		break;
+	}
+}
+
 // Reset contest serial number
 void qso_manager::qso_group::cb_init_serno(Fl_Widget* w, void* v) {
 	qso_group* that = ancestor_view<qso_group>(w);
@@ -1652,11 +1673,14 @@ void qso_manager::qso_group::cb_dec_serno(Fl_Widget* w, void* v) {
 void qso_manager::qso_group::cb_ch_field(Fl_Widget* w, void* v) {
 	qso_group* that = ancestor_view<qso_group>(w);
 	field_choice* ch = (field_choice*)w;
-	int ix = (int)(long)v;
 	const char* field = ch->value();
-	that->ip_field_[ix]->field_name(field);	
-	that->ip_field_[ix]->value(that->current_qso_->item(field).c_str());
-
+	int ix = (int)(long)v;
+	if (strlen(field)) {
+		that->action_add_field(ix, field);
+	}
+	else {
+		that->action_del_field(ix);
+	}
 }
 
 // Callback - general input
@@ -1706,6 +1730,23 @@ void qso_manager::qso_group::cb_ip_notes(Fl_Widget* w, void* v) {
 	tabbed_forms_->update_views(nullptr, HT_MINOR_CHANGE, book_->size() - 1);
 }
 
+// Callback - table
+void qso_manager::qso_group::cb_tab_qso(Fl_Widget* w, void* v) {
+	qso_group* that = ancestor_view<qso_group>(w);
+	record_table* table = (record_table*)w;
+	int row = table->callback_row();
+	int col = table->callback_col();
+	int button = Fl::event_button();
+	bool double_click = Fl::event_clicks();
+	string field = table->field(row);
+	switch (table->callback_context()) {
+	case Fl_Table::CONTEXT_ROW_HEADER:
+		if (button == FL_LEFT_MOUSE && double_click) {
+			that->action_add_field(that->number_fields_in_use_, field);
+		}
+		break;
+	}
+}
 
 // Save the settings
 void qso_manager::qso_group::save_values() {
@@ -1786,6 +1827,7 @@ void qso_manager::qso_group::initialise_fields() {
 		if (new_fields) {
 			ch_field_[iy]->value(field_names[ix].c_str());
 			ip_field_[iy]->field_name(field_names[ix].c_str());
+			field_names_[iy] = field_names[ix];
 		}
 		if (lock_preset) {
 			ch_field_[iy]->deactivate();
@@ -1794,6 +1836,7 @@ void qso_manager::qso_group::initialise_fields() {
 			ch_field_[iy]->activate();
 		}
 	}
+	number_fields_in_use_ = NUMBER_FIXED + field_names.size();
 	for (; iy < NUMBER_TOTAL; iy++) {
 		ch_field_[iy]->value("");
 		ip_field_[iy]->value("");
@@ -1830,14 +1873,14 @@ void qso_manager::qso_group::initialise_fields() {
 				ip_field_[ix]->value(current_qso_->item(tx_fields[i]).c_str());
 			}
 		}
-		field_ips_["CALL"]->value("");
+		ip_field_[field_ip_map_["CALL"]]->value("");
 		ip_notes_->value("");
 		for (size_t i = NUMBER_FIXED + tx_fields.size(); i < NUMBER_TOTAL; i++) {
 			ip_field_[i]->value("");
 		}
 	}
 	else {
-		field_ips_["CALL"]->value("");
+		ip_field_[field_ip_map_["CALL"]]->value("");
 		ip_notes_->value("");
 		for (int i = NUMBER_FIXED; i < NUMBER_TOTAL; i++) {
 			ip_field_[i]->value("");
@@ -2045,7 +2088,7 @@ void qso_manager::qso_group::action_cancel() {
 
 // Action DEACTIVATE - Transition from QSO_PENDING to QSO_INACTIVE
 void qso_manager::qso_group::action_deactivate() {
-	if (logging_state_ != QSO_PENDING || current_qso_ == nullptr) {
+	if (logging_state_ != QSO_PENDING && logging_state_ != QSO_BROWSE || current_qso_ == nullptr) {
 		status_->misc_status(ST_SEVERE, "DASH: Attempting to deactivate when not pending");
 	}
 	delete current_qso_;
@@ -2111,16 +2154,36 @@ void qso_manager::qso_group::action_cancel_edit() {
 	qsl_viewer_->hide();
 }
 
+// Action CANCEL in BROWSE 
+void qso_manager::qso_group::action_cancel_browse() {
+	if (logging_state_ != QSO_BROWSE || current_qso_ == nullptr) {
+		status_->misc_status(ST_SEVERE, "DASH: Attempting to save a QSO when not editing one");
+		return;
+	}
+	if (current_rec_num_ != book_->selection()) {
+		status_->misc_status(ST_SEVERE, "DASH: Mismatch between selected QSO in book and QSO manager");
+		return;
+	}
+	current_qso_ = nullptr;
+	logging_state_ = QSO_INACTIVE;
+	copy_qso_to_display(CF_ALL_FLAGS);
+	enable_widgets();
+	qsl_viewer_->hide();
+}
+
 // Action navigate button
 void qso_manager::qso_group::action_navigate(int target) {
 	logging_state_t saved_state = logging_state_;
-	if (logging_state_ == QSO_EDIT) {
-		// Save current edit first
+	switch (logging_state_) {
+	case QSO_EDIT:
 		action_save_edit();
-	}
-	else if (logging_state_ == QSO_PENDING) {
-		// Cancel pending
+		break;
+	case QSO_PENDING:
 		action_deactivate();
+		break;
+	case QSO_BROWSE:
+		action_cancel_browse();
+		break;
 	}
 	// We should now be inactive - navigate to new QSO
 	book_->navigate((navigate_t)target);
@@ -2134,27 +2197,108 @@ void qso_manager::qso_group::action_navigate(int target) {
 		action_activate();
 		action_view_qsl();
 		break;
+	case QSO_BROWSE:
+		action_browse();
+		action_view_qsl();
+		break;
 	}
 }
 
 // Action view qsl
 void qso_manager::qso_group::action_view_qsl() {
-	if (logging_state_ != QSO_EDIT && logging_state_ != QSO_PENDING) {
+	switch(logging_state_) {
+	case QSO_EDIT:
+	case QSO_BROWSE:
+		if (current_qso_) {
+			char title[128];
+			snprintf(title, 128, "QSL Status: %s %s %s %s %s",
+				current_qso_->item("CALL").c_str(),
+				current_qso_->item("QSO_DATE").c_str(),
+				current_qso_->item("TIME_ON").c_str(),
+				current_qso_->item("BAND").c_str(),
+				current_qso_->item("MODE", true, true).c_str());
+			qsl_viewer_->copy_label(title);
+			qsl_viewer_->set_qso(current_qso_, current_rec_num_);
+			char msg[128];
+			snprintf(msg, 128, "DASH: %s", title);
+			status_->misc_status(ST_LOG, msg);
+		}
+		break;
+	default:
 		status_->misc_status(ST_SEVERE, "DASH: No QSO selected - cannot view QSL status");
-	} else if (current_qso_) {
-		char title[128];
-		snprintf(title, 128, "QSL Status: %s %s %s %s %s",
-			current_qso_->item("CALL").c_str(),
-			current_qso_->item("QSO_DATE").c_str(),
-			current_qso_->item("TIME_ON").c_str(),
-			current_qso_->item("BAND").c_str(),
-			current_qso_->item("MODE", true, true).c_str());
-		qsl_viewer_->copy_label(title);
-		qsl_viewer_->set_qso(current_qso_, current_rec_num_);
-		char msg[128];
-		snprintf(msg, 128, "DASH: %s", title);
-		status_->misc_status(ST_LOG, msg);
+		break;
 	}
+}
+
+// Action add field - add the selected field to the set of entries
+void qso_manager::qso_group::action_add_field(int ix, string field) {
+	if (ix == NUMBER_TOTAL) {
+		char msg[128];
+		snprintf(msg, 128, "DASH: Cannot add any more fields to edit - %s ignored", field.c_str());
+		status_->misc_status(ST_ERROR, msg);
+		return;
+	}
+	if (ix < number_fields_in_use_) {
+		const char* old_field = field_names_[ix].c_str();
+		ip_field_[ix]->field_name(field.c_str());
+		ip_field_[ix]->value(current_qso_->item(field).c_str());
+		// Change mapping
+		if (strlen(old_field)) {
+			field_ip_map_.erase(old_field);
+		}
+		field_ip_map_[field] = ix;
+		field_names_[ix] = field;
+	}
+	else if (ix == number_fields_in_use_) {
+		if (field_ip_map_.find(field) == field_ip_map_.end()) {
+			number_fields_in_use_++;
+			ch_field_[ix]->value(field.c_str());
+			ip_field_[ix]->field_name(field.c_str());
+			ip_field_[ix]->value(current_qso_->item(field).c_str());
+			field_ip_map_[field] = ix;
+			field_names_[ix] = field;
+		}
+	}
+	else {
+		status_->misc_status(ST_SEVERE, "DASH: Trying to select a deactivated widget");
+	}
+	enable_entry_widgets();
+}
+
+// Delete a field
+void qso_manager::qso_group::action_del_field(int ix) {
+	string& old_field = field_names_[ix];
+	field_ip_map_.erase(old_field);
+	int pos = ix;
+	for (; pos < number_fields_in_use_ - 1; pos++) {
+		string& field = field_names_[pos + 1];
+		field_names_[pos] = field;
+		ch_field_[pos]->value(field.c_str());
+		ip_field_[pos]->field_name(field.c_str());
+		ip_field_[pos]->value(current_qso_->item(field).c_str());
+	}
+	ch_field_[pos]->value("");
+	ip_field_[pos]->field_name("");
+	ip_field_[pos]->value("");
+	number_fields_in_use_--;
+
+	enable_entry_widgets();
+}
+
+// Action browse
+void qso_manager::qso_group::action_browse() {
+	if (logging_state_ != QSO_INACTIVE || original_qso_ != nullptr) {
+		status_->misc_status(ST_SEVERE, "DASH: Attempting to browse a QSO while inputing a QSO");
+		return;
+	}
+	// Copy current selection
+	current_rec_num_ = book_->selection();
+	// Edit currently selected QSO
+	current_qso_ = book_->get_record();
+	logging_state_ = QSO_BROWSE;
+	tab_query_->set_records(current_qso_, nullptr, nullptr);
+	tab_query_->label("Browsing record...");
+	enable_widgets();
 }
 
 // Clock group - constructor

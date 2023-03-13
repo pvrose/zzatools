@@ -17,6 +17,7 @@
 #include <map>
 #include <list>
 #include <set>
+#include <array>
 
 #include <FL/Fl_Widget.H>
 #include <FL/Fl_Table.H>
@@ -67,6 +68,7 @@ using namespace std;
 			QSO_PENDING,     // Collecting data for QSO - not qctive
 			QSO_STARTED,     // QSO started
 			QSO_EDIT,        // Editing existing QSO
+			QSO_BROWSE,      // View selected view in table view
 		};
 
 		// Hamlib parameters 
@@ -190,6 +192,10 @@ using namespace std;
 			static void cb_qsl_viewer(Fl_Widget* w, void* v);
 			// View QSL button
 			static void cb_bn_view_qsl(Fl_Widget* w, void* v);
+			// Browse call back
+			static void cb_bn_browse(Fl_Widget* w, void* v);
+			// Record table
+			static void cb_tab_qso(Fl_Widget* w, void* v);
 
 			// Individual group creates
 			Fl_Group* create_contest_group(int X, int Y);
@@ -243,6 +249,15 @@ using namespace std;
 			void action_navigate(int target);
 			// Update QSL viewer
 			void action_view_qsl();
+			// Browse record
+			void action_browse();
+			// Action add field to widgets
+			void action_add_field(int ix, string field);
+			// Action delete field
+			void action_del_field(int ix);
+			// Action cancel browse
+			void action_cancel_browse();
+
 			// Get default copy record
 			record* get_default_record();
 			// QTH has changed
@@ -284,8 +299,6 @@ using namespace std;
 			
 			// Serial number
 			int serial_num_;
-			// Map name back to index
-			map<string, field_input*> field_ips_;
 			// Loggable field names
 			static const int NUMBER_FIXED = 10;
 			static const int NUMBER_TOTAL = NUMBER_FIXED + 12;
@@ -293,6 +306,9 @@ using namespace std;
 				"MY_RIG", "MY_ANTENNA", "APP_ZZA_QTH", "STATION_CALLSIGN",
 				"QSO_DATE", "TIME_ON", "CALL", "FREQ", 
 				"MODE", "TX_PWR" };
+			map<string, int> field_ip_map_;
+			string field_names_[NUMBER_TOTAL];
+			int number_fields_in_use_;
 
 			enum button_type {
 				ACTIVATE,
@@ -327,9 +343,10 @@ using namespace std;
 			const map<logging_state_t, list<button_type> > button_map_ =
 			{
 				{ QSO_INACTIVE, {ACTIVATE, START_QSO, EDIT_QSO, BROWSE } },
-				{ QSO_PENDING, { START_QSO, QUIT_QSO, EDIT_QTH, WORKED_B4, PARSE } },
+				{ QSO_PENDING, { START_QSO, QUIT_QSO, EDIT_QTH } },
 				{ QSO_STARTED, { SAVE_QSO, CANCEL_QSO, EDIT_QTH, WORKED_B4, PARSE } },
-				{ QSO_EDIT, { SAVE_EDIT, CANCEL_EDIT, NAV_FIRST, NAV_PREV, NAV_NEXT, NAV_LAST, WORKED_B4, VIEW_QSL } }
+				{ QSO_EDIT, { SAVE_EDIT, CANCEL_EDIT, NAV_FIRST, NAV_PREV, NAV_NEXT, NAV_LAST, WORKED_B4, VIEW_QSL } },
+				{ QSO_BROWSE, { EDIT_QSO, CANCEL_BROWSE, NAV_FIRST, NAV_PREV, NAV_NEXT, NAV_LAST, WORKED_B4, VIEW_QSL } }
 				// TODO add the query button maps
 			};
 
@@ -349,7 +366,7 @@ using namespace std;
 				{ ACTIVATE, { "Activate", "Pre-load QSO fields based on logging mode", FL_CYAN, cb_activate, 0 } },
 				{ START_QSO, { "Start QSO", "Start the QSO, after saving, and/or activating", FL_YELLOW, cb_start, 0 } },
 				{ EDIT_QSO, { "Edit QSO", "Edit the selected QSO", FL_MAGENTA, cb_edit, 0 } },
-				{ BROWSE, { "Browse Log", "Browse the log without editing", FL_BACKGROUND_COLOR, nullptr, 0}}, // TODO
+				{ BROWSE, { "Browse Log", "Browse the log without editing", FL_BLUE, cb_bn_browse, 0}},
 				{ QUIT_QSO, { "Quit", "Quit entry mode", fl_lighter(FL_RED), cb_cancel, 0 } },
 				{ EDIT_QTH, { "Edit QTH", "Edit the details of the QTH macro", FL_BACKGROUND_COLOR, cb_bn_edit_qth, 0 } },
 				{ SAVE_QSO, { "Save QSO", "Log the QSO, activate a new one", FL_GREEN, cb_save, 0 } },
@@ -362,7 +379,8 @@ using namespace std;
 				{ NAV_NEXT, { "@->", "Select next record in book", FL_YELLOW, cb_bn_navigate, (void*)NV_NEXT } },
 				{ NAV_LAST, { "@->|", "Select last record in book", FL_YELLOW, cb_bn_navigate, (void*)NV_LAST } },
 				{ VIEW_QSL, { "View QSL", "Display QSL status", FL_BACKGROUND_COLOR, cb_bn_view_qsl, 0 } },
-				{ PARSE, { "DX?", "Display the DX details for this callsign", FL_BACKGROUND_COLOR, cb_parse, 0 } }
+				{ PARSE, { "DX?", "Display the DX details for this callsign", FL_BACKGROUND_COLOR, cb_parse, 0 } },
+				{ CANCEL_BROWSE, { "Quit Browse", "Quit browse mode", fl_lighter(FL_RED), cb_cancel, 0 } }
 			};
 
 			// Previous value
