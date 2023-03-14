@@ -132,6 +132,13 @@ using namespace std;
 
 			const set < copy_flags > COPY_SET = { CF_RIG_ETC, CF_CAT, CF_TIME, CF_CONTACT, CF_REPORTS };
 
+			enum dupe_flags : int {
+				DF_1,
+				DF_2,
+				DF_MERGE,
+				DF_BOTH
+			};
+
 		public:
 			qso_group(int X, int Y, int W, int H, const char* l);
 			~qso_group();
@@ -207,6 +214,8 @@ using namespace std;
 			static void cb_bn_merge_query(Fl_Widget* w, void* v);
 			// Find QSO
 			static void cb_bn_find_match(Fl_Widget* w, void* v);
+			// Dupe
+			static void cb_bn_dupe(Fl_Widget* w, void* v);
 
 			// Individual group creates
 			Fl_Group* create_contest_group(int X, int Y);
@@ -278,6 +287,8 @@ using namespace std;
 			void action_find_match();
 			// Action query
 			void action_query(logging_state_t query);
+			// Action handle dupe
+			void action_handle_dupe(dupe_flags action);
 
 			// Get default copy record
 			record* get_default_record();
@@ -379,6 +390,7 @@ using namespace std;
 				{ QSO_BROWSE, { EDIT_QSO, CANCEL_BROWSE, NAV_FIRST, NAV_PREV, NAV_NEXT, NAV_LAST, WORKED_B4, VIEW_QSL } },
 				{ QUERY_MATCH, { ADD_QUERY, REJECT_QUERY, MERGE_QUERY, NAV_PREV, NAV_NEXT }},
 				{ QUERY_NEW, { ADD_QUERY, REJECT_QUERY, FIND_QSO }},
+				{ QUERY_DUPE, { KEEP_DUPE_1, MERGE_DUPE, KEEP_DUPE_2, KEEP_BOTH_DUPES }}
 				// TODO add the query button maps
 			};
 
@@ -418,6 +430,10 @@ using namespace std;
 				{ REJECT_QUERY, {"Reject QSO", "Do not add queried QSO to log", fl_lighter(FL_RED), cb_bn_reject_query, 0} },
 				{ MERGE_QUERY, {"Merge QSO", "Merge query with logged QSO", COLOUR_ORANGE, cb_bn_merge_query, 0 } },
 				{ FIND_QSO, { "@search", "Display possible match", FL_YELLOW, cb_bn_find_match, 0}},
+				{ KEEP_DUPE_1, { "Keep 1", "Keep first QSO and delete second", fl_lighter(FL_GREEN), cb_bn_dupe, (void*)DF_1}},
+				{ KEEP_DUPE_2, { "Keep 2", "Keep second QSO and delete first", fl_lighter(FL_GREEN), cb_bn_dupe, (void*)DF_2}},
+				{ MERGE_DUPE, { "Merge", "Merge the two records", COLOUR_ORANGE, cb_bn_dupe, (void*)DF_MERGE}},
+				{ KEEP_BOTH_DUPES, { "Keep 1 && 2", "Keep both records", FL_GREEN, cb_bn_dupe, (void*)DF_BOTH}},
 			};
 
 			// Previous value

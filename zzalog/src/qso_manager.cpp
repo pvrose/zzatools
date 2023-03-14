@@ -56,6 +56,7 @@ extern spec_data* spec_data_;
 extern book* book_;
 extern extract_data* extract_records_;
 extern import_data* import_data_;
+extern book* navigation_book_;
 extern menu* menu_;
 #ifdef _WIN32
 extern dxa_if* dxa_if_;
@@ -1739,6 +1740,19 @@ void qso_manager::qso_group::cb_bn_find_match(Fl_Widget* w, void* v) {
 	}
 }
 
+// Callback - dupe action
+void qso_manager::qso_group::cb_bn_dupe(Fl_Widget* w, void* v) {
+	qso_group* that = ancestor_view<qso_group>(w);
+	dupe_flags action = (dupe_flags)(long)v;
+	switch (that->logging_state_) {
+	case QUERY_DUPE:
+		that->action_handle_dupe(action);
+		break;
+	default:
+		break;
+	}
+}
+
 // Reset contest serial number
 void qso_manager::qso_group::cb_init_serno(Fl_Widget* w, void* v) {
 	qso_group* that = ancestor_view<qso_group>(w);
@@ -2407,16 +2421,19 @@ void qso_manager::qso_group::action_query(logging_state_t query) {
 		// And save a copy of it
 		original_qso_ = new record(*current_qso_);
 		query_qso_ = import_data_->get_record(query_rec_num_, false);
+		tab_query_->copy_label(import_data_->match_question().c_str());
 		break;
 	case QUERY_NEW:
 		current_qso_ = nullptr;
 		original_qso_ = nullptr;
 		query_qso_ = import_data_->get_record(query_rec_num_, false);;
+		tab_query_->copy_label(import_data_->match_question().c_str());
 		break;
 	case QUERY_DUPE:
-		current_qso_ = book_->get_record(current_rec_num_, false);
+		current_qso_ = navigation_book_->get_record(current_rec_num_, false);
 		original_qso_ = new record(*current_qso_);
-		query_qso_ = book_->get_record(query_rec_num_, false);
+		query_qso_ = navigation_book_->get_record(query_rec_num_, false);
+		tab_query_->copy_label(navigation_book_->match_question().c_str());
 		break;
 	default:
 		// TODO trap this sensibly
@@ -2424,7 +2441,6 @@ void qso_manager::qso_group::action_query(logging_state_t query) {
 	}
 	logging_state_ = query;
 	tab_query_->set_records(current_qso_, query_qso_, original_qso_);
-	tab_query_->copy_label(import_data_->match_question().c_str());
 	enable_widgets();
 }
 
@@ -2462,6 +2478,34 @@ void qso_manager::qso_group::action_merge_query() {
 // ACtion find match
 void qso_manager::qso_group::action_find_match() {
 	update_query(QUERY_MATCH, current_rec_num_, query_rec_num_);
+}
+
+// Action handle dupe
+void qso_manager::qso_group::action_handle_dupe(dupe_flags action) {
+	switch (action) {
+	case DF_1:
+		// Discard the queried possible duplicate
+		navigation_book_->reject_dupe(false);
+		break;
+	case DF_2:
+		// Keep the queried possible duplicate record and discard the original record
+		navigation_book_->reject_dupe(true);
+		break;
+	case DF_MERGE:
+		// Discard the queried duplicate record after merging the two records
+		navigation_book_->merge_dupe();
+		break;
+	case DF_BOTH:
+		// Queried duplicate record is not a duplicate, keep both it and the original record
+		navigation_book_->accept_dupe();
+		break;
+	}
+	current_qso_ = nullptr;
+	logging_state_ = QSO_INACTIVE;
+	enable_widgets();
+	// Restart the duplicate check process
+	navigation_book_->check_dupes(true);
+
 }
 
 // Clock group - constructor
