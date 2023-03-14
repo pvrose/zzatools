@@ -289,6 +289,8 @@ using namespace std;
 			void action_query(logging_state_t query);
 			// Action handle dupe
 			void action_handle_dupe(dupe_flags action);
+			// Action handle d-click
+			void action_handle_dclick(int col, string field);
 
 			// Get default copy record
 			record* get_default_record();

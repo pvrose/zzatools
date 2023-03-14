@@ -1853,6 +1853,11 @@ void qso_manager::qso_group::cb_tab_qso(Fl_Widget* w, void* v) {
 			that->action_add_field(that->number_fields_in_use_, field);
 		}
 		break;
+	case Fl_Table::CONTEXT_CELL:
+		if (button == FL_LEFT_MOUSE && double_click) {
+			that->action_handle_dclick(col, field);
+		}
+		break;
 	}
 }
 
@@ -2506,6 +2511,29 @@ void qso_manager::qso_group::action_handle_dupe(dupe_flags action) {
 	// Restart the duplicate check process
 	navigation_book_->check_dupes(true);
 
+}
+
+// Action table double click
+void qso_manager::qso_group::action_handle_dclick(int col, string field) {
+	switch (logging_state_) {
+	case QUERY_MATCH:
+	case QUERY_DUPE:
+		switch (col) {
+		case 0:
+			// Treat as if clicking roe header
+			action_add_field(number_fields_in_use_, field);
+			break;
+		case 1:
+			// Copy log field
+			current_qso_->item(field, query_qso_->item(field));
+			break;
+		case 2:
+			// Copy original record
+			current_qso_->item(field, original_qso_->item(field));
+			break;
+		}
+	}
+	enable_widgets();
 }
 
 // Clock group - constructor
