@@ -1267,13 +1267,13 @@ void book::check_dupes(bool restart) {
 		case MT_EXACT:
 			// Delete second occurence after query
 			match_question_ = "These appear to be duplicates - select one to delete";
-			selection(record_num_1, HT_DUPE_QUERY, nullptr, record_num_2);
+			selection(record_num_2, HT_DUPE_QUERY, nullptr, record_num_1);
 			possible_dupe = true;
 			break;
 		default:
 			// Open QSO query 
 			match_question_ = "Possible duplicate record found";
-			selection(record_num_1, HT_DUPE_QUERY, nullptr, record_num_2);
+			selection(record_num_2, HT_DUPE_QUERY, nullptr, record_num_1);
 			possible_dupe = true;
 			break;
 		}
