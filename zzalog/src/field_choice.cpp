@@ -180,12 +180,12 @@ void field_input::value(int i) {
 	Fl_Input_Choice::value(i);
 }
 
-void field_input::field_name(const char* field_name) {
+void field_input::field_name(const char* field_name, record* qso /*= nullptr*/) {
 	field_name_ = field_name;
 	string enum_name;
 	// Note MODE is a special case as the enumeration list is that of MODE and SUBMODE combined
 	if (field_name_ == "MODE") enum_name = "Combined";
-	else enum_name= spec_data_->enumeration_name(field_name_, nullptr);
+	else enum_name= spec_data_->enumeration_name(field_name_, qso);
 	if (enum_name.length()) {
 		populate_choice(enum_name);
 		menubutton()->show();
@@ -294,8 +294,8 @@ void field_input::populate_case_choice() {
 }
 
 // Repopulate choice
-void field_input::reload_choice() {
-	field_name(field_name_.c_str());
+void field_input::reload_choice(record* qso /* = nullptr */) {
+	field_name(field_name_.c_str(), qso);
 }
 
 // Field is a string type - allow case choice

@@ -3,6 +3,7 @@
 
 #include "spec_data.h"
 #include "intl_widgets.h"
+#include "record.h"
 
 #include <string>
 #include <FL/Fl_Choice.H>
@@ -55,7 +56,7 @@ using namespace std;
 		virtual void value(const char* val);
 		virtual void value(int i);
 
-		void field_name(const char* field_name);
+		void field_name(const char* field_name, record* qso = nullptr);
 		const char* field_name();
 
 		// Get reason for leaving 
@@ -68,7 +69,7 @@ using namespace std;
 		};
 		exit_reason_t reason();
 
-		void reload_choice();
+		void reload_choice(record* qso = nullptr);
 
 	protected:
 

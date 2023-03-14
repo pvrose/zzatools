@@ -902,7 +902,7 @@ Fl_Group* qso_manager::qso_group::create_entry_group(int X, int Y) {
 		ip_field_[ix]->callback(cb_ip_field, (void*)ix);
 		ip_field_[ix]->input()->when(FL_WHEN_RELEASE_ALWAYS);
 		if (ix < NUMBER_FIXED) {
-			ip_field_[ix]->field_name(fixed_names_[ix].c_str());
+			ip_field_[ix]->field_name(fixed_names_[ix].c_str(), current_qso_);
 			field_ip_map_[fixed_names_[ix]] = ix;
 			field_names_[ix] = fixed_names_[ix];
 			ip_field_[ix]->label(fixed_names_[ix].c_str());
@@ -1826,7 +1826,7 @@ void qso_manager::qso_group::initialise_fields() {
 	for (ix = 0, iy = NUMBER_FIXED; ix < field_names.size(); ix++, iy++) {
 		if (new_fields) {
 			ch_field_[iy]->value(field_names[ix].c_str());
-			ip_field_[iy]->field_name(field_names[ix].c_str());
+			ip_field_[iy]->field_name(field_names[ix].c_str(), current_qso_);
 			field_names_[iy] = field_names[ix];
 		}
 		if (lock_preset) {
@@ -2240,7 +2240,7 @@ void qso_manager::qso_group::action_add_field(int ix, string field) {
 	}
 	if (ix < number_fields_in_use_) {
 		const char* old_field = field_names_[ix].c_str();
-		ip_field_[ix]->field_name(field.c_str());
+		ip_field_[ix]->field_name(field.c_str(), current_qso_);
 		ip_field_[ix]->value(current_qso_->item(field).c_str());
 		// Change mapping
 		if (strlen(old_field)) {
@@ -2253,7 +2253,7 @@ void qso_manager::qso_group::action_add_field(int ix, string field) {
 		if (field_ip_map_.find(field) == field_ip_map_.end()) {
 			number_fields_in_use_++;
 			ch_field_[ix]->value(field.c_str());
-			ip_field_[ix]->field_name(field.c_str());
+			ip_field_[ix]->field_name(field.c_str(), current_qso_);
 			ip_field_[ix]->value(current_qso_->item(field).c_str());
 			field_ip_map_[field] = ix;
 			field_names_[ix] = field;
@@ -2274,7 +2274,7 @@ void qso_manager::qso_group::action_del_field(int ix) {
 		string& field = field_names_[pos + 1];
 		field_names_[pos] = field;
 		ch_field_[pos]->value(field.c_str());
-		ip_field_[pos]->field_name(field.c_str());
+		ip_field_[pos]->field_name(field.c_str(), current_qso_);
 		ip_field_[pos]->value(current_qso_->item(field).c_str());
 	}
 	ch_field_[pos]->value("");
