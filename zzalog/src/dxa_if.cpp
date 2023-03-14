@@ -798,9 +798,9 @@ HRESULT dxa_if::cb_map_clicked(float latitude, float longitude) {
 			if (qso_display_ != AQ_SEARCH) {
 				tabbed_forms_->activate_pane(OT_EXTRACT, true);
 			}
-			else {
-				tabbed_forms_->activate_pane(OT_RECORD, true);
-			}
+			//else {
+			//	tabbed_forms_->activate_pane(OT_RECORD, true);
+			//}
 		}
 	}
 	return S_OK;

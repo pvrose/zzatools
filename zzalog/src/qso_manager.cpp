@@ -1271,13 +1271,19 @@ void qso_manager::qso_group::update_qso(record_num_t log_qso) {
 
 // Update query
 void qso_manager::qso_group::update_query(logging_state_t query, record_num_t match_num, record_num_t query_num) {
-	if (logging_state_ == QSO_PENDING || logging_state_ == QSO_INACTIVE) {
+	switch(logging_state_) {
+	case QSO_PENDING:
+	case QSO_INACTIVE:
 		current_rec_num_ = match_num;
 		query_rec_num_ = query_num;
 		action_query(query);
-	}
-	else {
-		// TODO - tidy up befor actioning
+		break;
+	case QUERY_NEW:
+		action_query(query);
+		break;
+	default:
+		// TODO:
+		break;
 	}
 }
 
@@ -2289,6 +2295,10 @@ void qso_manager::qso_group::action_navigate(int target) {
 		action_browse();
 		action_view_qsl();
 		break;
+	case QUERY_MATCH:
+		current_rec_num_ = book_->selection();
+		action_query(saved_state);
+		break;
 	}
 }
 
@@ -2399,16 +2409,20 @@ void qso_manager::qso_group::action_query(logging_state_t query) {
 		query_qso_ = import_data_->get_record(query_rec_num_, false);
 		break;
 	case QUERY_NEW:
-		current_qso_ = book_->get_record(current_rec_num_, false);
+		current_qso_ = nullptr;
 		original_qso_ = nullptr;
-		query_qso_ = nullptr;
+		query_qso_ = import_data_->get_record(query_rec_num_, false);;
 		break;
 	case QUERY_DUPE:
 		current_qso_ = book_->get_record(current_rec_num_, false);
 		original_qso_ = new record(*current_qso_);
 		query_qso_ = book_->get_record(query_rec_num_, false);
 		break;
+	default:
+		// TODO trap this sensibly
+		return;
 	}
+	logging_state_ = query;
 	tab_query_->set_records(current_qso_, query_qso_, original_qso_);
 	tab_query_->copy_label(import_data_->match_question().c_str());
 	enable_widgets();
@@ -2419,6 +2433,10 @@ void qso_manager::qso_group::action_add_query() {
 	import_data_->save_update();
 	current_qso_ = nullptr;
 	logging_state_ = QSO_INACTIVE;
+	enable_widgets();
+	// Restart the update process
+	import_data_->update_book();
+
 }
 
 // Action reject query - do nothing
@@ -2426,6 +2444,9 @@ void qso_manager::qso_group::action_reject_query() {
 	import_data_->discard_update(true);
 	current_qso_ = nullptr;
 	logging_state_ = QSO_INACTIVE;
+	enable_widgets();
+	// Restart the update process
+	import_data_->update_book();
 }
 
 // Action merge query
@@ -2433,6 +2454,9 @@ void qso_manager::qso_group::action_merge_query() {
 	import_data_->merge_update();
 	current_qso_ = nullptr;
 	logging_state_ = QSO_INACTIVE;
+	enable_widgets();
+	// Restart the update process
+	import_data_->update_book();
 }
 
 // ACtion find match

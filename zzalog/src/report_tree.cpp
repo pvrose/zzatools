@@ -783,7 +783,7 @@ void report_tree::cb_tree_report(Fl_Widget* w, void* v) {
 		// If we select a record, then select that record in the book
 		if ((long)item->user_data() >= 0) {
 			that->get_book()->selection((record_num_t)(long)item->user_data());
-			tabbed_forms_->activate_pane(OT_RECORD, true);
+			//tabbed_forms_->activate_pane(OT_RECORD, true);
 			return;
 		}
 		cb_tree(w, v);

@@ -518,10 +518,10 @@ void import_data::update_book() {
 		if (is_updated) {
 			book_->modified(true, false);
 		}
-		// If we are dropping out to present a query - activate record view
-		if (update_in_progress_) {
-			tabbed_forms_->activate_pane(OT_RECORD, true);
-		}
+		//// If we are dropping out to present a query - activate record view
+		//if (update_in_progress_) {
+		//	tabbed_forms_->activate_pane(OT_RECORD, true);
+		//}
 		// Leaving after completing update so tidy up and select most recent record
 		if (!update_in_progress_) {
 			finish_update();

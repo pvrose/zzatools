@@ -6,6 +6,7 @@
 #include "callback.h"
 #include "intl_widgets.h"
 #include "intl_dialog.h"
+#include "field_choice.h"
 #include "fields.h"
 #include "menu.h"
 #include "toolbar.h"

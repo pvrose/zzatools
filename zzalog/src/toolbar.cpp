@@ -386,7 +386,7 @@ void toolbar::cb_bn_search(Fl_Widget* w, void* v) {
 				// select the record that was found
 				found = true;
 				navigation_book_->selection(i, HT_SELECTED);
-				tabbed_forms_->activate_pane(OT_RECORD, true);
+				//tabbed_forms_->activate_pane(OT_RECORD, true);
 				// Remember the record found
 				that->record_num_ = i + 1;
 			}
