@@ -189,7 +189,6 @@
     <ClCompile Include="zzalog\src\qsl_viewer.cpp" />
     <ClCompile Include="zzalog\src\qth_dialog.cpp" />
     <ClCompile Include="zzalog\src\record.cpp" />
-    <ClCompile Include="zzalog\src\record_form.cpp" />
     <ClCompile Include="zzalog\src\record_table.cpp" />
     <ClCompile Include="zzalog\src\report_tree.cpp" />
     <ClCompile Include="zzalog\src\search_dialog.cpp" />
@@ -269,7 +268,6 @@
     <ClInclude Include="zzalog\include\qsl_viewer.h" />
     <ClInclude Include="zzalog\include\qth_dialog.h" />
     <ClInclude Include="zzalog\include\record.h" />
-    <ClInclude Include="zzalog\include\record_form.h" />
     <ClInclude Include="zzalog\include\record_table.h" />
     <ClInclude Include="zzalog\include\report_tree.h" />
     <ClInclude Include="zzalog\include\search.h" />

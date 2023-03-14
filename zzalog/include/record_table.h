@@ -9,7 +9,7 @@
 using namespace std;
 
 
-	// This class is the table used in record_form to display the field items in the displayed record.
+	// This class is the table used in qso_manager to display the field items in the displayed record.
 	class record_table : public Fl_Table_Row
 	{
 		// The records that will be displayed

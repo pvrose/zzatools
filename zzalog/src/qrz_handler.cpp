@@ -158,7 +158,6 @@ bool qrz_handler::query_merge() {
 	merge_done_ = false;
 	// Get the record view to merge data
 	navigation_book_->selection(-1, HT_MERGE_DETAILS);
-	tabbed_forms_->activate_pane(OT_RECORD, true);
 	while (!merge_done_) Fl::check();
 	status_->misc_status(ST_OK, "QRZ: Update complete");
 	return false;

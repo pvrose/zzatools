@@ -102,9 +102,6 @@
     <ClCompile Include="zzalog\src\record.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="zzalog\src\record_form.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="zzalog\src\record_table.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -324,9 +321,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="zzalog\include\record.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\record_form.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="zzalog\include\record_table.h">

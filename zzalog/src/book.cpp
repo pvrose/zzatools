@@ -1287,10 +1287,6 @@ void book::check_dupes(bool restart) {
 		inhibit_view_update_ = false;
 		selection(size() - 1, HT_ALL);
 	}
-	//else {
-	//	// Activate record view
-	//	tabbed_forms_->activate_pane(OT_RECORD, true);
-	//}
 	enable_save(old_save_enabled);
 }
 

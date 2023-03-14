@@ -41,7 +41,7 @@ using namespace std;
 		FO_LAST              // Keep at end to supply extent of enum
 	};
 
-	// Default columns to use in log_form and record_form
+	// Default columns to use in log_form 
 	const field_info_t DEFAULT_FIELDS[] = {
 		{ "QSO_DATE", "Date", 62 },
 		{ "TIME_ON", "Start", 50 },

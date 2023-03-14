@@ -2,7 +2,6 @@
 
 #include "book.h"
 #include "log_table.h"
-#include "record_form.h"
 #include "extract_data.h"
 #include "import_data.h"
 #include "pfx_tree.h"
@@ -42,8 +41,6 @@ tabbed_forms::tabbed_forms(int X, int Y, int W, int H, const char* label) :
 	// create the views -
 	// Full log view - displays selected items of all records
 	add_view<log_table>("Full log view", FO_MAINLOG, OT_MAIN, "Displays all log records");
-	//// Record view - displays all items of selected record, record selection within subset
-	//add_view<record_form>("Selected record", FO_QSOVIEW, OT_RECORD, "Displays all the fields and other info in selected record");
 	// Imported data - view before merging
 	add_view<log_table>("Records for import", FO_IMPORTLOG, OT_IMPORT, "Displays all the records currently being imported");
 	// Extracted data - subset of records for search or exporting
@@ -114,7 +111,6 @@ void tabbed_forms::update_views(view* requester, hint_t hint, record_num_t recor
 				switch (fx->first) {
 				case OT_MAIN:
 				case OT_EXTRACT:
-				//case OT_RECORD:
 					// Always update these views
 					fx->second.v->update(hint, record_1, record_2);
 					break;
@@ -170,9 +166,6 @@ void tabbed_forms::activate_pane(object_t pane, bool active) {
 		case OT_IMPORT:
 			navigation_book_ = import_data_;
 			break;
-		//case OT_RECORD:
-		//	navigation_book_ = last_book_;
-		//	break;
 		}
 		// Restore any query
 		v->update(last_hint_, last_record_1_, last_record_2_);
@@ -201,9 +194,6 @@ void tabbed_forms::books() {
 		case OT_MAIN:
 			v->set_book(book_);
 			break;
-		//case OT_RECORD:
-		//	v->set_book(navigation_book_);
-		//	break;
 		case OT_EXTRACT:
 			v->set_book(extract_records_);
 			break;
@@ -240,9 +230,6 @@ void tabbed_forms::cb_tab_change(Fl_Widget* w, void* v) {
 		case OT_IMPORT:
 			navigation_book_ = import_data_;
 			break;
-		//case OT_RECORD:
-		//	navigation_book_ = that->last_book_;
-		//	break;
 		}
 	}
 	view* as_view = dynamic_cast<view*>(that->value());
