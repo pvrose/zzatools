@@ -69,6 +69,9 @@ using namespace std;
 			QSO_STARTED,     // QSO started
 			QSO_EDIT,        // Editing existing QSO
 			QSO_BROWSE,      // View selected view in table view
+			QUERY_MATCH,     // Query: Compare new QSO with nearest match in log - add, reject or selectively merge
+			QUERY_NEW,       // Query: Not able to find QSO - allow manual matching
+			QUERY_DUPE,      // Query: Two records in log found to be possible duplicates - select either, both or a merge
 		};
 
 		// Hamlib parameters 
@@ -196,6 +199,14 @@ using namespace std;
 			static void cb_bn_browse(Fl_Widget* w, void* v);
 			// Record table
 			static void cb_tab_qso(Fl_Widget* w, void* v);
+			// Add query
+			static void cb_bn_add_query(Fl_Widget* w, void* v);
+			// Reject query
+			static void cb_bn_reject_query(Fl_Widget* w, void* v);
+			// Merge query
+			static void cb_bn_merge_query(Fl_Widget* w, void* v);
+			// Find QSO
+			static void cb_bn_find_match(Fl_Widget* w, void* v);
 
 			// Individual group creates
 			Fl_Group* create_contest_group(int X, int Y);
@@ -257,11 +268,26 @@ using namespace std;
 			void action_del_field(int ix);
 			// Action cancel browse
 			void action_cancel_browse();
+			// Action add query
+			void action_add_query();
+			// Action reject query
+			void action_reject_query();
+			// Action merge query
+			void action_merge_query();
+			// Action find match
+			void action_find_match();
+			// Action query
+			void action_query(logging_state_t query);
 
 			// Get default copy record
 			record* get_default_record();
 			// QTH has changed
 			void check_qth_changed();
+
+			// Update QSO
+			void update_qso(record_num_t log_num);
+			// Update query
+			void update_query(logging_state_t query, record_num_t match_num, record_num_t query_num);
 
 			// Logging mode
 			logging_mode_t logging_mode_;
@@ -273,8 +299,12 @@ using namespace std;
 			record* selected_qso_;
 			// Saved current record
 			record* original_qso_;
+			// Presented query 
+			record* query_qso_;
 			// Current record number
 			record_num_t current_rec_num_;
+			// Query record number
+			record_num_t query_rec_num_;
 			// Contest ID
 			string contest_id_;
 			// Contest exchange format index
@@ -346,7 +376,9 @@ using namespace std;
 				{ QSO_PENDING, { START_QSO, QUIT_QSO, EDIT_QTH } },
 				{ QSO_STARTED, { SAVE_QSO, CANCEL_QSO, EDIT_QTH, WORKED_B4, PARSE } },
 				{ QSO_EDIT, { SAVE_EDIT, CANCEL_EDIT, NAV_FIRST, NAV_PREV, NAV_NEXT, NAV_LAST, WORKED_B4, VIEW_QSL } },
-				{ QSO_BROWSE, { EDIT_QSO, CANCEL_BROWSE, NAV_FIRST, NAV_PREV, NAV_NEXT, NAV_LAST, WORKED_B4, VIEW_QSL } }
+				{ QSO_BROWSE, { EDIT_QSO, CANCEL_BROWSE, NAV_FIRST, NAV_PREV, NAV_NEXT, NAV_LAST, WORKED_B4, VIEW_QSL } },
+				{ QUERY_MATCH, { ADD_QUERY, REJECT_QUERY, MERGE_QUERY, NAV_PREV, NAV_NEXT }},
+				{ QUERY_NEW, { ADD_QUERY, REJECT_QUERY, FIND_QSO }},
 				// TODO add the query button maps
 			};
 
@@ -361,6 +393,7 @@ using namespace std;
 				void* userdata;
 			};
 
+			const Fl_Color COLOUR_ORANGE = 93; /* R=4/4, B=0/4, G = 5/7 */	
 			const map<button_type, button_action> action_map_ = 
 			{
 				{ ACTIVATE, { "Activate", "Pre-load QSO fields based on logging mode", FL_CYAN, cb_activate, 0 } },
@@ -380,7 +413,11 @@ using namespace std;
 				{ NAV_LAST, { "@->|", "Select last record in book", FL_YELLOW, cb_bn_navigate, (void*)NV_LAST } },
 				{ VIEW_QSL, { "View QSL", "Display QSL status", FL_BACKGROUND_COLOR, cb_bn_view_qsl, 0 } },
 				{ PARSE, { "DX?", "Display the DX details for this callsign", FL_BACKGROUND_COLOR, cb_parse, 0 } },
-				{ CANCEL_BROWSE, { "Quit Browse", "Quit browse mode", fl_lighter(FL_RED), cb_cancel, 0 } }
+				{ CANCEL_BROWSE, { "Quit Browse", "Quit browse mode", fl_lighter(FL_RED), cb_cancel, 0 } },
+				{ ADD_QUERY, { "Add QSO", "Add queried QSO to log", FL_GREEN, cb_bn_add_query, 0 }},
+				{ REJECT_QUERY, {"Reject QSO", "Do not add queried QSO to log", fl_lighter(FL_RED), cb_bn_reject_query, 0} },
+				{ MERGE_QUERY, {"Merge QSO", "Merge query with logged QSO", COLOUR_ORANGE, cb_bn_merge_query, 0 } },
+				{ FIND_QSO, { "@search", "Display possible match", FL_YELLOW, cb_bn_find_match, 0}},
 			};
 
 			// Previous value
@@ -553,6 +590,8 @@ using namespace std;
 		virtual void save_values();
 		// Update record with MY_RIG etc. For use when importing 
 		void update_import_qso(record* import);
+		// Query/update
+		void update(hint_t hint, record_num_t log_num, record_num_t query_num);
 
 		// Callback - close button
 		static void cb_close(Fl_Widget* w, void* v);
@@ -576,8 +615,8 @@ using namespace std;
 		void rig_update(string frequency, string mode, string power);
 		// Called when rig is changed
 		void update_rig();
-		// Called when QSO is changed
-		void update_qso();
+		// Present query (uses view update mechanism)
+		void update_qso(hint_t hint, record_num_t match_num, record_num_t query_num);
 		// QSO i n progress
 		bool qso_in_progress();
 		// Start QSO

@@ -12,6 +12,7 @@
 #include "spec_data.h"
 #include "book.h"
 #include "extract_data.h"
+#include "import_data.h"
 #include "menu.h"
 #include "field_choice.h"
 #ifdef _WIN32
@@ -54,6 +55,7 @@ extern rig_if* rig_if_;
 extern spec_data* spec_data_;
 extern book* book_;
 extern extract_data* extract_records_;
+extern import_data* import_data_;
 extern menu* menu_;
 #ifdef _WIN32
 extern dxa_if* dxa_if_;
@@ -1244,6 +1246,41 @@ void qso_manager::qso_group::update_station_choices(stn_item_t station_item) {
 	redraw();
 }
 
+// Update QSO
+void qso_manager::qso_group::update_qso(record_num_t log_qso) {
+	if (log_qso == current_rec_num_) {
+		if (logging_state_ == QSO_STARTED ||
+			logging_state_ == QSO_EDIT) {
+			// Update the view if another view changes the record
+			copy_qso_to_display(qso_group::CF_ALL_FLAGS);
+		}
+	}
+	else if (logging_state_ == QSO_PENDING) {
+		// Switch to selected record if in QSO_PENDING state
+		current_rec_num_ = log_qso;
+		copy_qso_to_qso(book_->get_record(current_rec_num_, false), qso_group::CF_RIG_ETC | qso_group::CF_CAT);
+		action_view_qsl();
+	}
+	else if (logging_state_ == QSO_EDIT) {
+		// Selecting a new record - save the old one
+		action_save_edit();
+		action_edit();
+		action_view_qsl();
+	}
+}
+
+// Update query
+void qso_manager::qso_group::update_query(logging_state_t query, record_num_t match_num, record_num_t query_num) {
+	if (logging_state_ == QSO_PENDING || logging_state_ == QSO_INACTIVE) {
+		current_rec_num_ = match_num;
+		query_rec_num_ = query_num;
+		action_query(query);
+	}
+	else {
+		// TODO - tidy up befor actioning
+	}
+}
+
 // Copy record to the fields - reverse of above
 void qso_manager::qso_group::copy_qso_to_display(int flags) {
 	record* source = get_default_record();
@@ -1645,6 +1682,57 @@ void qso_manager::qso_group::cb_bn_browse(Fl_Widget* w, void* v) {
 	}
 }
 
+// Callback - add query record
+void qso_manager::qso_group::cb_bn_add_query(Fl_Widget* w, void* v) {
+	qso_group* that = ancestor_view<qso_group>(w);
+	switch (that->logging_state_) {
+	case QUERY_MATCH:
+	case QUERY_NEW:
+		that->action_add_query();
+		break;
+	default:
+		break;
+	}
+}
+
+// Callback - add query record
+void qso_manager::qso_group::cb_bn_reject_query(Fl_Widget* w, void* v) {
+	qso_group* that = ancestor_view<qso_group>(w);
+	switch (that->logging_state_) {
+	case QUERY_MATCH:
+	case QUERY_NEW:
+		that->action_reject_query();
+		break;
+	default:
+		break;
+	}
+}
+
+// Callback - add query record
+void qso_manager::qso_group::cb_bn_merge_query(Fl_Widget* w, void* v) {
+	qso_group* that = ancestor_view<qso_group>(w);
+	switch (that->logging_state_) {
+	case QUERY_MATCH:
+	case QUERY_NEW:
+		that->action_merge_query();
+		break;
+	default:
+		break;
+	}
+}
+
+// Callback - add query record
+void qso_manager::qso_group::cb_bn_find_match(Fl_Widget* w, void* v) {
+	qso_group* that = ancestor_view<qso_group>(w);
+	switch (that->logging_state_) {
+	case QUERY_NEW:
+		that->action_find_match();
+		break;
+	default:
+		break;
+	}
+}
+
 // Reset contest serial number
 void qso_manager::qso_group::cb_init_serno(Fl_Widget* w, void* v) {
 	qso_group* that = ancestor_view<qso_group>(w);
@@ -1930,9 +2018,11 @@ record* qso_manager::qso_group::get_default_record() {
 		case LM_OFF_AIR:
 		case LM_ON_AIR_CAT:
 		case LM_ON_AIR_TIME:
+			current_rec_num_ = book_->size() - 1;
 			return book_->get_latest();
 		case LM_ON_AIR_COPY:
 		case LM_ON_AIR_CLONE:
+			current_rec_num_ = book_->selection();
 			return book_->get_record();
 		default: 
 			return nullptr;
@@ -2103,10 +2193,8 @@ void qso_manager::qso_group::action_edit() {
 		status_->misc_status(ST_SEVERE, "DASH: Attempting to edit a QSO while inputing a QSO");
 		return;
 	}
-	// Copy current selection
-	current_rec_num_ = book_->selection();
 	// Edit currently selected QSO
-	current_qso_ = book_->get_record();
+	current_qso_ = book_->get_record(current_rec_num_, false);
 	// And save a copy of it
 	original_qso_ = new record(*current_qso_);
 	logging_state_ = QSO_EDIT;
@@ -2301,6 +2389,57 @@ void qso_manager::qso_group::action_browse() {
 	enable_widgets();
 }
 
+// Action query
+void qso_manager::qso_group::action_query(logging_state_t query) {
+	switch (query) {
+	case QUERY_MATCH:
+		current_qso_ = book_->get_record(current_rec_num_, false);
+		// And save a copy of it
+		original_qso_ = new record(*current_qso_);
+		query_qso_ = import_data_->get_record(query_rec_num_, false);
+		break;
+	case QUERY_NEW:
+		current_qso_ = book_->get_record(current_rec_num_, false);
+		original_qso_ = nullptr;
+		query_qso_ = nullptr;
+		break;
+	case QUERY_DUPE:
+		current_qso_ = book_->get_record(current_rec_num_, false);
+		original_qso_ = new record(*current_qso_);
+		query_qso_ = book_->get_record(query_rec_num_, false);
+		break;
+	}
+	tab_query_->set_records(current_qso_, query_qso_, original_qso_);
+	tab_query_->copy_label(import_data_->match_question().c_str());
+	enable_widgets();
+}
+
+// Action add query - add query QSO to book
+void qso_manager::qso_group::action_add_query() {
+	import_data_->save_update();
+	current_qso_ = nullptr;
+	logging_state_ = QSO_INACTIVE;
+}
+
+// Action reject query - do nothing
+void qso_manager::qso_group::action_reject_query() {
+	import_data_->discard_update(true);
+	current_qso_ = nullptr;
+	logging_state_ = QSO_INACTIVE;
+}
+
+// Action merge query
+void qso_manager::qso_group::action_merge_query() {
+	import_data_->merge_update();
+	current_qso_ = nullptr;
+	logging_state_ = QSO_INACTIVE;
+}
+
+// ACtion find match
+void qso_manager::qso_group::action_find_match() {
+	update_query(QUERY_MATCH, current_rec_num_, query_rec_num_);
+}
+
 // Clock group - constructor
 qso_manager::clock_group::clock_group
 	(int X, int Y, int W, int H, const char* l) :
@@ -2426,7 +2565,7 @@ qso_manager::qso_manager(int W, int H, const char* label) :
 	load_values();
 	create_form(0,0);
 	update_rig();
-	update_qso();
+	update_qso(HT_SELECTED, book_->selection(), -1);
 
 }
 
@@ -2629,25 +2768,27 @@ void qso_manager::update_rig() {
 }
 
 // Called whenever another view updates a record (or selects a new one)
-void qso_manager::update_qso() {
-	record* new_record = book_->get_record();
-	if (new_record == qso_group_->current_qso_) {
-		if (qso_group_->logging_state_ == QSO_STARTED ||
-			qso_group_->logging_state_ == QSO_EDIT) {
-			// Update the view if another view changes the record
-			qso_group_->copy_qso_to_display(qso_group::CF_ALL_FLAGS);
-		}
-	}
-	else if (qso_group_->logging_state_ == QSO_PENDING) {
-		// Switch to selected record if in QSO_PENDING state
-		qso_group_->copy_qso_to_qso(book_->get_record(), qso_group::CF_RIG_ETC | qso_group::CF_CAT);
-		qso_group_->action_view_qsl();
-	}
-	else if (qso_group_->logging_state_ == QSO_EDIT) {
-		// Selecting a new record - save the old one
-		qso_group_->action_save_edit();
-		qso_group_->action_edit();
-		qso_group_->action_view_qsl();
+void qso_manager::update_qso(hint_t hint, record_num_t match_num, record_num_t query_num) {
+	switch (hint) {
+	case HT_SELECTED:
+	case HT_ALL:
+	case HT_CHANGED:
+	case HT_DELETED:
+	case HT_INSERTED:
+	case HT_MINOR_CHANGE:
+	case HT_NEW_DATA:
+	case HT_RESET_ORDER:
+		qso_group_->update_qso(match_num);
+		break;
+	case HT_IMPORT_QUERY:
+		qso_group_->update_query(QUERY_MATCH, match_num, query_num);
+		break;
+	case HT_IMPORT_QUERYNEW:
+		qso_group_->update_query(QUERY_NEW, match_num, query_num);
+		break;
+	case HT_DUPE_QUERY:
+		qso_group_->update_query(QUERY_DUPE, match_num, query_num);
+		break;
 	}
 }
 
