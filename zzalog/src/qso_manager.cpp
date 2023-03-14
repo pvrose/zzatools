@@ -963,6 +963,9 @@ Fl_Group* qso_manager::qso_group::create_query_group(int X, int Y) {
 
 	tab_query_ = new record_table(curr_x, curr_y, WTABLE, HTABLE, "Query Message goes here");
 	tab_query_->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
+	tab_query_->labelfont(FL_BOLD);
+	tab_query_->labelsize(FL_NORMAL_SIZE + 2);
+	tab_query_->labelcolor(fl_darker(FL_RED));
 	tab_query_->callback(cb_tab_qso, nullptr);
 
 	curr_x += WTABLE + GAP;
@@ -2447,6 +2450,8 @@ void qso_manager::qso_group::action_query(logging_state_t query) {
 	logging_state_ = query;
 	tab_query_->set_records(current_qso_, query_qso_, original_qso_);
 	enable_widgets();
+	// Move window to top
+	parent()->show();
 }
 
 // Action add query - add query QSO to book
