@@ -221,6 +221,8 @@ using namespace std;
 			static void cb_bn_save_merge(Fl_Widget* w, void* v);
 			// Fetch data from QRZ.com
 			static void cb_bn_fetch_qrz(Fl_Widget* w, void* v);
+			// Parse WSJT-X for call
+			static void cb_bn_all_txt(Fl_Widget* w, void* v);
 
 			// Individual group creates
 			Fl_Group* create_contest_group(int X, int Y);
@@ -298,6 +300,10 @@ using namespace std;
 			void action_handle_dclick(int col, string field);
 			// Action merge from QRZ.com
 			void action_save_merge();
+			// Look in all.txt
+			void action_look_all_txt();
+			// Copy found text
+			void action_copy_all_text(string text);
 
 			// Get default copy record
 			record* get_default_record();
@@ -388,6 +394,7 @@ using namespace std;
 				KEEP_BOTH_DUPES,
 				MERGE_DONE,
 				VIEW_QSL,
+				LOOK_ALL_TXT,
 			};
 
 			const map<logging_state_t, list<button_type> > button_map_ =
@@ -398,7 +405,7 @@ using namespace std;
 				{ QSO_EDIT, { SAVE_EDIT, CANCEL_EDIT, NAV_FIRST, NAV_PREV, NAV_NEXT, NAV_LAST, WORKED_B4, VIEW_QSL } },
 				{ QSO_BROWSE, { EDIT_QSO, CANCEL_BROWSE, NAV_FIRST, NAV_PREV, NAV_NEXT, NAV_LAST, WORKED_B4, VIEW_QSL } },
 				{ QUERY_MATCH, { ADD_QUERY, REJECT_QUERY, MERGE_QUERY, NAV_PREV, NAV_NEXT }},
-				{ QUERY_NEW, { ADD_QUERY, REJECT_QUERY, FIND_QSO }},
+				{ QUERY_NEW, { ADD_QUERY, REJECT_QUERY, FIND_QSO, LOOK_ALL_TXT }},
 				{ QUERY_DUPE, { KEEP_DUPE_1, MERGE_DUPE, KEEP_DUPE_2, KEEP_BOTH_DUPES }},
 				{ QRZ_MERGE, { MERGE_DONE }}
 				// TODO add the query button maps
@@ -449,6 +456,7 @@ using namespace std;
 				{ MERGE_DUPE, { "Merge", "Merge the two records", COLOUR_ORANGE, cb_bn_dupe, (void*)DF_MERGE}},
 				{ KEEP_BOTH_DUPES, { "Keep 1 && 2", "Keep both records", FL_GREEN, cb_bn_dupe, (void*)DF_BOTH}},
 				{ MERGE_DONE, { "Done", "Save changes", COLOUR_APPLE, cb_bn_save_merge, 0}},
+				{ LOOK_ALL_TXT, { "all.txt?", "Look in WSJT-X all.txt file for possible contact", COLOUR_NAVY, cb_bn_all_txt, 0 } },
 			};
 
 			// Previous value

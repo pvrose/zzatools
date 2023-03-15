@@ -1770,6 +1770,19 @@ void qso_manager::qso_group::cb_bn_save_merge(Fl_Widget* w, void* v) {
 	}
 }
 
+// Callback Find QSO in WSJT-X
+void qso_manager::qso_group::cb_bn_all_txt(Fl_Widget* w, void* v) {
+	qso_group* that = ancestor_view<qso_group>(w);
+	switch (that->logging_state_) {
+	case QUERY_NEW:
+	case QUERY_MATCH:
+		that->action_look_all_txt();
+		break;
+	default:
+		break;
+	}
+}
+
 // Reset contest serial number
 void qso_manager::qso_group::cb_init_serno(Fl_Widget* w, void* v) {
 	qso_group* that = ancestor_view<qso_group>(w);
@@ -2574,6 +2587,185 @@ void qso_manager::qso_group::action_save_merge() {
 	logging_state_ = QSO_INACTIVE;
 	enable_widgets();
 	qrz_handler_->merge_done();
+}
+
+// ACtion look in all.txt
+void qso_manager::qso_group::action_look_all_txt() {
+	Fl_Preferences datapath_settings(settings_, "Datapath");
+	char* temp;
+	datapath_settings.get("WSJT-X", temp, "");
+	string filename = string(temp) + "/all.txt";
+	ifstream* all_file = new ifstream(filename.c_str());
+	// This will take a while so display the timer cursor
+	fl_cursor(FL_CURSOR_WAIT);
+	// calculate the file size and initialise the progress bar
+	streampos startpos = all_file->tellg();
+	all_file->seekg(0, ios::end);
+	streampos endpos = all_file->tellg();
+	long file_size = (long)(endpos - startpos);
+	status_->misc_status(ST_NOTE, "LOG: Starting to parse all.txt");
+	status_->progress(file_size, OT_RECORD, "Looking for queried call in WSJT-X data", "bytes");
+	// reposition back to beginning
+	all_file->seekg(0, ios::beg);
+	bool start_copying = false;
+	bool stop_copying = false;
+	// Get user callsign from settings
+	string my_call = ((qso_manager*)parent())->get_default(qso_manager::CALLSIGN);
+	// Get search items from record
+	string their_call = query_qso_->item("CALL");
+	string datestamp = query_qso_->item("QSO_DATE").substr(2);
+	string timestamp = query_qso_->item("TIME_ON");
+	string mode = query_qso_->item("MODE");
+	char msg[256];
+	// Mark QSO incomplete 
+	query_qso_->item("QSO_COMPLETE", string("N"));
+	g_query_->redraw();
+	int count = 0;
+	// Now read the file - search for the QSO start time
+	while (all_file->good() && !stop_copying) {
+		string line;
+		getline(*all_file, line);
+		count += line.length() + 1;
+		status_->progress(count, OT_RECORD);
+
+		// Does the line contain sought date, time, both calls and "Tx" or "Transmitting"
+		if (line.substr(0, 6) == datestamp &&
+			line.substr(7, 4) == timestamp.substr(0, 4) &&
+			(line.find("Transmitting") != string::npos || line.find("Tx")) &&
+			line.find(my_call) != string::npos &&
+			line.find(their_call) != string::npos &&
+			line.find(mode) != string::npos) {
+			start_copying = true;
+			snprintf(msg, 256, "DASH: %s %s %s %s %s Found possible match",
+				datestamp.c_str(),
+				timestamp.c_str(),
+				mode.c_str(),
+				my_call.c_str(),
+				their_call.c_str());
+			status_->misc_status(ST_NOTE, msg);
+		}
+		if (start_copying) {
+			if (line.find(my_call) != string::npos &&
+				line.find(their_call) != string::npos) {
+				// It has both calls - copy to buffer, and parse for QSO details (report, grid and QSO completion
+				snprintf(msg, 256, "DASH: %s", line.c_str());
+				status_->misc_status(ST_LOG, msg);
+				action_copy_all_text(line);
+			}
+			else if (line.find(my_call) == string::npos &&
+				line.find(their_call) == string::npos) {
+				// It has neither call - ignore
+			}
+			else {
+				// It has one or the other call - indicates QSO complete
+				stop_copying = true;
+				query_qso_->item("QSO_COMPLETE", string(""));
+			}
+		}
+	}
+	if (stop_copying) {
+		status_->progress("Found record!", OT_RECORD);
+		// If we are complete then say so
+		if (query_qso_->item("QSO_COMPLETE") != "N" && query_qso_->item("QSO_COMPLETE") != "?") {
+			all_file->close();
+			fl_cursor(FL_CURSOR_DEFAULT);
+		}
+	}
+	all_file->close();
+	snprintf(msg, 100, "LOG: Cannot find contact with %s in WSJT-X text.all file.", their_call.c_str());
+	status_->progress("Did not find record", OT_RECORD);
+	status_->misc_status(ST_WARNING, msg);
+	fl_cursor(FL_CURSOR_DEFAULT);
+}
+
+void qso_manager::qso_group::action_copy_all_text(string text) {
+	bool tx_record;
+	// After this initial processing pos will point to the start og the QSO decode string - look for old-style transmit record
+	size_t pos = text.find("Transmitting");
+	if (pos != string::npos) {
+		pos = text.find(query_qso_->item("MODE"));
+		pos += query_qso_->item("MODE").length() + 3;
+		tx_record = true;
+		// Nothing else to get from this record
+	}
+	else {
+		// Now see if it's a new-style Tx record
+		pos = text.find("Tx");
+		if (pos != string::npos) {
+			// Get frequency of transmission - including audio offset
+			string freq = text.substr(14, 9);
+			// Replace leading spaces with zeroes
+			for (size_t i = 0; freq[i] == ' '; i++) {
+				freq[i] = '0';
+			}
+			string freq_offset = text.substr(43, 4);
+			// Replace leading spaces with zeroes
+			for (size_t i = 0; freq_offset[i] == ' '; i++) {
+				freq_offset[i] = '0';
+			}
+			double frequency = stod(freq) + (stod(freq_offset) / 1000000.0);
+			query_qso_->item("FREQ", to_string(frequency));
+			pos = 48;
+			tx_record = true;
+		}
+		else {
+			// Look for a new-style Rx record
+			pos = text.find("Rx");
+			if (pos != string::npos) {
+				pos = 48;
+				tx_record = false;
+			}
+			else {
+				// Default to old-style Rx record
+				pos = 24;
+				tx_record = false;
+			}
+		}
+	}
+	// Now parse the exchange
+	vector<string> words;
+	split_line(text.substr(pos), words, ' ');
+	string report = words.back();
+	if (report == "RR73" || report == "RRR") {
+		// If we've seen the R-00 then mark the QSO complete, otherwise mark in provisional until we see the 73
+		if (query_qso_->item("QSO_COMPLETE") == "?") {
+			query_qso_->item("QSO_COMPLETE", string(""));
+		}
+		else if (query_qso_->item("QSO_COMPLETE") == "N") {
+			query_qso_->item("QSO_COMPLETE", string("?"));
+		}
+	}
+	else if (report == "73") {
+		// A 73 definitely indicates QSO compplete
+		query_qso_->item("QSO_COMPLETE", string(""));
+	}
+	else if (report[0] == 'R') {
+		// The first of the rogers
+		if (query_qso_->item("QSO_COMPLETE") == "N") {
+			query_qso_->item("QSO_COMPLETE", string("?"));
+		}
+		// Update reports if they've not been provided
+		if (tx_record && !query_qso_->item_exists("RST_SENT")) {
+			query_qso_->item("RST_SENT", report.substr(1));
+		}
+		else if (!tx_record && !query_qso_->item_exists("RST_RCVD")) {
+			query_qso_->item("RST_RCVD", report.substr(1));
+		}
+	}
+	else if (!tx_record && !query_qso_->item_exists("GRIDSQUARE")) {
+		// Update gridsquare if it's not been provided
+		query_qso_->item("GRIDSQUARE", report);
+	}
+	else if (report[0] == '-' || (report[0] >= '0' && report[0] <= '9')) {
+		// Numeric report
+		if (tx_record && !query_qso_->item_exists("RST_SENT")) {
+			query_qso_->item("RST_SENT", report);
+		}
+		else if (!tx_record && !query_qso_->item_exists("RST_RCVD")) {
+			query_qso_->item("RST_RCVD", report);
+		}
+	}
+
 }
 
 // Clock group - constructor
