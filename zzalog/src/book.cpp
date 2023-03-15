@@ -544,7 +544,7 @@ record_num_t book::selection(record_num_t num_item, hint_t hint /* = HT_SELECTED
 	case HT_IMPORT_QUERYNEW:
 	case HT_DUPE_QUERY:
 		// Query against first record in import_data or identified record
-		tabbed_forms_->update_views(requester, hint, record_num, num_other);
+		tabbed_forms_->update_views(requester, hint, record_num, record_number(num_other));
 		break;
 	case HT_CHANGED:
 	case HT_MINOR_CHANGE:
@@ -1253,8 +1253,6 @@ void book::check_dupes(bool restart) {
 	enable_save(false);
 	for (; duplicate_item_ < size() - 1 && !possible_dupe;) {
 		// Get adjacent records
-		record_num_t record_num_1 = record_number(duplicate_item_);
-		record_num_t record_num_2 = record_number(duplicate_item_ + 1);
 		record* record_1 = get_record(duplicate_item_, true);
 		record* record_2 = get_record(duplicate_item_ + 1, false);
 		match_result_t match = record_1->match_records(record_2);
@@ -1267,13 +1265,13 @@ void book::check_dupes(bool restart) {
 		case MT_EXACT:
 			// Delete second occurence after query
 			match_question_ = "These appear to be duplicates - select one to delete";
-			selection(record_num_2, HT_DUPE_QUERY, nullptr, record_num_1);
+			selection(duplicate_item_ + 1, HT_DUPE_QUERY, nullptr, duplicate_item_);
 			possible_dupe = true;
 			break;
 		default:
 			// Open QSO query 
 			match_question_ = "Possible duplicate record found";
-			selection(record_num_2, HT_DUPE_QUERY, nullptr, record_num_1);
+			selection(duplicate_item_ + 1, HT_DUPE_QUERY, nullptr, duplicate_item_);
 			possible_dupe = true;
 			break;
 		}

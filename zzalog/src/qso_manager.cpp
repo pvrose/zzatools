@@ -2465,9 +2465,10 @@ void qso_manager::qso_group::action_query(logging_state_t query) {
 		tab_query_->copy_label(import_data_->match_question().c_str());
 		break;
 	case QUERY_DUPE:
-		current_qso_ = navigation_book_->get_record(current_rec_num_, false);
+		// Note record numbers relate to book even if it is extracted data that refered the dupe check
+		current_qso_ = book_->get_record(current_rec_num_, false);
 		original_qso_ = new record(*current_qso_);
-		query_qso_ = navigation_book_->get_record(query_rec_num_, false);
+		query_qso_ = book_->get_record(query_rec_num_, false);
 		tab_query_->copy_label(navigation_book_->match_question().c_str());
 		break;
 	case QRZ_MERGE:

@@ -704,7 +704,7 @@ record_num_t extract_data::selection(record_num_t num_item, hint_t hint /* = HT_
 		current_item_ = num_item;
 	}
 	// And select the same record in the main log view
-	return book_->selection(record_number(current_item_), hint, requester, num_other);
+	return book::selection(current_item_, hint, requester, num_other);
 }
 
 // Extract all records for callsign
