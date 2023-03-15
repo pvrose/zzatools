@@ -25,6 +25,7 @@
 #include "qth_dialog.h"
 #include "utils.h"
 #include "qsl_viewer.h"
+#include "qrz_handler.h"
 
 #include <set>
 
@@ -64,6 +65,7 @@ extern dxa_if* dxa_if_;
 extern band_view* band_view_;
 extern tabbed_forms* tabbed_forms_;
 extern import_data* import_data_;
+extern qrz_handler* qrz_handler_;
 void add_rig_if();
 extern double prev_freq_;
 extern bool read_only_;
@@ -1756,6 +1758,18 @@ void qso_manager::qso_group::cb_bn_dupe(Fl_Widget* w, void* v) {
 	}
 }
 
+// Callback QRZ merge action
+void qso_manager::qso_group::cb_bn_save_merge(Fl_Widget* w, void* v) {
+	qso_group* that = ancestor_view<qso_group>(w);
+	switch (that->logging_state_) {
+	case QRZ_MERGE:
+		that->action_save_merge();
+		break;
+	default:
+		break;
+	}
+}
+
 // Reset contest serial number
 void qso_manager::qso_group::cb_init_serno(Fl_Widget* w, void* v) {
 	qso_group* that = ancestor_view<qso_group>(w);
@@ -2443,6 +2457,13 @@ void qso_manager::qso_group::action_query(logging_state_t query) {
 		query_qso_ = navigation_book_->get_record(query_rec_num_, false);
 		tab_query_->copy_label(navigation_book_->match_question().c_str());
 		break;
+	case QRZ_MERGE:
+		current_qso_ = book_->get_record(current_rec_num_, false);
+		original_qso_ = new record(*current_qso_);
+		query_qso_ = qrz_handler_->get_record();
+		tab_query_->copy_label(qrz_handler_->get_merge_message().c_str());
+		break;
+
 	default:
 		// TODO trap this sensibly
 		return;
@@ -2523,6 +2544,7 @@ void qso_manager::qso_group::action_handle_dclick(int col, string field) {
 	switch (logging_state_) {
 	case QUERY_MATCH:
 	case QUERY_DUPE:
+	case QRZ_MERGE:
 		switch (col) {
 		case 0:
 			// Treat as if clicking roe header
@@ -2539,6 +2561,19 @@ void qso_manager::qso_group::action_handle_dclick(int col, string field) {
 		}
 	}
 	enable_widgets();
+}
+
+// Action save as a result of a merge
+void qso_manager::qso_group::action_save_merge() {
+	// We no longer need to maintain the copy of the original QSO
+	book_->add_use_data(current_qso_);
+	book_->modified(true);
+	delete original_qso_;
+	original_qso_ = nullptr;
+	current_qso_ = nullptr;
+	logging_state_ = QSO_INACTIVE;
+	enable_widgets();
+	qrz_handler_->merge_done();
 }
 
 // Clock group - constructor
@@ -2890,6 +2925,8 @@ void qso_manager::update_qso(hint_t hint, record_num_t match_num, record_num_t q
 	case HT_DUPE_QUERY:
 		qso_group_->update_query(QUERY_DUPE, match_num, query_num);
 		break;
+	case HT_MERGE_DETAILS:
+		qso_group_->update_query(QRZ_MERGE, match_num, query_num);
 	}
 }
 

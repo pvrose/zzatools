@@ -261,7 +261,6 @@
     <ClInclude Include="zzalog\include\pfx_tree.h" />
     <ClInclude Include="zzalog\include\prefix.h" />
     <ClInclude Include="zzalog\include\printer.h" />
-    <ClInclude Include="zzalog\include\qrz_handler.h" />
     <ClInclude Include="zzalog\include\qsl_design.h" />
     <ClInclude Include="zzalog\include\qsl_form.h" />
     <ClInclude Include="zzalog\include\qsl_html_view.h" />

@@ -72,6 +72,7 @@ using namespace std;
 			QUERY_MATCH,     // Query: Compare new QSO with nearest match in log - add, reject or selectively merge
 			QUERY_NEW,       // Query: Not able to find QSO - allow manual matching
 			QUERY_DUPE,      // Query: Two records in log found to be possible duplicates - select either, both or a merge
+			QRZ_MERGE,       // Merge details downloaded from QRZ.com
 		};
 
 		// Hamlib parameters 
@@ -216,6 +217,10 @@ using namespace std;
 			static void cb_bn_find_match(Fl_Widget* w, void* v);
 			// Dupe
 			static void cb_bn_dupe(Fl_Widget* w, void* v);
+			// Merge yes/no
+			static void cb_bn_save_merge(Fl_Widget* w, void* v);
+			// Fetch data from QRZ.com
+			static void cb_bn_fetch_qrz(Fl_Widget* w, void* v);
 
 			// Individual group creates
 			Fl_Group* create_contest_group(int X, int Y);
@@ -291,6 +296,8 @@ using namespace std;
 			void action_handle_dupe(dupe_flags action);
 			// Action handle d-click
 			void action_handle_dclick(int col, string field);
+			// Action merge from QRZ.com
+			void action_save_merge();
 
 			// Get default copy record
 			record* get_default_record();
@@ -379,7 +386,7 @@ using namespace std;
 				KEEP_DUPE_2,
 				MERGE_DUPE,
 				KEEP_BOTH_DUPES,
-				MERGE_DATA,
+				MERGE_DONE,
 				VIEW_QSL,
 			};
 
@@ -392,7 +399,8 @@ using namespace std;
 				{ QSO_BROWSE, { EDIT_QSO, CANCEL_BROWSE, NAV_FIRST, NAV_PREV, NAV_NEXT, NAV_LAST, WORKED_B4, VIEW_QSL } },
 				{ QUERY_MATCH, { ADD_QUERY, REJECT_QUERY, MERGE_QUERY, NAV_PREV, NAV_NEXT }},
 				{ QUERY_NEW, { ADD_QUERY, REJECT_QUERY, FIND_QSO }},
-				{ QUERY_DUPE, { KEEP_DUPE_1, MERGE_DUPE, KEEP_DUPE_2, KEEP_BOTH_DUPES }}
+				{ QUERY_DUPE, { KEEP_DUPE_1, MERGE_DUPE, KEEP_DUPE_2, KEEP_BOTH_DUPES }},
+				{ QRZ_MERGE, { MERGE_DONE }}
 				// TODO add the query button maps
 			};
 
@@ -407,35 +415,40 @@ using namespace std;
 				void* userdata;
 			};
 
-			const Fl_Color COLOUR_ORANGE = 93; /* R=4/4, B=0/4, G = 5/7 */	
+			const Fl_Color COLOUR_ORANGE = 93; /* R=4/4, B=0/4, G=5/7 */	
+			const Fl_Color COLOUR_APPLE = 87;  /* R=3/4, B=0/4, G=7/7 */
+			const Fl_Color COLOUR_PINK = 170;  /* R=4/4, B=2/4, G=2/7 */
+			const Fl_Color COLOUR_NAVY = 136;  /* R=0/4, B=2/4, G=0/7 */
+
 			const map<button_type, button_action> action_map_ = 
 			{
 				{ ACTIVATE, { "Activate", "Pre-load QSO fields based on logging mode", FL_CYAN, cb_activate, 0 } },
 				{ START_QSO, { "Start QSO", "Start the QSO, after saving, and/or activating", FL_YELLOW, cb_start, 0 } },
 				{ EDIT_QSO, { "Edit QSO", "Edit the selected QSO", FL_MAGENTA, cb_edit, 0 } },
 				{ BROWSE, { "Browse Log", "Browse the log without editing", FL_BLUE, cb_bn_browse, 0}},
-				{ QUIT_QSO, { "Quit", "Quit entry mode", fl_lighter(FL_RED), cb_cancel, 0 } },
+				{ QUIT_QSO, { "Quit", "Quit entry mode", COLOUR_PINK, cb_cancel, 0 } },
 				{ EDIT_QTH, { "Edit QTH", "Edit the details of the QTH macro", FL_BACKGROUND_COLOR, cb_bn_edit_qth, 0 } },
 				{ SAVE_QSO, { "Save QSO", "Log the QSO, activate a new one", FL_GREEN, cb_save, 0 } },
-				{ CANCEL_QSO, { "Quit QSO", "Cancel the current QSO entry", fl_lighter(FL_RED), cb_cancel, 0 } },
+				{ CANCEL_QSO, { "Quit QSO", "Cancel the current QSO entry", COLOUR_PINK, cb_cancel, 0 } },
 				{ WORKED_B4, { "B4?", "Display all previous QSOs with this callsign", FL_BACKGROUND_COLOR, cb_wkb4, 0 } },
 				{ SAVE_EDIT, { "Save", "Copy changed record back to book", FL_GREEN, cb_save, 0}},
-				{ CANCEL_EDIT, { "Cancel Edit", "Cancel the current QSO edit", fl_lighter(FL_RED), cb_cancel, 0 } },
+				{ CANCEL_EDIT, { "Cancel Edit", "Cancel the current QSO edit", COLOUR_PINK, cb_cancel, 0 } },
 				{ NAV_FIRST, { "@$->|", "Select first record in book", FL_YELLOW, cb_bn_navigate, (void*)NV_FIRST } },
 				{ NAV_PREV, { "@<-", "Select previous record in book", FL_YELLOW, cb_bn_navigate, (void*)NV_PREV } },
 				{ NAV_NEXT, { "@->", "Select next record in book", FL_YELLOW, cb_bn_navigate, (void*)NV_NEXT } },
 				{ NAV_LAST, { "@->|", "Select last record in book", FL_YELLOW, cb_bn_navigate, (void*)NV_LAST } },
 				{ VIEW_QSL, { "View QSL", "Display QSL status", FL_BACKGROUND_COLOR, cb_bn_view_qsl, 0 } },
 				{ PARSE, { "DX?", "Display the DX details for this callsign", FL_BACKGROUND_COLOR, cb_parse, 0 } },
-				{ CANCEL_BROWSE, { "Quit Browse", "Quit browse mode", fl_lighter(FL_RED), cb_cancel, 0 } },
+				{ CANCEL_BROWSE, { "Quit Browse", "Quit browse mode", COLOUR_PINK, cb_cancel, 0 } },
 				{ ADD_QUERY, { "Add QSO", "Add queried QSO to log", FL_GREEN, cb_bn_add_query, 0 }},
-				{ REJECT_QUERY, {"Reject QSO", "Do not add queried QSO to log", fl_lighter(FL_RED), cb_bn_reject_query, 0} },
+				{ REJECT_QUERY, {"Reject QSO", "Do not add queried QSO to log", COLOUR_PINK, cb_bn_reject_query, 0} },
 				{ MERGE_QUERY, {"Merge QSO", "Merge query with logged QSO", COLOUR_ORANGE, cb_bn_merge_query, 0 } },
 				{ FIND_QSO, { "@search", "Display possible match", FL_YELLOW, cb_bn_find_match, 0}},
-				{ KEEP_DUPE_1, { "Keep 1", "Keep first QSO and delete second", fl_lighter(FL_GREEN), cb_bn_dupe, (void*)DF_1}},
-				{ KEEP_DUPE_2, { "Keep 2", "Keep second QSO and delete first", fl_lighter(FL_GREEN), cb_bn_dupe, (void*)DF_2}},
+				{ KEEP_DUPE_1, { "Keep 1", "Keep first QSO and delete second", COLOUR_APPLE, cb_bn_dupe, (void*)DF_1}},
+				{ KEEP_DUPE_2, { "Keep 2", "Keep second QSO and delete first", COLOUR_APPLE, cb_bn_dupe, (void*)DF_2}},
 				{ MERGE_DUPE, { "Merge", "Merge the two records", COLOUR_ORANGE, cb_bn_dupe, (void*)DF_MERGE}},
 				{ KEEP_BOTH_DUPES, { "Keep 1 && 2", "Keep both records", FL_GREEN, cb_bn_dupe, (void*)DF_BOTH}},
+				{ MERGE_DONE, { "Done", "Save changes", COLOUR_APPLE, cb_bn_save_merge, 0}},
 			};
 
 			// Previous value
