@@ -8,6 +8,8 @@
 #include "main_window.h"
 #include "qso_manager.h"
 
+#include <iostream>
+
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Radio_Round_Button.H>
 #include <FL/Fl.H>
@@ -18,8 +20,7 @@
 #include <FL/Fl_Text_Buffer.H>
 #include <FL/fl_ask.H>
 
-
-
+using namespace std;
 
 extern Fl_Preferences* settings_;
 extern rig_if* rig_if_;
@@ -436,6 +437,10 @@ void status::misc_status(status_t status, const char* label) {
 		status_file_viewer_->hide();
 	}
 	if (status != ST_DEBUG || display_debug_messages_) status_file_viewer_->append(message);
+
+#ifdef _DEBUG
+	cout << message;
+#endif
 
 	// Depending on the severity: LOG, NOTE, OK, WARNING, ERROR, SEVERE or FATAL
 	// Beep on the last three.

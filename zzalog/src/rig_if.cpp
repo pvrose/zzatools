@@ -51,7 +51,7 @@ string rig_if::get_swr_meter() {
 // Returns the string displaying the rig information for the rig status
 // e.g. Hamlib: TS-2000 14.123456 MHz 10 W USB S9+20
 string rig_if::rig_info() {
-	string rig_info = rig_info += rig_name_;
+	string rig_info = rig_name_;
 	// Valid rig - get data from it. TX frequency
 	if (is_split()) {
 		if (is_good()) rig_info += " TX:" + get_frequency(true) + " MHz";
@@ -232,6 +232,8 @@ rig_if::rig_if()
 	error_message_ = "";
 	baud_rate_ = 0;
 	unsupported_function_ = false;
+	max_power_ = 0.0;
+	prev_power_ = 0.0;
 }
 
 // Destructor
@@ -369,9 +371,6 @@ bool rig_if::open() {
 string& rig_if::rig_name() {
 	// Read capabilities to get manufacturer and model name
 	full_rig_name_ = rig_get_info(rig_);
-	rig_caps capabilities = *(rig_get_caps(model_id_));
-	rig_name_ = capabilities.model_name;
-	mfg_name_ = capabilities.mfg_name;
 	return full_rig_name_;
 }
 
