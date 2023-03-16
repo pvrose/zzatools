@@ -151,5 +151,9 @@ using namespace std;
 		int error_code_;
 		// Reported error code
 		bool unsupported_function_;
+		// Maximum TX power in QSO
+		double max_power_;
+		// Previous TX power to report in RX
+		double prev_power_;
 	};
 #endif

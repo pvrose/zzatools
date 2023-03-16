@@ -1385,10 +1385,7 @@ void qso_manager::qso_group::copy_cat_to_qso() {
 			snprintf(message, 128, "DASH: Rig submode changed during QSO, New value %s ignored", submode.c_str());
 			status_->misc_status(ST_WARNING, message);
 		}
-		double current_power = 0.0;
-		current_qso_->item("TX_PWR", current_power);
-		double rig_power = atof(tx_power.c_str());
-		current_qso_->item("TX_PWR", to_string(max(current_power, rig_power)));
+		current_qso_->item("TX_PWR", tx_power);
 		break;
 	}
 	}

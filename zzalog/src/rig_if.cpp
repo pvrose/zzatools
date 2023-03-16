@@ -97,6 +97,17 @@ string rig_if::get_frequency(bool tx) {
 // Return the power
 string rig_if::get_tx_power() {
 	double tx_power = pwr_meter();
+	if (get_tx()) {
+		// Get maximum power read during transmit and remember it for use in receive
+		max_power_ = max(max_power_, tx_power);
+		prev_power_ = max_power_;
+		tx_power = max_power_;
+	}
+	else {
+		// Always report back the maximum power during previous TX cycle
+		max_power_ = 0.0;
+		tx_power = prev_power_;
+	}
 	char text[100];
 	snprintf(text, 100, "%g", tx_power);
 	return text;
