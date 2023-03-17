@@ -20,7 +20,7 @@ using namespace std;
 			LOG_AND_QUERY      // Both the log record and supposed match from an import or duplicate query
 		};
 	public:
-		record_table(int X, int Y, int W, int H, const char* label);
+		record_table(int X, int Y, int W, int H, const char* label = nullptr);
 		~record_table();
 
 		// public methods

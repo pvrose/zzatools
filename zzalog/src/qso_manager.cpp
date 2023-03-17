@@ -879,12 +879,15 @@ Fl_Group* qso_manager::qso_group::create_entry_group(int X, int Y) {
 	int col2_y = curr_y;
 	int max_w = 0;
 
-	Fl_Group* g = new Fl_Group(curr_x, curr_y, 0, 0, "Entry");
+	Fl_Group* g = new Fl_Group(curr_x, curr_y, 0, 0);
 	g->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 	g->box(FL_BORDER_BOX);
+	g->labelfont(FL_BOLD);
+	g->labelsize(FL_NORMAL_SIZE + 2);
+	g->labelcolor(fl_darker(FL_BLUE));
 
 	curr_x += GAP;
-	curr_y += GAP;
+	curr_y += HTEXT;
 	// Fixed fields
 	// N rows of NUMBER_PER_ROW
 	const int NUMBER_PER_ROW = 2;
@@ -953,9 +956,12 @@ Fl_Group* qso_manager::qso_group::create_query_group(int X, int Y) {
 	int curr_x = X;
 	int curr_y = Y;
 
-	Fl_Group* g = new Fl_Group(curr_x, curr_y, 0, 0, "Query");
+	Fl_Group* g = new Fl_Group(curr_x, curr_y, 0, 0);
 	g->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 	g->box(FL_BORDER_BOX);
+	g->labelfont(FL_BOLD);
+	g->labelsize(FL_NORMAL_SIZE + 2);
+	g->labelcolor(fl_darker(FL_RED));
 
 	const int WTABLE = 420;
 	const int HTABLE = 250;
@@ -963,11 +969,8 @@ Fl_Group* qso_manager::qso_group::create_query_group(int X, int Y) {
 	curr_x += GAP;
 	curr_y += HTEXT;
 
-	tab_query_ = new record_table(curr_x, curr_y, WTABLE, HTABLE, "Query Message goes here");
+	tab_query_ = new record_table(curr_x, curr_y, WTABLE, HTABLE);
 	tab_query_->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
-	tab_query_->labelfont(FL_BOLD);
-	tab_query_->labelsize(FL_NORMAL_SIZE + 2);
-	tab_query_->labelcolor(fl_darker(FL_RED));
 	tab_query_->callback(cb_tab_qso, nullptr);
 
 	curr_x += WTABLE + GAP;
@@ -1149,6 +1152,7 @@ void qso_manager::qso_group::enable_entry_widgets() {
 	// Now enable disan=
 	switch (logging_state_) {
 	case QSO_INACTIVE:
+		g_entry_->label("QSO entry is not enabled.");
 		g_entry_->show();
 		for (int ix = 0; ix < NUMBER_TOTAL; ix++) {
 			if (ch_field_[ix]) ch_field_[ix]->deactivate();
@@ -1157,8 +1161,33 @@ void qso_manager::qso_group::enable_entry_widgets() {
 		ip_notes_->deactivate();
 		break;
 	case QSO_PENDING:
+		g_entry_->label("QSO Entry - prepared for real-time logging.");
+		g_entry_->show();
+		for (int ix = 0; ix <= number_fields_in_use_ && ix < NUMBER_TOTAL; ix++) {
+			if (ch_field_[ix]) ch_field_[ix]->activate();
+			ip_field_[ix]->activate();
+		}
+		for (int ix = number_fields_in_use_ + 1; ix < NUMBER_TOTAL; ix++) {
+			ch_field_[ix]->deactivate();
+			ip_field_[ix]->deactivate();
+		}
+		ip_notes_->activate();
+		break;
 	case QSO_STARTED:
+		g_entry_->label("QSO Entry - active real-time logging.");
+		g_entry_->show();
+		for (int ix = 0; ix <= number_fields_in_use_ && ix < NUMBER_TOTAL; ix++) {
+			if (ch_field_[ix]) ch_field_[ix]->activate();
+			ip_field_[ix]->activate();
+		}
+		for (int ix = number_fields_in_use_ + 1; ix < NUMBER_TOTAL; ix++) {
+			ch_field_[ix]->deactivate();
+			ip_field_[ix]->deactivate();
+		}
+		ip_notes_->activate();
+		break;
 	case QSO_EDIT:
+		g_entry_->label("QSO Entry - off air editing of QSO records.");
 		g_entry_->show();
 		for (int ix = 0; ix <= number_fields_in_use_ && ix < NUMBER_TOTAL; ix++) {
 			if (ch_field_[ix]) ch_field_[ix]->activate();
@@ -2441,7 +2470,7 @@ void qso_manager::qso_group::action_del_field(int ix) {
 void qso_manager::qso_group::action_browse() {
 	logging_state_ = QSO_BROWSE;
 	tab_query_->set_records(current_qso_, nullptr, nullptr);
-	tab_query_->label("Browsing record...");
+	g_query_->label("Browsing record");
 	enable_widgets();
 }
 
@@ -2453,26 +2482,26 @@ void qso_manager::qso_group::action_query(logging_state_t query) {
 		// And save a copy of it
 		original_qso_ = new record(*current_qso_);
 		query_qso_ = import_data_->get_record(query_rec_num_, false);
-		tab_query_->copy_label(import_data_->match_question().c_str());
+		g_query_->copy_label(import_data_->match_question().c_str());
 		break;
 	case QUERY_NEW:
 		current_qso_ = nullptr;
 		original_qso_ = nullptr;
 		query_qso_ = import_data_->get_record(query_rec_num_, false);;
-		tab_query_->copy_label(import_data_->match_question().c_str());
+		g_query_->copy_label(import_data_->match_question().c_str());
 		break;
 	case QUERY_DUPE:
 		// Note record numbers relate to book even if it is extracted data that refered the dupe check
 		current_qso_ = book_->get_record(current_rec_num_, false);
 		original_qso_ = new record(*current_qso_);
 		query_qso_ = book_->get_record(query_rec_num_, false);
-		tab_query_->copy_label(navigation_book_->match_question().c_str());
+		g_query_->copy_label(navigation_book_->match_question().c_str());
 		break;
 	case QRZ_MERGE:
 		current_qso_ = book_->get_record(current_rec_num_, false);
 		original_qso_ = new record(*current_qso_);
 		query_qso_ = qrz_handler_->get_record();
-		tab_query_->copy_label(qrz_handler_->get_merge_message().c_str());
+		g_query_->copy_label(qrz_handler_->get_merge_message().c_str());
 		break;
 
 	default:
