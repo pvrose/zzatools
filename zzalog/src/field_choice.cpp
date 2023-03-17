@@ -119,7 +119,8 @@ int field_input::handle(int event) {
 		if (intl_dialog_) {
 			intl_dialog_->editor(this);
 		}
-		return true;
+		if (input()->take_focus()) return true;
+		return Fl_Input_Choice::handle(event);
 	case FL_KEYBOARD:
 		// TODO: Compromise to use ALT/Nav keys 
 		switch (Fl::event_key()) {
