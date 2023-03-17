@@ -304,6 +304,8 @@ using namespace std;
 			void action_look_all_txt();
 			// Copy found text
 			void action_copy_all_text(string text);
+			// Set current QSO from selected record
+			void action_set_current();
 
 			// Get default copy record
 			record* get_default_record();
