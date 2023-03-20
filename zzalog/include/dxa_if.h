@@ -282,13 +282,15 @@ using namespace std;
 		double easternmost_;
 		double northernmost_;
 		double southernmost_;
-		int furthest_;
+		double horiz_most_;
+		double vert_most_;
 		// Without DX Location
 		double westernsave_;
 		double easternsave_;
 		double northernsave_;
 		double southernsave_;
-		int furthestsave_;
+		double horiz_save_;
+		double vert_save_;
 		// Map properties
 		int prefixes_;
 		int cq_zones_;

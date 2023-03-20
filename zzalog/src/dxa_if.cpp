@@ -1529,8 +1529,12 @@ void dxa_if::draw_pins() {
 			// Get most recent date (for AC_DAYS)
 			northernmost_ = home_lat_;
 			southernmost_ = home_lat_;
-			// Set smallest distance to a practicable limit to avoid zero divide if no pins to draw
-			furthest_ = 100;
+			// Set the azimuthal bounds to a finitessimal amount in each direction
+			horiz_most_ = 100.0;
+			vert_most_ = 100.0;
+#ifdef _DEBUG
+			cout << "Initial value: X=" << horiz_most_ << ", Y=" << vert_most_ << endl;
+#endif
 			last_time_ = time(nullptr);
 
 			// Clear records displayed
@@ -1648,13 +1652,19 @@ void dxa_if::draw_pins() {
 										point.parray = point_data;
 										(void)SafeArrayPutElement(point_array, &index_2, &point);
 										index_2++;
-										// Adjust furthest away;
-										int distance = 0;
+										// Adjust furthest for azimuthal projection
+										double distance;
+										double bearing;
 										record->item("DISTANCE", distance);
-										if (distance > furthest_) {
-											furthest_ = distance;
-										}
+										record->item("ANT_AZ", bearing);
+										double x_dist = distance * cos(bearing);
+										double y_dist = distance * sin(bearing);
+										horiz_most_ = max(horiz_most_, abs(x_dist));
+										vert_most_ = max(vert_most_, abs(y_dist));
 										// Add it to the set of records being displayed
+#ifdef _DEBUG
+										cout << "Wanted value: " << record->item("CALL") << ": X = " << x_dist << ", Y = " << y_dist << endl;
+#endif
 										records_displayed_.insert(record_num);
 										dxatlas_records_->add_record(record_num);
 									}
@@ -1778,7 +1788,8 @@ void dxa_if::draw_pins() {
 		southernsave_ = southernmost_;
 		westernsave_ = westernmost_;
 		easternsave_ = easternmost_;
-		furthestsave_ = furthest_;
+		horiz_save_ = horiz_most_;
+		vert_save_ = vert_most_;
 		redraw();
 		fl_cursor(FL_CURSOR_DEFAULT);
 	}
@@ -1897,21 +1908,14 @@ void dxa_if::zoom_centre(lat_long_t centre) {
 		// Zoom to include all records - get the furthermost from the centre E/W and N/S
 		// First calculate the necessary zoom to include all longitude values
 		double required_long = 2 * (max(easternmost_ - centre.longitude, centre.longitude - westernmost_));
-		double zoom_long = 360. / required_long;
-		double target_dpp = required_long / double(map->GetWidth());
-		// Now check if it will fit all the latitude values
 		double required_lat = 2 * (max(northernmost_ - centre.latitude, centre.latitude - southernmost_));
-		double zoomed_lat = target_dpp * double(map->GetHeight());
-		float zoom;
-		if (zoomed_lat >= required_lat) {
-			// It will fit - decrease zoom by 5% margin
-			zoom = (float)(zoom_long * 0.95);
-		}
-		else {
-			// Decrease zoom by mismatch (and a further 5%)
-			zoom = (float)(zoom_long * (zoomed_lat / required_lat) * 0.95);
-		}
+		// maximum degree per pixel
+		double width = map->GetWidth();
+		double height = map->GetHeight();
+		double max_dpp = max(360.0 / width, 180.0 / height);
+		double target_dpp = max(required_long / width, required_lat / height);
 		// now zoom by the smaller of these with 5% margin
+		float zoom = float(max_dpp / target_dpp) * 0.90F;
 		map->PutZoom(zoom);
 		if (zoom != zoom_value_) {
 			zoom_value_ = map->GetZoom();
@@ -1923,14 +1927,24 @@ void dxa_if::zoom_centre(lat_long_t centre) {
 void dxa_if::zoom_azimuthal() {
 	if (!zoom_changed_) {
 		DxAtlas::IDxMapPtr map = atlas_->GetMap();
-		float zoom;
 		// Zoom in to just the displayed QSOs
 		// Z=1.0 is full earth view, make Z = pi * R / furthest + 5%
-		// TODO: Account for width and height of DxAtlas by taking into account
-		//  bearing
-		zoom = (float)(EARTH_RADIUS * PI) / (float)furthest_ * 1.05F;
+		// maximum km per pixel
+		double width = map->GetWidth();
+		double height = map->GetHeight();
+		double max_dist = EARTH_RADIUS * PI;
+		double max_kmpp = max(max_dist / width, max_dist / height);
+		double target_kmpp = max(horiz_most_ / width, vert_most_ / height);
+		float zoom = float(max_kmpp / target_kmpp) * 0.90F;
+#ifdef _DEBUG
+		cout << "W=" << width << ", H=" << height << endl;
+		cout << "X=" << horiz_most_ << " Y=" << vert_most_ << endl;
+		cout << "km/px: Max=" << max_kmpp << ": Target=" << target_kmpp << ": Zoom=" << zoom << endl;
+#endif
 		map->PutZoom(zoom);
-		zoom_value_ = map->GetZoom();
+		if (zoom != zoom_value_) {
+			zoom_value_ = map->GetZoom();
+		}
 	}
 }
 
@@ -2101,7 +2115,8 @@ void dxa_if::set_dx_loc(string location, string callsign) {
 		southernsave_ = southernmost_;
 		westernsave_ = westernmost_;
 		easternsave_ = easternmost_;
-		furthestsave_ = furthest_;
+		horiz_most_ = horiz_save_;
+		vert_most_ = vert_save_;
 		// Adjust map limits to include dx location
 		if (lat_long.latitude > northernmost_) northernmost_ = lat_long.latitude;
 		if (lat_long.latitude < southernmost_) southernmost_ = lat_long.latitude;
@@ -2110,7 +2125,8 @@ void dxa_if::set_dx_loc(string location, string callsign) {
 		double bearing;
 		double distance;
 		great_circle({ home_lat_, home_long_ }, lat_long, bearing, distance);
-		if (distance > furthest_) furthest_ = (int)distance;
+		horiz_most_ = max(horiz_most_, distance * abs(cos(bearing)));
+		vert_most_ = max(vert_most_, distance * abs(sin(bearing)));
 		centre_map();
 		map->EndUpdate();
 		last_logged_call_ = callsign;
@@ -2130,7 +2146,8 @@ void dxa_if::clear_dx_loc() {
 		southernmost_ = southernsave_;
 		westernmost_ = westernsave_;
 		easternmost_ = easternsave_;
-		furthest_ = furthestsave_;
+		horiz_most_ = horiz_save_;
+		vert_most_ = vert_save_;
 		centre_map();
 	}
 }
