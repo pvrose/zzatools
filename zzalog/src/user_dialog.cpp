@@ -38,6 +38,7 @@ user_dialog::user_dialog(int X, int Y, int W, int H, const char* label) :
 	date_format_ = DATE_YYYYMMDD;
 	time_format_ = TIME_HHMMSS;
 	freq_format_ = FREQ_MHz;
+	session_elapse_ = 30.0;
 
 	do_creation(X, Y);
 }
@@ -51,6 +52,7 @@ void user_dialog::load_values() {
 	Fl_Preferences log_settings(user_settings, "Log Table");
 	log_settings.get("Font Name", (int&)log_font_, FONT);
 	log_settings.get("Font Size", (int&)log_size_, FONT_SIZE);
+	log_settings.get("Session Gap", session_elapse_, session_elapse_);
 	// Tooltip
 	Fl_Preferences tip_settings(user_settings, "Tooltip");
 	tip_settings.get("Duration", tip_duration_, Fl_Tooltip::delay());
@@ -106,10 +108,20 @@ void user_dialog::create_form(int X, int Y) {
 	br2->tooltip("Please select the font size used in the cells in all log table views");
 	br1->callback(cb_br_logfont, br2);
 	populate_size(br2, &log_font_, &log_size_);
-	// End group - fit to size
-	g1->resizable(nullptr);
 	pos_y = br2->y() + br2->h() + GAP;
-	pos_x = br2->x() + br2->w() + GAP;
+	pos_x = br1->x();
+	// Counter valuator - Session gap in 10 minute intervals
+	Fl_Counter* val0 = new Fl_Counter(pos_x, pos_y, WEDIT, HBUTTON, "Session elapse time (minutes)");
+	val0->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
+	val0->type(FL_SIMPLE_COUNTER);
+	val0->step(10.0);
+	val0->range(10.0, 120.0);
+	val0->value(session_elapse_);
+	val0->callback(cb_value<Fl_Counter, float>, &session_elapse_);
+	// End group - fit to size
+	pos_y = val0->y() + val0->h() + GAP;
+	pos_x = val0->x() + val0->w() + GAP;
+	g1->resizable(nullptr);
 	g1->size(pos_x - g1->x(), pos_y - g1->y());
 	g1->end();
 
@@ -158,6 +170,7 @@ void user_dialog::create_form(int X, int Y) {
 	val1->range(1.0, 15.0);
 	val1->value(tip_duration_);
 	val1->callback(cb_value<Fl_Counter, float>, &tip_duration_);
+	val1->tooltip("Please select the time (in seconds) that a tooltip will display");
 	// End group - fit to size
 	g2->resizable(nullptr);
 	pos_y = val1->y() + val1->h() + GAP;
@@ -302,6 +315,7 @@ void user_dialog::save_values() {
 	Fl_Preferences log_settings(user_settings, "Log Table");
 	log_settings.set("Font Name", (int&)log_font_);
 	log_settings.set("Font Size", (int&)log_size_);
+	log_settings.set("Session Gap", session_elapse_);
 	// Tell the log views
 	log_table::set_font(log_font_, log_size_);
 	// Tooltip

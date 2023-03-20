@@ -51,6 +51,8 @@
 		Fl_Fontsize log_size_;
 		// Duration a tool tip appears for (seconds)
 		float tip_duration_;
+		// Duration (in minutes) before a session is deemed closed
+		float session_elapse_;
 		// Font used for tool tip
 		Fl_Font tip_font_;
 		// and its size

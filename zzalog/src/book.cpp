@@ -1490,7 +1490,12 @@ bool book::enterring_record() {
 
 // Find the most recent QSO that is the gap after the previous one and set that as session start
 void book::set_session_start() {
+#ifdef _DEBUG
+	if (size()) session_start_ = get_record(size() - 1, false)->timestamp();
+	else session_start_ = 0;
+#else
 	session_start_ = time(nullptr);
+#endif
 	Fl_Preferences user_settings(settings_, "User Settings");
 	Fl_Preferences log_settings(user_settings, "Log Table");
 	double session_gap_mins;
