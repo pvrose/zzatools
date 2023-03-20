@@ -1718,6 +1718,7 @@ void dxa_if::draw_pins() {
 			call_layer_->BrushColor = DxAtlas::clWhite;
 			// Let DxAtlas callbacks update view
 			is_my_change_ = false;
+			zoom_changed_ = false;
 
 			// now centre on selected record - home location if azimuthal view
 			switch(map->GetProjection()) {
