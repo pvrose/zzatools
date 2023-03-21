@@ -2154,56 +2154,70 @@ void dxa_if::clear_dx_loc() {
 }
 
 HRESULT dxa_if::add_label(lat_long_t location, string text) {
-	_variant_t pt_lat, pt_long, pt_text;
-	_variant_t label, labels;
+	if (text.length()) {
+		_variant_t pt_lat, pt_long, pt_text;
+		_variant_t label, labels;
 
-	pt_lat.ChangeType(VT_R4);
-	pt_long.ChangeType(VT_R4);
+		pt_lat.ChangeType(VT_R4);
+		pt_long.ChangeType(VT_R4);
 
-	label.vt = VT_ARRAY | VT_VARIANT;
-	labels.vt = VT_ARRAY | VT_VARIANT;
-	//calculate attributes
-	pt_long = (float)location.longitude;
-	pt_lat = (float)location.latitude;
-	pt_text.SetString(text.c_str());
+		label.vt = VT_ARRAY | VT_VARIANT;
+		labels.vt = VT_ARRAY | VT_VARIANT;
+		//calculate attributes
+		pt_long = (float)location.longitude;
+		pt_lat = (float)location.latitude;
+		pt_text.SetString(text.c_str());
 
-	//create array of labels - 1 dimensional
-	SAFEARRAYBOUND rgsabound[1];
-	rgsabound[0].lLbound = 0;
-	rgsabound[0].cElements = 1;
+		//create array of labels - 1 dimensional
+		SAFEARRAYBOUND rgsabound[1];
+		rgsabound[0].lLbound = 0;
+		rgsabound[0].cElements = 1;
 
-	// Create an array of data (3 data items, longitude, latitude and callsign
-	SAFEARRAY* points = SafeArrayCreate(VT_VARIANT, 1, rgsabound);
-	if (points == nullptr) {
-		status_->misc_status(ST_SEVERE, "DXATLAS: Fatal error in callback");
-		return E_ABORT;
+		// Create an array of data (3 data items, longitude, latitude and callsign
+		SAFEARRAY* points = SafeArrayCreate(VT_VARIANT, 1, rgsabound);
+		if (points == nullptr) {
+			status_->misc_status(ST_SEVERE, "DXATLAS: Fatal error in callback");
+			return E_ABORT;
+		}
+		rgsabound[0].cElements = 3;
+		SAFEARRAY* point = SafeArrayCreate(VT_VARIANT, 1, rgsabound);
+		if (point == nullptr) {
+			status_->misc_status(ST_SEVERE, "DXATLAS: Fatal error in callback");
+			return E_ABORT;
+		}
+
+		//set attributes for point
+		long ix = 0;
+		(void)SafeArrayPutElement(point, &ix, &pt_long);
+		ix = 1; (void)SafeArrayPutElement(point, &ix, &pt_lat);
+		ix = 2; (void)SafeArrayPutElement(point, &ix, &pt_text);
+		//add point to the array
+		ix = 0; label.parray = point;
+		(void)SafeArrayPutElement(points, &ix, &label);
+		//put data into the layer
+		labels.parray = points;
+		try {
+			call_layer_->SetData(labels);
+			call_layer_->PutVisible(true);
+		}
+		catch (_com_error* e) {
+			char error[256];
+			sprintf(error, "DXATLAS: Got error displaying data : %s", e->ErrorMessage());
+			status_->misc_status(ST_ERROR, error);
+			return S_OK;
+		}
 	}
-	rgsabound[0].cElements = 3;
-	SAFEARRAY* point = SafeArrayCreate(VT_VARIANT, 1, rgsabound);
-	if (point == nullptr) {
-		status_->misc_status(ST_SEVERE, "DXATLAS: Fatal error in callback");
-		return E_ABORT;
-	}
+	else {
+		try {
+			call_layer_->PutVisible(false);
+		}
+		catch (_com_error* e) {
+			char error[256];
+			sprintf(error, "DXATLAS: Got error displaying data : %s", e->ErrorMessage());
+			status_->misc_status(ST_ERROR, error);
+			return S_OK;
+		}
 
-	//set attributes for point
-	long ix = 0;
-	(void)SafeArrayPutElement(point, &ix, &pt_long);
-	ix = 1; (void)SafeArrayPutElement(point, &ix, &pt_lat);
-	ix = 2; (void)SafeArrayPutElement(point, &ix, &pt_text);
-	//add point to the array
-	ix = 0; label.parray = point;
-	(void)SafeArrayPutElement(points, &ix, &label);
-	//put data into the layer
-	labels.parray = points;
-	try {
-		call_layer_->SetData(labels);
-		call_layer_->PutVisible(true);
-	}
-	catch (_com_error* e) {
-		char error[256];
-		sprintf(error, "DXATLAS: Got error displaying data : %s", e->ErrorMessage());
-		status_->misc_status(ST_ERROR, error);
-		return S_OK;
 	}
 
 	return S_OK;
