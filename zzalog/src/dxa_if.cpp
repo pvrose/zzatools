@@ -662,7 +662,6 @@ void dxa_if::cb_bn_centre(Fl_Widget* w, void* v) {
 	if (that->atlas_) {
 		DxAtlas::IDxMapPtr map = that->atlas_->GetMap();
 		lat_long_t home = { that->home_lat_, that->home_long_ };
-		that->clear_dx_loc();
 		that->centre_map(home);
 		that->zoom_changed_ = false;
 		switch (map->GetProjection()) {
