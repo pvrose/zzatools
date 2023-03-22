@@ -464,4 +464,9 @@
     <None Include="reference\Prefix.lst" />
     <None Include="zzalog\Makefile" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="zzalog\zzalog.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
 </Project>

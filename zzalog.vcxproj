@@ -290,6 +290,9 @@
     <None Include="reference\Prefix.lst" />
     <None Include="zzalog\Makefile" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="zzalog\zzalog.ico" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
     <Import Project="packages\pthreads.redist.2.9.1.4\build\native\pthreads.redist.targets" Condition="Exists('packages\pthreads.redist.2.9.1.4\build\native\pthreads.redist.targets')" />
