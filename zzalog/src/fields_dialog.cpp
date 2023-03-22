@@ -278,9 +278,10 @@ void fields_dialog::create_form(int X, int Y) {
 
 	// Group 1 surround
 	Fl_Group* gp1 = new Fl_Group(XG1, YG1, WG1, HG1, "Select field set");
-	gp1->labelsize(FONT_SIZE);
+	gp1->labelsize(FL_NORMAL_SIZE + 2);
+	gp1->labelfont(FL_BOLD);
 	gp1->align(FL_ALIGN_TOP_LEFT | FL_ALIGN_INSIDE);
-	gp1->box(FL_THIN_DOWN_BOX);
+	gp1->box(FL_BORDER_BOX);
 
 	// Choice - select name of field-set to use
 	Fl_Choice* ch1_1 = new Fl_Choice(X1_1, Y1, WSMEDIT, HTEXT, "Select by name");
@@ -353,9 +354,10 @@ void fields_dialog::create_form(int X, int Y) {
 
 	// Allow the view that uses the field-set to be slected
 	Fl_Group* gp2 = new Fl_Group(XG2, YG2, WG2, HG2);
-	gp2->labelsize(FONT_SIZE);
+	gp2->labelsize(FL_NORMAL_SIZE + 2);
+	gp2->labelfont(FL_BOLD);
 	gp2->align(FL_ALIGN_TOP_LEFT | FL_ALIGN_INSIDE);
-	gp2->box(FL_THIN_DOWN_BOX);
+	gp2->box(FL_BORDER_BOX);
 	// Add the app buttons
 	for (int i = 0; i < FO_LAST; i++) {
 		Fl_Light_Button* bn2 = new Fl_Light_Button(X2[i], Y2, WBUTTON, HBUTTON, APP_NAMES[i].c_str());
@@ -400,9 +402,10 @@ void fields_dialog::create_form(int X, int Y) {
 	sprintf(label3, "Columns for field set %s", field_set_name_.c_str());
 	Fl_Group* gp3 = new Fl_Group(XG3, YG3, WG3, HG3);
 	gp3->copy_label(label3);
-	gp3->labelsize(FONT_SIZE);
+	gp3->labelsize(FL_NORMAL_SIZE + 2);
+	gp3->labelfont(FL_BOLD);
 	gp3->align(FL_ALIGN_TOP_LEFT | FL_ALIGN_INSIDE);
-	gp3->box(FL_THIN_DOWN_BOX);
+	gp3->box(FL_BORDER_BOX);
 	// The used field table
 	fields_table* tab3_1a = new fields_table(XG3_1A, YG3_1, WG3_1A, HG3_1, "Columns in field set");
 	tab3_1a->labelsize(FONT_SIZE);

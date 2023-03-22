@@ -249,8 +249,9 @@ void files_dialog::create_form(int X, int Y) {
 	const int YMAX = GRP8 + HGRP8 + EDGE;
 	
 	Fl_Group* grp_auto = new Fl_Group (X + XGRP, Y + GRP1, XMAX, HGRP1, "Auto-import files");
-	grp_auto->labelsize(FONT_SIZE);
-	grp_auto->box(FL_THIN_DOWN_BOX);
+	grp_auto->labelsize(FL_NORMAL_SIZE + 2);
+	grp_auto->labelfont(FL_BOLD);
+	grp_auto->box(FL_BORDER_BOX);
 	grp_auto->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 
 	// widgets required for auto-import
@@ -317,8 +318,9 @@ void files_dialog::create_form(int X, int Y) {
 	grp_auto->end();
 
 	Fl_Group* grp_tqsl = new Fl_Group(X + XGRP, Y + GRP2, XMAX, HGRP2, "TQSL Executable");
-	grp_tqsl->labelsize(FONT_SIZE);
-	grp_tqsl->box(FL_THIN_DOWN_BOX);
+	grp_tqsl->labelsize(FL_NORMAL_SIZE + 2);
+	grp_tqsl->labelfont(FL_BOLD);
+	grp_tqsl->box(FL_BORDER_BOX);
 	grp_tqsl->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 	// Check box - TQSL executable is valid
 	Fl_Check_Button* bn_tqsl_en = new Fl_Check_Button(X + COL1, Y + ROW2_1, WRADIO, HBUTTON);
@@ -350,8 +352,9 @@ void files_dialog::create_form(int X, int Y) {
 	grp_tqsl->end();
 
 	Fl_Group* grp_card = new Fl_Group(X + XGRP, Y + GRP3, XMAX, HGRP2, "QSL Card Directoty");
-	grp_card->labelsize(FONT_SIZE);
-	grp_card->box(FL_THIN_DOWN_BOX);
+	grp_card->labelsize(FL_NORMAL_SIZE + 2);
+	grp_card->labelfont(FL_BOLD);
+	grp_card->box(FL_BORDER_BOX);
 	grp_card->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 	// Check box - Enable downloading eQSL.cc card images
 	Fl_Check_Button* bn_card_en = new Fl_Check_Button(X + COL1, Y + ROW3_1, WRADIO, HBUTTON);
@@ -378,8 +381,9 @@ void files_dialog::create_form(int X, int Y) {
 	grp_card->end();
 
 	Fl_Group* grp_ref_data = new Fl_Group(X + XGRP, Y + GRP4, XMAX, HGRP2, "Reference Data Directory");
-	grp_ref_data->labelsize(FONT_SIZE);
-	grp_ref_data->box(FL_THIN_DOWN_BOX);
+	grp_ref_data->labelsize(FL_NORMAL_SIZE + 2);
+	grp_ref_data->labelfont(FL_BOLD);
+	grp_ref_data->box(FL_BORDER_BOX);
 	grp_ref_data->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 	// Input - directory name for the reference (ADIF spec, Prefix data and band plans)
 	intl_input* in_ref_data_file = new intl_input(X + COL2, Y + ROW4_1, WEDIT + GAP + WBUTTON + GAP + WBUTTON, HTEXT);
@@ -400,8 +404,9 @@ void files_dialog::create_form(int X, int Y) {
 	grp_ref_data->end();
 
 	Fl_Group* grp_backup = new Fl_Group(X + XGRP, Y + GRP5, XMAX, HGRP2, "Backup Directory");
-	grp_backup->labelsize(FONT_SIZE);
-	grp_backup->box(FL_THIN_DOWN_BOX);
+	grp_backup->labelsize(FL_NORMAL_SIZE + 2);
+	grp_backup->labelfont(FL_BOLD);
+	grp_backup->box(FL_BORDER_BOX);
 	grp_backup->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 	// Check box - Enable automatic back up of data
 	Fl_Check_Button* bn_backup_en = new Fl_Check_Button(X + COL1, Y + ROW5_1, WRADIO, HBUTTON);
@@ -428,8 +433,9 @@ void files_dialog::create_form(int X, int Y) {
 	grp_backup->end();
 
 	Fl_Group* grp_web = new Fl_Group(X + XGRP, Y + GRP6, XMAX, HGRP2, "Web Browser");
-	grp_web->labelsize(FONT_SIZE);
-	grp_web->box(FL_THIN_DOWN_BOX);
+	grp_web->labelsize(FL_NORMAL_SIZE + 2);
+	grp_web->labelfont(FL_BOLD);
+	grp_web->box(FL_BORDER_BOX);
 	grp_web->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 	// Input - preferred web browser
 	intl_input* in_web_file = new intl_input(X + COL2, Y + ROW6_1, WEDIT + GAP + WBUTTON + GAP + WBUTTON, HTEXT);
@@ -455,8 +461,9 @@ void files_dialog::create_form(int X, int Y) {
 	grp_web->end();
 
 	Fl_Group* grp_status = new Fl_Group(X + XGRP, Y + GRP7, XMAX, HGRP7, "Status log file");
-	grp_status->labelsize(FONT_SIZE);
-	grp_status->box(FL_THIN_DOWN_BOX);
+	grp_status->labelsize(FL_NORMAL_SIZE + 2);
+	grp_status->labelfont(FL_BOLD);
+	grp_status->box(FL_BORDER_BOX);
 	grp_status->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 	// Input - status log file name
 	intl_input* in_status_file = new intl_input(X + COL2, Y + ROW7_1, WEDIT + GAP + WBUTTON + GAP + WBUTTON, HTEXT);
@@ -477,8 +484,9 @@ void files_dialog::create_form(int X, int Y) {
 	grp_status->end();
 
 	Fl_Group* grp_wsjtx = new Fl_Group(X + XGRP, Y + GRP7A, XMAX, HGRP7A, "WSJT-X directory");
-	grp_wsjtx->labelsize(FONT_SIZE);
-	grp_wsjtx->box(FL_THIN_DOWN_BOX);
+	grp_wsjtx->labelsize(FL_NORMAL_SIZE + 2);
+	grp_wsjtx->labelfont(FL_BOLD);
+	grp_wsjtx->box(FL_BORDER_BOX);
 	grp_wsjtx->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 	// Input - status log file name
 	intl_input* in_wsjtx_file = new intl_input(X + COL2, Y + ROW7A_1, WEDIT + GAP + WBUTTON + GAP + WBUTTON, HTEXT);
@@ -499,8 +507,9 @@ void files_dialog::create_form(int X, int Y) {
 	grp_wsjtx->end();
 
 	Fl_Group* grp_unzip = new Fl_Group(X + XGRP, Y + GRP8, XMAX, HGRP8, "Unzip executable");
-	grp_unzip->labelsize(FONT_SIZE);
-	grp_unzip->box(FL_THIN_DOWN_BOX);
+	grp_unzip->labelsize(FL_NORMAL_SIZE + 2);
+	grp_unzip->labelfont(FL_BOLD);
+	grp_unzip->box(FL_BORDER_BOX);
 	grp_unzip->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 	// Input - preferred web browser
 	intl_input* in_unzipper = new intl_input(X + COL2, Y + ROW8_1, WEDIT, HTEXT);
@@ -537,8 +546,9 @@ void files_dialog::create_form(int X, int Y) {
 	grp_unzip->end();
 
 	Fl_Group* grp_qsld = new Fl_Group(X + XGRP, Y + GRP9, XMAX, HGRP9, "QSL Template: - ");
-	grp_qsld->labelsize(FONT_SIZE);
-	grp_qsld->box(FL_THIN_DOWN_BOX);
+	grp_qsld->labelsize(FL_NORMAL_SIZE + 2);
+	grp_qsld->labelfont(FL_BOLD);
+	grp_qsld->box(FL_BORDER_BOX);
 	grp_qsld->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 
 	ch_callsign_ = new field_input(grp_qsld->x() + WLABEL * 2, grp_qsld->y(), WSMEDIT, HBUTTON);

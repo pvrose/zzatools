@@ -58,7 +58,7 @@ search_dialog::search_dialog() :
 	const int R12 = R11 + HBN;
 	const int R13 = R12 + HBN;
 	const int HG1A = R13 + HBN;
-	const int R14 = R13 + HBN;
+	const int R14 = R13 + HBN + GAP;
 	const int HG1B = R14 + HBN;
 	const int R15 = R14 + HBN + GAP;
 	const int HG1 = R15 + HBN + GAP - YG1;
@@ -121,15 +121,16 @@ search_dialog::search_dialog() :
 	// Read initial settings
 	load_values();
 
-	Fl_Group* gp1 = new Fl_Group(XG, YG1, WG1, HG1, "Condition");
-	gp1->labelsize(FONT_SIZE);
-	gp1->box(FL_THIN_DOWN_BOX);
-	gp1->align(FL_ALIGN_TOP_LEFT | FL_ALIGN_INSIDE);
+	Fl_Group* gp1 = new Fl_Group(XG, YG1, WG1, HG1, "Match condition");
+	gp1->labelsize(FL_NORMAL_SIZE + 2);
+	gp1->labelfont(FL_BOLD);
+	gp1->box(FL_BORDER_BOX);
+	gp1->align(FL_ALIGN_TOP | FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
 	// Positions for the 10 radio buttons
 
 	// Group the field selection buttons
 	Fl_Group* gp1a = new Fl_Group(XG, YG1, WG1, HG1A);
-	gp1a->box(FL_FLAT_BOX);
+	gp1a->box(FL_NO_BOX);
 	const int col1[10] = { C11, C12, C13, C14, C11, C12, C13, C14, C11, C12 };
 	const int row1[10] = { R11, R11, R11, R11, R12, R12, R12, R12, R13, R13 };
 	// For each condition
@@ -159,7 +160,7 @@ search_dialog::search_dialog() :
 	gp1a->end();
 	
 	Fl_Group* gp1b = new Fl_Group(XG, R14, WG1, HG1B);
-	gp1b->box(FL_FLAT_BOX);
+	gp1b->box(FL_NO_BOX);
 	// Position of the 7 comparator buttons
 	const int col2[7] = { C11, (C11 + C12)/2, C12, (C12 + C13)/2, C13, (C13 + C14)/2, C14 };
 	const int row2[7] = { R14, R14, R14, R14, R14, R14, R14 };
@@ -194,9 +195,10 @@ search_dialog::search_dialog() :
 	gp1->end();
 
 	Fl_Group* gp2 = new Fl_Group(XG, YG2, WG2, HG2, "Refinement");
-	gp2->labelsize(FONT_SIZE);
-	gp2->align(FL_ALIGN_TOP_LEFT | FL_ALIGN_INSIDE);
-	gp2->box(FL_THIN_DOWN_BOX);
+	gp2->labelsize(FL_NORMAL_SIZE + 2);
+	gp2->labelfont(FL_BOLD);
+	gp2->box(FL_BORDER_BOX);
+	gp2->align(FL_ALIGN_TOP | FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
 
 	// Row 1 - button and two date/calendars
 	// Check - Limit to date range
@@ -322,9 +324,10 @@ search_dialog::search_dialog() :
 
 	// Group 3 - Combination
 	Fl_Group* gp3 = new Fl_Group(XG, YG3, WG3, HG3, "Combination");
-	gp3->labelsize(FONT_SIZE);
-	gp3->align(FL_ALIGN_TOP_LEFT | FL_ALIGN_INSIDE);
-	gp3->box(FL_THIN_DOWN_BOX);
+	gp3->labelsize(FL_NORMAL_SIZE + 2);
+	gp3->labelfont(FL_BOLD);
+	gp3->box(FL_BORDER_BOX);
+	gp3->align(FL_ALIGN_TOP | FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
 
 	// Row 1 - radio buttons, NEW, AND, OR
 	const int col3[3] = { C31, C32, C33 };

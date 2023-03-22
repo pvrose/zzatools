@@ -687,10 +687,6 @@ using namespace std;
 		clock_group* clock_group_;
 		// widgets
 
-		// Scratchpad editor font
-		Fl_Font font_;
-		Fl_Fontsize fontsize_;
-
 		const static int WEDITOR = 400;
 
 	};

@@ -123,8 +123,8 @@ void qso_manager::cat_group::create_form(int X, int Y) {
 
 	// CAT control group
 	label("CAT Configuration");
-	labelfont(FONT);
-	labelsize(FONT_SIZE);
+	labelfont(FL_BOLD);
+	labelsize(FL_NORMAL_SIZE + 2);
 	align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 	box(FL_BORDER_BOX);
 
@@ -736,8 +736,8 @@ Fl_Group* qso_manager::qso_group::create_contest_group(int X, int Y) {
 	int curr_y = Y;
 
 	Fl_Group* g_contest = new Fl_Group(curr_x, curr_y, 0, 0, "Contest");
-	g_contest->labelfont(FONT);
-	g_contest->labelsize(FONT_SIZE);
+	g_contest->labelfont(FL_BOLD);
+	g_contest->labelsize(FL_NORMAL_SIZE + 2);
 	g_contest->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 	g_contest->box(FL_BORDER_BOX);
 
@@ -989,6 +989,8 @@ Fl_Group* qso_manager::qso_group::create_button_group(int X, int Y) {
 	int curr_y = Y;
 
 	Fl_Group* g = new Fl_Group(curr_x, curr_y, 0, 0, "Controls");
+	g->labelfont(FL_BOLD);
+	g->labelsize(FL_NORMAL_SIZE + 2);
 	g->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 	g->box(FL_BORDER_BOX);
 
@@ -1028,6 +1030,8 @@ void qso_manager::qso_group::create_form(int X, int Y) {
 	align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 	box(FL_BORDER_BOX);
 	label("QSO Data");
+	labelfont(FL_BOLD);
+	labelsize(FL_NORMAL_SIZE + 2);
 
 	// Choice widget to select the reqiuired logging mode
 	ch_logmode_ = new Fl_Choice(x() + GAP + WLLABEL, y() + HTEXT, 8 * WBUTTON, HTEXT, "QSO initialisation");
@@ -2825,8 +2829,8 @@ void qso_manager::clock_group::load_values() {
 void qso_manager::clock_group::create_form(int X, int Y) {
 
 	Fl_Group* g = new Fl_Group(X, Y, 10, 10, "Clock - UTC");
-	g->labelfont(FONT);
-	g->labelsize(FONT_SIZE);
+	g->labelfont(FL_BOLD);
+	g->labelsize(FL_NORMAL_SIZE + 2);
 	g->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 	g->box(FL_BORDER_BOX);
 
@@ -2921,8 +2925,6 @@ qso_manager::qso_manager(int W, int H, const char* label) :
 	Fl_Window(W, H, label)
 	, cat_group_(nullptr)
 	, created_(false)
-	, font_(FONT)
-	, fontsize_(FONT_SIZE)
 {
 	load_values();
 	create_form(0,0);
@@ -3003,8 +3005,6 @@ void qso_manager::load_values() {
 	// These are static, but will get to the same value each time
 	Fl_Preferences user_settings(settings_, "User Settings");
 	Fl_Preferences log_settings(user_settings, "Scratchpad");
-	log_settings.get("Font Name", (int&)font_, FONT);
-	log_settings.get("Font Size", (int&)fontsize_, FONT_SIZE);
 
 }
 

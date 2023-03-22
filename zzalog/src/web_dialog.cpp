@@ -214,8 +214,9 @@ void web_dialog::create_form(int X, int Y) {
 
 	// eQSL group
 	Fl_Group* gp1 = new Fl_Group(X + EDGE, Y + GRP1, WGRP, HGRP1, "eQSL.cc");
-	gp1->labelsize(FONT_SIZE);
-	gp1->box(FL_THIN_DOWN_FRAME);
+	gp1->labelsize(FL_NORMAL_SIZE + 2);
+	gp1->labelfont(FL_BOLD);
+	gp1->box(FL_BORDER_BOX);
 	gp1->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 
 	// Row 1 Col 2 - Date last accessed
@@ -317,8 +318,9 @@ void web_dialog::create_form(int X, int Y) {
 
 	// LotW group
 	Fl_Group* gp2 = new Fl_Group(X + EDGE, Y + GRP2, WGRP, HGRP2, "Logbook of the World");
-	gp2->labelsize(FONT_SIZE);
-	gp2->box(FL_THIN_DOWN_FRAME);
+	gp2->labelsize(FL_NORMAL_SIZE + 2);
+	gp2->labelfont(FL_BOLD);
+	gp2->box(FL_BORDER_BOX);
 	gp2->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 
 	// Row 1 Col 2 - Date last accessed
@@ -387,8 +389,9 @@ void web_dialog::create_form(int X, int Y) {
 
 	// QRZ.com group
 	Fl_Group* gp3 = new Fl_Group(X + EDGE, Y + GRP3, WGRP, HGRP3, "QRZ.com");
-	gp3->labelsize(FONT_SIZE);
-	gp3->box(FL_THIN_DOWN_FRAME);
+	gp3->labelsize(FL_NORMAL_SIZE + 2);
+	gp3->labelfont(FL_BOLD);
+	gp3->box(FL_BORDER_BOX);
 	gp3->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 
 
@@ -437,8 +440,9 @@ void web_dialog::create_form(int X, int Y) {
 
 	// QRZ.com group
 	Fl_Group* gp4 = new Fl_Group(X + EDGE, Y + GRP4, WGRP, HGRP4, "ClubLog");
-	gp4->labelsize(FONT_SIZE);
-	gp4->box(FL_THIN_DOWN_FRAME);
+	gp4->labelsize(FL_NORMAL_SIZE + 2);
+	gp4->labelfont(FL_BOLD);
+	gp4->box(FL_BORDER_BOX);
 	gp4->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 
 

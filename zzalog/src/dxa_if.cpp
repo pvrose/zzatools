@@ -213,8 +213,10 @@ void dxa_if::create_form() {
 
 	// Group 1 - DxAtlas controls
 	Fl_Group* group1 = new Fl_Group(EDGE, EDGE, 10, 10, "Display");
-	group1->box(FL_THIN_DOWN_BOX);
+	group1->box(FL_BORDER_BOX);
 	group1->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
+	group1->labelfont(FL_BOLD);
+	group1->labelsize(FL_NORMAL_SIZE + 2);
 
 	int curr_x = group1->x() + GAP;
 	int curr_y = group1->y() + HTEXT + FL_NORMAL_SIZE;
@@ -350,8 +352,6 @@ void dxa_if::create_form() {
 
 	// Button - Recentre
 	Fl_Button* bn13 = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Re-centre");
-	bn13->labelfont(FONT);
-	bn13->labelsize(FONT_SIZE);
 	bn13->callback(cb_bn_centre);
 	bn13->color(FL_YELLOW);
 	bn13->tooltip("Recentre the DxAtlas window");
@@ -368,11 +368,13 @@ void dxa_if::create_form() {
 	const int WWIN = EDGE + WGRP_1 + EDGE;
 
 
-	curr_y = group1->y() + group1->h();
+	curr_y = group1->y() + group1->h() + GAP;
 
 	Fl_Group* loc_grp = new Fl_Group(x() + GAP, curr_y, 10, 10, "Home Location");
 	loc_grp->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
-	loc_grp->box(FL_THIN_DOWN_BOX);
+	loc_grp->box(FL_BORDER_BOX);
+	loc_grp->labelfont(FL_BOLD);
+	loc_grp->labelsize(FL_NORMAL_SIZE + 2);
 
 	curr_x = loc_grp->x() + GAP + WLABEL;
 	curr_y = loc_grp->y() + HTEXT;
@@ -424,11 +426,16 @@ void dxa_if::create_form() {
 	update_location();
 	loc_grp->end();
 
+	curr_y += GAP;
+
 	// Group to contain the buttons displaying the colours
 	colour_grp_ = new Fl_Group(EDGE, curr_y, WGRP_1, HTEXT);
 	label_colour_grp();
-	colour_grp_->box(FL_THIN_DOWN_BOX);
+	colour_grp_->box(FL_BORDER_BOX);
 	colour_grp_->align(FL_ALIGN_TOP | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
+	colour_grp_->labelfont(FL_BOLD);
+	colour_grp_->labelsize(FL_NORMAL_SIZE + 2);
+
 
 	Fl_Light_Button* bn_colour_all = new Fl_Light_Button(EDGE + GAP + WBUTTON, colour_grp_->y() + HTEXT, WBUTTON, HBUTTON, "All colours");
 	bn_colour_all->align(FL_ALIGN_CENTER);
@@ -1196,8 +1203,8 @@ void dxa_if::create_colour_buttons() {
 	// now resize the window to just contain the buttons and don't allow the user to resize it smaller
 	colour_grp_->resizable(nullptr);
 	resizable(colour_grp_);
-	colour_grp_->size(colour_grp_->w(), (num_rows * HBUTTON) + HTEXT + GAP + GAP);
-	size(w(), colour_grp_->y() + colour_grp_->h() + GAP + EDGE);
+	colour_grp_->size(colour_grp_->w(), (num_rows * HBUTTON) + HTEXT + GAP + GAP +GAP);
+	size(w(), colour_grp_->y() + colour_grp_->h() + EDGE);
 	size_range(w(), h());
 	show();
 	redraw();

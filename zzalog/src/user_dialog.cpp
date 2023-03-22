@@ -76,7 +76,9 @@ void user_dialog::create_form(int X, int Y) {
 	// Log table 
 	Fl_Group* g1 = new Fl_Group(pos_x, pos_y, 0, 10, "Log Table");
 	g1->align(FL_ALIGN_TOP_LEFT | FL_ALIGN_INSIDE);
-	g1->box(FL_THIN_DOWN_BOX);
+	g1->labelfont(FL_BOLD);
+	g1->labelsize(FL_NORMAL_SIZE + 2);
+	g1->box(FL_BORDER_BOX);
 	// Add font browser
 	pos_x += GAP;
 	pos_y += HTEXT;
@@ -93,7 +95,7 @@ void user_dialog::create_form(int X, int Y) {
 	br2->tooltip("Please select the font size used in the cells in all log table views");
 	br1->callback(cb_br_logfont, br2);
 	populate_size(br2, &log_font_, &log_size_);
-	pos_y = br2->y() + br2->h() + GAP;
+	pos_y = br2->y() + br2->h() + HTEXT;
 	pos_x = br1->x();
 	// Counter valuator - Session gap in 10 minute intervals
 	Fl_Counter* val0 = new Fl_Counter(pos_x, pos_y, WEDIT, HBUTTON, "Session elapse time (minutes)");
@@ -112,10 +114,13 @@ void user_dialog::create_form(int X, int Y) {
 
 
 	// Group 2 - tool tip - align on above group
+	pos_y += GAP;
 	pos_x = g1->x();
 	Fl_Group* g2 = new Fl_Group(pos_x, pos_y, 10, 10, "Tooltips");
 	g2->align(FL_ALIGN_TOP_LEFT | FL_ALIGN_INSIDE);
-	g2->box(FL_THIN_DOWN_BOX);
+	g2->labelfont(FL_BOLD);
+	g2->labelsize(FL_NORMAL_SIZE + 2);
+	g2->box(FL_BORDER_BOX);
 	// Add font browser
 	pos_x += GAP;
 	pos_y += HTEXT;
@@ -131,7 +136,7 @@ void user_dialog::create_form(int X, int Y) {
 	br4->tooltip("Please select the font size used in the cells in all tooltips");
 	br3->callback(cb_br_tipfont, br4);
 	populate_size(br4, &tip_font_, &tip_size_);
-	pos_y = br4->y() + br4->h() + GAP;
+	pos_y = br4->y() + br4->h() + HTEXT;
 	pos_x = br3->x();
 	// Counter valuator - 1 to 15 s in 0.5 s steps
 	Fl_Counter* val1 = new Fl_Counter(pos_x, pos_y, br3->w(), HBUTTON, "Duration (s)");
@@ -150,10 +155,13 @@ void user_dialog::create_form(int X, int Y) {
 	g2->end();
 
 	// Group 3 - tree views (report, prefix and specification)
+	pos_y += GAP;
 	pos_x = g2->x();
 	Fl_Group* g4 = new Fl_Group(pos_x, pos_y, 0, 10, "Tree views");
 	g4->align(FL_ALIGN_TOP_LEFT | FL_ALIGN_INSIDE);
-	g4->box(FL_THIN_DOWN_BOX);
+	g4->labelfont(FL_BOLD);
+	g4->labelsize(FL_NORMAL_SIZE + 2);
+	g4->box(FL_BORDER_BOX);
 	// Add font browser
 	pos_x += GAP;
 	pos_y += HTEXT;
@@ -177,10 +185,13 @@ void user_dialog::create_form(int X, int Y) {
 	g4->end();
 
 	// Group 5 - user formats
+	pos_y += GAP;
 	pos_x = g4->x();
 	Fl_Group* g5 = new Fl_Group(pos_x, pos_y, 0, 10, "User Formats");
 	g5->align(FL_ALIGN_TOP_LEFT | FL_ALIGN_INSIDE);
-	g5->box(FL_THIN_DOWN_BOX);
+	g5->labelfont(FL_BOLD);
+	g5->labelsize(FL_NORMAL_SIZE + 2);
+	g5->box(FL_BORDER_BOX);
 	// Add choices - frequency 
 	pos_x += GAP + WLABEL;
 	pos_y += HTEXT;
