@@ -1685,6 +1685,7 @@ void qso_manager::qso_group::cb_edit(Fl_Widget* w, void* v) {
 		break;
 	case QSO_BROWSE:
 		that->action_cancel_browse();
+		that->action_set_current();
 		that->action_edit();
 		break;
 	}
