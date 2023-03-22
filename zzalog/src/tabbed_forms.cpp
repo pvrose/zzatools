@@ -37,7 +37,6 @@ tabbed_forms::tabbed_forms(int X, int Y, int W, int H, const char* label) :
 	Fl_Tabs(X, Y, W, H, label)
 {	
 	forms_.clear();
-	labelsize(FONT_SIZE);
 	// create the views -
 	// Full log view - displays selected items of all records
 	add_view<log_table>("Full log view", FO_MAINLOG, OT_MAIN, "Displays all log records");
@@ -80,7 +79,7 @@ void tabbed_forms::add_view(const char* label, field_ordering_t column_data, obj
 	// Create the view
 	VIEW* view = new VIEW(rx, ry, rw, rh, label, column_data);
 	// label - a bit bigger than text font size
-	view->labelsize(FONT_SIZE + 1);
+	view->labelsize(FL_NORMAL_SIZE + 1);
 	// standard colour used to represent this view - its tab, selected record/item and progress bar
 	Fl_Color bg_colour = OBJECT_COLOURS.at(object);
 	view->selection_color(bg_colour);

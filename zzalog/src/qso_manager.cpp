@@ -134,8 +134,6 @@ void qso_manager::cat_group::create_form(int X, int Y) {
 	// Choice - Select the rig model (Manufacturer/Model)
 	Fl_Choice* ch_model_ = new Fl_Choice(curr_x, curr_y, WSMEDIT, HTEXT, "Rig");
 	ch_model_->align(FL_ALIGN_LEFT);
-	ch_model_->labelsize(FONT_SIZE);
-	ch_model_->textsize(FONT_SIZE);
 	ch_model_->tooltip("Select the model - for Hamlib");
 	ch_model_->callback(cb_ch_model, nullptr);
 	rig_model_choice_ = ch_model_;
@@ -149,7 +147,6 @@ void qso_manager::cat_group::create_form(int X, int Y) {
 	// BAUDv  OVR*
 	curr_y += ch_model_->h() + GAP;
 	serial_grp_ = new Fl_Group(X + GAP, curr_y, 10, 10);
-	serial_grp_->labelsize(FONT_SIZE);
 	serial_grp_->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 	serial_grp_->box(FL_NO_BOX);
 
@@ -158,8 +155,6 @@ void qso_manager::cat_group::create_form(int X, int Y) {
 	curr_y = serial_grp_->y();
 	Fl_Choice* ch_port = new Fl_Choice(curr_x, curr_y, WBUTTON, HTEXT, "Port");
 	ch_port->align(FL_ALIGN_LEFT);
-	ch_port->labelsize(FONT_SIZE);
-	ch_port->textsize(FONT_SIZE);
 	ch_port->callback(cb_ch_port, nullptr);
 	ch_port->tooltip("Select the comms port to use");
 	port_if_choice_ = ch_port;
@@ -169,8 +164,6 @@ void qso_manager::cat_group::create_form(int X, int Y) {
 	curr_x += ch_port->w() + GAP;
 	Fl_Check_Button* bn_useall = new Fl_Check_Button(curr_x, curr_y, HBUTTON, HBUTTON, "All ports");
 	bn_useall->align(FL_ALIGN_RIGHT);
-	bn_useall->labelfont(FONT);
-	bn_useall->labelsize(FONT_SIZE);
 	bn_useall->tooltip("Select all existing ports, not just those available");
 	bn_useall->callback(cb_bn_all, &cat_data_->all_ports);
 	show_all_ports_ = bn_useall;
@@ -184,8 +177,6 @@ void qso_manager::cat_group::create_form(int X, int Y) {
 	int max_y = curr_y;
 	Fl_Choice* ch_baudrate = new Fl_Choice(curr_x, curr_y, WBUTTON, HTEXT, "Baud rate");
 	ch_baudrate->align(FL_ALIGN_LEFT);
-	ch_baudrate->labelsize(FONT_SIZE);
-	ch_baudrate->textsize(FONT_SIZE);
 	ch_baudrate->tooltip("Enter baud rate");
 	ch_baudrate->callback(cb_ch_baud, nullptr);
 	baud_rate_choice_ = ch_baudrate;
@@ -194,7 +185,6 @@ void qso_manager::cat_group::create_form(int X, int Y) {
 	curr_x += ch_baudrate->w() + GAP;
 	Fl_Check_Button* bn_override = new Fl_Check_Button(curr_x, curr_y, HBUTTON, HBUTTON, "Override\ncapability");
 	bn_override->align(FL_ALIGN_RIGHT);
-	bn_override->labelsize(FONT_SIZE);
 	bn_override->tooltip("Allow full baud rate selection");
 	bn_override->callback(cb_ch_over, nullptr);
 	override_check_ = bn_override;
@@ -211,7 +201,6 @@ void qso_manager::cat_group::create_form(int X, int Y) {
 	serial_grp_->end();
 
 	network_grp_ = new Fl_Group(serial_grp_->x(), serial_grp_->y(), 10, 10);
-	network_grp_->labelsize(FONT_SIZE);
 	network_grp_->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 	network_grp_->box(FL_NO_BOX);
 
@@ -220,8 +209,6 @@ void qso_manager::cat_group::create_form(int X, int Y) {
 	curr_y = network_grp_->y();
 	Fl_Input* ip_port = new Fl_Input(curr_x, curr_y, WSMEDIT, HTEXT, "Port");
 	ip_port->align(FL_ALIGN_LEFT);
-	ip_port->labelsize(FONT_SIZE);
-	ip_port->textsize(FONT_SIZE);
 	ip_port->callback(cb_ip_port, nullptr);
 	ip_port->tooltip("Enter the network/USB port to use");
 	ip_port->value(cat_data_->hamlib_params.port_name.c_str());
@@ -241,8 +228,6 @@ void qso_manager::cat_group::create_form(int X, int Y) {
 
 	// Connected status
 	bn_connect_ = new Fl_Button(curr_x, curr_y, WBUTTON * 2, HBUTTON, "Connect...");
-	bn_connect_->labelfont(FONT);
-	bn_connect_->labelsize(FONT_SIZE);
 	bn_connect_->color(FL_YELLOW);
 	bn_connect_->tooltip("Select to attempt to connect rig");
 	bn_connect_->callback(cb_bn_connect, nullptr);
@@ -255,7 +240,6 @@ void qso_manager::cat_group::create_form(int X, int Y) {
 	curr_x = X + GAP;
 	curr_y += bn_connect_->h() + GAP;
 	Fl_Group* poll_grp = new Fl_Group(curr_x, curr_y, 10, 10, "Polling interval (s)");
-	poll_grp->labelsize(FONT_SIZE);
 	poll_grp->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 	poll_grp->box(FL_NO_BOX);
 
@@ -264,8 +248,6 @@ void qso_manager::cat_group::create_form(int X, int Y) {
 	// Spinner to select fast polling rate (i.e. when still connected)
 	ctr_pollfast_ = new Fl_Spinner(curr_x, curr_y, WSMEDIT, HTEXT, "Conn'd");
 	ctr_pollfast_->align(FL_ALIGN_LEFT);
-	ctr_pollfast_->labelsize(FONT_SIZE);
-	ctr_pollfast_->textsize(FONT_SIZE);
 	ctr_pollfast_->tooltip("Select the polling period for fast polling");
 	ctr_pollfast_->type(FL_FLOAT_INPUT);
 	ctr_pollfast_->minimum(FAST_RIG_MIN);
@@ -280,8 +262,6 @@ void qso_manager::cat_group::create_form(int X, int Y) {
 	// Spinner to select slow polling rate (i.e. after disconnection to avoid excessive errors)
 	Fl_Spinner* ctr_pollslow_ = new Fl_Spinner(curr_x, curr_y, WSMEDIT, HTEXT, "Disconn'd");
 	ctr_pollslow_->align(FL_ALIGN_LEFT);
-	ctr_pollslow_->labelsize(FONT_SIZE);
-	ctr_pollslow_->textsize(FONT_SIZE);
 	ctr_pollslow_->tooltip("Select the polling period for slow polling");
 	ctr_pollslow_->type(FL_FLOAT_INPUT);
 	ctr_pollslow_->minimum(SLOW_RIG_MIN);
@@ -745,8 +725,6 @@ Fl_Group* qso_manager::qso_group::create_contest_group(int X, int Y) {
 	curr_y += HTEXT;
 
 	bn_enable_ = new Fl_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Enable");
-	bn_enable_->labelfont(FONT);
-	bn_enable_->labelsize(FONT_SIZE);
 	bn_enable_->value(field_mode_ != NO_CONTEST);
 	bn_enable_->selection_color(FL_GREEN);
 	bn_enable_->callback(cb_ena_contest, nullptr);
@@ -756,8 +734,6 @@ Fl_Group* qso_manager::qso_group::create_contest_group(int X, int Y) {
 
 	// Pause contest button
 	bn_pause_ = new Fl_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Pause");
-	bn_pause_->labelfont(FONT);
-	bn_pause_->labelsize(FONT_SIZE);
 	bn_pause_->value(field_mode_ == PAUSED);
 	bn_pause_->selection_color(FL_RED);
 	bn_pause_->callback(cb_pause_contest, nullptr);
@@ -767,10 +743,6 @@ Fl_Group* qso_manager::qso_group::create_contest_group(int X, int Y) {
 
 	// Contest ID - used for logging
 	ch_contest_id_ = new field_choice(curr_x, curr_y, WBUTTON * 2, HBUTTON, "CONTEST_ID");
-	ch_contest_id_->labelfont(FONT);
-	ch_contest_id_->labelsize(FONT_SIZE);
-	ch_contest_id_->textfont(FONT);
-	ch_contest_id_->textsize(FONT_SIZE);
 	ch_contest_id_->set_dataset("Contest_ID");
 	ch_contest_id_->value(contest_id_.c_str());
 	ch_contest_id_->callback(cb_value<field_choice, string>, &contest_id_);
@@ -782,12 +754,6 @@ Fl_Group* qso_manager::qso_group::create_contest_group(int X, int Y) {
 
 	// Choice widget to select the required exchanges
 	ch_format_ = new Fl_Input_Choice(curr_x, curr_y, WBUTTON + WBUTTON, HBUTTON, "Exch.");
-	ch_format_->labelfont(FONT);
-	ch_format_->labelsize(FONT_SIZE);
-	ch_format_->textfont(FONT);
-	ch_format_->textsize(FONT_SIZE);
-	ch_format_->menubutton()->textfont(FONT);
-	ch_format_->menubutton()->textsize(FONT_SIZE);
 	ch_format_->value(exch_fmt_id_.c_str());
 	ch_format_->align(FL_ALIGN_LEFT);
 	ch_format_->callback(cb_format, nullptr);
@@ -799,8 +765,6 @@ Fl_Group* qso_manager::qso_group::create_contest_group(int X, int Y) {
 
 	// Add exchange button
 	bn_add_exch_ = new Fl_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Add");
-	bn_add_exch_->labelfont(FONT);
-	bn_add_exch_->labelsize(FONT_SIZE);
 	bn_add_exch_->value(field_mode_ == EDIT);
 	bn_add_exch_->callback(cb_add_exch, nullptr);
 	bn_add_exch_->selection_color(FL_RED);
@@ -810,8 +774,6 @@ Fl_Group* qso_manager::qso_group::create_contest_group(int X, int Y) {
 
 	// Define contest exchanges
 	bn_define_tx_ = new Fl_Button(curr_x, curr_y, WBUTTON / 2, HBUTTON, "TX");
-	bn_define_tx_->labelfont(FONT);
-	bn_define_tx_->labelsize(FONT_SIZE);
 	bn_define_tx_->callback(cb_def_format, (void*)true);
 	bn_define_tx_->tooltip("Use the specified fields as contest exchange on transmit");
 
@@ -819,8 +781,6 @@ Fl_Group* qso_manager::qso_group::create_contest_group(int X, int Y) {
 
 	// Define contest
 	bn_define_rx_ = new Fl_Button(curr_x, curr_y, WBUTTON / 2, HBUTTON, "RX");
-	bn_define_rx_->labelfont(FONT);
-	bn_define_rx_->labelsize(FONT_SIZE);
 	bn_define_rx_->callback(cb_def_format, (void*)false);
 	bn_define_rx_->tooltip("Use the specified fields as contest exchange on receive");
 
@@ -828,8 +788,6 @@ Fl_Group* qso_manager::qso_group::create_contest_group(int X, int Y) {
 
 	// Serial number control buttons - Initialise to 001
 	bn_init_serno_ = new Fl_Button(curr_x, curr_y, WBUTTON / 2, HBUTTON, "@|<");
-	bn_init_serno_->labelfont(FONT);
-	bn_init_serno_->labelsize(FONT_SIZE);
 	bn_init_serno_->callback(cb_init_serno, nullptr);
 	bn_init_serno_->tooltip("Reset the contest serial number counter to \"001\"");
 
@@ -837,8 +795,7 @@ Fl_Group* qso_manager::qso_group::create_contest_group(int X, int Y) {
 
 	// Serial number control buttons - Decrement
 	bn_dec_serno_ = new Fl_Button(curr_x, curr_y, WBUTTON / 2, HBUTTON, "@<");
-	bn_dec_serno_->labelfont(FONT);
-	bn_dec_serno_->labelsize(FONT_SIZE + 2);
+	bn_dec_serno_->labelsize(FL_NORMAL_SIZE + 2);
 	bn_dec_serno_->callback(cb_dec_serno, nullptr);
 	bn_dec_serno_->tooltip("Decrement the contest serial number counter by 1");
 
@@ -846,8 +803,7 @@ Fl_Group* qso_manager::qso_group::create_contest_group(int X, int Y) {
 
 	// Serial number control buttons - Decrement
 	bn_inc_serno_ = new Fl_Button(curr_x, curr_y, WBUTTON / 2, HBUTTON, "@>");
-	bn_inc_serno_->labelfont(FONT);
-	bn_inc_serno_->labelsize(FONT_SIZE + 2);
+	bn_inc_serno_->labelsize(FL_NORMAL_SIZE + 2);
 	bn_inc_serno_->callback(cb_inc_serno, nullptr);
 	bn_inc_serno_->tooltip("Increment the contest serial number counter by 1");
 
@@ -856,10 +812,6 @@ Fl_Group* qso_manager::qso_group::create_contest_group(int X, int Y) {
 	// Transmitted contest exchange
 	op_serno_ = new Fl_Output(curr_x, curr_y, WBUTTON, HBUTTON, "Serial");
 	op_serno_->align(FL_ALIGN_TOP);
-	op_serno_->labelfont(FONT);
-	op_serno_->labelsize(FONT_SIZE);
-	op_serno_->textfont(FONT);
-	op_serno_->textsize(FONT_SIZE);
 	op_serno_->tooltip("This is the serial number you should be sending");
 
 	curr_x += op_serno_->w() + GAP;
@@ -896,8 +848,6 @@ Fl_Group* qso_manager::qso_group::create_entry_group(int X, int Y) {
 	for (int ix = 0; ix < NUMBER_TOTAL; ix++) {
 		if (ix >= NUMBER_FIXED) {
 			ch_field_[ix] = new field_choice(curr_x, curr_y, WCHOICE, HBUTTON);
-			ch_field_[ix]->textfont(FONT);
-			ch_field_[ix]->textsize(FONT_SIZE);
 			ch_field_[ix]->align(FL_ALIGN_RIGHT);
 			ch_field_[ix]->tooltip("Specify the field to provide");
 			ch_field_[ix]->callback(cb_ch_field, (void*)ix);
@@ -935,10 +885,6 @@ Fl_Group* qso_manager::qso_group::create_entry_group(int X, int Y) {
 	curr_y += HBUTTON;
 
 	ip_notes_ = new intl_input(curr_x, curr_y, max_w - curr_x, HBUTTON, "NOTES");
-	ip_notes_->labelfont(FONT);
-	ip_notes_->labelsize(FONT_SIZE);
-	ip_notes_->textfont(FONT);
-	ip_notes_->textsize(FONT_SIZE);
 	ip_notes_->callback(cb_ip_notes, nullptr);
 	ip_notes_->tooltip("Add any notes for the QSO");
 
@@ -1035,10 +981,6 @@ void qso_manager::qso_group::create_form(int X, int Y) {
 
 	// Choice widget to select the reqiuired logging mode
 	ch_logmode_ = new Fl_Choice(x() + GAP + WLLABEL, y() + HTEXT, 8 * WBUTTON, HTEXT, "QSO initialisation");
-	ch_logmode_->labelfont(FONT);
-	ch_logmode_->labelsize(FONT_SIZE);
-	ch_logmode_->textfont(FONT);
-	ch_logmode_->textsize(FONT_SIZE);
 	ch_logmode_->align(FL_ALIGN_LEFT);
 	ch_logmode_->add("Current date and time - used for parsing only");
 	ch_logmode_->add("All fields blank");
@@ -2842,8 +2784,8 @@ void qso_manager::clock_group::create_form(int X, int Y) {
 	bn_time_ = new Fl_Button(curr_x, curr_y, WCLOCKS, 3 * HTEXT);
 	bn_time_->color(FL_BLACK);
 	bn_time_->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE);
-	bn_time_->labelfont(FONT | FL_BOLD);
-	bn_time_->labelsize(5 * FONT_SIZE);
+	bn_time_->labelfont(FL_BOLD);
+	bn_time_->labelsize(5 * FL_NORMAL_SIZE);
 	bn_time_->labelcolor(FL_YELLOW);
 	bn_time_->box(FL_FLAT_BOX);
 
@@ -2852,8 +2794,7 @@ void qso_manager::clock_group::create_form(int X, int Y) {
 	bn_date_ = new Fl_Button(curr_x, curr_y, WCLOCKS, HTEXT * 3 / 2);
 	bn_date_->color(FL_BLACK);
 	bn_date_->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE);
-	bn_date_->labelfont(FONT);
-	bn_date_->labelsize(FONT_SIZE * 3 / 2);
+	bn_date_->labelsize(FL_NORMAL_SIZE * 3 / 2);
 	bn_date_->labelcolor(FL_YELLOW);
 	bn_date_->box(FL_FLAT_BOX);
 
@@ -2862,8 +2803,7 @@ void qso_manager::clock_group::create_form(int X, int Y) {
 	bn_local_ = new Fl_Button(curr_x, curr_y, WCLOCKS, HTEXT * 3 / 2);
 	bn_local_->color(FL_BLACK);
 	bn_local_->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE);
-	bn_local_->labelfont(FONT);
-	bn_local_->labelsize(FONT_SIZE * 3 / 2);
+	bn_local_->labelsize(FL_NORMAL_SIZE * 3 / 2);
 	bn_local_->labelcolor(FL_RED);
 	bn_local_->box(FL_FLAT_BOX);
 

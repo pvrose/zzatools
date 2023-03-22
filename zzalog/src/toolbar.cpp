@@ -275,8 +275,6 @@ toolbar::toolbar(int X, int Y, int W, int H, const char* label) :
 	ip->callback(cb_value<intl_input, string>, &search_text_);
 	ip->when(FL_WHEN_CHANGED);
 	ip->value(search_text_.c_str());
-	ip->textsize(FONT_SIZE);
-	ip->textfont(FONT);
 	ip->tooltip("Enter will search for the callsign typed");
 	add(ip);
 	// Make it visible to load the text up
@@ -287,7 +285,6 @@ toolbar::toolbar(int X, int Y, int W, int H, const char* label) :
 	bn->callback(cb_bn_search, (void*)false);
 	bn->when(FL_WHEN_RELEASE);
 	bn->tooltip("Jump to next occurence of call in log");
-	bn->labelsize(FONT_SIZE);
 	add(bn);
 	curr_x += H;
 	// Button to extract all records with this callsign
@@ -295,7 +292,6 @@ toolbar::toolbar(int X, int Y, int W, int H, const char* label) :
 	bn->callback(cb_bn_extract);
 	bn->when(FL_WHEN_RELEASE);
 	bn->tooltip("Display all QSOs with thsi callsign in extract log");
-	bn->labelsize(FONT_SIZE);
 	add(bn);
 	curr_x += H;
 	// Button to parse and explain the callsign in a tooltip
@@ -303,8 +299,6 @@ toolbar::toolbar(int X, int Y, int W, int H, const char* label) :
 	bn->callback(cb_bn_explain);
 	bn->when(FL_WHEN_RELEASE);
 	bn->tooltip("Parse the call");
-	bn->labelfont(FONT);
-	bn->labelsize(FONT_SIZE);
 	add(bn);
 	curr_x += H + TOOL_GAP;
 

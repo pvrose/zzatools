@@ -137,7 +137,6 @@ search_dialog::search_dialog() :
 	for (int i = 0; i < 10; i++) {
 		// Radio - one for each element of the search criterion
 		Fl_Radio_Round_Button* bn11 = new Fl_Radio_Round_Button(col1[i], row1[i], WBN, HBN, condition_labels_[i].c_str());
-		bn11->labelsize(FONT_SIZE);
 		bn11->box(FL_THIN_UP_BOX);
 		bn11->align(FL_ALIGN_RIGHT | FL_ALIGN_INSIDE);
 		bn11->value(criteria_->condition == i);
@@ -153,7 +152,6 @@ search_dialog::search_dialog() :
 	// Choice - Field-name choice
 	field_choice* ch12 = new field_choice(C13, R13, WCHOICE, HTEXT);
 	ch12->set_dataset("Fields",criteria_->field_name);
-	ch12->textsize(FONT_SIZE);
 	ch12->tooltip("Select field to search on");
 	ch12->callback(cb_value<field_choice, string>, (void*)&criteria_->field_name);
 	ch12->when(FL_WHEN_RELEASE);
@@ -167,7 +165,6 @@ search_dialog::search_dialog() :
 	// Radio: regex or comparator
 	for (int i = 0; i < 7; i++) {
 		Fl_Radio_Round_Button* bn13 = new Fl_Radio_Round_Button(col2[i], row2[i], WBN/2, HBN, comparator_labels_[i].c_str());
-		bn13->labelsize(FONT_SIZE);
 		bn13->box(FL_THIN_UP_BOX);
 		bn13->align(FL_ALIGN_RIGHT | FL_ALIGN_INSIDE);
 		bn13->value(criteria_->comparator == i);
@@ -184,8 +181,6 @@ search_dialog::search_dialog() :
 	// Input - text to match
 	intl_input* ip14 = new intl_input(C11, R15
 		, WEDIT, HTEXT, "Search text");
-	ip14->labelsize(FONT_SIZE);
-	ip14->textsize(FONT_SIZE);
 	ip14->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
 	ip14->callback(cb_value<intl_input, string>, (void*)&criteria_->pattern);
 	ip14->when(FL_WHEN_CHANGED);
@@ -203,7 +198,6 @@ search_dialog::search_dialog() :
 	// Row 1 - button and two date/calendars
 	// Check - Limit to date range
 	Fl_Light_Button* bn21 = new Fl_Light_Button(C211, R21, W211, HBUTTON, "By date");
-	bn21->labelsize(FONT_SIZE);
 	bn21->align(FL_ALIGN_RIGHT | FL_ALIGN_INSIDE);
 	bn21->selection_color(FL_RED);
 	bn21->callback(cb_value<Fl_Light_Button, bool>, (void*)&criteria_->by_dates);
@@ -213,8 +207,6 @@ search_dialog::search_dialog() :
 	// Input - Start date
 	intl_input* in22 = new intl_input(C212, R21, W212, HTEXT, "From:");
 	in22->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
-	in22->labelsize(FONT_SIZE);
-	in22->textsize(FONT_SIZE);
 	in22->value(criteria_->from_date.c_str());
 	in22->callback(cb_value<intl_input, string>, &criteria_->from_date);
 	in22->when(FL_WHEN_CHANGED);
@@ -229,8 +221,6 @@ search_dialog::search_dialog() :
 	// Input - End date
 	intl_input* in24 = new intl_input(C214, R21, W214, HTEXT, "To:");
 	in24->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
-	in24->labelsize(FONT_SIZE);
-	in24->textsize(FONT_SIZE);
 	in24->value(criteria_->to_date.c_str());
 	in24->callback(cb_value<intl_input, string>, &criteria_->to_date);
 	in24->when(FL_WHEN_CHANGED);
@@ -247,8 +237,6 @@ search_dialog::search_dialog() :
 	// Choice - Band to limit search to
 	Fl_Choice* ch26 = new Fl_Choice(C221, R22, W221, HTEXT, "Band");
 	ch26->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
-	ch26->labelsize(FONT_SIZE);
-	ch26->textsize(FONT_SIZE);
 	// Get the list of bands from ADIF specification
 	spec_dataset* bands = spec_data_->dataset("Band");
 	// Start with "Any"
@@ -269,8 +257,6 @@ search_dialog::search_dialog() :
 	ch26->tooltip("Select the band for matching records");
 	// Choice - Mode to limit search to
 	Fl_Choice* ch27 = new Fl_Choice(C222, R22, W222, HTEXT, "Mode");
-	ch27->labelsize(FONT_SIZE);
-	ch27->textsize(FONT_SIZE);
 	ch27->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
 	// Get the list of modes from the ADIF specification
 	spec_dataset* modes = spec_data_->dataset("Mode");
@@ -294,7 +280,6 @@ search_dialog::search_dialog() :
 	// Row 3 - confirmed
 	// Check - Restrict to records confirmed by eQSL
 	Fl_Light_Button* bn28 = new Fl_Light_Button(C231, R23, W231, HBUTTON, "eQSL");
-	bn28->labelsize(FONT_SIZE);
 	bn28->align(FL_ALIGN_RIGHT | FL_ALIGN_INSIDE);
 	bn28->selection_color(FL_RED);
 	bn28->value(criteria_->confirmed_eqsl);
@@ -303,7 +288,6 @@ search_dialog::search_dialog() :
 	bn28->tooltip("Match only when confirmed by eQSL");
 	// Check - Restrict to records confirmed by LotW
 	Fl_Light_Button* bn29 = new Fl_Light_Button(C232, R23, W232, HBUTTON, "LotW");
-	bn29->labelsize(FONT_SIZE);
 	bn29->align(FL_ALIGN_RIGHT | FL_ALIGN_INSIDE);
 	bn29->selection_color(FL_RED);
 	bn29->value(criteria_->confirmed_lotw);
@@ -312,7 +296,6 @@ search_dialog::search_dialog() :
 	bn29->tooltip("Match only when confirmed by LotW");
 	// Check - Restrict to records confirmed by Paper QSL
 	Fl_Light_Button* bn210 = new Fl_Light_Button(C233, R23, W233, HBUTTON, "Card");
-	bn210->labelsize(FONT_SIZE);
 	bn210->align(FL_ALIGN_RIGHT | FL_ALIGN_INSIDE);
 	bn210->selection_color(FL_RED);
 	bn210->value(criteria_->confirmed_card);
@@ -335,7 +318,6 @@ search_dialog::search_dialog() :
 	for (int i = 0; i < 3; i++) {
 		// Radio - select the combinnation mode: NEW, AND or OR
 		Fl_Radio_Round_Button* bn31 = new Fl_Radio_Round_Button(col3[i], R31, WBN, HBN, combination_labels_[i].c_str());
-		bn31->labelsize(FONT_SIZE);
 		bn31->align(FL_ALIGN_RIGHT | FL_ALIGN_INSIDE);
 		bn31->box(FL_THIN_UP_BOX);
 		bn31->value(criteria_->combi_mode == i);
@@ -360,7 +342,6 @@ search_dialog::search_dialog() :
 	// Box - Fail message
 	Fl_Box* box = new Fl_Box(CX0, YGX, WX0, HTEXT);
 	box->copy_label("");
-	box->labelsize(FONT_SIZE);
 	box->box(FL_FLAT_BOX);
 	box->labelcolor(FL_BLACK);
 	box->color(FL_BACKGROUND_COLOR);
@@ -368,13 +349,11 @@ search_dialog::search_dialog() :
 	fail_box_ = box;
 	// Button - OK
 	Fl_Button* bn_ok = new Fl_Button(CX1, YGX, WBUTTON, HBUTTON, "OK");
-	bn_ok->labelsize(FONT_SIZE);
 	bn_ok->callback(cb_bn_ok);
 	bn_ok->when(FL_WHEN_RELEASE);
 	bn_ok->tooltip("Start the search");
 	// Button - Cancel
 	Fl_Button* bn_cancel = new Fl_Button(CX2, YGX, WBUTTON, HBUTTON, "Cancel");
-	bn_cancel->labelsize(FONT_SIZE);
 	bn_cancel->callback(cb_bn_cancel);
 	bn_cancel->when(FL_WHEN_RELEASE);
 	bn_cancel->tooltip("Cancel the search");

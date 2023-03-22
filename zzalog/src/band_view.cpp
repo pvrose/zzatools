@@ -238,8 +238,6 @@ void band_view::update(record_num_t record_num) {
 void band_view::create_form() {
 	// Zoom value slider
 	Fl_Slider* val1 = new Fl_Slider(EDGE, EDGE, WRADIO, h() - (2 * EDGE) - HBUTTON);
-	val1->labelfont(FONT);
-	val1->labelsize(FONT_SIZE);
 	val1->type(FL_VERTICAL);
 	val1->callback(cb_roll_zoom, (void*)&zoom_value_);
 	val1->tooltip("Zoom in or out");
@@ -251,10 +249,6 @@ void band_view::create_form() {
 
 	// Zoom value display (converted to cycles per tick)
 	Fl_Output* out1 = new Fl_Output(EDGE, curr_y, WBUTTON, HBUTTON, "Zoom");
-	out1->textfont(FONT);
-	out1->textsize(FONT_SIZE);
-	out1->labelfont(FONT);
-	out1->labelsize(FONT_SIZE);
 	out1->align(FL_ALIGN_TOP | FL_ALIGN_RIGHT);
 	out1->type(FL_NORMAL_COUNTER);
 	out1->tooltip("Displays cycles per tick for selected zoom");
@@ -268,10 +262,6 @@ void band_view::create_form() {
 	int val2_x = out1->x() + out1->w() + GAP;
 	// Frequency value slider
 	Fl_Counter* val2 = new Fl_Counter(val2_x, curr_y, 180, HBUTTON, "Frequency");
-	val2->textfont(FONT);
-	val2->textsize(FONT_SIZE);
-	val2->labelfont(FONT);
-	val2->labelsize(FONT_SIZE);
 	val2->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
 	val2->type(0);
 	val2->callback(cb_redraw_value, (void*)&frequency_);
@@ -282,8 +272,6 @@ void band_view::create_form() {
 	int bn1_x = val2->x() + val2->w() + GAP;
 	// Restore to rig frequency button
 	Fl_Button* bn1 = new Fl_Button(bn1_x, curr_y, WBUTTON, HBUTTON, "Rig");
-	bn1->labelsize(FONT_SIZE);
-	bn1->labelfont(FONT);
 	bn1->callback(cb_bn_reset);
 	bn1->tooltip("Restore frequency to rig value");
 	bn1->color(fl_lighter(FL_RED));
@@ -323,7 +311,7 @@ int band_view::draw_scale() {
 	Fl_Window::draw();
 	double frequency = freqy_lhs_;
 	// Get how much space the frequency text requires - note text is drawn at 90 degrees
-	fl_font(FONT, FONT_SIZE - 2);
+	fl_font(0, FL_NORMAL_SIZE - 2);
 	int text_w = 0;
 	int text_h = 0;
 	char text[20];
@@ -366,18 +354,17 @@ int band_view::draw_frequency(int pos_y) {
 	sprintf(text, "%.3f", rig_frequency_);
 	int text_w = 0;
 	int text_h = 0;
-	fl_font(FONT, FONT_SIZE - 2);
+	fl_font(0, FL_NORMAL_SIZE - 2);
 	fl_measure(text, text_w, text_h);
 	Fl_Color old_colour = fl_color();
 	if (in_band(rig_frequency_)) {
 		fl_color(FL_BLUE);
 		((Fl_Counter*)w_freq_slider_)->textcolor(FL_BLACK);
-		((Fl_Counter*)w_freq_slider_)->textfont(FONT);
 	}
 	else {
 		fl_color(FL_RED);
 		((Fl_Counter*)w_freq_slider_)->textcolor(FL_RED);
-		((Fl_Counter*)w_freq_slider_)->textfont(FONT | FL_BOLD);
+		((Fl_Counter*)w_freq_slider_)->textfont(FL_BOLD);
 	}
 	// Draw a red or blue line across scale and plans
 	fl_line(curr_x, GAP, curr_x, pos_y);
@@ -390,7 +377,7 @@ int band_view::draw_frequency(int pos_y) {
 // Draw the band-plan elements
 int band_view::draw_plan(int curr_y) {
 	const int SIZE_BAR = 20;
-	fl_font(FONT, FONT_SIZE);
+	fl_font(0, FL_NORMAL_SIZE);
 	bool complete = false;
 	// Set y values
 	int top_mode_y = curr_y;

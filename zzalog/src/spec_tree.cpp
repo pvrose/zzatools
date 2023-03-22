@@ -33,8 +33,8 @@ spec_tree::spec_tree(int X, int Y, int W, int H, const char* label, field_orderi
 	// Tree parameters
 	Fl_Preferences user_settings(settings_, "User Settings");
 	Fl_Preferences tree_settings(user_settings, "Tree Views");
-	tree_settings.get("Font Name", (int&)font_, FONT);
-	tree_settings.get("Font Size", (int&)fontsize_, FONT_SIZE);
+	tree_settings.get("Font Name", (int&)font_, 0);
+	tree_settings.get("Font Size", (int&)fontsize_, FL_NORMAL_SIZE);
 
 	sortorder(FL_TREE_SORT_ASCENDING);
 	item_labelfont(font_);

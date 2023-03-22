@@ -34,7 +34,7 @@ void calendar_table::draw_cell(TableContext context, int R, int C, int X, int Y,
 	switch (context) {
 	case CONTEXT_STARTPAGE:
 		// Starting to draw the table - define font
-		fl_font(FONT, FONT_SIZE);
+		fl_font(0, FL_NORMAL_SIZE);
 		return;
 
 	case CONTEXT_ENDPAGE:
@@ -219,7 +219,6 @@ calendar::calendar(int X, int Y) :
 	// Current date
 	month_bn_ = new Fl_Button(C2, R0, W2, H0);
 	month_bn_->box(FL_FLAT_BOX);
-	month_bn_->labelsize(FONT_SIZE);
 	month_bn_->tooltip("The current month");
 	// next month
 	Fl_Button* bn_0_3 = new Fl_Button(C3, R0, COLWIDTH, H0, "@>");

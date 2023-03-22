@@ -1349,24 +1349,16 @@ void book::edit_header() {
 	// Save button
 	Fl_Button* bn_save = new Fl_Button(GAP, GAP, WBUTTON, HBUTTON, "Save");
 	bn_save->callback(cb_close_edith, (void*)this);
-	bn_save->labelfont(FONT);
-	bn_save->labelsize(FONT_SIZE);
 	// Cancel button
 	Fl_Button* bn_cncl = new Fl_Button(GAP + WBUTTON + GAP, GAP, WBUTTON, HBUTTON, "Cancel");
 	bn_cncl->callback(cb_cancel_edith, nullptr);
-	bn_cncl->labelfont(FONT);
-	bn_cncl->labelsize(FONT_SIZE);
 	// Default button
 	Fl_Button* bn_default = new Fl_Button(GAP + WBUTTON + GAP + WBUTTON + GAP, GAP, WBUTTON, HBUTTON, "Default");
 	bn_default->callback(cb_default_edith, nullptr);
-	bn_default->labelfont(FONT);
-	bn_default->labelsize(FONT_SIZE);
 	bn_default->tooltip(default_header_.c_str());
 	// Restore button
 	Fl_Button* bn_restore = new Fl_Button(bn_default->x() + bn_default->w() + GAP, GAP, WBUTTON, HBUTTON, "Restore");
 	bn_restore->callback(cb_restore_edith, (void*)this);
-	bn_restore->labelfont(FONT);
-	bn_restore->labelsize(FONT_SIZE);
 	bn_restore->tooltip("Restore the original header");
 
 	if (header_) {

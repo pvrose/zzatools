@@ -86,8 +86,6 @@ void qth_dialog::create_form(int X, int Y) {
 	// Explicitly call begin to ensure that we haven't had too many ends.
 	begin();
 
-	labelsize(FONT_SIZE);
-
 	const int WIP = WBUTTON * 2;
 
 	// Column 1: Opeartor name and address
@@ -97,11 +95,7 @@ void qth_dialog::create_form(int X, int Y) {
 	int max_h = curr_y - Y;
 	// Operator name
 	ip_name_ = new Fl_Input(curr_x, curr_y, WIP, HBUTTON, "Op. Name");
-	ip_name_->labelsize(FONT_SIZE);
-	ip_name_->labelfont(FONT);
 	ip_name_->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
-	ip_name_->textfont(FONT);
-	ip_name_->textsize(FONT_SIZE);
 	ip_name_->when(FL_WHEN_RELEASE);
 	ip_name_->value(current_qth_.name.c_str());
 	ip_name_->callback(cb_value<Fl_Input, string>, (void*)&current_qth_.name);
@@ -109,11 +103,7 @@ void qth_dialog::create_form(int X, int Y) {
 	// Address line 1 (
 	curr_y += HBUTTON + HTEXT;
 	ip_address1_ = new Fl_Input(curr_x, curr_y, WIP, HBUTTON, "Street");
-	ip_address1_->labelsize(FONT_SIZE);
-	ip_address1_->labelfont(FONT);
 	ip_address1_->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
-	ip_address1_->textfont(FONT);
-	ip_address1_->textsize(FONT_SIZE);
 	ip_address1_->when(FL_WHEN_RELEASE);
 	ip_address1_->value(current_qth_.street.c_str());
 	ip_address1_->callback(cb_value<Fl_Input, string>, (void*)&current_qth_.street);
@@ -121,11 +111,7 @@ void qth_dialog::create_form(int X, int Y) {
 	// Address line 3
 	curr_y += HBUTTON + HTEXT;
 	ip_address3_ = new Fl_Input(curr_x, curr_y, WIP, HBUTTON, "Town/City");
-	ip_address3_->labelsize(FONT_SIZE);
-	ip_address3_->labelfont(FONT);
 	ip_address3_->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
-	ip_address3_->textfont(FONT);
-	ip_address3_->textsize(FONT_SIZE);
 	ip_address3_->when(FL_WHEN_RELEASE);
 	ip_address3_->value(current_qth_.city.c_str());
 	ip_address3_->callback(cb_value<Fl_Input, string>, (void*)&current_qth_.city);
@@ -133,11 +119,7 @@ void qth_dialog::create_form(int X, int Y) {
 	// Address line 4
 	curr_y += HBUTTON + HTEXT;
 	ip_address4_ = new Fl_Input(curr_x, curr_y, WIP, HBUTTON, "Postal code");
-	ip_address4_->labelsize(FONT_SIZE);
-	ip_address4_->labelfont(FONT);
 	ip_address4_->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
-	ip_address4_->textfont(FONT);
-	ip_address4_->textsize(FONT_SIZE);
 	ip_address4_->when(FL_WHEN_RELEASE);
 	ip_address4_->value(current_qth_.postcode.c_str());
 	ip_address4_->callback(cb_ip_upper, (void*)&current_qth_.postcode);
@@ -150,11 +132,7 @@ void qth_dialog::create_form(int X, int Y) {
 
 	// Locator
 	ip_locator_ = new Fl_Input(curr_x, curr_y, WIP, HBUTTON, "Locator");
-	ip_locator_->labelsize(FONT_SIZE);
-	ip_locator_->labelfont(FONT);
 	ip_locator_->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
-	ip_locator_->textfont(FONT);
-	ip_locator_->textsize(FONT_SIZE);
 	ip_locator_->when(FL_WHEN_RELEASE);
 	ip_locator_->value(current_qth_.locator.c_str());
 	ip_locator_->callback(cb_ip_upper, (void*)&current_qth_.locator);
@@ -162,11 +140,7 @@ void qth_dialog::create_form(int X, int Y) {
 	// DXCC name (
 	curr_y += HBUTTON + HTEXT;
 	ip_dxcc_ = new Fl_Input(curr_x, curr_y, WIP, HBUTTON, "DXCC Entity");
-	ip_dxcc_->labelsize(FONT_SIZE);
-	ip_dxcc_->labelfont(FONT);
 	ip_dxcc_->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
-	ip_dxcc_->textfont(FONT);
-	ip_dxcc_->textsize(FONT_SIZE);
 	ip_dxcc_->when(FL_WHEN_RELEASE);
 	ip_dxcc_->value(current_qth_.dxcc_name.c_str());
 	ip_dxcc_->callback(cb_ip_cty, (void*)&current_qth_.dxcc_name);
@@ -174,11 +148,7 @@ void qth_dialog::create_form(int X, int Y) {
 	// DXCC Reference id. number
 	curr_y += HBUTTON + HTEXT;
 	ip_dxcc_adif_ = new Fl_Int_Input(curr_x, curr_y, WIP, HBUTTON, "DXCC Id.");
-	ip_dxcc_adif_->labelsize(FONT_SIZE);
-	ip_dxcc_adif_->labelfont(FONT);
 	ip_dxcc_adif_->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
-	ip_dxcc_adif_->textfont(FONT);
-	ip_dxcc_adif_->textsize(FONT_SIZE);
 	ip_dxcc_adif_->when(FL_WHEN_RELEASE);
 	ip_dxcc_adif_->value(current_qth_.dxcc_id.c_str());
 	ip_dxcc_adif_->callback(cb_value<Fl_Input, string>, (void*)&current_qth_.dxcc_id);
@@ -186,11 +156,7 @@ void qth_dialog::create_form(int X, int Y) {
 	// Primry Admin. Subdivision (E.g. US State)
 	curr_y += HBUTTON + HTEXT;
 	ip_admin1_ = new Fl_Input(curr_x, curr_y, WIP, HBUTTON, "1st Level");
-	ip_admin1_->labelsize(FONT_SIZE);
-	ip_admin1_->labelfont(FONT);
 	ip_admin1_->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
-	ip_admin1_->textfont(FONT);
-	ip_admin1_->textsize(FONT_SIZE);
 	ip_admin1_->when(FL_WHEN_RELEASE);
 	ip_admin1_->value(current_qth_.state.c_str());
 	ip_admin1_->callback(cb_value<Fl_Input, string>, (void*)&current_qth_.state);
@@ -198,11 +164,7 @@ void qth_dialog::create_form(int X, int Y) {
 	// Secondary Admin. subdivision (e.g. US County)
 	curr_y += HBUTTON + HTEXT;
 	ip_admin2_ = new Fl_Input(curr_x, curr_y, WIP, HBUTTON, "2nd level");
-	ip_admin2_->labelsize(FONT_SIZE);
-	ip_admin2_->labelfont(FONT);
 	ip_admin2_->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
-	ip_admin2_->textfont(FONT);
-	ip_admin2_->textsize(FONT_SIZE);
 	ip_admin2_->when(FL_WHEN_RELEASE);
 	ip_admin2_->value(current_qth_.county.c_str());
 	ip_admin2_->callback(cb_value<Fl_Input, string>, (void*)&current_qth_.county);
@@ -215,11 +177,7 @@ void qth_dialog::create_form(int X, int Y) {
 
 	// CQ Zone
 	ip_cq_zone_ = new Fl_Int_Input(curr_x, curr_y, WIP, HBUTTON, "CQ Zone");
-	ip_cq_zone_->labelsize(FONT_SIZE);
-	ip_cq_zone_->labelfont(FONT);
 	ip_cq_zone_->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
-	ip_cq_zone_->textfont(FONT);
-	ip_cq_zone_->textsize(FONT_SIZE);
 	ip_cq_zone_->when(FL_WHEN_RELEASE);
 	ip_cq_zone_->value(current_qth_.cq_zone.c_str());
 	ip_cq_zone_->callback(cb_value<Fl_Input, string>, (void*)&current_qth_.cq_zone);
@@ -227,11 +185,7 @@ void qth_dialog::create_form(int X, int Y) {
 	// ITU Zone
 	curr_y += HBUTTON + HTEXT;
 	ip_itu_zone_ = new Fl_Int_Input(curr_x, curr_y, WIP, HBUTTON, "ITU Zone");
-	ip_itu_zone_->labelsize(FONT_SIZE);
-	ip_itu_zone_->labelfont(FONT);
 	ip_itu_zone_->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
-	ip_itu_zone_->textfont(FONT);
-	ip_itu_zone_->textsize(FONT_SIZE);
 	ip_itu_zone_->when(FL_WHEN_RELEASE);
 	ip_itu_zone_->value(current_qth_.itu_zone.c_str());
 	ip_itu_zone_->callback(cb_value<Fl_Input, string>, (void*)&current_qth_.itu_zone);
@@ -239,11 +193,7 @@ void qth_dialog::create_form(int X, int Y) {
 	// Continent
 	curr_y += HBUTTON + HTEXT;
 	ip_cont_ = new Fl_Input(curr_x, curr_y, WIP, HBUTTON, "Continent");
-	ip_cont_->labelsize(FONT_SIZE);
-	ip_cont_->labelfont(FONT);
 	ip_cont_->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
-	ip_cont_->textfont(FONT);
-	ip_cont_->textsize(FONT_SIZE);
 	ip_cont_->when(FL_WHEN_RELEASE);
 	ip_cont_->value(current_qth_.continent.c_str());
 	ip_cont_->callback(cb_ip_upper, (void*)&current_qth_.continent);
@@ -251,11 +201,7 @@ void qth_dialog::create_form(int X, int Y) {
 	// Address line 4
 	curr_y += HBUTTON + HTEXT;
 	ip_iota_ = new Fl_Input(curr_x, curr_y, WIP, HBUTTON, "IOTA");
-	ip_iota_->labelsize(FONT_SIZE);
-	ip_iota_->labelfont(FONT);
 	ip_iota_->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
-	ip_iota_->textfont(FONT);
-	ip_iota_->textsize(FONT_SIZE);
 	ip_iota_->when(FL_WHEN_RELEASE);
 	ip_iota_->value(current_qth_.iota.c_str());
 	ip_iota_->callback(cb_ip_upper, (void*)&current_qth_.iota);
@@ -267,11 +213,7 @@ void qth_dialog::create_form(int X, int Y) {
 	curr_x = X + GAP;
 
 	ip_description_ = new Fl_Input(curr_x, curr_y, WIP * 2 + GAP, HBUTTON, "Description");
-	ip_description_->labelsize(FONT_SIZE);
-	ip_description_->labelfont(FONT);
 	ip_description_->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
-	ip_description_->textfont(FONT);
-	ip_description_->textsize(FONT_SIZE);
 	ip_description_->when(FL_WHEN_RELEASE);
 	ip_description_->value(current_qth_.description.c_str());
 	ip_description_->callback(cb_value<Fl_Input, string>, (void*)&current_qth_.description);
@@ -284,24 +226,14 @@ void qth_dialog::create_form(int X, int Y) {
 	curr_x = X + GAP;
 
 	ip_latitude_ = new Fl_Float_Input(curr_x, curr_y, WIP, HBUTTON, "Latitude");
-	ip_latitude_->labelsize(FONT_SIZE);
-	ip_latitude_->labelfont(FONT);
 	ip_latitude_->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
-	ip_latitude_->textfont(FONT);
-	ip_latitude_->textsize(FONT_SIZE);
 	ip_latitude_->tooltip("Enter the latitude to convert (+ve = N, -ve = S)");
 	curr_x += ip_latitude_->w() + GAP;
 	ip_longitude_ = new Fl_Float_Input(curr_x, curr_y, WIP, HBUTTON, "Latitude");
-	ip_longitude_->labelsize(FONT_SIZE);
-	ip_longitude_->labelfont(FONT);
 	ip_longitude_->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
-	ip_longitude_->textfont(FONT);
-	ip_longitude_->textsize(FONT_SIZE);
 	ip_longitude_->tooltip("Enter the longiitude to convert (+ve = E, -ve = W)");
 	curr_x += ip_longitude_->w() + GAP;
 	Fl_Button* bn_convert = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Gridsquare");
-	bn_convert->labelsize(FONT_SIZE);
-	bn_convert->labelfont(FONT);
 	bn_convert->callback(cb_bn_convert, (void*)&current_qth_.locator);
 	bn_convert->tooltip("Update gridsquare based on latitude and longitude");
 
@@ -312,14 +244,12 @@ void qth_dialog::create_form(int X, int Y) {
 
 	// OK Button
 	Fl_Button* bn_ok = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "OK");
-	bn_ok->labelsize(FONT_SIZE);
 	bn_ok->callback(cb_bn_ok);
 	bn_ok->when(FL_WHEN_RELEASE);
 	bn_ok->tooltip("Accept changes");
 	// Cancel button
 	curr_x += WBUTTON + GAP;
 	Fl_Button* bn_cancel = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Cancel");
-	bn_cancel->labelsize(FONT_SIZE);
 	bn_cancel->callback(cb_bn_cancel);
 	bn_cancel->when(FL_WHEN_RELEASE);
 	bn_cancel->tooltip("Cancel changes");

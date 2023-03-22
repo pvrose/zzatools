@@ -64,8 +64,8 @@ log_table::log_table(int X, int Y, int W, int H, const char* label, field_orderi
 	// These are static, but will get to the same value each time
 	Fl_Preferences user_settings(settings_, "User Settings");
 	Fl_Preferences log_settings(user_settings, "Log Table");
-	log_settings.get("Font Name", (int&)font_, FONT);
-	log_settings.get("Font Size", (int&)fontsize_, FONT_SIZE);
+	log_settings.get("Font Name", (int&)font_, 0);
+	log_settings.get("Font Size", (int&)fontsize_, FL_NORMAL_SIZE);
 	begin();
 	// Create cell input widget, zero size, hide it
 	edit_input_ = new field_input(x() + w() / 2, y() + h() / 2, 100, 20);
@@ -76,18 +76,6 @@ log_table::log_table(int X, int Y, int W, int H, const char* label, field_orderi
 	edit_input_->textfont(font_);
 	edit_input_->textsize(fontsize_);
 	add(edit_input_);
-	//// Create menu button for the edit_input, 
-	//edit_menu_ = new Fl_Menu_Button(0, 0, WBUTTON, HBUTTON, nullptr);
-	//// Popup means the button isn't drawn, but it is clickable
-	//edit_menu_->type(Fl_Menu_Button::POPUP3);
-	//edit_menu_->textsize(FONT_SIZE);
-	//edit_menu_->textfont(FONT);
-	//edit_menu_->box(FL_UP_BOX);
-	//edit_menu_->add("&UPPER", 0, cb_menu, (void*)UPPER);
-	//edit_menu_->add("&lower", 0, cb_menu, (void*)LOWER);
-	//edit_menu_->add("&Mixed", 0, cb_menu, (void*)MIXED);
-	//edit_menu_->hide();
-	//add(edit_menu_);
 	end();
 	alt_gr_ = false;
 

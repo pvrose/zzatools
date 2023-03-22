@@ -78,7 +78,6 @@ void change_dialog::create_form() {
 
 	// Free standing label
 	Fl_Box* bx11 = new Fl_Box(C1, R1, W1, H1, "Change field");
-	bx11->labelsize(FONT_SIZE);
 	bx11->box(FL_NO_BOX);
 	bx11->align(FL_ALIGN_RIGHT | FL_ALIGN_INSIDE);
 
@@ -89,7 +88,6 @@ void change_dialog::create_form() {
 	// Radio button - change the name of the field field
 	Fl_Radio_Round_Button* bn21 = new Fl_Radio_Round_Button(C1, R2, W1, H2, "Rename field");
 	bn21->box(FL_THIN_UP_BOX);
-	bn21->labelsize(FONT_SIZE);
 	bn21->align(FL_ALIGN_RIGHT | FL_ALIGN_INSIDE);
 	bn21->callback(cb_radio_action, (void*)&radio_params_[0]);
 	bn21->when(FL_WHEN_RELEASE);
@@ -98,7 +96,6 @@ void change_dialog::create_form() {
 	// Radio button - delete all instances of a field
 	Fl_Radio_Round_Button* bn31 = new Fl_Radio_Round_Button(C1, R3, W1, H2, "Delete field");
 	bn31->box(FL_THIN_UP_BOX);
-	bn31->labelsize(FONT_SIZE);
 	bn31->align(FL_ALIGN_RIGHT | FL_ALIGN_INSIDE);
 	bn31->callback(cb_radio_action, (void*)&radio_params_[1]);
 	bn31->when(FL_WHEN_RELEASE);
@@ -107,7 +104,6 @@ void change_dialog::create_form() {
 	// Add a new field to all records - but leave existing fields with this name as is.
 	Fl_Radio_Round_Button* bn41 = new Fl_Radio_Round_Button(C1, R4, W1, H2, "Add field");
 	bn41->box(FL_THIN_UP_BOX);
-	bn41->labelsize(FONT_SIZE);
 	bn41->align(FL_ALIGN_RIGHT | FL_ALIGN_INSIDE);
 	bn41->callback(cb_radio_action, (void*)&radio_params_[2]);
 	bn41->when(FL_WHEN_RELEASE);
@@ -116,7 +112,6 @@ void change_dialog::create_form() {
 	// Add a new field to all records - and change exsiting fields to this new value
 	Fl_Radio_Round_Button* bn51 = new Fl_Radio_Round_Button(C1, R5, W1, H2, "Change field");
 	bn51->box(FL_THIN_UP_BOX);
-	bn51->labelsize(FONT_SIZE);
 	bn51->align(FL_ALIGN_RIGHT | FL_ALIGN_INSIDE);
 	bn51->callback(cb_radio_action, (void*)&radio_params_[3]);
 	bn51->when(FL_WHEN_RELEASE);
@@ -128,7 +123,6 @@ void change_dialog::create_form() {
 	// Old field name choice
 	field_choice* ch12 = new field_choice(C2, R1, W2, H1);
 	ch12->set_dataset("Fields");
-	ch12->textsize(FONT_SIZE);
 	int ix = 0;
 	ch12->value(0);
 	old_field_name_ = ch12->value();
@@ -139,7 +133,6 @@ void change_dialog::create_form() {
 	// New field name choice
 	field_choice* ch22 = new field_choice(C2, R2, W2, H2);
 	ch22->set_dataset("Fields");
-	ch22->textsize(FONT_SIZE);
 	ix = 0;
 	ch22->value(0);
 	new_field_name_ = ch22->value();
@@ -150,8 +143,6 @@ void change_dialog::create_form() {
 
 	// New text input
 	intl_input* ip42 = new intl_input(C2, R4, W2, H4, "Value");
-	ip42->labelsize(FONT_SIZE);
-	ip42->textsize(FONT_SIZE);
 	ip42->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
 	ip42->callback(cb_value<intl_input, string>, (void*)&new_text_);
 	ip42->when(FL_WHEN_CHANGED);
@@ -160,8 +151,6 @@ void change_dialog::create_form() {
 
 	// Alternate enumeration vale
 	field_choice* ch52 = new field_choice(C2, R5, W2, H5, "Enum. Value");
-	ch52->labelsize(FONT_SIZE);
-	ch52->textsize(FONT_SIZE);
 	ch52->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
 	ch52->callback(cb_choice_text, (void*)&new_text_);
 	ch52->when(FL_WHEN_CHANGED | FL_WHEN_NOT_CHANGED);
@@ -173,7 +162,6 @@ void change_dialog::create_form() {
 	// OK button
 	Fl_Button* bn63 = new Fl_Button(C3, R6, W3, H6, "OK");
 	bn63->box(FL_UP_BOX);
-	bn63->labelsize(FONT_SIZE);
 	bn63->callback(cb_bn_ok);
 	bn63->when(FL_WHEN_RELEASE);
 	bn63->color(fl_lighter(FL_GREEN));
@@ -182,7 +170,6 @@ void change_dialog::create_form() {
 	// Action button
 	Fl_Button* bn64 = new Fl_Button(C4, R6, W3, H6, "Action");
 	bn64->box(FL_UP_BOX);
-	bn64->labelsize(FONT_SIZE);
 	bn64->callback(cb_bn_action);
 	bn64->when(FL_WHEN_RELEASE);
 	bn64->color(fl_lighter(FL_BLUE));
@@ -191,7 +178,6 @@ void change_dialog::create_form() {
 	// Cancel button
 	Fl_Button* bn65 = new Fl_Button(C5, R6, W5, H6, "Cancel");
 	bn65->box(FL_UP_BOX);
-	bn65->labelsize(FONT_SIZE);
 	bn65->callback(cb_bn_cancel);
 	bn65->when(FL_WHEN_RELEASE);
 	bn65->color(fl_lighter(FL_RED));

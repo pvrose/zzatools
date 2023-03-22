@@ -28,8 +28,8 @@ user_dialog::user_dialog(int X, int Y, int W, int H, const char* label) :
 	page_dialog(X, Y, W, H, label) 
 {
 	// Set defaults
-	log_font_ = FONT;
-	log_size_ = FONT_SIZE;
+	log_font_ = 0;
+	log_size_ = FL_NORMAL_SIZE;
 	tip_duration_ = Fl_Tooltip::delay();
 	tip_font_ = Fl_Tooltip::font();
 	tip_size_ = Fl_Tooltip::size();
@@ -48,8 +48,8 @@ void user_dialog::load_values() {
 	Fl_Preferences user_settings(settings_, "User Settings");
 	// Log table
 	Fl_Preferences log_settings(user_settings, "Log Table");
-	log_settings.get("Font Name", (int&)log_font_, FONT);
-	log_settings.get("Font Size", (int&)log_size_, FONT_SIZE);
+	log_settings.get("Font Name", (int&)log_font_, log_font_);
+	log_settings.get("Font Size", (int&)log_size_, log_size_);
 	log_settings.get("Session Gap", session_elapse_, session_elapse_);
 	// Tooltip
 	Fl_Preferences tip_settings(user_settings, "Tooltip");
@@ -58,8 +58,8 @@ void user_dialog::load_values() {
 	tip_settings.get("Font Size", (int&)tip_size_, Fl_Tooltip::size());
 	// Tree views
 	Fl_Preferences tree_settings(user_settings, "Tree Views");
-	tree_settings.get("Font Name", (int&)tree_font_, FONT);
-	tree_settings.get("Font Size", (int&)tree_size_, FONT_SIZE);
+	tree_settings.get("Font Name", (int&)tree_font_, 0);
+	tree_settings.get("Font Size", (int&)tree_size_, FL_NORMAL_SIZE);
 	// Formats
 	Fl_Preferences display_settings(settings_, "Display");
 	display_settings.get("Frequency", (int&)freq_format_, FREQ_MHz);

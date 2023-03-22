@@ -47,8 +47,8 @@ report_tree::report_tree(int X, int Y, int W, int H, const char* label, field_or
 
 	Fl_Preferences user_settings(settings_, "User Settings");
 	Fl_Preferences tree_settings(user_settings, "Tree Views");
-	tree_settings.get("Font Name", (int&)font_, FONT);
-	tree_settings.get("Font Size", (int&)fontsize_, FONT_SIZE);
+	tree_settings.get("Font Name", (int&)font_, 0);
+	tree_settings.get("Font Size", (int&)fontsize_, FL_NORMAL_SIZE);
 
 	// Set tree properties
 	sortorder(FL_TREE_SORT_ASCENDING);

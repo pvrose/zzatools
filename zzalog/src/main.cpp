@@ -335,15 +335,15 @@ void add_properties() {
 	Fl_Fontsize size;
 	float duration;
 	tip_settings.get("Duration", duration, (float)TIP_SHOW);
-	tip_settings.get("Font Name", font, FONT);
-	tip_settings.get("Font Size", size, FONT_SIZE);
+	tip_settings.get("Font Name", font, 0);
+	tip_settings.get("Font Size", size, FL_NORMAL_SIZE);
 	// Set the default tooltip properties
 	Fl_Tooltip::size(size);
 	Fl_Tooltip::font(font);
 	Fl_Tooltip::delay(duration);
 	// Default message properties
-	fl_message_size_ = FONT_SIZE;
-	fl_message_font_ = FONT;
+	fl_message_size_ = FL_NORMAL_SIZE;
+	fl_message_font_ = 0;
 	fl_message_title_default(PROGRAM_ID.c_str());
 	// Default scrollbar
 	Fl::scrollbar_size(10);
@@ -803,7 +803,7 @@ bool in_current_session(record* this_record) {
 int main(int argc, char** argv)
 {
 	// Set default font size for all widgets
-	FL_NORMAL_SIZE = FONT_SIZE;
+	FL_NORMAL_SIZE = 10;
 	// Set default Fil Chooser on non-windows
 #ifndef _WIN32
 	Fl::option(Fl::OPTION_FNFC_USES_ZENITY, true);

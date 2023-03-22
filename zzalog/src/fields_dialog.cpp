@@ -61,7 +61,7 @@ void fields_table::draw_cell(TableContext context, int R, int C, int X, int Y, i
 
 	case CONTEXT_STARTPAGE:
 		// Set the table font
-		fl_font(FONT, FONT_SIZE);
+		fl_font(0, FL_NORMAL_SIZE);
 		return;
 
 	case CONTEXT_ENDPAGE:
@@ -294,10 +294,6 @@ void fields_dialog::create_form(int X, int Y) {
 			ch1_1->value(i);
 		}
 	}
-	ch1_1->labelfont(FONT);
-	ch1_1->labelsize(FONT_SIZE);
-	ch1_1->textfont(FONT);
-	ch1_1->textsize(FONT_SIZE);
 	ch1_1->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
 	ch1_1->tooltip("Select the name of the set of fields to be listed");
 	ch1_1->callback(cb_ch_sel_col);
@@ -312,10 +308,6 @@ void fields_dialog::create_form(int X, int Y) {
 			ch1_2->value(i);
 		}
 	}
-	ch1_2->labelfont(FONT);
-	ch1_2->labelsize(FONT_SIZE);
-	ch1_2->textfont(FONT);
-	ch1_2->textsize(FONT_SIZE);
 	ch1_2->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
 	ch1_2->tooltip("Select the name of the application for which to list the set of fields");
 	ch1_2->callback(cb_ch_sel_app);
@@ -324,19 +316,13 @@ void fields_dialog::create_form(int X, int Y) {
 
 	// New button
 	Fl_Button* bn1_3 = new Fl_Button(X1_3, Y1, WBUTTON, HBUTTON, "New");
-	bn1_3->labelfont(FONT);
-	bn1_3->labelsize(FONT_SIZE);
 	bn1_3->callback(cb_bn_new);
 	bn1_3->when(FL_WHEN_RELEASE);
 	bn1_3->tooltip("Create a new set of fields from the default set");
 
 	// Name of new field set
 	Fl_Input* ip1_4 = new Fl_Input(X1_4, Y1, WSMEDIT, HTEXT, "Name of new set");
-	ip1_4->labelfont(FONT);
-	ip1_4->labelsize(FONT_SIZE);
 	ip1_4->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
-	ip1_4->textfont(FONT);
-	ip1_4->textsize(FONT_SIZE);
 	name_input_ = ip1_4;
 
 	gp1->end();
@@ -354,15 +340,11 @@ void fields_dialog::create_form(int X, int Y) {
 
 	// Allow the view that uses the field-set to be slected
 	Fl_Group* gp2 = new Fl_Group(XG2, YG2, WG2, HG2);
-	gp2->labelsize(FL_NORMAL_SIZE + 2);
-	gp2->labelfont(FL_BOLD);
 	gp2->align(FL_ALIGN_TOP_LEFT | FL_ALIGN_INSIDE);
 	gp2->box(FL_BORDER_BOX);
 	// Add the app buttons
 	for (int i = 0; i < FO_LAST; i++) {
 		Fl_Light_Button* bn2 = new Fl_Light_Button(X2[i], Y2, WBUTTON, HBUTTON, APP_NAMES[i].c_str());
-		bn2->labelsize(FONT_SIZE);
-		bn2->labelfont(FONT);
 		bn2->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE);
 		bn2->tooltip("Select application to use the current set of fields in it");
 		bn2->callback(cb_bn_use_app, (void*)i);
@@ -408,7 +390,6 @@ void fields_dialog::create_form(int X, int Y) {
 	gp3->box(FL_BORDER_BOX);
 	// The used field table
 	fields_table* tab3_1a = new fields_table(XG3_1A, YG3_1, WG3_1A, HG3_1, "Columns in field set");
-	tab3_1a->labelsize(FONT_SIZE);
 	tab3_1a->align(FL_ALIGN_TOP);
 	tab3_1a->callback(cb_tab_inuse);
 	tab3_1a->when(FL_WHEN_RELEASE);
@@ -417,7 +398,6 @@ void fields_dialog::create_form(int X, int Y) {
 
 	// Button - move unused field to used list
 	Fl_Button* bn3_1b1 = new Fl_Button(XG3_1B, YG3_1B1, WG3_1B, HBUTTON, "@<-");
-	bn3_1b1->labelsize(FONT_SIZE);
 	bn3_1b1->tooltip("Move the selected field from the unused to the used list");
 	bn3_1b1->callback(cb_bn_use);
 	bn3_1b1->when(FL_WHEN_RELEASE);
@@ -425,7 +405,6 @@ void fields_dialog::create_form(int X, int Y) {
 	gp3->add(bn3_1b1);
 	// Button - move used field to unused list
 	Fl_Button* bn3_1b2 = new Fl_Button(XG3_1B, YG3_1B2, WG3_1B, HBUTTON, "@->");
-	bn3_1b2->labelsize(FONT_SIZE);
 	bn3_1b2->tooltip("Move the selected field from the used to the unused list");
 	bn3_1b2->callback(cb_bn_disuse);
 	bn3_1b2->when(FL_WHEN_RELEASE);
@@ -433,7 +412,6 @@ void fields_dialog::create_form(int X, int Y) {
 	gp3->add(bn3_1b2);
 	// Button - move field up the used list
 	Fl_Button* bn3_1b3 = new Fl_Button(XG3_1B, YG3_1B3, WG3_1B, HBUTTON, "@8->");
-	bn3_1b3->labelsize(FONT_SIZE);
 	bn3_1b3->tooltip("Move the selected field up one position in the used list");
 	bn3_1b3->callback(cb_bn_up);
 	bn3_1b3->when(FL_WHEN_RELEASE);
@@ -441,7 +419,6 @@ void fields_dialog::create_form(int X, int Y) {
 	gp3->add(bn3_1b3);
 	// Button - move field down the used list
 	Fl_Button* bn3_1b4 = new Fl_Button(XG3_1B, YG3_1B4, WG3_1B, HBUTTON, "@2->");
-	bn3_1b4->labelsize(FONT_SIZE);
 	bn3_1b4->tooltip("Move the selected field down one position in the used list");
 	bn3_1b4->callback(cb_bn_down);
 	bn3_1b4->when(FL_WHEN_RELEASE);
@@ -450,7 +427,6 @@ void fields_dialog::create_form(int X, int Y) {
 
 	// The unused list
 	fields_table* tab3_1c = new fields_table(XG3_1C, YG3_1, WG3_1C, HG3_1, "Available fields");
-	tab3_1c->labelsize(FONT_SIZE);
 	tab3_1c->align(FL_ALIGN_TOP);
 	tab3_1c->callback(cb_tab_avail);
 	tab3_1c->when(FL_WHEN_RELEASE);
@@ -460,9 +436,7 @@ void fields_dialog::create_form(int X, int Y) {
 
 	// Input - header text for the selected field
 	intl_input* ip3_2a = new intl_input(XG3_2A, YG3_2, WG3_2, HG3_2, "Header");
-	ip3_2a->labelsize(FONT_SIZE);
 	ip3_2a->align(FL_ALIGN_LEFT);
-	ip3_2a->textsize(FONT_SIZE);
 	ip3_2a->callback(cb_ip_header);
 	ip3_2a->when(FL_WHEN_CHANGED);
 	ip3_2a->tooltip("Type in the new value for the header of the selected field");
@@ -470,9 +444,7 @@ void fields_dialog::create_form(int X, int Y) {
 	gp3->add(ip3_2a);
 	// Input - width in pixels for the selected field
 	Fl_Int_Input* ip3_2b = new Fl_Int_Input(XG3_2B, YG3_2, WG3_2, HG3_2, "Width");
-	ip3_2b->labelsize(FONT_SIZE);
 	ip3_2b->align(FL_ALIGN_LEFT);
-	ip3_2b->textsize(FONT_SIZE);
 	ip3_2b->callback(cb_ip_width);
 	ip3_2b->when(FL_WHEN_CHANGED);
 	ip3_2b->tooltip("Type in the new value for the width of the selected field");

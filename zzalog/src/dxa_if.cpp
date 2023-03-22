@@ -1186,8 +1186,6 @@ void dxa_if::create_colour_buttons() {
 		for (int c = 0; c < num_cols && button_num < num_colours; c++) {
 			Fl_Button* bn = new Fl_Button(colour_grp_->x() + (c * WBUTTON) + GAP, (r * HBUTTON) + HBUTTON + colour_grp_->y() + HTEXT, WBUTTON, HBUTTON);
 			bn->box(FL_BORDER_BOX);
-			bn->labelfont(FONT);
-			bn->labelsize(FONT_SIZE);
 			bn->color(button_colour(button_num));
 			bn->copy_label(colours_used_[button_num].c_str());
 			bn->labelcolor(fl_contrast(FL_BLACK, button_colour(button_num)));

@@ -206,7 +206,6 @@ void web_dialog::create_form(int X, int Y) {
 	// Row 1 Col 1 - eQSL Enable
 	Fl_Check_Button* bn1_1_1 = new Fl_Check_Button(X + C1, Y + R1_1, W1, H1_1, "En");
 	bn1_1_1->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
-	bn1_1_1->labelsize(FONT_SIZE);
 	bn1_1_1->value(eqsl_enable_);
 	bn1_1_1->callback(cb_ch_enable, &eqsl_enable_);
 	bn1_1_1->when(FL_WHEN_CHANGED);
@@ -222,8 +221,6 @@ void web_dialog::create_form(int X, int Y) {
 	// Row 1 Col 2 - Date last accessed
 	intl_input* in1_1_2 = new intl_input(X + C2, Y + R1_1, W2, H1_1, "Last accessed");
 	in1_1_2->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
-	in1_1_2->labelsize(FONT_SIZE);
-	in1_1_2->textsize(FONT_SIZE);
 	in1_1_2->value(eqsl_last_got_.c_str());
 	in1_1_2->callback(cb_value<intl_input, string>, &eqsl_last_got_);
 	in1_1_2->when(FL_WHEN_CHANGED);
@@ -241,8 +238,6 @@ void web_dialog::create_form(int X, int Y) {
 	// Row 1 Col 4 - User entry field
 	intl_input* in1_1_4 = new intl_input(X + C4, Y + R1_1, W4, H1_1, "User");
 	in1_1_4->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
-	in1_1_4->labelsize(FONT_SIZE);
-	in1_1_4->textsize(FONT_SIZE);
 	in1_1_4->value(eqsl_username_.c_str());
 	in1_1_4->callback(cb_value<intl_input, string>, &eqsl_username_);
 	in1_1_4->when(FL_WHEN_CHANGED);
@@ -251,8 +246,6 @@ void web_dialog::create_form(int X, int Y) {
 	// Row 1 Col 5 - Password entry field
 	Fl_Secret_Input* in1_1_5 = new Fl_Secret_Input(X + C5, Y + R1_1, W5, H1_1, "Password");
 	in1_1_5->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
-	in1_1_5->labelsize(FONT_SIZE);
-	in1_1_5->textsize(FONT_SIZE);
 	in1_1_5->value(eqsl_password_.c_str());
 	in1_1_5->callback(cb_value<Fl_Secret_Input, string>, &eqsl_password_);
 	in1_1_5->when(FL_WHEN_CHANGED);
@@ -261,8 +254,6 @@ void web_dialog::create_form(int X, int Y) {
 	// Row 1A Col 1 - Update evry QSO
 	Fl_Check_Button* bn1_1A_1 = new Fl_Check_Button(X + C1, Y + R1_1A, W1, H1_1A, "Update each QSO");
 	bn1_1A_1->align(FL_ALIGN_RIGHT);
-	bn1_1A_1->labelfont(FONT);
-	bn1_1A_1->labelsize(FONT_SIZE);
 	bn1_1A_1->value(eqsl_upload_qso_);
 	bn1_1A_1->callback(cb_value < Fl_Check_Button, bool>, &eqsl_upload_qso_);
 	bn1_1A_1->when(FL_WHEN_CHANGED);
@@ -271,7 +262,6 @@ void web_dialog::create_form(int X, int Y) {
 	// Row 2 Col 1 - QSO Message enable
 	Fl_Check_Button* bn1_2_1 = new Fl_Check_Button(X + C1, Y + R1_2, W1, H1_2, "Use QSO Message");
 	bn1_2_1->align(FL_ALIGN_RIGHT);
-	bn1_2_1->labelsize(FONT_SIZE);
 	bn1_2_1->value(eqsl_use_qso_msg_);
 	bn1_2_1->callback(cb_ch_enable, &eqsl_use_qso_msg_);
 	bn1_2_1->when(FL_WHEN_CHANGED);
@@ -280,7 +270,6 @@ void web_dialog::create_form(int X, int Y) {
 	// Row2 Col 2A - QSO Message
 	intl_input* in1_2_2 = new intl_input(X + C2A, Y + R1_2, W2A, H1_2);
 	in1_2_2->value(eqsl_qso_msg_.c_str());
-	in1_2_2->textsize(FONT_SIZE);
 	in1_2_2->callback(cb_value<intl_input, string>, &eqsl_qso_msg_);
 	in1_2_2->when(FL_WHEN_CHANGED);
 	in1_2_2->tooltip("Message to send to eQSL.cc or print on cards for QSOs");
@@ -288,7 +277,6 @@ void web_dialog::create_form(int X, int Y) {
 	// Row 3 Col 1 - SWL Message enable
 	Fl_Check_Button* bn1_3_1 = new Fl_Check_Button(X + C1, Y + R1_3, W1, H1_3, "Use SWL Message");
 	bn1_3_1->align(FL_ALIGN_RIGHT);
-	bn1_3_1->labelsize(FONT_SIZE);
 	bn1_3_1->value(eqsl_use_swl_msg_);
 	bn1_3_1->callback(cb_ch_enable, &eqsl_use_swl_msg_);
 	bn1_3_1->when(FL_WHEN_CHANGED);
@@ -297,7 +285,6 @@ void web_dialog::create_form(int X, int Y) {
 	// Row2 Col 2A - SWL Message
 	intl_input* in1_3_2 = new intl_input(X + C2A, Y + R1_3, W2A, H1_3);
 	in1_3_2->value(eqsl_swl_msg_.c_str());
-	in1_3_2->textsize(FONT_SIZE);
 	in1_3_2->callback(cb_value<intl_input, string>, &eqsl_swl_msg_);
 	in1_3_2->when(FL_WHEN_CHANGED);
 	in1_3_2->tooltip("Message to send to eQSL.cc or print on cards for SWL reports");
@@ -310,7 +297,6 @@ void web_dialog::create_form(int X, int Y) {
 	// Row 1 Col 1 - LotW Enable
 	Fl_Check_Button* bn2_1_1 = new Fl_Check_Button(X + C1, Y + R2_1, W1, H2_1, "En");
 	bn2_1_1->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
-	bn2_1_1->labelsize(FONT_SIZE);
 	bn2_1_1->value(lotw_enable_);
 	bn2_1_1->callback(cb_ch_enable, &lotw_enable_);
 	bn2_1_1->when(FL_WHEN_CHANGED);
@@ -326,8 +312,6 @@ void web_dialog::create_form(int X, int Y) {
 	// Row 1 Col 2 - Date last accessed
 	intl_input* in2_1_2 = new intl_input(X + C2, Y + R2_1, W2, H2_1, "Last accessed");
 	in2_1_2->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
-	in2_1_2->labelsize(FONT_SIZE);
-	in2_1_2->textsize(FONT_SIZE);
 	in2_1_2->value(lotw_last_got_.c_str());
 	in2_1_2->callback(cb_value<intl_input, string>, &lotw_last_got_);
 	in2_1_2->when(FL_WHEN_CHANGED);
@@ -346,8 +330,6 @@ void web_dialog::create_form(int X, int Y) {
 	// Row 1 Col 4 - User entry field
 	intl_input* in2_1_4 = new intl_input(X + C4, Y + R2_1, W4, H2_1, "User");
 	in2_1_4->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
-	in2_1_4->labelsize(FONT_SIZE);
-	in2_1_4->textsize(FONT_SIZE);
 	in2_1_4->value(lotw_username_.c_str());
 	in2_1_4->callback(cb_value<intl_input, string>, &lotw_username_);
 	in2_1_4->when(FL_WHEN_CHANGED);
@@ -356,8 +338,6 @@ void web_dialog::create_form(int X, int Y) {
 	// Row 1 Col 5 - Password entry field
 	Fl_Secret_Input* in2_1_5 = new Fl_Secret_Input(X + C5, Y + R2_1, W5, H2_1, "Password");
 	in2_1_5->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
-	in2_1_5->labelsize(FONT_SIZE);
-	in2_1_5->textsize(FONT_SIZE);
 	in2_1_5->value(lotw_password_.c_str());
 	in2_1_5->callback(cb_value<Fl_Secret_Input, string>, &lotw_password_);
 	in2_1_5->when(FL_WHEN_CHANGED);
@@ -366,8 +346,6 @@ void web_dialog::create_form(int X, int Y) {
 	// Row 1A Col 1 - Update evry QSO
 	Fl_Check_Button* bn2_1A_1 = new Fl_Check_Button(X + C1, Y + R2_1A, W1, H2_1A, "Update each QSO");
 	bn2_1A_1->align(FL_ALIGN_RIGHT);
-	bn2_1A_1->labelfont(FONT);
-	bn2_1A_1->labelsize(FONT_SIZE);
 	bn2_1A_1->value(lotw_upload_qso_);
 	bn2_1A_1->callback(cb_value < Fl_Check_Button, bool>, &lotw_upload_qso_);
 	bn2_1A_1->when(FL_WHEN_CHANGED);
@@ -381,7 +359,6 @@ void web_dialog::create_form(int X, int Y) {
 	// Row 1 Col 1 - QRZ Enable
 	Fl_Check_Button* bn3_1_1 = new Fl_Check_Button(X + C1, Y + R3_1, W1, H3_1, "En");
 	bn3_1_1->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
-	bn3_1_1->labelsize(FONT_SIZE);
 	bn3_1_1->value(qrz_enable_);
 	bn3_1_1->callback(cb_ch_enable, &qrz_enable_);
 	bn3_1_1->when(FL_WHEN_CHANGED);
@@ -398,8 +375,6 @@ void web_dialog::create_form(int X, int Y) {
 	// Row 1 Col 4 - User entry field
 	intl_input* in3_1_4 = new intl_input(X + C4, Y + R3_1, W4, H3_1, "User");
 	in3_1_4->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
-	in3_1_4->labelsize(FONT_SIZE);
-	in3_1_4->textsize(FONT_SIZE);
 	in3_1_4->value(qrz_username_.c_str());
 	in3_1_4->callback(cb_value<intl_input, string>, &qrz_username_);
 	in3_1_4->when(FL_WHEN_CHANGED);
@@ -408,8 +383,6 @@ void web_dialog::create_form(int X, int Y) {
 	// Row 1 Col 5 - Password entry field
 	Fl_Secret_Input* in3_1_5 = new Fl_Secret_Input(X + C5, Y + R3_1, W5, H3_1, "Password");
 	in3_1_5->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
-	in3_1_5->labelsize(FONT_SIZE);
-	in3_1_5->textsize(FONT_SIZE);
 	in3_1_5->value(qrz_password_.c_str());
 	in3_1_5->callback(cb_value<Fl_Secret_Input, string>, &qrz_password_);
 	in3_1_5->when(FL_WHEN_CHANGED);
@@ -418,8 +391,6 @@ void web_dialog::create_form(int X, int Y) {
 	// Row 2 Col 4 - Always use XML database
 	Fl_Check_Button* bn3_2_1 = new Fl_Check_Button(X + C4, Y + R3_2, WRADIO, HRADIO, "Use XML Database");
 	bn3_2_1->align(FL_ALIGN_RIGHT);
-	bn3_2_1->labelsize(FONT_SIZE);
-	bn3_2_1->labelfont(FONT);
 	bn3_2_1->value(qrz_xml_merge_);
 	bn3_2_1->callback(cb_value<Fl_Check_Button, bool>, &qrz_xml_merge_);
 	bn3_2_1->tooltip("Always the QRZ XML database even if non-subscriber");
@@ -432,7 +403,6 @@ void web_dialog::create_form(int X, int Y) {
 	// Row 1 Col 1 - ClubLog Enable
 	Fl_Check_Button* bn4_1_1 = new Fl_Check_Button(X + C1, Y + R4_1, W1, H4_1, "En");
 	bn4_1_1->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
-	bn4_1_1->labelsize(FONT_SIZE);
 	bn4_1_1->value(club_enable_);
 	bn4_1_1->callback(cb_ch_enable, &club_enable_);
 	bn4_1_1->when(FL_WHEN_CHANGED);
@@ -449,8 +419,6 @@ void web_dialog::create_form(int X, int Y) {
 	// Row 1 Col 3/4 - User entry field
 	intl_input* in4_1_4 = new intl_input(X + C3, Y + R4_1, W34, H4_1, "User (e-mail)");
 	in4_1_4->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
-	in4_1_4->labelsize(FONT_SIZE);
-	in4_1_4->textsize(FONT_SIZE);
 	in4_1_4->value(club_username_.c_str());
 	in4_1_4->callback(cb_value<intl_input, string>, &club_username_);
 	in4_1_4->when(FL_WHEN_CHANGED);
@@ -459,8 +427,6 @@ void web_dialog::create_form(int X, int Y) {
 	// Row 1 Col 5 - Password entry field
 	Fl_Secret_Input* in4_1_5 = new Fl_Secret_Input(X + C5, Y + R4_1, W5, H4_1, "Password");
 	in4_1_5->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
-	in4_1_5->labelsize(FONT_SIZE);
-	in4_1_5->textsize(FONT_SIZE);
 	in4_1_5->value(club_password_.c_str());
 	in4_1_5->callback(cb_value<Fl_Secret_Input, string>, &club_password_);
 	in4_1_5->when(FL_WHEN_CHANGED);
@@ -469,8 +435,6 @@ void web_dialog::create_form(int X, int Y) {
 	// Row 2 Col 2 - Interval bewteen downloads
 	Fl_Int_Input* in4_2_2 = new Fl_Int_Input(X + C2, Y + R4_2, W2, H4_2, "Interval");
 	in4_2_2->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
-	in4_2_2->labelsize(FONT_SIZE);
-	in4_2_2->textsize(FONT_SIZE);
 	in4_2_2->value(to_string(club_interval_).c_str());
 	in4_2_2->callback(cb_value_int<Fl_Int_Input>, &club_interval_);
 	in4_2_2->when(FL_WHEN_CHANGED);
@@ -479,8 +443,6 @@ void web_dialog::create_form(int X, int Y) {
 	// Row 1A Col 1 - Update evry QSO
 	Fl_Check_Button* bn4_1A_1 = new Fl_Check_Button(X + C1, Y + R4_1A, W1, H4_1A, "Update each QSO");
 	bn4_1A_1->align(FL_ALIGN_RIGHT);
-	bn4_1A_1->labelfont(FONT);
-	bn4_1A_1->labelsize(FONT_SIZE);
 	bn4_1A_1->value(club_upload_qso_);
 	bn4_1A_1->callback(cb_value < Fl_Check_Button, bool>, &club_upload_qso_);
 	bn4_1A_1->when(FL_WHEN_CHANGED);

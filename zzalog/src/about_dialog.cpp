@@ -49,13 +49,11 @@ about_dialog::about_dialog() :
 	int w = W2;
 	int h = 0;
 	// Get the width and height required to display the message (add a bit of height) 
-	fl_font(FONT, FONT_SIZE);
+	fl_font(0, FL_NORMAL_SIZE);
 	fl_measure(program_id.c_str(), w, h);
 	h += 5;
 	Fl_Multiline_Output* op1 = new Fl_Multiline_Output(C2, R1, W2, h);
 	op1->value(program_id.c_str());
-	op1->textfont(FONT);
-	op1->textsize(FONT_SIZE);
 	op1->wrap(true);
 	const int R2 = R1 + h + GAP;
 	// Secondly - copyright statement
@@ -64,16 +62,12 @@ about_dialog::about_dialog() :
 	h += 5;
 	Fl_Multiline_Output* op2 = new Fl_Multiline_Output(C2, R2, W2, h);
 	op2->value(copyright.c_str());
-	op2->textfont(FONT);
-	op2->textsize(FONT_SIZE);
 	op2->wrap(true);
 
 	const int R4 = R2 + h + GAP;
 	const int C3 = WALL - EDGE - WBUTTON;
 	// And the OK Button
 	Fl_Button* bn_ok = new Fl_Button(C3, R4, WBUTTON, HBUTTON, "OK");
-	bn_ok->labelfont(FONT);
-	bn_ok->labelsize(FONT_SIZE);
 	bn_ok->callback(cb_bn_ok);
 	bn_ok->when(FL_WHEN_RELEASE);
 	const int HALL = R4 + HBUTTON + EDGE;

@@ -33,37 +33,6 @@ const float IN_TO_POINT = 72.0f;
 			POINT       // = 1/72 in.
 		};
 
-		//// Data for an individual widget (item of text on the card)
-		//struct qsl_widget {
-		//	string text;
-		//	Fl_Color colour;
-		//	int font_size;
-		//	Fl_Font font;
-
-		//	qsl_widget() :
-		//		text(""),
-		//		colour(FL_BLACK),
-		//		font_size(FONT_SIZE),
-		//		font(FONT) {};
-		//	qsl_widget(string t, Fl_Color c, int s, Fl_Font f) :
-		//		text(t),
-		//		colour(c),
-		//		font_size(s),
-		//		font(f) {};
-		//};
-
-		//// Widget set position
-		//enum widget_set {
-		//	TOP_LEFT,
-		//	TOP_RIGHT,
-		//	TABLE,
-		//	BOTTOM_LEFT,
-		//	BOTTOM_RIGHT
-		//};
-
-		//// Default margin
-		//const int MARGIN = 10;
-
 	public:
 		// Constructor provides X and Y position (W and H set from design data) and current records to display in card format
 		qsl_form(int x, int y, record** records, int num_records);

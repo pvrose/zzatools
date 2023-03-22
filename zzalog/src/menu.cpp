@@ -274,7 +274,7 @@ menu::menu(int X, int Y, int W, int H, const char* label) :
 	// Add the recent files list to it
 	add_recent_files();
 	// default text size - just larger than default font size
-	textsize(FONT_SIZE + 1);
+	textsize(FL_NORMAL_SIZE + 1);
 	criteria_ = nullptr;
 	show();
 }

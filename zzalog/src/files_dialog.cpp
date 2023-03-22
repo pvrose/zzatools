@@ -272,14 +272,12 @@ void files_dialog::create_form(int X, int Y) {
 		in_auto_file[i] = new intl_input(X + COL2, Y + *ROW1[i], WEDIT, HTEXT);
 		in_auto_file[i]->callback(cb_value_auto<intl_input, string>, &(auto_file_[i]));
 		in_auto_file[i]->when(FL_WHEN_CHANGED);
-		in_auto_file[i]->textsize(FONT_SIZE);
 		in_auto_file[i]->value(auto_file_[i].c_str());
 		in_auto_file[i]->tooltip("File name for auto-import");
 		// Input - name of application generating the auto-import
 		in_auto_src[i] = new intl_input(X + COL3, Y + *ROW1[i], WBUTTON, HTEXT);
 		in_auto_src[i]->callback(cb_value_auto<intl_input, string>, &(auto_src_[i]));
 		in_auto_src[i]->when(FL_WHEN_CHANGED);
-		in_auto_src[i]->textsize(FONT_SIZE);
 		in_auto_src[i]->value(auto_src_[i].c_str());
 		in_auto_src[i]->tooltip("Application generating the auto-import");
 		// Button - file will be cleared after auto-import
@@ -287,7 +285,6 @@ void files_dialog::create_form(int X, int Y) {
 		bn_auto_mt[i]->align(FL_ALIGN_RIGHT);
 		bn_auto_mt[i]->callback(cb_value_auto<Fl_Check_Button, bool>, &(auto_empty_[i]));
 		bn_auto_mt[i]->when(FL_WHEN_CHANGED);
-		bn_auto_mt[i]->labelsize(FONT_SIZE);
 		bn_auto_mt[i]->value(auto_empty_[i]);
 		bn_auto_mt[i]->tooltip("Empty the file after import");
 		// Button - opens a file browser to get the filename
@@ -296,13 +293,10 @@ void files_dialog::create_form(int X, int Y) {
 		auto_data_[i] = { "Please enter a file to auto-import", "ADI Files\t*.adi\nADX Files\t*.adx", &auto_file_[i], &enable_auto_[i], in_auto_file[i], bn_auto_en[i] };
 		bn_browse_auto[i]->callback(cb_bn_browsefile, &(auto_data_[i]));
 		bn_browse_auto[i]->when(FL_WHEN_RELEASE);
-		bn_browse_auto[i]->labelsize(FONT_SIZE);
 		bn_browse_auto[i]->tooltip("Open file browser to locate auto-import file");
 	}
 	// Spinner - sets  the polling interval for auto-import
 	Fl_Spinner* spin_auto = new Fl_Spinner(X + COL6, Y + ROW1_2, WBUTTON, HBUTTON, "Polling\nint. (secs)");
-	spin_auto->labelsize(FONT_SIZE);
-	spin_auto->textsize(FONT_SIZE);
 	spin_auto->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
 	spin_auto->type(FL_FLOAT_INPUT);
 	spin_auto->maximum(AUTO_IP_MAX);
@@ -318,8 +312,6 @@ void files_dialog::create_form(int X, int Y) {
 	grp_auto->end();
 
 	Fl_Group* grp_tqsl = new Fl_Group(X + XGRP, Y + GRP2, XMAX, HGRP2, "TQSL Executable");
-	grp_tqsl->labelsize(FL_NORMAL_SIZE + 2);
-	grp_tqsl->labelfont(FL_BOLD);
 	grp_tqsl->box(FL_BORDER_BOX);
 	grp_tqsl->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 	// Check box - TQSL executable is valid
@@ -332,7 +324,6 @@ void files_dialog::create_form(int X, int Y) {
 	intl_input* in_tqsl_file = new intl_input(X + COL2, Y + ROW2_1, WEDIT + GAP + WBUTTON + GAP + WBUTTON, HTEXT);
 	in_tqsl_file->callback(cb_value<intl_input, string>, &tqsl_executable_);
 	in_tqsl_file->when(FL_WHEN_CHANGED);
-	in_tqsl_file->textsize(FONT_SIZE);
 	in_tqsl_file->value(tqsl_executable_.c_str());
 	in_tqsl_file->tooltip("Location of TQSL executable");
 	// Button - Opens file browser to locate executable
@@ -346,7 +337,6 @@ void files_dialog::create_form(int X, int Y) {
 #endif
 	bn_browse_tqsl->callback(cb_bn_browsefile, &tqsl_data_);
 	bn_browse_tqsl->when(FL_WHEN_RELEASE);
-	bn_browse_tqsl->labelsize(FONT_SIZE);
 	bn_browse_tqsl->tooltip("Opens a file browsewr to locate the TQSL executable");
 
 	grp_tqsl->end();
@@ -366,7 +356,6 @@ void files_dialog::create_form(int X, int Y) {
 	intl_input* in_card_file = new intl_input(X + COL2, Y + ROW3_1, WEDIT + GAP + WBUTTON + GAP + WBUTTON, HTEXT);
 	in_card_file->callback(cb_value<intl_input, string>, &card_directory_);
 	in_card_file->when(FL_WHEN_CHANGED);
-	in_card_file->textsize(FONT_SIZE);
 	in_card_file->value(card_directory_.c_str());
 	in_card_file->tooltip("Directory to which to download eQSL cards");
 	// Button - Opens directory browser to locate the directory
@@ -375,7 +364,6 @@ void files_dialog::create_form(int X, int Y) {
 	card_data_ = { "Please enter the QSL card top-level directory", "", &card_directory_, &enable_card_, in_card_file, bn_card_en };
 	bn_browse_card->callback(cb_bn_browsedir, &card_data_);
 	bn_browse_card->when(FL_WHEN_RELEASE);
-	bn_browse_card->labelsize(FONT_SIZE);
 	bn_browse_card->tooltip("Opens directory for saving eQSL e-cards");
 
 	grp_card->end();
@@ -389,7 +377,6 @@ void files_dialog::create_form(int X, int Y) {
 	intl_input* in_ref_data_file = new intl_input(X + COL2, Y + ROW4_1, WEDIT + GAP + WBUTTON + GAP + WBUTTON, HTEXT);
 	in_ref_data_file->callback(cb_value<intl_input, string>, &ref_data_directory_);
 	in_ref_data_file->when(FL_WHEN_CHANGED);
-	in_ref_data_file->textsize(FONT_SIZE);
 	in_ref_data_file->value(ref_data_directory_.c_str());
 	in_ref_data_file->tooltip("Directory containing reference data");
 	// Button - Opens directory browse
@@ -398,7 +385,6 @@ void files_dialog::create_form(int X, int Y) {
 	ref_data_data_ = { "Please enter the reference data directory", "", &ref_data_directory_, nullptr, in_ref_data_file, nullptr };
 	bn_browse_ref_data->callback(cb_bn_browsedir, &ref_data_data_);
 	bn_browse_ref_data->when(FL_WHEN_RELEASE);
-	bn_browse_ref_data->labelsize(FONT_SIZE);
 	bn_browse_ref_data->tooltip("Opens directory browser to locate reference data directory");
 
 	grp_ref_data->end();
@@ -418,7 +404,6 @@ void files_dialog::create_form(int X, int Y) {
 	intl_input* in_backup_file = new intl_input(X + COL2, Y + ROW5_1, WEDIT + GAP + WBUTTON + GAP + WBUTTON, HTEXT);
 	in_backup_file->callback(cb_value<intl_input, string>, &backup_directory_);
 	in_backup_file->when(FL_WHEN_CHANGED);
-	in_backup_file->textsize(FONT_SIZE);
 	in_backup_file->value(backup_directory_.c_str());
 	in_backup_file->tooltip("Directory to which to back-up the log");
 	// Button - opens directory browser
@@ -427,7 +412,6 @@ void files_dialog::create_form(int X, int Y) {
 	backup_data_ = { "Please enter the backup directory", "", &backup_directory_, &enable_backup_, in_backup_file, bn_backup_en };
 	bn_browse_backup->callback(cb_bn_browsedir, &backup_data_);
 	bn_browse_backup->when(FL_WHEN_RELEASE);
-	bn_browse_backup->labelsize(FONT_SIZE);
 	bn_browse_backup->tooltip("Opens directory browser to locate back-up directory");
 
 	grp_backup->end();
@@ -441,7 +425,6 @@ void files_dialog::create_form(int X, int Y) {
 	intl_input* in_web_file = new intl_input(X + COL2, Y + ROW6_1, WEDIT + GAP + WBUTTON + GAP + WBUTTON, HTEXT);
 	in_web_file->callback(cb_value<intl_input, string>, &web_browser_);
 	in_web_file->when(FL_WHEN_CHANGED);
-	in_web_file->textsize(FONT_SIZE);
 	in_web_file->value(web_browser_.c_str());
 	in_web_file->tooltip("Location of web browser executable");
 	// Button - opens file browser
@@ -455,7 +438,6 @@ void files_dialog::create_form(int X, int Y) {
 #endif
 	bn_browse_web->callback(cb_bn_browsefile, &web_data_);
 	bn_browse_web->when(FL_WHEN_RELEASE);
-	bn_browse_web->labelsize(FONT_SIZE);
 	bn_browse_web->tooltip("Opens file browser to locate your preferred web browser");
 
 	grp_web->end();
@@ -469,7 +451,6 @@ void files_dialog::create_form(int X, int Y) {
 	intl_input* in_status_file = new intl_input(X + COL2, Y + ROW7_1, WEDIT + GAP + WBUTTON + GAP + WBUTTON, HTEXT);
 	in_status_file->callback(cb_value<intl_input, string>, &status_log_file_);
 	in_status_file->when(FL_WHEN_CHANGED);
-	in_status_file->textsize(FONT_SIZE);
 	in_status_file->value(status_log_file_.c_str());
 	in_status_file->tooltip("Location of status log file");
 	// Button - opens file browser
@@ -478,7 +459,6 @@ void files_dialog::create_form(int X, int Y) {
 	status_data_ = { "Please enter the status log file", "Text\t*.txt", &status_log_file_, nullptr, in_status_file, nullptr };
 	bn_browse_status->callback(cb_bn_browsefile, &status_data_);
 	bn_browse_status->when(FL_WHEN_RELEASE);
-	bn_browse_status->labelsize(FONT_SIZE);
 	bn_browse_status->tooltip("Opens a file browsewr to locate the status file");
 
 	grp_status->end();
@@ -492,7 +472,6 @@ void files_dialog::create_form(int X, int Y) {
 	intl_input* in_wsjtx_file = new intl_input(X + COL2, Y + ROW7A_1, WEDIT + GAP + WBUTTON + GAP + WBUTTON, HTEXT);
 	in_wsjtx_file->callback(cb_value<intl_input, string>, &wsjtx_directory_);
 	in_wsjtx_file->when(FL_WHEN_CHANGED);
-	in_wsjtx_file->textsize(FONT_SIZE);
 	in_wsjtx_file->value(wsjtx_directory_.c_str());
 	in_wsjtx_file->tooltip("Location of WSJT-X directory");
 	// Button - opens file browser
@@ -501,7 +480,6 @@ void files_dialog::create_form(int X, int Y) {
 	wsjtx_data_ = { "Please enter the WSJT-X directory", "", &wsjtx_directory_, nullptr, in_wsjtx_file, nullptr };
 	bn_browse_wsjtx->callback(cb_bn_browsedir, &wsjtx_data_);
 	bn_browse_wsjtx->when(FL_WHEN_RELEASE);
-	bn_browse_wsjtx->labelsize(FONT_SIZE);
 	bn_browse_wsjtx->tooltip("Opens a file browsewr to locate the status file");
 
 	grp_wsjtx->end();
@@ -515,17 +493,13 @@ void files_dialog::create_form(int X, int Y) {
 	intl_input* in_unzipper = new intl_input(X + COL2, Y + ROW8_1, WEDIT, HTEXT);
 	in_unzipper->callback(cb_value<intl_input, string>, &unzipper_);
 	in_unzipper->when(FL_WHEN_CHANGED);
-	in_unzipper->textsize(FONT_SIZE);
 	in_unzipper->value(unzipper_.c_str());
 	in_unzipper->tooltip("Location of unzipper executable");
 	// Input switches for unzip command
 	intl_input* in_switches = new intl_input(X + COL3, Y + ROW8_1, WSMEDIT, HTEXT, "Switches");
-	in_switches->labelfont(FONT);
-	in_switches->labelsize(FONT_SIZE);
 	in_switches->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
 	in_switches->callback(cb_value<intl_input, string>, &unzip_switches_);
 	in_switches->when(FL_WHEN_CHANGED);
-	in_switches->textsize(FONT_SIZE);
 	in_switches->value(unzip_switches_.c_str());
 	in_switches->tooltip("Location of unzipper executable");
 
@@ -540,7 +514,6 @@ void files_dialog::create_form(int X, int Y) {
 #endif
 	bn_browse_unzip->callback(cb_bn_browsefile, &unzipper_data_);
 	bn_browse_unzip->when(FL_WHEN_RELEASE);
-	bn_browse_unzip->labelsize(FONT_SIZE);
 	bn_browse_unzip->tooltip("Opens file browser to locate your preferred web browser");
 
 	grp_unzip->end();
@@ -561,7 +534,6 @@ void files_dialog::create_form(int X, int Y) {
 	ip_qsl_template_ = new intl_input(X + COL2, Y + ROW9_1, WEDIT + GAP + WBUTTON + GAP + WBUTTON, HTEXT);
 	ip_qsl_template_->callback(cb_value<intl_input, string>, &qsl_template_);
 	ip_qsl_template_->when(FL_WHEN_CHANGED);
-	ip_qsl_template_->textsize(FONT_SIZE);
 	ip_qsl_template_->value(qsl_template_.c_str());
 	ip_qsl_template_->tooltip("Location of QSL Template file");
 
@@ -571,14 +543,12 @@ void files_dialog::create_form(int X, int Y) {
 	template_data_ = { "Please enter the QSL Template", "HTML\t*.{htm,html}", &qsl_template_, nullptr, ip_qsl_template_, nullptr };
 	bn_browse_qsld->callback(cb_bn_browsefile, &template_data_);
 	bn_browse_qsld->when(FL_WHEN_RELEASE);
-	bn_browse_qsld->labelsize(FONT_SIZE);
 	bn_browse_qsld->tooltip("Opens a file browser to locate the QSL template file");
 
 	// Button - open dimansions dialog
 	Fl_Button* bn_qsl_dim = new Fl_Button(X + COL6, Y + ROW9_1, WBUTTON, HBUTTON, "Params");
 	bn_qsl_dim->align(FL_ALIGN_INSIDE);
 	bn_qsl_dim->callback(cb_bn_qslt, nullptr);
-	bn_qsl_dim->labelsize(FONT_SIZE);
 	bn_qsl_dim->when(FL_WHEN_RELEASE);
 	bn_qsl_dim->tooltip("Opens dialog to set label size and printer details");
 	bn_params_ = bn_qsl_dim;

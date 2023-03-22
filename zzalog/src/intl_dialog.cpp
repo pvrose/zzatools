@@ -43,29 +43,21 @@ void intl_dialog::create_form() {
 	// Button - save the displayed characters into a the non-ASCII character file
 	Fl_Button* bn_save = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Save");
 	bn_save->callback(cb_bn_save);
-	bn_save->labelfont(FONT);
-	bn_save->labelsize(FONT_SIZE);
 	bn_save->tooltip("Save the currently displated characters");
 	curr_x += bn_save->w();
 	// Button - restore the displayed characters from the file
 	Fl_Button* bn_restore = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Restore");
 	bn_restore->callback(cb_bn_restore);
-	bn_restore->labelfont(FONT);
-	bn_restore->labelsize(FONT_SIZE);
 	bn_restore->tooltip("Reload the saved character set");
 	curr_x += bn_restore->w();
 	// Button - add the characters in the adjacent input widget to the displayed characters
 	Fl_Button* bn_add = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Add");
 	bn_add->callback(cb_bn_add);
-	bn_add->labelfont(FONT);
-	bn_add->labelsize(FONT_SIZE);
 	bn_add->tooltip("Add the characters in the adjacent display to the displayed set");
 	curr_x += bn_add->w();
 	// Input - allows additional characters to be defined.
 	Fl_Input* ip_new = new Fl_Input(curr_x, curr_y, WSMEDIT, HBUTTON);
 	ip_new->callback(cb_value<Fl_Input, string>, (void*)&new_char_);
-	ip_new->textfont(FONT);
-	ip_new->textsize(FONT_SIZE);
 	ip_new->tooltip("Paste in desired additional characters");
 	// Get the size of the button array
 	int width = curr_x + ip_new->w() - EDGE;

@@ -42,7 +42,7 @@ void pfx_dlg_table::draw_cell(TableContext context, int R, int C, int X, int Y,	
 	switch (context) {
 	case CONTEXT_STARTPAGE:
 		// Set the table font
-		fl_font(FONT, FONT_SIZE);
+		fl_font(0, FL_NORMAL_SIZE);
 		return;
 
 	case CONTEXT_ENDPAGE:
@@ -144,13 +144,10 @@ pfx_dialog::pfx_dialog() :
 	int curr_x = EDGE;
 	int curr_y = EDGE;
 	call_out_ = new Fl_Output(curr_x + WLABEL, curr_y, 100, HTEXT, "Call");
-	call_out_->textsize(FONT_SIZE);
-	call_out_->labelsize(FONT_SIZE);
 
 	// table to list the prefixes to be chosen from
 	curr_y += HTEXT + GAP;
 	table_ = new pfx_dlg_table(this, curr_x, curr_y, 400, (PFXD_ROWS + 2) * (ROW_HEIGHT));
-	table_->labelsize(FONT_SIZE);
 	table_->callback((Fl_Callback*)pfx_dialog::cb_tab_pfx, (void*)this);
 
 	int wall = table_->x() + table_->w() + EDGE;
@@ -159,7 +156,6 @@ pfx_dialog::pfx_dialog() :
 	curr_y += table_->h() + GAP;
 	Fl_Button* qrz_bn = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "QRZ.com");
 	qrz_bn->callback(cb_bn_qrz);
-	qrz_bn->labelsize(FONT_SIZE);
 	qrz_bn->align(FL_ALIGN_INSIDE);
 	rep_widgets_.push_back(qrz_bn);
 
@@ -167,7 +163,6 @@ pfx_dialog::pfx_dialog() :
 	curr_x += WBUTTON;
 	Fl_Button* ok_bn = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "OK");
 	ok_bn->callback(cb_bn_ok);
-	ok_bn->labelsize(FONT_SIZE);
 	ok_bn->align(FL_ALIGN_INSIDE);
 	ok_bn->tooltip("Accept selected prefix");
 	rep_widgets_.push_back(ok_bn);
@@ -176,7 +171,6 @@ pfx_dialog::pfx_dialog() :
 	curr_x += WBUTTON;
 	Fl_Button* cancel_bn = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Cancel");
 	cancel_bn->callback(cb_bn_cancel);
-	cancel_bn->labelsize(FONT_SIZE);
 	cancel_bn->align(FL_ALIGN_INSIDE);
 	cancel_bn->tooltip("Cancel parsing");
 	rep_widgets_.push_back(cancel_bn);

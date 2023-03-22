@@ -74,7 +74,6 @@ status::status(int X, int Y, int W, int H, const char* label) :
 	const int clock_w = rem_w / 4;
 	// Button - display the clock
 	clock_bn_ = new Fl_Button(curr_x, Y, clock_w, H);
-	clock_bn_->labelsize(FONT_SIZE);
 	clock_bn_->box(FL_DOWN_BOX);
 	clock_bn_->color(FL_BLACK);
 	clock_bn_->selection_color(FL_BLACK);
@@ -98,7 +97,6 @@ status::status(int X, int Y, int W, int H, const char* label) :
 	// Progress bar
 	progress_ = new Fl_Progress(curr_x, Y, progress_w, H, "Initialising...");
 	progress_->align(FL_ALIGN_INSIDE);
-	progress_->labelsize(FONT_SIZE);
 	progress_->tooltip("Activity progress");
 	progress_->color(FL_WHITE, OBJECT_COLOURS.at(OT_NONE));
 	add(progress_);
@@ -108,11 +106,9 @@ status::status(int X, int Y, int W, int H, const char* label) :
 	const int rig_status_w = rem_w / 4;
 	// Button - rig status
 	rig_status_ = new Fl_Button(curr_x, Y, rig_status_w, H, "Rig connection not yet established");
-	rig_status_->labelsize(FONT_SIZE);
 	rig_status_->box(FL_DOWN_BOX);
 	rig_status_->color(STATUS_COLOURS.at(ST_NONE));
 	rig_status_->labelcolor(FL_BLACK);
-	rig_status_->labelfont(FONT);
 	rig_status_->copy_tooltip(rig_status_->label());
 	// Add callback to try and reconnect the rig
 	rig_status_->callback(cb_bn_rig);
@@ -124,11 +120,9 @@ status::status(int X, int Y, int W, int H, const char* label) :
 	const int misc_w = rem_w * 3 / 10;
 	// Button - status message 
 	misc_status_ = new Fl_Button(curr_x, Y, misc_w, H, "Miscellaneous information");
-	misc_status_->labelsize(FONT_SIZE);
 	misc_status_->box(FL_DOWN_BOX);
 	misc_status_->color(STATUS_COLOURS.at(ST_NONE));
 	misc_status_->labelcolor(FL_BLACK);
-	misc_status_->labelfont(FONT);
 	misc_status_->copy_tooltip(misc_status_->label());
 	// Callback will open the status log report
 	misc_status_->callback(cb_bn_misc);
@@ -637,15 +631,9 @@ void viewer_window::draw_window() {
 	match_case_ = 1;
 	// Find button
 	Fl_Button* bn_find = new Fl_Button(GAP, GAP, WBUTTON, HBUTTON, "Find");
-	bn_find->labelfont(FONT);
-	bn_find->labelsize(FONT_SIZE);
 	bn_find->callback(cb_find);
 	// Search text
 	intl_input* ip_search = new intl_input(bn_find->x() + bn_find->w() + GAP + (WLABEL / 2), GAP, WBUTTON, HBUTTON, "Text");
-	ip_search->labelfont(FONT);
-	ip_search->labelsize(FONT_SIZE);
-	ip_search->textfont(FONT);
-	ip_search->textsize(FONT_SIZE);
 	ip_search->align(FL_ALIGN_LEFT);
 	ip_search->value(search_.c_str());
 	ip_search->callback(cb_value<intl_input, string>, &search_);
@@ -654,14 +642,12 @@ void viewer_window::draw_window() {
 	grp->box(FL_NO_BOX);
 	// Backward radiobutton
 	Fl_Radio_Round_Button* bn_backward = new Fl_Radio_Round_Button(grp->x(), GAP, WBUTTON / 2, HBUTTON, "@<");
-	bn_backward->labelsize(FONT_SIZE);
 	bn_backward->box(FL_DOWN_BOX);
 	bn_backward->value(direction_ == 0);
 	radio_param_t* back_param = new radio_param_t(0, &direction_);
 	bn_backward->callback(cb_radio, back_param);
 	// Forward radio button
 	Fl_Radio_Round_Button* bn_forward = new Fl_Radio_Round_Button(grp->x() + bn_backward->w(), GAP, WBUTTON / 2, HBUTTON, "@>");
-	bn_forward->labelsize(FONT_SIZE);
 	bn_forward->box(FL_DOWN_BOX);
 	bn_forward->value(direction_ == 1);
 	radio_param_t* for_param = new radio_param_t(1, &direction_);
@@ -670,17 +656,11 @@ void viewer_window::draw_window() {
 	// Match case indicator
 	Fl_Round_Button* bn_match = new Fl_Round_Button(grp->x() + grp->w() + GAP, GAP, WBUTTON, HBUTTON, "Match Case");
 	bn_match->box(FL_DOWN_BOX);
-	bn_match->labelsize(FONT_SIZE);
-	bn_match->labelfont(FONT);
 	bn_match->value(match_case_);
 	bn_match->selection_color(FL_BLUE);
 	bn_match->callback(cb_value < Fl_Round_Button, int >, &match_case_);
 	// Filter choice
 	Fl_Choice* ch_filter = new Fl_Choice(bn_match->x() + bn_match->w() + GAP + WLABEL, GAP, WSMEDIT, HTEXT, "Topic");
-	ch_filter->labelfont(FONT);
-	ch_filter->labelsize(FONT_SIZE);
-	ch_filter->textfont(FONT);
-	ch_filter->textsize(FONT_SIZE);
 	ch_filter->align(FL_ALIGN_LEFT);
 	ch_filter->clear();
 	// Add the hard-coded choice values
@@ -712,10 +692,6 @@ void viewer_window::draw_window() {
 	ch_filter->add("ZZALOG");
 	// Filter severity
 	Fl_Choice* ch_severity = new Fl_Choice(ch_filter->x() + ch_filter->w() + GAP + WLABEL, GAP, WSMEDIT, HTEXT, "Severity");
-	ch_severity->labelfont(FONT);
-	ch_severity->labelsize(FONT_SIZE);
-	ch_severity->textfont(FONT);
-	ch_severity->textsize(FONT_SIZE);
 	ch_severity->align(FL_ALIGN_LEFT);
 	ch_severity->clear();
 	// Add the hard-coded choice values

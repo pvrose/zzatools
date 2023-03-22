@@ -15,8 +15,6 @@ config_tree::config_tree(int X, int Y, int W, int H, const char* label) :
 {
 	// Set the tree parameters
 	sortorder(FL_TREE_SORT_ASCENDING);
-	item_labelfont(FONT);
-	item_labelsize(FONT_SIZE);
 	// Create the tree
 	create_tree();
 }
@@ -50,8 +48,6 @@ void config_tree::add_leaf(Fl_Tree_Item* parent, string label, string value) {
 	}
 	if (leaf) {
 		// Set its attributes
-		leaf->labelsize(FONT_SIZE);
-		leaf->labelcolor(FL_BLUE);
 	}
 }
 
@@ -71,7 +67,6 @@ void config_tree::add_branch(Fl_Tree_Item* parent, Fl_Preferences* settings) {
 	}
 	if (branch) {
 		// Set attributes
-		branch->labelsize(FONT_SIZE);
 	}
 	// now get the nodes in this settings group
 	// Entries

@@ -48,7 +48,7 @@ void record_table::draw_cell(TableContext context, int R, int C, int X, int Y, i
 
 	case CONTEXT_STARTPAGE:
 		// Set the table font
-		fl_font(FONT, FONT_SIZE);
+		fl_font(0, FL_NORMAL_SIZE);
 		return;
 
 	case CONTEXT_ENDPAGE:

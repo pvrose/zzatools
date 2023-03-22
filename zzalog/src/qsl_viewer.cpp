@@ -43,7 +43,6 @@ qsl_viewer::qsl_viewer(int W, int H, const char* L) :
 	curr_y += HCARD;
 	// Output - Filename of the image
 	card_filename_out_ = new Fl_Box(curr_x, curr_y, WCARD, HTEXT);
-	card_filename_out_->labelsize(FONT_SIZE);
 	card_filename_out_->align(FL_ALIGN_CENTER);
 	card_filename_out_->box(FL_DOWN_BOX);
 	card_filename_out_->color(FL_WHITE);
@@ -72,7 +71,6 @@ qsl_viewer::qsl_viewer(int W, int H, const char* L) :
 	curr_y = y() + HTEXT;
 
 	card_type_grp_ = new Fl_Group(curr_x, curr_y, WBUTTON + (2 * GAP), 8 * HBUTTON + (2 * GAP), "QSL type selection");
-	card_type_grp_->labelsize(FONT_SIZE);
 	card_type_grp_->align(FL_ALIGN_TOP_LEFT);
 	card_type_grp_->box(FL_DOWN_BOX);
 	curr_x += GAP;
@@ -82,7 +80,6 @@ qsl_viewer::qsl_viewer(int W, int H, const char* L) :
 	keep_bn_->selection_color(FL_RED);
 	keep_bn_->align(FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
 	keep_bn_->value(false);
-	keep_bn_->labelsize(FONT_SIZE);
 	keep_bn_->tooltip("Remembers selection after record update");
 	curr_y += HBUTTON;
 	// Radio - Display eQSL.cc card image
@@ -91,7 +88,6 @@ qsl_viewer::qsl_viewer(int W, int H, const char* L) :
 	eqsl_radio_->selection_color(FL_BLACK);
 	eqsl_radio_->callback(cb_rad_card, (void*)QI_EQSL);
 	eqsl_radio_->when(FL_WHEN_RELEASE);
-	eqsl_radio_->labelsize(FONT_SIZE);
 	eqsl_radio_->tooltip("Select image downloaded from eQSL");
 	curr_y += HBUTTON;
 	// Radio - display scanned image of front of paper card
@@ -100,7 +96,6 @@ qsl_viewer::qsl_viewer(int W, int H, const char* L) :
 	card_front_radio_->selection_color(FL_BLACK);
 	card_front_radio_->callback(cb_rad_card, (void*)QI_CARD_FRONT);
 	card_front_radio_->when(FL_WHEN_RELEASE);
-	card_front_radio_->labelsize(FONT_SIZE);
 	card_front_radio_->tooltip("Select image scanned of paper card front");
 	curr_y += HBUTTON;
 	// Radio - display scanned image of reverse of paper card
@@ -109,7 +104,6 @@ qsl_viewer::qsl_viewer(int W, int H, const char* L) :
 	card_back_radio_->selection_color(FL_BLACK);
 	card_back_radio_->callback(cb_rad_card, (void*)QI_CARD_BACK);
 	card_back_radio_->when(FL_WHEN_RELEASE);
-	card_back_radio_->labelsize(FONT_SIZE);
 	card_back_radio_->tooltip("Select image scanned of paper card back");
 	curr_y += HBUTTON;
 	// Radio - generate QSL card and display
@@ -118,27 +112,23 @@ qsl_viewer::qsl_viewer(int W, int H, const char* L) :
 	gen_card_radio_->selection_color(FL_BLACK);
 	gen_card_radio_->callback(cb_rad_card, (void*)QI_GEN_CARD);
 	gen_card_radio_->when(FL_WHEN_RELEASE);
-	gen_card_radio_->labelsize(FONT_SIZE);
 	gen_card_radio_->tooltip("Select generated label for card");
 	curr_y += HBUTTON;
 
 	// Button - Fetch the card image from eQSL.cc
 	fetch_bn_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Fetch");
-	fetch_bn_->labelsize(FONT_SIZE);
 	fetch_bn_->tooltip("Request a fresh download of the eQSL image");
 	fetch_bn_->callback(cb_bn_fetch, nullptr);
 	fetch_bn_->when(FL_WHEN_RELEASE);
 	curr_y += HBUTTON;
 	// Button - Mark paper card received
 	log_card_bn_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Log card");
-	log_card_bn_->labelsize(FONT_SIZE);
 	log_card_bn_->tooltip("Log a paper card received on today's date");
 	log_card_bn_->callback(cb_bn_log_card, nullptr);
 	log_card_bn_->when(FL_WHEN_RELEASE);
 	curr_y += HBUTTON;
 	// Button - Scale or stretch
 	scale_bn_ = new Fl_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Scale image");
-	scale_bn_->labelsize(FONT_SIZE);
 	scale_bn_->tooltip("Scale - keep in proportion");
 	scale_bn_->callback(cb_bn_scale, nullptr);
 	scale_bn_->when(FL_WHEN_RELEASE);
