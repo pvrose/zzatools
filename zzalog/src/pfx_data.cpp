@@ -581,7 +581,7 @@ bool pfx_data::match_callsign(prefix* prefix, string& callsign) {
 				break;
 			default:
 				// Match the explicit character
-				call_matches &= callsign[i2] == test_char;
+				call_matches &= i2 < callsign.length() && callsign[i2] == test_char;
 				break;
 			}
 		}
