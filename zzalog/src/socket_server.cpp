@@ -506,5 +506,5 @@ void socket_server::dump(string data) {
 			escaped += *it;
 		}
 	}
-	printf("%s", escaped.c_str());
+	printf("%s\n", escaped.c_str());
 }
