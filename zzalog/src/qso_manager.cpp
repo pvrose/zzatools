@@ -1573,9 +1573,9 @@ void qso_manager::qso_group::cb_activate(Fl_Widget* w, void* v) {
 void qso_manager::qso_group::cb_start(Fl_Widget* w, void* v) {
 	qso_group* that = ancestor_view<qso_group>(w);
 	qso_manager* mgr = (qso_manager*)that->parent();
-	that->action_set_current();
 	switch (that->logging_state_) {
 	case QSO_INACTIVE:
+		that->action_set_current();
 		that->action_activate();
 		// Fall into next state
 	case QSO_PENDING:
@@ -1593,6 +1593,7 @@ void qso_manager::qso_group::cb_save(Fl_Widget* w, void* v) {
 		that->action_start();
 	case QSO_STARTED:
 		that->action_save();
+		that->action_set_current();
 		that->action_activate();
 		break;
 	// QSO editing
@@ -2140,6 +2141,7 @@ void qso_manager::qso_group::action_activate() {
 	current_rec_num_ = -1;
 	time_t now = time(nullptr);
 	qso_manager* mgr = ancestor_view<qso_manager>(this);
+	logging_state_ = QSO_PENDING;
 	switch (logging_mode_) {
 	case LM_OFF_AIR:
 		// Just copy the station details
@@ -2167,7 +2169,6 @@ void qso_manager::qso_group::action_activate() {
 		copy_clock_to_qso(now);
 		break;
 	}
-	logging_state_ = QSO_PENDING;
 	enable_widgets();
 }
 
