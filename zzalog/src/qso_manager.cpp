@@ -2751,8 +2751,9 @@ void qso_manager::qso_group::action_set_current() {
 
 // Clock group - constructor
 qso_manager::clock_group::clock_group
-	(int X, int Y, int W, int H, const char* l) :
+(int X, int Y, int W, int H, const char* l) :
 	Fl_Group(X, Y, W, H, l)
+	, display_local_(false)
 {
 	load_values();
 }
@@ -2771,14 +2772,14 @@ void qso_manager::clock_group::load_values() {
 // Create form
 void qso_manager::clock_group::create_form(int X, int Y) {
 
-	Fl_Group* g = new Fl_Group(X, Y, 10, 10, "Clock - UTC");
-	g->labelfont(FL_BOLD);
-	g->labelsize(FL_NORMAL_SIZE + 2);
-	g->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
-	g->box(FL_BORDER_BOX);
+	g_clock_ = new Fl_Group(X, Y, 10, 10);
+	g_clock_->labelfont(FL_BOLD);
+	g_clock_->labelsize(FL_NORMAL_SIZE + 2);
+	g_clock_->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
+	g_clock_->box(FL_BORDER_BOX);
 
-	int curr_x = g->x() + GAP;
-	int curr_y = g->y() + HTEXT;
+	int curr_x = g_clock_->x() + GAP;
+	int curr_y = g_clock_->y() + HTEXT;
 
 	const int WCLOCKS = 250;
 
@@ -2789,6 +2790,8 @@ void qso_manager::clock_group::create_form(int X, int Y) {
 	bn_time_->labelsize(5 * FL_NORMAL_SIZE);
 	bn_time_->labelcolor(FL_YELLOW);
 	bn_time_->box(FL_FLAT_BOX);
+	bn_time_->when(FL_WHEN_RELEASE);
+	bn_time_->callback(cb_click, nullptr);
 
 	curr_y += bn_time_->h();
 
@@ -2798,6 +2801,8 @@ void qso_manager::clock_group::create_form(int X, int Y) {
 	bn_date_->labelsize(FL_NORMAL_SIZE * 3 / 2);
 	bn_date_->labelcolor(FL_YELLOW);
 	bn_date_->box(FL_FLAT_BOX);
+	bn_date_->when(FL_WHEN_RELEASE);
+	bn_date_->callback(cb_click, nullptr);
 
 	curr_y += bn_date_->h();
 
@@ -2807,16 +2812,18 @@ void qso_manager::clock_group::create_form(int X, int Y) {
 	bn_local_->labelsize(FL_NORMAL_SIZE * 3 / 2);
 	bn_local_->labelcolor(FL_RED);
 	bn_local_->box(FL_FLAT_BOX);
+	bn_local_->when(FL_WHEN_RELEASE);
+	bn_local_->callback(cb_click, nullptr);
 
 	curr_x += GAP + WCLOCKS;
 	curr_y += bn_local_->h() + GAP;
 
-	g->resizable(nullptr);
-	g->size(curr_x - g->x(), curr_y - g->y());
-	g->end();
+	g_clock_->resizable(nullptr);
+	g_clock_->size(curr_x - g_clock_->x(), curr_y - g_clock_->y());
+	g_clock_->end();
 
 	resizable(nullptr);
-	size(g->w(), g->h());
+	size(g_clock_->w(), g_clock_->h());
 	show();
 	end();
 
@@ -2826,7 +2833,44 @@ void qso_manager::clock_group::create_form(int X, int Y) {
 
 // Enable/disab;e widgets
 void qso_manager::clock_group::enable_widgets() {
-	// NO CODE
+	time_t now = time(nullptr);
+	tm* value;
+	tm* other_value;
+	char result[100];
+	if (display_local_) {
+		value = localtime(&now);
+		other_value = gmtime(&now);
+		strftime(result, 99, "Clock - %Z", value);
+		g_clock_->copy_label(result);
+		bn_time_->labelcolor(FL_RED);
+		bn_date_->labelcolor(FL_RED);
+		bn_local_->labelcolor(FL_YELLOW);
+		// Convert other time
+		strftime(result, 99, "%T UTC", other_value);
+		bn_local_->copy_label(result);
+	}
+	else {
+		value = gmtime(&now);
+		other_value = localtime(&now);
+		g_clock_->label("Clock - UTC");
+		bn_time_->labelcolor(FL_YELLOW);
+		bn_date_->labelcolor(FL_YELLOW);
+		bn_local_->labelcolor(FL_RED);
+		// Convert other time
+		strftime(result, 99, "%T %Z", other_value);
+		bn_local_->copy_label(result);
+	}
+	// convert to C string, then C++ string
+	strftime(result, 99, "%H:%M:%S", value);
+	bn_time_->copy_label(result);
+	// Convert date
+	strftime(result, 99, "%A %d %B %Y", value);
+	bn_date_->copy_label(result);
+
+	qso_manager* mgr = (qso_manager*)parent();
+	if (mgr->qso_group_->logging_state_ == QSO_PENDING) {
+		mgr->qso_group_->copy_clock_to_qso(now);
+	}
 }
 
 // save value
@@ -2838,26 +2882,17 @@ void qso_manager::clock_group::save_values() {
 void qso_manager::clock_group::cb_timer_clock(void* v) {
 	// Update the label in the clock button which is passed as the parameter
 	clock_group* that = (clock_group*)v;
-	time_t now = time(nullptr);
-	tm* value = gmtime(&now);
-	char result[100];
-	// convert to C string, then C++ string
-	strftime(result, 99, "%H:%M:%S", value);
-	that->bn_time_->copy_label(result);
-	// Convert date
-	strftime(result, 99, "%A %d %B %Y", value);
-	that->bn_date_->copy_label(result);
-	// Convert local time
-	value = localtime(&now);
-	strftime(result, 99, "%T %Z", value);
-	that->bn_local_->copy_label(result);
+	that->enable_widgets();
 
-	qso_manager* mgr = ancestor_view<qso_manager>(that);
-	if (mgr->qso_group_->logging_state_ == QSO_PENDING) {
-		mgr->qso_group_->copy_clock_to_qso(now);
-	}
 
 	Fl::repeat_timeout(UTC_TIMER, cb_timer_clock, v);
+}
+
+// Callback click group
+void qso_manager::clock_group::cb_click(Fl_Widget* w, void* v) {
+	clock_group* that = ancestor_view<clock_group>(w);
+	that->display_local_ = !that->display_local_;
+	that->enable_widgets();
 }
 
 

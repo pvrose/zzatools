@@ -35,13 +35,11 @@ extern bool close_by_error_;
 // Constructor
 status::status(int X, int Y, int W, int H, const char* label) :
 	Fl_Group(X, Y, W, H, label)
-	, clock_bn_(nullptr)
 	, progress_(nullptr)
 	, rig_status_(nullptr)
 	, misc_status_(nullptr)
 	, file_status_(nullptr)
 	, status_file_viewer_(nullptr)
-	, use_local_(false)
 	, report_filename_("")
 	, report_file_(nullptr)
 	, min_level_(ST_NONE)
@@ -69,31 +67,13 @@ status::status(int X, int Y, int W, int H, const char* label) :
 	add(file_status_);
 	curr_x += file_w;
 	const int rem_w = W - curr_x;
-
-	// Add clock widget - use a button which when clicked switches between UTC and local time
-	const int clock_w = rem_w / 4;
-	// Button - display the clock
-	clock_bn_ = new Fl_Button(curr_x, Y, clock_w, H);
-	clock_bn_->box(FL_DOWN_BOX);
-	clock_bn_->color(FL_BLACK);
-	clock_bn_->selection_color(FL_BLACK);
-	clock_bn_->labelcolor(use_local_ ? FL_YELLOW : FL_GREEN);
-	clock_bn_->labelfont(FL_HELVETICA_BOLD);
-	// Get initial time 2018/12/02 14:13:00 UTC +0000, default to UTC at start-up.
-	use_local_ = false;
-	string clock_text = now(use_local_, "%F %T UTC %z");
-	clock_bn_->copy_label(clock_text.c_str());
-	// Set callback to switch between UTC and local timezone when clicked
-	clock_bn_->callback(cb_bn_clock);
-	clock_bn_->when(FL_WHEN_RELEASE);
-	clock_bn_->tooltip("Current time (UTC)");
-	// Set callback to receive an update every UTC_TIMER (1) second.
-	Fl::add_timeout(UTC_TIMER, cb_timer_clock, (void*)clock_bn_);
-	add(clock_bn_);
+	const int WPROG = 2;
+	const int WRIG = 3;
+	const int WMISC = 5;
+	const int WALL = WPROG + WRIG + WMISC;
 
 	// Add a progress bar widget - updated by all the processes which take a while
-	curr_x += clock_w;
-	const int progress_w = rem_w * 2 / 10;
+	const int progress_w = rem_w * WPROG / WALL;
 	// Progress bar
 	progress_ = new Fl_Progress(curr_x, Y, progress_w, H, "Initialising...");
 	progress_->align(FL_ALIGN_INSIDE);
@@ -103,7 +83,7 @@ status::status(int X, int Y, int W, int H, const char* label) :
 	curr_x += progress_w;
 
 	// Add rig status
-	const int rig_status_w = rem_w / 4;
+	const int rig_status_w = rem_w * WRIG / WALL;
 	// Button - rig status
 	rig_status_ = new Fl_Button(curr_x, Y, rig_status_w, H, "Rig connection not yet established");
 	rig_status_->box(FL_DOWN_BOX);
@@ -117,7 +97,7 @@ status::status(int X, int Y, int W, int H, const char* label) :
 	curr_x += rig_status_w;
 
 	// Miscellaneous status - used for general status and error information
-	const int misc_w = rem_w * 3 / 10;
+	const int misc_w = rem_w * WMISC / WALL;
 	// Button - status message 
 	misc_status_ = new Fl_Button(curr_x, Y, misc_w, H, "Miscellaneous information");
 	misc_status_->box(FL_DOWN_BOX);
@@ -181,38 +161,6 @@ void status::null_file_viewer() {
 }
 
 // Callbacks
-// Clock button callback - toggles between UTC and local-time
-void status::cb_bn_clock(Fl_Widget* bn, void* v) {
-	status* that = ancestor_view<status>(bn);
-	// Toggle the flag 
-	that->use_local_ = that->use_local_ ? false : true;
-	// Set label-colour to indicate local or UTC
-	bn->labelcolor(that->use_local_ ? FL_YELLOW : FL_GREEN);
-	// Redisplay the time
-	string clock_text = now(that->use_local_, "%F %T UTC %z");
-	bn->copy_label(clock_text.c_str());
-	if (that->use_local_) {
-		string tz = now(true, "Current time (UTC %z)");
-		bn->copy_tooltip(tz.c_str());
-	}
-	else {
-		bn->tooltip("Current time (UTC)");
-	}
-	bn->redraw();
-}
-
-// Clock timer callback - received every UTC_TIMER seconds
-void status::cb_timer_clock(void * v) {
-	// Update the label in the clock button which is passed as the parameter
-	Fl_Button* bn = (Fl_Button*)v;
-	status* that = ancestor_view<status>(bn);
-	string clock_text = now(that->use_local_, "%F %T UTC %z");
-	bn->copy_label(clock_text.c_str());
-	bn->redraw();
-	// repeat the timer
-	Fl::repeat_timeout(UTC_TIMER, cb_timer_clock, v);
-}
-
 // Rig status bn callback - attempts to toggle rig connection state
 void status::cb_bn_rig(Fl_Widget* bn, void* v) {
 	status* that = ancestor_view<status>(bn);

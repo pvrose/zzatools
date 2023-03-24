@@ -606,7 +606,13 @@ using namespace std;
 
 			// Callback - 1s timer
 			static void cb_timer_clock(void* v);
+			// Callback - click on group
+			static void cb_click(Fl_Widget* w, void* v);
 
+			// Display local time rather than UTC
+			bool display_local_;
+
+			Fl_Group* g_clock_;
 			Fl_Button* bn_time_;
 			Fl_Button* bn_date_;
 			Fl_Button* bn_local_;

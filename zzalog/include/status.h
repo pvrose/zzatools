@@ -219,10 +219,6 @@ using namespace std;
 		bool display_debug();
 
 		// Callbacks
-		// Clock button callback
-		static void cb_bn_clock(Fl_Widget* bn, void* v);
-		// Clock timer callback
-		static void cb_timer_clock(void* v);
 		// Rig button callback
 		static void cb_bn_rig(Fl_Widget* bn, void* v);
 		// Misc button callback
@@ -236,8 +232,6 @@ using namespace std;
 		void update_progress(object_t object);
 
 	protected:
-		// The clock display
-		Fl_Button * clock_bn_;
 		// Progress bar - shows progress during activities that take noticeable time
 		Fl_Progress* progress_;
 		// Rig status - when a rig connected regularly update from rig
@@ -250,8 +244,6 @@ using namespace std;
 		viewer_window* status_file_viewer_;
 		// Containing window
 
-		// local or UTC
-		bool use_local_;
 		// Status report file
 		string report_filename_;
 		ofstream* report_file_;
