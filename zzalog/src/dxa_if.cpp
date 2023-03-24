@@ -1670,6 +1670,8 @@ void dxa_if::draw_pins() {
 										double bearing;
 										record->item("DISTANCE", distance);
 										record->item("ANT_AZ", bearing);
+										if (isnan(distance)) distance = 0.0;
+										if (isnan(bearing)) bearing = 0.0;
 										double radb = bearing * PI / 180.0;
 										double x_dist = distance * sin(radb);
 										double y_dist = distance * cos(radb);
@@ -1677,8 +1679,9 @@ void dxa_if::draw_pins() {
 										vert_most_ = max(vert_most_, abs(y_dist));
 										// Add it to the set of records being displayed
 #ifdef _DEBUG
-										printf("Wanted value, %s %s: D=%0.0f, Ph=%0.0f, X=%0.0f, Y=%0.0f\n",
-										record->item("CALL").c_str(), record->item("GRIDSQUARE").c_str(), distance, bearing, x_dist, y_dist);
+										printf("Wanted value, %s %s %s: D=%0.0f, Ph=%0.0f, X=%0.0f, Y=%0.0f\n",
+										record->item("CALL").c_str(), record->item("GRIDSQUARE").c_str(), 
+											record->item("QSO_DATE").c_str(), distance, bearing, x_dist, y_dist);
 #endif
 										records_displayed_.insert(record_num);
 										dxatlas_records_->add_record(record_num);
