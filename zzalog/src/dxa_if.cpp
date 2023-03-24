@@ -1938,6 +1938,7 @@ void dxa_if::zoom_centre(lat_long_t centre) {
 		is_my_change_ = true;
 		map->PutZoom(zoom);
 		zoom_value_ = map->GetZoom();
+		is_my_change_ = false;
 	}
 }
 
@@ -1963,6 +1964,7 @@ void dxa_if::zoom_azimuthal() {
 		is_my_change_ = true;
 		map->PutZoom(zoom);
 		zoom_value_ = map->GetZoom();
+		is_my_change_ = false;
 	}
 }
 
