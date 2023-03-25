@@ -44,7 +44,7 @@ using namespace std;
 		// text to search for
 		string search_text_;
 		// Record number when stepping the search through the log
-		record_num_t record_num_;
+		qso_num_t record_num_;
 		// The search input
 		Fl_Widget* ip_search_;
 

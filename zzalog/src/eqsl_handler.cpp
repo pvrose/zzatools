@@ -52,7 +52,7 @@ eqsl_handler::~eqsl_handler()
 */
 
 // Put the image request on to the queue 
-void eqsl_handler::enqueue_request(record_num_t record_num, bool force /*=false*/) {
+void eqsl_handler::enqueue_request(qso_num_t record_num, bool force /*=false*/) {
 	// eQSL requests can be disabled when compiled with _DEBUG
 	if (debug_enabled_) {
 		// Enqueue request
@@ -876,7 +876,7 @@ void eqsl_handler::debug_enable(bool value) {
 
 
 // Upload single QSO to eQSL.cc
-bool eqsl_handler::upload_single_qso(record_num_t record_num) {
+bool eqsl_handler::upload_single_qso(qso_num_t record_num) {
 	Fl_Preferences qsl_settings(settings_, "QSL");
 	Fl_Preferences eqsl_settings(qsl_settings, "eQSL");
 	int upload_qso;

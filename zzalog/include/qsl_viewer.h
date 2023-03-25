@@ -39,7 +39,7 @@
 		static void cb_bn_log_card(Fl_Widget* w, void* v);
 
 		// Set record
-		void set_qso(record* qso, record_num_t number);
+		void set_qso(record* qso, qso_num_t number);
 	
 	protected:
 		// Access to selected record (for use in callback)
@@ -66,7 +66,7 @@
 		// Current QSO
 		record* current_qso_;
 		// Current QSO number
-		record_num_t current_qso_num_;
+		qso_num_t current_qso_num_;
 
 		// Card image and info
 		Fl_Group* card_display_;

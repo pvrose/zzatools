@@ -28,7 +28,7 @@ using namespace std;
 
 	public:
 		// inherited from view
-		virtual void update(hint_t hint, record_num_t record_num_1, record_num_t record_num_2 = 0);
+		virtual void update(hint_t hint, qso_num_t record_num_1, qso_num_t record_num_2 = 0);
 		// Delete the tree
 		void delete_tree();
 

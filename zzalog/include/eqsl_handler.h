@@ -37,14 +37,14 @@ using namespace std;
 		};
 		// Data required to repeat throttled requests
 		struct request_t {
-			record_num_t record_num;
+			item_num_t record_num;
 			bool force;
 			request_t()
 				: record_num(0)
 				, force(false)
 			{
 			}
-			request_t(record_num_t n, bool f)
+			request_t(item_num_t n, bool f)
 				: record_num(n)
 				, force(f)
 			{}
@@ -77,7 +77,7 @@ using namespace std;
 		~eqsl_handler();
 
 		// enqueue a request to fetch a qsl card
-		void enqueue_request(record_num_t record_num, bool force = false);
+		void enqueue_request(qso_num_t record_num, bool force = false);
 		// download the data from eqsl
 		bool download_eqsl_log(stringstream* adif);
 		// queue timer
@@ -91,7 +91,7 @@ using namespace std;
 		// Set/Clear debug_enabled_
 		void debug_enable(bool value);
 		// Upload single record
-		bool upload_single_qso(record_num_t record_num);
+		bool upload_single_qso(qso_num_t record_num);
 
 	protected:
 		// call backs

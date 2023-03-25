@@ -50,7 +50,7 @@ spec_tree::~spec_tree()
 }
 
 // inherited from view
-void spec_tree::update(hint_t hint, record_num_t record_num_1, record_num_t record_num_2) {
+void spec_tree::update(hint_t hint, qso_num_t record_num_1, qso_num_t record_num_2) {
 	switch (hint) {
 	case HT_FORMAT:
 		// May have changed font - redraw

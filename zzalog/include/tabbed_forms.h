@@ -21,7 +21,7 @@
 		~tabbed_forms();
 
 		// tell all views that record(s) have changed
-		void update_views(view* requester, hint_t hint, record_num_t record_1, record_num_t record_2 = 0);
+		void update_views(view* requester, hint_t hint, qso_num_t record_1, qso_num_t record_2 = 0);
 		// set the various books into the views
 		void books();
 		// Return the specific view
@@ -45,8 +45,8 @@
 		};
 		map<object_t, view_ptrs> forms_;
 		// Last records updated
-		record_num_t last_record_1_;
-		record_num_t last_record_2_;
+		qso_num_t last_record_1_;
+		qso_num_t last_record_2_;
 		// Last hint type (when switching between view) for query
 		hint_t last_hint_;
 		// Last book (switching in/out of different books) for query

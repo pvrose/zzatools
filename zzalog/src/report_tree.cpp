@@ -95,7 +95,7 @@ report_tree::~report_tree() {
 }
 
 // Overloaded view update method
-void report_tree::update(hint_t hint, record_num_t record_num_1, record_num_t record_num_2) {
+void report_tree::update(hint_t hint, qso_num_t record_num_1, qso_num_t record_num_2) {
 	// Only use record_num_1
 	selection_ = record_num_1;
 	switch (hint) {
@@ -140,7 +140,7 @@ void report_tree::delete_tree() {
 
 // methods
 // Add record details to a specific map entry
-void report_tree::add_record(record_num_t record_num, report_map_entry_t* entry) {
+void report_tree::add_record(item_num_t record_num, report_map_entry_t* entry) {
 	string map_key = "";
 	string state_code;
 	int dxcc;
@@ -417,7 +417,7 @@ void report_tree::copy_records_to_tree(record_list_t* record_list, Fl_Tree_Item*
 		// For each entry in the record list
 		for (auto it = record_list->begin(); it != record_list->end(); it++) {
 			// Get the record
-			record_num_t record_num = *it;
+			item_num_t record_num = *it;
 			record* record = get_book()->get_record(record_num, false);
 			// Strings to build up text
 			string eqsl_text = "";
@@ -782,7 +782,7 @@ void report_tree::cb_tree_report(Fl_Widget* w, void* v) {
 	case FL_TREE_REASON_SELECTED:
 		// If we select a record, then select that record in the book
 		if ((long)item->user_data() >= 0) {
-			that->get_book()->selection((record_num_t)(long)item->user_data());
+			that->get_book()->selection((item_num_t)(long)item->user_data());
 			return;
 		}
 		cb_tree(w, v);

@@ -30,7 +30,7 @@ using namespace std;
 		// Public methods
 	public:
 		// inherited from view
-		virtual void update(hint_t hint, record_num_t record_num_1, record_num_t record_num_2 = 0);
+		virtual void update(hint_t hint, qso_num_t record_num_1, qso_num_t record_num_2 = 0);
 		// inherited from Fl_Table_Row
 		virtual void draw_cell(TableContext context, int R = 0, int C = 0, int X = 0, int Y = 0,
 			int W = 0, int H = 0);

@@ -497,7 +497,7 @@ record* book::get_record() {
 }
 
 // Get the numbered record and optionally select it (quietly)
-record* book::get_record(record_num_t num_item, bool set_selected/* = true*/) {
+record* book::get_record(item_num_t num_item, bool set_selected/* = true*/) {
 	if (num_item < size()) {
 		if (set_selected) {
 			// Set the selected record
@@ -526,8 +526,8 @@ void book::remember_record() {
 }
 
 // Change the selected record (& update any necessary controls
-record_num_t book::selection(record_num_t num_item, hint_t hint /* = HT_SELECTED */, view* requester /* = nullptr */, record_num_t num_other /*= 0*/) {
-	record_num_t previous = current_item_;
+item_num_t book::selection(item_num_t num_item, hint_t hint /* = HT_SELECTED */, view* requester /* = nullptr */, item_num_t num_other /*= 0*/) {
+	item_num_t previous = current_item_;
 	// Special case - -1 indicates no change to the selection
 	if ((signed)num_item != -1 && size()) {
 		current_item_ = num_item;
@@ -536,7 +536,7 @@ record_num_t book::selection(record_num_t num_item, hint_t hint /* = HT_SELECTED
 	else {
 	}
 	record* this_record = get_record(current_item_, false);
-	record_num_t record_num = record_number(current_item_);
+	qso_num_t record_num = record_number(current_item_);
 	bool force_save = false;
 	// update turned off during certain activities
 	switch (hint) {
@@ -591,21 +591,21 @@ record_num_t book::selection(record_num_t num_item, hint_t hint /* = HT_SELECTED
 }
 
 // Get the current selected item
-record_num_t book::selection() {
+item_num_t book::selection() {
 	return current_item_;
 }
 
 // Insert a record in its chronological position 
-record_num_t book::insert_record(record* record) {
+qso_num_t book::insert_record(record* record) {
 	// Get the offset where to add the record and insert it into the array
-	record_num_t pos_record = get_insert_point(record);
+	item_num_t pos_record = get_insert_point(record);
 	insert_record_at(pos_record, record);
 	return pos_record;
 }
 
 // Append a record at the end of the book
-record_num_t book::append_record(record* record) {
-	record_num_t pos_record = size();
+item_num_t book::append_record(record* record) {
+	item_num_t pos_record = size();
 	insert_record_at(pos_record, record);
 	return pos_record;
 }
@@ -656,18 +656,18 @@ void book::delete_contents(bool new_book) {
 }
 
 // Return count of records
-record_num_t book::get_count() {
+item_num_t book::get_count() {
 	return size();
 }
 
 // returns the position at which to chronologically insert a record
-record_num_t book::get_insert_point(record* record) {
+item_num_t book::get_insert_point(record* record) {
 	// Find where to insert the record
 	// operator> overloaded to compare Record date and start time
 	// Check at tail as new record likely to be a more recent one.
-	record_num_t upper_bound = size() == 0 ? 0 : size() - 1;
-	record_num_t lower_bound = 0;
-	record_num_t next_bound;
+	item_num_t upper_bound = size() == 0 ? 0 : size() - 1;
+	item_num_t lower_bound = 0;
+	item_num_t next_bound;
 
 	// if the book is empty add to the beginning 
 	if (size() == 0) {
@@ -704,7 +704,7 @@ record_num_t book::get_insert_point(record* record) {
 }
 
 // insert the record at specific position
-void book::insert_record_at(record_num_t pos_record, record* record) {
+void book::insert_record_at(item_num_t pos_record, record* record) {
 	// get the iterator to the insert position
 	insert(begin() + pos_record, record);
 	if (book_type_ == OT_MAIN) {
@@ -742,8 +742,8 @@ void book::navigate(navigate_t target) {
 // Go to the date specified
 void book::go_date(string date) {
 	// set the bounds of the search - binary split search
-	record_num_t u_bound = size() - 1;
-	record_num_t l_bound = 0;
+	item_num_t u_bound = size() - 1;
+	item_num_t l_bound = 0;
 	// Continue until a gap of only 1 between upper and lower bounds of the search
 	while (u_bound - l_bound > 1) {
 		// Compare string form of dates
@@ -759,7 +759,7 @@ void book::go_date(string date) {
 		}
 		else {
 			// Now implement binary search - repeatedly halving search range 
-			record_num_t mid_pos = (l_bound + u_bound) / 2;
+			item_num_t mid_pos = (l_bound + u_bound) / 2;
 			string m_date = at(mid_pos)->item("QSO_DATE");
 			if (m_date > date) {
 				// Date in earlier half
@@ -876,7 +876,7 @@ void book::delete_record(bool force) {
 }
 
 // Move the record to its correct chronological position
-record_num_t book::correct_record_position(record_num_t current_pos) {
+item_num_t book::correct_record_position(item_num_t current_pos) {
 	// First delete the old position so it doesn't confuse GetOffset
 	// Save the record first
 	record* this_record = get_record(current_pos, false);
@@ -1049,10 +1049,10 @@ bool book::match_int(int value, search_comp_t comparator, int test) {
 }
 
 // Returns the position of the next record that matches search criterion
-record_num_t book::search(search_criteria_t* criteria, bool reset_search) {
+item_num_t book::search(search_criteria_t* criteria, bool reset_search) {
 	// Save the criteria
 	criteria_ = criteria;
-	record_num_t ix;
+	item_num_t ix;
 	if (reset_search) {
 		ix = 0;
 	}
@@ -1305,8 +1305,8 @@ void book::reject_dupe(bool use_dupe) {
 
 // Handle duplicate action - MERGE_DUPE - merge and delete it
 void book::merge_dupe() {
-	record_num_t curr_record = record_number(duplicate_item_);
-	record_num_t dupe_record = record_number(duplicate_item_ + 1);
+	qso_num_t curr_record = record_number(duplicate_item_);
+	qso_num_t dupe_record = record_number(duplicate_item_ + 1);
 	get_record(duplicate_item_, false)->merge_records(get_record(duplicate_item_ + 1, false));
 	selection(dupe_record, HT_DUPE_DELETED);
 	char message[128];
@@ -1458,7 +1458,7 @@ bool book::delete_enabled() {
 }
 
 // Upload the latest QSO imported to eQSL, LotW and Clublog
-bool book::upload_qso(record_num_t record_num) {
+bool book::upload_qso(qso_num_t record_num) {
 	bool old_save_enabled = save_enabled_;
 	enable_save(false);
 	bool ok = eqsl_handler_->upload_single_qso(record_num);
@@ -1494,7 +1494,7 @@ void book::set_session_start() {
 	log_settings.get("Session Gap", session_gap_mins, 30.0);
 	// Start at end of book
 	bool found = false;
-	record_num_t rec_num = size() - 1;
+	qso_num_t rec_num = size() - 1;
 	while (rec_num > 0 && !found) {
 		time_t qso_time = get_record(rec_num, false)->timestamp();
 		if (difftime(session_start_, qso_time) < (session_gap_mins * 60.0)) {

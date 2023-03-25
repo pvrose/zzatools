@@ -373,7 +373,7 @@ void toolbar::cb_bn_search(Fl_Widget* w, void* v) {
 	string search_call = to_upper(that->search_text_);
 	while (keep_on) {
 		// For each record from the last search result until found
-		for (record_num_t i = that->record_num_; i < navigation_book_->size() && !found; i++) {
+		for (item_num_t i = that->record_num_; i < navigation_book_->size() && !found; i++) {
 			// Compare the callsign against the search input
 			record* record = navigation_book_->get_record(i, false);
 			if (record->item("CALL") == search_call) {

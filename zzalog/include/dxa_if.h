@@ -196,7 +196,7 @@ using namespace std;
 		// draw home flag
 		void draw_home_flag();
 		// Is the point displayed
-		bool is_displayed(record_num_t record_num);
+		bool is_displayed(qso_num_t record_num);
 		// Convert colours
 		DxAtlas::EnumColor convert_colour(Fl_Color colour);
 		// Update location widgets
@@ -214,7 +214,7 @@ using namespace std;
 		// Get distance in 1000 km bands
 		string get_distance(record* this_record);
 		// Check QSL status and add to list of records
-		void check_qsl(record_num_t record_num, set<int>& record_list);
+		void check_qsl(qso_num_t record_num, set<int>& record_list);
 		// Add label
 		HRESULT add_label(lat_long_t location, string label);
 		// Update location details
@@ -231,9 +231,9 @@ using namespace std;
 		//!! DX Atlas automation object
 		DxAtlas::IAtlasPtr atlas_;
 		// List of records to display
-		set<record_num_t> records_to_display_;
+		set<qso_num_t> records_to_display_;
 		// List of records being displayed - i.e. have colour selected
-		set<record_num_t> records_displayed_;
+		set<qso_num_t> records_displayed_;
 		// Name of the home location of the selected record
 		string location_name_;
 		// Latitude of home station...

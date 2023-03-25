@@ -2294,7 +2294,7 @@ void spec_data::report_correction(const string&  field, const string&  data, sta
 }
 
 // validate a record 
-bool spec_data::validate(record* record, record_num_t number)
+bool spec_data::validate(record* record, qso_num_t number)
 {
 	// Check configured to do it at this stage
 	abandon_validation_ = false;

@@ -59,6 +59,9 @@ using namespace std;
 		HT_IGNORE,                // Ignore the change
 	};
 
+	// The records are kept in a container with size_t as index
+	typedef size_t item_num_t;    // Position of item within this book
+
 	class view;
 
 	// This class is the container for the ADIF records. These are held in chronological order.
@@ -81,19 +84,19 @@ using namespace std;
 		// Get the current selected record
 		record* get_record();
 		// Set the numbered record and optionally select it
-		record* get_record(record_num_t item_num, bool set_selected);
+		record* get_record(item_num_t item_num, bool set_selected);
 		// Get the most recent record
 		record* get_latest();
 		// Delete the current record
 		void delete_record(bool force);
 		// Change the selected record (& update any necessary controls) - returns the new record number if the book gets reordered
-		virtual record_num_t selection(record_num_t num_record, hint_t hint = HT_SELECTED, view* requester = nullptr, record_num_t num_other = 0);
+		virtual item_num_t selection(item_num_t num_item, hint_t hint = HT_SELECTED, view* requester = nullptr, item_num_t num_other = 0);
 		// Get the current selection
-		record_num_t selection();
+		item_num_t selection();
 		// Insert a record in its chronological position 
-		record_num_t insert_record(record* record);
+		item_num_t insert_record(record* record);
 		// Append a record at the end of the book
-		record_num_t append_record(record* record);
+		item_num_t append_record(record* record);
 		// add a header record
 		void header(record* header);
 		// return the header
@@ -101,7 +104,7 @@ using namespace std;
 		// Delete all records and tidy up
 		void delete_contents(bool new_book);
 		// Return count of records - less header
-		record_num_t get_count();
+		item_num_t get_count();
 		// Navigate the log 
 		void navigate(navigate_t target);
 		// Go to a date
@@ -109,9 +112,9 @@ using namespace std;
 		// set modified
 		void modified(bool yes, bool update_progress = true);
 		// get the position at which to chronologically insert a record
-		record_num_t get_insert_point(record* record);
+		item_num_t get_insert_point(record* record);
 		// insert the record at specific position
-		void insert_record_at(record_num_t pos_record, record* record);
+		void insert_record_at(item_num_t pos_record, record* record);
 		// get modified
 		bool modified();
 		// get filename
@@ -170,19 +173,19 @@ using namespace std;
 
 		// methods to be overridden --
 		// Add/replace the search/find criteria
-		record_num_t search(search_criteria_t* criteria, bool reset_search);
+		item_num_t search(search_criteria_t* criteria, bool reset_search);
 
 		// return the real record number - base class returns it unchanged, 
-		inline virtual record_num_t record_number(record_num_t item_num) {
+		inline virtual qso_num_t record_number(item_num_t item_num) {
 			return item_num;
 		}
 		// return the virtual record number - base class returns it unchanged
-		inline virtual record_num_t item_number(record_num_t record_num, bool nearest = false) {
+		inline virtual item_num_t item_number(qso_num_t record_num, bool nearest = false) {
 			return record_num;
 		}
 
 		// Protected methods
-		record_num_t correct_record_position(record_num_t current_pos);
+		item_num_t correct_record_position(item_num_t current_pos);
 		// And all data
 		void add_use_data(record* record);
 		// Enable/Disable auto-save
@@ -192,7 +195,7 @@ using namespace std;
 		// Delete enabled
 		bool delete_enabled();
 		// Upload single QSO
-		bool upload_qso(record_num_t record);
+		bool upload_qso(qso_num_t record);
 		// enterring record
 		bool enterring_record();
 
@@ -202,11 +205,11 @@ using namespace std;
 		// Protected attributes
 	protected:
 		// current selected item number
-		record_num_t current_item_;
+		item_num_t current_item_;
 		// Test duplicate item
-		record_num_t duplicate_item_;
+		item_num_t duplicate_item_;
 		// Newest record number
-		record_num_t newest_item_;
+		item_num_t newest_item_;
 		// Book type
 		object_t book_type_;
 		// modified flag
@@ -230,7 +233,7 @@ using namespace std;
 		// Current find/extract criteria
 		search_criteria_t* criteria_;
 		// Most recent search result
-		record_num_t last_search_result_;
+		item_num_t last_search_result_;
 		// used bands
 		set<string> used_bands_;
 		// used modes

@@ -113,7 +113,7 @@ int fllog_emul::check_dup(rpc_data_item::rpc_list& params, rpc_data_item& respon
 		printf("check_dup %s Mode=%s Span=%d Freq=%d State=%s RST=%s", callsign.c_str(), mode.c_str(), span, freq, state.c_str(), rst_in.c_str());
 		if (extract_records_->size()) {
 			bool found = false;
-			record_num_t item_num;
+			item_num_t item_num;
 			for (item_num = 0; item_num < extract_records_->size() && !found; item_num++) {
 				that_->current_record_ = extract_records_->get_record(0, false);
 				time_t now = time(nullptr);

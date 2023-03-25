@@ -237,7 +237,7 @@ void club_handler::get_reference(string& dir_name) {
 }
 
 // Upload the single specified QSO in real time
-bool club_handler::upload_single_qso(record_num_t record_num) {
+bool club_handler::upload_single_qso(qso_num_t record_num) {
 	Fl_Preferences qsl_settings(settings_, "QSL");
 	Fl_Preferences club_settings(qsl_settings, "ClubLog");
 	int upload_qso;

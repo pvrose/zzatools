@@ -151,7 +151,7 @@ using namespace std;
 		// The DXCC has ADIF defined primary administrative districts
 		bool has_states(int dxcc);
 		// Validate a record - returns TRUE if record corrected
-		bool validate(record* record, record_num_t number);
+		bool validate(record* record, qso_num_t number);
 		// Validate the data in the field
 		valn_error_t validate(const string&  field_name, const string& data, bool inhibit_report = false);
 		// Set the loaded filename
@@ -249,7 +249,7 @@ using namespace std;
 		// Saved record
 		record* saved_record_;
 		// Record number
-		record_num_t record_number_;
+		qso_num_t record_number_;
 		// Number of validation errors
 		int error_count_;
 		int error_record_count_;

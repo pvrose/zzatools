@@ -1228,7 +1228,7 @@ void qso_manager::qso_group::update_station_choices(stn_item_t station_item) {
 }
 
 // Update QSO
-void qso_manager::qso_group::update_qso(record_num_t log_qso) {
+void qso_manager::qso_group::update_qso(qso_num_t log_qso) {
 	if (log_qso == current_rec_num_) {
 		switch (logging_state_) {
 		case QSO_INACTIVE:
@@ -1305,7 +1305,7 @@ void qso_manager::qso_group::update_qso(record_num_t log_qso) {
 }
 
 // Update query
-void qso_manager::qso_group::update_query(logging_state_t query, record_num_t match_num, record_num_t query_num) {
+void qso_manager::qso_group::update_query(logging_state_t query, qso_num_t match_num, qso_num_t query_num) {
 	switch(logging_state_) {
 	case QSO_PENDING:
 	case QSO_INACTIVE:
@@ -2184,7 +2184,7 @@ void qso_manager::qso_group::action_start() {
 // Action SAVE - transition from QSO_STARTED to QSO_INACTIVE while saving record
 void qso_manager::qso_group::action_save() {
 	bool old_save_enabled = book_->save_enabled();
-	record_num_t item_number = book_->item_number(current_rec_num_);
+	item_num_t item_number = book_->item_number(current_rec_num_);
 	book_->enable_save(false);
 	// On-air logging add date/time off
 	switch (logging_mode_) {
@@ -3106,7 +3106,7 @@ void qso_manager::update_rig() {
 }
 
 // Called whenever another view updates a record (or selects a new one)
-void qso_manager::update_qso(hint_t hint, record_num_t match_num, record_num_t query_num) {
+void qso_manager::update_qso(hint_t hint, qso_num_t match_num, qso_num_t query_num) {
 	switch (hint) {
 	case HT_SELECTED:
 	case HT_ALL:

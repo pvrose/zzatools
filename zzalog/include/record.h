@@ -66,11 +66,11 @@ using namespace std;
 		TIME_END,
 	};
 
-	// The records are kept in a container with size_t as index
-	typedef size_t record_num_t;
 
 	// forward declaration
 	enum hint_t : unsigned char;
+
+	typedef size_t qso_num_t;    // QSO number
 
 	// This class represents a single record as a container of field items NAME=>VALUE
 	class record : public map<string, string> {

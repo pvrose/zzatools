@@ -133,7 +133,7 @@ using namespace std;
 		// Original value of book_->enable_save_
 		bool old_enable_save_;
 		// Last added record number
-		record_num_t last_added_number_;
+		qso_num_t last_added_number_;
 
 	};
 #endif

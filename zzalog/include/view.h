@@ -28,7 +28,7 @@ using namespace std;
 		// Public methods
 	public:
 		// something has changed in the book - usually record 1 is to be selected, record_2 usage per view
-		virtual void update(hint_t hint, record_num_t record_num_1, record_num_t record_num_2 = 0) = 0;
+		virtual void update(hint_t hint, qso_num_t record_num_1, qso_num_t record_num_2 = 0) = 0;
 		// Returns minimum resizing capability
 		int min_w();
 		int min_h();

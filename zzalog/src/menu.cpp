@@ -600,7 +600,7 @@ void menu::cb_mi_nav_recnum(Fl_Widget* w, void* v) {
 		// Valid reply - convert to integer and select item
 		record_num = atoi(reply);
 		if (record_num > 0) {
-			record_num_t item_num = navigation_book_->item_number(record_num - 1, true);
+			item_num_t item_num = navigation_book_->item_number(record_num - 1, true);
 			navigation_book_->selection(item_num);
 		}
 	}
@@ -744,12 +744,12 @@ void menu::cb_mi_parse_log(Fl_Widget* w, void* v) {
 // v is not used
 void menu::cb_mi_valid8_qso(Fl_Widget* w, void* v) {
 	record* record = navigation_book_->get_record();
-	record_num_t record_num = navigation_book_->record_number(navigation_book_->selection());
+	qso_num_t record_num = navigation_book_->record_number(navigation_book_->selection());
 	// If command validation is enabled
 	bool changed = spec_data_->validate(record, record_num);
 	if (changed) {
 		// Update views if record has changed
-		record_num_t item_num = navigation_book_->item_number(record_num);
+		item_num_t item_num = navigation_book_->item_number(record_num);
 		navigation_book_->selection(item_num, HT_MINOR_CHANGE);
 		book_->modified(true);
 	}
@@ -875,7 +875,7 @@ void menu::cb_mi_log_bulk(Fl_Widget* w, void* v) {
 			status_->progress(navigation_book_->size(), navigation_book_->book_type(), "Changing data in bulk", "records");
 			status_->misc_status(ST_NOTE, "LOG: Bulk change started");
 			// For each record in selected book
-			for (record_num_t i = 0; i < navigation_book_->size(); i++) {
+			for (item_num_t i = 0; i < navigation_book_->size(); i++) {
 				record* record = navigation_book_->get_record(i, false);
 
 				switch (action) {
@@ -957,7 +957,7 @@ void menu::cb_mi_log_edith(Fl_Widget* w, void* v) {
 // v is long: 0 is now, 1 is selected QSO
 void menu::cb_mi_log_start(Fl_Widget* w, void* v) {
 	long mode = (long)v;
-	record_num_t save_pos = book_->selection();
+	item_num_t save_pos = book_->selection();
 	switch (mode) {
 	case 0:
 		session_start_ = time(nullptr);
@@ -970,7 +970,7 @@ void menu::cb_mi_log_start(Fl_Widget* w, void* v) {
 	}
 	case 2: {
 		// Get most recent QSO
-		record_num_t pos = book_->size() - 1;
+		item_num_t pos = book_->size() - 1;
 		record* start = book_->get_record(pos, false);
 		string qso_date = start->item("QSO_DATE");
 		pos--;

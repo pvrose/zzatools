@@ -129,9 +129,9 @@ void log_table::cb_tab_log(Fl_Widget* w, void* v) {
 	// Get the item number and field clicked
 	log_table* that = (log_table*)w;
 	int row = that->callback_row();
-	record_num_t item_num = that->order_ == LAST_TO_FIRST ? that->my_book_->size() - 1 - row : row;
+	item_num_t item_num = that->order_ == LAST_TO_FIRST ? that->my_book_->size() - 1 - row : row;
 	int col = that->callback_col();
-	record_num_t save_num = that->current_item_num_;
+	item_num_t save_num = that->current_item_num_;
 	switch (that->callback_context()) {
 	case Fl_Table::CONTEXT_CELL:
 		// Mouse clicked within the cell
@@ -467,7 +467,7 @@ int log_table::handle(int event) {
 }
 
 // override of view::update(). view-specific actions on update
-void log_table::update(hint_t hint, record_num_t record_num_1, record_num_t record_num_2) {
+void log_table::update(hint_t hint, qso_num_t record_num_1, qso_num_t record_num_2) {
 	record* this_record = my_book_->get_record(my_book_->item_number(record_num_1), false);
 	// Hide any edit input 
 	if (edit_input_->visible()) {
@@ -567,7 +567,7 @@ void log_table::draw_cell(TableContext context, int R, int C, int X, int Y, int 
 		// Put record number into header (left-most column)
 		fl_push_clip(X, Y, W, H);
 		{
-			record_num_t item_number = (order_ == LAST_TO_FIRST) ? my_book_->size() - 1 - R : R;
+			item_num_t item_number = (order_ == LAST_TO_FIRST) ? my_book_->size() - 1 - R : R;
 			record* this_record = my_book_->get_record(item_number, false);
 			// If the row is selected include the row header in the colouring
 			Fl_Color bg_colour = row_selected(R) ? selection_color() : row_header_color();
@@ -621,7 +621,7 @@ void log_table::draw_cell(TableContext context, int R, int C, int X, int Y, int 
 			!(edit_input_->visible() && R == edit_row_ && C == edit_col_)) {
 			fl_push_clip(X, Y, W, H);
 			{
-				record_num_t item_number = (order_ == LAST_TO_FIRST) ? my_book_->size() - 1 - R : R;
+				item_num_t item_number = (order_ == LAST_TO_FIRST) ? my_book_->size() - 1 - R : R;
 				record* this_record = my_book_->get_record(item_number, false);
 				// Selected rows will have table specific colour, others in current sesson grey, rest white
 				Fl_Color default_bg_colour = in_current_session(this_record) ? FL_GRAY : FL_WHITE;
@@ -712,7 +712,7 @@ vector<field_info_t>& log_table::fields() {
 // Open an input dialog to allow user to edit the cell 
 void log_table::edit_cell(int row, int col) {
 	// get the field item under the mouse
-	record_num_t item_number = (order_ == LAST_TO_FIRST) ? my_book_->size() - 1 - row : row;
+	item_num_t item_number = (order_ == LAST_TO_FIRST) ? my_book_->size() - 1 - row : row;
 	record* record = my_book_->get_record(item_number, true);
 	field_info_t field_info = fields_[col];
 	string text = record->item(field_info.field, true);
@@ -744,7 +744,7 @@ void log_table::edit_cell(int row, int col) {
 void log_table::done_edit(bool keep_row) {
 	if (edit_input_->visible()) {
 		// Get the record and field
-		record_num_t item_number = (order_ == LAST_TO_FIRST) ? my_book_->size() - 1 - edit_row_ : edit_row_;
+		item_num_t item_number = (order_ == LAST_TO_FIRST) ? my_book_->size() - 1 - edit_row_ : edit_row_;
 		record* record = my_book_->get_record(item_number, true);
 		field_info_t field_info = fields_[edit_col_];
 		string old_text = record->item(field_info.field);
@@ -771,14 +771,14 @@ void log_table::done_edit(bool keep_row) {
 			if (field_info.field == "QSO_DATE" || field_info.field == "TIME_ON") {
 				// The book will tell all views
 				// the changed start time may cause the book to get reordered - move the edit point accordingly
-				record_num_t new_record = book_->selection(my_book_->record_number(item_number), HT_START_CHANGED);
+				item_num_t new_item_num = my_book_->item_number(book_->selection(my_book_->record_number(item_number), HT_START_CHANGED));
 				if (keep_row && my_book_->book_type() == OT_MAIN) {
 					switch (order_) {
 					case FIRST_TO_LAST:
-						edit_row_ = new_record;
+						edit_row_ = new_item_num;
 						break;
 					case LAST_TO_FIRST:
-						edit_row_ = my_book_->size() - 1 - new_record;
+						edit_row_ = my_book_->size() - 1 - new_item_num;
 						break;
 					default:
 						// Do not set edit_row_
@@ -918,7 +918,7 @@ void log_table::dbl_click_column(int col) {
 	else if (my_book_->book_type() == OT_EXTRACT || my_book_->book_type() == OT_DXATLAS) {
 		// Sorting on any other column is only available in extracted records
 		// Remember the record number
-		record_num_t selected_record = my_book_->record_number(my_book_->selection());
+		qso_num_t selected_record = my_book_->record_number(my_book_->selection());
 		switch (order_) {
 		case FIRST_TO_LAST:
 		case LAST_TO_FIRST:

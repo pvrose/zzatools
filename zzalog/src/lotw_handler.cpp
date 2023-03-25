@@ -355,7 +355,7 @@ bool lotw_handler::validate_adif(stringstream* adif) {
 }
 
 // Upload single QSO
-bool lotw_handler::upload_single_qso(record_num_t record_num) {
+bool lotw_handler::upload_single_qso(qso_num_t record_num) {
 	Fl_Preferences qsl_settings(settings_, "QSL");
 	Fl_Preferences lotw_settings(qsl_settings, "LotW");
 	int upload_qso;

@@ -96,7 +96,7 @@ void tabbed_forms::add_view(const char* label, field_ordering_t column_data, obj
 }
 
 // tell all views and others that record(s) have changed and why
-void tabbed_forms::update_views(view* requester, hint_t hint, record_num_t record_1, record_num_t record_2) {
+void tabbed_forms::update_views(view* requester, hint_t hint, qso_num_t record_1, qso_num_t record_2) {
 	if (hint != HT_IGNORE) {
 		// Remeber the records to update non-visible views when they become visible
 		last_record_1_ = record_1;

@@ -749,8 +749,8 @@ void dxa_if::cb_close(Fl_Widget* w, void* v) {
 // If we are not, then copy all records within the tolerance to the extracted records.
 HRESULT dxa_if::cb_map_clicked(float latitude, float longitude) {
 	int num_found = 0;
-	record_num_t record_num;
-	record_num_t display_num = 0;
+	qso_num_t record_num;
+	qso_num_t display_num = 0;
 	float tolerance = (float)5.0 / zoom_value_;
 	float best_diff = tolerance;
 	record* disp_record = nullptr;
@@ -827,12 +827,12 @@ HRESULT dxa_if::cb_mouse_moved(float latitude, float longitude) {
 		string text = " ";
 
 		// Start by having ridiculous closest point (As far away as we can consider)
-		record_num_t closest_num = -1;
+		qso_num_t closest_num = -1;
 		float closest_diff = 360.0;
 		float allowed_diff = (float)5.0 / zoom_value_;
 		for (auto it = records_to_display_.begin(); it != records_to_display_.end(); it++ ) {
 			// For all records being displayed
-			record_num_t record_num = *it;
+			qso_num_t record_num = *it;
 			// Get the location of the record
 			record* record = book_->get_record(record_num, false);
 			if (record) {
@@ -1218,7 +1218,7 @@ void dxa_if::create_colour_buttons() {
 }
 
 // Is the point displayed
-bool dxa_if::is_displayed(record_num_t record_num) {
+bool dxa_if::is_displayed(qso_num_t record_num) {
 	string selected_by;
 	long days_old;
 	record* record = book_->get_record(record_num, false);
@@ -1295,7 +1295,7 @@ void dxa_if::get_records() {
 	switch (qso_display_) {
 	case AQ_ALL:
 		// Get all record numbers
-		for (record_num_t i = 0; i < book_->size(); i++) {
+		for (qso_num_t i = 0; i < book_->size(); i++) {
 			check_qsl(i, record_nums);
 		}
 		break;
@@ -1305,7 +1305,7 @@ void dxa_if::get_records() {
 		break;
 	case AQ_SEARCH:
 		// Copy the list of extracted records
-		for (record_num_t i = 0; i < extract_records_->size(); i++) {
+		for (qso_num_t i = 0; i < extract_records_->size(); i++) {
 			record_nums.insert(extract_records_->record_number(i));
 		}
 		break;
@@ -1314,12 +1314,12 @@ void dxa_if::get_records() {
 	{
 		if (book_->size()) {
 			// only if the log has records
-			record_num_t last_record_num = book_->size() - 1;
+			qso_num_t last_record_num = book_->size() - 1;
 			time_t last_date = book_->get_record(last_record_num, false)->timestamp();
 			bool done = false;
 			// Always insert the last record
 			record_nums.insert(last_record_num);
-			record_num_t i = last_record_num - 1;
+			qso_num_t i = last_record_num - 1;
 			double most_recent_seconds = (double)most_recent_count_ * 24 * 60 * 60;
 			// Go backwards until the time difference is > n days.
 			for (; (signed)i >= 0 && !done; i--) {
@@ -1384,7 +1384,7 @@ void dxa_if::get_records() {
 }
 
 // Check QSL status and add to record list
-void dxa_if::check_qsl(record_num_t record_num, set<int>& record_list) {
+void dxa_if::check_qsl(qso_num_t record_num, set<int>& record_list) {
 	record* test_record = book_->get_record(record_num, false);
 	switch (qsl_status_) {
 	case AL_ALL:
@@ -1596,7 +1596,7 @@ void dxa_if::draw_pins() {
 					// For each record check it is this colour and whether to display it
 					for (auto it2 = records_to_display_.begin(); it2 != records_to_display_.end(); it2++) {
 						// Go through all the selected records
-						record_num_t record_num = *it2;
+						qso_num_t record_num = *it2;
 						long index_1 = 0;
 						record* record = book_->get_record(record_num, false);
 						lat_long_t lat_long;

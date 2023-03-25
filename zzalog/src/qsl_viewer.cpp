@@ -200,7 +200,7 @@ void qsl_viewer::cb_bn_log_card(Fl_Widget* w, void* v) {
 	that->set_image_buttons();
 }
 
-void qsl_viewer::set_qso(record* qso, record_num_t number) {
+void qsl_viewer::set_qso(record* qso, qso_num_t number) {
 	current_qso_ = qso;
 	current_qso_num_ = number;
 	update_widgets();

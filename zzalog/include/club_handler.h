@@ -24,7 +24,7 @@
 		// Download the exception file
 		bool download_exception();
 		// Upload a single QSO
-		bool upload_single_qso(record_num_t record_num);
+		bool upload_single_qso(qso_num_t record_num);
 
 	protected:
 		// Generate the fields for posting the log

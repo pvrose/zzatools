@@ -48,7 +48,7 @@ using namespace std;
 		// Extract for specific criteria - all records with call
 		void extract_call(string callsign);
 		// Add a record to the list
-		void add_record(record_num_t record_num);
+		void add_record(qso_num_t record_num);
 		// Sort records by filed_name
 		void sort_records(string field_name, bool reverse);
 		// Special extract (NO_NAME, NO_QTH, LOCATOR_4)
@@ -59,11 +59,11 @@ using namespace std;
 		bool upload_in_progress();
 
 		// return the real record number
-		virtual record_num_t record_number(record_num_t item);
+		virtual qso_num_t record_number(item_num_t item);
 		// return the virtual record number
-		virtual record_num_t item_number(record_num_t record, bool nearest = false);
+		virtual item_num_t item_number(qso_num_t record, bool nearest = false);
 		// Change the selected record (& update any necessary controls)
-		virtual record_num_t selection(record_num_t num_record, hint_t hint = HT_SELECTED, view* requester = nullptr, record_num_t num_other = 0);
+		virtual qso_num_t selection(qso_num_t num_record, hint_t hint = HT_SELECTED, view* requester = nullptr, qso_num_t num_other = 0);
 
 
 	protected:
@@ -74,14 +74,14 @@ using namespace std;
 		// Short form comment for status log
 		string short_comment();
 		// Swap two records
-		void swap_records(record_num_t record_num_1, record_num_t record_num_2);
+		void swap_records(item_num_t record_num_1, item_num_t record_num_2);
 
 		// The list of extract criteria
 		list<search_criteria_t> extract_criteria_;
 		// The records 
-		vector<record_num_t> mapping_;
+		vector<qso_num_t> mapping_;
 		// reverse mapping
-		map<record_num_t, record_num_t> rev_mapping_;
+		map<item_num_t, qso_num_t> rev_mapping_;
 		// Current use mode
 		extract_mode_t use_mode_;
 

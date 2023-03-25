@@ -60,13 +60,13 @@ using namespace std;
 		~report_tree();
 
 		// inherited from view
-		virtual void update(hint_t hint, record_num_t record_num_1, record_num_t record_num_2 = 0);
+		virtual void update(hint_t hint, qso_num_t record_num_1, qso_num_t record_num_2 = 0);
 		// Delete all items
 		void delete_all();
 		// Delete the tree
 		void delete_tree();
 		// Basic record list - list of record numbers
-		typedef list<record_num_t> record_list_t;
+		typedef list<qso_num_t> record_list_t;
 		// Basic entry for a map
 		struct report_map_entry_t {
 			// Depth of entry
@@ -89,7 +89,7 @@ using namespace std;
 		typedef map<string, report_map_entry_t*> report_map_t;
 		// methods
 		// Add record details to a specific map entry
-		void add_record(record_num_t iRecord, report_map_entry_t* entry);
+		void add_record(qso_num_t iRecord, report_map_entry_t* entry);
 		// Copy the map to the tree control
 		void copy_map_to_tree(report_map_t* pMap, Fl_Tree_Item* item, int& num_records, int& num_eqsl, int& num_lotw, int& num_card, int& num_dxcc, int &num_any);
 		// Copy the list of records at a map entry to the tree control
@@ -123,7 +123,7 @@ using namespace std;
 		// Report type
 		report_filter_t filter_;
 		// number of current selected record
-		record_num_t selection_;
+		qso_num_t selection_;
 		// Add statesin break down of DXCC
 		bool add_states_;
 		// Font and size

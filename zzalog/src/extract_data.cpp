@@ -82,7 +82,7 @@ int extract_data::criteria(search_criteria_t criteria, extract_data::extract_mod
 
 // Add all records that match in main log to this log
 void extract_data::extract_records() {
-	record_num_t count = 0;
+	item_num_t count = 0;
 	char message[100];
 	status_->misc_status(ST_NOTE, "EXTRACT: Started");
 	status_->misc_status(ST_NOTE, short_comment().c_str());
@@ -102,7 +102,7 @@ void extract_data::extract_records() {
 			header_->header(comment());
 		}
 		// For all records in main log book
-		for (record_num_t ixb = 0; ixb < book_->size(); ixb++) {
+		for (item_num_t ixb = 0; ixb < book_->size(); ixb++) {
 			record* ext_record = book_->get_record(ixb, false);
 			// Compare record against seaarch criteria
 			if (match_record(ext_record)) {
@@ -123,7 +123,7 @@ void extract_data::extract_records() {
 		if (header_ == nullptr) header_ = new record;
 		header_->header(header_->header() + '\n' + comment());
 		// For all records in this book
-		for (record_num_t ixe = 0; ixe < get_count(); ) {
+		for (item_num_t ixe = 0; ixe < get_count(); ) {
 			// Compare record against these search criteria
 			if (!match_record(get_record(ixe, false))) {
 				// If it doesn't match, remove the record pointer from this book
@@ -147,12 +147,12 @@ void extract_data::extract_records() {
 		if (header_ == nullptr) header_ = new record;
 		header_->header(header_->header() + '\n' + comment());
 		// For all records in main log book
-		for (record_num_t ixb = 0; ixb < book_->get_count(); ixb++) {
+		for (item_num_t ixb = 0; ixb < book_->get_count(); ixb++) {
 			record* test_record = book_->get_record(ixb, false);
 			// Compare record against search criteria
 			if (match_record(test_record)) {
 				// If it matches find insert point in this book
-				record_num_t ixe = get_insert_point(test_record);
+				item_num_t ixe = get_insert_point(test_record);
 				// If this record is not already at the insert point
 				if (get_record(ixe, false) != book_->get_record(ixb, false)) {
 					// Add the record to this book
@@ -207,7 +207,7 @@ void extract_data::clear_criteria(bool redraw) {
 }
 
 // Convert item index in this book to the record index in the main log book
-inline record_num_t extract_data::record_number(record_num_t item_number) {
+inline qso_num_t extract_data::record_number(item_num_t item_number) {
 	if (size() > 0) 
 		// Return the mapping from this book to the main book
 		return mapping_[item_number];
@@ -216,7 +216,7 @@ inline record_num_t extract_data::record_number(record_num_t item_number) {
 
 // Convert record index in the main log book to the item index in this book
 // nearest = true will choose the closest item to the record number
-inline record_num_t extract_data::item_number(record_num_t record_number, bool nearest /*=false*/) {
+inline item_num_t extract_data::item_number(qso_num_t record_number, bool nearest /*=false*/) {
 	// Return the mapping item from main book  to this book
 	if (size() == 0) {
 		if (nearest) {
@@ -234,8 +234,8 @@ inline record_num_t extract_data::item_number(record_num_t record_number, bool n
 		if (nearest && it == rev_mapping_.end()) {
 			// Need to find nearest mapping
 			// Get the bounds of the search (initially first and last items)
-			record_num_t lbound = 0;
-			record_num_t ubound = mapping_.size() - 1;
+			item_num_t lbound = 0;
+			item_num_t ubound = mapping_.size() - 1;
 			if (mapping_[lbound] > record_number) {
 				// Record is before first item - return the first item
 				return 0;
@@ -247,7 +247,7 @@ inline record_num_t extract_data::item_number(record_num_t record_number, bool n
 			// Binary slice the array until found
 			// Keep comparing the record number between upper bound and lower bound and move one or 
 			// other of the bounds until they differ by one, then put it there.
-			record_num_t test;
+			item_num_t test;
 			while (ubound - 1 != lbound) {
 				// Compare with the half-way point 
 				test = (lbound + ubound) / 2;
@@ -698,13 +698,13 @@ void extract_data::upload() {
 }
 
 // Change the record selection (& update any necessary controls)
-record_num_t extract_data::selection(record_num_t num_item, hint_t hint /* = HT_SELECTED */, view* requester /* = nullptr */, record_num_t num_other /* = 0 */) {
+item_num_t extract_data::selection(item_num_t num_item, hint_t hint /* = HT_SELECTED */, view* requester /* = nullptr */, item_num_t num_other /* = 0 */) {
 	// Set the current item in this view
 	if ((signed)num_item != -1) {
 		current_item_ = num_item;
 	}
 	// And select the same record in the main log view
-	return book::selection(current_item_, hint, requester, num_other);
+	return item_number(book_->selection(record_number(current_item_), hint, requester, record_number(num_other)));
 }
 
 // Extract all records for callsign
@@ -745,22 +745,22 @@ void extract_data::extract_call(string callsign) {
 }
 
 // Add the record to the extract list
-void extract_data::add_record(record_num_t record_num) {
+void extract_data::add_record(qso_num_t record_num) {
 	record* record = book_->get_record(record_num, false);
-	record_num_t insert_point = get_insert_point(record);
+	item_num_t insert_point = get_insert_point(record);
 	insert_record_at(insert_point, record);
 	mapping_.insert(mapping_.begin() + insert_point, record_num);
 	rev_mapping_[record_num] = insert_point;
 }
 
 // Swap two records
-void extract_data::swap_records(record_num_t first, record_num_t second) {
+void extract_data::swap_records(item_num_t first, item_num_t second) {
 	// Swap records
 	record* record_1 = at(first);
 	at(first) = at(second);
 	at(second) = record_1;
 	// Swap mapping data
-	record_num_t record_num_1 = mapping_.at(first);
+	qso_num_t record_num_1 = mapping_.at(first);
 	mapping_.at(first) = mapping_.at(second);
 	mapping_.at(second) = record_num_1;
 	// Repair the reverse mapping
@@ -771,7 +771,7 @@ void extract_data::swap_records(record_num_t first, record_num_t second) {
 // Sort records according to field_name
 void extract_data::sort_records(string field_name, bool reversed) {
 	fl_cursor(FL_CURSOR_WAIT);
-	record_num_t count = size();
+	item_num_t count = size();
 	int num_scans = 0;
 	char message[100];
 	snprintf(message, 100, "EXTRACT: Starting sorting %d records on %s", size(), field_name.c_str());
@@ -783,7 +783,7 @@ void extract_data::sort_records(string field_name, bool reversed) {
 	while (count > 0) {
 		count = 0;
 		// Compare each record with its immediate follower - swap if it's larger
-		for (record_num_t ix = 0; ix < size() - 1; ix++) {
+		for (item_num_t ix = 0; ix < size() - 1; ix++) {
 			if (spec_data_->datatype_indicator(field_name) == 'N') {
 				// Numeric field - compare the numeric value - basically ignore white space
 				double item_1;
@@ -820,7 +820,7 @@ void extract_data::sort_records(string field_name, bool reversed) {
 // Undo the above sort 
 void extract_data::correct_record_order() {
 	fl_cursor(FL_CURSOR_WAIT);
-	record_num_t count = size();
+	item_num_t count = size();
 	int num_scans = 0;
 	char message[100];
 	snprintf(message, 100, "EXTRACT: Starting sorting %d records on date/time", size());
@@ -832,7 +832,7 @@ void extract_data::correct_record_order() {
 	while (count > 0) {
 		count = 0;
 		// Compare each record with its immediate follower - swap if it's larger
-		for (record_num_t ix = 0; ix < size() - 1; ix++) {
+		for (item_num_t ix = 0; ix < size() - 1; ix++) {
 			if (*at(ix) > *at(ix + 1)) {
 				swap_records(ix, ix + 1);
 				count++;

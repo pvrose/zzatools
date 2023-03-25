@@ -313,9 +313,9 @@ using namespace std;
 			void check_qth_changed();
 
 			// Update QSO
-			void update_qso(record_num_t log_num);
+			void update_qso(qso_num_t log_num);
 			// Update query
-			void update_query(logging_state_t query, record_num_t match_num, record_num_t query_num);
+			void update_query(logging_state_t query, qso_num_t match_num, qso_num_t query_num);
 
 			// Logging mode
 			logging_mode_t logging_mode_;
@@ -330,9 +330,9 @@ using namespace std;
 			// Presented query 
 			record* query_qso_;
 			// Current record number
-			record_num_t current_rec_num_;
+			qso_num_t current_rec_num_;
 			// Query record number
-			record_num_t query_rec_num_;
+			qso_num_t query_rec_num_;
 			// Contest ID
 			string contest_id_;
 			// Contest exchange format index
@@ -638,7 +638,7 @@ using namespace std;
 		// Update record with MY_RIG etc. For use when importing 
 		void update_import_qso(record* import);
 		// Query/update
-		void update(hint_t hint, record_num_t log_num, record_num_t query_num);
+		void update(hint_t hint, qso_num_t log_num, qso_num_t query_num);
 
 		// Callback - close button
 		static void cb_close(Fl_Widget* w, void* v);
@@ -663,7 +663,7 @@ using namespace std;
 		// Called when rig is changed
 		void update_rig();
 		// Present query (uses view update mechanism)
-		void update_qso(hint_t hint, record_num_t match_num, record_num_t query_num);
+		void update_qso(hint_t hint, qso_num_t match_num, qso_num_t query_num);
 		// QSO i n progress
 		bool qso_in_progress();
 		// Start QSO

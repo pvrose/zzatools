@@ -99,7 +99,7 @@ using namespace std;
 		// count of ignored constructs
 		int num_ignored_;
 		// count of completed records
-		record_num_t num_records_;
+		item_num_t num_records_;
 		// counts for progress
 		long file_size_;
 		long previous_count_;

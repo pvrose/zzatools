@@ -223,7 +223,7 @@ void band_view::update(double frequency) {
 }
 
 // Update the frequency from the specified record
-void band_view::update(record_num_t record_num) {
+void band_view::update(qso_num_t record_num) {
 	if (record_num >= 0 && record_num < book_->size()) {
 		record* this_record = book_->get_record(record_num, false);
 		double frequency;
