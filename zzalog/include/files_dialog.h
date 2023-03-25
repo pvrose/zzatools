@@ -70,8 +70,6 @@ using namespace std;
 		string wsjtx_directory_;
 		// Names of the modem applications providiing auto-import data
 		string auto_src_[AUTO_COUNT];
-		// Default web-browser location
-		string web_browser_;
 		// Unzipper location
 		string unzipper_;
 		// Unzipper switches
@@ -92,8 +90,6 @@ using namespace std;
 		browser_data_t ref_data_data_;
 		// callback data for the Backup directory browse button
 		browser_data_t backup_data_;
-		// callback data for the web browser executable browse button
-		browser_data_t web_data_;
 		// callback data for the status log file browse button
 		browser_data_t status_data_;
 		// callback data for all.txt file

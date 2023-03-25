@@ -376,21 +376,10 @@ bool qrz_handler::has_session() {
 
 // Non-subscriber access to QRZ.com web interface
 void qrz_handler::open_web_page(string callsign) {
-	// If we have a selected record - get browser executable from settings
-	string browser = menu_->get_browser();
-	if (browser.length() == 0) {
-		return;
-	}
 	// Open browser with QRZ URL 
-#ifdef _WIN32
-	char format[] = "start \"%s\" http://www.qrz.com/lookup?callsign=%s";
-#else
-	char format[] = "\"%s\" http://www.qrz.com/lookup?callsign=%s &";
-#endif
-	char* url = new char[strlen(format) + callsign.length() + browser.length() + 10];
-	sprintf(url, format, browser.c_str(), callsign.c_str());
+	char uri[256];
+	snprintf(uri, sizeof(uri), "http://www.qrz.com/lookup?callsign=%s", callsign.c_str());
 	status_->misc_status(ST_NOTE, string("QRZ: Launching QRZ web page for " + callsign).c_str());
-	int result = system(url);
-	delete[] url;
+	int result = fl_open_uri(uri);
 }
 

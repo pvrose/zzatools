@@ -1327,32 +1327,19 @@ void menu::cb_mi_info_map(Fl_Widget* w, void* v) {
 		string city = record->item("QTH");
 		string label = record->item("CALL");
 		// These are DOS specific, will need the Linux version
-#ifdef _WIN32
-		string format_coords = "start \"%s\" http://google.com/maps/@%f,%f,25000m";
-		string format_city = "start \"%s\" http://google.com/maps/?q=%s&z=10";
-#else
-		string format_coords = "\"%s\" http://google.com/maps/@%f,%f,25000m &";
-		string format_city = "\"%s\" http://google.com/maps/?q=%s&z=10 &";
-#endif
+		string format_coords = "http://google.com/maps/@%f,%f,25000m";
 		char message[128];
-		// Get browser from settings
-		string browser = that->get_browser();
-		if (browser.length() == 0) {
-			return;
-		}
-		char * url = nullptr;
+		char uri[256];
 		if ((source == LOC_NONE || source == LOC_GRID2 || source == LOC_GRID4) && city != "") {
 			// Location got from wide stuff, therefore use city location
 			// ?q=City&z=10 - centre on city zoom level 10
-			url = new char[format_city.length() + city.length() + browser.length() + 10];
-			sprintf(url, format_city.c_str(), browser.c_str(), city.c_str());
+			snprintf(uri, sizeof(uri), "http://google.com/maps/?q=%s&z=10", city.c_str());
 			snprintf(message, 128, "INFO: Launching Google maps for %s", city.c_str());
 		}
 		else if (source == LOC_GRID6 || source == LOC_GRID8 || source == LOC_LATLONG) {
 			// grid square is 6 or more characters 
 			// @%f,%f,25000m display 25 km around long/lat
-			url = new char[format_coords.length() + browser.length() + 30];
-			sprintf(url,format_coords.c_str(), browser.c_str(), location.latitude, location.longitude);
+			snprintf(uri, sizeof(uri), "http://google.com/maps/@%f,%f,25000m", location.latitude, location.longitude);
 			snprintf(message, 128, "INFO: Lunching Google maps for %s", locator.c_str());
 		}
 		else {
@@ -1361,8 +1348,7 @@ void menu::cb_mi_info_map(Fl_Widget* w, void* v) {
 			return;
 		}
 		status_->misc_status(ST_NOTE, message);
-		int result = system(url);
-		delete[] url;
+		int result = fl_open_uri(uri);
 	}
 }
 
@@ -1380,19 +1366,13 @@ void menu::cb_mi_info_web(Fl_Widget* w, void* v) {
 			return;
 		}
 		// Open browser with URL from WEB field in record
-#ifdef _WIN32
-		char format[] = "start \"%s\" %s";
-#else
-		char format[] = "\"%s\" %s &";
-#endif
 		string website = record->item("WEB");
-		char* url = new char[website.length() + browser.length() + strlen(format) + 10];
-		sprintf(url, format, browser.c_str(), website.c_str());
+		char uri[256];
+		snprintf(uri, sizeof(uri), "%s", website.c_str());
 		char message[128];
 		snprintf(message, 128, "INFO: Opening website %s", website.c_str());
 		status_->misc_status(ST_NOTE, message);
-		int result = system(url);
-		delete[] url;
+		int result = fl_open_uri(uri);
 	}
 	else {
 		char message[128];

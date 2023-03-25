@@ -43,14 +43,12 @@ files_dialog::files_dialog(int X, int Y, int W, int H, const char* label) :
 	ref_data_directory_ = "";
 	backup_directory_ = "";
 	status_log_file_ = "";
-	web_browser_ = "";
 	unzipper_ = "";
 	qsl_template_ = "";
 	tqsl_data_ = { "", "", nullptr, nullptr, nullptr, nullptr };
 	card_data_ = { "", "", nullptr, nullptr, nullptr, nullptr };
 	ref_data_data_ = { "", "", nullptr, nullptr, nullptr, nullptr };
 	backup_data_ = { "", "", nullptr, nullptr, nullptr, nullptr };
-	web_data_ = { "", "", nullptr, nullptr, nullptr, nullptr };
 	status_data_ = { "", "", nullptr, nullptr, nullptr, nullptr };
 	unzipper_data_ = { "", "", nullptr, nullptr, nullptr, nullptr };
 	template_data_ = { "", "", nullptr, nullptr, nullptr, nullptr };
@@ -153,11 +151,6 @@ void files_dialog::load_values() {
 	backup_settings.get("Enable", temp_bool, false);
 	enable_backup_ = temp_bool;
 
-	// Web browser executable
-	datapath_settings.get("Web Browser", temp_string, "");
-	web_browser_ = temp_string;
-	free(temp_string);
-
 	// Status log file
 	status_settings.get("Report File", temp_string, "");
 	status_log_file_ = temp_string;
@@ -224,12 +217,8 @@ void files_dialog::create_form(int X, int Y) {
 	const int GRP5 = GRP4 + HGRP4;
 	const int ROW5_1 = GRP5 + HTEXT;
 	const int HGRP5 = ROW5_1 - GRP5 + max(HBUTTON, HTEXT) + GAP;
-	// Group 6, row 1
-	const int GRP6 = GRP5 + HGRP5;
-	const int ROW6_1 = GRP6 + HTEXT;
-	const int HGRP6 = ROW6_1 - GRP6 + max(HBUTTON, HTEXT) + GAP;
 	// Group 7, row 1
-	const int GRP7 = GRP6 + HGRP6;
+	const int GRP7 = GRP5 + HGRP5;
 	const int ROW7_1 = GRP7 + HTEXT;
 	const int HGRP7 = ROW7_1 - GRP7 + max(HBUTTON, HTEXT) + GAP;
 	// Group 7A, row 1
@@ -416,32 +405,6 @@ void files_dialog::create_form(int X, int Y) {
 
 	grp_backup->end();
 
-	Fl_Group* grp_web = new Fl_Group(X + XGRP, Y + GRP6, XMAX, HGRP2, "Web Browser");
-	grp_web->labelsize(FL_NORMAL_SIZE + 2);
-	grp_web->labelfont(FL_BOLD);
-	grp_web->box(FL_BORDER_BOX);
-	grp_web->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
-	// Input - preferred web browser
-	intl_input* in_web_file = new intl_input(X + COL2, Y + ROW6_1, WEDIT + GAP + WBUTTON + GAP + WBUTTON, HTEXT);
-	in_web_file->callback(cb_value<intl_input, string>, &web_browser_);
-	in_web_file->when(FL_WHEN_CHANGED);
-	in_web_file->value(web_browser_.c_str());
-	in_web_file->tooltip("Location of web browser executable");
-	// Button - opens file browser
-	Fl_Button* bn_browse_web = new Fl_Button(X + COL5, Y + ROW6_1, WBUTTON, HBUTTON, "Browse");
-	bn_browse_web->align(FL_ALIGN_INSIDE);
-#ifdef _WIN32
-	web_data_ = { "Please enter the Web browser", "Executable\t*.exe", &web_browser_, nullptr, in_web_file, nullptr };
-#else
-	// TODO: Change file pattern for Posix executables
-	web_data_ = { "Please enter the Web browser", "Executable\t*.exe", &web_browser_, nullptr, in_web_file, nullptr };
-#endif
-	bn_browse_web->callback(cb_bn_browsefile, &web_data_);
-	bn_browse_web->when(FL_WHEN_RELEASE);
-	bn_browse_web->tooltip("Opens file browser to locate your preferred web browser");
-
-	grp_web->end();
-
 	Fl_Group* grp_status = new Fl_Group(X + XGRP, Y + GRP7, XMAX, HGRP7, "Status log file");
 	grp_status->labelsize(FL_NORMAL_SIZE + 2);
 	grp_status->labelfont(FL_BOLD);
@@ -611,9 +574,6 @@ void files_dialog::save_values() {
 	// Backup 
 	backup_settings.set("Path", backup_directory_.c_str());
 	backup_settings.set("Enable", enable_backup_);
-
-	// Web browser
-	datapath_settings.set("Web Browser", web_browser_.c_str());
 
 	// Status log file
 	status_settings.set("Report File", status_log_file_.c_str());
