@@ -2023,6 +2023,7 @@ void qso_manager::qso_group::initialise_fields() {
 	if (field_mode_ == CONTEST) {
 		// Automatically create a pending QSO
 		if (logging_state_ == QSO_INACTIVE) {
+			action_set_current();
 			action_activate();
 		}
 
@@ -2128,7 +2129,7 @@ void qso_manager::qso_group::check_qth_changed() {
 			previous_locator_ = current->item("MY_GRIDSQUARE", true);
 			previous_qth_ = current->item("APP_ZZA_QTH");
 #ifdef _WIN32
-			dxa_if_->update(HT_LOCATION);
+			if (dxa_if_) dxa_if_->update(HT_LOCATION);
 #endif
 		}
 	}
