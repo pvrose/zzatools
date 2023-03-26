@@ -2848,33 +2848,35 @@ void qso_manager::clock_group::enable_widgets() {
 	char result[100];
 	if (display_local_) {
 		value = localtime(&now);
-		other_value = gmtime(&now);
 		strftime(result, 99, "Clock - %Z", value);
 		g_clock_->copy_label(result);
 		bn_time_->labelcolor(FL_RED);
+		strftime(result, 99, "%H:%M:%S", value);
+		bn_time_->copy_label(result);
 		bn_date_->labelcolor(FL_RED);
-		bn_local_->labelcolor(FL_YELLOW);
+		strftime(result, 99, "%A %d %B %Y", value);
+		bn_date_->copy_label(result);
 		// Convert other time
+		other_value = gmtime(&now);
 		strftime(result, 99, "%T UTC", other_value);
+		bn_local_->labelcolor(FL_YELLOW);
 		bn_local_->copy_label(result);
 	}
 	else {
 		value = gmtime(&now);
-		other_value = localtime(&now);
 		g_clock_->label("Clock - UTC");
 		bn_time_->labelcolor(FL_YELLOW);
+		strftime(result, 99, "%H:%M:%S", value);
+		bn_time_->copy_label(result);
 		bn_date_->labelcolor(FL_YELLOW);
-		bn_local_->labelcolor(FL_RED);
+		strftime(result, 99, "%A %d %B %Y", value);
+		bn_date_->copy_label(result);
 		// Convert other time
+		other_value = localtime(&now);
 		strftime(result, 99, "%T %Z", other_value);
+		bn_local_->labelcolor(FL_RED);
 		bn_local_->copy_label(result);
 	}
-	// convert to C string, then C++ string
-	strftime(result, 99, "%H:%M:%S", value);
-	bn_time_->copy_label(result);
-	// Convert date
-	strftime(result, 99, "%A %d %B %Y", value);
-	bn_date_->copy_label(result);
 
 	qso_manager* mgr = (qso_manager*)parent();
 	if (mgr->qso_group_->logging_state_ == QSO_PENDING) {
