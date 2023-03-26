@@ -695,6 +695,7 @@ void log_table::get_fields() {
 	}
 	// If the field_set is empty - use the default set
 	if (num_fields == 0) {
+		fields_.clear();
 		// For each field in the default field set
 		for (unsigned int i = 0; DEFAULT_FIELDS[i].field.size() > 0; i++) {
 			// Copy the field information
