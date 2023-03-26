@@ -665,17 +665,25 @@ void qso_manager::qso_group::load_values() {
 	//		Index: n
 	//		TX: Transmit fields
 	//		RX: Receive fields
-	for (unsigned int i = 0; i < num_formats; i++) {
-		Fl_Preferences one_setting(format_settings, format_settings.group(i));
-		int index;
-		one_setting.get("Index", index, 0);
-		ef_ids_[index] = format_settings.group(i);
-		one_setting.get("TX", temp, "RST_SENT,STX");
-		ef_txs_[index] = string(temp);
-		free(temp);
-		one_setting.get("RX", temp, "RST_RCVD,SRX");
-		ef_rxs_[index] = string(temp);
-		free(temp);
+	if (num_formats == 0) {
+		max_ef_index_ = 1;
+		ef_ids_[0] = "";
+		ef_txs_[0] = "RST_SENT,STX";
+		ef_rxs_[0] = "RST_RCVD,SRX";
+	}
+	else {
+		for (unsigned int i = 0; i < num_formats; i++) {
+			Fl_Preferences one_setting(format_settings, format_settings.group(i));
+			int index;
+			one_setting.get("Index", index, 0);
+			ef_ids_[index] = format_settings.group(i);
+			one_setting.get("TX", temp, "RST_SENT,STX");
+			ef_txs_[index] = string(temp);
+			free(temp);
+			one_setting.get("RX", temp, "RST_RCVD,SRX");
+			ef_rxs_[index] = string(temp);
+			free(temp);
+		}
 	}
 	// Set active contest format ID
 	exch_fmt_id_ = ef_ids_[exch_fmt_ix_];
