@@ -1484,7 +1484,7 @@ bool book::enterring_record() {
 void book::set_session_start() {
 #ifdef _DEBUG
 	if (size()) session_start_ = get_record(size() - 1, false)->timestamp();
-	else session_start_ = 0;
+	else session_start_ = time(nullptr);
 #else
 	session_start_ = time(nullptr);
 #endif
@@ -1492,19 +1492,21 @@ void book::set_session_start() {
 	Fl_Preferences log_settings(user_settings, "Log Table");
 	double session_gap_mins;
 	log_settings.get("Session Gap", session_gap_mins, 30.0);
-	// Start at end of book
-	bool found = false;
-	qso_num_t rec_num = size() - 1;
-	while (rec_num > 0 && !found) {
-		time_t qso_time = get_record(rec_num, false)->timestamp();
-		if (difftime(session_start_, qso_time) < (session_gap_mins * 60.0)) {
-			session_start_ = qso_time;
+	if (size()) {
+		// Start at end of book
+		bool found = false;
+		qso_num_t rec_num = size() - 1;
+		while (rec_num > 0 && !found) {
+			time_t qso_time = get_record(rec_num, false)->timestamp();
+			if (difftime(session_start_, qso_time) < (session_gap_mins * 60.0)) {
+				session_start_ = qso_time;
+			}
+			else {
+				found = true;
+			}
+			rec_num--;
 		}
-		else {
-			found = true;
-		}
-		rec_num--;
-	}
+	} 
 	// Display the start time in the status log
 	char stime[100];
 	tm* start_time = gmtime(&session_start_);
