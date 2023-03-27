@@ -356,6 +356,7 @@ void qso_manager::cat_group::enable_widgets() {
 			break;
 		}
 	}
+	redraw();
 }
 
 // Populate manufacturer and model choices - hierarchical menu: first manufacturer, then model
@@ -514,6 +515,7 @@ void qso_manager::cat_group::cb_ch_model(Fl_Widget* w, void* v) {
 		status_->misc_status(ST_ERROR, message);
 	}
 	that->populate_baud_choice();
+	that->populate_port_choice();
 	that->enable_widgets();
 }
 
