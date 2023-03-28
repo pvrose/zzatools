@@ -1622,6 +1622,8 @@ void qso_manager::qso_group::cb_cancel(Fl_Widget* w, void* v) {
 		break;
 	case QSO_STARTED:
 		that->action_cancel();
+		that->action_set_current();
+		that->action_activate();
 		break;
 	case QSO_EDIT:
 		that->action_cancel_edit();
@@ -1897,7 +1899,18 @@ void qso_manager::qso_group::cb_ip_field(Fl_Widget* w, void* v) {
 		}
 		that->check_qth_changed();
 	}
-	tabbed_forms_->update_views(nullptr, HT_MINOR_CHANGE, that->current_rec_num_);
+	// Update other views if editing or logging
+	switch (that->logging_state_) {
+	case QSO_INACTIVE:
+	case QSO_PENDING:
+		break;
+	case QSO_STARTED:
+	case QSO_EDIT:
+		tabbed_forms_->update_views(nullptr, HT_MINOR_CHANGE, that->current_rec_num_);
+		break;
+	default:
+		break;
+	}
 }
 
 // Callback -notes input
@@ -1966,7 +1979,6 @@ void qso_manager::qso_group::populate_exch_fmt() {
 // Initialise fields from format definitions
 void qso_manager::qso_group::initialise_fields() {
 	string preset_fields;
-	string tx_fields;
 	bool lock_preset;
 	bool new_fields;
 	switch (field_mode_) {
@@ -1980,7 +1992,7 @@ void qso_manager::qso_group::initialise_fields() {
 		break;
 	case CONTEST:
 		// Contest mode
-		preset_fields = ef_txs_[exch_fmt_ix_] + "," + ef_rxs_[exch_fmt_ix_];
+		preset_fields = ef_rxs_[exch_fmt_ix_] + "," + ef_txs_[exch_fmt_ix_];
 		new_fields = true;
 		lock_preset = true;
 		break;
@@ -2037,31 +2049,29 @@ void qso_manager::qso_group::initialise_fields() {
 			action_activate();
 		}
 
-		vector<string> tx_fields;
-		split_line(ef_txs_[exch_fmt_ix_], tx_fields, ',');
-		for (size_t i = 0; i < tx_fields.size(); i++) {
+		vector<string> fields;
+		split_line(preset_fields, fields, ',');
+		for (size_t i = 0; i < fields.size(); i++) {
 			int ix = NUMBER_FIXED + i;
-			if (tx_fields[i] == "RST_SENT") {
-				string contest_mode = spec_data_->dxcc_mode(current_qso_->item("MODE"));
+			string contest_mode = spec_data_->dxcc_mode(current_qso_->item("MODE"));
+			if (fields[i] == "RST_SENT" || fields[i] == "RST_RCVD") {
 				if (contest_mode == "CW" || contest_mode == "DATA") {
-					ip_field_[ix]->value("599");
+					current_qso_->item(fields[i], string("599"));
 				}
 				else {
-					ip_field_[ix]->value("59");
+					current_qso_->item(fields[i], string("59"));
 				}
 			}
-			else if (tx_fields[i] == "STX") {
+			else if (fields[i] == "STX") {
 				char text[10];
 				snprintf(text, 10, "%03d", serial_num_);
-				ip_field_[ix]->value(text);
+				current_qso_->item(fields[i], string(text));
 			}
-			else {
-				ip_field_[ix]->value(current_qso_->item(tx_fields[i]).c_str());
-			}
+			ip_field_[ix]->value(current_qso_->item(fields[i]).c_str());
 		}
 		ip_field_[field_ip_map_["CALL"]]->value("");
 		ip_notes_->value("");
-		for (size_t i = NUMBER_FIXED + tx_fields.size(); i < NUMBER_TOTAL; i++) {
+		for (size_t i = NUMBER_FIXED + fields.size(); i < NUMBER_TOTAL; i++) {
 			ip_field_[i]->value("");
 		}
 	}
@@ -2180,6 +2190,7 @@ void qso_manager::qso_group::action_activate() {
 		copy_clock_to_qso(now);
 		break;
 	}
+	initialise_fields();
 	enable_widgets();
 }
 
@@ -2212,6 +2223,8 @@ void qso_manager::qso_group::action_save() {
 			// Time as HHMMSS - always log seconds.
 			current_qso_->item("TIME_OFF", timestamp.substr(8));
 		}
+		// Increment contest serial number
+		if (field_mode_ == CONTEST) serial_num_++;
 		break;
 	case LM_OFF_AIR:
 		book_->correct_record_position(item_number);
