@@ -10,7 +10,7 @@ using namespace std;
 
 const char* DATE_FORMAT = "%Y-%m-%d";
 extern int FL_NORMAL_SIZE;
-const char* VERSION = "1.0.7";
+const char* VERSION = "1.0.8";
 
 QBS_window* window_;
 

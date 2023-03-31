@@ -816,6 +816,13 @@ bool QBS_data::read_qbs(string& filename) {
 				check = ham_data(date, call, i_name, i_value);
 				do_check = false;
 				break;
+			case ADJUST:
+				date = words[1];
+				box = stoi(words[2]);
+				call = words[3];
+				value = stoi(words[4]);
+				check - adjust_cards(box, date, call, value);
+				break;
 			case COMMENT:
 				getline(file_, line);
 				// TODO what to do with comments - just ignore
