@@ -1413,16 +1413,19 @@ void qso_manager::qso_group::copy_cat_to_qso() {
 		// Ignore values except TX_PWR which accumulates maximum value
 		char message[128];
 		if (current_qso_->item("FREQ") != freqy) {
-			snprintf(message, 128, "DASH: Rig frequency changed during QSO, New value %s ignored", freqy.c_str());
+			snprintf(message, 128, "DASH: Rig frequency changed during QSO, New value %s", freqy.c_str());
 			status_->misc_status(ST_WARNING, message);
+			current_qso_->item("FREQ", freqy);
 		}
 		if (current_qso_->item("MODE") != mode) {
-			snprintf(message, 128, "DASH: Rig mode changed during QSO, New value %s ignored", mode.c_str());
+			snprintf(message, 128, "DASH: Rig mode changed during QSO, New value %s", mode.c_str());
 			status_->misc_status(ST_WARNING, message);
+			current_qso_->item("MODE", mode);
 		}
 		if (current_qso_->item("SUBMODE") != submode) {
-			snprintf(message, 128, "DASH: Rig submode changed during QSO, New value %s ignored", submode.c_str());
+			snprintf(message, 128, "DASH: Rig submode changed during QSO, New value %s", submode.c_str());
 			status_->misc_status(ST_WARNING, message);
+			current_qso_->item("SUBMODE", submode);
 		}
 		current_qso_->item("TX_PWR", tx_power);
 		break;
@@ -3110,7 +3113,7 @@ void qso_manager::update_rig() {
 				if (band_view_) {
 					double freq;
 					qso_group_->current_qso_->item("FREQ", freq);;
-					band_view_->update(freq);
+					band_view_->update(freq * 1000.0);
 					prev_freq_ = freq;
 				}
 			}
