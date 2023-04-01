@@ -1,9 +1,9 @@
 #ifndef __STN_DIALOG__
 #define __STN_DIALOG__
 
+#include "qso_connector.h"
 
 #include "callback.h"
-#include "rig_if.h"
 #include "record.h"
 #include "intl_widgets.h"
 #include "alarm_dial.h"
@@ -73,35 +73,6 @@ using namespace std;
 			QUERY_NEW,       // Query: Not able to find QSO - allow manual matching
 			QUERY_DUPE,      // Query: Two records in log found to be possible duplicates - select either, both or a merge
 			QRZ_MERGE,       // Merge details downloaded from QRZ.com
-		};
-
-		// Hamlib parameters 
-		struct hamlib_data {
-			// Manufacturer
-			string mfr = "";
-			// Model
-			string model = "";
-			// Portname
-			string port_name = "";
-			// Baud rate
-			string baud_rate = "9600";
-			// Model ID - as knoen by hamlib
-			int model_id = -1;
-			// Override caps
-			bool override_caps = false;
-			// Port type
-			rig_port_t port_type = RIG_PORT_NONE;
-		};
-
-		// Rig parameters (from handler onwards - rig only)
-		struct cat_data {
-			// Polling intervals
-			double fast_poll_interval = 1.0;
-			double slow_poll_interval = 60.0;
-			//
-			bool all_ports = false;
-			// Hamlib data
-			hamlib_data hamlib_params;
 		};
 
 		// Class for QSO group of widgets
@@ -515,75 +486,6 @@ using namespace std;
 		};
 
 		public:
-		class cat_group :
-			public Fl_Group
-		{
-		public:
-
-			cat_group(int X, int Y, int W, int H, const char* l);
-			~cat_group();
-
-			// get settings 
-			void load_values();
-			// Create form
-			void create_form(int X, int Y);
-			// Enable widgets
-			void enable_widgets();
-			// Save changes
-			void save_values();
-
-		protected:
-			// Callback - model choice
-			static void cb_ch_model(Fl_Widget* w, void* v);
-			// Callback - hamlib serial ports
-			static void cb_ch_port(Fl_Widget* w, void* v);
-			// Callback - hamlib baudrate
-			static void cb_ch_baud(Fl_Widget* w, void* v);
-			// Callback override caps
-			static void cb_ch_over(Fl_Widget* w, void* v);
-			// Callback all ports
-			static void cb_bn_all(Fl_Widget* w, void* v);
-			// Callback network port
-			static void cb_ip_port(Fl_Widget* w, void* v);
-		public:
-			// Callback - Connect button
-			static void cb_bn_connect(Fl_Widget* w, void* v);
-		protected:
-			// Spinner fast polling rate
-			static void cb_ctr_pollfast(Fl_Widget* w, void* v);
-			// slow polling rate
-			static void cb_ctr_pollslow(Fl_Widget* w, void* v);
-
-			//populate port choice
-			void populate_port_choice();
-			// Populate model choice
-			void populate_model_choice();
-			//Populate baud rate choice
-			void populate_baud_choice();
-
-			Fl_Group* serial_grp_;
-			Fl_Group* network_grp_;
-			// Hamlib widgets to revalue when rig selected changes
-			Fl_Widget* mfr_choice_;
-			Fl_Widget* rig_model_choice_;
-			Fl_Widget* port_if_choice_;
-			Fl_Widget* port_if_input_;
-			Fl_Widget* baud_rate_choice_;
-			Fl_Widget* rig_choice_;
-			Fl_Widget* override_check_;
-			Fl_Widget* show_all_ports_;
-			Fl_Button* bn_connect_;
-
-			// CAT connection data
-			cat_data* cat_data_;
-			// Waiting connect
-			bool wait_connect_;
-
-			Fl_Spinner* ctr_pollfast_;
-			Fl_Spinner* ctr_pollslow_;
-
-		};
-
 		class clock_group :
 			public Fl_Group
 
@@ -660,6 +562,8 @@ using namespace std;
 		void rig_update(string frequency, string mode, string power);
 		// Called when rig is changed
 		void update_rig();
+		// Switch rig status
+		void switch_rig();
 		// Present query (uses view update mechanism)
 		void update_qso(hint_t hint, qso_num_t match_num, qso_num_t query_num);
 		// QSO i n progress
@@ -687,7 +591,7 @@ using namespace std;
 
 		// Groups
 		qso_group* qso_group_;
-		cat_group* cat_group_;
+		qso_connector* connect_group_;
 		clock_group* clock_group_;
 		// widgets
 

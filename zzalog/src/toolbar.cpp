@@ -203,7 +203,6 @@ toolbar::toolbar(int X, int Y, int W, int H, const char* label) :
 	bn->tooltip("Upload extracted records");
 	add(bn);
 	curr_x += H + TOOL_GAP;
-	// TODO: Now in Operation not menu.....
 	// Connect/disconnect rig
 	bn = new Fl_Button(curr_x, Y, H, H, 0);
 	bn->callback(cb_bn_rig, nullptr);
@@ -452,7 +451,7 @@ void toolbar::cb_bn_import(Fl_Widget* w, void* v) {
 // Connect or disconnect rig
 // v is not used
 void toolbar::cb_bn_rig(Fl_Widget* w, void* v) {
-	qso_manager::cat_group::cb_bn_connect(qso_manager_, nullptr);
+	qso_manager_->switch_rig();
 }
 
 // Return the minimum width required
@@ -505,14 +504,8 @@ void toolbar::update_items() {
 				w->deactivate();
 			}
 		}
-		else if (w->callback() == &qso_manager::cat_group::cb_bn_connect) {
-			if (w->user_data() && qso_manager_ && qso_manager_->logging_mode() == qso_manager::LM_ON_AIR_CAT) {
-				w->deactivate();
-			}
-			else if (!w->user_data() && qso_manager_ && qso_manager_->logging_mode() != qso_manager::LM_ON_AIR_CAT) {
-				w->deactivate();
-			}
-			else if (!qso_manager_) {
+		else if (w->callback() == cb_bn_rig) {
+			if (!qso_manager_) {
 				w->deactivate();
 			} else {
 				w->activate();
