@@ -2225,154 +2225,6 @@ void qso_manager::qso_group::action_set_current() {
 	current_rec_num_ = book_->selection();
 }
 
-// Clock group - constructor
-qso_manager::clock_group::clock_group
-(int X, int Y, int W, int H, const char* l) :
-	Fl_Group(X, Y, W, H, l)
-	, display_local_(false)
-{
-	load_values();
-}
-
-// Clock group destructor
-qso_manager::clock_group::~clock_group() {
-	Fl::remove_timeout(cb_timer_clock, nullptr);
-	save_values();
-}
-
-// get settings
-void qso_manager::clock_group::load_values() {
-	// No code
-}
-
-// Create form
-void qso_manager::clock_group::create_form(int X, int Y) {
-
-	g_clock_ = new Fl_Group(X, Y, 10, 10);
-	g_clock_->labelfont(FL_BOLD);
-	g_clock_->labelsize(FL_NORMAL_SIZE + 2);
-	g_clock_->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
-	g_clock_->box(FL_BORDER_BOX);
-
-	int curr_x = g_clock_->x() + GAP;
-	int curr_y = g_clock_->y() + HTEXT;
-
-	const int WCLOCKS = 250;
-
-	bn_time_ = new Fl_Button(curr_x, curr_y, WCLOCKS, 3 * HTEXT);
-	bn_time_->color(FL_BLACK);
-	bn_time_->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE);
-	bn_time_->labelfont(FL_BOLD);
-	bn_time_->labelsize(5 * FL_NORMAL_SIZE);
-	bn_time_->labelcolor(FL_YELLOW);
-	bn_time_->box(FL_FLAT_BOX);
-	bn_time_->when(FL_WHEN_RELEASE);
-	bn_time_->callback(cb_click, nullptr);
-
-	curr_y += bn_time_->h();
-
-	bn_date_ = new Fl_Button(curr_x, curr_y, WCLOCKS, HTEXT * 3 / 2);
-	bn_date_->color(FL_BLACK);
-	bn_date_->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE);
-	bn_date_->labelsize(FL_NORMAL_SIZE * 3 / 2);
-	bn_date_->labelcolor(FL_YELLOW);
-	bn_date_->box(FL_FLAT_BOX);
-	bn_date_->when(FL_WHEN_RELEASE);
-	bn_date_->callback(cb_click, nullptr);
-
-	curr_y += bn_date_->h();
-
-	bn_local_ = new Fl_Button(curr_x, curr_y, WCLOCKS, HTEXT * 3 / 2);
-	bn_local_->color(FL_BLACK);
-	bn_local_->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE);
-	bn_local_->labelsize(FL_NORMAL_SIZE * 3 / 2);
-	bn_local_->labelcolor(FL_RED);
-	bn_local_->box(FL_FLAT_BOX);
-	bn_local_->when(FL_WHEN_RELEASE);
-	bn_local_->callback(cb_click, nullptr);
-
-	curr_x += GAP + WCLOCKS;
-	curr_y += bn_local_->h() + GAP;
-
-	g_clock_->resizable(nullptr);
-	g_clock_->size(curr_x - g_clock_->x(), curr_y - g_clock_->y());
-	g_clock_->end();
-
-	resizable(nullptr);
-	size(g_clock_->w(), g_clock_->h());
-	show();
-	end();
-
-	// Start clock timer
-	Fl::add_timeout(0, cb_timer_clock, this);
-}
-
-// Enable/disab;e widgets
-void qso_manager::clock_group::enable_widgets() {
-	time_t now = time(nullptr);
-	tm* value;
-	tm* other_value;
-	char result[100];
-	if (display_local_) {
-		value = localtime(&now);
-		strftime(result, 99, "Clock - %Z", value);
-		g_clock_->copy_label(result);
-		bn_time_->labelcolor(FL_RED);
-		strftime(result, 99, "%H:%M:%S", value);
-		bn_time_->copy_label(result);
-		bn_date_->labelcolor(FL_RED);
-		strftime(result, 99, "%A %d %B %Y", value);
-		bn_date_->copy_label(result);
-		// Convert other time
-		other_value = gmtime(&now);
-		strftime(result, 99, "%T UTC", other_value);
-		bn_local_->labelcolor(FL_YELLOW);
-		bn_local_->copy_label(result);
-	}
-	else {
-		value = gmtime(&now);
-		g_clock_->label("Clock - UTC");
-		bn_time_->labelcolor(FL_YELLOW);
-		strftime(result, 99, "%H:%M:%S", value);
-		bn_time_->copy_label(result);
-		bn_date_->labelcolor(FL_YELLOW);
-		strftime(result, 99, "%A %d %B %Y", value);
-		bn_date_->copy_label(result);
-		// Convert other time
-		other_value = localtime(&now);
-		strftime(result, 99, "%T %Z", other_value);
-		bn_local_->labelcolor(FL_RED);
-		bn_local_->copy_label(result);
-	}
-
-	qso_manager* mgr = (qso_manager*)parent();
-	if (mgr->qso_group_->logging_state_ == QSO_PENDING) {
-		mgr->qso_group_->copy_clock_to_qso(now);
-	}
-}
-
-// save value
-void qso_manager::clock_group::save_values() {
-	// No code
-}
-
-// Callback - 1s timer
-void qso_manager::clock_group::cb_timer_clock(void* v) {
-	// Update the label in the clock button which is passed as the parameter
-	clock_group* that = (clock_group*)v;
-	that->enable_widgets();
-
-
-	Fl::repeat_timeout(UTC_TIMER, cb_timer_clock, v);
-}
-
-// Callback click group
-void qso_manager::clock_group::cb_click(Fl_Widget* w, void* v) {
-	clock_group* that = ancestor_view<clock_group>(w);
-	that->display_local_ = !that->display_local_;
-	that->enable_widgets();
-}
-
 
 // The main dialog constructor
 qso_manager::qso_manager(int W, int H, const char* label) :
@@ -2435,7 +2287,7 @@ void qso_manager::create_form(int X, int Y) {
 
 	curr_x += connect_group_->w() + GAP;
 
-	clock_group_ = new clock_group(curr_x, curr_y, 0, 0, nullptr);
+	clock_group_ = new qso_clock(curr_x, curr_y, 0, 0, nullptr);
 	clock_group_->create_form(curr_x, curr_y);
 	curr_x += clock_group_->w();
 	curr_y += max(clock_group_->h(), connect_group_->h());
@@ -2519,6 +2371,11 @@ qso_manager::logging_mode_t qso_manager::logging_mode() {
 void qso_manager::logging_mode(logging_mode_t mode) {
 	qso_group_->logging_mode_ = mode;
 	enable_widgets();
+}
+
+// 
+qso_manager::logging_state_t qso_manager::logging_state() {
+	return qso_group_->logging_state_;
 }
 
 // Return true if we have a current QSO
@@ -2740,4 +2597,9 @@ string qso_manager::get_default(stn_item_t item) {
 	else {
 		return"";
 	}
+}
+
+// Update the time
+void qso_manager::update_time(time_t when) {
+	qso_group_->copy_clock_to_qso(when);
 }

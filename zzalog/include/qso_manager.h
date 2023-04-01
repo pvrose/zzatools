@@ -2,6 +2,7 @@
 #define __STN_DIALOG__
 
 #include "qso_connector.h"
+#include "qso_clock.h"
 
 #include "callback.h"
 #include "record.h"
@@ -60,8 +61,6 @@ using namespace std;
 			NONE = 0
 		};
 
-	protected:
-
 		// Loggng state
 		enum logging_state_t {
 			QSO_INACTIVE,    // No QSO being edited
@@ -75,6 +74,7 @@ using namespace std;
 			QRZ_MERGE,       // Merge details downloaded from QRZ.com
 		};
 
+	protected:
 		// Class for QSO group of widgets
 		class qso_group :
 			public Fl_Group
@@ -485,40 +485,6 @@ using namespace std;
 
 		};
 
-		public:
-		class clock_group :
-			public Fl_Group
-
-		{
-			friend class qso_manager;
-
-			clock_group(int X, int Y, int W, int H, const char* l);
-			~clock_group();
-
-			// get settings
-			void load_values();
-			// Create form
-			void create_form(int X, int Y);
-			// Enable/disab;e widgets
-			void enable_widgets();
-			// save value
-			void save_values();
-
-			// Callback - 1s timer
-			static void cb_timer_clock(void* v);
-			// Callback - click on group
-			static void cb_click(Fl_Widget* w, void* v);
-
-			// Display local time rather than UTC
-			bool display_local_;
-
-			Fl_Group* g_clock_;
-			Fl_Button* bn_time_;
-			Fl_Button* bn_date_;
-			Fl_Button* bn_local_;
-		};
-
-
 	// qso_manager
 	public:
 		qso_manager(int W, int H, const char* label);
@@ -539,6 +505,8 @@ using namespace std;
 		void update_import_qso(record* import);
 		// Query/update
 		void update(hint_t hint, qso_num_t log_num, qso_num_t query_num);
+		// Update time
+		void update_time(time_t when);
 
 		// Callback - close button
 		static void cb_close(Fl_Widget* w, void* v);
@@ -558,6 +526,8 @@ using namespace std;
 		logging_mode_t logging_mode();
 		// Set logging mode
 		void logging_mode(logging_mode_t mode);
+		// Get logging state
+		logging_state_t logging_state();
 		// Called when rig is read
 		void rig_update(string frequency, string mode, string power);
 		// Called when rig is changed
@@ -592,7 +562,7 @@ using namespace std;
 		// Groups
 		qso_group* qso_group_;
 		qso_connector* connect_group_;
-		clock_group* clock_group_;
+		qso_clock* clock_group_;
 		// widgets
 
 		const static int WEDITOR = 400;

@@ -113,9 +113,6 @@ using namespace std;
 	// 
 	enum object_t;
 
-	// clock display - 1s.
-	const double UTC_TIMER = 1.0;
-
 	// This class extends Fl_Text_Buffer by switching off UTF-8 warnin
 	class text_buffer : public Fl_Text_Buffer {
 	public:
