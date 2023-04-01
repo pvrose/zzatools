@@ -152,8 +152,6 @@ using namespace std;
 			void enable_widgets();
 			// save value
 			void save_values();
-			// Update MY_RIG etc
-			void update_station_choices(stn_item_t item);
 
 			// Callbacks
 		protected:

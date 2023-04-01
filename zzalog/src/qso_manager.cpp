@@ -1219,24 +1219,6 @@ void qso_manager::qso_group::enable_widgets() {
 
 }
 
-// Update specific station item input
-void qso_manager::qso_group::update_station_choices(stn_item_t station_item) {
-	// Note can update multiple items as the flags are bit wise
-	if (station_item & RIG) {
-		ip_field_[field_ip_map_["MY_RIG"]]->reload_choice();
-	}
-	if (station_item & ANTENNA) {
-		ip_field_[field_ip_map_["MY_ANTENNA"]]->reload_choice();
-	}
-	if (station_item & QTH) {
-		ip_field_[field_ip_map_["APP_ZZA_QTH"]]->reload_choice();
-	}
-	if (station_item & CALLSIGN) {
-		ip_field_[field_ip_map_["STATION_CALLSIGN"]]->reload_choice();
-	}
-	redraw();
-}
-
 // Update QSO
 void qso_manager::qso_group::update_qso(qso_num_t log_qso) {
 	if (log_qso == current_rec_num_) {
