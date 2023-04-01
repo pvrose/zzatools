@@ -494,7 +494,7 @@ void add_rig_if() {
 		if (rig_if_ == nullptr) {
 			// No handler defined - assume manual logging in real-time
 			status_->misc_status(ST_WARNING, "RIG: Cannot connect to hamlib, assume real-time logging, no rig");
-			if (qso_manager_) qso_manager_->logging_mode(qso_manager::LM_ON_AIR_COPY);
+			if (qso_manager_) qso_manager_->logging_mode(qso_data::LM_ON_AIR_COPY);
 		}
 		else {
 			// Set callbacks
@@ -554,7 +554,7 @@ void add_rig_if() {
 							// Change logging mode to ON_AIR
 							if (qso_manager_) {
 								qso_manager_->update_rig();
-								qso_manager_->logging_mode(qso_manager::LM_ON_AIR_CAT);
+								qso_manager_->logging_mode(qso_data::LM_ON_AIR_CAT);
 							}
 							done = true;
 						}

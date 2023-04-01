@@ -127,7 +127,7 @@ void qso_clock::enable_widgets() {
 	}
 
 	qso_manager* mgr = (qso_manager*)parent();
-	if (mgr->logging_state() == qso_manager::QSO_PENDING) {
+	if (mgr->logging_state() == qso_data::QSO_PENDING) {
 		mgr->update_time(now);
 	}
 }

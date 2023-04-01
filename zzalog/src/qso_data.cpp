@@ -1,0 +1,2326 @@
+#include "qso_data.h"
+#include "qso_manager.h"
+#include "qsl_viewer.h"
+#include "qth_dialog.h"
+#include "settings.h"
+#include "rig_if.h"
+#include "book.h"
+#include "status.h"
+#include "extract_data.h"
+#include "pfx_data.h"
+#include "spec_data.h"
+#include "band_view.h"
+#include "tabbed_forms.h"
+#include "import_data.h"
+#include "qrz_handler.h"
+#ifdef _WIN32
+#include "dxa_if.h"
+#endif
+
+#include <FL/Fl_Preferences.H>
+#include <FL/Fl_Tooltip.H>
+
+extern Fl_Preferences* settings_;
+extern rig_if* rig_if_;
+extern book* book_;
+extern extract_data* extract_records_;
+extern status* status_;
+extern pfx_data* pfx_data_;
+extern spec_data* spec_data_;
+extern band_view* band_view_;
+extern tabbed_forms* tabbed_forms_;
+extern import_data* import_data_;
+extern book* navigation_book_;
+extern qrz_handler* qrz_handler_;
+#ifdef _WIN32
+extern dxa_if* dxa_if_;
+#endif
+extern double prev_freq_;
+
+
+// qso_group_
+qso_data::qso_data(int X, int Y, int W, int H, const char* l) :
+	Fl_Group(X, Y, W, H, l)
+	, current_qso_(nullptr)
+	, original_qso_(nullptr)
+	, logging_mode_(LM_OFF_AIR)
+	, contest_id_("")
+	, exch_fmt_ix_(0)
+	, exch_fmt_id_("")
+	, max_ef_index_(0)
+	, field_mode_(NO_CONTEST)
+	, logging_state_(QSO_INACTIVE)
+	, previous_locator_("")
+	, previous_qth_("")
+{
+	for (int ix = 0; ix < NUMBER_TOTAL; ix++) {
+		ip_field_[ix] = nullptr;
+		ch_field_[ix] = nullptr;
+	}
+	load_values();
+	qsl_viewer_ = new qsl_viewer(10, 10);
+	qsl_viewer_->callback(cb_qsl_viewer);
+	qsl_viewer_->hide();
+	// Initialise field input map
+	field_ip_map_.clear();
+
+}
+
+// Destructor
+qso_data::~qso_data() {
+}
+
+// Load values
+void qso_data::load_values() {
+	// Dashboard configuration
+	Fl_Preferences dash_settings(settings_, "Dashboard");
+	// Set logging mode -default is On-air with or without rig connection
+	int new_lm;
+	logging_mode_t default_lm = rig_if_ ? LM_ON_AIR_CAT : LM_ON_AIR_COPY;
+	dash_settings.get("Logging Mode", new_lm, default_lm);
+
+	// If we are set to "On-air with CAT connection" check connecton
+	if (!rig_if_ && new_lm == LM_ON_AIR_CAT) new_lm = LM_ON_AIR_COPY;
+
+	logging_mode_ = (logging_mode_t)new_lm;
+
+	// Contest definitions
+	Fl_Preferences contest_settings(dash_settings, "Contests");
+	contest_settings.get("Next Serial Number", serial_num_, 0);
+	contest_settings.get("Contest Mode", (int&)field_mode_, false);
+	char* temp;
+	contest_settings.get("Contest ID", temp, "");
+	contest_id_ = temp;
+	free(temp);
+	contest_settings.get("Exchange Format", exch_fmt_ix_, 0);
+	// Contest exchnage formats
+	Fl_Preferences format_settings(contest_settings, "Formats");
+	unsigned int num_formats = format_settings.groups();
+	max_ef_index_ = num_formats;
+	// Already have contests set, read them
+	//	Format ID (nickname)
+	//		Index: n
+	//		TX: Transmit fields
+	//		RX: Receive fields
+	if (num_formats == 0) {
+		max_ef_index_ = 1;
+		ef_ids_[0] = "";
+		ef_txs_[0] = "RST_SENT,STX";
+		ef_rxs_[0] = "RST_RCVD,SRX";
+	}
+	else {
+		for (unsigned int i = 0; i < num_formats; i++) {
+			Fl_Preferences one_setting(format_settings, format_settings.group(i));
+			int index;
+			one_setting.get("Index", index, 0);
+			ef_ids_[index] = format_settings.group(i);
+			one_setting.get("TX", temp, "RST_SENT,STX");
+			ef_txs_[index] = string(temp);
+			free(temp);
+			one_setting.get("RX", temp, "RST_RCVD,SRX");
+			ef_rxs_[index] = string(temp);
+			free(temp);
+		}
+	}
+	// Set active contest format ID
+	exch_fmt_id_ = ef_ids_[exch_fmt_ix_];
+
+	// Read contest details from most recent QSO
+	if (book_->size()) {
+		record* prev_record = book_->get_record(book_->size() - 1, false);
+		string prev_contest = prev_record->item("CONTEST_ID");
+		char message[100];
+		if (field_mode_ != NO_CONTEST) {
+			if (prev_contest != contest_id_) {
+				snprintf(message, 100, "DASH: Contest ID in log (%s) differs from settings (%s)", prev_contest.c_str(), contest_id_.c_str());
+				status_->misc_status(ST_WARNING, message);
+			}
+			else {
+				// Get serial number from log
+				string serno = prev_record->item("STX");
+				if (serno.length() > 0) {
+					int sernum = stoi(serno);
+					if (sernum > serial_num_) {
+						snprintf(message, 100, "DASH: Contest serial in log (%d) greater than settings (%d) - using log", sernum, serial_num_);
+						status_->misc_status(ST_WARNING, message);
+						serial_num_ = sernum;
+					}
+					else {
+						snprintf(message, 100, "DASH: Contest serial in log (%d) less than settings (%d) - using settings", sernum, serial_num_);
+						status_->misc_status(ST_NOTE, message);
+					}
+				}
+			}
+		}
+	}
+}
+
+// Create contest group
+Fl_Group* qso_data::create_contest_group(int X, int Y) {
+	int curr_x = X;
+	int curr_y = Y;
+
+	Fl_Group* g_contest = new Fl_Group(curr_x, curr_y, 0, 0, "Contest");
+	g_contest->labelfont(FL_BOLD);
+	g_contest->labelsize(FL_NORMAL_SIZE + 2);
+	g_contest->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
+	g_contest->box(FL_BORDER_BOX);
+
+	curr_x += GAP;
+	curr_y += HTEXT;
+
+	bn_enable_ = new Fl_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Enable");
+	bn_enable_->value(field_mode_ != NO_CONTEST);
+	bn_enable_->selection_color(FL_GREEN);
+	bn_enable_->callback(cb_ena_contest, nullptr);
+	bn_enable_->tooltip("Enable contest operation - resets contest parameters");
+
+	curr_x += bn_enable_->w() + GAP;
+
+	// Pause contest button
+	bn_pause_ = new Fl_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Pause");
+	bn_pause_->value(field_mode_ == PAUSED);
+	bn_pause_->selection_color(FL_RED);
+	bn_pause_->callback(cb_pause_contest, nullptr);
+	bn_pause_->tooltip("Pause contest, i.e. keep parameters when resume");
+
+	curr_x += bn_pause_->w() + GAP + (WLABEL * 3 / 2);
+
+	// Contest ID - used for logging
+	ch_contest_id_ = new field_choice(curr_x, curr_y, WBUTTON * 2, HBUTTON, "CONTEST_ID");
+	ch_contest_id_->set_dataset("Contest_ID");
+	ch_contest_id_->value(contest_id_.c_str());
+	ch_contest_id_->callback(cb_value<field_choice, string>, &contest_id_);
+	ch_contest_id_->tooltip("Select the ID for the contest (for logging)");
+
+	int max_w = curr_x + ch_contest_id_->w() + GAP - x();
+	curr_x = g_contest->x() + GAP + WLABEL;
+	curr_y += ch_contest_id_->h();
+
+	// Choice widget to select the required exchanges
+	ch_format_ = new Fl_Input_Choice(curr_x, curr_y, WBUTTON + WBUTTON, HBUTTON, "Exch.");
+	ch_format_->value(exch_fmt_id_.c_str());
+	ch_format_->align(FL_ALIGN_LEFT);
+	ch_format_->callback(cb_format, nullptr);
+	ch_format_->when(FL_WHEN_RELEASE);
+	ch_format_->tooltip("Select existing exchange format or type in new (click \"Add\" to add)");
+	populate_exch_fmt();
+
+	curr_x += ch_format_->w();
+
+	// Add exchange button
+	bn_add_exch_ = new Fl_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Add");
+	bn_add_exch_->value(field_mode_ == EDIT);
+	bn_add_exch_->callback(cb_add_exch, nullptr);
+	bn_add_exch_->selection_color(FL_RED);
+	bn_add_exch_->tooltip("Add new exchange format - choose fields and click \"TX\" or \"RX\" to create them");
+
+	curr_x += bn_add_exch_->w() + GAP;
+
+	// Define contest exchanges
+	bn_define_tx_ = new Fl_Button(curr_x, curr_y, WBUTTON / 2, HBUTTON, "TX");
+	bn_define_tx_->callback(cb_def_format, (void*)true);
+	bn_define_tx_->tooltip("Use the specified fields as contest exchange on transmit");
+
+	curr_x += bn_define_tx_->w();
+
+	// Define contest
+	bn_define_rx_ = new Fl_Button(curr_x, curr_y, WBUTTON / 2, HBUTTON, "RX");
+	bn_define_rx_->callback(cb_def_format, (void*)false);
+	bn_define_rx_->tooltip("Use the specified fields as contest exchange on receive");
+
+	curr_x += bn_define_rx_->w() + GAP;
+
+	// Serial number control buttons - Initialise to 001
+	bn_init_serno_ = new Fl_Button(curr_x, curr_y, WBUTTON / 2, HBUTTON, "@|<");
+	bn_init_serno_->callback(cb_init_serno, nullptr);
+	bn_init_serno_->tooltip("Reset the contest serial number counter to \"001\"");
+
+	curr_x += bn_init_serno_->w();
+
+	// Serial number control buttons - Decrement
+	bn_dec_serno_ = new Fl_Button(curr_x, curr_y, WBUTTON / 2, HBUTTON, "@<");
+	bn_dec_serno_->labelsize(FL_NORMAL_SIZE + 2);
+	bn_dec_serno_->callback(cb_dec_serno, nullptr);
+	bn_dec_serno_->tooltip("Decrement the contest serial number counter by 1");
+
+	curr_x += bn_dec_serno_->w();
+
+	// Serial number control buttons - Decrement
+	bn_inc_serno_ = new Fl_Button(curr_x, curr_y, WBUTTON / 2, HBUTTON, "@>");
+	bn_inc_serno_->labelsize(FL_NORMAL_SIZE + 2);
+	bn_inc_serno_->callback(cb_inc_serno, nullptr);
+	bn_inc_serno_->tooltip("Increment the contest serial number counter by 1");
+
+	curr_x += bn_inc_serno_->w();
+
+	// Transmitted contest exchange
+	op_serno_ = new Fl_Output(curr_x, curr_y, WBUTTON, HBUTTON, "Serial");
+	op_serno_->align(FL_ALIGN_TOP);
+	op_serno_->tooltip("This is the serial number you should be sending");
+
+	curr_x += op_serno_->w() + GAP;
+	curr_y += op_serno_->h() + GAP;
+
+	g_contest->resizable(nullptr);
+	g_contest->size(curr_x - g_contest->x(), curr_y - g_contest->y());
+	g_contest->end();
+
+	return g_contest;
+}
+
+Fl_Group* qso_data::create_entry_group(int X, int Y) {
+	int curr_x = X;
+	int curr_y = Y;
+
+	int col2_y = curr_y;
+	int max_w = 0;
+
+	Fl_Group* g = new Fl_Group(curr_x, curr_y, 0, 0);
+	g->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
+	g->box(FL_BORDER_BOX);
+	g->labelfont(FL_BOLD);
+	g->labelsize(FL_NORMAL_SIZE + 2);
+	g->labelcolor(fl_darker(FL_BLUE));
+
+	curr_x += GAP;
+	curr_y += HTEXT;
+	// Fixed fields
+	// N rows of NUMBER_PER_ROW
+	const int NUMBER_PER_ROW = 2;
+	const int WCHOICE = WBUTTON * 3 / 2;
+	const int WINPUT = WBUTTON * 7 / 4;
+	for (int ix = 0; ix < NUMBER_TOTAL; ix++) {
+		if (ix >= NUMBER_FIXED) {
+			ch_field_[ix] = new field_choice(curr_x, curr_y, WCHOICE, HBUTTON);
+			ch_field_[ix]->align(FL_ALIGN_RIGHT);
+			ch_field_[ix]->tooltip("Specify the field to provide");
+			ch_field_[ix]->callback(cb_ch_field, (void*)ix);
+			ch_field_[ix]->set_dataset("Fields");
+		}
+		curr_x += WCHOICE;
+		ip_field_[ix] = new field_input(curr_x, curr_y, WINPUT, HBUTTON);
+		ip_field_[ix]->align(FL_ALIGN_LEFT);
+		ip_field_[ix]->tooltip("Enter required value to log");
+		ip_field_[ix]->callback(cb_ip_field, (void*)ix);
+		ip_field_[ix]->input()->when(FL_WHEN_RELEASE_ALWAYS);
+		if (ix < NUMBER_FIXED) {
+			ip_field_[ix]->field_name(fixed_names_[ix].c_str(), current_qso_);
+			field_ip_map_[fixed_names_[ix]] = ix;
+			field_names_[ix] = fixed_names_[ix];
+			ip_field_[ix]->label(fixed_names_[ix].c_str());
+		}
+		else {
+			field_names_[ix] = "";
+		}
+		number_fields_in_use_ = NUMBER_FIXED;
+		curr_x += WINPUT + GAP;
+		if (ix % NUMBER_PER_ROW == (NUMBER_PER_ROW - 1)) {
+			max_w = max(max_w, curr_x - x());
+			curr_x = X + GAP;
+			curr_y += HBUTTON;
+		}
+	}
+
+
+	max_w = max(max_w, curr_x);
+
+	// nOtes input
+	curr_x = X + WCHOICE;
+	curr_y += HBUTTON;
+
+	ip_notes_ = new intl_input(curr_x, curr_y, max_w - curr_x, HBUTTON, "NOTES");
+	ip_notes_->callback(cb_ip_notes, nullptr);
+	ip_notes_->tooltip("Add any notes for the QSO");
+
+	curr_y += HBUTTON + GAP;
+	g->resizable(nullptr);
+	g->size(max_w, curr_y - Y);
+	g->end();
+
+	return g;
+}
+
+// Query table
+Fl_Group* qso_data::create_query_group(int X, int Y) {
+
+	int curr_x = X;
+	int curr_y = Y;
+
+	Fl_Group* g = new Fl_Group(curr_x, curr_y, 0, 0);
+	g->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
+	g->box(FL_BORDER_BOX);
+	g->labelfont(FL_BOLD);
+	g->labelsize(FL_NORMAL_SIZE + 2);
+	g->labelcolor(fl_darker(FL_RED));
+
+	const int WTABLE = 420;
+	const int HTABLE = 250;
+
+	curr_x += GAP;
+	curr_y += HTEXT;
+
+	tab_query_ = new record_table(curr_x, curr_y, WTABLE, HTABLE);
+	tab_query_->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
+	tab_query_->callback(cb_tab_qso, nullptr);
+
+	curr_x += WTABLE + GAP;
+	curr_y += HTABLE + GAP;
+
+	g->resizable(nullptr);
+	g->size(curr_x - X, curr_y - Y);
+	g->end();
+
+	return g;
+}
+
+// QSO control group
+Fl_Group* qso_data::create_button_group(int X, int Y) {
+	int curr_x = X;
+	int curr_y = Y;
+
+	Fl_Group* g = new Fl_Group(curr_x, curr_y, 0, 0, "Controls");
+	g->labelfont(FL_BOLD);
+	g->labelsize(FL_NORMAL_SIZE + 2);
+	g->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
+	g->box(FL_BORDER_BOX);
+
+	curr_x += GAP;
+	curr_y += HTEXT;
+	int max_x = curr_x;
+
+	const int NUMBER_PER_ROW = 8;
+	for (int ix = 0; ix < MAX_ACTIONS; ix++) {
+		bn_action_[ix] = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "");
+		if ((ix + 1) % NUMBER_PER_ROW == 0 && ix < MAX_ACTIONS) {
+			curr_x += WBUTTON;
+			max_x = max(max_x, curr_x);
+			curr_x = X + GAP;
+			curr_y += HBUTTON;
+		}
+		else {
+			curr_x += WBUTTON;
+			max_x = max(max_x, curr_x);
+		}
+	}
+
+	max_x += GAP;
+	curr_y += GAP;
+	g->resizable(nullptr);
+	g->size(max_x - X, curr_y - Y);
+	g->end();
+
+	return g;
+}
+
+// Create qso_data
+void qso_data::create_form(int X, int Y) {
+	int max_w = 0;
+
+	begin();
+	align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
+	box(FL_BORDER_BOX);
+	label("QSO Data");
+	labelfont(FL_BOLD);
+	labelsize(FL_NORMAL_SIZE + 2);
+
+	// Choice widget to select the reqiuired logging mode
+	ch_logmode_ = new Fl_Choice(x() + GAP + WLLABEL, y() + HTEXT, 8 * WBUTTON, HTEXT, "QSO initialisation");
+	ch_logmode_->align(FL_ALIGN_LEFT);
+	ch_logmode_->add("Current date and time - used for parsing only");
+	ch_logmode_->add("All fields blank");
+	ch_logmode_->add("Current date and time, data from CAT");
+	ch_logmode_->add("Current date and time, data from selected QSO - including call");
+	ch_logmode_->add("Current date and time, data from selected QSO - excluding call");
+	ch_logmode_->add("Current date and time, no other data");
+	ch_logmode_->value(logging_mode_);
+	ch_logmode_->callback(cb_logging_mode, &logging_mode_);
+	ch_logmode_->tooltip("Select the logging mode - i.e. how to initialise a new QSO record");
+
+	int curr_y = ch_logmode_->y() + ch_logmode_->h() + GAP;;
+	int top = ch_logmode_->y() + ch_logmode_->h();
+	int curr_x = X + GAP;
+
+	g_contest_ = create_contest_group(curr_x, curr_y);
+
+	max_w = max(max_w, g_contest_->x() + g_contest_->w() + GAP);
+	curr_y = g_contest_->y() + g_contest_->h() + GAP;
+
+	// One or the other of the two groups below will be shown at a time
+	g_entry_ = create_entry_group(curr_x, curr_y);
+	max_w = max(max_w, g_entry_->x() + g_entry_->w() + GAP);
+	g_query_ = create_query_group(curr_x, curr_y);
+	max_w = max(max_w, g_query_->x() + g_query_->w() + GAP);
+	curr_y = max(g_entry_->y() + g_entry_->h(), g_query_->y() + g_query_->h()) + GAP;
+
+	g_buttons_ = create_button_group(curr_x, curr_y);
+	max_w = max(max_w, g_buttons_->x() + g_buttons_->w() + GAP);
+	curr_y += g_buttons_->h() + GAP;
+
+	ch_logmode_->size(max_w - ch_logmode_->x() - GAP, ch_logmode_->h());
+
+	resizable(nullptr);
+	size(max_w, curr_y - Y);
+	end();
+
+	initialise_fields();
+}
+
+void qso_data::enable_contest_widgets() {
+	// Get exchange data
+	if (exch_fmt_ix_ < MAX_CONTEST_TYPES && field_mode_ == CONTEST) {
+		char text[10];
+		snprintf(text, 10, "%03d", serial_num_);
+		op_serno_->value(text);
+	}
+	else {
+		op_serno_->value("");
+	}
+	// Basic contest on/off widgets 
+	switch (field_mode_) {
+	case NO_CONTEST:
+		op_serno_->deactivate();
+		bn_pause_->deactivate();
+		ch_contest_id_->deactivate();
+		ch_format_->deactivate();
+		bn_init_serno_->deactivate();
+		bn_inc_serno_->deactivate();
+		bn_dec_serno_->deactivate();
+		break;
+	default:
+		op_serno_->activate();
+		bn_pause_->activate();
+		ch_contest_id_->activate();
+		ch_format_->activate();
+		bn_init_serno_->activate();
+		bn_inc_serno_->activate();
+		bn_dec_serno_->activate();
+	}
+	op_serno_->redraw();
+	bn_pause_->redraw();
+	ch_contest_id_->redraw();
+	ch_format_->redraw();
+	bn_init_serno_->redraw();
+	bn_inc_serno_->redraw();
+	bn_dec_serno_->redraw();
+	// Mode dependent
+	switch (field_mode_) {
+	case NEW:
+		bn_add_exch_->activate();
+		bn_add_exch_->label("Add");
+		bn_define_rx_->deactivate();
+		bn_define_tx_->deactivate();
+		break;
+	case DEFINE:
+	case EDIT:
+		bn_add_exch_->activate();
+		bn_add_exch_->label("Save");
+		bn_define_rx_->activate();
+		bn_define_tx_->activate();
+		break;
+	case CONTEST:
+		bn_add_exch_->activate();
+		bn_add_exch_->label("Edit");
+		bn_define_rx_->deactivate();
+		bn_define_tx_->deactivate();
+		break;
+	default:
+		bn_add_exch_->deactivate();
+		bn_add_exch_->label(nullptr);
+		bn_define_rx_->deactivate();
+		bn_define_tx_->deactivate();
+		break;
+	}
+	bn_add_exch_->redraw();
+	bn_add_exch_->redraw();
+	bn_define_rx_->redraw();
+	bn_define_tx_->redraw();
+
+}
+
+// Enable field widgets
+void qso_data::enable_entry_widgets() {
+	// Now enable disan=
+	switch (logging_state_) {
+	case QSO_INACTIVE:
+		g_entry_->label("QSO entry is not enabled.");
+		g_entry_->show();
+		for (int ix = 0; ix < NUMBER_TOTAL; ix++) {
+			if (ch_field_[ix]) ch_field_[ix]->deactivate();
+			ip_field_[ix]->deactivate();
+		}
+		ip_notes_->deactivate();
+		break;
+	case QSO_PENDING:
+		g_entry_->label("QSO Entry - prepared for real-time logging.");
+		g_entry_->show();
+		for (int ix = 0; ix <= number_fields_in_use_ && ix < NUMBER_TOTAL; ix++) {
+			if (ch_field_[ix]) ch_field_[ix]->activate();
+			ip_field_[ix]->activate();
+		}
+		for (int ix = number_fields_in_use_ + 1; ix < NUMBER_TOTAL; ix++) {
+			ch_field_[ix]->deactivate();
+			ip_field_[ix]->deactivate();
+		}
+		ip_notes_->activate();
+		break;
+	case QSO_STARTED:
+		g_entry_->label("QSO Entry - active real-time logging.");
+		g_entry_->show();
+		for (int ix = 0; ix <= number_fields_in_use_ && ix < NUMBER_TOTAL; ix++) {
+			if (ch_field_[ix]) ch_field_[ix]->activate();
+			ip_field_[ix]->activate();
+		}
+		for (int ix = number_fields_in_use_ + 1; ix < NUMBER_TOTAL; ix++) {
+			ch_field_[ix]->deactivate();
+			ip_field_[ix]->deactivate();
+		}
+		ip_notes_->activate();
+		break;
+	case QSO_EDIT:
+		g_entry_->label("QSO Entry - off air editing of QSO records.");
+		g_entry_->show();
+		for (int ix = 0; ix <= number_fields_in_use_ && ix < NUMBER_TOTAL; ix++) {
+			if (ch_field_[ix]) ch_field_[ix]->activate();
+			ip_field_[ix]->activate();
+		}
+		for (int ix = number_fields_in_use_ + 1; ix < NUMBER_TOTAL; ix++) {
+			ch_field_[ix]->deactivate();
+			ip_field_[ix]->deactivate();
+		}
+		ip_notes_->activate();
+		break;
+	default:
+		// Reserver=d for Query states
+		g_entry_->hide();
+		break;
+	}
+}
+
+// Enable query widgets
+void qso_data::enable_query_widgets() {
+	switch (logging_state_) {
+	case QSO_INACTIVE:
+	case QSO_PENDING:
+	case QSO_STARTED:
+	case QSO_EDIT:
+		g_query_->hide();
+		break;
+	case QSO_BROWSE:
+	default:
+		g_query_->show();
+		tab_query_->activate();
+		break;
+	}
+}
+
+// Enable action buttons
+void qso_data::enable_button_widgets() {
+	const list<button_type>& buttons = button_map_.at(logging_state_);
+	int ix = 0;
+	for (auto bn = buttons.begin(); bn != buttons.end() && ix < MAX_ACTIONS; bn++, ix++) {
+		const button_action& action = action_map_.at(*bn);
+		bn_action_[ix]->label(action.label);
+		bn_action_[ix]->tooltip(action.label);
+		bn_action_[ix]->color(action.colour);
+		bn_action_[ix]->labelcolor(fl_contrast(FL_FOREGROUND_COLOR, action.colour));
+		bn_action_[ix]->callback(action.callback, action.userdata);
+		bn_action_[ix]->activate();
+	}
+	for (; ix < MAX_ACTIONS; ix++) {
+		bn_action_[ix]->label("");
+		bn_action_[ix]->tooltip("");
+		bn_action_[ix]->color(FL_BACKGROUND_COLOR);
+		bn_action_[ix]->callback((Fl_Callback*)nullptr);
+		bn_action_[ix]->deactivate();
+	}
+}
+
+// Enable QSO widgets
+void qso_data::enable_widgets() {
+	// Disable log mode menu item from CAT if no CAT
+	if (rig_if_ == nullptr) {
+		ch_logmode_->mode(LM_ON_AIR_CAT, ch_logmode_->mode(LM_ON_AIR_CAT) | FL_MENU_INACTIVE);
+	}
+	else {
+		ch_logmode_->mode(LM_ON_AIR_CAT, ch_logmode_->mode(LM_ON_AIR_CAT) & ~FL_MENU_INACTIVE);
+	}
+	ch_logmode_->redraw();
+
+	enable_contest_widgets();
+	enable_entry_widgets();
+	enable_query_widgets();
+	enable_button_widgets();
+
+}
+
+// Update QSO
+void qso_data::update_qso(qso_num_t log_qso) {
+	if (log_qso == current_rec_num_) {
+		switch (logging_state_) {
+		case QSO_INACTIVE:
+			// Do nothing
+			break;
+		case QSO_PENDING:
+		case QSO_STARTED:
+		case QSO_EDIT:
+			// Update the view if another view changes the record
+			copy_qso_to_display(qso_data::CF_ALL_FLAGS);
+			redraw();
+			break;
+		case QSO_BROWSE:
+			tab_query_->redraw();
+			break;
+		}
+	}
+	else {
+		switch (logging_state_) {
+		case QSO_INACTIVE:
+			// Do nothing
+			break;
+		case QSO_PENDING:
+			// Deactivate then reactivate with new QSPO
+			action_deactivate();
+			current_rec_num_ = log_qso;
+			current_qso_ = book_->get_record(log_qso, false);
+			action_activate();
+			break;
+		case QSO_STARTED:
+			// Ack whether to save or quit then activate new QSO
+			fl_beep(FL_BEEP_QUESTION);
+			switch (fl_choice("Trying to select a different record while logging a QSO", "Save QSO", "Quit QSO", nullptr)) {
+			case 0:
+				// Save QSO
+				action_save();
+				break;
+			case 1:
+				// Cancel QSO
+				action_cancel();
+				break;
+			}
+			// Actions will have changed selection - change it back.
+			logging_state_ = QSO_INACTIVE;
+			current_rec_num_ = log_qso;
+			current_qso_ = book_->get_record(log_qso, true);
+			break;
+		case QSO_EDIT:
+			// Ask whether to save or quit then open new QSO in edit mode
+			fl_beep(FL_BEEP_QUESTION);
+			switch (fl_choice("Trying to select a different record while editing a record", "Save edit", "Cancel edit", nullptr)) {
+			case 0:
+				// Save QSO
+				action_save_edit();
+				break;
+			case 1:
+				// Cancel QSO
+				action_cancel_edit();
+				break;
+			}
+			current_rec_num_ = log_qso;
+			current_qso_ = book_->get_record(log_qso, true);
+			action_edit();
+			break;
+		case QSO_BROWSE:
+			// Open new record in browse mode
+			action_cancel_browse();
+			current_rec_num_ = log_qso;
+			current_qso_ = book_->get_record(log_qso, true);
+			action_browse();
+			break;
+		}
+	}
+}
+
+// Update query
+void qso_data::update_query(logging_state_t query, qso_num_t match_num, qso_num_t query_num) {
+	switch (logging_state_) {
+	case QSO_PENDING:
+	case QSO_INACTIVE:
+		current_rec_num_ = match_num;
+		query_rec_num_ = query_num;
+		action_query(query);
+		break;
+	case QUERY_NEW:
+		action_query(query);
+		break;
+	default:
+		// TODO:
+		break;
+	}
+}
+
+// Copy record to the fields - reverse of above
+void qso_data::copy_qso_to_display(int flags) {
+	record* source = get_default_record();
+	if (source) {
+		// For each field input
+		for (int i = 0; i < NUMBER_TOTAL; i++) {
+			string field;
+			if (i < NUMBER_FIXED) field = fixed_names_[i];
+			else field = ch_field_[i]->value();
+			if (field.length()) {
+				if (flags == CF_ALL_FLAGS) {
+					// Copy all fields that have edit fields defined
+					ip_field_[i]->value(source->item(field, false, true).c_str());
+				}
+				else {
+					// Copy per flag bits
+					for (auto sf = COPY_SET.begin(); sf != COPY_SET.end(); sf++) {
+						copy_flags f = (*sf);
+						if (flags & f) {
+							for (auto fx = COPY_FIELDS.at(f).begin(); fx != COPY_FIELDS.at(f).end(); fx++) {
+								if ((*fx) == field)	ip_field_[i]->value(source->item(field, false, true).c_str());
+							}
+						}
+					}
+				}
+			}
+		}
+		ip_notes_->value(source->item("NOTES").c_str());
+		// If QTH changes tell DXA-IF to update home_location
+		check_qth_changed();
+	}
+}
+
+// Copy from an existing record: fields depend on flags set
+void qso_data::copy_qso_to_qso(record* old_record, int flags) {
+	if (current_qso_ && old_record) {
+		// For all flag bits
+		for (auto sf = COPY_SET.begin(); sf != COPY_SET.end(); sf++) {
+			copy_flags f = (*sf);
+			for (auto fx = COPY_FIELDS.at(f).begin(); fx != COPY_FIELDS.at(f).end(); fx++) {
+				if (flags & f) {
+					// If it's set copy it
+					current_qso_->item((*fx), old_record->item((*fx)));
+				}
+				else {
+					// else clear it
+					current_qso_->item(string(""));
+				}
+			}
+		}
+		copy_qso_to_display(flags);
+	}
+}
+
+// Copy fields from CAT and default rig etc.
+void qso_data::copy_cat_to_qso() {
+	string freqy = rig_if_->get_frequency(true);
+	string mode;
+	string submode;
+	rig_if_->get_string_mode(mode, submode);
+	string tx_power = rig_if_->get_tx_power();
+	switch (logging_state_) {
+	case QSO_PENDING: {
+		// Load values from rig
+		current_qso_->item("FREQ", freqy);
+		// Get mode - NB USB/LSB need further processing
+		if (mode != "DATA L" && mode != "DATA U") {
+			current_qso_->item("MODE", mode);
+			current_qso_->item("SUBMODE", submode);
+		}
+		else {
+			current_qso_->item("MODE", string(""));
+			current_qso_->item("SUBMODE", string(""));
+		}
+		current_qso_->item("TX_PWR", tx_power);
+		break;
+	}
+	case QSO_STARTED: {
+		// Ignore values except TX_PWR which accumulates maximum value
+		char message[128];
+		if (current_qso_->item("FREQ") != freqy) {
+			snprintf(message, 128, "DASH: Rig frequency changed during QSO, New value %s", freqy.c_str());
+			status_->misc_status(ST_WARNING, message);
+			current_qso_->item("FREQ", freqy);
+		}
+		if (current_qso_->item("MODE") != mode) {
+			snprintf(message, 128, "DASH: Rig mode changed during QSO, New value %s", mode.c_str());
+			status_->misc_status(ST_WARNING, message);
+			current_qso_->item("MODE", mode);
+		}
+		if (current_qso_->item("SUBMODE") != submode) {
+			snprintf(message, 128, "DASH: Rig submode changed during QSO, New value %s", submode.c_str());
+			status_->misc_status(ST_WARNING, message);
+			current_qso_->item("SUBMODE", submode);
+		}
+		current_qso_->item("TX_PWR", tx_power);
+		break;
+	}
+	}
+	copy_qso_to_display(CF_CAT);
+}
+
+// Copy current timestamp to QSO
+void qso_data::copy_clock_to_qso(time_t clock) {
+	// Only allow this if in activate - will be called every second 
+	if (current_qso_) {
+		tm* value = gmtime(&clock);
+		char result[100];
+		// convert date
+		strftime(result, 99, "%Y%m%d", value);
+		current_qso_->item("QSO_DATE", string(result));
+		// convert time
+		strftime(result, 99, "%H%M%S", value);
+		current_qso_->item("TIME_ON", string(result));
+		current_qso_->item("QSO_DATE_OFF", string(""));
+		current_qso_->item("TIME_OFF", string(""));
+
+		copy_qso_to_display(CF_TIME);
+	}
+}
+
+// Clear fields
+void qso_data::clear_display() {
+	for (int i = 0; i < NUMBER_TOTAL; i++) {
+		ip_field_[i]->value("");
+	}
+	ip_notes_->value("");
+}
+
+// Clear fields in current QSO
+void qso_data::clear_qso() {
+	current_qso_->delete_contents();
+	copy_qso_to_display(CF_QSO);
+}
+
+// Select logging mode
+void qso_data::cb_logging_mode(Fl_Widget* w, void* v) {
+	cb_value<Fl_Choice, logging_mode_t>(w, v);
+	qso_data* that = ancestor_view<qso_data>(w);
+	// Deactivate and reactivate to pick up logging mode changes
+	if (that->logging_state_ == QSO_PENDING) {
+		that->action_deactivate();
+		that->action_activate();
+	}
+}
+
+// Set contest enable/disable
+// v - not used
+void qso_data::cb_ena_contest(Fl_Widget* w, void* v) {
+	qso_data* that = ancestor_view<qso_data>(w);
+	bool enable = false;
+	cb_value<Fl_Light_Button, bool>(w, &enable);
+
+	if (enable) {
+		that->serial_num_ = 1;
+		that->field_mode_ = CONTEST;
+	}
+	else {
+		that->field_mode_ = NO_CONTEST;
+	}
+	that->initialise_fields();
+	that->enable_widgets();
+}
+
+// Pause contest mode
+void qso_data::cb_pause_contest(Fl_Widget* w, void* v) {
+	qso_data* that = ancestor_view<qso_data>(w);
+	bool pause = false;
+	cb_value<Fl_Light_Button, bool>(w, &pause);
+
+	if (pause) {
+		that->field_mode_ = PAUSED;
+	}
+	else {
+		that->field_mode_ = CONTEST;
+	}
+	that->initialise_fields();
+	that->enable_widgets();
+}
+
+// Set exchange format
+// v is exchange
+void qso_data::cb_format(Fl_Widget* w, void* v) {
+	qso_data* that = ancestor_view<qso_data>(w);
+	Fl_Input_Choice* ch = (Fl_Input_Choice*)w;
+	// Get format ID
+	that->exch_fmt_id_ = ch->value();
+	// Get source
+	if (ch->menubutton()->changed()) {
+		// Selected menu item
+		that->exch_fmt_ix_ = ch->menubutton()->value();
+		that->field_mode_ = CONTEST; // Should already be so
+		that->initialise_fields();
+	}
+	else {
+		that->field_mode_ = NEW;
+	}
+	that->enable_widgets();
+}
+
+// Add exchange format
+// v is unused
+void qso_data::cb_add_exch(Fl_Widget* w, void* v) {
+	qso_data* that = ancestor_view<qso_data>(w);
+	bool update = false;
+	cb_value<Fl_Light_Button, bool>(w, &update);
+	if (update) {
+		// Switch to update format definitions
+		switch (that->field_mode_) {
+		case NEW:
+			// Adding a new format - add it to the list
+			that->exch_fmt_ix_ = that->add_format_id(that->exch_fmt_id_);
+			that->field_mode_ = DEFINE;
+			that->initialise_fields();
+			break;
+		case CONTEST:
+			// Editing an existing format
+			that->field_mode_ = EDIT;
+			that->initialise_fields();
+			break;
+		}
+		that->enable_widgets();
+	}
+	else {
+		// Start/Resume contest
+		that->field_mode_ = CONTEST;
+		that->populate_exch_fmt();
+		that->initialise_fields();
+	}
+	that->enable_widgets();
+}
+
+// Define contest exchange
+// v - bool TX or RX
+void qso_data::cb_def_format(Fl_Widget* w, void* v) {
+	qso_data* that = ancestor_view<qso_data>(w);
+	bool tx = (bool)(long)v;
+	that->add_format_def(that->exch_fmt_ix_, tx);
+	that->initialise_fields();
+	that->enable_widgets();
+}
+
+// Activate- Go from QSO_INACTIVE to QSO_PENDING
+void qso_data::cb_activate(Fl_Widget* w, void* v) {
+	qso_data* that = ancestor_view<qso_data>(w);
+	if (that->logging_state_ == QSO_INACTIVE) {
+		that->action_set_current();
+		that->action_activate();
+	}
+}
+
+// Start QSO - transition from QSO_INACTIVE->QSO_PENDING->QSO_STARTED
+void qso_data::cb_start(Fl_Widget* w, void* v) {
+	qso_data* that = ancestor_view<qso_data>(w);
+	switch (that->logging_state_) {
+	case QSO_INACTIVE:
+		that->action_set_current();
+		that->action_activate();
+		// Fall into next state
+	case QSO_PENDING:
+		that->action_start();
+		break;
+	}
+}
+
+// Save QSO - transition through QSO_PENDING->QSO_STARTED->QSO_INACTIVE saving QSO
+void qso_data::cb_save(Fl_Widget* w, void* v) {
+	qso_data* that = ancestor_view<qso_data>(w);
+	switch (that->logging_state_) {
+		// Two routes - QSO entry
+	case QSO_PENDING:
+		that->action_start();
+	case QSO_STARTED:
+		that->action_save();
+		that->action_set_current();
+		that->action_activate();
+		break;
+		// QSO editing
+	case QSO_EDIT:
+		that->action_save_edit();
+		break;
+	}
+}
+
+// Cancel QSO - delete QSO; clear fields
+void qso_data::cb_cancel(Fl_Widget* w, void* v) {
+	qso_data* that = ancestor_view<qso_data>(w);
+	switch (that->logging_state_) {
+	case QSO_PENDING:
+		that->action_deactivate();
+		break;
+	case QSO_STARTED:
+		that->action_cancel();
+		that->action_set_current();
+		that->action_activate();
+		break;
+	case QSO_EDIT:
+		that->action_cancel_edit();
+		break;
+	case QSO_BROWSE:
+		that->action_cancel_browse();
+		break;
+	}
+}
+
+// Edit QSO - transition to QSO_EDIT
+void qso_data::cb_edit(Fl_Widget* w, void* v) {
+	qso_data* that = ancestor_view<qso_data>(w);
+	switch (that->logging_state_) {
+	case QSO_INACTIVE:
+		that->action_set_current();
+		that->action_edit();
+		break;
+	case QSO_BROWSE:
+		that->action_cancel_browse();
+		that->action_set_current();
+		that->action_edit();
+		break;
+	}
+}
+
+// Callback - Worked B4? button
+void qso_data::cb_wkb4(Fl_Widget* w, void* v) {
+	qso_data* that = ancestor_view<qso_data>(w);
+	extract_records_->extract_call(string(that->ip_field_[that->field_ip_map_["CALL"]]->value()));
+	book_->selection(that->current_rec_num_, HT_SELECTED);
+}
+
+// Callback - Parse callsign
+void qso_data::cb_parse(Fl_Widget* w, void* v) {
+	qso_data* that = ancestor_view<qso_data>(w);
+	// Create a temporary record to parse the callsign
+	record* tip_record = that->dummy_qso();
+	string message = "";
+	// Set the callsign in the temporary record
+	tip_record->item("CALL", string(that->ip_field_[that->field_ip_map_["CALL"]]->value()));
+	// Parse the temporary record
+	message = pfx_data_->get_tip(tip_record);
+	// Create a tooltip window at the parse button (in w) X and Y
+	Fl_Window* qw = ancestor_view<qso_manager>(w);
+	Fl_Window* tw = ::tip_window(message, qw->x_root() + w->x() + w->w() / 2, qw->y_root() + w->y() + w->h() / 2);
+	// Set the timeout on the tooltip
+	Fl::add_timeout(Fl_Tooltip::delay(), cb_timer_tip, tw);
+	delete tip_record;
+}
+
+// Callback - view QSL button
+void qso_data::cb_bn_view_qsl(Fl_Widget* w, void* v) {
+	qso_data* that = ancestor_view<qso_data>(w);
+	record* qso = that->current_qso_;
+	qsl_viewer* qsl = that->qsl_viewer_;
+	that->action_view_qsl();
+	if (qso) qsl->show();
+}
+
+// Callback - QSL viewer "closing" - make it hide instead
+void qso_data::cb_qsl_viewer(Fl_Widget* w, void* v) {
+	qsl_viewer* qsl = (qsl_viewer*)w;
+	if (qsl->visible()) qsl->hide();
+}
+
+// Callback - Edit QTH
+void qso_data::cb_bn_edit_qth(Fl_Widget* w, void* v) {
+	qso_data* that = ancestor_view<qso_data>(w);
+	qso_manager* mgr = (qso_manager*)that->parent();
+	string qth = mgr->get_default(qso_manager::QTH);
+	// Open QTH dialog
+	qth_dialog* dlg = new qth_dialog(qth);
+	set<string> changed_fields;
+	record* macro;
+	record* current = that->get_default_record();
+	switch (dlg->display()) {
+	case BN_OK:
+		changed_fields = spec_data_->get_macro_changes();
+		macro = spec_data_->expand_macro("APP_ZZA_QTH", qth);
+		for (auto fx = changed_fields.begin(); fx != changed_fields.end(); fx++) {
+			current->item(*fx, macro->item(*fx));
+		}
+		that->check_qth_changed();
+		that->enable_widgets();
+		break;
+	case BN_CANCEL:
+		break;
+	}
+	delete dlg;
+}
+
+// CAllback - navigate buttons
+// v - direction
+void qso_data::cb_bn_navigate(Fl_Widget* w, void* v) {
+	qso_data* that = ancestor_view<qso_data>(w);
+	navigate_t target = (navigate_t)(long)v;
+	that->action_navigate(target);
+}
+
+// Callback - browse
+void qso_data::cb_bn_browse(Fl_Widget* w, void* v) {
+	qso_data* that = ancestor_view<qso_data>(w);
+	switch (that->logging_state_) {
+	case QSO_INACTIVE:
+		that->action_set_current();
+		that->action_browse();
+		break;
+	default:
+		break;
+	}
+}
+
+// Callback - add query record
+void qso_data::cb_bn_add_query(Fl_Widget* w, void* v) {
+	qso_data* that = ancestor_view<qso_data>(w);
+	switch (that->logging_state_) {
+	case QUERY_MATCH:
+	case QUERY_NEW:
+		that->action_add_query();
+		break;
+	default:
+		break;
+	}
+}
+
+// Callback - add query record
+void qso_data::cb_bn_reject_query(Fl_Widget* w, void* v) {
+	qso_data* that = ancestor_view<qso_data>(w);
+	switch (that->logging_state_) {
+	case QUERY_MATCH:
+	case QUERY_NEW:
+		that->action_reject_query();
+		break;
+	default:
+		break;
+	}
+}
+
+// Callback - add query record
+void qso_data::cb_bn_merge_query(Fl_Widget* w, void* v) {
+	qso_data* that = ancestor_view<qso_data>(w);
+	switch (that->logging_state_) {
+	case QUERY_MATCH:
+	case QUERY_NEW:
+		that->action_merge_query();
+		break;
+	default:
+		break;
+	}
+}
+
+// Callback - add query record
+void qso_data::cb_bn_find_match(Fl_Widget* w, void* v) {
+	qso_data* that = ancestor_view<qso_data>(w);
+	switch (that->logging_state_) {
+	case QUERY_NEW:
+		that->action_find_match();
+		break;
+	default:
+		break;
+	}
+}
+
+// Callback - dupe action
+void qso_data::cb_bn_dupe(Fl_Widget* w, void* v) {
+	qso_data* that = ancestor_view<qso_data>(w);
+	dupe_flags action = (dupe_flags)(long)v;
+	switch (that->logging_state_) {
+	case QUERY_DUPE:
+		that->action_handle_dupe(action);
+		break;
+	default:
+		break;
+	}
+}
+
+// Callback QRZ merge action
+void qso_data::cb_bn_save_merge(Fl_Widget* w, void* v) {
+	qso_data* that = ancestor_view<qso_data>(w);
+	switch (that->logging_state_) {
+	case QRZ_MERGE:
+		that->action_save_merge();
+		break;
+	default:
+		break;
+	}
+}
+
+// Callback Find QSO in WSJT-X
+void qso_data::cb_bn_all_txt(Fl_Widget* w, void* v) {
+	qso_data* that = ancestor_view<qso_data>(w);
+	switch (that->logging_state_) {
+	case QUERY_NEW:
+	case QUERY_MATCH:
+		that->action_look_all_txt();
+		break;
+	default:
+		break;
+	}
+}
+
+// Reset contest serial number
+void qso_data::cb_init_serno(Fl_Widget* w, void* v) {
+	qso_data* that = ancestor_view<qso_data>(w);
+	that->serial_num_ = 1;
+	that->initialise_fields();
+	that->enable_widgets();
+}
+
+// Increment serial number
+void qso_data::cb_inc_serno(Fl_Widget* w, void* v) {
+	qso_data* that = ancestor_view<qso_data>(w);
+	that->serial_num_++;
+	that->initialise_fields();
+	that->enable_widgets();
+}
+
+// Decrement serial number
+void qso_data::cb_dec_serno(Fl_Widget* w, void* v) {
+	qso_data* that = ancestor_view<qso_data>(w);
+	that->serial_num_--;
+	that->initialise_fields();
+	that->enable_widgets();
+}
+
+// Callback change field selected
+void qso_data::cb_ch_field(Fl_Widget* w, void* v) {
+	qso_data* that = ancestor_view<qso_data>(w);
+	field_choice* ch = (field_choice*)w;
+	const char* field = ch->value();
+	int ix = (int)(long)v;
+	if (strlen(field)) {
+		that->action_add_field(ix, field);
+	}
+	else {
+		that->action_del_field(ix);
+	}
+}
+
+// Callback - general input
+// v - index of input widget
+void qso_data::cb_ip_field(Fl_Widget* w, void* v) {
+	qso_data* that = ancestor_view<qso_data>(w);
+	field_input* ip = (field_input*)w;
+	string field = ip->field_name();
+	string value = ip->value();
+	that->current_qso_->item(field, value);
+
+	if (field == "FREQ") {
+		double freq = atof(value.c_str()) * 1000;
+		if (band_view_) {
+			band_view_->update(freq);
+		}
+		prev_freq_ = freq;
+	}
+	else if (field == "MODE") {
+		if (spec_data_->is_submode(value)) {
+			that->current_qso_->item("SUBMODE", value);
+			that->current_qso_->item("MODE", spec_data_->mode_for_submode(value));
+		}
+		else {
+			that->current_qso_->item("MODE", value);
+			that->current_qso_->item("SUBMODE", string(""));
+		}
+	}
+	else if (field == "APP_ZZA_QTH") {
+		// Send new value to spec_data to create an empty entry if it's a new one
+		if (!ip->menubutton()->changed()) {
+			macro_defn entry = { nullptr, "" };
+			spec_data_->add_user_macro(field, value, entry);
+		}
+		that->check_qth_changed();
+	}
+	// Update other views if editing or logging
+	switch (that->logging_state_) {
+	case QSO_INACTIVE:
+	case QSO_PENDING:
+		break;
+	case QSO_STARTED:
+	case QSO_EDIT:
+		tabbed_forms_->update_views(nullptr, HT_MINOR_CHANGE, that->current_rec_num_);
+		break;
+	default:
+		break;
+	}
+}
+
+// Callback -notes input
+// v - not used
+void qso_data::cb_ip_notes(Fl_Widget* w, void* v) {
+	qso_data* that = ancestor_view<qso_data>(w);
+	string notes;
+	cb_value<intl_input, string>(w, &notes);
+	that->current_qso_->item("NOTES", notes);
+	tabbed_forms_->update_views(nullptr, HT_MINOR_CHANGE, book_->size() - 1);
+}
+
+// Callback - table
+void qso_data::cb_tab_qso(Fl_Widget* w, void* v) {
+	qso_data* that = ancestor_view<qso_data>(w);
+	record_table* table = (record_table*)w;
+	int row = table->callback_row();
+	int col = table->callback_col();
+	int button = Fl::event_button();
+	bool double_click = Fl::event_clicks();
+	string field = table->field(row);
+	switch (table->callback_context()) {
+	case Fl_Table::CONTEXT_ROW_HEADER:
+		if (button == FL_LEFT_MOUSE && double_click) {
+			that->action_add_field(that->number_fields_in_use_, field);
+		}
+		break;
+	case Fl_Table::CONTEXT_CELL:
+		if (button == FL_LEFT_MOUSE && double_click) {
+			that->action_handle_dclick(col, field);
+		}
+		break;
+	}
+}
+
+// Save the settings
+void qso_data::save_values() {
+	// Dashboard configuration
+	Fl_Preferences dash_settings(settings_, "Dashboard");
+	dash_settings.set("Logging Mode", (int)logging_mode_);
+
+	// Contest definitions
+	Fl_Preferences contest_settings(dash_settings, "Contests");
+	contest_settings.clear();
+	contest_settings.set("Next Serial Number", serial_num_);
+	contest_settings.set("Contest Mode", (int)field_mode_);
+	contest_settings.set("Contest ID", contest_id_.c_str());
+	contest_settings.set("Exchange Format", exch_fmt_ix_);
+	// Exchanges
+	Fl_Preferences format_settings(contest_settings, "Formats");
+	for (int ix = 0; ix < max_ef_index_; ix++) {
+		Fl_Preferences one_settings(format_settings, ef_ids_[ix].c_str());
+		one_settings.set("Index", (signed)ix);
+		one_settings.set("TX", ef_txs_[ix].c_str());
+		one_settings.set("RX", ef_rxs_[ix].c_str());
+	}
+}
+
+// Add contests
+void qso_data::populate_exch_fmt() {
+	for (int ix = 0; ix < max_ef_index_; ix++) {
+		ch_format_->add(ef_ids_[ix].c_str());
+	}
+}
+
+// Initialise fields from format definitions
+void qso_data::initialise_fields() {
+	string preset_fields;
+	bool lock_preset;
+	bool new_fields;
+	switch (field_mode_) {
+	case NO_CONTEST:
+	case PAUSED:
+		// Non -contest mode
+		preset_fields = "RST_SENT,RST_RCVD,NAME,QTH";
+
+		new_fields = true;
+		lock_preset = false;
+		break;
+	case CONTEST:
+		// Contest mode
+		preset_fields = ef_rxs_[exch_fmt_ix_] + "," + ef_txs_[exch_fmt_ix_];
+		new_fields = true;
+		lock_preset = true;
+		break;
+	case NEW:
+		// Do not change existing
+		preset_fields = "";
+		new_fields = false;
+		lock_preset = true;
+		break;
+	case DEFINE:
+		// Define new exchange - provide base RS/Serno
+		preset_fields = "RST_RCVD,SRX";
+		new_fields = true;
+		lock_preset = false;
+		break;
+	case EDIT:
+		// Unlock existing definition 
+		preset_fields = "";
+		new_fields = false;
+		lock_preset = false;
+		break;
+	}
+	// Now set fields
+	vector<string> field_names;
+	split_line(preset_fields, field_names, ',');
+	size_t ix = 0;
+	int iy;
+	for (ix = 0, iy = NUMBER_FIXED; ix < field_names.size(); ix++, iy++) {
+		if (new_fields) {
+			ch_field_[iy]->value(field_names[ix].c_str());
+			ip_field_[iy]->field_name(field_names[ix].c_str(), current_qso_);
+			field_names_[iy] = field_names[ix];
+		}
+		if (lock_preset) {
+			ch_field_[iy]->deactivate();
+		}
+		else {
+			ch_field_[iy]->activate();
+		}
+	}
+	number_fields_in_use_ = NUMBER_FIXED + field_names.size();
+	for (; iy < NUMBER_TOTAL; iy++) {
+		ch_field_[iy]->value("");
+		ip_field_[iy]->value("");
+		ip_field_[iy]->field_name("");
+	}
+	// Set contest format
+	ch_format_->value(exch_fmt_id_.c_str());
+	// Default Contest TX values
+	if (field_mode_ == CONTEST) {
+		// Automatically create a pending QSO
+		if (logging_state_ == QSO_INACTIVE) {
+			action_set_current();
+			action_activate();
+		}
+
+		vector<string> fields;
+		split_line(preset_fields, fields, ',');
+		for (size_t i = 0; i < fields.size(); i++) {
+			int ix = NUMBER_FIXED + i;
+			string contest_mode = spec_data_->dxcc_mode(current_qso_->item("MODE"));
+			if (fields[i] == "RST_SENT" || fields[i] == "RST_RCVD") {
+				if (contest_mode == "CW" || contest_mode == "DATA") {
+					current_qso_->item(fields[i], string("599"));
+				}
+				else {
+					current_qso_->item(fields[i], string("59"));
+				}
+			}
+			else if (fields[i] == "STX") {
+				char text[10];
+				snprintf(text, 10, "%03d", serial_num_);
+				current_qso_->item(fields[i], string(text));
+			}
+			ip_field_[ix]->value(current_qso_->item(fields[i]).c_str());
+		}
+		ip_field_[field_ip_map_["CALL"]]->value("");
+		ip_notes_->value("");
+		for (size_t i = NUMBER_FIXED + fields.size(); i < NUMBER_TOTAL; i++) {
+			ip_field_[i]->value("");
+		}
+	}
+	else {
+		ip_field_[field_ip_map_["CALL"]]->value("");
+		ip_notes_->value("");
+		for (int i = NUMBER_FIXED; i < NUMBER_TOTAL; i++) {
+			ip_field_[i]->value("");
+		}
+	}
+}
+
+// Add new format - return format index
+int qso_data::add_format_id(string id) {
+	// Add the string to the choice
+	ch_format_->add(id.c_str());
+	int index = ch_format_->menubutton()->find_index(id.c_str());
+	// Add the format id to the array
+	ef_ids_[index] = id;
+	max_ef_index_ = index + 1;
+	// Return the index
+	return index;
+}
+
+// Add new format definition 
+void qso_data::add_format_def(int ix, bool tx) {
+	// Get the string from the field choices
+	string defn = "";
+	for (int i = NUMBER_FIXED; i < NUMBER_TOTAL; i++) {
+		const char* field = ch_field_[i]->value();
+		if (strlen(field)) {
+			if (i > NUMBER_FIXED) {
+				defn += ",";
+			}
+			defn += field;
+		}
+	}
+	// Add the format definition to the array
+	if (tx) {
+		ef_txs_[ix] = defn;
+	}
+	else {
+		ef_rxs_[ix] = defn;
+	}
+}
+
+// Get default record to copy
+record* qso_data::get_default_record() {
+	switch (logging_state_) {
+	case QSO_INACTIVE:
+		switch (logging_mode_) {
+		case LM_OFF_AIR:
+		case LM_ON_AIR_CAT:
+		case LM_ON_AIR_TIME:
+			current_rec_num_ = book_->size() - 1;
+			return book_->get_latest();
+		case LM_ON_AIR_COPY:
+		case LM_ON_AIR_CLONE:
+			current_rec_num_ = book_->selection();
+			return book_->get_record();
+		default:
+			return nullptr;
+		}
+	default:
+		return current_qso_;
+	}
+}
+
+// Check if QTH has changed and action change (redraw DxAtlas
+void qso_data::check_qth_changed() {
+	record* current = get_default_record();
+	if (current) {
+		if (current->item("MY_GRIDSQUARE", true) != previous_locator_ ||
+			current->item("APP_ZZA_QTH") != previous_qth_) {
+			previous_locator_ = current->item("MY_GRIDSQUARE", true);
+			previous_qth_ = current->item("APP_ZZA_QTH");
+#ifdef _WIN32
+			if (dxa_if_) dxa_if_->update(HT_LOCATION);
+#endif
+		}
+	}
+}
+
+// Action ACTIVATE: transition from QSO_INACTIVE to QSO_PENDING
+void qso_data::action_activate() {
+	record* source_record = current_qso_;
+	current_qso_ = new record;
+	current_rec_num_ = -1;
+	time_t now = time(nullptr);
+	qso_manager* mgr = ancestor_view<qso_manager>(this);
+	logging_state_ = QSO_PENDING;
+	switch (logging_mode_) {
+	case LM_OFF_AIR:
+		// Just copy the station details
+		copy_qso_to_qso(source_record, CF_RIG_ETC);
+		break;
+	case LM_ON_AIR_CAT:
+		// Copy station details and get read rig details for band etc.
+		copy_qso_to_qso(source_record, CF_RIG_ETC);
+		copy_cat_to_qso();
+		copy_clock_to_qso(now);
+		break;
+	case LM_ON_AIR_CLONE:
+		// Clone the QSO - get station and band from original QSO
+		copy_qso_to_qso(source_record, CF_RIG_ETC | CF_CAT);
+		copy_clock_to_qso(now);
+		break;
+	case LM_ON_AIR_COPY:
+		// Copy the QSO - as abobe but also same callsign and details
+		copy_qso_to_qso(source_record, CF_RIG_ETC | CF_CAT | CF_CONTACT);
+		copy_clock_to_qso(now);
+		break;
+	case LM_ON_AIR_TIME:
+		// Copy the station details and set the current date/time.
+		copy_qso_to_qso(source_record, CF_RIG_ETC);
+		copy_clock_to_qso(now);
+		break;
+	}
+	initialise_fields();
+	enable_widgets();
+}
+
+// Action START - transition from QSO_PENDING to QSO_STARTED
+void qso_data::action_start() {
+	// Add to book
+	current_rec_num_ = book_->append_record(current_qso_);
+	book_->selection(book_->item_number(current_rec_num_), HT_INSERTED);
+	logging_state_ = QSO_STARTED;
+	enable_widgets();
+}
+
+// Action SAVE - transition from QSO_STARTED to QSO_INACTIVE while saving record
+void qso_data::action_save() {
+	bool old_save_enabled = book_->save_enabled();
+	item_num_t item_number = book_->item_number(current_rec_num_);
+	book_->enable_save(false);
+	// On-air logging add date/time off
+	switch (logging_mode_) {
+	case LM_ON_AIR_CAT:
+	case LM_ON_AIR_COPY:
+	case LM_ON_AIR_CLONE:
+	case LM_ON_AIR_TIME:
+		// All on-air modes - set cime-off to now
+		if (current_qso_->item("TIME_OFF") == "") {
+			// Add end date/time - current time of interactive entering
+			// Get current date and time in UTC
+			string timestamp = now(false, "%Y%m%d%H%M%S");
+			current_qso_->item("QSO_DATE_OFF", timestamp.substr(0, 8));
+			// Time as HHMMSS - always log seconds.
+			current_qso_->item("TIME_OFF", timestamp.substr(8));
+		}
+		// Increment contest serial number
+		if (field_mode_ == CONTEST) serial_num_++;
+		break;
+	case LM_OFF_AIR:
+		book_->correct_record_position(item_number);
+		break;
+	}
+
+	// check whether record has changed - when parsed
+	if (pfx_data_->parse(current_qso_)) {
+	}
+
+	// check whether record has changed - when validated
+	if (spec_data_->validate(current_qso_, item_number)) {
+	}
+
+	book_->add_use_data(current_qso_);
+
+	// Upload QSO to QSL servers
+	book_->upload_qso(current_rec_num_);
+	current_qso_ = nullptr;
+	logging_state_ = QSO_INACTIVE;
+	enable_widgets();
+
+	// If new or changed then update the fact and let every one know
+	book_->modified(true);
+	book_->selection(item_number, HT_INSERTED);
+	book_->enable_save(old_save_enabled);
+}
+
+// Action CANCEL - Transition from QSO_STARTED to QSO_INACTIVE without saving record
+void qso_data::action_cancel() {
+	// book_->delete_record() will change the selected record - we need ti be inactive to ignore it
+	logging_state_ = QSO_INACTIVE;
+	book_->delete_record(true);
+	delete current_qso_;
+	current_qso_ = nullptr;
+	check_qth_changed();
+	enable_widgets();
+	qsl_viewer_->hide();
+}
+
+// Action DEACTIVATE - Transition from QSO_PENDING to QSO_INACTIVE
+void qso_data::action_deactivate() {
+	delete current_qso_;
+	current_qso_ = nullptr;
+	logging_state_ = QSO_INACTIVE;
+	enable_widgets();
+}
+
+// Action EDIT - Transition from QSO_INACTIVE to QSO_EDIT
+void qso_data::action_edit() {
+	// Save a copy of the current record
+	original_qso_ = new record(*current_qso_);
+	logging_state_ = QSO_EDIT;
+	copy_qso_to_display(CF_ALL_FLAGS);
+	enable_widgets();
+}
+
+// Action SAVE EDIT - Transition from QSO_EDIT to QSO_INACTIVE while saving changes
+void qso_data::action_save_edit() {
+	// We no longer need to maintain the copy of the original QSO
+	book_->add_use_data(current_qso_);
+	book_->modified(true);
+	delete original_qso_;
+	original_qso_ = nullptr;
+	current_qso_ = nullptr;
+	current_rec_num_ = -1;
+	logging_state_ = QSO_INACTIVE;
+	enable_widgets();
+}
+
+// ACtion CANCEL EDIT - Transition from QSO_EDIT to QSO_INACTIVE scrapping changes
+void qso_data::action_cancel_edit() {
+	// Copy original back to the book
+	*book_->get_record(current_rec_num_, false) = *original_qso_;
+	delete original_qso_;
+	original_qso_ = nullptr;
+	current_qso_ = nullptr;
+	current_rec_num_ = -1;
+	logging_state_ = QSO_INACTIVE;
+	copy_qso_to_display(CF_ALL_FLAGS);
+	enable_widgets();
+	qsl_viewer_->hide();
+}
+
+// Action CANCEL in BROWSE 
+void qso_data::action_cancel_browse() {
+	current_qso_ = nullptr;
+	current_rec_num_ = -1;
+	logging_state_ = QSO_INACTIVE;
+	copy_qso_to_display(CF_ALL_FLAGS);
+	enable_widgets();
+	qsl_viewer_->hide();
+}
+
+// Action navigate button
+void qso_data::action_navigate(int target) {
+	logging_state_t saved_state = logging_state_;
+	switch (logging_state_) {
+	case QSO_EDIT:
+		action_save_edit();
+		break;
+	case QSO_PENDING:
+		action_deactivate();
+		break;
+	case QSO_BROWSE:
+		action_cancel_browse();
+		break;
+	}
+	// We should now be inactive - navigate to new QSO
+	book_->navigate((navigate_t)target);
+	action_set_current();
+	// And restore state
+	switch (saved_state) {
+	case QSO_EDIT:
+		action_edit();
+		action_view_qsl();
+		break;
+	case QSO_PENDING:
+		action_activate();
+		action_view_qsl();
+		break;
+	case QSO_BROWSE:
+		action_browse();
+		action_view_qsl();
+		break;
+	case QUERY_MATCH:
+		current_rec_num_ = book_->selection();
+		action_query(saved_state);
+		break;
+	}
+}
+
+// Action view qsl
+void qso_data::action_view_qsl() {
+	switch (logging_state_) {
+	case QSO_EDIT:
+	case QSO_BROWSE:
+		if (current_qso_) {
+			char title[128];
+			snprintf(title, 128, "QSL Status: %s %s %s %s %s",
+				current_qso_->item("CALL").c_str(),
+				current_qso_->item("QSO_DATE").c_str(),
+				current_qso_->item("TIME_ON").c_str(),
+				current_qso_->item("BAND").c_str(),
+				current_qso_->item("MODE", true, true).c_str());
+			qsl_viewer_->copy_label(title);
+			qsl_viewer_->set_qso(current_qso_, current_rec_num_);
+			char msg[128];
+			snprintf(msg, 128, "DASH: %s", title);
+			status_->misc_status(ST_LOG, msg);
+		}
+		break;
+	default:
+		status_->misc_status(ST_SEVERE, "DASH: No QSO selected - cannot view QSL status");
+		break;
+	}
+}
+
+// Action add field - add the selected field to the set of entries
+void qso_data::action_add_field(int ix, string field) {
+	if (ix == NUMBER_TOTAL) {
+		char msg[128];
+		snprintf(msg, 128, "DASH: Cannot add any more fields to edit - %s ignored", field.c_str());
+		status_->misc_status(ST_ERROR, msg);
+		return;
+	}
+	if (ix < number_fields_in_use_) {
+		const char* old_field = field_names_[ix].c_str();
+		ip_field_[ix]->field_name(field.c_str(), current_qso_);
+		ip_field_[ix]->value(current_qso_->item(field).c_str());
+		// Change mapping
+		if (strlen(old_field)) {
+			field_ip_map_.erase(old_field);
+		}
+		field_ip_map_[field] = ix;
+		field_names_[ix] = field;
+	}
+	else if (ix == number_fields_in_use_) {
+		if (field_ip_map_.find(field) == field_ip_map_.end()) {
+			number_fields_in_use_++;
+			ch_field_[ix]->value(field.c_str());
+			ip_field_[ix]->field_name(field.c_str(), current_qso_);
+			ip_field_[ix]->value(current_qso_->item(field).c_str());
+			field_ip_map_[field] = ix;
+			field_names_[ix] = field;
+		}
+	}
+	else {
+		status_->misc_status(ST_SEVERE, "DASH: Trying to select a deactivated widget");
+	}
+	enable_entry_widgets();
+}
+
+// Delete a field
+void qso_data::action_del_field(int ix) {
+	string& old_field = field_names_[ix];
+	field_ip_map_.erase(old_field);
+	int pos = ix;
+	for (; pos < number_fields_in_use_ - 1; pos++) {
+		string& field = field_names_[pos + 1];
+		field_names_[pos] = field;
+		ch_field_[pos]->value(field.c_str());
+		ip_field_[pos]->field_name(field.c_str(), current_qso_);
+		ip_field_[pos]->value(current_qso_->item(field).c_str());
+	}
+	ch_field_[pos]->value("");
+	ip_field_[pos]->field_name("");
+	ip_field_[pos]->value("");
+	number_fields_in_use_--;
+
+	enable_entry_widgets();
+}
+
+// Action browse
+void qso_data::action_browse() {
+	logging_state_ = QSO_BROWSE;
+	tab_query_->set_records(current_qso_, nullptr, nullptr);
+	g_query_->label("Browsing record");
+	enable_widgets();
+}
+
+// Action query
+void qso_data::action_query(logging_state_t query) {
+	switch (query) {
+	case QUERY_MATCH:
+		current_qso_ = book_->get_record(current_rec_num_, false);
+		// And save a copy of it
+		original_qso_ = new record(*current_qso_);
+		query_qso_ = import_data_->get_record(query_rec_num_, false);
+		g_query_->copy_label(import_data_->match_question().c_str());
+		break;
+	case QUERY_NEW:
+		current_qso_ = nullptr;
+		original_qso_ = nullptr;
+		query_qso_ = import_data_->get_record(query_rec_num_, false);;
+		g_query_->copy_label(import_data_->match_question().c_str());
+		break;
+	case QUERY_DUPE:
+		// Note record numbers relate to book even if it is extracted data that refered the dupe check
+		current_qso_ = book_->get_record(current_rec_num_, false);
+		original_qso_ = new record(*current_qso_);
+		query_qso_ = book_->get_record(query_rec_num_, false);
+		g_query_->copy_label(navigation_book_->match_question().c_str());
+		break;
+	case QRZ_MERGE:
+		current_qso_ = book_->get_record(current_rec_num_, false);
+		original_qso_ = new record(*current_qso_);
+		query_qso_ = qrz_handler_->get_record();
+		g_query_->copy_label(qrz_handler_->get_merge_message().c_str());
+		break;
+
+	default:
+		// TODO trap this sensibly
+		return;
+	}
+	logging_state_ = query;
+	tab_query_->set_records(current_qso_, query_qso_, original_qso_);
+	enable_widgets();
+	// Move window to top
+	parent()->show();
+}
+
+// Action add query - add query QSO to book
+void qso_data::action_add_query() {
+	import_data_->save_update();
+	current_qso_ = nullptr;
+	logging_state_ = QSO_INACTIVE;
+	enable_widgets();
+	// Restart the update process
+	import_data_->update_book();
+
+}
+
+// Action reject query - do nothing
+void qso_data::action_reject_query() {
+	import_data_->discard_update(true);
+	current_qso_ = nullptr;
+	logging_state_ = QSO_INACTIVE;
+	enable_widgets();
+	// Restart the update process
+	import_data_->update_book();
+}
+
+// Action merge query
+void qso_data::action_merge_query() {
+	import_data_->merge_update();
+	current_qso_ = nullptr;
+	logging_state_ = QSO_INACTIVE;
+	enable_widgets();
+	// Restart the update process
+	import_data_->update_book();
+}
+
+// ACtion find match
+void qso_data::action_find_match() {
+	update_query(QUERY_MATCH, current_rec_num_, query_rec_num_);
+}
+
+// Action handle dupe
+void qso_data::action_handle_dupe(dupe_flags action) {
+	switch (action) {
+	case DF_1:
+		// Discard the queried possible duplicate
+		navigation_book_->reject_dupe(false);
+		break;
+	case DF_2:
+		// Keep the queried possible duplicate record and discard the original record
+		navigation_book_->reject_dupe(true);
+		break;
+	case DF_MERGE:
+		// Discard the queried duplicate record after merging the two records
+		navigation_book_->merge_dupe();
+		break;
+	case DF_BOTH:
+		// Queried duplicate record is not a duplicate, keep both it and the original record
+		navigation_book_->accept_dupe();
+		break;
+	}
+	current_qso_ = nullptr;
+	logging_state_ = QSO_INACTIVE;
+	enable_widgets();
+	// Restart the duplicate check process
+	navigation_book_->check_dupes(true);
+
+}
+
+// Action table double click
+void qso_data::action_handle_dclick(int col, string field) {
+	switch (logging_state_) {
+	case QUERY_MATCH:
+	case QUERY_DUPE:
+	case QRZ_MERGE:
+		switch (col) {
+		case 0:
+			// Treat as if clicking roe header
+			action_add_field(number_fields_in_use_, field);
+			break;
+		case 1:
+			// Copy log field
+			current_qso_->item(field, query_qso_->item(field));
+			break;
+		case 2:
+			// Copy original record
+			current_qso_->item(field, original_qso_->item(field));
+			break;
+		}
+	}
+	enable_widgets();
+}
+
+// Action save as a result of a merge
+void qso_data::action_save_merge() {
+	// We no longer need to maintain the copy of the original QSO
+	book_->add_use_data(current_qso_);
+	book_->modified(true);
+	delete original_qso_;
+	original_qso_ = nullptr;
+	current_qso_ = nullptr;
+	logging_state_ = QSO_INACTIVE;
+	enable_widgets();
+	qrz_handler_->merge_done();
+}
+
+// ACtion look in all.txt
+void qso_data::action_look_all_txt() {
+	Fl_Preferences datapath_settings(settings_, "Datapath");
+	char* temp;
+	datapath_settings.get("WSJT-X", temp, "");
+	string filename = string(temp) + "/all.txt";
+	ifstream* all_file = new ifstream(filename.c_str());
+	// This will take a while so display the timer cursor
+	fl_cursor(FL_CURSOR_WAIT);
+	// calculate the file size and initialise the progress bar
+	streampos startpos = all_file->tellg();
+	all_file->seekg(0, ios::end);
+	streampos endpos = all_file->tellg();
+	long file_size = (long)(endpos - startpos);
+	status_->misc_status(ST_NOTE, "LOG: Starting to parse all.txt");
+	status_->progress(file_size, OT_RECORD, "Looking for queried call in WSJT-X data", "bytes");
+	// reposition back to beginning
+	all_file->seekg(0, ios::beg);
+	bool start_copying = false;
+	bool stop_copying = false;
+	// Get user callsign from settings
+	string my_call = ((qso_manager*)parent())->get_default(qso_manager::CALLSIGN);
+	// Get search items from record
+	string their_call = query_qso_->item("CALL");
+	string datestamp = query_qso_->item("QSO_DATE").substr(2);
+	string timestamp = query_qso_->item("TIME_ON");
+	string mode = query_qso_->item("MODE");
+	char msg[256];
+	// Mark QSO incomplete 
+	query_qso_->item("QSO_COMPLETE", string("N"));
+	g_query_->redraw();
+	int count = 0;
+	// Now read the file - search for the QSO start time
+	while (all_file->good() && !stop_copying) {
+		string line;
+		getline(*all_file, line);
+		count += line.length() + 1;
+		status_->progress(count, OT_RECORD);
+
+		// Does the line contain sought date, time, both calls and "Tx" or "Transmitting"
+		if (line.substr(0, 6) == datestamp &&
+			line.substr(7, 4) == timestamp.substr(0, 4) &&
+			(line.find("Transmitting") != string::npos || line.find("Tx")) &&
+			line.find(my_call) != string::npos &&
+			line.find(their_call) != string::npos &&
+			line.find(mode) != string::npos) {
+			start_copying = true;
+			snprintf(msg, 256, "DASH: %s %s %s %s %s Found possible match",
+				datestamp.c_str(),
+				timestamp.c_str(),
+				mode.c_str(),
+				my_call.c_str(),
+				their_call.c_str());
+			status_->misc_status(ST_NOTE, msg);
+		}
+		if (start_copying) {
+			if (line.find(my_call) != string::npos &&
+				line.find(their_call) != string::npos) {
+				// It has both calls - copy to buffer, and parse for QSO details (report, grid and QSO completion
+				snprintf(msg, 256, "DASH: %s", line.c_str());
+				status_->misc_status(ST_LOG, msg);
+				action_copy_all_text(line);
+			}
+			else if (line.find(my_call) == string::npos &&
+				line.find(their_call) == string::npos) {
+				// It has neither call - ignore
+			}
+			else {
+				// It has one or the other call - indicates QSO complete
+				stop_copying = true;
+				query_qso_->item("QSO_COMPLETE", string(""));
+			}
+		}
+	}
+	if (stop_copying) {
+		status_->progress("Found record!", OT_RECORD);
+		// If we are complete then say so
+		if (query_qso_->item("QSO_COMPLETE") != "N" && query_qso_->item("QSO_COMPLETE") != "?") {
+			all_file->close();
+			fl_cursor(FL_CURSOR_DEFAULT);
+		}
+	}
+	all_file->close();
+	snprintf(msg, 100, "LOG: Cannot find contact with %s in WSJT-X text.all file.", their_call.c_str());
+	status_->progress("Did not find record", OT_RECORD);
+	status_->misc_status(ST_WARNING, msg);
+	fl_cursor(FL_CURSOR_DEFAULT);
+}
+
+void qso_data::action_copy_all_text(string text) {
+	bool tx_record;
+	// After this initial processing pos will point to the start og the QSO decode string - look for old-style transmit record
+	size_t pos = text.find("Transmitting");
+	if (pos != string::npos) {
+		pos = text.find(query_qso_->item("MODE"));
+		pos += query_qso_->item("MODE").length() + 3;
+		tx_record = true;
+		// Nothing else to get from this record
+	}
+	else {
+		// Now see if it's a new-style Tx record
+		pos = text.find("Tx");
+		if (pos != string::npos) {
+			// Get frequency of transmission - including audio offset
+			string freq = text.substr(14, 9);
+			// Replace leading spaces with zeroes
+			for (size_t i = 0; freq[i] == ' '; i++) {
+				freq[i] = '0';
+			}
+			string freq_offset = text.substr(43, 4);
+			// Replace leading spaces with zeroes
+			for (size_t i = 0; freq_offset[i] == ' '; i++) {
+				freq_offset[i] = '0';
+			}
+			double frequency = stod(freq) + (stod(freq_offset) / 1000000.0);
+			query_qso_->item("FREQ", to_string(frequency));
+			pos = 48;
+			tx_record = true;
+		}
+		else {
+			// Look for a new-style Rx record
+			pos = text.find("Rx");
+			if (pos != string::npos) {
+				pos = 48;
+				tx_record = false;
+			}
+			else {
+				// Default to old-style Rx record
+				pos = 24;
+				tx_record = false;
+			}
+		}
+	}
+	// Now parse the exchange
+	vector<string> words;
+	split_line(text.substr(pos), words, ' ');
+	string report = words.back();
+	if (report == "RR73" || report == "RRR") {
+		// If we've seen the R-00 then mark the QSO complete, otherwise mark in provisional until we see the 73
+		if (query_qso_->item("QSO_COMPLETE") == "?") {
+			query_qso_->item("QSO_COMPLETE", string(""));
+		}
+		else if (query_qso_->item("QSO_COMPLETE") == "N") {
+			query_qso_->item("QSO_COMPLETE", string("?"));
+		}
+	}
+	else if (report == "73") {
+		// A 73 definitely indicates QSO compplete
+		query_qso_->item("QSO_COMPLETE", string(""));
+	}
+	else if (report[0] == 'R') {
+		// The first of the rogers
+		if (query_qso_->item("QSO_COMPLETE") == "N") {
+			query_qso_->item("QSO_COMPLETE", string("?"));
+		}
+		// Update reports if they've not been provided
+		if (tx_record && !query_qso_->item_exists("RST_SENT")) {
+			query_qso_->item("RST_SENT", report.substr(1));
+		}
+		else if (!tx_record && !query_qso_->item_exists("RST_RCVD")) {
+			query_qso_->item("RST_RCVD", report.substr(1));
+		}
+	}
+	else if (!tx_record && !query_qso_->item_exists("GRIDSQUARE")) {
+		// Update gridsquare if it's not been provided
+		query_qso_->item("GRIDSQUARE", report);
+	}
+	else if (report[0] == '-' || (report[0] >= '0' && report[0] <= '9')) {
+		// Numeric report
+		if (tx_record && !query_qso_->item_exists("RST_SENT")) {
+			query_qso_->item("RST_SENT", report);
+		}
+		else if (!tx_record && !query_qso_->item_exists("RST_RCVD")) {
+			query_qso_->item("RST_RCVD", report);
+		}
+	}
+
+}
+
+// Set current QSO from selected record
+void qso_data::action_set_current() {
+	current_qso_ = book_->get_record();
+	current_rec_num_ = book_->selection();
+}
+
+// Dummy QSO
+record* qso_data::dummy_qso() {
+	record* dummy = new record;
+	string timestamp = now(false, "%Y%m%d%H%M%S");
+	// Get current date and time in UTC
+	dummy->item("QSO_DATE", timestamp.substr(0, 8));
+	// Time as HHMMSS - always log seconds.
+	dummy->item("TIME_ON", timestamp.substr(8));
+	dummy->item("QSO_DATE_OFF", string(""));
+	dummy->item("TIME_OFF", string(""));
+	dummy->item("CALL", string(""));
+	// otherwise leave blank so that we enter it manually later.
+	dummy->item("FREQ", string(""));
+	dummy->item("FREQ_RX", string(""));
+	dummy->item("MODE", string(""));
+	dummy->item("SUBMODE", string(""));
+	dummy->item("TX_PWR", string(""));
+	// initialise fields
+	dummy->item("RX_PWR", string(""));
+	dummy->item("RST_SENT", string(""));
+	dummy->item("RST_RCVD", string(""));
+	dummy->item("NAME", string(""));
+	dummy->item("QTH", string(""));
+	dummy->item("GRIDSQUARE", string(""));
+
+	return dummy;
+}
+
+void qso_data::update_rig() {
+	// Get freq etc from QSO or rig
+// Get present values data from rig
+	if (logging_state_ == QSO_PENDING) {
+		switch (logging_mode_) {
+		case LM_OFF_AIR:
+		case LM_ON_AIR_TIME:
+			// Do nothing
+			break;
+		case LM_ON_AIR_CAT: {
+			if (rig_if_) {
+				//dial_swr_->value(rig_if_->swr_meter());
+				//dial_pwr_->value(rig_if_->pwr_meter());
+				//dial_vdd_->value(rig_if_->vdd_meter());
+				copy_cat_to_qso();
+				if (band_view_) {
+					double freq;
+					current_qso_->item("FREQ", freq);;
+					band_view_->update(freq * 1000.0);
+					prev_freq_ = freq;
+				}
+			}
+			else {
+				// We have now disconnected rig - disable selecting this logging mode
+				logging_mode_ = LM_ON_AIR_TIME;
+				enable_widgets();
+			}
+			break;
+		}
+		case LM_ON_AIR_COPY:
+		case LM_ON_AIR_CLONE:
+		{
+			break;
+		}
+		}
+	}
+}
+
+// Start a QSO as long as we are in the correct state
+void qso_data::start_qso() {
+	switch (logging_state_) {
+	case qso_data::QSO_INACTIVE:
+		action_activate();
+		// drop through
+	case qso_data::QSO_PENDING:
+		action_start();
+		break;
+	case qso_data::QSO_STARTED:
+		status_->misc_status(ST_ERROR, "DASH: Cannot start a QSO when one already started");
+		break;
+	case qso_data::QSO_EDIT:
+		status_->misc_status(ST_ERROR, "DASH: Cannot start a QSO while editing an existing one");
+		break;
+	}
+}
+
+// End a QSO as long as we are in the correct state
+void qso_data::end_qso() {
+	switch (logging_state_) {
+	case qso_data::QSO_INACTIVE:
+		status_->misc_status(ST_ERROR, "DASH: Cannot end a QSO that hasn't been started");
+		break;
+	case qso_data::QSO_PENDING:
+		action_start();
+		// drop through
+	case qso_data::QSO_STARTED:
+		action_save();
+		break;
+	case qso_data::QSO_EDIT:
+		action_save_edit();
+		break;
+	}
+}
+
+// Edit a QSO as long as we are in the correct state
+void qso_data::edit_qso() {
+	switch (logging_state_) {
+	case qso_data::QSO_INACTIVE:
+		action_edit();
+		break;
+	case qso_data::QSO_PENDING:
+	case qso_data::QSO_STARTED:
+		status_->misc_status(ST_ERROR, "DASH: Cannot edit a QSO when in on-air");
+		break;
+	case qso_data::QSO_EDIT:
+		status_->misc_status(ST_ERROR, "DASH: Cannot edit another QSO while editing an existing one");
+		break;
+	}
+}
+
+// Get logging mode
+qso_data::logging_mode_t qso_data::logging_mode() {
+	return logging_mode_;
+}
+
+// Set logging mode
+void qso_data::logging_mode(qso_data::logging_mode_t mode) {
+	logging_mode_ = mode;
+}
+
+// Get logging state
+qso_data::logging_state_t qso_data::logging_state() {
+	return logging_state_;
+}
