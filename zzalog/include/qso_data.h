@@ -1,5 +1,6 @@
 #pragma once
 
+#include "qso_contest.h"
 #include "qsl_viewer.h"
 #include "field_choice.h"
 #include "record_table.h"
@@ -118,6 +119,10 @@ public:
 	void update_query(logging_state_t query, qso_num_t match_num, qso_num_t query_num);
 	// Get default copy record
 	record* get_default_record();
+	// Initialise fields
+	void initialise_fields();
+	// Get defined fields
+	string get_defined_fields();
 
 	// Callbacks
 public:
@@ -140,22 +145,6 @@ protected:
 	static void cb_ip_field(Fl_Widget* w, void* v);
 	// Field choice - v: widget no. X1 to X7
 	static void cb_ch_field(Fl_Widget* w, void* v);
-	// Initialise setial number
-	static void cb_init_serno(Fl_Widget* w, void* v);
-	// Increment serial number
-	static void cb_inc_serno(Fl_Widget* w, void* v);
-	// Decrement serial number
-	static void cb_dec_serno(Fl_Widget* w, void* v);
-	// Define contest exchange format
-	static void cb_def_format(Fl_Widget* w, void* v);
-	// Start/Stop contest mode
-	static void cb_ena_contest(Fl_Widget* w, void* v);
-	// Pause contest mode
-	static void cb_pause_contest(Fl_Widget* w, void* v);
-	// Exchange format choice
-	static void cb_format(Fl_Widget* w, void* v);
-	// Add exchange button
-	static void cb_add_exch(Fl_Widget* w, void* v);
 	// Logging mode
 	static void cb_logging_mode(Fl_Widget* w, void* v);
 	// Notes input field
@@ -190,30 +179,20 @@ protected:
 	static void cb_bn_all_txt(Fl_Widget* w, void* v);
 
 	// Individual group creates
-	Fl_Group* create_contest_group(int X, int Y);
 	Fl_Group* create_entry_group(int X, int Y);
 	Fl_Group* create_query_group(int X, int Y);
 	Fl_Group* create_button_group(int X, int Y);
 	// Individual enable
-	void enable_contest_widgets();
 	void enable_entry_widgets();
 	void enable_query_widgets();
 	void enable_button_widgets();
 
-	// Add contest exchanges
-	void populate_exch_fmt();
-	// Copy fields from record
-	void copy_qso_to_display(int flags);
-	// Initialise fields
-	void initialise_fields();
 	// Clear display fields
 	void clear_display();
 	// Clear QSO fields
 	void clear_qso();
-	// Add new format - return format index
-	int add_format_id(string id);
-	// Add new format definition 
-	void add_format_def(int ix, bool tx);
+	// Copy fields from record
+	void copy_qso_to_display(int flags);
 	// State transition actions:-
 	// Create a new record per loging mode
 	void action_activate();
@@ -286,30 +265,6 @@ protected:
 	qso_num_t current_rec_num_;
 	// Query record number
 	qso_num_t query_rec_num_;
-	// Contest ID
-	string contest_id_;
-	// Contest exchange format index
-	int exch_fmt_ix_;
-	// And its id
-	string exch_fmt_id_;
-	// Exchanges: format ID, TX and RX fields
-	static const int MAX_CONTEST_TYPES = 100;
-	string ef_ids_[MAX_CONTEST_TYPES];
-	string ef_txs_[MAX_CONTEST_TYPES];
-	string ef_rxs_[MAX_CONTEST_TYPES];
-	int max_ef_index_;
-	// Adding an exchange
-	enum field_mode_t {
-		NO_CONTEST = 0,  // Normal non-contest logging behaviour
-		CONTEST,         // Normal contest logging behaviour
-		PAUSED,          // Log non-contest within contest logging
-		NEW,             // A new format id is selected
-		DEFINE,          // Define new contest exchange definition
-		EDIT             // Edit contest exchange definition
-	} field_mode_;
-
-	// Serial number
-	int serial_num_;
 	// Loggable field names
 	static const int NUMBER_FIXED = 10;
 	static const int NUMBER_TOTAL = NUMBER_FIXED + 12;
@@ -422,7 +377,7 @@ protected:
 
 	// Widgets
 	// Contest group
-	Fl_Group* g_contest_;
+	qso_contest* g_contest_;
 	// Entry group
 	Fl_Group* g_entry_;
 	// Query group
@@ -433,27 +388,6 @@ protected:
 	Fl_Group* grp_fpm_;
 	// Logging mode
 	Fl_Choice* ch_logmode_;
-	// Contest ID
-	field_choice* ch_contest_id_;
-	// Contest exchange
-	Fl_Input_Choice* ch_format_;
-	// Add exchange
-	Fl_Button* bn_add_exch_;
-	// Define exchanges
-	Fl_Button* bn_define_tx_;
-	Fl_Button* bn_define_rx_;
-	// TX Serial number
-	Fl_Output* op_serno_;
-	// Initialise serial number
-	Fl_Button* bn_init_serno_;
-	// Increment serial number
-	Fl_Button* bn_inc_serno_;
-	// Decrement serial number
-	Fl_Button* bn_dec_serno_;
-	// Pause contest
-	Fl_Light_Button* bn_pause_;
-	// Enable contest
-	Fl_Light_Button* bn_enable_;
 	// Notes
 	Fl_Input* ip_notes_;
 	// Field choices

@@ -234,6 +234,9 @@
     <ClCompile Include="zzalog\src\qso_data.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="zzalog\src\qso_contest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="zzalog\include\about_dialog.h">
@@ -474,6 +477,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="zzalog\include\qso_data.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zzalog\include\qso_contest.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
