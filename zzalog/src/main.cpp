@@ -427,16 +427,7 @@ void update_rig_status() {
 		// Update scratchpad
 		string freq = rig_if_->get_frequency(true);
 		if (qso_manager_) {
-			string mode;
-			string submode;
-			rig_if_->get_string_mode(mode, submode);
-			string power = rig_if_->get_tx_power();
-			if (submode.length()) {
-				qso_manager_->rig_update(freq, submode, power);
-			}
-			else {
-				qso_manager_->rig_update(freq, mode, power);
-			}
+			qso_manager_->update_rig();
 		}
 		// update_rig_status
 		// Update rig status

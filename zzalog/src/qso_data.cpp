@@ -45,19 +45,11 @@ qso_data::qso_data(int X, int Y, int W, int H, const char* l) :
 	, original_qso_(nullptr)
 	, logging_mode_(LM_OFF_AIR)
 	, logging_state_(QSO_INACTIVE)
-	, previous_locator_("")
-	, previous_qth_("")
 {
-	for (int ix = 0; ix < NUMBER_TOTAL; ix++) {
-		ip_field_[ix] = nullptr;
-		ch_field_[ix] = nullptr;
-	}
 	load_values();
 	qsl_viewer_ = new qsl_viewer(10, 10);
 	qsl_viewer_->callback(cb_qsl_viewer);
 	qsl_viewer_->hide();
-	// Initialise field input map
-	field_ip_map_.clear();
 
 }
 
@@ -79,78 +71,6 @@ void qso_data::load_values() {
 
 	logging_mode_ = (logging_mode_t)new_lm;
 
-}
-
-Fl_Group* qso_data::create_entry_group(int X, int Y) {
-	int curr_x = X;
-	int curr_y = Y;
-
-	int col2_y = curr_y;
-	int max_w = 0;
-
-	Fl_Group* g = new Fl_Group(curr_x, curr_y, 0, 0);
-	g->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
-	g->box(FL_BORDER_BOX);
-	g->labelfont(FL_BOLD);
-	g->labelsize(FL_NORMAL_SIZE + 2);
-	g->labelcolor(fl_darker(FL_BLUE));
-
-	curr_x += GAP;
-	curr_y += HTEXT;
-	// Fixed fields
-	// N rows of NUMBER_PER_ROW
-	const int NUMBER_PER_ROW = 2;
-	const int WCHOICE = WBUTTON * 3 / 2;
-	const int WINPUT = WBUTTON * 7 / 4;
-	for (int ix = 0; ix < NUMBER_TOTAL; ix++) {
-		if (ix >= NUMBER_FIXED) {
-			ch_field_[ix] = new field_choice(curr_x, curr_y, WCHOICE, HBUTTON);
-			ch_field_[ix]->align(FL_ALIGN_RIGHT);
-			ch_field_[ix]->tooltip("Specify the field to provide");
-			ch_field_[ix]->callback(cb_ch_field, (void*)ix);
-			ch_field_[ix]->set_dataset("Fields");
-		}
-		curr_x += WCHOICE;
-		ip_field_[ix] = new field_input(curr_x, curr_y, WINPUT, HBUTTON);
-		ip_field_[ix]->align(FL_ALIGN_LEFT);
-		ip_field_[ix]->tooltip("Enter required value to log");
-		ip_field_[ix]->callback(cb_ip_field, (void*)ix);
-		ip_field_[ix]->input()->when(FL_WHEN_RELEASE_ALWAYS);
-		if (ix < NUMBER_FIXED) {
-			ip_field_[ix]->field_name(fixed_names_[ix].c_str(), current_qso_);
-			field_ip_map_[fixed_names_[ix]] = ix;
-			field_names_[ix] = fixed_names_[ix];
-			ip_field_[ix]->label(fixed_names_[ix].c_str());
-		}
-		else {
-			field_names_[ix] = "";
-		}
-		number_fields_in_use_ = NUMBER_FIXED;
-		curr_x += WINPUT + GAP;
-		if (ix % NUMBER_PER_ROW == (NUMBER_PER_ROW - 1)) {
-			max_w = max(max_w, curr_x - x());
-			curr_x = X + GAP;
-			curr_y += HBUTTON;
-		}
-	}
-
-
-	max_w = max(max_w, curr_x);
-
-	// nOtes input
-	curr_x = X + WCHOICE;
-	curr_y += HBUTTON;
-
-	ip_notes_ = new intl_input(curr_x, curr_y, max_w - curr_x, HBUTTON, "NOTES");
-	ip_notes_->callback(cb_ip_notes, nullptr);
-	ip_notes_->tooltip("Add any notes for the QSO");
-
-	curr_y += HBUTTON + GAP;
-	g->resizable(nullptr);
-	g->size(max_w, curr_y - Y);
-	g->end();
-
-	return g;
 }
 
 // Query table
@@ -259,7 +179,8 @@ void qso_data::create_form(int X, int Y) {
 	curr_y = g_contest_->y() + g_contest_->h() + GAP;
 
 	// One or the other of the two groups below will be shown at a time
-	g_entry_ = create_entry_group(curr_x, curr_y);
+	g_entry_ = new qso_entry(curr_x, curr_y, 10, 10);
+
 	max_w = max(max_w, g_entry_->x() + g_entry_->w() + GAP);
 	g_query_ = create_query_group(curr_x, curr_y);
 	max_w = max(max_w, g_query_->x() + g_query_->w() + GAP);
@@ -276,67 +197,6 @@ void qso_data::create_form(int X, int Y) {
 	end();
 
 	initialise_fields();
-}
-
-
-
-// Enable field widgets
-void qso_data::enable_entry_widgets() {
-	// Now enable disan=
-	switch (logging_state_) {
-	case QSO_INACTIVE:
-		g_entry_->label("QSO entry is not enabled.");
-		g_entry_->show();
-		for (int ix = 0; ix < NUMBER_TOTAL; ix++) {
-			if (ch_field_[ix]) ch_field_[ix]->deactivate();
-			ip_field_[ix]->deactivate();
-		}
-		ip_notes_->deactivate();
-		break;
-	case QSO_PENDING:
-		g_entry_->label("QSO Entry - prepared for real-time logging.");
-		g_entry_->show();
-		for (int ix = 0; ix <= number_fields_in_use_ && ix < NUMBER_TOTAL; ix++) {
-			if (ch_field_[ix]) ch_field_[ix]->activate();
-			ip_field_[ix]->activate();
-		}
-		for (int ix = number_fields_in_use_ + 1; ix < NUMBER_TOTAL; ix++) {
-			ch_field_[ix]->deactivate();
-			ip_field_[ix]->deactivate();
-		}
-		ip_notes_->activate();
-		break;
-	case QSO_STARTED:
-		g_entry_->label("QSO Entry - active real-time logging.");
-		g_entry_->show();
-		for (int ix = 0; ix <= number_fields_in_use_ && ix < NUMBER_TOTAL; ix++) {
-			if (ch_field_[ix]) ch_field_[ix]->activate();
-			ip_field_[ix]->activate();
-		}
-		for (int ix = number_fields_in_use_ + 1; ix < NUMBER_TOTAL; ix++) {
-			ch_field_[ix]->deactivate();
-			ip_field_[ix]->deactivate();
-		}
-		ip_notes_->activate();
-		break;
-	case QSO_EDIT:
-		g_entry_->label("QSO Entry - off air editing of QSO records.");
-		g_entry_->show();
-		for (int ix = 0; ix <= number_fields_in_use_ && ix < NUMBER_TOTAL; ix++) {
-			if (ch_field_[ix]) ch_field_[ix]->activate();
-			ip_field_[ix]->activate();
-		}
-		for (int ix = number_fields_in_use_ + 1; ix < NUMBER_TOTAL; ix++) {
-			ch_field_[ix]->deactivate();
-			ip_field_[ix]->deactivate();
-		}
-		ip_notes_->activate();
-		break;
-	default:
-		// Reserver=d for Query states
-		g_entry_->hide();
-		break;
-	}
 }
 
 // Enable query widgets
@@ -390,7 +250,7 @@ void qso_data::enable_widgets() {
 	ch_logmode_->redraw();
 
 	g_contest_->enable_widgets();
-	enable_entry_widgets();
+	g_entry_->enable_widgets();
 	enable_query_widgets();
 	enable_button_widgets();
 
@@ -407,7 +267,7 @@ void qso_data::update_qso(qso_num_t log_qso) {
 		case QSO_STARTED:
 		case QSO_EDIT:
 			// Update the view if another view changes the record
-			copy_qso_to_display(qso_data::CF_ALL_FLAGS);
+			g_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
 			redraw();
 			break;
 		case QSO_BROWSE:
@@ -489,141 +349,6 @@ void qso_data::update_query(logging_state_t query, qso_num_t match_num, qso_num_
 		// TODO:
 		break;
 	}
-}
-
-// Copy record to the fields - reverse of above
-void qso_data::copy_qso_to_display(int flags) {
-	record* source = get_default_record();
-	if (source) {
-		// For each field input
-		for (int i = 0; i < NUMBER_TOTAL; i++) {
-			string field;
-			if (i < NUMBER_FIXED) field = fixed_names_[i];
-			else field = ch_field_[i]->value();
-			if (field.length()) {
-				if (flags == CF_ALL_FLAGS) {
-					// Copy all fields that have edit fields defined
-					ip_field_[i]->value(source->item(field, false, true).c_str());
-				}
-				else {
-					// Copy per flag bits
-					for (auto sf = COPY_SET.begin(); sf != COPY_SET.end(); sf++) {
-						copy_flags f = (*sf);
-						if (flags & f) {
-							for (auto fx = COPY_FIELDS.at(f).begin(); fx != COPY_FIELDS.at(f).end(); fx++) {
-								if ((*fx) == field)	ip_field_[i]->value(source->item(field, false, true).c_str());
-							}
-						}
-					}
-				}
-			}
-		}
-		ip_notes_->value(source->item("NOTES").c_str());
-		// If QTH changes tell DXA-IF to update home_location
-		check_qth_changed();
-	}
-}
-
-// Copy from an existing record: fields depend on flags set
-void qso_data::copy_qso_to_qso(record* old_record, int flags) {
-	if (current_qso_ && old_record) {
-		// For all flag bits
-		for (auto sf = COPY_SET.begin(); sf != COPY_SET.end(); sf++) {
-			copy_flags f = (*sf);
-			for (auto fx = COPY_FIELDS.at(f).begin(); fx != COPY_FIELDS.at(f).end(); fx++) {
-				if (flags & f) {
-					// If it's set copy it
-					current_qso_->item((*fx), old_record->item((*fx)));
-				}
-				else {
-					// else clear it
-					current_qso_->item(string(""));
-				}
-			}
-		}
-		copy_qso_to_display(flags);
-	}
-}
-
-// Copy fields from CAT and default rig etc.
-void qso_data::copy_cat_to_qso() {
-	string freqy = rig_if_->get_frequency(true);
-	string mode;
-	string submode;
-	rig_if_->get_string_mode(mode, submode);
-	string tx_power = rig_if_->get_tx_power();
-	switch (logging_state_) {
-	case QSO_PENDING: {
-		// Load values from rig
-		current_qso_->item("FREQ", freqy);
-		// Get mode - NB USB/LSB need further processing
-		if (mode != "DATA L" && mode != "DATA U") {
-			current_qso_->item("MODE", mode);
-			current_qso_->item("SUBMODE", submode);
-		}
-		else {
-			current_qso_->item("MODE", string(""));
-			current_qso_->item("SUBMODE", string(""));
-		}
-		current_qso_->item("TX_PWR", tx_power);
-		break;
-	}
-	case QSO_STARTED: {
-		// Ignore values except TX_PWR which accumulates maximum value
-		char message[128];
-		if (current_qso_->item("FREQ") != freqy) {
-			snprintf(message, 128, "DASH: Rig frequency changed during QSO, New value %s", freqy.c_str());
-			status_->misc_status(ST_WARNING, message);
-			current_qso_->item("FREQ", freqy);
-		}
-		if (current_qso_->item("MODE") != mode) {
-			snprintf(message, 128, "DASH: Rig mode changed during QSO, New value %s", mode.c_str());
-			status_->misc_status(ST_WARNING, message);
-			current_qso_->item("MODE", mode);
-		}
-		if (current_qso_->item("SUBMODE") != submode) {
-			snprintf(message, 128, "DASH: Rig submode changed during QSO, New value %s", submode.c_str());
-			status_->misc_status(ST_WARNING, message);
-			current_qso_->item("SUBMODE", submode);
-		}
-		current_qso_->item("TX_PWR", tx_power);
-		break;
-	}
-	}
-	copy_qso_to_display(CF_CAT);
-}
-
-// Copy current timestamp to QSO
-void qso_data::copy_clock_to_qso(time_t clock) {
-	// Only allow this if in activate - will be called every second 
-	if (current_qso_) {
-		tm* value = gmtime(&clock);
-		char result[100];
-		// convert date
-		strftime(result, 99, "%Y%m%d", value);
-		current_qso_->item("QSO_DATE", string(result));
-		// convert time
-		strftime(result, 99, "%H%M%S", value);
-		current_qso_->item("TIME_ON", string(result));
-		current_qso_->item("QSO_DATE_OFF", string(""));
-		current_qso_->item("TIME_OFF", string(""));
-
-		copy_qso_to_display(CF_TIME);
-	}
-}
-
-// Clear fields
-void qso_data::clear_display() {
-	for (int i = 0; i < NUMBER_TOTAL; i++) {
-		ip_field_[i]->value("");
-	}
-	ip_notes_->value("");
-}
-
-// Clear fields in current QSO
-void qso_data::clear_qso() {
-	current_qso_->delete_contents();
-	copy_qso_to_display(CF_QSO);
 }
 
 // Select logging mode
@@ -720,7 +445,7 @@ void qso_data::cb_edit(Fl_Widget* w, void* v) {
 // Callback - Worked B4? button
 void qso_data::cb_wkb4(Fl_Widget* w, void* v) {
 	qso_data* that = ancestor_view<qso_data>(w);
-	extract_records_->extract_call(string(that->ip_field_[that->field_ip_map_["CALL"]]->value()));
+	extract_records_->extract_call(that->g_entry_->get_call());
 	book_->selection(that->current_rec_num_, HT_SELECTED);
 }
 
@@ -731,7 +456,7 @@ void qso_data::cb_parse(Fl_Widget* w, void* v) {
 	record* tip_record = that->dummy_qso();
 	string message = "";
 	// Set the callsign in the temporary record
-	tip_record->item("CALL", string(that->ip_field_[that->field_ip_map_["CALL"]]->value()));
+	tip_record->item("CALL", string(that->g_entry_->get_call()));
 	// Parse the temporary record
 	message = pfx_data_->get_tip(tip_record);
 	// Create a tooltip window at the parse button (in w) X and Y
@@ -774,7 +499,7 @@ void qso_data::cb_bn_edit_qth(Fl_Widget* w, void* v) {
 		for (auto fx = changed_fields.begin(); fx != changed_fields.end(); fx++) {
 			current->item(*fx, macro->item(*fx));
 		}
-		that->check_qth_changed();
+		that->g_entry_->check_qth_changed();
 		that->enable_widgets();
 		break;
 	case BN_CANCEL:
@@ -894,77 +619,6 @@ void qso_data::cb_bn_all_txt(Fl_Widget* w, void* v) {
 }
 
 
-// Callback change field selected
-void qso_data::cb_ch_field(Fl_Widget* w, void* v) {
-	qso_data* that = ancestor_view<qso_data>(w);
-	field_choice* ch = (field_choice*)w;
-	const char* field = ch->value();
-	int ix = (int)(long)v;
-	if (strlen(field)) {
-		that->action_add_field(ix, field);
-	}
-	else {
-		that->action_del_field(ix);
-	}
-}
-
-// Callback - general input
-// v - index of input widget
-void qso_data::cb_ip_field(Fl_Widget* w, void* v) {
-	qso_data* that = ancestor_view<qso_data>(w);
-	field_input* ip = (field_input*)w;
-	string field = ip->field_name();
-	string value = ip->value();
-	that->current_qso_->item(field, value);
-
-	if (field == "FREQ") {
-		double freq = atof(value.c_str()) * 1000;
-		if (band_view_) {
-			band_view_->update(freq);
-		}
-		prev_freq_ = freq;
-	}
-	else if (field == "MODE") {
-		if (spec_data_->is_submode(value)) {
-			that->current_qso_->item("SUBMODE", value);
-			that->current_qso_->item("MODE", spec_data_->mode_for_submode(value));
-		}
-		else {
-			that->current_qso_->item("MODE", value);
-			that->current_qso_->item("SUBMODE", string(""));
-		}
-	}
-	else if (field == "APP_ZZA_QTH") {
-		// Send new value to spec_data to create an empty entry if it's a new one
-		if (!ip->menubutton()->changed()) {
-			macro_defn entry = { nullptr, "" };
-			spec_data_->add_user_macro(field, value, entry);
-		}
-		that->check_qth_changed();
-	}
-	// Update other views if editing or logging
-	switch (that->logging_state_) {
-	case QSO_INACTIVE:
-	case QSO_PENDING:
-		break;
-	case QSO_STARTED:
-	case QSO_EDIT:
-		tabbed_forms_->update_views(nullptr, HT_MINOR_CHANGE, that->current_rec_num_);
-		break;
-	default:
-		break;
-	}
-}
-
-// Callback -notes input
-// v - not used
-void qso_data::cb_ip_notes(Fl_Widget* w, void* v) {
-	qso_data* that = ancestor_view<qso_data>(w);
-	string notes;
-	cb_value<intl_input, string>(w, &notes);
-	that->current_qso_->item("NOTES", notes);
-	tabbed_forms_->update_views(nullptr, HT_MINOR_CHANGE, book_->size() - 1);
-}
 
 // Callback - table
 void qso_data::cb_tab_qso(Fl_Widget* w, void* v) {
@@ -978,7 +632,7 @@ void qso_data::cb_tab_qso(Fl_Widget* w, void* v) {
 	switch (table->callback_context()) {
 	case Fl_Table::CONTEXT_ROW_HEADER:
 		if (button == FL_LEFT_MOUSE && double_click) {
-			that->action_add_field(that->number_fields_in_use_, field);
+			that->g_entry_->action_add_field(-1, field);
 		}
 		break;
 	case Fl_Table::CONTEXT_CELL:
@@ -1035,30 +689,7 @@ void qso_data::initialise_fields() {
 		lock_preset = false;
 		break;
 	}
-	// Now set fields
-	vector<string> field_names;
-	split_line(preset_fields, field_names, ',');
-	size_t ix = 0;
-	int iy;
-	for (ix = 0, iy = NUMBER_FIXED; ix < field_names.size(); ix++, iy++) {
-		if (new_fields) {
-			ch_field_[iy]->value(field_names[ix].c_str());
-			ip_field_[iy]->field_name(field_names[ix].c_str(), current_qso_);
-			field_names_[iy] = field_names[ix];
-		}
-		if (lock_preset) {
-			ch_field_[iy]->deactivate();
-		}
-		else {
-			ch_field_[iy]->activate();
-		}
-	}
-	number_fields_in_use_ = NUMBER_FIXED + field_names.size();
-	for (; iy < NUMBER_TOTAL; iy++) {
-		ch_field_[iy]->value("");
-		ip_field_[iy]->value("");
-		ip_field_[iy]->field_name("");
-	}
+	g_entry_->initialise_fields(preset_fields, new_fields, lock_preset);
 	// TODO this shoule be somewhere else
 	//// Set contest format
 	//ch_format_->value(exch_fmt_id_.c_str());
@@ -1069,54 +700,12 @@ void qso_data::initialise_fields() {
 			action_set_current();
 			action_activate();
 		}
-
-		vector<string> fields;
-		split_line(preset_fields, fields, ',');
-		for (size_t i = 0; i < fields.size(); i++) {
-			int ix = NUMBER_FIXED + i;
-			string contest_mode = spec_data_->dxcc_mode(current_qso_->item("MODE"));
-			if (fields[i] == "RST_SENT" || fields[i] == "RST_RCVD") {
-				if (contest_mode == "CW" || contest_mode == "DATA") {
-					current_qso_->item(fields[i], string("599"));
-				}
-				else {
-					current_qso_->item(fields[i], string("59"));
-				}
-			}
-			else if (fields[i] == "STX") {
-				char text[10];
-				snprintf(text, 10, "%03d", g_contest_->serial_number());
-				current_qso_->item(fields[i], string(text));
-			}
-			ip_field_[ix]->value(current_qso_->item(fields[i]).c_str());
-		}
-		ip_field_[field_ip_map_["CALL"]]->value("");
-		ip_notes_->value("");
-		for (size_t i = NUMBER_FIXED + fields.size(); i < NUMBER_TOTAL; i++) {
-			ip_field_[i]->value("");
-		}
 	}
-	else {
-		ip_field_[field_ip_map_["CALL"]]->value("");
-		ip_notes_->value("");
-		for (int i = NUMBER_FIXED; i < NUMBER_TOTAL; i++) {
-			ip_field_[i]->value("");
-		}
-	}
+	g_entry_->initialise_values(preset_fields, g_contest_->serial_number());
 }
 
 string qso_data::get_defined_fields() {
-	string defn = "";
-	for (int i = NUMBER_FIXED; i < NUMBER_TOTAL; i++) {
-		const char* field = ch_field_[i]->value();
-		if (strlen(field)) {
-			if (i > NUMBER_FIXED) {
-				defn += ",";
-			}
-			defn += field;
-		}
-	}
-	return defn;
+	return g_entry_->get_defined_fields();
 }
 
 // Get default record to copy
@@ -1141,21 +730,6 @@ record* qso_data::get_default_record() {
 	}
 }
 
-// Check if QTH has changed and action change (redraw DxAtlas
-void qso_data::check_qth_changed() {
-	record* current = get_default_record();
-	if (current) {
-		if (current->item("MY_GRIDSQUARE", true) != previous_locator_ ||
-			current->item("APP_ZZA_QTH") != previous_qth_) {
-			previous_locator_ = current->item("MY_GRIDSQUARE", true);
-			previous_qth_ = current->item("APP_ZZA_QTH");
-#ifdef _WIN32
-			if (dxa_if_) dxa_if_->update(HT_LOCATION);
-#endif
-		}
-	}
-}
-
 // Action ACTIVATE: transition from QSO_INACTIVE to QSO_PENDING
 void qso_data::action_activate() {
 	record* source_record = current_qso_;
@@ -1167,28 +741,28 @@ void qso_data::action_activate() {
 	switch (logging_mode_) {
 	case LM_OFF_AIR:
 		// Just copy the station details
-		copy_qso_to_qso(source_record, CF_RIG_ETC);
+		g_entry_->copy_qso_to_qso(source_record, qso_entry::CF_RIG_ETC);
 		break;
 	case LM_ON_AIR_CAT:
 		// Copy station details and get read rig details for band etc.
-		copy_qso_to_qso(source_record, CF_RIG_ETC);
-		copy_cat_to_qso();
-		copy_clock_to_qso(now);
+		g_entry_->copy_qso_to_qso(source_record, qso_entry::CF_RIG_ETC);
+		g_entry_->copy_cat_to_qso();
+		g_entry_->copy_clock_to_qso(now);
 		break;
 	case LM_ON_AIR_CLONE:
 		// Clone the QSO - get station and band from original QSO
-		copy_qso_to_qso(source_record, CF_RIG_ETC | CF_CAT);
-		copy_clock_to_qso(now);
+		g_entry_->copy_qso_to_qso(source_record, qso_entry::CF_RIG_ETC | qso_entry::CF_CAT);
+		g_entry_->copy_clock_to_qso(now);
 		break;
 	case LM_ON_AIR_COPY:
 		// Copy the QSO - as abobe but also same callsign and details
-		copy_qso_to_qso(source_record, CF_RIG_ETC | CF_CAT | CF_CONTACT);
-		copy_clock_to_qso(now);
+		g_entry_->copy_qso_to_qso(source_record, qso_entry::CF_RIG_ETC | qso_entry::CF_CAT | qso_entry::CF_CONTACT);
+		g_entry_->copy_clock_to_qso(now);
 		break;
 	case LM_ON_AIR_TIME:
 		// Copy the station details and set the current date/time.
-		copy_qso_to_qso(source_record, CF_RIG_ETC);
-		copy_clock_to_qso(now);
+		g_entry_->copy_qso_to_qso(source_record, qso_entry::CF_RIG_ETC);
+		g_entry_->copy_clock_to_qso(now);
 		break;
 	}
 	initialise_fields();
@@ -1261,7 +835,7 @@ void qso_data::action_cancel() {
 	book_->delete_record(true);
 	delete current_qso_;
 	current_qso_ = nullptr;
-	check_qth_changed();
+	g_entry_->check_qth_changed();
 	enable_widgets();
 	qsl_viewer_->hide();
 }
@@ -1279,7 +853,7 @@ void qso_data::action_edit() {
 	// Save a copy of the current record
 	original_qso_ = new record(*current_qso_);
 	logging_state_ = QSO_EDIT;
-	copy_qso_to_display(CF_ALL_FLAGS);
+	g_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
 	enable_widgets();
 }
 
@@ -1305,7 +879,7 @@ void qso_data::action_cancel_edit() {
 	current_qso_ = nullptr;
 	current_rec_num_ = -1;
 	logging_state_ = QSO_INACTIVE;
-	copy_qso_to_display(CF_ALL_FLAGS);
+	g_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
 	enable_widgets();
 	qsl_viewer_->hide();
 }
@@ -1315,7 +889,7 @@ void qso_data::action_cancel_browse() {
 	current_qso_ = nullptr;
 	current_rec_num_ = -1;
 	logging_state_ = QSO_INACTIVE;
-	copy_qso_to_display(CF_ALL_FLAGS);
+	g_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
 	enable_widgets();
 	qsl_viewer_->hide();
 }
@@ -1384,60 +958,6 @@ void qso_data::action_view_qsl() {
 	}
 }
 
-// Action add field - add the selected field to the set of entries
-void qso_data::action_add_field(int ix, string field) {
-	if (ix == NUMBER_TOTAL) {
-		char msg[128];
-		snprintf(msg, 128, "DASH: Cannot add any more fields to edit - %s ignored", field.c_str());
-		status_->misc_status(ST_ERROR, msg);
-		return;
-	}
-	if (ix < number_fields_in_use_) {
-		const char* old_field = field_names_[ix].c_str();
-		ip_field_[ix]->field_name(field.c_str(), current_qso_);
-		ip_field_[ix]->value(current_qso_->item(field).c_str());
-		// Change mapping
-		if (strlen(old_field)) {
-			field_ip_map_.erase(old_field);
-		}
-		field_ip_map_[field] = ix;
-		field_names_[ix] = field;
-	}
-	else if (ix == number_fields_in_use_) {
-		if (field_ip_map_.find(field) == field_ip_map_.end()) {
-			number_fields_in_use_++;
-			ch_field_[ix]->value(field.c_str());
-			ip_field_[ix]->field_name(field.c_str(), current_qso_);
-			ip_field_[ix]->value(current_qso_->item(field).c_str());
-			field_ip_map_[field] = ix;
-			field_names_[ix] = field;
-		}
-	}
-	else {
-		status_->misc_status(ST_SEVERE, "DASH: Trying to select a deactivated widget");
-	}
-	enable_entry_widgets();
-}
-
-// Delete a field
-void qso_data::action_del_field(int ix) {
-	string& old_field = field_names_[ix];
-	field_ip_map_.erase(old_field);
-	int pos = ix;
-	for (; pos < number_fields_in_use_ - 1; pos++) {
-		string& field = field_names_[pos + 1];
-		field_names_[pos] = field;
-		ch_field_[pos]->value(field.c_str());
-		ip_field_[pos]->field_name(field.c_str(), current_qso_);
-		ip_field_[pos]->value(current_qso_->item(field).c_str());
-	}
-	ch_field_[pos]->value("");
-	ip_field_[pos]->field_name("");
-	ip_field_[pos]->value("");
-	number_fields_in_use_--;
-
-	enable_entry_widgets();
-}
 
 // Action browse
 void qso_data::action_browse() {
@@ -1560,8 +1080,8 @@ void qso_data::action_handle_dclick(int col, string field) {
 	case QRZ_MERGE:
 		switch (col) {
 		case 0:
-			// Treat as if clicking roe header
-			action_add_field(number_fields_in_use_, field);
+			// Treat as if clicking row header
+			g_entry_->action_add_field(-1, field);
 			break;
 		case 1:
 			// Copy log field
@@ -1816,7 +1336,7 @@ void qso_data::update_rig() {
 				//dial_swr_->value(rig_if_->swr_meter());
 				//dial_pwr_->value(rig_if_->pwr_meter());
 				//dial_vdd_->value(rig_if_->vdd_meter());
-				copy_cat_to_qso();
+				g_entry_->copy_cat_to_qso();
 				if (band_view_) {
 					double freq;
 					current_qso_->item("FREQ", freq);;
@@ -1905,4 +1425,19 @@ void qso_data::logging_mode(qso_data::logging_mode_t mode) {
 // Get logging state
 qso_data::logging_state_t qso_data::logging_state() {
 	return logging_state_;
+}
+
+// Current QSO
+record* qso_data::current_qso() {
+	return current_qso_;
+}
+
+// Current QSO record number
+qso_num_t qso_data::current_qso_num() {
+	return current_rec_num_;
+}
+
+// Update time
+void qso_data::update_time(time_t when) {
+	g_entry_->copy_clock_to_qso(when);
 }

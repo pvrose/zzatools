@@ -85,9 +85,7 @@ using namespace std;
 		void logging_mode(qso_data::logging_mode_t mode);
 		// Get logging state
 		qso_data::logging_state_t logging_state();
-		// Called when rig is read
-		void rig_update(string frequency, string mode, string power);
-		// Called when rig is changed
+		// Called when rig is read or changed
 		void update_rig();
 		// Switch rig status
 		void switch_rig();

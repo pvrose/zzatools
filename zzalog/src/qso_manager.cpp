@@ -240,15 +240,6 @@ void qso_manager::switch_rig() {
 	connect_group_->switch_rig();
 }
 
-// Called when rig is read to update values here
-void qso_manager::rig_update(string frequency, string mode, string power) {
-	if ((data_group_->logging_state() == qso_data::QSO_PENDING ||
-		data_group_->logging_state() == qso_data::QSO_STARTED) &&
-		data_group_->logging_mode() == qso_data::LM_ON_AIR_CAT) {
-		data_group_->copy_cat_to_qso();
-	}
-}
-
 // Get QSO information from previous record not rig
 void qso_manager::update_rig() {
 	data_group_->update_rig();
@@ -349,5 +340,5 @@ string qso_manager::get_default(stn_item_t item) {
 
 // Update the time
 void qso_manager::update_time(time_t when) {
-	data_group_->copy_clock_to_qso(when);
+	data_group_->update_time(when);
 }

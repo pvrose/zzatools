@@ -1,6 +1,7 @@
 #pragma once
 
 #include "qso_contest.h"
+#include "qso_entry.h"
 #include "qsl_viewer.h"
 #include "field_choice.h"
 #include "record_table.h"
@@ -48,27 +49,6 @@ public:
 		QRZ_MERGE,       // Merge details downloaded from QRZ.com
 	};
 
-	enum copy_flags : int {
-		CF_NONE = 0,
-		CF_RIG_ETC = 1,
-		CF_CAT = 2,
-		CF_TIME = 4,
-		CF_CONTACT = 8,
-		CF_REPORTS = 16,
-		CF_QSO = CF_RIG_ETC | CF_CAT | CF_TIME | CF_CONTACT,
-		CF_ALL_FLAGS = -1
-	};
-
-	const map < copy_flags, set<string> > COPY_FIELDS =
-	{
-		{ CF_RIG_ETC, { "MY_RIG", "MY_ANTENNA", "STATION_CALLSIGN", "APP_ZZA_QTH" } },
-		{ CF_CAT, { "MODE", "FREQ", "SUBMODE", "TX_PWR", "BAND"} },
-		{ CF_TIME, { "QSO_DATE", "QSO_DATE_OFF", "TIME_ON", "TIME_OFF" } },
-		{ CF_CONTACT, { "CALL", "NAME", "QTH", "DXCC", "STATE", "CNTY", "GRIDSQUARE", "CQZ", "ITUZ" } },
-		{ CF_REPORTS, { "RST_SENT", "RST_RCVD", "SRX", "STX" }}
-	};
-
-	const set < copy_flags > COPY_SET = { CF_RIG_ETC, CF_CAT, CF_TIME, CF_CONTACT, CF_REPORTS };
 
 	enum dupe_flags : int {
 		DF_1,
@@ -105,14 +85,6 @@ public:
 	void logging_mode(qso_data::logging_mode_t mode);
 	// Get logging state
 	qso_data::logging_state_t logging_state();
-	// Copy from an existing record
-	void copy_qso_to_qso(record* old_record, int flags);
-	// Copy fields from CAT
-	void copy_cat_to_qso();
-	// Copy clock to QSO
-	void copy_clock_to_qso(time_t clock);
-	// Update rig in QSO
-	void update_rig();
 	// Update QSO
 	void update_qso(qso_num_t log_num);
 	// Update query
@@ -123,6 +95,14 @@ public:
 	void initialise_fields();
 	// Get defined fields
 	string get_defined_fields();
+	// Current QSO
+	record* current_qso();
+	// Curernt QSO number
+	qso_num_t current_qso_num();
+	// Update view and 
+	void update_rig();
+	// Update clock
+	void update_time(time_t when);
 
 	// Callbacks
 public:
@@ -141,14 +121,8 @@ protected:
 	static void cb_wkb4(Fl_Widget* w, void* v);
 	// Callback - Parse callsign
 	static void cb_parse(Fl_Widget* w, void* v);
-	// Field input - v: field name
-	static void cb_ip_field(Fl_Widget* w, void* v);
-	// Field choice - v: widget no. X1 to X7
-	static void cb_ch_field(Fl_Widget* w, void* v);
 	// Logging mode
 	static void cb_logging_mode(Fl_Widget* w, void* v);
-	// Notes input field
-	static void cb_ip_notes(Fl_Widget* w, void* v);
 	// Edit QTH details
 	static void cb_bn_edit_qth(Fl_Widget* w, void* v);
 	// Navigate buttons
@@ -179,20 +153,12 @@ protected:
 	static void cb_bn_all_txt(Fl_Widget* w, void* v);
 
 	// Individual group creates
-	Fl_Group* create_entry_group(int X, int Y);
 	Fl_Group* create_query_group(int X, int Y);
 	Fl_Group* create_button_group(int X, int Y);
 	// Individual enable
-	void enable_entry_widgets();
 	void enable_query_widgets();
 	void enable_button_widgets();
 
-	// Clear display fields
-	void clear_display();
-	// Clear QSO fields
-	void clear_qso();
-	// Copy fields from record
-	void copy_qso_to_display(int flags);
 	// State transition actions:-
 	// Create a new record per loging mode
 	void action_activate();
@@ -216,10 +182,6 @@ protected:
 	void action_view_qsl();
 	// Browse record
 	void action_browse();
-	// Action add field to widgets
-	void action_add_field(int ix, string field);
-	// Action delete field
-	void action_del_field(int ix);
 	// Action cancel browse
 	void action_cancel_browse();
 	// Action add query
@@ -245,10 +207,6 @@ protected:
 	// Set current QSO from selected record
 	void action_set_current();
 
-	// QTH has changed
-	void check_qth_changed();
-
-
 	// Logging mode
 	logging_mode_t logging_mode_;
 	// Logging state
@@ -265,16 +223,6 @@ protected:
 	qso_num_t current_rec_num_;
 	// Query record number
 	qso_num_t query_rec_num_;
-	// Loggable field names
-	static const int NUMBER_FIXED = 10;
-	static const int NUMBER_TOTAL = NUMBER_FIXED + 12;
-	const string fixed_names_[NUMBER_FIXED] = {
-		"MY_RIG", "MY_ANTENNA", "APP_ZZA_QTH", "STATION_CALLSIGN",
-		"QSO_DATE", "TIME_ON", "CALL", "FREQ",
-		"MODE", "TX_PWR" };
-	map<string, int> field_ip_map_;
-	string field_names_[NUMBER_TOTAL];
-	int number_fields_in_use_;
 
 	enum button_type {
 		ACTIVATE,
@@ -369,9 +317,6 @@ protected:
 		{ LOOK_ALL_TXT, { "all.txt?", "Look in WSJT-X all.txt file for possible contact", COLOUR_NAVY, cb_bn_all_txt, 0 } },
 	};
 
-	// Previous value
-	string previous_qth_;
-	string previous_locator_;
 	// Query message
 	string query_message_;
 
@@ -379,7 +324,7 @@ protected:
 	// Contest group
 	qso_contest* g_contest_;
 	// Entry group
-	Fl_Group* g_entry_;
+	qso_entry* g_entry_;
 	// Query group
 	Fl_Group* g_query_;
 	// Button group
@@ -388,12 +333,6 @@ protected:
 	Fl_Group* grp_fpm_;
 	// Logging mode
 	Fl_Choice* ch_logmode_;
-	// Notes
-	Fl_Input* ip_notes_;
-	// Field choices
-	field_choice* ch_field_[NUMBER_TOTAL];
-	// field inputs
-	field_input* ip_field_[NUMBER_TOTAL];
 	// QSL Viewer window
 	qsl_viewer* qsl_viewer_;
 	// Record table
