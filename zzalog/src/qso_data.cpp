@@ -73,39 +73,6 @@ void qso_data::load_values() {
 
 }
 
-// Query table
-Fl_Group* qso_data::create_query_group(int X, int Y) {
-
-	int curr_x = X;
-	int curr_y = Y;
-
-	Fl_Group* g = new Fl_Group(curr_x, curr_y, 0, 0);
-	g->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
-	g->box(FL_BORDER_BOX);
-	g->labelfont(FL_BOLD);
-	g->labelsize(FL_NORMAL_SIZE + 2);
-	g->labelcolor(fl_darker(FL_RED));
-
-	const int WTABLE = 420;
-	const int HTABLE = 250;
-
-	curr_x += GAP;
-	curr_y += HTEXT;
-
-	tab_query_ = new record_table(curr_x, curr_y, WTABLE, HTABLE);
-	tab_query_->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
-	tab_query_->callback(cb_tab_qso, nullptr);
-
-	curr_x += WTABLE + GAP;
-	curr_y += HTABLE + GAP;
-
-	g->resizable(nullptr);
-	g->size(curr_x - X, curr_y - Y);
-	g->end();
-
-	return g;
-}
-
 // QSO control group
 Fl_Group* qso_data::create_button_group(int X, int Y) {
 	int curr_x = X;
@@ -182,7 +149,8 @@ void qso_data::create_form(int X, int Y) {
 	g_entry_ = new qso_entry(curr_x, curr_y, 10, 10);
 
 	max_w = max(max_w, g_entry_->x() + g_entry_->w() + GAP);
-	g_query_ = create_query_group(curr_x, curr_y);
+	g_query_ = new qso_query(curr_x, curr_y, 10, 10);
+
 	max_w = max(max_w, g_query_->x() + g_query_->w() + GAP);
 	curr_y = max(g_entry_->y() + g_entry_->h(), g_query_->y() + g_query_->h()) + GAP;
 
@@ -197,23 +165,6 @@ void qso_data::create_form(int X, int Y) {
 	end();
 
 	initialise_fields();
-}
-
-// Enable query widgets
-void qso_data::enable_query_widgets() {
-	switch (logging_state_) {
-	case QSO_INACTIVE:
-	case QSO_PENDING:
-	case QSO_STARTED:
-	case QSO_EDIT:
-		g_query_->hide();
-		break;
-	case QSO_BROWSE:
-	default:
-		g_query_->show();
-		tab_query_->activate();
-		break;
-	}
 }
 
 // Enable action buttons
@@ -251,7 +202,7 @@ void qso_data::enable_widgets() {
 
 	g_contest_->enable_widgets();
 	g_entry_->enable_widgets();
-	enable_query_widgets();
+	g_query_->enable_widgets();
 	enable_button_widgets();
 
 }
@@ -271,7 +222,7 @@ void qso_data::update_qso(qso_num_t log_qso) {
 			redraw();
 			break;
 		case QSO_BROWSE:
-			tab_query_->redraw();
+			g_query_->redraw();
 			break;
 		}
 	}
@@ -618,31 +569,6 @@ void qso_data::cb_bn_all_txt(Fl_Widget* w, void* v) {
 	}
 }
 
-
-
-// Callback - table
-void qso_data::cb_tab_qso(Fl_Widget* w, void* v) {
-	qso_data* that = ancestor_view<qso_data>(w);
-	record_table* table = (record_table*)w;
-	int row = table->callback_row();
-	int col = table->callback_col();
-	int button = Fl::event_button();
-	bool double_click = Fl::event_clicks();
-	string field = table->field(row);
-	switch (table->callback_context()) {
-	case Fl_Table::CONTEXT_ROW_HEADER:
-		if (button == FL_LEFT_MOUSE && double_click) {
-			that->g_entry_->action_add_field(-1, field);
-		}
-		break;
-	case Fl_Table::CONTEXT_CELL:
-		if (button == FL_LEFT_MOUSE && double_click) {
-			that->action_handle_dclick(col, field);
-		}
-		break;
-	}
-}
-
 // Save the settings
 void qso_data::save_values() {
 	// Dashboard configuration
@@ -962,7 +888,8 @@ void qso_data::action_view_qsl() {
 // Action browse
 void qso_data::action_browse() {
 	logging_state_ = QSO_BROWSE;
-	tab_query_->set_records(current_qso_, nullptr, nullptr);
+	original_qso_ = nullptr;
+	query_qso_ = nullptr;
 	g_query_->label("Browsing record");
 	enable_widgets();
 }
@@ -1002,7 +929,6 @@ void qso_data::action_query(logging_state_t query) {
 		return;
 	}
 	logging_state_ = query;
-	tab_query_->set_records(current_qso_, query_qso_, original_qso_);
 	enable_widgets();
 	// Move window to top
 	parent()->show();
@@ -1430,6 +1356,16 @@ qso_data::logging_state_t qso_data::logging_state() {
 // Current QSO
 record* qso_data::current_qso() {
 	return current_qso_;
+}
+
+// Current QSO
+record* qso_data::original_qso() {
+	return original_qso_;
+}
+
+// Current QSO
+record* qso_data::query_qso() {
+	return query_qso_;
 }
 
 // Current QSO record number

@@ -2,6 +2,7 @@
 
 #include "qso_contest.h"
 #include "qso_entry.h"
+#include "qso_query.h"
 #include "qsl_viewer.h"
 #include "field_choice.h"
 #include "record_table.h"
@@ -97,12 +98,18 @@ public:
 	string get_defined_fields();
 	// Current QSO
 	record* current_qso();
+	// Query QSO
+	record* query_qso();
+	// Original QSO
+	record* original_qso();
 	// Curernt QSO number
 	qso_num_t current_qso_num();
 	// Update view and 
 	void update_rig();
 	// Update clock
 	void update_time(time_t when);
+	// Action handle d-click
+	void action_handle_dclick(int col, string field);
 
 	// Callbacks
 public:
@@ -133,8 +140,6 @@ protected:
 	static void cb_bn_view_qsl(Fl_Widget* w, void* v);
 	// Browse call back
 	static void cb_bn_browse(Fl_Widget* w, void* v);
-	// Record table
-	static void cb_tab_qso(Fl_Widget* w, void* v);
 	// Add query
 	static void cb_bn_add_query(Fl_Widget* w, void* v);
 	// Reject query
@@ -153,10 +158,8 @@ protected:
 	static void cb_bn_all_txt(Fl_Widget* w, void* v);
 
 	// Individual group creates
-	Fl_Group* create_query_group(int X, int Y);
 	Fl_Group* create_button_group(int X, int Y);
 	// Individual enable
-	void enable_query_widgets();
 	void enable_button_widgets();
 
 	// State transition actions:-
@@ -196,8 +199,6 @@ protected:
 	void action_query(logging_state_t query);
 	// Action handle dupe
 	void action_handle_dupe(dupe_flags action);
-	// Action handle d-click
-	void action_handle_dclick(int col, string field);
 	// Action merge from QRZ.com
 	void action_save_merge();
 	// Look in all.txt
@@ -317,8 +318,6 @@ protected:
 		{ LOOK_ALL_TXT, { "all.txt?", "Look in WSJT-X all.txt file for possible contact", COLOUR_NAVY, cb_bn_all_txt, 0 } },
 	};
 
-	// Query message
-	string query_message_;
 
 	// Widgets
 	// Contest group
@@ -326,7 +325,7 @@ protected:
 	// Entry group
 	qso_entry* g_entry_;
 	// Query group
-	Fl_Group* g_query_;
+	qso_query* g_query_;
 	// Button group
 	Fl_Group* g_buttons_;
 	// Group for freq/power/mode
@@ -335,8 +334,6 @@ protected:
 	Fl_Choice* ch_logmode_;
 	// QSL Viewer window
 	qsl_viewer* qsl_viewer_;
-	// Record table
-	record_table* tab_query_;
 	// Action buttos
 	Fl_Button* bn_action_[MAX_ACTIONS];
 
