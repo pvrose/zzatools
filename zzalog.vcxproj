@@ -134,6 +134,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="zzalog\src\page_dialog.cpp" />
+    <ClCompile Include="zzalog\src\qso_buttons.cpp" />
     <ClCompile Include="zzalog\src\qso_clock.cpp" />
     <ClCompile Include="zzalog\src\qso_connector.cpp" />
     <ClCompile Include="zzalog\src\qso_contest.cpp" />
@@ -217,6 +218,7 @@
     <ClInclude Include="zzalog\include\callback.h" />
     <ClInclude Include="zzalog\include\formats.h" />
     <ClInclude Include="zzalog\include\page_dialog.h" />
+    <ClInclude Include="zzalog\include\qso_buttons.h" />
     <ClInclude Include="zzalog\include\qso_clock.h" />
     <ClInclude Include="zzalog\include\qso_connector.h" />
     <ClInclude Include="zzalog\include\qso_contest.h" />

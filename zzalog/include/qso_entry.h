@@ -85,8 +85,6 @@ public:
 	// Action delete field
 	void action_del_field(int ix);
 
-	// QTH has changed
-	void check_qth_changed();
 	// Get callsign
 	string get_call();
 
@@ -114,9 +112,6 @@ protected:
 	field_input* ip_field_[NUMBER_TOTAL];
 	// Parent qso_data
 	qso_data* qso_data_;
-	// Previous value
-	string previous_qth_;
-	string previous_locator_;
 
 };
 

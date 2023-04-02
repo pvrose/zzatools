@@ -205,22 +205,7 @@ void qso_entry::copy_qso_to_display(int flags) {
 		}
 		ip_notes_->value(source->item("NOTES").c_str());
 		// If QTH changes tell DXA-IF to update home_location
-		check_qth_changed();
-	}
-}
-
-// Check if QTH has changed and action change (redraw DxAtlas
-void qso_entry::check_qth_changed() {
-	record* current = qso_data_->get_default_record();
-	if (current) {
-		if (current->item("MY_GRIDSQUARE", true) != previous_locator_ ||
-			current->item("APP_ZZA_QTH") != previous_qth_) {
-			previous_locator_ = current->item("MY_GRIDSQUARE", true);
-			previous_qth_ = current->item("APP_ZZA_QTH");
-#ifdef _WIN32
-			if (dxa_if_) dxa_if_->update(HT_LOCATION);
-#endif
-		}
+		qso_data_->check_qth_changed();
 	}
 }
 
@@ -510,7 +495,7 @@ void qso_entry::cb_ip_field(Fl_Widget* w, void* v) {
 			macro_defn entry = { nullptr, "" };
 			spec_data_->add_user_macro(field, value, entry);
 		}
-		that->check_qth_changed();
+		that->qso_data_->check_qth_changed();
 	}
 	// Update other views if editing or logging
 	switch (that->qso_data_->logging_state()) {

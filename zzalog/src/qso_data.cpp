@@ -50,7 +50,6 @@ qso_data::qso_data(int X, int Y, int W, int H, const char* l) :
 	qsl_viewer_ = new qsl_viewer(10, 10);
 	qsl_viewer_->callback(cb_qsl_viewer);
 	qsl_viewer_->hide();
-
 }
 
 // Destructor
@@ -71,45 +70,6 @@ void qso_data::load_values() {
 
 	logging_mode_ = (logging_mode_t)new_lm;
 
-}
-
-// QSO control group
-Fl_Group* qso_data::create_button_group(int X, int Y) {
-	int curr_x = X;
-	int curr_y = Y;
-
-	Fl_Group* g = new Fl_Group(curr_x, curr_y, 0, 0, "Controls");
-	g->labelfont(FL_BOLD);
-	g->labelsize(FL_NORMAL_SIZE + 2);
-	g->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
-	g->box(FL_BORDER_BOX);
-
-	curr_x += GAP;
-	curr_y += HTEXT;
-	int max_x = curr_x;
-
-	const int NUMBER_PER_ROW = 8;
-	for (int ix = 0; ix < MAX_ACTIONS; ix++) {
-		bn_action_[ix] = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "");
-		if ((ix + 1) % NUMBER_PER_ROW == 0 && ix < MAX_ACTIONS) {
-			curr_x += WBUTTON;
-			max_x = max(max_x, curr_x);
-			curr_x = X + GAP;
-			curr_y += HBUTTON;
-		}
-		else {
-			curr_x += WBUTTON;
-			max_x = max(max_x, curr_x);
-		}
-	}
-
-	max_x += GAP;
-	curr_y += GAP;
-	g->resizable(nullptr);
-	g->size(max_x - X, curr_y - Y);
-	g->end();
-
-	return g;
 }
 
 // Create qso_data
@@ -154,7 +114,8 @@ void qso_data::create_form(int X, int Y) {
 	max_w = max(max_w, g_query_->x() + g_query_->w() + GAP);
 	curr_y = max(g_entry_->y() + g_entry_->h(), g_query_->y() + g_query_->h()) + GAP;
 
-	g_buttons_ = create_button_group(curr_x, curr_y);
+	g_buttons_ = new qso_buttons(curr_x, curr_y, 10, 10);
+
 	max_w = max(max_w, g_buttons_->x() + g_buttons_->w() + GAP);
 	curr_y += g_buttons_->h() + GAP;
 
@@ -165,28 +126,6 @@ void qso_data::create_form(int X, int Y) {
 	end();
 
 	initialise_fields();
-}
-
-// Enable action buttons
-void qso_data::enable_button_widgets() {
-	const list<button_type>& buttons = button_map_.at(logging_state_);
-	int ix = 0;
-	for (auto bn = buttons.begin(); bn != buttons.end() && ix < MAX_ACTIONS; bn++, ix++) {
-		const button_action& action = action_map_.at(*bn);
-		bn_action_[ix]->label(action.label);
-		bn_action_[ix]->tooltip(action.label);
-		bn_action_[ix]->color(action.colour);
-		bn_action_[ix]->labelcolor(fl_contrast(FL_FOREGROUND_COLOR, action.colour));
-		bn_action_[ix]->callback(action.callback, action.userdata);
-		bn_action_[ix]->activate();
-	}
-	for (; ix < MAX_ACTIONS; ix++) {
-		bn_action_[ix]->label("");
-		bn_action_[ix]->tooltip("");
-		bn_action_[ix]->color(FL_BACKGROUND_COLOR);
-		bn_action_[ix]->callback((Fl_Callback*)nullptr);
-		bn_action_[ix]->deactivate();
-	}
 }
 
 // Enable QSO widgets
@@ -203,7 +142,7 @@ void qso_data::enable_widgets() {
 	g_contest_->enable_widgets();
 	g_entry_->enable_widgets();
 	g_query_->enable_widgets();
-	enable_button_widgets();
+	g_buttons_->enable_widgets();
 
 }
 
@@ -313,260 +252,10 @@ void qso_data::cb_logging_mode(Fl_Widget* w, void* v) {
 	}
 }
 
-
-// Activate- Go from QSO_INACTIVE to QSO_PENDING
-void qso_data::cb_activate(Fl_Widget* w, void* v) {
-	qso_data* that = ancestor_view<qso_data>(w);
-	if (that->logging_state_ == QSO_INACTIVE) {
-		that->action_set_current();
-		that->action_activate();
-	}
-}
-
-// Start QSO - transition from QSO_INACTIVE->QSO_PENDING->QSO_STARTED
-void qso_data::cb_start(Fl_Widget* w, void* v) {
-	qso_data* that = ancestor_view<qso_data>(w);
-	switch (that->logging_state_) {
-	case QSO_INACTIVE:
-		that->action_set_current();
-		that->action_activate();
-		// Fall into next state
-	case QSO_PENDING:
-		that->action_start();
-		break;
-	}
-}
-
-// Save QSO - transition through QSO_PENDING->QSO_STARTED->QSO_INACTIVE saving QSO
-void qso_data::cb_save(Fl_Widget* w, void* v) {
-	qso_data* that = ancestor_view<qso_data>(w);
-	switch (that->logging_state_) {
-		// Two routes - QSO entry
-	case QSO_PENDING:
-		that->action_start();
-	case QSO_STARTED:
-		that->action_save();
-		that->action_set_current();
-		that->action_activate();
-		break;
-		// QSO editing
-	case QSO_EDIT:
-		that->action_save_edit();
-		break;
-	}
-}
-
-// Cancel QSO - delete QSO; clear fields
-void qso_data::cb_cancel(Fl_Widget* w, void* v) {
-	qso_data* that = ancestor_view<qso_data>(w);
-	switch (that->logging_state_) {
-	case QSO_PENDING:
-		that->action_deactivate();
-		break;
-	case QSO_STARTED:
-		that->action_cancel();
-		that->action_set_current();
-		that->action_activate();
-		break;
-	case QSO_EDIT:
-		that->action_cancel_edit();
-		break;
-	case QSO_BROWSE:
-		that->action_cancel_browse();
-		break;
-	}
-}
-
-// Edit QSO - transition to QSO_EDIT
-void qso_data::cb_edit(Fl_Widget* w, void* v) {
-	qso_data* that = ancestor_view<qso_data>(w);
-	switch (that->logging_state_) {
-	case QSO_INACTIVE:
-		that->action_set_current();
-		that->action_edit();
-		break;
-	case QSO_BROWSE:
-		that->action_cancel_browse();
-		that->action_set_current();
-		that->action_edit();
-		break;
-	}
-}
-
-// Callback - Worked B4? button
-void qso_data::cb_wkb4(Fl_Widget* w, void* v) {
-	qso_data* that = ancestor_view<qso_data>(w);
-	extract_records_->extract_call(that->g_entry_->get_call());
-	book_->selection(that->current_rec_num_, HT_SELECTED);
-}
-
-// Callback - Parse callsign
-void qso_data::cb_parse(Fl_Widget* w, void* v) {
-	qso_data* that = ancestor_view<qso_data>(w);
-	// Create a temporary record to parse the callsign
-	record* tip_record = that->dummy_qso();
-	string message = "";
-	// Set the callsign in the temporary record
-	tip_record->item("CALL", string(that->g_entry_->get_call()));
-	// Parse the temporary record
-	message = pfx_data_->get_tip(tip_record);
-	// Create a tooltip window at the parse button (in w) X and Y
-	Fl_Window* qw = ancestor_view<qso_manager>(w);
-	Fl_Window* tw = ::tip_window(message, qw->x_root() + w->x() + w->w() / 2, qw->y_root() + w->y() + w->h() / 2);
-	// Set the timeout on the tooltip
-	Fl::add_timeout(Fl_Tooltip::delay(), cb_timer_tip, tw);
-	delete tip_record;
-}
-
-// Callback - view QSL button
-void qso_data::cb_bn_view_qsl(Fl_Widget* w, void* v) {
-	qso_data* that = ancestor_view<qso_data>(w);
-	record* qso = that->current_qso_;
-	qsl_viewer* qsl = that->qsl_viewer_;
-	that->action_view_qsl();
-	if (qso) qsl->show();
-}
-
 // Callback - QSL viewer "closing" - make it hide instead
 void qso_data::cb_qsl_viewer(Fl_Widget* w, void* v) {
 	qsl_viewer* qsl = (qsl_viewer*)w;
 	if (qsl->visible()) qsl->hide();
-}
-
-// Callback - Edit QTH
-void qso_data::cb_bn_edit_qth(Fl_Widget* w, void* v) {
-	qso_data* that = ancestor_view<qso_data>(w);
-	qso_manager* mgr = (qso_manager*)that->parent();
-	string qth = mgr->get_default(qso_manager::QTH);
-	// Open QTH dialog
-	qth_dialog* dlg = new qth_dialog(qth);
-	set<string> changed_fields;
-	record* macro;
-	record* current = that->get_default_record();
-	switch (dlg->display()) {
-	case BN_OK:
-		changed_fields = spec_data_->get_macro_changes();
-		macro = spec_data_->expand_macro("APP_ZZA_QTH", qth);
-		for (auto fx = changed_fields.begin(); fx != changed_fields.end(); fx++) {
-			current->item(*fx, macro->item(*fx));
-		}
-		that->g_entry_->check_qth_changed();
-		that->enable_widgets();
-		break;
-	case BN_CANCEL:
-		break;
-	}
-	delete dlg;
-}
-
-// CAllback - navigate buttons
-// v - direction
-void qso_data::cb_bn_navigate(Fl_Widget* w, void* v) {
-	qso_data* that = ancestor_view<qso_data>(w);
-	navigate_t target = (navigate_t)(long)v;
-	that->action_navigate(target);
-}
-
-// Callback - browse
-void qso_data::cb_bn_browse(Fl_Widget* w, void* v) {
-	qso_data* that = ancestor_view<qso_data>(w);
-	switch (that->logging_state_) {
-	case QSO_INACTIVE:
-		that->action_set_current();
-		that->action_browse();
-		break;
-	default:
-		break;
-	}
-}
-
-// Callback - add query record
-void qso_data::cb_bn_add_query(Fl_Widget* w, void* v) {
-	qso_data* that = ancestor_view<qso_data>(w);
-	switch (that->logging_state_) {
-	case QUERY_MATCH:
-	case QUERY_NEW:
-		that->action_add_query();
-		break;
-	default:
-		break;
-	}
-}
-
-// Callback - add query record
-void qso_data::cb_bn_reject_query(Fl_Widget* w, void* v) {
-	qso_data* that = ancestor_view<qso_data>(w);
-	switch (that->logging_state_) {
-	case QUERY_MATCH:
-	case QUERY_NEW:
-		that->action_reject_query();
-		break;
-	default:
-		break;
-	}
-}
-
-// Callback - add query record
-void qso_data::cb_bn_merge_query(Fl_Widget* w, void* v) {
-	qso_data* that = ancestor_view<qso_data>(w);
-	switch (that->logging_state_) {
-	case QUERY_MATCH:
-	case QUERY_NEW:
-		that->action_merge_query();
-		break;
-	default:
-		break;
-	}
-}
-
-// Callback - add query record
-void qso_data::cb_bn_find_match(Fl_Widget* w, void* v) {
-	qso_data* that = ancestor_view<qso_data>(w);
-	switch (that->logging_state_) {
-	case QUERY_NEW:
-		that->action_find_match();
-		break;
-	default:
-		break;
-	}
-}
-
-// Callback - dupe action
-void qso_data::cb_bn_dupe(Fl_Widget* w, void* v) {
-	qso_data* that = ancestor_view<qso_data>(w);
-	dupe_flags action = (dupe_flags)(long)v;
-	switch (that->logging_state_) {
-	case QUERY_DUPE:
-		that->action_handle_dupe(action);
-		break;
-	default:
-		break;
-	}
-}
-
-// Callback QRZ merge action
-void qso_data::cb_bn_save_merge(Fl_Widget* w, void* v) {
-	qso_data* that = ancestor_view<qso_data>(w);
-	switch (that->logging_state_) {
-	case QRZ_MERGE:
-		that->action_save_merge();
-		break;
-	default:
-		break;
-	}
-}
-
-// Callback Find QSO in WSJT-X
-void qso_data::cb_bn_all_txt(Fl_Widget* w, void* v) {
-	qso_data* that = ancestor_view<qso_data>(w);
-	switch (that->logging_state_) {
-	case QUERY_NEW:
-	case QUERY_MATCH:
-		that->action_look_all_txt();
-		break;
-	default:
-		break;
-	}
 }
 
 // Save the settings
@@ -761,9 +450,8 @@ void qso_data::action_cancel() {
 	book_->delete_record(true);
 	delete current_qso_;
 	current_qso_ = nullptr;
-	g_entry_->check_qth_changed();
+	check_qth_changed();
 	enable_widgets();
-	qsl_viewer_->hide();
 }
 
 // Action DEACTIVATE - Transition from QSO_PENDING to QSO_INACTIVE
@@ -807,7 +495,6 @@ void qso_data::action_cancel_edit() {
 	logging_state_ = QSO_INACTIVE;
 	g_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
 	enable_widgets();
-	qsl_viewer_->hide();
 }
 
 // Action CANCEL in BROWSE 
@@ -817,7 +504,6 @@ void qso_data::action_cancel_browse() {
 	logging_state_ = QSO_INACTIVE;
 	g_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
 	enable_widgets();
-	qsl_viewer_->hide();
 }
 
 // Action navigate button
@@ -873,6 +559,7 @@ void qso_data::action_view_qsl() {
 				current_qso_->item("MODE", true, true).c_str());
 			qsl_viewer_->copy_label(title);
 			qsl_viewer_->set_qso(current_qso_, current_rec_num_);
+			qsl_viewer_->show();
 			char msg[128];
 			snprintf(msg, 128, "DASH: %s", title);
 			status_->misc_status(ST_LOG, msg);
@@ -1248,6 +935,21 @@ record* qso_data::dummy_qso() {
 	return dummy;
 }
 
+// Check if QTH has changed and action change (redraw DxAtlas
+void qso_data::check_qth_changed() {
+	record* current = get_default_record();
+	if (current) {
+		if (current->item("MY_GRIDSQUARE", true) != previous_locator_ ||
+			current->item("APP_ZZA_QTH") != previous_qth_) {
+			previous_locator_ = current->item("MY_GRIDSQUARE", true);
+			previous_qth_ = current->item("APP_ZZA_QTH");
+#ifdef _WIN32
+			if (dxa_if_) dxa_if_->update(HT_LOCATION);
+#endif
+		}
+	}
+}
+
 void qso_data::update_rig() {
 	// Get freq etc from QSO or rig
 // Get present values data from rig
@@ -1376,4 +1078,9 @@ qso_num_t qso_data::current_qso_num() {
 // Update time
 void qso_data::update_time(time_t when) {
 	g_entry_->copy_clock_to_qso(when);
+}
+
+// Call in editor
+string qso_data::get_call() {
+	return g_entry_->get_call();
 }
