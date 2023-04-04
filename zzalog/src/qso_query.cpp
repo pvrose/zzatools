@@ -54,6 +54,9 @@ void qso_query::create_form(int X, int Y) {
 void qso_query::enable_widgets() {
 	switch (qso_data_->logging_state()) {
 	case qso_data::QSO_BROWSE:
+	case qso_data::QUERY_DUPE:
+	case qso_data::QUERY_MATCH:
+	case qso_data::QUERY_NEW:
 		show();
 		tab_query_->activate();
 		tab_query_->set_records(qso_data_->current_qso(), qso_data_->query_qso(), qso_data_->original_qso());
