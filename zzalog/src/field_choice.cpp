@@ -128,7 +128,7 @@ int field_input::handle(int event) {
 			// Send to parent to handle
 			return 0;
 		case FL_Enter:
-			reason_ = IR_NULL;
+			reason_ = IR_ENTER;
 			do_callback();
 			return 1;
 		case FL_Left:
@@ -314,4 +314,8 @@ bool field_input::is_string(string field) {
 }
 
 // Return reason
-field_input::exit_reason_t field_input::reason() { return reason_; }
+field_input::exit_reason_t field_input::reason() {
+	exit_reason_t result = reason_;
+	reason_ = IR_NULL;
+	return result;
+}

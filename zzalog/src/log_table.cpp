@@ -263,7 +263,7 @@ void log_table::edit_save(field_input::exit_reason_t exit_type) {
 	// Deselect row being edited
 	select_row(edit_row_, 0);
 	switch (exit_type) {
-	case field_input::exit_reason_t::IR_NULL:
+	case field_input::exit_reason_t::IR_ENTER:
 		done_edit(false);
 		break;
 	case field_input::exit_reason_t::IR_LEFT:

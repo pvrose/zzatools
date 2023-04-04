@@ -65,7 +65,8 @@ using namespace std;
 			IR_RIGHT,      // Tab right
 			IR_LEFT,       // Tab left (Shift-tab)
 			IR_UP,         // Up key pressed
-			IR_DOWN        // Down key pressed
+			IR_DOWN,       // Down key pressed
+			IR_ENTER,    // Do not do anything
 		};
 		exit_reason_t reason();
 
