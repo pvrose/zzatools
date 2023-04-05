@@ -464,7 +464,9 @@ void report_tree::copy_records_to_tree(record_list_t* record_list, Fl_Tree_Item*
 			Fl_Tree_Item* record_item = item->add(prefs(), text);
 			// Item data is the number of the record
 			record_item->user_data((void*)(long)record_num);
-			record_item->labelcolor(FL_BLUE);
+			if (is_dxcc) record_item->labelcolor(fl_darker(FL_GREEN));
+			else if (is_confirmed) record_item->labelcolor(FL_BLUE);
+			else record_item->labelcolor(fl_darker(FL_RED));
 			record_item->labelfont(item_labelfont() | FL_ITALIC);
 		}
 		delete[] text;
