@@ -59,16 +59,16 @@ using namespace std;
 
 		// Values read from rig
 		struct rig_values {
-			double tx_frequency;
-			double rx_frequency;
-			rig_mode_t mode;
-			double drive;
-			bool split;
-			int s_value;
-			double pwr;
-			bool ptt;
-			double swr;
-			double vdd;
+			double tx_frequency = 0.0;
+			double rx_frequency = 0.0;
+			rig_mode_t mode = GM_CWU;
+			double drive = 0.0;
+			bool split = false;
+			int s_value = -54;
+			double pwr = 0.0;
+			bool ptt = false;
+			double swr = 1.0;
+			double vdd = 13.8;
 		};
 
 		// Opens the COM port associated with the rig
