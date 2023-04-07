@@ -1,6 +1,5 @@
 #include "qth_dialog.h"
 #include "callback.h"
-#include "rig_if.h"
 #include "utils.h"
 
 #include "record.h"
@@ -29,7 +28,6 @@ extern Fl_Preferences* settings_;
 extern pfx_data* pfx_data_;
 extern status* status_;
 extern tabbed_forms* tabbed_forms_;
-extern rig_if* rig_if_;
 extern qso_manager* qso_manager_;
 extern spec_data* spec_data_;
 

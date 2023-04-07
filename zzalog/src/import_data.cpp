@@ -6,7 +6,6 @@
 #include "eqsl_handler.h"
 #include "lotw_handler.h"
 #include "club_handler.h"
-#include "rig_if.h"
 #include "utils.h"
 #include "menu.h"
 #include "qso_manager.h"
@@ -38,10 +37,8 @@ extern tabbed_forms* tabbed_forms_;
 extern eqsl_handler* eqsl_handler_;
 extern lotw_handler* lotw_handler_;
 extern club_handler* club_handler_;
-extern rig_if* rig_if_;
 extern menu* menu_;
 extern qso_manager* qso_manager_;
-extern void add_rig_if();
 
 // Constructor - this book is used to contain data being imported. It adds functionality to support this
 import_data::import_data() :
@@ -634,10 +631,6 @@ void import_data::finish_update(bool merged /*= true*/) {
 	// If we are merging eQSL, release the card queue
 	if (update_mode_ == EQSL_UPDATE) {
 		eqsl_handler_->enable_fetch(eqsl_handler::EQ_START);
-	}
-	// If we are not connected to a rig
-	if (!rig_if_) {
-		qso_manager_->update_rig();
 	}
 	// Allow the book to save (and save if modified)
 	close_pending_ = false;

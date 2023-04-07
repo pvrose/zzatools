@@ -10,7 +10,6 @@
 #include "toolbar.h"
 #include "dxa_if.h"
 #include "settings.h"
-#include "rig_if.h"
 #include "band_view.h"
 #include "qso_manager.h"
 
@@ -28,7 +27,6 @@ extern dxa_if* dxa_if_;
 #endif
 extern settings* config_;
 extern bool closing_;
-extern rig_if* rig_if_;
 extern band_view* band_view_;
 extern qso_manager* qso_manager_;
 
@@ -134,7 +132,7 @@ void tabbed_forms::update_views(view* requester, hint_t hint, qso_num_t record_1
 		// Update the settngs config dialog
 		if (config_) config_->update();
 		// Update band view
-		if (!rig_if_ && band_view_ && band_view_->visible()) {
+		if (band_view_ && band_view_->visible()) {
 			band_view_->update(record_1);
 		}
 		// Update qso_manager - avoid recursion

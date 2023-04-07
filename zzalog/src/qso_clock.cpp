@@ -142,7 +142,7 @@ void qso_clock::cb_timer_clock(void* v) {
 	// Update the label in the clock button which is passed as the parameter
 	qso_clock* that = (qso_clock*)v;
 	that->enable_widgets();
-
+	((qso_manager*)that->parent())->ticker();
 
 	Fl::repeat_timeout(UTC_TIMER, cb_timer_clock, v);
 }

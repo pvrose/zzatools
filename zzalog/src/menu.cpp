@@ -7,7 +7,6 @@
 #include "settings.h"
 #include "tabbed_forms.h"
 #include "import_data.h"
-#include "rig_if.h"
 #include "utils.h"
 #include "status.h"
 
@@ -56,7 +55,6 @@ extern extract_data* extract_records_;
 extern book* navigation_book_;
 extern pfx_data* pfx_data_;
 extern spec_data* spec_data_;
-extern rig_if* rig_if_;
 extern status* status_;
 extern tabbed_forms* tabbed_forms_;
 extern url_handler* url_handler_;
@@ -259,7 +257,6 @@ settings* config_ = nullptr;
 	{ 0 }
 	};
 
-extern void add_rig_if();
 extern void add_data();
 extern void main_window_label(string text);
 extern void backup_file(bool force, bool retrieve = false);
@@ -1238,18 +1235,11 @@ void menu::cb_mi_ref_details(Fl_Widget* w, void* v) {
 // v is not used
 void menu::cb_mi_ref_reload(Fl_Widget* w, void* v) {
 	// Turn rig timer off in case it fires while we are reloading
-	if (rig_if_ && rig_if_->is_open()) {
-		Fl::remove_timeout(rig_if::cb_timer_rig);
-	}
 	// Get spec_data_ to reload itself
 	delete pfx_data_;
 	delete spec_data_;
 	delete intl_dialog_;
 	add_data();
-	// Turn the rig timer back on
-	if (rig_if_ && rig_if_->is_open()) {
-		Fl::add_timeout(0.0, rig_if::cb_timer_rig);
-	}
 }
 
 // Reference->Exceptions->Reload Data

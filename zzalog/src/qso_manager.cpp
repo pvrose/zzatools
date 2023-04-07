@@ -73,11 +73,13 @@ extern bool read_only_;
 // The main dialog constructor
 qso_manager::qso_manager(int W, int H, const char* label) :
 	Fl_Window(W, H, label)
-	, connect_group_(nullptr)
+	, rig_group_(nullptr)
 	, created_(false)
+	, ticker_in_progress_(false)
 {
 	load_values();
 	create_form(0,0);
+	rig_if_ = rig_group_->rig();
 	update_rig();
 	update_qso(HT_SELECTED, book_->selection(), -1);
 
@@ -126,15 +128,15 @@ void qso_manager::create_form(int X, int Y) {
 	curr_y += GAP;
 	int save_y = curr_y;
 
-	connect_group_ = new qso_connector(curr_x, curr_y, 0, 0, nullptr);
-	connect_group_->create_form(curr_x, curr_y);
+	rig_group_ = new qso_rig(curr_x, curr_y, 0, 0, nullptr);
+	rig_group_->create_form(curr_x, curr_y);
 
-	curr_x += connect_group_->w() + GAP;
+	curr_x += rig_group_->w() + GAP;
 
 	clock_group_ = new qso_clock(curr_x, curr_y, 0, 0, nullptr);
 	clock_group_->create_form(curr_x, curr_y);
 	curr_x += clock_group_->w();
-	curr_y += max(clock_group_->h(), connect_group_->h());
+	curr_y += max(clock_group_->h(), rig_group_->h());
 
 	max_x = max(max_x, curr_x);
 	max_y = max(max_y, curr_y);
@@ -170,7 +172,7 @@ void qso_manager::save_values() {
 
 //	Fl_Preferences stations_settings(settings_, "Stations");
 	data_group_->save_values();
-	connect_group_->save_values();
+	rig_group_->save_values();
 	clock_group_->save_values();
 }
 
@@ -182,7 +184,8 @@ void qso_manager::enable_widgets() {
 	if (!created_) return;
 
 	data_group_->enable_widgets();
-	connect_group_->enable_widgets();
+	rig_group_->copy_label(get_my_rig().c_str());
+	rig_group_->enable_widgets();
 }
 
 // Close button clicked - check editing or not
@@ -237,7 +240,7 @@ bool qso_manager::qso_in_progress() {
 
 // Switch the rig connection on or off
 void qso_manager::switch_rig() {
-	connect_group_->switch_rig();
+	rig_group_->switch_rig();
 }
 
 // Get QSO information from previous record not rig
@@ -341,4 +344,18 @@ string qso_manager::get_default(stn_item_t item) {
 // Update the time
 void qso_manager::update_time(time_t when) {
 	data_group_->update_time(when);
+}
+
+// Get current rig value
+string qso_manager::get_my_rig() {
+	return data_group_->get_default_record()->item("MY_RIG");
+}
+
+// Handle 1 second timer
+void qso_manager::ticker() {
+	if (!ticker_in_progress_) {
+		ticker_in_progress_ = true;
+		rig_group_->ticker();
+		ticker_in_progress_ = false;
+	}
 }

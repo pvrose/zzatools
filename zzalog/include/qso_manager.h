@@ -1,7 +1,7 @@
 #ifndef __STN_DIALOG__
 #define __STN_DIALOG__
 
-#include "qso_connector.h"
+#include "qso_rig.h"
 #include "qso_clock.h"
 #include "qso_data.h"
 
@@ -103,6 +103,10 @@ using namespace std;
 		void edit_qso();
 		// Get default value
 		string get_default(stn_item_t item);
+		// Get current MY_RIG value
+		string get_my_rig();
+		// 1 second ticker
+		void ticker();
 
 
 	protected:
@@ -113,10 +117,12 @@ using namespace std;
 		bool created_;
 		// Typing into choice - prevent it being overwritten
 		bool items_changed_;
+		// Ticker action in progress - prevent continual ticker access
+		bool ticker_in_progress_;
 
 		// Groups
 		qso_data* data_group_;
-		qso_connector* connect_group_;
+		qso_rig* rig_group_;
 		qso_clock* clock_group_;
 		// widgets
 

@@ -10,7 +10,6 @@ record.cpp - Individual record data item: implementation file
 #include "utils.h"
 #include "pfx_data.h"
 #include "spec_data.h"
-#include "rig_if.h"
 #include "status.h"
 #include "view.h"
 #include "formats.h"
@@ -33,7 +32,6 @@ using namespace std;
 extern pfx_data* pfx_data_;
 extern spec_data* spec_data_;
 extern Fl_Preferences* settings_;
-extern rig_if* rig_if_;
 extern status* status_;
 extern qso_manager* qso_manager_;
 

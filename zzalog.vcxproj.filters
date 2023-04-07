@@ -225,7 +225,7 @@
     <ClCompile Include="zzalog\src\qsl_viewer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="zzalog\src\qso_connector.cpp">
+    <ClCompile Include="zzalog\src\qso_rig.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="zzalog\src\qso_clock.cpp">
@@ -479,7 +479,7 @@
     <ClInclude Include="zzalog\include\qsl_viewer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="zzalog\include\qso_connector.h">
+    <ClInclude Include="zzalog\include\qso_rig.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="zzalog\include\qso_clock.h">

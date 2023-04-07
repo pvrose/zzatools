@@ -30,47 +30,57 @@ using namespace std;
 	};
 
 	// slow rig polling - 1s -> 10min (default 1 min)
-	const double SLOW_RIG_MAX = 600.0;
-	const double SLOW_RIG_MIN = 1.0;
-	const double SLOW_RIG_DEF = 60.0;
+	const int SLOW_RIG_TIMER = 60;
 	// fast rig polling - 20ms -> 2s (default 1s);
-	const double FAST_RIG_MAX = 2.0;
-	const double FAST_RIG_MIN = 0.02;
-	const double FAST_RIG_DEF = 1.0;
+	const int FAST_RIG_TIMER = 1;
 
 	// This class is the base class for rig handlers. 
 	class rig_if
 	{
 	public:
-		rig_if();
+		// Hamlib parameters 
+		struct hamlib_data_t {
+			// Manufacturer
+			string mfr = "";
+			// Model
+			string model = "";
+			// Portname
+			string port_name = "";
+			// Baud rate
+			int baud_rate = 9600;
+			// Model ID - as known by hamlib
+			rig_model_t model_id = -1;
+			// Port type
+			rig_port_t port_type = RIG_PORT_NONE;
+		};
+
+		rig_if(const char* name, hamlib_data_t data);
 		~rig_if();
+
+		// Values read from rig
+		struct rig_values {
+			double tx_frequency;
+			double rx_frequency;
+			rig_mode_t mode;
+			double drive;
+			bool split;
+			int s_value;
+			double pwr;
+			bool ptt;
+			double swr;
+			double vdd;
+		};
 
 		// Opens the COM port associated with the rig
 		bool open();
 		// Return rig name
 		string& rig_name();
-		// Read TX Frequency
-		double tx_frequency();
-		// Read mode from rig
-		rig_mode_t mode();
-		// Return drive level * 100% power
-		double drive();
-		// Rig is working split TX/RX frequency
-		bool is_split();
-		// Get separate frequency
-		double rx_frequency();
-		// Return S-meter reading (S9+/-dB)
-		int s_meter();
-		// Return power meter reading
-		double pwr_meter();
+		// Read values
+		rig_values get_data();
+		// Formatted values
+		string rig_info();
 		// Return the most recent error message
-		string error_message(string func_name);
-		// Get TX mode
-		bool get_tx();
-		// Get SWR meter
-		double swr_meter();
-		// Get Voltage meter
-		double vdd_meter();
+		string error_message(const char* func_name);
 
 		// Error Code is not OK.
 		bool is_good();
@@ -79,10 +89,8 @@ using namespace std;
 
 		// Port was successfully opened
 		bool is_open();
-		// Get the rig info to display
-		string rig_info();
 		// Rig timer callback
-		static void cb_timer_rig(void* v);
+		void ticker();
 
 		// return mode/submode
 		void get_string_mode(string& mode, string& submode);
@@ -94,38 +102,17 @@ using namespace std;
 		string get_smeter();
 		// Return SWR meter
 		string get_swr_meter();
-		// Return open message
-		string success_message();
-
-		// Callback to set certain functions (timer callback, freq to band conversion, error message
-		void callback(void (*function)(), string(*spec_func)(double), void(*mess_func)(status_t, const char*));
-
 
 		// Protected methods
 	protected:
-
+		// Get the data from the rig
+		bool read_values();
 		// Protected attributes
 	protected:
-		// Name of the rig
-		string rig_name_;
-		// Name of the rig (prepended with manufacturer)
-		string mfg_name_;
 		// Rig opened OK
 		bool opened_ok_;
-		// Text error message
-		string error_message_;
-		// Text success message
-		string success_message_;
-		// On timer callback to update
-		void(*on_timer_)();
-		// Access spec for 
-		string(*freq_to_band_)(double frequency);
-		// Display message
-		void(*error)(status_t ok, const char* message);
 		// bool
 		bool have_freq_to_band_;
-		// have reported high SWR
-		bool reported_hi_swr_;
 		// last band read
 		string previous_band_;
 		// Stop incessane errors
@@ -136,24 +123,23 @@ using namespace std;
 		// Re-implement error message
 		const char* error_text(rig_errcode_e code);
 
+		// MY_RIG name
+		const char* my_rig_name_;
 		// Hamlib specific attributes
-		// Current rig
-		string current_rig_;
-		// COM port name
-		string port_name_;
-		// COM baud rate
-		int baud_rate_;
+		hamlib_data_t hamlib_data_;
 		// Rig interface
 		RIG* rig_;
-		// Numeric ID of rig
-		rig_model_t model_id_;
 		// Numeric error code
 		int error_code_;
 		// Reported error code
 		bool unsupported_function_;
-		// Maximum TX power in QSO
-		double max_power_;
-		// Previous TX power to report in RX
-		double prev_power_;
-	};
+		// Rig values
+		rig_values rig_data_;
+		// Timer count down
+		int count_down_;
+		// Reported lack of functionality
+		bool reported_no_vdd_;
+		// have reported high SWR
+		bool reported_no_swr_;
+};
 #endif

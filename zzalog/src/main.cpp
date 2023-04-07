@@ -74,7 +74,7 @@ using namespace std;
 string COPYRIGHT = "© Philip Rose GM3ZZA 2018. All rights reserved.\n (Prefix data, DX Atlas & OmniRig interfaces © Alex Shovkoplyas, VE3NEA.)";
 string PROGRAM_ID = "ZZALOG";
 string PROG_ID = "ZLG";
-string VERSION = "3.3.29";
+string VERSION = "3.4.0";
 string TIMESTAMP = __DATE__ + string(" ") + __TIME__;
 #ifdef _DEBUG
 string PROGRAM_VERSION = VERSION + " (Debug " + TIMESTAMP + ")";
@@ -88,7 +88,6 @@ string VENDOR = "GM3ZZA";
 #endif
 
 // Global data items instanced in zzalib
-extern rig_if* rig_if_;
 extern url_handler* url_handler_;
 
 // FLTK externals
@@ -117,6 +116,7 @@ club_handler* club_handler_ = nullptr;
 wsjtx_handler* wsjtx_handler_ = nullptr;
 fllog_emul* fllog_emul_ = nullptr;
 qso_manager* qso_manager_ = nullptr;
+rig_if* rig_if_ = nullptr;
 
 #ifdef _WIN32
 dxa_if* dxa_if_ = nullptr;
@@ -156,14 +156,6 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 	else {
 		closing_ = true;
 		status_->misc_status(ST_NOTE, "ZZALOG: Closing...");
-		// If rig connected close it - this will close the timer as well. Tell the scorebaord there
-		// is no longer a rig to read.
-		if (rig_if_) {
-			rig_if_->close();
-			if (qso_manager_) {
-				qso_manager_->update_rig();
-			}
-		}
 		// Delete band view
 		if (band_view_) {
 			Fl::delete_widget(band_view_);
@@ -412,59 +404,6 @@ void add_book(char* arg) {
 	}
 }
 
-// Update rig information in the various views - this is controlled by rig_if_.
-void update_rig_status() {
-	// There may be a race hazard involving flrig and zzalog when I try and close zzalog
-	if (!closing_) {
-		// Band view may not have been created yet - only update if frequency has changed to remove annoying flicker
-		if (band_view_) {
-			double frequency = rig_if_->tx_frequency() / 1000.0;
-			if (frequency != prev_freq_) {
-				band_view_->update(frequency);
-			}
-			prev_freq_ = frequency;
-		}
-		// Update scratchpad
-		string freq = rig_if_->get_frequency(true);
-		if (qso_manager_) {
-			qso_manager_->update_rig();
-		}
-		// update_rig_status
-		// Update rig status
-		if (!band_view_ || band_view_->in_band(rig_if_->tx_frequency()/1000.0)) {
-			// We are at a valid frequency
-			if (rig_if_->get_tx() == true) {
-				//if (rig_if_->check_swr()) {
-					// Transmit, low SWR
-					status_->rig_status(RS_TX, rig_if_->rig_info().c_str());
-				//}
-				//else {
-				//	// Transmit, high SWR
-				//	status_->rig_status(RS_HIGH, rig_if_->rig_info().c_str());
-				//}
-			}
-			else {
-				// Receive
-				status_->rig_status(RS_RX, rig_if_->rig_info().c_str());
-			}
-		}
-		else {
-			// Out of band or not known
-			status_->rig_status(RS_ERROR, rig_if_->rig_info().c_str());
-		}
-		// if rig crashed - delete it
-		if (!rig_if_ || !rig_if_->is_good()) {
-			delete rig_if_;
-			rig_if_ = nullptr;
-		}
-		// Update qso_manager - display widgets
-		if (qso_manager_) {
-			qso_manager_->update_rig();
-		}
-
-	}
-}
-
 // Callback for rig_if_ to use to access spec_data_
 string cb_freq_to_band(double frequency) {
 	return spec_data_->band_for_freq(frequency);
@@ -475,126 +414,22 @@ void cb_error_message(status_t level, const char* message) {
 	status_->misc_status(level, message);
 }
 
-// Create the rig interface handler and connect to the rig.
-void add_rig_if() {
-	if (!closing_) {
-		fl_cursor(FL_CURSOR_WAIT);
-		delete rig_if_;
-		status_->misc_status(ST_NOTE, "RIG: Connecting to hamlib...");
-		rig_if_ = new rig_if;
-		if (rig_if_ == nullptr) {
-			// No handler defined - assume manual logging in real-time
-			status_->misc_status(ST_WARNING, "RIG: Cannot connect to hamlib, assume real-time logging, no rig");
-			if (qso_manager_) qso_manager_->logging_mode(qso_data::LM_ON_AIR_COPY);
-		}
-		else {
-			// Set callbacks
-			rig_if_->callback(update_rig_status, cb_freq_to_band, cb_error_message);
-			// Try and open the connection to the rig
-			bool done = false;
-			while (!done) {
-				if (rig_if_->open()) {
-					if (!rig_if_->is_good()) {
-						// No rig handler or rig didn't open - assume manual logging
-						delete rig_if_;
-						rig_if_ = nullptr;
-						status_->misc_status(ST_ERROR, "RIG: No handler - assume real-time logging, no rig");
-						done = true;
-					}
-					else {
-						// Connect to rig OK - see if we are a digital mode and if so start auto-import process
-						if ((rig_if_->mode() == GM_DIGL || rig_if_->mode() == GM_DIGU) && import_data_->start_auto_update()) {
-							char message[256];
-							snprintf(message, 256, "RIG: %s", rig_if_->success_message().c_str());
-							status_->misc_status(ST_OK, message);
-							// start auto-data mode so we import the log written by the mode app
-							status_->misc_status(ST_WARNING, "RIG: Data mode - assume logging by data modem app");
-							// Change logging mode to IMPORTED as will be using a data-modem
-							done = true;
-						}
-						// The first access to read the mode may fail
-						else if (!rig_if_->is_good()) {
-							char message[512];
-							sprintf(message, "RIG: Bad access - %s. Assume real-time logging, no rig", rig_if_->error_message("Open").c_str());
-							// Problem with rig_if when making first access, close it to stop timer and clean up 
-							rig_if_->close();
-							string error_message = rig_if_->error_message("");
-							delete rig_if_;
-							rig_if_ = nullptr;
-							if (qso_manager_) {
-								qso_manager_->update_rig();
-							}
-							status_->misc_status(ST_ERROR, message);
-							// Put the error message from the rig in the rig status box
-							status_->rig_status(RS_ERROR, error_message.c_str());
-							done = true;
-						}
-						else {
-							// Rig seems OK - timer will have been started by rig_if_->open()
-							// Set rig timer callnack
-							char message[256];
-							snprintf(message, 256, "RIG: %s", rig_if_->success_message().c_str());
-							status_->misc_status(ST_OK, message);
-							// Get the operating condition from the rig
-							if (!band_view_ || band_view_->in_band(rig_if_->tx_frequency())) {
-								status_->rig_status(rig_if_->get_tx() ? RS_TX : RS_RX, rig_if_->rig_info().c_str());
-							}
-							else {
-								status_->rig_status(RS_ERROR, rig_if_->rig_info().c_str());
-							}
-							// Change logging mode to ON_AIR
-							if (qso_manager_) {
-								qso_manager_->update_rig();
-								qso_manager_->logging_mode(qso_data::LM_ON_AIR_CAT);
-							}
-							done = true;
-						}
-					}
-				}
-				else {
-					// Rig hadn't opened
-					char temp[128] = "RIG: failed to open - no information";
-					if (rig_if_) {
-						snprintf(temp, sizeof(temp), "RIG: failed to open - %s", rig_if_->error_message("Open").c_str());
-					}
-					delete rig_if_;
-					rig_if_ = nullptr;
-					status_->misc_status(ST_ERROR, temp);
-					done = true;
-				}
-			}
-		}
-		// Tell menu to update its items
-		menu_->update_items();
-		if (rig_if_ == nullptr) {
-			status_->rig_status(RS_OFF, "No rig present");
-		}
-		fl_cursor(FL_CURSOR_DEFAULT);
-	}
-}
-
 // Add the band plan window
 void add_band_view() {
 	if (!closing_) {
-		if (rig_if_) {
-			// Use actual rig frequency 
-			band_view_ = new band_view(rig_if_->tx_frequency() / 1000.0, 400, 100, "Band plan");
+		// Use frequency of selected record if the book is not empty, else use 14.1 MHz
+		double frequency;
+		if (book_->size() && book_->get_record() && book_->get_record()->item("FREQ").length()) {
+			frequency = stod(book_->get_record()->item("FREQ")) * 1000.0;
 		}
 		else {
-			// Use frequency of selected record if the book is not empty, else use 14.1 MHz
-			double frequency;
-			if (book_->size() && book_->get_record() && book_->get_record()->item("FREQ").length()) {
-				frequency = stod(book_->get_record()->item("FREQ")) * 1000.0;
-			}
-			else {
-				frequency = 14100.0;
-			}
-			band_view_ = new band_view(frequency, 400, 100, "Band plan");
+			frequency = 14100.0;
 		}
-		if (!band_view_->valid()) {
-			Fl::delete_widget(band_view_);
-			band_view_ = nullptr;
-		}
+		band_view_ = new band_view(frequency, 400, 100, "Band plan");
+	}
+	if (!band_view_->valid()) {
+		Fl::delete_widget(band_view_);
+		band_view_ = nullptr;
 	}
 }
 
@@ -741,7 +576,6 @@ void tidy() {
 	delete eqsl_handler_;
 	delete url_handler_;
 	delete band_view_;
-	delete rig_if_;
 	delete extract_records_;
 	delete import_data_;
 	delete book_;
@@ -825,10 +659,8 @@ int main(int argc, char** argv)
 	add_book(argc == 1 ? nullptr : argv[argc - 1]);
 	Fl::check();
 	// Connect to the rig - load all hamlib backends once only here
-	rig_if_ = nullptr;
 	rig_set_debug(HAMLIB_DEBUG_LEVEL);
 	rig_load_all_backends();
-	add_rig_if();
 	// Add qso_manager
 	add_dashboard();
 	// Add band-plan 

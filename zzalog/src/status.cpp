@@ -1,7 +1,6 @@
 #include "status.h"
 
 #include "utils.h"
-#include "rig_if.h"
 #include "callback.h"
 #include "menu.h"
 #include "intl_widgets.h"
@@ -23,9 +22,7 @@
 using namespace std;
 
 extern Fl_Preferences* settings_;
-extern rig_if* rig_if_;
 extern menu* menu_;
-extern void add_rig_if();
 extern main_window* main_window_;
 extern status* status_;
 extern qso_manager* qso_manager_;
@@ -164,24 +161,7 @@ void status::null_file_viewer() {
 // Rig status bn callback - attempts to toggle rig connection state
 void status::cb_bn_rig(Fl_Widget* bn, void* v) {
 	status* that = ancestor_view<status>(bn);
-
-	if (rig_if_ == nullptr || !rig_if_->is_good() || !rig_if_->is_open()) {
-		// Rig wasn't present or hadn't connected or had crashed, so try again
-		if (!that->rig_in_progress_) {
-			that->rig_in_progress_ = true;
-			add_rig_if();
-			that->rig_in_progress_ = false;
-		}
-		else {
-			that->misc_status(ST_WARNING, "RIG: Already trying to open rig");
-		}
-	}
-	else {
-		// Close the rig
-		rig_if_->close();
-		that->misc_status(ST_WARNING, "RIG: Closing rig connection");
-		qso_manager_->update_rig();
-	}
+	qso_manager_->switch_rig();
 	bn->redraw();
 }
 
@@ -321,6 +301,7 @@ void status::rig_status(rig_status_t status, const char* label) {
 	rig_status_->color(colour);
 	rig_status_->labelcolor(fl_contrast(FL_BLACK, colour));
 	rig_status_->copy_tooltip(label);
+	Fl::check();
 	//rig_status_->redraw();
 }
 
