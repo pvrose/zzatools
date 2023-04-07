@@ -184,7 +184,6 @@ void qso_manager::enable_widgets() {
 	if (!created_) return;
 
 	data_group_->enable_widgets();
-	rig_group_->copy_label(get_my_rig().c_str());
 	rig_group_->enable_widgets();
 }
 

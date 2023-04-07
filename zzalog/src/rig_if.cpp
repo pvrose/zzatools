@@ -367,7 +367,6 @@ bool rig_if::read_values() {
 	else if (!rig_data_.ptt) {
 		rig_data_.s_value = max(rig_data_.s_value, meter_value.i);
 	}
-	rig_data_.s_value = meter_value.i;
 	// Power meter
 	error_code_ = rig_get_level(rig_, RIG_VFO_CURR, RIG_LEVEL_RFPOWER_METER_WATTS, &meter_value);
 	if (error_code_ != RIG_OK) {

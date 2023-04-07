@@ -19,8 +19,8 @@ extern status* status_;
 qso_rig::qso_rig(int X, int Y, int W, int H, const char* L) :
 	Fl_Group(X, Y, W, H, L)
 {
-	// Pass supplied label to rig as the MY_RIG name, if it's null then set the label to the fancy + sign
-	if (L == nullptr || strlen(L) == 0) label("@+");;
+	// Set supplied label to rig as the MY_RIG name
+	if (L == nullptr || strlen(L) == 0) copy_label(((qso_manager*)parent())->get_my_rig().c_str());
 	load_values();
 	mode_ = hamlib_data_.port_type;
 	rig_ = new rig_if(L, hamlib_data_);
@@ -65,6 +65,9 @@ void qso_rig::load_values() {
 				hamlib_data_.model.c_str());
 			status_->misc_status(ST_WARNING, msg);
 			find_hamlib_data();
+		}
+		else {
+			hamlib_data_.port_type = capabilities->port_type;
 		};
 	}
 }
