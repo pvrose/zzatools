@@ -51,7 +51,6 @@ extern Fl_Preferences* settings_;
 extern pfx_data* pfx_data_;
 extern status* status_;
 extern tabbed_forms* tabbed_forms_;
-extern rig_if* rig_if_;
 extern spec_data* spec_data_;
 extern book* book_;
 extern extract_data* extract_records_;
@@ -79,7 +78,6 @@ qso_manager::qso_manager(int W, int H, const char* label) :
 {
 	load_values();
 	create_form(0,0);
-	rig_if_ = rig_group_->rig();
 	update_rig();
 	update_qso(HT_SELECTED, book_->selection(), -1);
 
@@ -183,8 +181,6 @@ void qso_manager::enable_widgets() {
 	// Not all widgets may exist yet!
 	if (!created_) return;
 
-	rig_if_ = rig_group_->rig();
-
 	data_group_->enable_widgets();
 	rig_group_->enable_widgets();
 }
@@ -256,8 +252,13 @@ void qso_manager::change_rig(string rig_name) {
 		rig_group_->copy_label(rig_name.c_str());
 		rig_group_->load_values();
 		rig_group_->switch_rig();
-		rig_if_ = rig_group_->rig();
 	}
+}
+
+// Get rig
+rig_if* qso_manager::rig() {
+	if (rig_group_) return rig_group_->rig();
+	else return nullptr;
 }
 
 // Called whenever another view updates a record (or selects a new one)
@@ -367,4 +368,9 @@ void qso_manager::ticker() {
 		data_group_->ticker();
 		ticker_in_progress_ = false;
 	}
+}
+
+// Stop 1 second ticker
+void qso_manager::stop_ticker() {
+	clock_group_->stop_ticker();
 }

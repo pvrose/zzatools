@@ -180,8 +180,15 @@ rig_if::rig_if(const char* name, hamlib_data_t data)
 	hamlib_data_ = data;
 	
 	// If the name has been set, there is a rig
-	if (my_rig_name_ && strlen(my_rig_name_) && hamlib_data_.port_type != RIG_PORT_NONE) {
-		open();
+	if (my_rig_name_.length()) {
+		if (hamlib_data_.port_type != RIG_PORT_NONE) {
+			open();
+		}
+		else {
+			char msg[128];
+			snprintf(msg, 128, "RIG: Not opening %s - no hamlib available", my_rig_name_.c_str());
+			status_->misc_status(ST_WARNING, msg);
+		}
 	}
 }
 
@@ -195,8 +202,15 @@ rig_if::~rig_if()
 // Clsoe the serial port
 void rig_if::close() {
 
+
 	if (rig_ != nullptr) {
 		if (opened_ok_) {
+			char msg[128];
+			snprintf(msg, 128, "RIG: Closing connection %s (%s on port %s)",
+				my_rig_name_.c_str(),
+				hamlib_data_.model.c_str(),
+				hamlib_data_.port_name.c_str());
+			status_->misc_status(ST_NOTE, msg);
 			// If we have a connection and it's open, close it and tidy memory used by hamlib
 			rig_close(rig_);
 			rig_cleanup(rig_);
@@ -210,6 +224,16 @@ bool rig_if::open() {
 	// If changing rig type - delete any existing rig and create new one
 	if (rig_ != nullptr) {
 		close();
+	}
+	if (hamlib_data_.port_name.length() == 0) {
+		char msg[256];
+		snprintf(msg, 256, "RIG: Connection %s/%s No port supplied - open failed",
+			hamlib_data_.mfr.c_str(),
+			hamlib_data_.model.c_str()
+		);
+		status_->misc_status(ST_WARNING, msg);
+		return false;
+
 	}
 	// Get the rig interface
 	rig_ = rig_init(hamlib_data_.model_id);
@@ -263,11 +287,12 @@ bool rig_if::open() {
 		return true;
 	}
 	else {
-		snprintf(msg, 256, "RIG: Connection %s/%s on port %s failed to open",
+		snprintf(msg, 256, "open(): %s/%s port %s",
 			hamlib_data_.mfr.c_str(),
 			hamlib_data_.model.c_str(),
-			hamlib_data_.port_name.c_str());
-		status_->misc_status(ST_ERROR, msg);
+			hamlib_data_.port_name.c_str()
+			);
+		status_->misc_status(ST_ERROR, error_message(msg).c_str());
 		return false;
 	}
 }

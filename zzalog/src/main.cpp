@@ -116,7 +116,6 @@ club_handler* club_handler_ = nullptr;
 wsjtx_handler* wsjtx_handler_ = nullptr;
 fllog_emul* fllog_emul_ = nullptr;
 qso_manager* qso_manager_ = nullptr;
-rig_if* rig_if_ = nullptr;
 
 #ifdef _WIN32
 dxa_if* dxa_if_ = nullptr;
@@ -155,6 +154,7 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 	}
 	else {
 		closing_ = true;
+		qso_manager_->stop_ticker();
 		status_->misc_status(ST_NOTE, "ZZALOG: Closing...");
 		// Delete band view
 		if (band_view_) {
@@ -426,10 +426,10 @@ void add_band_view() {
 			frequency = 14100.0;
 		}
 		band_view_ = new band_view(frequency, 400, 100, "Band plan");
-	}
-	if (!band_view_->valid()) {
-		Fl::delete_widget(band_view_);
-		band_view_ = nullptr;
+		if (!band_view_->valid()) {
+			Fl::delete_widget(band_view_);
+			band_view_ = nullptr;
+		}
 	}
 }
 

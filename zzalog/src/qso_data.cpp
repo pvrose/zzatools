@@ -21,7 +21,6 @@
 #include <FL/Fl_Tooltip.H>
 
 extern Fl_Preferences* settings_;
-extern rig_if* rig_if_;
 extern book* book_;
 extern extract_data* extract_records_;
 extern status* status_;
@@ -62,11 +61,13 @@ void qso_data::load_values() {
 	Fl_Preferences dash_settings(settings_, "Dashboard");
 	// Set logging mode -default is On-air with or without rig connection
 	int new_lm;
-	logging_mode_t default_lm = rig_if_ ? LM_ON_AIR_CAT : LM_ON_AIR_COPY;
+	rig_if* rig = ((qso_manager*)parent())->rig();
+	bool have_rig = rig && rig->is_good();
+	logging_mode_t default_lm = have_rig ? LM_ON_AIR_CAT : LM_ON_AIR_COPY;
 	dash_settings.get("Logging Mode", new_lm, default_lm);
 
 	// If we are set to "On-air with CAT connection" check connecton
-	if (!rig_if_ && new_lm == LM_ON_AIR_CAT) new_lm = LM_ON_AIR_COPY;
+	if (!have_rig && new_lm == LM_ON_AIR_CAT) new_lm = LM_ON_AIR_COPY;
 
 	logging_mode_ = (logging_mode_t)new_lm;
 
@@ -131,7 +132,7 @@ void qso_data::create_form(int X, int Y) {
 // Enable QSO widgets
 void qso_data::enable_widgets() {
 	// Disable log mode menu item from CAT if no CAT
-	if (rig_if_ == nullptr) {
+	if (!((qso_manager*)parent())->rig()->is_good()) {
 		ch_logmode_->mode(LM_ON_AIR_CAT, ch_logmode_->mode(LM_ON_AIR_CAT) | FL_MENU_INACTIVE);
 	}
 	else {
@@ -959,10 +960,7 @@ void qso_data::update_rig() {
 			// Do nothing
 			break;
 		case LM_ON_AIR_CAT: {
-			if (rig_if_) {
-				//dial_swr_->value(rig_if_->swr_meter());
-				//dial_pwr_->value(rig_if_->pwr_meter());
-				//dial_vdd_->value(rig_if_->vdd_meter());
+			if (((qso_manager*)parent())->rig()->is_good()) {
 				g_entry_->copy_cat_to_qso();
 				if (band_view_) {
 					double freq;

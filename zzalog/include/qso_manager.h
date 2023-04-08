@@ -109,6 +109,10 @@ using namespace std;
 		void ticker();
 		// Change rig 
 		void change_rig(string rig_name);
+		// Get rig
+		rig_if* rig();
+		// Stop the 1s timer in qso_clock
+		void stop_ticker();
 
 
 	protected:

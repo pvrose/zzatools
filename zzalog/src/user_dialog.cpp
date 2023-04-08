@@ -22,7 +22,6 @@ extern Fl_Preferences* settings_;
 extern book* book_;
 extern qso_manager* qso_manager_;
 extern tabbed_forms* tabbed_forms_;
-extern rig_if* rig_if_;
 
 user_dialog::user_dialog(int X, int Y, int W, int H, const char* label) :
 	page_dialog(X, Y, W, H, label) 
@@ -357,8 +356,9 @@ void user_dialog::populate_size(Fl_Hold_Browser* br, const Fl_Font* font, const 
 // Populate frequency
 void user_dialog::populate_freq(Fl_Choice* ch, display_freq_t format) {
 	string freq = "14.000000";
-	if (rig_if_) {
-		freq = rig_if_->get_frequency(false);
+	rig_if* rig = qso_manager_->rig();
+	if (rig->is_good()) {
+		freq = rig->get_frequency(false);
 	}
 	ch->clear();
 	char temp[25];

@@ -8,7 +8,6 @@
 #include "tabbed_forms.h"
 #include "book.h"
 
-extern rig_if* rig_if_;
 extern status* status_;
 extern spec_data* spec_data_;
 extern band_view* band_view_;
@@ -233,12 +232,13 @@ void qso_entry::copy_qso_to_qso(record* old_record, int flags) {
 
 // Copy fields from CAT and default rig etc.
 void qso_entry::copy_cat_to_qso() {
-	if (rig_if_->is_good()) {
-		string freqy = rig_if_->get_frequency(true);
+	rig_if* rig = ((qso_manager*)qso_data_->parent())->rig();
+	if (rig->is_good()) {
+		string freqy = rig->get_frequency(true);
 		string mode;
 		string submode;
-		rig_if_->get_string_mode(mode, submode);
-		string tx_power = rig_if_->get_tx_power();
+		rig->get_string_mode(mode, submode);
+		string tx_power = rig->get_tx_power();
 		switch (qso_data_->logging_state()) {
 		case qso_data::QSO_PENDING: {
 			// Load values from rig

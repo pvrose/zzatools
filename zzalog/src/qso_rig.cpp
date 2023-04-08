@@ -270,6 +270,7 @@ void qso_rig::enable_widgets() {
 		if (rig_->is_open()) network_grp_->deactivate();
 		else network_grp_->activate();
 		network_grp_->show();
+		ip_port_->value(hamlib_data_.port_name.c_str());
 		if (rig_->is_open()) {
 			bn_connect_->color(FL_GREEN);
 			bn_connect_->label("Disconnect");
@@ -341,6 +342,7 @@ void qso_rig::populate_model_choice() {
 		}
 	}
 	// Add the rigs in alphabetical order to the choice widget, set widget's value to intended
+	ch_rig_model_->add("");
 	for (auto ix = rig_list.begin(); ix != rig_list.end(); ix++) {
 		string name = *ix;
 		rig_model_t id = rig_ids.at(name);

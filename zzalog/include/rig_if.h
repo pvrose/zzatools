@@ -124,7 +124,7 @@ using namespace std;
 		const char* error_text(rig_errcode_e code);
 
 		// MY_RIG name
-		const char* my_rig_name_;
+		string my_rig_name_;
 		// Hamlib specific attributes
 		hamlib_data_t hamlib_data_;
 		// Rig interface

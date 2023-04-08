@@ -149,3 +149,7 @@ void qso_clock::cb_click(Fl_Widget* w, void* v) {
 	that->enable_widgets();
 }
 
+// Stop 1s ticker
+void qso_clock::stop_ticker() {
+	Fl::remove_timeout(cb_timer_clock);
+}
