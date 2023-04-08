@@ -23,7 +23,7 @@ qso_rig::qso_rig(int X, int Y, int W, int H, const char* L) :
 	if (L == nullptr || strlen(L) == 0) copy_label(((qso_manager*)parent())->get_my_rig().c_str());
 	load_values();
 	mode_ = hamlib_data_.port_type;
-	rig_ = new rig_if(L, hamlib_data_);
+	rig_ = new rig_if(label(), hamlib_data_);
 	create_form(X, Y);
 	enable_widgets();
 }
