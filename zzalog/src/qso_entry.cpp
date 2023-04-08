@@ -1,5 +1,6 @@
 #include "qso_entry.h"
 #include "qso_data.h"
+#include "qso_manager.h"
 #include "rig_if.h"
 #include "status.h"
 #include "spec_data.h"
@@ -499,6 +500,10 @@ void qso_entry::cb_ip_field(Fl_Widget* w, void* v) {
 			spec_data_->add_user_macro(field, value, entry);
 		}
 		that->qso_data_->check_qth_changed();
+	}
+	else if (field == "MY_RIG") {
+		// Update the selected rig CAT group
+		((qso_manager*)that->qso_data_->parent())->change_rig(value);
 	}
 	// Update other views if editing or logging
 	switch (that->qso_data_->logging_state()) {
