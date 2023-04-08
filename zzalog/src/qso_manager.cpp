@@ -249,6 +249,17 @@ void qso_manager::update_rig() {
 	data_group_->update_rig();
 }
 
+// Change rig
+void qso_manager::change_rig(string rig_name) {
+	if (strcmp(rig_name.c_str(), rig_group_->label())) {
+		// Change the rig's name and reload the connection data
+		rig_group_->copy_label(rig_name.c_str());
+		rig_group_->load_values();
+		rig_group_->switch_rig();
+		rig_if_ = rig_group_->rig();
+	}
+}
+
 // Called whenever another view updates a record (or selects a new one)
 void qso_manager::update_qso(hint_t hint, qso_num_t match_num, qso_num_t query_num) {
 	switch (hint) {
@@ -261,6 +272,7 @@ void qso_manager::update_qso(hint_t hint, qso_num_t match_num, qso_num_t query_n
 	case HT_NEW_DATA:
 	case HT_RESET_ORDER:
 		data_group_->update_qso(match_num);
+		change_rig(book_->get_record(match_num, false)->item("MY_RIG"));
 		break;
 	case HT_IMPORT_QUERY:
 		data_group_->update_query(qso_data::QUERY_MATCH, match_num, query_num);

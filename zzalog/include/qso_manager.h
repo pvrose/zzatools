@@ -62,6 +62,8 @@ using namespace std;
 		void update_import_qso(record* import);
 		// Query/update
 		void update(hint_t hint, qso_num_t log_num, qso_num_t query_num);
+		// Update time
+		void update_time(time_t when);
 
 		// Callback - close button
 		static void cb_close(Fl_Widget* w, void* v);
@@ -105,6 +107,8 @@ using namespace std;
 		string get_my_rig();
 		// 1 second ticker
 		void ticker();
+		// Change rig 
+		void change_rig(string rig_name);
 
 
 	protected:
