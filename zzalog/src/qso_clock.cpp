@@ -125,11 +125,6 @@ void qso_clock::enable_widgets() {
 		bn_local_->labelcolor(FL_RED);
 		bn_local_->copy_label(result);
 	}
-
-	qso_manager* mgr = (qso_manager*)parent();
-	if (mgr->logging_state() == qso_data::QSO_PENDING) {
-		mgr->update_time(now);
-	}
 }
 
 // save value

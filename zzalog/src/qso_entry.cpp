@@ -279,10 +279,11 @@ void qso_entry::copy_cat_to_qso() {
 }
 
 // Copy current timestamp to QSO
-void qso_entry::copy_clock_to_qso(time_t clock) {
+void qso_entry::copy_clock_to_qso() {
 	// Only allow this if in activate - will be called every second 
 	if (qso_data_->current_qso()) {
-		tm* value = gmtime(&clock);
+		time_t now = time(nullptr);
+		tm* value = gmtime(&now);
 		char result[100];
 		// convert date
 		strftime(result, 99, "%Y%m%d", value);

@@ -66,7 +66,7 @@ public:
 	// Copy fields from CAT
 	void copy_cat_to_qso();
 	// Copy clock to QSO
-	void copy_clock_to_qso(time_t clock);
+	void copy_clock_to_qso();
 	// Update rig in QSO
 	void update_rig();
 	// Initialise fields

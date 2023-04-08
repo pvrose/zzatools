@@ -62,8 +62,6 @@ using namespace std;
 		void update_import_qso(record* import);
 		// Query/update
 		void update(hint_t hint, qso_num_t log_num, qso_num_t query_num);
-		// Update time
-		void update_time(time_t when);
 
 		// Callback - close button
 		static void cb_close(Fl_Widget* w, void* v);

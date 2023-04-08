@@ -106,14 +106,14 @@ public:
 	qso_num_t current_qso_num();
 	// Update view and 
 	void update_rig();
-	// Update clock
-	void update_time(time_t when);
 	// Action handle d-click
 	void action_handle_dclick(int col, string field);
 	// Gt call
 	string get_call();
 	// QTH has changed
 	void check_qth_changed();
+	// Ticker clock
+	void ticker();
 
 
 	// State transition actions:-

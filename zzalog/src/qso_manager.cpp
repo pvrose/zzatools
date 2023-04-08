@@ -183,6 +183,8 @@ void qso_manager::enable_widgets() {
 	// Not all widgets may exist yet!
 	if (!created_) return;
 
+	rig_if_ = rig_group_->rig();
+
 	data_group_->enable_widgets();
 	rig_group_->enable_widgets();
 }
@@ -340,11 +342,6 @@ string qso_manager::get_default(stn_item_t item) {
 	}
 }
 
-// Update the time
-void qso_manager::update_time(time_t when) {
-	data_group_->update_time(when);
-}
-
 // Get current rig value
 string qso_manager::get_my_rig() {
 	return data_group_->get_default_record()->item("MY_RIG");
@@ -355,6 +352,7 @@ void qso_manager::ticker() {
 	if (!ticker_in_progress_) {
 		ticker_in_progress_ = true;
 		rig_group_->ticker();
+		data_group_->ticker();
 		ticker_in_progress_ = false;
 	}
 }

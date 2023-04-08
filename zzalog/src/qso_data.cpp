@@ -350,7 +350,6 @@ void qso_data::action_activate() {
 	record* source_record = current_qso_;
 	current_qso_ = new record;
 	current_rec_num_ = -1;
-	time_t now = time(nullptr);
 	qso_manager* mgr = ancestor_view<qso_manager>(this);
 	logging_state_ = QSO_PENDING;
 	switch (logging_mode_) {
@@ -362,22 +361,22 @@ void qso_data::action_activate() {
 		// Copy station details and get read rig details for band etc.
 		g_entry_->copy_qso_to_qso(source_record, qso_entry::CF_RIG_ETC);
 		g_entry_->copy_cat_to_qso();
-		g_entry_->copy_clock_to_qso(now);
+		g_entry_->copy_clock_to_qso();
 		break;
 	case LM_ON_AIR_CLONE:
 		// Clone the QSO - get station and band from original QSO
 		g_entry_->copy_qso_to_qso(source_record, qso_entry::CF_RIG_ETC | qso_entry::CF_CAT);
-		g_entry_->copy_clock_to_qso(now);
+		g_entry_->copy_clock_to_qso();
 		break;
 	case LM_ON_AIR_COPY:
 		// Copy the QSO - as abobe but also same callsign and details
 		g_entry_->copy_qso_to_qso(source_record, qso_entry::CF_RIG_ETC | qso_entry::CF_CAT | qso_entry::CF_CONTACT);
-		g_entry_->copy_clock_to_qso(now);
+		g_entry_->copy_clock_to_qso();
 		break;
 	case LM_ON_AIR_TIME:
 		// Copy the station details and set the current date/time.
 		g_entry_->copy_qso_to_qso(source_record, qso_entry::CF_RIG_ETC);
-		g_entry_->copy_clock_to_qso(now);
+		g_entry_->copy_clock_to_qso();
 		break;
 	}
 	initialise_fields();
@@ -1076,8 +1075,9 @@ qso_num_t qso_data::current_qso_num() {
 }
 
 // Update time
-void qso_data::update_time(time_t when) {
-	g_entry_->copy_clock_to_qso(when);
+void qso_data::ticker() {
+	g_entry_->copy_clock_to_qso();
+	g_entry_->copy_cat_to_qso();
 }
 
 // Call in editor
