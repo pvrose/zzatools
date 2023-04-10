@@ -10,6 +10,7 @@
 extern Fl_Preferences* settings_;
 extern spec_data* spec_data_;
 extern status* status_;
+extern bool closing_;
 
 qso_tabbed_rigs::qso_tabbed_rigs(int X, int Y, int W, int H, const char* L) :
 	Fl_Tabs(X, Y, W, H, L)
@@ -84,10 +85,10 @@ void qso_tabbed_rigs::enable_widgets() {
 	for (auto ix = label_map_.begin(); ix != label_map_.end(); ix++) {
 		Fl_Widget* w = (*ix).second;
 		if (w == value()) {
-			w->labelfont(w->labelfont() | FL_BOLD & ~FL_ITALIC);
+			w->labelfont((w->labelfont() | FL_BOLD) & (~FL_ITALIC));
 		}
 		else {
-			w->labelfont(w->labelfont() & ~FL_BOLD | FL_ITALIC);
+			w->labelfont((w->labelfont() & (~FL_BOLD)) | FL_ITALIC);
 		}
 	}
 }
@@ -125,9 +126,11 @@ void qso_tabbed_rigs::cb_tabs(Fl_Widget* w, void* v) {
 
 // 1s clock interface
 void qso_tabbed_rigs::ticker() {
-	for (auto ix = label_map_.begin(); ix != label_map_.end(); ix++) {
-		qso_rig* rig = (qso_rig*)(*ix).second;
-		if (rig != nullptr) rig->ticker();
+	if (!closing_) {
+		for (auto ix = label_map_.begin(); ix != label_map_.end() && !closing_; ix++) {
+			qso_rig* rig = (qso_rig*)(*ix).second;
+			if (rig != nullptr) rig->ticker();
+		}
 	}
 }
 

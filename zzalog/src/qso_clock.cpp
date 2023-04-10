@@ -5,6 +5,7 @@
 #include<ctime>
 
 const double UTC_TIMER = 1.0;
+extern bool closing_;
 
 // Clock group - constructor
 qso_clock::qso_clock
@@ -135,11 +136,13 @@ void qso_clock::save_values() {
 // Callback - 1s timer
 void qso_clock::cb_timer_clock(void* v) {
 	// Update the label in the clock button which is passed as the parameter
-	qso_clock* that = (qso_clock*)v;
-	that->enable_widgets();
-	((qso_manager*)that->parent())->ticker();
+	if (!closing_) {
+		qso_clock* that = (qso_clock*)v;
+		that->enable_widgets();
+		((qso_manager*)that->parent())->ticker();
 
-	Fl::repeat_timeout(UTC_TIMER, cb_timer_clock, v);
+		Fl::repeat_timeout(UTC_TIMER, cb_timer_clock, v);
+	}
 }
 
 // Callback click group

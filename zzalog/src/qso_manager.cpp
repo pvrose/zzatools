@@ -66,6 +66,7 @@ extern import_data* import_data_;
 extern qrz_handler* qrz_handler_;
 void add_rig_if();
 extern bool read_only_;
+extern bool closing_;
 
 
 
@@ -361,7 +362,7 @@ string qso_manager::get_my_rig() {
 
 // Handle 1 second timer
 void qso_manager::ticker() {
-	if (!ticker_in_progress_) {
+	if (!ticker_in_progress_ && !closing_) {
 		ticker_in_progress_ = true;
 		rig_group_->ticker();
 		data_group_->ticker();
