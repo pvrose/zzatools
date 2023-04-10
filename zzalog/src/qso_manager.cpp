@@ -126,8 +126,7 @@ void qso_manager::create_form(int X, int Y) {
 	curr_y += GAP;
 	int save_y = curr_y;
 
-	rig_group_ = new qso_rig(curr_x, curr_y, 0, 0, nullptr);
-	rig_group_->create_form(curr_x, curr_y);
+	rig_group_ = new qso_tabbed_rigs(curr_x, curr_y, 0, 0, nullptr);
 
 	curr_x += rig_group_->w() + GAP;
 
@@ -247,10 +246,10 @@ void qso_manager::update_rig() {
 
 // Change rig
 void qso_manager::change_rig(string rig_name) {
-	if (strcmp(rig_name.c_str(), rig_group_->label())) {
+	if (rig_group_->label() == nullptr || strcmp(rig_name.c_str(), rig_group_->label())) {
 		// Change the rig's name and reload the connection data
 		rig_group_->copy_label(rig_name.c_str());
-		rig_group_->load_values();
+		//rig_group_->load_values();
 		rig_group_->switch_rig();
 	}
 }

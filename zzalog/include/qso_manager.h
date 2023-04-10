@@ -1,9 +1,9 @@
 #ifndef __STN_DIALOG__
 #define __STN_DIALOG__
 
-#include "qso_rig.h"
 #include "qso_clock.h"
 #include "qso_data.h"
+#include "qso_tabbed_rigs.h"
 
 #include "callback.h"
 #include "record.h"
@@ -128,7 +128,7 @@ using namespace std;
 
 		// Groups
 		qso_data* data_group_;
-		qso_rig* rig_group_;
+		qso_tabbed_rigs* rig_group_;
 		qso_clock* clock_group_;
 		// widgets
 

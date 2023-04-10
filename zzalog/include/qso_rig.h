@@ -17,7 +17,7 @@ class qso_rig :
 
 public:
 
-	qso_rig(int X, int Y, int W, int H, const char* l);
+	qso_rig(int X, int Y, int W, int H, const char* l = nullptr);
 	~qso_rig();
 
 	// get settings 
@@ -36,6 +36,8 @@ public:
 	void new_rig();
 	// Get the rig
 	rig_if* rig();
+	// Notification colour
+	Fl_Color alert_colour();
 
 protected:
 	// Callback - model choice

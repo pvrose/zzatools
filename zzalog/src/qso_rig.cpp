@@ -17,10 +17,12 @@ extern status* status_;
 
 // Constructor
 qso_rig::qso_rig(int X, int Y, int W, int H, const char* L) :
-	Fl_Group(X, Y, W, H, L)
+	Fl_Group(X, Y, W, H, nullptr)
 {
-	// Set supplied label to rig as the MY_RIG name
-	if (L == nullptr || strlen(L) == 0) copy_label(((qso_manager*)parent())->get_my_rig().c_str());
+	// If no name is provided then get from qso_manager
+	if (L == nullptr || strlen(L) == 0) copy_label(ancestor_view<qso_manager>(this)->get_my_rig().c_str());
+	// Otherwise copy that supplied as it is probably a transient string
+	else copy_label(L);
 	load_values();
 	rig_ = new rig_if(label(), hamlib_data_);
 	create_form(X, Y);
@@ -114,11 +116,11 @@ void qso_rig::create_form(int X, int Y) {
 	// CAT control group
 	labelfont(FL_BOLD);
 	labelsize(FL_NORMAL_SIZE + 2);
-	align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
+	//align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 	box(FL_BORDER_BOX);
 
 	int curr_x = X + GAP + WLABEL;
-	int curr_y = Y + HTEXT;
+	int curr_y = Y + GAP;
 
 	// First button - connect/disconnect or add
 	bn_connect_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Connect");
@@ -514,7 +516,7 @@ void qso_rig::cb_bn_connect(Fl_Widget* w, void* v) {
 void qso_rig::switch_rig() {
 	delete rig_;
 	rig_ = new rig_if(label(), hamlib_data_);
-	((qso_manager*)parent())->update_rig();
+	ancestor_view<qso_manager>(this)->update_rig();
 	enable_widgets();
 }
 
@@ -547,3 +549,7 @@ rig_if* qso_rig::rig() {
 	return rig_;
 }
 
+// Return the colour used in the connect button as its alert
+Fl_Color qso_rig::alert_colour() {
+	return bn_connect_->color();
+}
