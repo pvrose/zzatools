@@ -60,6 +60,8 @@ void qso_tabbed_rigs::create_form(int X, int Y) {
 		status_->misc_status(ST_NOTE, msg);
 		// Create a version of qso_rig 
 		qso_rig* w = new qso_rig(rx, ry, rw, rh, (*ix).first.c_str());
+		// TODO The following code relies on a later version of FLTK 1.4
+		//w->when(FL_WHEN_CLOSED);
 		add(w);
 		(*ix).second = w;
 		// All versions of qso_rig should be the same size, but...
