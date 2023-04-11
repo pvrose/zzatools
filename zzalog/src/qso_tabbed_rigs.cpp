@@ -112,10 +112,14 @@ void qso_tabbed_rigs::switch_rig() {
 		label_map_[rig_name] = w;
 		value(w);
 	}
-	else {
-		// It exists, switch its state
+	else if (label_map_.at(rig_name) == value()) {
+		// It exists and is current selection, switch its state
 		((qso_rig*)value())->switch_rig();
+	} else {
+		// It isn't the current selection so select it
+		value(label_map_.at(rig_name));
 	}
+	enable_widgets();
 }
 
 void qso_tabbed_rigs::cb_tabs(Fl_Widget* w, void* v) {
@@ -127,14 +131,12 @@ void qso_tabbed_rigs::cb_tabs(Fl_Widget* w, void* v) {
 // 1s clock interface
 void qso_tabbed_rigs::ticker() {
 	if (!closing_) {
-		for (auto ix = label_map_.begin(); ix != label_map_.end() && !closing_; ix++) {
-			qso_rig* rig = (qso_rig*)(*ix).second;
-			if (rig != nullptr) rig->ticker();
-		}
+		// Only send ticker to active rig
+		((qso_rig*)value())->ticker();
 	}
 }
 
 // Get the rig
 rig_if* qso_tabbed_rigs::rig() {
-	return (rig_if*)value();
+	return ((qso_rig*)value())->rig();
 }
