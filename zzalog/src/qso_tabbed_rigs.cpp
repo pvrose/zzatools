@@ -43,6 +43,9 @@ void qso_tabbed_rigs::load_values() {
 			label_map_[string(name)] = nullptr;
 		}
 	}
+	if (label_map_.size() == 0) {
+		label_map_["No Rig"] = nullptr;
+	}
 }
 
 // Create form
