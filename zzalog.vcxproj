@@ -71,7 +71,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\pvros\Documents\dev\deps\lib;C:\Users\pvros\Documents\dev\fltk-master\build\lib\Release;C:\Users\pvros\Documents\dev\curl-7.65.1\builds\libcurl-vc15-x86-release-dll-ipv6-sspi-winssl\lib;C:\Users\pvros\Documents\dev\zzatools\Release;$(LibraryPath);C:\Program Files %28x86%29\hamlib-w32-4.5.3\lib\msvc</LibraryPath>
+    <LibraryPath>C:\Users\pvros\Documents\dev\deps\lib;C:\Users\pvros\Documents\dev\fltk-master\build\lib\RelWithDebInfo;C:\Users\pvros\Documents\dev\curl-7.65.1\builds\libcurl-vc15-x86-release-dll-ipv6-sspi-winssl\lib;C:\Users\pvros\Documents\dev\zzatools\Release;$(LibraryPath);C:\Program Files %28x86%29\hamlib-w32-4.5.3\lib\msvc</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LibraryPath>C:\Users\pvros\Documents\dev\deps\lib;C:\Users\pvros\Documents\dev\fltk-1.4.x-20200320-0a38e2e3\build\lib\Debug;C:\cygwin\usr\local\bin;C:\Users\pvros\Documents\dev\curl-7.65.1\builds\libcurl-vc15-x86-release-dll-ipv6-sspi-winssl\lib;C:\Users\pvros\Documents\dev\zzatools\Debug;$(LibraryPath)</LibraryPath>
@@ -117,7 +117,7 @@
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>libcurl.lib;libssh2_a.lib;nghttp2.lib;libssl.lib;libcrypto.lib;oldap32_a.lib;olber32_a.lib;zlib_a.lib;fltk.lib;fltk_jpeg.lib;fltk_png.lib;fltk_z.lib;fltk_images.lib;fltk_gl.lib;fltk_forms.lib;comctl32.lib;Ws2_32.lib;libhamlib-4.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libcurl.lib;libssh2_a.lib;nghttp2.lib;libssl.lib;libcrypto.lib;oldap32_a.lib;olber32_a.lib;zlib_a.lib;fltk.lib;fltk_jpeg.lib;fltk_png.lib;fltk_z.lib;fltk_images.lib;fltk_gl.lib;fltk_forms.lib;gdiplus.lib;comctl32.lib;Ws2_32.lib;libhamlib-4.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <HeapReserveSize>2000000</HeapReserveSize>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>

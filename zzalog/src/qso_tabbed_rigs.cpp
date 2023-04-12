@@ -143,66 +143,66 @@ rig_if* qso_tabbed_rigs::rig() {
 	return ((qso_rig*)value())->rig();
 }
 
-#define BORDER 2
-#define EXTRASPACE 10
-#define SELECTION_BORDER 5
-
-// Copy of Fl_Tabs - verbatim until noted otherwise
-int qso_tabbed_rigs::tab_positions() {
-	const int nc = children();
-	if (nc != tab_count) {
-		clear_tab_positions();
-		if (nc) {
-			tab_pos = (int*)malloc((nc + 1) * sizeof(int));
-			tab_width = (int*)malloc((nc) * sizeof(int));
-		}
-		tab_count = nc;
-	}
-	if (nc == 0) return 0;
-	int selected = 0;
-	Fl_Widget* const* a = array();
-	int i;
-	char prev_draw_shortcut = fl_draw_shortcut;
-	fl_draw_shortcut = 1;
-
-	tab_pos[0] = Fl::box_dx(box());
-	for (i = 0; i < nc; i++) {
-		Fl_Widget* o = *a++;
-		if (o->visible()) selected = i;
-
-		int wt = 0; int ht = 0;
-		Fl_Labeltype ot = o->labeltype();
-		Fl_Align oa = o->align();
-		if (ot == FL_NO_LABEL) {
-			o->labeltype(FL_NORMAL_LABEL);
-		}
-		o->align(tab_align());
-		o->measure_label(wt, ht);
-		o->labeltype(ot);
-		o->align(oa);
-
-		tab_width[i] = wt + EXTRASPACE;
-		tab_pos[i + 1] = tab_pos[i] + tab_width[i] + BORDER;
-	}
-	fl_draw_shortcut = prev_draw_shortcut;
-
-	int r = w();
-	if (tab_pos[i] <= r) return selected;
-
-	// Change the algorithm if they are too big
-	// Reduce all deselected widths by the apportioned oversize
-	// Use fixed point arithmetic (x2^10) to reduce rounding error
-	int delta = 1024 * (r - tab_width[selected]) / (tab_pos[i] - tab_width[selected]);
-	for (i = 0; i < nc; i++) {
-		if (i != selected) {
-			tab_width[i] = tab_width[i] * delta / 1024;
-		}
-		tab_pos[i + 1] = tab_pos[i] + tab_width[i] + BORDER;
-	}
-	// If we haven't used the full width, increase the size of the last tab to compensate
-	if (tab_pos[i] < r) {
-		tab_width[i - 1] = r - tab_pos[i];
-		tab_pos[i] = r;
-	}
-	return selected;
-}
+//#define BORDER 2
+//#define EXTRASPACE 10
+//#define SELECTION_BORDER 5
+//
+//// Copy of Fl_Tabs - verbatim until noted otherwise
+//int qso_tabbed_rigs::tab_positions() {
+//	const int nc = children();
+//	if (nc != tab_count) {
+//		clear_tab_positions();
+//		if (nc) {
+//			tab_pos = (int*)malloc((nc + 1) * sizeof(int));
+//			tab_width = (int*)malloc((nc) * sizeof(int));
+//		}
+//		tab_count = nc;
+//	}
+//	if (nc == 0) return 0;
+//	int selected = 0;
+//	Fl_Widget* const* a = array();
+//	int i;
+//	char prev_draw_shortcut = fl_draw_shortcut;
+//	fl_draw_shortcut = 1;
+//
+//	tab_pos[0] = Fl::box_dx(box());
+//	for (i = 0; i < nc; i++) {
+//		Fl_Widget* o = *a++;
+//		if (o->visible()) selected = i;
+//
+//		int wt = 0; int ht = 0;
+//		Fl_Labeltype ot = o->labeltype();
+//		Fl_Align oa = o->align();
+//		if (ot == FL_NO_LABEL) {
+//			o->labeltype(FL_NORMAL_LABEL);
+//		}
+//		o->align(tab_align());
+//		o->measure_label(wt, ht);
+//		o->labeltype(ot);
+//		o->align(oa);
+//
+//		tab_width[i] = wt + EXTRASPACE;
+//		tab_pos[i + 1] = tab_pos[i] + tab_width[i] + BORDER;
+//	}
+//	fl_draw_shortcut = prev_draw_shortcut;
+//
+//	int r = w();
+//	if (tab_pos[i] <= r) return selected;
+//
+//	// Change the algorithm if they are too big
+//	// Reduce all deselected widths by the apportioned oversize
+//	// Use fixed point arithmetic (x2^10) to reduce rounding error
+//	int delta = 1024 * (r - tab_width[selected]) / (tab_pos[i] - tab_width[selected]);
+//	for (i = 0; i < nc; i++) {
+//		if (i != selected) {
+//			tab_width[i] = tab_width[i] * delta / 1024;
+//		}
+//		tab_pos[i + 1] = tab_pos[i] + tab_width[i] + BORDER;
+//	}
+//	// If we haven't used the full width, increase the size of the last tab to compensate
+//	if (tab_pos[i] < r) {
+//		tab_width[i - 1] = r - tab_pos[i];
+//		tab_pos[i] = r;
+//	}
+//	return selected;
+//}
