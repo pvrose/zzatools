@@ -43,6 +43,9 @@ void qso_tabbed_rigs::load_values() {
 			label_map_[string(name)] = nullptr;
 		}
 	}
+	if (label_map_.size() == 0) {
+		label_map_[string("")] = nullptr;
+	}
 }
 
 // Create form
@@ -76,21 +79,23 @@ void qso_tabbed_rigs::create_form(int X, int Y) {
 // Enable widgets
 void qso_tabbed_rigs::enable_widgets() {
 	string name;
-	if (label() == nullptr || strlen(label()) == 0) {
-		name = (*label_map_.begin()).first;
-	}
-	else {
-		name = label();
-	}
-	printf("Selecting rig control %s\n", name.c_str());
-	value(label_map_.at(name));
-	for (auto ix = label_map_.begin(); ix != label_map_.end(); ix++) {
-		Fl_Widget* w = (*ix).second;
-		if (w == value()) {
-			w->labelfont((w->labelfont() | FL_BOLD) & (~FL_ITALIC));
+	if (label_map_.size() > 0) {
+		if (label() == nullptr || strlen(label()) == 0) {
+			name = (*label_map_.begin()).first;
 		}
 		else {
-			w->labelfont((w->labelfont() & (~FL_BOLD)) | FL_ITALIC);
+			name = label();
+		}
+		printf("Selecting rig control %s\n", name.c_str());
+		value(label_map_.at(name));
+		for (auto ix = label_map_.begin(); ix != label_map_.end(); ix++) {
+			Fl_Widget* w = (*ix).second;
+			if (w == value()) {
+				w->labelfont((w->labelfont() | FL_BOLD) & (~FL_ITALIC));
+			}
+			else {
+				w->labelfont((w->labelfont() & (~FL_BOLD)) | FL_ITALIC);
+			}
 		}
 	}
 }
@@ -103,6 +108,11 @@ void qso_tabbed_rigs::save_values() {
 void qso_tabbed_rigs::switch_rig() {
 	string rig_name = label();
 	if (label_map_.find(rig_name) == label_map_.end() || label_map_.at(rig_name) == nullptr) {
+		if (label_map_.size() == 1 && (*label_map_.begin()).first == string("")) {
+			// Place holder null string - delete it and its reference
+			delete (qso_rig*)(*label_map_.begin()).second;
+			label_map_.erase(string(""));
+		}
 		// Rig does not yet exist, create it and select it
 		int rx = 0;
 		int ry = 0;
@@ -140,6 +150,9 @@ void qso_tabbed_rigs::ticker() {
 
 // Get the rig
 rig_if* qso_tabbed_rigs::rig() {
+	// No child tabs so return no rig
+	if (children() == 0) return nullptr;
+	// Otherwise return the rig in the selected tab
 	return ((qso_rig*)value())->rig();
 }
 

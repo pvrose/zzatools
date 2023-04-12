@@ -95,7 +95,7 @@
       <TargetMachine>MachineX86</TargetMachine>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>libcurl.lib;libssh2_a.lib;nghttp2.lib;libssl.lib;libcrypto.lib;oldap32_a.lib;olber32_a.lib;zlib_a.lib;libhamlib-4.lib;fltkd.lib;fltk_jpegd.lib;fltk_pngd.lib;fltk_zd.lib;fltk_imagesd.lib;fltk_gld.lib;fltk_formsd.lib;comctl32.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libcurl.lib;libssh2_a.lib;nghttp2.lib;libssl.lib;libcrypto.lib;oldap32_a.lib;olber32_a.lib;zlib_a.lib;libhamlib-4.lib;fltkd.lib;fltk_jpegd.lib;fltk_pngd.lib;fltk_zd.lib;fltk_imagesd.lib;fltk_gld.lib;fltk_formsd.lib;gdiplus.lib;comctl32.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <HeapReserveSize>2000000</HeapReserveSize>

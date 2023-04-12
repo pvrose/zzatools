@@ -132,7 +132,8 @@ void qso_data::create_form(int X, int Y) {
 // Enable QSO widgets
 void qso_data::enable_widgets() {
 	// Disable log mode menu item from CAT if no CAT
-	if (!((qso_manager*)parent())->rig()->is_good()) {
+	rig_if* rig = ((qso_manager*)parent())->rig();
+	if (rig == nullptr || !rig->is_good()) {
 		ch_logmode_->mode(LM_ON_AIR_CAT, ch_logmode_->mode(LM_ON_AIR_CAT) | FL_MENU_INACTIVE);
 	}
 	else {
