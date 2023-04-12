@@ -404,7 +404,7 @@ bool rig_if::read_values() {
 	}
 	// TX use accumulated maximum value
 	else if (rig_data_.ptt) {
-		rig_data_.pwr = max(rig_data_.pwr, meter_value.f);
+		rig_data_.pwr = max(rig_data_.pwr, (double)meter_value.f);
 	}
 	// VDD meter
 	if (!reported_no_vdd_) {
