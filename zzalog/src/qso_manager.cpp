@@ -25,6 +25,7 @@
 #include "utils.h"
 #include "qsl_viewer.h"
 #include "qrz_handler.h"
+#include "main_window.h"
 
 #include <set>
 
@@ -64,11 +65,9 @@ extern band_view* band_view_;
 extern tabbed_forms* tabbed_forms_;
 extern import_data* import_data_;
 extern qrz_handler* qrz_handler_;
-void add_rig_if();
+extern main_window* main_window_;
 extern bool read_only_;
 extern bool closing_;
-
-
 
 // The main dialog constructor
 qso_manager::qso_manager(int W, int H, const char* label) :
@@ -77,6 +76,7 @@ qso_manager::qso_manager(int W, int H, const char* label) :
 	, created_(false)
 	, ticker_in_progress_(false)
 {
+	callback(cb_close);
 	load_values();
 	create_form(0,0);
 	update_rig();
@@ -185,7 +185,7 @@ void qso_manager::enable_widgets() {
 	rig_group_->enable_widgets();
 }
 
-// Close button clicked - check editing or not
+// Close button clicked - invoke main window close
 // v is not used
 void qso_manager::cb_close(Fl_Widget* w, void* v) {
 	// It is the window that raised this callback
@@ -200,10 +200,8 @@ void qso_manager::cb_close(Fl_Widget* w, void* v) {
 			qso_buttons::cb_cancel(w, v);
 		}
 	}
-	// Mark qso_manager disabled, hide it and update menu item
-	Fl_Preferences spad_settings(settings_, "Scratchpad");
-	spad_settings.set("Enabled", (int)false);
-	menu_->update_items();
+	// Call the main window callback to close the app.
+	main_window_->do_callback();
 }
 
 // Return the logging mode
