@@ -284,20 +284,26 @@ void qso_entry::copy_cat_to_qso() {
 // Copy current timestamp to QSO
 void qso_entry::copy_clock_to_qso() {
 	// Only allow this if in activate - will be called every second 
-	if (qso_data_->current_qso()) {
-		time_t now = time(nullptr);
-		tm* value = gmtime(&now);
-		char result[100];
-		// convert date
-		strftime(result, 99, "%Y%m%d", value);
-		qso_data_->current_qso()->item("QSO_DATE", string(result));
-		// convert time
-		strftime(result, 99, "%H%M%S", value);
-		qso_data_->current_qso()->item("TIME_ON", string(result));
-		qso_data_->current_qso()->item("QSO_DATE_OFF", string(""));
-		qso_data_->current_qso()->item("TIME_OFF", string(""));
+	switch (qso_data_->logging_state()) {
+	case qso_data::QSO_PENDING:
+		{
+			time_t now = time(nullptr);
+			tm* value = gmtime(&now);
+			char result[100];
+			// convert date
+			strftime(result, 99, "%Y%m%d", value);
+			qso_data_->current_qso()->item("QSO_DATE", string(result));
+			// convert time
+			strftime(result, 99, "%H%M%S", value);
+			qso_data_->current_qso()->item("TIME_ON", string(result));
+			qso_data_->current_qso()->item("QSO_DATE_OFF", string(""));
+			qso_data_->current_qso()->item("TIME_OFF", string(""));
 
-		copy_qso_to_display(CF_TIME);
+			copy_qso_to_display(CF_TIME);
+			break;
+		}
+	default:
+		break;
 	}
 }
 
