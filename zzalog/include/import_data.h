@@ -2,7 +2,6 @@
 #define __IMPORT_DATA__
 
 #include "book.h"
-#include "qso_manager.h"
 
 #include <string>
 #include <vector>

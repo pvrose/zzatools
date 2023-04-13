@@ -8,7 +8,6 @@
 #include "status.h"
 #include "tabbed_forms.h"
 #include "intl_widgets.h"
-#include "qso_manager.h"
 #include "spec_data.h"
 
 #include <set>
@@ -28,7 +27,6 @@ extern Fl_Preferences* settings_;
 extern pfx_data* pfx_data_;
 extern status* status_;
 extern tabbed_forms* tabbed_forms_;
-extern qso_manager* qso_manager_;
 extern spec_data* spec_data_;
 
 // QTH group constructor

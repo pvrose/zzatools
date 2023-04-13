@@ -3,11 +3,14 @@
 #include "status.h"
 #include "book.h"
 #include "qsl_form.h"
+#include "callback.h"
 
 #include <FL/Fl_Preferences.H>
 #include <FL/Fl_JPEG_Image.H>
 #include <FL/Fl_BMP_Image.H>
 #include <FL/Fl_PNG_Image.H>
+#include <FL/Fl_Light_Button.H>
+#include <FL/Fl_Native_File_Chooser.H>
 
 
 

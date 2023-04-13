@@ -14,7 +14,6 @@ record.cpp - Individual record data item: implementation file
 #include "view.h"
 #include "formats.h"
 #include "book.h"
-#include "qso_manager.h"
 
 #include <ctime>
 #include <chrono>
@@ -33,7 +32,6 @@ extern pfx_data* pfx_data_;
 extern spec_data* spec_data_;
 extern Fl_Preferences* settings_;
 extern status* status_;
-extern qso_manager* qso_manager_;
 
 // initialise the static variables
 bool record::expecting_header_ = true;
