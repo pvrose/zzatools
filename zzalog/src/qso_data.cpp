@@ -578,7 +578,7 @@ void qso_data::action_browse() {
 	logging_state_ = QSO_BROWSE;
 	original_qso_ = nullptr;
 	query_qso_ = nullptr;
-	g_query_->label("Browsing record");
+	g_query_->set_message("Browsing record");
 	enable_widgets();
 }
 
@@ -590,26 +590,26 @@ void qso_data::action_query(logging_state_t query) {
 		// And save a copy of it
 		original_qso_ = new record(*current_qso_);
 		query_qso_ = import_data_->get_record(query_rec_num_, false);
-		g_query_->copy_label(import_data_->match_question().c_str());
+		g_query_->set_message(import_data_->match_question().c_str());
 		break;
 	case QUERY_NEW:
 		current_qso_ = nullptr;
 		original_qso_ = nullptr;
 		query_qso_ = import_data_->get_record(query_rec_num_, false);;
-		g_query_->copy_label(import_data_->match_question().c_str());
+		g_query_->set_message(import_data_->match_question().c_str());
 		break;
 	case QUERY_DUPE:
 		// Note record numbers relate to book even if it is extracted data that refered the dupe check
 		current_qso_ = book_->get_record(current_rec_num_, false);
 		original_qso_ = new record(*current_qso_);
 		query_qso_ = book_->get_record(query_rec_num_, false);
-		g_query_->copy_label(navigation_book_->match_question().c_str());
+		g_query_->set_message(navigation_book_->match_question().c_str());
 		break;
 	case QRZ_MERGE:
 		current_qso_ = book_->get_record(current_rec_num_, false);
 		original_qso_ = new record(*current_qso_);
 		query_qso_ = qrz_handler_->get_record();
-		g_query_->copy_label(qrz_handler_->get_merge_message().c_str());
+		g_query_->set_message(qrz_handler_->get_merge_message().c_str());
 		break;
 
 	default:

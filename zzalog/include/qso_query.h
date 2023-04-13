@@ -25,6 +25,8 @@ public:
 	void enable_widgets();
 	// save value
 	void save_values();
+	// Set query message
+	void set_message(string message);
 
 
 protected:

@@ -120,9 +120,10 @@ void qso_entry::create_form(int X, int Y) {
 
 void qso_entry::enable_widgets() {
 	// Now enable disan=
+	char l[128];
 	switch (qso_data_->logging_state()) {
 	case qso_data::QSO_INACTIVE:
-		label("QSO entry is not enabled.");
+		label("QSO Entry is not enabled.");
 		show();
 		for (int ix = 0; ix < NUMBER_TOTAL; ix++) {
 			if (ch_field_[ix]) ch_field_[ix]->deactivate();
@@ -144,7 +145,8 @@ void qso_entry::enable_widgets() {
 		ip_notes_->activate();
 		break;
 	case qso_data::QSO_STARTED:
-		label("QSO Entry - active real-time logging.");
+		snprintf(l, sizeof(l), "QSO Entry - %s - active real-time logging", get_call().c_str());
+		copy_label(l);
 		show();
 		for (int ix = 0; ix <= number_fields_in_use_ && ix < NUMBER_TOTAL; ix++) {
 			if (ch_field_[ix]) ch_field_[ix]->activate();
@@ -157,7 +159,8 @@ void qso_entry::enable_widgets() {
 		ip_notes_->activate();
 		break;
 	case qso_data::QSO_EDIT:
-		label("QSO Entry - off air editing of QSO records.");
+		snprintf(l, sizeof(l), "QSO Entry - %s - off-air editing", get_call().c_str());
+		copy_label(l);
 		show();
 		for (int ix = 0; ix <= number_fields_in_use_ && ix < NUMBER_TOTAL; ix++) {
 			if (ch_field_[ix]) ch_field_[ix]->activate();
@@ -523,6 +526,7 @@ void qso_entry::cb_ip_field(Fl_Widget* w, void* v) {
 		break;
 	case qso_data::QSO_STARTED:
 	case qso_data::QSO_EDIT:
+		that->enable_widgets();
 		tabbed_forms_->update_views(nullptr, HT_MINOR_CHANGE, that->qso_data_->current_qso_num());
 		break;
 	default:
