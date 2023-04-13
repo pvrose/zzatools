@@ -74,7 +74,7 @@ using namespace std;
 string COPYRIGHT = "© Philip Rose GM3ZZA 2018. All rights reserved.\n (Prefix data, DX Atlas & OmniRig interfaces © Alex Shovkoplyas, VE3NEA.)";
 string PROGRAM_ID = "ZZALOG";
 string PROG_ID = "ZLG";
-string VERSION = "3.4.0";
+string VERSION = "3.4.1";
 string TIMESTAMP = __DATE__ + string(" ") + __TIME__;
 #ifdef _DEBUG
 string PROGRAM_VERSION = VERSION + " (Debug " + TIMESTAMP + ")";
@@ -126,7 +126,7 @@ bool read_only_ = false;
 list<string> recent_files_;
 
 // Forward declarations
-void backup_file(bool force, bool retrieve = false);
+void backup_file();
 void set_recent_file(string filename);
 
 // Display the time in the local timezone rather than UTC
@@ -250,7 +250,7 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 
 		// Back up the book
 		if (book_ && book_->been_modified()) {
-			backup_file(false);
+			backup_file();
 		}
 		else {
 			status_->misc_status(ST_NOTE, "ZZALOG: Book has not been modified, skipping backup");
@@ -692,106 +692,79 @@ int main(int argc, char** argv)
 }
 
 // Copy existing data to back up file. force = true used by menu command, 
-void backup_file(bool force, bool retrieve) {
+void backup_file() {
 	// This needs to be int and not bool as the settings.get() would corrupt the stack.
-	int settings_force;
 	Fl_Preferences backup_settings(settings_, "Backup");
-	backup_settings.get("Enable", settings_force, false);
-	if (!force && !retrieve) {
-		if (!settings_force) {
-			fl_beep(FL_BEEP_QUESTION);
-			if (fl_choice("Backup is currently disabled, do you want to enable it?", "Yes", "No", nullptr) == 0) {
-				settings_force = true;
-			}
+	// Get back-up directory
+	char* temp;
+	backup_settings.get("Path", temp, "");
+	string backup = temp;
+	free(temp);
+	while (backup.length() == 0) {
+		Fl_Native_File_Chooser* chooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_DIRECTORY);
+		chooser->title("Select directory for backup");
+		if (chooser->show() == 0) {
+			backup = chooser->filename();
 		}
-		backup_settings.set("Enable", (int)settings_force);
+		delete chooser;
 	}
-	if (force || settings_force) {
-		// Get back-up directory
-		char* temp;
-		backup_settings.get("Path", temp, "");
-		string backup = temp;
-		free(temp);
-		while (backup.length() == 0) {
-			Fl_Native_File_Chooser* chooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_DIRECTORY);
-			chooser->title("Select directory for backup");
-			if (chooser->show() == 0) {
-				backup = chooser->filename();
-			}
-			delete chooser;
-		}
-		// Save the result of the chooser
-		backup_settings.set("Path", backup.c_str());
+	// Save the result of the chooser
+	backup_settings.set("Path", backup.c_str());
 
-		// ensure a '\' is appendded
-		if (backup.back() != '/' && backup.back() != '\\') {
-			backup += '\\';
-		}
-		// Get source filename
-		string source = book_->filename(true);
-		// Create backup filename - use back-up directory and current file-name
-		size_t last_slash = source.find_last_of("/\\");
-		if (last_slash == string::npos) {
-			backup += source;
-		}
-		else {
-			backup += source.substr(last_slash + 1);
-		}
-		char* message = new char[backup.length() + 25];
-		if (retrieve) {
-			sprintf(message, "RETRIEVE: Reading %s", backup.c_str());
-		}
-		else {
-			sprintf(message, "BACKUP: Writing %s", backup.c_str());
-		}
-		status_->misc_status(ST_NOTE, message);
-		delete[] message;
-		// In and out streams
-		ifstream in(retrieve ? backup :source);
-		in.seekg(0, in.end);
-		int length = (int)in.tellg();
-		const int increment = 8000;
-		in.seekg(0, in.beg);
-		if (retrieve) {
-			status_->progress(length, OT_MAIN, "Copying data from backup", "bytes");
-		}
-		else {
-			status_->progress(length, OT_MAIN, "Copying data to backup", "bytes");
-		}
-		ofstream out(retrieve ? source : backup);
-		bool ok = in.good() && out.good();
-		char buffer[increment];
-		int count = 0;
-		// Copy file in 7999 byte chunks
-		while (!in.eof() && ok) {
-			in.read(buffer, increment);
-			out.write(buffer, in.gcount());
-			count += (int)in.gcount();
-			ok = out.good() && (in.good() || in.eof());
-			status_->progress(count, OT_MAIN);
-		}
-		status_->progress(length, OT_MAIN);
-		in.close();
-		out.close();
-		if (!ok) {
-			// Report error
-			if (retrieve) {
-				status_->misc_status(ST_ERROR, "RETRIEVE: failed");
-			}
-			else {
-				status_->misc_status(ST_ERROR, "BACKUP: failed");
-			}
-		}
-		else if (retrieve) {
-			status_->misc_status(ST_OK, "RETRIEVE: Done");
-		} else {
-			status_->misc_status(ST_OK, "BACKUP: Done");
-		}
+	// ensure a '\' is appendded
+	if (backup.back() != '/' && backup.back() != '\\') {
+		backup += '\\';
 	}
-	else if (retrieve) {
-		status_->misc_status(ST_WARNING, "RETRIEVE: Disabled");
+	// Get source filename
+	string source = book_->filename(true);
+	// Create backup filename - use back-up directory and current file-name plus timestamp
+	size_t last_period = source.find_last_of('.');
+	size_t last_slash = source.find_last_of("/\\");
+	string suffix = source.substr(last_period);
+	string base_name;
+	if (last_slash == string::npos) {
+		base_name = source.substr(0, last_period);
+	}
+	else {
+		base_name = source.substr(last_slash + 1, last_period - last_slash - 1);
+	}
+	record* last_record = book_->get_latest();
+	string timestamp = "EMPTY";
+	if (last_record != nullptr) {
+		timestamp = last_record->item("QSO_DATE") + last_record->item("TIME_ON").substr(0, 4);
+	}
+	backup += base_name + "_" + timestamp + suffix;
+	char* message = new char[backup.length() + 25];
+	sprintf(message, "BACKUP: Writing %s", backup.c_str());
+	status_->misc_status(ST_NOTE, message);
+	delete[] message;
+	// In and out streams
+	ifstream in(source);
+	in.seekg(0, in.end);
+	int length = (int)in.tellg();
+	const int increment = 8000;
+	in.seekg(0, in.beg);
+	status_->progress(length, OT_MAIN, "Copying data to backup", "bytes");
+	ofstream out(backup);
+	bool ok = in.good() && out.good();
+	char buffer[increment];
+	int count = 0;
+	// Copy file in 7999 byte chunks
+	while (!in.eof() && ok) {
+		in.read(buffer, increment);
+		out.write(buffer, in.gcount());
+		count += (int)in.gcount();
+		ok = out.good() && (in.good() || in.eof());
+		status_->progress(count, OT_MAIN);
+	}
+	status_->progress(length, OT_MAIN);
+	in.close();
+	out.close();
+	if (!ok) {
+		// Report error
+		status_->misc_status(ST_ERROR, "BACKUP: failed");
 	} else {
-		status_->misc_status(ST_WARNING, "BACKUP: Disabled");
+		status_->misc_status(ST_OK, "BACKUP: Done");
 	}
 }
 

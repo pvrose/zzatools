@@ -92,7 +92,6 @@ settings* config_ = nullptr;
 		// Extra menu items are dynamically inserted here 
 			{ 0 },
 		{ "&Backup", 0, menu::cb_mi_file_backup, (void*)false },
-		{ "Retrie&ve", 0, menu::cb_mi_file_backup, (void*)true },
 		{ 0 },
 
 	// Settings operations
@@ -259,7 +258,7 @@ settings* config_ = nullptr;
 
 extern void add_data();
 extern void main_window_label(string text);
-extern void backup_file(bool force, bool retrieve = false);
+extern void backup_file();
 extern void set_recent_file(string filename);
 
 // Constructor
@@ -492,9 +491,8 @@ void menu::cb_mi_file_print(Fl_Widget* w, void* v) {
 // File->Backup
 // v is bool. false = backup; true = retrieve
 void menu::cb_mi_file_backup(Fl_Widget*, void* v) {
-	bool retrieve = (bool)(long)v;
 	// Back up
-	backup_file(true, retrieve);
+	backup_file();
 }
 
 // Config->any
