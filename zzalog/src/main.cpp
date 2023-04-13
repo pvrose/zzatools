@@ -713,10 +713,7 @@ void backup_file() {
 		base_name = source.substr(last_slash + 1, last_period - last_slash - 1);
 	}
 	record* last_record = book_->get_latest();
-	string timestamp = "EMPTY";
-	if (last_record != nullptr) {
-		timestamp = last_record->item("QSO_DATE") + last_record->item("TIME_ON").substr(0, 4);
-	}
+	string timestamp = now(false, "%Y%m%d_%H%MZ");
 	backup += base_name + "_" + timestamp + suffix;
 	char* message = new char[backup.length() + 25];
 	sprintf(message, "BACKUP: Writing %s", backup.c_str());
