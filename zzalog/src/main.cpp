@@ -157,17 +157,6 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 		qso_manager_->stop_ticker();
 		status_->misc_status(ST_NOTE, "ZZALOG: Closing...");
 		// Delete band view
-		if (band_view_) {
-			Fl::delete_widget(band_view_);
-			band_view_ = nullptr;
-		}
-#ifdef _WIN32
-		// Close DxAtlas connection
-		if (dxa_if_) {
-			delete dxa_if_;
-			dxa_if_ = nullptr;
-		}
-#endif
 		// Currently modifying a (potentially new) record
 		if (book_ && (book_->modified_record() || book_->new_record()) ) {
 			fl_beep(FL_BEEP_QUESTION);
@@ -181,11 +170,6 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 				book_->delete_record(book_->new_record());
 				break;
 			}
-		}
-		// Delete scratchpad
-		if (qso_manager_) {
-			delete qso_manager_;
-			qso_manager_ = nullptr;
 		}
 		// Wait for auto-import of files to complete
 		if (import_data_) {
