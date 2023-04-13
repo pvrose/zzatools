@@ -75,6 +75,7 @@ book::book()
 	, old_record_(nullptr)
 	, been_modified_(false)
 	, main_loading_(false)
+	, ignore_gridsquare_(false)
 {
 	used_bands_.clear();
 	used_modes_.clear();
@@ -1150,27 +1151,32 @@ void book::add_use_data(record* use_record) {
 				// and if it's already captured - check it is the same
 				if (old_value.length() && old_value != value) {
 					char message[128];
-					snprintf(message, 128, "LOG: %s %s %s %s - new value  (%s) differs from old (%s)",
-						use_record->item("QSO_DATE").c_str(),
-						use_record->item("TIME_ON").c_str(),
-						use_record->item("CALL").c_str(),
-						(*it).c_str(),
-						value.c_str(),
-						old_value.c_str());
-					status_->misc_status(ST_NOTE, message);
-					if ((*it) != "MY_GRIDSQUARE" || value.length() > old_value.length() || value != old_value.substr(0, value.length())) {
-						snprintf(message, 128, "LOG: QTH %s - Field %s replacing %s with %s",
-							qth.c_str(), (*it).c_str(), old_value.c_str(), value.c_str());
-						status_->misc_status(ST_WARNING, message);
-						qth_data->fields->item(*it, value);
-						update_qth = true;
-					}
 					if ((*it) == "MY_GRIDSQUARE" && value.length() < old_value.length() && value == old_value.substr(0, value.length())) {
-						snprintf(message, 128, "LOG: QTH %s - Field %s=%s ignoring change to %s",
-							qth.c_str(), (*it).c_str(), old_value.c_str(), value.c_str());
-						status_->misc_status(ST_WARNING, message);
+						if (ignore_gridsquare_) {
+							snprintf(message, 128, "LOG: QTH %s - Field %s=%s ignoring change to %s",
+								qth.c_str(), (*it).c_str(), old_value.c_str(), value.c_str());
+							status_->misc_status(ST_WARNING, message);
+							ignore_gridsquare_ = true;
+						}
 						use_record->item((*it), old_value);
 						modified(true);
+					}
+					else {
+						snprintf(message, 128, "LOG: %s %s %s %s - new value  (%s) differs from old (%s)",
+							use_record->item("QSO_DATE").c_str(),
+							use_record->item("TIME_ON").c_str(),
+							use_record->item("CALL").c_str(),
+							(*it).c_str(),
+							value.c_str(),
+							old_value.c_str());
+						status_->misc_status(ST_NOTE, message);
+						if ((*it) != "MY_GRIDSQUARE" || value.length() > old_value.length() || value != old_value.substr(0, value.length())) {
+							snprintf(message, 128, "LOG: QTH %s - Field %s replacing %s with %s",
+								qth.c_str(), (*it).c_str(), old_value.c_str(), value.c_str());
+							status_->misc_status(ST_WARNING, message);
+							qth_data->fields->item(*it, value);
+							update_qth = true;
+						}
 					}
 				}
 				else if (old_value.length() == 0) {

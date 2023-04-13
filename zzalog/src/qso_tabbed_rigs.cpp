@@ -107,29 +107,32 @@ void qso_tabbed_rigs::save_values() {
 // Switch the rig on or off
 void qso_tabbed_rigs::switch_rig() {
 	string rig_name = label();
-	if (label_map_.find(rig_name) == label_map_.end() || label_map_.at(rig_name) == nullptr) {
-		if (label_map_.size() == 1 && (*label_map_.begin()).first == string("")) {
-			// Place holder null string - delete it and its reference
-			delete (qso_rig*)(*label_map_.begin()).second;
-			label_map_.erase(string(""));
+	if (rig_name.length()) {
+		if (label_map_.find(rig_name) == label_map_.end() || label_map_.at(rig_name) == nullptr) {
+			if (label_map_.size() == 1 && (*label_map_.begin()).first == string("")) {
+				// Place holder null string - delete it and its reference
+				delete (qso_rig*)(*label_map_.begin()).second;
+				label_map_.erase(string(""));
+			}
+			// Rig does not yet exist, create it and select it
+			int rx = 0;
+			int ry = 0;
+			int rw = 0;
+			int rh = 0;
+			client_area(rx, ry, rw, rh, 0);
+			qso_rig* w = new qso_rig(rx, ry, rw, rh, label());
+			add(w);
+			label_map_[rig_name] = w;
+			value(w);
 		}
-		// Rig does not yet exist, create it and select it
-		int rx = 0;
-		int ry = 0;
-		int rw = 0;
-		int rh = 0;
-		client_area(rx, ry, rw, rh, 0);
-		qso_rig* w = new qso_rig(rx, ry, rw, rh, label());
-		add(w);
-		label_map_[rig_name] = w;
-		value(w);
-	}
-	else if (label_map_.at(rig_name) == value()) {
-		// It exists and is current selection, switch its state
-		((qso_rig*)value())->switch_rig();
-	} else {
-		// It isn't the current selection so select it
-		value(label_map_.at(rig_name));
+		else if (label_map_.at(rig_name) == value()) {
+			// It exists and is current selection, switch its state
+			((qso_rig*)value())->switch_rig();
+		}
+		else {
+			// It isn't the current selection so select it
+			value(label_map_.at(rig_name));
+		}
 	}
 	enable_widgets();
 }

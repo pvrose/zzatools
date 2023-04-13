@@ -266,6 +266,8 @@ using namespace std;
 		bool been_modified_;
 		// File loading
 		bool main_loading_;
+		// Ignore GRIDSQUARE shortening
+		bool ignore_gridsquare_;
 
 	};
 
