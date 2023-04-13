@@ -422,7 +422,7 @@ void qso_entry::action_add_field(int ix, string field) {
 		field_ip_map_[field] = ix;
 		field_names_[ix] = field;
 	}
-	else if (ix == -1) {
+	else if (ix == number_fields_in_use_) {
 		if (field_ip_map_.find(field) == field_ip_map_.end()) {
 			ch_field_[number_fields_in_use_]->value(field.c_str());
 			ip_field_[number_fields_in_use_]->field_name(field.c_str(), qso_data_->current_qso());
@@ -430,6 +430,11 @@ void qso_entry::action_add_field(int ix, string field) {
 			field_ip_map_[field] = number_fields_in_use_;
 			field_names_[number_fields_in_use_] = field;
 			number_fields_in_use_++;
+		}
+		else {
+			char msg[128];
+			snprintf(msg, sizeof(msg), "DASH: Already have a field for %s, new field ignored", field.c_str());
+			status_->misc_status(ST_ERROR, msg);
 		}
 	}
 	else {
