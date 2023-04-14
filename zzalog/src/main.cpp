@@ -446,26 +446,9 @@ void add_dashboard() {
 			qso_manager_ = new qso_manager(10, 10, "Operating Dashboard");
 		}
 		// Get the Operation window
-		int enabled;
-		int top;
-		int left;
-		Fl_Preferences dash_settings(settings_, "Dashboard");
-		dash_settings.get("Left", left, 100);
-		dash_settings.get("Top", top, 100);
-		dash_settings.get("Enabled", enabled, true);
-		if (top < 0) top = 100;
-		if (left < 0) left = 100;
-		if (enabled) {
-			// Show the scratchpad at the saved position
-			qso_manager_->show();
-			qso_manager_->position(left, top);
-			status_->misc_status(ST_NOTE, "DASH: Opened");
-		}
-		else {
-			// Hide it
-			qso_manager_->hide();
-			status_->misc_status(ST_NOTE, "DASH: Closed");
-		}
+		// Show the scratchpad at the saved position
+		qso_manager_->show();
+		status_->misc_status(ST_NOTE, "DASH: Opened");
 	}
 }
 

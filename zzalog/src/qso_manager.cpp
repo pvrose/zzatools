@@ -151,11 +151,15 @@ void qso_manager::create_form(int X, int Y) {
 
 // Load values
 void qso_manager::load_values() {
-
-	// These are static, but will get to the same value each time
-	Fl_Preferences user_settings(settings_, "User Settings");
-	Fl_Preferences log_settings(user_settings, "Scratchpad");
-
+	// Get position of window
+	int top;
+	int left;
+	Fl_Preferences dash_settings(settings_, "Dashboard");
+	dash_settings.get("Left", left, 100);
+	dash_settings.get("Top", top, 100);
+	if (top < 0) top = 100;
+	if (left < 0) left = 100;
+	position(left, top);
 }
 
 // Write values back to settings - write the three groups back separately
@@ -165,8 +169,6 @@ void qso_manager::save_values() {
 	Fl_Preferences dash_settings(settings_, "Dashboard");
 	dash_settings.set("Left", x_root());
 	dash_settings.set("Top", y_root());
-	dash_settings.set("Enabled", (signed int)(shown() || close_by_dash_));
-	dash_settings.set("Logging Mode", logging_mode());
 
 //	Fl_Preferences stations_settings(settings_, "Stations");
 	data_group_->save_values();
