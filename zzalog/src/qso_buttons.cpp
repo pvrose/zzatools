@@ -185,6 +185,8 @@ void qso_buttons::cb_save(Fl_Widget* w, void* v) {
 		// QSO editing
 	case qso_data::QSO_EDIT:
 		that->qso_data_->action_save_edit();
+		that->qso_data_->action_set_current();
+		that->qso_data_->action_edit();
 		break;
 	}
 }
