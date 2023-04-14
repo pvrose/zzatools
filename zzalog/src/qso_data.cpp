@@ -199,16 +199,22 @@ void qso_data::update_qso(qso_num_t log_qso) {
 			break;
 		case QSO_EDIT:
 			// Ask whether to save or quit then open new QSO in edit mode
-			fl_beep(FL_BEEP_QUESTION);
-			switch (fl_choice("Trying to select a different record while editing a record", "Save edit", "Cancel edit", nullptr)) {
-			case 0:
-				// Save QSO
-				action_save_edit();
-				break;
-			case 1:
-				// Cancel QSO
+			if (current_qso_->is_dirty()) {
+				fl_beep(FL_BEEP_QUESTION);
+				switch (fl_choice("Trying to select a different record while editing a record", "Save edit", "Cancel edit", nullptr)) {
+				case 0:
+					// Save QSO
+					action_save_edit();
+					break;
+				case 1:
+					// Cancel QSO
+					action_cancel_edit();
+					break;
+				}
+			}
+			else {
+				// Record not changed so just cancel the edit
 				action_cancel_edit();
-				break;
 			}
 			current_rec_num_ = log_qso;
 			current_qso_ = book_->get_record(log_qso, true);
