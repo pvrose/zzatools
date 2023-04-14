@@ -86,6 +86,7 @@
 		// QSL status
 		Fl_Box* eqsl_status_box_;
 		Fl_Box* lotw_status_box_;
+		Fl_Box* card_status_box_;
 
 
 	};

@@ -65,6 +65,10 @@ qsl_viewer::qsl_viewer(int W, int H, const char* L) :
 	lotw_status_box_->box(FL_FLAT_BOX);
 
 	curr_x += WSMEDIT + GAP;
+	card_status_box_ = new Fl_Box(curr_x, curr_y, WSMEDIT, HBUTTON);
+	card_status_box_->box(FL_FLAT_BOX);
+
+	curr_x += WSMEDIT + GAP;
 	max_w = max(max_w, curr_x - x());
 
 	curr_y += HBUTTON + GAP;
@@ -532,19 +536,28 @@ void qsl_viewer::set_selected_image(image_t value) {
 void qsl_viewer::set_qsl_status() {
 	if (current_qso_) {
 		if (current_qso_->item("EQSL_QSL_RCVD") == "Y") {
-			eqsl_status_box_->label("eQSL Confirmed");
+			eqsl_status_box_->label("eQSL confirmed");
 			eqsl_status_box_->color(FL_GREEN);
 		}
 		else {
-			eqsl_status_box_->label("eQSL Not Confirmed");
+			eqsl_status_box_->label("eQSL not confirmed");
 			eqsl_status_box_->color(fl_lighter(FL_RED));
 		}
 		if (current_qso_->item("LOTW_QSL_RCVD") == "Y") {
-			lotw_status_box_->label("LotW Confirmed");
+			lotw_status_box_->label("LotW confirmed");
 			lotw_status_box_->color(FL_GREEN);
-		} else {
-			lotw_status_box_->label("LotW Not Confirmed");
+		}
+		else {
+			lotw_status_box_->label("LotW not confirmed");
 			lotw_status_box_->color(fl_lighter(FL_RED));
+		}
+		if (current_qso_->item("QSL_RCVD") == "Y") {
+			card_status_box_->label("Card confirmed");
+			card_status_box_->color(FL_GREEN);
+		}
+		else {
+			card_status_box_->label("Card not confirmed");
+			card_status_box_->color(fl_lighter(FL_RED));
 		}
 	}
 }
