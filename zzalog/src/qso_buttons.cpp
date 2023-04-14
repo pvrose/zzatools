@@ -21,7 +21,8 @@ const Fl_Color COLOUR_NAVY = 136;  /* R=0/4, B=2/4, G=0/7 */
 
 map<qso_data::logging_state_t, list<qso_buttons::button_type> > button_map_ =
 {
-	{ qso_data::QSO_INACTIVE, {qso_buttons::ACTIVATE, qso_buttons::START_QSO, qso_buttons::EDIT_QSO, qso_buttons::BROWSE } },
+	{ qso_data::QSO_INACTIVE, {qso_buttons::ACTIVATE, qso_buttons::START_QSO, qso_buttons::EDIT_QSO, qso_buttons::BROWSE,
+		qso_buttons::VIEW_QSL } },
 	{ qso_data::QSO_PENDING, { qso_buttons::START_QSO, qso_buttons::QUIT_QSO, qso_buttons::EDIT_QTH } },
 	{ qso_data::QSO_STARTED, { qso_buttons::SAVE_QSO, qso_buttons::CANCEL_QSO, qso_buttons::EDIT_QTH,
 		qso_buttons::WORKED_B4, qso_buttons::PARSE } },
