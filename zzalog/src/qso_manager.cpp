@@ -165,7 +165,7 @@ void qso_manager::save_values() {
 	Fl_Preferences dash_settings(settings_, "Dashboard");
 	dash_settings.set("Left", x_root());
 	dash_settings.set("Top", y_root());
-	dash_settings.set("Enabled", (signed int)shown());
+	dash_settings.set("Enabled", (signed int)(shown() || close_by_dash_));
 	dash_settings.set("Logging Mode", logging_mode());
 
 //	Fl_Preferences stations_settings(settings_, "Stations");
@@ -201,6 +201,7 @@ void qso_manager::cb_close(Fl_Widget* w, void* v) {
 		}
 	}
 	// Call the main window callback to close the app.
+	that->close_by_dash_ = true;
 	main_window_->do_callback();
 }
 

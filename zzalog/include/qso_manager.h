@@ -125,6 +125,8 @@ using namespace std;
 		bool items_changed_;
 		// Ticker action in progress - prevent continual ticker access
 		bool ticker_in_progress_;
+		// Closing down app from here
+		bool close_by_dash_;
 
 		// Groups
 		qso_data* data_group_;
