@@ -7,6 +7,7 @@
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Light_Button.H>
 #include <FL/Fl_Output.H>
+#include <FL/Fl_Window.H>
 
 using namespace std;
 
@@ -111,6 +112,8 @@ protected:
 	Fl_Light_Button* bn_pause_;
 	// Enable contest
 	Fl_Light_Button* bn_enable_;
+	// Instructions
+	Fl_Window* wn_instructions_;
 
 };
 

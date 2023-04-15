@@ -4,6 +4,7 @@
 #include "record.h"
 #include "status.h"
 #include "callback.h"
+#include "utils.h"
 
 #include <FL/Fl_Preferences.H>
 
@@ -11,6 +12,23 @@
 extern Fl_Preferences* settings_;
 extern book* book_;
 extern status* status_;
+
+// How to use the contest facility
+string instructions =
+"Using and existing contest definition:-\n"
+"Select the contest in the CONTEST_ID field choice\n"
+"Select the exchange definition\n"
+"Click \"Enable\"\n"
+"\n"
+"Defining a new contest definition:-\n"
+"Select the contest in the CONTEST_ID field choice\n"
+"Type in a name for the exchange deifinition\n"
+"Click \"Edit\"\n"
+"Add the fields that you need to log for your transmission\n"
+"Click \"Set TX\"\n"
+"Add the fields that you need to log for their transmission\n"
+"Click \"Set RX\"\n"
+"Click \"Save\"\n";
 
 // QSO contest group
 qso_contest::qso_contest(int X, int Y, int W, int H, const char* L) :
@@ -37,7 +55,7 @@ void qso_contest::load_values() {
 	// Contest definitions
 	Fl_Preferences contest_settings(dash_settings, "Contests");
 	contest_settings.get("Next Serial Number", serial_num_, 0);
-	contest_settings.get("Contest Mode", (int&)field_mode_, false);
+	contest_settings.get("Contest Status", (int&)field_mode_, false);
 	char* temp;
 	contest_settings.get("Contest ID", temp, "");
 	contest_id_ = temp;
@@ -168,14 +186,14 @@ void qso_contest::create_form(int X, int Y) {
 	curr_x += bn_add_exch_->w() + GAP;
 
 	// Define contest exchanges
-	bn_define_tx_ = new Fl_Button(curr_x, curr_y, WBUTTON / 2, HBUTTON, "TX");
+	bn_define_tx_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Set TX");
 	bn_define_tx_->callback(cb_def_format, (void*)true);
 	bn_define_tx_->tooltip("Use the specified fields as contest exchange on transmit");
 
 	curr_x += bn_define_tx_->w();
 
 	// Define contest
-	bn_define_rx_ = new Fl_Button(curr_x, curr_y, WBUTTON / 2, HBUTTON, "RX");
+	bn_define_rx_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Set RX");
 	bn_define_rx_->callback(cb_def_format, (void*)false);
 	bn_define_rx_->tooltip("Use the specified fields as contest exchange on receive");
 
@@ -214,6 +232,12 @@ void qso_contest::create_form(int X, int Y) {
 
 	resizable(nullptr);
 	size(curr_x - x(), curr_y - y());
+
+	// Create the instruction tooltip 
+	Fl_Window* win = ancestor_view<Fl_Window>(this);
+	wn_instructions_ = tip_window(instructions, win->x_root() + x() + w(), win->y_root() + y() + h());
+	wn_instructions_->show();
+
 	end();
 
 	return;
@@ -263,6 +287,7 @@ void qso_contest::enable_widgets() {
 		bn_add_exch_->label("Add");
 		bn_define_rx_->deactivate();
 		bn_define_tx_->deactivate();
+		wn_instructions_->show();
 		break;
 	case DEFINE:
 	case EDIT:
@@ -270,18 +295,21 @@ void qso_contest::enable_widgets() {
 		bn_add_exch_->label("Save");
 		bn_define_rx_->activate();
 		bn_define_tx_->activate();
+		wn_instructions_->show();
 		break;
 	case CONTEST:
 		bn_add_exch_->activate();
 		bn_add_exch_->label("Edit");
 		bn_define_rx_->deactivate();
 		bn_define_tx_->deactivate();
+		wn_instructions_->hide();
 		break;
 	default:
 		bn_add_exch_->deactivate();
 		bn_add_exch_->label(nullptr);
 		bn_define_rx_->deactivate();
 		bn_define_tx_->deactivate();
+		wn_instructions_->hide();
 		break;
 	}
 	bn_add_exch_->redraw();
@@ -420,7 +448,7 @@ void qso_contest::save_values() {
 	Fl_Preferences contest_settings(dash_settings, "Contests");
 	contest_settings.clear();
 	contest_settings.set("Next Serial Number", serial_num_);
-	contest_settings.set("Contest Mode", (int)field_mode_);
+	contest_settings.set("Contest Status", (int)field_mode_);
 	contest_settings.set("Contest ID", contest_id_.c_str());
 	contest_settings.set("Exchange Format", exch_fmt_ix_);
 	// Exchanges
