@@ -379,12 +379,16 @@ void dxa_if::create_form() {
 	curr_x = loc_grp->x() + GAP + WLABEL;
 	curr_y = loc_grp->y() + HTEXT;
 
-	const int  HLOC = FL_NORMAL_SIZE + 2;
+	const int  HLOC = FL_NORMAL_SIZE + 3;
+	// 60% grey
+	const Fl_Color COLOUR_GREY = fl_lighter(FL_BLACK);
 	// Output - Home location name
 	Fl_Output* op20 = new Fl_Output(curr_x, curr_y, WSMEDIT, HLOC, "Name");
 	op20->align(FL_ALIGN_LEFT);
 	op20->labelfont(FL_ITALIC);
+	op20->labelcolor(COLOUR_GREY);
 	op20->textfont(FL_BOLD);
+	op20->textsize(FL_NORMAL_SIZE + 1);
 	op20->value(location_name_.c_str());
 	op20->box(FL_FLAT_BOX);
 	op20->color(group1->color());
@@ -396,7 +400,9 @@ void dxa_if::create_form() {
 	Fl_Output* op21 = new Fl_Output(curr_x, curr_y, WSMEDIT, HLOC, "Locator");
 	op21->align(FL_ALIGN_LEFT);
 	op21->labelfont(FL_ITALIC);
+	op21->labelcolor(COLOUR_GREY);
 	op21->textfont(FL_BOLD);
+	op21->textsize(FL_NORMAL_SIZE + 1);
 	op21->value(locator_.c_str());
 	op21->box(FL_FLAT_BOX);
 	op21->color(group1->color());
@@ -408,7 +414,9 @@ void dxa_if::create_form() {
 	Fl_Output* op22 = new Fl_Output(curr_x, curr_y, WSMEDIT, HLOC, "Latitude");
 	op22->align(FL_ALIGN_LEFT);
 	op22->labelfont(FL_ITALIC);
+	op22->labelcolor(COLOUR_GREY);
 	op22->textfont(FL_BOLD);
+	op22->textsize(FL_NORMAL_SIZE + 1);
 	op22->value(home_lat_dms_.c_str());
 	op22->box(FL_FLAT_BOX);
 	op22->color(group1->color());
@@ -420,7 +428,9 @@ void dxa_if::create_form() {
 	Fl_Output* op23 = new Fl_Output(curr_x, curr_y, WSMEDIT, HLOC, "Longitude");
 	op23->align(FL_ALIGN_LEFT);
 	op23->labelfont(FL_ITALIC);
+	op23->labelcolor(COLOUR_GREY);
 	op23->textfont(FL_BOLD);
+	op23->textsize(FL_NORMAL_SIZE + 1);
 	op23->value(home_long_dms_.c_str());
 	op23->box(FL_FLAT_BOX);
 	op23->color(group1->color());
