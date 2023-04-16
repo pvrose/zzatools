@@ -694,6 +694,7 @@ void log_table::get_fields() {
 		free(field_set_name);
 	}
 	else {
+		field_set_name = new char[128];
 		strcpy(field_set_name, "Default");
 	}
 	// If the field_set is empty - use the default set
