@@ -183,21 +183,23 @@ void qso_contest::create_form(int X, int Y) {
 	bn_add_exch_->selection_color(FL_RED);
 	bn_add_exch_->tooltip("Add new exchange format - choose fields and click \"TX\" or \"RX\" to create them");
 
-	curr_x += bn_add_exch_->w() + GAP;
+	curr_x += bn_add_exch_->w();
 
 	// Define contest
-	bn_define_rx_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Set RX");
+	bn_define_rx_ = new Fl_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Set RX");
 	bn_define_rx_->callback(cb_def_format, (void*)false);
+	bn_define_rx_->selection_color(FL_BLUE);
 	bn_define_rx_->tooltip("Use the specified fields as contest exchange on receive");
 
-	curr_x += bn_define_rx_->w() + GAP;
+	curr_x += bn_define_rx_->w();
 
 	// Define contest exchanges
-	bn_define_tx_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Set TX");
+	bn_define_tx_ = new Fl_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Set TX");
 	bn_define_tx_->callback(cb_def_format, (void*)true);
+	bn_define_tx_->selection_color(FL_BLUE);
 	bn_define_tx_->tooltip("Use the specified fields as contest exchange on transmit");
 
-	curr_x += bn_define_tx_->w();
+	curr_x += bn_define_tx_->w() + GAP;
 
 	// Serial number control buttons - Initialise to 001
 	bn_init_serno_ = new Fl_Button(curr_x, curr_y, WBUTTON / 2, HBUTTON, "@|<");
@@ -288,7 +290,10 @@ void qso_contest::enable_widgets() {
 		bn_add_exch_->activate();
 		bn_add_exch_->label("Save");
 		bn_define_rx_->activate();
-		bn_define_tx_->activate();
+		bn_define_rx_->value(rx_set_);
+		if (!rx_set_) bn_define_tx_->deactivate();
+		else bn_define_tx_->activate();
+		bn_define_tx_->value(tx_set_);
 		break;
 	case CONTEST:
 		bn_add_exch_->activate();
@@ -378,11 +383,15 @@ void qso_contest::cb_add_exch(Fl_Widget* w, void* v) {
 			// Adding a new format - add it to the list
 			that->exch_fmt_ix_ = that->add_format_id(that->exch_fmt_id_);
 			that->contest_mode_ = DEFINE;
+			that->rx_set_ = false;
+			that->tx_set_ = false;
 			that->initialise_fields();
 			break;
 		case CONTEST:
 			// Editing an existing format
 			that->contest_mode_ = EDIT;
+			that->rx_set_ = false;
+			that->tx_set_ = false;
 			that->initialise_fields();
 			break;
 		}
@@ -404,7 +413,16 @@ void qso_contest::cb_add_exch(Fl_Widget* w, void* v) {
 void qso_contest::cb_def_format(Fl_Widget* w, void* v) {
 	qso_contest* that = ancestor_view<qso_contest>(w);
 	bool tx = (bool)(long)v;
-	that->add_format_def(that->exch_fmt_ix_, tx);
+	bool set;
+	cb_value<Fl_Light_Button, bool>(w, &set);
+	// If the button is being set then update the exchange fileds required
+	if (set) {
+		that->add_format_def(that->exch_fmt_ix_, tx);
+	} 
+	// Record the set state TX or RX
+	if (tx) that->tx_set_ = set;
+	else that->rx_set_ = set;
+	// Re initialise
 	that->initialise_fields();
 	that->enable_widgets();
 }
@@ -476,10 +494,19 @@ qso_contest::contest_mode_t qso_contest::mode() {
 string qso_contest::contest_fields() {
 	string& rx = ef_rxs_[exch_fmt_ix_];
 	string& tx = ef_txs_[exch_fmt_ix_];
-	// Only concatenate RX and TX strings if both are not empty
-	if (rx.length() == 0) return tx;
-	else if (tx.length() == 0) return rx;
-	else return rx + ',' + tx;
+	switch (contest_mode_) {
+	case CONTEST:
+		// Only concatenate RX and TX strings if both are not empty
+		if (rx.length() == 0) return tx;
+		else if (tx.length() == 0) return rx;
+		else return rx + ',' + tx;
+	case EDIT:
+		if (!rx_set_) return rx;
+		if (!tx_set_) return tx;
+		return "";
+	default:
+		return "";
+	}
 }
 
 // Add new format - return format index

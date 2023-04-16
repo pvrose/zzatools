@@ -92,6 +92,9 @@ protected:
 
 	// Serial number
 	int serial_num_;
+	// RX fields edited
+	bool rx_set_;
+	bool tx_set_;
 
 	// Contest ID
 	field_choice* ch_contest_id_;

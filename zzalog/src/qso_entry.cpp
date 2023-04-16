@@ -334,6 +334,13 @@ string qso_entry::get_call() {
 	return string(ip_field_[field_ip_map_["CALL"]]->value());
 }
 
+// Initialise field map
+void qso_entry::initialise_field_map() {
+	field_ip_map_.clear();
+	for (int ix = 0; ix < NUMBER_FIXED; ix++) {
+		field_ip_map_[fixed_names_[ix]] = ix;
+	}
+}
 // Initialise fields
 void qso_entry::initialise_fields(string fields, bool new_fields, bool lock_preset) {
 	// Now set fields
@@ -342,6 +349,8 @@ void qso_entry::initialise_fields(string fields, bool new_fields, bool lock_pres
 	else field_names.clear();
 	if (lock_preset) number_locked_ = field_names.size();
 	else number_locked_ = 0;
+	// Clear field map
+	initialise_field_map();
 	size_t ix = 0;
 	int iy;
 	for (ix = 0, iy = NUMBER_FIXED; ix < field_names.size(); ix++, iy++) {

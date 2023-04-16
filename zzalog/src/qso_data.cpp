@@ -286,7 +286,6 @@ void qso_data::initialise_fields() {
 	case qso_contest::PAUSED:
 		// Non -contest mode
 		preset_fields = "RST_SENT,RST_RCVD,NAME,QTH";
-
 		new_fields = true;
 		lock_preset = false;
 		break;
@@ -310,8 +309,8 @@ void qso_data::initialise_fields() {
 		break;
 	case qso_contest::EDIT:
 		// Unlock existing definition 
-		preset_fields = "";
-		new_fields = false;
+		preset_fields = g_contest_->contest_fields();
+		new_fields = true;
 		lock_preset = false;
 		break;
 	}

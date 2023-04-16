@@ -67,10 +67,8 @@ public:
 	void copy_cat_to_qso();
 	// Copy clock to QSO
 	void copy_clock_to_qso();
-	// Update rig in QSO
-	void update_rig();
 	// Initialise fields
-	void initialise_fields();
+	void initialise_field_map();
 	// Get defined fields
 	string get_defined_fields();
 	// Clear display fields
