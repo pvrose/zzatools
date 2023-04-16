@@ -17,7 +17,7 @@ class qso_contest :
 public:
 
 	// Adding an exchange
-	enum field_mode_t {
+	enum contest_mode_t {
 		NO_CONTEST = 0,  // Normal non-contest logging behaviour
 		CONTEST,         // Normal contest logging behaviour
 		PAUSED,          // Log non-contest within contest logging
@@ -38,7 +38,7 @@ public:
 	// save value
 	void save_values();
 	// Mode
-	field_mode_t mode();
+	contest_mode_t mode();
 	// Contest fields
 	string contest_fields();
 	// Get serial number
@@ -76,7 +76,7 @@ protected:
 	void initialise_fields();
 
 	// Mode
-	field_mode_t field_mode_;
+	contest_mode_t contest_mode_;
 	// Contest ID
 	string contest_id_;
 	// Contest exchange format index

@@ -112,6 +112,8 @@ protected:
 	field_input* ip_field_[NUMBER_TOTAL];
 	// Parent qso_data
 	qso_data* qso_data_;
+	// Number of locked fields
+	int number_locked_;
 
 };
 

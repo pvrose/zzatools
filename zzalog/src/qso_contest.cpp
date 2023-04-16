@@ -37,7 +37,7 @@ qso_contest::qso_contest(int X, int Y, int W, int H, const char* L) :
 	, exch_fmt_ix_(0)
 	, exch_fmt_id_("")
 	, max_ef_index_(0)
-	, field_mode_(NO_CONTEST)
+	, contest_mode_(NO_CONTEST)
 	, wn_instructions_(nullptr)
 {
 	load_values();
@@ -55,7 +55,7 @@ void qso_contest::load_values() {
 	// Contest definitions
 	Fl_Preferences contest_settings(dash_settings, "Contests");
 	contest_settings.get("Next Serial Number", serial_num_, 0);
-	contest_settings.get("Contest Status", (int&)field_mode_, false);
+	contest_settings.get("Contest Status", (int&)contest_mode_, false);
 	char* temp;
 	contest_settings.get("Contest ID", temp, "");
 	contest_id_ = temp;
@@ -98,7 +98,7 @@ void qso_contest::load_values() {
 		record* prev_record = book_->get_record(book_->size() - 1, false);
 		string prev_contest = prev_record->item("CONTEST_ID");
 		char message[100];
-		if (field_mode_ != NO_CONTEST) {
+		if (contest_mode_ != NO_CONTEST) {
 			if (prev_contest != contest_id_) {
 				snprintf(message, 100, "DASH: Contest ID in log (%s) differs from settings (%s)", prev_contest.c_str(), contest_id_.c_str());
 				status_->misc_status(ST_WARNING, message);
@@ -138,7 +138,7 @@ void qso_contest::create_form(int X, int Y) {
 	curr_y += HTEXT;
 
 	bn_enable_ = new Fl_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Enable");
-	bn_enable_->value(field_mode_ != NO_CONTEST);
+	bn_enable_->value(contest_mode_ != NO_CONTEST);
 	bn_enable_->selection_color(FL_GREEN);
 	bn_enable_->callback(cb_ena_contest, nullptr);
 	bn_enable_->tooltip("Enable contest operation - resets contest parameters");
@@ -147,7 +147,7 @@ void qso_contest::create_form(int X, int Y) {
 
 	// Pause contest button
 	bn_pause_ = new Fl_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Pause");
-	bn_pause_->value(field_mode_ == PAUSED);
+	bn_pause_->value(contest_mode_ == PAUSED);
 	bn_pause_->selection_color(FL_RED);
 	bn_pause_->callback(cb_pause_contest, nullptr);
 	bn_pause_->tooltip("Pause contest, i.e. keep parameters when resume");
@@ -178,7 +178,7 @@ void qso_contest::create_form(int X, int Y) {
 
 	// Add exchange button
 	bn_add_exch_ = new Fl_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Add");
-	bn_add_exch_->value(field_mode_ == EDIT);
+	bn_add_exch_->value(contest_mode_ == EDIT);
 	bn_add_exch_->callback(cb_add_exch, nullptr);
 	bn_add_exch_->selection_color(FL_RED);
 	bn_add_exch_->tooltip("Add new exchange format - choose fields and click \"TX\" or \"RX\" to create them");
@@ -240,7 +240,7 @@ void qso_contest::create_form(int X, int Y) {
 
 void qso_contest::enable_widgets() {
 	// Get exchange data
-	if (exch_fmt_ix_ < MAX_CONTEST_TYPES && field_mode_ == CONTEST) {
+	if (exch_fmt_ix_ < MAX_CONTEST_TYPES && contest_mode_ == CONTEST) {
 		char text[10];
 		snprintf(text, 10, "%03d", serial_num_);
 		op_serno_->value(text);
@@ -249,7 +249,7 @@ void qso_contest::enable_widgets() {
 		op_serno_->value("");
 	}
 	// Basic contest on/off widgets 
-	switch (field_mode_) {
+	switch (contest_mode_) {
 	case NO_CONTEST:
 		op_serno_->deactivate();
 		bn_pause_->deactivate();
@@ -276,7 +276,7 @@ void qso_contest::enable_widgets() {
 	bn_inc_serno_->redraw();
 	bn_dec_serno_->redraw();
 	// Mode dependent
-	switch (field_mode_) {
+	switch (contest_mode_) {
 	case NEW:
 		bn_add_exch_->activate();
 		bn_add_exch_->label("Add");
@@ -319,10 +319,10 @@ void qso_contest::cb_ena_contest(Fl_Widget* w, void* v) {
 
 	if (enable) {
 		that->serial_num_ = 1;
-		that->field_mode_ = CONTEST;
+		that->contest_mode_ = CONTEST;
 	}
 	else {
-		that->field_mode_ = NO_CONTEST;
+		that->contest_mode_ = NO_CONTEST;
 	}
 	that->initialise_fields();
 	that->enable_widgets();
@@ -335,10 +335,10 @@ void qso_contest::cb_pause_contest(Fl_Widget* w, void* v) {
 	cb_value<Fl_Light_Button, bool>(w, &pause);
 
 	if (pause) {
-		that->field_mode_ = PAUSED;
+		that->contest_mode_ = PAUSED;
 	}
 	else {
-		that->field_mode_ = CONTEST;
+		that->contest_mode_ = CONTEST;
 	}
 	that->initialise_fields();
 	that->enable_widgets();
@@ -355,11 +355,11 @@ void qso_contest::cb_format(Fl_Widget* w, void* v) {
 	if (ch->menubutton()->changed()) {
 		// Selected menu item
 		that->exch_fmt_ix_ = ch->menubutton()->value();
-		that->field_mode_ = CONTEST; // Should already be so
+		that->contest_mode_ = CONTEST; // Should already be so
 		that->initialise_fields();
 	}
 	else {
-		that->field_mode_ = NEW;
+		that->contest_mode_ = NEW;
 	}
 	that->enable_widgets();
 	that->instructions_window(true);
@@ -373,16 +373,16 @@ void qso_contest::cb_add_exch(Fl_Widget* w, void* v) {
 	cb_value<Fl_Light_Button, bool>(w, &update);
 	if (update) {
 		// Switch to update format definitions
-		switch (that->field_mode_) {
+		switch (that->contest_mode_) {
 		case NEW:
 			// Adding a new format - add it to the list
 			that->exch_fmt_ix_ = that->add_format_id(that->exch_fmt_id_);
-			that->field_mode_ = DEFINE;
+			that->contest_mode_ = DEFINE;
 			that->initialise_fields();
 			break;
 		case CONTEST:
 			// Editing an existing format
-			that->field_mode_ = EDIT;
+			that->contest_mode_ = EDIT;
 			that->initialise_fields();
 			break;
 		}
@@ -391,7 +391,7 @@ void qso_contest::cb_add_exch(Fl_Widget* w, void* v) {
 	}
 	else {
 		// Start/Resume contest
-		that->field_mode_ = CONTEST;
+		that->contest_mode_ = CONTEST;
 		that->populate_exch_fmt();
 		that->initialise_fields();
 		that->enable_widgets();
@@ -442,7 +442,7 @@ void qso_contest::save_values() {
 	Fl_Preferences contest_settings(dash_settings, "Contests");
 	contest_settings.clear();
 	contest_settings.set("Next Serial Number", serial_num_);
-	contest_settings.set("Contest Status", (int)field_mode_);
+	contest_settings.set("Contest Status", (int)contest_mode_);
 	contest_settings.set("Contest ID", contest_id_.c_str());
 	contest_settings.set("Exchange Format", exch_fmt_ix_);
 	// Exchanges
@@ -468,13 +468,18 @@ void qso_contest::initialise_fields() {
 }
 
 // Return field mode
-qso_contest::field_mode_t qso_contest::mode() {
-	return field_mode_;
+qso_contest::contest_mode_t qso_contest::mode() {
+	return contest_mode_;
 }
 
 // Contest fields
 string qso_contest::contest_fields() {
-	return ef_rxs_[exch_fmt_ix_] + "," + ef_txs_[exch_fmt_ix_];
+	string& rx = ef_rxs_[exch_fmt_ix_];
+	string& tx = ef_txs_[exch_fmt_ix_];
+	// Only concatenate RX and TX strings if both are not empty
+	if (rx.length() == 0) return tx;
+	else if (tx.length() == 0) return rx;
+	else return rx + ',' + tx;
 }
 
 // Add new format - return format index
@@ -509,7 +514,7 @@ int qso_contest::serial_number() {
 
 // increment serial number
 void qso_contest::increment_serial() {
-	if (field_mode_ == CONTEST) serial_num_++;
+	if (contest_mode_ == CONTEST) serial_num_++;
 }
 
 // Create instructions window

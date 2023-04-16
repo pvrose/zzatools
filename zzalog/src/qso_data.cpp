@@ -328,6 +328,7 @@ void qso_data::initialise_fields() {
 		}
 	}
 	g_entry_->initialise_values(preset_fields, g_contest_->serial_number());
+	g_entry_->enable_widgets();
 }
 
 string qso_data::get_defined_fields() {
@@ -1111,4 +1112,9 @@ void qso_data::ticker() {
 // Call in editor
 string qso_data::get_call() {
 	return g_entry_->get_call();
+}
+
+// Contest mode
+qso_contest::contest_mode_t qso_data::contest_mode() {
+	return g_contest_->mode();
 }

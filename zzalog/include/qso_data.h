@@ -86,6 +86,8 @@ public:
 	void logging_mode(qso_data::logging_mode_t mode);
 	// Get logging state
 	qso_data::logging_state_t logging_state();
+	// Get contest mode
+	qso_contest::contest_mode_t contest_mode();
 	// Update QSO
 	void update_qso(qso_num_t log_num);
 	// Update query

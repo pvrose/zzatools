@@ -24,6 +24,7 @@ extern dxa_if* dxa_if_;
 
 qso_entry::qso_entry(int X, int Y, int W, int H, const char* L) :
 	Fl_Group(X, Y, W, H, L)
+	, number_locked_(0)
 {
 	qso_data_ = (qso_data*)parent();
 	for (int ix = 0; ix < NUMBER_TOTAL; ix++) {
@@ -135,7 +136,9 @@ void qso_entry::enable_widgets() {
 		label("QSO Entry - prepared for real-time logging.");
 		show();
 		for (int ix = 0; ix <= number_fields_in_use_ && ix < NUMBER_TOTAL; ix++) {
-			if (ch_field_[ix]) ch_field_[ix]->activate();
+			if (ch_field_[ix])
+				if (ix < number_locked_ + NUMBER_FIXED) ch_field_[ix]->deactivate();
+				else ch_field_[ix]->activate();
 			ip_field_[ix]->activate();
 		}
 		for (int ix = number_fields_in_use_ + 1; ix < NUMBER_TOTAL; ix++) {
@@ -149,7 +152,9 @@ void qso_entry::enable_widgets() {
 		copy_label(l);
 		show();
 		for (int ix = 0; ix <= number_fields_in_use_ && ix < NUMBER_TOTAL; ix++) {
-			if (ch_field_[ix]) ch_field_[ix]->activate();
+			if (ch_field_[ix])
+				if (ix < number_locked_ + NUMBER_FIXED) ch_field_[ix]->deactivate();
+				else ch_field_[ix]->activate();
 			ip_field_[ix]->activate();
 		}
 		for (int ix = number_fields_in_use_ + 1; ix < NUMBER_TOTAL; ix++) {
@@ -333,7 +338,10 @@ string qso_entry::get_call() {
 void qso_entry::initialise_fields(string fields, bool new_fields, bool lock_preset) {
 	// Now set fields
 	vector<string> field_names;
-	split_line(fields, field_names, ',');
+	if (fields.length()) split_line(fields, field_names, ',');
+	else field_names.clear();
+	if (lock_preset) number_locked_ = field_names.size();
+	else number_locked_ = 0;
 	size_t ix = 0;
 	int iy;
 	for (ix = 0, iy = NUMBER_FIXED; ix < field_names.size(); ix++, iy++) {
@@ -342,22 +350,10 @@ void qso_entry::initialise_fields(string fields, bool new_fields, bool lock_pres
 			ip_field_[iy]->field_name(field_names[ix].c_str(), qso_data_->current_qso());
 			field_names_[iy] = field_names[ix];
 		}
-		if (lock_preset) {
-			ch_field_[iy]->deactivate();
-		}
-		else {
-			ch_field_[iy]->activate();
-		}
-	}
-	if (iy < NUMBER_TOTAL) {
-		ch_field_[iy]->value("");
-		ch_field_[iy]->activate();
-		iy++;
 	}
 	number_fields_in_use_ = iy;
 	for (; iy < NUMBER_TOTAL; iy++) {
 		ch_field_[iy]->value("");
-		ch_field_[iy]->deactivate();
 		ip_field_[iy]->value("");
 		ip_field_[iy]->field_name("");
 	}
@@ -370,22 +366,27 @@ void qso_entry::initialise_values(string preset_fields, int contest_serial) {
 	int ix = NUMBER_FIXED;
 	for (size_t i = 0; i < fields.size(); i++, ix++) {
 		if (qso_data_->current_qso()) {
-			string contest_mode = spec_data_->dxcc_mode(qso_data_->current_qso()->item("MODE"));
-			if (fields[i] == "RST_SENT" || fields[i] == "RST_RCVD") {
-				if (contest_mode == "CW" || contest_mode == "DATA") {
-					qso_data_->current_qso()->item(fields[i], string("599"));
+			if (qso_data_->contest_mode() == qso_contest::CONTEST) {
+				string contest_mode = spec_data_->dxcc_mode(qso_data_->current_qso()->item("MODE"));
+				if (fields[i] == "RST_SENT" || fields[i] == "RST_RCVD") {
+					if (contest_mode == "CW" || contest_mode == "DATA") {
+						qso_data_->current_qso()->item(fields[i], string("599"));
+					}
+					else {
+						qso_data_->current_qso()->item(fields[i], string("59"));
+					}
+				}
+				else if (fields[i] == "STX") {
+					char text[10];
+					snprintf(text, 10, "%03d", contest_serial);
+					qso_data_->current_qso()->item(fields[i], string(text));
+				}
+				if (fields[i] == "CALL") {
+					ip_field_[ix]->value("");
 				}
 				else {
-					qso_data_->current_qso()->item(fields[i], string("59"));
+					ip_field_[ix]->value(qso_data_->current_qso()->item(fields[i]).c_str());
 				}
-			}
-			else if (fields[i] == "STX") {
-				char text[10];
-				snprintf(text, 10, "%03d", contest_serial);
-				qso_data_->current_qso()->item(fields[i], string(text));
-			}
-			if (fields[i] == "CALL") {
-				ip_field_[ix]->value("");
 			}
 			else {
 				ip_field_[ix]->value(qso_data_->current_qso()->item(fields[i]).c_str());
