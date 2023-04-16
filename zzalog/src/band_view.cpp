@@ -63,6 +63,7 @@ band_view::band_view(double frequency, int W, int H, const char* label) :
 		// Carry on and create window - default 0.1 kHz
 		band_settings.get("Zoom value", zoom_value_, 3);
 		create_form();
+		end();
 		// Recalculate zoom values and left and right frequencies
 		recalculate(rig_frequency_);
 		// Set frequency slider value and step values
@@ -279,6 +280,10 @@ void band_view::create_form() {
 	// Get the even number of ticks that fit in what remains
 	num_ticks_ = (w() - EDGE - val1->w() - GAP - EDGE) / PIXELS_PER_TICK / 2 * 2;
 	pixel_rhs_ = pixel_lhs_ + (num_ticks_ * PIXELS_PER_TICK);
+
+	// The window will resize itself - only make the zoom slider re-size
+	resizable(val1);
+
 }
 
 // Convert frequency to text
@@ -441,8 +446,11 @@ void band_view::draw() {
 	int pos_y = draw_scale();
 	pos_y = draw_plan(pos_y);
 	pos_y = draw_frequency(pos_y);
-	// Don't allow the window to be resized to smaller than this
-	size_range(pixel_rhs_ + GAP, pos_y + GAP);
+	// Calculate the size of window required
+	int target_y = h() - HBUTTON - EDGE - GAP;
+	int new_h = h() - target_y + pos_y;
+	size(w(), new_h);
+	size_range(w(), h(), w(), h());
 }
 
 // Add title
