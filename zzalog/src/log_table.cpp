@@ -693,6 +693,9 @@ void log_table::get_fields() {
 		}
 		free(field_set_name);
 	}
+	else {
+		strcpy(field_set_name, "Default");
+	}
 	// If the field_set is empty - use the default set
 	if (num_fields == 0) {
 		fields_.clear();
