@@ -45,6 +45,8 @@ public:
 	int serial_number();
 	// conditionally Increment serial number
 	void increment_serial();
+	// Create/display instructions window
+	void instructions_window(bool show);
 
 protected:
 	// Initialise setial number

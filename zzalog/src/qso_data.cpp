@@ -304,7 +304,7 @@ void qso_data::initialise_fields() {
 		break;
 	case qso_contest::DEFINE:
 		// Define new exchange - provide base RS/Serno
-		preset_fields = "RST_RCVD,SRX";
+		preset_fields = "";
 		new_fields = true;
 		lock_preset = false;
 		break;

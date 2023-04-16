@@ -346,6 +346,7 @@ Fl_Window* tip_window(const string& tip, int x_root, int y_root) {
 	op->box(FL_BORDER_BOX);
 	op->value(tip.c_str());
 	win->add(op);
+	win->end();
 	// set the window parameters: always on top, tooltip
 	win->set_non_modal();
 	win->set_tooltip_window();

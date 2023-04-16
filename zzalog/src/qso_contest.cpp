@@ -15,7 +15,7 @@ extern status* status_;
 
 // How to use the contest facility
 string instructions =
-"Using and existing contest definition:-\n"
+"Using an existing contest definition:-\n"
 "Select the contest in the CONTEST_ID field choice\n"
 "Select the exchange definition\n"
 "Click \"Enable\"\n"
@@ -24,10 +24,10 @@ string instructions =
 "Select the contest in the CONTEST_ID field choice\n"
 "Type in a name for the exchange deifinition\n"
 "Click \"Edit\"\n"
-"Add the fields that you need to log for your transmission\n"
-"Click \"Set TX\"\n"
-"Add the fields that you need to log for their transmission\n"
+"Add the fields that you need to log your reception\n"
 "Click \"Set RX\"\n"
+"Add the fields that you need to log your transmission\n"
+"Click \"Set TX\"\n"
 "Click \"Save\"\n";
 
 // QSO contest group
@@ -38,10 +38,10 @@ qso_contest::qso_contest(int X, int Y, int W, int H, const char* L) :
 	, exch_fmt_id_("")
 	, max_ef_index_(0)
 	, field_mode_(NO_CONTEST)
+	, wn_instructions_(nullptr)
 {
 	load_values();
 	create_form(X, Y);
-	enable_widgets();
 }
 
 
@@ -185,19 +185,19 @@ void qso_contest::create_form(int X, int Y) {
 
 	curr_x += bn_add_exch_->w() + GAP;
 
-	// Define contest exchanges
-	bn_define_tx_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Set TX");
-	bn_define_tx_->callback(cb_def_format, (void*)true);
-	bn_define_tx_->tooltip("Use the specified fields as contest exchange on transmit");
-
-	curr_x += bn_define_tx_->w();
-
 	// Define contest
 	bn_define_rx_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Set RX");
 	bn_define_rx_->callback(cb_def_format, (void*)false);
 	bn_define_rx_->tooltip("Use the specified fields as contest exchange on receive");
 
 	curr_x += bn_define_rx_->w() + GAP;
+
+	// Define contest exchanges
+	bn_define_tx_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Set TX");
+	bn_define_tx_->callback(cb_def_format, (void*)true);
+	bn_define_tx_->tooltip("Use the specified fields as contest exchange on transmit");
+
+	curr_x += bn_define_tx_->w();
 
 	// Serial number control buttons - Initialise to 001
 	bn_init_serno_ = new Fl_Button(curr_x, curr_y, WBUTTON / 2, HBUTTON, "@|<");
@@ -232,11 +232,6 @@ void qso_contest::create_form(int X, int Y) {
 
 	resizable(nullptr);
 	size(curr_x - x(), curr_y - y());
-
-	// Create the instruction tooltip 
-	Fl_Window* win = ancestor_view<Fl_Window>(this);
-	wn_instructions_ = tip_window(instructions, win->x_root() + x() + w(), win->y_root() + y() + h());
-	wn_instructions_->show();
 
 	end();
 
@@ -287,7 +282,6 @@ void qso_contest::enable_widgets() {
 		bn_add_exch_->label("Add");
 		bn_define_rx_->deactivate();
 		bn_define_tx_->deactivate();
-		wn_instructions_->show();
 		break;
 	case DEFINE:
 	case EDIT:
@@ -295,21 +289,18 @@ void qso_contest::enable_widgets() {
 		bn_add_exch_->label("Save");
 		bn_define_rx_->activate();
 		bn_define_tx_->activate();
-		wn_instructions_->show();
 		break;
 	case CONTEST:
 		bn_add_exch_->activate();
 		bn_add_exch_->label("Edit");
 		bn_define_rx_->deactivate();
 		bn_define_tx_->deactivate();
-		wn_instructions_->hide();
 		break;
 	default:
 		bn_add_exch_->deactivate();
 		bn_add_exch_->label(nullptr);
 		bn_define_rx_->deactivate();
 		bn_define_tx_->deactivate();
-		wn_instructions_->hide();
 		break;
 	}
 	bn_add_exch_->redraw();
@@ -371,6 +362,7 @@ void qso_contest::cb_format(Fl_Widget* w, void* v) {
 		that->field_mode_ = NEW;
 	}
 	that->enable_widgets();
+	that->instructions_window(true);
 }
 
 // Add exchange format
@@ -395,14 +387,16 @@ void qso_contest::cb_add_exch(Fl_Widget* w, void* v) {
 			break;
 		}
 		that->enable_widgets();
+		that->instructions_window(true);
 	}
 	else {
 		// Start/Resume contest
 		that->field_mode_ = CONTEST;
 		that->populate_exch_fmt();
 		that->initialise_fields();
+		that->enable_widgets();
+		that->instructions_window(false);
 	}
-	that->enable_widgets();
 }
 
 // Define contest exchange
@@ -516,4 +510,20 @@ int qso_contest::serial_number() {
 // increment serial number
 void qso_contest::increment_serial() {
 	if (field_mode_ == CONTEST) serial_num_++;
+}
+
+// Create instructions window
+void qso_contest::instructions_window(bool show) {
+	if (wn_instructions_ == nullptr) {
+		Fl_Window* win = window();
+		wn_instructions_ = tip_window(instructions, win->x_root() + x() + w(), win->y_root() + y());
+	}
+	if (show) {
+		wn_instructions_->show();
+	}
+	else {
+		wn_instructions_->hide();
+	}
+	wn_instructions_->focus(this);
+
 }

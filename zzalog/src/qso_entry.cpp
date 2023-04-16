@@ -349,9 +349,15 @@ void qso_entry::initialise_fields(string fields, bool new_fields, bool lock_pres
 			ch_field_[iy]->activate();
 		}
 	}
-	number_fields_in_use_ = NUMBER_FIXED + field_names.size();
+	if (iy < NUMBER_TOTAL) {
+		ch_field_[iy]->value("");
+		ch_field_[iy]->activate();
+		iy++;
+	}
+	number_fields_in_use_ = iy;
 	for (; iy < NUMBER_TOTAL; iy++) {
 		ch_field_[iy]->value("");
+		ch_field_[iy]->deactivate();
 		ip_field_[iy]->value("");
 		ip_field_[iy]->field_name("");
 	}
@@ -361,8 +367,8 @@ void qso_entry::initialise_fields(string fields, bool new_fields, bool lock_pres
 void qso_entry::initialise_values(string preset_fields, int contest_serial) {
 	vector<string> fields;
 	split_line(preset_fields, fields, ',');
-	for (size_t i = 0; i < fields.size(); i++) {
-		int ix = NUMBER_FIXED + i;
+	int ix = NUMBER_FIXED;
+	for (size_t i = 0; i < fields.size(); i++, ix++) {
 		if (qso_data_->current_qso()) {
 			string contest_mode = spec_data_->dxcc_mode(qso_data_->current_qso()->item("MODE"));
 			if (fields[i] == "RST_SENT" || fields[i] == "RST_RCVD") {
@@ -378,17 +384,21 @@ void qso_entry::initialise_values(string preset_fields, int contest_serial) {
 				snprintf(text, 10, "%03d", contest_serial);
 				qso_data_->current_qso()->item(fields[i], string(text));
 			}
-			ip_field_[ix]->value(qso_data_->current_qso()->item(fields[i]).c_str());
+			if (fields[i] == "CALL") {
+				ip_field_[ix]->value("");
+			}
+			else {
+				ip_field_[ix]->value(qso_data_->current_qso()->item(fields[i]).c_str());
+			}
 		}
 		else {
 			ip_field_[ix]->value("");
 		}
 	}
-	ip_field_[field_ip_map_["CALL"]]->value("");
-	ip_notes_->value("");
-	for (size_t i = NUMBER_FIXED + fields.size(); i < NUMBER_TOTAL; i++) {
-		ip_field_[i]->value("");
+	for (; ix < NUMBER_TOTAL; ix++) {
+		ip_field_[ix]->value("");
 	}
+	ip_notes_->value("");
 }
 
 // Return fields that have been defines as comma seperated list
