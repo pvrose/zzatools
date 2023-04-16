@@ -696,11 +696,19 @@ void log_table::get_fields() {
 	// If the field_set is empty - use the default set
 	if (num_fields == 0) {
 		fields_.clear();
+		Fl_Preferences field_set_settings(fields_settings, field_set_name);
 		// For each field in the default field set
 		for (unsigned int i = 0; DEFAULT_FIELDS[i].field.size() > 0; i++) {
 			// Copy the field information
 			field_info_t field = DEFAULT_FIELDS[i];
 			fields_.push_back(field);
+			// Save the field definitions to settings
+			char g_name[15];
+			snprintf(g_name, sizeof(g_name), "Field %d", i);
+			Fl_Preferences field_settings(field_set_settings, g_name);
+			field_settings.set("Width", (signed)field.width);
+			field_settings.set("Header", field.header.c_str());
+			field_settings.set("Name", field.field.c_str());
 		}
 	}
 }
