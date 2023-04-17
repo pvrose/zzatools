@@ -74,7 +74,7 @@ using namespace std;
 string COPYRIGHT = "© Philip Rose GM3ZZA 2018. All rights reserved.\n (Prefix data, DX Atlas & OmniRig interfaces © Alex Shovkoplyas, VE3NEA.)";
 string PROGRAM_ID = "ZZALOG";
 string PROG_ID = "ZLG";
-string VERSION = "3.4.3";
+string VERSION = "3.4.4";
 string TIMESTAMP = __DATE__ + string(" ") + __TIME__;
 #ifdef _DEBUG
 string PROGRAM_VERSION = VERSION + " (Debug " + TIMESTAMP + ")";
@@ -678,9 +678,13 @@ void backup_file() {
 	// Save the result of the chooser
 	backup_settings.set("Path", backup.c_str());
 
-	// ensure a '\' is appendded
+	// ensure the correct delimiiter is appendded
 	if (backup.back() != '/' && backup.back() != '\\') {
+#ifdef _WIN32
 		backup += '\\';
+#else
+		backup += '/';
+#endif
 	}
 	// Get source filename
 	string source = book_->filename(true);
