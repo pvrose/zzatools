@@ -20,7 +20,7 @@ qso_rig::qso_rig(int X, int Y, int W, int H, const char* L) :
 	Fl_Group(X, Y, W, H, nullptr)
 {
 	// If no name is provided then get from qso_manager
-	if (L == nullptr || strlen(L) == 0) copy_label(ancestor_view<qso_manager>(this)->get_my_rig().c_str());
+	if (L == nullptr || strlen(L) == 0) copy_label(ancestor_view<qso_manager>(this)->get_default(qso_manager::RIG).c_str());
 	// Otherwise copy that supplied as it is probably a transient string
 	else copy_label(L);
 	load_values();

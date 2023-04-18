@@ -49,6 +49,8 @@ public:
 		QUERY_NEW,       // Query: Not able to find QSO - allow manual matching
 		QUERY_DUPE,      // Query: Two records in log found to be possible duplicates - select either, both or a merge
 		QRZ_MERGE,       // Merge details downloaded from QRZ.com
+		NET_STARTED,     // Started several QSOs in a net.
+		NET_EDIT,        // Converting sngle QSO into a net by adding callsigns
 	};
 
 	enum dupe_flags : int {
@@ -93,23 +95,21 @@ public:
 	// Update query
 	void update_query(logging_state_t query, qso_num_t match_num, qso_num_t query_num);
 	// Get default copy record
-	record* get_default_record();
+	qso_num_t get_default_number();
 	// Initialise fields
 	void initialise_fields();
 	// Get defined fields
 	string get_defined_fields();
 	// Current QSO
 	record* current_qso();
-	// Query QSO
-	record* query_qso();
-	// Original QSO
-	record* original_qso();
+	//// Query QSO
+	//record* query_qso();
+	//// Original QSO
+	//record* original_qso();
 	// Curernt QSO number
 	qso_num_t current_qso_num();
 	// Update view and 
 	void update_rig();
-	// Action handle d-click
-	void action_handle_dclick(int col, string field);
 	// Gt call
 	string get_call();
 	// QTH has changed
@@ -152,7 +152,7 @@ public:
 	// Action find match
 	void action_find_match();
 	// Action query
-	void action_query(logging_state_t query);
+	void action_query(logging_state_t query, qso_num_t match_num, qso_num_t query_num);
 	// Action handle dupe
 	void action_handle_dupe(dupe_flags action);
 	// Action merge from QRZ.com
@@ -161,8 +161,6 @@ public:
 	void action_look_all_txt();
 	// Copy found text
 	void action_copy_all_text(string text);
-	// Set current QSO from selected record
-	void action_set_current();
 
 protected:
 	// Callbacks
@@ -175,18 +173,18 @@ protected:
 	logging_mode_t logging_mode_;
 	// Logging state
 	logging_state_t logging_state_;
-	// Current record - being entered or edited
-	record* current_qso_;
+	//// Current record - being entered or edited
+	//record* current_qso_;
 	// Selected record
 	record* selected_qso_;
-	// Saved current record
-	record* original_qso_;
-	// Presented query 
-	record* query_qso_;
-	// Current record number
-	qso_num_t current_rec_num_;
-	// Query record number
-	qso_num_t query_rec_num_;
+	//// Saved current record
+	//record* original_qso_;
+	//// Presented query 
+	//record* query_qso_;
+	//// Current record number
+	//qso_num_t current_rec_num_;
+	//// Query record number
+	//qso_num_t query_rec_num_;
 	// Previous value
 	string previous_qth_;
 	string previous_locator_;

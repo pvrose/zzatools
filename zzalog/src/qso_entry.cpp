@@ -25,6 +25,9 @@ extern dxa_if* dxa_if_;
 qso_entry::qso_entry(int X, int Y, int W, int H, const char* L) :
 	Fl_Group(X, Y, W, H, L)
 	, number_locked_(0)
+	, qso_(nullptr)
+	, qso_number_(-1)
+	, original_qso_(nullptr)
 {
 	qso_data_ = (qso_data*)parent();
 	for (int ix = 0; ix < NUMBER_TOTAL; ix++) {
@@ -86,7 +89,7 @@ void qso_entry::create_form(int X, int Y) {
 		ip_field_[ix]->callback(cb_ip_field, (void*)ix);
 		ip_field_[ix]->input()->when(FL_WHEN_RELEASE_ALWAYS);
 		if (ix < NUMBER_FIXED) {
-			ip_field_[ix]->field_name(fixed_names_[ix].c_str(), qso_data_->current_qso());
+			ip_field_[ix]->field_name(fixed_names_[ix].c_str(), qso_);
 			field_ip_map_[fixed_names_[ix]] = ix;
 			field_names_[ix] = fixed_names_[ix];
 			ip_field_[ix]->label(fixed_names_[ix].c_str());
@@ -186,8 +189,7 @@ void qso_entry::enable_widgets() {
 
 // Copy record to the fields - reverse of above
 void qso_entry::copy_qso_to_display(int flags) {
-	record* source = qso_data_->get_default_record();
-	if (source) {
+	if (qso_) {
 		// For each field input
 		for (int i = 0; i < NUMBER_TOTAL; i++) {
 			string field;
@@ -196,7 +198,7 @@ void qso_entry::copy_qso_to_display(int flags) {
 			if (field.length()) {
 				if (flags == CF_ALL_FLAGS) {
 					// Copy all fields that have edit fields defined
-					ip_field_[i]->value(source->item(field, false, true).c_str());
+					ip_field_[i]->value(qso_->item(field, false, true).c_str());
 				}
 				else {
 					// Copy per flag bits
@@ -204,14 +206,14 @@ void qso_entry::copy_qso_to_display(int flags) {
 						copy_flags f = (*sf);
 						if (flags & f) {
 							for (auto fx = COPY_FIELDS.at(f).begin(); fx != COPY_FIELDS.at(f).end(); fx++) {
-								if ((*fx) == field)	ip_field_[i]->value(source->item(field, false, true).c_str());
+								if ((*fx) == field)	ip_field_[i]->value(qso_->item(field, false, true).c_str());
 							}
 						}
 					}
 				}
 			}
 		}
-		ip_notes_->value(source->item("NOTES").c_str());
+		ip_notes_->value(qso_->item("NOTES").c_str());
 		// If QTH changes tell DXA-IF to update home_location
 		qso_data_->check_qth_changed();
 	}
@@ -219,23 +221,25 @@ void qso_entry::copy_qso_to_display(int flags) {
 
 // Copy from an existing record: fields depend on flags set
 void qso_entry::copy_qso_to_qso(record* old_record, int flags) {
-	if (qso_data_->current_qso() && old_record) {
+	if (old_record) {
+		// Create a new record
+		qso(-1);
 		// For all flag bits
 		for (auto sf = COPY_SET.begin(); sf != COPY_SET.end(); sf++) {
 			copy_flags f = (*sf);
 			for (auto fx = COPY_FIELDS.at(f).begin(); fx != COPY_FIELDS.at(f).end(); fx++) {
 				if (flags & f) {
 					// If it's set copy it
-					qso_data_->current_qso()->item((*fx), old_record->item((*fx)));
+					qso_->item((*fx), old_record->item((*fx)));
 				}
 				else {
 					// else clear it
-					qso_data_->current_qso()->item(string(""));
+					qso_->item(string(""));
 				}
 			}
 		}
-		copy_qso_to_display(flags);
 	}
+	copy_qso_to_display(flags);
 }
 
 // Copy fields from CAT and default rig etc.
@@ -250,38 +254,38 @@ void qso_entry::copy_cat_to_qso() {
 		switch (qso_data_->logging_state()) {
 		case qso_data::QSO_PENDING: {
 			// Load values from rig
-			qso_data_->current_qso()->item("FREQ", freqy);
+			qso_->item("FREQ", freqy);
 			// Get mode - NB USB/LSB need further processing
 			if (mode != "DATA L" && mode != "DATA U") {
-				qso_data_->current_qso()->item("MODE", mode);
-				qso_data_->current_qso()->item("SUBMODE", submode);
+				qso_->item("MODE", mode);
+				qso_->item("SUBMODE", submode);
 			}
 			else {
-				qso_data_->current_qso()->item("MODE", string(""));
-				qso_data_->current_qso()->item("SUBMODE", string(""));
+				qso_->item("MODE", string(""));
+				qso_->item("SUBMODE", string(""));
 			}
-			qso_data_->current_qso()->item("TX_PWR", tx_power);
+			qso_->item("TX_PWR", tx_power);
 			break;
 		}
 		case qso_data::QSO_STARTED: {
 			// Ignore values except TX_PWR which accumulates maximum value
 			char message[128];
-			if (qso_data_->current_qso()->item("FREQ") != freqy) {
+			if (qso_->item("FREQ") != freqy) {
 				snprintf(message, 128, "DASH: Rig frequency changed during QSO, New value %s", freqy.c_str());
 				status_->misc_status(ST_WARNING, message);
-				qso_data_->current_qso()->item("FREQ", freqy);
+				qso_->item("FREQ", freqy);
 			}
-			if (qso_data_->current_qso()->item("MODE") != mode) {
+			if (qso_->item("MODE") != mode) {
 				snprintf(message, 128, "DASH: Rig mode changed during QSO, New value %s", mode.c_str());
 				status_->misc_status(ST_WARNING, message);
-				qso_data_->current_qso()->item("MODE", mode);
+				qso_->item("MODE", mode);
 			}
-			if (qso_data_->current_qso()->item("SUBMODE") != submode) {
+			if (qso_->item("SUBMODE") != submode) {
 				snprintf(message, 128, "DASH: Rig submode changed during QSO, New value %s", submode.c_str());
 				status_->misc_status(ST_WARNING, message);
-				qso_data_->current_qso()->item("SUBMODE", submode);
+				qso_->item("SUBMODE", submode);
 			}
-			qso_data_->current_qso()->item("TX_PWR", tx_power);
+			qso_->item("TX_PWR", tx_power);
 			break;
 		}
 		}
@@ -300,12 +304,12 @@ void qso_entry::copy_clock_to_qso() {
 			char result[100];
 			// convert date
 			strftime(result, 99, "%Y%m%d", value);
-			qso_data_->current_qso()->item("QSO_DATE", string(result));
+			qso_->item("QSO_DATE", string(result));
 			// convert time
 			strftime(result, 99, "%H%M%S", value);
-			qso_data_->current_qso()->item("TIME_ON", string(result));
-			qso_data_->current_qso()->item("QSO_DATE_OFF", string(""));
-			qso_data_->current_qso()->item("TIME_OFF", string(""));
+			qso_->item("TIME_ON", string(result));
+			qso_->item("QSO_DATE_OFF", string(""));
+			qso_->item("TIME_OFF", string(""));
 
 			copy_qso_to_display(CF_TIME);
 			break;
@@ -325,7 +329,7 @@ void qso_entry::clear_display() {
 
 // Clear fields in current QSO
 void qso_entry::clear_qso() {
-	qso_data_->current_qso()->delete_contents();
+	qso_->delete_contents();
 	copy_qso_to_display(CF_QSO);
 }
 
@@ -356,7 +360,7 @@ void qso_entry::initialise_fields(string fields, bool new_fields, bool lock_pres
 	for (ix = 0, iy = NUMBER_FIXED; ix < field_names.size(); ix++, iy++) {
 		if (new_fields) {
 			ch_field_[iy]->value(field_names[ix].c_str());
-			ip_field_[iy]->field_name(field_names[ix].c_str(), qso_data_->current_qso());
+			ip_field_[iy]->field_name(field_names[ix].c_str(), qso_);
 			field_names_[iy] = field_names[ix];
 		}
 	}
@@ -374,31 +378,31 @@ void qso_entry::initialise_values(string preset_fields, int contest_serial) {
 	split_line(preset_fields, fields, ',');
 	int ix = NUMBER_FIXED;
 	for (size_t i = 0; i < fields.size(); i++, ix++) {
-		if (qso_data_->current_qso()) {
+		if (qso_) {
 			if (qso_data_->contest_mode() == qso_contest::CONTEST) {
-				string contest_mode = spec_data_->dxcc_mode(qso_data_->current_qso()->item("MODE"));
+				string contest_mode = spec_data_->dxcc_mode(qso_->item("MODE"));
 				if (fields[i] == "RST_SENT" || fields[i] == "RST_RCVD") {
 					if (contest_mode == "CW" || contest_mode == "DATA") {
-						qso_data_->current_qso()->item(fields[i], string("599"));
+						qso_->item(fields[i], string("599"));
 					}
 					else {
-						qso_data_->current_qso()->item(fields[i], string("59"));
+						qso_->item(fields[i], string("59"));
 					}
 				}
 				else if (fields[i] == "STX") {
 					char text[10];
 					snprintf(text, 10, "%03d", contest_serial);
-					qso_data_->current_qso()->item(fields[i], string(text));
+					qso_->item(fields[i], string(text));
 				}
 				if (fields[i] == "CALL") {
 					ip_field_[ix]->value("");
 				}
 				else {
-					ip_field_[ix]->value(qso_data_->current_qso()->item(fields[i]).c_str());
+					ip_field_[ix]->value(qso_->item(fields[i]).c_str());
 				}
 			}
 			else {
-				ip_field_[ix]->value(qso_data_->current_qso()->item(fields[i]).c_str());
+				ip_field_[ix]->value(qso_->item(fields[i]).c_str());
 			}
 		}
 		else {
@@ -436,8 +440,8 @@ void qso_entry::action_add_field(int ix, string field) {
 	}
 	if (ix >= 0 && ix < number_fields_in_use_) {
 		const char* old_field = field_names_[ix].c_str();
-		ip_field_[ix]->field_name(field.c_str(), qso_data_->current_qso());
-		ip_field_[ix]->value(qso_data_->current_qso()->item(field).c_str());
+		ip_field_[ix]->field_name(field.c_str(), qso_);
+		ip_field_[ix]->value(qso_->item(field).c_str());
 		// Change mapping
 		if (strlen(old_field)) {
 			field_ip_map_.erase(old_field);
@@ -448,8 +452,8 @@ void qso_entry::action_add_field(int ix, string field) {
 	else if (ix == number_fields_in_use_) {
 		if (field_ip_map_.find(field) == field_ip_map_.end()) {
 			ch_field_[number_fields_in_use_]->value(field.c_str());
-			ip_field_[number_fields_in_use_]->field_name(field.c_str(), qso_data_->current_qso());
-			ip_field_[number_fields_in_use_]->value(qso_data_->current_qso()->item(field).c_str());
+			ip_field_[number_fields_in_use_]->field_name(field.c_str(), qso_);
+			ip_field_[number_fields_in_use_]->value(qso_->item(field).c_str());
 			field_ip_map_[field] = number_fields_in_use_;
 			field_names_[number_fields_in_use_] = field;
 			number_fields_in_use_++;
@@ -475,8 +479,8 @@ void qso_entry::action_del_field(int ix) {
 		string& field = field_names_[pos + 1];
 		field_names_[pos] = field;
 		ch_field_[pos]->value(field.c_str());
-		ip_field_[pos]->field_name(field.c_str(), qso_data_->current_qso());
-		ip_field_[pos]->value(qso_data_->current_qso()->item(field).c_str());
+		ip_field_[pos]->field_name(field.c_str(), qso_);
+		ip_field_[pos]->value(qso_->item(field).c_str());
 	}
 	ch_field_[pos]->value("");
 	ip_field_[pos]->field_name("");
@@ -508,7 +512,7 @@ void qso_entry::cb_ip_field(Fl_Widget* w, void* v) {
 	field_input* ip = (field_input*)w;
 	string field = ip->field_name();
 	string value = ip->value();
-	that->qso_data_->current_qso()->item(field, value);
+	that->qso_->item(field, value);
 
 	if (field == "FREQ") {
 		double freq = atof(value.c_str()) * 1000;
@@ -519,12 +523,12 @@ void qso_entry::cb_ip_field(Fl_Widget* w, void* v) {
 	}
 	else if (field == "MODE") {
 		if (spec_data_->is_submode(value)) {
-			that->qso_data_->current_qso()->item("SUBMODE", value);
-			that->qso_data_->current_qso()->item("MODE", spec_data_->mode_for_submode(value));
+			that->qso_->item("SUBMODE", value);
+			that->qso_->item("MODE", spec_data_->mode_for_submode(value));
 		}
 		else {
-			that->qso_data_->current_qso()->item("MODE", value);
-			that->qso_data_->current_qso()->item("SUBMODE", string(""));
+			that->qso_->item("MODE", value);
+			that->qso_->item("SUBMODE", string(""));
 		}
 	}
 	else if (field == "APP_ZZA_QTH") {
@@ -547,7 +551,7 @@ void qso_entry::cb_ip_field(Fl_Widget* w, void* v) {
 	case qso_data::QSO_STARTED:
 	case qso_data::QSO_EDIT:
 		that->enable_widgets();
-		tabbed_forms_->update_views(nullptr, HT_MINOR_CHANGE, that->qso_data_->current_qso_num());
+		tabbed_forms_->update_views(nullptr, HT_MINOR_CHANGE, that->qso_number_);
 		break;
 	default:
 		break;
@@ -560,6 +564,59 @@ void qso_entry::cb_ip_notes(Fl_Widget* w, void* v) {
 	qso_entry* that = ancestor_view<qso_entry>(w);
 	string notes;
 	cb_value<intl_input, string>(w, &notes);
-	that->qso_data_->current_qso()->item("NOTES", notes);
+	that->qso_->item("NOTES", notes);
 	tabbed_forms_->update_views(nullptr, HT_MINOR_CHANGE, book_->size() - 1);
+}
+
+// Get current qso
+record* qso_entry::qso() {
+	return qso_;
+}
+
+// Set current qso
+void qso_entry::qso(qso_num_t number) {
+	if (qso_number_ == -1 || qso_number_ != number) {
+		qso_number_ = number;
+		if (number == -1) {
+			qso_ = new record();
+		}
+		else {
+			qso_ = book_->get_record(number, false);
+		}
+		delete original_qso_;
+		original_qso_ = new record(*qso_);
+	}
+}
+
+// Get original qso
+record* qso_entry::original_qso() {
+	return original_qso_;
+}
+
+// Get current number
+qso_num_t qso_entry::qso_number() {
+	return qso_number_;
+}
+
+// Append QSO to book
+void qso_entry::append_qso() {
+	qso_number_ = book_->append_record(qso_);
+}
+
+// DElete QSO
+void qso_entry::delete_qso() {
+	if (qso_number_ == -1) {
+		// QSO is not in the book yet
+		delete qso_;
+		qso_ = nullptr;
+		delete original_qso_;
+		original_qso_ = nullptr;
+	}
+	else {
+		// QSO is in the book, remove this reference
+		qso_ = nullptr;
+		qso_number_ = -1;
+		delete original_qso_;
+		original_qso_ = nullptr;
+	}
 }

@@ -103,8 +103,6 @@ using namespace std;
 		void edit_qso();
 		// Get default value
 		string get_default(stn_item_t item);
-		// Get current MY_RIG value
-		string get_my_rig();
 		// 1 second ticker
 		void ticker();
 		// Change rig 

@@ -17,25 +17,31 @@ extern spec_data* spec_data_;
 const Fl_Color COLOUR_ORANGE = 93; /* R=4/4, B=0/4, G=5/7 */
 const Fl_Color COLOUR_APPLE = 87;  /* R=3/4, B=0/4, G=7/7 */
 const Fl_Color COLOUR_PINK = 170;  /* R=4/4, B=2/4, G=2/7 */
+const Fl_Color COLOUR_MAUVE = 212; /* R-4/4, B=3/4, G=4/7 */
 const Fl_Color COLOUR_NAVY = 136;  /* R=0/4, B=2/4, G=0/7 */
 
 map<qso_data::logging_state_t, list<qso_buttons::button_type> > button_map_ =
 {
-	{ qso_data::QSO_INACTIVE, {qso_buttons::ACTIVATE, qso_buttons::START_QSO, qso_buttons::EDIT_QSO, qso_buttons::BROWSE,
-		qso_buttons::VIEW_QSL } },
-	{ qso_data::QSO_PENDING, { qso_buttons::START_QSO, qso_buttons::QUIT_QSO, qso_buttons::EDIT_QTH } },
-	{ qso_data::QSO_STARTED, { qso_buttons::SAVE_QSO, qso_buttons::CANCEL_QSO, qso_buttons::EDIT_QTH,
-		qso_buttons::WORKED_B4, qso_buttons::PARSE } },
-	{ qso_data::QSO_EDIT, { qso_buttons::SAVE_EDIT, qso_buttons::CANCEL_EDIT, qso_buttons::NAV_FIRST,
-		qso_buttons::NAV_PREV, qso_buttons::NAV_NEXT, qso_buttons::NAV_LAST, qso_buttons::WORKED_B4, qso_buttons::VIEW_QSL } },
+	{ qso_data::QSO_INACTIVE, {qso_buttons::ACTIVATE, qso_buttons::START_QSO, 
+		qso_buttons::START_NET, qso_buttons::EDIT_QSO, qso_buttons::BROWSE, qso_buttons::VIEW_QSL } },
+	{ qso_data::QSO_PENDING, { qso_buttons::START_QSO, qso_buttons::QUIT_QSO,
+		qso_buttons::START_NET, qso_buttons::EDIT_QTH } },
+	{ qso_data::QSO_STARTED, { qso_buttons::SAVE_QSO, qso_buttons::CANCEL_QSO, 
+		qso_buttons::START_NET, qso_buttons::EDIT_QTH, qso_buttons::WORKED_B4, qso_buttons::PARSE } },
+	{ qso_data::QSO_EDIT, { qso_buttons::SAVE_EDIT, qso_buttons::CANCEL_EDIT, 
+		qso_buttons::ADD_NET, qso_buttons::NAV_FIRST,
+		qso_buttons::NAV_PREV, qso_buttons::NAV_NEXT, qso_buttons::NAV_LAST, qso_buttons::VIEW_QSL } },
 	{ qso_data::QSO_BROWSE, { qso_buttons::EDIT_QSO, qso_buttons::CANCEL_BROWSE, qso_buttons::NAV_FIRST,
-		qso_buttons::NAV_PREV, qso_buttons::NAV_NEXT, qso_buttons::NAV_LAST, qso_buttons::WORKED_B4, qso_buttons::VIEW_QSL } },
+		qso_buttons::NAV_PREV, qso_buttons::NAV_NEXT, qso_buttons::NAV_LAST, qso_buttons::VIEW_QSL } },
 	{ qso_data::QUERY_MATCH, { qso_buttons::ADD_QUERY, qso_buttons::REJECT_QUERY, qso_buttons::MERGE_QUERY,
 		qso_buttons::NAV_PREV, qso_buttons::NAV_NEXT }},
 	{ qso_data::QUERY_NEW, { qso_buttons::ADD_QUERY, qso_buttons::REJECT_QUERY, qso_buttons::FIND_QSO, qso_buttons::LOOK_ALL_TXT }},
 	{ qso_data::QUERY_DUPE, { qso_buttons::KEEP_DUPE_1, qso_buttons::MERGE_DUPE, qso_buttons::KEEP_DUPE_2,
 		qso_buttons::KEEP_BOTH_DUPES }},
-	{ qso_data::QRZ_MERGE, { qso_buttons::MERGE_DONE }}
+	{ qso_data::QRZ_MERGE, { qso_buttons::MERGE_DONE }},
+	{ qso_data::NET_STARTED, {qso_buttons::SAVE_NET, qso_buttons::SAVE_QSO, qso_buttons::CANCEL_QSO, qso_buttons::CANCEL_NET,
+		qso_buttons::ADD_QSO }},
+	{ qso_data::NET_EDIT, { qso_buttons::SAVE_EDIT_NET, qso_buttons::CANCEL_QSO, qso_buttons::ADD_QSO}}
 };
 
 map<qso_buttons::button_type, qso_buttons::button_action> action_map_ =
@@ -68,6 +74,12 @@ map<qso_buttons::button_type, qso_buttons::button_action> action_map_ =
 	{ qso_buttons::KEEP_BOTH_DUPES, { "Keep 1 && 2", "Keep both records", FL_GREEN, qso_buttons::cb_bn_dupe, (void*)qso_data::DF_BOTH}},
 	{ qso_buttons::MERGE_DONE, { "Done", "Save changes", COLOUR_APPLE, qso_buttons::cb_bn_save_merge, 0}},
 	{ qso_buttons::LOOK_ALL_TXT, { "all.txt?", "Look in WSJT-X all.txt file for possible contact", COLOUR_NAVY, qso_buttons::cb_bn_all_txt, 0 } },
+	{ qso_buttons::START_NET, { "Start Net", "Start a QSO with more than one other station", COLOUR_ORANGE, qso_buttons::cb_bn_start_net, 0 } },
+	{ qso_buttons::ADD_NET, { "Add QSOs", "Add QSOs with the same details as this", COLOUR_ORANGE, qso_buttons::cb_bn_add, 0}},
+	{ qso_buttons::SAVE_NET, { "Save Net", "Log all the QSOs", COLOUR_APPLE, qso_buttons::cb_bn_save_all, 0}},
+	{ qso_buttons::CANCEL_NET, { "Quit Net", "Cancel all QSOs", COLOUR_MAUVE, qso_buttons::cb_bn_cancel_all, 0}},
+	{ qso_buttons::ADD_QSO, { "Add QSO", "Add a QSO to the net", COLOUR_ORANGE, qso_buttons::cb_bn_add, 0}},
+	{ qso_buttons::SAVE_EDIT_NET, {"Save Net", "Save all QSOs in the net", FL_GREEN, qso_buttons::cb_bn_save_all} }
 };
 
 qso_buttons::qso_buttons(int X, int Y, int W, int H, const char* L) :
@@ -151,7 +163,6 @@ void qso_buttons::enable_widgets() {
 void qso_buttons::cb_activate(Fl_Widget* w, void* v) {
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
 	if (that->qso_data_->logging_state() == qso_data::QSO_INACTIVE) {
-		that->qso_data_->action_set_current();
 		that->qso_data_->action_activate();
 	}
 }
@@ -161,7 +172,6 @@ void qso_buttons::cb_start(Fl_Widget* w, void* v) {
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
 	switch (that->qso_data_->logging_state()) {
 	case qso_data::QSO_INACTIVE:
-		that->qso_data_->action_set_current();
 		that->qso_data_->action_activate();
 		// Fall into next state
 	case qso_data::QSO_PENDING:
@@ -179,13 +189,11 @@ void qso_buttons::cb_save(Fl_Widget* w, void* v) {
 		that->qso_data_->action_start();
 	case qso_data::QSO_STARTED:
 		that->qso_data_->action_save();
-		that->qso_data_->action_set_current();
 		that->qso_data_->action_activate();
 		break;
 		// QSO editing
 	case qso_data::QSO_EDIT:
 		that->qso_data_->action_save_edit();
-		that->qso_data_->action_set_current();
 		that->qso_data_->action_edit();
 		break;
 	}
@@ -200,7 +208,6 @@ void qso_buttons::cb_cancel(Fl_Widget* w, void* v) {
 		break;
 	case qso_data::QSO_STARTED:
 		that->qso_data_->action_cancel();
-		that->qso_data_->action_set_current();
 		that->qso_data_->action_activate();
 		break;
 	case qso_data::QSO_EDIT:
@@ -217,12 +224,10 @@ void qso_buttons::cb_edit(Fl_Widget* w, void* v) {
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
 	switch (that->qso_data_->logging_state()) {
 	case qso_data::QSO_INACTIVE:
-		that->qso_data_->action_set_current();
 		that->qso_data_->action_edit();
 		break;
 	case qso_data::QSO_BROWSE:
 		that->qso_data_->action_cancel_browse();
-		that->qso_data_->action_set_current();
 		that->qso_data_->action_edit();
 		break;
 	}
@@ -268,7 +273,7 @@ void qso_buttons::cb_bn_edit_qth(Fl_Widget* w, void* v) {
 	qth_dialog* dlg = new qth_dialog(qth);
 	set<string> changed_fields;
 	record* macro;
-	record* current = that->qso_data_->get_default_record();
+	record* current = that->qso_data_->current_qso();
 	switch (dlg->display()) {
 	case BN_OK:
 		changed_fields = spec_data_->get_macro_changes();
@@ -298,7 +303,6 @@ void qso_buttons::cb_bn_browse(Fl_Widget* w, void* v) {
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
 	switch (that->qso_data_->logging_state()) {
 	case qso_data::QSO_INACTIVE:
-		that->qso_data_->action_set_current();
 		that->qso_data_->action_browse();
 		break;
 	default:
@@ -394,3 +398,13 @@ void qso_buttons::cb_bn_all_txt(Fl_Widget* w, void* v) {
 		break;
 	}
 }
+
+// Save all qsos
+void qso_buttons::cb_bn_save_all(Fl_Widget* w, void* v) {}
+// Cancel all QSOs
+void qso_buttons::cb_bn_cancel_all(Fl_Widget* w, void* v) {}
+// Add a QSO to the net
+void qso_buttons::cb_bn_add(Fl_Widget* w, void* v) {}
+// Start a net
+void qso_buttons::cb_bn_start_net(Fl_Widget* w, void* v) {}
+

@@ -317,12 +317,12 @@ void qso_manager::update_import_qso(record* import_qso) {
 	string mode = import_qso->item("MODE");
 	string submode = import_qso->item("SUBMODE");
 	// If we have activated the QSO manager, then use active QSO as template
-	use_qso = data_group_->get_default_record();
+	use_qso = data_group_->current_qso();
 	// If we have a QSO to copy from and one to copy to, copy these fields.
 	if (use_qso && import_qso) {
 		char message[128];
 		snprintf(message, 128, "IMPORT: Copying station data from %s %s %s %s",
-			use_qso->item("qso_data::QSO_DATE").c_str(),
+			use_qso->item("QSO_DATE").c_str(),
 			use_qso->item("TIME_ON").c_str(),
 			use_qso->item("CALL").c_str(),
 			use_qso->item("MODE").c_str());
@@ -336,7 +336,11 @@ void qso_manager::update_import_qso(record* import_qso) {
 
 // Get the default value of the station item
 string qso_manager::get_default(stn_item_t item) {
-	record* source = data_group_->get_default_record();
+	record* source = data_group_->current_qso();
+	// If there isn't a default QSO the use the latest one
+	if (source == nullptr) {
+		source = book_->get_latest();
+	}
 	if (source) {
 		switch (item) {
 		case RIG:
@@ -352,13 +356,8 @@ string qso_manager::get_default(stn_item_t item) {
 		}
 	}
 	else {
-		return"";
+		return "";
 	}
-}
-
-// Get current rig value
-string qso_manager::get_my_rig() {
-	return data_group_->get_default_record()->item("MY_RIG");
 }
 
 // Handle 1 second timer

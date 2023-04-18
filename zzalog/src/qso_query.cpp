@@ -2,11 +2,18 @@
 #include "drawing.h"
 #include "record_table.h"
 #include "qso_data.h"
+#include "book.h"
+
+extern book* book_;
 
 // Constrctor
 qso_query::qso_query(int X, int Y, int W, int H, const char* L) :
 	Fl_Group(X, Y, W, H, L),
-	qso_data_((qso_data*)parent())
+	qso_data_((qso_data*)parent()),
+	log_qso_(nullptr),
+	log_number_(-1),
+	query_message_(""),
+	query_qso_(nullptr)
 {
 	create_form(X, Y);
 	load_values();
@@ -55,20 +62,20 @@ void qso_query::enable_widgets() {
 	char l[128];
 	switch (qso_data_->logging_state()) {
 	case qso_data::QSO_BROWSE:
-		snprintf(l, sizeof(l), "QSO Query - %s - %s", qso_data_->current_qso()->item("CALL").c_str(), query_message_.c_str());
+		snprintf(l, sizeof(l), "QSO Query - %s - %s", log_qso_->item("CALL").c_str(), query_message_.c_str());
 		copy_label(l);
 		show();
 		tab_query_->activate();
-		tab_query_->set_records(qso_data_->current_qso(), qso_data_->query_qso(), qso_data_->original_qso());
+		tab_query_->set_records(log_qso_, query_qso_, original_qso_);
 		break;
 	case qso_data::QUERY_DUPE:
 	case qso_data::QUERY_MATCH:
 	case qso_data::QUERY_NEW:
-		snprintf(l, sizeof(l), "QSO Query - %s - %s", qso_data_->query_qso()->item("CALL").c_str(), query_message_.c_str());
+		snprintf(l, sizeof(l), "QSO Query - %s - %s", query_qso_->item("CALL").c_str(), query_message_.c_str());
 		copy_label(l);
 		show();
 		tab_query_->activate();
-		tab_query_->set_records(qso_data_->current_qso(), qso_data_->query_qso(), qso_data_->original_qso());
+		tab_query_->set_records(log_qso_, query_qso_, original_qso_);
 		break;
 	default:
 		hide();
@@ -87,17 +94,71 @@ void qso_query::cb_tab_qso(Fl_Widget* w, void* v) {
 	switch (table->callback_context()) {
 	case Fl_Table::CONTEXT_ROW_HEADER:
 		if (button == FL_LEFT_MOUSE && double_click) {
-			that->qso_data_->action_handle_dclick(0, field);
+			that->action_handle_dclick(0, field);
 		}
 		break;
 	case Fl_Table::CONTEXT_CELL:
 		if (button == FL_LEFT_MOUSE && double_click) {
-			that->qso_data_->action_handle_dclick(col, field);
+			that->action_handle_dclick(col, field);
 		}
 		break;
 	}
 }
 
-void qso_query::set_message(string message) {
+//Set QSOs
+void qso_query::set_query(string message, qso_num_t log_number, record* query_qso) {
 	query_message_ = message;
+	log_number_ = log_number;
+	log_qso_ = book_->get_record(book_->item_number(log_number_), false);
+	original_qso_ = new record(*log_qso_);
+	query_qso_ = query_qso;
+}
+
+// Get QSO
+record* qso_query::qso() {
+	return log_qso_;
+}
+
+// Get QSO number
+qso_num_t qso_query::qso_number() {
+	return log_number_;
+}
+
+// Return Query QSO
+record* qso_query::query_qso() {
+	return query_qso_;
+}
+
+// Clear query
+void qso_query::clear_query() {
+	query_message_ = "";
+	log_number_ = -1;
+	log_qso_ = nullptr;
+	delete original_qso_;
+	original_qso_ = nullptr;
+	query_qso_ = nullptr;
+}
+
+// Action table double click
+void qso_query::action_handle_dclick(int col, string field) {
+	switch (qso_data_->logging_state()) {
+	case qso_data::QUERY_MATCH:
+	case qso_data::QUERY_DUPE:
+	case qso_data::QRZ_MERGE:
+		switch (col) {
+		case 0:
+			//// Treat as if clicking row header
+			//g_entry_->action_add_field(-1, field);
+			break;
+		case 1:
+			// Copy log field
+			log_qso_->item(field, query_qso_->item(field));
+			break;
+		case 2:
+			// Copy original record
+			log_qso_->item(field, original_qso_->item(field));
+			break;
+		}
+	}
+	enable_widgets();
 }

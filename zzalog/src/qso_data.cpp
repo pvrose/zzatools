@@ -40,8 +40,6 @@ extern double prev_freq_;
 // qso_group_
 qso_data::qso_data(int X, int Y, int W, int H, const char* l) :
 	Fl_Group(X, Y, W, H, l)
-	, current_qso_(nullptr)
-	, original_qso_(nullptr)
 	, logging_mode_(LM_OFF_AIR)
 	, logging_state_(QSO_INACTIVE)
 {
@@ -149,38 +147,24 @@ void qso_data::enable_widgets() {
 }
 
 // Update QSO
-void qso_data::update_qso(qso_num_t log_qso) {
-	if (log_qso == current_rec_num_) {
-		switch (logging_state_) {
-		case QSO_INACTIVE:
-			// Do nothing
-			break;
-		case QSO_PENDING:
-		case QSO_STARTED:
-		case QSO_EDIT:
-			// Update the view if another view changes the record
-			g_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
-			redraw();
-			break;
-		case QSO_BROWSE:
-			g_query_->redraw();
-			break;
-		}
-	}
-	else {
-		switch (logging_state_) {
-		case QSO_INACTIVE:
-			// Do nothing
-			break;
-		case QSO_PENDING:
-			// Deactivate then reactivate with new QSPO
+void qso_data::update_qso(qso_num_t log_num) {
+	switch (logging_state_) {
+	case QSO_INACTIVE:
+		// Do nothing
+		break;
+	case QSO_PENDING:
+		if (log_num != g_entry_->qso_number()) {
+			// Deactivate then reactivate with new QSO
 			action_deactivate();
-			current_rec_num_ = log_qso;
-			current_qso_ = book_->get_record(log_qso, false);
 			action_activate();
-			break;
-		case QSO_STARTED:
-			// Ack whether to save or quit then activate new QSO
+		}
+		else {
+			g_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
+		}
+		break;
+	case QSO_STARTED:
+		// Ack whether to save or quit then activate new QSO
+		if (log_num != g_entry_->qso_number()) {
 			fl_beep(FL_BEEP_QUESTION);
 			switch (fl_choice("Trying to select a different record while logging a QSO", "Save QSO", "Quit QSO", nullptr)) {
 			case 0:
@@ -194,12 +178,15 @@ void qso_data::update_qso(qso_num_t log_qso) {
 			}
 			// Actions will have changed selection - change it back.
 			logging_state_ = QSO_INACTIVE;
-			current_rec_num_ = log_qso;
-			current_qso_ = book_->get_record(log_qso, true);
-			break;
-		case QSO_EDIT:
-			// Ask whether to save or quit then open new QSO in edit mode
-			if (current_qso_->is_dirty()) {
+		}
+		else {
+			g_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
+		}
+		break;
+	case QSO_EDIT:
+		// Ask whether to save or quit then open new QSO in edit mode
+		if (log_num != g_entry_->qso_number()) {
+			if (g_entry_->qso()->is_dirty()) {
 				fl_beep(FL_BEEP_QUESTION);
 				switch (fl_choice("Trying to select a different record while editing a record", "Save edit", "Cancel edit", nullptr)) {
 				case 0:
@@ -216,18 +203,17 @@ void qso_data::update_qso(qso_num_t log_qso) {
 				// Record not changed so just cancel the edit
 				action_cancel_edit();
 			}
-			current_rec_num_ = log_qso;
-			current_qso_ = book_->get_record(log_qso, true);
 			action_edit();
-			break;
-		case QSO_BROWSE:
-			// Open new record in browse mode
-			action_cancel_browse();
-			current_rec_num_ = log_qso;
-			current_qso_ = book_->get_record(log_qso, true);
-			action_browse();
-			break;
 		}
+		else {
+			g_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
+		}
+		break;
+	case QSO_BROWSE:
+		// Open new record in browse mode
+		action_cancel_browse();
+		action_browse();
+		break;
 	}
 	if (qsl_viewer_->visible()) {
 		action_view_qsl();
@@ -239,12 +225,8 @@ void qso_data::update_query(logging_state_t query, qso_num_t match_num, qso_num_
 	switch (logging_state_) {
 	case QSO_PENDING:
 	case QSO_INACTIVE:
-		current_rec_num_ = match_num;
-		query_rec_num_ = query_num;
-		action_query(query);
-		break;
 	case QUERY_NEW:
-		action_query(query);
+		action_query(query, match_num, query_num);
 		break;
 	default:
 		// TODO:
@@ -322,7 +304,6 @@ void qso_data::initialise_fields() {
 	if (g_contest_->mode() == qso_contest::CONTEST) {
 		// Automatically create a pending QSO
 		if (logging_state_ == QSO_INACTIVE) {
-			action_set_current();
 			action_activate();
 		}
 	}
@@ -335,32 +316,37 @@ string qso_data::get_defined_fields() {
 }
 
 // Get default record to copy
-record* qso_data::get_default_record() {
+qso_num_t qso_data::get_default_number() {
 	switch (logging_state_) {
 	case QSO_INACTIVE:
 		switch (logging_mode_) {
 		case LM_OFF_AIR:
 		case LM_ON_AIR_CAT:
 		case LM_ON_AIR_TIME:
-			current_rec_num_ = book_->size() - 1;
-			return book_->get_latest();
+			return book_->size() - 1;
 		case LM_ON_AIR_COPY:
 		case LM_ON_AIR_CLONE:
-			current_rec_num_ = book_->selection();
-			return book_->get_record();
+			return book_->selection();
 		default:
-			return nullptr;
+			return -1;
 		}
+	case QSO_PENDING:
+	case QSO_STARTED:
+	case QSO_EDIT:
+		return g_entry_->qso_number();
+	case QSO_BROWSE:
+	case QUERY_DUPE:
+	case QUERY_MATCH:
+	case QUERY_NEW:
+		return g_query_->qso_number();
 	default:
-		return current_qso_;
+		return -1;
 	}
 }
 
 // Action ACTIVATE: transition from QSO_INACTIVE to QSO_PENDING
 void qso_data::action_activate() {
-	record* source_record = current_qso_;
-	current_qso_ = new record;
-	current_rec_num_ = -1;
+	record* source_record = book_->get_record();
 	qso_manager* mgr = ancestor_view<qso_manager>(this);
 	logging_state_ = QSO_PENDING;
 	switch (logging_mode_) {
@@ -390,15 +376,14 @@ void qso_data::action_activate() {
 		g_entry_->copy_clock_to_qso();
 		break;
 	}
-	initialise_fields();
 	enable_widgets();
 }
 
 // Action START - transition from QSO_PENDING to QSO_STARTED
 void qso_data::action_start() {
 	// Add to book
-	current_rec_num_ = book_->append_record(current_qso_);
-	book_->selection(book_->item_number(current_rec_num_), HT_INSERTED);
+	g_entry_->append_qso();
+	book_->selection(book_->item_number(g_entry_->qso_number()), HT_INSERTED);
 	logging_state_ = QSO_STARTED;
 	enable_widgets();
 }
@@ -406,7 +391,18 @@ void qso_data::action_start() {
 // Action SAVE - transition from QSO_STARTED to QSO_INACTIVE while saving record
 void qso_data::action_save() {
 	bool old_save_enabled = book_->save_enabled();
-	item_num_t item_number = book_->item_number(current_rec_num_);
+	record* qso = nullptr;
+	item_num_t item_number;
+	qso_num_t qso_number;
+	switch (logging_state_) {
+	case QSO_STARTED:
+		item_number = book_->item_number(g_entry_->qso_number());
+		qso = g_entry_->qso();
+		qso_number = g_entry_->qso_number();
+		break;
+	default:
+		break;
+	}
 	book_->enable_save(false);
 	// On-air logging add date/time off
 	switch (logging_mode_) {
@@ -415,13 +411,13 @@ void qso_data::action_save() {
 	case LM_ON_AIR_CLONE:
 	case LM_ON_AIR_TIME:
 		// All on-air modes - set cime-off to now
-		if (current_qso_->item("TIME_OFF") == "") {
+		if (qso->item("TIME_OFF") == "") {
 			// Add end date/time - current time of interactive entering
 			// Get current date and time in UTC
 			string timestamp = now(false, "%Y%m%d%H%M%S");
-			current_qso_->item("QSO_DATE_OFF", timestamp.substr(0, 8));
+			qso->item("QSO_DATE_OFF", timestamp.substr(0, 8));
 			// Time as HHMMSS - always log seconds.
-			current_qso_->item("TIME_OFF", timestamp.substr(8));
+			qso->item("TIME_OFF", timestamp.substr(8));
 		}
 		// Increment contest serial number
 		g_contest_->increment_serial();
@@ -432,18 +428,17 @@ void qso_data::action_save() {
 	}
 
 	// check whether record has changed - when parsed
-	if (pfx_data_->parse(current_qso_)) {
+	if (pfx_data_->parse(qso)) {
 	}
 
 	// check whether record has changed - when validated
-	if (spec_data_->validate(current_qso_, item_number)) {
+	if (spec_data_->validate(qso, item_number)) {
 	}
 
-	book_->add_use_data(current_qso_);
+	book_->add_use_data(qso);
 
 	// Upload QSO to QSL servers
-	book_->upload_qso(current_rec_num_);
-	current_qso_ = nullptr;
+	book_->upload_qso(qso_number);
 	logging_state_ = QSO_INACTIVE;
 	enable_widgets();
 
@@ -458,16 +453,14 @@ void qso_data::action_cancel() {
 	// book_->delete_record() will change the selected record - we need ti be inactive to ignore it
 	logging_state_ = QSO_INACTIVE;
 	book_->delete_record(true);
-	delete current_qso_;
-	current_qso_ = nullptr;
+	g_entry_->delete_qso();
 	check_qth_changed();
 	enable_widgets();
 }
 
 // Action DEACTIVATE - Transition from QSO_PENDING to QSO_INACTIVE
 void qso_data::action_deactivate() {
-	delete current_qso_;
-	current_qso_ = nullptr;
+	g_entry_->delete_qso();
 	logging_state_ = QSO_INACTIVE;
 	enable_widgets();
 }
@@ -475,8 +468,9 @@ void qso_data::action_deactivate() {
 // Action EDIT - Transition from QSO_INACTIVE to QSO_EDIT
 void qso_data::action_edit() {
 	// Save a copy of the current record
-	original_qso_ = new record(*current_qso_);
+	qso_num_t qso_number = get_default_number();
 	logging_state_ = QSO_EDIT;
+	g_entry_->qso(qso_number);
 	g_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
 	enable_widgets();
 }
@@ -484,12 +478,9 @@ void qso_data::action_edit() {
 // Action SAVE EDIT - Transition from QSO_EDIT to QSO_INACTIVE while saving changes
 void qso_data::action_save_edit() {
 	// We no longer need to maintain the copy of the original QSO
-	book_->add_use_data(current_qso_);
+	book_->add_use_data(g_entry_->qso());
 	book_->modified(true);
-	delete original_qso_;
-	original_qso_ = nullptr;
-	current_qso_ = nullptr;
-	current_rec_num_ = -1;
+	g_entry_->delete_qso();
 	logging_state_ = QSO_INACTIVE;
 	enable_widgets();
 }
@@ -497,11 +488,8 @@ void qso_data::action_save_edit() {
 // ACtion CANCEL EDIT - Transition from QSO_EDIT to QSO_INACTIVE scrapping changes
 void qso_data::action_cancel_edit() {
 	// Copy original back to the book
-	*book_->get_record(current_rec_num_, false) = *original_qso_;
-	delete original_qso_;
-	original_qso_ = nullptr;
-	current_qso_ = nullptr;
-	current_rec_num_ = -1;
+	*book_->get_record(g_entry_->qso_number(), false) = *g_entry_->original_qso();
+	g_entry_->delete_qso();
 	logging_state_ = QSO_INACTIVE;
 	g_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
 	enable_widgets();
@@ -509,8 +497,8 @@ void qso_data::action_cancel_edit() {
 
 // Action CANCEL in BROWSE 
 void qso_data::action_cancel_browse() {
-	current_qso_ = nullptr;
-	current_rec_num_ = -1;
+	g_entry_->qso(g_query_->qso_number());
+	g_query_->clear_query();
 	logging_state_ = QSO_INACTIVE;
 	g_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
 	enable_widgets();
@@ -532,7 +520,6 @@ void qso_data::action_navigate(int target) {
 	}
 	// We should now be inactive - navigate to new QSO
 	book_->navigate((navigate_t)target);
-	action_set_current();
 	// And restore state
 	switch (saved_state) {
 	case QSO_EDIT:
@@ -548,99 +535,56 @@ void qso_data::action_navigate(int target) {
 		action_view_qsl();
 		break;
 	case QUERY_MATCH:
-		current_rec_num_ = book_->selection();
-		action_query(saved_state);
+		action_query(saved_state, get_default_number(), -1);
 		break;
 	}
 }
 
 // Action view qsl
 void qso_data::action_view_qsl() {
-	switch (logging_state_) {
-	case QSO_INACTIVE:
-	{
-		record* qso = book_->get_record();
-		if (qso) {
-			char title[128];
-			snprintf(title, 128, "QSL Status: %s %s %s %s %s",
-				qso->item("CALL").c_str(),
-				qso->item("QSO_DATE").c_str(),
-				qso->item("TIME_ON").c_str(),
-				qso->item("BAND").c_str(),
-				qso->item("MODE", true, true).c_str());
-			qsl_viewer_->copy_label(title);
-			qsl_viewer_->set_qso(qso, book_->selection());
-			qsl_viewer_->show();
-			char msg[128];
-			snprintf(msg, 128, "DASH: %s", title);
-			status_->misc_status(ST_LOG, msg);
-		}
-		break;
-		}
-	case QSO_EDIT:
-	case QSO_BROWSE:
-		if (current_qso_) {
-			char title[128];
-			snprintf(title, 128, "QSL Status: %s %s %s %s %s",
-				current_qso_->item("CALL").c_str(),
-				current_qso_->item("QSO_DATE").c_str(),
-				current_qso_->item("TIME_ON").c_str(),
-				current_qso_->item("BAND").c_str(),
-				current_qso_->item("MODE", true, true).c_str());
-			qsl_viewer_->copy_label(title);
-			qsl_viewer_->set_qso(current_qso_, current_rec_num_);
-			qsl_viewer_->show();
-			char msg[128];
-			snprintf(msg, 128, "DASH: %s", title);
-			status_->misc_status(ST_LOG, msg);
-		}
-		break;
-	default:
-		status_->misc_status(ST_ERROR, "DASH: No QSO selected - cannot view QSL status");
-		break;
+	record* qso = book_->get_record(book_->item_number(get_default_number()), false);
+	if (qso) {
+		char title[128];
+		snprintf(title, 128, "QSL Status: %s %s %s %s %s",
+			qso->item("CALL").c_str(),
+			qso->item("QSO_DATE").c_str(),
+			qso->item("TIME_ON").c_str(),
+			qso->item("BAND").c_str(),
+			qso->item("MODE", true, true).c_str());
+		qsl_viewer_->copy_label(title);
+		qsl_viewer_->set_qso(qso, book_->selection());
+		qsl_viewer_->show();
+		char msg[128];
+		snprintf(msg, 128, "DASH: %s", title);
+		status_->misc_status(ST_LOG, msg);
 	}
 }
 
 
 // Action browse
 void qso_data::action_browse() {
+	qso_num_t qso_number = get_default_number();
 	logging_state_ = QSO_BROWSE;
-	original_qso_ = nullptr;
-	query_qso_ = nullptr;
-	g_query_->set_message("Browsing record");
+	g_query_->set_query("Browsing record",qso_number);
 	enable_widgets();
 }
 
 // Action query
-void qso_data::action_query(logging_state_t query) {
+void qso_data::action_query(logging_state_t query, qso_num_t match_number, qso_num_t query_number) {
 	switch (query) {
 	case QUERY_MATCH:
-		current_qso_ = book_->get_record(current_rec_num_, false);
-		// And save a copy of it
-		original_qso_ = new record(*current_qso_);
-		query_qso_ = import_data_->get_record(query_rec_num_, false);
-		g_query_->set_message(import_data_->match_question().c_str());
+		g_query_->set_query(import_data_->match_question(), match_number, import_data_->get_record(query_number, false));
 		break;
 	case QUERY_NEW:
-		current_qso_ = nullptr;
-		original_qso_ = nullptr;
-		query_qso_ = import_data_->get_record(query_rec_num_, false);;
-		g_query_->set_message(import_data_->match_question().c_str());
+		g_query_->set_query(import_data_->match_question(), -1, import_data_->get_record(query_number, false));
 		break;
 	case QUERY_DUPE:
 		// Note record numbers relate to book even if it is extracted data that refered the dupe check
-		current_qso_ = book_->get_record(current_rec_num_, false);
-		original_qso_ = new record(*current_qso_);
-		query_qso_ = book_->get_record(query_rec_num_, false);
-		g_query_->set_message(navigation_book_->match_question().c_str());
+		g_query_->set_query(navigation_book_->match_question(), match_number, book_->get_record(query_number, false));
 		break;
 	case QRZ_MERGE:
-		current_qso_ = book_->get_record(current_rec_num_, false);
-		original_qso_ = new record(*current_qso_);
-		query_qso_ = qrz_handler_->get_record();
-		g_query_->set_message(qrz_handler_->get_merge_message().c_str());
+		g_query_->set_query(qrz_handler_->get_merge_message(), match_number, qrz_handler_->get_record());
 		break;
-
 	default:
 		// TODO trap this sensibly
 		return;
@@ -654,7 +598,7 @@ void qso_data::action_query(logging_state_t query) {
 // Action add query - add query QSO to book
 void qso_data::action_add_query() {
 	import_data_->save_update();
-	current_qso_ = nullptr;
+	g_query_->clear_query();
 	logging_state_ = QSO_INACTIVE;
 	enable_widgets();
 	// Restart the update process
@@ -665,7 +609,7 @@ void qso_data::action_add_query() {
 // Action reject query - do nothing
 void qso_data::action_reject_query() {
 	import_data_->discard_update(true);
-	current_qso_ = nullptr;
+	g_query_->clear_query();
 	logging_state_ = QSO_INACTIVE;
 	enable_widgets();
 	// Restart the update process
@@ -675,7 +619,7 @@ void qso_data::action_reject_query() {
 // Action merge query
 void qso_data::action_merge_query() {
 	import_data_->merge_update();
-	current_qso_ = nullptr;
+	g_query_->clear_query();
 	logging_state_ = QSO_INACTIVE;
 	enable_widgets();
 	// Restart the update process
@@ -684,7 +628,7 @@ void qso_data::action_merge_query() {
 
 // ACtion find match
 void qso_data::action_find_match() {
-	update_query(QUERY_MATCH, current_rec_num_, query_rec_num_);
+	update_query(QUERY_MATCH, g_query_->qso_number(), -1);
 }
 
 // Action handle dupe
@@ -707,7 +651,7 @@ void qso_data::action_handle_dupe(dupe_flags action) {
 		navigation_book_->accept_dupe();
 		break;
 	}
-	current_qso_ = nullptr;
+	g_query_->clear_query();
 	logging_state_ = QSO_INACTIVE;
 	enable_widgets();
 	// Restart the duplicate check process
@@ -715,38 +659,12 @@ void qso_data::action_handle_dupe(dupe_flags action) {
 
 }
 
-// Action table double click
-void qso_data::action_handle_dclick(int col, string field) {
-	switch (logging_state_) {
-	case QUERY_MATCH:
-	case QUERY_DUPE:
-	case QRZ_MERGE:
-		switch (col) {
-		case 0:
-			// Treat as if clicking row header
-			g_entry_->action_add_field(-1, field);
-			break;
-		case 1:
-			// Copy log field
-			current_qso_->item(field, query_qso_->item(field));
-			break;
-		case 2:
-			// Copy original record
-			current_qso_->item(field, original_qso_->item(field));
-			break;
-		}
-	}
-	enable_widgets();
-}
-
 // Action save as a result of a merge
 void qso_data::action_save_merge() {
 	// We no longer need to maintain the copy of the original QSO
-	book_->add_use_data(current_qso_);
+	book_->add_use_data(g_query_->qso());
 	book_->modified(true);
-	delete original_qso_;
-	original_qso_ = nullptr;
-	current_qso_ = nullptr;
+	g_query_->clear_query();
 	logging_state_ = QSO_INACTIVE;
 	enable_widgets();
 	qrz_handler_->merge_done();
@@ -775,13 +693,13 @@ void qso_data::action_look_all_txt() {
 	// Get user callsign from settings
 	string my_call = ((qso_manager*)parent())->get_default(qso_manager::CALLSIGN);
 	// Get search items from record
-	string their_call = query_qso_->item("CALL");
-	string datestamp = query_qso_->item("QSO_DATE").substr(2);
-	string timestamp = query_qso_->item("TIME_ON");
-	string mode = query_qso_->item("MODE");
+	string their_call = g_query_->query_qso()->item("CALL");
+	string datestamp = g_query_->query_qso()->item("QSO_DATE").substr(2);
+	string timestamp = g_query_->query_qso()->item("TIME_ON");
+	string mode = g_query_->query_qso()->item("MODE");
 	char msg[256];
 	// Mark QSO incomplete 
-	query_qso_->item("QSO_COMPLETE", string("N"));
+	g_query_->query_qso()->item("QSO_COMPLETE", string("N"));
 	g_query_->redraw();
 	int count = 0;
 	// Now read the file - search for the QSO start time
@@ -822,14 +740,14 @@ void qso_data::action_look_all_txt() {
 			else {
 				// It has one or the other call - indicates QSO complete
 				stop_copying = true;
-				query_qso_->item("QSO_COMPLETE", string(""));
+				g_query_->query_qso()->item("QSO_COMPLETE", string(""));
 			}
 		}
 	}
 	if (stop_copying) {
 		status_->progress("Found record!", OT_RECORD);
 		// If we are complete then say so
-		if (query_qso_->item("QSO_COMPLETE") != "N" && query_qso_->item("QSO_COMPLETE") != "?") {
+		if (g_query_->query_qso()->item("QSO_COMPLETE") != "N" && g_query_->query_qso()->item("QSO_COMPLETE") != "?") {
 			all_file->close();
 			fl_cursor(FL_CURSOR_DEFAULT);
 		}
@@ -846,8 +764,8 @@ void qso_data::action_copy_all_text(string text) {
 	// After this initial processing pos will point to the start og the QSO decode string - look for old-style transmit record
 	size_t pos = text.find("Transmitting");
 	if (pos != string::npos) {
-		pos = text.find(query_qso_->item("MODE"));
-		pos += query_qso_->item("MODE").length() + 3;
+		pos = text.find(g_query_->query_qso()->item("MODE"));
+		pos += g_query_->query_qso()->item("MODE").length() + 3;
 		tx_record = true;
 		// Nothing else to get from this record
 	}
@@ -867,7 +785,7 @@ void qso_data::action_copy_all_text(string text) {
 				freq_offset[i] = '0';
 			}
 			double frequency = stod(freq) + (stod(freq_offset) / 1000000.0);
-			query_qso_->item("FREQ", to_string(frequency));
+			g_query_->query_qso()->item("FREQ", to_string(frequency));
 			pos = 48;
 			tx_record = true;
 		}
@@ -891,50 +809,44 @@ void qso_data::action_copy_all_text(string text) {
 	string report = words.back();
 	if (report == "RR73" || report == "RRR") {
 		// If we've seen the R-00 then mark the QSO complete, otherwise mark in provisional until we see the 73
-		if (query_qso_->item("QSO_COMPLETE") == "?") {
-			query_qso_->item("QSO_COMPLETE", string(""));
+		if (g_query_->query_qso()->item("QSO_COMPLETE") == "?") {
+			g_query_->query_qso()->item("QSO_COMPLETE", string(""));
 		}
-		else if (query_qso_->item("QSO_COMPLETE") == "N") {
-			query_qso_->item("QSO_COMPLETE", string("?"));
+		else if (g_query_->query_qso()->item("QSO_COMPLETE") == "N") {
+			g_query_->query_qso()->item("QSO_COMPLETE", string("?"));
 		}
 	}
 	else if (report == "73") {
 		// A 73 definitely indicates QSO compplete
-		query_qso_->item("QSO_COMPLETE", string(""));
+		g_query_->query_qso()->item("QSO_COMPLETE", string(""));
 	}
 	else if (report[0] == 'R') {
 		// The first of the rogers
-		if (query_qso_->item("QSO_COMPLETE") == "N") {
-			query_qso_->item("QSO_COMPLETE", string("?"));
+		if (g_query_->query_qso()->item("QSO_COMPLETE") == "N") {
+			g_query_->query_qso()->item("QSO_COMPLETE", string("?"));
 		}
 		// Update reports if they've not been provided
-		if (tx_record && !query_qso_->item_exists("RST_SENT")) {
-			query_qso_->item("RST_SENT", report.substr(1));
+		if (tx_record && !g_query_->query_qso()->item_exists("RST_SENT")) {
+			g_query_->query_qso()->item("RST_SENT", report.substr(1));
 		}
-		else if (!tx_record && !query_qso_->item_exists("RST_RCVD")) {
-			query_qso_->item("RST_RCVD", report.substr(1));
+		else if (!tx_record && !g_query_->query_qso()->item_exists("RST_RCVD")) {
+			g_query_->query_qso()->item("RST_RCVD", report.substr(1));
 		}
 	}
-	else if (!tx_record && !query_qso_->item_exists("GRIDSQUARE")) {
+	else if (!tx_record && !g_query_->query_qso()->item_exists("GRIDSQUARE")) {
 		// Update gridsquare if it's not been provided
-		query_qso_->item("GRIDSQUARE", report);
+		g_query_->query_qso()->item("GRIDSQUARE", report);
 	}
 	else if (report[0] == '-' || (report[0] >= '0' && report[0] <= '9')) {
 		// Numeric report
-		if (tx_record && !query_qso_->item_exists("RST_SENT")) {
-			query_qso_->item("RST_SENT", report);
+		if (tx_record && !g_query_->query_qso()->item_exists("RST_SENT")) {
+			g_query_->query_qso()->item("RST_SENT", report);
 		}
-		else if (!tx_record && !query_qso_->item_exists("RST_RCVD")) {
-			query_qso_->item("RST_RCVD", report);
+		else if (!tx_record && !g_query_->query_qso()->item_exists("RST_RCVD")) {
+			g_query_->query_qso()->item("RST_RCVD", report);
 		}
 	}
 
-}
-
-// Set current QSO from selected record
-void qso_data::action_set_current() {
-	current_qso_ = book_->get_record();
-	current_rec_num_ = book_->selection();
 }
 
 // Dummy QSO
@@ -967,7 +879,7 @@ record* qso_data::dummy_qso() {
 
 // Check if QTH has changed and action change (redraw DxAtlas
 void qso_data::check_qth_changed() {
-	record* current = get_default_record();
+	record* current = g_entry_->qso();
 	if (current) {
 		if (current->item("MY_GRIDSQUARE", true) != previous_locator_ ||
 			current->item("APP_ZZA_QTH") != previous_qth_) {
@@ -994,7 +906,7 @@ void qso_data::update_rig() {
 				g_entry_->copy_cat_to_qso();
 				if (band_view_) {
 					double freq;
-					current_qso_->item("FREQ", freq);;
+					g_entry_->qso()->item("FREQ", freq);;
 					band_view_->update(freq * 1000.0);
 					prev_freq_ = freq;
 				}
@@ -1084,22 +996,52 @@ qso_data::logging_state_t qso_data::logging_state() {
 
 // Current QSO
 record* qso_data::current_qso() {
-	return current_qso_;
+	switch (logging_state_) {
+	case QSO_INACTIVE:
+		return nullptr;
+	case QSO_PENDING:
+	case QSO_STARTED:
+	case QSO_EDIT:
+		return g_entry_->qso();
+	case QSO_BROWSE:
+	case QUERY_DUPE:
+	case QUERY_MATCH:
+	case QUERY_NEW:
+	case QRZ_MERGE:
+		return g_query_->qso();
+	default:
+		return nullptr;
+	}
 }
 
-// Current QSO
-record* qso_data::original_qso() {
-	return original_qso_;
-}
-
-// Current QSO
-record* qso_data::query_qso() {
-	return query_qso_;
-}
-
+//// Current QSO
+//record* qso_data::original_qso() {
+//	return original_qso_;
+//}
+//
+//// Current QSO
+//record* qso_data::query_qso() {
+//	return query_qso_;
+//}
+//
 // Current QSO record number
 qso_num_t qso_data::current_qso_num() {
-	return current_rec_num_;
+	switch (logging_state_) {
+	case QSO_INACTIVE:
+		return -1;
+	case QSO_PENDING:
+	case QSO_STARTED:
+	case QSO_EDIT:
+		return g_entry_->qso_number();
+	case QSO_BROWSE:
+	case QUERY_DUPE:
+	case QUERY_MATCH:
+	case QUERY_NEW:
+	case QRZ_MERGE:
+		return g_query_->qso_number();
+	default:
+		return -1;
+	}
 }
 
 // Update time

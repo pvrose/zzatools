@@ -61,6 +61,17 @@ public:
 	// save value
 	void save_values();
 
+	// Set/get records
+	record* qso();
+	void qso(qso_num_t qso_number);
+	record* original_qso();
+	qso_num_t qso_number();
+
+	// Append QSO to book
+	void append_qso();
+	// Delete qso
+	void delete_qso();
+
 	// Copy from an existing record
 	void copy_qso_to_qso(record* old_record, int flags);
 	// Copy fields from CAT
@@ -112,6 +123,10 @@ protected:
 	qso_data* qso_data_;
 	// Number of locked fields
 	int number_locked_;
+	// Records
+	record* qso_;
+	record* original_qso_;
+	qso_num_t qso_number_;
 
 };
 

@@ -54,6 +54,12 @@ public:
 		MERGE_DONE,
 		VIEW_QSL,
 		LOOK_ALL_TXT,
+		START_NET,
+		ADD_NET,
+		SAVE_NET,
+		CANCEL_NET,
+		ADD_QSO,
+		SAVE_EDIT_NET,
 	};
 
 
@@ -103,6 +109,15 @@ public:
 	static void cb_bn_fetch_qrz(Fl_Widget* w, void* v);
 	// Parse WSJT-X for call
 	static void cb_bn_all_txt(Fl_Widget* w, void* v);
+	// Save all qsos
+	static void cb_bn_save_all(Fl_Widget* w, void* v);
+	// Cancel all QSOs
+	static void cb_bn_cancel_all(Fl_Widget* w, void* v);
+	// Add a QSO to the net
+	static void cb_bn_add(Fl_Widget* w, void* v);
+	// Start a net
+	static void cb_bn_start_net(Fl_Widget* w, void* v);
+
 
 protected:
 	// Maps that require both qso_data a

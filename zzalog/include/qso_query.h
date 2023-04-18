@@ -25,13 +25,23 @@ public:
 	void enable_widgets();
 	// save value
 	void save_values();
-	// Set query message
-	void set_message(string message);
+	// Set QSOs
+	void set_query(string message, qso_num_t log_number, record* query_qso = nullptr);
+	// Return QSO
+	record* qso();
+	// Return Query QSO
+	record* query_qso();
+	// Return record number
+	qso_num_t qso_number();
+	// Clear query
+	void clear_query();
 
 
 protected:
 	// Record table
 	static void cb_tab_qso(Fl_Widget* w, void* v);
+	// Action handle d-click
+	void action_handle_dclick(int col, string field);
 
 	// Query message
 	string query_message_;
@@ -40,6 +50,11 @@ protected:
 	record_table* tab_query_;
 	// Parent
 	qso_data* qso_data_;
+	// QSOs
+	record* log_qso_;
+	qso_num_t log_number_;
+	record* query_qso_;
+	record* original_qso_;
 
 };
 
