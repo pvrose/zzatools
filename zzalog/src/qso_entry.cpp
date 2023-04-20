@@ -29,7 +29,10 @@ qso_entry::qso_entry(int X, int Y, int W, int H, const char* L) :
 	, qso_number_(-1)
 	, original_qso_(nullptr)
 {
-	qso_data_ = (qso_data*)parent();
+	// Get the enclosing qso_data instance
+	qso_data_ = ancestor_view<qso_data>(this);
+	box(FL_BORDER_BOX);
+
 	for (int ix = 0; ix < NUMBER_TOTAL; ix++) {
 		ip_field_[ix] = nullptr;
 		ch_field_[ix] = nullptr;
@@ -60,12 +63,6 @@ void qso_entry::create_form(int X, int Y) {
 
 	int col2_y = curr_y;
 	int max_w = 0;
-
-	align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
-	box(FL_BORDER_BOX);
-	labelfont(FL_BOLD);
-	labelsize(FL_NORMAL_SIZE + 2);
-	labelcolor(fl_darker(FL_BLUE));
 
 	curr_x += GAP;
 	curr_y += HTEXT;
@@ -124,11 +121,8 @@ void qso_entry::create_form(int X, int Y) {
 
 void qso_entry::enable_widgets() {
 	// Now enable disan=
-	char l[128];
 	switch (qso_data_->logging_state()) {
 	case qso_data::QSO_INACTIVE:
-		label("QSO Entry is not enabled.");
-		show();
 		for (int ix = 0; ix < NUMBER_TOTAL; ix++) {
 			if (ch_field_[ix]) ch_field_[ix]->deactivate();
 			ip_field_[ix]->deactivate();
@@ -136,8 +130,6 @@ void qso_entry::enable_widgets() {
 		ip_notes_->deactivate();
 		break;
 	case qso_data::QSO_PENDING:
-		label("QSO Entry - prepared for real-time logging.");
-		show();
 		for (int ix = 0; ix <= number_fields_in_use_ && ix < NUMBER_TOTAL; ix++) {
 			if (ch_field_[ix])
 				if (ix < number_locked_ + NUMBER_FIXED) ch_field_[ix]->deactivate();
@@ -151,9 +143,7 @@ void qso_entry::enable_widgets() {
 		ip_notes_->activate();
 		break;
 	case qso_data::QSO_STARTED:
-		snprintf(l, sizeof(l), "QSO Entry - %s - active real-time logging", get_call().c_str());
-		copy_label(l);
-		show();
+	case qso_data::NET_STARTED:
 		for (int ix = 0; ix <= number_fields_in_use_ && ix < NUMBER_TOTAL; ix++) {
 			if (ch_field_[ix])
 				if (ix < number_locked_ + NUMBER_FIXED) ch_field_[ix]->deactivate();
@@ -167,9 +157,7 @@ void qso_entry::enable_widgets() {
 		ip_notes_->activate();
 		break;
 	case qso_data::QSO_EDIT:
-		snprintf(l, sizeof(l), "QSO Entry - %s - off-air editing", get_call().c_str());
-		copy_label(l);
-		show();
+	case qso_data::NET_EDIT:
 		for (int ix = 0; ix <= number_fields_in_use_ && ix < NUMBER_TOTAL; ix++) {
 			if (ch_field_[ix]) ch_field_[ix]->activate();
 			ip_field_[ix]->activate();
@@ -295,27 +283,21 @@ void qso_entry::copy_cat_to_qso() {
 
 // Copy current timestamp to QSO
 void qso_entry::copy_clock_to_qso() {
-	// Only allow this if in activate - will be called every second 
-	switch (qso_data_->logging_state()) {
-	case qso_data::QSO_PENDING:
-		{
-			time_t now = time(nullptr);
-			tm* value = gmtime(&now);
-			char result[100];
-			// convert date
-			strftime(result, 99, "%Y%m%d", value);
-			qso_->item("QSO_DATE", string(result));
-			// convert time
-			strftime(result, 99, "%H%M%S", value);
-			qso_->item("TIME_ON", string(result));
-			qso_->item("QSO_DATE_OFF", string(""));
-			qso_->item("TIME_OFF", string(""));
+	// Only allow this if it hasn't been done 
+	if (qso_ != nullptr && qso_->item("QSO_DATE").length() == 0) {
+		time_t now = time(nullptr);
+		tm* value = gmtime(&now);
+		char result[100];
+		// convert date
+		strftime(result, 99, "%Y%m%d", value);
+		qso_->item("QSO_DATE", string(result));
+		// convert time
+		strftime(result, 99, "%H%M%S", value);
+		qso_->item("TIME_ON", string(result));
+		qso_->item("QSO_DATE_OFF", string(""));
+		qso_->item("TIME_OFF", string(""));
 
-			copy_qso_to_display(CF_TIME);
-			break;
-		}
-	default:
-		break;
+		copy_qso_to_display(CF_TIME);
 	}
 }
 
@@ -331,11 +313,6 @@ void qso_entry::clear_display() {
 void qso_entry::clear_qso() {
 	qso_->delete_contents();
 	copy_qso_to_display(CF_QSO);
-}
-
-// Get callsign
-string qso_entry::get_call() {
-	return string(ip_field_[field_ip_map_["CALL"]]->value());
 }
 
 // Initialise field map
@@ -548,6 +525,13 @@ void qso_entry::cb_ip_field(Fl_Widget* w, void* v) {
 	case qso_data::QSO_INACTIVE:
 	case qso_data::QSO_PENDING:
 		break;
+	case qso_data::NET_STARTED:
+	case qso_data::NET_EDIT:
+		if (field == "CALL") {
+			that->copy_label(that->qso_->item("CALL").c_str());
+			Fl::check();
+		}
+		// drop through
 	case qso_data::QSO_STARTED:
 	case qso_data::QSO_EDIT:
 		that->enable_widgets();

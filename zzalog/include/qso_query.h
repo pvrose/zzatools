@@ -35,6 +35,8 @@ public:
 	qso_num_t qso_number();
 	// Clear query
 	void clear_query();
+	// Get query message
+	string query_message();
 
 
 protected:

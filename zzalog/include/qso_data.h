@@ -4,6 +4,7 @@
 #include "qso_entry.h"
 #include "qso_query.h"
 #include "qso_buttons.h"
+#include "qso_net_entry.h"
 #include "qsl_viewer.h"
 #include "field_choice.h"
 #include "record_table.h"
@@ -106,8 +107,6 @@ public:
 	//record* query_qso();
 	//// Original QSO
 	//record* original_qso();
-	// Curernt QSO number
-	qso_num_t current_qso_num();
 	// Update view and 
 	void update_rig();
 	// Gt call
@@ -161,6 +160,21 @@ public:
 	void action_look_all_txt();
 	// Copy found text
 	void action_copy_all_text(string text);
+	// Create a net from current QSO
+	void action_create_net();
+	// Add a QSO to the net - copy existing qso start times or not
+	void action_add_net_qso();
+	// Save the whole net
+	void action_save_net_all();
+	// Save a net edit
+	void action_save_net_edit();
+	// Cancel the whole net
+	void action_cancel_net_all();
+	// Cancel an individual net edit
+	void action_cancel_net_edit();
+	// Create a new QSO 
+	void action_new_qso(record* qso);
+
 
 protected:
 	// Callbacks
@@ -188,6 +202,8 @@ protected:
 	// Previous value
 	string previous_qth_;
 	string previous_locator_;
+	// Disable drawing update
+	bool inhibit_drawing_;
 
 
 	// Widgets
@@ -197,6 +213,8 @@ protected:
 	qso_entry* g_entry_;
 	// Query group
 	qso_query* g_query_;
+	// Net Entry group
+	qso_net_entry* g_net_entry_;
 	// Button group
 	qso_buttons* g_buttons_;
 	// Group for freq/power/mode

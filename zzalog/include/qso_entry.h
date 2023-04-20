@@ -94,9 +94,6 @@ public:
 	// Action delete field
 	void action_del_field(int ix);
 
-	// Get callsign
-	string get_call();
-
 	// Initialise fields
 	void initialise_fields(string fields, bool new_fields, bool lock_preset);
 	void initialise_values(string fields, int contest_serial);

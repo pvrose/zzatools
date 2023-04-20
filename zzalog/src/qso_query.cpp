@@ -59,27 +59,25 @@ void qso_query::create_form(int X, int Y) {
 }
 
 void qso_query::enable_widgets() {
-	char l[128];
 	switch (qso_data_->logging_state()) {
 	case qso_data::QSO_BROWSE:
-		snprintf(l, sizeof(l), "QSO Query - %s - %s", log_qso_->item("CALL").c_str(), query_message_.c_str());
-		copy_label(l);
-		show();
 		tab_query_->activate();
 		tab_query_->set_records(log_qso_, query_qso_, original_qso_);
 		break;
 	case qso_data::QUERY_DUPE:
 	case qso_data::QUERY_MATCH:
 	case qso_data::QUERY_NEW:
-		snprintf(l, sizeof(l), "QSO Query - %s - %s", query_qso_->item("CALL").c_str(), query_message_.c_str());
-		copy_label(l);
-		show();
 		tab_query_->activate();
 		tab_query_->set_records(log_qso_, query_qso_, original_qso_);
 		break;
 	default:
 		hide();
 	}
+}
+
+// Return query message
+string qso_query::query_message() {
+	return query_message_;
 }
 
 // Callback - table

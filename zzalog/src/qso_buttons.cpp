@@ -196,6 +196,9 @@ void qso_buttons::cb_save(Fl_Widget* w, void* v) {
 		that->qso_data_->action_save_edit();
 		that->qso_data_->action_edit();
 		break;
+	case qso_data::NET_STARTED:
+		that->qso_data_->action_save();
+		break;
 	}
 }
 
@@ -237,7 +240,7 @@ void qso_buttons::cb_edit(Fl_Widget* w, void* v) {
 void qso_buttons::cb_wkb4(Fl_Widget* w, void* v) {
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
 	extract_records_->extract_call(that->qso_data_->get_call());
-	book_->selection(that->qso_data_->current_qso_num(), HT_SELECTED);
+	book_->selection(that->qso_data_->get_default_number(), HT_SELECTED);
 }
 
 // Callback - Parse callsign
@@ -400,11 +403,50 @@ void qso_buttons::cb_bn_all_txt(Fl_Widget* w, void* v) {
 }
 
 // Save all qsos
-void qso_buttons::cb_bn_save_all(Fl_Widget* w, void* v) {}
+void qso_buttons::cb_bn_save_all(Fl_Widget* w, void* v) {
+	qso_buttons* that = ancestor_view<qso_buttons>(w);
+	switch (that->qso_data_->logging_state()) {
+	case qso_data::NET_STARTED:
+		that->qso_data_->action_save_net_all();
+		break;
+	}
+}
+
 // Cancel all QSOs
-void qso_buttons::cb_bn_cancel_all(Fl_Widget* w, void* v) {}
+void qso_buttons::cb_bn_cancel_all(Fl_Widget* w, void* v) {
+	qso_buttons* that = ancestor_view<qso_buttons>(w);
+	switch (that->qso_data_->logging_state()) {
+	case qso_data::NET_STARTED:
+		that->qso_data_->action_cancel_net_all();
+		break;
+	}
+}
+
 // Add a QSO to the net
-void qso_buttons::cb_bn_add(Fl_Widget* w, void* v) {}
+void qso_buttons::cb_bn_add(Fl_Widget* w, void* v) {
+	qso_buttons* that = ancestor_view<qso_buttons>(w);
+	switch (that->qso_data_->logging_state()) {
+	case qso_data::QSO_EDIT:
+		that->qso_data_->action_create_net();
+		break;
+	case qso_data::NET_STARTED:
+	case qso_data::NET_EDIT:
+		that->qso_data_->action_add_net_qso();
+		break;
+	}
+}
+
 // Start a net
-void qso_buttons::cb_bn_start_net(Fl_Widget* w, void* v) {}
+void qso_buttons::cb_bn_start_net(Fl_Widget* w, void* v) {
+	qso_buttons* that = ancestor_view<qso_buttons>(w);
+	switch (that->qso_data_->logging_state()) {
+	case qso_data::QSO_INACTIVE:
+		that->qso_data_->action_activate();
+	case qso_data::QSO_PENDING:
+		that->qso_data_->action_start();
+	case qso_data::QSO_STARTED:
+		that->qso_data_->action_create_net();
+		break;
+	}
+}
 

@@ -154,7 +154,7 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 	}
 	else {
 		closing_ = true;
-		qso_manager_->stop_ticker();
+		if (qso_manager_) qso_manager_->stop_ticker();
 		status_->misc_status(ST_NOTE, "ZZALOG: Closing...");
 		// Delete band view
 		// Currently modifying a (potentially new) record
