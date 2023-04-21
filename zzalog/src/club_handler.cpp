@@ -64,7 +64,7 @@ bool club_handler::upload_log(book* book) {
 		else {
 			// Update all records sent with the fact that they have been uploaded and when
 			status_->misc_status(ST_OK, "CLUBLOG: Upload successful");
-			bool old_enable = book_->save_enabled();
+			book_->enable_save(false);
 			ok = true;
 			string today = now(false, "%Y%m%d");
 			for (auto it = book->begin(); it != book->end(); it++) {
@@ -75,7 +75,7 @@ bool club_handler::upload_log(book* book) {
 			book_->selection(book_->size() - 1, HT_SELECTED);
 			// Force the book to save itself with these changes
 			book_->modified(true);
-			book_->enable_save(old_enable);
+			book_->enable_save(true);
 		}
 		fl_cursor(FL_CURSOR_DEFAULT);
 		return ok;

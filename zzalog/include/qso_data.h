@@ -32,6 +32,7 @@ public:
 	enum logging_mode_t {
 		LM_FOR_PARSING, // Use current time
 		LM_OFF_AIR,     // Off-line logging (w/o radio)
+		LM_OFF_AIR_CLONE, // Off-line logging - data from selected QSO (except CALL) 
 		LM_ON_AIR_CAT,  // Real -time logging - data from radio
 		LM_ON_AIR_COPY, // Real-time logging - data from selected QSO
 		LM_ON_AIR_CLONE,// Real-time logging - data from selected QSO (except CALL)

@@ -584,7 +584,7 @@ qso_num_t qso_entry::qso_number() {
 
 // Append QSO to book
 void qso_entry::append_qso() {
-	qso_number_ = book_->append_record(qso_);
+	qso_number_ = book_->insert_record(qso_);
 }
 
 // DElete QSO

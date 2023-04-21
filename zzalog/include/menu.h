@@ -31,8 +31,6 @@
 		static void cb_mi_file_saveas(Fl_Widget* w, void* v);
 		// File->Close
 		static void cb_mi_file_close(Fl_Widget* w, void* v);
-		// File->Auto Save
-		static void cb_mi_file_auto(Fl_Widget* w, void* v);
 		// File->Print
 		static void cb_mi_file_print(Fl_Widget* w, void* v);
 		// File->Backup

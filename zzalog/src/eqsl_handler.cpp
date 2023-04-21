@@ -37,7 +37,6 @@ eqsl_handler::eqsl_handler()
 	, dequeue_parameter_({ &request_queue_, this })
 	, help_dialog_(nullptr)
 	, debug_enabled_(true)
-	, save_enabled_(true)
 {
 }
 
@@ -792,7 +791,6 @@ bool eqsl_handler::upload_eqsl_log(book* book) {
 			help_dialog_->show();
 		}
 		// now update book - don't try and save after each record
-		save_enabled_ = book_->save_enabled();
 		book_->enable_save(false);
 		for (size_t pos = 0; pos < book->size(); pos++) {
 			record* record = book->get_record(pos, false);
@@ -811,7 +809,7 @@ bool eqsl_handler::upload_eqsl_log(book* book) {
 				record->item("EQSL_QSL_SENT", string("Y"));
 			}
 		}
-		book_->enable_save(save_enabled_);
+		book_->enable_save(true);
 
 		// Update status with succesful uploads and remove extracted records
 		if (num_errors || num_warnings) {
@@ -821,11 +819,6 @@ bool eqsl_handler::upload_eqsl_log(book* book) {
 		}
 
 	}
-#ifndef _DEBUG
-	if (book_->save_enabled() && book_->modified()) {
-		book_->store_data();
-	}
-#endif
 	fl_cursor(FL_CURSOR_DEFAULT);
 	return status == ER_OK;
 }
@@ -966,7 +959,6 @@ bool eqsl_handler::upload_single_qso(qso_num_t record_num) {
 			this_message = this_record->item_merge(qsl_message);
 		}
 		bool update = false;
-		save_enabled_ = book_->save_enabled();
 		// Only upload valid records or reply to SWL reports
 		if (this_record->is_valid() || this_record->item("SWL") == "Y") {
 			// Generate URL parameters for QSL

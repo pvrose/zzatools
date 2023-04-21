@@ -63,7 +63,6 @@ book::book()
 	, new_record_(false)
 	, header_(nullptr)
 	, inhibit_view_update_(false)
-	, save_enabled_(true)
 	, current_item_(0)
 	, modified_(false)
 	, filename_("")
@@ -76,6 +75,7 @@ book::book()
 	, been_modified_(false)
 	, main_loading_(false)
 	, ignore_gridsquare_(false)
+	, save_level_(0)
 {
 	used_bands_.clear();
 	used_modes_.clear();
@@ -534,7 +534,6 @@ item_num_t book::selection(item_num_t num_item, hint_t hint /* = HT_SELECTED */,
 	}
 	record* this_record = get_record(current_item_, false);
 	qso_num_t record_num = record_number(current_item_);
-	bool force_save = false;
 	// update turned off during certain activities
 	switch (hint) {
 	case HT_IMPORT_QUERY:
@@ -555,8 +554,6 @@ item_num_t book::selection(item_num_t num_item, hint_t hint /* = HT_SELECTED */,
 	case HT_INSERTED:
 	case HT_DELETED:
 		if (!inhibit_view_update_) {
-			// Set force save as the record number will not change but a record has been inserted or deleted
-			force_save = true;
 			// Set modified flag
 			modified(true);
 			// Update to this record
@@ -577,7 +574,7 @@ item_num_t book::selection(item_num_t num_item, hint_t hint /* = HT_SELECTED */,
 		}
 		break;
 	}
-	if (force_save || (current_item_ != previous && !read_only_ && save_enabled_ && modified() && !save_in_progress_)) {
+	if (current_item_ != previous && !read_only_ && save_level_ == 0 && modified() && !save_in_progress_) {
 #ifndef _DEBUG
 		store_data();
 #endif // _DEBUG
@@ -1220,23 +1217,20 @@ bool book::new_record() { return new_record_; }
 
 // Set save_enabled_ (and save if modified)
 void book::enable_save(bool enable) {
-	save_enabled_ = enable;
 	if (enable) {
-		status_->misc_status(ST_DEBUG, "LOG: Enabling log-book save!");
+		if (save_level_) save_level_--;
 	}
 	else {
-		status_->misc_status(ST_DEBUG, "LOG: Disabling log-book save!");
+		save_level_++;
 	}
+	char msg[128];
+	snprintf(msg, sizeof(msg), "LOG: Setting save enable level %d", save_level_);
+	status_->misc_status(ST_LOG, msg);
 #ifndef _DEBUG
-	if (enable && !read_only_) {
+	if (save_level_ == 0 && !read_only_) {
 		store_data();
 	}
 #endif
-}
-
-// Return value of save_enabled_
-bool book::save_enabled() {
-	return save_enabled_;
 }
 
 // Check duplicates - restart set after a query to confirm it's a duplicate
@@ -1251,7 +1245,6 @@ void book::check_dupes(bool restart) {
 		number_dupes_removed_ = 0;
 	}
 	bool possible_dupe = false;
-	bool old_save_enabled = save_enabled();
 	enable_save(false);
 	for (; duplicate_item_ < size() - 1 && !possible_dupe;) {
 		// Get adjacent records
@@ -1287,7 +1280,7 @@ void book::check_dupes(bool restart) {
 		inhibit_view_update_ = false;
 		selection(size() - 1, HT_ALL);
 	}
-	enable_save(old_save_enabled);
+	enable_save(true);
 }
 
 // Handle duplicate action - KEEP_LOG or KEEP_DUPE - delete it
@@ -1461,14 +1454,13 @@ bool book::delete_enabled() {
 
 // Upload the latest QSO imported to eQSL, LotW and Clublog
 bool book::upload_qso(qso_num_t record_num) {
-	bool old_save_enabled = save_enabled_;
 	enable_save(false);
 	bool ok = eqsl_handler_->upload_single_qso(record_num);
 	if (!lotw_handler_->upload_single_qso(record_num)) ok = false;
 	if (!club_handler_->upload_single_qso(record_num)) ok = false;
 	// Clear flag as already handled new record features
 	new_record_ = false;
-	enable_save(old_save_enabled);
+	enable_save(true);
 	return ok;
 }
 

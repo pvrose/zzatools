@@ -86,7 +86,6 @@ settings* config_ = nullptr;
 		{ "&Save", 0, menu::cb_mi_file_save, (void*)OT_MAIN },
 		{ "Save &As", 0, menu::cb_mi_file_saveas, (void*)OT_MAIN },
 		{ "&Close", 0, menu::cb_mi_file_close, 0 },
-		{ "Au&to Save", 0, menu::cb_mi_file_auto, 0, FL_MENU_TOGGLE | FL_MENU_DIVIDER },
 		{ "&Print", 0, menu::cb_mi_file_print, (void*)OT_MAIN, FL_MENU_DIVIDER },
 		{ "&Recent", 0, 0, 0, FL_SUBMENU | FL_MENU_DIVIDER },
 		// Extra menu items are dynamically inserted here 
@@ -464,16 +463,6 @@ void menu::cb_mi_file_close(Fl_Widget* w, void* v) {
 	import_data_->stop_update(false);
 	while (!import_data_->update_complete()) Fl::check();
 	main_window_->do_callback();
-}
-
-// File ->Auto Save
-// v is not used
-void menu::cb_mi_file_auto(Fl_Widget* w, void* v) {
-	// Get the value of the checked menu item
-	Fl_Menu_* menu = (Fl_Menu_*)w;
-	const Fl_Menu_Item* item = menu->mvalue();
-	bool value = item->value();
-	book_->enable_save(value);
 }
 
 // File->Print
@@ -1678,14 +1667,12 @@ void menu::update_items() {
 		bool last = navigation_book_->selection() == navigation_book_->size() - 1;
 		bool record_modified = book_->modified_record();
 		bool new_record = book_->new_record();
-		bool save_enabled = book_->save_enabled();
 		bool delete_enabled = book_->delete_enabled();
 		bool web_enabled = book_ && book_->get_record() && book_->get_record()->item_exists("WEB");
 		bool listening_wsjtx = wsjtx_handler_ && wsjtx_handler_->has_server();
 		// Get all relevant menu item indices
 		int index_save = find_index("&File/&Save");
 		int index_saveas = find_index("&File/Save &As");
-		int index_auto = find_index("&File/Au&to Save");
 		int index_print = find_index("&File/&Print");
 		int index_first = find_index("&Navigate/&First");
 		int index_prev = find_index("&Navigate/&Previous");
@@ -1710,13 +1697,6 @@ void menu::update_items() {
 		}
 		else {
 			mode(index_save, mode(index_save) | FL_MENU_INACTIVE);
-		}
-		// Auto save enabled
-		if (save_enabled) {
-			mode(index_auto, mode(index_auto) | FL_MENU_VALUE);
-		}
-		else {
-			mode(index_auto, mode(index_auto) & ~FL_MENU_VALUE);
 		}
 		if (empty) {
 			// Disallow log/record modification etc. if the file is empty

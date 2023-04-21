@@ -1,8 +1,10 @@
 #include "qso_net_entry.h"
 #include "qso_entry.h"
 #include "status.h"
+#include "book.h"
 
 extern status* status_;
+extern book* book_;
 
 // Constructor
 qso_net_entry::qso_net_entry(int X, int Y, int W, int H, const char* L) :
@@ -32,6 +34,7 @@ void qso_net_entry::create_form(int X, int Y) {
 	labelcolor(fl_darker(FL_GREEN));
 
 	entries_ = new Fl_Tabs(X, Y + HTEXT, w(), h());
+	entries_->callback(cb_entries);
 	int rx = 0;
 	int ry = 0;
 	int rw = 0;
@@ -185,4 +188,11 @@ void qso_net_entry::ticker() {
 void qso_net_entry::append_qso() {
 	qso_entry* qe = (qso_entry*)entries_->value();
 	qe->append_qso();
+}
+
+// Callback on selecting a tab
+void qso_net_entry::cb_entries(Fl_Widget* w, void* v) {
+	Fl_Tabs* tabs = (Fl_Tabs*)w;
+	qso_entry* qe = (qso_entry*)tabs->value();
+	book_->selection(qe->qso_number());
 }

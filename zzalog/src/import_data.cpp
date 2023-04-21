@@ -68,7 +68,6 @@ import_data::import_data() :
 	close_pending_ = false;
 	timer_period_ = nan("");
 	last_added_number_ = 0;
-	old_enable_save_ = true;
 }
 
 // Destructor
@@ -314,11 +313,6 @@ void import_data::update_book() {
 	else {
 		// Prevent view update with every record imported
 		inhibit_view_update_ = true;
-		if (!update_in_progress_) {
-			// This is the first time through this method - save the current state of save enabled
-			// If we allow this to happen each time we end up with it completely disabled
-			old_enable_save_ = book_->save_enabled();
-		}
 		book_->enable_save(false);
 		// Clear flags
 		update_in_progress_ = false;
@@ -557,8 +551,6 @@ void import_data::stop_update(bool immediate) {
 
 // Tidy up after an update
 void import_data::finish_update(bool merged /*= true*/) {
-	// Restore state of save_enabled
-	book_->enable_save(old_enable_save_);
 	// No import data so select last record and activate main log view
 	if (merged && size() == 0) {
 		char message[256];
@@ -639,6 +631,8 @@ void import_data::finish_update(bool merged /*= true*/) {
 		update_mode_ = NONE;
 	}
 	number_modified_ = 0;
+	// Restore state of save_enabled
+	book_->enable_save(true);
 }
 
 // Where an update has come from a QSL server, some ADIF fields are renamed to the viewpoiint of this 

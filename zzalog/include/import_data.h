@@ -129,8 +129,6 @@ using namespace std;
 		time_t timer_start_;
 		// Timer period
 		double timer_period_;
-		// Original value of book_->enable_save_
-		bool old_enable_save_;
 		// Last added record number
 		qso_num_t last_added_number_;
 

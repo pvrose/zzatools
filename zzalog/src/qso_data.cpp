@@ -88,6 +88,7 @@ void qso_data::create_form(int X, int Y) {
 	ch_logmode_->align(FL_ALIGN_LEFT);
 	ch_logmode_->add("Current date and time - used for parsing only");
 	ch_logmode_->add("All fields blank");
+	ch_logmode_->add("Copy all data from selected QSO - excluding call");
 	ch_logmode_->add("Current date and time, data from CAT");
 	ch_logmode_->add("Current date and time, data from selected QSO - including call");
 	ch_logmode_->add("Current date and time, data from selected QSO - excluding call");
@@ -427,6 +428,7 @@ qso_num_t qso_data::get_default_number() {
 			return book_->size() - 1;
 		case LM_ON_AIR_COPY:
 		case LM_ON_AIR_CLONE:
+		case LM_OFF_AIR_CLONE:
 			return book_->selection();
 		default:
 			return -1;
@@ -481,6 +483,11 @@ void qso_data::action_new_qso(record* qso) {
 		qe->copy_qso_to_qso(qso, qso_entry::CF_RIG_ETC | qso_entry::CF_CAT | qso_entry::CF_CONTACT);
 		qe->copy_clock_to_qso();
 		break;
+	case LM_OFF_AIR_CLONE:
+		// Clone the QSO - get time, station and band from original QSO
+		qe->copy_qso_to_qso(qso, qso_entry::CF_TIME | qso_entry::CF_RIG_ETC | qso_entry::CF_CAT);
+		qe->copy_clock_to_qso();
+		break;
 	case LM_ON_AIR_TIME:
 		// Copy the station details and set the current date/time.
 		qe->copy_qso_to_qso(qso, qso_entry::CF_RIG_ETC);
@@ -502,6 +509,7 @@ void qso_data::action_activate() {
 // Action START - transition from QSO_PENDING to QSO_STARTED
 void qso_data::action_start() {
 	// Add to book
+	book_->enable_save(false);
 	g_entry_->append_qso();
 	book_->selection(book_->item_number(g_entry_->qso_number()), HT_INSERTED);
 	logging_state_ = QSO_STARTED;
@@ -510,7 +518,6 @@ void qso_data::action_start() {
 
 // Action SAVE - transition from QSO_STARTED to QSO_INACTIVE while saving record
 void qso_data::action_save() {
-	bool old_save_enabled = book_->save_enabled();
 	record* qso = nullptr;
 	item_num_t item_number;
 	qso_num_t qso_number;
@@ -528,7 +535,6 @@ void qso_data::action_save() {
 	default:
 		break;
 	}
-	book_->enable_save(false);
 	// On-air logging add date/time off
 	switch (logging_mode_) {
 	case LM_ON_AIR_CAT:
@@ -586,7 +592,7 @@ void qso_data::action_save() {
 	enable_widgets();
 
 	// If new or changed then update the fact and let every one know
-	book_->enable_save(old_save_enabled);
+	book_->enable_save(true);
 }
 
 // Action CANCEL - Transition from QSO_STARTED to QSO_INACTIVE without saving record
@@ -610,6 +616,7 @@ void qso_data::action_cancel() {
 		break;
 	}
 	check_qth_changed();
+	book_->enable_save(true);
 	enable_widgets();
 }
 
@@ -636,6 +643,7 @@ void qso_data::action_save_edit() {
 	book_->add_use_data(g_entry_->qso());
 	book_->modified(true);
 	g_entry_->delete_qso();
+	book_->enable_save(true);
 	logging_state_ = QSO_INACTIVE;
 	enable_widgets();
 }
@@ -647,6 +655,7 @@ void qso_data::action_cancel_edit() {
 	g_entry_->delete_qso();
 	logging_state_ = QSO_INACTIVE;
 	g_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
+	book_->enable_save(true);
 	enable_widgets();
 }
 
@@ -1019,6 +1028,7 @@ void qso_data::action_create_net() {
 		logging_state_ = NET_STARTED;
 		break;
 	case QSO_EDIT:
+		logging_mode_ = LM_OFF_AIR_CLONE;
 		logging_state_ = NET_EDIT;
 		break;
 	default:
@@ -1036,6 +1046,7 @@ void qso_data::action_add_net_qso() {
 	// Create the entry tab
 	g_net_entry_->add_entry();
 	// Create the new QSO therein
+	book_->enable_save(false);
 	action_new_qso(qso);
 	// Add it to the book
 	g_net_entry_->append_qso();
@@ -1055,6 +1066,8 @@ void qso_data::action_save_net_all() {
 			break;
 		}
 	}
+	// Restore the place-holder entry
+	g_net_entry_->add_entry();
 	enable_widgets();
 }
 
@@ -1070,6 +1083,7 @@ void qso_data::action_save_net_edit() {
 	else {
 		logging_state_ = NET_EDIT;
 	}
+	book_->enable_save(true);
 	enable_widgets();
 }
 
@@ -1078,6 +1092,8 @@ void qso_data::action_cancel_net_all() {
 	while (g_net_entry_->entries()) {
 		action_cancel();
 	}
+	// Restore the place-holder entry
+	g_net_entry_->add_entry();
 	enable_widgets();
 }
 
@@ -1093,6 +1109,7 @@ void qso_data::action_cancel_net_edit() {
 	else {
 		logging_state_ = NET_EDIT;
 	}
+	book_->enable_save(true);
 	enable_widgets();
 }
 

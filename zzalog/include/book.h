@@ -190,8 +190,6 @@ using namespace std;
 		void add_use_data(record* record);
 		// Enable/Disable auto-save
 		void enable_save(bool enable);
-		// Return its value
-		bool save_enabled();
 		// Delete enabled
 		bool delete_enabled();
 		// Upload single QSO
@@ -248,8 +246,6 @@ using namespace std;
 		set<string> used_callsigns_;
 		// QTHs used - with data
 		macro_map used_qths_;
-		// Save enabled
-		bool save_enabled_;
 		// match query question
 		string match_question_;
 		// INhibit automatic save -
@@ -268,6 +264,8 @@ using namespace std;
 		bool main_loading_;
 		// Ignore GRIDSQUARE shortening
 		bool ignore_gridsquare_;
+		// Save enabled level (enable downs it, disable ups it
+		int save_level_;
 
 	};
 

@@ -133,7 +133,5 @@ using namespace std;
 		string username_;
 		// Password
 		string password_;
-		// Book saving ebaled
-		bool save_enabled_;
 	};
 #endif

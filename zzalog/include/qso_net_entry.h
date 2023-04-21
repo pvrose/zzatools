@@ -14,6 +14,9 @@ public:
     qso_net_entry(int X, int Y, int W, int H, const char* L = nullptr);
     ~qso_net_entry();
 
+	// Call back for entries
+	static void cb_entries(Fl_Widget* w, void* v);
+
 	// get settings
 	void load_values();
 	// Create form

@@ -23,7 +23,7 @@ const Fl_Color COLOUR_NAVY = 136;  /* R=0/4, B=2/4, G=0/7 */
 map<qso_data::logging_state_t, list<qso_buttons::button_type> > button_map_ =
 {
 	{ qso_data::QSO_INACTIVE, {qso_buttons::ACTIVATE, qso_buttons::START_QSO, 
-		qso_buttons::START_NET, qso_buttons::EDIT_QSO, qso_buttons::BROWSE, qso_buttons::VIEW_QSL } },
+		qso_buttons::START_NET, qso_buttons::EDIT_QSO, qso_buttons::ADD_NET, qso_buttons::BROWSE, qso_buttons::VIEW_QSL } },
 	{ qso_data::QSO_PENDING, { qso_buttons::START_QSO, qso_buttons::QUIT_QSO,
 		qso_buttons::START_NET, qso_buttons::EDIT_QTH } },
 	{ qso_data::QSO_STARTED, { qso_buttons::SAVE_QSO, qso_buttons::CANCEL_QSO, 
@@ -219,6 +219,12 @@ void qso_buttons::cb_cancel(Fl_Widget* w, void* v) {
 	case qso_data::QSO_BROWSE:
 		that->qso_data_->action_cancel_browse();
 		break;
+	case qso_data::NET_STARTED:
+		that->qso_data_->action_cancel();
+		break;
+	case qso_data::NET_EDIT:
+		that->qso_data_->action_cancel_net_edit();
+		break;
 	}
 }
 
@@ -407,6 +413,7 @@ void qso_buttons::cb_bn_save_all(Fl_Widget* w, void* v) {
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
 	switch (that->qso_data_->logging_state()) {
 	case qso_data::NET_STARTED:
+	case qso_data::NET_EDIT:
 		that->qso_data_->action_save_net_all();
 		break;
 	}
@@ -426,6 +433,8 @@ void qso_buttons::cb_bn_cancel_all(Fl_Widget* w, void* v) {
 void qso_buttons::cb_bn_add(Fl_Widget* w, void* v) {
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
 	switch (that->qso_data_->logging_state()) {
+	case qso_data::QSO_INACTIVE:
+		that->qso_data_->action_edit();
 	case qso_data::QSO_EDIT:
 		that->qso_data_->action_create_net();
 		break;
