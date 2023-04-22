@@ -233,14 +233,16 @@ void qso_entry::copy_qso_to_qso(record* old_record, int flags) {
 // Copy fields from CAT and default rig etc.
 void qso_entry::copy_cat_to_qso() {
 	rig_if* rig = ((qso_manager*)qso_data_->parent())->rig();
-	if (rig->is_good()) {
+	if (rig->is_good() && qso_ != nullptr) {
 		string freqy = rig->get_frequency(true);
 		string mode;
 		string submode;
 		rig->get_string_mode(mode, submode);
 		string tx_power = rig->get_tx_power();
 		switch (qso_data_->logging_state()) {
-		case qso_data::QSO_PENDING: {
+		case qso_data::QSO_PENDING:
+		case qso_data::NET_STARTED:
+		{
 			// Load values from rig
 			qso_->item("FREQ", freqy);
 			// Get mode - NB USB/LSB need further processing
@@ -529,7 +531,7 @@ void qso_entry::cb_ip_field(Fl_Widget* w, void* v) {
 	case qso_data::NET_EDIT:
 		if (field == "CALL") {
 			that->copy_label(that->qso_->item("CALL").c_str());
-			Fl::check();
+			that->parent()->redraw();
 		}
 		// drop through
 	case qso_data::QSO_STARTED:

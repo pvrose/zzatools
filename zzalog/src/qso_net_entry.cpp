@@ -126,16 +126,18 @@ void qso_net_entry::remove_entry() {
 // Set the QSO into the selected tab
 void qso_net_entry::set_qso(qso_num_t qso_number) {
 	qso_entry* qe = (qso_entry*)entries_->value();
-	if (qe->qso() != nullptr) {
-		char msg[128];
-		snprintf(msg, sizeof(msg), "DASH: Trying to use a net QSO tab that is used for %s", qe->qso()->item("CALL").c_str());
-		status_->misc_status(ST_SEVERE, msg);
-	}
-	else {
-		qe->qso(qso_number);
-		record* qso = qe->qso();
-		qe->copy_label(qso->item("CALL").c_str());
-		entries_->value(qe);
+	if (qe != nullptr) {
+		if (qe->qso() != nullptr) {
+			char msg[128];
+			snprintf(msg, sizeof(msg), "DASH: Trying to use a net QSO tab that is used for %s", qe->qso()->item("CALL").c_str());
+			status_->misc_status(ST_SEVERE, msg);
+		}
+		else {
+			qe->qso(qso_number);
+			record* qso = qe->qso();
+			qe->copy_label(qso->item("CALL").c_str());
+			entries_->value(qe);
+		}
 	}
 }
 
