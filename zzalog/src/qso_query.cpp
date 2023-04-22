@@ -107,8 +107,14 @@ void qso_query::cb_tab_qso(Fl_Widget* w, void* v) {
 void qso_query::set_query(string message, qso_num_t log_number, record* query_qso) {
 	query_message_ = message;
 	log_number_ = log_number;
-	log_qso_ = book_->get_record(book_->item_number(log_number_), false);
-	original_qso_ = new record(*log_qso_);
+	if (log_number != -1) {
+		log_qso_ = book_->get_record(book_->item_number(log_number_), false);
+		original_qso_ = new record(*log_qso_);
+	}
+	else {
+		log_qso_ = nullptr;
+		original_qso_ = nullptr;
+	}
 	query_qso_ = query_qso;
 }
 

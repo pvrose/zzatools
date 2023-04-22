@@ -313,7 +313,9 @@ void import_data::update_book() {
 	else {
 		// Prevent view update with every record imported
 		inhibit_view_update_ = true;
-		book_->enable_save(false);
+		if (!update_in_progress_) {
+			book_->enable_save(false);
+		}
 		// Clear flags
 		update_in_progress_ = false;
 		update_is_new_ = false;

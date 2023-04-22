@@ -195,9 +195,16 @@ void qso_data::enable_widgets() {
 			break;
 		case QUERY_DUPE:
 		case QUERY_MATCH:
-		case QUERY_NEW:
 			g_entry_->hide();
 			snprintf(l, sizeof(l), "QSO Query - %s - %s", g_query_->qso()->item("CALL").c_str(), g_query_->query_message().c_str());
+			g_query_->copy_label(l);
+			g_query_->show();
+			g_query_->enable_widgets();
+			g_net_entry_->hide();
+			break;
+		case QUERY_NEW:
+			g_entry_->hide();
+			snprintf(l, sizeof(l), "QSO Query - %s - %s", g_query_->query_qso()->item("CALL").c_str(), g_query_->query_message().c_str());
 			g_query_->copy_label(l);
 			g_query_->show();
 			g_query_->enable_widgets();

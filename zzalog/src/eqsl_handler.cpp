@@ -54,6 +54,8 @@ eqsl_handler::~eqsl_handler()
 void eqsl_handler::enqueue_request(qso_num_t record_num, bool force /*=false*/) {
 	// eQSL requests can be disabled when compiled with _DEBUG
 	if (debug_enabled_) {
+		// Inhibit saving log
+		book_->enable_save(false);
 		// Enqueue request
 		request_queue_.push(request_t(record_num, force));
 		// Update status
@@ -89,12 +91,16 @@ void eqsl_handler::cb_timer_deq(void* v) {
 				break;
 			case 1:
 				// Cancel - delete all requests in the queue
-				while (!request_queue->empty())	request_queue->pop();
+				while (!request_queue->empty()) {
+					request_queue->pop();
+					book_->enable_save(true);
+				}
 				cards_skipped = true;
 				break;
 			case 2:
 				// Request failed and repeat not wanted - remove request from queue
 				request_queue->pop();
+				book_->enable_save(true);
 				cards_skipped = true;
 				break;
 			}
@@ -102,10 +108,12 @@ void eqsl_handler::cb_timer_deq(void* v) {
 		case ER_OK:
 			// request succeeded - remove request from queue
 			request_queue->pop();
+			book_->enable_save(true);
 			break;
 		case ER_SKIPPED:
 			// request skipped - remove request from queue
 			request_queue->pop();
+			book_->enable_save(true);
 			break;
 		case ER_THROTTLED:
 			// Request remains on queue to be tried again
@@ -119,12 +127,16 @@ void eqsl_handler::cb_timer_deq(void* v) {
 				break;
 			case 1:
 				// Cancel - delete all requests in the queue
-				while (!request_queue->empty())	request_queue->pop();
+				while (!request_queue->empty()) {
+					request_queue->pop();
+					book_->enable_save(true);
+				}
 				cards_skipped = true;
 				break;
 			case 2:
 				// Request failed and repeat not wanted - delete request from queue
 				request_queue->pop();
+				book_->enable_save(true);
 				cards_skipped = true;
 				break;
 			}
