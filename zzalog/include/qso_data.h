@@ -37,6 +37,7 @@ public:
 		LM_ON_AIR_COPY, // Real-time logging - data from selected QSO
 		LM_ON_AIR_CLONE,// Real-time logging - data from selected QSO (except CALL)
 		LM_ON_AIR_TIME, // Real-time logging - date/time only
+		LM_ON_AIR_NEW,  // Real-time logging - either clone or CAT depending on state of CAT
 		//LM_IMPORTED,    // Import from modem software (w/ or w/o radio)
 	};
 

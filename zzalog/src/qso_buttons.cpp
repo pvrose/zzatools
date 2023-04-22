@@ -436,6 +436,7 @@ void qso_buttons::cb_bn_add(Fl_Widget* w, void* v) {
 	case qso_data::QSO_INACTIVE:
 		that->qso_data_->action_edit();
 	case qso_data::QSO_EDIT:
+		that->qso_data_->logging_mode(qso_data::LM_OFF_AIR_CLONE);
 		that->qso_data_->action_create_net();
 		break;
 	case qso_data::NET_STARTED:
@@ -448,6 +449,7 @@ void qso_buttons::cb_bn_add(Fl_Widget* w, void* v) {
 // Start a net
 void qso_buttons::cb_bn_start_net(Fl_Widget* w, void* v) {
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
+	that->qso_data_->logging_mode(qso_data::LM_ON_AIR_NEW);
 	switch (that->qso_data_->logging_state()) {
 	case qso_data::QSO_INACTIVE:
 		that->qso_data_->action_activate();

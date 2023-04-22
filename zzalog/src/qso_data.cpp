@@ -93,6 +93,7 @@ void qso_data::create_form(int X, int Y) {
 	ch_logmode_->add("Current date and time, data from selected QSO - including call");
 	ch_logmode_->add("Current date and time, data from selected QSO - excluding call");
 	ch_logmode_->add("Current date and time, no other data");
+	ch_logmode_->add("Current date and time, data from CAT if present, else selected call");
 	ch_logmode_->value(logging_mode_);
 	ch_logmode_->callback(cb_logging_mode, &logging_mode_);
 	ch_logmode_->tooltip("Select the logging mode - i.e. how to initialise a new QSO record");
@@ -469,6 +470,7 @@ void qso_data::action_new_qso(record* qso) {
 		qe = g_entry_;
 		break;
 	}
+	rig_if* rig = ((qso_manager*)parent())->rig();
 	switch (logging_mode_) {
 	case LM_OFF_AIR:
 		// Just copy the station details
@@ -1035,7 +1037,6 @@ void qso_data::action_create_net() {
 		logging_state_ = NET_STARTED;
 		break;
 	case QSO_EDIT:
-		logging_mode_ = LM_OFF_AIR_CLONE;
 		logging_state_ = NET_EDIT;
 		break;
 	default:
@@ -1265,7 +1266,19 @@ qso_data::logging_mode_t qso_data::logging_mode() {
 
 // Set logging mode
 void qso_data::logging_mode(qso_data::logging_mode_t mode) {
-	logging_mode_ = mode;
+	if (mode == LM_ON_AIR_NEW) {
+		rig_if* rig = ((qso_manager*)parent())->rig();
+		if (rig == nullptr || !rig->is_good()) {
+			logging_mode_ = LM_ON_AIR_CLONE;
+		}
+		else {
+			logging_mode_ = LM_ON_AIR_CAT;
+		}
+	}
+	else {
+		logging_mode_ = mode;
+	}
+	enable_widgets();
 }
 
 // Get logging state
