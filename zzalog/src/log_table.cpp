@@ -589,10 +589,6 @@ void log_table::draw_cell(TableContext context, int R, int C, int X, int Y, int 
 			text = to_string(my_book_->record_number(item_number) + 1);
 			fl_draw(text.c_str(), X, Y, W, H, FL_ALIGN_LEFT);
 			fl_font(save, fontsize_);
-			// BORDER - mid grey
-			fl_color(color());
-			// draw top and right edges only
-			fl_line(X, Y, X + W - 1, Y, X + W - 1, Y + H - 1);
 		}
 		fl_pop_clip();
 		return;
@@ -641,10 +637,6 @@ void log_table::draw_cell(TableContext context, int R, int C, int X, int Y, int 
 				text = this_record->item(fields_[C].field, true);
 				fl_draw(text.c_str(), X + 1, Y, W - 1, H, FL_ALIGN_LEFT);
 
-				// BORDER - unselected colour
-				fl_color(color());
-				// draw top and right edges only
-				fl_line(X, Y, X + W - 1, Y, X + W - 1, Y + H - 1);
 			}
 			fl_pop_clip();
 		}
