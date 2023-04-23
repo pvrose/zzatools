@@ -316,8 +316,8 @@ void qso_manager::update_import_qso(record* import_qso) {
 	record* use_qso;
 	string mode = import_qso->item("MODE");
 	string submode = import_qso->item("SUBMODE");
-	// If we have activated the QSO manager, then use active QSO as template
-	use_qso = data_group_->current_qso();
+	// Get the default record for copying
+	use_qso = book_->get_record(data_group_->get_default_number(), false);
 	// If we have a QSO to copy from and one to copy to, copy these fields.
 	if (use_qso && import_qso) {
 		char message[128];
