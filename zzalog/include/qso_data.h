@@ -100,7 +100,7 @@ public:
 	// Get default copy record
 	qso_num_t get_default_number();
 	// Initialise fields
-	void initialise_fields();
+	void initialise_fields(qso_entry* entry);
 	// Get defined fields
 	string get_defined_fields();
 	// Current QSO

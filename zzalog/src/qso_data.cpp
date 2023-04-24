@@ -136,7 +136,7 @@ void qso_data::create_form(int X, int Y) {
 	size(max_w, curr_y - Y);
 	end();
 
-	initialise_fields();
+	enable_widgets();
 }
 
 // Enable QSO widgets
@@ -369,7 +369,7 @@ void qso_data::save_values() {
 }
 
 // Initialise fields from format definitions
-void qso_data::initialise_fields() {
+void qso_data::initialise_fields(qso_entry* entry) {
 	string preset_fields;
 	bool lock_preset;
 	bool new_fields;
@@ -406,7 +406,6 @@ void qso_data::initialise_fields() {
 		lock_preset = false;
 		break;
 	}
-	g_entry_->initialise_fields(preset_fields, new_fields, lock_preset);
 	// TODO this shoule be somewhere else
 	//// Set contest format
 	//ch_format_->value(exch_fmt_id_.c_str());
@@ -417,8 +416,8 @@ void qso_data::initialise_fields() {
 			action_activate();
 		}
 	}
-	g_entry_->initialise_values(preset_fields, g_contest_->serial_number());
-	g_entry_->enable_widgets();
+	entry->initialise_fields(preset_fields, new_fields, lock_preset);
+	entry->initialise_values(preset_fields, g_contest_->serial_number());
 }
 
 string qso_data::get_defined_fields() {
@@ -1110,11 +1109,11 @@ void qso_data::action_cancel_net_edit() {
 	// Copy original back to the book
 	*book_->get_record(g_net_entry_->qso_number(), false) = *g_net_entry_->original_qso();
 	g_net_entry_->remove_entry();
-	((qso_entry*)g_net_entry_->entry())->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
 	if (g_net_entry_->entries() == 0) {
 		logging_state_ = QSO_INACTIVE;
 	}
 	else {
+		((qso_entry*)g_net_entry_->entry())->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
 		logging_state_ = NET_EDIT;
 	}
 	book_->enable_save(true);

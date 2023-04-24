@@ -482,7 +482,7 @@ void qso_contest::populate_exch_fmt() {
 
 // Initialise fields
 void qso_contest::initialise_fields() {
-	((qso_data*)parent())->initialise_fields();
+	((qso_data*)parent())->enable_widgets();
 }
 
 // Return field mode
