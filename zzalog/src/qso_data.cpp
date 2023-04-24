@@ -1185,7 +1185,6 @@ void qso_data::update_rig() {
 			else {
 				// We have now disconnected rig - disable selecting this logging mode
 				logging_mode_ = LM_ON_AIR_TIME;
-				enable_widgets();
 			}
 			break;
 		}
@@ -1196,6 +1195,7 @@ void qso_data::update_rig() {
 		}
 		}
 	}
+	enable_widgets();
 }
 
 // Start a QSO as long as we are in the correct state
