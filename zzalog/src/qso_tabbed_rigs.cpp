@@ -39,7 +39,7 @@ void qso_tabbed_rigs::load_values() {
 	for (int g = 0; g < cat_settings.groups(); g++) {
 		const char* name = cat_settings.group(g);
 		// If the names is both in settings and in the list read from the log add it to the list
-		if (rig_dataset->data.find(name) != rig_dataset->data.end()) {
+		if (rig_dataset && rig_dataset->data.find(name) != rig_dataset->data.end()) {
 			label_map_[string(name)] = nullptr;
 		}
 	}

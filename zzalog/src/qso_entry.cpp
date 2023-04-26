@@ -117,12 +117,11 @@ void qso_entry::create_form(int X, int Y) {
 	resizable(nullptr);
 	size(max_w, curr_y - Y);
 	end();
+
+	qso_data_->initialise_fields(this);
 }
 
 void qso_entry::enable_widgets() {
-	// Get fields
-	qso_data* data = ancestor_view<qso_data>(this);
-	data->initialise_fields(this);
 	// Now enable disan=
 	switch (qso_data_->logging_state()) {
 	case qso_data::QSO_INACTIVE:
