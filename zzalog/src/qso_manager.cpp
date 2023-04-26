@@ -264,6 +264,7 @@ rig_if* qso_manager::rig() {
 
 // Called whenever another view updates a record (or selects a new one)
 void qso_manager::update_qso(hint_t hint, qso_num_t match_num, qso_num_t query_num) {
+	record* target = book_->get_record(match_num, false);
 	switch (hint) {
 	case HT_SELECTED:
 	case HT_ALL:
@@ -274,7 +275,9 @@ void qso_manager::update_qso(hint_t hint, qso_num_t match_num, qso_num_t query_n
 	case HT_NEW_DATA:
 	case HT_RESET_ORDER:
 		data_group_->update_qso(match_num);
-		change_rig(book_->get_record(match_num, false)->item("MY_RIG"));
+		if (target != nullptr) {
+			change_rig(book_->get_record(match_num, false)->item("MY_RIG"));
+		}
 		break;
 	case HT_IMPORT_QUERY:
 		data_group_->update_query(qso_data::QUERY_MATCH, match_num, query_num);
