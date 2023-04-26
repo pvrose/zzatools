@@ -489,6 +489,7 @@ void import_data::update_book() {
 					// If Auto update or importing a file then record needs parsing etc.
 					import_record->update_timeoff();
 					if (update_mode_ == AUTO_IMPORT || update_mode_ == FILE_IMPORT || update_mode_ == DATAGRAM) {
+						add_use_data(import_record);
 						pfx_data_->parse(import_record);
 						spec_data_->validate(import_record, -1);
 						qso_manager_->update_import_qso(import_record);

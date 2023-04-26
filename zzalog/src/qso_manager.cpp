@@ -323,13 +323,6 @@ void qso_manager::update_import_qso(record* import_qso) {
 	use_qso = book_->get_record(data_group_->get_default_number(), false);
 	// If we have a QSO to copy from and one to copy to, copy these fields.
 	if (use_qso && import_qso) {
-		char message[128];
-		snprintf(message, 128, "IMPORT: Copying station data from %s %s %s %s",
-			use_qso->item("QSO_DATE").c_str(),
-			use_qso->item("TIME_ON").c_str(),
-			use_qso->item("CALL").c_str(),
-			use_qso->item("MODE").c_str());
-		status_->misc_status(ST_LOG, message);
 		import_qso->item("MY_RIG", use_qso->item("MY_RIG"));
 		import_qso->item("MY_ANTENNA", use_qso->item("MY_ANTENNA"));
 		import_qso->item("STATION_CALLSIGN", use_qso->item("STATION_CALLSIGN"));
