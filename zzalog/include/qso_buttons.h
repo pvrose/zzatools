@@ -28,7 +28,10 @@ public:
 	enum button_type {
 		ACTIVATE,
 		START_QSO,
+		ADD_QSO,
 		EDIT_QSO,
+		COPY_QSO,
+		CLONE_QSO,
 		CANCEL_EDIT,
 		CANCEL_BROWSE,
 		CANCEL_QSO,
@@ -58,7 +61,7 @@ public:
 		ADD_NET,
 		SAVE_NET,
 		CANCEL_NET,
-		ADD_QSO,
+		ADD_NET_QSO,
 		SAVE_EDIT_NET,
 	};
 
@@ -114,7 +117,7 @@ public:
 	// Cancel all QSOs
 	static void cb_bn_cancel_all(Fl_Widget* w, void* v);
 	// Add a QSO to the net
-	static void cb_bn_add(Fl_Widget* w, void* v);
+	static void cb_bn_add_net(Fl_Widget* w, void* v);
 	// Start a net
 	static void cb_bn_start_net(Fl_Widget* w, void* v);
 
@@ -124,7 +127,7 @@ protected:
 	//static map<qso_data::logging_state_t, list<qso_buttons::button_type> > button_map_;
 	//static map<button_type, button_action> action_map_;
 	// Number of buttons
-	static const int MAX_ACTIONS = 8;
+	static const int MAX_ACTIONS = 10;
 
 	// parent
 	qso_data* qso_data_;

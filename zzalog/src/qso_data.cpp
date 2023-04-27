@@ -40,9 +40,9 @@ extern double prev_freq_;
 // qso_group_
 qso_data::qso_data(int X, int Y, int W, int H, const char* l) :
 	Fl_Group(X, Y, W, H, l)
-	, logging_mode_(LM_OFF_AIR)
 	, logging_state_(QSO_INACTIVE)
 	, inhibit_drawing_(false)
+	, previous_mode_(QSO_NONE)
 {
 	load_values();
 	qsl_viewer_ = new qsl_viewer(10, 10);
@@ -59,17 +59,8 @@ void qso_data::load_values() {
 	// Dashboard configuration
 	Fl_Preferences dash_settings(settings_, "Dashboard");
 	// Set logging mode -default is On-air with or without rig connection
-	int new_lm;
 	rig_if* rig = ((qso_manager*)parent())->rig();
 	bool have_rig = rig && rig->is_good();
-	logging_mode_t default_lm = have_rig ? LM_ON_AIR_CAT : LM_ON_AIR_COPY;
-	dash_settings.get("Logging Mode", new_lm, default_lm);
-
-	// If we are set to "On-air with CAT connection" check connecton
-	if (!have_rig && new_lm == LM_ON_AIR_CAT) new_lm = LM_ON_AIR_COPY;
-
-	logging_mode_ = (logging_mode_t)new_lm;
-
 }
 
 // Create qso_data
@@ -83,23 +74,8 @@ void qso_data::create_form(int X, int Y) {
 	labelfont(FL_BOLD);
 	labelsize(FL_NORMAL_SIZE + 2);
 
-	// Choice widget to select the reqiuired logging mode
-	ch_logmode_ = new Fl_Choice(x() + GAP + WLLABEL, y() + HTEXT, 8 * WBUTTON, HTEXT, "QSO initialisation");
-	ch_logmode_->align(FL_ALIGN_LEFT);
-	ch_logmode_->add("Current date and time - used for parsing only");
-	ch_logmode_->add("All fields blank");
-	ch_logmode_->add("Copy all data from selected QSO - excluding call");
-	ch_logmode_->add("Current date and time, data from CAT");
-	ch_logmode_->add("Current date and time, data from selected QSO - including call");
-	ch_logmode_->add("Current date and time, data from selected QSO - excluding call");
-	ch_logmode_->add("Current date and time, no other data");
-	ch_logmode_->add("Current date and time, data from CAT if present, else selected call");
-	ch_logmode_->value(logging_mode_);
-	ch_logmode_->callback(cb_logging_mode, &logging_mode_);
-	ch_logmode_->tooltip("Select the logging mode - i.e. how to initialise a new QSO record");
-
-	int curr_y = ch_logmode_->y() + ch_logmode_->h() + GAP;;
-	int top = ch_logmode_->y() + ch_logmode_->h();
+	int curr_y = Y + HTEXT;
+	int top = Y;
 	int curr_x = X + GAP;
 
 	g_contest_ = new qso_contest(curr_x, curr_y, 10, 10);
@@ -130,8 +106,6 @@ void qso_data::create_form(int X, int Y) {
 	max_w = max(max_w, g_buttons_->x() + g_buttons_->w() + GAP);
 	curr_y += g_buttons_->h() + GAP;
 
-	ch_logmode_->size(max_w - ch_logmode_->x() - GAP, ch_logmode_->h());
-
 	resizable(nullptr);
 	size(max_w, curr_y - Y);
 	end();
@@ -144,13 +118,6 @@ void qso_data::enable_widgets() {
 	if (!inhibit_drawing_) {
 		// Disable log mode menu item from CAT if no CAT
 		rig_if* rig = ((qso_manager*)parent())->rig();
-		if (rig == nullptr || !rig->is_good()) {
-			ch_logmode_->mode(LM_ON_AIR_CAT, ch_logmode_->mode(LM_ON_AIR_CAT) | FL_MENU_INACTIVE);
-		}
-		else {
-			ch_logmode_->mode(LM_ON_AIR_CAT, ch_logmode_->mode(LM_ON_AIR_CAT) & ~FL_MENU_INACTIVE);
-		}
-		ch_logmode_->redraw();
 
 		g_contest_->enable_widgets();
 
@@ -171,7 +138,7 @@ void qso_data::enable_widgets() {
 			g_query_->hide();
 			break;
 		case QSO_STARTED:
-			snprintf(l, sizeof(l), "QSO Entry - %s - active real-time logging", current_qso()->item("CALL").c_str());
+			snprintf(l, sizeof(l), "QSO Entry - %s - logging new contact", current_qso()->item("CALL").c_str());
 			g_entry_->copy_label(l);
 			g_entry_->show();
 			g_entry_->enable_widgets();
@@ -179,7 +146,7 @@ void qso_data::enable_widgets() {
 			g_query_->hide();
 			break;
 		case QSO_EDIT:
-			snprintf(l, sizeof(l), "QSO Entry - %s - off-air editing", current_qso()->item("CALL").c_str());
+			snprintf(l, sizeof(l), "QSO Entry - %s - editing existing contact", current_qso()->item("CALL").c_str());
 			g_entry_->copy_label(l);
 			g_entry_->show();
 			g_entry_->enable_widgets();
@@ -240,7 +207,7 @@ void qso_data::update_qso(qso_num_t log_num) {
 		if (log_num != g_entry_->qso_number()) {
 			// Deactivate then reactivate with new QSO
 			action_deactivate();
-			action_activate();
+			action_activate(previous_mode_);
 		}
 		else {
 			g_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
@@ -344,17 +311,6 @@ void qso_data::update_query(logging_state_t query, qso_num_t match_num, qso_num_
 	}
 }
 
-// Select logging mode
-void qso_data::cb_logging_mode(Fl_Widget* w, void* v) {
-	cb_value<Fl_Choice, logging_mode_t>(w, v);
-	qso_data* that = ancestor_view<qso_data>(w);
-	// Deactivate and reactivate to pick up logging mode changes
-	if (that->logging_state_ == QSO_PENDING) {
-		that->action_deactivate();
-		that->action_activate();
-	}
-}
-
 // Callback - QSL viewer "closing" - make it hide instead
 void qso_data::cb_qsl_viewer(Fl_Widget* w, void* v) {
 	qsl_viewer* qsl = (qsl_viewer*)w;
@@ -364,8 +320,6 @@ void qso_data::cb_qsl_viewer(Fl_Widget* w, void* v) {
 // Save the settings
 void qso_data::save_values() {
 	// Dashboard configuration
-	Fl_Preferences dash_settings(settings_, "Dashboard");
-	dash_settings.set("Logging Mode", (int)logging_mode_);
 }
 
 // Initialise fields from format definitions
@@ -413,7 +367,7 @@ void qso_data::initialise_fields(qso_entry* entry) {
 	if (g_contest_->mode() == qso_contest::CONTEST) {
 		// Automatically create a pending QSO
 		if (logging_state_ == QSO_INACTIVE) {
-			action_activate();
+			action_activate(previous_mode_);
 		}
 	}
 	entry->initialise_fields(preset_fields, new_fields, lock_preset);
@@ -428,18 +382,7 @@ string qso_data::get_defined_fields() {
 qso_num_t qso_data::get_default_number() {
 	switch (logging_state_) {
 	case QSO_INACTIVE:
-		switch (logging_mode_) {
-		case LM_OFF_AIR:
-		case LM_ON_AIR_CAT:
-		case LM_ON_AIR_TIME:
-			return book_->size() - 1;
-		case LM_ON_AIR_COPY:
-		case LM_ON_AIR_CLONE:
-		case LM_OFF_AIR_CLONE:
-			return book_->selection();
-		default:
-			return -1;
-		}
+		return book_->selection();
 	case QSO_PENDING:
 	case QSO_STARTED:
 	case QSO_EDIT:
@@ -458,7 +401,7 @@ qso_num_t qso_data::get_default_number() {
 }
 
 // Action - create a new QSL in the appropriate copy of qso_entry
-void qso_data::action_new_qso(record* qso) {
+void qso_data::action_new_qso(record* qso, qso_init_t mode) {
 	qso_entry* qe;
 	switch (logging_state_) {
 	case NET_STARTED:
@@ -470,47 +413,44 @@ void qso_data::action_new_qso(record* qso) {
 		break;
 	}
 	rig_if* rig = ((qso_manager*)parent())->rig();
-	switch (logging_mode_) {
-	case LM_OFF_AIR:
+	qso_init_t new_mode = (mode == QSO_AS_WAS) ? previous_mode_ : mode;
+	switch (new_mode) {
+	case QSO_NONE:
 		// Just copy the station details
 		qe->copy_qso_to_qso(qso, qso_entry::CF_RIG_ETC);
 		break;
-	case LM_ON_AIR_CAT:
+	case QSO_ON_AIR:
 		// Copy station details and get read rig details for band etc.
 		qe->copy_qso_to_qso(qso, qso_entry::CF_RIG_ETC);
 		qe->copy_cat_to_qso();
 		qe->copy_clock_to_qso();
 		break;
-	case LM_ON_AIR_CLONE:
+	case QSO_COPY_CONDX:
 		// Clone the QSO - get station and band from original QSO
 		qe->copy_qso_to_qso(qso, qso_entry::CF_RIG_ETC | qso_entry::CF_CAT);
 		qe->copy_clock_to_qso();
 		break;
-	case LM_ON_AIR_COPY:
+	case QSO_COPY_CALL:
 		// Copy the QSO - as abobe but also same callsign and details
 		qe->copy_qso_to_qso(qso, qso_entry::CF_RIG_ETC | qso_entry::CF_CAT | qso_entry::CF_CONTACT);
 		qe->copy_clock_to_qso();
 		break;
-	case LM_OFF_AIR_CLONE:
+	case QSO_COPY_FOR_NET:
 		// Clone the QSO - get time, station and band from original QSO
 		qe->copy_qso_to_qso(qso, qso_entry::CF_TIME | qso_entry::CF_RIG_ETC | qso_entry::CF_CAT);
 		qe->copy_clock_to_qso();
 		break;
-	case LM_ON_AIR_TIME:
-		// Copy the station details and set the current date/time.
-		qe->copy_qso_to_qso(qso, qso_entry::CF_RIG_ETC);
-		qe->copy_clock_to_qso();
-		break;
 	}
+	previous_mode_ = new_mode;
 }
 
 
 // Action ACTIVATE: transition from QSO_INACTIVE to QSO_PENDING
-void qso_data::action_activate() {
+void qso_data::action_activate(qso_init_t mode) {
 	record* source_record = book_->get_record();
 	qso_manager* mgr = ancestor_view<qso_manager>(this);
 	logging_state_ = QSO_PENDING;
-	action_new_qso(source_record);
+	action_new_qso(source_record, mode);
 	enable_widgets();
 }
 
@@ -544,11 +484,8 @@ void qso_data::action_save() {
 		break;
 	}
 	// On-air logging add date/time off
-	switch (logging_mode_) {
-	case LM_ON_AIR_CAT:
-	case LM_ON_AIR_COPY:
-	case LM_ON_AIR_CLONE:
-	case LM_ON_AIR_TIME:
+	switch (previous_mode_) {
+	case QSO_ON_AIR:
 		// All on-air modes - set cime-off to now
 		if (qso->item("TIME_OFF") == "") {
 			// Add end date/time - current time of interactive entering
@@ -561,8 +498,13 @@ void qso_data::action_save() {
 		// Increment contest serial number
 		g_contest_->increment_serial();
 		break;
-	case LM_OFF_AIR:
-		book_->correct_record_position(item_number);
+	case QSO_NONE:
+	case QSO_COPY_CALL:
+	case QSO_COPY_CONDX:
+	case QSO_COPY_FOR_NET:
+		// Put the record in its correct position and save that position
+		item_number = book_->correct_record_position(item_number);
+		qso_number = book_->record_number(item_number);
 		break;
 	}
 
@@ -700,7 +642,7 @@ void qso_data::action_navigate(int target) {
 		action_view_qsl();
 		break;
 	case QSO_PENDING:
-		action_activate();
+		action_activate(previous_mode_);
 		action_view_qsl();
 		break;
 	case QSO_BROWSE:
@@ -1054,7 +996,7 @@ void qso_data::action_add_net_qso() {
 	g_net_entry_->add_entry();
 	// Create the new QSO therein
 	book_->enable_save(false);
-	action_new_qso(qso);
+	action_new_qso(qso, QSO_COPY_FOR_NET);
 	// Add it to the book
 	g_net_entry_->append_qso();
 	book_->selection(book_->item_number(g_net_entry_->qso_number()), HT_INSERTED);
@@ -1167,42 +1109,24 @@ void qso_data::update_rig() {
 	// Get freq etc from QSO or rig
 // Get present values data from rig
 	if (logging_state_ == QSO_PENDING) {
-		switch (logging_mode_) {
-		case LM_OFF_AIR:
-		case LM_ON_AIR_TIME:
-			// Do nothing
-			break;
-		case LM_ON_AIR_CAT: {
-			if (((qso_manager*)parent())->rig()->is_good()) {
-				g_entry_->copy_cat_to_qso();
-				if (band_view_) {
-					double freq;
-					g_entry_->qso()->item("FREQ", freq);;
-					band_view_->update(freq * 1000.0);
-					prev_freq_ = freq;
-				}
+		if (((qso_manager*)parent())->rig()->is_good()) {
+			g_entry_->copy_cat_to_qso();
+			if (band_view_) {
+				double freq;
+				g_entry_->qso()->item("FREQ", freq);;
+				band_view_->update(freq * 1000.0);
+				prev_freq_ = freq;
 			}
-			else {
-				// We have now disconnected rig - disable selecting this logging mode
-				logging_mode_ = LM_ON_AIR_TIME;
-			}
-			break;
-		}
-		case LM_ON_AIR_COPY:
-		case LM_ON_AIR_CLONE:
-		{
-			break;
-		}
 		}
 	}
 	enable_widgets();
 }
 
 // Start a QSO as long as we are in the correct state
-void qso_data::start_qso() {
+void qso_data::start_qso(qso_init_t mode) {
 	switch (logging_state_) {
 	case qso_data::QSO_INACTIVE:
-		action_activate();
+		action_activate(mode);
 		// drop through
 	case qso_data::QSO_PENDING:
 		action_start();
@@ -1258,28 +1182,6 @@ void qso_data::edit_qso() {
 	}
 }
 
-// Get logging mode
-qso_data::logging_mode_t qso_data::logging_mode() {
-	return logging_mode_;
-}
-
-// Set logging mode
-void qso_data::logging_mode(qso_data::logging_mode_t mode) {
-	if (mode == LM_ON_AIR_NEW) {
-		rig_if* rig = ((qso_manager*)parent())->rig();
-		if (rig == nullptr || !rig->is_good()) {
-			logging_mode_ = LM_ON_AIR_CLONE;
-		}
-		else {
-			logging_mode_ = LM_ON_AIR_CAT;
-		}
-	}
-	else {
-		logging_mode_ = mode;
-	}
-	enable_widgets();
-}
-
 // Get logging state
 qso_data::logging_state_t qso_data::logging_state() {
 	return logging_state_;
@@ -1308,11 +1210,11 @@ record* qso_data::current_qso() {
 	}
 }
 
-// Update time
+// Update time and rig info
 void qso_data::ticker() {
 	g_entry_->copy_clock_to_qso();
-	g_entry_->copy_cat_to_qso();
 	g_net_entry_->ticker();
+	g_entry_->copy_cat_to_qso();
 }
 
 // Call in editor

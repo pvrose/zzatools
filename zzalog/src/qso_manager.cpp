@@ -207,17 +207,6 @@ void qso_manager::cb_close(Fl_Widget* w, void* v) {
 	main_window_->do_callback();
 }
 
-// Return the logging mode
-qso_data::logging_mode_t qso_manager::logging_mode() {
-	return data_group_->logging_mode();
-}
-
-// Set the logging mode
-void qso_manager::logging_mode(qso_data::logging_mode_t mode) {
-	data_group_->logging_mode(mode);
-	enable_widgets();
-}
-
 // 
 qso_data::logging_state_t qso_manager::logging_state() {
 	return data_group_->logging_state();
@@ -295,7 +284,7 @@ void qso_manager::update_qso(hint_t hint, qso_num_t match_num, qso_num_t query_n
 
 // Start QSO
 void qso_manager::start_qso() {
-	data_group_->start_qso();
+	data_group_->start_qso(qso_data::QSO_AS_WAS);
 }
 
 // End QSO - add time off

@@ -288,20 +288,25 @@ void qso_entry::copy_cat_to_qso() {
 // Copy current timestamp to QSO
 void qso_entry::copy_clock_to_qso() {
 	// Only allow this if it hasn't been done 
-	if (qso_ != nullptr && qso_->item("QSO_DATE").length() == 0) {
-		time_t now = time(nullptr);
-		tm* value = gmtime(&now);
-		char result[100];
-		// convert date
-		strftime(result, 99, "%Y%m%d", value);
-		qso_->item("QSO_DATE", string(result));
-		// convert time
-		strftime(result, 99, "%H%M%S", value);
-		qso_->item("TIME_ON", string(result));
-		qso_->item("QSO_DATE_OFF", string(""));
-		qso_->item("TIME_OFF", string(""));
-
-		copy_qso_to_display(CF_TIME);
+	if (qso_ != nullptr) {
+		switch (qso_data_->logging_state()) {
+		case qso_data::QSO_INACTIVE:
+		case qso_data::QSO_PENDING: {
+			time_t now = time(nullptr);
+			tm* value = gmtime(&now);
+			char result[100];
+			// convert date
+			strftime(result, 99, "%Y%m%d", value);
+			qso_->item("QSO_DATE", string(result));
+			// convert time
+			strftime(result, 99, "%H%M%S", value);
+			qso_->item("TIME_ON", string(result));
+			qso_->item("QSO_DATE_OFF", string(""));
+			qso_->item("TIME_OFF", string(""));
+			copy_qso_to_display(CF_TIME);
+			break;
+		}
+		}
 	}
 }
 
@@ -539,6 +544,7 @@ void qso_entry::cb_ip_field(Fl_Widget* w, void* v) {
 	case qso_data::QSO_STARTED:
 	case qso_data::QSO_EDIT:
 		that->enable_widgets();
+		that->qso_data_->enable_widgets();
 		tabbed_forms_->update_views(nullptr, HT_MINOR_CHANGE, that->qso_number_);
 		break;
 	default:

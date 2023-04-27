@@ -524,64 +524,70 @@ void book::remember_record() {
 
 // Change the selected record (& update any necessary controls
 item_num_t book::selection(item_num_t num_item, hint_t hint /* = HT_SELECTED */, view* requester /* = nullptr */, item_num_t num_other /*= 0*/) {
-	item_num_t previous = current_item_;
-	// Special case - -1 indicates no change to the selection
-	if ((signed)num_item != -1 && size()) {
-		current_item_ = num_item;
-		remember_record();
+	if (save_in_progress_) {
+		status_->misc_status(ST_WARNING, "LOG: Currently storing the book, cannot change selection");
+		return current_item_;
 	}
 	else {
-	}
-	record* this_record = get_record(current_item_, false);
-	qso_num_t record_num = record_number(current_item_);
-	// update turned off during certain activities
-	switch (hint) {
-	case HT_IMPORT_QUERY:
-	case HT_IMPORT_QUERYNEW:
-	case HT_DUPE_QUERY:
-		// Query against first record in import_data or identified record
-		tabbed_forms_->update_views(requester, hint, record_num, record_number(num_other));
-		break;
-	case HT_CHANGED:
-	case HT_MINOR_CHANGE:
-		if (!inhibit_view_update_) {
-			// Set modified flag
+		item_num_t previous = current_item_;
+		// Special case - -1 indicates no change to the selection
+		if ((signed)num_item != -1 && size()) {
+			current_item_ = num_item;
+			remember_record();
+		}
+		else {
+		}
+		record* this_record = get_record(current_item_, false);
+		qso_num_t record_num = record_number(current_item_);
+		// update turned off during certain activities
+		switch (hint) {
+		case HT_IMPORT_QUERY:
+		case HT_IMPORT_QUERYNEW:
+		case HT_DUPE_QUERY:
+			// Query against first record in import_data or identified record
+			tabbed_forms_->update_views(requester, hint, record_num, record_number(num_other));
+			break;
+		case HT_CHANGED:
+		case HT_MINOR_CHANGE:
+			if (!inhibit_view_update_) {
+				// Set modified flag
+				modified(true);
+				// Update to this record
+				tabbed_forms_->update_views(requester, hint, record_num);
+			}
+			break;
+		case HT_INSERTED:
+		case HT_DELETED:
+			if (!inhibit_view_update_) {
+				// Set modified flag
+				modified(true);
+				// Update to this record
+				tabbed_forms_->update_views(requester, hint, record_num);
+			}
+			break;
+		case HT_START_CHANGED:
+			// The QSO start date has been changed. Re-order the book and tell everyone
+			this_record = get_record(current_item_, false);
+			erase(begin() + current_item_);
+			record_num = insert_record(this_record);
 			modified(true);
-			// Update to this record
-			tabbed_forms_->update_views(requester, hint, record_num);
+			tabbed_forms_->update_views(requester, HT_ALL, record_num);
+			break;
+		default:
+			if (!inhibit_view_update_) {
+				tabbed_forms_->update_views(requester, hint, record_num);
+			}
+			break;
 		}
-		break;
-	case HT_INSERTED:
-	case HT_DELETED:
-		if (!inhibit_view_update_) {
-			// Set modified flag
-			modified(true);
-			// Update to this record
-			tabbed_forms_->update_views(requester, hint, record_num);
-		}
-		break;
-	case HT_START_CHANGED:
-		// The QSO start date has been changed. Re-order the book and tell everyone
-		this_record = get_record(current_item_, false);
-		erase(begin() + current_item_);
-		record_num = insert_record(this_record);
-		modified(true);
-		tabbed_forms_->update_views(requester, HT_ALL, record_num);
-		break;
-	default:
-		if (!inhibit_view_update_) {
-			tabbed_forms_->update_views(requester, hint, record_num);
-		}
-		break;
-	}
-	if (current_item_ != previous && !read_only_ && save_level_ == 0 && modified() && !save_in_progress_) {
+		if (current_item_ != previous && !read_only_ && save_level_ == 0 && modified() && !save_in_progress_) {
 #ifndef _DEBUG
-		store_data();
+			store_data();
 #endif // _DEBUG
+		}
+		// Update menu item activeness
+		menu_->update_items();
+		return record_num;
 	}
-	// Update menu item activeness
-	menu_->update_items();
-	return record_num;
 }
 
 // Get the current selected item

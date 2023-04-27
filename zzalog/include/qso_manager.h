@@ -79,10 +79,6 @@ using namespace std;
 			WRITE_FIELD
 		};
 
-		// Get logging mode
-		qso_data::logging_mode_t logging_mode();
-		// Set logging mode
-		void logging_mode(qso_data::logging_mode_t mode);
 		// Get logging state
 		qso_data::logging_state_t logging_state();
 		// Called when rig is read or changed

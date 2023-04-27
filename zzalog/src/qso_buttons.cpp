@@ -22,8 +22,9 @@ const Fl_Color COLOUR_NAVY = 136;  /* R=0/4, B=2/4, G=0/7 */
 
 map<qso_data::logging_state_t, list<qso_buttons::button_type> > button_map_ =
 {
-	{ qso_data::QSO_INACTIVE, {qso_buttons::ACTIVATE, qso_buttons::START_QSO, 
-		qso_buttons::START_NET, qso_buttons::EDIT_QSO, qso_buttons::ADD_NET, qso_buttons::BROWSE, qso_buttons::VIEW_QSL } },
+	{ qso_data::QSO_INACTIVE, {qso_buttons::ACTIVATE, qso_buttons::START_QSO, qso_buttons::ADD_QSO, 
+		qso_buttons::EDIT_QSO, qso_buttons::COPY_QSO, qso_buttons::CLONE_QSO, qso_buttons::START_NET, 
+		qso_buttons::ADD_NET, qso_buttons::BROWSE } },
 	{ qso_data::QSO_PENDING, { qso_buttons::START_QSO, qso_buttons::QUIT_QSO,
 		qso_buttons::START_NET, qso_buttons::EDIT_QTH } },
 	{ qso_data::QSO_STARTED, { qso_buttons::SAVE_QSO, qso_buttons::CANCEL_QSO, 
@@ -40,15 +41,18 @@ map<qso_data::logging_state_t, list<qso_buttons::button_type> > button_map_ =
 		qso_buttons::KEEP_BOTH_DUPES }},
 	{ qso_data::QRZ_MERGE, { qso_buttons::MERGE_DONE }},
 	{ qso_data::NET_STARTED, {qso_buttons::SAVE_NET, qso_buttons::SAVE_QSO, qso_buttons::CANCEL_QSO, qso_buttons::CANCEL_NET,
-		qso_buttons::ADD_QSO }},
-	{ qso_data::NET_EDIT, { qso_buttons::SAVE_EDIT_NET, qso_buttons::CANCEL_QSO, qso_buttons::ADD_QSO}}
+		qso_buttons::ADD_NET_QSO }},
+	{ qso_data::NET_EDIT, { qso_buttons::SAVE_EDIT_NET, qso_buttons::CANCEL_QSO, qso_buttons::ADD_NET_QSO}}
 };
 
 map<qso_buttons::button_type, qso_buttons::button_action> action_map_ =
 {
 	{ qso_buttons::ACTIVATE, { "Activate", "Pre-load QSO fields based on logging mode", FL_CYAN, qso_buttons::cb_activate, 0 } },
-	{ qso_buttons::START_QSO, { "Start QSO", "Start the QSO, after saving, and/or activating", FL_YELLOW, qso_buttons::cb_start, 0 } },
+	{ qso_buttons::START_QSO, { "Start QSO", "Start a QSO in real-time", FL_YELLOW, qso_buttons::cb_start, (void*)qso_data::QSO_ON_AIR } },
 	{ qso_buttons::EDIT_QSO, { "Edit QSO", "Edit the selected QSO", FL_MAGENTA, qso_buttons::cb_edit, 0 } },
+	{ qso_buttons::ADD_QSO, { "Add QSO", "Create a new record (no initialisation)", FL_YELLOW, qso_buttons::cb_start, (void*)qso_data::QSO_NONE }},
+	{ qso_buttons::COPY_QSO, { "Copy QSO", "Create a new record (copy call and conditions)", FL_YELLOW, qso_buttons::cb_start, (void*)qso_data::QSO_COPY_CALL }},
+	{ qso_buttons::CLONE_QSO, { "Clone QSO", "Create a new record (copy conditions)", FL_YELLOW, qso_buttons::cb_start, (void*)qso_data::QSO_COPY_CONDX }},
 	{ qso_buttons::BROWSE, { "Browse Log", "Browse the log without editing", FL_BLUE, qso_buttons::cb_bn_browse, 0}},
 	{ qso_buttons::QUIT_QSO, { "Quit", "Quit entry mode", COLOUR_PINK, qso_buttons::cb_cancel, 0 } },
 	{ qso_buttons::EDIT_QTH, { "Edit QTH", "Edit the details of the QTH macro", FL_BACKGROUND_COLOR, qso_buttons::cb_bn_edit_qth, 0 } },
@@ -75,10 +79,10 @@ map<qso_buttons::button_type, qso_buttons::button_action> action_map_ =
 	{ qso_buttons::MERGE_DONE, { "Done", "Save changes", COLOUR_APPLE, qso_buttons::cb_bn_save_merge, 0}},
 	{ qso_buttons::LOOK_ALL_TXT, { "all.txt?", "Look in WSJT-X all.txt file for possible contact", COLOUR_NAVY, qso_buttons::cb_bn_all_txt, 0 } },
 	{ qso_buttons::START_NET, { "Start Net", "Start a QSO with more than one other station", COLOUR_ORANGE, qso_buttons::cb_bn_start_net, 0 } },
-	{ qso_buttons::ADD_NET, { "Add QSOs", "Add QSOs with the same details as this", COLOUR_ORANGE, qso_buttons::cb_bn_add, 0}},
+	{ qso_buttons::ADD_NET, { "Add QSOs", "Add QSOs with the same details as this", COLOUR_ORANGE, qso_buttons::cb_bn_add_net, 0}},
 	{ qso_buttons::SAVE_NET, { "Save Net", "Log all the QSOs", COLOUR_APPLE, qso_buttons::cb_bn_save_all, 0}},
 	{ qso_buttons::CANCEL_NET, { "Quit Net", "Cancel all QSOs", COLOUR_MAUVE, qso_buttons::cb_bn_cancel_all, 0}},
-	{ qso_buttons::ADD_QSO, { "Add QSO", "Add a QSO to the net", COLOUR_ORANGE, qso_buttons::cb_bn_add, 0}},
+	{ qso_buttons::ADD_NET_QSO, { "Add QSO", "Add a QSO to the net", COLOUR_ORANGE, qso_buttons::cb_bn_add_net, 0}},
 	{ qso_buttons::SAVE_EDIT_NET, {"Save Net", "Save all QSOs in the net", FL_GREEN, qso_buttons::cb_bn_save_all} }
 };
 
@@ -129,6 +133,9 @@ void qso_buttons::create_form(int X, int Y) {
 			max_x = max(max_x, curr_x);
 		}
 	}
+	if (MAX_ACTIONS % NUMBER_PER_ROW != 0) {
+		curr_y += HBUTTON;
+	}
 
 	max_x += GAP;
 	curr_y += GAP;
@@ -143,7 +150,7 @@ void qso_buttons::enable_widgets() {
 	for (auto bn = buttons.begin(); bn != buttons.end() && ix < MAX_ACTIONS; bn++, ix++) {
 		const button_action& action = action_map_.at(*bn);
 		bn_action_[ix]->label(action.label);
-		bn_action_[ix]->tooltip(action.label);
+		bn_action_[ix]->tooltip(action.tooltip);
 		bn_action_[ix]->color(action.colour);
 		bn_action_[ix]->labelcolor(fl_contrast(FL_FOREGROUND_COLOR, action.colour));
 		bn_action_[ix]->callback(action.callback, action.userdata);
@@ -163,16 +170,17 @@ void qso_buttons::enable_widgets() {
 void qso_buttons::cb_activate(Fl_Widget* w, void* v) {
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
 	if (that->qso_data_->logging_state() == qso_data::QSO_INACTIVE) {
-		that->qso_data_->action_activate();
+		that->qso_data_->action_activate(qso_data::QSO_ON_AIR);
 	}
 }
 
 // Start QSO - transition from qso_data::QSO_INACTIVE->qso_data::QSO_PENDING->qso_data::QSO_STARTED
 void qso_buttons::cb_start(Fl_Widget* w, void* v) {
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
+	qso_data::qso_init_t mode = (qso_data::qso_init_t)(long)v;
 	switch (that->qso_data_->logging_state()) {
 	case qso_data::QSO_INACTIVE:
-		that->qso_data_->action_activate();
+		that->qso_data_->action_activate(mode);
 		// Fall into next state
 	case qso_data::QSO_PENDING:
 		that->qso_data_->action_start();
@@ -182,48 +190,46 @@ void qso_buttons::cb_start(Fl_Widget* w, void* v) {
 
 // Save QSO - transition through qso_data::QSO_PENDING->qso_data::QSO_STARTED->qso_data::QSO_INACTIVE saving QSO
 void qso_buttons::cb_save(Fl_Widget* w, void* v) {
-	qso_buttons* that = ancestor_view<qso_buttons>(w);
-	switch (that->qso_data_->logging_state()) {
+	qso_data* data = ancestor_view<qso_data>(w);
+	switch (data->logging_state()) {
 		// Two routes - QSO entry
-	case qso_data::QSO_PENDING:
-		that->qso_data_->action_start();
 	case qso_data::QSO_STARTED:
-		that->qso_data_->action_save();
-		that->qso_data_->action_activate();
+		data->action_save();
+		data->action_activate(qso_data::QSO_AS_WAS);
 		break;
 		// QSO editing
 	case qso_data::QSO_EDIT:
-		that->qso_data_->action_save_edit();
-		that->qso_data_->action_edit();
+		data->action_save_edit();
+		data->action_edit();
 		break;
 	case qso_data::NET_STARTED:
-		that->qso_data_->action_save();
+		data->action_save();
 		break;
 	}
 }
 
 // Cancel QSO - delete QSO; clear fields
 void qso_buttons::cb_cancel(Fl_Widget* w, void* v) {
-	qso_buttons* that = ancestor_view<qso_buttons>(w);
-	switch (that->qso_data_->logging_state()) {
+	qso_data* data = ancestor_view<qso_data>(w);
+	switch (data->logging_state()) {
 	case qso_data::QSO_PENDING:
-		that->qso_data_->action_deactivate();
+		data->action_deactivate();
 		break;
 	case qso_data::QSO_STARTED:
-		that->qso_data_->action_cancel();
-		that->qso_data_->action_activate();
+		data->action_cancel();
+		data->action_activate(qso_data::QSO_AS_WAS);
 		break;
 	case qso_data::QSO_EDIT:
-		that->qso_data_->action_cancel_edit();
+		data->action_cancel_edit();
 		break;
 	case qso_data::QSO_BROWSE:
-		that->qso_data_->action_cancel_browse();
+		data->action_cancel_browse();
 		break;
 	case qso_data::NET_STARTED:
-		that->qso_data_->action_cancel();
+		data->action_cancel();
 		break;
 	case qso_data::NET_EDIT:
-		that->qso_data_->action_cancel_net_edit();
+		data->action_cancel_net_edit();
 		break;
 	}
 }
@@ -430,13 +436,12 @@ void qso_buttons::cb_bn_cancel_all(Fl_Widget* w, void* v) {
 }
 
 // Add a QSO to the net
-void qso_buttons::cb_bn_add(Fl_Widget* w, void* v) {
+void qso_buttons::cb_bn_add_net(Fl_Widget* w, void* v) {
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
 	switch (that->qso_data_->logging_state()) {
 	case qso_data::QSO_INACTIVE:
 		that->qso_data_->action_edit();
 	case qso_data::QSO_EDIT:
-		that->qso_data_->logging_mode(qso_data::LM_OFF_AIR_CLONE);
 		that->qso_data_->action_create_net();
 		break;
 	case qso_data::NET_STARTED:
@@ -449,10 +454,9 @@ void qso_buttons::cb_bn_add(Fl_Widget* w, void* v) {
 // Start a net
 void qso_buttons::cb_bn_start_net(Fl_Widget* w, void* v) {
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
-	that->qso_data_->logging_mode(qso_data::LM_ON_AIR_NEW);
 	switch (that->qso_data_->logging_state()) {
 	case qso_data::QSO_INACTIVE:
-		that->qso_data_->action_activate();
+		that->qso_data_->action_activate(qso_data::QSO_ON_AIR);
 	case qso_data::QSO_PENDING:
 		that->qso_data_->action_start();
 	case qso_data::QSO_STARTED:

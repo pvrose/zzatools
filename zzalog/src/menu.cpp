@@ -373,8 +373,6 @@ void menu::cb_mi_file_open(Fl_Widget* w, void* v) {
 		extract_records_->clear_criteria();
 		// get book to load it.
 		if (book_->load_data(filename)) {
-			// Set off-air logging, clear any search results, select last entry
-			qso_manager_->logging_mode(qso_data::LM_OFF_AIR);
 			tabbed_forms_->activate_pane(OT_MAIN, true);
 			book_->navigate(NV_LAST);
 			// Set the filename in the window title and recent file list

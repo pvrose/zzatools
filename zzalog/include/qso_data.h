@@ -29,17 +29,6 @@ class qso_data :
     public Fl_Group
 {
 public:
-	enum logging_mode_t {
-		LM_FOR_PARSING, // Use current time
-		LM_OFF_AIR,     // Off-line logging (w/o radio)
-		LM_OFF_AIR_CLONE, // Off-line logging - data from selected QSO (except CALL) 
-		LM_ON_AIR_CAT,  // Real -time logging - data from radio
-		LM_ON_AIR_COPY, // Real-time logging - data from selected QSO
-		LM_ON_AIR_CLONE,// Real-time logging - data from selected QSO (except CALL)
-		LM_ON_AIR_TIME, // Real-time logging - date/time only
-		LM_ON_AIR_NEW,  // Real-time logging - either clone or CAT depending on state of CAT
-		//LM_IMPORTED,    // Import from modem software (w/ or w/o radio)
-	};
 
 	// Loggng state
 	enum logging_state_t {
@@ -63,6 +52,16 @@ public:
 		DF_BOTH
 	};
 
+	// Source of editing
+	enum qso_init_t {
+		QSO_ON_AIR,         // Start a QSO using current time and CAT if connected
+		QSO_NONE,           // Start a QSO with no initial values
+		QSO_COPY_CALL,      // Start a QSO copying callsign, station details and CAT conditions
+		QSO_COPY_CONDX,     // Start a QSO copying station details and CAT conditions
+		QSO_COPY_FOR_NET,   // Start a QSO copyin station details, CAT conditions and start time
+		QSO_AS_WAS,         // Used with action_activate() to maintain the existing one
+	};
+
 public:
 	qso_data(int X, int Y, int W, int H, const char* l);
 	~qso_data();
@@ -79,16 +78,12 @@ public:
 	// Create a dummy QSO
 	record* dummy_qso();
 	// Start a new QSO
-	void start_qso();
+	void start_qso(qso_init_t mode);
 	// End QSO
 	void end_qso();
 	// Edit QSO
 	void edit_qso();
 
-	// Get logging mode
-	qso_data::logging_mode_t logging_mode();
-	// Set logging mode
-	void logging_mode(qso_data::logging_mode_t mode);
 	// Get logging state
 	qso_data::logging_state_t logging_state();
 	// Get contest mode
@@ -121,7 +116,7 @@ public:
 
 	// State transition actions:-
 	// Create a new record per loging mode
-	void action_activate();
+	void action_activate(qso_init_t mode);
 	// Clear all QSO infp
 	void action_deactivate();
 	// Add new record to book, add time on
@@ -175,18 +170,14 @@ public:
 	// Cancel an individual net edit
 	void action_cancel_net_edit();
 	// Create a new QSO 
-	void action_new_qso(record* qso);
+	void action_new_qso(record* qso, qso_init_t mode);
 
 
 protected:
 	// Callbacks
-	// Logging mode
-	static void cb_logging_mode(Fl_Widget* w, void* v);
 	// QSL Viewer closed
 	static void cb_qsl_viewer(Fl_Widget* w, void* v);
 
-	// Logging mode
-	logging_mode_t logging_mode_;
 	// Logging state
 	logging_state_t logging_state_;
 	//// Current record - being entered or edited
@@ -206,6 +197,8 @@ protected:
 	string previous_locator_;
 	// Disable drawing update
 	bool inhibit_drawing_;
+	// Current starting mode
+	qso_init_t previous_mode_;
 
 
 	// Widgets
@@ -221,8 +214,6 @@ protected:
 	qso_buttons* g_buttons_;
 	// Group for freq/power/mode
 	Fl_Group* grp_fpm_;
-	// Logging mode
-	Fl_Choice* ch_logmode_;
 	// QSL Viewer window
 	qsl_viewer* qsl_viewer_;
 
