@@ -79,10 +79,10 @@ map<qso_buttons::button_type, qso_buttons::button_action> action_map_ =
 	{ qso_buttons::MERGE_DONE, { "Done", "Save changes", COLOUR_APPLE, qso_buttons::cb_bn_save_merge, 0}},
 	{ qso_buttons::LOOK_ALL_TXT, { "all.txt?", "Look in WSJT-X all.txt file for possible contact", COLOUR_NAVY, qso_buttons::cb_bn_all_txt, 0 } },
 	{ qso_buttons::START_NET, { "Start Net", "Start a QSO with more than one other station", COLOUR_ORANGE, qso_buttons::cb_bn_start_net, 0 } },
-	{ qso_buttons::ADD_NET, { "Add QSOs", "Add QSOs with the same details as this", COLOUR_ORANGE, qso_buttons::cb_bn_add_net, 0}},
+	{ qso_buttons::ADD_NET, { "Add Calls", "Add records with the same details as this", COLOUR_ORANGE, qso_buttons::cb_bn_add_net, 0}},
 	{ qso_buttons::SAVE_NET, { "Save Net", "Log all the QSOs", COLOUR_APPLE, qso_buttons::cb_bn_save_all, 0}},
 	{ qso_buttons::CANCEL_NET, { "Quit Net", "Cancel all QSOs", COLOUR_MAUVE, qso_buttons::cb_bn_cancel_all, 0}},
-	{ qso_buttons::ADD_NET_QSO, { "Add QSO", "Add a QSO to the net", COLOUR_ORANGE, qso_buttons::cb_bn_add_net, 0}},
+	{ qso_buttons::ADD_NET_QSO, { "Add Call", "Add a QSO with this call to the net", COLOUR_ORANGE, qso_buttons::cb_bn_add_net, 0}},
 	{ qso_buttons::SAVE_EDIT_NET, {"Save Net", "Save all QSOs in the net", FL_GREEN, qso_buttons::cb_bn_save_all} }
 };
 

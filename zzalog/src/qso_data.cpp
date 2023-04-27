@@ -531,8 +531,8 @@ void qso_data::action_save() {
 		break;
 	case NET_STARTED:
 		g_net_entry_->remove_entry();
+		logging_state_ = SWITCHING;
 		if (g_net_entry_->entries() == 0) {
-			logging_state_ = SWITCHING;
 			book_->modified(true);
 			book_->selection(item_number, HT_INSERTED);
 			logging_state_ = QSO_INACTIVE;
@@ -540,6 +540,7 @@ void qso_data::action_save() {
 		else {
 			book_->modified(true);
 			book_->selection(g_net_entry_->qso_number(), HT_INSERTED);
+			logging_state_ = NET_STARTED;
 		}
 		break;
 	}
@@ -1003,7 +1004,7 @@ void qso_data::action_add_net_qso() {
 	switch (logging_state_) {
 	case NET_STARTED:
 		logging_state_ = NET_ADDING;
-		action_new_qso(qso, QSO_COPY_CONDX);
+		action_new_qso(qso, QSO_ON_AIR);
 		logging_state_ = NET_STARTED;
 		break;
 	case NET_EDIT:

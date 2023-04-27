@@ -288,7 +288,7 @@ void qso_entry::copy_cat_to_qso() {
 // Copy current timestamp to QSO
 void qso_entry::copy_clock_to_qso() {
 	// Only allow this if it hasn't been done 
-	if (qso_ != nullptr) {
+	if (qso_ != nullptr && qso_->item("TIME_OFF").length() == 0) {
 		switch (qso_data_->logging_state()) {
 		case qso_data::QSO_INACTIVE:
 		case qso_data::QSO_PENDING:
