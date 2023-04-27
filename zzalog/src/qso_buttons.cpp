@@ -25,8 +25,8 @@ map<qso_data::logging_state_t, list<qso_buttons::button_type> > button_map_ =
 	{ qso_data::QSO_INACTIVE, {qso_buttons::ACTIVATE, qso_buttons::START_QSO, qso_buttons::ADD_QSO, 
 		qso_buttons::EDIT_QSO, qso_buttons::COPY_QSO, qso_buttons::CLONE_QSO, qso_buttons::START_NET, 
 		qso_buttons::ADD_NET, qso_buttons::BROWSE } },
-	{ qso_data::QSO_PENDING, { qso_buttons::START_QSO, qso_buttons::QUIT_QSO,
-		qso_buttons::START_NET, qso_buttons::EDIT_QTH } },
+	{ qso_data::QSO_PENDING, { qso_buttons::START_QSO, qso_buttons::ADD_QSO, qso_buttons::COPY_QSO, 
+		qso_buttons::CLONE_QSO, qso_buttons::QUIT_QSO, qso_buttons::START_NET, qso_buttons::EDIT_QTH } },
 	{ qso_data::QSO_STARTED, { qso_buttons::SAVE_QSO, qso_buttons::CANCEL_QSO, 
 		qso_buttons::START_NET, qso_buttons::EDIT_QTH, qso_buttons::WORKED_B4, qso_buttons::PARSE } },
 	{ qso_data::QSO_EDIT, { qso_buttons::SAVE_EDIT, qso_buttons::CANCEL_EDIT, 
@@ -183,7 +183,7 @@ void qso_buttons::cb_start(Fl_Widget* w, void* v) {
 		that->qso_data_->action_activate(mode);
 		// Fall into next state
 	case qso_data::QSO_PENDING:
-		that->qso_data_->action_start();
+		that->qso_data_->action_start(mode);
 		break;
 	}
 }
@@ -458,7 +458,7 @@ void qso_buttons::cb_bn_start_net(Fl_Widget* w, void* v) {
 	case qso_data::QSO_INACTIVE:
 		that->qso_data_->action_activate(qso_data::QSO_ON_AIR);
 	case qso_data::QSO_PENDING:
-		that->qso_data_->action_start();
+		that->qso_data_->action_start(qso_data::QSO_ON_AIR);
 	case qso_data::QSO_STARTED:
 		that->qso_data_->action_create_net();
 		break;

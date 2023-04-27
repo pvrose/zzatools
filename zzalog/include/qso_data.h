@@ -43,6 +43,7 @@ public:
 		QRZ_MERGE,       // Merge details downloaded from QRZ.com
 		NET_STARTED,     // Started several QSOs in a net.
 		NET_EDIT,        // Converting sngle QSO into a net by adding callsigns
+		SWITCHING,       // Switching state - used to ignore stuff
 	};
 
 	enum dupe_flags : int {
@@ -120,7 +121,7 @@ public:
 	// Clear all QSO infp
 	void action_deactivate();
 	// Add new record to book, add time on
-	void action_start();
+	void action_start(qso_init_t mode);
 	// Stop QSO - 
 	void action_save();
 	// Cancel QSO - remove new record from book

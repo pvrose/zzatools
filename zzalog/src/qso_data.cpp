@@ -455,9 +455,10 @@ void qso_data::action_activate(qso_init_t mode) {
 }
 
 // Action START - transition from QSO_PENDING to QSO_STARTED
-void qso_data::action_start() {
+void qso_data::action_start(qso_init_t mode) {
 	// Add to book
 	book_->enable_save(false);
+	action_new_qso(g_entry_->qso(), mode);
 	g_entry_->append_qso();
 	book_->selection(book_->item_number(g_entry_->qso_number()), HT_INSERTED);
 	logging_state_ = QSO_STARTED;
@@ -522,16 +523,18 @@ void qso_data::action_save() {
 	book_->upload_qso(qso_number);
 	switch (logging_state_) {
 	case QSO_STARTED:
-		logging_state_ = QSO_INACTIVE;
+		logging_state_ = SWITCHING;
 		book_->modified(true);
 		book_->selection(item_number, HT_INSERTED);
+		logging_state_ = QSO_INACTIVE;
 		break;
 	case NET_STARTED:
 		g_net_entry_->remove_entry();
 		if (g_net_entry_->entries() == 0) {
-			logging_state_ = QSO_INACTIVE;
+			logging_state_ = SWITCHING;
 			book_->modified(true);
 			book_->selection(item_number, HT_INSERTED);
+			logging_state_ = QSO_INACTIVE;
 		}
 		else {
 			book_->modified(true);
@@ -1129,7 +1132,7 @@ void qso_data::start_qso(qso_init_t mode) {
 		action_activate(mode);
 		// drop through
 	case qso_data::QSO_PENDING:
-		action_start();
+		action_start(mode);
 		break;
 	case qso_data::QSO_STARTED:
 	case NET_STARTED:
@@ -1149,7 +1152,7 @@ void qso_data::end_qso() {
 		status_->misc_status(ST_ERROR, "DASH: Cannot end a QSO that hasn't been started");
 		break;
 	case qso_data::QSO_PENDING:
-		action_start();
+		action_start(previous_mode_);
 		// drop through
 	case qso_data::QSO_STARTED:
 		action_save();
@@ -1212,9 +1215,13 @@ record* qso_data::current_qso() {
 
 // Update time and rig info
 void qso_data::ticker() {
-	g_entry_->copy_clock_to_qso();
-	g_net_entry_->ticker();
-	g_entry_->copy_cat_to_qso();
+	switch (previous_mode_) {
+	case QSO_ON_AIR:
+		g_entry_->copy_clock_to_qso();
+		g_net_entry_->ticker();
+		g_entry_->copy_cat_to_qso();
+		break;
+	}
 }
 
 // Call in editor
