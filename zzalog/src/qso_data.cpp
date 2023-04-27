@@ -406,6 +406,7 @@ void qso_data::action_new_qso(record* qso, qso_init_t mode) {
 	switch (logging_state_) {
 	case NET_STARTED:
 	case NET_EDIT:
+	case NET_ADDING:
 		qe = (qso_entry*)g_net_entry_->entry();
 		break;
 	default:
@@ -999,7 +1000,16 @@ void qso_data::action_add_net_qso() {
 	g_net_entry_->add_entry();
 	// Create the new QSO therein
 	book_->enable_save(false);
-	action_new_qso(qso, QSO_COPY_FOR_NET);
+	switch (logging_state_) {
+	case NET_STARTED:
+		logging_state_ = NET_ADDING;
+		action_new_qso(qso, QSO_COPY_CONDX);
+		logging_state_ = NET_STARTED;
+		break;
+	case NET_EDIT:
+		action_new_qso(qso, QSO_COPY_FOR_NET);
+		break;
+	}
 	// Add it to the book
 	g_net_entry_->append_qso();
 	book_->selection(book_->item_number(g_net_entry_->qso_number()), HT_INSERTED);

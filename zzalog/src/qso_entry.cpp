@@ -291,7 +291,9 @@ void qso_entry::copy_clock_to_qso() {
 	if (qso_ != nullptr) {
 		switch (qso_data_->logging_state()) {
 		case qso_data::QSO_INACTIVE:
-		case qso_data::QSO_PENDING: {
+		case qso_data::QSO_PENDING:
+		case qso_data::NET_ADDING:
+		{
 			time_t now = time(nullptr);
 			tm* value = gmtime(&now);
 			char result[100];

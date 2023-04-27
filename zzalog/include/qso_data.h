@@ -43,6 +43,7 @@ public:
 		QRZ_MERGE,       // Merge details downloaded from QRZ.com
 		NET_STARTED,     // Started several QSOs in a net.
 		NET_EDIT,        // Converting sngle QSO into a net by adding callsigns
+		NET_ADDING,      // Adding a new QSO to the started net.
 		SWITCHING,       // Switching state - used to ignore stuff
 	};
 
