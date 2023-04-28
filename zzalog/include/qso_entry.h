@@ -61,6 +61,9 @@ public:
 	// save value
 	void save_values();
 
+	// Handle override
+	int handle(int event);
+
 	// Set/get records
 	record* qso();
 	void qso(qso_num_t qso_number);
@@ -97,6 +100,9 @@ public:
 	// Initialise fields
 	void initialise_fields(string fields, bool new_fields, bool lock_preset);
 	void initialise_values(string fields, int contest_serial);
+
+	// Set initial focus
+	void set_initial_focus();
 
 
 protected:

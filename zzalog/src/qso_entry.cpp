@@ -49,6 +49,16 @@ qso_entry::~qso_entry() {
 	save_values();
 }
 
+// When shown set the focus to the most likely input widgets
+int qso_entry::handle(int event) {
+	switch (event) {
+	case FL_SHOW:
+		set_initial_focus();
+		return 1;
+	}
+	return Fl_Group::handle(event);
+}
+
 // Nothing so far
 void qso_entry::load_values() {
 }
@@ -175,6 +185,7 @@ void qso_entry::enable_widgets() {
 		hide();
 		break;
 	}
+	set_initial_focus();
 }
 
 // Copy record to the fields - reverse of above
@@ -333,6 +344,7 @@ void qso_entry::initialise_field_map() {
 		field_ip_map_[fixed_names_[ix]] = ix;
 	}
 }
+
 // Initialise fields
 void qso_entry::initialise_fields(string fields, bool new_fields, bool lock_preset) {
 	// Now set fields
@@ -614,5 +626,19 @@ void qso_entry::delete_qso() {
 		qso_number_ = -1;
 		delete original_qso_;
 		original_qso_ = nullptr;
+	}
+}
+
+// Set initial focus - try QSO_DATE then CALL 
+void qso_entry::set_initial_focus() {
+	if (field_ip_map_.find("QSO_DATE") != field_ip_map_.end()) {
+		field_input* w = ip_field_[field_ip_map_["QSO_DATE"]];
+		if (w && strlen(w->value()) == 0) {
+			if (w->take_focus()) return;
+		}
+	}
+	if (field_ip_map_.find("CALL") != field_ip_map_.end()) {
+		field_input* w = ip_field_[field_ip_map_["CALL"]];
+		if (w->take_focus()) return;
 	}
 }

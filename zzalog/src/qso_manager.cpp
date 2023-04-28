@@ -280,6 +280,8 @@ void qso_manager::update_qso(hint_t hint, qso_num_t match_num, qso_num_t query_n
 	case HT_MERGE_DETAILS:
 		data_group_->update_query(qso_data::QRZ_MERGE, match_num, query_num);
 	}
+	// Set this window to the top
+	show();
 }
 
 // Start QSO
