@@ -504,6 +504,15 @@ void qso_data::action_save() {
 	case QSO_COPY_CALL:
 	case QSO_COPY_CONDX:
 	case QSO_COPY_FOR_NET:
+		// All on-air modes - set cime-off to now
+		if (qso->item("TIME_OFF") == "") {
+			// Add end date/time - current time of interactive entering
+			// Get current date and time in UTC
+			string timestamp = now(false, "%Y%m%d%H%M%S");
+			qso->item("QSO_DATE_OFF", timestamp.substr(0, 8));
+			// Time as HHMMSS - always log seconds.
+			qso->item("TIME_OFF", timestamp.substr(8));
+		}
 		// Put the record in its correct position and save that position
 		item_number = book_->correct_record_position(item_number);
 		qso_number = book_->record_number(item_number);
