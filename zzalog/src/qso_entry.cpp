@@ -78,7 +78,7 @@ void qso_entry::create_form(int X, int Y) {
 	curr_y += HTEXT;
 	// Fixed fields
 	// N rows of NUMBER_PER_ROW
-	const int NUMBER_PER_ROW = 2;
+	const int NUMBER_PER_ROW = 3;
 	const int WCHOICE = WBUTTON * 3 / 2;
 	const int WINPUT = WBUTTON * 7 / 4;
 	for (int ix = 0; ix < NUMBER_TOTAL; ix++) {

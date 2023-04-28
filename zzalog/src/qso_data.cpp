@@ -500,7 +500,6 @@ void qso_data::action_save() {
 		// Increment contest serial number
 		g_contest_->increment_serial();
 		break;
-	case QSO_NONE:
 	case QSO_COPY_CALL:
 	case QSO_COPY_CONDX:
 	case QSO_COPY_FOR_NET:
@@ -513,6 +512,11 @@ void qso_data::action_save() {
 			// Time as HHMMSS - always log seconds.
 			qso->item("TIME_OFF", timestamp.substr(8));
 		}
+		// Put the record in its correct position and save that position
+		item_number = book_->correct_record_position(item_number);
+		qso_number = book_->record_number(item_number);
+		break;
+	case QSO_NONE:
 		// Put the record in its correct position and save that position
 		item_number = book_->correct_record_position(item_number);
 		qso_number = book_->record_number(item_number);

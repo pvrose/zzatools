@@ -40,12 +40,12 @@ public:
 	const set < copy_flags > COPY_SET = { CF_RIG_ETC, CF_CAT, CF_TIME, CF_CALL, CF_DETAILS, CF_REPORTS };
 
 	// Loggable field names
-	static const int NUMBER_FIXED = 10;
-	static const int NUMBER_TOTAL = NUMBER_FIXED + 12;
+	static const int NUMBER_FIXED = 11;
+	static const int NUMBER_TOTAL = NUMBER_FIXED + 13;
 protected:
 	const string fixed_names_[NUMBER_FIXED] = {
 		"MY_RIG", "MY_ANTENNA", "APP_ZZA_QTH", "STATION_CALLSIGN",
-		"QSO_DATE", "TIME_ON", "CALL", "FREQ",
+		"QSO_DATE", "TIME_ON", "TIME_OFF", "CALL", "FREQ",
 		"MODE", "TX_PWR" };
 	map<string, int> field_ip_map_;
 	string field_names_[NUMBER_TOTAL];
