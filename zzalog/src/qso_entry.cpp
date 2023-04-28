@@ -543,6 +543,12 @@ void qso_entry::cb_ip_field(Fl_Widget* w, void* v) {
 		// Update the selected rig CAT group
 		((qso_manager*)that->qso_data_->parent())->change_rig(value);
 	}
+	else if (field == "QSO_DATE" || field == "TIME_ON") {
+		// Reposition QSO in book
+		item_num_t item = book_->item_number(that->qso_number_);
+		item = book_->correct_record_position(item);
+		that->qso_number_ = book_->record_number(item);
+	}
 	// Update other views if editing or logging
 	switch (that->qso_data_->logging_state()) {
 	case qso_data::QSO_INACTIVE:

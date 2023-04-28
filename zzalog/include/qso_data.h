@@ -173,6 +173,8 @@ public:
 	void action_cancel_net_edit();
 	// Create a new QSO 
 	void action_new_qso(record* qso, qso_init_t mode);
+	// Delete the selected QSO
+	void action_delete_qso();
 
 
 protected:

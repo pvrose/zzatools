@@ -575,6 +575,17 @@ void qso_data::action_cancel() {
 	enable_widgets();
 }
 
+// Action DELETE - we should be inactive but leave this code 
+void qso_data::action_delete_qso() {
+	// book_->delete_record() will change the selected record - we need ti be inactive to ignore it
+	logging_state_t saved_state = logging_state_;
+	logging_state_ = QSO_INACTIVE;
+	book_->delete_record(true);
+	logging_state_ = saved_state;
+
+	enable_widgets();
+}
+
 // Action DEACTIVATE - Transition from QSO_PENDING to QSO_INACTIVE
 void qso_data::action_deactivate() {
 	g_entry_->delete_qso();

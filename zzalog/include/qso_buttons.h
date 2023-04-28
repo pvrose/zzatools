@@ -35,6 +35,7 @@ public:
 		CANCEL_EDIT,
 		CANCEL_BROWSE,
 		CANCEL_QSO,
+		DELETE_QSO,
 		QUIT_QSO,
 		SAVE_QSO,
 		SAVE_EDIT,
@@ -120,6 +121,8 @@ public:
 	static void cb_bn_add_net(Fl_Widget* w, void* v);
 	// Start a net
 	static void cb_bn_start_net(Fl_Widget* w, void* v);
+	// Delete the selected QSO
+	static void cb_bn_delete_qso(Fl_Widget* w, void* v);
 
 
 protected:

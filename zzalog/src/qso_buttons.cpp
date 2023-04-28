@@ -23,10 +23,10 @@ const Fl_Color COLOUR_NAVY = 136;  /* R=0/4, B=2/4, G=0/7 */
 map<qso_data::logging_state_t, list<qso_buttons::button_type> > button_map_ =
 {
 	{ qso_data::QSO_INACTIVE, {qso_buttons::ACTIVATE, qso_buttons::START_QSO, qso_buttons::ADD_QSO, 
-		qso_buttons::EDIT_QSO, qso_buttons::COPY_QSO, qso_buttons::CLONE_QSO, qso_buttons::START_NET, 
-		qso_buttons::ADD_NET, qso_buttons::BROWSE } },
-	{ qso_data::QSO_PENDING, { qso_buttons::START_QSO, qso_buttons::ADD_QSO, qso_buttons::COPY_QSO, 
-		qso_buttons::CLONE_QSO, qso_buttons::QUIT_QSO, qso_buttons::START_NET, qso_buttons::EDIT_QTH } },
+		qso_buttons::EDIT_QSO, qso_buttons::COPY_QSO, qso_buttons::CLONE_QSO, qso_buttons::DELETE_QSO,
+		qso_buttons::START_NET, qso_buttons::ADD_NET, qso_buttons::BROWSE } },
+	{ qso_data::QSO_PENDING, { qso_buttons::START_QSO, qso_buttons::ADD_QSO, qso_buttons::EDIT_QSO, qso_buttons::COPY_QSO, 
+		qso_buttons::CLONE_QSO, qso_buttons::QUIT_QSO, qso_buttons::SAVE_QSO, qso_buttons::START_NET, qso_buttons::EDIT_QTH } },
 	{ qso_data::QSO_STARTED, { qso_buttons::SAVE_QSO, qso_buttons::CANCEL_QSO, 
 		qso_buttons::START_NET, qso_buttons::EDIT_QTH, qso_buttons::WORKED_B4, qso_buttons::PARSE } },
 	{ qso_data::QSO_EDIT, { qso_buttons::SAVE_EDIT, qso_buttons::CANCEL_EDIT, 
@@ -58,6 +58,7 @@ map<qso_buttons::button_type, qso_buttons::button_action> action_map_ =
 	{ qso_buttons::EDIT_QTH, { "Edit QTH", "Edit the details of the QTH macro", FL_BACKGROUND_COLOR, qso_buttons::cb_bn_edit_qth, 0 } },
 	{ qso_buttons::SAVE_QSO, { "Save QSO", "Log the QSO, activate a new one", FL_GREEN, qso_buttons::cb_save, 0 } },
 	{ qso_buttons::CANCEL_QSO, { "Quit QSO", "Cancel the current QSO entry", COLOUR_PINK, qso_buttons::cb_cancel, 0 } },
+	{ qso_buttons::DELETE_QSO, { "Delete QSO", "Delete the selected QSO", FL_RED, qso_buttons::cb_bn_delete_qso, 0 } },
 	{ qso_buttons::WORKED_B4, { "B4?", "Display all previous QSOs with this callsign", FL_BACKGROUND_COLOR, qso_buttons::cb_wkb4, 0 } },
 	{ qso_buttons::SAVE_EDIT, { "Save", "Copy changed record back to book", FL_GREEN, qso_buttons::cb_save, 0}},
 	{ qso_buttons::CANCEL_EDIT, { "Cancel Edit", "Cancel the current QSO edit", COLOUR_PINK, qso_buttons::cb_cancel, 0 } },
@@ -192,6 +193,9 @@ void qso_buttons::cb_start(Fl_Widget* w, void* v) {
 void qso_buttons::cb_save(Fl_Widget* w, void* v) {
 	qso_data* data = ancestor_view<qso_data>(w);
 	switch (data->logging_state()) {
+	case qso_data::QSO_PENDING:
+		// If in pending then we can assume it's started
+		data->action_start(qso_data::QSO_AS_WAS);
 		// Two routes - QSO entry
 	case qso_data::QSO_STARTED:
 		data->action_save();
@@ -282,7 +286,7 @@ void qso_buttons::cb_bn_view_qsl(Fl_Widget* w, void* v) {
 // Callback - Edit QTH
 void qso_buttons::cb_bn_edit_qth(Fl_Widget* w, void* v) {
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
-	qso_manager* mgr = (qso_manager*)that->parent();
+	qso_manager* mgr = ancestor_view<qso_manager>(that);
 	string qth = mgr->get_default(qso_manager::QTH);
 	// Open QTH dialog
 	qth_dialog* dlg = new qth_dialog(qth);
@@ -465,3 +469,12 @@ void qso_buttons::cb_bn_start_net(Fl_Widget* w, void* v) {
 	}
 }
 
+// Delete the current QSO
+void qso_buttons::cb_bn_delete_qso(Fl_Widget* w, void* v) {
+	qso_buttons* that = ancestor_view<qso_buttons>(w);
+	switch (that->qso_data_->logging_state()) {
+	case qso_data::QSO_INACTIVE:
+		that->qso_data_->action_delete_qso();
+		break;
+	}
+}
