@@ -421,8 +421,8 @@ void qso_data::action_new_qso(record* qso, qso_init_t mode) {
 		qe->copy_qso_to_qso(qso, qso_entry::CF_RIG_ETC);
 		break;
 	case QSO_ON_AIR:
-		// Copy station details and get read rig details for band etc.
-		qe->copy_qso_to_qso(qso, qso_entry::CF_RIG_ETC);
+		// Copy station details and get read rig details for band etc. Keep call in case it's been edited
+		qe->copy_qso_to_qso(qso, qso_entry::CF_RIG_ETC | qso_entry::CF_CALL);
 		qe->copy_cat_to_qso();
 		qe->copy_clock_to_qso();
 		break;

@@ -19,8 +19,10 @@ public:
 		CF_RIG_ETC = 1,
 		CF_CAT = 2,
 		CF_TIME = 4,
-		CF_CONTACT = 8,
-		CF_REPORTS = 16,
+		CF_CALL = 8,
+		CF_DETAILS = 16,
+		CF_REPORTS = 32,
+		CF_CONTACT = CF_CALL | CF_DETAILS,
 		CF_QSO = CF_RIG_ETC | CF_CAT | CF_TIME | CF_CONTACT,
 		CF_ALL_FLAGS = -1
 	};
@@ -30,11 +32,12 @@ public:
 		{ CF_RIG_ETC, { "MY_RIG", "MY_ANTENNA", "STATION_CALLSIGN", "APP_ZZA_QTH" } },
 		{ CF_CAT, { "MODE", "FREQ", "SUBMODE", "TX_PWR", "BAND"} },
 		{ CF_TIME, { "QSO_DATE", "QSO_DATE_OFF", "TIME_ON", "TIME_OFF" } },
-		{ CF_CONTACT, { "CALL", "NAME", "QTH", "DXCC", "STATE", "CNTY", "GRIDSQUARE", "CQZ", "ITUZ" } },
+		{ CF_CALL, { "CALL" }},
+		{ CF_DETAILS, { "NAME", "QTH", "DXCC", "STATE", "CNTY", "GRIDSQUARE", "CQZ", "ITUZ" } },
 		{ CF_REPORTS, { "RST_SENT", "RST_RCVD", "SRX", "STX" }}
 	};
 
-	const set < copy_flags > COPY_SET = { CF_RIG_ETC, CF_CAT, CF_TIME, CF_CONTACT, CF_REPORTS };
+	const set < copy_flags > COPY_SET = { CF_RIG_ETC, CF_CAT, CF_TIME, CF_CALL, CF_DETAILS, CF_REPORTS };
 
 	// Loggable field names
 	static const int NUMBER_FIXED = 10;
