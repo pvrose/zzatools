@@ -196,10 +196,10 @@ void qso_manager::cb_close(Fl_Widget* w, void* v) {
 	if (that->data_group_->logging_state() == qso_data::qso_data::QSO_EDIT ||
 		that->data_group_->logging_state() == qso_data::qso_data::QSO_STARTED) {
 		if (fl_choice("Entering a record - save or cancel?", "Cancel", "Save", nullptr) == 1) {
-			qso_buttons::cb_save(w, v);
+			qso_buttons::cb_save(that->data_group_, v);
 		}
 		else {
-			qso_buttons::cb_cancel(w, v);
+			qso_buttons::cb_cancel(that->data_group_, v);
 		}
 	}
 	// Call the main window callback to close the app.
