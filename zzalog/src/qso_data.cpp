@@ -193,7 +193,7 @@ void qso_data::enable_widgets() {
 			g_net_entry_->enable_widgets();
 			break;
 		}
-		g_buttons_->enable_widgets();
+//		g_buttons_->enable_widgets();
 	}
 }
 

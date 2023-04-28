@@ -167,17 +167,27 @@ void qso_buttons::enable_widgets() {
 
 }
 
+// Deactivate all buttons to prevent double clicking
+void qso_buttons::disable_widgets() {
+	for (int ix = 0; ix < MAX_ACTIONS; ix++) {
+		bn_action_[ix]->deactivate();
+	}
+}
+
 // Activate- Go from qso_data::QSO_INACTIVE to qso_data::QSO_PENDING
 void qso_buttons::cb_activate(Fl_Widget* w, void* v) {
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
+	that->disable_widgets();
 	if (that->qso_data_->logging_state() == qso_data::QSO_INACTIVE) {
 		that->qso_data_->action_activate(qso_data::QSO_ON_AIR);
 	}
+	that->enable_widgets();
 }
 
 // Start QSO - transition from qso_data::QSO_INACTIVE->qso_data::QSO_PENDING->qso_data::QSO_STARTED
 void qso_buttons::cb_start(Fl_Widget* w, void* v) {
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
+	that->disable_widgets();
 	qso_data::qso_init_t mode = (qso_data::qso_init_t)(long)v;
 	switch (that->qso_data_->logging_state()) {
 	case qso_data::QSO_INACTIVE:
@@ -187,11 +197,14 @@ void qso_buttons::cb_start(Fl_Widget* w, void* v) {
 		that->qso_data_->action_start(mode);
 		break;
 	}
+	that->enable_widgets();
 }
 
 // Save QSO - transition through qso_data::QSO_PENDING->qso_data::QSO_STARTED->qso_data::QSO_INACTIVE saving QSO
 void qso_buttons::cb_save(Fl_Widget* w, void* v) {
 	qso_data* data = ancestor_view<qso_data>(w);
+	qso_buttons* that = ancestor_view<qso_buttons>(w);
+	that->disable_widgets();
 	switch (data->logging_state()) {
 	case qso_data::QSO_PENDING:
 		// If in pending then we can assume it's started
@@ -210,11 +223,14 @@ void qso_buttons::cb_save(Fl_Widget* w, void* v) {
 		data->action_save();
 		break;
 	}
+	that->enable_widgets();
 }
 
 // Cancel QSO - delete QSO; clear fields
 void qso_buttons::cb_cancel(Fl_Widget* w, void* v) {
 	qso_data* data = ancestor_view<qso_data>(w);
+	qso_buttons* that = ancestor_view<qso_buttons>(w);
+	that->disable_widgets();
 	switch (data->logging_state()) {
 	case qso_data::QSO_PENDING:
 		data->action_deactivate();
@@ -236,11 +252,13 @@ void qso_buttons::cb_cancel(Fl_Widget* w, void* v) {
 		data->action_cancel_net_edit();
 		break;
 	}
+	that->enable_widgets();
 }
 
 // Edit QSO - transition to qso_data::QSO_EDIT
 void qso_buttons::cb_edit(Fl_Widget* w, void* v) {
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
+	that->disable_widgets();
 	switch (that->qso_data_->logging_state()) {
 	case qso_data::QSO_INACTIVE:
 		that->qso_data_->action_edit();
@@ -250,18 +268,22 @@ void qso_buttons::cb_edit(Fl_Widget* w, void* v) {
 		that->qso_data_->action_edit();
 		break;
 	}
+	that->enable_widgets();
 }
 
 // Callback - Worked B4? button
 void qso_buttons::cb_wkb4(Fl_Widget* w, void* v) {
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
+	that->disable_widgets();
 	extract_records_->extract_call(that->qso_data_->get_call());
 	book_->selection(that->qso_data_->get_default_number(), HT_SELECTED);
+	that->enable_widgets();
 }
 
 // Callback - Parse callsign
 void qso_buttons::cb_parse(Fl_Widget* w, void* v) {
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
+	that->disable_widgets();
 	// Create a temporary record to parse the callsign
 	record* tip_record = that->qso_data_->dummy_qso();
 	string message = "";
@@ -275,17 +297,21 @@ void qso_buttons::cb_parse(Fl_Widget* w, void* v) {
 	// Set the timeout on the tooltip
 	Fl::add_timeout(Fl_Tooltip::delay(), cb_timer_tip, tw);
 	delete tip_record;
+	that->enable_widgets();
 }
 
 // Callback - view QSL button
 void qso_buttons::cb_bn_view_qsl(Fl_Widget* w, void* v) {
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
+	that->disable_widgets();
 	that->qso_data_->action_view_qsl();
+	that->enable_widgets();
 }
 
 // Callback - Edit QTH
 void qso_buttons::cb_bn_edit_qth(Fl_Widget* w, void* v) {
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
+	that->disable_widgets();
 	qso_manager* mgr = ancestor_view<qso_manager>(that);
 	string qth = mgr->get_default(qso_manager::QTH);
 	// Open QTH dialog
@@ -307,19 +333,23 @@ void qso_buttons::cb_bn_edit_qth(Fl_Widget* w, void* v) {
 		break;
 	}
 	delete dlg;
+	that->enable_widgets();
 }
 
 // CAllback - navigate buttons
 // v - direction
 void qso_buttons::cb_bn_navigate(Fl_Widget* w, void* v) {
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
+	that->disable_widgets();
 	navigate_t target = (navigate_t)(long)v;
 	that->qso_data_->action_navigate(target);
+	that->enable_widgets();
 }
 
 // Callback - browse
 void qso_buttons::cb_bn_browse(Fl_Widget* w, void* v) {
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
+	that->disable_widgets();
 	switch (that->qso_data_->logging_state()) {
 	case qso_data::QSO_INACTIVE:
 		that->qso_data_->action_browse();
@@ -327,11 +357,13 @@ void qso_buttons::cb_bn_browse(Fl_Widget* w, void* v) {
 	default:
 		break;
 	}
+	that->enable_widgets();
 }
 
 // Callback - add query record
 void qso_buttons::cb_bn_add_query(Fl_Widget* w, void* v) {
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
+	that->disable_widgets();
 	switch (that->qso_data_->logging_state()) {
 	case qso_data::QUERY_MATCH:
 	case qso_data::QUERY_NEW:
@@ -340,11 +372,13 @@ void qso_buttons::cb_bn_add_query(Fl_Widget* w, void* v) {
 	default:
 		break;
 	}
+	that->enable_widgets();
 }
 
 // Callback - add query record
 void qso_buttons::cb_bn_reject_query(Fl_Widget* w, void* v) {
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
+	that->disable_widgets();
 	switch (that->qso_data_->logging_state()) {
 	case qso_data::QUERY_MATCH:
 	case qso_data::QUERY_NEW:
@@ -353,11 +387,13 @@ void qso_buttons::cb_bn_reject_query(Fl_Widget* w, void* v) {
 	default:
 		break;
 	}
+	that->enable_widgets();
 }
 
 // Callback - add query record
 void qso_buttons::cb_bn_merge_query(Fl_Widget* w, void* v) {
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
+	that->disable_widgets();
 	switch (that->qso_data_->logging_state()) {
 	case qso_data::QUERY_MATCH:
 	case qso_data::QUERY_NEW:
@@ -366,11 +402,13 @@ void qso_buttons::cb_bn_merge_query(Fl_Widget* w, void* v) {
 	default:
 		break;
 	}
+	that->enable_widgets();
 }
 
 // Callback - add query record
 void qso_buttons::cb_bn_find_match(Fl_Widget* w, void* v) {
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
+	that->disable_widgets();
 	switch (that->qso_data_->logging_state()) {
 	case qso_data::QUERY_NEW:
 		that->qso_data_->action_find_match();
@@ -378,11 +416,13 @@ void qso_buttons::cb_bn_find_match(Fl_Widget* w, void* v) {
 	default:
 		break;
 	}
+	that->enable_widgets();
 }
 
 // Callback - dupe action
 void qso_buttons::cb_bn_dupe(Fl_Widget* w, void* v) {
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
+	that->disable_widgets();
 	qso_data::dupe_flags action = (qso_data::dupe_flags)(long)v;
 	switch (that->qso_data_->logging_state()) {
 	case qso_data::QUERY_DUPE:
@@ -391,11 +431,13 @@ void qso_buttons::cb_bn_dupe(Fl_Widget* w, void* v) {
 	default:
 		break;
 	}
+	that->enable_widgets();
 }
 
 // Callback QRZ merge action
 void qso_buttons::cb_bn_save_merge(Fl_Widget* w, void* v) {
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
+	that->disable_widgets();
 	switch (that->qso_data_->logging_state()) {
 	case qso_data::QRZ_MERGE:
 		that->qso_data_->action_save_merge();
@@ -403,11 +445,13 @@ void qso_buttons::cb_bn_save_merge(Fl_Widget* w, void* v) {
 	default:
 		break;
 	}
+	that->enable_widgets();
 }
 
 // Callback Find QSO in WSJT-X
 void qso_buttons::cb_bn_all_txt(Fl_Widget* w, void* v) {
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
+	that->disable_widgets();
 	switch (that->qso_data_->logging_state()) {
 	case qso_data::QUERY_NEW:
 	case qso_data::QUERY_MATCH:
@@ -416,32 +460,38 @@ void qso_buttons::cb_bn_all_txt(Fl_Widget* w, void* v) {
 	default:
 		break;
 	}
+	that->enable_widgets();
 }
 
 // Save all qsos
 void qso_buttons::cb_bn_save_all(Fl_Widget* w, void* v) {
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
+	that->disable_widgets();
 	switch (that->qso_data_->logging_state()) {
 	case qso_data::NET_STARTED:
 	case qso_data::NET_EDIT:
 		that->qso_data_->action_save_net_all();
 		break;
 	}
+	that->enable_widgets();
 }
 
 // Cancel all QSOs
 void qso_buttons::cb_bn_cancel_all(Fl_Widget* w, void* v) {
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
+	that->disable_widgets();
 	switch (that->qso_data_->logging_state()) {
 	case qso_data::NET_STARTED:
 		that->qso_data_->action_cancel_net_all();
 		break;
 	}
+	that->enable_widgets();
 }
 
 // Add a QSO to the net
 void qso_buttons::cb_bn_add_net(Fl_Widget* w, void* v) {
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
+	that->disable_widgets();
 	switch (that->qso_data_->logging_state()) {
 	case qso_data::QSO_INACTIVE:
 		that->qso_data_->action_edit();
@@ -453,11 +503,13 @@ void qso_buttons::cb_bn_add_net(Fl_Widget* w, void* v) {
 		that->qso_data_->action_add_net_qso();
 		break;
 	}
+	that->enable_widgets();
 }
 
 // Start a net
 void qso_buttons::cb_bn_start_net(Fl_Widget* w, void* v) {
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
+	that->disable_widgets();
 	switch (that->qso_data_->logging_state()) {
 	case qso_data::QSO_INACTIVE:
 		that->qso_data_->action_activate(qso_data::QSO_ON_AIR);
@@ -467,14 +519,17 @@ void qso_buttons::cb_bn_start_net(Fl_Widget* w, void* v) {
 		that->qso_data_->action_create_net();
 		break;
 	}
+	that->enable_widgets();
 }
 
 // Delete the current QSO
 void qso_buttons::cb_bn_delete_qso(Fl_Widget* w, void* v) {
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
+	that->disable_widgets();
 	switch (that->qso_data_->logging_state()) {
 	case qso_data::QSO_INACTIVE:
 		that->qso_data_->action_delete_qso();
 		break;
 	}
+	that->enable_widgets();
 }

@@ -126,6 +126,10 @@ public:
 
 
 protected:
+
+	// Disanle all buttons
+	void disable_widgets();
+
 	// Maps that require both qso_data a
 	//static map<qso_data::logging_state_t, list<qso_buttons::button_type> > button_map_;
 	//static map<button_type, button_action> action_map_;
