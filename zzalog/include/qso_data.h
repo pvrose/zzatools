@@ -136,7 +136,7 @@ public:
 	// Navigate
 	void action_navigate(int target);
 	// Update QSL viewer
-	void action_view_qsl();
+	void action_view_qsl(bool force = false);
 	// Browse record
 	void action_browse();
 	// Action cancel browse

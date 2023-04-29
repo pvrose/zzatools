@@ -304,7 +304,7 @@ void qso_buttons::cb_parse(Fl_Widget* w, void* v) {
 void qso_buttons::cb_bn_view_qsl(Fl_Widget* w, void* v) {
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
 	that->disable_widgets();
-	that->qso_data_->action_view_qsl();
+	that->qso_data_->action_view_qsl(true);
 	that->enable_widgets();
 }
 

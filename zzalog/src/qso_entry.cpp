@@ -645,6 +645,8 @@ void qso_entry::set_initial_focus() {
 	}
 	if (field_ip_map_.find("CALL") != field_ip_map_.end()) {
 		field_input* w = ip_field_[field_ip_map_["CALL"]];
-		if (w->take_focus()) return;
+		if (w && strlen(w->value()) == 0) {
+			if (w->take_focus()) return;
+		}
 	}
 }

@@ -292,9 +292,7 @@ void qso_data::update_qso(qso_num_t log_num) {
 		}
 		break;
 	}
-	if (qsl_viewer_->visible()) {
-		action_view_qsl();
-	}
+	action_view_qsl();
 }
 
 // Update query
@@ -687,22 +685,24 @@ void qso_data::action_navigate(int target) {
 }
 
 // Action view qsl
-void qso_data::action_view_qsl() {
-	record* qso = book_->get_record(book_->item_number(get_default_number()), false);
-	if (qso) {
-		char title[128];
-		snprintf(title, 128, "QSL Status: %s %s %s %s %s",
-			qso->item("CALL").c_str(),
-			qso->item("QSO_DATE").c_str(),
-			qso->item("TIME_ON").c_str(),
-			qso->item("BAND").c_str(),
-			qso->item("MODE", true, true).c_str());
-		qsl_viewer_->copy_label(title);
-		qsl_viewer_->set_qso(qso, book_->selection());
-		qsl_viewer_->show();
-		char msg[128];
-		snprintf(msg, 128, "DASH: %s", title);
-		status_->misc_status(ST_LOG, msg);
+void qso_data::action_view_qsl(bool force) {
+	if (force || qsl_viewer_->visible()) {
+		record* qso = book_->get_record(book_->item_number(get_default_number()), false);
+		if (qso) {
+			char title[128];
+			snprintf(title, 128, "QSL Status: %s %s %s %s %s",
+				qso->item("CALL").c_str(),
+				qso->item("QSO_DATE").c_str(),
+				qso->item("TIME_ON").c_str(),
+				qso->item("BAND").c_str(),
+				qso->item("MODE", true, true).c_str());
+			qsl_viewer_->copy_label(title);
+			qsl_viewer_->set_qso(qso, book_->selection());
+			qsl_viewer_->show();
+			char msg[128];
+			snprintf(msg, 128, "DASH: %s", title);
+			status_->misc_status(ST_LOG, msg);
+		}
 	}
 }
 
