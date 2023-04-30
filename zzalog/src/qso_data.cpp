@@ -201,8 +201,12 @@ void qso_data::enable_widgets() {
 void qso_data::update_qso(qso_num_t log_num) {
 	switch (logging_state_) {
 	case QSO_INACTIVE:
-		// Do nothing
+	{
+		// Copy selected QSO 
+		record* qso = book_->get_record();
+		g_entry_->copy_qso_to_qso(qso, qso_entry::CF_ALL_FLAGS);
 		break;
+	}
 	case QSO_PENDING:
 		if (log_num != g_entry_->qso_number()) {
 			// Deactivate then reactivate with new QSO
