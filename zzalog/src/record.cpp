@@ -45,7 +45,10 @@ bool record::operator > (record& them) {
 	if (my_time > their_time) {
 		return true;
 	}
-	else {
+	else if (my_time == their_time && item("CALL") > them.item("CALL")) {
+		// If times are equal then sort on call
+		return true;
+	} else {
 		return false;
 	}
 }

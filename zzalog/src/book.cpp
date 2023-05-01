@@ -1269,6 +1269,11 @@ void book::check_dupes(bool restart) {
 			selection(duplicate_item_ + 1, HT_DUPE_QUERY, nullptr, duplicate_item_);
 			possible_dupe = true;
 			break;
+		case MT_OVERLAP:
+			if (record_1->item("CALL") != record_2->item("CALL")) {
+				break;
+			}
+			// Else drop through
 		default:
 			// Open QSO query 
 			match_question_ = "Possible duplicate record found";
