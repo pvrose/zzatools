@@ -1066,6 +1066,8 @@ void qso_data::action_add_net_qso() {
 
 // Save the whole net
 void qso_data::action_save_net_all() {
+	// Only save the book once all records have been saved
+	book_->enable_save(false);
 	while (g_net_entry_->entries()) {
 		switch (logging_state_) {
 		case NET_STARTED:
@@ -1078,6 +1080,7 @@ void qso_data::action_save_net_all() {
 	}
 	// Restore the place-holder entry
 	g_net_entry_->add_entry();
+	book_->enable_save(true);
 	enable_widgets();
 }
 
@@ -1093,7 +1096,6 @@ void qso_data::action_save_net_edit() {
 	else {
 		logging_state_ = NET_EDIT;
 	}
-	book_->enable_save(true);
 	enable_widgets();
 }
 
