@@ -999,9 +999,10 @@ void qso_data::action_copy_all_text(string text) {
 
 }
 
-// Create a net from current QSO
+// Create a net from current QSO and others which overlap
 void qso_data::action_create_net() {
 	qso_num_t qso_number = g_entry_->qso_number();
+	record* qso = g_entry_->qso();
 	string call = get_call();
 	char msg[128];
 	g_net_entry_->set_qso(qso_number);
@@ -1017,6 +1018,22 @@ void qso_data::action_create_net() {
 		snprintf(msg, sizeof(msg), "DASH: Trying to create a net for %s when neither started nor editing", call.c_str());
 		status_->misc_status(ST_SEVERE, msg);
 		break;
+	}
+	// Now add the remaining QSOs in the net - first look earlier
+	qso_num_t other_number = qso_number - 1;
+	while (qso->match_records(book_->get_record(other_number, false)) == MT_OVERLAP) {
+		g_net_entry_->add_entry();
+		g_net_entry_->set_qso(other_number);
+		g_net_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
+		other_number--;
+	}
+	// Now look later
+	other_number = qso_number + 1;
+	while (qso->match_records(book_->get_record(other_number, false)) == MT_OVERLAP) {
+		g_net_entry_->add_entry();
+		g_net_entry_->set_qso(other_number);
+		g_net_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
+		other_number++;
 	}
 	enable_widgets();
 }

@@ -26,7 +26,8 @@ using namespace std;
 		MT_LOC_MISMATCH,     // A close match but a location field differs
 		MT_SWL_MATCH,        // An SWL report that is a close match to existing activity
 		MT_SWL_NOMATCH,      // An SWL report that is no match for any activity
-		MT_2XSWL_MATCH       // An SWL report matches an existing SWL report
+		MT_2XSWL_MATCH,      // An SWL report matches an existing SWL report
+		MT_OVERLAP,          // The two records have same freq/mode and times overlap
 	};
 
 	// Location source

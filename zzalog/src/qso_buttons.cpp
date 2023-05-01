@@ -19,13 +19,13 @@ map<qso_data::logging_state_t, list<qso_buttons::button_type> > button_map_ =
 {
 	{ qso_data::QSO_INACTIVE, {qso_buttons::ACTIVATE, qso_buttons::START_QSO, qso_buttons::ADD_QSO, 
 		qso_buttons::EDIT_QSO, qso_buttons::COPY_QSO, qso_buttons::CLONE_QSO, qso_buttons::DELETE_QSO,
-		qso_buttons::START_NET, qso_buttons::ADD_NET, qso_buttons::BROWSE } },
+		qso_buttons::START_NET, qso_buttons::EDIT_NET, qso_buttons::BROWSE } },
 	{ qso_data::QSO_PENDING, { qso_buttons::START_QSO, qso_buttons::ADD_QSO, qso_buttons::EDIT_QSO, qso_buttons::COPY_QSO, 
 		qso_buttons::CLONE_QSO, qso_buttons::QUIT_QSO, qso_buttons::SAVE_QSO, qso_buttons::START_NET } },
 	{ qso_data::QSO_STARTED, { qso_buttons::SAVE_QSO, qso_buttons::CANCEL_QSO, 
 		qso_buttons::START_NET, qso_buttons::WORKED_B4, qso_buttons::PARSE } },
 	{ qso_data::QSO_EDIT, { qso_buttons::SAVE_EDIT, qso_buttons::CANCEL_EDIT, 
-		qso_buttons::ADD_NET, qso_buttons::NAV_FIRST,
+		qso_buttons::EDIT_NET, qso_buttons::NAV_FIRST,
 		qso_buttons::NAV_PREV, qso_buttons::NAV_NEXT, qso_buttons::NAV_LAST, qso_buttons::VIEW_QSL } },
 	{ qso_data::QSO_BROWSE, { qso_buttons::EDIT_QSO, qso_buttons::CANCEL_BROWSE, qso_buttons::NAV_FIRST,
 		qso_buttons::NAV_PREV, qso_buttons::NAV_NEXT, qso_buttons::NAV_LAST, qso_buttons::VIEW_QSL } },
@@ -48,7 +48,7 @@ map<qso_buttons::button_type, qso_buttons::button_action> action_map_ =
 	{ qso_buttons::ADD_QSO, { "Add QSO", "Create a new record (no initialisation)", FL_YELLOW, qso_buttons::cb_start, (void*)qso_data::QSO_NONE }},
 	{ qso_buttons::COPY_QSO, { "Copy QSO", "Create a new record (copy call and conditions)", FL_YELLOW, qso_buttons::cb_start, (void*)qso_data::QSO_COPY_CALL }},
 	{ qso_buttons::CLONE_QSO, { "Clone QSO", "Create a new record (copy conditions)", FL_YELLOW, qso_buttons::cb_start, (void*)qso_data::QSO_COPY_CONDX }},
-	{ qso_buttons::BROWSE, { "Browse Log", "Browse the log without editing", FL_BLUE, qso_buttons::cb_bn_browse, 0}},
+	{ qso_buttons::BROWSE, { "Browse Log", "Browse the log without editing", FL_BLUE, qso_buttons::cb_bn_browse, 0}} ,
 	{ qso_buttons::QUIT_QSO, { "Quit", "Quit entry mode", COLOUR_PINK, qso_buttons::cb_cancel, 0 } },
 	{ qso_buttons::SAVE_QSO, { "Save QSO", "Log the QSO, activate a new one", FL_GREEN, qso_buttons::cb_save, 0 } },
 	{ qso_buttons::CANCEL_QSO, { "Quit QSO", "Cancel the current QSO entry", COLOUR_PINK, qso_buttons::cb_cancel, 0 } },
@@ -69,16 +69,16 @@ map<qso_buttons::button_type, qso_buttons::button_action> action_map_ =
 	{ qso_buttons::FIND_QSO, { "@search", "Display possible match", FL_YELLOW, qso_buttons::cb_bn_find_match, 0}},
 	{ qso_buttons::KEEP_DUPE_1, { "Keep 1", "Keep first QSO and delete second", COLOUR_APPLE, qso_buttons::cb_bn_dupe, (void*)qso_data::DF_1}},
 	{ qso_buttons::KEEP_DUPE_2, { "Keep 2", "Keep second QSO and delete first", COLOUR_APPLE, qso_buttons::cb_bn_dupe, (void*)qso_data::DF_2}},
-	{ qso_buttons::MERGE_DUPE, { "Merge", "Merge the two records", COLOUR_ORANGE, qso_buttons::cb_bn_dupe, (void*)qso_data::DF_MERGE}},
+	{ qso_buttons::MERGE_DUPE, { "Merge", "Merge the two records", FL_MAGENTA, qso_buttons::cb_bn_dupe, (void*)qso_data::DF_MERGE}},
 	{ qso_buttons::KEEP_BOTH_DUPES, { "Keep 1 && 2", "Keep both records", FL_GREEN, qso_buttons::cb_bn_dupe, (void*)qso_data::DF_BOTH}},
-	{ qso_buttons::MERGE_DONE, { "Done", "Save changes", COLOUR_APPLE, qso_buttons::cb_bn_save_merge, 0}},
+	{ qso_buttons::MERGE_DONE, { "Done", "Save changes", COLOUR_APPLE, qso_buttons::cb_bn_save_merge, 0} },
 	{ qso_buttons::LOOK_ALL_TXT, { "all.txt?", "Look in WSJT-X all.txt file for possible contact", COLOUR_NAVY, qso_buttons::cb_bn_all_txt, 0 } },
 	{ qso_buttons::START_NET, { "Start Net", "Start a QSO with more than one other station", COLOUR_ORANGE, qso_buttons::cb_bn_start_net, 0 } },
-	{ qso_buttons::ADD_NET, { "Add Calls", "Add records with the same details as this", COLOUR_ORANGE, qso_buttons::cb_bn_add_net, 0}},
+	{ qso_buttons::EDIT_NET, { "Edit Net", "Open all calls that overlap", FL_DARK_MAGENTA, qso_buttons::cb_bn_add_net, 0}},
 	{ qso_buttons::SAVE_NET, { "Save Net", "Log all the QSOs", COLOUR_APPLE, qso_buttons::cb_bn_save_all, 0}},
 	{ qso_buttons::CANCEL_NET, { "Quit Net", "Cancel all QSOs", COLOUR_MAUVE, qso_buttons::cb_bn_cancel_all, 0}},
 	{ qso_buttons::ADD_NET_QSO, { "Add Call", "Add a QSO with this call to the net", COLOUR_ORANGE, qso_buttons::cb_bn_add_net, 0}},
-	{ qso_buttons::SAVE_EDIT_NET, {"Save Net", "Save all QSOs in the net", FL_GREEN, qso_buttons::cb_bn_save_all} }
+	{ qso_buttons::SAVE_EDIT_NET, {"Save Net", "Save all QSOs in the net", FL_GREEN, qso_buttons::cb_bn_save_all, 0} }
 };
 
 qso_buttons::qso_buttons(int X, int Y, int W, int H, const char* L) :

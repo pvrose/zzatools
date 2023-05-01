@@ -813,6 +813,7 @@ match_result_t record::match_records(record* record) {
 	// Match conditions
 	int nondate_mismatch_count = 0; // Important fields mismatch
 	int trivial_mismatch_count = 0; // Trivial fields mismatch
+	int net_mismatch_count = 0; // QSOs do not form part of a net
 	bool dates_match = true;
 	bool location_match = true;
 	bool swl_match = true;
@@ -861,6 +862,7 @@ match_result_t record::match_records(record* record) {
 			if (!(items_match(record, field_name))) {
 				swl_match = false;
 				nondate_mismatch_count++;
+				net_mismatch_count++;
 			}
 		}
 		else if (
@@ -891,6 +893,16 @@ match_result_t record::match_records(record* record) {
 		double time_difference = difftime(timestamp(), record->timestamp());
 		// Time difference is within +/- 30 mins (fairly arbitrary)
 		bool within_30mins = abs(time_difference) <= (30.0 * 60.0);
+		// The two records overlap
+		time_t this_on = timestamp();
+		time_t this_off = timestamp(true);
+		time_t rec_on = record->timestamp();
+		time_t rec_off = record->timestamp(true);
+		bool overlap =
+			(rec_on >= this_on && rec_on <= this_off) ||
+			(rec_off >= this_on && rec_off <= this_off) ||
+			(this_on >= rec_on && this_on <= rec_off) ||
+			(this_off >= rec_on && this_off <= rec_off);
 		bool is_swl = (item("SWL") == "Y");
 		bool other_swl = (record->item("SWL") == "Y");
 		// Both records are SWL and match
@@ -918,6 +930,10 @@ match_result_t record::match_records(record* record) {
 		// Date fields out by > 30 mins and other fields agree - POSSIBLE
 		else if (nondate_mismatch_count == 0) {
 			return MT_POSSIBLE;
+		}
+		// The two records overlap their times on and off
+		else if (overlap && net_mismatch_count == 0) {
+			return MT_OVERLAP;
 		}
 		// Significant difference - NOMATCH
 		else {

@@ -58,7 +58,7 @@ public:
 		VIEW_QSL,
 		LOOK_ALL_TXT,
 		START_NET,
-		ADD_NET,
+		EDIT_NET,
 		SAVE_NET,
 		CANCEL_NET,
 		ADD_NET_QSO,
@@ -116,7 +116,7 @@ public:
 	static void cb_bn_save_all(Fl_Widget* w, void* v);
 	// Cancel all QSOs
 	static void cb_bn_cancel_all(Fl_Widget* w, void* v);
-	// Add a QSO to the net
+	// Edit net
 	static void cb_bn_add_net(Fl_Widget* w, void* v);
 	// Start a net
 	static void cb_bn_start_net(Fl_Widget* w, void* v);
