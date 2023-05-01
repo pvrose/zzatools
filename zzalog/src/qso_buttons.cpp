@@ -198,7 +198,7 @@ void qso_buttons::cb_start(Fl_Widget* w, void* v) {
 void qso_buttons::cb_save(Fl_Widget* w, void* v) {
 	qso_data* data = ancestor_view<qso_data>(w);
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
-	that->disable_widgets();
+	if (that) that->disable_widgets();
 	switch (data->logging_state()) {
 	case qso_data::QSO_PENDING:
 		// If in pending then we can assume it's started
@@ -217,14 +217,14 @@ void qso_buttons::cb_save(Fl_Widget* w, void* v) {
 		data->action_save();
 		break;
 	}
-	that->enable_widgets();
+	if (that) that->enable_widgets();
 }
 
 // Cancel QSO - delete QSO; clear fields
 void qso_buttons::cb_cancel(Fl_Widget* w, void* v) {
 	qso_data* data = ancestor_view<qso_data>(w);
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
-	that->disable_widgets();
+	if (that) that->disable_widgets();
 	switch (data->logging_state()) {
 	case qso_data::QSO_PENDING:
 		data->action_deactivate();
@@ -246,7 +246,7 @@ void qso_buttons::cb_cancel(Fl_Widget* w, void* v) {
 		data->action_cancel_net_edit();
 		break;
 	}
-	that->enable_widgets();
+	if (that) that->enable_widgets();
 }
 
 // Edit QSO - transition to qso_data::QSO_EDIT
