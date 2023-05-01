@@ -21,7 +21,7 @@ map<qso_data::logging_state_t, list<qso_buttons::button_type> > button_map_ =
 		qso_buttons::EDIT_QSO, qso_buttons::COPY_QSO, qso_buttons::CLONE_QSO, qso_buttons::DELETE_QSO,
 		qso_buttons::START_NET, qso_buttons::EDIT_NET, qso_buttons::BROWSE } },
 	{ qso_data::QSO_PENDING, { qso_buttons::START_QSO, qso_buttons::ADD_QSO, qso_buttons::EDIT_QSO, qso_buttons::COPY_QSO, 
-		qso_buttons::CLONE_QSO, qso_buttons::QUIT_QSO, qso_buttons::SAVE_QSO, qso_buttons::START_NET } },
+		qso_buttons::CLONE_QSO, qso_buttons::QUIT_QSO, qso_buttons::SAVE_QSO, qso_buttons::START_NET, qso_buttons::BROWSE } },
 	{ qso_data::QSO_STARTED, { qso_buttons::SAVE_QSO, qso_buttons::CANCEL_QSO, 
 		qso_buttons::START_NET, qso_buttons::WORKED_B4, qso_buttons::PARSE } },
 	{ qso_data::QSO_EDIT, { qso_buttons::SAVE_EDIT, qso_buttons::CANCEL_EDIT, 
@@ -345,6 +345,9 @@ void qso_buttons::cb_bn_browse(Fl_Widget* w, void* v) {
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
 	that->disable_widgets();
 	switch (that->qso_data_->logging_state()) {
+	case qso_data::QSO_PENDING:
+		that->qso_data_->action_deactivate();
+		// Drop through
 	case qso_data::QSO_INACTIVE:
 		that->qso_data_->action_browse();
 		break;
