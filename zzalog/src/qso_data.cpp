@@ -741,6 +741,7 @@ void qso_data::action_query(logging_state_t query, qso_num_t match_number, qso_n
 	}
 	logging_state_ = query;
 	enable_widgets();
+	g_buttons_->enable_widgets();
 	// Move window to top
 	parent()->show();
 }
