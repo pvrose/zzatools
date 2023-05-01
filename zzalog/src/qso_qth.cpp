@@ -34,14 +34,17 @@ void qso_qth::create_form(int X, int Y) {
 	int curr_y = Y + GAP;
 	int max_x = curr_x;
 
-	op_descr_ = new Fl_Output(curr_x, curr_y, WEDIT, HTEXT * 2);
+	op_descr_ = new Fl_Output(curr_x, curr_y, WEDIT, HTEXT);
 	op_descr_->box(FL_FLAT_BOX);
-//	op_descr_->color(FL_BACKGROUND_COLOR);
+	op_descr_->color(FL_BACKGROUND_COLOR);
+	op_descr_->textfont(FL_BOLD);
+	op_descr_->textsize(FL_NORMAL_SIZE + 1);
 	op_descr_->tooltip("A description of the QTH");
 	max_x = max(curr_x, op_descr_->x() + op_descr_->w());
 	
-	curr_y += HTEXT * 2 + GAP;
-	table_ = new table(curr_x, curr_y, WEDIT, 10 * ROW_HEIGHT);
+	curr_y += HTEXT + HTEXT;
+	table_ = new table(curr_x, curr_y, WEDIT, 10 * ROW_HEIGHT, "Macro definition");
+	table_->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
 	table_->tooltip("The macro substitution used for this QTH");
 	max_x = max(max_x, table_->x() + table_->w());
 
@@ -73,6 +76,15 @@ void qso_qth::enable_widgets() {
 		table_->set_data(qth_details_);
 		table_->redraw();
 		redraw();
+	}
+	qso_data* data = ancestor_view<qso_data>(this);
+	switch (data->logging_state()) {
+	case qso_data::QSO_PENDING:
+		bn_edit_->deactivate();
+		break;
+	default:
+		bn_edit_->activate();
+		break;
 	}
 }
 

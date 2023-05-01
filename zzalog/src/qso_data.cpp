@@ -65,7 +65,7 @@ void qso_data::load_values() {
 
 // Create qso_data
 void qso_data::create_form(int X, int Y) {
-	int max_w = 0;
+	int max_x = X;
 
 	begin();
 	align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
@@ -80,7 +80,7 @@ void qso_data::create_form(int X, int Y) {
 
 	g_contest_ = new qso_contest(curr_x, curr_y, 10, 10);
 
-	max_w = max(max_w, g_contest_->x() + g_contest_->w() + GAP);
+	max_x = max(max_x, g_contest_->x() + g_contest_->w());
 	curr_y = g_contest_->y() + g_contest_->h() + GAP;
 
 	// One or the other of the two groups below will be shown at a time
@@ -90,24 +90,25 @@ void qso_data::create_form(int X, int Y) {
 	g_entry_->labelsize(FL_NORMAL_SIZE + 2);
 	g_entry_->labelcolor(fl_darker(FL_BLUE));
 
-	max_w = max(max_w, g_entry_->x() + g_entry_->w() + GAP);
+	max_x = max(max_x, g_entry_->x() + g_entry_->w());
 	g_query_ = new qso_query(curr_x, curr_y, 10, 10);
 
-	max_w = max(max_w, g_query_->x() + g_query_->w() + GAP);
+	max_x = max(max_x, g_query_->x() + g_query_->w());
 
 	g_net_entry_ = new qso_net_entry(curr_x, curr_y, 10, 10);
-	max_w = max(max_w, g_net_entry_->x() + g_net_entry_->w() + GAP);
+	max_x = max(max_x, g_net_entry_->x() + g_net_entry_->w());
 	curr_y = max(g_entry_->y() + g_entry_->h(), g_query_->y() + g_query_->h());
 	curr_y = max(curr_y, g_net_entry_->y() + g_net_entry_->h());
 	curr_y += GAP;
 
 	g_buttons_ = new qso_buttons(curr_x, curr_y, 10, 10);
 
-	max_w = max(max_w, g_buttons_->x() + g_buttons_->w() + GAP);
+	max_x = max(max_x, g_buttons_->x() + g_buttons_->w());
+	max_x += GAP;
 	curr_y += g_buttons_->h() + GAP;
 
 	resizable(nullptr);
-	size(max_w, curr_y - Y);
+	size(max_x - X, curr_y - Y);
 	end();
 
 	enable_widgets();

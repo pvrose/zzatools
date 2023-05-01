@@ -72,7 +72,7 @@ void qso_entry::create_form(int X, int Y) {
 	int curr_y = Y;
 
 	int col2_y = curr_y;
-	int max_w = 0;
+	int max_x = X;
 	int max_y = Y;
 
 	curr_x += GAP;
@@ -111,34 +111,34 @@ void qso_entry::create_form(int X, int Y) {
 		number_fields_in_use_ = NUMBER_FIXED;
 		curr_x += ip_field_[ix]->w() + GAP;
 		if (ix % NUMBER_PER_ROW == (NUMBER_PER_ROW - 1)) {
-			max_w = max(max_w, curr_x - x());
+			max_x = max(max_x, curr_x);
 			curr_x = X + GAP;
 			curr_y += HBUTTON;
 		}
 	}
-	max_w = max(max_w, curr_x);
+	max_x = max(max_x, curr_x);
 	max_y = curr_y;
 
-	curr_x = max_w + GAP;
+	curr_x = max_x;
 	curr_y = save_y;
 
 	qth_ = new qso_qth(curr_x, curr_y, 10, 10);
 	curr_x += qth_->w();
 	curr_y += qth_->h();
-	max_w = max(max_w, qth_->x() + qth_->w());
+	max_x = max(max_x, qth_->x() + qth_->w()) + GAP;
 	max_y = max(max_y, qth_->y() + qth_->h());
 
 	// nOtes input
 	curr_x = X + WCHOICE;
 	curr_y += HBUTTON;
 
-	ip_notes_ = new intl_input(curr_x, curr_y, max_w - curr_x, HBUTTON, "NOTES");
+	ip_notes_ = new intl_input(curr_x, curr_y, max_x - curr_x - GAP, HBUTTON, "NOTES");
 	ip_notes_->callback(cb_ip_notes, nullptr);
 	ip_notes_->tooltip("Add any notes for the QSO");
 
 	curr_y += HBUTTON + GAP;
 	resizable(nullptr);
-	size(max_w, curr_y - Y);
+	size(max_x - X, curr_y - Y);
 	end();
 
 	qso_data_->initialise_fields(this);
@@ -167,7 +167,7 @@ void qso_entry::enable_widgets() {
 			ip_field_[ix]->deactivate();
 		}
 		ip_notes_->activate();
-		qth_->deactivate();
+		qth_->activate();
 		break;
 	case qso_data::QSO_STARTED:
 	case qso_data::NET_STARTED:
@@ -237,7 +237,7 @@ void qso_entry::copy_qso_to_display(int flags) {
 		if (flags == CF_ALL_FLAGS || (flags & CF_DETAILS)) {
 			qth_->set_qth(qso_->item("APP_ZZA_QTH"));
 			char qth_l[128];
-			snprintf(qth_l, sizeof(qth_l), "QTH %s details", qso_->item("APP_ZZA_QTH").c_str());
+			snprintf(qth_l, sizeof(qth_l), "QTH = %s details", qso_->item("APP_ZZA_QTH").c_str());
 			qth_->copy_label(qth_l);
 		}
 	}
