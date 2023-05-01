@@ -39,13 +39,13 @@ void qso_clock::create_form(int X, int Y) {
 	int curr_x = g_clock_->x() + GAP;
 	int curr_y = g_clock_->y() + HTEXT;
 
-	const int WCLOCKS = 250;
+	const int WCLOCKS = 200;
 
 	bn_time_ = new Fl_Button(curr_x, curr_y, WCLOCKS, 3 * HTEXT);
 	bn_time_->color(FL_BLACK);
 	bn_time_->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE);
-	bn_time_->labelfont(FL_BOLD);
-	bn_time_->labelsize(5 * FL_NORMAL_SIZE);
+//	bn_time_->labelfont(FL_BOLD);
+	bn_time_->labelsize(4 * FL_NORMAL_SIZE);
 	bn_time_->labelcolor(FL_YELLOW);
 	bn_time_->box(FL_FLAT_BOX);
 	bn_time_->when(FL_WHEN_RELEASE);
