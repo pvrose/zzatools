@@ -6,6 +6,7 @@
 #include "qso_manager.h"
 #include "qth_dialog.h"
 #include "spec_data.h"
+#include "drawing.h"
 
 #include <FL/Fl_Tooltip.H>
 
@@ -14,21 +15,15 @@ extern book* book_;
 extern pfx_data* pfx_data_;
 extern spec_data* spec_data_;
 
-const Fl_Color COLOUR_ORANGE = 93; /* R=4/4, B=0/4, G=5/7 */
-const Fl_Color COLOUR_APPLE = 87;  /* R=3/4, B=0/4, G=7/7 */
-const Fl_Color COLOUR_PINK = 170;  /* R=4/4, B=2/4, G=2/7 */
-const Fl_Color COLOUR_MAUVE = 212; /* R-4/4, B=3/4, G=4/7 */
-const Fl_Color COLOUR_NAVY = 136;  /* R=0/4, B=2/4, G=0/7 */
-
 map<qso_data::logging_state_t, list<qso_buttons::button_type> > button_map_ =
 {
 	{ qso_data::QSO_INACTIVE, {qso_buttons::ACTIVATE, qso_buttons::START_QSO, qso_buttons::ADD_QSO, 
 		qso_buttons::EDIT_QSO, qso_buttons::COPY_QSO, qso_buttons::CLONE_QSO, qso_buttons::DELETE_QSO,
 		qso_buttons::START_NET, qso_buttons::ADD_NET, qso_buttons::BROWSE } },
 	{ qso_data::QSO_PENDING, { qso_buttons::START_QSO, qso_buttons::ADD_QSO, qso_buttons::EDIT_QSO, qso_buttons::COPY_QSO, 
-		qso_buttons::CLONE_QSO, qso_buttons::QUIT_QSO, qso_buttons::SAVE_QSO, qso_buttons::START_NET, qso_buttons::EDIT_QTH } },
+		qso_buttons::CLONE_QSO, qso_buttons::QUIT_QSO, qso_buttons::SAVE_QSO, qso_buttons::START_NET } },
 	{ qso_data::QSO_STARTED, { qso_buttons::SAVE_QSO, qso_buttons::CANCEL_QSO, 
-		qso_buttons::START_NET, qso_buttons::EDIT_QTH, qso_buttons::WORKED_B4, qso_buttons::PARSE } },
+		qso_buttons::START_NET, qso_buttons::WORKED_B4, qso_buttons::PARSE } },
 	{ qso_data::QSO_EDIT, { qso_buttons::SAVE_EDIT, qso_buttons::CANCEL_EDIT, 
 		qso_buttons::ADD_NET, qso_buttons::NAV_FIRST,
 		qso_buttons::NAV_PREV, qso_buttons::NAV_NEXT, qso_buttons::NAV_LAST, qso_buttons::VIEW_QSL } },
@@ -55,7 +50,6 @@ map<qso_buttons::button_type, qso_buttons::button_action> action_map_ =
 	{ qso_buttons::CLONE_QSO, { "Clone QSO", "Create a new record (copy conditions)", FL_YELLOW, qso_buttons::cb_start, (void*)qso_data::QSO_COPY_CONDX }},
 	{ qso_buttons::BROWSE, { "Browse Log", "Browse the log without editing", FL_BLUE, qso_buttons::cb_bn_browse, 0}},
 	{ qso_buttons::QUIT_QSO, { "Quit", "Quit entry mode", COLOUR_PINK, qso_buttons::cb_cancel, 0 } },
-	{ qso_buttons::EDIT_QTH, { "Edit QTH", "Edit the details of the QTH macro", FL_BACKGROUND_COLOR, qso_buttons::cb_bn_edit_qth, 0 } },
 	{ qso_buttons::SAVE_QSO, { "Save QSO", "Log the QSO, activate a new one", FL_GREEN, qso_buttons::cb_save, 0 } },
 	{ qso_buttons::CANCEL_QSO, { "Quit QSO", "Cancel the current QSO entry", COLOUR_PINK, qso_buttons::cb_cancel, 0 } },
 	{ qso_buttons::DELETE_QSO, { "Delete QSO", "Delete the selected QSO", FL_RED, qso_buttons::cb_bn_delete_qso, 0 } },
@@ -120,7 +114,7 @@ void qso_buttons::create_form(int X, int Y) {
 	curr_y += HTEXT;
 	int max_x = curr_x;
 
-	const int NUMBER_PER_ROW = 8;
+	const int NUMBER_PER_ROW = 10;
 	for (int ix = 0; ix < MAX_ACTIONS; ix++) {
 		bn_action_[ix] = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "");
 		if ((ix + 1) % NUMBER_PER_ROW == 0 && ix < MAX_ACTIONS) {
@@ -308,33 +302,33 @@ void qso_buttons::cb_bn_view_qsl(Fl_Widget* w, void* v) {
 	that->enable_widgets();
 }
 
-// Callback - Edit QTH
-void qso_buttons::cb_bn_edit_qth(Fl_Widget* w, void* v) {
-	qso_buttons* that = ancestor_view<qso_buttons>(w);
-	that->disable_widgets();
-	qso_manager* mgr = ancestor_view<qso_manager>(that);
-	string qth = mgr->get_default(qso_manager::QTH);
-	// Open QTH dialog
-	qth_dialog* dlg = new qth_dialog(qth);
-	set<string> changed_fields;
-	record* macro;
-	record* current = that->qso_data_->current_qso();
-	switch (dlg->display()) {
-	case BN_OK:
-		changed_fields = spec_data_->get_macro_changes();
-		macro = spec_data_->expand_macro("APP_ZZA_QTH", qth);
-		for (auto fx = changed_fields.begin(); fx != changed_fields.end(); fx++) {
-			current->item(*fx, macro->item(*fx));
-		}
-		that->qso_data_->check_qth_changed();
-		that->enable_widgets();
-		break;
-	case BN_CANCEL:
-		break;
-	}
-	delete dlg;
-	that->enable_widgets();
-}
+//// Callback - Edit QTH
+//void qso_buttons::cb_bn_edit_qth(Fl_Widget* w, void* v) {
+//	qso_buttons* that = ancestor_view<qso_buttons>(w);
+//	that->disable_widgets();
+//	qso_manager* mgr = ancestor_view<qso_manager>(that);
+//	string qth = mgr->get_default(qso_manager::QTH);
+//	// Open QTH dialog
+//	qth_dialog* dlg = new qth_dialog(qth);
+//	set<string> changed_fields;
+//	record* macro;
+//	record* current = that->qso_data_->current_qso();
+//	switch (dlg->display()) {
+//	case BN_OK:
+//		changed_fields = spec_data_->get_macro_changes();
+//		macro = spec_data_->expand_macro("APP_ZZA_QTH", qth);
+//		for (auto fx = changed_fields.begin(); fx != changed_fields.end(); fx++) {
+//			current->item(*fx, macro->item(*fx));
+//		}
+//		that->qso_data_->check_qth_changed();
+//		that->enable_widgets();
+//		break;
+//	case BN_CANCEL:
+//		break;
+//	}
+//	delete dlg;
+//	that->enable_widgets();
+//}
 
 // CAllback - navigate buttons
 // v - direction

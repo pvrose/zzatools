@@ -70,6 +70,7 @@ void qth_dialog::load_values() {
 	current_qth_.county = qth_details_->item("MY_CNTY");
 	current_qth_.cq_zone = qth_details_->item("MY_CQ_ZONE");
 	current_qth_.itu_zone = qth_details_->item("MY_ITU_ZONE");
+	// MY_CONT is not a valid ADIF field
 	//current_qth_.continent = qth_details_->item("MY_CONT");
 	current_qth_.iota = qth_details_->item("MY_IOTA");
 	current_qth_.description = qth_details_->item("APP_ZZA_QTH_DESCR");
@@ -276,6 +277,7 @@ void qth_dialog::save_values() {
 		qth_details_->item("MY_CNTY", current_qth_.county);
 		qth_details_->item("MY_CQ_ZONE", current_qth_.cq_zone);
 		qth_details_->item("MY_ITU_ZONE", current_qth_.itu_zone);
+		// MY_CONT is not a valid ADIF field
 		//qth_details_->item("MY_CONT", current_qth_.continent);
 		qth_details_->item("MY_IOTA", current_qth_.iota);
 		qth_details_->item("APP_ZZA_QTH_DESCR", current_qth_.description);

@@ -110,8 +110,6 @@ public:
 	void update_rig();
 	// Gt call
 	string get_call();
-	// QTH has changed
-	void check_qth_changed();
 	// Ticker clock
 	void ticker();
 
@@ -196,9 +194,6 @@ protected:
 	//qso_num_t current_rec_num_;
 	//// Query record number
 	//qso_num_t query_rec_num_;
-	// Previous value
-	string previous_qth_;
-	string previous_locator_;
 	// Disable drawing update
 	bool inhibit_drawing_;
 	// Current starting mode

@@ -23,6 +23,11 @@ qso_rig::qso_rig(int X, int Y, int W, int H, const char* L) :
 	if (L == nullptr || strlen(L) == 0) copy_label(ancestor_view<qso_manager>(this)->get_default(qso_manager::RIG).c_str());
 	// Otherwise copy that supplied as it is probably a transient string
 	else copy_label(L);
+	// CAT control group
+	labelfont(FL_BOLD);
+	labelsize(FL_NORMAL_SIZE + 2);
+	//align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
+	box(FL_BORDER_BOX);
 	load_values();
 	rig_ = new rig_if(label(), hamlib_data_);
 	create_form(X, Y);
@@ -112,12 +117,6 @@ void qso_rig::create_form(int X, int Y) {
 
 	int max_w = 0;
 	int max_h = 0;
-
-	// CAT control group
-	labelfont(FL_BOLD);
-	labelsize(FL_NORMAL_SIZE + 2);
-	//align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
-	box(FL_BORDER_BOX);
 
 	int curr_x = X + GAP + WLABEL;
 	int curr_y = Y + GAP;

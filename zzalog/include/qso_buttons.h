@@ -41,7 +41,6 @@ public:
 		SAVE_EDIT,
 		WORKED_B4,
 		PARSE,
-		EDIT_QTH,
 		NAV_FIRST,
 		NAV_PREV,
 		NAV_NEXT,
@@ -89,8 +88,8 @@ public:
 	static void cb_wkb4(Fl_Widget* w, void* v);
 	// Callback - Parse callsign
 	static void cb_parse(Fl_Widget* w, void* v);
-	// Edit QTH details
-	static void cb_bn_edit_qth(Fl_Widget* w, void* v);
+	//// Edit QTH details
+	//static void cb_bn_edit_qth(Fl_Widget* w, void* v);
 	// Navigate buttons
 	static void cb_bn_navigate(Fl_Widget*, void* v);
 	// View QSL button

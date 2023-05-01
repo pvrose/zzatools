@@ -73,12 +73,16 @@ void qso_entry::create_form(int X, int Y) {
 
 	int col2_y = curr_y;
 	int max_w = 0;
+	int max_y = Y;
 
 	curr_x += GAP;
 	curr_y += HTEXT;
+
+	int save_y = curr_y;
+
 	// Fixed fields
 	// N rows of NUMBER_PER_ROW
-	const int NUMBER_PER_ROW = 3;
+	const int NUMBER_PER_ROW = 2;
 	const int WCHOICE = WBUTTON * 3 / 2;
 	const int WINPUT = WBUTTON * 7 / 4;
 	for (int ix = 0; ix < NUMBER_TOTAL; ix++) {
@@ -105,15 +109,24 @@ void qso_entry::create_form(int X, int Y) {
 			field_names_[ix] = "";
 		}
 		number_fields_in_use_ = NUMBER_FIXED;
-		curr_x += WINPUT + GAP;
+		curr_x += ip_field_[ix]->w() + GAP;
 		if (ix % NUMBER_PER_ROW == (NUMBER_PER_ROW - 1)) {
 			max_w = max(max_w, curr_x - x());
 			curr_x = X + GAP;
 			curr_y += HBUTTON;
 		}
 	}
-
 	max_w = max(max_w, curr_x);
+	max_y = curr_y;
+
+	curr_x = max_w + GAP;
+	curr_y = save_y;
+
+	qth_ = new qso_qth(curr_x, curr_y, 10, 10);
+	curr_x += qth_->w();
+	curr_y += qth_->h();
+	max_w = max(max_w, qth_->x() + qth_->w());
+	max_y = max(max_y, qth_->y() + qth_->h());
 
 	// nOtes input
 	curr_x = X + WCHOICE;
@@ -140,6 +153,7 @@ void qso_entry::enable_widgets() {
 			ip_field_[ix]->deactivate();
 		}
 		ip_notes_->deactivate();
+		qth_->deactivate();
 		break;
 	case qso_data::QSO_PENDING:
 		for (int ix = 0; ix <= number_fields_in_use_ && ix < NUMBER_TOTAL; ix++) {
@@ -153,6 +167,7 @@ void qso_entry::enable_widgets() {
 			ip_field_[ix]->deactivate();
 		}
 		ip_notes_->activate();
+		qth_->deactivate();
 		break;
 	case qso_data::QSO_STARTED:
 	case qso_data::NET_STARTED:
@@ -167,6 +182,7 @@ void qso_entry::enable_widgets() {
 			ip_field_[ix]->deactivate();
 		}
 		ip_notes_->activate();
+		qth_->activate();
 		break;
 	case qso_data::QSO_EDIT:
 	case qso_data::NET_EDIT:
@@ -179,6 +195,7 @@ void qso_entry::enable_widgets() {
 			ip_field_[ix]->deactivate();
 		}
 		ip_notes_->activate();
+		qth_->activate();
 		break;
 	default:
 		// Reserver=d for Query states
@@ -216,7 +233,13 @@ void qso_entry::copy_qso_to_display(int flags) {
 		}
 		ip_notes_->value(qso_->item("NOTES").c_str());
 		// If QTH changes tell DXA-IF to update home_location
-		qso_data_->check_qth_changed();
+		check_qth_changed();
+		if (flags == CF_ALL_FLAGS || (flags & CF_DETAILS)) {
+			qth_->set_qth(qso_->item("APP_ZZA_QTH"));
+			char qth_l[128];
+			snprintf(qth_l, sizeof(qth_l), "QTH %s details", qso_->item("APP_ZZA_QTH").c_str());
+			qth_->copy_label(qth_l);
+		}
 	}
 }
 
@@ -537,7 +560,7 @@ void qso_entry::cb_ip_field(Fl_Widget* w, void* v) {
 			macro_defn entry = { nullptr, "" };
 			spec_data_->add_user_macro(field, value, entry);
 		}
-		that->qso_data_->check_qth_changed();
+		that->check_qth_changed();
 	}
 	else if (field == "MY_RIG") {
 		// Update the selected rig CAT group
@@ -647,6 +670,20 @@ void qso_entry::set_initial_focus() {
 		field_input* w = ip_field_[field_ip_map_["CALL"]];
 		if (w && strlen(w->value()) == 0) {
 			if (w->take_focus()) return;
+		}
+	}
+}
+
+// Check if QTH has changed and action change (redraw DxAtlas
+void qso_entry::check_qth_changed() {
+	if (qso_) {
+		if (qso_->item("MY_GRIDSQUARE", true) != previous_locator_ ||
+			qso_->item("APP_ZZA_QTH") != previous_qth_) {
+			previous_locator_ = qso_->item("MY_GRIDSQUARE", true);
+			previous_qth_ = qso_->item("APP_ZZA_QTH");
+#ifdef _WIN32
+			if (dxa_if_) dxa_if_->update(HT_LOCATION);
+#endif
 		}
 	}
 }

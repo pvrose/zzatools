@@ -2,6 +2,7 @@
 
 #include "book.h"
 #include "field_choice.h"
+#include "qso_qth.h"
 
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Input.H>
@@ -106,6 +107,8 @@ public:
 
 	// Set initial focus
 	void set_initial_focus();
+	// QTH has changed
+	void check_qth_changed();
 
 
 protected:
@@ -125,6 +128,8 @@ protected:
 	field_choice* ch_field_[NUMBER_TOTAL];
 	// field inputs
 	field_input* ip_field_[NUMBER_TOTAL];
+	// QTH Edit group
+	qso_qth* qth_;
 	// Parent qso_data
 	qso_data* qso_data_;
 	// Number of locked fields
@@ -133,6 +138,8 @@ protected:
 	record* qso_;
 	record* original_qso_;
 	qso_num_t qso_number_;
-
+	// Previous value
+	string previous_qth_;
+	string previous_locator_;
 };
 

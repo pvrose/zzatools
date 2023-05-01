@@ -1,0 +1,184 @@
+#include "qso_qth.h"
+#include "qso_entry.h"
+#include "qso_data.h"
+#include "qth_dialog.h"
+#include "spec_data.h"
+#include "drawing.h"
+
+extern spec_data* spec_data_;
+
+qso_qth::qso_qth(int X, int Y, int W, int H, const char* L) :
+	Fl_Group(X, Y, W, H, L)
+	, qth_details_(nullptr)
+	, qth_name_("")
+{
+	// CAT control group
+	labelfont(FL_BOLD);
+	labelsize(FL_NORMAL_SIZE + 2);
+	//align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
+	box(FL_BORDER_BOX);
+
+	load_values();
+	create_form(X, Y);
+}
+
+qso_qth::~qso_qth() {
+	save_values();
+}
+
+void qso_qth::load_values() {
+}
+
+void qso_qth::create_form(int X, int Y) {
+	int curr_x = X + GAP;
+	int curr_y = Y + GAP;
+	int max_x = curr_x;
+
+	op_descr_ = new Fl_Output(curr_x, curr_y, WEDIT, HTEXT * 2);
+	op_descr_->box(FL_FLAT_BOX);
+//	op_descr_->color(FL_BACKGROUND_COLOR);
+	op_descr_->tooltip("A description of the QTH");
+	max_x = max(curr_x, op_descr_->x() + op_descr_->w());
+	
+	curr_y += HTEXT * 2 + GAP;
+	table_ = new table(curr_x, curr_y, WEDIT, 10 * ROW_HEIGHT);
+	table_->tooltip("The macro substitution used for this QTH");
+	max_x = max(max_x, table_->x() + table_->w());
+
+	curr_y += table_->h() + GAP;
+	bn_edit_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Edit");
+	bn_edit_->color(COLOUR_MAUVE);
+	bn_edit_->callback(cb_bn_edit, nullptr);
+	bn_edit_->tooltip("Open window to allow QTH to be edited");
+	max_x = max(max_x, bn_edit_->x() + bn_edit_->w());
+
+	max_x += GAP;
+	curr_y += HBUTTON + GAP;
+
+	resizable(nullptr);
+	size(max_x - X, curr_y - Y);
+	end();
+
+	show();
+	enable_widgets();
+}
+
+void qso_qth::save_values() {
+	// No action
+}
+
+void qso_qth::enable_widgets() {
+	if (qth_details_) {
+		op_descr_->value(qth_details_->item("APP_ZZA_QTH_DESCR").c_str());
+		table_->set_data(qth_details_);
+		table_->redraw();
+		redraw();
+	}
+}
+
+void qso_qth::set_qth(string name) {
+	qth_name_ = name;
+	qth_details_ = new record(*spec_data_->expand_macro("APP_ZZA_QTH", qth_name_));
+	enable_widgets();
+}
+
+void qso_qth::cb_bn_edit(Fl_Widget* w, void* v) {
+	qso_qth* that = ancestor_view<qso_qth>(w);
+	qso_entry* qe = ancestor_view<qso_entry>(that);
+	// Open QTH dialog
+	qth_dialog* dlg = new qth_dialog(that->qth_name_);
+	switch (dlg->display()) {
+	case BN_OK: 
+	{
+		that->qth_details_ = spec_data_->expand_macro("APP_ZZA_QTH", that->qth_name_);
+		set<string> changed_fields = spec_data_->get_macro_changes();
+		record* qso = qe->qso();
+		if (qso && qso->item("APP_ZZA_QTH") == that->qth_name_) {
+			for (auto fx = changed_fields.begin(); fx != changed_fields.end(); fx++) {
+				qso->item(*fx, that->qth_details_->item(*fx));
+			}
+			qe->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
+		}
+		qe->check_qth_changed();
+		qe->enable_widgets();
+		that->enable_widgets();
+		break;
+	}
+	case BN_CANCEL:
+		break;
+	}
+	delete dlg;
+	that->enable_widgets();
+}
+
+qso_qth::table::table(int X, int Y, int W, int H, const char* L) :
+	Fl_Table_Row(X, Y, W, H, L)
+	, macro_(nullptr)
+{
+	fields_.clear();
+	type(SELECT_SINGLE);
+	cols(2);
+	col_width_all(w() / cols());
+	end();
+}
+
+qso_qth::table::~table() {
+}
+
+void qso_qth::table::draw_cell(TableContext context, int R, int C, int X, int Y, int W, int H)
+{
+	string text;
+
+	switch (context) {
+
+	case CONTEXT_STARTPAGE:
+		// Set the table font
+		fl_font(0, FL_NORMAL_SIZE);
+		return;
+
+	case CONTEXT_ENDPAGE:
+		// Do nothing
+		return;
+
+
+	case CONTEXT_CELL:
+		// Column indicates which record, row the field
+		fl_push_clip(X, Y, W, H);
+		{
+			// TEXT
+			fl_color(active_r() ? FL_BLACK : FL_INACTIVE_COLOR);
+			string field_name = fields_[R];
+			switch (C) {
+			case 0:
+				fl_font(FL_ITALIC, FL_NORMAL_SIZE);
+				text = fields_[R];
+				break;
+			case 1:
+				fl_font(FL_BOLD, FL_NORMAL_SIZE);
+				text = macro_->item(fields_[R]);
+				break;
+			}
+			fl_draw(text.c_str(), X + 1, Y, W - 1, H, FL_ALIGN_LEFT);
+
+			// BORDER
+			fl_color(FL_LIGHT1);
+			// draw top and right edges only
+			fl_line(X, Y, X + W - 1, Y, X + W - 1, Y + H - 1);
+			fl_pop_clip();
+			return;
+		}
+	}
+}
+
+void qso_qth::table::set_data(record* macro) {
+	macro_ = macro;
+	fields_.clear();
+	for (auto it = macro_->begin(); it != macro_->end(); it++) {
+		if ((*it).first != "APP_ZZA_QTH_DESCR" && (*it).second.length()) {
+			fields_.push_back((*it).first);
+		}
+	}
+	rows(fields_.size());
+	row_height_all(ROW_HEIGHT);
+	redraw();
+}

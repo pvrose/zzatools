@@ -107,6 +107,8 @@ using namespace std;
 		rig_if* rig();
 		// Stop the 1s timer in qso_clock
 		void stop_ticker();
+		// Get current displayed QSO
+		qso_data* data();
 
 
 	protected:

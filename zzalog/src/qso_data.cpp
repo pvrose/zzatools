@@ -585,9 +585,9 @@ void qso_data::action_cancel() {
 		}
 		break;
 	}
-	check_qth_changed();
 	book_->enable_save(true);
 	enable_widgets();
+	g_entry_->check_qth_changed();
 }
 
 // Action DELETE - we should be inactive but leave this code 
@@ -1132,21 +1132,6 @@ record* qso_data::dummy_qso() {
 	return dummy;
 }
 
-// Check if QTH has changed and action change (redraw DxAtlas
-void qso_data::check_qth_changed() {
-	record* current = g_entry_->qso();
-	if (current) {
-		if (current->item("MY_GRIDSQUARE", true) != previous_locator_ ||
-			current->item("APP_ZZA_QTH") != previous_qth_) {
-			previous_locator_ = current->item("MY_GRIDSQUARE", true);
-			previous_qth_ = current->item("APP_ZZA_QTH");
-#ifdef _WIN32
-			if (dxa_if_) dxa_if_->update(HT_LOCATION);
-#endif
-		}
-	}
-}
-
 void qso_data::update_rig() {
 	// Get freq etc from QSO or rig
 // Get present values data from rig
@@ -1233,7 +1218,6 @@ qso_data::logging_state_t qso_data::logging_state() {
 record* qso_data::current_qso() {
 	switch (logging_state_) {
 	case QSO_INACTIVE:
-		return nullptr;
 	case QSO_PENDING:
 	case QSO_STARTED:
 	case QSO_EDIT:

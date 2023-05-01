@@ -133,7 +133,8 @@ void qso_manager::create_form(int X, int Y) {
 
 	clock_group_ = new qso_clock(curr_x, curr_y, 0, 0, nullptr);
 	clock_group_->create_form(curr_x, curr_y);
-	curr_x += clock_group_->w();
+	curr_x += clock_group_->w() + GAP;
+
 	curr_y += max(clock_group_->h(), rig_group_->h());
 
 	max_x = max(max_x, curr_x);
@@ -360,4 +361,9 @@ void qso_manager::ticker() {
 // Stop 1 second ticker
 void qso_manager::stop_ticker() {
 	clock_group_->stop_ticker();
+}
+
+// Return current QSO
+qso_data* qso_manager::data() {
+	return data_group_;
 }
