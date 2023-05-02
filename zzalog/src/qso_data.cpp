@@ -385,6 +385,7 @@ string qso_data::get_defined_fields() {
 qso_num_t qso_data::get_default_number() {
 	switch (logging_state_) {
 	case QSO_INACTIVE:
+	case QUERY_NEW:
 		return book_->selection();
 	case QSO_PENDING:
 	case QSO_STARTED:
@@ -393,7 +394,6 @@ qso_num_t qso_data::get_default_number() {
 	case QSO_BROWSE:
 	case QUERY_DUPE:
 	case QUERY_MATCH:
-	case QUERY_NEW:
 		return g_query_->qso_number();
 	case NET_EDIT:
 	case NET_STARTED:
