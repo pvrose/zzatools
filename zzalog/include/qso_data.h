@@ -198,6 +198,9 @@ protected:
 	bool inhibit_drawing_;
 	// Current starting mode
 	qso_init_t previous_mode_;
+	// Potential match
+	qso_num_t potential_match_;
+	qso_num_t query_number_;
 
 
 	// Widgets

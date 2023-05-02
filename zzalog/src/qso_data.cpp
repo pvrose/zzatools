@@ -682,7 +682,7 @@ void qso_data::action_navigate(int target) {
 		action_view_qsl();
 		break;
 	case QUERY_MATCH:
-		action_query(saved_state, get_default_number(), -1);
+		action_query(saved_state, book_->selection(), 0);
 		break;
 	}
 	inhibit_drawing_ = false;
@@ -727,6 +727,8 @@ void qso_data::action_query(logging_state_t query, qso_num_t match_number, qso_n
 		g_query_->set_query(import_data_->match_question(), match_number, import_data_->get_record(query_number, false));
 		break;
 	case QUERY_NEW:
+		potential_match_ = match_number;
+		query_number_ = query_number;
 		g_query_->set_query(import_data_->match_question(), -1, import_data_->get_record(query_number, false));
 		break;
 	case QUERY_DUPE:
@@ -780,7 +782,7 @@ void qso_data::action_merge_query() {
 
 // ACtion find match
 void qso_data::action_find_match() {
-	update_query(QUERY_MATCH, g_query_->qso_number(), -1);
+	update_query(QUERY_MATCH, potential_match_, query_number_);
 }
 
 // Action handle dupe
