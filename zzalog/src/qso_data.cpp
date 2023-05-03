@@ -1011,6 +1011,7 @@ void qso_data::action_create_net() {
 	char msg[128];
 	g_net_entry_->set_qso(qso_number);
 	g_net_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
+	Fl_Widget* w = g_net_entry_->entry();
 	switch (logging_state_) {
 	case QSO_STARTED:
 		logging_state_ = NET_STARTED;
@@ -1039,6 +1040,7 @@ void qso_data::action_create_net() {
 		g_net_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
 		other_number++;
 	}
+	g_net_entry_->entry(w);
 	enable_widgets();
 }
 	

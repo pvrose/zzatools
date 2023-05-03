@@ -49,6 +49,8 @@ public:
 	void ticker();
 	// SElected entry
 	Fl_Widget* entry();
+	// Set entry
+	void entry(Fl_Widget* w);
 	// Number of entries
 	int entries();
 

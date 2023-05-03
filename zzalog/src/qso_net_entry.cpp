@@ -61,6 +61,10 @@ Fl_Widget* qso_net_entry::entry() {
 	return entries_->value();
 }
 
+void qso_net_entry::entry(Fl_Widget* w) {
+	entries_->value(w);
+}
+
 int qso_net_entry::entries() {
 	return entries_->children();
 }
@@ -167,14 +171,14 @@ bool qso_net_entry::qso_in_net(qso_num_t qso_number) {
 // Select QSO with the provided number - if it exists
 void qso_net_entry::select_qso(qso_num_t qso_number) {
 	bool found = false;
-	int cx = 0;
-	for (; cx < entries_->children() && !found; cx++) {
-		qso_entry* qe = (qso_entry*)entries_->child(cx);
+	qso_entry* qe;
+	for (int cx = 0; cx < entries_->children() && !found; cx++) {
+		qe = (qso_entry*)entries_->child(cx);
 		if (qe->qso_number() == qso_number) {
 			found = true;
 		}
 	}
-	if (found) entries_->value(child(cx));
+	if (found) entries_->value(qe);
 }
 
 // Ticker - update all children
