@@ -123,6 +123,7 @@ bool lotw_handler::upload_lotw_log(book* book) {
 				// TODO: Check command format in Linux
 				snprintf(command, 256, "\"%s\" -x -u -d %s -c %s", tqsl_executable.c_str(), new_filename.c_str(), callsign.c_str());
 				status_->misc_status(ST_NOTE, "LOTW: Signing and uploading QSLs to LotW");
+				status_->misc_status(ST_LOG, command);
 				// Launch TQSL - signs and uploads data: Note this is a blocking action
 				int result = system(command);
 				delete[] command;
@@ -134,7 +135,7 @@ bool lotw_handler::upload_lotw_log(book* book) {
 					ok = true;
 					break;
 				case 1:
-					status_->misc_status(ST_WARNING, "LOTW: cancelled by user");
+					status_->misc_status(ST_WARNING, "LOTW: command failed or cancelled by user");
 					ok = false;
 					break;
 				case 2:
