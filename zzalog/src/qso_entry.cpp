@@ -233,7 +233,18 @@ void qso_entry::copy_qso_to_display(int flags) {
 		}
 		ip_notes_->value(qso_->item("NOTES").c_str());
 		// If QTH changes tell DXA-IF to update home_location
-		check_qth_changed();
+		switch (qso_data_->logging_state()) {
+		case qso_data::QSO_EDIT:
+		case qso_data::QSO_INACTIVE:
+		case qso_data::QSO_PENDING:
+		case qso_data::QSO_STARTED:
+			check_qth_changed();
+			break;
+		case qso_data::NET_ADDING:
+		case qso_data::NET_EDIT:
+		case qso_data::NET_STARTED:
+			break;
+		}
 		if (flags == CF_ALL_FLAGS || (flags & CF_DETAILS)) {
 			qth_->set_qth(qso_->item("APP_ZZA_QTH"));
 			char qth_l[128];
