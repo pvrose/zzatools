@@ -329,10 +329,14 @@ void qso_manager::update_import_qso(record* import_qso) {
 	use_qso = book_->get_record(data_group_->get_default_number(), false);
 	// If we have a QSO to copy from and one to copy to, copy these fields.
 	if (use_qso && import_qso) {
-		import_qso->item("MY_RIG", use_qso->item("MY_RIG"));
-		import_qso->item("MY_ANTENNA", use_qso->item("MY_ANTENNA"));
-		import_qso->item("STATION_CALLSIGN", use_qso->item("STATION_CALLSIGN"));
-		import_qso->item("APP_ZZA_QTH", use_qso->item("APP_ZZA_QTH"));
+		if (import_qso->item("MY_RIG").length() == 0) 
+			import_qso->item("MY_RIG", use_qso->item("MY_RIG"));
+		if (import_qso->item("MY_ANTENNA").length() == 0) 
+			import_qso->item("MY_ANTENNA", use_qso->item("MY_ANTENNA"));
+		if (import_qso->item("STATION_CALLSIGN").length() == 0) 
+			import_qso->item("STATION_CALLSIGN", use_qso->item("STATION_CALLSIGN"));
+		if (import_qso->item("APP_ZZA_QTH").length() == 0) 
+			import_qso->item("APP_ZZA_QTH", use_qso->item("APP_ZZA_QTH"));
 	}
 }
 
