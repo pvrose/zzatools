@@ -129,7 +129,16 @@ void log_table::cb_tab_log(Fl_Widget* w, void* v) {
 	// Get the item number and field clicked
 	log_table* that = (log_table*)w;
 	int row = that->callback_row();
-	item_num_t item_num = that->order_ == LAST_TO_FIRST ? that->my_book_->size() - 1 - row : row;
+	item_num_t item_num;
+	qso_num_t qso_number;
+	if (that->my_book_) {
+		item_num = that->order_ == LAST_TO_FIRST ? that->my_book_->size() - 1 - row : row;
+		qso_number = qso_number = that->my_book_->record_number(item_num);
+	}
+	else {
+		item_num = -1;
+		qso_number = -1;
+	}
 	int col = that->callback_col();
 	item_num_t save_num = that->current_item_num_;
 	switch (that->callback_context()) {
@@ -139,15 +148,28 @@ void log_table::cb_tab_log(Fl_Widget* w, void* v) {
 		case FL_RELEASE:
 			switch (that->last_button_) {
 			case FL_LEFT_MOUSE:
-				// Select the item at the row that was clicked
-				// Tidy up any edit in progress
-				that->done_edit(false);
-				// Left button - double click edit cell
-				if (Fl::event_clicks()) {
-					that->edit_cell(row, col);
+				// Select the item at the row that was clicked if it can be selected
+				if (qso_manager_->editing() && qso_manager_->outwith_edit(qso_number)) {
+					// It cannot be selected - keep original selection
+					char msg[128];
+					snprintf(msg, sizeof(msg), "LOG: Attempt to select record %d when another record is being edited", qso_number);
+					status_->misc_status(ST_WARNING, msg);
+					// and select the row in the table
+					int orig_row = that->order_ == LAST_TO_FIRST ? that->my_book_->size() - 1 - save_num : save_num;
+					that->select_row(orig_row);
+					that->redraw();
 				}
 				else {
-					that->my_book_->selection(item_num, HT_SELECTED, that);
+					// Tidy up any edit in progress
+					that->done_edit(false);
+					// Left button - double click edit cell
+					if (Fl::event_clicks()) {
+						that->edit_cell(row, col);
+					}
+					else {
+						item_num_t selected = that->my_book_->selection(item_num, HT_SELECTED, that);
+					}
+					that->current_item_num_ = item_num;
 				}
 			break;
 			case FL_RIGHT_MOUSE:

@@ -112,6 +112,8 @@ public:
 	string get_call();
 	// Ticker clock
 	void ticker();
+	// The QSO is being edited
+	bool qso_editing(qso_num_t number);
 
 
 	// State transition actions:-

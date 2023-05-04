@@ -1287,3 +1287,17 @@ string qso_data::get_call() {
 qso_contest::contest_mode_t qso_data::contest_mode() {
 	return g_contest_->mode();
 }
+
+// The supplied QSO number is being edited
+bool qso_data::qso_editing(qso_num_t number) {
+	switch (logging_state_) {
+	case QSO_EDIT:
+		if (number == g_entry_->qso_number()) return true;
+		else return false;
+	case NET_EDIT:
+	case NET_ADDING:
+		return g_net_entry_->qso_in_net(number);
+	default:
+		return false;
+	}
+}

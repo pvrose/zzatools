@@ -208,9 +208,23 @@ void qso_manager::cb_close(Fl_Widget* w, void* v) {
 	main_window_->do_callback();
 }
 
-// 
-qso_data::logging_state_t qso_manager::logging_state() {
-	return data_group_->logging_state();
+// Return that we are currently editing or creating ot QSO or net
+bool qso_manager::editing() {
+	switch (data_group_->logging_state()) {
+	case qso_data::NET_STARTED:
+	case qso_data::NET_ADDING:
+	case qso_data::NET_EDIT:
+	case qso_data::QSO_EDIT:
+	case qso_data::QSO_STARTED:
+		return true;
+	default:
+		return false;
+	}
+}
+
+// The QSO number being selected is outwith that being edited
+bool qso_manager::outwith_edit(qso_num_t number) {
+	return !(data_group_->qso_editing(number));
 }
 
 // Return true if we have a current QSO

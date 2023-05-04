@@ -29,9 +29,6 @@
 #include <atlbase.h>
 #include <atlcom.h>
 
-
-
-
 // Top-level data items
 extern Fl_Preferences* settings_;
 extern book* book_;

@@ -19,6 +19,7 @@
 #include "lotw_handler.h"
 #include "club_handler.h"
 #include "main_window.h"
+#include "qso_manager.h"
 
 // C/C++ header files
 #include <ctime>
@@ -47,6 +48,7 @@ extern book* book_;
 extern eqsl_handler* eqsl_handler_;
 extern lotw_handler* lotw_handler_;
 extern club_handler* club_handler_;
+extern qso_manager* qso_manager_;
 extern bool read_only_;
 extern void main_window_label(string text);
 extern string PROGRAM_ID;

@@ -79,8 +79,10 @@ using namespace std;
 			WRITE_FIELD
 		};
 
-		// Get logging state
-		qso_data::logging_state_t logging_state();
+		// In a state that does not allow interference
+		bool editing();
+		// The QSO number is inwith that being edited
+		bool outwith_edit(qso_num_t number);
 		// Called when rig is read or changed
 		void update_rig();
 		// Switch rig status
