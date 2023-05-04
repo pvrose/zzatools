@@ -41,6 +41,7 @@ extern spec_data* spec_data_;
 extern time_t session_start_;
 extern menu* menu_;
 extern qso_manager* qso_manager_;
+extern pfx_data* pfx_data_;
 extern bool in_current_session(record*);
 
 // Constructor
@@ -2176,6 +2177,66 @@ void dxa_if::set_dx_loc(string location, string callsign) {
 		map->EndUpdate();
 		last_logged_call_ = callsign;
 		last_logged_grid_ = location;
+	}
+}
+
+void dxa_if::set_dx_loc(string callsign) {
+	// Get the grid location of the prefix centre - only if 1 prefix matches the callsign.
+	record* dx_record = qso_manager_->dummy_qso();
+	dx_record->item("CALL", callsign);
+	vector<prefix*> prefixes;
+	char message[100];
+	// Get prefix(es), If only 1 and the DXCC Code != 0 (i.e. not /MM)
+	if (pfx_data_->all_prefixes(dx_record, &prefixes, false) && prefixes.size() == 1) {
+		// Get DXCC prefix record for the DXCC number
+		prefix* dxcc_prefix = prefixes[0];
+		while (dxcc_prefix->parent_ != nullptr) {
+			dxcc_prefix = dxcc_prefix->parent_;
+		}
+		if (dxcc_prefix->dxcc_code_ != 0) {
+			// Use the actual prefixes location rather than the DXCC's
+			lat_long_t location = { prefixes[0]->latitude_, prefixes[0]->longitude_ };
+			set_dx_loc(latlong_to_grid(location, 6), callsign);
+		}
+		else {
+			// Not a DXCC entity - clear any existing DX Location
+			snprintf(message, sizeof(message), "DXATLAS: Locating %s - not in a DXCC entity", callsign.c_str());
+			status_->misc_status(ST_WARNING, message);
+			clear_dx_loc();
+		}
+	}
+	else {
+		set<prefix*> parents;
+		parents.clear();
+		for (auto it = prefixes.begin(); it != prefixes.end(); it++) {
+			if ((*it)->parent_ == nullptr) {
+				parents.insert((*it));
+			}
+		}
+		if (parents.size() != 1) {
+			// Too many prefixes to automatically parse - clear any existing DX Location
+			snprintf(message, sizeof(message), "WSJT-X: Locating %s - %d matching prefixes found (%d DXCCs)",
+				callsign.c_str(), prefixes.size(), parents.size());
+			status_->misc_status(ST_WARNING, message);
+			clear_dx_loc();
+		}
+		else {
+			prefix* dxcc_prefix = *(parents.begin());
+			snprintf(message, sizeof(message), "WSJT-X: Locating %s - %d matching prefixes found - using DXCC %s(%s)",
+				callsign.c_str(), prefixes.size(), dxcc_prefix->nickname_.c_str(), dxcc_prefix->name_.c_str());
+			status_->misc_status(ST_NOTE, message);
+			if (dxcc_prefix->dxcc_code_ != 0) {
+				// Use the the DXCC's
+				lat_long_t location = { dxcc_prefix->latitude_, dxcc_prefix->longitude_ };
+				set_dx_loc(latlong_to_grid(location, 6), callsign);
+			}
+			else {
+				// Not a DXCC entity - clear any existing DX Location
+				snprintf(message, sizeof(message), "DXATLAS: Cannot locate %s - not in a DXCC entity", callsign.c_str());
+				status_->misc_status(ST_WARNING, message);
+				clear_dx_loc();
+			}
+		}
 	}
 }
 

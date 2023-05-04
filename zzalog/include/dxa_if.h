@@ -123,6 +123,8 @@ using namespace std;
 		void update(hint_t hint);
 		// Set DX location
 		void set_dx_loc(string location, string callsign);
+		// Set DX location - Call only
+		void set_dx_loc(string callsign);
 		// Clear DX location
 		void clear_dx_loc();
 		// Callbacks

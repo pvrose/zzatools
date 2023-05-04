@@ -267,43 +267,7 @@ int wsjtx_handler::handle_status(stringstream& ss) {
 			toolbar_->search_text(status.dx_call);
 		}
 		else {
-			// Get the grid location of the prefix centre - only if 1 prefix matches the callsign.
-			record* dx_record = qso_manager_->dummy_qso();
-			dx_record->item("CALL", status.dx_call);
-			vector<prefix*> prefixes;
-			// Get prefix(es), If only 1 and the DXCC Code != 0 (i.e. not /MM)
-			if (pfx_data_->all_prefixes(dx_record, &prefixes, false) && prefixes.size() == 1) {
-				// Get DXCC prefix record for the DXCC number
-				prefix* dxcc_prefix = prefixes[0];
-				while (dxcc_prefix->parent_ != nullptr) {
-					dxcc_prefix = dxcc_prefix->parent_;
-				}
-				if (dxcc_prefix->dxcc_code_ != 0) {
-					// Use the actual prefixes location rather than the DXCC's
-					lat_long_t location = { prefixes[0]->latitude_, prefixes[0]->longitude_ };
-#ifdef _WIN32
-					dxa_if_->set_dx_loc(latlong_to_grid(location, 6), status.dx_call);
-#endif
-				}
-				else {
-					// Not a DXCC entity - clear any existing DX Location
-					char message[100];
-					snprintf(message, 100, "WSJT-X: Cannot locate %s - not in a DXCC entity", status.dx_call.c_str());
-					status_->misc_status(ST_WARNING, message);
-#ifdef _WIN32
-					dxa_if_->clear_dx_loc();
-#endif
-				}
-			}
-			else {
-				// Too many prefixes to automatically parse - clear any existing DX Location
-				char message[100];
-				snprintf(message, 100, "WSJT-X: Cannot parse %s - %d matching prefixes found", status.dx_call.c_str(), prefixes.size());
-				status_->misc_status(ST_WARNING, message);
-#ifdef _WIN32
-				dxa_if_->clear_dx_loc();
-#endif
-			}
+			dxa_if_->set_dx_loc(status.dx_call);
 			toolbar_->search_text(status.dx_call);
 		}
 	}
