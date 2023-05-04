@@ -249,21 +249,18 @@ int wsjtx_handler::handle_status(stringstream& ss) {
 	status.tx_rx_period = get_uint32(ss);
 	// Configuration name
 	status.config_name = get_utf8(ss); 
+#ifdef _WIN32
 	if (status.dx_call.length() && status.dx_grid.length() && status.transmitting) {
 		// Use the actual grid loaction - and put it into the cache
-#ifdef _WIN32
 		dxa_if_->set_dx_loc(status.dx_grid, status.dx_call);
-#endif
 		grid_cache_[status.dx_call] = status.dx_grid;
 		toolbar_->search_text(status.dx_call);
 	}
 	else if (status.dx_call.length() && status.transmitting) {
 		// Look in location cache
 		if (grid_cache_.find(status.dx_call) != grid_cache_.end()) {
-#ifdef _WIN32
 			// Use the remembered grid loaction
 			dxa_if_->set_dx_loc(grid_cache_[status.dx_call], status.dx_call);
-#endif
 			toolbar_->search_text(status.dx_call);
 		}
 		else {
@@ -272,11 +269,10 @@ int wsjtx_handler::handle_status(stringstream& ss) {
 		}
 	}
 	else if (!status.dx_call.length()) {
-#ifdef _WIN32
 		// Can clear the Dx Location by clearing the DX Call field
 		dxa_if_->clear_dx_loc();
-#endif
 	}
+#endif
 	prev_status_ = status;
 	return 0;
 }
