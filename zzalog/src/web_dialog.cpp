@@ -11,9 +11,7 @@
 #include <FL/Fl_Group.H>
 #include <FL/Fl_RGB_Image.H>
 #include <FL/Fl_Int_Input.H>
-
-
-
+#include <FL/Fl_Round_Button.H>
 
 extern Fl_Preferences* settings_;
 
@@ -192,13 +190,15 @@ void web_dialog::create_form(int X, int Y) {
 	const int W34 = W3 + W4 + GAP;
 	const int C5 = C4 + W4 + GAP;
 	const int W5 = WSMEDIT;
+	const int C6 = C5 + W5 + GAP;
+	const int W6 = HBUTTON;
 
 	// offset columns
 	const int C2A = C1 + W1 + WLLABEL + GAP;
 	const int W2A = WMESS;
 
 	// overall width 
-	const int WGRP = ((C5 + W5) > (C2A + W2A) ? C5 + W5 : C2A + W2A) + GAP;
+	const int WGRP = ((C6 + W6) > (C2A + W2A) ? C5 + W5 : C2A + W2A) + GAP;
 	const int WALL = WGRP + EDGE;
 
 	image_widgets_.clear();
@@ -250,6 +250,14 @@ void web_dialog::create_form(int X, int Y) {
 	in1_1_5->callback(cb_value<Fl_Secret_Input, string>, &eqsl_password_);
 	in1_1_5->when(FL_WHEN_CHANGED);
 	in1_1_5->tooltip("Enter password for eQSL.cc");
+
+	// TODO - uncomment once I can implement making the input secret again
+	//// Row 1 Col 6 - Password visible
+	//Fl_Round_Button* bn1_1_6 = new Fl_Round_Button(X + C6, Y + R1_1, W6, H1_1, "Look");
+	//bn1_1_6->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
+	//bn1_1_6->value(false);
+	//bn1_1_6->callback(cb_bn_plain, in1_1_5);
+	//bn1_1_6->tooltip("See password in plain");
 
 	// Row 1A Col 1 - Update evry QSO
 	Fl_Check_Button* bn1_1A_1 = new Fl_Check_Button(X + C1, Y + R1_1A, W1, H1_1A, "Update each QSO");
@@ -526,4 +534,16 @@ void web_dialog::enable_widgets() {
 	else {
 		grp_club_->deactivate();
 	}
+}
+
+// Callback to make passwords plain or secret
+void web_dialog::cb_bn_plain(Fl_Widget* w, void* v) {
+	Fl_Secret_Input* ip = (Fl_Secret_Input*)v;
+	if (ip->value()) {
+		ip->input_type(FL_NORMAL_INPUT);
+	}
+	else {
+		ip->input_type(FL_SECRET_INPUT);
+	}
+	ip->redraw();
 }

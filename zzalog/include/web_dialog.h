@@ -35,6 +35,7 @@ using namespace std;
 
 	protected:
 		// Callbacks
+		static void cb_bn_plain(Fl_Widget* w, void* v);
 
 		// Widgets for eQSL
 		Fl_Group* grp_eqsl_;
