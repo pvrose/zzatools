@@ -99,6 +99,18 @@ int qso_manager::handle(int event) {
 		// Get menu to update Windows controls
 		menu_->update_windows_items();
 		return true;
+	case FL_KEYBOARD:
+		// This 
+		switch (Fl::event_key()) {
+		case 'v':
+			// CTRL-V
+			if (Fl::event_key(FL_Control_L) || Fl::event_key(FL_Control_R)) {
+				// Treat as paste clipboard
+				Fl::paste(*main_window_, 1);
+				return true;
+			}
+			break;
+		}
 	}
 
 	return Fl_Window::handle(event);
