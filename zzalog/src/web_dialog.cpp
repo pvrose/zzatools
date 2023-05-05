@@ -11,7 +11,6 @@
 #include <FL/Fl_Group.H>
 #include <FL/Fl_RGB_Image.H>
 #include <FL/Fl_Int_Input.H>
-#include <FL/Fl_Round_Button.H>
 
 extern Fl_Preferences* settings_;
 
@@ -190,7 +189,7 @@ void web_dialog::create_form(int X, int Y) {
 	const int W34 = W3 + W4 + GAP;
 	const int C5 = C4 + W4 + GAP;
 	const int W5 = WSMEDIT;
-	const int C6 = C5 + W5 + GAP;
+	const int C6 = C5 + W5;
 	const int W6 = HBUTTON;
 
 	// offset columns
@@ -198,7 +197,7 @@ void web_dialog::create_form(int X, int Y) {
 	const int W2A = WMESS;
 
 	// overall width 
-	const int WGRP = ((C6 + W6) > (C2A + W2A) ? C5 + W5 : C2A + W2A) + GAP;
+	const int WGRP = max(C6 + W6,C2A + W2A) + GAP;
 	const int WALL = WGRP + EDGE;
 
 	image_widgets_.clear();
@@ -251,13 +250,13 @@ void web_dialog::create_form(int X, int Y) {
 	in1_1_5->when(FL_WHEN_CHANGED);
 	in1_1_5->tooltip("Enter password for eQSL.cc");
 
-	// TODO - uncomment once I can implement making the input secret again
-	//// Row 1 Col 6 - Password visible
-	//Fl_Round_Button* bn1_1_6 = new Fl_Round_Button(X + C6, Y + R1_1, W6, H1_1, "Look");
-	//bn1_1_6->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
-	//bn1_1_6->value(false);
-	//bn1_1_6->callback(cb_bn_plain, in1_1_5);
-	//bn1_1_6->tooltip("See password in plain");
+	// Row 1 Col 6 - Password visible
+	Fl_Button* bn1_1_6 = new Fl_Button(X + C6, Y + R1_1, W6, H1_1, "@search");
+	bn1_1_6->type(FL_TOGGLE_BUTTON);
+	bn1_1_6->align(FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
+	bn1_1_6->value(false);
+	bn1_1_6->callback(cb_bn_plain, in1_1_5);
+	bn1_1_6->tooltip("See password in plain");
 
 	// Row 1A Col 1 - Update evry QSO
 	Fl_Check_Button* bn1_1A_1 = new Fl_Check_Button(X + C1, Y + R1_1A, W1, H1_1A, "Update each QSO");
@@ -351,6 +350,14 @@ void web_dialog::create_form(int X, int Y) {
 	in2_1_5->when(FL_WHEN_CHANGED);
 	in2_1_5->tooltip("Enter password for Logbook of the World");
 
+	// Row 1 Col 6 - Password visible
+	Fl_Button* bn2_1_6 = new Fl_Button(X + C6, Y + R2_1, W6, H2_1, "@search");
+	bn2_1_6->type(FL_TOGGLE_BUTTON);
+	bn2_1_6->align(FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
+	bn2_1_6->value(false);
+	bn2_1_6->callback(cb_bn_plain, in2_1_5);
+	bn2_1_6->tooltip("See password in plain");
+
 	// Row 1A Col 1 - Update evry QSO
 	Fl_Check_Button* bn2_1A_1 = new Fl_Check_Button(X + C1, Y + R2_1A, W1, H2_1A, "Update each QSO");
 	bn2_1A_1->align(FL_ALIGN_RIGHT);
@@ -396,6 +403,14 @@ void web_dialog::create_form(int X, int Y) {
 	in3_1_5->when(FL_WHEN_CHANGED);
 	in3_1_5->tooltip("Enter password for QRZ.com");
 
+	// Row 1 Col 6 - Password visible
+	Fl_Button* bn3_1_6 = new Fl_Button(X + C6, Y + R3_1, W6, H3_1, "@search");
+	bn3_1_6->type(FL_TOGGLE_BUTTON);
+	bn3_1_6->align(FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
+	bn3_1_6->value(false);
+	bn3_1_6->callback(cb_bn_plain, in3_1_5);
+	bn3_1_6->tooltip("See password in plain");
+
 	// Row 2 Col 4 - Always use XML database
 	Fl_Check_Button* bn3_2_1 = new Fl_Check_Button(X + C4, Y + R3_2, WRADIO, HRADIO, "Use XML Database");
 	bn3_2_1->align(FL_ALIGN_RIGHT);
@@ -439,6 +454,14 @@ void web_dialog::create_form(int X, int Y) {
 	in4_1_5->callback(cb_value<Fl_Secret_Input, string>, &club_password_);
 	in4_1_5->when(FL_WHEN_CHANGED);
 	in4_1_5->tooltip("Enter password for ClubLog");
+
+	// Row 1 Col 6 - Password visible
+	Fl_Button* bn4_1_6 = new Fl_Button(X + C6, Y + R4_1, W6, H4_1, "@search");
+	bn4_1_6->type(FL_TOGGLE_BUTTON);
+	bn4_1_6->align(FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
+	bn4_1_6->value(false);
+	bn4_1_6->callback(cb_bn_plain, in4_1_5);
+	bn4_1_6->tooltip("See password in plain");
 
 	// Row 2 Col 2 - Interval bewteen downloads
 	Fl_Int_Input* in4_2_2 = new Fl_Int_Input(X + C2, Y + R4_2, W2, H4_2, "Interval");
@@ -539,7 +562,7 @@ void web_dialog::enable_widgets() {
 // Callback to make passwords plain or secret
 void web_dialog::cb_bn_plain(Fl_Widget* w, void* v) {
 	Fl_Secret_Input* ip = (Fl_Secret_Input*)v;
-	if (ip->value()) {
+	if (((Fl_Button*)w)->value()) {
 		ip->input_type(FL_NORMAL_INPUT);
 	}
 	else {
