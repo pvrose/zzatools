@@ -76,6 +76,7 @@ void pfx_tree::update(hint_t hint, qso_num_t record_num_1, qso_num_t record_num_
 	case HT_DELETED:
 	case HT_DUPE_DELETED:
 	case HT_INSERTED:
+	case HT_INSERTED_NODXA:
 	case HT_IMPORT_QUERY:
 	case HT_IMPORT_QUERYNEW:
 	case HT_DUPE_QUERY:

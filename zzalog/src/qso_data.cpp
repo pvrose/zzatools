@@ -555,7 +555,7 @@ void qso_data::action_save() {
 		}
 		else {
 			book_->modified(true);
-			book_->selection(g_net_entry_->qso_number(), HT_INSERTED);
+			book_->selection(g_net_entry_->qso_number(), HT_INSERTED_NODXA);
 			logging_state_ = NET_STARTED;
 		}
 		break;

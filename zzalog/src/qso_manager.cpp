@@ -275,6 +275,7 @@ void qso_manager::update_qso(hint_t hint, qso_num_t match_num, qso_num_t query_n
 	case HT_CHANGED:
 	case HT_DELETED:
 	case HT_INSERTED:
+	case HT_INSERTED_NODXA:
 	case HT_MINOR_CHANGE:
 	case HT_NEW_DATA:
 	case HT_RESET_ORDER:

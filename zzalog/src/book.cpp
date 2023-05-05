@@ -559,6 +559,7 @@ item_num_t book::selection(item_num_t num_item, hint_t hint /* = HT_SELECTED */,
 			}
 			break;
 		case HT_INSERTED:
+		case HT_INSERTED_NODXA:
 		case HT_DELETED:
 			if (!inhibit_view_update_) {
 				// Set modified flag
