@@ -74,9 +74,14 @@ void qso_qth::enable_widgets() {
 	if (qth_details_) {
 		op_descr_->value(qth_details_->item("APP_ZZA_QTH_DESCR").c_str());
 		table_->set_data(qth_details_);
-		table_->redraw();
-		redraw();
 	}
+	else {
+		op_descr_->value("No QTH Specified");
+		table_->set_data(nullptr);
+	}
+	table_->redraw();
+	redraw();
+
 	qso_data* data = ancestor_view<qso_data>(this);
 	switch (data->logging_state()) {
 	case qso_data::QSO_PENDING:
@@ -90,7 +95,15 @@ void qso_qth::enable_widgets() {
 
 void qso_qth::set_qth(string name) {
 	qth_name_ = name;
-	qth_details_ = new record(*spec_data_->expand_macro("APP_ZZA_QTH", qth_name_));
+	delete qth_details_;
+	qth_details_ = nullptr;
+	if (name.length()) {
+		record* src = spec_data_->expand_macro("APP_ZZA_QTH", qth_name_);
+		if (src) {
+			qth_details_ = new record(*src);
+		}
+		
+	}
 	enable_widgets();
 }
 
@@ -185,12 +198,17 @@ void qso_qth::table::draw_cell(TableContext context, int R, int C, int X, int Y,
 void qso_qth::table::set_data(record* macro) {
 	macro_ = macro;
 	fields_.clear();
-	for (auto it = macro_->begin(); it != macro_->end(); it++) {
-		if ((*it).first != "APP_ZZA_QTH_DESCR" && (*it).second.length()) {
-			fields_.push_back((*it).first);
+	if (macro_) {
+		for (auto it = macro_->begin(); it != macro_->end(); it++) {
+			if ((*it).first != "APP_ZZA_QTH_DESCR" && (*it).second.length()) {
+				fields_.push_back((*it).first);
+			}
 		}
+		rows(fields_.size());
+		row_height_all(ROW_HEIGHT);
 	}
-	rows(fields_.size());
-	row_height_all(ROW_HEIGHT);
+	else {
+		rows(0);
+	}
 	redraw();
 }

@@ -600,7 +600,17 @@ void qso_data::action_delete_qso() {
 	logging_state_t saved_state = logging_state_;
 	logging_state_ = QSO_INACTIVE;
 	book_->delete_record(true);
-	logging_state_ = saved_state;
+	// TODO: Probably a frig - ne need to set up the qso_entry that is now exposed
+	action_activate(QSO_NONE);
+
+	// Now restore the original state
+	switch (saved_state) {
+	case QSO_INACTIVE:
+		action_deactivate();
+		break;
+	case QSO_PENDING:
+		break;
+	}
 
 	enable_widgets();
 }
