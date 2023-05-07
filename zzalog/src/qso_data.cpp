@@ -383,28 +383,24 @@ string qso_data::get_defined_fields() {
 
 // Get default record to copy
 qso_num_t qso_data::get_default_number() {
-	qso_num_t qso_number = -1;
 	switch (logging_state_) {
 	case QSO_INACTIVE:
 	case QUERY_NEW:
-		qso_number = book_->selection();
-		break;
+		return book_->selection();
 	case QSO_PENDING:
 	case QSO_STARTED:
 	case QSO_EDIT:
-		qso_number = g_entry_->qso_number();
-		break;
+		return g_entry_->qso_number();
 	case QSO_BROWSE:
 	case QUERY_DUPE:
 	case QUERY_MATCH:
-		qso_number = g_query_->qso_number();
-		break;
+		return g_query_->qso_number();
 	case NET_EDIT:
 	case NET_STARTED:
-		qso_number = g_net_entry_->qso_number();
+		return g_net_entry_->qso_number();
+	default:
+		return -1;
 	}
-	if (qso_number == -1) return book_->selection();
-	else return qso_number;
 }
 
 // Action - create a new QSL in the appropriate copy of qso_entry
