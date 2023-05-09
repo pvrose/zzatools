@@ -122,7 +122,7 @@ void qso_entry::create_form(int X, int Y) {
 	curr_x = max_x;
 	curr_y = save_y;
 
-	qth_ = new qso_qth(curr_x, curr_y, 10, 10);
+	qth_ = new qso_qth(curr_x, curr_y, 10, 10, "My QTH");
 	curr_x += qth_->w();
 	curr_y += qth_->h();
 	max_x = max(max_x, qth_->x() + qth_->w()) + GAP;
@@ -248,9 +248,6 @@ void qso_entry::copy_qso_to_display(int flags) {
 		}
 		if (flags == CF_ALL_FLAGS || (flags & CF_DETAILS)) {
 			qth_->set_qth(qso_->item("APP_ZZA_QTH"));
-			char qth_l[128];
-			snprintf(qth_l, sizeof(qth_l), "QTH = %s details", qso_->item("APP_ZZA_QTH").c_str());
-			qth_->copy_label(qth_l);
 		}
 	}
 }

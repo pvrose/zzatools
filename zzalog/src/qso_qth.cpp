@@ -34,6 +34,16 @@ void qso_qth::create_form(int X, int Y) {
 	int curr_y = Y + GAP;
 	int max_x = curr_x;
 
+	op_name_ = new Fl_Output(curr_x, curr_y, WEDIT, HTEXT);
+	op_name_->box(FL_FLAT_BOX);
+	op_name_->color(FL_BACKGROUND_COLOR);
+	op_name_->textfont(FL_BOLD);
+	op_name_->textsize(FL_NORMAL_SIZE + 2);
+	op_name_->textcolor(COLOUR_CLARET);
+
+	max_x = max(curr_x, op_name_->x() + op_name_->y());
+	curr_y += HTEXT;
+
 	op_descr_ = new Fl_Output(curr_x, curr_y, WEDIT, HTEXT);
 	op_descr_->box(FL_FLAT_BOX);
 	op_descr_->color(FL_BACKGROUND_COLOR);
@@ -72,11 +82,13 @@ void qso_qth::save_values() {
 
 void qso_qth::enable_widgets() {
 	if (qth_details_) {
+		op_name_->value(qth_name_.c_str());
 		op_descr_->value(qth_details_->item("APP_ZZA_QTH_DESCR").c_str());
 		table_->set_data(qth_details_);
 	}
 	else {
-		op_descr_->value("No QTH Specified");
+		op_name_->value("<No name>");
+		op_descr_->value("");
 		table_->set_data(nullptr);
 	}
 	table_->redraw();

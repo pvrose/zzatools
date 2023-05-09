@@ -52,6 +52,7 @@ protected:
     // Macro expansion
     record* qth_details_;
     // Widgets
+    Fl_Output* op_name_;
     Fl_Output* op_descr_;
     table* table_;
     Fl_Button* bn_edit_;
