@@ -122,11 +122,11 @@ void qso_entry::create_form(int X, int Y) {
 	curr_x = max_x;
 	curr_y = save_y;
 
-	qth_ = new qso_qth(curr_x, curr_y, 10, 10, "My QTH");
-	curr_x += qth_->w();
-	curr_y += qth_->h();
-	max_x = max(max_x, qth_->x() + qth_->w()) + GAP;
-	max_y = max(max_y, qth_->y() + qth_->h());
+	misc_ = new qso_misc(curr_x, curr_y, WCHOICE + WINPUT + GAP, max_y - curr_y);
+	curr_x += misc_->w();
+	curr_y += misc_->h();
+	max_x = max(max_x, misc_->x() + misc_->w()) + GAP;
+	max_y = max(max_y, misc_->y() + misc_->h());
 
 	// nOtes input
 	curr_x = X + WCHOICE;
@@ -153,7 +153,7 @@ void qso_entry::enable_widgets() {
 			ip_field_[ix]->deactivate();
 		}
 		ip_notes_->deactivate();
-		qth_->deactivate();
+		misc_->deactivate();
 		break;
 	case qso_data::QSO_PENDING:
 		for (int ix = 0; ix <= number_fields_in_use_ && ix < NUMBER_TOTAL; ix++) {
@@ -167,7 +167,7 @@ void qso_entry::enable_widgets() {
 			ip_field_[ix]->deactivate();
 		}
 		ip_notes_->activate();
-		qth_->activate();
+		misc_->activate();
 		break;
 	case qso_data::QSO_STARTED:
 	case qso_data::NET_STARTED:
@@ -183,7 +183,7 @@ void qso_entry::enable_widgets() {
 			ip_field_[ix]->deactivate();
 		}
 		ip_notes_->activate();
-		qth_->activate();
+		misc_->activate();
 		break;
 	case qso_data::QSO_EDIT:
 	case qso_data::NET_EDIT:
@@ -196,7 +196,7 @@ void qso_entry::enable_widgets() {
 			ip_field_[ix]->deactivate();
 		}
 		ip_notes_->activate();
-		qth_->activate();
+		misc_->activate();
 		break;
 	default:
 		// Reserver=d for Query states
@@ -247,7 +247,7 @@ void qso_entry::copy_qso_to_display(int flags) {
 			break;
 		}
 		if (flags == CF_ALL_FLAGS || (flags & CF_DETAILS)) {
-			qth_->set_qth(qso_->item("APP_ZZA_QTH"));
+			misc_->qso(qso_);
 		}
 	}
 }

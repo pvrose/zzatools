@@ -2,7 +2,7 @@
 
 #include "book.h"
 #include "field_choice.h"
-#include "qso_qth.h"
+#include "qso_misc.h"
 
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Input.H>
@@ -130,7 +130,7 @@ protected:
 	// field inputs
 	field_input* ip_field_[NUMBER_TOTAL];
 	// QTH Edit group
-	qso_qth* qth_;
+	qso_misc* misc_;
 	// Parent qso_data
 	qso_data* qso_data_;
 	// Number of locked fields

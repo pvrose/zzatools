@@ -31,10 +31,12 @@ void qso_qth::load_values() {
 
 void qso_qth::create_form(int X, int Y) {
 	int curr_x = X + GAP;
-	int curr_y = Y + GAP;
+	int curr_y = Y + 1;
 	int max_x = curr_x;
 
-	op_name_ = new Fl_Output(curr_x, curr_y, WEDIT, HTEXT);
+	int width = w() - GAP - GAP;
+
+	op_name_ = new Fl_Output(curr_x, curr_y, width, HTEXT);
 	op_name_->box(FL_FLAT_BOX);
 	op_name_->color(FL_BACKGROUND_COLOR);
 	op_name_->textfont(FL_BOLD);
@@ -44,7 +46,7 @@ void qso_qth::create_form(int X, int Y) {
 	max_x = max(curr_x, op_name_->x() + op_name_->y());
 	curr_y += HTEXT;
 
-	op_descr_ = new Fl_Output(curr_x, curr_y, WEDIT, HTEXT);
+	op_descr_ = new Fl_Output(curr_x, curr_y, width, HTEXT);
 	op_descr_->box(FL_FLAT_BOX);
 	op_descr_->color(FL_BACKGROUND_COLOR);
 	op_descr_->textfont(FL_BOLD);
@@ -53,23 +55,21 @@ void qso_qth::create_form(int X, int Y) {
 	max_x = max(curr_x, op_descr_->x() + op_descr_->w());
 	
 	curr_y += HTEXT + HTEXT;
-	table_ = new table(curr_x, curr_y, WEDIT, 10 * ROW_HEIGHT, "Macro definition");
-	table_->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
-	table_->tooltip("The macro substitution used for this QTH");
-	max_x = max(max_x, table_->x() + table_->w());
+	int save_y = curr_y;
 
-	curr_y += table_->h() + GAP;
+	curr_y = y() + h() - GAP - HBUTTON;
+
 	bn_edit_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Edit");
 	bn_edit_->color(COLOUR_MAUVE);
 	bn_edit_->callback(cb_bn_edit, nullptr);
 	bn_edit_->tooltip("Open window to allow QTH to be edited");
 	max_x = max(max_x, bn_edit_->x() + bn_edit_->w());
 
-	max_x += GAP;
-	curr_y += HBUTTON + GAP;
+	table_ = new table(curr_x, save_y, width, curr_y - save_y, "Macro definition");
+	table_->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
+	table_->tooltip("The macro substitution used for this QTH");
+	max_x = max(max_x, table_->x() + table_->w());
 
-	resizable(nullptr);
-	size(max_x - X, curr_y - Y);
 	end();
 
 	show();
