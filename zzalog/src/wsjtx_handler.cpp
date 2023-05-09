@@ -506,7 +506,7 @@ bool wsjtx_handler::check_message(record* qso, string message, bool tx) {
 		}
 	}
 	else {
-		qso->item("QSO_COMPLETE", "N");
+		qso->item("QSO_COMPLETE", string("N"));
 	}
 	return true;
 }

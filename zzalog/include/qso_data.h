@@ -183,6 +183,8 @@ public:
 	void action_add_modem(record* qso);
 	// Update modem
 	void action_update_modem(record* qso);
+	// Cancel modem
+	void action_cancel_modem();
 
 
 protected:

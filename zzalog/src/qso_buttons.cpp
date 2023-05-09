@@ -39,7 +39,7 @@ map<qso_data::logging_state_t, list<qso_buttons::button_type> > button_map_ =
 	{ qso_data::NET_STARTED, {qso_buttons::SAVE_NET, qso_buttons::SAVE_QSO, qso_buttons::CANCEL_QSO, qso_buttons::CANCEL_NET,
 		qso_buttons::ADD_NET_QSO }},
 	{ qso_data::NET_EDIT, { qso_buttons::SAVE_EDIT_NET, qso_buttons::CANCEL_QSO, qso_buttons::ADD_NET_QSO}},
-	{ qso_data::QSO_MODEM, { qso_buttons::CANCEL_EDIT }}
+	{ qso_data::QSO_MODEM, { qso_buttons::CANCEL_MODEM }}
 };
 
 map<qso_buttons::button_type, qso_buttons::button_action> action_map_ =
@@ -58,6 +58,7 @@ map<qso_buttons::button_type, qso_buttons::button_action> action_map_ =
 	{ qso_buttons::WORKED_B4, { "B4?", "Display all previous QSOs with this callsign", FL_BACKGROUND_COLOR, qso_buttons::cb_wkb4, 0 } },
 	{ qso_buttons::SAVE_EDIT, { "Save", "Copy changed record back to book", FL_GREEN, qso_buttons::cb_save, 0}},
 	{ qso_buttons::CANCEL_EDIT, { "Cancel Edit", "Cancel the current QSO edit", FL_RED, qso_buttons::cb_cancel, 0 } },
+	{ qso_buttons::CANCEL_MODEM, { "Cancel", "Cancel the current modem QSO view", FL_RED, qso_buttons::cb_bn_cancel_modem, 0 } },
 	{ qso_buttons::NAV_FIRST, { "@$->|", "Select first record in book", FL_YELLOW, qso_buttons::cb_bn_navigate, (void*)NV_FIRST } },
 	{ qso_buttons::NAV_PREV, { "@<-", "Select previous record in book", FL_YELLOW, qso_buttons::cb_bn_navigate, (void*)NV_PREV } },
 	{ qso_buttons::NAV_NEXT, { "@->", "Select next record in book", FL_YELLOW, qso_buttons::cb_bn_navigate, (void*)NV_NEXT } },
@@ -528,6 +529,18 @@ void qso_buttons::cb_bn_delete_qso(Fl_Widget* w, void* v) {
 	switch (that->qso_data_->logging_state()) {
 	case qso_data::QSO_INACTIVE:
 		that->qso_data_->action_delete_qso();
+		break;
+	}
+	that->enable_widgets();
+}
+
+// Cancel the current modem operation
+void qso_buttons::cb_bn_cancel_modem(Fl_Widget* w, void* v) {
+	qso_buttons* that = ancestor_view<qso_buttons>(w);
+	that->disable_widgets();
+	switch (that->qso_data_->logging_state()) {
+	case qso_data::QSO_MODEM:
+		that->qso_data_->action_cancel_modem();
 		break;
 	}
 	that->enable_widgets();

@@ -202,7 +202,7 @@ void qso_data::enable_widgets() {
 			g_query_->hide();
 			break;
 		}
-//		g_buttons_->enable_widgets();
+		g_buttons_->enable_widgets();
 	}
 }
 
@@ -615,6 +615,7 @@ void qso_data::action_cancel() {
 
 	switch (logging_state_) {
 	case QSO_STARTED:
+	case QSO_MODEM:
 		g_entry_->delete_qso();
 		logging_state_ = QSO_INACTIVE;
 #ifdef WIN32
@@ -1198,8 +1199,7 @@ void qso_data::action_update_modem(record* qso) {
 	// Compare with existing
 	if (qso != current_qso()) {
 		// This is a new record as the previous one did not complete
-		logging_state_ = QSO_INACTIVE;
-		book_->delete_record(true);
+		action_cancel();
 		action_add_modem(qso);
 	}
 	else {
@@ -1214,6 +1214,18 @@ void qso_data::action_update_modem(record* qso) {
 	}
 	enable_widgets();
 }
+
+// Cancel modem operation
+void qso_data::action_cancel_modem() {
+	if (current_qso()->item("QSO_COMPLETE") == "" || current_qso()->item("QSO_COMPLETE") == "Y") {
+		// Complete so should save it
+		action_save();
+	}
+	else {
+		action_cancel();
+	}
+}
+
 
 // Dummy QSO
 record* qso_data::dummy_qso() {

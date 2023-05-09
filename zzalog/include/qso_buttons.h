@@ -63,6 +63,7 @@ public:
 		CANCEL_NET,
 		ADD_NET_QSO,
 		SAVE_EDIT_NET,
+		CANCEL_MODEM,
 	};
 
 
@@ -122,6 +123,8 @@ public:
 	static void cb_bn_start_net(Fl_Widget* w, void* v);
 	// Delete the selected QSO
 	static void cb_bn_delete_qso(Fl_Widget* w, void* v);
+	// Cancel the modem operation
+	static void cb_bn_cancel_modem(Fl_Widget* w, void* v);
 
 
 protected:
