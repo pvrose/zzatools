@@ -38,7 +38,8 @@ map<qso_data::logging_state_t, list<qso_buttons::button_type> > button_map_ =
 	{ qso_data::QRZ_MERGE, { qso_buttons::MERGE_DONE }},
 	{ qso_data::NET_STARTED, {qso_buttons::SAVE_NET, qso_buttons::SAVE_QSO, qso_buttons::CANCEL_QSO, qso_buttons::CANCEL_NET,
 		qso_buttons::ADD_NET_QSO }},
-	{ qso_data::NET_EDIT, { qso_buttons::SAVE_EDIT_NET, qso_buttons::CANCEL_QSO, qso_buttons::ADD_NET_QSO}}
+	{ qso_data::NET_EDIT, { qso_buttons::SAVE_EDIT_NET, qso_buttons::CANCEL_QSO, qso_buttons::ADD_NET_QSO}},
+	{ qso_data::QSO_MODEM, { qso_buttons::CANCEL_EDIT }}
 };
 
 map<qso_buttons::button_type, qso_buttons::button_action> action_map_ =

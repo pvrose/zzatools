@@ -193,6 +193,14 @@ void qso_data::enable_widgets() {
 			g_net_entry_->show();
 			g_net_entry_->enable_widgets();
 			break;
+		case QSO_MODEM:
+			snprintf(l, sizeof(l), "QSO Entry - %s - record received from modem app", current_qso()->item("CALL").c_str());
+			g_entry_->copy_label(l);
+			g_entry_->show();
+			g_entry_->enable_widgets();
+			g_net_entry_->hide();
+			g_query_->hide();
+			break;
 		}
 //		g_buttons_->enable_widgets();
 	}
@@ -219,6 +227,7 @@ void qso_data::update_qso(qso_num_t log_num) {
 		}
 		break;
 	case QSO_STARTED:
+	case QSO_MODEM:
 		// Ack whether to save or quit then activate new QSO
 		if (log_num != g_entry_->qso_number()) {
 			fl_beep(FL_BEEP_QUESTION);
@@ -312,6 +321,27 @@ void qso_data::update_query(logging_state_t query, qso_num_t match_num, qso_num_
 		// TODO:
 		break;
 	}
+}
+
+// Update modem QSO
+void qso_data::update_modem_qso(record* qso) {
+	switch (logging_state_) {
+	case QSO_PENDING:
+		action_deactivate();
+		// drop down
+	case QSO_INACTIVE:
+		action_add_modem(qso);
+		break;
+
+	case QSO_MODEM:
+		action_update_modem(qso);
+		break;
+
+	default:
+		status_->misc_status(ST_ERROR, "DASH: Gatting a modem update when not expected");
+		return;
+	}
+	enable_widgets();
 }
 
 // Callback - QSL viewer "closing" - make it hide instead
@@ -444,6 +474,12 @@ void qso_data::action_new_qso(record* qso, qso_init_t mode) {
 		qe->copy_qso_to_qso(qso, qso_entry::CF_TIME | qso_entry::CF_RIG_ETC | qso_entry::CF_CAT);
 		qe->copy_clock_to_qso();
 		break;
+	case QSO_COPY_MODEM:
+		// Set QSO and Update the display
+		qe->qso(qso);
+		qe->copy_clock_to_qso();
+		qe->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
+		break;
 	}
 	previous_mode_ = new_mode;
 }
@@ -472,10 +508,11 @@ void qso_data::action_start(qso_init_t mode) {
 // Action SAVE - transition from QSO_STARTED to QSO_INACTIVE while saving record
 void qso_data::action_save() {
 	record* qso = nullptr;
-	item_num_t item_number;
-	qso_num_t qso_number;
+	item_num_t item_number = -1;
+	qso_num_t qso_number = -1;
 	switch (logging_state_) {
 	case QSO_STARTED:
+	case QSO_MODEM:
 		item_number = book_->item_number(g_entry_->qso_number());
 		qso = g_entry_->qso();
 		qso_number = g_entry_->qso_number();
@@ -520,6 +557,7 @@ void qso_data::action_save() {
 		qso_number = book_->record_number(item_number);
 		break;
 	case QSO_NONE:
+	case QSO_COPY_MODEM:
 		// Put the record in its correct position and save that position
 		item_number = book_->correct_record_position(item_number);
 		qso_number = book_->record_number(item_number);
@@ -540,6 +578,7 @@ void qso_data::action_save() {
 	book_->upload_qso(qso_number);
 	switch (logging_state_) {
 	case QSO_STARTED:
+	case QSO_MODEM:
 		logging_state_ = SWITCHING;
 		book_->modified(true);
 		book_->selection(item_number, HT_INSERTED);
@@ -1142,6 +1181,40 @@ void qso_data::action_cancel_net_edit() {
 	enable_widgets();
 }
 
+// Start a modem record
+void qso_data::action_add_modem(record* qso) {
+	// Add to book
+	book_->enable_save(false);
+	action_new_qso(qso, QSO_COPY_MODEM);
+	g_entry_->append_qso();
+	(ancestor_view<qso_manager>(this))->update_import_qso(qso);
+	logging_state_ = QSO_MODEM;
+	book_->selection(book_->item_number(g_entry_->qso_number()), HT_INSERTED);
+	enable_widgets();
+}
+
+// Update or replace a modem record
+void qso_data::action_update_modem(record* qso) {
+	// Compare with existing
+	if (qso != current_qso()) {
+		// This is a new record as the previous one did not complete
+		logging_state_ = QSO_INACTIVE;
+		book_->delete_record(true);
+		action_add_modem(qso);
+	}
+	else {
+		if (qso->item("QSO_COMPLETE") == "" || qso->item("QSO_COMPLETE") == "Y") {
+			// The QSO is complete
+			action_save();
+
+		}
+		else {
+			g_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
+		}
+	}
+	enable_widgets();
+}
+
 // Dummy QSO
 record* qso_data::dummy_qso() {
 	record* dummy = new record;
@@ -1259,6 +1332,7 @@ record* qso_data::current_qso() {
 	case QSO_PENDING:
 	case QSO_STARTED:
 	case QSO_EDIT:
+	case QSO_MODEM:
 		return g_entry_->qso();
 	case QSO_BROWSE:
 	case QUERY_DUPE:

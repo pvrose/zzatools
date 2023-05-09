@@ -1,6 +1,5 @@
 ﻿#include "wsjtx_handler.h"
 #include "status.h"
-#include "import_data.h"
 #include "menu.h"
 #include "utils.h"
 #include "dxa_if.h"
@@ -8,6 +7,7 @@
 #include "pfx_data.h"
 #include "toolbar.h"
 #include "qso_manager.h"
+#include "adi_reader.h"
 
 #include <stdio.h>
 #include <sstream>
@@ -29,7 +29,6 @@
 using namespace std;
 
 extern status* status_;
-extern import_data* import_data_;
 extern void cb_error_message(status_t level, const char* message);
 extern menu* menu_;
 extern Fl_Preferences* settings_;
@@ -49,6 +48,7 @@ wsjtx_handler::wsjtx_handler()
 {
 	that_ = this;
 	server_ = nullptr;
+	qso_ = nullptr;
 	run_server();
 	new_heartbeat_ = false;
 	status_rcvd_ = 0;
@@ -159,12 +159,13 @@ int wsjtx_handler::handle_log(stringstream& ss) {
 	// Convert it to a record
 	stringstream adif;
 	adif.str(utf8);
-	// Stop any extant update and wait for it to complete
-	import_data_->stop_update(false);
-	while (!import_data_->update_complete()) Fl::check();
-	import_data_->load_stream(adif, import_data::update_mode_t::DATAGRAM);
-	// Wait for the import to finish
-	while (import_data_->size()) Fl::check();
+	adi_reader* reader = new adi_reader;
+	record* log_qso = new record;;
+	load_result_t result;
+	reader->load_record(log_qso, adif, result);
+	qso_->merge_records(log_qso);
+	delete log_qso;
+	qso_manager_->update_modem_qso(qso_);
 	status_->misc_status(ST_NOTE, "WSJT-X: Logged QSO");
 #ifdef _WIN32
 	// Clear DX locator flag
@@ -194,9 +195,7 @@ int wsjtx_handler::handle_decode(stringstream& ss) {
 	minutes = minutes - (hours * 60);
 	char message[256];
 	snprintf(message, 256, "WSJT-X: Decode %02d:%02d:%02.0f: %s", hours, minutes, seconds, decode.message.c_str());
-	// Change display if addressed to user
-	vector<string> words;
-	split_line(decode.message, words, ' ');
+	add_rx_message(decode);
 	return 0;
 }
 
@@ -249,28 +248,34 @@ int wsjtx_handler::handle_status(stringstream& ss) {
 	status.tx_rx_period = get_uint32(ss);
 	// Configuration name
 	status.config_name = get_utf8(ss); 
+	// TX Message
+	status.tx_message = get_utf8(ss);
+	// Create qso
+	add_tx_message(status);
 #ifdef _WIN32
-	if (status.dx_call.length() && status.dx_grid.length() && status.transmitting) {
-		// Use the actual grid loaction - and put it into the cache
-		dxa_if_->set_dx_loc(status.dx_grid, status.dx_call);
-		grid_cache_[status.dx_call] = status.dx_grid;
-		toolbar_->search_text(status.dx_call);
-	}
-	else if (status.dx_call.length() && status.transmitting) {
-		// Look in location cache
-		if (grid_cache_.find(status.dx_call) != grid_cache_.end()) {
-			// Use the remembered grid loaction
-			dxa_if_->set_dx_loc(grid_cache_[status.dx_call], status.dx_call);
+	if (dxa_if_) {
+		if (status.dx_call.length() && status.dx_grid.length() && status.transmitting) {
+			// Use the actual grid loaction - and put it into the cache
+			dxa_if_->set_dx_loc(status.dx_grid, status.dx_call);
+			grid_cache_[status.dx_call] = status.dx_grid;
 			toolbar_->search_text(status.dx_call);
 		}
-		else {
-			dxa_if_->set_dx_loc(status.dx_call);
-			toolbar_->search_text(status.dx_call);
+		else if (status.dx_call.length() && status.transmitting) {
+			// Look in location cache
+			if (grid_cache_.find(status.dx_call) != grid_cache_.end()) {
+				// Use the remembered grid loaction
+				dxa_if_->set_dx_loc(grid_cache_[status.dx_call], status.dx_call);
+				toolbar_->search_text(status.dx_call);
+			}
+			else {
+				dxa_if_->set_dx_loc(status.dx_call);
+				toolbar_->search_text(status.dx_call);
+			}
 		}
-	}
-	else if (!status.dx_call.length()) {
-		// Can clear the Dx Location by clearing the DX Call field
-		dxa_if_->clear_dx_loc();
+		else if (!status.dx_call.length()) {
+			// Can clear the Dx Location by clearing the DX Call field
+			dxa_if_->clear_dx_loc();
+		}
 	}
 #endif
 	prev_status_ = status;
@@ -385,4 +390,123 @@ void wsjtx_handler::close_server() {
 	if (server_) {
 		status_->misc_status(ST_OK, "WSJT-X: Application closing");
 	}
+}
+
+void wsjtx_handler::add_tx_message(const status_dg& status) {
+	if (status.transmitting) {
+		// If the call changes use a different record - qso_data will handle it
+		if (qso_ == nullptr || qso_->item("CALL") != status.dx_call) {
+			qso_ = new record();
+		}
+		// Can get all the required fields off status
+		qso_->item("CALL", status.dx_call);
+		qso_->item("GRIDSQUARE", status.dx_grid);
+		double freq = (status.dial_freq + status.tx_offset) / 1000000.0;
+		char cfreq[15];
+		snprintf(cfreq, sizeof(cfreq), "%0.6f", freq);
+		qso_->item("FREQ", string(cfreq));
+		qso_->item("MODE", status.mode);
+		qso_->item("RST_SENT", status.report);
+		qso_->item("STATION_CALLSIGN", status.own_call);
+		if (check_message(qso_, status.tx_message, true)) {
+			qso_manager_->update_modem_qso(qso_);
+		}
+		else {
+			char msg[128];
+			snprintf(msg, sizeof(msg), "WSJT-X: Mismatch in decoding status for %s", status.dx_call.c_str());
+			status_->misc_status(ST_WARNING, msg);
+		}
+	}
+}
+
+void wsjtx_handler::add_rx_message(const decode_dg& decode) {
+	// Parse the message
+	vector<string> words;
+	split_line(decode.message, words, ' ');
+	if (words[0] != my_call_ && words[0] != my_bracketed_call_) {
+		// Not interested as its not for me
+		return;
+	}
+
+	const string& call = words[1];
+	if (qso_ == nullptr) {
+		// Someone is calling me - wait until I reply
+		return;
+	}
+
+	if (check_message(qso_, decode.message, false)) {
+		qso_manager_->update_modem_qso(qso_);
+	}
+	else {
+		char msg[128];
+		snprintf(msg, sizeof(msg), "WSJT-X: Mismatch in decoding decode for %s", call.c_str());
+		status_->misc_status(ST_WARNING, msg);
+	}
+}
+
+bool wsjtx_handler::check_message(record* qso, string message, bool tx) {
+	// Now parse the exchange
+	vector<string> words;
+	split_line(message, words, ' ');
+	string report = words.back();
+	string call = words[0];
+	string qso_call = qso->item("CALL");
+	if (call != qso_call && call != ("<" + qso_call + ">")) {
+		return false;
+	}
+	if (report == "RR73" || report == "RRR") {
+		// If we've seen the R-00 then mark the QSO complete, otherwise mark in provisional until we see the 73
+		if (qso->item("QSO_COMPLETE") == "?") {
+			qso->item("QSO_COMPLETE", string(""));
+		}
+		else if (qso->item("QSO_COMPLETE") == "N") {
+			qso->item("QSO_COMPLETE", string("?"));
+		}
+	}
+	else if (report == "73") {
+		// A 73 definitely indicates QSO compplete
+		qso->item("QSO_COMPLETE", string(""));
+	}
+	else if (report[0] == 'R') {
+		// The first of the rogers
+		if (qso->item("QSO_COMPLETE") == "N") {
+			qso->item("QSO_COMPLETE", string("?"));
+		}
+		// Update reports if they've not been provided
+		if (tx && !qso->item_exists("RST_SENT")) {
+			qso->item("RST_SENT", report.substr(1));
+		}
+		else if (tx && qso->item("RST_SENT") != report.substr(1)) {
+			char msg[128];
+			snprintf(msg, sizeof(msg), "WSJTX: Mismatch for %s RST_SENT is changing", qso->item("CALL").c_str());
+			status_->misc_status(ST_WARNING, msg);
+			return false;
+		}
+		else if (!tx && !qso->item_exists("RST_RCVD")) {
+			qso->item("RST_RCVD", report.substr(1));
+		}
+	}
+	else if (!tx && !qso->item_exists("GRIDSQUARE")) {
+		// Update gridsquare if it's not been provided
+		qso->item("GRIDSQUARE", report);
+	}
+	else if (!tx && qso->item("GRIDSQUARE") != report) {
+		char msg[128];
+		snprintf(msg, sizeof(msg), "WSJTX: Mismatch for %s GRIDSQUARE is changing", qso->item("CALL").c_str());
+		status_->misc_status(ST_WARNING, msg);
+		return false;
+	}
+	else if (report[0] == '-' || (report[0] >= '0' && report[0] <= '9')) {
+		// Numeric report
+		if (tx && !qso->item_exists("RST_SENT")) {
+			qso->item("RST_SENT", report);
+		}
+		else if (!tx && !qso->item_exists("RST_RCVD")) {
+			qso->item("RST_RCVD", report);
+		}
+	}
+	else {
+		qso->item("QSO_COMPLETE", "N");
+	}
+	return true;
 }

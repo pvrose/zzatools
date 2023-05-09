@@ -2,6 +2,7 @@
 #define __WSJTX_HANDLER__
 
 #include "socket_server.h"
+#include "record.h"
 
 #include <string>
 #include <cstdint>
@@ -82,7 +83,7 @@ using namespace std;
 				* Frequency Tolerance    quint32
 				* T / R Period             quint32
 				* Configuration Name     utf8
-				*
+				* TX Message
 			*/
 			string id;
 			uint64_t dial_freq;
@@ -105,6 +106,7 @@ using namespace std;
 			uint32_t freq_tolerance;
 			uint32_t tx_rx_period;
 			string config_name;
+			string tx_message;
 		};
 
 		// Receive a datagram from WSJT-X
@@ -142,6 +144,12 @@ using namespace std;
 		void put_utf8(stringstream& os, string s);
 		// Add 32-but unsigned integer
 		void put_uint32(stringstream& os, const unsigned int i);
+		// Add RX message to QSO
+		void add_rx_message(const decode_dg& decode);
+		// Add TX message to QSO
+		void add_tx_message(const status_dg& status);
+		// Check message validity
+		bool check_message(record* qso, string message, bool tx);
 
 		// Socket server
 		socket_server* server_;
@@ -168,6 +176,8 @@ using namespace std;
 		status_dg prev_status_;
 		// Grid locations worked
 		map<string, string> grid_cache_;
+		// Interface QSO record
+		record* qso_;
 	};
 
 #endif

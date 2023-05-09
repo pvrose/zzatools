@@ -398,3 +398,8 @@ void qso_manager::stop_ticker() {
 qso_data* qso_manager::data() {
 	return data_group_;
 }
+
+// Update book with a QSO from the modem app
+void qso_manager::update_modem_qso(record* qso) {
+	data_group_->update_modem_qso(qso);
+}

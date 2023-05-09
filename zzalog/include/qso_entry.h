@@ -71,6 +71,7 @@ public:
 	// Set/get records
 	record* qso();
 	void qso(qso_num_t qso_number);
+	void qso(record* qso);
 	record* original_qso();
 	qso_num_t qso_number();
 

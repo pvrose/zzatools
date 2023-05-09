@@ -171,6 +171,7 @@ void qso_entry::enable_widgets() {
 		break;
 	case qso_data::QSO_STARTED:
 	case qso_data::NET_STARTED:
+	case qso_data::QSO_MODEM:
 		for (int ix = 0; ix <= number_fields_in_use_ && ix < NUMBER_TOTAL; ix++) {
 			if (ch_field_[ix])
 				if (ix < number_locked_ + NUMBER_FIXED) ch_field_[ix]->deactivate();
@@ -652,6 +653,12 @@ void qso_entry::qso(qso_num_t number) {
 		delete original_qso_;
 		original_qso_ = new record(*qso_);
 	}
+}
+
+// Set current qso as supplied on
+void qso_entry::qso(record* qso) {
+	qso_number_ = -1;
+	qso_ = qso;
 }
 
 // Get original qso

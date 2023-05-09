@@ -45,6 +45,7 @@ public:
 		NET_EDIT,        // Converting sngle QSO into a net by adding callsigns
 		NET_ADDING,      // Adding a new QSO to the started net.
 		SWITCHING,       // Switching state - used to ignore stuff
+		QSO_MODEM,       // Recording QSOs from a modem
 	};
 
 	enum dupe_flags : int {
@@ -62,6 +63,7 @@ public:
 		QSO_COPY_CONDX,     // Start a QSO copying station details and CAT conditions
 		QSO_COPY_FOR_NET,   // Start a QSO copyin station details, CAT conditions and start time
 		QSO_AS_WAS,         // Used with action_activate() to maintain the existing one
+		QSO_COPY_MODEM,     // Copy QSO from modem
 	};
 
 public:
@@ -94,6 +96,8 @@ public:
 	void update_qso(qso_num_t log_num);
 	// Update query
 	void update_query(logging_state_t query, qso_num_t match_num, qso_num_t query_num);
+	// Update modem QSO
+	void update_modem_qso(record* qso);
 	// Get default copy record
 	qso_num_t get_default_number();
 	// Initialise fields
@@ -175,6 +179,10 @@ public:
 	void action_new_qso(record* qso, qso_init_t mode);
 	// Delete the selected QSO
 	void action_delete_qso();
+	// Use the QSO received from the modem
+	void action_add_modem(record* qso);
+	// Update modem
+	void action_update_modem(record* qso);
 
 
 protected:
