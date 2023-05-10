@@ -663,13 +663,18 @@ bool eqsl_handler::upload_eqsl_log(book* book) {
 	fl_cursor(FL_CURSOR_WAIT);
 	bool ok = true;
 	// For book - use STATION_CALLSIGN of first QSO
-	record* this_record = book_->get_record(0, false);
+	record* this_record = book->get_record(0, false);
 	string station = this_record->item("STATION_CALLSIGN", true, true);
 	if (station.length() && station != to_upper(username_)) {
 		char message[100];
-		snprintf(message, 100, "EQSL: Using %s instead of username %s", station.c_str(), username_.c_str());
+		snprintf(message, 100, "EQSL: Uploading %s instead of username %s", station.c_str(), username_.c_str());
 		status_->misc_status(ST_WARNING, message);
 		username_ = station;
+	}
+	else {
+		char message[100];
+		snprintf(message, 100, "EQSL: Uploading %s", username_.c_str());
+		status_->misc_status(ST_OK, message);
 	}
 	// stream the book data 
 	// Add QSL or SWL message to the record
@@ -699,6 +704,12 @@ bool eqsl_handler::upload_eqsl_log(book* book) {
 	vector<url_handler::field_pair> f_fields;
 	form_fields(f_fields);
 	stringstream response;
+#ifdef _DEBUG
+	printf("Posting to www.eqsl.cc ...\n");
+	for (auto it = f_fields.begin(); it != f_fields.end(); it++) {
+		printf("     %s %s\n", (*it).name.c_str(), (*it).value.c_str());
+	}
+#endif
 	// Post the form to eQSL.cc with the stream data attached. WE'll get a response to indicate success or not
 	if (url_handler_->post_form("https://www.eqsl.cc/qslcard/ImportADIF.cfm", f_fields, &ss, &response)) {
 		// Successfully uploaded
