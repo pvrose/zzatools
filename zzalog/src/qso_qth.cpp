@@ -95,27 +95,11 @@ void qso_qth::enable_widgets() {
 	redraw();
 
 	qso_data* data = ancestor_view<qso_data>(this);
-	switch (data->logging_state()) {
-	case qso_data::QSO_PENDING:
-		bn_edit_->deactivate();
-		break;
-	default:
-		bn_edit_->activate();
-		break;
-	}
 }
 
 void qso_qth::set_qth(string name) {
 	qth_name_ = name;
-	delete qth_details_;
-	qth_details_ = nullptr;
-	if (name.length()) {
-		record* src = spec_data_->expand_macro("APP_ZZA_QTH", qth_name_);
-		if (src) {
-			qth_details_ = new record(*src);
-		}
-		
-	}
+	qth_details_ = spec_data_->expand_macro("APP_ZZA_QTH", qth_name_);
 	enable_widgets();
 }
 
@@ -127,7 +111,6 @@ void qso_qth::cb_bn_edit(Fl_Widget* w, void* v) {
 	switch (dlg->display()) {
 	case BN_OK: 
 	{
-		that->qth_details_ = spec_data_->expand_macro("APP_ZZA_QTH", that->qth_name_);
 		set<string> changed_fields = spec_data_->get_macro_changes();
 		record* qso = qe->qso();
 		if (qso && qso->item("APP_ZZA_QTH") == that->qth_name_) {

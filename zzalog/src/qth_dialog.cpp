@@ -307,6 +307,8 @@ void qth_dialog::enable_widgets() {
 	ip_cont_->value(current_qth_.continent.c_str());
 	ip_iota_->value(current_qth_.iota.c_str());
 	ip_description_->value(current_qth_.description.c_str());
+	// TODO - there isn't a MY_CONT in ADIF
+	ip_cont_->deactivate();
 }
 
 // Callback that converts what is typed to upper-case
