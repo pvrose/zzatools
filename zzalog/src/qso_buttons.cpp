@@ -528,6 +528,7 @@ void qso_buttons::cb_bn_delete_qso(Fl_Widget* w, void* v) {
 	that->disable_widgets();
 	switch (that->qso_data_->logging_state()) {
 	case qso_data::QSO_INACTIVE:
+	case qso_data::QSO_PENDING:
 		that->qso_data_->action_delete_qso();
 		break;
 	}
