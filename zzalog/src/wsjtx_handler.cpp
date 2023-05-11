@@ -402,6 +402,7 @@ void wsjtx_handler::add_tx_message(const status_dg& status) {
 	if (status.transmitting) {
 		// If the call changes use a different record - qso_data will handle it
 		if (qso_ == nullptr || qso_->item("CALL") != status.dx_call) {
+			if (qso_ && qso_->item("QSO_COMPLETE") == "Y") qso_->item("QSO_COMPLETE", string(""));
 			qso_ = new record();
 		}
 		// Can get all the required fields off status
@@ -463,13 +464,13 @@ bool wsjtx_handler::check_message(record* qso, string message, bool tx) {
 	string report = words.back();
 	string call = words[0];
 	string qso_call = qso->item("CALL");
-	if (call != qso_call && call != ("<" + qso_call + ">")) {
+	if (call != qso_call && call != ("<" + qso_call + ">") && call <= "CQ") {
 		return false;
 	}
 	if (report == "RR73" || report == "RRR") {
 		// If we've seen the R-00 then mark the QSO complete, otherwise mark in provisional until we see the 73
 		if (qso->item("QSO_COMPLETE") == "?") {
-			qso->item("QSO_COMPLETE", string(""));
+			qso->item("QSO_COMPLETE", string("Y"));
 		}
 		else if (qso->item("QSO_COMPLETE") == "N") {
 			qso->item("QSO_COMPLETE", string("?"));
@@ -508,7 +509,7 @@ bool wsjtx_handler::check_message(record* qso, string message, bool tx) {
 		status_->misc_status(ST_WARNING, msg);
 		return false;
 	}
-	else if (report[0] == '-' || (report[0] >= '0' && report[0] <= '9')) {
+	else if (report[0] == '-' || report[0] == '+' || (report[0] >= '0' && report[0] <= '9')) {
 		// Numeric report
 		if (tx && !qso->item_exists("RST_SENT")) {
 			qso->item("RST_SENT", report);

@@ -477,6 +477,7 @@ void qso_data::action_new_qso(record* qso, qso_init_t mode) {
 	case QSO_COPY_MODEM:
 		// Set QSO and Update the display
 		qe->qso(qso);
+		ancestor_view<qso_manager>(this)->update_import_qso(qso);
 		qe->copy_clock_to_qso();
 		qe->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
 		break;
