@@ -162,7 +162,6 @@ int wsjtx_handler::handle_log(stringstream& ss) {
 	adi_reader* reader = new adi_reader;
 	// The stream received from WSJT-X is header and record so create a book from it
 	book* rcvd_book = new book();
-	load_result_t result;
 	if (qso_) {
 		reader->load_book(rcvd_book, adif);
 		record* log_qso = rcvd_book->get_record(0, false);
