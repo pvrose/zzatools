@@ -160,13 +160,19 @@ int wsjtx_handler::handle_log(stringstream& ss) {
 	stringstream adif;
 	adif.str(utf8);
 	adi_reader* reader = new adi_reader;
-	record* log_qso = new record;;
+	// The stream received from WSJT-X is header and record so create a book from it
+	book* rcvd_book = new book();
 	load_result_t result;
-	reader->load_record(log_qso, adif, result);
-	qso_->merge_records(log_qso);
-	delete log_qso;
-	qso_manager_->update_modem_qso(qso_);
-	status_->misc_status(ST_NOTE, "WSJT-X: Logged QSO");
+	if (qso_) {
+		reader->load_book(rcvd_book, adif);
+		record* log_qso = rcvd_book->get_record(0, false);
+		qso_->merge_records(log_qso);
+		qso_->item("QSO_COMPLETE", string(""));
+		qso_manager_->update_modem_qso(qso_);
+		status_->misc_status(ST_NOTE, "WSJT-X: Logged QSO");
+		delete rcvd_book;
+		qso_ = nullptr;
+	}
 #ifdef _WIN32
 	// Clear DX locator flag
 	dxa_if_->clear_dx_loc();
@@ -410,6 +416,9 @@ void wsjtx_handler::add_tx_message(const status_dg& status) {
 		qso_->item("STATION_CALLSIGN", status.own_call);
 		if (check_message(qso_, status.tx_message, true)) {
 			qso_manager_->update_modem_qso(qso_);
+			if (qso_->item("QSO_COMPLETE").length() == 0) {
+				qso_ = nullptr;
+			}
 		}
 		else {
 			char msg[128];
@@ -436,6 +445,9 @@ void wsjtx_handler::add_rx_message(const decode_dg& decode) {
 
 	if (check_message(qso_, decode.message, false)) {
 		qso_manager_->update_modem_qso(qso_);
+		if (qso_->item("QSO_COMPLETE").length() == 0) {
+			qso_ = nullptr;
+		}
 	}
 	else {
 		char msg[128];

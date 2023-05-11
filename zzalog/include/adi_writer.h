@@ -25,7 +25,7 @@ using namespace std;
 		// write book to output stream
 		bool store_book(book* book, ostream& out, bool clean, set<string>* fields = nullptr);
 		// Convert record to ADIF format text and send to the output stream
-		void to_adif(record* record, ostream& out, set<string>* fields = nullptr);
+		static void to_adif(record* record, ostream& out, set<string>* fields = nullptr);
 		// Convert item to ADIF format text and send to the output stream
 		static string item_to_adif(record* record, string field);
 

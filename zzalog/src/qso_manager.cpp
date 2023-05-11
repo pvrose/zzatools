@@ -26,8 +26,10 @@
 #include "qsl_viewer.h"
 #include "qrz_handler.h"
 #include "main_window.h"
+#include "adi_writer.h"
 
 #include <set>
+#include <iostream>
 
 #include <FL/Fl_Preferences.H>
 #include <FL/Fl_Input_Choice.H>
@@ -401,5 +403,8 @@ qso_data* qso_manager::data() {
 
 // Update book with a QSO from the modem app
 void qso_manager::update_modem_qso(record* qso) {
+	cout << "Received record from modem:" << endl;
+	adi_writer::to_adif(qso, cout);
+	cout << endl;
 	data_group_->update_modem_qso(qso);
 }
