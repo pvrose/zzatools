@@ -688,17 +688,17 @@ bool record::update_band(bool force /*=false*/) {
 }
 
 // Merge fields from another record
-bool record::merge_records(record* record, bool allow_loc_mismatch /* = false */, hint_t* result /*= nullptr*/)
+bool record::merge_records(record* merge_record, bool allow_loc_mismatch /* = false */, hint_t* result /*= nullptr*/)
 {
 	bool merged = false;
 	bool bearing_change = false;
-	// For each field in other record
-	for (auto it = record->begin(); it != record->end(); it++) {
+	// For each field in other merge_record
+	for (auto it = merge_record->begin(); it != merge_record->end(); it++) {
 		string field_name = it->first;
 		string merge_data = it->second;
 		// Get my value for the field
 		string my_data = item(field_name);
-		bool item_match = items_match(record, field_name);
+		bool item_match = items_match(merge_record, field_name);
 		bool is_location = false;
 		bool is_grid_4_to_6 = false;
 		bool is_qsl_rcvd = false;
@@ -723,7 +723,7 @@ bool record::merge_records(record* record, bool allow_loc_mismatch /* = false */
 			// Actually it's to the north of the Bering Straits, but can be captured if
 			// RR73 is used in JT exchanges
 			if (merge_data != "RR73" || 
-				fl_choice("Location in record is RR73 - please confirm?", fl_ok, fl_cancel, "") == 0) {
+				fl_choice("Location in merge_record is RR73 - please confirm?", fl_ok, fl_cancel, "") == 0) {
 				// Grid is good (RR73 confirmed by user)
 				is_location = true;
 				// Updating a 4-character grid with a 6-character one and the first 4 agree
@@ -748,7 +748,7 @@ bool record::merge_records(record* record, bool allow_loc_mismatch /* = false */
 		}
 		else if (field_name == "TIME_OFF" ||
 			field_name == "QSO_DATE_OFF") {
-			// Update from the other record - erstwhile bug overwrote previous import
+			// Update from the other merge_record - erstwhile bug overwrote previous import
 			if (!item_match) {
 				item(field_name, merge_data);
 				merged = true;
@@ -763,6 +763,17 @@ bool record::merge_records(record* record, bool allow_loc_mismatch /* = false */
 			// Merge data is more accurate
 			item(field_name, merge_data);
 			merged = true;
+		}
+		else if (!item_match && (field_name == "RST_RVCD" || field_name == "RST_SENT")) {
+			// Use merge data if the values match numerically but differ in string value
+			int l_value;
+			int r_value;
+			item(field_name, l_value);
+			merge_record->item(field_name, r_value);
+			if (l_value == r_value) {
+				item(field_name, merge_data);
+				merged = true;
+			}
 		}
 		else {
 			// All other fields

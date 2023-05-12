@@ -461,9 +461,13 @@ bool wsjtx_handler::check_message(record* qso, string message, bool tx) {
 	vector<string> words;
 	split_line(message, words, ' ');
 	string report = words.back();
+	while (report.length() == 0) {
+		words.pop_back();
+		report = words.back();
+	}
 	string call = words[0];
 	string qso_call = qso->item("CALL");
-	if (call != qso_call && call != ("<" + qso_call + ">") && call <= "CQ") {
+	if (call != qso_call && call != ("<" + qso_call + ">") && call != "CQ") {
 		return false;
 	}
 	if (report == "RR73" || report == "RRR") {
