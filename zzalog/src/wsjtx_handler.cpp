@@ -167,6 +167,7 @@ int wsjtx_handler::handle_log(stringstream& ss) {
 		record* log_qso = rcvd_book->get_record(0, false);
 		qso_->merge_records(log_qso);
 		qso_->item("QSO_COMPLETE", string(""));
+		printf("LOG %s sending to DASH\n", qso_->item("CALL").c_str());
 		qso_manager_->update_modem_qso(qso_);
 		status_->misc_status(ST_NOTE, "WSJT-X: Logged QSO");
 		delete rcvd_book;
@@ -509,7 +510,8 @@ bool wsjtx_handler::check_message(record* qso, string message, bool tx) {
 		if (target != my_call_ && target != my_bracketed_call_) {
 			return false;
 		}
-		// taret
+		// save sender
+		qso->item("CALL", sender);
 	}
 	if (exchange == "RR73" || exchange == "RRR") {
 		// If we've seen the R-00 then mark the QSO complete, otherwise mark in provisional until we see the 73
@@ -561,6 +563,7 @@ bool wsjtx_handler::check_message(record* qso, string message, bool tx) {
 		else if (!tx && !qso->item_exists("RST_RCVD")) {
 			qso->item("RST_RCVD", exchange);
 		}
+		qso->item("QSO_COMPLETE", string("N"));
 	}
 	else {
 		qso->item("QSO_COMPLETE", string("N"));
