@@ -404,6 +404,7 @@ void wsjtx_handler::add_tx_message(const status_dg& status) {
 		if (qso_ == nullptr || qso_->item("CALL") != status.dx_call) {
 			if (qso_ && qso_->item("QSO_COMPLETE") == "Y") qso_->item("QSO_COMPLETE", string(""));
 			qso_ = new record();
+			qso_->item("QSO_COMPLETE", string("N"));
 		}
 		// Can get all the required fields off status
 		qso_->item("CALL", status.dx_call);
@@ -415,6 +416,7 @@ void wsjtx_handler::add_tx_message(const status_dg& status) {
 		qso_->item("MODE", status.mode);
 		qso_->item("RST_SENT", status.report);
 		qso_->item("STATION_CALLSIGN", status.own_call);
+
 		if (check_message(qso_, status.tx_message, true)) {
 			printf("TX: %s - sending to DASH\n", status.tx_message.c_str());
 			qso_manager_->update_modem_qso(qso_);
@@ -486,12 +488,20 @@ bool wsjtx_handler::check_message(record* qso, string message, bool tx) {
 		if (sender != my_call_) {
 			return false;
 		}
-		// Target is the other call or a CQ
+		// Target is CQ
 		if (target.substr(0, 2) == "CQ") {
-			// Ignore CQs
-			return false;
+			if (qso_ && qso_->item("CALL").length()) {
+				// A CQ is replacing a call to another station so replace that call with null string
+				qso_->item("CALL", string(""));
+			}
+			else {
+				// Ignore single CQs
+				return false;
+			}
 		}
+		// Over with another station
 		else {
+			// Set QSO->CALL to the target field - replacing cached callsigns eg "<GM3ZZA>" with "GM3ZZA"
 			string their_call = qso->item("CALL");
 			if (target[0] == '<') {
 				target = target.substr(1, target.length() - 2);
@@ -508,6 +518,7 @@ bool wsjtx_handler::check_message(record* qso, string message, bool tx) {
 	else {
 		// Am I the target?
 		if (target != my_call_ && target != my_bracketed_call_) {
+			// return false if not
 			return false;
 		}
 		// save sender
@@ -516,6 +527,7 @@ bool wsjtx_handler::check_message(record* qso, string message, bool tx) {
 	if (exchange == "RR73" || exchange == "RRR") {
 		// If we've seen the R-00 then mark the QSO complete, otherwise mark in provisional until we see the 73
 		if (qso->item("QSO_COMPLETE") == "?") {
+			// It's complete as far as I am concerned, but partner may disagree - leave QSO active
 			qso->item("QSO_COMPLETE", string("Y"));
 		}
 		else if (qso->item("QSO_COMPLETE") == "N") {
@@ -529,15 +541,17 @@ bool wsjtx_handler::check_message(record* qso, string message, bool tx) {
 	else if (exchange[0] == 'R') {
 		// The first of the rogers
 		if (qso->item("QSO_COMPLETE") == "N") {
+			// Half the exchange is complete
 			qso->item("QSO_COMPLETE", string("?"));
 		}
-		// Update reports if they've not been provided
+		// Update reports if they've not been provided 
 		if (tx && !qso->item_exists("RST_SENT")) {
 			qso->item("RST_SENT", exchange.substr(1));
 		}
 		else if (tx && qso->item("RST_SENT") != exchange.substr(1)) {
 			char msg[128];
-			snprintf(msg, sizeof(msg), "WSJTX: Mismatch for %s RST_SENT is changing", qso->item("CALL").c_str());
+			snprintf(msg, sizeof(msg), "WSJTX: Mismatch for %s RST_SENT is changing from %s to %s", 
+				qso->item("CALL").c_str(), qso->item("RST_SENT").c_str(), exchange.c_str());
 			status_->misc_status(ST_WARNING, msg);
 			return false;
 		}
@@ -551,7 +565,8 @@ bool wsjtx_handler::check_message(record* qso, string message, bool tx) {
 	}
 	else if (!tx && qso->item("GRIDSQUARE") != exchange) {
 		char msg[128];
-		snprintf(msg, sizeof(msg), "WSJTX: Mismatch for %s GRIDSQUARE is changing", qso->item("CALL").c_str());
+		snprintf(msg, sizeof(msg), "WSJTX: Mismatch for %s GRIDSQUARE is changing from %s to %s",
+			qso->item("CALL").c_str(), qso->item("GRIDSQUARE").c_str(), exchange.c_str());
 		status_->misc_status(ST_WARNING, msg);
 		return false;
 	}

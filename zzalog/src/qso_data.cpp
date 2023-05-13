@@ -1200,8 +1200,10 @@ void qso_data::action_update_modem(record* qso) {
 	// Compare with existing
 	if (qso != current_qso()) {
 		// This is a new record as the previous one did not complete
+		book_->enable_save(false);
 		action_cancel();
 		action_add_modem(qso);
+		book_->enable_save(true);
 	}
 	else {
 		if (qso->item("QSO_COMPLETE") == "" || qso->item("QSO_COMPLETE") == "Y") {

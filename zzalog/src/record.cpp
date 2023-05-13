@@ -109,7 +109,7 @@ void record::item(string field, string value, bool formatted/* = false*/, bool d
 	snprintf(message, 256, "You are deleting %s, are you sure", field.c_str());
 	if ((field == "CALL" || field == "QSO_DATE" || field == "QSO_DATE_OFF" || field == "TIME_ON" ||
 		field == "TIME_OFF") &&
-		item(field).length() && !value.length() &&
+		item(field).length() && !value.length() && item("QSO_COMPLETE") == "" &&
 		fl_choice(message, "Yes", "No", nullptr) == 1) {
 		snprintf(message, 256, "Unexpected deletion of the field, %s", field.c_str());
 		status_->misc_status(ST_FATAL, message);
