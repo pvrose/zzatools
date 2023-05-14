@@ -1242,6 +1242,11 @@ void book::enable_save(bool enable) {
 #endif
 }
 
+// Return whether save is enabled
+bool book::enable_save() {
+	return save_level_ == 0;
+}
+
 // Check duplicates - restart set after a query to confirm it's a duplicate
 void book::check_dupes(bool restart) {
 	if (!restart) {

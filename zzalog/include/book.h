@@ -191,6 +191,8 @@ using namespace std;
 		void add_use_data(record* record);
 		// Enable/Disable auto-save
 		void enable_save(bool enable);
+		// Save enabled
+		bool enable_save();
 		// Delete enabled
 		bool delete_enabled();
 		// Upload single QSO

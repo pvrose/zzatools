@@ -127,7 +127,7 @@ void tabbed_forms::update_views(view* requester, hint_t hint, qso_num_t record_1
 		}
 #ifdef _WIN32
 		// Update DxAtlas
-		if (dxa_if_ && dxa_if_->visible()) dxa_if_->update(hint);
+		if (dxa_if_ && dxa_if_->visible() && book_->enable_save()) dxa_if_->update(hint);
 #endif
 		// Update the settngs config dialog
 		if (config_) config_->update();
