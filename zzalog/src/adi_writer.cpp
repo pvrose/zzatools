@@ -161,7 +161,6 @@ void adi_writer::to_adif(record* record, ostream& out, set<string>* fields /* = 
 				// send the field to the output stream
 				out << item_to_adif(record, field);
 			}
-			out << endl;
 		}
 	}
 	if (record->is_header()) {

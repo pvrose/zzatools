@@ -1206,7 +1206,7 @@ void qso_data::action_update_modem(record* qso) {
 		book_->enable_save(true);
 	}
 	else {
-		if (qso->item("QSO_COMPLETE") == "" || qso->item("QSO_COMPLETE") == "Y") {
+		if (qso->item("QSO_COMPLETE") == "") {
 			// The QSO is complete
 			action_save();
 
@@ -1220,7 +1220,7 @@ void qso_data::action_update_modem(record* qso) {
 
 // Cancel modem operation
 void qso_data::action_cancel_modem() {
-	if (current_qso()->item("QSO_COMPLETE") == "" || current_qso()->item("QSO_COMPLETE") == "Y") {
+	if (current_qso()->item("QSO_COMPLETE") == "") {
 		// Complete so should save it
 		action_save();
 	}

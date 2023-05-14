@@ -201,7 +201,7 @@ int wsjtx_handler::handle_decode(stringstream& ss) {
 	minutes = minutes - (hours * 60);
 	char message[256];
 	snprintf(message, 256, "WSJT-X: Decode %02d:%02d:%02.0f: %s", hours, minutes, seconds, decode.message.c_str());
-	add_rx_message(decode);
+	//add_rx_message(decode);
 	return 0;
 }
 
@@ -399,7 +399,7 @@ void wsjtx_handler::close_server() {
 }
 
 void wsjtx_handler::add_tx_message(const status_dg& status) {
-	if (status.transmitting) {
+	if (status.transmitting && status.dx_call.length()) {
 		// If the call changes use a different record - qso_data will handle it
 		if (qso_ == nullptr || qso_->item("CALL") != status.dx_call) {
 			if (qso_ && qso_->item("QSO_COMPLETE") == "Y") qso_->item("QSO_COMPLETE", string(""));
@@ -407,14 +407,14 @@ void wsjtx_handler::add_tx_message(const status_dg& status) {
 			qso_->item("QSO_COMPLETE", string("N"));
 		}
 		// Can get all the required fields off status
-		qso_->item("CALL", status.dx_call);
-		qso_->item("GRIDSQUARE", status.dx_grid);
+		//qso_->item("CALL", status.dx_call);
+		//qso_->item("GRIDSQUARE", status.dx_grid);
 		double freq = (status.dial_freq + status.tx_offset) / 1000000.0;
 		char cfreq[15];
 		snprintf(cfreq, sizeof(cfreq), "%0.6f", freq);
 		qso_->item("FREQ", string(cfreq));
 		qso_->item("MODE", status.mode);
-		qso_->item("RST_SENT", status.report);
+		//qso_->item("RST_SENT", status.report);
 		qso_->item("STATION_CALLSIGN", status.own_call);
 
 		if (check_message(qso_, status.tx_message, true)) {
@@ -535,8 +535,8 @@ bool wsjtx_handler::check_message(record* qso, string message, bool tx) {
 		}
 	}
 	else if (exchange == "73") {
-		// A 73 definitely indicates QSO compplete
-		qso->item("QSO_COMPLETE", string(""));
+		// A 73 definitely indicates QSO compplete - but only qso_manager can clear it on logging event
+		qso->item("QSO_COMPLETE", string("Y"));
 	}
 	else if (exchange[0] == 'R') {
 		// The first of the rogers
