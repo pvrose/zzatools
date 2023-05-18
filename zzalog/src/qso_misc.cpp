@@ -27,6 +27,7 @@ void qso_misc::create_form() {
 	client_area(rx, ry, rw, rh, 0);
 
 	qth_ = new qso_qth(rx, ry, rw, rh, "My QTH");
+	details_ = new qso_details(rx, ry, rw, rh, "Prev.Details");
 
 	end();
 
@@ -35,6 +36,7 @@ void qso_misc::create_form() {
 void qso_misc::enable_widgets() {
 	qth_->set_qth(qso_->item("APP_ZZA_QTH"));
 	qth_->enable_widgets();
+	details_->set_call(qso_->item("CALL"));
 }
 
 // save value

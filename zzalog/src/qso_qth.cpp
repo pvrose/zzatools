@@ -170,11 +170,11 @@ void qso_qth::table::draw_cell(TableContext context, int R, int C, int X, int Y,
 			string field_name = fields_[R];
 			switch (C) {
 			case 0:
-				fl_font(FL_ITALIC, FL_NORMAL_SIZE);
+				fl_font(FL_ITALIC | FL_BOLD, FL_NORMAL_SIZE);
 				text = fields_[R];
 				break;
 			case 1:
-				fl_font(FL_BOLD, FL_NORMAL_SIZE);
+				fl_font(0, FL_NORMAL_SIZE);
 				text = macro_->item(fields_[R]);
 				break;
 			}
