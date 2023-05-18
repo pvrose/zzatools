@@ -274,7 +274,9 @@ bool book::load_data(string filename)
 				}
 				if (ok) {
 					char* message = new char[filename.length() + 100];
-					sprintf(message, "LOG: %d records read from %s", size(), filename.c_str());
+					size_t num_records = size();
+					if (header()) num_records++;
+					sprintf(message, "LOG: %d records read from %s", num_records, filename.c_str());
 					status_->misc_status(ST_OK, message);
 					delete[] message;
 				}
@@ -452,7 +454,9 @@ bool book::store_data(string filename, bool force, set<string>* fields) {
 				}
 				if (ok) {
 					char* message = new char[filename_.length() + 100];
-					sprintf(message, "LOG: %d records written to %s", size(), filename_.c_str());
+					size_t num_records = size();
+					if (header()) num_records++;
+					sprintf(message, "LOG: %d records written to %s", num_records, filename_.c_str());
 					status_->misc_status(ST_OK, message);
 					delete[] message;
 				}
