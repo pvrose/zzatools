@@ -1,5 +1,7 @@
 #pragma once
 
+#include "record.h"
+
 #include <string>
 #include <set>
 #include <vector>
@@ -25,11 +27,11 @@ public:
     void set_call(string name);
 
 protected:
-    class table : public Fl_Table
+    class table_d : public Fl_Table
     {
     public:
-        table(int X, int Y, int W, int H, const char* L = nullptr);
-        ~table();
+        table_d(int X, int Y, int W, int H, const char* L = nullptr);
+        ~table_d();
         // public methods
        // inherited from Fl_Table_Row
         virtual void draw_cell(TableContext context, int R = 0, int C = 0, int X = 0, int Y = 0,
@@ -68,6 +70,22 @@ protected:
 
     };
 
+    class table_q : Fl_Table
+    {
+    public:
+        table_q(int X, int Y, int W, int H, const char* L = nullptr);
+        ~table_q();
+        // public methods
+        // inherited from Fl_Table_Row
+        virtual void draw_cell(TableContext context, int R = 0, int C = 0, int X = 0, int Y = 0,
+            int W = 0, int H = 0);
+        // Set data
+        void set_data(set<record*>* records);
+            
+    protected:
+        vector<record*> items_;
+
+    };
 
 protected:
 
@@ -77,7 +95,8 @@ protected:
 
     //widgets
     Fl_Output* op_call_;
-    table* table_;
+    table_d* table_details_;
+    table_q* table_qsos_;
 
 
 };

@@ -26,8 +26,8 @@ void qso_misc::create_form() {
 	int rh = 0;
 	client_area(rx, ry, rw, rh, 0);
 
+	details_ = new qso_details(rx, ry, rw, rh, "Previous");
 	qth_ = new qso_qth(rx, ry, rw, rh, "My QTH");
-	details_ = new qso_details(rx, ry, rw, rh, "Prev.Details");
 
 	end();
 

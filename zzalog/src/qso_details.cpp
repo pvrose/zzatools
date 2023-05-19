@@ -37,8 +37,13 @@ void qso_details::create_form() {
 
 	curr_y += op_call_->h() + GAP;
 	// Add table
-	table_ = new table(curr_x, curr_y, avail_width, avail_height + y() - curr_y);
+	table_details_ = new table_d(curr_x, curr_y, avail_width, 5 * ROW_HEIGHT);
 
+	curr_y += table_details_->h() + GAP;
+
+	table_qsos_ = new table_q(curr_x, curr_y, avail_width, y() + avail_height - curr_y);
+
+	end();
 	enable_widgets();
 }
 
@@ -51,6 +56,9 @@ void qso_details::get_qsos() {
 	set<string> names;
 	set<string> qths;
 	set<string> locators;
+	set<record*>* records = new set<record*>;
+	qso_entry* qe = ancestor_view<qso_entry>(this);
+	record* qso = qe->qso();
 	for (auto it = book_->begin(); it != book_->end(); it++) {
 		if ((*it)->item("CALL") == callsign_) {
 			string name = (*it)->item("NAME");
@@ -65,9 +73,13 @@ void qso_details::get_qsos() {
 			if (locator.length()) {
 				locators.insert(locator);
 			}
+			if (qso->timestamp() != (*it)->timestamp()) {
+				records->insert((*it));
+			}
 		}
 	}
-	table_->set_data(names, qths, locators);
+	table_details_->set_data(names, qths, locators);
+	table_qsos_->set_data(records);
 }
 
 void qso_details::set_call(string callsign) {
@@ -75,7 +87,7 @@ void qso_details::set_call(string callsign) {
 	enable_widgets();
 }
 
-qso_details::table::table(int X, int Y, int W, int H, const char* L) :
+qso_details::table_d::table_d(int X, int Y, int W, int H, const char* L) :
 	Fl_Table(X, Y, W, H, L)
 {
 	row_header(true);
@@ -86,10 +98,10 @@ qso_details::table::table(int X, int Y, int W, int H, const char* L) :
 	when(FL_WHEN_RELEASE);
 }
 
-qso_details::table::~table() {
+qso_details::table_d::~table_d() {
 }
 
-void qso_details::table::draw_cell(TableContext context, int R, int C, int X, int Y, int W, int H)
+void qso_details::table_d::draw_cell(TableContext context, int R, int C, int X, int Y, int W, int H)
 {
 	string text;
 
@@ -124,13 +136,15 @@ void qso_details::table::draw_cell(TableContext context, int R, int C, int X, in
 			// Get the details of the item
 			qso_entry* qe = ancestor_view<qso_entry>(this);
 			record* qso = qe->qso();
-			string s_value = "******";
+			string s_value = "";
 			string field = name_map_.at(items_[R].type).field;
 			text = items_[R].value;
+			bool used = false;
 			if (qso) {
 				s_value = qso->item(field);
+				if (s_value.length() && s_value == text) used = true;
 			}
-			Fl_Color bg_colour = s_value == text ? fl_lighter(COLOUR_CLARET) : FL_BACKGROUND_COLOR;
+			Fl_Color bg_colour = used ? fl_lighter(COLOUR_CLARET) : FL_BACKGROUND_COLOR;
 			// BOX
 			fl_draw_box(FL_THIN_UP_BOX, X, Y, W, H, bg_colour);
 			// TEXT
@@ -148,20 +162,20 @@ void qso_details::table::draw_cell(TableContext context, int R, int C, int X, in
 	}
 }
 
-void qso_details::table::set_data(set<string>names, set < string>qths, set<string> locators) {
+void qso_details::table_d::set_data(set<string>names, set < string>qths, set<string> locators) {
 	items_.clear();
 	for (auto it = names.begin(); it != names.end(); it++) {
 		items_.push_back({ NAME, (*it) });
 	}
-	items_.push_back({ NAME, "" });
+	if (names.size() == 0) items_.push_back({ NAME, "" });
 	for (auto it = qths.begin(); it != qths.end(); it++) {
 		items_.push_back({ QTH, (*it) });
 	}
-	items_.push_back({ QTH, "" });
+	if (qths.size() == 0) items_.push_back({ QTH, "" });
 	for (auto it = locators.begin(); it != locators.end(); it++) {
 		items_.push_back({ LOCATOR, (*it) });
 	}
-	items_.push_back({ LOCATOR, "" });
+	if (locators.size() == 0) items_.push_back({ LOCATOR, "" });
 	cols(1);
 	rows(items_.size());
 	row_height_all(ROW_HEIGHT);
@@ -170,8 +184,8 @@ void qso_details::table::set_data(set<string>names, set < string>qths, set<strin
 
 // Table callback 
 // Set the selected value in the appropriate record item
-void qso_details::table::cb_table(Fl_Widget* w, void* v) {
-	table* that = ancestor_view<table>(w);
+void qso_details::table_d::cb_table(Fl_Widget* w, void* v) {
+	table_d* that = ancestor_view<table_d>(w);
 	if (that->callback_context() == CONTEXT_CELL) {
 		int row = that->callback_row();
 		string field = that->name_map_.at(that->items_[row].type).field;
@@ -183,3 +197,111 @@ void qso_details::table::cb_table(Fl_Widget* w, void* v) {
 	}
 }
 
+qso_details::table_q::table_q(int X, int Y, int W, int H, const char* L) :
+	Fl_Table(X, Y, W, H, L)
+{
+	row_header(false);
+	col_header(true);
+	cols(3);
+	col_width(0, tiw / 2 );
+	col_width(1, tiw / 4);
+	col_width(2, tiw / 4);
+	end();
+}
+
+qso_details::table_q::~table_q() {
+}
+
+void qso_details::table_q::draw_cell(TableContext context, int R, int C, int X, int Y, int W, int H)
+{
+	string text;
+
+	switch (context) {
+
+	case CONTEXT_STARTPAGE:
+		// Set the table font
+		fl_font(0, FL_NORMAL_SIZE);
+		return;
+
+	case CONTEXT_ENDPAGE:
+		// Do nothing
+		return;
+
+	case CONTEXT_COL_HEADER:
+		switch (C) {
+		case 0:
+			text = "QSO_DATE";
+			break;
+		case 1:
+			text = "BAND";
+			break;
+		case 2:
+			text = "MODE";
+			break;
+		}
+		// TEXT
+		fl_color(FL_BLACK);
+		fl_font(FL_BOLD | FL_ITALIC, FL_NORMAL_SIZE);
+		fl_draw(text.c_str(), X + 1, Y, W - 1, H, FL_ALIGN_LEFT);
+		// BORDER
+		fl_color(FL_LIGHT1);
+		// draw top and right edges only
+		fl_line(X, Y, X + W - 1, Y, X + W - 1, Y + H - 1);
+		fl_pop_clip();
+		return;
+
+	case CONTEXT_CELL:
+		// Column indicates which record, R the field
+		fl_push_clip(X, Y, W, H);
+		{
+			// Get the details of the item
+			qso_entry* qe = ancestor_view<qso_entry>(this);
+			record* qso = qe->qso();
+			string s_value = "";
+			string field;
+			switch (C) {
+			case 0:
+				field = "QSO_DATE";
+				break;
+			case 1:
+				field = "BAND";
+				break;
+			case 2:
+				field = "MODE";
+				break;
+			}
+			text = items_[R]->item(field);
+			bool used = false;
+			bool same_call = false;
+			if (qso) {
+				s_value = qso->item(field);
+				if (s_value.length() && s_value == text) used = true;
+				if (qso->item("STATION_CALLSIGN") == items_[R]->item("STATION_CALLSIGN")) same_call = true;
+			}
+			Fl_Color bg_colour = used ? (same_call ? fl_lighter(COLOUR_CLARET) : COLOUR_APPLE) : FL_BACKGROUND_COLOR;
+			// BOX
+			fl_draw_box(FL_THIN_UP_BOX, X, Y, W, H, bg_colour);
+			// TEXT
+			fl_color(fl_contrast(FL_BLACK, bg_colour));
+			fl_font(0, FL_NORMAL_SIZE);
+			fl_draw(text.c_str(), X + 1, Y, W - 1, H, FL_ALIGN_LEFT);
+
+			// BORDER
+			fl_color(FL_LIGHT1);
+			// draw top and right edges only
+			fl_line(X, Y, X + W - 1, Y, X + W - 1, Y + H - 1);
+			fl_pop_clip();
+			return;
+		}
+	}
+}
+
+void qso_details::table_q::set_data(set<record*>* items) {
+	items_.clear();
+	for (auto it = items->begin(); it != items->end(); it++) {
+		items_.insert(items_.begin(), (*it));
+	}
+	rows(items_.size());
+	row_height_all(ROW_HEIGHT);
+	redraw();
+}
