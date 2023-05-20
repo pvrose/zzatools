@@ -33,11 +33,10 @@ extern qso_manager* qso_manager_;
 
 // Constructor
 extract_data::extract_data() :
-	book()
+	book(OT_EXTRACT)
 	, use_mode_(NONE)
 {
 	// This book contains extract data
-	book_type_ = OT_EXTRACT;
 	extract_criteria_.clear();
 	mapping_.clear();
 	rev_mapping_.clear();

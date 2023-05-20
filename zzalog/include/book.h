@@ -72,7 +72,7 @@ using namespace std;
 	// Constructors and destructors
 	public:
 		// default constructor
-		book();
+		book(object_t type = OT_MAIN);
 		// default destructor
 		virtual ~book();
 

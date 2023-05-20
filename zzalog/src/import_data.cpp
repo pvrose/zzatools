@@ -42,10 +42,9 @@ extern qso_manager* qso_manager_;
 
 // Constructor - this book is used to contain data being imported. It adds functionality to support this
 import_data::import_data() :
-	book()
+	book(OT_IMPORT)
 {
 	// Initialise
-	book_type_ = OT_IMPORT;
 	update_files_ = nullptr;
 	empty_files_ = nullptr;
 	close_pending_ = false;
