@@ -166,7 +166,9 @@ void qso_qth::table::draw_cell(TableContext context, int R, int C, int X, int Y,
 		fl_push_clip(X, Y, W, H);
 		{
 			// TEXT
-			fl_color(active_r() ? FL_BLACK : FL_INACTIVE_COLOR);
+			Fl_Color fg_colour = FL_BLACK;
+			if (!active_r()) fg_colour = fl_inactive(fg_colour);
+			fl_color(fg_colour);
 			string field_name = fields_[R];
 			switch (C) {
 			case 0:

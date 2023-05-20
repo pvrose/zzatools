@@ -120,7 +120,7 @@ void qso_details::table_d::draw_cell(TableContext context, int R, int C, int X, 
 		fl_push_clip(X, Y, W, H);
 		{
 			fl_draw_box(FL_THIN_UP_BOX, X, Y, W, H, row_header_color());
-			fl_color(FL_BLACK);
+			fl_color(active_r() ? FL_BLACK : fl_inactive(FL_BLACK));
 			fl_font(FL_ITALIC | FL_BOLD, FL_NORMAL_SIZE);
 			const char* heading = name_map_.at(items_[R].type).heading;
 			if (R == 0) fl_draw(heading, X, Y, W, H, FL_ALIGN_LEFT);
@@ -145,10 +145,13 @@ void qso_details::table_d::draw_cell(TableContext context, int R, int C, int X, 
 				if (s_value.length() && s_value == text) used = true;
 			}
 			Fl_Color bg_colour = used ? fl_lighter(COLOUR_CLARET) : FL_BACKGROUND_COLOR;
+			if (!active_r()) bg_colour = fl_inactive(bg_colour);
 			// BOX
 			fl_draw_box(FL_THIN_UP_BOX, X, Y, W, H, bg_colour);
 			// TEXT
-			fl_color(fl_contrast(FL_BLACK, bg_colour));
+			Fl_Color fg_colour = fl_contrast(FL_BLACK, bg_colour);
+			if (!active_r()) fg_colour = fl_inactive(fg_colour);
+			fl_color(fg_colour);
 			fl_font(0, FL_NORMAL_SIZE);
 			fl_draw(text.c_str(), X + 1, Y, W - 1, H, FL_ALIGN_LEFT);
 
@@ -228,6 +231,7 @@ void qso_details::table_q::draw_cell(TableContext context, int R, int C, int X, 
 		return;
 
 	case CONTEXT_COL_HEADER:
+	{
 		fl_push_clip(X, Y, W, H);
 		switch (C) {
 		case 0:
@@ -241,7 +245,9 @@ void qso_details::table_q::draw_cell(TableContext context, int R, int C, int X, 
 			break;
 		}
 		// TEXT
-		fl_color(FL_BLACK);
+		Fl_Color fg_colour = FL_BLACK;
+		if (!active_r()) fg_colour = fl_inactive(fg_colour);
+		fl_color(fg_colour);
 		fl_font(FL_BOLD | FL_ITALIC, FL_NORMAL_SIZE);
 		fl_draw(text.c_str(), X + 1, Y, W - 1, H, FL_ALIGN_LEFT);
 		// BORDER
@@ -250,7 +256,7 @@ void qso_details::table_q::draw_cell(TableContext context, int R, int C, int X, 
 		fl_line(X, Y, X + W - 1, Y, X + W - 1, Y + H - 1);
 		fl_pop_clip();
 		return;
-
+	}
 	case CONTEXT_CELL:
 		// Column indicates which record, R the field
 		fl_push_clip(X, Y, W, H);
@@ -280,10 +286,13 @@ void qso_details::table_q::draw_cell(TableContext context, int R, int C, int X, 
 				if (qso->item("STATION_CALLSIGN") == items_[R]->item("STATION_CALLSIGN")) same_call = true;
 			}
 			Fl_Color bg_colour = used ? (same_call ? fl_lighter(COLOUR_CLARET) : COLOUR_APPLE) : FL_BACKGROUND_COLOR;
+			if (!active_r()) bg_colour = fl_inactive(bg_colour);
 			// BOX
 			fl_draw_box(FL_THIN_UP_BOX, X, Y, W, H, bg_colour);
 			// TEXT
-			fl_color(fl_contrast(FL_BLACK, bg_colour));
+			Fl_Color fg_colour = fl_contrast(FL_BLACK, bg_colour);
+			if (!active_r()) fg_colour = fl_inactive(fg_colour);
+			fl_color(fg_colour);
 			fl_font(0, FL_NORMAL_SIZE);
 			fl_draw(text.c_str(), X + 1, Y, W - 1, H, FL_ALIGN_LEFT);
 
