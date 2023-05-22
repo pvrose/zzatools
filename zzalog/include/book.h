@@ -135,12 +135,12 @@ using namespace std;
 		object_t book_type();
 		// set book type
 		void book_type(object_t);
-		// get used bands
-		set<string>& used_bands();
-		// get used modes
-		set<string>& used_modes();
+		// get used bands - -1 = all DXCC
+		set<string>* used_bands(int dxcc = -1);
+		// get used modes = -1 = all DXCC
+		set<string>* used_modes(int dxcc = -1);
 		// get used submodes
-		set<string>& used_submodes();
+		set<string>* used_submodes(int dxcc = -1);
 		// Enterring record
 		bool modified_record();
 		// Set entering record
@@ -249,6 +249,12 @@ using namespace std;
 		set<string> used_callsigns_;
 		// QTHs used - with data
 		macro_map used_qths_;
+		// Bands worked per DXCC
+		map < int, set<string> > bands_per_dxcc_;
+		// mOdes worked per DXCC
+		map < int, set<string> > modes_per_dxcc_;
+		// submOdes worked per DXCC
+		map < int, set<string> > submodes_per_dxcc_;
 		// match query question
 		string match_question_;
 		// INhibit automatic save -

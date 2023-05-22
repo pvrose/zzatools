@@ -3,6 +3,7 @@
 #include "record.h"
 #include "qso_qth.h"
 #include "qso_details.h"
+#include "qso_dxcc.h"
 
 #include <FL/Fl_Tabs.H>
 class qso_misc :
@@ -30,6 +31,7 @@ protected:
 	// Widgets
 	qso_qth* qth_;
 	qso_details* details_;
+	qso_dxcc* dxcc_;
 
 };
 

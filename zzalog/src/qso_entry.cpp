@@ -184,6 +184,7 @@ void qso_entry::enable_widgets() {
 		}
 		ip_notes_->activate();
 		misc_->activate();
+		misc_->enable_widgets();
 		break;
 	case qso_data::QSO_EDIT:
 	case qso_data::NET_EDIT:
@@ -197,6 +198,7 @@ void qso_entry::enable_widgets() {
 		}
 		ip_notes_->activate();
 		misc_->activate();
+		misc_->enable_widgets();
 		break;
 	default:
 		// Reserver=d for Query states
@@ -547,11 +549,13 @@ void qso_entry::cb_ip_field(Fl_Widget* w, void* v) {
 	that->qso_->item(field, value);
 
 	if (field == "FREQ") {
-		double freq = atof(value.c_str()) * 1000;
+		double freq_MHz = atof(value.c_str());
+		double freq_kHz = freq_MHz * 1000.0;
 		if (band_view_) {
-			band_view_->update(freq);
+			band_view_->update(freq_kHz);
 		}
-		prev_freq_ = freq;
+		prev_freq_ = freq_kHz;
+		that->qso_->item("BAND", spec_data_->band_for_freq(freq_MHz));
 	}
 	else if (field == "MODE") {
 		if (spec_data_->is_submode(value)) {

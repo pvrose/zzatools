@@ -1434,7 +1434,7 @@ void dxa_if::allocate_colours() {
 	case AC_BANDS:
 		// Colour by the bands that have been found in the book
 		if (book_) {
-			text_values = book_->used_bands();
+			text_values = *(book_->used_bands());
 			// Arrange the bands in frequency order rather than string order of the band name
 			for (auto it = text_values.begin(); it != text_values.end(); it++) {
 				string text = *it;
@@ -1455,7 +1455,7 @@ void dxa_if::allocate_colours() {
 	case AC_LOGMODE:
 		// Colour by logged mode that have been found in the book
 		if (book_) {
-			text_values = book_->used_submodes();
+			text_values = *(book_->used_submodes());
 			for (auto it = text_values.begin(); it != text_values.end(); it++) {
 				string text = *it;
 				bool done = false;
@@ -1475,7 +1475,7 @@ void dxa_if::allocate_colours() {
 	case AC_AWARDMODE:
 		// Colour by DXCC Award mode - first get all modes that have been used in the book
 		if (book_) {
-			text_values = book_->used_modes();
+			text_values = *(book_->used_modes());
 			for (auto it = text_values.begin(); it != text_values.end(); it++) {
 				// Convert it to award mode
 				string text = spec_data_->dxcc_mode(*it);

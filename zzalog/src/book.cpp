@@ -86,6 +86,8 @@ book::book(object_t type)
 	used_antennas_.clear();
 	used_callsigns_.clear();
 	used_qths_.clear();
+	bands_per_dxcc_.clear();
+	modes_per_dxcc_.clear();
 	delete_contents(true);
 }
 
@@ -646,6 +648,8 @@ void book::delete_contents(bool new_book) {
 	used_modes_.clear();
 	used_bands_.clear();
 	used_submodes_.clear();
+	bands_per_dxcc_.clear();
+	modes_per_dxcc_.clear();
 	if (new_book && book_type_ == OT_MAIN) {
 		// Delete all non-ADIF defined fields 
 		spec_data_->delete_user_data();
@@ -1087,6 +1091,8 @@ void book::book_type(object_t value) {
 // Add the band and mode to the lists of used bands and modes if not already there
 void book::add_use_data(record* use_record) {
 	string band = use_record->item("BAND");
+	int dxcc;
+	use_record->item("DXCC", dxcc);
 	if (band == "") {
 		// Get the band from the frequency 
 		double freq = 0.0;
@@ -1096,10 +1102,12 @@ void book::add_use_data(record* use_record) {
 	}
 	if (band.length()) {
 		used_bands_.insert(band);
+		bands_per_dxcc_[dxcc].insert(band);
 	}
 	string mode = use_record->item("MODE");
 	if (mode.length()) {
 		used_modes_.insert(mode);
+		modes_per_dxcc_[dxcc].insert(band);
 	}
 	string submode = use_record->item("SUBMODE");
 	if (!submode.length()) {
@@ -1107,6 +1115,7 @@ void book::add_use_data(record* use_record) {
 	}
 	if (submode.length()) {
 		used_submodes_.insert(submode);
+		submodes_per_dxcc_[dxcc].insert(submode);
 	}
 	string rig = use_record->item("MY_RIG");
 	bool update_spec = false;
@@ -1209,13 +1218,25 @@ void book::add_use_data(record* use_record) {
 }
 
 // get used bands
-set<string>& book::used_bands() { return used_bands_; }
+set<string>* book::used_bands(int dxcc) { 
+	if (dxcc == -1) return &used_bands_;
+	else if (bands_per_dxcc_.find(dxcc) == bands_per_dxcc_.end()) return nullptr;
+	else return &(bands_per_dxcc_[dxcc]);
+}
 
 // get used modes
-set<string>& book::used_modes() { return used_modes_; }
+set<string>* book::used_modes(int dxcc) {
+	if (dxcc == -1) return &used_modes_;
+	else if (modes_per_dxcc_.find(dxcc) == modes_per_dxcc_.end()) return nullptr;
+	else return &(modes_per_dxcc_[dxcc]);
+}
 
 // get used submodes
-set<string>& book::used_submodes() { return used_submodes_;  }
+set<string>* book::used_submodes(int dxcc) {
+	if (dxcc == -1) return &used_submodes_;
+	else if (submodes_per_dxcc_.find(dxcc) == submodes_per_dxcc_.end()) return nullptr;
+	else return &(submodes_per_dxcc_[dxcc]);
+}
 
 // Returns true if in incomplete new_record
 bool book::modified_record() { return modified_record_; }

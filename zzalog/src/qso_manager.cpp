@@ -224,13 +224,16 @@ void qso_manager::cb_close(Fl_Widget* w, void* v) {
 
 // Return that we are currently editing or creating ot QSO or net
 bool qso_manager::editing() {
+	record* edit_qso;
 	switch (data_group_->logging_state()) {
 	case qso_data::NET_STARTED:
 	case qso_data::NET_ADDING:
 	case qso_data::NET_EDIT:
+		return true;
 	case qso_data::QSO_EDIT:
 	case qso_data::QSO_STARTED:
-		return true;
+		edit_qso = data_group_->current_qso();
+		return edit_qso->is_dirty();
 	default:
 		return false;
 	}
