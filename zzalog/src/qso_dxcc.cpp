@@ -4,6 +4,7 @@
 #include "book.h"
 #include "drawing.h"
 #include "utils.h"
+#include "menu.h"
 
 extern pfx_data* pfx_data_;
 extern book* book_;
@@ -32,13 +33,19 @@ void qso_dxcc::create_form() {
 	int curr_y = y() + 1;
 
 	// "Title" is callsign
-	op_call_ = new Fl_Output(curr_x, curr_y, avail_width, HBUTTON);
+	op_call_ = new Fl_Output(curr_x, curr_y, avail_width - WBUTTON, HBUTTON);
 	op_call_->box(FL_FLAT_BOX);
 	op_call_->color(FL_BACKGROUND_COLOR);
 	op_call_->textfont(FL_BOLD);
 	op_call_->textsize(FL_NORMAL_SIZE + 2);
 	op_call_->textcolor(COLOUR_CLARET);
+	curr_x += op_call_->w();
 
+	// QRZ.com button
+	bn_qrz_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "QRZ.com");
+	bn_qrz_->callback(cb_bn_qrz, nullptr);
+
+	curr_x = x() + GAP;
 	curr_y += op_call_->h() + HTEXT;
 	tree_ = new tree(curr_x, curr_y, avail_width, avail_height, "Possible prefixes");
 	tree_->align(FL_ALIGN_TOP);
@@ -153,6 +160,12 @@ void qso_dxcc::cb_tree(Fl_Widget* w, void* v) {
 		qso->item("APP_ZZA_PFX", pfx->nickname_);
 	}
 	qe->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
+}
+
+// QRZ.com button clicked
+void qso_dxcc::cb_bn_qrz(Fl_Widget* w, void* v) {
+	qso_dxcc* that = ancestor_view<qso_dxcc>(w);
+	menu::cb_mi_info_qrz(w, (void*)&that->callsign_);
 }
 
 qso_dxcc::source_t qso_dxcc::source() {

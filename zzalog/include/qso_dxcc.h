@@ -10,6 +10,7 @@
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Tree.H>
 #include <FL/Fl_Output.H>
+#include <FL/Fl_Button.H>
 
 class qso_dxcc :
     public Fl_Group
@@ -71,7 +72,11 @@ public:
 
 protected:
 
+    // Tree callback
     static void cb_tree(Fl_Widget* w, void* v);
+    // Button for QRZ.com
+    static void cb_bn_qrz(Fl_Widget* w, void* v);
+    
 
     source_t source();
 
@@ -82,6 +87,8 @@ protected:
     Fl_Output* op_call_;
     // Buttons showing worked before
     wb4_buttons* g_wb4_;
+    // Call QRZ.com
+    Fl_Button* bn_qrz_;
 
     // Callsign
     string callsign_;
