@@ -35,10 +35,8 @@ void qso_misc::create_form() {
 }
 // Enable/disab;e widgets
 void qso_misc::enable_widgets() {
-	qth_->set_qth(qso_->item("APP_ZZA_QTH"));
 	qth_->enable_widgets();
-	details_->set_call(qso_->item("CALL"));
-	dxcc_->set_data();
+	details_->enable_widgets();
 	dxcc_->enable_widgets();
 }
 
@@ -47,7 +45,8 @@ void qso_misc::save_values() {}
 
 void qso_misc::qso(record* qso) {
 	qso_ = qso;
-
-	enable_widgets();
+	qth_->set_qth(qso_->item("APP_ZZA_QTH"));
+	details_->set_call(qso_->item("CALL"));
+	dxcc_->set_data();
 }
 

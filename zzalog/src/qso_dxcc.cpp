@@ -10,7 +10,8 @@ extern book* book_;
 
 qso_dxcc::qso_dxcc(int X, int Y, int W, int H, const char* L) :
 	Fl_Group(X, Y, W, H, L) ,
-	prefixes_(nullptr)
+	prefixes_(nullptr),
+	source_(NONE)
 {
 	labelfont(FL_BOLD);
 	labelsize(FL_NORMAL_SIZE + 2);
@@ -58,10 +59,9 @@ void qso_dxcc::create_form() {
 
 // Enable the widgets
 void qso_dxcc::enable_widgets() {
-	set_data();
 	op_call_->value(callsign_.c_str());
 	tree_->enable_widgets();
-	if (prefixes_->size() == 0) {
+	if (prefixes_ == nullptr || prefixes_->size() == 0) {
 		// Only display tree with suitable notice
 		tree_->size(tree_->w(), 5 * ROW_HEIGHT);
 		tree_->when(FL_WHEN_NEVER);
@@ -92,13 +92,14 @@ void qso_dxcc::set_data() {
 	bands_worked_ = nullptr;
 	modes_worked_ = nullptr;
 	prefixes_ = new vector<prefix*>;
+	source_ = NONE;
 	if (qso) {
 		callsign_ = qso->item("CALL");
-		printf("Setting data for %s ", callsign_.c_str());
 		// Is a prefix supplied
 		string nickname = qso->item("APP_ZZA_PFX");
 		if (nickname.length()) {
 			prefixes_->push_back(pfx_data_->get_prefix(nickname));
+			source_ = RECORD_PFX;
 		}
 		else {
 			// Is the DXCC supplied
@@ -106,6 +107,7 @@ void qso_dxcc::set_data() {
 			if (qso->item("DXCC").length())	qso->item("DXCC", dxcc);
 			if (dxcc >= 0) {
 				prefixes_->push_back(pfx_data_->get_prefix(dxcc));
+				source_ = RECORD_DXCC;
 			}
 			else {
 				// Check execptions
@@ -114,10 +116,12 @@ void qso_dxcc::set_data() {
 					dxcc = exception->adif_id;
 					qso->item("DXCC", to_string(dxcc));
 					prefixes_->push_back(pfx_data_->get_prefix(dxcc));
+					source_ = EXCEPTION;
 				}
 				else {
 					// Get all prefixes that could provide this callsign
 					pfx_data_->all_prefixes(qso, prefixes_, false);
+					source_ = PREFIX_LIST;
 				}
 			}
 		}
@@ -129,9 +133,6 @@ void qso_dxcc::set_data() {
 			int dxcc = parent->dxcc_code_;
 			bands_worked_ = book_->used_bands(dxcc);
 			modes_worked_ = book_->used_submodes(dxcc);
-			printf("%d:%s ", dxcc, parent->nickname_.c_str());
-			for (auto it = bands_worked_->begin(); it != bands_worked_->end(); it++) printf("%s ", (*it).c_str());
-			printf("\n");
 		}
 	}
 	tree_->set_data(prefixes_);
@@ -148,12 +149,19 @@ void qso_dxcc::cb_tree(Fl_Widget* w, void* v) {
 	record* qso = qe->qso();
 	if (qso) {
 		qso->item("DXCC", pfx->dxcc_code_);
+		qso->item("STATE", pfx->state_);
+		qso->item("APP_ZZA_PFX", pfx->nickname_);
 	}
-	that->enable_widgets();
+	qe->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
+}
+
+qso_dxcc::source_t qso_dxcc::source() {
+	return source_;
 }
 
 qso_dxcc::tree::tree(int X, int Y, int W, int H, const char* L) :
-	Fl_Tree(X, Y, W, H, L)
+	Fl_Tree(X, Y, W, H, L),
+	prefixes_(nullptr)
 {
 	clear();
 }
@@ -168,18 +176,64 @@ void qso_dxcc::tree::enable_widgets() {
 	root_item->labelfont(item_labelfont() | FL_BOLD);
 	root_item->labelcolor(FL_BLACK);
 	char root_label[128];
-	snprintf(root_label, sizeof(root_label), "%d Prefixes found", prefixes_->size());
+	source_t source = ancestor_view<qso_dxcc>(this)->source();
+	switch (source) {
+	case EXCEPTION:
+		strcpy(root_label, "Found in exception file.");
+		break;
+	case PREFIX_LIST:
+		snprintf(root_label, sizeof(root_label), "%d Prefixes found.", prefixes_->size());
+		break;
+	case RECORD_DXCC:
+		strcpy(root_label, "'DXCC' field in QSO.");
+		break;
+	case RECORD_PFX:
+		strcpy(root_label, "'APP_ZZA_PFX' field in QSO.");
+		break;
+	}
 	root_item->label(root_label);
-	for (auto it = prefixes_->begin(); it != prefixes_->end(); it++) {
-		// Reuse code in pfx_tree
-		Fl_Tree_Item* item = nullptr;
-		hang_item(item, (*it));
+	if (prefixes_) {
+		for (auto it = prefixes_->begin(); it != prefixes_->end(); it++) {
+			// Reuse code in pfx_tree
+			Fl_Tree_Item* item = hang_item(*it);
+		}
 	}
 }
 
 void qso_dxcc::tree::set_data(vector<prefix*>* data) {
 	prefixes_ = data;
 }
+
+// Hang the item on the tree where it should go
+Fl_Tree_Item* qso_dxcc::tree::hang_item(prefix* pfx) {
+	// Existing item or created one
+	Fl_Tree_Item* item;
+	// Label for the item
+	char text[128];
+	snprintf(text, sizeof(text), "%s: %s",
+		pfx->nickname_.c_str(),
+		pfx->name_.c_str());
+	// Find where to hang it
+	prefix* parent = pfx->parent_;
+	if (parent) {
+		Fl_Tree_Item* hang_pt = hang_item(parent);
+		item = hang_pt->find_child_item(text);
+		if (item == nullptr) {
+			item = hang_pt->add(prefs(), text);
+			item->user_data(pfx);
+		} 
+	}
+	else {
+		item = find_item(text);
+		if (item == nullptr) {
+			item = add(text);
+			item->user_data(pfx);
+			item->labelfont(FL_BOLD);
+		}
+	}
+	return item;
+}
+
 
 // The "worked before" lights
 qso_dxcc::wb4_buttons::wb4_buttons(int X, int Y, int W, int H, const char* L) :
@@ -248,13 +302,10 @@ void qso_dxcc::wb4_buttons::enable_widgets() {
 	// Set band colours - CLARET this QSO, MAUVE other QSOs
 	for (auto ix = bands_->begin(); ix != bands_->end(); ix++) {
 		Fl_Button* bn = (Fl_Button*)map_.at(*ix);
-		printf("Button %s set by band %s", bn->label(), (*ix).c_str());
 		if ((*ix) == qso_band) {
-			printf(" - this QSO\n");
 			bn->color(COLOUR_CLARET);
 		}
 		else {
-			printf("\n");
 			bn->color(COLOUR_MAUVE);
 		}
 		bn->labelcolor(fl_contrast(FL_BLACK, bn->color()));
@@ -262,13 +313,10 @@ void qso_dxcc::wb4_buttons::enable_widgets() {
 	// Set mode colours - CALRET this QSO, APPLE other QSOs
 	for (auto ix = modes_->begin(); ix != modes_->end(); ix++) {
 		Fl_Button* bn = (Fl_Button*)map_.at(*ix);
-		printf("Button %s set by mode %s", bn->label(), (*ix).c_str());
 		if ((*ix) == qso_mode) {
-			printf(" - this QSO\n");
 			bn->color(COLOUR_CLARET);
 		}
 		else {
-			printf("\n");
 			bn->color(COLOUR_APPLE);
 		}
 		bn->labelcolor(fl_contrast(FL_BLACK, bn->color()));
@@ -278,30 +326,4 @@ void qso_dxcc::wb4_buttons::enable_widgets() {
 void qso_dxcc::wb4_buttons::set_data(set<string>* bands, set<string>* modes) {
 	bands_ = bands;
 	modes_ = modes;
-}
-
-void qso_dxcc::tree::hang_item(Fl_Tree_Item*& child, prefix* pfx) {
-	char text[128];
-	snprintf(text, sizeof(text), "%s: %s",
-		pfx->nickname_.c_str(),
-		pfx->name_.c_str());
-	if (child == nullptr) {
-		// New child
-		if (pfx->parent_ != nullptr) {
-			// we have a parent - insert that
-			Fl_Tree_Item* parent = find_item(text);
-			hang_item(parent, pfx->parent_);
-			// Then hang the child on it
-			child = parent->add(prefs(), text);
-			child->user_data(pfx);
-		}
-		else {
-			// This a top level prefix so hang it directly on the tree
-			if (!find_item(text)) {
-				child = root()->add(prefs(), text);
-				child->labelfont(FL_BOLD);
-				child->user_data(pfx);
-			}
-		}
-	}
 }

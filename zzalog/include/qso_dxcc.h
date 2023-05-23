@@ -15,6 +15,14 @@ class qso_dxcc :
     public Fl_Group
 {
 
+    enum source_t {
+        NONE,
+        EXCEPTION,
+        RECORD_DXCC,
+        RECORD_PFX,
+        PREFIX_LIST
+    };
+
     class tree : public Fl_Tree
     {
     public:
@@ -28,7 +36,7 @@ class qso_dxcc :
     protected:
 
         // Hang an item on the tree
-        void hang_item(Fl_Tree_Item*& child, prefix* pfx);
+        Fl_Tree_Item* hang_item(prefix* pfx);
 
         vector<prefix*>* prefixes_;
     };
@@ -65,6 +73,8 @@ protected:
 
     static void cb_tree(Fl_Widget* w, void* v);
 
+    source_t source();
+
     // Widgets:
     // Tree
     tree* tree_;
@@ -81,6 +91,8 @@ protected:
     set<string>* bands_worked_;
     // Modes worked
     set<string>* modes_worked_;
+    // Source of prefix parsing
+    source_t source_;
 
 };
 

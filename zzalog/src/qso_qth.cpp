@@ -100,7 +100,6 @@ void qso_qth::enable_widgets() {
 void qso_qth::set_qth(string name) {
 	qth_name_ = name;
 	qth_details_ = spec_data_->expand_macro("APP_ZZA_QTH", qth_name_);
-	enable_widgets();
 }
 
 void qso_qth::cb_bn_edit(Fl_Widget* w, void* v) {

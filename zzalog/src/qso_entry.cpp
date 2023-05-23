@@ -250,6 +250,7 @@ void qso_entry::copy_qso_to_display(int flags) {
 		}
 		if (flags == CF_ALL_FLAGS || (flags & CF_DETAILS)) {
 			misc_->qso(qso_);
+			misc_->enable_widgets();
 		}
 	}
 }
@@ -584,6 +585,10 @@ void qso_entry::cb_ip_field(Fl_Widget* w, void* v) {
 		item_num_t item = book_->item_number(that->qso_number_);
 		item = book_->correct_record_position(item);
 		that->qso_number_ = book_->record_number(item);
+	}
+	else if (field == "CALL") {
+		// Remove any dependent fields that may be left over from previous edits
+		that->qso_->unparse();
 	}
 	// Update other views if editing or logging
 	switch (that->qso_data_->logging_state()) {

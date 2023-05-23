@@ -84,7 +84,6 @@ void qso_details::get_qsos() {
 
 void qso_details::set_call(string callsign) {
 	callsign_ = callsign;
-	enable_widgets();
 }
 
 qso_details::table_d::table_d(int X, int Y, int W, int H, const char* L) :
