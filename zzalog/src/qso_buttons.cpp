@@ -2,7 +2,7 @@
 #include "qso_data.h"
 #include "extract_data.h"
 #include "book.h"
-#include "pfx_data.h"
+#include "cty_data.h"
 #include "qso_manager.h"
 #include "qth_dialog.h"
 #include "spec_data.h"
@@ -12,7 +12,7 @@
 
 extern extract_data* extract_records_;
 extern book* book_;
-extern pfx_data* pfx_data_;
+extern cty_data* cty_data_;
 extern spec_data* spec_data_;
 
 map<qso_data::logging_state_t, list<qso_buttons::button_type> > button_map_ =
@@ -287,7 +287,7 @@ void qso_buttons::cb_parse(Fl_Widget* w, void* v) {
 	// Set the callsign in the temporary record
 	tip_record->item("CALL", string(that->qso_data_->get_call()));
 	// Parse the temporary record
-	message = pfx_data_->get_tip(tip_record);
+	message = cty_data_->get_tip(tip_record);
 	// Create a tooltip window at the parse button (in w) X and Y
 	Fl_Window* qw = ancestor_view<qso_manager>(w);
 	Fl_Window* tw = ::tip_window(message, qw->x_root() + w->x() + w->w() / 2, qw->y_root() + w->y() + w->h() / 2);

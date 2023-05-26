@@ -2,7 +2,7 @@
 #include "record.h"
 #include "book.h"
 #include "extract_data.h"
-#include "pfx_data.h"
+#include "cty_data.h"
 #include "spec_data.h"
 #include "tabbed_forms.h"
 
@@ -20,7 +20,7 @@
 
 extern book* book_;
 extern extract_data* extract_records_;
-extern pfx_data* pfx_data_;
+extern cty_data* cty_data_;
 extern spec_data* spec_data_;
 extern tabbed_forms* tabbed_forms_;
 extern status* status_;
@@ -172,7 +172,7 @@ void report_tree::add_record(item_num_t record_num, report_map_entry_t* entry) {
 				// Set key to "GM: Scotland" - get the DXCC code for the record
 				record->item("DXCC", dxcc);
 				// Get the prefix information
-				prefix* prefix = pfx_data_->get_prefix(dxcc);
+				string nickname = cty_data_->nickname(dxcc);
 				spec_dataset* dxcc_dataset = spec_data_->dataset("DXCC_Entity_Code");
 				map<string, string>* dxcc_data;
 				auto it = dxcc_dataset->data.find(record->item("DXCC"));
@@ -180,14 +180,14 @@ void report_tree::add_record(item_num_t record_num, report_map_entry_t* entry) {
 					// We have an entry for the DXCC s0 build the label
 					dxcc_data = it->second;
 					dxcc_name = (*dxcc_data)["Entity Name"];
-					map_key = prefix->nickname_ + " " + dxcc_name;
+					map_key = nickname + " " + dxcc_name;
 					if (next_category == RC_PAS && spec_data_->has_states(dxcc)) {
 						map_key += " (with states)";
 					}
 				}
 				else {
 					// We cannot find the DXCC entry
-					map_key = prefix->nickname_ + " *** Entity Name not available ***";
+					map_key = nickname + " *** Entity Name not available ***";
 				}
 			}
 			break;

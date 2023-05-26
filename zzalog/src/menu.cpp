@@ -1,8 +1,7 @@
 #include "menu.h"
 #include "book.h"
 #include "record.h"
-#include "pfx_data.h"
-#include "exc_data.h"
+#include "cty_data.h"
 #include "spec_data.h"
 #include "settings.h"
 #include "tabbed_forms.h"
@@ -16,7 +15,6 @@
 #include "search_dialog.h"
 #include "change_dialog.h"
 #include "about_dialog.h"
-#include "pfx_tree.h"
 #include "spec_tree.h"
 #include "report_tree.h"
 #include "url_handler.h"
@@ -53,7 +51,7 @@ extern book* book_;
 extern import_data* import_data_;
 extern extract_data* extract_records_;
 extern book* navigation_book_;
-extern pfx_data* pfx_data_;
+extern cty_data* cty_data_;
 extern spec_data* spec_data_;
 extern status* status_;
 extern tabbed_forms* tabbed_forms_;
@@ -180,23 +178,20 @@ settings* config_ = nullptr;
 		{ "&Cancel", 0, menu::cb_mi_imp_cancel, nullptr },
 		{ 0 },
 
-	// Prefix reference
-		{ "&Reference", 0, 0, 0, FL_SUBMENU },
-			{ "&Prefix", 0, 0, 0, FL_SUBMENU },
-			{ "&Clear", 0, menu::cb_mi_ref_filter, (void*)RF_NONE, FL_MENU_RADIO },
-			{ "&All", 0, menu::cb_mi_ref_filter, (void*)RF_ALL, FL_MENU_RADIO | FL_MENU_VALUE },
-			{ "E&xtracted", 0, menu::cb_mi_ref_filter, (void*)RF_EXTRACTED, FL_MENU_RADIO },
-			{ "&Selected record", 0, menu::cb_mi_ref_filter, (void*)RF_SELECTED, FL_MENU_RADIO | FL_MENU_DIVIDER },
-			{ "&Code", 0, menu::cb_mi_ref_items, (void*)RI_CODE,  FL_MENU_RADIO | FL_MENU_VALUE },
-			{ "&Prefix", 0, menu::cb_mi_ref_items, (void*)RI_NICK, FL_MENU_RADIO },
-			{ "&Name", 0, menu::cb_mi_ref_items, (void*)RI_NAME, FL_MENU_RADIO | FL_MENU_DIVIDER },
-			{ "Add &details", 0, menu::cb_mi_ref_details, nullptr, FL_MENU_TOGGLE },
-			{ "&Reload data", 0, menu::cb_mi_ref_reload, 0},
-			{ 0 },
-		{ "E&xception data", 0, 0, 0, FL_SUBMENU },
-			{ "&Reload data", 0, menu::cb_mi_ref_relexc, 0 },
-			{ 0 },
-		{ 0 },
+	//// Prefix reference
+	//	{ "&Reference", 0, 0, 0, FL_SUBMENU },
+	//		{ "&Prefix", 0, 0, 0, FL_SUBMENU },
+	//		{ "&Clear", 0, menu::cb_mi_ref_filter, (void*)RF_NONE, FL_MENU_RADIO },
+	//		{ "&All", 0, menu::cb_mi_ref_filter, (void*)RF_ALL, FL_MENU_RADIO | FL_MENU_VALUE },
+	//		{ "E&xtracted", 0, menu::cb_mi_ref_filter, (void*)RF_EXTRACTED, FL_MENU_RADIO },
+	//		{ "&Selected record", 0, menu::cb_mi_ref_filter, (void*)RF_SELECTED, FL_MENU_RADIO | FL_MENU_DIVIDER },
+	//		{ "&Code", 0, menu::cb_mi_ref_items, (void*)RI_CODE,  FL_MENU_RADIO | FL_MENU_VALUE },
+	//		{ "&Prefix", 0, menu::cb_mi_ref_items, (void*)RI_NICK, FL_MENU_RADIO },
+	//		{ "&Name", 0, menu::cb_mi_ref_items, (void*)RI_NAME, FL_MENU_RADIO | FL_MENU_DIVIDER },
+	//		{ "Add &details", 0, menu::cb_mi_ref_details, nullptr, FL_MENU_TOGGLE },
+	//		{ "&Reload data", 0, menu::cb_mi_ref_reload, 0},
+	//		{ 0 },
+	//	{ 0 },
 
 	// Log analysis reports
 	{ "Re&port", 0, 0, 0, FL_SUBMENU },
@@ -644,10 +639,10 @@ void menu::cb_mi_parse_qso(Fl_Widget* w, void* v) {
 	// get parse mode
 	if (true) {
 		// command parsing enabled - parse record
-		parse_result_t parse_result = pfx_data_->parse(record);
+		bool parse_result = cty_data_->update_qso(record);
 		// update band
 		bool changed = record->update_band(true);
-		if (changed || parse_result == PR_CHANGED) {
+		if (changed || parse_result) {
 			// If modified - tell views to update
 			navigation_book_->selection(-1, HT_CHANGED);
 			book_->modified(true);
@@ -691,22 +686,16 @@ void menu::cb_mi_parse_log(Fl_Widget* w, void* v) {
 		for (int i = 0; i < num_items && !abandon;) {
 			record* record = navigation_book_->get_record(i, false);
 			// Parse each record in turn
-			parse_result_t parse_result = pfx_data_->parse(record);
+			bool parse_result = cty_data_->update_qso(record);
 			bool changed = record->update_band(true);
 			record_num = navigation_book_->record_number(i);
 			item_number = i;
 			// Update progress
 			status_->progress(++i, navigation_book_->book_type());
-			if (changed || parse_result == PR_CHANGED) {
+			if (changed || parse_result) {
 				book_->modified(true);
 				// The parsing may have modified date and time
 				book_->correct_record_position(navigation_book_->record_number(item_number));
-			}
-			else if (parse_result == PR_ABANDONED) {
-				// User has the opportunity to abandon this if too many records have issues
-				abandon = true;
-				status_->misc_status(ST_WARNING, "LOG: Parsing abandoned");
-				status_->progress("Abandoned", navigation_book_->book_type());
 			}
 		}
 		// update views with last record parsed selected
@@ -1187,51 +1176,45 @@ void menu::cb_mi_ext_mark(Fl_Widget* w, void* v) {
 
 }
 
-// Reference->Prefix->Filter - used to set the filter for displaying prefix data
-// v is enum report_filter_t: RF_NONE, RF_ALL, RF_EXTRACTED or RF_SELECTED
-void menu::cb_mi_ref_filter(Fl_Widget* w, void* v) {
-	// v contains the particular filter
-	report_filter_t filter = (report_filter_t)(long)v;
-	((pfx_tree*)tabbed_forms_->get_view(OT_PREFIX))->set_filter(filter);
-	tabbed_forms_->activate_pane(OT_PREFIX, true);
-}
-
-// Reference->Prefix->Items - used to set the items  to display
-// v is enum report_item_t: RI_CODE, RI_NICK, RI_NAME, RI_CQ_ZONE, RI_ITU_ZONE or RI_ADIF
-void menu::cb_mi_ref_items(Fl_Widget* w, void* v) {
-	// v defineds the items to dispaly
-	report_item_t items = (report_item_t)(long)v;
-	((pfx_tree*)tabbed_forms_->get_view(OT_PREFIX))->set_items(items);
-	tabbed_forms_->activate_pane(OT_PREFIX, true);
-}
-
-// Reference->Prefix->Add details - Add or remove the details from the prefix record
-// v is not used
-void menu::cb_mi_ref_details(Fl_Widget* w, void* v) {
-	// Get the value of the checked menu item
-	Fl_Menu_* menu = (Fl_Menu_*)w;
-	const Fl_Menu_Item* item = menu->mvalue();
-	bool value = item->value();
-	((pfx_tree*)tabbed_forms_->get_view(OT_PREFIX))->add_details(value);
-	tabbed_forms_->activate_pane(OT_PREFIX, true);
-}
-
-// Reference->Prefix->Reload Data - reload the specification data
-// v is not used
-void menu::cb_mi_ref_reload(Fl_Widget* w, void* v) {
-	// Turn rig timer off in case it fires while we are reloading
-	// Get spec_data_ to reload itself
-	delete pfx_data_;
-	delete spec_data_;
-	delete intl_dialog_;
-	add_data();
-}
-
-// Reference->Exceptions->Reload Data
-// v is not used
-void menu::cb_mi_ref_relexc(Fl_Widget* w, void* v) {
-	pfx_data_->get_exceptions()->reload_data();
-}
+//// Reference->Prefix->Filter - used to set the filter for displaying prefix data
+//// v is enum report_filter_t: RF_NONE, RF_ALL, RF_EXTRACTED or RF_SELECTED
+//void menu::cb_mi_ref_filter(Fl_Widget* w, void* v) {
+//	// v contains the particular filter
+//	report_filter_t filter = (report_filter_t)(long)v;
+//	((pfx_tree*)tabbed_forms_->get_view(OT_PREFIX))->set_filter(filter);
+//	tabbed_forms_->activate_pane(OT_PREFIX, true);
+//}
+//
+//// Reference->Prefix->Items - used to set the items  to display
+//// v is enum report_item_t: RI_CODE, RI_NICK, RI_NAME, RI_CQ_ZONE, RI_ITU_ZONE or RI_ADIF
+//void menu::cb_mi_ref_items(Fl_Widget* w, void* v) {
+//	// v defineds the items to dispaly
+//	report_item_t items = (report_item_t)(long)v;
+//	((pfx_tree*)tabbed_forms_->get_view(OT_PREFIX))->set_items(items);
+//	tabbed_forms_->activate_pane(OT_PREFIX, true);
+//}
+//
+//// Reference->Prefix->Add details - Add or remove the details from the prefix record
+//// v is not used
+//void menu::cb_mi_ref_details(Fl_Widget* w, void* v) {
+//	// Get the value of the checked menu item
+//	Fl_Menu_* menu = (Fl_Menu_*)w;
+//	const Fl_Menu_Item* item = menu->mvalue();
+//	bool value = item->value();
+//	((pfx_tree*)tabbed_forms_->get_view(OT_PREFIX))->add_details(value);
+//	tabbed_forms_->activate_pane(OT_PREFIX, true);
+//}
+//
+//// Reference->Prefix->Reload Data - reload the specification data
+//// v is not used
+//void menu::cb_mi_ref_reload(Fl_Widget* w, void* v) {
+//	// Turn rig timer off in case it fires while we are reloading
+//	// Get spec_data_ to reload itself
+//	delete cty_data_;
+//	delete spec_data_;
+//	delete intl_dialog_;
+//	add_data();
+//}
 
 // Report->Clear etc. - set the report filter
 // v is enum report_filter_t: RF_NONE, RF_ALL, RF_ALL_CURRENT, RF_EXTRACTED or RF_SELECTED

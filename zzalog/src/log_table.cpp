@@ -11,7 +11,7 @@
 #include "menu.h"
 #include "toolbar.h"
 #include "status.h"
-#include "pfx_data.h"
+#include "cty_data.h"
 #include "main_window.h"
 #include "dxa_if.h"
 #include "qso_manager.h"
@@ -32,7 +32,7 @@ extern toolbar* toolbar_;
 extern status* status_;
 extern intl_dialog* intl_dialog_;
 extern time_t session_start_;
-extern pfx_data* pfx_data_;
+extern cty_data* cty_data_;
 #ifdef _WIN32
 extern dxa_if* dxa_if_;
 #endif
@@ -831,14 +831,13 @@ void log_table::done_edit(bool keep_row) {
 				}
 				else if (field_info.field == "CALL") {
 					// Get the grid location of the prefix centre - only if 1 prefix matches the callsign.
-					vector<prefix*> prefixes;
-					if (pfx_data_->all_prefixes(record, &prefixes, false) && prefixes.size() == 1) {
-						lat_long_t location = { prefixes[0]->latitude_, prefixes[0]->longitude_ };
+					lat_long_t location = cty_data_->location(record);
+					if (!isnan(location.latitude) && !isnan(location.longitude)) {
 						dxa_if_->set_dx_loc(latlong_to_grid(location, 6), record->item("CALL"));
 					}
 					else {
 						char message[100];
-						snprintf(message, 100, "WSJT-X: Cannot parse %s - %d matching prefixes found", text.c_str(), prefixes.size());
+						snprintf(message, 100, "LOG: Cannot locate %s", text.c_str());
 						status_->misc_status(ST_WARNING, message);
 					}
 				}
@@ -887,7 +886,7 @@ void log_table::describe_cell(int item, int col) {
 		field_info_t field_info = fields_[col];
 		// get the tip - for Call parse the call and provide prefix info, otherwise the ADIF description
 		if (field_info.field == "CALL") {
-			tip = pfx_data_->get_tip(record);
+			tip = cty_data_->get_tip(record);
 		}
 		else {
 			tip = spec_data_->get_tip(field_info.field, record);

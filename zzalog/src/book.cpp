@@ -10,7 +10,7 @@
 #include "tabbed_forms.h"
 #include "spec_data.h"
 #include "spec_tree.h"
-#include "pfx_data.h"
+#include "cty_data.h"
 #include "prefix.h"
 #include "utils.h"
 #include "intl_widgets.h"
@@ -40,7 +40,7 @@ extern menu* menu_;
 extern tabbed_forms* tabbed_forms_;
 extern spec_data* spec_data_;
 extern spec_tree* spec_tree_;
-extern pfx_data* pfx_data_;
+extern cty_data* cty_data_;
 extern Fl_Preferences* settings_;
 extern main_window* main_window_;
 extern band_view* band_view_;
@@ -931,10 +931,8 @@ bool book::basic_match(record* record) {
 		}
 		else {
 			// Treat as a nickname
-			prefix* dxcc_pfx = pfx_data_->get_prefix(criteria_->pattern);
-			if (dxcc_pfx != nullptr && dxcc_pfx->dxcc_code_ != 0) {
-				return match_string(to_string(dxcc_pfx->dxcc_code_), criteria_->comparator, record->item("DXCC"));
-			}
+			int dxcc = cty_data_->entity(criteria_->pattern);
+			return match_string(to_string(dxcc), criteria_->comparator, record->item("DXCC"));
 		}
 		break;
 	case XC_FIELD:
@@ -943,12 +941,8 @@ bool book::basic_match(record* record) {
 		break;
 	case XC_GEO: {
 		// match by the "geography" - based on default prefix for that region
-		prefix* prefix = pfx_data_->get_prefix(record->item("APP_ZZA_PFX"));
-		bool match = false;
-		while (!match && prefix != nullptr && prefix->parent_ != nullptr) {
-			return match_string(criteria_->pattern, criteria_->comparator, prefix->nickname_);
-			prefix = prefix->parent_;
-		}
+		string nickname = cty_data_->nickname(record);
+		return match_string(criteria_->pattern, criteria_->comparator, nickname);
 		break;
 	}
 	case XC_ITUZ:

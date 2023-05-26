@@ -5,7 +5,7 @@
 #include "callback.h"
 #include "book.h"
 #include "tabbed_forms.h"
-#include "pfx_data.h"
+#include "cty_data.h"
 #include "utils.h"
 #include "status.h"
 #include "drawing.h"
@@ -29,7 +29,7 @@ extern book* navigation_book_;
 extern book* book_;
 extern extract_data* extract_records_;
 extern tabbed_forms* tabbed_forms_;
-extern pfx_data* pfx_data_;
+extern cty_data* cty_data_;
 extern status* status_;
 extern main_window* main_window_;
 extern qso_manager* qso_manager_;
@@ -434,7 +434,7 @@ void toolbar::cb_bn_explain(Fl_Widget* w, void* v) {
 	// Set the callsign in the temporary record
 	tip_record->item("CALL", to_upper(that->search_text_));
 	// Parse the temporary record
-	message = pfx_data_->get_tip(tip_record);
+	message = cty_data_->get_tip(tip_record);
 	// Create a tooltip window at the explain button (in w) X and Y
 	Fl_Window* tw = ::tip_window(message, main_window_->x_root() + w->x(), main_window_->y_root() + w->y());
 	// Set the timeout on the tooltip

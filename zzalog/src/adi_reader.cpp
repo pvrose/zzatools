@@ -4,7 +4,6 @@
 #include "record.h"
 #include "status.h"
 #include "spec_data.h"
-#include "pfx_data.h"
 #include "utils.h"
 
 #include <istream>
@@ -22,7 +21,6 @@ using namespace std;
 
 extern status* status_;
 extern spec_data* spec_data_;
-extern pfx_data* pfx_data_;
 extern bool closing_;
 
 

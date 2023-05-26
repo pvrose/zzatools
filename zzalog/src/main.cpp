@@ -14,7 +14,7 @@ main.cpp - application entry point
 #include "settings.h"
 #include "menu.h"
 #include "book.h"
-#include "pfx_data.h"
+#include "cty_data.h"
 #include "toolbar.h"
 #include "spec_data.h"
 #include "rig_if.h"
@@ -25,7 +25,6 @@ main.cpp - application entry point
 #include "lotw_handler.h"
 #include "eqsl_handler.h"
 #include "url_handler.h"
-#include "pfx_tree.h"
 #include "spec_tree.h"
 #include "report_tree.h"
 #include "callback.h"
@@ -74,7 +73,7 @@ using namespace std;
 string COPYRIGHT = "© Philip Rose GM3ZZA 2018. All rights reserved.\n (Prefix data, DX Atlas & OmniRig interfaces © Alex Shovkoplyas, VE3NEA.)";
 string PROGRAM_ID = "ZZALOG";
 string PROG_ID = "ZLG";
-string VERSION = "3.4.18";
+string VERSION = "3.4.19";
 string TIMESTAMP = __DATE__ + string(" ") + __TIME__;
 #ifdef _DEBUG
 string PROGRAM_VERSION = VERSION + " (Debug " + TIMESTAMP + ")";
@@ -104,7 +103,7 @@ menu* menu_ = nullptr;
 toolbar* toolbar_ = nullptr;
 status* status_ = nullptr;
 Fl_Preferences* settings_ = nullptr;
-pfx_data* pfx_data_ = nullptr;
+cty_data* cty_data_ = nullptr;
 spec_data* spec_data_ = nullptr;
 eqsl_handler* eqsl_handler_ = nullptr;
 lotw_handler* lotw_handler_ = nullptr;
@@ -349,9 +348,7 @@ void add_data() {
 	if (!closing_) {
 		if (!club_handler_) club_handler_ = new club_handler;
 		// Get pfx_data
-		pfx_data_ = new pfx_data;
-		// Draw the prefix data view
-		((pfx_tree*)tabbed_forms_->get_view(OT_PREFIX))->populate_tree(false);
+		cty_data_ = new cty_data;
 	}
 	if (!closing_) {
 		// add ADIF specification data.
@@ -550,7 +547,7 @@ void tidy() {
 	// This will be used in toolbar_
 	intl_dialog_ = nullptr;
 	delete spec_data_;
-	delete pfx_data_;
+	delete cty_data_;
 	delete tabbed_forms_;
 	delete toolbar_;
 	delete status_;

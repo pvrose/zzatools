@@ -45,7 +45,7 @@ pfx_data::pfx_data()
 
 	delete reader;
 
-	exceptions_ = new exc_data;
+	exceptions_ = new cty_data;
 
 }
 
@@ -987,6 +987,6 @@ string pfx_data::get_tip(record* record) {
 	return message;
 }
 
-exc_data* pfx_data::get_exceptions() {
+cty_data* pfx_data::get_exceptions() {
 	return exceptions_;
 }

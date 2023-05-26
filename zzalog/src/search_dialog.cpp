@@ -3,7 +3,7 @@
 #include "calendar.h"
 #include "field_choice.h"
 #include "prefix.h"
-#include "pfx_data.h"
+#include "cty_data.h"
 #include "icons.h"
 #include "utils.h"
 #include "spec_data.h"
@@ -23,7 +23,7 @@ using namespace std;
 
 extern Fl_Preferences* settings_;
 extern spec_data* spec_data_;
-extern pfx_data* pfx_data_;
+extern cty_data* cty_data_;
 
 // Constructor
 search_dialog::search_dialog() :
@@ -424,10 +424,8 @@ void search_dialog::save_values() {
 			// Check that the whole condition is numeric or not 
 			if (dummy != criteria_->pattern.length()) {
 				// Some letters so nickname supplied - get the ID
-				prefix* prefix = pfx_data_->get_prefix(criteria_->pattern);
-				if (prefix != nullptr) {
-					criteria_->pattern = to_string(prefix->dxcc_code_);
-				}
+				int dxcc = cty_data_->entity(criteria_->pattern);
+				criteria_->pattern = to_string(dxcc);
 			}
 
 		}

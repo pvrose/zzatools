@@ -1,6 +1,5 @@
 #include "extract_data.h"
 #include "prefix.h"
-#include "pfx_data.h"
 #include "utils.h"
 #include "tabbed_forms.h"
 #include "status.h"
@@ -21,7 +20,6 @@
 
 extern book* book_;
 extern book* navigation_book_;
-extern pfx_data* pfx_data_;
 extern tabbed_forms* tabbed_forms_;
 extern status* status_;
 extern eqsl_handler* eqsl_handler_;

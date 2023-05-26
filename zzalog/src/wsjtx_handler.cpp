@@ -4,7 +4,6 @@
 #include "utils.h"
 #include "dxa_if.h"
 #include "prefix.h"
-#include "pfx_data.h"
 #include "toolbar.h"
 #include "qso_manager.h"
 #include "adi_reader.h"
@@ -35,7 +34,6 @@ extern Fl_Preferences* settings_;
 #ifdef _WIN32
 extern dxa_if* dxa_if_;
 #endif
-extern pfx_data* pfx_data_;
 extern toolbar* toolbar_;
 extern qso_manager* qso_manager_;
 extern string PROGRAM_ID;

@@ -2,7 +2,6 @@
 #include "drawing.h"
 #include "log_table.h"
 #include "book.h"
-#include "pfx_tree.h"
 #include "report_tree.h"
 #include "spec_tree.h"
 #include "tabbed_forms.h"
@@ -14,9 +13,6 @@
 #include <FL/Fl_Hold_Browser.H>
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Counter.H>
-
-
-
 
 extern Fl_Preferences* settings_;
 extern book* book_;
@@ -250,7 +246,7 @@ void user_dialog::save_values() {
 	Fl_Preferences tree_settings(user_settings, "Tree Views");
 	tree_settings.set("Font Name", (int&)tree_font_);
 	tree_settings.set("Font Size", (int&)tree_size_);
-	((pfx_tree*)tabbed_forms_->get_view(OT_PREFIX))->set_font(tree_font_, tree_size_);
+	//((pfx_tree*)tabbed_forms_->get_view(OT_PREFIX))->set_font(tree_font_, tree_size_);
 	((report_tree*)tabbed_forms_->get_view(OT_REPORT))->set_font(tree_font_, tree_size_);
 	((spec_tree*)tabbed_forms_->get_view(OT_ADIF))->set_font(tree_font_, tree_size_);
 

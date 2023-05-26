@@ -2,7 +2,7 @@
 #include "specx_reader.h"
 #include "utils.h"
 #include "book.h"
-#include "pfx_data.h"
+#include "cty_data.h"
 #include "files.h"
 #include "status.h"
 #include "corr_dialog.h"
@@ -27,7 +27,7 @@ using namespace std;
 
 extern Fl_Preferences* settings_;
 extern book* book_;
-extern pfx_data* pfx_data_;
+extern cty_data* cty_data_;
 extern status* status_;
 
 // Default constructor
@@ -1061,72 +1061,72 @@ valn_error_t spec_data::check_integer(const string&  data, const string&  field,
 		// If the whole string is not a valid integer - invalid
 		return VE_VALUE_INVALID;
 	}
-	// Check compatibility with other fields
-	if (field == "CQZ" || field == "MY_CQZ") {
-		// Check that the CQ Zone is listed for the DXCC.
-		int dxcc_code;
-		try {
-			if (field.length() == 6) {
-				// MY_CQZ - check against MY_DXCC
-				dxcc_code = stoi(record_->item("MY_DXCC"));
-			}
-			else {
-				// CQZ - check against DXCC
-				dxcc_code = stoi(record_->item("DXCC"));
-			}
-		}
-		catch (const invalid_argument&) {
-			// exception raised if first character is non-numeric or empty string
-			dxcc_code = 0;
-		}
+	//// Check compatibility with other fields
+	//if (field == "CQZ" || field == "MY_CQZ") {
+	//	// Check that the CQ Zone is listed for the DXCC.
+	//	int dxcc_code;
+	//	try {
+	//		if (field.length() == 6) {
+	//			// MY_CQZ - check against MY_DXCC
+	//			dxcc_code = stoi(record_->item("MY_DXCC"));
+	//		}
+	//		else {
+	//			// CQZ - check against DXCC
+	//			dxcc_code = stoi(record_->item("DXCC"));
+	//		}
+	//	}
+	//	catch (const invalid_argument&) {
+	//		// exception raised if first character is non-numeric or empty string
+	//		dxcc_code = 0;
+	//	}
 
-		if (dxcc_code) {
-			// Get the entry in the prefix database for the DXCC code
-			prefix* prefix = pfx_data_->get_prefix(dxcc_code);
-			// Go through the list of zones for the prefix
-			for (unsigned int i = 0; i < prefix->cq_zones_.size(); i++) {
-				// If the entry matches - OK
-				if (data_value == prefix->cq_zones_[i]) return VE_OK;
-			}
-			// Not found in the list for the DXCC
-			return VE_VALUE_INCOMPATIBLE;
-		}
-		else {
-			// If DXCC field is blank or 0 (for a /MM station) it is not checkable
-			return VE_VALUE_UNCHECKABLE;
-		}
-	}
-	else if (field == "ITUZ" || field == "MY_ITUZ") {
-		// Check that the ITU Zone is listed for the DXCC
-		int dxcc_code;
-		try {
-			if (field.length() == 7) {
-				// MY_ITUZ - check MY_DXCC
-				dxcc_code = stoi(record_->item("MY_DXCC"));
-			}
-			else {
-				// ITUZ - check DXCC
-				dxcc_code = stoi(record_->item("DXCC"));
-			}
-		}
-		catch (const invalid_argument&) {
-			// exception raised if first character is non-numeric or empty string
-			dxcc_code = 0;
-		}
-		if (dxcc_code) {
-			// Get the prefix database entry for the DXCC code
-			prefix* prefix = pfx_data_->get_prefix(dxcc_code);
-			for (unsigned int i = 0; i < prefix->itu_zones_.size(); i++) {
-				if (data_value == prefix->itu_zones_[i]) return VE_OK;
-			}
-			// Not found in the list for the DXCC
-			return VE_VALUE_INCOMPATIBLE;
-		}
-		else {
-			// If DXCC field is blank or 0 (for a /MM station) it is not checkable
-			return VE_VALUE_UNCHECKABLE;
-		}
-	}
+	//	if (dxcc_code) {
+	//		// Get the entry in the prefix database for the DXCC code
+	//		prefix* prefix = pfx_data_->get_prefix(dxcc_code);
+	//		// Go through the list of zones for the prefix
+	//		for (unsigned int i = 0; i < prefix->cq_zones_.size(); i++) {
+	//			// If the entry matches - OK
+	//			if (data_value == prefix->cq_zones_[i]) return VE_OK;
+	//		}
+	//		// Not found in the list for the DXCC
+	//		return VE_VALUE_INCOMPATIBLE;
+	//	}
+	//	else {
+	//		// If DXCC field is blank or 0 (for a /MM station) it is not checkable
+	//		return VE_VALUE_UNCHECKABLE;
+	//	}
+	//}
+	//else if (field == "ITUZ" || field == "MY_ITUZ") {
+	//	// Check that the ITU Zone is listed for the DXCC
+	//	int dxcc_code;
+	//	try {
+	//		if (field.length() == 7) {
+	//			// MY_ITUZ - check MY_DXCC
+	//			dxcc_code = stoi(record_->item("MY_DXCC"));
+	//		}
+	//		else {
+	//			// ITUZ - check DXCC
+	//			dxcc_code = stoi(record_->item("DXCC"));
+	//		}
+	//	}
+	//	catch (const invalid_argument&) {
+	//		// exception raised if first character is non-numeric or empty string
+	//		dxcc_code = 0;
+	//	}
+	//	if (dxcc_code) {
+	//		// Get the prefix database entry for the DXCC code
+	//		prefix* prefix = pfx_data_->get_prefix(dxcc_code);
+	//		for (unsigned int i = 0; i < prefix->itu_zones_.size(); i++) {
+	//			if (data_value == prefix->itu_zones_[i]) return VE_OK;
+	//		}
+	//		// Not found in the list for the DXCC
+	//		return VE_VALUE_INCOMPATIBLE;
+	//	}
+	//	else {
+	//		// If DXCC field is blank or 0 (for a /MM station) it is not checkable
+	//		return VE_VALUE_UNCHECKABLE;
+	//	}
+	//}
 	// Get the ADIF field parameters. Minimum and Maximum values - uses largest +/- value if blank
 	map<string, string>* fields = dataset("Fields")->data.at(field);
 	int min_value = INT_MIN;
@@ -1208,34 +1208,34 @@ valn_error_t spec_data::check_enumeration(const string& data, const string& fiel
 			return VE_VALUE_NOT_RECOMMENDED;
 		}
 	}
-	else if (field == "CONT" || field == "MY_CONT") {
-		// Check that the continent is correct for the DXCC.
-		int dxcc_code = 0;
-		if (field.length() == 7) {
-			// MY_CONT
-			if (record_->item("MY_DXCC").length())
-				dxcc_code = stoi(record_->item("MY_DXCC"));
-		}
-		else {
-			// CONT
-			if (record_->item("DXCC").length())
-				dxcc_code = stoi(record_->item("DXCC"));
-		}
-		if (dxcc_code) {
-			// Get the prefix entry for the DXCC code
-			prefix* prefix = pfx_data_->get_prefix(dxcc_code);
-			for (unsigned int i = 0; i < prefix->continents_.size(); i++) {
-				// The continent matches an entry in the list of continent in DXCC
-				if (data == prefix->continents_[i]) return VE_OK;
-			}
-			// Not found in the list
-			return VE_VALUE_INCOMPATIBLE;
-		}
-		else {
-			// If DXCC field is blank or 0 (for a /MM station) it is not checkable
-			return VE_VALUE_UNCHECKABLE;
-		}
-	}
+	//else if (field == "CONT" || field == "MY_CONT") {
+	//	// Check that the continent is correct for the DXCC.
+	//	int dxcc_code = 0;
+	//	if (field.length() == 7) {
+	//		// MY_CONT
+	//		if (record_->item("MY_DXCC").length())
+	//			dxcc_code = stoi(record_->item("MY_DXCC"));
+	//	}
+	//	else {
+	//		// CONT
+	//		if (record_->item("DXCC").length())
+	//			dxcc_code = stoi(record_->item("DXCC"));
+	//	}
+	//	if (dxcc_code) {
+	//		// Get the prefix entry for the DXCC code
+	//		prefix* prefix = pfx_data_->get_prefix(dxcc_code);
+	//		for (unsigned int i = 0; i < prefix->continents_.size(); i++) {
+	//			// The continent matches an entry in the list of continent in DXCC
+	//			if (data == prefix->continents_[i]) return VE_OK;
+	//		}
+	//		// Not found in the list
+	//		return VE_VALUE_INCOMPATIBLE;
+	//	}
+	//	else {
+	//		// If DXCC field is blank or 0 (for a /MM station) it is not checkable
+	//		return VE_VALUE_UNCHECKABLE;
+	//	}
+	//}
 	else {
 		// No other enumerations to check
 		return VE_OK;
@@ -2205,7 +2205,7 @@ bool spec_data::auto_correction(valn_error_t error_code, const string&  data, co
 			// These fields should be reparsed - if we can
 			if (record_->item("DXCC").length()) {
 				record_->item(field, string(""));
-				pfx_data_->parse(record_);
+				cty_data_->update_qso(record_);
 				correction_message_ = field + "=" + display_item + " auto-corrected to " +
 					field + "=" + record_->item(field, true) + ".";
 				return true;

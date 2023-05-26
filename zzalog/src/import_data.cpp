@@ -1,5 +1,5 @@
 #include "import_data.h"
-#include "pfx_data.h"
+#include "cty_data.h"
 #include "spec_data.h"
 #include "tabbed_forms.h"
 #include "status.h"
@@ -31,7 +31,7 @@
 extern status* status_;
 extern book* book_;
 extern Fl_Preferences* settings_;
-extern pfx_data* pfx_data_;
+extern cty_data* cty_data_;
 extern spec_data* spec_data_;
 extern tabbed_forms* tabbed_forms_;
 extern eqsl_handler* eqsl_handler_;
@@ -254,7 +254,7 @@ void import_data::merge_update() {
 	if (book_record->merge_records(import_record, false, &hint)) {
 		book_->modified(true, false);
 	}
-	if (pfx_data_->parse(book_record) == PR_CHANGED) {
+	if (cty_data_->update_qso(book_record)) {
 		book_->modified(true, false);
 	}
 	if (spec_data_->validate(book_record, book_->selection())) {
@@ -272,7 +272,7 @@ void import_data::save_update() {
 	// Get parse and validation settings
 	record* import_record = at(0);
 	qso_manager_->update_import_qso(import_record);
-	if (pfx_data_->parse(import_record) == PR_CHANGED) {
+	if (cty_data_->update_qso(import_record)) {
 	}
 	// Need to copy it over before calling the next two to get the record number
 	int record_number = book_->insert_record(import_record);
@@ -489,7 +489,7 @@ void import_data::update_book() {
 					import_record->update_timeoff();
 					if (update_mode_ == AUTO_IMPORT || update_mode_ == FILE_IMPORT || update_mode_ == DATAGRAM) {
 						add_use_data(import_record);
-						pfx_data_->parse(import_record);
+						cty_data_->update_qso(import_record);
 						spec_data_->validate(import_record, -1);
 						qso_manager_->update_import_qso(import_record);
 					}

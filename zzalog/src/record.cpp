@@ -8,7 +8,7 @@ record.cpp - Individual record data item: implementation file
 
 #include "record.h"
 #include "utils.h"
-#include "pfx_data.h"
+#include "cty_data.h"
 #include "spec_data.h"
 #include "status.h"
 #include "view.h"
@@ -28,7 +28,7 @@ using namespace std;
 
 
 
-extern pfx_data* pfx_data_;
+extern cty_data* cty_data_;
 extern spec_data* spec_data_;
 extern Fl_Preferences* settings_;
 extern status* status_;
@@ -594,15 +594,7 @@ lat_long_t record::location(bool my_station, location_t& source) {
 		// 2 or 4 character grid square - use centre of grid square
 		if (value_1.length() <= 4) {
 			// Get prefix coordinates
-			lat_long_t prefix_lat_long = { nan(""), nan("") };
-			string prefix_code = item("APP_ZZA_PFX");
-			if (prefix_code != "") {
-				prefix* prefix = pfx_data_->get_prefix(prefix_code);
-				if (prefix != nullptr) {
-					prefix_lat_long.latitude = prefix->latitude_;
-					prefix_lat_long.longitude = prefix->longitude_;
-				}
-			}
+			lat_long_t prefix_lat_long = cty_data_->location(this);
 			if (value_1.length()) {
 				double side = 0.0;
 				switch (value_1.length()) {
@@ -789,7 +781,7 @@ bool record::merge_records(record* merge_record, bool allow_loc_mismatch /* = fa
 	}
 	// Recalculate bearing and distance as location has changed
 	if (bearing_change) {
-		pfx_data_->update_bearing(this);
+		update_bearing();
 	}
 	// If the location has changed we want to redraw DxAtlas, otherwise we don't.
 	if (result) {
@@ -801,6 +793,38 @@ bool record::merge_records(record* merge_record, bool allow_loc_mismatch /* = fa
 	}
 	return merged;
 }
+
+// Update the ANT_AZ and DISTANCE fields based on record data or entity data
+void record::update_bearing() {
+	lat_long_t their_location = location(false);
+	lat_long_t my_location = location(true);
+	bool updated = false;
+	// Need both user and contact locations
+	if (!isnan(my_location.latitude) && !isnan(my_location.longitude) &&
+		!isnan(their_location.latitude) && !isnan(their_location.longitude)) {
+		double bearing;
+		double distance;
+		// Calculate bearing and distance
+		great_circle(my_location, their_location, bearing, distance);
+		char azimuth[16];
+		sprintf(azimuth, "%0.f", bearing);
+		char distance_string[16];
+		sprintf(distance_string, "%0.f", distance);
+		// Update if different
+		if (item("ANT_AZ") != azimuth) {
+			item("ANT_AZ", string(azimuth));
+			updated = true;
+		}
+		if (item("DISTANCE") != distance_string) {
+			item("DISTANCE", string(distance_string));
+			updated = true;
+		}
+	}
+	if (updated) {
+		is_dirty_ = true;
+	}
+}
+
 
 // Change a field name
 void record::change_field_name(string from, string to) {

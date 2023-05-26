@@ -3,7 +3,7 @@
 #include "utils.h"
 
 #include "record.h"
-#include "pfx_data.h"
+#include "cty_data.h"
 #include "prefix.h"
 #include "status.h"
 #include "tabbed_forms.h"
@@ -24,7 +24,7 @@
 
 
 extern Fl_Preferences* settings_;
-extern pfx_data* pfx_data_;
+extern cty_data* cty_data_;
 extern status* status_;
 extern tabbed_forms* tabbed_forms_;
 extern spec_data* spec_data_;
@@ -69,7 +69,8 @@ void qth_dialog::load_values() {
 	current_qth_.state = qth_details_->item("MY_STATE");
 	current_qth_.county = qth_details_->item("MY_CNTY");
 	current_qth_.cq_zone = qth_details_->item("MY_CQ_ZONE");
-	current_qth_.itu_zone = qth_details_->item("MY_ITU_ZONE");
+	// ITU_ZONE is not supported by ClubLog cty.xml
+	//current_qth_.itu_zone = qth_details_->item("MY_ITU_ZONE");
 	// MY_CONT is not a valid ADIF field
 	//current_qth_.continent = qth_details_->item("MY_CONT");
 	current_qth_.iota = qth_details_->item("MY_IOTA");
@@ -293,8 +294,8 @@ void qth_dialog::enable_widgets() {
 	ip_address4_->value(current_qth_.postcode.c_str());
 	ip_locator_->value(current_qth_.locator.c_str());
 	if (current_qth_.dxcc_id.length() && current_qth_.dxcc_name.length()) {
-		prefix* pfx = pfx_data_->get_prefix(stoi(current_qth_.dxcc_id));
-		ip_dxcc_->value((pfx->nickname_ + ":" + current_qth_.dxcc_name).c_str());
+		string nickname = cty_data_->nickname(stoi(current_qth_.dxcc_id));
+		ip_dxcc_->value((nickname + ":" + current_qth_.dxcc_name).c_str());
 	}
 	else {
 		ip_dxcc_->value(current_qth_.dxcc_name.c_str());
@@ -329,68 +330,9 @@ void qth_dialog::cb_ip_cty(Fl_Widget* w, void* v) {
 	// Find prefix (nickname) - either GM or GM:SCOTLAND
 	size_t pos = ::find(value->c_str(), value->length(), ':');
 	string nickname = value->substr(0, pos);
-	// Get the prefix and track up to the DXCC prefix
-	prefix* prefix = pfx_data_->get_prefix(nickname);
-	if (prefix) {
-		// Get CQZone - if > 1 supplied then message for now
-		if (prefix->cq_zones_.size() > 1) {
-			string message = "STATION: Multiple CQ Zones: ";
-			for (unsigned int i = 0; i < prefix->cq_zones_.size(); i++) {
-				string zone = to_string(prefix->cq_zones_[i]);
-				message += zone;
-			}
-			status_->misc_status(ST_WARNING, message.c_str());
-			qth->cq_zone = "";
-		}
-		else {
-			// Set it in the QTH
-			qth->cq_zone = to_string(prefix->cq_zones_[0]);
-		}
-		// Get ITUZone - if > 1 supplied then message for now
-		if (prefix->itu_zones_.size() > 1) {
-			string message = "STATION: Multiple ITU Zones: ";
-			for (unsigned int i = 0; i < prefix->itu_zones_.size(); i++) {
-				string zone = to_string(prefix->itu_zones_[i]);
-				message += zone;
-			}
-			status_->misc_status(ST_WARNING, message.c_str());
-			qth->itu_zone = "";
-		}
-		else {
-			// Set it in the QTH
-			qth->itu_zone = to_string(prefix->itu_zones_[0]);
-		}
-		// Get Continent - if > 1 supplied then message for now
-		if (prefix->continents_.size() > 1) {
-			string message = "STATION: Multiple Continents: ";
-			for (unsigned int i = 0; i < prefix->continents_.size(); i++) {
-				message += prefix->continents_[i] + "; ";
-			}
-			status_->misc_status(ST_WARNING, message.c_str());
-			qth->continent = "";
-		}
-		else {
-			// Set it in the QTH
-			qth->continent = prefix->continents_[0];
-		}
-		qth->state = prefix->state_;
-		// Track up to DXCC prefix record
-		while (prefix->parent_ != nullptr) {
-			prefix = prefix->parent_;
-		}
-		// Fill in DXCC fields
-		qth->dxcc_id = to_string(prefix->dxcc_code_);
-		qth->dxcc_name = prefix->name_;
-	}
-	else {
-		// Not a valid nickname - set fields to blurgh
-		qth->cq_zone = "";
-		qth->itu_zone = "";
-		qth->continent = "";
-		qth->state = "";
-		qth->dxcc_id = "";
-		qth->dxcc_name = "";
-	}
+	int dxcc = cty_data_->entity(nickname);
+	qth->cq_zone = to_string(cty_data_->cq_zone(dxcc));
+	qth->continent = cty_data_->continent(dxcc);
 	// Update other widgets
 	that->enable_widgets();
 	that->redraw();

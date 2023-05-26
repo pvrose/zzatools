@@ -176,8 +176,8 @@
     <ClCompile Include="zzalog\src\corr_dialog.cpp" />
     <ClCompile Include="zzalog\src\dxa_if.cpp" />
     <ClCompile Include="zzalog\src\eqsl_handler.cpp" />
-    <ClCompile Include="zzalog\src\exc_data.cpp" />
-    <ClCompile Include="zzalog\src\exc_reader.cpp" />
+    <ClCompile Include="zzalog\src\cty_data.cpp" />
+    <ClCompile Include="zzalog\src\cty_reader.cpp" />
     <ClCompile Include="zzalog\src\extract_data.cpp" />
     <ClCompile Include="zzalog\src\fields_dialog.cpp" />
     <ClCompile Include="zzalog\src\field_choice.cpp" />
@@ -191,10 +191,6 @@
     <ClCompile Include="zzalog\src\main.cpp" />
     <ClCompile Include="zzalog\src\main_window.cpp" />
     <ClCompile Include="zzalog\src\menu.cpp" />
-    <ClCompile Include="zzalog\src\pfx_data.cpp" />
-    <ClCompile Include="zzalog\src\pfx_dialog.cpp" />
-    <ClCompile Include="zzalog\src\pfx_reader.cpp" />
-    <ClCompile Include="zzalog\src\pfx_tree.cpp" />
     <ClCompile Include="zzalog\src\printer.cpp" />
     <ClCompile Include="zzalog\src\qrz_handler.cpp" />
     <ClCompile Include="zzalog\src\qsl_design.cpp" />
@@ -267,8 +263,8 @@
     <ClInclude Include="zzalog\include\dxa_if.h" />
     <ClInclude Include="zzalog\include\edit_input.h" />
     <ClInclude Include="zzalog\include\eqsl_handler.h" />
-    <ClInclude Include="zzalog\include\exc_data.h" />
-    <ClInclude Include="zzalog\include\exc_reader.h" />
+    <ClInclude Include="zzalog\include\cty_data.h" />
+    <ClInclude Include="zzalog\include\cty_reader.h" />
     <ClInclude Include="zzalog\include\extract_data.h" />
     <ClInclude Include="zzalog\include\fields.h" />
     <ClInclude Include="zzalog\include\fields_dialog.h" />
@@ -284,10 +280,7 @@
     <ClInclude Include="zzalog\include\lotw_handler.h" />
     <ClInclude Include="zzalog\include\main_window.h" />
     <ClInclude Include="zzalog\include\menu.h" />
-    <ClInclude Include="zzalog\include\pfx_data.h" />
-    <ClInclude Include="zzalog\include\pfx_dialog.h" />
-    <ClInclude Include="zzalog\include\pfx_reader.h" />
-    <ClInclude Include="zzalog\include\pfx_tree.h" />
+    <ClInclude Include="zzalog\include\pfx_data.old.h" />
     <ClInclude Include="zzalog\include\prefix.h" />
     <ClInclude Include="zzalog\include\printer.h" />
     <ClInclude Include="zzalog\include\qsl_design.h" />

@@ -7,7 +7,7 @@
 #include "book.h"
 #include "status.h"
 #include "extract_data.h"
-#include "pfx_data.h"
+#include "cty_data.h"
 #include "spec_data.h"
 #include "band_view.h"
 #include "tabbed_forms.h"
@@ -24,7 +24,7 @@ extern Fl_Preferences* settings_;
 extern book* book_;
 extern extract_data* extract_records_;
 extern status* status_;
-extern pfx_data* pfx_data_;
+extern cty_data* cty_data_;
 extern spec_data* spec_data_;
 extern band_view* band_view_;
 extern tabbed_forms* tabbed_forms_;
@@ -566,7 +566,7 @@ void qso_data::action_save() {
 	}
 
 	// check whether record has changed - when parsed
-	if (pfx_data_->parse(qso)) {
+	if (cty_data_->update_qso(qso)) {
 	}
 
 	// check whether record has changed - when validated

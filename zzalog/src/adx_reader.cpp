@@ -1,7 +1,6 @@
 #include "adx_reader.h"
 #include "utils.h"
 #include "spec_data.h"
-#include "pfx_data.h"
 #include "status.h"
 #include "files.h"
 
@@ -14,7 +13,6 @@
 
 
 extern spec_data* spec_data_;
-extern pfx_data* pfx_data_;
 extern Fl_Preferences* settings_;
 extern status* status_;
 

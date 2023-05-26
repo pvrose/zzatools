@@ -124,6 +124,8 @@ using namespace std;
 		match_result_t match_records(record* record);
 		// Add timeoff if its isn't set
 		void update_timeoff();
+		// Update DISTANCE and ANT_AZ fields 
+		void update_bearing();
 		// change the field name
 		void change_field_name(string from, string to);
 		// Write to an item merging data from other items

@@ -4,7 +4,6 @@
 #include "log_table.h"
 #include "extract_data.h"
 #include "import_data.h"
-#include "pfx_tree.h"
 #include "spec_tree.h"
 #include "report_tree.h"
 #include "toolbar.h"
@@ -46,8 +45,8 @@ tabbed_forms::tabbed_forms(int X, int Y, int W, int H, const char* label) :
 	// Records displayed in DxAtlas
 	add_view<log_table>("Records in DxAtlas", FO_DXATLAS, OT_DXATLAS, "Displays the records being displayed in DxAtlas");
 #endif
-	// Prefix reference data
-	add_view<pfx_tree>("Prefix Reference", FO_LAST, OT_PREFIX, "Displays the prefix reference data in tree format");
+	//// Prefix reference data
+	//add_view<pfx_tree>("Prefix Reference", FO_LAST, OT_PREFIX, "Displays the prefix reference data in tree format");
 	// ADIF reference data
 	add_view<spec_tree>("Specifications", FO_LAST, OT_ADIF, "Displays the ADIF specification data in tree format");
 	// Report view

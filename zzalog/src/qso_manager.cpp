@@ -3,7 +3,6 @@
 #include "rig_if.h"
 
 #include "record.h"
-#include "pfx_data.h"
 #include "prefix.h"
 #include "status.h"
 #include "tabbed_forms.h"
@@ -51,7 +50,6 @@
 
 // External declarations
 extern Fl_Preferences* settings_;
-extern pfx_data* pfx_data_;
 extern status* status_;
 extern tabbed_forms* tabbed_forms_;
 extern spec_data* spec_data_;
