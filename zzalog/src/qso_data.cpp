@@ -676,8 +676,9 @@ void qso_data::action_edit() {
 // Action SAVE EDIT - Transition from QSO_EDIT to QSO_INACTIVE while saving changes
 void qso_data::action_save_edit() {
 	// We no longer need to maintain the copy of the original QSO
-	book_->add_use_data(g_entry_->qso());
-	book_->modified(true);
+	record* qso = g_entry_->qso();
+	book_->add_use_data(qso);
+	if (qso->is_dirty()) book_->modified(true);
 	g_entry_->delete_qso();
 	book_->enable_save(true);
 	logging_state_ = QSO_INACTIVE;
