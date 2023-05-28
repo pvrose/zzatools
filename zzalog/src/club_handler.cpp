@@ -152,6 +152,7 @@ bool club_handler::download_exception() {
 	string filename = ref_dir + "cty.xml.gz";
 	ofstream os(filename, ios::trunc | ios::out | ios::binary);
 	string url = "https://cdn.clublog.org/cty.php?api=" + string(api_key_);
+	printf("Fetching URL: %s\n", url.c_str());
 	if (url_handler_->read_url(url, &os)) {
 		os.close();
 		status_->misc_status(ST_NOTE, "CLUBLOG: Exception file downloaded successfully - unzipping it");

@@ -130,6 +130,7 @@ bool cty_data::data_valid(string filename) {
 #endif
 	time_t now;
 	time(&now);
+	printf("Current %lld, file %s %lld\n", now, filename.c_str(), status.st_mtime);
 	if (difftime(now, status.st_mtime) > 7 * 24 * 3600) {
 		// File is over 7 days old
 		return false;
