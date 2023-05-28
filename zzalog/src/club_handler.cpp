@@ -171,7 +171,7 @@ bool club_handler::unzip_exception(string filename) {
 #ifdef _WIN32
 	snprintf(cmd, sizeof(cmd), "\"C:/Program Files (x86)/7-Zip/7z\" e %s -o%s -y", filename.c_str(), ref_dir.c_str());
 #else
-	snprintf(cmd, sizeof(cmd), "gunzip %s", filename.c_str());
+	snprintf(cmd, sizeof(cmd), "gunzip -f %s", filename.c_str());
 #endif
 
 	//Fl_Preferences qsl_settings(settings_, "QSL");
