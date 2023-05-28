@@ -371,14 +371,14 @@ int cty_data::entity(record* qso) {
 // Return entity prefix
 string cty_data::nickname(record* qso) {
 	int adif_id = entity(qso);
-	if (adif_id < 0) return "";
+	if (adif_id <= 0) return "";
 	else return entities_.at(adif_id)->prefix;
 }
 
 /// Return entity name
 string cty_data::name(record* qso) {
 	int adif_id = entity(qso);
-	if (adif_id < 0) return "";
+	if (adif_id <= 0) return "";
 	else return entities_.at(adif_id)->name;
 }
 
@@ -449,7 +449,7 @@ bool cty_data::update_qso(record* qso) {
 	parse(qso);
 	// Use the values in the exceptions entry
 	qso->item("DXCC", to_string(entity(qso_)));
-	qso->item("CQZ", to_string(cq_zone(qso_)));
+	if (cq_zone(qso_) > 0) qso->item("CQZ", to_string(cq_zone(qso_)));
 	qso->item("COUNTRY", name(qso));
 	qso->item("CONT", continent(qso));
 	qso->update_bearing();
