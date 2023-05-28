@@ -202,14 +202,6 @@ void web_dialog::create_form(int X, int Y) {
 
 	image_widgets_.clear();
 
-	// Row 1 Col 1 - eQSL Enable
-	Fl_Check_Button* bn1_1_1 = new Fl_Check_Button(X + C1, Y + R1_1, W1, H1_1, "En");
-	bn1_1_1->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
-	bn1_1_1->value(eqsl_enable_);
-	bn1_1_1->callback(cb_ch_enable, &eqsl_enable_);
-	bn1_1_1->when(FL_WHEN_CHANGED);
-	bn1_1_1->tooltip("Enable eQSL.cc access");
-
 	// eQSL group
 	Fl_Group* gp1 = new Fl_Group(X + EDGE, Y + GRP1, WGRP, HGRP1, "eQSL.cc");
 	gp1->labelsize(FL_NORMAL_SIZE + 2);
@@ -301,13 +293,14 @@ void web_dialog::create_form(int X, int Y) {
 
 	gp1->end();
 
-	// Row 1 Col 1 - LotW Enable
-	Fl_Check_Button* bn2_1_1 = new Fl_Check_Button(X + C1, Y + R2_1, W1, H2_1, "En");
-	bn2_1_1->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
-	bn2_1_1->value(lotw_enable_);
-	bn2_1_1->callback(cb_ch_enable, &lotw_enable_);
-	bn2_1_1->when(FL_WHEN_CHANGED);
-	bn2_1_1->tooltip("Enable Logbook of the World access");
+	// Row 1 Col 1 - eQSL Enable
+	Fl_Check_Button* bn1_1_1 = new Fl_Check_Button(X + C1, Y + R1_1, W1, H1_1, "En");
+	bn1_1_1->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
+	bn1_1_1->value(eqsl_enable_);
+	bn1_1_1->callback(cb_ch_enable, &eqsl_enable_);
+	bn1_1_1->when(FL_WHEN_CHANGED);
+	bn1_1_1->tooltip("Enable eQSL.cc access");
+
 
 	// LotW group
 	Fl_Group* gp2 = new Fl_Group(X + EDGE, Y + GRP2, WGRP, HGRP2, "Logbook of the World");
@@ -371,13 +364,13 @@ void web_dialog::create_form(int X, int Y) {
 
 	gp2->end();
 
-	// Row 1 Col 1 - QRZ Enable
-	Fl_Check_Button* bn3_1_1 = new Fl_Check_Button(X + C1, Y + R3_1, W1, H3_1, "En");
-	bn3_1_1->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
-	bn3_1_1->value(qrz_enable_);
-	bn3_1_1->callback(cb_ch_enable, &qrz_enable_);
-	bn3_1_1->when(FL_WHEN_CHANGED);
-	bn3_1_1->tooltip("Enable QRZ.com access");
+	// Row 1 Col 1 - LotW Enable
+	Fl_Check_Button* bn2_1_1 = new Fl_Check_Button(X + C1, Y + R2_1, W1, H2_1, "En");
+	bn2_1_1->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
+	bn2_1_1->value(lotw_enable_);
+	bn2_1_1->callback(cb_ch_enable, &lotw_enable_);
+	bn2_1_1->when(FL_WHEN_CHANGED);
+	bn2_1_1->tooltip("Enable Logbook of the World access");
 
 	// QRZ.com group
 	Fl_Group* gp3 = new Fl_Group(X + EDGE, Y + GRP3, WGRP, HGRP3, "QRZ.com");
@@ -423,13 +416,13 @@ void web_dialog::create_form(int X, int Y) {
 
 	gp3->end();
 
-	// Row 1 Col 1 - ClubLog Enable
-	Fl_Check_Button* bn4_1_1 = new Fl_Check_Button(X + C1, Y + R4_1, W1, H4_1, "En");
-	bn4_1_1->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
-	bn4_1_1->value(club_enable_);
-	bn4_1_1->callback(cb_ch_enable, &club_enable_);
-	bn4_1_1->when(FL_WHEN_CHANGED);
-	bn4_1_1->tooltip("Enable ClubLog access");
+	// Row 1 Col 1 - QRZ Enable
+	Fl_Check_Button* bn3_1_1 = new Fl_Check_Button(X + C1, Y + R3_1, W1, H3_1, "En");
+	bn3_1_1->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
+	bn3_1_1->value(qrz_enable_);
+	bn3_1_1->callback(cb_ch_enable, &qrz_enable_);
+	bn3_1_1->when(FL_WHEN_CHANGED);
+	bn3_1_1->tooltip("Enable QRZ.com access");
 
 	// QRZ.com group
 	Fl_Group* gp4 = new Fl_Group(X + EDGE, Y + GRP4, WGRP, HGRP4, "ClubLog");
@@ -482,6 +475,14 @@ void web_dialog::create_form(int X, int Y) {
 
 	grp_club_ = gp4;
 	gp4->end();
+
+	// Row 1 Col 1 - ClubLog Enable
+	Fl_Check_Button* bn4_1_1 = new Fl_Check_Button(X + C1, Y + R4_1, W1, H4_1, "En");
+	bn4_1_1->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
+	bn4_1_1->value(club_enable_);
+	bn4_1_1->callback(cb_ch_enable, &club_enable_);
+	bn4_1_1->when(FL_WHEN_CHANGED);
+	bn4_1_1->tooltip("Enable ClubLog access");
 
 	Fl_Group::end();
 }
