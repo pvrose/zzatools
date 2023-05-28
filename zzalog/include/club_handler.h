@@ -22,7 +22,7 @@
 		// Upload the saved log to ClubLog using putlogs.php interface
 		bool upload_log(book* book);
 		// Download the exception file
-		bool download_exception();
+		bool download_exception(string filename);
 		// Upload a single QSO
 		bool upload_single_qso(qso_num_t record_num);
 

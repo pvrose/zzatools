@@ -37,7 +37,7 @@ cty_data::cty_data() :
 	if (!data_valid(filename)) {
 		// Exception list has expired or didn't exist
 		status_->misc_status(ST_NOTE, "CTY DATA: Downloading exception file again as doesn't exist or is > 7 days old");
-		club_handler_->download_exception();
+		club_handler_->download_exception(filename);
 		filename.replace(filename.length() - 3, 3, "xml");
 	}
 	// Load the exception data

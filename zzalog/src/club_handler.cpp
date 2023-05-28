@@ -144,19 +144,17 @@ void club_handler::generate_adif(set < string > &adif_fields) {
 }
 
 // Download the exception file
-bool club_handler::download_exception() {
+bool club_handler::download_exception(string filename) {
 	// Start downloading exception file
 	status_->misc_status(ST_NOTE, "CLUBLOG: Starting to download exception file");
-	string ref_dir;
-	get_reference(ref_dir);
-	string filename = ref_dir + "cty.xml.gz";
-	ofstream os(filename, ios::trunc | ios::out | ios::binary);
+	string zip_filename = filename + ".gz";
+	ofstream os(zip_filename, ios::trunc | ios::out | ios::binary);
 	string url = "https://cdn.clublog.org/cty.php?api=" + string(api_key_);
 	printf("Fetching URL: %s\n", url.c_str());
 	if (url_handler_->read_url(url, &os)) {
 		os.close();
 		status_->misc_status(ST_NOTE, "CLUBLOG: Exception file downloaded successfully - unzipping it");
-		return unzip_exception(filename);
+		return unzip_exception(zip_filename);
 	} else {
 		os.close();
 		status_->misc_status(ST_ERROR, "CLUBLOG: Exception file download failed.");
@@ -169,21 +167,28 @@ bool club_handler::unzip_exception(string filename) {
 	// Read the settings that define user's access 
 	string ref_dir;
 	get_reference(ref_dir);
-	Fl_Preferences qsl_settings(settings_, "QSL");
-	Fl_Preferences clublog_settings(qsl_settings, "ClubLog");
-	char* cmd_executable;
-	clublog_settings.get("Unzip Command", cmd_executable, "C:/Program Files (x86)/7-Zip/7z");
-	char* switch_format;
-	clublog_settings.get("Unzip Switches", switch_format, "e %s -o%s -y");
-	char* cmd_format = new char[strlen(switch_format) + strlen(cmd_executable) + 10];
-	// Add quotes around the executable in case it is in C:\Program Files (x86)
-	sprintf(cmd_format, "\"%s\" %s", cmd_executable, switch_format);
-	char cmd[200];
-	snprintf(cmd, 199, cmd_format, filename.c_str(), ref_dir.c_str());
+	char cmd[256];
+#ifdef _WIN32
+	snprintf(cmd, sizeof(cmd), "\"C:/Program Files (x86)/7-Zip/7z\" e %s -o%s -y", filename.c_str(), ref_dir.c_str());
+#else
+	snprintf(cmd, sizeof(cmd), "gunzip %s", filename.c_str());
+#endif
 
-	delete[] cmd_format;
-	free(cmd_executable);
-	free(switch_format);
+	//Fl_Preferences qsl_settings(settings_, "QSL");
+	//Fl_Preferences clublog_settings(qsl_settings, "ClubLog");
+	//char* cmd_executable;
+	//clublog_settings.get("Unzip Command", cmd_executable, "C:/Program Files (x86)/7-Zip/7z");
+	//char* switch_format;
+	//clublog_settings.get("Unzip Switches", switch_format, "e %s -o%s -y");
+	//char* cmd_format = new char[strlen(switch_format) + strlen(cmd_executable) + 10];
+	//// Add quotes around the executable in case it is in C:\Program Files (x86)
+	//sprintf(cmd_format, "\"%s\" %s", cmd_executable, switch_format);
+	//char cmd[200];
+	//snprintf(cmd, 199, cmd_format, filename.c_str(), ref_dir.c_str());
+
+	//delete[] cmd_format;
+	//free(cmd_executable);
+	//free(switch_format);
 	int result = system(cmd);
 	if (result < 0) {
 		status_->misc_status(ST_ERROR, "CLUBLOG: Unzipping failed");
