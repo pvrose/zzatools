@@ -451,7 +451,7 @@ bool cty_data::update_qso(record* qso) {
 	qso->item("DXCC", to_string(entity(qso_)));
 	qso->item("CQZ", to_string(cq_zone(qso_)));
 	qso->item("COUNTRY", name(qso));
-	qso->item("CONTINENT", continent(qso));
+	qso->item("CONT", continent(qso));
 	qso->update_bearing();
 	if (parse_result_->invalid) return false;
 	return true;
