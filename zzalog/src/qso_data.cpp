@@ -577,6 +577,10 @@ void qso_data::action_save() {
 
 	// Upload QSO to QSL servers
 	book_->upload_qso(qso_number);
+
+	// If new or changed then update the fact and let every one know
+	book_->enable_save(true);
+
 	switch (logging_state_) {
 	case QSO_STARTED:
 	case QSO_MODEM:
@@ -601,9 +605,6 @@ void qso_data::action_save() {
 		break;
 	}
 	enable_widgets();
-
-	// If new or changed then update the fact and let every one know
-	book_->enable_save(true);
 }
 
 // Action CANCEL - Transition from QSO_STARTED to QSO_INACTIVE without saving record
