@@ -124,7 +124,7 @@ bool cty_data::data_valid(string filename) {
 #ifdef _WIN32
 	struct _stat status;
 	int result = _fstat(fd, &status);
-	close(fd);
+	_close(fd);
 #else
 	struct stat status;
 	int result = fstat(fd, &status);
@@ -132,7 +132,6 @@ bool cty_data::data_valid(string filename) {
 #endif
 	time_t now;
 	time(&now);
-	printf("Current %lld, file %s %lld\n", now, filename.c_str(), status.st_mtime);
 	if (difftime(now, status.st_mtime) > 7 * 24 * 3600) {
 		// File is over 7 days old
 		return false;
@@ -322,10 +321,10 @@ cty_data::prefix_entry* cty_data::prefix(record* qso) {
 			prefix_entry* prefix = *it;
 			if ((prefix->end == -1 || prefix->end > timestamp) &&
 				(prefix->start == -1 || timestamp > prefix->start)) {
-				char message[160];
-				snprintf(message, 160, "CTY DATA: Contact %s at %s %s is in entity %d",
-					call.c_str(), qso->item("QSO_DATE").c_str(), qso->item("TIME_ON").c_str(), prefix->adif_id);
-				status_->misc_status(ST_NOTE, message);
+				//char message[160];
+				//snprintf(message, 160, "CTY DATA: Contact %s at %s %s is in entity %d",
+				//	call.c_str(), qso->item("QSO_DATE").c_str(), qso->item("TIME_ON").c_str(), prefix->adif_id);
+				//status_->misc_status(ST_NOTE, message);
 				return prefix;
 			}
 		}
@@ -341,10 +340,10 @@ cty_data::prefix_entry* cty_data::prefix(record* qso) {
 					prefix_entry* prefix = *it;
 					if ((prefix->end == -1 || prefix->end > timestamp) &&
 						(prefix->start == -1 || timestamp > prefix->start)) {
-						char message[160];
-						snprintf(message, 160, "CTY DATA: Contact %s at %s %s is in entity %d",
-							call.c_str(), qso->item("QSO_DATE").c_str(), qso->item("TIME_ON").c_str(), prefix->adif_id);
-						status_->misc_status(ST_NOTE, message);
+						//char message[160];
+						//snprintf(message, 160, "CTY DATA: Contact %s at %s %s is in entity %d",
+						//	call.c_str(), qso->item("QSO_DATE").c_str(), qso->item("TIME_ON").c_str(), prefix->adif_id);
+						//status_->misc_status(ST_NOTE, message);
 						return prefix;
 					}
 				}
