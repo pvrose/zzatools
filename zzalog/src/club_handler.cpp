@@ -169,7 +169,7 @@ bool club_handler::unzip_exception(string filename) {
 	get_reference(ref_dir);
 	char cmd[256];
 #ifdef _WIN32
-	snprintf(cmd, sizeof(cmd), "\"C:/Program Files (x86)/7-Zip/7z\" e %s -o%s -y", filename.c_str(), ref_dir.c_str());
+	snprintf(cmd, sizeof(cmd), "7z e %s -o%s -y", filename.c_str(), ref_dir.c_str());
 #else
 	snprintf(cmd, sizeof(cmd), "gunzip -f %s", filename.c_str());
 #endif
@@ -189,6 +189,9 @@ bool club_handler::unzip_exception(string filename) {
 	//delete[] cmd_format;
 	//free(cmd_executable);
 	//free(switch_format);
+	char msg[128];
+	snprintf(msg, sizeof(msg), "CLUBLOG: Unzipping started: %s", cmd);
+	status_->misc_status(ST_NOTE, msg);
 	int result = system(cmd);
 	if (result < 0) {
 		status_->misc_status(ST_ERROR, "CLUBLOG: Unzipping failed");

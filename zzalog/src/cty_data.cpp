@@ -124,9 +124,11 @@ bool cty_data::data_valid(string filename) {
 #ifdef _WIN32
 	struct _stat status;
 	int result = _fstat(fd, &status);
+	close(fd);
 #else
 	struct stat status;
 	int result = fstat(fd, &status);
+	close(fd);
 #endif
 	time_t now;
 	time(&now);
