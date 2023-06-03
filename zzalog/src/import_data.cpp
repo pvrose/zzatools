@@ -473,7 +473,8 @@ void import_data::update_book() {
 				}
 				// Unexpected new record (update from log) - set flags to display new record - 
 				// user will either accept, reject or search for match
-				if (!found_match && !cancel_update && update_mode_ != AUTO_IMPORT && update_mode_ != FILE_IMPORT && update_mode_ != DATAGRAM) {
+				if (!found_match && !cancel_update && update_mode_ != AUTO_IMPORT && update_mode_ != FILE_IMPORT && 
+					update_mode_ != DATAGRAM && update_mode_ != CLIPBOARD) {
 					update_in_progress_ = true;
 					update_is_new_ = true;
 					match_question_ = "Cannot find matching record - click ""Accept"" to add to log.";
@@ -484,10 +485,12 @@ void import_data::update_book() {
 					book_->selection(offset, HT_IMPORT_QUERYNEW);
 				}
 				// Expected new record (merging logs) - Move from update log to main log. 
-				else if (!found_match && (update_mode_ == AUTO_IMPORT || update_mode_ == FILE_IMPORT || update_mode_ == DATAGRAM)) {
+				else if (!found_match && (update_mode_ == AUTO_IMPORT || update_mode_ == FILE_IMPORT || 
+					update_mode_ == DATAGRAM || update_mode_ == CLIPBOARD)) {
 					// If Auto update or importing a file then record needs parsing etc.
 					import_record->update_timeoff();
-					if (update_mode_ == AUTO_IMPORT || update_mode_ == FILE_IMPORT || update_mode_ == DATAGRAM) {
+					if (update_mode_ == AUTO_IMPORT || update_mode_ == FILE_IMPORT ||
+						update_mode_ == DATAGRAM || update_mode_ == CLIPBOARD) {
 						add_use_data(import_record);
 						cty_data_->update_qso(import_record);
 						spec_data_->validate(import_record, -1);
@@ -532,6 +535,7 @@ void import_data::stop_update(bool immediate) {
 	case EQSL_UPDATE:
 	case LOTW_UPDATE:
 	case DATAGRAM:
+	case CLIPBOARD:
 		// Set gradual stopping - will stop when update currently in progress completes
 		close_pending_ = true;
 		// Go back to updating book
@@ -574,6 +578,9 @@ void import_data::finish_update(bool merged /*= true*/) {
 				break;
 			case DATAGRAM:
 				source = "UDP";
+				break;
+			case CLIPBOARD:
+				source = "CLIPBOARD";
 				break;
 			}
 			sprintf(message, "IMPORT: %s %d records read, %d checked, %d modified, %d matched, %d added, %d SWLs added, %d rejected",
@@ -807,7 +814,7 @@ bool import_data::download_data(import_data::update_mode_t server) {
 
 // Load from a data stream
 void import_data::load_stream(stringstream& adif, import_data::update_mode_t server) {
-	if (server == DATAGRAM) {
+	if (server == DATAGRAM || server == CLIPBOARD) {
 		update_mode_ = server;
 	}
 	// This download data will be ADI format - load the stream into this book

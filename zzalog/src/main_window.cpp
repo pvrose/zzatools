@@ -33,13 +33,9 @@ int main_window::handle(int event) {
 		// Stop any extant update and wait for it to complete
 		import_data_->stop_update(false);
 		while (!import_data_->update_complete()) Fl::check();
-		import_data_->load_stream(adif, import_data::update_mode_t::DATAGRAM);
-		int num_records = import_data_->size();
+		import_data_->load_stream(adif, import_data::update_mode_t::CLIPBOARD);
 		// Wait for the import to finish
 		while (import_data_->size()) Fl::check();
-		char message[100];
-		snprintf(message, 100, "LOG: %d records copied from clipboard", num_records);
-		status_->misc_status(ST_NOTE, message);
 		return true;
 	}
 

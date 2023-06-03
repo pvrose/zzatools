@@ -35,6 +35,7 @@ using namespace std;
 			WAIT_AUTO,       // Book is reserved for the next auto-import session
 			READ_AUTO,       // Data is being read - we can interrupt the process
 			DATAGRAM,        // Book contains data received from WSJT-X datagram
+			CLIPBOARD,       // Book is being imported from clipboard
 		};
 
 	public:
