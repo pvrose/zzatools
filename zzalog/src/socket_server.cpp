@@ -68,7 +68,6 @@ void socket_server::close_server() {
 	Fl::remove_timeout(cb_timer_acc, this);
 	Fl::remove_timeout(cb_timer_rcv, this);
 	if (server_ != INVALID_SOCKET) {
-		printf("Closing....");
 		SOCKADDR_IN server_addr;
 		LEN_SOCKET_ADDR len_server_addr = sizeof(server_addr);
 		char message[256];
@@ -506,5 +505,4 @@ void socket_server::dump(string data) {
 			escaped += *it;
 		}
 	}
-	printf("%s\n", escaped.c_str());
 }

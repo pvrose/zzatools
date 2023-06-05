@@ -246,14 +246,12 @@ bool rig_if::open() {
 			break;
 		case RIG_PORT_NETWORK:
 		case RIG_PORT_USB:
-			printf("RIG: Setting port path=%s\n", hamlib_data_.port_name.c_str());
 			int err = rig_set_conf(rig_, rig_token_lookup(rig_, "rig_pathname"), hamlib_data_.port_name.c_str());
 			//strcpy(rig_->state.rigport.pathname, port_name_.c_str());
 			break;
 		}
 	}
-		// open rig connection over serial port
-	printf("RIG: Opening rig\n");
+	// open rig connection over serial port
 	error_code_ = rig_open(rig_);
 
 	if (error_code_ != RIG_OK) {

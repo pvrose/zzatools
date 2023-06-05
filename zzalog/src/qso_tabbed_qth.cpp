@@ -68,7 +68,6 @@ void qso_tabbed_qth::enable_widgets() {
 		else {
 			name = label();
 		}
-		printf("Selecting QTH %s\n", name.c_str());
 		qso_qth* q = (qso_qth*)label_map_.at(name);
 		value(q);
 		for (auto ix = label_map_.begin(); ix != label_map_.end(); ix++) {

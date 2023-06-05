@@ -86,7 +86,6 @@ void qso_tabbed_rigs::enable_widgets() {
 		else {
 			name = label();
 		}
-		printf("Selecting rig control %s\n", name.c_str());
 		value(label_map_.at(name));
 		for (auto ix = label_map_.begin(); ix != label_map_.end(); ix++) {
 			Fl_Widget* w = (*ix).second;

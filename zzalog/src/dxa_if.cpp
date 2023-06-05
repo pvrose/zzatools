@@ -687,9 +687,6 @@ void dxa_if::cb_bn_centre(Fl_Widget* w, void* v) {
 		lat_long_t home = { that->home_lat_, that->home_long_ };
 		that->centre_map(home);
 		that->zoom_changed_ = false;
-#ifdef _DEBUG
-		printf("Clearing zoom_changed as re-centred\n");
-#endif
 		switch (map->GetProjection()) {
 		case DxAtlas::PRJ_RECTANGULAR:
 			that->zoom_centre(home);
@@ -915,9 +912,6 @@ HRESULT dxa_if::cb_map_changed(DxAtlas::EnumMapChange change) {
 				}
 			}
 			else {
-#ifdef _DEBUG
-				printf("Setting zoom changed as DxAtlas has changed was %0.1f now %0.1f\n", zoom_value_, atlas_->GetMap()->GetZoom());
-#endif
 				zoom_changed_ = true;
 			}
 			break;
@@ -1028,9 +1022,6 @@ bool dxa_if::connect_dxatlas() {
 		atlas_->GetMap()->PutMouseMode(DxAtlas::MM_USER);
 		atlas_->GetMap()->PutActiveLabels(false);
 		status_->misc_status(ST_OK, "DXATLAS: Connected");
-#ifdef _DEBUG
-		printf("Clearing zoom_changed_ as just connected DxAtlas\n");
-#endif
 		zoom_changed_ = false;
 	}
 	else {
@@ -1561,9 +1552,6 @@ void dxa_if::draw_pins() {
 			// Set the azimuthal bounds to a finitessimal amount in each direction
 			horiz_most_ = 100.0;
 			vert_most_ = 100.0;
-#ifdef _DEBUG
-			printf("Initial value: X=%0.0f, Y= %0.0f\n", horiz_most_, vert_most_);
-#endif
 			last_time_ = time(nullptr);
 
 			// Clear records displayed
@@ -1694,11 +1682,6 @@ void dxa_if::draw_pins() {
 										horiz_most_ = max(horiz_most_, abs(x_dist));
 										vert_most_ = max(vert_most_, abs(y_dist));
 										// Add it to the set of records being displayed
-#ifdef _DEBUG
-										printf("Wanted value, %s %s %s: D=%0.0f, Ph=%0.0f, X=%0.0f, Y=%0.0f\n",
-										record->item("CALL").c_str(), record->item("GRIDSQUARE").c_str(), 
-											record->item("QSO_DATE").c_str(), distance, bearing, x_dist, y_dist);
-#endif
 										records_displayed_.insert(record_num);
 										dxatlas_records_->add_record(record_num);
 									}
@@ -1752,9 +1735,6 @@ void dxa_if::draw_pins() {
 			call_layer_->BrushColor = DxAtlas::clWhite;
 			// Let DxAtlas callbacks update view
 			is_my_change_ = false;
-#ifdef _DEBUG
-			printf("Clearing zoom_changed_ as drawing pin collection\n");
-#endif
 			zoom_changed_ = false;
 
 			// now centre on selected record - home location if azimuthal view
@@ -1974,12 +1954,6 @@ void dxa_if::zoom_azimuthal() {
 		double max_kmpp = max(max_dist / width, max_dist / height);
 		double target_kmpp = max(horiz_most_ / width, vert_most_ / height);
 		float zoom = float(max_kmpp / target_kmpp) * 0.90F;
-#ifdef _DEBUG
-		printf("Map pixels W=%0.0f, H=%0.0f, Required km X=%0.0f, Y=%0.0f\n",
-			width, height, horiz_most_, vert_most_);
-		printf("km/pixel: Full Earth %0.1f, Required %0.1f, Zoom=%0.1f\n",
-			max_kmpp, target_kmpp, zoom);
-#endif
 		is_my_change_ = true;
 		map->PutZoom(zoom);
 		zoom_value_ = map->GetZoom();
@@ -2167,10 +2141,6 @@ void dxa_if::set_dx_loc(string location, string callsign) {
 		double radb = bearing * PI / 180.0;
 		double x_dist = distance * sin(radb);
 		double y_dist = distance * cos(radb);
-#ifdef _DEBUG
-		printf("Wanted value, %s %s: D=%0.0f, Ph=%0.0f, X=%0.0f, Y=%0.0f\n",
-			callsign.c_str(), location.c_str(), distance, bearing, x_dist, y_dist);
-#endif
 		horiz_most_ = max(horiz_most_, abs(x_dist));
 		vert_most_ = max(vert_most_, abs(y_dist));
 		centre_map();

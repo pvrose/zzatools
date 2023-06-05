@@ -704,12 +704,6 @@ bool eqsl_handler::upload_eqsl_log(book* book) {
 	vector<url_handler::field_pair> f_fields;
 	form_fields(f_fields);
 	stringstream response;
-#ifdef _DEBUG
-	printf("Posting to www.eqsl.cc ...\n");
-	for (auto it = f_fields.begin(); it != f_fields.end(); it++) {
-		printf("     %s %s\n", (*it).name.c_str(), (*it).value.c_str());
-	}
-#endif
 	// Post the form to eQSL.cc with the stream data attached. WE'll get a response to indicate success or not
 	if (url_handler_->post_form("https://www.eqsl.cc/qslcard/ImportADIF.cfm", f_fields, &ss, &response)) {
 		// Successfully uploaded

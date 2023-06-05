@@ -165,7 +165,6 @@ int wsjtx_handler::handle_log(stringstream& ss) {
 		record* log_qso = rcvd_book->get_record(0, false);
 		qso_->merge_records(log_qso);
 		qso_->item("QSO_COMPLETE", string(""));
-		printf("LOG %s sending to DASH\n", qso_->item("CALL").c_str());
 		qso_manager_->update_modem_qso(qso_);
 		status_->misc_status(ST_NOTE, "WSJT-X: Logged QSO");
 		delete rcvd_book;
@@ -416,7 +415,6 @@ void wsjtx_handler::add_tx_message(const status_dg& status) {
 		qso_->item("STATION_CALLSIGN", status.own_call);
 
 		if (check_message(qso_, status.tx_message, true)) {
-			printf("TX: %s - sending to DASH\n", status.tx_message.c_str());
 			qso_manager_->update_modem_qso(qso_);
 			if (qso_->item("QSO_COMPLETE").length() == 0) {
 				qso_ = nullptr;
@@ -446,7 +444,6 @@ void wsjtx_handler::add_rx_message(const decode_dg& decode) {
 	}
 
 	if (check_message(qso_, decode.message, false)) {
-		printf("RX: %s - sending to DASH\n", decode.message.c_str());
 		qso_manager_->update_modem_qso(qso_);
 		if (qso_->item("QSO_COMPLETE").length() == 0) {
 			qso_ = nullptr;
