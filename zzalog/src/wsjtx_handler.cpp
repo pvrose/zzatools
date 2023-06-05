@@ -459,24 +459,52 @@ void wsjtx_handler::add_rx_message(const decode_dg& decode) {
 bool wsjtx_handler::check_message(record* qso, string message, bool tx) {
 	// Now parse the exchange - 
 	// TODO: Currently assuming non F/H exchange
-	string exchange;
-	string sender;
-	string target;
+	string exchange = "";
+	string sender = "";
+	string target = "";
+	int state = 0;
 	// exchange is the last word, sender last but one and target the rest
-	size_t start_pos;
-	size_t end_pos = message.length();
-	while (message[--end_pos] == ' ');
-	start_pos = end_pos;
-	while (message[--start_pos] != ' ');
-	exchange = message.substr(start_pos + 1, end_pos - start_pos);
-	end_pos = start_pos;
-	while (message[--end_pos] == ' ');
-	start_pos = end_pos;
-	while (message[--start_pos] != ' ');
-	sender = message.substr(start_pos + 1, end_pos - start_pos);
-	end_pos = start_pos;
-	while (message[--end_pos] == ' ');
-	target = message.substr(0, end_pos + 1);
+	for (auto it = message.rbegin(); it != message.rend(); it++) {
+		switch (state) {
+		case 0: 
+			if (*it!= ' ') {
+				state = 1;
+				exchange = *it;
+			}
+			break;
+		case 1:
+			if (*it == ' ') {
+				state = 2;
+			} else {
+				exchange = *it + exchange;
+			}
+			break;
+		case 2: 
+			if (*it!= ' ') {
+				state = 3;
+				sender = *it;
+			}
+			break;
+		case 3:
+			if (*it == ' ') {
+				state = 4;
+			} else {
+				sender = *it + sender;
+			}
+			break;
+		case 4: 
+			if (*it!= ' ') {
+				state = 5;
+				target = *it;
+			}
+			break;
+		case 5:
+			target = *it + target;
+			break;
+		}
+	}
+	printf("%s: |%s|%s|%s|\n", tx ? "TX" : "RX", 
+		target.c_str(), sender.c_str(), exchange.c_str());
 	// Sort out my call
 	if (tx) {
 		// Not me sending - should not happen
