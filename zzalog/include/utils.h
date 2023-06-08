@@ -58,6 +58,8 @@ using namespace std;
 	void string_to_ints(string& text, vector<unsigned int>& ints);
 	// get the time in specific fomat
 	string now(bool local, const char* format);
+	// Get the time stamp to millisecond
+	string now_ms();
 	// test for leap year
 	bool is_leap(tm* date);
 	// refresh the tm struct after modifying it

@@ -306,13 +306,17 @@ bool rig_if::read_values() {
 	opened_ok_ = false;
 	rig_values current_values = rig_data_;
 	// Read TX frequency
+	printf("%s - reading TX Frequency\n", now_ms().c_str());
 	error_code_ = rig_get_freq(rig_, RIG_VFO_TX, &rig_data_.tx_frequency);
+	printf("%s - done\n", now_ms().c_str());
 	if (error_code_ != RIG_OK) {
 		status_->misc_status(ST_ERROR, error_message("TX Frequency").c_str());
 		return false;
 	}
 	// Read RX frequency
+	printf("%s - reading RX Frequency\n", now_ms().c_str());
 	error_code_ = rig_get_freq(rig_, RIG_VFO_CURR, &rig_data_.rx_frequency);
+	printf("%s - done\n", now_ms().c_str());
 	if (error_code_ != RIG_OK) {
 		status_->misc_status(ST_ERROR, error_message("RX Frequency").c_str());
 		return false;
@@ -320,7 +324,9 @@ bool rig_if::read_values() {
 	// Read mode
 	rmode_t mode;
 	shortfreq_t bandwidth;
+	printf("%s - reading mode/bandwidth\n", now_ms().c_str());
 	error_code_ = rig_get_mode(rig_, RIG_VFO_CURR, &mode, &bandwidth);
+	printf("%s - done\n", now_ms().c_str());
 	if (error_code_ != RIG_OK) {
 		status_->misc_status(ST_ERROR, error_message("Mode").c_str());
 		return false;
@@ -352,7 +358,9 @@ bool rig_if::read_values() {
 	}
 	// Read drive level
 	value_t drive_level;
+	printf("%s - reading Drive level\n", now_ms().c_str());
 	error_code_ = rig_get_level(rig_, RIG_VFO_CURR, RIG_LEVEL_RFPOWER, &drive_level);
+	printf("%s - done\n", now_ms().c_str());
 	if (error_code_ != RIG_OK) {
 		status_->misc_status(ST_ERROR, error_message("Drive").c_str());
 		return false;
@@ -361,7 +369,9 @@ bool rig_if::read_values() {
 	// Split
 	vfo_t TxVFO;
 	split_t split;
+	printf("%s - reading Split\n", now_ms().c_str());
 	error_code_ = rig_get_split_vfo(rig_, RIG_VFO_CURR, &split, &TxVFO);
+	printf("%s - done\n", now_ms().c_str());
 	if (error_code_ != RIG_OK) {
 		status_->misc_status(ST_ERROR, error_message("Split").c_str());
 		return false;
@@ -369,7 +379,9 @@ bool rig_if::read_values() {
 	rig_data_.split = split == split_t::RIG_SPLIT_ON;
 	// PTT value
 	ptt_t ptt;
+	printf("%s - reading PTT\n", now_ms().c_str());
 	error_code_ = rig_get_ptt(rig_, RIG_VFO_CURR, &ptt);
+	printf("%s - done\n", now_ms().c_str());
 	if (error_code_ != RIG_OK) {
 		status_->misc_status(ST_ERROR, error_message("PTT").c_str());
 		return false;
@@ -377,7 +389,9 @@ bool rig_if::read_values() {
 	rig_data_.ptt = ptt == ptt_t::RIG_PTT_ON;
 	// S-meter - set to max value during RX and last RX value during TX
 	value_t meter_value;
+	printf("%s - reading S-meter\n", now_ms().c_str());
 	error_code_ = rig_get_level(rig_, RIG_VFO_CURR, RIG_LEVEL_STRENGTH, &meter_value);
+	printf("%s - done\n", now_ms().c_str());
 	if (error_code_ != RIG_OK) {
 		status_->misc_status(ST_ERROR, error_message("S meter").c_str());
 		return false;
@@ -391,7 +405,9 @@ bool rig_if::read_values() {
 		rig_data_.s_value = max(rig_data_.s_value, meter_value.i);
 	}
 	// Power meter
+	printf("%s - reading Power meter\n", now_ms().c_str());
 	error_code_ = rig_get_level(rig_, RIG_VFO_CURR, RIG_LEVEL_RFPOWER_METER_WATTS, &meter_value);
+	printf("%s - done\n", now_ms().c_str());
 	if (error_code_ != RIG_OK) {
 		status_->misc_status(ST_ERROR, error_message("Power meter").c_str());
 		return false;
@@ -406,7 +422,9 @@ bool rig_if::read_values() {
 	}
 	// VDD meter
 	if (!reported_no_vdd_) {
+		printf("%s - reading VDD meter\n", now_ms().c_str());
 		error_code_ = rig_get_level(rig_, RIG_VFO_CURR, RIG_LEVEL_VD_METER, &meter_value);
+		printf("%s - done\n", now_ms().c_str());
 		if (error_code_ != RIG_OK) {
 			if (abs(error_code_) == RIG_ENAVAIL) {
 				// If the rig has no VDD meter
@@ -423,7 +441,9 @@ bool rig_if::read_values() {
 	rig_data_.vdd = meter_value.f;
 	// SWR meter
 	if (!reported_no_swr_) {
+		printf("%s - reading SWR meter\n", now_ms().c_str());
 		error_code_ = rig_get_level(rig_, RIG_VFO_CURR, RIG_LEVEL_SWR, &meter_value);
+		printf("%s - done\n", now_ms().c_str());
 		if (error_code_ != RIG_OK) {
 			if (abs(error_code_) == RIG_ENAVAIL) {
 				// If the rig has no VDD meter

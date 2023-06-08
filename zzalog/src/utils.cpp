@@ -21,8 +21,10 @@ utils.h - Utility methods
 #include <map>
 #include <ctime>
 #include <cmath>
+#include <chrono>
 
 using namespace std;
+using namespace std::chrono;
 
 // Split the line into its separate words with specified separator
 void split_line(const string& line, vector<string>& words, const char separator) {
@@ -254,6 +256,24 @@ string now(bool local, const char* format) {
 	char result[100];
 	// convert to C string, then C++ string
 	strftime(result, 99, format, figures);
+	return string(result);
+}
+
+// Print current time to the millisecond
+string now_ms() {
+	system_clock::time_point p = system_clock::now();
+
+	milliseconds ms = duration_cast<milliseconds>(p.time_since_epoch());
+
+	seconds s = duration_cast<seconds>(ms);
+	time_t t = s.count();
+	tm* utc = gmtime(&t);
+	size_t fractional_seconds = ms.count() % 1000;
+
+	char* result = new char[20];
+	strftime(result, 20, "%H:%M:%S", utc);
+	snprintf(result + 8, 10, ".%d", fractional_seconds);
+
 	return string(result);
 }
 
