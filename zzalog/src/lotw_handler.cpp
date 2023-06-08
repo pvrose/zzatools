@@ -99,8 +99,10 @@ bool lotw_handler::upload_lotw_log(book* book) {
 				chooser->title("Please locate TQSL executable");
 				chooser->filter("Applications\t*.exe");
 #else
-				// TODO: POsix equivalent filename pattern
-//				Fl_File_Chooser* chooser = new Fl_File_Chooser("", "Applications(*.exe)", Fl_File_Chooser::SINGLE, "Please locate TQSL executable");
+				// Create an Open dialog; the default file name extension is ".exe".
+				Fl_Native_File_Chooser* chooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_FILE);
+				chooser->title("Please locate TQSL executable");
+				chooser->filter("*");
 #endif
 				if (chooser->show() != 0) {
 					// No executable found - cancel upload

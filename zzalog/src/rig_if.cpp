@@ -3,6 +3,8 @@
 #include "utils.h"
 #include "status.h"
 
+#include <climits>
+
 #include <FL/Fl.H>
 #include <FL/Fl_Preferences.H>
 #include <FL/fl_ask.H>
@@ -104,6 +106,8 @@ string rig_if::get_tx_power() {
 void rig_if::ticker() {
 	count_down_--;
 	if (count_down_ == 0) {
+		// Set count to a large value so that if read takes > 1s it doesn't stack up
+		count_down_ = INT_MAX;
 		read_values();
 	} 
 	if (opened_ok_) {
@@ -313,6 +317,7 @@ bool rig_if::read_values() {
 		status_->misc_status(ST_ERROR, error_message("TX Frequency").c_str());
 		return false;
 	}
+	Fl::check();
 	// Read RX frequency
 	printf("%s - reading RX Frequency\n", now_ms().c_str());
 	error_code_ = rig_get_freq(rig_, RIG_VFO_CURR, &rig_data_.rx_frequency);
@@ -321,6 +326,7 @@ bool rig_if::read_values() {
 		status_->misc_status(ST_ERROR, error_message("RX Frequency").c_str());
 		return false;
 	}
+	Fl::check();
 	// Read mode
 	rmode_t mode;
 	shortfreq_t bandwidth;
@@ -357,6 +363,7 @@ bool rig_if::read_values() {
 		rig_data_.mode = GM_DIGU;
 	}
 	// Read drive level
+	Fl::check();
 	value_t drive_level;
 	printf("%s - reading Drive level\n", now_ms().c_str());
 	error_code_ = rig_get_level(rig_, RIG_VFO_CURR, RIG_LEVEL_RFPOWER, &drive_level);
@@ -367,6 +374,7 @@ bool rig_if::read_values() {
 	}
 	rig_data_.drive = drive_level.f * 100;
 	// Split
+	Fl::check();
 	vfo_t TxVFO;
 	split_t split;
 	printf("%s - reading Split\n", now_ms().c_str());
@@ -378,6 +386,7 @@ bool rig_if::read_values() {
 	}
 	rig_data_.split = split == split_t::RIG_SPLIT_ON;
 	// PTT value
+	Fl::check();
 	ptt_t ptt;
 	printf("%s - reading PTT\n", now_ms().c_str());
 	error_code_ = rig_get_ptt(rig_, RIG_VFO_CURR, &ptt);
@@ -388,6 +397,7 @@ bool rig_if::read_values() {
 	}
 	rig_data_.ptt = ptt == ptt_t::RIG_PTT_ON;
 	// S-meter - set to max value during RX and last RX value during TX
+	Fl::check();
 	value_t meter_value;
 	printf("%s - reading S-meter\n", now_ms().c_str());
 	error_code_ = rig_get_level(rig_, RIG_VFO_CURR, RIG_LEVEL_STRENGTH, &meter_value);
@@ -405,6 +415,7 @@ bool rig_if::read_values() {
 		rig_data_.s_value = max(rig_data_.s_value, meter_value.i);
 	}
 	// Power meter
+	Fl::check();
 	printf("%s - reading Power meter\n", now_ms().c_str());
 	error_code_ = rig_get_level(rig_, RIG_VFO_CURR, RIG_LEVEL_RFPOWER_METER_WATTS, &meter_value);
 	printf("%s - done\n", now_ms().c_str());
@@ -422,6 +433,7 @@ bool rig_if::read_values() {
 	}
 	// VDD meter
 	if (!reported_no_vdd_) {
+		Fl::check();
 		printf("%s - reading VDD meter\n", now_ms().c_str());
 		error_code_ = rig_get_level(rig_, RIG_VFO_CURR, RIG_LEVEL_VD_METER, &meter_value);
 		printf("%s - done\n", now_ms().c_str());
@@ -441,6 +453,7 @@ bool rig_if::read_values() {
 	rig_data_.vdd = meter_value.f;
 	// SWR meter
 	if (!reported_no_swr_) {
+		Fl::check();
 		printf("%s - reading SWR meter\n", now_ms().c_str());
 		error_code_ = rig_get_level(rig_, RIG_VFO_CURR, RIG_LEVEL_SWR, &meter_value);
 		printf("%s - done\n", now_ms().c_str());

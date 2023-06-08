@@ -503,8 +503,6 @@ bool wsjtx_handler::check_message(record* qso, string message, bool tx) {
 			break;
 		}
 	}
-	printf("%s: |%s|%s|%s|\n", tx ? "TX" : "RX", 
-		target.c_str(), sender.c_str(), exchange.c_str());
 	// Sort out my call
 	if (tx) {
 		// Not me sending - should not happen

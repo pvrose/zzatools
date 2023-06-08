@@ -83,7 +83,7 @@ string PROGRAM_VERSION = VERSION;
 string VENDOR = "GM3ZZA";
 // Allow hamlib debug level to be set by -D
 #ifndef HAMLIB_DEBUG_LEVEL
-#define HAMLIB_DEBUG_LEVEL RIG_DEBUG_ERR
+#define HAMLIB_DEBUG_LEVEL RIG_DEBUG_TRACE
 #endif
 
 // Global data items instanced in zzalib
