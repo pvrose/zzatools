@@ -134,6 +134,7 @@ settings* config_ = nullptr;
 		{ "&Validate record", 0, menu::cb_mi_valid8_qso, 0, FL_MENU_DIVIDER },
 		{ "Pa&rse log", 0, menu::cb_mi_parse_log, 0 },
 		{ "Val&idate log", 0, menu::cb_mi_valid8_log, 0, FL_MENU_DIVIDER },
+		{ "Suspend Save", 0, menu::cb_mi_log_ssave, 0, FL_MENU_TOGGLE },
 		{ "&Bulk changes", 0, menu::cb_mi_log_bulk, 0 },
 		{ "Chec&k Duplicates", 0, menu::cb_mi_log_dupes, 0 },
 		{ "Edit &Header", 0, menu::cb_mi_log_edith, 0 },
@@ -963,6 +964,20 @@ void menu::cb_mi_log_start(Fl_Widget* w, void* v) {
 	tabbed_forms_->update_views(nullptr, HT_ALL, save_pos);
 }
 
+// Log->Zuspend Save
+// If suspeneded remove all bars on saving
+void menu::cb_mi_log_ssave(Fl_Widget* w, void* v) {
+	// Get the value of the checked menu item
+	Fl_Menu_* m = (Fl_Menu_*)w;
+	const Fl_Menu_Item* item = m->mvalue();
+	bool value = item->value();
+	if (value) {
+		book_->enable_save(false);
+	} else {
+		while(!book_->enable_save()) book_->enable_save(true);
+	}
+}
+
 // Import->File
 // v defines subsequent load type (FILE_IMPORT or FILE_UPDATE
 void menu::cb_mi_imp_file(Fl_Widget* w, void* v) {
@@ -1649,6 +1664,7 @@ void menu::update_items() {
 		bool record_modified = book_->modified_record();
 		bool new_record = book_->new_record();
 		bool delete_enabled = book_->delete_enabled();
+		bool save_enabled = book_->enable_save();
 		bool web_enabled = book_ && book_->get_record() && book_->get_record()->item_exists("WEB");
 		bool listening_wsjtx = wsjtx_handler_ && wsjtx_handler_->has_server();
 		// Get all relevant menu item indices
@@ -1666,6 +1682,7 @@ void menu::update_items() {
 		int index_newr = find_index("&Log/&New record");
 		int index_parser = find_index("&Log/&Parse record");
 		int index_bulk = find_index("&Log/&Bulk changes");
+		int index_ssave = find_index("&Log/Suspend Save");
 		int index_extract = find_index("E&xtract");
 		int index_wsjtx = find_index("&Import/&WSJT-X UDP");
 		int index_rep = find_index("Re&port");
@@ -1745,6 +1762,12 @@ void menu::update_items() {
 			mode(index_saver, mode(index_saver) | FL_MENU_INACTIVE);
 			mode(index_cancel, mode(index_cancel) | FL_MENU_INACTIVE);
 			mode(index_newr, mode(index_newr) & ~FL_MENU_INACTIVE);
+		}
+		// Suspend save
+		if (save_enabled) {
+			mode(index_ssave, mode(index_ssave) & ~FL_MENU_VALUE);
+		} else {
+			mode(index_ssave, mode(index_ssave) | FL_MENU_VALUE);
 		}
 		// Delete enabled
 		if (delete_enabled) {

@@ -77,6 +77,8 @@
 		static void cb_mi_log_start(Fl_Widget* w, void* v);
 		// Log->Edit Header
 		static void cb_mi_log_edith(Fl_Widget* w, void* v);
+		// Log->Suspend save
+		static void cb_mi_log_ssave(Fl_Widget* w, void* v);
 		// Extract->Clear
 		static void cb_mi_ext_clr(Fl_Widget* w, void* v);
 		// Extract->Criteria

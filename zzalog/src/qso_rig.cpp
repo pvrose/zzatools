@@ -122,7 +122,7 @@ void qso_rig::create_form(int X, int Y) {
 	int curr_y = Y + GAP;
 
 	// First button - connect/disconnect or add
-	bn_connect_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Connect");
+	bn_connect_ = new Fl_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON);
 	bn_connect_->color(FL_YELLOW);
 	bn_connect_->tooltip("Select to attempt to connect/disconnect rig");
 	bn_connect_->callback(cb_bn_connect, nullptr);
@@ -256,11 +256,11 @@ void qso_rig::enable_widgets() {
 		network_grp_->hide();
 		if (rig_->is_open()) {
 			bn_connect_->color(FL_GREEN);
-			bn_connect_->label("Disconnect");
+			bn_connect_->label("Connected");
 		}
 		else {
 			bn_connect_->color(FL_RED);
-			bn_connect_->label("Connect");
+			bn_connect_->label("Disconnected");
 		}
 		break;
 	case RIG_PORT_NETWORK:
@@ -274,11 +274,11 @@ void qso_rig::enable_widgets() {
 		ip_port_->value(hamlib_data_.port_name.c_str());
 		if (rig_->is_open()) {
 			bn_connect_->color(FL_GREEN);
-			bn_connect_->label("Disconnect");
+			bn_connect_->label("Connected");
 		}
 		else {
 			bn_connect_->color(FL_RED);
-			bn_connect_->label("Connect");
+			bn_connect_->label("Disconnected");
 		}
 		break;
 	case RIG_PORT_NONE:

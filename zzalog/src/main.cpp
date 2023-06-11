@@ -73,7 +73,7 @@ using namespace std;
 string COPYRIGHT = "© Philip Rose GM3ZZA 2018. All rights reserved.\nPrefix data courtesy of clublog.org";
 string PROGRAM_ID = "ZZALOG";
 string PROG_ID = "ZLG";
-string VERSION = "3.4.23";
+string VERSION = "3.4.24";
 string TIMESTAMP = __DATE__ + string(" ") + __TIME__;
 #ifdef _DEBUG
 string PROGRAM_VERSION = VERSION + " (Debug " + TIMESTAMP + ")";
@@ -83,7 +83,7 @@ string PROGRAM_VERSION = VERSION;
 string VENDOR = "GM3ZZA";
 // Allow hamlib debug level to be set by -D
 #ifndef HAMLIB_DEBUG_LEVEL
-#define HAMLIB_DEBUG_LEVEL RIG_DEBUG_TRACE
+#define HAMLIB_DEBUG_LEVEL RIG_DEBUG_ERR
 #endif
 
 // Global data items instanced in zzalib
@@ -153,6 +153,7 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 	}
 	else {
 		closing_ = true;
+		printf("ZZALOG: Closing\n");
 		if (qso_manager_) qso_manager_->stop_ticker();
 		status_->misc_status(ST_NOTE, "ZZALOG: Closing...");
 		// Delete band view
@@ -247,13 +248,14 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 		window_settings.set("Height", main_window_->h());
 
 		// Hide all the open windows - this will allow Fl to close the app.
-		for (Fl_Window* w = Fl::first_window(); w; w = Fl::first_window()) w->hide();
+		for (Fl_Window* wx = Fl::first_window(); wx; wx = Fl::first_window()) wx->hide();
 		// Leave the status file viewer visible if a severe or fatal error forced the shutdown.
 		if (close_by_error_ && status_->file_viewer()) {
 			status_->file_viewer()->show();
 		}
 
 		// Exit and close application
+		printf("ZZALOG: Closed\n");
 		Fl_Single_Window::default_callback((Fl_Window*)w, v);
 	}
 }
@@ -466,6 +468,7 @@ void main_window_label(string text) {
 		label += ": " + text;
 	}
 	main_window_->copy_label(label.c_str());
+	printf("%s\n", label.c_str());
 }
 
 // Create the main window
@@ -629,7 +632,7 @@ int main(int argc, char** argv)
 	// Add qso_manager
 	add_dashboard();
 	// Add band-plan 
-	add_band_view();
+//	add_band_view();
 	// Add qsl_handlers - note add_rig_if() may have added URL handler
 	add_qsl_handlers();
 	// Add DxAtlas interface

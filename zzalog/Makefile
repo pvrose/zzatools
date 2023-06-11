@@ -8,8 +8,8 @@ EXEC_DIR = $(BUILD_DIR)/$(BUILD_TYPE)
 INSTALL_DIR := /usr/local/bin
 
 FLTK_DIR := ~/ham_dev/fltk
-FLTK_BUILD := $(FLTK_DIR)/build/$(BUILD_TYPE)
-HAMLIB_DIR := ~/ham_dev/hamlib/hamlib-4.5.4
+#FLTK_BUILD := $(FLTK_DIR)/build/$(BUILD_TYPE)
+#HAMLIB_DIR := ~/ham_dev/hamlib/hamlib-4.5.5
 #HAMLIB_BUILD := $(HAMLIB_DIR)/mingw64-inst
 
 # Standard compilers and debuggers
@@ -34,8 +34,8 @@ TARFILE = $(TARGET_EXEC:.exe=.tgz)
 
 # Every folder in ./src will need to be passed to GCC so that it can find header files
 INC_DIRS := ./include
-INC_DIRS += $(FLTK_DIR) $(FLTK_BUILD)
-INC_DIRS += $(HAMLIB_DIR)/include
+#INC_DIRS += $(FLTK_DIR) $(FLTK_BUILD)
+#INC_DIRS += $(HAMLIB_DIR)/include
 
 # Add a prefix to INC_DIRS. So moduleA would become -ImoduleA. GCC understands this -I flag
 INC_FLAGS := $(addprefix -I,$(INC_DIRS))

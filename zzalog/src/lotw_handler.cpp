@@ -84,6 +84,7 @@ bool lotw_handler::upload_lotw_log(book* book) {
 		fields.insert("STATION_CALLSIGN");
 		// Write the book (only the above fields)
 		if (book->size() && book->store_data(string(new_filename), true, &fields)) {
+#ifdef WIN32
 			// Get the TQSL (an app that signs the upload) executable
 			string tqsl_executable;
 			char* temp;
@@ -93,17 +94,10 @@ bool lotw_handler::upload_lotw_log(book* book) {
 			free(temp);
 			// We have no value in the settings for it
 			if (!tqsl_executable.length()) {
-#ifdef WIN32
 				// Create an Open dialog; the default file name extension is ".exe".
 				Fl_Native_File_Chooser* chooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_FILE);
 				chooser->title("Please locate TQSL executable");
 				chooser->filter("Applications\t*.exe");
-#else
-				// Create an Open dialog; the default file name extension is ".exe".
-				Fl_Native_File_Chooser* chooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_FILE);
-				chooser->title("Please locate TQSL executable");
-				chooser->filter("*");
-#endif
 				if (chooser->show() != 0) {
 					// No executable found - cancel upload
 					status_->misc_status(ST_ERROR, "LOTW: TQSL Executable not found, upload cancelled");
@@ -116,6 +110,9 @@ bool lotw_handler::upload_lotw_log(book* book) {
 				}
 				delete chooser;
 			}
+#else
+			string tqsl_executable = "tqsl";
+#endif			
 			if (ok) {
 				// Get Callsign from first (maybe only) record in book
 				record* record_0 = book->get_record(0, false);
