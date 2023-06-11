@@ -13,6 +13,8 @@
 
 // C/C++ includes
 #include <string>
+#include <thread>
+#include <atomic>
 
 using namespace std;
 
@@ -59,22 +61,20 @@ using namespace std;
 
 		// Values read from rig
 		struct rig_values {
-			double tx_frequency = 0.0;
-			double rx_frequency = 0.0;
-			rig_mode_t mode = GM_CWU;
-			double drive = 0.0;
-			bool split = false;
-			int s_value = -54;
-			double pwr = 0.0;
-			bool ptt = false;
+			atomic<double> tx_frequency = 0.0;
+			atomic<double> rx_frequency = 0.0;
+			atomic<rig_mode_t> mode = GM_CWU;
+			atomic<double> drive = 0.0;
+			atomic<bool> split = false;
+			atomic<int> s_value = -54;
+			atomic<double> pwr = 0.0;
+			atomic<bool> ptt = false;
 		};
 
 		// Opens the COM port associated with the rig
 		bool open();
 		// Return rig name
 		string& rig_name();
-		// Read values
-		rig_values get_data();
 		// Formatted values
 		string rig_info();
 		// Return the most recent error message
@@ -98,13 +98,13 @@ using namespace std;
 		string get_tx_power();
 		// return S-meter reading
 		string get_smeter();
-
-		// Protected methods
-	protected:
+		// Return PTT value
+		bool get_ptt();
 		// Get the data from the rig
-		bool read_values();
+		static void th_read(rig_if* that);
 		// Protected attributes
 	protected:
+		void read_values();
 		// Rig opened OK
 		bool opened_ok_;
 		// bool
@@ -133,5 +133,9 @@ using namespace std;
 		rig_values rig_data_;
 		// Timer count down
 		int count_down_;
+		// Read rig thread
+		thread* th_read_;
+		// Stop thread
+		atomic<bool> run_read_;
 };
 #endif

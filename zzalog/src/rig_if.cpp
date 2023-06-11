@@ -4,6 +4,7 @@
 #include "status.h"
 
 #include <climits>
+#include <chrono>
 
 #include <FL/Fl.H>
 #include <FL/Fl_Preferences.H>
@@ -36,7 +37,7 @@ string rig_if::get_smeter() {
 	}
 	else {
 		// S9+
-		snprintf(text, 100, " S9+%ddB", rig_data_.s_value);
+		snprintf(text, 100, " S9+%ddB", (int)rig_data_.s_value);
 	}
 
 	return text;
@@ -91,24 +92,24 @@ string rig_if::get_frequency(bool tx) {
 // Return the power
 string rig_if::get_tx_power() {
 	char text[100];
-	snprintf(text, 100, "%g", rig_data_.pwr);
+	snprintf(text, 100, "%g", (double)rig_data_.pwr);
 	return text;
 }
 
 // 1 second time from clock 
 void rig_if::ticker() {
-	count_down_--;
-	if (count_down_ == 0) {
-		// Set count to a large value so that if read takes > 1s it doesn't stack up
-		count_down_ = INT_MAX;
-		read_values();
-	} 
-	if (opened_ok_) {
-		count_down_ = FAST_RIG_TIMER;
-	}
-	else {
-		count_down_ = SLOW_RIG_TIMER;
-	}
+	//count_down_--;
+	//if (count_down_ == 0) {
+	//	// Set count to a large value so that if read takes > 1s it doesn't stack up
+	//	count_down_ = INT_MAX;
+	//	read_values();
+	//} 
+	//if (opened_ok_) {
+	//	count_down_ = FAST_RIG_TIMER;
+	//}
+	//else {
+	//	count_down_ = SLOW_RIG_TIMER;
+	//}
 }
 
 // Converts rig mode to string
@@ -149,6 +150,10 @@ void rig_if::get_string_mode(string& mode, string& submode) {
 	}
 }
 
+bool rig_if::get_ptt() {
+	return rig_data_.ptt;
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////
 //    H a M L I B implementation
 //
@@ -172,6 +177,7 @@ rig_if::rig_if(const char* name, hamlib_data_t data)
 	unsupported_function_ = false;
 	my_rig_name_ = name;
 	hamlib_data_ = data;
+	run_read_ = false;
 	
 	// If the name has been set, there is a rig
 	if (my_rig_name_.length()) {
@@ -206,6 +212,10 @@ void rig_if::close() {
 				hamlib_data_.port_name.c_str());
 			status_->misc_status(ST_NOTE, msg);
 			// If we have a connection and it's open, close it and tidy memory used by hamlib
+			// Delete the thread that reads the required rig values
+			run_read_ = false;
+			th_read_->join();
+			delete th_read_;
 			rig_close(rig_);
 			rig_cleanup(rig_);
 		}
@@ -275,7 +285,8 @@ bool rig_if::open() {
 				rig_get_info(rig_));
 		}
 		status_->misc_status(ST_NOTE, msg);
-		read_values();
+		run_read_ = true;
+		th_read_ = new thread(th_read, this);
 		status_->misc_status(ST_NOTE, "RIG: Rig values read");
 		return true;
 	}
@@ -297,41 +308,49 @@ string& rig_if::rig_name() {
 	return full_rig_name_;
 }
 
-bool rig_if::read_values() {
-	rig_values current_values = rig_data_;
+// Thraed method
+void rig_if::th_read(rig_if* that) {
+	while (that->run_read_) {
+		that->read_values();
+		this_thread::sleep_for(chrono::milliseconds(1000));
+	}
+}
+
+void rig_if::read_values() {
 	// Read TX frequency
 //	printf("%s - reading TX Frequency\n", now_ms().c_str());
-	if (opened_ok_) error_code_ = rig_get_freq(rig_, RIG_VFO_TX, &rig_data_.tx_frequency);
-	else return false;
+	double d_temp;
+	if (opened_ok_) error_code_ = rig_get_freq(rig_, RIG_VFO_TX, &d_temp);
+	else return;
 //	printf("%s - done\n", now_ms().c_str());
 	if (error_code_ != RIG_OK) {
 		status_->misc_status(ST_ERROR, error_message("TX Frequency").c_str());
 		opened_ok_ = false;
-		return false;
+		return;
 	}
-	Fl::check();
+	rig_data_.tx_frequency = d_temp;
 	// Read RX frequency
 //	printf("%s - reading RX Frequency\n", now_ms().c_str());
-	if (opened_ok_) error_code_ = rig_get_freq(rig_, RIG_VFO_CURR, &rig_data_.rx_frequency);
-	else return false;
+	if (opened_ok_) error_code_ = rig_get_freq(rig_, RIG_VFO_CURR, &d_temp);
+	else return;
 	//	printf("%s - done\n", now_ms().c_str());
 	if (error_code_ != RIG_OK) {
 		status_->misc_status(ST_ERROR, error_message("RX Frequency").c_str());
 		opened_ok_ = false;
-		return false;
+		return;
 	}
-	Fl::check();
+	rig_data_.rx_frequency = d_temp;
 	// Read mode
 	rmode_t mode;
 	shortfreq_t bandwidth;
 //	printf("%s - reading mode/bandwidth\n", now_ms().c_str());
 	if (opened_ok_) error_code_ = rig_get_mode(rig_, RIG_VFO_CURR, &mode, &bandwidth);
-	else return false;
+	else return;
 	//	printf("%s - done\n", now_ms().c_str());
 	if (error_code_ != RIG_OK) {
 		status_->misc_status(ST_ERROR, error_message("Mode").c_str());
 		opened_ok_ = false;
-		return false;
+		return;
 	}
 	// Convert hamlib mode encoding to ZLG encoding
 	if (mode & RIG_MODE_AM) {
@@ -359,88 +378,88 @@ bool rig_if::read_values() {
 		rig_data_.mode = GM_DIGU;
 	}
 	// Read drive level
-	Fl::check();
 	value_t drive_level;
 //	printf("%s - reading Drive level\n", now_ms().c_str());
 	if (opened_ok_) error_code_ = rig_get_level(rig_, RIG_VFO_CURR, RIG_LEVEL_RFPOWER, &drive_level);
-	else return false;
+	else return;
 	//	printf("%s - done\n", now_ms().c_str());
 	if (error_code_ != RIG_OK) {
 		status_->misc_status(ST_ERROR, error_message("Drive").c_str());
 		opened_ok_ = false;
-		return false;
+		return;
 	}
 	rig_data_.drive = drive_level.f * 100;
 	// Split
-	Fl::check();
 	vfo_t TxVFO;
 	split_t split;
 //	printf("%s - reading Split\n", now_ms().c_str());
 	if (opened_ok_) error_code_ = rig_get_split_vfo(rig_, RIG_VFO_CURR, &split, &TxVFO);
-	else return false;
+	else return;
 	//	printf("%s - done\n", now_ms().c_str());
 	if (error_code_ != RIG_OK) {
 		status_->misc_status(ST_ERROR, error_message("Split").c_str());
 		opened_ok_ = false;
-		return false;
+		return;
 	}
 	rig_data_.split = split == split_t::RIG_SPLIT_ON;
 	// PTT value
-	Fl::check();
 	ptt_t ptt;
+	bool current_ptt = rig_data_.ptt;
 //	printf("%s - reading PTT\n", now_ms().c_str());
 	if (opened_ok_) error_code_ = rig_get_ptt(rig_, RIG_VFO_CURR, &ptt);
-	else return false;
+	else return;
 	//	printf("%s - done\n", now_ms().c_str());
 	if (error_code_ != RIG_OK) {
 		status_->misc_status(ST_ERROR, error_message("PTT").c_str());
 		opened_ok_ = false;
-		return false;
+		return;
 	}
 	rig_data_.ptt = ptt == ptt_t::RIG_PTT_ON;
 	// S-meter - set to max value during RX and last RX value during TX
-	Fl::check();
 	value_t meter_value;
 //	printf("%s - reading S-meter\n", now_ms().c_str());
 	if (opened_ok_) error_code_ = rig_get_level(rig_, RIG_VFO_CURR, RIG_LEVEL_STRENGTH, &meter_value);
-	else return false;
+	else return;
 	//	printf("%s - done\n", now_ms().c_str());
 	if (error_code_ != RIG_OK) {
 		status_->misc_status(ST_ERROR, error_message("S meter").c_str());
 		opened_ok_ = false;
-		return false;
+		return;
 	}
 	// TX->RX - use read value
-	if (current_values.ptt && !rig_data_.ptt) {
+	if (current_ptt && !rig_data_.ptt) {
 		rig_data_.s_value = meter_value.i;
 	}
 	// RX use accumulated maximum value
 	else if (!rig_data_.ptt) {
-		rig_data_.s_value = max(rig_data_.s_value, meter_value.i);
+		if (meter_value.i > rig_data_.s_value) {
+			rig_data_.s_value = meter_value.i;
+		}
 	}
 	// Power meter
-	Fl::check();
 //	printf("%s - reading Power meter\n", now_ms().c_str());
 	if (opened_ok_) error_code_ = rig_get_level(rig_, RIG_VFO_CURR, RIG_LEVEL_RFPOWER_METER_WATTS, &meter_value);
-	else return false;
+	else return;
 	//	printf("%s - done\n", now_ms().c_str());
 	if (error_code_ != RIG_OK) {
 		status_->misc_status(ST_ERROR, error_message("Power meter").c_str());
 		opened_ok_ = false;
-		return false;
+		return;
 	}
 	// RX->TX - use read value
-	if (!current_values.ptt && rig_data_.ptt) {
+	if (!current_ptt && rig_data_.ptt) {
 		rig_data_.pwr = meter_value.f;
 	}
 	// TX use accumulated maximum value
 	else if (rig_data_.ptt) {
-		rig_data_.pwr = max(rig_data_.pwr, (double)meter_value.f);
+		if ((double)meter_value.f > rig_data_.pwr) {
+			rig_data_.pwr = (double)meter_value.f;
+		}
 	}
 
 	// All successful
 	count_down_ = FAST_RIG_TIMER;
-	return true;
+	return;
 }
 
 // Return the most recent error message
@@ -500,8 +519,4 @@ const char* rig_if::error_text(rig_errcode_e code) {
 		return "Error not defined";
 	}
 };
-
-rig_if::rig_values rig_if::get_data() {
-	return rig_data_;
-}
 
