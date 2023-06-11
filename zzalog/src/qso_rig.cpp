@@ -540,8 +540,7 @@ void qso_rig::ticker() {
 	if (!rig_->is_open()) st = RS_OFF;
 	else if (!rig_->is_good()) st = RS_ERROR;
 	else if (!rig_->get_data().ptt) st = RS_RX;
-	else if (rig_->get_data().swr >= 2.0) st = RS_TX;
-	else st = RS_HIGH;
+	else st = RS_TX;
 	status_->rig_status(st, msg.c_str());
 }
 

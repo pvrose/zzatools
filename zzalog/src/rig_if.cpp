@@ -42,13 +42,6 @@ string rig_if::get_smeter() {
 	return text;
 }
 
-// Convert SWR meter into display formet
-string rig_if::get_swr_meter() {
-	char text[100];
-	snprintf(text, 100, "1:%.1f", rig_data_.swr);
-	return text;
-}
-
 // Returns the string displaying the rig information for the rig status
 // e.g. Hamlib: TS-2000 14.123456 MHz 10 W USB S9+20
 string rig_if::rig_info() {
@@ -177,9 +170,6 @@ rig_if::rig_if(const char* name, hamlib_data_t data)
 	rig_ = nullptr;
 	error_code_ = 0;
 	unsupported_function_ = false;
-	reported_no_vdd_ = false;
-	reported_no_swr_ = false;
-
 	my_rig_name_ = name;
 	hamlib_data_ = data;
 	
@@ -272,13 +262,13 @@ bool rig_if::open() {
 	if (opened_ok_) {
 
 		if (hamlib_data_.port_type == RIG_PORT_SERIAL) {
-			snprintf(msg, 256, "RIG: Connection %s/%s on port %s opened OK",
+			snprintf(msg, 256, "RIG: Connection %s/%s on port %s opened OK - reading values",
 				hamlib_data_.mfr.c_str(),
 				hamlib_data_.model.c_str(),
 				hamlib_data_.port_name.c_str());
 		}
 		else {
-			snprintf(msg, 256, "RIG: Connection %s/%s on port %s (%s) opened OK",
+			snprintf(msg, 256, "RIG: Connection %s/%s on port %s (%s) opened OK - reading values",
 				hamlib_data_.mfr.c_str(),
 				hamlib_data_.model.c_str(),
 				hamlib_data_.port_name.c_str(),
@@ -286,6 +276,7 @@ bool rig_if::open() {
 		}
 		status_->misc_status(ST_NOTE, msg);
 		read_values();
+		status_->misc_status(ST_NOTE, "RIG: Rig values read");
 		return true;
 	}
 	else {
@@ -446,50 +437,6 @@ bool rig_if::read_values() {
 	else if (rig_data_.ptt) {
 		rig_data_.pwr = max(rig_data_.pwr, (double)meter_value.f);
 	}
-	// VDD meter
-	if (!reported_no_vdd_) {
-		Fl::check();
-//		printf("%s - reading VDD meter\n", now_ms().c_str());
-		if (opened_ok_) error_code_ = rig_get_level(rig_, RIG_VFO_CURR, RIG_LEVEL_VD_METER, &meter_value);
-		else return false;
-		//		printf("%s - done\n", now_ms().c_str());
-		if (error_code_ != RIG_OK) {
-			if (abs(error_code_) == RIG_ENAVAIL) {
-				// If the rig has no VDD meter
-				status_->misc_status(ST_WARNING, error_message("VDD meter").c_str());
-				reported_no_vdd_ = true;
-				error_code_ = RIG_OK;
-			}
-			else {
-				status_->misc_status(ST_ERROR, error_message("VDD meter").c_str());
-				opened_ok_ = false;
-				return false;
-			}
-		}
-	}
-	rig_data_.vdd = meter_value.f;
-	// SWR meter
-	if (!reported_no_swr_) {
-		Fl::check();
-//		printf("%s - reading SWR meter\n", now_ms().c_str());
-		if (opened_ok_) error_code_ = rig_get_level(rig_, RIG_VFO_CURR, RIG_LEVEL_SWR, &meter_value);
-		else return false;
-		//		printf("%s - done\n", now_ms().c_str());
-		if (error_code_ != RIG_OK) {
-			if (abs(error_code_) == RIG_ENAVAIL) {
-				// If the rig has no VDD meter
-				status_->misc_status(ST_WARNING, error_message("SWR meter").c_str());
-				reported_no_swr_ = true;
-				error_code_ = RIG_OK;
-			}
-			else {
-				status_->misc_status(ST_ERROR, error_message("SWR meter").c_str());
-				opened_ok_ = false;
-				return false;
-			}
-		}
-	}
-	rig_data_.swr = meter_value.f;
 
 	// All successful
 	count_down_ = FAST_RIG_TIMER;

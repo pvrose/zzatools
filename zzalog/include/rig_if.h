@@ -67,8 +67,6 @@ using namespace std;
 			int s_value = -54;
 			double pwr = 0.0;
 			bool ptt = false;
-			double swr = 1.0;
-			double vdd = 13.8;
 		};
 
 		// Opens the COM port associated with the rig
@@ -100,8 +98,6 @@ using namespace std;
 		string get_tx_power();
 		// return S-meter reading
 		string get_smeter();
-		// Return SWR meter
-		string get_swr_meter();
 
 		// Protected methods
 	protected:
@@ -137,9 +133,5 @@ using namespace std;
 		rig_values rig_data_;
 		// Timer count down
 		int count_down_;
-		// Reported lack of functionality
-		bool reported_no_vdd_;
-		// have reported high SWR
-		bool reported_no_swr_;
 };
 #endif
