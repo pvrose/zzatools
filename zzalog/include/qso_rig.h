@@ -77,7 +77,7 @@ protected:
 	Fl_Choice* ch_baud_rate_;
 	Fl_Check_Button* bn_all_rates_;
 	Fl_Check_Button* bn_all_ports_;
-	Fl_Light_Button* bn_connect_;
+	Fl_Button* bn_connect_;
 
 	// Add all ports to port choice
 	bool use_all_ports_;

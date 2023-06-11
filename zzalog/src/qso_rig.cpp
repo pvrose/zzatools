@@ -122,7 +122,7 @@ void qso_rig::create_form(int X, int Y) {
 	int curr_y = Y + GAP;
 
 	// First button - connect/disconnect or add
-	bn_connect_ = new Fl_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON);
+	bn_connect_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON);
 	bn_connect_->color(FL_YELLOW);
 	bn_connect_->tooltip("Select to attempt to connect/disconnect rig");
 	bn_connect_->callback(cb_bn_connect, nullptr);
@@ -260,7 +260,7 @@ void qso_rig::enable_widgets() {
 		}
 		else {
 			bn_connect_->color(FL_RED);
-			bn_connect_->label("Disconnected");
+			bn_connect_->label("Disconn'd");
 		}
 		break;
 	case RIG_PORT_NETWORK:
@@ -278,7 +278,7 @@ void qso_rig::enable_widgets() {
 		}
 		else {
 			bn_connect_->color(FL_RED);
-			bn_connect_->label("Disconnected");
+			bn_connect_->label("Disconn'd");
 		}
 		break;
 	case RIG_PORT_NONE:
@@ -513,8 +513,16 @@ void qso_rig::cb_bn_connect(Fl_Widget* w, void* v) {
 
 // Connect rig if disconnected and vice-versa
 void qso_rig::switch_rig() {
-	delete rig_;
-	rig_ = new rig_if(label(), hamlib_data_);
+	if (!rig_) {
+		rig_ = new rig_if(label(), hamlib_data_);
+	} else {
+		if (rig_->is_open()) {
+			rig_->close();
+		}
+		else {
+			rig_->open();
+		}
+	}
 	ancestor_view<qso_manager>(this)->update_rig();
 	enable_widgets();
 }
