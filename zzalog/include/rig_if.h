@@ -61,14 +61,25 @@ using namespace std;
 
 		// Values read from rig
 		struct rig_values {
-			atomic<double> tx_frequency = 0.0;
-			atomic<double> rx_frequency = 0.0;
-			atomic<rig_mode_t> mode = GM_CWU;
-			atomic<double> drive = 0.0;
-			atomic<bool> split = false;
-			atomic<int> s_value = -54;
-			atomic<double> pwr = 0.0;
-			atomic<bool> ptt = false;
+			atomic<double> tx_frequency;
+			atomic<double> rx_frequency;
+			atomic<rig_mode_t> mode;
+			atomic<double> drive ;
+			atomic<bool> split;
+			atomic<int> s_value;
+			atomic<double> pwr;
+			atomic<bool> ptt;
+			
+			rig_values() {
+				tx_frequency = 0.0;
+				rx_frequency = 0.0;
+				mode =GM_CWU;
+				drive = 0.0;
+				split = false;
+				s_value = -54;
+				pwr = 0.0;
+				ptt = false;
+			}
 		};
 
 		// Opens the COM port associated with the rig
