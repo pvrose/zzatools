@@ -101,10 +101,12 @@ using namespace std;
 		// Return PTT value
 		bool get_ptt();
 		// Get the data from the rig
-		static void th_read(rig_if* that);
+		static void th_run_rig(rig_if* that);
 		// Protected attributes
 	protected:
 		void read_values();
+		// Open rig - run in thread
+		bool open_rig();
 		// Rig opened OK
 		bool opened_ok_;
 		// bool
@@ -134,7 +136,7 @@ using namespace std;
 		// Timer count down
 		int count_down_;
 		// Read rig thread
-		thread* th_read_;
+		thread* thread_;
 		// Stop thread
 		atomic<bool> run_read_;
 };

@@ -214,8 +214,8 @@ void rig_if::close() {
 			// If we have a connection and it's open, close it and tidy memory used by hamlib
 			// Delete the thread that reads the required rig values
 			run_read_ = false;
-			th_read_->join();
-			delete th_read_;
+			thread_->join();
+			delete thread_;
 			rig_close(rig_);
 			rig_cleanup(rig_);
 		}
@@ -239,6 +239,11 @@ bool rig_if::open() {
 		return false;
 
 	}
+	thread_ = new thread(th_run_rig, this);
+	return opened_ok_;
+}
+
+bool rig_if::open_rig() {
 	// Get the rig interface
 	rig_ = rig_init(hamlib_data_.model_id);
 	if (rig_ != nullptr) {
@@ -285,9 +290,6 @@ bool rig_if::open() {
 				rig_get_info(rig_));
 		}
 		status_->misc_status(ST_NOTE, msg);
-		run_read_ = true;
-		th_read_ = new thread(th_read, this);
-		status_->misc_status(ST_NOTE, "RIG: Rig values read");
 		return true;
 	}
 	else {
@@ -309,7 +311,11 @@ string& rig_if::rig_name() {
 }
 
 // Thraed method
-void rig_if::th_read(rig_if* that) {
+void rig_if::th_run_rig(rig_if* that) {
+	// Open the rig
+	if (!that->open_rig()) {
+		return;
+	}
 	while (that->run_read_) {
 		that->read_values();
 		this_thread::sleep_for(chrono::milliseconds(1000));
