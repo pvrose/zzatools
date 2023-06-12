@@ -22,22 +22,23 @@ bool rig_if::is_open() {
 }
 
 // Convert s-meter reading into display format
-string rig_if::get_smeter() {
+string rig_if::get_smeter(bool max) {
 	char text[100];
+	int value = max ? (int)rig_data_.s_value : (int)rig_data_.s_meter;
 	// SMeter value is relative to S9
 	// Smeter value 0 indicates S9,
 	// 1 S-point is 6 dB
 	if (rig_data_.s_value < -54) {
 		// Below S0
-		snprintf(text, 100, " S0%ddB", 54 + rig_data_.s_value);
+		snprintf(text, 100, " S0%ddB", 54 + value);
 	}
 	else if (rig_data_.s_value <= 0) {
 		// Below S9 - convert to S points (6dB per S-point
-		snprintf(text, 100, " S%1d", (54 + rig_data_.s_value) / 6);
+		snprintf(text, 100, " S%1d", (54 + value) / 6);
 	}
 	else {
 		// S9+
-		snprintf(text, 100, " S9+%ddB", (int)rig_data_.s_value);
+		snprintf(text, 100, " S9+%ddB", value);
 	}
 
 	return text;
@@ -55,7 +56,7 @@ string rig_if::rig_info() {
 	else {
 		if (is_good()) rig_info += " " + get_frequency(true) + " MHz";
 	}
-	if (is_good()) rig_info += " " + get_tx_power() + " W";
+	if (is_good()) rig_info += " " + get_tx_power(false) + " W";
 	string mode;
 	string submode;
 	if (is_good()) {
@@ -67,7 +68,7 @@ string rig_if::rig_info() {
 			rig_info += " " + mode;
 		}
 	}
-	if (is_good()) rig_info += " " + get_smeter();
+	if (is_good()) rig_info += " " + get_smeter(false);
 	//if (is_good()) rig_info += " " + get_swr_meter();
 	return rig_info;
 }
@@ -90,9 +91,10 @@ string rig_if::get_frequency(bool tx) {
 }
 
 // Return the power
-string rig_if::get_tx_power() {
+string rig_if::get_tx_power(bool max) {
 	char text[100];
-	snprintf(text, 100, "%g", (double)rig_data_.pwr);
+	double value = max ? (double)rig_data_.pwr_value : (double)rig_data_.pwr_meter;
+	snprintf(text, 100, "%g", value);
 	return text;
 }
 
@@ -444,6 +446,7 @@ void rig_if::read_values() {
 			rig_data_.s_value = meter_value.i;
 		}
 	}
+	rig_data_.s_meter = meter_value.i;
 	// Power meter
 //	printf("%s - reading Power meter\n", now_ms().c_str());
 	if (opened_ok_) error_code_ = rig_get_level(rig_, RIG_VFO_CURR, RIG_LEVEL_RFPOWER_METER_WATTS, &meter_value);
@@ -456,15 +459,15 @@ void rig_if::read_values() {
 	}
 	// RX->TX - use read value
 	if (!current_ptt && rig_data_.ptt) {
-		rig_data_.pwr = meter_value.f;
+		rig_data_.pwr_value = meter_value.f;
 	}
 	// TX use accumulated maximum value
 	else if (rig_data_.ptt) {
-		if ((double)meter_value.f > rig_data_.pwr) {
-			rig_data_.pwr = (double)meter_value.f;
+		if ((double)meter_value.f > rig_data_.pwr_value) {
+			rig_data_.pwr_value = (double)meter_value.f;
 		}
 	}
-
+	rig_data_.pwr_meter = (double)meter_value.f;
 	// All successful
 	count_down_ = FAST_RIG_TIMER;
 	return;

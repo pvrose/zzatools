@@ -67,7 +67,9 @@ using namespace std;
 			atomic<double> drive ;
 			atomic<bool> split;
 			atomic<int> s_value;
-			atomic<double> pwr;
+			atomic<int> s_meter;
+			atomic<double> pwr_value;
+			atomic<double> pwr_meter;
 			atomic<bool> ptt;
 			
 			rig_values() {
@@ -77,7 +79,9 @@ using namespace std;
 				drive = 0.0;
 				split = false;
 				s_value = -54;
-				pwr = 0.0;
+				s_meter = -54;
+				pwr_value = 0.0;
+				pwr_meter = 0.0;
 				ptt = false;
 			}
 		};
@@ -106,9 +110,9 @@ using namespace std;
 		// return frequency
 		string get_frequency(bool tx);
 		// return power
-		string get_tx_power();
-		// return S-meter reading
-		string get_smeter();
+		string get_tx_power(bool max = true);
+		// return S-meter reading - max - maximum over receive perion, false = instatntaneous
+		string get_smeter(bool max = true);
 		// Return PTT value
 		bool get_ptt();
 		// Get the data from the rig
