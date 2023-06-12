@@ -119,7 +119,7 @@ using namespace std;
 		// Open rig - run in thread
 		bool open_rig();
 		// Rig opened OK
-		bool opened_ok_;
+		atomic<bool> opened_ok_;
 		// bool
 		bool have_freq_to_band_;
 		// last band read

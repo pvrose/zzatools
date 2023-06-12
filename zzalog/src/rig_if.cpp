@@ -277,13 +277,13 @@ bool rig_if::open_rig() {
 	if (opened_ok_) {
 
 		if (hamlib_data_.port_type == RIG_PORT_SERIAL) {
-			snprintf(msg, 256, "RIG: Connection %s/%s on port %s opened OK - reading values",
+			snprintf(msg, 256, "RIG: Connection %s/%s on port %s opened OK",
 				hamlib_data_.mfr.c_str(),
 				hamlib_data_.model.c_str(),
 				hamlib_data_.port_name.c_str());
 		}
 		else {
-			snprintf(msg, 256, "RIG: Connection %s/%s on port %s (%s) opened OK - reading values",
+			snprintf(msg, 256, "RIG: Connection %s/%s on port %s (%s) opened OK",
 				hamlib_data_.mfr.c_str(),
 				hamlib_data_.model.c_str(),
 				hamlib_data_.port_name.c_str(),
@@ -316,6 +316,8 @@ void rig_if::th_run_rig(rig_if* that) {
 	if (!that->open_rig()) {
 		return;
 	}
+	// run_read_ will be cleared when the rig closes or errors.
+	that->run_read_ = true;
 	while (that->run_read_) {
 		that->read_values();
 		this_thread::sleep_for(chrono::milliseconds(1000));
