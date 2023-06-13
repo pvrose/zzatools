@@ -136,11 +136,11 @@ using namespace std;
 		// set book type
 		void book_type(object_t);
 		// get used bands - -1 = all DXCC
-		set<string>* used_bands(int dxcc = -1);
+		set<string>* used_bands(int dxcc = -1, string call = "");
 		// get used modes = -1 = all DXCC
-		set<string>* used_modes(int dxcc = -1);
+		set<string>* used_modes(int dxcc = -1, string call = "");
 		// get used submodes
-		set<string>* used_submodes(int dxcc = -1);
+		set<string>* used_submodes(int dxcc = -1, string call = "");
 		// Enterring record
 		bool modified_record();
 		// Set entering record
@@ -250,11 +250,11 @@ using namespace std;
 		// QTHs used - with data
 		macro_map used_qths_;
 		// Bands worked per DXCC
-		map < int, set<string> > bands_per_dxcc_;
+		map < string, map < int, set<string> > > bands_per_dxcc_;
 		// mOdes worked per DXCC
-		map < int, set<string> > modes_per_dxcc_;
+		map < string, map < int, set<string> > > modes_per_dxcc_;
 		// submOdes worked per DXCC
-		map < int, set<string> > submodes_per_dxcc_;
+		map < string, map < int, set<string> > > submodes_per_dxcc_;
 		// match query question
 		string match_question_;
 		// INhibit automatic save -

@@ -211,6 +211,8 @@ void qso_entry::enable_widgets() {
 // Copy record to the fields - reverse of above
 void qso_entry::copy_qso_to_display(int flags) {
 	if (qso_) {
+		// Uodate band
+		qso_->update_band();
 		// For each field input
 		for (int i = 0; i < NUMBER_TOTAL; i++) {
 			string field;

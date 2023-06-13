@@ -3,9 +3,11 @@
 #include "drawing.h"
 #include "book.h"
 #include "status.h"
+#include "spec_data.h"
 
 extern book* book_;
 extern status* status_;
+extern spec_data* spec_data_;
 
 qso_details::qso_details(int X, int Y, int W, int H, const char* L) :
 	Fl_Group(X, Y, W, H, L)
@@ -204,10 +206,12 @@ qso_details::table_q::table_q(int X, int Y, int W, int H, const char* L) :
 {
 	row_header(false);
 	col_header(true);
-	cols(3);
-	col_width(0, tiw / 2 );
-	col_width(1, tiw / 4);
-	col_width(2, tiw / 4);
+	cols(4);
+	float wd = tiw;
+	col_width(0, wd * 0.3 );
+	col_width(1, wd * 0.2 );
+	col_width(2, wd * 0.2 );
+	col_width(3, wd * 0.3);
 	end();
 }
 
@@ -234,13 +238,16 @@ void qso_details::table_q::draw_cell(TableContext context, int R, int C, int X, 
 		fl_push_clip(X, Y, W, H);
 		switch (C) {
 		case 0:
-			text = "QSO_DATE";
+			text = "Date";
 			break;
 		case 1:
-			text = "BAND";
+			text = "Band";
 			break;
 		case 2:
-			text = "MODE";
+			text = "Mode";
+			break;
+		case 3:
+			text = "My Call";
 			break;
 		}
 		// TEXT
@@ -274,6 +281,9 @@ void qso_details::table_q::draw_cell(TableContext context, int R, int C, int X, 
 				break;
 			case 2:
 				field = "MODE";
+				break;
+			case 3:
+				field = "STATION_CALLSIGN";
 				break;
 			}
 			text = items_[R]->item(field);

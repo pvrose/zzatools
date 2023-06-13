@@ -1087,6 +1087,7 @@ void book::add_use_data(record* use_record) {
 	string band = use_record->item("BAND");
 	int dxcc;
 	use_record->item("DXCC", dxcc);
+	string call = use_record->item("STATION_CALLSIGN");
 	if (band == "") {
 		// Get the band from the frequency 
 		double freq = 0.0;
@@ -1096,12 +1097,14 @@ void book::add_use_data(record* use_record) {
 	}
 	if (band.length()) {
 		used_bands_.insert(band);
-		bands_per_dxcc_[dxcc].insert(band);
+		bands_per_dxcc_[call][dxcc].insert(band);
+		bands_per_dxcc_[""][dxcc].insert(band);
 	}
 	string mode = use_record->item("MODE");
 	if (mode.length()) {
 		used_modes_.insert(mode);
-		modes_per_dxcc_[dxcc].insert(band);
+		modes_per_dxcc_[call][dxcc].insert(band);
+		modes_per_dxcc_[""][dxcc].insert(band);
 	}
 	string submode = use_record->item("SUBMODE");
 	if (!submode.length()) {
@@ -1109,7 +1112,8 @@ void book::add_use_data(record* use_record) {
 	}
 	if (submode.length()) {
 		used_submodes_.insert(submode);
-		submodes_per_dxcc_[dxcc].insert(submode);
+		submodes_per_dxcc_[call][dxcc].insert(submode);
+		submodes_per_dxcc_[""][dxcc].insert(submode);
 	}
 	string rig = use_record->item("MY_RIG");
 	bool update_spec = false;
@@ -1212,24 +1216,48 @@ void book::add_use_data(record* use_record) {
 }
 
 // get used bands
-set<string>* book::used_bands(int dxcc) { 
+set<string>* book::used_bands(int dxcc, string call) { 
+	set<string>* result = nullptr;
 	if (dxcc == -1) return &used_bands_;
-	else if (bands_per_dxcc_.find(dxcc) == bands_per_dxcc_.end()) return nullptr;
-	else return &(bands_per_dxcc_[dxcc]);
+	else if (bands_per_dxcc_.find(call) == bands_per_dxcc_.end());
+	else {
+		auto it = bands_per_dxcc_.at(call);
+		if (it.find(dxcc) == it.end());
+		else {
+			result = new set<string>(it[dxcc]);
+		}
+	}
+	return result;
 }
 
 // get used modes
-set<string>* book::used_modes(int dxcc) {
+set<string>* book::used_modes(int dxcc, string call) {
+	set<string>* result = nullptr;
 	if (dxcc == -1) return &used_modes_;
-	else if (modes_per_dxcc_.find(dxcc) == modes_per_dxcc_.end()) return nullptr;
-	else return &(modes_per_dxcc_[dxcc]);
+	else if (modes_per_dxcc_.find(call) == modes_per_dxcc_.end());
+	else {
+		auto it = modes_per_dxcc_.at(call);
+		if (it.find(dxcc) == it.end());
+		else {
+			result = new set<string>(it[dxcc]);
+		}
+	}
+	return result;
 }
 
 // get used submodes
-set<string>* book::used_submodes(int dxcc) {
+set<string>* book::used_submodes(int dxcc, string call) {
+	set<string>* result = nullptr;
 	if (dxcc == -1) return &used_submodes_;
-	else if (submodes_per_dxcc_.find(dxcc) == submodes_per_dxcc_.end()) return nullptr;
-	else return &(submodes_per_dxcc_[dxcc]);
+	else if (submodes_per_dxcc_.find(call) == submodes_per_dxcc_.end());
+	else {
+		auto it = submodes_per_dxcc_.at(call);
+		if (it.find(dxcc) == it.end());
+		else {
+			result = new set<string>(it[dxcc]);
+		}
+	}
+	return result;
 }
 
 // Returns true if in incomplete new_record
