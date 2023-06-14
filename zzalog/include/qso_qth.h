@@ -44,9 +44,8 @@ protected:
         record* macro_;
         // Sorted list of field names
         vector<string> fields_;
-
-
     };
+ 
     // Name of QTH
     string qth_name_;
     // Macro expansion

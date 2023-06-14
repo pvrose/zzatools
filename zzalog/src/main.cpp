@@ -636,7 +636,7 @@ int main(int argc, char** argv)
 	// Add qsl_handlers - note add_rig_if() may have added URL handler
 	add_qsl_handlers();
 	// Add DxAtlas interface
-	add_dxatlas();
+//	add_dxatlas();
 	int code = 0;
 	// We are now initialised
 	initialised_ = true;

@@ -56,11 +56,12 @@ class qso_dxcc :
         // widget maps
         map<string, Fl_Widget*> map_;
 
-        void set_data(set<string>* bands, set<string>* modes);
-
+ 
     protected:
-        set<string>* bands_;
-        set<string>* modes_;
+        set<string>* dxcc_bands_;
+        set<string>* dxcc_modes_;
+        set<string>* all_bands_;
+        set<string>* all_modes_;
     };
 
 public:

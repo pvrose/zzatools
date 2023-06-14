@@ -20,6 +20,7 @@ qso_dxcc::qso_dxcc(int X, int Y, int W, int H, const char* L) :
 	box(FL_BORDER_BOX);
 	create_form();
 	enable_widgets();
+	end();
 }
 
 qso_dxcc::~qso_dxcc() {
@@ -122,10 +123,7 @@ void qso_dxcc::set_data() {
 		cq_zone_ = cty_data_->cq_zone(qso);
 		location_ = cty_data_->location(qso);
 		int dxcc = cty_data_->entity(qso);;
-		bands_worked_ = book_->used_bands(dxcc);
-		modes_worked_ = book_->used_submodes(dxcc);
 	}
-	g_wb4_->set_data(bands_worked_, modes_worked_);
 
 }
 
@@ -232,10 +230,12 @@ void qso_dxcc::cb_bn_qrz(Fl_Widget* w, void* v) {
 // The "worked before" lights
 qso_dxcc::wb4_buttons::wb4_buttons(int X, int Y, int W, int H, const char* L) :
 	Fl_Scroll(X, Y, W, H, L),
-	bands_(nullptr),
-	modes_(nullptr)
+	dxcc_bands_(nullptr),
+	dxcc_modes_(nullptr),
+	all_bands_(nullptr),
+	all_modes_(nullptr)
 {
-	create_form();
+	end();
 }
 
 qso_dxcc::wb4_buttons::~wb4_buttons() {}
@@ -248,8 +248,7 @@ void qso_dxcc::wb4_buttons::create_form() {
 	begin();
 	int curr_x = x();
 	int curr_y = y();
-	set<string>* bands = book_->used_bands();
-	for (auto it = bands->begin(); it != bands->end(); it++) {
+	for (auto it = all_bands_->begin(); it != all_bands_->end(); it++) {
 		Fl_Button* bn = new Fl_Button(curr_x, curr_y, BWIDTH, HBUTTON);
 		bn->copy_label((*it).c_str());
 		map_[*it] = bn;
@@ -264,9 +263,8 @@ void qso_dxcc::wb4_buttons::create_form() {
 		curr_x = x();
 		curr_y += HBUTTON;
 	}
-	set<string>* modes = book_->used_submodes();
 	bn_number = 0;
-	for (auto it = modes->begin(); it != modes->end(); it++) {
+	for (auto it = all_modes_->begin(); it != all_modes_->end(); it++) {
 		Fl_Button* bn = new Fl_Button(curr_x, curr_y, BWIDTH, HBUTTON);
 		bn->copy_label((*it).c_str());
 		map_[*it] = bn;
@@ -277,6 +275,7 @@ void qso_dxcc::wb4_buttons::create_form() {
 			curr_y += HBUTTON;
 		}
 	}
+	end();
 }
 
 // Light the buttons that have been worked: 
@@ -285,19 +284,39 @@ void qso_dxcc::wb4_buttons::enable_widgets() {
 	record* qso = qe->qso();
 	string qso_band = "";
 	string qso_mode = "";
+	all_bands_ = book_->used_bands();
+	all_modes_ = book_->used_submodes();
 	if (qso) {
 		qso_band = qso->item("BAND");
 		qso_mode = qso->item("MODE", false, true);
+		int dxcc;
+		qso->item("DXCC", dxcc);
+		string my_call = qso->item("STATION_CALLSIGN");
+		all_bands_->insert(qso_band);
+		all_modes_->insert(qso_mode);
+		dxcc_bands_ = book_->used_bands(dxcc, my_call);
+		dxcc_modes_ = book_->used_submodes(dxcc, my_call);
 	}
+	// Create all the buttons
+	create_form();
 	// Clear all widgets
 	for (int ix = 0; ix < children(); ix++) {
 		Fl_Button* bn = (Fl_Button*)child(ix);
 		bn->color(FL_BACKGROUND_COLOR);
 		bn->labelcolor(fl_inactive(FL_BLACK));
 	}
+	// Mark QSO buttons
+	if (qso_band.length()) {
+		map_.at(qso_band)->color(COLOUR_ORANGE);
+		map_.at(qso_band)->labelcolor(FL_BLACK);
+	}
+	if (qso_mode.length()) {
+		map_.at(qso_mode)->color(COLOUR_ORANGE);
+		map_.at(qso_mode)->labelcolor(FL_BLACK);
+	}
 	// Set band colours - CLARET this QSO, MAUVE other QSOs
-	if (bands_) {
-		for (auto ix = bands_->begin(); ix != bands_->end(); ix++) {
+	if (dxcc_bands_) {
+		for (auto ix = dxcc_bands_->begin(); ix != dxcc_bands_->end(); ix++) {
 			Fl_Button* bn = (Fl_Button*)map_.at(*ix);
 			if ((*ix) == qso_band) {
 				bn->color(COLOUR_CLARET);
@@ -309,8 +328,8 @@ void qso_dxcc::wb4_buttons::enable_widgets() {
 		}
 	}
 	// Set mode colours - CALRET this QSO, APPLE other QSOs
-	if (modes_) {
-		for (auto ix = modes_->begin(); ix != modes_->end(); ix++) {
+	if (dxcc_modes_) {
+		for (auto ix = dxcc_modes_->begin(); ix != dxcc_modes_->end(); ix++) {
 			Fl_Button* bn = (Fl_Button*)map_.at(*ix);
 			if ((*ix) == qso_mode) {
 				bn->color(FL_DARK_GREEN);
@@ -321,9 +340,4 @@ void qso_dxcc::wb4_buttons::enable_widgets() {
 			bn->labelcolor(fl_contrast(FL_BLACK, bn->color()));
 		}
 	}
-}
-
-void qso_dxcc::wb4_buttons::set_data(set<string>* bands, set<string>* modes) {
-	bands_ = bands;
-	modes_ = modes;
 }
