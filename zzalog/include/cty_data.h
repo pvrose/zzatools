@@ -209,6 +209,8 @@ protected:
 	parse_result* parse_result_;
 	// Record for last parse result
 	record* qso_;
+	// Call sign for the previous parse result
+	string parse_call_;
 };
 
 #endif

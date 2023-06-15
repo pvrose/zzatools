@@ -621,7 +621,7 @@ void qso_data::action_cancel() {
 		g_entry_->delete_qso();
 		logging_state_ = QSO_INACTIVE;
 #ifdef WIN32
-		dxa_if_->clear_dx_loc();
+		if (dxa_if_) dxa_if_->clear_dx_loc();
 #endif
 		break;
 	case NET_STARTED:

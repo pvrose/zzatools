@@ -292,8 +292,8 @@ void qso_dxcc::wb4_buttons::enable_widgets() {
 		int dxcc;
 		qso->item("DXCC", dxcc);
 		string my_call = qso->item("STATION_CALLSIGN");
-		all_bands_->insert(qso_band);
-		all_modes_->insert(qso_mode);
+		if (qso_band.length()) all_bands_->insert(qso_band);
+		if (qso_mode.length()) all_modes_->insert(qso_mode);
 		dxcc_bands_ = book_->used_bands(dxcc, my_call);
 		dxcc_modes_ = book_->used_submodes(dxcc, my_call);
 	}

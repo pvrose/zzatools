@@ -256,8 +256,9 @@ string cty_data::get_filename() {
 
 // Parse the record
 void cty_data::parse(record* qso) {
-	if (qso != qso_) {
+	if (qso != qso_ || qso->item("CALL") != parse_call_) {
 		qso_ = qso;
+		parse_call_ = qso->item("CALL");
 		delete parse_result_;
 		parse_result_ = new parse_result;
 		parse_result_->invalid = invalid(qso);
@@ -269,11 +270,10 @@ void cty_data::parse(record* qso) {
 
 // Get prefix
 cty_data::prefix_entry* cty_data::prefix(record* qso) {
-	string call = qso->item("CALL");
 	time_t timestamp = qso->timestamp();
 	// Split the callsign into its various components
 	vector<string> words;
-	split_line(call, words, '/');
+	split_line(parse_call_, words, '/');
 	string suffix = words.back();
 	string body = "";
 	string alt = "";
@@ -314,29 +314,36 @@ cty_data::prefix_entry* cty_data::prefix(record* qso) {
 		break;
 	}
 	// Try alternate 
-	if (alt.length() && prefixes_.find(alt) != prefixes_.end()) {
-		list<prefix_entry*>* list_entries = &(prefixes_.at(alt));
-		// Exceptions are time limited - return the entry if the call was in the appropriate time-period
-		for (auto it = list_entries->begin(); it != list_entries->end(); it++) {
-			prefix_entry* prefix = *it;
-			if ((prefix->end == -1 || prefix->end > timestamp) &&
-				(prefix->start == -1 || timestamp > prefix->start)) {
-				//char message[160];
-				//snprintf(message, 160, "CTY DATA: Contact %s at %s %s is in entity %d",
-				//	call.c_str(), qso->item("QSO_DATE").c_str(), qso->item("TIME_ON").c_str(), prefix->adif_id);
-				//status_->misc_status(ST_NOTE, message);
-				return prefix;
+	if (alt.length()) {
+		// Start comparing alt callsign and then reduce in length until found
+		for (int len = alt.length(); len > 0; len--) {
+			string test = alt.substr(0, len);
+			if (prefixes_.find(test) != prefixes_.end()) {
+				list<prefix_entry*>& list_entries = prefixes_.at(test);
+				// Exceptions are time limited - return the entry if the call was in the appropriate time-period
+				for (auto it = list_entries.begin(); it != list_entries.end(); it++) {
+					prefix_entry* prefix = *it;
+					if ((prefix->end == -1 || prefix->end > timestamp) &&
+						(prefix->start == -1 || timestamp > prefix->start)) {
+						//char message[160];
+						//snprintf(message, 160, "CTY DATA: Contact %s at %s %s is in entity %d",
+						//	call.c_str(), qso->item("QSO_DATE").c_str(), qso->item("TIME_ON").c_str(), prefix->adif_id);
+						//status_->misc_status(ST_NOTE, message);
+						return prefix;
+					}
+				}
 			}
 		}
-	} 
+	}
 	// Start comparing full callsign and then reduce in length until found
 	for (int len = body.length(); len > 0; len--) {
 		// Now try and match the callsign body
 		for (auto it = prefixes_.begin(); it != prefixes_.end(); it++) {
-			if (body.substr(0, len) == (*it).first) {
-				list<prefix_entry*>* list_entries = &((*it).second);
+			string test = body.substr(0, len);
+			if (prefixes_.find(test) != prefixes_.end()) {
+				list<prefix_entry*>& list_entries = prefixes_.at(test);
 				// Exceptions are time limited - return the entry if the call was in the appropriate time-period
-				for (auto it = list_entries->begin(); it != list_entries->end(); it++) {
+				for (auto it = list_entries.begin(); it != list_entries.end(); it++) {
 					prefix_entry* prefix = *it;
 					if ((prefix->end == -1 || prefix->end > timestamp) &&
 						(prefix->start == -1 || timestamp > prefix->start)) {
@@ -352,7 +359,7 @@ cty_data::prefix_entry* cty_data::prefix(record* qso) {
 	}
 	char message[160];
 	snprintf(message, sizeof(message), "CTY DATA: Contact %s at %s %s cannot be parsed",
-		call.c_str(), qso->item("QSO_DATE").c_str(), qso->item("TIME_ON").c_str());
+		parse_call_.c_str(), qso->item("QSO_DATE").c_str(), qso->item("TIME_ON").c_str());
 	return nullptr;
 }
 
@@ -365,7 +372,7 @@ int cty_data::entity(record* qso) {
 	else {
 		char msg[256];
 		snprintf(msg, sizeof(msg), "CTY DATA: Contact %s at %s %s has no entity",
-			qso->item("CALL").c_str(), qso->item("QSO_DATE").c_str(), qso->item("TIME_ON").c_str());
+			parse_call_.c_str(), qso->item("QSO_DATE").c_str(), qso->item("TIME_ON").c_str());
 		return -1;
 	}
 }
@@ -392,8 +399,8 @@ string cty_data::continent(record* qso) {
 	else if (parse_result_->prefix) return parse_result_->prefix->continent;
 	else {
 		char msg[256];
-		snprintf(msg, sizeof(msg), "CTY DATA: Contact %s at %s %s has no entity",
-			qso->item("CALL").c_str(), qso->item("QSO_DATE").c_str(), qso->item("TIME_ON").c_str());
+		snprintf(msg, sizeof(msg), "CTY DATA: Contact %s at %s %s has no continent",
+			parse_call_.c_str(), qso->item("QSO_DATE").c_str(), qso->item("TIME_ON").c_str());
 		return "";
 	}
 }
@@ -406,8 +413,8 @@ int cty_data::cq_zone(record* qso) {
 	else if (parse_result_->prefix) return parse_result_->prefix->cq_zone;
 	else {
 		char msg[256];
-		snprintf(msg, sizeof(msg), "CTY DATA: Contact %s at %s %s has no entity",
-			qso->item("CALL").c_str(), qso->item("QSO_DATE").c_str(), qso->item("TIME_ON").c_str());
+		snprintf(msg, sizeof(msg), "CTY DATA: Contact %s at %s %s has no CQ zone",
+			parse_call_.c_str(), qso->item("QSO_DATE").c_str(), qso->item("TIME_ON").c_str());
 		return -1;
 	}
 }
@@ -422,8 +429,8 @@ lat_long_t cty_data::location(record* qso) {
 		result = { parse_result_->prefix->latitude, parse_result_->prefix->longitude };
 	else {
 		char msg[256];
-		snprintf(msg, sizeof(msg), "CTY DATA: Contact %s at %s %s has no entity",
-			qso->item("CALL").c_str(), qso->item("QSO_DATE").c_str(), qso->item("TIME_ON").c_str());
+		snprintf(msg, sizeof(msg), "CTY DATA: Contact %s at %s %s has no location",
+			parse_call_.c_str(), qso->item("QSO_DATE").c_str(), qso->item("TIME_ON").c_str());
 	}
 	return result;
 }

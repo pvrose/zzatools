@@ -207,11 +207,11 @@ qso_details::table_q::table_q(int X, int Y, int W, int H, const char* L) :
 	row_header(false);
 	col_header(true);
 	cols(4);
-	float wd = tiw;
-	col_width(0, wd * 0.3 );
-	col_width(1, wd * 0.2 );
-	col_width(2, wd * 0.2 );
-	col_width(3, wd * 0.3);
+	float wd = (float)tiw;
+	col_width(0, (int)(wd * 0.3) );
+	col_width(1, (int)(wd * 0.2) );
+	col_width(2, (int)(wd * 0.2) );
+	col_width(3, (int)(wd * 0.3) );
 	end();
 }
 

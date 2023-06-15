@@ -610,20 +610,22 @@ void qso_entry::cb_ip_field(Fl_Widget* w, void* v) {
 		that->qso_data_->enable_widgets();
 		tabbed_forms_->update_views(nullptr, HT_MINOR_CHANGE, that->qso_number_);
 #ifdef WIN32
-		if (field == "CALL" || field == "GRIDSQUARE") {
-			// Place DX Location flag in DxAtlas
-			string call = that->qso_->item("CALL");
-			string grid = that->qso_->item("GRIDSQUARE");
-			if (call.length()) {
-				if (grid.length()) {
-					dxa_if_->set_dx_loc(grid, call);
+		if (dxa_if_) {
+			if (field == "CALL" || field == "GRIDSQUARE") {
+				// Place DX Location flag in DxAtlas
+				string call = that->qso_->item("CALL");
+				string grid = that->qso_->item("GRIDSQUARE");
+				if (call.length()) {
+					if (grid.length()) {
+						dxa_if_->set_dx_loc(grid, call);
+					}
+					else {
+						dxa_if_->set_dx_loc(call);
+					}
 				}
 				else {
-					dxa_if_->set_dx_loc(call);
+					dxa_if_->clear_dx_loc();
 				}
-			}
-			else {
-				dxa_if_->clear_dx_loc();
 			}
 		}
 #endif
