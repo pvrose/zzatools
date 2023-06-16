@@ -277,7 +277,7 @@ void qso_entry::copy_qso_to_qso(record* old_record, int flags) {
 			}
 		}
 	}
-	copy_qso_to_display(flags);
+	copy_qso_to_display(CF_ALL_FLAGS);
 }
 
 // Copy fields from CAT and default rig etc.

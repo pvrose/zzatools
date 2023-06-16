@@ -1084,133 +1084,136 @@ void book::book_type(object_t value) {
 
 // Add the band and mode to the lists of used bands and modes if not already there
 void book::add_use_data(record* use_record) {
-	string band = use_record->item("BAND");
-	int dxcc;
-	use_record->item("DXCC", dxcc);
-	string call = use_record->item("STATION_CALLSIGN");
-	if (band == "") {
-		// Get the band from the frequency 
-		double freq = 0.0;
-		use_record->item("FREQ", freq);
-		band = spec_data_->band_for_freq(freq);
-		use_record->item("BAND", band);
-	}
-	if (band.length()) {
-		used_bands_.insert(band);
-		bands_per_dxcc_[call][dxcc].insert(band);
-		bands_per_dxcc_[""][dxcc].insert(band);
-	}
-	string mode = use_record->item("MODE");
-	if (mode.length()) {
-		used_modes_.insert(mode);
-		modes_per_dxcc_[call][dxcc].insert(band);
-		modes_per_dxcc_[""][dxcc].insert(band);
-	}
-	string submode = use_record->item("SUBMODE");
-	if (!submode.length()) {
-		submode = use_record->item("MODE");
-	}
-	if (submode.length()) {
-		used_submodes_.insert(submode);
-		submodes_per_dxcc_[call][dxcc].insert(submode);
-		submodes_per_dxcc_[""][dxcc].insert(submode);
-	}
-	string rig = use_record->item("MY_RIG");
-	bool update_spec = false;
-	if (rig.length()) {
-		if (used_rigs_.find(rig) == used_rigs_.end()) {
-			used_rigs_.insert(rig);
-			spec_data_->add_user_enum("MY_RIG", rig);
-			update_spec = true;
+	// Do not look at SWL records
+	if (use_record->item("SWL") == "") {
+		string band = use_record->item("BAND");
+		int dxcc;
+		use_record->item("DXCC", dxcc);
+		string call = use_record->item("STATION_CALLSIGN");
+		if (band == "") {
+			// Get the band from the frequency 
+			double freq = 0.0;
+			use_record->item("FREQ", freq);
+			band = spec_data_->band_for_freq(freq);
+			use_record->item("BAND", band);
 		}
-	}
-	string antenna = use_record->item("MY_ANTENNA");
-	if (antenna.length()) {
-		if (used_antennas_.find(antenna) == used_antennas_.end()) {
-			used_antennas_.insert(antenna);
-			spec_data_->add_user_enum("MY_ANTENNA", antenna);
-			update_spec = true;
+		if (band.length()) {
+			used_bands_.insert(band);
+			bands_per_dxcc_[call][dxcc].insert(band);
+			bands_per_dxcc_[""][dxcc].insert(band);
 		}
-	}
-	string callsign = use_record->item("STATION_CALLSIGN");
-	if (callsign.length()) {
-		if (used_callsigns_.find(callsign) == used_callsigns_.end()) {
-			used_callsigns_.insert(callsign);
-			spec_data_->add_user_enum("STATION_CALLSIGN", callsign);
-			update_spec = true;
+		string mode = use_record->item("MODE");
+		if (mode.length()) {
+			used_modes_.insert(mode);
+			modes_per_dxcc_[call][dxcc].insert(band);
+			modes_per_dxcc_[""][dxcc].insert(band);
 		}
-	}
-	// "APP_ZZA_QTH" inplies a macro substitition. Description given in APP_ZZA_QTH_DESCR
-	string qth = use_record->item("APP_ZZA_QTH");
-	if (qth.length()) {
-		macro_defn* qth_data;
-		bool update_qth = false;
-		if (used_qths_.find(qth) == used_qths_.end()) {
-			qth_data = new macro_defn;
-			qth_data->fields = new record;
-			used_qths_[qth] = qth_data;
-			update_qth = true;
+		string submode = use_record->item("SUBMODE");
+		if (!submode.length()) {
+			submode = use_record->item("MODE");
 		}
-		else {
-			qth_data = used_qths_.at(qth);
+		if (submode.length()) {
+			used_submodes_.insert(submode);
+			submodes_per_dxcc_[call][dxcc].insert(submode);
+			submodes_per_dxcc_[""][dxcc].insert(submode);
 		}
-		// Allow compiler to optimise this
-		static const set<string> qth_fields = {
-			"MY_NAME", "MY_STREET", "MY_CITY", "MY_POSTAL_CODE", "MY_GRIDSQUARE", "MY_COUNTRY",
-			"MY_DXCC", "MY_STATE", "MY_CNTY", "MY_CQ_ZONE", "MY_ITU_ZONE", "MY_CONT", "MY_IOTA",
-			"APP_ZZA_QTH_DESCR"
-		};
-		for (auto it = qth_fields.begin(); it != qth_fields.end(); it++) {
-			string value = use_record->item(*it);
-			// If it is in supplied data
-			if (value.length()) {
-				string old_value = qth_data->fields->item(*it);
-				// and if it's already captured - check it is the same
-				if (old_value.length() && old_value != value) {
-					char message[128];
-					if ((*it) == "MY_GRIDSQUARE" && value.length() < old_value.length() && value == old_value.substr(0, value.length())) {
-						if (ignore_gridsquare_) {
-							snprintf(message, 128, "LOG: QTH %s - Field %s=%s ignoring change to %s",
-								qth.c_str(), (*it).c_str(), old_value.c_str(), value.c_str());
-							status_->misc_status(ST_WARNING, message);
-							ignore_gridsquare_ = true;
-						}
-						use_record->item((*it), old_value);
-						modified(true);
-					}
-					else {
-						snprintf(message, 128, "LOG: %s %s %s %s - new value  (%s) differs from old (%s)",
-							use_record->item("QSO_DATE").c_str(),
-							use_record->item("TIME_ON").c_str(),
-							use_record->item("CALL").c_str(),
-							(*it).c_str(),
-							value.c_str(),
-							old_value.c_str());
-						status_->misc_status(ST_NOTE, message);
-						if ((*it) != "MY_GRIDSQUARE" || value.length() > old_value.length() || value != old_value.substr(0, value.length())) {
-							snprintf(message, 128, "LOG: QTH %s - Field %s replacing %s with %s",
-								qth.c_str(), (*it).c_str(), old_value.c_str(), value.c_str());
-							status_->misc_status(ST_WARNING, message);
-							qth_data->fields->item(*it, value);
-							update_qth = true;
-						}
-					}
-				}
-				else if (old_value.length() == 0) {
-					qth_data->fields->item(*it, value);
-					update_qth = true;
-				}
+		string rig = use_record->item("MY_RIG");
+		bool update_spec = false;
+		if (rig.length()) {
+			if (used_rigs_.find(rig) == used_rigs_.end()) {
+				used_rigs_.insert(rig);
+				spec_data_->add_user_enum("MY_RIG", rig);
+				update_spec = true;
 			}
 		}
-		// description already forms part of qth_data no need to check it again
-		if (update_qth) {
-			// Update the spec data and then the spec ttree viewer
-			qth_data->description = use_record->item("APP_ZZA_QTH_DESCR");
-			spec_data_->add_user_macro("APP_ZZA_QTH", qth, *qth_data);
-			update_spec = true;
+		string antenna = use_record->item("MY_ANTENNA");
+		if (antenna.length()) {
+			if (used_antennas_.find(antenna) == used_antennas_.end()) {
+				used_antennas_.insert(antenna);
+				spec_data_->add_user_enum("MY_ANTENNA", antenna);
+				update_spec = true;
+			}
 		}
-		if (update_spec && !main_loading_) {
-			tabbed_forms_->update_views(nullptr, HT_FORMAT, size() - 1);
+		string callsign = use_record->item("STATION_CALLSIGN");
+		if (callsign.length()) {
+			if (used_callsigns_.find(callsign) == used_callsigns_.end()) {
+				used_callsigns_.insert(callsign);
+				spec_data_->add_user_enum("STATION_CALLSIGN", callsign);
+				update_spec = true;
+			}
+		}
+		// "APP_ZZA_QTH" inplies a macro substitition. Description given in APP_ZZA_QTH_DESCR
+		string qth = use_record->item("APP_ZZA_QTH");
+		if (qth.length()) {
+			macro_defn* qth_data;
+			bool update_qth = false;
+			if (used_qths_.find(qth) == used_qths_.end()) {
+				qth_data = new macro_defn;
+				qth_data->fields = new record;
+				used_qths_[qth] = qth_data;
+				update_qth = true;
+			}
+			else {
+				qth_data = used_qths_.at(qth);
+			}
+			// Allow compiler to optimise this
+			static const set<string> qth_fields = {
+				"MY_NAME", "MY_STREET", "MY_CITY", "MY_POSTAL_CODE", "MY_GRIDSQUARE", "MY_COUNTRY",
+				"MY_DXCC", "MY_STATE", "MY_CNTY", "MY_CQ_ZONE", "MY_ITU_ZONE", "MY_CONT", "MY_IOTA",
+				"APP_ZZA_QTH_DESCR"
+			};
+			for (auto it = qth_fields.begin(); it != qth_fields.end(); it++) {
+				string value = use_record->item(*it);
+				// If it is in supplied data
+				if (value.length()) {
+					string old_value = qth_data->fields->item(*it);
+					// and if it's already captured - check it is the same
+					if (old_value.length() && old_value != value) {
+						char message[128];
+						if ((*it) == "MY_GRIDSQUARE" && value.length() < old_value.length() && value == old_value.substr(0, value.length())) {
+							if (ignore_gridsquare_) {
+								snprintf(message, 128, "LOG: QTH %s - Field %s=%s ignoring change to %s",
+									qth.c_str(), (*it).c_str(), old_value.c_str(), value.c_str());
+								status_->misc_status(ST_WARNING, message);
+								ignore_gridsquare_ = true;
+							}
+							use_record->item((*it), old_value);
+							modified(true);
+						}
+						else {
+							snprintf(message, 128, "LOG: %s %s %s %s - new value  (%s) differs from old (%s)",
+								use_record->item("QSO_DATE").c_str(),
+								use_record->item("TIME_ON").c_str(),
+								use_record->item("CALL").c_str(),
+								(*it).c_str(),
+								value.c_str(),
+								old_value.c_str());
+							status_->misc_status(ST_NOTE, message);
+							if ((*it) != "MY_GRIDSQUARE" || value.length() > old_value.length() || value != old_value.substr(0, value.length())) {
+								snprintf(message, 128, "LOG: QTH %s - Field %s replacing %s with %s",
+									qth.c_str(), (*it).c_str(), old_value.c_str(), value.c_str());
+								status_->misc_status(ST_WARNING, message);
+								qth_data->fields->item(*it, value);
+								update_qth = true;
+							}
+						}
+					}
+					else if (old_value.length() == 0) {
+						qth_data->fields->item(*it, value);
+						update_qth = true;
+					}
+				}
+			}
+			// description already forms part of qth_data no need to check it again
+			if (update_qth) {
+				// Update the spec data and then the spec ttree viewer
+				qth_data->description = use_record->item("APP_ZZA_QTH_DESCR");
+				spec_data_->add_user_macro("APP_ZZA_QTH", qth, *qth_data);
+				update_spec = true;
+			}
+			if (update_spec && !main_loading_) {
+				tabbed_forms_->update_views(nullptr, HT_FORMAT, size() - 1);
+			}
 		}
 	}
 }
