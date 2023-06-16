@@ -61,7 +61,7 @@ void qso_details::get_qsos() {
 	set<record*>* records = new set<record*>;
 	qso_entry* qe = ancestor_view<qso_entry>(this);
 	record* qso = qe->qso();
-	for (auto it = book_->begin(); it != book_->end(); it++) {
+	for (auto it = book_->begin(); qso && it != book_->end(); it++) {
 		if ((*it)->item("CALL") == callsign_) {
 			string name = (*it)->item("NAME");
 			if (name.length()) {

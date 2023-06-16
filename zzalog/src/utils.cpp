@@ -402,6 +402,8 @@ string to_lower(const string& data) {
 bool is_integer(const string& data) {
 	bool result = true;
 	const char* src = data.c_str();
+	// Ignore initial +/- sign
+	if (*src == '-' || *src == '+') src++;
 	while (*src != 0 && result) {
 		result = isdigit(*src++);
 	}
