@@ -438,6 +438,8 @@ void extract_data::extract_qsl(extract_data::extract_mode_t server) {
 		field_name = "CLUBLOG_QSO_UPLOAD_STATUS";
 		break;
 	}
+	// Now check that they are all for the current station
+	string station = qso_manager_->get_default(qso_manager::CALLSIGN);
 
 	// Extract those records not sent to QSL server !(*QSL_SENT==Y) 
 	search_criteria_t	new_criteria = {
@@ -453,7 +455,8 @@ void extract_data::extract_qsl(extract_data::extract_mode_t server) {
 		/*bool confirmed_card;*/ false,
 		/*search_combi_t combi_mode;*/ XM_NEW,
 		/*string field_name; */ field_name,
-		/*string pattern;*/ "Y"
+		/*string pattern;*/ "Y",
+		/*string my_call*/ station
 	};
 	status_->misc_status(ST_NOTE, "EXTRACT: Extracting QSOs not sent already");
 	criteria(new_criteria, server);
@@ -471,7 +474,8 @@ void extract_data::extract_qsl(extract_data::extract_mode_t server) {
 		/*bool confirmed_card;*/ false,
 		/*search_combi_t combi_mode;*/ XM_AND,
 		/*string field_name; */ "QSO_COMPLETE",
-		/*string pattern;*/ "N"
+		/*string pattern;*/ "N",
+		/*string my_call*/ station
 	};
 	status_->misc_status(ST_NOTE, "EXTRACT: Removing incomplete QSOs");
 	criteria(new_criteria, server);
@@ -490,7 +494,8 @@ void extract_data::extract_qsl(extract_data::extract_mode_t server) {
 			/*bool confirmed_card;*/ false,
 			/*search_combi_t combi_mode;*/ XM_AND,
 			/*string field_name; */ "SWL",
-			/*string pattern;*/ "Y"
+			/*string pattern;*/ "Y",
+			/*string my_call*/ station
 		};
 		status_->misc_status(ST_NOTE, "EXTRACT: Removing replies to SWL reports");
 		criteria(new_criteria, server);
@@ -510,7 +515,8 @@ void extract_data::extract_qsl(extract_data::extract_mode_t server) {
 			/*bool confirmed_card;*/ false,
 			/*search_combi_t combi_mode;*/ XM_AND,
 			/*string field_name; */ "QSL_SENT",
-			/*string pattern;*/ "Q"
+			/*string pattern;*/ "Q",
+			/*string my_call*/ station
 		};
 		status_->misc_status(ST_NOTE, "EXTRACT: Extracting queued cards only");
 		criteria(new_criteria, server);
@@ -528,7 +534,8 @@ void extract_data::extract_qsl(extract_data::extract_mode_t server) {
 			/*bool confirmed_card;*/ false,
 			/*search_combi_t combi_mode;*/ XM_AND,
 			/*string field_name; */ "QSL_SENT",
-			/*string pattern;*/ "I"
+			/*string pattern;*/ "I",
+			/*string my_call*/ station
 		};
 		status_->misc_status(ST_NOTE, "EXTRACT: Removing QSOs marked  ignore QSL");
 		criteria(new_criteria, server);
@@ -537,25 +544,6 @@ void extract_data::extract_qsl(extract_data::extract_mode_t server) {
 		tabbed_forms_->update_views(nullptr, HT_RESET_ORDER, 0);
 
 	}
-	// Now check that they are all for the current station
-	string station = qso_manager_->get_default(qso_manager::CALLSIGN);
-	new_criteria = {
-		/*search_cond_t condition*/ XC_FIELD,
-		/*search_comp_t comparator*/ XP_EQ,
-		/*bool by_dates*/ false,
-		/*string from_date*/"",
-		/*string to_date;*/"",
-		/*string band;*/ "Any",
-		/*string mode;*/ "Any",
-		/*bool confirmed_eqsl;*/ false,
-		/*bool confirmed_lotw;*/ false,
-		/*bool confirmed_card;*/ false,
-		/*search_combi_t combi_mode;*/ XM_AND,
-		/*string field_name; */ "STATION_CALLSIGN",
-		/*string pattern;*/ station
-	};
-	status_->misc_status(ST_NOTE, "EXTRACT: Removing QSOs for a different home callsign");
-	criteria(new_criteria, server);
 
 	if (size() == 0) {
 		// No records match these criteria
@@ -601,7 +589,8 @@ void extract_data::extract_special(extract_data::extract_mode_t reason) {
 			/*bool confirmed_card;*/ false,
 			/*search_combi_t combi_mode;*/ XM_NEW,
 			/*string field_name; */ "NAME",
-			/*string pattern;*/ ""
+			/*string pattern;*/ "",
+			/*string my_call*/ "Any"
 		};
 		reason_name = "missing name";
 		break;
@@ -620,7 +609,8 @@ void extract_data::extract_special(extract_data::extract_mode_t reason) {
 			/*bool confirmed_card;*/ false,
 			/*search_combi_t combi_mode;*/ XM_NEW,
 			/*string field_name; */ "QTH",
-			/*string pattern;*/ ""
+			/*string pattern;*/ "",
+			/*string my_call*/ "Any"
 		};
 		reason_name = "missing QTH";
 		break;
@@ -639,7 +629,8 @@ void extract_data::extract_special(extract_data::extract_mode_t reason) {
 			/*bool confirmed_card;*/ false,
 			/*search_combi_t combi_mode;*/ XM_NEW,
 			/*string field_name; */ "GRIDSQUARE",
-			/*string pattern;*/ "[A-R]{2}[0-9]{2}[A-X]{2}([0-9]{2})?"
+			/*string pattern;*/ "[A-R]{2}[0-9]{2}[A-X]{2}([0-9]{2})?",
+			/*string my_call*/ "Any"
 		};
 		reason_name = "with insufficient locator";
 		break;
@@ -706,6 +697,8 @@ item_num_t extract_data::selection(item_num_t num_item, hint_t hint /* = HT_SELE
 
 // Extract all records for callsign
 void extract_data::extract_call(string callsign) {
+	// Now check that they are all for the current station
+	string station = qso_manager_->get_default(qso_manager::CALLSIGN);
 	// Extract those records where CALL matches callsign 
 	search_criteria_t	new_criteria = {
 		/*search_cond_t condition*/ XC_CALL,
@@ -720,7 +713,8 @@ void extract_data::extract_call(string callsign) {
 		/*bool confirmed_card;*/ false,
 		/*search_combi_t combi_mode;*/ XM_NEW,
 		/*string field_name; */ "",
-		/*string pattern;*/ callsign
+		/*string pattern;*/ callsign,
+		/*string my_call;*/ station
 	};
 	criteria(new_criteria, SEARCH);
 	if (size() == 0 || (book_->new_record() && size() == 1)) {

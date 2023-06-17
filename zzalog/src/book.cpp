@@ -988,6 +988,10 @@ bool book::refine_match(record* record) {
 	if (criteria_->mode != "Any" && criteria_->mode != record->item("MODE")) {
 		return false;
 	}
+	// Refine by mode - confirm if the record matches my_call (STATION_CALLSIGN)
+	if (criteria_->my_call != "Any" && criteria_->my_call != record->item("STATION_CALLSIGN")) {
+		return false;
+	}
 	// Refine by eQSL card - confirm if eQSL confirmation
 	if (criteria_->confirmed_eqsl && record->item("EQSL_QSL_RCVD") != "Y") {
 		return false;

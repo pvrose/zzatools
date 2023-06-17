@@ -57,6 +57,7 @@ using namespace std;
 		search_combi_t combi_mode;     // Combination mode
 		string field_name;              // Field name for criterion = FIELD
 		string pattern;                 // Matching pattern
+		string my_call;                 // match only records with this value of my_call
 
 		search_criteria_t() :
 			condition(XC_DXCC),
@@ -71,8 +72,9 @@ using namespace std;
 			confirmed_card(false),
 			combi_mode(XM_NEW),
 			field_name(""),
-			pattern("") {};
-		search_criteria_t(search_cond_t a, search_comp_t b, bool c, string d, string e, string f, string g, bool h, bool i, bool j, search_combi_t k, string m, string n) :
+			pattern(""),
+			my_call("Any") {};
+		search_criteria_t(search_cond_t a, search_comp_t b, bool c, string d, string e, string f, string g, bool h, bool i, bool j, search_combi_t k, string m, string n, string o) :
 			condition(a),
 			comparator(b),
 			by_dates(c),
@@ -85,7 +87,8 @@ using namespace std;
 			confirmed_card(j),
 			combi_mode(k),
 			field_name(m),
-			pattern(n) {};
+			pattern(n),
+			my_call(o) {};
 	};
 
 #endif

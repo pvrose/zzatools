@@ -77,13 +77,15 @@ search_dialog::search_dialog() :
 	const int C215 = C214 + W214;
 	const int W215 = WCAL;
 	const int W21 = C215 + W215 + GAP;
-	// row 2 [Band v] [Mode v]
-	const int R22 = R21 + HBNT + GAP;
+	// row 2 [Band v][Mode v][My call v]
+	const int R22 = R21 + HBNT + HTEXT;
 	const int C221 = XG + GAP;
 	const int W221 = WSMEDIT;
-	const int C222 = C221 + W221 + GAP;
+	const int C222 = C221 + W221;
 	const int W222 = WSMEDIT;
-	const int W22 = C222 + W222 + GAP;
+	const int C223 = C222 + W222;
+	const int W223 = WSMEDIT;
+	const int W22 = C223 + W223;
 	// row 3 - # eQSL # LotW # Card
 	const int R23 = R22 + HTEXT + GAP;
 	const int C231 = XG + GAP;
@@ -276,6 +278,27 @@ search_dialog::search_dialog() :
 	ch27->callback(cb_text<Fl_Choice, string>, (void*)&criteria_->mode);
 	ch27->when(FL_WHEN_RELEASE);
 	ch27->tooltip("Select the mode for matching records");
+	// Choice - Mode to limit search to
+	Fl_Choice* ch27a = new Fl_Choice(C223, R22, W223, HTEXT, "My Call");
+	ch27a->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
+	// Get the list of modes from the ADIF specification
+	spec_dataset* callsigns = spec_data_->dataset("Dynamic STATION_CALLSIGN");
+	// Start with "Any"
+	ch27a->add("Any");
+	if (criteria_->mode == "Any") {
+		ch27a->value(0);
+	}
+	ix = 1;
+	// Append all the modes in the data set
+	for (auto it = callsigns->data.begin(); it != callsigns->data.end(); it++, ix++) {
+		ch27a->add(escape_menu(it->first).c_str());
+		if (it->first == criteria_->mode) {
+			ch27a->value(ix);
+		}
+	}
+	ch27a->callback(cb_text<Fl_Choice, string>, (void*)&criteria_->my_call);
+	ch27a->when(FL_WHEN_RELEASE);
+	ch27a->tooltip("Select 'STATION_CALLSIGN' for matching records");
 
 	// Row 3 - confirmed
 	// Check - Restrict to records confirmed by eQSL
