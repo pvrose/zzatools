@@ -79,11 +79,13 @@ protected:
         // inherited from Fl_Table_Row
         virtual void draw_cell(TableContext context, int R = 0, int C = 0, int X = 0, int Y = 0,
             int W = 0, int H = 0);
+        // Click on row to peek 
+        static void cb_table(Fl_Widget* w, void* v);
         // Set data
-        void set_data(set<record*>* records);
+        void set_data(set<qso_num_t> items);
             
     protected:
-        vector<record*> items_;
+        vector<qso_num_t> items_;
 
     };
 

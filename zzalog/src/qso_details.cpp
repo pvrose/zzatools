@@ -1,5 +1,6 @@
 #include "qso_details.h"
 #include "qso_entry.h"
+#include "qso_data.h"
 #include "drawing.h"
 #include "book.h"
 #include "status.h"
@@ -58,30 +59,32 @@ void qso_details::get_qsos() {
 	set<string> names;
 	set<string> qths;
 	set<string> locators;
-	set<record*>* records = new set<record*>;
+	set<qso_num_t> items;
 	qso_entry* qe = ancestor_view<qso_entry>(this);
 	record* qso = qe->qso();
-	for (auto it = book_->begin(); qso && it != book_->end(); it++) {
-		if ((*it)->item("CALL") == callsign_) {
-			string name = (*it)->item("NAME");
+
+	for (qso_num_t ix = 0; qso && ix < book_->size(); ix++) {
+		record* it = book_->get_record(ix, false);
+		if (it->item("CALL") == callsign_) {
+			string name = it->item("NAME");
 			if (name.length()) {
 				names.insert(name);
 			}
-			string qth = (*it)->item("QTH");
+			string qth = it->item("QTH");
 			if (qth.length()) {
 				qths.insert(qth);
 			}
-			string locator = (*it)->item("GRIDSQUARE");
+			string locator = it->item("GRIDSQUARE");
 			if (locator.length()) {
 				locators.insert(locator);
 			}
-			if (qso->timestamp() != (*it)->timestamp()) {
-				records->insert((*it));
+			if (qso->timestamp() != it->timestamp()) {
+				items.insert(ix);
 			}
 		}
 	}
 	table_details_->set_data(names, qths, locators);
-	table_qsos_->set_data(records);
+	table_qsos_->set_data(items);
 }
 
 void qso_details::set_call(string callsign) {
@@ -212,6 +215,7 @@ qso_details::table_q::table_q(int X, int Y, int W, int H, const char* L) :
 	col_width(1, (int)(wd * 0.2) );
 	col_width(2, (int)(wd * 0.2) );
 	col_width(3, (int)(wd * 0.3) );
+	callback(cb_table);
 	end();
 }
 
@@ -270,6 +274,7 @@ void qso_details::table_q::draw_cell(TableContext context, int R, int C, int X, 
 			// Get the details of the item
 			qso_entry* qe = ancestor_view<qso_entry>(this);
 			record* qso = qe->qso();
+			record* it = book_->get_record(items_[R], false);
 			string s_value = "";
 			string field;
 			switch (C) {
@@ -286,13 +291,13 @@ void qso_details::table_q::draw_cell(TableContext context, int R, int C, int X, 
 				field = "STATION_CALLSIGN";
 				break;
 			}
-			text = items_[R]->item(field);
+			text = it->item(field);
 			bool used = false;
 			bool same_call = false;
 			if (qso) {
 				s_value = qso->item(field);
 				if (s_value.length() && s_value == text) used = true;
-				if (qso->item("STATION_CALLSIGN") == items_[R]->item("STATION_CALLSIGN")) same_call = true;
+				if (qso->item("STATION_CALLSIGN") == it->item("STATION_CALLSIGN")) same_call = true;
 			}
 			Fl_Color bg_colour = used ? (same_call ? fl_lighter(COLOUR_CLARET) : COLOUR_APPLE) : FL_BACKGROUND_COLOR;
 			if (!active_r()) bg_colour = fl_inactive(bg_colour);
@@ -315,9 +320,20 @@ void qso_details::table_q::draw_cell(TableContext context, int R, int C, int X, 
 	}
 }
 
-void qso_details::table_q::set_data(set<record*>* items) {
+// Table callback 
+// Set the selected value in the appropriate record item
+void qso_details::table_q::cb_table(Fl_Widget* w, void* v) {
+	table_q* that = (table_q*)w;
+	if (that->callback_context() == CONTEXT_CELL) {
+		int row = that->callback_row();
+		qso_data* data = ancestor_view<qso_data>(that);
+		data->action_peek(that->items_[row]);
+	}
+}
+
+void qso_details::table_q::set_data(set<qso_num_t> items) {
 	items_.clear();
-	for (auto it = items->begin(); it != items->end(); it++) {
+	for (auto it = items.begin(); it != items.end(); it++) {
 		items_.insert(items_.begin(), (*it));
 	}
 	rows(items_.size());
