@@ -64,6 +64,7 @@ public:
 		ADD_NET_QSO,
 		SAVE_EDIT_NET,
 		CANCEL_MODEM,
+		CANCEL_PEEK,
 	};
 
 
@@ -125,6 +126,8 @@ public:
 	static void cb_bn_delete_qso(Fl_Widget* w, void* v);
 	// Cancel the modem operation
 	static void cb_bn_cancel_modem(Fl_Widget* w, void* v);
+	// Cancel peek operation
+	static void cb_bn_cancel_peek(Fl_Widget* w, void* v);
 
 
 protected:

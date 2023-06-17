@@ -37,6 +37,7 @@ public:
 		QSO_STARTED,     // QSO started
 		QSO_EDIT,        // Editing existing QSO
 		QSO_BROWSE,      // View selected view in table view
+		QSO_PEEK,        // View alternate QSO in entry view
 		QUERY_MATCH,     // Query: Compare new QSO with nearest match in log - add, reject or selectively merge
 		QUERY_NEW,       // Query: Not able to find QSO - allow manual matching
 		QUERY_DUPE,      // Query: Two records in log found to be possible duplicates - select either, both or a merge
@@ -185,6 +186,10 @@ public:
 	void action_update_modem(record* qso);
 	// Cancel modem
 	void action_cancel_modem();
+	// Start peeking behaviour
+	void action_peek(qso_num_t number);
+	// Cancel peeking behaviour
+	void action_cancel_peek();
 
 
 protected:
@@ -214,6 +219,10 @@ protected:
 	qso_num_t potential_match_;
 	qso_num_t query_number_;
 
+	// Peek - save logging state
+	logging_state_t interrupted_state_;
+	// QSO being peeked
+	record* peeked_qso_;
 
 	// Widgets
 	// Contest group
@@ -224,6 +233,8 @@ protected:
 	qso_query* g_query_;
 	// Net Entry group
 	qso_net_entry* g_net_entry_;
+	// Peek entry group
+	qso_entry* g_peek_;
 	// Button group
 	qso_buttons* g_buttons_;
 	// Group for freq/power/mode

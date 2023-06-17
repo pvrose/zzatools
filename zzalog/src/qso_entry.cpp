@@ -172,6 +172,7 @@ void qso_entry::enable_widgets() {
 	case qso_data::QSO_STARTED:
 	case qso_data::NET_STARTED:
 	case qso_data::QSO_MODEM:
+	case qso_data::QSO_PEEK:
 		for (int ix = 0; ix <= number_fields_in_use_ && ix < NUMBER_TOTAL; ix++) {
 			if (ch_field_[ix])
 				if (ix < number_locked_ + NUMBER_FIXED) ch_field_[ix]->deactivate();

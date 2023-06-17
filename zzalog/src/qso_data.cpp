@@ -88,7 +88,7 @@ void qso_data::create_form(int X, int Y) {
 	g_entry_->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 	g_entry_->labelfont(FL_BOLD);
 	g_entry_->labelsize(FL_NORMAL_SIZE + 2);
-	g_entry_->labelcolor(fl_darker(FL_BLUE));
+	g_entry_->labelcolor(FL_DARK_BLUE);
 
 	max_x = max(max_x, g_entry_->x() + g_entry_->w());
 	g_query_ = new qso_query(curr_x, curr_y, 10, 10);
@@ -97,6 +97,14 @@ void qso_data::create_form(int X, int Y) {
 
 	g_net_entry_ = new qso_net_entry(curr_x, curr_y, 10, 10);
 	max_x = max(max_x, g_net_entry_->x() + g_net_entry_->w());
+
+	g_peek_ = new qso_entry(curr_x, curr_y, 10, 10);
+	g_peek_->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
+	g_peek_->labelfont(FL_BOLD);
+	g_peek_->labelsize(FL_NORMAL_SIZE + 2);
+	g_peek_->labelcolor(FL_DARK_YELLOW);
+	max_x = max(max_x, g_peek_->x() + g_peek_->w());
+
 	curr_y = max(g_entry_->y() + g_entry_->h(), g_query_->y() + g_query_->h());
 	curr_y = max(curr_y, g_net_entry_->y() + g_net_entry_->h());
 	curr_y += GAP;
@@ -130,6 +138,7 @@ void qso_data::enable_widgets() {
 			g_entry_->enable_widgets();
 			g_net_entry_->hide();
 			g_query_->hide();
+			g_peek_->hide();
 			break;
 		case QSO_PENDING:
 			g_entry_->label("QSO Entry - prepared for real-time logging.");
@@ -137,6 +146,7 @@ void qso_data::enable_widgets() {
 			g_entry_->enable_widgets();
 			g_net_entry_->hide();
 			g_query_->hide();
+			g_peek_->hide();
 			break;
 		case QSO_STARTED:
 			snprintf(l, sizeof(l), "QSO Entry - %s - logging new contact", current_qso()->item("CALL").c_str());
@@ -145,6 +155,7 @@ void qso_data::enable_widgets() {
 			g_entry_->enable_widgets();
 			g_net_entry_->hide();
 			g_query_->hide();
+			g_peek_->hide();
 			break;
 		case QSO_EDIT:
 			snprintf(l, sizeof(l), "QSO Entry - %s - editing existing contact", current_qso()->item("CALL").c_str());
@@ -153,6 +164,7 @@ void qso_data::enable_widgets() {
 			g_entry_->enable_widgets();
 			g_net_entry_->hide();
 			g_query_->hide();
+			g_peek_->hide();
 			break;
 		case QSO_BROWSE:
 			g_entry_->hide();
@@ -161,6 +173,7 @@ void qso_data::enable_widgets() {
 			g_query_->show();
 			g_query_->enable_widgets();
 			g_net_entry_->hide();
+			g_peek_->hide();
 			break;
 		case QUERY_DUPE:
 		case QUERY_MATCH:
@@ -170,6 +183,7 @@ void qso_data::enable_widgets() {
 			g_query_->show();
 			g_query_->enable_widgets();
 			g_net_entry_->hide();
+			g_peek_->hide();
 			break;
 		case QUERY_NEW:
 			g_entry_->hide();
@@ -178,6 +192,7 @@ void qso_data::enable_widgets() {
 			g_query_->show();
 			g_query_->enable_widgets();
 			g_net_entry_->hide();
+			g_peek_->hide();
 			break;
 		case NET_STARTED:
 			g_entry_->hide();
@@ -185,6 +200,7 @@ void qso_data::enable_widgets() {
 			g_net_entry_->label("Net Entry - active real-time logging");
 			g_net_entry_->show();
 			g_net_entry_->enable_widgets();
+			g_peek_->hide();
 			break;
 		case NET_EDIT:
 			g_entry_->hide();
@@ -192,6 +208,7 @@ void qso_data::enable_widgets() {
 			g_net_entry_->label("Net Entry - off-air logging");
 			g_net_entry_->show();
 			g_net_entry_->enable_widgets();
+			g_peek_->hide();
 			break;
 		case QSO_MODEM:
 			snprintf(l, sizeof(l), "QSO Entry - %s - record received from modem app", current_qso()->item("CALL").c_str());
@@ -200,6 +217,16 @@ void qso_data::enable_widgets() {
 			g_entry_->enable_widgets();
 			g_net_entry_->hide();
 			g_query_->hide();
+			g_peek_->hide();
+			break;
+		case QSO_PEEK:
+			snprintf(l, sizeof(l), "QSO Peek - %s", current_qso()->item("CALL").c_str());
+			g_entry_->hide();
+			g_net_entry_->hide();
+			g_query_->hide();
+			g_peek_->copy_label(l);
+			g_peek_->show();
+			g_peek_->enable_widgets();
 			break;
 		}
 		g_buttons_->enable_widgets();
@@ -304,6 +331,10 @@ void qso_data::update_qso(qso_num_t log_num) {
 			}
 			g_net_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
 		}
+		break;
+	case QSO_PEEK:
+		g_peek_->copy_qso_to_qso(book_->get_record(log_num, false), qso_entry::CF_ALL_FLAGS);
+		g_peek_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
 		break;
 	}
 	action_view_qsl();
@@ -441,6 +472,9 @@ void qso_data::action_new_qso(record* qso, qso_init_t mode) {
 	case NET_EDIT:
 	case NET_ADDING:
 		qe = (qso_entry*)g_net_entry_->entry();
+		break;
+	case QSO_PEEK:
+		qe = g_peek_;
 		break;
 	default:
 		qe = g_entry_;
@@ -1231,6 +1265,22 @@ void qso_data::action_cancel_modem() {
 	}
 }
 
+// Action PEEK - interrupt current state and peek at supplied qso
+void qso_data::action_peek(qso_num_t number) {
+	// SAve the current state unless it is already peeking
+	if (logging_state_ != QSO_PEEK)	interrupted_state_ = logging_state_;
+	// Save a copy of the current record
+	logging_state_ = QSO_PEEK;
+	g_peek_->qso(number);
+	g_peek_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
+	enable_widgets();
+}
+
+// Action CANCEL_PEEK - restore interrupted state
+void qso_data::action_cancel_peek() {
+	logging_state_ = interrupted_state_;
+	enable_widgets();
+}
 
 // Dummy QSO
 record* qso_data::dummy_qso() {
@@ -1360,6 +1410,8 @@ record* qso_data::current_qso() {
 	case NET_STARTED:
 	case NET_EDIT:
 		return g_net_entry_->qso();
+	case QSO_PEEK:
+		return g_peek_->qso();
 	default:
 		return nullptr;
 	}

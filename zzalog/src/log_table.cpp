@@ -167,7 +167,12 @@ void log_table::cb_tab_log(Fl_Widget* w, void* v) {
 						that->edit_cell(row, col);
 					}
 					else {
-						item_num_t selected = that->my_book_->selection(item_num, HT_SELECTED, that);
+						if (that->get_book()->book_type() == OT_EXTRACT) {
+							item_num_t selected = that->my_book_->selection(item_num, HT_PEEK, that);
+						}
+						else {
+							item_num_t selected = that->my_book_->selection(item_num, HT_SELECTED, that);
+						}
 					}
 					that->current_item_num_ = item_num;
 				}
