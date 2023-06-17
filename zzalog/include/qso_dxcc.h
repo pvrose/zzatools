@@ -50,6 +50,9 @@ class qso_dxcc :
         wb4_buttons(int X, int Y, int W, int H, const char* L = nullptr);
         ~wb4_buttons();
 
+        static void cb_bn_mode(Fl_Widget* w, void* v);
+        static void cb_bn_band(Fl_Widget* w, void* v);
+
         void create_form();
         void enable_widgets();
 
