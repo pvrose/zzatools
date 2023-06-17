@@ -925,16 +925,18 @@ bool book::basic_match(record* record) {
 		return match_int(criteria_->pattern, criteria_->comparator, record->item("CQZ"));
 		break;
 	case XC_DXCC:
-		// all numeric so its a DXCC code
-		if (is_integer(criteria_->pattern)) {
+	{
+		// See if it is a valid nickname
+		int dxcc = cty_data_->entity(criteria_->pattern);
+		if (dxcc == -1) {
+			// Not a nickname so match against the raw value
 			return match_int(criteria_->pattern, criteria_->comparator, record->item("DXCC"));
 		}
 		else {
-			// Treat as a nickname
-			int dxcc = cty_data_->entity(criteria_->pattern);
+			// Treat as a nickname - match against the dxcc value for the nickname
 			return match_string(to_string(dxcc), criteria_->comparator, record->item("DXCC"));
 		}
-		break;
+	}
 	case XC_FIELD:
 		// match by a specified field
 		return match_string(criteria_->pattern, criteria_->comparator, record->item(criteria_->field_name));

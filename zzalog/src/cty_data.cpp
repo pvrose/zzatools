@@ -542,9 +542,9 @@ int cty_data::entity(string nickname) {
 			return (*it).first;
 		}
 	}
-	char msg[160];
-	snprintf(msg, sizeof(msg), "CTY DATA: %s is not a valid 'nickname' for an entity", nickname.c_str());
-	status_->misc_status(ST_ERROR, msg);
+	//char msg[160];
+	//snprintf(msg, sizeof(msg), "CTY DATA: %s is not a valid 'nickname' for an entity", nickname.c_str());
+	//status_->misc_status(ST_ERROR, msg);
 	return -1;
 }
 
