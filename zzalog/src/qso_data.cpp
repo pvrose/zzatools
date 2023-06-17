@@ -134,6 +134,7 @@ void qso_data::enable_widgets() {
 		switch (logging_state_) {
 		case QSO_INACTIVE:
 			g_entry_->label("QSO Entry is not enabled");
+			g_entry_->labelcolor(FL_DARK_RED);
 			g_entry_->show();
 			g_entry_->enable_widgets();
 			g_net_entry_->hide();
@@ -142,6 +143,7 @@ void qso_data::enable_widgets() {
 			break;
 		case QSO_PENDING:
 			g_entry_->label("QSO Entry - prepared for real-time logging.");
+			g_entry_->labelcolor(FL_DARK_BLUE);
 			g_entry_->show();
 			g_entry_->enable_widgets();
 			g_net_entry_->hide();
@@ -151,6 +153,7 @@ void qso_data::enable_widgets() {
 		case QSO_STARTED:
 			snprintf(l, sizeof(l), "QSO Entry - %s - logging new contact", current_qso()->item("CALL").c_str());
 			g_entry_->copy_label(l);
+			g_entry_->labelcolor(FL_DARK_BLUE);
 			g_entry_->show();
 			g_entry_->enable_widgets();
 			g_net_entry_->hide();
@@ -160,6 +163,7 @@ void qso_data::enable_widgets() {
 		case QSO_EDIT:
 			snprintf(l, sizeof(l), "QSO Entry - %s - editing existing contact", current_qso()->item("CALL").c_str());
 			g_entry_->copy_label(l);
+			g_entry_->labelcolor(FL_DARK_BLUE);
 			g_entry_->show();
 			g_entry_->enable_widgets();
 			g_net_entry_->hide();
