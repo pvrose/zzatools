@@ -140,9 +140,11 @@ int wsjtx_handler::send_hbeat() {
 // Close datagram: shut the server down 
 int wsjtx_handler::handle_close(stringstream& ss) {
 	status_->misc_status(ST_NOTE, "WSJT-X: Received Closing down");
+	// Clear any WSJT-X related items
 #ifdef _WIN32
-	dxa_if_->clear_dx_loc();
+	if (dxa_if_) dxa_if_->clear_dx_loc();
 #endif
+	qso_manager_->update_modem_qso(nullptr);
 	menu_->update_items();
 	return 1;
 }

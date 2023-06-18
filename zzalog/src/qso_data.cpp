@@ -362,21 +362,30 @@ void qso_data::update_query(logging_state_t query, qso_num_t match_num, qso_num_
 
 // Update modem QSO
 void qso_data::update_modem_qso(record* qso) {
-	switch (logging_state_) {
-	case QSO_PENDING:
-		action_deactivate();
-		// drop down
-	case QSO_INACTIVE:
-		action_add_modem(qso);
-		break;
+	if (qso == nullptr) {
+		switch (logging_state_) {
+		case QSO_MODEM:
+			action_cancel_modem();
+			break;
+		}
+	}
+	else {
+		switch (logging_state_) {
+		case QSO_PENDING:
+			action_deactivate();
+			// drop down
+		case QSO_INACTIVE:
+			action_add_modem(qso);
+			break;
 
-	case QSO_MODEM:
-		action_update_modem(qso);
-		break;
+		case QSO_MODEM:
+			action_update_modem(qso);
+			break;
 
-	default:
-		status_->misc_status(ST_ERROR, "DASH: Gatting a modem update when not expected");
-		return;
+		default:
+			status_->misc_status(ST_ERROR, "DASH: Getting a modem update when not expected");
+			return;
+		}
 	}
 	enable_widgets();
 }
