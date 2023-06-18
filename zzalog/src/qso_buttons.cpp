@@ -264,6 +264,10 @@ void qso_buttons::cb_edit(Fl_Widget* w, void* v) {
 	case qso_data::QSO_INACTIVE:
 		that->qso_data_->action_edit();
 		break;
+	case qso_data::QSO_PENDING:
+		that->qso_data_->action_deactivate();
+		that->qso_data_->action_edit();
+		break;
 	case qso_data::QSO_BROWSE:
 		that->qso_data_->action_cancel_browse();
 		that->qso_data_->action_edit();
