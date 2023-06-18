@@ -403,7 +403,7 @@ string extract_data::short_comment() {
 			result += " (" + criteria_->from_date += ":" + criteria_->to_date + ") ";
 		}
 		// Band and Mode
-		result += "On " + criteria_->band + " " + criteria_->mode + " ";
+		result += "On " + criteria_->band + " " + criteria_->mode + " " + criteria_->my_call + " ";
 		// Confirmation status
 		if (criteria_->confirmed_eqsl) result += "eQSL ";
 		if (criteria_->confirmed_lotw) result += "LotW ";
