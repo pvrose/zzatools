@@ -41,6 +41,7 @@ map<qso_data::logging_state_t, list<qso_buttons::button_type> > button_map_ =
 	{ qso_data::NET_EDIT, { qso_buttons::SAVE_EDIT_NET, qso_buttons::CANCEL_QSO, qso_buttons::ADD_NET_QSO}},
 	{ qso_data::QSO_MODEM, { qso_buttons::CANCEL_MODEM }},
 	{ qso_data::QSO_PEEK, { qso_buttons:: CANCEL_PEEK }},
+	{ qso_data::QSO_PEEK_ED, { qso_buttons::CANCEL_PEEK, qso_buttons::EDIT_PEEK }},
 };
 
 map<qso_buttons::button_type, qso_buttons::button_action> action_map_ =
@@ -84,6 +85,7 @@ map<qso_buttons::button_type, qso_buttons::button_action> action_map_ =
 	{ qso_buttons::ADD_NET_QSO, { "Add Call", "Add a QSO with this call to the net", COLOUR_ORANGE, qso_buttons::cb_bn_add_net, 0}},
 	{ qso_buttons::SAVE_EDIT_NET, {"Save Net", "Save all QSOs in the net", FL_GREEN, qso_buttons::cb_bn_save_all, 0} },
 	{ qso_buttons::CANCEL_PEEK, {"Cancel", "Cancel current peek and restore previous view", FL_RED, qso_buttons::cb_bn_cancel_peek, 0}},
+	{ qso_buttons::EDIT_PEEK, { "Edit", "Edit current peek", FL_MAGENTA, qso_buttons::cb_bn_edit_peek, 0}},
 };
 
 qso_buttons::qso_buttons(int X, int Y, int W, int H, const char* L) :
@@ -555,8 +557,22 @@ void qso_buttons::cb_bn_cancel_peek(Fl_Widget* w, void* v) {
 	that->disable_widgets();
 	switch (that->qso_data_->logging_state()) {
 	case qso_data::QSO_PEEK:
+	case qso_data::QSO_PEEK_ED:
 		that->qso_data_->action_cancel_peek();
 		break;
 	}
 	that->enable_widgets();
+}
+
+// Edit the current peeked QSO
+void qso_buttons::cb_bn_edit_peek(Fl_Widget* w, void* v) {
+	qso_buttons* that = ancestor_view<qso_buttons>(w);
+	that->disable_widgets();
+	switch (that->qso_data_->logging_state()) {
+	case qso_data::QSO_PEEK_ED:
+		that->qso_data_->action_edit_peek();
+		break;
+	}
+	that->enable_widgets();
+
 }

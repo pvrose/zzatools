@@ -65,6 +65,7 @@ public:
 		SAVE_EDIT_NET,
 		CANCEL_MODEM,
 		CANCEL_PEEK,
+		EDIT_PEEK,
 	};
 
 
@@ -128,6 +129,8 @@ public:
 	static void cb_bn_cancel_modem(Fl_Widget* w, void* v);
 	// Cancel peek operation
 	static void cb_bn_cancel_peek(Fl_Widget* w, void* v);
+	// Edit peeked QSO
+	static void cb_bn_edit_peek(Fl_Widget* w, void* v);
 
 
 protected:

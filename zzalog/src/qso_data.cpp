@@ -224,6 +224,7 @@ void qso_data::enable_widgets() {
 			g_peek_->hide();
 			break;
 		case QSO_PEEK:
+		case QSO_PEEK_ED:
 			snprintf(l, sizeof(l), "QSO Peek - %s", current_qso()->item("CALL").c_str());
 			g_entry_->hide();
 			g_net_entry_->hide();
@@ -337,6 +338,7 @@ void qso_data::update_qso(qso_num_t log_num) {
 		}
 		break;
 	case QSO_PEEK:
+	case QSO_PEEK_ED:
 		g_peek_->copy_qso_to_qso(book_->get_record(log_num, false), qso_entry::CF_ALL_FLAGS);
 		g_peek_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
 		break;
@@ -478,6 +480,7 @@ void qso_data::action_new_qso(record* qso, qso_init_t mode) {
 		qe = (qso_entry*)g_net_entry_->entry();
 		break;
 	case QSO_PEEK:
+	case QSO_PEEK_ED:
 		qe = g_peek_;
 		break;
 	default:
@@ -1272,9 +1275,29 @@ void qso_data::action_cancel_modem() {
 // Action PEEK - interrupt current state and peek at supplied qso
 void qso_data::action_peek(qso_num_t number) {
 	// SAve the current state unless it is already peeking
-	if (logging_state_ != QSO_PEEK)	interrupted_state_ = logging_state_;
-	// Save a copy of the current record
-	logging_state_ = QSO_PEEK;
+	// Either QSO_PEEK or QSO_PEEK_ED
+	switch (logging_state_) {
+	case QSO_INACTIVE:
+	case QSO_PENDING:
+	case QSO_EDIT:
+	case QSO_BROWSE:
+	case NET_EDIT:
+		interrupted_state_ = logging_state_;
+		logging_state_ = QSO_PEEK_ED;
+		break;
+	case QSO_STARTED:
+	case QUERY_DUPE:
+	case QUERY_MATCH:
+	case QUERY_NEW:
+	case QRZ_MERGE:
+	case NET_STARTED:
+	case NET_ADDING:
+	case SWITCHING:
+	case QSO_MODEM:
+		interrupted_state_ = logging_state_;
+		logging_state_ = QSO_PEEK;
+		break;
+	}
 	g_peek_->qso(number);
 	g_peek_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
 	enable_widgets();
@@ -1283,6 +1306,63 @@ void qso_data::action_peek(qso_num_t number) {
 // Action CANCEL_PEEK - restore interrupted state
 void qso_data::action_cancel_peek() {
 	logging_state_ = interrupted_state_;
+	enable_widgets();
+}
+
+// Action EDIT_PEEK - close down existing edit
+void qso_data::action_edit_peek() {
+	bool existing_entry = false;
+	switch (interrupted_state_) {
+	case QSO_EDIT:
+		if (g_entry_->qso()->is_dirty()) {
+			fl_beep(FL_BEEP_QUESTION);
+			switch (fl_choice("Trying to select a different record while editing a record", "Save edit", "Cancel edit", nullptr)) {
+			case 0:
+				// Save QSO
+				action_save_edit();
+				break;
+			case 1:
+				// Cancel QSO
+				action_cancel_edit();
+				break;
+			}
+		}
+		else {
+			action_cancel_edit();
+		}
+	case NET_EDIT:
+		if (!g_net_entry_->qso_in_net(g_peek_->qso_number())) {
+			// Selected QSO is not part of the net, save or cancel the net
+			fl_beep(FL_BEEP_QUESTION);
+			switch (fl_choice("Trying to select a different record while logging a net", "Save Net", "Quit Net", nullptr)) {
+			case 0:
+				// Save QSO
+				action_save_net_all();
+				break;
+			case 1:
+				// Cancel QSO
+				action_cancel_net_all();
+				break;
+			}
+			// Actions will have changed selection - change it back.
+			logging_state_ = QSO_INACTIVE;
+		}
+		else {
+			// Switch to the selected QSO as part of the net if necessary
+			if (g_peek_->qso_number() != g_net_entry_->qso_number()) {
+				g_net_entry_->select_qso(g_peek_->qso_number());
+			}
+			g_net_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
+			existing_entry = true;
+			logging_state_ = NET_EDIT;
+		}
+	}
+	// Save a copy of the current record
+	if (!existing_entry) {
+		logging_state_ = QSO_EDIT;
+		g_entry_->qso(g_peek_->qso_number());
+		g_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
+	}
 	enable_widgets();
 }
 
@@ -1415,6 +1495,7 @@ record* qso_data::current_qso() {
 	case NET_EDIT:
 		return g_net_entry_->qso();
 	case QSO_PEEK:
+	case QSO_PEEK_ED:
 		return g_peek_->qso();
 	default:
 		return nullptr;

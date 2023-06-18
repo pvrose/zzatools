@@ -38,6 +38,7 @@ public:
 		QSO_EDIT,        // Editing existing QSO
 		QSO_BROWSE,      // View selected view in table view
 		QSO_PEEK,        // View alternate QSO in entry view
+		QSO_PEEK_ED,     // View alternate QSO in entry view and allow it to be edited
 		QUERY_MATCH,     // Query: Compare new QSO with nearest match in log - add, reject or selectively merge
 		QUERY_NEW,       // Query: Not able to find QSO - allow manual matching
 		QUERY_DUPE,      // Query: Two records in log found to be possible duplicates - select either, both or a merge
@@ -190,6 +191,8 @@ public:
 	void action_peek(qso_num_t number);
 	// Cancel peeking behaviour
 	void action_cancel_peek();
+	// Edit peeked QSO
+	void action_edit_peek();
 
 
 protected:
