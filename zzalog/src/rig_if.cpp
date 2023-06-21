@@ -242,6 +242,7 @@ bool rig_if::open() {
 
 	}
 	thread_ = new thread(th_run_rig, this);
+
 	return opened_ok_;
 }
 
@@ -292,6 +293,14 @@ bool rig_if::open_rig() {
 				rig_get_info(rig_));
 		}
 		status_->misc_status(ST_NOTE, msg);
+		// Setting callback
+		error_code_ = rig_set_freq_callback(rig_, cb_hl_freq, (void*)this);
+		if (error_code_ == RIG_OK) {
+			printf("RIG: Frequency callback set\n");
+		}
+		else {
+			printf("RIG: Frequency callback nor set - %s\n", error_message("").c_str());			
+		}
 		return true;
 	}
 	else {
@@ -530,4 +539,10 @@ const char* rig_if::error_text(rig_errcode_e code) {
 		return "Error not defined";
 	}
 };
+
+int rig_if::cb_hl_freq(RIG* rig, vfo_t vfo, freq_t freq, rig_ptr_t data) {
+	rig_if* that = (rig_if*)data;
+	printf("RIG: Received CB: %g (VFO %c)\n", freq, vfo == RIG_VFO_A ? 'A' : 'B');
+	return RIG_OK;
+}
 

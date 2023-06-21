@@ -117,6 +117,9 @@ using namespace std;
 		bool get_ptt();
 		// Get the data from the rig
 		static void th_run_rig(rig_if* that);
+
+		// Testing hamlib callbacks
+		static int cb_hl_freq(RIG* rig, vfo_t vfo, freq_t freq, rig_ptr_t data);
 		// Protected attributes
 	protected:
 		void read_values();
