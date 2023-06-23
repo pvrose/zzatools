@@ -29,7 +29,7 @@ qso_rig::qso_rig(int X, int Y, int W, int H, const char* L) :
 	//align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 	box(FL_BORDER_BOX);
 	load_values();
-	rig_ = new rig_if(label(), hamlib_data_);
+	rig_ = new rig_if(label(), &hamlib_data_);
 	create_form(X, Y);
 	enable_widgets();
 }
@@ -264,6 +264,7 @@ void qso_rig::enable_widgets() {
 	if (!rig_) {
 		bn_connect_->deactivate();
 		bn_connect_->color(FL_BACKGROUND_COLOR);
+		bn_connect_->label("");
 		bn_select_->activate();
 		if (bn_select_->value()) {
 			bn_select_->label("Use");
@@ -273,11 +274,14 @@ void qso_rig::enable_widgets() {
 	} else if (rig_->is_open()) {
 		bn_connect_->activate();
 		bn_connect_->color(COLOUR_APPLE);
+		bn_connect_->label("Disconnect");
 		bn_select_->deactivate();
+		bn_select_->label("");
 		bn_select_->value(false);
 	} else {
 		bn_connect_->activate();
 		bn_connect_->color(COLOUR_MAUVE);
+		bn_connect_->label("Connect");
 		bn_select_->activate();
 		if (bn_select_->value()) {
 			bn_select_->label("Use");
@@ -557,7 +561,7 @@ void qso_rig::cb_bn_select(Fl_Widget* w, void* v) {
 void qso_rig::switch_rig() {
 	if (rig_) {
 		delete rig_;
-		rig_ = new rig_if(label(), hamlib_data_);
+		rig_ = new rig_if(label(), &hamlib_data_);
 	}
 	ancestor_view<qso_manager>(this)->update_rig();
 	enable_widgets();

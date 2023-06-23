@@ -47,7 +47,7 @@ string rig_if::get_smeter(bool max) {
 // Returns the string displaying the rig information for the rig status
 // e.g. Hamlib: TS-2000 14.123456 MHz 10 W USB S9+20
 string rig_if::rig_info() {
-	string rig_info = hamlib_data_.model;
+	string rig_info = hamlib_data_->model;
 	// Valid rig - get data from it. TX frequency
 	if (rig_data_.split) {
 		if (is_good()) rig_info += " TX:" + get_frequency(true) + " MHz";
@@ -167,7 +167,7 @@ bool rig_if::get_ptt() {
 // to muliplex accesses
 ///////////////////////////////////////////////////////////////////////////////////////
 // Constructor
-rig_if::rig_if(const char* name, hamlib_data_t data) 
+rig_if::rig_if(const char* name, hamlib_data_t* data) 
 {
 	// Initialise
 	opening_ = false;
@@ -184,7 +184,7 @@ rig_if::rig_if(const char* name, hamlib_data_t data)
 	
 	// If the name has been set, there is a rig
 	if (my_rig_name_.length()) {
-		if (hamlib_data_.port_type != RIG_PORT_NONE) {
+		if (hamlib_data_->port_type != RIG_PORT_NONE) {
 			open();
 		}
 		else {
@@ -211,8 +211,8 @@ void rig_if::close() {
 			char msg[128];
 			snprintf(msg, 128, "RIG: Closing connection %s (%s on port %s)",
 				my_rig_name_.c_str(),
-				hamlib_data_.model.c_str(),
-				hamlib_data_.port_name.c_str());
+				hamlib_data_->model.c_str(),
+				hamlib_data_->port_name.c_str());
 			status_->misc_status(ST_NOTE, msg);
 			// If we have a connection and it's open, close it and tidy memory used by hamlib
 			// Delete the thread that reads the required rig values
@@ -228,43 +228,44 @@ void rig_if::close() {
 
 // Opens the connection associated with the rig
 bool rig_if::open() {
-	if (hamlib_data_.port_name.length() == 0) {
+	if (hamlib_data_->port_name.length() == 0) {
 		char msg[256];
 		snprintf(msg, 256, "RIG: Connection %s/%s No port supplied - open failed",
-			hamlib_data_.mfr.c_str(),
-			hamlib_data_.model.c_str()
+			hamlib_data_->mfr.c_str(),
+			hamlib_data_->model.c_str()
 		);
 		status_->misc_status(ST_WARNING, msg);
 		return false;
 
 	}
-	printf("RIG: Starting thread - set semaphore\n");
-	opening_ = true;
+	printf("RIG 1: Starting thread - set semaphore\n");
+	printf("RIG 1: Wanting port %s\n", hamlib_data_->port_name.c_str());
+	opening_.store(true, memory_order_seq_cst);
 	thread_ = new thread(th_run_rig, this);
 	// Lock until the rig has been opened - should wait 
-	printf("RIG: Waiting for semaphore to clear\n");
+	printf("RIG 1: Waiting for semaphore to clear\n");
 	while(opening_) {
 		// Allow FLTK scheduler in
 		Fl::check();
 		this_thread::sleep_for(chrono::milliseconds(100));
 	}
 	// And immediately unlock it
-	printf("RIG: Semaphore clear - proceed\n");
+	printf("RIG 1: Semaphore clear - proceed\n");
 		
 	char msg[256];
 	if (opened_ok_) {
 
-		if (hamlib_data_.port_type == RIG_PORT_SERIAL) {
-			snprintf(msg, 256, "RIG: Connection %s/%s on port %s opened OK",
-				hamlib_data_.mfr.c_str(),
-				hamlib_data_.model.c_str(),
-				hamlib_data_.port_name.c_str());
+		if (hamlib_data_->port_type == RIG_PORT_SERIAL) {
+			snprintf(msg, 256, "RIG 1: Connection %s/%s on port %s opened OK",
+				hamlib_data_->mfr.c_str(),
+				hamlib_data_->model.c_str(),
+				hamlib_data_->port_name.c_str());
 		}
 		else {
-			snprintf(msg, 256, "RIG: Connection %s/%s on port %s (%s) opened OK",
-				hamlib_data_.mfr.c_str(),
-				hamlib_data_.model.c_str(),
-				hamlib_data_.port_name.c_str(),
+			snprintf(msg, 256, "RIG 1: Connection %s/%s on port %s (%s) opened OK",
+				hamlib_data_->mfr.c_str(),
+				hamlib_data_->model.c_str(),
+				hamlib_data_->port_name.c_str(),
 				rig_get_info(rig_));
 		}
 		status_->misc_status(ST_NOTE, msg);
@@ -272,9 +273,9 @@ bool rig_if::open() {
 	}
 	else {
 		snprintf(msg, 256, "open(): %s/%s port %s",
-			hamlib_data_.mfr.c_str(),
-			hamlib_data_.model.c_str(),
-			hamlib_data_.port_name.c_str()
+			hamlib_data_->mfr.c_str(),
+			hamlib_data_->model.c_str(),
+			hamlib_data_->port_name.c_str()
 			);
 		status_->misc_status(ST_ERROR, error_message(msg).c_str());
 		return false;
@@ -288,36 +289,36 @@ bool rig_if::th_open_rig() {
 		close();
 	}
 	// Get the rig interface
-	printf("RIG: Initialising rig %s\n", hamlib_data_.model.c_str());
-	rig_ = rig_init(hamlib_data_.model_id);
+	printf("RIG 2: Initialising rig %s\n", hamlib_data_->model.c_str());
+	rig_ = rig_init(hamlib_data_->model_id);
 	if (rig_ != nullptr) {
-		switch (hamlib_data_.port_type) {
+		switch (hamlib_data_->port_type) {
 		case RIG_PORT_SERIAL:
 			// Successful - set up the serial port parameters
-			strcpy(rig_->state.rigport.pathname, hamlib_data_.port_name.c_str());
-			rig_->state.rigport.parm.serial.rate = hamlib_data_.baud_rate;
+			strcpy(rig_->state.rigport.pathname, hamlib_data_->port_name.c_str());
+			rig_->state.rigport.parm.serial.rate = hamlib_data_->baud_rate;
 			break;
 		case RIG_PORT_NETWORK:
 		case RIG_PORT_USB:
-			int err = rig_set_conf(rig_, rig_token_lookup(rig_, "rig_pathname"), hamlib_data_.port_name.c_str());
+			int err = rig_set_conf(rig_, rig_token_lookup(rig_, "rig_pathname"), hamlib_data_->port_name.c_str());
 			//strcpy(rig_->state.rigport.pathname, port_name_.c_str());
 			break;
 		}
 	}
 	// open rig connection over serial port
-	printf("RIG: Opening rig\n");
+	printf("RIG 2: Opening rig\n");
 	error_code_ = rig_open(rig_);
 
 	if (error_code_ != RIG_OK) {
 		// Not opened, tidy hamlib memory usage and mark it so.
-		printf("RIG: rig open failed with error %d\n", error_code_);
+		printf("RIG 2: rig open failed with error %d\n", error_code_);
 		rig_cleanup(rig_);
 		rig_ = nullptr;
 		opened_ok_ = false;
 	}
 	else {
 		// Opened OK
-		printf("RIG: rig open OK\n", error_code_);
+		printf("RIG 2: rig open OK\n", error_code_);
 		opened_ok_ = true;
 	}
 	//if (opened_ok_) {
@@ -342,25 +343,26 @@ string& rig_if::rig_name() {
 
 // Thraed method
 void rig_if::th_run_rig(rig_if* that) {
+	printf("RIG 2: Accessing port %s\n", that->hamlib_data_->port_name.c_str());
 	// Open the rig
 	if (!that->th_open_rig()) {
-		printf("RIG: Open rig failed - clearing semaphore.\n");
+		printf("RIG 2: Open rig failed - clearing semaphore.\n");
 		that->opening_ = false;
 		return;
 	}
 	// run_read_ will be cleared when the rig closes or errors.
 	that->th_read_values();
 	if (that->opened_ok_) {
-		printf("RIG: Accessed rig - clearing semaphore.\n");
+		printf("RIG 2: Accessed rig - clearing semaphore.\n");
 		that->opening_ = false;
 		that->run_read_ = true;
 		while (that->run_read_) {
 			that->th_read_values();
 			this_thread::sleep_for(chrono::milliseconds(1000));
 		}
-		printf("RIG: Rig closed or failed - ending thread.\n");
+		printf("RIG 2: Rig closed or failed - ending thread.\n");
 	} else {
-		printf("RIG: Rig access failed - clearing semaphore.\n");
+		printf("RIG 2: Rig access failed - clearing semaphore.\n");
 		that->opening_ = false;
 	}
 }
@@ -373,7 +375,7 @@ void rig_if::th_read_values() {
 	else return;
 //	printf("%s - done\n", now_ms().c_str());
 	if (error_code_ != RIG_OK) {
-		printf("%s\n", error_message("TX Frequency").c_str());
+		printf("RIG 2: %s\n", error_message("TX Frequency").c_str());
 		opened_ok_ = false;
 		return;
 	}
@@ -384,7 +386,7 @@ void rig_if::th_read_values() {
 	else return;
 	//	printf("%s - done\n", now_ms().c_str());
 	if (error_code_ != RIG_OK) {
-		printf("%s\n", error_message("RX Frequency").c_str());
+		printf("RIG 2: %s\n", error_message("RX Frequency").c_str());
 		opened_ok_ = false;
 		return;
 	}
@@ -397,7 +399,7 @@ void rig_if::th_read_values() {
 	else return;
 	//	printf("%s - done\n", now_ms().c_str());
 	if (error_code_ != RIG_OK) {
-		printf("%s\n", error_message("Mode").c_str());
+		printf("RIG 2: %s\n", error_message("Mode").c_str());
 		opened_ok_ = false;
 		return;
 	}
@@ -433,7 +435,7 @@ void rig_if::th_read_values() {
 	else return;
 	//	printf("%s - done\n", now_ms().c_str());
 	if (error_code_ != RIG_OK) {
-		printf("%s\n", error_message("Drive").c_str());
+		printf("RIG 2: %s\n", error_message("Drive").c_str());
 		opened_ok_ = false;
 		return;
 	}
@@ -446,7 +448,7 @@ void rig_if::th_read_values() {
 	else return;
 	//	printf("%s - done\n", now_ms().c_str());
 	if (error_code_ != RIG_OK) {
-		printf("%s\n", error_message("Split").c_str());
+		printf("RIG 2: %s\n", error_message("Split").c_str());
 		opened_ok_ = false;
 		return;
 	}
@@ -459,7 +461,7 @@ void rig_if::th_read_values() {
 	else return;
 	//	printf("%s - done\n", now_ms().c_str());
 	if (error_code_ != RIG_OK) {
-		printf("%s\n", error_message("PTT").c_str());
+		printf("RIG 2: %s\n", error_message("PTT").c_str());
 		opened_ok_ = false;
 		return;
 	}
@@ -471,7 +473,7 @@ void rig_if::th_read_values() {
 	else return;
 	//	printf("%s - done\n", now_ms().c_str());
 	if (error_code_ != RIG_OK) {
-		printf("%s\n", error_message("S meter").c_str());
+		printf("RIG 2: %s\n", error_message("S meter").c_str());
 		opened_ok_ = false;
 		return;
 	}
@@ -492,7 +494,7 @@ void rig_if::th_read_values() {
 	else return;
 	//	printf("%s - done\n", now_ms().c_str());
 	if (error_code_ != RIG_OK) {
-		printf("%s\n", error_message("Power meter").c_str());
+		printf("RIG 2: %s\n", error_message("Power meter").c_str());
 		opened_ok_ = false;
 		return;
 	}

@@ -57,7 +57,7 @@ using namespace std;
 			rig_port_t port_type = RIG_PORT_NONE;
 		};
 
-		rig_if(const char* name, hamlib_data_t data);
+		rig_if(const char* name, hamlib_data_t* data);
 		~rig_if();
 
 		// Values read from rig
@@ -147,7 +147,7 @@ using namespace std;
 		// MY_RIG name
 		string my_rig_name_;
 		// Hamlib specific attributes
-		hamlib_data_t hamlib_data_;
+		hamlib_data_t* hamlib_data_;
 		// Rig interface
 		RIG* rig_;
 		// Numeric error code
