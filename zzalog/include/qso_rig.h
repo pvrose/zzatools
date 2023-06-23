@@ -10,6 +10,7 @@
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Choice.H>
 #include <FL/Fl_Input.H>
+#include <FL/Fl_Output.H>
 
 using namespace std;
 
@@ -79,7 +80,8 @@ protected:
 	Fl_Choice* ch_baud_rate_;
 	Fl_Check_Button* bn_all_rates_;
 	Fl_Check_Button* bn_all_ports_;
-	Fl_Light_Button* bn_connect_;
+	Fl_Output* op_status_;
+	Fl_Button* bn_connect_;
 	Fl_Light_Button* bn_select_;
 
 	// Add all ports to port choice

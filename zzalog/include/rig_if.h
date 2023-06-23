@@ -103,6 +103,8 @@ using namespace std;
 
 		// Port was successfully opened
 		bool is_open();
+		// Port is being opened
+		bool is_opening();
 		// Rig timer callback
 		void ticker();
 

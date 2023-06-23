@@ -120,10 +120,18 @@ void qso_rig::create_form(int X, int Y) {
 
 	int curr_x = X + GAP;
 	int curr_y = Y + GAP;
+	
+	// "Label" - rig status
+	op_status_ = new Fl_Output(curr_x, curr_y, WEDIT, HBUTTON);
+	op_status_->color(FL_BACKGROUND_COLOR);
+	op_status_->textfont(FL_BOLD);
+	op_status_->textsize(FL_NORMAL_SIZE + 2);
+	op_status_->box(FL_FLAT_BOX);
+	
+	curr_y += op_status_->h();
 
 	// First button - connect/disconnect or add
-	bn_connect_ = new Fl_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Connected");
-	bn_connect_->selection_color(FL_GREEN);
+	bn_connect_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Connect");
 	bn_connect_->tooltip("Select to attempt to connect/disconnect rig");
 	bn_connect_->callback(cb_bn_connect, nullptr);
 	
@@ -255,6 +263,7 @@ void qso_rig::enable_widgets() {
 	// CAT access buttons
 	if (!rig_) {
 		bn_connect_->deactivate();
+		bn_connect_->color(FL_BACKGROUND_COLOR);
 		bn_select_->activate();
 		if (bn_select_->value()) {
 			bn_select_->label("Use");
@@ -263,18 +272,28 @@ void qso_rig::enable_widgets() {
 		}
 	} else if (rig_->is_open()) {
 		bn_connect_->activate();
-		bn_connect_->value(true);
+		bn_connect_->color(COLOUR_APPLE);
 		bn_select_->deactivate();
 		bn_select_->value(false);
 	} else {
 		bn_connect_->activate();
-		bn_connect_->value(false);
+		bn_connect_->color(COLOUR_MAUVE);
 		bn_select_->activate();
 		if (bn_select_->value()) {
 			bn_select_->label("Use");
 		} else {
 			bn_select_->label("Select");
 		}
+	}
+	// Status
+	if (!rig_) {
+		op_status_->value("No rig specified");
+	} else if (rig_->is_opening()) {
+		op_status_->value("Opening rig");
+	} else if (rig_->is_open()) {
+		op_status_->value("Connected");
+	} else {
+		op_status_->value("Disconnected");
 	}
 	// CAT control widgets - allow only when select button active
 	if (bn_select_->value()) {

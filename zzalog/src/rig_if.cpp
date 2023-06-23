@@ -576,3 +576,7 @@ int rig_if::cb_hl_freq(RIG* rig, vfo_t vfo, freq_t freq, rig_ptr_t data) {
 	return RIG_OK;
 }
 
+bool rig_if::is_opening() {
+	return opening_;
+}
+
