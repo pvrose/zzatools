@@ -118,15 +118,23 @@ void qso_rig::create_form(int X, int Y) {
 	int max_w = 0;
 	int max_h = 0;
 
-	int curr_x = X + GAP + WLABEL;
+	int curr_x = X + GAP;
 	int curr_y = Y + GAP;
 
 	// First button - connect/disconnect or add
-	bn_connect_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON);
-	bn_connect_->color(FL_YELLOW);
+	bn_connect_ = new Fl_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Connected");
+	bn_connect_->selection_color(FL_GREEN);
 	bn_connect_->tooltip("Select to attempt to connect/disconnect rig");
 	bn_connect_->callback(cb_bn_connect, nullptr);
 	
+	curr_x += bn_connect_->w();
+	bn_select_ = new Fl_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Select");
+	bn_select_->color(FL_YELLOW, FL_BLACK);
+	bn_select_->tooltip("Select the rig to connect");
+	bn_select_->value(false);
+	bn_select_->callback(cb_bn_select, nullptr);
+	
+	curr_x = X + GAP + WLABEL;
 	curr_y += HBUTTON + GAP;
 
 	// Choice - Select the rig model (Manufacturer/Model)
@@ -180,7 +188,7 @@ void qso_rig::create_form(int X, int Y) {
 	bn_all_rates_ = new Fl_Check_Button(curr_x, curr_y, HBUTTON, HBUTTON, "All rates");
 	bn_all_rates_->align(FL_ALIGN_RIGHT);
 	bn_all_rates_->tooltip("Allow full baud rate selection");
-	bn_all_rates_->callback(cb_ch_over, nullptr);
+	bn_all_rates_->callback(cb_ch_over, &use_all_rates_);
 	populate_baud_choice();
 	curr_x += HBUTTON + WLABEL + GAP;
 	max_x = max(max_x, curr_x);
@@ -244,50 +252,54 @@ void qso_rig::save_values() {
 
 // Enable CAT Connection widgets
 void qso_rig::enable_widgets() {
-
-	// CAT control widgets
+	// CAT access buttons
+	if (!rig_) {
+		bn_connect_->deactivate();
+		bn_select_->activate();
+		if (bn_select_->value()) {
+			bn_select_->label("Use");
+		} else {
+			bn_select_->label("Select");
+		}
+	} else if (rig_->is_open()) {
+		bn_connect_->activate();
+		bn_connect_->value(true);
+		bn_select_->deactivate();
+		bn_select_->value(false);
+	} else {
+		bn_connect_->activate();
+		bn_connect_->value(false);
+		bn_select_->activate();
+		if (bn_select_->value()) {
+			bn_select_->label("Use");
+		} else {
+			bn_select_->label("Select");
+		}
+	}
+	// CAT control widgets - allow only when select button active
+	if (bn_select_->value()) {
+		serial_grp_->activate();
+		network_grp_->activate();
+	} else {
+		serial_grp_->deactivate();
+		network_grp_->deactivate();
+	}
 	switch (mode_) {
 	case RIG_PORT_SERIAL:
-		// If we are connected do not allow it to be changed
-		if (rig_->is_open()) serial_grp_->deactivate();
-		else serial_grp_->activate();
 		serial_grp_->show();
-		network_grp_->deactivate();
 		network_grp_->hide();
-		if (rig_->is_open()) {
-			bn_connect_->color(FL_GREEN);
-			bn_connect_->label("Connected");
-		}
-		else {
-			bn_connect_->color(FL_RED);
-			bn_connect_->label("Disconn'd");
-		}
 		break;
 	case RIG_PORT_NETWORK:
 	case RIG_PORT_USB:
-		serial_grp_->deactivate();
 		serial_grp_->hide();
-		// If we are connected do not allow it to be changed
-		if (rig_->is_open()) network_grp_->deactivate();
-		else network_grp_->activate();
 		network_grp_->show();
-		ip_port_->value(hamlib_data_.port_name.c_str());
-		if (rig_->is_open()) {
-			bn_connect_->color(FL_GREEN);
-			bn_connect_->label("Connected");
-		}
-		else {
-			bn_connect_->color(FL_RED);
-			bn_connect_->label("Disconn'd");
+		if (!bn_select_->value()) {
+			ip_port_->value(hamlib_data_.port_name.c_str());
 		}
 		break;
 	case RIG_PORT_NONE:
-		serial_grp_->deactivate();
 		serial_grp_->hide();
-		network_grp_->deactivate();
 		network_grp_->hide();
-		bn_connect_->color(FL_YELLOW);
-		bn_connect_->label("Add Rig");
 		break;
 	}
 	redraw();
@@ -476,7 +488,8 @@ void qso_rig::cb_ip_port(Fl_Widget* w, void* v) {
 // v is unused
 void qso_rig::cb_ch_baud(Fl_Widget* w, void* v) {
 	qso_rig* that = ancestor_view<qso_rig>(w);
-	cb_text<Fl_Choice, string>(w, (void*)&that->hamlib_data_.baud_rate);
+	const char* text = ((Fl_Choice*)w)->text();
+	that->hamlib_data_.baud_rate = atoi(text);
 }
 
 // Override rig capabilities selected - repopulate the baud choice
@@ -499,29 +512,33 @@ void qso_rig::cb_bn_all(Fl_Widget* w, void* v) {
 // v is not used 
 void qso_rig::cb_bn_connect(Fl_Widget* w, void* v) {
 	qso_rig* that = ancestor_view<qso_rig>(w);
-	switch (that->mode_) {
-	case RIG_PORT_SERIAL:
-	case RIG_PORT_NETWORK:
-	case RIG_PORT_USB:
+	if (that->rig_->is_open()) {
+		that->rig_->close();
+	} else {
+		that->rig_->open();
+	}
+	that->enable_widgets();
+}
+
+// Pressed the select button 
+// v is not used 
+void qso_rig::cb_bn_select(Fl_Widget* w, void* v) {
+	qso_rig* that = ancestor_view<qso_rig>(w);
+	Fl_Light_Button* bn = (Fl_Light_Button*)w;
+	if (bn->value()) {
+		// This is called in switch_rig
+		that->enable_widgets();
+	} else {
 		that->switch_rig();
-		break;
-	case RIG_PORT_NONE:
-		that->new_rig();
-		break;
 	}
 }
 
+
 // Connect rig if disconnected and vice-versa
 void qso_rig::switch_rig() {
-	if (!rig_) {
+	if (rig_) {
+		delete rig_;
 		rig_ = new rig_if(label(), hamlib_data_);
-	} else {
-		if (rig_->is_open()) {
-			rig_->close();
-		}
-		else {
-			rig_->open();
-		}
 	}
 	ancestor_view<qso_manager>(this)->update_rig();
 	enable_widgets();
@@ -535,6 +552,9 @@ void qso_rig::switch_rig() {
 //RS_HIGH              // The rig is in TX mode but SWR is too high
 void qso_rig::ticker() {
 	rig_->ticker();
+	// The rig may have disconnected - update connect/select buttons
+	enable_widgets();
+	// Update status with latest values from rig
 	string msg = rig_->rig_info();
 	rig_status_t st;
 	if (!rig_->is_open()) st = RS_OFF;

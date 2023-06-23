@@ -15,6 +15,7 @@
 #include <string>
 #include <thread>
 #include <atomic>
+#include <mutex>
 
 using namespace std;
 
@@ -122,11 +123,13 @@ using namespace std;
 		static int cb_hl_freq(RIG* rig, vfo_t vfo, freq_t freq, rig_ptr_t data);
 		// Protected attributes
 	protected:
-		void read_values();
+		void th_read_values();
 		// Open rig - run in thread
-		bool open_rig();
+		bool th_open_rig();
 		// Rig opened OK
 		atomic<bool> opened_ok_;
+		// SEmaphore to use around opening
+		atomic<bool> opening_;
 		// bool
 		bool have_freq_to_band_;
 		// last band read

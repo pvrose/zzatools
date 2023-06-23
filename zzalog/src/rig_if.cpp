@@ -170,6 +170,7 @@ bool rig_if::get_ptt() {
 rig_if::rig_if(const char* name, hamlib_data_t data) 
 {
 	// Initialise
+	opening_ = false;
 	opened_ok_ = false;
 	// Default action
 	have_freq_to_band_ = false;
@@ -227,10 +228,6 @@ void rig_if::close() {
 
 // Opens the connection associated with the rig
 bool rig_if::open() {
-	// If changing rig type - delete any existing rig and create new one
-	if (rig_ != nullptr) {
-		close();
-	}
 	if (hamlib_data_.port_name.length() == 0) {
 		char msg[256];
 		snprintf(msg, 256, "RIG: Connection %s/%s No port supplied - open failed",
@@ -241,41 +238,19 @@ bool rig_if::open() {
 		return false;
 
 	}
+	printf("RIG: Starting thread - set semaphore\n");
+	opening_ = true;
 	thread_ = new thread(th_run_rig, this);
-
-	return opened_ok_;
-}
-
-bool rig_if::open_rig() {
-	// Get the rig interface
-	rig_ = rig_init(hamlib_data_.model_id);
-	if (rig_ != nullptr) {
-		switch (hamlib_data_.port_type) {
-		case RIG_PORT_SERIAL:
-			// Successful - set up the serial port parameters
-			strcpy(rig_->state.rigport.pathname, hamlib_data_.port_name.c_str());
-			rig_->state.rigport.parm.serial.rate = hamlib_data_.baud_rate;
-			break;
-		case RIG_PORT_NETWORK:
-		case RIG_PORT_USB:
-			int err = rig_set_conf(rig_, rig_token_lookup(rig_, "rig_pathname"), hamlib_data_.port_name.c_str());
-			//strcpy(rig_->state.rigport.pathname, port_name_.c_str());
-			break;
-		}
+	// Lock until the rig has been opened - should wait 
+	printf("RIG: Waiting for semaphore to clear\n");
+	while(opening_) {
+		// Allow FLTK scheduler in
+		Fl::check();
+		this_thread::sleep_for(chrono::milliseconds(100));
 	}
-	// open rig connection over serial port
-	error_code_ = rig_open(rig_);
-
-	if (error_code_ != RIG_OK) {
-		// Not opened, tidy hamlib memory usage and mark it so.
-		rig_cleanup(rig_);
-		rig_ = nullptr;
-		opened_ok_ = false;
-	}
-	else {
-		// Opened OK
-		opened_ok_ = true;
-	}
+	// And immediately unlock it
+	printf("RIG: Semaphore clear - proceed\n");
+		
 	char msg[256];
 	if (opened_ok_) {
 
@@ -293,14 +268,6 @@ bool rig_if::open_rig() {
 				rig_get_info(rig_));
 		}
 		status_->misc_status(ST_NOTE, msg);
-		// Setting callback
-		error_code_ = rig_set_freq_callback(rig_, cb_hl_freq, (void*)this);
-		if (error_code_ == RIG_OK) {
-			printf("RIG: Frequency callback set\n");
-		}
-		else {
-			printf("RIG: Frequency callback nor set - %s\n", error_message("").c_str());			
-		}
 		return true;
 	}
 	else {
@@ -314,6 +281,58 @@ bool rig_if::open_rig() {
 	}
 }
 
+// This is within the thread
+bool rig_if::th_open_rig() {
+	// If changing rig type - delete any existing rig and create new one
+	if (rig_ != nullptr) {
+		close();
+	}
+	// Get the rig interface
+	printf("RIG: Initialising rig %s\n", hamlib_data_.model.c_str());
+	rig_ = rig_init(hamlib_data_.model_id);
+	if (rig_ != nullptr) {
+		switch (hamlib_data_.port_type) {
+		case RIG_PORT_SERIAL:
+			// Successful - set up the serial port parameters
+			strcpy(rig_->state.rigport.pathname, hamlib_data_.port_name.c_str());
+			rig_->state.rigport.parm.serial.rate = hamlib_data_.baud_rate;
+			break;
+		case RIG_PORT_NETWORK:
+		case RIG_PORT_USB:
+			int err = rig_set_conf(rig_, rig_token_lookup(rig_, "rig_pathname"), hamlib_data_.port_name.c_str());
+			//strcpy(rig_->state.rigport.pathname, port_name_.c_str());
+			break;
+		}
+	}
+	// open rig connection over serial port
+	printf("RIG: Opening rig\n");
+	error_code_ = rig_open(rig_);
+
+	if (error_code_ != RIG_OK) {
+		// Not opened, tidy hamlib memory usage and mark it so.
+		printf("RIG: rig open failed with error %d\n", error_code_);
+		rig_cleanup(rig_);
+		rig_ = nullptr;
+		opened_ok_ = false;
+	}
+	else {
+		// Opened OK
+		printf("RIG: rig open OK\n", error_code_);
+		opened_ok_ = true;
+	}
+	//if (opened_ok_) {
+		//// Setting callback
+		//error_code_ = rig_set_freq_callback(rig_, cb_hl_freq, (void*)this);
+		//if (error_code_ == RIG_OK) {
+			//printf("RIG: Frequency callback set\n");
+		//}
+		//else {
+			//printf("RIG: Frequency callback nor set - %s\n", error_message("").c_str());			
+		//}
+	//}
+	return opened_ok_;
+}
+
 // Return rig name
 string& rig_if::rig_name() {
 	// Read capabilities to get manufacturer and model name
@@ -324,18 +343,29 @@ string& rig_if::rig_name() {
 // Thraed method
 void rig_if::th_run_rig(rig_if* that) {
 	// Open the rig
-	if (!that->open_rig()) {
+	if (!that->th_open_rig()) {
+		printf("RIG: Open rig failed - clearing semaphore.\n");
+		that->opening_ = false;
 		return;
 	}
 	// run_read_ will be cleared when the rig closes or errors.
-	that->run_read_ = true;
-	while (that->run_read_) {
-		that->read_values();
-		this_thread::sleep_for(chrono::milliseconds(1000));
+	that->th_read_values();
+	if (that->opened_ok_) {
+		printf("RIG: Accessed rig - clearing semaphore.\n");
+		that->opening_ = false;
+		that->run_read_ = true;
+		while (that->run_read_) {
+			that->th_read_values();
+			this_thread::sleep_for(chrono::milliseconds(1000));
+		}
+		printf("RIG: Rig closed or failed - ending thread.\n");
+	} else {
+		printf("RIG: Rig access failed - clearing semaphore.\n");
+		that->opening_ = false;
 	}
 }
 
-void rig_if::read_values() {
+void rig_if::th_read_values() {
 	// Read TX frequency
 //	printf("%s - reading TX Frequency\n", now_ms().c_str());
 	double d_temp;
@@ -343,7 +373,7 @@ void rig_if::read_values() {
 	else return;
 //	printf("%s - done\n", now_ms().c_str());
 	if (error_code_ != RIG_OK) {
-		status_->misc_status(ST_ERROR, error_message("TX Frequency").c_str());
+		printf("%s\n", error_message("TX Frequency").c_str());
 		opened_ok_ = false;
 		return;
 	}
@@ -354,7 +384,7 @@ void rig_if::read_values() {
 	else return;
 	//	printf("%s - done\n", now_ms().c_str());
 	if (error_code_ != RIG_OK) {
-		status_->misc_status(ST_ERROR, error_message("RX Frequency").c_str());
+		printf("%s\n", error_message("RX Frequency").c_str());
 		opened_ok_ = false;
 		return;
 	}
@@ -367,7 +397,7 @@ void rig_if::read_values() {
 	else return;
 	//	printf("%s - done\n", now_ms().c_str());
 	if (error_code_ != RIG_OK) {
-		status_->misc_status(ST_ERROR, error_message("Mode").c_str());
+		printf("%s\n", error_message("Mode").c_str());
 		opened_ok_ = false;
 		return;
 	}
@@ -403,7 +433,7 @@ void rig_if::read_values() {
 	else return;
 	//	printf("%s - done\n", now_ms().c_str());
 	if (error_code_ != RIG_OK) {
-		status_->misc_status(ST_ERROR, error_message("Drive").c_str());
+		printf("%s\n", error_message("Drive").c_str());
 		opened_ok_ = false;
 		return;
 	}
@@ -416,7 +446,7 @@ void rig_if::read_values() {
 	else return;
 	//	printf("%s - done\n", now_ms().c_str());
 	if (error_code_ != RIG_OK) {
-		status_->misc_status(ST_ERROR, error_message("Split").c_str());
+		printf("%s\n", error_message("Split").c_str());
 		opened_ok_ = false;
 		return;
 	}
@@ -429,7 +459,7 @@ void rig_if::read_values() {
 	else return;
 	//	printf("%s - done\n", now_ms().c_str());
 	if (error_code_ != RIG_OK) {
-		status_->misc_status(ST_ERROR, error_message("PTT").c_str());
+		printf("%s\n", error_message("PTT").c_str());
 		opened_ok_ = false;
 		return;
 	}
@@ -441,7 +471,7 @@ void rig_if::read_values() {
 	else return;
 	//	printf("%s - done\n", now_ms().c_str());
 	if (error_code_ != RIG_OK) {
-		status_->misc_status(ST_ERROR, error_message("S meter").c_str());
+		printf("%s\n", error_message("S meter").c_str());
 		opened_ok_ = false;
 		return;
 	}
@@ -462,7 +492,7 @@ void rig_if::read_values() {
 	else return;
 	//	printf("%s - done\n", now_ms().c_str());
 	if (error_code_ != RIG_OK) {
-		status_->misc_status(ST_ERROR, error_message("Power meter").c_str());
+		printf("%s\n", error_message("Power meter").c_str());
 		opened_ok_ = false;
 		return;
 	}

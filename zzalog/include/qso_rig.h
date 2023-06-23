@@ -57,6 +57,8 @@ protected:
 	static void cb_ip_port(Fl_Widget* w, void* v);
 	// Callback - Connect button
 	static void cb_bn_connect(Fl_Widget* w, void* v);
+	// Callback - Select rig
+	static void cb_bn_select(Fl_Widget* w, void* v);
 
 	// Get hamlib data
 	void find_hamlib_data();
@@ -77,7 +79,8 @@ protected:
 	Fl_Choice* ch_baud_rate_;
 	Fl_Check_Button* bn_all_rates_;
 	Fl_Check_Button* bn_all_ports_;
-	Fl_Button* bn_connect_;
+	Fl_Light_Button* bn_connect_;
+	Fl_Light_Button* bn_select_;
 
 	// Add all ports to port choice
 	bool use_all_ports_;
