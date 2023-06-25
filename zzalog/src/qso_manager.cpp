@@ -71,7 +71,7 @@ extern bool closing_;
 
 // The main dialog constructor
 qso_manager::qso_manager(int W, int H, const char* label) :
-	Fl_Window(W, H, label)
+	Fl_Double_Window(W, H, label)
 	, rig_group_(nullptr)
 	, created_(false)
 	, ticker_in_progress_(false)

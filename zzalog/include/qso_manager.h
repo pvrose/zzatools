@@ -21,13 +21,13 @@
 #include <set>
 #include <array>
 
-#include <FL/Fl_Window.H>
+#include <FL/Fl_Double_Window.H>
 
 using namespace std;
 
 	// This class provides the dialog to chage the current station settings: rig, antenna and QTH
 	class qso_manager :
-		public Fl_Window
+		public Fl_Double_Window
 	{
 		// Logging mode - used when initialising a record
 	public:
