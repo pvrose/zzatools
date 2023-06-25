@@ -74,7 +74,7 @@ string rig_if::rig_info() {
 }
 
 // Return the transmit or receive frequency
-string rig_if::get_frequency(bool tx) {
+double rig_if::get_dfrequency(bool tx) {
 	// Read the frequency (in MHz)
 	double frequency;
 	if (tx) {
@@ -83,11 +83,14 @@ string rig_if::get_frequency(bool tx) {
 	else {
 		frequency = rig_data_.rx_frequency / 1000000.0;
 	}
+	return frequency;
+}
+
+string rig_if::get_frequency(bool tx) {
+	double frequency = get_dfrequency(tx);
 	char text[15];
 	snprintf(text, 15, "%0.6f", frequency);
-
 	return text;
-
 }
 
 // Return the power
@@ -318,7 +321,7 @@ bool rig_if::th_open_rig() {
 	}
 	else {
 		// Opened OK
-		printf("RIG 2: rig open OK\n", error_code_);
+		printf("RIG 2: rig open OK\n");
 		opened_ok_ = true;
 	}
 	//if (opened_ok_) {

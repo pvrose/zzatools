@@ -228,9 +228,46 @@ void qso_rig::create_form(int X, int Y) {
 
 	network_grp_->end();
 
-	max_y = max(serial_grp_->y() + serial_grp_->h(), network_grp_->y() + network_grp_->h());
-	max_x = max(serial_grp_->x() + serial_grp_->w(), network_grp_->x() + network_grp_->w());
-	curr_y = max_y + GAP;
+	curr_x = x() + GAP;
+	curr_y = max(serial_grp_->y() + serial_grp_->h(), network_grp_->y() + network_grp_->h());
+	
+	display_grp_ = new Fl_Group(curr_x, curr_y, 10, 10);
+	display_grp_->box(FL_NO_BOX);
+
+	op_frequency_ = new Fl_Float_Input(curr_x, curr_y, WSMEDIT, HTEXT + 2);
+	op_frequency_->set_output();
+	op_frequency_->tooltip("Current displayed frequency");
+	op_frequency_->value("");
+	op_frequency_->box(FL_FLAT_BOX);
+	op_frequency_->color(FL_BLACK);
+	op_frequency_->textcolor(FL_YELLOW);
+	op_frequency_->textfont(FL_BOLD);
+	op_frequency_->textsize(FL_NORMAL_SIZE + 2);
+
+	curr_x += op_frequency_->w();
+	op_mode_ = new Fl_Output(curr_x, curr_y, WBUTTON, op_frequency_->h());
+	op_mode_->tooltip("Current displayed mode");
+	op_mode_->value("");
+	op_mode_->box(FL_FLAT_BOX);
+	op_mode_->color(FL_BLACK);
+	op_mode_->textcolor(FL_YELLOW);
+	op_mode_->textfont(FL_BOLD);
+	op_mode_->textsize(FL_NORMAL_SIZE + 2);
+
+	curr_y += op_mode_->h();
+	curr_x += op_mode_->w();
+
+	display_grp_->resizable(nullptr);
+	display_grp_->size(curr_x - display_grp_->x(), curr_y - display_grp_->y());
+
+	display_grp_->end();
+
+
+	max_x = max(
+		max(serial_grp_->x() + serial_grp_->w(), network_grp_->x() + network_grp_->w()),
+		display_grp_->x() + display_grp_->w());
+
+	curr_y = curr_y + GAP;
 	curr_x = save_x;
 
 	// Connected status
@@ -324,6 +361,34 @@ void qso_rig::enable_widgets() {
 		serial_grp_->hide();
 		network_grp_->hide();
 		break;
+	}
+	// Update display values
+	if (rig_ && rig_->is_open()) {
+		op_frequency_->activate();
+		op_mode_->activate();
+		op_frequency_->color(FL_BLACK);
+		op_mode_->color(FL_BLACK);
+		double freq = rig_->get_dfrequency(true);
+		char msg[25];
+		snprintf(msg, sizeof(msg), "  %9.3f MHz", freq);
+		op_frequency_->value(msg);
+		string rig_mode;
+		string submode;
+		rig_->get_string_mode(rig_mode, submode);
+		if (submode.length()) {
+			op_mode_->value(submode.c_str());
+		}
+		else {
+			op_mode_->value(rig_mode.c_str());
+		}
+	}
+	else {
+		op_frequency_->deactivate();
+		op_frequency_->value("");
+		op_frequency_->color(FL_BACKGROUND_COLOR);
+		op_mode_->deactivate();
+		op_mode_->value("");
+		op_mode_->color(FL_BACKGROUND_COLOR);
 	}
 	redraw();
 }

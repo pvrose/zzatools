@@ -112,6 +112,8 @@ using namespace std;
 		void get_string_mode(string& mode, string& submode);
 		// return frequency
 		string get_frequency(bool tx);
+		// Return frequency as double
+		double get_dfrequency(bool tx);
 		// return power
 		string get_tx_power(bool max = true);
 		// return S-meter reading - max - maximum over receive perion, false = instatntaneous

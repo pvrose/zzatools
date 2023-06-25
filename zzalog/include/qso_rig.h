@@ -11,6 +11,7 @@
 #include <FL/Fl_Choice.H>
 #include <FL/Fl_Input.H>
 #include <FL/Fl_Output.H>
+#include <FL/Fl_Float_Input.H>
 
 using namespace std;
 
@@ -83,6 +84,9 @@ protected:
 	Fl_Output* op_status_;
 	Fl_Button* bn_connect_;
 	Fl_Light_Button* bn_select_;
+	Fl_Group* display_grp_;
+	Fl_Float_Input* op_frequency_;
+	Fl_Output* op_mode_;
 
 	// Add all ports to port choice
 	bool use_all_ports_;
