@@ -548,7 +548,6 @@ void qso_data::action_activate(qso_init_t mode) {
 // Action START - transition from QSO_PENDING to QSO_STARTED
 void qso_data::action_start(qso_init_t mode) {
 	// Add to book
-	book_->enable_save(false);
 	action_new_qso(g_entry_->qso(), mode);
 	g_entry_->append_qso();
 	book_->selection(book_->item_number(g_entry_->qso_number()), HT_INSERTED);
@@ -628,9 +627,6 @@ void qso_data::action_save() {
 	// Upload QSO to QSL servers
 	book_->upload_qso(qso_number);
 
-	// If new or changed then update the fact and let every one know
-	book_->enable_save(true);
-
 	switch (logging_state_) {
 	case QSO_STARTED:
 	case QSO_MODEM:
@@ -681,7 +677,6 @@ void qso_data::action_cancel() {
 		}
 		break;
 	}
-	book_->enable_save(true);
 	enable_widgets();
 	g_entry_->check_qth_changed();
 }
@@ -731,7 +726,6 @@ void qso_data::action_save_edit() {
 	book_->add_use_data(qso);
 	if (qso->is_dirty()) book_->modified(true);
 	g_entry_->delete_qso();
-	book_->enable_save(true);
 	logging_state_ = QSO_INACTIVE;
 	enable_widgets();
 }
@@ -743,7 +737,6 @@ void qso_data::action_cancel_edit() {
 	g_entry_->delete_qso();
 	logging_state_ = QSO_INACTIVE;
 	g_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
-	book_->enable_save(true);
 	enable_widgets();
 }
 
@@ -1157,7 +1150,6 @@ void qso_data::action_add_net_qso() {
 	// Create the entry tab
 	g_net_entry_->add_entry();
 	// Create the new QSO therein
-	book_->enable_save(false);
 	switch (logging_state_) {
 	case NET_STARTED:
 		logging_state_ = NET_ADDING;
@@ -1211,9 +1203,11 @@ void qso_data::action_save_net_edit() {
 
 // Cancel the whole net
 void qso_data::action_cancel_net_all() {
+	book_->enable_save(false);
 	while (g_net_entry_->entries()) {
 		action_cancel();
 	}
+	book_->enable_save(true);
 	// Restore the place-holder entry
 	g_net_entry_->add_entry();
 	enable_widgets();
@@ -1252,16 +1246,14 @@ void qso_data::action_update_modem(record* qso) {
 	// Compare with existing
 	if (qso != current_qso()) {
 		// This is a new record as the previous one did not complete
-		book_->enable_save(false);
 		action_cancel();
 		action_add_modem(qso);
-		book_->enable_save(true);
 	}
 	else {
 		if (qso->item("QSO_COMPLETE") == "") {
 			// The QSO is complete
 			action_save();
-
+			book_->enable_save(true);
 		}
 		else {
 			g_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
@@ -1275,6 +1267,7 @@ void qso_data::action_cancel_modem() {
 	if (current_qso()->item("QSO_COMPLETE") == "") {
 		// Complete so should save it
 		action_save();
+		book_->enable_save(true);
 	}
 	else {
 		action_cancel();

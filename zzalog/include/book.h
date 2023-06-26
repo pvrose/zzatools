@@ -65,6 +65,10 @@ using namespace std;
 	typedef size_t item_num_t;    // Position of item within this book
 
 	class view;
+	class adi_reader;
+	class adx_reader;
+	class adi_writer;
+	class adx_writer;
 
 	// This class is the container for the ADIF records. These are held in chronological order.
 	// As well as standing alone it is used as a base class for extract_data and import_data
@@ -203,6 +207,11 @@ using namespace std;
 
 		// Find session start
 		void set_session_start();
+		// Get percentage comple of load or save
+		double get_complete();
+		// Get loading
+		bool loading();
+		bool storing();
 
 		// Protected attributes
 	protected:
@@ -276,6 +285,11 @@ using namespace std;
 		bool ignore_gridsquare_;
 		// Save enabled level (enable downs it, disable ups it
 		int save_level_;
+		// Readers and writer
+		adi_reader* adi_reader_;
+		adx_reader* adx_reader_;
+		adi_writer* adi_writer_;
+		adx_writer* adx_writer_;
 
 	};
 

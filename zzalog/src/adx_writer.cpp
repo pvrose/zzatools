@@ -221,15 +221,15 @@ bool adx_writer::write_element(adx_element_t element) {
 		ok &= start_element(name, nullptr);
 		total = my_book_->get_count();
 		// iterate through the records - abandon if error
-		for (int i = 0; i < total && ok; i++) {
-			record_ = my_book_->get_record(i, false);
+		for (current_ = 0; current_ < (unsigned)total && ok; current_++) {
+			record_ = my_book_->get_record(current_, false);
 			// Write RECORD element
 			ok &= write_element(AET_RECORD);
 			if (clean_records_) {
 				record_->clean();
 			}
 			// Update progress every record
-			status_->progress(i, my_book_->book_type());
+			status_->progress(current_, my_book_->book_type());
 		}
 		ok &= end_element(name);
 		break;
@@ -281,4 +281,8 @@ bool adx_writer::write_element(adx_element_t element) {
 		status_->misc_status(ST_ERROR, "LOG: Error occured while writing XML!");
 	}
 	return ok;
+}
+
+double adx_writer::progress() {
+	return (double)current_ / (double)my_book_->size();
 }

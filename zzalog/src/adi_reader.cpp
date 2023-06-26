@@ -307,3 +307,7 @@ bool adi_reader::load_book(book* book, istream& in) {
 		return true;
 	}
 }
+
+double adi_reader::progress() {
+	return (double)byte_count_ / (double)file_size_;
+}

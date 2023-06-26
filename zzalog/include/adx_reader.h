@@ -54,6 +54,8 @@ using namespace std;
 		// characters
 		virtual bool characters(string content);
 
+		double progress();
+
 	protected:
 
 		// start the <APP> element
@@ -99,10 +101,11 @@ using namespace std;
 		// count of ignored constructs
 		int num_ignored_;
 		// count of completed records
-		item_num_t num_records_;
+		size_t num_records_;
 		// counts for progress
 		long file_size_;
 		long previous_count_;
+		long current_count_;
 		istream* in_;
 		// Igore non-APP_ZZA_ fields
 		bool ignore_app_;

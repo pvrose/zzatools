@@ -1,0 +1,120 @@
+#include "qso_log_info.h"
+#include "drawing.h"
+#include "book.h"
+
+extern book* book_;
+
+qso_log_info::qso_log_info(int X, int Y, int W, int H, const char* l) :
+	Fl_Group(X, Y, W, H, l)
+{
+	align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
+	// Log status group
+	labelfont(FL_BOLD);
+	labelsize(FL_NORMAL_SIZE + 2);
+	//align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
+	box(FL_BORDER_BOX);
+	load_values();
+	create_form(X, Y);
+	enable_widgets();
+}
+
+qso_log_info::~qso_log_info() {
+
+}
+
+// get settings 
+void qso_log_info::load_values() {
+	// Nothing yet
+}
+
+// Create form
+void qso_log_info::create_form(int X, int Y) {
+	int curr_x = X + GAP;
+	int curr_y = Y + HTEXT + GAP;
+
+	pr_loadsave_ = new Fl_Progress(curr_x, curr_y, WSMEDIT, HBUTTON, "Load/Save");
+	pr_loadsave_->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
+	pr_loadsave_->color(FL_BACKGROUND_COLOR, FL_BLUE);
+	pr_loadsave_->tooltip("Displays loading or saving progress");
+	pr_loadsave_->minimum(0.0);
+	pr_loadsave_->maximum(1.0);
+
+	curr_y += pr_loadsave_->h();
+	int max_x = pr_loadsave_->x() + pr_loadsave_->w() + GAP;
+
+	bn_save_enable_ = new Fl_Check_Button(curr_x, curr_y, HBUTTON, HBUTTON, "Save after each QSO");
+	bn_save_enable_->align(FL_ALIGN_RIGHT);
+	bn_save_enable_->tooltip("Enable/Disable save");
+	bn_save_enable_->callback(cb_bn_enable);
+	bn_save_enable_->value(true);
+
+	curr_y += bn_save_enable_->h() + GAP;
+	curr_x += bn_save_enable_->w() + GAP;
+
+	max_x = max(max_x, curr_x);
+
+
+	resizable(nullptr);
+	size(max_x - x(), curr_y - y());
+	end();
+}
+
+// Enable widgets
+void qso_log_info::enable_widgets() {
+
+	if (book_->empty()) {
+		label("Log: No Data");
+		pr_loadsave_->color(FL_BACKGROUND_COLOR, FL_BACKGROUND_COLOR);
+		pr_loadsave_->value(0.0);
+	}
+	else if (book_->storing()) {
+		label("Log: Storing");
+		pr_loadsave_->color(FL_GREEN, FL_RED);
+		pr_loadsave_->value(1.0F - (float)book_->get_complete());
+	}
+	else if (book_->loading()) {
+		label("Log: Loading");
+		pr_loadsave_->color(FL_BACKGROUND_COLOR, FL_GREEN);
+		pr_loadsave_->value((float)book_->get_complete());
+	} else {
+		if (book_->modified()) {
+			label("Log: Modified");
+			pr_loadsave_->color(FL_RED, FL_RED);
+			pr_loadsave_->value(0.0);
+		}
+		else {
+			label("Log: Unmodified");
+			pr_loadsave_->color(FL_GREEN, FL_GREEN);
+			pr_loadsave_->value(0.0);
+		}
+		if (book_->enable_save()) {
+			bn_save_enable_->value(true);
+		}
+		else {
+			bn_save_enable_->value(false);
+		}
+	}
+}
+
+// Save changes
+void qso_log_info::save_values() {
+	// No content yet
+}
+
+// On 1s ticker - reevaluate the widgets
+void qso_log_info::ticker() {
+	enable_widgets();
+}
+
+// Callback on Save Enable button
+void qso_log_info::cb_bn_enable(Fl_Widget* w, void* v) {
+	qso_log_info* that = ancestor_view<qso_log_info>(w);
+	bool value = ((Fl_Check_Button*)w)->value();
+	if (!value) {
+		book_->enable_save(false);
+	}
+	else {
+		while (!book_->enable_save()) book_->enable_save(true);
+	}
+	that->enable_widgets();
+}

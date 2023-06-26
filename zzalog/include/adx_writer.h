@@ -26,6 +26,8 @@ using namespace std;
 		// Generate an individual element of the type given
 		bool write_element(adx_element_t element);
 
+		double progress();
+
 	protected:
 		// Current record being processed
 		record * record_;
@@ -39,7 +41,7 @@ using namespace std;
 		char type_indicator_;
 		// Clean records
 		bool clean_records_;
-
+		item_num_t current_;
 
 	};
 #endif

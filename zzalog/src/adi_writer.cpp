@@ -40,6 +40,7 @@ bool adi_writer::store_book(book* out_book, ostream& out, bool clean, set<string
 	load_result_t result = LR_GOOD;
 	int count = 0;
 	clean_records_ = clean;
+	out_book_ = out_book;
 
 	// configure progress bar - progress is counted by number of records processed
 	status_->misc_status(ST_NOTE, "LOG: Started writing ADI");
@@ -49,10 +50,10 @@ bool adi_writer::store_book(book* out_book, ostream& out, bool clean, set<string
 		store_record(out_book->header(), out, result, nullptr);
 		status_->progress(1, out_book->book_type());
 	}
-	for (unsigned int i = 0; i < out_book->size() && result == LR_GOOD; i++) {
+	for (current_ = 0; current_ < out_book->size() && result == LR_GOOD; current_++) {
 		// Output the record
-		store_record(out_book->get_record(i, false), out, result, fields);
-		status_->progress(i + 1, out_book->book_type());
+		store_record(out_book->get_record(current_, false), out, result, fields);
+		status_->progress(current_ + 1, out_book->book_type());
 	}
 	// Update the progress bar with complete or failed
 	if (result == LR_GOOD) {
@@ -174,4 +175,8 @@ void adi_writer::to_adif(record* record, ostream& out, set<string>* fields /* = 
 		// Add <EOR>
 		out << "<EOR>" << endl << endl;
 	}
+}
+
+double adi_writer::progress() {
+	return (double)current_ / (double)out_book_->size();
 }

@@ -147,7 +147,12 @@ void qso_manager::create_form(int X, int Y) {
 	clock_group_->create_form(curr_x, curr_y);
 	curr_x += clock_group_->w() + GAP;
 
-	curr_y += max(clock_group_->h(), rig_group_->h());
+	info_group_ = new qso_log_info(curr_x, curr_y, 0, 0, nullptr);
+	curr_x += info_group_->w() + GAP;
+
+	curr_y += max(
+		max(clock_group_->h(), rig_group_->h()),
+		info_group_->h());
 
 	max_x = max(max_x, curr_x);
 	max_y = max(max_y, curr_y);
@@ -392,6 +397,7 @@ void qso_manager::ticker() {
 		ticker_in_progress_ = true;
 		rig_group_->ticker();
 		data_group_->ticker();
+		info_group_->ticker();
 		ticker_in_progress_ = false;
 	}
 }

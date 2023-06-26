@@ -30,6 +30,9 @@ using namespace std;
 		// Load data to an individual record, failure is reported in result
 		istream & load_record(record* record, istream& in, load_result_t& result);
 
+		// Read progress
+		double progress();
+
 		// protected methods
 	protected:
 		// protected attributes

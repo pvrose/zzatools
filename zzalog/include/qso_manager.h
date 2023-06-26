@@ -4,6 +4,7 @@
 #include "qso_clock.h"
 #include "qso_data.h"
 #include "qso_tabbed_rigs.h"
+#include "qso_log_info.h"
 
 #include "callback.h"
 #include "record.h"
@@ -132,6 +133,7 @@ using namespace std;
 		qso_data* data_group_;
 		qso_tabbed_rigs* rig_group_;
 		qso_clock* clock_group_;
+		qso_log_info* info_group_;
 		// widgets
 
 		const static int WEDITOR = 400;

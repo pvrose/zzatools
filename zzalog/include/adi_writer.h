@@ -29,6 +29,9 @@ using namespace std;
 		// Convert item to ADIF format text and send to the output stream
 		static string item_to_adif(record* record, string field);
 
+		// Progress
+		double progress();
+
 		// protected methods
 	protected:
 		// write record to output stream
@@ -36,6 +39,8 @@ using namespace std;
 
 	protected:
 		bool clean_records_;
+		item_num_t current_;
+		book* out_book_;
 
 	};
 

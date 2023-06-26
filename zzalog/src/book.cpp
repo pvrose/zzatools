@@ -78,6 +78,10 @@ book::book(object_t type)
 	, main_loading_(false)
 	, ignore_gridsquare_(false)
 	, save_level_(0)
+	, adi_reader_(nullptr)
+	, adx_reader_(nullptr)
+	, adi_writer_(nullptr)
+	, adx_writer_(nullptr)
 {
 	used_bands_.clear();
 	used_modes_.clear();
@@ -150,14 +154,14 @@ bool book::load_data(string filename)
 				// Check for .adi or .adif format
 				if (filetype == ".adi" || filetype == ".adif") {
 					// Use ADI reader to read from an input stream connected to thefile
-					adi_reader* reader = new adi_reader;
+					adi_reader_ = new adi_reader;
 					input_.open(filename.c_str(), fstream::in);
 					// Load the book
 					if (book_type_ == OT_MAIN) {
 						status_->file_status(FS_LOADING);
 						main_loading_ = true;
 					}
-					if (!reader->load_book(this, input_)) {
+					if (!adi_reader_->load_book(this, input_)) {
 						// Error while reading book
 						char message[256];
 						sprintf(message, "LOG: Failed to open %s", filename.c_str());
@@ -168,7 +172,8 @@ bool book::load_data(string filename)
 							selection(0, HT_NO_DATA);
 							//Fl::wait();
 						}
-						delete reader;
+						delete adi_reader_;
+						adi_reader_ = nullptr;
 						ok = false;
 					}
 					else {
@@ -191,7 +196,8 @@ bool book::load_data(string filename)
 							// Parse and validate
 //							Fl::wait();
 						}
-						delete reader;
+						delete adi_reader_;
+						adi_reader_ = nullptr;
 						ok = true;
 					}
 					input_.close();
@@ -208,16 +214,16 @@ bool book::load_data(string filename)
 				// Check for .adx format
 				else if (filetype == ".adx") {
 					// Use ADX reader to load the data from the file through an input stream
-					adx_reader* reader = new adx_reader;
+					adx_reader_ = new adx_reader;
 					// Opening in text mode appears to do some behind-the-scenes processing
 					// when seeking backwards passed NL.
 					input_.open(filename.c_str(), fstream::in | fstream::binary);
 					status_->file_status(FS_LOADING);
 					main_loading_ = true;
-					if (!input_.good() || !reader->load_book(this, input_)) {
+					if (!input_.good() || !adx_reader_->load_book(this, input_)) {
 						// Failed to complete the load
-						char * message = new char[filename.length() + reader->information().length() + 100];
-						sprintf(message, "LOG: Failed to open %s. Error messages = %s", filename.c_str(), reader->information().c_str());
+						char * message = new char[filename.length() + adx_reader_->information().length() + 100];
+						sprintf(message, "LOG: Failed to open %s. Error messages = %s", filename.c_str(), adx_reader_->information().c_str());
 						status_->misc_status(ST_ERROR, message);
 						delete[] message;
 						clear();
@@ -227,7 +233,8 @@ bool book::load_data(string filename)
 							selection(0, HT_NO_DATA);
 							//Fl::wait();
 						}
-						delete reader;
+						delete adx_reader_;
+						adx_reader_ = nullptr;
 						ok = false;
 					}
 					else {
@@ -250,7 +257,8 @@ bool book::load_data(string filename)
 							// Parse and validate
 							//Fl::wait();
 						}
-						delete reader;
+						delete adx_reader_;
+						adx_reader_ = nullptr;
 						ok = true;
 					}
 					input_.close();
@@ -391,8 +399,8 @@ bool book::store_data(string filename, bool force, set<string>* fields) {
 						status_->file_status(FS_SAVING);
 					}
 					file.open(filename_.c_str(), fstream::out);
-					adi_writer* writer = new adi_writer;
-					if (writer->store_book(this, file, book_type_ == OT_MAIN ? true : false, fields) != LR_GOOD) {
+					adi_writer_ = new adi_writer;
+					if (adi_writer_->store_book(this, file, book_type_ == OT_MAIN ? true : false, fields) != LR_GOOD) {
 						// Store failed
 						char* message = new char[filename_.length() + 100];
 						sprintf(message, "LOG: Failed to open %s", filename_.c_str());
@@ -403,7 +411,8 @@ bool book::store_data(string filename, bool force, set<string>* fields) {
 					else {
 						ok = true;
 					}
-					delete writer;
+					delete adi_writer_;
+					adi_writer_ = nullptr;
 				}
 				// check for .adx format
 				else if (filetype == ".adx") {
@@ -412,8 +421,8 @@ bool book::store_data(string filename, bool force, set<string>* fields) {
 						status_->file_status(FS_SAVING);
 					}
 					file.open(filename_.c_str(), fstream::out);
-					adx_writer* writer = new adx_writer;
-					if (!writer->store_book(this, file, book_type_ == OT_MAIN ? true: false)) {
+					adx_writer_ = new adx_writer;
+					if (!adx_writer_->store_book(this, file, book_type_ == OT_MAIN ? true: false)) {
 						// Store failed
 						char * message = new char[filename_.length() + 100];
 						sprintf(message, "LOG: Failed to open %s", filename_.c_str());
@@ -425,7 +434,8 @@ bool book::store_data(string filename, bool force, set<string>* fields) {
 					else {
 						ok = true;
 					}
-					delete writer;
+					delete adx_writer_;
+					adx_writer_ = nullptr;
 				}
 				// check for .tsv format
 				else if (filetype == ".tsv" || filetype == ".tab") {
@@ -1583,4 +1593,20 @@ void book::set_session_start() {
 	char message[256];
 	snprintf(message, 256, "ZZALOG: Setting session start at %s", stime);
 	status_->misc_status(ST_NOTE, message);
+}
+
+double book::get_complete() {
+	if (adi_reader_) return adi_reader_->progress();
+	else if (adi_writer_) return adi_writer_->progress();
+	else if (adx_reader_) return adx_reader_->progress();
+	else if (adx_writer_) return adx_writer_->progress();
+	else return 0.0;
+}
+
+bool book::loading() {
+	return (adi_reader_ != nullptr || adx_reader_ != nullptr);
+}
+
+bool book::storing() {
+	return (adi_writer_ != nullptr || adx_writer_ != nullptr);
 }

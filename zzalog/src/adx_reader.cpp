@@ -214,8 +214,8 @@ bool adx_reader::end_element(string name) {
 				}
 			}
 			// Update progress every record
-			long current_count = (long)in_->tellg();
-			status_->progress(current_count, my_book_->book_type());
+			current_count_ = (long)in_->tellg();
+			status_->progress(current_count_, my_book_->book_type());
 		}
 		// Clear the record - destroyed when book destroyed
 		record_ = nullptr;
@@ -242,8 +242,8 @@ bool adx_reader::end_element(string name) {
 		else {
 			my_book_->header(record_);
 			// Update progress every record
-			long current_count = (long)in_->tellg();
-			status_->progress(current_count, my_book_->book_type());
+			current_count_ = (long)in_->tellg();
+			status_->progress(current_count_, my_book_->book_type());
 		}
 		// Clear the record - destroyed when book destroyed
 		record_ = nullptr;
@@ -563,3 +563,6 @@ bool adx_reader::start_field(string field_name) {
 	return false;
 }
 
+double adx_reader::progress() {
+	return (double)current_count_ / (double)file_size_;
+}
