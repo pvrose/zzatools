@@ -7,7 +7,6 @@ extern book* book_;
 qso_log_info::qso_log_info(int X, int Y, int W, int H, const char* l) :
 	Fl_Group(X, Y, W, H, l)
 {
-	align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 	// Log status group
 	labelfont(FL_BOLD);
 	labelsize(FL_NORMAL_SIZE + 2);
@@ -30,17 +29,25 @@ void qso_log_info::load_values() {
 // Create form
 void qso_log_info::create_form(int X, int Y) {
 	int curr_x = X + GAP;
-	int curr_y = Y + HTEXT + GAP;
+	int curr_y = Y + 1;
 
-	pr_loadsave_ = new Fl_Progress(curr_x, curr_y, WSMEDIT, HBUTTON, "Load/Save");
-	pr_loadsave_->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
+	op_status_ = new Fl_Output(curr_x, curr_y, WSMEDIT, HBUTTON + 2);
+	op_status_->box(FL_FLAT_BOX);
+	op_status_->color(FL_BACKGROUND_COLOR);
+	op_status_->textsize(FL_NORMAL_SIZE + 2);
+	op_status_->textfont(FL_BOLD);
+
+	curr_y += op_status_->h();
+	int max_x = op_status_->x() + op_status_->w() + GAP;
+
+	pr_loadsave_ = new Fl_Progress(curr_x, curr_y, WSMEDIT, HBUTTON);
 	pr_loadsave_->color(FL_BACKGROUND_COLOR, FL_BLUE);
 	pr_loadsave_->tooltip("Displays loading or saving progress");
 	pr_loadsave_->minimum(0.0);
 	pr_loadsave_->maximum(1.0);
 
 	curr_y += pr_loadsave_->h();
-	int max_x = pr_loadsave_->x() + pr_loadsave_->w() + GAP;
+	max_x = max(max_x, pr_loadsave_->x() + pr_loadsave_->w() + GAP);
 
 	bn_save_enable_ = new Fl_Check_Button(curr_x, curr_y, HBUTTON, HBUTTON, "Save after each QSO");
 	bn_save_enable_->align(FL_ALIGN_RIGHT);
@@ -63,27 +70,27 @@ void qso_log_info::create_form(int X, int Y) {
 void qso_log_info::enable_widgets() {
 
 	if (book_->empty()) {
-		label("Log: No Data");
+		op_status_->value("No Data");
 		pr_loadsave_->color(FL_BACKGROUND_COLOR, FL_BACKGROUND_COLOR);
 		pr_loadsave_->value(0.0);
 	}
 	else if (book_->storing()) {
-		label("Log: Storing");
+		op_status_->value("Storing");
 		pr_loadsave_->color(FL_GREEN, FL_RED);
 		pr_loadsave_->value(1.0F - (float)book_->get_complete());
 	}
 	else if (book_->loading()) {
-		label("Log: Loading");
+		op_status_->value("Loading");
 		pr_loadsave_->color(FL_BACKGROUND_COLOR, FL_GREEN);
 		pr_loadsave_->value((float)book_->get_complete());
 	} else {
 		if (book_->modified()) {
-			label("Log: Modified");
+			op_status_->value("Modified");
 			pr_loadsave_->color(FL_RED, FL_RED);
 			pr_loadsave_->value(0.0);
 		}
 		else {
-			label("Log: Unmodified");
+			op_status_->value("Unmodified");
 			pr_loadsave_->color(FL_GREEN, FL_GREEN);
 			pr_loadsave_->value(0.0);
 		}

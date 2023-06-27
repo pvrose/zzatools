@@ -147,7 +147,7 @@ void qso_manager::create_form(int X, int Y) {
 	clock_group_->create_form(curr_x, curr_y);
 	curr_x += clock_group_->w() + GAP;
 
-	info_group_ = new qso_log_info(curr_x, curr_y, 0, 0, nullptr);
+	info_group_ = new qso_log(curr_x, curr_y, 0, 0, nullptr);
 	curr_x += info_group_->w() + GAP;
 
 	curr_y += max(

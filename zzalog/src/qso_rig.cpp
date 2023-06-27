@@ -119,7 +119,7 @@ void qso_rig::create_form(int X, int Y) {
 	int max_h = 0;
 
 	int curr_x = X + GAP;
-	int curr_y = Y + GAP;
+	int curr_y = Y + 1;
 	
 	// "Label" - rig status
 	op_status_ = new Fl_Output(curr_x, curr_y, WEDIT, HBUTTON);

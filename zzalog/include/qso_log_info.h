@@ -3,6 +3,7 @@
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Progress.H>
 #include <FL/Fl_Check_Button.H>
+#include <FL/Fl_Output.H>
 
 using namespace std;
 
@@ -30,6 +31,7 @@ public:
 	static void cb_bn_enable(Fl_Widget* w, void* v);
 
 protected:
+	Fl_Output* op_status_;
 	Fl_Progress* pr_loadsave_;
 	Fl_Check_Button* bn_save_enable_;
 

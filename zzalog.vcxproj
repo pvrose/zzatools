@@ -138,6 +138,7 @@
     <ClCompile Include="zzalog\src\qso_clock.cpp" />
     <ClCompile Include="zzalog\src\qso_details.cpp" />
     <ClCompile Include="zzalog\src\qso_dxcc.cpp" />
+    <ClCompile Include="zzalog\src\qso_log.cpp" />
     <ClCompile Include="zzalog\src\qso_log_info.cpp" />
     <ClCompile Include="zzalog\src\qso_misc.cpp" />
     <ClCompile Include="zzalog\src\qso_net_entry.cpp" />
@@ -227,6 +228,7 @@
     <ClInclude Include="zzalog\include\qso_clock.h" />
     <ClInclude Include="zzalog\include\qso_details.h" />
     <ClInclude Include="zzalog\include\qso_dxcc.h" />
+    <ClInclude Include="zzalog\include\qso_log.h" />
     <ClInclude Include="zzalog\include\qso_log_info.h" />
     <ClInclude Include="zzalog\include\qso_misc.h" />
     <ClInclude Include="zzalog\include\qso_net_entry.h" />
