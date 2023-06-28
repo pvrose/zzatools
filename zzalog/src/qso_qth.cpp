@@ -16,7 +16,6 @@ qso_qth::qso_qth(int X, int Y, int W, int H, const char* L) :
 	labelfont(FL_BOLD);
 	labelsize(FL_NORMAL_SIZE + 2);
 	//align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
-	box(FL_BORDER_BOX);
 
 	load_values();
 	create_form(X, Y);

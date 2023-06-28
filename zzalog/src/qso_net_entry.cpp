@@ -44,9 +44,7 @@ void qso_net_entry::create_form(int X, int Y) {
 	int dh = h() - rh;
 	// Initially with an "empty" copy of qso_entry
 	qso_entry* wx = new qso_entry(rx, ry, rw, rh, "");
-	wx->labelfont(labelfont());
-	wx->labelsize(labelsize());
-	wx->labelcolor(labelcolor());
+	wx->labelsize(FL_NORMAL_SIZE + 2);
 	entries_->add(wx);
 	entries_->resizable(nullptr);
 	entries_->size(wx->w() + dw, wx->h() + dh);
@@ -72,7 +70,14 @@ int qso_net_entry::entries() {
 // Enable/disable widgets - pass on to children
 void qso_net_entry::enable_widgets() {
 	for (int cx = 0; cx < entries_->children(); cx++) {
-		qso_entry* qe = (qso_entry*)entries_->child(cx);
+		Fl_Widget* wx = entries_->child(cx);
+		if (wx == entries_->value()) {
+			wx->labelfont((wx->labelfont() | FL_BOLD) & (~FL_ITALIC));
+		}
+		else {
+			wx->labelfont((wx->labelfont() & (~FL_BOLD)) | FL_ITALIC);
+		}
+		qso_entry* qe = (qso_entry*)wx;
 		if (qe->qso()) qe->copy_label(qe->qso()->item("CALL").c_str());
 		qe->enable_widgets();
 	}
@@ -101,11 +106,10 @@ void qso_net_entry::add_entry() {
 	// Initially with an "empty" copy of qso_entry
 	entries_->begin();
 	qso_entry* wx = new qso_entry(rx, ry, rw, rh, "");
-	wx->labelfont(labelfont());
-	wx->labelsize(labelsize());
-	wx->labelcolor(labelcolor());
+	wx->labelsize(FL_NORMAL_SIZE + 2);
 	entries_->end();
 	entries_->value(wx);
+	
 }
 
 // Save and remove selected qso
@@ -199,6 +203,8 @@ void qso_net_entry::append_qso() {
 // Callback on selecting a tab
 void qso_net_entry::cb_entries(Fl_Widget* w, void* v) {
 	Fl_Tabs* tabs = (Fl_Tabs*)w;
+	qso_net_entry* that = ancestor_view<qso_net_entry>(w);
+	that->enable_widgets();
 	qso_entry* qe = (qso_entry*)tabs->value();
 	book_->selection(qe->qso_number());
 }

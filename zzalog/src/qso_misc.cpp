@@ -16,9 +16,9 @@ void qso_misc::load_values() {}
 void qso_misc::create_form() {
 
 	align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
-	box(FL_BORDER_BOX);
 	labelfont(FL_BOLD);
 	labelsize(FL_NORMAL_SIZE + 2);
+	callback(cb_tabs);
 
 	int rx = 0;
 	int ry = 0;
@@ -35,6 +35,16 @@ void qso_misc::create_form() {
 }
 // Enable/disab;e widgets
 void qso_misc::enable_widgets() {
+	// Set the label of the selected tab to BOLD, others to ITALIC
+	for (int ix = 0; ix < children(); ix++) {
+		Fl_Widget* wx = child(ix);
+		if (wx == value()) {
+			wx->labelfont((wx->labelfont() | FL_BOLD) & (~FL_ITALIC));
+		}
+		else {
+			wx->labelfont((wx->labelfont() & (~FL_BOLD)) | FL_ITALIC);
+		}
+	}
 	qth_->enable_widgets();
 	details_->enable_widgets();
 	dxcc_->enable_widgets();
@@ -50,3 +60,8 @@ void qso_misc::qso(record* qso) {
 	dxcc_->set_data();
 }
 
+// Callback when changing tabs
+void qso_misc::cb_tabs(Fl_Widget* w, void* v) {
+	qso_misc* that = ancestor_view<qso_misc>(w);
+	that->enable_widgets();
+}

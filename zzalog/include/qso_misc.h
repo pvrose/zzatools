@@ -25,6 +25,8 @@ public:
 	void qso(record* qso);
 
 protected:
+	static void cb_tabs(Fl_Widget* w, void* v);
+
 	// The QSO to base all displays on
 	record* qso_;
 
