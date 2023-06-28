@@ -37,14 +37,33 @@ void qso_log::create_form(int X, int Y) {
 	rw = max(rw, log_info_->w());
 	rh = max(rh, log_info_->h());
 
+	qsl_ctrl_ = new qso_qsl(rx, ry, rw, rh, "On-line QSL");
+	rw = max(rw, qsl_ctrl_->w());
+	rh = max(rh, qsl_ctrl_->h());
+
 	resizable(nullptr);
 	size(w() + rw - saved_rw, h() + rh - saved_rh);
 	end();
 
+	for (int ix = 0; ix < children(); ix++) {
+		child(ix)->size(rw, rh);
+	}
+	redraw();
 }
+
 // Enable widgets
 void qso_log::enable_widgets() {
+	for (int ix = 0; ix < children(); ix++) {
+		Fl_Widget* wx = child(ix);
+		if (wx == value()) {
+			wx->labelfont((wx->labelfont() | FL_BOLD) & (~FL_ITALIC));
+		}
+		else {
+			wx->labelfont((wx->labelfont() & (~FL_BOLD)) | FL_ITALIC);
+		}
+	}
 	log_info_->enable_widgets();
+	qsl_ctrl_->enable_widgets();
 }
 
 // Save changes
