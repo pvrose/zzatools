@@ -1,7 +1,7 @@
 #ifndef __STN_DIALOG__
 #define __STN_DIALOG__
 
-#include "qso_clock.h"
+#include "qso_clocks.h"
 #include "qso_data.h"
 #include "qso_tabbed_rigs.h"
 #include "qso_log.h"
@@ -132,7 +132,7 @@ using namespace std;
 		// Groups
 		qso_data* data_group_;
 		qso_tabbed_rigs* rig_group_;
-		qso_clock* clock_group_;
+		qso_clocks* clock_group_;
 		qso_log* info_group_;
 		// widgets
 

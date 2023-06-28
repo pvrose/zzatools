@@ -143,8 +143,7 @@ void qso_manager::create_form(int X, int Y) {
 
 	curr_x += rig_group_->w() + GAP;
 
-	clock_group_ = new qso_clock(curr_x, curr_y, 0, 0, nullptr);
-	clock_group_->create_form(curr_x, curr_y);
+	clock_group_ = new qso_clocks(curr_x, curr_y, 0, 0, nullptr);
 	curr_x += clock_group_->w() + GAP;
 
 	info_group_ = new qso_log(curr_x, curr_y, 0, 0, nullptr);
@@ -191,7 +190,6 @@ void qso_manager::save_values() {
 //	Fl_Preferences stations_settings(settings_, "Stations");
 	data_group_->save_values();
 	rig_group_->save_values();
-	clock_group_->save_values();
 }
 
 // Enable the widgets - activate the group associated with each rig handler when that
@@ -391,7 +389,7 @@ string qso_manager::get_default(stn_item_t item) {
 	}
 }
 
-// Handle 1 second timer
+// Handle 1 second timer (from clock_group_
 void qso_manager::ticker() {
 	if (!ticker_in_progress_ && !closing_) {
 		ticker_in_progress_ = true;

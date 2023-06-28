@@ -6,7 +6,7 @@ class qso_clock :
     public Fl_Group
 {
 public:
-	qso_clock(int X, int Y, int W, int H, const char* l);
+	qso_clock(int X, int Y, int W, int H, bool local);
 	~qso_clock();
 
 	// get settings
@@ -22,18 +22,10 @@ public:
 
 protected:
 
-	// Callback - 1s timer
-	static void cb_timer_clock(void* v);
-	// Callback - click on group
-	static void cb_click(Fl_Widget* w, void* v);
-
 	// Display local time rather than UTC
 	bool display_local_;
 
-	Fl_Group* g_clock_;
 	Fl_Button* bn_time_;
 	Fl_Button* bn_date_;
-	Fl_Button* bn_local_;
-
 };
 
