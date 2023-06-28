@@ -3,7 +3,7 @@
 #include "qso_log_info.h"
 #include "qso_qsl.h"
 
-#include <FL\Fl_Tabs.H>
+#include <FL/Fl_Tabs.H>
 
 class qso_log :
     public Fl_Tabs
