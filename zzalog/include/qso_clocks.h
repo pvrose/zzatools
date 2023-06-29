@@ -2,7 +2,7 @@
 
 #include "qso_clock.h"
 
-#include <FL\Fl_Tabs.H>
+#include <FL/Fl_Tabs.H>
 class qso_clocks :
     public Fl_Tabs
 {
