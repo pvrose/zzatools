@@ -10,7 +10,7 @@
 
 extern status* status_;
 extern spec_data* spec_data_;
-extern band_view* band_view_;
+//extern band_view* band_view_;
 extern tabbed_forms* tabbed_forms_;
 extern book* book_;
 
@@ -556,9 +556,9 @@ void qso_entry::cb_ip_field(Fl_Widget* w, void* v) {
 	if (field == "FREQ") {
 		double freq_MHz = atof(value.c_str());
 		double freq_kHz = freq_MHz * 1000.0;
-		if (band_view_) {
-			band_view_->update(freq_kHz);
-		}
+		//if (band_view_) {
+		//	band_view_->update(freq_kHz);
+		//}
 		prev_freq_ = freq_kHz;
 		that->qso_->item("BAND", spec_data_->band_for_freq(freq_MHz));
 	}

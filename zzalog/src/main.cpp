@@ -30,7 +30,7 @@ main.cpp - application entry point
 #include "callback.h"
 #include "drawing.h"
 #include "intl_dialog.h"
-#include "band_view.h"
+#include "band_data.h"
 #ifdef _WIN32
 #include "dxa_if.h"
 #endif
@@ -110,7 +110,7 @@ lotw_handler* lotw_handler_ = nullptr;
 qrz_handler* qrz_handler_ = nullptr;
 main_window* main_window_ = nullptr;
 intl_dialog* intl_dialog_ = nullptr;
-band_view* band_view_ = nullptr;
+band_data* band_data_ = nullptr;
 club_handler* club_handler_ = nullptr;
 wsjtx_handler* wsjtx_handler_ = nullptr;
 fllog_emul* fllog_emul_ = nullptr;
@@ -363,6 +363,10 @@ void add_data() {
 		intl_dialog_ = new intl_dialog;
 		// Don't show here - add a menu item to show it.
 	}
+	// And band plan data
+	if (!closing_) {
+		band_data_ = new band_data;
+	}
 }
 
 
@@ -397,24 +401,24 @@ void cb_error_message(status_t level, const char* message) {
 	status_->misc_status(level, message);
 }
 
-// Add the band plan window
-void add_band_view() {
-	if (!closing_) {
-		// Use frequency of selected record if the book is not empty, else use 14.1 MHz
-		double frequency;
-		if (book_->size() && book_->get_record() && book_->get_record()->item("FREQ").length()) {
-			frequency = stod(book_->get_record()->item("FREQ")) * 1000.0;
-		}
-		else {
-			frequency = 14100.0;
-		}
-		band_view_ = new band_view(frequency, 400, 100, "Band plan");
-		if (!band_view_->valid()) {
-			Fl::delete_widget(band_view_);
-			band_view_ = nullptr;
-		}
-	}
-}
+//// Add the band plan window
+//void add_band_view() {
+//	if (!closing_) {
+//		// Use frequency of selected record if the book is not empty, else use 14.1 MHz
+//		double frequency;
+//		if (book_->size() && book_->get_record() && book_->get_record()->item("FREQ").length()) {
+//			frequency = stod(book_->get_record()->item("FREQ")) * 1000.0;
+//		}
+//		else {
+//			frequency = 14100.0;
+//		}
+//		band_view_ = new band_view(frequency, 400, 100, "Band plan");
+//		if (!band_view_->valid()) {
+//			Fl::delete_widget(band_view_);
+//			band_view_ = nullptr;
+//		}
+//	}
+//}
 
 // Add the various HTML handlers
 void add_qsl_handlers() {
@@ -542,10 +546,10 @@ void tidy() {
 	delete lotw_handler_;
 	delete eqsl_handler_;
 	delete url_handler_;
-	delete band_view_;
 	delete extract_records_;
 	delete import_data_;
 	delete book_;
+	delete band_data_;
 	delete intl_dialog_;
 	// This will be used in toolbar_
 	intl_dialog_ = nullptr;

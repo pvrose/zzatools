@@ -12,6 +12,7 @@
 #include <FL/Fl_Input.H>
 #include <FL/Fl_Output.H>
 #include <FL/Fl_Float_Input.H>
+#include <FL/Fl_Box.H>
 
 using namespace std;
 
@@ -85,6 +86,7 @@ protected:
 	Fl_Button* bn_connect_;
 	Fl_Light_Button* bn_select_;
 	Fl_Group* display_grp_;
+	Fl_Box* op_summary_;
 	Fl_Float_Input* op_frequency_;
 	Fl_Output* op_mode_;
 

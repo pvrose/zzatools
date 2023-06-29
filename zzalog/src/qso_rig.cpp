@@ -3,6 +3,8 @@
 #include "serial.h"
 #include "status.h"
 #include "qso_manager.h"
+#include "band_data.h"
+#include "spec_data.h"
 
 #include <set>
 #include <string>
@@ -13,6 +15,8 @@ using namespace std;
 
 extern Fl_Preferences* settings_;
 extern status* status_;
+extern band_data* band_data_;
+extern spec_data* spec_data_;
 
 
 // Constructor
@@ -234,6 +238,14 @@ void qso_rig::create_form(int X, int Y) {
 	display_grp_ = new Fl_Group(curr_x, curr_y, 10, 10);
 	display_grp_->box(FL_NO_BOX);
 
+	op_summary_ = new Fl_Box(curr_x, curr_y, WSMEDIT + WBUTTON, HTEXT);
+	op_summary_->tooltip("Frequency summary");
+	op_summary_->box(FL_FLAT_BOX);
+	op_summary_->color(FL_BLACK);
+	op_summary_->align(FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
+
+	curr_y += op_summary_->h();
+
 	op_frequency_ = new Fl_Float_Input(curr_x, curr_y, WSMEDIT, HTEXT + 2);
 	op_frequency_->set_output();
 	op_frequency_->tooltip("Current displayed frequency");
@@ -364,11 +376,23 @@ void qso_rig::enable_widgets() {
 	}
 	// Update display values
 	if (rig_ && rig_->is_open()) {
+		op_summary_->activate();
 		op_frequency_->activate();
 		op_mode_->activate();
 		op_frequency_->color(FL_BLACK);
 		op_mode_->color(FL_BLACK);
 		double freq = rig_->get_dfrequency(true);
+		band_data::band_entry_t* entry = band_data_->get_entry(freq * 1000);
+		if (entry) {
+			char l[50];
+			snprintf(l, sizeof(l), "%s %s", spec_data_->band_for_freq(freq).c_str(), entry->mode.c_str());
+			op_summary_->copy_label(l);
+			op_summary_->labelcolor(FL_YELLOW);
+		}
+		else {
+			op_summary_->label("Out of band!");
+			op_summary_->labelcolor(FL_RED);
+		}
 		char msg[25];
 		snprintf(msg, sizeof(msg), "  %9.3f MHz", freq);
 		op_frequency_->value(msg);

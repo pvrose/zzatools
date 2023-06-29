@@ -64,7 +64,7 @@ extern intl_dialog* intl_dialog_;
 extern toolbar* toolbar_;
 extern qrz_handler* qrz_handler_;
 extern wsjtx_handler* wsjtx_handler_;
-extern band_view* band_view_;
+//extern band_view* band_view_;
 #ifdef _WIN32
 extern dxa_if* dxa_if_;
 #endif
@@ -502,7 +502,7 @@ void menu::cb_mi_windows_all(Fl_Widget* w, void* v) {
 #ifdef _WIN32
 		dxa_if_->show();
 #endif
-		band_view_->show();
+		//band_view_->show();
 		intl_dialog_->show();
 	}
 	else {
@@ -513,7 +513,7 @@ void menu::cb_mi_windows_all(Fl_Widget* w, void* v) {
 #ifdef _WIN32
 		dxa_if_->hide();
 #endif
-		band_view_->hide();
+		//band_view_->hide();
 		intl_dialog_->hide();
 	}
 	that->update_windows_items();
@@ -1808,7 +1808,7 @@ void menu::add_windows_items() {
 #ifdef _WIN32
 	insert(index, "&Windows/&DxAtlas Control", 0, cb_mi_windows, dxa_if_, FL_MENU_TOGGLE);
 #endif
-	insert(index, "&Windows/&Band View", 0, cb_mi_windows, band_view_, FL_MENU_TOGGLE);
+	//insert(index, "&Windows/&Band View", 0, cb_mi_windows, band_view_, FL_MENU_TOGGLE);
 	insert(index, "&Windows/&International Chars", 0, cb_mi_windows, intl_dialog_, FL_MENU_TOGGLE);
 }
 
@@ -1821,7 +1821,7 @@ void menu::update_windows_items() {
 #ifdef _WIN32
 	int index_dxatlas = find_index("&Windows/&DxAtlas Control");
 #endif
-	int index_band = find_index("&Windows/&Band View");
+	//int index_band = find_index("&Windows/&Band View");
 	int index_intl = find_index("&Windows/&International Chars");
 
 	if (main_window_ && index_main != -1) {
@@ -1862,14 +1862,14 @@ void menu::update_windows_items() {
 	}
 #endif
 
-	if (band_view_ && index_band != -1) {
-		if (band_view_->visible()) {
-			mode(index_band, mode(index_band) | FL_MENU_VALUE);
-		}
-		else {
-			mode(index_band, mode(index_band) & ~FL_MENU_VALUE);
-		}
-	}
+	//if (band_view_ && index_band != -1) {
+	//	if (band_view_->visible()) {
+	//		mode(index_band, mode(index_band) | FL_MENU_VALUE);
+	//	}
+	//	else {
+	//		mode(index_band, mode(index_band) & ~FL_MENU_VALUE);
+	//	}
+	//}
 
 	if (intl_dialog_ && index_intl != -1) {
 		if (intl_dialog_->visible()) {

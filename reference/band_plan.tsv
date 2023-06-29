@@ -63,7 +63,7 @@ Lower	Upper	Bandwidth	Modes	Notes
 14060				QRP (low power) Centre of Activity 
 14070	14089	0.5	CW,Dig	Narrow band modes
 14089	14099	0.5	CW,Dig	Narrow band modes - automatically controlled data stations (unattended)
-14099	14101			IBP - reserved exclusively for beacons
+14099	14101		Beacons	IBP - reserved exclusively for beacons
 14101	14112	2.7	CW,Dig,Phone	All modes - automatically controlled data stations (unattended)    
 14112	14125	2.7	CW,Phone	All modes (excluding digimodes)
 14125	14300	2.7	CW,Dig,Phone	All modes -       SSB contest preferred segment 
@@ -77,7 +77,7 @@ Lower	Upper	Bandwidth	Modes	Notes
 18086				QRP (low power) Centre of Activity. 
 18095	18105	0.5	CW,Dig	Narrow band modes
 18105	18109	0.5	CW,Dig	Narrow band modes - automatically controlled data stations (unattended)  
-18109	18111			IBP - reserved exclusively for beacons
+18109	18111		Beacons	IBP - reserved exclusively for beacons
 18111	18120	2.7	CW,Dig,Phone	All modes - automatically controlled data stations (unattended)
 18120	18168	2.7	CW,Dig,Phone	All modes
 18130				SSB QRP Centre of Activity
@@ -90,7 +90,7 @@ Lower	Upper	Bandwidth	Modes	Notes
 21090	21110	0.5	CW,Dig	Narrow band modes - automatically controlled data stations (unattended)
 21110	21120	2.7	CW,Dig	All modes (excluding SSB) - automatically controlled data stations (unattended)
 21120	21149	0.5	CW,Dig	Narrow band modes
-21149	21151			IBP - reserved exclusively for beacons
+21149	21151		Beacons	IBP - reserved exclusively for beacons
 21151	21450	2.7	CW,Dig,Phone	All modes. 
 21180				digital voice Centre of Activity
 21285				QRP Centre of Activity.   
@@ -100,7 +100,7 @@ Lower	Upper	Bandwidth	Modes	Notes
 24906				QRP (low power) Centre of Activity
 24915	24925	0.5	CW,Dig	Narrow band modes
 24925	24929	0.5	CW,Dig	Narrow band modes  - automatically controlled data stations (unattended) 
-24929	24931			IBP - reserved exclusively for beacons
+24929	24931		Beacons	IBP - reserved exclusively for beacons
 24931	24940	2.7	CW,Dig,Phone	All modes - automatically controlled data stations (unattended)
 24940	24990	2.7	CW,Dig,Phone	All modes
 24950				SSB QRP Centre of Activity
@@ -111,9 +111,9 @@ Lower	Upper	Bandwidth	Modes	Notes
 28070	28120	0.5	CW,Dig	Narrow band modes
 28120	28150	0.5	CW,Dig	Narrow band modes - automatically controlled data stations (unattended) 
 28150	28190	0.5	CW,Dig	Narrow band modes
-28190	28199			IBP - regional time shared beacons
-28199	28201			IBP - world wide time shared beacons
-28201	28225			IBP - continuous-duty beacons
+28190	28199		Beacons	IBP - regional time shared beacons
+28199	28201		Beacons	IBP - world wide time shared beacons
+28201	28225		Beacons	IBP - continuous-duty beacons
 28225	28300	2.7	CW,Dig,Phone	All modes - beacons
 28300	28320	2.7	CW,Dig,Phone	All modes - automatically controlled data stations (unattended) 
 28320	29000	2.7	CW,Dig,Phone	All modes
@@ -127,7 +127,7 @@ Lower	Upper	Bandwidth	Modes	Notes
 29280				UK Internet voice gateway - unattended
 29290				UK Internet voice gateway - unattended
 29300	29510	6	CW,Dig,Phone	Satellite links
-29510	29520			Guard channel
+29510	29520		Guard	Guard channel
 29520	29590	6	CW,Dig,Phone	All modes - FM repeater inputs (RH1-RH8)
 29600	29600	6	CW,Dig,Phone	All modes - FM calling channel
 29610	29610	6	CW,Dig,Phone	All modes - FM simplex repeater (parrot) - input and output

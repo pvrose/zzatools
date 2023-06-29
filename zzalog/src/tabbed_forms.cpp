@@ -26,7 +26,7 @@ extern dxa_if* dxa_if_;
 #endif
 extern settings* config_;
 extern bool closing_;
-extern band_view* band_view_;
+//extern band_view* band_view_;
 extern qso_manager* qso_manager_;
 
 // Constructor
@@ -130,10 +130,10 @@ void tabbed_forms::update_views(view* requester, hint_t hint, qso_num_t record_1
 #endif
 		// Update the settngs config dialog
 		if (config_) config_->update();
-		// Update band view
-		if (band_view_ && band_view_->visible()) {
-			band_view_->update(record_1);
-		}
+		//// Update band view
+		//if (band_view_ && band_view_->visible()) {
+		//	band_view_->update(record_1);
+		//}
 		// Update qso_manager - avoid recursion
 		if (qso_manager_) qso_manager_->update_qso(hint, record_1, record_2);
 	}

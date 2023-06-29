@@ -133,6 +133,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="zzalog\src\band_data.cpp" />
     <ClCompile Include="zzalog\src\page_dialog.cpp" />
     <ClCompile Include="zzalog\src\qso_buttons.cpp" />
     <ClCompile Include="zzalog\src\qso_clock.cpp" />
@@ -222,6 +223,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="packages\pthreads.2.9.1.4\build\native\include\pthread.h" />
+    <ClInclude Include="zzalog\include\band_data.h" />
     <ClInclude Include="zzalog\include\callback.h" />
     <ClInclude Include="zzalog\include\drawing.h" />
     <ClInclude Include="zzalog\include\formats.h" />

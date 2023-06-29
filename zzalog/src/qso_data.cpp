@@ -26,7 +26,6 @@ extern extract_data* extract_records_;
 extern status* status_;
 extern cty_data* cty_data_;
 extern spec_data* spec_data_;
-extern band_view* band_view_;
 extern tabbed_forms* tabbed_forms_;
 extern import_data* import_data_;
 extern book* navigation_book_;
@@ -1402,12 +1401,12 @@ void qso_data::update_rig() {
 	if (logging_state_ == QSO_PENDING) {
 		if (((qso_manager*)parent())->rig()->is_good()) {
 			g_entry_->copy_cat_to_qso();
-			if (band_view_) {
-				double freq;
-				g_entry_->qso()->item("FREQ", freq);;
-				band_view_->update(freq * 1000.0);
-				prev_freq_ = freq;
-			}
+			//if (band_view_) {
+			//	double freq;
+			//	g_entry_->qso()->item("FREQ", freq);;
+			//	band_view_->update(freq * 1000.0);
+			//	prev_freq_ = freq;
+			//}
 		}
 	}
 	enable_widgets();
