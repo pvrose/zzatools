@@ -241,19 +241,15 @@ bool rig_if::open() {
 		return false;
 
 	}
-	printf("RIG 1: Starting thread - set semaphore\n");
-	printf("RIG 1: Wanting port %s\n", hamlib_data_->port_name.c_str());
 	opening_.store(true, memory_order_seq_cst);
 	thread_ = new thread(th_run_rig, this);
 	// Lock until the rig has been opened - should wait 
-	printf("RIG 1: Waiting for semaphore to clear\n");
 	while(opening_) {
 		// Allow FLTK scheduler in
 		Fl::check();
 		this_thread::sleep_for(chrono::milliseconds(100));
 	}
 	// And immediately unlock it
-	printf("RIG 1: Semaphore clear - proceed\n");
 		
 	char msg[256];
 	if (opened_ok_) {
@@ -292,7 +288,6 @@ bool rig_if::th_open_rig() {
 		close();
 	}
 	// Get the rig interface
-	printf("RIG 2: Initialising rig %s\n", hamlib_data_->model.c_str());
 	rig_ = rig_init(hamlib_data_->model_id);
 	if (rig_ != nullptr) {
 		switch (hamlib_data_->port_type) {
@@ -309,31 +304,18 @@ bool rig_if::th_open_rig() {
 		}
 	}
 	// open rig connection over serial port
-	printf("RIG 2: Opening rig\n");
 	error_code_ = rig_open(rig_);
 
 	if (error_code_ != RIG_OK) {
 		// Not opened, tidy hamlib memory usage and mark it so.
-		printf("RIG 2: rig open failed with error %d\n", error_code_);
 		rig_cleanup(rig_);
 		rig_ = nullptr;
 		opened_ok_ = false;
 	}
 	else {
 		// Opened OK
-		printf("RIG 2: rig open OK\n");
 		opened_ok_ = true;
 	}
-	//if (opened_ok_) {
-		//// Setting callback
-		//error_code_ = rig_set_freq_callback(rig_, cb_hl_freq, (void*)this);
-		//if (error_code_ == RIG_OK) {
-			//printf("RIG: Frequency callback set\n");
-		//}
-		//else {
-			//printf("RIG: Frequency callback nor set - %s\n", error_message("").c_str());			
-		//}
-	//}
 	return opened_ok_;
 }
 
@@ -346,50 +328,39 @@ string& rig_if::rig_name() {
 
 // Thraed method
 void rig_if::th_run_rig(rig_if* that) {
-	printf("RIG 2: Accessing port %s\n", that->hamlib_data_->port_name.c_str());
 	// Open the rig
 	if (!that->th_open_rig()) {
-		printf("RIG 2: Open rig failed - clearing semaphore.\n");
 		that->opening_ = false;
 		return;
 	}
 	// run_read_ will be cleared when the rig closes or errors.
 	that->th_read_values();
 	if (that->opened_ok_) {
-		printf("RIG 2: Accessed rig - clearing semaphore.\n");
 		that->opening_ = false;
 		that->run_read_ = true;
 		while (that->run_read_) {
 			that->th_read_values();
 			this_thread::sleep_for(chrono::milliseconds(1000));
 		}
-		printf("RIG 2: Rig closed or failed - ending thread.\n");
 	} else {
-		printf("RIG 2: Rig access failed - clearing semaphore.\n");
 		that->opening_ = false;
 	}
 }
 
 void rig_if::th_read_values() {
 	// Read TX frequency
-//	printf("%s - reading TX Frequency\n", now_ms().c_str());
 	double d_temp;
 	if (opened_ok_) error_code_ = rig_get_freq(rig_, RIG_VFO_TX, &d_temp);
 	else return;
-//	printf("%s - done\n", now_ms().c_str());
 	if (error_code_ != RIG_OK) {
-		printf("RIG 2: %s\n", error_message("TX Frequency").c_str());
 		opened_ok_ = false;
 		return;
 	}
 	rig_data_.tx_frequency = d_temp;
 	// Read RX frequency
-//	printf("%s - reading RX Frequency\n", now_ms().c_str());
 	if (opened_ok_) error_code_ = rig_get_freq(rig_, RIG_VFO_CURR, &d_temp);
 	else return;
-	//	printf("%s - done\n", now_ms().c_str());
 	if (error_code_ != RIG_OK) {
-		printf("RIG 2: %s\n", error_message("RX Frequency").c_str());
 		opened_ok_ = false;
 		return;
 	}
@@ -397,12 +368,9 @@ void rig_if::th_read_values() {
 	// Read mode
 	rmode_t mode;
 	shortfreq_t bandwidth;
-//	printf("%s - reading mode/bandwidth\n", now_ms().c_str());
 	if (opened_ok_) error_code_ = rig_get_mode(rig_, RIG_VFO_CURR, &mode, &bandwidth);
 	else return;
-	//	printf("%s - done\n", now_ms().c_str());
 	if (error_code_ != RIG_OK) {
-		printf("RIG 2: %s\n", error_message("Mode").c_str());
 		opened_ok_ = false;
 		return;
 	}
@@ -433,12 +401,9 @@ void rig_if::th_read_values() {
 	}
 	// Read drive level
 	value_t drive_level;
-//	printf("%s - reading Drive level\n", now_ms().c_str());
 	if (opened_ok_) error_code_ = rig_get_level(rig_, RIG_VFO_CURR, RIG_LEVEL_RFPOWER, &drive_level);
 	else return;
-	//	printf("%s - done\n", now_ms().c_str());
 	if (error_code_ != RIG_OK) {
-		printf("RIG 2: %s\n", error_message("Drive").c_str());
 		opened_ok_ = false;
 		return;
 	}
@@ -446,12 +411,9 @@ void rig_if::th_read_values() {
 	// Split
 	vfo_t TxVFO;
 	split_t split;
-//	printf("%s - reading Split\n", now_ms().c_str());
 	if (opened_ok_) error_code_ = rig_get_split_vfo(rig_, RIG_VFO_CURR, &split, &TxVFO);
 	else return;
-	//	printf("%s - done\n", now_ms().c_str());
 	if (error_code_ != RIG_OK) {
-		printf("RIG 2: %s\n", error_message("Split").c_str());
 		opened_ok_ = false;
 		return;
 	}
@@ -459,24 +421,18 @@ void rig_if::th_read_values() {
 	// PTT value
 	ptt_t ptt;
 	bool current_ptt = rig_data_.ptt;
-//	printf("%s - reading PTT\n", now_ms().c_str());
 	if (opened_ok_) error_code_ = rig_get_ptt(rig_, RIG_VFO_CURR, &ptt);
 	else return;
-	//	printf("%s - done\n", now_ms().c_str());
 	if (error_code_ != RIG_OK) {
-		printf("RIG 2: %s\n", error_message("PTT").c_str());
 		opened_ok_ = false;
 		return;
 	}
 	rig_data_.ptt = ptt == ptt_t::RIG_PTT_ON;
 	// S-meter - set to max value during RX and last RX value during TX
 	value_t meter_value;
-//	printf("%s - reading S-meter\n", now_ms().c_str());
 	if (opened_ok_) error_code_ = rig_get_level(rig_, RIG_VFO_CURR, RIG_LEVEL_STRENGTH, &meter_value);
 	else return;
-	//	printf("%s - done\n", now_ms().c_str());
 	if (error_code_ != RIG_OK) {
-		printf("RIG 2: %s\n", error_message("S meter").c_str());
 		opened_ok_ = false;
 		return;
 	}
@@ -492,12 +448,9 @@ void rig_if::th_read_values() {
 	}
 	rig_data_.s_meter = meter_value.i;
 	// Power meter
-//	printf("%s - reading Power meter\n", now_ms().c_str());
 	if (opened_ok_) error_code_ = rig_get_level(rig_, RIG_VFO_CURR, RIG_LEVEL_RFPOWER_METER_WATTS, &meter_value);
 	else return;
-	//	printf("%s - done\n", now_ms().c_str());
 	if (error_code_ != RIG_OK) {
-		printf("RIG 2: %s\n", error_message("Power meter").c_str());
 		opened_ok_ = false;
 		return;
 	}
@@ -577,7 +530,6 @@ const char* rig_if::error_text(rig_errcode_e code) {
 
 int rig_if::cb_hl_freq(RIG* rig, vfo_t vfo, freq_t freq, rig_ptr_t data) {
 	rig_if* that = (rig_if*)data;
-	printf("RIG: Received CB: %g (VFO %c)\n", freq, vfo == RIG_VFO_A ? 'A' : 'B');
 	return RIG_OK;
 }
 
