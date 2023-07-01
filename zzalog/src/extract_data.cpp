@@ -852,3 +852,7 @@ bool extract_data::upload_in_progress() {
 		return false;
 	}
 }
+
+extract_data::extract_mode_t extract_data::use_mode() {
+	return use_mode_;
+}

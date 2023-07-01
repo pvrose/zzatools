@@ -57,6 +57,8 @@ using namespace std;
 		void correct_record_order();
 		// Upload in progress
 		bool upload_in_progress();
+		// Return extract mode
+		extract_mode_t use_mode();
 
 		// return the real record number
 		virtual qso_num_t record_number(item_num_t item);
