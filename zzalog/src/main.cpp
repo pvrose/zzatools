@@ -62,6 +62,7 @@ main.cpp - application entry point
 #include <FL/Fl_Preferences.H>
 #include <FL/Fl_PNG_Image.H>
 #include <FL/fl_draw.H>
+#include <FL/Fl_Help_Dialog.H>
 // included to allow windows specifics to be called
 #include <FL/platform.H>
 
@@ -115,6 +116,7 @@ club_handler* club_handler_ = nullptr;
 wsjtx_handler* wsjtx_handler_ = nullptr;
 fllog_emul* fllog_emul_ = nullptr;
 qso_manager* qso_manager_ = nullptr;
+Fl_Help_Dialog* help_dialog_ = nullptr;
 
 #ifdef _WIN32
 dxa_if* dxa_if_ = nullptr;

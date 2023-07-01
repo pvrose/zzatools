@@ -15,11 +15,7 @@
 #include <thread>
 #include <atomic>
 
-#include <FL/Fl_Help_Dialog.H>
-
 using namespace std;
-
-
 
 	// eQSL throttling - 10s
 	const double EQSL_THROTTLE = 10.0;
@@ -35,7 +31,8 @@ using namespace std;
 			ER_SKIPPED,    // Request skipped
 			ER_THROTTLED,  // Request throttled by eQSL
 			ER_FAILED,     // Request failed
-			ER_HTML_ERR    // HTML error
+			ER_HTML_ERR,   // HTML error
+			ER_DUPLICATE   // Duplicate request
 		};
 		// Data required to repeat throttled requests
 		struct request_t {
@@ -75,14 +72,17 @@ using namespace std;
 		};
 		// Upload response
 		struct upload_response_t {
-			bool successful;
+			response_t status;
+			string error_message;
+			string html;
 			record* qso;
-			upload_response_t(bool b, record* r) :
-				successful(b),
-				qso(r)
-			{}
+			upload_response_t() {
+				status = ER_OK;
+				error_message = "";
+				html = "";
+				qso = nullptr;
+			}
 		};
-
 	public:
 		eqsl_handler();
 		~eqsl_handler();
@@ -136,7 +136,7 @@ using namespace std;
 		static void thread_run(eqsl_handler* that);
 
 		// main-side upload complete
-		bool upload_done(upload_response_t response);
+		bool upload_done(upload_response_t* response);
 
 	protected:
 		// The throttled request queue
@@ -145,8 +145,6 @@ using namespace std;
 		dequeue_param_t dequeue_parameter_;
 		// Request queue is allowed to empty
 		bool empty_queue_enable_;
-		// Help dialog
-		Fl_Help_Dialog* help_dialog_;
 		// Queue enabled for debug
 		bool debug_enabled_;
 		// Username
@@ -155,12 +153,16 @@ using namespace std;
 		string password_;
 		// Upload thread
 		thread* th_upload_;
+		// Enable for threads
+		atomic<bool> run_threads_;
 		// interface busy
 		atomic<bool> upload_if_busy_;
 		// interface data
 		atomic<record*> upload_record_;
 		// Upload queue
-		queue<qso_num_t> upload_queue_;
+		queue<record*> upload_queue_;
+		// Upload response queue
+		atomic<upload_response_t*> upload_response_;
 
 	};
 #endif
