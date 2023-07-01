@@ -12,6 +12,8 @@
 #include <sstream>
 #include <vector>
 #include <set>
+#include <thread>
+#include <atomic>
 
 #include <FL/Fl_Help_Dialog.H>
 
@@ -71,6 +73,15 @@ using namespace std;
 			{
 			}
 		};
+		// Upload response
+		struct upload_response_t {
+			bool successful;
+			record* qso;
+			upload_response_t(bool b, record* r) :
+				successful(b),
+				qso(r)
+			{}
+		};
 
 	public:
 		eqsl_handler();
@@ -90,7 +101,7 @@ using namespace std;
 		string card_filename_l(record* record);
 		// Set/Clear debug_enabled_
 		void debug_enable(bool value);
-		// Upload single record
+		// Enqueue single record
 		bool upload_single_qso(qso_num_t record_num);
 
 	protected:
@@ -117,6 +128,15 @@ using namespace std;
 		void form_fields(vector<url_handler::field_pair>&);
 		// parse bad record
 		map<string, string> parse_warning(string text);
+		// thtread callback
+		static void cb_upload_done(void* v);
+		// thtead-side upload QSO
+		bool th_upload_qso(record* qso);
+		// thread runner
+		static void thread_run(eqsl_handler* that);
+
+		// main-side upload complete
+		bool upload_done(upload_response_t response);
 
 	protected:
 		// The throttled request queue
@@ -133,5 +153,14 @@ using namespace std;
 		string username_;
 		// Password
 		string password_;
+		// Upload thread
+		thread* th_upload_;
+		// interface busy
+		atomic<bool> upload_if_busy_;
+		// interface data
+		atomic<record*> upload_record_;
+		// Upload queue
+		queue<qso_num_t> upload_queue_;
+
 	};
 #endif

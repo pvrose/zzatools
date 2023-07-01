@@ -936,33 +936,6 @@ bool eqsl_handler::upload_single_qso(qso_num_t record_num) {
 			status_->misc_status(ST_WARNING, message);
 			username = station;
 		}
-		// URL to upload a single QSO (ref eQSL.cc)
-		char url[] = "http://www.eqsl.cc/qslcard/ImportADIF.cfm?ADIFData=";
-		char header_format[2048];
-		char header_data[2048];
-		record* header = book_->header();
-		bool passed = true;
-		if (header != nullptr) {
-			// Add user and password to URL with header comment...
-			strcpy(header_format, "Upload %s %s <EQSL_USER:%d>%s <EQSL_PSWD:%d>%s <EOH>");
-			sprintf(header_data, header_format,
-				header->item("ADIF_VER").c_str(),
-				header->item("PROGRAMID").c_str(),
-				username.length(),
-				username.c_str(),
-				password.length(),
-				password.c_str());
-		}
-		else {
-			// ...or without header comment
-			strcpy(header_format, "Upload <EQSL_USER:%d>%s <EQSL_PSWD:%d>%s <EOH>");
-			sprintf(header_data, header_format,
-				username.length(),
-				username.c_str(),
-				password.length(),
-				password.c_str());
-		}
-		bool upload_failed = false;
 		// Count of records successfully uploaded
 		int num_successful = 0;
 		status = ER_OK;
@@ -975,21 +948,62 @@ bool eqsl_handler::upload_single_qso(qso_num_t record_num) {
 		else {
 			this_message = this_record->item_merge(qsl_message);
 		}
-		bool update = false;
+		this_record->item("QSLMSG", this_message);
 		// Only upload valid records or reply to SWL reports
 		if (this_record->is_valid() || this_record->item("SWL") == "Y") {
+			// Now send to upload thread to process
+			while (upload_if_busy_) {
+				// Allow everyone else a say
+				Fl::check();
+				this_thread::yield();
+			}
+			upload_record_ = this_record;
+			upload_if_busy_ = true;
+		}
+	}
+	return upload_qso;
+}
+
+bool eqsl_handler::th_upload_qso(record* this_record) {
+		bool update = false;
 			// Generate URL parameters for QSL
 			char qsl_data[2048];
-			sprintf(qsl_data, "%s %s %s %s %s %s <QSLMSG:%d>%s <EOR>",
+			sprintf(qsl_data, "%s %s %s %s %s %s %s <EOR>",
 				adi_writer::item_to_adif(this_record, "CALL").c_str(),
 				adi_writer::item_to_adif(this_record, "QSO_DATE").c_str(),
 				adi_writer::item_to_adif(this_record, "TIME_ON").c_str(),
 				adi_writer::item_to_adif(this_record, "BAND").c_str(),
 				adi_writer::item_to_adif(this_record, "MODE").c_str(),
 				adi_writer::item_to_adif(this_record, "RST_SENT").c_str(),
-				this_message.length(),
-				this_message.c_str()
+				adi_writer::item_to_adif(this_record, "QSLMSG").c_str()
 			);
+			// URL to upload a single QSO (ref eQSL.cc)
+			char url[] = "http://www.eqsl.cc/qslcard/ImportADIF.cfm?ADIFData=";
+			char header_format[2048];
+			char header_data[2048];
+			record* header = book_->header();
+			bool passed = true;
+			if (header != nullptr) {
+				// Add user and password to URL with header comment...
+				strcpy(header_format, "Upload %s %s <EQSL_USER:%d>%s <EQSL_PSWD:%d>%s <EOH>");
+				sprintf(header_data, header_format,
+					header->item("ADIF_VER").c_str(),
+					header->item("PROGRAMID").c_str(),
+					username.length(),
+					username.c_str(),
+					password.length(),
+					password.c_str());
+			}
+			else {
+				// ...or without header comment
+				strcpy(header_format, "Upload <EQSL_USER:%d>%s <EQSL_PSWD:%d>%s <EOH>");
+				sprintf(header_data, header_format,
+					username.length(),
+					username.c_str(),
+					password.length(),
+					password.c_str());
+			}
+			bool upload_failed = false;
 			// Concatenate components of full URL
 			string full_url = url + escape_url(string(header_data) + string(qsl_data));
 			stringstream response;
