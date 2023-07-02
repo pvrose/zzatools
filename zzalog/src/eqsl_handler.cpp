@@ -1029,6 +1029,7 @@ bool eqsl_handler::th_upload_qso(record* this_record) {
 	// Send URL with QSO details and download response
 	if (url_handler_->read_url(full_url, &resp)) {
 		// Successfully downloaded
+		printf("THREAD: eQSL responded with response - started parsing\n");
 		string warning_text = "";
 		string text_line;
 		bool valid_response = false;
@@ -1088,9 +1089,11 @@ bool eqsl_handler::th_upload_qso(record* this_record) {
 			response->status = ER_FAILED;
 
 		}
+		printf("THREAD: Received %s\n", response->error_message.c_str());
 	}
 	else {
 		response->status = ER_HTML_ERR;
+		printf("THREAD: Bad HTML received\n");
 	}
 	//// Stopped  editing record
 	//if (update) {
@@ -1100,6 +1103,7 @@ bool eqsl_handler::th_upload_qso(record* this_record) {
 	response->html = resp.str();
 	// Send response back to 
 	upload_response_ = response;
+	printf("THREAD: Calling thread callback\n");
 	Fl::awake(cb_upload_done, (void*)this);
 
 	return true;
@@ -1107,6 +1111,7 @@ bool eqsl_handler::th_upload_qso(record* this_record) {
 
 // Handle call back 
 void eqsl_handler::cb_upload_done(void* v) {
+	printf("MAIN: Entered thread callback handler\n");
 	eqsl_handler* that = (eqsl_handler*)v;
 	that->upload_done(that->upload_response_);
 }
