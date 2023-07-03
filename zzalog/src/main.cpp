@@ -603,6 +603,8 @@ int main(int argc, char** argv)
 	// Set default font size for all widgets
 	FL_NORMAL_SIZE = 10;
 	fl_contrast_mode(FL_CONTRAST_CIELAB);
+	// Allow the main thread to respond to Fl::awake() requests
+	Fl::lock();
 	// Set default Fil Chooser on non-windows
 #ifndef _WIN32
 	Fl::option(Fl::OPTION_FNFC_USES_ZENITY, true);
