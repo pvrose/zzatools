@@ -39,6 +39,7 @@ eqsl_handler::eqsl_handler()
 	, debug_enabled_(true)
 {
 	run_threads_ = true;
+	printf("MAIN: Starting thread\n");
 	th_upload_ = new thread(thread_run, this);
 }
 
@@ -1105,6 +1106,7 @@ bool eqsl_handler::th_upload_qso(record* this_record) {
 	upload_response_ = response;
 	printf("THREAD: Calling thread callback\n");
 	Fl::awake(cb_upload_done, (void*)this);
+	this_thread::yield();
 
 	return true;
 }
@@ -1168,6 +1170,7 @@ bool eqsl_handler::upload_done(upload_response_t* response) {
 }
 
 void eqsl_handler::thread_run(eqsl_handler* that) {
+	printf("THREAD: Thread started\n");
 	while (that->run_threads_) {
 		while (!that->upload_if_busy_ && that->run_threads_) {
 			if (!that->upload_queue_.empty()) {
@@ -1178,7 +1181,6 @@ void eqsl_handler::thread_run(eqsl_handler* that) {
 			}
 			this_thread::yield();
 		}
-		that->upload_queue_.push(that->upload_record_);
 		that->upload_if_busy_ = false;
 	}
 }
