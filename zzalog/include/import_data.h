@@ -36,6 +36,7 @@ using namespace std;
 			READ_AUTO,       // Data is being read - we can interrupt the process
 			DATAGRAM,        // Book contains data received from WSJT-X datagram
 			CLIPBOARD,       // Book is being imported from clipboard
+			SINGLE_ADIF,     // Import a single ADIF
 		};
 
 	public:
@@ -75,6 +76,8 @@ using namespace std;
 		int number_update_files();
 		// Load from a data stream
 		void load_stream(stringstream& adif, update_mode_t mode);
+		// Load record
+		void load_record(record* qso, update_mode_t mode = SINGLE_ADIF);
 		// Import process is auto-update or timer set for one
 		bool is_auto_update();
 

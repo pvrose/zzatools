@@ -188,6 +188,20 @@ void qso_entry::enable_widgets() {
 		misc_->activate();
 		misc_->enable_widgets();
 		break;
+	case qso_data::MANUAL_ENTRY:
+		for (int ix = 0; ix <= number_fields_in_use_ && ix < NUMBER_TOTAL; ix++) {
+			if (ch_field_[ix])
+				if (ix < number_locked_ + NUMBER_FIXED) ch_field_[ix]->deactivate();
+				else ch_field_[ix]->activate();
+			ip_field_[ix]->activate();
+		}
+		for (int ix = number_fields_in_use_ + 1; ix < NUMBER_TOTAL; ix++) {
+			ch_field_[ix]->deactivate();
+			ip_field_[ix]->deactivate();
+		}
+		ip_notes_->activate();
+		misc_->deactivate();
+		break;
 	case qso_data::QSO_EDIT:
 	case qso_data::NET_EDIT:
 		for (int ix = 0; ix <= number_fields_in_use_ && ix < NUMBER_TOTAL; ix++) {
@@ -359,6 +373,17 @@ void qso_entry::copy_clock_to_qso() {
 			break;
 		}
 		}
+	}
+}
+
+// Copy default values to QSO
+void qso_entry::copy_default_to_qso() {
+	if (qso_) {
+		record* latest = book_->get_latest();
+		qso_->item("STATION_CALLSIGN", latest->item("STATION_CALLSIGN"));
+		qso_->item("APP_ZZA_QTH", latest->item("APP_ZZA_QTH"));
+		qso_->item("MY_RIG", latest->item("MY_RIG"));
+		qso_->item("MY_ANTENNA", latest->item("MY_ANTENNA"));
 	}
 }
 
@@ -585,10 +610,12 @@ void qso_entry::cb_ip_field(Fl_Widget* w, void* v) {
 		((qso_manager*)that->qso_data_->parent())->change_rig(value);
 	}
 	else if (field == "QSO_DATE" || field == "TIME_ON") {
-		// Reposition QSO in book
-		item_num_t item = book_->item_number(that->qso_number_);
-		item = book_->correct_record_position(item);
-		that->qso_number_ = book_->record_number(item);
+		if (that->qso_number_ != -1) {
+			// Reposition QSO in book
+			item_num_t item = book_->item_number(that->qso_number_);
+			item = book_->correct_record_position(item);
+			that->qso_number_ = book_->record_number(item);
+		}
 	}
 	else if (field == "CALL") {
 		// Remove any dependent fields that may be left over from previous edits

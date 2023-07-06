@@ -86,6 +86,8 @@ public:
 	void copy_cat_to_qso();
 	// Copy clock to QSO
 	void copy_clock_to_qso();
+	// Copy default value to QSO
+	void copy_default_to_qso();
 	// Initialise fields
 	void initialise_field_map();
 	// Get defined fields

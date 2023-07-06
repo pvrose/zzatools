@@ -873,6 +873,13 @@ bool import_data::load_data(string filename, update_mode_t mode) {
 	return result;
 }
 
+// Import a single record
+void import_data::load_record(record* qso, update_mode_t mode) {
+	update_mode_ = mode;
+	append_record(qso);
+	merge_data();
+}
+
 // Process LotW header - merges
 void import_data::process_lotw_header() {
 	if (header()->item("PROGRAMID") != "LoTW") {

@@ -39,6 +39,7 @@ public:
 		QUIT_QSO,
 		SAVE_QSO,
 		SAVE_EDIT,
+		SAVE_EXIT,
 		WORKED_B4,
 		PARSE,
 		NAV_FIRST,
@@ -66,6 +67,10 @@ public:
 		CANCEL_MODEM,
 		CANCEL_PEEK,
 		EDIT_PEEK,
+		ENTER_QUERY,
+		EXEC_QUERY,
+		CANCEL_QUERY,
+		IMPORT_QUERY,
 	};
 
 
@@ -131,6 +136,14 @@ public:
 	static void cb_bn_cancel_peek(Fl_Widget* w, void* v);
 	// Edit peeked QSO
 	static void cb_bn_edit_peek(Fl_Widget* w, void* v);
+	// Enter query data
+	static void cb_bn_query_entry(Fl_Widget* w, void* v);
+	// Execute query
+	static void cb_bn_execute_query(Fl_Widget* w, void* v);
+	// Cancel query
+	static void cb_bn_cancel_query(Fl_Widget* w, void* v);
+	// Import query
+	static void cb_bn_import_query(Fl_Widget* w, void* v);
 
 
 protected:
@@ -142,7 +155,7 @@ protected:
 	//static map<qso_data::logging_state_t, list<qso_buttons::button_type> > button_map_;
 	//static map<button_type, button_action> action_map_;
 	// Number of buttons
-	static const int MAX_ACTIONS = 10;
+	static const int MAX_ACTIONS = 11;
 
 	// parent
 	qso_data* qso_data_;

@@ -735,6 +735,30 @@ void extract_data::extract_call(string callsign) {
 
 }
 
+// Extract all records for specified field
+void extract_data::extract_field(string field_name, string value, bool and_search) {
+	// Now check that they are all for the current station
+	string station = qso_manager_->get_default(qso_manager::CALLSIGN);
+	// Extract those records where CALL matches callsign 
+	search_criteria_t	new_criteria = {
+		/*search_cond_t condition*/ XC_FIELD,
+		/*search_comp_t comparator*/ XP_EQ,
+		/*bool by_dates*/ false,
+		/*string from_date*/"",
+		/*string to_date;*/"",
+		/*string band;*/ "Any",
+		/*string mode;*/ "Any",
+		/*bool confirmed_eqsl;*/ false,
+		/*bool confirmed_lotw;*/ false,
+		/*bool confirmed_card;*/ false,
+		/*search_combi_t combi_mode;*/ and_search ? XM_AND : XM_NEW,
+		/*string field_name; */ field_name,
+		/*string pattern;*/ value,
+		/*string my_call;*/ station
+	};
+	criteria(new_criteria, SEARCH);
+}
+
 // Add the record to the extract list
 void extract_data::add_record(qso_num_t record_num) {
 	record* record = book_->get_record(record_num, false);

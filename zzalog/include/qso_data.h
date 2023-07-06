@@ -48,6 +48,7 @@ public:
 		NET_ADDING,      // Adding a new QSO to the started net.
 		SWITCHING,       // Switching state - used to ignore stuff
 		QSO_MODEM,       // Recording QSOs from a modem
+		MANUAL_ENTRY,    // Allow the definition of a record to query
 	};
 
 	enum dupe_flags : int {
@@ -151,6 +152,8 @@ public:
 	void action_add_query();
 	// Action reject query
 	void action_reject_query();
+	// Action reject manual query
+	void action_reject_manual();
 	// Action merge query
 	void action_merge_query();
 	// Action find match
@@ -193,7 +196,17 @@ public:
 	void action_cancel_peek();
 	// Edit peeked QSO
 	void action_edit_peek();
+	// Create a query entry
+	void action_query_entry();
+	// Execute the query
+	void action_exec_query();
+	// Cancel the query
+	void action_cancel_query();
+	// Import the query
+	void action_import_query();
 
+	// Edit - saved logging state
+	logging_state_t edit_return_state_;
 
 protected:
 	// Callbacks
@@ -238,6 +251,8 @@ protected:
 	qso_net_entry* g_net_entry_;
 	// Peek entry group
 	qso_entry* g_peek_;
+	// Query entry group
+	qso_entry* g_qy_entry_;
 	// Button group
 	qso_buttons* g_buttons_;
 	// Group for freq/power/mode

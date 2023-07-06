@@ -367,7 +367,7 @@ void qso_manager::update_import_qso(record* import_qso) {
 string qso_manager::get_default(stn_item_t item) {
 	record* source = data_group_->current_qso();
 	// If there isn't a default QSO the use the latest one
-	if (source == nullptr) {
+	if (source == nullptr || source->size() == 0) {
 		source = book_->get_latest();
 	}
 	if (source) {

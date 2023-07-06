@@ -104,6 +104,13 @@ void qso_data::create_form(int X, int Y) {
 	g_peek_->labelcolor(FL_DARK_YELLOW);
 	max_x = max(max_x, g_peek_->x() + g_peek_->w());
 
+	g_qy_entry_ = new qso_entry(curr_x, curr_y, 10, 10);
+	g_qy_entry_->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
+	g_qy_entry_->labelfont(FL_BOLD);
+	g_qy_entry_->labelsize(FL_NORMAL_SIZE + 2);
+	g_qy_entry_->labelcolor(FL_DARK_MAGENTA);
+	max_x = max(max_x, g_qy_entry_->x() + g_qy_entry_->w());
+
 	curr_y = max(g_entry_->y() + g_entry_->h(), g_query_->y() + g_query_->h());
 	curr_y = max(curr_y, g_net_entry_->y() + g_net_entry_->h());
 	curr_y += GAP;
@@ -139,6 +146,7 @@ void qso_data::enable_widgets() {
 			g_net_entry_->hide();
 			g_query_->hide();
 			g_peek_->hide();
+			g_qy_entry_->hide();
 			break;
 		case QSO_PENDING:
 			g_entry_->label("QSO Entry - prepared for real-time logging.");
@@ -148,6 +156,7 @@ void qso_data::enable_widgets() {
 			g_net_entry_->hide();
 			g_query_->hide();
 			g_peek_->hide();
+			g_qy_entry_->hide();
 			break;
 		case QSO_STARTED:
 			snprintf(l, sizeof(l), "QSO Entry - %s - logging new contact", current_qso()->item("CALL").c_str());
@@ -158,6 +167,7 @@ void qso_data::enable_widgets() {
 			g_net_entry_->hide();
 			g_query_->hide();
 			g_peek_->hide();
+			g_qy_entry_->hide();
 			break;
 		case QSO_EDIT:
 			snprintf(l, sizeof(l), "QSO Entry - %s - editing existing contact", current_qso()->item("CALL").c_str());
@@ -168,6 +178,7 @@ void qso_data::enable_widgets() {
 			g_net_entry_->hide();
 			g_query_->hide();
 			g_peek_->hide();
+			g_qy_entry_->hide();
 			break;
 		case QSO_BROWSE:
 			g_entry_->hide();
@@ -177,6 +188,7 @@ void qso_data::enable_widgets() {
 			g_query_->enable_widgets();
 			g_net_entry_->hide();
 			g_peek_->hide();
+			g_qy_entry_->hide();
 			break;
 		case QUERY_DUPE:
 		case QUERY_MATCH:
@@ -187,7 +199,7 @@ void qso_data::enable_widgets() {
 			g_query_->enable_widgets();
 			g_net_entry_->hide();
 			g_peek_->hide();
-			break;
+			g_qy_entry_->hide();
 		case QUERY_NEW:
 			g_entry_->hide();
 			snprintf(l, sizeof(l), "QSO Query - %s - %s", g_query_->query_qso()->item("CALL").c_str(), g_query_->query_message().c_str());
@@ -196,6 +208,7 @@ void qso_data::enable_widgets() {
 			g_query_->enable_widgets();
 			g_net_entry_->hide();
 			g_peek_->hide();
+			g_qy_entry_->hide();
 			break;
 		case NET_STARTED:
 			g_entry_->hide();
@@ -204,6 +217,7 @@ void qso_data::enable_widgets() {
 			g_net_entry_->show();
 			g_net_entry_->enable_widgets();
 			g_peek_->hide();
+			g_qy_entry_->hide();
 			break;
 		case NET_EDIT:
 			g_entry_->hide();
@@ -212,6 +226,7 @@ void qso_data::enable_widgets() {
 			g_net_entry_->show();
 			g_net_entry_->enable_widgets();
 			g_peek_->hide();
+			g_qy_entry_->hide();
 			break;
 		case QSO_MODEM:
 			snprintf(l, sizeof(l), "QSO Entry - %s - record received from modem app", current_qso()->item("CALL").c_str());
@@ -221,6 +236,7 @@ void qso_data::enable_widgets() {
 			g_net_entry_->hide();
 			g_query_->hide();
 			g_peek_->hide();
+			g_qy_entry_->hide();
 			break;
 		case QSO_PEEK:
 		case QSO_PEEK_ED:
@@ -231,6 +247,15 @@ void qso_data::enable_widgets() {
 			g_peek_->copy_label(l);
 			g_peek_->show();
 			g_peek_->enable_widgets();
+			g_qy_entry_->hide();
+			break;
+		case MANUAL_ENTRY:
+			g_entry_->hide();
+			g_query_->hide();
+			g_peek_->hide();
+			g_qy_entry_->show();
+			g_qy_entry_->label("Enter QSO details for search");
+			g_qy_entry_->enable_widgets();
 			break;
 		}
 		g_buttons_->enable_widgets();
@@ -351,6 +376,7 @@ void qso_data::update_query(logging_state_t query, qso_num_t match_num, qso_num_
 	case QSO_PENDING:
 	case QSO_INACTIVE:
 	case QUERY_NEW:
+	case MANUAL_ENTRY:
 		action_query(query, match_num, query_num);
 		break;
 	default:
@@ -403,8 +429,8 @@ void qso_data::save_values() {
 // Initialise fields from format definitions
 void qso_data::initialise_fields(qso_entry* entry) {
 	string preset_fields;
-	bool lock_preset;
-	bool new_fields;
+	bool lock_preset = false;
+	bool new_fields = false;
 	switch (g_contest_->mode()) {
 	case qso_contest::NO_CONTEST:
 	case qso_contest::PAUSED:
@@ -490,6 +516,9 @@ void qso_data::action_new_qso(record* qso, qso_init_t mode) {
 	case QSO_PEEK:
 	case QSO_PEEK_ED:
 		qe = g_peek_;
+		break;
+	case MANUAL_ENTRY:
+		qe = g_qy_entry_;
 		break;
 	default:
 		qe = g_entry_;
@@ -712,6 +741,7 @@ void qso_data::action_deactivate() {
 void qso_data::action_edit() {
 	// Save a copy of the current record
 	qso_num_t qso_number = get_default_number();
+	edit_return_state_ = logging_state_;
 	logging_state_ = QSO_EDIT;
 	g_entry_->qso(qso_number);
 	g_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
@@ -764,7 +794,7 @@ void qso_data::action_navigate(int target) {
 		break;
 	}
 	// We should now be inactive - navigate to new QSO
-	book_->navigate((navigate_t)target);
+	navigation_book_->navigate((navigate_t)target);
 	// And restore state
 	switch (saved_state) {
 	case QSO_EDIT:
@@ -868,6 +898,13 @@ void qso_data::action_reject_query() {
 	import_data_->update_book();
 }
 
+// Action reject manual query - do nothing
+void qso_data::action_reject_manual() {
+	g_query_->clear_query();
+	logging_state_ = QSO_INACTIVE;
+	enable_widgets();
+}
+
 // Action merge query
 void qso_data::action_merge_query() {
 	import_data_->merge_update();
@@ -922,12 +959,12 @@ void qso_data::action_save_merge() {
 	qrz_handler_->merge_done();
 }
 
-// ACtion look in all.txt
+// ACtion look in ALL.TXT
 void qso_data::action_look_all_txt() {
 	Fl_Preferences datapath_settings(settings_, "Datapath");
 	char* temp;
 	datapath_settings.get("WSJT-X", temp, "");
-	string filename = string(temp) + "/all.txt";
+	string filename = string(temp) + "/ALL.TXT";
 	ifstream* all_file = new ifstream(filename.c_str());
 	// This will take a while so display the timer cursor
 	fl_cursor(FL_CURSOR_WAIT);
@@ -936,7 +973,7 @@ void qso_data::action_look_all_txt() {
 	all_file->seekg(0, ios::end);
 	streampos endpos = all_file->tellg();
 	long file_size = (long)(endpos - startpos);
-	status_->misc_status(ST_NOTE, "LOG: Starting to parse all.txt");
+	status_->misc_status(ST_NOTE, "LOG: Starting to parse ALL.TXT");
 	status_->progress(file_size, OT_RECORD, "Looking for queried call in WSJT-X data", "bytes");
 	// reposition back to beginning
 	all_file->seekg(0, ios::beg);
@@ -1360,11 +1397,68 @@ void qso_data::action_edit_peek() {
 	}
 	// Save a copy of the current record
 	if (!existing_entry) {
+		edit_return_state_ = logging_state_;
 		logging_state_ = QSO_EDIT;
 		g_entry_->qso(g_peek_->qso_number());
 		g_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
 	}
 	enable_widgets();
+}
+
+// Create a query entry
+void qso_data::action_query_entry() {
+	g_qy_entry_->qso(-1);
+	logging_state_ = MANUAL_ENTRY;
+	g_qy_entry_->copy_default_to_qso();
+	g_qy_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
+	enable_widgets();
+}
+
+// Execute the query
+void qso_data::action_exec_query() {
+	record* qso = g_qy_entry_->qso();
+	extract_records_->clear_criteria();
+	qso->update_band();
+	// First search callsign
+	if (qso->item("CALL").length()) {
+		extract_records_->extract_field("CALL", qso->item("CALL"), false);
+	}
+	if (qso->item("BAND").length()) {
+		extract_records_->extract_field("BAND", qso->item("BAND"), true);
+	}
+	if (qso->item("MODE").length()) {
+		extract_records_->extract_field("MODE", qso->item("MODE"), true);
+	}
+	char msg[128];
+	if (extract_records_->size()) {
+		snprintf(msg, sizeof(msg), "DASH: %d matching records found", extract_records_->size());
+		status_->misc_status(ST_NOTE, msg);
+		edit_return_state_ = logging_state_;
+		logging_state_ = QSO_EDIT;
+		// Display the first record
+		g_entry_->qso(extract_records_->record_number(0));
+		g_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
+		enable_widgets();
+	}
+	else {
+		snprintf(msg, sizeof(msg), "DASH: No matching records found - try import");
+		status_->misc_status(ST_ERROR, msg);
+		enable_widgets();
+	}
+}
+
+// Abandon the query
+void qso_data::action_cancel_query() {
+	g_qy_entry_->delete_qso();
+	logging_state_ = QSO_INACTIVE;
+	enable_widgets();
+}
+
+// Import the query
+void qso_data::action_import_query() {
+	import_data_->stop_update(false);
+	while (!import_data_->update_complete()) Fl::check();
+	import_data_->load_record(g_qy_entry_->qso());
 }
 
 // Dummy QSO
@@ -1498,6 +1592,8 @@ record* qso_data::current_qso() {
 	case QSO_PEEK:
 	case QSO_PEEK_ED:
 		return g_peek_->qso();
+	case MANUAL_ENTRY:
+		return g_qy_entry_->qso();
 	default:
 		return nullptr;
 	}

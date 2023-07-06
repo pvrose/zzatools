@@ -53,6 +53,8 @@ using namespace std;
 		void sort_records(string field_name, bool reverse);
 		// Special extract (NO_NAME, NO_QTH, LOCATOR_4)
 		void extract_special(extract_mode_t reason);
+		// Extract field only
+		void extract_field(string field_name, string value, bool and_search);
 		// Correct record order
 		void correct_record_order();
 		// Upload in progress
