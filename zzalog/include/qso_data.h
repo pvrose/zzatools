@@ -109,6 +109,8 @@ public:
 	string get_defined_fields();
 	// Current QSO
 	record* current_qso();
+	// Current QSO number
+	qso_num_t current_number();
 	//// Query QSO
 	//record* query_qso();
 	//// Original QSO

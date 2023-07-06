@@ -830,7 +830,7 @@ void qso_data::action_view_qsl(bool force) {
 				qso->item("BAND").c_str(),
 				qso->item("MODE", true, true).c_str());
 			qsl_viewer_->copy_label(title);
-			qsl_viewer_->set_qso(qso, book_->selection());
+			qsl_viewer_->set_qso(qso, current_number());
 			qsl_viewer_->show();
 			char msg[128];
 			snprintf(msg, 128, "DASH: %s", title);
@@ -1596,6 +1596,34 @@ record* qso_data::current_qso() {
 		return g_qy_entry_->qso();
 	default:
 		return nullptr;
+	}
+}
+
+// Current QSO number
+qso_num_t qso_data::current_number() {
+	switch (logging_state_) {
+	case QSO_INACTIVE:
+	case QSO_PENDING:
+	case QSO_STARTED:
+	case QSO_EDIT:
+	case QSO_MODEM:
+		return g_entry_->qso_number();
+	case QSO_BROWSE:
+	case QUERY_DUPE:
+	case QUERY_MATCH:
+	case QUERY_NEW:
+	case QRZ_MERGE:
+		return g_query_->qso_number();
+	case NET_STARTED:
+	case NET_EDIT:
+		return g_net_entry_->qso_number();
+	case QSO_PEEK:
+	case QSO_PEEK_ED:
+		return g_peek_->qso_number();
+	case MANUAL_ENTRY:
+		return g_qy_entry_->qso_number();
+	default:
+		return book_->selection();
 	}
 }
 

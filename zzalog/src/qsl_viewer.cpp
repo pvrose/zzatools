@@ -205,6 +205,7 @@ void qsl_viewer::cb_bn_log_card(Fl_Widget* w, void* v) {
 	// now pretend the Card Front radio button has been pressed
 	cb_rad_card(that->card_front_radio_, (void*)QI_CARD_FRONT);
 	that->set_image_buttons();
+	book_->selection(that->current_qso_num_, HT_MINOR_CHANGE);
 }
 
 void qsl_viewer::set_qso(record* qso, qso_num_t number) {
