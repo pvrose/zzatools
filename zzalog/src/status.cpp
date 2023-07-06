@@ -360,9 +360,9 @@ void status::misc_status(status_t status, const char* label) {
 	}
 	if (status != ST_DEBUG || display_debug_messages_) status_file_viewer_->append(message);
 
-#ifdef _DEBUG
+//#ifdef _DEBUG
 	cout << message;
-#endif
+//#endif
 
 	// Depending on the severity: LOG, NOTE, OK, WARNING, ERROR, SEVERE or FATAL
 	// Beep on the last three.

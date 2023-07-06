@@ -1005,21 +1005,23 @@ void qso_data::action_look_all_txt() {
 			line.find(my_call) != string::npos &&
 			line.find(their_call) != string::npos &&
 			line.find(mode) != string::npos) {
+			if (!start_copying) {
+				snprintf(msg, 256, "DASH: %s %s %s %s %s Found possible match",
+					datestamp.c_str(),
+					timestamp.c_str(),
+					mode.c_str(),
+					my_call.c_str(),
+					their_call.c_str());
+				status_->misc_status(ST_WARNING, msg);
+			}
 			start_copying = true;
-			snprintf(msg, 256, "DASH: %s %s %s %s %s Found possible match",
-				datestamp.c_str(),
-				timestamp.c_str(),
-				mode.c_str(),
-				my_call.c_str(),
-				their_call.c_str());
-			status_->misc_status(ST_NOTE, msg);
 		}
 		if (start_copying) {
 			if (line.find(my_call) != string::npos &&
 				line.find(their_call) != string::npos) {
 				// It has both calls - copy to buffer, and parse for QSO details (report, grid and QSO completion
 				snprintf(msg, 256, "DASH: %s", line.c_str());
-				status_->misc_status(ST_LOG, msg);
+				status_->misc_status(ST_NOTE, msg);
 				action_copy_all_text(line);
 			}
 			else if (line.find(my_call) == string::npos &&
@@ -1040,21 +1042,25 @@ void qso_data::action_look_all_txt() {
 			all_file->close();
 			fl_cursor(FL_CURSOR_DEFAULT);
 		}
+		enable_widgets();
 	}
-	all_file->close();
-	snprintf(msg, 100, "LOG: Cannot find contact with %s in WSJT-X text.all file.", their_call.c_str());
-	status_->progress("Did not find record", OT_RECORD);
-	status_->misc_status(ST_WARNING, msg);
-	fl_cursor(FL_CURSOR_DEFAULT);
+	else {
+		all_file->close();
+		snprintf(msg, 100, "LOG: Cannot find contact with %s in WSJT-X text.all file.", their_call.c_str());
+		status_->progress("Did not find record", OT_RECORD);
+		status_->misc_status(ST_WARNING, msg);
+		fl_cursor(FL_CURSOR_DEFAULT);
+	}
 }
 
 void qso_data::action_copy_all_text(string text) {
+	record* qso = g_query_->query_qso();
 	bool tx_record;
 	// After this initial processing pos will point to the start og the QSO decode string - look for old-style transmit record
 	size_t pos = text.find("Transmitting");
 	if (pos != string::npos) {
-		pos = text.find(g_query_->query_qso()->item("MODE"));
-		pos += g_query_->query_qso()->item("MODE").length() + 3;
+		pos = text.find(qso->item("MODE"));
+		pos += qso->item("MODE").length() + 3;
 		tx_record = true;
 		// Nothing else to get from this record
 	}
@@ -1074,7 +1080,7 @@ void qso_data::action_copy_all_text(string text) {
 				freq_offset[i] = '0';
 			}
 			double frequency = stod(freq) + (stod(freq_offset) / 1000000.0);
-			g_query_->query_qso()->item("FREQ", to_string(frequency));
+			qso->item("FREQ", to_string(frequency));
 			pos = 48;
 			tx_record = true;
 		}
@@ -1098,44 +1104,65 @@ void qso_data::action_copy_all_text(string text) {
 	string report = words.back();
 	if (report == "RR73" || report == "RRR") {
 		// If we've seen the R-00 then mark the QSO complete, otherwise mark in provisional until we see the 73
-		if (g_query_->query_qso()->item("QSO_COMPLETE") == "?") {
-			g_query_->query_qso()->item("QSO_COMPLETE", string(""));
+		if (qso->item("QSO_COMPLETE") == "?") {
+			qso->item("QSO_COMPLETE", string(""));
 		}
-		else if (g_query_->query_qso()->item("QSO_COMPLETE") == "N") {
-			g_query_->query_qso()->item("QSO_COMPLETE", string("?"));
+		else if (qso->item("QSO_COMPLETE") == "N") {
+			qso->item("QSO_COMPLETE", string("?"));
 		}
 	}
 	else if (report == "73") {
 		// A 73 definitely indicates QSO compplete
-		g_query_->query_qso()->item("QSO_COMPLETE", string(""));
+		qso->item("QSO_COMPLETE", string(""));
 	}
 	else if (report[0] == 'R') {
 		// The first of the rogers
-		if (g_query_->query_qso()->item("QSO_COMPLETE") == "N") {
-			g_query_->query_qso()->item("QSO_COMPLETE", string("?"));
+		if (qso->item("QSO_COMPLETE") == "N") {
+			qso->item("QSO_COMPLETE", string("?"));
 		}
 		// Update reports if they've not been provided
-		if (tx_record && !g_query_->query_qso()->item_exists("RST_SENT")) {
-			g_query_->query_qso()->item("RST_SENT", report.substr(1));
+		if (tx_record && !qso->item_exists("RST_SENT")) {
+			qso->item("RST_SENT", report.substr(1));
 		}
-		else if (!tx_record && !g_query_->query_qso()->item_exists("RST_RCVD")) {
-			g_query_->query_qso()->item("RST_RCVD", report.substr(1));
+		else if (!tx_record && !qso->item_exists("RST_RCVD")) {
+			qso->item("RST_RCVD", report.substr(1));
+		}
+		// Update callsign
+		if (tx_record) {
+			string& dx_call = words[0];
+			if (dx_call[0] == '<') {
+				dx_call = dx_call.substr(1, dx_call.length() - 2);
+			}
+			string qso_call = qso->item("CALL");
+			if (dx_call != qso_call) {
+				int comp_len = min(dx_call.length(), qso_call.length());
+				if (dx_call.substr(0, comp_len) == qso_call.substr(0, comp_len)) {
+					qso->item("CALL", dx_call);
+					char msg[128];
+					snprintf(msg, sizeof(msg), "DASH: Replacing callsign %s with %s", qso_call.c_str(), dx_call.c_str());
+					status_->misc_status(ST_WARNING, msg);
+				}
+				else {
+					char msg[128];
+					snprintf(msg, sizeof(msg), "DASH: Callsigns dissimilar %s v %s", qso_call.c_str(), dx_call.c_str());
+					status_->misc_status(ST_WARNING, msg);
+				}
+			}
 		}
 	}
-	else if (!tx_record && !g_query_->query_qso()->item_exists("GRIDSQUARE")) {
+	else if (!tx_record && !qso->item_exists("GRIDSQUARE")) {
 		// Update gridsquare if it's not been provided
-		g_query_->query_qso()->item("GRIDSQUARE", report);
+		qso->item("GRIDSQUARE", report);
 	}
 	else if (report[0] == '-' || (report[0] >= '0' && report[0] <= '9')) {
 		// Numeric report
-		if (tx_record && !g_query_->query_qso()->item_exists("RST_SENT")) {
-			g_query_->query_qso()->item("RST_SENT", report);
+		if (tx_record && !qso->item_exists("RST_SENT")) {
+			qso->item("RST_SENT", report);
 		}
-		else if (!tx_record && !g_query_->query_qso()->item_exists("RST_RCVD")) {
-			g_query_->query_qso()->item("RST_RCVD", report);
+		else if (!tx_record && !qso->item_exists("RST_RCVD")) {
+			qso->item("RST_RCVD", report);
 		}
 	}
-
 }
 
 // Create a net from current QSO and others which overlap
