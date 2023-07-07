@@ -277,7 +277,7 @@ void qsl_viewer::set_image() {
 				case QI_CARD_FRONT:
 					// Card image of a scanned-in paper QSL card (front - i.e. callsign side)
 					// File name e.g.= <root>\scans\<received date>\PA_GM3ZZA_P__<QSO date>.png
-					sprintf(filename, "%s\\Scans\\%s\\%s__%s",
+					sprintf(filename, "%s/scans/%s/%s__%s",
 						directory.c_str(),
 						current_qso_->item("QSLRDATE").c_str(),
 						call.c_str(),
@@ -286,7 +286,7 @@ void qsl_viewer::set_image() {
 				case QI_CARD_BACK:
 					// Card image of a scanned-in paper QSL card (back - i.e. QSO details side)
 					// File name e.g.= <root>\scans\<received date>\PA_GM3ZZA_P++<QSO date>.png
-					sprintf(filename, "%s\\Scans\\%s\\%s++%s",
+					sprintf(filename, "%s/scans/%s/%s++%s",
 						directory.c_str(),
 						current_qso_->item("QSLRDATE").c_str(),
 						call.c_str(),
