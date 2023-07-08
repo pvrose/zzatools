@@ -468,6 +468,10 @@ bool printer::start_printer(int& from_page, int& to_page) {
 		result = false;
 		break;
 	}
+	// For ALL pages Windows returns 10000 in to_page, Linux returns 0
+	if (to_page < from_page) {
+		to_page = INT_MAX;
+	}
 	delete[] error_message;
 	delete[] message;
 	return result;
