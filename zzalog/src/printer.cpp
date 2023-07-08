@@ -6,6 +6,8 @@
 #include "drawing.h"
 #include "qso_manager.h"
 
+#include <climits>
+
 #include <FL/fl_ask.H>
 #include <FL/fl_draw.H>
 #include <FL/Fl_Preferences.H>
@@ -87,8 +89,9 @@ int printer::print_book() {
 		if (temp != nullptr) page_title_ = temp;
 		else page_title_ = callsign;
 	}
-	int from_page;
-	int to_page;
+	int from_page = 1; 
+	int to_page = INT_MAX;
+	printf("PRINTER: #P=%d From=%d To=%d\n", number_pages_, from_page, to_page);
 	if (!start_printer(from_page, to_page)) {
 		return 1;
 	}
@@ -97,6 +100,7 @@ int printer::print_book() {
 	// calculate basic properies - row height etc.
 	calculate_properties();
 	// Initialise progress - switch to display device and back again
+	printf("PRINTER: #P=%d From=%d To=%d\n", number_pages_, from_page, to_page);
 	Fl_Surface_Device::push_current(Fl_Display_Device::display_device());
 	status_->progress(min(to_page + 1 - from_page, number_pages_), type_, "Printing log", "pages");
 	Fl_Surface_Device::pop_current();
@@ -286,8 +290,8 @@ int printer::print_cards() {
 	char message[256];
 	sprintf(message, "PRINTER: Starting print, %d cards", navigation_book_->size());
 	status_->misc_status(ST_NOTE, message);
-	int from_page;
-	int to_page;
+	int from_page = 1; 
+	int to_page = INT_MAX;
 	if (!start_printer(from_page, to_page)) {
 		return 1;
 	}
@@ -445,7 +449,7 @@ bool printer::start_printer(int& from_page, int& to_page) {
 	char* message = new char[266];
 	bool result;
 	// Start the job with unknown number of pages - exit if cancelled
-	switch (start_job(0, &from_page, &to_page, &error_message)) {
+	switch (begin_job(0, &from_page, &to_page, &error_message)) {
 	case 0:
 		// Successful
 		result = true;
@@ -453,13 +457,13 @@ bool printer::start_printer(int& from_page, int& to_page) {
 	case 1:
 		// User cancel
 		strcpy(message, "PRINTER: Print cancelled by user");
-		Fl_Display_Device::display_device()->set_current();
+		Fl_Surface_Device::pop_current();
 		status_->misc_status(ST_WARNING, message);
 		result = false;
 		break;
 	default:
 		snprintf(message, 256, "PRINTER: %s", error_message);
-		Fl_Display_Device::display_device()->set_current();
+		Fl_Surface_Device::pop_current();
 		status_->misc_status(ST_ERROR, message);
 		result = false;
 		break;
