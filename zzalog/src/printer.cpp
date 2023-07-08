@@ -97,9 +97,9 @@ int printer::print_book() {
 	// calculate basic properies - row height etc.
 	calculate_properties();
 	// Initialise progress - switch to display device and back again
-	Fl_Surface_Device* surf = Fl_Surface_Device::pop_current();
+	Fl_Surface_Device::push_current(Fl_Display_Device::display_device());
 	status_->progress(min(to_page + 1 - from_page, number_pages_), type_, "Printing log", "pages");
-	Fl_Surface_Device::push_current(surf);
+	Fl_Surface_Device::pop_current();
 	// Get field data and calculate field widths
 	book_properties();
 	// Start the page - exit on error
@@ -123,9 +123,9 @@ int printer::print_book() {
 				// End the page
 				error = end_page();
 				// Update progress
-				Fl_Surface_Device* surf = Fl_Surface_Device::pop_current();
+				Fl_Surface_Device::push_current(Fl_Display_Device::display_device());
 				status_->progress(page_number - from_page, type_);
-				Fl_Surface_Device::push_current(surf);
+				Fl_Surface_Device::pop_current();
 				// Start the next page
 				if (!error) error = start_page();
 				if (!error) print_page_header(page_number);
@@ -299,9 +299,9 @@ int printer::print_cards() {
 	// calculate basic properies - row height etc.
 	// Initialise progress - switch to display device and back again
 	printf("PRINTER: #P=%d From=%d To=%d\n", number_pages_, from_page, to_page);
-	Fl_Surface_Device* surf = Fl_Surface_Device::pop_current();
+	Fl_Surface_Device::push_current(Fl_Display_Device::display_device());
 	status_->progress(min(to_page + 1 - from_page, number_pages_), type_, "Printing QSL labels", "pages");
-	Fl_Surface_Device::push_current(surf);
+	Fl_Surface_Device::pop_current();
 	// For each record
 	int page_number = from_page;
 	int error = 0;
@@ -321,9 +321,9 @@ int printer::print_cards() {
 				// End the page
 				error = end_page();
 				// Update progress
-				Fl_Surface_Device* surf = Fl_Surface_Device::pop_current();
+				Fl_Surface_Device::push_current(Fl_Display_Device::display_device());
 				status_->progress(page_number - from_page, type_);
-				Fl_Surface_Device::push_current(surf);
+				Fl_Surface_Device::pop_current();
 				// Start the next page
 				if (i < navigation_book_->size() && !error) {
 					error = start_page();
