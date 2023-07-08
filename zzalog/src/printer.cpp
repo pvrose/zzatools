@@ -298,6 +298,7 @@ int printer::print_cards() {
 	fl_cursor(FL_CURSOR_WAIT);
 	// calculate basic properies - row height etc.
 	// Initialise progress - switch to display device and back again
+	printf("PRINTER: #P=%d From=%d To=%d\n", number_pages_, from_page, to_page);
 	Fl_Surface_Device* surf = Fl_Surface_Device::pop_current();
 	status_->progress(min(to_page + 1 - from_page, number_pages_), type_, "Printing QSL labels", "pages");
 	Fl_Surface_Device::push_current(surf);
@@ -403,6 +404,9 @@ int printer::card_properties() {
 	call_settings.get("First Row", row_top_, 12.9);
 	call_settings.get("First Column", col_left_, 4.6);
 	call_settings.get("Unit", (int&)unit_, (int)qsl_form::MILLIMETER);
+	printf("PRINTER: Q=%d R=%d C=%d W=%g H=%g R1=%g C1=%g U=%d\n",
+	max_number_qsos_, num_rows_, num_cols_, col_width_, row_height_,
+	row_top_, col_left_, (int)unit_);
 
 	items_per_page_ = num_rows_ * num_cols_;
 	int top_margin = 0;
@@ -429,6 +433,7 @@ int printer::card_properties() {
 	//
 	int last_item = navigation_book_->size() - 1;
 	number_pages_ = (last_item / items_per_page_) + 1;
+	printf("PRINTER: #Q=%d, Q/P=%d, #P=%d\n", last_item, items_per_page_, number_pages_);
 
 	return 0;
 }
