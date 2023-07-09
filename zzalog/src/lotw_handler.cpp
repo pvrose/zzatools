@@ -28,6 +28,10 @@ extern url_handler* url_handler_;
 // Constructor
 lotw_handler::lotw_handler()
 {
+	run_threads_ = true;
+	printf("LOTW MAIN: Starting thread\n");
+	th_upload_ = new thread(thread_run, this);
+
 }
 
 // Destructor
@@ -37,6 +41,7 @@ lotw_handler::~lotw_handler()
 
 // Export extracted records, sign them and upload to LotW
 bool lotw_handler::upload_lotw_log(book* book) {
+	upload_book_ = book;
 	status_->misc_status(ST_DEBUG, "LOTW: uploading extracted data");
 	fl_cursor(FL_CURSOR_WAIT);
 	// Get LotW settings
@@ -83,7 +88,7 @@ bool lotw_handler::upload_lotw_log(book* book) {
 		fields.insert("RST_SENT");
 		fields.insert("STATION_CALLSIGN");
 		// Write the book (only the above fields)
-		if (book->size() && book->store_data(string(new_filename), true, &fields)) {
+		if (upload_book_->size() && upload_book_->store_data(string(new_filename), true, &fields)) {
 #ifdef WIN32
 			// Get the TQSL (an app that signs the upload) executable
 			string tqsl_executable;
@@ -115,7 +120,7 @@ bool lotw_handler::upload_lotw_log(book* book) {
 #endif			
 			if (ok) {
 				// Get Callsign from first (maybe only) record in book
-				record* record_0 = book->get_record(0, false);
+				record* record_0 = upload_book_->get_record(0, false);
 				string callsign = record_0->item("STATION_CALLSIGN");
 				// Generate TQSL command line - note the executable may have spaces in its filename
 				char* command = new char[256];
@@ -123,82 +128,14 @@ bool lotw_handler::upload_lotw_log(book* book) {
 				snprintf(command, 256, "\"%s\" -x -u -d %s -c %s", tqsl_executable.c_str(), new_filename.c_str(), callsign.c_str());
 				status_->misc_status(ST_NOTE, "LOTW: Signing and uploading QSLs to LotW");
 				status_->misc_status(ST_LOG, command);
-				// Launch TQSL - signs and uploads data: Note this is a blocking action
-				int result = system(command);
-				delete[] command;
-				// Analyse result received from TQSL - responses documented in TQSL help
-				string default_message = "LOTW: Unknown response";
-				switch (result) {
-				case 0:
-					status_->misc_status(ST_OK, "LOTW: all qsos submitted were signed and uploaded");
-					ok = true;
-					break;
-				case 1:
-					status_->misc_status(ST_WARNING, "LOTW: command failed or cancelled by user");
-					ok = false;
-					break;
-				case 2:
-					status_->misc_status(ST_ERROR, "LOTW: rejected by LoTW");
-					ok = false;
-					break;
-				case 3:
-					status_->misc_status(ST_ERROR, "LOTW: unexpected response from TQSL server");
-					ok = false;
-					break;
-				case 4:
-					status_->misc_status(ST_ERROR, "LOTW: TQSL error");
-					ok = false;
-					break;
-				case 5:
-					status_->misc_status(ST_ERROR, "LOTW: TQSLlib error");
-					ok = false;
-					break;
-				case 6:
-					status_->misc_status(ST_ERROR, "LOTW: unable to open input file");
-					ok = false;
-					break;
-				case 7:
-					status_->misc_status(ST_ERROR, "LOTW: unable to open output file");
-					ok = false;
-					break;
-				case 8:
-					status_->misc_status(ST_WARNING, "LOTW: No QSOs were processed since some QSOs were duplicates or out of date range");
-					ok = false;
-					break;
-				case 9:
-					status_->misc_status(ST_WARNING, "LOTW: Some QSOs were processed, and some QSOs were ignored because they were duplicates or out of date range");
-					ok = true;
-					break;
-				case 10:
-					status_->misc_status(ST_ERROR, "LOTW: Command syntax error");
-					ok = false;
-					break;
-				case 11:
-					status_->misc_status(ST_ERROR, "LOTW: LoTW Connection error (no network or LoTW is unreachable)");
-					ok = false;
-					break;
-				default:
-					status_->misc_status(ST_ERROR, default_message.c_str());
-					ok = false;
-					break;
+				while (upload_if_busy_) {
+					// Allow everyone else a say
+					Fl::check();
+					this_thread::yield();
 				}
-			}
-			if (ok) {
-				// Good response received
-				bool updated = false;
-				// For each entry extracted for signing - add that is has been sent and when
-				// Note for duplicates this will correct for the fact that these fields had wrongly been set
-				for (auto it = book->begin(); it != book->end(); it++) {
-					if ((*it)->item("LOTW_QSLSDATE") == "") {
-						(*it)->item("LOTW_QSLSDATE", now(false, "%Y%m%d"));
-						updated = true;
-					}
-					if ((*it)->item("LOTW_QSL_SENT") != "Y") {
-						(*it)->item("LOTW_QSL_SENT", string("Y"));
-						updated = true;
-					}
-				}
-				book_->modified(updated);
+				printf("LOTW MAIN: Uploading QSOs to LotW\n");
+				upload_request_ = command;
+				upload_if_busy_ = true;
 			}
 		}
 		else {
@@ -350,7 +287,7 @@ bool lotw_handler::validate_adif(stringstream* adif) {
 }
 
 // Upload single QSO
-bool lotw_handler::upload_single_qso(qso_num_t record_num) {
+bool lotw_handler::upload_single_qso(item_num_t record_num) {
 	Fl_Preferences qsl_settings(settings_, "QSL");
 	Fl_Preferences lotw_settings(qsl_settings, "LotW");
 	int upload_qso;
@@ -387,4 +324,117 @@ bool lotw_handler::upload_single_qso(qso_num_t record_num) {
 		delete one_qso;
 	}
 	return false;
+}
+
+bool lotw_handler::upload_done(int result) {
+	// Analyse result received from TQSL - responses documented in TQSL help
+	bool ok = false;
+	string default_message = "LOTW: Unknown response";
+	switch (result) {
+	case 0:
+		status_->misc_status(ST_OK, "LOTW: all qsos submitted were signed and uploaded");
+		ok = true;
+		break;
+	case 1:
+		status_->misc_status(ST_WARNING, "LOTW: command failed or cancelled by user");
+		ok = false;
+		break;
+	case 2:
+		status_->misc_status(ST_ERROR, "LOTW: rejected by LoTW");
+		ok = false;
+		break;
+	case 3:
+		status_->misc_status(ST_ERROR, "LOTW: unexpected response from TQSL server");
+		ok = false;
+		break;
+	case 4:
+		status_->misc_status(ST_ERROR, "LOTW: TQSL error");
+		ok = false;
+		break;
+	case 5:
+		status_->misc_status(ST_ERROR, "LOTW: TQSLlib error");
+		ok = false;
+		break;
+	case 6:
+		status_->misc_status(ST_ERROR, "LOTW: unable to open input file");
+		ok = false;
+		break;
+	case 7:
+		status_->misc_status(ST_ERROR, "LOTW: unable to open output file");
+		ok = false;
+		break;
+	case 8:
+		status_->misc_status(ST_WARNING, "LOTW: No QSOs were processed since some QSOs were duplicates or out of date range");
+		ok = false;
+		break;
+	case 9:
+		status_->misc_status(ST_WARNING, "LOTW: Some QSOs were processed, and some QSOs were ignored because they were duplicates or out of date range");
+		ok = true;
+		break;
+	case 10:
+		status_->misc_status(ST_ERROR, "LOTW: Command syntax error");
+		ok = false;
+		break;
+	case 11:
+		status_->misc_status(ST_ERROR, "LOTW: LoTW Connection error (no network or LoTW is unreachable)");
+		ok = false;
+		break;
+	default:
+		status_->misc_status(ST_ERROR, default_message.c_str());
+		ok = false;
+		break;
+	}
+	if (ok) {
+		// Good response received
+		bool updated = false;
+		// For each entry extracted for signing - add that is has been sent and when
+		// Note for duplicates this will correct for the fact that these fields had wrongly been set
+		for (auto it = upload_book_->begin(); it != upload_book_->end(); it++) {
+			if ((*it)->item("LOTW_QSLSDATE") == "") {
+				(*it)->item("LOTW_QSLSDATE", now(false, "%Y%m%d"));
+				updated = true;
+			}
+			if ((*it)->item("LOTW_QSL_SENT") != "Y") {
+				(*it)->item("LOTW_QSL_SENT", string("Y"));
+				updated = true;
+			}
+		}
+		book_->modified(updated);
+	}
+	return ok;
+}
+
+void lotw_handler::thread_run(lotw_handler* that) {
+	printf("LOTW THREAD: Thread started\n");
+	while (that->run_threads_) {
+		// Wait until qso placed on interface
+		while (!that->upload_if_busy_ && that->run_threads_) {
+			this_thread::sleep_for(chrono::milliseconds(1000));
+		}
+		// Process it
+		if (that->upload_if_busy_) {
+			const char* command = that->upload_request_;
+			printf("LOTW THREAD: Received request %s\n", command);
+			that->th_upload(command);
+		}
+		// Say done and yield 
+		that->upload_if_busy_ = false;
+		this_thread::yield();
+	}
+}
+
+void lotw_handler::th_upload(const char* command) {
+	// Blocking system request
+	int result = system(command);
+	// 
+	upload_response_ = result;
+	printf("LOTW THREAD: Calling thread callback result = %d\n", result);
+	Fl::awake(cb_upload_done, (void*)this);
+	this_thread::yield();
+}
+
+void lotw_handler::cb_upload_done(void* v) {
+	printf("LOTW MAIN: Entered thread callback handler\n");
+	lotw_handler* that = (lotw_handler*)v;
+	that->upload_done(that->upload_response_);
 }

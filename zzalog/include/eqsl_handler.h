@@ -159,8 +159,6 @@ using namespace std;
 		atomic<bool> upload_if_busy_;
 		// interface data
 		atomic<record*> upload_record_;
-		// Upload queue
-		queue<record*> upload_queue_;
 		// Upload response queue
 		atomic<upload_response_t*> upload_response_;
 
