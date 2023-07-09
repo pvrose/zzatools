@@ -23,15 +23,13 @@
 #include <FL/Fl_Native_File_Chooser.H>
 #include <FL/Fl_Help_Dialog.H>
 
-
-
-
 extern book* book_;
 extern status* status_;
 extern Fl_Preferences* settings_;
 extern qso_manager* qso_manager_;
 extern url_handler* url_handler_;
 extern Fl_Help_Dialog* help_dialog_;
+extern unsigned int DEBUG_ITEMS;
 
 // Constructor
 eqsl_handler::eqsl_handler()
@@ -40,7 +38,7 @@ eqsl_handler::eqsl_handler()
 	, debug_enabled_(true)
 {
 	run_threads_ = true;
-	printf("MAIN: Starting thread\n");
+	if (DEBUG_ITEMS & DEBUG_THREADS) printf("MAIN: Starting thread\n");
 	th_upload_ = new thread(thread_run, this);
 }
 
@@ -963,7 +961,7 @@ bool eqsl_handler::upload_single_qso(qso_num_t record_num) {
 				Fl::check();
 				this_thread::yield();
 			}
-			printf("MAIN: Uploading eQSL %s\n", this_record->item("CALL").c_str());
+			if (DEBUG_ITEMS & DEBUG_THREADS) printf("MAIN: Uploading eQSL %s\n", this_record->item("CALL").c_str());
 			upload_record_ = this_record;
 			upload_if_busy_ = true;
 		}
@@ -972,7 +970,7 @@ bool eqsl_handler::upload_single_qso(qso_num_t record_num) {
 }
 
 bool eqsl_handler::th_upload_qso(record* this_record) {
-	printf("THREAD: Uploading eQSL %s\n", this_record->item("CALL").c_str());
+	if (DEBUG_ITEMS & DEBUG_THREADS) printf("THREAD: Uploading eQSL %s\n", this_record->item("CALL").c_str());
 	bool update = false;
 	// Generate URL parameters for QSL
 	char qsl_data[2048];
@@ -1091,11 +1089,11 @@ bool eqsl_handler::th_upload_qso(record* this_record) {
 			response->status = ER_FAILED;
 
 		}
-		printf("THREAD: Received %s\n", response->error_message.c_str());
+		if (DEBUG_ITEMS & DEBUG_THREADS) printf("THREAD: Received %s\n", response->error_message.c_str());
 	}
 	else {
 		response->status = ER_HTML_ERR;
-		printf("THREAD: Bad HTML received\n");
+		if (DEBUG_ITEMS & DEBUG_THREADS) printf("THREAD: Bad HTML received\n");
 	}
 	//// Stopped  editing record
 	//if (update) {
@@ -1105,7 +1103,7 @@ bool eqsl_handler::th_upload_qso(record* this_record) {
 	response->html = resp.str();
 	// Send response back to 
 	upload_response_ = response;
-	printf("THREAD: Calling thread callback\n");
+	if (DEBUG_ITEMS & DEBUG_THREADS) printf("THREAD: Calling thread callback\n");
 	Fl::awake(cb_upload_done, (void*)this);
 	this_thread::yield();
 
@@ -1114,7 +1112,7 @@ bool eqsl_handler::th_upload_qso(record* this_record) {
 
 // Handle call back 
 void eqsl_handler::cb_upload_done(void* v) {
-	printf("MAIN: Entered thread callback handler\n");
+	if (DEBUG_ITEMS & DEBUG_THREADS) printf("MAIN: Entered thread callback handler\n");
 	eqsl_handler* that = (eqsl_handler*)v;
 	that->upload_done(that->upload_response_);
 }
@@ -1171,7 +1169,7 @@ bool eqsl_handler::upload_done(upload_response_t* response) {
 }
 
 void eqsl_handler::thread_run(eqsl_handler* that) {
-	printf("THREAD: Thread started\n");
+	if (DEBUG_ITEMS & DEBUG_THREADS) printf("THREAD: Thread started\n");
 	while (that->run_threads_) {
 		// Wait until qso placed on interface
 		while (!that->upload_if_busy_ && that->run_threads_) {
@@ -1180,7 +1178,7 @@ void eqsl_handler::thread_run(eqsl_handler* that) {
 		// Process it
 		if (that->upload_if_busy_) {
 			record* qso = that->upload_record_;
-			printf("THREAD: Received request %s\n", qso->item("CALL").c_str());
+			if (DEBUG_ITEMS & DEBUG_THREADS) printf("THREAD: Received request %s\n", qso->item("CALL").c_str());
 			that->th_upload_qso(qso);
 		}
 		// Say done and yield 

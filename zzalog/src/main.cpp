@@ -86,6 +86,7 @@ string VENDOR = "GM3ZZA";
 #ifndef HAMLIB_DEBUG_LEVEL
 #define HAMLIB_DEBUG_LEVEL RIG_DEBUG_NONE
 #endif
+unsigned int DEBUG_ITEMS = DEBUG_ERRORS | DEBUG_THREADS;
 
 // Global data items instanced in zzalib
 extern url_handler* url_handler_;
