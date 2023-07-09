@@ -6,6 +6,7 @@
 #include <sstream>
 #include <string>
 #include <thread>
+#include <atomic>
 
 
 	// The timestamp format required by the ARRL header record.
@@ -20,7 +21,7 @@
 		~lotw_handler();
 
 		// output and load data to LotW
-		bool upload_lotw_log(book* book);
+		bool upload_lotw_log(book* book, bool mine = false);
 		// download the data from LotW
 		bool download_lotw_log(stringstream* adif);
 		// Upload single QSO
@@ -54,6 +55,8 @@
 		atomic<char*> upload_request_;
 		// Upload response queue
 		atomic<int> upload_response_;
+		// Upload request internal
+		bool upload_book_mine_;
 
 	};
 #endif // !__LOTW_HANDLER__

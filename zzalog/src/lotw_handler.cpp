@@ -28,7 +28,11 @@ extern url_handler* url_handler_;
 // Constructor
 lotw_handler::lotw_handler()
 {
+	// Initialise thread interface
 	run_threads_ = true;
+	upload_if_busy_ = false;
+	upload_request_ = nullptr;
+	upload_response_ = 0;	
 	printf("LOTW MAIN: Starting thread\n");
 	th_upload_ = new thread(thread_run, this);
 
@@ -40,8 +44,9 @@ lotw_handler::~lotw_handler()
 }
 
 // Export extracted records, sign them and upload to LotW
-bool lotw_handler::upload_lotw_log(book* book) {
+bool lotw_handler::upload_lotw_log(book* book, bool mine) {
 	upload_book_ = book;
+	upload_book_mine_ = mine;
 	status_->misc_status(ST_DEBUG, "LOTW: uploading extracted data");
 	fl_cursor(FL_CURSOR_WAIT);
 	// Get LotW settings
@@ -310,7 +315,7 @@ bool lotw_handler::upload_single_qso(item_num_t record_num) {
 		extract_data* one_qso = new extract_data;
 		one_qso->add_record(record_num);
 		// TODO: Check QSO is from QTHs/Current/Callsign
-		if (upload_lotw_log(one_qso)) {
+		if (upload_lotw_log(one_qso, true)) {
 			record* this_record = book_->get_record(record_num, false);
 			char ok_message[256];
 			sprintf(ok_message, "LOTW: %s %s %s QSL uploaded",
@@ -318,10 +323,8 @@ bool lotw_handler::upload_single_qso(item_num_t record_num) {
 				this_record->item("TIME_ON").c_str(),
 				this_record->item("CALL").c_str());
 			status_->misc_status(ST_OK, ok_message);
-			delete one_qso;
 			return true;
 		} 
-		delete one_qso;
 	}
 	return false;
 }
@@ -401,6 +404,7 @@ bool lotw_handler::upload_done(int result) {
 		}
 		book_->modified(updated);
 	}
+	if (upload_book_mine_) delete upload_book_;
 	return ok;
 }
 
