@@ -14,6 +14,7 @@
 #include <fstream>
 #include <istream>
 #include <sstream>
+#include <chrono>
 
 #include <FL/Fl.H>
 #include <FL/fl_ask.H>
@@ -1172,15 +1173,18 @@ bool eqsl_handler::upload_done(upload_response_t* response) {
 void eqsl_handler::thread_run(eqsl_handler* that) {
 	printf("THREAD: Thread started\n");
 	while (that->run_threads_) {
+		// Wait until qso placed on interface
 		while (!that->upload_if_busy_ && that->run_threads_) {
-			if (!that->upload_queue_.empty()) {
-				record* qso = that->upload_queue_.front();
-				printf("THREAD: Received request %s\n", qso->item("CALL").c_str());
-				that->upload_queue_.pop();
-				that->th_upload_qso(qso);
-			}
-			this_thread::yield();
+			this_thread::sleep_for(chrono::milliseconds(1000));
 		}
+		// Process it
+		if (that->upload_if_busy_) {
+			record* qso = that->upload_record_;
+			printf("THREAD: Received request %s\n", qso->item("CALL").c_str());
+			that->th_upload_qso(qso);
+		}
+		// Say done and yield 
 		that->upload_if_busy_ = false;
+		this_thread::yield();
 	}
 }
