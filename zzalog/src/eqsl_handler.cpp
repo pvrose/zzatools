@@ -956,14 +956,10 @@ bool eqsl_handler::upload_single_qso(qso_num_t record_num) {
 		// Only upload valid records or reply to SWL reports
 		if (this_record->is_valid() || this_record->item("SWL") == "Y") {
 			// Now send to upload thread to process
-			while (upload_if_busy_) {
-				// Allow everyone else a say
-				Fl::check();
-				this_thread::yield();
-			}
-			if (DEBUG_ITEMS & DEBUG_THREADS) printf("MAIN: Uploading eQSL %s\n", this_record->item("CALL").c_str());
-			upload_record_ = this_record;
-			upload_if_busy_ = true;
+			upload_lock_.lock();
+			if (DEBUG_ITEMS & DEBUG_THREADS) printf("MAIN: Enqueueing eQSL request %s\n", this_record->item("CALL").c_str());
+			upload_queue_.push(this_record);
+			upload_lock_.unlock();
 		}
 	}
 	return upload_qso;
@@ -1172,17 +1168,21 @@ void eqsl_handler::thread_run(eqsl_handler* that) {
 	if (DEBUG_ITEMS & DEBUG_THREADS) printf("THREAD: Thread started\n");
 	while (that->run_threads_) {
 		// Wait until qso placed on interface
-		while (!that->upload_if_busy_ && that->run_threads_) {
+		while (that->run_threads_ && that->upload_queue_.empty()) {
 			this_thread::sleep_for(chrono::milliseconds(1000));
 		}
 		// Process it
-		if (that->upload_if_busy_) {
-			record* qso = that->upload_record_;
+		that->upload_lock_.lock();
+		if (!that->upload_queue_.empty()) {
+			record* qso = that->upload_queue_.front();
+			that->upload_queue_.pop();
 			if (DEBUG_ITEMS & DEBUG_THREADS) printf("THREAD: Received request %s\n", qso->item("CALL").c_str());
+			that->upload_lock_.unlock();
 			that->th_upload_qso(qso);
 		}
-		// Say done and yield 
-		that->upload_if_busy_ = false;
+		else {
+			that->upload_lock_.unlock();
+		}
 		this_thread::yield();
 	}
 }

@@ -14,6 +14,7 @@
 #include <set>
 #include <thread>
 #include <atomic>
+#include <mutex>
 
 using namespace std;
 
@@ -155,10 +156,10 @@ using namespace std;
 		thread* th_upload_;
 		// Enable for threads
 		atomic<bool> run_threads_;
-		// interface busy
-		atomic<bool> upload_if_busy_;
 		// interface data
-		atomic<record*> upload_record_;
+		queue<record*> upload_queue_;
+		// Interface q lock
+		mutex upload_lock_;
 		// Upload response queue
 		atomic<upload_response_t*> upload_response_;
 
