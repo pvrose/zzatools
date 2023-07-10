@@ -272,7 +272,7 @@ bool club_handler::upload_single_qso(qso_num_t record_num) {
 	}
 	if (upload_qso) {
 		record* this_record = book_->get_record(record_num, false);
-		if (DEBUG_ITEMS & DEBUG_THREADS) printf("CLUBLOG MAIN: Queueing request %s", this_record->item("CALL").c_str());
+		if (DEBUG_ITEMS & DEBUG_THREADS) printf("CLUBLOG MAIN: Queueing request %s\n", this_record->item("CALL").c_str());
 		upload_lock_.lock();
 		upload_queue_.push(this_record);
 		upload_done_queue_.push(this_record);
@@ -292,7 +292,7 @@ void club_handler::th_upload(record* this_record) {
 	stringstream resp;
 	// Post the form
 	bool ok;
-	if (!url_handler_->post_form("https://clublog.org/realtime.php", fields, nullptr, &resp)) {
+	if (!url_handler_->post_form("https://clublog.org/realtime.php", fields, nullptr, (ostream*)&resp)) {
 		ok = false;
 		upload_error_ = resp.str();
 	}
@@ -352,6 +352,7 @@ void club_handler::thread_run(club_handler* that) {
 			record* qso = that->upload_queue_.front();
 			that->upload_queue_.pop();
 			if (DEBUG_ITEMS & DEBUG_THREADS) printf("CLUBLOG THREAD: Received request %s\n", qso->item("CALL").c_str());
+			that->upload_lock_.unlock();
 			that->th_upload(qso);
 		}
 		else {

@@ -416,6 +416,7 @@ void lotw_handler::thread_run(lotw_handler* that) {
 			const char* command = that->upload_queue_.front();
 			that->upload_queue_.pop();
 			if (DEBUG_ITEMS & DEBUG_THREADS) printf("LOTW THREAD: Received request %s\n", command);
+			that->upload_lock_.unlock();
 			that->th_upload(command);
 		}
 		else {
