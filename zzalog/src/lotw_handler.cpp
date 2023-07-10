@@ -27,8 +27,6 @@ lotw_handler::lotw_handler()
 {
 	// Initialise thread interface
 	run_threads_ = true;
-	upload_if_busy_ = false;
-	upload_request_ = nullptr;
 	upload_response_ = 0;	
 	if (DEBUG_ITEMS & DEBUG_THREADS) printf("LOTW MAIN: Starting thread\n");
 	th_upload_ = new thread(thread_run, this);
@@ -134,14 +132,10 @@ bool lotw_handler::upload_lotw_log(book* book, bool mine) {
 				snprintf(command, 256, "\"%s\" -x -u -d %s -c %s", tqsl_executable.c_str(), new_filename.c_str(), callsign.c_str());
 				status_->misc_status(ST_NOTE, "LOTW: Signing and uploading QSLs to LotW");
 				status_->misc_status(ST_LOG, command);
-				while (upload_if_busy_) {
-					// Allow everyone else a say
-					Fl::check();
-					this_thread::yield();
-				}
 				if (DEBUG_ITEMS & DEBUG_THREADS) printf("LOTW MAIN: Uploading QSOs to LotW\n");
-				upload_request_ = command;
-				upload_if_busy_ = true;
+				upload_lock_.lock();
+				upload_queue_.push(command);
+				upload_lock_.unlock();
 			}
 		}
 		else {
@@ -413,17 +407,20 @@ void lotw_handler::thread_run(lotw_handler* that) {
 	if (DEBUG_ITEMS & DEBUG_THREADS) printf("LOTW THREAD: Thread started\n");
 	while (that->run_threads_) {
 		// Wait until qso placed on interface
-		while (!that->upload_if_busy_ && that->run_threads_) {
+		while (that->run_threads_ && that->upload_queue_.empty()) {
 			this_thread::sleep_for(chrono::milliseconds(1000));
 		}
 		// Process it
-		if (that->upload_if_busy_) {
-			const char* command = that->upload_request_;
+		that->upload_lock_.lock();
+		if (!that->upload_queue_.empty()) {
+			const char* command = that->upload_queue_.front();
+			that->upload_queue_.pop();
 			if (DEBUG_ITEMS & DEBUG_THREADS) printf("LOTW THREAD: Received request %s\n", command);
 			that->th_upload(command);
 		}
-		// Say done and yield 
-		that->upload_if_busy_ = false;
+		else {
+			that->upload_lock_.unlock();
+		}
 		this_thread::yield();
 	}
 }

@@ -7,6 +7,8 @@
 #include <string>
 #include <thread>
 #include <atomic>
+#include <queue>
+#include <mutex>
 
 
 	// The timestamp format required by the ARRL header record.
@@ -49,10 +51,10 @@
 		thread* th_upload_;
 		// Enable for threads
 		atomic<bool> run_threads_;
-		// interface busy
-		atomic<bool> upload_if_busy_;
 		// interface data
-		atomic<char*> upload_request_;
+		queue<char*> upload_queue_;
+		// interface lock
+		mutex upload_lock_;
 		// Upload response queue
 		atomic<int> upload_response_;
 		// Upload request internal
