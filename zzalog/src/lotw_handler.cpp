@@ -38,6 +38,10 @@ lotw_handler::lotw_handler()
 // Destructor
 lotw_handler::~lotw_handler()
 {
+	// Close down upload thread
+	run_threads_ = false;
+	th_upload_->join();
+	delete th_upload_;
 }
 
 // Export extracted records, sign them and upload to LotW

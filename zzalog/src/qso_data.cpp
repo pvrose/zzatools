@@ -35,7 +35,6 @@ extern dxa_if* dxa_if_;
 #endif
 extern double prev_freq_;
 
-
 // qso_group_
 qso_data::qso_data(int X, int Y, int W, int H, const char* l) :
 	Fl_Group(X, Y, W, H, l)
@@ -126,6 +125,7 @@ void qso_data::create_form(int X, int Y) {
 	end();
 
 	enable_widgets();
+
 }
 
 // Enable QSO widgets
@@ -467,15 +467,6 @@ void qso_data::initialise_fields(qso_entry* entry) {
 	// TODO this shoule be somewhere else
 	//// Set contest format
 	//ch_format_->value(exch_fmt_id_.c_str());
-
-	// TODO: This results in an exception if contest mode is set during initialisation
-	// Default Contest TX values
-	//if (g_contest_->mode() == qso_contest::CONTEST) {
-	//	// Automatically create a pending QSO
-	//	if (logging_state_ == QSO_INACTIVE) {
-	//		action_activate(previous_mode_);
-	//	}
-	//}
 
 	entry->initialise_fields(preset_fields, new_fields, lock_preset);
 	entry->initialise_values(preset_fields, g_contest_->serial_number());
