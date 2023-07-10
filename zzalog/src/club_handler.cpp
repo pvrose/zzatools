@@ -22,12 +22,19 @@ extern Fl_Preferences* settings_;
 extern status* status_;
 extern book* book_;
 extern qso_manager* qso_manager_;
+extern unsigned int DEBUG_ITEMS;
 
 // Constructor 
 club_handler::club_handler() {
 	// Create the URL handler if it hasn't already been done
 	if (!url_handler_) url_handler_ = new url_handler;
 	help_dialog_ = nullptr;
+	// Initialise thread interface
+	run_threads_ = true;
+	upload_response_ = 0;
+	if (DEBUG_ITEMS & DEBUG_THREADS) printf("CLUBLOG MAIN: Starting thread\n");
+	th_upload_ = new thread(thread_run, this);
+
 }
 
 club_handler::~club_handler() {
@@ -264,44 +271,94 @@ bool club_handler::upload_single_qso(qso_num_t record_num) {
 		upload_qso = false;
 	}
 	if (upload_qso) {
-
 		record* this_record = book_->get_record(record_num, false);
-		set<string> adif_fields;
-		generate_adif(adif_fields);
-		single_qso_ = to_adif(this_record, adif_fields);
-		// Get the parameters and make available for the HTTP POST FORM
-		vector<url_handler::field_pair> fields;
-		generate_form(fields, this_record);
-		stringstream resp;
-		// Post the form
-		bool ok;
-		if (!url_handler_->post_form("https://clublog.org/realtime.php", fields, nullptr, &resp)) {
-			// Display error message received from post
-			char* message = new char[resp.str().length() + 30];
-			sprintf(message, "CLUBLOG: Upload failed - %s", resp.str().c_str());
-			status_->misc_status(ST_ERROR, message);
-			ok = false;
-		}
-		else {
-			// Update all records sent with the fact that they have been uploaded and when
-			char message[200];
-			snprintf(message, 200, "CLUBLOG: %s %s %s QSL uploaded",
-				this_record->item("QSO_DATE").c_str(),
-				this_record->item("TIME_ON").c_str(),
-				this_record->item("CALL").c_str());
-			status_->misc_status(ST_OK, message);
-			ok = true;
-			string today = now(false, "%Y%m%d");
-			this_record->item("CLUBLOG_QSO_UPLOAD_DATE", today);
-			this_record->item("CLUBLOG_QSO_UPLOAD_STATUS", string("Y"));
-			// Go back to last entry in book.
-			book_->selection(record_num, HT_SELECTED);
-			// Force the book to save itself with these changes
-			book_->modified(true);
-		}
-		return ok;
+		if (DEBUG_ITEMS & DEBUG_THREADS) printf("CLUBLOG MAIN: Queueing request %s", this_record->item("CALL").c_str());
+		upload_lock_.lock();
+		upload_queue_.push(this_record);
+		upload_done_queue_.push(this_record);
+		upload_lock_.unlock();
 	}
 	return false;
+}
+
+// Upload QSO to clublog (in thread)
+void club_handler::th_upload(record* this_record) {
+	set<string> adif_fields;
+	generate_adif(adif_fields);
+	single_qso_ = to_adif(this_record, adif_fields);
+	// Get the parameters and make available for the HTTP POST FORM
+	vector<url_handler::field_pair> fields;
+	generate_form(fields, this_record);
+	stringstream resp;
+	// Post the form
+	bool ok;
+	if (!url_handler_->post_form("https://clublog.org/realtime.php", fields, nullptr, &resp)) {
+		ok = false;
+		upload_error_ = resp.str();
+	}
+	else {
+		ok = true;
+		upload_error_ = "";
+
+	}
+	upload_response_ = ok;
+	if (DEBUG_ITEMS & DEBUG_THREADS) printf("CLUBLOG THREAD: Calling thread callback result = %d\n", ok);
+	Fl::awake(cb_upload_done, (void*)this);
+	this_thread::yield();
+}
+
+bool club_handler::upload_done(bool response) {
+	if (response == false) {
+		// Display error message received from post
+		char message[128];
+		snprintf(message, sizeof(message), "CLUBLOG: Upload failed - %s", upload_error_.c_str());
+		status_->misc_status(ST_ERROR, message);
+	}
+	else {
+		// Update all records sent with the fact that they have been uploaded and when
+		char message[200];
+		record* this_record = upload_done_queue_.front();
+		snprintf(message, 200, "CLUBLOG: %s %s %s QSL uploaded",
+			this_record->item("QSO_DATE").c_str(),
+			this_record->item("TIME_ON").c_str(),
+			this_record->item("CALL").c_str());
+		status_->misc_status(ST_OK, message);
+		string today = now(false, "%Y%m%d");
+		this_record->item("CLUBLOG_QSO_UPLOAD_DATE", today);
+		this_record->item("CLUBLOG_QSO_UPLOAD_STATUS", string("Y"));
+		// Force the book to save itself with these changes
+		book_->modified(true);
+	}
+	upload_done_queue_.pop();
+	return response;
+}
+
+void club_handler::cb_upload_done(void* v) {
+	if (DEBUG_ITEMS & DEBUG_THREADS) printf("CLUBLOG MAIN: Entered thread callback handler\n");
+	club_handler* that = (club_handler*)v;
+	that->upload_done(that->upload_response_);
+}
+
+void club_handler::thread_run(club_handler* that) {
+	if (DEBUG_ITEMS & DEBUG_THREADS) printf("CLUBLOG THREAD: Thread started\n");
+	while (that->run_threads_) {
+		// Wait until qso placed on interface
+		while (that->run_threads_ && that->upload_queue_.empty()) {
+			this_thread::sleep_for(chrono::milliseconds(1000));
+		}
+		// Process it
+		that->upload_lock_.lock();
+		if (!that->upload_queue_.empty()) {
+			record* qso = that->upload_queue_.front();
+			that->upload_queue_.pop();
+			if (DEBUG_ITEMS & DEBUG_THREADS) printf("CLUBLOG THREAD: Received request %s\n", qso->item("CALL").c_str());
+			that->th_upload(qso);
+		}
+		else {
+			that->upload_lock_.unlock();
+		}
+		this_thread::yield();
+	}
 }
 
 string club_handler::to_adif(record* this_record, set<string> &fields) {

@@ -6,6 +6,10 @@
 #include "url_handler.h"
 
 #include <vector>
+#include <queue>
+#include <thread>
+#include <atomic>
+#include <mutex>
 
 #include <FL/Fl_Help_Dialog.H>
 
@@ -37,8 +41,29 @@
 		void get_reference(string& dir_name);
 		// Copy QSO to ADIF string
 		string to_adif(record* this_record, set<string>& fields);
+		// thtread callback
+		static void cb_upload_done(void* v);
+		// thtead-side upload QSO
+		void th_upload(record* qso);
+		// thread runner
+		static void thread_run(club_handler* that);
+		// main-side upload complete
+		bool upload_done(bool response);
 		// Help dialog  to display file received from post
 		Fl_Help_Dialog* help_dialog_;
+		// Upload thread
+		thread* th_upload_;
+		// Enable for threads
+		atomic<bool> run_threads_;
+		// interface data
+		queue<record*> upload_queue_;
+		queue<record*> upload_done_queue_;
+		// interface lock
+		mutex upload_lock_;
+		// Upload response queue
+		string upload_error_;
+		// Response
+		atomic<bool> upload_response_;
 		// Single QSO ADIF
 		string single_qso_;
 	};
