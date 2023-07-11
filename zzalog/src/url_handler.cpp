@@ -5,6 +5,7 @@
 
 
 url_handler* url_handler_;
+mutex url_handler::lock_;
 
 // Constructor
 url_handler::url_handler()
@@ -54,6 +55,8 @@ size_t url_handler::cb_read(char* data, size_t size, size_t nmemb, void* is) {
 
 // Read the URL (HTTP GET) and write it back to the output stream
 bool url_handler::read_url(string url, ostream* os) {
+	
+	lock_.lock();
 
 	CURLcode result;
 	// Start a new transfer
@@ -74,11 +77,13 @@ bool url_handler::read_url(string url, ostream* os) {
 	/* check for errors */
 	if (result != CURLE_OK) {
 		curl_easy_cleanup(curl_);
+		lock_.unlock();
 		return false;
 	}
 
 	/* reset transfer details */
 	curl_easy_cleanup(curl_);
+	lock_.unlock();
 
 	return true;
 }
@@ -86,6 +91,7 @@ bool url_handler::read_url(string url, ostream* os) {
 // Perform an HTTP PUT operation - this may respond with data
 bool url_handler::post_url(string url, string resource, istream* req, ostream* resp) {
 
+    lock_.lock();
 	CURLcode result;
 	// Start a new transfer
 	curl_ = curl_easy_init();
@@ -131,17 +137,19 @@ bool url_handler::post_url(string url, string resource, istream* req, ostream* r
 
 		curl_easy_reset(curl_);
 		curl_easy_cleanup(curl_);
+		lock_.unlock();
 		return false;
 	}
 
 	/* reset transfer details */
 	curl_easy_cleanup(curl_);
-
+    lock_.unlock();
 	return true;
 }
 
 // Performa an HTTP POST FORM operation 
 bool url_handler::post_form(string url, vector<field_pair> fields, istream* req, ostream* resp) {
+	lock_.lock();
 	CURLcode result;
 	// Start a new transfer
 	curl_ = curl_easy_init();
@@ -202,6 +210,7 @@ bool url_handler::post_form(string url, vector<field_pair> fields, istream* req,
 		// Reset the operation and clean up
 		curl_easy_reset(curl_);
 		curl_easy_cleanup(curl_);
+		lock_.unlock();
 		return false;
 	}
 	else {
@@ -209,6 +218,7 @@ bool url_handler::post_form(string url, vector<field_pair> fields, istream* req,
 		// Check the HTTP response
 		if (curl_easy_getinfo(curl_, CURLINFO_RESPONSE_CODE, &code) == CURLE_OK) {
 			if (code != 200) {
+				lock_.unlock();
 				return false;
 			}
 		}
@@ -217,7 +227,7 @@ bool url_handler::post_form(string url, vector<field_pair> fields, istream* req,
 	/* reset transfer details */
 	curl_easy_cleanup(curl_);
 	curl_mime_free(form);
-
+    lock_.unlock();
 	return true;
 }
 

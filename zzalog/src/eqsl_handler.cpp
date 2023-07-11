@@ -1023,7 +1023,7 @@ bool eqsl_handler::th_upload_qso(record* this_record) {
 	string full_url = url + escape_url(string(header_data) + string(qsl_data));
 	stringstream resp;
 	// Send URL with QSO details and download response
-	if (url_handler_->read_url(full_url, &resp)) {
+	if (url_handler_->read_url(full_url, (ostream*)&resp)) {
 		// Successfully downloaded
 		printf("THREAD: eQSL responded with response - started parsing\n");
 		string warning_text = "";

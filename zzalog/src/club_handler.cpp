@@ -302,7 +302,8 @@ void club_handler::th_upload(record* this_record) {
 
 	}
 	upload_response_ = ok;
-	if (DEBUG_ITEMS & DEBUG_THREADS) printf("CLUBLOG THREAD: Calling thread callback result = %d\n", ok);
+	if (DEBUG_ITEMS & DEBUG_THREADS) printf("CLUBLOG THREAD: Calling thread callback result = %d(%s)\n",
+	    ok, upload_error_.c_str());
 	Fl::awake(cb_upload_done, (void*)this);
 	this_thread::yield();
 }

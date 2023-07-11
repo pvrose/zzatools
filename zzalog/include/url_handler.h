@@ -6,6 +6,7 @@
 #include <istream>
 #include <cstdio>
 #include <vector>
+#include <mutex>
 
 #include <curl/curl.h>
 
@@ -47,5 +48,8 @@ using namespace std;
 
 		// Current curl session
 		CURL * curl_;
+		
+		// Ensure only 1 CURL operation at once
+		static mutex lock_;
 	};
 #endif
