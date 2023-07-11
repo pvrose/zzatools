@@ -44,8 +44,6 @@ lotw_handler::~lotw_handler()
 
 // Export extracted records, sign them and upload to LotW
 bool lotw_handler::upload_lotw_log(book* book, bool mine) {
-	upload_book_ = book;
-	upload_book_mine_ = mine;
 	status_->misc_status(ST_DEBUG, "LOTW: uploading extracted data");
 	fl_cursor(FL_CURSOR_WAIT);
 	// Get LotW settings
@@ -92,7 +90,7 @@ bool lotw_handler::upload_lotw_log(book* book, bool mine) {
 		fields.insert("RST_SENT");
 		fields.insert("STATION_CALLSIGN");
 		// Write the book (only the above fields)
-		if (upload_book_->size() && upload_book_->store_data(string(new_filename), true, &fields)) {
+		if (book->size() && book->store_data(string(new_filename), true, &fields)) {
 #ifdef WIN32
 			// Get the TQSL (an app that signs the upload) executable
 			string tqsl_executable;
@@ -124,7 +122,7 @@ bool lotw_handler::upload_lotw_log(book* book, bool mine) {
 #endif			
 			if (ok) {
 				// Get Callsign from first (maybe only) record in book
-				record* record_0 = upload_book_->get_record(0, false);
+				record* record_0 = book->get_record(0, false);
 				string callsign = record_0->item("STATION_CALLSIGN");
 				// Generate TQSL command line - note the executable may have spaces in its filename
 				char* command = new char[256];
@@ -134,8 +132,15 @@ bool lotw_handler::upload_lotw_log(book* book, bool mine) {
 				status_->misc_status(ST_LOG, command);
 				if (DEBUG_ITEMS & DEBUG_THREADS) printf("LOTW MAIN: Uploading QSOs to LotW\n");
 				upload_lock_.lock();
+				upload_done_szq_.push(book->size());
+				for (size_t ix = 0; ix < book->size(); ix++) {
+					upload_done_queue_.push(book->get_record(ix, false));
+				}
 				upload_queue_.push(command);
 				upload_lock_.unlock();
+				if (mine) {
+					delete book;
+				}
 			}
 		}
 		else {
@@ -382,24 +387,24 @@ bool lotw_handler::upload_done(int result) {
 		ok = false;
 		break;
 	}
-	if (ok) {
-		// Good response received
-		bool updated = false;
-		// For each entry extracted for signing - add that is has been sent and when
-		// Note for duplicates this will correct for the fact that these fields had wrongly been set
-		for (auto it = upload_book_->begin(); it != upload_book_->end(); it++) {
-			if ((*it)->item("LOTW_QSLSDATE") == "") {
-				(*it)->item("LOTW_QSLSDATE", now(false, "%Y%m%d"));
+	bool updated = false;
+	size_t count = upload_done_szq_.front();
+	upload_done_szq_.pop();
+	for (size_t ix = 0; ix < count; ix++) {
+		record* qso = upload_done_queue_.front();
+		upload_done_queue_.pop();
+		if (ok) {
+			if (qso->item("LOTW_QSLSDATE") == "") {
+				qso->item("LOTW_QSLSDATE", now(false, "%Y%m%d"));
 				updated = true;
 			}
-			if ((*it)->item("LOTW_QSL_SENT") != "Y") {
-				(*it)->item("LOTW_QSL_SENT", string("Y"));
+			if (qso->item("LOTW_QSL_SENT") != "Y") {
+				qso->item("LOTW_QSL_SENT", string("Y"));
 				updated = true;
 			}
 		}
-		book_->modified(updated);
 	}
-	if (upload_book_mine_) delete upload_book_;
+	book_->modified(updated);
 	return ok;
 }
 

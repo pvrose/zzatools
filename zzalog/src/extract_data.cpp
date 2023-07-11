@@ -664,17 +664,17 @@ void extract_data::upload() {
 	switch (use_mode_) {
 	case EQSL:
 		if (eqsl_handler_->upload_eqsl_log(this)) {
-			status_->misc_status(ST_OK, "EXTRACT: eQSL upload successful!");
+			status_->misc_status(ST_OK, "EXTRACT: eQSL upload requested!");
 		}
 		break;
 	case LOTW:
 		if (lotw_handler_->upload_lotw_log(this)) {
-			status_->misc_status(ST_OK, "EXTRACT: LotW upload successful!");
+			status_->misc_status(ST_OK, "EXTRACT: LotW upload requested!");
 		}
 		break;
 	case CLUBLOG:
 		if (club_handler_->upload_log(this)) {
-			status_->misc_status(ST_OK, "EXTRACT: Clublog upload successful!");
+			status_->misc_status(ST_OK, "EXTRACT: Clublog upload requested!");
 		}
 		break;
 	default:

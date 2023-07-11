@@ -45,20 +45,19 @@
 		// Validate the data
 		bool validate_adif(stringstream* adif);
 
-		// Upload book
-		book* upload_book_;
 		// Upload thread
 		thread* th_upload_;
 		// Enable for threads
 		atomic<bool> run_threads_;
 		// interface data
 		queue<char*> upload_queue_;
+		// REcords changed queue
+		queue<record*> upload_done_queue_;
+		queue<size_t> upload_done_szq_;
 		// interface lock
 		mutex upload_lock_;
 		// Upload response queue
 		atomic<int> upload_response_;
-		// Upload request internal
-		bool upload_book_mine_;
 
 	};
 #endif // !__LOTW_HANDLER__
