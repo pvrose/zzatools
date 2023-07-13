@@ -56,7 +56,6 @@ public:
 		MERGE_DUPE,
 		KEEP_BOTH_DUPES,
 		MERGE_DONE,
-		VIEW_QSL,
 		LOOK_ALL_TXT,
 		START_NET,
 		EDIT_NET,
@@ -100,8 +99,6 @@ public:
 	//static void cb_bn_edit_qth(Fl_Widget* w, void* v);
 	// Navigate buttons
 	static void cb_bn_navigate(Fl_Widget*, void* v);
-	// View QSL button
-	static void cb_bn_view_qsl(Fl_Widget* w, void* v);
 	// Browse call back
 	static void cb_bn_browse(Fl_Widget* w, void* v);
 	// Add query
@@ -155,7 +152,7 @@ protected:
 	//static map<qso_data::logging_state_t, list<qso_buttons::button_type> > button_map_;
 	//static map<button_type, button_action> action_map_;
 	// Number of buttons
-	static const int MAX_ACTIONS = 11;
+	static const int MAX_ACTIONS = 12;
 
 	// parent
 	qso_data* qso_data_;

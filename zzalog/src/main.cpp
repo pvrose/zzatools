@@ -74,7 +74,7 @@ using namespace std;
 string COPYRIGHT = "© Philip Rose GM3ZZA 2018. All rights reserved.\nPrefix data courtesy of clublog.org";
 string PROGRAM_ID = "ZZALOG";
 string PROG_ID = "ZLG";
-string VERSION = "3.4.31";
+string VERSION = "3.4.32";
 string TIMESTAMP = __DATE__ + string(" ") + __TIME__;
 #ifdef _DEBUG
 string PROGRAM_VERSION = VERSION + " (Debug " + TIMESTAMP + ")";
@@ -88,8 +88,6 @@ string VENDOR = "GM3ZZA";
 #endif
 unsigned int DEBUG_ITEMS = DEBUG_ERRORS | DEBUG_THREADS;
 
-// Global data items instanced in zzalib
-extern url_handler* url_handler_;
 
 // FLTK externals
 extern int FL_NORMAL_SIZE;
@@ -109,6 +107,7 @@ cty_data* cty_data_ = nullptr;
 spec_data* spec_data_ = nullptr;
 eqsl_handler* eqsl_handler_ = nullptr;
 lotw_handler* lotw_handler_ = nullptr;
+url_handler* url_handler_ = nullptr;
 qrz_handler* qrz_handler_ = nullptr;
 main_window* main_window_ = nullptr;
 intl_dialog* intl_dialog_ = nullptr;

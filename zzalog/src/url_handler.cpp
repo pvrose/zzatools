@@ -2,9 +2,6 @@
 
 #include <FL/fl_ask.H>
 
-
-
-url_handler* url_handler_;
 mutex url_handler::lock_;
 
 // Constructor

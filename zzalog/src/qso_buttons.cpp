@@ -27,9 +27,9 @@ map<qso_data::logging_state_t, list<qso_buttons::button_type> > button_map_ =
 		qso_buttons::START_NET, qso_buttons::WORKED_B4, qso_buttons::PARSE } },
 	{ qso_data::QSO_EDIT, { qso_buttons::SAVE_EDIT, qso_buttons::SAVE_EXIT, qso_buttons::CANCEL_EDIT, 
 		qso_buttons::EDIT_NET, qso_buttons::NAV_FIRST,
-		qso_buttons::NAV_PREV, qso_buttons::NAV_NEXT, qso_buttons::NAV_LAST, qso_buttons::VIEW_QSL } },
+		qso_buttons::NAV_PREV, qso_buttons::NAV_NEXT, qso_buttons::NAV_LAST } },
 	{ qso_data::QSO_BROWSE, { qso_buttons::EDIT_QSO, qso_buttons::CANCEL_BROWSE, qso_buttons::NAV_FIRST,
-		qso_buttons::NAV_PREV, qso_buttons::NAV_NEXT, qso_buttons::NAV_LAST, qso_buttons::VIEW_QSL } },
+		qso_buttons::NAV_PREV, qso_buttons::NAV_NEXT, qso_buttons::NAV_LAST } },
 	{ qso_data::QUERY_MATCH, { qso_buttons::ADD_QUERY, qso_buttons::REJECT_QUERY, qso_buttons::MERGE_QUERY,
 		qso_buttons::NAV_PREV, qso_buttons::NAV_NEXT }},
 	{ qso_data::QUERY_NEW, { qso_buttons::ADD_QUERY, qso_buttons::REJECT_QUERY, qso_buttons::FIND_QSO, qso_buttons::LOOK_ALL_TXT }},
@@ -67,7 +67,6 @@ map<qso_buttons::button_type, qso_buttons::button_action> action_map_ =
 	{ qso_buttons::NAV_PREV, { "@<-", "Select previous record in book", FL_YELLOW, qso_buttons::cb_bn_navigate, (void*)NV_PREV } },
 	{ qso_buttons::NAV_NEXT, { "@->", "Select next record in book", FL_YELLOW, qso_buttons::cb_bn_navigate, (void*)NV_NEXT } },
 	{ qso_buttons::NAV_LAST, { "@->|", "Select last record in book", FL_YELLOW, qso_buttons::cb_bn_navigate, (void*)NV_LAST } },
-	{ qso_buttons::VIEW_QSL, { "View QSL", "Display QSL status", FL_BACKGROUND_COLOR, qso_buttons::cb_bn_view_qsl, 0 } },
 	{ qso_buttons::PARSE, { "DX?", "Display the DX details for this callsign", FL_BACKGROUND_COLOR, qso_buttons::cb_parse, 0 } },
 	{ qso_buttons::CANCEL_BROWSE, { "Quit Browse", "Quit browse mode", COLOUR_PINK, qso_buttons::cb_cancel, 0 } },
 	{ qso_buttons::ADD_QUERY, { "Add QSO", "Add queried QSO to log", FL_GREEN, qso_buttons::cb_bn_add_query, 0 }},
@@ -325,42 +324,6 @@ void qso_buttons::cb_parse(Fl_Widget* w, void* v) {
 	delete tip_record;
 	that->enable_widgets();
 }
-
-// Callback - view QSL button
-void qso_buttons::cb_bn_view_qsl(Fl_Widget* w, void* v) {
-	qso_buttons* that = ancestor_view<qso_buttons>(w);
-	that->disable_widgets();
-	that->qso_data_->action_view_qsl(true);
-	that->enable_widgets();
-}
-
-//// Callback - Edit QTH
-//void qso_buttons::cb_bn_edit_qth(Fl_Widget* w, void* v) {
-//	qso_buttons* that = ancestor_view<qso_buttons>(w);
-//	that->disable_widgets();
-//	qso_manager* mgr = ancestor_view<qso_manager>(that);
-//	string qth = mgr->get_default(qso_manager::QTH);
-//	// Open QTH dialog
-//	qth_dialog* dlg = new qth_dialog(qth);
-//	set<string> changed_fields;
-//	record* macro;
-//	record* current = that->qso_data_->current_qso();
-//	switch (dlg->display()) {
-//	case BN_OK:
-//		changed_fields = spec_data_->get_macro_changes();
-//		macro = spec_data_->expand_macro("APP_ZZA_QTH", qth);
-//		for (auto fx = changed_fields.begin(); fx != changed_fields.end(); fx++) {
-//			current->item(*fx, macro->item(*fx));
-//		}
-//		that->qso_data_->check_qth_changed();
-//		that->enable_widgets();
-//		break;
-//	case BN_CANCEL:
-//		break;
-//	}
-//	delete dlg;
-//	that->enable_widgets();
-//}
 
 // CAllback - navigate buttons
 // v - direction
