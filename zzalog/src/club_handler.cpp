@@ -39,6 +39,9 @@ club_handler::club_handler() {
 
 club_handler::~club_handler() {
 	delete help_dialog_;
+	run_threads_ = false;
+	th_upload_->join();
+	delete th_upload_;
 }
 
 

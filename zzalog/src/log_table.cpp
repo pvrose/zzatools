@@ -149,7 +149,7 @@ void log_table::cb_tab_log(Fl_Widget* w, void* v) {
 			switch (that->last_button_) {
 			case FL_LEFT_MOUSE:
 				// Select the item at the row that was clicked if it can be selected
-				if (qso_manager_->editing() && qso_manager_->outwith_edit(qso_number)) {
+				if (qso_manager_ && qso_manager_->editing() && qso_manager_->outwith_edit(qso_number)) {
 					// It cannot be selected - keep original selection
 					char msg[128];
 					snprintf(msg, sizeof(msg), "LOG: Attempt to select record %d when another record is being edited", qso_number);

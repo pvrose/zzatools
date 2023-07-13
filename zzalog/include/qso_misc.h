@@ -4,6 +4,7 @@
 #include "qso_qth.h"
 #include "qso_details.h"
 #include "qso_dxcc.h"
+#include "qso_qsl_vwr.h"
 
 #include <FL/Fl_Tabs.H>
 class qso_misc :
@@ -22,7 +23,7 @@ public:
 	// save value
 	void save_values();
 
-	void qso(record* qso);
+	void qso(record* qso, qso_num_t qso_number);
 
 protected:
 	static void cb_tabs(Fl_Widget* w, void* v);
@@ -34,6 +35,7 @@ protected:
 	qso_qth* qth_;
 	qso_details* details_;
 	qso_dxcc* dxcc_;
+	qso_qsl_vwr* qsl_;
 
 };
 

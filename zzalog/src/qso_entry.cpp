@@ -168,6 +168,7 @@ void qso_entry::enable_widgets() {
 		}
 		ip_notes_->activate();
 		misc_->activate();
+		misc_->enable_widgets();
 		break;
 	case qso_data::QSO_STARTED:
 	case qso_data::NET_STARTED:
@@ -267,7 +268,7 @@ void qso_entry::copy_qso_to_display(int flags) {
 			break;
 		}
 		if (flags == CF_ALL_FLAGS || (flags & CF_DETAILS)) {
-			misc_->qso(qso_);
+			misc_->qso(qso_, qso_number_);
 			misc_->enable_widgets();
 		}
 	}

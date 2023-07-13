@@ -270,6 +270,9 @@
     <ClCompile Include="zzalog\src\band_data.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="zzalog\src\qso_qsl_vwr.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="zzalog\include\about_dialog.h">
@@ -552,6 +555,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="zzalog\include\band_data.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zzalog\include\qso_qsl_vwr.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

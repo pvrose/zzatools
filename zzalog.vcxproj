@@ -145,6 +145,7 @@
     <ClCompile Include="zzalog\src\qso_misc.cpp" />
     <ClCompile Include="zzalog\src\qso_net_entry.cpp" />
     <ClCompile Include="zzalog\src\qso_qsl.cpp" />
+    <ClCompile Include="zzalog\src\qso_qsl_vwr.cpp" />
     <ClCompile Include="zzalog\src\qso_qth.cpp" />
     <ClCompile Include="zzalog\src\qso_rig.cpp" />
     <ClCompile Include="zzalog\src\qso_contest.cpp" />
@@ -238,6 +239,7 @@
     <ClInclude Include="zzalog\include\qso_misc.h" />
     <ClInclude Include="zzalog\include\qso_net_entry.h" />
     <ClInclude Include="zzalog\include\qso_qsl.h" />
+    <ClInclude Include="zzalog\include\qso_qsl_vwr.h" />
     <ClInclude Include="zzalog\include\qso_qth.h" />
     <ClInclude Include="zzalog\include\qso_rig.h" />
     <ClInclude Include="zzalog\include\qso_contest.h" />

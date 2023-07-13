@@ -12,6 +12,7 @@ qso_misc::~qso_misc() {}
 
 // get settings
 void qso_misc::load_values() {}
+
 // Create form
 void qso_misc::create_form() {
 
@@ -29,6 +30,7 @@ void qso_misc::create_form() {
 	details_ = new qso_details(rx, ry, rw, rh, "Previous");
 	dxcc_ = new qso_dxcc(rx, ry, rw, rh, "DX?");
 	qth_ = new qso_qth(rx, ry, rw, rh, "My QTH");
+	qsl_ = new qso_qsl_vwr(rx, ry, rw, rh, "QSL");
 
 	end();
 
@@ -48,16 +50,18 @@ void qso_misc::enable_widgets() {
 	qth_->enable_widgets();
 	details_->enable_widgets();
 	dxcc_->enable_widgets();
+	qsl_->enable_widgets();
 }
 
 // save value
 void qso_misc::save_values() {}
 
-void qso_misc::qso(record* qso) {
+void qso_misc::qso(record* qso, qso_num_t number) {
 	qso_ = qso;
 	qth_->set_qth(qso_->item("APP_ZZA_QTH"));
 	details_->set_call(qso_->item("CALL"));
 	dxcc_->set_data();
+	qsl_->set_qso(qso_, number);
 }
 
 // Callback when changing tabs
