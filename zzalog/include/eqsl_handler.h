@@ -16,6 +16,9 @@
 #include <atomic>
 #include <mutex>
 
+#include <FL/Fl_Window.H>
+#include <FL/Fl_Help_View.H>
+
 using namespace std;
 
 	// eQSL throttling - 10s
@@ -138,6 +141,8 @@ using namespace std;
 
 		// main-side upload complete
 		bool upload_done(upload_response_t* response);
+
+		void display_response(string response);
 
 	protected:
 		// The throttled request queue

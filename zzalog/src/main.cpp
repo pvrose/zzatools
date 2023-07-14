@@ -116,7 +116,6 @@ club_handler* club_handler_ = nullptr;
 wsjtx_handler* wsjtx_handler_ = nullptr;
 fllog_emul* fllog_emul_ = nullptr;
 qso_manager* qso_manager_ = nullptr;
-Fl_Help_Dialog* help_dialog_ = nullptr;
 
 #ifdef _WIN32
 dxa_if* dxa_if_ = nullptr;

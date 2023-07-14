@@ -28,7 +28,6 @@ extern status* status_;
 extern Fl_Preferences* settings_;
 extern qso_manager* qso_manager_;
 extern url_handler* url_handler_;
-extern Fl_Help_Dialog* help_dialog_;
 extern unsigned int DEBUG_ITEMS;
 
 // Constructor
@@ -40,6 +39,10 @@ eqsl_handler::eqsl_handler()
 	run_threads_ = true;
 	if (DEBUG_ITEMS & DEBUG_THREADS) printf("MAIN: Starting thread\n");
 	th_upload_ = new thread(thread_run, this);
+
+	// Create help window
+	const int WHELP = 200;
+	const int HHELP = 200;
 }
 
 // Destructor
@@ -647,9 +650,6 @@ bool eqsl_handler::requests_queued() {
 // Upload updates to eQSL.cc log
 bool eqsl_handler::upload_eqsl_log(book* book) {
 	// Clear existing help dialog
-	if (help_dialog_) {
-		help_dialog_->value("");
-	}
 	// Get login details
 	string qsl_message;
 	string swl_message;
@@ -801,16 +801,7 @@ bool eqsl_handler::upload_eqsl_log(book* book) {
 		}
 		// Display full response
 		response.seekg(response.beg);
-		if (help_dialog_) {
-			string help_text = help_dialog_->value();
-			help_text += '\n' + response.str();
-			help_dialog_->value(help_text.c_str());
-		}
-		else {
-			help_dialog_ = new Fl_Help_Dialog;
-			help_dialog_->value(response.str().c_str());
-			help_dialog_->show();
-		}
+		display_response(response.str());
 		// now update book - don't try and save after each record
 		book_->enable_save(false);
 		for (size_t pos = 0; pos < book->size(); pos++) {
@@ -909,10 +900,6 @@ bool eqsl_handler::upload_single_qso(qso_num_t record_num) {
 		upload_qso = false;
 	}
 	if (upload_qso) {
-		// Clear existing help dialog
-		if (help_dialog_) {
-			help_dialog_->value("");
-		}
 		// Get login details
 		string username;
 		string password;
@@ -1143,14 +1130,7 @@ bool eqsl_handler::upload_done(upload_response_t* response) {
 		break;
 	}
 	// Display the response in a help dialog
-	if (help_dialog_) {
-		help_dialog_->value(response->html.c_str());
-	}
-	else {
-		help_dialog_ = new Fl_Help_Dialog;
-		help_dialog_->value(response->html.c_str());
-	}
-	help_dialog_->show();
+	display_response(response->html);
 	// Update status with succesful uploads and remove extracted records
 	if (passed) {
 		char ok_message[256];
@@ -1162,6 +1142,17 @@ bool eqsl_handler::upload_done(upload_response_t* response) {
 		book_->modified(true);
 	}
 	return passed;
+}
+
+void eqsl_handler::display_response(string response) {
+	const int WHELP = 400;
+	const int HHELP = 200;
+	Fl_Window* win = new Fl_Window(WHELP, HHELP, "eQSL Response");
+	Fl_Help_View* hv = new Fl_Help_View(0, 0, WHELP, HHELP);
+	hv->value(response.c_str());
+	win->end();
+	win->resizable(hv);
+	win->show();
 }
 
 void eqsl_handler::thread_run(eqsl_handler* that) {

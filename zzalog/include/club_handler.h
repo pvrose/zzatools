@@ -49,8 +49,6 @@
 		static void thread_run(club_handler* that);
 		// main-side upload complete
 		bool upload_done(bool response);
-		// Help dialog  to display file received from post
-		Fl_Help_Dialog* help_dialog_;
 		// Upload thread
 		thread* th_upload_;
 		// Enable for threads

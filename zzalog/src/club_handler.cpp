@@ -28,7 +28,6 @@ extern unsigned int DEBUG_ITEMS;
 club_handler::club_handler() {
 	// Create the URL handler if it hasn't already been done
 	if (!url_handler_) url_handler_ = new url_handler;
-	help_dialog_ = nullptr;
 	// Initialise thread interface
 	run_threads_ = true;
 	upload_response_ = 0;
@@ -38,7 +37,6 @@ club_handler::club_handler() {
 }
 
 club_handler::~club_handler() {
-	delete help_dialog_;
 	run_threads_ = false;
 	th_upload_->join();
 	delete th_upload_;
