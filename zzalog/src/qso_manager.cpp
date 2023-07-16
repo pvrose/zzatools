@@ -354,11 +354,10 @@ record* qso_manager::dummy_qso() {
 
 // Copy the sleected QSOs MY_RIG etc to the supplied qso record
 void qso_manager::update_import_qso(record* import_qso) {
-	record* use_qso;
 	string mode = import_qso->item("MODE");
 	string submode = import_qso->item("SUBMODE");
 	// If we have a QSO to copy from and one to copy to, copy these fields.
-	if (use_qso && import_qso) {
+	if (import_qso) {
 		if (import_qso->item("MY_RIG").length() == 0) 
 			import_qso->item("MY_RIG", get_default(RIG));
 		if (import_qso->item("MY_ANTENNA").length() == 0) 
@@ -422,5 +421,6 @@ void qso_manager::update_modem_qso(record* qso) {
 	//cout << "Received record from modem:" << qso << endl;
 	//adi_writer::to_adif(qso, cout);
 	//cout << endl;
+	update_import_qso(qso);
 	data_group_->update_modem_qso(qso);
 }

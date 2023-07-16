@@ -1297,7 +1297,6 @@ void qso_data::action_add_modem(record* qso) {
 	book_->enable_save(false);
 	action_new_qso(qso, QSO_COPY_MODEM);
 	g_entry_->append_qso();
-	(ancestor_view<qso_manager>(this))->update_import_qso(qso);
 	logging_state_ = QSO_MODEM;
 	book_->selection(book_->item_number(g_entry_->qso_number()), HT_INSERTED);
 	enable_widgets();

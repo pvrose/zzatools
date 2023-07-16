@@ -172,9 +172,12 @@ int wsjtx_handler::handle_log(stringstream& ss) {
 		delete rcvd_book;
 		qso_ = nullptr;
 	}
+	else {
+		status_->misc_status(ST_ERROR, "WSJT-X: Log datagram not expected, ignored.");
+	}
 #ifdef _WIN32
 	// Clear DX locator flag
-	dxa_if_->clear_dx_loc();
+	if (dxa_if_) dxa_if_->clear_dx_loc();
 #endif
 	return 0;
 }
