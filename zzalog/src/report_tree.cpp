@@ -15,9 +15,6 @@
 #include <FL/fl_draw.H>
 #include <FL/Fl_Preferences.H>
 
-
-
-
 extern book* book_;
 extern extract_data* extract_records_;
 extern cty_data* cty_data_;
@@ -785,7 +782,7 @@ void report_tree::cb_tree_report(Fl_Widget* w, void* v) {
 	case FL_TREE_REASON_SELECTED:
 		// If we select a record, then select that record in the book
 		if ((long)item->user_data() >= 0) {
-			that->get_book()->selection((item_num_t)(long)item->user_data());
+			that->get_book()->selection((item_num_t)(long)item->user_data(), HT_PEEK);
 			return;
 		}
 		cb_tree(w, v);
