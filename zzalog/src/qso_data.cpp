@@ -379,8 +379,13 @@ void qso_data::update_query(logging_state_t query, qso_num_t match_num, qso_num_
 	case MANUAL_ENTRY:
 		action_query(query, match_num, query_num);
 		break;
+	case QSO_EDIT:
+		status_->misc_status(ST_WARNING, "DASH: Query received while editing QSO. Existing edit saved.");
+		action_save_edit();
+		action_query(query, match_num, query_num);
+		break;
 	default:
-		// TODO:
+		status_->misc_status(ST_ERROR, "DASH: Query received when not expected. Query ignored.");
 		break;
 	}
 }

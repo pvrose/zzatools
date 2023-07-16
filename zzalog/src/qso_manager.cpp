@@ -357,18 +357,16 @@ void qso_manager::update_import_qso(record* import_qso) {
 	record* use_qso;
 	string mode = import_qso->item("MODE");
 	string submode = import_qso->item("SUBMODE");
-	// Get the default record for copying
-	use_qso = book_->get_record(data_group_->get_default_number(), false);
 	// If we have a QSO to copy from and one to copy to, copy these fields.
 	if (use_qso && import_qso) {
 		if (import_qso->item("MY_RIG").length() == 0) 
-			import_qso->item("MY_RIG", use_qso->item("MY_RIG"));
+			import_qso->item("MY_RIG", get_default(RIG));
 		if (import_qso->item("MY_ANTENNA").length() == 0) 
-			import_qso->item("MY_ANTENNA", use_qso->item("MY_ANTENNA"));
+			import_qso->item("MY_ANTENNA", get_default(ANTENNA));
 		if (import_qso->item("STATION_CALLSIGN").length() == 0) 
-			import_qso->item("STATION_CALLSIGN", use_qso->item("STATION_CALLSIGN"));
+			import_qso->item("STATION_CALLSIGN", get_default(CALLSIGN));
 		if (import_qso->item("APP_ZZA_QTH").length() == 0) 
-			import_qso->item("APP_ZZA_QTH", use_qso->item("APP_ZZA_QTH"));
+			import_qso->item("APP_ZZA_QTH", get_default(QTH));
 	}
 }
 

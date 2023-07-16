@@ -243,6 +243,7 @@ void qso_rig::create_form(int X, int Y) {
 	op_summary_->box(FL_FLAT_BOX);
 	op_summary_->color(FL_BLACK);
 	op_summary_->align(FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
+	op_summary_->labelsize(FL_NORMAL_SIZE + 2);
 
 	curr_y += op_summary_->h();
 
@@ -254,7 +255,7 @@ void qso_rig::create_form(int X, int Y) {
 	op_frequency_->color(FL_BLACK);
 	op_frequency_->textcolor(FL_YELLOW);
 	op_frequency_->textfont(FL_BOLD);
-	op_frequency_->textsize(FL_NORMAL_SIZE + 2);
+	op_frequency_->textsize(FL_NORMAL_SIZE + 4);
 
 	curr_x += op_frequency_->w();
 	op_mode_ = new Fl_Output(curr_x, curr_y, WBUTTON, op_frequency_->h());
@@ -264,7 +265,7 @@ void qso_rig::create_form(int X, int Y) {
 	op_mode_->color(FL_BLACK);
 	op_mode_->textcolor(FL_YELLOW);
 	op_mode_->textfont(FL_BOLD);
-	op_mode_->textsize(FL_NORMAL_SIZE + 2);
+	op_mode_->textsize(FL_NORMAL_SIZE + 4);
 
 	curr_y += op_mode_->h();
 	curr_x += op_mode_->w();
