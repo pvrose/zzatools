@@ -313,25 +313,6 @@ void report_tree::copy_map_to_tree(report_map_t* this_map, Fl_Tree_Item* item, i
 		// Get entry in the map
 		map_key = it->first;
 		next_entry = it->second;
-		Fl_Color label_colour;
-		// Set the colour depending on the entry type
-		switch (next_entry->entry_cat) {
-		case RC_DXCC:
-			label_colour = FL_BLACK;
-			break;
-		case RC_PAS:
-			label_colour = fl_darker(FL_DARK3);
-			break;
-		case RC_BAND:
-			label_colour = FL_DARK_GREEN;
-			break;
-		case RC_MODE:
-			label_colour = FL_DARK_RED;
-			break;
-		case RC_CUSTOM:
-			label_colour = FL_DARK_BLUE;
-			break;
-		}
 
 		if (next_entry->record_list != nullptr) {
 			// There is a valid record list in the entry
@@ -353,7 +334,9 @@ void report_tree::copy_map_to_tree(report_map_t* this_map, Fl_Tree_Item* item, i
 			next_item->label(text);
 			// Item data set to say it isn't a record entry
 			next_item->user_data((void*)(long)-1);
-			next_item->labelcolor(label_colour);
+			if (count_dxcc) next_item->labelcolor(fl_darker(FL_GREEN));
+			else if (count_eqsl) next_item->labelcolor(FL_BLUE);
+			else next_item->labelcolor(FL_BLACK);
 			next_item->close();
 		}
 		if (next_entry->next_entry != nullptr) {
@@ -375,7 +358,9 @@ void report_tree::copy_map_to_tree(report_map_t* this_map, Fl_Tree_Item* item, i
 			next_item->label(text);
 			// Item data set to say it isn't a record entry
 			next_item->user_data((void*)(long)-1);
-			next_item->labelcolor(label_colour);
+			if (count_dxcc) next_item->labelcolor(fl_darker(FL_GREEN));
+			else if (count_eqsl) next_item->labelcolor(FL_BLUE);
+			else next_item->labelcolor(FL_BLACK);
 			next_item->close();
 		}
 		// Totalise counts to use upwards and report progress
