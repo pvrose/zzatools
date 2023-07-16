@@ -443,14 +443,23 @@ void report_tree::copy_records_to_tree(record_list_t* record_list, Fl_Tree_Item*
 				record->item("BAND").c_str(),
 				record->item("MODE", true).c_str(),
 				confirmed.c_str(), eqsl_text.c_str(), lotw_text.c_str(), card_text.c_str());
+			// Have we hung the callsign before
+			string callsign = record->item("CALL");
+			Fl_Tree_Item* call_item = item->find_child_item(callsign.c_str());
+			if (call_item == nullptr) {
+				call_item = item->add(prefs(), callsign.c_str());
+				call_item->labelcolor(fl_darker(FL_RED));
+			}
 			// Hang the text on the tree in sorted order
-			Fl_Tree_Item* record_item = item->add(prefs(), text);
+			Fl_Tree_Item* record_item = call_item->add(prefs(), text);
 			// Item data is the number of the record
 			record_item->user_data((void*)(long)record_num);
 			if (is_dxcc) record_item->labelcolor(fl_darker(FL_GREEN));
 			else if (is_confirmed) record_item->labelcolor(FL_BLUE);
 			else record_item->labelcolor(fl_darker(FL_RED));
 			record_item->labelfont(item_labelfont() | FL_ITALIC);
+			if (is_dxcc) call_item->labelcolor(fl_darker(FL_GREEN));
+			else if (is_confirmed && call_item->labelcolor() != fl_darker(FL_GREEN)) call_item->labelcolor(FL_BLUE);
 		}
 		delete[] text;
 	}
