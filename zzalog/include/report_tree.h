@@ -46,7 +46,8 @@ using namespace std;
 		RC_PAS = 3,                   // DXCC plus primary adminstrative subdivision (State)
 		RC_BAND = 4,                  // Band
 		RC_MODE = 8,                  // Mode
-		RC_CUSTOM = 16,               // Custom - select ADIF field
+		RC_CALL = 16,                 // Callsign
+		RC_CUSTOM = 32,               // Custom - select ADIF field
 		RC_EMPTY = 0                  // Level not used
 	};
 

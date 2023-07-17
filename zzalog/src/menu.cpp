@@ -205,14 +205,16 @@ settings* config_ = nullptr;
 			{ "Entities/&States", 0, menu::cb_mi_rep_level, (void*)((1 << 8) + RC_PAS), FL_MENU_RADIO | FL_MENU_VALUE },
 			{ "&Bands", 0, menu::cb_mi_rep_level, (void*)((1 << 8) + RC_BAND), FL_MENU_RADIO },
 			{ "&Modes", 0, menu::cb_mi_rep_level, (void*)((1 << 8) + RC_MODE), FL_MENU_RADIO },
-			{ "&Custom", 0, menu::cb_mi_rep_level, (void*)((1 << 8) + RC_CUSTOM), FL_MENU_RADIO },
+			{ "&Callsigns", 0, menu::cb_mi_rep_level, (void*)((1 << 8) + RC_CALL), FL_MENU_RADIO },
+			{ "Cus&tom", 0, menu::cb_mi_rep_level, (void*)((1 << 8) + RC_CUSTOM), FL_MENU_RADIO },
 			{ 0 },
 		{ "Level &2", 0, 0, 0, FL_SUBMENU },
 			{ "&Entities", 0, menu::cb_mi_rep_level, (void*)((2 << 8) + RC_DXCC), FL_MENU_RADIO },
 			{ "Entities/&States", 0, menu::cb_mi_rep_level, (void*)((2 << 8) + RC_PAS), FL_MENU_RADIO },
 			{ "&Bands", 0, menu::cb_mi_rep_level, (void*)((2 << 8) + RC_BAND), FL_MENU_RADIO },
 			{ "&Modes", 0, menu::cb_mi_rep_level, (void*)((2 << 8) + RC_MODE), FL_MENU_RADIO },
-			{ "&Custom", 0, menu::cb_mi_rep_level, (void*)((2 << 8) + RC_CUSTOM), FL_MENU_RADIO },
+			{ "&Callsigns", 0, menu::cb_mi_rep_level, (void*)((2 << 8) + RC_CALL), FL_MENU_RADIO },
+			{ "Cus&tom", 0, menu::cb_mi_rep_level, (void*)((2 << 8) + RC_CUSTOM), FL_MENU_RADIO },
 			{ "&Nothing", 0, menu::cb_mi_rep_level, (void*)((2 << 8) + RC_EMPTY), FL_MENU_RADIO | FL_MENU_VALUE },
 			{ 0 },
 		{ "Level &3", 0, 0, 0, FL_SUBMENU },
@@ -220,7 +222,8 @@ settings* config_ = nullptr;
 			{ "Entities/&States", 0, menu::cb_mi_rep_level, (void*)((3 << 8) + RC_PAS), FL_MENU_RADIO },
 			{ "&Bands", 0, menu::cb_mi_rep_level, (void*)((3 << 8) + RC_BAND), FL_MENU_RADIO },
 			{ "&Modes", 0, menu::cb_mi_rep_level, (void*)((3 << 8) + RC_MODE), FL_MENU_RADIO },
-			{ "&Custom", 0, menu::cb_mi_rep_level, (void*)((3 << 8) + RC_CUSTOM), FL_MENU_RADIO },
+			{ "&Callsigns", 0, menu::cb_mi_rep_level, (void*)((3 << 8) + RC_CALL), FL_MENU_RADIO },
+			{ "Cus&tom", 0, menu::cb_mi_rep_level, (void*)((3 << 8) + RC_CUSTOM), FL_MENU_RADIO },
 			{ "&Nothing", 0, menu::cb_mi_rep_level, (void*)((3 << 8) + RC_EMPTY), FL_MENU_RADIO | FL_MENU_VALUE },
 			{ 0 },
 		{ 0 },
@@ -1470,7 +1473,9 @@ void menu::report_mode(vector<report_cat_t> report_mode, report_filter_t filter)
 		int index_bands = find_index(item_label);
 		sprintf(item_label, "Re&port/Level &%d/&Modes", i);
 		int index_modes = find_index(item_label);
-		sprintf(item_label, "Re&port/Level &%d/&Custom", i);
+		sprintf(item_label, "Re&port/Level &%d/&Callsigns", i);
+		int index_calls = find_index(item_label);
+		sprintf(item_label, "Re&port/Level &%d/Cus&tom", i);
 		int index_custom = find_index(item_label);
 		int index_nothing = -1;
 		// Nothing is not an option for Level1
@@ -1491,6 +1496,7 @@ void menu::report_mode(vector<report_cat_t> report_mode, report_filter_t filter)
 				mode(index_states, mode(index_states) & ~FL_MENU_VALUE);
 				mode(index_bands, mode(index_bands) & ~FL_MENU_VALUE);
 				mode(index_modes, mode(index_modes) & ~FL_MENU_VALUE);
+				mode(index_calls, mode(index_calls) & ~FL_MENU_VALUE);
 				mode(index_custom, mode(index_custom) & ~FL_MENU_VALUE);
 				break;
 			case RC_PAS:
@@ -1499,6 +1505,7 @@ void menu::report_mode(vector<report_cat_t> report_mode, report_filter_t filter)
 				mode(index_states, mode(index_states) | FL_MENU_VALUE);
 				mode(index_bands, mode(index_bands) & ~FL_MENU_VALUE);
 				mode(index_modes, mode(index_modes) & ~FL_MENU_VALUE);
+				mode(index_calls, mode(index_calls) & ~FL_MENU_VALUE);
 				mode(index_custom, mode(index_custom) & ~FL_MENU_VALUE);
 				break;
 			case RC_BAND:
@@ -1507,6 +1514,7 @@ void menu::report_mode(vector<report_cat_t> report_mode, report_filter_t filter)
 				mode(index_states, mode(index_states) & ~FL_MENU_VALUE);
 				mode(index_bands, mode(index_bands) | FL_MENU_VALUE);
 				mode(index_modes, mode(index_modes) & ~FL_MENU_VALUE);
+				mode(index_calls, mode(index_calls) & ~FL_MENU_VALUE);
 				mode(index_custom, mode(index_custom) & ~FL_MENU_VALUE);
 				break;
 			case RC_MODE:
@@ -1515,6 +1523,16 @@ void menu::report_mode(vector<report_cat_t> report_mode, report_filter_t filter)
 				mode(index_states, mode(index_states) & ~FL_MENU_VALUE);
 				mode(index_bands, mode(index_bands) & ~FL_MENU_VALUE);
 				mode(index_modes, mode(index_modes) | FL_MENU_VALUE);
+				mode(index_calls, mode(index_calls) & ~FL_MENU_VALUE);
+				mode(index_custom, mode(index_custom) & ~FL_MENU_VALUE);
+				break;
+			case RC_CALL:
+				// Set Callsigns only
+				mode(index_entities, mode(index_entities) & ~FL_MENU_VALUE);
+				mode(index_states, mode(index_states) & ~FL_MENU_VALUE);
+				mode(index_bands, mode(index_bands) & ~FL_MENU_VALUE);
+				mode(index_modes, mode(index_modes) & ~FL_MENU_VALUE);
+				mode(index_calls, mode(index_calls) | FL_MENU_VALUE);
 				mode(index_custom, mode(index_custom) & ~FL_MENU_VALUE);
 				break;
 			case RC_CUSTOM:
@@ -1523,6 +1541,7 @@ void menu::report_mode(vector<report_cat_t> report_mode, report_filter_t filter)
 				mode(index_states, mode(index_states) & ~FL_MENU_VALUE);
 				mode(index_bands, mode(index_bands) & ~FL_MENU_VALUE);
 				mode(index_modes, mode(index_modes) & ~FL_MENU_VALUE);
+				mode(index_calls, mode(index_calls) & ~FL_MENU_VALUE);
 				mode(index_custom, mode(index_custom) | FL_MENU_VALUE);
 				break;
 			}
@@ -1534,6 +1553,7 @@ void menu::report_mode(vector<report_cat_t> report_mode, report_filter_t filter)
 			mode(index_states, mode(index_states) & ~FL_MENU_VALUE);
 			mode(index_bands, mode(index_bands) & ~FL_MENU_VALUE);
 			mode(index_modes, mode(index_entities) & ~FL_MENU_VALUE);
+			mode(index_calls, mode(index_calls) & ~FL_MENU_VALUE);
 			mode(index_custom, mode(index_custom) & ~FL_MENU_VALUE);
 
 		}

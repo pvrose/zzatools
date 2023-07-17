@@ -236,6 +236,9 @@ void report_tree::add_record(item_num_t record_num, report_map_entry_t* entry) {
 			// Get the mode from the record
 			map_key = record->item("MODE", true);
 			break;
+		case RC_CALL:
+			map_key = record->item("CALL");
+			break;
 		case RC_CUSTOM:
 			// Custom from the record
 			custom_code = record->item(custom_field_);
@@ -336,7 +339,7 @@ void report_tree::copy_map_to_tree(report_map_t* this_map, Fl_Tree_Item* item, i
 			next_item->user_data((void*)(long)-1);
 			if (count_dxcc) next_item->labelcolor(fl_darker(FL_GREEN));
 			else if (count_eqsl) next_item->labelcolor(FL_BLUE);
-			else next_item->labelcolor(FL_BLACK);
+			else next_item->labelcolor(fl_darker(FL_RED));
 			next_item->close();
 		}
 		if (next_entry->next_entry != nullptr) {
@@ -360,7 +363,7 @@ void report_tree::copy_map_to_tree(report_map_t* this_map, Fl_Tree_Item* item, i
 			next_item->user_data((void*)(long)-1);
 			if (count_dxcc) next_item->labelcolor(fl_darker(FL_GREEN));
 			else if (count_eqsl) next_item->labelcolor(FL_BLUE);
-			else next_item->labelcolor(FL_BLACK);
+			else next_item->labelcolor(fl_darker(FL_RED));
 			next_item->close();
 		}
 		// Totalise counts to use upwards and report progress
@@ -443,23 +446,14 @@ void report_tree::copy_records_to_tree(record_list_t* record_list, Fl_Tree_Item*
 				record->item("BAND").c_str(),
 				record->item("MODE", true).c_str(),
 				confirmed.c_str(), eqsl_text.c_str(), lotw_text.c_str(), card_text.c_str());
-			// Have we hung the callsign before
-			string callsign = record->item("CALL");
-			Fl_Tree_Item* call_item = item->find_child_item(callsign.c_str());
-			if (call_item == nullptr) {
-				call_item = item->add(prefs(), callsign.c_str());
-				call_item->labelcolor(fl_darker(FL_RED));
-			}
 			// Hang the text on the tree in sorted order
-			Fl_Tree_Item* record_item = call_item->add(prefs(), text);
+			Fl_Tree_Item* record_item = item->add(prefs(), text);
 			// Item data is the number of the record
 			record_item->user_data((void*)(long)record_num);
 			if (is_dxcc) record_item->labelcolor(fl_darker(FL_GREEN));
 			else if (is_confirmed) record_item->labelcolor(FL_BLUE);
 			else record_item->labelcolor(fl_darker(FL_RED));
 			record_item->labelfont(item_labelfont() | FL_ITALIC);
-			if (is_dxcc) call_item->labelcolor(fl_darker(FL_GREEN));
-			else if (is_confirmed && call_item->labelcolor() != fl_darker(FL_GREEN)) call_item->labelcolor(FL_BLUE);
 		}
 		delete[] text;
 	}
@@ -505,6 +499,9 @@ void report_tree::create_map() {
 		break;
 	case RC_CUSTOM:
 		field_name = custom_field_;
+		break;
+	case RC_CALL:
+		field_name = "CALL";
 		break;
 	}
 
@@ -672,6 +669,8 @@ void report_tree::update_status() {
 		case RC_MODE:
 			text += " Modes";
 			break;
+		case RC_CALL:
+			text += " Callsigns";
 		}
 	}
 	// Get document to update status pane
