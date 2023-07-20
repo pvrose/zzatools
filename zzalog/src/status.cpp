@@ -466,7 +466,7 @@ void text_display::append(const char* line) {
 // v is a bool: true for find again, false for find new
 void viewer_window::cb_find(Fl_Widget* w, void* v) {
 	viewer_window* that = ancestor_view<viewer_window>(w);
-	bool repeat = (long)v;
+	bool repeat = (intptr_t)v;
 	// Look for the string from the current position
 	int pos = that->display_->insert_position();
 	int found;

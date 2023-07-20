@@ -449,7 +449,7 @@ void report_tree::copy_records_to_tree(record_list_t* record_list, Fl_Tree_Item*
 			// Hang the text on the tree in sorted order
 			Fl_Tree_Item* record_item = item->add(prefs(), text);
 			// Item data is the number of the record
-			record_item->user_data((void*)(long)record_num);
+			record_item->user_data((void*)(intptr_t)record_num);
 			if (is_dxcc) record_item->labelcolor(fl_darker(FL_GREEN));
 			else if (is_confirmed) record_item->labelcolor(FL_BLUE);
 			else record_item->labelcolor(fl_darker(FL_RED));
@@ -774,8 +774,8 @@ void report_tree::cb_tree_report(Fl_Widget* w, void* v) {
 	switch (that->callback_reason()) {
 	case FL_TREE_REASON_SELECTED:
 		// If we select a record, then select that record in the book
-		if ((long)item->user_data() >= 0) {
-			that->get_book()->selection((item_num_t)(long)item->user_data(), HT_PEEK);
+		if ((intptr_t)item->user_data() >= 0) {
+			that->get_book()->selection((item_num_t)(intptr_t)item->user_data(), HT_PEEK);
 			return;
 		}
 		cb_tree(w, v);

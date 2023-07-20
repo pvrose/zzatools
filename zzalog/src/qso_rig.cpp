@@ -472,7 +472,7 @@ void qso_rig::populate_model_choice() {
 	for (auto ix = rig_list.begin(); ix != rig_list.end(); ix++) {
 		string name = *ix;
 		rig_model_t id = rig_ids.at(name);
-		int pos = ch_rig_model_->add(name.c_str(), 0, nullptr, (void*)id);
+		int pos = ch_rig_model_->add(name.c_str(), 0, nullptr, (void*)(intptr_t)id);
 		if (id == hamlib_data_.model_id) {
 			ch_rig_model_->value(pos);
 		}
@@ -554,7 +554,7 @@ void qso_rig::cb_ch_model(Fl_Widget* w, void* v) {
 	Fl_Choice* ch = (Fl_Choice*)w;
 	qso_rig* that = ancestor_view<qso_rig>(w);
 	const Fl_Menu_Item* item = ch->mvalue();
-	rig_model_t id = (long)item->user_data();
+	rig_model_t id = (intptr_t)item->user_data();
 	const char* label = ch->text();
 	const rig_caps* capabilities = rig_get_caps(id);
 	if (capabilities != nullptr) {

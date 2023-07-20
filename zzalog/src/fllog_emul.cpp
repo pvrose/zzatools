@@ -26,6 +26,7 @@ fllog_emul* fllog_emul::that_ = nullptr;
 // Constructor
 fllog_emul::fllog_emul() {
 	rpc_handler_ = nullptr;
+	current_record_ = nullptr;
 	that_ = this;
 }
 
@@ -67,7 +68,7 @@ int fllog_emul::get_record(rpc_data_item::rpc_list& params, rpc_data_item& respo
 		rpc_data_item* item_0 = params.front();
 		string callsign = item_0->get_string();
 		extract_records_->extract_call(callsign);
-		printf("get_record %s %d records found\n", callsign.c_str(), extract_records_->size());
+		printf("get_record %s %zu records found\n", callsign.c_str(), extract_records_->size());
 		if (extract_records_->size()) {
 			that_->current_record_ = extract_records_->get_record(0, true);
 			adi_writer* writer = new adi_writer;

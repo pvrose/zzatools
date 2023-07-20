@@ -48,9 +48,6 @@
     <ClCompile Include="zzalog\src\corr_dialog.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="zzalog\src\dxa_if.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="zzalog\src\eqsl_handler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -273,6 +270,9 @@
     <ClCompile Include="zzalog\src\qso_qsl_vwr.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="zzalog\src\dxa_if.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="zzalog\include\about_dialog.h">
@@ -306,9 +306,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="zzalog\include\corr_dialog.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\dxa_if.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="zzalog\include\eqsl_handler.h">
@@ -560,9 +557,11 @@
     <ClInclude Include="zzalog\include\qso_qsl_vwr.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="zzalog\include\dxa_if.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
     <None Include="reference\Prefix.lst" />
     <None Include="zzalog\Makefile" />
   </ItemGroup>

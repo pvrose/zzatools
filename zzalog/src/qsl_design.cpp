@@ -256,7 +256,7 @@ void qsl_design::save_values() {
 // Call back when a radio button is pressed - v indicates which button
 void qsl_design::cb_radio_dim(Fl_Widget* w, void* v) {
 	qsl_design* that = ancestor_view<qsl_design>(w);
-	that->unit_ = ((qsl_form::dim_unit)(long)v);
+	that->unit_ = ((qsl_form::dim_unit)(intptr_t)v);
 }
 
 // Callback - OK

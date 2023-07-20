@@ -90,14 +90,14 @@ void qso_entry::create_form(int X, int Y) {
 			ch_field_[ix] = new field_choice(curr_x, curr_y, WCHOICE, HBUTTON);
 			ch_field_[ix]->align(FL_ALIGN_RIGHT);
 			ch_field_[ix]->tooltip("Specify the field to provide");
-			ch_field_[ix]->callback(cb_ch_field, (void*)ix);
+			ch_field_[ix]->callback(cb_ch_field, (void*)(intptr_t)ix);
 			ch_field_[ix]->set_dataset("Fields");
 		}
 		curr_x += WCHOICE;
 		ip_field_[ix] = new field_input(curr_x, curr_y, WINPUT, HBUTTON);
 		ip_field_[ix]->align(FL_ALIGN_LEFT);
 		ip_field_[ix]->tooltip("Enter required value to log");
-		ip_field_[ix]->callback(cb_ip_field, (void*)ix);
+		ip_field_[ix]->callback(cb_ip_field, (void*)(intptr_t)ix);
 		ip_field_[ix]->input()->when(FL_WHEN_RELEASE_ALWAYS);
 		if (ix < NUMBER_FIXED) {
 			ip_field_[ix]->field_name(fixed_names_[ix].c_str(), qso_);
@@ -561,7 +561,7 @@ void qso_entry::cb_ch_field(Fl_Widget* w, void* v) {
 	qso_entry* that = ancestor_view<qso_entry>(w);
 	field_choice* ch = (field_choice*)w;
 	const char* field = ch->value();
-	int ix = (int)(long)v;
+	int ix = (int)(intptr_t)v;
 	if (strlen(field)) {
 		that->action_add_field(ix, field);
 	}

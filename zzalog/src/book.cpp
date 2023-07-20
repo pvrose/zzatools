@@ -286,7 +286,7 @@ bool book::load_data(string filename)
 					char* message = new char[filename.length() + 100];
 					size_t num_records = size();
 					if (header()) num_records++;
-					sprintf(message, "LOG: %d records read from %s", num_records, filename.c_str());
+					sprintf(message, "LOG: %zu records read from %s", num_records, filename.c_str());
 					status_->misc_status(ST_OK, message);
 					delete[] message;
 				}
@@ -468,7 +468,7 @@ bool book::store_data(string filename, bool force, set<string>* fields) {
 					char* message = new char[filename_.length() + 100];
 					size_t num_records = size();
 					if (header()) num_records++;
-					sprintf(message, "LOG: %d records written to %s", num_records, filename_.c_str());
+					sprintf(message, "LOG: %zu records written to %s", num_records, filename_.c_str());
 					status_->misc_status(ST_OK, message);
 					delete[] message;
 				}
@@ -1360,7 +1360,7 @@ void book::check_dupes(bool restart) {
 	}
 	if (!possible_dupe) {
 		char message[256];
-		snprintf(message, 256, "LOG: Dupe check complete. %d checked, %d kept, %d removed", duplicate_item_, number_dupes_kept_, number_dupes_removed_);
+		snprintf(message, 256, "LOG: Dupe check complete. %zu checked, %d kept, %d removed", duplicate_item_, number_dupes_kept_, number_dupes_removed_);
 		status_->misc_status(ST_OK, message);
 		inhibit_view_update_ = false;
 		selection(size() - 1, HT_ALL);

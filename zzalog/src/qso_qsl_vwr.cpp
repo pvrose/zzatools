@@ -173,7 +173,7 @@ void qso_qsl_vwr::create_form() {
 void qso_qsl_vwr::cb_rad_card(Fl_Widget* w, void* v) {
 	qso_qsl_vwr* that = ancestor_view<qso_qsl_vwr>(w);
 	// Get the selected image and display it.
-	that->set_selected_image((image_t)(long)v);
+	that->set_selected_image((image_t)(intptr_t)v);
 	that->set_image();
 	// Save setting
 	//	main_window_->flush();

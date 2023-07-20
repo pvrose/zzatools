@@ -67,7 +67,7 @@ void eqsl_handler::enqueue_request(qso_num_t record_num, bool force /*=false*/) 
 		request_queue_.push(request_t(record_num, force));
 		// Update status
 		char message[512];
-		sprintf(message, "EQSL: %d Card requests pending", request_queue_.size());
+		sprintf(message, "EQSL: %zu Card requests pending", request_queue_.size());
 		status_->misc_status(ST_NOTE, message);
 	}
 }
@@ -155,7 +155,7 @@ void eqsl_handler::cb_timer_deq(void* v) {
 			request = request_queue->front();
 			// Now peek the queue and select the front request so user sees the QSO being requested
 			book_->selection(request.record_num);
-			sprintf(message, "EQSL: %d card requests pending - next request %s", request_queue->size(), book_->get_record()->item("CALL").c_str());
+			sprintf(message, "EQSL: %zu card requests pending - next request %s", request_queue->size(), book_->get_record()->item("CALL").c_str());
 			status_->misc_status(ST_NOTE, message);
 
 			switch (response) {
@@ -826,7 +826,7 @@ bool eqsl_handler::upload_eqsl_log(book* book) {
 		// Update status with succesful uploads and remove extracted records
 		if (num_errors || num_warnings) {
 			char ok_message[256];
-			sprintf(ok_message, "EQSL: %d QSLs uploaded %d errors %d warnings", book->size(), num_errors, num_warnings);
+			sprintf(ok_message, "EQSL: %zu QSLs uploaded %d errors %d warnings", book->size(), num_errors, num_warnings);
 			status_->misc_status(ST_OK, ok_message);
 		}
 

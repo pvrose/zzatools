@@ -1456,7 +1456,7 @@ void qso_data::action_exec_query() {
 	}
 	char msg[128];
 	if (extract_records_->size()) {
-		snprintf(msg, sizeof(msg), "DASH: %d matching records found", extract_records_->size());
+		snprintf(msg, sizeof(msg), "DASH: %zu matching records found", extract_records_->size());
 		status_->misc_status(ST_NOTE, msg);
 		edit_return_state_ = logging_state_;
 		logging_state_ = QSO_EDIT;

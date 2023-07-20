@@ -332,7 +332,7 @@ void menu::cb_mi_file_open(Fl_Widget* w, void* v) {
 	}
 	
 	// Set to a recent file number (1 to 4) or 0 for file_chooser
-	char file_id = (char)(long)v;
+	char file_id = (char)(intptr_t)v;
 	string filename = "";
 	// Set read_only flag
 	if (file_id < 0) {
@@ -430,7 +430,7 @@ void menu::cb_mi_file_saveas(Fl_Widget* w, void* v) {
 			while (!import_data_->update_complete()) Fl::check();
 			// Get the book to save
 			book* b = nullptr;
-			object_t type = (object_t)(long)v;
+			object_t type = (object_t)(intptr_t)v;
 			switch (type) {
 			case OT_MAIN:
 				b = book_;
@@ -466,7 +466,7 @@ void menu::cb_mi_file_close(Fl_Widget* w, void* v) {
 // v is not used
 void menu::cb_mi_file_print(Fl_Widget* w, void* v) {
 	// Print the current book
-	object_t type = (object_t)(long)v;
+	object_t type = (object_t)(intptr_t)v;
 	if (type == OT_MAIN) {
 		type = navigation_book_->book_type();
 	}
@@ -485,7 +485,7 @@ void menu::cb_mi_file_backup(Fl_Widget*, void* v) {
 // v is enum cfg_dialog_t indicating which settings page to open at
 void menu::cb_mi_settings(Fl_Widget* w, void* v) {
 	// v provides that id of the page of the settings dialogs to open with
-	settings::cfg_dialog_t active = (settings::cfg_dialog_t)(long)v;
+	settings::cfg_dialog_t active = (settings::cfg_dialog_t)(intptr_t)v;
 	if (!config_) {
 		// Open the config and wait for it to close
 		config_ = new settings(WCONFIG, HCONFIG + 100, "Configuration", active);
@@ -496,7 +496,7 @@ void menu::cb_mi_settings(Fl_Widget* w, void* v) {
 // Windows->Show All|Hide All
 // v is bool. false = hide all, true = show all
 void menu::cb_mi_windows_all(Fl_Widget* w, void* v) {
-	bool show_all = (bool)(long)v;
+	bool show_all = (bool)(intptr_t)v;
 	menu* that = ancestor_view<menu>(w);
 	if (show_all) {
 		main_window_->show();
@@ -545,7 +545,7 @@ void menu::cb_mi_windows(Fl_Widget* w, void* v) {
 // v is enum navigate_t indicating which record to go to
 void menu::cb_mi_navigate(Fl_Widget* w, void* v) {
 	// v supplies that navigation target
-	navigate_t target = (navigate_t)(long)v;
+	navigate_t target = (navigate_t)(intptr_t)v;
 	// Navigate to the specified point in the specified book
 	if (navigation_book_ != nullptr) {
 		navigation_book_->navigate(target);
@@ -592,7 +592,7 @@ void menu::cb_mi_nav_recnum(Fl_Widget* w, void* v) {
 void menu::cb_mi_nav_find(Fl_Widget* w, void* v) {
 	menu* that = ancestor_view<menu>(w);
 	// v supplies whether to change search criteria
-	bool do_extract = (bool)(long)v;
+	bool do_extract = (bool)(intptr_t)v;
 	if (do_extract || that->criteria_ == nullptr) {
 		// New search criteria - open dialog
 		delete that->criteria_;
@@ -799,7 +799,7 @@ void menu::cb_mi_log_save(Fl_Widget* w, void* v) {
 void menu::cb_mi_log_del(Fl_Widget* w, void* v) {
 	// delete_record(true) - deliberately deleting a record
 	// delete_record(false) - only deletes if entering a new record (i.e. cancel)
-	navigation_book_->delete_record((bool)(long)v);
+	navigation_book_->delete_record((bool)(intptr_t)v);
 	qso_manager_->update_rig();
 }
 
@@ -895,8 +895,8 @@ void menu::cb_mi_log_bulk(Fl_Widget* w, void* v) {
 					num_changed, old_field_name.c_str());
 				break;
 			case ADD_FIELD:
-				snprintf(message, 256, "LOG: Bulk_Change done: %d/%d records: Field %s changed from no value to %s",
-					num_changed, navigation_book_->size(), old_field_name.c_str(), new_text.c_str());
+				snprintf(message, 256, "LOG: Bulk_Change done: %d/%u records: Field %s changed from no value to %s",
+					num_changed, (int)navigation_book_->size(), old_field_name.c_str(), new_text.c_str());
 				break;
 			case CHANGE_FIELD:
 				snprintf(message, 256, "LOG: Bulk Change done, %d records: Field %s set to %s",
@@ -931,7 +931,7 @@ void menu::cb_mi_log_edith(Fl_Widget* w, void* v) {
 // Operate->Start Session
 // v is long: 0 is now, 1 is selected QSO
 void menu::cb_mi_log_start(Fl_Widget* w, void* v) {
-	long mode = (long)v;
+	long mode = (intptr_t)v;
 	item_num_t save_pos = book_->selection();
 	switch (mode) {
 	case 0:
@@ -1000,7 +1000,7 @@ void menu::cb_mi_imp_file(Fl_Widget* w, void* v) {
 	if (chooser->show() == 0) {
 		filename = chooser->filename();
 		// Get subsequent merge type
-		import_data::update_mode_t mode = (import_data::update_mode_t)(long)v;
+		import_data::update_mode_t mode = (import_data::update_mode_t)(intptr_t)v;
 		import_data_->load_data(filename, mode);
 	}
 	delete chooser;
@@ -1011,7 +1011,7 @@ void menu::cb_mi_imp_file(Fl_Widget* w, void* v) {
 // v is enum update_mode_t: EQSL_UPDATE or LOTW_UPDATE
 void menu::cb_mi_download(Fl_Widget* w, void* v) {
 	// v has QSL server
-	import_data_->download_data((import_data::update_mode_t)(long)v);
+	import_data_->download_data((import_data::update_mode_t)(intptr_t)v);
 }
 
 // Import->WSJT-X - start the WSJT-X listener for logging datagrams
@@ -1107,7 +1107,7 @@ void menu::cb_mi_ext_disp(Fl_Widget* w, void* v) {
 void menu::cb_mi_ext_qsl(Fl_Widget* w, void* v) {
 	menu* that = (menu*)w;
 	// v passes the particular option
-	that->qsl_type_ = (extract_data::extract_mode_t)(long)v;
+	that->qsl_type_ = (extract_data::extract_mode_t)(intptr_t)v;
 	extract_records_->extract_qsl(that->qsl_type_);
 	tabbed_forms_->activate_pane(OT_EXTRACT, true);
 }
@@ -1117,7 +1117,7 @@ void menu::cb_mi_ext_qsl(Fl_Widget* w, void* v) {
 void menu::cb_mi_ext_special(Fl_Widget* w, void* v) {
 	menu* that = (menu*)w;
 	// v passes the particular option
-	extract_data::extract_mode_t reason = (extract_data::extract_mode_t)(long)v;
+	extract_data::extract_mode_t reason = (extract_data::extract_mode_t)(intptr_t)v;
 	extract_records_->extract_special(reason);
 	tabbed_forms_->activate_pane(OT_EXTRACT, true);
 }
@@ -1238,7 +1238,7 @@ void menu::cb_mi_ext_mark(Fl_Widget* w, void* v) {
 // v is enum report_filter_t: RF_NONE, RF_ALL, RF_ALL_CURRENT, RF_EXTRACTED or RF_SELECTED
 void menu::cb_mi_rep_filter(Fl_Widget* w, void* v) {
 	// v has the filter
-	report_filter_t filter = (report_filter_t)(long)v;
+	report_filter_t filter = (report_filter_t)(intptr_t)v;
 	((report_tree*)tabbed_forms_->get_view(OT_REPORT))->add_filter(filter);
 	tabbed_forms_->activate_pane(OT_REPORT, true);
 }
@@ -1246,7 +1246,7 @@ void menu::cb_mi_rep_filter(Fl_Widget* w, void* v) {
 // Report->Levelx - set report level n to category
 // v contains two bytes { level, category }
 void menu::cb_mi_rep_level(Fl_Widget* w, void* v) {
-	long params = (long)v;
+	long params = (intptr_t)v;
 	string custom_field = "";
 	report_cat_t category = (report_cat_t)(params & 0xFF);
 	int level = params >> 8;
@@ -1376,7 +1376,7 @@ void menu::cb_mi_help_view(Fl_Widget* w, void* v) {
 // Help->Status->Note/Done/Warning/Error/Fatal
 // v is enum status_t: minimum display level
 void menu::cb_mi_help_level(Fl_Widget* w, void* v) {
-	status_->min_level((status_t)(long)v);
+	status_->min_level((status_t)(intptr_t)v);
 }
 
 // Help->Status->Display Debug
@@ -1462,7 +1462,7 @@ void menu::add_recent_files() {
 // Set check marks on the menu to represent the actual report tree mode and filter
 void menu::report_mode(vector<report_cat_t> report_mode, report_filter_t filter) {
 	// Set the Report->Level N->* menu items
-	for (size_t i = 1; i < 4; i++) {
+	for (int i = 1; i < 4; i++) {
 		// Get the item indices to set modes
 		char item_label[128];
 		sprintf(item_label, "Re&port/Level &%d/&Entities", i);

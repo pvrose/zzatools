@@ -50,6 +50,7 @@ printer::printer(object_t type) :
 	, row_height_(nan(""))
 	, row_top_(nan(""))
 	, unit_(qsl_form::MILLIMETER)
+	, max_number_qsos_(0)
 {
 	fields_.clear();
 }
@@ -79,7 +80,7 @@ int printer::do_job() {
 int printer::print_book() {
 	// Set status 
 	char message[256];
-	sprintf(message, "PRINTER: Starting print, %d records", navigation_book_->size());
+	sprintf(message, "PRINTER: Starting print, %zu records", navigation_book_->size());
 	status_->misc_status(ST_NOTE, message);
 	// Get page title for log print
 	if (navigation_book_->size() > 0) {
@@ -288,7 +289,7 @@ void printer::print_record(record* record) {
 int printer::print_cards() {
 	// Set status 
 	char message[256];
-	sprintf(message, "PRINTER: Starting print, %d cards", navigation_book_->size());
+	sprintf(message, "PRINTER: Starting print, %zu cards", navigation_book_->size());
 	status_->misc_status(ST_NOTE, message);
 	int from_page = 1; 
 	int to_page = INT_MAX;

@@ -152,7 +152,7 @@ void log_table::cb_tab_log(Fl_Widget* w, void* v) {
 				if (qso_manager_ && qso_manager_->editing() && qso_manager_->outwith_edit(qso_number)) {
 					// It cannot be selected - keep original selection
 					char msg[128];
-					snprintf(msg, sizeof(msg), "LOG: Attempt to select record %d when another record is being edited", qso_number);
+					snprintf(msg, sizeof(msg), "LOG: Attempt to select record %zu when another record is being edited", qso_number);
 					status_->misc_status(ST_WARNING, msg);
 					// and select the row in the table
 					int orig_row = that->order_ == LAST_TO_FIRST ? that->my_book_->size() - 1 - save_num : save_num;
@@ -687,7 +687,7 @@ void log_table::get_fields() {
 	int num_field_sets = fields_settings.groups();
 	// Then get the field_sets for the applications
 	char app_path[128];
-	char* field_set_name;
+	char* field_set_name = nullptr;
 	int num_fields = 0;
 	sprintf(app_path, "App%d", (int)application_);
 	if (fields_settings.groups() > 0) {

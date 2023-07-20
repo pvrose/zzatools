@@ -112,7 +112,7 @@ void extract_data::extract_records() {
 				count += 1;
 			}
 		}
-		snprintf(message, 100, "EXTRACT: %d records extracted, %d total", count, size());
+		snprintf(message, 100, "EXTRACT: %zu records extracted, %zu total", count, size());
 		break;
 	case XM_AND:
 		// Logical AND between existing and new criteria - i.e. only those that match both
@@ -136,7 +136,7 @@ void extract_data::extract_records() {
 				ixe++;
 			}
 		}
-		snprintf(message, 100, "EXTRACT: %d records deleted, %d total", count, size());
+		snprintf(message, 100, "EXTRACT: %zu records deleted, %zu total", count, size());
 		break;
 	case XM_OR: 
 		// Logical OR between existing search and new criteria - i.e. those that match either
@@ -160,7 +160,7 @@ void extract_data::extract_records() {
 				}
 			}
 		}
-		snprintf(message, 100, "EXTRACT: %d records added, %d total", count, size());
+		snprintf(message, 100, "EXTRACT: %zu records added, %zu total", count, size());
 		break;
 	}
 	status_->misc_status(ST_OK, message);
@@ -789,7 +789,7 @@ void extract_data::sort_records(string field_name, bool reversed) {
 	item_num_t count = size();
 	int num_scans = 0;
 	char message[100];
-	snprintf(message, 100, "EXTRACT: Starting sorting %d records on %s", size(), field_name.c_str());
+	snprintf(message, 100, "EXTRACT: Starting sorting %zu records on %s", size(), field_name.c_str());
 	status_->misc_status(ST_NOTE, message);
 	status_->progress(size(), book_type(), "Sorting log", "Sorting passes");
 	// Repeat until we no longer swap anything
@@ -838,7 +838,7 @@ void extract_data::correct_record_order() {
 	item_num_t count = size();
 	int num_scans = 0;
 	char message[100];
-	snprintf(message, 100, "EXTRACT: Starting sorting %d records on date/time", size());
+	snprintf(message, 100, "EXTRACT: Starting sorting %zu records on date/time", size());
 	status_->misc_status(ST_NOTE, message);
 	status_->progress(size(), book_type(), "Undoing custom sort", "Sorting passes");
 	// Repeat until we no longer swap anything

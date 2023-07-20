@@ -272,7 +272,7 @@ string now_ms() {
 
 	char* result = new char[20];
 	strftime(result, 20, "%H:%M:%S", utc);
-	snprintf(result + 8, 10, ".%d", fractional_seconds);
+	snprintf(result + 8, 10, ".%d", (int)fractional_seconds);
 
 	return string(result);
 }

@@ -233,7 +233,7 @@ void qso_qsl::cb_auto(Fl_Widget* w, void* v) {
 	Fl_Check_Button* bn = (Fl_Check_Button*)w;
 	qso_qsl* that = ancestor_view<qso_qsl>(w);
 	bool* enable;
-	extract_data::extract_mode_t server = (extract_data::extract_mode_t)(long)v;
+	extract_data::extract_mode_t server = (extract_data::extract_mode_t)(intptr_t)v;
 	switch (server) {
 	case extract_data::EQSL:
 		enable = &that->auto_eqsl_;
@@ -253,7 +253,7 @@ void qso_qsl::cb_auto(Fl_Widget* w, void* v) {
 // Download. v = eQSL/LotW (import data enum)
 void qso_qsl::cb_download(Fl_Widget* w, void* v) {
 	// v has QSL server
-	import_data::update_mode_t server = (import_data::update_mode_t)(long)v;
+	import_data::update_mode_t server = (import_data::update_mode_t)(intptr_t)v;
 	import_data_->download_data(server);
 	qso_qsl* that = ancestor_view<qso_qsl>(w);
 	that->enable_widgets();
@@ -261,7 +261,7 @@ void qso_qsl::cb_download(Fl_Widget* w, void* v) {
 
 // Extract. v = eQSL/LotW/ClubLog/Card
 void qso_qsl::cb_extract(Fl_Widget* w, void* v) {
-	extract_data::extract_mode_t server = (extract_data::extract_mode_t)(long)v;
+	extract_data::extract_mode_t server = (extract_data::extract_mode_t)(intptr_t)v;
 	extract_records_->extract_qsl(server);
 	tabbed_forms_->activate_pane(OT_EXTRACT, true);
 	qso_qsl* that = ancestor_view<qso_qsl>(w);

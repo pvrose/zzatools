@@ -194,7 +194,7 @@ void qso_buttons::cb_activate(Fl_Widget* w, void* v) {
 void qso_buttons::cb_start(Fl_Widget* w, void* v) {
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
 	that->disable_widgets();
-	qso_data::qso_init_t mode = (qso_data::qso_init_t)(long)v;
+	qso_data::qso_init_t mode = (qso_data::qso_init_t)(intptr_t)v;
 	switch (that->qso_data_->logging_state()) {
 	case qso_data::QSO_INACTIVE:
 		that->qso_data_->action_activate(mode);
@@ -210,7 +210,7 @@ void qso_buttons::cb_start(Fl_Widget* w, void* v) {
 void qso_buttons::cb_save(Fl_Widget* w, void* v) {
 	qso_data* data = ancestor_view<qso_data>(w);
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
-	bool edit_return = (bool)(long)v;
+	bool edit_return = (bool)(intptr_t)v;
 	if (that) that->disable_widgets();
 	switch (data->logging_state()) {
 	case qso_data::QSO_PENDING:
@@ -330,7 +330,7 @@ void qso_buttons::cb_parse(Fl_Widget* w, void* v) {
 void qso_buttons::cb_bn_navigate(Fl_Widget* w, void* v) {
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
 	that->disable_widgets();
-	navigate_t target = (navigate_t)(long)v;
+	navigate_t target = (navigate_t)(intptr_t)v;
 	that->qso_data_->action_navigate(target);
 	that->enable_widgets();
 }
@@ -415,7 +415,7 @@ void qso_buttons::cb_bn_find_match(Fl_Widget* w, void* v) {
 void qso_buttons::cb_bn_dupe(Fl_Widget* w, void* v) {
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
 	that->disable_widgets();
-	qso_data::dupe_flags action = (qso_data::dupe_flags)(long)v;
+	qso_data::dupe_flags action = (qso_data::dupe_flags)(intptr_t)v;
 	switch (that->qso_data_->logging_state()) {
 	case qso_data::QUERY_DUPE:
 		that->qso_data_->action_handle_dupe(action);

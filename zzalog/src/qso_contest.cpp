@@ -412,7 +412,7 @@ void qso_contest::cb_add_exch(Fl_Widget* w, void* v) {
 // v - bool TX or RX
 void qso_contest::cb_def_format(Fl_Widget* w, void* v) {
 	qso_contest* that = ancestor_view<qso_contest>(w);
-	bool tx = (bool)(long)v;
+	bool tx = (bool)(intptr_t)v;
 	bool set;
 	cb_value<Fl_Light_Button, bool>(w, &set);
 	// If the button is being set then update the exchange fileds required

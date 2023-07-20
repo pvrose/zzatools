@@ -701,7 +701,7 @@ void dxa_if::cb_bn_centre(Fl_Widget* w, void* v) {
 // One of the colour buttons selected - enable/disable that colour
 void dxa_if::cb_bn_colour(Fl_Widget* w, void* v) {
 	dxa_if* that = ancestor_view<dxa_if>(w);
-	int number = (int)v;
+	int number = (intptr_t)v;
 	if (that->colour_enables_[number]) {
 		that->colour_enables_[number] = false;
 	}
@@ -715,7 +715,7 @@ void dxa_if::cb_bn_colour(Fl_Widget* w, void* v) {
 // Set all or clear all selected
 void dxa_if::cb_bn_all(Fl_Widget* w, void* v) {
 	dxa_if* that = ancestor_view<dxa_if>(w);
-	bool enable = (long)v;
+	bool enable = (intptr_t)v;
 	for (size_t i = 0; i < that->colour_enables_.size(); i++) {
 		that->colour_enables_[i] = enable;
 	}
@@ -1205,7 +1205,7 @@ void dxa_if::create_colour_buttons() {
 			bn->color(button_colour(button_num));
 			bn->copy_label(colours_used_[button_num].c_str());
 			bn->labelcolor(fl_contrast(FL_BLACK, button_colour(button_num)));
-			bn->callback(cb_bn_colour, (void*)button_num);
+			bn->callback(cb_bn_colour, (void*)(intptr_t)button_num);
 			colour_bns_.push_back(bn);
 			colour_enables_.push_back(true);
 			colour_grp_->add(bn);
@@ -1380,7 +1380,7 @@ void dxa_if::get_records() {
 		}
 		else {
 			char text[256];
-			sprintf(text, "DXATLAS: %d records being displayed", records_to_display_.size());
+			sprintf(text, "DXATLAS: %zu records being displayed", records_to_display_.size());
 			status_->misc_status(ST_OK, text);
 		}
 	}
@@ -1780,7 +1780,7 @@ void dxa_if::draw_pins() {
 			status_->misc_status(ST_OK, "DXATLAS: Update done!");
 			if (count != records_to_display_.size()) {
 				char message[100];
-				snprintf(message, 100, "DXATLAS: %d record(s) not displayed", records_to_display_.size() - count);
+				snprintf(message, 100, "DXATLAS: %zu record(s) not displayed", records_to_display_.size() - count);
 				status_->misc_status(ST_WARNING, message);
 				for (size_t i = 0; i < colours_used_.size(); i++) {
 					snprintf(message, 100, "DXATLAS: %s - %d records", colours_used_[i].c_str(), colour_count[i]);

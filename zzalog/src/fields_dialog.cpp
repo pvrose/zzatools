@@ -347,7 +347,7 @@ void fields_dialog::create_form(int X, int Y) {
 		Fl_Light_Button* bn2 = new Fl_Light_Button(X2[i], Y2, WBUTTON, HBUTTON, APP_NAMES[i].c_str());
 		bn2->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE);
 		bn2->tooltip("Select application to use the current set of fields in it");
-		bn2->callback(cb_bn_use_app, (void*)i);
+		bn2->callback(cb_bn_use_app, (void*)(intptr_t)i);
 		bn2->when(FL_WHEN_RELEASE);
 		bn2->selection_color(FL_BLUE);
 		app_buttons_[i] = bn2;
@@ -617,7 +617,7 @@ void fields_dialog::cb_bn_new(Fl_Widget* w, void* v) {
 void fields_dialog::cb_bn_use_app(Fl_Widget* w, void* v) {
 	fields_dialog* that = ancestor_view<fields_dialog>(w);
 	// Change the field set used by selected application to the selected field set
-	field_ordering_t app = (field_ordering_t)(long)v;
+	field_ordering_t app = (field_ordering_t)(intptr_t)v;
 	that->field_set_by_app_[app] = that->field_set_name_;
 	that->update_widgets();
 }

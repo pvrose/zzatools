@@ -363,7 +363,7 @@ void toolbar::cb_bn_menu(Fl_Widget*w, void*v) {
 // v indicates whether to start a new search (true) or resume (false)
 void toolbar::cb_bn_search(Fl_Widget* w, void* v) {
 	toolbar* that = ancestor_view<toolbar>(w);
-	bool reset = (bool)(long)v;
+	bool reset = (bool)(intptr_t)v;
 	if (reset) {
 		that->record_num_ = 0;
 	}

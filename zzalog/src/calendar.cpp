@@ -271,7 +271,7 @@ calendar::~calendar() {
 // Callback when clicking a button
 void calendar::cb_bn_cal(Fl_Widget* w, void* v) {
 	// Indicates the button clicked
-	button_t action = (button_t)(long)v;
+	button_t action = (button_t)(intptr_t)v;
 	calendar* that = ancestor_view<calendar>(w);
 	switch (action) {
 	case BN_OK:

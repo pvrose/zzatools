@@ -25,6 +25,7 @@ qsl_viewer::qsl_viewer(int W, int H, const char* L) :
 	, image_(nullptr)
 	, scaling_image_(false)
 	, current_qso_(nullptr)
+	, text_display_(nullptr)
 {
 	// Window origin
 	int curr_x = 0;
@@ -162,7 +163,7 @@ qsl_viewer::~qsl_viewer() {
 void qsl_viewer::cb_rad_card(Fl_Widget* w, void* v) {
 	qsl_viewer* that = ancestor_view<qsl_viewer>(w);
 	// Get the selected image and display it.
-	that->set_selected_image((image_t)(long)v);
+	that->set_selected_image((image_t)(intptr_t)v);
 	that->set_image();
 	// Save setting
 	Fl_Preferences display_settings(settings_, "Display");
