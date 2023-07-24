@@ -70,7 +70,7 @@ int QBS_data::receive_cards(
 	// Check box number valid
 	if (box_num != IN_BOX && box_num != boxes_.size() - 1) {
 		char message[100];
-		snprintf(message, 100, "C: %s box number %d neither current (%d) nor in_box",
+		snprintf(message, 100, "C: %s box number %d neither current (%zu) nor in_box",
 			call.c_str(), box_num, boxes_.size() - 1);
 		cerr << message << endl;
 		return 0;
@@ -120,7 +120,7 @@ int QBS_data::new_batch(
 	// Check if box number is valid
 	if (box_num != boxes_.size()) {
 		char message[100];
-		snprintf(message, 100, "B: %s box number %d is not valid - should be %d",
+		snprintf(message, 100, "B: %s box number %d is not valid - should be %zu",
 			batch.c_str(), box_num, boxes_.size());
 		cerr << message << endl;
 		return -1;
@@ -130,7 +130,7 @@ int QBS_data::new_batch(
 		box_data* box = new box_data;
 		box->id = batch;
 		box->date_received = date;
-		int num = boxes_.size();
+		int num = (int)boxes_.size();
 		boxes_.push_back(box);
 		log_action(BATCH, box_num, date, batch, 0, 0);
 		window_->update_actions();
@@ -281,7 +281,7 @@ int QBS_data::keep_cards(
 ) {
 	if (box_num != boxes_.size() - 1) {
 		char message[100];
-		snprintf(message, 100, "K: %s box number %d is not current (%d)",
+		snprintf(message, 100, "K: %s box number %d is not current (%zu)",
 			call.c_str(), box_num, boxes_.size() - 1);
 		cerr << message << endl;
 		return 0;
@@ -318,7 +318,7 @@ int QBS_data::post_cards(
 	string date                 // date actioned
 ) {
 	action_read_ = POST_CARDS;
-	int box_num = boxes_.size() - 1;
+	int box_num = (int)boxes_.size() - 1;
 	box_data& box = *boxes_[box_num];
 	int cards = 0;
 	for (auto it = out_box_.begin(); it != out_box_.end(); it++) {
@@ -337,7 +337,7 @@ int QBS_data::dispose_cards(
 	mode_ = DORMANT;
 	action_read_ = DISPOSE_CARDS;
 	window_->update_actions();
-	int nbox = boxes_.size() - 1;
+	int nbox = (int)boxes_.size() - 1;
 	box_data& box = *boxes_[nbox];
 	int cards = 0;
 	for (auto it = (*box.counts).begin();
@@ -493,7 +493,7 @@ int QBS_data::get_count(int box_num, string call) {
 
 // Get current box_number
 int QBS_data::get_current() {
-	return boxes_.size() - 1;
+	return (int)boxes_.size() - 1;
 }
 
 // The disposal queue tail pointer
@@ -821,7 +821,7 @@ bool QBS_data::read_qbs(string& filename) {
 				box = stoi(words[2]);
 				call = words[3];
 				value = stoi(words[4]);
-				check - adjust_cards(box, date, call, value);
+				check = adjust_cards(box, date, call, value);
 				break;
 			case COMMENT:
 				getline(file_, line);
@@ -1032,7 +1032,7 @@ void QBS_data::trace_boxes(ostream& os) {
 	box_summary(IN_BOX, os);
 	box_summary(KEEP_BOX, os);
 	box_summary(OUT_BOX, os);
-	for (int box = boxes_.size() - 1; box >= head_ && box >= 0; box--) {
+	for (int box = (int)boxes_.size() - 1; box >= head_ && box >= 0; box--) {
 		box_summary(box, os);
 	}
 	if (head_ > 0) box_summary(head_ - 1, os);

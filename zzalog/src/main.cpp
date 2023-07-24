@@ -529,7 +529,7 @@ void resize_window() {
 	int min_h = tabbed_forms_->min_h() + status_->h() + toolbar_->h() + menu_->h();
 	main_window_->size_range(min_w, min_h);
 	// Set the size to the setting or minimum specified by the view + bars if that's larger
-	main_window_->resize(left, top, max(min_w, width), max(min_h, height));
+	main_window_->resize(max(left, 0), max(top, 100), max(min_w, width), max(min_h, height));
 }
 
 // Tidy memory

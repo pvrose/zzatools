@@ -100,7 +100,7 @@ void QBS_notes::draw_cell(TableContext context, int R, int C, int X, int Y, int 
 void QBS_notes::set_data(void* data) {
     data_ = data;
     vector<note_data>* this_data = (vector<note_data>*)data_;
-    rows(this_data->size());
+    rows((int)this_data->size());
     row_height_all(FL_NORMAL_SIZE + 2);
     int colw[3] = {25, 25, 25};
     for (int c = 0; c < 3; c++) {

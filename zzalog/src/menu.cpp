@@ -1455,7 +1455,7 @@ void menu::add_recent_files() {
 			// else use the end of the file name
 			sprintf(label, "&File/&Recent/%s", filename.substr(start + 1).c_str());
 		}
-		add(label, FL_ALT + i, cb_mi_file_open, (void*)i);
+		add(label, FL_ALT + i, cb_mi_file_open, (void*)(intptr_t)i);
 	}
 }
 

@@ -182,7 +182,7 @@ bool string_to_tm(string source, tm& time, string format) {
 void string_to_ints(string& text, vector<unsigned int>& ints) {
 	int current = 0;
 	int start = 0;
-	int index = 0;
+	size_t index = 0;
 	string temp = text;
 	ints.clear();
 	bool invalid = false;
@@ -359,7 +359,7 @@ string to_upper(const string& data) {
 	size_t len = data.length();
 	char* result = new char[3 * len + 1];
 	memset(result, 0, 3 * len + 1);
-	fl_utf_toupper((unsigned char*)data.c_str(), len, result);
+	fl_utf_toupper((unsigned char*)data.c_str(), (int)len, result);
 	string ret_value(result);
 	delete[] result;
 	return ret_value;
@@ -370,7 +370,7 @@ string to_lower(const string& data) {
 	size_t len = data.length();
 	char* result = new char[3 * len + 1];
 	memset(result, 0, 3 * len + 1);
-	fl_utf_tolower((unsigned char*)data.c_str(), len, result);
+	fl_utf_tolower((unsigned char*)data.c_str(), (int)len, result);
 	string ret_value(result);
 	delete[] result;
 	return ret_value;
@@ -405,7 +405,7 @@ size_t find(const char* data, size_t length, const char* match) {
 
 // Search for single character match
 size_t find(const char* data, size_t length, const char match) {
-	int pos = length;
+	size_t pos = length;
 	bool found = false;
 	// Compare each char in data with match
 	// pos should get set to the position that matches (or length if none do
@@ -487,7 +487,7 @@ string escape_url(string url) {
 
 // Escape / and & for menu items
 string escape_menu(string text) {
-	int len = text.length() * 2 + 1;
+	size_t len = text.length() * 2 + 1;
 	string dest = "";
 	dest.reserve(len);
 	const char* src = text.c_str();
@@ -828,7 +828,7 @@ unsigned char to_ascii(string data, int&ix) {
 	if (ix == data.length()) return 0;
 	size_t next_ix;
 	int val = stoi(data.substr(ix, 2), &next_ix, 16);
-	ix += next_ix;
+	ix += (int)next_ix;
 	return (unsigned char)val;
 }
 
