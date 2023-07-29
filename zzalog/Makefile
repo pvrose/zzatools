@@ -45,11 +45,11 @@ INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 # 32-bit
 #FLTK_FLAGS := -L/usr/local/lib -lfltk -lfltk_images -lfltk_jpeg -lz -lpng -lm -lX11 -lpthread -lXft -lXrender -lm -lfontconfig -ldl
 # 64-bit 
-FLTK_FLAGS := -L/usr/local/lib/aarch64-linux-gnu \
- -lfltk_images -lfltk_jpeg -lpng -lz -lfltk \
- -lm -lX11 -lXext -lpthread -lXfixes -lXcursor -lXft \
- -lXrender -lm -lfontconfig -ldl
-
+#FLTK_FLAGS := -L/usr/local/lib/aarch64-linux-gnu \
+# -lfltk_images -lfltk_jpeg -lpng -lz -lfltk \
+# -lm -lX11 -lXext -lpthread -lXfixes -lXcursor -lXft \
+# -lXrender -lm -lfontconfig -ldl
+FLTK_FLAGS := `fltk-config --use-images --ldflags`
 
 # Hamlib flags
 HAMLIB_FLAGS := -L/usr/local/lib -lhamlib -Wl,-rpath -Wl,/usr/local/lib
