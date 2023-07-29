@@ -7,11 +7,6 @@ SRC_DIRS := ./src
 EXEC_DIR = $(BUILD_DIR)/$(BUILD_TYPE)
 INSTALL_DIR := /usr/local/bin
 
-FLTK_DIR := ~/ham_dev/fltk
-#FLTK_BUILD := $(FLTK_DIR)/build/$(BUILD_TYPE)
-#HAMLIB_DIR := ~/ham_dev/hamlib/hamlib-4.5.5
-#HAMLIB_BUILD := $(HAMLIB_DIR)/mingw64-inst
-
 # Standard compilers and debuggers
 CC = gcc
 CXX = g++
@@ -34,21 +29,11 @@ TARFILE = $(TARGET_EXEC:.exe=.tgz)
 
 # Every folder in ./src will need to be passed to GCC so that it can find header files
 INC_DIRS := ./include
-#INC_DIRS += $(FLTK_DIR) $(FLTK_BUILD)
-#INC_DIRS += $(HAMLIB_DIR)/include
 
 # Add a prefix to INC_DIRS. So moduleA would become -ImoduleA. GCC understands this -I flag
 INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 
 # Set up libraries
-# FLTK ld flags - created using `fltk-config --use-images --ldflags`
-# 32-bit
-#FLTK_FLAGS := -L/usr/local/lib -lfltk -lfltk_images -lfltk_jpeg -lz -lpng -lm -lX11 -lpthread -lXft -lXrender -lm -lfontconfig -ldl
-# 64-bit 
-#FLTK_FLAGS := -L/usr/local/lib/aarch64-linux-gnu \
-# -lfltk_images -lfltk_jpeg -lpng -lz -lfltk \
-# -lm -lX11 -lXext -lpthread -lXfixes -lXcursor -lXft \
-# -lXrender -lm -lfontconfig -ldl
 FLTK_FLAGS := `fltk-config --use-images --ldflags`
 
 # Hamlib flags
@@ -61,13 +46,11 @@ LDFLAGS := $(FLTK_FLAGS) $(HAMLIB_FLAGS) $(CURL_FLAGS)
 # The -MMD and -MP flags together generate Makefiles for us!
 # These files will have .d instead of .o as the output.
 CPPFLAGS := $(INC_FLAGS) -MMD -MP 
-CFLAGS += -g
 
 # Set ccompile flags
 # include debug data
+CFLAGS += -g
 CXXFLAGS += -g
-# Avoid muliple definition of byte
-# CXXFLAGS += -DWIN32_LEAN_AND_MEAN
 
 # DEBUG_FLAG := -Og
 
