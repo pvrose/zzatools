@@ -578,7 +578,14 @@ void qso_data::action_start(qso_init_t mode) {
 	action_new_qso(g_entry_->qso(), mode);
 	g_entry_->append_qso();
 	book_->selection(book_->item_number(g_entry_->qso_number()), HT_INSERTED);
-	logging_state_ = QSO_STARTED;
+	switch (mode) {
+	case QSO_NONE:
+		logging_state_ = QSO_EDIT;
+		break;
+	default:
+		logging_state_ = QSO_STARTED;
+		break;
+	}
 	enable_widgets();
 }
 
