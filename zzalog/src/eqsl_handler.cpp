@@ -245,7 +245,7 @@ string eqsl_handler::card_filename_l(record* record) {
 	// If the directory name is not defined, open a chooser to get it.
 	if (!qsl_directory.length()) {
 		Fl_Native_File_Chooser* chooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_DIRECTORY);
-		chooser->title("Select reference file directory");
+		chooser->title("Select QSL Card directory");
 		chooser->preset_file(qsl_directory.c_str());
 		while (chooser->show()) {}
 		qsl_directory = chooser->filename();

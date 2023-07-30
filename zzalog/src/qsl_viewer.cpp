@@ -245,7 +245,7 @@ void qsl_viewer::set_image() {
 				//Fl_File_Chooser* chooser = new Fl_File_Chooser("", nullptr, Fl_File_Chooser::DIRECTORY,
 				//	"Select QSL card directory");
 				Fl_Native_File_Chooser* chooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_DIRECTORY);
-				chooser->title("Select QSL card directory");
+				chooser->title("Select QSL Card directory");
 				if (chooser->show() == 0) {
 					directory = chooser->filename();
 				}
