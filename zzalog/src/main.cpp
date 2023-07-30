@@ -472,8 +472,11 @@ void main_window_label(string text) {
 	if (text.length()) {
 		label += ": " + text;
 	}
-	main_window_->copy_label(label.c_str());
-	printf("%s\n", label.c_str());
+	const char* current = main_window_->label();
+	if (!current || label != string(current)) {
+		main_window_->copy_label(label.c_str());
+		printf("%s\n", label.c_str());
+	}
 }
 
 // Create the main window
