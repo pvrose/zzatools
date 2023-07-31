@@ -74,7 +74,7 @@ using namespace std;
 string COPYRIGHT = "© Philip Rose GM3ZZA 2018. All rights reserved.\nPrefix data courtesy of clublog.org";
 string PROGRAM_ID = "ZZALOG";
 string PROG_ID = "ZLG";
-string VERSION = "3.4.33";
+string VERSION = "3.4.34";
 string TIMESTAMP = __DATE__ + string(" ") + __TIME__;
 #ifdef _DEBUG
 string PROGRAM_VERSION = VERSION + " (Debug " + TIMESTAMP + ")";
@@ -472,8 +472,11 @@ void main_window_label(string text) {
 	if (text.length()) {
 		label += ": " + text;
 	}
-	main_window_->copy_label(label.c_str());
-	printf("%s\n", label.c_str());
+	const char* current = main_window_->label();
+	if (!current || label != string(current)) {
+		main_window_->copy_label(label.c_str());
+		printf("%s\n", label.c_str());
+	}
 }
 
 // Create the main window

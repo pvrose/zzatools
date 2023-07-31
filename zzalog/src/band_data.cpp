@@ -127,6 +127,7 @@ string band_data::get_path() {
 	}
 	// Free any memory used
 	if (dirname) free(dirname);
+	datapath.set("Reference", directory_name.c_str());
 	return directory_name;
 
 }

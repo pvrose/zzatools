@@ -47,10 +47,11 @@ void qso_qsl_vwr::load_values() {
 		//Fl_File_Chooser* chooser = new Fl_File_Chooser("", nullptr, Fl_File_Chooser::DIRECTORY,
 		//	"Select QSL card directory");
 		Fl_Native_File_Chooser* chooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_DIRECTORY);
-		chooser->title("Select QSL card directory");
+		chooser->title("Select QSL Card directory");
 		if (chooser->show() == 0) {
 			qsl_directory_ = chooser->filename();
 		}
+		datapath.set("QSLs", qsl_directory_.c_str());
 		delete chooser;
 	}
 	else {

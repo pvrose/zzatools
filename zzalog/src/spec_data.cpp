@@ -110,6 +110,7 @@ string spec_data::get_path(bool force) {
 		directory_name.append(1, '/');
 	}
 	if (dirname) free(dirname);
+	datapath.set("Reference", directory_name.c_str());
 	return directory_name;
 }
 
