@@ -167,6 +167,10 @@ using namespace std;
 		mutex upload_lock_;
 		// Upload response queue
 		atomic<upload_response_t*> upload_response_;
+		
+		// Window and Help viewer for displaying response
+		Fl_Window* help_window_;
+		Fl_Help_View* help_viewer_;
 
 	};
 #endif

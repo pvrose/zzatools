@@ -409,8 +409,8 @@ void wsjtx_handler::add_tx_message(const status_dg& status) {
 			qso_->item("QSO_COMPLETE", string("N"));
 		}
 		// Can get all the required fields off status
-		//qso_->item("CALL", status.dx_call);
-		//qso_->item("GRIDSQUARE", status.dx_grid);
+		qso_->item("CALL", status.dx_call);
+		qso_->item("GRIDSQUARE", status.dx_grid);
 		double freq = (status.dial_freq + status.tx_offset) / 1000000.0;
 		char cfreq[15];
 		snprintf(cfreq, sizeof(cfreq), "%0.6f", freq);

@@ -41,8 +41,13 @@ eqsl_handler::eqsl_handler()
 	th_upload_ = new thread(thread_run, this);
 
 	// Create help window
-	const int WHELP = 200;
+	const int WHELP = 400;
 	const int HHELP = 200;
+	help_window_ = new Fl_Window(WHELP, HHELP, "eQSL Response");
+	help_viewer_ = new Fl_Help_View(0, 0, WHELP, HHELP);
+	help_window_->end();
+	help_window_->hide();
+
 }
 
 // Destructor
@@ -1145,14 +1150,8 @@ bool eqsl_handler::upload_done(upload_response_t* response) {
 }
 
 void eqsl_handler::display_response(string response) {
-	const int WHELP = 400;
-	const int HHELP = 200;
-	Fl_Window* win = new Fl_Window(WHELP, HHELP, "eQSL Response");
-	Fl_Help_View* hv = new Fl_Help_View(0, 0, WHELP, HHELP);
-	hv->value(response.c_str());
-	win->end();
-	win->resizable(hv);
-	win->show();
+	help_viewer_->value(response.c_str());
+	help_window_->show();
 }
 
 void eqsl_handler::thread_run(eqsl_handler* that) {

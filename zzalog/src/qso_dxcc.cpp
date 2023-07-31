@@ -83,32 +83,39 @@ void qso_dxcc::create_form() {
 
 // Enable the widgets
 void qso_dxcc::enable_widgets() {
-	op_call_->value(callsign_.c_str());
-	char text[64];
-	snprintf(text, sizeof(text), "%s: %s", nickname_.c_str(), name_.c_str());
-	op_prefix_->value(text);
-	switch (source_) {
-	case cty_data::INVALID:
-		op_source_->value("Invalid Operation");
-		op_source_->color(FL_RED);
-		break;
-	case cty_data::EXCEPTION:
-		op_source_->value("Entity Exception");
-		op_source_->color(FL_BACKGROUND_COLOR);
-		break;
-	case cty_data::ZONE_EXCEPTION:
-		op_source_->value("CQ Zone Exception");
-		op_source_->color(FL_BACKGROUND_COLOR);
-		break;
-	case cty_data::DEFAULT:
-		op_source_->value("Default decode");
-		op_source_->color(FL_BACKGROUND_COLOR);
-		break;
+	if (callsign_.length()) {
+		op_call_->value(callsign_.c_str());
+		char text[64];
+		snprintf(text, sizeof(text), "%s: %s", nickname_.c_str(), name_.c_str());
+		op_prefix_->value(text);
+		switch (source_) {
+		case cty_data::INVALID:
+			op_source_->value("Invalid Operation");
+			op_source_->color(FL_RED);
+			break;
+		case cty_data::EXCEPTION:
+			op_source_->value("Entity Exception");
+			op_source_->color(FL_BACKGROUND_COLOR);
+			break;
+		case cty_data::ZONE_EXCEPTION:
+			op_source_->value("CQ Zone Exception");
+			op_source_->color(FL_BACKGROUND_COLOR);
+			break;
+		case cty_data::DEFAULT:
+			op_source_->value("Default decode");
+			op_source_->color(FL_BACKGROUND_COLOR);
+			break;
+		}
+		snprintf(text, sizeof(text), "CQ Zone %d. %.0f°%c %.0f°%c",
+			cq_zone_, abs(location_.latitude), location_.latitude > 0 ? 'N' : 'S',
+			abs(location_.longitude), location_.longitude > 0 ? 'E' : 'W');
+		op_geo_->value(text);
+	} else {
+		op_call_->value("No Contact");
+		op_prefix_->value("");
+		op_source_->value("");
+		op_geo_->value("");
 	}
-	snprintf(text, sizeof(text), "CQ Zone %d. %.0f°%c %.0f°%c",
-		cq_zone_, abs(location_.latitude), location_.latitude > 0 ? 'N' : 'S',
-		abs(location_.longitude), location_.longitude > 0 ? 'E' : 'W');
-	op_geo_->value(text);
 	g_wb4_->enable_widgets();
 }
 
