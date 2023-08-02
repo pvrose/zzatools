@@ -989,10 +989,19 @@ void qso_data::action_look_all_txt() {
 	string my_call = ((qso_manager*)parent())->get_default(qso_manager::CALLSIGN);
 	// Get search items from record
 	string their_call = g_query_->query_qso()->item("CALL");
-	string datestamp = g_query_->query_qso()->item("QSO_DATE").substr(2);
+	string datestamp = g_query_->query_qso()->item("QSO_DATE");
 	string timestamp = g_query_->query_qso()->item("TIME_ON");
 	string mode = g_query_->query_qso()->item("MODE");
+	if (their_call.length() == 0 || datestamp.length() != 8 || 
+		timestamp.length() < 4 || mode.length() == 0) {
+		status_->misc_status(ST_ERROR, "Searching ALL.TXT requires, call, date/time and mode");
+		return;
+	}
+	datestamp = datestamp.substr(2);
 	char msg[256];
+	snprintf(msg, sizeof(msg), "DASH: Searching ALL.TXT for %s %s %s %s",
+		their_call.c_str(), datestamp.c_str(), timestamp.c_str(), mode.c_str());
+	status_->misc_status(ST_NOTE, msg);
 	// Mark QSO incomplete 
 	g_query_->query_qso()->item("QSO_COMPLETE", string("N"));
 	g_query_->redraw();
@@ -1021,6 +1030,8 @@ void qso_data::action_look_all_txt() {
 				status_->misc_status(ST_WARNING, msg);
 			}
 			start_copying = true;
+			g_query_->query_qso()->item("QSO_COMPLETE", string("N"));
+			g_query_->query_qso()->item("TIME_ON", line.substr(7,6));
 		}
 		if (start_copying) {
 			if (line.find(my_call) != string::npos &&
@@ -1035,9 +1046,12 @@ void qso_data::action_look_all_txt() {
 				// It has neither call - ignore
 			}
 			else {
-				// It has one or the other call - indicates QSO complete
-				stop_copying = true;
-				g_query_->query_qso()->item("QSO_COMPLETE", string(""));
+				// It has one or the other call - copy and check QSO complete
+				action_copy_all_text(line);
+				if (g_query_->query_qso()->item("QSO_COMPLETE") == "Y") {
+					stop_copying = true;
+					g_query_->query_qso()->item("QSO_COMPLETE", string(""));
+				}
 			}
 		}
 	}
@@ -1111,7 +1125,7 @@ void qso_data::action_copy_all_text(string text) {
 	if (report == "RR73" || report == "RRR") {
 		// If we've seen the R-00 then mark the QSO complete, otherwise mark in provisional until we see the 73
 		if (qso->item("QSO_COMPLETE") == "?") {
-			qso->item("QSO_COMPLETE", string(""));
+			qso->item("QSO_COMPLETE", string("Y"));
 		}
 		else if (qso->item("QSO_COMPLETE") == "N") {
 			qso->item("QSO_COMPLETE", string("?"));
@@ -1119,7 +1133,7 @@ void qso_data::action_copy_all_text(string text) {
 	}
 	else if (report == "73") {
 		// A 73 definitely indicates QSO compplete
-		qso->item("QSO_COMPLETE", string(""));
+		qso->item("QSO_COMPLETE", string("Y"));
 	}
 	else if (report[0] == 'R') {
 		// The first of the rogers
@@ -1168,6 +1182,9 @@ void qso_data::action_copy_all_text(string text) {
 		else if (!tx_record && !qso->item_exists("RST_RCVD")) {
 			qso->item("RST_RCVD", report);
 		}
+	}
+	if (qso->item("QSO_COMPLETE") == "Y") {
+		qso->item("TIME_OFF", text.substr(7,6));
 	}
 }
 

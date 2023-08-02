@@ -63,12 +63,14 @@ void qso_query::enable_widgets() {
 	case qso_data::QSO_BROWSE:
 		tab_query_->activate();
 		tab_query_->set_records(log_qso_, query_qso_, original_qso_);
+		tab_query_->redraw();
 		break;
 	case qso_data::QUERY_DUPE:
 	case qso_data::QUERY_MATCH:
 	case qso_data::QUERY_NEW:
 		tab_query_->activate();
 		tab_query_->set_records(log_qso_, query_qso_, original_qso_);
+		tab_query_->redraw();
 		break;
 	default:
 		hide();
