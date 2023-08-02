@@ -269,7 +269,7 @@ bool cty_reader::load_data(cty_data* data, istream& in, string& version) {
 	}
 	else {
 		// Read failed - report failure
-		status_->misc_status(ST_FATAL, "EXCEPTION: Extraction failed");
+		status_->misc_status(ST_ERROR, "EXCEPTION: Extraction failed");
 		status_->progress("Load failed", OT_PREFIX);
 		fl_cursor(FL_CURSOR_DEFAULT);
 		return false;

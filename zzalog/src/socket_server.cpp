@@ -46,10 +46,10 @@ void socket_server::run_server() {
 	if (result) {
 		switch (protocol_) {
 		case UDP:
-			status(ST_SEVERE, "SOCKET: Unable to listen for WSJT-X datagrams");
+			status(ST_ERROR, "SOCKET: Unable to listen for WSJT-X datagrams");
 			break;
 		case HTTP:
-			status(ST_SEVERE, "SOCKET: Unable to listen for FLDIGI XML-RPC requests");
+			status(ST_ERROR, "SOCKET: Unable to listen for FLDIGI XML-RPC requests");
 			break;
 		}
 	}

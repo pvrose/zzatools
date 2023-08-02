@@ -247,28 +247,18 @@ void qso_rig::create_form(int X, int Y) {
 
 	curr_y += op_summary_->h();
 
-	op_frequency_ = new Fl_Float_Input(curr_x, curr_y, WSMEDIT, HTEXT + 2);
-	op_frequency_->set_output();
-	op_frequency_->tooltip("Current displayed frequency");
-	op_frequency_->value("");
-	op_frequency_->box(FL_FLAT_BOX);
-	op_frequency_->color(FL_BLACK);
-	op_frequency_->textcolor(FL_YELLOW);
-	op_frequency_->textfont(FL_BOLD);
-	op_frequency_->textsize(FL_NORMAL_SIZE + 4);
+	curr_x = op_summary_->x();
+	op_freq_mode_ = new Fl_Box(curr_x, curr_y, op_summary_->w(), op_summary_->h());
+	op_freq_mode_->tooltip("Current displayed mode");
+	op_freq_mode_->box(FL_FLAT_BOX);
+	op_freq_mode_->color(FL_BLACK);
+	op_freq_mode_->align(FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
+	op_freq_mode_->labelcolor(FL_YELLOW);
+	op_freq_mode_->labelfont(FL_BOLD);
+	op_freq_mode_->labelsize(FL_NORMAL_SIZE + 4);
 
-	curr_x += op_frequency_->w();
-	op_mode_ = new Fl_Output(curr_x, curr_y, WBUTTON, op_frequency_->h());
-	op_mode_->tooltip("Current displayed mode");
-	op_mode_->value("");
-	op_mode_->box(FL_FLAT_BOX);
-	op_mode_->color(FL_BLACK);
-	op_mode_->textcolor(FL_YELLOW);
-	op_mode_->textfont(FL_BOLD);
-	op_mode_->textsize(FL_NORMAL_SIZE + 4);
-
-	curr_y += op_mode_->h();
-	curr_x += op_mode_->w();
+	curr_y += op_freq_mode_->h();
+	curr_x += op_freq_mode_->w() + GAP;
 
 	display_grp_->resizable(nullptr);
 	display_grp_->size(curr_x - display_grp_->x(), curr_y - display_grp_->y());
@@ -378,10 +368,9 @@ void qso_rig::enable_widgets() {
 	// Update display values
 	if (rig_ && rig_->is_open()) {
 		op_summary_->activate();
-		op_frequency_->activate();
-		op_mode_->activate();
-		op_frequency_->color(FL_BLACK);
-		op_mode_->color(FL_BLACK);
+		op_summary_->color(FL_BLACK);
+		op_freq_mode_->activate();
+		op_freq_mode_->color(FL_BLACK);
 		double freq = rig_->get_dfrequency(true);
 		band_data::band_entry_t* entry = band_data_->get_entry(freq * 1000);
 		if (entry) {
@@ -394,26 +383,23 @@ void qso_rig::enable_widgets() {
 			op_summary_->label("Out of band!");
 			op_summary_->labelcolor(FL_RED);
 		}
-		char msg[25];
-		snprintf(msg, sizeof(msg), "  %9.3f MHz", freq);
-		op_frequency_->value(msg);
+		char msg[100];
 		string rig_mode;
 		string submode;
 		rig_->get_string_mode(rig_mode, submode);
-		if (submode.length()) {
-			op_mode_->value(submode.c_str());
-		}
-		else {
-			op_mode_->value(rig_mode.c_str());
-		}
+		snprintf(msg, sizeof(msg), "  %0.3f MHz %s", 
+			freq, 
+			submode.length() ? submode.c_str() : rig_mode.c_str()
+		);
+		op_freq_mode_->copy_label(msg);
 	}
 	else {
-		op_frequency_->deactivate();
-		op_frequency_->value("");
-		op_frequency_->color(FL_BACKGROUND_COLOR);
-		op_mode_->deactivate();
-		op_mode_->value("");
-		op_mode_->color(FL_BACKGROUND_COLOR);
+		op_summary_->deactivate();
+		op_summary_->label("");
+		op_summary_->color(FL_BACKGROUND_COLOR);
+		op_freq_mode_->deactivate();
+		op_freq_mode_->label("");
+		op_freq_mode_->color(FL_BACKGROUND_COLOR);
 	}
 	redraw();
 }

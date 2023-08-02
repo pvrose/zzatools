@@ -87,8 +87,7 @@ protected:
 	Fl_Light_Button* bn_select_;
 	Fl_Group* display_grp_;
 	Fl_Box* op_summary_;
-	Fl_Float_Input* op_frequency_;
-	Fl_Output* op_mode_;
+	Fl_Box* op_freq_mode_;
 
 	// Add all ports to port choice
 	bool use_all_ports_;

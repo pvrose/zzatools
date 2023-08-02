@@ -96,7 +96,7 @@ string spec_data::get_path(bool force) {
 		//Fl_File_Chooser* chooser = new Fl_File_Chooser(dirname, nullptr, Fl_File_Chooser::DIRECTORY,
 		//	"Select reference file directory");
 		Fl_Native_File_Chooser* chooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_DIRECTORY);
-		chooser->directory(dirname);
+		if (!force)	chooser->directory(dirname);
 		chooser->title("Select reference file directory");
 		while (chooser->show()) {}
 		directory_name = chooser->filename();
@@ -141,8 +141,14 @@ bool spec_data::load_data(bool force) {
 		ok = false;
 		char* message = new char[30 + file_name.length()];
 		sprintf(message, "ADIF SPEC: Fail to open %s", file_name.c_str());
-		status_->misc_status(ST_FATAL, message);
-	} 
+		status_->misc_status(ST_WARNING, message);
+		file.close();
+		// Try again to get a new reference
+		if (!force) {
+			ok = load_data(true);
+			return ok;
+		}
+	}
 	file.close();
 	delete reader;
 	if (ok) {

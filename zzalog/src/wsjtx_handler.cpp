@@ -7,6 +7,7 @@
 #include "toolbar.h"
 #include "qso_manager.h"
 #include "adi_reader.h"
+#include "menu.h"
 
 #include <stdio.h>
 #include <sstream>
