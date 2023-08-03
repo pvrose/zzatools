@@ -210,6 +210,16 @@ void qso_data::enable_widgets() {
 			g_peek_->hide();
 			g_qy_entry_->hide();
 			break;
+		case QUERY_WSJTX:
+			g_entry_->hide();
+			snprintf(l, sizeof(l), "QSO Query - %s - Possible match found in ALL.TXT", g_query_->query_qso()->item("CALL").c_str());
+			g_query_->copy_label(l);
+			g_query_->show();
+			g_query_->enable_widgets();
+			g_net_entry_->hide();
+			g_peek_->hide();
+			g_qy_entry_->hide();
+			break;
 		case NET_STARTED:
 			g_entry_->hide();
 			g_query_->hide();
@@ -259,6 +269,8 @@ void qso_data::enable_widgets() {
 			break;
 		}
 		g_buttons_->enable_widgets();
+		// Redraw this as some of the above labels may have extended into it.
+		redraw();
 	}
 }
 
@@ -376,6 +388,7 @@ void qso_data::update_query(logging_state_t query, qso_num_t match_num, qso_num_
 	case QSO_PENDING:
 	case QSO_INACTIVE:
 	case QUERY_NEW:
+	case QUERY_WSJTX:
 	case MANUAL_ENTRY:
 		action_query(query, match_num, query_num);
 		break;
@@ -486,6 +499,7 @@ qso_num_t qso_data::get_default_number() {
 	switch (logging_state_) {
 	case QSO_INACTIVE:
 	case QUERY_NEW:
+	case QUERY_WSJTX:
 		return book_->selection();
 	case QSO_PENDING:
 	case QSO_STARTED:
@@ -979,8 +993,8 @@ void qso_data::action_look_all_txt() {
 	all_file->seekg(0, ios::end);
 	streampos endpos = all_file->tellg();
 	long file_size = (long)(endpos - startpos);
-	status_->misc_status(ST_NOTE, "LOG: Starting to parse ALL.TXT");
-	status_->progress(file_size, OT_RECORD, "Looking for queried call in WSJT-X data", "bytes");
+	status_->misc_status(ST_NOTE, "DASH: Starting to parse ALL.TXT");
+	status_->progress(file_size, OT_RECORD, "Looking for queried call in ALL.TXT", "bytes");
 	// reposition back to beginning
 	all_file->seekg(0, ios::beg);
 	bool start_copying = false;
@@ -994,7 +1008,7 @@ void qso_data::action_look_all_txt() {
 	string mode = g_query_->query_qso()->item("MODE");
 	if (their_call.length() == 0 || datestamp.length() != 8 || 
 		timestamp.length() < 4 || mode.length() == 0) {
-		status_->misc_status(ST_ERROR, "Searching ALL.TXT requires, call, date/time and mode");
+		status_->misc_status(ST_ERROR, "DASH: Searching ALL.TXT requires, call, date/time and mode");
 		return;
 	}
 	datestamp = datestamp.substr(2);
@@ -1011,7 +1025,7 @@ void qso_data::action_look_all_txt() {
 		string line;
 		getline(*all_file, line);
 		count += line.length() + 1;
-		status_->progress(count, OT_RECORD);
+		if (count <= file_size) status_->progress(count, OT_RECORD);
 
 		// Does the line contain sought date, time, both calls and "Tx" or "Transmitting"
 		if (line.substr(0, 6) == datestamp &&
@@ -1062,12 +1076,12 @@ void qso_data::action_look_all_txt() {
 			all_file->close();
 			fl_cursor(FL_CURSOR_DEFAULT);
 		}
+		logging_state_ = QUERY_WSJTX;
 		enable_widgets();
 	}
 	else {
 		all_file->close();
-		snprintf(msg, 100, "LOG: Cannot find contact with %s in WSJT-X text.all file.", their_call.c_str());
-		status_->progress("Did not find record", OT_RECORD);
+		snprintf(msg, 100, "LOG: Cannot find contact with %s in ALL.TXT", their_call.c_str());
 		status_->misc_status(ST_WARNING, msg);
 		fl_cursor(FL_CURSOR_DEFAULT);
 	}
@@ -1376,6 +1390,7 @@ void qso_data::action_peek(qso_num_t number) {
 	case QUERY_DUPE:
 	case QUERY_MATCH:
 	case QUERY_NEW:
+	case QUERY_WSJTX:
 	case QRZ_MERGE:
 	case NET_STARTED:
 	case NET_ADDING:
@@ -1633,6 +1648,7 @@ record* qso_data::current_qso() {
 	case QUERY_DUPE:
 	case QUERY_MATCH:
 	case QUERY_NEW:
+	case QUERY_WSJTX:
 	case QRZ_MERGE:
 		return g_query_->qso();
 	case NET_STARTED:
@@ -1661,6 +1677,7 @@ qso_num_t qso_data::current_number() {
 	case QUERY_DUPE:
 	case QUERY_MATCH:
 	case QUERY_NEW:
+	case QUERY_WSJTX:
 	case QRZ_MERGE:
 		return g_query_->qso_number();
 	case NET_STARTED:

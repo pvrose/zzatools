@@ -239,7 +239,7 @@ void status::progress(int value, object_t object) {
 	if (progress_stack_.size()) {
 		if (progress_items_.find(object) == progress_items_.end()) {
 			char message[100];
-			snprintf(message, 100, "PROGRESS: Haven't started progress %s", OBJECT_NAMES.at(object));
+			snprintf(message, 100, "PROGRESS: %s not started but %d done", OBJECT_NAMES.at(object), value);
 			misc_status(ST_ERROR, message);
 		} else {
 			// Update progress item
@@ -270,7 +270,7 @@ void status::progress(const char* message, object_t object) {
 		if (progress_items_.find(object) == progress_items_.end()) {
 			// WE didn't start the bar in the first place
 			char msg[100];
-			snprintf(msg, 100, "PROGRESS: Haven't started progress %s", OBJECT_NAMES.at(object));
+			snprintf(msg, 100, "PROGRESS: %s not started %s", OBJECT_NAMES.at(object), message);
 			misc_status(ST_ERROR, msg);
 		}
 		else {
