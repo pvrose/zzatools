@@ -74,7 +74,7 @@ using namespace std;
 string COPYRIGHT = "© Philip Rose GM3ZZA 2018. All rights reserved.\nPrefix data courtesy of clublog.org";
 string PROGRAM_ID = "ZZALOG";
 string PROG_ID = "ZLG";
-string VERSION = "3.4.34";
+string VERSION = "3.4.35";
 string TIMESTAMP = __DATE__ + string(" ") + __TIME__;
 #ifdef _DEBUG
 string PROGRAM_VERSION = VERSION + " (Debug " + TIMESTAMP + ")";
@@ -447,7 +447,9 @@ void add_qsl_handlers() {
 void add_dashboard() {
 	if (!closing_) {
 		if (!qso_manager_) {
-			qso_manager_ = new qso_manager(10, 10, "Operating Dashboard");
+			char l[128];
+			snprintf(l, sizeof(l), "%s %s: Operating Dashboard", PROGRAM_ID.c_str(), VERSION.c_str());
+			qso_manager_ = new qso_manager(10, 10, l);
 		}
 		// Get the Operation window
 		// Show the scratchpad at the saved position
