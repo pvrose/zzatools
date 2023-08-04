@@ -1,6 +1,6 @@
 /*
 ZZALOG - Amateur radio log
-© - Copyright 2018, Philip Rose, GM3ZZA
+ï¿½ - Copyright 2018, Philip Rose, GM3ZZA
 All Rights Reserved
 
 record.cpp - Individual record data item: implementation file
@@ -967,7 +967,7 @@ match_result_t record::match_records(record* record) {
 		}
 		// Date fields out by > 30 mins and other fields agree - POSSIBLE
 		else if (nondate_mismatch_count == 0) {
-			return MT_POSSIBLE;
+			return MT_UNLIKELY;
 		}
 		// The two records overlap their times on and off
 		else if (overlap && net_mismatch_count == 0) {

@@ -1,6 +1,6 @@
 /*
 ZZALOG - Amateur Radio Log
-© - Copyright 2017, Philip Rose, GM3ZZA
+ï¿½ - Copyright 2017, Philip Rose, GM3ZZA
 All Rights Reserved
 
 record.h - Individual record data item: header file
@@ -23,6 +23,7 @@ using namespace std;
 		MT_EXACT,            // An exact match found in log
 		MT_PROBABLE,         // A close match - same band/date/call but time out by upto 30 minutes
 		MT_POSSIBLE,         // call found but something important differs
+		MT_UNLIKELY,         // A close match - same band/date/call but time out by > 30 mins
 		MT_LOC_MISMATCH,     // A close match but a location field differs
 		MT_SWL_MATCH,        // An SWL report that is a close match to existing activity
 		MT_SWL_NOMATCH,      // An SWL report that is no match for any activity

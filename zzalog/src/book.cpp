@@ -1324,9 +1324,9 @@ void book::check_dupes(bool restart) {
 		inhibit_view_update_ = true;
 		number_dupes_kept_ = 0;
 		number_dupes_removed_ = 0;
+		enable_save(false);
 	}
 	bool possible_dupe = false;
-	enable_save(false);
 	for (; duplicate_item_ < size() - 1 && !possible_dupe;) {
 		// Get adjacent records
 		record* record_1 = get_record(duplicate_item_, true);
@@ -1336,6 +1336,7 @@ void book::check_dupes(bool restart) {
 		case MT_NOMATCH:
 		case MT_SWL_NOMATCH:
 		case MT_SWL_MATCH:
+		case MT_UNLIKELY:    // Time out by > 30mins: treat as no match for dupe check
 			// Do nothing
 			break;
 		case MT_EXACT:
@@ -1365,8 +1366,8 @@ void book::check_dupes(bool restart) {
 		status_->misc_status(ST_OK, message);
 		inhibit_view_update_ = false;
 		selection(size() - 1, HT_ALL);
+		enable_save(true);
 	}
-	enable_save(true);
 }
 
 // Handle duplicate action - KEEP_LOG or KEEP_DUPE - delete it

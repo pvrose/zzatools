@@ -450,6 +450,12 @@ void import_data::update_book() {
 						book_->selection(test_record, HT_IMPORT_QUERY);
 						found_match = true;
 						break;
+					case MT_UNLIKELY:
+						update_in_progress_ = true;
+						match_question_ = "Call, band and mode match - time differs > 30m. Please select correct values.";
+						book_->selection(test_record, HT_IMPORT_QUERY);
+						found_match = true;
+						break;
 					}
 					if (found_match) {
 						// Note matching record
