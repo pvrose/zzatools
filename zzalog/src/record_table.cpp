@@ -152,6 +152,21 @@ void record_table::draw_cell(TableContext context, int R, int C, int X, int Y, i
 					break;
 				}
 				break;
+			case DUPE_QUERY:
+				// Three columns - the (modified) entry in the log, the record being queried
+				// The original log entry
+				switch (C) {
+				case 0:
+					text = "RECORD 1";
+					break;
+				case 1:
+					text = "RECORD 2";
+					break;
+				default:
+					text = "**INVALID**";
+					break;
+				}
+				break;
 			}
 			fl_draw(text.c_str(), X, Y, W, H, FL_ALIGN_CENTER);
 		}
@@ -174,6 +189,7 @@ void record_table::draw_cell(TableContext context, int R, int C, int X, int Y, i
 				switch(display_mode_) {
 				case LOG_ONLY:
 				case LOG_AND_QUERY:
+				case DUPE_QUERY:
 					// Log record
 					text = log_record_->item(field_name);
 					break;
@@ -191,6 +207,7 @@ void record_table::draw_cell(TableContext context, int R, int C, int X, int Y, i
 					text = "";
 					break;
 				case LOG_AND_QUERY:
+				case DUPE_QUERY:
 					// Query record
 					text = query_record_->item(field_name);
 					break;
@@ -200,6 +217,7 @@ void record_table::draw_cell(TableContext context, int R, int C, int X, int Y, i
 				switch (display_mode_) {
 				case LOG_ONLY:
 				case QUERY_ONLY:
+				case DUPE_QUERY:
 					// Should not get here
 					text = "";
 					break;
@@ -246,10 +264,15 @@ void record_table::set_records(record* log_record, record* query_record, record*
 		display_mode_ = QUERY_ONLY;
 		cols(1);
 	}
-	else if (log_record_ != NULL && query_record_ != NULL) {
+	else if (log_record_ != NULL && query_record_ != NULL && saved_record != NULL) {
 		// Display modified log, query and original log
 		display_mode_ = LOG_AND_QUERY;
 		cols(3);
+	}
+	else if (log_record_ != NULL && query_record_ != NULL && saved_record == NULL) {
+		// Display modified log, query and original log
+		display_mode_ = DUPE_QUERY;
+		cols(2);
 	}
 }
 

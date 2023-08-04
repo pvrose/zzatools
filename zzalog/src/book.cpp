@@ -860,6 +860,7 @@ void book::delete_record(bool force) {
 			menu_->update_items();
 			// Remove the current record from both the book_ and the extract_data_
 			if (book_type_ == OT_EXTRACT) {
+				printf("DELETE: Record %d(%d)\n", current_item_, record_number(current_item_));
 				book_->erase(book_->begin() + record_number(current_item_));
 			} 
 			erase(begin() + current_item_);
@@ -1374,7 +1375,7 @@ void book::reject_dupe(bool use_dupe) {
 		selection(duplicate_item_, HT_DUPE_DELETED);
 	}
 	else {
-		selection(duplicate_item_ + 1, HT_DUPE_DELETED);
+		selection(duplicate_item_ - 1, HT_DUPE_DELETED);
 	}
 	char message[128];
 	snprintf(message, 128, "LOG: Duplicate record %s deleted", get_record()->item("CALL").c_str());
@@ -1385,12 +1386,10 @@ void book::reject_dupe(bool use_dupe) {
 
 // Handle duplicate action - MERGE_DUPE - merge and delete it
 void book::merge_dupe() {
-	qso_num_t curr_record = record_number(duplicate_item_);
-	qso_num_t dupe_record = record_number(duplicate_item_ + 1);
-	get_record(duplicate_item_, false)->merge_records(get_record(duplicate_item_ + 1, false));
-	selection(dupe_record, HT_DUPE_DELETED);
+	get_record(duplicate_item_, false)->merge_records(get_record(duplicate_item_ - 1, false));
+	selection(duplicate_item_ - 1, HT_DUPE_DELETED);
 	char message[128];
-	snprintf(message, 128, "LOG: Duplicate record %s merged && deleted", get_record(duplicate_item_ + 1, false)->item("CALL").c_str());
+	snprintf(message, 128, "LOG: Duplicate record %s merged && deleted", get_record()->item("CALL").c_str());
 	status_->misc_status(ST_WARNING, message);
 	delete_record(true);
 	number_dupes_removed_++;

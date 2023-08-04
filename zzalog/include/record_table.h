@@ -17,7 +17,8 @@ using namespace std;
 			NO_RECORD,         // No record will be displayed
 			LOG_ONLY,          // Only a record from the log will be displayed
 			QUERY_ONLY,        // Only a record from an import query for which no match had been found
-			LOG_AND_QUERY      // Both the log record and supposed match from an import or duplicate query
+			LOG_AND_QUERY,     // Both the log record and supposed match from an import or duplicate query
+			DUPE_QUERY,        // The two dupe checks are displayed
 		};
 	public:
 		record_table(int X, int Y, int W, int H, const char* label = nullptr);

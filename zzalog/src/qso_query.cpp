@@ -107,12 +107,13 @@ void qso_query::cb_tab_qso(Fl_Widget* w, void* v) {
 }
 
 //Set QSOs
-void qso_query::set_query(string message, qso_num_t log_number, record* query_qso) {
+void qso_query::set_query(string message, qso_num_t log_number, record* query_qso, bool save_original) {
 	query_message_ = message;
 	log_number_ = log_number;
 	if (log_number != -1) {
 		log_qso_ = book_->get_record(book_->item_number(log_number_), false);
-		original_qso_ = new record(*log_qso_);
+		if (save_original) original_qso_ = new record(*log_qso_);
+		else original_qso_ = nullptr;
 	}
 	else {
 		log_qso_ = nullptr;

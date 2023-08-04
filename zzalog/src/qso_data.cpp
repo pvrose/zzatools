@@ -200,6 +200,7 @@ void qso_data::enable_widgets() {
 			g_net_entry_->hide();
 			g_peek_->hide();
 			g_qy_entry_->hide();
+			break;
 		case QUERY_NEW:
 			g_entry_->hide();
 			snprintf(l, sizeof(l), "QSO Query - %s - %s", g_query_->query_qso()->item("CALL").c_str(), g_query_->query_message().c_str());
@@ -881,7 +882,7 @@ void qso_data::action_query(logging_state_t query, qso_num_t match_number, qso_n
 		break;
 	case QUERY_DUPE:
 		// Note record numbers relate to book even if it is extracted data that refered the dupe check
-		g_query_->set_query(navigation_book_->match_question(), match_number, book_->get_record(query_number, false));
+		g_query_->set_query(navigation_book_->match_question(), match_number, book_->get_record(query_number, false), false);
 		break;
 	case QRZ_MERGE:
 		g_query_->set_query(qrz_handler_->get_merge_message(), match_number, qrz_handler_->get_record());
