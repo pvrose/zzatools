@@ -742,8 +742,27 @@ bool record::merge_records(record* merge_record, bool allow_loc_mismatch /* = fa
 			field_name == "QSO_DATE_OFF") {
 			// Update from the other merge_record - erstwhile bug overwrote previous import
 			if (!item_match) {
+				// Use the later of the two
+				if (merge_data > my_data) {
+					item(field_name, merge_data);
+					merged = true;
+				}
+			}
+			// Match but merge data is more accurate
+			else if (field_name == "TIME_OFF" && merge_data.length() > my_data.length()) {
 				item(field_name, merge_data);
 				merged = true;
+			}
+		}
+		else if (field_name == "TIME_ON" ||
+			field_name == "QSO_DATE") {
+			// Update from the other merge_record - erstwhile bug overwrote previous import
+			if (!item_match) {
+				// Use the earlier of the two
+				if (merge_data < my_data) {
+					item(field_name, merge_data);
+					merged = true;
+				}
 			}
 			// Match but merge data is more accurate
 			else if (field_name == "TIME_OFF" && merge_data.length() > my_data.length()) {
