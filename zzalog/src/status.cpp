@@ -354,9 +354,10 @@ void status::misc_status(status_t status, const char* label) {
 	// Now add the line to the file viewer
 	if (!status_file_viewer_) {
 		// Create a file viewer if it doesn't exist
-		char* title = new char[report_filename_.length() + 30];
-		sprintf(title, "%s %s: Status report file: %s", PROGRAM_ID.c_str(), VERSION.c_str(), report_filename_.c_str());
-		status_file_viewer_ = new viewer_window(640, 480, title);
+		char title[256];
+		snprintf(title, sizeof(title), "%s %s: Status report file: %s", PROGRAM_ID.c_str(), VERSION.c_str(), report_filename_.c_str());
+		status_file_viewer_ = new viewer_window(640, 480);
+		status_file_viewer_->copy_label(title);
 		status_file_viewer_->callback(cb_fv_close, this);
 		status_file_viewer_->hide();
 	}

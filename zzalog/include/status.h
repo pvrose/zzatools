@@ -139,7 +139,7 @@ using namespace std;
 	// This class provides the window in which to display the status log
 	class viewer_window : public Fl_Window {
 	public:
-		viewer_window(int W, int Y, const char* label);
+		viewer_window(int W, int Y, const char* label = nullptr);
 		~viewer_window();
 
 		virtual int handle(int event);

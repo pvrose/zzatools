@@ -1390,7 +1390,7 @@ void book::merge_dupe() {
 	get_record(duplicate_item_, false)->merge_records(get_record(duplicate_item_ - 1, false));
 	selection(duplicate_item_ - 1, HT_DUPE_DELETED);
 	char message[128];
-	snprintf(message, 128, "LOG: Duplicate record %s merged && deleted", get_record()->item("CALL").c_str());
+	snprintf(message, 128, "LOG: Duplicate record %s merged & deleted", get_record()->item("CALL").c_str());
 	status_->misc_status(ST_WARNING, message);
 	delete_record(true);
 	number_dupes_removed_++;
@@ -1399,7 +1399,9 @@ void book::merge_dupe() {
 // Handle duplicate action - KEEP_BOTH - ignore and restart check
 void book::accept_dupe() {
 	char message[128];
-	snprintf(message, 128, "LOG: Checked record %s not a duplicate", get_record(duplicate_item_ + 1, false)->item("CALL").c_str());
+	snprintf(message, 128, "LOG: Checked record %s & %s are not duplicates", 
+		get_record(duplicate_item_ - 1, false)->item("CALL").c_str(),
+		get_record(duplicate_item_, false)->item("CALL").c_str());
 	status_->misc_status(ST_WARNING, message);
 	number_dupes_kept_++;
 	duplicate_item_++;
