@@ -169,13 +169,13 @@ settings* config_ = nullptr;
 
 	// Log import operations
 	{ "&Import", 0, 0, 0, FL_SUBMENU },
-		{ "&File", 0, menu::cb_mi_imp_file, (void*)(long)import_data::FILE_IMPORT },
-		{ "File && Chec&k", 0, menu::cb_mi_imp_file, (void*)(long)import_data::FILE_UPDATE },
+		{ "&File", 0, menu::cb_mi_imp_file, 0 },
 		{ "Download e&QSL", 0, menu::cb_mi_download, (void*)(long)import_data::EQSL_UPDATE },
 		{ "Download &LotW", 0, menu::cb_mi_download, (void*)(long)import_data::LOTW_UPDATE, FL_MENU_DIVIDER },
 		{ "Clip&board", 0, menu::cb_mi_imp_clipb, nullptr },
 		{ "&WSJT-X UDP", 0, menu::cb_mi_imp_wsjtx, nullptr, FL_MENU_DIVIDER },
-		{ "&Merge", 0, menu::cb_mi_imp_merge, (void*)(long)import_data::FILE_IMPORT },
+		{ "&Merge (New QSOs)", 0, menu::cb_mi_imp_merge, (void*)(long)import_data::FILE_IMPORT },
+		{ "Merge (&Update QSOS)", 0, menu::cb_mi_imp_merge, (void*)(long)import_data::FILE_UPDATE },
 		{ "&Cancel", 0, menu::cb_mi_imp_cancel, nullptr },
 		{ 0 },
 
@@ -982,7 +982,7 @@ void menu::cb_mi_log_ssave(Fl_Widget* w, void* v) {
 }
 
 // Import->File
-// v defines subsequent load type (FILE_IMPORT or FILE_UPDATE
+// v 
 void menu::cb_mi_imp_file(Fl_Widget* w, void* v) {
 	// Cancel any existing update
 	import_data_->stop_update(false);
@@ -991,7 +991,7 @@ void menu::cb_mi_imp_file(Fl_Widget* w, void* v) {
 	char* directory;
 	Fl_Preferences datapath_settings(settings_, "Datapath");
 	datapath_settings.get("Log Directory", directory, "");
-		// Open file chooser
+	// Open file chooser
 	string filename;
 	Fl_Native_File_Chooser* chooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_FILE);
 	chooser->title("Select file name");
@@ -999,9 +999,7 @@ void menu::cb_mi_imp_file(Fl_Widget* w, void* v) {
 	chooser->filter("ADI files\t*.adi\nADX Files\t*.adx");
 	if (chooser->show() == 0) {
 		filename = chooser->filename();
-		// Get subsequent merge type
-		import_data::update_mode_t mode = (import_data::update_mode_t)(intptr_t)v;
-		import_data_->load_data(filename, mode);
+		import_data_->load_data(filename, import_data::FILE_IMPORT);
 	}
 	delete chooser;
 	free(directory);
@@ -1032,10 +1030,11 @@ void menu::cb_mi_imp_clipb(Fl_Widget* w, void* v) {
 }
 
 // Import->Merge - merge what has just been downloaded
-// v is not used
+// v is update mode
 void menu::cb_mi_imp_merge(Fl_Widget* w, void* v) {
 	// Merge the data
-	import_data_->merge_data();
+	import_data::update_mode_t mode = (import_data::update_mode_t)(intptr_t)v;
+	import_data_->merge_data(mode);
 }
 
 // Import->Cancel

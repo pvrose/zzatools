@@ -450,11 +450,20 @@ void import_data::update_book() {
 						book_->selection(test_record, HT_IMPORT_QUERY);
 						found_match = true;
 						break;
+						// Call, band and mode match but time > 30 minutes 
 					case MT_UNLIKELY:
-						update_in_progress_ = true;
-						match_question_ = "Call, band and mode match - time differs > 30m. Please select correct values.";
-						book_->selection(test_record, HT_IMPORT_QUERY);
-						found_match = true;
+						switch (update_mode_) {
+						case FILE_IMPORT:
+						case FILE_UPDATE:
+							// Matches are likely to be closer than 30 minutes so ignore those outwith this
+							break;
+						default:
+							update_in_progress_ = true;
+							match_question_ = "Call, band and mode match - time differs > 30m. Please select correct values.";
+							book_->selection(test_record, HT_IMPORT_QUERY);
+							found_match = true;
+							break;
+						}
 						break;
 					}
 					if (found_match) {
@@ -483,7 +492,7 @@ void import_data::update_book() {
 					update_mode_ != DATAGRAM && update_mode_ != CLIPBOARD) {
 					update_in_progress_ = true;
 					update_is_new_ = true;
-					match_question_ = "Cannot find matching record - click ""Accept"" to add to log.";
+					match_question_ = "Cannot find matching record - select appropriate action";
 					// we have (probably) looked beyond the end of the book, select the last record
 					if ((unsigned)offset >= book_->size()) {
 						offset = book_->size() - 1;
@@ -838,7 +847,10 @@ void import_data::load_stream(stringstream& adif, import_data::update_mode_t ser
 }
 
 // Merge data
-void import_data::merge_data() {
+void import_data::merge_data(import_data::update_mode_t mode) {
+	if (mode != EXISTING) {
+		update_mode_ = mode;
+	}
 	// Tell user
 	status_->misc_status(ST_NOTE, "IMPORT: Merging files started");
 	status_->progress(size(), book_type_, "Merging data from file", "records");
@@ -870,6 +882,7 @@ bool import_data::load_data(string filename, update_mode_t mode) {
 	if (result) {
 		tabbed_forms_->activate_pane(OT_IMPORT, true);
 		selection(record_number(0));
+		status_->misc_status(ST_NOTE, "Records read, select Import->Merge... to add them to log");
 	}
 	else {
 		// Read failed, delete any records that may have been loaded and tidy up.

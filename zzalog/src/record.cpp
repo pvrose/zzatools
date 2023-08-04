@@ -694,6 +694,7 @@ bool record::merge_records(record* merge_record, bool allow_loc_mismatch /* = fa
 		bool is_location = false;
 		bool is_grid_4_to_6 = false;
 		bool is_qsl_rcvd = false;
+		bool ignore_import = false;
 		// Select on field name
 		if (field_name == "CNTY" ||
 			field_name == "CONT" ||
@@ -737,6 +738,12 @@ bool record::merge_records(record* merge_record, bool allow_loc_mismatch /* = fa
 				merged = true;
 			}
 			is_qsl_rcvd = true;
+		}
+		else if (field_name == "QSL_SENT" ||
+			field_name == "QSL_SENT_VIA" ||
+			field_name == "QSLMSG") {
+			// Fields added by eQSL - ignore these
+			ignore_import = true;
 		}
 		else if (field_name == "TIME_OFF" ||
 			field_name == "QSO_DATE_OFF") {
@@ -792,7 +799,8 @@ bool record::merge_records(record* merge_record, bool allow_loc_mismatch /* = fa
 		}
 		// Merge if current field is "", is a location field being updated by LotW or 
 		// is updating from 4-char gridsquare to 6-char or QSL received
-		if (my_data == "" || (is_location && allow_loc_mismatch) || is_grid_4_to_6 || is_qsl_rcvd) {
+		if ((my_data == "" && !ignore_import) ||
+			(is_location && allow_loc_mismatch) || is_grid_4_to_6 || is_qsl_rcvd) {
 			// Can safely merge - use un-case-converted
 			item(field_name, merge_data);
 			merged = true;

@@ -44,6 +44,9 @@ using namespace std;
 		long previous_count_; // Previous reported count
 		long byte_count_;     // Current number of bytes read
 		long file_size_;      // Total expected number of bytes in stream
+
+		// Set of external application-defined fields that have been encountered altready
+		set<string> known_app_fields;
 	};
 
 

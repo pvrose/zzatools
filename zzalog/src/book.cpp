@@ -860,7 +860,6 @@ void book::delete_record(bool force) {
 			menu_->update_items();
 			// Remove the current record from both the book_ and the extract_data_
 			if (book_type_ == OT_EXTRACT) {
-				printf("DELETE: Record %d(%d)\n", current_item_, record_number(current_item_));
 				book_->erase(book_->begin() + record_number(current_item_));
 			} 
 			erase(begin() + current_item_);

@@ -27,6 +27,7 @@ using namespace std;
 		// Update or import mode
 		enum update_mode_t {
 			NONE,            // Book has no data
+			EXISTING,        // Use existing update mode
 			AUTO_IMPORT,     // Book contains data being auto-imported 
 			FILE_IMPORT,     // Book contains data manually loaded from a file (assume new records are correct)
 			FILE_UPDATE,     // Book contains data to be merged from a file (i.e. check it exists)
@@ -69,7 +70,7 @@ using namespace std;
 		// download data from QSL server
 		bool download_data(update_mode_t server);
 		// Merge the data into book_
-		void merge_data();
+		void merge_data(update_mode_t mode = EXISTING);
 		// load data for import
 		bool load_data(string filename, update_mode_t mode);
 		// Number of update files

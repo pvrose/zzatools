@@ -213,12 +213,15 @@ istream& adi_reader::load_record(record* in_record, istream& in, load_result_t& 
 						char message[200];
 						switch (validity) {
 						case IGNORED_APP:
-							sprintf(message, "LOG: %s %s %s - field ignored %s",
-								in_record->item("QSO_DATE").c_str(),
-								in_record->item("TIME_ON").c_str(),
-								in_record->item("CALL").c_str(),
-								bad_field.c_str());
-							status_->misc_status(ST_WARNING, message);
+							if (known_app_fields.find(bad_field) == known_app_fields.end()) {
+								sprintf(message, "LOG: %s %s %s - field ignored %s",
+									in_record->item("QSO_DATE").c_str(),
+									in_record->item("TIME_ON").c_str(),
+									in_record->item("CALL").c_str(),
+									bad_field.c_str());
+								status_->misc_status(ST_WARNING, message);
+								known_app_fields.insert(bad_field);
+							}
 							break;
 						case INVALID_TYPE:
 						case INVALID_USERDEF:
@@ -257,6 +260,8 @@ bool adi_reader::load_book(book* book, istream& in) {
 	my_book_ = book;
 	// This will take a while so display the timer cursor
 	fl_cursor(FL_CURSOR_WAIT);
+	// Initialise Known apps 
+	known_app_fields.clear();
 	// calculate the file size and initialise the progress bar
 	streampos startpos = in.tellg();
 	in.seekg(0, ios::end);
