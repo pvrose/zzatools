@@ -525,10 +525,20 @@ viewer_window::viewer_window(int W, int H, const char* label)
 	: Fl_Window(W, H, label)
 {
 	draw_window();
+	Fl_Preferences windows_settings(settings_, "Windows");
+	Fl_Preferences viewer_settings(windows_settings, "Status Viewer");
+	int left, top;
+	viewer_settings.get("Left", left, 0);
+	viewer_settings.get("Top", top, 100);
+	position(left, top);
 }
 
 // Viewer window destructor
 viewer_window::~viewer_window() {
+	Fl_Preferences windows_settings(settings_, "Windows");
+	Fl_Preferences vw_settings(windows_settings, "Status Viewer");
+	vw_settings.set("Left", x_root());
+	vw_settings.set("Top", y_root());
 }
 
 // Handle FL_HIDE and FL_SHOW to get menu to update otself

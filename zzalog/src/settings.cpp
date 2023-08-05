@@ -11,9 +11,9 @@
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Return_Button.H>
 #include <FL/Fl_Tabs.H>
+#include <FL/Fl_Preferences.H>
 
-
-
+extern Fl_Preferences* settings_;
 
 // Constructor
 settings::settings(int W, int H, const char* label, cfg_dialog_t active) :
@@ -22,6 +22,15 @@ settings::settings(int W, int H, const char* label, cfg_dialog_t active) :
 	, active_(true)
 {
 	updatable_views_.clear();
+
+	// Set position on screen
+	Fl_Preferences windows_settings(settings_, "Windows");
+	Fl_Preferences window_settings(windows_settings, "Settings");
+	int left, top;
+	window_settings.get("Left", left, 0);
+	window_settings.get("Top", top, 100);
+	position(left, top);
+
 	// Create the set of tabs - leave enough space beneath for OK etc buttons.
 	Fl_Tabs* tabs = new Fl_Tabs(0, 0, W, H - HBUTTON - GAP);
 	tabs->callback(cb_tab);
@@ -117,6 +126,11 @@ settings::settings(int W, int H, const char* label, cfg_dialog_t active) :
 settings::~settings()
 {
 	active_ = false;
+	// Rememeber window position
+	Fl_Preferences windows_settings(settings_, "Windows");
+	Fl_Preferences window_settings(windows_settings, "Settings");
+	window_settings.set("Left", x_root());
+	window_settings.set("Top", y_root());
 }
 
 // Callback - Save, OK or Cancel

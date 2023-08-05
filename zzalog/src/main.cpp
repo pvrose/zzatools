@@ -1,6 +1,6 @@
 /*
 ZZALOG - Amateur radio log
-© - Copyright 2018, Philip Rose, GM3ZZA
+ï¿½ - Copyright 2018, Philip Rose, GM3ZZA
 All Rights Reserved
 
 main.cpp - application entry point
@@ -71,7 +71,7 @@ using namespace std;
 
 
 // Program strings
-string COPYRIGHT = "© Philip Rose GM3ZZA 2018. All rights reserved.\nPrefix data courtesy of clublog.org";
+string COPYRIGHT = "ï¿½ Philip Rose GM3ZZA 2018. All rights reserved.\nPrefix data courtesy of clublog.org";
 string PROGRAM_ID = "ZZALOG";
 string PROG_ID = "ZLG";
 string VERSION = "3.4.36";
@@ -242,7 +242,8 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 		}
 
 		// Save the window position
-		Fl_Preferences window_settings(settings_, "Window");
+		Fl_Preferences windows_settings(settings_, "Windows");
+		Fl_Preferences window_settings(windows_settings, "Main");
 		window_settings.set("Left", main_window_->x_root());
 		window_settings.set("Top", main_window_->y_root());
 		window_settings.set("Width", main_window_->w());
@@ -521,9 +522,10 @@ void resize_window() {
 	int width;
 	int top;
 	int height;
-	Fl_Preferences window_settings(settings_, "Window");
-	window_settings.get("Left", left, -1);
-	window_settings.get("Top", top, -1);
+	Fl_Preferences windows_settings(settings_, "Windows");
+	Fl_Preferences window_settings(windows_settings, "Main");
+	window_settings.get("Left", left, 0);
+	window_settings.get("Top", top, 100);
 	window_settings.get("Width", width, WIDTH);
 	window_settings.get("Height", height, HEIGHT);
 	// Only allow the views to resize fully - the bars will resize horizontally

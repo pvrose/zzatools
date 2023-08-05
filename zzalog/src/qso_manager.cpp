@@ -178,13 +178,11 @@ void qso_manager::create_form(int X, int Y) {
 // Load values
 void qso_manager::load_values() {
 	// Get position of window
-	int top;
-	int left;
-	Fl_Preferences dash_settings(settings_, "Dashboard");
-	dash_settings.get("Left", left, 100);
+	Fl_Preferences windows_settings(settings_, "Windows");
+	Fl_Preferences dash_settings(windows_settings, "Dashboard");
+	int left, top;
+	dash_settings.get("Left", left, 0);
 	dash_settings.get("Top", top, 100);
-	if (top < 0) top = 100;
-	if (left < 0) left = 100;
 	position(left, top);
 }
 
@@ -192,7 +190,8 @@ void qso_manager::load_values() {
 void qso_manager::save_values() {
 
 	// Save window position
-	Fl_Preferences dash_settings(settings_, "Dashboard");
+	Fl_Preferences windows_settings(settings_, "Windows");
+	Fl_Preferences dash_settings(windows_settings, "Dashboard");
 	dash_settings.set("Left", x_root());
 	dash_settings.set("Top", y_root());
 
@@ -210,6 +209,7 @@ void qso_manager::enable_widgets() {
 
 	data_group_->enable_widgets();
 	rig_group_->enable_widgets();
+
 }
 
 // Close button clicked - invoke main window close
