@@ -1316,7 +1316,7 @@ bool book::enable_save() {
 // Check duplicates - restart set after a query to confirm it's a duplicate
 void book::check_dupes(bool restart) {
 	if (!restart) {
-		duplicate_item_ = 0;
+		test_item_ = 0;
 		// Only check N - 1 entries against the next entry
 		status_->misc_status(ST_NOTE, "LOG: Duplicate checking started");
 		status_->progress(size() - 1, book_type(), "Checking log for duplicates", "duplicates");
@@ -1326,42 +1326,48 @@ void book::check_dupes(bool restart) {
 		enable_save(false);
 	}
 	bool possible_dupe = false;
-	for (; duplicate_item_ < size() - 1 && !possible_dupe;) {
+	for (; test_item_ < size() - 1 && !possible_dupe;) {
 		// Get adjacent records
-		record* record_1 = get_record(duplicate_item_, true);
-		record* record_2 = get_record(duplicate_item_ + 1, false);
-		match_result_t match = record_1->match_records(record_2);
+		record* record_1 = get_record(test_item_, true);
+		record* record_2;
+		match_result_t match = MT_OVERLAP;
+		for (dupe_item_ = test_item_ + 1; 
+			dupe_item_ < size() && match == MT_OVERLAP;
+		    ) {
+			record_2 = get_record(dupe_item_, false);
+			match = record_1->match_records(record_2);
+			if (match == MT_OVERLAP) dupe_item_++;
+		}
 		switch (match) {
 		case MT_NOMATCH:
 		case MT_SWL_NOMATCH:
 		case MT_SWL_MATCH:
+		case MT_2XSWL_MATCH:
 		case MT_UNLIKELY:    // Time out by > 30mins: treat as no match for dupe check
+		case MT_OVERLAP:     // Still in the net at the end of the file
 			// Do nothing
 			break;
 		case MT_EXACT:
 			// Delete second occurence after query
 			match_question_ = "These appear to be duplicates - select one to delete";
-			selection(duplicate_item_ + 1, HT_DUPE_QUERY, nullptr, duplicate_item_);
+			selection(test_item_, HT_DUPE_QUERY, nullptr, dupe_item_);
 			possible_dupe = true;
 			break;
-		case MT_OVERLAP:
-			if (record_1->item("CALL") != record_2->item("CALL")) {
-				break;
-			}
-			// Else drop through
-		default:
+		case MT_PROBABLE:
+		case MT_POSSIBLE:
+		case MT_LOC_MISMATCH:
 			// Open QSO query 
 			match_question_ = "Possible duplicate record found";
-			selection(duplicate_item_ + 1, HT_DUPE_QUERY, nullptr, duplicate_item_);
+			selection(test_item_, HT_DUPE_QUERY, nullptr, dupe_item_);
 			possible_dupe = true;
 			break;
 		}
-		duplicate_item_++;
-		status_->progress(duplicate_item_, book_type());
+		test_item_++;
+		status_->progress(test_item_, book_type());
 	}
 	if (!possible_dupe) {
 		char message[256];
-		snprintf(message, 256, "LOG: Dupe check complete. %zu checked, %d kept, %d removed", duplicate_item_, number_dupes_kept_, number_dupes_removed_);
+		snprintf(message, 256, "LOG: Dupe check complete. %zu checked, %d kept, %d removed", test_item_, number_dupes_kept_, number_dupes_removed_);
 		status_->misc_status(ST_OK, message);
 		inhibit_view_update_ = false;
 		selection(size() - 1, HT_ALL);
@@ -1372,10 +1378,10 @@ void book::check_dupes(bool restart) {
 // Handle duplicate action - KEEP_LOG or KEEP_DUPE - delete it
 void book::reject_dupe(bool use_dupe) {
 	if (use_dupe) {
-		selection(duplicate_item_, HT_DUPE_DELETED);
+		selection(dupe_item_, HT_DUPE_DELETED);
 	}
 	else {
-		selection(duplicate_item_ - 1, HT_DUPE_DELETED);
+		selection(test_item_, HT_DUPE_DELETED);
 	}
 	char message[128];
 	snprintf(message, 128, "LOG: Duplicate record %s deleted", get_record()->item("CALL").c_str());
@@ -1386,8 +1392,8 @@ void book::reject_dupe(bool use_dupe) {
 
 // Handle duplicate action - MERGE_DUPE - merge and delete it
 void book::merge_dupe() {
-	get_record(duplicate_item_, false)->merge_records(get_record(duplicate_item_ - 1, false));
-	selection(duplicate_item_ - 1, HT_DUPE_DELETED);
+	get_record(test_item_, false)->merge_records(get_record(dupe_item_, false));
+	selection(dupe_item_, HT_DUPE_DELETED);
 	char message[128];
 	snprintf(message, 128, "LOG: Duplicate record %s merged & deleted", get_record()->item("CALL").c_str());
 	status_->misc_status(ST_WARNING, message);
@@ -1399,11 +1405,11 @@ void book::merge_dupe() {
 void book::accept_dupe() {
 	char message[128];
 	snprintf(message, 128, "LOG: Checked record %s & %s are not duplicates", 
-		get_record(duplicate_item_ - 1, false)->item("CALL").c_str(),
-		get_record(duplicate_item_, false)->item("CALL").c_str());
+		get_record(test_item_, false)->item("CALL").c_str(),
+		get_record(dupe_item_, false)->item("CALL").c_str());
 	status_->misc_status(ST_WARNING, message);
 	number_dupes_kept_++;
-	duplicate_item_++;
+	test_item_++;
 }
 
 // Returns the reason record view has been activated - used by record view to prompt the user

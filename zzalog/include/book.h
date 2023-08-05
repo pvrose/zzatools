@@ -218,7 +218,9 @@ using namespace std;
 		// current selected item number
 		item_num_t current_item_;
 		// Test duplicate item
-		item_num_t duplicate_item_;
+		item_num_t test_item_;
+		// Possible duplicate item
+		item_num_t dupe_item_;
 		// Newest record number
 		item_num_t newest_item_;
 		// Book type

@@ -882,6 +882,7 @@ match_result_t record::match_records(record* record) {
 	bool dates_match = true;
 	bool location_match = true;
 	bool swl_match = true;
+	bool call_match = true;
 	// For each field in this record
 	for (auto it = begin(); it != end(); it++) {
 		string field_name = it->first;
@@ -935,6 +936,7 @@ match_result_t record::match_records(record* record) {
 			field_name == "CALL") {
 			if (!(items_match(record, field_name))) {
 				nondate_mismatch_count++;
+				call_match = false;
 			}
 		}
 		else {
@@ -996,8 +998,8 @@ match_result_t record::match_records(record* record) {
 		else if (nondate_mismatch_count == 0) {
 			return MT_UNLIKELY;
 		}
-		// The two records overlap their times on and off
-		else if (overlap && net_mismatch_count == 0) {
+		// The two records overlap their times on and off 
+		else if (overlap && net_mismatch_count == 0 && !call_match) {
 			return MT_OVERLAP;
 		}
 		// Significant difference - NOMATCH
