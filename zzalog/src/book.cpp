@@ -1362,7 +1362,7 @@ void book::check_dupes(bool restart) {
 			possible_dupe = true;
 			break;
 		}
-		test_item_++;
+		if (!possible_dupe) test_item_++;
 		status_->progress(test_item_, book_type());
 	}
 	if (!possible_dupe) {
