@@ -802,36 +802,32 @@ void qso_data::action_cancel_browse() {
 // Action navigate button
 void qso_data::action_navigate(int target) {
 	inhibit_drawing_ = true;
-	logging_state_t saved_state = logging_state_;
 	switch (logging_state_) {
 	case QSO_EDIT:
+		// Save, navigate to new QSO and open editor
 		action_save_edit();
-		break;
-	case QSO_PENDING:
-		action_deactivate();
-		break;
-	case QSO_BROWSE:
-		action_cancel_browse();
-		break;
-	}
-	// We should now be inactive - navigate to new QSO
-	navigation_book_->navigate((navigate_t)target);
-	// And restore state
-	switch (saved_state) {
-	case QSO_EDIT:
+		navigation_book_->navigate((navigate_t)target);
 		action_edit();
 		action_view_qsl();
 		break;
 	case QSO_PENDING:
+		// Deactivate, navigate and go pending again
+		action_deactivate();
+		navigation_book_->navigate((navigate_t)target);
 		action_activate(previous_mode_);
 		action_view_qsl();
 		break;
 	case QSO_BROWSE:
+		// Close browser, navigate and reopen browser
+		action_cancel_browse();
+		navigation_book_->navigate((navigate_t)target);
 		action_browse();
 		action_view_qsl();
 		break;
 	case QUERY_MATCH:
-		action_query(saved_state, book_->selection(), 0);
+		// Navigate book to new compare record and reopen query
+		book_->navigate((navigate_t)target);
+		action_query(logging_state_, book_->selection(), 0);
 		break;
 	}
 	inhibit_drawing_ = false;
