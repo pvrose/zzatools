@@ -598,7 +598,11 @@ item_num_t book::selection(item_num_t num_item, hint_t hint /* = HT_SELECTED */,
 			}
 			break;
 		}
-		if (current_item_ != previous && !read_only_ && save_level_ == 0 && modified() && !save_in_progress_) {
+		if (current_item_ != previous && 
+			!read_only_ && 
+			save_level_ == 0 && 
+			modified() && 
+			!save_in_progress_ ) {
 #ifndef _DEBUG
 			store_data();
 #endif // _DEBUG

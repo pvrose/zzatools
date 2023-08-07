@@ -1328,9 +1328,8 @@ void qso_data::action_cancel_net_edit() {
 
 // Start a modem record
 void qso_data::action_add_modem(record* qso) {
-	// Increment inhibit save stack unless we are already in modem state
-	if (logging_state_ != QSO_MODEM) book_->enable_save(false);
 	// Add to book
+	book_->enable_save(false);
 	action_new_qso(qso, QSO_COPY_MODEM);
 	g_entry_->append_qso();
 	logging_state_ = QSO_MODEM;
@@ -1345,6 +1344,8 @@ void qso_data::action_update_modem(record* qso) {
 		// This is a new record as the previous one did not complete
 		action_cancel();
 		action_add_modem(qso);
+		// add model ups the inhibit level so down it again
+		book_->enable_save(true);
 	}
 	else {
 		if (qso->item("QSO_COMPLETE") == "") {
@@ -1368,6 +1369,7 @@ void qso_data::action_cancel_modem() {
 	}
 	else {
 		action_cancel();
+		book_->enable_save(true);
 	}
 }
 
