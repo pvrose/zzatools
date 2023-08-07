@@ -1328,8 +1328,9 @@ void qso_data::action_cancel_net_edit() {
 
 // Start a modem record
 void qso_data::action_add_modem(record* qso) {
+	// Increment inhibit save stack unless we are already in modem state
+	if (logging_state_ != QSO_MODEM) book_->enable_save(false);
 	// Add to book
-	book_->enable_save(false);
 	action_new_qso(qso, QSO_COPY_MODEM);
 	g_entry_->append_qso();
 	logging_state_ = QSO_MODEM;
