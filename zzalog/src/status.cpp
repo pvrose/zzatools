@@ -343,8 +343,24 @@ void status::misc_status(status_t status, const char* label) {
 			report_file_ = nullptr;
 			file_unusable_ = true;
 			fl_alert("STATUS: Failed to open status report file %s", report_filename_.c_str());
+			// It doesn'r exist get a new filename
+			// open file dialog, get it and set it.
+			report_filename_ = "";
+			while (report_filename_.length() == 0) {
+				// Create an Open dialog; the default file name extension is ".txt".
+				Fl_Native_File_Chooser* chooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_SAVE_FILE);
+				chooser->title("Select file name for status report");
+				chooser->filter("Text files\t*.txt");
+				if (chooser->show() == 0) {
+					report_filename_ = chooser->filename();
+					Fl_Preferences status_settings(settings_, "Status");
+					status_settings.set("Report File", report_filename_.c_str());
+				}
+				delete chooser;
+			}
+			// Create a new file 
+			report_file_ = new ofstream(report_filename_, ios::out | ios::trunc);
 		}
-
 	}
 	if (report_file_) {
 		// File did open correctly - write all message to file
