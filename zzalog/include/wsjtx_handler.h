@@ -109,6 +109,26 @@ using namespace std;
 			string tx_message;
 		};
 
+		enum message_t {
+			TX1,       // CALL1 CALL2 GRID
+			TX1A,      // CALL1 CALL2 - no excahnge 
+			TX2,       // CALL1 CALL2 Report
+			TX3,       // CALL1 CALL2 R-report
+			TX4,       // CALL1 CALL2 RRR
+			TX4A,      // CALL1 CALL2 RR73
+			TX5,       // CALL1 CALL2 73
+			TX6,       // CQ +  CALL2 GRID
+			TX6A,      // CQ + CALL2  - no exchange
+			TEXT,      // Any other decode
+		};
+
+		struct decoded_msg {
+			message_t type;
+			string target;
+			string sender;
+			string exchange;
+		};
+
 		// Receive a datagram from WSJT-X
 		static int rcv_request(stringstream& os);
 		// Receive a datagram from WSJT-X
@@ -144,12 +164,19 @@ using namespace std;
 		void put_utf8(stringstream& os, string s);
 		// Add 32-but unsigned integer
 		void put_uint32(stringstream& os, const unsigned int i);
-		// Add RX message to QSO
-		void add_rx_message(const decode_dg& decode);
-		// Add TX message to QSO
-		void add_tx_message(const status_dg& status);
-		// Check message validity
-		bool check_message(record* qso, string message, bool tx);
+		//// Add RX message to QSO
+		//void add_rx_message(const decode_dg& decode);
+		//// Add TX message to QSO
+		//void add_tx_message(const status_dg& status);
+		//// Check message validity
+		//bool check_message(record* qso, string message, bool tx);
+
+		// Decode the message
+		decoded_msg decode_message(string message);
+		// Update QSO with message
+		bool update_qso(bool tx, string message);
+
+		// Decode the message
 
 		// Socket server
 		socket_server* server_;

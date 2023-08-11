@@ -63,6 +63,20 @@ void split_line(const string& line, vector<string>& words, const char separator)
 	a_word.shrink_to_fit();
 }
 
+// Join line
+string join_line(vector<string> words, const char separator) {
+	string result = "";
+	for (auto it = words.begin(); it != words.end(); it++) {
+		if (result.length()) {
+			result += ' ' + *it;
+		}
+		else {
+			result = *it;
+		}
+	}
+	return result;
+}
+
 // Converts display format text to a tm object for reformatting
 bool string_to_tm(string source, tm& time, string format) {
 	bool escaped = false;

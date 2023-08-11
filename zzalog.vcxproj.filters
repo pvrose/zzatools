@@ -560,6 +560,9 @@
     <ClInclude Include="zzalog\include\dxa_if.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="zzalog\include\regices.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="reference\Prefix.lst" />

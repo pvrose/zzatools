@@ -1,4 +1,5 @@
 #include "spec_data.h"
+#include "regices.h"
 #include "specx_reader.h"
 #include "utils.h"
 #include "book.h"

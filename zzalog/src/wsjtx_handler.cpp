@@ -8,6 +8,7 @@
 #include "qso_manager.h"
 #include "adi_reader.h"
 #include "menu.h"
+#include "regices.h"
 
 #include <stdio.h>
 #include <sstream>
@@ -204,7 +205,9 @@ int wsjtx_handler::handle_decode(stringstream& ss) {
 	minutes = minutes - (hours * 60);
 	char message[256];
 	snprintf(message, 256, "WSJT-X: Decode %02d:%02d:%02.0f: %s", hours, minutes, seconds, decode.message.c_str());
-	//add_rx_message(decode);
+	if (update_qso(false, decode.message)) {
+		qso_manager_->update_modem_qso(qso_);
+	}
 	return 0;
 }
 
@@ -260,7 +263,11 @@ int wsjtx_handler::handle_status(stringstream& ss) {
 	// TX Message
 	status.tx_message = get_utf8(ss);
 	// Create qso
-	add_tx_message(status);
+	if (status.transmitting) {
+		if (update_qso(true, status.tx_message)) {
+			qso_manager_->update_modem_qso(qso_);
+		}
+	}
 #ifdef _WIN32
 	if (dxa_if_) {
 		if (status.dx_call.length() && status.dx_grid.length() && status.transmitting) {
@@ -401,214 +408,448 @@ void wsjtx_handler::close_server() {
 	}
 }
 
-void wsjtx_handler::add_tx_message(const status_dg& status) {
-	if (status.transmitting && status.dx_call.length()) {
-		// If the call changes use a different record - qso_data will handle it
-		if (qso_ == nullptr || qso_->item("CALL") != status.dx_call) {
-			if (qso_ && qso_->item("QSO_COMPLETE") == "Y") qso_->item("QSO_COMPLETE", string(""));
-			qso_ = new record();
-			qso_->item("QSO_COMPLETE", string("N"));
-		}
-		// Can get all the required fields off status
-		qso_->item("CALL", status.dx_call);
-		qso_->item("GRIDSQUARE", status.dx_grid);
-		double freq = (status.dial_freq + status.tx_offset) / 1000000.0;
-		char cfreq[15];
-		snprintf(cfreq, sizeof(cfreq), "%0.6f", freq);
-		qso_->item("FREQ", string(cfreq));
-		qso_->item("MODE", status.mode);
-		//qso_->item("RST_SENT", status.report);
-		qso_->item("STATION_CALLSIGN", status.own_call);
+//void wsjtx_handler::add_tx_message(const status_dg& status) {
+//	if (status.transmitting && status.dx_call.length()) {
+//		// If the call changes use a different record - qso_data will handle it
+//		if (qso_ == nullptr || qso_->item("CALL") != status.dx_call) {
+//			if (qso_ && qso_->item("QSO_COMPLETE") == "Y") qso_->item("QSO_COMPLETE", string(""));
+//			qso_ = new record();
+//			qso_->item("QSO_COMPLETE", string("N"));
+//		}
+//		// Can get all the required fields off status
+//		qso_->item("CALL", status.dx_call);
+//		qso_->item("GRIDSQUARE", status.dx_grid);
+//		double freq = (status.dial_freq + status.tx_offset) / 1000000.0;
+//		char cfreq[15];
+//		snprintf(cfreq, sizeof(cfreq), "%0.6f", freq);
+//		qso_->item("FREQ", string(cfreq));
+//		qso_->item("MODE", status.mode);
+//		//qso_->item("RST_SENT", status.report);
+//		qso_->item("STATION_CALLSIGN", status.own_call);
+//
+//		if (check_message(qso_, status.tx_message, true)) {
+//			qso_manager_->update_modem_qso(qso_);
+//			if (qso_->item("QSO_COMPLETE").length() == 0) {
+//				qso_ = nullptr;
+//			}
+//		}
+//		else {
+//			char msg[128];
+//			snprintf(msg, sizeof(msg), "WSJT-X: Mismatch in decoding status for %s", status.dx_call.c_str());
+//			status_->misc_status(ST_WARNING, msg);
+//		}
+//	}
+//}
+//
+//void wsjtx_handler::add_rx_message(const decode_dg& decode) {
+//	// Parse the message
+//	vector<string> words;
+//	split_line(decode.message, words, ' ');
+//	if (words[0] != my_call_ && words[0] != my_bracketed_call_) {
+//		// Not interested as its not for me
+//		return;
+//	}
+//
+//	const string& call = words[1];
+//	if (qso_ == nullptr) {
+//		// Someone is calling me - wait until I reply
+//		return;
+//	}
+//
+//	if (check_message(qso_, decode.message, false)) {
+//		qso_manager_->update_modem_qso(qso_);
+//		if (qso_->item("QSO_COMPLETE").length() == 0) {
+//			qso_ = nullptr;
+//		}
+//	}
+//	else {
+//		char msg[128];
+//		snprintf(msg, sizeof(msg), "WSJT-X: Mismatch in decoding decode for %s", call.c_str());
+//		status_->misc_status(ST_WARNING, msg);
+//	}
+//}
+//
+//bool wsjtx_handler::check_message(record* qso, string message, bool tx) {
+//	// Now parse the exchange - 
+//	// TODO: Currently assuming non F/H exchange
+//	string exchange = "";
+//	string sender = "";
+//	string target = "";
+//	int state = 0;
+//	// exchange is the last word, sender last but one and target the rest
+//	for (auto it = message.rbegin(); it != message.rend(); it++) {
+//		switch (state) {
+//		case 0: 
+//			if (*it!= ' ') {
+//				state = 1;
+//				exchange = *it;
+//			}
+//			break;
+//		case 1:
+//			if (*it == ' ') {
+//				state = 2;
+//			} else {
+//				exchange = *it + exchange;
+//			}
+//			break;
+//		case 2: 
+//			if (*it!= ' ') {
+//				state = 3;
+//				sender = *it;
+//			}
+//			break;
+//		case 3:
+//			if (*it == ' ') {
+//				state = 4;
+//			} else {
+//				sender = *it + sender;
+//			}
+//			break;
+//		case 4: 
+//			if (*it!= ' ') {
+//				state = 5;
+//				target = *it;
+//			}
+//			break;
+//		case 5:
+//			target = *it + target;
+//			break;
+//		}
+//	}
+//	// Sort out my call
+//	if (tx) {
+//		// Not me sending - should not happen
+//		if (sender != my_call_) {
+//			return false;
+//		}
+//		// Target is CQ
+//		if (target.substr(0, 2) == "CQ") {
+//			if (qso_ && qso_->item("CALL").length()) {
+//				// A CQ is replacing a call to another station so replace that call with null string
+//				qso_->item("CALL", string(""));
+//			}
+//			else {
+//				// Ignore single CQs
+//				return false;
+//			}
+//		}
+//		// Over with another station
+//		else {
+//			// Set QSO->CALL to the target field - replacing cached callsigns eg "<GM3ZZA>" with "GM3ZZA"
+//			string their_call = qso->item("CALL");
+//			if (target[0] == '<') {
+//				target = target.substr(1, target.length() - 2);
+//			}
+//			if (their_call != target) {
+//				char msg[128];
+//				snprintf(msg, sizeof(msg), "WSJT-X: Changing target call from %s to %s", their_call.c_str(), target.c_str());
+//				status_->misc_status(ST_WARNING, msg);
+//			}
+//			// Set the QSO call to the target
+//			qso->item("CALL", target);
+//		}
+//	}
+//	else {
+//		// Am I the target?
+//		if (target != my_call_ && target != my_bracketed_call_) {
+//			// return false if not
+//			return false;
+//		}
+//		// save sender
+//		qso->item("CALL", sender);
+//	}
+//	if (exchange == "RR73" || exchange == "RRR") {
+//		// If we've seen the R-00 then mark the QSO complete, otherwise mark in provisional until we see the 73
+//		if (qso->item("QSO_COMPLETE") == "?") {
+//			// It's complete as far as I am concerned, but partner may disagree - leave QSO active
+//			qso->item("QSO_COMPLETE", string("Y"));
+//		}
+//		else if (qso->item("QSO_COMPLETE") == "N") {
+//			qso->item("QSO_COMPLETE", string("?"));
+//		}
+//	}
+//	else if (exchange == "73") {
+//		// A 73 definitely indicates QSO compplete - but only qso_manager can clear it on logging event
+//		qso->item("QSO_COMPLETE", string("Y"));
+//	}
+//	else if (exchange[0] == 'R') {
+//		// The first of the rogers
+//		if (qso->item("QSO_COMPLETE") == "N") {
+//			// Half the exchange is complete
+//			qso->item("QSO_COMPLETE", string("?"));
+//		}
+//		// Update reports if they've not been provided 
+//		if (tx && !qso->item_exists("RST_SENT")) {
+//			qso->item("RST_SENT", exchange.substr(1));
+//		}
+//		else if (tx && qso->item("RST_SENT") != exchange.substr(1)) {
+//			char msg[128];
+//			snprintf(msg, sizeof(msg), "WSJTX: Mismatch for %s RST_SENT is changing from %s to %s", 
+//				qso->item("CALL").c_str(), qso->item("RST_SENT").c_str(), exchange.c_str());
+//			status_->misc_status(ST_WARNING, msg);
+//			return false;
+//		}
+//		else if (!tx && !qso->item_exists("RST_RCVD")) {
+//			qso->item("RST_RCVD", exchange.substr(1));
+//		}
+//	}
+//	else if (!tx && !qso->item_exists("GRIDSQUARE")) {
+//		// Update gridsquare if it's not been provided
+//		qso->item("GRIDSQUARE", exchange);
+//	}
+//	else if (!tx && qso->item("GRIDSQUARE") != exchange) {
+//		char msg[128];
+//		snprintf(msg, sizeof(msg), "WSJTX: Mismatch for %s GRIDSQUARE is changing from %s to %s",
+//			qso->item("CALL").c_str(), qso->item("GRIDSQUARE").c_str(), exchange.c_str());
+//		status_->misc_status(ST_WARNING, msg);
+//		return false;
+//	}
+//	else if (exchange[0] == '-' || exchange[0] == '+' || isdigit(exchange[0])) {
+//		// Numeric report
+//		if (tx && !qso->item_exists("RST_SENT")) {
+//			qso->item("RST_SENT", exchange);
+//		}
+//		else if (!tx && !qso->item_exists("RST_RCVD")) {
+//			qso->item("RST_RCVD", exchange);
+//		}
+//		qso->item("QSO_COMPLETE", string("N"));
+//	}
+//	else {
+//		qso->item("QSO_COMPLETE", string("N"));
+//	}
+//	return true;
+//}
 
-		if (check_message(qso_, status.tx_message, true)) {
-			qso_manager_->update_modem_qso(qso_);
-			if (qso_->item("QSO_COMPLETE").length() == 0) {
-				qso_ = nullptr;
-			}
-		}
-		else {
-			char msg[128];
-			snprintf(msg, sizeof(msg), "WSJT-X: Mismatch in decoding status for %s", status.dx_call.c_str());
-			status_->misc_status(ST_WARNING, msg);
-		}
-	}
-}
-
-void wsjtx_handler::add_rx_message(const decode_dg& decode) {
-	// Parse the message
-	vector<string> words;
-	split_line(decode.message, words, ' ');
-	if (words[0] != my_call_ && words[0] != my_bracketed_call_) {
-		// Not interested as its not for me
-		return;
-	}
-
-	const string& call = words[1];
-	if (qso_ == nullptr) {
-		// Someone is calling me - wait until I reply
-		return;
-	}
-
-	if (check_message(qso_, decode.message, false)) {
-		qso_manager_->update_modem_qso(qso_);
-		if (qso_->item("QSO_COMPLETE").length() == 0) {
-			qso_ = nullptr;
-		}
-	}
-	else {
-		char msg[128];
-		snprintf(msg, sizeof(msg), "WSJT-X: Mismatch in decoding decode for %s", call.c_str());
-		status_->misc_status(ST_WARNING, msg);
-	}
-}
-
-bool wsjtx_handler::check_message(record* qso, string message, bool tx) {
-	// Now parse the exchange - 
+wsjtx_handler::decoded_msg wsjtx_handler::decode_message(string message) {
 	// TODO: Currently assuming non F/H exchange
-	string exchange = "";
-	string sender = "";
-	string target = "";
-	int state = 0;
-	// exchange is the last word, sender last but one and target the rest
-	for (auto it = message.rbegin(); it != message.rend(); it++) {
-		switch (state) {
-		case 0: 
-			if (*it!= ' ') {
-				state = 1;
-				exchange = *it;
-			}
-			break;
-		case 1:
-			if (*it == ' ') {
-				state = 2;
-			} else {
-				exchange = *it + exchange;
-			}
-			break;
-		case 2: 
-			if (*it!= ' ') {
-				state = 3;
-				sender = *it;
-			}
-			break;
-		case 3:
-			if (*it == ' ') {
-				state = 4;
-			} else {
-				sender = *it + sender;
-			}
-			break;
-		case 4: 
-			if (*it!= ' ') {
-				state = 5;
-				target = *it;
-			}
-			break;
-		case 5:
-			target = *it + target;
-			break;
+	decoded_msg decode;
+	vector<string> words;
+	split_line(message, words, ' ');
+
+	string test_exch = words.back();
+	const char* test = test_exch.c_str();
+	if (regex_match(test, REGEX_GRIDSQUARE4)) {
+		// TX1 or TX6
+		decode.exchange = test_exch;
+		words.pop_back();
+		decode.sender = words.back();
+		words.pop_back();
+		decode.target = join_line(words, ' ');
+		if (regex_match(decode.target.c_str(), REGEX_CQ)) {
+			decode.type = TX6;
 		}
-	}
-	// Sort out my call
-	if (tx) {
-		// Not me sending - should not happen
-		if (sender != my_call_) {
-			return false;
-		}
-		// Target is CQ
-		if (target.substr(0, 2) == "CQ") {
-			if (qso_ && qso_->item("CALL").length()) {
-				// A CQ is replacing a call to another station so replace that call with null string
-				qso_->item("CALL", string(""));
-			}
-			else {
-				// Ignore single CQs
-				return false;
-			}
-		}
-		// Over with another station
 		else {
-			// Set QSO->CALL to the target field - replacing cached callsigns eg "<GM3ZZA>" with "GM3ZZA"
-			string their_call = qso->item("CALL");
-			if (target[0] == '<') {
-				target = target.substr(1, target.length() - 2);
+			decode.type = TX1;
+		}
+	}
+	else if (regex_match(test, REGEX_REPORT)) {
+		// TX2
+		decode.exchange = test_exch;
+		words.pop_back();
+		decode.sender = words.back();
+		words.pop_back();
+		decode.target = join_line(words, ' ');
+		decode.type = TX2;
+	}
+	else if (regex_match(test, REGEX_ROGER)) {
+		// TX3
+		decode.exchange = test_exch;
+		words.pop_back();
+		decode.sender = words.back();
+		words.pop_back();
+		decode.target = join_line(words, ' ');
+		decode.type = TX3;
+	}
+	else if (strcmp(test, "RRR") == 0) {
+		// TX4
+		decode.exchange = test_exch;
+		words.pop_back();
+		decode.sender = words.back();
+		words.pop_back();
+		decode.target = join_line(words, ' ');
+		decode.type = TX4;
+	}
+	else if (strcmp(test, "RR73") == 0) {
+		// TX4A
+		decode.exchange = test_exch;
+		words.pop_back();
+		decode.sender = words.back();
+		words.pop_back();
+		decode.target = join_line(words, ' ');
+		decode.type = TX4A;
+	}
+	else if (strcmp(test, "73") == 0) {
+		// TX5
+		decode.exchange = test_exch;
+		words.pop_back();
+		decode.sender = words.back();
+		words.pop_back();
+		decode.target = join_line(words, ' ');
+		decode.type = TX5;
+	}
+	else {
+		// No exchange - unusual call either TX1A or TX6A
+		decode.exchange = "";
+		decode.sender = words.back();
+		words.pop_back();
+		decode.target = join_line(words, ' ');
+		if (regex_match(decode.target.c_str(), REGEX_CQ)) {
+			decode.type = TX6A;
+		}
+		else {
+			decode.type = TX1A;
+		}
+	}
+	return decode;
+}
+
+
+// Update QSO - returns true if updated and let qso_manager know
+bool wsjtx_handler::update_qso(bool tx, string message) {
+	decoded_msg decode = decode_message(message);
+	string sender = decode.sender[0] == '<' ? decode.sender.substr(1, decode.sender.length() - 2) : decode.sender;
+	string target = decode.target[0] == '<' ? decode.target.substr(1, decode.target.length() - 2) : decode.target;
+	if (tx) {
+		if (sender != my_call_) {
+			char msg[100];
+			snprintf(msg, sizeof(msg), "WSJTX: TX decode not for user %s: %s", my_call_.c_str(), message.c_str());
+			status_->misc_status(ST_ERROR, msg);
+		}
+		else {
+			switch (decode.type) {
+			case TX1:
+			case TX1A:
+			{
+				// Reuse existing QSO record 
+				qso_->item("QSO_COMPLETE", string("N"));
+				qso_->item("CALL", target);
+				// Set grid square: from exchange, cache or no value
+				if (decode.exchange.length()) {
+					qso_->item("GRIDSQUARE", decode.exchange);
+				}
+				else if (grid_cache_.find(target) != grid_cache_.end()) {
+					qso_->item("GRIDSQUARE", grid_cache_.at(target));
+				}
+				else {
+					qso_->item("GRIDSQUARE", string(""));
+				}
+				return true;
 			}
-			if (their_call != target) {
-				char msg[128];
-				snprintf(msg, sizeof(msg), "WSJT-X: Changing target call from %s to %s", their_call.c_str(), target.c_str());
-				status_->misc_status(ST_WARNING, msg);
+			case TX2:
+			{
+				// Reuse existing QSO record 
+				qso_->item("QSO_COMPLETE", string("N"));
+				qso_->item("CALL", target);
+				// Set grid square: from cache or no value
+				if (grid_cache_.find(target) != grid_cache_.end()) {
+					qso_->item("GRIDSQUARE", grid_cache_.at(target));
+				}
+				else {
+					qso_->item("GRIDSQUARE", string(""));
+				}
+				// Add report to existing QSO
+				qso_->item("RST_SENT", decode.exchange);
+				return true;
 			}
-			// Set the QSO call to the target
-			qso->item("CALL", target);
+			case TX3:
+			{
+				// Add report to existing QSO
+				qso_->item("RST_SENT", decode.exchange.substr(1));
+				return true;
+			}
+			case TX4:
+			{
+				// RRR - possibly complete
+				qso_->item("QSO_COMPLETE", string("?"));
+				return true;
+			}
+			case TX4A:
+			case TX5:
+			{
+				// RR73 - complete
+				qso_->item("QSO_COMPLETE", string(""));
+				return true;
+			}
+			case TX6:
+			case TX6A:
+			{
+				// Calling CQ - new QSO - add CQ message to call
+				qso_ = new record();
+				qso_->item("APP_ZZA_CQ", target);
+				return true;
+			}
+			}
 		}
 	}
 	else {
-		// Am I the target?
-		if (target != my_call_ && target != my_bracketed_call_) {
-			// return false if not
-			return false;
+		// RX
+		if (target != my_call_) {
+			// Not for me
+			switch (decode.type) {
+			case TX1:
+				// Call - capture in grid
+				grid_cache_[sender] = decode.exchange;
+				break;
+			case TX6:
+				grid_cache_[sender] = decode.exchange;
+				// TODO send to new object wsjtx_runner
+				break;
+			case TX4:
+			case TX4A:
+			case TX5:
+				// TODO send to new object wsjtx_runner
+				break;				
+			}
 		}
-		// save sender
-		qso->item("CALL", sender);
+		else {
+			switch (decode.type) {
+			case TX1:
+				// They are calling me
+				// Wait until I send the call before starting log entry as may get >1 per decode period
+				break;
+			case TX2:
+				// Reuse existing QSO record 
+				qso_->item("QSO_COMPLETE", string("N"));
+				if (sender != qso_->item("CALL")) {
+					// New call - overwrite record
+					qso_->item("CALL", sender);
+					// Set grid square: from exchange, cache or no value
+					if (decode.exchange.length()) {
+						qso_->item("GRIDSQUARE", decode.exchange);
+					}
+					else if (grid_cache_.find(target) != grid_cache_.end()) {
+						qso_->item("GRIDSQUARE", grid_cache_.at(target));
+					}
+					else {
+						qso_->item("GRIDSQUARE", string(""));
+					}
+				}
+				else {
+					if (qso_->item("GRIDSQUARE").length() == 0) {
+						if (grid_cache_.find(target) != grid_cache_.end()) {
+							qso_->item("GRIDSQUARE", grid_cache_.at(target));
+						}
+						else {
+							qso_->item("GRIDSQUARE", string(""));
+						}
+					}
+				}
+				qso_->item("RST_RCVD", decode.exchange);
+				return true;
+			case TX3:
+				qso_->item("RST_RCVD", decode.exchange.substr(1));
+				return true;
+			case TX4:
+				// RRR - possibly complete
+				qso_->item("QSO_COMPLETE", string("?"));
+				return true;
+			case TX4A:
+			case TX5:
+				// RR73 - complete
+				qso_->item("QSO_COMPLETE", string(""));
+				return true;
+			}
+		}
 	}
-	if (exchange == "RR73" || exchange == "RRR") {
-		// If we've seen the R-00 then mark the QSO complete, otherwise mark in provisional until we see the 73
-		if (qso->item("QSO_COMPLETE") == "?") {
-			// It's complete as far as I am concerned, but partner may disagree - leave QSO active
-			qso->item("QSO_COMPLETE", string("Y"));
-		}
-		else if (qso->item("QSO_COMPLETE") == "N") {
-			qso->item("QSO_COMPLETE", string("?"));
-		}
-	}
-	else if (exchange == "73") {
-		// A 73 definitely indicates QSO compplete - but only qso_manager can clear it on logging event
-		qso->item("QSO_COMPLETE", string("Y"));
-	}
-	else if (exchange[0] == 'R') {
-		// The first of the rogers
-		if (qso->item("QSO_COMPLETE") == "N") {
-			// Half the exchange is complete
-			qso->item("QSO_COMPLETE", string("?"));
-		}
-		// Update reports if they've not been provided 
-		if (tx && !qso->item_exists("RST_SENT")) {
-			qso->item("RST_SENT", exchange.substr(1));
-		}
-		else if (tx && qso->item("RST_SENT") != exchange.substr(1)) {
-			char msg[128];
-			snprintf(msg, sizeof(msg), "WSJTX: Mismatch for %s RST_SENT is changing from %s to %s", 
-				qso->item("CALL").c_str(), qso->item("RST_SENT").c_str(), exchange.c_str());
-			status_->misc_status(ST_WARNING, msg);
-			return false;
-		}
-		else if (!tx && !qso->item_exists("RST_RCVD")) {
-			qso->item("RST_RCVD", exchange.substr(1));
-		}
-	}
-	else if (!tx && !qso->item_exists("GRIDSQUARE")) {
-		// Update gridsquare if it's not been provided
-		qso->item("GRIDSQUARE", exchange);
-	}
-	else if (!tx && qso->item("GRIDSQUARE") != exchange) {
-		char msg[128];
-		snprintf(msg, sizeof(msg), "WSJTX: Mismatch for %s GRIDSQUARE is changing from %s to %s",
-			qso->item("CALL").c_str(), qso->item("GRIDSQUARE").c_str(), exchange.c_str());
-		status_->misc_status(ST_WARNING, msg);
-		return false;
-	}
-	else if (exchange[0] == '-' || exchange[0] == '+' || isdigit(exchange[0])) {
-		// Numeric report
-		if (tx && !qso->item_exists("RST_SENT")) {
-			qso->item("RST_SENT", exchange);
-		}
-		else if (!tx && !qso->item_exists("RST_RCVD")) {
-			qso->item("RST_RCVD", exchange);
-		}
-		qso->item("QSO_COMPLETE", string("N"));
-	}
-	else {
-		qso->item("QSO_COMPLETE", string("N"));
-	}
-	return true;
+	return false;
 }

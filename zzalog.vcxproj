@@ -268,6 +268,7 @@
     <ClInclude Include="zzalog\include\qso_query.h" />
     <ClInclude Include="zzalog\include\qso_tabbed_qth.h" />
     <ClInclude Include="zzalog\include\qso_tabbed_rigs.h" />
+    <ClInclude Include="zzalog\include\regices.h" />
     <ClInclude Include="zzalog\include\rig_if.h" />
     <ClInclude Include="zzalog\include\rpc_data_item.h" />
     <ClInclude Include="zzalog\include\rpc_handler.h" />
