@@ -174,7 +174,7 @@ using namespace std;
 		// Decode the message
 		decoded_msg decode_message(string message);
 		// Update QSO with message
-		bool update_qso(bool tx, string message);
+		bool update_qso(bool tx, string time, double audio_freq, string message);
 
 		// Decode the message
 
@@ -205,6 +205,10 @@ using namespace std;
 		map<string, string> grid_cache_;
 		// Interface QSO record
 		record* qso_;
+		// Dial frequency
+		double dial_frequency_;
+		// Current mode
+		string mode_;
 	};
 
 #endif

@@ -203,9 +203,9 @@ int wsjtx_handler::handle_decode(stringstream& ss) {
 	seconds = seconds - (minutes * 60.0);
 	unsigned int hours = minutes / 60;
 	minutes = minutes - (hours * 60);
-	char message[256];
-	snprintf(message, 256, "WSJT-X: Decode %02d:%02d:%02.0f: %s", hours, minutes, seconds, decode.message.c_str());
-	if (update_qso(false, decode.message)) {
+	char t[20];
+	snprintf(t, sizeof(t), "%0d%0d%0.0f", hours, minutes, seconds);
+	if (update_qso(false, string(t), (double)decode.d_freq, decode.message)) {
 		qso_manager_->update_modem_qso(qso_);
 	}
 	return 0;
@@ -262,9 +262,12 @@ int wsjtx_handler::handle_status(stringstream& ss) {
 	status.config_name = get_utf8(ss); 
 	// TX Message
 	status.tx_message = get_utf8(ss);
+	// Save frequency and mode
+	dial_frequency_ = (double)status.dial_freq / 1000000.0;
+	mode_ = status.mode;
 	// Create qso
 	if (status.transmitting) {
-		if (update_qso(true, status.tx_message)) {
+		if (update_qso(true, now(false, "%h%m%s"), (double)status.tx_offset, status.tx_message)) {
 			qso_manager_->update_modem_qso(qso_);
 		}
 	}
@@ -705,24 +708,42 @@ wsjtx_handler::decoded_msg wsjtx_handler::decode_message(string message) {
 
 
 // Update QSO - returns true if updated and let qso_manager know
-bool wsjtx_handler::update_qso(bool tx, string message) {
+bool wsjtx_handler::update_qso(bool tx, string time, double audio_freq, string message) {
 	decoded_msg decode = decode_message(message);
 	string sender = decode.sender[0] == '<' ? decode.sender.substr(1, decode.sender.length() - 2) : decode.sender;
 	string target = decode.target[0] == '<' ? decode.target.substr(1, decode.target.length() - 2) : decode.target;
+	string today = now(false, "%Y%m%d");
+	char msg[100];
+	// If QSO does not exist yet create it
+	if (qso_ == nullptr) {
+		qso_ = new record();
+		qso_->item("QSO_COMPLETE", string("N"));
+	}
 	if (tx) {
 		if (sender != my_call_) {
 			char msg[100];
 			snprintf(msg, sizeof(msg), "WSJTX: TX decode not for user %s: %s", my_call_.c_str(), message.c_str());
 			status_->misc_status(ST_ERROR, msg);
+			return false;
 		}
 		else {
 			switch (decode.type) {
 			case TX1:
+				// <THEM> <ME> <GRID>
 			case TX1A:
+				// <THEM> <ME> 
 			{
-				// Reuse existing QSO record 
+				// I am starting a new call - set date/ time/freq/mode
 				qso_->item("QSO_COMPLETE", string("N"));
 				qso_->item("CALL", target);
+				qso_->item("QSO_DATE", today);
+				qso_->item("TIME_ON", time);
+				char f[20];
+				double freq = dial_frequency_ + (audio_freq / 1000000.0);
+				snprintf(f, sizeof(f), "%0.6f");
+				qso_->item("FREQ", string(f));
+				qso_->item("MODE", mode_);
+
 				// Set grid square: from exchange, cache or no value
 				if (decode.exchange.length()) {
 					qso_->item("GRIDSQUARE", decode.exchange);
@@ -737,9 +758,21 @@ bool wsjtx_handler::update_qso(bool tx, string message) {
 			}
 			case TX2:
 			{
-				// Reuse existing QSO record 
+				// <THEM> <ME> <Report>
 				qso_->item("QSO_COMPLETE", string("N"));
-				qso_->item("CALL", target);
+				if (qso_->item("CALL") != target) {
+					// Starting a new record
+					snprintf(msg, sizeof(msg), "WSJT-X: Calling %s, already in QSO with %s", target.c_str(), qso_->item("CALL").c_str());
+					status_->misc_status(ST_WARNING, msg);
+					qso_->item("CALL", target);
+					qso_->item("QSO_DATE", today);
+					qso_->item("TIME_ON", time);
+					char f[20];
+					double freq = dial_frequency_ + (audio_freq / 1000000.0);
+					snprintf(f, sizeof(f), "%0.6f");
+					qso_->item("FREQ", string(f));
+					qso_->item("MODE", mode_);
+				}
 				// Set grid square: from cache or no value
 				if (grid_cache_.find(target) != grid_cache_.end()) {
 					qso_->item("GRIDSQUARE", grid_cache_.at(target));
@@ -753,28 +786,28 @@ bool wsjtx_handler::update_qso(bool tx, string message) {
 			}
 			case TX3:
 			{
-				// Add report to existing QSO
+				// <THEM> <ME> R<report>
 				qso_->item("RST_SENT", decode.exchange.substr(1));
 				return true;
 			}
 			case TX4:
 			{
-				// RRR - possibly complete
+				// <THEM> <ME> RRR
 				qso_->item("QSO_COMPLETE", string("?"));
 				return true;
 			}
 			case TX4A:
+				// <THEM> <ME> RR73
 			case TX5:
 			{
-				// RR73 - complete
-				qso_->item("QSO_COMPLETE", string(""));
+				// <THEM><ME> 73
+				qso_->item("QSO_COMPLETE", string("Y"));
 				return true;
 			}
 			case TX6:
 			case TX6A:
 			{
-				// Calling CQ - new QSO - add CQ message to call
-				qso_ = new record();
+				// CQ (direction) <ME> (<GRID>)
 				qso_->item("APP_ZZA_CQ", target);
 				return true;
 			}
@@ -789,40 +822,32 @@ bool wsjtx_handler::update_qso(bool tx, string message) {
 			case TX1:
 				// Call - capture in grid
 				grid_cache_[sender] = decode.exchange;
-				break;
+				return false;;
 			case TX6:
 				grid_cache_[sender] = decode.exchange;
 				// TODO send to new object wsjtx_runner
-				break;
+				return false;;
 			case TX4:
 			case TX4A:
 			case TX5:
 				// TODO send to new object wsjtx_runner
-				break;				
+				return false;
 			}
 		}
 		else {
 			switch (decode.type) {
 			case TX1:
-				// They are calling me
+				// <ME> <CALL> <GRID>
+			case TX1A:
+				// <ME> <CALL>
 				// Wait until I send the call before starting log entry as may get >1 per decode period
-				break;
+				return false;
 			case TX2:
-				// Reuse existing QSO record 
-				qso_->item("QSO_COMPLETE", string("N"));
+				// <ME> <THEM> <report>
 				if (sender != qso_->item("CALL")) {
-					// New call - overwrite record
-					qso_->item("CALL", sender);
-					// Set grid square: from exchange, cache or no value
-					if (decode.exchange.length()) {
-						qso_->item("GRIDSQUARE", decode.exchange);
-					}
-					else if (grid_cache_.find(target) != grid_cache_.end()) {
-						qso_->item("GRIDSQUARE", grid_cache_.at(target));
-					}
-					else {
-						qso_->item("GRIDSQUARE", string(""));
-					}
+					// New call
+					// Wait until I send the call before starting log entry as may get >1 per decode period
+					return false;
 				}
 				else {
 					if (qso_->item("GRIDSQUARE").length() == 0) {
@@ -833,23 +858,24 @@ bool wsjtx_handler::update_qso(bool tx, string message) {
 							qso_->item("GRIDSQUARE", string(""));
 						}
 					}
+					qso_->item("RST_RCVD", decode.exchange);
+					return true;
 				}
-				qso_->item("RST_RCVD", decode.exchange);
-				return true;
 			case TX3:
+				// <ME> <THEM> R<report>
 				qso_->item("RST_RCVD", decode.exchange.substr(1));
 				return true;
 			case TX4:
-				// RRR - possibly complete
+				// <ME> <THEM> RRR
 				qso_->item("QSO_COMPLETE", string("?"));
 				return true;
 			case TX4A:
+				// <ME> <THEM> RR73
 			case TX5:
-				// RR73 - complete
-				qso_->item("QSO_COMPLETE", string(""));
+				// <ME> <THEM> 73
+				qso_->item("QSO_COMPLETE", string("Y"));
 				return true;
 			}
 		}
 	}
-	return false;
 }
