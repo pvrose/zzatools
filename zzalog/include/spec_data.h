@@ -75,7 +75,7 @@ using namespace std;
 		// Get the ADIF mode for a submode
 		string mode_for_submode(string submode);
 		// Get the band for a specific frequency
-		string band_for_freq(double frequency);
+		string band_for_freq(double frequency_MHz);
 		// Get the Lower frequency for a band
 		double freq_for_band(string sBand);
 		// Get mode/submode for a particular mode

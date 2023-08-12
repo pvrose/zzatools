@@ -237,7 +237,7 @@ string spec_data::mode_for_submode(string submode) {
 }
 
 // Get the band for a specific frequency
-string spec_data::band_for_freq(double frequency) {
+string spec_data::band_for_freq(double frequency_MHz) {
 	// Get the Band dataset
 	spec_dataset* table = dataset("Band");
 	string result = "";
@@ -247,7 +247,7 @@ string spec_data::band_for_freq(double frequency) {
 		// If the frequency is within that specified, return band and stop
 		double lower = stod(it->second->at("Lower Freq (MHz)"));
 		double upper = stod(it->second->at("Upper Freq (MHz)"));
-		if (lower <= frequency && upper >= frequency) {
+		if (lower <= frequency_MHz && upper >= frequency_MHz) {
 			result = it->first;
 			found = true;
 		}
@@ -2507,6 +2507,7 @@ void spec_data::add_my_appdefs() {
 		"APP_ZZA_EQSL_MSG",
 		"APP_ZZA_ERROR",
 		"APP_ZZA_ECARD",
+		"APP_ZZA_CQ",
 		"APP_LOTW_NUMREC",
 		"APP_LOTW_LASTQSL",
 		""

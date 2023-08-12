@@ -9,6 +9,7 @@
 #include "adi_reader.h"
 #include "menu.h"
 #include "regices.h"
+#include "spec_data.h"
 
 #include <stdio.h>
 #include <sstream>
@@ -38,6 +39,7 @@ extern dxa_if* dxa_if_;
 #endif
 extern toolbar* toolbar_;
 extern qso_manager* qso_manager_;
+extern spec_data* spec_data_;
 extern string PROGRAM_ID;
 extern string VERSION;
 
@@ -48,7 +50,7 @@ wsjtx_handler::wsjtx_handler()
 {
 	that_ = this;
 	server_ = nullptr;
-	qso_ = nullptr;
+	qsos_.clear();
 	run_server();
 	new_heartbeat_ = false;
 	status_rcvd_ = 0;
@@ -164,19 +166,14 @@ int wsjtx_handler::handle_log(stringstream& ss) {
 	adi_reader* reader = new adi_reader;
 	// The stream received from WSJT-X is header and record so create a book from it
 	book* rcvd_book = new book(OT_NONE);
-	if (qso_) {
-		reader->load_book(rcvd_book, adif);
-		record* log_qso = rcvd_book->get_record(0, false);
-		qso_->merge_records(log_qso);
-		qso_->item("QSO_COMPLETE", string(""));
-		qso_manager_->update_modem_qso(qso_);
-		status_->misc_status(ST_NOTE, "WSJT-X: Logged QSO");
-		delete rcvd_book;
-		qso_ = nullptr;
-	}
-	else {
-		status_->misc_status(ST_ERROR, "WSJT-X: Log datagram not expected, ignored.");
-	}
+	reader->load_book(rcvd_book, adif);
+	record* log_qso = rcvd_book->get_record(0, false);
+	record* qso = qso_call(log_qso->item("CALL"));
+	qso->merge_records(log_qso);
+	qso->item("QSO_COMPLETE", string(""));
+	qso_manager_->update_modem_qso(qso);
+	status_->misc_status(ST_NOTE, "WSJT-X: Logged QSO");
+	delete rcvd_book;
 #ifdef _WIN32
 	// Clear DX locator flag
 	if (dxa_if_) dxa_if_->clear_dx_loc();
@@ -205,9 +202,8 @@ int wsjtx_handler::handle_decode(stringstream& ss) {
 	minutes = minutes - (hours * 60);
 	char t[20];
 	snprintf(t, sizeof(t), "%0d%0d%0.0f", hours, minutes, seconds);
-	if (update_qso(false, string(t), (double)decode.d_freq, decode.message)) {
-		qso_manager_->update_modem_qso(qso_);
-	}
+	record* qso = update_qso(false, string(t), (double)decode.d_freq, decode.message);
+	if (qso) qso_manager_->update_modem_qso(qso);
 	return 0;
 }
 
@@ -267,9 +263,8 @@ int wsjtx_handler::handle_status(stringstream& ss) {
 	mode_ = status.mode;
 	// Create qso
 	if (status.transmitting) {
-		if (update_qso(true, now(false, "%h%m%s"), (double)status.tx_offset, status.tx_message)) {
-			qso_manager_->update_modem_qso(qso_);
-		}
+		record* qso = update_qso(true, now(false, "%h%m%s"), (double)status.tx_offset, status.tx_message);
+		if (qso) qso_manager_->update_modem_qso(qso);
 	}
 #ifdef _WIN32
 	if (dxa_if_) {
@@ -708,25 +703,21 @@ wsjtx_handler::decoded_msg wsjtx_handler::decode_message(string message) {
 
 
 // Update QSO - returns true if updated and let qso_manager know
-bool wsjtx_handler::update_qso(bool tx, string time, double audio_freq, string message) {
+record* wsjtx_handler::update_qso(bool tx, string time, double audio_freq, string message) {
 	decoded_msg decode = decode_message(message);
 	string sender = decode.sender[0] == '<' ? decode.sender.substr(1, decode.sender.length() - 2) : decode.sender;
 	string target = decode.target[0] == '<' ? decode.target.substr(1, decode.target.length() - 2) : decode.target;
 	string today = now(false, "%Y%m%d");
 	char msg[100];
-	// If QSO does not exist yet create it
-	if (qso_ == nullptr) {
-		qso_ = new record();
-		qso_->item("QSO_COMPLETE", string("N"));
-	}
 	if (tx) {
 		if (sender != my_call_) {
 			char msg[100];
 			snprintf(msg, sizeof(msg), "WSJTX: TX decode not for user %s: %s", my_call_.c_str(), message.c_str());
 			status_->misc_status(ST_ERROR, msg);
-			return false;
+			return nullptr;
 		}
 		else {
+			record* qso = qso_call(target);
 			switch (decode.type) {
 			case TX1:
 				// <THEM> <ME> <GRID>
@@ -734,83 +725,79 @@ bool wsjtx_handler::update_qso(bool tx, string time, double audio_freq, string m
 				// <THEM> <ME> 
 			{
 				// I am starting a new call - set date/ time/freq/mode
-				qso_->item("QSO_COMPLETE", string("N"));
-				qso_->item("CALL", target);
-				qso_->item("QSO_DATE", today);
-				qso_->item("TIME_ON", time);
+				qso->item("QSO_DATE", today);
+				qso->item("TIME_ON", time);
 				char f[20];
 				double freq = dial_frequency_ + (audio_freq / 1000000.0);
-				snprintf(f, sizeof(f), "%0.6f");
-				qso_->item("FREQ", string(f));
-				qso_->item("MODE", mode_);
+				snprintf(f, sizeof(f), "%0.6f", freq);
+				qso->item("FREQ", string(f));
+				qso->item("MODE", mode_);
 
 				// Set grid square: from exchange, cache or no value
 				if (decode.exchange.length()) {
-					qso_->item("GRIDSQUARE", decode.exchange);
+					qso->item("GRIDSQUARE", decode.exchange);
 				}
 				else if (grid_cache_.find(target) != grid_cache_.end()) {
-					qso_->item("GRIDSQUARE", grid_cache_.at(target));
+					qso->item("GRIDSQUARE", grid_cache_.at(target));
 				}
 				else {
-					qso_->item("GRIDSQUARE", string(""));
+					qso->item("GRIDSQUARE", string(""));
 				}
-				return true;
+				return qso;
 			}
 			case TX2:
 			{
 				// <THEM> <ME> <Report>
-				qso_->item("QSO_COMPLETE", string("N"));
-				if (qso_->item("CALL") != target) {
-					// Starting a new record
-					snprintf(msg, sizeof(msg), "WSJT-X: Calling %s, already in QSO with %s", target.c_str(), qso_->item("CALL").c_str());
-					status_->misc_status(ST_WARNING, msg);
-					qso_->item("CALL", target);
-					qso_->item("QSO_DATE", today);
-					qso_->item("TIME_ON", time);
-					char f[20];
-					double freq = dial_frequency_ + (audio_freq / 1000000.0);
-					snprintf(f, sizeof(f), "%0.6f");
-					qso_->item("FREQ", string(f));
-					qso_->item("MODE", mode_);
-				}
+				// Starting a new record
+				snprintf(msg, sizeof(msg), "WSJT-X: Calling %s, already in QSO with %s", target.c_str(), qso->item("CALL").c_str());
+				status_->misc_status(ST_WARNING, msg);
+				qso->item("QSO_DATE", today);
+				qso->item("TIME_ON", time);
+				char f[20];
+				double freq = dial_frequency_ + (audio_freq / 1000000.0);
+				snprintf(f, sizeof(f), "%0.6f", freq);
+				qso->item("FREQ", string(f));
+				qso->item("MODE", mode_);
 				// Set grid square: from cache or no value
 				if (grid_cache_.find(target) != grid_cache_.end()) {
-					qso_->item("GRIDSQUARE", grid_cache_.at(target));
+					qso->item("GRIDSQUARE", grid_cache_.at(target));
 				}
 				else {
-					qso_->item("GRIDSQUARE", string(""));
+					qso->item("GRIDSQUARE", string(""));
 				}
 				// Add report to existing QSO
-				qso_->item("RST_SENT", decode.exchange);
-				return true;
+				qso->item("RST_SENT", decode.exchange);
+				return qso;
 			}
 			case TX3:
 			{
 				// <THEM> <ME> R<report>
-				qso_->item("RST_SENT", decode.exchange.substr(1));
-				return true;
+				qso->item("RST_SENT", decode.exchange.substr(1));
+				return qso;
 			}
 			case TX4:
 			{
 				// <THEM> <ME> RRR
-				qso_->item("QSO_COMPLETE", string("?"));
-				return true;
+				qso->item("QSO_COMPLETE", string("?"));
+				return qso;
 			}
 			case TX4A:
 				// <THEM> <ME> RR73
 			case TX5:
 			{
 				// <THEM><ME> 73
-				qso_->item("QSO_COMPLETE", string("Y"));
-				return true;
+				qso->item("QSO_COMPLETE", string("Y"));
+				return qso;
 			}
 			case TX6:
 			case TX6A:
 			{
 				// CQ (direction) <ME> (<GRID>)
-				qso_->item("APP_ZZA_CQ", target);
-				return true;
+				qso->item("APP_ZZA_CQ", target);
+				return qso;
 			}
+			default:
+				return nullptr;
 			}
 		}
 	}
@@ -822,60 +809,113 @@ bool wsjtx_handler::update_qso(bool tx, string time, double audio_freq, string m
 			case TX1:
 				// Call - capture in grid
 				grid_cache_[sender] = decode.exchange;
-				return false;;
+				return nullptr;
 			case TX6:
 				grid_cache_[sender] = decode.exchange;
 				// TODO send to new object wsjtx_runner
-				return false;;
+				return nullptr;
 			case TX4:
 			case TX4A:
 			case TX5:
 				// TODO send to new object wsjtx_runner
-				return false;
+				return nullptr;
+			default:
+				return nullptr;
 			}
 		}
 		else {
+			record* qso = qso_call(sender);
 			switch (decode.type) {
 			case TX1:
 				// <ME> <CALL> <GRID>
 			case TX1A:
 				// <ME> <CALL>
 				// Wait until I send the call before starting log entry as may get >1 per decode period
-				return false;
+				return nullptr;
 			case TX2:
 				// <ME> <THEM> <report>
-				if (sender != qso_->item("CALL")) {
-					// New call
-					// Wait until I send the call before starting log entry as may get >1 per decode period
-					return false;
-				}
-				else {
-					if (qso_->item("GRIDSQUARE").length() == 0) {
-						if (grid_cache_.find(target) != grid_cache_.end()) {
-							qso_->item("GRIDSQUARE", grid_cache_.at(target));
-						}
-						else {
-							qso_->item("GRIDSQUARE", string(""));
-						}
+				if (qso->item("GRIDSQUARE").length() == 0) {
+					if (grid_cache_.find(target) != grid_cache_.end()) {
+						qso->item("GRIDSQUARE", grid_cache_.at(target));
 					}
-					qso_->item("RST_RCVD", decode.exchange);
-					return true;
+					else {
+						qso->item("GRIDSQUARE", string(""));
+					}
 				}
+				qso->item("RST_RCVD", decode.exchange);
+				return qso;
 			case TX3:
 				// <ME> <THEM> R<report>
-				qso_->item("RST_RCVD", decode.exchange.substr(1));
-				return true;
+				qso->item("RST_RCVD", decode.exchange.substr(1));
+				return qso;
 			case TX4:
 				// <ME> <THEM> RRR
-				qso_->item("QSO_COMPLETE", string("?"));
-				return true;
+				qso->item("QSO_COMPLETE", string("?"));
+				return qso;
 			case TX4A:
 				// <ME> <THEM> RR73
 			case TX5:
 				// <ME> <THEM> 73
-				qso_->item("QSO_COMPLETE", string("Y"));
-				return true;
+				qso->item("QSO_COMPLETE", string("Y"));
+				return qso;
+			default:
+				return nullptr;
 			}
+		}
+	}
+}
+
+// Get a QSO record for this callsign
+record* wsjtx_handler::qso_call(string call) {
+	record* qso = nullptr;
+	if (qsos_.find(call) == qsos_.end()) {
+		qso = new record();
+		qso->item("CALL", call);
+		qso->item("QSO_COMPLETE", string("N"));
+		qsos_[call] = qso;
+	}
+	else {
+		qso = qsos_.at(call);
+		string band = spec_data_->band_for_freq(dial_frequency_);
+		if (qso->item("MODE") == mode_ && qso->item("BAND") == band) {
+			time_t now = time(nullptr);
+			time_t qso_ts = qso->timestamp(true);
+			if (difftime(now, qso_ts) > (5 * 60)) {
+				switch (
+					fl_choice("Received update to QSO %s %s %s, is this...", "the same QSO??", "a new QSO?", nullptr,
+						call.c_str(), band.c_str(), mode_.c_str())) {
+				case 0:
+					break;
+				case 1:
+					qso = new record();
+					qso->item("CALL", call);
+					qso->item("QSO_COMPLETE", string("N"));
+					qsos_[call] = qso;
+					break;
+				}
+			}
+		}
+		else {
+			qso = new record();
+			qso->item("CALL", call);
+			qso->item("QSO_COMPLETE", string("N"));
+			qsos_[call] = qso;
+		}
+	}
+	return qso;
+}
+
+// Clear existing QSO record
+void wsjtx_handler::clear_qsos() {
+	for (auto ix = qsos_.begin(); ix != qsos_.end(); ix++) {
+		record* qso = ix->second;
+		if (qso->item("QSO_COMPLETE") == "Y") {
+			// Complete but not logged
+			qso->item("QSO_COMPLETE", string(""));
+			qso_manager_->update_modem_qso(qso);
+		}
+		else if (qso->item("QSO_COMPLETE") != "") {
+			delete qso;
 		}
 	}
 }

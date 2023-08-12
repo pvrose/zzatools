@@ -119,6 +119,7 @@ using namespace std;
 			TX5,       // CALL1 CALL2 73
 			TX6,       // CQ +  CALL2 GRID
 			TX6A,      // CQ + CALL2  - no exchange
+			MISC,      // Miscellaneous transmit (eg TUNE)
 			TEXT,      // Any other decode
 		};
 
@@ -174,7 +175,12 @@ using namespace std;
 		// Decode the message
 		decoded_msg decode_message(string message);
 		// Update QSO with message
-		bool update_qso(bool tx, string time, double audio_freq, string message);
+		record* update_qso(bool tx, string time, double audio_freq, string message);
+
+		// Get a QSO record for this callsign
+		record* qso_call(string call);
+		// Clear existing QSO record
+		void clear_qsos();
 
 		// Decode the message
 
@@ -204,8 +210,8 @@ using namespace std;
 		// Grid locations worked
 		map<string, string> grid_cache_;
 		// Interface QSO record
-		record* qso_;
-		// Dial frequency
+		map<string, record*> qsos_;
+		// Dial frequency (MHz)
 		double dial_frequency_;
 		// Current mode
 		string mode_;

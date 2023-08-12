@@ -712,8 +712,13 @@ void qso_data::action_cancel() {
 
 	switch (logging_state_) {
 	case QSO_STARTED:
-	case QSO_MODEM:
 		g_entry_->delete_qso();
+		logging_state_ = QSO_INACTIVE;
+#ifdef WIN32
+		if (dxa_if_) dxa_if_->clear_dx_loc();
+#endif
+		break;
+	case QSO_MODEM:
 		logging_state_ = QSO_INACTIVE;
 #ifdef WIN32
 		if (dxa_if_) dxa_if_->clear_dx_loc();
