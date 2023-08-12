@@ -2507,6 +2507,7 @@ void spec_data::add_my_appdefs() {
 		"APP_ZZA_EQSL_MSG",
 		"APP_ZZA_ERROR",
 		"APP_ZZA_ECARD",
+		"APP_ZZA_CQ",
 		"APP_LOTW_NUMREC",
 		"APP_LOTW_LASTQSL",
 		""

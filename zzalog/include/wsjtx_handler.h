@@ -119,6 +119,7 @@ using namespace std;
 			TX5,       // CALL1 CALL2 73
 			TX6,       // CQ +  CALL2 GRID
 			TX6A,      // CQ + CALL2  - no exchange
+			MISC,      // Miscellaneous transmit (eg TUNE)
 			TEXT,      // Any other decode
 		};
 

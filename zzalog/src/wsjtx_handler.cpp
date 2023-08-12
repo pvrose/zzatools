@@ -624,11 +624,25 @@ wsjtx_handler::decoded_msg wsjtx_handler::decode_message(string message) {
 	// TODO: Currently assuming non F/H exchange
 	decoded_msg decode;
 	vector<string> words;
-	split_line(message, words, ' ');
+	// Remove trailing spaces
+	size_t ix = message.length();
+	while (message[--ix] == ' ');
+	string trunc = message.substr(0, ix + 1);
+	split_line(trunc, words, ' ');
 
 	string test_exch = words.back();
 	const char* test = test_exch.c_str();
-	if (regex_match(test, REGEX_GRIDSQUARE4)) {
+	if (strcmp(test, "RR73") == 0) {
+		// Test RR73 before GRIDSQUARE because  it is one :(
+		// TX4A
+		decode.exchange = test_exch;
+		words.pop_back();
+		decode.sender = words.back();
+		words.pop_back();
+		decode.target = join_line(words, ' ');
+		decode.type = TX4A;
+	}
+	else if (regex_match(test, REGEX_GRIDSQUARE4)) {
 		// TX1 or TX6
 		decode.exchange = test_exch;
 		words.pop_back();
@@ -669,15 +683,6 @@ wsjtx_handler::decoded_msg wsjtx_handler::decode_message(string message) {
 		decode.target = join_line(words, ' ');
 		decode.type = TX4;
 	}
-	else if (strcmp(test, "RR73") == 0) {
-		// TX4A
-		decode.exchange = test_exch;
-		words.pop_back();
-		decode.sender = words.back();
-		words.pop_back();
-		decode.target = join_line(words, ' ');
-		decode.type = TX4A;
-	}
 	else if (strcmp(test, "73") == 0) {
 		// TX5
 		decode.exchange = test_exch;
@@ -686,6 +691,12 @@ wsjtx_handler::decoded_msg wsjtx_handler::decode_message(string message) {
 		words.pop_back();
 		decode.target = join_line(words, ' ');
 		decode.type = TX5;
+	}
+	else if (strcmp(test, "TUNE") == 0) {
+		decode.exchange = "";
+		decode.sender="";
+		decode.target = "";
+		decode.type = MISC;
 	}
 	else {
 		// No exchange - unusual call either TX1A or TX6A
@@ -704,13 +715,20 @@ wsjtx_handler::decoded_msg wsjtx_handler::decode_message(string message) {
 }
 
 
-// Update QSO - returns true if updated and let qso_manager know
+// Update QSO - returns true if updated so that caller can let qso_manager know
 bool wsjtx_handler::update_qso(bool tx, string message) {
 	decoded_msg decode = decode_message(message);
 	string sender = decode.sender[0] == '<' ? decode.sender.substr(1, decode.sender.length() - 2) : decode.sender;
 	string target = decode.target[0] == '<' ? decode.target.substr(1, decode.target.length() - 2) : decode.target;
 	if (tx) {
-		if (sender != my_call_) {
+		printf("WSJTX: Message %s; Target = %s Sender = %s Exchange = %s Type = %d\n",
+		message.c_str(), target.c_str(), sender.c_str(), decode.exchange.c_str(), (int)decode.type);
+		if (decode.type == MISC) {
+			char msg[100];
+			snprintf(msg, sizeof(msg), "WSJTX: Miscellaneous message: %s", message.c_str());
+			status_->misc_status(ST_NOTE, msg);
+		}
+		else if (sender != my_call_) {
 			char msg[100];
 			snprintf(msg, sizeof(msg), "WSJTX: TX decode not for user %s: %s", my_call_.c_str(), message.c_str());
 			status_->misc_status(ST_ERROR, msg);
@@ -764,11 +782,20 @@ bool wsjtx_handler::update_qso(bool tx, string message) {
 				return true;
 			}
 			case TX4A:
-			case TX5:
 			{
 				// RR73 - complete
 				qso_->item("QSO_COMPLETE", string(""));
 				return true;
+			}
+			case TX5:
+			{
+				// 73 - complete - it may have been logged already
+				if (qso_) {
+					qso_->item("QSO_COMPLETE", string(""));
+					return true;
+				} else {
+					return false;
+				}
 			}
 			case TX6:
 			case TX6A:
@@ -844,10 +871,17 @@ bool wsjtx_handler::update_qso(bool tx, string message) {
 				qso_->item("QSO_COMPLETE", string("?"));
 				return true;
 			case TX4A:
-			case TX5:
 				// RR73 - complete
 				qso_->item("QSO_COMPLETE", string(""));
 				return true;
+			case TX5:
+				// 73 - complete
+				if (qso_) {
+					qso_->item("QSO_COMPLETE", string(""));
+					return true;
+				} else {
+					return false;
+				}
 			}
 		}
 	}
