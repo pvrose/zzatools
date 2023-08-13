@@ -196,33 +196,12 @@ void qso_qsl::save_values() {
 
 void qso_qsl::enable_widgets() {
 	// Disable extract and upload buttons if auto-upload enabled
-	if (auto_eqsl_) {
-		bn_extr_eqsl_->deactivate();
-		bn_upld_eqsl_->deactivate();
-	}
-	else {
-		bn_extr_eqsl_->activate();
-		if (extract_records_->size() && extract_records_->use_mode() == extract_data::EQSL) bn_upld_eqsl_->activate();
-		else bn_upld_eqsl_->deactivate();
-	}
-	if (auto_lotw_) {
-		bn_extr_lotw_->deactivate();
-		bn_upld_lotw_->deactivate();
-	}
-	else {
-		bn_extr_lotw_->activate();
-		if (extract_records_->size() && extract_records_->use_mode() == extract_data::LOTW) bn_upld_lotw_->activate();
-		else bn_upld_lotw_->deactivate();
-	}
-	if (auto_club_) {
-		bn_extr_club_->deactivate();
-		bn_upld_club_->deactivate();
-	}
-	else {
-		bn_extr_club_->activate();
-		if (extract_records_->size() && extract_records_->use_mode() == extract_data::CLUBLOG) bn_upld_club_->activate();
-		else bn_upld_club_->deactivate();
-	}
+	if (extract_records_->size() && extract_records_->use_mode() == extract_data::EQSL) bn_upld_eqsl_->activate();
+	else bn_upld_eqsl_->deactivate();
+	if (extract_records_->size() && extract_records_->use_mode() == extract_data::LOTW) bn_upld_lotw_->activate();
+	else bn_upld_lotw_->deactivate();
+	if (extract_records_->size() && extract_records_->use_mode() == extract_data::CLUBLOG) bn_upld_club_->activate();
+	else bn_upld_club_->deactivate();
 	if (extract_records_->size()) bn_print_->deactivate();
 	else bn_print_->activate();
 }
