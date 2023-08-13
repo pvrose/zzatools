@@ -201,7 +201,7 @@ int wsjtx_handler::handle_decode(stringstream& ss) {
 	unsigned int hours = minutes / 60;
 	minutes = minutes - (hours * 60);
 	char t[20];
-	snprintf(t, sizeof(t), "%0d%0d%0.0f", hours, minutes, seconds);
+	snprintf(t, sizeof(t), "%02d%02d%02.0f", hours, minutes, seconds);
 	record* qso = update_qso(false, string(t), (double)decode.d_freq, decode.message);
 	if (qso) qso_manager_->update_modem_qso(qso);
 	return 0;
@@ -263,7 +263,7 @@ int wsjtx_handler::handle_status(stringstream& ss) {
 	mode_ = status.mode;
 	// Create qso
 	if (status.transmitting) {
-		record* qso = update_qso(true, now(false, "%h%m%s"), (double)status.tx_offset, status.tx_message);
+		record* qso = update_qso(true, now(false, "%H%M%S"), (double)status.tx_offset, status.tx_message);
 		if (qso) qso_manager_->update_modem_qso(qso);
 	}
 #ifdef _WIN32
@@ -622,7 +622,11 @@ wsjtx_handler::decoded_msg wsjtx_handler::decode_message(string message) {
 	// TODO: Currently assuming non F/H exchange
 	decoded_msg decode;
 	vector<string> words;
-	split_line(message, words, ' ');
+	// Prune the trailing spaces from message
+	size_t ix = message.length();
+	while(message[--ix] == ' ');
+	string pruned = message.substr(0, ix+1);
+	split_line(pruned, words, ' ');
 
 	string test_exch = words.back();
 	const char* test = test_exch.c_str();
@@ -708,6 +712,7 @@ record* wsjtx_handler::update_qso(bool tx, string time, double audio_freq, strin
 	string sender = decode.sender[0] == '<' ? decode.sender.substr(1, decode.sender.length() - 2) : decode.sender;
 	string target = decode.target[0] == '<' ? decode.target.substr(1, decode.target.length() - 2) : decode.target;
 	string today = now(false, "%Y%m%d");
+//	printf("Message: %s %s %g %s\n", tx?"TX":"RX", time.c_str(), audio_freq, message.c_str());
 	char msg[100];
 	if (tx) {
 		if (sender != my_call_) {
@@ -732,17 +737,6 @@ record* wsjtx_handler::update_qso(bool tx, string time, double audio_freq, strin
 				snprintf(f, sizeof(f), "%0.6f", freq);
 				qso->item("FREQ", string(f));
 				qso->item("MODE", mode_);
-
-				// Set grid square: from exchange, cache or no value
-				if (decode.exchange.length()) {
-					qso->item("GRIDSQUARE", decode.exchange);
-				}
-				else if (grid_cache_.find(target) != grid_cache_.end()) {
-					qso->item("GRIDSQUARE", grid_cache_.at(target));
-				}
-				else {
-					qso->item("GRIDSQUARE", string(""));
-				}
 				return qso;
 			}
 			case TX2:
@@ -791,11 +785,6 @@ record* wsjtx_handler::update_qso(bool tx, string time, double audio_freq, strin
 			}
 			case TX6:
 			case TX6A:
-			{
-				// CQ (direction) <ME> (<GRID>)
-				qso->item("APP_ZZA_CQ", target);
-				return qso;
-			}
 			default:
 				return nullptr;
 			}
@@ -878,20 +867,22 @@ record* wsjtx_handler::qso_call(string call) {
 		qso = qsos_.at(call);
 		string band = spec_data_->band_for_freq(dial_frequency_);
 		if (qso->item("MODE") == mode_ && qso->item("BAND") == band) {
-			time_t now = time(nullptr);
-			time_t qso_ts = qso->timestamp(true);
-			if (difftime(now, qso_ts) > (5 * 60)) {
-				switch (
-					fl_choice("Received update to QSO %s %s %s, is this...", "the same QSO??", "a new QSO?", nullptr,
-						call.c_str(), band.c_str(), mode_.c_str())) {
-				case 0:
-					break;
-				case 1:
-					qso = new record();
-					qso->item("CALL", call);
-					qso->item("QSO_COMPLETE", string("N"));
-					qsos_[call] = qso;
-					break;
+			if (qso->item("TIME_OFF") != "") {
+				time_t now = time(nullptr);
+				time_t qso_ts = qso->timestamp(true);
+				if (difftime(now, qso_ts) > (5 * 60)) {
+					switch (
+						fl_choice("Received update to QSO %s %s %s, is this...", "the same QSO??", "a new QSO?", nullptr,
+							call.c_str(), band.c_str(), mode_.c_str())) {
+					case 0:
+						break;
+					case 1:
+						qso = new record();
+						qso->item("CALL", call);
+						qso->item("QSO_COMPLETE", string("N"));
+						qsos_[call] = qso;
+						break;
+					}
 				}
 			}
 		}
