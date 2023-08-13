@@ -37,5 +37,6 @@ protected:
 	qso_dxcc* dxcc_;
 	qso_qsl_vwr* qsl_;
 
+	int default_tab_;
 };
 

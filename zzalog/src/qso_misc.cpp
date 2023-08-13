@@ -1,6 +1,10 @@
 #include "qso_misc.h"
 #include "qso_qth.h"
 
+#include <FL/Fl_Preferences.H>
+
+extern Fl_Preferences* settings_;
+
 qso_misc::qso_misc(int X, int Y, int W, int H, const char* L) :
 	Fl_Tabs(X, Y, W, H, L)
 {
@@ -8,10 +12,17 @@ qso_misc::qso_misc(int X, int Y, int W, int H, const char* L) :
 	create_form();
 }
 
-qso_misc::~qso_misc() {}
+qso_misc::~qso_misc() {
+	save_values();
+}
 
 // get settings
-void qso_misc::load_values() {}
+void qso_misc::load_values() {
+	// Load default tab value
+	Fl_Preferences display_settings(settings_, "Display");
+	display_settings.get("QSO Entry Tab", default_tab_, 0);
+
+}
 
 // Create form
 void qso_misc::create_form() {
@@ -34,6 +45,7 @@ void qso_misc::create_form() {
 
 	end();
 
+	value(child(default_tab_));
 }
 // Enable/disab;e widgets
 void qso_misc::enable_widgets() {
@@ -54,7 +66,16 @@ void qso_misc::enable_widgets() {
 }
 
 // save value
-void qso_misc::save_values() {}
+void qso_misc::save_values() {
+	Fl_Preferences display_settings(settings_, "Display");
+	// Find the current selected tab and save its index
+	Fl_Widget* w = value();
+	for (int ix = 0; ix != children(); ix++) {
+		if (child(ix) == w) {
+			display_settings.set("QSO Entry Tab", ix);
+		}
+	}
+}
 
 void qso_misc::qso(record* qso, qso_num_t number) {
 	qso_ = qso;
