@@ -370,7 +370,11 @@ void qso_rig::enable_widgets() {
 		op_summary_->activate();
 		op_summary_->color(FL_BLACK);
 		op_freq_mode_->activate();
-		op_freq_mode_->color(FL_BLACK);
+		if (rig_->get_ptt()) {
+			op_freq_mode_->color(FL_RED);
+		} else {
+			op_freq_mode_->color(FL_BLACK);
+		}
 		double freq = rig_->get_dfrequency(true);
 		band_data::band_entry_t* entry = band_data_->get_entry(freq * 1000);
 		if (entry) {
