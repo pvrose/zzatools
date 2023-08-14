@@ -630,7 +630,16 @@ wsjtx_handler::decoded_msg wsjtx_handler::decode_message(string message) {
 
 	string test_exch = words.back();
 	const char* test = test_exch.c_str();
-	if (regex_match(test, REGEX_GRIDSQUARE4)) {
+	if (strcmp(test, "RR73") == 0) {
+		// TX4A
+		decode.exchange = test_exch;
+		words.pop_back();
+		decode.sender = words.back();
+		words.pop_back();
+		decode.target = join_line(words, ' ');
+		decode.type = TX4A;
+	}
+	else if (regex_match(test, REGEX_GRIDSQUARE4)) {
 		// TX1 or TX6
 		decode.exchange = test_exch;
 		words.pop_back();
@@ -671,15 +680,6 @@ wsjtx_handler::decoded_msg wsjtx_handler::decode_message(string message) {
 		decode.target = join_line(words, ' ');
 		decode.type = TX4;
 	}
-	else if (strcmp(test, "RR73") == 0) {
-		// TX4A
-		decode.exchange = test_exch;
-		words.pop_back();
-		decode.sender = words.back();
-		words.pop_back();
-		decode.target = join_line(words, ' ');
-		decode.type = TX4A;
-	}
 	else if (strcmp(test, "73") == 0) {
 		// TX5
 		decode.exchange = test_exch;
@@ -707,11 +707,13 @@ wsjtx_handler::decoded_msg wsjtx_handler::decode_message(string message) {
 
 
 // Update QSO - returns true if updated and let qso_manager know
-record* wsjtx_handler::update_qso(bool tx, string time, double audio_freq, string message) {
+record* wsjtx_handler::update_qso(bool tx, string time, double audio_freq, string message, record* match, double dial, string mode) {
 	decoded_msg decode = decode_message(message);
 	string sender = decode.sender[0] == '<' ? decode.sender.substr(1, decode.sender.length() - 2) : decode.sender;
 	string target = decode.target[0] == '<' ? decode.target.substr(1, decode.target.length() - 2) : decode.target;
 	string today = now(false, "%Y%m%d");
+	double df = dial == 0.0 ? dial_frequency_ : dial;
+	string m = mode == "" ? mode_ : mode;
 //	printf("Message: %s %s %g %s\n", tx?"TX":"RX", time.c_str(), audio_freq, message.c_str());
 	char msg[100];
 	if (tx) {
@@ -722,10 +724,10 @@ record* wsjtx_handler::update_qso(bool tx, string time, double audio_freq, strin
 			return nullptr;
 		}
 		else {
-			record* qso = qso_call(target);
+			record* qso = match != nullptr ? match : qso_call(target);
 			switch (decode.type) {
 			case TX1:
-				// <THEM> <ME> <GRID>
+				// <THEM> <ME> <MY_GRID>
 			case TX1A:
 				// <THEM> <ME> 
 			{
@@ -733,25 +735,27 @@ record* wsjtx_handler::update_qso(bool tx, string time, double audio_freq, strin
 				qso->item("QSO_DATE", today);
 				qso->item("TIME_ON", time);
 				char f[20];
-				double freq = dial_frequency_ + (audio_freq / 1000000.0);
+				double freq = df + (audio_freq / 1000000.0);
 				snprintf(f, sizeof(f), "%0.6f", freq);
 				qso->item("FREQ", string(f));
-				qso->item("MODE", mode_);
+				qso->item("MODE", m);
+				if (grid_cache_.find(target) != grid_cache_.end()) {
+					qso->item("GRIDSQUARE", grid_cache_.at(target));
+				}
 				return qso;
 			}
 			case TX2:
 			{
 				// <THEM> <ME> <Report>
 				// Starting a new record
-				snprintf(msg, sizeof(msg), "WSJT-X: Calling %s, already in QSO with %s", target.c_str(), qso->item("CALL").c_str());
 				status_->misc_status(ST_WARNING, msg);
-				qso->item("QSO_DATE", today);
-				qso->item("TIME_ON", time);
+				if (qso->item("QSO_DATE") == "") qso->item("QSO_DATE", today);
+				if (qso->item("TIME_ON") == "") qso->item("TIME_ON", time);
 				char f[20];
-				double freq = dial_frequency_ + (audio_freq / 1000000.0);
+				double freq = df + (audio_freq / 1000000.0);
 				snprintf(f, sizeof(f), "%0.6f", freq);
 				qso->item("FREQ", string(f));
-				qso->item("MODE", mode_);
+				qso->item("MODE", m);
 				// Set grid square: from cache or no value
 				if (grid_cache_.find(target) != grid_cache_.end()) {
 					qso->item("GRIDSQUARE", grid_cache_.at(target));
@@ -817,6 +821,8 @@ record* wsjtx_handler::update_qso(bool tx, string time, double audio_freq, strin
 			switch (decode.type) {
 			case TX1:
 				// <ME> <CALL> <GRID>
+				grid_cache_[sender] = decode.exchange;
+				return nullptr;
 			case TX1A:
 				// <ME> <CALL>
 				// Wait until I send the call before starting log entry as may get >1 per decode period
@@ -845,7 +851,9 @@ record* wsjtx_handler::update_qso(bool tx, string time, double audio_freq, strin
 				// <ME> <THEM> RR73
 			case TX5:
 				// <ME> <THEM> 73
-				qso->item("QSO_COMPLETE", string("Y"));
+				if (qso->item("QSO_COMPLETE") == "N" || qso->item("QSO_COMPLETE") == "?") {
+					qso->item("QSO_COMPLETE", string("Y"));
+				}
 				return qso;
 			default:
 				return nullptr;
@@ -909,4 +917,146 @@ void wsjtx_handler::clear_qsos() {
 			delete qso;
 		}
 	}
+}
+
+bool wsjtx_handler::parse_all_txt(record* qso, string line) {
+	bool tx_record;
+	double dial_frequency = 0.0;
+	double audio_frequency = 0.0;
+	string time_on = "";
+	// After this initial processing pos will point to the start og the QSO decode string - look for old-style transmit record
+	size_t pos = line.find("Transmitting");
+	if (pos != string::npos) {
+		pos = line.find(qso->item("MODE"));
+		pos += qso->item("MODE").length() + 3;
+		tx_record = true;
+		time_on = line.substr(7,6);
+		// Nothing else to get from this record
+	}
+	else {
+		// Now see if it's a new-style Tx record
+		pos = line.find("Tx");
+		if (pos != string::npos) {
+			// Get frequency of transmission - including audio offset
+			string freq = line.substr(14, 9);
+			// Replace leading spaces with zeroes
+			for (size_t i = 0; freq[i] == ' '; i++) {
+				freq[i] = '0';
+			}
+			dial_frequency = stod(freq);
+			string freq_offset = line.substr(43, 4);
+			// Replace leading spaces with zeroes
+			for (size_t i = 0; freq_offset[i] == ' '; i++) {
+				freq_offset[i] = '0';
+			}
+			audio_frequency = stod(freq_offset);
+			pos = 48;
+			tx_record = true;
+			time_on = line.substr(7,6);
+		}
+		else {
+			// Look for a new-style Rx record
+			pos = line.find("Rx");
+			if (pos != string::npos) {
+				pos = 48;
+				tx_record = false;
+				time_on = line.substr(7,6);
+			}
+			else {
+				// Default to old-style Rx record
+				pos = 24;
+				tx_record = false;
+				time_on = line.substr(0,6);
+			}
+		}
+	}
+	if (update_qso(tx_record, time_on, audio_frequency, line.substr(pos), qso, dial_frequency, qso->item("MODE")) ) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+bool wsjtx_handler::match_all_txt(record* qso) {
+	Fl_Preferences datapath_settings(settings_, "Datapath");
+	char* temp;
+	datapath_settings.get("WSJT-X", temp, "");
+	string filename = string(temp) + "/ALL.TXT";
+	ifstream* all_file = new ifstream(filename.c_str());
+	// This will take a while so display the timer cursor
+	fl_cursor(FL_CURSOR_WAIT);
+	// calculate the file size and initialise the progress bar
+	streampos startpos = all_file->tellg();
+	all_file->seekg(0, ios::end);
+	streampos endpos = all_file->tellg();
+	long file_size = (long)(endpos - startpos);
+	status_->misc_status(ST_NOTE, "WSJTX: Starting to parse ALL.TXT");
+	status_->progress(file_size, OT_RECORD, "Looking for queried call in ALL.TXT", "bytes");
+	// reposition back to beginning
+	all_file->seekg(0, ios::beg);
+	bool start_copying = false;
+	bool stop_copying = false;
+	// Get user callsign from settings
+	// Get search items from record
+	string their_call = qso->item("CALL");
+	string datestamp = qso->item("QSO_DATE");
+	string timestamp = qso->item("TIME_ON");
+	string mode = qso->item("MODE");
+	if (their_call.length() == 0 || datestamp.length() != 8 || 
+		timestamp.length() < 4 || mode.length() == 0) {
+		status_->misc_status(ST_ERROR, "WSJTX: Searching ALL.TXT requires, call, date/time and mode");
+		return false;
+	}
+	datestamp = datestamp.substr(2);
+	char msg[256];
+	snprintf(msg, sizeof(msg), "WSJTX: Searching ALL.TXT for %s %s %s %s",
+		their_call.c_str(), datestamp.c_str(), timestamp.c_str(), mode.c_str());
+	status_->misc_status(ST_NOTE, msg);
+	int count = 0;
+	// Now read the file - search for the QSO start time
+	while (all_file->good() && !stop_copying) {
+		string line;
+		getline(*all_file, line);
+		count += line.length() + 1;
+		if (count <= file_size) status_->progress(count, OT_RECORD);
+
+		// Does the line contain sought date, time, both calls and "Tx" or "Transmitting"
+		if (line.substr(0, 6) == datestamp &&
+			line.substr(7, 4) == timestamp.substr(0, 4) &&
+			(line.find("Transmitting") != string::npos || line.find("Tx")) &&
+			line.find(my_call_) != string::npos &&
+			line.find(their_call) != string::npos &&
+			line.find(mode) != string::npos) {
+			if (!start_copying) {
+				snprintf(msg, 256, "DASH: %s %s %s %s %s Found possible match",
+					datestamp.c_str(),
+					timestamp.c_str(),
+					mode.c_str(),
+					my_call_.c_str(),
+					their_call.c_str());
+				status_->misc_status(ST_WARNING, msg);
+			}
+			start_copying = true;
+		}
+		if (start_copying) {
+			parse_all_txt(qso, line);
+		}
+	}
+	if (stop_copying) {
+		status_->progress("Found record!", OT_RECORD);
+		// If we are complete then say so
+		if (qso->item("QSO_COMPLETE") != "N" && qso->item("QSO_COMPLETE") != "?") {
+			all_file->close();
+			fl_cursor(FL_CURSOR_DEFAULT);
+		}
+		return true;
+	}
+	else {
+		all_file->close();
+		snprintf(msg, 100, "WSJTX: Cannot find contact with %s in ALL.TXT", their_call.c_str());
+		status_->misc_status(ST_WARNING, msg);
+		fl_cursor(FL_CURSOR_DEFAULT);
+		return false;
+	}
+
 }

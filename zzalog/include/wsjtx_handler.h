@@ -29,6 +29,9 @@ using namespace std;
 		// Close servver
 		void close_server();
 
+		// Search for match in ALL.TXT
+		bool match_all_txt(record* qso);
+
 		// Used in static methods to point to the single instance of this class
 		static wsjtx_handler* that_;
 
@@ -175,10 +178,14 @@ using namespace std;
 		// Decode the message
 		decoded_msg decode_message(string message);
 		// Update QSO with message
-		record* update_qso(bool tx, string time, double audio_freq, string message);
+		record* update_qso(bool tx, string time, double audio_freq, string message,
+		    record* match = nullptr, double dial_frequency = 0.0, string mode = "");
 
 		// Get a QSO record for this callsign
 		record* qso_call(string call);
+		// Parse the ALL.TXT record
+		bool parse_all_txt(record* match, string line);
+
 		// Clear existing QSO record
 		void clear_qsos();
 
@@ -215,6 +222,7 @@ using namespace std;
 		double dial_frequency_;
 		// Current mode
 		string mode_;
+		
 	};
 
 #endif

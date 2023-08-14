@@ -169,8 +169,8 @@ public:
 	void action_save_merge();
 	// Look in all.txt
 	void action_look_all_txt();
-	// Copy found text
-	void action_copy_all_text(string text);
+	// // Copy found text
+	// void action_copy_all_text(string text);
 	// Create a net from current QSO
 	void action_create_net();
 	// Add a QSO to the net - copy existing qso start times or not
