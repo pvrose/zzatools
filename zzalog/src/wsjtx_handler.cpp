@@ -81,7 +81,7 @@ int wsjtx_handler::rcv_dgram(stringstream & ss) {
 	// Check the magic number and schema are supported
 	if (magic_number_ != expected_magic_ || schema_ < minimum_schema_) {
 		char message[256];
-		snprintf(message, 256, "datagram had wrong magic number (%08x) or unsupported schema (%d)", magic_number_, schema_);
+		snprintf(message, 256, "WSJTX: datagram had wrong magic number (%08x) or unsupported schema (%d)", magic_number_, schema_);
 		status_->misc_status(ST_WARNING, message);
 		return 1;
 	}
@@ -714,7 +714,7 @@ record* wsjtx_handler::update_qso(bool tx, string time, double audio_freq, strin
 	string today = now(false, "%Y%m%d");
 	double df = dial == 0.0 ? dial_frequency_ : dial;
 	string m = mode == "" ? mode_ : mode;
-//	printf("Message: %s %s %g %s\n", tx?"TX":"RX", time.c_str(), audio_freq, message.c_str());
+	printf("Message: %s %s %g %s\n", tx?"TX":"RX", time.c_str(), audio_freq, message.c_str());
 	char msg[100];
 	if (tx) {
 		if (sender != my_call_) {
@@ -732,7 +732,7 @@ record* wsjtx_handler::update_qso(bool tx, string time, double audio_freq, strin
 				// <THEM> <ME> 
 			{
 				// I am starting a new call - set date/ time/freq/mode
-				qso->item("QSO_DATE", today);
+				if (qso->item("QSO_DATE") == "") qso->item("QSO_DATE", today);
 				qso->item("TIME_ON", time);
 				char f[20];
 				double freq = df + (audio_freq / 1000000.0);
@@ -748,7 +748,6 @@ record* wsjtx_handler::update_qso(bool tx, string time, double audio_freq, strin
 			{
 				// <THEM> <ME> <Report>
 				// Starting a new record
-				status_->misc_status(ST_WARNING, msg);
 				if (qso->item("QSO_DATE") == "") qso->item("QSO_DATE", today);
 				if (qso->item("TIME_ON") == "") qso->item("TIME_ON", time);
 				char f[20];
@@ -785,6 +784,7 @@ record* wsjtx_handler::update_qso(bool tx, string time, double audio_freq, strin
 			{
 				// <THEM><ME> 73
 				qso->item("QSO_COMPLETE", string("Y"));
+				qso->item("TIME_OFF", time);
 				return qso;
 			}
 			case TX6:
@@ -817,7 +817,7 @@ record* wsjtx_handler::update_qso(bool tx, string time, double audio_freq, strin
 			}
 		}
 		else {
-			record* qso = qso_call(sender);
+			record* qso = match != nullptr ? match : qso_call(target);
 			switch (decode.type) {
 			case TX1:
 				// <ME> <CALL> <GRID>
@@ -854,6 +854,7 @@ record* wsjtx_handler::update_qso(bool tx, string time, double audio_freq, strin
 				if (qso->item("QSO_COMPLETE") == "N" || qso->item("QSO_COMPLETE") == "?") {
 					qso->item("QSO_COMPLETE", string("Y"));
 				}
+				qso->item("TIME_OFF", time);
 				return qso;
 			default:
 				return nullptr;
@@ -983,6 +984,11 @@ bool wsjtx_handler::match_all_txt(record* qso) {
 	datapath_settings.get("WSJT-X", temp, "");
 	string filename = string(temp) + "/ALL.TXT";
 	ifstream* all_file = new ifstream(filename.c_str());
+	if (!all_file->good()) {
+		char msg[100];
+		snprintf(msg, sizeof(msg), "WSJTX: Fail to open %s", filename.c_str());
+		status_->misc_status(ST_ERROR, msg);
+	}
 	// This will take a while so display the timer cursor
 	fl_cursor(FL_CURSOR_WAIT);
 	// calculate the file size and initialise the progress bar
@@ -994,8 +1000,7 @@ bool wsjtx_handler::match_all_txt(record* qso) {
 	status_->progress(file_size, OT_RECORD, "Looking for queried call in ALL.TXT", "bytes");
 	// reposition back to beginning
 	all_file->seekg(0, ios::beg);
-	bool start_copying = false;
-	bool stop_copying = false;
+	enum {SEARCHING, FOUND, COPYING, COPIED} copy_status = SEARCHING;
 	// Get user callsign from settings
 	// Get search items from record
 	string their_call = qso->item("CALL");
@@ -1014,35 +1019,48 @@ bool wsjtx_handler::match_all_txt(record* qso) {
 	status_->misc_status(ST_NOTE, msg);
 	int count = 0;
 	// Now read the file - search for the QSO start time
-	while (all_file->good() && !stop_copying) {
+	while (all_file->good() && copy_status != COPIED) {
 		string line;
 		getline(*all_file, line);
 		count += line.length() + 1;
 		if (count <= file_size) status_->progress(count, OT_RECORD);
 
 		// Does the line contain sought date, time, both calls and "Tx" or "Transmitting"
-		if (line.substr(0, 6) == datestamp &&
-			line.substr(7, 4) == timestamp.substr(0, 4) &&
-			(line.find("Transmitting") != string::npos || line.find("Tx")) &&
-			line.find(my_call_) != string::npos &&
-			line.find(their_call) != string::npos &&
-			line.find(mode) != string::npos) {
-			if (!start_copying) {
-				snprintf(msg, 256, "DASH: %s %s %s %s %s Found possible match",
-					datestamp.c_str(),
-					timestamp.c_str(),
-					mode.c_str(),
-					my_call_.c_str(),
-					their_call.c_str());
-				status_->misc_status(ST_WARNING, msg);
+		bool found = false;
+		if (line.substr(0,6) == datestamp) {
+			if (line.substr(7,4) == timestamp 
+				|| copy_status == FOUND || copy_status == COPYING) {
+				if (line.find(my_call_) != string::npos &&
+					line.find(their_call) != string::npos &&
+					line.find(mode) != string::npos) {
+					printf("Line: %s\n", line.c_str());
+					if (copy_status == SEARCHING) {
+						snprintf(msg, 256, "WSJTX: %s %s %s %s %s Found possible match",
+							datestamp.c_str(),
+							timestamp.c_str(),
+							mode.c_str(),
+							my_call_.c_str(),
+							their_call.c_str());
+						status_->misc_status(ST_WARNING, msg);
+					}
+					copy_status = FOUND;;
+				}
 			}
-			start_copying = true;
 		}
-		if (start_copying) {
-			parse_all_txt(qso, line);
+		if (copy_status != SEARCHING) {
+			if (line.find(my_call_) != string::npos &&
+				line.find(their_call) != string::npos &&
+				line.find(mode) != string::npos) {
+				parse_all_txt(qso, line);
+				if (qso->item("QSO_COMPLETE") == "N") copy_status = COPYING;
+				else if (copy_status == COPYING && 
+					(qso->item("QSO_COMPLETE") == "Y" ||
+					 qso->item("QSO_COMPLETE") == ""))
+				    copy_status = COPIED;
+			}
 		}
 	}
-	if (stop_copying) {
+	if (copy_status = COPIED) {
 		status_->progress("Found record!", OT_RECORD);
 		// If we are complete then say so
 		if (qso->item("QSO_COMPLETE") != "N" && qso->item("QSO_COMPLETE") != "?") {

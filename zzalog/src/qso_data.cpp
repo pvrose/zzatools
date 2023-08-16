@@ -996,7 +996,11 @@ void qso_data::action_save_merge() {
 
 // ACtion look in ALL.TXT
 void qso_data::action_look_all_txt() {
-	wsjtx_handler_->match_all_txt(g_query_->query_qso());
+	if (wsjtx_handler_->match_all_txt(g_query_->query_qso())) {
+		logging_state_ = QUERY_WSJTX;
+	}
+	enable_widgets();
+}
 	// Fl_Preferences datapath_settings(settings_, "Datapath");
 	// char* temp;
 	// datapath_settings.get("WSJT-X", temp, "");
@@ -1101,7 +1105,7 @@ void qso_data::action_look_all_txt() {
 	// 	status_->misc_status(ST_WARNING, msg);
 	// 	fl_cursor(FL_CURSOR_DEFAULT);
 	// }
-}
+// }
 
 // void qso_data::action_copy_all_text(string text) {
 // 	record* qso = g_query_->query_qso();
@@ -1543,6 +1547,10 @@ void qso_data::action_import_query() {
 	import_data_->stop_update(false);
 	while (!import_data_->update_complete()) Fl::check();
 	import_data_->load_record(g_qy_entry_->qso());
+	// If completed OK go to manual entry again
+	if (import_data_->update_complete()) {
+		action_query_entry();
+	}
 }
 
 // Dummy QSO
