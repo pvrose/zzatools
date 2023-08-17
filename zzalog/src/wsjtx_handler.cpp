@@ -714,13 +714,13 @@ record* wsjtx_handler::update_qso(bool tx, string time, double audio_freq, strin
 	string today = now(false, "%Y%m%d");
 	double df = dial == 0.0 ? dial_frequency_ : dial;
 	string m = mode == "" ? mode_ : mode;
-	printf("Message: %s %s %g %s\n", tx?"TX":"RX", time.c_str(), audio_freq, message.c_str());
+//	printf("Message: %s %s %g %s\n", tx?"TX":"RX", time.c_str(), audio_freq, message.c_str());
 	char msg[100];
 	if (tx) {
 		if (sender != my_call_) {
 			char msg[100];
 			snprintf(msg, sizeof(msg), "WSJTX: TX decode not for user %s: %s", my_call_.c_str(), message.c_str());
-			status_->misc_status(ST_ERROR, msg);
+			status_->misc_status(ST_WARNING, msg);
 			return nullptr;
 		}
 		else {

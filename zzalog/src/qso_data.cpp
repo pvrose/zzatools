@@ -417,7 +417,8 @@ void qso_data::update_modem_qso(record* qso) {
 	}
 	else {
 		// Debug
-		printf("DEBUG: QSO received: %s %s %s %s %s %s %s %s Complete = %s\n",
+		printf("DEBUG: QSO %p received: %s %s %s %s %s %s %s %s Complete = %s\n",
+			qso,
 			qso->item("QSO_DATE").c_str(),
 			qso->item("TIME_ON").c_str(),
 			qso->item("CALL").c_str(),
@@ -437,6 +438,25 @@ void qso_data::update_modem_qso(record* qso) {
 
 		case QSO_MODEM:
 			action_update_modem(qso);
+			break;
+
+		case QSO_EDIT:
+			if (g_entry_->qso()->is_dirty()) {
+				fl_beep(FL_BEEP_QUESTION);
+				switch (fl_choice("Trying to select a different record while editing a record", "Save edit", "Cancel edit", nullptr)) {
+				case 0:
+					// Save QSO
+					action_save_edit();
+					break;
+				case 1:
+					// Cancel QSO
+					action_cancel_edit();
+					break;
+				}
+			} else {
+				action_cancel_edit();
+			}
+			action_add_modem(qso);
 			break;
 
 		default:
