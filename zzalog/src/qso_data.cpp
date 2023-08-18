@@ -182,6 +182,17 @@ void qso_data::enable_widgets() {
 			g_peek_->hide();
 			g_qy_entry_->hide();
 			break;
+		case QSO_VIEW:
+			snprintf(l, sizeof(l), "QSO Entry - %s - read only", current_qso()->item("CALL").c_str());
+			g_entry_->copy_label(l);
+			g_entry_->labelcolor(FL_DARK_BLUE);
+			g_entry_->show();
+			g_entry_->enable_widgets();
+			g_net_entry_->hide();
+			g_query_->hide();
+			g_peek_->hide();
+			g_qy_entry_->hide();
+			break;
 		case QSO_BROWSE:
 			g_entry_->hide();
 			snprintf(l, sizeof(l), "QSO Query - %s - %s", g_query_->qso()->item("CALL").c_str(), g_query_->query_message().c_str());
@@ -350,6 +361,9 @@ void qso_data::update_qso(qso_num_t log_num) {
 		action_cancel_browse();
 		action_browse();
 		break;
+	case QSO_VIEW:
+		action_view();
+		break;
 	case NET_STARTED:
 	case NET_EDIT:
 		if (!g_net_entry_->qso_in_net(log_num)) {
@@ -390,6 +404,7 @@ void qso_data::update_query(logging_state_t query, qso_num_t match_num, qso_num_
 	switch (logging_state_) {
 	case QSO_PENDING:
 	case QSO_INACTIVE:
+	case QSO_VIEW:
 	case QUERY_NEW:
 	case QUERY_WSJTX:
 	case MANUAL_ENTRY:
@@ -461,6 +476,11 @@ void qso_data::update_modem_qso(record* qso) {
 			} else {
 				action_cancel_edit();
 			}
+			action_add_modem(qso);
+			break;
+
+		case QSO_VIEW:
+			action_cancel_edit();
 			action_add_modem(qso);
 			break;
 
@@ -539,6 +559,7 @@ qso_num_t qso_data::get_default_number() {
 	case QSO_INACTIVE:
 	case QUERY_NEW:
 	case QUERY_WSJTX:
+	case QSO_VIEW:
 		return book_->selection();
 	case QSO_PENDING:
 	case QSO_STARTED:
@@ -812,6 +833,17 @@ void qso_data::action_edit() {
 	enable_widgets();
 }
 
+// Action VIEW - Transition from QSO_INACTIVE to QSO_VIEW
+void qso_data::action_view() {
+	// Save a copy of the current record
+	qso_num_t qso_number = get_default_number();
+	edit_return_state_ = logging_state_;
+	logging_state_ = QSO_VIEW;
+	g_entry_->qso(qso_number);
+	g_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
+	enable_widgets();
+}
+
 // Action SAVE EDIT - Transition from QSO_EDIT to QSO_INACTIVE while saving changes
 void qso_data::action_save_edit() {
 	// We no longer need to maintain the copy of the original QSO
@@ -851,6 +883,13 @@ void qso_data::action_navigate(int target) {
 		action_save_edit();
 		navigation_book_->navigate((navigate_t)target);
 		action_edit();
+		action_view_qsl();
+		break;
+	case QSO_VIEW:
+		// Save, navigate to new QSO and open editor
+		action_cancel_edit();
+		navigation_book_->navigate((navigate_t)target);
+		action_view();
 		action_view_qsl();
 		break;
 	case QSO_PENDING:
@@ -1475,6 +1514,7 @@ record* qso_data::current_qso() {
 	case QSO_PENDING:
 	case QSO_STARTED:
 	case QSO_EDIT:
+	case QSO_VIEW:
 	case QSO_MODEM:
 		return g_entry_->qso();
 	case QSO_BROWSE:
@@ -1504,6 +1544,7 @@ qso_num_t qso_data::current_number() {
 	case QSO_PENDING:
 	case QSO_STARTED:
 	case QSO_EDIT:
+	case QSO_VIEW:
 	case QSO_MODEM:
 		return g_entry_->qso_number();
 	case QSO_BROWSE:

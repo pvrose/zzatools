@@ -32,6 +32,7 @@ public:
 		EDIT_QSO,
 		COPY_QSO,
 		CLONE_QSO,
+		VIEW_QSO,
 		CANCEL_EDIT,
 		CANCEL_BROWSE,
 		CANCEL_QSO,
@@ -70,6 +71,7 @@ public:
 		EXEC_QUERY,
 		CANCEL_QUERY,
 		IMPORT_QUERY,
+		CANCEL_VIEW,
 	};
 
 
@@ -141,6 +143,8 @@ public:
 	static void cb_bn_cancel_query(Fl_Widget* w, void* v);
 	// Import query
 	static void cb_bn_import_query(Fl_Widget* w, void* v);
+	// View QSO
+	static void cb_bn_view_qso(Fl_Widget* w, void* v);
 
 
 protected:

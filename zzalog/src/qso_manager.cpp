@@ -260,8 +260,11 @@ bool qso_manager::qso_in_progress() {
 	case qso_data::QSO_PENDING:
 	case qso_data::QSO_INACTIVE:
 	case qso_data::QSO_EDIT:
+	case qso_data::QSO_VIEW:
 		return false;
 	case qso_data::QSO_STARTED:
+	case qso_data::QSO_MODEM:
+	case qso_data::NET_STARTED:
 		return true;
 	}
 	return false;

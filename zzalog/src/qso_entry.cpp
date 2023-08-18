@@ -173,6 +173,7 @@ void qso_entry::enable_widgets() {
 	case qso_data::QSO_STARTED:
 	case qso_data::NET_STARTED:
 	case qso_data::QSO_MODEM:
+	case qso_data::QSO_VIEW:
 	case qso_data::QSO_PEEK:
 	case qso_data::QSO_PEEK_ED:
 		for (int ix = 0; ix <= number_fields_in_use_ && ix < NUMBER_TOTAL; ix++) {
@@ -257,6 +258,7 @@ void qso_entry::copy_qso_to_display(int flags) {
 		// If QTH changes tell DXA-IF to update home_location
 		switch (qso_data_->logging_state()) {
 		case qso_data::QSO_EDIT:
+		case qso_data::QSO_VIEW:
 		case qso_data::QSO_INACTIVE:
 		case qso_data::QSO_PENDING:
 		case qso_data::QSO_STARTED:
@@ -626,6 +628,7 @@ void qso_entry::cb_ip_field(Fl_Widget* w, void* v) {
 	switch (that->qso_data_->logging_state()) {
 	case qso_data::QSO_INACTIVE:
 	case qso_data::QSO_PENDING:
+	case qso_data::QSO_VIEW:
 		break;
 	case qso_data::NET_STARTED:
 	case qso_data::NET_EDIT:

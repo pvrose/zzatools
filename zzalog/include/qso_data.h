@@ -37,6 +37,7 @@ public:
 		QSO_STARTED,     // QSO started
 		QSO_EDIT,        // Editing existing QSO
 		QSO_BROWSE,      // View selected view in table view
+		QSO_VIEW,        // View selected QSO in entry view
 		QSO_PEEK,        // View alternate QSO in entry view
 		QSO_PEEK_ED,     // View alternate QSO in entry view and allow it to be edited
 		QUERY_MATCH,     // Query: Compare new QSO with nearest match in log - add, reject or selectively merge
@@ -139,6 +140,8 @@ public:
 	void action_cancel();
 	// Copy selected QSO and allow it to be edited
 	void action_edit();
+	// View selected QSO in entry view (disable editing)
+	void action_view();
 	// Copy edited QSO back to selected QSO
 	void action_save_edit();
 	// Cancel editing
