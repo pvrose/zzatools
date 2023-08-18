@@ -417,17 +417,17 @@ void qso_data::update_modem_qso(record* qso) {
 	}
 	else {
 		// Debug
-		printf("DEBUG: QSO %p received: %s %s %s %s %s %s %s %s Complete = %s\n",
-			qso,
-			qso->item("QSO_DATE").c_str(),
-			qso->item("TIME_ON").c_str(),
-			qso->item("CALL").c_str(),
-			qso->item("FREQ").c_str(),
-			qso->item("MODE").c_str(),
-			qso->item("GRIDSQUARE").c_str(),
-			qso->item("RST_SENT").c_str(),
-			qso->item("RST_RCVD").c_str(),
-			qso->item("QSO_COMPLETE").c_str());
+		// printf("DEBUG: QSO %p received: %s %s %s %s %s %s %s %s Complete = %s\n",
+		// 	qso,
+		// 	qso->item("QSO_DATE").c_str(),
+		// 	qso->item("TIME_ON").c_str(),
+		// 	qso->item("CALL").c_str(),
+		// 	qso->item("FREQ").c_str(),
+		// 	qso->item("MODE").c_str(),
+		// 	qso->item("GRIDSQUARE").c_str(),
+		// 	qso->item("RST_SENT").c_str(),
+		// 	qso->item("RST_RCVD").c_str(),
+		// 	qso->item("QSO_COMPLETE").c_str());
 		switch (logging_state_) {
 		case QSO_PENDING:
 			action_deactivate();
