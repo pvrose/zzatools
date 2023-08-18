@@ -702,6 +702,17 @@ wsjtx_handler::decoded_msg wsjtx_handler::decode_message(string message) {
 			decode.type = TX1A;
 		}
 	}
+	printf("MESSAGE: %s, decode = %s: target %s; sender %s, xchg %s.\n", message.c_str(),
+		decode.type == TX1 ? "TX1" :
+		decode.type == TX1A ? "TX1A" :
+		decode.type == TX2? "TX2" :
+		decode.type == TX3 ? "TX3" :
+		decode.type == TX4 ? "TX4" :
+		decode.type == TX4A ? "TX4A" :
+		decode.type == TX5 ? "TX5" :
+		decode.type == TX6 ? "TX6" :
+		decode.type == TX6A ? "TX6A" : "???",
+		decode.target.c_str(), decode.sender.c_str(), decode.exchange.c_str());
 	return decode;
 }
 
@@ -817,7 +828,7 @@ record* wsjtx_handler::update_qso(bool tx, string time, double audio_freq, strin
 			}
 		}
 		else {
-			record* qso = match != nullptr ? match : qso_call(target);
+			record* qso = match != nullptr ? match : qso_call(sender);
 			switch (decode.type) {
 			case TX1:
 				// <ME> <CALL> <GRID>
