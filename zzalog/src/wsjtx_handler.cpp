@@ -702,17 +702,17 @@ wsjtx_handler::decoded_msg wsjtx_handler::decode_message(string message) {
 			decode.type = TX1A;
 		}
 	}
-	printf("MESSAGE: %s, decode = %s: target %s; sender %s, xchg %s.\n", message.c_str(),
-		decode.type == TX1 ? "TX1" :
-		decode.type == TX1A ? "TX1A" :
-		decode.type == TX2? "TX2" :
-		decode.type == TX3 ? "TX3" :
-		decode.type == TX4 ? "TX4" :
-		decode.type == TX4A ? "TX4A" :
-		decode.type == TX5 ? "TX5" :
-		decode.type == TX6 ? "TX6" :
-		decode.type == TX6A ? "TX6A" : "???",
-		decode.target.c_str(), decode.sender.c_str(), decode.exchange.c_str());
+	// printf("MESSAGE: %s, decode = %s: target %s; sender %s, xchg %s.\n", message.c_str(),
+	// 	decode.type == TX1 ? "TX1" :
+	// 	decode.type == TX1A ? "TX1A" :
+	// 	decode.type == TX2? "TX2" :
+	// 	decode.type == TX3 ? "TX3" :
+	// 	decode.type == TX4 ? "TX4" :
+	// 	decode.type == TX4A ? "TX4A" :
+	// 	decode.type == TX5 ? "TX5" :
+	// 	decode.type == TX6 ? "TX6" :
+	// 	decode.type == TX6A ? "TX6A" : "???",
+	// 	decode.target.c_str(), decode.sender.c_str(), decode.exchange.c_str());
 	return decode;
 }
 
@@ -794,7 +794,8 @@ record* wsjtx_handler::update_qso(bool tx, string time, double audio_freq, strin
 			case TX5:
 			{
 				// <THEM><ME> 73
-				qso->item("QSO_COMPLETE", string("Y"));
+				if(qso->item("QSO_COMPLETE") == "N" || qso->item("QSO_COMPLETE") == "?")
+					qso->item("QSO_COMPLETE", string("Y"));
 				qso->item("TIME_OFF", time);
 				return qso;
 			}

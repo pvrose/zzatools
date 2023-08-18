@@ -433,7 +433,12 @@ void qso_data::update_modem_qso(record* qso) {
 			action_deactivate();
 			// drop down
 		case QSO_INACTIVE:
-			action_add_modem(qso);
+			if (qso->item("QSO_COMPLETE") == "") {
+				// We can get multiple message when complete if TX5 decoded after log
+				action_update_modem(qso);
+			} else {
+				action_add_modem(qso);
+			}
 			break;
 
 		case QSO_MODEM:
@@ -1392,7 +1397,7 @@ void qso_data::action_update_modem(record* qso) {
 		book_->enable_save(true);
 	}
 	else {
-		if (qso->item("QSO_COMPLETE") == "") {
+		if (qso->item("QSO_COMPLETE") == "" && logging_state_ == QSO_MODEM) {
 			// The QSO is complete
 			action_save();
 			book_->enable_save(true);
