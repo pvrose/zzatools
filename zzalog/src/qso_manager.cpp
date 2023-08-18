@@ -22,7 +22,6 @@
 #include "alarm_dial.h"
 #include "qth_dialog.h"
 #include "utils.h"
-#include "qsl_viewer.h"
 #include "qrz_handler.h"
 #include "main_window.h"
 #include "adi_writer.h"

@@ -5,7 +5,6 @@
 #include "qso_query.h"
 #include "qso_buttons.h"
 #include "qso_net_entry.h"
-#include "qsl_viewer.h"
 #include "field_choice.h"
 #include "record_table.h"
 #include "book.h"
@@ -22,6 +21,7 @@
 #include <FL/Fl_Choice.H>
 #include <FL/Fl_Input_Choice.H>
 #include <FL/Fl_Output.H>
+#include <FL/Fl_Window.H>
 
 using namespace std;
 
@@ -148,8 +148,8 @@ public:
 	void action_cancel_edit();
 	// Navigate
 	void action_navigate(int target);
-	// Update QSL viewer
-	void action_view_qsl(bool force = false);
+	// // Update QSL viewer
+	// void action_view_qsl(bool force = false);
 	// Browse record
 	void action_browse();
 	// Action cancel browse
@@ -216,8 +216,6 @@ public:
 
 protected:
 	// Callbacks
-	// QSL Viewer closed
-	static void cb_qsl_viewer(Fl_Widget* w, void* v);
 
 	// Logging state
 	logging_state_t logging_state_;
@@ -263,8 +261,6 @@ protected:
 	qso_buttons* g_buttons_;
 	// Group for freq/power/mode
 	Fl_Group* grp_fpm_;
-	// QSL Viewer window
-	qsl_viewer* qsl_viewer_;
 
 
 };

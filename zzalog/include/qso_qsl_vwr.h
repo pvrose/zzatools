@@ -90,6 +90,7 @@ protected:
 	Fl_Window* win_full_view_;
 	// Button
 	Fl_Button* bn_full_view_;
+	Fl_Button* bn_no_image_;
 
 
 };

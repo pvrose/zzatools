@@ -1,6 +1,5 @@
 #include "qso_data.h"
 #include "qso_manager.h"
-#include "qsl_viewer.h"
 #include "qth_dialog.h"
 #include "settings.h"
 #include "rig_if.h"
@@ -45,9 +44,6 @@ qso_data::qso_data(int X, int Y, int W, int H, const char* l) :
 	, previous_mode_(QSO_NONE)
 {
 	load_values();
-	qsl_viewer_ = new qsl_viewer(10, 10);
-	qsl_viewer_->callback(cb_qsl_viewer);
-	qsl_viewer_->hide();
 }
 
 // Destructor
@@ -396,7 +392,7 @@ void qso_data::update_qso(qso_num_t log_num) {
 		g_peek_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
 		break;
 	}
-	action_view_qsl();
+	// action_view_qsl();
 }
 
 // Update query
@@ -490,12 +486,6 @@ void qso_data::update_modem_qso(record* qso) {
 		}
 	}
 	enable_widgets();
-}
-
-// Callback - QSL viewer "closing" - make it hide instead
-void qso_data::cb_qsl_viewer(Fl_Widget* w, void* v) {
-	qsl_viewer* qsl = (qsl_viewer*)w;
-	if (qsl->visible()) qsl->hide();
 }
 
 // Save the settings
@@ -883,28 +873,28 @@ void qso_data::action_navigate(int target) {
 		action_save_edit();
 		navigation_book_->navigate((navigate_t)target);
 		action_edit();
-		action_view_qsl();
+		// action_view_qsl();
 		break;
 	case QSO_VIEW:
 		// Save, navigate to new QSO and open editor
 		action_cancel_edit();
 		navigation_book_->navigate((navigate_t)target);
 		action_view();
-		action_view_qsl();
+		// action_view_qsl();
 		break;
 	case QSO_PENDING:
 		// Deactivate, navigate and go pending again
 		action_deactivate();
 		navigation_book_->navigate((navigate_t)target);
 		action_activate(previous_mode_);
-		action_view_qsl();
+		// action_view_qsl();
 		break;
 	case QSO_BROWSE:
 		// Close browser, navigate and reopen browser
 		action_cancel_browse();
 		navigation_book_->navigate((navigate_t)target);
 		action_browse();
-		action_view_qsl();
+		// action_view_qsl();
 		break;
 	case QUERY_MATCH:
 		// Navigate book to new compare record and reopen query
@@ -916,27 +906,27 @@ void qso_data::action_navigate(int target) {
 	enable_widgets();
 }
 
-// Action view qsl
-void qso_data::action_view_qsl(bool force) {
-	if (force || qsl_viewer_->visible()) {
-		record* qso = book_->get_record(book_->item_number(get_default_number()), false);
-		if (qso) {
-			char title[128];
-			snprintf(title, 128, "QSL Status: %s %s %s %s %s",
-				qso->item("CALL").c_str(),
-				qso->item("QSO_DATE").c_str(),
-				qso->item("TIME_ON").c_str(),
-				qso->item("BAND").c_str(),
-				qso->item("MODE", true, true).c_str());
-			qsl_viewer_->copy_label(title);
-			qsl_viewer_->set_qso(qso, current_number());
-			qsl_viewer_->show();
-			char msg[128];
-			snprintf(msg, 128, "DASH: %s", title);
-			status_->misc_status(ST_LOG, msg);
-		}
-	}
-}
+// // Action view qsl
+// void qso_data::action_view_qsl(bool force) {
+// 	if (force || qsl_viewer_->visible()) {
+// 		record* qso = book_->get_record(book_->item_number(get_default_number()), false);
+// 		if (qso) {
+// 			char title[128];
+// 			snprintf(title, 128, "QSL Status: %s %s %s %s %s",
+// 				qso->item("CALL").c_str(),
+// 				qso->item("QSO_DATE").c_str(),
+// 				qso->item("TIME_ON").c_str(),
+// 				qso->item("BAND").c_str(),
+// 				qso->item("MODE", true, true).c_str());
+// 			qsl_viewer_->copy_label(title);
+// 			qsl_viewer_->set_qso(qso, current_number());
+// 			qsl_viewer_->show();
+// 			char msg[128];
+// 			snprintf(msg, 128, "DASH: %s", title);
+// 			status_->misc_status(ST_LOG, msg);
+// 		}
+// 	}
+// }
 
 
 // Action browse

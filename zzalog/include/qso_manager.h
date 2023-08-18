@@ -11,7 +11,6 @@
 #include "intl_widgets.h"
 #include "alarm_dial.h"
 #include "field_choice.h"
-#include "qsl_viewer.h"
 #include "record_table.h"
 #include "book.h"
 

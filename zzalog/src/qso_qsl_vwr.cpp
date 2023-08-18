@@ -162,6 +162,14 @@ void qso_qsl_vwr::create_form() {
 	win_full_view_ = new Fl_Window(WCARD, HCARD);
 	bn_full_view_ = new Fl_Button(0, 0, WCARD, HCARD);
 	bn_full_view_->box(FL_FLAT_BOX);
+	// bn_full_view_->labelcolor(FL_RED);
+	// bn_full_view_->labelsize(FL_NORMAL_SIZE * 3);
+	// bn_full_view_->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE);
+	bn_no_image_ = new Fl_Button(0, 0, WCARD, HCARD);
+	bn_no_image_->box(FL_FLAT_BOX);
+	bn_no_image_->label("No image available!");
+	bn_no_image_->labelsize(FL_NORMAL_SIZE * 3);
+	bn_no_image_->labelcolor(FL_RED);
 	win_full_view_->resizable(bn_full_view_);
 	win_full_view_->end();
 	win_full_view_->hide();
@@ -228,6 +236,14 @@ void qso_qsl_vwr::enable_widgets() {
 	if (current_qso_ != nullptr) {
 		set_image();
 		set_qsl_status();
+		char title[128];
+		snprintf(title, 128, "QSL: %s %s %s %s %s",
+			current_qso_->item("CALL").c_str(),
+			current_qso_->item("QSO_DATE").c_str(),
+			current_qso_->item("TIME_ON").c_str(),
+			current_qso_->item("BAND").c_str(),
+			current_qso_->item("MODE", true, true).c_str());
+		win_full_view_->copy_label(title);
 	}
 	// Display the image choice buttons
 	set_image_buttons();
@@ -445,7 +461,12 @@ void qso_qsl_vwr::update_full_view() {
 	bn_full_view_->image(raw_image_);
 	bn_full_view_->deimage(raw_image_);
 	if (raw_image_) {
+		bn_full_view_->show();
+		bn_no_image_->hide();
 		win_full_view_->size(raw_image_->w(), raw_image_->h());
+	} else {
+		bn_full_view_->hide();
+		bn_no_image_->show();
 	}
 	win_full_view_->redraw();
 }
