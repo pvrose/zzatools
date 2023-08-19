@@ -1207,6 +1207,9 @@ void qso_data::action_update_modem(record* qso) {
 	}
 	else {
 		if (qso->item("QSO_COMPLETE") == "" && logging_state_ == QSO_MODEM) {
+			// Get power from rig
+			rig_if* rig = ((qso_manager*)parent())->rig();
+			qso->item("TX_PWR", rig->get_tx_power(true));
 			// The QSO is complete
 			action_save();
 			book_->enable_save(true);
