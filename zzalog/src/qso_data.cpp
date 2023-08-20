@@ -1390,6 +1390,12 @@ void qso_data::action_import_query() {
 	}
 }
 
+// Open QRZ.com page
+void qso_data::action_qrz_com() {
+	record* qso = current_qso();
+	qrz_handler_->open_web_page(qso->item("CALL"));
+}
+
 // Dummy QSO
 record* qso_data::dummy_qso() {
 	record* dummy = new record;

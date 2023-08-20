@@ -210,6 +210,8 @@ public:
 	void action_cancel_query();
 	// Import the query
 	void action_import_query();
+	// Opne QRZ.com browser
+	void action_qrz_com();
 
 	// Edit - saved logging state
 	logging_state_t edit_return_state_;

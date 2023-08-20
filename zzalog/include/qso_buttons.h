@@ -72,6 +72,7 @@ public:
 		CANCEL_QUERY,
 		IMPORT_QUERY,
 		CANCEL_VIEW,
+		QRZ_COM,
 	};
 
 
@@ -145,6 +146,8 @@ public:
 	static void cb_bn_import_query(Fl_Widget* w, void* v);
 	// View QSO
 	static void cb_bn_view_qso(Fl_Widget* w, void* v);
+	// Open QRZ.com
+	static void cb_bn_qrz_com(Fl_Widget* w, void* v);
 
 
 protected:
