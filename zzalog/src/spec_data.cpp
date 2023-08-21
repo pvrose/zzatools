@@ -606,11 +606,13 @@ void spec_data::delete_appdefs() {
 void spec_data::delete_user_data() {
 	// Delete macros
 	macros_.clear();
+	user_enums_.clear();
 	// Get original and current datasets
 	spec_dataset* original = dataset("Original Fields");
 	if (original != nullptr) {
 		spec_dataset* current = dataset("Fields");
 		for (auto it = original->data.begin(); it != original->data.end(); it++) {
+			delete current->data[(*it).first];
 			current->data[(*it).first] = (*it).second;
 		}
 	}

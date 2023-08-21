@@ -186,7 +186,6 @@ bool book::load_data(string filename)
 							else {
 								main_window_label(filename);
 							}
-							selection(size() - 1, HT_NEW_DATA, nullptr);
 							if (modified()) {
 								status_->file_status(FS_MODIFIED);
 							}
@@ -247,7 +246,6 @@ bool book::load_data(string filename)
 							else {
 								main_window_label(filename);
 							}
-							selection(size() - 1, HT_NEW_DATA);
 							if (modified()) {
 								status_->file_status(FS_MODIFIED);
 							}
@@ -662,6 +660,10 @@ void book::delete_contents(bool new_book) {
 	used_modes_.clear();
 	used_bands_.clear();
 	used_submodes_.clear();
+	used_rigs_.clear();
+	used_antennas_.clear();
+	used_callsigns_.clear();
+	used_qths_.clear();
 	bands_per_dxcc_.clear();
 	modes_per_dxcc_.clear();
 	if (new_book && book_type_ == OT_MAIN) {

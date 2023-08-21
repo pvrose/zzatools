@@ -274,6 +274,18 @@ void qso_entry::copy_qso_to_display(int flags) {
 			misc_->enable_widgets();
 		}
 	}
+	else {
+		// Clear all fields
+		for (int i = 0; i < NUMBER_TOTAL; i++) {
+			string field;
+			if (i < NUMBER_FIXED) field = fixed_names_[i];
+			else field = ch_field_[i]->value();
+			if (field.length()) {
+				ip_field_[i]->value("");
+			}
+		}
+		ip_notes_->value("");
+	}
 }
 
 // Copy from an existing record: fields depend on flags set
@@ -295,6 +307,9 @@ void qso_entry::copy_qso_to_qso(record* old_record, int flags) {
 				}
 			}
 		}
+	}
+	else {
+		qso_ = nullptr;
 	}
 	copy_qso_to_display(CF_ALL_FLAGS);
 }
