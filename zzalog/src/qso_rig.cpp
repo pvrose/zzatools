@@ -641,6 +641,7 @@ void qso_rig::cb_bn_select(Fl_Widget* w, void* v) {
 void qso_rig::switch_rig() {
 	if (rig_) {
 		delete rig_;
+		rig_ = nullptr;
 		rig_ = new rig_if(label(), &hamlib_data_);
 	}
 	ancestor_view<qso_manager>(this)->update_rig();
@@ -654,17 +655,19 @@ void qso_rig::switch_rig() {
 //RS_TX,               // The rig is connected and in TX mode
 //RS_HIGH              // The rig is in TX mode but SWR is too high
 void qso_rig::ticker() {
-	rig_->ticker();
-	// The rig may have disconnected - update connect/select buttons
-	enable_widgets();
-	// Update status with latest values from rig
-	string msg = rig_->rig_info();
-	rig_status_t st;
-	if (!rig_->is_open()) st = RS_OFF;
-	else if (!rig_->is_good()) st = RS_ERROR;
-	else if (!rig_->get_ptt()) st = RS_RX;
-	else st = RS_TX;
-	status_->rig_status(st, msg.c_str());
+	if (rig_) {
+		rig_->ticker();
+		// The rig may have disconnected - update connect/select buttons
+		enable_widgets();
+		// Update status with latest values from rig
+		string msg = rig_->rig_info();
+		rig_status_t st;
+		if (!rig_->is_open()) st = RS_OFF;
+		else if (!rig_->is_good()) st = RS_ERROR;
+		else if (!rig_->get_ptt()) st = RS_RX;
+		else st = RS_TX;
+		status_->rig_status(st, msg.c_str());
+	}
 }
 
 // New rig 

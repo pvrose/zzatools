@@ -146,7 +146,8 @@ void qso_tabbed_rigs::cb_tabs(Fl_Widget* w, void* v) {
 void qso_tabbed_rigs::ticker() {
 	if (!closing_) {
 		// Only send ticker to active rig
-		((qso_rig*)value())->ticker();
+		Fl_Widget* w = value();
+		((qso_rig*)w)->ticker();
 	}
 }
 
