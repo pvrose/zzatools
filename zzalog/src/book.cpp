@@ -289,14 +289,16 @@ bool book::load_data(string filename)
 					delete[] message;
 				}
 				set_session_start();
-				// Update spec_data
+				// Update spec_data_item_
 				for (auto mx = used_qths_.begin(); mx != used_qths_.end(); mx++) {
 					spec_data_->add_user_macro("APP_ZZA_QTH", (*mx).first, *((*mx).second));
 				}
-				tabbed_forms_->update_views(nullptr, HT_ALL, size() - 1);
+				current_item_ = size() - 1;
+				newest_item_ = size() - 1;
+				tabbed_forms_->update_views(nullptr, HT_ALL, current_item_);
 				// TODO: Review how to update spec_data that is dependent on read in values 
 				// do the following for now
-				tabbed_forms_->update_views(nullptr, HT_FORMAT, size() - 1);
+				tabbed_forms_->update_views(nullptr, HT_FORMAT, current_item_);
 			}
 			else { // filename.length() == 0 (File->New)
 				main_window_label("[No file loaded]");

@@ -557,7 +557,10 @@ void menu::cb_mi_navigate(Fl_Widget* w, void* v) {
 void menu::cb_mi_nav_date(Fl_Widget* w, void* v) {
 	menu* that = ancestor_view<menu>(w);
 	// Populate calendar with today's date
-	string date = now(false, "%Y%m%d");
+	record* qso = navigation_book_->get_record();
+	string date;
+	if (qso) date = qso->item("QSO_DATE");
+	else date = now(false, "%Y%m%d");
 	cal_cb_data_t cb_data(&date, nullptr);
 	calendar* cal = new calendar(Fl::event_x_root(), Fl::event_y_root());
 	cal->value(date.c_str());
