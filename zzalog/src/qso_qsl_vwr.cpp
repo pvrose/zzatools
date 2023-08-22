@@ -281,7 +281,6 @@ void qso_qsl_vwr::set_image() {
 				// Find the filename saved when card was downloaded - i.e. use same algorithm
 				strcpy(filename, eqsl_handler_->card_filename_l(current_qso_).c_str());
 				// Cards are downloaded from eQSL in PNG format
-				printf("Trying file %s\n", filename);
 				raw_image_ = new Fl_PNG_Image(filename);
 				if (raw_image_->fail()) {
 					delete raw_image_;
@@ -320,7 +319,6 @@ void qso_qsl_vwr::set_image() {
 					// Scanned-in paper card - could be any graphic format
 					for (int i = 0; i < num_types && !found_image; i++) {
 						full_name_ = string(filename) + file_types[i];
-						printf("Trying file %s\n", full_name_.c_str());
 						// Read files depending on file type
 						if (file_types[i] == ".jpg") {
 							raw_image_ = new Fl_JPEG_Image(full_name_.c_str());
@@ -345,7 +343,6 @@ void qso_qsl_vwr::set_image() {
 				}
 			}
 			if (found_image) {
-				printf("Found file %s\n", full_name_.c_str());
 				// Resize the image to fit the control
 				// Resize keeping original height/width ratio
 				float scale_w = (float)raw_image_->w() / (float)card_display_->w();

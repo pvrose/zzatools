@@ -779,90 +779,92 @@ void log_table::done_edit(bool keep_row) {
 		field_info_t field_info = fields_[edit_col_];
 		string old_text = record->item(field_info.field);
 		string text = edit_input_->value();
-		// Set the record item to the edit input value
-		record->item(field_info.field, text, true);
-		// Now implemnt book-specific actions
-		switch (my_book_->book_type()) {
-		case OT_MAIN:
-		case OT_EXTRACT:
-			// Set book is modified if a new record
-			if (!my_book_->modified_record() && !my_book_->new_record()) {
-				if (!my_book_->new_record()) {
-					my_book_->modified_record(true);
+		if (old_text != text) {
+			// Set the record item to the edit input value
+			record->item(field_info.field, text, true);
+			// Now implemnt book-specific actions
+			switch (my_book_->book_type()) {
+			case OT_MAIN:
+			case OT_EXTRACT:
+				// Set book is modified if a new record
+				if (!my_book_->modified_record() && !my_book_->new_record()) {
+					if (!my_book_->new_record()) {
+						my_book_->modified_record(true);
+					}
 				}
-			}
-			else {
-				// This book has now been modified. Redraw it and tell menu to update enabled menu items
+				else {
+					// This book has now been modified. Redraw it and tell menu to update enabled menu items
+					redraw();
+					book_->modified(true);
+					menu_->update_items();
+				}
+				// Update all views with the change - fields that change location are major changes that require DxAtlas to be redrawn, date/time the book to be reordered
+				if (field_info.field == "QSO_DATE" || field_info.field == "TIME_ON") {
+					// The book will tell all views
+					// the changed start time may cause the book to get reordered - move the edit point accordingly
+					item_num_t new_item_num = my_book_->item_number(book_->selection(my_book_->record_number(item_number), HT_START_CHANGED));
+					if (keep_row && my_book_->book_type() == OT_MAIN) {
+						switch (order_) {
+						case FIRST_TO_LAST:
+							edit_row_ = new_item_num;
+							break;
+						case LAST_TO_FIRST:
+							edit_row_ = my_book_->size() - 1 - new_item_num;
+							break;
+						default:
+							// Do not set edit_row_
+							break;
+						}
+					}
+				}
+				else if (field_info.field == "GRIDSQUARE" || field_info.field == "DXCC" || field_info.field == "STATE" || field_info.field == "APP_ZZA_PFX") {
+					// Location may have changed
+					book_->selection(my_book_->record_number(item_number), HT_CHANGED, this);
+				}
+				else {
+					// Minor change - not important for DxAtlas
+					book_->selection(my_book_->record_number(item_number), HT_MINOR_CHANGE, this);
+				}
+				if (field_info.field == "CALL") {
+					toolbar_->search_text(my_book_->record_number(item_number));
+				}
+	#ifdef _WIN32
+				// Set DX location in DX Atlas
+				if (my_book_->new_record()) {
+					if (field_info.field == "GRIDSQUARE") {
+						// WE have an actual gridsquare - read back from record to get in upper case
+						dxa_if_->set_dx_loc(record->item("GRIDSQUARE"), record->item("CALL"));
+					}
+					else if (field_info.field == "CALL") {
+						// Get the grid location of the prefix centre - only if 1 prefix matches the callsign.
+						lat_long_t location = cty_data_->location(record);
+						if (!isnan(location.latitude) && !isnan(location.longitude)) {
+							dxa_if_->set_dx_loc(latlong_to_grid(location, 6), record->item("CALL"));
+						}
+						else {
+							char message[100];
+							snprintf(message, 100, "LOG: Cannot locate %s", text.c_str());
+							status_->misc_status(ST_WARNING, message);
+						}
+					}
+				}
+	#endif
+				char message[200];
+				// Log the fact that a record has been interactively changed
+				snprintf(message, 200, "LOG: %s %s %s record changed %s from %s to %s",
+					record->item("QSO_DATE").c_str(),
+					record->item("TIME_ON").c_str(),
+					record->item("CALL").c_str(),
+					field_info.field.c_str(),
+					old_text.c_str(),
+					record->item(field_info.field).c_str());
+				status_->misc_status(ST_LOG, message);
+				break;
+			case OT_IMPORT:
+				// Otherwise just redraw this log
 				redraw();
-				book_->modified(true);
-				menu_->update_items();
+				break;
 			}
-			// Update all views with the change - fields that change location are major changes that require DxAtlas to be redrawn, date/time the book to be reordered
-			if (field_info.field == "QSO_DATE" || field_info.field == "TIME_ON") {
-				// The book will tell all views
-				// the changed start time may cause the book to get reordered - move the edit point accordingly
-				item_num_t new_item_num = my_book_->item_number(book_->selection(my_book_->record_number(item_number), HT_START_CHANGED));
-				if (keep_row && my_book_->book_type() == OT_MAIN) {
-					switch (order_) {
-					case FIRST_TO_LAST:
-						edit_row_ = new_item_num;
-						break;
-					case LAST_TO_FIRST:
-						edit_row_ = my_book_->size() - 1 - new_item_num;
-						break;
-					default:
-						// Do not set edit_row_
-						break;
-					}
-				}
-			}
-			else if (field_info.field == "GRIDSQUARE" || field_info.field == "DXCC" || field_info.field == "STATE" || field_info.field == "APP_ZZA_PFX") {
-				// Location may have changed
-				book_->selection(my_book_->record_number(item_number), HT_CHANGED, this);
-			}
-			else {
-				// Minor change - not important for DxAtlas
-				book_->selection(my_book_->record_number(item_number), HT_MINOR_CHANGE, this);
-			}
-			if (field_info.field == "CALL") {
-				toolbar_->search_text(my_book_->record_number(item_number));
-			}
-#ifdef _WIN32
-			// Set DX location in DX Atlas
-			if (my_book_->new_record()) {
-				if (field_info.field == "GRIDSQUARE") {
-					// WE have an actual gridsquare - read back from record to get in upper case
-					dxa_if_->set_dx_loc(record->item("GRIDSQUARE"), record->item("CALL"));
-				}
-				else if (field_info.field == "CALL") {
-					// Get the grid location of the prefix centre - only if 1 prefix matches the callsign.
-					lat_long_t location = cty_data_->location(record);
-					if (!isnan(location.latitude) && !isnan(location.longitude)) {
-						dxa_if_->set_dx_loc(latlong_to_grid(location, 6), record->item("CALL"));
-					}
-					else {
-						char message[100];
-						snprintf(message, 100, "LOG: Cannot locate %s", text.c_str());
-						status_->misc_status(ST_WARNING, message);
-					}
-				}
-			}
-#endif
-			char message[200];
-			// Log the fact that a record has been interactively changed
-			snprintf(message, 200, "LOG: %s %s %s record changed %s from %s to %s",
-				record->item("QSO_DATE").c_str(),
-				record->item("TIME_ON").c_str(),
-				record->item("CALL").c_str(),
-				field_info.field.c_str(),
-				old_text.c_str(),
-				record->item(field_info.field).c_str());
-			status_->misc_status(ST_LOG, message);
-			break;
-		case OT_IMPORT:
-			// Otherwise just redraw this log
-			redraw();
-			break;
 		}
 		// Make these invivible as done with them
 		edit_input_->hide();
