@@ -268,73 +268,84 @@ void qso_qsl_vwr::set_image() {
 				call[pos] = '_';
 				pos = call.find('/', pos + 1);
 			}
-			// Select the image type: eQSL or scanned in card (front or back)
-			switch (selected_image_) {
-			case QI_EQSL:
-				// Card image downloaded from eQSL
-				// Find the filename saved when card was downloaded - i.e. use same algorithm
-				strcpy(filename, eqsl_handler_->card_filename_l(current_qso_).c_str());
-				break;
-			case QI_CARD_FRONT:
-				// Card image of a scanned-in paper QSL card (front - i.e. callsign side)
-				// File name e.g.= <root>\scans\<received date>\PA_GM3ZZA_P__<QSO date>.png
-				sprintf(filename, "%s/scans/%s/%s__%s",
-					qsl_directory_.c_str(),
-					current_qso_->item("QSLRDATE").c_str(),
-					call.c_str(),
-					current_qso_->item("QSO_DATE").c_str());
-				break;
-			case QI_CARD_BACK:
-				// Card image of a scanned-in paper QSL card (back - i.e. QSO details side)
-				// File name e.g.= <root>\scans\<received date>\PA_GM3ZZA_P++<QSO date>.png
-				sprintf(filename, "%s/scans/%s/%s++%s",
-					qsl_directory_.c_str(),
-					current_qso_->item("QSLRDATE").c_str(),
-					call.c_str(),
-					current_qso_->item("QSO_DATE").c_str());
-				break;
-			}
 			// Look for a possible image file and try and load into the image object
 			bool found_image = false;
 			delete raw_image_;
 			raw_image_ = nullptr;
 			delete scaled_image_;
 			scaled_image_ = nullptr;
-			// For each of coded image file types
-			if (selected_image_ == QI_EQSL) {
+			// Select the image type: eQSL or scanned in card (front or back)
+			switch (selected_image_) {
+			case QI_EQSL:
+				// Card image downloaded from eQSL
+				// Find the filename saved when card was downloaded - i.e. use same algorithm
+				strcpy(filename, eqsl_handler_->card_filename_l(current_qso_).c_str());
 				// Cards are downloaded from eQSL in PNG format
+				printf("Trying file %s\n", filename);
 				raw_image_ = new Fl_PNG_Image(filename);
 				if (raw_image_->fail()) {
 					delete raw_image_;
 					raw_image_ = nullptr;
 				}
-			}
-			else {
-				// Scanned-in paper card - could be any graphic format
-				for (int i = 0; i < num_types && !found_image; i++) {
-					full_name_ = string(filename) + file_types[i];
-					// Read files depending on file type
-					if (file_types[i] == ".jpg") {
-						raw_image_ = new Fl_JPEG_Image(full_name_.c_str());
+				else {
+					full_name_ = string(filename);
+					found_image = true;
+				}
+				break;
+			case QI_CARD_FRONT:
+			case QI_CARD_BACK:
+				for (int ix = 0; ix < 2 && !found_image; ix++) {
+					if (ix == 0) call = to_upper(call);
+					else call = to_lower(call);
+					switch (selected_image_) {
+					case QI_CARD_FRONT:
+						// Card image of a scanned-in paper QSL card (front - i.e. callsign side)
+						// File name e.g.= <root>\scans\<received date>\PA_GM3ZZA_P__<QSO date>.png
+						sprintf(filename, "%s/scans/%s/%s__%s",
+							qsl_directory_.c_str(),
+							current_qso_->item("QSLRDATE").c_str(),
+							call.c_str(),
+							current_qso_->item("QSO_DATE").c_str());
+						break;
+					case QI_CARD_BACK:
+						// Card image of a scanned-in paper QSL card (back - i.e. QSO details side)
+						// File name e.g.= <root>\scans\<received date>\PA_GM3ZZA_P++<QSO date>.png
+						sprintf(filename, "%s/scans/%s/%s++%s",
+							qsl_directory_.c_str(),
+							current_qso_->item("QSLRDATE").c_str(),
+							call.c_str(),
+							current_qso_->item("QSO_DATE").c_str());
+						break;
 					}
-					else if (file_types[i] == ".png") {
-						raw_image_ = new Fl_PNG_Image(full_name_.c_str());
-					}
-					else if (file_types[i] == ".bmp") {
-						raw_image_ = new Fl_BMP_Image(full_name_.c_str());
-					}
-					else {
-						raw_image_ = nullptr;
-					}
-					if (raw_image_ && raw_image_->fail()) {
-						delete raw_image_;
-						raw_image_ = nullptr;
+					// Scanned-in paper card - could be any graphic format
+					for (int i = 0; i < num_types && !found_image; i++) {
+						full_name_ = string(filename) + file_types[i];
+						printf("Trying file %s\n", full_name_.c_str());
+						// Read files depending on file type
+						if (file_types[i] == ".jpg") {
+							raw_image_ = new Fl_JPEG_Image(full_name_.c_str());
+						}
+						else if (file_types[i] == ".png") {
+							raw_image_ = new Fl_PNG_Image(full_name_.c_str());
+						}
+						else if (file_types[i] == ".bmp") {
+							raw_image_ = new Fl_BMP_Image(full_name_.c_str());
+						}
+						else {
+							raw_image_ = nullptr;
+						}
+						if (raw_image_ && raw_image_->fail()) {
+							delete raw_image_;
+							raw_image_ = nullptr;
+						}
+						if (raw_image_) {
+							found_image = true;
+						}
 					}
 				}
 			}
-
-			if (raw_image_) {
-				found_image = true;
+			if (found_image) {
+				printf("Found file %s\n", full_name_.c_str());
 				// Resize the image to fit the control
 				// Resize keeping original height/width ratio
 				float scale_w = (float)raw_image_->w() / (float)card_display_->w();
