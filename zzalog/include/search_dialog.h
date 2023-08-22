@@ -33,6 +33,10 @@ using namespace std;
 		static void cb_bn_ok(Fl_Widget* w, void* v);
 		// Cancel button clicked
 		static void cb_bn_cancel(Fl_Widget* w, void* v);
+		// One of the condition buttons
+		static void cb_bn_condx(Fl_Widget* w, void* v);
+		// The field name choice
+		static void cb_ch_field(Fl_Widget* w, void* v);
 
 
 	protected:
@@ -40,6 +44,8 @@ using namespace std;
 		void load_values();
 		// Save criteria in settings
 		void save_values();
+		// Enable widgets
+		void enable_widgets();
 
 		// The current criteria
 		search_criteria_t* criteria_;
@@ -90,5 +96,8 @@ using namespace std;
 		};
 		// Fail display widget
 		Fl_Widget* fail_box_;
+		// Field definitions widget
+		Fl_Widget* field_name_;
+		Fl_Widget* search_text_;
 	};
 #endif

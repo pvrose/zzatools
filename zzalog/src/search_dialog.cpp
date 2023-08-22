@@ -148,7 +148,7 @@ search_dialog::search_dialog() :
 		bn11->copy_tooltip(temp);
 		delete[] temp;
 		condition_params_[i].attribute = (int*)&criteria_->condition;
-		bn11->callback(cb_radio, (void*)&condition_params_[i]);
+		bn11->callback(cb_bn_condx, (void*)&condition_params_[i]);
 		bn11->when(FL_WHEN_RELEASE);
 	}
 	// Choice - Field-name choice
@@ -157,6 +157,7 @@ search_dialog::search_dialog() :
 	ch12->tooltip("Select field to search on");
 	ch12->callback(cb_value<field_choice, string>, (void*)&criteria_->field_name);
 	ch12->when(FL_WHEN_RELEASE);
+	field_name_ = ch12;
 	gp1a->end();
 	
 	Fl_Group* gp1b = new Fl_Group(XG, R14, WG1, HG1B);
@@ -181,13 +182,14 @@ search_dialog::search_dialog() :
 	}
 	gp1b->end();
 	// Input - text to match
-	intl_input* ip14 = new intl_input(C11, R15
+	field_input* ip14 = new field_input(C11, R15
 		, WEDIT, HTEXT, "Search text");
 	ip14->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
-	ip14->callback(cb_value<intl_input, string>, (void*)&criteria_->pattern);
+	ip14->callback(cb_ch_field, (void*)&criteria_->pattern);
 	ip14->when(FL_WHEN_CHANGED);
 	ip14->value(criteria_->pattern.c_str());
 	ip14->tooltip("The expression to match records against");
+	search_text_ = ip14;
 
 	gp1->end();
 
@@ -384,6 +386,8 @@ search_dialog::search_dialog() :
 	end();
 	// Window close button - acts as Cancel
 	callback(cb_bn_cancel);
+
+	enable_widgets();
 }
 
 // Destructor
@@ -513,4 +517,29 @@ void search_dialog::cb_bn_cancel(Fl_Widget* w, void* v) {
 	search_dialog* that = ancestor_view<search_dialog>(w);
 	// Closes the dialog - returns FAIL
 	that->do_button(BN_CANCEL);
+}
+
+// call back condition button
+void search_dialog::cb_bn_condx(Fl_Widget* w, void* v) {
+	search_dialog* that = ancestor_view<search_dialog>(w);
+	cb_radio(w, v);
+	that->enable_widgets();
+}
+
+// Field name choice
+void search_dialog::cb_ch_field(Fl_Widget* w, void* v) {
+	search_dialog* that = ancestor_view<search_dialog>(w);
+	cb_value<field_input, string>(w, v);
+	that->enable_widgets();
+}
+
+// Enable widgets
+void search_dialog::enable_widgets() {
+	if (criteria_->condition == XC_FIELD) {
+		field_name_->activate();
+		((field_input*)search_text_)->field_name(criteria_->field_name.c_str());
+	} else {
+		field_name_->deactivate();
+		((field_input*)search_text_)->field_name("");
+	}
 }
