@@ -225,14 +225,6 @@ void status::update_progress(object_t object) {
 		// Set range (0:max_value)
 		progress_->minimum(0.0);
 		progress_->maximum((float)item->max_value);
-		if (item->value == 0 || item->value == item->max_value ||
-			(item->value - item->prev_value) > (item->max_value / 100)) {
-			// redraw and allow scheduler to effect the redrawing if value has gone up by > 1% or is at start or finish
-			// Without the below we don't see the progress bar move
-			redraw();
-			Fl::check();
-			item->prev_value = item->value;
-		}
 	}
 }
 
@@ -289,10 +281,15 @@ void status::progress(const char* message, object_t object) {
 			}
 			if (message) {
 				progress_->copy_label(message);
-				progress_->redraw();
 			}
 		}
 	}
+}
+
+// 1 second ticker - redraw progress bar
+void status::ticker() {
+	// Redraw progress bar
+	progress_->redraw();
 }
 
 // Update rig_status - set text and colour

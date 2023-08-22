@@ -214,6 +214,8 @@ using namespace std;
 		// Debug display
 		void display_debug(bool value);
 		bool display_debug();
+		// One second ticker
+		void ticker();
 
 		// Callbacks
 		// Rig button callback

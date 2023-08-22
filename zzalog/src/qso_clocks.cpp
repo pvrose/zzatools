@@ -1,12 +1,14 @@
 #include "qso_clocks.h"
 #include "qso_manager.h"
 #include "utils.h"
+#include "status.h"
 
 #include <algorithm>
 
 using namespace std;
 
 const double UTC_TIMER = 1.0;
+extern status* status_;
 extern bool closing_;
 
 qso_clocks::qso_clocks(int X, int Y, int W, int H, const char* L) :
@@ -64,8 +66,8 @@ void qso_clocks::cb_ticker(void* v) {
 	if (!closing_) {
 		qso_clocks* that = (qso_clocks*)v;
 		that->enable_widgets();
-		qso_manager* mgr = ancestor_view<qso_manager>(that);
 		((qso_manager*)that->parent())->ticker();
+		status_->ticker();
 
 		Fl::repeat_timeout(UTC_TIMER, cb_ticker, v);
 	}
