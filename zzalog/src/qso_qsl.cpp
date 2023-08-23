@@ -163,7 +163,7 @@ void qso_qsl::create_form() {
 	//bn_down_eqsl_->tooltip("Download latest records from eQSL");
 	// Extract
 	bn_extr_card_ = new Fl_Button(C4, curr_y, W4, HBUTTON, "@search");
-	bn_extr_card_->callback(cb_extract, (void*)extract_data::EQSL);
+	bn_extr_card_->callback(cb_extract, (void*)extract_data::CARD);
 	bn_extr_card_->tooltip("Extract records for printing labels");
 	// print
 	bn_print_ = new Fl_Button(C5, curr_y, W5, HBUTTON, "@fileprint");
@@ -202,8 +202,14 @@ void qso_qsl::enable_widgets() {
 	else bn_upld_lotw_->deactivate();
 	if (extract_records_->size() && extract_records_->use_mode() == extract_data::CLUBLOG) bn_upld_club_->activate();
 	else bn_upld_club_->deactivate();
-	if (extract_records_->size()) bn_print_->deactivate();
-	else bn_print_->activate();
+	if (extract_records_->size() && extract_records_->use_mode() == extract_data::CARD) {
+		bn_print_->activate();
+		bn_mark_done_->activate();
+	}
+	else { 
+		bn_print_->deactivate();
+		bn_mark_done_->deactivate();
+	}
 }
 
 // callbacks
