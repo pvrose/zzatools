@@ -582,7 +582,7 @@ string degrees_to_dms(float value, bool is_latitude) {
 	num_minutes = num_minutes % 60;
 	// Now format the text 
 	char temp[20]; // I count 11 but add a bit
-	snprintf(temp, 20, "%d°%d'%.1f\"%c", num_degrees, num_minutes, num_seconds, value < 0 ? (is_latitude ? 'S' : 'W') : (is_latitude ? 'N' : 'E'));
+	snprintf(temp, 20, u8"%d°%d'%.1f\"%c", num_degrees, num_minutes, num_seconds, value < 0 ? (is_latitude ? 'S' : 'W') : (is_latitude ? 'N' : 'E'));
 	text = temp;
 	return text;
 }

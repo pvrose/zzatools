@@ -300,7 +300,7 @@ void dxa_if::create_form() {
 	ch13->add("DX Location");
 	ch13->add("Selected QSO");
 	ch13->add("In group");
-	ch13->add("At 0°N 0°E");
+	ch13->add(u8"At 0°N 0°E");
 	// centre_t = DUMMY is used for the sub-menu created by the below
 	ch13->add("Continent/Europe");
 	ch13->add("Continent/Asia");
@@ -944,24 +944,24 @@ void dxa_if::home_location() {
 	// Add uncertainty
 	switch (locator_.length()) {
 	case 0:
-		home_lat_dms_ += " ±90°";
-		home_long_dms_ += " ±180°";
+		home_lat_dms_ += u8" ±90°";
+		home_long_dms_ += u8" ±180°";
 		break;
 	case 2:
-		home_lat_dms_ += " ±5°";
-		home_long_dms_ += " ±10°";
+		home_lat_dms_ += u8" ±5°";
+		home_long_dms_ += u8" ±10°";
 		break;
 	case 4:
-		home_lat_dms_ += " ±30'";
-		home_long_dms_ += " ±1°";
+		home_lat_dms_ += u8" ±30'";
+		home_long_dms_ += u8" ±1°";
 		break;
 	case 6:
-		home_lat_dms_ += " ±1'15\"";
-		home_long_dms_ += " ±2'30\"";
+		home_lat_dms_ += u8" ±1'15\"";
+		home_long_dms_ += u8" ±2'30\"";
 		break;
 	case 8:
-		home_lat_dms_ += " ±7.5\"";
-		home_long_dms_ += " ±15\"";
+		home_lat_dms_ += u8" ±7.5\"";
+		home_long_dms_ += u8" ±15\"";
 		break;
 	case 10:
 		home_lat_dms_ += " ±0.3125\"";
