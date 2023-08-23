@@ -1129,8 +1129,8 @@ void book::add_use_data(record* use_record) {
 		string mode = use_record->item("MODE");
 		if (mode.length()) {
 			used_modes_.insert(mode);
-			modes_per_dxcc_[call][dxcc].insert(band);
-			modes_per_dxcc_[""][dxcc].insert(band);
+			modes_per_dxcc_[call][dxcc].insert(mode);
+			modes_per_dxcc_[""][dxcc].insert(mode);
 		}
 		string submode = use_record->item("SUBMODE");
 		if (!submode.length()) {

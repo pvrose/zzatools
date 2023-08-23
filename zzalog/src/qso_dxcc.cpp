@@ -106,7 +106,7 @@ void qso_dxcc::enable_widgets() {
 			op_source_->color(FL_BACKGROUND_COLOR);
 			break;
 		}
-		snprintf(text, sizeof(text), "CQ Zone %d. %.0f°%c %.0f°%c",
+		snprintf(text, sizeof(text), "CQ Zone %d. %.0fï¿½%c %.0fï¿½%c",
 			cq_zone_, abs(location_.latitude), location_.latitude > 0 ? 'N' : 'S',
 			abs(location_.longitude), location_.longitude > 0 ? 'E' : 'W');
 		op_geo_->value(text);
@@ -139,105 +139,11 @@ void qso_dxcc::set_data() {
 
 }
 
-//void qso_dxcc::cb_tree(Fl_Widget* w, void* v) {
-//	qso_dxcc* that = ancestor_view<qso_dxcc>(w);
-//	tree* that_tree = (tree*)w;
-//	Fl_Tree_Item* item = that_tree->callback_item();
-//	prefix* pfx = (prefix*)item->user_data();
-//	qso_entry* qe = ancestor_view<qso_entry>(that);
-//	record* qso = qe->qso();
-//	if (qso) {
-//		qso->item("DXCC", pfx->dxcc_code_);
-//		qso->item("STATE", pfx->state_);
-//		qso->item("APP_ZZA_PFX", pfx->nickname_);
-//	}
-//	qe->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
-//}
-
 // QRZ.com button clicked
 void qso_dxcc::cb_bn_qrz(Fl_Widget* w, void* v) {
 	qso_dxcc* that = ancestor_view<qso_dxcc>(w);
 	menu::cb_mi_info_qrz(w, (void*)&that->callsign_);
 }
-
-//qso_dxcc::source_t qso_dxcc::source() {
-//	return source_;
-//}
-//
-//qso_dxcc::tree::tree(int X, int Y, int W, int H, const char* L) :
-//	Fl_Tree(X, Y, W, H, L),
-//	prefixes_(nullptr)
-//{
-//	clear();
-//}
-//
-//qso_dxcc::tree::~tree() {}
-//
-//// Draw the tree bottom up
-//void qso_dxcc::tree::enable_widgets() {
-//	// Define the root item
-//	Fl_Tree_Item* root_item = new Fl_Tree_Item(this);
-//	root(root_item);
-//	root_item->labelfont(item_labelfont() | FL_BOLD);
-//	root_item->labelcolor(FL_BLACK);
-//	char root_label[128];
-//	source_t source = ancestor_view<qso_dxcc>(this)->source();
-//	switch (source) {
-//	case EXCEPTION:
-//		strcpy(root_label, "Found in exception file.");
-//		break;
-//	case PREFIX_LIST:
-//		snprintf(root_label, sizeof(root_label), "%d Prefixes found.", prefixes_->size());
-//		break;
-//	case RECORD_DXCC:
-//		strcpy(root_label, "'DXCC' field in QSO.");
-//		break;
-//	case RECORD_PFX:
-//		strcpy(root_label, "'APP_ZZA_PFX' field in QSO.");
-//		break;
-//	}
-//	root_item->label(root_label);
-//	if (prefixes_) {
-//		for (auto it = prefixes_->begin(); it != prefixes_->end(); it++) {
-//			// Reuse code in pfx_tree
-//			Fl_Tree_Item* item = hang_item(*it);
-//		}
-//	}
-//}
-//
-//void qso_dxcc::tree::set_data(vector<prefix*>* data) {
-//	prefixes_ = data;
-//}
-//
-//// Hang the item on the tree where it should go
-//Fl_Tree_Item* qso_dxcc::tree::hang_item(prefix* pfx) {
-//	// Existing item or created one
-//	Fl_Tree_Item* item;
-//	// Label for the item
-//	char text[128];
-//	snprintf(text, sizeof(text), "%s: %s",
-//		pfx->nickname_.c_str(),
-//		pfx->name_.c_str());
-//	// Find where to hang it
-//	prefix* parent = pfx->parent_;
-//	if (parent) {
-//		Fl_Tree_Item* hang_pt = hang_item(parent);
-//		item = hang_pt->find_child_item(text);
-//		if (item == nullptr) {
-//			item = hang_pt->add(prefs(), text);
-//			item->user_data(pfx);
-//		} 
-//	}
-//	else {
-//		item = find_item(text);
-//		if (item == nullptr) {
-//			item = add(text);
-//			item->user_data(pfx);
-//			item->labelfont(FL_BOLD);
-//		}
-//	}
-//	return item;
-//}
 
 // The "worked before" lights
 qso_dxcc::wb4_buttons::wb4_buttons(int X, int Y, int W, int H, const char* L) :
@@ -310,6 +216,9 @@ void qso_dxcc::wb4_buttons::enable_widgets() {
 		if (qso_mode.length()) all_modes_->insert(qso_mode);
 		dxcc_bands_ = book_->used_bands(dxcc, my_call);
 		dxcc_modes_ = book_->used_submodes(dxcc, my_call);
+		char l[128];
+		snprintf(l, sizeof(l), "DXCC worked before as %s", my_call.c_str());
+		copy_label(l);
 	}
 	// Create all the buttons
 	create_form();
