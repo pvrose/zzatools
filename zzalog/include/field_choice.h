@@ -72,6 +72,8 @@ using namespace std;
 
 		void reload_choice(record* qso = nullptr);
 
+		virtual void type(uchar t);
+
 	protected:
 
 		// Populate the choice

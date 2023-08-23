@@ -161,6 +161,7 @@ void qso_entry::enable_widgets() {
 				if (ix < number_locked_ + NUMBER_FIXED) ch_field_[ix]->deactivate();
 				else ch_field_[ix]->activate();
 			ip_field_[ix]->activate();
+			ip_field_[ix]->type(FL_NORMAL_INPUT);
 		}
 		for (int ix = number_fields_in_use_ + 1; ix < NUMBER_TOTAL; ix++) {
 			ch_field_[ix]->deactivate();
@@ -173,6 +174,21 @@ void qso_entry::enable_widgets() {
 	case qso_data::QSO_STARTED:
 	case qso_data::NET_STARTED:
 	case qso_data::QSO_MODEM:
+		for (int ix = 0; ix <= number_fields_in_use_ && ix < NUMBER_TOTAL; ix++) {
+			if (ch_field_[ix])
+				if (ix < number_locked_ + NUMBER_FIXED) ch_field_[ix]->deactivate();
+				else ch_field_[ix]->activate();
+			ip_field_[ix]->activate();
+			ip_field_[ix]->type(FL_NORMAL_INPUT);
+		}
+		for (int ix = number_fields_in_use_ + 1; ix < NUMBER_TOTAL; ix++) {
+			ch_field_[ix]->deactivate();
+			ip_field_[ix]->deactivate();
+		}
+		ip_notes_->activate();
+		misc_->activate();
+		misc_->enable_widgets();
+		break;
 	case qso_data::QSO_VIEW:
 	case qso_data::QSO_PEEK:
 	case qso_data::QSO_PEEK_ED:
@@ -181,6 +197,7 @@ void qso_entry::enable_widgets() {
 				if (ix < number_locked_ + NUMBER_FIXED) ch_field_[ix]->deactivate();
 				else ch_field_[ix]->activate();
 			ip_field_[ix]->activate();
+			ip_field_[ix]->type(FL_NORMAL_OUTPUT);
 		}
 		for (int ix = number_fields_in_use_ + 1; ix < NUMBER_TOTAL; ix++) {
 			ch_field_[ix]->deactivate();
@@ -196,6 +213,7 @@ void qso_entry::enable_widgets() {
 				if (ix < number_locked_ + NUMBER_FIXED) ch_field_[ix]->deactivate();
 				else ch_field_[ix]->activate();
 			ip_field_[ix]->activate();
+			ip_field_[ix]->type(FL_NORMAL_INPUT);
 		}
 		for (int ix = number_fields_in_use_ + 1; ix < NUMBER_TOTAL; ix++) {
 			ch_field_[ix]->deactivate();
@@ -209,6 +227,7 @@ void qso_entry::enable_widgets() {
 		for (int ix = 0; ix <= number_fields_in_use_ && ix < NUMBER_TOTAL; ix++) {
 			if (ch_field_[ix]) ch_field_[ix]->activate();
 			ip_field_[ix]->activate();
+			ip_field_[ix]->type(FL_NORMAL_INPUT);
 		}
 		for (int ix = number_fields_in_use_ + 1; ix < NUMBER_TOTAL; ix++) {
 			ch_field_[ix]->deactivate();

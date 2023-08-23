@@ -103,6 +103,7 @@ field_input::field_input(int X, int Y, int W, int H, const char* label) :
 	, field_name_("")
 
 {
+	type(FL_NORMAL_INPUT);
 }
 
 field_input::~field_input() {
@@ -318,4 +319,18 @@ field_input::exit_reason_t field_input::reason() {
 	exit_reason_t result = reason_;
 	reason_ = IR_NULL;
 	return result;
+}
+
+// Type
+void field_input::type(uchar t) {
+	switch(t) {
+	case FL_NORMAL_INPUT:
+		input()->type(FL_NORMAL_INPUT);
+		menubutton()->activate();
+		break;
+	case FL_NORMAL_OUTPUT:
+		input()->type(FL_NORMAL_OUTPUT);
+		menubutton()->deactivate();
+		break;
+	}
 }
