@@ -71,7 +71,7 @@ using namespace std;
 
 
 // Program strings
-string COPYRIGHT = "� Philip Rose GM3ZZA 2018. All rights reserved.\nPrefix data courtesy of clublog.org";
+string COPYRIGHT = u8"© Philip Rose GM3ZZA 2018. All rights reserved.\nPrefix data courtesy of clublog.org";
 string PROGRAM_ID = "ZZALOG";
 string PROG_ID = "ZLG";
 string VERSION = "3.4.40";

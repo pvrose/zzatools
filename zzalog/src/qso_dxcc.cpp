@@ -106,7 +106,7 @@ void qso_dxcc::enable_widgets() {
 			op_source_->color(FL_BACKGROUND_COLOR);
 			break;
 		}
-		snprintf(text, sizeof(text), "CQ Zone %d. %.0f°%c %.0f°%c",
+		snprintf(text, sizeof(text), u8"CQ Zone %d. %.0f°%c %.0f°%c",
 			cq_zone_, abs(location_.latitude), location_.latitude > 0 ? 'N' : 'S',
 			abs(location_.longitude), location_.longitude > 0 ? 'E' : 'W');
 		op_geo_->value(text);
