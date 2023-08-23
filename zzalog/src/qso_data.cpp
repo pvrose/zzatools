@@ -1257,6 +1257,7 @@ void qso_data::action_peek(qso_num_t number) {
 	case NET_ADDING:
 	case SWITCHING:
 	case QSO_MODEM:
+	case QSO_VIEW:
 		interrupted_state_ = logging_state_;
 		logging_state_ = QSO_PEEK;
 		break;
