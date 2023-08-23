@@ -54,8 +54,15 @@ void qso_log_info::create_form(int X, int Y) {
 	bn_save_enable_->tooltip("Enable/Disable save");
 	bn_save_enable_->callback(cb_bn_enable);
 	bn_save_enable_->value(true);
-
 	curr_y += bn_save_enable_->h() + GAP;
+
+	bn_save_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Save!");
+	bn_save_->align(FL_ALIGN_CENTER);
+	bn_save_->tooltip("Force save now");
+	bn_save_->callback(cb_bn_save);
+	
+	curr_y += bn_save_->h() + GAP;
+
 	curr_x += bn_save_enable_->w() + GAP;
 
 	max_x = max(max_x, curr_x);
@@ -73,26 +80,31 @@ void qso_log_info::enable_widgets() {
 		op_status_->value("No Data");
 		pr_loadsave_->color(FL_BACKGROUND_COLOR, FL_BACKGROUND_COLOR);
 		pr_loadsave_->value(0.0);
+		bn_save_->deactivate();
 	}
 	else if (book_->storing()) {
 		op_status_->value("Storing");
 		pr_loadsave_->color(FL_GREEN, FL_RED);
 		pr_loadsave_->value(1.0F - (float)book_->get_complete());
+		bn_save_->deactivate();
 	}
 	else if (book_->loading()) {
 		op_status_->value("Loading");
 		pr_loadsave_->color(FL_BACKGROUND_COLOR, FL_GREEN);
 		pr_loadsave_->value((float)book_->get_complete());
+		bn_save_->deactivate();
 	} else {
 		if (book_->modified()) {
 			op_status_->value("Modified");
 			pr_loadsave_->color(FL_RED, FL_RED);
 			pr_loadsave_->value(0.0);
+			bn_save_->activate();
 		}
 		else {
 			op_status_->value("Unmodified");
 			pr_loadsave_->color(FL_GREEN, FL_GREEN);
 			pr_loadsave_->value(0.0);
+			bn_save_->deactivate();
 		}
 		if (book_->enable_save()) {
 			bn_save_enable_->value(true);
@@ -124,4 +136,9 @@ void qso_log_info::cb_bn_enable(Fl_Widget* w, void* v) {
 		while (!book_->enable_save()) book_->enable_save(true);
 	}
 	that->enable_widgets();
+}
+
+// Callback to force save
+void qso_log_info::cb_bn_save(Fl_Widget* w, void* v) {
+	book_->store_data();
 }

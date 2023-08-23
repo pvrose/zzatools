@@ -14,6 +14,8 @@ public:
 
     void enable_widgets();
     void stop_ticker();
+ 
+    static unsigned int tick_count_;
 
 protected:
     static void cb_ticker(void* v);
@@ -21,5 +23,6 @@ protected:
  
     qso_clock* utc_clock_;
     qso_clock* local_clock_;
+
 };
 

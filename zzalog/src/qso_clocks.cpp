@@ -7,7 +7,9 @@
 
 using namespace std;
 
-const double UTC_TIMER = 1.0;
+// basic tick is 200 ms 
+const double BASIC_TICK = 0.1;
+unsigned int qso_clocks::tick_count_ = 0;
 extern status* status_;
 extern bool closing_;
 
@@ -18,7 +20,7 @@ qso_clocks::qso_clocks(int X, int Y, int W, int H, const char* L) :
 	create_form();
 	callback(cb_tabs);
     enable_widgets();
-	Fl::add_timeout(UTC_TIMER, cb_ticker, this);
+	Fl::add_timeout(0, cb_ticker, this);
 }
 
 qso_clocks::~qso_clocks() {
@@ -65,11 +67,14 @@ void qso_clocks::enable_widgets() {
 void qso_clocks::cb_ticker(void* v) {
 	if (!closing_) {
 		qso_clocks* that = (qso_clocks*)v;
-		that->enable_widgets();
-		((qso_manager*)that->parent())->ticker();
+		tick_count_++;
+		if (tick_count_ % 10 == 0) {
+			that->enable_widgets();
+			((qso_manager*)that->parent())->ticker();
+		}
 		status_->ticker();
 
-		Fl::repeat_timeout(UTC_TIMER, cb_ticker, v);
+		Fl::repeat_timeout(BASIC_TICK, cb_ticker, v);
 	}
 }
 
