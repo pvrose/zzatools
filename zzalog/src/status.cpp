@@ -290,6 +290,7 @@ void status::progress(const char* message, object_t object) {
 void status::ticker() {
 	// Redraw progress bar
 	progress_->redraw();
+	Fl::check();
 }
 
 // Update rig_status - set text and colour
