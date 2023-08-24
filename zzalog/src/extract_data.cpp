@@ -504,7 +504,7 @@ void extract_data::extract_qsl(extract_data::extract_mode_t server) {
 		// Only those for which we intend to send a card (QSL_SENT==Q - Queued)
 		new_criteria = {
 			/*search_cond_t condition*/ XC_FIELD,
-			/*search_comp_t comparator*/ XP_EQ,
+			/*search_comp_t comparator*/ XP_REGEX,
 			/*bool by_dates*/ false,
 			/*string from_date*/"",
 			/*string to_date;*/"",
@@ -515,7 +515,7 @@ void extract_data::extract_qsl(extract_data::extract_mode_t server) {
 			/*bool confirmed_card;*/ false,
 			/*search_combi_t combi_mode;*/ XM_AND,
 			/*string field_name; */ "QSL_SENT",
-			/*string pattern;*/ "Q",
+			/*string pattern;*/ "[QR]",
 			/*string my_call*/ station
 		};
 		status_->misc_status(ST_NOTE, "EXTRACT: Extracting queued cards only");

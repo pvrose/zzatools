@@ -38,6 +38,8 @@ public:
 	static void cb_bn_fetch(Fl_Widget* w, void* v);
 	// Log Card button has been clicked
 	static void cb_bn_log_card(Fl_Widget* w, void* v);
+	// Set "Card requested"
+	static void cb_bn_card_reqd(Fl_Widget* w, void* v);
 
 	// Set record
 	void set_qso(record* qso, qso_num_t number);
@@ -82,6 +84,7 @@ protected:
 	Fl_Radio_Light_Button* card_back_radio_;
 	Fl_Button* fetch_bn_;
 	Fl_Button* log_card_bn_;
+	Fl_Button* card_reqd_bn_;
 	// QSL status
 	Fl_Box* eqsl_status_box_;
 	Fl_Box* lotw_status_box_;

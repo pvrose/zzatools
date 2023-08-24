@@ -1,4 +1,5 @@
 #include "qso_qsl_vwr.h"
+#include "qso_data.h"
 #include "eqsl_handler.h"
 #include "status.h"
 #include "book.h"
@@ -154,6 +155,12 @@ void qso_qsl_vwr::create_form() {
 	log_card_bn_->callback(cb_bn_log_card, nullptr);
 	log_card_bn_->when(FL_WHEN_RELEASE);
 	curr_x += WBUTTON;
+	// Button - Set QSL_SENT=R in current QSO
+	card_reqd_bn_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Requested");
+	card_reqd_bn_->tooltip("Marl QSL as wanting a card QSL");
+	card_reqd_bn_->callback(cb_bn_card_reqd);
+	card_reqd_bn_->when(FL_WHEN_RELEASE);
+	curr_x += WBUTTON;
 
 	end();
 	show();
@@ -223,6 +230,14 @@ void qso_qsl_vwr::cb_bn_image(Fl_Widget* w, void* v) {
 	else {
 		that->win_full_view_->show();
 	}
+}
+
+// Set card requested "QSL_SENT=R"
+void qso_qsl_vwr::cb_bn_card_reqd(Fl_Widget* w, void* v) {
+	qso_qsl_vwr* that = ancestor_view<qso_qsl_vwr>(w);
+	that->current_qso_->item("QSL_SENT", string("R"));
+	qso_data* data = ancestor_view<qso_data>(that);
+	data->enable_widgets();
 }
 
 void qso_qsl_vwr::set_qso(record* qso, qso_num_t number) {
