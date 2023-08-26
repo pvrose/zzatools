@@ -426,3 +426,32 @@ void qso_manager::update_modem_qso(record* qso) {
 	update_import_qso(qso);
 	data_group_->update_modem_qso(qso);
 }
+
+// Download QSLs;
+void qso_manager::qsl_download(import_data::update_mode_t server) {
+	qsl_control()->qsl_download(server);
+}
+
+// Extract QSLs;
+void qso_manager::qsl_extract(extract_data::extract_mode_t server) {
+	qsl_control()->qsl_extract(server);
+}
+
+// Upload QSLs;
+void qso_manager::qsl_upload() {
+	qsl_control()->qsl_upload();
+}
+
+// Print QSLs
+void qso_manager::qsl_print() {
+	qsl_control()->qsl_print();
+}
+
+// Mark QSL print done
+void qso_manager::qsl_print_done() {
+	qsl_control()->qsl_print_done();
+}
+
+qso_qsl* qso_manager::qsl_control() {
+	return info_group_->qsl_control();
+}

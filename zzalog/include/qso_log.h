@@ -23,6 +23,8 @@ public:
 	// 1s clock interface
 	void ticker();
 
+	qso_qsl* qsl_control();
+
 protected:
 
 	// Callback

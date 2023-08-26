@@ -1,5 +1,8 @@
 #pragma once
 
+#include "import_data.h"
+#include "extract_data.h"
+
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Check_Button.H>
 #include <FL/Fl_Button.H>
@@ -16,6 +19,13 @@ public:
     void save_values();
     void enable_widgets();
 
+   // Shared download method
+    void qsl_download(import_data::update_mode_t server);
+    void qsl_extract(extract_data::extract_mode_t server);
+    void qsl_upload();
+    void qsl_print();
+    void qsl_print_done();
+
 protected:
     // callbacks
     // Auto download v = eQSL/LotW/ClubLog
@@ -31,6 +41,7 @@ protected:
     // Mark printing done
     static void cb_mark_done(Fl_Widget* w, void* v);
 
+ 
     // Attributes
     bool auto_eqsl_;
     bool auto_lotw_;

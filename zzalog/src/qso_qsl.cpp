@@ -1,4 +1,5 @@
 #include "qso_qsl.h"
+#include "qso_manager.h"
 #include "drawing.h"
 #include "extract_data.h"
 #include "import_data.h"
@@ -195,6 +196,23 @@ void qso_qsl::save_values() {
 }
 
 void qso_qsl::enable_widgets() {
+	// Disable download and extract buttons if not is the correct state
+	qso_manager* mgr = ancestor_view<qso_manager>(this);
+	if (mgr->data()->inactive()) {
+		bn_down_eqsl_->activate();
+		bn_down_lotw_->activate();
+		bn_extr_club_->activate();
+		bn_extr_eqsl_->activate();
+		bn_extr_lotw_->activate();
+		bn_extr_card_->activate();
+	} else {
+		bn_down_eqsl_->deactivate();
+		bn_down_lotw_->deactivate();
+		bn_extr_club_->deactivate();
+		bn_extr_eqsl_->deactivate();
+		bn_extr_lotw_->deactivate();
+		bn_extr_card_->deactivate();
+	}
 	// Disable extract and upload buttons if auto-upload enabled
 	if (extract_records_->size() && extract_records_->use_mode() == extract_data::EQSL) bn_upld_eqsl_->activate();
 	else bn_upld_eqsl_->deactivate();
@@ -239,47 +257,86 @@ void qso_qsl::cb_auto(Fl_Widget* w, void* v) {
 void qso_qsl::cb_download(Fl_Widget* w, void* v) {
 	// v has QSL server
 	import_data::update_mode_t server = (import_data::update_mode_t)(intptr_t)v;
-	import_data_->download_data(server);
 	qso_qsl* that = ancestor_view<qso_qsl>(w);
-	that->enable_widgets();
+	that->qsl_download(server);
 }
 
 // Extract. v = eQSL/LotW/ClubLog/Card
 void qso_qsl::cb_extract(Fl_Widget* w, void* v) {
 	extract_data::extract_mode_t server = (extract_data::extract_mode_t)(intptr_t)v;
-	extract_records_->extract_qsl(server);
-	tabbed_forms_->activate_pane(OT_EXTRACT, true);
 	qso_qsl* that = ancestor_view<qso_qsl>(w);
-	that->enable_widgets();
+	that->qsl_extract(server);
 }
 
 // Upload. v = eQSL/LotW/Clublog
 void qso_qsl::cb_upload(Fl_Widget* w, void* v) {
 	// extract_records has remembered the server
-	extract_records_->upload();
-	tabbed_forms_->activate_pane(OT_MAIN, true);
 	qso_qsl* that = ancestor_view<qso_qsl>(w);
-	that->enable_widgets();
-	book_->modified(true);
+	that->qsl_upload();
 }
 
 // Print . Card only
 void qso_qsl::cb_print(Fl_Widget* w, void* v) {
-	printer* ptr = new printer(OT_CARD);
-	delete ptr;
 	qso_qsl* that = ancestor_view<qso_qsl>(w);
-	that->enable_widgets();
+	that->qsl_print();
 }
 
 
 // Mark printing done
 void qso_qsl::cb_mark_done(Fl_Widget* w, void* v) {
+	qso_qsl* that = ancestor_view<qso_qsl>(w);
+	that->qsl_print_done();
+}
+
+// Download. v = eQSL/LotW (import data enum)
+void qso_qsl::qsl_download(import_data::update_mode_t server) {
+	qso_manager* mgr = ancestor_view<qso_manager>(this);
+	if (mgr->data()->inactive()) {
+		import_data_->download_data(server);
+		enable_widgets();
+	} else {
+		status_->misc_status(ST_ERROR, "Not ready to download - finish operating");
+	}
+}
+
+// Extract 
+void qso_qsl::qsl_extract(extract_data::extract_mode_t server) {
+	qso_manager* mgr = ancestor_view<qso_manager>(this);
+	if (mgr->data()->inactive()) {
+		extract_records_->extract_qsl(server);
+		tabbed_forms_->activate_pane(OT_EXTRACT, true);
+		enable_widgets();
+	} else {
+		status_->misc_status(ST_ERROR, "Not ready to extract - finish operating");
+	}
+}
+
+// Upload
+void qso_qsl::qsl_upload() {
+	qso_manager* mgr = ancestor_view<qso_manager>(this);
+	if (mgr->data()->inactive()) {
+		extract_records_->upload();
+		tabbed_forms_->activate_pane(OT_MAIN, true);
+		enable_widgets();
+		book_->modified(true);
+	} else {
+		status_->misc_status(ST_ERROR, "Not ready to upload - finish operating");
+	}
+}
+
+// Print
+void qso_qsl::qsl_print() {
+	printer* ptr = new printer(OT_CARD);
+	delete ptr;
+	enable_widgets();
+}
+
+// Mark printing done
+void qso_qsl::qsl_print_done() {
 	if (extract_records_->size()) {
 		char message[200];
-		string date_name;
-		string sent_name;
-			date_name = "QSLSDATE";
-			sent_name = "QSL_SENT";
+		string date_name = "QSLSDATE";
+		string sent_name = "QSL_SENT";
 		string today = now(false, "%Y%m%d");
 		snprintf(message, 200, "EXTRACT: Setting %s to \"%s\", %s to \"Y\"", date_name.c_str(), today.c_str(), sent_name.c_str());
 		status_->misc_status(ST_NOTE, message);
@@ -292,6 +349,5 @@ void qso_qsl::cb_mark_done(Fl_Widget* w, void* v) {
 	else {
 		status_->misc_status(ST_WARNING, "EXTRACT: No records to change");
 	}
-	qso_qsl* that = ancestor_view<qso_qsl>(w);
-	that->enable_widgets();
+	enable_widgets();
 }

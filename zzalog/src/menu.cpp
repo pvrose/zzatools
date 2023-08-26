@@ -1012,7 +1012,8 @@ void menu::cb_mi_imp_file(Fl_Widget* w, void* v) {
 // v is enum update_mode_t: EQSL_UPDATE or LOTW_UPDATE
 void menu::cb_mi_download(Fl_Widget* w, void* v) {
 	// v has QSL server
-	import_data_->download_data((import_data::update_mode_t)(intptr_t)v);
+	import_data::update_mode_t server = (import_data::update_mode_t)(intptr_t)v;
+	qso_manager_->qsl_download(server);
 }
 
 // Import->WSJT-X - start the WSJT-X listener for logging datagrams
@@ -1107,12 +1108,10 @@ void menu::cb_mi_ext_disp(Fl_Widget* w, void* v) {
 // Extract->eQSL/LotW/Card/ClubLog - specificall extract records for QSL use
 // v is enum extract_mode_t: EQSL, LOTW, CARD or CLUBLOG
 void menu::cb_mi_ext_qsl(Fl_Widget* w, void* v) {
-	menu* that = (menu*)w;
 	// v passes the particular option
-	that->qsl_type_ = (extract_data::extract_mode_t)(intptr_t)v;
-	extract_records_->extract_qsl(that->qsl_type_);
-	tabbed_forms_->activate_pane(OT_EXTRACT, true);
-}
+	extract_data::extract_mode_t server = (extract_data::extract_mode_t)(intptr_t)v;
+	qso_manager_->qsl_extract(server);
+	}
 
 // Extract->Quick->* - one-click for specific searches
 // v is enum extract_mode_t: NO_NAME, NO_QTH or (inadequate) LOCATOR
@@ -1127,73 +1126,20 @@ void menu::cb_mi_ext_special(Fl_Widget* w, void* v) {
 // Extract->Upload - upload to the server the data was extracted for
 // v is not used
 void menu::cb_mi_ext_upload(Fl_Widget* w, void* v) {
-	extract_records_->upload();
-	tabbed_forms_->activate_pane(OT_MAIN, true);
+	qso_manager_->qsl_upload();
 }
 
 // Extract->Print - print 
 // v is not used
 void menu::cb_mi_ext_print(Fl_Widget* w, void* v) {
-	menu* that = (menu*)w;
-	printer* ptr;
-	switch (that->qsl_type_) {
-	case extract_data::EQSL:
-	case extract_data::LOTW:
-		// Print in log-book form
-		ptr = new printer(OT_EXTRACT);
-		delete ptr;
-		break;
-	case extract_data::CARD:
-		// Print labels for cards
-		ptr = new printer(OT_CARD);
-		delete ptr;
-		break;
-	}
+	qso_manager_->qsl_print();
 }
 
 // Extract->Mark sent
 // Update the extracted records with the fct that a QSL has been sent to the appropriate place
 // v is not used
 void menu::cb_mi_ext_mark(Fl_Widget* w, void* v) {
-	if (extract_records_->size()) {
-		char message[200];
-		status_->progress(extract_records_->size(), OT_EXTRACT, "Marking data as sent", "records", false);
-		int count = 0;
-		menu* that = (menu*)w;
-		string date_name;
-		string sent_name;
-		switch (that->qsl_type_) {
-		case extract_data::EQSL:
-			date_name = "EQSL_QSLSDATE";
-			sent_name = "EQSL_QSL_SENT";
-			break;
-		case extract_data::LOTW:
-			date_name = "LOTW_QSLSDATE";
-			sent_name = "LOTQ_QSL_SENT";
-			break;
-		case extract_data::CARD:
-			date_name = "QSLSDATE";
-			sent_name = "QSL_SENT";
-			break;
-		case extract_data::CLUBLOG:
-			date_name = "CLUBLOG_QSO_UPLOAD_DATE";
-			sent_name = "CLUBLOG_QSO_UPLOAD_STATUS";
-			break;
-		}
-		string today = now(false, "%Y%m%d");
-		snprintf(message, 200, "EXTRACT: Setting %s to \"%s\", %s to \"Y\"", date_name.c_str(), today.c_str(), sent_name.c_str());
-		status_->misc_status(ST_NOTE, message);
-		for (auto it = extract_records_->begin(); it != extract_records_->end(); it++) {
-			(*it)->item(date_name, today);
-			(*it)->item(sent_name, string("Y"));
-			status_->progress(++count, OT_EXTRACT);
-		}
-		book_->modified(true);
-	}
-	else {
-		status_->misc_status(ST_WARNING, "EXTRACT: No records to change");
-	}
-
+	qso_manager_->qsl_print_done();
 }
 
 //// Reference->Prefix->Filter - used to set the filter for displaying prefix data
@@ -1815,7 +1761,7 @@ void menu::update_items() {
 	}
 	redraw();
 	update_windows_items();
-	update_upload_items();
+	update_qsl_items();
 	// Update toolbar to reflect active state of menu items
 	toolbar_->update_items();
 }
@@ -1932,13 +1878,25 @@ string menu::get_browser() {
 }
 
 // Do not allow a second upload to take place until the first has completed
-void menu::update_upload_items() {
+void menu::update_qsl_items() {
 	int index_eqsl = find_index("E&xtract/e&QSL");
 	int index_lotw = find_index("E&xtract/&LotW");
 	int index_clog = find_index("E&xtract/Club&Log");
 	int index_upload = find_index("E&xtract/&Upload");
+	int index_dn_eqsl = find_index("&Import/Download e&QSL");
+	int index_dn_lotw = find_index("&Import/Download &LotW");
 
-	if (extract_records_->upload_in_progress()) {
+	bool inactive = qso_manager_ ? qso_manager_->data()->inactive() : false;
+
+	if (inactive) {
+		mode(index_dn_eqsl, mode(index_dn_eqsl) & ~FL_MENU_INACTIVE);
+		mode(index_dn_lotw, mode(index_dn_lotw) & ~FL_MENU_INACTIVE);
+	} else {
+		mode(index_dn_eqsl, mode(index_dn_eqsl) | FL_MENU_INACTIVE);
+		mode(index_dn_lotw, mode(index_dn_lotw) | FL_MENU_INACTIVE);
+	}
+
+	if (extract_records_->upload_in_progress() || !inactive) {
 		mode(index_eqsl, mode(index_eqsl) | FL_MENU_INACTIVE);
 		mode(index_lotw, mode(index_lotw) | FL_MENU_INACTIVE);
 		mode(index_clog, mode(index_clog) | FL_MENU_INACTIVE);

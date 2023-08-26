@@ -13,6 +13,8 @@
 #include "field_choice.h"
 #include "record_table.h"
 #include "book.h"
+#include "import_data.h"
+#include "extract_data.h"
 
 #include <string>
 #include <vector>
@@ -113,14 +115,23 @@ using namespace std;
 		void stop_ticker();
 		// Get current displayed QSO
 		qso_data* data();
+		// QSL handler
+		qso_qsl* qsl_control();
 
+		// Shared QSL methods
+		void qsl_download(import_data::update_mode_t server);
+		void qsl_extract(extract_data::extract_mode_t server);
+		void qsl_upload();
+		void qsl_print();
+		void qsl_print_done();
+
+		// Widgets have been xcreated
+		bool created_;
 
 	protected:
 
 		// Set of bands in frequency order
 		list<string> ordered_bands_;
-		// Widgets have been xcreated
-		bool created_;
 		// Typing into choice - prevent it being overwritten
 		bool items_changed_;
 		// Ticker action in progress - prevent continual ticker access

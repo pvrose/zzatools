@@ -13,6 +13,7 @@
 #include "import_data.h"
 #include "qrz_handler.h"
 #include "wsjtx_handler.h"
+#include "menu.h"
 #ifdef _WIN32
 #include "dxa_if.h"
 #endif
@@ -31,6 +32,7 @@ extern import_data* import_data_;
 extern book* navigation_book_;
 extern qrz_handler* qrz_handler_;
 extern wsjtx_handler* wsjtx_handler_;
+extern menu* menu_;
 #ifdef _WIN32
 extern dxa_if* dxa_if_;
 #endif
@@ -130,9 +132,13 @@ void qso_data::create_form(int X, int Y) {
 void qso_data::enable_widgets() {
 	if (!inhibit_drawing_) {
 		// Disable log mode menu item from CAT if no CAT
-		rig_if* rig = ((qso_manager*)parent())->rig();
-
-		g_contest_->enable_widgets();
+		qso_manager* mgr = (qso_manager*)parent();
+		if (mgr->created_) {
+			rig_if* rig = mgr->rig();
+			g_contest_->enable_widgets();
+			mgr->qsl_control()->enable_widgets();
+			if (menu_) menu_->update_items();
+		}
 
 		char l[128];
 		switch (logging_state_) {
@@ -1603,6 +1609,18 @@ bool qso_data::qso_editing(qso_num_t number) {
 	case NET_EDIT:
 	case NET_ADDING:
 		return g_net_entry_->qso_in_net(number);
+	default:
+		return false;
+	}
+}
+
+// Inactive
+bool qso_data::inactive() {
+	switch(logging_state_) {
+	case QSO_INACTIVE:
+	case QSO_PENDING:
+	case QSO_PEEK:
+		return true;
 	default:
 		return false;
 	}

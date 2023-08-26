@@ -158,16 +158,14 @@
 		void update_windows_items();
 		// Add userdate to windows items
 		void add_windows_items();
-		// Update QSL upload items
-		void update_upload_items();
+		// Update QSL related items
+		void update_qsl_items();
 
 	protected:
 		// search criteria - remembered
 		search_criteria_t* criteria_;
 		// Enabled
 		bool active_enabled_;
-		// Current extraction
-		extract_data::extract_mode_t qsl_type_;
 
 	};
 #endif

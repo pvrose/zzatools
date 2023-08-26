@@ -82,3 +82,7 @@ void qso_log::cb_tabs(Fl_Widget* w, void* v) {
 	that->label(that->value()->label());
 	that->enable_widgets();
 }
+
+qso_qsl* qso_log::qsl_control() {
+	return qsl_ctrl_;
+}
