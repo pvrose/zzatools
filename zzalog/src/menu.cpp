@@ -1881,8 +1881,10 @@ string menu::get_browser() {
 void menu::update_qsl_items() {
 	int index_eqsl = find_index("E&xtract/e&QSL");
 	int index_lotw = find_index("E&xtract/&LotW");
+	int index_card = find_index("E&xtract/Car&d");
 	int index_clog = find_index("E&xtract/Club&Log");
 	int index_upload = find_index("E&xtract/&Upload");
+	int index_print = find_index("E&xtract/&Print");
 	int index_dn_eqsl = find_index("&Import/Download e&QSL");
 	int index_dn_lotw = find_index("&Import/Download &LotW");
 
@@ -1891,21 +1893,30 @@ void menu::update_qsl_items() {
 	if (inactive) {
 		mode(index_dn_eqsl, mode(index_dn_eqsl) & ~FL_MENU_INACTIVE);
 		mode(index_dn_lotw, mode(index_dn_lotw) & ~FL_MENU_INACTIVE);
+		mode(index_card, mode(index_card) & ~FL_MENU_INACTIVE);
+		mode(index_print, mode(index_print) & ~FL_MENU_INACTIVE);
+
 	} else {
 		mode(index_dn_eqsl, mode(index_dn_eqsl) | FL_MENU_INACTIVE);
 		mode(index_dn_lotw, mode(index_dn_lotw) | FL_MENU_INACTIVE);
+		mode(index_card, mode(index_card) | FL_MENU_INACTIVE);
+		mode(index_print, mode(index_print) | FL_MENU_INACTIVE);
 	}
 
 	if (extract_records_->upload_in_progress() || !inactive) {
 		mode(index_eqsl, mode(index_eqsl) | FL_MENU_INACTIVE);
 		mode(index_lotw, mode(index_lotw) | FL_MENU_INACTIVE);
 		mode(index_clog, mode(index_clog) | FL_MENU_INACTIVE);
-		mode(index_upload, mode(index_upload) & ~FL_MENU_INACTIVE);
 	}
 	else {
 		mode(index_eqsl, mode(index_eqsl) & ~FL_MENU_INACTIVE);
 		mode(index_lotw, mode(index_lotw) & ~FL_MENU_INACTIVE);
 		mode(index_clog, mode(index_clog) & ~FL_MENU_INACTIVE);
+	}
+
+	if (extract_records_->upload_in_progress() && inactive) {
+		mode(index_upload, mode(index_upload) & ~FL_MENU_INACTIVE);
+	} else {
 		mode(index_upload, mode(index_upload) | FL_MENU_INACTIVE);
 	}
 }
