@@ -35,7 +35,7 @@ map<qso_data::logging_state_t, list<qso_buttons::button_type> > button_map_ =
 	    qso_buttons::NAV_FIRST,
 		qso_buttons::NAV_PREV, qso_buttons::NAV_NEXT, qso_buttons::NAV_LAST, qso_buttons::QRZ_COM } },
 	{ qso_data::QUERY_MATCH, { qso_buttons::ADD_QUERY, qso_buttons::REJECT_QUERY, qso_buttons::MERGE_QUERY,
-		qso_buttons::NAV_PREV, qso_buttons::NAV_NEXT }},
+		qso_buttons::NAV_PREV, qso_buttons::NAV_NEXT, qso_buttons::LOOK_ALL_TXT }},
 	{ qso_data::QUERY_NEW, { qso_buttons::ADD_QUERY, qso_buttons::REJECT_QUERY, qso_buttons::FIND_QSO, qso_buttons::LOOK_ALL_TXT }},
 	{ qso_data::QUERY_WSJTX, { qso_buttons::ADD_QUERY, qso_buttons::REJECT_QUERY } },
 	{ qso_data::QUERY_DUPE, { qso_buttons::KEEP_DUPE_1, qso_buttons::MERGE_DUPE, qso_buttons::KEEP_DUPE_2,
