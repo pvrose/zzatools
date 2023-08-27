@@ -168,7 +168,7 @@ void qso_qsl::create_form() {
 	bn_extr_card_->tooltip("Extract records for printing labels");
 	// print
 	bn_print_ = new Fl_Button(C5, curr_y, W5, HBUTTON, "@fileprint");
-	bn_print_->callback(cb_upload);
+	bn_print_->callback(cb_print);
 	bn_print_->tooltip("Print labels from extracted records");
 	// Mark read
 	bn_mark_done_ = new Fl_Button(C6, curr_y, W6, HBUTTON, "Done");
