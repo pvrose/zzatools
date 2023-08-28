@@ -393,35 +393,6 @@ void add_book(char* arg) {
 	}
 }
 
-// // Callback for rig_if_ to use to access spec_data_
-// string cb_freq_to_band(double frequency) {
-// 	return spec_data_->band_for_freq(frequency);
-// }
-
-// // Callback for rig_if_ to use to display messages in statues_
-// void cb_error_message(status_t level, const char* message) {
-// 	status_->misc_status(level, message);
-// }
-
-//// Add the band plan window
-//void add_band_view() {
-//	if (!closing_) {
-//		// Use frequency of selected record if the book is not empty, else use 14.1 MHz
-//		double frequency;
-//		if (book_->size() && book_->get_record() && book_->get_record()->item("FREQ").length()) {
-//			frequency = stod(book_->get_record()->item("FREQ")) * 1000.0;
-//		}
-//		else {
-//			frequency = 14100.0;
-//		}
-//		band_view_ = new band_view(frequency, 400, 100, "Band plan");
-//		if (!band_view_->valid()) {
-//			Fl::delete_widget(band_view_);
-//			band_view_ = nullptr;
-//		}
-//	}
-//}
-
 // Add the various HTML handlers
 void add_qsl_handlers() {
 	if (!closing_) {
