@@ -191,8 +191,7 @@ void extract_data::clear_criteria(bool redraw) {
 	// Clear the mappings
 	mapping_.clear();
 	rev_mapping_.clear();
-	current_item_ = 0;
-	// now tidy up this book
+	// now tidy up this book, records have already been removed so will not be deleted
 	delete_contents(true);
 	use_mode_ = NONE;
 	// Set navigation book to main log

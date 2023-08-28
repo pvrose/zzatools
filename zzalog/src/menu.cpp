@@ -1056,7 +1056,6 @@ void menu::cb_mi_imp_cancel(Fl_Widget* w, void* v) {
 void menu::cb_mi_ext_clr(Fl_Widget* w, void* v) {
 	extract_records_->clear_criteria();
 	tabbed_forms_->activate_pane(OT_MAIN, true);
-	navigation_book_->selection(0, HT_EXTRACTION);
 }
 
 // Extract->Criteria
