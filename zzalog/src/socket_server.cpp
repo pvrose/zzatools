@@ -274,7 +274,7 @@ socket_server::client_status socket_server::accept_client() {
 			return NG;
 		}
 #else
-		return NG;
+		return BLOCK;
 #endif
 	}
 	else {
@@ -308,6 +308,7 @@ int socket_server::rcv_packet() {
 		client_status result = BLOCK;
 		while (client_ == INVALID_SOCKET && result == BLOCK) {
 			result = accept_client();
+			Fl::check();
 		}
 		if (result == NG) {
 			return 1;
@@ -332,9 +333,7 @@ int socket_server::rcv_packet() {
 			break;
 		}
 		if (bytes_rcvd > 0) {
-#ifdef _DEBUG
 			dump(string(buffer, buffer_len));
-#endif
 			stringstream ss;
 			string s(buffer, bytes_rcvd);
 			ss.clear();
@@ -383,9 +382,7 @@ int socket_server::send_response(istream& response) {
 	char* buffer = new char[resp_size + 1];
 	memset(buffer, '\0', resp_size + 1);
 	response.read(buffer, resp_size);
-#ifdef _DEBUG
 	dump(string(buffer));
-#endif
 
 	// Send the response packet
 	int result;

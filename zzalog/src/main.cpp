@@ -411,7 +411,7 @@ void add_qsl_handlers() {
 			wsjtx_handler_ = new wsjtx_handler;
 		}
 		// FLLOG emulator
-		//if (fllog_emul_ == nullptr) fllog_emul_ = new fllog_emul;
+		if (fllog_emul_ == nullptr) fllog_emul_ = new fllog_emul;
 	}
 }
 
