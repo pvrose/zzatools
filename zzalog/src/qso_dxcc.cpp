@@ -9,6 +9,8 @@
 #include "extract_data.h"
 #include "tabbed_forms.h"
 
+#include <FL/Fl_Toggle_Button.H>
+
 extern cty_data* cty_data_;
 extern book* book_;
 extern extract_data* extract_records_;
@@ -167,7 +169,7 @@ void qso_dxcc::wb4_buttons::create_form() {
 	int curr_x = x();
 	int curr_y = y();
 	for (auto it = all_bands_->begin(); it != all_bands_->end(); it++) {
-		Fl_Button* bn = new Fl_Button(curr_x, curr_y, BWIDTH, HBUTTON);
+		Fl_Toggle_Button* bn = new Fl_Toggle_Button(curr_x, curr_y, BWIDTH, HBUTTON);
 		bn->copy_label((*it).c_str());
 		bn->callback(cb_bn_band, (void*)(*it).c_str());
 		map_[*it] = bn;
@@ -184,7 +186,7 @@ void qso_dxcc::wb4_buttons::create_form() {
 	}
 	bn_number = 0;
 	for (auto it = all_modes_->begin(); it != all_modes_->end(); it++) {
-		Fl_Button* bn = new Fl_Button(curr_x, curr_y, BWIDTH, HBUTTON);
+		Fl_Toggle_Button* bn = new Fl_Toggle_Button(curr_x, curr_y, BWIDTH, HBUTTON);
 		bn->copy_label((*it).c_str());
 		bn->callback(cb_bn_mode, (void*)(*it).c_str());
 		map_[*it] = bn;
@@ -217,49 +219,45 @@ void qso_dxcc::wb4_buttons::enable_widgets() {
 		dxcc_bands_ = book_->used_bands(dxcc, my_call);
 		dxcc_modes_ = book_->used_submodes(dxcc, my_call);
 		char l[128];
-		snprintf(l, sizeof(l), "DXCC worked before as %s", my_call.c_str());
+		snprintf(l, sizeof(l), "DXCC worked status as %s", my_call.c_str());
 		copy_label(l);
 	}
 	// Create all the buttons
 	create_form();
 	// Clear all widgets
 	for (int ix = 0; ix < children(); ix++) {
-		Fl_Button* bn = (Fl_Button*)child(ix);
+		Fl_Toggle_Button* bn = (Fl_Toggle_Button*)child(ix);
 		bn->color(FL_BACKGROUND_COLOR);
 		bn->labelcolor(fl_inactive(FL_BLACK));
+		bn->value(false);
 	}
 	// Mark QSO buttons
 	if (qso_band.length()) {
-		map_.at(qso_band)->color(COLOUR_ORANGE);
-		map_.at(qso_band)->labelcolor(FL_BLACK);
+		Fl_Toggle_Button* bn = (Fl_Toggle_Button*)map_.at(qso_band);
+		bn->color(COLOUR_CLARET, COLOUR_CLARET);
+		bn->labelcolor(fl_contrast(FL_BLACK, bn->color()));
+		bn->value(true);
 	}
 	if (qso_mode.length()) {
-		map_.at(qso_mode)->color(COLOUR_ORANGE);
-		map_.at(qso_mode)->labelcolor(FL_BLACK);
+		Fl_Toggle_Button* bn = (Fl_Toggle_Button*)map_.at(qso_mode);
+		bn->color(FL_DARK_GREEN, FL_DARK_GREEN);
+		bn->labelcolor(fl_contrast(FL_BLACK, bn->color()));
+		bn->value(true);
 	}
 	// Set band colours - CLARET this QSO, MAUVE other QSOs
+	// Set this band to CLARET - overwrite tp MAUVE if wkb4
 	if (dxcc_bands_) {
 		for (auto ix = dxcc_bands_->begin(); ix != dxcc_bands_->end(); ix++) {
-			Fl_Button* bn = (Fl_Button*)map_.at(*ix);
-			if ((*ix) == qso_band) {
-				bn->color(COLOUR_CLARET);
-			}
-			else {
-				bn->color(COLOUR_MAUVE);
-			}
+			Fl_Toggle_Button * bn = (Fl_Toggle_Button*)map_.at(*ix);
+			bn->color(COLOUR_MAUVE, COLOUR_MAUVE);
 			bn->labelcolor(fl_contrast(FL_BLACK, bn->color()));
 		}
 	}
 	// Set mode colours - CALRET this QSO, APPLE other QSOs
 	if (dxcc_modes_) {
 		for (auto ix = dxcc_modes_->begin(); ix != dxcc_modes_->end(); ix++) {
-			Fl_Button* bn = (Fl_Button*)map_.at(*ix);
-			if ((*ix) == qso_mode) {
-				bn->color(FL_DARK_GREEN);
-			}
-			else {
-				bn->color(COLOUR_APPLE);
-			}
+			Fl_Toggle_Button* bn = (Fl_Toggle_Button*)map_.at(*ix);
+			bn->color(COLOUR_APPLE, COLOUR_APPLE);
 			bn->labelcolor(fl_contrast(FL_BLACK, bn->color()));
 		}
 	}
