@@ -3,6 +3,7 @@
 #include "xml_writer.h"
 #include "xml_reader.h"
 #include "utils.h"
+#include "status.h"
 
 #include <sstream>
 #include <iostream>
@@ -16,8 +17,8 @@ using namespace std;
 
 
 extern url_handler* url_handler_;
+extern status* status_;
 rpc_handler* rpc_handler::that_ = nullptr;
-extern void cb_error_message(status_t level, const char* message);
 extern string VERSION;
 extern string PROGRAM_ID;
 
@@ -28,7 +29,6 @@ rpc_handler::rpc_handler(string host_name, string resource_name)
 	host_name_ = host_name.substr(0, pos);
 	server_port_ = stoi(host_name.substr(pos+1));
 	resource_ = resource_name;
-	cb_message = default_error_message;
 	server_ = nullptr;
 }
 
@@ -38,7 +38,6 @@ rpc_handler::rpc_handler(int port_num, string resource_name) {
 	host_name_ = "127.0.0.1";
 	server_port_ = port_num;
 	resource_ = resource_name;
-	cb_message = default_error_message;
 	that_ = this;
 	server_ = nullptr;
 	add_method({ "system.listMethods", "s:s", "List of methods available" }, list_methods);
@@ -252,7 +251,7 @@ bool rpc_handler::decode_response(istream& response_xml, rpc_data_item* response
 	xml_element* top_element = reader->element();
 	if (top_element == nullptr) {
 		// Currently this happens when closing
-		cb_error_message(ST_ERROR, "RPC: null XML received!");
+		status_->misc_status(ST_ERROR, "RPC: null XML received!");
 		delete reader;
 		return false;
 	} 
@@ -717,7 +716,7 @@ void rpc_handler::run_server() {
 	}
 	else {
 		server_ = new socket_server(socket_server::HTTP, server_port_);
-		server_->callback(rcv_request, cb_error_message);
+		server_->callback(rcv_request);
 		server_->run_server();
 	}
 }
@@ -762,11 +761,6 @@ int rpc_handler::handle_request(stringstream& ss) {
 		add_header(BAD_REQUEST, dummy, error_response);
 		return server_->send_response(error_response);
 	}
-}
-
-// Callback to action request 
-void rpc_handler::callback(void(*message)(status_t, const char*)) {
-	cb_message = message;
 }
 
 // Check and parse HTML header - returns start of payload

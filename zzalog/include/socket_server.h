@@ -41,7 +41,7 @@ using namespace std;
 		// Is this listening
 		bool has_server();
 		// Set handler 
-		void callback(int(*do_request)(stringstream&), void(*message)(status_t, const char*));
+		void callback(int(*do_request)(stringstream&));
 		// Send response
 		int send_response(istream& response);
 
@@ -61,8 +61,6 @@ using namespace std;
 		void handle_error(const char* phase);
 		// Send request - set by call-back
 		int (*do_request)(stringstream& request);
-		// Error message
-		void (*status)(status_t level, const char* message);
 
 		// Open socket and create server
 		int create_server();

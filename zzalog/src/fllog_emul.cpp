@@ -14,7 +14,6 @@
 
 extern rpc_handler* rpc_handler_;
 extern status* status_;
-extern void cb_error_message(status_t status, const char* message);
 extern fllog_emul* fllog_emul_;
 extern extract_data* extract_records_;
 extern book* book_;
@@ -37,7 +36,6 @@ void fllog_emul::run_server() {
 		rpc_handler_ = new rpc_handler(8421, "/RPC2");
 	}
 	// Set up callbacks to handle these
-	rpc_handler_->callback(cb_error_message);
 	method_list_.push_back({ "log.add_record", "s:s", "adds new ADIF-RECORD" });
 	rpc_handler_->add_method(method_list_.back(), add_record);
 	method_list_.push_back({ "log.get_record",    "s:s", "returns ADIF-RECORD for CALL" });

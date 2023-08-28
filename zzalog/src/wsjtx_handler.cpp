@@ -31,7 +31,6 @@
 using namespace std;
 
 extern status* status_;
-extern void cb_error_message(status_t level, const char* message);
 extern menu* menu_;
 extern Fl_Preferences* settings_;
 #ifdef _WIN32
@@ -390,7 +389,7 @@ void wsjtx_handler::run_server() {
 	if (!server_) {
 		status_->misc_status(ST_NOTE, "WSJT-X: Creating new socket");
 		server_ = new socket_server(socket_server::UDP, 2237);
-		server_->callback(rcv_request, cb_error_message);
+		server_->callback(rcv_request);
 	}
 	if (!server_->has_server()) {
 		status_->misc_status(ST_NOTE, "WSJT-X: Starting socket");

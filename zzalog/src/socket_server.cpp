@@ -1,4 +1,5 @@
 #include "socket_server.h"
+#include "status.h"
 
 #include <stdio.h>
 #include <sstream>
@@ -28,6 +29,8 @@
 #define LEN_SOCKET_ADDR unsigned int
 #endif
 
+extern status* status_;
+
 // Constructor
 socket_server::socket_server(protocol_t protocol, int port_num) :
 	server_(INVALID_SOCKET),
@@ -46,10 +49,10 @@ void socket_server::run_server() {
 	if (result) {
 		switch (protocol_) {
 		case UDP:
-			status(ST_ERROR, "SOCKET: Unable to listen for WSJT-X datagrams");
+			status_->misc_status(ST_ERROR, "SOCKET: Unable to listen for WSJT-X datagrams");
 			break;
 		case HTTP:
-			status(ST_ERROR, "SOCKET: Unable to listen for FLDIGI XML-RPC requests");
+			status_->misc_status(ST_ERROR, "SOCKET: Unable to listen for FLDIGI XML-RPC requests");
 			break;
 		}
 	}
@@ -74,12 +77,12 @@ void socket_server::close_server() {
 		getsockname(server_, (SOCKADDR*)&server_addr, &len_server_addr);
 #ifdef _WIN32
 		snprintf(message, 256, "SOCKET: Closing socket %s:%d", inet_ntoa(server_addr.sin_addr), htons(server_addr.sin_port));
-		status(ST_OK, message);
+		status_->misc_status(ST_OK, message);
 		closesocket(server_);
 		WSACleanup();
 #else 
 		snprintf(message, 256, "SOCKET: Closing socket %d:%d", server_addr.sin_addr, server_addr.sin_port);
-		status(ST_OK, message);
+		status_->misc_status(ST_OK, message);
 		close(server_);
 #endif
 		server_ = INVALID_SOCKET;
@@ -100,7 +103,7 @@ int socket_server::create_server() {
 		return result;
 	}
 	else {
-		status(ST_LOG, "SOCKET: Initialised winsock.");
+		status_->misc_status(ST_LOG, "SOCKET: Initialised winsock.");
 	}
 	// Check the version of winsock loaded is 2.2
 	if (ws_data.wVersion != MAKEWORD(2, 2)) {
@@ -125,10 +128,10 @@ int socket_server::create_server() {
 	else {
 		switch (protocol_) {
 		case UDP:
-			status(ST_LOG, "SOCKET: Created UDP socket");
+			status_->misc_status(ST_LOG, "SOCKET: Created UDP socket");
 			break;
 		case HTTP:
-			status(ST_LOG, "SOCKET: Created HTTP socket");
+			status_->misc_status(ST_LOG, "SOCKET: Created HTTP socket");
 			break;
 		}
 	}
@@ -148,7 +151,7 @@ int socket_server::create_server() {
 	else {
 		getsockname(server_, (SOCKADDR*)&server_addr, &len_server_addr);
 		snprintf(message, 256, "SOCKET: Connected socket %s:%d", inet_ntoa(server_addr.sin_addr), htons(server_addr.sin_port));
-		status(ST_OK, message);
+		status_->misc_status(ST_OK, message);
 	}
 
 	unsigned long nonblocking = 1;
@@ -167,7 +170,7 @@ int socket_server::create_server() {
 		else {
 			getsockname(server_, (SOCKADDR*)&server_addr, &len_server_addr);
 			snprintf(message, 256, "SOCKET: Listening socket %s:%d", inet_ntoa(server_addr.sin_addr), htons(server_addr.sin_port));
-			status(ST_OK, message);
+			status_->misc_status(ST_OK, message);
 		}
 
 		// Make the client non-blocking as well
@@ -198,10 +201,10 @@ int socket_server::create_server() {
 	else {
 		switch (protocol_) {
 		case UDP:
-			status(ST_LOG, "SOCKET: Created UDP socket");
+			status_->misc_status(ST_LOG, "SOCKET: Created UDP socket");
 			break;
 		case HTTP:
-			status(ST_LOG, "SOCKET: Created HTTP socket");
+			status_->misc_status(ST_LOG, "SOCKET: Created HTTP socket");
 			break;
 		}
 	}
@@ -221,7 +224,7 @@ int socket_server::create_server() {
 	else {
 		getsockname(server_, (SOCKADDR*)&server_addr, &len_server_addr);
 		snprintf(message, 256, "SOCKET: Connected socket %s:%d", server_addr.sin_addr, htons(server_addr.sin_port));
-		status(ST_OK, message);
+		status_->misc_status(ST_OK, message);
 	}
 
 	//unsigned long nonblocking = 1;
@@ -240,7 +243,7 @@ int socket_server::create_server() {
 		else {
 			getsockname(server_, (SOCKADDR*)&server_addr, &len_server_addr);
 			snprintf(message, 256, "SOCKET: Listening socket %s:%d", server_addr.sin_addr, htons(server_addr.sin_port));
-			status(ST_OK, message);
+			status_->misc_status(ST_OK, message);
 		}
 
 		//// Make the client non-blocking as well
@@ -262,7 +265,7 @@ socket_server::client_status socket_server::accept_client() {
 	if (client_ == INVALID_SOCKET) {
 #ifdef _WIN32
 		if (WSAGetLastError() == WSAEWOULDBLOCK) {
-			//status(ST_LOG, "SOCKET: No client socket to accept");
+			//status_->misc_status(ST_LOG, "SOCKET: No client socket to accept");
 			// Non-blocking accept would have blocked - let other events get handled and try again
 			return BLOCK;
 		}
@@ -280,7 +283,7 @@ socket_server::client_status socket_server::accept_client() {
 #else
 		snprintf(message, 256, "SOCKET: Accepted socket %d:%d", client_addr_.sin_addr, htons(client_addr_.sin_port));
 #endif
-		status(ST_OK, message);
+		status_->misc_status(ST_OK, message);
 		return OK;
 	}
 }
@@ -432,13 +435,12 @@ void socket_server::handle_error(const char* phase) {
 #else
 	snprintf(message, 1028, "SOCKET: %s", phase);
 #endif
-	status(ST_ERROR, message);
+	status_->misc_status(ST_ERROR, message);
 	close_server();
 }
 
 // Set handlers
-void socket_server::callback(int(*request)(stringstream&), void(*message)(status_t, const char*)) {
-	status = message;
+void socket_server::callback(int(*request)(stringstream&)) {
 	do_request = request;
 }
 

@@ -44,8 +44,6 @@
 		void run_server();
 		// Add server method
 		void add_method(method_entry method, int(*callback)(rpc_data_item::rpc_list& params, rpc_data_item& response));
-		// Add message callback
-		void callback(void(*message)(status_t, const char*));
 
 	protected:
 		struct method_def {
@@ -77,9 +75,6 @@
 		// Generate error resposne
 		void generate_error(int code, string message, rpc_data_item& response);
 
-
-		// Callback for message handler
-		void(*cb_message)(status_t status, const char* message);
 		// Remove header - returns true if successful and payload is valid
 		bool strip_header(stringstream& message, stringstream& payload);
 		// Add header

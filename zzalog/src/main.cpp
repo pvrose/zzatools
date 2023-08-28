@@ -393,15 +393,15 @@ void add_book(char* arg) {
 	}
 }
 
-// Callback for rig_if_ to use to access spec_data_
-string cb_freq_to_band(double frequency) {
-	return spec_data_->band_for_freq(frequency);
-}
+// // Callback for rig_if_ to use to access spec_data_
+// string cb_freq_to_band(double frequency) {
+// 	return spec_data_->band_for_freq(frequency);
+// }
 
-// Callback for rig_if_ to use to display messages in statues_
-void cb_error_message(status_t level, const char* message) {
-	status_->misc_status(level, message);
-}
+// // Callback for rig_if_ to use to display messages in statues_
+// void cb_error_message(status_t level, const char* message) {
+// 	status_->misc_status(level, message);
+// }
 
 //// Add the band plan window
 //void add_band_view() {
