@@ -72,7 +72,9 @@ void qso_clocks::cb_ticker(void* v) {
 			that->enable_widgets();
 			((qso_manager*)that->parent())->ticker();
 		}
-		status_->ticker();
+		if (tick_count_ % 2 == 0) {
+			status_->ticker();
+		}
 
 		Fl::repeat_timeout(BASIC_TICK, cb_ticker, v);
 	}

@@ -239,21 +239,23 @@ void status::progress(int value, object_t object) {
 			// Update progress item
 			progress_item* item = progress_items_.at(object);
 			item->value = value;
-			update_progress(object);
+			// update_progress(object);
 			// If it's 100% (or 0% if counting down) delete item and draw the next in the stack - certain objects can overrun (this will give an error)
 			if ((item->countdown && value <= 0) || (!item->countdown && value >= item->max_value)) {
 				char message[100];
 				snprintf(message, 100, "PROGRESS: %s finished (%d %s)", item->description, item->max_value, item->suffix);
 				misc_status(ST_LOG, message);
+				update_progress(object);
 				// Remove the item from the stack - even if it's not top of the stack
 				delete item;
 				progress_items_.erase(object);
 				progress_stack_.remove(object);
-				if (progress_stack_.size()) {
-					// Revert to previous progress item (current top-of-stack)
-					update_progress(progress_stack_.back());
-				}
+				// if (progress_stack_.size()) {
+				// 	// Revert to previous progress item (current top-of-stack)
+				// 	update_progress(progress_stack_.back());
+				// }
 			}
+			Fl::check();
 		}
 	}
 }
@@ -272,15 +274,15 @@ void status::progress(const char* message, object_t object) {
 			char msg[100];
 			snprintf(msg, 100, "PROGRESS: %s abandoned %s (%d %s)", OBJECT_NAMES.at(object), message, item->value, item->suffix);
 			misc_status(ST_LOG, msg);
+			if (message) {
+				progress_->copy_label(message);
+			}
 			// Mark progress bar complete
 			if (item->countdown) {
-				progress(0, object);
+				progress((int)0, object);
 			}
 			else {
 				progress(item->max_value, object);
-			}
-			if (message) {
-				progress_->copy_label(message);
 			}
 		}
 	}
@@ -288,8 +290,11 @@ void status::progress(const char* message, object_t object) {
 
 // 1 second ticker - redraw progress bar
 void status::ticker() {
-	// Redraw progress bar
-	progress_->redraw();
+	// Redraw all status 
+	if (progress_stack_.size()) {
+		// Display progress item at top of stack
+		update_progress(progress_stack_.back());
+	}
 	Fl::check();
 }
 
