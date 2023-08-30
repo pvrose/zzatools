@@ -1,6 +1,6 @@
 /*
 ZZALOG - Amateur Radio Log
-© - Copyright 2017, Philip Rose, GM3ZZA
+ï¿½ - Copyright 2017, Philip Rose, GM3ZZA
 All Rights Reserved
 
 utils.h - Utility methods
@@ -54,8 +54,13 @@ void split_line(const string& line, vector<string>& words, const char separator)
 			a_word += line[i1];
 		}
 	}
-	// at EOL save the last field
-	words.push_back(a_word);
+	// Remove the final character if it is CR or LF
+	char c = a_word.back();
+	if (c == '\x0d' || c == '\x0a') {
+		words.push_back(a_word.substr(0, a_word.length() - 1));
+	} else {
+		words.push_back(a_word);
+	}
 	// Tidy up
 	a_word.shrink_to_fit();
 }
@@ -564,7 +569,7 @@ string unescape_string(const string text) {
 	return result;
 }
 
-// Convert a floating point degree value to ° ' " N/E/S/W
+// Convert a floating point degree value to ï¿½ ' " N/E/S/W
 string degrees_to_dms(float value, bool is_latitude) {
 	int num_degrees;
 	int num_minutes;

@@ -41,9 +41,7 @@ INC_DIRS += $(FLTK_DIR) $(FLTK_BUILD)
 INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 
 # Set up libraries
-#LIB_DIRS += $(HAMLIB_BUILD)/lib
-# FLTK ld flags - created using `fltk-config --ldflags`
-FLTK_FLAGS := -L/usr/local/lib -lfltk -lm -lX11 -lpthread -lXft -lXrender -lm -lfontconfig -ldl
+FLTK_FLAGS := `fltk-config --use-images --ldflags`
 
 LDFLAGS := $(FLTK_FLAGS)
 
