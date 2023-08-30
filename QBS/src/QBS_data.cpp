@@ -446,7 +446,7 @@ int QBS_data::ham_data(
 }
 
 // Get count for specific box/call
-int QBS_data::get_count(int box_num, string call) {
+float QBS_data::get_count(int box_num, string call) {
 	switch (box_num) {
 	case IN_BOX:
 		if (in_box_.find(call) == in_box_.end()) {
@@ -476,6 +476,30 @@ int QBS_data::get_count(int box_num, string call) {
 		else {
 			return sases_[call];
 		}
+	case AVERAGE_BOX: {
+		float count = 0.0F;
+		int b = 0;
+		for (; b <= get_current(); b++) {
+			if (boxes_[b]->received->find(call) != boxes_[b]->received->end()) {
+				int d = boxes_[b]->received->at(call);
+				count += d;
+			}
+		}
+		b++;
+		return count / b;
+	}
+	case LAST4_BOX: {
+		float count = 0.0F;
+		int i = 0;
+		for (int b = get_current(); i < 4 && b >= 0; b--, i++) {
+			if (boxes_[b]->received->find(call) != boxes_[b]->received->end()) {
+				int d = boxes_[b]->received->at(call);
+				count += d;
+			}
+		}
+		return count / i;
+	}
+
 	default:
 		if (box_num >= (signed)boxes_.size() || box_num < 0) {
 			return 0;

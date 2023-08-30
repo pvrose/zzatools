@@ -92,7 +92,9 @@ enum special_box_t {
 	SASE_BOX = -4,        // Box containing SASEs
 	RCVD_BOX = -5,        // "Box" representing ALL received cards
 	SENT_BOX = -6,        // "Box" representing cards placed in post-box
-	DISP_BOX = -7         // "Box" representing cards placed in recycling bin  
+	DISP_BOX = -7,        // "Box" representing cards placed in recycling bin  
+	AVERAGE_BOX = -8,     // Average over all boxes
+	LAST4_BOX = -9,       // Average over last 4 boxes
 };
 
 class QBS_window;
@@ -156,7 +158,7 @@ public:
 
 	// Windows interface - get data
 	// Get count for specific box/call
-	int get_count(int box_num, string call);
+	float get_count(int box_num, string call);
 	// Get current box_number
 	int get_current();
 	// Het dispose tal box_num

@@ -10,7 +10,7 @@ using namespace std;
 
 const char* DATE_FORMAT = "%Y-%m-%d";
 extern int FL_NORMAL_SIZE;
-const char* VERSION = "1.0.8";
+const char* VERSION = "1.0.9";
 
 QBS_window* window_;
 
@@ -18,6 +18,7 @@ void create_window(string filename) {
 	char title[100];
 	snprintf(title, 100, "QBS - GM4-8 QSL Bureau status - %s (%s)", VERSION, __DATE__);
 	window_ = new QBS_window(10, 10, title, filename.c_str());
+	printf("%s\n", title);
 }
 
 // The main app entry point

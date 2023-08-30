@@ -189,6 +189,7 @@ protected:
     static const int NUM_COUNTS = 10;
     Fl_Output* op_value_[NUM_COUNTS];
     Fl_Input* ip_delta_[NUM_COUNTS];
+    Fl_Box* bx_label_[NUM_COUNTS];
     int index_inbox_;
     int index_sase_;
     int index_curr_;

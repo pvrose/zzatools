@@ -421,6 +421,7 @@ void QBS_window::create_form() {
 	// save_x and save_y are the common (X,Y) for counts and notes
 	int col1 = save_x + WLABEL;
 	int col2 = col1 + WBUTTON + GAP;
+	int col3 = col2 + WBUTTON + GAP;
 	curr_y += HTEXT;
 	int save_y = curr_y;
 
@@ -439,10 +440,16 @@ void QBS_window::create_form() {
 		op_value_[ix] = new Fl_Output(col1, curr_y, WBUTTON, HBUTTON);
 		op_value_[ix]->copy_label(label);
 		op_value_[ix]->align(FL_ALIGN_LEFT);
+		op_value_[ix]->color(FL_BACKGROUND_COLOR);
 
 		ip_delta_[ix] = new Fl_Input(col2, curr_y, WBUTTON, HBUTTON);
 		ip_delta_[ix]->callback(cb_ip_enter, nullptr);
 		ip_delta_[ix]->when(FL_WHEN_ENTER_KEY_ALWAYS);
+
+		bx_label_[ix] = new Fl_Box(col3, curr_y, WBUTTON, HBUTTON);
+		bx_label_[ix]->box(FL_FLAT_BOX);
+		bx_label_[ix]->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE);
+		bx_label_[ix]->color(FL_BACKGROUND_COLOR);
 		curr_y += HBUTTON;
 	}
 
@@ -544,32 +551,10 @@ void QBS_window::update_new_batch() {
 	bx_change_->label("Add");
 	// Count inputs IN-BOX
 	int ix = 0;
-	op_value_[ix]->hide();
-	op_value_[ix]->label("IN");
-	snprintf(buff, 32, "%d", data_->get_count(IN_BOX, call_));
-	op_value_[ix]->value(buff);
-	ip_delta_[ix]->hide();
-	index_inbox_ = ix;
-	ix++;
-	// Count inputs KEEP BOX
-	op_value_[ix]->hide();
-	op_value_[ix]->label("KEEP");
-	snprintf(buff, 32, "%d", data_->get_count(KEEP_BOX, call_));
-	op_value_[ix]->value(buff);
-	ip_delta_[ix]->hide();
-	index_keep_ = ix;
-	ix++;
-	// New cards in batch - eg "2022 Q4 (C)"
-	op_value_[ix]->hide();
-	snprintf(buff, 12, "%s -C", op_batch_->value());
-	op_value_[ix]->copy_label(buff);
-	op_value_[ix]->value("0");
-	ip_delta_[ix]->hide();
-	ip_delta_[ix]->value("0");
-	index_curr_ = ix;
 	for (ix++; ix < NUM_COUNTS; ix++) {
 		op_value_[ix]->hide();
 		ip_delta_[ix]->hide();
+		bx_label_[ix]->hide();
 	}
 	// Hide the note widgets
 	hide_edit_notes(false);
@@ -608,32 +593,36 @@ void QBS_window::update_sort_cards() {
 	int ix = 0;
 	op_value_[ix]->show();
 	op_value_[ix]->label("IN");
-	snprintf(buff, 32, "%d", data_->get_count(IN_BOX, call_));
+	snprintf(buff, 32, "%0.0f", data_->get_count(IN_BOX, call_));
 	op_value_[ix]->value(buff);
 	ip_delta_[ix]->hide();
+	bx_label_[ix]->hide();
 	index_inbox_ = ix;
 	ix++;
 	// Count inputs KEEP BOX
 	op_value_[ix]->show();
 	op_value_[ix]->label("KEEP");
-	snprintf(buff, 32, "%d", data_->get_count(KEEP_BOX, call_));
+	snprintf(buff, 32, "%0.0f", data_->get_count(KEEP_BOX, call_));
 	op_value_[ix]->value(buff);
 	ip_delta_[ix]->hide();
+	bx_label_[ix]->hide();
 	index_keep_ = ix;
 	ix++;
 	// New cards in batch - eg "2022 Q4 (C)"
 	op_value_[ix]->show();
-	char temp[12];
-	snprintf(temp, 12, "%s -C", op_batch_->value());
-	op_value_[ix]->copy_label(temp);
-	snprintf(buff, 32, "%d", data_->get_count(data_->get_current(), call_));
+	op_value_[ix]->label("CURRENT");
+	snprintf(buff, 32, "%0.0f", data_->get_count(data_->get_current(), call_));
 	op_value_[ix]->value(buff);
 	ip_delta_[ix]->show();
 	ip_delta_[ix]->value("0");
+	bx_label_[ix]->show();
+	bx_label_[ix]->label(op_batch_->value());
 	index_curr_ = ix;
 	for (ix++; ix < NUM_COUNTS; ix++) {
 		op_value_[ix]->hide();
 		ip_delta_[ix]->hide();
+		bx_label_[ix]->hide();
+
 	}
 	// Hide the note widgets
 	hide_edit_notes(true);
@@ -671,24 +660,40 @@ void QBS_window::update_keep_cards() {
 	// Count inputs KEEP BOX
 	op_value_[ix]->show();
 	op_value_[ix]->label("KEEP");
-	snprintf(buff, 32, "%d", data_->get_count(KEEP_BOX, call_));
+	snprintf(buff, 32, "%0.0f", data_->get_count(KEEP_BOX, call_));
 	op_value_[ix]->value(buff);
 	ip_delta_[ix]->show();
 	ip_delta_[ix]->value("0");
+	bx_label_[ix]->hide();
 	index_keep_ = ix;
 	ix++;
 	// New cards in batch - eg "2022 Q4 (C)"
 	op_value_[ix]->show();
-	char temp[12];
-	snprintf(temp, 12, "%s -C", op_batch_->value());
-	op_value_[ix]->copy_label(temp);
-	snprintf(buff, 32, "%d", data_->get_count(data_->get_current(), call_));
+	op_value_[ix]->label("CURRENT");
+	snprintf(buff, 32, "%0.0f", data_->get_count(data_->get_current(), call_));
 	op_value_[ix]->value(buff);
 	ip_delta_[ix]->hide();
+	bx_label_[ix]->show();
+	bx_label_[ix]->label(op_batch_->value());
 	index_curr_ = ix;
+	ix++;
+	op_value_[ix]->show();
+	op_value_[ix]->label("AVERAGE");
+	snprintf(buff, 32, "%0.1f", data_->get_count(AVERAGE_BOX, call_));
+	op_value_[ix]->value(buff);
+	ip_delta_[ix]->hide();
+	bx_label_[ix]->hide();
+	ix++;
+	op_value_[ix]->show();
+	op_value_[ix]->label("LAST 4");
+	snprintf(buff, 32, "%0.1f", data_->get_count(LAST4_BOX, call_));
+	op_value_[ix]->value(buff);
+	ip_delta_[ix]->hide();
+	bx_label_[ix]->hide();
 	for (ix++; ix < NUM_COUNTS; ix++) {
 		op_value_[ix]->hide();
 		ip_delta_[ix]->hide();
+		bx_label_[ix]->hide();
 	}
 	// Hide the note widgets
 	hide_edit_notes(true);
@@ -726,14 +731,28 @@ void QBS_window::update_rcv_card() {
 	int ix = 0;
 	op_value_[ix]->show();
 	op_value_[ix]->label("IN-BOX");
-	snprintf(buff, 32, "%d", data_->get_count(IN_BOX, call_));
+	snprintf(buff, 32, "%0.0f", data_->get_count(IN_BOX, call_));
 	op_value_[ix]->value(buff);
 	ip_delta_[ix]->show();
 	ip_delta_[ix]->value("0");
+	bx_label_[ix]->hide();
 	index_inbox_ = ix;
+	ix++;
+	op_value_[ix]->show();
+	op_value_[ix]->label("AVERAGE");
+	snprintf(buff, 32, "%0.1f", data_->get_count(AVERAGE_BOX, call_));
+	ip_delta_[ix]->hide();
+	bx_label_[ix]->hide();
+	ix++;
+	op_value_[ix]->show();
+	op_value_[ix]->label("LAST 4");
+	snprintf(buff, 32, "%0.1f", data_->get_count(LAST4_BOX, call_));
+	ip_delta_[ix]->hide();
+	bx_label_[ix]->hide();
 	for (ix++; ix < NUM_COUNTS; ix++) {
 		op_value_[ix]->hide();
 		ip_delta_[ix]->hide();
+		bx_label_[ix]->hide();
 	}
 	// Hide the note widgets
 	hide_edit_notes(true);
@@ -768,14 +787,16 @@ void QBS_window::update_rcv_sase() {
 	int ix = 0;
 	op_value_[ix]->show();
 	op_value_[ix]->label("SASES");
-	snprintf(buff, 32, "%d", data_->get_count(SASE_BOX, call_));
+	snprintf(buff, 32, "%0.0f", data_->get_count(SASE_BOX, call_));
 	op_value_[ix]->value(buff);
 	ip_delta_[ix]->show();
 	ip_delta_[ix]->value("0");
+	bx_label_[ix]->hide();
 	index_sase_ = ix;
 	for (ix++; ix < NUM_COUNTS; ix++) {
 		op_value_[ix]->hide();
 		ip_delta_[ix]->hide();
+		bx_label_[ix]->hide();
 	}
 	// Hide the note widgets
 	hide_edit_notes(true);
@@ -811,7 +832,7 @@ void QBS_window::update_stuff_cards() {
 	int ix = 0;
 	op_value_[ix]->show();
 	op_value_[ix]->label("KEEP");
-	snprintf(buff, 32, "%d", data_->get_count(KEEP_BOX, call_));
+	snprintf(buff, 32, "%0.0f", data_->get_count(KEEP_BOX, call_));
 	op_value_[ix]->value(buff);
 	ip_delta_[ix]->show();
 	ip_delta_[ix]->value(default_inputs_ ? buff: "0");
@@ -819,7 +840,7 @@ void QBS_window::update_stuff_cards() {
 	ix++;
 	op_value_[ix]->show();
 	op_value_[ix]->label("IN-BOX");
-	snprintf(buff, 32, "%d", data_->get_count(IN_BOX, call_));
+	snprintf(buff, 32, "%0.0f", data_->get_count(IN_BOX, call_));
 	op_value_[ix]->value(buff);
 	ip_delta_[ix]->show();
 	ip_delta_[ix]->value(default_inputs_ ? buff : "0");
@@ -830,27 +851,27 @@ void QBS_window::update_stuff_cards() {
 	int head = data_->get_head();
 	int box = curr;
 	ix++;
-	char temp[12];
 	while (box >= head) {
 		// Display the current and disposal queue boxes (by batch id)
 		op_value_[ix]->show();
 		if (box == curr) {
-			snprintf(temp, 12, "%s C", data_->get_batch(box).c_str());
+			op_value_[ix]->label("CURRENT");
 		}
 		else if (box == head) {
-			snprintf(temp, 12, "%s H", data_->get_batch(box).c_str());
+			op_value_[ix]->label("HEAD");
 		}
 		else if (box == tail) {
-			snprintf(temp, 12, "%s T", data_->get_batch(box).c_str());
+			op_value_[ix]->label("TAIL");
 		}
 		else {
-			snprintf(temp, 12, "%s  ", data_->get_batch(box).c_str());
+			op_value_[ix]->label("");
 		}
-		op_value_[ix]->copy_label(temp);
-		snprintf(buff, 32, "%d", data_->get_count(box, call_));
+		snprintf(buff, 32, "%0.0f", data_->get_count(box, call_));
 		op_value_[ix]->value(buff);
 		ip_delta_[ix]->show();
 		ip_delta_[ix]->value(default_inputs_ ? buff : "0");
+		bx_label_[ix]->show();
+		bx_label_[ix]->copy_label(data_->get_batch(box).c_str());
 		if (box == curr) index_curr_ = ix;
 		if (box == head) index_head_ = ix;
 		box--;
@@ -858,23 +879,41 @@ void QBS_window::update_stuff_cards() {
 	}
 	op_value_[ix]->show();
 	op_value_[ix]->label("OUT BOX");
-	snprintf(buff, 32, "%d", data_->get_count(OUT_BOX, call_));
+	snprintf(buff, 32, "%0.0f", data_->get_count(OUT_BOX, call_));
 	op_value_[ix]->value(buff);
 	ip_delta_[ix]->hide();
 	ip_delta_[ix]->value("0");
+	bx_label_[ix]->hide();
 	index_outbox_ = ix;
 	ix++;
 	op_value_[ix]->show();
 	op_value_[ix]->label("SASEs");
-	snprintf(buff, 32, "%d", data_->get_count(SASE_BOX, call_));
+	snprintf(buff, 32, "%0.0f", data_->get_count(SASE_BOX, call_));
 	op_value_[ix]->value(buff);
 	ip_delta_[ix]->show();
 	ip_delta_[ix]->value("0");
+	bx_label_[ix]->hide();
 	index_sase_ = ix;
+	ix++;
+	op_value_[ix]->show();
+	op_value_[ix]->label("AVERAGE");
+	snprintf(buff, 32, "%0.1f", data_->get_count(AVERAGE_BOX, call_));
+	op_value_[ix]->value(buff);
+	ip_delta_[ix]->hide();
+	bx_label_[ix]->hide();
+	ix++;
+	op_value_[ix]->show();
+	op_value_[ix]->label("LAST 4");
+	snprintf(buff, 32, "%0.1f", data_->get_count(LAST4_BOX, call_));
+	op_value_[ix]->value(buff);
+	ip_delta_[ix]->hide();
+	bx_label_[ix]->hide();
+	
 	// Deactivate the rest
 	for (ix++; ix < NUM_COUNTS; ix++) {
 		op_value_[ix]->hide();
 		ip_delta_[ix]->hide();
+		bx_label_[ix]->hide();
 	}
 	// Hide the note widgets
 	hide_edit_notes(true);
@@ -909,6 +948,7 @@ void QBS_window::update_dispose_cards() {
 		op_value_[ix]->hide();
 		op_value_[ix]->label("");
 		ip_delta_[ix]->hide();
+		bx_label_[ix]->hide();
 	}
 	// Hide the note widgets
 	hide_edit_notes(false);
@@ -944,6 +984,7 @@ void QBS_window::update_post_cards() {
 		op_value_[ix]->hide();
 		op_value_[ix]->label("");
 		ip_delta_[ix]->hide();
+		bx_label_[ix]->hide();
 	}
 	// Hide the note widgets
 	hide_edit_notes(false);
@@ -983,6 +1024,7 @@ void QBS_window::update_recycle_cards() {
 	snprintf(buff, 32, "%d", recycle.sum_received);
 	op_value_[ix]->value(buff);
 	ip_delta_[ix]->hide();
+	bx_label_[ix]->hide();
 
 	ix++;
 	op_value_[ix]->show();
@@ -990,6 +1032,7 @@ void QBS_window::update_recycle_cards() {
 	snprintf(buff, 32, "%d", recycle.sum_recycled);
 	op_value_[ix]->value(buff);
 	ip_delta_[ix]->hide();
+	bx_label_[ix]->hide();
 
 	ix++;
 	op_value_[ix]->show();
@@ -997,6 +1040,7 @@ void QBS_window::update_recycle_cards() {
 	snprintf(buff, 32, "%d", recycle.count_received);
 	op_value_[ix]->value(buff);
 	ip_delta_[ix]->hide();
+	bx_label_[ix]->hide();
 
 	ix++;
 	op_value_[ix]->show();
@@ -1004,6 +1048,7 @@ void QBS_window::update_recycle_cards() {
 	snprintf(buff, 32, "%d", recycle.count_recycled);
 	op_value_[ix]->value(buff);
 	ip_delta_[ix]->hide();
+	bx_label_[ix]->hide();
 
 	ix++;
 	op_value_[ix]->show();
@@ -1012,12 +1057,14 @@ void QBS_window::update_recycle_cards() {
 	op_value_[ix]->value(buff);
 	ip_delta_[ix]->show();
 	ip_delta_[ix]->value("0.0");
+	bx_label_[ix]->hide();
 	index_weight_ = ix;
 
 	for (ix++; ix < NUM_COUNTS; ix++) {
 		op_value_[ix]->hide();
 		op_value_[ix]->label("");
 		ip_delta_[ix]->hide();
+		bx_label_[ix]->hide();
 	}
 	// Hide the note widgets
 	hide_edit_notes(false);
@@ -1052,15 +1099,17 @@ void QBS_window::update_dispose_sase() {
 	int ix = 0;
 	op_value_[ix]->show();
 	op_value_[ix]->label("SASES");
-	snprintf(buff, 32, "%d", data_->get_count(SASE_BOX, call_));
+	snprintf(buff, 32, "%0.0f", data_->get_count(SASE_BOX, call_));
 	op_value_[ix]->value(buff);
 	ip_delta_[ix]->show();
 	ip_delta_[ix]->value("0");
+	bx_label_[ix]->hide();
 	index_sase_ = ix;
 
 	for (ix++; ix < NUM_COUNTS; ix++) {
 		op_value_[ix]->hide();
 		ip_delta_[ix]->hide();
+		bx_label_[ix]->hide();
 	}
 	// Hide the note widgets
 	hide_edit_notes(true);
@@ -1094,6 +1143,7 @@ void QBS_window::update_batch_summary() {
 	for (; ix < NUM_COUNTS; ix++) {
 		op_value_[ix]->hide();
 		ip_delta_[ix]->hide();
+		bx_label_[ix]->hide();
 	}
 	// Hide the note widgets
 	hide_edit_notes(false);
@@ -1127,6 +1177,7 @@ void QBS_window::update_batch_listing() {
 	for (; ix < NUM_COUNTS; ix++) {
 		op_value_[ix]->hide();
 		ip_delta_[ix]->hide();
+		bx_label_[ix]->hide();
 	}
 	// Hide the note widgets
 	hide_edit_notes(false);
@@ -1161,6 +1212,7 @@ void QBS_window::update_call_summary() {
 	for (; ix < NUM_COUNTS; ix++) {
 		op_value_[ix]->hide();
 		ip_delta_[ix]->hide();
+		bx_label_[ix]->hide();
 	}
 	// Hide the note widgets
 	hide_edit_notes(false);
@@ -1195,6 +1247,7 @@ void QBS_window::update_call_history() {
 	for (; ix < NUM_COUNTS; ix++) {
 		op_value_[ix]->hide();
 		ip_delta_[ix]->hide();
+		bx_label_[ix]->hide();
 	}
 	// Hide the note widgets
 	hide_edit_notes(false);
@@ -1227,6 +1280,7 @@ void QBS_window::update_edit_notes() {
 	for (int ix = 0; ix < NUM_COUNTS; ix++) {
 		op_value_[ix]->hide();
 		ip_delta_[ix]->hide();
+		bx_label_[ix]->hide();
 	}
 	// Show the note widgets
 	tab_old_notes_->show();
@@ -1271,18 +1325,20 @@ void QBS_window::update_correct_data() {
 	int ix = 0;
 	op_value_[ix]->show();
 	op_value_[ix]->label("KEEP");
-	snprintf(buff, 32, "%d", data_->get_count(KEEP_BOX, call_));
+	snprintf(buff, 32, "%0.0f", data_->get_count(KEEP_BOX, call_));
 	op_value_[ix]->value(buff);
 	ip_delta_[ix]->show();
 	ip_delta_[ix]->value("0");
+	bx_label_[ix]->hide();
 	index_keep_ = ix;
 	ix++;
 	op_value_[ix]->show();
 	op_value_[ix]->label("IN-BOX");
-	snprintf(buff, 32, "%d", data_->get_count(IN_BOX, call_));
+	snprintf(buff, 32, "%0.0f", data_->get_count(IN_BOX, call_));
 	op_value_[ix]->value(buff);
 	ip_delta_[ix]->show();
 	ip_delta_[ix]->value("0");
+	bx_label_[ix]->hide();
 	index_inbox_ = ix;
 	// Now output all the bins
 	int curr = data_->get_current();
@@ -1295,22 +1351,23 @@ void QBS_window::update_correct_data() {
 		// Display the current and disposal queue boxes (by batch id)
 		op_value_[ix]->show();
 		if (box == curr) {
-			snprintf(temp, 12, "%s C", data_->get_batch(box).c_str());
+			op_value_[ix]->label("CURRENT");
 		}
 		else if (box == head) {
-			snprintf(temp, 12, "%s H", data_->get_batch(box).c_str());
+			op_value_[ix]->label("HEAD");
 		}
 		else if (box == tail) {
-			snprintf(temp, 12, "%s T", data_->get_batch(box).c_str());
+			op_value_[ix]->label("TAIL");
 		}
 		else {
-			snprintf(temp, 12, "%s  ", data_->get_batch(box).c_str());
+			op_value_[ix]->label("");
 		}
-		op_value_[ix]->copy_label(temp);
-		snprintf(buff, 32, "%d", data_->get_count(box, call_));
+		snprintf(buff, 32, "%0.0f", data_->get_count(box, call_));
 		op_value_[ix]->value(buff);
 		ip_delta_[ix]->show();
-		ip_delta_[ix]->value("0");
+		ip_delta_[ix]->value(default_inputs_ ? buff : "0");
+		bx_label_[ix]->show();
+		bx_label_[ix]->copy_label(data_->get_batch(box).c_str());
 		if (box == curr) index_curr_ = ix;
 		if (box == head) index_head_ = ix;
 		box--;
@@ -1318,15 +1375,30 @@ void QBS_window::update_correct_data() {
 	}
 	op_value_[ix]->show();
 	op_value_[ix]->label("SASEs");
-	snprintf(buff, 32, "%d", data_->get_count(SASE_BOX, call_));
+	snprintf(buff, 32, "%0.0f", data_->get_count(SASE_BOX, call_));
 	op_value_[ix]->value(buff);
 	ip_delta_[ix]->show();
 	ip_delta_[ix]->value("0");
 	index_sase_ = ix;
+	ix++;
+	op_value_[ix]->show();
+	op_value_[ix]->label("AVERAGE");
+	snprintf(buff, 32, "%0.1f", data_->get_count(AVERAGE_BOX, call_));
+	op_value_[ix]->value(buff);
+	ip_delta_[ix]->hide();
+	bx_label_[ix]->hide();
+	ix++;
+	op_value_[ix]->show();
+	op_value_[ix]->label("LAST 4");
+	snprintf(buff, 32, "%0.1f", data_->get_count(LAST4_BOX, call_));
+	op_value_[ix]->value(buff);
+	ip_delta_[ix]->hide();
+	bx_label_[ix]->hide();
 	// Deactivate the rest
 	for (ix++; ix < NUM_COUNTS; ix++) {
 		op_value_[ix]->hide();
 		ip_delta_[ix]->hide();
+		bx_label_[ix]->hide();
 	}
 	// Hide the note widgets
 	hide_edit_notes(true);
