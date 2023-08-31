@@ -70,7 +70,9 @@ void qso_qsl::create_form() {
 	const int W5 = WBUTTON / 2;
 	const int C6 = C5 + W5;
 	const int W6 = WBUTTON / 2;
-	int max_x = C6 + W6 + GAP;
+	const int C7 = C6 + W6;
+	const int W7 = WBUTTON / 2;
+	int max_x = C7 + W7 + GAP;
 	int curr_y = y() + GAP;
 
 	// eQSL buttons
@@ -95,6 +97,10 @@ void qso_qsl::create_form() {
 	bn_upld_eqsl_ = new Fl_Button(C5, curr_y, W5, HBUTTON, "@8->");
 	bn_upld_eqsl_->callback(cb_upload, (void*)extract_data::EQSL);
 	bn_upld_eqsl_->tooltip("Upload extracted records to eQSL");
+	// Cancel
+	bn_cncl_eqsl_ = new Fl_Button(C6, curr_y, W6, HBUTTON, "@undo");
+	bn_cncl_eqsl_->callback(cb_cancel, (void*)extract_data::EQSL);
+	bn_cncl_eqsl_->tooltip("Cancel upload");
 	//// Fetch cards
 	//bn_down_ecard_ = new Fl_Button(C6, curr_y, W6, HBUTTON, "eCards");
 	//bn_down_ecard_->callback(cb_fetch);
@@ -123,6 +129,10 @@ void qso_qsl::create_form() {
 	bn_upld_lotw_ = new Fl_Button(C5, curr_y, W5, HBUTTON, "@8->");
 	bn_upld_lotw_->callback(cb_upload, (void*)extract_data::LOTW);
 	bn_upld_lotw_->tooltip("Upload extracted records to LotW");
+	// Cancel
+	bn_cncl_lotw_ = new Fl_Button(C6, curr_y, W6, HBUTTON, "@undo");
+	bn_cncl_lotw_->callback(cb_cancel, (void*)extract_data::LOTW);
+	bn_cncl_lotw_->tooltip("Cancel upload");
 
 	curr_y += HBUTTON;
 
@@ -146,6 +156,10 @@ void qso_qsl::create_form() {
 	bn_upld_club_ = new Fl_Button(C5, curr_y, W5, HBUTTON, "@8->");
 	bn_upld_club_->callback(cb_upload, (void*)extract_data::CLUBLOG);
 	bn_upld_club_->tooltip("Upload extracted records to ClubLog");
+	// Cancel
+	bn_cncl_club_ = new Fl_Button(C6, curr_y, W6, HBUTTON, "@undo");
+	bn_cncl_club_->callback(cb_cancel, (void*)extract_data::CLUBLOG);
+	bn_cncl_club_->tooltip("Cancel upload");
 
 	curr_y += HBUTTON;
 
@@ -170,8 +184,12 @@ void qso_qsl::create_form() {
 	bn_print_ = new Fl_Button(C5, curr_y, W5, HBUTTON, "@fileprint");
 	bn_print_->callback(cb_print);
 	bn_print_->tooltip("Print labels from extracted records");
+	// Cancel
+	bn_cncl_card_ = new Fl_Button(C6, curr_y, W6, HBUTTON, "@undo");
+	bn_cncl_card_->callback(cb_cancel, (void*)extract_data::CARD);
+	bn_cncl_card_->tooltip("Cancel upload");
 	// Mark read
-	bn_mark_done_ = new Fl_Button(C6, curr_y, W6, HBUTTON, "Done");
+	bn_mark_done_ = new Fl_Button(C7, curr_y, W7, HBUTTON, "Done");
 	bn_mark_done_->callback(cb_mark_done);
 	bn_mark_done_->tooltip("Mark extracted records as printed");
 
@@ -214,19 +232,39 @@ void qso_qsl::enable_widgets() {
 		bn_extr_card_->deactivate();
 	}
 	// Disable extract and upload buttons if auto-upload enabled
-	if (extract_records_->size() && extract_records_->use_mode() == extract_data::EQSL) bn_upld_eqsl_->activate();
-	else bn_upld_eqsl_->deactivate();
-	if (extract_records_->size() && extract_records_->use_mode() == extract_data::LOTW) bn_upld_lotw_->activate();
-	else bn_upld_lotw_->deactivate();
-	if (extract_records_->size() && extract_records_->use_mode() == extract_data::CLUBLOG) bn_upld_club_->activate();
-	else bn_upld_club_->deactivate();
+	if (extract_records_->size() && extract_records_->use_mode() == extract_data::EQSL) {
+		bn_upld_eqsl_->activate();
+		bn_cncl_eqsl_->activate();
+	}
+	else {
+		bn_upld_eqsl_->deactivate();
+		bn_cncl_eqsl_->deactivate();
+	}
+	if (extract_records_->size() && extract_records_->use_mode() == extract_data::LOTW) {
+		bn_upld_lotw_->activate();
+		bn_cncl_lotw_->activate();
+	}
+	else {
+		bn_upld_lotw_->deactivate();
+		bn_cncl_lotw_->deactivate();
+	}
+	if (extract_records_->size() && extract_records_->use_mode() == extract_data::CLUBLOG) {
+		bn_upld_club_->activate();
+		bn_cncl_club_->activate();
+	}
+	else {
+		bn_upld_club_->deactivate();
+		bn_cncl_club_->deactivate();
+	}
 	if (extract_records_->size() && extract_records_->use_mode() == extract_data::CARD) {
 		bn_print_->activate();
 		bn_mark_done_->activate();
+		bn_cncl_card_->activate();
 	}
 	else { 
 		bn_print_->deactivate();
 		bn_mark_done_->deactivate();
+		bn_cncl_card_->deactivate();
 	}
 }
 
@@ -281,11 +319,16 @@ void qso_qsl::cb_print(Fl_Widget* w, void* v) {
 	that->qsl_print();
 }
 
-
 // Mark printing done
 void qso_qsl::cb_mark_done(Fl_Widget* w, void* v) {
 	qso_qsl* that = ancestor_view<qso_qsl>(w);
 	that->qsl_print_done();
+}
+
+// Cancel extraction
+void qso_qsl::cb_cancel(Fl_Widget* w, void* v) {
+	qso_qsl* that = ancestor_view<qso_qsl>(w);
+	that->qsl_cancel();
 }
 
 // Download. v = eQSL/LotW (import data enum)
@@ -349,5 +392,11 @@ void qso_qsl::qsl_print_done() {
 	else {
 		status_->misc_status(ST_WARNING, "EXTRACT: No records to change");
 	}
+	enable_widgets();
+}
+
+// Cancel uploads
+void qso_qsl::qsl_cancel() {
+	extract_records_->clear_criteria();
 	enable_widgets();
 }

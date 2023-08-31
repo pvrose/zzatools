@@ -25,6 +25,7 @@ public:
     void qsl_upload();
     void qsl_print();
     void qsl_print_done();
+    void qsl_cancel();
 
 protected:
     // callbacks
@@ -40,6 +41,8 @@ protected:
     static void cb_print(Fl_Widget* w, void* v);
     // Mark printing done
     static void cb_mark_done(Fl_Widget* w, void* v);
+    // Cancel extract
+    static void cb_cancel(Fl_Widget* w, void* v);
 
  
     // Attributes
@@ -62,6 +65,10 @@ protected:
     Fl_Button* bn_upld_club_;
     Fl_Button* bn_print_;
     Fl_Button* bn_mark_done_;
+    Fl_Button* bn_cncl_eqsl_;
+    Fl_Button* bn_cncl_lotw_;
+    Fl_Button* bn_cncl_club_;
+    Fl_Button* bn_cncl_card_;
 
 };
 
