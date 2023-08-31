@@ -315,18 +315,26 @@ void qso_data::update_qso(qso_num_t log_num) {
 		// Ack whether to save or quit then activate new QSO
 		if (log_num != g_entry_->qso_number()) {
 			fl_beep(FL_BEEP_QUESTION);
-			switch (fl_choice("Trying to select a different record while logging a QSO", "Save QSO", "Quit QSO", nullptr)) {
+			switch (fl_choice("Trying to select a different record while logging a QSO", "Save QSO", "Quit QSO", "Ignore")) {
 			case 0:
 				// Save QSO
 				action_save();
+				book_->selection(book_->item_number(log_num));
+				logging_state_ = QSO_INACTIVE;
+				action_peek(log_num);
 				break;
 			case 1:
 				// Cancel QSO
 				action_cancel();
+				book_->selection(book_->item_number(log_num));
+				logging_state_ = QSO_INACTIVE;
+				action_peek(log_num);
+				break;
+			case 2:
+				// Ignore the selection request
+				book_->selection(book_->item_number(g_entry_->qso_number()));
 				break;
 			}
-			// Actions will have changed selection - change it back.
-			logging_state_ = QSO_INACTIVE;
 		}
 		else {
 			g_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
@@ -337,14 +345,20 @@ void qso_data::update_qso(qso_num_t log_num) {
 		if (log_num != g_entry_->qso_number()) {
 			if (g_entry_->qso()->is_dirty()) {
 				fl_beep(FL_BEEP_QUESTION);
-				switch (fl_choice("Trying to select a different record while editing a record", "Save edit", "Cancel edit", nullptr)) {
+				switch (fl_choice("Trying to select a different record while editing a record", "Save edit", "Cancel edit", "Ignore")) {
 				case 0:
 					// Save QSO
 					action_save_edit();
+					action_edit();
 					break;
 				case 1:
 					// Cancel QSO
 					action_cancel_edit();
+					action_edit();
+					break;
+				case 2:
+					// Ignore the selection request
+					book_->selection(book_->item_number(g_entry_->qso_number()));
 					break;
 				}
 			}
@@ -371,18 +385,24 @@ void qso_data::update_qso(qso_num_t log_num) {
 		if (!g_net_entry_->qso_in_net(log_num)) {
 			// Selected QSO is not part of the net, save or cancel the net
 			fl_beep(FL_BEEP_QUESTION);
-			switch (fl_choice("Trying to select a different record while logging a net", "Save Net", "Quit Net", nullptr)) {
+			switch (fl_choice("Trying to select a different record while logging a net", "Save Net", "Quit Net", "Ignore")) {
 			case 0:
 				// Save QSO
 				action_save_net_all();
+				logging_state_ = QSO_INACTIVE;
+				action_peek(log_num);
 				break;
 			case 1:
 				// Cancel QSO
 				action_cancel_net_all();
+				logging_state_ = QSO_INACTIVE;
+				action_peek(log_num);
+				break;
+			case 2:
+				// Ignore the selection request
+				book_->selection(book_->item_number(g_net_entry_->qso_number()));
 				break;
 			}
-			// Actions will have changed selection - change it back.
-			logging_state_ = QSO_INACTIVE;
 		}
 		else {
 			// Switch to the selected QSO as part of the net if necessary
@@ -465,20 +485,25 @@ void qso_data::update_modem_qso(record* qso) {
 		case QSO_EDIT:
 			if (g_entry_->qso()->is_dirty()) {
 				fl_beep(FL_BEEP_QUESTION);
-				switch (fl_choice("Trying to select a different record while editing a record", "Save edit", "Cancel edit", nullptr)) {
+				switch (fl_choice("Trying to select a different record while editing a record", "Save edit", "Cancel edit", "Ignore")) {
 				case 0:
 					// Save QSO
 					action_save_edit();
+					action_add_modem(qso);
 					break;
 				case 1:
 					// Cancel QSO
 					action_cancel_edit();
+					action_add_modem(qso);
+					break;
+				case 2:
+					// Ignore the modem request
 					break;
 				}
 			} else {
 				action_cancel_edit();
+				action_add_modem(qso);
 			}
-			action_add_modem(qso);
 			break;
 
 		case QSO_VIEW:

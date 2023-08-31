@@ -238,6 +238,7 @@ bool qso_manager::editing() {
 	case qso_data::NET_STARTED:
 	case qso_data::NET_ADDING:
 	case qso_data::NET_EDIT:
+	case qso_data::QSO_MODEM:
 		return true;
 	case qso_data::QSO_EDIT:
 	case qso_data::QSO_STARTED:
