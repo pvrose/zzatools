@@ -79,6 +79,32 @@ void qso_rig::load_values() {
 		else {
 			hamlib_data_.port_type = capabilities->port_type;
 		};
+
+		Fl_Preferences modifier_settings(rig_settings, "Modifiers");
+		if (modifier_settings.get("Frequency", freq_offset_, 0.0)) {
+			modify_freq_ = true;
+		} else {
+			modify_freq_ = false;
+		}
+		if (modifier_settings.get("Gain", gain_, 0)) {
+			modify_gain_ = true;
+		} else {
+			modify_gain_ = false;
+		}
+		if (modifier_settings.get("Power", power_, 0.0)) {
+			modify_power_ = true;
+		} else {
+			modify_power_ = false;
+		}
+		// If we cannot read power from hamlib - force modify_power_
+		if (!(capabilities->has_get_level & RIG_LEVEL_RFPOWER_METER_WATTS)) {
+			char msg[128];
+			snprintf(msg, sizeof(msg), "DASH: Rig %s does not supply power - set it", 
+				hamlib_data_.model.c_str());
+			status_->misc_status(ST_WARNING, msg);
+			modify_power_ = true;
+			modify_gain_ = true;
+		}
 	}
 	else {
 		// New hamlib data
@@ -235,6 +261,67 @@ void qso_rig::create_form(int X, int Y) {
 	curr_x = x() + GAP;
 	curr_y = max(serial_grp_->y() + serial_grp_->h(), network_grp_->y() + network_grp_->h());
 	
+	modifier_grp_ = new Fl_Group(curr_x, curr_y, 10, 10);
+	modifier_grp_->box(FL_FLAT_BOX);
+
+	curr_x = modifier_grp_->x() + WLABEL;
+
+	bn_mod_freq_ = new Fl_Check_Button(curr_x, curr_y, WRADIO, HRADIO, "\316\224 F (MHz)");
+	bn_mod_freq_->align(FL_ALIGN_LEFT);
+	bn_mod_freq_->callback(cb_bn_mod_freq, (void*)&modify_freq_);
+	bn_mod_freq_->tooltip("Allow frequency to be offset - eg transverter");
+	bn_mod_freq_->value(modify_freq_);
+	
+	curr_x += WRADIO;
+	ip_freq_ = new Fl_Float_Input(curr_x, curr_y, WBUTTON, HBUTTON);
+	ip_freq_->callback(cb_ip_freq, (void*)&freq_offset_);
+	ip_freq_->tooltip("Enter frequency offset");
+	ip_freq_->when(FL_WHEN_CHANGED);
+	char text[20];
+	snprintf(text, sizeof(text), "%g", freq_offset_);
+	ip_freq_->value(text);
+
+	curr_y += HBUTTON;
+	curr_x = modifier_grp_->x() + WLABEL;
+
+	bn_gain_ = new Fl_Check_Button(curr_x, curr_y, WRADIO, HRADIO, "Gain (dB)");
+	bn_gain_->align(FL_ALIGN_LEFT);
+	bn_gain_->callback(cb_bn_power, (void*)(intptr_t)false);
+	bn_gain_->tooltip("Allow amplifier");
+	bn_gain_->value(modify_gain_);
+
+	curr_x += WRADIO;
+	ip_gain_ = new Fl_Int_Input(curr_x, curr_y, WBUTTON, HBUTTON);
+	ip_gain_->callback(cb_ip_gain, (void*)&gain_);
+	ip_gain_->when(FL_WHEN_CHANGED);
+	ip_gain_->tooltip("Specify the amplifier gain (dB)");
+	snprintf(text, sizeof(text), "%d", gain_);
+	ip_gain_->value(text);
+
+	curr_y += HBUTTON;
+	curr_x = modifier_grp_->x() + WLABEL;
+
+	bn_power_ = new Fl_Check_Button(curr_x, curr_y, WRADIO, HRADIO, "Pwr (W)");
+	bn_power_->align(FL_ALIGN_LEFT);
+	bn_power_->callback(cb_bn_power, (void*)(intptr_t)true);
+	bn_power_->tooltip("Specify absolute power");
+	bn_power_->value(modify_power_);
+
+	curr_x += WRADIO;
+	ip_power_ = new Fl_Float_Input(curr_x, curr_y, WBUTTON, HBUTTON);
+	ip_power_->callback(cb_ip_power, (void*)&power_);
+	ip_power_->when(FL_WHEN_CHANGED);
+	ip_power_->tooltip("Specify power out ");
+	snprintf(text, sizeof(text), "%g", power_);
+	ip_power_->value(text);
+
+	curr_x += WBUTTON;
+	curr_y += HBUTTON + GAP;
+	modifier_grp_->resizable(nullptr);
+	modifier_grp_->size(curr_x - modifier_grp_->x(), curr_y - modifier_grp_->y());
+
+	curr_x = x() + GAP;
+
 	display_grp_ = new Fl_Group(curr_x, curr_y, 10, 10);
 	display_grp_->box(FL_NO_BOX);
 
@@ -276,6 +363,7 @@ void qso_rig::create_form(int X, int Y) {
 	// Connected status
 
 	// Display hamlib ot flrig settings as selected
+	modify_rig();
 	enable_widgets();
 
 	resizable(nullptr);
@@ -295,6 +383,18 @@ void qso_rig::save_values() {
 		hamlib_settings.set("Port", hamlib_data_.port_name.c_str());
 		hamlib_settings.set("Baud Rate", hamlib_data_.baud_rate);
 		hamlib_settings.set("Model ID", (int)hamlib_data_.model_id);
+		// Modifier settings
+		Fl_Preferences modr_settings(rig_settings, "Modifiers");
+		modr_settings.clear();
+		if (modify_freq_) {
+			modr_settings.set("Frequency", freq_offset_);
+		}
+		if (modify_gain_) {
+			modr_settings.set("Gain", gain_);
+		}
+		if (modify_power_) {
+			modr_settings.set("Power", power_);
+		}
 	}
 }
 
@@ -365,6 +465,25 @@ void qso_rig::enable_widgets() {
 		network_grp_->hide();
 		break;
 	}
+	// Update modifier values
+	if (modify_freq_) {
+		ip_freq_->activate();
+	} else {
+		ip_freq_->deactivate();
+	}
+	// We have modified the values so reload them
+	bn_gain_->value(modify_gain_);
+	bn_power_->value(modify_power_);
+	if (modify_gain_) {
+		ip_gain_->activate();
+	} else {
+		ip_gain_->deactivate();
+	}
+	if (modify_power_) {
+		ip_power_->activate();
+	} else {
+		ip_power_->deactivate();
+	}
 	// Update display values
 	if (rig_ && rig_->is_open()) {
 		op_summary_->activate();
@@ -391,9 +510,10 @@ void qso_rig::enable_widgets() {
 		string rig_mode;
 		string submode;
 		rig_->get_string_mode(rig_mode, submode);
-		snprintf(msg, sizeof(msg), "  %0.3f MHz %s", 
+		snprintf(msg, sizeof(msg), "  %0.3fMHz %s %sW" , 
 			freq, 
-			submode.length() ? submode.c_str() : rig_mode.c_str()
+			submode.length() ? submode.c_str() : rig_mode.c_str(),
+			rig_->get_tx_power(true).c_str()
 		);
 		op_freq_mode_->copy_label(msg);
 	}
@@ -636,6 +756,71 @@ void qso_rig::cb_bn_select(Fl_Widget* w, void* v) {
 	}
 }
 
+// Pressed the modify frequency
+// v is the bool
+void qso_rig::cb_bn_mod_freq(Fl_Widget* w, void* v) {
+	qso_rig* that = ancestor_view<qso_rig>(w);
+	cb_value<Fl_Check_Button, bool>(w, v);
+	that->modify_rig();
+	that->enable_widgets();
+}
+
+// Typed in freaquency value
+// v is the input
+void qso_rig::cb_ip_freq(Fl_Widget* w, void* v) {
+	qso_rig* that = ancestor_view<qso_rig>(w);
+	float f;
+	cb_value_float<Fl_Float_Input>(w, &f);
+	*(double*)v = (double)f;
+	that->modify_rig();
+	that->enable_widgets();
+}
+
+// Pressed either power or gain check button
+// v: false = gain, true = power
+void qso_rig::cb_bn_power(Fl_Widget* w, void* v) {
+	qso_rig* that = ancestor_view<qso_rig>(w);
+	bool bn_p = (bool)(intptr_t)v;
+	if (bn_p) {
+		bool v = that->bn_power_->value();
+		if (v) {
+			that->modify_power_ = true;
+			that->modify_gain_ = false;
+		} else {
+			that->modify_power_ = false;
+			that->modify_gain_ = false;
+		}
+	} else {
+		bool v = that->bn_gain_->value();
+		if (v) {
+			that->modify_power_ = false;
+			that->modify_gain_ = true;
+		} else {
+			that->modify_power_ = false;
+			that->modify_gain_ = false;
+		}
+	}
+	that->modify_rig();
+	that->enable_widgets();
+}
+
+// Entered gain value
+void qso_rig::cb_ip_gain(Fl_Widget* w, void* v) {
+	qso_rig* that = ancestor_view<qso_rig>(w);
+	cb_value_int<Fl_Int_Input>(w, v);
+	that->modify_rig();
+	that->enable_widgets();
+}
+
+// Entered power value
+void qso_rig::cb_ip_power(Fl_Widget* w, void* v) {
+	qso_rig* that = ancestor_view<qso_rig>(w);
+	float f;
+	cb_value_float<Fl_Float_Input>(w, &f);
+	*(double*)v = (double)f;
+	that->modify_rig();
+	that->enable_widgets();
+}
 
 // Connect rig if disconnected and vice-versa
 void qso_rig::switch_rig() {
@@ -645,6 +830,7 @@ void qso_rig::switch_rig() {
 		rig_ = new rig_if(label(), &hamlib_data_);
 	}
 	ancestor_view<qso_manager>(this)->update_rig();
+	modify_rig();
 	enable_widgets();
 }
 
@@ -684,4 +870,24 @@ rig_if* qso_rig::rig() {
 // Return the colour used in the connect button as its alert
 Fl_Color qso_rig::alert_colour() {
 	return bn_connect_->color();
+}
+
+// Enable rig values
+void qso_rig::modify_rig() {
+	if (rig_) {
+		if (modify_freq_) {
+			rig_->set_freq_modifier(freq_offset_);
+		} else {
+			rig_->clear_freq_modifier();
+		}
+		if (modify_gain_ && modify_power_) {
+			status_->misc_status(ST_SEVERE, "DASH: Trying to set both gain and absolute power");
+		} else if (modify_gain_) {
+			rig_->set_power_modifier(gain_);
+		} else if (modify_power_) {
+			rig_->set_power_modifier(power_);
+		} else {
+			rig_->clear_power_modifier();
+		}
+	}
 }

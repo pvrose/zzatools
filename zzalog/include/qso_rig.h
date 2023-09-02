@@ -12,6 +12,7 @@
 #include <FL/Fl_Input.H>
 #include <FL/Fl_Output.H>
 #include <FL/Fl_Float_Input.H>
+#include <FL/Fl_Int_Input.H>
 #include <FL/Fl_Box.H>
 
 using namespace std;
@@ -63,6 +64,17 @@ protected:
 	// Callback - Select rig
 	static void cb_bn_select(Fl_Widget* w, void* v);
 
+	// Callback - modify frequency
+	static void cb_bn_mod_freq(Fl_Widget* w, void* v);
+	// Callback - input frequency
+	static void cb_ip_freq(Fl_Widget* w, void* v);
+	// Callback - use gain/power
+	static void cb_bn_power(Fl_Widget* w, void* v);
+	// Callback - input gain
+	static void cb_ip_gain(Fl_Widget* w, void* v);
+	// Callback - input power
+	static void cb_ip_power(Fl_Widget* w, void* v);
+
 	// Get hamlib data
 	void find_hamlib_data();
 
@@ -72,6 +84,9 @@ protected:
 	void populate_model_choice();
 	//Populate baud rate choice
 	void populate_baud_choice();
+
+	// Update rig with modifiers
+	void modify_rig();
 
 	Fl_Group* serial_grp_;
 	Fl_Group* network_grp_;
@@ -85,6 +100,15 @@ protected:
 	Fl_Output* op_status_;
 	Fl_Button* bn_connect_;
 	Fl_Light_Button* bn_select_;
+	// Modifier widgets
+	Fl_Group* modifier_grp_;
+	Fl_Check_Button* bn_mod_freq_;
+	Fl_Float_Input* ip_freq_;
+	Fl_Check_Button* bn_gain_;
+	Fl_Int_Input* ip_gain_;
+	Fl_Check_Button* bn_power_;
+	Fl_Float_Input* ip_power_;
+	// Freq/Mode display
 	Fl_Group* display_grp_;
 	Fl_Box* op_summary_;
 	Fl_Box* op_freq_mode_;
@@ -99,6 +123,14 @@ protected:
 	rig_if::hamlib_data_t hamlib_data_;
 	// Current mode
 	rig_port_e mode_;
+
+	// Modifier attributes
+	bool modify_freq_;
+	double freq_offset_;
+	bool modify_gain_;
+	int gain_;
+	bool modify_power_;
+	double power_;
 
 };
 

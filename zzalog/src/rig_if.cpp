@@ -5,6 +5,7 @@
 
 #include <climits>
 #include <chrono>
+#include <cmath>
 
 #include <FL/Fl.H>
 #include <FL/Fl_Preferences.H>
@@ -83,7 +84,8 @@ double rig_if::get_dfrequency(bool tx) {
 	else {
 		frequency = rig_data_.rx_frequency / 1000000.0;
 	}
-	return frequency;
+	if (modify_freq_) return frequency + freq_modifier_;
+	else return frequency;
 }
 
 string rig_if::get_frequency(bool tx) {
@@ -97,6 +99,16 @@ string rig_if::get_frequency(bool tx) {
 string rig_if::get_tx_power(bool max) {
 	char text[100];
 	double value = max ? (double)rig_data_.pwr_value : (double)rig_data_.pwr_meter;
+	switch(modify_power_) {
+		case UNMODIFIED: 
+			break;
+		case GAIN:
+			value *= power_modifier_;
+			break;
+		case ABSOLUTE:
+			value = power_modifier_;
+			break;
+	}
 	snprintf(text, 100, "%g", value);
 	return text;
 }
@@ -184,6 +196,11 @@ rig_if::rig_if(const char* name, hamlib_data_t* data)
 	my_rig_name_ = name;
 	hamlib_data_ = data;
 	run_read_ = false;
+	// Modifiers
+	modify_freq_ = false;
+	freq_modifier_ = 0.0;
+	modify_power_ = UNMODIFIED;
+	power_modifier_ = 0.0;
 	
 	// If the name has been set, there is a rig
 	if (my_rig_name_.length()) {
@@ -537,3 +554,26 @@ bool rig_if::is_opening() {
 	return opening_;
 }
 
+void rig_if::set_freq_modifier(double delta_freq) {
+	modify_freq_ = true;
+	freq_modifier_ = delta_freq;
+}
+
+void rig_if::clear_freq_modifier() {
+	modify_freq_ = false;
+}
+
+void rig_if::set_power_modifier(int gain) {
+	modify_power_ = GAIN;
+	power_modifier_ = pow(10.0, (double)gain/10.0);
+}
+
+void rig_if::set_power_modifier(double power) {
+	modify_power_ = ABSOLUTE;
+	power_modifier_ = power;
+}
+
+void rig_if::clear_power_modifier() {
+	modify_power_ = UNMODIFIED;
+	power_modifier_ = 0;
+}

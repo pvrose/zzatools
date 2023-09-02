@@ -125,6 +125,14 @@ using namespace std;
 
 		// Testing hamlib callbacks
 		static int cb_hl_freq(RIG* rig, vfo_t vfo, freq_t freq, rig_ptr_t data);
+
+		// Set modifiers
+		void set_freq_modifier(double delta_freq);
+		void clear_freq_modifier();
+		void set_power_modifier(int gain);
+		void set_power_modifier(double abs_power);
+		void clear_power_modifier();
+
 		// Protected attributes
 	protected:
 		void th_read_values();
@@ -164,5 +172,16 @@ using namespace std;
 		thread* thread_;
 		// Stop thread
 		atomic<bool> run_read_;
+
+		// Modifiers
+		bool modify_freq_;
+		double freq_modifier_;
+
+		enum {
+			UNMODIFIED,
+			GAIN,
+			ABSOLUTE
+		} modify_power_;
+		double power_modifier_; 
 };
 #endif
