@@ -5,6 +5,9 @@
 
 #include <string>
 #include <cstdint>
+#include <thread>
+#include <mutex>
+#include <queue>
 #ifdef _WIN32
 #include <WinSock2.h>
 #else
@@ -70,6 +73,11 @@ using namespace std;
 		static void cb_timer_acc(void* v);
 		// Diagnostic data
 		void dump(string line);
+		// Call back to handle packets - pass pointer to socket serevr
+		static void cb_th_packet(void* v);
+		// Thread runner
+		static void thread_run(socket_server* that);
+
 		// Server socket
 		SOCKET server_;
 		// HTTP Client
@@ -87,6 +95,12 @@ using namespace std;
 		protocol_t protocol_;
 		// Closure in progress
 		bool closing_;
+		// Thread handling
+		thread* th_socket_;
+		// Packet queue
+		queue<string> q_packet_;
+		// Packet queue lock
+		mutex mu_packet_;
 
 	};
 

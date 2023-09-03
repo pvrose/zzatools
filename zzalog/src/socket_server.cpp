@@ -58,7 +58,8 @@ void socket_server::run_server() {
 	}
 
 	// Start listening for packets - will set a timer to the listen after that
-	result = rcv_packet();
+	printf("MAIN: Starting socket thread\n");
+	th_socket_ = new thread(thread_run, this);
 }
 
 // Destructor
@@ -68,6 +69,7 @@ socket_server::~socket_server() {
 // Close the socket and clean up winsock
 void socket_server::close_server() {
 	closing_ = true;
+	th_socket_->join();
 	Fl::remove_timeout(cb_timer_acc, this);
 	Fl::remove_timeout(cb_timer_rcv, this);
 	if (server_ != INVALID_SOCKET) {
@@ -224,6 +226,7 @@ int socket_server::create_server() {
 	else {
 		getsockname(server_, (SOCKADDR*)&server_addr, &len_server_addr);
 		snprintf(message, 256, "SOCKET: Connected socket %s:%d", server_addr.sin_addr, htons(server_addr.sin_port));
+		printf("%s\n", message);
 		status_->misc_status(ST_OK, message);
 	}
 
@@ -278,12 +281,12 @@ socket_server::client_status socket_server::accept_client() {
 #endif
 	}
 	else {
-#ifdef _WIN32
-		snprintf(message, 256, "SOCKET: Accepted socket %s:%d", inet_ntoa(client_addr_.sin_addr), htons(client_addr_.sin_port));
-#else
-		snprintf(message, 256, "SOCKET: Accepted socket %d:%d", client_addr_.sin_addr, htons(client_addr_.sin_port));
-#endif
-		status_->misc_status(ST_OK, message);
+// #ifdef _WIN32
+// 		snprintf(message, 256, "SOCKET: Accepted socket %s:%d", inet_ntoa(client_addr_.sin_addr), htons(client_addr_.sin_port));
+// #else
+ 		printf("SOCKET: Accepted socket %d:%d", client_addr_.sin_addr, htons(client_addr_.sin_port));
+// #endif
+// 		status_->misc_status(ST_OK, message);
 		return OK;
 	}
 }
@@ -308,7 +311,7 @@ int socket_server::rcv_packet() {
 		client_status result = BLOCK;
 		while (client_ == INVALID_SOCKET && result == BLOCK) {
 			result = accept_client();
-			Fl::check();
+			this_thread::yield();
 		}
 		if (result == NG) {
 			return 1;
@@ -320,9 +323,9 @@ int socket_server::rcv_packet() {
 	string resource = "";
 	string function = "";
 	int pos_payload = 0;
-	double wait_time = 0.0;
 	LEN_SOCKET_ADDR len_client_addr = sizeof(client_addr_);
 	do {
+		printf("THREAD: Waiting packets....\n");
 		// Keep processing packets while they keep coming
 		switch (protocol_) {
 		case UDP:
@@ -332,41 +335,39 @@ int socket_server::rcv_packet() {
 			bytes_rcvd = recv(client_, buffer, buffer_len, 0);
 			break;
 		}
+		printf("THREAD: Received packet %d bytes\n", bytes_rcvd);
 		if (bytes_rcvd > 0) {
 			dump(string(buffer, buffer_len));
-			stringstream ss;
-			string s(buffer, bytes_rcvd);
-			ss.clear();
-			ss << s;
-			do_request(ss);
-			// Receiving data - set wait time short
-			wait_time = 0;
+			mu_packet_.lock();
+			string s = string(buffer, bytes_rcvd);
+			printf("THREAD: Received packet %s\n", s.c_str());
+			q_packet_.push(s);
+			mu_packet_.unlock();
+			Fl::awake(cb_th_packet, this);
 		}
 #ifdef _WIN32
 		else if (WSAGetLastError() == WSAEWOULDBLOCK) {
 			// Try again immediately after letting FLTK in
-			Fl::check();
-			wait_time = 0;
+			this_thread::yield();
 		}
-		else if (WSAGetLastError() == WSAENOTSOCK && closing_) {
+		else if (WSAGetLastError() == WSAENOTSOCK && closing_
+		) {
 			// We can get here through a race between closing and turning the timers off
 			delete[] buffer;
-			return 1;
 		}
 		else {
 			handle_error("Unable to read from client");
 			delete[] buffer;
-			return 1;
 		}
 #else
 		else {
 			// Try again after checking for any fltk events
-			Fl::check();
+			this_thread::sleep_for(chrono::milliseconds(1000));
 		}
 #endif
-	} while (bytes_rcvd > 0);
+	} while (!closing_);
 	// Now see if we have another - the timer goes on the scheduling queue so other tasks will get in
-	Fl::add_timeout(wait_time, cb_timer_rcv, this);
+	this_thread::yield();
 	delete[] buffer;
 	return 0;
 }
@@ -504,4 +505,32 @@ void socket_server::dump(string data) {
 			escaped += *it;
 		}
 	}
+}
+
+// main thread side handle packet
+void socket_server::cb_th_packet(void* v) {
+	socket_server* that = (socket_server*)v;
+	printf("MAIN: Received packet request.\n");
+	// Lock queue while empty it
+	that->mu_packet_.lock();
+	printf("MAIN: Locking queue\n");
+	while (!that->q_packet_.empty()) {
+		string s = that->q_packet_.front();
+		printf("MAIN: Received packet %s\n", s.c_str());
+		stringstream ss;
+		ss.clear();
+		ss << s;
+		that->q_packet_.pop();
+		that->mu_packet_.unlock();
+		// Process packet having unlocked queue to allow another packet in
+		that->do_request(ss);
+		that->mu_packet_.lock();
+	}
+	that->mu_packet_.unlock();
+}
+
+// Thread runner
+void socket_server::thread_run(socket_server* that) {
+	printf("THREAD: Starting.....\n");
+	that->rcv_packet();
 }
