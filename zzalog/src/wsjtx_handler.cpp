@@ -85,7 +85,6 @@ int wsjtx_handler::rcv_dgram(stringstream & ss) {
 		return 1;
 	}
 	// Select method to interpret datagram
-	printf("WSJT-X: received dgram type %d\n", dgram_type);
 	switch (dgram_type) {
 	case 0:
 		// Heartbeat

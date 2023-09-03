@@ -109,12 +109,13 @@ int fllog_emul::check_dup(rpc_data_item::rpc_list& params, rpc_data_item& respon
 		string rst_in = i_rst_in->get_string();
 		// Get all possible matches
 		extract_records_->extract_call(callsign);
-		printf("check_dup %s Mode=%s Span=%d Freq=%d State=%s RST=%s", callsign.c_str(), mode.c_str(), span, freq, state.c_str(), rst_in.c_str());
+		printf("check_dup %s Mode=%s Span=%d Freq=%d State=%s RST=%s", 
+			callsign.c_str(), mode.c_str(), span, freq, state.c_str(), rst_in.c_str());
 		if (extract_records_->size()) {
 			bool found = false;
 			item_num_t item_num;
 			for (item_num = 0; item_num < extract_records_->size() && !found; item_num++) {
-				that_->current_record_ = extract_records_->get_record(0, false);
+				that_->current_record_ = extract_records_->get_record(item_num, false);
 				time_t now = time(nullptr);
 				found = true;
 				// Now check for exact match 

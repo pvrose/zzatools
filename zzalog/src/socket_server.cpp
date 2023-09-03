@@ -58,7 +58,6 @@ void socket_server::run_server() {
 	}
 
 	// Start listening for packets - will set a timer to the listen after that
-	printf("MAIN: Starting socket thread\n");
 	th_socket_ = new thread(thread_run, this);
 }
 
@@ -226,7 +225,6 @@ int socket_server::create_server() {
 	else {
 		getsockname(server_, (SOCKADDR*)&server_addr, &len_server_addr);
 		snprintf(message, 256, "SOCKET: Connected socket %s:%d", server_addr.sin_addr, htons(server_addr.sin_port));
-		printf("%s\n", message);
 		status_->misc_status(ST_OK, message);
 	}
 
@@ -281,12 +279,6 @@ socket_server::client_status socket_server::accept_client() {
 #endif
 	}
 	else {
-// #ifdef _WIN32
-// 		snprintf(message, 256, "SOCKET: Accepted socket %s:%d", inet_ntoa(client_addr_.sin_addr), htons(client_addr_.sin_port));
-// #else
- 		printf("SOCKET: Accepted socket %d:%d", client_addr_.sin_addr, htons(client_addr_.sin_port));
-// #endif
-// 		status_->misc_status(ST_OK, message);
 		return OK;
 	}
 }
@@ -325,7 +317,6 @@ int socket_server::rcv_packet() {
 	int pos_payload = 0;
 	LEN_SOCKET_ADDR len_client_addr = sizeof(client_addr_);
 	do {
-		printf("THREAD: Waiting packets....\n");
 		// Keep processing packets while they keep coming
 		switch (protocol_) {
 		case UDP:
@@ -335,12 +326,10 @@ int socket_server::rcv_packet() {
 			bytes_rcvd = recv(client_, buffer, buffer_len, 0);
 			break;
 		}
-		printf("THREAD: Received packet %d bytes\n", bytes_rcvd);
 		if (bytes_rcvd > 0) {
 			dump(string(buffer, buffer_len));
 			mu_packet_.lock();
 			string s = string(buffer, bytes_rcvd);
-			printf("THREAD: Received packet %s\n", s.c_str());
 			q_packet_.push(s);
 			mu_packet_.unlock();
 			Fl::awake(cb_th_packet, this);
@@ -510,13 +499,10 @@ void socket_server::dump(string data) {
 // main thread side handle packet
 void socket_server::cb_th_packet(void* v) {
 	socket_server* that = (socket_server*)v;
-	printf("MAIN: Received packet request.\n");
 	// Lock queue while empty it
 	that->mu_packet_.lock();
-	printf("MAIN: Locking queue\n");
 	while (!that->q_packet_.empty()) {
 		string s = that->q_packet_.front();
-		printf("MAIN: Received packet %s\n", s.c_str());
 		stringstream ss;
 		ss.clear();
 		ss << s;
@@ -531,6 +517,5 @@ void socket_server::cb_th_packet(void* v) {
 
 // Thread runner
 void socket_server::thread_run(socket_server* that) {
-	printf("THREAD: Starting.....\n");
 	that->rcv_packet();
 }
