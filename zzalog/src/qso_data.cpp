@@ -413,8 +413,10 @@ void qso_data::update_qso(qso_num_t log_num) {
 		break;
 	case QSO_PEEK:
 	case QSO_PEEK_ED:
+		printf("DEBUG: Peeking record %d\n", log_num);
 		g_peek_->copy_qso_to_qso(book_->get_record(log_num, false), qso_entry::CF_ALL_FLAGS);
 		g_peek_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
+		enable_widgets();
 		break;
 	}
 	// action_view_qsl();
@@ -429,6 +431,11 @@ void qso_data::update_query(logging_state_t query, qso_num_t match_num, qso_num_
 	case QUERY_NEW:
 	case QUERY_WSJTX:
 	case MANUAL_ENTRY:
+		action_query(query, match_num, query_num);
+		break;
+	case QSO_PEEK:
+	case QSO_PEEK_ED:
+		action_cancel_peek();
 		action_query(query, match_num, query_num);
 		break;
 	case QSO_EDIT:
@@ -466,6 +473,8 @@ void qso_data::update_modem_qso(record* qso) {
 		// 	qso->item("QSO_COMPLETE").c_str());
 		switch (logging_state_) {
 		case QSO_PENDING:
+		case QSO_PEEK:
+		case QSO_PEEK_ED:
 			action_deactivate();
 			// drop down
 		case QSO_INACTIVE:
@@ -1269,15 +1278,15 @@ void qso_data::action_peek(qso_num_t number) {
 	// SAve the current state unless it is already peeking
 	// Either QSO_PEEK or QSO_PEEK_ED
 	switch (logging_state_) {
-	case QSO_INACTIVE:
-	case QSO_PENDING:
 	case QSO_EDIT:
-	case QSO_BROWSE:
 	case NET_EDIT:
 		interrupted_state_ = logging_state_;
 		logging_state_ = QSO_PEEK_ED;
 		break;
+	case QSO_INACTIVE:
+	case QSO_PENDING:
 	case QSO_STARTED:
+	case QSO_BROWSE:
 	case QUERY_DUPE:
 	case QUERY_MATCH:
 	case QUERY_NEW:
@@ -1644,6 +1653,7 @@ bool qso_data::inactive() {
 	case QSO_INACTIVE:
 	case QSO_PENDING:
 	case QSO_PEEK:
+	case QSO_PEEK_ED:
 		return true;
 	default:
 		return false;
