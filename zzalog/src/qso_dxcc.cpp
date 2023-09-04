@@ -211,8 +211,7 @@ void qso_dxcc::wb4_buttons::enable_widgets() {
 	if (qso) {
 		qso_band = qso->item("BAND");
 		qso_mode = qso->item("MODE", false, true);
-		int dxcc;
-		qso->item("DXCC", dxcc);
+		int dxcc = cty_data_->entity(qso);
 		string my_call = qso->item("STATION_CALLSIGN");
 		if (qso_band.length()) all_bands_->insert(qso_band);
 		if (qso_mode.length()) all_modes_->insert(qso_mode);
