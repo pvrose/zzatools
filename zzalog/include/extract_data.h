@@ -67,7 +67,7 @@ using namespace std;
 		// return the virtual record number
 		virtual item_num_t item_number(qso_num_t record, bool nearest = false);
 		// Change the selected record (& update any necessary controls)
-		virtual qso_num_t selection(qso_num_t num_record, hint_t hint = HT_SELECTED, view* requester = nullptr, qso_num_t num_other = 0);
+		virtual item_num_t selection(item_num_t num_record, hint_t hint = HT_SELECTED, view* requester = nullptr, qso_num_t num_other = 0);
 
 
 	protected:

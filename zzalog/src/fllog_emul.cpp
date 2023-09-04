@@ -69,9 +69,11 @@ int fllog_emul::get_record(rpc_data_item::rpc_list& params, rpc_data_item& respo
 		printf("get_record %s %zu records found\n", callsign.c_str(), extract_records_->size());
 		if (extract_records_->size()) {
 			that_->current_record_ = extract_records_->get_record(0, true);
+			extract_records_->selection(0, HT_SELECTED);
 			adi_writer* writer = new adi_writer;
 			stringstream ss;
 			writer->to_adif(that_->current_record_, ss);
+			printf("get_record: %s\n", ss.str().c_str());
 			response.set(ss.str(), XRT_STRING);
 			delete writer;
 		}
@@ -147,12 +149,14 @@ int fllog_emul::check_dup(rpc_data_item::rpc_list& params, rpc_data_item& respon
 				// Exact match - set selection
 				printf(" Exact match\n");
 				that_->current_record_ = extract_records_->get_record(item_num, true);
+				extract_records_->selection(item_num, HT_SELECTED);
 				response.set("true", XRT_STRING);
 			}
 			else {
 				// Callsign matches - select the first one
 				printf(" Callsign match\n");
 				that_->current_record_ = extract_records_->get_record(0, true);
+				extract_records_->selection(0, HT_SELECTED);
 				response.set("possible", XRT_STRING);
 			}
 		}
@@ -181,7 +185,8 @@ int fllog_emul::add_record(rpc_data_item::rpc_list& params, rpc_data_item& respo
 		load_result_t dummy;
 		that_->current_record_ = new record();
 		reader->load_record(that_->current_record_, ss, dummy);
-		book_->insert_record(that_->current_record_);
+		item_num_t number = book_->insert_record(that_->current_record_);
+		book_->selection(number, HT_SELECTED);
 		return 0;
 	}
 	else {

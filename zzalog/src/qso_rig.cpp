@@ -103,12 +103,15 @@ void qso_rig::load_values() {
 				hamlib_data_.model.c_str());
 			status_->misc_status(ST_WARNING, msg);
 			modify_power_ = true;
-			modify_gain_ = true;
+			modify_gain_ = false;
 		}
 	}
 	else {
 		// New hamlib data
 		hamlib_data_ = rig_if::hamlib_data_t();
+		modify_freq_ = false;
+		modify_power_ = false;
+		modify_gain_ = false;
 	}
 	mode_ = hamlib_data_.port_type;
 }

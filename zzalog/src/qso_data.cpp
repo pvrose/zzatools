@@ -296,15 +296,14 @@ void qso_data::update_qso(qso_num_t log_num) {
 	case QSO_INACTIVE:
 	{
 		// Copy selected QSO 
-		record* qso = book_->get_record();
-		g_entry_->copy_qso_to_qso(qso, qso_entry::CF_ALL_FLAGS);
+		action_peek(log_num);
 		break;
 	}
 	case QSO_PENDING:
 		if (log_num != g_entry_->qso_number()) {
 			// Deactivate then reactivate with new QSO
 			action_deactivate();
-			action_activate(previous_mode_);
+			action_peek(log_num);
 		}
 		else {
 			g_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
