@@ -30,7 +30,7 @@ using namespace std;
 		void close_server();
 
 		// Search for match in ALL.TXT
-		bool match_all_txt(record* qso);
+		bool match_all_txt(record* qso, bool update_qso);
 
 		// Used in static methods to point to the single instance of this class
 		static wsjtx_handler* that_;

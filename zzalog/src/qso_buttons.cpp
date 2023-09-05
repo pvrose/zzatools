@@ -30,7 +30,8 @@ map<qso_data::logging_state_t, list<qso_buttons::button_type> > button_map_ =
 		qso_buttons::EDIT_NET, qso_buttons::NAV_FIRST,
 		qso_buttons::NAV_PREV, qso_buttons::NAV_NEXT, qso_buttons::NAV_LAST, qso_buttons::QRZ_COM } },
 	{ qso_data::QSO_VIEW, { qso_buttons::EDIT_QSO, qso_buttons::CANCEL_VIEW, qso_buttons::NAV_FIRST,
-		qso_buttons::NAV_PREV, qso_buttons::NAV_NEXT, qso_buttons::NAV_LAST , qso_buttons::QRZ_COM} },
+		qso_buttons::NAV_PREV, qso_buttons::NAV_NEXT, qso_buttons::NAV_LAST , qso_buttons::QRZ_COM,
+		qso_buttons::LOOK_ALL_TXT } },
 	{ qso_data::QSO_BROWSE, { qso_buttons::EDIT_QSO, qso_buttons::CANCEL_BROWSE, qso_buttons::VIEW_QSO, 
 	    qso_buttons::NAV_FIRST,
 		qso_buttons::NAV_PREV, qso_buttons::NAV_NEXT, qso_buttons::NAV_LAST, qso_buttons::QRZ_COM } },
@@ -45,8 +46,8 @@ map<qso_data::logging_state_t, list<qso_buttons::button_type> > button_map_ =
 		qso_buttons::ADD_NET_QSO }},
 	{ qso_data::NET_EDIT, { qso_buttons::SAVE_EDIT_NET, qso_buttons::CANCEL_QSO, qso_buttons::ADD_NET_QSO}},
 	{ qso_data::QSO_MODEM, { qso_buttons::CANCEL_MODEM }},
-	{ qso_data::QSO_PEEK, { qso_buttons:: EDIT_QSO, qso_buttons:: CANCEL_PEEK, qso_buttons::QRZ_COM }},
-	{ qso_data::QSO_PEEK_ED, { qso_buttons::CANCEL_PEEK, qso_buttons::EDIT_PEEK, qso_buttons::QRZ_COM }},
+	{ qso_data::QSO_PEEK, { qso_buttons:: EDIT_QSO, qso_buttons:: CANCEL_PEEK, qso_buttons::QRZ_COM, qso_buttons::LOOK_ALL_TXT }},
+	{ qso_data::QSO_PEEK_ED, { qso_buttons::CANCEL_PEEK, qso_buttons::EDIT_PEEK, qso_buttons::QRZ_COM, qso_buttons::LOOK_ALL_TXT }},
 	{ qso_data::MANUAL_ENTRY, { qso_buttons::EXEC_QUERY, qso_buttons::IMPORT_QUERY, qso_buttons::CANCEL_QUERY }},
 };
 
@@ -483,6 +484,9 @@ void qso_buttons::cb_bn_all_txt(Fl_Widget* w, void* v) {
 	switch (that->qso_data_->logging_state()) {
 	case qso_data::QUERY_NEW:
 	case qso_data::QUERY_MATCH:
+	case qso_data::QSO_PEEK:
+	case qso_data::QSO_PEEK_ED:
+	case qso_data::QSO_VIEW:
 		that->qso_data_->action_look_all_txt();
 		break;
 	default:

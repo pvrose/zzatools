@@ -1092,8 +1092,28 @@ void qso_data::action_save_merge() {
 
 // ACtion look in ALL.TXT
 void qso_data::action_look_all_txt() {
-	if (wsjtx_handler_->match_all_txt(g_query_->query_qso())) {
-		logging_state_ = QUERY_WSJTX;
+	switch(logging_state_) {
+		case QUERY_NEW:
+		case QUERY_MATCH:
+			if (wsjtx_handler_->match_all_txt(g_query_->query_qso(), true)) {
+				logging_state_ = QUERY_WSJTX;
+			}
+			break;
+		case QSO_PEEK:
+		case QSO_PEEK_ED:
+			if (wsjtx_handler_->match_all_txt(g_peek_->qso(), false)) {
+				status_->misc_status(ST_NOTE, "DASH: ALL.TXT search found QSO: see above");
+			} else {
+				status_->misc_status(ST_WARNING, "DASH: ALL.TXT search did not find QSO");
+			}
+			break;
+		case QSO_VIEW:
+			if (wsjtx_handler_->match_all_txt(g_entry_->qso(), false)) {
+				status_->misc_status(ST_NOTE, "DASH: ALL.TXT search found QSO: see above");
+			} else {
+				status_->misc_status(ST_WARNING, "DASH: ALL.TXT search did not find QSO");
+			}
+			break;
 	}
 	enable_widgets();
 }

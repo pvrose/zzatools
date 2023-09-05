@@ -989,7 +989,7 @@ bool wsjtx_handler::parse_all_txt(record* qso, string line) {
 	}
 }
 
-bool wsjtx_handler::match_all_txt(record* qso) {
+bool wsjtx_handler::match_all_txt(record* qso, bool update_qso) {
 	Fl_Preferences datapath_settings(settings_, "Datapath");
 	char* temp;
 	datapath_settings.get("WSJT-X", temp, "");
@@ -1039,12 +1039,11 @@ bool wsjtx_handler::match_all_txt(record* qso) {
 		// Does the line contain sought date, time, both calls and "Tx" or "Transmitting"
 		bool found = false;
 		if (line.substr(0,6) == datestamp) {
-			if (line.substr(7,4) == timestamp 
-				|| copy_status == FOUND || copy_status == COPYING) {
+			if (line.substr(7,4) == timestamp.substr(0,4) || 
+				copy_status != SEARCHING) {
 				if (line.find(my_call_) != string::npos &&
 					line.find(their_call) != string::npos &&
 					line.find(mode) != string::npos) {
-					printf("Line: %s\n", line.c_str());
 					if (copy_status == SEARCHING) {
 						snprintf(msg, 256, "WSJTX: %s %s %s %s %s Found possible match",
 							datestamp.c_str(),
@@ -1054,6 +1053,8 @@ bool wsjtx_handler::match_all_txt(record* qso) {
 							their_call.c_str());
 						status_->misc_status(ST_WARNING, msg);
 					}
+					snprintf(msg, sizeof(msg),"WSJTX: Line = %s", line.c_str());
+					status_->misc_status(ST_NOTE, msg);
 					copy_status = FOUND;;
 				}
 			}
@@ -1062,8 +1063,8 @@ bool wsjtx_handler::match_all_txt(record* qso) {
 			if (line.find(my_call_) != string::npos &&
 				line.find(their_call) != string::npos &&
 				line.find(mode) != string::npos) {
-				parse_all_txt(qso, line);
-				if (qso->item("QSO_COMPLETE") == "N") copy_status = COPYING;
+				if (update_qso) parse_all_txt(qso, line);
+				if (qso->item("QSO_COMPLETE") == "N" || !update_qso) copy_status = COPYING;
 				else if (copy_status == COPYING && 
 					(qso->item("QSO_COMPLETE") == "Y" ||
 					 qso->item("QSO_COMPLETE") == ""))
@@ -1071,8 +1072,15 @@ bool wsjtx_handler::match_all_txt(record* qso) {
 			}
 		}
 	}
-	if (copy_status = COPIED) {
+	if (copy_status == COPIED || (copy_status == COPYING && !update_qso)) {
 		status_->progress("Found record!", OT_RECORD);
+					snprintf(msg, 256, "WSJTX: %s %s %s %s %s Found match",
+						datestamp.c_str(),
+						timestamp.c_str(),
+						mode.c_str(),
+						my_call_.c_str(),
+						their_call.c_str());
+					status_->misc_status(ST_WARNING, msg);
 		// If we are complete then say so
 		if (qso->item("QSO_COMPLETE") != "N" && qso->item("QSO_COMPLETE") != "?") {
 			all_file->close();
