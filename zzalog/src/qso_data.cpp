@@ -601,6 +601,9 @@ qso_num_t qso_data::get_default_number() {
 	case NET_EDIT:
 	case NET_STARTED:
 		return g_net_entry_->qso_number();
+	case QSO_PEEK:
+	case QSO_PEEK_ED:
+		return g_peek_->qso_number();
 	default:
 		return -1;
 	}
