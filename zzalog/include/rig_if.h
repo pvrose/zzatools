@@ -180,7 +180,7 @@ using namespace std;
 		enum {
 			UNMODIFIED,
 			GAIN,
-			ABSOLUTE
+			ABS_POWER
 		} modify_power_;
 		double power_modifier_; 
 };

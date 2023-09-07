@@ -105,7 +105,7 @@ string rig_if::get_tx_power(bool max) {
 		case GAIN:
 			value *= power_modifier_;
 			break;
-		case ABSOLUTE:
+		case ABS_POWER:
 			value = power_modifier_;
 			break;
 	}
@@ -569,7 +569,7 @@ void rig_if::set_power_modifier(int gain) {
 }
 
 void rig_if::set_power_modifier(double power) {
-	modify_power_ = ABSOLUTE;
+	modify_power_ = ABS_POWER;
 	power_modifier_ = power;
 }
 
