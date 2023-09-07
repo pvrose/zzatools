@@ -21,7 +21,13 @@ extern spec_data* spec_data_;
 
 // Constructor
 qso_rig::qso_rig(int X, int Y, int W, int H, const char* L) :
-	Fl_Group(X, Y, W, H, nullptr)
+	Fl_Group(X, Y, W, H, nullptr),
+	modify_freq_(false),
+	freq_offset_(0.0),
+	modify_gain_(false),
+	gain_(0),
+	modify_power_(false),
+	power_(0.0)
 {
 	// If no name is provided then get from qso_manager
 	if (L == nullptr || strlen(L) == 0) copy_label(ancestor_view<qso_manager>(this)->get_default(qso_manager::RIG).c_str());
