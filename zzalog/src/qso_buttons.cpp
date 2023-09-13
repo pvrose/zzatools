@@ -306,6 +306,7 @@ void qso_buttons::cb_edit(Fl_Widget* w, void* v) {
 		that->qso_data_->action_edit();
 		break;
 	case qso_data::QSO_PEEK:
+	case qso_data::QSO_PEEK_ED:
 		that->qso_data_->action_edit();
 	}
 	that->enable_widgets();

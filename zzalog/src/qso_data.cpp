@@ -414,6 +414,7 @@ void qso_data::update_qso(qso_num_t log_num) {
 	case QSO_PEEK:
 	case QSO_PEEK_ED:
 		printf("DEBUG: Peeking record %d\n", log_num);
+		g_peek_->qso(log_num);
 		g_peek_->copy_qso_to_qso(book_->get_record(log_num, false), qso_entry::CF_ALL_FLAGS);
 		g_peek_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
 		enable_widgets();
@@ -858,6 +859,7 @@ void qso_data::action_deactivate() {
 void qso_data::action_edit() {
 	// Save a copy of the current record
 	qso_num_t qso_number = get_default_number();
+	printf("DEBUG: Editing QSO#%d\n", qso_number);
 	edit_return_state_ = logging_state_;
 	logging_state_ = QSO_EDIT;
 	g_entry_->qso(qso_number);
