@@ -938,38 +938,38 @@ void dxa_if::home_location() {
 	// Convert to single precision explicitly
 	home_lat_ = home_lat_long.latitude;
 	home_long_ = home_lat_long.longitude;
-	// Convert to ° ' " N/E/S/W format
+	// Convert to ï¿½ ' " N/E/S/W format
 	home_lat_dms_ = degrees_to_dms((float)home_lat_, true);
 	home_long_dms_ = degrees_to_dms((float)home_long_, false);
 	// Add uncertainty
 	switch (locator_.length()) {
 	case 0:
-		home_lat_dms_ += " ±90\xB0";
-		home_long_dms_ += " ±180\xB0";
+		home_lat_dms_ += " ï¿½90\xB0";
+		home_long_dms_ += " ï¿½180\xB0";
 		break;
 	case 2:
-		home_lat_dms_ += " ±5\xB0";
-		home_long_dms_ += " ±10\xB0";
+		home_lat_dms_ += " ï¿½5\xB0";
+		home_long_dms_ += " ï¿½10\xB0";
 		break;
 	case 4:
-		home_lat_dms_ += " ±30'";
-		home_long_dms_ += " ±1\xB0";
+		home_lat_dms_ += " ï¿½30'";
+		home_long_dms_ += " ï¿½1\xB0";
 		break;
 	case 6:
-		home_lat_dms_ += " ±1'15\"";
-		home_long_dms_ += " ±2'30\"";
+		home_lat_dms_ += " ï¿½1'15\"";
+		home_long_dms_ += " ï¿½2'30\"";
 		break;
 	case 8:
-		home_lat_dms_ += " ±7.5\"";
-		home_long_dms_ += " ±15\"";
+		home_lat_dms_ += " ï¿½7.5\"";
+		home_long_dms_ += " ï¿½15\"";
 		break;
 	case 10:
-		home_lat_dms_ += " ±0.3125\"";
-		home_long_dms_ += " ±0.625\"";
+		home_lat_dms_ += " ï¿½0.3125\"";
+		home_long_dms_ += " ï¿½0.625\"";
 		break;
 	case 12:
-		home_lat_dms_ += " ±0.03125\"";
-		home_long_dms_ += " ±0.0625\"";
+		home_lat_dms_ += " ï¿½0.03125\"";
+		home_long_dms_ += " ï¿½0.0625\"";
 		break;
 
 	}
@@ -1288,7 +1288,6 @@ DxAtlas::EnumColor dxa_if::convert_colour(Fl_Color colour) {
 	Fl::get_color(colour, red, green, blue);
 	unsigned result = ((unsigned)blue << 16) | ((unsigned)green << 8) | (unsigned)red;
 	char message[200];
-	snprintf(message, 200, "DEBUG: Fl_Color %8x, DxAtlas: %8x\n", colour, result);
 	// cout << message;
 	return (DxAtlas::EnumColor)result;
 }
