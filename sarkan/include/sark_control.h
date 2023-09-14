@@ -12,6 +12,7 @@
 #include <FL/Fl_Output.H>
 #include <FL/Enumerations.H>
 #include <FL/Fl_Preferences.H>
+#include <FL/Fl_Radio_Button.H>
 
 using namespace std;
 
@@ -35,6 +36,7 @@ protected:
     static void cb_ch_max_swr(Fl_Widget* w, void* v);
     static void cb_ch_max_ohm(Fl_Widget* w, void* v);
     static void cb_bn_colour(Fl_Widget* w, void* v);
+    static void cb_bn_scantype(Fl_Widget* w, void* v);
 
     // Timer
     static void cb_ticker(void* v);
@@ -48,6 +50,7 @@ protected:
     void update_scan_progress();
     void scan_sark();
     void clear_sark_graph();
+    void update_scan_type();
     
     // Load/Save settings
     void load_settings();
@@ -87,6 +90,8 @@ protected:
     Fl_Color x_colour_;
     Fl_Color r_colour_;
     Fl_Color z_colour_;
+    // Scan tyype
+    enum scan_type { RAW_ABS, RAW_SIGN, COMPUTED } scan_type_;
 
     // Widgets
     Fl_Light_Button* bn_connect_;
@@ -104,5 +109,9 @@ protected:
     Fl_Button* bn_colour_x_;
     Fl_Button* bn_colour_r_;
     Fl_Button* bn_colour_z_;
+    Fl_Group* gp_scan_type_;
+    Fl_Radio_Button* bn_raw_abs_;
+    Fl_Radio_Button* bn_raw_sign_;
+    Fl_Radio_Button* bn_computed_;
 
 };

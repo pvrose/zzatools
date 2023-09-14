@@ -32,7 +32,7 @@ const int WEDIT = 3 * WBUTTON;
 const int WSMEDIT = 2 * WBUTTON;
 const int WSSEDIT = WBUTTON * 3 / 2;
 const int ROW_HEIGHT = DEFAULT_SIZE + 4;
-const int AXIS_GAP = 30;
+const int AXIS_GAP = 40;
  
 
 // Main window default sizes

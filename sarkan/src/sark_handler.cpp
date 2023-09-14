@@ -78,7 +78,7 @@ size_t sark_handler::read_line() {
         while (!line_done) {
             ssize_t resp = read(serial_port_, buff, 1);
             if (resp <= 0) {
-                printf("ERROR: Error %d reading port (%s)\n", errno, strerror(errno));
+                printf("Error %d reading port (%s)\n", errno, strerror(errno));
                 return resp;
             } else {
             switch(*buff) {
@@ -102,7 +102,7 @@ size_t sark_handler::read_line() {
 }
 
 // Get the reading
-bool sark_handler::read_data(sark_data* data) {
+bool sark_handler::read_data(sark_data* data, bool raw, bool add_sign) {
     char command[128];
     ssize_t resp;
     check_prompt();
@@ -121,29 +121,51 @@ bool sark_handler::read_data(sark_data* data) {
     // write_cmd(cmd_on, sizeof(cmd_on));
     // check_response();
     // check_prompt();
- 
+    if (raw) printf("Started reading raw data from SARK-100 ");
+    else printf("Started reading computed data from SARK-100 ");
+    fflush(stdout);
     memset(command, 0, sizeof(command));
-    snprintf(command, sizeof(command), cmd_scanr, params.start, params.end, params.step);
+    if (raw) {
+        snprintf(command, sizeof(command), cmd_scanr, params.start, params.end, params.step);
+    } else {
+        snprintf(command, sizeof(command), cmd_scan, params.start, params.end, params.step);
+    }
     write_cmd(command, strlen(command));
     resp = read_line();
     if (resp < 0) {
         return false;
     }
     if (strcmp(buffer_, "Start") != 0) return false;
+    int dot = data->size() / 20;
     for (size_t ix = 0; ix < data->size(); ix++) {
         resp = read_line();
         if (resp < 0) {
             return false;
         }
-        sark_data::raw_data ip = {0, 0, 0, 0};
-        sscanf(buffer_, "%d,%d,%d,%d", &ip.Vf, &ip.Vr, &ip.Vz, &ip.Va);
-        data->add_reading(ip);
+        if (raw) {
+            sark_data::raw_data ip = {0, 0, 0, 0};
+            sscanf(buffer_, "%d,%d,%d,%d", &ip.Vf, &ip.Vr, &ip.Vz, &ip.Va);
+            data->add_reading(ip, add_sign);
+        } else {
+            // This is a convoluted way of doing this but directly reading struc
+            // fields results in gibberish
+            float swr;
+            int r, x, z;
+            int n = sscanf(buffer_, "%g,%d,%d,%d", &swr, &r, &x, &z);
+            sark_data::comp_data ip = { swr, (double)r, (double)z, (double)x};
+            data->add_reading(ip);
+        }
+        if (ix % dot == 0) {
+            printf(".");
+            fflush(stdout);
+        }
     }
     resp = read_line();
     if (resp < 0) {
         return false;
     } 
     if (strcmp(buffer_, "End") != 0) return false;
+    printf(" DONE!\n");
 
  //   check_prompt();
  }

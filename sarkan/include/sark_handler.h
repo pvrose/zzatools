@@ -14,7 +14,7 @@ public:
     ~sark_handler();
 
     // Get the readings
-    bool read_data(sark_data* data);
+    bool read_data(sark_data* data, bool raw, bool add_sign);
  
 protected:
     // SARK command set

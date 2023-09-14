@@ -1,6 +1,7 @@
 #include "sark_window.h"
 
 #include <cstdio>
+#include <clocale>
 
 #include <FL/Fl_Preferences.H>
 // included to allow windows specifics to be called

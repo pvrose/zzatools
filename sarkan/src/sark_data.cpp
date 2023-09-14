@@ -36,7 +36,7 @@ sark_data::~sark_data() {
     data_.clear();
 }
 
-void sark_data::add_reading(sark_data::raw_data reading) {
+void sark_data::add_reading(sark_data::raw_data reading, bool add_sign) {
     if (read_index_ >= readings_.size()) {
         printf("ERROR: Unexpected input reading %zu\n", read_index_);
         return;
@@ -48,19 +48,33 @@ void sark_data::add_reading(sark_data::raw_data reading) {
     double z = Z0 * (double)reading.Vz / (double)reading.Va;
     double r = ( ( (Z0 * Z0) + (z * z) ) * swr) /
                     (Z0 * ( (swr * swr) + 1));
-    double abs_x = sqrt((z * z) - (r * r));
+    double abs_x = z > r ? sqrt((z * z) - (r * r)) : 0.0;
     double prev_x = abs(previous.X);
     double x;
-    double delta_x = prev_x - abs_x;
-    // Assume frequency increases for each reading
-    if (delta_x >= 0.0) {
-        // Increase reactance with frequency is inductive
-        x = abs_x;
+    if (add_sign) {
+        double delta_x = prev_x - abs_x;
+        // Assume frequency increases for each reading
+        if (delta_x >= 0.0) {
+            // Increase reactance with frequency is inductive
+            x = abs_x;
+        } else {
+            // Decrease reactance with frequency is capacitative
+            x = -abs_x;
+        }
     } else {
-        // Decrease reactance with frequency is capacitative
-        x = -abs_x;
+        x = abs_x;
     }
     data_[read_index_] = { swr, r, z, x};
+    read_index_++;
+    Fl::check();
+}
+
+void sark_data::add_reading(sark_data::comp_data reading) {
+    if (read_index_ >= readings_.size()) {
+        printf("ERROR: Unexpected input reading %zu\n", read_index_);
+        return;
+    }
+    data_[read_index_] = reading;
     read_index_++;
     Fl::check();
 }

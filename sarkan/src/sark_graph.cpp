@@ -73,11 +73,13 @@ void sark_graph::data(sark_data* d) {
                 min_swr_ = min(min_swr_, p.SWR);
                 max_swr_ = max(max_swr_, p.SWR);
             }
-            // Limit max_swr_ to 25.0
+            // Limit max_swr_ between 2.0 and 25.0
             max_swr_ = min(25.0, max_swr_);
+            max_swr_ = max(2.0, max_swr_);
         }
-        if (min_ohm_ == max_ohm_) {
+        if (abs(min_ohm_) == abs(max_ohm_)) {
             for (size_t ix = 1; ix < data_->size(); ix++) {
+                p = data_->get_data(ix);
                 min_ohm_ = min(min_ohm_, p.R);
                 min_ohm_ = min(min_ohm_, p.X);
                 min_ohm_ = min(min_ohm_, p.Z);
@@ -90,6 +92,7 @@ void sark_graph::data(sark_data* d) {
             max_ohm_ = min(max_ohm_, 10000.0);
             // If min_ohm is +ve make  it zero
             min_ohm_ = min(min_ohm_, 0.0);
+
          }
         min_MHz_ = (double)data_->get_params().start / 1000000;
         max_MHz_ = (double)data_->get_params().end / 1000000; 
@@ -148,8 +151,9 @@ void sark_graph::draw_yl_axis() {
     // Draw the SWR axis
     fl_color(FL_BLACK);
     int ax = charts_->x();
-    int ay = charts_->y();
-    int ah = charts_->h();
+    int dh = fl_height();
+    int ay = charts_->y() + dh;
+    int ah = charts_->h() - (2 * dh);
 
     fl_line(ax, ay, ax, ay + ah);
     // Now add the ticks - generate values
@@ -172,7 +176,7 @@ void sark_graph::draw_yl_axis() {
         tick += gap;
     }
     double range = max_swr_ - min_swr_;
-    double pixel_per_swr = (double)charts_->h() / range;
+    double pixel_per_swr = ah / range;
     // For each tick
     for (auto it = ticks.begin(); it != ticks.end(); it++) {
         int ty = ay + round((max_swr_ - *it) * pixel_per_swr);
@@ -186,16 +190,17 @@ void sark_graph::draw_yl_axis() {
         } else {
             snprintf(l, sizeof(l), "%.2f:1", *it);
         }
-        fl_draw(l, x(), ty - 1);
+        fl_draw(l, x() + 1, ty - 1);
     }
 }
 
 void sark_graph::draw_yr_axis() {
        // Draw the SWR axis
     fl_color(FL_BLACK);
+    int dh = fl_height();
     int ax = charts_->x() + charts_->w();
-    int ay = charts_->y();
-    int ah = charts_->h();
+    int ay = charts_->y() + dh;
+    int ah = charts_->h() - (2 * dh);
     int axw = x() + w();
 
     fl_line(ax, ay, ax, ay + ah);
@@ -204,7 +209,9 @@ void sark_graph::draw_yr_axis() {
     double tick = 0.0;
     double range = max_ohm_ - min_ohm_;
     double gap;
-    if (range > 5000.0) {
+    if (range > 10000.0) {
+        gap = 1000.0;
+    } else if (range > 5000.0) {
         gap = 500.0;
     } else if (range > 2000.0) {
         gap = 200.0;
@@ -224,11 +231,11 @@ void sark_graph::draw_yr_axis() {
         gap = 1.0;
     }
     tick = trunc(max_ohm_ / gap) * gap;
-    while (tick > min_ohm_) {
+    while (tick > min_ohm_ - gap) {
         ticks.insert(tick);
         tick -= gap;
     }
-    double pixel_per_ohm = (double)charts_->h() / range;
+    double pixel_per_ohm = ah / range;
     // For each tick
     for (auto it = ticks.begin(); it != ticks.end(); it++) {
         int ty = ay + round((max_ohm_ - *it) * pixel_per_ohm);
@@ -242,7 +249,7 @@ void sark_graph::draw_yr_axis() {
         } else {
             snprintf(l, sizeof(l), "%.0f\316\251", *it);
         }
-        fl_draw(l, ax, ty - 1);
+        fl_draw(l, ax + 1, ty - 1);
     }
 }
 void sark_graph::draw_x_axis() {
@@ -296,7 +303,7 @@ void sark_graph::draw_x_axis() {
         } else {
             snprintf(l, sizeof(l), "%.1fMHz", *it);
         }
-        fl_draw(270, l, tx + 1, ay);
+        fl_draw(270, l, tx + 1, ay + 1);
     }
 
 }

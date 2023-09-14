@@ -46,7 +46,8 @@ protected:
 
 public:
 
-    void add_reading(raw_data reading);
+    void add_reading(raw_data reading, bool add_sign);
+    void add_reading(comp_data reading);
 
     // Get frequency at the reading point
     int64_t get_frequency(size_t index);

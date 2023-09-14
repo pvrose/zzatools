@@ -95,6 +95,7 @@ void sark_control::load_settings() {
     settings_->get("Colour Reactance", (int&)x_colour_, FL_RED);
     settings_->get("Colour Resistance", (int&)r_colour_, FL_GREEN);
     settings_->get("Colour Impedance", (int&)z_colour_, FL_BLACK);
+    settings_->get("Scan Type", (int&)scan_type_, RAW_SIGN);
 }
 
 void sark_control::save_settings() {
@@ -110,6 +111,7 @@ void sark_control::save_settings() {
     settings_->set("Colour Reactance", (int)x_colour_);
     settings_->set("Colour Resistance", (int)r_colour_);
     settings_->set("Colour Impedance", (int)z_colour_);
+    settings_->set("Scan Type", (int)scan_type_);
     settings_->flush();
 }
 
@@ -167,6 +169,27 @@ void sark_control::create() {
     populate_step();
     update_scan_params();
 
+    // Scan type
+    curr_x = x() + GAP;
+    curr_y += HBUTTON + GAP;
+    gp_scan_type_ = new Fl_Group(curr_x, curr_y, (WBUTTON + WSSEDIT), HBUTTON);
+    const int WSCANB = gp_scan_type_->w() / 3;
+    bn_raw_abs_ = new Fl_Radio_Button(curr_x, curr_y, WSCANB, HBUTTON, "Raw |X|");
+    bn_raw_abs_->value(scan_type_ == RAW_ABS);
+    bn_raw_abs_->callback(cb_bn_scantype, (void*)(intptr_t)RAW_ABS);
+    bn_raw_abs_->tooltip("Scan raw data values - do not adjust sign of reactance");
+    curr_x += WSCANB;
+    bn_raw_sign_ = new Fl_Radio_Button(curr_x, curr_y, WSCANB, HBUTTON, "Raw \302\261X");
+    bn_raw_sign_->value(scan_type_ == RAW_SIGN);
+    bn_raw_sign_->callback(cb_bn_scantype, (void*)(intptr_t)RAW_SIGN);
+    bn_raw_sign_->tooltip("Scan raw data values - estimate sign of reactance");
+    curr_x += WSCANB;
+    bn_computed_ = new Fl_Radio_Button(curr_x, curr_y, WSCANB, HBUTTON, "Computed");
+    bn_computed_->value(scan_type_ == COMPUTED);
+    bn_computed_->callback(cb_bn_scantype, (void*)(intptr_t)COMPUTED);
+    bn_computed_->tooltip("Scan computed data values");
+    gp_scan_type_->end();
+ 
     // Do scan and progress bar
     curr_x = x() + GAP;
     curr_y += HBUTTON + GAP;
@@ -399,6 +422,13 @@ void sark_control::cb_ch_step(Fl_Widget* w, void* v) {
     that->update_scan_params();
 }
 
+// Scan type radio buttons
+void sark_control::cb_bn_scantype(Fl_Widget* w, void* v) {
+    sark_control* that = (sark_control*)w->parent()->parent();
+    that->scan_type_ = (scan_type)(intptr_t)v;
+    that->update_scan_type();
+}
+
 // Initiate scan
 void sark_control::cb_bn_scan(Fl_Widget* w, void* v) {
     sark_control* that = (sark_control*)w->parent();
@@ -520,7 +550,20 @@ void sark_control::scan_sark() {
     pr_scan_->value(0.0);
     redraw();
     win->data_ = new sark_data(parms);
-    win->handler_->read_data(win->data_);
+    switch (scan_type_) {
+        case RAW_ABS: {
+            win->handler_->read_data(win->data_, true, false);
+            break;
+        }
+        case RAW_SIGN: {
+            win->handler_->read_data(win->data_, true, true);
+            break;
+        }
+        case COMPUTED: {
+            win->handler_->read_data(win->data_, false, false);
+            break;
+        }
+    }
 }
 
 // Send the data to the sark_graph
@@ -528,7 +571,12 @@ void sark_control::update_sark_graph() {
     sark_window* win = (sark_window*)parent();
     win->graph_->colours(swr_colour_, x_colour_, r_colour_, z_colour_);
     win->graph_->swr_bounds(SWR_LIMITS[ch_max_swr_->value()]);
-    win->graph_->ohm_bounds(OHM_LIMITS[ch_max_ohm_->value()]);
+    if (scan_type_ == RAW_SIGN) {
+        win->graph_->ohm_bounds(OHM_LIMITS[ch_max_ohm_->value()],
+            -OHM_LIMITS[ch_max_ohm_->value()]);
+    } else {
+        win->graph_->ohm_bounds(OHM_LIMITS[ch_max_ohm_->value()]);
+    }
     win->graph_->MHz_bounds((double)end_/1000000, (double)start_/1000000);
     win->graph_->data(win->data_);
 
@@ -538,4 +586,22 @@ void sark_control::update_sark_graph() {
 void sark_control::clear_sark_graph() {
     sark_window* win = (sark_window*)parent();
     win->graph_->clear();
+}
+
+// Update scan type
+void sark_control::update_scan_type() {
+    switch(scan_type_) {
+        case RAW_ABS: {
+            bn_raw_abs_->setonly();
+            break;
+        }
+        case RAW_SIGN: {
+            bn_raw_sign_->setonly();
+            break;
+        }
+        case COMPUTED: {
+            bn_computed_->setonly();
+            break;
+        }
+    }
 }
