@@ -12,7 +12,7 @@ sark_data::sark_data(sark_data::scan_params params) {
     read_index_ = 0;
     params_ = params;
     // Calculate size of data
-    int64_t number_points = (params_.end - params_.start) / params_.step;
+    int64_t number_points = (params_.end - params_.start) / params_.step + 1;
     size_t sz_array = (size_t)number_points;
     // Initialise all data to NAN
     raw_data raw_dummy = { 0, 0, 0, 0 };
@@ -38,7 +38,7 @@ sark_data::~sark_data() {
 
 void sark_data::add_reading(sark_data::raw_data reading, bool add_sign) {
     if (read_index_ >= readings_.size()) {
-        printf("ERROR: Unexpected input reading %zu\n", read_index_);
+        printf("ERROR: Unexpected input reading: index %zu, size %zu\n", read_index_, readings_.size());
         return;
     }
     readings_[read_index_] = reading;
@@ -71,7 +71,7 @@ void sark_data::add_reading(sark_data::raw_data reading, bool add_sign) {
 
 void sark_data::add_reading(sark_data::comp_data reading) {
     if (read_index_ >= readings_.size()) {
-        printf("ERROR: Unexpected input reading %zu\n", read_index_);
+        printf("ERROR: Unexpected input reading: index %zu, size %zu\n", read_index_, readings_.size());
         return;
     }
     data_[read_index_] = reading;

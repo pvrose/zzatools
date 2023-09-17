@@ -172,22 +172,38 @@ void sark_control::create() {
     // Scan type
     curr_x = x() + GAP;
     curr_y += HBUTTON + GAP;
-    gp_scan_type_ = new Fl_Group(curr_x, curr_y, (WBUTTON + WSSEDIT), HBUTTON);
+    gp_scan_type_ = new Fl_Group(curr_x, curr_y, (WBUTTON + WSSEDIT), HBUTTON * 2);
     const int WSCANB = gp_scan_type_->w() / 3;
-    bn_raw_abs_ = new Fl_Radio_Button(curr_x, curr_y, WSCANB, HBUTTON, "Raw |X|");
+    bn_raw_abs_ = new Fl_Radio_Button(curr_x, curr_y, WSCANB, HBUTTON, "|Raw|");
     bn_raw_abs_->value(scan_type_ == RAW_ABS);
     bn_raw_abs_->callback(cb_bn_scantype, (void*)(intptr_t)RAW_ABS);
     bn_raw_abs_->tooltip("Scan raw data values - do not adjust sign of reactance");
     curr_x += WSCANB;
-    bn_raw_sign_ = new Fl_Radio_Button(curr_x, curr_y, WSCANB, HBUTTON, "Raw \302\261X");
+    bn_raw_sign_ = new Fl_Radio_Button(curr_x, curr_y, WSCANB, HBUTTON, "\302\261Raw");
     bn_raw_sign_->value(scan_type_ == RAW_SIGN);
     bn_raw_sign_->callback(cb_bn_scantype, (void*)(intptr_t)RAW_SIGN);
     bn_raw_sign_->tooltip("Scan raw data values - estimate sign of reactance");
     curr_x += WSCANB;
-    bn_computed_ = new Fl_Radio_Button(curr_x, curr_y, WSCANB, HBUTTON, "Computed");
+    bn_computed_ = new Fl_Radio_Button(curr_x, curr_y, WSCANB, HBUTTON, "Comp");
     bn_computed_->value(scan_type_ == COMPUTED);
     bn_computed_->callback(cb_bn_scantype, (void*)(intptr_t)COMPUTED);
     bn_computed_->tooltip("Scan computed data values");
+    curr_x = x() + GAP;
+    curr_y += HBUTTON;
+    bn_raw_absi_ = new Fl_Radio_Button(curr_x, curr_y, WSCANB, HBUTTON, "{|RAW|}");
+    bn_raw_absi_->value(scan_type_ == RAW_ABS_I);
+    bn_raw_absi_->callback(cb_bn_scantype, (void*)(intptr_t)RAW_ABS_I);
+    bn_raw_absi_->tooltip("Scan raw data values - do not adjust sign of reactance");
+    curr_x += WSCANB;
+    bn_raw_signi_ = new Fl_Radio_Button(curr_x, curr_y, WSCANB, HBUTTON, "{\302\261Raw}");
+    bn_raw_signi_->value(scan_type_ == RAW_SIGN_I);
+    bn_raw_signi_->callback(cb_bn_scantype, (void*)(intptr_t)RAW_SIGN_I);
+    bn_raw_signi_->tooltip("Scan raw data values - estimate sign of reactance");
+    curr_x += WSCANB;
+    bn_computedi_ = new Fl_Radio_Button(curr_x, curr_y, WSCANB, HBUTTON, "{Comp}");
+    bn_computedi_->value(scan_type_ == COMPUTED_I);
+    bn_computedi_->callback(cb_bn_scantype, (void*)(intptr_t)COMPUTED_I);
+    bn_computedi_->tooltip("Scan computed data values");
     gp_scan_type_->end();
  
     // Do scan and progress bar
@@ -527,7 +543,7 @@ void sark_control::update_scan_params() {
     ch_preset_->value(ix);
     // Adjust start value to be a muliplte of step <= its current value
     start_ = start_ - (start_ % step_);
-    // Adjust end value to be a multiple of step >= current value
+    // Adjust end value to be a multiple of step >= current value + 1
     if (end_ % step_ != 0) {
         end_ = end_ + step_ - (end_ % step_);
     }
@@ -537,7 +553,7 @@ void sark_control::update_scan_params() {
     vl_start_->value(start_);
     vl_start_->step((double)step_);
     vl_start_->maximum(vl_end_->value());
-    int num_samples = (end_ - start_) / step_;
+    int num_samples = (end_ - start_) / step_ + 1;
     char text[16];
     snprintf(text, sizeof(text), "%d", num_samples);
     op_samples_->value(text);
@@ -552,17 +568,37 @@ void sark_control::scan_sark() {
     win->data_ = new sark_data(parms);
     switch (scan_type_) {
         case RAW_ABS: {
+            printf("Reading RAW data with no sign allocation\n");
             win->handler_->read_data(win->data_, true, false);
             break;
         }
         case RAW_SIGN: {
+            printf("Reading RAW data hoping to correct sign");
             win->handler_->read_data(win->data_, true, true);
             break;
         }
         case COMPUTED: {
+            printf("Reading computed data\n");
             win->handler_->read_data(win->data_, false, false);
             break;
         }
+        case RAW_ABS_I: {
+            printf("Reading RAW data with no sign allocation\n");
+            win->handler_->read_datai(win->data_, true, false);
+            break;
+        }
+        case RAW_SIGN_I: {
+            printf("Reading RAW data hoping to correct sign");
+            win->handler_->read_datai(win->data_, true, true);
+            break;
+        }
+        case COMPUTED_I: {
+            printf("Reading computed data\n");
+            win->handler_->read_datai(win->data_, false, false);
+            break;
+        }
+        default:
+            printf("ERROR: Unknown scan type\n");
     }
 }
 
@@ -571,11 +607,15 @@ void sark_control::update_sark_graph() {
     sark_window* win = (sark_window*)parent();
     win->graph_->colours(swr_colour_, x_colour_, r_colour_, z_colour_);
     win->graph_->swr_bounds(SWR_LIMITS[ch_max_swr_->value()]);
-    if (scan_type_ == RAW_SIGN) {
-        win->graph_->ohm_bounds(OHM_LIMITS[ch_max_ohm_->value()],
-            -OHM_LIMITS[ch_max_ohm_->value()]);
-    } else {
-        win->graph_->ohm_bounds(OHM_LIMITS[ch_max_ohm_->value()]);
+    switch (scan_type_) {
+        case RAW_SIGN:
+        case RAW_SIGN_I: {
+            win->graph_->ohm_bounds(OHM_LIMITS[ch_max_ohm_->value()],
+                -OHM_LIMITS[ch_max_ohm_->value()]);
+        }
+        default: {
+            win->graph_->ohm_bounds(OHM_LIMITS[ch_max_ohm_->value()]);
+        }
     }
     win->graph_->MHz_bounds((double)end_/1000000, (double)start_/1000000);
     win->graph_->data(win->data_);

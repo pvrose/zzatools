@@ -91,7 +91,8 @@ protected:
     Fl_Color r_colour_;
     Fl_Color z_colour_;
     // Scan tyype
-    enum scan_type { RAW_ABS, RAW_SIGN, COMPUTED } scan_type_;
+    enum scan_type { RAW_ABS, RAW_SIGN, COMPUTED, RAW_ABS_I, RAW_SIGN_I, COMPUTED_I } scan_type_;
+
 
     // Widgets
     Fl_Light_Button* bn_connect_;
@@ -113,5 +114,8 @@ protected:
     Fl_Radio_Button* bn_raw_abs_;
     Fl_Radio_Button* bn_raw_sign_;
     Fl_Radio_Button* bn_computed_;
+    Fl_Radio_Button* bn_raw_absi_;
+    Fl_Radio_Button* bn_raw_signi_;
+    Fl_Radio_Button* bn_computedi_;
 
 };

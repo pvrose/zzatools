@@ -37,6 +37,7 @@ protected:
     double min_ohm_;
     double max_MHz_;
     double min_MHz_;
+    double step_MHz_;
 
     // Chart line colours
     Fl_Color swr_colour_;

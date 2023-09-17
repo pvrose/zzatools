@@ -96,6 +96,7 @@ void sark_graph::data(sark_data* d) {
          }
         min_MHz_ = (double)data_->get_params().start / 1000000;
         max_MHz_ = (double)data_->get_params().end / 1000000; 
+        step_MHz_ = (double)data_->get_params().step / 1000000;
 
         // Configure the charts - Y-axis limits
         swr_chart_->bounds(min_swr_, max_swr_);
@@ -278,15 +279,22 @@ void sark_graph::draw_x_axis() {
     } else if (range > 1.0) {
         gap = 0.1;
     } else if (range > 0.5) {
-        gap = 0.5;
+        gap = 0.05;
     } else if (range > 0.2) {
-        gap = 0.2;
+        gap = 0.02;
     } else {
-        gap = 0.1;
+        gap = 0.01;
     }
-    double pixel_per_MHz = (double)charts_->w() / range;
+    // Adjust X-axis as Fl_Chart places each point in the middle of a band
+    // So 5 points will be at 10, 30, 50, 70, 90% of the axis
+    double number_points = range / step_MHz_ + 1.0;
+    double pixel_per_point = (double)aw / number_points;
+    // Adjust aw and aw accordingly
+    ax += (int)(pixel_per_point / 2.0);
+    aw -= (int)pixel_per_point;
+    double pixel_per_MHz = (double)aw / range;
     tick = trunc(max_MHz_ / gap) * gap;
-    while (tick > min_MHz_) {
+    while (tick > (min_MHz_ - gap)) {
         ticks.insert(tick);
         tick -= gap;
     }
