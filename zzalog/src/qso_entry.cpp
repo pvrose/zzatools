@@ -271,6 +271,9 @@ void qso_entry::copy_qso_to_display(int flags) {
 						}
 					}
 				}
+				if (field == "STATE") {
+					ip_field_[i]->reload_choice(qso_);
+				}
 			}
 		}
 		ip_notes_->value(qso_->item("NOTES").c_str());
