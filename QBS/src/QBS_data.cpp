@@ -499,6 +499,17 @@ float QBS_data::get_count(int box_num, string call) {
 		}
 		return count / i;
 	}
+	case PREV4_BOX: {
+		float count = 0.0F;
+		int i = 0;
+		for (int b = get_current() - 1; i < 4 && b >= 0; b--, i++) {
+			if (boxes_[b]->received->find(call) != boxes_[b]->received->end()) {
+				int d = boxes_[b]->received->at(call);
+				count += d;
+			}
+		}
+		return count / i;
+	}
 
 	default:
 		if (box_num >= (signed)boxes_.size() || box_num < 0) {

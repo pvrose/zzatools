@@ -618,6 +618,27 @@ void QBS_window::update_sort_cards() {
 	bx_label_[ix]->show();
 	bx_label_[ix]->label(op_batch_->value());
 	index_curr_ = ix;
+	ix++;
+	op_value_[ix]->show();
+	op_value_[ix]->label("PREVIOUS");
+	snprintf(buff, 32, "%0.0f", data_->get_count(data_->get_current() - 1, call_));
+	op_value_[ix]->value(buff);
+	ip_delta_[ix]->hide();
+	bx_label_[ix]->hide();
+	ix++;
+	op_value_[ix]->show();
+	op_value_[ix]->label("PREV 4");
+	snprintf(buff, 32, "%0.1f", data_->get_count(PREV4_BOX, call_));
+	op_value_[ix]->value(buff);
+	ip_delta_[ix]->hide();
+	bx_label_[ix]->hide();
+	ix++;
+	op_value_[ix]->show();
+	op_value_[ix]->label("AVERAGE");
+	snprintf(buff, 32, "%0.1f", data_->get_count(AVERAGE_BOX, call_));
+	op_value_[ix]->value(buff);
+	ip_delta_[ix]->hide();
+	bx_label_[ix]->hide();
 	for (ix++; ix < NUM_COUNTS; ix++) {
 		op_value_[ix]->hide();
 		ip_delta_[ix]->hide();
@@ -741,12 +762,14 @@ void QBS_window::update_rcv_card() {
 	op_value_[ix]->show();
 	op_value_[ix]->label("AVERAGE");
 	snprintf(buff, 32, "%0.1f", data_->get_count(AVERAGE_BOX, call_));
+	op_value_[ix]->value(buff);
 	ip_delta_[ix]->hide();
 	bx_label_[ix]->hide();
 	ix++;
 	op_value_[ix]->show();
 	op_value_[ix]->label("LAST 4");
 	snprintf(buff, 32, "%0.1f", data_->get_count(LAST4_BOX, call_));
+	op_value_[ix]->value(buff);
 	ip_delta_[ix]->hide();
 	bx_label_[ix]->hide();
 	for (ix++; ix < NUM_COUNTS; ix++) {

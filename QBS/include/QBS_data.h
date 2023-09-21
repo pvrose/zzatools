@@ -95,6 +95,7 @@ enum special_box_t {
 	DISP_BOX = -7,        // "Box" representing cards placed in recycling bin  
 	AVERAGE_BOX = -8,     // Average over all boxes
 	LAST4_BOX = -9,       // Average over last 4 boxes
+	PREV4_BOX = -11,      // Average over previous 4
 };
 
 class QBS_window;
