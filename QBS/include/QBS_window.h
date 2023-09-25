@@ -99,6 +99,7 @@ protected:
     void update_call_history();
     void update_edit_notes();
     void update_correct_data();
+    void update_history(bool enable);
     void hide_edit_notes(bool info);
     void update_action_values();
     void update_action_bn(Fl_Button* b, action_t a);
@@ -207,6 +208,16 @@ protected:
     Fl_Input* ip_note_value_;
 
     Fl_Text_Display* td_log_;
+
+    Fl_Group* g_history_;
+    Fl_Output* op_rcvd_cnt_;
+    Fl_Output* op_rcvd_ave_;
+    Fl_Output* op_sent_cnt_;
+    Fl_Output* op_sent_ave_;
+    Fl_Output* op_unsent_cnt_;
+    Fl_Output* op_unsent_ave_;
+    Fl_Output* op_missing_;
+
  
     // Command selection
     action_t action_;
