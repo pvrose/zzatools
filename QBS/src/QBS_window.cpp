@@ -1448,7 +1448,7 @@ void QBS_window::update_correct_data() {
 		snprintf(buff, 32, "%0.0f", data_->get_count(box, call_));
 		op_value_[ix]->value(buff);
 		ip_delta_[ix]->show();
-		ip_delta_[ix]->value(default_inputs_ ? buff : "0");
+		ip_delta_[ix]->value("0");
 		bx_label_[ix]->show();
 		bx_label_[ix]->copy_label(data_->get_batch(box).c_str());
 		if (box == curr) index_curr_ = ix;
@@ -2028,13 +2028,17 @@ void QBS_window::cb_exec_call(Fl_Widget* w, void* v) {
 	case CORRECT_DATA: {
 		// Send those in keep
 		num_cards = atoi(that->ip_delta_[that->index_keep_]->value());
-		that->data_->adjust_cards(KEEP_BOX, date, call, num_cards);
-		snprintf(log_msg, 256, "Correction %s: %s %d cards added to KEEP_BOX\n", date.c_str(), call.c_str(), num_cards);
-		that->append_batch_log(log_msg);
+		if (num_cards != 0) {
+			that->data_->adjust_cards(KEEP_BOX, date, call, num_cards);
+			snprintf(log_msg, 256, "Correction %s: %s %d cards added to KEEP_BOX\n", date.c_str(), call.c_str(), num_cards);
+			that->append_batch_log(log_msg);
+		}
 		num_cards = atoi(that->ip_delta_[that->index_inbox_]->value());
-		that->data_->adjust_cards(IN_BOX, date, call, num_cards);
-		snprintf(log_msg, 256, "Correction %s: %s %d cards added to IN_BOX\n", date.c_str(), call.c_str(), num_cards);
-		that->append_batch_log(log_msg);
+		if (num_cards != 0) {
+			that->data_->adjust_cards(IN_BOX, date, call, num_cards);
+			snprintf(log_msg, 256, "Correction %s: %s %d cards added to IN_BOX\n", date.c_str(), call.c_str(), num_cards);
+			that->append_batch_log(log_msg);
+		}
 		// From HEAD to CURR - send cards
 		int curr = that->data_->get_current();
 		int head = that->data_->get_head();
@@ -2042,17 +2046,21 @@ void QBS_window::cb_exec_call(Fl_Widget* w, void* v) {
 		int ix = that->index_head_;
 		while (ix >= that->index_curr_ && box <= curr) {
 			num_cards = atoi(that->ip_delta_[ix]->value());
-			that->data_->adjust_cards(box, date, call, num_cards);
-			snprintf(log_msg, 256, "Correction %s: %s %d cards added to box %d\n", date.c_str(), call.c_str(), num_cards, box);
-			that->append_batch_log(log_msg);
+			if (num_cards != 0) {
+				that->data_->adjust_cards(box, date, call, num_cards);
+				snprintf(log_msg, 256, "Correction %s: %s %d cards added to box %d\n", date.c_str(), call.c_str(), num_cards, box);
+				that->append_batch_log(log_msg);
+			}
 			ix--;
 			if (box < curr) box++;
 		}
 		// Use SASEs
 		num_sases = atoi(that->ip_delta_[that->index_sase_]->value());
-		that->data_->adjust_cards(SASE_BOX, date, call, num_sases);
-		snprintf(log_msg, 256, "Correction %s: %s %d SASEs added\n", date.c_str(), call.c_str(), num_sases);
-		that->append_batch_log(log_msg);
+		if (num_sases != 0) {
+			that->data_->adjust_cards(SASE_BOX, date, call, num_sases);
+			snprintf(log_msg, 256, "Correction %s: %s %d SASEs added\n", date.c_str(), call.c_str(), num_sases);
+			that->append_batch_log(log_msg);
+		}
 		that->update_correct_data();
 		break;
 	}
