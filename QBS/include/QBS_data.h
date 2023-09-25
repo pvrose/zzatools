@@ -27,7 +27,7 @@ struct recycle_data {
 	int count_sent;              // Number of hamd to whom sent
 	int count_received;          // Number of calls received
 	float weight_kg;             // Weight (in kg) of cards recycled
-	list<string> top_20;       // Top 20 callsigns recycled
+	list<string> top_20;         // Top 20 callsigns recycled
 
 	recycle_data() {
 		sum_recycled = 0;
@@ -93,9 +93,15 @@ enum special_box_t {
 	RCVD_BOX = -5,        // "Box" representing ALL received cards
 	SENT_BOX = -6,        // "Box" representing cards placed in post-box
 	DISP_BOX = -7,        // "Box" representing cards placed in recycling bin  
-	AVERAGE_BOX = -8,     // Average over all boxes
-	LAST4_BOX = -9,       // Average over last 4 boxes
-	PREV4_BOX = -11,      // Average over previous 4
+	RCVD_AVE = -8,        // Average over all boxes
+	LAST4_AVE = -9,       // Average over last 4 boxes
+	PREV4_AVE = -10,      // Average over previous 4
+	UNSENT_AVE = -11,     // Average cards not sent previously
+	SENT_AVE = -12,       // Average sent
+	RCVD_ALL = -13,       // cards received for call in all boxes
+	SENT_ALL = -14,       // cards sent for call in all boxes
+	UNSENT_ALL = -15,     // cards not sent for call in all boxes
+
 };
 
 class QBS_window;

@@ -501,7 +501,46 @@ void QBS_window::create_form() {
 
 	// Calculate window size
 	max_y = g_process_->y() + g_process_->h() + GAP;
-	max_x += GAP;
+	curr_x = col3 + WLABEL + GAP;
+
+	g_history_ = new Fl_Group(curr_x, save_y, 10, 10, "Call history");
+	g_history_->align(FL_ALIGN_TOP | FL_ALIGN_INSIDE);
+	curr_x = g_history_->x() + GAP + WLABEL;
+	curr_y = g_history_->y() + HTEXT;
+	op_rcvd_cnt_ = new Fl_Output(curr_x, curr_y, WBUTTON, HBUTTON, "Received");
+	op_rcvd_cnt_->align(FL_ALIGN_LEFT);
+
+	curr_x += WBUTTON;
+	op_rcvd_ave_ = new Fl_Output(curr_x, curr_y, WBUTTON, HBUTTON);
+
+	curr_y += HBUTTON;
+	curr_x = g_history_->x() + GAP + WLABEL;
+	op_sent_cnt_ = new Fl_Output(curr_x, curr_y, WBUTTON, HBUTTON, "Sent");
+	op_sent_cnt_->align(FL_ALIGN_LEFT);
+
+	curr_x += WBUTTON;
+	op_sent_ave_ = new Fl_Output(curr_x, curr_y, WBUTTON, HBUTTON);
+
+	curr_y += HBUTTON;
+	curr_x = g_history_->x() + GAP + WLABEL;
+	op_unsent_cnt_ = new Fl_Output(curr_x, curr_y, WBUTTON, HBUTTON, "Not sent");
+	op_unsent_cnt_->align(FL_ALIGN_LEFT);
+
+	curr_x += WBUTTON;
+	op_unsent_ave_ = new Fl_Output(curr_x, curr_y, WBUTTON, HBUTTON);
+
+	curr_y += HBUTTON;
+	int gx = curr_x + WBUTTON + GAP;
+	curr_x = g_history_->x() + GAP + WLABEL;
+	op_missing_ = new Fl_Output(curr_x, curr_y, WBUTTON, HBUTTON, "Error");
+
+	curr_y += HBUTTON;
+
+	g_history_->resizable(nullptr);
+	g_history_->size(gx - g_history_->x(), curr_y - g_history_->y());
+	g_history_->end();
+
+	max_x = max(max_x, gx);
 
 	// Log display
 	curr_x = GAP;
@@ -558,6 +597,7 @@ void QBS_window::update_new_batch() {
 	}
 	// Hide the note widgets
 	hide_edit_notes(false);
+	update_history(false);
 	return;
 }
 
@@ -628,14 +668,21 @@ void QBS_window::update_sort_cards() {
 	ix++;
 	op_value_[ix]->show();
 	op_value_[ix]->label("PREV 4");
-	snprintf(buff, 32, "%0.1f", data_->get_count(PREV4_BOX, call_));
+	snprintf(buff, 32, "%0.1f", data_->get_count(PREV4_AVE, call_));
 	op_value_[ix]->value(buff);
 	ip_delta_[ix]->hide();
 	bx_label_[ix]->hide();
 	ix++;
 	op_value_[ix]->show();
 	op_value_[ix]->label("AVERAGE");
-	snprintf(buff, 32, "%0.1f", data_->get_count(AVERAGE_BOX, call_));
+	snprintf(buff, 32, "%0.1f", data_->get_count(RCVD_AVE, call_));
+	op_value_[ix]->value(buff);
+	ip_delta_[ix]->hide();
+	bx_label_[ix]->hide();
+	ix++;
+	op_value_[ix]->show();
+	op_value_[ix]->label("NOT SENT");
+	snprintf(buff, 32, "%0.1f", data_->get_count(UNSENT_AVE, call_));
 	op_value_[ix]->value(buff);
 	ip_delta_[ix]->hide();
 	bx_label_[ix]->hide();
@@ -647,6 +694,7 @@ void QBS_window::update_sort_cards() {
 	}
 	// Hide the note widgets
 	hide_edit_notes(true);
+	update_history(true);
 	return;
 }
 
@@ -700,14 +748,14 @@ void QBS_window::update_keep_cards() {
 	ix++;
 	op_value_[ix]->show();
 	op_value_[ix]->label("AVERAGE");
-	snprintf(buff, 32, "%0.1f", data_->get_count(AVERAGE_BOX, call_));
+	snprintf(buff, 32, "%0.1f", data_->get_count(RCVD_AVE, call_));
 	op_value_[ix]->value(buff);
 	ip_delta_[ix]->hide();
 	bx_label_[ix]->hide();
 	ix++;
 	op_value_[ix]->show();
 	op_value_[ix]->label("LAST 4");
-	snprintf(buff, 32, "%0.1f", data_->get_count(LAST4_BOX, call_));
+	snprintf(buff, 32, "%0.1f", data_->get_count(LAST4_AVE, call_));
 	op_value_[ix]->value(buff);
 	ip_delta_[ix]->hide();
 	bx_label_[ix]->hide();
@@ -718,6 +766,7 @@ void QBS_window::update_keep_cards() {
 	}
 	// Hide the note widgets
 	hide_edit_notes(true);
+	update_history(true);
 	return;
 }
 
@@ -761,14 +810,14 @@ void QBS_window::update_rcv_card() {
 	ix++;
 	op_value_[ix]->show();
 	op_value_[ix]->label("AVERAGE");
-	snprintf(buff, 32, "%0.1f", data_->get_count(AVERAGE_BOX, call_));
+	snprintf(buff, 32, "%0.1f", data_->get_count(RCVD_AVE, call_));
 	op_value_[ix]->value(buff);
 	ip_delta_[ix]->hide();
 	bx_label_[ix]->hide();
 	ix++;
 	op_value_[ix]->show();
 	op_value_[ix]->label("LAST 4");
-	snprintf(buff, 32, "%0.1f", data_->get_count(LAST4_BOX, call_));
+	snprintf(buff, 32, "%0.1f", data_->get_count(LAST4_AVE, call_));
 	op_value_[ix]->value(buff);
 	ip_delta_[ix]->hide();
 	bx_label_[ix]->hide();
@@ -779,6 +828,7 @@ void QBS_window::update_rcv_card() {
 	}
 	// Hide the note widgets
 	hide_edit_notes(true);
+	update_history(true);
 	return;
 }
 
@@ -823,6 +873,7 @@ void QBS_window::update_rcv_sase() {
 	}
 	// Hide the note widgets
 	hide_edit_notes(true);
+	update_history(true);
 	return;
 }
 
@@ -920,14 +971,14 @@ void QBS_window::update_stuff_cards() {
 	ix++;
 	op_value_[ix]->show();
 	op_value_[ix]->label("AVERAGE");
-	snprintf(buff, 32, "%0.1f", data_->get_count(AVERAGE_BOX, call_));
+	snprintf(buff, 32, "%0.1f", data_->get_count(RCVD_AVE, call_));
 	op_value_[ix]->value(buff);
 	ip_delta_[ix]->hide();
 	bx_label_[ix]->hide();
 	ix++;
 	op_value_[ix]->show();
 	op_value_[ix]->label("LAST 4");
-	snprintf(buff, 32, "%0.1f", data_->get_count(LAST4_BOX, call_));
+	snprintf(buff, 32, "%0.1f", data_->get_count(LAST4_AVE, call_));
 	op_value_[ix]->value(buff);
 	ip_delta_[ix]->hide();
 	bx_label_[ix]->hide();
@@ -940,6 +991,7 @@ void QBS_window::update_stuff_cards() {
 	}
 	// Hide the note widgets
 	hide_edit_notes(true);
+	update_history(true);
 	return;
 }
 
@@ -975,6 +1027,7 @@ void QBS_window::update_dispose_cards() {
 	}
 	// Hide the note widgets
 	hide_edit_notes(false);
+	update_history(false);
 	return;
 }
 
@@ -1011,6 +1064,7 @@ void QBS_window::update_post_cards() {
 	}
 	// Hide the note widgets
 	hide_edit_notes(false);
+	update_history(false);
 	return;
 }
 
@@ -1091,6 +1145,7 @@ void QBS_window::update_recycle_cards() {
 	}
 	// Hide the note widgets
 	hide_edit_notes(false);
+	update_history(false);
 	return;
 }
 
@@ -1136,6 +1191,7 @@ void QBS_window::update_dispose_sase() {
 	}
 	// Hide the note widgets
 	hide_edit_notes(true);
+	update_history(true);
 	return;
 }
 
@@ -1170,6 +1226,7 @@ void QBS_window::update_batch_summary() {
 	}
 	// Hide the note widgets
 	hide_edit_notes(false);
+	update_history(false);
 	return;
 }
 
@@ -1204,6 +1261,7 @@ void QBS_window::update_batch_listing() {
 	}
 	// Hide the note widgets
 	hide_edit_notes(false);
+	update_history(false);
 	return;
 }
 
@@ -1239,6 +1297,7 @@ void QBS_window::update_call_summary() {
 	}
 	// Hide the note widgets
 	hide_edit_notes(false);
+	update_history(false);
 	return;
 }
 
@@ -1274,6 +1333,7 @@ void QBS_window::update_call_history() {
 	}
 	// Hide the note widgets
 	hide_edit_notes(false);
+	update_history(false);
 	return;
 }
 
@@ -1406,14 +1466,14 @@ void QBS_window::update_correct_data() {
 	ix++;
 	op_value_[ix]->show();
 	op_value_[ix]->label("AVERAGE");
-	snprintf(buff, 32, "%0.1f", data_->get_count(AVERAGE_BOX, call_));
+	snprintf(buff, 32, "%0.1f", data_->get_count(RCVD_AVE, call_));
 	op_value_[ix]->value(buff);
 	ip_delta_[ix]->hide();
 	bx_label_[ix]->hide();
 	ix++;
 	op_value_[ix]->show();
 	op_value_[ix]->label("LAST 4");
-	snprintf(buff, 32, "%0.1f", data_->get_count(LAST4_BOX, call_));
+	snprintf(buff, 32, "%0.1f", data_->get_count(LAST4_AVE, call_));
 	op_value_[ix]->value(buff);
 	ip_delta_[ix]->hide();
 	bx_label_[ix]->hide();
@@ -1425,6 +1485,7 @@ void QBS_window::update_correct_data() {
 	}
 	// Hide the note widgets
 	hide_edit_notes(true);
+	update_history(true);
 	return;
 }
 
@@ -1440,6 +1501,42 @@ void QBS_window::hide_edit_notes(bool info) {
 		op_note_date_->hide();
 		ip_note_name_->hide();
 		ip_note_value_->hide();
+	}
+}
+
+// Update the history
+void QBS_window::update_history(bool enable) {
+	if (enable) {
+		g_history_->show();
+		char buff[32];
+		float f = data_->get_count(RCVD_ALL, call_);
+		snprintf(buff, sizeof(buff), "%0.0f", data_->get_count(RCVD_ALL, call_));
+		op_rcvd_cnt_->value(buff);
+		snprintf(buff, sizeof(buff), "%0.1f", data_->get_count(RCVD_AVE, call_));
+		op_rcvd_ave_->value(buff);
+		f -= data_->get_count(SENT_ALL, call_);
+		snprintf(buff, sizeof(buff), "%0.0f", data_->get_count(SENT_ALL, call_));
+		op_sent_cnt_->value(buff);
+		snprintf(buff, sizeof(buff), "%0.1f", data_->get_count(SENT_AVE, call_));
+		op_sent_ave_->value(buff);
+		f -= data_->get_count(UNSENT_ALL, call_);
+		snprintf(buff, sizeof(buff), "%0.0f", data_->get_count(UNSENT_ALL, call_));
+		op_unsent_cnt_->value(buff);
+		snprintf(buff, sizeof(buff), "%0.1f", data_->get_count(UNSENT_AVE, call_));
+		op_unsent_ave_->value(buff);
+		snprintf(buff, sizeof(buff), "%0.0f", f);
+		op_missing_->value(buff);
+		if (abs(f) > 0.01) {
+			op_missing_->textcolor(FL_RED);
+			op_missing_->textfont(FL_BOLD);
+		}
+		else {
+			op_missing_->textcolor(FL_BLACK);
+			op_missing_->textfont(0);
+		}
+	}
+	else {
+		g_history_->hide();
 	}
 }
 
@@ -1460,6 +1557,7 @@ void QBS_window::update_actions() {
 		bx_change_->hide();
 		bx_current_->hide();
 		hide_edit_notes(false);
+		update_history(false);
 
 		g_input_->activate();
 		break;

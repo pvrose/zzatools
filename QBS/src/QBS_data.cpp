@@ -476,7 +476,7 @@ float QBS_data::get_count(int box_num, string call) {
 		else {
 			return sases_[call];
 		}
-	case AVERAGE_BOX: {
+	case RCVD_AVE: {
 		float count = 0.0F;
 		int b = 0;
 		for (; b <= get_current(); b++) {
@@ -488,7 +488,19 @@ float QBS_data::get_count(int box_num, string call) {
 		b++;
 		return count / b;
 	}
-	case LAST4_BOX: {
+	case SENT_AVE: {
+		float count = 0.0F;
+		int b = 0;
+		for (; b <= get_current(); b++) {
+			if (boxes_[b]->sent->find(call) != boxes_[b]->sent->end()) {
+				int d = boxes_[b]->sent->at(call);
+				count += d;
+			}
+		}
+		b++;
+		return count / b;
+	}
+	case LAST4_AVE: {
 		float count = 0.0F;
 		int i = 0;
 		for (int b = get_current(); i < 4 && b >= 0; b--, i++) {
@@ -499,7 +511,7 @@ float QBS_data::get_count(int box_num, string call) {
 		}
 		return count / i;
 	}
-	case PREV4_BOX: {
+	case PREV4_AVE: {
 		float count = 0.0F;
 		int i = 0;
 		for (int b = get_current() - 1; i < 4 && b >= 0; b--, i++) {
@@ -509,6 +521,52 @@ float QBS_data::get_count(int box_num, string call) {
 			}
 		}
 		return count / i;
+	}
+
+	case UNSENT_AVE: {
+		float count = 0.0F;
+		int b = 0;
+		for (; b < get_current(); b++) {
+			if (boxes_[b]->counts->find(call) != boxes_[b]->counts->end()) {
+				int d = boxes_[b]->counts->at(call);
+				count += d;
+			}
+		}
+		b++;
+		return count / b;
+	}
+
+	case RCVD_ALL: {
+		float count = 0.0F;
+		for (int b = 0; b < get_current(); b++) {
+			if (boxes_[b]->received->find(call) != boxes_[b]->received->end()) {
+				int d = boxes_[b]->received->at(call);
+				count += d;
+			}
+		}
+		return count;
+	}
+
+	case SENT_ALL: {
+		float count = 0.0F;
+		for (int b = 0; b < get_current(); b++) {
+			if (boxes_[b]->sent->find(call) != boxes_[b]->sent->end()) {
+				int d = boxes_[b]->sent->at(call);
+				count += d;
+			}
+		}
+		return count;
+	}
+
+	case UNSENT_ALL: {
+		float count = 0.0F;
+		for (int b = 0; b < get_current(); b++) {
+			if (boxes_[b]->counts->find(call) != boxes_[b]->counts->end()) {
+				int d = boxes_[b]->counts->at(call);
+				count += d;
+			}
+		}
+		return count;
 	}
 
 	default:
