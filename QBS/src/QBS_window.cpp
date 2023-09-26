@@ -503,49 +503,10 @@ void QBS_window::create_form() {
 	max_y = g_process_->y() + g_process_->h() + GAP;
 	curr_x = col3 + WLABEL + GAP;
 
-	g_history_ = new Fl_Group(curr_x, save_y, 10, 10, "Call history");
-	g_history_->align(FL_ALIGN_TOP | FL_ALIGN_INSIDE);
-	curr_x = g_history_->x() + GAP + WLABEL;
-	curr_y = g_history_->y() + HTEXT;
-	op_rcvd_cnt_ = new Fl_Output(curr_x, curr_y, WBUTTON, HBUTTON, "Received");
-	op_rcvd_cnt_->align(FL_ALIGN_LEFT);
-
-	curr_x += WBUTTON;
-	op_rcvd_ave_ = new Fl_Output(curr_x, curr_y, WBUTTON, HBUTTON);
-
-	curr_y += HBUTTON;
-	curr_x = g_history_->x() + GAP + WLABEL;
-	op_sent_cnt_ = new Fl_Output(curr_x, curr_y, WBUTTON, HBUTTON, "Sent");
-	op_sent_cnt_->align(FL_ALIGN_LEFT);
-
-	curr_x += WBUTTON;
-	op_sent_ave_ = new Fl_Output(curr_x, curr_y, WBUTTON, HBUTTON);
-
-	curr_y += HBUTTON;
-	curr_x = g_history_->x() + GAP + WLABEL;
-	op_unsent_cnt_ = new Fl_Output(curr_x, curr_y, WBUTTON, HBUTTON, "Not sent");
-	op_unsent_cnt_->align(FL_ALIGN_LEFT);
-
-	curr_x += WBUTTON;
-	op_unsent_ave_ = new Fl_Output(curr_x, curr_y, WBUTTON, HBUTTON);
-
-	curr_y += HBUTTON;
-	int gx = curr_x + WBUTTON + GAP;
-	curr_x = g_history_->x() + GAP + WLABEL;
-	op_missing_ = new Fl_Output(curr_x, curr_y, WBUTTON, HBUTTON, "Error");
-
-	curr_y += HBUTTON + GAP;
-	curr_x = g_history_->x() + GAP;
-
-	g_charts_ = new QBS_charth(curr_x, curr_y, gx - curr_x - GAP, 100);
+	g_charts_ = new QBS_charth(curr_x, save_y, 160, 100, "Card history");
 	g_charts_->data(data_);
-	curr_y += g_charts_->h();
 
-	g_history_->resizable(nullptr);
-	g_history_->size(gx - g_history_->x(), curr_y - g_history_->y());
-	g_history_->end();
-
-	max_x = max(max_x, gx);
+	max_x = max(max_x, curr_x + g_charts_->w() + GAP);
 
 	// Log display
 	curr_x = GAP;
@@ -572,7 +533,6 @@ void QBS_window::create_form() {
 // the movement of cards from the in-box and the newly received cards into
 // the new box
 void QBS_window::update_new_batch() {
-	char buff[32];
 	g_process_->label("Receive new batch from Bureau");
 	// Batch output
 	op_batch_->activate();
@@ -664,33 +624,6 @@ void QBS_window::update_sort_cards() {
 	bx_label_[ix]->label(op_batch_->value());
 	index_curr_ = ix;
 	ix++;
-	op_value_[ix]->show();
-	op_value_[ix]->label("PREVIOUS");
-	snprintf(buff, 32, "%0.0f", data_->get_count(data_->get_current() - 1, call_));
-	op_value_[ix]->value(buff);
-	ip_delta_[ix]->hide();
-	bx_label_[ix]->hide();
-	ix++;
-	op_value_[ix]->show();
-	op_value_[ix]->label("PREV 4");
-	snprintf(buff, 32, "%0.1f", data_->get_count(PREV4_AVE, call_));
-	op_value_[ix]->value(buff);
-	ip_delta_[ix]->hide();
-	bx_label_[ix]->hide();
-	ix++;
-	op_value_[ix]->show();
-	op_value_[ix]->label("AVERAGE");
-	snprintf(buff, 32, "%0.1f", data_->get_count(RCVD_AVE, call_));
-	op_value_[ix]->value(buff);
-	ip_delta_[ix]->hide();
-	bx_label_[ix]->hide();
-	ix++;
-	op_value_[ix]->show();
-	op_value_[ix]->label("NOT SENT");
-	snprintf(buff, 32, "%0.1f", data_->get_count(UNSENT_AVE, call_));
-	op_value_[ix]->value(buff);
-	ip_delta_[ix]->hide();
-	bx_label_[ix]->hide();
 	for (ix++; ix < NUM_COUNTS; ix++) {
 		op_value_[ix]->hide();
 		ip_delta_[ix]->hide();
@@ -751,19 +684,6 @@ void QBS_window::update_keep_cards() {
 	bx_label_[ix]->label(op_batch_->value());
 	index_curr_ = ix;
 	ix++;
-	op_value_[ix]->show();
-	op_value_[ix]->label("AVERAGE");
-	snprintf(buff, 32, "%0.1f", data_->get_count(RCVD_AVE, call_));
-	op_value_[ix]->value(buff);
-	ip_delta_[ix]->hide();
-	bx_label_[ix]->hide();
-	ix++;
-	op_value_[ix]->show();
-	op_value_[ix]->label("LAST 4");
-	snprintf(buff, 32, "%0.1f", data_->get_count(LAST4_AVE, call_));
-	op_value_[ix]->value(buff);
-	ip_delta_[ix]->hide();
-	bx_label_[ix]->hide();
 	for (ix++; ix < NUM_COUNTS; ix++) {
 		op_value_[ix]->hide();
 		ip_delta_[ix]->hide();
@@ -813,19 +733,6 @@ void QBS_window::update_rcv_card() {
 	bx_label_[ix]->hide();
 	index_inbox_ = ix;
 	ix++;
-	op_value_[ix]->show();
-	op_value_[ix]->label("AVERAGE");
-	snprintf(buff, 32, "%0.1f", data_->get_count(RCVD_AVE, call_));
-	op_value_[ix]->value(buff);
-	ip_delta_[ix]->hide();
-	bx_label_[ix]->hide();
-	ix++;
-	op_value_[ix]->show();
-	op_value_[ix]->label("LAST 4");
-	snprintf(buff, 32, "%0.1f", data_->get_count(LAST4_AVE, call_));
-	op_value_[ix]->value(buff);
-	ip_delta_[ix]->hide();
-	bx_label_[ix]->hide();
 	for (ix++; ix < NUM_COUNTS; ix++) {
 		op_value_[ix]->hide();
 		ip_delta_[ix]->hide();
@@ -974,19 +881,6 @@ void QBS_window::update_stuff_cards() {
 	bx_label_[ix]->hide();
 	index_sase_ = ix;
 	ix++;
-	op_value_[ix]->show();
-	op_value_[ix]->label("AVERAGE");
-	snprintf(buff, 32, "%0.1f", data_->get_count(RCVD_AVE, call_));
-	op_value_[ix]->value(buff);
-	ip_delta_[ix]->hide();
-	bx_label_[ix]->hide();
-	ix++;
-	op_value_[ix]->show();
-	op_value_[ix]->label("LAST 4");
-	snprintf(buff, 32, "%0.1f", data_->get_count(LAST4_AVE, call_));
-	op_value_[ix]->value(buff);
-	ip_delta_[ix]->hide();
-	bx_label_[ix]->hide();
 	
 	// Deactivate the rest
 	for (ix++; ix < NUM_COUNTS; ix++) {
@@ -1381,6 +1275,7 @@ void QBS_window::update_edit_notes() {
 	ip_note_value_->value("");
 	tab_old_notes_->show();
 	tab_old_notes_->set_data(data_->get_notes(call_));
+	update_history(false);
 	return;
 
 }
@@ -1434,7 +1329,6 @@ void QBS_window::update_correct_data() {
 	int head = data_->get_head();
 	int box = curr;
 	ix++;
-	char temp[12];
 	while (box >= head) {
 		// Display the current and disposal queue boxes (by batch id)
 		op_value_[ix]->show();
@@ -1500,6 +1394,9 @@ void QBS_window::hide_edit_notes(bool info) {
 	if (info) {
 		tab_old_notes_->show();
 		tab_old_notes_->set_data(data_->get_notes(call_));
+		op_note_date_->hide();
+		ip_note_name_->hide();
+		ip_note_value_->hide();
 	}
 	else {
 		tab_old_notes_->hide();
@@ -1512,37 +1409,11 @@ void QBS_window::hide_edit_notes(bool info) {
 // Update the history
 void QBS_window::update_history(bool enable) {
 	if (enable) {
-		g_history_->show();
-		char buff[32];
-		float f = data_->get_count(RCVD_ALL, call_);
-		snprintf(buff, sizeof(buff), "%0.0f", data_->get_count(RCVD_ALL, call_));
-		op_rcvd_cnt_->value(buff);
-		snprintf(buff, sizeof(buff), "%0.1f", data_->get_count(RCVD_AVE, call_));
-		op_rcvd_ave_->value(buff);
-		f -= data_->get_count(SENT_ALL, call_);
-		snprintf(buff, sizeof(buff), "%0.0f", data_->get_count(SENT_ALL, call_));
-		op_sent_cnt_->value(buff);
-		snprintf(buff, sizeof(buff), "%0.1f", data_->get_count(SENT_AVE, call_));
-		op_sent_ave_->value(buff);
-		f -= data_->get_count(UNSENT_ALL, call_);
-		snprintf(buff, sizeof(buff), "%0.0f", data_->get_count(UNSENT_ALL, call_));
-		op_unsent_cnt_->value(buff);
-		snprintf(buff, sizeof(buff), "%0.1f", data_->get_count(UNSENT_AVE, call_));
-		op_unsent_ave_->value(buff);
-		snprintf(buff, sizeof(buff), "%0.0f", f);
-		op_missing_->value(buff);
-		if (abs(f) > 0.01) {
-			op_missing_->textcolor(FL_RED);
-			op_missing_->textfont(FL_BOLD);
-		}
-		else {
-			op_missing_->textcolor(FL_BLACK);
-			op_missing_->textfont(0);
-		}
+		g_charts_->show();
 		g_charts_->update(call_);
 	}
 	else {
-		g_history_->hide();
+		g_charts_->hide();
 	}
 }
 

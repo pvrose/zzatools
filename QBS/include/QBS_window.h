@@ -210,15 +210,6 @@ protected:
 
     Fl_Text_Display* td_log_;
 
-    Fl_Group* g_history_;
-    Fl_Output* op_rcvd_cnt_;
-    Fl_Output* op_rcvd_ave_;
-    Fl_Output* op_sent_cnt_;
-    Fl_Output* op_sent_ave_;
-    Fl_Output* op_unsent_cnt_;
-    Fl_Output* op_unsent_ave_;
-    Fl_Output* op_missing_;
-
     QBS_charth* g_charts_;
 
  

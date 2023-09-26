@@ -1,9 +1,14 @@
 #include "QBS_charth.h"
 #include "QBS_data.h"
 
+#include <set>
+
+using namespace std;
+
 const Fl_Color COLOUR_RECEIVED = FL_YELLOW;
 const Fl_Color COLOUR_RECYCLED = FL_RED;
 const Fl_Color COLOUR_SENT = FL_GREEN;
+const int AXIS_WIDTH = 16;
 
 QBS_charth::QBS_charth(int X, int Y, int W, int H, const char* L) :
 	Fl_Group(X, Y, W, H, L)
@@ -21,18 +26,24 @@ void QBS_charth::create_form() {
 	box(FL_FLAT_BOX);
 	color(FL_WHITE);
 
-	// Create the charts on top of each other
+	// Allow space foe axis
+	int curr_x = x() + AXIS_WIDTH;
+	int curr_w = w() - AXIS_WIDTH;
 
-	ct_received_ = new Fl_Chart(x(), y(), w(), h());
+	// Create the charts on top of each other - assumes draw order will remain
+	ct_received_ = new Fl_Chart(curr_x, y(), curr_w, h());
 	ct_received_->box(FL_NO_BOX);
+	ct_received_->type(FL_BAR_CHART);
 	ct_received_->autosize(true);
 
-	ct_recycled_ = new Fl_Chart(x(), y(), w(), h());
+	ct_recycled_ = new Fl_Chart(curr_x, y(), curr_w, h());
 	ct_recycled_->box(FL_NO_BOX);
+	ct_recycled_->type(FL_BAR_CHART);
 	ct_recycled_->autosize(true);
 
-	ct_sent_ = new Fl_Chart(x(), y(), w(), h());
+	ct_sent_ = new Fl_Chart(curr_x, y(), curr_w, h());
 	ct_sent_->box(FL_NO_BOX);
+	ct_sent_->type(FL_BAR_CHART);
 	ct_sent_->autosize(true);
 
 	end();
@@ -87,4 +98,62 @@ void QBS_charth::update(string call) {
 	ct_sent_->bounds(min, max);
 	
 	redraw();
+}
+
+void QBS_charth::draw_y_axis() {
+	// Draw the SWR axis
+	fl_color(FL_BLACK);
+	int ax = x() + AXIS_WIDTH;
+	int dh = fl_height();
+	int ay = y();
+	int ah = h() - dh - 1;
+
+	fl_line(ax, ay, ax, ay + ah);
+	// Now add the ticks - generate values
+	set<double> ticks;
+	double tick = 0.0;
+	double gap;
+	double min;
+	double max;
+	ct_received_->bounds(&min, &max);
+	if (max > 100) {
+		gap = 50.0;
+	}
+	else if (max > 50) {
+		gap = 20.0;
+	}
+	else if (max > 20) {
+		gap = 10.0;
+	}
+	else if (max > 10) {
+		gap = 5.0;
+	}
+	else if (max > 5) {
+		gap = 2.0;
+	}
+	else {
+		gap = 1.0;
+	}
+	while (tick <= max) {
+		ticks.insert(tick);
+		tick += gap;
+	}
+	double range = max - min;
+	double pixel_per_unit = ah / range;
+	// For each tick
+	for (auto it = ticks.begin(); it != ticks.end(); it++) {
+		int ty = ay + ah - (int)round(*it * pixel_per_unit);
+		// Draw the tick
+		fl_color(FL_BLACK);
+		fl_line(x(), ty, ax, ty);
+		// Label the tick
+		char l[10];
+		snprintf(l, sizeof(l), "%.0f", *it);
+		fl_draw(l, x() + 1, ty - 1);
+	}
+}
+
+void QBS_charth::draw() {
+	Fl_Group::draw();
+	draw_y_axis();
 }

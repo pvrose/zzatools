@@ -23,6 +23,8 @@ public:
 
     void update(string call);
 
+    virtual void draw();
+
 protected:
 
     QBS_data* data_;
@@ -31,6 +33,8 @@ protected:
     Fl_Chart* ct_received_;
     Fl_Chart* ct_recycled_;
     Fl_Chart* ct_sent_;
+
+    void draw_y_axis();
 
 };
 

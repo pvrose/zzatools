@@ -450,31 +450,31 @@ float QBS_data::get_count(int box_num, string call) {
 	switch (box_num) {
 	case IN_BOX:
 		if (in_box_.find(call) == in_box_.end()) {
-			return 0;
+			return 0.0F;
 		}
 		else {
-			return in_box_.at(call);
+			return (float)in_box_.at(call);
 		}
 	case OUT_BOX:
 		if (out_box_.find(call) == out_box_.end()) {
-			return 0;
+			return 0.0F;
 		}
 		else {
-			return out_box_.at(call);
+			return (float)out_box_.at(call);
 		}
 	case KEEP_BOX:
 		if (keep_box_.find(call) == keep_box_.end()) {
-			return 0;
+			return 0.0F;
 		}
 		else {
-			return keep_box_[call];
+			return (float)keep_box_[call];
 		}
 	case SASE_BOX:
 		if (sases_.find(call) == sases_.end()) {
-			return 0;
+			return 0.0F;
 		}
 		else {
-			return sases_[call];
+			return (float)sases_[call];
 		}
 	case RCVD_AVE: {
 		float count = 0.0F;
@@ -571,14 +571,14 @@ float QBS_data::get_count(int box_num, string call) {
 
 	default:
 		if (box_num >= (signed)boxes_.size() || box_num < 0) {
-			return 0;
+			return 0.0F;
 		}
 		else {
 			if (boxes_[box_num]->counts->find(call) == boxes_[box_num]->counts->end()) {
-				return 0;
+				return 0.0F;
 			}
 			else {
-				return boxes_[box_num]->counts->at(call);
+				return (float)boxes_[box_num]->counts->at(call);
 			}
 		}
 	}
