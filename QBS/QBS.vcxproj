@@ -152,6 +152,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="include\QBS_callback.h" />
+    <ClInclude Include="include\QBS_charth.h" />
     <ClInclude Include="include\QBS_consts.h" />
     <ClInclude Include="include\QBS_data.h" />
     <ClInclude Include="include\QBS_import.h" />
@@ -161,6 +162,7 @@
     <ClInclude Include="include\QBS_window.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\QBS_charth.cpp" />
     <ClCompile Include="src\QBS_data.cpp" />
     <ClCompile Include="src\QBS_import.cpp" />
     <ClCompile Include="src\QBS_main.cpp" />

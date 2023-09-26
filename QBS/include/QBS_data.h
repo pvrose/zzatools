@@ -183,6 +183,8 @@ public:
 	count_data* get_count_data(int box_num);
 	// Get recycle data
 	recycle_data& get_recycle_data(int box_num);
+	// Get box
+	box_data* get_box(int box_num);
 	// Set window
 	void set_window(QBS_window* w);
 	// Get action
