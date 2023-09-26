@@ -1394,3 +1394,12 @@ void QBS_data::display_call_history(string call) {
 	reporter_->text(ss.str().c_str());
 	reporter_->show();
 }
+
+box_data* QBS_data::get_box(int box_num) {
+	if (box_num >= 0 && box_num < (signed)boxes_.size()) {
+		return boxes_[box_num];
+	}
+	else {
+		return nullptr;
+	}
+}

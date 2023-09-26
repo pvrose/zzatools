@@ -4,6 +4,7 @@
 #include "QBS_notes.h"
 #include "QBS_utils.h"
 #include "QBS_callback.h"
+#include "QBS_charth.h"
 
 #include <map>
 #include <string>
@@ -217,6 +218,8 @@ protected:
     Fl_Output* op_unsent_cnt_;
     Fl_Output* op_unsent_ave_;
     Fl_Output* op_missing_;
+
+    QBS_charth* g_charts_;
 
  
     // Command selection

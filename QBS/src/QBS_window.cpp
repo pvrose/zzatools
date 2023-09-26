@@ -534,7 +534,12 @@ void QBS_window::create_form() {
 	curr_x = g_history_->x() + GAP + WLABEL;
 	op_missing_ = new Fl_Output(curr_x, curr_y, WBUTTON, HBUTTON, "Error");
 
-	curr_y += HBUTTON;
+	curr_y += HBUTTON + GAP;
+	curr_x = g_history_->x() + GAP;
+
+	g_charts_ = new QBS_charth(curr_x, curr_y, gx - curr_x - GAP, 100);
+	g_charts_->data(data_);
+	curr_y += g_charts_->h();
 
 	g_history_->resizable(nullptr);
 	g_history_->size(gx - g_history_->x(), curr_y - g_history_->y());
@@ -1534,6 +1539,7 @@ void QBS_window::update_history(bool enable) {
 			op_missing_->textcolor(FL_BLACK);
 			op_missing_->textfont(0);
 		}
+		g_charts_->update(call_);
 	}
 	else {
 		g_history_->hide();
