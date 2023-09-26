@@ -22,17 +22,18 @@ void QBS_charth::create_form() {
 	color(FL_WHITE);
 
 	// Create the charts on top of each other
+
 	ct_received_ = new Fl_Chart(x(), y(), w(), h());
 	ct_received_->box(FL_NO_BOX);
 	ct_received_->autosize(true);
 
 	ct_recycled_ = new Fl_Chart(x(), y(), w(), h());
 	ct_recycled_->box(FL_NO_BOX);
-	ct_recycled_->autosize(false);
+	ct_recycled_->autosize(true);
 
 	ct_sent_ = new Fl_Chart(x(), y(), w(), h());
 	ct_sent_->box(FL_NO_BOX);
-	ct_sent_->autosize(false);
+	ct_sent_->autosize(true);
 
 	end();
 }
@@ -56,6 +57,9 @@ void QBS_charth::update(string call) {
 		if (box_name.substr(5, 2) == "Q1") {
 			label = box_name.substr(2, 2);
 		}
+		//else {
+		//	label = box_name.substr(5, 2);
+		//}
 		box_data* box = data_->get_box(b);
 		// Add received data
 		int rcvd = 0;
@@ -82,10 +86,5 @@ void QBS_charth::update(string call) {
 	ct_recycled_->bounds(min, max);
 	ct_sent_->bounds(min, max);
 	
-	ct_received_->redraw();
-	ct_recycled_->redraw();
-	ct_sent_->redraw();
-
+	redraw();
 }
-
-
