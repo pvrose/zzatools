@@ -6,6 +6,7 @@
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Check_Button.H>
 #include <FL/Fl_Button.H>
+#include <FL/Fl_Output.H>
 
 class qso_qsl :
     public Fl_Group
@@ -26,6 +27,9 @@ public:
     void qsl_print();
     void qsl_print_done();
     void qsl_cancel();
+
+    // Update eQSL image download count
+    void update_eqsl(int count);
 
 protected:
     // callbacks
@@ -50,6 +54,9 @@ protected:
     bool auto_lotw_;
     bool auto_club_;
 
+    // Outstanding eQSL downloads
+    int os_eqsl_dnld_;
+
     // Widgets
     Fl_Check_Button* bn_auto_eqsl_;
     Fl_Check_Button* bn_auto_lotw_;
@@ -69,6 +76,7 @@ protected:
     Fl_Button* bn_cncl_lotw_;
     Fl_Button* bn_cncl_club_;
     Fl_Button* bn_cncl_card_;
+    Fl_Output* op_eqsl_count_;
 
 };
 

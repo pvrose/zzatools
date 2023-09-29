@@ -24,6 +24,7 @@ public:
 	void ticker();
 
 	qso_qsl* qsl_control();
+	
 
 protected:
 

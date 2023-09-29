@@ -26,6 +26,7 @@ qso_qsl::qso_qsl(int X, int Y, int W, int H, const char* L) :
 	labelsize(FL_NORMAL_SIZE + 2);
 	//align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 	box(FL_BORDER_BOX);
+	os_eqsl_dnld_ = 0;
 	load_values();
 	create_form();
 	enable_widgets();
@@ -101,7 +102,12 @@ void qso_qsl::create_form() {
 	bn_cncl_eqsl_ = new Fl_Button(C6, curr_y, W6, HBUTTON, "@undo");
 	bn_cncl_eqsl_->callback(cb_cancel, (void*)extract_data::EQSL);
 	bn_cncl_eqsl_->tooltip("Cancel upload");
-	//// Fetch cards
+	// Fetch cards
+	op_eqsl_count_ = new Fl_Output(C7, curr_y, W7, HBUTTON);
+	char text[10];
+	snprintf(text, sizeof(text), "%d", os_eqsl_dnld_);
+	op_eqsl_count_->value(text);
+	op_eqsl_count_->tooltip("Displays the number of outstanding image downloads");
 	//bn_down_ecard_ = new Fl_Button(C6, curr_y, W6, HBUTTON, "eCards");
 	//bn_down_ecard_->callback(cb_fetch);
 	//bn_down_ecard_->tooltip("Fetch any eQSL card images missing");
@@ -216,7 +222,7 @@ void qso_qsl::save_values() {
 void qso_qsl::enable_widgets() {
 	// Disable download and extract buttons if not is the correct state
 	qso_manager* mgr = ancestor_view<qso_manager>(this);
-	if (mgr->data()->inactive()) {
+	if (mgr->data()->inactive() && os_eqsl_dnld_ == 0) {
 		bn_down_eqsl_->activate();
 		bn_down_lotw_->activate();
 		bn_extr_club_->activate();
@@ -266,6 +272,9 @@ void qso_qsl::enable_widgets() {
 		bn_mark_done_->deactivate();
 		bn_cncl_card_->deactivate();
 	}
+	char text[10];
+	snprintf(text, sizeof(text), "%d", os_eqsl_dnld_);
+	op_eqsl_count_->value(text);
 }
 
 // callbacks
@@ -398,5 +407,11 @@ void qso_qsl::qsl_print_done() {
 // Cancel uploads
 void qso_qsl::qsl_cancel() {
 	extract_records_->clear_criteria();
+	enable_widgets();
+}
+
+// Update eQSL download count
+void qso_qsl::update_eqsl(int count) {
+	os_eqsl_dnld_ = count;
 	enable_widgets();
 }

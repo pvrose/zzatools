@@ -73,6 +73,7 @@ void eqsl_handler::enqueue_request(qso_num_t record_num, bool force /*=false*/) 
 		// Update status
 		char message[512];
 		sprintf(message, "EQSL: %zu Card requests pending", request_queue_.size());
+		qso_manager_->qsl_control()->update_eqsl(request_queue_.size());
 		status_->misc_status(ST_NOTE, message);
 	}
 }
@@ -184,6 +185,7 @@ void eqsl_handler::cb_timer_deq(void* v) {
 			}
 		}
 	}
+	qso_manager_->qsl_control()->update_eqsl(request_queue->size());
 }
 
 // Make the eQSL card image request

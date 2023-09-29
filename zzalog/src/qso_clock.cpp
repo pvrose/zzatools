@@ -77,7 +77,7 @@ void qso_clock::enable_widgets() {
 		strftime(result, 99, "%H:%M:%S", value);
 		bn_time_->copy_label(result);
 		bn_date_->labelcolor(FL_RED);
-		strftime(result, 99, "%A %d %B %Y", value);
+		strftime(result, 99, "%a %d %b %Y", value);
 		bn_date_->copy_label(result);
 	}
 	else {
@@ -87,7 +87,7 @@ void qso_clock::enable_widgets() {
 		strftime(result, 99, "%H:%M:%S", value);
 		bn_time_->copy_label(result);
 		bn_date_->labelcolor(FL_YELLOW);
-		strftime(result, 99, "%A %d %B %Y", value);
+		strftime(result, 99, "%a %d %b %Y", value);
 		bn_date_->copy_label(result);
 	}
 }
