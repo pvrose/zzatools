@@ -36,7 +36,8 @@ socket_server::socket_server(protocol_t protocol, int port_num) :
 	server_(INVALID_SOCKET),
 	client_(INVALID_SOCKET),
 	protocol_(protocol),
-	port_num_(port_num)
+	port_num_(port_num),
+	th_socket_(nullptr)
 {
 
 }
@@ -68,7 +69,7 @@ socket_server::~socket_server() {
 // Close the socket and clean up winsock
 void socket_server::close_server() {
 	closing_ = true;
-	th_socket_->join();
+	if (th_socket_) th_socket_->join();
 	Fl::remove_timeout(cb_timer_acc, this);
 	Fl::remove_timeout(cb_timer_rcv, this);
 	if (server_ != INVALID_SOCKET) {

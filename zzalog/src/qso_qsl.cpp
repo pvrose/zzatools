@@ -275,6 +275,13 @@ void qso_qsl::enable_widgets() {
 	char text[10];
 	snprintf(text, sizeof(text), "%d", os_eqsl_dnld_);
 	op_eqsl_count_->value(text);
+	if (os_eqsl_dnld_ > 0) {
+		op_eqsl_count_->textcolor(FL_RED);
+		op_eqsl_count_->textfont(FL_BOLD);
+	} else {
+		op_eqsl_count_->textcolor(FL_BLACK);
+		op_eqsl_count_->textfont(0);
+	}
 }
 
 // callbacks

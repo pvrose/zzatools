@@ -81,7 +81,7 @@ void qsl_form::create_form(int X, int Y) {
 	char* buffer = new char[length];
 	memset(buffer, 0, length);
 	ifile.read(buffer, length);
-	if (!ifile.eof()) {
+	if (!ifile.eof() && !ifile.good()) {
 		snprintf(message, 256, "QSL: Failed to read %s", filename_.c_str());
 		status_->misc_status(ST_ERROR, message);
 		delete buffer;

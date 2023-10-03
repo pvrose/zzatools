@@ -12,7 +12,7 @@ void qsl_html_view::value(const char* val, record** records, int num_records) {
 	// Creat a new string 3x the size to contain processed HTML
 	int val_length = strlen(val);
 	char* dval = new char[val_length * 3];
-	memset(dval, 0, val_length);
+	memset(dval, 0, val_length * 3);
 
 	// Pointers to current processing position
 	// Source string
