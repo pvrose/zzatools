@@ -21,6 +21,8 @@
 		~fllog_emul();
 		// Start the server
 		void run_server();
+		// Clsoe servefr
+		void close_server();
 
 	protected:
 		// Get ADIF string for first record with callsign

@@ -57,7 +57,7 @@ void socket_server::run_server() {
 			break;
 		}
 	}
-
+	printf("DEBUG: Starting new thread\n");
 	// Start listening for packets - will set a timer to the listen after that
 	th_socket_ = new thread(thread_run, this);
 }
@@ -69,9 +69,14 @@ socket_server::~socket_server() {
 // Close the socket and clean up winsock
 void socket_server::close_server() {
 	closing_ = true;
-	if (th_socket_) th_socket_->join();
+	printf("DEBUG: Entered socket_server::close_server()\n");
+	if (th_socket_) th_socket_->detach();
+	printf("DEBUG: Detached thread\n");
+	delete th_socket_;
+	printf("DEBUG: Deleted thread\n");
 	Fl::remove_timeout(cb_timer_acc, this);
 	Fl::remove_timeout(cb_timer_rcv, this);
+	printf("DEBUG: Closing socket %d\n", (int)server_);
 	if (server_ != INVALID_SOCKET) {
 		SOCKADDR_IN server_addr;
 		LEN_SOCKET_ADDR len_server_addr = sizeof(server_addr);
@@ -84,8 +89,10 @@ void socket_server::close_server() {
 		WSACleanup();
 #else 
 		snprintf(message, 256, "SOCKET: Closing socket %d:%d", server_addr.sin_addr, server_addr.sin_port);
+		printf("DEBUG: %s\n", message);
 		status_->misc_status(ST_OK, message);
 		close(server_);
+		printf("DEBUG: Closed\n");
 #endif
 		server_ = INVALID_SOCKET;
 	}
@@ -300,6 +307,7 @@ int socket_server::rcv_packet() {
 
 	// Now wait until we see a client
 	if (protocol_ == HTTP) {
+		printf("DEBUG: Waiting for HTTP client\n");
 		client_ = INVALID_SOCKET;
 		client_status result = BLOCK;
 		while (client_ == INVALID_SOCKET && result == BLOCK) {

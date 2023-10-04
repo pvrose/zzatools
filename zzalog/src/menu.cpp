@@ -94,7 +94,7 @@ settings* config_ = nullptr;
 	// Settings operations
 	{ "&Settings", 0, 0, 0, FL_SUBMENU },
 		{ "Fi&les", 0, menu::cb_mi_settings, (void*)settings::DLG_FILES },
-		{ "&Web", 0, menu::cb_mi_settings, (void*)settings::DLG_WEB },
+		{ "&Web\/Network", 0, menu::cb_mi_settings, (void*)settings::DLG_WEB },
 		{ "&Fields", 0, menu::cb_mi_settings, (void*)settings::DLG_COLUMN },
 		{ "&User settings", 0, menu::cb_mi_settings, (void*)settings::DLG_USER },
 		{ "&All", 0, menu::cb_mi_settings, (void*)settings::DLG_ALL },

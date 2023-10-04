@@ -387,8 +387,11 @@ bool wsjtx_handler::has_server() {
 // Start the server
 void wsjtx_handler::run_server() {
 	if (!server_) {
+		Fl_Preferences nw_settings(settings_, "Network");
+		int udp_port = 2237;
+		nw_settings.get("WSJT-X", udp_port, udp_port);
 		status_->misc_status(ST_NOTE, "WSJT-X: Creating new socket");
-		server_ = new socket_server(socket_server::UDP, 2237);
+		server_ = new socket_server(socket_server::UDP, udp_port);
 		server_->callback(rcv_request);
 	}
 	if (!server_->has_server()) {
@@ -402,6 +405,9 @@ void wsjtx_handler::run_server() {
 void wsjtx_handler::close_server() {
 	if (server_) {
 		status_->misc_status(ST_OK, "WSJT-X: Application closing");
+		server_->close_server();
+		delete server_;
+		server_ = nullptr;
 	}
 }
 

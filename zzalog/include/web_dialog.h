@@ -36,6 +36,8 @@ using namespace std;
 	protected:
 		// Callbacks
 		static void cb_bn_plain(Fl_Widget* w, void* v);
+		static void cb_bn_wsjtx(Fl_Widget* w, void* v);
+		static void cb_bn_fldigi(Fl_Widget* w, void* v);
 
 		// Widgets for eQSL
 		Fl_Group* grp_eqsl_;
@@ -45,8 +47,14 @@ using namespace std;
 		Fl_Group* grp_qrz_;
 		// Widgets for ClubLog
 		Fl_Group* grp_club_;
+		// Widgets for networking
+		Fl_Group* grp_server_;
 		// Widgets containing images
 		set<Fl_Widget*> image_widgets_;
+
+		// 
+		Fl_Input* ip_wsjtx_port_;
+		Fl_Input* ip_fldigi_port_;
 
 		// Callback data for eQSL calendars
 		cal_cb_data_t eqsl_cal_cb_data_;
@@ -105,6 +113,13 @@ using namespace std;
 		int club_interval_;
 		// Upload QSOs as logged
 		bool club_upload_qso_;
+
+		// wsjt-x udp PORT CONNECTION
+		int wsjtx_udp_port_;
+		bool wsjtx_enable_;
+		// Fl-digi log xmlrpc server
+		int fldigi_rpc_port_;
+		bool fldigi_enable_;
 
 	};
 #endif

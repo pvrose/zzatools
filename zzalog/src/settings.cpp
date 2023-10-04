@@ -49,7 +49,7 @@ settings::settings(int W, int H, const char* label, cfg_dialog_t active) :
 	files->selection_color(fl_lighter(FL_YELLOW));
 	files->tooltip("Allows the specification of the locations of various resources used by zzalog");
 	// Web URLs, user-names and passwords
-	web_dialog* aweb = new web_dialog(rx, ry, rw, rh, "Web Info");
+	web_dialog* aweb = new web_dialog(rx, ry, rw, rh, "Web/Network");
 	aweb->labelfont(FL_BOLD);
 	aweb->labelsize(FL_NORMAL_SIZE + 2);
 	aweb->selection_color(fl_lighter(FL_YELLOW));

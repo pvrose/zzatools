@@ -42,6 +42,8 @@
 		static int rcv_request(stringstream& ss);
 		// Run server
 		void run_server();
+		// Close server
+		void close_server();
 		// Add server method
 		void add_method(method_entry method, int(*callback)(rpc_data_item::rpc_list& params, rpc_data_item& response));
 

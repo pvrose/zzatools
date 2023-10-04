@@ -302,6 +302,8 @@ void files_dialog::create_form(int X, int Y) {
 
 	Fl_Group* grp_tqsl = new Fl_Group(X + XGRP, Y + GRP2, XMAX, HGRP2, "TQSL Executable");
 	grp_tqsl->box(FL_BORDER_BOX);
+	grp_tqsl->labelsize(FL_NORMAL_SIZE + 2);
+	grp_tqsl->labelfont(FL_BOLD);
 	grp_tqsl->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 	// Check box - TQSL executable is valid
 	Fl_Check_Button* bn_tqsl_en = new Fl_Check_Button(X + COL1, Y + ROW2_1, WRADIO, HBUTTON);

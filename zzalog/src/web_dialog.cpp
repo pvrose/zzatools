@@ -3,6 +3,8 @@
 #include "calendar.h"
 #include "intl_widgets.h"
 #include "icons.h"
+#include "wsjtx_handler.h"
+#include "fllog_emul.h"
 
 #include <FL/Fl_Preferences.H>
 #include <FL/Fl_Check_Button.H>
@@ -13,6 +15,8 @@
 #include <FL/Fl_Int_Input.H>
 
 extern Fl_Preferences* settings_;
+extern wsjtx_handler* wsjtx_handler_;
+extern fllog_emul* fllog_emul_;
 
 // Constructor
 web_dialog::web_dialog(int X, int Y, int W, int H, const char* label) :
@@ -43,6 +47,8 @@ web_dialog::web_dialog(int X, int Y, int W, int H, const char* label) :
 	, club_username_("")
 	, club_password_("")
 	, club_interval_(0)
+	, wsjtx_enable_(true)
+	, fldigi_enable_(true)
 {
 	image_widgets_.clear();
 
@@ -72,6 +78,7 @@ void web_dialog::load_values() {
 	Fl_Preferences qrz_settings(qsl_settings, "QRZ");
 	Fl_Preferences card_settings(qsl_settings, "Card");
 	Fl_Preferences club_settings(qsl_settings, "ClubLog");
+	Fl_Preferences nw_settings(settings_, "Network");
 
 	// eQSL User/Password
 	eqsl_settings.get("Enable", (int&)eqsl_enable_, false);
@@ -130,6 +137,10 @@ void web_dialog::load_values() {
 	club_settings.get("Interval", club_interval_, 7);
 	club_settings.get("Upload per QSO", (int&)club_upload_qso_, false);
 
+	// Server ports
+	nw_settings.get("WSJT-X", wsjtx_udp_port_, 2237);
+	nw_settings.get("Fldigi", fldigi_rpc_port_, 8421);
+
 }
 
 // Create the dialog
@@ -173,8 +184,16 @@ void web_dialog::create_form(int X, int Y) {
 	const int H4_2 = HTEXT;
 	const int HGRP4 = R4_2 + H4_2 + GAP - GRP4;
 
+	// Group 5 Network ports
+	const int GRP5 = GRP4 + HGRP4 + GAP;
+	const int R5_1 = GRP5 + GAP + HTEXT;
+	const int H5_1 = HBUTTON;
+	const int R5_2 = R5_1 + H5_1;
+	const int H5_2 = HBUTTON;
+	const int HGRP5 = R5_2 + H5_2 + GAP - GRP5;
+
 	// overall height 
-	const int HALL = GRP4 + HGRP4 + EDGE;
+	const int HALL = GRP5 + HGRP5 + EDGE;
 
 	// Columns
 	// main columns
@@ -484,6 +503,40 @@ void web_dialog::create_form(int X, int Y) {
 	bn4_1_1->when(FL_WHEN_CHANGED);
 	bn4_1_1->tooltip("Enable ClubLog access");
 
+	Fl_Group* gp5 = new Fl_Group(X + EDGE, Y + GRP5, WGRP, HGRP5, "Network ports");
+	gp5->labelsize(FL_NORMAL_SIZE + 2);
+	gp5->labelfont(FL_BOLD);
+	gp5->box(FL_BORDER_BOX);
+	gp5->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
+
+	Fl_Check_Button* bn5_1_1 = new Fl_Check_Button(X + C1, Y + R5_1, HBUTTON, HBUTTON);
+	bn5_1_1->value(wsjtx_enable_);
+	bn5_1_1->callback(cb_bn_wsjtx);
+	bn5_1_1->when(FL_WHEN_CHANGED);
+	bn5_1_1->tooltip("Enable port, disable changing port");
+
+	Fl_Input* ip5_1_1 = new Fl_Input(X + C2 + W2 - WBUTTON, Y + R5_1, WBUTTON, H5_1, "WSJT-X UDP");
+	ip5_1_1->align(FL_ALIGN_LEFT);
+	ip5_1_1->value(to_string(wsjtx_udp_port_).c_str());
+	ip5_1_1->callback(cb_value_int<Fl_Input>, &wsjtx_udp_port_);
+	ip5_1_1->when(FL_WHEN_CHANGED);
+	ip5_1_1->tooltip("Specify WSJT-X UDP server port number");
+	ip_wsjtx_port_ = ip5_1_1;
+
+	Fl_Check_Button* bn5_2_1 = new Fl_Check_Button(X + C1, Y + R5_2, HBUTTON, HBUTTON);
+	bn5_2_1->value(fldigi_enable_);
+	bn5_2_1->callback(cb_bn_fldigi);
+	bn5_2_1->when(FL_WHEN_CHANGED);
+	bn5_2_1->tooltip("Enable port, disable changing port");
+
+	Fl_Input* ip5_1_2 = new Fl_Input(X + C2 + W2 - WBUTTON, Y + R5_2, WBUTTON, H5_2, "FlDigi RPC");
+	ip5_1_2->align(FL_ALIGN_LEFT);
+	ip5_1_2->value(to_string(fldigi_rpc_port_).c_str());
+	ip5_1_2->callback(cb_value_int<Fl_Input>, &fldigi_rpc_port_);
+	ip5_1_2->when(FL_WHEN_CHANGED);
+	ip5_1_2->tooltip("Specify Fldigi XML-RPC server port number");
+	ip_fldigi_port_ = ip5_1_2;
+
 	Fl_Group::end();
 }
 
@@ -496,6 +549,7 @@ void web_dialog::save_values() {
 	Fl_Preferences qrz_settings(qsl_settings, "QRZ");
 	Fl_Preferences card_settings(qsl_settings, "Card");
 	Fl_Preferences club_settings(qsl_settings, "ClubLog");
+	Fl_Preferences nw_settings(settings_, "Network");
 	// eQSL Settings
 	eqsl_settings.set("Enable", eqsl_enable_);
 	eqsl_settings.set("User", eqsl_username_.c_str());
@@ -526,6 +580,10 @@ void web_dialog::save_values() {
 	club_settings.set("Password", club_password_.c_str());
 	club_settings.set("Interval", club_interval_);
 	club_settings.set("Upload per QSO", club_upload_qso_);
+
+	// Network settings
+	nw_settings.set("WSJT-X", wsjtx_udp_port_);
+	nw_settings.set("Fldigi", fldigi_rpc_port_);
 }
 
 // Enable widgets after enabling/disabling stuff
@@ -558,6 +616,18 @@ void web_dialog::enable_widgets() {
 	else {
 		grp_club_->deactivate();
 	}
+	//WSJTX widgets
+	if (wsjtx_enable_) {
+		ip_wsjtx_port_->deactivate();
+	} else {
+		ip_wsjtx_port_->activate();
+	}
+	// FLDIGI widgets
+	if (fldigi_enable_) {
+		ip_fldigi_port_->deactivate();
+	} else {
+		ip_fldigi_port_->activate();
+	}
 }
 
 // Callback to make passwords plain or secret
@@ -570,4 +640,32 @@ void web_dialog::cb_bn_plain(Fl_Widget* w, void* v) {
 		ip->input_type(FL_SECRET_INPUT);
 	}
 	ip->redraw();
+}
+
+// Callback to implement WSJTX enable
+void web_dialog::cb_bn_wsjtx(Fl_Widget* w, void* v) {
+	web_dialog* that = ancestor_view<web_dialog>(w);
+	cb_value<Fl_Check_Button, bool>(w, &that->wsjtx_enable_);
+	that->save_values();
+	that->enable_widgets();
+
+	if(that->wsjtx_enable_) {
+		wsjtx_handler_->run_server();
+	} else {
+		wsjtx_handler_->close_server();
+	}
+}
+
+// Callback to implement Fldigi enable
+void web_dialog::cb_bn_fldigi(Fl_Widget* w, void* v) {
+	web_dialog* that = ancestor_view<web_dialog>(w);
+	cb_value<Fl_Check_Button, bool>(w, &that->fldigi_enable_);
+	that->save_values();
+	that->enable_widgets();
+
+	if(that->fldigi_enable_) {
+		fllog_emul_->run_server();
+	} else {
+		fllog_emul_->close_server();
+	}
 }

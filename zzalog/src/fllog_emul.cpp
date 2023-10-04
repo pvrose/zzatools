@@ -9,7 +9,7 @@
 
 #include <sstream>
 
-
+#include <FL/Fl_Preferences.H>
 
 
 extern rpc_handler* rpc_handler_;
@@ -18,6 +18,7 @@ extern fllog_emul* fllog_emul_;
 extern extract_data* extract_records_;
 extern book* book_;
 extern spec_data* spec_data_;
+extern Fl_Preferences* settings_;
 
 // Static - only one instance of this class supported
 fllog_emul* fllog_emul::that_ = nullptr;
@@ -33,7 +34,10 @@ fllog_emul::fllog_emul() {
 void fllog_emul::run_server() {
 	if (!rpc_handler_) {
 		// TODO Provisionally hard-coded, make part of configuration
-		rpc_handler_ = new rpc_handler(8421, "/RPC2");
+		Fl_Preferences nw_settings(settings_, "Network");
+		int rpc_port = 8421;
+		nw_settings.get("Fldigi", rpc_port, rpc_port);
+		rpc_handler_ = new rpc_handler(rpc_port, "/RPC2");
 	}
 	// Set up callbacks to handle these
 	method_list_.push_back({ "log.add_record", "s:s", "adds new ADIF-RECORD" });
@@ -48,6 +52,12 @@ void fllog_emul::run_server() {
 	rpc_handler_->add_method(method_list_.back(), list_methods);
 
 	rpc_handler_->run_server();
+}
+
+void fllog_emul::close_server() {
+	rpc_handler_->close_server();
+	delete rpc_handler_;
+	rpc_handler_ = nullptr;
 }
 
 // Generate an XML-RPC error response

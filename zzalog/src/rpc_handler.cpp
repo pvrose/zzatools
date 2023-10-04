@@ -47,6 +47,15 @@ rpc_handler::rpc_handler(int port_num, string resource_name) {
 // Destructor
 rpc_handler::~rpc_handler()
 {
+	close_server();
+}
+
+void rpc_handler::close_server() {
+	if (server_) {
+		server_->close_server();
+		delete server_;
+		server_ = nullptr;
+	}
 }
 
 // Do request - response = method_name(params)
