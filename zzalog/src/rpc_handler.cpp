@@ -40,6 +40,7 @@ rpc_handler::rpc_handler(int port_num, string resource_name) {
 	resource_ = resource_name;
 	that_ = this;
 	server_ = nullptr;
+	method_list_.clear();
 	add_method({ "system.listMethods", "s:s", "List of methods available" }, list_methods);
 	add_method({ "system.methodHelp", "s:s", "Help text for method" }, method_help);
 }
@@ -48,6 +49,11 @@ rpc_handler::rpc_handler(int port_num, string resource_name) {
 rpc_handler::~rpc_handler()
 {
 	close_server();
+	for (auto ix = method_list_.begin(); ix != method_list_.end(); ix++) {
+		// printf("DEBUG: %s %s\n", (*ix).first.c_str(), (*ix).second.signature.c_str());
+	}
+	method_list_.clear();
+	// printf("DEBUG: Size of method list %u\n", method_list_.size());
 }
 
 void rpc_handler::close_server() {
