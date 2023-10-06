@@ -273,15 +273,22 @@ void qso_qsl::enable_widgets() {
 		bn_cncl_card_->deactivate();
 	}
 	char text[10];
+	int curr = atoi(op_eqsl_count_->value());
 	snprintf(text, sizeof(text), "%d", os_eqsl_dnld_);
 	op_eqsl_count_->value(text);
-	if (os_eqsl_dnld_ > 0) {
-		op_eqsl_count_->textcolor(FL_RED);
-		op_eqsl_count_->textfont(FL_BOLD);
-	} else {
+	if (os_eqsl_dnld_ == 0) {
 		op_eqsl_count_->textcolor(FL_BLACK);
 		op_eqsl_count_->textfont(0);
-	}
+		op_eqsl_count_->color(FL_BACKGROUND_COLOR);
+	} else if ( os_eqsl_dnld_ > curr) {
+		op_eqsl_count_->textcolor(FL_BLACK);
+		op_eqsl_count_->textfont(FL_BOLD);
+		op_eqsl_count_->color(FL_WHITE);
+	} else {
+		op_eqsl_count_->textcolor(FL_RED);
+		op_eqsl_count_->textfont(FL_BOLD);
+		op_eqsl_count_->color(FL_WHITE);
+	} 
 }
 
 // callbacks
