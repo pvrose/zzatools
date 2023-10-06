@@ -168,6 +168,7 @@ void qso_entry::enable_widgets() {
 			ip_field_[ix]->deactivate();
 		}
 		ip_notes_->activate();
+		ip_notes_->type(FL_NORMAL_INPUT);
 		misc_->activate();
 		misc_->enable_widgets();
 		break;
@@ -186,6 +187,7 @@ void qso_entry::enable_widgets() {
 			ip_field_[ix]->deactivate();
 		}
 		ip_notes_->activate();
+		ip_notes_->type(FL_NORMAL_INPUT);
 		misc_->activate();
 		misc_->enable_widgets();
 		break;
@@ -204,6 +206,7 @@ void qso_entry::enable_widgets() {
 			ip_field_[ix]->deactivate();
 		}
 		ip_notes_->activate();
+		ip_notes_->type(FL_NORMAL_OUTPUT);
 		misc_->activate();
 		misc_->enable_widgets();
 		break;
@@ -220,6 +223,7 @@ void qso_entry::enable_widgets() {
 			ip_field_[ix]->deactivate();
 		}
 		ip_notes_->activate();
+		ip_notes_->type(FL_NORMAL_INPUT);
 		misc_->deactivate();
 		break;
 	case qso_data::QSO_EDIT:
@@ -234,6 +238,7 @@ void qso_entry::enable_widgets() {
 			ip_field_[ix]->deactivate();
 		}
 		ip_notes_->activate();
+		ip_notes_->type(FL_NORMAL_INPUT);
 		misc_->activate();
 		misc_->enable_widgets();
 		break;
