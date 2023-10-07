@@ -16,6 +16,7 @@
 #include <string.h>
 #include <sys/socket.h>
 #include <unistd.h>
+#include <arpa/inet.h>
 #define INVALID_SOCKET -1
 #define SOCKADDR sockaddr
 
@@ -32,14 +33,18 @@
 extern status* status_;
 
 // Constructor
-socket_server::socket_server(protocol_t protocol, int port_num) :
+socket_server::socket_server(protocol_t protocol, string address, int port_num) :
 	server_(INVALID_SOCKET),
 	client_(INVALID_SOCKET),
 	protocol_(protocol),
 	port_num_(port_num),
 	th_socket_(nullptr)
 {
-
+	if (address.length()) {
+		address_ = address;
+	} else {
+		address_ = "0.0.0.0";
+	}
 }
 
 // Create and start the server
@@ -83,7 +88,7 @@ void socket_server::close_server() {
 		closesocket(server_);
 		WSACleanup();
 #else 
-		snprintf(message, 256, "SOCKET: Closing socket %d:%d", server_addr.sin_addr, server_addr.sin_port);
+		snprintf(message, 256, "SOCKET: Closing socket %s:%d", inet_ntoa(server_addr.sin_addr), htons(server_addr.sin_port));
 		status_->misc_status(ST_OK, message);
 		close(server_);
 #endif
@@ -143,7 +148,7 @@ int socket_server::create_server() {
 	LEN_SOCKET_ADDR len_server_addr = sizeof(server_addr);
 	server_addr.sin_family = AF_INET;
 	server_addr.sin_port = htons(port_num_);
-	server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+	server_addr.sin_addr.s_addr = htonl(inet_addr(address_.c_str()));
 	// Associate the socket with this address data
 	result = bind(server_, (SOCKADDR*)&server_addr, len_server_addr);
 	if (result < 0) {
@@ -216,8 +221,11 @@ int socket_server::create_server() {
 	LEN_SOCKET_ADDR len_server_addr = sizeof(server_addr);
 	server_addr.sin_family = AF_INET;
 	server_addr.sin_port = htons(port_num_);
-	server_addr.sin_addr.s_addr = INADDR_ANY;
-	// Associate the socket with this address data
+	server_addr.sin_addr.s_addr = inet_addr(address_.c_str());
+	int set_option_on = 1;
+	// it is important to do "reuse address" before bind, not after
+	int res = setsockopt(server_, SOL_SOCKET, SO_REUSEADDR, (char*) &set_option_on, 
+		sizeof(set_option_on));	// Associate the socket with this address data
 	result = bind(server_, (SOCKADDR*)&server_addr, len_server_addr);
 	if (result < 0) {
 		handle_error("Unable to bind the socket");
@@ -225,7 +233,7 @@ int socket_server::create_server() {
 	}
 	else {
 		getsockname(server_, (SOCKADDR*)&server_addr, &len_server_addr);
-		snprintf(message, 256, "SOCKET: Connected socket %s:%d", server_addr.sin_addr, htons(server_addr.sin_port));
+		snprintf(message, 256, "SOCKET: Connected socket %s:%d", inet_ntoa(server_addr.sin_addr), htons(server_addr.sin_port));
 		status_->misc_status(ST_OK, message);
 	}
 
@@ -244,7 +252,7 @@ int socket_server::create_server() {
 		}
 		else {
 			getsockname(server_, (SOCKADDR*)&server_addr, &len_server_addr);
-			snprintf(message, 256, "SOCKET: Listening socket %s:%d", server_addr.sin_addr, htons(server_addr.sin_port));
+			snprintf(message, 256, "SOCKET: Listening socket %s:%d", inet_ntoa(server_addr.sin_addr), htons(server_addr.sin_port));
 			status_->misc_status(ST_OK, message);
 		}
 

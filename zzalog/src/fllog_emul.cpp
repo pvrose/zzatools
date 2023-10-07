@@ -33,11 +33,14 @@ fllog_emul::fllog_emul() {
 // Start and run the RPC Server
 void fllog_emul::run_server() {
 	if (!rpc_handler_) {
-		// TODO Provisionally hard-coded, make part of configuration
+		// TODO - Do we need server address - it IS available 
 		Fl_Preferences nw_settings(settings_, "Network");
+		Fl_Preferences fllog_settings(nw_settings, "Fllog");
 		int rpc_port = 8421;
-		nw_settings.get("Fldigi", rpc_port, rpc_port);
-		rpc_handler_ = new rpc_handler(rpc_port, "/RPC2");
+		fllog_settings.get("Port Number", rpc_port, rpc_port);
+		char* addr;
+		fllog_settings.get("Address", addr, "127.0.0.1");
+		rpc_handler_ = new rpc_handler(string(addr), rpc_port, "/RPC2");
 	}
 	// Set up callbacks to handle these
 	method_list_.push_back({ "log.add_record", "s:s", "adds new ADIF-RECORD" });

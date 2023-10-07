@@ -23,20 +23,10 @@ extern string VERSION;
 extern string PROGRAM_ID;
 
 // Constructor
-rpc_handler::rpc_handler(string host_name, string resource_name)
+rpc_handler::rpc_handler(string address, int port_number, string resource_name)
 {
-	size_t pos = find(host_name.c_str(), host_name.length(), ':');
-	host_name_ = host_name.substr(0, pos);
-	server_port_ = stoi(host_name.substr(pos+1));
-	resource_ = resource_name;
-	server_ = nullptr;
-}
-
-// Constructor for a server-only
-rpc_handler::rpc_handler(int port_num, string resource_name) {
-	// For completion only - not used in server_only
-	host_name_ = "127.0.0.1";
-	server_port_ = port_num;
+	host_name_ = address;
+	server_port_ = port_number;
 	resource_ = resource_name;
 	that_ = this;
 	server_ = nullptr;
@@ -730,7 +720,7 @@ void rpc_handler::run_server() {
 		server_->run_server();
 	}
 	else {
-		server_ = new socket_server(socket_server::HTTP, server_port_);
+		server_ = new socket_server(socket_server::HTTP, host_name_, server_port_);
 		server_->callback(rcv_request);
 		server_->run_server();
 	}

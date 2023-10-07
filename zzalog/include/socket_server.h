@@ -34,7 +34,7 @@ using namespace std;
 			HTTP,
 			UDP
 		};
-		socket_server(protocol_t protocol, int port_num);
+		socket_server(protocol_t protocol, string address, int port_num);
 		~socket_server();
 
 		// Close the socket
@@ -91,6 +91,8 @@ using namespace std;
 		string host_id_;
 		// port number
 		int port_num_;
+		// Server address
+		string address_;
 		// protocol
 		protocol_t protocol_;
 		// Closure in progress

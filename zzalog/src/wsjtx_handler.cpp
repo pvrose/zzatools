@@ -388,11 +388,15 @@ bool wsjtx_handler::has_server() {
 void wsjtx_handler::run_server() {
 	if (!server_) {
 		Fl_Preferences nw_settings(settings_, "Network");
+		Fl_Preferences wsjtx_settings(nw_settings, "WSJT-X");
 		int udp_port = 2237;
-		nw_settings.get("WSJT-X", udp_port, udp_port);
+		wsjtx_settings.get("Port Number", udp_port, udp_port);
+		char* temp;
+		wsjtx_settings.get("Address", temp, "127.0.0.1");
 		status_->misc_status(ST_NOTE, "WSJT-X: Creating new socket");
-		server_ = new socket_server(socket_server::UDP, udp_port);
+		server_ = new socket_server(socket_server::UDP, string(temp), udp_port);
 		server_->callback(rcv_request);
+		free(temp);
 	}
 	if (!server_->has_server()) {
 		status_->misc_status(ST_NOTE, "WSJT-X: Starting socket");

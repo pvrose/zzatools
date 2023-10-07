@@ -53,8 +53,8 @@ using namespace std;
 		set<Fl_Widget*> image_widgets_;
 
 		// 
-		Fl_Input* ip_wsjtx_port_;
-		Fl_Input* ip_fldigi_port_;
+		Fl_Group* grp_wsjtx_;
+		Fl_Group* grp_fldigi_;
 
 		// Callback data for eQSL calendars
 		cal_cb_data_t eqsl_cal_cb_data_;
@@ -116,9 +116,11 @@ using namespace std;
 
 		// wsjt-x udp PORT CONNECTION
 		int wsjtx_udp_port_;
+		string wsjtx_udp_addr_;
 		bool wsjtx_enable_;
 		// Fl-digi log xmlrpc server
 		int fldigi_rpc_port_;
+		string fldigi_rpc_addr_;
 		bool fldigi_enable_;
 
 	};

@@ -32,9 +32,7 @@
 		};
 
 		// Handler for client (or both)
-		rpc_handler(string host_name, string resource_name);
-		// Handler for server
-		rpc_handler(int port_name, string resource_name);
+		rpc_handler(string host_address, int port_name, string resource_name);
 		~rpc_handler();
 		// Generate XML for the request and decode XML for the response
 		bool do_request(string method_name, rpc_data_item::rpc_list* params, rpc_data_item* response);
