@@ -745,6 +745,7 @@ record* wsjtx_handler::update_qso(bool tx, string time, double audio_freq, strin
 		}
 		else {
 			record* qso = match != nullptr ? match : qso_call(target);
+			qso->item("QSO_COMPLETE", string("N"));
 			switch (decode.type) {
 			case TX1:
 				// <THEM> <ME> <MY_GRID>
@@ -839,6 +840,7 @@ record* wsjtx_handler::update_qso(bool tx, string time, double audio_freq, strin
 		}
 		else {
 			record* qso = match != nullptr ? match : qso_call(sender);
+			qso->item("QSO_COMPLETE", string("N"));
 			switch (decode.type) {
 			case TX1:
 				// <ME> <CALL> <GRID>
@@ -870,6 +872,8 @@ record* wsjtx_handler::update_qso(bool tx, string time, double audio_freq, strin
 				return qso;
 			case TX4A:
 				// <ME> <THEM> RR73
+				qso->item("QSO_COMPLETE", string("?"));
+				// And drop through
 			case TX5:
 				// <ME> <THEM> 73
 				if (qso->item("QSO_COMPLETE") == "N" || qso->item("QSO_COMPLETE") == "?") {
@@ -1022,6 +1026,7 @@ bool wsjtx_handler::match_all_txt(record* qso, bool update_qso) {
 	// reposition back to beginning
 	all_file->seekg(0, ios::beg);
 	enum {SEARCHING, FOUND, COPYING, COPIED} copy_status = SEARCHING;
+	string s_status[] = {"SEARCHING", "FOUND    ", "COPYING  ", "COPIED   "};
 	// Get user callsign from settings
 	// Get search items from record
 	string their_call = qso->item("CALL");
@@ -1062,10 +1067,10 @@ bool wsjtx_handler::match_all_txt(record* qso, bool update_qso) {
 							my_call_.c_str(),
 							their_call.c_str());
 						status_->misc_status(ST_WARNING, msg);
+						copy_status = FOUND;;
 					}
-					snprintf(msg, sizeof(msg),"WSJTX: Line = %s", line.c_str());
+					snprintf(msg, sizeof(msg),"WSJTX: %s: %s", s_status[(int)copy_status].c_str(), line.c_str());
 					status_->misc_status(ST_NOTE, msg);
-					copy_status = FOUND;;
 				}
 			}
 		}
