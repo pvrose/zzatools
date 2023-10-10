@@ -13,12 +13,10 @@ public:
     void create_form();
 
     void enable_widgets();
-    void stop_ticker();
- 
-    static unsigned int tick_count_;
 
+    void ticker();
+ 
 protected:
-    static void cb_ticker(void* v);
     static void cb_tabs(Fl_Widget* w, void* v);
  
     qso_clock* utc_clock_;

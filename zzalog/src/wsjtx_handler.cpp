@@ -1117,12 +1117,16 @@ bool wsjtx_handler::match_all_txt(record* qso, bool update_qso) {
 }
 
 // Called every 15s - check whether a heartbeat has been received from another app
-void wsjtx_handler::heartbeat() {
-	if (check_beats_ && received_beats_.empty()) {
-		status_->misc_status(ST_WARNING, "WSJT-X: No heartbeats received.");
-		check_beats_ = false;
+void wsjtx_handler::ticker() {
+	if (has_server()) {
+		if (check_beats_ && received_beats_.empty()) {
+			status_->misc_status(ST_WARNING, "WSJT-X: No heartbeats received.");
+			check_beats_ = false;
+		}
+		if (!received_beats_.empty()) {
+			printf("DEBUG: Heartbeat sent from %s\n", PROGRAM_ID.c_str());
+			send_hbeat();
+		}
+		received_beats_.clear();
 	}
-	received_beats_.clear();
-	printf("DEBUG: Heartbeat sent from %s\n", PROGRAM_ID.c_str());
-	send_hbeat();
 }

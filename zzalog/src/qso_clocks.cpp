@@ -9,8 +9,6 @@
 using namespace std;
 
 // basic tick is 200 ms 
-const double BASIC_TICK = 0.1;
-unsigned int qso_clocks::tick_count_ = 0;
 extern status* status_;
 extern wsjtx_handler* wsjtx_handler_;
 extern bool closing_;
@@ -22,11 +20,9 @@ qso_clocks::qso_clocks(int X, int Y, int W, int H, const char* L) :
 	create_form();
 	callback(cb_tabs);
     enable_widgets();
-	Fl::add_timeout(0, cb_ticker, this);
 }
 
 qso_clocks::~qso_clocks() {
-    Fl::remove_timeout(cb_ticker);
 }
 
 void qso_clocks::create_form() {
@@ -66,27 +62,8 @@ void qso_clocks::enable_widgets() {
 	local_clock_->enable_widgets();	
 }
 
-void qso_clocks::cb_ticker(void* v) {
-	if (!closing_) {
-		qso_clocks* that = (qso_clocks*)v;
-		tick_count_++;
-		if (tick_count_ % 10 == 0) {
-			that->enable_widgets();
-			((qso_manager*)that->parent())->ticker();
-		}
-		if (tick_count_ % 2 == 0) {
-			status_->ticker();
-		}
-		if (tick_count_ % 150 == 0) {
-			wsjtx_handler_->heartbeat();
-		}
-
-		Fl::repeat_timeout(BASIC_TICK, cb_ticker, v);
-	}
-}
-
-void qso_clocks::stop_ticker() {
-	Fl::remove_timeout(cb_ticker);
+void qso_clocks::ticker() {
+	enable_widgets();
 }
 
 void qso_clocks::cb_tabs(Fl_Widget* w, void* v) {

@@ -405,13 +405,9 @@ void qso_manager::ticker() {
 		rig_group_->ticker();
 		data_group_->ticker();
 		info_group_->ticker();
+		clock_group_->ticker();
 		ticker_in_progress_ = false;
 	}
-}
-
-// Stop 1 second ticker
-void qso_manager::stop_ticker() {
-	clock_group_->stop_ticker();
 }
 
 // Return current QSO

@@ -88,6 +88,10 @@ string VENDOR = "GM3ZZA";
 #endif
 unsigned int DEBUG_ITEMS = DEBUG_ERRORS;
 
+// Ticker values
+double TICK = 0.1;      // 100 ms
+unsigned int TICK_SECOND = 10;
+
 
 // FLTK externals
 extern int FL_NORMAL_SIZE;
@@ -143,6 +147,25 @@ bool close_by_error_ = false;
 double prev_freq_ = 0.0;
 // Sessions is a resumption
 bool resuming_ = false;
+// Ticker counter - max value = 0.1 * 2^64 seconds = a long time
+uint64_t ticks_ = 0;
+
+static void cb_ticker(void* v) {
+	// Units that require 1s tick
+	if (ticks_ % TICK_SECOND == 0) {
+		qso_manager_->ticker();
+	}
+	// Units that require a 200ms tick
+	if (ticks_ % (TICK_SECOND * 2 / 10) == 0) {
+		status_->ticker();
+	}
+	// Units that require 15s tick
+	if (ticks_ % (TICK_SECOND * 15) == 0) {
+		wsjtx_handler_->ticker();
+	}
+	ticks_++;
+	Fl::repeat_timeout(TICK, cb_ticker);
+}
 
 // This callback intercepts the close command and performs checks and tidies up
 // Updates recent files settings
@@ -155,7 +178,8 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 	else {
 		closing_ = true;
 		printf("ZZALOG: Closing\n");
-		if (qso_manager_) qso_manager_->stop_ticker();
+		// Stop the ticker
+		Fl::remove_timeout(cb_ticker);
 		status_->misc_status(ST_NOTE, "ZZALOG: Closing...");
 		// Delete band view
 		// Currently modifying a (potentially new) record
@@ -625,6 +649,8 @@ int main(int argc, char** argv)
 	int code = 0;
 	// We are now initialised
 	initialised_ = true;
+	// Start the ticker
+	Fl::add_timeout(TICK, cb_ticker);
 	if (!closing_) {
 		// Now we have created everything add the windows items to the menu
 		// Enable menu so that we can do thigs while waiting for Fllog client to appear

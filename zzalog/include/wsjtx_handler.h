@@ -35,7 +35,7 @@ using namespace std;
 		bool match_all_txt(record* qso, bool update_qso);
 
 		// 15s ticker
-		void heartbeat();
+		void ticker();
 
 		// Used in static methods to point to the single instance of this class
 		static wsjtx_handler* that_;

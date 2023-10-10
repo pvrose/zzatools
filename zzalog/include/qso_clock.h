@@ -17,8 +17,6 @@ public:
 	void enable_widgets();
 	// save value
 	void save_values();
-	// Stop te 1 second ticker
-	void stop_ticker();
 
 protected:
 
