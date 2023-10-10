@@ -2,6 +2,7 @@
 #include "qso_manager.h"
 #include "utils.h"
 #include "status.h"
+#include "wsjtx_handler.h"
 
 #include <algorithm>
 
@@ -11,6 +12,7 @@ using namespace std;
 const double BASIC_TICK = 0.1;
 unsigned int qso_clocks::tick_count_ = 0;
 extern status* status_;
+extern wsjtx_handler* wsjtx_handler_;
 extern bool closing_;
 
 qso_clocks::qso_clocks(int X, int Y, int W, int H, const char* L) :
@@ -74,6 +76,9 @@ void qso_clocks::cb_ticker(void* v) {
 		}
 		if (tick_count_ % 2 == 0) {
 			status_->ticker();
+		}
+		if (tick_count_ % 150 == 0) {
+			wsjtx_handler_->heartbeat();
 		}
 
 		Fl::repeat_timeout(BASIC_TICK, cb_ticker, v);

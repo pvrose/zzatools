@@ -51,7 +51,8 @@ wsjtx_handler::wsjtx_handler()
 	server_ = nullptr;
 	qsos_.clear();
 	run_server();
-	new_heartbeat_ = false;
+	check_beats_ = false;
+	received_beats_.clear();
 	status_rcvd_ = 0;
 	// Get logged callsign from spec_data
 	my_call_ = qso_manager_->get_default(qso_manager::CALLSIGN);
@@ -114,8 +115,10 @@ int wsjtx_handler::handle_default(stringstream& ss, uint32_t type) {
 
 // Handle the heartbeat - send one back
 int wsjtx_handler::handle_hbeat(stringstream& ss) {
-	new_heartbeat_ = true;
-	send_hbeat();
+	string id = get_utf8(ss);
+	check_beats_ = true;
+	received_beats_.insert(id);
+	printf("DEBUG: Heartbeat received from %s\n", id.c_str());
 	return 0;
 }
 
@@ -1111,4 +1114,15 @@ bool wsjtx_handler::match_all_txt(record* qso, bool update_qso) {
 		return false;
 	}
 
+}
+
+// Called every 15s - check whether a heartbeat has been received from another app
+void wsjtx_handler::heartbeat() {
+	if (check_beats_ && received_beats_.empty()) {
+		status_->misc_status(ST_WARNING, "WSJT-X: No heartbeats received.");
+		check_beats_ = false;
+	}
+	received_beats_.clear();
+	printf("DEBUG: Heartbeat sent from %s\n", PROGRAM_ID.c_str());
+	send_hbeat();
 }

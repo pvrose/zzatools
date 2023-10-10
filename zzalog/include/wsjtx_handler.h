@@ -7,6 +7,8 @@
 #include <string>
 #include <cstdint>
 #include <map>
+#include <set>
+
 #ifdef _WIN32
 #include <WinSock2.h>
 #endif
@@ -31,6 +33,9 @@ using namespace std;
 
 		// Search for match in ALL.TXT
 		bool match_all_txt(record* qso, bool update_qso);
+
+		// 15s ticker
+		void heartbeat();
 
 		// Used in static methods to point to the single instance of this class
 		static wsjtx_handler* that_;
@@ -204,8 +209,6 @@ using namespace std;
 		uint32_t minimum_schema_ = 2;
 		// Received first datagram
 		bool received_datagram_;
-		// New heartbeat received
-		bool new_heartbeat_;
 		// Number status received
 		unsigned int status_rcvd_;
 		// My call
@@ -222,6 +225,12 @@ using namespace std;
 		double dial_frequency_;
 		// Current mode
 		string mode_;
+
+		// Heartbeat management -
+		// REeceived heartbeats
+		set<string> received_beats_;
+		// Check missing heartbeats
+		bool check_beats_;
 		
 	};
 
