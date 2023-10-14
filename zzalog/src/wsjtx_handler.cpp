@@ -85,6 +85,10 @@ int wsjtx_handler::rcv_dgram(stringstream & ss) {
 		status_->misc_status(ST_WARNING, message);
 		return 1;
 	}
+	id_ = get_utf8(ss);
+
+	printf("DEBUG: %s Type %d ", id_.c_str(), dgram_type);
+
 	// Select method to interpret datagram
 	switch (dgram_type) {
 	case 0:
@@ -95,6 +99,8 @@ int wsjtx_handler::rcv_dgram(stringstream & ss) {
 		return handle_status(ss);
 	case 2:
 		return handle_decode(ss);
+	case 4:
+		return handle_reply(ss);
 	case 6:
 		return handle_close(ss);
 	case 12:
@@ -115,10 +121,9 @@ int wsjtx_handler::handle_default(stringstream& ss, uint32_t type) {
 
 // Handle the heartbeat - send one back
 int wsjtx_handler::handle_hbeat(stringstream& ss) {
-	string id = get_utf8(ss);
 	check_beats_ = true;
-	received_beats_.insert(id);
-	printf("DEBUG: Heartbeat received from %s\n", id.c_str());
+	received_beats_.insert(id_);
+	printf("Heartbeat\n");
 	return 0;
 }
 
@@ -128,6 +133,7 @@ int wsjtx_handler::send_hbeat() {
 	// Add the magic number, schema and function number
 	put_uint32(ss, magic_number_);
 	put_uint32(ss, schema_);
+	// Frequency
 	put_uint32(ss, 0);
 	// Add the ID
 	put_utf8(ss, PROGRAM_ID);
@@ -150,6 +156,7 @@ int wsjtx_handler::handle_close(stringstream& ss) {
 #ifdef _WIN32
 	if (dxa_if_) dxa_if_->clear_dx_loc();
 #endif
+	printf("Close\n");
 	qso_manager_->update_modem_qso(nullptr);
 	menu_->update_items();
 	return 1;
@@ -158,10 +165,8 @@ int wsjtx_handler::handle_close(stringstream& ss) {
 // Handle the logged ADIF datagram. Send it to the logger
 int wsjtx_handler::handle_log(stringstream& ss) {
 	status_->misc_status(ST_LOG, "WSJT-X: Received Log ADIF datagram");
-	// Ignore Id filed
-	string utf8 = get_utf8(ss);
 	// Get ADIF string
-	utf8 = get_utf8(ss);
+	string utf8 = get_utf8(ss);
 	// Convert it to a record
 	stringstream adif;
 	adif.str(utf8);
@@ -175,6 +180,7 @@ int wsjtx_handler::handle_log(stringstream& ss) {
 	qso->item("QSO_COMPLETE", string(""));
 	qso_manager_->update_modem_qso(qso);
 	status_->misc_status(ST_NOTE, "WSJT-X: Logged QSO");
+	printf("Log %s\n", log_qso->item("CALL").c_str());
 	delete rcvd_book;
 #ifdef _WIN32
 	// Clear DX locator flag
@@ -186,7 +192,7 @@ int wsjtx_handler::handle_log(stringstream& ss) {
 // handle decode - display and beep if it contains the user's callsign
 int wsjtx_handler::handle_decode(stringstream& ss) {
 	decode_dg decode;
-	decode.id = get_utf8(ss);
+	decode.id = id_;
 	decode.new_decode = get_bool(ss);
 	decode.time = get_uint32(ss);
 	decode.snr = get_uint32(ss);
@@ -203,6 +209,34 @@ int wsjtx_handler::handle_decode(stringstream& ss) {
 	unsigned int hours = minutes / 60;
 	minutes = minutes - (hours * 60);
 	char t[20];
+	printf("Decode %s\n", decode.message.c_str());
+	snprintf(t, sizeof(t), "%02d%02d%02.0f", hours, minutes, seconds);
+	record* qso = update_qso(false, string(t), (double)decode.d_freq, decode.message);
+	if (qso) qso_manager_->update_modem_qso(qso);
+	return 0;
+}
+
+// handle decode - display and beep if it contains the user's callsign
+int wsjtx_handler::handle_reply(stringstream& ss) {
+	decode_dg decode;
+	decode.id = id_;
+	decode.new_decode = get_bool(ss);
+	decode.time = get_uint32(ss);
+	decode.snr = get_uint32(ss);
+	decode.d_time = get_double(ss);
+	decode.d_freq = get_uint32(ss);
+	decode.mode = get_utf8(ss);
+	decode.message = get_utf8(ss);
+	decode.low_confidence = get_bool(ss);
+//	decode.off_air = get_bool(ss);
+	// display ID, time and message
+	double seconds = decode.time / 1000.0;
+	unsigned int minutes = (unsigned int)seconds / 60;
+	seconds = seconds - (minutes * 60.0);
+	unsigned int hours = minutes / 60;
+	minutes = minutes - (hours * 60);
+	char t[20];
+	printf("Reply %s\n", decode.message.c_str());
 	snprintf(t, sizeof(t), "%02d%02d%02.0f", hours, minutes, seconds);
 	record* qso = update_qso(false, string(t), (double)decode.d_freq, decode.message);
 	if (qso) qso_manager_->update_modem_qso(qso);
@@ -217,7 +251,7 @@ int wsjtx_handler::handle_status(stringstream& ss) {
 
 	status_dg status;
 	// ID
-	status.id = get_utf8(ss);
+	status.id = id_;
 	// Frequency
 	status.dial_freq = get_uint64(ss);
 	// Mode
@@ -263,6 +297,7 @@ int wsjtx_handler::handle_status(stringstream& ss) {
 	// Save frequency and mode
 	dial_frequency_ = (double)status.dial_freq / 1000000.0;
 	mode_ = status.mode;
+	printf("Status %d %s\n", status.dial_freq, status.mode.c_str());
 	// Create qso
 	if (status.transmitting) {
 		record* qso = update_qso(true, now(false, "%H%M%S"), (double)status.tx_offset, status.tx_message);
@@ -398,6 +433,7 @@ void wsjtx_handler::run_server() {
 		wsjtx_settings.get("Address", temp, "127.0.0.1");
 		status_->misc_status(ST_NOTE, "WSJT-X: Creating new socket");
 		server_ = new socket_server(socket_server::UDP, string(temp), udp_port);
+//		server_ = new socket_server(socket_server::UDP, "0.0.0.0", udp_port);
 		server_->callback(rcv_request);
 		free(temp);
 	}
@@ -1124,7 +1160,6 @@ void wsjtx_handler::ticker() {
 			check_beats_ = false;
 		}
 		if (!received_beats_.empty()) {
-			printf("DEBUG: Heartbeat sent from %s\n", PROGRAM_ID.c_str());
 			send_hbeat();
 		}
 		received_beats_.clear();

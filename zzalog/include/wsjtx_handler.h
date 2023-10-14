@@ -155,6 +155,8 @@ using namespace std;
 		int handle_default(stringstream& os, uint32_t type);
 		// handle decode
 		int handle_decode(stringstream& os);
+		// handle decode
+		int handle_reply(stringstream& os);
 		// handle status
 		int handle_status(stringstream& os);
 		// Get the utf8 from the dgram
@@ -225,6 +227,8 @@ using namespace std;
 		double dial_frequency_;
 		// Current mode
 		string mode_;
+		// Received partnet ID
+		string id_;
 
 		// Heartbeat management -
 		// REeceived heartbeats

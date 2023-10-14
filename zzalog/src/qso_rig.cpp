@@ -687,7 +687,7 @@ void qso_rig::cb_ch_model(Fl_Widget* w, void* v) {
 		snprintf(message, 128, "DASH: Error reading hamlib details selecting %s", label);
 		status_->misc_status(ST_ERROR, message);
 	}
-	switch (that->mode_) {
+	switch (that->hamlib_data_.port_type) {
 	case RIG_PORT_SERIAL:
 	case RIG_PORT_NETWORK:
 	case RIG_PORT_USB:

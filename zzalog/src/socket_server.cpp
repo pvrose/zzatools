@@ -33,11 +33,12 @@
 extern status *status_;
 
 // Constructor
-socket_server::socket_server(protocol_t protocol, string address, int port_num) : server_(INVALID_SOCKET),
-																				  client_(INVALID_SOCKET),
-																				  protocol_(protocol),
-																				  port_num_(port_num),
-																				  th_socket_(nullptr)
+socket_server::socket_server(protocol_t protocol, string address, int port_num) : 
+	server_(INVALID_SOCKET),
+	client_(INVALID_SOCKET),
+    protocol_(protocol),
+    port_num_(port_num),
+    th_socket_(nullptr)
 {
 	if (address.length())
 	{
