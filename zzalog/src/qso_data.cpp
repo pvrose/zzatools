@@ -828,6 +828,7 @@ void qso_data::action_delete_qso() {
 		action_deactivate();
 		break;
 	case QSO_PENDING:
+	case QSO_PEEK:
 		break;
 	}
 
