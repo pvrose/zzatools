@@ -141,7 +141,6 @@ void qso_data::enable_widgets() {
 		}
 
 		char l[128];
-		printf("DEBUG: In qso_data::enable_widgets()\n");
 		switch (logging_state_) {
 		case QSO_INACTIVE:
 			g_entry_->label("QSO Entry is not enabled");
@@ -1247,7 +1246,6 @@ void qso_data::action_add_modem(record* qso) {
 // Update or replace a modem record
 void qso_data::action_update_modem(record* qso) {
 	// Compare with existing
-	printf("DEBUG: In action_update_modem\n");
 	if (qso != current_qso()) {
 		printf("Received QSO %s current %s\n", qso->item("CALL").c_str(), current_qso()->item("CALL").c_str());
 		// This is a new record as the previous one did not complete
@@ -1274,7 +1272,6 @@ void qso_data::action_update_modem(record* qso) {
 
 // Cancel modem operation
 void qso_data::action_cancel_modem() {
-	printf("DEBUG: In action_cancel_mode\n");
 	if (current_qso()->item("QSO_COMPLETE") == "") {
 		// Complete so should save it
 		action_save();
@@ -1445,7 +1442,6 @@ void qso_data::action_import_query() {
 
 // Open QRZ.com page
 void qso_data::action_qrz_com() {
-	printf("DEBUG: In action_qrz\n");
 	record* qso = current_qso();
 	qrz_handler_->open_web_page(qso->item("CALL"));
 }
@@ -1562,7 +1558,6 @@ qso_data::logging_state_t qso_data::logging_state() {
 
 // Current QSO
 record* qso_data::current_qso() {
-	printf("DEBUG: Logging state %d\n", (int)logging_state_);
 	switch (logging_state_) {
 	case QSO_INACTIVE:
 	case QSO_PENDING:
@@ -1583,10 +1578,6 @@ record* qso_data::current_qso() {
 		return g_net_entry_->qso();
 	case QSO_PEEK:
 	case QSO_PEEK_ED:
-		printf("DEBUG: Peeked QSO %s %s %s\n",
-			g_peek_->qso()->item("QSO_DATE").c_str(),
-			g_peek_->qso()->item("TIME_ON").c_str(),
-			g_peek_->qso()->item("CALL").c_str());
 		return g_peek_->qso();
 	case MANUAL_ENTRY:
 		return g_qy_entry_->qso();
@@ -1638,7 +1629,6 @@ void qso_data::ticker() {
 
 // Call in editor
 string qso_data::get_call() {
-	printf("DEBUG: In get_call\n");
 	record* qso = current_qso();
 	if (qso) {
 		return qso->item("CALL");

@@ -31,7 +31,6 @@ int main_window::handle(int event) {
 		stringstream adif;
 		adif.str(data);
 		// Stop any extant update and wait for it to complete
-		printf("DEBUG: handle PASTE\n");
 		import_data_->stop_update(false);
 		while (!import_data_->update_complete()) Fl::check();
 		import_data_->load_stream(adif, import_data::update_mode_t::CLIPBOARD);

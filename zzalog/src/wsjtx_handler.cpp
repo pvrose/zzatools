@@ -87,8 +87,6 @@ int wsjtx_handler::rcv_dgram(stringstream & ss) {
 	}
 	id_ = get_utf8(ss);
 
-	printf("DEBUG: %s Type %d ", id_.c_str(), dgram_type);
-
 	// Select method to interpret datagram
 	switch (dgram_type) {
 	case 0:

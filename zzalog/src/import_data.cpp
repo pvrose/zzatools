@@ -313,7 +313,6 @@ void import_data::update_book() {
 		// Prevent view update with every record imported
 		inhibit_view_update_ = true;
 		if (!update_in_progress_) {
-			printf("DEBUG: Step -3\n");
 			book_->enable_save(false);
 		}
 		// Clear flags
@@ -354,7 +353,6 @@ void import_data::update_book() {
 			}
 			else {
 				// Some fields may require conversion (e.g. eQSL uses RST_SENT from contact's perspective
-				printf("DEBUG: Step -2\n");
 				convert_update(import_record);
 				bool found_match = false;
 				// Find the position of the record either equal in time or just after
@@ -371,7 +369,6 @@ void import_data::update_book() {
 					test_record <= (offset + 2) && !update_in_progress_ && !found_match && test_record != book_->size();
 					test_record++) {
 					// Get potential match QSO
-					printf("DEBUG: Step -1\n");
 					record* record = book_->get_record(test_record, false);
 					// Compare QSO records - Import record should have fewer fields
 					match_result_t match_result = import_record->match_records(record);
@@ -506,17 +503,12 @@ void import_data::update_book() {
 				else if (!found_match && (update_mode_ == AUTO_IMPORT || update_mode_ == FILE_IMPORT || 
 					update_mode_ == DATAGRAM || update_mode_ == CLIPBOARD)) {
 					// If Auto update or importing a file then record needs parsing etc.
-					printf("DEBUG: Step 0\n");
 					import_record->update_timeoff();
 					if (update_mode_ == AUTO_IMPORT || update_mode_ == FILE_IMPORT ||
 						update_mode_ == DATAGRAM || update_mode_ == CLIPBOARD) {
-						printf("DEBUG: Step 1\n");
 						add_use_data(import_record);
-						printf("DEBUG: Step 2\n");
 						cty_data_->update_qso(import_record);
-						printf("DEBUG: Step 3\n");
 						spec_data_->validate(import_record, -1);
-						printf("DEBUG: Step 4\n");
 						qso_manager_->update_import_qso(import_record);
 					}
 
@@ -842,7 +834,6 @@ void import_data::load_stream(stringstream& adif, import_data::update_mode_t ser
 	}
 	// This download data will be ADI format - load the stream into this book
 	adi_reader* reader = new adi_reader();
-	printf("DEBUG: load_stream()\n");
 	reader->load_book(this, adif);
 	delete reader;
 	if (server == LOTW_UPDATE) {
@@ -857,7 +848,6 @@ void import_data::load_stream(stringstream& adif, import_data::update_mode_t ser
 
 // Merge data
 void import_data::merge_data(import_data::update_mode_t mode) {
-	printf("DEBUG: Step -4\n");
 	if (mode != EXISTING) {
 		update_mode_ = mode;
 	}

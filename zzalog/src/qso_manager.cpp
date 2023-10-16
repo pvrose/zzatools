@@ -242,7 +242,6 @@ bool qso_manager::editing() {
 		return true;
 	case qso_data::QSO_EDIT:
 	case qso_data::QSO_STARTED:
-		printf("DEBUG: in editing()\n");
 		edit_qso = data_group_->current_qso();
 		return edit_qso->is_dirty();
 	default:
@@ -383,11 +382,6 @@ string qso_manager::get_default(stn_item_t item) {
 	if (source) {
 		switch (item) {
 		case RIG:
-			printf("DEBUG: Source %s %s %s %s\n", 
-				source->item("QSO_DATE").c_str(),
-				source->item("TIME_ON").c_str(),
-				source->item("CALL").c_str(),
-				source->item("MY_RIG").c_str());
 			return source->item("MY_RIG");
 		case ANTENNA:
 			return source->item("MY_ANTENNA");

@@ -1145,7 +1145,6 @@ void book::add_use_data(record* use_record) {
 		}
 		string rig = use_record->item("MY_RIG");
 		bool update_spec = false;
-		printf("DEBUG: MY_RIG is =%s=\n", rig.c_str());
 		if (rig.length()) {
 			if (used_rigs_.find(rig) == used_rigs_.end()) {
 				used_rigs_.insert(rig);
