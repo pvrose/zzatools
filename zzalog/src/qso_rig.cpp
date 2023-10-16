@@ -744,8 +744,13 @@ void qso_rig::cb_bn_all(Fl_Widget* w, void* v) {
 // v is not used 
 void qso_rig::cb_bn_connect(Fl_Widget* w, void* v) {
 	qso_rig* that = ancestor_view<qso_rig>(w);
-	if (that->rig_->is_open()) {
+	if (!that->rig_) {
+		that->rig_ = new rig_if(that->label(), &that->hamlib_data_);
+		printf("Connected rig %s\n", that->label());
+	}
+	else if (that->rig_->is_open()) {
 		that->rig_->close();
+
 	} else {
 		that->rig_->open();
 	}

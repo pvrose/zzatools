@@ -242,6 +242,7 @@ bool qso_manager::editing() {
 		return true;
 	case qso_data::QSO_EDIT:
 	case qso_data::QSO_STARTED:
+		printf("DEBUG: in editing()\n");
 		edit_qso = data_group_->current_qso();
 		return edit_qso->is_dirty();
 	default:
@@ -361,7 +362,7 @@ void qso_manager::update_import_qso(record* import_qso) {
 		string mode = import_qso->item("MODE");
 		string submode = import_qso->item("SUBMODE");
 		// If we have a QSO to copy from and one to copy to, copy these fields.
-		if (import_qso->item("MY_RIG").length() == 0) 
+		if (import_qso->item("MY_RIG").length() == 0)
 			import_qso->item("MY_RIG", get_default(RIG));
 		if (import_qso->item("MY_ANTENNA").length() == 0) 
 			import_qso->item("MY_ANTENNA", get_default(ANTENNA));
@@ -382,6 +383,11 @@ string qso_manager::get_default(stn_item_t item) {
 	if (source) {
 		switch (item) {
 		case RIG:
+			printf("DEBUG: Source %s %s %s %s\n", 
+				source->item("QSO_DATE").c_str(),
+				source->item("TIME_ON").c_str(),
+				source->item("CALL").c_str(),
+				source->item("MY_RIG").c_str());
 			return source->item("MY_RIG");
 		case ANTENNA:
 			return source->item("MY_ANTENNA");

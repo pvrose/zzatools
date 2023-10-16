@@ -351,7 +351,8 @@ void qso_entry::copy_qso_to_qso(record* old_record, int flags) {
 // Copy fields from CAT and default rig etc.
 void qso_entry::copy_cat_to_qso() {
 	rig_if* rig = ((qso_manager*)qso_data_->parent())->rig();
-	if (rig->is_good() && qso_ != nullptr) {
+	// Rig can be temporarily missing q
+	if (rig && rig->is_good() && qso_ != nullptr) {
 		string freqy = rig->get_frequency(true);
 		string mode;
 		string submode;
