@@ -213,6 +213,9 @@ using namespace std;
 		bool loading();
 		bool storing();
 
+		// Process macro fields
+		bool get_macro(record* use_record, string macro_name, set<string> field_names, macro_map& map, bool allow_null = false);
+
 		// Protected attributes
 	protected:
 		// current selected item number
@@ -261,6 +264,8 @@ using namespace std;
 		set<string> used_callsigns_;
 		// QTHs used - with data
 		macro_map used_qths_;
+		// Operators used
+		macro_map used_ops_;
 		// Bands worked per DXCC
 		map < string, map < int, set<string> > > bands_per_dxcc_;
 		// mOdes worked per DXCC

@@ -2510,6 +2510,9 @@ void spec_data::add_my_appdefs() {
 		"APP_ZZA_ERROR",
 		"APP_ZZA_ECARD",
 		"APP_ZZA_CQ",
+		"APP_ZZA_OP",
+		"APP_ZZA_OP_DESCR",
+		"APP_ZZA_OPERATOR",    // Operator of QSL partner - provided in OPERATOR
 		"APP_LOTW_NUMREC",
 		"APP_LOTW_LASTQSL",
 		""

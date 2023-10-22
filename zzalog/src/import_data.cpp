@@ -705,6 +705,11 @@ void import_data::convert_update(record* record) {
 				field_name == "RX_PWR") {
 				update_name = "!TX_PWR";
 			}
+			else if (
+				// OPERATOR => APP_ZZA_OPERATOR
+				field_name == "OPERATOR") {
+				update_name = "APP_ZZA_OPERATOR";
+			}
 			else {
 				update_name = field_name;
 			}
@@ -718,6 +723,11 @@ void import_data::convert_update(record* record) {
 			else if (field_name == "QSLRDATE") {
 				update_name = "LOTW_QSLRDATE";
 				override = true;
+			}
+			else if (
+				// OPERATOR => APP_ZZA_OPERATOR
+				field_name == "OPERATOR") {
+				update_name = "APP_ZZA_OPERATOR";
 			}
 			else {
 				update_name = field_name;

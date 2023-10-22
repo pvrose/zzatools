@@ -661,8 +661,13 @@ void log_table::draw_cell(TableContext context, int R, int C, int X, int Y, int 
 					fl_color(fl_contrast(FL_BLACK, bg_colour));
 				}
 				// get the formatted data from the field of the record
-				text = this_record->item(fields_[C].field, true);
+				string direct = this_record->item(fields_[C].field, true, false);
+				text = this_record->item(fields_[C].field, true, true);
+				Fl_Font save = fl_font();
+				if (direct == text) fl_font(save & ~FL_ITALIC, fontsize_);
+				else fl_font(save | FL_ITALIC, fontsize_);
 				fl_draw(text.c_str(), X + 1, Y, W - 1, H, FL_ALIGN_LEFT);
+				fl_font(save, fontsize_);
 
 			}
 			fl_pop_clip();

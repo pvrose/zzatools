@@ -437,6 +437,7 @@ void qso_entry::copy_default_to_qso() {
 		qso_->item("APP_ZZA_QTH", latest->item("APP_ZZA_QTH"));
 		qso_->item("MY_RIG", latest->item("MY_RIG"));
 		qso_->item("MY_ANTENNA", latest->item("MY_ANTENNA"));
+		qso_->item("APP_ZZA_OP", latest->item("APP_ZZA_OP"));
 	}
 }
 
@@ -651,6 +652,14 @@ void qso_entry::cb_ip_field(Fl_Widget* w, void* v) {
 		}
 	}
 	else if (field == "APP_ZZA_QTH") {
+		// Send new value to spec_data to create an empty entry if it's a new one
+		if (!ip->menubutton()->changed()) {
+			macro_defn entry = { nullptr, "" };
+			spec_data_->add_user_macro(field, value, entry);
+		}
+		that->check_qth_changed();
+	}
+	else if (field == "APP_ZZA_OP") {
 		// Send new value to spec_data to create an empty entry if it's a new one
 		if (!ip->menubutton()->changed()) {
 			macro_defn entry = { nullptr, "" };

@@ -25,7 +25,6 @@ using namespace std;
 
 		// Station location details - ADIF field name
 		struct qth_info_t {
-			string name;           // MY_NAME
 			string street;         // MY_STREET
 			string city;           // MY_CITY
 			string postcode;       // MY_POSTAL_CODE
@@ -41,8 +40,7 @@ using namespace std;
 			string description;    // not ADIF - APP_ZZA_QTH_DESCR
 
 			bool operator==(qth_info_t rhs) {
-				return name == rhs.name &&
-					street == rhs.name &&
+				return street == rhs.street &&
 					city == rhs.city &&
 					postcode == rhs.postcode &&
 					locator == rhs.locator &&
@@ -96,7 +94,6 @@ using namespace std;
 		bool changed_;
 
 		// All widgets
-		Fl_Input* ip_name_;
 		Fl_Input* ip_address1_;
 		Fl_Input* ip_address3_;
 		Fl_Input* ip_address4_;

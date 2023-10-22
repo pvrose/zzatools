@@ -59,7 +59,6 @@ qth_dialog::~qth_dialog() {
 void qth_dialog::load_values() {
 	// Get the QTH details
 	qth_details_ = new record(*spec_data_->expand_macro("APP_ZZA_QTH", qth_name_));
-	current_qth_.name = qth_details_->item("MY_NAME");
 	current_qth_.street = qth_details_->item("MY_STREET");
 	current_qth_.city = qth_details_->item("MY_CITY");
 	current_qth_.postcode = qth_details_->item("MY_POSTAL_CODE");
@@ -91,13 +90,6 @@ void qth_dialog::create_form(int X, int Y) {
 	int curr_y = Y + HTEXT;
 	int max_w = curr_x - X;
 	int max_h = curr_y - Y;
-	// Operator name
-	ip_name_ = new Fl_Input(curr_x, curr_y, WIP, HBUTTON, "Op. Name");
-	ip_name_->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
-	ip_name_->when(FL_WHEN_RELEASE);
-	ip_name_->value(current_qth_.name.c_str());
-	ip_name_->callback(cb_value<Fl_Input, string>, (void*)&current_qth_.name);
-	ip_name_->tooltip("Enter operator name");
 	// Address line 1 (
 	curr_y += HBUTTON + HTEXT;
 	ip_address1_ = new Fl_Input(curr_x, curr_y, WIP, HBUTTON, "Street");
@@ -267,7 +259,6 @@ void qth_dialog::save_values() {
 	// Note QTH structure only has == operator
 	if (!(current_qth_ == original_qth_)) {
 		changed_ = true;
-		qth_details_->item("MY_NAME", current_qth_.name);
 		qth_details_->item("MY_STREET", current_qth_.street);
 		qth_details_->item("MY_CITY", current_qth_.city);
 		qth_details_->item("MY_POSTAL_CODE", current_qth_.postcode);
@@ -288,7 +279,6 @@ void qth_dialog::save_values() {
 
 // Add values
 void qth_dialog::enable_widgets() {
-	ip_name_->value(current_qth_.name.c_str());
 	ip_address1_->value(current_qth_.street.c_str());
 	ip_address3_->value(current_qth_.city.c_str());
 	ip_address4_->value(current_qth_.postcode.c_str());

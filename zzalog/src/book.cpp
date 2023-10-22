@@ -90,6 +90,7 @@ book::book(object_t type)
 	used_antennas_.clear();
 	used_callsigns_.clear();
 	used_qths_.clear();
+	used_ops_.clear();
 	bands_per_dxcc_.clear();
 	modes_per_dxcc_.clear();
 	delete_contents(true);
@@ -1169,79 +1170,95 @@ void book::add_use_data(record* use_record) {
 			}
 		}
 		// "APP_ZZA_QTH" inplies a macro substitition. Description given in APP_ZZA_QTH_DESCR
-		string qth = use_record->item("APP_ZZA_QTH");
-		if (qth.length()) {
-			macro_defn* qth_data;
-			bool update_qth = false;
-			if (used_qths_.find(qth) == used_qths_.end()) {
-				qth_data = new macro_defn;
-				qth_data->fields = new record;
-				used_qths_[qth] = qth_data;
-				update_qth = true;
-			}
-			else {
-				qth_data = used_qths_.at(qth);
-			}
-			// Allow compiler to optimise this
-			static const set<string> qth_fields = {
-				"MY_NAME", "MY_STREET", "MY_CITY", "MY_POSTAL_CODE", "MY_GRIDSQUARE", "MY_COUNTRY",
-				"MY_DXCC", "MY_STATE", "MY_CNTY", "MY_CQ_ZONE", "MY_ITU_ZONE", "MY_CONT", "MY_IOTA",
-				"APP_ZZA_QTH_DESCR"
-			};
-			for (auto it = qth_fields.begin(); it != qth_fields.end(); it++) {
-				string value = use_record->item(*it);
-				// If it is in supplied data
-				if (value.length()) {
-					string old_value = qth_data->fields->item(*it);
-					// and if it's already captured - check it is the same
-					if (old_value.length() && old_value != value) {
-						char message[128];
-						if ((*it) == "MY_GRIDSQUARE" && value.length() < old_value.length() && value == old_value.substr(0, value.length())) {
-							if (ignore_gridsquare_) {
-								snprintf(message, 128, "LOG: QTH %s - Field %s=%s ignoring change to %s",
-									qth.c_str(), (*it).c_str(), old_value.c_str(), value.c_str());
-								status_->misc_status(ST_WARNING, message);
-								ignore_gridsquare_ = true;
-							}
-							use_record->item((*it), old_value);
-							modified(true);
-						}
-						else {
-							snprintf(message, 128, "LOG: %s %s %s %s - new value  (%s) differs from old (%s)",
-								use_record->item("QSO_DATE").c_str(),
-								use_record->item("TIME_ON").c_str(),
-								use_record->item("CALL").c_str(),
-								(*it).c_str(),
-								value.c_str(),
-								old_value.c_str());
-							status_->misc_status(ST_NOTE, message);
-							if ((*it) != "MY_GRIDSQUARE" || value.length() > old_value.length() || value != old_value.substr(0, value.length())) {
-								snprintf(message, 128, "LOG: QTH %s - Field %s replacing %s with %s",
-									qth.c_str(), (*it).c_str(), old_value.c_str(), value.c_str());
-								status_->misc_status(ST_WARNING, message);
-								qth_data->fields->item(*it, value);
-								update_qth = true;
-							}
-						}
-					}
-					else if (old_value.length() == 0) {
-						qth_data->fields->item(*it, value);
-						update_qth = true;
-					}
-				}
-			}
-			// description already forms part of qth_data no need to check it again
-			if (update_qth) {
-				// Update the spec data and then the spec ttree viewer
-				qth_data->description = use_record->item("APP_ZZA_QTH_DESCR");
-				spec_data_->add_user_macro("APP_ZZA_QTH", qth, *qth_data);
-				update_spec = true;
-			}
-			if (update_spec && !main_loading_) {
-				tabbed_forms_->update_views(nullptr, HT_FORMAT, size() - 1);
-			}
+		// Allow compiler to optimise this
+		static const set<string> qth_fields = {
+			"MY_STREET", "MY_CITY", "MY_POSTAL_CODE", "MY_GRIDSQUARE", "MY_COUNTRY",
+			"MY_DXCC", "MY_STATE", "MY_CNTY", "MY_CQ_ZONE", "MY_ITU_ZONE", "MY_CONT", "MY_IOTA",
+			"APP_ZZA_QTH_DESCR"
+		};
+		if (get_macro(use_record, "APP_ZZA_QTH", qth_fields, used_qths_, false)) {
+			update_spec = true;
+		}
+		// "APP_ZZA_OP" implies a macro substitution
+		static const set<string> op_fields = {
+			"OPERATOR", "MY_NAME"
+		};
+		if (get_macro(use_record, "APP_ZZA_OP", op_fields, used_ops_, true)) {
+			update_spec = true;
+		}
+		// A log-defined enum or a macro has changed
+		if (update_spec && !main_loading_) {
+			tabbed_forms_->update_views(nullptr, HT_FORMAT, size() - 1);
 		}
 	}
+}
+
+// Process the macro field
+bool book::get_macro(record* use_record, string macro_name, set<string> field_names, macro_map& map, bool allow_null) {
+	string id = use_record->item(macro_name);
+	if (allow_null || id.length()) {
+		macro_defn* defn;
+		bool update_qth = false;
+		if (map.find(id) == map.end()) {
+			defn = new macro_defn;
+			defn->fields = new record;
+			map[id] = defn;
+			update_qth = true;
+		}
+		else {
+			defn = map.at(id);
+		}
+		for (auto it = field_names.begin(); it != field_names.end(); it++) {
+			string value = use_record->item(*it);
+			// If it is in supplied data
+			if (value.length()) {
+				string old_value = defn->fields->item(*it);
+				// and if it's already captured - check it is the same
+				if (old_value.length() && old_value != value) {
+					char message[128];
+					if ((*it) == "MY_GRIDSQUARE" && value.length() < old_value.length() && value == old_value.substr(0, value.length())) {
+						if (ignore_gridsquare_) {
+							snprintf(message, 128, "LOG: %s %s - Field %s=%s ignoring change to %s",
+								macro_name.c_str(), id.c_str(), (*it).c_str(), old_value.c_str(), value.c_str());
+							status_->misc_status(ST_WARNING, message);
+							ignore_gridsquare_ = true;
+						}
+						use_record->item((*it), old_value);
+						modified(true);
+					}
+					else {
+						snprintf(message, 128, "LOG: %s %s %s %s - new value  (%s) differs from old (%s)",
+							use_record->item("QSO_DATE").c_str(),
+							use_record->item("TIME_ON").c_str(),
+							use_record->item("CALL").c_str(),
+							(*it).c_str(),
+							value.c_str(),
+							old_value.c_str());
+						status_->misc_status(ST_NOTE, message);
+						if ((*it) != "MY_GRIDSQUARE" || value.length() > old_value.length() || value != old_value.substr(0, value.length())) {
+							snprintf(message, 128, "LOG: %s %s - Field %s replacing %s with %s",
+								macro_name.c_str(), id.c_str(), (*it).c_str(), old_value.c_str(), value.c_str());
+							status_->misc_status(ST_WARNING, message);
+							defn->fields->item(*it, value);
+							update_qth = true;
+						}
+					}
+				}
+				else if (old_value.length() == 0) {
+					defn->fields->item(*it, value);
+					update_qth = true;
+				}
+			}
+		}
+		// description already forms part of defn no need to check it again
+		if (update_qth) {
+			// Update the spec data and then the spec ttree viewer
+			defn->description = use_record->item(macro_name + "_DESCR");
+			spec_data_->add_user_macro(macro_name, id, *defn);
+			return true;
+		}
+	}
+	return false;
 }
 
 // get used bands

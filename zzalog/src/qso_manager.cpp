@@ -369,6 +369,8 @@ void qso_manager::update_import_qso(record* import_qso) {
 			import_qso->item("STATION_CALLSIGN", get_default(CALLSIGN));
 		if (import_qso->item("APP_ZZA_QTH").length() == 0) 
 			import_qso->item("APP_ZZA_QTH", get_default(QTH));
+		if (import_qso->item("APP_ZZA_OP").length() == 0) 
+			import_qso->item("APP_ZZA_OP", get_default(QTH));
 	}
 }
 
@@ -389,6 +391,8 @@ string qso_manager::get_default(stn_item_t item) {
 			return source->item("STATION_CALLSIGN");
 		case QTH:
 			return source->item("APP_ZZA_QTH");
+		case OP:
+			return source->item("APP_ZZA_OP");
 		default:
 			return "";
 		}

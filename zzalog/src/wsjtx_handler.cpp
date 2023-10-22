@@ -121,7 +121,6 @@ int wsjtx_handler::handle_default(stringstream& ss, uint32_t type) {
 int wsjtx_handler::handle_hbeat(stringstream& ss) {
 	check_beats_ = true;
 	received_beats_.insert(id_);
-	printf("Heartbeat\n");
 	return 0;
 }
 
@@ -154,7 +153,6 @@ int wsjtx_handler::handle_close(stringstream& ss) {
 #ifdef _WIN32
 	if (dxa_if_) dxa_if_->clear_dx_loc();
 #endif
-	printf("Close\n");
 	qso_manager_->update_modem_qso(nullptr);
 	menu_->update_items();
 	return 1;
@@ -178,7 +176,6 @@ int wsjtx_handler::handle_log(stringstream& ss) {
 	qso->item("QSO_COMPLETE", string(""));
 	qso_manager_->update_modem_qso(qso);
 	status_->misc_status(ST_NOTE, "WSJT-X: Logged QSO");
-	printf("Log %s\n", log_qso->item("CALL").c_str());
 	delete rcvd_book;
 #ifdef _WIN32
 	// Clear DX locator flag
@@ -207,7 +204,6 @@ int wsjtx_handler::handle_decode(stringstream& ss) {
 	unsigned int hours = minutes / 60;
 	minutes = minutes - (hours * 60);
 	char t[20];
-	printf("Decode %s\n", decode.message.c_str());
 	snprintf(t, sizeof(t), "%02d%02d%02.0f", hours, minutes, seconds);
 	record* qso = update_qso(false, string(t), (double)decode.d_freq, decode.message);
 	if (qso) qso_manager_->update_modem_qso(qso);
@@ -234,7 +230,6 @@ int wsjtx_handler::handle_reply(stringstream& ss) {
 	unsigned int hours = minutes / 60;
 	minutes = minutes - (hours * 60);
 	char t[20];
-	printf("Reply %s\n", decode.message.c_str());
 	snprintf(t, sizeof(t), "%02d%02d%02.0f", hours, minutes, seconds);
 	record* qso = update_qso(false, string(t), (double)decode.d_freq, decode.message);
 	if (qso) qso_manager_->update_modem_qso(qso);
@@ -295,7 +290,6 @@ int wsjtx_handler::handle_status(stringstream& ss) {
 	// Save frequency and mode
 	dial_frequency_ = (double)status.dial_freq / 1000000.0;
 	mode_ = status.mode;
-	printf("Status %d %s\n", status.dial_freq, status.mode.c_str());
 	// Create qso
 	if (status.transmitting) {
 		record* qso = update_qso(true, now(false, "%H%M%S"), (double)status.tx_offset, status.tx_message);
@@ -748,17 +742,6 @@ wsjtx_handler::decoded_msg wsjtx_handler::decode_message(string message) {
 			decode.type = TX1A;
 		}
 	}
-	// printf("MESSAGE: %s, decode = %s: target %s; sender %s, xchg %s.\n", message.c_str(),
-	// 	decode.type == TX1 ? "TX1" :
-	// 	decode.type == TX1A ? "TX1A" :
-	// 	decode.type == TX2? "TX2" :
-	// 	decode.type == TX3 ? "TX3" :
-	// 	decode.type == TX4 ? "TX4" :
-	// 	decode.type == TX4A ? "TX4A" :
-	// 	decode.type == TX5 ? "TX5" :
-	// 	decode.type == TX6 ? "TX6" :
-	// 	decode.type == TX6A ? "TX6A" : "???",
-	// 	decode.target.c_str(), decode.sender.c_str(), decode.exchange.c_str());
 	return decode;
 }
 
@@ -771,7 +754,6 @@ record* wsjtx_handler::update_qso(bool tx, string time, double audio_freq, strin
 	string today = now(false, "%Y%m%d");
 	double df = dial == 0.0 ? dial_frequency_ : dial;
 	string m = mode == "" ? mode_ : mode;
-//	printf("Message: %s %s %g %s\n", tx?"TX":"RX", time.c_str(), audio_freq, message.c_str());
 	char msg[100];
 	if (tx) {
 		if (sender != my_call_) {

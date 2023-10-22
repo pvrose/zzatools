@@ -40,6 +40,7 @@ using namespace std;
 			ANTENNA = 2,
 			CALLSIGN = 4,
 			QTH = 8,
+			OP = 16,
 			NONE = 0
 		};
 
