@@ -324,9 +324,9 @@ void qso_entry::copy_qso_to_display(int flags) {
 
 // Copy from an existing record: fields depend on flags set
 void qso_entry::copy_qso_to_qso(record* old_record, int flags) {
+	// Create a new record
+	qso(-1);
 	if (old_record) {
-		// Create a new record
-		qso(-1);
 		// For all flag bits
 		for (auto sf = COPY_SET.begin(); sf != COPY_SET.end(); sf++) {
 			copy_flags f = (*sf);
@@ -341,9 +341,6 @@ void qso_entry::copy_qso_to_qso(record* old_record, int flags) {
 				}
 			}
 		}
-	}
-	else {
-		qso_ = nullptr;
 	}
 	copy_qso_to_display(CF_ALL_FLAGS);
 }
@@ -422,7 +419,7 @@ void qso_entry::copy_clock_to_qso() {
 			qso_->item("TIME_ON", string(result));
 			qso_->item("QSO_DATE_OFF", string(""));
 			qso_->item("TIME_OFF", string(""));
-			copy_qso_to_display(CF_TIME);
+			copy_qso_to_display(CF_TIME | CF_DATE);
 			break;
 		}
 		}

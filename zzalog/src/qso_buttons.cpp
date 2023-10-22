@@ -46,7 +46,8 @@ map<qso_data::logging_state_t, list<qso_buttons::button_type> > button_map_ =
 		qso_buttons::ADD_NET_QSO }},
 	{ qso_data::NET_EDIT, { qso_buttons::SAVE_EDIT_NET, qso_buttons::CANCEL_QSO, qso_buttons::ADD_NET_QSO}},
 	{ qso_data::QSO_MODEM, { qso_buttons::CANCEL_MODEM }},
-	{ qso_data::QSO_PEEK, { qso_buttons::ACTIVATE, qso_buttons:: EDIT_QSO, qso_buttons::DELETE_QSO, qso_buttons::EDIT_NET, qso_buttons:: CANCEL_PEEK, qso_buttons::QRZ_COM, qso_buttons::LOOK_ALL_TXT }},
+	{ qso_data::QSO_PEEK, { qso_buttons::ACTIVATE, qso_buttons:: EDIT_QSO, qso_buttons::ADD_QSO, qso_buttons::DELETE_QSO,
+	    qso_buttons::EDIT_NET, qso_buttons:: CANCEL_PEEK, qso_buttons::QRZ_COM, qso_buttons::LOOK_ALL_TXT }},
 	{ qso_data::QSO_PEEK_ED, { qso_buttons::CANCEL_PEEK, qso_buttons::EDIT_PEEK, qso_buttons::QRZ_COM, qso_buttons::LOOK_ALL_TXT }},
 	{ qso_data::MANUAL_ENTRY, { qso_buttons::EXEC_QUERY, qso_buttons::IMPORT_QUERY, qso_buttons::CANCEL_QUERY }},
 };
@@ -208,6 +209,7 @@ void qso_buttons::cb_start(Fl_Widget* w, void* v) {
 	that->disable_widgets();
 	qso_data::qso_init_t mode = (qso_data::qso_init_t)(intptr_t)v;
 	switch (that->qso_data_->logging_state()) {
+	case qso_data::QSO_PEEK:
 	case qso_data::QSO_INACTIVE:
 		that->qso_data_->action_activate(mode);
 		// Fall into next state

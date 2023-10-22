@@ -621,7 +621,7 @@ void qso_data::action_new_qso(record* qso, qso_init_t mode) {
 	switch (new_mode) {
 	case QSO_NONE:
 		// Just copy the station details
-		qe->copy_qso_to_qso(qso, qso_entry::CF_RIG_ETC);
+		qe->copy_qso_to_qso(qso, qso_entry::CF_COPY);
 		break;
 	case QSO_ON_AIR:
 		// Copy station details and get read rig details for band etc. 
@@ -641,7 +641,7 @@ void qso_data::action_new_qso(record* qso, qso_init_t mode) {
 		break;
 	case QSO_COPY_FOR_NET:
 		// Clone the QSO - get time, station and band from original QSO
-		qe->copy_qso_to_qso(qso, qso_entry::CF_TIME | qso_entry::CF_RIG_ETC | qso_entry::CF_CAT);
+		qe->copy_qso_to_qso(qso, qso_entry::CF_TIME | qso_entry::CF_DATE | qso_entry::CF_RIG_ETC | qso_entry::CF_CAT);
 		qe->copy_clock_to_qso();
 		break;
 	case QSO_COPY_MODEM:
@@ -668,7 +668,7 @@ void qso_data::action_activate(qso_init_t mode) {
 // Action START - transition from QSO_PENDING to QSO_STARTED
 void qso_data::action_start(qso_init_t mode) {
 	// Add to book
-	action_new_qso(g_entry_->qso(), mode);
+	action_new_qso(current_qso(), mode);
 	g_entry_->append_qso();
 	book_->selection(book_->item_number(g_entry_->qso_number()), HT_INSERTED);
 	switch (mode) {

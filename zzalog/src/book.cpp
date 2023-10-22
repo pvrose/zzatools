@@ -168,8 +168,9 @@ bool book::load_data(string filename)
 						sprintf(message, "LOG: Failed to open %s", filename.c_str());
 						status_->misc_status(ST_ERROR, message);
 						if (book_type_ == OT_MAIN) {
+							snprintf(message, sizeof(message), "%s [load failed]", filename.c_str());
 							// Display message in main window title and update views that there's no or partial data
-							main_window_label("[load failed]");
+							main_window_label(message);
 							selection(0, HT_NO_DATA);
 							//Fl::wait();
 						}
@@ -702,6 +703,10 @@ item_num_t book::get_insert_point(record* record) {
 	// if the book is empty add to the beginning 
 	if (size() == 0) {
 		return 0;
+	}
+	// if the record has not been corrected - then the last in the bbook
+	else if (record == nullptr) {
+		return size();
 	}
 	// if the record is later than the last in the book.
 	else if (*record > *(at(upper_bound))) {
