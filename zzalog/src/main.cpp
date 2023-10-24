@@ -74,7 +74,7 @@ using namespace std;
 string COPYRIGHT = "\xA9 Philip Rose GM3ZZA 2018. All rights reserved.\nPrefix data courtesy of clublog.org";
 string PROGRAM_ID = "ZZALOG";
 string PROG_ID = "ZLG";
-string VERSION = "3.4.49";
+string VERSION = "3.4.50";
 string TIMESTAMP = __DATE__ + string(" ") + __TIME__;
 string PROGRAM_VERSION = VERSION + " -- "  + TIMESTAMP;
 string VENDOR = "GM3ZZA";
@@ -402,6 +402,8 @@ void show_help() {
 	"\t\te|errors\tprovide more details on errors\n"
 	"\t\t\tnoe|noerrors\n"
 	"\t\th=N|hamlib=N\tSet hamlib debug level (default ERRORS)\n"
+	"\t\ts|status\tPrint status messages to terminal\n"
+	"\t\t\tnos|nostatus\n"
 	"\t\tt|threads\tProvide debug tracing on thread use\n"
 	"\t\t\tnot|nothreads\n"
 	"\t-h|--help\tPrint this\n"
