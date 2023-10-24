@@ -36,6 +36,7 @@ public:
 		QSO_PENDING,     // Collecting data for QSO - not qctive
 		QSO_STARTED,     // QSO started
 		QSO_EDIT,        // Editing existing QSO
+		QSO_ENTER,       // Entering a new QSO
 		QSO_BROWSE,      // View selected view in table view
 		QSO_VIEW,        // View selected QSO in entry view
 		QSO_PEEK,        // View alternate QSO in entry view

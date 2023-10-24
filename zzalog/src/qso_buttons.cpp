@@ -26,6 +26,7 @@ map<qso_data::logging_state_t, list<qso_buttons::button_type> > button_map_ =
 		qso_buttons::DELETE_QSO, qso_buttons::START_NET, qso_buttons::BROWSE, qso_buttons::VIEW_QSO } },
 	{ qso_data::QSO_STARTED, { qso_buttons::SAVE_QSO, qso_buttons::CANCEL_QSO, 
 		qso_buttons::START_NET, qso_buttons::WORKED_B4, qso_buttons::PARSE, qso_buttons::QRZ_COM } },
+	{ qso_data::QSO_ENTER, { qso_buttons::SAVE_QSO, qso_buttons::CANCEL_QSO } },
 	{ qso_data::QSO_EDIT, { qso_buttons::SAVE_EDIT, qso_buttons::SAVE_EXIT, qso_buttons::CANCEL_EDIT, 
 		qso_buttons::EDIT_NET, qso_buttons::NAV_FIRST,
 		qso_buttons::NAV_PREV, qso_buttons::NAV_NEXT, qso_buttons::NAV_LAST, qso_buttons::QRZ_COM } },
@@ -46,7 +47,8 @@ map<qso_data::logging_state_t, list<qso_buttons::button_type> > button_map_ =
 		qso_buttons::ADD_NET_QSO }},
 	{ qso_data::NET_EDIT, { qso_buttons::SAVE_EDIT_NET, qso_buttons::CANCEL_QSO, qso_buttons::ADD_NET_QSO}},
 	{ qso_data::QSO_MODEM, { qso_buttons::CANCEL_MODEM }},
-	{ qso_data::QSO_PEEK, { qso_buttons::ACTIVATE, qso_buttons:: EDIT_QSO, qso_buttons::ADD_QSO, qso_buttons::DELETE_QSO,
+	{ qso_data::QSO_PEEK, { qso_buttons::ACTIVATE, qso_buttons:: EDIT_QSO, qso_buttons::START_QSO, 
+		qso_buttons::ADD_QSO, qso_buttons::DELETE_QSO,
 	    qso_buttons::EDIT_NET, qso_buttons:: CANCEL_PEEK, qso_buttons::QRZ_COM, qso_buttons::LOOK_ALL_TXT }},
 	{ qso_data::QSO_PEEK_ED, { qso_buttons::CANCEL_PEEK, qso_buttons::EDIT_PEEK, qso_buttons::QRZ_COM, qso_buttons::LOOK_ALL_TXT }},
 	{ qso_data::MANUAL_ENTRY, { qso_buttons::EXEC_QUERY, qso_buttons::IMPORT_QUERY, qso_buttons::CANCEL_QUERY }},
@@ -232,6 +234,7 @@ void qso_buttons::cb_save(Fl_Widget* w, void* v) {
 		data->action_start(qso_data::QSO_AS_WAS);
 		// Two routes - QSO entry
 	case qso_data::QSO_STARTED:
+	case qso_data::QSO_ENTER:
 		data->action_save();
 		data->action_activate(qso_data::QSO_AS_WAS);
 		break;
@@ -271,6 +274,7 @@ void qso_buttons::cb_cancel(Fl_Widget* w, void* v) {
 		data->action_deactivate();
 		break;
 	case qso_data::QSO_STARTED:
+	case qso_data::QSO_ENTER:
 		data->action_cancel();
 		data->action_activate(qso_data::QSO_AS_WAS);
 		break;

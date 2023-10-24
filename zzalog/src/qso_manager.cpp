@@ -65,7 +65,6 @@ extern tabbed_forms* tabbed_forms_;
 extern import_data* import_data_;
 extern qrz_handler* qrz_handler_;
 extern main_window* main_window_;
-extern bool read_only_;
 extern bool closing_;
 
 // The main dialog constructor
@@ -217,9 +216,8 @@ void qso_manager::cb_close(Fl_Widget* w, void* v) {
 	// It is the window that raised this callback
 	qso_manager* that = (qso_manager*)w;
 	// If we are editing does the user want to save or cancel?
-	if (that->data_group_->logging_state() == qso_data::qso_data::QSO_EDIT ||
-		that->data_group_->logging_state() == qso_data::qso_data::QSO_STARTED) {
-		if (fl_choice("Entering a record - save or cancel?", "Cancel", "Save", nullptr) == 1) {
+	if (that->editing()) {
+		if (fl_choice("Modifying a record - save or cancel?", "Cancel", "Save", nullptr) == 1) {
 			qso_buttons::cb_save(that->data_group_, v);
 		}
 		else {
@@ -242,6 +240,7 @@ bool qso_manager::editing() {
 		return true;
 	case qso_data::QSO_EDIT:
 	case qso_data::QSO_STARTED:
+	case qso_data::QSO_ENTER:
 		edit_qso = data_group_->current_qso();
 		return edit_qso->is_dirty();
 	default:
@@ -261,6 +260,7 @@ bool qso_manager::qso_in_progress() {
 	case qso_data::QSO_INACTIVE:
 	case qso_data::QSO_EDIT:
 	case qso_data::QSO_VIEW:
+	case qso_data::QSO_ENTER:
 		return false;
 	case qso_data::QSO_STARTED:
 	case qso_data::QSO_MODEM:

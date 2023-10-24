@@ -26,10 +26,11 @@ extern menu* menu_;
 extern main_window* main_window_;
 extern status* status_;
 extern qso_manager* qso_manager_;
-extern bool read_only_;
+extern bool READ_ONLY;
 extern bool close_by_error_;
 extern string PROGRAM_ID;
 extern string VERSION;
+extern bool DEBUG_STATUS;
 
 // Constructor
 status::status(int X, int Y, int W, int H, const char* label) :
@@ -382,9 +383,7 @@ void status::misc_status(status_t status, const char* label) {
 	}
 	if (status != ST_DEBUG || display_debug_messages_) status_file_viewer_->append(message);
 
-#ifdef _DEBUG
-	cout << message;
-#endif
+	if (DEBUG_STATUS)	cout << message;
 
 	// Depending on the severity: LOG, NOTE, OK, WARNING, ERROR, SEVERE or FATAL
 	// Beep on the last three.
@@ -428,7 +427,7 @@ void status::misc_status(status_t status, const char* label) {
 // Update file status
 void status::file_status(file_status_t status) {
 	Fl_Color colour;
-	if (read_only_) {
+	if (READ_ONLY) {
 		// set a darker version of the colour if the file is read-only
 		colour = fl_darker(FILE_STATUS_COLOURS.at(status));
 	}

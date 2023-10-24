@@ -38,10 +38,6 @@ using namespace std;
 		ST_FATAL             // A fatal (non-recoverable) error has been signaled
 	};
 
-	// Debug levels
-	const unsigned int DEBUG_ERRORS = 1 << 0;
-	const unsigned int DEBUG_THREADS = 1 << 1;
-
 	// Tip display - 2 seconds
 	const double TIP_SHOW = 2.0;
 	// π to maximum precision in double - let the compiler take the strain

@@ -58,7 +58,7 @@ extern tabbed_forms* tabbed_forms_;
 extern url_handler* url_handler_;
 extern main_window* main_window_;
 extern Fl_Preferences* settings_;
-extern bool read_only_;
+extern bool READ_ONLY;
 extern list<string> recent_files_;
 extern intl_dialog* intl_dialog_;
 extern toolbar* toolbar_;
@@ -306,7 +306,7 @@ void menu::cb_mi_file_new(Fl_Widget* w, void* v) {
 	// get book to delete contents by loading no data
 	book_->load_data("");
 	// Allow writes
-	read_only_ = false;
+	READ_ONLY = false;
 
 	// Clear any extracted data as there are no records to reference
 	extract_records_->clear_criteria();
@@ -336,10 +336,10 @@ void menu::cb_mi_file_open(Fl_Widget* w, void* v) {
 	string filename = "";
 	// Set read_only flag
 	if (file_id < 0) {
-		read_only_ = true;
+		READ_ONLY = true;
 	}
 	else {
-		read_only_ = false;
+		READ_ONLY = false;
 	}
 	// Open chooser and open read/write (0) or read only (-1)
 	if (file_id <= 0) {
@@ -388,7 +388,7 @@ void menu::cb_mi_file_save(Fl_Widget* w, void* v) {
 	import_data_->stop_update(false);
 	while (!import_data_->update_complete()) Fl::check();
 	// Get the main book to store itself as long as it wasn't opened read-only
-	if (read_only_) {
+	if (READ_ONLY) {
 		fl_beep(FL_BEEP_QUESTION);
 		if (fl_choice("File was opened read-only - save as new file?", "OK", "No", nullptr) == 0) {
 			cb_mi_file_saveas(w, v);
@@ -398,7 +398,7 @@ void menu::cb_mi_file_save(Fl_Widget* w, void* v) {
 		// If we have a file loaded then save it
 		if (book_->filename().length()) {
 			book_->store_data();
-			read_only_ = false;
+			READ_ONLY = false;
 		}
 		// otherwise it's a new file with added records - ask for name
 		else {
@@ -448,7 +448,7 @@ void menu::cb_mi_file_saveas(Fl_Widget* w, void* v) {
 			}
 		}
 		delete check;
-		read_only_ = false;
+		READ_ONLY = false;
 	}
 	delete chooser;
 }
@@ -681,6 +681,7 @@ void menu::cb_mi_parse_log(Fl_Widget* w, void* v) {
 	fl_cursor(FL_CURSOR_WAIT);
 	// Get parse mode
 	int num_items = navigation_book_->size();
+	book_->enable_save(false);
 	if (true) {	
 		// If command parsing allowed
 		bool abandon = false;
@@ -709,12 +710,7 @@ void menu::cb_mi_parse_log(Fl_Widget* w, void* v) {
 		status_->misc_status(ST_OK, "LOG: Parsing done!");
 		navigation_book_->selection(item_number, HT_CHANGED);
 	}
-#ifndef _DEBUG
-	// Save document
-	if (book_->modified()) {
-		book_->store_data();
-	}
-#endif
+	book_->enable_save(false);
 	fl_cursor(FL_CURSOR_DEFAULT);
 }
 
@@ -723,6 +719,7 @@ void menu::cb_mi_parse_log(Fl_Widget* w, void* v) {
 void menu::cb_mi_valid8_qso(Fl_Widget* w, void* v) {
 	record* record = navigation_book_->get_record();
 	qso_num_t record_num = navigation_book_->record_number(navigation_book_->selection());
+	book_->enable_save(false);
 	// If command validation is enabled
 	bool changed = spec_data_->validate(record, record_num);
 	if (changed) {
@@ -731,12 +728,7 @@ void menu::cb_mi_valid8_qso(Fl_Widget* w, void* v) {
 		navigation_book_->selection(item_num, HT_MINOR_CHANGE);
 		book_->modified(true);
 	}
-#ifndef _DEBUG
-	// Save document
-	if (book_->modified()) {
-		book_->store_data();
-	}
-#endif
+	book_->enable_save(true);
 }
  
 // Log->Validate Log - validate all records in selected log
@@ -749,6 +741,7 @@ void menu::cb_mi_valid8_log(Fl_Widget* w, void* v) {
 	int num_items = navigation_book_->size();
 	bool changed = false;
 	// Initialse progress
+	book_->enable_save(false);
 	status_->misc_status(ST_NOTE, "VALIDATE: Started");
 	status_->progress(num_items, navigation_book_->book_type(), "Validating log", "records");
 	spec_data_->reset_continue();
@@ -767,12 +760,7 @@ void menu::cb_mi_valid8_log(Fl_Widget* w, void* v) {
 	if (changed) {
 		navigation_book_->selection(item_number, HT_MINOR_CHANGE);
 	}
-#ifndef _DEBUG
-	// Save document
-	if (book_->modified()) {
-		book_->store_data();
-	}
-#endif
+	book_->enable_save(false);
 	fl_cursor(FL_CURSOR_DEFAULT);
 }
 

@@ -134,6 +134,7 @@ void qso_entry::create_form(int X, int Y) {
 
 	ip_notes_ = new intl_input(curr_x, curr_y, max_x - curr_x - GAP, HBUTTON, "NOTES");
 	ip_notes_->callback(cb_ip_notes, nullptr);
+	ip_notes_->when(FL_WHEN_RELEASE_ALWAYS);
 	ip_notes_->tooltip("Add any notes for the QSO");
 
 	curr_y += HBUTTON + GAP;
@@ -175,6 +176,9 @@ void qso_entry::enable_widgets() {
 	case qso_data::QSO_STARTED:
 	case qso_data::NET_STARTED:
 	case qso_data::QSO_MODEM:
+	case qso_data::QSO_EDIT:
+	case qso_data::NET_EDIT:
+	case qso_data::QSO_ENTER:
 		for (int ix = 0; ix <= number_fields_in_use_ && ix < NUMBER_TOTAL; ix++) {
 			if (ch_field_[ix])
 				if (ix < number_locked_ + NUMBER_FIXED) ch_field_[ix]->deactivate();
@@ -226,22 +230,6 @@ void qso_entry::enable_widgets() {
 		ip_notes_->type(FL_NORMAL_INPUT);
 		misc_->deactivate();
 		break;
-	case qso_data::QSO_EDIT:
-	case qso_data::NET_EDIT:
-		for (int ix = 0; ix <= number_fields_in_use_ && ix < NUMBER_TOTAL; ix++) {
-			if (ch_field_[ix]) ch_field_[ix]->activate();
-			ip_field_[ix]->activate();
-			ip_field_[ix]->type(FL_NORMAL_INPUT);
-		}
-		for (int ix = number_fields_in_use_ + 1; ix < NUMBER_TOTAL; ix++) {
-			ch_field_[ix]->deactivate();
-			ip_field_[ix]->deactivate();
-		}
-		ip_notes_->activate();
-		ip_notes_->type(FL_NORMAL_INPUT);
-		misc_->activate();
-		misc_->enable_widgets();
-		break;
 	default:
 		// Reserver=d for Query states
 		hide();
@@ -281,11 +269,19 @@ void qso_entry::copy_qso_to_display(int flags) {
 				}
 			}
 		}
-		for (auto sf = COPY_SET.begin(); sf != COPY_SET.end(); sf++) {
-			copy_flags f = (*sf);
-			if (flags & f) {
-				for (auto fx = COPY_FIELDS.at(f).begin(); fx != COPY_FIELDS.at(f).end(); fx++) {
-					if ((*fx) == "NOTES")	ip_notes_->value(qso_->item("NOTES", false, true).c_str());
+		// Handle NOTES separately 
+		if (flags == CF_ALL_FLAGS) {
+			// ALL_FLAGS includes NOTES
+			ip_notes_->value(qso_->item("NOTES", false, true).c_str());
+		} else {
+			// Check if each flag includes it
+			for (auto sf = COPY_SET.begin(); sf != COPY_SET.end(); sf++) {
+				copy_flags f = (*sf);
+				if (flags & f) {
+					for (auto fx = COPY_FIELDS.at(f).begin(); fx != COPY_FIELDS.at(f).end(); fx++) {
+						if ((*fx) == "NOTES")	
+							ip_notes_->value(qso_->item("NOTES", false, true).c_str());
+					}
 				}
 			}
 		}
@@ -296,6 +292,7 @@ void qso_entry::copy_qso_to_display(int flags) {
 		case qso_data::QSO_INACTIVE:
 		case qso_data::QSO_PENDING:
 		case qso_data::QSO_STARTED:
+		case qso_data::QSO_ENTER:
 			check_qth_changed();
 			break;
 		case qso_data::NET_ADDING:
@@ -327,6 +324,10 @@ void qso_entry::copy_qso_to_qso(record* old_record, int flags) {
 	// Create a new record
 	qso(-1);
 	if (old_record) {
+		printf("DEBUG: Copying QSO %p %s %s %s %s F=%d \n", old_record,
+		old_record->item("QSO_DATE").c_str(),
+		old_record->item("TIME_ON").c_str(), old_record->item("CALL").c_str(),
+		old_record->item("APP_ZZA_OP").c_str(), flags);
 		// For all flag bits
 		for (auto sf = COPY_SET.begin(); sf != COPY_SET.end(); sf++) {
 			copy_flags f = (*sf);
@@ -683,7 +684,6 @@ void qso_entry::cb_ip_field(Fl_Widget* w, void* v) {
 	// Update other views if editing or logging
 	switch (that->qso_data_->logging_state()) {
 	case qso_data::QSO_INACTIVE:
-	case qso_data::QSO_PENDING:
 	case qso_data::QSO_VIEW:
 		break;
 	case qso_data::NET_STARTED:
@@ -693,8 +693,10 @@ void qso_entry::cb_ip_field(Fl_Widget* w, void* v) {
 			that->parent()->redraw();
 		}
 		// drop through
+	case qso_data::QSO_PENDING:
 	case qso_data::QSO_STARTED:
 	case qso_data::QSO_EDIT:
+	case qso_data::QSO_ENTER:
 		that->enable_widgets();
 		that->qso_data_->enable_widgets();
 		tabbed_forms_->update_views(nullptr, HT_MINOR_CHANGE, that->qso_number_);
@@ -730,8 +732,10 @@ void qso_entry::cb_ip_notes(Fl_Widget* w, void* v) {
 	qso_entry* that = ancestor_view<qso_entry>(w);
 	string notes;
 	cb_value<intl_input, string>(w, &notes);
-	that->qso_->item("NOTES", notes);
-	tabbed_forms_->update_views(nullptr, HT_MINOR_CHANGE, book_->size() - 1);
+	if (that->qso_) {
+		that->qso_->item("NOTES", notes);
+		tabbed_forms_->update_views(nullptr, HT_MINOR_CHANGE, that->qso_number_);
+	}
 }
 
 // Get current qso

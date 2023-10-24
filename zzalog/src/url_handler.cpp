@@ -2,6 +2,8 @@
 
 #include <FL/fl_ask.H>
 
+extern bool DEBUG_CURL;
+
 mutex url_handler::lock_;
 
 // Constructor
@@ -119,11 +121,12 @@ bool url_handler::post_url(string url, string resource, istream* req, ostream* r
 	/* some servers don't like requests that are made without a user-agent
 	field, so we provide one */
 	curl_easy_setopt(curl_, CURLOPT_USERAGENT, "libcurl-agent/1.0");
-#ifdef _DEBUG
-	// Add extra verbosity
-	curl_easy_setopt(curl_, CURLOPT_DEBUGFUNCTION, cb_debug);
-	curl_easy_setopt(curl_, CURLOPT_VERBOSE, 1);
-#endif
+
+	if (DEBUG_CURL) {
+		// Add extra verbosity
+		curl_easy_setopt(curl_, CURLOPT_DEBUGFUNCTION, cb_debug);
+		curl_easy_setopt(curl_, CURLOPT_VERBOSE, 1);
+	}
 	/* get it! */
 	result = curl_easy_perform(curl_);
 
@@ -193,11 +196,11 @@ bool url_handler::post_form(string url, vector<field_pair> fields, istream* req,
 	}
 	// Add the form to the post
 	curl_easy_setopt(curl_, CURLOPT_MIMEPOST, form);
-#ifdef _DEBUG
-	// Add extra verbosity
-	curl_easy_setopt(curl_, CURLOPT_DEBUGFUNCTION, cb_debug);
-	curl_easy_setopt(curl_, CURLOPT_VERBOSE, 1);
-#endif
+	if (DEBUG_CURL) {
+		// Add extra verbosity
+		curl_easy_setopt(curl_, CURLOPT_DEBUGFUNCTION, cb_debug);
+		curl_easy_setopt(curl_, CURLOPT_VERBOSE, 1);
+	}
 	/* get it! */
 	result = curl_easy_perform(curl_);
 

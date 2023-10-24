@@ -76,17 +76,22 @@ string PROGRAM_ID = "ZZALOG";
 string PROG_ID = "ZLG";
 string VERSION = "3.4.49";
 string TIMESTAMP = __DATE__ + string(" ") + __TIME__;
-#ifdef _DEBUG
-string PROGRAM_VERSION = VERSION + " (Debug " + TIMESTAMP + ")";
-#else
-string PROGRAM_VERSION = VERSION;
-#endif
+string PROGRAM_VERSION = VERSION + " -- "  + TIMESTAMP;
 string VENDOR = "GM3ZZA";
-// Allow hamlib debug level to be set by -D
-#ifndef HAMLIB_DEBUG_LEVEL
-#define HAMLIB_DEBUG_LEVEL RIG_DEBUG_NONE
-#endif
-unsigned int DEBUG_ITEMS = DEBUG_ERRORS;
+
+// switches
+// Debug levels
+bool DEBUG_ERRORS = true;
+bool DEBUG_THREADS = false;
+bool DEBUG_CURL = false;
+bool DEBUG_STATUS = false;
+rig_debug_level_e HAMLIB_DEBUG_LEVEL = RIG_DEBUG_ERR;
+bool AUTO_UPLOAD = true;
+bool AUTO_SAVE = true;
+bool READ_ONLY = false;
+bool RESUME_SESSION = false;
+bool VERBOSE = false;
+bool HELP = false;
 
 // Ticker values
 double TICK = 0.1;      // 100 ms
@@ -124,8 +129,6 @@ qso_manager* qso_manager_ = nullptr;
 #ifdef _WIN32
 dxa_if* dxa_if_ = nullptr;
 #endif
-// Readonly flag on command-line
-bool read_only_ = false;
 // Recent files opened
 list<string> recent_files_;
 
@@ -149,6 +152,8 @@ double prev_freq_ = 0.0;
 bool resuming_ = false;
 // Ticker counter - max value = 0.1 * 2^64 seconds = a long time
 uint64_t ticks_ = 0;
+// Filename in arguments
+char* filename_ = nullptr;
 
 static void cb_ticker(void* v) {
 	// Units that require 1s tick
@@ -241,7 +246,7 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 				break;
 			case 1:
 				// Save and Exit
-				if (read_only_) {
+				if (READ_ONLY) {
 					// Open the Save As dialog and save
 					menu::cb_mi_file_saveas(w, (void*)OT_MAIN);
 				}
@@ -289,13 +294,124 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 // Callback to parse arguments
 // -r | --read_only : marks the file read-only
 int cb_args(int argc, char** argv, int& i) {
-	// Look for read_only (-r or --read_only)
-	if (strcmp("-r", argv[i]) == 0 || strcmp("--read_only", argv[i]) == 0) {
-		read_only_ = true;
-		i += 1;
-		return 1;
+	int i_init = i;
+
+	// Process all arguments
+	while (i < argc) {
+		// Look for read_only (-r or --read_only)
+		if (strcmp("-r", argv[i]) == 0 || strcmp("--read_only", argv[i]) == 0) {
+			READ_ONLY = true;
+			i += 1;
+		}
+		// Look for test mode (-t or --test) 
+		else if (strcmp("-t", argv[i]) == 0 || strcmp("--test", argv[i]) == 0) {
+			AUTO_UPLOAD = false;
+			AUTO_SAVE = false;
+			i += 1;
+		}
+		// No auto upload
+		else if (strcmp("-q", argv[i]) == 0 || strcmp("--quiet", argv[i]) == 0) {
+			AUTO_UPLOAD = false;
+			i += 1;
+		} 
+		// No auto save
+		else if (strcmp("-w", argv[i]) == 0 || strcmp("--wait_save", argv[i]) == 0) {
+			AUTO_SAVE = false;
+			i += 1;
+		}
+		// Resume session
+		else if (strcmp("-m", argv[i]) == 0 || strcmp("--resume", argv[i]) == 0) {
+			RESUME_SESSION = true;
+			i += 1;
+		}
+		// Help
+		else if (strcmp("-h", argv[i]) == 0 || strcmp("--help", argv[i]) == 0) {
+			HELP = true;
+			i += 1;
+		}
+		// Debug
+		else if (strcmp("-d", argv[i]) == 0 || strcmp("--debug", argv[i]) == 0) {
+			i += 1;
+			bool debugs = true;
+			while (debugs && i < argc) {
+				int save_i = i;
+				if (strcmp("e", argv[i]) == 0 || strcmp("errors", argv[i]) == 0) {
+					DEBUG_ERRORS = true;
+					i += 1;
+				}
+				else if (strcmp("noe", argv[i]) == 0 || strcmp("noerrors", argv[i]) == 0) {
+					DEBUG_ERRORS = false;
+					i += 1;
+				}
+				else if (strcmp("t", argv[i]) == 0 || strcmp("threads", argv[i]) == 0) {
+					DEBUG_THREADS = true;
+					i += 1;
+				}
+				else if (strcmp("not", argv[i]) == 0 || strcmp("nothreads", argv[i]) == 0) {
+					DEBUG_THREADS = false;
+					i += 1;
+				}
+				else if (strcmp("c", argv[i]) == 0 || strcmp("curl", argv[i]) == 0) {
+					DEBUG_CURL = true;
+					i += 1;
+				}
+				else if (strcmp("noc", argv[i]) == 0 || strcmp("nocurl", argv[i]) == 0) {
+					DEBUG_CURL = false;
+					i += 1;
+				}
+				else if (strcmp("s", argv[i]) == 0 || strcmp("status", argv[i]) == 0) {
+					DEBUG_STATUS = true;
+					i += 1;
+				}
+				else if (strcmp("nos", argv[i]) == 0 || strcmp("nostatus", argv[i]) == 0) {
+					DEBUG_STATUS = false;
+					i += 1;
+				}
+				else if (strncmp("h=", argv[i], 2) == 0) {
+					int v = atoi(argv[i] + 2);
+					HAMLIB_DEBUG_LEVEL = (rig_debug_level_e)v;
+					i += 1;
+				}
+				else if (strncmp("hamlib=", argv[i], 7) == 0) {
+					int v = atoi(argv[i] + 7);
+					HAMLIB_DEBUG_LEVEL = (rig_debug_level_e)v;
+					i += 1;
+				}
+				// Not processed any parameter
+				if (i == save_i) debugs = false;
+			}
+		}
+		// Hopefully last switch
+		else if (*argv[i] != '-') {
+			filename_ = argv[i];
+			i += 1;
+		}
 	}
-	return 0;
+	return i - i_init;
+}
+
+// Show help listing
+void show_help() {
+	char text[] = 
+	"zzalog [switches] [filename] \n"
+	"\n"
+	"switches:\n"
+	"\t-d|--debug [mode...]\n"
+	"\t\tc|curl\tincrease verbosity from libcurl\n"
+	"\t\t\tnoc|nocurl\n"
+	"\t\te|errors\tprovide more details on errors\n"
+	"\t\t\tnoe|noerrors\n"
+	"\t\th=N|hamlib=N\tSet hamlib debug level (default ERRORS)\n"
+	"\t\tt|threads\tProvide debug tracing on thread use\n"
+	"\t\t\tnot|nothreads\n"
+	"\t-h|--help\tPrint this\n"
+	"\t-m|--resume\tResume the previous session\n"
+	"\t-q|--quiet\tDo not publish QSOs to online sites\n"
+	"\t-r|--read_only\tOpen file in read only mode\n"
+	"\t-t|--test\tTest mode: infers -q -w\n"
+	"\t-w|--wait_save\tDo not automatically save each change\n"
+	"\n";
+	printf(text);
 }
 
 // Use supplied argument, or read the latest file from settings or open file chooser if that's an empty string
@@ -613,6 +729,11 @@ int main(int argc, char** argv)
 	// Parse command-line arguments - accept FLTK standard arguments and custom ones (in cb_args)
 	int i = 1;
 	Fl::args(argc, argv, i, cb_args);
+	if (HELP) {
+		// Help requested - display help text and exit
+		show_help();
+		return 0;
+	}
 	// Create the settings before anything else 
 	settings_ = new Fl_Preferences(Fl_Preferences::USER, VENDOR.c_str(), PROGRAM_ID.c_str());
 	// Create window
@@ -633,7 +754,7 @@ int main(int argc, char** argv)
 	add_data();
 	Fl::check();
 	// Read in log book data - uses progress - use supplied argument for filename
-	add_book(argc == 1 ? nullptr : argv[argc - 1]);
+	add_book(filename_);
 	Fl::check();
 	// Connect to the rig - load all hamlib backends once only here
 	rig_set_debug(HAMLIB_DEBUG_LEVEL);

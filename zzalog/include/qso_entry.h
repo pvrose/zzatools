@@ -37,7 +37,7 @@ public:
 		{ CF_DATE, { "QSO_DATE" } },
 		{ CF_TIME, { "QSO_DATE_OFF", "TIME_ON", "TIME_OFF" } },
 		{ CF_CALL, { "CALL" }},
-		{ CF_DETAILS, { "NAME", "QTH", "DXCC", "STATE", "CNTY", "GRIDSQUARE", "CQZ", "ITUZ" } },
+		{ CF_DETAILS, { "NAME", "QTH", "DXCC", "STATE", "CNTY", "GRIDSQUARE", "CQZ", "ITUZ", "NOTES" } },
 		{ CF_REPORTS, { "RST_SENT", "RST_RCVD", "SRX", "STX" }}
 	};
 

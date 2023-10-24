@@ -803,18 +803,7 @@ bool import_data::download_data(import_data::update_mode_t server) {
 		status_->misc_status(ST_NOTE, "IMPORT: Downloading eQSL");
 		eqsl_handler_->enable_fetch(eqsl_handler::EQ_PAUSE);
 		result = eqsl_handler_->download_eqsl_log(&adif);
-#ifdef _DEBUG
-		// Give developer a choice of whether to downloag eQSL images
-		fl_beep(FL_BEEP_QUESTION);
-		if (fl_choice("You are in debug mode. Do you want to download eQSL images?", "YES", "NO", nullptr) == 1) {
-			eqsl_handler_->debug_enable(false);
-		}
-		else {
-			eqsl_handler_->debug_enable(true);
-		}
-#else
 		eqsl_handler_->debug_enable(true);
-#endif
 		break;
 	case LOTW_UPDATE:
 		// Fetch inbox from LotW into local stream

@@ -22,7 +22,7 @@ extern Fl_Preferences* settings_;
 extern status* status_;
 extern book* book_;
 extern qso_manager* qso_manager_;
-extern unsigned int DEBUG_ITEMS;
+extern bool DEBUG_THREADS;
 
 // Constructor 
 club_handler::club_handler() {
@@ -31,7 +31,7 @@ club_handler::club_handler() {
 	// Initialise thread interface
 	run_threads_ = true;
 	upload_response_ = 0;
-	if (DEBUG_ITEMS & DEBUG_THREADS) printf("CLUBLOG MAIN: Starting thread\n");
+	if (DEBUG_THREADS) printf("CLUBLOG MAIN: Starting thread\n");
 	th_upload_ = new thread(thread_run, this);
 
 }
@@ -273,7 +273,7 @@ bool club_handler::upload_single_qso(qso_num_t record_num) {
 	}
 	if (upload_qso) {
 		record* this_record = book_->get_record(record_num, false);
-		if (DEBUG_ITEMS & DEBUG_THREADS) printf("CLUBLOG MAIN: Queueing request %s\n", this_record->item("CALL").c_str());
+		if (DEBUG_THREADS) printf("CLUBLOG MAIN: Queueing request %s\n", this_record->item("CALL").c_str());
 		upload_lock_.lock();
 		upload_queue_.push(this_record);
 		upload_done_queue_.push(this_record);
@@ -303,7 +303,7 @@ void club_handler::th_upload(record* this_record) {
 
 	}
 	upload_response_ = ok;
-	if (DEBUG_ITEMS & DEBUG_THREADS) printf("CLUBLOG THREAD: Calling thread callback result = %d(%s)\n",
+	if (DEBUG_THREADS) printf("CLUBLOG THREAD: Calling thread callback result = %d(%s)\n",
 	    ok, upload_error_.c_str());
 	Fl::awake(cb_upload_done, (void*)this);
 	this_thread::yield();
@@ -336,13 +336,13 @@ bool club_handler::upload_done(bool response) {
 }
 
 void club_handler::cb_upload_done(void* v) {
-	if (DEBUG_ITEMS & DEBUG_THREADS) printf("CLUBLOG MAIN: Entered thread callback handler\n");
+	if (DEBUG_THREADS) printf("CLUBLOG MAIN: Entered thread callback handler\n");
 	club_handler* that = (club_handler*)v;
 	that->upload_done(that->upload_response_);
 }
 
 void club_handler::thread_run(club_handler* that) {
-	if (DEBUG_ITEMS & DEBUG_THREADS) printf("CLUBLOG THREAD: Thread started\n");
+	if (DEBUG_THREADS) printf("CLUBLOG THREAD: Thread started\n");
 	while (that->run_threads_) {
 		// Wait until qso placed on interface
 		while (that->run_threads_ && that->upload_queue_.empty()) {
@@ -353,7 +353,7 @@ void club_handler::thread_run(club_handler* that) {
 		if (!that->upload_queue_.empty()) {
 			record* qso = that->upload_queue_.front();
 			that->upload_queue_.pop();
-			if (DEBUG_ITEMS & DEBUG_THREADS) printf("CLUBLOG THREAD: Received request %s\n", qso->item("CALL").c_str());
+			if (DEBUG_THREADS) printf("CLUBLOG THREAD: Received request %s\n", qso->item("CALL").c_str());
 			that->upload_lock_.unlock();
 			that->th_upload(qso);
 		}

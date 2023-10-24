@@ -78,12 +78,12 @@ endif
 # Create a target to run the compiled code
 .PHONY: run
 run: $(EXEC_DIR)/$(TARGET_EXEC)
-	$(EXEC_DIR)/$(TARGET_EXEC)
+	$(EXEC_DIR)/$(TARGET_EXEC) $(ARGS)
 
 # Create a target to run debugger
 .PHONY: debug
 debug: $(EXEC_DIR)/$(TARGET_EXEC)
-	$(DBG) $(EXEC_DIR)/$(TARGET_EXEC)
+	$(DBG) --args $(EXEC_DIR)/$(TARGET_EXEC) $(ARGS)
 
 .PHONY: clean
 clean:

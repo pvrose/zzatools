@@ -17,7 +17,7 @@
 
 using namespace std;
 
-extern unsigned int DEBUG_ITEMS;
+extern bool DEBUG_ERRORS;
 
 	// Datatypes to pass to radio and or_check button callbacks 
 	struct radio_param_t {
@@ -179,7 +179,7 @@ extern unsigned int DEBUG_ITEMS;
 			break;
 		case -1:
 			// Error from dialog
-			if (DEBUG_ITEMS & DEBUG_ERRORS) printf("ERROR: %s", chooser->errmsg());
+			if (DEBUG_ERRORS) printf("ERROR: %s", chooser->errmsg());
 			break;
 		case 1:
 			// Ignore user Cancel
@@ -207,7 +207,7 @@ extern unsigned int DEBUG_ITEMS;
 			break;
 		case -1:
 			// Error from dialog
-			if (DEBUG_ITEMS & DEBUG_ERRORS) printf("ERROR: %s", chooser->errmsg());
+			if (DEBUG_ERRORS) printf("ERROR: %s", chooser->errmsg());
 			break;
 		case 1:
 			// Ignore user Cancel
