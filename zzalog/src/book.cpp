@@ -55,6 +55,7 @@ extern string PROGRAM_ID;
 extern string PROGRAM_VERSION;
 extern time_t session_start_;
 extern bool AUTO_SAVE;
+extern bool AUTO_UPLOAD;
 extern bool RESUME_SESSION;
 
 
@@ -1576,14 +1577,19 @@ bool book::delete_enabled() {
 
 // Upload the latest QSO imported to eQSL, LotW and Clublog
 bool book::upload_qso(qso_num_t record_num) {
-	enable_save(false);
-	bool ok = eqsl_handler_->upload_single_qso(record_num);
-	if (!lotw_handler_->upload_single_qso(record_num)) ok = false;
-	if (!club_handler_->upload_single_qso(record_num)) ok = false;
-	// Clear flag as already handled new record features
-	new_record_ = false;
-	enable_save(true);
-	return ok;
+	if (AUTO_UPLOAD) {
+		enable_save(false);
+		bool ok = eqsl_handler_->upload_single_qso(record_num);
+		if (!lotw_handler_->upload_single_qso(record_num)) ok = false;
+		if (!club_handler_->upload_single_qso(record_num)) ok = false;
+		// Clear flag as already handled new record features
+		new_record_ = false;
+		enable_save(true);
+		return ok;
+	} else {
+		status_->misc_status(ST_WARNING, "LOG: QSO uploads inhibited");
+		return false;
+	}
 }
 
 // Return the been_modified_ flag

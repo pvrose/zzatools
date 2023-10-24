@@ -103,8 +103,6 @@ using namespace std;
 		bool requests_queued();
 		// get the local card file-name
 		string card_filename_l(record* record);
-		// Set/Clear debug_enabled_
-		void debug_enable(bool value);
 		// Enqueue single record
 		bool upload_single_qso(qso_num_t record_num);
 
@@ -151,8 +149,6 @@ using namespace std;
 		dequeue_param_t dequeue_parameter_;
 		// Request queue is allowed to empty
 		bool empty_queue_enable_;
-		// Queue enabled for debug
-		bool debug_enabled_;
 		// Username
 		string username_;
 		// Password

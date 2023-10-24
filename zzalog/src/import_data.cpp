@@ -803,7 +803,6 @@ bool import_data::download_data(import_data::update_mode_t server) {
 		status_->misc_status(ST_NOTE, "IMPORT: Downloading eQSL");
 		eqsl_handler_->enable_fetch(eqsl_handler::EQ_PAUSE);
 		result = eqsl_handler_->download_eqsl_log(&adif);
-		eqsl_handler_->debug_enable(true);
 		break;
 	case LOTW_UPDATE:
 		// Fetch inbox from LotW into local stream

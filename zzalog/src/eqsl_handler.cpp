@@ -34,7 +34,6 @@ extern bool DEBUG_THREADS;
 eqsl_handler::eqsl_handler()
 	: empty_queue_enable_(false)
 	, dequeue_parameter_({ &request_queue_, this })
-	, debug_enabled_(true)
 {
 	run_threads_ = true;
 	if (DEBUG_THREADS) printf("EQSL MAIN: Starting thread\n");
@@ -65,17 +64,15 @@ eqsl_handler::~eqsl_handler()
 // Put the image request on to the queue 
 void eqsl_handler::enqueue_request(qso_num_t record_num, bool force /*=false*/) {
 	// eQSL requests can be disabled when compiled with _DEBUG
-	if (debug_enabled_) {
-		// Inhibit saving log
-		book_->enable_save(false);
-		// Enqueue request
-		request_queue_.push(request_t(record_num, force));
-		// Update status
-		char message[512];
-		sprintf(message, "EQSL: %zu Card requests pending", request_queue_.size());
-		qso_manager_->qsl_control()->update_eqsl(request_queue_.size());
-		status_->misc_status(ST_NOTE, message);
-	}
+	// Inhibit saving log
+	book_->enable_save(false);
+	// Enqueue request
+	request_queue_.push(request_t(record_num, force));
+	// Update status
+	char message[512];
+	sprintf(message, "EQSL: %zu Card requests pending", request_queue_.size());
+	qso_manager_->qsl_control()->update_eqsl(request_queue_.size());
+	status_->misc_status(ST_NOTE, message);
 }
 
 // handle the timeout for the request queue - it takes the first request in the queue and sends it to eQSL.cc
@@ -880,12 +877,6 @@ map<string, string> eqsl_handler::parse_warning(string text) {
 	}
 	return result;
 }
-
-// Set/clear debug_enabled
-void eqsl_handler::debug_enable(bool value) {
-	debug_enabled_ = value;
-}
-
 
 // Upload single QSO to eQSL.cc
 bool eqsl_handler::upload_single_qso(qso_num_t record_num) {
