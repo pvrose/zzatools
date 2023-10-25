@@ -26,7 +26,7 @@ const int LINE_MARGIN = 1;
 const int LINE_WIDTH = 1;
 const Fl_Font PRINT_FONT = FL_HELVETICA;
 const int HEADER_SIZE = 12;
-const int ROW_SIZE = 9;
+const int ROW_SIZE = 8;
 
 // Constructor - supply the book to print (main log or extract or extract(cards))
 printer::printer(object_t type) :
@@ -267,7 +267,7 @@ void printer::print_record(record* record) {
 		// Limit drawing area to the cell
 		fl_push_clip(current_x + 1, current_y_, it->width - 2, height);
 		// Draw the text
-		fl_draw(record->item(it->field, true).c_str(), current_x + 1, current_y_ + delta_y);
+		fl_draw(record->item(it->field, true, true).c_str(), current_x + 1, current_y_ + delta_y);
 		// Inter field lines
 		if (it != fields_.begin()) {
 			fl_color(FL_DARK1);
