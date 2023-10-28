@@ -78,7 +78,7 @@ qso_manager::qso_manager(int W, int H, const char* label) :
 	load_values();
 	create_form(0,0);
 	update_rig();
-	update_qso(HT_SELECTED, book_->selection(), -1);
+	// update_qso(HT_SELECTED, book_->selection(), -1);
 
 }
 

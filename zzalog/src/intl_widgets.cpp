@@ -70,10 +70,14 @@ int intl_input::handle(int event) {
 	case FL_FOCUS:
 		if (intl_dialog_) {
 			intl_dialog_->editor(this);
+			return true;
 		}
-		return true;
-	default:
-		// Do normal handling
-		return Fl_Input::handle(event);
+		break;
+	case FL_UNFOCUS:
+		if (intl_dialog_) {
+			return true;
+		}
+		break;
 	}
+	return Fl_Input::handle(event);
 }

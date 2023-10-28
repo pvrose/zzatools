@@ -669,6 +669,7 @@ void book::delete_contents(bool new_book) {
 	used_antennas_.clear();
 	used_callsigns_.clear();
 	used_qths_.clear();
+	used_ops_.clear();
 	bands_per_dxcc_.clear();
 	modes_per_dxcc_.clear();
 	if (new_book && book_type_ == OT_MAIN) {
@@ -1204,12 +1205,12 @@ bool book::get_macro(record* use_record, string macro_name, set<string> field_na
 	string id = use_record->item(macro_name);
 	if (allow_null || id.length()) {
 		macro_defn* defn;
-		bool update_qth = false;
+		bool update = false;
 		if (map.find(id) == map.end()) {
 			defn = new macro_defn;
 			defn->fields = new record;
 			map[id] = defn;
-			update_qth = true;
+			update = true;
 		}
 		else {
 			defn = map.at(id);
@@ -1246,18 +1247,18 @@ bool book::get_macro(record* use_record, string macro_name, set<string> field_na
 								macro_name.c_str(), id.c_str(), (*it).c_str(), old_value.c_str(), value.c_str());
 							status_->misc_status(ST_WARNING, message);
 							defn->fields->item(*it, value);
-							update_qth = true;
+							update = true;
 						}
 					}
 				}
 				else if (old_value.length() == 0) {
 					defn->fields->item(*it, value);
-					update_qth = true;
+					update = true;
 				}
 			}
 		}
 		// description already forms part of defn no need to check it again
-		if (update_qth) {
+		if (update) {
 			// Update the spec data and then the spec ttree viewer
 			defn->description = use_record->item(macro_name + "_DESCR");
 			spec_data_->add_user_macro(macro_name, id, *defn);

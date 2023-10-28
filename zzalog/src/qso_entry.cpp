@@ -55,6 +55,9 @@ int qso_entry::handle(int event) {
 	case FL_SHOW:
 		set_initial_focus();
 		return 1;
+	case FL_HIDE:
+		// Don't do anything but absorb the event
+		return 1;
 	}
 	return Fl_Group::handle(event);
 }

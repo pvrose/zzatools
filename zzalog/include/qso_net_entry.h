@@ -1,6 +1,7 @@
 #pragma once
 
 #include "record.h"
+#include "qso_entry.h"
 
 #include <FL/Fl_Tabs.H>
 #include <FL/Fl_Group.H>
@@ -48,9 +49,11 @@ public:
 	// Ticker
 	void ticker();
 	// SElected entry
-	Fl_Widget* entry();
+	qso_entry* entry();
+	// Most recent entry
+	qso_entry* last_entry();
 	// Set entry
-	void entry(Fl_Widget* w);
+	void entry(qso_entry* w);
 	// Number of entries
 	int entries();
 

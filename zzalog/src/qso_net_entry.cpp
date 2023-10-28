@@ -55,18 +55,23 @@ void qso_net_entry::create_form(int X, int Y) {
 	end();
 }
 
-Fl_Widget* qso_net_entry::entry() {
-	return entries_->value();
+qso_entry* qso_net_entry::entry() {
+	return (qso_entry*)entries_->value();
 }
 
-void qso_net_entry::entry(Fl_Widget* w) {
-	entries_->value(w);
+void qso_net_entry::entry(qso_entry* w) {
+	int ok = entries_->value(w);
 }
 
 int qso_net_entry::entries() {
 	return entries_->children();
 }
 
+qso_entry* qso_net_entry::last_entry() {
+	int ix = entries_->children() - 1;
+	Fl_Widget* w = entries_->child(ix);
+	return (qso_entry*)w;
+}
 // Enable/disable widgets - pass on to children
 void qso_net_entry::enable_widgets() {
 	for (int cx = 0; cx < entries_->children(); cx++) {
@@ -88,16 +93,17 @@ void qso_net_entry::save_values() {}
 
 // Return QSO - return open tab's QSO
 record* qso_net_entry::qso() {
-	return ((qso_entry*)entries_->value())->qso();
+	return entry()->qso();
 }
 
 // Return record number - return open tab;s QSO number
 qso_num_t qso_net_entry::qso_number() {
-	return ((qso_entry*)entries_->value())->qso_number();
+	return entry()->qso_number();
 }
 
 // Add QSO - add a tab
 void qso_net_entry::add_entry() {
+	begin();
 	int rx = 0;
 	int ry = 0;
 	int rw = 0;
@@ -107,8 +113,10 @@ void qso_net_entry::add_entry() {
 	entries_->begin();
 	qso_entry* wx = new qso_entry(rx, ry, rw, rh, "");
 	wx->labelsize(FL_NORMAL_SIZE + 2);
+	entries_->add(wx);
 	entries_->end();
-	entries_->value(wx);
+	end();
+	entry(wx);
 	
 }
 

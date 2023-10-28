@@ -617,7 +617,7 @@ void qso_data::action_new_qso(record* qso, qso_init_t mode) {
 	case NET_STARTED:
 	case NET_EDIT:
 	case NET_ADDING:
-		qe = (qso_entry*)g_net_entry_->entry();
+		qe = g_net_entry_->entry();
 		break;
 	case QSO_PEEK:
 	case QSO_PEEK_ED:
@@ -630,6 +630,7 @@ void qso_data::action_new_qso(record* qso, qso_init_t mode) {
 		qe = g_entry_;
 		break;
 	}
+	printf("DEBUG: Creating QSO in %p\n", qe);
 	rig_if* rig = ((qso_manager*)parent())->rig();
 	qso_init_t new_mode = (mode == QSO_AS_WAS) ? previous_mode_ : mode;
 	switch (new_mode) {
@@ -1157,7 +1158,7 @@ void qso_data::action_create_net() {
 	char msg[128];
 	g_net_entry_->set_qso(qso_number);
 	g_net_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
-	Fl_Widget* w = g_net_entry_->entry();
+	qso_entry* w = g_net_entry_->entry();
 	switch (logging_state_) {
 	case QSO_STARTED:
 		logging_state_ = NET_STARTED;
@@ -1275,7 +1276,7 @@ void qso_data::action_cancel_net_edit() {
 		logging_state_ = QSO_INACTIVE;
 	}
 	else {
-		((qso_entry*)g_net_entry_->entry())->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
+		g_net_entry_->entry()->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
 		logging_state_ = NET_EDIT;
 	}
 	book_->enable_save(true);
@@ -1284,9 +1285,9 @@ void qso_data::action_cancel_net_edit() {
 
 // Start a modem record
 void qso_data::action_add_modem(record* qso) {
+	printf("DEBUG: action_add_modem\n");
 	// Add to book
 	book_->enable_save(false);
-	printf("DEBUG: Start modme\n");
 	action_new_qso(qso, QSO_COPY_MODEM);
 	g_entry_->append_qso();
 	logging_state_ = QSO_MODEM;
@@ -1296,6 +1297,7 @@ void qso_data::action_add_modem(record* qso) {
 
 // Update or replace a modem record
 void qso_data::action_update_modem(record* qso) {
+	printf("DEBUG: action_update_modem\n");
 	// Compare with existing
 	if (qso != current_qso()) {
 		printf("Received QSO %s current %s\n", qso->item("CALL").c_str(), current_qso()->item("CALL").c_str());
@@ -1323,6 +1325,7 @@ void qso_data::action_update_modem(record* qso) {
 
 // Cancel modem operation
 void qso_data::action_cancel_modem() {
+	printf("DEBUG: action_cancel_modem\n");
 	if (current_qso()->item("QSO_COMPLETE") == "") {
 		// Complete so should save it
 		action_save();
@@ -1336,6 +1339,7 @@ void qso_data::action_cancel_modem() {
 
 // Action PEEK - interrupt current state and peek at supplied qso
 void qso_data::action_peek(qso_num_t number) {
+	printf("DEBUG: action_peek\n");
 	// SAve the current state unless it is already peeking
 	// Either QSO_PEEK or QSO_PEEK_ED
 	switch (logging_state_) {
@@ -1370,12 +1374,14 @@ void qso_data::action_peek(qso_num_t number) {
 
 // Action CANCEL_PEEK - restore interrupted state
 void qso_data::action_cancel_peek() {
+	printf("DEBUG: action_cancel_peek\n");
 	logging_state_ = interrupted_state_;
 	enable_widgets();
 }
 
 // Action EDIT_PEEK - close down existing edit
 void qso_data::action_edit_peek() {
+	printf("DEBUG: action_edit_peek\n");
 	bool existing_entry = false;
 	switch (interrupted_state_) {
 	case QSO_EDIT:
@@ -1434,6 +1440,7 @@ void qso_data::action_edit_peek() {
 
 // Create a query entry
 void qso_data::action_query_entry() {
+	printf("DEBUG: action_query_entry\n");
 	g_qy_entry_->qso(-1);
 	logging_state_ = MANUAL_ENTRY;
 	g_qy_entry_->copy_default_to_qso();
@@ -1443,6 +1450,7 @@ void qso_data::action_query_entry() {
 
 // Execute the query
 void qso_data::action_exec_query() {
+	printf("DEBUG: action_exec_query\n");
 	record* qso = g_qy_entry_->qso();
 	extract_records_->clear_criteria();
 	qso->update_band();
@@ -1476,6 +1484,7 @@ void qso_data::action_exec_query() {
 
 // Abandon the query
 void qso_data::action_cancel_query() {
+	printf("DEBUG: action_cancel_query\n");
 	g_qy_entry_->delete_qso();
 	logging_state_ = QSO_INACTIVE;
 	enable_widgets();
@@ -1483,6 +1492,7 @@ void qso_data::action_cancel_query() {
 
 // Import the query
 void qso_data::action_import_query() {
+	printf("DEBUG: action_import_query\n");
 	import_data_->stop_update(false);
 	while (!import_data_->update_complete()) Fl::check();
 	import_data_->load_record(g_qy_entry_->qso());
@@ -1494,6 +1504,7 @@ void qso_data::action_import_query() {
 
 // Open QRZ.com page
 void qso_data::action_qrz_com() {
+	printf("DEBUG: action_qrz_com\n");
 	record* qso = current_qso();
 	qrz_handler_->open_web_page(qso->item("CALL"));
 }
