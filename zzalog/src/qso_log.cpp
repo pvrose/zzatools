@@ -74,6 +74,7 @@ void qso_log::save_values() {
 // 1s clock interface
 void qso_log::ticker() {
 	log_info_->ticker();
+	qsl_ctrl_->ticker();
 }
 
 // Callback

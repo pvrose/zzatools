@@ -7,6 +7,7 @@
 #include <FL/Fl_Check_Button.H>
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Output.H>
+#include <FL/Fl_Progress.H>
 
 class qso_qsl :
     public Fl_Group
@@ -30,6 +31,8 @@ public:
 
     // Update eQSL image download count
     void update_eqsl(int count);
+
+    void ticker();
 
 protected:
     // callbacks
@@ -56,6 +59,8 @@ protected:
 
     // Outstanding eQSL downloads
     int os_eqsl_dnld_;
+    // Ticker count
+    float tkr_value_;
 
     // Widgets
     Fl_Check_Button* bn_auto_eqsl_;
@@ -76,7 +81,7 @@ protected:
     Fl_Button* bn_cncl_lotw_;
     Fl_Button* bn_cncl_club_;
     Fl_Button* bn_cncl_card_;
-    Fl_Output* op_eqsl_count_;
+    Fl_Progress* op_eqsl_count_;
 
 };
 

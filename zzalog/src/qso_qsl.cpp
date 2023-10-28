@@ -27,6 +27,7 @@ qso_qsl::qso_qsl(int X, int Y, int W, int H, const char* L) :
 	//align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 	box(FL_BORDER_BOX);
 	os_eqsl_dnld_ = 0;
+	tkr_value_ = 0.0;
 	load_values();
 	create_form();
 	enable_widgets();
@@ -103,11 +104,15 @@ void qso_qsl::create_form() {
 	bn_cncl_eqsl_->callback(cb_cancel, (void*)extract_data::EQSL);
 	bn_cncl_eqsl_->tooltip("Cancel upload");
 	// Fetch cards
-	op_eqsl_count_ = new Fl_Output(C7, curr_y, W7, HBUTTON);
+	op_eqsl_count_ = new Fl_Progress(C7, curr_y, W7, HBUTTON);
 	char text[10];
 	snprintf(text, sizeof(text), "%d", os_eqsl_dnld_);
-	op_eqsl_count_->value(text);
+	op_eqsl_count_->copy_label(text);
 	op_eqsl_count_->tooltip("Displays the number of outstanding image downloads");
+	op_eqsl_count_->minimum(0.0);
+	op_eqsl_count_->maximum(1.0);
+	op_eqsl_count_->value(0.0);
+	op_eqsl_count_->color(FL_WHITE, FL_YELLOW);
 	//bn_down_ecard_ = new Fl_Button(C6, curr_y, W6, HBUTTON, "eCards");
 	//bn_down_ecard_->callback(cb_fetch);
 	//bn_down_ecard_->tooltip("Fetch any eQSL card images missing");
@@ -273,21 +278,24 @@ void qso_qsl::enable_widgets() {
 		bn_cncl_card_->deactivate();
 	}
 	char text[10];
-	int curr = atoi(op_eqsl_count_->value());
+	int curr = atoi(op_eqsl_count_->label());
 	snprintf(text, sizeof(text), "%d", os_eqsl_dnld_);
-	op_eqsl_count_->value(text);
+	op_eqsl_count_->copy_label(text);
 	if (os_eqsl_dnld_ == 0) {
-		op_eqsl_count_->textcolor(FL_BLACK);
-		op_eqsl_count_->textfont(0);
+		op_eqsl_count_->labelcolor(FL_BLACK);
+		op_eqsl_count_->labelfont(0);
 		op_eqsl_count_->color(FL_BACKGROUND_COLOR);
+		op_eqsl_count_->value(0.0);
 	} else if ( os_eqsl_dnld_ > curr) {
-		op_eqsl_count_->textcolor(FL_BLACK);
-		op_eqsl_count_->textfont(FL_BOLD);
-		op_eqsl_count_->color(FL_WHITE);
+		op_eqsl_count_->labelcolor(FL_BLACK);
+		op_eqsl_count_->labelfont(FL_BOLD);
+		op_eqsl_count_->color(FL_WHITE, FL_YELLOW);
+		op_eqsl_count_->value(tkr_value_);
 	} else {
-		op_eqsl_count_->textcolor(FL_RED);
-		op_eqsl_count_->textfont(FL_BOLD);
-		op_eqsl_count_->color(FL_WHITE);
+		op_eqsl_count_->labelcolor(FL_RED);
+		op_eqsl_count_->labelfont(FL_BOLD);
+		op_eqsl_count_->color(FL_WHITE, FL_YELLOW);
+		op_eqsl_count_->value(tkr_value_);
 	} 
 }
 
@@ -427,5 +435,16 @@ void qso_qsl::qsl_cancel() {
 // Update eQSL download count
 void qso_qsl::update_eqsl(int count) {
 	os_eqsl_dnld_ = count;
+	tkr_value_ = 0.0;
 	enable_widgets();
+}
+
+// Update ticker
+void qso_qsl::ticker() {
+	if (os_eqsl_dnld_ > 0) {
+		if (tkr_value_ < 1.0) {
+			tkr_value_ += 0.1;
+			enable_widgets();
+		}
+	}
 }
