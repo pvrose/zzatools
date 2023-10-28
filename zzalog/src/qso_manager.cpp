@@ -370,7 +370,7 @@ void qso_manager::update_import_qso(record* import_qso) {
 		if (import_qso->item("APP_ZZA_QTH").length() == 0) 
 			import_qso->item("APP_ZZA_QTH", get_default(QTH));
 		if (import_qso->item("APP_ZZA_OP").length() == 0) 
-			import_qso->item("APP_ZZA_OP", get_default(QTH));
+			import_qso->item("APP_ZZA_OP", get_default(OP));
 	}
 }
 
