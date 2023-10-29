@@ -928,7 +928,7 @@ void qso_data::action_cancel_browse() {
 
 // Action navigate button
 void qso_data::action_navigate(int target) {
-	printf("DEBUG: action_navigaten");
+	printf("DEBUG: action_navigate\n");
 	inhibit_drawing_ = true;
 	switch (logging_state_) {
 	case QSO_EDIT:
