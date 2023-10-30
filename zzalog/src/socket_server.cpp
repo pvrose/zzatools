@@ -134,10 +134,19 @@ int socket_server::create_server()
 	switch (protocol_)
 	{
 	case UDP:
+#ifdef _WIN32
+// Windows does not support SOCK_NONBLOCK
+		server_ = socket(AF_INET, SOCK_STREAM, IPPROTO_UDP);
+#else
 		server_ = socket(AF_INET, SOCK_DGRAM | SOCK_NONBLOCK, IPPROTO_UDP);
+#endif
 		break;
 	case HTTP:
+#ifdef _WIN32
+		server_ = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+#else
 		server_ = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, IPPROTO_TCP);
+#endif
 		break;
 	}
 	if (server_ == INVALID_SOCKET)
@@ -190,14 +199,15 @@ int socket_server::create_server()
 		status_->misc_status(ST_OK, message);
 	}
 
-// #ifdef _WIN32
-// 	unsigned long nonblocking = 1;
-// 	if (server_ != INVALID_SOCKET && ioctlsocket(server_, FIONBIO, &nonblocking))
-// 	{
-// 		handle_error("Unable to make socket non-blocking");
-// 		return 1;
-// 	}
-// #endif
+ #ifdef _WIN32
+	// Windows way of supporting non-blocking operations
+ 	unsigned long nonblocking = 1;
+ 	if (server_ != INVALID_SOCKET && ioctlsocket(server_, FIONBIO, &nonblocking))
+ 	{
+ 		handle_error("Unable to make socket non-blocking");
+ 		return 1;
+ 	}
+ #endif
 
 	// Set socket into listening mode
 	if (protocol_ == HTTP)
@@ -215,15 +225,15 @@ int socket_server::create_server()
 			status_->misc_status(ST_OK, message);
 		}
 
-// #ifdef _WIN32
-// 		// Make the client non-blocking as well
-// 		unsigned long nonblocking = 1;
-// 		if (client_ != INVALID_SOCKET && ioctlsocket(client_, FIONBIO, &nonblocking))
-// 		{
-// 			handle_error("Unable to make client socket non-blocking");
-// 			return 1;
-// 		}
-// #endif
+ #ifdef _WIN32
+ 		// Make the client non-blocking as well
+ 		unsigned long nonblocking = 1;
+ 		if (client_ != INVALID_SOCKET && ioctlsocket(client_, FIONBIO, &nonblocking))
+ 		{
+ 			handle_error("Unable to make client socket non-blocking");
+ 			return 1;
+ 		}
+#endif
 	}
 	return 0;
 }
@@ -326,11 +336,13 @@ int socket_server::rcv_packet()
 		{
 			// We can get here through a race between closing and turning the timers off
 			delete[] buffer;
+			buffer = nullptr;
 		}
 		else
 		{
 			handle_error("Unable to read from client");
 			delete[] buffer;
+			buffer = nullptr;
 		}
 #else
 		else
@@ -342,7 +354,7 @@ int socket_server::rcv_packet()
 	} while (!closing_);
 	// Now see if we have another - the timer goes on the scheduling queue so other tasks will get in
 	this_thread::yield();
-	delete[] buffer;
+	if (buffer) delete[] buffer;
 	return 0;
 }
 
