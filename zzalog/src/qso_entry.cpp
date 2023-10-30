@@ -165,6 +165,7 @@ void qso_entry::enable_widgets() {
 				if (ix < number_locked_ + NUMBER_FIXED) ch_field_[ix]->deactivate();
 				else ch_field_[ix]->activate();
 			ip_field_[ix]->activate();
+			ip_field_[ix]->input()->color(FL_WHITE);
 			ip_field_[ix]->type(FL_NORMAL_INPUT);
 		}
 		for (int ix = number_fields_in_use_ + 1; ix < NUMBER_TOTAL; ix++) {
@@ -172,6 +173,7 @@ void qso_entry::enable_widgets() {
 			ip_field_[ix]->deactivate();
 		}
 		ip_notes_->activate();
+		ip_notes_->color(FL_WHITE);
 		ip_notes_->type(FL_NORMAL_INPUT);
 		misc_->activate();
 		misc_->enable_widgets();
@@ -187,6 +189,7 @@ void qso_entry::enable_widgets() {
 				if (ix < number_locked_ + NUMBER_FIXED) ch_field_[ix]->deactivate();
 				else ch_field_[ix]->activate();
 			ip_field_[ix]->activate();
+			ip_field_[ix]->input()->color(FL_WHITE);
 			ip_field_[ix]->type(FL_NORMAL_INPUT);
 		}
 		for (int ix = number_fields_in_use_ + 1; ix < NUMBER_TOTAL; ix++) {
@@ -194,6 +197,7 @@ void qso_entry::enable_widgets() {
 			ip_field_[ix]->deactivate();
 		}
 		ip_notes_->activate();
+		ip_notes_->color(FL_WHITE);
 		ip_notes_->type(FL_NORMAL_INPUT);
 		misc_->activate();
 		misc_->enable_widgets();
@@ -206,6 +210,7 @@ void qso_entry::enable_widgets() {
 				if (ix < number_locked_ + NUMBER_FIXED) ch_field_[ix]->deactivate();
 				else ch_field_[ix]->activate();
 			ip_field_[ix]->activate();
+			ip_field_[ix]->input()->color(FL_BACKGROUND_COLOR);
 			ip_field_[ix]->type(FL_NORMAL_OUTPUT);
 		}
 		for (int ix = number_fields_in_use_ + 1; ix < NUMBER_TOTAL; ix++) {
@@ -213,6 +218,7 @@ void qso_entry::enable_widgets() {
 			ip_field_[ix]->deactivate();
 		}
 		ip_notes_->activate();
+		ip_notes_->color(FL_BACKGROUND_COLOR);
 		ip_notes_->type(FL_NORMAL_OUTPUT);
 		misc_->activate();
 		misc_->enable_widgets();
@@ -223,6 +229,7 @@ void qso_entry::enable_widgets() {
 				if (ix < number_locked_ + NUMBER_FIXED) ch_field_[ix]->deactivate();
 				else ch_field_[ix]->activate();
 			ip_field_[ix]->activate();
+			ip_field_[ix]->input()->color(FL_WHITE);
 			ip_field_[ix]->type(FL_NORMAL_INPUT);
 		}
 		for (int ix = number_fields_in_use_ + 1; ix < NUMBER_TOTAL; ix++) {
@@ -230,6 +237,7 @@ void qso_entry::enable_widgets() {
 			ip_field_[ix]->deactivate();
 		}
 		ip_notes_->activate();
+		ip_notes_->color(FL_WHITE);
 		ip_notes_->type(FL_NORMAL_INPUT);
 		misc_->deactivate();
 		break;
