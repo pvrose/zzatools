@@ -29,7 +29,7 @@ extern qso_manager* qso_manager_;
 extern bool READ_ONLY;
 extern bool close_by_error_;
 extern string PROGRAM_ID;
-extern string VERSION;
+extern string PROGRAM_VERSION;
 extern bool DEBUG_STATUS;
 
 // Constructor
@@ -375,7 +375,7 @@ void status::misc_status(status_t status, const char* label) {
 	if (!status_file_viewer_) {
 		// Create a file viewer if it doesn't exist
 		char title[256];
-		snprintf(title, sizeof(title), "%s %s: Status report file: %s", PROGRAM_ID.c_str(), VERSION.c_str(), report_filename_.c_str());
+		snprintf(title, sizeof(title), "%s %s: Status report file: %s", PROGRAM_ID.c_str(), PROGRAM_VERSION.c_str(), report_filename_.c_str());
 		status_file_viewer_ = new viewer_window(640, 480);
 		status_file_viewer_->copy_label(title);
 		status_file_viewer_->callback(cb_fv_close, this);

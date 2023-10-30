@@ -19,7 +19,7 @@ using namespace std;
 extern url_handler* url_handler_;
 extern status* status_;
 rpc_handler* rpc_handler::that_ = nullptr;
-extern string VERSION;
+extern string PROGRAM_VERSION;
 extern string PROGRAM_ID;
 
 // Constructor
@@ -811,7 +811,7 @@ bool rpc_handler::add_header(http_code code, stringstream& payload, stringstream
 		//	Content-Length : 124
 		resp << "HTTP/1.1 " << code << " OK\r\n";
 		resp << "Date: " << now(false, "%a %d %b %Y %X GMT") << "\r\n";
-		resp << "Server: " << PROGRAM_ID << ". " << VERSION << "\r\n";
+		resp << "Server: " << PROGRAM_ID << ". " << PROGRAM_VERSION << "\r\n";
 		resp << "Content-Type: text/xml\r\n";
 		resp << "Content-Length: " << len_pl << "\r\n";
 		resp << "\r\n";
@@ -820,7 +820,7 @@ bool rpc_handler::add_header(http_code code, stringstream& payload, stringstream
 	case BAD_REQUEST:
 		resp << "HTTP/1.1 " << code << " BAD REQUEST\r\n";
 		resp << "Date: " << now(false, "%a %d %b %Y %X GMT") << "\r\n";
-		resp << "Server: " << PROGRAM_ID << ". " << VERSION << "\r\n";
+		resp << "Server: " << PROGRAM_ID << ". " << PROGRAM_VERSION << "\r\n";
 		resp << "Connection: close\r\n";
 		resp << "\r\n";
 		break;

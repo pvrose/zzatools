@@ -74,9 +74,8 @@ using namespace std;
 string COPYRIGHT = "\xA9 Philip Rose GM3ZZA 2018. All rights reserved.\nPrefix data courtesy of clublog.org";
 string PROGRAM_ID = "ZZALOG";
 string PROG_ID = "ZLG";
-string VERSION = "3.4.51";
+string PROGRAM_VERSION = "3.4.51";
 string TIMESTAMP = __DATE__ + string(" ") + __TIME__;
-string PROGRAM_VERSION = VERSION + " -- "  + TIMESTAMP;
 string VENDOR = "GM3ZZA";
 
 // switches
@@ -562,7 +561,7 @@ void add_dashboard() {
 	if (!closing_) {
 		if (!qso_manager_) {
 			char l[128];
-			snprintf(l, sizeof(l), "%s %s: Operating Dashboard", PROGRAM_ID.c_str(), VERSION.c_str());
+			snprintf(l, sizeof(l), "%s %s: Operating Dashboard", PROGRAM_ID.c_str(), PROGRAM_VERSION.c_str());
 			qso_manager_ = new qso_manager(10, 10, l);
 		}
 		// Get the Operation window
@@ -697,7 +696,8 @@ void print_args(int argc, char** argv) {
 	for (int i = 0; i < argc; i++) {
 		length += strlen(argv[i]);
 	}
-	char* message = new char[length + 10];
+	char message[256];
+	memset(message, 0, sizeof(message));
 	// Generate the string
 	strcpy(message, "ZZALOG: ");
 	for (int i = 0; i < argc; i++) {
@@ -706,8 +706,9 @@ void print_args(int argc, char** argv) {
 	}
 	strcat(message, "Started");
 	status_->misc_status(ST_NOTE, message);
-	strcpy(message, "ZZALOG: ");
-	strcat(message, main_window_->label());
+	snprintf(message, sizeof(message), "ZZALOG: %s", main_window_->label());
+	status_->misc_status(ST_NOTE, message);
+	snprintf(message, sizeof(message), "ZZALOG: Compiled %s", TIMESTAMP.c_str());
 	status_->misc_status(ST_NOTE, message);
 }
 

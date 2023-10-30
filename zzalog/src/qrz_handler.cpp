@@ -24,7 +24,7 @@ extern book* navigation_book_;
 extern menu* menu_;
 extern Fl_Preferences* settings_;
 extern string PROG_ID;
-extern string VERSION;
+extern string PROGRAM_VERSION;
 
 // Constructor
 qrz_handler::qrz_handler() :
@@ -167,9 +167,9 @@ bool qrz_handler::query_merge() {
 string qrz_handler::generate_session_uri() {
 	string result;
 	char format[] = "http://xmldata.qrz.com/xml/current/?username=%s;password=%s;agent=%s%s";
-	int length = strlen(format) + username_.length() + password_.length() + PROG_ID.length() + VERSION.length();
+	int length = strlen(format) + username_.length() + password_.length() + PROG_ID.length() + PROGRAM_VERSION.length();
 	char* uri = new char[length];
-	snprintf(uri, length, format, username_.c_str(), password_.c_str(), PROG_ID.c_str(), VERSION.c_str());
+	snprintf(uri, length, format, username_.c_str(), password_.c_str(), PROG_ID.c_str(), PROGRAM_VERSION.c_str());
 	result = uri;
 	return result;
 }

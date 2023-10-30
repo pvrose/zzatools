@@ -40,7 +40,7 @@ extern toolbar* toolbar_;
 extern qso_manager* qso_manager_;
 extern spec_data* spec_data_;
 extern string PROGRAM_ID;
-extern string VERSION;
+extern string PROGRAM_VERSION;
 
 wsjtx_handler* wsjtx_handler::that_ = nullptr;
 
@@ -137,7 +137,7 @@ int wsjtx_handler::send_hbeat() {
 	// Add the max schema
 	put_uint32(ss, 3);
 	// Add the version
-	put_utf8(ss, VERSION);
+	put_utf8(ss, PROGRAM_VERSION);
 	// Add the revision ""
 	put_uint32(ss, (uint32_t)(~0));
 	
