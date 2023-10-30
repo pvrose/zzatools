@@ -205,6 +205,7 @@ int wsjtx_handler::handle_decode(stringstream& ss) {
 	minutes = minutes - (hours * 60);
 	char t[20];
 	snprintf(t, sizeof(t), "%02d%02d%02.0f", hours, minutes, seconds);
+	// printf("DEBUG: Updating QSO in handle_decode - %s\n", decode.message.c_str());
 	record* qso = update_qso(false, string(t), (double)decode.d_freq, decode.message);
 	if (qso) qso_manager_->update_modem_qso(qso);
 	return 0;
@@ -231,6 +232,7 @@ int wsjtx_handler::handle_reply(stringstream& ss) {
 	minutes = minutes - (hours * 60);
 	char t[20];
 	snprintf(t, sizeof(t), "%02d%02d%02.0f", hours, minutes, seconds);
+	// printf("DEBUG: Updating QSO in handle_reply - %s\n", decode.message.c_str());
 	record* qso = update_qso(false, string(t), (double)decode.d_freq, decode.message);
 	if (qso) qso_manager_->update_modem_qso(qso);
 	return 0;
@@ -292,6 +294,7 @@ int wsjtx_handler::handle_status(stringstream& ss) {
 	mode_ = status.mode;
 	// Create qso
 	if (status.transmitting) {
+		// printf("DEBUG: Updating qso in handle status %s\n", status.tx_message.c_str());
 		record* qso = update_qso(true, now(false, "%H%M%S"), (double)status.tx_offset, status.tx_message);
 		if (qso) qso_manager_->update_modem_qso(qso);
 	}
@@ -1015,6 +1018,7 @@ bool wsjtx_handler::parse_all_txt(record* qso, string line) {
 			}
 		}
 	}
+	// printf("DEBUG: Updating QSO in parse_all_txt %s\n", line.substr(pos).c_str());
 	if (update_qso(tx_record, time_on, audio_frequency, line.substr(pos), qso, dial_frequency, qso->item("MODE")) ) {
 		return true;
 	} else {

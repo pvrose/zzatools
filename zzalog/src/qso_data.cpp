@@ -611,7 +611,7 @@ qso_num_t qso_data::get_default_number() {
 
 // Action - create a new QSL in the appropriate copy of qso_entry
 void qso_data::action_new_qso(record* qso, qso_init_t mode) {
-	printf("DEBUG: action_new_qso\n");
+	printf("DEBUG: action_new_qso %p\n", qso);
 	qso_entry* qe;
 	switch (logging_state_) {
 	case NET_STARTED:
@@ -1297,7 +1297,7 @@ void qso_data::action_add_modem(record* qso) {
 
 // Update or replace a modem record
 void qso_data::action_update_modem(record* qso) {
-	printf("DEBUG: action_update_modem\n");
+	printf("DEBUG: action_update_modem %p\n", qso);
 	// Compare with existing
 	if (qso != current_qso()) {
 		printf("Received QSO %s current %s\n", qso->item("CALL").c_str(), current_qso()->item("CALL").c_str());
