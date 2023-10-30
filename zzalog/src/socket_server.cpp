@@ -185,6 +185,20 @@ int socket_server::create_server()
 		handle_error("Unable to set socket reusable");
 		return result;
 	}
+	// Apply to join the multicast group
+	switch (protocol_) {
+		case UDP:
+			ip_mreq mreq = {server_addr.sin_addr, INADDR_ANY};
+			result = setsockopt(server_, IPPROTO_IP, IP_ADD_MEMBERSHIP, &mreq, sizeof(mreq));
+			if (result < 0) {
+				handle_error("Unable to join multicast group");
+				return result;
+			} else {
+				snprintf(message, sizeof(message), "SOCKET: Joined multicast %s", inet_ntoa(server_addr.sin_addr));
+				status_->misc_status(ST_OK, message);
+			}
+			break;
+	}
 	// Associate the socket with this address data
 	result = bind(server_, (SOCKADDR *)&server_addr, len_server_addr);
 	if (result < 0)

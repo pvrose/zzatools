@@ -1300,7 +1300,6 @@ void qso_data::action_update_modem(record* qso) {
 	printf("DEBUG: action_update_modem %p\n", qso);
 	// Compare with existing
 	if (qso != current_qso()) {
-		printf("Received QSO %s current %s\n", qso->item("CALL").c_str(), current_qso()->item("CALL").c_str());
 		// This is a new record as the previous one did not complete
 		action_cancel();
 		action_add_modem(qso);
