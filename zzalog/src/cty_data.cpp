@@ -4,6 +4,7 @@
 #include "status.h"
 #include "callback.h"
 #include "utils.h"
+#include "spec_data.h"
 
 #include <fcntl.h>
 #include <fstream>
@@ -20,11 +21,9 @@
 #include <FL/Fl_Preferences.H>
 #include <FL/Fl_Native_File_Chooser.H>
 
-
-
-
 extern club_handler* club_handler_;
 extern status* status_;
+extern spec_data* spec_data_;
 extern Fl_Preferences* settings_;
 
 // Constructor - Download new data and build database
@@ -98,8 +97,10 @@ cty_data::exc_entry* cty_data::except(record* qso) {
 			if ((entry->end == -1 || entry->end > timestamp) && 
 				(entry->start == -1 || timestamp > entry->start)) {
 				char message[160];
-				snprintf(message, 160, "CTY DATA: Contact %s at %s %s is in exceptions list in DXCC %d", 
-					call.c_str(), qso->item("QSO_DATE").c_str(), qso->item("TIME_ON").c_str(), entry->adif_id);
+				snprintf(message, 160, "CTY DATA: Contact %s at %s %s is in exceptions list in DXCC %d (%s)", 
+					call.c_str(), qso->item("QSO_DATE").c_str(), 
+					qso->item("TIME_ON").c_str(), entry->adif_id, 
+					spec_data_->entity_name(entry->adif_id).c_str());
 				status_->misc_status(ST_NOTE, message);
 				return entry;
 			}
