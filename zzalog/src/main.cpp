@@ -158,6 +158,7 @@ static void cb_ticker(void* v) {
 	// Units that require 1s tick
 	if (ticks_ % TICK_SECOND == 0) {
 		qso_manager_->ticker();
+		import_data_->ticker();
 	}
 	// Units that require a 200ms tick
 	if (ticks_ % (TICK_SECOND * 2 / 10) == 0) {

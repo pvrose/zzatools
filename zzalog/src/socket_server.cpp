@@ -195,6 +195,13 @@ int socket_server::create_server()
 				handle_error("Canmnot set multicast loopback");
 				return result;
 			}
+			// Set Multicast all
+			unsigned char mall = 1;
+			result = setsockopt(server_, IPPROTO_IP, IP_MULTICAST_ALL, &mall, sizeof(mall));
+			if (result < 0) {
+				handle_error("Canmnot set multicast all");
+				return result;
+			}
 			ip_mreq mreq = {server_addr.sin_addr, INADDR_ANY};
 			result = setsockopt(server_, IPPROTO_IP, IP_ADD_MEMBERSHIP, &mreq, sizeof(mreq));
 			if (result < 0) {
@@ -340,7 +347,7 @@ int socket_server::rcv_packet()
 		}
 		if (bytes_rcvd > 0)
 		{
-			dump(string(buffer, buffer_len));
+			dump(string(buffer, bytes_rcvd));
 			mu_packet_.lock();
 			string s = string(buffer, bytes_rcvd);
 			q_packet_.push(s);
@@ -468,40 +475,8 @@ void socket_server::dump(string data)
 	// For every data byte
 	for (auto it = data.begin(); it != data.end(); it++)
 	{
-
-		if (*it >= 7 && *it <= 13)
-		{
-			// Convert control characters to escaped
-			switch (*it)
-			{
-			case '\a':
-				escaped += "\\a";
-				break;
-			case '\b':
-				escaped += "\\b";
-				break;
-			case '\t':
-				escaped += "\\t";
-				break;
-			case '\n':
-				escaped += "\\n";
-				newline = true;
-				break;
-			case '\v':
-				escaped += "\\v";
-				newline = true;
-				break;
-			case '\f':
-				escaped += "\\f";
-				newline = true;
-				break;
-			case '\r':
-				escaped += "\\r";
-				newline = true;
-				break;
-			}
-		}
-		else if (*it < 32 || *it > 0x7F)
+		unsigned char c = *it;
+		if (c < 32 || c > 0x7F)
 		{
 			// Convert other non-printable or non-ASCII characters to hex escaped form
 			if (newline)
@@ -510,9 +485,10 @@ void socket_server::dump(string data)
 				newline = false;
 			}
 			char hex[10];
-			snprintf(hex, 10, "\\x%02x", *it);
+			snprintf(hex, 10, "\\x%02x", c);
+			escaped += hex;
 		}
-		else if (*it == '\\')
+		else if (c == '\\')
 		{
 			if (newline)
 			{
@@ -532,6 +508,7 @@ void socket_server::dump(string data)
 			escaped += *it;
 		}
 	}
+	// printf("%s\n", escaped.c_str());
 }
 
 // main thread side handle packet

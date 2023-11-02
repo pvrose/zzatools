@@ -12,9 +12,9 @@ using namespace std;
 
 
 	// auto-import polling period - 15s -> 5 min (default 1 min)
-	const double AUTO_IP_MAX = 300.0;
-	const double AUTO_IP_MIN = 15.0;
-	const double AUTO_IP_DEF = 60.0;
+	const int AUTO_IP_MAX = 300;
+	const int AUTO_IP_MIN = 15;
+	const int AUTO_IP_DEF = 60;
 
 
 	// This class inherits book and provides the additional functionality required
@@ -43,9 +43,6 @@ using namespace std;
 	public:
 		import_data();
 		~import_data();
-
-		// Timer callback for auto-update
-		static void cb_timer_imp(void* v);
 
 		// public methods
 	public:
@@ -81,6 +78,8 @@ using namespace std;
 		void load_record(record* qso, update_mode_t mode = SINGLE_ADIF);
 		// Import process is auto-update or timer set for one
 		bool is_auto_update();
+		// 1 second ticker
+		void ticker();
 
 	protected:
 		// repeat the auto-import timer
@@ -130,10 +129,10 @@ using namespace std;
 		string last_timestamp_;
 		// Close is pending
 		bool close_pending_;
-		// Start of timer
-		time_t timer_start_;
+		// Time count
+		int auto_count_;
 		// Timer period
-		double timer_period_;
+		int auto_period_;
 		// Last added record number
 		qso_num_t last_added_number_;
 

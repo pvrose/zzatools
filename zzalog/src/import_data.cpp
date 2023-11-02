@@ -65,7 +65,8 @@ import_data::import_data() :
 	sources_ = nullptr;
 	match_question_ = "";
 	close_pending_ = false;
-	timer_period_ = nan("");
+	auto_count_ = 0;
+	auto_period_ = 60;
 	last_added_number_ = 0;
 }
 
@@ -77,20 +78,18 @@ import_data::~import_data()
 }
 
 // Timer callback - Called every second between auto-updates so that a countdown can be displayed
-void import_data::cb_timer_imp(void* v) {
-	import_data* that = (import_data*)v;
-	time_t now;
-	time(&now);
-	// How many seconds still to go before we need to start an auto-update
-	double seconds = that->timer_period_ - difftime(now, that->timer_start_);
-	status_->progress((int)seconds, that->book_type());
-	if (seconds <= 0.0) {
-		// Countdown reached zero so start the auto-update
-		that->auto_update();
-	}
-	else {
-		// Restart the timer
-		Fl::repeat_timeout(1.0, cb_timer_imp, v);
+void import_data::ticker() {
+	if (update_mode_ == WAIT_AUTO) {
+		time_t now;
+		time(&now);
+		// How many seconds still to go before we need to start an auto-update
+		auto_count_--;
+		status_->progress(auto_count_, book_type());
+		if (auto_count_ == 0) {
+			// Countdown reached zero so start the auto-update
+			auto_update();
+			auto_count_ = auto_period_;
+		}
 	}
 }
 
@@ -128,6 +127,8 @@ bool import_data::start_auto_update() {
 			last_timestamps_[i] = temp;
 			free(temp);
 		}
+		// Tell QSO manager to update display
+		qso_manager_->log_info()->auto_state(true, false);
 		// Start auto_update
 		auto_update();
 	}
@@ -145,6 +146,7 @@ void import_data::auto_update() {
 	// Report auto-update
 	status_->misc_status(ST_NOTE, "IMPORT: File load started");
 	update_mode_ = READ_AUTO;
+	qso_manager_->log_info()->auto_state(true, true);
 
 	delete_contents(true);
 	// Set last timestamp to the latest it can be
@@ -293,13 +295,12 @@ void import_data::save_update() {
 void import_data::repeat_auto_timer() {
 	// Get the polling interval from settings
 	Fl_Preferences update_settings(settings_, "Real Time Update");
-	update_settings.get("Polling Interval", timer_period_, AUTO_IP_DEF);
+	update_settings.get("Polling Interval", auto_period_, AUTO_IP_DEF);
 
-	// Restart the timer - 1 second so get visual indication of the time counting down
-	Fl::repeat_timeout(1.0, cb_timer_imp, (void*)this);
+	qso_manager_->log_info()->auto_state(true, false);
 	// Tell user - display countdown so that the bar gets bigger as it counts down the seconds
-	status_->progress((int)timer_period_, OT_IMPORT, "Waiting for auto-import timer", "seconds", true);
-	time(&timer_start_);
+	status_->progress(auto_period_, OT_IMPORT, "Waiting for auto-import timer", "seconds", true);
+	auto_count_ = auto_period_;
 	update_mode_ = WAIT_AUTO;
 }
 
@@ -538,8 +539,6 @@ void import_data::update_book() {
 
 // Stop importing - about to do something else. Either immediately or gracefully complete
 void import_data::stop_update(bool immediate) {
-	// Turn auto-import off
-	Fl::remove_timeout(cb_timer_imp);
 	// If immediately crashing - stop expecting further updates
 	if (immediate) {
 		update_mode_ = NONE;
@@ -562,6 +561,7 @@ void import_data::stop_update(bool immediate) {
 		delete_contents(true);
 		status_->progress("Auto-update stopped", OT_IMPORT);
 		close_pending_ = false;
+		qso_manager_->log_info()->auto_state(false, false);
 		break;
 	case READ_AUTO:
 		// Cancel any read in progress
@@ -636,8 +636,6 @@ void import_data::finish_update(bool merged /*= true*/) {
 	}
 	// We are waiting to finish the update
 	if (close_pending_) {
-		// Stop timer
-		Fl::remove_timeout(cb_timer_imp);
 		// Delete the update files
 		delete[] update_files_;
 		update_files_ = nullptr;

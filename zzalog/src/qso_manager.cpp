@@ -456,3 +456,7 @@ void qso_manager::qsl_print_done() {
 qso_qsl* qso_manager::qsl_control() {
 	return info_group_->qsl_control();
 }
+
+qso_log_info* qso_manager::log_info() {
+	return info_group_->log_info();
+}

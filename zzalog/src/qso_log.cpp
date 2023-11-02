@@ -87,3 +87,7 @@ void qso_log::cb_tabs(Fl_Widget* w, void* v) {
 qso_qsl* qso_log::qsl_control() {
 	return qsl_ctrl_;
 }
+
+qso_log_info* qso_log::log_info() {
+	return log_info_;
+}

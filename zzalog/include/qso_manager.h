@@ -118,6 +118,8 @@ using namespace std;
 		qso_data* data();
 		// QSL handler
 		qso_qsl* qsl_control();
+		// Log info
+		qso_log_info* log_info();
 
 		// Shared QSL methods
 		void qsl_download(import_data::update_mode_t server);

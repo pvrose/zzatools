@@ -1,8 +1,10 @@
 #include "qso_log_info.h"
 #include "drawing.h"
 #include "book.h"
+#include "import_data.h"
 
 extern book* book_;
+extern import_data* import_data_;
 
 qso_log_info::qso_log_info(int X, int Y, int W, int H, const char* l) :
 	Fl_Group(X, Y, W, H, l)
@@ -54,14 +56,26 @@ void qso_log_info::create_form(int X, int Y) {
 	bn_save_enable_->tooltip("Enable/Disable save");
 	bn_save_enable_->callback(cb_bn_enable);
 	bn_save_enable_->value(true);
-	curr_y += bn_save_enable_->h() + GAP;
 
+	curr_x += WSMEDIT;
 	bn_save_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Save!");
 	bn_save_->align(FL_ALIGN_CENTER);
 	bn_save_->tooltip("Force save now");
 	bn_save_->callback(cb_bn_save);
 	
+	curr_x = X + GAP;
+	curr_y += bn_save_enable_->h() + GAP;
+	bn_auto_update_ = new Fl_Button(curr_x, curr_y, HBUTTON, HBUTTON, "Auto-update");
+	bn_auto_update_->box(FL_FLAT_BOX);
+	bn_auto_update_->align(FL_ALIGN_RIGHT);
+	bn_auto_update_->tooltip("Enable/Disable auto-update");
+	bn_auto_update_->callback(cb_bn_auto);
+	// TODO - Bug accessing this
+	bn_auto_update_->deactivate();
+	auto_state(import_data_->is_auto_update(), false);
+
 	curr_y += bn_save_->h() + GAP;
+
 
 	curr_x += bn_save_enable_->w() + GAP;
 
@@ -141,4 +155,28 @@ void qso_log_info::cb_bn_enable(Fl_Widget* w, void* v) {
 // Callback to force save
 void qso_log_info::cb_bn_save(Fl_Widget* w, void* v) {
 	book_->store_data();
+}
+
+// Callback on auto-state
+void qso_log_info::cb_bn_auto(Fl_Widget* w, void* v) {
+	if (import_data_->is_auto_update()) {
+		import_data_->stop_update(true);
+	} else {
+		import_data_->start_auto_update();
+	}
+	qso_log_info* that = (qso_log_info*)w;
+	that->auto_state(import_data_->is_auto_update(), false);
+}
+
+// Update auto_updaye
+void qso_log_info::auto_state(bool enabled, bool in_progress) {
+	if (enabled) {
+		if (in_progress) {
+			bn_auto_update_->color(FL_YELLOW);
+		} else {
+			bn_auto_update_->color(FL_GREEN);
+		}
+	} else {
+		bn_auto_update_->color(FL_RED);
+	}
 }
