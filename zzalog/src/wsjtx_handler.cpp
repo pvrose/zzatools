@@ -87,23 +87,31 @@ int wsjtx_handler::rcv_dgram(stringstream & ss) {
 	}
 	id_ = get_utf8(ss);
 
+	// printf("DEBUG: DATAGRAM received from %s type ", id_.c_str());
 	// Select method to interpret datagram
 	switch (dgram_type) {
 	case 0:
 		// Heartbeat
+		// printf("HEARTBEAT\n");
 		return handle_hbeat(ss);
 	case 1:
 		// Status
+		// printf("STATUS\n");
 		return handle_status(ss);
 	case 2:
+		// printf("DECODE\n");
 		return handle_decode(ss);
 	case 4:
+		// printf("REPLY\n");
 		return handle_reply(ss);
 	case 6:
+		// printf("CLOSE\n");
 		return handle_close(ss);
 	case 12:
+		// printf("LOG ADIF\n");
 		return handle_log(ss);
 	default:
+		// printf("Unsupported %d\n", dgram_type);
 		return handle_default(ss, dgram_type);
 	}
 	return 0;

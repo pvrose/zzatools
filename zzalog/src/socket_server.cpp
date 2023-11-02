@@ -188,6 +188,13 @@ int socket_server::create_server()
 	// Apply to join the multicast group
 	switch (protocol_) {
 		case UDP:
+			// Set Multicast loop
+			unsigned char loop = 1;
+			result = setsockopt(server_, IPPROTO_IP, IP_MULTICAST_LOOP, &loop, sizeof(loop));
+			if (result < 0) {
+				handle_error("Canmnot set multicast loopback");
+				return result;
+			}
 			ip_mreq mreq = {server_addr.sin_addr, INADDR_ANY};
 			result = setsockopt(server_, IPPROTO_IP, IP_ADD_MEMBERSHIP, &mreq, sizeof(mreq));
 			if (result < 0) {
