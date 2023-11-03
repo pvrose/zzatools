@@ -65,19 +65,21 @@ void qso_log_info::create_form(int X, int Y) {
 	
 	curr_x = X + GAP;
 	curr_y += bn_save_enable_->h() + GAP;
-	bn_auto_update_ = new Fl_Button(curr_x, curr_y, HBUTTON, HBUTTON, "Auto-update");
-	bn_auto_update_->box(FL_FLAT_BOX);
+	bn_auto_update_ = new Fl_Check_Button(curr_x, curr_y, HBUTTON, HBUTTON, "Auto-update");
 	bn_auto_update_->align(FL_ALIGN_RIGHT);
 	bn_auto_update_->tooltip("Enable/Disable auto-update");
 	bn_auto_update_->callback(cb_bn_auto);
-	// TODO - Bug accessing this
-	bn_auto_update_->deactivate();
-	auto_state(import_data_->is_auto_update(), false);
 
-	curr_y += bn_save_->h() + GAP;
+	curr_x += WSMEDIT;
+	op_update_ = new Fl_Output(curr_x, curr_y, WBUTTON, HBUTTON);
+	op_update_->box(FL_FLAT_BOX);
+	op_update_->color(FL_BACKGROUND_COLOR);
+	op_update_->value("");
+
+	curr_y += bn_auto_update_->h() + GAP;
 
 
-	curr_x += bn_save_enable_->w() + GAP;
+	curr_x += op_update_->w() + GAP;
 
 	max_x = max(max_x, curr_x);
 
@@ -127,6 +129,11 @@ void qso_log_info::enable_widgets() {
 			bn_save_enable_->value(false);
 		}
 	}
+	if (import_data_->is_auto_update()) {
+		bn_auto_update_->value(true);
+	} else {
+		bn_auto_update_->value(false);
+	}
 }
 
 // Save changes
@@ -159,24 +166,16 @@ void qso_log_info::cb_bn_save(Fl_Widget* w, void* v) {
 
 // Callback on auto-state
 void qso_log_info::cb_bn_auto(Fl_Widget* w, void* v) {
-	if (import_data_->is_auto_update()) {
-		import_data_->stop_update(true);
-	} else {
+	qso_log_info* that = ancestor_view<qso_log_info>(w);
+	if (((Fl_Check_Button*)w)->value()) {
 		import_data_->start_auto_update();
+	} else {
+		import_data_->stop_update(true);
 	}
-	qso_log_info* that = (qso_log_info*)w;
-	that->auto_state(import_data_->is_auto_update(), false);
+	that->enable_widgets();
 }
 
 // Update auto_updaye
-void qso_log_info::auto_state(bool enabled, bool in_progress) {
-	if (enabled) {
-		if (in_progress) {
-			bn_auto_update_->color(FL_YELLOW);
-		} else {
-			bn_auto_update_->color(FL_GREEN);
-		}
-	} else {
-		bn_auto_update_->color(FL_RED);
-	}
+void qso_log_info::auto_source(const char* source) {
+	op_update_->value(source);
 }

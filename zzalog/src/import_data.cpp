@@ -127,8 +127,6 @@ bool import_data::start_auto_update() {
 			last_timestamps_[i] = temp;
 			free(temp);
 		}
-		// Tell QSO manager to update display
-		qso_manager_->log_info()->auto_state(true, false);
 		// Start auto_update
 		auto_update();
 	}
@@ -146,33 +144,23 @@ void import_data::auto_update() {
 	// Report auto-update
 	status_->misc_status(ST_NOTE, "IMPORT: File load started");
 	update_mode_ = READ_AUTO;
-	qso_manager_->log_info()->auto_state(true, true);
 
 	delete_contents(true);
 	// Set last timestamp to the latest it can be
 	last_timestamp_ = now(false, "%Y%m%d%H%M%S");
 	// For each auto-import file
 	for (int i = 0; i < num_update_files_; i++) {
+		qso_manager_->log_info()->auto_source(sources_[i].c_str());
 		// Timer will only restart when update is complete
 		bool failed = false;
 		char timestamp[16];
 #ifdef _WIN32
 		// Open the file to see when it was last written
 		int fd = _sopen(update_files_[i].c_str(), _O_RDONLY, _SH_DENYNO);
-		if (fd == -1) {
-			string message = "IMPORT: Error opening file " + update_files_[i] + ": " + string(strerror(errno));
-			status_->misc_status(ST_ERROR, message.c_str());
-			failed = true;
-
-		}
-		else {
-			struct _stat status;
-			int result = _fstat(fd, &status);
-			strftime(timestamp, 16, "%Y%m%d%H%M%S", gmtime(&status.st_mtime));
-			_close(fd);
 #else
 		// Open the file to see when it was last written
 		int fd = open(update_files_[i].c_str(), O_RDONLY);
+#endif
 		if (fd == -1) {
 			string message = "IMPORT: Error opening file " + update_files_[i] + ": " + string(strerror(errno));
 			status_->misc_status(ST_ERROR, message.c_str());
@@ -180,9 +168,17 @@ void import_data::auto_update() {
 
 		}
 		else {
+#ifdef _WIN32
+			struct _stat status;
+			int result = _fstat(fd, &status);
+#else
 			struct stat status;
 			int result = fstat(fd, &status);
+#endif
 			strftime(timestamp, 16, "%Y%m%d%H%M%S", gmtime(&status.st_mtime));
+#ifdef _WIN32
+			_close(fd);
+#else
 			close(fd);
 #endif
 			if (timestamp > last_timestamps_[i]) {
@@ -204,28 +200,29 @@ void import_data::auto_update() {
 				status_->misc_status(ST_WARNING, message);
 			}
 		}
+		if (size()) {
+			// Merge records from the auto-import
+			update_mode_ = AUTO_IMPORT;
+			status_->misc_status(ST_NOTE, "IMPORT: merging data");
+			status_->progress(size(), book_type_, "Merging data from auto-import file", "records");
+			number_checked_ = 0;
+			number_matched_ = 0;
+			number_modified_ = 0;
+			number_added_ = 0;
+			number_rejected_ = 0;
+			number_clublog_ = 0;
+			number_swl_ = 0;
+			number_to_import_ = size();
+			update_book();
+		}
+		else {
+			// Tell user no data and restart the timer. Even though nothing to import we need to set AUTO_IMPORT.
+			update_mode_ = AUTO_IMPORT;
+			status_->misc_status(ST_WARNING, "IMPORT: No data - skipped");
+			finish_update(false);
+		}
 	}
-	if (size()) {
-		// Merge records from the auto-import
-		update_mode_ = AUTO_IMPORT;
-		status_->misc_status(ST_NOTE, "IMPORT: merging data");
-		status_->progress(size(), book_type_, "Merging data from auto-import file", "records");
-		number_checked_ = 0;
-		number_matched_ = 0;
-		number_modified_ = 0;
-		number_added_ = 0;
-		number_rejected_ = 0;
-		number_clublog_ = 0;
-		number_swl_ = 0;
-		number_to_import_ = size();
-		update_book();
-	}
-	else {
-		// Tell user no data and restart the timer. Even though nothing to import we need to set AUTO_IMPORT.
-		update_mode_ = AUTO_IMPORT;
-		status_->misc_status(ST_WARNING, "IMPORT: No data - skipped");
-		finish_update(false);
-	}
+	qso_manager_->log_info()->auto_source("");
 }
 
 // Delete the mismatch record in the update - delete it and erase 
@@ -297,7 +294,6 @@ void import_data::repeat_auto_timer() {
 	Fl_Preferences update_settings(settings_, "Real Time Update");
 	update_settings.get("Polling Interval", auto_period_, AUTO_IP_DEF);
 
-	qso_manager_->log_info()->auto_state(true, false);
 	// Tell user - display countdown so that the bar gets bigger as it counts down the seconds
 	status_->progress(auto_period_, OT_IMPORT, "Waiting for auto-import timer", "seconds", true);
 	auto_count_ = auto_period_;
@@ -561,7 +557,6 @@ void import_data::stop_update(bool immediate) {
 		delete_contents(true);
 		status_->progress("Auto-update stopped", OT_IMPORT);
 		close_pending_ = false;
-		qso_manager_->log_info()->auto_state(false, false);
 		break;
 	case READ_AUTO:
 		// Cancel any read in progress

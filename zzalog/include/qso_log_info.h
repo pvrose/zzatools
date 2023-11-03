@@ -31,7 +31,7 @@ public:
 	void ticker();
 
 	// auto_update in progress
-	void auto_state(bool enabled, bool in_progress);
+	void auto_source(const char* source);
 
 	// Call back for enable check box
 	static void cb_bn_enable(Fl_Widget* w, void* v);
@@ -45,6 +45,7 @@ protected:
 	Fl_Progress* pr_loadsave_;
 	Fl_Check_Button* bn_save_enable_;
 	Fl_Button* bn_save_;
-	Fl_Button* bn_auto_update_;
+	Fl_Check_Button* bn_auto_update_;
+	Fl_Output* op_update_;
 
 };
