@@ -57,6 +57,7 @@ wsjtx_handler::wsjtx_handler()
 	// Get logged callsign from spec_data
 	my_call_ = qso_manager_->get_default(qso_manager::CALLSIGN);
 	my_bracketed_call_ = "<" + my_call_ + ">";
+	connected_ = false;
 }
 
 // Destructor
@@ -86,6 +87,12 @@ int wsjtx_handler::rcv_dgram(stringstream & ss) {
 		return 1;
 	}
 	id_ = get_utf8(ss);
+
+	if (!connected_) {
+		connected_ = true;
+		fl_beep(FL_BEEP_NOTIFICATION);
+		fl_alert("WSJT-X has connected, please ensure correct station details will get logged!");
+	}
 
 	// printf("DEBUG: DATAGRAM received from %s type ", id_.c_str());
 	// Select method to interpret datagram

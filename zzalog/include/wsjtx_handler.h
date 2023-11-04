@@ -235,6 +235,8 @@ using namespace std;
 		set<string> received_beats_;
 		// Check missing heartbeats
 		bool check_beats_;
+		// WSJT-X connected
+		bool connected_;
 		
 	};
 

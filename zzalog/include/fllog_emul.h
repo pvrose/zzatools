@@ -39,6 +39,9 @@
 		// Generate error resposne
 		void generate_error(int code, string message, rpc_data_item& response);
 
+		// Check connected
+		void check_connected();
+
 		// The currently selected record
 		record* current_record_;
 		// RPC handler
@@ -48,6 +51,9 @@
 		
 		// The only instance
 		static fllog_emul* that_;
+
+		// Connected
+		bool connected_;
 
 
 	};

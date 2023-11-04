@@ -6,6 +6,7 @@
 #include "adi_reader.h"
 #include "spec_data.h"
 #include "rpc_data_item.h"
+#include "qso_manager.h"
 
 #include <sstream>
 
@@ -18,6 +19,7 @@ extern fllog_emul* fllog_emul_;
 extern extract_data* extract_records_;
 extern book* book_;
 extern spec_data* spec_data_;
+extern qso_manager* qso_manager_;
 extern Fl_Preferences* settings_;
 
 // Static - only one instance of this class supported
@@ -28,6 +30,7 @@ fllog_emul::fllog_emul() {
 	rpc_handler_ = nullptr;
 	current_record_ = nullptr;
 	that_ = this;
+	connected_ = false;
 }
 
 // Start and run the RPC Server
@@ -75,6 +78,7 @@ void fllog_emul::generate_error(int code, string message, rpc_data_item& respons
 
 // Get ADIF string for first record with callsign - also displays all matching records in extract window
 int fllog_emul::get_record(rpc_data_item::rpc_list& params, rpc_data_item& response) {
+	that_->check_connected();
 	if (params.size() == 1) {
 		rpc_data_item* item_0 = params.front();
 		string callsign = item_0->get_string();
@@ -103,6 +107,7 @@ int fllog_emul::get_record(rpc_data_item::rpc_list& params, rpc_data_item& respo
 
 // Check duplicate - replies true (exact match), possible (callsign matches), false (not a match
 int fllog_emul::check_dup(rpc_data_item::rpc_list& params, rpc_data_item& response) {
+	that_->check_connected();
 	if (params.size() == 6) {
 		// Get parametrs
 		rpc_data_item* i_call = params.front();
@@ -129,10 +134,12 @@ int fllog_emul::check_dup(rpc_data_item::rpc_list& params, rpc_data_item& respon
 		if (extract_records_->size()) {
 			bool found = false;
 			item_num_t item_num;
+			item_num_t found_item;
 			for (item_num = 0; item_num < extract_records_->size() && !found; item_num++) {
 				that_->current_record_ = extract_records_->get_record(item_num, false);
 				time_t now = time(nullptr);
 				found = true;
+				found_item = item_num;
 				// Now check for exact match 
 				if (mode != "0" && that_->current_record_->item("MODE", true) != to_upper(mode)) {
 					// different mode (note this includes submode)
@@ -162,7 +169,7 @@ int fllog_emul::check_dup(rpc_data_item::rpc_list& params, rpc_data_item& respon
 				// Exact match - set selection
 				printf(" Exact match\n");
 				that_->current_record_ = extract_records_->get_record(item_num, true);
-				extract_records_->selection(item_num, HT_SELECTED);
+				extract_records_->selection(found_item, HT_SELECTED);
 				response.set("true", XRT_STRING);
 			}
 			else {
@@ -188,6 +195,7 @@ int fllog_emul::check_dup(rpc_data_item::rpc_list& params, rpc_data_item& respon
 
 // Add new record
 int fllog_emul::add_record(rpc_data_item::rpc_list& params, rpc_data_item& response) {
+	that_->check_connected();
 	if (params.size() == 1) {
 		// Convert the adif data into a new record - use existing code from adi_reader
 		rpc_data_item* item = params.front();
@@ -199,7 +207,8 @@ int fllog_emul::add_record(rpc_data_item::rpc_list& params, rpc_data_item& respo
 		that_->current_record_ = new record();
 		reader->load_record(that_->current_record_, ss, dummy);
 		item_num_t number = book_->insert_record(that_->current_record_);
-		book_->selection(number, HT_SELECTED);
+		qso_manager_->update_import_qso(that_->current_record_);
+		status_->misc_status(ST_NOTE, "FLLOG_EMUL: Logged QSO");
 		return 0;
 	}
 	else {
@@ -210,6 +219,7 @@ int fllog_emul::add_record(rpc_data_item::rpc_list& params, rpc_data_item& respo
 
 // Update fields in current selection
 int fllog_emul::update_record(rpc_data_item::rpc_list& params, rpc_data_item& response) {
+	that_->check_connected();
 	if (params.size() == 1) {
 		// Convert the adif data into a new record - use existing code from adi_reader
 		rpc_data_item* item = params.front();
@@ -232,6 +242,7 @@ int fllog_emul::update_record(rpc_data_item::rpc_list& params, rpc_data_item& re
 
 // List methods - string returns list of methods suppported
 int fllog_emul::list_methods(rpc_data_item::rpc_list& params, rpc_data_item& response) {
+	that_->check_connected();
 	if (params.size() == 0) {
 		// Copied nearly verbatim from fllog
 		printf("list_methods\n");
@@ -262,5 +273,11 @@ int fllog_emul::list_methods(rpc_data_item::rpc_list& params, rpc_data_item& res
 
 }
 
-
+void fllog_emul::check_connected() {
+	if (!connected_) {
+		connected_ = true;
+		fl_beep(FL_BEEP_NOTIFICATION);
+		fl_alert("FLDIGI has connected, please ensure station details will be logged correctly!");
+	}
+}
 
