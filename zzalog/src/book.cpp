@@ -1243,11 +1243,26 @@ bool book::get_macro(record* use_record, string macro_name, set<string> field_na
 							old_value.c_str());
 						status_->misc_status(ST_NOTE, message);
 						if ((*it) != "MY_GRIDSQUARE" || value.length() > old_value.length() || value != old_value.substr(0, value.length())) {
-							snprintf(message, 128, "LOG: %s %s - Field %s replacing %s with %s",
-								macro_name.c_str(), id.c_str(), (*it).c_str(), old_value.c_str(), value.c_str());
-							status_->misc_status(ST_WARNING, message);
-							defn->fields->item(*it, value);
-							update = true;
+							switch(fl_choice(
+								"Imported %s: New value %s; old value %s. Select New or Old?",
+								"New", "Old", nullptr,
+								(*it).c_str(), value.c_str(), old_value.c_str())
+							) {
+							case 0:
+								snprintf(message, 128, "LOG: %s %s - Field %s replacing %s with %s",
+									macro_name.c_str(), id.c_str(), (*it).c_str(), old_value.c_str(), value.c_str());
+								status_->misc_status(ST_WARNING, message);
+								defn->fields->item(*it, value);
+								update = true;
+								break;
+							case 1:
+								snprintf(message, 128, "LOG: %s %s - Field %s, ignoring update %s",
+									macro_name.c_str(), id.c_str(), (*it).c_str(), value.c_str());
+								status_->misc_status(ST_WARNING, message);
+								defn->fields->item(*it, value);
+								break;
+							}
+							
 						}
 					}
 				}

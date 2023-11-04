@@ -197,6 +197,8 @@ int fllog_emul::check_dup(rpc_data_item::rpc_list& params, rpc_data_item& respon
 int fllog_emul::add_record(rpc_data_item::rpc_list& params, rpc_data_item& response) {
 	that_->check_connected();
 	if (params.size() == 1) {
+		// Clear down any look up from fldigi
+		extract_records_->clear_criteria();
 		// Convert the adif data into a new record - use existing code from adi_reader
 		rpc_data_item* item = params.front();
 		stringstream ss;
@@ -207,7 +209,7 @@ int fllog_emul::add_record(rpc_data_item::rpc_list& params, rpc_data_item& respo
 		that_->current_record_ = new record();
 		reader->load_record(that_->current_record_, ss, dummy);
 		item_num_t number = book_->insert_record(that_->current_record_);
-		qso_manager_->update_import_qso(that_->current_record_);
+		qso_manager_->update_modem_qso(that_->current_record_);
 		status_->misc_status(ST_NOTE, "FLLOG_EMUL: Logged QSO");
 		return 0;
 	}
