@@ -97,6 +97,8 @@
 		static void cb_mi_ext_mark(Fl_Widget* w, void* v);
 		// Extract->Special->
 		static void cb_mi_ext_special(Fl_Widget* w, void* v);
+		// Extract->No card image
+		static void cb_mi_ext_no_image(Fl_Widget* w, void* v);
 		// Import->File
 		static void cb_mi_imp_file(Fl_Widget* w, void* v);
 		// Import->Download->eQSL/LotW

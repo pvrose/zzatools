@@ -29,6 +29,7 @@ using namespace std;
 			NO_NAME,     // Special search for empty NAME item
 			NO_QTH,      // Special search for empty QTH item
 			LOCATOR,     // Special seatch for non-6 or 8 character gridsquare
+			NO_EQSL_CARD,// Have eQSL but no card image
 			DUMMY        // end of enumeration
 		};
 
@@ -53,6 +54,8 @@ using namespace std;
 		void sort_records(string field_name, bool reverse);
 		// Special extract (NO_NAME, NO_QTH, LOCATOR_4)
 		void extract_special(extract_mode_t reason);
+		// Special extract that requires additional action
+		void extract_no_image();
 		// Extract field only
 		void extract_field(string field_name, string value, bool and_search);
 		// Correct record order

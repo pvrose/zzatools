@@ -103,6 +103,8 @@ using namespace std;
 		bool requests_queued();
 		// get the local card file-name
 		string card_filename_l(record* record);
+		// does the file exist and is it a valid png file
+		bool card_file_valid(string& filename);
 		// Enqueue single record
 		bool upload_single_qso(qso_num_t record_num);
 
@@ -112,8 +114,6 @@ using namespace std;
 		static void cb_timer_deq(void* v);
 		// request an eqsl card 
 		response_t request_eqsl(request_t request);
-		// does the file exist and is it a valid png file
-		bool card_file_valid(string& filename);
 		// get the remote filename of the card
 		response_t card_filename_r(record* record, string& filename);
 		// copy the card to local file-store

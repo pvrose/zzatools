@@ -274,7 +274,7 @@ bool eqsl_handler::card_file_valid(string& filename) {
 	ifstream file(filename.c_str());
 	if (!file.good()) {
 		// File doesn't exist
-		return false;
+		file_exists = false;
 	}
 	else {
 		// Read the first four characters to check it's a valid PNG files
@@ -286,20 +286,20 @@ bool eqsl_handler::card_file_valid(string& filename) {
 			// File is at least 4 characters long
 			if (strcmp(buffer, png_test) == 0) {
 				// Starts with the PNG marker
-				return true;
+				file_exists = true;
 			}
 			else {
 				// Not a valid PNG file
-				return false;
+				file_exists = false;
 			}
 		}
 		else {
 			// Not a valid PNG file (too short)
-			return false;
+			file_exists = false;
 		}
-		file.close();
-		return true;
 	}
+	file.close();
+	return file_exists;
 }
 
 // get the remote filename of the card

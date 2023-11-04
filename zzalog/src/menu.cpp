@@ -151,10 +151,11 @@ settings* config_ = nullptr;
 		{ "Clea&r", 0, menu::cb_mi_ext_clr, 0 },
 		{ "&Criteria", 0, menu::cb_mi_ext_crit, 0 },
 		{ "Re&do", 0, menu::cb_mi_ext_redo, 0 },
-		{ "&Quick", 0, 0, 0, FL_SUBMENU },
+		{ "Special", 0, 0, 0, FL_SUBMENU },
 			{ "No &Name", 0, menu::cb_mi_ext_special, (void*)extract_data::NO_NAME },
 			{ "No &QTH", 0, menu::cb_mi_ext_special, (void*)extract_data::NO_QTH },
 			{ "Small &Locator", 0, menu::cb_mi_ext_special, (void*)extract_data::LOCATOR },
+			{ "No &Image", 0, menu::cb_mi_ext_no_image, 0 },
 			{ 0 },
 		{ "&Display", 0, menu::cb_mi_ext_disp, 0, FL_MENU_DIVIDER },
 		{ "e&QSL", 0, menu::cb_mi_ext_qsl, (void*)extract_data::EQSL },
@@ -1107,6 +1108,14 @@ void menu::cb_mi_ext_special(Fl_Widget* w, void* v) {
 	// v passes the particular option
 	extract_data::extract_mode_t reason = (extract_data::extract_mode_t)(intptr_t)v;
 	extract_records_->extract_special(reason);
+	tabbed_forms_->activate_pane(OT_EXTRACT, true);
+}
+
+// Extract->No Image- 
+void menu::cb_mi_ext_no_image(Fl_Widget* w, void* v) {
+	menu* that = (menu*)w;
+	// v passes the particular option
+	extract_records_->extract_no_image();
 	tabbed_forms_->activate_pane(OT_EXTRACT, true);
 }
 

@@ -568,6 +568,68 @@ void extract_data::extract_qsl(extract_data::extract_mode_t server) {
 	}
 }
 
+// Extract special - no eQSL image
+void extract_data::extract_no_image() {
+	string reason_name = "eQSL received";
+	search_criteria_t new_criteria = {
+		/*search_cond_t condition*/ XC_FIELD,
+		/*search_comp_t comparator*/ XP_EQ,
+		/*bool by_dates*/ false,
+		/*string from_date*/"",
+		/*string to_date;*/"",
+		/*string band;*/ "Any",
+		/*string mode;*/ "Any",
+		/*bool confirmed_eqsl;*/ false,
+		/*bool confirmed_lotw;*/ false,
+		/*bool confirmed_card;*/ false,
+		/*search_combi_t combi_mode;*/ XM_NEW,
+		/*string field_name; */ "EQSL_QSL_RCVD",
+		/*string pattern;*/ "Y",
+		/*string my_call*/ "Any"
+	};
+	criteria(new_criteria);
+	if (size() == 0) {
+		// No records match these criteria
+		status_->misc_status(ST_WARNING, "EXTRACT: No records match quick extract");
+		tabbed_forms_->activate_pane(OT_MAIN, true);
+		// Select most recent QSO
+		book_->selection(book_->size() - 1, HT_EXTRACTION);
+	}
+	else {
+		// Records match
+		char format[] = "EXTRACT: %d records extracted %s";
+		char* message = new char[strlen(format) + reason_name.length() + 10];
+		sprintf(message, format, size(), reason_name.c_str());
+		status_->misc_status(ST_OK, message);
+		delete[] message;
+		// Now check existance of card image
+		int count = 0;
+		// For all records in this book
+		for (item_num_t ixe = 0; ixe < get_count(); ) {
+			// Check file exists for this record
+			string filename = eqsl_handler_->card_filename_l(get_record(ixe, false));
+			if (eqsl_handler_->card_file_valid(filename)) {
+				// If it exists, remove the record pointer from this book
+				erase(begin() + ixe);
+				int ixb = mapping_[ixe];
+				mapping_.erase(mapping_.begin() + ixe);
+				rev_mapping_.erase(ixb);
+				count += 1;
+			}
+			else {
+				// Remap reverse mapping to the new index in this book.
+				rev_mapping_[mapping_[ixe]] = ixe;
+				ixe++;
+			}
+		}
+		snprintf(message, 100, "EXTRACT: %zu records deleted, %zu total", count, size());
+		status_->misc_status(ST_OK, message);
+		tabbed_forms_->activate_pane(OT_EXTRACT, true);
+		// Select first extracted record
+		selection(0, HT_EXTRACTION);
+	}
+}
+
 // Extract records for special fixed criteria
 void extract_data::extract_special(extract_data::extract_mode_t reason) {
 	search_criteria_t new_criteria;
