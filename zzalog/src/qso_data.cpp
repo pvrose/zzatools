@@ -641,8 +641,9 @@ void qso_data::action_new_qso(record* qso, qso_init_t mode) {
 		break;
 	case QSO_ON_AIR:
 		// Copy station details and get read rig details for band etc. 
+		// If rig not connected use same as original
 		printf("DEBUG: On-air contact\n");
-		qe->copy_qso_to_qso(qso, qso_entry::CF_RIG_ETC);
+		qe->copy_qso_to_qso(qso, qso_entry::CF_RIG_ETC | qso_entry::CF_CAT);
 		qe->copy_cat_to_qso();
 		qe->copy_clock_to_qso();
 		break;
@@ -1195,7 +1196,7 @@ void qso_data::action_create_net() {
 // Add a QSO to the net - copy existing qso start times or not
 void qso_data::action_add_net_qso() {
 	printf("DEBUG: action_add_net_qso\n");
-record* qso = g_net_entry_->qso();
+	record* qso = g_net_entry_->qso();
 	// Create the entry tab
 	g_net_entry_->add_entry();
 	// Create the new QSO therein
