@@ -188,6 +188,7 @@ int socket_server::create_server()
 	// Apply to join the multicast group
 	switch (protocol_) {
 		case UDP:
+#ifndef _WIN32
 			// Set Multicast loop
 			unsigned char loop = 1;
 			result = setsockopt(server_, IPPROTO_IP, IP_MULTICAST_LOOP, &loop, sizeof(loop));
@@ -211,6 +212,7 @@ int socket_server::create_server()
 				snprintf(message, sizeof(message), "SOCKET: Joined multicast %s", inet_ntoa(server_addr.sin_addr));
 				status_->misc_status(ST_OK, message);
 			}
+#endif
 			break;
 	}
 	// Associate the socket with this address data
