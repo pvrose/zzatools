@@ -5,6 +5,7 @@
 #include "book.h"
 #include "qsl_form.h"
 #include "callback.h"
+#include "drawing.h"
 
 #include <FL/Fl_Preferences.H>
 #include <FL/Fl_JPEG_Image.H>
@@ -12,6 +13,7 @@
 #include <FL/Fl_PNG_Image.H>
 #include <FL/Fl_Light_Button.H>
 #include <FL/Fl_Native_File_Chooser.H>
+#include <FL/Fl_Box.H>
 
 
 
@@ -80,87 +82,124 @@ void qso_qsl_vwr::create_form() {
 	int curr_x = x();
 	int curr_y = y();
 	// Create image size in ratio 540x340 to fit supplied width
-	int w_image = w();
-	int h_image = w() * HCARD / WCARD;
+	const int WIMAGE = w();
+	const int HIMAGE = w() * HCARD / WCARD;
+	const int WBN = WIMAGE / 4;
+
 
 	// Box - for the display of a card image or if no card exists the callsign in large text
-	card_display_ = new Fl_Button(curr_x, curr_y, w_image, h_image, "Image");
-	card_display_->box(FL_FLAT_BOX);
-	card_display_->tooltip("The card image is displayed here!");
-	card_display_->callback(cb_bn_image, nullptr);
+	bn_card_display_ = new Fl_Button(curr_x, curr_y, WIMAGE, HIMAGE, "Image");
+	bn_card_display_->box(FL_FLAT_BOX);
+	bn_card_display_->tooltip("The card image is displayed here!");
+	bn_card_display_->callback(cb_bn_image, nullptr);
 
-	curr_y += card_display_->h();
+	curr_y += bn_card_display_->h();
 
-	curr_x = x() + ((w() - (3 * WBUTTON)) / 2);
-	eqsl_status_box_ = new Fl_Box(curr_x, curr_y, WBUTTON, HBUTTON, "eQSL");
-	eqsl_status_box_->box(FL_FLAT_BOX);
+	curr_x = x();
 
-	curr_x += eqsl_status_box_->w();
-	lotw_status_box_ = new Fl_Box(curr_x, curr_y, WBUTTON, HBUTTON, "LotW");
-	lotw_status_box_->box(FL_FLAT_BOX);
 
-	curr_x += lotw_status_box_->w();
-	card_status_box_ = new Fl_Box(curr_x, curr_y, WBUTTON, HBUTTON, "Card");
-	card_status_box_->box(FL_FLAT_BOX);
+	Fl_Box* label1 = new Fl_Box(curr_x, curr_y, WBN, HBUTTON, "Rcvd");
+	label1->box(FL_FLAT_BOX);
+	label1->color(FL_BACKGROUND_COLOR);
 
-	curr_x += card_status_box_->w();
+	curr_x += WBN;
+	bn_eqsl_status_ = new Fl_Light_Button(curr_x, curr_y, WBN, HBUTTON, "eQSL");
+	bn_eqsl_status_->box(FL_FLAT_BOX);
+	bn_eqsl_status_->value(true);
+
+	curr_x += WBN;
+	bn_lotw_status_ = new Fl_Light_Button(curr_x, curr_y, WBN, HBUTTON, "LotW");
+	bn_lotw_status_->box(FL_FLAT_BOX);
+	bn_lotw_status_->value(true);
+
+	curr_x += WBN;
+	bn_card_status_ = new Fl_Light_Button(curr_x, curr_y, WBN, HBUTTON, "Card");
+	bn_card_status_->box(FL_FLAT_BOX);
+	bn_card_status_->value(true);
 
 	curr_y += HBUTTON;
-	curr_x = x() + GAP;
+	curr_x = x();
 
-	card_type_grp_ = new Fl_Group(curr_x, curr_y, WBUTTON * 3, HBUTTON + HTEXT, "QSL type selection");
-	card_type_grp_->align(FL_ALIGN_TOP | FL_ALIGN_INSIDE);
-	card_type_grp_->box(FL_FLAT_BOX);
-	curr_y += HTEXT;
+	grp_card_type_ = new Fl_Group(curr_x, curr_y, WBN * 4, HBUTTON);
+	grp_card_type_->box(FL_FLAT_BOX);
+
 	// Radio - Display eQSL.cc card image
-	eqsl_radio_ = new Fl_Radio_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "eQSL");
-	eqsl_radio_->align(FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
-	eqsl_radio_->selection_color(FL_BLACK);
-	eqsl_radio_->callback(cb_rad_card, (void*)QI_EQSL);
-	eqsl_radio_->when(FL_WHEN_RELEASE);
-	eqsl_radio_->tooltip("Select image downloaded from eQSL");
-	curr_x += WBUTTON;
+	radio_eqsl_ = new Fl_Radio_Light_Button(curr_x, curr_y, WBN, HBUTTON, "eQSL");
+	radio_eqsl_->align(FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
+	radio_eqsl_->selection_color(FL_BLACK);
+	radio_eqsl_->callback(cb_rad_card, (void*)QI_EQSL);
+	radio_eqsl_->when(FL_WHEN_RELEASE);
+	radio_eqsl_->tooltip("Select image downloaded from eQSL");
+	curr_x += WBN;
 	// Radio - display scanned image of front of paper card
-	card_front_radio_ = new Fl_Radio_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Card(F)");
-	card_front_radio_->align(FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
-	card_front_radio_->selection_color(FL_BLACK);
-	card_front_radio_->callback(cb_rad_card, (void*)QI_CARD_FRONT);
-	card_front_radio_->when(FL_WHEN_RELEASE);
-	card_front_radio_->tooltip("Select image scanned of paper card front");
-	curr_x += WBUTTON;
+	radio_card_front_ = new Fl_Radio_Light_Button(curr_x, curr_y, WBN, HBUTTON, "Card(F)");
+	radio_card_front_->align(FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
+	radio_card_front_->selection_color(FL_BLACK);
+	radio_card_front_->callback(cb_rad_card, (void*)QI_CARD_FRONT);
+	radio_card_front_->when(FL_WHEN_RELEASE);
+	radio_card_front_->tooltip("Select image scanned of paper card front");
+	curr_x += WBN;
 	// Radio - display scanned image of reverse of paper card
-	card_back_radio_ = new Fl_Radio_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Card(B)");
-	card_back_radio_->align(FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
-	card_back_radio_->selection_color(FL_BLACK);
-	card_back_radio_->callback(cb_rad_card, (void*)QI_CARD_BACK);
-	card_back_radio_->when(FL_WHEN_RELEASE);
-	card_back_radio_->tooltip("Select image scanned of paper card back");
+	radio_card_back_ = new Fl_Radio_Light_Button(curr_x, curr_y, WBN, HBUTTON, "Card(B)");
+	radio_card_back_->align(FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
+	radio_card_back_->selection_color(FL_BLACK);
+	radio_card_back_->callback(cb_rad_card, (void*)QI_CARD_BACK);
+	radio_card_back_->when(FL_WHEN_RELEASE);
+	radio_card_back_->tooltip("Select image scanned of paper card back");
+	curr_x += WBN;
+	// Radio - display received e-mail image
+	radio_email_ = new Fl_Radio_Light_Button(curr_x, curr_y, WBN, HBUTTON, "e-mail");
+	radio_email_->align(FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
+	radio_email_->selection_color(FL_BLACK);
+	radio_email_->callback(cb_rad_card, (void*)QI_EMAIL);
+	radio_email_->when(FL_WHEN_RELEASE);
+	radio_email_->tooltip("Select image received by e-mail");
 
-	card_type_grp_->end();
+	grp_card_type_->end();
 
-	curr_x += WBUTTON;
+	curr_x += WBN;
 
 	curr_y += HBUTTON;
-	curr_x = x() + GAP;
+	curr_x = x();
 
-	// Button - Fetch the card image from eQSL.cc
-	fetch_bn_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Fetch");
-	fetch_bn_->tooltip("Request a fresh download of the eQSL image");
-	fetch_bn_->callback(cb_bn_fetch, nullptr);
-	fetch_bn_->when(FL_WHEN_RELEASE);
-	curr_x += WBUTTON;
+	Fl_Box* label2 = new Fl_Box(curr_x, curr_y, WBN, HBUTTON, "Log");
+	label2->box(FL_FLAT_BOX);
+	label2->color(FL_BACKGROUND_COLOR);
+
+	curr_x += WBN;
 	// Button - Mark paper card received
-	log_card_bn_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Log card");
-	log_card_bn_->tooltip("Log a paper card received on today's date");
-	log_card_bn_->callback(cb_bn_log_card, nullptr);
-	log_card_bn_->when(FL_WHEN_RELEASE);
-	curr_x += WBUTTON;
+	bn_log_bureau_ = new Fl_Button(curr_x, curr_y, WBN, HBUTTON, "Bureau");
+	bn_log_bureau_->tooltip("Log a paper card received from the bureau on today's date");
+	bn_log_bureau_->callback(cb_bn_log_card, (void*)"B");
+	bn_log_bureau_->when(FL_WHEN_RELEASE);
+	curr_x += WBN;
+	// Button - Mark e-mail received
+	bn_log_bureau_ = new Fl_Button(curr_x, curr_y, WBN, HBUTTON, "e-mail");
+	bn_log_bureau_->tooltip("Log an e-mail card received on today's date");
+	bn_log_bureau_->callback(cb_bn_log_card, (void*)"E");
+	bn_log_bureau_->when(FL_WHEN_RELEASE);
+	curr_x += WBN;
+	// Button - Mark e-mail received
+	bn_log_direct_ = new Fl_Button(curr_x, curr_y, WBN, HBUTTON, "Direct");
+	bn_log_direct_->tooltip("Log a paper card received direct on today's date");
+	bn_log_direct_->callback(cb_bn_log_card, (void*)"D");
+	bn_log_direct_->when(FL_WHEN_RELEASE);
+
+	curr_x = x();
+	curr_y += HBUTTON;
+	// Button - Fetch the card image from eQSL.cc
+	bn_fetch_ = new Fl_Button(curr_x, curr_y, WBN, HBUTTON, "Fetch");
+	bn_fetch_->tooltip("Request a fresh download of the eQSL image");
+	bn_fetch_->callback(cb_bn_fetch, nullptr);
+	bn_fetch_->when(FL_WHEN_RELEASE);
+	curr_x += WBN;
 	// Button - Set QSL_SENT=R in current QSO
-	card_reqd_bn_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Requested");
-	card_reqd_bn_->tooltip("Marl QSL as wanting a card QSL");
-	card_reqd_bn_->callback(cb_bn_card_reqd);
-	card_reqd_bn_->when(FL_WHEN_RELEASE);
-	curr_x += WBUTTON;
+	bn_card_reqd_ = new Fl_Button(curr_x, curr_y, WBN, HBUTTON, "Requested");
+	bn_card_reqd_->tooltip("Marl QSL as wanting a card QSL");
+	bn_card_reqd_->callback(cb_bn_card_reqd);
+	bn_card_reqd_->when(FL_WHEN_RELEASE);
+	curr_x += WBN;
+
 
 	end();
 	show();
@@ -206,17 +245,23 @@ void qso_qsl_vwr::cb_bn_fetch(Fl_Widget* w, void* v) {
 
 // Set the QSL_RCVD and QSLRDATE values in current record
 // Set QSL_SENT to QUEUED if not already set
-// v is unused
+// v selects scanned card (QI_CARD_FRONT) or e-mail (QI_EMAIL)
 void qso_qsl_vwr::cb_bn_log_card(Fl_Widget* w, void* v) {
 	qso_qsl_vwr* that = ancestor_view<qso_qsl_vwr>(w);
+	const char* source = (const char*)v;
 	string today = now(false, "%Y%m%d");
 	that->current_qso_->item("QSLRDATE", today);
 	that->current_qso_->item("QSL_RCVD", string("Y"));
+	that->current_qso_->item("QSL_RCVD_VIA", string(source));
 	if (!that->current_qso_->item("QSL_SENT").length()) {
 		that->current_qso_->item("QSL_SENT", string("Q"));
 	}
 	// now pretend the Card Front radio button has been pressed
-	cb_rad_card(that->card_front_radio_, (void*)QI_CARD_FRONT);
+	if (*source == 'E') {
+		cb_rad_card(that->radio_card_front_, (void*)QI_EMAIL);
+	} else {
+		cb_rad_card(that->radio_card_front_, (void*)QI_CARD_FRONT);
+	}
 	that->set_image_buttons();
 	book_->selection(that->current_qso_num_, HT_MINOR_CHANGE);
 }
@@ -308,6 +353,7 @@ void qso_qsl_vwr::set_image() {
 				break;
 			case QI_CARD_FRONT:
 			case QI_CARD_BACK:
+			case QI_EMAIL:
 				for (int ix = 0; ix < 2 && !found_image; ix++) {
 					if (ix == 0) call = to_upper(call);
 					else call = to_lower(call);
@@ -330,10 +376,19 @@ void qso_qsl_vwr::set_image() {
 							call.c_str(),
 							current_qso_->item("QSO_DATE").c_str());
 						break;
+					case QI_EMAIL:
+						// Card image of a scanned-in paper QSL card (front - i.e. callsign side)
+						// File name e.g.= <root>\emails\PA_GM3ZZA_P__<QSO date>.png
+						sprintf(filename, "%s/email/%s__%s",
+							qsl_directory_.c_str(),
+							call.c_str(),
+							current_qso_->item("QSO_DATE").c_str());
+						break;
 					}
 					// Scanned-in paper card - could be any graphic format
 					for (int i = 0; i < num_types && !found_image; i++) {
 						full_name_ = string(filename) + file_types[i];
+						printf("DEBUG QSO_QSL_VWR: Image file %s\n", full_name_.c_str());
 						// Read files depending on file type
 						if (file_types[i] == ".jpg") {
 							raw_image_ = new Fl_JPEG_Image(full_name_.c_str());
@@ -360,13 +415,13 @@ void qso_qsl_vwr::set_image() {
 			if (found_image) {
 				// Resize the image to fit the control
 				// Resize keeping original height/width ratio
-				float scale_w = (float)raw_image_->w() / (float)card_display_->w();
-				float scale_h = (float)raw_image_->h() / (float)card_display_->h();
+				float scale_w = (float)raw_image_->w() / (float)bn_card_display_->w();
+				float scale_h = (float)raw_image_->h() / (float)bn_card_display_->h();
 				if (scale_w < scale_h) {
-					scaled_image_ = raw_image_->copy((int)(raw_image_->w() / scale_h), card_display_->h());
+					scaled_image_ = raw_image_->copy((int)(raw_image_->w() / scale_h), bn_card_display_->h());
 				}
 				else {
-					scaled_image_ = raw_image_->copy(card_display_->w(), (int)(raw_image_->h() / scale_w));
+					scaled_image_ = raw_image_->copy(bn_card_display_->w(), (int)(raw_image_->h() / scale_w));
 				}
 				update_full_view();
 			}
@@ -381,74 +436,94 @@ void qso_qsl_vwr::set_image_buttons() {
 	switch (selected_image_) {
 	case QI_EQSL:
 		// eQSL displayed
-		eqsl_radio_->value(true);
-		card_front_radio_->value(false);
-		card_back_radio_->value(false);
+		radio_eqsl_->value(true);
+		radio_card_front_->value(false);
+		radio_card_back_->value(false);
+		radio_email_->value(false);
 		break;
 	case QI_CARD_FRONT:
 		// Display the front of a scanned-in paper card
-		eqsl_radio_->value(false);
-		card_front_radio_->value(true);
-		card_back_radio_->value(false);
+		radio_eqsl_->value(false);
+		radio_card_front_->value(true);
+		radio_card_back_->value(false);
+		radio_email_->value(false);
 		break;
 	case QI_CARD_BACK:
 		// Display the back of a scanned-in paper card
-		eqsl_radio_->value(false);
-		card_front_radio_->value(false);
-		card_back_radio_->value(true);
+		radio_eqsl_->value(false);
+		radio_card_front_->value(false);
+		radio_card_back_->value(true);
+		radio_email_->value(false);
+		break;
+	case QI_EMAIL:
+		// Display the back of a scanned-in paper card
+		radio_eqsl_->value(false);
+		radio_card_front_->value(false);
+		radio_card_back_->value(false);
+		radio_email_->value(true);
 		break;
 	default:
 		// Shouldn't get here
-		eqsl_radio_->value(false);
-		card_front_radio_->value(false);
-		card_back_radio_->value(false);
+		radio_eqsl_->value(false);
+		radio_card_front_->value(false);
+		radio_card_back_->value(false);
+		radio_email_->value(false);
 		break;
 	}
 	if (current_qso_ && current_qso_->item("EQSL_QSL_RCVD") == "Y") {
-		eqsl_radio_->activate();
+		radio_eqsl_->activate();
 	}
 	else {
-		eqsl_radio_->deactivate();
+		radio_eqsl_->deactivate();
 	}
 	if (current_qso_ && current_qso_->item("QSL_RCVD") == "Y") {
-		card_front_radio_->activate();
-		card_back_radio_->activate();
+		if (current_qso_ && current_qso_->item("QSL_RCVD_VIA") == "E") {
+			radio_email_->activate();
+			radio_card_back_->deactivate();
+			radio_card_front_->deactivate();
+		} else {
+			radio_card_front_->activate();
+			radio_card_back_->activate();
+			radio_email_->deactivate();
+		}
 	}
 	else {
-		card_front_radio_->deactivate();
-		card_back_radio_->deactivate();
+		radio_card_front_->deactivate();
+		radio_card_back_->deactivate();
+		radio_email_->deactivate();
 	}
 }
 
 // Draw the selected QSL card image (or callsign if no image)
 void qso_qsl_vwr::draw_image() {
 	// Remove existing images
-	card_display_->label(nullptr);
-	card_display_->image(nullptr);
-	card_display_->deimage(nullptr);
+	bn_card_display_->label(nullptr);
+	bn_card_display_->image(nullptr);
+	bn_card_display_->deimage(nullptr);
 	switch (selected_image_) {
 	case QI_EQSL:
 	case QI_CARD_BACK:
 	case QI_CARD_FRONT:
+	case QI_EMAIL:
 		// We want to display the saved QSL image
 		if (scaled_image_) {
 			// we have an image
 			// Set the resized image as the selected and unselected image for the control
-			card_display_->image(scaled_image_);
-			card_display_->deimage(scaled_image_);
+			bn_card_display_->image(scaled_image_);
+			bn_card_display_->deimage(scaled_image_);
 		}
 		else {
 			// Display the error message in red.
 			// Display a label instead in large letters - 36 pt.
-			card_display_->copy_label(current_qso_->item("CALL").c_str());
-			card_display_->labelsize(36);
-			card_display_->labelcolor(FL_BLACK);
-			//card_display_->color(FL_WHITE);
+			bn_card_display_->copy_label(current_qso_->item("CALL").c_str());
+			bn_card_display_->labelsize(36);
+			bn_card_display_->labelcolor(FL_BLACK);
+			//bn_card_display_->color(FL_WHITE);
 		}
 		break;
 	}
 
-	card_display_->redraw();
+	bn_card_display_->redraw();
 }
 
 // Set the selected image to that provided
@@ -460,22 +535,33 @@ void qso_qsl_vwr::set_selected_image(image_t value) {
 void qso_qsl_vwr::set_qsl_status() {
 	if (current_qso_) {
 		if (current_qso_->item("EQSL_QSL_RCVD") == "Y") {
-			eqsl_status_box_->color(FL_GREEN);
+			bn_eqsl_status_->selection_color(FL_GREEN);
 		}
 		else {
-			eqsl_status_box_->color(fl_lighter(FL_RED));
+			bn_eqsl_status_->selection_color(FL_RED);
 		}
 		if (current_qso_->item("LOTW_QSL_RCVD") == "Y") {
-			lotw_status_box_->color(FL_GREEN);
+			bn_lotw_status_->selection_color(FL_GREEN);
 		}
 		else {
-			lotw_status_box_->color(fl_lighter(FL_RED));
+			bn_lotw_status_->selection_color(FL_RED);
 		}
 		if (current_qso_->item("QSL_RCVD") == "Y") {
-			card_status_box_->color(FL_GREEN);
+			bn_card_status_->selection_color(FL_GREEN);
+			string s = current_qso_->item("QSL_RCVD_VIA");
+			if (s == "B") {
+				bn_card_status_->label("Bureau");
+			} else if (s == "D") {
+				bn_card_status_->label("Direct");
+			} else if (s == "E") {
+				bn_card_status_->label("e-mail");
+			} else {
+				bn_card_status_->label("Card");
+			}
 		}
 		else {
-			card_status_box_->color(fl_lighter(FL_RED));
+			bn_card_status_->selection_color(FL_RED);
+			bn_card_status_->label("Card");
 		}
 	}
 }

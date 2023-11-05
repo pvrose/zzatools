@@ -5,7 +5,7 @@
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Radio_Light_Button.H>
-#include <FL/Fl_Box.H>
+#include <FL/Fl_Light_Button.H>
 
 class qso_qsl_vwr :
     public Fl_Group
@@ -15,6 +15,7 @@ class qso_qsl_vwr :
 		QI_EQSL,            // Downloaded eQSL image
 		QI_CARD_FRONT,      // Scanned-in front of a card
 		QI_CARD_BACK,       // Scanned-in back of a card
+		QI_EMAIL,          	// e-mailed image
 	};
 
 public:
@@ -76,19 +77,22 @@ protected:
 	string full_name_;
 
 	// Card image and info
-	Fl_Button* card_display_;
+	Fl_Button* bn_card_display_;
 	// Card controls
-	Fl_Group* card_type_grp_;
-	Fl_Radio_Light_Button* eqsl_radio_;
-	Fl_Radio_Light_Button* card_front_radio_;
-	Fl_Radio_Light_Button* card_back_radio_;
-	Fl_Button* fetch_bn_;
-	Fl_Button* log_card_bn_;
-	Fl_Button* card_reqd_bn_;
+	Fl_Group* grp_card_type_;
+	Fl_Radio_Light_Button* radio_eqsl_;
+	Fl_Radio_Light_Button* radio_card_front_;
+	Fl_Radio_Light_Button* radio_card_back_;
+	Fl_Radio_Light_Button* radio_email_;
+	Fl_Button* bn_fetch_;
+	Fl_Button* bn_log_bureau_;
+	Fl_Button* bn_log_email_;
+	Fl_Button* bn_log_direct_;
+	Fl_Button* bn_card_reqd_;
 	// QSL status
-	Fl_Box* eqsl_status_box_;
-	Fl_Box* lotw_status_box_;
-	Fl_Box* card_status_box_;
+	Fl_Light_Button* bn_eqsl_status_;
+	Fl_Light_Button* bn_lotw_status_;
+	Fl_Light_Button* bn_card_status_;
 	// Window to contain full view
 	Fl_Window* win_full_view_;
 	// Button
