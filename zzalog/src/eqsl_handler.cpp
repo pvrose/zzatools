@@ -326,8 +326,10 @@ eqsl_handler::response_t eqsl_handler::card_filename_r(record* record, string& c
 	string time_on = record->item("TIME_ON");
 	string mode = record->item("MODE");
 	string band = record->item("BAND");
+	string station = record->item("STATION_CALLSIGN");
+	if (station.length() == 0) station = username;
 	// Apply fields to complete the URL
-	sprintf(url, url_format, username.c_str(), password.c_str(), call.c_str(), qso_date.substr(0, 4).c_str(), 
+	sprintf(url, url_format, station.c_str(), password.c_str(), call.c_str(), qso_date.substr(0, 4).c_str(), 
 		qso_date.substr(4, 2).c_str(), qso_date.substr(6, 2).c_str(),
 		time_on.substr(0, 2).c_str(), time_on.substr(2, 2).c_str(), band.c_str(), mode.c_str());
 	// Stream to receive the data
