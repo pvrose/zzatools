@@ -461,7 +461,7 @@ void qso_data::update_query(logging_state_t query, qso_num_t match_num, qso_num_
 }
 
 // Update modem QSO
-void qso_data::update_modem_qso(record* qso) {
+void qso_data::update_modem_qso(record* qso, bool new_qso) {
 	if (qso == nullptr) {
 		switch (logging_state_) {
 		case QSO_MODEM:
@@ -477,7 +477,7 @@ void qso_data::update_modem_qso(record* qso) {
 			action_deactivate();
 			// drop down
 		case QSO_INACTIVE:
-			if (qso->item("QSO_COMPLETE") == "") {
+			if (qso->item("QSO_COMPLETE") == "" && !new_qso) {
 				// We can get multiple message when complete if TX5 decoded after log
 				action_update_modem(qso);
 			} else {

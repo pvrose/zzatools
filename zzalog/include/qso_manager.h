@@ -93,7 +93,7 @@ using namespace std;
 		// Present query (uses view update mechanism)
 		void update_qso(hint_t hint, qso_num_t match_num, qso_num_t query_num);
 		// Update modem query with a QSO
-		void update_modem_qso(record* qso);
+		void update_modem_qso(record* qso, bool new_qso);
 		// QSO i n progress
 		bool qso_in_progress();
 		// Start QSO

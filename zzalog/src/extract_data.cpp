@@ -778,6 +778,23 @@ void extract_data::extract_call(string callsign) {
 		/*string my_call;*/ station
 	};
 	criteria(new_criteria, SEARCH);
+	new_criteria = {
+		/*search_cond_t condition*/ XC_FIELD,
+		/*search_comp_t comparator*/ XP_NE,
+		/*bool by_dates*/ false,
+		/*string from_date*/"",
+		/*string to_date;*/"",
+		/*string band;*/ "Any",
+		/*string mode;*/ "Any",
+		/*bool confirmed_eqsl;*/ false,
+		/*bool confirmed_lotw;*/ false,
+		/*bool confirmed_card;*/ false,
+		/*search_combi_t combi_mode;*/ XM_AND,
+		/*string field_name; */ "QSO_COMPLETE",
+		/*string pattern;*/ "N",
+		/*string my_call;*/ station
+	};
+	criteria(new_criteria, SEARCH);
 	if (size() == 0 || (book_->new_record() && size() == 1)) {
 		// No records match these criteria
 		status_->misc_status(ST_NOTE, "EXTRACT: Not worked this call before");

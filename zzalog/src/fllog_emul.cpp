@@ -31,6 +31,7 @@ fllog_emul::fllog_emul() {
 	current_record_ = nullptr;
 	that_ = this;
 	connected_ = false;
+	qso_ = nullptr;
 }
 
 // Start and run the RPC Server
@@ -131,13 +132,14 @@ int fllog_emul::check_dup(rpc_data_item::rpc_list& params, rpc_data_item& respon
 		extract_records_->extract_call(callsign);
 		printf("check_dup %s Mode=%s Span=%d Freq=%d State=%s RST=%s", 
 			callsign.c_str(), mode.c_str(), span, freq, state.c_str(), rst_in.c_str());
+		time_t timestamp = time(nullptr);
+		record*& qso = that_->qso_;
 		if (extract_records_->size()) {
 			bool found = false;
 			item_num_t item_num;
 			item_num_t found_item;
 			for (item_num = 0; item_num < extract_records_->size() && !found; item_num++) {
 				that_->current_record_ = extract_records_->get_record(item_num, false);
-				time_t now = time(nullptr);
 				found = true;
 				found_item = item_num;
 				// Now check for exact match 
@@ -145,7 +147,7 @@ int fllog_emul::check_dup(rpc_data_item::rpc_list& params, rpc_data_item& respon
 					// different mode (note this includes submode)
 					found = false;
 				}
-				else if (span > 0 && difftime(now, that_->current_record_->timestamp(true)) > (span * 60)) {
+				else if (span > 0 && difftime(timestamp, that_->current_record_->timestamp(true)) > (span * 60)) {
 					// More that span minutes ago
 					found = false;
 				}
@@ -185,7 +187,25 @@ int fllog_emul::check_dup(rpc_data_item::rpc_list& params, rpc_data_item& respon
 			printf(" No match\n");
 			response.set("false", XRT_STRING);
 		}
-		return 0;
+		// Now create a record to view
+		if (qso && qso->item("CALL") != callsign) {
+			printf("DEBUG: Check_dup - previous was %s this %s\n", qso->item("CALL").c_str(), callsign.c_str());
+			delete qso;
+		}
+		qso = new record();
+		tm* log_time = gmtime(&timestamp);
+		char result[100];
+		// convert to C string, then C++ string
+		strftime(result, 99, "%Y%m%d", log_time);
+		qso->item("QSO_COMPLETE", string("N"));
+		qso->item("QSO_DATE", string(result));
+		strftime(result, sizeof(result), "%H%H%S", log_time);
+		qso->item("TIME_ON", string(result));
+		qso->item("CALL", callsign);
+		qso->item("MODE", mode);
+		qso->item("FREQ", freq);
+		if (rst_in != "0") qso->item("RST_RCVD", rst_in);
+		qso_manager_->update_modem_qso(qso, true);
 	}
 	else {
 		that_->generate_error(-2, "Wrong number of parameters in call", response);
@@ -206,10 +226,10 @@ int fllog_emul::add_record(rpc_data_item::rpc_list& params, rpc_data_item& respo
 		printf("add_record: %s\n", item->get_string().c_str());
 		adi_reader* reader = new adi_reader();
 		load_result_t dummy;
-		that_->current_record_ = new record();
-		reader->load_record(that_->current_record_, ss, dummy);
-		item_num_t number = book_->insert_record(that_->current_record_);
-		qso_manager_->update_modem_qso(that_->current_record_);
+		record* log_qso = new record();
+		reader->load_record(log_qso, ss, dummy);
+		that_->qso_->merge_records(log_qso);
+		qso_manager_->update_modem_qso(that_->qso_, true);
 		status_->misc_status(ST_NOTE, "FLLOG_EMUL: Logged QSO");
 		return 0;
 	}
@@ -276,10 +296,10 @@ int fllog_emul::list_methods(rpc_data_item::rpc_list& params, rpc_data_item& res
 }
 
 void fllog_emul::check_connected() {
-	if (!connected_) {
-		connected_ = true;
-		fl_beep(FL_BEEP_NOTIFICATION);
-		fl_alert("FLDIGI has connected, please ensure station details will be logged correctly!");
-	}
+	// if (!connected_) {
+	// 	connected_ = true;
+	// 	fl_beep(FL_BEEP_NOTIFICATION);
+	// 	fl_alert("FLDIGI has connected, please ensure station details will be logged correctly!");
+	// }
 }
 

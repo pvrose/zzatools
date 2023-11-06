@@ -54,6 +54,8 @@
 
 		// Connected
 		bool connected_;
+		// New record
+		record* qso_;
 
 
 	};
