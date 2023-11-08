@@ -38,6 +38,8 @@
 
 		// Generate error resposne
 		void generate_error(int code, string message, rpc_data_item& response);
+		// Create/Update qso
+		void prepare_qso(string callsign, string freq, string mode);
 
 		// Check connected
 		void check_connected();

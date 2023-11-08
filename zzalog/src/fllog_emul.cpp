@@ -84,14 +84,14 @@ int fllog_emul::get_record(rpc_data_item::rpc_list& params, rpc_data_item& respo
 		rpc_data_item* item_0 = params.front();
 		string callsign = item_0->get_string();
 		extract_records_->extract_call(callsign);
-		printf("get_record %s %zu records found\n", callsign.c_str(), extract_records_->size());
+		printf("DEBUG: get_record %s %zu records found\n", callsign.c_str(), extract_records_->size());
 		if (extract_records_->size()) {
 			that_->current_record_ = extract_records_->get_record(0, true);
 			extract_records_->selection(0, HT_SELECTED);
 			adi_writer* writer = new adi_writer;
 			stringstream ss;
 			writer->to_adif(that_->current_record_, ss);
-			printf("get_record: %s\n", ss.str().c_str());
+			printf("DEBUG: get_record: %s\n", ss.str().c_str());
 			response.set(ss.str(), XRT_STRING);
 			delete writer;
 		}
@@ -120,8 +120,10 @@ int fllog_emul::check_dup(rpc_data_item::rpc_list& params, rpc_data_item& respon
 		rpc_data_item* i_span = params.front();
 		long span = atol(i_span->get_string().c_str());
 		params.pop_front();
+		// Frequency received in kHz
 		rpc_data_item* i_freq = params.front();
-		long freq = atol(i_span->get_string().c_str());
+		long freq_kHz = atol(i_freq->get_string().c_str());
+		double freq_MHz = (double)freq_kHz / 1000.0;
 		params.pop_front();
 		rpc_data_item* i_state = params.front();
 		string state = i_state->get_string();
@@ -130,10 +132,9 @@ int fllog_emul::check_dup(rpc_data_item::rpc_list& params, rpc_data_item& respon
 		string rst_in = i_rst_in->get_string();
 		// Get all possible matches
 		extract_records_->extract_call(callsign);
-		printf("check_dup %s Mode=%s Span=%d Freq=%d State=%s RST=%s", 
-			callsign.c_str(), mode.c_str(), span, freq, state.c_str(), rst_in.c_str());
+		printf("DEBUG: check_dup %s Mode=%s Span=%d Freq=%d State=%s RST=%s", 
+			callsign.c_str(), mode.c_str(), span, freq_kHz, state.c_str(), rst_in.c_str());
 		time_t timestamp = time(nullptr);
-		record*& qso = that_->qso_;
 		if (extract_records_->size()) {
 			bool found = false;
 			item_num_t item_num;
@@ -151,10 +152,10 @@ int fllog_emul::check_dup(rpc_data_item::rpc_list& params, rpc_data_item& respon
 					// More that span minutes ago
 					found = false;
 				}
-				else if (freq > 0) {
+				else if (freq_MHz > 0) {
 					// Different frequency - need to check if this is exact frequency
 					string band = that_->current_record_->item("BAND");
-					if (spec_data_->band_for_freq((double)freq / 1000000) != band) {
+					if (spec_data_->band_for_freq(freq_MHz) != band) {
 						found = false;
 					}
 				}
@@ -187,25 +188,8 @@ int fllog_emul::check_dup(rpc_data_item::rpc_list& params, rpc_data_item& respon
 			printf(" No match\n");
 			response.set("false", XRT_STRING);
 		}
-		// Now create a record to view
-		if (qso && qso->item("CALL") != callsign) {
-			printf("DEBUG: Check_dup - previous was %s this %s\n", qso->item("CALL").c_str(), callsign.c_str());
-			delete qso;
-		}
-		qso = new record();
-		tm* log_time = gmtime(&timestamp);
-		char result[100];
-		// convert to C string, then C++ string
-		strftime(result, 99, "%Y%m%d", log_time);
-		qso->item("QSO_COMPLETE", string("N"));
-		qso->item("QSO_DATE", string(result));
-		strftime(result, sizeof(result), "%H%H%S", log_time);
-		qso->item("TIME_ON", string(result));
-		qso->item("CALL", callsign);
-		qso->item("MODE", mode);
-		qso->item("FREQ", freq);
-		if (rst_in != "0") qso->item("RST_RCVD", rst_in);
-		qso_manager_->update_modem_qso(qso, true);
+		that_->prepare_qso(callsign, to_string(freq_MHz), mode);
+		return 0;
 	}
 	else {
 		that_->generate_error(-2, "Wrong number of parameters in call", response);
@@ -228,8 +212,7 @@ int fllog_emul::add_record(rpc_data_item::rpc_list& params, rpc_data_item& respo
 		load_result_t dummy;
 		record* log_qso = new record();
 		reader->load_record(log_qso, ss, dummy);
-		that_->qso_->merge_records(log_qso);
-		qso_manager_->update_modem_qso(that_->qso_, true);
+		qso_manager_->update_modem_qso(log_qso, true);
 		status_->misc_status(ST_NOTE, "FLLOG_EMUL: Logged QSO");
 		return 0;
 	}
@@ -303,3 +286,26 @@ void fllog_emul::check_connected() {
 	// }
 }
 
+void fllog_emul::prepare_qso(string callsign, string freq, string mode) {
+	time_t timestamp = time(nullptr);
+	if (qso_ && qso_->item("CALL") != callsign) {
+		printf("DEBUG: Check_dup - previous was %s this %s\n", qso_->item("CALL").c_str(), callsign.c_str());
+		delete qso_;
+		qso_ = nullptr;
+	}
+	if (!qso_) qso_ = new record();
+	tm* log_time = gmtime(&timestamp);
+	char result[100];
+	// convert to C string, then C++ string
+	strftime(result, 99, "%Y%m%d", log_time);
+	if (qso_->item("QSO_COMPLETE") != "N") {
+		qso_->item("QSO_COMPLETE", string("N"));
+		qso_->item("QSO_DATE", string(result));
+		strftime(result, sizeof(result), "%H%M%S", log_time);
+		qso_->item("TIME_ON", string(result));
+		qso_->item("CALL", callsign);
+		qso_->item("MODE", mode);
+		qso_->item("FREQ", freq);
+		qso_manager_->update_modem_qso(qso_, true);
+	}
+}
