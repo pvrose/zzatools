@@ -324,7 +324,7 @@ void qso_data::update_qso(qso_num_t log_num) {
 	case QSO_MODEM:
 	case QSO_ENTER:
 		// Ack whether to save or quit then activate new QSO
-		if (log_num != g_entry_->qso_number()) {
+		if (log_num != g_entry_->qso_number() && g_entry_->qso()->item("QSO_COMPLETE") != "N") {
 			fl_beep(FL_BEEP_QUESTION);
 			switch (fl_choice("Trying to select a different record while logging a QSO", "Save QSO", "Quit QSO", "Ignore")) {
 			case 0:
