@@ -239,6 +239,7 @@ string eqsl_handler::card_filename_l(record* record) {
 	string time_on = record->item("TIME_ON");
 	string mode = record->item("MODE");
 	string band = record->item("BAND");
+	string station = record->item("STATION_CALLSIGN");
 	// Location of top-directory for QSL card images
 	Fl_Preferences datapath_settings(settings_, "Datapath");
 	string qsl_directory;
@@ -257,9 +258,12 @@ string eqsl_handler::card_filename_l(record* record) {
 		delete chooser;
 	}
 	char save_filename[2048];
-	// Create file name e.g. <dir-name>/20M/PSK/GM3ZZA__202007201424.png
+	// Create file name e.g. <dir-name>/<MY_CALL>/20M/PSK/GM3ZZA__202007201424.png
 	// NB we used to have APP_ZZA_EQSL_TS as thetimestamp from the eQSL record, but we now do this after merging the data.
-	sprintf(save_filename, "%s/%s/%s/%s__%s%s.png", qsl_directory.c_str(), band.c_str(), mode.c_str(), card_call.c_str(), qso_date.c_str(), time_on.substr(0, 4).c_str());
+	sprintf(save_filename, "%s/%s/%s/%s/%s__%s%s.png", 
+		qsl_directory.c_str(),
+		station.c_str(), band.c_str(), mode.c_str(), 
+		card_call.c_str(), qso_date.c_str(), time_on.substr(0, 4).c_str());
 	return save_filename;
 }
 
@@ -512,7 +516,9 @@ eqsl_handler::response_t eqsl_handler::adif_filename(string& filename) {
 	// url for in-box at eQSL.cc
 	char url_format[] = "http://www.eqsl.cc/qslcard/DownloadInBox.cfm?Username=%s&Password=%s&RcvdSince=%s";
 	char url[2048];
-	sprintf(url, url_format, username.c_str(), password.c_str(), last_access.c_str());
+	// Get default callsign
+	string station = qso_manager_->get_default(qso_manager::CALLSIGN);
+	sprintf(url, url_format, station.c_str(), password.c_str(), last_access.c_str());
 	response_t result = ER_OK;
 	stringstream eqsl_ss;
 	strcpy(message, "EQSL: Querying in-box...");

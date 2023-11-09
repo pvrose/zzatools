@@ -360,9 +360,10 @@ void qso_qsl_vwr::set_image() {
 					switch (selected_image_) {
 					case QI_CARD_FRONT:
 						// Card image of a scanned-in paper QSL card (front - i.e. callsign side)
-						// File name e.g.= <root>\scans\<received date>\PA_GM3ZZA_P__<QSO date>.png
-						sprintf(filename, "%s/scans/%s/%s__%s",
+						// File name e.g.= <root>/<MY_CALL>\scans\<received date>\PA_GM3ZZA_P__<QSO date>.png
+						sprintf(filename, "%s/%s/scans/%s/%s__%s",
 							qsl_directory_.c_str(),
+							current_qso_->item("STATION_CALLSIGN").c_str(),
 							current_qso_->item("QSLRDATE").c_str(),
 							call.c_str(),
 							current_qso_->item("QSO_DATE").c_str());
@@ -370,8 +371,9 @@ void qso_qsl_vwr::set_image() {
 					case QI_CARD_BACK:
 						// Card image of a scanned-in paper QSL card (back - i.e. QSO details side)
 						// File name e.g.= <root>\scans\<received date>\PA_GM3ZZA_P++<QSO date>.png
-						sprintf(filename, "%s/scans/%s/%s++%s",
+						sprintf(filename, "%s/%s/scans/%s/%s++%s",
 							qsl_directory_.c_str(),
+							current_qso_->item("STATION_CALLSIGN").c_str(),
 							current_qso_->item("QSLRDATE").c_str(),
 							call.c_str(),
 							current_qso_->item("QSO_DATE").c_str());
@@ -379,8 +381,9 @@ void qso_qsl_vwr::set_image() {
 					case QI_EMAIL:
 						// Card image of a scanned-in paper QSL card (front - i.e. callsign side)
 						// File name e.g.= <root>\emails\PA_GM3ZZA_P__<QSO date>.png
-						sprintf(filename, "%s/email/%s__%s",
+						sprintf(filename, "%s/%s/email/%s__%s",
 							qsl_directory_.c_str(),
+							current_qso_->item("STATION_CALLSIGN").c_str(),
 							call.c_str(),
 							current_qso_->item("QSO_DATE").c_str());
 						break;
