@@ -266,6 +266,8 @@ using namespace std;
 		macro_map used_qths_;
 		// Operators used
 		macro_map used_ops_;
+		// Ignore null macros
+		bool ignore_null_;
 		// Bands worked per DXCC
 		map < string, map < int, set<string> > > bands_per_dxcc_;
 		// mOdes worked per DXCC

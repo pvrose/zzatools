@@ -85,6 +85,7 @@ book::book(object_t type)
 	, adx_reader_(nullptr)
 	, adi_writer_(nullptr)
 	, adx_writer_(nullptr)
+	, ignore_null_(false)
 {
 	used_bands_.clear();
 	used_modes_.clear();
@@ -1210,7 +1211,7 @@ void book::add_use_data(record* use_record) {
 // Process the macro field
 bool book::get_macro(record* use_record, string macro_name, set<string> field_names, macro_map& map, bool allow_null) {
 	string id = use_record->item(macro_name);
-	if (allow_null || id.length()) {
+	if ((allow_null && !ignore_null_) || id.length()) {
 		macro_defn* defn;
 		bool update = false;
 		if (map.find(id) == map.end()) {
@@ -1241,6 +1242,10 @@ bool book::get_macro(record* use_record, string macro_name, set<string> field_na
 						modified(true);
 					}
 					else {
+						char* bn3;
+						char* label = "Ignore";
+						if (allow_null) bn3 = label;
+						else bn3 = nullptr;
 						snprintf(message, 128, "LOG: %s %s %s %s - new value  (%s) differs from old (%s)",
 							use_record->item("QSO_DATE").c_str(),
 							use_record->item("TIME_ON").c_str(),
@@ -1252,7 +1257,7 @@ bool book::get_macro(record* use_record, string macro_name, set<string> field_na
 						if ((*it) != "MY_GRIDSQUARE" || value.length() > old_value.length() || value != old_value.substr(0, value.length())) {
 							switch(fl_choice(
 								"Imported %s: New value %s; old value %s. Select New or Old?",
-								"New", "Old", nullptr,
+								"New", "Old", bn3,
 								(*it).c_str(), value.c_str(), old_value.c_str())
 							) {
 							case 0:
@@ -1268,8 +1273,14 @@ bool book::get_macro(record* use_record, string macro_name, set<string> field_na
 								status_->misc_status(ST_WARNING, message);
 								defn->fields->item(*it, value);
 								break;
+							case 2:
+								snprintf(message, sizeof(message),
+									"LOG: Macro %s - ignoring null value!",
+									macro_name.c_str());
+								status_->misc_status(ST_WARNING, message);
+								ignore_null_ = true;
+								break;
 							}
-							
 						}
 					}
 				}
