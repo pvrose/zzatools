@@ -67,10 +67,10 @@ using namespace std;
 
 		// Open socket and create server
 		int create_server();
-		// Timer to wait before testing receive
-		static void cb_timer_rcv(void* v);
-		// Timer to wait before trying to accept again
-		static void cb_timer_acc(void* v);
+		// // Timer to wait before testing receive
+		// static void cb_timer_rcv(void* v);
+		// // Timer to wait before trying to accept again
+		// static void cb_timer_acc(void* v);
 		// Diagnostic data
 		void dump(string line);
 		// Call back to handle packets - pass pointer to socket serevr

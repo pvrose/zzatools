@@ -82,8 +82,8 @@ void socket_server::close_server()
 	if (th_socket_)
 		th_socket_->detach();
 	delete th_socket_;
-	Fl::remove_timeout(cb_timer_acc, this);
-	Fl::remove_timeout(cb_timer_rcv, this);
+	// Fl::remove_timeout(cb_timer_acc, this);
+	// Fl::remove_timeout(cb_timer_rcv, this);
 	if (server_ != INVALID_SOCKET)
 	{
 		SOCKADDR_IN server_addr;
@@ -420,19 +420,19 @@ int socket_server::send_response(istream &response)
 	return 0;
 }
 
-// Call back to restart attempt to restart datagram
-void socket_server::cb_timer_rcv(void *v)
-{
-	socket_server *that = (socket_server *)v;
-	that->rcv_packet();
-}
+// // Call back to restart attempt to restart datagram
+// void socket_server::cb_timer_rcv(void *v)
+// {
+// 	socket_server *that = (socket_server *)v;
+// 	that->rcv_packet();
+// }
 
-// Callback to restart attempt to accept client
-void socket_server::cb_timer_acc(void *v)
-{
-	socket_server *that = (socket_server *)v;
-	that->accept_client();
-}
+// // Callback to restart attempt to accept client
+// void socket_server::cb_timer_acc(void *v)
+// {
+// 	socket_server *that = (socket_server *)v;
+// 	that->accept_client();
+// }
 
 // Has a server
 bool socket_server::has_server()
