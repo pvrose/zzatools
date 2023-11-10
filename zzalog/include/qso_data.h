@@ -103,7 +103,7 @@ public:
 	// Update query
 	void update_query(logging_state_t query, qso_num_t match_num, qso_num_t query_num);
 	// Update modem QSO
-	void update_modem_qso(record* qso, bool new_qso);
+	void update_modem_qso(record* qso);
 	// Get default copy record
 	qso_num_t get_default_number();
 	// Initialise fields

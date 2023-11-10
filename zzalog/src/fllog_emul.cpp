@@ -31,7 +31,6 @@ fllog_emul::fllog_emul() {
 	current_record_ = nullptr;
 	that_ = this;
 	connected_ = false;
-	qso_ = nullptr;
 }
 
 // Start and run the RPC Server
@@ -188,7 +187,6 @@ int fllog_emul::check_dup(rpc_data_item::rpc_list& params, rpc_data_item& respon
 			printf(" No match\n");
 			response.set("false", XRT_STRING);
 		}
-		that_->prepare_qso(callsign, to_string(freq_MHz), mode);
 		return 0;
 	}
 	else {
@@ -207,12 +205,12 @@ int fllog_emul::add_record(rpc_data_item::rpc_list& params, rpc_data_item& respo
 		rpc_data_item* item = params.front();
 		stringstream ss;
 		ss.str(item->get_string());
-		printf("add_record: %s\n", item->get_string().c_str());
+		printf("DEBUG: add_record: %s\n", item->get_string().c_str());
 		adi_reader* reader = new adi_reader();
 		load_result_t dummy;
-		record* log_qso = new record();
-		reader->load_record(log_qso, ss, dummy);
-		qso_manager_->update_modem_qso(log_qso, true);
+		that_->current_record_ = new record();
+		reader->load_record(that_->current_record_, ss, dummy);
+		qso_manager_->update_modem_qso(that_->current_record_);
 		status_->misc_status(ST_NOTE, "FLLOG_EMUL: Logged QSO");
 		return 0;
 	}
@@ -284,28 +282,4 @@ void fllog_emul::check_connected() {
 	// 	fl_beep(FL_BEEP_NOTIFICATION);
 	// 	fl_alert("FLDIGI has connected, please ensure station details will be logged correctly!");
 	// }
-}
-
-void fllog_emul::prepare_qso(string callsign, string freq, string mode) {
-	time_t timestamp = time(nullptr);
-	if (qso_ && qso_->item("CALL") != callsign) {
-		printf("DEBUG: Check_dup - previous was %s this %s\n", qso_->item("CALL").c_str(), callsign.c_str());
-		delete qso_;
-		qso_ = nullptr;
-	}
-	if (!qso_) qso_ = new record();
-	tm* log_time = gmtime(&timestamp);
-	char result[100];
-	// convert to C string, then C++ string
-	strftime(result, 99, "%Y%m%d", log_time);
-	if (qso_->item("QSO_COMPLETE") != "N") {
-		qso_->item("QSO_COMPLETE", string("N"));
-		qso_->item("QSO_DATE", string(result));
-		strftime(result, sizeof(result), "%H%M%S", log_time);
-		qso_->item("TIME_ON", string(result));
-		qso_->item("CALL", callsign);
-		qso_->item("MODE", mode);
-		qso_->item("FREQ", freq);
-		qso_manager_->update_modem_qso(qso_, true);
-	}
 }

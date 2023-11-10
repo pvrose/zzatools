@@ -420,12 +420,12 @@ qso_data* qso_manager::data() {
 }
 
 // Update book with a QSO from the modem app
-void qso_manager::update_modem_qso(record* qso, bool new_qso) {
+void qso_manager::update_modem_qso(record* qso) {
 	//cout << "Received record from modem:" << qso << endl;
 	//adi_writer::to_adif(qso, cout);
 	//cout << endl;
 	update_import_qso(qso);
-	data_group_->update_modem_qso(qso, new_qso);
+	data_group_->update_modem_qso(qso);
 }
 
 // Download QSLs;
