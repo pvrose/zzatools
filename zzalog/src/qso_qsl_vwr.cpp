@@ -345,20 +345,20 @@ void qso_qsl_vwr::set_image() {
 				strcpy(filename, eqsl_handler_->card_filename_l(current_qso_).c_str());
 				// Cards are downloaded from eQSL in PNG format
 				raw_image_ = new Fl_PNG_Image(filename);
-				printf("DEBUG testing filename %s", filename);
+				// printf("DEBUG testing filename %s", filename);
 				if (raw_image_->fail()) {
-					printf(" - failed\n");
+					// printf(" - failed\n");
 					delete raw_image_;
 					// Now try dfefault call
 					strcpy(default_name, eqsl_handler_->card_filename_l(current_qso_, true).c_str());
 					raw_image_ = new Fl_PNG_Image(default_name);
-					printf("DEBUG testing filename %s", default_name);
+					// printf("DEBUG testing filename %s", default_name);
 					if (raw_image_->fail()) {
-						printf(" - failed\n");
+						// printf(" - failed\n");
 						delete raw_image_;
 						raw_image_ = nullptr;
 					} else {
-						printf(" - succeeded\n");
+						// printf(" - succeeded\n");
 						use_default = true;
 						full_name_ = string(default_name);
 						found_image = true;
@@ -366,7 +366,7 @@ void qso_qsl_vwr::set_image() {
 				}
 				else {
 					full_name_ = string(filename);
-						printf(" - succeeded\n");
+						// printf(" - succeeded\n");
 					found_image = true;
 				}
 				break;
