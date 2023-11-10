@@ -102,7 +102,7 @@ using namespace std;
 		// is there active fetching
 		bool requests_queued();
 		// get the local card file-name
-		string card_filename_l(record* record);
+		string card_filename_l(record* record, bool use_default = false);
 		// does the file exist and is it a valid png file
 		bool card_file_valid(string& filename);
 		// Enqueue single record

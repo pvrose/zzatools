@@ -122,7 +122,8 @@ using namespace std;
 	void default_error_message(status_t level, const char* message);
 	// Calculate the great circle bearing and distance between two locations on the Earth's surface
 	void great_circle(lat_long_t source, lat_long_t destination, double& bearing, double& distance);
-
+	// Replace '/' with '_' throught
+	void de_slash(string& data);
 
 	// template function to find the enclosing widget of class WIDGET
 	template <class WIDGET>

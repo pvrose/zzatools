@@ -1034,3 +1034,9 @@ void great_circle(lat_long_t source, lat_long_t destination, double& bearing, do
 	// Convert to distance = radius * angle in radians
 	distance = EARTH_RADIUS * acos(cos_angle);
 }
+
+void de_slash(string& data) {
+	for (size_t ix = 0; ix < data.length(); ix++) {
+		if (data[ix] == '/') data[ix] = '_';
+	}
+}

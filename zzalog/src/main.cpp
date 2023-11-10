@@ -153,6 +153,8 @@ bool resuming_ = false;
 uint64_t ticks_ = 0;
 // Filename in arguments
 char* filename_ = nullptr;
+// Default station callsign
+string default_station_ = "";
 
 static void cb_ticker(void* v) {
 	// Units that require 1s tick

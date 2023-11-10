@@ -21,6 +21,7 @@ extern eqsl_handler* eqsl_handler_;
 extern Fl_Preferences* settings_;
 extern status* status_;
 extern book* book_;
+extern string default_station_;
 
 qso_qsl_vwr::qso_qsl_vwr(int X, int Y, int W, int H, const char* L) :
 	Fl_Group(X, Y, W, H, L)
@@ -313,9 +314,12 @@ void qso_qsl_vwr::enable_widgets() {
 
 // Get the card image to display and put it in the image widget.
 void qso_qsl_vwr::set_image() {
+	bool use_default = false;
+	bool found_image = false;
+	char filename[256];
+	char default_name[256];
 	if (current_qso_ != nullptr) {
 		// We want to display the received card (eQSL or scanned image)
-		char filename[256];
 		// Get callsign
 		string call = current_qso_->item("CALL");
 		// OPtional file types
@@ -329,7 +333,6 @@ void qso_qsl_vwr::set_image() {
 				pos = call.find('/', pos + 1);
 			}
 			// Look for a possible image file and try and load into the image object
-			bool found_image = false;
 			delete raw_image_;
 			raw_image_ = nullptr;
 			delete scaled_image_;
@@ -342,28 +345,50 @@ void qso_qsl_vwr::set_image() {
 				strcpy(filename, eqsl_handler_->card_filename_l(current_qso_).c_str());
 				// Cards are downloaded from eQSL in PNG format
 				raw_image_ = new Fl_PNG_Image(filename);
+				printf("DEBUG testing filename %s", filename);
 				if (raw_image_->fail()) {
+					printf(" - failed\n");
 					delete raw_image_;
-					raw_image_ = nullptr;
+					// Now try dfefault call
+					strcpy(default_name, eqsl_handler_->card_filename_l(current_qso_, true).c_str());
+					raw_image_ = new Fl_PNG_Image(default_name);
+					printf("DEBUG testing filename %s", default_name);
+					if (raw_image_->fail()) {
+						printf(" - failed\n");
+						delete raw_image_;
+						raw_image_ = nullptr;
+					} else {
+						printf(" - succeeded\n");
+						use_default = true;
+						full_name_ = string(default_name);
+						found_image = true;
+					}
 				}
 				else {
 					full_name_ = string(filename);
+						printf(" - succeeded\n");
 					found_image = true;
 				}
 				break;
 			case QI_CARD_FRONT:
 			case QI_CARD_BACK:
 			case QI_EMAIL:
-				for (int ix = 0; ix < 2 && !found_image; ix++) {
-					if (ix == 0) call = to_upper(call);
+				for (int ix = 0; ix < 4 && !found_image; ix++) {
+					if (ix % 2 == 0) call = to_upper(call);
 					else call = to_lower(call);
+					string station;
+					if (ix > 1) station = current_qso_->item("STATION_CALLSIGN");
+					else station = default_station_;
+					char* test_name;
+					if (ix > 1) test_name = default_name;
+					else test_name = filename;
 					switch (selected_image_) {
 					case QI_CARD_FRONT:
 						// Card image of a scanned-in paper QSL card (front - i.e. callsign side)
 						// File name e.g.= <root>/<MY_CALL>\scans\<received date>\PA_GM3ZZA_P__<QSO date>.png
-						sprintf(filename, "%s/%s/scans/%s/%s__%s",
+						sprintf(test_name, "%s/%s/scans/%s/%s__%s",
 							qsl_directory_.c_str(),
-							current_qso_->item("STATION_CALLSIGN").c_str(),
+							station.c_str(),
 							current_qso_->item("QSLRDATE").c_str(),
 							call.c_str(),
 							current_qso_->item("QSO_DATE").c_str());
@@ -371,9 +396,9 @@ void qso_qsl_vwr::set_image() {
 					case QI_CARD_BACK:
 						// Card image of a scanned-in paper QSL card (back - i.e. QSO details side)
 						// File name e.g.= <root>\scans\<received date>\PA_GM3ZZA_P++<QSO date>.png
-						sprintf(filename, "%s/%s/scans/%s/%s++%s",
+						sprintf(test_name, "%s/%s/scans/%s/%s++%s",
 							qsl_directory_.c_str(),
-							current_qso_->item("STATION_CALLSIGN").c_str(),
+							station.c_str(),
 							current_qso_->item("QSLRDATE").c_str(),
 							call.c_str(),
 							current_qso_->item("QSO_DATE").c_str());
@@ -381,16 +406,17 @@ void qso_qsl_vwr::set_image() {
 					case QI_EMAIL:
 						// Card image of a scanned-in paper QSL card (front - i.e. callsign side)
 						// File name e.g.= <root>\emails\PA_GM3ZZA_P__<QSO date>.png
-						sprintf(filename, "%s/%s/email/%s__%s",
+						sprintf(test_name, "%s/%s/email/%s__%s",
 							qsl_directory_.c_str(),
-							current_qso_->item("STATION_CALLSIGN").c_str(),
+							station.c_str(),
 							call.c_str(),
 							current_qso_->item("QSO_DATE").c_str());
 						break;
 					}
 					// Scanned-in paper card - could be any graphic format
 					for (int i = 0; i < num_types && !found_image; i++) {
-						full_name_ = string(filename) + file_types[i];
+						if (ix > 2) full_name_ = string(default_name) + file_types[i];
+						else full_name_ = string(filename) + file_types[i];
 						printf("DEBUG QSO_QSL_VWR: Image file %s\n", full_name_.c_str());
 						// Read files depending on file type
 						if (file_types[i] == ".jpg") {
@@ -410,6 +436,7 @@ void qso_qsl_vwr::set_image() {
 							raw_image_ = nullptr;
 						}
 						if (raw_image_) {
+							if (ix > 2) use_default = true;
 							found_image = true;
 						}
 					}
@@ -427,11 +454,31 @@ void qso_qsl_vwr::set_image() {
 					scaled_image_ = raw_image_->copy(bn_card_display_->w(), (int)(raw_image_->h() / scale_w));
 				}
 				update_full_view();
+				// Test Whether we've used default station callsign
 			}
 		}
 	}
 	// Got an image: draw it
 	draw_image();
+	if (found_image && use_default) {
+		char message[200];
+		switch(fl_choice("Image for station call %s found looking for %s - Copy?", 
+			"no", "yes", nullptr, default_station_.c_str(),
+			current_qso_->item("STATION_CALLSIGN").c_str())) {
+		case 0:
+			snprintf(message, sizeof(message), 
+				"QSL: Ignoring %s", default_name);
+			status_->misc_status(ST_WARNING, message);
+			break;
+		case 1:
+			snprintf(message, sizeof(message),
+				"QSL: Renaming %s as %s", default_name, filename);
+			status_->misc_status(ST_WARNING, message);
+			fl_make_path_for_file(filename);
+			rename(default_name, filename);
+			break;
+		}
+	}
 }
 
 // Set the values of the various buttons associated with the image.

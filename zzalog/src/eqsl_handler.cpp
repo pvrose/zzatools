@@ -29,6 +29,7 @@ extern Fl_Preferences* settings_;
 extern qso_manager* qso_manager_;
 extern url_handler* url_handler_;
 extern bool DEBUG_THREADS;
+extern string default_station_;
 
 // Constructor
 eqsl_handler::eqsl_handler()
@@ -225,21 +226,17 @@ eqsl_handler::response_t eqsl_handler::request_eqsl(request_t request) {
 }
 
 // Get the local filename for the card - hard-defined directory structure, but configurable top directory name
-string eqsl_handler::card_filename_l(record* record) {
-	string card_call = record->item("CALL");
-	string call = card_call;
+string eqsl_handler::card_filename_l(record* record, bool use_default) {
+	string call = record->item("CALL");
 	// Replace all / in call-sign with _ - e.g. PA/GM3ZZA/P => PA_GM3ZZA_P
-	int index = call.find('/');
-	while (index != string::npos) {
-		card_call[index] = '_';
-		index = call.find('/', index + 1);
-	}
+	de_slash(call);
 	// Get QSO details
 	string qso_date = record->item("QSO_DATE");
 	string time_on = record->item("TIME_ON");
 	string mode = record->item("MODE");
 	string band = record->item("BAND");
-	string station = record->item("STATION_CALLSIGN");
+	string station = use_default ? default_station_ : record->item("STATION_CALLSIGN");
+	de_slash(station);
 	// Location of top-directory for QSL card images
 	Fl_Preferences datapath_settings(settings_, "Datapath");
 	string qsl_directory;
@@ -263,7 +260,7 @@ string eqsl_handler::card_filename_l(record* record) {
 	sprintf(save_filename, "%s/%s/%s/%s/%s__%s%s.png", 
 		qsl_directory.c_str(),
 		station.c_str(), band.c_str(), mode.c_str(), 
-		card_call.c_str(), qso_date.c_str(), time_on.substr(0, 4).c_str());
+		call.c_str(), qso_date.c_str(), time_on.substr(0, 4).c_str());
 	return save_filename;
 }
 
