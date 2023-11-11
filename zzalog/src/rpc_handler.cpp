@@ -870,3 +870,11 @@ void rpc_handler::generate_error(int code, string message, rpc_data_item & respo
 	response.set(&fault_resp);
 }
 
+// Returns the state of the server
+bool rpc_handler::has_server() {
+	if (server_) {
+		return server_->has_server();
+	} else {
+		return false;
+	}
+}

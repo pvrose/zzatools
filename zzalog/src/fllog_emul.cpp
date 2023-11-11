@@ -285,3 +285,12 @@ void fllog_emul::check_connected() {
 	// 	fl_alert("FLDIGI has connected, please ensure station details will be logged correctly!");
 	// }
 }
+
+// server state
+bool fllog_emul::has_server() {
+	if (rpc_handler_) {
+		return rpc_handler_->has_server();
+	} else {
+		return false;
+	}
+}

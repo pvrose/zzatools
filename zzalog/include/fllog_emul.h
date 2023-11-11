@@ -23,6 +23,8 @@
 		void run_server();
 		// Clsoe servefr
 		void close_server();
+		// Return server state
+		bool has_server();
 
 	protected:
 		// Get ADIF string for first record with callsign
