@@ -206,11 +206,13 @@ eqsl_handler::response_t eqsl_handler::request_eqsl(request_t request) {
 		status_->misc_status(ST_NOTE, message);
 		// fetch it
 		string remote_filename;
+		string file_type;
 		// Request the filename from eQSL.cc
-		response_t response= card_filename_r(record, remote_filename);
+		response_t response= card_filename_r(record, remote_filename, file_type);
 		switch (response) {
 		case ER_OK:
 			// Try and download the file
+			local_filename += '.' + file_type;
 			if (download(remote_filename, local_filename)) {
 				return ER_FAILED;
 			}
@@ -255,9 +257,10 @@ string eqsl_handler::card_filename_l(record* record, bool use_default) {
 		delete chooser;
 	}
 	char save_filename[2048];
-	// Create file name e.g. <dir-name>/<MY_CALL>/20M/PSK/GM3ZZA__202007201424.png
+	// Create file name e.g. <dir-name>/<MY_CALL>/20M/PSK/GM3ZZA__202007201424
+	// Filetype to be the same as the remote filename
 	// NB we used to have APP_ZZA_EQSL_TS as thetimestamp from the eQSL record, but we now do this after merging the data.
-	sprintf(save_filename, "%s/%s/%s/%s/%s__%s%s.png", 
+	sprintf(save_filename, "%s/%s/%s/%s/%s__%s%s", 
 		qsl_directory.c_str(),
 		station.c_str(), band.c_str(), mode.c_str(), 
 		call.c_str(), qso_date.c_str(), time_on.substr(0, 4).c_str());
@@ -304,7 +307,8 @@ bool eqsl_handler::card_file_valid(string& filename) {
 }
 
 // get the remote filename of the card
-eqsl_handler::response_t eqsl_handler::card_filename_r(record* record, string& card_filename) {
+eqsl_handler::response_t eqsl_handler::card_filename_r(
+		record* record, string& card_filename, string& filetype) {
 	// Get username and password for building url to fetch front page
 	response_t response = ER_OK;
 	string username;
@@ -386,8 +390,18 @@ eqsl_handler::response_t eqsl_handler::card_filename_r(record* record, string& c
 						// Extract file name from response
 						else {
 							card_filename = text_line.substr(char_pos, end_pos - char_pos);
-							response = ER_OK;
-							got_card_filename = true;
+							size_t dot_pos = card_filename.find_last_of('.');
+							if (dot_pos == string::npos) {
+								response = ER_FAILED;
+								got_card_filename = false;
+								sprintf(message, "EQSL: error: %s Cannot find file type", call.c_str());
+								status_->misc_status(ST_ERROR, message);
+								filetype = "";
+							} else {
+								filetype = card_filename.substr(dot_pos +1);
+								response = ER_OK;
+								got_card_filename = true;
+							}
 						}
 					}
 				}
@@ -404,13 +418,14 @@ eqsl_handler::response_t eqsl_handler::card_filename_r(record* record, string& c
 }
 
 // Download the card image file to local filestore
-eqsl_handler::response_t eqsl_handler::download(string remote_filename, string local_filename) {
+eqsl_handler::response_t eqsl_handler::download(
+	string remote_filename, string local_filename) {
 
 	// We have a remote file name - prepend with web-site to generate url to fetch image
 	char url[2048];
 	char message[256];
 	sprintf(url, "http://www.eqsl.cc%s", remote_filename.c_str());
-	sprintf(message, "EQSL: Getting remote image");
+	sprintf(message, "EQSL: Getting remote image %s", remote_filename.c_str());
 	status_->misc_status(ST_NOTE, message);
 	// Create an output stream to the local filename and fetch the file (handled directly by url_handler)
 	ofstream* os = new ofstream(local_filename, ios_base::out | ios_base::binary);

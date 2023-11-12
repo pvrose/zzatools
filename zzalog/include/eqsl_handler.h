@@ -115,7 +115,7 @@ using namespace std;
 		// request an eqsl card 
 		response_t request_eqsl(request_t request);
 		// get the remote filename of the card
-		response_t card_filename_r(record* record, string& filename);
+		response_t card_filename_r(record* record, string& filename, string& filetype);
 		// copy the card to local file-store
 		response_t download(string remote_filename, string local_filename);
 		// get user details

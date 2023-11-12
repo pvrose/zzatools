@@ -316,8 +316,10 @@ void qso_qsl_vwr::enable_widgets() {
 void qso_qsl_vwr::set_image() {
 	bool use_default = false;
 	bool found_image = false;
+	bool png_is_jpeg = false;
 	char filename[256];
-	char default_name[256];
+	string target_name = "";
+	// string default_name;
 	if (current_qso_ != nullptr) {
 		// We want to display the received card (eQSL or scanned image)
 		// Get callsign
@@ -337,112 +339,93 @@ void qso_qsl_vwr::set_image() {
 			raw_image_ = nullptr;
 			delete scaled_image_;
 			scaled_image_ = nullptr;
+			string station = current_qso_->item("STATION_CALLSIGN");
 			// Select the image type: eQSL or scanned in card (front or back)
 			switch (selected_image_) {
 			case QI_EQSL:
 				// Card image downloaded from eQSL
 				// Find the filename saved when card was downloaded - i.e. use same algorithm
 				strcpy(filename, eqsl_handler_->card_filename_l(current_qso_).c_str());
-				// Cards are downloaded from eQSL in PNG format
-				raw_image_ = new Fl_PNG_Image(filename);
-				// printf("DEBUG testing filename %s", filename);
-				if (raw_image_->fail()) {
-					// printf(" - failed\n");
-					delete raw_image_;
-					// Now try dfefault call
-					strcpy(default_name, eqsl_handler_->card_filename_l(current_qso_, true).c_str());
-					raw_image_ = new Fl_PNG_Image(default_name);
-					// printf("DEBUG testing filename %s", default_name);
-					if (raw_image_->fail()) {
-						// printf(" - failed\n");
-						delete raw_image_;
-						raw_image_ = nullptr;
-					} else {
-						// printf(" - succeeded\n");
-						use_default = true;
-						full_name_ = string(default_name);
-						found_image = true;
-					}
-				}
-				else {
-					full_name_ = string(filename);
-						// printf(" - succeeded\n");
-					found_image = true;
-				}
 				break;
 			case QI_CARD_FRONT:
+				// Card image of a scanned-in paper QSL card (front - i.e. callsign side)
+				// File name e.g.= <root>/<MY_CALL>\scans\<received date>\PA_GM3ZZA_P__<QSO date>.png
+				sprintf(filename, "%s/%s/scans/%s/%s__%s",
+					qsl_directory_.c_str(),
+					station.c_str(),
+					current_qso_->item("QSLRDATE").c_str(),
+					call.c_str(),
+					current_qso_->item("QSO_DATE").c_str());
+				break;
 			case QI_CARD_BACK:
+				// Card image of a scanned-in paper QSL card (back - i.e. QSO details side)
+				// File name e.g.= <root>\scans\<received date>\PA_GM3ZZA_P++<QSO date>.png
+				sprintf(filename, "%s/%s/scans/%s/%s++%s",
+					qsl_directory_.c_str(),
+					station.c_str(),
+					current_qso_->item("QSLRDATE").c_str(),
+					call.c_str(),
+					current_qso_->item("QSO_DATE").c_str());
+				break;
 			case QI_EMAIL:
-				for (int ix = 0; ix < 4 && !found_image; ix++) {
-					if (ix % 2 == 0) call = to_upper(call);
-					else call = to_lower(call);
-					string station;
-					if (ix > 1) station = current_qso_->item("STATION_CALLSIGN");
-					else station = default_station_;
-					char* test_name;
-					if (ix > 1) test_name = default_name;
-					else test_name = filename;
-					switch (selected_image_) {
-					case QI_CARD_FRONT:
-						// Card image of a scanned-in paper QSL card (front - i.e. callsign side)
-						// File name e.g.= <root>/<MY_CALL>\scans\<received date>\PA_GM3ZZA_P__<QSO date>.png
-						sprintf(test_name, "%s/%s/scans/%s/%s__%s",
-							qsl_directory_.c_str(),
-							station.c_str(),
-							current_qso_->item("QSLRDATE").c_str(),
-							call.c_str(),
-							current_qso_->item("QSO_DATE").c_str());
-						break;
-					case QI_CARD_BACK:
-						// Card image of a scanned-in paper QSL card (back - i.e. QSO details side)
-						// File name e.g.= <root>\scans\<received date>\PA_GM3ZZA_P++<QSO date>.png
-						sprintf(test_name, "%s/%s/scans/%s/%s++%s",
-							qsl_directory_.c_str(),
-							station.c_str(),
-							current_qso_->item("QSLRDATE").c_str(),
-							call.c_str(),
-							current_qso_->item("QSO_DATE").c_str());
-						break;
-					case QI_EMAIL:
-						// Card image of a scanned-in paper QSL card (front - i.e. callsign side)
-						// File name e.g.= <root>\emails\PA_GM3ZZA_P__<QSO date>.png
-						sprintf(test_name, "%s/%s/email/%s__%s",
-							qsl_directory_.c_str(),
-							station.c_str(),
-							call.c_str(),
-							current_qso_->item("QSO_DATE").c_str());
-						break;
+				// Card image of a scanned-in paper QSL card (front - i.e. callsign side)
+				// File name e.g.= <root>\emails\PA_GM3ZZA_P__<QSO date>.png
+				sprintf(filename, "%s/%s/email/%s__%s",
+					qsl_directory_.c_str(),
+					station.c_str(),
+					call.c_str(),
+					current_qso_->item("QSO_DATE").c_str());
+				break;
+			}
+			// Images could be any graphic format
+			// Test first with existing filename then replace with default station
+			for (int ia = 0; ia < 2 && !found_image; ia++) {
+				string testname = filename;
+				if (ia == 1) {
+					size_t pos = testname.find(station);
+					testname.replace(pos, station.length(), default_station_);
+					use_default = true;
+				}
+				for (int i = 0; i < num_types && !found_image; i++) {
+					full_name_ = testname + file_types[i];
+					target_name = filename + file_types[i];
+					printf("DEBUG QSO_QSL_VWR: Image file %s\n", full_name_.c_str());
+					// Read files depending on file type
+					if (file_types[i] == ".jpg") {
+						raw_image_ = new Fl_JPEG_Image(full_name_.c_str());
 					}
-					// Scanned-in paper card - could be any graphic format
-					for (int i = 0; i < num_types && !found_image; i++) {
-						if (ix > 2) full_name_ = string(default_name) + file_types[i];
-						else full_name_ = string(filename) + file_types[i];
-						printf("DEBUG QSO_QSL_VWR: Image file %s\n", full_name_.c_str());
-						// Read files depending on file type
-						if (file_types[i] == ".jpg") {
-							raw_image_ = new Fl_JPEG_Image(full_name_.c_str());
-						}
-						else if (file_types[i] == ".png") {
-							raw_image_ = new Fl_PNG_Image(full_name_.c_str());
-						}
-						else if (file_types[i] == ".bmp") {
-							raw_image_ = new Fl_BMP_Image(full_name_.c_str());
-						}
-						else {
-							raw_image_ = nullptr;
-						}
-						if (raw_image_ && raw_image_->fail()) {
+					else if (file_types[i] == ".png") {
+						raw_image_ = new Fl_PNG_Image(full_name_.c_str());
+						// Some JPEGs may have been saved as .png
+						if (raw_image_->fail()) {
 							delete raw_image_;
-							raw_image_ = nullptr;
+							raw_image_ = new Fl_JPEG_Image(full_name_.c_str());
+							if (raw_image_->fail()) {
+								delete raw_image_;
+								raw_image_ = nullptr;
+							} else {
+								png_is_jpeg = true;
+							}
 						}
-						if (raw_image_) {
-							if (ix > 2) use_default = true;
-							found_image = true;
-						}
+					}
+					else if (file_types[i] == ".bmp") {
+						raw_image_ = new Fl_BMP_Image(full_name_.c_str());
+					}
+					else {
+						raw_image_ = nullptr;
+					}
+					if (raw_image_ && raw_image_->fail()) {
+						delete raw_image_;
+						raw_image_ = nullptr;
+					}
+					if (raw_image_) {
+						if (ia == 1) use_default = true;
+						found_image = true;
 					}
 				}
 			}
 			if (found_image) {
+				printf("DEBUG: Found image %s\n", full_name_.c_str());
 				// Resize the image to fit the control
 				// Resize keeping original height/width ratio
 				float scale_w = (float)raw_image_->w() / (float)bn_card_display_->w();
@@ -460,22 +443,48 @@ void qso_qsl_vwr::set_image() {
 	}
 	// Got an image: draw it
 	draw_image();
+	// If we've found an image under the default station intended for this station 
+	// move (rename) it
 	if (found_image && use_default) {
 		char message[200];
-		switch(fl_choice("Image for station call %s found looking for %s - Copy?", 
+		switch(fl_choice("Image for station call: %s found looking for %s - Replace?", 
 			"no", "yes", nullptr, default_station_.c_str(),
 			current_qso_->item("STATION_CALLSIGN").c_str())) {
 		case 0:
 			snprintf(message, sizeof(message), 
-				"QSL: Ignoring %s", default_name);
+				"QSL: Ignoring %s", full_name_.c_str());
 			status_->misc_status(ST_WARNING, message);
 			break;
 		case 1:
 			snprintf(message, sizeof(message),
-				"QSL: Renaming %s as %s", default_name, filename);
+				"QSL: Renaming station %s as %s", full_name_.c_str(), target_name.c_str());
 			status_->misc_status(ST_WARNING, message);
-			fl_make_path_for_file(filename);
-			rename(default_name, filename);
+			fl_make_path_for_file(target_name.c_str());
+			rename(full_name_.c_str(), target_name.c_str());
+			full_name_ = target_name;
+			break;
+		}
+	}
+	// If we've found a .png that is actually a JPEG - rename it
+	if (found_image && png_is_jpeg) {
+		char message[200];
+		switch(fl_choice("Image for station call: JPEG found looking for PNG - Replace?", 
+			"no", "yes", nullptr)) {
+		case 0:
+			snprintf(message, sizeof(message), 
+				"QSL: Leaving %s as a JPED without renaming", full_name_.c_str());
+			status_->misc_status(ST_WARNING, message);
+			break;
+		case 1:
+			string jpeg_name = full_name_;
+			size_t pos = jpeg_name.find(".png");
+			jpeg_name.replace(pos, 4, ".jpg");
+			snprintf(message, sizeof(message),
+				"QSL: Renaming type %s as %s", full_name_.c_str(), jpeg_name.c_str());
+			status_->misc_status(ST_WARNING, message);
+			fl_make_path_for_file(jpeg_name.c_str());
+			rename(full_name_.c_str(), jpeg_name.c_str());
+			full_name_ = jpeg_name;
 			break;
 		}
 	}
