@@ -828,12 +828,20 @@ record* wsjtx_handler::update_qso(bool tx, string time, double audio_freq, strin
 			{
 				// <THEM> <ME> R<report>
 				qso->item("RST_SENT", decode.exchange.substr(1));
+				char f[20];
+				double freq = df + (audio_freq / 1000000.0);
+				snprintf(f, sizeof(f), "%0.6f", freq);
+				qso->item("FREQ", string(f));
 				return qso;
 			}
 			case TX4:
 			{
 				// <THEM> <ME> RRR
 				qso->item("QSO_COMPLETE", string("?"));
+				char f[20];
+				double freq = df + (audio_freq / 1000000.0);
+				snprintf(f, sizeof(f), "%0.6f", freq);
+				qso->item("FREQ", string(f));
 				return qso;
 			}
 			case TX4A:
@@ -841,6 +849,10 @@ record* wsjtx_handler::update_qso(bool tx, string time, double audio_freq, strin
 			case TX5:
 			{
 				// <THEM><ME> 73
+				char f[20];
+				double freq = df + (audio_freq / 1000000.0);
+				snprintf(f, sizeof(f), "%0.6f", freq);
+				qso->item("FREQ", string(f));
 				if(qso->item("QSO_COMPLETE") == "N" || qso->item("QSO_COMPLETE") == "?")
 					qso->item("QSO_COMPLETE", string("Y"));
 				qso->item("TIME_OFF", time);

@@ -223,6 +223,7 @@ void status::update_progress(object_t object) {
 		}
 		sprintf(label, "%d/%d %s", item->value, item->max_value, item->suffix);
 		progress_->copy_label(label);
+		// printf("DEBUG: %s\n", label);
 		// Set range (0:max_value)
 		progress_->minimum(0.0);
 		progress_->maximum((float)item->max_value);
@@ -256,7 +257,6 @@ void status::progress(int value, object_t object) {
 				// 	update_progress(progress_stack_.back());
 				// }
 			}
-			Fl::check();
 		}
 	}
 }
