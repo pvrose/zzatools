@@ -46,7 +46,6 @@ map<qso_data::logging_state_t, list<qso_buttons::button_type> > button_map_ =
 	{ qso_data::NET_STARTED, {qso_buttons::SAVE_NET, qso_buttons::SAVE_QSO, qso_buttons::CANCEL_QSO, qso_buttons::CANCEL_NET,
 		qso_buttons::ADD_NET_QSO }},
 	{ qso_data::NET_EDIT, { qso_buttons::SAVE_EDIT_NET, qso_buttons::CANCEL_QSO, qso_buttons::ADD_NET_QSO}},
-	{ qso_data::QSO_MODEM, { qso_buttons::CANCEL_MODEM }},
 	{ qso_data::QSO_PEEK, { qso_buttons::ACTIVATE, qso_buttons:: EDIT_QSO, qso_buttons::START_QSO, 
 		qso_buttons::ADD_QSO, qso_buttons::DELETE_QSO,
 	    qso_buttons::EDIT_NET, qso_buttons:: CANCEL_PEEK, qso_buttons::QRZ_COM, qso_buttons::LOOK_ALL_TXT }},
@@ -73,8 +72,7 @@ map<qso_buttons::button_type, qso_buttons::button_action> action_map_ =
 	{ qso_buttons::SAVE_EXIT, { "Save && Exit", "Copy changed record and return to previous activity", COLOUR_APPLE, qso_buttons::cb_save, (void*)1 }},
 	{ qso_buttons::CANCEL_EDIT, { "Cancel Edit", "Cancel the current QSO edit", FL_RED, qso_buttons::cb_cancel, 0 } },
 	{ qso_buttons::CANCEL_VIEW, { "Cancel", "Cancel the current QSO view", FL_RED, qso_buttons::cb_cancel, 0 } },
-	{ qso_buttons::CANCEL_MODEM, { "Cancel", "Cancel the current modem QSO view", FL_RED, qso_buttons::cb_bn_cancel_modem, 0 } },
-	{ qso_buttons::NAV_FIRST, { "@$->|", "Select first record in book", FL_YELLOW, qso_buttons::cb_bn_navigate, (void*)NV_FIRST } },
+    { qso_buttons::NAV_FIRST, { "@$->|", "Select first record in book", FL_YELLOW, qso_buttons::cb_bn_navigate, (void*)NV_FIRST } },
 	{ qso_buttons::NAV_PREV, { "@<-", "Select previous record in book", FL_YELLOW, qso_buttons::cb_bn_navigate, (void*)NV_PREV } },
 	{ qso_buttons::NAV_NEXT, { "@->", "Select next record in book", FL_YELLOW, qso_buttons::cb_bn_navigate, (void*)NV_NEXT } },
 	{ qso_buttons::NAV_LAST, { "@->|", "Select last record in book", FL_YELLOW, qso_buttons::cb_bn_navigate, (void*)NV_LAST } },
@@ -164,16 +162,19 @@ void qso_buttons::create_form(int X, int Y) {
 }
 
 void qso_buttons::enable_widgets() {
-	const list<button_type>& buttons = button_map_.at(qso_data_->logging_state());
 	int ix = 0;
-	for (auto bn = buttons.begin(); bn != buttons.end() && ix < MAX_ACTIONS; bn++, ix++) {
-		const button_action& action = action_map_.at(*bn);
-		bn_action_[ix]->label(action.label);
-		bn_action_[ix]->tooltip(action.tooltip);
-		bn_action_[ix]->color(action.colour);
-		bn_action_[ix]->labelcolor(fl_contrast(FL_FOREGROUND_COLOR, action.colour));
-		bn_action_[ix]->callback(action.callback, action.userdata);
-		bn_action_[ix]->activate();
+	if (button_map_.find(qso_data_->logging_state()) != button_map_.end()) {
+		// If we have a button map for the state use it - else deactivate all buttons
+		const list<button_type>& buttons = button_map_.at(qso_data_->logging_state());
+		for (auto bn = buttons.begin(); bn != buttons.end() && ix < MAX_ACTIONS; bn++, ix++) {
+			const button_action& action = action_map_.at(*bn);
+			bn_action_[ix]->label(action.label);
+			bn_action_[ix]->tooltip(action.tooltip);
+			bn_action_[ix]->color(action.colour);
+			bn_action_[ix]->labelcolor(fl_contrast(FL_FOREGROUND_COLOR, action.colour));
+			bn_action_[ix]->callback(action.callback, action.userdata);
+			bn_action_[ix]->activate();
+		}
 	}
 	for (; ix < MAX_ACTIONS; ix++) {
 		bn_action_[ix]->label("");
@@ -574,18 +575,6 @@ void qso_buttons::cb_bn_delete_qso(Fl_Widget* w, void* v) {
 	case qso_data::QSO_PENDING:
 	case qso_data::QSO_PEEK:
 		that->qso_data_->action_delete_qso();
-		break;
-	}
-	that->enable_widgets();
-}
-
-// Cancel the current modem operation
-void qso_buttons::cb_bn_cancel_modem(Fl_Widget* w, void* v) {
-	qso_buttons* that = ancestor_view<qso_buttons>(w);
-	that->disable_widgets();
-	switch (that->qso_data_->logging_state()) {
-	case qso_data::QSO_MODEM:
-		that->qso_data_->action_cancel_modem();
 		break;
 	}
 	that->enable_widgets();

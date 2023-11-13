@@ -50,7 +50,7 @@ public:
 		NET_EDIT,        // Converting sngle QSO into a net by adding callsigns
 		NET_ADDING,      // Adding a new QSO to the started net.
 		SWITCHING,       // Switching state - used to ignore stuff
-		QSO_MODEM,       // Recording QSOs from a modem
+		QSO_MODEM,       // Recording QSOs from a modem - allows editing of recveived qso
 		MANUAL_ENTRY,    // Allow the definition of a record to query
 	};
 
@@ -195,10 +195,6 @@ public:
 	void action_delete_qso();
 	// Use the QSO received from the modem
 	void action_add_modem(record* qso);
-	// Update modem
-	void action_update_modem(record* qso);
-	// Cancel modem
-	void action_cancel_modem();
 	// Start peeking behaviour
 	void action_peek(qso_num_t number);
 	// Cancel peeking behaviour

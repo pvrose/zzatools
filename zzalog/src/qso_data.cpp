@@ -462,68 +462,50 @@ void qso_data::update_query(logging_state_t query, qso_num_t match_num, qso_num_
 
 // Update modem QSO
 void qso_data::update_modem_qso(record* qso) {
-	if (qso == nullptr) {
-		switch (logging_state_) {
-		case QSO_MODEM:
-			action_cancel_modem();
-			break;
-		}
-	}
-	else {
-		switch (logging_state_) {
-		case QSO_PENDING:
-		case QSO_PEEK:
-		case QSO_PEEK_ED:
-			action_deactivate();
-			// drop down
-		case QSO_INACTIVE:
-			if (qso->item("QSO_COMPLETE") == "") {
-				// We can get multiple message when complete if TX5 decoded after log
-				action_update_modem(qso);
-			} else {
+	switch (logging_state_) {
+	case QSO_PENDING:
+	case QSO_PEEK:
+	case QSO_PEEK_ED:
+		action_deactivate();
+		// drop down
+	case QSO_INACTIVE:
+	case QSO_MODEM:
+		action_add_modem(qso);
+		break;	
+
+	case QSO_EDIT:
+		if (g_entry_->qso()->is_dirty()) {
+			fl_beep(FL_BEEP_QUESTION);
+			switch (fl_choice("Trying to select a different record while editing a record", "Save edit", "Cancel edit", "Ignore")) {
+			case 0:
+				// Save QSO
+				action_save_edit();
 				action_add_modem(qso);
-			}
-			break;
-
-		case QSO_MODEM:
-			action_update_modem(qso);
-			break;
-
-		case QSO_EDIT:
-			if (g_entry_->qso()->is_dirty()) {
-				fl_beep(FL_BEEP_QUESTION);
-				switch (fl_choice("Trying to select a different record while editing a record", "Save edit", "Cancel edit", "Ignore")) {
-				case 0:
-					// Save QSO
-					action_save_edit();
-					action_add_modem(qso);
-					break;
-				case 1:
-					// Cancel QSO
-					action_cancel_edit();
-					action_add_modem(qso);
-					break;
-				case 2:
-					// Ignore the modem request
-					break;
-				}
-			} else {
+				break;
+			case 1:
+				// Cancel QSO
 				action_cancel_edit();
 				action_add_modem(qso);
+				break;
+			case 2:
+				// Ignore the modem request
+				break;
 			}
-			break;
-
-		case QSO_VIEW:
+		} else {
 			action_cancel_edit();
 			action_add_modem(qso);
-			break;
-
-		default:
-			status_->misc_status(ST_ERROR, "DASH: Getting a modem update when not expected");
-			return;
 		}
+		break;
+
+	case QSO_VIEW:
+		action_cancel_edit();
+		action_add_modem(qso);
+		break;
+
+	default:
+		status_->misc_status(ST_ERROR, "DASH: Getting a modem update when not expected");
+		return;
 	}
-	enable_widgets();
 }
 
 // Save the settings
@@ -1292,52 +1274,17 @@ void qso_data::action_add_modem(record* qso) {
 	action_new_qso(qso, QSO_COPY_MODEM);
 	g_entry_->append_qso();
 	logging_state_ = QSO_MODEM;
-	book_->selection(book_->item_number(g_entry_->qso_number()), HT_INSERTED);
-	enable_widgets();
-}
-
-// Update or replace a modem record
-void qso_data::action_update_modem(record* qso) {
-	printf("DEBUG: action_update_modem %p\n", qso);
-	// Compare with existing
-	if (qso != current_qso()) {
-		// New record - check if previous completed and cancel it if not
-		if (current_qso()) {
-			string complete = current_qso()->item("QSO_COMPLETE");
-			if (complete == "N" || complete == "?") {
-				action_cancel();
-			}
-		}
-		action_add_modem(qso);
-		// add model ups the inhibit level so down it again
-	}
-	if (qso->item("QSO_COMPLETE") == "" && logging_state_ == QSO_MODEM) {
+	if (qso->item("TX_PWR") == "") {
 		// Get power from rig
 		rig_if* rig = ((qso_manager*)parent())->rig();
 		qso->item("TX_PWR", rig->get_tx_power(true));
-		// The QSO is complete
-		action_save();
-		book_->enable_save(true);
 	}
-	else {
-		g_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
-	}
-
+	// The QSO is complete
+	action_save();
+	
+	book_->selection(book_->item_number(g_entry_->qso_number()), HT_INSERTED);
+	book_->enable_save(true);
 	enable_widgets();
-}
-
-// Cancel modem operation
-void qso_data::action_cancel_modem() {
-	printf("DEBUG: action_cancel_modem\n");
-	if (current_qso()->item("QSO_COMPLETE") == "") {
-		// Complete so should save it
-		action_save();
-		book_->enable_save(true);
-	}
-	else {
-		action_cancel();
-		book_->enable_save(true);
-	}
 }
 
 // Action PEEK - interrupt current state and peek at supplied qso
