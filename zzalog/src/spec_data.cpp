@@ -988,10 +988,16 @@ record* spec_data::expand_macro(string field, string value) {
 	else {
 		macro_map* field_macros = macros_.at(field);
 		if (field_macros->find(value) == field_macros->end()) {
-			snprintf(message, 128, "ADIF SPEC: Macro %s not defined for field %s",
-				value.c_str(),
-				field.c_str());
-			status_->misc_status(ST_ERROR, message);
+			if (value == "") {
+				snprintf(message, sizeof(message), "ADIF SPEC: Ignoring blank macro for field %s",
+					field.c_str());
+				status_->misc_status(ST_WARNING, message);
+			} else {
+				snprintf(message, 128, "ADIF SPEC: Macro %s not defined for field %s",
+					value.c_str(),
+					field.c_str());
+				status_->misc_status(ST_ERROR, message);
+			}
 			return nullptr;
 		}
 		else {
