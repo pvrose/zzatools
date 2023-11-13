@@ -389,7 +389,7 @@ void qso_qsl_vwr::set_image() {
 				for (int i = 0; i < num_types && !found_image; i++) {
 					full_name_ = testname + file_types[i];
 					target_name = filename + file_types[i];
-					printf("DEBUG QSO_QSL_VWR: Image file %s\n", full_name_.c_str());
+					// printf("DEBUG QSO_QSL_VWR: Image file %s\n", full_name_.c_str());
 					// Read files depending on file type
 					if (file_types[i] == ".jpg") {
 						raw_image_ = new Fl_JPEG_Image(full_name_.c_str());
@@ -425,7 +425,7 @@ void qso_qsl_vwr::set_image() {
 				}
 			}
 			if (found_image) {
-				printf("DEBUG: Found image %s\n", full_name_.c_str());
+				// printf("DEBUG: Found image %s\n", full_name_.c_str());
 				// Resize the image to fit the control
 				// Resize keeping original height/width ratio
 				float scale_w = (float)raw_image_->w() / (float)bn_card_display_->w();

@@ -168,7 +168,7 @@ int wsjtx_handler::handle_close(stringstream& ss) {
 #ifdef _WIN32
 	if (dxa_if_) dxa_if_->clear_dx_loc();
 #endif
-	qso_manager_->update_modem_qso(nullptr);
+	// qso_manager_->update_modem_qso(nullptr);
 	menu_->update_items();
 	return 1;
 }
@@ -222,7 +222,7 @@ int wsjtx_handler::handle_decode(stringstream& ss) {
 	snprintf(t, sizeof(t), "%02d%02d%02.0f", hours, minutes, seconds);
 	// printf("DEBUG: Updating QSO in handle_decode - %s\n", decode.message.c_str());
 	record* qso = update_qso(false, string(t), (double)decode.d_freq, decode.message);
-	if (qso) qso_manager_->update_modem_qso(qso);
+	// if (qso) qso_manager_->update_modem_qso(qso);
 	return 0;
 }
 
@@ -249,7 +249,7 @@ int wsjtx_handler::handle_reply(stringstream& ss) {
 	snprintf(t, sizeof(t), "%02d%02d%02.0f", hours, minutes, seconds);
 	// printf("DEBUG: Updating QSO in handle_reply - %s\n", decode.message.c_str());
 	record* qso = update_qso(false, string(t), (double)decode.d_freq, decode.message);
-	if (qso) qso_manager_->update_modem_qso(qso);
+	// if (qso) qso_manager_->update_modem_qso(qso);
 	return 0;
 }
 
@@ -311,7 +311,7 @@ int wsjtx_handler::handle_status(stringstream& ss) {
 	if (status.transmitting) {
 		// printf("DEBUG: Updating qso in handle status %s\n", status.tx_message.c_str());
 		record* qso = update_qso(true, now(false, "%H%M%S"), (double)status.tx_offset, status.tx_message);
-		if (qso) qso_manager_->update_modem_qso(qso);
+		// if (qso) qso_manager_->update_modem_qso(qso);
 	}
 #ifdef _WIN32
 	if (dxa_if_) {
@@ -986,7 +986,7 @@ void wsjtx_handler::clear_qsos() {
 		if (qso->item("QSO_COMPLETE") == "Y") {
 			// Complete but not logged
 			qso->item("QSO_COMPLETE", string(""));
-			qso_manager_->update_modem_qso(qso);
+			// qso_manager_->update_modem_qso(qso);
 		}
 		else if (qso->item("QSO_COMPLETE") != "") {
 			delete qso;

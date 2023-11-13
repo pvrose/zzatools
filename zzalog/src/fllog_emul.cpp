@@ -83,14 +83,14 @@ int fllog_emul::get_record(rpc_data_item::rpc_list& params, rpc_data_item& respo
 		rpc_data_item* item_0 = params.front();
 		string callsign = item_0->get_string();
 		extract_records_->extract_call(callsign);
-		printf("DEBUG: get_record %s %zu records found\n", callsign.c_str(), extract_records_->size());
+		// printf("DEBUG: get_record %s %zu records found\n", callsign.c_str(), extract_records_->size());
 		if (extract_records_->size()) {
 			that_->current_record_ = extract_records_->get_record(0, true);
 			extract_records_->selection(0, HT_SELECTED);
 			adi_writer* writer = new adi_writer;
 			stringstream ss;
 			writer->to_adif(that_->current_record_, ss);
-			printf("DEBUG: get_record: %s\n", ss.str().c_str());
+			// printf("DEBUG: get_record: %s\n", ss.str().c_str());
 			response.set(ss.str(), XRT_STRING);
 			delete writer;
 		}
@@ -131,8 +131,8 @@ int fllog_emul::check_dup(rpc_data_item::rpc_list& params, rpc_data_item& respon
 		string rst_in = i_rst_in->get_string();
 		// Get all possible matches
 		extract_records_->extract_call(callsign);
-		printf("DEBUG: check_dup %s Mode=%s Span=%d Freq=%d State=%s RST=%s", 
-			callsign.c_str(), mode.c_str(), span, freq_kHz, state.c_str(), rst_in.c_str());
+		// printf("DEBUG: check_dup %s Mode=%s Span=%d Freq=%d State=%s RST=%s", 
+			// callsign.c_str(), mode.c_str(), span, freq_kHz, state.c_str(), rst_in.c_str());
 		time_t timestamp = time(nullptr);
 		if (extract_records_->size()) {
 			bool found = false;
