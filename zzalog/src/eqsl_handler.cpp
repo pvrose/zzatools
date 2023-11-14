@@ -275,32 +275,21 @@ bool eqsl_handler::card_file_valid(string& filename) {
 	// Check if PNG file already exists
 	bool file_exists = false;
 	// Try and open the file
-	ifstream file(filename.c_str());
+	string testname = filename + ".png";
+	ifstream file(testname.c_str());
 	if (!file.good()) {
-		// File doesn't exist
-		file_exists = false;
+		file.close();
+		// File doesn't exist - try JPEG
+		testname = filename + ".jpg";
+		file = ifstream(testname.c_str());
+		if  (!file.good()) {
+			file_exists = false;
+		} else {
+			file_exists = true;
+		}
 	}
 	else {
-		// Read the first four characters to check it's a valid PNG files
-		char buffer[5];
-		memset(&buffer, 0, 5);
-		char png_test[] = { (char)0x89, 'P', 'N', 'G', '\0' };
-		file.read(buffer, 4);
-		if (file.gcount() == 4) {
-			// File is at least 4 characters long
-			if (strcmp(buffer, png_test) == 0) {
-				// Starts with the PNG marker
-				file_exists = true;
-			}
-			else {
-				// Not a valid PNG file
-				file_exists = false;
-			}
-		}
-		else {
-			// Not a valid PNG file (too short)
-			file_exists = false;
-		}
+		file_exists = true;
 	}
 	file.close();
 	return file_exists;
