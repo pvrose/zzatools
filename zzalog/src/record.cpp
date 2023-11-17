@@ -778,7 +778,7 @@ bool record::merge_records(record* merge_record, bool allow_loc_mismatch /* = fa
 				}
 			}
 			// Match but merge data is more accurate
-			else if (field_name == "TIME_OFF" && merge_data.length() > my_data.length()) {
+			else if (field_name == "TIME_ON" && merge_data.length() > my_data.length()) {
 				item(field_name, merge_data);
 				merged = true;
 			}

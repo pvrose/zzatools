@@ -172,6 +172,7 @@
     <ClCompile Include="zzalog\src\qso_data.cpp" />
     <ClCompile Include="zzalog\src\qso_entry.cpp" />
     <ClCompile Include="zzalog\src\qso_query.cpp" />
+    <ClCompile Include="zzalog\src\qso_server.cpp" />
     <ClCompile Include="zzalog\src\qso_tabbed_qth.cpp" />
     <ClCompile Include="zzalog\src\qso_tabbed_rigs.cpp" />
     <ClCompile Include="zzalog\src\rig_if.cpp" />
@@ -265,6 +266,7 @@
     <ClInclude Include="zzalog\include\qso_data.h" />
     <ClInclude Include="zzalog\include\qso_entry.h" />
     <ClInclude Include="zzalog\include\qso_query.h" />
+    <ClInclude Include="zzalog\include\qso_server.h" />
     <ClInclude Include="zzalog\include\qso_tabbed_qth.h" />
     <ClInclude Include="zzalog\include\qso_tabbed_rigs.h" />
     <ClInclude Include="zzalog\include\regices.h" />

@@ -74,7 +74,7 @@ using namespace std;
 string COPYRIGHT = "\xA9 Philip Rose GM3ZZA 2018. All rights reserved.\nPrefix data courtesy of clublog.org";
 string PROGRAM_ID = "ZZALOG";
 string PROG_ID = "ZLG";
-string PROGRAM_VERSION = "3.4.53";
+string PROGRAM_VERSION = "3.4.54";
 string TIMESTAMP = __DATE__ + string(" ") + __TIME__;
 string VENDOR = "GM3ZZA";
 
@@ -160,16 +160,16 @@ string default_station_ = "";
 static void cb_ticker(void* v) {
 	// Units that require 1s tick
 	if (ticks_ % TICK_SECOND == 0) {
-		qso_manager_->ticker();
-		import_data_->ticker();
+		if (qso_manager_) qso_manager_->ticker();
+		if (import_data_) import_data_->ticker();
 	}
 	// Units that require a 200ms tick
 	if (ticks_ % (TICK_SECOND * 2 / 10) == 0) {
-		status_->ticker();
+		if (status_) status_->ticker();
 	}
 	// Units that require 15s tick
 	if (ticks_ % (TICK_SECOND * 15) == 0) {
-		wsjtx_handler_->ticker();
+		if (wsjtx_handler_) wsjtx_handler_->ticker();
 	}
 	ticks_++;
 	Fl::repeat_timeout(TICK, cb_ticker);

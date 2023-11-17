@@ -406,10 +406,10 @@ string qso_manager::get_default(stn_item_t item) {
 void qso_manager::ticker() {
 	if (!ticker_in_progress_ && !closing_) {
 		ticker_in_progress_ = true;
-		rig_group_->ticker();
-		data_group_->ticker();
-		info_group_->ticker();
-		clock_group_->ticker();
+		if (rig_group_) rig_group_->ticker();
+		if (data_group_) data_group_->ticker();
+		if (info_group_) info_group_->ticker();
+		if (clock_group_) clock_group_->ticker();
 		ticker_in_progress_ = false;
 	}
 }

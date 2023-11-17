@@ -450,7 +450,7 @@ void socket_server::handle_error(const char *phase)
 	{
 		char error_msg[1028];
 		FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, nullptr, error_code, 0, error_msg, sizeof(error_msg), nullptr);
-		snprintf(message, 1028, "SOCKET: %s: %s", phase, error_msg);
+		snprintf(message, 1028, "SOCKET: %s: (%d) %s", phase, error_code, error_msg);
 	}
 	else
 	{
