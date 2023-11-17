@@ -91,6 +91,7 @@ bool READ_ONLY = false;
 bool RESUME_SESSION = false;
 bool VERBOSE = false;
 bool HELP = false;
+bool PRIVATE = false;
 
 // Ticker values
 double TICK = 0.1;      // 100 ms
@@ -326,6 +327,11 @@ int cb_args(int argc, char** argv, int& i) {
 			RESUME_SESSION = true;
 			i += 1;
 		}
+		// Private log - do not update recent files
+		else if (strcmp("-p", argv[i]) == 0 || strcmp("--private", argv[i]) == 0) {
+			PRIVATE = true;
+			i += 1;
+		}
 		// Help
 		else if (strcmp("-h", argv[i]) == 0 || strcmp("--help", argv[i]) == 0) {
 			HELP = true;
@@ -410,6 +416,7 @@ void show_help() {
 	"\t\t\tnot|nothreads\n"
 	"\t-h|--help\tPrint this\n"
 	"\t-m|--resume\tResume the previous session\n"
+	"\t-p|--private\tDo not update recent files list\n"
 	"\t-q|--quiet\tDo not publish QSOs to online sites\n"
 	"\t-r|--read_only\tOpen file in read only mode\n"
 	"\t-t|--test\tTest mode: infers -q -w\n"
@@ -878,22 +885,26 @@ void backup_file() {
 // Add the current file to the recent files list
 void set_recent_file(string filename) {
 
-	// Add or move the file to the front of list
-	recent_files_.remove(filename);
-	recent_files_.push_front(filename);
+	if (!PRIVATE) {
 
-	// Update recent files in the settings
-	Fl_Preferences recent_settings(settings_, "Recent Files");
-	// Clear the existing settings
-	recent_settings.clear();
-	// And write the top four names on the list to settings
-	int i = 1;
-	for (auto it = recent_files_.begin(); i <= 4 && it != recent_files_.end(); i++, it++) {
-		char path[6];
-		sprintf(path, "File%d", i);
-		recent_settings.set(path, (*it).c_str());
+		// Add or move the file to the front of list
+		recent_files_.remove(filename);
+		recent_files_.push_front(filename);
+
+		// Update recent files in the settings
+		Fl_Preferences recent_settings(settings_, "Recent Files");
+		// Clear the existing settings
+		recent_settings.clear();
+		// And write the top four names on the list to settings
+		int i = 1;
+		for (auto it = recent_files_.begin(); i <= 4 && it != recent_files_.end(); i++, it++) {
+			char path[6];
+			sprintf(path, "File%d", i);
+			recent_settings.set(path, (*it).c_str());
+		}
+
+		menu_->add_recent_files();
+
 	}
-
-	menu_->add_recent_files();
 
 }

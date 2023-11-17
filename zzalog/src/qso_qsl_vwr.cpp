@@ -242,6 +242,10 @@ void qso_qsl_vwr::cb_bn_fetch(Fl_Widget* w, void* v) {
 	// Put the card request onto the eQSL request queue - so that requests are made
 	eqsl_handler_->enqueue_request(that->current_qso_num_, true);
 	eqsl_handler_->enable_fetch(eqsl_handler::EQ_START);
+	// Wait until donwload complete
+	while (eqsl_handler_->requests_queued()) Fl::check();
+	that->set_selected_image(QI_EQSL);
+	that->set_image();
 }
 
 // Set the QSL_RCVD and QSLRDATE values in current record
