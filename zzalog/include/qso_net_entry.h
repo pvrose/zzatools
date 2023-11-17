@@ -52,6 +52,8 @@ public:
 	qso_entry* entry();
 	// Most recent entry
 	qso_entry* last_entry();
+	// First entry
+	qso_entry* first_entry();
 	// Set entry
 	void entry(qso_entry* w);
 	// Number of entries

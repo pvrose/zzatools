@@ -1134,16 +1134,16 @@ void qso_data::action_look_all_txt() {
 
 // Create a net from current QSO and others which overlap
 void qso_data::action_create_net() {
-	// printf("DEBUG: action_create_net\n");
+	printf("DEBUG: action_create_net\n");
 	qso_num_t qso_number = g_entry_->qso_number();
 	record* qso = g_entry_->qso();
 	string call = get_call();
 	char msg[128];
 	g_net_entry_->set_qso(qso_number);
-	g_net_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
 	qso_entry* w = g_net_entry_->entry();
 	switch (logging_state_) {
 	case QSO_STARTED:
+		w->copy_cat_to_qso();
 		logging_state_ = NET_STARTED;
 		break;
 	case QSO_EDIT:
@@ -1154,6 +1154,7 @@ void qso_data::action_create_net() {
 		status_->misc_status(ST_SEVERE, msg);
 		break;
 	}
+	g_net_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
 	// Now add the remaining QSOs in the net - first look earlier
 	qso_num_t other_number = qso_number - 1;
 	while (qso->match_records(book_->get_record(other_number, false)) == MT_OVERLAP) {

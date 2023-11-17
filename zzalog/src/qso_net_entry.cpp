@@ -72,6 +72,11 @@ qso_entry* qso_net_entry::last_entry() {
 	Fl_Widget* w = entries_->child(ix);
 	return (qso_entry*)w;
 }
+
+qso_entry* qso_net_entry::first_entry() {
+	return (qso_entry*)entries_->child(0);
+}
+
 // Enable/disable widgets - pass on to children
 void qso_net_entry::enable_widgets() {
 	for (int cx = 0; cx < entries_->children(); cx++) {
