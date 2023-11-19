@@ -297,105 +297,110 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 // Callback to parse arguments
 // -r | --read_only : marks the file read-only
 int cb_args(int argc, char** argv, int& i) {
-	int i_init = i;
-
-	// Process all arguments
-	while (i < argc) {
-		// Look for read_only (-r or --read_only)
-		if (strcmp("-r", argv[i]) == 0 || strcmp("--read_only", argv[i]) == 0) {
-			READ_ONLY = true;
-			i += 1;
-		}
-		// Look for test mode (-t or --test) 
-		else if (strcmp("-t", argv[i]) == 0 || strcmp("--test", argv[i]) == 0) {
-			AUTO_UPLOAD = false;
-			AUTO_SAVE = false;
-			i += 1;
-		}
-		// No auto upload
-		else if (strcmp("-q", argv[i]) == 0 || strcmp("--quiet", argv[i]) == 0) {
-			AUTO_UPLOAD = false;
-			i += 1;
-		} 
-		// No auto save
-		else if (strcmp("-w", argv[i]) == 0 || strcmp("--wait_save", argv[i]) == 0) {
-			AUTO_SAVE = false;
-			i += 1;
-		}
-		// Resume session
-		else if (strcmp("-m", argv[i]) == 0 || strcmp("--resume", argv[i]) == 0) {
-			RESUME_SESSION = true;
-			i += 1;
-		}
-		// Private log - do not update recent files
-		else if (strcmp("-p", argv[i]) == 0 || strcmp("--private", argv[i]) == 0) {
-			PRIVATE = true;
-			i += 1;
-		}
-		// Help
-		else if (strcmp("-h", argv[i]) == 0 || strcmp("--help", argv[i]) == 0) {
-			HELP = true;
-			i += 1;
-		}
-		// Debug
-		else if (strcmp("-d", argv[i]) == 0 || strcmp("--debug", argv[i]) == 0) {
-			i += 1;
-			bool debugs = true;
-			while (debugs && i < argc) {
-				int save_i = i;
-				if (strcmp("e", argv[i]) == 0 || strcmp("errors", argv[i]) == 0) {
-					DEBUG_ERRORS = true;
-					i += 1;
-				}
-				else if (strcmp("noe", argv[i]) == 0 || strcmp("noerrors", argv[i]) == 0) {
-					DEBUG_ERRORS = false;
-					i += 1;
-				}
-				else if (strcmp("t", argv[i]) == 0 || strcmp("threads", argv[i]) == 0) {
-					DEBUG_THREADS = true;
-					i += 1;
-				}
-				else if (strcmp("not", argv[i]) == 0 || strcmp("nothreads", argv[i]) == 0) {
-					DEBUG_THREADS = false;
-					i += 1;
-				}
-				else if (strcmp("c", argv[i]) == 0 || strcmp("curl", argv[i]) == 0) {
-					DEBUG_CURL = true;
-					i += 1;
-				}
-				else if (strcmp("noc", argv[i]) == 0 || strcmp("nocurl", argv[i]) == 0) {
-					DEBUG_CURL = false;
-					i += 1;
-				}
-				else if (strcmp("s", argv[i]) == 0 || strcmp("status", argv[i]) == 0) {
-					DEBUG_STATUS = true;
-					i += 1;
-				}
-				else if (strcmp("nos", argv[i]) == 0 || strcmp("nostatus", argv[i]) == 0) {
-					DEBUG_STATUS = false;
-					i += 1;
-				}
-				else if (strncmp("h=", argv[i], 2) == 0) {
-					int v = atoi(argv[i] + 2);
-					HAMLIB_DEBUG_LEVEL = (rig_debug_level_e)v;
-					i += 1;
-				}
-				else if (strncmp("hamlib=", argv[i], 7) == 0) {
-					int v = atoi(argv[i] + 7);
-					HAMLIB_DEBUG_LEVEL = (rig_debug_level_e)v;
-					i += 1;
-				}
-				// Not processed any parameter
-				if (i == save_i) debugs = false;
+	printf("DEBUG: parsing parameter %s\n", argv[i]);
+	// Look for read_only (-r or --read_only)
+	if (strcmp("-r", argv[i]) == 0 || strcmp("--read_only", argv[i]) == 0) {
+		READ_ONLY = true;
+		i += 1;
+	}
+	// Look for test mode (-t or --test) 
+	else if (strcmp("-t", argv[i]) == 0 || strcmp("--test", argv[i]) == 0) {
+		AUTO_UPLOAD = false;
+		AUTO_SAVE = false;
+		i += 1;
+	}
+	// No auto upload
+	else if (strcmp("-q", argv[i]) == 0 || strcmp("--quiet", argv[i]) == 0) {
+		AUTO_UPLOAD = false;
+		i += 1;
+	} 
+	// No auto save
+	else if (strcmp("-w", argv[i]) == 0 || strcmp("--wait_save", argv[i]) == 0) {
+		AUTO_SAVE = false;
+		i += 1;
+	}
+	// Resume session
+	else if (strcmp("-m", argv[i]) == 0 || strcmp("--resume", argv[i]) == 0) {
+		RESUME_SESSION = true;
+		i += 1;
+	}
+	// Private log - do not update recent files
+	else if (strcmp("-p", argv[i]) == 0 || strcmp("--private", argv[i]) == 0) {
+		PRIVATE = true;
+		i += 1;
+	}
+	// Help
+	else if (strcmp("-h", argv[i]) == 0 || strcmp("--help", argv[i]) == 0) {
+		HELP = true;
+		i += 1;
+	}
+	// Debug
+	else if (strcmp("-d", argv[i]) == 0 || strcmp("--debug", argv[i]) == 0) {
+		i += 1;
+		bool debugs = true;
+		while (debugs && i < argc) {
+			int save_i = i;
+			if (strcmp("e", argv[i]) == 0 || strcmp("errors", argv[i]) == 0) {
+				DEBUG_ERRORS = true;
+				i += 1;
 			}
-		}
-		// Hopefully last switch
-		else if (*argv[i] != '-') {
-			filename_ = argv[i];
-			i += 1;
+			else if (strcmp("noe", argv[i]) == 0 || strcmp("noerrors", argv[i]) == 0) {
+				DEBUG_ERRORS = false;
+				i += 1;
+			}
+			else if (strcmp("t", argv[i]) == 0 || strcmp("threads", argv[i]) == 0) {
+				DEBUG_THREADS = true;
+				i += 1;
+			}
+			else if (strcmp("not", argv[i]) == 0 || strcmp("nothreads", argv[i]) == 0) {
+				DEBUG_THREADS = false;
+				i += 1;
+			}
+			else if (strcmp("c", argv[i]) == 0 || strcmp("curl", argv[i]) == 0) {
+				DEBUG_CURL = true;
+				i += 1;
+			}
+			else if (strcmp("noc", argv[i]) == 0 || strcmp("nocurl", argv[i]) == 0) {
+				DEBUG_CURL = false;
+				i += 1;
+			}
+			else if (strcmp("s", argv[i]) == 0 || strcmp("status", argv[i]) == 0) {
+				DEBUG_STATUS = true;
+				i += 1;
+			}
+			else if (strcmp("nos", argv[i]) == 0 || strcmp("nostatus", argv[i]) == 0) {
+				DEBUG_STATUS = false;
+				i += 1;
+			}
+			else if (strncmp("h=", argv[i], 2) == 0) {
+				int v = atoi(argv[i] + 2);
+				HAMLIB_DEBUG_LEVEL = (rig_debug_level_e)v;
+				i += 1;
+			}
+			else if (strncmp("hamlib=", argv[i], 7) == 0) {
+				int v = atoi(argv[i] + 7);
+				HAMLIB_DEBUG_LEVEL = (rig_debug_level_e)v;
+				i += 1;
+			}
+			// Not processed any parameter
+			if (i == save_i) debugs = false;
 		}
 	}
-	return i - i_init;
+	if (i < argc) {
+		if (*argv[i] == '-') {
+			printf ("DEBUG: Not recognised switch %d %s passing to fltk", i, argv[i]);
+			// Unrecognised switch - try Fl speciific ones
+			int n = Fl::arg(argc, argv, i);
+			printf(" %d words processed\n");
+			if (n == 0) return 0;
+			else return i;
+		} else {
+			filename_ = argv[i];
+			return i;
+		}
+	} else {
+		return argc;
+	}
 }
 
 // Show help listing
