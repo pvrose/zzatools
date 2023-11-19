@@ -118,7 +118,7 @@ int field_input::handle(int event) {
 	switch (event) {
 	case FL_FOCUS:
 		if (intl_dialog_) {
-			intl_dialog_->editor(this);
+			intl_dialog_->editor(this->input());
 		}
 		if (input()->take_focus()) return true;
 		return Fl_Input_Choice::handle(event);
