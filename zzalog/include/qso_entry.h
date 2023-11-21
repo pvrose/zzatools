@@ -4,10 +4,18 @@
 #include "field_choice.h"
 #include "qso_misc.h"
 
+#include <map>
+#include <vector>
+#include <set>
+
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Input.H>
 
 class qso_data;
+
+// Default field sets - contest
+static vector<string> DEFAULT_CONTEST = {"RST_RCVD","SRX","RST_SENT","STX"};
+static vector<string> DEFAULT_NONTEST = {"RST_RCVD","RST_SENT","NAME","QTH","GRIDSQUARE"};
 
 class qso_entry :
     public Fl_Group
@@ -46,6 +54,10 @@ public:
 	// Loggable field names
 	static const int NUMBER_FIXED = 11;
 	static const int NUMBER_TOTAL = NUMBER_FIXED + 13;
+
+	// Variable fields - per usage
+	static map <string, vector<string> > field_map_;
+
 protected:
 	const string fixed_names_[NUMBER_FIXED] = {
 		"MY_RIG", "MY_ANTENNA", "APP_ZZA_QTH", "STATION_CALLSIGN",
@@ -108,8 +120,8 @@ public:
 	void action_del_field(int ix);
 
 	// Initialise fields
-	void initialise_fields(string fields, bool new_fields, bool lock_preset);
-	void initialise_values(string fields, int contest_serial);
+	void initialise_fields();
+	void initialise_values();
 
 	// Set initial focus
 	void set_initial_focus();
@@ -147,5 +159,7 @@ protected:
 	// Previous value
 	string previous_qth_;
 	string previous_locator_;
+	// Previous contest serial number
+	int previous_serial_;
 };
 

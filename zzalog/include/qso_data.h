@@ -1,6 +1,5 @@
 #pragma once
 
-#include "qso_contest.h"
 #include "qso_entry.h"
 #include "qso_query.h"
 #include "qso_buttons.h"
@@ -96,8 +95,6 @@ public:
 
 	// Get logging state
 	qso_data::logging_state_t logging_state();
-	// Get contest mode
-	qso_contest::contest_mode_t contest_mode();
 	// Update QSO
 	void update_qso(qso_num_t log_num);
 	// Update query
@@ -106,8 +103,8 @@ public:
 	void update_modem_qso(record* qso);
 	// Get default copy record
 	qso_num_t get_default_number();
-	// Initialise fields
-	void initialise_fields(qso_entry* entry);
+	// // Initialise fields
+	// void initialise_fields(qso_entry* entry);
 	// Get defined fields
 	string get_defined_fields();
 	// Current QSO
@@ -246,8 +243,6 @@ protected:
 	record* peeked_qso_;
 
 	// Widgets
-	// Contest group
-	qso_contest* g_contest_;
 	// Entry group
 	qso_entry* g_entry_;
 	// Query group

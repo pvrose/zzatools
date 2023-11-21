@@ -14,6 +14,7 @@
 #include "qrz_handler.h"
 #include "wsjtx_handler.h"
 #include "menu.h"
+#include "utils.h"
 #ifdef _WIN32
 #include "dxa_if.h"
 #endif
@@ -56,6 +57,17 @@ qso_data::~qso_data() {
 void qso_data::load_values() {
 	// Dashboard configuration
 	Fl_Preferences dash_settings(settings_, "Dashboard");
+	// Read field settings
+	Fl_Preferences field_settings(dash_settings, "Field Lists");
+	int num_contests = field_settings.entries();
+	for (int ix = 0; ix < num_contests; ix++) {
+		string contest = field_settings.entry(ix);
+		char* fields;
+		field_settings.get(field_settings.entry(ix), fields, "");
+		if (strlen(fields) > 0) {
+			split_line(string(fields), 	qso_entry::field_map_[contest], ',');
+		}
+	}
 	// Set logging mode -default is On-air with or without rig connection
 	rig_if* rig = ((qso_manager*)parent())->rig();
 	bool have_rig = rig && rig->is_good();
@@ -75,11 +87,6 @@ void qso_data::create_form(int X, int Y) {
 	int curr_y = Y + HTEXT;
 	int top = Y;
 	int curr_x = X + GAP;
-
-	g_contest_ = new qso_contest(curr_x, curr_y, 10, 10);
-
-	max_x = max(max_x, g_contest_->x() + g_contest_->w());
-	curr_y = g_contest_->y() + g_contest_->h() + GAP;
 
 	// One or the other of the two groups below will be shown at a time
 	g_entry_ = new qso_entry(curr_x, curr_y, 10, 10);
@@ -135,7 +142,6 @@ void qso_data::enable_widgets() {
 		qso_manager* mgr = (qso_manager*)parent();
 		if (mgr->created_) {
 			rig_if* rig = mgr->rig();
-			g_contest_->enable_widgets();
 			mgr->qsl_control()->enable_widgets();
 			if (menu_) menu_->update_items();
 		}
@@ -511,53 +517,59 @@ void qso_data::update_modem_qso(record* qso) {
 // Save the settings
 void qso_data::save_values() {
 	// Dashboard configuration
-}
-
-// Initialise fields from format definitions
-void qso_data::initialise_fields(qso_entry* entry) {
-	string preset_fields;
-	bool lock_preset = false;
-	bool new_fields = false;
-	switch (g_contest_->mode()) {
-	case qso_contest::NO_CONTEST:
-	case qso_contest::PAUSED:
-		// Non -contest mode
-		preset_fields = "RST_SENT,RST_RCVD,NAME,QTH";
-		new_fields = true;
-		lock_preset = false;
-		break;
-	case qso_contest::CONTEST:
-		// Contest mode
-		preset_fields = g_contest_->contest_fields();
-		new_fields = true;
-		lock_preset = true;
-		break;
-	case qso_contest::NEW:
-		// Do not change existing
-		preset_fields = "";
-		new_fields = false;
-		lock_preset = true;
-		break;
-	case qso_contest::DEFINE:
-		// Define new exchange - provide base RS/Serno
-		preset_fields = "";
-		new_fields = true;
-		lock_preset = false;
-		break;
-	case qso_contest::EDIT:
-		// Unlock existing definition 
-		preset_fields = g_contest_->contest_fields();
-		new_fields = true;
-		lock_preset = false;
-		break;
+	Fl_Preferences dash_settings(settings_, "Dashboard");
+	// Read field settings
+	Fl_Preferences field_settings(dash_settings, "Field Lists");
+	for (auto ix = qso_entry::field_map_.begin(); ix != qso_entry::field_map_.end(); ix++) {
+		field_settings.set(ix->first.c_str(), join_line(ix->second, ',').c_str());
 	}
-	// TODO this shoule be somewhere else
-	//// Set contest format
-	//ch_format_->value(exch_fmt_id_.c_str());
-
-	entry->initialise_fields(preset_fields, new_fields, lock_preset);
-	entry->initialise_values(preset_fields, g_contest_->serial_number());
 }
+
+// // Initialise fields from format definitions
+// void qso_data::initialise_fields(qso_entry* entry) {
+// 	string preset_fields;
+// 	bool lock_preset = false;
+// 	bool new_fields = false;
+// 	switch (g_contest_->mode()) {
+// 	case qso_contest::NO_CONTEST:
+// 	case qso_contest::PAUSED:
+// 		// Non -contest mode
+// 		preset_fields = "RST_SENT,RST_RCVD,NAME,QTH";
+// 		new_fields = true;
+// 		lock_preset = false;
+// 		break;
+// 	case qso_contest::CONTEST:
+// 		// Contest mode
+// 		preset_fields = g_contest_->contest_fields();
+// 		new_fields = true;
+// 		lock_preset = true;
+// 		break;
+// 	case qso_contest::NEW:
+// 		// Do not change existing
+// 		preset_fields = "";
+// 		new_fields = false;
+// 		lock_preset = true;
+// 		break;
+// 	case qso_contest::DEFINE:
+// 		// Define new exchange - provide base RS/Serno
+// 		preset_fields = "";
+// 		new_fields = true;
+// 		lock_preset = false;
+// 		break;
+// 	case qso_contest::EDIT:
+// 		// Unlock existing definition 
+// 		preset_fields = g_contest_->contest_fields();
+// 		new_fields = true;
+// 		lock_preset = false;
+// 		break;
+// 	}
+// 	// TODO this shoule be somewhere else
+// 	//// Set contest format
+// 	//ch_format_->value(exch_fmt_id_.c_str());
+
+// 	entry->initialise_fields(preset_fields, new_fields, lock_preset);
+// 	entry->initialise_values(preset_fields, g_contest_->serial_number());
+// }
 
 string qso_data::get_defined_fields() {
 	return g_entry_->get_defined_fields();
@@ -721,8 +733,8 @@ void qso_data::action_save() {
 			// Time as HHMMSS - always log seconds.
 			qso->item("TIME_OFF", timestamp.substr(8));
 		}
-		// Increment contest serial number
-		g_contest_->increment_serial();
+		// // Increment contest serial number
+		// g_contest_->increment_serial();
 		break;
 	case QSO_COPY_CALL:
 	case QSO_COPY_CONDX:
@@ -1659,10 +1671,6 @@ string qso_data::get_call() {
 	}
 }
 
-// Contest mode
-qso_contest::contest_mode_t qso_data::contest_mode() {
-	return g_contest_->mode();
-}
 
 // The supplied QSO number is being edited
 bool qso_data::qso_editing(qso_num_t number) {

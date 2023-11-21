@@ -21,6 +21,7 @@ extern double prev_freq_;
 extern dxa_if* dxa_if_;
 #endif
 
+map <string, vector<string> > qso_entry::field_map_;
 
 qso_entry::qso_entry(int X, int Y, int W, int H, const char* L) :
 	Fl_Group(X, Y, W, H, L)
@@ -28,6 +29,7 @@ qso_entry::qso_entry(int X, int Y, int W, int H, const char* L) :
 	, qso_(nullptr)
 	, qso_number_(-1)
 	, original_qso_(nullptr)
+	, previous_serial_(0)
 {
 	// Get the enclosing qso_data instance
 	qso_data_ = ancestor_view<qso_data>(this);
@@ -121,6 +123,7 @@ void qso_entry::create_form(int X, int Y) {
 	}
 	max_x = max(max_x, curr_x);
 	max_y = curr_y;
+	// Clear QSO fields
 
 	curr_x = max_x;
 	curr_y = save_y;
@@ -145,7 +148,7 @@ void qso_entry::create_form(int X, int Y) {
 	size(max_x - X, curr_y - Y);
 	end();
 
-	qso_data_->initialise_fields(this);
+	initialise_fields();
 }
 
 void qso_entry::enable_widgets() {
@@ -473,23 +476,28 @@ void qso_entry::initialise_field_map() {
 }
 
 // Initialise fields
-void qso_entry::initialise_fields(string fields, bool new_fields, bool lock_preset) {
+void qso_entry::initialise_fields() {
 	// Now set fields
-	vector<string> field_names;
-	if (fields.length()) split_line(fields, field_names, ',');
-	else field_names.clear();
-	if (lock_preset) number_locked_ = field_names.size();
-	else number_locked_ = 0;
+	string contest = qso_ ? qso_->item("CONTEST_ID") : "";
+	if (contest == "") {
+		if (field_map_.find("None") == field_map_.end()) {
+			field_map_["None"] = DEFAULT_NONTEST;
+		}
+		contest = "None";
+	} else {
+		if (field_map_.find(contest) == field_map_.end()) {
+			field_map_[contest] = DEFAULT_CONTEST;
+		}
+	}
+	vector<string>& field_names = field_map_.at(contest);
 	// Clear field map
 	initialise_field_map();
 	size_t ix = 0;
 	int iy;
 	for (ix = 0, iy = NUMBER_FIXED; ix < field_names.size(); ix++, iy++) {
-		if (new_fields) {
-			ch_field_[iy]->value(field_names[ix].c_str());
-			ip_field_[iy]->field_name(field_names[ix].c_str(), qso_);
-			field_names_[iy] = field_names[ix];
-		}
+		ch_field_[iy]->value(field_names[ix].c_str());
+		ip_field_[iy]->field_name(field_names[ix].c_str(), qso_);
+		field_names_[iy] = field_names[ix];
 	}
 	number_fields_in_use_ = iy;
 	for (; iy < NUMBER_TOTAL; iy++) {
@@ -500,13 +508,14 @@ void qso_entry::initialise_fields(string fields, bool new_fields, bool lock_pres
 }
 
 // Initialise the values of the above fields
-void qso_entry::initialise_values(string preset_fields, int contest_serial) {
-	vector<string> fields;
-	split_line(preset_fields, fields, ',');
+void qso_entry::initialise_values() {
+	string contest = qso_ ? qso_->item("CONTEST_ID") : "";
+	if (contest == "") contest = "None";
+	vector<string>& fields = field_map_.at(contest);
 	int ix = NUMBER_FIXED;
 	for (size_t i = 0; i < fields.size(); i++, ix++) {
 		if (qso_) {
-			if (qso_data_->contest_mode() == qso_contest::CONTEST) {
+			if (contest != "None") {
 				string contest_mode = spec_data_->dxcc_mode(qso_->item("MODE"));
 				if (fields[i] == "RST_SENT" || fields[i] == "RST_RCVD") {
 					if (contest_mode == "CW" || contest_mode == "DATA") {
@@ -518,7 +527,7 @@ void qso_entry::initialise_values(string preset_fields, int contest_serial) {
 				}
 				else if (fields[i] == "STX") {
 					char text[10];
-					snprintf(text, 10, "%03d", contest_serial);
+					snprintf(text, 10, "%03d", ++previous_serial_);
 					qso_->item(fields[i], string(text));
 				}
 				if (fields[i] == "CALL") {
@@ -563,9 +572,8 @@ void qso_entry::action_add_field(int ix, string field) {
 		char msg[128];
 		snprintf(msg, 128, "DASH: Cannot add any more fields to edit - %s ignored", field.c_str());
 		status_->misc_status(ST_ERROR, msg);
-		return;
 	}
-	if (ix >= 0 && ix < number_fields_in_use_) {
+	else if (ix >= 0 && ix < number_fields_in_use_) {
 		const char* old_field = field_names_[ix].c_str();
 		ip_field_[ix]->field_name(field.c_str(), qso_);
 		ip_field_[ix]->value(qso_->item(field).c_str());
@@ -594,6 +602,14 @@ void qso_entry::action_add_field(int ix, string field) {
 	else {
 		status_->misc_status(ST_SEVERE, "DASH: Trying to select a deactivated widget");
 	}
+
+	// Save the altered field names
+	string contest = qso_ ? qso_->item("CONTEST_ID") : "";
+	if (contest == "") contest = "None";
+	field_map_[contest].clear();
+	for (int iy = NUMBER_FIXED; iy < number_fields_in_use_; iy++) {
+		field_map_[contest].push_back(field_names_[iy]);
+	}
 	enable_widgets();
 }
 
@@ -613,6 +629,14 @@ void qso_entry::action_del_field(int ix) {
 	ip_field_[pos]->field_name("");
 	ip_field_[pos]->value("");
 	number_fields_in_use_--;
+
+	// Save the altered field names
+	string contest = qso_ ? qso_->item("CONTEST_ID") : "";
+	if (contest == "") contest = "None";
+	field_map_[contest].clear();
+	for (int iy = NUMBER_FIXED; iy < number_fields_in_use_; iy++) {
+		field_map_[contest].push_back(field_names_[iy]);
+	}
 
 	enable_widgets();
 }

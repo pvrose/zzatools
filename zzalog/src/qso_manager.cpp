@@ -163,13 +163,13 @@ void qso_manager::create_form(int X, int Y) {
 
 	enable_widgets();
 
-	// If contest mode go straight to QSO_PENDING
-	if (data_group_->contest_mode() == qso_contest::CONTEST) {
-		// Automatically create a pending QSO
-		if (data_group_->logging_state() == qso_data::QSO_INACTIVE) {
-			data_group_->action_activate(qso_data::QSO_NONE);
-		}
-	}
+	// // If contest mode go straight to QSO_PENDING
+	// if (data_group_->contest_mode() == qso_contest::CONTEST) {
+	// 	// Automatically create a pending QSO
+	// 	if (data_group_->logging_state() == qso_data::QSO_INACTIVE) {
+	// 		data_group_->action_activate(qso_data::QSO_NONE);
+	// 	}
+	// }
 
 }
 

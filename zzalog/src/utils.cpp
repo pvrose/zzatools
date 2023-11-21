@@ -22,6 +22,7 @@ utils.h - Utility methods
 #include <ctime>
 #include <cmath>
 #include <chrono>
+#include <set>
 
 using namespace std;
 using namespace std::chrono;
