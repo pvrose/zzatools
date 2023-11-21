@@ -103,13 +103,6 @@ void qso_data::create_form(int X, int Y) {
 	g_net_entry_ = new qso_net_entry(curr_x, curr_y, 10, 10);
 	max_x = max(max_x, g_net_entry_->x() + g_net_entry_->w());
 
-	g_peek_ = new qso_entry(curr_x, curr_y, 10, 10);
-	g_peek_->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
-	g_peek_->labelfont(FL_BOLD);
-	g_peek_->labelsize(FL_NORMAL_SIZE + 2);
-	g_peek_->labelcolor(FL_DARK_YELLOW);
-	max_x = max(max_x, g_peek_->x() + g_peek_->w());
-
 	g_qy_entry_ = new qso_entry(curr_x, curr_y, 10, 10);
 	g_qy_entry_->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 	g_qy_entry_->labelfont(FL_BOLD);
@@ -155,7 +148,6 @@ void qso_data::enable_widgets() {
 			g_entry_->enable_widgets();
 			g_net_entry_->hide();
 			g_query_->hide();
-			g_peek_->hide();
 			g_qy_entry_->hide();
 			break;
 		case QSO_PENDING:
@@ -165,7 +157,6 @@ void qso_data::enable_widgets() {
 			g_entry_->enable_widgets();
 			g_net_entry_->hide();
 			g_query_->hide();
-			g_peek_->hide();
 			g_qy_entry_->hide();
 			break;
 		case QSO_STARTED:
@@ -176,7 +167,6 @@ void qso_data::enable_widgets() {
 			g_entry_->enable_widgets();
 			g_net_entry_->hide();
 			g_query_->hide();
-			g_peek_->hide();
 			g_qy_entry_->hide();
 			break;
 		case QSO_ENTER:
@@ -187,7 +177,6 @@ void qso_data::enable_widgets() {
 			g_entry_->enable_widgets();
 			g_net_entry_->hide();
 			g_query_->hide();
-			g_peek_->hide();
 			g_qy_entry_->hide();
 			break;
 		case QSO_EDIT:
@@ -198,7 +187,6 @@ void qso_data::enable_widgets() {
 			g_entry_->enable_widgets();
 			g_net_entry_->hide();
 			g_query_->hide();
-			g_peek_->hide();
 			g_qy_entry_->hide();
 			break;
 		case QSO_VIEW:
@@ -209,7 +197,6 @@ void qso_data::enable_widgets() {
 			g_entry_->enable_widgets();
 			g_net_entry_->hide();
 			g_query_->hide();
-			g_peek_->hide();
 			g_qy_entry_->hide();
 			break;
 		case QSO_BROWSE:
@@ -219,7 +206,6 @@ void qso_data::enable_widgets() {
 			g_query_->show();
 			g_query_->enable_widgets();
 			g_net_entry_->hide();
-			g_peek_->hide();
 			g_qy_entry_->hide();
 			break;
 		case QUERY_DUPE:
@@ -230,7 +216,6 @@ void qso_data::enable_widgets() {
 			g_query_->show();
 			g_query_->enable_widgets();
 			g_net_entry_->hide();
-			g_peek_->hide();
 			g_qy_entry_->hide();
 			break;
 		case QUERY_NEW:
@@ -240,7 +225,6 @@ void qso_data::enable_widgets() {
 			g_query_->show();
 			g_query_->enable_widgets();
 			g_net_entry_->hide();
-			g_peek_->hide();
 			g_qy_entry_->hide();
 			break;
 		case QUERY_WSJTX:
@@ -250,7 +234,6 @@ void qso_data::enable_widgets() {
 			g_query_->show();
 			g_query_->enable_widgets();
 			g_net_entry_->hide();
-			g_peek_->hide();
 			g_qy_entry_->hide();
 			break;
 		case NET_STARTED:
@@ -259,7 +242,6 @@ void qso_data::enable_widgets() {
 			g_net_entry_->label("Net Entry - active real-time logging");
 			g_net_entry_->show();
 			g_net_entry_->enable_widgets();
-			g_peek_->hide();
 			g_qy_entry_->hide();
 			break;
 		case NET_EDIT:
@@ -268,7 +250,6 @@ void qso_data::enable_widgets() {
 			g_net_entry_->label("Net Entry - off-air logging");
 			g_net_entry_->show();
 			g_net_entry_->enable_widgets();
-			g_peek_->hide();
 			g_qy_entry_->hide();
 			break;
 		case QSO_MODEM:
@@ -278,24 +259,11 @@ void qso_data::enable_widgets() {
 			g_entry_->enable_widgets();
 			g_net_entry_->hide();
 			g_query_->hide();
-			g_peek_->hide();
-			g_qy_entry_->hide();
-			break;
-		case QSO_PEEK:
-		case QSO_PEEK_ED:
-			snprintf(l, sizeof(l), "QSO Peek - %s", current_qso()->item("CALL").c_str());
-			g_entry_->hide();
-			g_net_entry_->hide();
-			g_query_->hide();
-			g_peek_->copy_label(l);
-			g_peek_->show();
-			g_peek_->enable_widgets();
 			g_qy_entry_->hide();
 			break;
 		case MANUAL_ENTRY:
 			g_entry_->hide();
 			g_query_->hide();
-			g_peek_->hide();
 			g_qy_entry_->show();
 			g_qy_entry_->label("Enter QSO details for search");
 			g_qy_entry_->enable_widgets();
@@ -313,14 +281,12 @@ void qso_data::update_qso(qso_num_t log_num) {
 	case QSO_INACTIVE:
 	{
 		// Copy selected QSO 
-		action_peek(log_num);
 		break;
 	}
 	case QSO_PENDING:
 		if (log_num != g_entry_->qso_number()) {
 			// Deactivate then reactivate with new QSO
 			action_deactivate();
-			action_peek(log_num);
 		}
 		else {
 			g_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
@@ -338,14 +304,12 @@ void qso_data::update_qso(qso_num_t log_num) {
 				action_save();
 				book_->selection(book_->item_number(log_num));
 				logging_state_ = QSO_INACTIVE;
-				action_peek(log_num);
 				break;
 			case 1:
 				// Cancel QSO
 				action_cancel();
 				book_->selection(book_->item_number(log_num));
 				logging_state_ = QSO_INACTIVE;
-				action_peek(log_num);
 				break;
 			case 2:
 				// Ignore the selection request
@@ -407,13 +371,11 @@ void qso_data::update_qso(qso_num_t log_num) {
 				// Save QSO
 				action_save_net_all();
 				logging_state_ = QSO_INACTIVE;
-				action_peek(log_num);
 				break;
 			case 1:
 				// Cancel QSO
 				action_cancel_net_all();
 				logging_state_ = QSO_INACTIVE;
-				action_peek(log_num);
 				break;
 			case 2:
 				// Ignore the selection request
@@ -429,12 +391,6 @@ void qso_data::update_qso(qso_num_t log_num) {
 			g_net_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
 		}
 		break;
-	case QSO_PEEK:
-	case QSO_PEEK_ED:
-		g_peek_->qso(log_num);
-		g_peek_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
-		enable_widgets();
-		break;
 	}
 	// action_view_qsl();
 }
@@ -448,11 +404,6 @@ void qso_data::update_query(logging_state_t query, qso_num_t match_num, qso_num_
 	case QUERY_NEW:
 	case QUERY_WSJTX:
 	case MANUAL_ENTRY:
-		action_query(query, match_num, query_num);
-		break;
-	case QSO_PEEK:
-	case QSO_PEEK_ED:
-		action_cancel_peek();
 		action_query(query, match_num, query_num);
 		break;
 	case QSO_EDIT:
@@ -470,8 +421,6 @@ void qso_data::update_query(logging_state_t query, qso_num_t match_num, qso_num_
 void qso_data::update_modem_qso(record* qso) {
 	switch (logging_state_) {
 	case QSO_PENDING:
-	case QSO_PEEK:
-	case QSO_PEEK_ED:
 		action_deactivate();
 		// drop down
 	case QSO_INACTIVE:
@@ -595,9 +544,6 @@ qso_num_t qso_data::get_default_number() {
 	case NET_EDIT:
 	case NET_STARTED:
 		return g_net_entry_->qso_number();
-	case QSO_PEEK:
-	case QSO_PEEK_ED:
-		return g_peek_->qso_number();
 	default:
 		return -1;
 	}
@@ -612,10 +558,6 @@ void qso_data::action_new_qso(record* qso, qso_init_t mode) {
 	case NET_EDIT:
 	case NET_ADDING:
 		qe = g_net_entry_->entry();
-		break;
-	case QSO_PEEK:
-	case QSO_PEEK_ED:
-		qe = g_peek_;
 		break;
 	case MANUAL_ENTRY:
 		qe = g_qy_entry_;
@@ -849,7 +791,6 @@ void qso_data::action_delete_qso() {
 		action_deactivate();
 		break;
 	case QSO_PENDING:
-	case QSO_PEEK:
 		break;
 	}
 
@@ -1125,14 +1066,6 @@ void qso_data::action_look_all_txt() {
 				logging_state_ = QUERY_WSJTX;
 			}
 			break;
-		case QSO_PEEK:
-		case QSO_PEEK_ED:
-			if (wsjtx_handler_->match_all_txt(g_peek_->qso(), false)) {
-				status_->misc_status(ST_NOTE, "DASH: ALL.TXT search found QSO: see above");
-			} else {
-				status_->misc_status(ST_WARNING, "DASH: ALL.TXT search did not find QSO");
-			}
-			break;
 		case QSO_VIEW:
 			if (wsjtx_handler_->match_all_txt(g_entry_->qso(), false)) {
 				status_->misc_status(ST_NOTE, "DASH: ALL.TXT search found QSO: see above");
@@ -1297,107 +1230,6 @@ void qso_data::action_add_modem(record* qso) {
 	
 	book_->selection(book_->item_number(g_entry_->qso_number()), HT_INSERTED);
 	book_->enable_save(true);
-	enable_widgets();
-}
-
-// Action PEEK - interrupt current state and peek at supplied qso
-void qso_data::action_peek(qso_num_t number) {
-	// printf("DEBUG: action_peek\n");
-	// SAve the current state unless it is already peeking
-	// Either QSO_PEEK or QSO_PEEK_ED
-	switch (logging_state_) {
-	case QSO_EDIT:
-	case NET_EDIT:
-		interrupted_state_ = logging_state_;
-		logging_state_ = QSO_PEEK_ED;
-		break;
-	case QSO_INACTIVE:
-	case QSO_PENDING:
-	case QSO_STARTED:
-	case QSO_ENTER:
-	case QSO_BROWSE:
-	case QUERY_DUPE:
-	case QUERY_MATCH:
-	case QUERY_NEW:
-	case QUERY_WSJTX:
-	case QRZ_MERGE:
-	case NET_STARTED:
-	case NET_ADDING:
-	case SWITCHING:
-	case QSO_MODEM:
-	case QSO_VIEW:
-		interrupted_state_ = logging_state_;
-		logging_state_ = QSO_PEEK;
-		break;
-	}
-	g_peek_->qso(number);
-	g_peek_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
-	enable_widgets();
-}
-
-// Action CANCEL_PEEK - restore interrupted state
-void qso_data::action_cancel_peek() {
-	// printf("DEBUG: action_cancel_peek\n");
-	logging_state_ = interrupted_state_;
-	enable_widgets();
-}
-
-// Action EDIT_PEEK - close down existing edit
-void qso_data::action_edit_peek() {
-	// printf("DEBUG: action_edit_peek\n");
-	bool existing_entry = false;
-	switch (interrupted_state_) {
-	case QSO_EDIT:
-		if (g_entry_->qso()->is_dirty()) {
-			fl_beep(FL_BEEP_QUESTION);
-			switch (fl_choice("Trying to select a different record while editing a record", "Save edit", "Cancel edit", nullptr)) {
-			case 0:
-				// Save QSO
-				action_save_edit();
-				break;
-			case 1:
-				// Cancel QSO
-				action_cancel_edit();
-				break;
-			}
-		}
-		else {
-			action_cancel_edit();
-		}
-	case NET_EDIT:
-		if (!g_net_entry_->qso_in_net(g_peek_->qso_number())) {
-			// Selected QSO is not part of the net, save or cancel the net
-			fl_beep(FL_BEEP_QUESTION);
-			switch (fl_choice("Trying to select a different record while logging a net", "Save Net", "Quit Net", nullptr)) {
-			case 0:
-				// Save QSO
-				action_save_net_all();
-				break;
-			case 1:
-				// Cancel QSO
-				action_cancel_net_all();
-				break;
-			}
-			// Actions will have changed selection - change it back.
-			logging_state_ = QSO_INACTIVE;
-		}
-		else {
-			// Switch to the selected QSO as part of the net if necessary
-			if (g_peek_->qso_number() != g_net_entry_->qso_number()) {
-				g_net_entry_->select_qso(g_peek_->qso_number());
-			}
-			g_net_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
-			existing_entry = true;
-			logging_state_ = NET_EDIT;
-		}
-	}
-	// Save a copy of the current record
-	if (!existing_entry) {
-		edit_return_state_ = logging_state_;
-		logging_state_ = QSO_EDIT;
-		g_entry_->qso(g_peek_->qso_number());
-		g_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
-	}
 	enable_widgets();
 }
 
@@ -1608,9 +1440,6 @@ record* qso_data::current_qso() {
 	case NET_STARTED:
 	case NET_EDIT:
 		return g_net_entry_->qso();
-	case QSO_PEEK:
-	case QSO_PEEK_ED:
-		return g_peek_->qso();
 	case MANUAL_ENTRY:
 		return g_qy_entry_->qso();
 	default:
@@ -1639,9 +1468,6 @@ qso_num_t qso_data::current_number() {
 	case NET_STARTED:
 	case NET_EDIT:
 		return g_net_entry_->qso_number();
-	case QSO_PEEK:
-	case QSO_PEEK_ED:
-		return g_peek_->qso_number();
 	case MANUAL_ENTRY:
 		return g_qy_entry_->qso_number();
 	default:
@@ -1691,8 +1517,6 @@ bool qso_data::inactive() {
 	switch(logging_state_) {
 	case QSO_INACTIVE:
 	case QSO_PENDING:
-	case QSO_PEEK:
-	case QSO_PEEK_ED:
 		return true;
 	default:
 		return false;

@@ -74,7 +74,7 @@ using namespace std;
 string COPYRIGHT = "\xA9 Philip Rose GM3ZZA 2018. All rights reserved.\nPrefix data courtesy of clublog.org";
 string PROGRAM_ID = "ZZALOG";
 string PROG_ID = "ZLG";
-string PROGRAM_VERSION = "3.4.54";
+string PROGRAM_VERSION = "3.4.55";
 string TIMESTAMP = __DATE__ + string(" ") + __TIME__;
 string VENDOR = "GM3ZZA";
 

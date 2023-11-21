@@ -206,8 +206,6 @@ void qso_entry::enable_widgets() {
 		misc_->enable_widgets();
 		break;
 	case qso_data::QSO_VIEW:
-	case qso_data::QSO_PEEK:
-	case qso_data::QSO_PEEK_ED:
 		for (int ix = 0; ix <= number_fields_in_use_ && ix < NUMBER_TOTAL; ix++) {
 			if (ch_field_[ix])
 				if (ix < number_locked_ + NUMBER_FIXED) ch_field_[ix]->deactivate();

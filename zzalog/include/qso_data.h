@@ -38,8 +38,6 @@ public:
 		QSO_ENTER,       // Entering a new QSO
 		QSO_BROWSE,      // View selected view in table view
 		QSO_VIEW,        // View selected QSO in entry view
-		QSO_PEEK,        // View alternate QSO in entry view
-		QSO_PEEK_ED,     // View alternate QSO in entry view and allow it to be edited
 		QUERY_MATCH,     // Query: Compare new QSO with nearest match in log - add, reject or selectively merge
 		QUERY_NEW,       // Query: Not able to find QSO - allow manual matching
 		QUERY_WSJTX,     // Query found in WSJT-X ALL.TXT file
@@ -192,12 +190,6 @@ public:
 	void action_delete_qso();
 	// Use the QSO received from the modem
 	void action_add_modem(record* qso);
-	// Start peeking behaviour
-	void action_peek(qso_num_t number);
-	// Cancel peeking behaviour
-	void action_cancel_peek();
-	// Edit peeked QSO
-	void action_edit_peek();
 	// Create a query entry
 	void action_query_entry();
 	// Execute the query
@@ -249,8 +241,6 @@ protected:
 	qso_query* g_query_;
 	// Net Entry group
 	qso_net_entry* g_net_entry_;
-	// Peek entry group
-	qso_entry* g_peek_;
 	// Query entry group
 	qso_entry* g_qy_entry_;
 	// Button group

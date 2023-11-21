@@ -326,7 +326,6 @@ void qso_details::table_q::cb_table(Fl_Widget* w, void* v) {
 	if (that->callback_context() == CONTEXT_CELL) {
 		int row = that->callback_row();
 		qso_data* data = ancestor_view<qso_data>(that);
-		data->action_peek(that->items_[row]);
 	}
 }
 

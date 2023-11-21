@@ -58,7 +58,6 @@ using namespace std;
 		HT_DXATLAS,               // DxAtlas selection has changed
 		HT_IGNORE,                // Ignore the change
 		HT_INSERTED_NODXA,         // As HT_INSERTED but do not update DxAtlas
-		HT_PEEK,                  // Record has been selected in extracted view - allow some views to see it
 	};
 
 	// The records are kept in a container with size_t as index

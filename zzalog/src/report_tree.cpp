@@ -775,7 +775,7 @@ void report_tree::cb_tree_report(Fl_Widget* w, void* v) {
 	case FL_TREE_REASON_SELECTED:
 		// If we select a record, then select that record in the book
 		if ((intptr_t)item->user_data() >= 0) {
-			that->get_book()->selection((item_num_t)(intptr_t)item->user_data(), HT_PEEK);
+			that->get_book()->selection((item_num_t)(intptr_t)item->user_data(), HT_SELECTED);
 			return;
 		}
 		cb_tree(w, v);

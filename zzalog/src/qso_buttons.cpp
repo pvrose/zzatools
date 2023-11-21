@@ -46,10 +46,6 @@ map<qso_data::logging_state_t, list<qso_buttons::button_type> > button_map_ =
 	{ qso_data::NET_STARTED, {qso_buttons::SAVE_NET, qso_buttons::SAVE_QSO, qso_buttons::CANCEL_QSO, qso_buttons::CANCEL_NET,
 		qso_buttons::ADD_NET_QSO }},
 	{ qso_data::NET_EDIT, { qso_buttons::SAVE_EDIT_NET, qso_buttons::CANCEL_QSO, qso_buttons::ADD_NET_QSO}},
-	{ qso_data::QSO_PEEK, { qso_buttons::ACTIVATE, qso_buttons:: EDIT_QSO, qso_buttons::START_QSO, 
-		qso_buttons::ADD_QSO, qso_buttons::DELETE_QSO,
-	    qso_buttons::EDIT_NET, qso_buttons:: CANCEL_PEEK, qso_buttons::QRZ_COM, qso_buttons::LOOK_ALL_TXT }},
-	{ qso_data::QSO_PEEK_ED, { qso_buttons::CANCEL_PEEK, qso_buttons::EDIT_PEEK, qso_buttons::QRZ_COM, qso_buttons::LOOK_ALL_TXT }},
 	{ qso_data::MANUAL_ENTRY, { qso_buttons::EXEC_QUERY, qso_buttons::IMPORT_QUERY, qso_buttons::CANCEL_QUERY }},
 };
 
@@ -94,8 +90,6 @@ map<qso_buttons::button_type, qso_buttons::button_action> action_map_ =
 	{ qso_buttons::CANCEL_NET, { "Quit Net", "Cancel all QSOs", COLOUR_MAUVE, qso_buttons::cb_bn_cancel_all, 0}},
 	{ qso_buttons::ADD_NET_QSO, { "Add Call", "Add a QSO with this call to the net", COLOUR_ORANGE, qso_buttons::cb_bn_add_net, 0}},
 	{ qso_buttons::SAVE_EDIT_NET, {"Save Net", "Save all QSOs in the net", FL_GREEN, qso_buttons::cb_bn_save_all, 0} },
-	{ qso_buttons::CANCEL_PEEK, {"Cancel", "Cancel current peek and restore previous view", FL_RED, qso_buttons::cb_bn_cancel_peek, 0}},
-	{ qso_buttons::EDIT_PEEK, { "Edit", "Edit current peek", FL_MAGENTA, qso_buttons::cb_bn_edit_peek, 0}},
 	{ qso_buttons::ENTER_QUERY, { "Query", "Enter QSO details for search query", FL_MAGENTA, qso_buttons::cb_bn_query_entry, 0 }},
 	{ qso_buttons::EXEC_QUERY, { "Check", "Execute query", FL_GREEN, qso_buttons::cb_bn_execute_query, 0 }},
 	{ qso_buttons::CANCEL_QUERY, { "Cancel", "Cancel query", FL_RED, qso_buttons::cb_bn_cancel_query, 0 }},
@@ -199,7 +193,6 @@ void qso_buttons::cb_activate(Fl_Widget* w, void* v) {
 	that->disable_widgets();
 	switch (that->qso_data_->logging_state()) {
 	case qso_data::QSO_INACTIVE:
-	case qso_data::QSO_PEEK:
 		that->qso_data_->action_activate(qso_data::QSO_ON_AIR);
 		break;
 	}
@@ -212,7 +205,6 @@ void qso_buttons::cb_start(Fl_Widget* w, void* v) {
 	that->disable_widgets();
 	qso_data::qso_init_t mode = (qso_data::qso_init_t)(intptr_t)v;
 	switch (that->qso_data_->logging_state()) {
-	case qso_data::QSO_PEEK:
 	case qso_data::QSO_INACTIVE:
 		that->qso_data_->action_activate(mode);
 		// Fall into next state
@@ -321,9 +313,6 @@ void qso_buttons::cb_edit(Fl_Widget* w, void* v) {
 	case qso_data::QSO_VIEW:
 		that->qso_data_->action_edit();
 		break;
-	case qso_data::QSO_PEEK:
-	case qso_data::QSO_PEEK_ED:
-		that->qso_data_->action_edit();
 	}
 	that->enable_widgets();
 }
@@ -501,8 +490,6 @@ void qso_buttons::cb_bn_all_txt(Fl_Widget* w, void* v) {
 	switch (that->qso_data_->logging_state()) {
 	case qso_data::QUERY_NEW:
 	case qso_data::QUERY_MATCH:
-	case qso_data::QSO_PEEK:
-	case qso_data::QSO_PEEK_ED:
 	case qso_data::QSO_VIEW:
 		that->qso_data_->action_look_all_txt();
 		break;
@@ -543,7 +530,6 @@ void qso_buttons::cb_bn_add_net(Fl_Widget* w, void* v) {
 	that->disable_widgets();
 	switch (that->qso_data_->logging_state()) {
 	case qso_data::QSO_INACTIVE:
-	case qso_data::QSO_PEEK:
 		that->qso_data_->action_edit();
 	case qso_data::QSO_EDIT:
 		that->qso_data_->action_create_net();
@@ -579,37 +565,10 @@ void qso_buttons::cb_bn_delete_qso(Fl_Widget* w, void* v) {
 	switch (that->qso_data_->logging_state()) {
 	case qso_data::QSO_INACTIVE:
 	case qso_data::QSO_PENDING:
-	case qso_data::QSO_PEEK:
 		that->qso_data_->action_delete_qso();
 		break;
 	}
 	that->enable_widgets();
-}
-
-// Cancel the current peek 
-void qso_buttons::cb_bn_cancel_peek(Fl_Widget* w, void* v) {
-	qso_buttons* that = ancestor_view<qso_buttons>(w);
-	that->disable_widgets();
-	switch (that->qso_data_->logging_state()) {
-	case qso_data::QSO_PEEK:
-	case qso_data::QSO_PEEK_ED:
-		that->qso_data_->action_cancel_peek();
-		break;
-	}
-	that->enable_widgets();
-}
-
-// Edit the current peeked QSO
-void qso_buttons::cb_bn_edit_peek(Fl_Widget* w, void* v) {
-	qso_buttons* that = ancestor_view<qso_buttons>(w);
-	that->disable_widgets();
-	switch (that->qso_data_->logging_state()) {
-	case qso_data::QSO_PEEK_ED:
-		that->qso_data_->action_edit_peek();
-		break;
-	}
-	that->enable_widgets();
-
 }
 
 // Open a qso_query to define search criteria
@@ -669,8 +628,6 @@ void qso_buttons::cb_bn_qrz_com(Fl_Widget* w, void* v) {
 	case qso_data::QSO_EDIT:
 	case qso_data::QSO_VIEW:
 	case qso_data::QSO_BROWSE:
-	case qso_data::QSO_PEEK:
-	case qso_data::QSO_PEEK_ED:
 		that->qso_data_->action_qrz_com();
 		break;
 	}
