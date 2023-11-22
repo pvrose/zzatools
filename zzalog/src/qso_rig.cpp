@@ -176,7 +176,7 @@ void qso_rig::create_form(int X, int Y) {
 	
 	curr_x += bn_connect_->w();
 	bn_select_ = new Fl_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Select");
-	bn_select_->color(FL_YELLOW, FL_BLACK);
+	bn_select_->color(FL_YELLOW);
 	bn_select_->tooltip("Select the rig to connect");
 	bn_select_->value(false);
 	bn_select_->callback(cb_bn_select, nullptr);
@@ -438,6 +438,8 @@ void qso_rig::enable_widgets() {
 			bn_select_->label("Select");
 		}
 	}
+	bn_connect_->labelcolor(fl_contrast(FL_FOREGROUND_COLOR, bn_connect_->color()));
+	bn_select_->labelcolor(fl_contrast(FL_FOREGROUND_COLOR, bn_select_->color()));
 	// Status
 	if (!rig_) {
 		op_status_->value("No rig specified");

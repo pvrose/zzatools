@@ -579,7 +579,7 @@ void log_table::draw_cell(TableContext context, int R, int C, int X, int Y, int 
 		int H1 = col_header_height();
 		fl_draw_box(FL_BORDER_BOX, X1, Y1, W1, H1, col_header_color());
 		// Text color
-		fl_color(FL_BLACK);
+		fl_color(FL_FOREGROUND_COLOR);
 		fl_draw("QSO No.", X1, Y1, W1, H1, FL_ALIGN_CENTER);
 
 		return;
@@ -620,7 +620,7 @@ void log_table::draw_cell(TableContext context, int R, int C, int X, int Y, int 
 		fl_push_clip(X, Y, W, H);
 		{
 			fl_draw_box(FL_BORDER_BOX, X, Y, W, H, col_header_color());
-			fl_color(FL_BLACK);
+			fl_color(FL_FOREGROUND_COLOR);
 			// text is field header
 			text = fields_[C].header;
 			fl_draw(text.c_str(), X, Y, W, H, FL_ALIGN_CENTER);
@@ -642,7 +642,7 @@ void log_table::draw_cell(TableContext context, int R, int C, int X, int Y, int 
 				item_num_t item_number = (order_ == LAST_TO_FIRST) ? my_book_->size() - 1 - R : R;
 				record* this_record = my_book_->get_record(item_number, false);
 				// Selected rows will have table specific colour, others in current sesson grey, rest white
-				Fl_Color default_bg_colour = in_current_session(this_record) ? FL_GRAY : FL_WHITE;
+				Fl_Color default_bg_colour = in_current_session(this_record) ? COLOUR_GREY : FL_BACKGROUND2_COLOR;
 				Fl_Color bg_colour = row_selected(R) ? selection_color() : default_bg_colour;
 				if (this_record && this_record->is_dirty()) bg_colour = fl_lighter(bg_colour);
 				fl_color(bg_colour);
@@ -653,7 +653,7 @@ void log_table::draw_cell(TableContext context, int R, int C, int X, int Y, int 
 					fl_color(FL_RED);
 				}
 				else {
-					fl_color(fl_contrast(FL_BLACK, bg_colour));
+					fl_color(fl_contrast(FL_FOREGROUND_COLOR, bg_colour));
 				}
 				// get the formatted data from the field of the record
 				string direct = this_record->item(fields_[C].field, true, false);

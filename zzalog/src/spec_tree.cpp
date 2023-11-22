@@ -39,6 +39,7 @@ spec_tree::spec_tree(int X, int Y, int W, int H, const char* label, field_orderi
 	sortorder(FL_TREE_SORT_ASCENDING);
 	item_labelfont(font_);
 	item_labelsize(fontsize_);
+	item_labelfgcolor(fl_contrast(FL_FOREGROUND_COLOR, item_labelbgcolor()));
 	// Call back standard tree callback
 	callback(cb_tree);
 }

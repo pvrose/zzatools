@@ -40,7 +40,7 @@ using namespace std;
 	// Default colours for status bars
 	const map<status_t, Fl_Color> STATUS_COLOURS = {
 		{ ST_NONE, FL_LIGHT2 },
-		{ ST_LOG, FL_GRAY },
+		{ ST_LOG, FL_FOREGROUND_COLOR },
 		{ ST_DEBUG, fl_lighter(FL_MAGENTA) },
 		{ ST_NOTE, fl_lighter(FL_CYAN) },
 		{ ST_OK, fl_lighter(FL_GREEN) },
@@ -48,7 +48,7 @@ using namespace std;
 		{ ST_NOTIFY, fl_darker(FL_YELLOW) },
 		{ ST_ERROR, fl_lighter(FL_RED) },
 		{ ST_SEVERE, fl_darker(FL_RED) },
-		{ ST_FATAL, FL_BLACK }
+		{ ST_FATAL, FL_BACKGROUND_COLOR }
 	};
 
 	// Code - letters witten to log file to indicate severity of the logged status
@@ -80,10 +80,10 @@ using namespace std;
 	};
 	// Styles used by Fl_Text_Display to control font and colour 
 	const Fl_Text_Display::Style_Table_Entry STATUS_STYLES[] = {        // Style label and status
-		{ fl_gray_ramp(4), FL_COURIER_ITALIC, 12, 0 },                  // A - ST_NONE
-		{ fl_gray_ramp(4), FL_COURIER, 12, 0 },                         // B - ST_LOG
+		{ COLOUR_GREY, FL_COURIER_ITALIC, 12, 0 },                  // A - ST_NONE
+		{ COLOUR_GREY, FL_COURIER, 12, 0 },                         // B - ST_LOG
 		{ FL_MAGENTA, FL_COURIER, 12, 0 },                              // C - ST_DEBUG
-		{ FL_BLACK, FL_COURIER, 12, 0 },                                // D - ST_NOTE
+		{ FL_FOREGROUND_COLOR, FL_COURIER, 12, 0 },                                // D - ST_NOTE
 		{ fl_darker(FL_GREEN), FL_COURIER, 12, 0},                      // E - ST_OK
 		{ fl_color_average(FL_RED, FL_YELLOW, 0.5), FL_COURIER, 12, 0}, // G - ST_WARNING
 		{ fl_darker(FL_YELLOW), FL_COURIER, 12, 0},                     // H - ST_NOTIFY
