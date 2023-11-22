@@ -27,9 +27,9 @@ record_table::record_table(int X, int Y, int W, int H, const char* label) :
 	col_header(true);
 	col_resize(true);
 	col_resize_min(10);
-	col_header_color(FL_GRAY);
+	col_header_color(COLOUR_GREY);
 	row_header(true);
-	row_header_color(FL_GRAY);
+	row_header_color(COLOUR_GREY);
 	row_header_width(150);
 	selection_color(FL_YELLOW);
 
@@ -67,7 +67,7 @@ void record_table::draw_cell(TableContext context, int R, int C, int X, int Y, i
 				query_record_->item(field_name) != "") {
 				if (log_record_->item(field_name) == query_record_->item(field_name)) {
 					// Set text colour black if match exactly
-					fl_color(FL_BLACK);
+					fl_color(FL_FOREGROUND_COLOR);
 				}
 				else if (log_record_->items_match(query_record_, field_name)) {
 					// Set text color dark yellow if they almost match - e.g. 4 vs 6 character grid-square
@@ -100,7 +100,7 @@ void record_table::draw_cell(TableContext context, int R, int C, int X, int Y, i
 			}
 			else {
 				// Set it black
-				fl_color(FL_BLACK);
+				fl_color(FL_FOREGROUND_COLOR);
 			}
 			fl_draw(field_name.c_str(), X, Y, W, H, FL_ALIGN_LEFT);
 		}
@@ -112,7 +112,7 @@ void record_table::draw_cell(TableContext context, int R, int C, int X, int Y, i
 		fl_push_clip(X, Y, W, H);
 		{
 			fl_draw_box(FL_FLAT_BOX, X, Y, W, H, col_header_color());
-			fl_color(FL_BLACK);
+			fl_color(FL_FOREGROUND_COLOR);
 			// text is field header
 			switch (display_mode_) {
 			case LOG_ONLY:
@@ -178,11 +178,11 @@ void record_table::draw_cell(TableContext context, int R, int C, int X, int Y, i
 		fl_push_clip(X, Y, W, H);
 		{
 			// BG COLOR
-			fl_color(row_selected(R) ? selection_color() : FL_WHITE);
+			fl_color(row_selected(R) ? selection_color() : FL_BACKGROUND_COLOR);
 			fl_rectf(X, Y, W, H);
 
 			// TEXT
-			fl_color(FL_BLACK);
+			fl_color(FL_FOREGROUND_COLOR);
 			string field_name = fields_[R];
 			switch (C) {
 			case 0:

@@ -99,6 +99,7 @@ settings::settings(int W, int H, const char* label, cfg_dialog_t active) :
 	Fl_Button* save_bn = new Fl_Button(W - 3 * WBUTTON - 2 * GAP, H - HBUTTON, WBUTTON, HBUTTON, "Save");
 	save_bn->color(fl_lighter(fl_lighter(FL_BLUE)));
 	save_bn->callback(cb_bn_cal, (long)CA_SAVE);
+	save_bn->labelcolor(FL_BLACK);
 	save_bn->tooltip("Save changes and resume editing");
 	add(save_bn);
 	// button - save and close
@@ -106,6 +107,7 @@ settings::settings(int W, int H, const char* label, cfg_dialog_t active) :
 	ok_bn->color(FL_GREEN);
 	ok_bn->callback(cb_bn_cal, (long)CA_OK);
 	ok_bn->tooltip("Save changes and close dialog");
+	ok_bn->labelcolor(FL_BLACK);
 	add(ok_bn);
 	// button - cancel last tab and close
 	Fl_Button* cancel_bn = new Fl_Button(W - WBUTTON, H - HBUTTON, WBUTTON, HBUTTON, "Cancel");

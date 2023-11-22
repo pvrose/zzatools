@@ -92,6 +92,7 @@ bool RESUME_SESSION = false;
 bool VERBOSE = false;
 bool HELP = false;
 bool PRIVATE = false;
+bool DARK = true;
 
 // Ticker values
 double TICK = 0.1;      // 100 ms
@@ -334,6 +335,16 @@ int cb_args(int argc, char** argv, int& i) {
 		HELP = true;
 		i += 1;
 	}
+	// Dark
+	else if (strcmp("-k", argv[i]) == 0 || strcmp("--dark", argv[i]) == 0) {
+		DARK = true;
+		i += 1;
+	}
+	// Dark
+	else if (strcmp("-l", argv[i]) == 0 || strcmp("--light", argv[i]) == 0) {
+		DARK = false;
+		i += 1;
+	}
 	// Debug
 	else if (strcmp("-d", argv[i]) == 0 || strcmp("--debug", argv[i]) == 0) {
 		i += 1;
@@ -388,12 +399,12 @@ int cb_args(int argc, char** argv, int& i) {
 	}
 	if (i < argc) {
 		if (*argv[i] == '-') {
-			printf ("DEBUG: Not recognised switch %d %s passing to fltk", i, argv[i]);
-			// Unrecognised switch - try Fl speciific ones
-			int n = Fl::arg(argc, argv, i);
-			printf(" %d words processed\n");
-			if (n == 0) return 0;
-			else return i;
+			// printf ("DEBUG: Not recognised switch %d %s passing to fltk", i, argv[i]);
+			// // Unrecognised switch - try Fl speciific ones
+			// int n = Fl::arg(argc, argv, i);
+			// printf(" %d words processed\n");
+			// if (n == 0) return 0;
+			// else return i;
 		} else {
 			filename_ = argv[i];
 			return i;
@@ -420,6 +431,8 @@ void show_help() {
 	"\t\tt|threads\tProvide debug tracing on thread use\n"
 	"\t\t\tnot|nothreads\n"
 	"\t-h|--help\tPrint this\n"
+	"\t-k|--dark\tDark mode\n"
+	"\t-l|--light\tLight mode\n"
 	"\t-m|--resume\tResume the previous session\n"
 	"\t-p|--private\tDo not update recent files list\n"
 	"\t-q|--quiet\tDo not publish QSOs to online sites\n"
@@ -741,12 +754,14 @@ int main(int argc, char** argv)
 	// Allow the main thread to respond to Fl::awake() requests
 	Fl::lock();
 	// Set default Fil Chooser on non-windows
-#ifndef _WIN32
-	Fl::option(Fl::OPTION_FNFC_USES_ZENITY, true);
-#endif
 	// Parse command-line arguments - accept FLTK standard arguments and custom ones (in cb_args)
 	int i = 1;
 	Fl::args(argc, argv, i, cb_args);
+	if (DARK) {
+		Fl::foreground(255, 255, 255);
+		Fl::background2(25, 25, 25);
+		Fl::background(0, 0, 0);
+	}
 	if (HELP) {
 		// Help requested - display help text and exit
 		show_help();

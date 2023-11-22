@@ -642,7 +642,7 @@ void log_table::draw_cell(TableContext context, int R, int C, int X, int Y, int 
 				item_num_t item_number = (order_ == LAST_TO_FIRST) ? my_book_->size() - 1 - R : R;
 				record* this_record = my_book_->get_record(item_number, false);
 				// Selected rows will have table specific colour, others in current sesson grey, rest white
-				Fl_Color default_bg_colour = in_current_session(this_record) ? COLOUR_GREY : FL_BACKGROUND2_COLOR;
+				Fl_Color default_bg_colour = in_current_session(this_record) ? COLOUR_GREY : FL_BACKGROUND_COLOR;
 				Fl_Color bg_colour = row_selected(R) ? selection_color() : default_bg_colour;
 				if (this_record && this_record->is_dirty()) bg_colour = fl_lighter(bg_colour);
 				fl_color(bg_colour);
