@@ -27,7 +27,8 @@ map<qso_data::logging_state_t, list<qso_buttons::button_type> > button_map_ =
 	{ qso_data::QSO_STARTED, { qso_buttons::SAVE_QSO, qso_buttons::CANCEL_QSO, 
 		qso_buttons::START_NET, qso_buttons::WORKED_B4, qso_buttons::PARSE, qso_buttons::QRZ_COM } },
 	{ qso_data::QSO_ENTER, { qso_buttons::SAVE_QSO, qso_buttons::CANCEL_QSO } },
-	{ qso_data::QSO_EDIT, { qso_buttons::SAVE_EDIT, qso_buttons::SAVE_EXIT, qso_buttons::CANCEL_EDIT, 
+	{ qso_data::QSO_EDIT, { qso_buttons::SAVE_EDIT, qso_buttons::SAVE_EXIT, 
+		qso_buttons::SAVE_VIEW, qso_buttons::CANCEL_EDIT, 
 		qso_buttons::EDIT_NET, qso_buttons::NAV_FIRST,
 		qso_buttons::NAV_PREV, qso_buttons::NAV_NEXT, qso_buttons::NAV_LAST, qso_buttons::QRZ_COM } },
 	{ qso_data::QSO_VIEW, { qso_buttons::EDIT_QSO, qso_buttons::CANCEL_VIEW, qso_buttons::NAV_FIRST,
@@ -64,8 +65,9 @@ map<qso_buttons::button_type, qso_buttons::button_action> action_map_ =
 	{ qso_buttons::CANCEL_QSO, { "Quit QSO", "Cancel the current QSO entry", FL_RED, qso_buttons::cb_cancel, 0 } },
 	{ qso_buttons::DELETE_QSO, { "Delete QSO", "Delete the selected QSO", COLOUR_CLARET, qso_buttons::cb_bn_delete_qso, 0 } },
 	{ qso_buttons::WORKED_B4, { "B4?", "Display all previous QSOs with this callsign", FL_BACKGROUND_COLOR, qso_buttons::cb_wkb4, 0 } },
-	{ qso_buttons::SAVE_EDIT, { "Save", "Copy changed record back to book", FL_GREEN, qso_buttons::cb_save, 0}},
-	{ qso_buttons::SAVE_EXIT, { "Save && Exit", "Copy changed record and return to previous activity", COLOUR_APPLE, qso_buttons::cb_save, (void*)1 }},
+	{ qso_buttons::SAVE_EDIT, { "Save", "Copy changed record back to book", FL_GREEN, qso_buttons::cb_save, (void*)qso_buttons::SAVE_EDIT}},
+	{ qso_buttons::SAVE_EXIT, { "Save && Exit", "Copy changed record and return to previous activity", COLOUR_APPLE, qso_buttons::cb_save, (void*)qso_buttons::SAVE_EXIT }},
+	{ qso_buttons::SAVE_VIEW, { "Save && View", "Copy changed record and allow view", FL_BLUE, qso_buttons::cb_save, (void*)qso_buttons::SAVE_VIEW }},
 	{ qso_buttons::CANCEL_EDIT, { "Cancel Edit", "Cancel the current QSO edit", FL_RED, qso_buttons::cb_cancel, 0 } },
 	{ qso_buttons::CANCEL_VIEW, { "Cancel", "Cancel the current QSO view", FL_RED, qso_buttons::cb_cancel, 0 } },
     { qso_buttons::NAV_FIRST, { "@$->|", "Select first record in book", FL_YELLOW, qso_buttons::cb_bn_navigate, (void*)NV_FIRST } },
@@ -219,7 +221,7 @@ void qso_buttons::cb_start(Fl_Widget* w, void* v) {
 void qso_buttons::cb_save(Fl_Widget* w, void* v) {
 	qso_data* data = ancestor_view<qso_data>(w);
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
-	bool edit_return = (bool)(intptr_t)v;
+	button_type edit_button = (button_type)(intptr_t)v;
 	if (that) that->disable_widgets();
 	switch (data->logging_state()) {
 	case qso_data::QSO_PENDING:
@@ -240,7 +242,8 @@ void qso_buttons::cb_save(Fl_Widget* w, void* v) {
 		// QSO editing
 	case qso_data::QSO_EDIT:
 		data->action_save_edit();
-		if (edit_return) {
+		switch (edit_button) {
+		case SAVE_EXIT:
 			switch (data->edit_return_state_) {
 			case qso_data::QSO_INACTIVE:
 				break;
@@ -251,9 +254,13 @@ void qso_buttons::cb_save(Fl_Widget* w, void* v) {
 				data->action_query_entry();
 				break;
 			}
-		}
-		else {
+			break;
+		case SAVE_EDIT:
 			data->action_edit();
+			break;
+		case SAVE_VIEW:
+			data->action_view();
+			break;
 		}
 		break;
 	case qso_data::NET_STARTED:

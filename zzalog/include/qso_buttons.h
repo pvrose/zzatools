@@ -41,6 +41,7 @@ public:
 		SAVE_QSO,
 		SAVE_EDIT,
 		SAVE_EXIT,
+		SAVE_VIEW,
 		WORKED_B4,
 		PARSE,
 		NAV_FIRST,
