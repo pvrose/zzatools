@@ -683,7 +683,7 @@ void extract_data::extract_special(extract_data::extract_mode_t reason) {
 		// Extract those records with GRIDSQUARE empty or only 2 or 4 character locators 
 		new_criteria = {
 			/*search_cond_t condition*/ XC_FIELD,
-			/*search_comp_t comparator*/ XP_NE,
+			/*search_comp_t comparator*/ XP_REGEX,
 			/*bool by_dates*/ false,
 			/*string from_date*/"",
 			/*string to_date;*/"",
@@ -694,7 +694,7 @@ void extract_data::extract_special(extract_data::extract_mode_t reason) {
 			/*bool confirmed_card;*/ false,
 			/*search_combi_t combi_mode;*/ XM_NEW,
 			/*string field_name; */ "GRIDSQUARE",
-			/*string pattern;*/ "[A-R]{2}[0-9]{2}[A-X]{2}([0-9]{2})?",
+			/*string pattern;*/ ".{0,4}",
 			/*string my_call*/ "Any"
 		};
 		reason_name = "with insufficient locator";

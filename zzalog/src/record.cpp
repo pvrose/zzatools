@@ -394,7 +394,7 @@ string record::item(string field, bool formatted/* = false*/, bool indirect/* = 
 			case 'B':
 				if (field == "GRIDSQUARE" || field == "MY_GRIDSQUARE") {
 					// Concatenate base and extension fields
-					if (unformatted_value.length() < 8) {
+					if (unformatted_value.length() <= 8) {
 						result = unformatted_value;
 					} 
 					else if (item_exists(field + "_EXT")) {
