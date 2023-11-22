@@ -107,16 +107,19 @@ void qso_qsl_vwr::create_form() {
 	bn_eqsl_status_ = new Fl_Light_Button(curr_x, curr_y, WBN, HBUTTON, "eQSL");
 	bn_eqsl_status_->box(FL_FLAT_BOX);
 	bn_eqsl_status_->value(true);
+	bn_eqsl_status_->type(bn_eqsl_status_->type() & ~FL_TOGGLE_BUTTON);
 
 	curr_x += WBN;
 	bn_lotw_status_ = new Fl_Light_Button(curr_x, curr_y, WBN, HBUTTON, "LotW");
 	bn_lotw_status_->box(FL_FLAT_BOX);
 	bn_lotw_status_->value(true);
+	bn_lotw_status_->type(bn_lotw_status_->type() & ~FL_TOGGLE_BUTTON);
 
 	curr_x += WBN;
 	bn_card_status_ = new Fl_Light_Button(curr_x, curr_y, WBN, HBUTTON, "Card");
 	bn_card_status_->box(FL_FLAT_BOX);
 	bn_card_status_->value(true);
+	bn_card_status_->type(bn_card_status_->type() & ~FL_TOGGLE_BUTTON);
 
 	curr_y += HBUTTON;
 	curr_x = x();
