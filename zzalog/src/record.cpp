@@ -1129,12 +1129,10 @@ time_t record::timestamp(bool time_off /*= false*/) {
 				}
 			} else {
 				// Assume QSO is 10 minutes long
-				// TODO convert to <chrono>
-				time_t time_on = timestamp(false);
-				time_t time_off = time_on + 600;
 				// Check this is 10 mins
-				double diff = difftime(time_off, time_on);
-				time_off = time_on + (600 * 600 / diff);
+				chrono::system_clock::time_point time_on = chrono::system_clock::from_time_t(timestamp());
+				chrono::seconds ten_minutes(600);
+				time_t time_off = chrono::system_clock::to_time_t(time_on + ten_minutes);
 				return time_off;
 			}
 			// Add time on
@@ -1174,7 +1172,7 @@ void record::update_timeoff() {
 		// TIME_OFF has no meaning in a header record
 		// Set TIME_OFF to TIME_ON plus 10 s.
 		chrono::system_clock::time_point time_on = chrono::system_clock::from_time_t(timestamp());
-		chrono::duration<int, ratio<1> > ten_seconds(10);
+		chrono::seconds ten_seconds(10);
 		time_t time_off = chrono::system_clock::to_time_t(time_on + ten_seconds);
 		char temp[10];
 		// Convert to date YYYYMMDD and time HHMMSS and update record
