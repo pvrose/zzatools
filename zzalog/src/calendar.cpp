@@ -59,29 +59,31 @@ void calendar_table::draw_cell(TableContext context, int R, int C, int X, int Y,
 		{
 			// Get date for cell
 			tm* date = get_date(R, C);
+			Fl_Color bg_color;
 
 			// BG COLOR
 			if (date == nullptr) {
 				// Outwith this month
-				fl_color(FL_WHITE);
+				bg_color = COLOUR_GREY;
 			}
 			else if (mktime(date) == mktime(&today_)) {
 				// Today
-				fl_color(FL_RED);
+				bg_color = FL_RED;
 			}
 			else if (mktime(date) == mktime(&selected_date_)) {
 				// Selected date
-				fl_color(selection_color());
+				bg_color = selection_color();
 			}
 			else {
 				// Other days
-				fl_color(FL_BACKGROUND_COLOR);
+				bg_color = FL_BACKGROUND_COLOR;
 			}
 			// Draw the blackground
+			fl_color(bg_color);
 			fl_rectf(X, Y, W, H);
 
 			// TEXT
-			fl_color(FL_BLACK);
+			fl_color(fl_contrast(FL_FOREGROUND_COLOR, bg_color));
 			if (date != nullptr) {
 				// Get day of the month and write it in cell
 				char mday[3];
@@ -200,7 +202,7 @@ calendar::calendar(int X, int Y) :
 	// Remove standard window border and delineate the window
 	size(WALL, HALL);
 	clear_border();
-	box(FL_BORDER_BOX);
+	box(FL_ENGRAVED_BOX);
 
 	// Create row 1 buttons
 

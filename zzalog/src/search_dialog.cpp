@@ -370,17 +370,19 @@ search_dialog::search_dialog() :
 	Fl_Box* box = new Fl_Box(CX0, YGX, WX0, HTEXT);
 	box->copy_label("");
 	box->box(FL_FLAT_BOX);
-	box->labelcolor(FL_BLACK);
-	box->color(FL_BACKGROUND_COLOR);
 	box->tooltip("Error message displays here");
 	fail_box_ = box;
 	// Button - OK
 	Fl_Button* bn_ok = new Fl_Button(CX1, YGX, WBUTTON, HBUTTON, "OK");
+	bn_ok->color(fl_lighter(FL_GREEN));
+	bn_ok->labelcolor(FL_BLACK);
 	bn_ok->callback(cb_bn_ok);
 	bn_ok->when(FL_WHEN_RELEASE);
 	bn_ok->tooltip("Start the search");
 	// Button - Cancel
 	Fl_Button* bn_cancel = new Fl_Button(CX2, YGX, WBUTTON, HBUTTON, "Cancel");
+	bn_cancel->color(fl_lighter(FL_RED));
+	bn_cancel->labelcolor(FL_BLACK);
 	bn_cancel->callback(cb_bn_cancel);
 	bn_cancel->when(FL_WHEN_RELEASE);
 	bn_cancel->tooltip("Cancel the search");
@@ -495,11 +497,13 @@ void search_dialog::fail(string message) {
 		// Copy message to box and colour the box red.
 		fail_box_->copy_label(message.c_str());
 		fail_box_->color(fl_lighter(FL_RED));
+		fail_box_->labelcolor(FL_BLACK);
 	}
 	else {
 		// Write empty string to box and set its colour to the background
 		fail_box_->copy_label("");
 		fail_box_->color(FL_BACKGROUND_COLOR);
+		fail_box_->labelcolor(FL_FOREGROUND_COLOR);
 	}
 	show();
 }

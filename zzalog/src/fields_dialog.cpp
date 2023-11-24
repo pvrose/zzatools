@@ -76,7 +76,7 @@ void fields_table::draw_cell(TableContext context, int R, int C, int X, int Y, i
 		// put field header text into header
 		fl_push_clip(X, Y, W, H);
 		fl_draw_box(FL_FLAT_BOX, X, Y, W, H, col_header_color());
-		fl_color(FL_BLACK);
+		fl_color(FL_FOREGROUND_COLOR);
 		switch (C) {
 		case 0:
 			text = "Column";
@@ -96,11 +96,11 @@ void fields_table::draw_cell(TableContext context, int R, int C, int X, int Y, i
 		// Get content from fields[R].what C is
 		fl_push_clip(X, Y, W, H);
 		// BG COLOR
-		fl_color(row_selected(R) ? selection_color() : FL_WHITE);
+		fl_color(row_selected(R) ? selection_color() : FL_BACKGROUND_COLOR);
 		fl_rectf(X, Y, W, H);
 
 		// TEXT
-		fl_color(FL_BLACK);
+		fl_color(fl_contrast(FL_FOREGROUND_COLOR, fl_color()));
 		if (field == nullptr) {
 			// No field to display
 			text = "";

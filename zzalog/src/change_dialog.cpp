@@ -165,6 +165,7 @@ void change_dialog::create_form() {
 	bn63->callback(cb_bn_ok);
 	bn63->when(FL_WHEN_RELEASE);
 	bn63->color(fl_lighter(FL_GREEN));
+	bn63->labelcolor(FL_BLACK);
 	bn63->tooltip("Make the changes and close");
 
 	// Action button
@@ -173,6 +174,7 @@ void change_dialog::create_form() {
 	bn64->callback(cb_bn_action);
 	bn64->when(FL_WHEN_RELEASE);
 	bn64->color(fl_lighter(FL_BLUE));
+	bn64->labelcolor(FL_BLACK);
 	bn64->tooltip("Make the changes and don't close");
 
 	// Cancel button
@@ -181,6 +183,7 @@ void change_dialog::create_form() {
 	bn65->callback(cb_bn_cancel);
 	bn65->when(FL_WHEN_RELEASE);
 	bn65->color(fl_lighter(FL_RED));
+	bn65->labelcolor(FL_BLACK);
 	bn65->tooltip("Cancel changes");
 
 	// 

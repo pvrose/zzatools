@@ -47,12 +47,14 @@ settings::settings(int W, int H, const char* label, cfg_dialog_t active) :
 	files->labelfont(FL_BOLD);
 	files->labelsize(FL_NORMAL_SIZE + 2);
 	files->selection_color(fl_lighter(FL_YELLOW));
+	files->labelcolor(FL_BLACK);
 	files->tooltip("Allows the specification of the locations of various resources used by zzalog");
 	// Web URLs, user-names and passwords
 	web_dialog* aweb = new web_dialog(rx, ry, rw, rh, "Web/Network");
 	aweb->labelfont(FL_BOLD);
 	aweb->labelsize(FL_NORMAL_SIZE + 2);
 	aweb->selection_color(fl_lighter(FL_YELLOW));
+	aweb->labelcolor(FL_BLACK);
 	aweb->tooltip("Allows the setting of user details for the various on-line services");
 	// Fields settings - fields to display as columns in log views, first few rows in record view
 	// and fields to export to TSV files
@@ -60,12 +62,14 @@ settings::settings(int W, int H, const char* label, cfg_dialog_t active) :
 	fields->labelfont(FL_BOLD);
 	fields->labelsize(FL_NORMAL_SIZE + 2);
 	fields->selection_color(fl_lighter(FL_YELLOW));
+	fields->labelcolor(FL_BLACK);
 	fields->tooltip("Allows the specification of which fields to display in the various applications");
 	// User settings - allows user to control cetain aspects of the displayed information
 	user_dialog* user = new user_dialog(rx, ry, rw, rh, "User settings");
 	user->labelfont(FL_BOLD);
 	user->labelsize(FL_NORMAL_SIZE + 2);
 	user->selection_color(fl_lighter(FL_YELLOW));
+	user->labelcolor(FL_BLACK);
 	user->tooltip("Allows limited configuration of fonts and tip timeouts");
 
 	// Lastly - a tree display showing all settings
@@ -73,6 +77,7 @@ settings::settings(int W, int H, const char* label, cfg_dialog_t active) :
 	all_settings->labelfont(FL_BOLD);
 	all_settings->labelsize(FL_NORMAL_SIZE + 2);
 	all_settings->selection_color(fl_lighter(FL_RED));
+	all_settings->labelcolor(FL_BLACK);
 	all_settings->tooltip("Displays the current settings in tree format");
 	// Default to show all settings
 	settings_view_ = all_settings;
