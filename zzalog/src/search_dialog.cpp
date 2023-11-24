@@ -143,6 +143,7 @@ search_dialog::search_dialog() :
 		bn11->align(FL_ALIGN_RIGHT | FL_ALIGN_INSIDE);
 		bn11->value(criteria_->condition == i);
 		bn11->color(fl_lighter(FL_MAGENTA));
+		bn11->labelcolor(FL_BLACK);
 		char* temp = new char[128];
 		sprintf(temp, "Use %s to search for records", condition_labels_[i].c_str());
 		bn11->copy_tooltip(temp);
@@ -172,6 +173,7 @@ search_dialog::search_dialog() :
 		bn13->align(FL_ALIGN_RIGHT | FL_ALIGN_INSIDE);
 		bn13->value(criteria_->comparator == i);
 		bn13->color(fl_lighter(FL_YELLOW));
+		bn13->labelcolor(FL_BLACK);
 		char* temp = new char[128];
 		sprintf(temp, "Use %s to compare records", comparator_labels_[i].c_str());
 		bn13->copy_tooltip(temp);
