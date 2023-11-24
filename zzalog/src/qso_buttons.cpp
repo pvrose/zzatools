@@ -230,12 +230,12 @@ void qso_buttons::cb_save(Fl_Widget* w, void* v) {
 		// Two routes - QSO entry
 	case qso_data::QSO_STARTED:
 		// Realtime entry - do not start another
-		data->action_save();
+		if(!data->action_save()) break;
 		data->action_activate(qso_data::QSO_AS_WAS);
 		break;
 	case qso_data::QSO_ENTER:
 		// Batch entry - start another entry
-		data->action_save();
+		if(!data->action_save()) break;
 		data->action_activate(qso_data::QSO_NONE);
 		data->action_start(qso_data::QSO_NONE);
 		break;

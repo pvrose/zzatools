@@ -301,7 +301,7 @@ void qso_data::update_qso(qso_num_t log_num) {
 			switch (fl_choice("Trying to select a different record while logging a QSO", "Save QSO", "Quit QSO", "Ignore")) {
 			case 0:
 				// Save QSO
-				action_save();
+				if(!action_save()) break;
 				book_->selection(book_->item_number(log_num));
 				logging_state_ = QSO_INACTIVE;
 				break;
@@ -642,7 +642,7 @@ void qso_data::action_start(qso_init_t mode) {
 }
 
 // Action SAVE - transition from QSO_STARTED to QSO_INACTIVE while saving record
-void qso_data::action_save() {
+bool qso_data::action_save() {
 	// printf("DEBUG: action_save\n");
 	record* qso = nullptr;
 	item_num_t item_number = -1;
@@ -662,6 +662,10 @@ void qso_data::action_save() {
 		break;
 	default:
 		break;
+	}
+	if (!qso->is_valid()) {
+		fl_alert("QSO has necessary fields (CALL, TIME ON and FREQ) missing");
+		return false;
 	}
 	// On-air logging add date/time off
 	switch (previous_mode_) {
@@ -739,6 +743,7 @@ void qso_data::action_save() {
 		break;
 	}
 	enable_widgets();
+	return true;
 }
 
 // Action CANCEL - Transition from QSO_STARTED to QSO_INACTIVE without saving record
@@ -1150,10 +1155,11 @@ void qso_data::action_save_net_all() {
 	// printf("DEBUG: action_save_net_all\n");
 	// Only save the book once all records have been saved
 	book_->enable_save(false);
-	while (g_net_entry_->entries()) {
+	bool ok = true;
+	while (g_net_entry_->entries() && ok) {
 		switch (logging_state_) {
 		case NET_STARTED:
-			action_save();
+			ok = action_save();
 			break;
 		case NET_EDIT:
 			action_save_net_edit();
@@ -1161,7 +1167,7 @@ void qso_data::action_save_net_all() {
 		}
 	}
 	// Restore the place-holder entry
-	g_net_entry_->add_entry();
+	if (ok) g_net_entry_->add_entry();
 	book_->enable_save(true);
 	enable_widgets();
 }

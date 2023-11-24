@@ -133,7 +133,7 @@ public:
 	// Add new record to book, add time on
 	void action_start(qso_init_t mode);
 	// Stop QSO - 
-	void action_save();
+	bool action_save();
 	// Cancel QSO - remove new record from book
 	void action_cancel();
 	// Copy selected QSO and allow it to be edited
