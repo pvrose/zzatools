@@ -758,7 +758,7 @@ int main(int argc, char** argv)
 	int i = 1;
 	Fl::args(argc, argv, i, cb_args);
 	if (DARK) {
-		Fl::foreground(255, 255, 255);
+		Fl::foreground(240, 240, 240);
 		Fl::background2(25, 25, 25);
 		Fl::background(0, 0, 0);
 	}
