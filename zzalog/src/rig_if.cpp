@@ -96,8 +96,7 @@ string rig_if::get_frequency(bool tx) {
 }
 
 // Return the power
-string rig_if::get_tx_power(bool max) {
-	char text[100];
+double rig_if::get_dpower(bool max) {
 	double value = max ? (double)rig_data_.pwr_value : (double)rig_data_.pwr_meter;
 	switch(modify_power_) {
 		case UNMODIFIED: 
@@ -109,7 +108,13 @@ string rig_if::get_tx_power(bool max) {
 			value = power_modifier_;
 			break;
 	}
-	snprintf(text, 100, "%g", value);
+	return value;
+}
+
+// Convert power to string
+string rig_if::get_tx_power(bool max) {
+	char text[100];
+	snprintf(text, 100, "%g", get_dpower(max));
 	return text;
 }
 

@@ -116,6 +116,8 @@ using namespace std;
 		double get_dfrequency(bool tx);
 		// return power
 		string get_tx_power(bool max = true);
+		// return max power as double
+		double get_dpower(bool max = true);
 		// return S-meter reading - max - maximum over receive perion, false = instatntaneous
 		string get_smeter(bool max = true);
 		// Return PTT value

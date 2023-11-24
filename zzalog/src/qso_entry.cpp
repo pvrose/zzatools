@@ -367,7 +367,10 @@ void qso_entry::copy_cat_to_qso() {
 		string mode;
 		string submode;
 		rig->get_string_mode(mode, submode);
-		string tx_power = rig->get_tx_power(true);
+		// Get the maximum power over course of QSO.
+		double tx_power;
+		qso_->item("TX_PWR", tx_power);
+		tx_power = max(tx_power, rig->get_dpower(true));
 		switch (qso_data_->logging_state()) {
 		case qso_data::QSO_PENDING:
 		case qso_data::NET_STARTED:
