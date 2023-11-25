@@ -183,6 +183,7 @@ void QBS_window::create_form() {
 	bn_rcv_card_ = new Fl_Radio_Light_Button(curr_x, curr_y, WPBUTTON, HBUTTON, "Receive Card");
 	bn_rcv_card_->color(COLOUR_ADHOC);
 	bn_rcv_card_->selection_color(FL_BLACK);
+	bn_rcv_card_->labelcolor(fl_contrast(FL_FOREGROUND_COLOR, bn_rcv_card_->color()));
 	rp_rcv_card_ = radio_param_t(RECEIVE_CARD, (int*)&action_);
 	bn_rcv_card_->callback(cb_process, &rp_rcv_card_);
 	curr_y += HBUTTON;
@@ -191,6 +192,7 @@ void QBS_window::create_form() {
 	bn_rcv_sase_ = new Fl_Radio_Light_Button(curr_x, curr_y, WPBUTTON, HBUTTON, "Receive SASEs");
 	bn_rcv_sase_->color(COLOUR_ADHOC);
 	bn_rcv_sase_->selection_color(FL_BLACK);
+	bn_rcv_sase_->labelcolor(fl_contrast(FL_FOREGROUND_COLOR, bn_rcv_sase_->color()));
 	rp_rcv_sase_ = radio_param_t(RECEIVE_SASE, (int*)&action_);
 	bn_rcv_sase_->callback(cb_process, &rp_rcv_sase_);
 	curr_y += HBUTTON;
@@ -199,6 +201,7 @@ void QBS_window::create_form() {
 	bn_dispose_sase_ = new Fl_Radio_Light_Button(curr_x, curr_y, WPBUTTON, HBUTTON, "Dispose SASE");
 	bn_dispose_sase_->color(COLOUR_ADHOC);
 	bn_dispose_sase_->selection_color(FL_BLACK);
+	bn_dispose_sase_->labelcolor(fl_contrast(FL_FOREGROUND_COLOR, bn_dispose_sase_->color()));
 	rp_dispose_sase_ = radio_param_t(DISPOSE_SASE, (int*)&action_);
 	bn_dispose_sase_->callback(cb_process, &rp_dispose_sase_);
 	curr_y += HBUTTON;
@@ -209,6 +212,7 @@ void QBS_window::create_form() {
 	bn_new_batch_ = new Fl_Radio_Light_Button(curr_x, curr_y, WPBUTTON, HBUTTON, "New Batch");
 	bn_new_batch_->color(COLOUR_BATCH);
 	bn_new_batch_->selection_color(FL_BLACK);
+	bn_new_batch_->labelcolor(fl_contrast(FL_FOREGROUND_COLOR, bn_new_batch_->color()));
 	rp_new_batch_ = radio_param_t(NEW_BATCH, (int*)&action_);
 	bn_new_batch_->callback(cb_process, &rp_new_batch_);
 	curr_y += HBUTTON;
@@ -217,6 +221,7 @@ void QBS_window::create_form() {
 	bn_sort_cards_ = new Fl_Radio_Light_Button(curr_x, curr_y, WPBUTTON, HBUTTON, "Sort received cards");
 	bn_sort_cards_->color(COLOUR_BATCH);
 	bn_sort_cards_->selection_color(FL_BLACK);
+	bn_sort_cards_->labelcolor(fl_contrast(FL_FOREGROUND_COLOR, bn_sort_cards_->color()));
 	rp_sort_cards_ = radio_param_t(SORT_CARDS, (int*)&action_);
 	bn_sort_cards_->callback(cb_process, &rp_sort_cards_);
 	curr_y += HBUTTON;
@@ -225,6 +230,7 @@ void QBS_window::create_form() {
 	bn_stuff_cards_ = new Fl_Radio_Light_Button(curr_x, curr_y, WPBUTTON, HBUTTON, "Stuff cards in SASEs");
 	bn_stuff_cards_->color(COLOUR_BATCH);
 	bn_stuff_cards_->selection_color(FL_BLACK);
+	bn_stuff_cards_->labelcolor(fl_contrast(FL_FOREGROUND_COLOR, bn_stuff_cards_->color()));
 	rp_stuff_cards_ = radio_param_t(STUFF_CARDS, (int*)&action_);
 	bn_stuff_cards_->callback(cb_process, &rp_stuff_cards_);
 	curr_y += HBUTTON;
@@ -233,6 +239,7 @@ void QBS_window::create_form() {
 	bn_keep_cards_ = new Fl_Radio_Light_Button(curr_x, curr_y, WPBUTTON, HBUTTON, "Keep cards");
 	bn_keep_cards_->color(COLOUR_BATCH);
 	bn_keep_cards_->selection_color(FL_BLACK);
+	bn_keep_cards_->labelcolor(fl_contrast(FL_FOREGROUND_COLOR, bn_keep_cards_->color()));
 	rp_keep_cards_ = radio_param_t(KEEP_CARDS, (int*)&action_);
 	bn_keep_cards_->callback(cb_process, &rp_keep_cards_);
 	curr_y += HBUTTON;
@@ -241,6 +248,7 @@ void QBS_window::create_form() {
 	bn_post_cards_ = new Fl_Radio_Light_Button(curr_x, curr_y, WPBUTTON, HBUTTON, "Post cards");
 	bn_post_cards_->color(COLOUR_BATCH);
 	bn_post_cards_->selection_color(FL_BLACK);
+	bn_post_cards_->labelcolor(fl_contrast(FL_FOREGROUND_COLOR, bn_post_cards_->color()));
 	rp_post_cards_ = radio_param_t(POST_CARDS, (int*)&action_);
 	bn_post_cards_->callback(cb_process, &rp_post_cards_);
 	curr_y += HBUTTON;
@@ -249,6 +257,7 @@ void QBS_window::create_form() {
 	bn_dispose_cards_ = new Fl_Radio_Light_Button(curr_x, curr_y, WPBUTTON, HBUTTON, "Finish processing");
 	bn_dispose_cards_->color(COLOUR_BATCH);
 	bn_dispose_cards_->selection_color(FL_BLACK);
+	bn_dispose_cards_->labelcolor(fl_contrast(FL_FOREGROUND_COLOR, bn_dispose_cards_->color()));
 	rp_dispose_cards_ = radio_param_t(DISPOSE_CARDS, (int*)&action_);
 	bn_dispose_cards_->callback(cb_process, &rp_dispose_cards_);
 	curr_y += HBUTTON;
@@ -257,6 +266,7 @@ void QBS_window::create_form() {
 	bn_recycle_cards_ = new Fl_Radio_Light_Button(curr_x, curr_y, WPBUTTON, HBUTTON, "Recycle cards");
 	bn_recycle_cards_->color(COLOUR_BATCH);
 	bn_recycle_cards_->selection_color(FL_BLACK);
+	bn_recycle_cards_->labelcolor(fl_contrast(FL_FOREGROUND_COLOR, bn_recycle_cards_->color()));
 	rp_recycle_cards_ = radio_param_t(RECYCLE_CARDS, (int*)&action_);
 	bn_recycle_cards_->callback(cb_process, &rp_recycle_cards_);
 	curr_y += HBUTTON;
@@ -267,6 +277,7 @@ void QBS_window::create_form() {
 	bn_correction_ = new Fl_Radio_Light_Button(curr_x, curr_y, WPBUTTON, HBUTTON, "Correct data");
 	bn_correction_->color(COLOUR_NOTES);
 	bn_correction_->selection_color(FL_BLACK);
+	bn_correction_->labelcolor(fl_contrast(FL_FOREGROUND_COLOR, bn_correction_->color()));
 	rp_correction_ = radio_param_t(CORRECT_DATA, (int*)&action_);
 	bn_correction_->callback(cb_process, &rp_correction_);
 	curr_y += HBUTTON;
@@ -275,6 +286,7 @@ void QBS_window::create_form() {
 	bn_edit_notes_ = new Fl_Radio_Light_Button(curr_x, curr_y, WPBUTTON, HBUTTON, "Edit Notes");
 	bn_edit_notes_->color(COLOUR_NOTES);
 	bn_edit_notes_->selection_color(FL_BLACK);
+	bn_edit_notes_->labelcolor(fl_contrast(FL_FOREGROUND_COLOR, bn_edit_notes_->color()));
 	rp_edit_notes_ = radio_param_t(EDIT_NOTES, (int*)&action_);
 	bn_edit_notes_->callback(cb_process, &rp_edit_notes_);
 	curr_y += HBUTTON;
@@ -284,6 +296,7 @@ void QBS_window::create_form() {
 	bn_summ_batch_ = new Fl_Radio_Light_Button(curr_x, curr_y, WPBUTTON, HBUTTON, "Batch summary report");
 	bn_summ_batch_->color(COLOUR_REPORT);
 	bn_summ_batch_->selection_color(FL_BLACK);
+	bn_summ_batch_->labelcolor(fl_contrast(FL_FOREGROUND_COLOR, bn_summ_batch_->color()));
 	rp_summ_batch_ = radio_param_t(SUMMARY_BATCH, (int*)&action_);
 	bn_summ_batch_->callback(cb_process, &rp_summ_batch_);
 	curr_y += HBUTTON;
@@ -291,6 +304,7 @@ void QBS_window::create_form() {
 	bn_list_batch_ = new Fl_Radio_Light_Button(curr_x, curr_y, WPBUTTON, HBUTTON, "Batch report");
 	bn_list_batch_->color(COLOUR_REPORT);
 	bn_list_batch_->selection_color(FL_BLACK);
+	bn_list_batch_->labelcolor(fl_contrast(FL_FOREGROUND_COLOR, bn_list_batch_->color()));
 	rp_list_batch_ = radio_param_t(LIST_BATCH, (int*)&action_);
 	bn_list_batch_->callback(cb_process, &rp_list_batch_);
 	curr_y += HBUTTON;
@@ -298,6 +312,7 @@ void QBS_window::create_form() {
 	bn_summ_call_ = new Fl_Radio_Light_Button(curr_x, curr_y, WPBUTTON, HBUTTON, "Call summary report");
 	bn_summ_call_->color(COLOUR_REPORT);
 	bn_summ_call_->selection_color(FL_BLACK);
+	bn_summ_call_->labelcolor(fl_contrast(FL_FOREGROUND_COLOR, bn_summ_call_->color()));
 	rp_summ_call_ = radio_param_t(SUMMARY_CALL, (int*)&action_);
 	bn_summ_call_->callback(cb_process, &rp_summ_call_);
 	curr_y += HBUTTON;
@@ -305,6 +320,7 @@ void QBS_window::create_form() {
 	bn_hist_call_ = new Fl_Radio_Light_Button(curr_x, curr_y, WPBUTTON, HBUTTON, "Call history report");
 	bn_hist_call_->color(COLOUR_REPORT);
 	bn_hist_call_->selection_color(FL_BLACK);
+	bn_hist_call_->labelcolor(fl_contrast(FL_FOREGROUND_COLOR, bn_hist_call_->color()));
 	rp_hist_call_ = radio_param_t(HISTORY_CALL, (int*)&action_);
 	bn_hist_call_->callback(cb_process, &rp_hist_call_);
 	curr_y += HBUTTON;
@@ -313,12 +329,14 @@ void QBS_window::create_form() {
 
 	bn_reset_ = new Fl_Button(curr_x, curr_y, WPBUTTON, HBUTTON, "Reset");
 	bn_reset_->color(COLOUR_RESET);
+	bn_reset_->labelcolor(fl_contrast(FL_FOREGROUND_COLOR, bn_reset_->color()));
 	bn_reset_->labelfont(FL_BOLD_ITALIC);
 	bn_reset_->callback(cb_reset, nullptr);
 	curr_y += HBUTTON;
 
 	bn_close_ = new Fl_Button(curr_x, curr_y, WPBUTTON, HBUTTON, "Close");
 	bn_close_->color(COLOUR_CLOSE);
+	bn_close_->labelcolor(fl_contrast(FL_FOREGROUND_COLOR, bn_close_->color()));
 	bn_close_->labelfont(FL_BOLD_ITALIC);
 	bn_close_->callback(cb_close, nullptr);
 
@@ -356,7 +374,8 @@ void QBS_window::create_form() {
 	bn_b_action_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "New");
 	bn_b_action_->callback(cb_exec_batch, nullptr);
 	bn_b_action_->color(FL_GREEN);
-	
+	bn_b_action_->labelcolor(fl_contrast(FL_FOREGROUND_COLOR, bn_b_action_->color()));
+
 	curr_x += bn_b_action_->w() + GAP;
 	max_x = max(max_x, curr_x);
 
@@ -398,6 +417,7 @@ void QBS_window::create_form() {
 	bn_c_action_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Execute");
 	bn_c_action_->callback(cb_exec_call, nullptr);
 	bn_c_action_->color(FL_GREEN);
+	bn_c_action_->labelcolor(fl_contrast(FL_FOREGROUND_COLOR, bn_c_action_->color()));
 
 	curr_x += bn_c_action_->w() + GAP;
 	max_x = max(max_x, curr_x);

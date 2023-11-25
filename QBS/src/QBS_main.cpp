@@ -10,7 +10,7 @@ using namespace std;
 
 const char* DATE_FORMAT = "%Y-%m-%d";
 extern int FL_NORMAL_SIZE;
-const char* VERSION = "1.0.11";
+const char* VERSION = "1.0.12";
 
 QBS_window* window_;
 
@@ -26,6 +26,10 @@ int main(int argc, char** argv)
 {	
 	// Change FL defaults
 	FL_NORMAL_SIZE = 11;
+	// Set dark mode
+	Fl::foreground(240, 240, 240);
+	Fl::background2(25, 25, 25);
+	Fl::background(0, 0, 0);
 
 	// Get filename - use argument if set
 	string filename = "";
