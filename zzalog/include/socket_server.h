@@ -8,6 +8,7 @@
 #include <thread>
 #include <mutex>
 #include <queue>
+#include <atomic>
 #ifdef _WIN32
 #include <WinSock2.h>
 #else

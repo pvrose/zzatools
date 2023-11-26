@@ -177,17 +177,10 @@ int socket_server::create_server()
 	LEN_SOCKET_ADDR len_server_addr = sizeof(server_addr);
 	server_addr.sin_family = AF_INET;
 	server_addr.sin_port = htons(port_num_);
-//#ifdef _WIN32
-//	server_addr.sin_addr.s_addr = htonl(inet_addr(address_.c_str()));
-//#else
 	server_addr.sin_addr.s_addr = inet_addr(address_.c_str());
-//#endif
-#ifdef _WIN32
-	bool multicast = (server_addr.sin_addr.s_addr & (unsigned)0x000000F0) == (unsigned)0x000000E0;
-#else
-	bool multicast = (server_addr.sin_addr.s_addr & (unsigned)0xF0000000) == (unsigned)0xE0000000;
-#endif
 
+	// Multicast addresses 224.0.0.0 to 239.255.255.255 = NB byte order
+	bool multicast = (server_addr.sin_addr.s_addr & (unsigned)0x000000F0) == (unsigned)0x000000E0;
 	if (multicast) {
 #ifdef _WIN32
 		handle_error("Multicast not yet implemented in app on Windows");
