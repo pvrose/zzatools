@@ -46,7 +46,7 @@ rpc_handler::~rpc_handler()
 
 void rpc_handler::close_server() {
 	if (server_) {
-		server_->close_server();
+		server_->close_server(true);
 		delete server_;
 		server_ = nullptr;
 	}

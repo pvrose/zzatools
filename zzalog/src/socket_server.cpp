@@ -76,12 +76,17 @@ void socket_server::run_server()
 socket_server::~socket_server(){};
 
 // Close the socket and clean up winsock
-void socket_server::close_server()
+void socket_server::close_server(bool external)
 {
+	// WAit for rcv_packet to tidy up
 	closing_ = true;
+	if (external) {
+		while (!closed_) this_thread::yield();
+	}
 	if (th_socket_)
 		th_socket_->detach();
 	delete th_socket_;
+	th_socket_ = nullptr;
 	// Fl::remove_timeout(cb_timer_acc, this);
 	// Fl::remove_timeout(cb_timer_rcv, this);
 	if (server_ != INVALID_SOCKET)
@@ -136,7 +141,7 @@ int socket_server::create_server()
 	case UDP:
 #ifdef _WIN32
 // Windows does not support SOCK_NONBLOCK
-		server_ = socket(AF_INET, SOCK_STREAM, IPPROTO_UDP);
+		server_ = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 #else
 		server_ = socket(AF_INET, SOCK_DGRAM | SOCK_NONBLOCK, IPPROTO_UDP);
 #endif
@@ -172,48 +177,65 @@ int socket_server::create_server()
 	LEN_SOCKET_ADDR len_server_addr = sizeof(server_addr);
 	server_addr.sin_family = AF_INET;
 	server_addr.sin_port = htons(port_num_);
-#ifdef _WIN32
-	server_addr.sin_addr.s_addr = htonl(inet_addr(address_.c_str()));
-#else
+//#ifdef _WIN32
+//	server_addr.sin_addr.s_addr = htonl(inet_addr(address_.c_str()));
+//#else
 	server_addr.sin_addr.s_addr = inet_addr(address_.c_str());
+//#endif
+#ifdef _WIN32
+	bool multicast = (server_addr.sin_addr.s_addr & (unsigned)0x000000F0) == (unsigned)0x000000E0;
+#else
+	bool multicast = (server_addr.sin_addr.s_addr & (unsigned)0xF0000000) == (unsigned)0xE0000000;
 #endif
-	int set_option_on = 1;
-	// Allow address to be reused
-	result = setsockopt(server_, SOL_SOCKET, SO_REUSEADDR, (char*)&set_option_on,
-		sizeof(set_option_on));
-	if (result < 0) {
-		handle_error("Unable to set socket reusable");
-		return result;
-	}
-	// Apply to join the multicast group
-	switch (protocol_) {
-		case UDP:
-#ifndef _WIN32
-			// Set Multicast loop
-			unsigned char loop = 1;
-			result = setsockopt(server_, IPPROTO_IP, IP_MULTICAST_LOOP, &loop, sizeof(loop));
-			if (result < 0) {
-				handle_error("Canmnot set multicast loopback");
-				return result;
+
+	if (multicast) {
+#ifdef _WIN32
+		handle_error("Multicast not yet implemented in app on Windows");
+		return -1;
+#else
+		int set_option_on = 1;
+		// Allow address to be reused
+		result = setsockopt(server_, SOL_SOCKET, SO_REUSEADDR, (char*)&set_option_on,
+			sizeof(set_option_on));
+		if (result < 0) {
+			handle_error("Unable to set socket reusable");
+			return result;
+		}
+		// Apply to join the multicast group
+		switch (protocol_) {
+			case UDP: {
+				// Set Multicast loop
+				char loop = 1;
+				result = setsockopt(server_, IPPROTO_IP, IP_MULTICAST_LOOP, &loop, sizeof(loop));
+				if (result < 0) {
+					handle_error("Cannot set multicast loopback");
+					return result;
+				}
+				// Set Multicast all
+				char mall = 1;
+				result = setsockopt(server_, IPPROTO_IP, IP_MULTICAST_ALL, &mall, sizeof(mall));
+				if (result < 0) {
+					handle_error("Canmnot set multicast all");
+					return result;
+				}
+				ip_mreq mreq = { server_addr.sin_addr, INADDR_ANY };
+				result = setsockopt(server_, IPPROTO_IP, IP_ADD_MEMBERSHIP, &mreq, sizeof(mreq));
+				if (result < 0) {
+					handle_error("Unable to join multicast group");
+					return result;
+				}
+				else {
+					snprintf(message, sizeof(message), "SOCKET: Joined multicast %s", inet_ntoa(server_addr.sin_addr));
+					status_->misc_status(ST_OK, message);
+				}
+				break;
 			}
-			// Set Multicast all
-			unsigned char mall = 1;
-			result = setsockopt(server_, IPPROTO_IP, IP_MULTICAST_ALL, &mall, sizeof(mall));
-			if (result < 0) {
-				handle_error("Canmnot set multicast all");
-				return result;
-			}
-			ip_mreq mreq = {server_addr.sin_addr, INADDR_ANY};
-			result = setsockopt(server_, IPPROTO_IP, IP_ADD_MEMBERSHIP, &mreq, sizeof(mreq));
-			if (result < 0) {
-				handle_error("Unable to join multicast group");
-				return result;
-			} else {
-				snprintf(message, sizeof(message), "SOCKET: Joined multicast %s", inet_ntoa(server_addr.sin_addr));
-				status_->misc_status(ST_OK, message);
-			}
+			case HTTP:
+				snprintf(message, sizeof(message), "SOCKET: Cannot set multicast %s for HTTP", inet_ntoa(server_addr.sin_addr));
+				status_->misc_status(ST_WARNING, message);
+				break;
+		}
 #endif
-			break;
 	}
 	// Associate the socket with this address data
 	result = bind(server_, (SOCKADDR *)&server_addr, len_server_addr);
@@ -301,15 +323,16 @@ const int MAX_SOCKET = 10240;
 
 int socket_server::rcv_packet()
 {
+	closed_ = false;
 	char *buffer = new char[MAX_SOCKET];
 	int buffer_len = MAX_SOCKET;
 	int bytes_rcvd = 0;
 	// Generate a set of socket descriptors for use in select()
-#ifdef _WIN32
-	FD_SET set_sockets;
-#else
+//#ifdef _WIN32
+//	FD_SET set_sockets;
+//#else
 	fd_set set_sockets;
-#endif
+//#endif
 	FD_ZERO(&set_sockets);
 	FD_SET(server_, &set_sockets);
 
@@ -318,7 +341,7 @@ int socket_server::rcv_packet()
 	{
 		client_ = INVALID_SOCKET;
 		client_status result = BLOCK;
-		while (client_ == INVALID_SOCKET && result == BLOCK)
+		while (client_ == INVALID_SOCKET && result == BLOCK && !closing_)
 		{
 			result = accept_client();
 			this_thread::yield();
@@ -383,6 +406,7 @@ int socket_server::rcv_packet()
 #endif
 	} while (!closing_);
 	// Now see if we have another - the timer goes on the scheduling queue so other tasks will get in
+	closed_ = true;
 	this_thread::yield();
 	if (buffer) delete[] buffer;
 	return 0;
@@ -460,7 +484,7 @@ void socket_server::handle_error(const char *phase)
 	snprintf(message, 1028, "SOCKET: %s", phase);
 #endif
 	status_->misc_status(ST_ERROR, message);
-	close_server();
+	close_server(false);
 }
 
 // Set handlers

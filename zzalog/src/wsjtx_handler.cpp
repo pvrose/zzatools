@@ -63,7 +63,7 @@ wsjtx_handler::wsjtx_handler()
 // Destructor
 wsjtx_handler::~wsjtx_handler() {
 	if (server_) {
-		server_->close_server();
+		server_->close_server(true);
 		delete server_;
 	}
 };
@@ -457,8 +457,8 @@ void wsjtx_handler::run_server() {
 // Close the server
 void wsjtx_handler::close_server() {
 	if (server_) {
-		status_->misc_status(ST_OK, "WSJT-X: Application closing");
-		server_->close_server();
+		status_->misc_status(ST_OK, "WSJT-X: Closing server");
+		server_->close_server(true);
 		delete server_;
 		server_ = nullptr;
 	}

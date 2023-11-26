@@ -61,9 +61,11 @@ void fllog_emul::run_server() {
 }
 
 void fllog_emul::close_server() {
-	rpc_handler_->close_server();
-	delete rpc_handler_;
-	rpc_handler_ = nullptr;
+	if (rpc_handler_) {
+		rpc_handler_->close_server();
+		delete rpc_handler_;
+		rpc_handler_ = nullptr;
+	}
 }
 
 // Generate an XML-RPC error response

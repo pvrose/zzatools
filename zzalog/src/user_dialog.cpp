@@ -353,7 +353,7 @@ void user_dialog::populate_size(Fl_Hold_Browser* br, const Fl_Font* font, const 
 void user_dialog::populate_freq(Fl_Choice* ch, display_freq_t format) {
 	string freq = "14.000000";
 	rig_if* rig = qso_manager_->rig();
-	if (rig->is_good()) {
+	if (rig && rig->is_good()) {
 		freq = rig->get_frequency(false);
 	}
 	ch->clear();

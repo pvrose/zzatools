@@ -168,7 +168,6 @@
     <ClCompile Include="zzalog\src\qso_qsl_vwr.cpp" />
     <ClCompile Include="zzalog\src\qso_qth.cpp" />
     <ClCompile Include="zzalog\src\qso_rig.cpp" />
-    <ClCompile Include="zzalog\src\qso_contest.cpp" />
     <ClCompile Include="zzalog\src\qso_data.cpp" />
     <ClCompile Include="zzalog\src\qso_entry.cpp" />
     <ClCompile Include="zzalog\src\qso_query.cpp" />
@@ -262,7 +261,6 @@
     <ClInclude Include="zzalog\include\qso_qsl_vwr.h" />
     <ClInclude Include="zzalog\include\qso_qth.h" />
     <ClInclude Include="zzalog\include\qso_rig.h" />
-    <ClInclude Include="zzalog\include\qso_contest.h" />
     <ClInclude Include="zzalog\include\qso_data.h" />
     <ClInclude Include="zzalog\include\qso_entry.h" />
     <ClInclude Include="zzalog\include\qso_query.h" />

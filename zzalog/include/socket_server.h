@@ -38,7 +38,7 @@ using namespace std;
 		~socket_server();
 
 		// Close the socket
-		void close_server();
+		void close_server(bool external);
 		// Start listening
 		void run_server();
 		// Is this listening
@@ -96,7 +96,8 @@ using namespace std;
 		// protocol
 		protocol_t protocol_;
 		// Closure in progress
-		bool closing_;
+		atomic<bool> closing_;
+		atomic<bool> closed_;
 		// Thread handling
 		thread* th_socket_;
 		// Packet queue
