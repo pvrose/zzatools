@@ -25,7 +25,6 @@
 #include "calendar.h"
 #include "qrz_handler.h"
 #include "wsjtx_handler.h"
-#include "band_view.h"
 #ifdef _WIN32
 #include "dxa_if.h"
 #endif
@@ -64,7 +63,6 @@ extern intl_dialog* intl_dialog_;
 extern toolbar* toolbar_;
 extern qrz_handler* qrz_handler_;
 extern wsjtx_handler* wsjtx_handler_;
-//extern band_view* band_view_;
 #ifdef _WIN32
 extern dxa_if* dxa_if_;
 #endif

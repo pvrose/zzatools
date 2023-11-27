@@ -9,7 +9,6 @@
 #include "toolbar.h"
 #include "dxa_if.h"
 #include "settings.h"
-#include "band_view.h"
 #include "qso_manager.h"
 
 
@@ -26,7 +25,6 @@ extern dxa_if* dxa_if_;
 #endif
 extern settings* config_;
 extern bool closing_;
-//extern band_view* band_view_;
 extern qso_manager* qso_manager_;
 
 // Constructor

@@ -16,10 +16,8 @@
 #ifdef _WIN32
 #include "dxa_if.h"
 #endif
-#include "band_view.h"
 #include "tabbed_forms.h"
 #include "import_data.h"
-#include "alarm_dial.h"
 #include "qth_dialog.h"
 #include "utils.h"
 #include "qrz_handler.h"
@@ -60,7 +58,6 @@ extern menu* menu_;
 #ifdef _WIN32
 extern dxa_if* dxa_if_;
 #endif
-extern band_view* band_view_;
 extern tabbed_forms* tabbed_forms_;
 extern import_data* import_data_;
 extern qrz_handler* qrz_handler_;

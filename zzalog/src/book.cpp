@@ -14,7 +14,6 @@
 #include "prefix.h"
 #include "utils.h"
 #include "intl_widgets.h"
-#include "band_view.h"
 #include "eqsl_handler.h"
 #include "lotw_handler.h"
 #include "club_handler.h"
@@ -43,7 +42,6 @@ extern spec_tree* spec_tree_;
 extern cty_data* cty_data_;
 extern Fl_Preferences* settings_;
 extern main_window* main_window_;
-extern band_view* band_view_;
 extern book* book_;
 extern eqsl_handler* eqsl_handler_;
 extern lotw_handler* lotw_handler_;

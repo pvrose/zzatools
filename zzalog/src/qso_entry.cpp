@@ -4,13 +4,11 @@
 #include "rig_if.h"
 #include "status.h"
 #include "spec_data.h"
-#include "band_view.h"
 #include "tabbed_forms.h"
 #include "book.h"
 
 extern status* status_;
 extern spec_data* spec_data_;
-//extern band_view* band_view_;
 extern tabbed_forms* tabbed_forms_;
 extern book* book_;
 

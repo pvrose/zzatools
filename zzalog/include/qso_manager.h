@@ -9,7 +9,6 @@
 #include "callback.h"
 #include "record.h"
 #include "intl_widgets.h"
-#include "alarm_dial.h"
 #include "field_choice.h"
 #include "record_table.h"
 #include "book.h"

@@ -8,7 +8,6 @@
 #include "extract_data.h"
 #include "cty_data.h"
 #include "spec_data.h"
-#include "band_view.h"
 #include "tabbed_forms.h"
 #include "import_data.h"
 #include "qrz_handler.h"
