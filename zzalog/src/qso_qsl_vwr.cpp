@@ -130,7 +130,7 @@ void qso_qsl_vwr::create_form() {
 	// Radio - Display eQSL.cc card image
 	radio_eqsl_ = new Fl_Radio_Light_Button(curr_x, curr_y, WBN, HBUTTON, "eQSL");
 	radio_eqsl_->align(FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
-	radio_eqsl_->selection_color(FL_BLACK);
+	radio_eqsl_->selection_color(FL_FOREGROUND_COLOR);
 	radio_eqsl_->callback(cb_rad_card, (void*)QI_EQSL);
 	radio_eqsl_->when(FL_WHEN_RELEASE);
 	radio_eqsl_->tooltip("Select image downloaded from eQSL");
@@ -138,7 +138,7 @@ void qso_qsl_vwr::create_form() {
 	// Radio - display scanned image of front of paper card
 	radio_card_front_ = new Fl_Radio_Light_Button(curr_x, curr_y, WBN, HBUTTON, "Card(F)");
 	radio_card_front_->align(FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
-	radio_card_front_->selection_color(FL_BLACK);
+	radio_card_front_->selection_color(FL_FOREGROUND_COLOR);
 	radio_card_front_->callback(cb_rad_card, (void*)QI_CARD_FRONT);
 	radio_card_front_->when(FL_WHEN_RELEASE);
 	radio_card_front_->tooltip("Select image scanned of paper card front");
@@ -146,7 +146,7 @@ void qso_qsl_vwr::create_form() {
 	// Radio - display scanned image of reverse of paper card
 	radio_card_back_ = new Fl_Radio_Light_Button(curr_x, curr_y, WBN, HBUTTON, "Card(B)");
 	radio_card_back_->align(FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
-	radio_card_back_->selection_color(FL_BLACK);
+	radio_card_back_->selection_color(FL_FOREGROUND_COLOR);
 	radio_card_back_->callback(cb_rad_card, (void*)QI_CARD_BACK);
 	radio_card_back_->when(FL_WHEN_RELEASE);
 	radio_card_back_->tooltip("Select image scanned of paper card back");
@@ -154,7 +154,7 @@ void qso_qsl_vwr::create_form() {
 	// Radio - display received e-mail image
 	radio_email_ = new Fl_Radio_Light_Button(curr_x, curr_y, WBN, HBUTTON, "e-mail");
 	radio_email_->align(FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
-	radio_email_->selection_color(FL_BLACK);
+	radio_email_->selection_color(FL_FOREGROUND_COLOR);
 	radio_email_->callback(cb_rad_card, (void*)QI_EMAIL);
 	radio_email_->when(FL_WHEN_RELEASE);
 	radio_email_->tooltip("Select image received by e-mail");
