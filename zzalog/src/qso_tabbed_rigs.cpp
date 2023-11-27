@@ -21,7 +21,6 @@ qso_tabbed_rigs::qso_tabbed_rigs(int X, int Y, int W, int H, const char* L) :
 	load_values();
 	create_form(X, Y);
 	enable_widgets();
-
 }
 
 qso_tabbed_rigs::~qso_tabbed_rigs() {
@@ -91,9 +90,11 @@ void qso_tabbed_rigs::enable_widgets() {
 			Fl_Widget* w = (*ix).second;
 			if (w == value()) {
 				w->labelfont((w->labelfont() | FL_BOLD) & (~FL_ITALIC));
+				w->labelcolor(FL_FOREGROUND_COLOR);
 			}
 			else {
 				w->labelfont((w->labelfont() & (~FL_BOLD)) | FL_ITALIC);
+				w->labelcolor(COLOUR_GREY);
 			}
 		}
 	}

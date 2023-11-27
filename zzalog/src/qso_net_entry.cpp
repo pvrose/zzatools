@@ -83,9 +83,11 @@ void qso_net_entry::enable_widgets() {
 		Fl_Widget* wx = entries_->child(cx);
 		if (wx == entries_->value()) {
 			wx->labelfont((wx->labelfont() | FL_BOLD) & (~FL_ITALIC));
+			wx->labelcolor(FL_FOREGROUND_COLOR);
 		}
 		else {
 			wx->labelfont((wx->labelfont() & (~FL_BOLD)) | FL_ITALIC);
+			wx->labelcolor(COLOUR_GREY);
 		}
 		qso_entry* qe = (qso_entry*)wx;
 		if (qe->qso()) qe->copy_label(qe->qso()->item("CALL").c_str());

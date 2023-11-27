@@ -759,7 +759,7 @@ int main(int argc, char** argv)
 	Fl::args(argc, argv, i, cb_args);
 	if (DARK) {
 		Fl::foreground(240, 240, 240);
-		Fl::background2(25, 25, 25);
+		Fl::background2(31, 31, 31);
 		Fl::background(0, 0, 0);
 	}
 	if (HELP) {
