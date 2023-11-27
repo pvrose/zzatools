@@ -1488,6 +1488,7 @@ void qso_data::ticker() {
 		g_entry_->copy_clock_to_qso();
 		g_net_entry_->ticker();
 		g_entry_->copy_cat_to_qso();
+		g_query_->ticker_1s();
 		break;
 	}
 }

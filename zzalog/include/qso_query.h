@@ -38,6 +38,9 @@ public:
 	// Get query message
 	string query_message();
 
+	// 1 second ticker
+	void ticker_1s();
+
 
 protected:
 	// Record table

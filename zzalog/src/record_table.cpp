@@ -27,9 +27,9 @@ record_table::record_table(int X, int Y, int W, int H, const char* label) :
 	col_header(true);
 	col_resize(true);
 	col_resize_min(10);
-	col_header_color(COLOUR_GREY);
+	col_header_color(FL_BACKGROUND2_COLOR);
 	row_header(true);
-	row_header_color(COLOUR_GREY);
+	row_header_color(FL_BACKGROUND2_COLOR);
 	row_header_width(150);
 	selection_color(FL_YELLOW);
 

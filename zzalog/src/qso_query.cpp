@@ -6,6 +6,8 @@
 
 extern book* book_;
 
+Fl_Color label_colour = fl_darker(FL_RED);
+
 // Constrctor
 qso_query::qso_query(int X, int Y, int W, int H, const char* L) :
 	Fl_Group(X, Y, W, H, L),
@@ -38,7 +40,7 @@ void qso_query::create_form(int X, int Y) {
 	box(FL_BORDER_BOX);
 	labelfont(FL_BOLD);
 	labelsize(FL_NORMAL_SIZE + 2);
-	labelcolor(fl_darker(FL_RED));
+	labelcolor(label_colour);
 
 	const int WTABLE = 420;
 	const int HTABLE = 250;
@@ -169,4 +171,14 @@ void qso_query::action_handle_dclick(int col, string field) {
 		}
 	}
 	enable_widgets();
+}
+
+// 1s ticker
+void qso_query::ticker_1s() {
+	if (labelcolor() == FL_BACKGROUND_COLOR) {
+		labelcolor(label_colour);
+	} else {
+		labelcolor(FL_BACKGROUND_COLOR);
+	}
+	redraw();
 }
