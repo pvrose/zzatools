@@ -277,13 +277,13 @@ bool rig_if::open() {
 	if (opened_ok_) {
 
 		if (hamlib_data_->port_type == RIG_PORT_SERIAL) {
-			snprintf(msg, 256, "RIG 1: Connection %s/%s on port %s opened OK",
+			snprintf(msg, 256, "RIG: Connection %s/%s on port %s opened OK",
 				hamlib_data_->mfr.c_str(),
 				hamlib_data_->model.c_str(),
 				hamlib_data_->port_name.c_str());
 		}
 		else {
-			snprintf(msg, 256, "RIG 1: Connection %s/%s on port %s (%s) opened OK",
+			snprintf(msg, 256, "RIG: Connection %s/%s on port %s (%s) opened OK",
 				hamlib_data_->mfr.c_str(),
 				hamlib_data_->model.c_str(),
 				hamlib_data_->port_name.c_str(),
