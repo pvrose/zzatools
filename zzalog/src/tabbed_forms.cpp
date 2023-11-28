@@ -7,7 +7,6 @@
 #include "spec_tree.h"
 #include "report_tree.h"
 #include "toolbar.h"
-#include "dxa_if.h"
 #include "settings.h"
 #include "qso_manager.h"
 
@@ -20,9 +19,6 @@ extern extract_data* extract_records_;
 extern import_data* import_data_;
 extern extract_data* dxatlas_records_;
 extern toolbar* toolbar_;
-#ifdef _WIN32
-extern dxa_if* dxa_if_;
-#endif
 extern settings* config_;
 extern bool closing_;
 extern qso_manager* qso_manager_;
@@ -122,10 +118,6 @@ void tabbed_forms::update_views(view* requester, hint_t hint, qso_num_t record_1
 			// Add the current record's callsign to the search box in the tool bar
 			toolbar_->search_text(record_1);
 		}
-#ifdef _WIN32
-		// Update DxAtlas
-		if (dxa_if_ && dxa_if_->visible() && book_->enable_save()) dxa_if_->update(hint);
-#endif
 		// Update the settngs config dialog
 		if (config_) config_->update();
 		// Update qso_manager - avoid recursion

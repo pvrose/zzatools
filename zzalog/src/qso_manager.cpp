@@ -13,9 +13,6 @@
 #include "import_data.h"
 #include "menu.h"
 #include "field_choice.h"
-#ifdef _WIN32
-#include "dxa_if.h"
-#endif
 #include "tabbed_forms.h"
 #include "import_data.h"
 #include "qth_dialog.h"
@@ -55,9 +52,6 @@ extern extract_data* extract_records_;
 extern import_data* import_data_;
 extern book* navigation_book_;
 extern menu* menu_;
-#ifdef _WIN32
-extern dxa_if* dxa_if_;
-#endif
 extern tabbed_forms* tabbed_forms_;
 extern import_data* import_data_;
 extern qrz_handler* qrz_handler_;

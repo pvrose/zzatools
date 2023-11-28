@@ -2,7 +2,6 @@
 #include "status.h"
 #include "menu.h"
 #include "utils.h"
-#include "dxa_if.h"
 #include "prefix.h"
 #include "toolbar.h"
 #include "qso_manager.h"
@@ -33,9 +32,6 @@ using namespace std;
 extern status* status_;
 extern menu* menu_;
 extern Fl_Preferences* settings_;
-#ifdef _WIN32
-extern dxa_if* dxa_if_;
-#endif
 extern toolbar* toolbar_;
 extern qso_manager* qso_manager_;
 extern spec_data* spec_data_;
@@ -165,9 +161,6 @@ int wsjtx_handler::send_hbeat() {
 int wsjtx_handler::handle_close(stringstream& ss) {
 	status_->misc_status(ST_NOTE, "WSJT-X: Received Closing down");
 	// Clear any WSJT-X related items
-#ifdef _WIN32
-	if (dxa_if_) dxa_if_->clear_dx_loc();
-#endif
 	// qso_manager_->update_modem_qso(nullptr);
 	menu_->update_items();
 	return 1;
@@ -192,10 +185,6 @@ int wsjtx_handler::handle_log(stringstream& ss) {
 	qso_manager_->update_modem_qso(qso);
 	status_->misc_status(ST_NOTE, "WSJT-X: Logged QSO");
 	delete rcvd_book;
-#ifdef _WIN32
-	// Clear DX locator flag
-	if (dxa_if_) dxa_if_->clear_dx_loc();
-#endif
 	return 0;
 }
 
@@ -313,32 +302,6 @@ int wsjtx_handler::handle_status(stringstream& ss) {
 		record* qso = update_qso(true, now(false, "%H%M%S"), (double)status.tx_offset, status.tx_message);
 		// if (qso) qso_manager_->update_modem_qso(qso);
 	}
-#ifdef _WIN32
-	if (dxa_if_) {
-		if (status.dx_call.length() && status.dx_grid.length() && status.transmitting) {
-			// Use the actual grid loaction - and put it into the cache
-			dxa_if_->set_dx_loc(status.dx_grid, status.dx_call);
-			grid_cache_[status.dx_call] = status.dx_grid;
-			toolbar_->search_text(status.dx_call);
-		}
-		else if (status.dx_call.length() && status.transmitting) {
-			// Look in location cache
-			if (grid_cache_.find(status.dx_call) != grid_cache_.end()) {
-				// Use the remembered grid loaction
-				dxa_if_->set_dx_loc(grid_cache_[status.dx_call], status.dx_call);
-				toolbar_->search_text(status.dx_call);
-			}
-			else {
-				dxa_if_->set_dx_loc(status.dx_call);
-				toolbar_->search_text(status.dx_call);
-			}
-		}
-		else if (!status.dx_call.length()) {
-			// Can clear the Dx Location by clearing the DX Call field
-			dxa_if_->clear_dx_loc();
-		}
-	}
-#endif
 	prev_status_ = status;
 	return 0;
 }

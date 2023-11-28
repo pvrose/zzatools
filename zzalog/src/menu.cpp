@@ -25,9 +25,6 @@
 #include "calendar.h"
 #include "qrz_handler.h"
 #include "wsjtx_handler.h"
-#ifdef _WIN32
-#include "dxa_if.h"
-#endif
 #include "main_window.h"
 #include "qso_manager.h"
 
@@ -63,9 +60,6 @@ extern intl_dialog* intl_dialog_;
 extern toolbar* toolbar_;
 extern qrz_handler* qrz_handler_;
 extern wsjtx_handler* wsjtx_handler_;
-#ifdef _WIN32
-extern dxa_if* dxa_if_;
-#endif
 extern time_t session_start_;
 extern qso_manager* qso_manager_;
 settings* config_ = nullptr;
@@ -501,9 +495,6 @@ void menu::cb_mi_windows_all(Fl_Widget* w, void* v) {
 		main_window_->show();
 		qso_manager_->show();
 		status_->file_viewer()->show();
-#ifdef _WIN32
-		dxa_if_->show();
-#endif
 		intl_dialog_->show();
 	}
 	else {
@@ -511,9 +502,6 @@ void menu::cb_mi_windows_all(Fl_Widget* w, void* v) {
 		main_window_->iconize();
 		qso_manager_->hide();
 		status_->file_viewer()->hide();
-#ifdef _WIN32
-		dxa_if_->hide();
-#endif
 		intl_dialog_->hide();
 	}
 	that->update_windows_items();
@@ -775,9 +763,6 @@ void menu::cb_mi_log_new(Fl_Widget* w, void* v) {
 // Log->Save - save current record
 // v is not used
 void menu::cb_mi_log_save(Fl_Widget* w, void* v) {
-#ifdef _WIN32
-	dxa_if_->clear_dx_loc();
-#endif
 	qso_manager_->end_qso();
 	qso_manager_->update_rig();
 }
@@ -1765,9 +1750,6 @@ void menu::add_windows_items() {
 	insert(index, "&Windows/&Main", 0, cb_mi_windows, main_window_, FL_MENU_TOGGLE);
 	insert(index, "&Windows/Das&hboard", 0, cb_mi_windows, qso_manager_, FL_MENU_TOGGLE);
 	insert(index, "&Windows/S&tatus Viewer", 0, cb_mi_windows, status_->file_viewer(), FL_MENU_TOGGLE);
-#ifdef _WIN32
-	insert(index, "&Windows/&DxAtlas Control", 0, cb_mi_windows, dxa_if_, FL_MENU_TOGGLE);
-#endif
 	insert(index, "&Windows/&International Chars", 0, cb_mi_windows, intl_dialog_, FL_MENU_TOGGLE);
 }
 
@@ -1777,9 +1759,6 @@ void menu::update_windows_items() {
 	int index_main = find_index("&Windows/&Main");
 	int index_oper = find_index("&Windows/Das&hboard");
 	int index_status = find_index("&Windows/S&tatus Viewer");
-#ifdef _WIN32
-	int index_dxatlas = find_index("&Windows/&DxAtlas Control");
-#endif
 	//int index_band = find_index("&Windows/&Band View");
 	int index_intl = find_index("&Windows/&International Chars");
 
@@ -1809,17 +1788,6 @@ void menu::update_windows_items() {
 			mode(index_status, mode(index_status) & ~FL_MENU_VALUE);
 		}
 	}
-
-#ifdef _WIN32
-	if (dxa_if_ && index_dxatlas != -1) {
-		if (dxa_if_->visible()) {
-			mode(index_dxatlas, mode(index_dxatlas) | FL_MENU_VALUE);
-		}
-		else {
-			mode(index_dxatlas, mode(index_dxatlas) & ~FL_MENU_VALUE);
-		}
-	}
-#endif
 
 	if (intl_dialog_ && index_intl != -1) {
 		if (intl_dialog_->visible()) {

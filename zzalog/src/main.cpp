@@ -31,9 +31,6 @@ main.cpp - application entry point
 #include "drawing.h"
 #include "intl_dialog.h"
 #include "band_data.h"
-#ifdef _WIN32
-#include "dxa_if.h"
-#endif
 #include "qrz_handler.h"
 #include "club_handler.h"
 #include "wsjtx_handler.h"
@@ -127,9 +124,6 @@ wsjtx_handler* wsjtx_handler_ = nullptr;
 fllog_emul* fllog_emul_ = nullptr;
 qso_manager* qso_manager_ = nullptr;
 
-#ifdef _WIN32
-dxa_if* dxa_if_ = nullptr;
-#endif
 // Recent files opened
 list<string> recent_files_;
 
@@ -599,15 +593,6 @@ void add_dashboard() {
 	}
 }
 
-// Add DxAtlas control window
-void add_dxatlas() {
-#ifdef _WIN32
-	if (!closing_ && dxa_if_ == nullptr) {
-		dxa_if_ = new dxa_if();
-	}
-#endif
-}
-
 // Set the text in the main window label
 void main_window_label(string text) {
 	// e.g. ZZALOG 3.0.0: <filename> - PROGRAM_VERSION includes (Debug) if compiled under _DEBUG
@@ -685,9 +670,6 @@ void tidy() {
 	// From inspection of the code - calling this a second time frees the memory
 	fl_message_title_default(nullptr);
 	delete qso_manager_;
-#ifdef _WIN32
-	delete dxa_if_;
-#endif
 	delete wsjtx_handler_;
 	delete club_handler_;
 	delete qrz_handler_;

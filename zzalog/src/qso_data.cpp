@@ -14,9 +14,6 @@
 #include "wsjtx_handler.h"
 #include "menu.h"
 #include "utils.h"
-#ifdef _WIN32
-#include "dxa_if.h"
-#endif
 
 #include <FL/Fl_Preferences.H>
 #include <FL/Fl_Tooltip.H>
@@ -33,9 +30,6 @@ extern book* navigation_book_;
 extern qrz_handler* qrz_handler_;
 extern wsjtx_handler* wsjtx_handler_;
 extern menu* menu_;
-#ifdef _WIN32
-extern dxa_if* dxa_if_;
-#endif
 extern double prev_freq_;
 
 // qso_group_
@@ -758,15 +752,9 @@ void qso_data::action_cancel() {
 	case QSO_STARTED:
 		g_entry_->delete_qso();
 		logging_state_ = QSO_INACTIVE;
-#ifdef WIN32
-		if (dxa_if_) dxa_if_->clear_dx_loc();
-#endif
 		break;
 	case QSO_MODEM:
 		logging_state_ = QSO_INACTIVE;
-#ifdef WIN32
-		if (dxa_if_) dxa_if_->clear_dx_loc();
-#endif
 		break;
 	case NET_STARTED:
 		g_net_entry_->remove_entry();

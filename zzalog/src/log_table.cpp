@@ -13,7 +13,6 @@
 #include "status.h"
 #include "cty_data.h"
 #include "main_window.h"
-#include "dxa_if.h"
 #include "qso_manager.h"
 
 #include <FL/fl_draw.H>
@@ -33,9 +32,6 @@ extern status* status_;
 extern intl_dialog* intl_dialog_;
 extern time_t session_start_;
 extern cty_data* cty_data_;
-#ifdef _WIN32
-extern dxa_if* dxa_if_;
-#endif
 extern qso_manager* qso_manager_;
 extern bool in_current_session(record*);
 extern bool DARK;
@@ -834,13 +830,11 @@ void log_table::done_edit(bool keep_row) {
 				if (my_book_->new_record()) {
 					if (field_info.field == "GRIDSQUARE") {
 						// WE have an actual gridsquare - read back from record to get in upper case
-						dxa_if_->set_dx_loc(record->item("GRIDSQUARE"), record->item("CALL"));
 					}
 					else if (field_info.field == "CALL") {
 						// Get the grid location of the prefix centre - only if 1 prefix matches the callsign.
 						lat_long_t location = cty_data_->location(record);
 						if (!isnan(location.latitude) && !isnan(location.longitude)) {
-							dxa_if_->set_dx_loc(latlong_to_grid(location, 6), record->item("CALL"));
 						}
 						else {
 							char message[100];

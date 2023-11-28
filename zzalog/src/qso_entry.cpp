@@ -14,11 +14,6 @@ extern book* book_;
 
 extern double prev_freq_;
 
-#ifdef _WIN32
-#include "dxa_if.h"
-extern dxa_if* dxa_if_;
-#endif
-
 map <string, vector<string> > qso_entry::field_map_;
 
 qso_entry::qso_entry(int X, int Y, int W, int H, const char* L) :
@@ -731,26 +726,6 @@ void qso_entry::cb_ip_field(Fl_Widget* w, void* v) {
 		that->enable_widgets();
 		that->qso_data_->enable_widgets();
 		tabbed_forms_->update_views(nullptr, HT_MINOR_CHANGE, that->qso_number_);
-#ifdef WIN32
-		if (dxa_if_) {
-			if (field == "CALL" || field == "GRIDSQUARE") {
-				// Place DX Location flag in DxAtlas
-				string call = that->qso_->item("CALL");
-				string grid = that->qso_->item("GRIDSQUARE");
-				if (call.length()) {
-					if (grid.length()) {
-						dxa_if_->set_dx_loc(grid, call);
-					}
-					else {
-						dxa_if_->set_dx_loc(call);
-					}
-				}
-				else {
-					dxa_if_->clear_dx_loc();
-				}
-			}
-		}
-#endif
 		break;
 	default:
 		break;
@@ -851,9 +826,6 @@ void qso_entry::check_qth_changed() {
 			qso_->item("APP_ZZA_QTH") != previous_qth_) {
 			previous_locator_ = qso_->item("MY_GRIDSQUARE", true);
 			previous_qth_ = qso_->item("APP_ZZA_QTH");
-#ifdef _WIN32
-			if (dxa_if_) dxa_if_->update(HT_LOCATION);
-#endif
 		}
 	}
 }
