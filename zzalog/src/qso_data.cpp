@@ -1343,12 +1343,6 @@ void qso_data::update_rig() {
 	if (logging_state_ == QSO_PENDING) {
 		if (((qso_manager*)parent())->rig()->is_good()) {
 			g_entry_->copy_cat_to_qso();
-			//if (band_view_) {
-			//	double freq;
-			//	g_entry_->qso()->item("FREQ", freq);;
-			//	band_view_->update(freq * 1000.0);
-			//	prev_freq_ = freq;
-			//}
 		}
 	}
 	enable_widgets();
