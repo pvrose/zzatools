@@ -361,10 +361,14 @@ void import_data::update_book() {
 				// There may be a slight discrepancy in time so check 2 records either side of this position  
 				// Any more than this is presented to the user to search for possible match
 				// Start at previous record or beginning of the book
-				for (int test_record = (offset < 2) ? 0 : (offset - 2);
+				int tries[] = { 0, -1, -2, 1, 2};
+				for (int ix = 0;
 					// Stop at next record, possible match or match found or end of book 
-					test_record <= (offset + 2) && !update_in_progress_ && !found_match && test_record != book_->size();
-					test_record++) {
+					ix < 5 && !update_in_progress_ && !found_match;
+					ix++) {
+					int test_record = offset + tries[ix];
+					// If the test record is outwith the book skip the check
+					if (test_record < 0 || test_record >= book_->size()) continue;
 					// Get potential match QSO
 					record* record = book_->get_record(test_record, false);
 					// Compare QSO records - Import record should have fewer fields
