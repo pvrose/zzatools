@@ -775,8 +775,7 @@ void status::append_log(bool append) {
 // Close file viewer 
 void status::cb_fv_close(Fl_Widget* w, void* v) {
 	status* that = (status*)v;;
-	Fl::delete_widget(that->status_file_viewer_);
-	that->status_file_viewer_ = nullptr;
+	that->status_file_viewer_->hide();
 }
 
 // Return the file viewer
