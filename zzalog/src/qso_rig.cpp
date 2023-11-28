@@ -422,14 +422,14 @@ void qso_rig::enable_widgets() {
 		}
 	} else if (rig_->is_open()) {
 		bn_connect_->activate();
-		bn_connect_->color(COLOUR_APPLE);
+		bn_connect_->color(fl_lighter(FL_RED));
 		bn_connect_->label("Disconnect");
 		bn_select_->deactivate();
 		bn_select_->label("");
 		bn_select_->value(false);
 	} else {
 		bn_connect_->activate();
-		bn_connect_->color(COLOUR_MAUVE);
+		bn_connect_->color(fl_lighter(FL_GREEN));
 		bn_connect_->label("Connect");
 		bn_select_->activate();
 		if (bn_select_->value()) {

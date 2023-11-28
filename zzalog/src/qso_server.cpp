@@ -70,18 +70,24 @@ void qso_server::enable_widgets() {
     if (fllog_emul_ && fllog_emul_->has_server()) {
         bn_fldigi_on_->value(true);
         bn_fldigi_->label("Stop");
+        bn_fldigi_->color(fl_lighter(FL_RED));
     } else {
         bn_fldigi_on_->value(false);
         bn_fldigi_->label("Start");
+        bn_fldigi_->color(fl_lighter(FL_GREEN));
     }
+    bn_fldigi_->labelcolor(fl_contrast(FL_FOREGROUND_COLOR, bn_fldigi_->color()));
     // WSJTX widgets
     if (wsjtx_handler_ && wsjtx_handler_->has_server()) {
         bn_wsjtx_on_->value(true);
         bn_wsjtx_->label("Stop");
+        bn_wsjtx_->color(fl_lighter(FL_RED));
     } else {
         bn_wsjtx_on_->value(false);
         bn_wsjtx_->label("Start");
-    }
+        bn_wsjtx_->color(fl_lighter(FL_GREEN));
+   }
+    bn_wsjtx_->labelcolor(fl_contrast(FL_FOREGROUND_COLOR, bn_wsjtx_->color()));
 }
 
 // Button callback
