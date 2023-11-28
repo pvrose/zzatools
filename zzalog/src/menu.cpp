@@ -1119,46 +1119,6 @@ void menu::cb_mi_ext_mark(Fl_Widget* w, void* v) {
 	qso_manager_->qsl_print_done();
 }
 
-//// Reference->Prefix->Filter - used to set the filter for displaying prefix data
-//// v is enum report_filter_t: RF_NONE, RF_ALL, RF_EXTRACTED or RF_SELECTED
-//void menu::cb_mi_ref_filter(Fl_Widget* w, void* v) {
-//	// v contains the particular filter
-//	report_filter_t filter = (report_filter_t)(long)v;
-//	((pfx_tree*)tabbed_forms_->get_view(OT_PREFIX))->set_filter(filter);
-//	tabbed_forms_->activate_pane(OT_PREFIX, true);
-//}
-//
-//// Reference->Prefix->Items - used to set the items  to display
-//// v is enum report_item_t: RI_CODE, RI_NICK, RI_NAME, RI_CQ_ZONE, RI_ITU_ZONE or RI_ADIF
-//void menu::cb_mi_ref_items(Fl_Widget* w, void* v) {
-//	// v defineds the items to dispaly
-//	report_item_t items = (report_item_t)(long)v;
-//	((pfx_tree*)tabbed_forms_->get_view(OT_PREFIX))->set_items(items);
-//	tabbed_forms_->activate_pane(OT_PREFIX, true);
-//}
-//
-//// Reference->Prefix->Add details - Add or remove the details from the prefix record
-//// v is not used
-//void menu::cb_mi_ref_details(Fl_Widget* w, void* v) {
-//	// Get the value of the checked menu item
-//	Fl_Menu_* menu = (Fl_Menu_*)w;
-//	const Fl_Menu_Item* item = menu->mvalue();
-//	bool value = item->value();
-//	((pfx_tree*)tabbed_forms_->get_view(OT_PREFIX))->add_details(value);
-//	tabbed_forms_->activate_pane(OT_PREFIX, true);
-//}
-//
-//// Reference->Prefix->Reload Data - reload the specification data
-//// v is not used
-//void menu::cb_mi_ref_reload(Fl_Widget* w, void* v) {
-//	// Turn rig timer off in case it fires while we are reloading
-//	// Get spec_data_ to reload itself
-//	delete cty_data_;
-//	delete spec_data_;
-//	delete intl_dialog_;
-//	add_data();
-//}
-
 // Report->Clear etc. - set the report filter
 // v is enum report_filter_t: RF_NONE, RF_ALL, RF_ALL_CURRENT, RF_EXTRACTED or RF_SELECTED
 void menu::cb_mi_rep_filter(Fl_Widget* w, void* v) {

@@ -178,15 +178,6 @@ void qso_qsl::create_form() {
 	Fl_Box* box_q = new Fl_Box(C1, curr_y, W1, HBUTTON, "Cards");
 	box_e->box(FL_FLAT_BOX);
 	box_e->color(FL_BACKGROUND_COLOR);
-	//// Auto upload
-	//bn_auto_eqsl_ = new Fl_Check_Button(C2, curr_y, W2, HBUTTON);
-	//bn_auto_eqsl_->value(auto_eqsl_);
-	//bn_auto_eqsl_->callback(cb_auto, (void*)extract_data::EQSL);
-	//bn_auto_eqsl_->tooltip("Enable automatic upload of eQSL after logging");
-	//// Download
-	//bn_down_eqsl_ = new Fl_Button(C3, curr_y, W3, HBUTTON, "@2->");
-	//bn_down_eqsl_->callback(cb_download, (void*)extract_data::EQSL);
-	//bn_down_eqsl_->tooltip("Download latest records from eQSL");
 	// Extract
 	bn_extr_card_ = new Fl_Button(C4, curr_y, W4, HBUTTON, "@search");
 	bn_extr_card_->callback(cb_extract, (void*)extract_data::CARD);

@@ -467,52 +467,6 @@ void qso_data::save_values() {
 	}
 }
 
-// // Initialise fields from format definitions
-// void qso_data::initialise_fields(qso_entry* entry) {
-// 	string preset_fields;
-// 	bool lock_preset = false;
-// 	bool new_fields = false;
-// 	switch (g_contest_->mode()) {
-// 	case qso_contest::NO_CONTEST:
-// 	case qso_contest::PAUSED:
-// 		// Non -contest mode
-// 		preset_fields = "RST_SENT,RST_RCVD,NAME,QTH";
-// 		new_fields = true;
-// 		lock_preset = false;
-// 		break;
-// 	case qso_contest::CONTEST:
-// 		// Contest mode
-// 		preset_fields = g_contest_->contest_fields();
-// 		new_fields = true;
-// 		lock_preset = true;
-// 		break;
-// 	case qso_contest::NEW:
-// 		// Do not change existing
-// 		preset_fields = "";
-// 		new_fields = false;
-// 		lock_preset = true;
-// 		break;
-// 	case qso_contest::DEFINE:
-// 		// Define new exchange - provide base RS/Serno
-// 		preset_fields = "";
-// 		new_fields = true;
-// 		lock_preset = false;
-// 		break;
-// 	case qso_contest::EDIT:
-// 		// Unlock existing definition 
-// 		preset_fields = g_contest_->contest_fields();
-// 		new_fields = true;
-// 		lock_preset = false;
-// 		break;
-// 	}
-// 	// TODO this shoule be somewhere else
-// 	//// Set contest format
-// 	//ch_format_->value(exch_fmt_id_.c_str());
-
-// 	entry->initialise_fields(preset_fields, new_fields, lock_preset);
-// 	entry->initialise_values(preset_fields, g_contest_->serial_number());
-// }
-
 string qso_data::get_defined_fields() {
 	return g_entry_->get_defined_fields();
 }
@@ -896,29 +850,6 @@ void qso_data::action_navigate(int target) {
 	inhibit_drawing_ = false;
 	enable_widgets();
 }
-
-// // Action view qsl
-// void qso_data::action_view_qsl(bool force) {
-// 	if (force || qsl_viewer_->visible()) {
-// 		record* qso = book_->get_record(book_->item_number(get_default_number()), false);
-// 		if (qso) {
-// 			char title[128];
-// 			snprintf(title, 128, "QSL Status: %s %s %s %s %s",
-// 				qso->item("CALL").c_str(),
-// 				qso->item("QSO_DATE").c_str(),
-// 				qso->item("TIME_ON").c_str(),
-// 				qso->item("BAND").c_str(),
-// 				qso->item("MODE", true, true).c_str());
-// 			qsl_viewer_->copy_label(title);
-// 			qsl_viewer_->set_qso(qso, current_number());
-// 			qsl_viewer_->show();
-// 			char msg[128];
-// 			snprintf(msg, 128, "DASH: %s", title);
-// 			status_->misc_status(ST_LOG, msg);
-// 		}
-// 	}
-// }
-
 
 // Action browse
 void qso_data::action_browse() {

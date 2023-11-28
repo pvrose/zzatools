@@ -35,8 +35,6 @@ protected:
 
 	// Callback
 	static void cb_tabs(Fl_Widget* w, void* v);
-	//// Redesign tab_positions
-	//virtual int tab_positions();
 
 	// Map the labels to the widgets
 	map<string, Fl_Widget*> label_map_;

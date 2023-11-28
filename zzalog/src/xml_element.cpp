@@ -1,7 +1,5 @@
 #include "xml_element.h"
 
-
-
 // Constructor - creates an empty element
 xml_element::xml_element()
 {

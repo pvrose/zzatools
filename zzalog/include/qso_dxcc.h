@@ -18,32 +18,7 @@ class qso_dxcc :
     public Fl_Group
 {
 
-    //enum source_t {
-    //    NONE,
-    //    EXCEPTION,
-    //    RECORD_DXCC,
-    //    RECORD_PFX,
-    //    PREFIX_LIST
-    //};
-
-    //class tree : public Fl_Tree
-    //{
-    //public:
-    //    tree(int X, int Y, int W, int H, const char* L = nullptr);
-    //    ~tree();
-
-    //    void enable_widgets();
-
-    //    void set_data(vector<prefix*>* items);
-
-    //protected:
-
-    //    // Hang an item on the tree
-    //    Fl_Tree_Item* hang_item(prefix* pfx);
-
-    //    vector<prefix*>* prefixes_;
-    //};
-
+ 
     class wb4_buttons : public Fl_Scroll
     {
     public:
@@ -78,13 +53,9 @@ public:
 
 protected:
 
-    //// Tree callback
-    //static void cb_tree(Fl_Widget* w, void* v);
     // Button for QRZ.com
     static void cb_bn_qrz(Fl_Widget* w, void* v);
     
-
-    //source_t source();
 
     // Widgets:
     // Tree

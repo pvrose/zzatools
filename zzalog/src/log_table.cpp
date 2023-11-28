@@ -208,75 +208,6 @@ void log_table::cb_input(Fl_Widget* w, void* v) {
 	that->edit_save(fi->reason());
 }
 
-//// Callback when right click in edit_menu_ - convert selected text to upper, lower or mixed-case
-//// Also called for OK and Cancel buttons and on certain keyboard events
-//void log_table::cb_menu(Fl_Widget* w, void* v) {
-//	// Get the enclosing log_table
-//	log_table* that = ancestor_view<log_table>(w);
-//	// Get the source string 
-//	const char* src = that->edit_input_->value();
-//	unsigned int l = strlen(src);
-//	bool mixed_upper;
-//	bool prev_upper;
-//	int num_utf8_bytes;
-//	// Destination string could be upto 3 times the length of the source
-//	char* dst = new char[l * 3];
-//	memset(dst, 0, l * 3);
-//	char* dst2 = dst;
-//	// Depending on the menu item pressed convert case appropriately
-//	switch ((edit_menu_t)(long)v) {
-//	case UPPER:
-//		// Convert entire string to upper case
-//		fl_utf_toupper((unsigned char*)src, l, dst);
-//		break;
-//	case LOWER:
-//		// Convert entire string to lower case
-//		fl_utf_tolower((unsigned char*)src, l, dst);
-//		break;
-//	case MIXED:
-//		mixed_upper = true;
-//		prev_upper = true;
-//		for (unsigned int i = 0; i < l; ) {
-//			// Get the next UTF-8 character 
-//			unsigned int ucs = fl_utf8decode(src + i, src + l, &num_utf8_bytes);
-//			// Step to the next UTF-8 character
-//			i += num_utf8_bytes;
-//			// Convert case
-//			unsigned int new_ucs;
-//			if (mixed_upper) {
-//				new_ucs = fl_toupper(ucs);
-//			}
-//			else {
-//				new_ucs = fl_tolower(ucs);
-//			}
-//			// Convert UTF-8 character to bytes, store it and step destination pointer
-//			dst += fl_utf8encode(new_ucs, dst);
-//			switch (ucs) {
-//			case ' ':
-//			case '-':
-//			case '.':
-//				// Force upper case after some punctuation
-//				prev_upper = mixed_upper;
-//				mixed_upper = true;
-//				break;
-//			case '\'':
-//				// Keep case prior to apostrophe
-//				mixed_upper = prev_upper;
-//				break;
-//			default:
-//				// Force lower case
-//				prev_upper = mixed_upper;
-//				mixed_upper = false;
-//				break;
-//			}
-//		}
-//		break;
-//	}
-//	that->edit_input_->value(dst2);
-//	// Rehide edit_menu_
-//	w->hide();
-//}
-
 // Copy the data from the edit input, and start a new edit input to the left, right, above or below
 void log_table::edit_save(field_input::exit_reason_t exit_type) {
 	// Deselect row being edited
@@ -336,14 +267,6 @@ void log_table::edit_save(field_input::exit_reason_t exit_type) {
 		top_row(edit_row_);
 	}
 }
-
-//// Open edit menu 
-//void log_table::open_edit_menu() {
-//	// Put it bottom right of the edit input
-//	edit_menu_->position(edit_input_->x() + edit_input_->w(), edit_input_->y() + edit_input_->h());
-//	edit_menu_->show();
-//	edit_menu_->popup();
-//}
 
 // event handler - remember the event and call widget's handle
 int log_table::handle(int event) {
@@ -825,25 +748,6 @@ void log_table::done_edit(bool keep_row) {
 				if (field_info.field == "CALL") {
 					toolbar_->search_text(my_book_->record_number(item_number));
 				}
-	#ifdef _WIN32
-				// Set DX location in DX Atlas
-				if (my_book_->new_record()) {
-					if (field_info.field == "GRIDSQUARE") {
-						// WE have an actual gridsquare - read back from record to get in upper case
-					}
-					else if (field_info.field == "CALL") {
-						// Get the grid location of the prefix centre - only if 1 prefix matches the callsign.
-						lat_long_t location = cty_data_->location(record);
-						if (!isnan(location.latitude) && !isnan(location.longitude)) {
-						}
-						else {
-							char message[100];
-							snprintf(message, 100, "LOG: Cannot locate %s", text.c_str());
-							status_->misc_status(ST_WARNING, message);
-						}
-					}
-				}
-	#endif
 				char message[200];
 				// Log the fact that a record has been interactively changed
 				snprintf(message, 200, "LOG: %s %s %s record changed %s from %s to %s",

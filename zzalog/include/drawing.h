@@ -91,44 +91,6 @@ const int ROW_HEIGHT = DEFAULT_SIZE + 4;
 		{ OT_MEMORY, "OT_MEMORY" }
 	};
 
-	// Colour palette used in DxAtlas legend and band plan
-	// DxAtlas only has a limited palette of colours for drawing - 
-	// so after about 12 colours used these are not seen in the actual colours
-	const Fl_Color ZLG_PALETTE[] =
-	{ fl_rgb_color(0,0,0),
-	fl_rgb_color(255,255,255),fl_rgb_color(0,255,0),fl_rgb_color(0,0,255),
-	fl_rgb_color(0,255,255),fl_rgb_color(255,0,255),fl_rgb_color(255,255,0),
-	fl_rgb_color(128,0,0),fl_rgb_color(0,128,0),fl_rgb_color(0,0,128),
-	fl_rgb_color(0,128,128),fl_rgb_color(128,0,128),fl_rgb_color(128,128,0),
-	fl_rgb_color(128,255,0),fl_rgb_color(0,128,255),fl_rgb_color(255,0,128),
-	fl_rgb_color(255,128,0),fl_rgb_color(0,255,128),fl_rgb_color(128,0,255),
-	fl_rgb_color(128,128,255),fl_rgb_color(255,128,128),fl_rgb_color(128,255,128),
-	fl_rgb_color(255,255,128),fl_rgb_color(128,255,255),fl_rgb_color(255,128,255),
-	fl_rgb_color(64,0,0),fl_rgb_color(0,64,0),fl_rgb_color(0,0,64),
-	fl_rgb_color(0,64,64),fl_rgb_color(64,0,64),fl_rgb_color(64,64,0),
-	fl_rgb_color(64,255,0),fl_rgb_color(0,64,255),fl_rgb_color(255,0,64),
-	fl_rgb_color(255,64,0),fl_rgb_color(0,255,64),fl_rgb_color(64,0,255),
-	fl_rgb_color(64,64,255),fl_rgb_color(255,64,64),fl_rgb_color(64,255,64),
-	fl_rgb_color(255,255,64),fl_rgb_color(64,255,255),fl_rgb_color(255,64,255),
-	fl_rgb_color(64,128,0),fl_rgb_color(0,64,128),fl_rgb_color(128,0,64),
-	fl_rgb_color(128,64,0),fl_rgb_color(0,128,64),fl_rgb_color(64,0,128),
-	fl_rgb_color(64,64,128),fl_rgb_color(128,64,64),fl_rgb_color(64,128,64),
-	fl_rgb_color(128,128,64),fl_rgb_color(64,128,128),fl_rgb_color(128,64,128),
-	fl_rgb_color(192,0,0),fl_rgb_color(0,192,0),fl_rgb_color(0,0,192),
-	fl_rgb_color(0,192,192),fl_rgb_color(192,0,192),fl_rgb_color(192,192,0),
-	fl_rgb_color(192,255,0),fl_rgb_color(0,192,255),fl_rgb_color(255,0,192),
-	fl_rgb_color(255,192,0),fl_rgb_color(0,255,192),fl_rgb_color(192,0,255),
-	fl_rgb_color(192,192,255),fl_rgb_color(255,192,192),fl_rgb_color(192,255,192),
-	fl_rgb_color(255,255,192),fl_rgb_color(192,255,255),fl_rgb_color(255,192,255),
-	fl_rgb_color(192,128,0),fl_rgb_color(0,192,128),fl_rgb_color(128,0,192),
-	fl_rgb_color(128,192,0),fl_rgb_color(0,128,192),fl_rgb_color(192,0,128),
-	fl_rgb_color(192,192,128),fl_rgb_color(128,192,192),fl_rgb_color(192,128,192),
-	fl_rgb_color(128,128,192),fl_rgb_color(192,128,128),fl_rgb_color(128,192,128),
-	fl_rgb_color(192,64,0),fl_rgb_color(0,192,64),fl_rgb_color(64,0,192),
-	fl_rgb_color(64,192,0),fl_rgb_color(0,64,192),fl_rgb_color(192,0,64),
-	fl_rgb_color(192,192,64),fl_rgb_color(64,192,192),fl_rgb_color(192,64,192),
-	fl_rgb_color(64,64,192),fl_rgb_color(192,64,64),fl_rgb_color(64,192,64) };
-
 	// Main window default sizes
 	const unsigned int WIDTH = 1000;
 	const unsigned int HEIGHT = 650;
