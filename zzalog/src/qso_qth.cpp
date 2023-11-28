@@ -60,6 +60,7 @@ void qso_qth::create_form(int X, int Y) {
 
 	bn_edit_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Edit");
 	bn_edit_->color(COLOUR_MAUVE);
+	bn_edit_->labelcolor(FL_BLACK);
 	bn_edit_->callback(cb_bn_edit, nullptr);
 	bn_edit_->tooltip("Open window to allow QTH to be edited");
 	max_x = max(max_x, bn_edit_->x() + bn_edit_->w());
@@ -164,7 +165,7 @@ void qso_qth::table::draw_cell(TableContext context, int R, int C, int X, int Y,
 		fl_push_clip(X, Y, W, H);
 		{
 			// TEXT
-			Fl_Color fg_colour = FL_BLACK;
+			Fl_Color fg_colour = FL_FOREGROUND_COLOR;
 			if (!active_r()) fg_colour = fl_inactive(fg_colour);
 			fl_color(fg_colour);
 			string field_name = fields_[R];
@@ -181,7 +182,7 @@ void qso_qth::table::draw_cell(TableContext context, int R, int C, int X, int Y,
 			fl_draw(text.c_str(), X + 1, Y, W - 1, H, FL_ALIGN_LEFT);
 
 			// BORDER
-			fl_color(FL_LIGHT1);
+			fl_color(COLOUR_GREY);
 			// draw top and right edges only
 			fl_line(X, Y, X + W - 1, Y, X + W - 1, Y + H - 1);
 			fl_pop_clip();
