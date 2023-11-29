@@ -123,7 +123,7 @@ void qso_details::table_d::draw_cell(TableContext context, int R, int C, int X, 
 		fl_push_clip(X, Y, W, H);
 		{
 			fl_draw_box(FL_THIN_UP_BOX, X, Y, W, H, row_header_color());
-			fl_color(active_r() ? FL_BLACK : fl_inactive(FL_BLACK));
+			fl_color(active_r() ? FL_FOREGROUND_COLOR : fl_inactive(FL_FOREGROUND_COLOR));
 			fl_font(FL_ITALIC | FL_BOLD, FL_NORMAL_SIZE);
 			const char* heading = name_map_.at(items_[R].type).heading;
 			if (R == 0) fl_draw(heading, X, Y, W, H, FL_ALIGN_LEFT);
