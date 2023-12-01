@@ -279,9 +279,9 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 		// Hide all the open windows - this will allow Fl to close the app.
 		for (Fl_Window* wx = Fl::first_window(); wx; wx = Fl::first_window()) wx->hide();
 		// Leave the status file viewer visible if a severe or fatal error forced the shutdown.
-		if (close_by_error_ && status_->file_viewer()) {
-			status_->file_viewer()->show();
-		}
+		// if (close_by_error_ && status_->file_viewer()) {
+		// 	status_->file_viewer()->show();
+		// }
 
 		// Exit and close application
 		printf("ZZALOG: Closed\n");

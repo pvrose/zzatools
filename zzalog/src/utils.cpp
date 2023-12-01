@@ -263,19 +263,7 @@ void string_to_ints(string& text, vector<unsigned int>& ints) {
 }
 
 // returns the current time in supplied format
-string now(bool local, const char* format) {
-	// Get current time
-	time_t now = time(nullptr);
-	// convert to struct in selected timezone
-	tm* figures = local ? localtime(&now) : gmtime(&now);
-	char result[100];
-	// convert to C string, then C++ string
-	strftime(result, 99, format, figures);
-	return string(result);
-}
-
-// Print current time to the millisecond
-string now_ms() {
+string now(bool local, const char* format, bool add_ms) {
 	system_clock::time_point p = system_clock::now();
 
 	milliseconds ms = duration_cast<milliseconds>(p.time_since_epoch());
@@ -285,11 +273,20 @@ string now_ms() {
 	tm* utc = gmtime(&t);
 	size_t fractional_seconds = ms.count() % 1000;
 
-	char* result = new char[20];
-	strftime(result, 20, "%H:%M:%S", utc);
-	snprintf(result + 8, 10, ".%d", (int)fractional_seconds);
+	char result[50];
+	strftime(result, sizeof(result), format, utc);
+	if (add_ms) {
+		char ms[5];
+		snprintf(ms, sizeof(ms), ".%03d", (int)fractional_seconds);
+		strcat(result, ms);
+	}
 
 	return string(result);
+}
+
+// Print current time to the millisecond
+string now_ms() {
+	now(false, "%H:%M:%S", true);
 }
 
 // copy tm to time_t and back to update derived values in tm struct

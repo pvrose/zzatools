@@ -113,62 +113,62 @@ using namespace std;
 	// 
 	enum object_t;
 
-	// This class extends Fl_Text_Buffer by switching off UTF-8 warnin
-	class text_buffer : public Fl_Text_Buffer {
-	public:
-		text_buffer(int requestedSize = 0, int preferredGapSize = 1024);
-		~text_buffer();
-	};
+	// // This class extends Fl_Text_Buffer by switching off UTF-8 warnin
+	// class text_buffer : public Fl_Text_Buffer {
+	// public:
+	// 	text_buffer(int requestedSize = 0, int preferredGapSize = 1024);
+	// 	~text_buffer();
+	// };
 
-	// This class provides an extension to the Text Display widget to allow the buffer to be reloaded
-	class text_display : public Fl_Text_Display {
-	public:
-		text_display(int X, int Y, int W, int H, const char* label = nullptr);
-		~text_display();
+	// // This class provides an extension to the Text Display widget to allow the buffer to be reloaded
+	// class text_display : public Fl_Text_Display {
+	// public:
+	// 	text_display(int X, int Y, int W, int H, const char* label = nullptr);
+	// 	~text_display();
 
-		void append(const char* line);
+	// 	void append(const char* line);
 
-		// Text filter
-		string filter_;
-		// Status filter
-		status_t status_filter_;
+	// 	// Text filter
+	// 	string filter_;
+	// 	// Status filter
+	// 	status_t status_filter_;
 
 
-	};
+	// };
 
-	// This class provides the window in which to display the status log
-	class viewer_window : public Fl_Window {
-	public:
-		viewer_window(int W, int Y, const char* label = nullptr);
-		~viewer_window();
+	// // This class provides the window in which to display the status log
+	// class viewer_window : public Fl_Window {
+	// public:
+	// 	viewer_window(int W, int Y, const char* label = nullptr);
+	// 	~viewer_window();
 
-		virtual int handle(int event);
-		// Add a line to the window
-		void append(const char* line);
-		// Draw the window
-		void draw_window();
-		// Apply colours to the various levels of message
-		void colour_buffer();
+	// 	virtual int handle(int event);
+	// 	// Add a line to the window
+	// 	void append(const char* line);
+	// 	// Draw the window
+	// 	void draw_window();
+	// 	// Apply colours to the various levels of message
+	// 	void colour_buffer();
 
-	protected:
-		// Find text in Text Buffer
-		static void cb_find(Fl_Widget* w, void* v);
-		// Filter choice button
-		static void cb_ch_filter(Fl_Widget* w, void* v);
-		// Status filter 
-		static void cb_ch_status(Fl_Widget* w, void* v);
+	// protected:
+	// 	// Find text in Text Buffer
+	// 	static void cb_find(Fl_Widget* w, void* v);
+	// 	// Filter choice button
+	// 	static void cb_ch_filter(Fl_Widget* w, void* v);
+	// 	// Status filter 
+	// 	static void cb_ch_status(Fl_Widget* w, void* v);
 
-		// Display widget
-		text_display* display_;
-		// Find search string
-		string search_;
-		// Search direction
-		int direction_;
-		// Whether to match case
-		int match_case_;
-		// The raw data - for restoring to buffer
-		vector<const char*> original_lines_;
-	};
+	// 	// Display widget
+	// 	text_display* display_;
+	// 	// Find search string
+	// 	string search_;
+	// 	// Search direction
+	// 	int direction_;
+	// 	// Whether to match case
+	// 	int match_case_;
+	// 	// The raw data - for restoring to buffer
+	// 	vector<const char*> original_lines_;
+	// };
 
 	// A progress stack entry
 	struct progress_item {
@@ -201,16 +201,16 @@ using namespace std;
 		// Update file status
 		void file_status(file_status_t status);
 		// return misc_status widget
-		Fl_Widget* misc_status();
+		// Fl_Widget* misc_status();
 		// Set minimum status reporting level
 		void min_level(status_t);
 		status_t min_level();
 		// Append or overwrite status log
 		void append_log(bool append);
 		// Set file viewer to nullptr
-		void null_file_viewer();
+		// void null_file_viewer();
 		// Get status_file_viewer
-		Fl_Window* file_viewer();
+		// Fl_Window* file_viewer();
 		// Debug display
 		void display_debug(bool value);
 		bool display_debug();
@@ -221,9 +221,9 @@ using namespace std;
 		// Rig button callback
 		static void cb_bn_rig(Fl_Widget* bn, void* v);
 		// Misc button callback
-		static void cb_bn_misc(Fl_Widget* bn, void* v);
+		// static void cb_bn_misc(Fl_Widget* bn, void* v);
 		// File viewer close callback
-		static void cb_fv_close(Fl_Widget* w, void* v);
+		// static void cb_fv_close(Fl_Widget* w, void* v);
 
 
 	protected:
@@ -232,15 +232,15 @@ using namespace std;
 
 	protected:
 		// Progress bar - shows progress during activities that take noticeable time
-		Fl_Progress* progress_;
+		// Fl_Progress* progress_;
 		// Rig status - when a rig connected regularly update from rig
 		Fl_Button* rig_status_;
 		// Miscellaneous status - used to display messages from the aplication
-		Fl_Button* misc_status_;
+		// Fl_Button* misc_status_;
 		// File status
 		Fl_Button* file_status_;
 		// Status file viewer
-		viewer_window* status_file_viewer_;
+		// viewer_window* status_file_viewer_;
 		// Containing window
 
 		// Status report file

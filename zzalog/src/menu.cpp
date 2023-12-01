@@ -494,14 +494,14 @@ void menu::cb_mi_windows_all(Fl_Widget* w, void* v) {
 	if (show_all) {
 		main_window_->show();
 		qso_manager_->show();
-		status_->file_viewer()->show();
+		// status_->file_viewer()->show();
 		intl_dialog_->show();
 	}
 	else {
 		// Minimise the main window rather than hide it. When all windows are hidden we end the app
 		main_window_->iconize();
 		qso_manager_->hide();
-		status_->file_viewer()->hide();
+		// status_->file_viewer()->hide();
 		intl_dialog_->hide();
 	}
 	that->update_windows_items();
@@ -1255,7 +1255,7 @@ void menu::cb_mi_help_abt(Fl_Widget* w, void* v) {
 // Help->Status->View - display status log file
 // v is not used
 void menu::cb_mi_help_view(Fl_Widget* w, void* v) {
-	status_->misc_status()->do_callback();
+	// status_->misc_status()->do_callback();
 }
 
 // Help->Status->Note/Done/Warning/Error/Fatal
@@ -1709,7 +1709,7 @@ void menu::add_windows_items() {
 	int index = find_index("&Windows/&Hide All");
 	insert(index, "&Windows/&Main", 0, cb_mi_windows, main_window_, FL_MENU_TOGGLE);
 	insert(index, "&Windows/Das&hboard", 0, cb_mi_windows, qso_manager_, FL_MENU_TOGGLE);
-	insert(index, "&Windows/S&tatus Viewer", 0, cb_mi_windows, status_->file_viewer(), FL_MENU_TOGGLE);
+	// insert(index, "&Windows/S&tatus Viewer", 0, cb_mi_windows, status_->file_viewer(), FL_MENU_TOGGLE);
 	insert(index, "&Windows/&International Chars", 0, cb_mi_windows, intl_dialog_, FL_MENU_TOGGLE);
 }
 
@@ -1740,14 +1740,14 @@ void menu::update_windows_items() {
 		}
 	}
 
-	if (status_ && status_->file_viewer() && index_status != -1) {
-		if (status_->file_viewer()->visible()) {
-			mode(index_status, mode(index_status) | FL_MENU_VALUE);
-		}
-		else {
-			mode(index_status, mode(index_status) & ~FL_MENU_VALUE);
-		}
-	}
+	// if (status_ && status_->file_viewer() && index_status != -1) {
+	// 	if (status_->file_viewer()->visible()) {
+	// 		mode(index_status, mode(index_status) | FL_MENU_VALUE);
+	// 	}
+	// 	else {
+	// 		mode(index_status, mode(index_status) & ~FL_MENU_VALUE);
+	// 	}
+	// }
 
 	if (intl_dialog_ && index_intl != -1) {
 		if (intl_dialog_->visible()) {

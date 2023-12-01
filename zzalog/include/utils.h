@@ -57,7 +57,7 @@ using namespace std;
 	// Convert a string e.g. 00-06:08 to an array of UINTs {0,1,2,3,4,5,6,8}
 	void string_to_ints(string& text, vector<unsigned int>& ints);
 	// get the time in specific fomat
-	string now(bool local, const char* format);
+	string now(bool local, const char* format, bool add_ms = false);
 	// Get the time stamp to millisecond
 	string now_ms();
 	// test for leap year
