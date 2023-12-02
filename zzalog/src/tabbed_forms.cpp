@@ -72,12 +72,12 @@ void tabbed_forms::add_view(const char* label, field_ordering_t column_data, obj
 	// label - a bit bigger than text font size
 	view->labelsize(FL_NORMAL_SIZE + 1);
 	// standard colour used to represent this view - its tab, selected record/item and progress bar
-	Fl_Color bg_colour = OBJECT_COLOURS.at(object);
-	view->selection_color(bg_colour);
-	// The colour for undrawn parts of the view - 25% colour, 75% white
-	view->color(fl_color_average(bg_colour, FL_WHITE, 0.25));
-	// Draw the label text in a contrasting colour
-	view->labelcolor(fl_contrast(FL_BLACK, bg_colour));
+	// Fl_Color bg_colour = OBJECT_COLOURS.at(object);
+	// view->selection_color(bg_colour);
+	// // The colour for undrawn parts of the view - 25% colour, 75% white
+	// view->color(fl_color_average(bg_colour, FL_WHITE, 0.25));
+	// // Draw the label text in a contrasting colour
+	// view->labelcolor(fl_contrast(FL_FOREGROUND_COLOR, bg_colour));
 	// Add the tooltip
 	view->tooltip(tooltip);
 	// Add the view to the Fl_Tabs widget
@@ -137,7 +137,8 @@ void tabbed_forms::activate_pane(object_t pane, bool active) {
 		}
 		// Update and Select the pane
 		value(w);
-		selection_color(value()->color());
+		// selection_color(value()->color());
+		// w->labelcolor(FL_BLACK);
 		switch (pane) {
 		case OT_MAIN:
 			navigation_book_ = book_;
@@ -159,9 +160,10 @@ void tabbed_forms::activate_pane(object_t pane, bool active) {
 			view* vm = forms_[OT_MAIN].v;
 			Fl_Widget* wm = forms_[OT_MAIN].w;
 			value(wm);
-			selection_color(value()->color());
+			// selection_color(value()->color());
 			navigation_book_ = book_;
 		}
+		// w->labelcolor(fl_contrast(FL_FOREGROUND_COLOR, w->color()));
 		w->deactivate();
 	}
 }
@@ -198,7 +200,9 @@ view* tabbed_forms::get_view(object_t view_name) {
 void tabbed_forms::cb_tab_change(Fl_Widget* w, void* v) {
 	tabbed_forms* that = (tabbed_forms*)w;
 	// Set the colour to that of the pane
-	that->selection_color(that->value()->color());
+	// that->selection_color(that->value()->color());
+	that->value()->labelcolor(fl_contrast(FL_FOREGROUND_COLOR, that->value()->color()));
+
 	log_table* table = dynamic_cast<log_table*>(that->value());
 	if (table) {
 		// The pane is a log book viewer. Change the navigation controls to affect that pane
