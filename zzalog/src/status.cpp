@@ -36,7 +36,7 @@ extern bool DEBUG_STATUS;
 status::status(int X, int Y, int W, int H, const char* label) :
 	Fl_Group(X, Y, W, H, label)
 	// , progress_(nullptr)
-	, rig_status_(nullptr)
+	// , rig_status_(nullptr)
 	// , misc_status_(nullptr)
 	, file_status_(nullptr)
 	// , status_file_viewer_(nullptr)
@@ -84,18 +84,18 @@ status::status(int X, int Y, int W, int H, const char* label) :
 
 	// Add rig status
 	// const int rig_status_w = rem_w * WRIG / WALL;
-	const int rig_status_w = rem_w;
-	// Button - rig status
-	rig_status_ = new Fl_Button(curr_x, Y, rig_status_w, H, "Rig connection not yet established");
-	rig_status_->box(FL_DOWN_BOX);
-	rig_status_->color(STATUS_COLOURS.at(ST_NONE).bg);
-	rig_status_->labelcolor(FL_BLACK);
-	rig_status_->copy_tooltip(rig_status_->label());
-	// Add callback to try and reconnect the rig
-	rig_status_->callback(cb_bn_rig);
-	rig_status_->when(FL_WHEN_RELEASE);
-	add(rig_status_);
-	curr_x += rig_status_w;
+	// const int rig_status_w = rem_w;
+	// // Button - rig status
+	// rig_status_ = new Fl_Button(curr_x, Y, rig_status_w, H, "Rig connection not yet established");
+	// rig_status_->box(FL_DOWN_BOX);
+	// rig_status_->color(STATUS_COLOURS.at(ST_NONE).bg);
+	// rig_status_->labelcolor(FL_BLACK);
+	// rig_status_->copy_tooltip(rig_status_->label());
+	// // Add callback to try and reconnect the rig
+	// rig_status_->callback(cb_bn_rig);
+	// rig_status_->when(FL_WHEN_RELEASE);
+	// add(rig_status_);
+	// curr_x += rig_status_w;
 
 	// // Miscellaneous status - used for general status and error information
 	// const int misc_w = rem_w * WMISC / WALL;
@@ -300,17 +300,6 @@ void status::ticker() {
 		// Display progress item at top of stack
 		update_progress(progress_stack_.back());
 	}
-}
-
-// Update rig_status - set text and colour
-void status::rig_status(rig_status_t status, const char* label) {
-	// Set the fixed label and tool tip value. Set the text colour to contrast the button colour
-	Fl_Color colour = RIG_STATUS_COLOURS.at(status);
-	rig_status_->copy_label(label);
-	rig_status_->color(colour);
-	rig_status_->labelcolor(fl_contrast(FL_BLACK, colour));
-	rig_status_->copy_tooltip(label);
-	//rig_status_->redraw();
 }
 
 // Update miscellaneous status - set text and colour, log the status

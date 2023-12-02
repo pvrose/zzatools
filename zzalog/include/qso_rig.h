@@ -17,6 +17,8 @@
 
 using namespace std;
 
+
+
 class qso_rig :
     public Fl_Group
 {
@@ -131,6 +133,7 @@ protected:
 	int gain_;
 	bool modify_power_;
 	double power_;
+
 
 };
 

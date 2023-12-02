@@ -443,12 +443,21 @@ void qso_rig::enable_widgets() {
 	// Status
 	if (!rig_) {
 		op_status_->value("No rig specified");
+		op_status_->textcolor(FL_YELLOW);
 	} else if (rig_->is_opening()) {
 		op_status_->value("Opening rig");
+		op_status_->textcolor(FL_CYAN);
 	} else if (rig_->is_open()) {
-		op_status_->value("Connected");
+		if (rig_->get_ptt()) {
+			op_status_->value("Transmitting");
+			op_status_->textcolor(FL_RED);
+		} else {
+			op_status_->value("Receiving");
+			op_status_->textcolor(FL_GREEN);
+		}
 	} else {
 		op_status_->value("Disconnected");
+		op_status_->textcolor(COLOUR_ORANGE);
 	}
 	// CAT control widgets - allow only when select button active
 	if (bn_select_->value()) {
@@ -861,14 +870,6 @@ void qso_rig::ticker() {
 		rig_->ticker();
 		// The rig may have disconnected - update connect/select buttons
 		enable_widgets();
-		// Update status with latest values from rig
-		string msg = rig_->rig_info();
-		rig_status_t st;
-		if (!rig_->is_open()) st = RS_OFF;
-		else if (!rig_->is_good()) st = RS_ERROR;
-		else if (!rig_->get_ptt()) st = RS_RX;
-		else st = RS_TX;
-		status_->rig_status(st, msg.c_str());
 	}
 }
 

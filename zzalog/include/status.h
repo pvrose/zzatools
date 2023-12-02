@@ -28,14 +28,6 @@ using namespace std;
 		FS_SAVING            // The log is being saved
 	};
 
-	// The status of the rig
-	enum rig_status_t {
-		RS_OFF,              // The rig is off or disconnected
-		RS_ERROR,            // An error with the rig occured
-		RS_RX,               // The rig is connected and in RX mode
-		RS_TX,               // The rig is connected and in TX mode
-		RS_HIGH              // The rig is in TX mode but SWR is too high
-	};
 
 	// Default colours for status bars
 	struct colours_t {
@@ -103,15 +95,6 @@ using namespace std;
 		{ FS_MODIFIED, FL_RED },
 		{ FS_LOADING, FL_YELLOW },
 		{ FS_SAVING, FL_CYAN }
-	};
-
-	// Default colours for rig status
-	const map<rig_status_t, Fl_Color> RIG_STATUS_COLOURS = {
-		{ RS_OFF, FL_YELLOW },
-		{ RS_ERROR, fl_color_average(FL_RED, FL_YELLOW, 0.5)},
-		{ RS_RX, FL_GREEN },
-		{ RS_TX, FL_RED },
-		{ RS_HIGH, fl_darker(FL_RED) }
 	};
 
 	// 
@@ -198,8 +181,6 @@ using namespace std;
 		void progress(int value, object_t object);
 		// Update progress with a text message and mark 100%
 		void progress(const char* message, object_t object);
-		// Update rig_status
-		void rig_status(rig_status_t status, const char* label);
 		// Update miscellaneous status
 		void misc_status(status_t status, const char* label);
 		// Update file status
@@ -242,7 +223,7 @@ using namespace std;
 		// Progress bar - shows progress during activities that take noticeable time
 		// Fl_Progress* progress_;
 		// Rig status - when a rig connected regularly update from rig
-		Fl_Button* rig_status_;
+		// Fl_Button* rig_status_;
 		// Miscellaneous status - used to display messages from the aplication
 		// Fl_Button* misc_status_;
 		// File status
