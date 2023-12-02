@@ -198,9 +198,10 @@ void status::misc_status(status_t status, const char* label) {
 		// Restore default colours
 		const char restore[] = "\033[0m";
 		const char faint[] = "\033[2m";
-		printf("%s%s %s%s%s%s\n", 
+		printf("%s%s%s %s%s%s%s\n", 
 			faint,
 			timestamp.c_str(), 
+			restore,
 			colour_code(status, true).c_str(),
 			colour_code(status, false).c_str(),
 			label,

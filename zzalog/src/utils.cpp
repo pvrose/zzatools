@@ -286,7 +286,7 @@ string now(bool local, const char* format, bool add_ms) {
 
 // Print current time to the millisecond
 string now_ms() {
-	now(false, "%H:%M:%S", true);
+	return now(false, "%H:%M:%S", true);
 }
 
 // copy tm to time_t and back to update derived values in tm struct

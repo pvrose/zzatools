@@ -153,7 +153,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="zzalog\src\band_data.cpp" />
-    <ClCompile Include="zzalog\src\dxa_if.cpp" />
     <ClCompile Include="zzalog\src\page_dialog.cpp" />
     <ClCompile Include="zzalog\src\qso_buttons.cpp" />
     <ClCompile Include="zzalog\src\qso_clock.cpp" />
@@ -192,8 +191,6 @@
     <ClCompile Include="zzalog\src\adi_writer.cpp" />
     <ClCompile Include="zzalog\src\adx_reader.cpp" />
     <ClCompile Include="zzalog\src\adx_writer.cpp" />
-    <ClCompile Include="zzalog\src\alarm_dial.cpp" />
-    <ClCompile Include="zzalog\src\band_view.cpp" />
     <ClCompile Include="zzalog\src\book.cpp" />
     <ClCompile Include="zzalog\src\calendar.cpp" />
     <ClCompile Include="zzalog\src\change_dialog.cpp" />
@@ -245,7 +242,6 @@
     <ClInclude Include="zzalog\include\band_data.h" />
     <ClInclude Include="zzalog\include\callback.h" />
     <ClInclude Include="zzalog\include\drawing.h" />
-    <ClInclude Include="zzalog\include\dxa_if.h" />
     <ClInclude Include="zzalog\include\formats.h" />
     <ClInclude Include="zzalog\include\page_dialog.h" />
     <ClInclude Include="zzalog\include\qso_buttons.h" />
@@ -284,8 +280,6 @@
     <ClInclude Include="zzalog\include\adi_writer.h" />
     <ClInclude Include="zzalog\include\adx_reader.h" />
     <ClInclude Include="zzalog\include\adx_writer.h" />
-    <ClInclude Include="zzalog\include\alarm_dial.h" />
-    <ClInclude Include="zzalog\include\band_view.h" />
     <ClInclude Include="zzalog\include\book.h" />
     <ClInclude Include="zzalog\include\calendar.h" />
     <ClInclude Include="zzalog\include\change_dialog.h" />
