@@ -131,25 +131,25 @@
 		static void cb_mi_info_web(Fl_Widget* w, void* v);
 		// Help->About
 		static void cb_mi_help_abt(Fl_Widget* w, void* v);
-		// Help->View Status
-		static void cb_mi_help_view(Fl_Widget* w, void* v);
-		// Help->Minimum status level
-		static void cb_mi_help_level(Fl_Widget* w, void* v);
-		// Help->Status->Append log
-		static void cb_mi_help_append(Fl_Widget* w, void* v);
+		// // Help->View Status
+		// static void cb_mi_help_view(Fl_Widget* w, void* v);
+		// // Help->Minimum status level
+		// static void cb_mi_help_level(Fl_Widget* w, void* v);
+		// // Help->Status->Append log
+		// static void cb_mi_help_append(Fl_Widget* w, void* v);
 		// Help->Show Intl
 		static void cb_mi_help_intl(Fl_Widget* w, void * v);
-		// Help->Status->Display Debug
-		static void cb_mi_help_ddebug(Fl_Widget* w, void* v);
+		// // Help->Status->Display Debug
+		// static void cb_mi_help_ddebug(Fl_Widget* w, void* v);
 
 		// Enable/disable menu
 		void enable(bool active);
 		// Set report mode
 		void report_mode(vector<report_cat_t> mode, report_filter_t filter);
-		// Set ststus level
-		void status_level(status_t level);
 		// Set append status
 		void append_file(bool append);
+		// // Set ststus level
+		// void status_level(status_t level);
 		// Add the recent files to the menu
 		void add_recent_files();
 		// Update menu items - activeness

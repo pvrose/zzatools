@@ -169,7 +169,6 @@ bool book::load_data(string filename)
 					input_.open(filename.c_str(), fstream::in);
 					// Load the book
 					if (book_type_ == OT_MAIN) {
-						status_->file_status(FS_LOADING);
 						main_loading_ = true;
 					}
 					if (!adi_reader_->load_book(this, input_)) {
@@ -198,14 +197,6 @@ bool book::load_data(string filename)
 							else {
 								main_window_label(filename);
 							}
-							if (modified()) {
-								status_->file_status(FS_MODIFIED);
-							}
-							else {
-								status_->file_status(FS_SAVED);
-							}
-							// Parse and validate
-//							Fl::wait();
 						}
 						delete adi_reader_;
 						adi_reader_ = nullptr;
@@ -229,7 +220,6 @@ bool book::load_data(string filename)
 					// Opening in text mode appears to do some behind-the-scenes processing
 					// when seeking backwards passed NL.
 					input_.open(filename.c_str(), fstream::in | fstream::binary);
-					status_->file_status(FS_LOADING);
 					main_loading_ = true;
 					if (!input_.good() || !adx_reader_->load_book(this, input_)) {
 						// Failed to complete the load
@@ -258,14 +248,6 @@ bool book::load_data(string filename)
 							else {
 								main_window_label(filename);
 							}
-							if (modified()) {
-								status_->file_status(FS_MODIFIED);
-							}
-							else {
-								status_->file_status(FS_SAVED);
-							}
-							// Parse and validate
-							//Fl::wait();
 						}
 						delete adx_reader_;
 						adx_reader_ = nullptr;
@@ -415,7 +397,6 @@ bool book::store_data(string filename, bool force, set<string>* fields) {
 				if (filetype == ".adi" || filetype == ".adif") {
 					// Connect file to output stream and get ADI writer to write it
 					if (book_type_ == OT_MAIN) {
-						status_->file_status(FS_SAVING);
 					}
 					file.open(filename_.c_str(), fstream::out);
 					adi_writer_ = new adi_writer;
@@ -437,7 +418,6 @@ bool book::store_data(string filename, bool force, set<string>* fields) {
 				else if (filetype == ".adx") {
 					// Connect file to output stream and store data
 					if (book_type_ == OT_MAIN) {
-						status_->file_status(FS_SAVING);
 					}
 					file.open(filename_.c_str(), fstream::out);
 					adx_writer_ = new adx_writer;
@@ -697,7 +677,6 @@ void book::delete_contents(bool new_book) {
 	}
 	if (book_type_ == OT_MAIN) {
 		// Update status to empty
-		status_->file_status(FS_EMPTY);
 		main_loading_ = false;
 	}
 }
@@ -834,22 +813,6 @@ void book::modified(bool value, bool update_progress /*= true*/) {
 	modified_ = value;
 	if (modified_) {
 		been_modified_ = true;
-	}
-	if (book_type_ == OT_MAIN) {
-		// Only change file status for main book
-		if (modified_) {
-			// Set the progress bar to indicate it's been modified
-			status_->file_status(FS_MODIFIED);
-		}
-		else {
-			// If the main book is empty indicate so.
-			if (get_count() == 0) {
-				status_->file_status(FS_EMPTY);
-			}
-			else {
-				status_->file_status(FS_SAVED);
-			}
-		}
 	}
 }
 

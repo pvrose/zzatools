@@ -624,10 +624,6 @@ void add_widgets(int& curr_y) {
 	main_window_->add(menu_);
 	menu_->enable(false);
 	curr_y += menu_->h();
-	// Status bar - tracks progress and reports any messages and errors.
-	status_ = new status(0, curr_y, WIDTH, TOOL_HEIGHT);
-	main_window_->add(status_);
-	curr_y += status_->h();
 	// Toolbar - image buttons representing a number of menu and other commands - disable all menu related buttons
 	toolbar_ = new toolbar(0, curr_y, WIDTH, TOOL_HEIGHT);
 	main_window_->add(toolbar_);
@@ -658,7 +654,7 @@ void resize_window() {
 	// Get minimum resizing from all the children - horizontal limited by views and toolbar
 	int min_w = max(tabbed_forms_->min_w(), toolbar_->min_w());
 	// Vertical limited by view, the bars remain a fixed height
-	int min_h = tabbed_forms_->min_h() + status_->h() + toolbar_->h() + menu_->h();
+	int min_h = tabbed_forms_->min_h() + toolbar_->h() + menu_->h();
 	main_window_->size_range(min_w, min_h);
 	// Set the size to the setting or minimum specified by the view + bars if that's larger
 	main_window_->resize(max(left, 0), max(top, 100), max(min_w, width), max(min_h, height));
@@ -751,6 +747,8 @@ int main(int argc, char** argv)
 	}
 	// Create the settings before anything else 
 	settings_ = new Fl_Preferences(Fl_Preferences::USER, VENDOR.c_str(), PROGRAM_ID.c_str());
+	// Ctreate status to handle status messages
+	status_ = new status();
 	// Create window
 	add_icon(argv[0]);
 	create_window();

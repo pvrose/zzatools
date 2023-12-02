@@ -9,14 +9,9 @@
 
 #include <iostream>
 
-#include <FL/Fl_Button.H>
-#include <FL/Fl_Radio_Round_Button.H>
 #include <FL/Fl.H>
 #include <FL/Fl_Preferences.H>
-#include <FL/Fl_Single_Window.H>
 #include <FL/Fl_Native_File_Chooser.H>
-#include <FL/Fl_Text_Display.H>
-#include <FL/Fl_Text_Buffer.H>
 #include <FL/fl_ask.H>
 
 using namespace std;
@@ -33,44 +28,43 @@ extern string PROGRAM_VERSION;
 extern bool DEBUG_STATUS;
 
 // Constructor
-status::status(int X, int Y, int W, int H, const char* label) :
-	Fl_Group(X, Y, W, H, label)
+status::status() :
 	// , progress_(nullptr)
 	// , rig_status_(nullptr)
 	// , misc_status_(nullptr)
-	, file_status_(nullptr)
+	// , file_status_(nullptr)
 	// , status_file_viewer_(nullptr)
-	, report_filename_("")
+	  report_filename_("")
 	, report_file_(nullptr)
-	, min_level_(ST_NONE)
-	, append_log_(false)
-	, rig_in_progress_(false)
+	// , min_level_(ST_NONE)
+	// , append_log_(false)
+	// , rig_in_progress_(false)
 	, file_unusable_(false)
-	, no_update_viewer(false)
-	, display_debug_messages_(false)
+	// , no_update_viewer(false)
+	// , display_debug_messages_(false)
 {
 	// Initialise attributes
 	progress_stack_.clear();
 	progress_items_.clear();
 
-	// Current position for next widget
-	int curr_x = X;
-	// Add modified indicator
-	const int file_w = H;
-	// BUTTON - colour by file status
-	file_status_ = new Fl_Button(curr_x, Y, file_w, H);
-	file_status_->box(FL_DOWN_BOX);
-	file_status_->color(FILE_STATUS_COLOURS.at(FS_EMPTY), FILE_STATUS_COLOURS.at(FS_EMPTY));
-	file_status_->tooltip("File status:\n\tOff white - log empty\n\tYellow - loading file\n"
-		"\tGreen - log saved to file\n\tRed - log modified\n\tCyan - saving file"
-		"\n\tDark Green - read-only unmodified\n\tDark Red - read-only modified");
-	add(file_status_);
-	curr_x += file_w;
-	const int rem_w = W - curr_x;
-	const int WPROG = 2;
-	const int WRIG = 3;
-	const int WMISC = 5;
-	const int WALL = WPROG + WRIG + WMISC;
+	// // Current position for next widget
+	// int curr_x = X;
+	// // Add modified indicator
+	// const int file_w = H;
+	// // BUTTON - colour by file status
+	// file_status_ = new Fl_Button(curr_x, Y, file_w, H);
+	// file_status_->box(FL_DOWN_BOX);
+	// file_status_->color(FILE_STATUS_COLOURS.at(FS_EMPTY), FILE_STATUS_COLOURS.at(FS_EMPTY));
+	// file_status_->tooltip("File status:\n\tOff white - log empty\n\tYellow - loading file\n"
+	// 	"\tGreen - log saved to file\n\tRed - log modified\n\tCyan - saving file"
+	// 	"\n\tDark Green - read-only unmodified\n\tDark Red - read-only modified");
+	// add(file_status_);
+	// curr_x += file_w;
+	// const int rem_w = W - curr_x;
+	// const int WPROG = 2;
+	// const int WRIG = 3;
+	// const int WMISC = 5;
+	// const int WALL = WPROG + WRIG + WMISC;
 
 	// // Add a progress bar widget - updated by all the processes which take a while
 	// const int progress_w = rem_w * WPROG / WALL;
@@ -111,7 +105,7 @@ status::status(int X, int Y, int W, int H, const char* label) :
 	// add(misc_status_);
 	// curr_x += misc_w;
 
-	end();
+	// end();
 
 	// Get report filename from the settings
 	char * filename;
@@ -132,12 +126,12 @@ status::status(int X, int Y, int W, int H, const char* label) :
 		delete chooser;
 	}
 
-	status_settings.get("Minimum Level", (int&)min_level_, ST_NOTE);
-	// Update menu to change enables
-	menu_->status_level(min_level_);
-	menu_->append_file(append_log_);
+	// status_settings.get("Minimum Level", (int&)min_level_, ST_NOTE);
+	// // Update menu to change enables
+	// menu_->status_level(min_level_);
+	// menu_->append_file(append_log_);
 
-	status_settings.get("Append", (int&)append_log_, false);
+	// status_settings.get("Append", (int&)append_log_, false);
 
 	// status_file_viewer_ = nullptr;
 }
@@ -145,7 +139,6 @@ status::status(int X, int Y, int W, int H, const char* label) :
 // Destructor
 status::~status()
 {
-	clear();
 	// if (!close_by_error_) delete status_file_viewer_;
 	if (report_file_) report_file_->close();
 	for (auto it = progress_items_.begin(); it != progress_items_.end(); it++) {
@@ -161,18 +154,18 @@ status::~status()
 // 	// status_file_viewer_ = nullptr;
 // }
 
-// Callbacks
-// Rig status bn callback - attempts to toggle rig connection state
-void status::cb_bn_rig(Fl_Widget* bn, void* v) {
-	status* that = ancestor_view<status>(bn);
-	qso_manager_->switch_rig();
-	bn->redraw();
-}
+// // Callbacks
+// // Rig status bn callback - attempts to toggle rig connection state
+// void status::cb_bn_rig(Fl_Widget* bn, void* v) {
+// 	status* that = ancestor_view<status>(bn);
+// 	qso_manager_->switch_rig();
+// 	bn->redraw();
+// }
 
 // Add a progress item to the stack
 void status::progress(int max_value, object_t object, const char* description, const char* suffix, bool countdown /*= false*/) {
 	// Turrn off file viewer update to improve performance
-	no_update_viewer = true;
+	// no_update_viewer = true;
 	// Initialise it
 	if (progress_items_.find(object) != progress_items_.end()) {
 		// We already have a progress bar process in place for this object
@@ -337,14 +330,8 @@ void status::misc_status(status_t status, const char* label) {
 	if (!report_file_) {
 		// Append the status to the file
 		// Try to open the file. Open and close it each message
-		if (append_log_) {
-			// Append the message to the log
-			report_file_ = new ofstream(report_filename_, ios::out | ios::app);
-		}
-		else {
-			// Create a new file 
-			report_file_ = new ofstream(report_filename_, ios::out | ios::trunc);
-		}
+		// Create a new file 
+		report_file_ = new ofstream(report_filename_, ios::out | ios::trunc);
 		if (!report_file_->good()) {
 			// File didn't open correctly
 			delete report_file_;
@@ -426,19 +413,19 @@ void status::misc_status(status_t status, const char* label) {
 	}
 }
 
-// Update file status
-void status::file_status(file_status_t status) {
-	Fl_Color colour;
-	if (READ_ONLY) {
-		// set a darker version of the colour if the file is read-only
-		colour = fl_darker(FILE_STATUS_COLOURS.at(status));
-	}
-	else {
-		colour = FILE_STATUS_COLOURS.at(status);
-	}
-	file_status_->color(colour, colour);
-	file_status_->redraw();
-}
+// // Update file status
+// void status::file_status(file_status_t status) {
+// 	Fl_Color colour;
+// 	if (READ_ONLY) {
+// 		// set a darker version of the colour if the file is read-only
+// 		colour = fl_darker(FILE_STATUS_COLOURS.at(status));
+// 	}
+// 	else {
+// 		colour = FILE_STATUS_COLOURS.at(status);
+// 	}
+// 	file_status_->color(colour, colour);
+// 	file_status_->redraw();
+// }
 
 // // Text buffer constructor
 // text_buffer::text_buffer(int requestedSize, int preferredGapSize) :
@@ -751,25 +738,25 @@ void status::file_status(file_status_t status) {
 // 	return misc_status_;
 // }
 
-// Set the minimum status severity level that is displayed
-void status::min_level(status_t level) {
-	min_level_ = level;
-	Fl_Preferences status_settings(settings_, "Status");
-	status_settings.set("Minimum Level", min_level_);
-}
+// // Set the minimum status severity level that is displayed
+// void status::min_level(status_t level) {
+// 	min_level_ = level;
+// 	Fl_Preferences status_settings(settings_, "Status");
+// 	status_settings.set("Minimum Level", min_level_);
+// }
 
-// Get the minimum status severity level that is displayed
-status_t status::min_level() {
-	return min_level_;
-}
+// // Get the minimum status severity level that is displayed
+// status_t status::min_level() {
+// 	return min_level_;
+// }
 
 
-// Set the append_log 
-void status::append_log(bool append) {
-	append_log_ = append;
-	Fl_Preferences status_settings(settings_, "Status");
-	status_settings.set("Append", (int)append_log_);
-}
+// // Set the append_log 
+// void status::append_log(bool append) {
+// 	append_log_ = append;
+// 	Fl_Preferences status_settings(settings_, "Status");
+// 	status_settings.set("Append", (int)append_log_);
+// }
 
 // // Close file viewer 
 // void status::cb_fv_close(Fl_Widget* w, void* v) {
@@ -782,13 +769,13 @@ void status::append_log(bool append) {
 // 	return status_file_viewer_;
 // }
 
-// Display debug
-void status::display_debug(bool value) {
-	display_debug_messages_ = value;
-}
-bool status::display_debug() {
-	return display_debug_messages_;
-}
+// // Display debug
+// void status::display_debug(bool value) {
+// 	display_debug_messages_ = value;
+// }
+// bool status::display_debug() {
+// 	return display_debug_messages_;
+// }
 
 string status::colour_code(status_t status, bool fg) {
 	char result[25];
