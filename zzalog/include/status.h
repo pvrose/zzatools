@@ -38,17 +38,21 @@ using namespace std;
 	};
 
 	// Default colours for status bars
-	const map<status_t, Fl_Color> STATUS_COLOURS = {
-		{ ST_NONE, FL_LIGHT2 },
-		{ ST_LOG, FL_FOREGROUND_COLOR },
-		{ ST_DEBUG, fl_lighter(FL_MAGENTA) },
-		{ ST_NOTE, fl_lighter(FL_CYAN) },
-		{ ST_OK, fl_lighter(FL_GREEN) },
-		{ ST_WARNING, FL_YELLOW },
-		{ ST_NOTIFY, fl_darker(FL_YELLOW) },
-		{ ST_ERROR, fl_lighter(FL_RED) },
-		{ ST_SEVERE, fl_darker(FL_RED) },
-		{ ST_FATAL, FL_BACKGROUND_COLOR }
+	struct colours_t {
+		Fl_Color fg;
+		Fl_Color bg;
+	};
+	const map<status_t, colours_t> STATUS_COLOURS = {
+		{ ST_NONE, { FL_LIGHT2, FL_BLACK } },
+		{ ST_LOG, { FL_WHITE, FL_BLACK } },
+		{ ST_DEBUG, { fl_lighter(FL_MAGENTA), FL_BLACK } },
+		{ ST_NOTE, { fl_lighter(FL_CYAN), FL_BLACK } },
+		{ ST_OK, { fl_lighter(FL_GREEN), FL_BLACK } },
+		{ ST_WARNING, { FL_YELLOW, FL_BLACK } },
+		{ ST_NOTIFY, { fl_darker(FL_YELLOW), FL_BLACK } },
+		{ ST_ERROR, { FL_RED, FL_BLACK } },
+		{ ST_SEVERE, { FL_RED, FL_WHITE } },
+		{ ST_FATAL, { FL_BLACK, FL_RED } }
 	};
 
 	// Code - letters witten to log file to indicate severity of the logged status
@@ -229,6 +233,10 @@ using namespace std;
 	protected:
 		// Re-initialise progress bar
 		void update_progress(object_t object);
+
+		// Colour code
+		string colour_code(status_t status, bool fg); 
+
 
 	protected:
 		// Progress bar - shows progress during activities that take noticeable time

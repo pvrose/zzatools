@@ -88,7 +88,7 @@ status::status(int X, int Y, int W, int H, const char* label) :
 	// Button - rig status
 	rig_status_ = new Fl_Button(curr_x, Y, rig_status_w, H, "Rig connection not yet established");
 	rig_status_->box(FL_DOWN_BOX);
-	rig_status_->color(STATUS_COLOURS.at(ST_NONE));
+	rig_status_->color(STATUS_COLOURS.at(ST_NONE).bg);
 	rig_status_->labelcolor(FL_BLACK);
 	rig_status_->copy_tooltip(rig_status_->label());
 	// Add callback to try and reconnect the rig
@@ -293,14 +293,13 @@ void status::progress(const char* message, object_t object) {
 	}
 }
 
-// 1 second ticker - redraw progress bar
+// 200 millisecond ticker - redraw progress bar
 void status::ticker() {
 	// Redraw all status 
 	if (progress_stack_.size()) {
 		// Display progress item at top of stack
 		update_progress(progress_stack_.back());
 	}
-	Fl::check();
 }
 
 // Update rig_status - set text and colour
@@ -329,11 +328,23 @@ void status::misc_status(status_t status, const char* label) {
 
 	// Start each entry with a timestamp
 	string timestamp = now(false, "%Y/%m/%d %H:%M:%S", true);
-	char* message = new char[timestamp.length() + 10 + strlen(label)];
+	char f_message[128];
 	// X YYYY/MM/DD HH:MM:SS Message 
 	// X is a single letter indicating the message severity
-	sprintf(message, "%c %s %s\n", STATUS_CODES.at(status), timestamp.c_str(), label);
+	snprintf(f_message, sizeof(f_message), "%c %s %s\n", STATUS_CODES.at(status), timestamp.c_str(), label);
 
+	if (DEBUG_STATUS) {
+		// Restore default colours
+		const char restore[] = "\033[0m";
+		const char faint[] = "\033[2m";
+		printf("%s%s %s%s%s%s\n", 
+			faint,
+			timestamp.c_str(), 
+			colour_code(status, true).c_str(),
+			colour_code(status, false).c_str(),
+			label,
+			restore);
+	}
 	if (!report_file_) {
 		// Append the status to the file
 		// Try to open the file. Open and close it each message
@@ -372,7 +383,7 @@ void status::misc_status(status_t status, const char* label) {
 	}
 	if (report_file_) {
 		// File did open correctly - write all message to file
-		*report_file_ << message;
+		*report_file_ << f_message;
 	}
 
 	// // Now add the line to the file viewer
@@ -386,15 +397,6 @@ void status::misc_status(status_t status, const char* label) {
 	// 	status_file_viewer_->hide();
 	// }
 	// if (status != ST_DEBUG || display_debug_messages_) status_file_viewer_->append(message);
-
-	if (DEBUG_STATUS) {
-		Fl_Color colour = STATUS_COLOURS.at(status);
-		unsigned char r, g, b;
-		Fl::get_color(colour, r, g, b);
-		char cc[20];
-		snprintf(cc, sizeof(cc), "\033[38;2;%d;%d;%dm", r, g, b);
-		cout << cc << message << "\033[38;5;15m";
-	}
 
 	// Depending on the severity: LOG, NOTE, OK, WARNING, ERROR, SEVERE or FATAL
 	// Beep on the last three.
@@ -797,4 +799,19 @@ void status::display_debug(bool value) {
 }
 bool status::display_debug() {
 	return display_debug_messages_;
+}
+
+string status::colour_code(status_t status, bool fg) {
+	char result[25];
+	unsigned char r, g, b;
+	if (fg) {
+		Fl_Color colour = STATUS_COLOURS.at(status).fg;
+		Fl::get_color(colour, r, g, b);
+		snprintf(result, sizeof(result), "\033[38;2;%d;%d;%dm", r, g, b);
+	} else {
+		Fl_Color colour = STATUS_COLOURS.at(status).bg;
+		Fl::get_color(colour, r, g, b);
+		snprintf(result, sizeof(result), "\033[48;2;%d;%d;%dm", r, g, b);
+	}
+	return string(result);
 }

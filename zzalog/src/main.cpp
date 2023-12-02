@@ -759,6 +759,8 @@ int main(int argc, char** argv)
 
 	// now show the window
 	main_window_->show(argc, argv);
+	// Start the ticker
+	Fl::add_timeout(TICK, cb_ticker);
 	// add the various drawn items
 	int curr_y = 0;
 	add_widgets(curr_y);
@@ -785,8 +787,6 @@ int main(int argc, char** argv)
 	int code = 0;
 	// We are now initialised
 	initialised_ = true;
-	// Start the ticker
-	Fl::add_timeout(TICK, cb_ticker);
 	if (!closing_) {
 		// Now we have created everything add the windows items to the menu
 		// Enable menu so that we can do thigs while waiting for Fllog client to appear
