@@ -172,21 +172,6 @@ settings* config_ = nullptr;
 		{ "&Cancel", 0, menu::cb_mi_imp_cancel, nullptr },
 		{ 0 },
 
-	//// Prefix reference
-	//	{ "&Reference", 0, 0, 0, FL_SUBMENU },
-	//		{ "&Prefix", 0, 0, 0, FL_SUBMENU },
-	//		{ "&Clear", 0, menu::cb_mi_ref_filter, (void*)RF_NONE, FL_MENU_RADIO },
-	//		{ "&All", 0, menu::cb_mi_ref_filter, (void*)RF_ALL, FL_MENU_RADIO | FL_MENU_VALUE },
-	//		{ "E&xtracted", 0, menu::cb_mi_ref_filter, (void*)RF_EXTRACTED, FL_MENU_RADIO },
-	//		{ "&Selected record", 0, menu::cb_mi_ref_filter, (void*)RF_SELECTED, FL_MENU_RADIO | FL_MENU_DIVIDER },
-	//		{ "&Code", 0, menu::cb_mi_ref_items, (void*)RI_CODE,  FL_MENU_RADIO | FL_MENU_VALUE },
-	//		{ "&Prefix", 0, menu::cb_mi_ref_items, (void*)RI_NICK, FL_MENU_RADIO },
-	//		{ "&Name", 0, menu::cb_mi_ref_items, (void*)RI_NAME, FL_MENU_RADIO | FL_MENU_DIVIDER },
-	//		{ "Add &details", 0, menu::cb_mi_ref_details, nullptr, FL_MENU_TOGGLE },
-	//		{ "&Reload data", 0, menu::cb_mi_ref_reload, 0},
-	//		{ 0 },
-	//	{ 0 },
-
 	// Log analysis reports
 	{ "Re&port", 0, 0, 0, FL_SUBMENU },
 		{ "&Clear", 0, menu::cb_mi_rep_filter, (void*)RF_NONE, FL_MENU_RADIO },
@@ -231,17 +216,6 @@ settings* config_ = nullptr;
 	// Program help features
 	{ "&Help", 0, 0, 0, FL_SUBMENU },
 		{ "&About", 0, menu::cb_mi_help_abt },
-		// { "&Status", 0, 0, 0, FL_SUBMENU },
-		// 	{ "View &Status", 0, menu::cb_mi_help_view, nullptr, FL_MENU_DIVIDER },
-		// 	{ "&Note", 0, menu::cb_mi_help_level, (void*)ST_NOTE, FL_MENU_RADIO | FL_MENU_VALUE },
-		// 	{ "&Done", 0, menu::cb_mi_help_level, (void*)ST_OK, FL_MENU_RADIO },
-		// 	{ "&Warning", 0, menu::cb_mi_help_level, (void*)ST_WARNING, FL_MENU_RADIO },
-		// 	{ "&Error", 0, menu::cb_mi_help_level, (void*)ST_ERROR, FL_MENU_RADIO },
-		// 	{ "Se&vere", 0, menu::cb_mi_help_level, (void*)ST_SEVERE, FL_MENU_RADIO },
-		// 	{ "&Fatal", 0, menu::cb_mi_help_level, (void*)ST_FATAL, FL_MENU_RADIO | FL_MENU_DIVIDER},
-		// 	{ "&Append File", 0 , menu::cb_mi_help_append, 0, FL_MENU_TOGGLE},
-		// 	{ "Display De&bug", 0, menu::cb_mi_help_ddebug, 0, FL_MENU_TOGGLE},
-		// 	{ 0 },
 		{ "&Intl", 0, menu::cb_mi_help_intl, nullptr, FL_MENU_TOGGLE },
 		{ 0 },
 	{ 0 }
@@ -1252,37 +1226,6 @@ void menu::cb_mi_help_abt(Fl_Widget* w, void* v) {
 	delete dialog;
 }
 
-// // Help->Status->View - display status log file
-// // v is not used
-// void menu::cb_mi_help_view(Fl_Widget* w, void* v) {
-// 	// status_->misc_status()->do_callback();
-// }
-
-// // Help->Status->Note/Done/Warning/Error/Fatal
-// // v is enum status_t: minimum display level
-// void menu::cb_mi_help_level(Fl_Widget* w, void* v) {
-// 	status_->min_level((status_t)(intptr_t)v);
-// }
-
-// // Help->Status->Display Debug
-// // v is unused
-// void menu::cb_mi_help_ddebug(Fl_Widget* w, void* v) {
-// 	// Get the value of the checked menu item
-// 	Fl_Menu_* menu = (Fl_Menu_*)w;
-// 	const Fl_Menu_Item* item = menu->mvalue();
-// 	bool value = item->value();
-// 	status_->display_debug(value);
-// }
-
-// // Help->Status->Append File
-// void menu::cb_mi_help_append(Fl_Widget* w, void* v) {
-// 	// Get the value of the checked menu item
-// 	Fl_Menu_* menu = (Fl_Menu_*)w;
-// 	const Fl_Menu_Item* item = menu->mvalue();
-// 	bool value = item->value();
-// 	status_->append_log(value);
-// }
-
 // Help->Intl - show/hide international character set
 // v is not used
 void menu::cb_mi_help_intl(Fl_Widget* w, void* v) {
@@ -1480,73 +1423,6 @@ void menu::report_mode(vector<report_cat_t> report_mode, report_filter_t filter)
 	}
 }
 
-// // Set check marks on the menu items Help->Status->* to reflect current display level
-// void menu::status_level(status_t level) {
-// 	// Set menu items Help->Status->*
-// 	int index_note = find_index("&Help/&Status/&Note");
-// 	int index_done = find_index("&Help/&Status/&Done");
-// 	int index_warning = find_index("&Help/&Status/&Warning");
-// 	int index_error = find_index("&Help/&Status/&Error");
-// 	int index_severe = find_index("&Help/&Status/Se&vere");
-// 	int index_fatal = find_index("&Help/&Status/&Fatal");
-// 	switch (level) {
-// 	case ST_NOTE:
-// 		// Set Help->Status->Note only
-// 		mode(index_note, mode(index_note) | FL_MENU_VALUE);
-// 		mode(index_done, mode(index_done) & ~FL_MENU_VALUE);
-// 		mode(index_warning, mode(index_warning) & ~FL_MENU_VALUE);
-// 		mode(index_error, mode(index_error) & ~FL_MENU_VALUE);
-// 		mode(index_severe, mode(index_severe) & ~FL_MENU_VALUE);
-// 		mode(index_fatal, mode(index_fatal) & ~FL_MENU_VALUE);
-// 		break;
-// 	case ST_OK:
-// 		// Set Help->Status->Done only
-// 		mode(index_note, mode(index_note) & ~FL_MENU_VALUE);
-// 		mode(index_done, mode(index_done)  | FL_MENU_VALUE);
-// 		mode(index_warning, mode(index_warning) & ~FL_MENU_VALUE);
-// 		mode(index_error, mode(index_error) & ~FL_MENU_VALUE);
-// 		mode(index_severe, mode(index_severe) & ~FL_MENU_VALUE);
-// 		mode(index_fatal, mode(index_fatal) & ~FL_MENU_VALUE);
-// 		break;
-// 	case ST_WARNING:
-// 		// Set Help->Status->Warning only
-// 		mode(index_note, mode(index_note) & ~FL_MENU_VALUE);
-// 		mode(index_done, mode(index_done) & ~FL_MENU_VALUE);
-// 		mode(index_warning, mode(index_warning) | FL_MENU_VALUE);
-// 		mode(index_error, mode(index_error) & ~FL_MENU_VALUE);
-// 		mode(index_severe, mode(index_severe) & ~FL_MENU_VALUE);
-// 		mode(index_fatal, mode(index_fatal) & ~FL_MENU_VALUE);
-// 		break;
-// 	case ST_ERROR:
-// 		// Set Help->Status->Error only
-// 		mode(index_note, mode(index_note) & ~FL_MENU_VALUE);
-// 		mode(index_done, mode(index_done) & ~FL_MENU_VALUE);
-// 		mode(index_warning, mode(index_warning) & ~FL_MENU_VALUE);
-// 		mode(index_error, mode(index_error) | FL_MENU_VALUE);
-// 		mode(index_severe, mode(index_severe) & ~FL_MENU_VALUE);
-// 		mode(index_fatal, mode(index_fatal) & ~FL_MENU_VALUE);
-// 		break;
-// 	case ST_SEVERE:
-// 		// Set Help->Status->Error only
-// 		mode(index_note, mode(index_note) & ~FL_MENU_VALUE);
-// 		mode(index_done, mode(index_done) & ~FL_MENU_VALUE);
-// 		mode(index_warning, mode(index_warning) & ~FL_MENU_VALUE);
-// 		mode(index_error, mode(index_error) & ~FL_MENU_VALUE);
-// 		mode(index_severe, mode(index_severe) | FL_MENU_VALUE);
-// 		mode(index_fatal, mode(index_fatal) & ~FL_MENU_VALUE);
-// 		break;
-// 	case ST_FATAL:
-// 		// Set Help->Status->Fatal only
-// 		mode(index_note, mode(index_note) & ~FL_MENU_VALUE);
-// 		mode(index_done, mode(index_done) & ~FL_MENU_VALUE);
-// 		mode(index_warning, mode(index_warning) & ~FL_MENU_VALUE);
-// 		mode(index_error, mode(index_error) & ~FL_MENU_VALUE);
-// 		mode(index_severe, mode(index_severe) & ~FL_MENU_VALUE);
-// 		mode(index_fatal, mode(index_fatal) | FL_MENU_VALUE);
-// 		break;
-// 	}
-// }
-
 // Update menu item Help->Status/Append File
 void menu::append_file(bool append) {
 	int index_append = find_index("&Help/&Status/&Append File");
@@ -1739,15 +1615,6 @@ void menu::update_windows_items() {
 			mode(index_oper, mode(index_oper) & ~FL_MENU_VALUE);
 		}
 	}
-
-	// if (status_ && status_->file_viewer() && index_status != -1) {
-	// 	if (status_->file_viewer()->visible()) {
-	// 		mode(index_status, mode(index_status) | FL_MENU_VALUE);
-	// 	}
-	// 	else {
-	// 		mode(index_status, mode(index_status) & ~FL_MENU_VALUE);
-	// 	}
-	// }
 
 	if (intl_dialog_ && index_intl != -1) {
 		if (intl_dialog_->visible()) {

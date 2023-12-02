@@ -111,14 +111,6 @@
 		static void cb_mi_imp_wsjtx(Fl_Widget* w, void* v);
 		// Import->Clipboard
 		static void cb_mi_imp_clipb(Fl_Widget* w, void* v);
-		//// Reference->Prefix->Clear/All/Extracted/Selected
-		//static void cb_mi_ref_filter(Fl_Widget* w, void* v);
-		//// Reference->Prefix->Items
-		//static void cb_mi_ref_items(Fl_Widget* w, void* v);
-		//// Reference->Prefix->Add details
-		//static void cb_mi_ref_details(Fl_Widget* w, void* v);
-		//// Reference->Prefix->Reload data
-		//static void cb_mi_ref_reload(Fl_Widget* w, void* v);
 		// Report->Clear/All/Extracted?Selected
 		static void cb_mi_rep_filter(Fl_Widget* w, void* v);
 		// Report->Levelx
@@ -131,16 +123,8 @@
 		static void cb_mi_info_web(Fl_Widget* w, void* v);
 		// Help->About
 		static void cb_mi_help_abt(Fl_Widget* w, void* v);
-		// // Help->View Status
-		// static void cb_mi_help_view(Fl_Widget* w, void* v);
-		// // Help->Minimum status level
-		// static void cb_mi_help_level(Fl_Widget* w, void* v);
-		// // Help->Status->Append log
-		// static void cb_mi_help_append(Fl_Widget* w, void* v);
 		// Help->Show Intl
 		static void cb_mi_help_intl(Fl_Widget* w, void * v);
-		// // Help->Status->Display Debug
-		// static void cb_mi_help_ddebug(Fl_Widget* w, void* v);
 
 		// Enable/disable menu
 		void enable(bool active);
