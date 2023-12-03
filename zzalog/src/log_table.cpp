@@ -81,9 +81,10 @@ log_table::log_table(int X, int Y, int W, int H, const char* label, field_orderi
 	col_header(true);
 	col_resize(true);
 	col_resize_min(10);
-	col_header_color(FL_GRAY);
+	col_header_color(COLOUR_GREY);
 	row_header(true);
-	row_header_color(FL_GRAY);
+	row_header_color(COLOUR_GREY);
+	selection_color(FL_BLUE);
 	fl_font(font_, fontsize_);
 	int row_height = fl_height() + 2;
 	adjust_row_sizes();
@@ -522,7 +523,7 @@ void log_table::draw_cell(TableContext context, int R, int C, int X, int Y, int 
 				fl_color(FL_RED);
 			}
 			else {
-				fl_color(fl_contrast(FL_BLUE, bg_colour));
+				fl_color(fl_contrast(FL_FOREGROUND_COLOR, bg_colour));
 			}
 			// Make this italic version of default font
 			Fl_Font save = fl_font();
