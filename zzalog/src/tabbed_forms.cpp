@@ -50,7 +50,8 @@ tabbed_forms::tabbed_forms(int X, int Y, int W, int H, const char* label) :
 	// Set the callback for changing tabs
 	callback(cb_tab_change);
 	// Set the selected label colour the same as the view being selected
-	selection_color(value()->color());
+	// selection_color(value()->color());
+	enable_widgets();
 }
 
 // Desctructor
@@ -67,10 +68,12 @@ void tabbed_forms::add_view(const char* label, field_ordering_t column_data, obj
 	int rw = 0;
 	int rh = 0;
 	client_area(rx, ry, rw, rh, 0);
+	Fl_Group* container = new Fl_Group(rx, ry, rw, rh, label);
+	container->labelsize(FL_NORMAL_SIZE + 2);
 	// Create the view
 	VIEW* view = new VIEW(rx, ry, rw, rh, label, column_data);
 	// label - a bit bigger than text font size
-	view->labelsize(FL_NORMAL_SIZE + 1);
+	// view->labelsize(FL_NORMAL_SIZE + 1);
 	// standard colour used to represent this view - its tab, selected record/item and progress bar
 	// Fl_Color bg_colour = OBJECT_COLOURS.at(object);
 	// view->selection_color(bg_colour);
@@ -81,8 +84,9 @@ void tabbed_forms::add_view(const char* label, field_ordering_t column_data, obj
 	// Add the tooltip
 	view->tooltip(tooltip);
 	// Add the view to the Fl_Tabs widget
-	add(view);
+	container->add(view);
 	// map the object type to the particular instance of view and Fl_Widget (they inherit both)
+	add(container);
 	forms_[object] = { view, view };
 }
 
@@ -129,14 +133,15 @@ void tabbed_forms::update_views(view* requester, hint_t hint, qso_num_t record_1
 void tabbed_forms::activate_pane(object_t pane, bool active) {
 	view* v = forms_[pane].v;
 	Fl_Widget* w = forms_[pane].w;
+	Fl_Group* g = w->parent();
 	if (active) {
 		// Make the pane active
 
-		if (!w->active()) {
-			w->activate();
+		if (!g->active()) {
+			g->activate();
 		}
 		// Update and Select the pane
-		value(w);
+		value(g);
 		// selection_color(value()->color());
 		// w->labelcolor(FL_BLACK);
 		switch (pane) {
@@ -152,20 +157,22 @@ void tabbed_forms::activate_pane(object_t pane, bool active) {
 		}
 		// Restore any query
 		v->update(last_hint_, last_record_1_, last_record_2_);
-		w->redraw();
+		g->redraw();
 	}
 	else {
 		// "Hide" the object by switching to the main log
 		if (pane != OT_MAIN) {
 			view* vm = forms_[OT_MAIN].v;
 			Fl_Widget* wm = forms_[OT_MAIN].w;
-			value(wm);
+			Fl_Group* gm = wm->parent();
+			value(gm);
 			// selection_color(value()->color());
 			navigation_book_ = book_;
 		}
 		// w->labelcolor(fl_contrast(FL_FOREGROUND_COLOR, w->color()));
-		w->deactivate();
+		g->deactivate();
 	}
+	enable_widgets();
 }
 
 // set the books into the various views
@@ -201,7 +208,8 @@ void tabbed_forms::cb_tab_change(Fl_Widget* w, void* v) {
 	tabbed_forms* that = (tabbed_forms*)w;
 	// Set the colour to that of the pane
 	// that->selection_color(that->value()->color());
-	that->value()->labelcolor(fl_contrast(FL_FOREGROUND_COLOR, that->value()->color()));
+	// that->value()->labelcolor(fl_contrast(FL_FOREGROUND_COLOR, that->value()->color()));
+	that->enable_widgets();
 
 	log_table* table = dynamic_cast<log_table*>(that->value());
 	if (table) {
@@ -218,7 +226,7 @@ void tabbed_forms::cb_tab_change(Fl_Widget* w, void* v) {
 			break;
 		}
 	}
-	view* as_view = dynamic_cast<view*>(that->value());
+	view* as_view = dynamic_cast<view*>(((Fl_Group*)that->value())->child(0));
 	as_view->update(that->last_hint_, that->last_record_1_, that->last_record_2_);
 }
 
@@ -240,4 +248,21 @@ int tabbed_forms::min_h() {
 		result = max(result, ix->second.v->min_h());
 	}
 	return result;
+}
+
+// Enable widgets
+void tabbed_forms::enable_widgets() {
+	// value() returns the selected widget. We need to test which widget it is.
+	Fl_Widget* tab = value();
+	for (int ix = 0; ix < children(); ix++) {
+		Fl_Widget* wx = child(ix);
+		if (wx == tab) {
+			wx->labelfont((wx->labelfont() | FL_BOLD) & (~FL_ITALIC));
+			wx->labelcolor(FL_FOREGROUND_COLOR);
+		}
+		else {
+			wx->labelfont((wx->labelfont() & (~FL_BOLD)) | FL_ITALIC);
+			wx->labelcolor(COLOUR_GREY);
+		}
+	}
 }

@@ -31,6 +31,7 @@ settings::settings(int W, int H, const char* label, cfg_dialog_t active) :
 	window_settings.get("Top", top, 100);
 	position(left, top);
 
+	children_ids_.clear();
 	// Create the set of tabs - leave enough space beneath for OK etc buttons.
 	Fl_Tabs* tabs = new Fl_Tabs(0, 0, W, H - HBUTTON - GAP);
 	tabs->callback(cb_tab);
@@ -46,39 +47,39 @@ settings::settings(int W, int H, const char* label, cfg_dialog_t active) :
 	files_dialog* files = new files_dialog(rx, ry, rw, rh, "File Locations");
 	files->labelfont(FL_BOLD);
 	files->labelsize(FL_NORMAL_SIZE + 2);
-	files->selection_color(fl_lighter(FL_YELLOW));
-	files->labelcolor(FL_BLACK);
 	files->tooltip("Allows the specification of the locations of various resources used by zzalog");
+	children_ids_.push_back(DLG_FILES);
 	// Web URLs, user-names and passwords
 	web_dialog* aweb = new web_dialog(rx, ry, rw, rh, "Web/Network");
 	aweb->labelfont(FL_BOLD);
 	aweb->labelsize(FL_NORMAL_SIZE + 2);
-	aweb->selection_color(fl_lighter(FL_YELLOW));
-	aweb->labelcolor(FL_BLACK);
 	aweb->tooltip("Allows the setting of user details for the various on-line services");
+	children_ids_.push_back(DLG_WEB);
 	// Fields settings - fields to display as columns in log views, first few rows in record view
 	// and fields to export to TSV files
 	fields_dialog* fields = new fields_dialog(rx, ry, rw, rh, "Fields");
 	fields->labelfont(FL_BOLD);
 	fields->labelsize(FL_NORMAL_SIZE + 2);
-	fields->selection_color(fl_lighter(FL_YELLOW));
-	fields->labelcolor(FL_BLACK);
 	fields->tooltip("Allows the specification of which fields to display in the various applications");
+	children_ids_.push_back(DLG_FORMAT);
 	// User settings - allows user to control cetain aspects of the displayed information
 	user_dialog* user = new user_dialog(rx, ry, rw, rh, "User settings");
 	user->labelfont(FL_BOLD);
 	user->labelsize(FL_NORMAL_SIZE + 2);
-	user->selection_color(fl_lighter(FL_YELLOW));
-	user->labelcolor(FL_BLACK);
 	user->tooltip("Allows limited configuration of fonts and tip timeouts");
+	children_ids_.push_back(DLG_USER);
 
 	// Lastly - a tree display showing all settings
-	config_tree* all_settings = new config_tree(rx, ry, rw, rh, "All Settings");
+	Fl_Group* all_settings = new Fl_Group(rx, ry, rw, rh, "All Settings");
 	all_settings->labelfont(FL_BOLD);
 	all_settings->labelsize(FL_NORMAL_SIZE + 2);
-	all_settings->selection_color(fl_lighter(FL_RED));
-	all_settings->labelcolor(FL_BLACK);
 	all_settings->tooltip("Displays the current settings in tree format");
+	children_ids_.push_back(DLG_ALL);
+
+	config_tree* all_tree = new config_tree(rx, ry, rw, rh);
+
+	all_settings->end();
+
 	// Default to show all settings
 	settings_view_ = all_settings;
 	// Activate the required dialog
@@ -127,6 +128,8 @@ settings::settings(int W, int H, const char* label, cfg_dialog_t active) :
 
 	end();
 	show();
+
+	enable_widgets();
 }
 
 // Destructor
@@ -138,6 +141,27 @@ settings::~settings()
 	Fl_Preferences window_settings(windows_settings, "Settings");
 	window_settings.set("Left", x_root());
 	window_settings.set("Top", y_root());
+}
+
+// Enable widgets
+void settings::enable_widgets() {
+	Fl_Tabs* tabs = (Fl_Tabs*)child(0);
+	// value() returns the selected widget. We need to test which widget it is.
+	Fl_Widget* tab = tabs->value();
+	cfg_dialog_t dlg = DLG_X;
+	for (int ix = 0; ix < tabs->children(); ix++) {
+		Fl_Widget* wx = tabs->child(ix);
+		if (wx == tab) {
+			wx->labelfont((wx->labelfont() | FL_BOLD) & (~FL_ITALIC));
+			wx->labelcolor(FL_FOREGROUND_COLOR);
+			dlg = children_ids_[ix];
+		}
+		else {
+			wx->labelfont((wx->labelfont() & (~FL_BOLD)) | FL_ITALIC);
+			wx->labelcolor(COLOUR_GREY);
+		}
+	}
+	set_label(dlg);
 }
 
 // Callback - Save, OK or Cancel
@@ -170,16 +194,7 @@ void settings::cb_tab(Fl_Widget* w, void* v) {
 	settings* that = ancestor_view<settings>(w);
 	Fl_Tabs* tabs = (Fl_Tabs*)that->child(0);
 	// value() returns the selected widget. We need to test which widget it is.
-	Fl_Widget* tab = tabs->value();
-	cfg_dialog_t ix;
-	if (dynamic_cast<files_dialog*>(tab)) ix = DLG_FILES;
-	else if (dynamic_cast<web_dialog*>(tab)) ix = DLG_WEB;
-	else if (dynamic_cast<fields_dialog*>(tab)) ix = DLG_COLUMN;
-	else if (dynamic_cast<user_dialog*>(tab)) ix = DLG_USER;
-	else if (dynamic_cast<config_tree*>(tab)) ix = DLG_ALL;
-	else ix = DLG_X;
-	// Change the label of the tabs to the appropriate value for the selected widget
-	that->set_label(ix);
+	that->enable_widgets();
 }
 
 void settings::set_label(settings::cfg_dialog_t active) {

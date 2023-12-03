@@ -34,14 +34,17 @@ void qso_log::create_form(int X, int Y) {
 	int saved_rh = rh;
 
 	log_info_ = new qso_log_info(rx, ry, rw, rh, "Log");
+	log_info_->labelsize(FL_NORMAL_SIZE + 2);
 	rw = max(rw, log_info_->w());
 	rh = max(rh, log_info_->h());
 
 	qsl_ctrl_ = new qso_qsl(rx, ry, rw, rh, "On-line QSL");
+	qsl_ctrl_->labelsize(FL_NORMAL_SIZE + 2);
 	rw = max(rw, qsl_ctrl_->w());
 	rh = max(rh, qsl_ctrl_->h());
 
 	server_ctrl_ = new qso_server(rx, ry, rw, rh, "Servers");
+	server_ctrl_->labelsize(FL_NORMAL_SIZE + 2);
 	rw = max(rw, server_ctrl_->w());
 	rh = max(rh, server_ctrl_->h());
 

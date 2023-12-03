@@ -4,6 +4,7 @@
 #include "page_dialog.h"
 
 #include <set>
+#include <vector>
 
 #include <FL/Fl_Window.H>
 #include <FL/Fl_Widget.H>
@@ -45,6 +46,8 @@
 		// protected methods
 	protected:
 		void set_label(cfg_dialog_t active);
+		// 
+		void enable_widgets();
 
 		// protected attributes
 	protected:
@@ -54,6 +57,8 @@
 		set<page_dialog*> updatable_views_;
 		// Active flag
 		bool active_;
+		// List of children
+		vector<cfg_dialog_t> children_ids_;
 
 
 

@@ -38,6 +38,8 @@
 		// Add a view of class VIEW
 		template <class VIEW>
 		void add_view(const char* label, field_ordering_t column_data, object_t object, const char* tooltip);
+		// Enable widgets
+		void enable_widgets();
 		// the contained forms as views
 		struct view_ptrs {
 			view* v;

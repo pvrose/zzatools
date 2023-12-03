@@ -1,5 +1,6 @@
 #include "qso_misc.h"
 #include "qso_qth.h"
+#include "drawing.h"
 
 #include <FL/Fl_Preferences.H>
 
@@ -54,9 +55,11 @@ void qso_misc::enable_widgets() {
 		Fl_Widget* wx = child(ix);
 		if (wx == value()) {
 			wx->labelfont((wx->labelfont() | FL_BOLD) & (~FL_ITALIC));
+			wx->labelcolor(FL_FOREGROUND_COLOR);
 		}
 		else {
 			wx->labelfont((wx->labelfont() & (~FL_BOLD)) | FL_ITALIC);
+			wx->labelcolor(COLOUR_GREY);
 		}
 	}
 	qth_->enable_widgets();
