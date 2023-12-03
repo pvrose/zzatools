@@ -71,7 +71,7 @@ using namespace std;
 string COPYRIGHT = "\xA9 Philip Rose GM3ZZA 2018. All rights reserved.\nPrefix data courtesy of clublog.org";
 string PROGRAM_ID = "ZZALOG";
 string PROG_ID = "ZLG";
-string PROGRAM_VERSION = "3.4.57";
+string PROGRAM_VERSION = "3.4.58";
 string TIMESTAMP = __DATE__ + string(" ") + __TIME__;
 string VENDOR = "GM3ZZA";
 
@@ -80,7 +80,7 @@ string VENDOR = "GM3ZZA";
 bool DEBUG_ERRORS = true;
 bool DEBUG_THREADS = false;
 bool DEBUG_CURL = false;
-bool DEBUG_STATUS = false;
+bool DEBUG_STATUS = true;
 rig_debug_level_e HAMLIB_DEBUG_LEVEL = RIG_DEBUG_ERR;
 bool AUTO_UPLOAD = true;
 bool AUTO_SAVE = true;
@@ -393,6 +393,7 @@ int cb_args(int argc, char** argv, int& i) {
 	}
 	if (i < argc) {
 		if (*argv[i] == '-') {
+			return i;
 			// printf ("DEBUG: Not recognised switch %d %s passing to fltk", i, argv[i]);
 			// // Unrecognised switch - try Fl speciific ones
 			// int n = Fl::arg(argc, argv, i);
