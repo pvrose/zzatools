@@ -1111,7 +1111,14 @@ void qso_data::action_cancel_net_all() {
 	// printf("DEBUG: action_cancel_net_all\n");
 	book_->enable_save(false);
 	while (g_net_entry_->entries()) {
-		action_cancel();
+		switch(logging_state_) {
+		case NET_STARTED: 
+			action_cancel();
+			break;
+		case NET_EDIT:
+			action_cancel_net_edit();
+			break;
+		}
 	}
 	book_->enable_save(true);
 	// Restore the place-holder entry
