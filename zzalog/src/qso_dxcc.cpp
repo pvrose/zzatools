@@ -227,7 +227,7 @@ void qso_dxcc::wb4_buttons::enable_widgets() {
 	for (int ix = 0; ix < children(); ix++) {
 		Fl_Toggle_Button* bn = (Fl_Toggle_Button*)child(ix);
 		bn->color(FL_BACKGROUND_COLOR);
-		bn->labelcolor(fl_inactive(FL_BLACK));
+		bn->labelcolor(fl_inactive(FL_FOREGROUND_COLOR));
 		bn->value(false);
 	}
 	// Mark QSO buttons
