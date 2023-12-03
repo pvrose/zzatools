@@ -23,6 +23,7 @@ extern tabbed_forms* tabbed_forms_;
 extern status* status_;
 extern menu* menu_;
 extern Fl_Preferences* settings_;
+extern bool DARK;
 
 // Constructor
 report_tree::report_tree(int X, int Y, int W, int H, const char* label, field_ordering_t app) :
@@ -337,9 +338,9 @@ void report_tree::copy_map_to_tree(report_map_t* this_map, Fl_Tree_Item* item, i
 			next_item->label(text);
 			// Item data set to say it isn't a record entry
 			next_item->user_data((void*)(long)-1);
-			if (count_dxcc) next_item->labelcolor(fl_darker(FL_GREEN));
-			else if (count_eqsl) next_item->labelcolor(FL_BLUE);
-			else next_item->labelcolor(fl_darker(FL_RED));
+			if (count_dxcc) next_item->labelcolor(DARK ? FL_GREEN : fl_darker(FL_GREEN));
+			else if (count_eqsl) next_item->labelcolor(DARK ? FL_CYAN : FL_BLUE);
+			else next_item->labelcolor(DARK ? FL_RED : fl_darker(FL_RED));
 			next_item->close();
 		}
 		if (next_entry->next_entry != nullptr) {
@@ -361,9 +362,9 @@ void report_tree::copy_map_to_tree(report_map_t* this_map, Fl_Tree_Item* item, i
 			next_item->label(text);
 			// Item data set to say it isn't a record entry
 			next_item->user_data((void*)(long)-1);
-			if (count_dxcc) next_item->labelcolor(fl_darker(FL_GREEN));
-			else if (count_eqsl) next_item->labelcolor(FL_BLUE);
-			else next_item->labelcolor(fl_darker(FL_RED));
+			if (count_dxcc) next_item->labelcolor(DARK ? FL_GREEN : fl_darker(FL_GREEN));
+			else if (count_eqsl) next_item->labelcolor(DARK ? FL_CYAN : FL_BLUE);
+			else next_item->labelcolor(DARK ? FL_RED : fl_darker(FL_RED));
 			next_item->close();
 		}
 		// Totalise counts to use upwards and report progress
@@ -450,9 +451,9 @@ void report_tree::copy_records_to_tree(record_list_t* record_list, Fl_Tree_Item*
 			Fl_Tree_Item* record_item = item->add(prefs(), text);
 			// Item data is the number of the record
 			record_item->user_data((void*)(intptr_t)record_num);
-			if (is_dxcc) record_item->labelcolor(fl_darker(FL_GREEN));
-			else if (is_confirmed) record_item->labelcolor(FL_BLUE);
-			else record_item->labelcolor(fl_darker(FL_RED));
+			if (is_dxcc) record_item->labelcolor(DARK ? FL_GREEN : fl_darker(FL_GREEN));
+			else if (is_confirmed) record_item->labelcolor(DARK ? FL_CYAN : FL_BLUE);
+			else record_item->labelcolor(DARK ? FL_RED : fl_darker(FL_RED));
 			record_item->labelfont(item_labelfont() | FL_ITALIC);
 		}
 		delete[] text;
@@ -576,7 +577,7 @@ void report_tree::populate_tree(bool activate) {
 			Fl_Tree_Item* root_item = new Fl_Tree_Item(this);
 			root(root_item);
 			root_item->labelfont(item_labelfont() | FL_BOLD);
-			root_item->labelcolor(FL_BLACK);
+			root_item->labelcolor(FL_FOREGROUND_COLOR);
 			// Copy the map to the tree - starting by adding top level entries to the root
 			// This then iterates down to the record entries
 			// Initialise progress bar

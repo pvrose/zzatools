@@ -500,7 +500,7 @@ void log_table::draw_cell(TableContext context, int R, int C, int X, int Y, int 
 		int H1 = col_header_height();
 		fl_draw_box(FL_BORDER_BOX, X1, Y1, W1, H1, col_header_color());
 		// Text color
-		fl_color(FL_FOREGROUND_COLOR);
+		fl_color(FL_BLACK);
 		fl_draw("QSO No.", X1, Y1, W1, H1, FL_ALIGN_CENTER);
 
 		return;
@@ -523,7 +523,7 @@ void log_table::draw_cell(TableContext context, int R, int C, int X, int Y, int 
 				fl_color(FL_RED);
 			}
 			else {
-				fl_color(fl_contrast(FL_FOREGROUND_COLOR, bg_colour));
+				fl_color(FL_BLACK);
 			}
 			// Make this italic version of default font
 			Fl_Font save = fl_font();
@@ -541,7 +541,7 @@ void log_table::draw_cell(TableContext context, int R, int C, int X, int Y, int 
 		fl_push_clip(X, Y, W, H);
 		{
 			fl_draw_box(FL_BORDER_BOX, X, Y, W, H, col_header_color());
-			fl_color(FL_FOREGROUND_COLOR);
+			fl_color(FL_BLACK);
 			// text is field header
 			text = fields_[C].header;
 			fl_draw(text.c_str(), X, Y, W, H, FL_ALIGN_CENTER);

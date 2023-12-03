@@ -212,7 +212,7 @@ void spec_tree::insert_adif_spec(Fl_Tree_Item* parent, const spec_dataset& datas
 					char line[2048];
 					snprintf(line, 2048, "%s: %s", column.c_str(), column_text.c_str());
 					Fl_Tree_Item* column_item = entry_item->add(prefs(), line);
-					column_item->labelcolor(DARK ? fl_lighter(FL_BLUE) : FL_BLUE);
+					column_item->labelcolor(DARK ? FL_CYAN : FL_BLUE);
 					if (column == "Enumeration") {
 						// Get the enumeration dataset
 						spec_dataset* enum_dataset = spec_data_->dataset(column_text);
