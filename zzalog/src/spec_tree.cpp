@@ -19,6 +19,7 @@ extern spec_data* spec_data_;
 extern tabbed_forms* tabbed_forms_;
 extern status* status_;
 extern Fl_Preferences* settings_;
+extern bool DARK;
 
 using namespace std;
 
@@ -39,7 +40,7 @@ spec_tree::spec_tree(int X, int Y, int W, int H, const char* label, field_orderi
 	sortorder(FL_TREE_SORT_ASCENDING);
 	item_labelfont(font_);
 	item_labelsize(fontsize_);
-	item_labelfgcolor(fl_contrast(FL_FOREGROUND_COLOR, item_labelbgcolor()));
+	// item_labelfgcolor(fl_contrast(FL_FOREGROUND_COLOR, item_labelbgcolor()));
 	// Call back standard tree callback
 	callback(cb_tree);
 }
@@ -168,11 +169,11 @@ void spec_tree::insert_adif_spec(Fl_Tree_Item* parent, const spec_dataset& datas
 				string dxcc_name = (*dxcc_data)["Entity Name"];
 				// Make the tree label just the DXCC code in a dark grey
 				hang_item = hang_item->add(prefs(), dxcc_name.c_str());
-				hang_item->labelcolor(fl_darker(FL_DARK3));
+				hang_item->labelcolor(COLOUR_GREY);
 			}
 			else {
 				hang_item = hang_item->add(prefs(), item.c_str());
-				hang_item->labelcolor(fl_darker(FL_DARK3));
+				hang_item->labelcolor(COLOUR_GREY);
 			}
 		}
 		// They all hang on the parent
@@ -211,7 +212,7 @@ void spec_tree::insert_adif_spec(Fl_Tree_Item* parent, const spec_dataset& datas
 					char line[2048];
 					snprintf(line, 2048, "%s: %s", column.c_str(), column_text.c_str());
 					Fl_Tree_Item* column_item = entry_item->add(prefs(), line);
-					column_item->labelcolor(FL_BLUE);
+					column_item->labelcolor(DARK ? fl_lighter(FL_BLUE) : FL_BLUE);
 					if (column == "Enumeration") {
 						// Get the enumeration dataset
 						spec_dataset* enum_dataset = spec_data_->dataset(column_text);
@@ -246,7 +247,7 @@ void spec_tree::insert_adif_spec(Fl_Tree_Item* parent, const spec_dataset& datas
 									snprintf(line, 2048, "%s: %s", it->first.c_str(), enum_desc.c_str());
 								}
 								Fl_Tree_Item* enum_item = column_item->add(prefs(), line);
-								enum_item->labelcolor(fl_darker(FL_RED));
+								enum_item->labelcolor(DARK ? FL_RED : fl_darker(FL_RED));
 								enum_item->labelfont(item_labelfont() | FL_ITALIC);
 							}
 						}
@@ -270,7 +271,7 @@ void spec_tree::insert_adif_spec(Fl_Tree_Item* parent, const spec_dataset& datas
 									if (type_col_text.length() > 0) {
 										sprintf(line, "%s: %s", type_col_name.c_str(), type_col_text.c_str());
 										Fl_Tree_Item* type_item = column_item->add(prefs(), line);
-										type_item->labelcolor(fl_darker(FL_GREEN));
+										type_item->labelcolor(DARK ? FL_GREEN : fl_darker(FL_GREEN));
 										type_item->labelfont(item_labelfont() | FL_ITALIC);
 									}
 								}
