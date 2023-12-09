@@ -1073,6 +1073,7 @@ void qso_data::action_save_net_all() {
 	// printf("DEBUG: action_save_net_all\n");
 	// Only save the book once all records have been saved
 	book_->enable_save(false);
+	book_->allow_upload(false);
 	bool ok = true;
 	while (g_net_entry_->entries() && ok) {
 		switch (logging_state_) {
@@ -1087,6 +1088,7 @@ void qso_data::action_save_net_all() {
 	// Restore the place-holder entry
 	if (ok) g_net_entry_->add_entry();
 	book_->enable_save(true);
+	book_->allow_upload(true);
 	enable_widgets();
 }
 

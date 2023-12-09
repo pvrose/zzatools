@@ -85,6 +85,7 @@ book::book(object_t type)
 	, adi_writer_(nullptr)
 	, adx_writer_(nullptr)
 	, ignore_null_(false)
+	, update_allowed_(true)
 {
 	used_bands_.clear();
 	used_modes_.clear();
@@ -1580,7 +1581,7 @@ bool book::delete_enabled() {
 
 // Upload the latest QSO imported to eQSL, LotW and Clublog
 bool book::upload_qso(qso_num_t record_num) {
-	if (AUTO_UPLOAD) {
+	if (AUTO_UPLOAD || update_allowed_) {
 		enable_save(false);
 		bool ok = eqsl_handler_->upload_single_qso(record_num);
 		if (!lotw_handler_->upload_single_qso(record_num)) ok = false;
@@ -1651,4 +1652,8 @@ bool book::loading() {
 
 bool book::storing() {
 	return (adi_writer_ != nullptr || adx_writer_ != nullptr);
+}
+
+void book::allow_upload(bool enable) {
+	update_allowed_ = enable && AUTO_UPLOAD;
 }

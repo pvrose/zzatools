@@ -188,6 +188,8 @@ using namespace std;
 		inline virtual item_num_t item_number(qso_num_t record_num, bool nearest = false) {
 			return record_num;
 		}
+		// Inhibit QSO u-pload
+		void allow_upload(bool enable);
 
 		// Protected methods
 		item_num_t correct_record_position(item_num_t current_pos);
@@ -298,6 +300,8 @@ using namespace std;
 		adx_reader* adx_reader_;
 		adi_writer* adi_writer_;
 		adx_writer* adx_writer_;
+		// Update allowed
+		bool update_allowed_;
 
 	};
 
