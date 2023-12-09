@@ -14,6 +14,7 @@ QBS_charth::QBS_charth(int X, int Y, int W, int H, const char* L) :
 	Fl_Group(X, Y, W, H, L)
 {
 	data_ = nullptr;
+	max_ = 15.0;
 	create_form();
 }
 
@@ -64,8 +65,6 @@ void QBS_charth::update(string call) {
 
 	char err_msg[64];
 
-	max_ = 5;
-
 	for (int b = start_box; b <= stop_box; b++) {
 		string box_name = data_->get_batch(b);
 		string label = "";
@@ -108,7 +107,6 @@ void QBS_charth::update(string call) {
 		}
 		ct_recycled_->add((double)(rcyc + sent), "", COLOUR_RECYCLED);
 		ct_sent_->add((double)sent, "", COLOUR_SENT);
-		max_ = max(max_, max( rcyc, max(sent, rcvd)));
 	}
 
 	// Set boiunds of recycled and sent to those of received
