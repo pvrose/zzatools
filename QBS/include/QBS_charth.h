@@ -36,5 +36,7 @@ protected:
 
     void draw_y_axis();
 
+    int max_;
+
 };
 

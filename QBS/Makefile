@@ -95,8 +95,10 @@ clean:
 	
 # install
 .PHONY: install
-install: $(EXEC_DIR)/$(TARGET_EXEC)
-	cp $(EXEC_DIR)/$(TARGET_EXEC) $(INSTALL_DIR)
+install: $(INSTALL_DIR)/$(TARGET_EXEC)
+
+$(INSTALL_DIR)/$(TARGET_EXEC): $(EXEC_DIR)/$(TARGET_EXEC)
+	sudo cp $(EXEC_DIR)/$(TARGET_EXEC) $(INSTALL_DIR)
 
 # Include the .d makefiles. The - at the front suppresses the errors of missing
 # Makefiles. Initially, all the .d files will be missing, and we don't want those

@@ -24,7 +24,7 @@ QBS_charth::~QBS_charth() {
 void QBS_charth::create_form() {
 	begin();
 	box(FL_FLAT_BOX);
-	color(FL_WHITE);
+	color(FL_BACKGROUND2_COLOR);
 
 	// Allow space foe axis
 	int curr_x = x() + AXIS_WIDTH;
@@ -62,6 +62,10 @@ void QBS_charth::update(string call) {
 	ct_recycled_->clear();
 	ct_sent_->clear();
 
+	char err_msg[64];
+
+	max_ = 5;
+
 	for (int b = start_box; b <= stop_box; b++) {
 		string box_name = data_->get_batch(b);
 		string label = "";
@@ -76,6 +80,11 @@ void QBS_charth::update(string call) {
 		int rcvd = 0;
 		if (box->received->find(call) != box->received->end()) {
 			rcvd = box->received->at(call);
+			if (rcvd < 0) {
+				snprintf(err_msg, sizeof(err_msg), "Negative value %d received Box %s\n", rcvd, box_name.c_str());
+				clog << err_msg;
+				rcvd = 0;
+			}
 		}
 		ct_received_->add((double)rcvd, label.c_str(), COLOUR_RECEIVED);
 		// Add recycled and sent data
@@ -83,26 +92,36 @@ void QBS_charth::update(string call) {
 		int sent = 0;
 		if (box->sent->find(call) != box->sent->end()) {
 			sent = box->sent->at(call);
+			if (sent < 0) {
+				snprintf(err_msg, sizeof(err_msg), "Negative value %d sent Box %s\n", sent, box_name.c_str());
+				clog << err_msg;
+				sent = 0;
+			}
 		}
 		if (b < head_box && box->counts->find(call) != box->counts->end()) {
 			rcyc = box->counts->at(call);
+			if (rcyc < 0) {
+				snprintf(err_msg, sizeof(err_msg), "Negative value %d recycled Box %s\n", rcyc, box_name.c_str());
+				clog << err_msg;
+				rcyc = 0;
+			}
 		}
 		ct_recycled_->add((double)(rcyc + sent), "", COLOUR_RECYCLED);
 		ct_sent_->add((double)sent, "", COLOUR_SENT);
+		max_ = max(max_, max( rcyc, max(sent, rcvd)));
 	}
-	// Set boiunds of recycled and sent to those ofreceived
-	double min;
-	double max;
-	ct_received_->bounds(&min, &max);
-	ct_recycled_->bounds(min, max);
-	ct_sent_->bounds(min, max);
+
+	// Set boiunds of recycled and sent to those of received
+	ct_received_->bounds(0, max_);
+	ct_recycled_->bounds(0, max_);
+	ct_sent_->bounds(0, max_);
 	
 	redraw();
 }
 
 void QBS_charth::draw_y_axis() {
 	// Draw the SWR axis
-	fl_color(FL_BLACK);
+	fl_color(FL_FOREGROUND_COLOR);
 	int ax = x() + AXIS_WIDTH;
 	int dh = fl_height();
 	int ay = y();
@@ -113,38 +132,32 @@ void QBS_charth::draw_y_axis() {
 	set<double> ticks;
 	double tick = 0.0;
 	double gap;
-	double min;
-	double max;
-	ct_received_->bounds(&min, &max);
-	if (max > 100) {
+	if (max_ >= 100) {
 		gap = 50.0;
 	}
-	else if (max > 50) {
+	else if (max_ >= 50) {
 		gap = 20.0;
 	}
-	else if (max > 20) {
+	else if (max_ >= 20) {
 		gap = 10.0;
 	}
-	else if (max > 10) {
+	else if (max_ >= 10) {
 		gap = 5.0;
 	}
-	else if (max > 5) {
+	else {
 		gap = 2.0;
 	}
-	else {
-		gap = 1.0;
-	}
-	while (tick <= max) {
+	while (tick <= max_) {
 		ticks.insert(tick);
 		tick += gap;
 	}
-	double range = max - min;
+	double range = max_;
 	double pixel_per_unit = ah / range;
 	// For each tick
 	for (auto it = ticks.begin(); it != ticks.end(); it++) {
 		int ty = ay + ah - (int)round(*it * pixel_per_unit);
 		// Draw the tick
-		fl_color(FL_BLACK);
+		fl_color(FL_FOREGROUND_COLOR);
 		fl_line(x(), ty, ax, ty);
 		// Label the tick
 		char l[10];
