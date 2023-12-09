@@ -707,6 +707,8 @@ void qso_entry::cb_ip_field(Fl_Widget* w, void* v) {
 		// Remove any dependent fields that may be left over from previous edits
 		that->qso_->unparse();
 	}
+	// QSO has changed, change QSL servers' status
+	that->qso_->invalidate_qsl_status();
 	// Update other views if editing or logging
 	switch (that->qso_data_->logging_state()) {
 	case qso_data::QSO_INACTIVE:

@@ -1421,3 +1421,17 @@ bool record::is_dirty() { return is_dirty_; }
 
 // Clear dirty flag
 void record::clean() { is_dirty_ = false; }
+
+// Invalidate QSL status
+void record::invalidate_qsl_status() {
+	// eQSL
+	if (item("EQSL_QSL_SENT") == "Y") {
+		item("EQSL_QSL_SENT", string("I"));
+	}
+	if (item("LOTW_QSL_SENT") == "Y") {
+		item("LOTW_QSL_SENT", string("I"));
+	}
+	if (item("CLUBLOG_QSO_UPLOAD_STATUS") == "Y") {
+		item("CLUBLOG_QSO_UPLOAD_STATUS", string("M"));
+	}
+}

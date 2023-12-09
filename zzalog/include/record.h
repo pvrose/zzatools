@@ -148,6 +148,8 @@ using namespace std;
 		void clean();
 		// Delete all contents
 		void delete_contents();
+		// Invalidate QSL statuses
+		void invalidate_qsl_status();
 
 
 		// protected methods
