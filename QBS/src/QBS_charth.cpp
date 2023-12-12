@@ -58,6 +58,7 @@ void QBS_charth::update(string call) {
 	int stop_box = data_->get_current();
 	int start_box = stop_box > 11 ? stop_box - 11 : 0;
 	int head_box = data_->get_head();
+	max_ = 0;
 
 	ct_received_->clear();
 	ct_recycled_->clear();
@@ -84,6 +85,7 @@ void QBS_charth::update(string call) {
 				clog << err_msg;
 				rcvd = 0;
 			}
+			max_ = max(max_, rcvd);
 		}
 		ct_received_->add((double)rcvd, label.c_str(), COLOUR_RECEIVED);
 		// Add recycled and sent data
@@ -105,9 +107,15 @@ void QBS_charth::update(string call) {
 				rcyc = 0;
 			}
 		}
+		max_ = max(max_, sent + rcyc);
 		ct_recycled_->add((double)(rcyc + sent), "", COLOUR_RECYCLED);
 		ct_sent_->add((double)sent, "", COLOUR_SENT);
 	}
+
+	if (max_ > 50) max_ = 100;
+	else if(max_ > 25) max_ = 50;
+	else if (max_ > 15) max_ = 25;
+	else max_ = 15;
 
 	// Set boiunds of recycled and sent to those of received
 	ct_received_->bounds(0, max_);
