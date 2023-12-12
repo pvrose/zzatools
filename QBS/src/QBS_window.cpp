@@ -356,19 +356,7 @@ void QBS_window::create_form() {
 	op_batch_ = new Fl_Output(curr_x, curr_y, WSMEDIT, HBUTTON, "Batch");
 	op_batch_->align(FL_ALIGN_LEFT);
 	// Batch navigation buttons
-	curr_x += op_batch_->w();
-	bn_b_navbb_ = new Fl_Button(curr_x, curr_y, HBUTTON, HBUTTON, "@|<");
-	bn_b_navbb_->callback(cb_nav_batch, (void*)(long)PREV_FIRST);
-	curr_x += bn_b_navbb_->w() + HBUTTON;
-	bn_b_navb_ = new Fl_Button(curr_x, curr_y, HBUTTON, HBUTTON, "@<");
-	bn_b_navb_->callback(cb_nav_batch, (void*)(long)PREV_MINOR);
-	curr_x += bn_b_navb_->w();
-	bn_b_navf_ = new Fl_Button(curr_x, curr_y, HBUTTON, HBUTTON, "@>");
-	bn_b_navf_->callback(cb_nav_batch, (void*)(long)NEXT_MINOR);
-	curr_x += bn_b_navf_->w() + HBUTTON;
-	bn_b_navff_ = new Fl_Button(curr_x, curr_y, HBUTTON, HBUTTON, "@>|");
-	bn_b_navff_->callback(cb_nav_batch, (void*)(long)NEXT_LAST);
-	curr_x += bn_b_navff_->w() + GAP;
+	curr_x += op_batch_->w() + GAP;
 	
 	// Batch action button
 	bn_b_action_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "New");
@@ -387,30 +375,7 @@ void QBS_window::create_form() {
 	ip_call_->callback(cb_input_call, &call_);
 	ip_call_->when(FL_WHEN_CHANGED);
 
-	// Batch navigation buttons
 	curr_x += ip_call_->w();
-	bn_c_navbbb_ = new Fl_Button(curr_x, curr_y, HBUTTON, HBUTTON, "@|<");
-	bn_c_navbbb_->callback(cb_nav_call, (void*)(long)PREV_FIRST);
-	bn_c_navbbb_->tooltip("Go to first call on file");
-	curr_x += bn_c_navbbb_->w();
-	bn_c_navbb_ = new Fl_Button(curr_x, curr_y, HBUTTON, HBUTTON, "@<<");
-	bn_c_navbb_->callback(cb_nav_call, (void*)(long)PREV_MAJOR);
-	bn_c_navbb_->tooltip("Go to first call with same prefix");
-	curr_x += bn_c_navbb_->w();
-	bn_c_navb_ = new Fl_Button(curr_x, curr_y, HBUTTON, HBUTTON, "@<");
-	bn_c_navb_->callback(cb_nav_call, (void*)(long)PREV_MINOR);
-	curr_x += bn_c_navb_->w();
-	bn_c_navf_ = new Fl_Button(curr_x, curr_y, HBUTTON, HBUTTON, "@>");
-	bn_c_navf_->callback(cb_nav_call, (void*)(long)NEXT_MINOR);
-	curr_x += bn_c_navf_->w();
-	bn_c_navff_ = new Fl_Button(curr_x, curr_y, HBUTTON, HBUTTON, "@>>");
-	bn_c_navff_->callback(cb_nav_call, (void*)(long)NEXT_MAJOR);
-	bn_c_navff_->tooltip("Go to first call with different prefix");
-	curr_x += bn_c_navff_->w();
-	bn_c_navfff_ = new Fl_Button(curr_x, curr_y, HBUTTON, HBUTTON, "@>|");
-	bn_c_navfff_->callback(cb_nav_call, (void*)(long)NEXT_LAST);
-	bn_c_navfff_->tooltip("Go to last call on file");
-	curr_x += bn_c_navfff_->w();
 
 	curr_x += GAP;
 	// Call action button
@@ -1547,72 +1512,12 @@ void QBS_window::update_batches(bool enable_nav) {
 	if (op_batch_->active()) {
 		op_batch_->value(data_->get_batch(selected_box_).c_str());
 	}
-	if (op_batch_->active() && enable_nav) {
-		if (selected_box_ == 0) {
-			bn_b_navbb_->deactivate();
-			bn_b_navb_->deactivate();
-			bn_b_navf_->activate();
-			bn_b_navff_->activate();
-		}
-		else if (selected_box_ == data_->get_current()) {
-			bn_b_navbb_->activate();
-			bn_b_navb_->activate();
-			bn_b_navf_->deactivate();
-			bn_b_navff_->deactivate();
-		}
-		else {
-			bn_b_navbb_->activate();
-			bn_b_navb_->activate();
-			bn_b_navf_->activate();
-			bn_b_navff_->activate();
-		}
-	}
-	else {
-		bn_b_navbb_->deactivate();
-		bn_b_navb_->deactivate();
-		bn_b_navf_->deactivate();
-		bn_b_navff_->deactivate();
-	}
 }
 
 // Update calls
 void QBS_window::update_calls(int box_num) {
 	if (ip_call_->active()) {
 		ip_call_->value(call_.c_str());
-	}
-	if (ip_call_->active() && call_.length() > 0) {
-		if (data_->get_prev_call(box_num, call_) == call_) {
-			bn_c_navbbb_->deactivate();
-			bn_c_navbb_->deactivate();
-			bn_c_navb_->deactivate();
-			bn_c_navf_->activate();
-			bn_c_navff_->activate();
-			bn_c_navfff_->activate();
-		}
-		else if (data_->get_next_call(box_num, call_) == call_) {
-			bn_c_navbbb_->activate();
-			bn_c_navbb_->activate();
-			bn_c_navb_->activate();
-			bn_c_navf_->deactivate();
-			bn_c_navff_->deactivate();
-			bn_c_navfff_->deactivate();
-		}
-		else {
-			bn_c_navbbb_->activate();
-			bn_c_navbb_->activate();
-			bn_c_navb_->activate();
-			bn_c_navf_->activate();
-			bn_c_navff_->activate();
-			bn_c_navfff_->activate();
-		}
-	}
-	else {
-		bn_c_navbbb_->deactivate();
-		bn_c_navbb_->deactivate();
-		bn_c_navb_->deactivate();
-		bn_c_navf_->deactivate();
-		bn_c_navff_->deactivate();
-		bn_c_navfff_->deactivate();
 	}
 }
 

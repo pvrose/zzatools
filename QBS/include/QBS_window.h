@@ -171,18 +171,8 @@ protected:
     radio_param_t rp_hist_call_;
 
     Fl_Output* op_batch_;
-    Fl_Button* bn_b_navbb_;
-    Fl_Button* bn_b_navb_;
-    Fl_Button* bn_b_navf_;
-    Fl_Button* bn_b_navff_;
     Fl_Button* bn_b_action_;
     Fl_Input* ip_call_;
-    Fl_Button* bn_c_navbbb_;
-    Fl_Button* bn_c_navbb_;
-    Fl_Button* bn_c_navb_;
-    Fl_Button* bn_c_navf_;
-    Fl_Button* bn_c_navff_;
-    Fl_Button* bn_c_navfff_;
     Fl_Button* bn_c_action_;
     Fl_Button* bn_nav_n_do_;
     Fl_Button* bn_use_defaults_;
