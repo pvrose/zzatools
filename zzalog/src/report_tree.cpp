@@ -627,6 +627,9 @@ void report_tree::populate_tree(bool activate) {
 			tabbed_forms_->activate_pane(OT_REPORT, true);
 		}
 	}
+	// Update display
+	show();
+	redraw();
 	// Update the status pane if this is the active view
 	update_status();
 	fl_cursor(FL_CURSOR_DEFAULT);
