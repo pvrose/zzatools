@@ -1221,13 +1221,16 @@ void QBS_data::display_batch_summary(int box_num) {
 		t20 != info->top_20.end() && !done; t20++, pos++) {
 		const string& call = (*t20);
 		const int count = (*box.counts)[call];
+		const int pc = count * 100 / info->sum_received;
 		if (count == prev_count) {
-			ss << "<TR><TD>=</TD><TD>" << call << "</TD><TD>" << count << "</TD></TR>" << endl;
+			ss << "<TR><TD>=</TD><TD>" << call << "</TD><TD>" << count << 
+			"(" << pc << "%)</TD></TR>" << endl;
 		}
 		else if (pos > 20 || count == 0) {
 			done = true;
 		} else{
-			ss << "<TR><TD>" << pos << "</TD><TD>" << call << "</TD><TD>" << count << "</TD></TR>" << endl;
+			ss << "<TR><TD>" << pos << "</TD><TD>" << call << "</TD><TD>" << count <<
+			"(" << pc << "%)</TD></TR>" << endl;
 		}
 		if (!done) top20_recycled += count;
 		prev_count = count;

@@ -19,6 +19,7 @@
 #include <FL/Fl_Radio_Button.H>
 #include <FL/Fl_Table.H>
 #include <FL/Fl_Text_Display.H>
+#include <FL/Fl_Choice.H>
 
 using namespace std;
 
@@ -70,10 +71,7 @@ protected:
     static void cb_exec_call(Fl_Widget* w, void* v);
     // Call input 
     static void cb_input_call(Fl_Widget* w, void* v);
-    // navigation buttons - v used to pass user data of type navigate_t
-    static void cb_nav_batch(Fl_Widget* w, void* v);
-    static void cb_nav_call(Fl_Widget* w, void* v);
-    // Reset button
+     // Reset button
     static void cb_reset(Fl_Widget* w, void* v);
     // Enter in any input value widget
     static void cb_ip_enter(Fl_Widget* w, void* v);
@@ -108,6 +106,8 @@ protected:
     void update_whatever();
     // Write batch log
     void append_batch_log(const char* text);
+    // Populate batch choice
+    void populate_batch(bool enable_change);
 
     // Various data items accessible by most classes
     Fl_Preferences settings_;
@@ -170,11 +170,10 @@ protected:
     Fl_Radio_Light_Button* bn_hist_call_;
     radio_param_t rp_hist_call_;
 
-    Fl_Output* op_batch_;
+    Fl_Choice* ch_batch_;
     Fl_Button* bn_b_action_;
     Fl_Input* ip_call_;
     Fl_Button* bn_c_action_;
-    Fl_Button* bn_nav_n_do_;
     Fl_Button* bn_use_defaults_;
     Fl_Box* bx_current_;
     Fl_Box* bx_change_;
