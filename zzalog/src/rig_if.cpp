@@ -207,17 +207,17 @@ rig_if::rig_if(const char* name, hamlib_data_t* data)
 	modify_power_ = UNMODIFIED;
 	power_modifier_ = 0.0;
 	
-	// If the name has been set, there is a rig
-	if (my_rig_name_.length()) {
-		if (hamlib_data_->port_type != RIG_PORT_NONE) {
-			open();
-		}
-		else {
-			char msg[128];
-			snprintf(msg, 128, "RIG: Not opening %s - no hamlib available", my_rig_name_.c_str());
-			status_->misc_status(ST_WARNING, msg);
-		}
-	}
+	// // If the name has been set, there is a rig
+	// if (my_rig_name_.length()) {
+	// 	if (hamlib_data_->port_type != RIG_PORT_NONE) {
+	// 		open();
+	// 	}
+	// 	else {
+	// 		char msg[128];
+	// 		snprintf(msg, 128, "RIG: Not opening %s - no hamlib available", my_rig_name_.c_str());
+	// 		status_->misc_status(ST_WARNING, msg);
+	// 	}
+	// }
 }
 
 // Destructor
