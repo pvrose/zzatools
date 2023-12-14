@@ -266,10 +266,22 @@ bool rig_if::open() {
 	opening_.store(true, memory_order_seq_cst);
 	thread_ = new thread(th_run_rig, this);
 	// Lock until the rig has been opened - should wait 
+	int timer = 0;
+	const int interval = 100;
+	const int timeout = 150000;
 	while(opening_) {
 		// Allow FLTK scheduler in
 		Fl::check();
-		this_thread::sleep_for(chrono::milliseconds(100));
+		this_thread::sleep_for(chrono::milliseconds(interval));
+		timer += interval;
+		if (timer >= timeout) {
+			char msg[128];
+			snprintf(msg, sizeof(msg), "RIG: Connecting %s abandoned after %d s", 
+				hamlib_data_->model.c_str(),
+				timeout / 1000);
+			status_->misc_status(ST_WARNING, msg);
+			opening_.store(false);
+		}
 	}
 	// And immediately unlock it
 		
@@ -310,6 +322,7 @@ bool rig_if::th_open_rig() {
 		close();
 	}
 	// Get the rig interface
+	printf("DEBUG: Getting rig info\n");
 	rig_ = rig_init(hamlib_data_->model_id);
 	if (rig_ != nullptr) {
 		switch (hamlib_data_->port_type) {
@@ -318,16 +331,18 @@ bool rig_if::th_open_rig() {
 			strcpy(rig_->state.rigport.pathname, hamlib_data_->port_name.c_str());
 			rig_->state.rigport.parm.serial.rate = hamlib_data_->baud_rate;
 			break;
+	// open r
 		case RIG_PORT_NETWORK:
 		case RIG_PORT_USB:
 			int err = rig_set_conf(rig_, rig_token_lookup(rig_, "rig_pathname"), hamlib_data_->port_name.c_str());
 			//strcpy(rig_->state.rigport.pathname, port_name_.c_str());
 			break;
 		}
-	}
+	} 
 	// open rig connection over serial port
+	printf("DEBUG: Opening rig\n");
 	error_code_ = rig_open(rig_);
-
+	printf("DEBUG: Open rig returned with error code %d\n", error_code_);
 	if (error_code_ != RIG_OK) {
 		// Not opened, tidy hamlib memory usage and mark it so.
 		rig_cleanup(rig_);
@@ -350,14 +365,17 @@ string& rig_if::rig_name() {
 
 // Thraed method
 void rig_if::th_run_rig(rig_if* that) {
+	printf("DEBUG:L Opening rig\n");
 	// Open the rig
 	if (!that->th_open_rig()) {
+		printf("DEBUG: Open failed!\n");
 		that->opening_ = false;
 		return;
 	}
 	// run_read_ will be cleared when the rig closes or errors.
 	that->th_read_values();
 	if (that->opened_ok_) {
+		printf("DEBUG: Opened OK\n");
 		that->opening_ = false;
 		that->run_read_ = true;
 		while (that->run_read_) {
@@ -365,6 +383,7 @@ void rig_if::th_run_rig(rig_if* that) {
 			this_thread::sleep_for(chrono::milliseconds(1000));
 		}
 	} else {
+		printf("DEBUG: Open failed!\n");
 		that->opening_ = false;
 	}
 }
