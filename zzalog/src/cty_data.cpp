@@ -287,7 +287,12 @@ cty_data::prefix_entry* cty_data::prefix(record* qso) {
 		suffix = "";
 		break;
 	case 2:
-		if (suffix.length() == 1 || suffix == "MM" || suffix == "AM") {
+		if (suffix == "MM") {
+			prefix_entry* prefix = new prefix_entry;
+			prefix->adif_id = 0;
+			return prefix;
+		}
+		else if (suffix.length() == 1 || suffix == "MM" || suffix == "AM") {
 			// Callsign has a roving style suffix - e.g. /M
 			suffix = "";
 			body = words[0];

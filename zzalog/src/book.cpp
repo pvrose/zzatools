@@ -1015,10 +1015,11 @@ bool book::refine_match(record* record) {
 
 // string item matches taking whether to use regex or not.
 bool book::match_string(string test, search_comp_t comparator, string value) {
-	basic_regex<char> regex(to_upper(test));
 	switch (comparator) {
-	case XP_REGEX:
+	case XP_REGEX: {
+		basic_regex<char> regex(to_upper(test));
 		return regex_match(to_upper(value), regex);
+	}
 	case XP_NE:
 		return (to_upper(value) != to_upper(test));
 	case XP_LT:
