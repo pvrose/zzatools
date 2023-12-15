@@ -791,7 +791,9 @@ void qso_data::action_save_edit() {
 void qso_data::action_cancel_edit() {
 	// printf("DEBUG: action_cancel_edit\n");
 	// Copy original back to the book
-	*book_->get_record(g_entry_->qso_number(), false) = *g_entry_->original_qso();
+	if (g_entry_->original_qso()) {
+		*book_->get_record(g_entry_->qso_number(), false) = *g_entry_->original_qso();
+	}
 	g_entry_->delete_qso();
 	logging_state_ = QSO_INACTIVE;
 	g_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
@@ -1160,6 +1162,8 @@ void qso_data::action_add_modem(record* qso) {
 	}
 	// The QSO is complete
 	action_save();
+	// Open in view
+	action_view();
 	
 	book_->selection(book_->item_number(g_entry_->qso_number()), HT_INSERTED);
 	book_->enable_save(true);
