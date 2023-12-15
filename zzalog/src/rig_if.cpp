@@ -325,7 +325,6 @@ bool rig_if::th_open_rig() {
 		close();
 	}
 	// Get the rig interface
-	printf("DEBUG: Getting rig info\n");
 	rig_ = rig_init(hamlib_data_->model_id);
 	if (rig_ != nullptr) {
 		switch (hamlib_data_->port_type) {
@@ -343,9 +342,7 @@ bool rig_if::th_open_rig() {
 		}
 	} 
 	// open rig connection over serial port
-	printf("DEBUG: Opening rig\n");
 	error_code_ = rig_open(rig_);
-	printf("DEBUG: Open rig returned with error code %d\n", error_code_);
 	if (error_code_ != RIG_OK) {
 		// Not opened, tidy hamlib memory usage and mark it so.
 		rig_cleanup(rig_);
@@ -368,17 +365,14 @@ string& rig_if::rig_name() {
 
 // Thraed method
 void rig_if::th_run_rig(rig_if* that) {
-	printf("DEBUG:L Opening rig\n");
 	// Open the rig
 	if (!that->th_open_rig()) {
-		printf("DEBUG: Open failed!\n");
 		that->opening_ = false;
 		return;
 	}
 	// run_read_ will be cleared when the rig closes or errors.
 	that->th_read_values();
 	if (that->opened_ok_) {
-		printf("DEBUG: Opened OK\n");
 		that->opening_ = false;
 		that->run_read_ = true;
 		while (that->run_read_) {
@@ -386,7 +380,6 @@ void rig_if::th_run_rig(rig_if* that) {
 			this_thread::sleep_for(chrono::milliseconds(1000));
 		}
 	} else {
-		printf("DEBUG: Open failed!\n");
 		that->opening_ = false;
 	}
 }
