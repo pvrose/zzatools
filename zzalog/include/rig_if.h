@@ -29,7 +29,8 @@ using namespace std;
 		GM_AM = '5',
 		GM_DIGL = '6',
 		GM_CWL = '7',
-		GM_DIGU = '9'
+		GM_DIGU = '9',
+		GM_DSTAR = 'A'
 	};
 
 	// slow rig polling - 1s -> 10min (default 1 min)

@@ -141,7 +141,7 @@ void rig_if::get_string_mode(string& mode, string& submode) {
 	submode = "";
 	switch (rig_mode) {
 	case GM_INVALID:
-		status_->misc_status(ST_ERROR, "RIG: Invalid mode got from rig");
+		mode = "???";
 		return;
 	case GM_DIGL:
 		mode = "DATA L";
@@ -166,6 +166,9 @@ void rig_if::get_string_mode(string& mode, string& submode) {
 		return;
 	case GM_AM:
 		mode = "AM";
+		return;
+	case GM_DSTAR:
+		mode = "DSTAR";
 		return;
 	default:
 		return;
@@ -416,6 +419,7 @@ void rig_if::th_read_values() {
 		return;
 	}
 	// Convert hamlib mode encoding to ZLG encoding
+	rig_data_.mode = GM_INVALID;
 	if (mode & RIG_MODE_AM) {
 		rig_data_.mode = GM_AM;
 	}
@@ -439,6 +443,9 @@ void rig_if::th_read_values() {
 	}
 	if (mode & (RIG_MODE_RTTYR | RIG_MODE_PKTUSB)) {
 		rig_data_.mode = GM_DIGU;
+	}
+	if (mode & RIG_MODE_DSTAR) {
+		rig_data_.mode = GM_DSTAR;
 	}
 	// Read drive level
 	value_t drive_level;
