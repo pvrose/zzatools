@@ -598,7 +598,7 @@ void QBS_window::update_sort_cards() {
 	ip_delta_[ix]->show();
 	ip_delta_[ix]->value("0");
 	bx_label_[ix]->show();
-	bx_label_[ix]->label(data_->get_batch(ch_batch_->value()).c_str());
+	bx_label_[ix]->copy_label(data_->get_batch(ch_batch_->value()).c_str());
 	index_curr_ = ix;
 	ix++;
 	for (ix++; ix < NUM_COUNTS; ix++) {
@@ -657,10 +657,10 @@ void QBS_window::update_keep_cards() {
 	op_value_[ix]->value(buff);
 	ip_delta_[ix]->hide();
 	bx_label_[ix]->show();
-	bx_label_[ix]->label(data_->get_batch(ch_batch_->value()).c_str());
+	bx_label_[ix]->copy_label(data_->get_batch(ch_batch_->value()).c_str());
 	index_curr_ = ix;
 	ix++;
-	for (ix++; ix < NUM_COUNTS; ix++) {
+	for (; ix < NUM_COUNTS; ix++) {
 		op_value_[ix]->hide();
 		ip_delta_[ix]->hide();
 		bx_label_[ix]->hide();
