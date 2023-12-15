@@ -32,6 +32,7 @@ status::status() :
 	  report_filename_("")
 	, report_file_(nullptr)
 	, file_unusable_(false)
+	, previous_value_(-1)
 {
 	// Initialise attributes
 	progress_stack_.clear();
@@ -81,6 +82,8 @@ void status::progress(int max_value, object_t object, const char* description, c
 		snprintf(message, 100, "PROGRESS: Already started progress for %s", OBJECT_NAMES.at(object));
 		misc_status(ST_ERROR, message);
 	} else {
+		// Reset previous value as a new progress
+		previous_value_ = -1;
 		// Start a new progress bar process - create the progress item (total expected count, objects being counted, up/down and what view it's for)
 		char message[100];
 		snprintf(message, 100, "PROGRESS: Starting %s - %d %s", description, max_value, suffix);
@@ -111,11 +114,14 @@ void status::update_progress(object_t object) {
 	if (progress_stack_.size() && progress_stack_.back() == object) {
 		// The progress bar is top of the stack - don't update the bar if it isn't
 		progress_item* item = progress_items_.at(object);
-		Fl_Color bar_colour = OBJECT_COLOURS.at(object);
-		char label[100];
-		sprintf(label, "PROGRESS: %d/%d %s", item->value, item->max_value, item->suffix);
-		// progress_->copy_label(label);
-		misc_status(ST_LOG, label);
+		if (item->value != previous_value_) {
+			Fl_Color bar_colour = OBJECT_COLOURS.at(object);
+			char label[100];
+			sprintf(label, "PROGRESS: %d/%d %s", item->value, item->max_value, item->suffix);
+			// progress_->copy_label(label);
+			misc_status(ST_LOG, label);
+			previous_value_ = item->value;
+		}
 	}
 }
 

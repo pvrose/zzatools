@@ -108,6 +108,8 @@ using namespace std;
 		map<object_t, progress_item*> progress_items_;
 		// Report file unusable
 		bool file_unusable_;
+		// Previous progress value
+		int previous_value_;
 	};
 #endif
 
