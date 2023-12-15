@@ -491,10 +491,13 @@ string cty_data::get_tip(record* qso) {
 
 // Get default values for entity n
 string cty_data::name(int adif_id) {
+	if (adif_id == 0) {
+		return "";
+	}
 	if (entities_.find(adif_id) == entities_.end()) {
 		char msg[160];
 		snprintf(msg, sizeof(msg), "CTY DATA: %d is not a valid DXCC entity number", adif_id);
-		status_->misc_status(adif_id == 0 ? ST_WARNING : ST_ERROR, msg);
+		status_->misc_status(ST_ERROR, msg);
 		return "";
 	}
 	else {
@@ -503,10 +506,13 @@ string cty_data::name(int adif_id) {
 }
 
 string cty_data::continent(int adif_id) {
+	if (adif_id == 0) {
+		return "";
+	}
 	if (entities_.find(adif_id) == entities_.end()) {
 		char msg[160];
 		snprintf(msg, sizeof(msg), "CTY DATA: %d is not a valid DXCC entity number", adif_id);
-		status_->misc_status(adif_id == 0 ? ST_WARNING : ST_ERROR, msg);
+		status_->misc_status(ST_ERROR, msg);
 		return "";
 	}
 	else {
@@ -515,10 +521,13 @@ string cty_data::continent(int adif_id) {
 }
 
 string cty_data::nickname(int adif_id) {
+	if (adif_id == 0) {
+		return "";
+	}
 	if (entities_.find(adif_id) == entities_.end()) {
 		char msg[160];
 		snprintf(msg, sizeof(msg), "CTY DATA: %d is not a valid DXCC entity number", adif_id);
-		status_->misc_status(adif_id == 0 ? ST_WARNING : ST_ERROR, msg);
+		status_->misc_status(ST_ERROR, msg);
 		return "";
 	}
 	else {
@@ -527,10 +536,13 @@ string cty_data::nickname(int adif_id) {
 }
 
 int cty_data::cq_zone(int adif_id) {
+	if (adif_id == 0) {
+		return 0;
+	}
 	if (entities_.find(adif_id) == entities_.end()) {
 		char msg[160];
 		snprintf(msg, sizeof(msg), "CTY DATA: %d is not a valid DXCC entity number", adif_id);
-		status_->misc_status(adif_id == 0 ? ST_WARNING : ST_ERROR, msg);
+		status_->misc_status(ST_ERROR, msg);
 		return 0;
 	}
 	else {
