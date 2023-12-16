@@ -134,7 +134,7 @@ void rig_if::ticker() {
 	//}
 }
 
-// Converts rig mode to string
+// Converts rig mode to ADIF mode/submode
 void rig_if::get_string_mode(string& mode, string& submode) {
 	rig_mode_t rig_mode = rig_data_.mode;
 	mode = "";
@@ -168,7 +168,8 @@ void rig_if::get_string_mode(string& mode, string& submode) {
 		mode = "AM";
 		return;
 	case GM_DSTAR:
-		mode = "DSTAR";
+		mode = "DIGITALVOICE";
+		submode = "DSTAR";
 		return;
 	default:
 		return;
@@ -304,7 +305,7 @@ bool rig_if::open() {
 				hamlib_data_->port_name.c_str(),
 				rig_get_info(rig_));
 		}
-		status_->misc_status(ST_NOTE, msg);
+		status_->misc_status(ST_OK, msg);
 		return true;
 	}
 	else {
