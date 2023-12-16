@@ -288,6 +288,7 @@ cty_data::prefix_entry* cty_data::prefix(record* qso) {
 		break;
 	case 2:
 		if (suffix == "MM") {
+			// /MM - not in a DXCC entity so no need to parse the callsign further
 			prefix_entry* prefix = new prefix_entry;
 			prefix->adif_id = 0;
 			return prefix;
