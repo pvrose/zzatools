@@ -1448,6 +1448,7 @@ bool qso_data::inactive() {
 	switch(logging_state_) {
 	case QSO_INACTIVE:
 	case QSO_PENDING:
+	case QSO_VIEW:
 		return true;
 	default:
 		return false;
