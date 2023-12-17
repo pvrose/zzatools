@@ -31,6 +31,7 @@ extern qrz_handler* qrz_handler_;
 extern wsjtx_handler* wsjtx_handler_;
 extern menu* menu_;
 extern double prev_freq_;
+extern bool DARK;
 
 // qso_group_
 qso_data::qso_data(int X, int Y, int W, int H, const char* l) :
@@ -136,7 +137,7 @@ void qso_data::enable_widgets() {
 		switch (logging_state_) {
 		case QSO_INACTIVE:
 			g_entry_->label("QSO Entry is not enabled");
-			g_entry_->labelcolor(FL_RED);
+			g_entry_->labelcolor(DARK ? fl_lighter(FL_RED) : FL_RED);
 			g_entry_->show();
 			g_entry_->enable_widgets();
 			g_net_entry_->hide();
@@ -145,7 +146,7 @@ void qso_data::enable_widgets() {
 			break;
 		case QSO_PENDING:
 			g_entry_->label("QSO Entry - prepared for real-time logging.");
-			g_entry_->labelcolor(FL_BLUE);
+			g_entry_->labelcolor(DARK ? fl_lighter(FL_BLUE) : FL_BLUE);
 			g_entry_->show();
 			g_entry_->enable_widgets();
 			g_net_entry_->hide();
@@ -155,7 +156,7 @@ void qso_data::enable_widgets() {
 		case QSO_STARTED:
 			snprintf(l, sizeof(l), "QSO Entry - %s - logging new contact", current_qso()->item("CALL").c_str());
 			g_entry_->copy_label(l);
-			g_entry_->labelcolor(FL_BLUE);
+			g_entry_->labelcolor(DARK ? fl_lighter(FL_BLUE) : FL_BLUE);
 			g_entry_->show();
 			g_entry_->enable_widgets();
 			g_net_entry_->hide();
@@ -165,7 +166,7 @@ void qso_data::enable_widgets() {
 		case QSO_ENTER:
 			snprintf(l, sizeof(l), "QSO Entry - %s - logging old contact", current_qso()->item("CALL").c_str());
 			g_entry_->copy_label(l);
-			g_entry_->labelcolor(FL_BLUE);
+			g_entry_->labelcolor(DARK ? fl_lighter(FL_BLUE) : FL_BLUE);
 			g_entry_->show();
 			g_entry_->enable_widgets();
 			g_net_entry_->hide();
@@ -175,7 +176,7 @@ void qso_data::enable_widgets() {
 		case QSO_EDIT:
 			snprintf(l, sizeof(l), "QSO Entry - %s - editing existing contact", current_qso()->item("CALL").c_str());
 			g_entry_->copy_label(l);
-			g_entry_->labelcolor(FL_BLUE);
+			g_entry_->labelcolor(DARK ? fl_lighter(FL_BLUE) : FL_BLUE);
 			g_entry_->show();
 			g_entry_->enable_widgets();
 			g_net_entry_->hide();
@@ -185,7 +186,7 @@ void qso_data::enable_widgets() {
 		case QSO_VIEW:
 			snprintf(l, sizeof(l), "QSO Entry - %s - read only", current_qso()->item("CALL").c_str());
 			g_entry_->copy_label(l);
-			g_entry_->labelcolor(FL_BLUE);
+			g_entry_->labelcolor(DARK ? fl_lighter(FL_BLUE) : FL_BLUE);
 			g_entry_->show();
 			g_entry_->enable_widgets();
 			g_net_entry_->hide();

@@ -280,12 +280,12 @@ void qso_qsl::enable_widgets() {
 	} else if ( os_eqsl_dnld_ > curr) {
 		op_eqsl_count_->labelcolor(FL_BLACK);
 		op_eqsl_count_->labelfont(FL_BOLD);
-		op_eqsl_count_->color(FL_WHITE, FL_YELLOW);
+		op_eqsl_count_->color(FL_WHITE, FL_DARK_YELLOW);
 		op_eqsl_count_->value(tkr_value_);
 	} else {
 		op_eqsl_count_->labelcolor(FL_RED);
 		op_eqsl_count_->labelfont(FL_BOLD);
-		op_eqsl_count_->color(FL_WHITE, FL_YELLOW);
+		op_eqsl_count_->color(FL_WHITE, FL_DARK_YELLOW);
 		op_eqsl_count_->value(tkr_value_);
 	} 
 }
