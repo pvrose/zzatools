@@ -38,6 +38,7 @@ main.cpp - application entry point
 #include "hamlib/rig.h"
 #include "main_window.h"
 #include "qso_manager.h"
+#include "logo.h"
 
 // C/C++ header files
 #include <ctime>
@@ -693,7 +694,8 @@ void tidy() {
 // Add the icon
 void add_icon(const char* arg0) {
 	// set the default Icon
-	Fl_Window::default_icon(new Fl_RGB_Image(ICON_MAIN, 16, 16, 4));
+	// Fl_Window::default_icon(new Fl_RGB_Image(ICON_MAIN, 16, 16, 4));
+	Fl_Window::default_icon(new Fl_PNG_Image("LOGO", logo, sizeof(logo)));
 }
 
 // Display the arguments in the status log
