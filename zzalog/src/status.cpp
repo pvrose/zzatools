@@ -198,7 +198,7 @@ void status::misc_status(status_t status, const char* label) {
 	char f_message[128];
 	// X YYYY/MM/DD HH:MM:SS Message 
 	// X is a single letter indicating the message severity
-	snprintf(f_message, sizeof(f_message), "%c %s %s%c", STATUS_CODES.at(status), timestamp.c_str(), label, status == ST_PROGRESS ? '\r' : '\n');
+	snprintf(f_message, sizeof(f_message), "%c %s %s\n", STATUS_CODES.at(status), timestamp.c_str(), label);
 
 	if (DEBUG_STATUS) {
 		// Restore default colours
