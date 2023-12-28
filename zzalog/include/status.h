@@ -20,6 +20,7 @@ using namespace std;
 	const map<status_t, colours_t> STATUS_COLOURS = {
 		{ ST_NONE, { FL_BLUE, FL_BLACK } },
 		{ ST_LOG, { fl_lighter(FL_BLUE), FL_BLACK } },
+		{ ST_PROGRESS, { fl_lighter(FL_BLUE), FL_BLACK } },
 		{ ST_DEBUG, { fl_lighter(FL_MAGENTA), FL_BLACK } },
 		{ ST_NOTE, { fl_lighter(FL_CYAN), FL_BLACK } },
 		{ ST_OK, { fl_lighter(FL_GREEN), FL_BLACK } },
@@ -34,6 +35,7 @@ using namespace std;
 	const map<status_t, char> STATUS_CODES = {
 		{ ST_NONE, ' '},
 		{ ST_LOG, 'L'},
+		{ ST_PROGRESS, 'P'},
 		{ ST_DEBUG, 'B' },
 		{ ST_NOTE, 'N'},
 		{ ST_OK, 'D'},
@@ -48,6 +50,7 @@ using namespace std;
 	const map<status_t, string> STATUS_TEXTS = {
 		{ ST_NONE, "All"},
 		{ ST_LOG, "Information"},
+		{ ST_PROGRESS, "Progress info"},
 		{ ST_DEBUG, "Debug info"},
 		{ ST_NOTE, "Action starting"},
 		{ ST_OK, "Action complete"},

@@ -28,6 +28,7 @@ using namespace std;
 	enum status_t {
 		ST_NONE,             // Uninitialised
 		ST_LOG,              // Only log the message, do not display it in status
+		ST_PROGRESS,         // as ST_LOG does not append a new line only CR
 		ST_DEBUG,            // Debug message
 		ST_NOTE,             // An information message
 		ST_OK,               // Task successful

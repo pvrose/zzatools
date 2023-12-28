@@ -153,6 +153,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="zzalog\src\band_data.cpp" />
+    <ClCompile Include="zzalog\src\logo.cpp" />
     <ClCompile Include="zzalog\src\page_dialog.cpp" />
     <ClCompile Include="zzalog\src\qso_buttons.cpp" />
     <ClCompile Include="zzalog\src\qso_clock.cpp" />
@@ -243,6 +244,7 @@
     <ClInclude Include="zzalog\include\callback.h" />
     <ClInclude Include="zzalog\include\drawing.h" />
     <ClInclude Include="zzalog\include\formats.h" />
+    <ClInclude Include="zzalog\include\logo.h" />
     <ClInclude Include="zzalog\include\page_dialog.h" />
     <ClInclude Include="zzalog\include\qso_buttons.h" />
     <ClInclude Include="zzalog\include\qso_clock.h" />
