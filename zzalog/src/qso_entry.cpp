@@ -353,58 +353,69 @@ void qso_entry::copy_qso_to_qso(record* old_record, int flags) {
 
 // Copy fields from CAT and default rig etc.
 void qso_entry::copy_cat_to_qso() {
-	rig_if* rig = ((qso_manager*)qso_data_->parent())->rig();
-	// Rig can be temporarily missing q
-	if (rig && rig->is_good() && qso_ != nullptr) {
-		string freqy = rig->get_frequency(true);
-		string mode;
-		string submode;
-		rig->get_string_mode(mode, submode);
-		// Get the maximum power over course of QSO.
-		double tx_power;
-		qso_->item("TX_PWR", tx_power);
-		tx_power = max(tx_power, rig->get_dpower(true));
-		switch (qso_data_->logging_state()) {
-		case qso_data::QSO_PENDING:
-		case qso_data::NET_STARTED:
-		{
-			// Load values from rig
-			qso_->item("FREQ", freqy);
-			// Get mode - NB USB/LSB need further processing
-			if (mode != "DATA L" && mode != "DATA U") {
-				qso_->item("MODE", mode);
-				qso_->item("SUBMODE", submode);
-			}
-			else {
-				qso_->item("MODE", string(""));
-				qso_->item("SUBMODE", string(""));
-			}
+	qso_rig* rig_control = ((qso_manager*)qso_data_->parent())->rig_control();
+	if (rig_control){
+		rig_if* rig = rig_control->rig();
+		// Rig can be temporarily missing q
+		if (rig && rig->is_good() && qso_ != nullptr) {
+			string rig_name = rig_control->label();
+			string freqy = rig->get_frequency(true);
+			string mode;
+			string submode;
+			rig->get_string_mode(mode, submode);
+			// Get the maximum power over course of QSO.
+			double tx_power;
 			qso_->item("TX_PWR", tx_power);
-			break;
-		}
-		case qso_data::QSO_STARTED: {
-			// Ignore values except TX_PWR which accumulates maximum value
-			char message[128];
-			if (qso_->item("FREQ") != freqy) {
-				snprintf(message, 128, "DASH: Rig frequency changed during QSO, New value %s", freqy.c_str());
-				status_->misc_status(ST_WARNING, message);
+			tx_power = max(tx_power, rig->get_dpower(true));
+			switch (qso_data_->logging_state()) {
+			case qso_data::QSO_PENDING:
+			case qso_data::NET_STARTED:
+			{
+				// Load rig label
+				qso_->item("MY_RIG", rig_name);
+				// Load values from rig
 				qso_->item("FREQ", freqy);
+				// Get mode - NB USB/LSB need further processing
+				if (mode != "DATA L" && mode != "DATA U") {
+					qso_->item("MODE", mode);
+					qso_->item("SUBMODE", submode);
+				}
+				else {
+					qso_->item("MODE", string(""));
+					qso_->item("SUBMODE", string(""));
+				}
+				qso_->item("TX_PWR", tx_power);
+				break;
 			}
-			if (qso_->item("MODE") != mode) {
-				snprintf(message, 128, "DASH: Rig mode changed during QSO, New value %s", mode.c_str());
-				status_->misc_status(ST_WARNING, message);
-				qso_->item("MODE", mode);
+			case qso_data::QSO_STARTED: {
+				// Ignore values except TX_PWR which accumulates maximum value
+				char message[128];
+				if (qso_->item("MY_RIG") != rig_name) {
+					snprintf(message, 128, "DASH: Rig changed during QSO, New value %s", rig_name.c_str());
+					status_->misc_status(ST_WARNING, message);
+					qso_->item("MY_RIGy", rig_name);
+				}
+				if (qso_->item("FREQ") != freqy) {
+					snprintf(message, 128, "DASH: Rig frequency changed during QSO, New value %s", freqy.c_str());
+					status_->misc_status(ST_WARNING, message);
+					qso_->item("FREQ", freqy);
+				}
+				if (qso_->item("MODE") != mode) {
+					snprintf(message, 128, "DASH: Rig mode changed during QSO, New value %s", mode.c_str());
+					status_->misc_status(ST_WARNING, message);
+					qso_->item("MODE", mode);
+				}
+				if (qso_->item("SUBMODE") != submode) {
+					snprintf(message, 128, "DASH: Rig submode changed during QSO, New value %s", submode.c_str());
+					status_->misc_status(ST_WARNING, message);
+					qso_->item("SUBMODE", submode);
+				}
+				qso_->item("TX_PWR", tx_power);
+				break;
 			}
-			if (qso_->item("SUBMODE") != submode) {
-				snprintf(message, 128, "DASH: Rig submode changed during QSO, New value %s", submode.c_str());
-				status_->misc_status(ST_WARNING, message);
-				qso_->item("SUBMODE", submode);
 			}
-			qso_->item("TX_PWR", tx_power);
-			break;
+			copy_qso_to_display(CF_CAT);
 		}
-		}
-		copy_qso_to_display(CF_CAT);
 	}
 }
 

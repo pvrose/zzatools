@@ -287,6 +287,12 @@ rig_if* qso_manager::rig() {
 	else return nullptr;
 }
 
+// Get rig control
+qso_rig* qso_manager::rig_control() {
+	if (rig_group_) return (qso_rig*)rig_group_->value();
+	else return nullptr;
+}
+
 // Called whenever another view updates a record (or selects a new one)
 void qso_manager::update_qso(hint_t hint, qso_num_t match_num, qso_num_t query_num) {
 	record* target = book_->get_record(match_num, false);

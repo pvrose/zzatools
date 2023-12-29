@@ -5,6 +5,7 @@
 #include "qso_data.h"
 #include "qso_tabbed_rigs.h"
 #include "qso_log.h"
+#include "qso_rig.h"
 
 #include "callback.h"
 #include "record.h"
@@ -14,6 +15,7 @@
 #include "book.h"
 #include "import_data.h"
 #include "extract_data.h"
+#include "rig_if.h"
 
 #include <string>
 #include <vector>
@@ -111,6 +113,8 @@ using namespace std;
 		void change_rig(string rig_name);
 		// Get rig
 		rig_if* rig();
+		// Get rig control
+		qso_rig* rig_control();
 		// Stop the 1s timer in qso_clock
 		void stop_ticker();
 		// Get current displayed QSO
