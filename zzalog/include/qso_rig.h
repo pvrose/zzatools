@@ -2,8 +2,10 @@
 
 #include "rig_if.h"
 #include "hamlib/rig.h"
+#include "field_choice.h"
 
 #include <string>
+
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Light_Button.H>
 #include <FL/Fl_Check_Button.H>
@@ -47,6 +49,8 @@ public:
 	rig_if* rig();
 	// Notification colour
 	Fl_Color alert_colour();
+	// Preferred antenna
+	string antenna();
 
 protected:
 	// Callback - model choice
@@ -102,6 +106,7 @@ protected:
 	Fl_Output* op_status_;
 	Fl_Button* bn_connect_;
 	Fl_Light_Button* bn_select_;
+	field_input* ip_antenna_;
 	// Modifier widgets
 	Fl_Group* modifier_grp_;
 	Fl_Check_Button* bn_mod_freq_;
@@ -125,6 +130,9 @@ protected:
 	rig_if::hamlib_data_t hamlib_data_;
 	// Current mode
 	rig_port_e mode_;
+	// Current antenna
+	string antenna_;
+	
 
 	// Modifier attributes
 	bool modify_freq_;

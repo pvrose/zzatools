@@ -85,6 +85,11 @@ void qso_rig::load_values() {
 		else {
 			hamlib_data_.port_type = capabilities->port_type;
 		};
+		
+		// Preferred antenna
+		rig_settings.get("Antenna", temp, "");
+		antenna_ = temp;
+		free(temp);
 
 		Fl_Preferences modifier_settings(rig_settings, "Modifiers");
 		if (modifier_settings.get("Frequency", freq_offset_, 0.0)) {
@@ -197,7 +202,7 @@ void qso_rig::create_form(int X, int Y) {
 	// RIG=====v
 	// PORTv  ALL*
 	// BAUDv  OVR*
-	curr_y += HTEXT + GAP;
+	curr_y += HTEXT;
 	serial_grp_ = new Fl_Group(X + GAP, curr_y, 10, 10);
 	serial_grp_->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 	serial_grp_->box(FL_NO_BOX);
@@ -270,6 +275,17 @@ void qso_rig::create_form(int X, int Y) {
 	curr_x = x() + GAP;
 	curr_y = max(serial_grp_->y() + serial_grp_->h(), network_grp_->y() + network_grp_->h());
 	
+	curr_x += WLABEL;
+	ip_antenna_ = new field_input(curr_x, curr_y, WSMEDIT, HTEXT, "Antenna");
+	ip_antenna_->align(FL_ALIGN_LEFT);
+	ip_antenna_->callback(cb_value<field_input, string>, &antenna_);
+	ip_antenna_->tooltip("Select the preferred antenna for this rig");
+	ip_antenna_->field_name("MY_ANTENNA");
+	ip_antenna_->value(antenna_.c_str());
+
+	curr_x = x() + GAP;
+	curr_y += ip_antenna_->h() + GAP;
+
 	modifier_grp_ = new Fl_Group(curr_x, curr_y, 10, 10);
 	modifier_grp_->box(FL_FLAT_BOX);
 
@@ -392,6 +408,8 @@ void qso_rig::save_values() {
 		hamlib_settings.set("Port", hamlib_data_.port_name.c_str());
 		hamlib_settings.set("Baud Rate", hamlib_data_.baud_rate);
 		hamlib_settings.set("Model ID", (int)hamlib_data_.model_id);
+		// Preferred antenna
+		rig_settings.set("Antenna", antenna_.c_str());
 		// Modifier settings
 		Fl_Preferences modr_settings(rig_settings, "Modifiers");
 		modr_settings.clear();
@@ -907,4 +925,9 @@ void qso_rig::modify_rig() {
 			rig_->clear_power_modifier();
 		}
 	}
+}
+
+// Return the preferred antenna
+string qso_rig::antenna() {
+	return antenna_;
 }

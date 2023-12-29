@@ -359,6 +359,7 @@ void qso_entry::copy_cat_to_qso() {
 		// Rig can be temporarily missing q
 		if (rig && rig->is_good() && qso_ != nullptr) {
 			string rig_name = rig_control->label();
+			string antenna = rig_control->antenna();
 			string freqy = rig->get_frequency(true);
 			string mode;
 			string submode;
@@ -373,6 +374,7 @@ void qso_entry::copy_cat_to_qso() {
 			{
 				// Load rig label
 				qso_->item("MY_RIG", rig_name);
+				qso_->item("MY_ANTENNA", antenna);
 				// Load values from rig
 				qso_->item("FREQ", freqy);
 				// Get mode - NB USB/LSB need further processing
@@ -393,7 +395,12 @@ void qso_entry::copy_cat_to_qso() {
 				if (qso_->item("MY_RIG") != rig_name) {
 					snprintf(message, 128, "DASH: Rig changed during QSO, New value %s", rig_name.c_str());
 					status_->misc_status(ST_WARNING, message);
-					qso_->item("MY_RIGy", rig_name);
+					qso_->item("MY_RIG", rig_name);
+				}
+				if (qso_->item("MY_ANTENNA") != antenna) {
+					snprintf(message, 128, "DASH: Antenna changed during QSO, New value %s", rig_name.c_str());
+					status_->misc_status(ST_WARNING, message);
+					qso_->item("MY_ANTENNA", antenna);
 				}
 				if (qso_->item("FREQ") != freqy) {
 					snprintf(message, 128, "DASH: Rig frequency changed during QSO, New value %s", freqy.c_str());

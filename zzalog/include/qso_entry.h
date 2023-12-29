@@ -41,7 +41,7 @@ public:
 	const map < copy_flags, set<string> > COPY_FIELDS =
 	{
 		{ CF_RIG_ETC, { "MY_RIG", "MY_ANTENNA", "STATION_CALLSIGN", "APP_ZZA_QTH", "APP_ZZA_OP" } },
-		{ CF_CAT, { "MODE", "FREQ", "SUBMODE", "TX_PWR", "BAND", "MY_RIG" } },
+		{ CF_CAT, { "MODE", "FREQ", "SUBMODE", "TX_PWR", "BAND", "MY_RIG", "MY_ANTENNA" } },
 		{ CF_DATE, { "QSO_DATE" } },
 		{ CF_TIME, { "QSO_DATE_OFF", "TIME_ON", "TIME_OFF" } },
 		{ CF_CALL, { "CALL" }},
