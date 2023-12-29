@@ -449,9 +449,11 @@ void log_table::update(hint_t hint, qso_num_t record_num_1, qso_num_t record_num
 		// Rows must exist before the following has an effect
 		adjust_row_sizes();
 		// select specified record
-		current_item_num_ = my_book_->item_number(record_num_1);
-		if (order_ == LAST_TO_FIRST) {
-			current_item_num_ = my_book_->size() - 1 - current_item_num_;
+		if (record_num_1 != -1) {
+			current_item_num_ = my_book_->item_number(record_num_1);
+			if (order_ == LAST_TO_FIRST) {
+				current_item_num_ = my_book_->size() - 1 - current_item_num_;
+			}
 		}
 		display_current();
 		redraw();
