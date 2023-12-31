@@ -1213,10 +1213,6 @@ bool book::get_macro(record* use_record, string macro_name, set<string> field_na
 						modified(true);
 					}
 					else {
-						char* bn3;
-						char* label = "Ignore";
-						if (allow_null) bn3 = label;
-						else bn3 = nullptr;
 						snprintf(message, 128, "LOG: %s %s %s %s - new value  (%s) differs from old (%s)",
 							use_record->item("QSO_DATE").c_str(),
 							use_record->item("TIME_ON").c_str(),
@@ -1228,7 +1224,7 @@ bool book::get_macro(record* use_record, string macro_name, set<string> field_na
 						if ((*it) != "MY_GRIDSQUARE" || value.length() > old_value.length() || value != old_value.substr(0, value.length())) {
 							switch(fl_choice(
 								"Imported %s: New value %s; old value %s. Select New or Old?",
-								"New", "Old", bn3,
+								"New", "Old", allow_null ? "Ignore" : nullptr,
 								(*it).c_str(), value.c_str(), old_value.c_str())
 							) {
 							case 0:
