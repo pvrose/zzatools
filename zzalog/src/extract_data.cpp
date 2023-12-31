@@ -626,7 +626,7 @@ void extract_data::extract_no_image() {
 			checked++;
 			status_->progress(checked, OT_EXTRACT);
 		}
-		snprintf(message, sizeof(message), "EXTRACT: %zu records deleted, %zu total", count, size());
+		snprintf(message, sizeof(message), "EXTRACT: %d records deleted, %zu total", count, size());
 		status_->misc_status(ST_OK, message);
 		tabbed_forms_->activate_pane(OT_EXTRACT, true);
 		// Select first extracted record

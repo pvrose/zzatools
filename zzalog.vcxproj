@@ -153,7 +153,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="zzalog\src\band_data.cpp" />
-    <ClCompile Include="zzalog\src\logo.cpp" />
     <ClCompile Include="zzalog\src\page_dialog.cpp" />
     <ClCompile Include="zzalog\src\qso_buttons.cpp" />
     <ClCompile Include="zzalog\src\qso_clock.cpp" />

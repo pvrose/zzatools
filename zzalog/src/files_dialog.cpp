@@ -295,7 +295,7 @@ void files_dialog::create_form(int X, int Y) {
 	spin_auto->when(FL_WHEN_RELEASE);
 	spin_auto->value(auto_poll_);
 	char tip[128];
-	sprintf(tip, "Select the required polling period (s). Min = %f, Max = %f", AUTO_IP_MIN, AUTO_IP_MAX);
+	sprintf(tip, "Select the required polling period (s). Min = %d, Max = %d", AUTO_IP_MIN, AUTO_IP_MAX);
 	spin_auto->copy_tooltip(tip);
 
 	grp_auto->end();
