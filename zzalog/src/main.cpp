@@ -71,7 +71,7 @@ using namespace std;
 string COPYRIGHT = "\xA9 Philip Rose GM3ZZA 2018. All rights reserved.\nPrefix data courtesy of clublog.org";
 string PROGRAM_ID = "ZZALOG";
 string PROG_ID = "ZLG";
-string PROGRAM_VERSION = "3.4.58";
+string PROGRAM_VERSION = "3.4.59";
 string TIMESTAMP = __DATE__ + string(" ") + __TIME__;
 string VENDOR = "GM3ZZA";
 
@@ -92,8 +92,8 @@ bool PRIVATE = false;
 bool DARK = true;
 
 // Ticker values
-double TICK = 0.1;      // 100 ms
-unsigned int TICK_SECOND = 10;
+const double TICK = 0.1;      // 100 ms
+const unsigned int TICK_SECOND = 10;
 
 
 // FLTK externals
