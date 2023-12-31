@@ -1,16 +1,21 @@
 #include "QBS_data.h"
 #include "QBS_window.h"
 #include "QBS_consts.h"
+#include "QBS_logo.h"
 
 #include <string>
 
 #include <FL/Fl_Preferences.H>
+#include <FL/Fl_PNG_Image.H>
 
 using namespace std;
 
 const char* DATE_FORMAT = "%Y-%m-%d";
 extern int FL_NORMAL_SIZE;
 const char* VERSION = "1.0.12";
+// Main logo
+Fl_PNG_Image main_icon_("QBS_ICON", qbs_png, qbs_png_len);
+
 
 QBS_window* window_;
 
@@ -30,6 +35,8 @@ int main(int argc, char** argv)
 	Fl::foreground(240, 240, 240);
 	Fl::background2(25, 25, 25);
 	Fl::background(0, 0, 0);
+
+	Fl_Window::default_icon(&main_icon_);
 
 	// Get filename - use argument if set
 	string filename = "";

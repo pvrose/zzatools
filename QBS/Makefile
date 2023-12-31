@@ -34,7 +34,7 @@ TARFILE = $(TARGET_EXEC:.exe=.tgz)
 
 # Every folder in ./src will need to be passed to GCC so that it can find header files
 INC_DIRS := ./include
-INC_DIRS += $(FLTK_DIR) $(FLTK_BUILD)
+#INC_DIRS += $(FLTK_DIR) $(FLTK_BUILD)
 #INC_DIRS += $(HAMLIB_BUILD)/include
 
 # Add a prefix to INC_DIRS. So moduleA would become -ImoduleA. GCC understands this -I flag
@@ -78,6 +78,10 @@ ifeq ($(BUILD_TYPE), Debug)
 else
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
 endif
+# Create the logo includefile
+./include/QBS_logo.h: $(TARGET_EXEC).png
+	xxd -i $< > $@
+	
 
 # Create a target to run the compiled code
 .PHONY: run
