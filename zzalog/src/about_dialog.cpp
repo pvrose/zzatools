@@ -1,7 +1,6 @@
 #include "about_dialog.h"
 
 #include "spec_data.h"
-#include "icons.h"
 #include "utils.h"
 
 #include "hamlib/rig.h"
@@ -9,7 +8,7 @@
 #include <FL/Fl_Multiline_Output.H>
 #include <FL/fl_draw.H>
 #include <FL/Fl_Button.H>
-#include <FL/Fl_RGB_Image.H>
+#include <FL/Fl_PNG_Image.H>
 #include <FL/Fl.H>
 
 
@@ -20,7 +19,7 @@ extern string PROGRAM_ID;
 extern string PROGRAM_VERSION;
 extern string COPYRIGHT;
 extern string TIMESTAMP;
-
+extern Fl_PNG_Image main_icon_;
 
 
 // Creates the about box dialog and displays it.
@@ -28,12 +27,13 @@ about_dialog::about_dialog() :
 	win_dialog(10, 10)
 {
 	// Position constants 
+	const int WICON = main_icon_.w();
+	const int HICON = main_icon_.h();
 	const int XG = EDGE;
 	// Column 1 has just the program icon
 	const int C1 = XG;
-	const int ICON = 48;
 	// Column 2 - text boxes and OK button
-	const int C2 = C1 + ICON + GAP;
+	const int C2 = C1 + WICON + GAP;
 	const int W2 = 2 * WEDIT;
 	const int WALL = C2 + W2 + EDGE;
 	const int YG = EDGE;
@@ -75,12 +75,10 @@ about_dialog::about_dialog() :
 	const int HALL = R4 + HBUTTON + EDGE;
 
 	// now calculate where to put the icon - centralise its Y position
-	const int YICON = (HALL - ICON) / 2;
-	Fl_Button* bn_icon = new Fl_Button(C1, YICON, ICON, ICON);
-	// Icon is defined as a 16*16 RGBA image -
-	Fl_RGB_Image icon(ICON_MAIN, 16, 16, 4);
+	const int YICON = (HALL - HICON) / 2;
+	Fl_Button* bn_icon = new Fl_Button(C1, YICON, WICON, HICON);
 	// Expand it to 48*48
-	bn_icon->image(icon.copy(ICON, ICON));
+	bn_icon->image(main_icon_);
 	// No edge to the button
 	bn_icon->box(FL_FLAT_BOX);
 

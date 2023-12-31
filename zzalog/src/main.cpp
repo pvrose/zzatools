@@ -8,7 +8,6 @@ main.cpp - application entry point
 
 // local header files
 
-#include "icons.h"
 #include "utils.h"
 #include "record.h"
 #include "settings.h"
@@ -152,6 +151,8 @@ uint64_t ticks_ = 0;
 char* filename_ = nullptr;
 // Default station callsign
 string default_station_ = "";
+// Main logo
+Fl_PNG_Image main_icon_("ZZALOG_ICON", zzalog_png, zzalog_png_len);
 
 static void cb_ticker(void* v) {
 	// Units that require 1s tick
@@ -695,7 +696,7 @@ void tidy() {
 void add_icon(const char* arg0) {
 	// set the default Icon
 	// Fl_Window::default_icon(new Fl_RGB_Image(ICON_MAIN, 16, 16, 4));
-	Fl_Window::default_icon(new Fl_PNG_Image("LOGO", logo, sizeof(logo)));
+	Fl_Window::default_icon(&main_icon_);
 }
 
 // Display the arguments in the status log

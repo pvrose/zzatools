@@ -74,7 +74,10 @@ ifeq ($(BUILD_TYPE), Debug)
 else
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
 endif
-
+# Create the logo includefile
+$(INC_DIRS)/logo.h: $(TARGET_EXEC).png
+	xxd -i $< > $@
+	
 # Create a target to run the compiled code
 .PHONY: run
 run: $(EXEC_DIR)/$(TARGET_EXEC)
