@@ -182,7 +182,6 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 	}
 	else {
 		closing_ = true;
-		printf("ZZALOG: Closing\n");
 		// Stop the ticker
 		Fl::remove_timeout(cb_ticker);
 		status_->misc_status(ST_NOTE, "ZZALOG: Closing...");
@@ -264,7 +263,11 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 
 		// Back up the book
 		if (book_ && book_->been_modified()) {
-			backup_file();
+			if (book_->filename().length()) {
+				backup_file();
+			} else {
+				status_->misc_status(ST_WARNING, "ZZALOG: No filename: any changes will not be backed up");
+			}
 		}
 		else {
 			status_->misc_status(ST_NOTE, "ZZALOG: Book has not been modified, skipping backup");
@@ -286,7 +289,7 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 		// }
 
 		// Exit and close application
-		printf("ZZALOG: Closed\n");
+		status_->misc_status(ST_OK, "ZZALOG: Closed");
 		Fl_Single_Window::default_callback((Fl_Window*)w, v);
 	}
 }
