@@ -396,8 +396,12 @@ int cb_args(int argc, char** argv, int& i) {
 			if (i == save_i) debugs = false;
 		}
 	}
-	if (i < argc) {
+	if (i <= (argc - 1)) {
 		if (*argv[i] == '-') {
+			char msg[128];
+			snprintf(msg, sizeof(msg), "ZZALOG: Unrecognised switch %s", argv[i]);
+			status_->misc_status(ST_ERROR, msg);
+			i += 1;
 			return i;
 			// printf ("DEBUG: Not recognised switch %d %s passing to fltk", i, argv[i]);
 			// // Unrecognised switch - try Fl speciific ones
@@ -407,6 +411,7 @@ int cb_args(int argc, char** argv, int& i) {
 			// else return i;
 		} else {
 			filename_ = argv[i];
+			i += 1;
 			return i;
 		}
 	} else {
@@ -739,6 +744,10 @@ int main(int argc, char** argv)
 	// Allow the main thread to respond to Fl::awake() requests
 	Fl::lock();
 	// Set default Fil Chooser on non-windows
+	// Create the settings before anything else 
+	settings_ = new Fl_Preferences(Fl_Preferences::USER, VENDOR.c_str(), PROGRAM_ID.c_str());
+	// Ctreate status to handle status messages
+	status_ = new status();
 	// Parse command-line arguments - accept FLTK standard arguments and custom ones (in cb_args)
 	int i = 1;
 	Fl::args(argc, argv, i, cb_args);
@@ -752,10 +761,6 @@ int main(int argc, char** argv)
 		show_help();
 		return 0;
 	}
-	// Create the settings before anything else 
-	settings_ = new Fl_Preferences(Fl_Preferences::USER, VENDOR.c_str(), PROGRAM_ID.c_str());
-	// Ctreate status to handle status messages
-	status_ = new status();
 	// Create window
 	add_icon(argv[0]);
 	create_window();
