@@ -982,7 +982,7 @@ record* spec_data::expand_macro(string field, string value) {
 	}
 	else if (macros_.find(field) == macros_.end()) {
 		snprintf(message, 128, "ADIF SPEC: No macros defined for field %s", field.c_str());
-		status_->misc_status(ST_ERROR, message);
+		status_->misc_status(ST_WARNING, message);
 		return nullptr;
 	}
 	else {
