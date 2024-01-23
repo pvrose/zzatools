@@ -11,14 +11,17 @@ using namespace std;
 
 class Fl_Rect;
 
+const uchar XYC_NORMAL = 0;
+// TODO extend other chart types
+
 class xy_chart : public Fl_Widget {
 public:
     xy_chart(int X, int Y, int W, int H, const char* L = nullptr);
     ~xy_chart();
 
-    // Overloaded methods
+// Overloaded methods
     void draw();
-
+ 
     // data structure - basic point
     struct point { 
         double X;
@@ -38,18 +41,17 @@ public:
 
     // Set bounds
     void bounds(point minimum, point maximum);
-    // Get bounds
+// Get bounds
     void bounds(point* minimum, point* maximum);
-    // Set automatic bounds
+// Set automatic bounds
     void auto_bounds();
-
+    // Set/get scalewidth
+    void scale_width(int w);
+    int scale_width();
+  
 protected:
-    // The main data
+// The main data
     vector<line> data_;
-
-    // units per pixel - x or y
-    double units_per_pixel_x_;
-    double units_per_pixel_y_;
 
     // drawing bounds
     point minimum_;
@@ -59,20 +61,13 @@ protected:
     int scale_width_;
 
     // Drawing methods
-    void draw_y_scale(Fl_Rect& r);
-    void draw_x_scale(Fl_Rect& r);
+    void draw_scale(Fl_Rect& r, double min, double max, bool mirrored);
     void draw_chart(Fl_Rect& r);
 
     // Draw a line between a and b thickness t
     void draw_line(Fl_Rect& r, point a, point b, unsigned int t);
 
-    // Calculate units per pixel
-    void calc_uppx(Fl_Rect& r);
-
-    // Convert unit value to pixel position
-    int y_pixel(double d);
-    int x_pixel(double d);
-
-
-};
-
+     // Line segment crosses the rectangle
+    bool crosses(Fl_Rect& r, int x0, int y0, int x1, int y1);
+  
+ };

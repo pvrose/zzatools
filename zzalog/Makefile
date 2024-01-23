@@ -75,7 +75,7 @@ else
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
 endif
 # Create the logo includefile
-$(INC_DIRS)/logo.h: $(TARGET_EXEC).png
+$(INC_DIRS)/logo.h: ../rose.png
 	xxd -i $< > $@
 	
 # Create a target to run the compiled code

@@ -152,7 +152,7 @@ char* filename_ = nullptr;
 // Default station callsign
 string default_station_ = "";
 // Main logo
-Fl_PNG_Image main_icon_("ZZALOG_ICON", zzalog_png, zzalog_png_len);
+Fl_PNG_Image main_icon_("ZZALOG_ICON", ___rose_png, ___rose_png_len);
 
 static void cb_ticker(void* v) {
 	// Units that require 1s tick
