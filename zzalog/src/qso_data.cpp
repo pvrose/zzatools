@@ -992,6 +992,13 @@ void qso_data::action_look_all_txt() {
 				logging_state_ = QUERY_WSJTX;
 			}
 			break;
+		case MANUAL_ENTRY:
+			if (wsjtx_handler_->match_all_txt(g_qy_entry_->qso(), false)) {
+				status_->misc_status(ST_NOTE, "DASH: ALL.TXT search found QSO: see above");
+			} else {
+				status_->misc_status(ST_WARNING, "DASH: ALL.TXT search did not find QSO");
+			}
+			break;
 		case QSO_VIEW:
 			if (wsjtx_handler_->match_all_txt(g_entry_->qso(), false)) {
 				status_->misc_status(ST_NOTE, "DASH: ALL.TXT search found QSO: see above");

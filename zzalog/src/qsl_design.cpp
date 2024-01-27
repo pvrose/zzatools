@@ -214,6 +214,7 @@ void qsl_design::create_form(int X, int Y) {
 	// button - save and close
 	Fl_Return_Button* ok_bn = new Fl_Return_Button(X_211, Y_21, WBUTTON, HBUTTON, "OK");
 	ok_bn->color(FL_GREEN);
+	ok_bn->labelcolor(FL_BLACK);
 	ok_bn->callback(cb_bn_ok, nullptr);
 	ok_bn->tooltip("Save changes and close dialog");
 	add(ok_bn);

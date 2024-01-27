@@ -56,7 +56,9 @@ void qsl_form::load_data() {
 	free(temp);
 	if (width_ == 0 || height_ == 0 || filename_.length() == 0) {
 		// We have either width or height not defined - so load the edfault data
-		status_->misc_status(ST_ERROR, "QSL: Insufficient information for QSL card");
+		char msg[256];
+		snprintf(msg, sizeof(msg), "QSL: Incorrect info W=%f, H=%f, File=%s", width_, height_, temp);
+		status_->misc_status(ST_ERROR, msg);
 	}
 }
 
