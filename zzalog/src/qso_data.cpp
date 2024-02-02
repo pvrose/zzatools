@@ -527,8 +527,12 @@ void qso_data::action_new_qso(record* qso, qso_init_t mode) {
 		// Copy station details and get read rig details for band etc. 
 		// If rig not connected use same as original
 		// printf("DEBUG: On-air contact\n");
-		qe->copy_qso_to_qso(qso, qso_entry::CF_RIG_ETC | qso_entry::CF_CAT);
-		qe->copy_cat_to_qso();
+		if (rig && rig->is_good()) {
+			qe->copy_qso_to_qso(qso, qso_entry::CF_RIG_ETC);
+			qe->copy_cat_to_qso();
+		} else {
+			qe->copy_qso_to_qso(qso, qso_entry::CF_RIG_ETC | qso_entry::CF_CAT);
+		}
 		qe->copy_clock_to_qso();
 		break;
 	case QSO_COPY_CONDX:

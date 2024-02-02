@@ -367,6 +367,7 @@ void qso_entry::copy_cat_to_qso() {
 			// Get the maximum power over course of QSO.
 			double tx_power;
 			qso_->item("TX_PWR", tx_power);
+			if (isnan(tx_power)) tx_power = 0.0;
 			tx_power = max(tx_power, rig->get_dpower(true));
 			switch (qso_data_->logging_state()) {
 			case qso_data::QSO_PENDING:
