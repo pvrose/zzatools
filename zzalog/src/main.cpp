@@ -38,6 +38,7 @@ main.cpp - application entry point
 #include "main_window.h"
 #include "qso_manager.h"
 #include "logo.h"
+#include "wx_handler.h"
 
 // C/C++ header files
 #include <ctime>
@@ -123,6 +124,7 @@ club_handler* club_handler_ = nullptr;
 wsjtx_handler* wsjtx_handler_ = nullptr;
 fllog_emul* fllog_emul_ = nullptr;
 qso_manager* qso_manager_ = nullptr;
+wx_handler* wx_handler_ = nullptr;
 
 // Recent files opened
 list<string> recent_files_;
@@ -167,6 +169,10 @@ static void cb_ticker(void* v) {
 	// Units that require 15s tick
 	if (ticks_ % (TICK_SECOND * 15) == 0) {
 		if (wsjtx_handler_) wsjtx_handler_->ticker();
+	}
+	// Units that require 30 minute tick
+	if (ticks_ % (TICK_SECOND * 60 * 30) == 0) {
+		if (wx_handler_) wx_handler_->ticker();
 	}
 	ticks_++;
 	Fl::repeat_timeout(TICK, cb_ticker);
@@ -586,6 +592,8 @@ void add_qsl_handlers() {
 		}
 		// FLLOG emulator
 		if (fllog_emul_ == nullptr) fllog_emul_ = new fllog_emul;
+		// Weather handler
+		if (wx_handler_ == nullptr) wx_handler_ = new wx_handler;
 	}
 }
 
@@ -676,6 +684,7 @@ void tidy() {
 	// Tidy memory - this is not perfect
 	// From inspection of the code - calling this a second time frees the memory
 	fl_message_title_default(nullptr);
+	delete wx_handler_;
 	delete qso_manager_;
 	delete wsjtx_handler_;
 	delete club_handler_;

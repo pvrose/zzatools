@@ -583,7 +583,7 @@ bool rpc_handler::decode_xml_element(rpc_element_t element_type, xml_element* el
 		if (element->count() == 0) {
 			string content = element->content();
 			// Check it a valid ISO date/time yyyymmddThh:mm:ss
-			if (regex_match<char>(content.c_str(), REGEX_RPC_DATETIME)) {
+			if (regex_match<char>(content.c_str(), REGEX_ISO_DATETIME)) {
 				item->set(content, XRT_DATETIME);
 			}
 			else {
