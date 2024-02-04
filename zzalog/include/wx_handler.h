@@ -110,6 +110,10 @@ public:
     time_t sun_rise();
     // Sun set
     time_t sun_set();
+    // Last updated
+    time_t last_updated();
+    // Location
+    string location();
 
 protected:
 

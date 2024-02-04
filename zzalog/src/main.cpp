@@ -82,6 +82,7 @@ bool DEBUG_ERRORS = true;
 bool DEBUG_THREADS = false;
 bool DEBUG_CURL = false;
 bool DEBUG_STATUS = true;
+bool DEBUG_QUICK = false;
 rig_debug_level_e HAMLIB_DEBUG_LEVEL = RIG_DEBUG_ERR;
 bool AUTO_UPLOAD = true;
 bool AUTO_SAVE = true;
@@ -171,7 +172,7 @@ static void cb_ticker(void* v) {
 		if (wsjtx_handler_) wsjtx_handler_->ticker();
 	}
 	// Units that require 30 minute tick
-	if (ticks_ % (TICK_SECOND * 60 * 30) == 0) {
+	if (ticks_ % (TICK_SECOND * 60 * (DEBUG_QUICK ? 5 : 30)) == 0) {
 		if (wx_handler_) wx_handler_->ticker();
 	}
 	ticks_++;
@@ -388,6 +389,10 @@ int cb_args(int argc, char** argv, int& i) {
 				DEBUG_STATUS = false;
 				i += 1;
 			}
+			else if (strcmp("q", argv[i]) == 0 || strcmp("quick", argv[i]) == 0) {
+				DEBUG_QUICK = true;
+				i += 1;
+			} 
 			else if (strncmp("h=", argv[i], 2) == 0) {
 				int v = atoi(argv[i] + 2);
 				HAMLIB_DEBUG_LEVEL = (rig_debug_level_e)v;
@@ -437,6 +442,7 @@ void show_help() {
 	"\t\te|errors\tprovide more details on errors\n"
 	"\t\t\tnoe|noerrors\n"
 	"\t\th=N|hamlib=N\tSet hamlib debug level (default ERRORS)\n"
+	"\t\tq|quick\tShorten long timeout and polling intervals\n"
 	"\t\ts|status\tPrint status messages to terminal\n"
 	"\t\t\tnos|nostatus\n"
 	"\t\tt|threads\tProvide debug tracing on thread use\n"

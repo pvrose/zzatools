@@ -185,12 +185,12 @@ string wx_handler::description() {
 
 // Temperature (K)
 float wx_handler::temperature() {
-    return report_.temperature_K;
+    return report_.temperature_K - 273.15;
 }
 
 // Wind-speed (m/s)
 float wx_handler::wind_speed() {
-    return report_.wind_speed_ms;
+    return report_.wind_speed_ms / 0.44704;
 }
 
 // Wind direction (16th cardinals)
@@ -208,6 +208,16 @@ time_t wx_handler::sun_set() {
     return report_.sunset;
 }
 
+// Last updated
+time_t wx_handler::last_updated() {
+    return report_.updated;
+}
+
+// Location
+string wx_handler::location() {
+    return report_.city_name;
+}
+
 // The overall XML container
 bool wx_handler::start_current() {
     if (elements_.size()) {
@@ -222,6 +232,11 @@ bool wx_handler::start_current() {
 }
 
 bool wx_handler::end_current() {
+    // printf("Location #%d, %s (%f, %f)\n", report_.city_id, report_.city_name.c_str(), report_.city_location.longitude, report_.city_location.latitude);
+    // printf("%s %d\n", report_.iso_country.c_str(), report_.timezone_hr);
+    // printf("T=%fK; H=%d%%, P=%dhPA\n", report_.temperature_K, report_.humidity_pc, report_.pressure_hPa);
+    // printf("%s %d\n", report_.precipitation.c_str(), report_.precip_mm);
+    // printf("Wind %fm/s, %d(%s)\n", report_.wind_speed_ms, report_.wind_dirn, report_.wind_cardinal.c_str());
     return true;
 }
 
