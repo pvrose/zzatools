@@ -8,6 +8,7 @@
 #include <cstdint>
 #include <map>
 #include <set>
+#include <atomic>
 
 #ifdef _WIN32
 #include <WinSock2.h>
@@ -189,12 +190,11 @@ using namespace std;
 		    record* match = nullptr, double dial_frequency = 0.0, string mode = "");
 
 		// Get a QSO record for this callsign
-		record* qso_call(string call);
+		record* qso_call(string call, bool create);
+		// Create a record for this call
+		record* new_qso(string call);
 		// Parse the ALL.TXT record
 		bool parse_all_txt(record* match, string line);
-
-		// Clear existing QSO record
-		void clear_qsos();
 
 		// Decode the message
 
@@ -237,6 +237,8 @@ using namespace std;
 		bool check_beats_;
 		// WSJT-X connected
 		bool connected_;
+		// Semaphore to prevent multiple cretions of a QSO for the same status 
+		atomic_flag tx_semaphore_;
 		
 	};
 

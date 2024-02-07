@@ -93,8 +93,10 @@ using namespace std;
 		void switch_rig();
 		// Present query (uses view update mechanism)
 		void update_qso(hint_t hint, qso_num_t match_num, qso_num_t query_num);
-		// Update modem query with a QSO
-		void update_modem_qso(record* qso);
+		// Start modem - returns a new record
+		record* start_modem_qso(string call);
+		// Log modem record
+		void update_modem_qso(bool log_it);
 		// QSO i n progress
 		bool qso_in_progress();
 		// Start QSO

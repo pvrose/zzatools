@@ -287,10 +287,9 @@ void qso_data::update_qso(qso_num_t log_num) {
 		}
 		break;
 	case QSO_STARTED:
-	case QSO_MODEM:
 	case QSO_ENTER:
 		// Ack whether to save or quit then activate new QSO
-		if (log_num != g_entry_->qso_number() && g_entry_->qso()->item("QSO_COMPLETE") != "N") {
+		if (log_num != g_entry_->qso_number()) {
 			fl_beep(FL_BEEP_QUESTION);
 			switch (fl_choice("Trying to select a different record while logging a QSO", "Save QSO", "Quit QSO", "Ignore")) {
 			case 0:
@@ -412,14 +411,13 @@ void qso_data::update_query(logging_state_t query, qso_num_t match_num, qso_num_
 }
 
 // Update modem QSO
-void qso_data::update_modem_qso(record* qso) {
+record* qso_data::start_modem_qso(string call) {
+	bool allow_modem = true;
 	switch (logging_state_) {
 	case QSO_PENDING:
 		action_deactivate();
 		// drop down
 	case QSO_INACTIVE:
-	case QSO_MODEM:
-		action_add_modem(qso);
 		break;	
 
 	case QSO_EDIT:
@@ -429,31 +427,63 @@ void qso_data::update_modem_qso(record* qso) {
 			case 0:
 				// Save QSO
 				action_save_edit();
-				action_add_modem(qso);
 				break;
 			case 1:
 				// Cancel QSO
 				action_cancel_edit();
-				action_add_modem(qso);
 				break;
 			case 2:
 				// Ignore the modem request
+				allow_modem = false;
 				break;
 			}
 		} else {
 			action_cancel_edit();
-			action_add_modem(qso);
 		}
 		break;
 
 	case QSO_VIEW:
 		action_cancel_edit();
-		action_add_modem(qso);
+		break;
+
+	case QSO_MODEM:
+	// We are altready displaying a modem QSO
+		action_cancel_modem();
 		break;
 
 	default:
 		status_->misc_status(ST_ERROR, "DASH: Getting a modem update when not expected");
-		return;
+		return nullptr;
+	}
+	if (allow_modem) {
+		printf("DEBUG DASH Received request to create a record for %s\n", call.c_str());
+		action_activate(QSO_COPY_MODEM);
+		action_start(QSO_COPY_MODEM);
+		current_qso()->item("CALL", call);
+		printf("DEBUG DASH generated %s - %p\n", call.c_str(), current_qso());
+		return current_qso();
+	} else {
+		return nullptr;
+	}
+}
+
+// Update modem QSO
+void qso_data::update_modem_qso(bool log_it) {
+	switch (logging_state_) {
+	case QSO_MODEM: {
+		if (log_it) {
+			action_log_modem();
+			logging_state_ = QSO_INACTIVE;
+		} else {
+			g_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
+			tabbed_forms_->update_views(nullptr, HT_MINOR_CHANGE, g_entry_->qso_number());
+			enable_widgets();
+		}
+		break;
+	}
+	default: {
+		break;
+	}
 	}
 }
 
@@ -555,8 +585,9 @@ void qso_data::action_new_qso(record* qso, qso_init_t mode) {
 		break;
 	case QSO_COPY_MODEM:
 		// Set QSO and Update the display
-		qe->qso(qso);
-		ancestor_view<qso_manager>(this)->update_import_qso(qso);
+		qe->qso(-1);
+		// ancestor_view<qso_manager>(this)->update_import_qso(qso);
+		qe->copy_default_to_qso();
 		qe->copy_clock_to_qso();
 		qe->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
 		break;
@@ -585,6 +616,9 @@ void qso_data::action_start(qso_init_t mode) {
 	switch (mode) {
 	case QSO_NONE:
 		logging_state_ = QSO_ENTER;
+		break;
+	case QSO_COPY_MODEM:
+		logging_state_ = QSO_MODEM;
 		break;
 	default:
 		logging_state_ = QSO_STARTED;
@@ -1160,13 +1194,11 @@ void qso_data::action_cancel_net_edit() {
 }
 
 // Start a modem record
-void qso_data::action_add_modem(record* qso) {
+void qso_data::action_log_modem() {
 	// printf("DEBUG: action_add_modem\n");
 	// Add to book
 	book_->enable_save(false);
-	action_new_qso(qso, QSO_COPY_MODEM);
-	g_entry_->append_qso();
-	logging_state_ = QSO_MODEM;
+	record* qso = current_qso();
 	if (qso->item("TX_PWR") == "") {
 		// Get power from rig
 		rig_if* rig = ((qso_manager*)parent())->rig();
@@ -1179,6 +1211,15 @@ void qso_data::action_add_modem(record* qso) {
 	
 	book_->selection(book_->item_number(g_entry_->qso_number()), HT_INSERTED);
 	book_->enable_save(true);
+	enable_widgets();
+}
+
+// Cacncel a modem record
+void qso_data::action_cancel_modem() {
+	printf("DEBUG DASH - Cancelling modem %s - %p\n", current_qso()->item("CALL").c_str(), current_qso());
+	logging_state_ = QSO_INACTIVE;
+	g_entry_->delete_qso();
+	book_->delete_record(true);
 	enable_widgets();
 }
 

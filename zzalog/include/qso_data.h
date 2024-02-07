@@ -66,7 +66,7 @@ public:
 		QSO_COPY_CONDX,     // Start a QSO copying station details and CAT conditions
 		QSO_COPY_FOR_NET,   // Start a QSO copyin station details, CAT conditions and start time
 		QSO_AS_WAS,         // Used with action_activate() to maintain the existing one
-		QSO_COPY_MODEM,     // Copy QSO from modem
+		QSO_COPY_MODEM,     // Copy QSO to modem
 	};
 
 public:
@@ -97,8 +97,10 @@ public:
 	void update_qso(qso_num_t log_num);
 	// Update query
 	void update_query(logging_state_t query, qso_num_t match_num, qso_num_t query_num);
+	// start a ,mode QSO
+	record* start_modem_qso(string call);
 	// Update modem QSO
-	void update_modem_qso(record* qso);
+	void update_modem_qso(bool log_it);
 	// Get default copy record
 	qso_num_t get_default_number();
 	// // Initialise fields
@@ -189,13 +191,15 @@ public:
 	// Delete the selected QSO
 	void action_delete_qso();
 	// Use the QSO received from the modem
-	void action_add_modem(record* qso);
+	void action_log_modem();
 	// Create a query entry
 	void action_query_entry();
 	// Execute the query
 	void action_exec_query();
 	// Cancel the query
 	void action_cancel_query();
+	// Cancel the modem
+	void action_cancel_modem();
 	// Import the query
 	void action_import_query();
 	// Opne QRZ.com browser
