@@ -106,6 +106,8 @@ public:
     float wind_speed();
     // Wind direction (16th cardinals)
     string wind_direction();
+    // Wind direction (degrees)
+    unsigned int wind_degrees();
     // Sunris
     time_t sun_rise();
     // Sun set

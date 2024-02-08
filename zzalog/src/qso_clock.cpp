@@ -68,6 +68,7 @@ void qso_clock::create_form(int X, int Y) {
 	curr_y += bn_date_->h() + GAP;
 	const int WICON = 2 * HBUTTON;
 	const int WTEXT = WCLOCKS - WICON - GAP;
+	const int WT3 = WTEXT / 3;
 	const int WX_SIZE = FL_NORMAL_SIZE + 2;
 
 	bn_wx_icon_ = new Fl_Button(curr_x, curr_y, WICON, WICON);
@@ -89,11 +90,27 @@ void qso_clock::create_form(int X, int Y) {
 	bn_wx_description_->labelsize(WX_SIZE);
 
 	curr_y += WX_SIZE;
-	bn_wx_detail_ = new Fl_Button(curr_x, curr_y, WTEXT, WX_SIZE);
-	bn_wx_detail_->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE);
-	bn_wx_detail_->box(FL_FLAT_BOX);
-	bn_wx_detail_->labelsize(WX_SIZE);
+	bn_temperature_ = new Fl_Button(curr_x, curr_y, WT3, WX_SIZE);
+	bn_temperature_->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE);
+	bn_temperature_->box(FL_FLAT_BOX);
+	bn_temperature_->labelsize(WX_SIZE);
+	bn_temperature_->callback(cb_bn_temperature, nullptr);
 
+	curr_x += WT3;
+	bn_speed_ = new Fl_Button(curr_x, curr_y, WT3, WX_SIZE);
+	bn_speed_->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE);
+	bn_speed_->box(FL_FLAT_BOX);
+	bn_speed_->labelsize(WX_SIZE);
+	bn_speed_->callback(cb_bn_speed, nullptr);
+
+	curr_x += WT3;
+	bn_direction_ = new Fl_Button(curr_x, curr_y, WT3, WX_SIZE);
+	bn_direction_->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE);
+	bn_direction_->box(FL_FLAT_BOX);
+	bn_direction_->labelsize(WX_SIZE);
+	bn_direction_->callback(cb_bn_direction, nullptr);
+
+	curr_x = X + GAP + WICON + GAP;
 	curr_y += WX_SIZE;
 
 	bn_sun_times_ = new Fl_Button(curr_x, curr_y, WTEXT, WX_SIZE);
@@ -125,6 +142,7 @@ void qso_clock::enable_widgets() {
 	float temperature = wx_handler_ ? wx_handler_->temperature() : 0.0; 
 	float wind_speed = wx_handler_ ? wx_handler_->wind_speed() : 0.0;
 	string wind_dirn = wx_handler_ ? wx_handler_->wind_direction() : "";
+	unsigned int wind_degree = wx_handler_ ? wx_handler_->wind_degrees() : 0;
 	Fl_Image* icon = wx_handler_ ? wx_handler_->icon() : nullptr;
 	time_t updated = wx_handler_ ? wx_handler_->last_updated() : 0;
 	string wx_location = wx_handler_ ? wx_handler_->location() : "";
@@ -166,8 +184,39 @@ void qso_clock::enable_widgets() {
 	bn_location_->copy_label(wx_location.c_str());
 	bn_wx_description_->copy_label(wx_descr.c_str());
 	char label[128];
-	snprintf(label, sizeof(label), "%0.0f \302\260C %0.0f MPH %s", temperature, wind_speed, wind_dirn.c_str());
-	bn_wx_detail_->copy_label(label);
+	switch(display_temperature_) {
+		case CELSIUS: {
+			snprintf(label, sizeof(label), "%0.0f \302\260C", temperature);
+			break;
+		}
+		case FAHRENHEIT: {
+			snprintf(label, sizeof(label), "%0.0f \302\260F", (temperature * 9 / 5) + 32);
+			break;
+		}
+	}
+	bn_temperature_->copy_label(label);
+	switch(display_speed_) {
+		case MILE_PER_HOUR: {
+			snprintf(label, sizeof(label), "%0.0f MPH", wind_speed);
+			break;
+		}
+		case METRE_PER_SECOND: {
+			snprintf(label, sizeof(label), "%0.0f m/s", wind_speed * 1760 * 36 *25.4 / 3600000);
+			break;
+		}
+	}
+	bn_speed_->copy_label(label);
+	switch(display_direction_) {
+		case CARDINAL: {
+			snprintf(label, sizeof(label), "%s", wind_dirn.c_str());
+			break;
+		}
+		case DEGREES: {
+			snprintf(label, sizeof(label), "%03d\302\260", wind_degree);
+			break;
+		}
+	}
+	bn_direction_->copy_label(label);
 	char sunup[16];
 	char sundown[16];
 	char update_value[16];
@@ -191,5 +240,53 @@ void qso_clock::save_values() {
 void qso_clock::cb_bn_icon(Fl_Widget* w, void* v) {
 	qso_clock* that = ancestor_view<qso_clock>(w);
 	wx_handler_->update();
+	that->enable_widgets();
+}
+
+// Temperetaure clicked
+void qso_clock::cb_bn_temperature(Fl_Widget* w, void * v) {
+	qso_clock* that = ancestor_view<qso_clock>(w);
+	switch (that->display_temperature_) {
+		case CELSIUS: {
+			that->display_temperature_ = FAHRENHEIT;
+			break;
+		}
+		case FAHRENHEIT: {
+			that->display_temperature_ = CELSIUS;
+			break;
+		}
+	}
+	that->enable_widgets();
+}
+
+// Speed clicked
+void qso_clock::cb_bn_speed(Fl_Widget* w, void * v) {
+	qso_clock* that = ancestor_view<qso_clock>(w);
+	switch (that->display_speed_) {
+		case MILE_PER_HOUR: {
+			that->display_speed_ = METRE_PER_SECOND;
+			break;
+		}
+		case METRE_PER_SECOND: {
+			that->display_speed_ = MILE_PER_HOUR;
+			break;
+		}
+	}
+	that->enable_widgets();
+}
+
+// Direction clicked
+void qso_clock::cb_bn_direction(Fl_Widget* w, void * v) {
+	qso_clock* that = ancestor_view<qso_clock>(w);
+	switch (that->display_direction_) {
+		case CARDINAL: {
+			that->display_direction_ = DEGREES;
+			break;
+		}
+		case DEGREES: {
+			that->display_direction_ = CARDINAL;
+			break;
+		}
+	}
 	that->enable_widgets();
 }

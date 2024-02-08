@@ -198,6 +198,11 @@ string wx_handler::wind_direction() {
     return report_.wind_cardinal;
 }
 
+// Wind direction (degrees)
+unsigned int wx_handler::wind_degrees() {
+    return report_.wind_dirn;
+}
+
 // Sunris
 time_t wx_handler::sun_rise() {
     return report_.sunrise;

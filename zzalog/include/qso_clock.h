@@ -21,6 +21,9 @@ public:
 protected:
 
 	static void cb_bn_icon(Fl_Widget* w, void *v);
+	static void cb_bn_temperature(Fl_Widget* w, void* v);
+	static void cb_bn_speed(Fl_Widget* w, void* v);
+	static void cb_bn_direction(Fl_Widget* w, void* v);
 
 	// Display local time rather than UTC
 	bool display_local_;
@@ -33,12 +36,18 @@ protected:
 		METRE_PER_SECOND,
 		MILE_PER_HOUR
 	} display_speed_;
+	enum {
+		CARDINAL,
+		DEGREES
+	} display_direction_;
 
 	Fl_Button* bn_time_;
 	Fl_Button* bn_date_;
 	Fl_Button* bn_wx_icon_;
 	Fl_Button* bn_wx_description_;
-	Fl_Button* bn_wx_detail_;
+	Fl_Button* bn_temperature_;
+	Fl_Button* bn_speed_;
+	Fl_Button* bn_direction_;
 	Fl_Button* bn_sun_times_;
 	Fl_Button* bn_updated_;
 	Fl_Button* bn_location_;
