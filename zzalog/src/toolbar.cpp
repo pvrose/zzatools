@@ -261,7 +261,7 @@ toolbar::toolbar(int X, int Y, int W, int H, const char* label) :
 	add(bn);
 	curr_x += H;
 	// Help->Intl
-	bn = new Fl_Button(curr_x, Y, H, H, "Æ");
+	bn = new Fl_Button(curr_x, Y, H, H, "\303\206");
 	bn->callback(cb_bn_menu, (void*)"&Help/&Intl");
 	bn->when(FL_WHEN_RELEASE);
 	bn->tooltip("Hide/Show International character set");
