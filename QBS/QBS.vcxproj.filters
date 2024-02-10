@@ -42,6 +42,9 @@
     <ClInclude Include="include\QBS_charth.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\QBS_logo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\QBS_data.cpp">
