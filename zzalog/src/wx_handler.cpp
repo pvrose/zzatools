@@ -5,7 +5,7 @@
 #include "qso_manager.h"
 #include "record.h"
 
-#include <strstream>
+#include <sstream>
 
 #include <FL/Fl_Help_Dialog.H>
 #include <FL/Fl_PNG_Image.H>

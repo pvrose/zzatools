@@ -421,13 +421,30 @@ void qso_qsl_vwr::set_image() {
 					else {
 						raw_image_ = nullptr;
 					}
-					if (raw_image_ && raw_image_->fail()) {
-						delete raw_image_;
-						raw_image_ = nullptr;
-					}
 					if (raw_image_) {
-						if (ia == 1) use_default = true;
-						found_image = true;
+						char msg[128];
+						switch(raw_image_->fail()) {
+							case 0: {
+								if (ia == 1) use_default = true;
+								found_image = true;
+								break;
+							}
+							case Fl_Image::ERR_NO_IMAGE:
+							case Fl_Image::ERR_FILE_ACCESS: {
+								// snprintf(msg, sizeof(msg), "QSL: Error %s - %s", full_name_.c_str(), strerror(errno));
+								// status_->misc_status(ST_WARNING, msg);
+								break;
+							}
+							case Fl_Image::ERR_FORMAT: {
+								snprintf(msg, sizeof(msg), "QSL: Error format of %s incorrect", full_name_.c_str());
+								status_->misc_status(ST_WARNING, msg);
+								break;
+							}
+						}
+						if (!found_image) {
+							delete raw_image_;
+							raw_image_ = nullptr;
+						}
 					}
 				}
 			}
