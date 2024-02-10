@@ -10,6 +10,8 @@
 #include <FL/Fl_Help_Dialog.H>
 #include <FL/Fl_PNG_Image.H>
 
+using namespace std;
+
 extern status* status_;
 extern url_handler* url_handler_;
 extern qso_manager* qso_manager_;
@@ -18,7 +20,7 @@ wx_handler::wx_handler() :
     xml_reader() {
 
     report_.icon = nullptr;
-    elements_.empty();
+    elements_.clear();
     update();
 
 };
@@ -141,16 +143,23 @@ bool wx_handler::characters(string content){
 // Update weather report - forecd
 void wx_handler::update() {
     // Create a dummy record to get own location
+    char msg[1024];
     record* dummy = qso_manager_->dummy_qso();
     dummy->item("APP_ZZA_QTH", qso_manager_->get_default(qso_manager::QTH));
     lat_long_t location = dummy->location(true);
+    if (isnan(location.latitude) || isnan(location.longitude)) {
+        snprintf(msg, sizeof(msg),"WX_HANDLER: Location '%s' has no coordinates", dummy->item("APP_ZZA_QTH").c_str());
+        status_->misc_status(ST_ERROR, msg);
+        report_ = wx_report();
+        report_.city_name = "Not known";
+        return;
+    }
     char url[1024];
     stringstream ss;
     snprintf(url, sizeof(url), "https://api.openweathermap.org/data/2.5/weather?lat=%f&lon=%f&appid=%s&mode=xml",
         location.latitude,
         location.longitude,
         key_);
-    char msg[1024];
     snprintf(msg, sizeof(msg), "WX_HANDLER: Fetching %s", url);
     status_->misc_status(ST_NOTE, msg);
     if (url_handler_->read_url(string(url), &ss)) {
@@ -163,6 +172,9 @@ void wx_handler::update() {
         ss.seekg(ios::beg);
         dlg->load(ss.str().c_str());
         dlg->show();
+        // Create a dummy report
+        report_ = wx_report();
+        report_.city_name = "Not known";
     }
 }
 

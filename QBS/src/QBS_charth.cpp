@@ -14,7 +14,7 @@ QBS_charth::QBS_charth(int X, int Y, int W, int H, const char* L) :
 	Fl_Group(X, Y, W, H, L)
 {
 	data_ = nullptr;
-	max_ = 15.0;
+	max_ = 15;
 	create_form();
 }
 

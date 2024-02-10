@@ -270,7 +270,7 @@ bool book::load_data(string filename)
 				// neither .adi nor .adx 
 				else {
 					char* message = new char[filename.length() + 100];
-					sprintf(message, "LOG: Unknown file format. %s ignored", filename.c_str());
+					sprintf(message, "LOG: Unknown file format. '%s' ignored", filename.c_str());
 					status_->misc_status(ST_ERROR, message);
 					delete[] message;
 					ok = false;
