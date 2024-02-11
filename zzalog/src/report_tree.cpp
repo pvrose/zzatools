@@ -94,37 +94,40 @@ report_tree::~report_tree() {
 
 // Overloaded view update method
 void report_tree::update(hint_t hint, qso_num_t record_num_1, qso_num_t record_num_2) {
-	// Only use record_num_1
-	selection_ = record_num_1;
-	switch (hint) {
-	case HT_SELECTED:
-		// re-populate_tree if displaying selected only
-		if (filter_ == RF_SELECTED) {
+	// Only recreate if it's visible
+	if (visible()) {
+		// Only use record_num_1
+		selection_ = record_num_1;
+		switch (hint) {
+		case HT_SELECTED:
+			// re-populate_tree if displaying selected only
+			if (filter_ == RF_SELECTED) {
+				populate_tree(false);
+			}
+			break;
+		case HT_EXTRACTION:
+			// re-populate_tree if showing extracted data
+			if (filter_ == RF_EXTRACTED) {
+				populate_tree(false);
+			}
+			break;
+		case HT_CHANGED:
+		case HT_ALL:
+		case HT_DELETED:
+		case HT_INSERTED:
+		case HT_INSERTED_NODXA:
+		case HT_DUPE_DELETED:
+		case HT_NEW_DATA:
+			// Always re-populate as a substantial change has been made
 			populate_tree(false);
-		}
-		break;
-	case HT_EXTRACTION:
-		// re-populate_tree if showing extracted data
-		if (filter_ == RF_EXTRACTED) {
+			break;
+		case HT_FORMAT:
+			// Re-populate as font have have cghanged
+			item_labelfont(font_);
+			item_labelsize(fontsize_);
 			populate_tree(false);
+			break;
 		}
-		break;
-	case HT_CHANGED:
-	case HT_ALL:
-	case HT_DELETED:
-	case HT_INSERTED:
-	case HT_INSERTED_NODXA:
-	case HT_DUPE_DELETED:
-	case HT_NEW_DATA:
-		// Always re-populate as a substantial change has been made
-		populate_tree(false);
-		break;
-	case HT_FORMAT:
-		// Re-populate as font have have cghanged
-		item_labelfont(font_);
-		item_labelsize(fontsize_);
-		populate_tree(false);
-		break;
 	}
 }
 
@@ -794,4 +797,19 @@ void report_tree::cb_tree_report(Fl_Widget* w, void* v) {
 void report_tree::set_font(Fl_Font font, Fl_Fontsize size) {
 	font_ = font;
 	fontsize_ = size;
+}
+
+// Handle the show event
+int report_tree::handle(int event) {
+	// Always check the Fl_Tree event
+	int base_event = Fl_Tree::handle(event);
+	switch(event) {
+		case FL_SHOW: {
+			// Update the report
+			update(HT_ALL, book_->selection());
+			return 1;
+			break;
+		}
+	}
+	return base_event;;
 }

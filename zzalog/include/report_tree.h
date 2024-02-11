@@ -62,6 +62,8 @@ using namespace std;
 
 		// inherited from view
 		virtual void update(hint_t hint, qso_num_t record_num_1, qso_num_t record_num_2 = 0);
+		// Handle show event
+		int handle(int event);
 		// Delete all items
 		void delete_all();
 		// Delete the tree
