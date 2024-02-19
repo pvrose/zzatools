@@ -366,9 +366,7 @@ void qso_entry::copy_cat_to_qso() {
 			rig->get_string_mode(mode, submode);
 			// Get the maximum power over course of QSO.
 			double tx_power;
-			qso_->item("TX_PWR", tx_power);
-			if (isnan(tx_power)) tx_power = 0.0;
-			tx_power = max(tx_power, rig->get_dpower(true));
+			char txp[10];
 			switch (qso_data_->logging_state()) {
 			case qso_data::QSO_PENDING:
 			case qso_data::NET_STARTED:
@@ -387,7 +385,10 @@ void qso_entry::copy_cat_to_qso() {
 					qso_->item("MODE", string(""));
 					qso_->item("SUBMODE", string(""));
 				}
-				qso_->item("TX_PWR", tx_power);
+				tx_power = rig->get_dpower(true);
+				snprintf(txp, sizeof(txp), "%0.0f", tx_power);
+				qso_->item("TX_PWR", string(txp));
+				copy_qso_to_display(CF_CAT);
 				break;
 			}
 			case qso_data::QSO_STARTED: {
@@ -419,10 +420,14 @@ void qso_entry::copy_cat_to_qso() {
 					qso_->item("SUBMODE", submode);
 				}
 				qso_->item("TX_PWR", tx_power);
+				if (isnan(tx_power)) tx_power = 0.0;
+				tx_power = max(tx_power, rig->get_dpower(true));
+				snprintf(txp, sizeof(txp), "%0.0f", tx_power);
+				qso_->item("TX_PWR", string(txp));
+				copy_qso_to_display(CF_CAT);
 				break;
 			}
 			}
-			copy_qso_to_display(CF_CAT);
 		}
 	}
 }

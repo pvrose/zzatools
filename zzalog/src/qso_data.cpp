@@ -1459,15 +1459,11 @@ qso_num_t qso_data::current_number() {
 	}
 }
 
-// Update time and rig info
+// Update time and rig infoF
 void qso_data::ticker() {
-	switch (previous_mode_) {
-	case QSO_ON_AIR:
-		g_entry_->copy_clock_to_qso();
-		g_net_entry_->ticker();
-		g_entry_->copy_cat_to_qso();
-		break;
-	}
+	g_entry_->copy_clock_to_qso();
+	g_net_entry_->ticker();
+	g_entry_->copy_cat_to_qso();
 }
 
 // Call in editor
