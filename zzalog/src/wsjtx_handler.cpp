@@ -954,3 +954,15 @@ void wsjtx_handler::ticker() {
 		received_beats_.clear();
 	}
 }
+
+// Erase cache entry for callsign
+void wsjtx_handler::delete_qso(string call) {
+	if (qsos_.find(call) != qsos_.end()) {
+		printf("DEBUG: WSJTX - removing %s from cache", call.c_str());
+		qsos_.erase(call);
+	} else {
+		char msg[128];
+		snprintf(msg, sizeof(msg),"WSJTX: Request to delete unknown record from cache", call.c_str());
+		status_->misc_status(ST_ERROR, msg);
+	}
+}

@@ -1218,6 +1218,7 @@ void qso_data::action_log_modem() {
 void qso_data::action_cancel_modem() {
 	printf("DEBUG DASH - Cancelling modem %s - %p\n", current_qso()->item("CALL").c_str(), current_qso());
 	logging_state_ = QSO_INACTIVE;
+	wsjtx_handler_->delete_qso(current_qso()->item("CALL"));
 	g_entry_->delete_qso();
 	book_->delete_record(true);
 	enable_widgets();

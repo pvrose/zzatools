@@ -37,6 +37,8 @@ using namespace std;
 
 		// 15s ticker
 		void ticker();
+		// Remove QSO from cache
+		void delete_qso(string call);
 
 		// Used in static methods to point to the single instance of this class
 		static wsjtx_handler* that_;
