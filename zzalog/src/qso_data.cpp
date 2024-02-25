@@ -796,8 +796,22 @@ void qso_data::action_edit() {
 	// Save a copy of the current record
 	qso_num_t qso_number = get_default_number();
 	edit_return_state_ = logging_state_;
-	logging_state_ = QSO_EDIT;
 	g_entry_->qso(qso_number);
+	record* qso = g_entry_->qso();
+	// If the QSO looks incomplete ask if it is so and restart it else edit it
+	if (qso->item("TIME_OFF") == "") {
+		time_t now = time(nullptr);
+		time_t qso_start = qso->timestamp();
+		if (difftime(now, qso_start) < 1800.0) {
+			if (fl_choice("It looks as if the QSO you want to edit is still active - do you want to continue?", "Yes", "No", nullptr) == 0) {
+				logging_state_ = QSO_STARTED;
+			} else {
+				logging_state_ = QSO_EDIT;
+			}
+		}
+	} else {
+		logging_state_ = QSO_EDIT;
+	}
 	g_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
 	enable_widgets();
 }

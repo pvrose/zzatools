@@ -545,6 +545,7 @@ void qso_buttons::cb_bn_add_net(Fl_Widget* w, void* v) {
 	switch (that->qso_data_->logging_state()) {
 	case qso_data::QSO_INACTIVE:
 		that->qso_data_->action_edit();
+		// NB state may now be QSO_EDIT _or_ QSO_STARTED
 	case qso_data::QSO_EDIT:
 		that->qso_data_->action_create_net();
 		break;
