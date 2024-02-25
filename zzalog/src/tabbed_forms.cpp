@@ -109,8 +109,8 @@ void tabbed_forms::update_views(view* requester, hint_t hint, qso_num_t record_1
 					fx->second.v->update(hint, record_1, record_2);
 					break;
 				default:
-					// Only update a view that is visible
-					if (fx->second.w->visible()) {
+					// Only update a view if it's the current selected one
+					if (fx->second.w == value()) {
 						fx->second.v->update(hint, record_1, record_2);
 					}
 					break;

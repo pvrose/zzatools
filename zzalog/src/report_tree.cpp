@@ -94,40 +94,37 @@ report_tree::~report_tree() {
 
 // Overloaded view update method
 void report_tree::update(hint_t hint, qso_num_t record_num_1, qso_num_t record_num_2) {
-	// Only recreate if it's visible
-	if (visible()) {
-		// Only use record_num_1
-		selection_ = record_num_1;
-		switch (hint) {
-		case HT_SELECTED:
-			// re-populate_tree if displaying selected only
-			if (filter_ == RF_SELECTED) {
-				populate_tree(false);
-			}
-			break;
-		case HT_EXTRACTION:
-			// re-populate_tree if showing extracted data
-			if (filter_ == RF_EXTRACTED) {
-				populate_tree(false);
-			}
-			break;
-		case HT_CHANGED:
-		case HT_ALL:
-		case HT_DELETED:
-		case HT_INSERTED:
-		case HT_INSERTED_NODXA:
-		case HT_DUPE_DELETED:
-		case HT_NEW_DATA:
-			// Always re-populate as a substantial change has been made
+	// Only use record_num_1
+	selection_ = record_num_1;
+	switch (hint) {
+	case HT_SELECTED:
+		// re-populate_tree if displaying selected only
+		if (filter_ == RF_SELECTED) {
 			populate_tree(false);
-			break;
-		case HT_FORMAT:
-			// Re-populate as font have have cghanged
-			item_labelfont(font_);
-			item_labelsize(fontsize_);
-			populate_tree(false);
-			break;
 		}
+		break;
+	case HT_EXTRACTION:
+		// re-populate_tree if showing extracted data
+		if (filter_ == RF_EXTRACTED) {
+			populate_tree(false);
+		}
+		break;
+	case HT_CHANGED:
+	case HT_ALL:
+	case HT_DELETED:
+	case HT_INSERTED:
+	case HT_INSERTED_NODXA:
+	case HT_DUPE_DELETED:
+	case HT_NEW_DATA:
+		// Always re-populate as a substantial change has been made
+		populate_tree(false);
+		break;
+	case HT_FORMAT:
+		// Re-populate as font have have cghanged
+		item_labelfont(font_);
+		item_labelsize(fontsize_);
+		populate_tree(false);
+		break;
 	}
 }
 
