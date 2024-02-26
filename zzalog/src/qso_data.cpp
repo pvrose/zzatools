@@ -612,6 +612,7 @@ void qso_data::action_start(qso_init_t mode) {
 	// Add to book
 	// action_new_qso(current_qso(), mode);
 	g_entry_->append_qso();
+	book_->enable_save(false);
 	book_->selection(book_->item_number(g_entry_->qso_number()), HT_INSERTED);
 	switch (mode) {
 	case QSO_NONE:
@@ -701,6 +702,8 @@ bool qso_data::action_save() {
 	}
 
 	book_->add_use_data(qso);
+
+	book_->enable_save(true);
 
 	// Upload QSO to QSL servers
 	book_->upload_qso(qso_number);
@@ -1235,6 +1238,7 @@ void qso_data::action_cancel_modem() {
 	wsjtx_handler_->delete_qso(current_qso()->item("CALL"));
 	g_entry_->delete_qso();
 	book_->delete_record(true);
+	book_->enable_save(true);
 	enable_widgets();
 }
 
