@@ -90,7 +90,6 @@ int wsjtx_handler::rcv_dgram(stringstream & ss) {
 	// 	fl_alert("WSJT-X has connected, please ensure correct station details will get logged!");
 	// }
 
-	// printf("DEBUG: DATAGRAM received from %s type ", id_.c_str());
 	// Select method to interpret datagram
 	switch (dgram_type) {
 	case 0:
@@ -179,7 +178,6 @@ int wsjtx_handler::handle_log(stringstream& ss) {
 	book* rcvd_book = new book(OT_NONE);
 	reader->load_book(rcvd_book, adif);
 	record* log_qso = rcvd_book->get_record(0, false);
-	printf("DEBUG, Logging....\n");
 	record* qso = qso_call(log_qso->item("CALL"), true);
 	qso->merge_records(log_qso);
 	qso->item("QSO_COMPLETE", string(""));
@@ -210,7 +208,6 @@ int wsjtx_handler::handle_decode(stringstream& ss) {
 	minutes = minutes - (hours * 60);
 	char t[20];
 	snprintf(t, sizeof(t), "%02d%02d%02.0f", hours, minutes, seconds);
-	// printf("DEBUG: Updating QSO in handle_decode - %s\n", decode.message.c_str());
 	record* qso = update_qso(false, string(t), (double)decode.d_freq, decode.message);
 	if (qso) qso_manager_->update_modem_qso(false);
 	// if (qso) qso_manager_->update_modem_qso(qso);
@@ -238,7 +235,6 @@ int wsjtx_handler::handle_reply(stringstream& ss) {
 	minutes = minutes - (hours * 60);
 	char t[20];
 	snprintf(t, sizeof(t), "%02d%02d%02.0f", hours, minutes, seconds);
-	// printf("DEBUG: Updating QSO in handle_reply - %s\n", decode.message.c_str());
 	record* qso = update_qso(false, string(t), (double)decode.d_freq, decode.message);
 	if (qso) qso_manager_->update_modem_qso(false);
 	// if (qso) qso_manager_->update_modem_qso(qso);
@@ -303,7 +299,6 @@ int wsjtx_handler::handle_status(stringstream& ss) {
 	if (status.transmitting) {
 		// Onl;y update QSO if not already doing so - this is called by multiple threads
 		if (!tx_semaphore_.test_and_set()) {
-			// printf("DEBUG: Updating qso in handle status %s\n", status.tx_message.c_str());
 			record* qso = update_qso(true, now(false, "%H%M%S"), (double)status.tx_offset, status.tx_message);
 			if (qso && qso->item("CALL").substr(0,2) != "CQ") qso_manager_->update_modem_qso(false);
 			// if (qso) qso_manager_->update_modem_qso(qso);
@@ -550,7 +545,6 @@ record* wsjtx_handler::update_qso(bool tx, string time, double audio_freq, strin
 					break;
 				}
 				default: {
-					printf("DEBUG Status TX...\n");
 					qso = match != nullptr ? match : qso_call(target, true);
 					qso->item("QSO_COMPLETE", string("N"));
 					break;
@@ -663,7 +657,6 @@ record* wsjtx_handler::update_qso(bool tx, string time, double audio_freq, strin
 			}
 		}
 		else {
-			printf("DEBUG Status RX...");
 			record* qso = match != nullptr ? match : qso_call(sender, false);
 			if (qso) {
 				qso->item("QSO_COMPLETE", string("N"));
@@ -731,12 +724,7 @@ record* wsjtx_handler::new_qso(string call) {
 
 // Get a QSO record for this callsign
 record* wsjtx_handler::qso_call(string call, bool create) {
-	printf("DEBUG: QSO cache");
-	for (auto it = qsos_.begin(); it != qsos_.end(); it++) 
-		printf(" %s:%p", it->first.c_str(), it->second);
-	printf("\n");	
 	record* qso = nullptr;
-	printf("DEBUG: WSJTX Requesting QSO for call %s.\n", call.c_str());
 	if (qsos_.find(call) == qsos_.end()) {
 		if (create) {
 			qso = new_qso(call);
@@ -768,7 +756,6 @@ record* wsjtx_handler::qso_call(string call, bool create) {
 			}
 		}
 	}
-	printf("DEBUG: WSJTX %s Got %p\n", call.c_str(), qso);
 	return qso;
 }
 
@@ -823,7 +810,6 @@ bool wsjtx_handler::parse_all_txt(record* qso, string line) {
 			}
 		}
 	}
-	// printf("DEBUG: Updating QSO in parse_all_txt %s\n", line.substr(pos).c_str());
 	if (update_qso(tx_record, time_on, audio_frequency, line.substr(pos), qso, dial_frequency, qso->item("MODE")) ) {
 		return true;
 	} else {
@@ -958,7 +944,6 @@ void wsjtx_handler::ticker() {
 // Erase cache entry for callsign
 void wsjtx_handler::delete_qso(string call) {
 	if (qsos_.find(call) != qsos_.end()) {
-		printf("DEBUG: WSJTX - removing %s from cache", call.c_str());
 		qsos_.erase(call);
 	} else {
 		char msg[128];

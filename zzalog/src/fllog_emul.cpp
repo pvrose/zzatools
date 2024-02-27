@@ -207,7 +207,7 @@ int fllog_emul::add_record(rpc_data_item::rpc_list& params, rpc_data_item& respo
 		rpc_data_item* item = params.front();
 		stringstream ss;
 		ss.str(item->get_string());
-		printf("DEBUG: add_record: %s\n", item->get_string().c_str());
+		// printf("DEBUG: add_record: %s\n", item->get_string().c_str());
 		adi_reader* reader = new adi_reader();
 		load_result_t dummy;
 		that_->current_record_ = new record();

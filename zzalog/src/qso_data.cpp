@@ -456,11 +456,11 @@ record* qso_data::start_modem_qso(string call) {
 		return nullptr;
 	}
 	if (allow_modem) {
-		printf("DEBUG DASH Received request to create a record for %s\n", call.c_str());
+		// printf("DEBUG DASH Received request to create a record for %s\n", call.c_str());
 		action_activate(QSO_COPY_MODEM);
 		action_start(QSO_COPY_MODEM);
 		current_qso()->item("CALL", call);
-		printf("DEBUG DASH generated %s - %p\n", call.c_str(), current_qso());
+		// printf("DEBUG DASH generated %s - %p\n", call.c_str(), current_qso());
 		return current_qso();
 	} else {
 		return nullptr;
@@ -962,7 +962,7 @@ void qso_data::action_add_query() {
 
 // Action reject query - do nothing
 void qso_data::action_reject_query() {
-	printf("DEBUG: action_reject_query\n");
+	// printf("DEBUG: action_reject_query\n");
 	import_data_->discard_update(true);
 	g_query_->clear_query();
 	logging_state_ = QSO_INACTIVE;
@@ -1067,7 +1067,7 @@ void qso_data::action_look_all_txt() {
 
 // Create a net from current QSO and others which overlap
 void qso_data::action_create_net() {
-	printf("DEBUG: action_create_net\n");
+	// printf("DEBUG: action_create_net\n");
 	qso_num_t qso_number = g_entry_->qso_number();
 	record* qso = g_entry_->qso();
 	string call = get_call();
@@ -1233,7 +1233,7 @@ void qso_data::action_log_modem() {
 
 // Cacncel a modem record
 void qso_data::action_cancel_modem() {
-	printf("DEBUG DASH - Cancelling modem %s - %p\n", current_qso()->item("CALL").c_str(), current_qso());
+	// printf("DEBUG DASH - Cancelling modem %s - %p\n", current_qso()->item("CALL").c_str(), current_qso());
 	logging_state_ = QSO_INACTIVE;
 	wsjtx_handler_->delete_qso(current_qso()->item("CALL"));
 	g_entry_->delete_qso();
