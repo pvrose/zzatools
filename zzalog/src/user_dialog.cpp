@@ -303,7 +303,8 @@ void user_dialog::populate_font(Fl_Hold_Browser* br, const Fl_Font* font) {
 	br->clear();
 	// Get only ISO9958-1 fonts
 	int num_fonts = Fl::set_fonts(nullptr);
-	for (int i = 0; i < num_fonts; i++) {
+	// Only get FLTK default fonts
+	for (int i = 0; i < num_fonts && i < FL_FREE_FONT; i++) {
 		// Contains any combination of FL_BOLD and FL_ITALIC
 		int attr = 0;
 		const char* name = Fl::get_font_name(Fl_Font(i), &attr);

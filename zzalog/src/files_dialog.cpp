@@ -475,7 +475,7 @@ void files_dialog::create_form(int X, int Y) {
 	unzipper_data_ = { "Please select the unzip tool", "Executable\t*.exe", &unzipper_, nullptr, in_unzipper, nullptr };
 #else
 	// TODO: Change file pattern for Posix executables
-	unzipper_data_ = { "Please select the unzip tool", "Executable\t*.exe", &unzipper_, nullptr, in_unzipper, nullptr };
+	unzipper_data_ = { "Please select the unzip tool", "", &unzipper_, nullptr, in_unzipper, nullptr };
 #endif
 	bn_browse_unzip->callback(cb_bn_browsefile, &unzipper_data_);
 	bn_browse_unzip->when(FL_WHEN_RELEASE);

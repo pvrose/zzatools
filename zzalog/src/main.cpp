@@ -760,7 +760,7 @@ int main(int argc, char** argv)
 	Fl::lock();
 	// Set default Fil Chooser on non-windows
 	// Create the settings before anything else 
-	settings_ = new Fl_Preferences(Fl_Preferences::USER, VENDOR.c_str(), PROGRAM_ID.c_str());
+	settings_ = new Fl_Preferences(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
 	// Ctreate status to handle status messages
 	status_ = new status();
 	// Parse command-line arguments - accept FLTK standard arguments and custom ones (in cb_args)

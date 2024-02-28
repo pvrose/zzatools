@@ -41,7 +41,7 @@ status::status() :
 	// Get report filename from the settings
 	char * filename;
 	Fl_Preferences status_settings(settings_, "Status");
-	status_settings.get("Report File", filename, "");
+	status_settings.get("Report File", filename, "status.txt");
 	report_filename_ = filename;
 	free(filename);
 	// If it's not in the settings, open file dialog, get it and set it.
@@ -50,10 +50,10 @@ status::status() :
 		Fl_Native_File_Chooser* chooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_SAVE_FILE);
 		chooser->title("Select file name for status report");
 		chooser->filter("Text files\t*.txt");
-		if (chooser->show() == 0) {
-			report_filename_ = chooser->filename();
-			status_settings.set("Report File", report_filename_.c_str());
-		}
+		chooser->preset_file(report_filename_.c_str());
+		if (chooser->show() == 0) {}
+		report_filename_ = chooser->filename();
+		status_settings.set("Report File", report_filename_.c_str());
 		delete chooser;
 	}
 
