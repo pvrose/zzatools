@@ -71,6 +71,7 @@ public:
 		IMPORT_QUERY,
 		CANCEL_VIEW,
 		QRZ_COM,
+		UPDATE_CAT,
 	};
 
 
@@ -140,6 +141,8 @@ public:
 	static void cb_bn_view_qso(Fl_Widget* w, void* v);
 	// Open QRZ.com
 	static void cb_bn_qrz_com(Fl_Widget* w, void* v);
+	// Update CAT
+	static void cb_bn_update_cat(Fl_Widget* w, void* v);
 
 
 protected:

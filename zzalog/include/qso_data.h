@@ -204,6 +204,8 @@ public:
 	void action_import_query();
 	// Opne QRZ.com browser
 	void action_qrz_com();
+	// Update selected QSO with current CAT conditions
+	void action_update_cat();
 
 	// Edit - saved logging state
 	logging_state_t edit_return_state_;

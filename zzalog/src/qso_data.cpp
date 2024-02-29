@@ -904,6 +904,12 @@ void qso_data::action_navigate(int target) {
 		book_->navigate((navigate_t)target);
 		action_query(logging_state_, book_->selection(), 0);
 		break;
+	case NET_STARTED:
+	case NET_EDIT: {
+		// "Navigate" - select left anf right of tabs
+		g_net_entry_->navigate((navigate_t) target);
+		break;
+	}
 	}
 	inhibit_drawing_ = false;
 	enable_widgets();
@@ -1311,6 +1317,20 @@ void qso_data::action_qrz_com() {
 	// printf("DEBUG: action_qrz_com\n");
 	record* qso = current_qso();
 	qrz_handler_->open_web_page(qso->item("CALL"));
+}
+
+// Action update CAT
+void qso_data::action_update_cat() {
+	switch (logging_state_) {
+		case QSO_EDIT: {
+			g_entry_->copy_cat_to_qso();
+			break;
+		}
+		case NET_EDIT: {
+			g_net_entry_->entry()->copy_cat_to_qso();
+			break;
+		}
+	}
 }
 
 // Dummy QSO

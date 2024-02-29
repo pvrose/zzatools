@@ -30,7 +30,8 @@ map<qso_data::logging_state_t, list<qso_buttons::button_type> > button_map_ =
 	{ qso_data::QSO_EDIT, { qso_buttons::SAVE_EDIT, qso_buttons::SAVE_EXIT, 
 		qso_buttons::SAVE_VIEW, qso_buttons::CANCEL_EDIT, 
 		qso_buttons::EDIT_NET, qso_buttons::NAV_FIRST,
-		qso_buttons::NAV_PREV, qso_buttons::NAV_NEXT, qso_buttons::NAV_LAST, qso_buttons::QRZ_COM } },
+		qso_buttons::NAV_PREV, qso_buttons::NAV_NEXT, qso_buttons::NAV_LAST,
+		qso_buttons::UPDATE_CAT, qso_buttons::QRZ_COM } },
 	{ qso_data::QSO_VIEW, { qso_buttons::EDIT_QSO, qso_buttons::CANCEL_VIEW, qso_buttons::NAV_FIRST,
 		qso_buttons::NAV_PREV, qso_buttons::NAV_NEXT, qso_buttons::NAV_LAST , qso_buttons::QRZ_COM,
 		qso_buttons::LOOK_ALL_TXT } },
@@ -45,9 +46,11 @@ map<qso_data::logging_state_t, list<qso_buttons::button_type> > button_map_ =
 		qso_buttons::KEEP_BOTH_DUPES }},
 	{ qso_data::QRZ_MERGE, { qso_buttons::MERGE_DONE }},
 	{ qso_data::NET_STARTED, {qso_buttons::SAVE_NET, qso_buttons::SAVE_QSO, qso_buttons::CANCEL_QSO, qso_buttons::CANCEL_NET,
+		qso_buttons::NAV_FIRST, qso_buttons::NAV_PREV, qso_buttons::NAV_NEXT, qso_buttons::NAV_LAST,
 		qso_buttons::ADD_NET_QSO }},
 	{ qso_data::NET_EDIT, { qso_buttons::SAVE_EDIT_NET, qso_buttons::CANCEL_QSO, qso_buttons::CANCEL_NET, 
-	    qso_buttons::ADD_NET_QSO}},
+		qso_buttons::NAV_FIRST, qso_buttons::NAV_PREV, qso_buttons::NAV_NEXT, qso_buttons::NAV_LAST,
+	    qso_buttons::ADD_NET_QSO, qso_buttons::UPDATE_CAT}},
 	{ qso_data::MANUAL_ENTRY, { qso_buttons::EXEC_QUERY, qso_buttons::IMPORT_QUERY, qso_buttons::CANCEL_QUERY, qso_buttons::LOOK_ALL_TXT }},
 	{ qso_data::QSO_MODEM, { qso_buttons::CANCEL_QSO }},
 };
@@ -72,10 +75,10 @@ map<qso_buttons::button_type, qso_buttons::button_action> action_map_ =
 	{ qso_buttons::SAVE_VIEW, { "Save && View", "Copy changed record and allow view", FL_BLUE, qso_buttons::cb_save, (void*)qso_buttons::SAVE_VIEW }},
 	{ qso_buttons::CANCEL_EDIT, { "Cancel Edit", "Cancel the current QSO edit", FL_RED, qso_buttons::cb_cancel, 0 } },
 	{ qso_buttons::CANCEL_VIEW, { "Cancel", "Cancel the current QSO view", FL_RED, qso_buttons::cb_cancel, 0 } },
-    { qso_buttons::NAV_FIRST, { "@$->|", "Select first record in book", FL_YELLOW, qso_buttons::cb_bn_navigate, (void*)NV_FIRST } },
-	{ qso_buttons::NAV_PREV, { "@<-", "Select previous record in book", FL_YELLOW, qso_buttons::cb_bn_navigate, (void*)NV_PREV } },
-	{ qso_buttons::NAV_NEXT, { "@->", "Select next record in book", FL_YELLOW, qso_buttons::cb_bn_navigate, (void*)NV_NEXT } },
-	{ qso_buttons::NAV_LAST, { "@->|", "Select last record in book", FL_YELLOW, qso_buttons::cb_bn_navigate, (void*)NV_LAST } },
+    { qso_buttons::NAV_FIRST, { "@$->|", "Select first record in net or book", FL_YELLOW, qso_buttons::cb_bn_navigate, (void*)NV_FIRST } },
+	{ qso_buttons::NAV_PREV, { "@<-", "Select previous record in net or book", FL_YELLOW, qso_buttons::cb_bn_navigate, (void*)NV_PREV } },
+	{ qso_buttons::NAV_NEXT, { "@->", "Select next record in net or book", FL_YELLOW, qso_buttons::cb_bn_navigate, (void*)NV_NEXT } },
+	{ qso_buttons::NAV_LAST, { "@->|", "Select last record in net or book", FL_YELLOW, qso_buttons::cb_bn_navigate, (void*)NV_LAST } },
 	{ qso_buttons::PARSE, { "DX?", "Display the DX details for this callsign", FL_BACKGROUND_COLOR, qso_buttons::cb_parse, 0 } },
 	{ qso_buttons::CANCEL_BROWSE, { "Quit Browse", "Quit browse mode", COLOUR_PINK, qso_buttons::cb_cancel, 0 } },
 	{ qso_buttons::ADD_QUERY, { "Add QSO", "Add queried QSO to log", FL_GREEN, qso_buttons::cb_bn_add_query, 0 }},
@@ -99,6 +102,7 @@ map<qso_buttons::button_type, qso_buttons::button_action> action_map_ =
 	{ qso_buttons::CANCEL_QUERY, { "Cancel", "Cancel query", FL_RED, qso_buttons::cb_bn_cancel_query, 0 }},
 	{ qso_buttons::IMPORT_QUERY, { "Test Import", "Test import query", FL_YELLOW, qso_buttons::cb_bn_import_query, 0 }},
 	{ qso_buttons::QRZ_COM, { "@search QRZ.com", "Display details in QRZ.com", FL_DARK_CYAN, qso_buttons::cb_bn_qrz_com, 0}},
+	{ qso_buttons::UPDATE_CAT, { "Update CAT", "Update QSO with current CAT info", FL_DARK_BLUE, qso_buttons::cb_bn_update_cat, 0 }},
 };
 
 qso_buttons::qso_buttons(int X, int Y, int W, int H, const char* L) :
@@ -645,6 +649,20 @@ void qso_buttons::cb_bn_qrz_com(Fl_Widget* w, void* v) {
 	case qso_data::QSO_BROWSE:
 		that->qso_data_->action_qrz_com();
 		break;
+	}
+	that->enable_widgets();
+}
+
+// Update QSO with CAT data
+void qso_buttons::cb_bn_update_cat(Fl_Widget* w, void* v) {
+	qso_buttons* that = ancestor_view<qso_buttons>(w);
+	that->disable_widgets();
+	switch(that->qso_data_->logging_state()) {
+		case qso_data::QSO_EDIT:
+		case qso_data::NET_EDIT: {
+			that->qso_data_->action_update_cat();
+			break;
+		}
 	}
 	that->enable_widgets();
 }

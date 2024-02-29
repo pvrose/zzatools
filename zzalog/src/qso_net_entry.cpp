@@ -223,3 +223,46 @@ void qso_net_entry::cb_entries(Fl_Widget* w, void* v) {
 	qso_entry* qe = (qso_entry*)tabs->value();
 	book_->selection(qe->qso_number());
 }
+
+// Navigate to target
+void qso_net_entry::navigate(navigate_t target) {
+	// Current tab
+	int ix = 0;
+	bool found = false;
+	Fl_Widget* curr = entries_->value();
+	for (int i = 0; i < entries() && ~found; i ++) {
+		if (curr == entries_->child(i)) {
+			found = true;
+			ix = i;
+		}
+	}
+	printf("DEBUG: NET: Selected tab %d - call = %s\n", ix, ((qso_entry*)entries_->child(ix))->qso()->item("CALL").c_str());
+	switch(target) {
+		case NV_FIRST: {
+			entries_->value(first_entry());
+			break;
+		}
+		case NV_PREV: {
+			if ( ix > 0) {
+				ix--;
+				entries_->value(entries_->child(ix));
+			}
+			break;
+		}
+		case NV_NEXT: {
+			if (ix < entries_->children() - 1) {
+				ix++;
+				entries_->value(entries_->child(ix));
+			}
+			break;
+		}
+		case NV_LAST: {
+			entries_->value(last_entry());
+
+		}
+	}
+	enable_widgets();
+	qso_entry* qe = (qso_entry*)entries_->value();
+	printf("DEBUG: NET: Selected call - %s\n", qe->qso()->item("CALL").c_str());
+	book_->selection(qe->qso_number());
+}

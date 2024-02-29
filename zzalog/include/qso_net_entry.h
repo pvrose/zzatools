@@ -58,6 +58,8 @@ public:
 	void entry(qso_entry* w);
 	// Number of entries
 	int entries();
+	// Navigate entry
+	void navigate(navigate_t target);
 
 protected:
 	Fl_Tabs* entries_;
