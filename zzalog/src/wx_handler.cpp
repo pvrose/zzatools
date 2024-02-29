@@ -16,6 +16,8 @@ extern status* status_;
 extern url_handler* url_handler_;
 extern qso_manager* qso_manager_;
 
+const double MPH2MPS = 1.0 / 3600.0 * (1760.0 * 36.0) * 25.4 / 1000.0;
+
 wx_handler::wx_handler() :
     xml_reader() {
 
@@ -166,11 +168,11 @@ void wx_handler::update() {
         char msg[128];
         ss.seekg(ios::beg);
         parse(ss);
-        snprintf(msg, sizeof(msg), "WX_HANDLER: Weather read OK: %s %0.0f\302\260C %0.0fm/s %s.",
+        snprintf(msg, sizeof(msg), "WX_HANDLER: Weather read OK: %s %0.0f\302\260C %0.0fMPH %s.",
             description().c_str(), temperature(), wind_speed(), wind_direction().c_str());
         status_->misc_status(ST_OK, msg);
     } else {
-        status_->misc_status(ST_ERROR, "WX_HANDLER: WX read failed - see pop-up help wiindow");
+        status_->misc_status(ST_ERROR, "WX_HANDLER: WX read failed - see pop-up help window");
         Fl_Help_Dialog* dlg = new Fl_Help_Dialog();
         ss.seekg(ios::beg);
         dlg->load(ss.str().c_str());
@@ -198,14 +200,14 @@ string wx_handler::description() {
     return report_.description;
 }
 
-// Temperature (K)
+// Temperature (C)
 float wx_handler::temperature() {
     return report_.temperature_K - 273.15;
 }
 
-// Wind-speed (m/s)
+// Wind-speed (MPH)
 float wx_handler::wind_speed() {
-    return report_.wind_speed_ms / 0.44704;
+    return report_.wind_speed_ms / MPH2MPS;
 }
 
 // Wind direction (16th cardinals)
@@ -470,7 +472,7 @@ bool wx_handler::start_wind_speed(map<string, string>* attributes) {
 bool wx_handler::end_wind_speed() {
     float f = report_.wind_speed_ms;
     if (unit_ == "mph") {
-        f *= 0.44704;
+        f *= MPH2MPS;
     } // default is m/s
     report_.wind_speed_ms = f;
     return true;
