@@ -1325,7 +1325,7 @@ void book::modified_record(bool value) {
 bool book::new_record() { return new_record_; }
 
 // Set save_enabled_ (and save if modified)
-void book::enable_save(bool enable) {
+void book::enable_save(bool enable, const char* reason) {
 	if (enable) {
 		if (save_level_) save_level_--;
 	}
@@ -1333,7 +1333,7 @@ void book::enable_save(bool enable) {
 		save_level_++;
 	}
 	char msg[128];
-	snprintf(msg, sizeof(msg), "LOG: Setting save enable level %d", save_level_);
+	snprintf(msg, sizeof(msg), "LOG: Setting save enable level %d - %s", save_level_, reason);
 	status_->misc_status(ST_LOG, msg);
 	if (AUTO_SAVE && save_level_ == 0 && !READ_ONLY && modified()) {
 		store_data();
@@ -1355,7 +1355,7 @@ void book::check_dupes(bool restart) {
 		inhibit_view_update_ = true;
 		number_dupes_kept_ = 0;
 		number_dupes_removed_ = 0;
-		enable_save(false);
+		enable_save(false, "Checking dupes");
 	}
 	bool possible_dupe = false;
 	for (; test_item_ < size() - 1 && !possible_dupe;) {
@@ -1403,7 +1403,7 @@ void book::check_dupes(bool restart) {
 		status_->misc_status(ST_OK, message);
 		inhibit_view_update_ = false;
 		selection(size() - 1, HT_ALL);
-		enable_save(true);
+		enable_save(true, "Checked dupes");
 	}
 }
 
@@ -1579,13 +1579,13 @@ bool book::delete_enabled() {
 // Upload the latest QSO imported to eQSL, LotW and Clublog
 bool book::upload_qso(qso_num_t record_num) {
 	if (AUTO_UPLOAD && update_allowed_) {
-		enable_save(false);
+		enable_save(false, "Uploading to QSL sites");
 		bool ok = eqsl_handler_->upload_single_qso(record_num);
 		if (!lotw_handler_->upload_single_qso(record_num)) ok = false;
 		if (!club_handler_->upload_single_qso(record_num)) ok = false;
 		// Clear flag as already handled new record features
 		new_record_ = false;
-		enable_save(true);
+		enable_save(true, "Upload to QSL sites requested");
 		return ok;
 	} else {
 		status_->misc_status(ST_WARNING, "LOG: QSO uploads inhibited");

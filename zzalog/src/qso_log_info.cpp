@@ -151,10 +151,10 @@ void qso_log_info::cb_bn_enable(Fl_Widget* w, void* v) {
 	qso_log_info* that = ancestor_view<qso_log_info>(w);
 	bool value = ((Fl_Check_Button*)w)->value();
 	if (!value) {
-		book_->enable_save(false);
+		book_->enable_save(false, "Diabling save from QSO Manager");
 	}
 	else {
-		while (!book_->enable_save()) book_->enable_save(true);
+		while (!book_->enable_save()) book_->enable_save(true, "Enabling save from QSO manager");
 	}
 	that->enable_widgets();
 }

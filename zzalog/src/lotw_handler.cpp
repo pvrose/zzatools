@@ -131,6 +131,7 @@ bool lotw_handler::upload_lotw_log(book* book, bool mine) {
 				status_->misc_status(ST_NOTE, "LOTW: Signing and uploading QSLs to LotW");
 				status_->misc_status(ST_LOG, command);
 				if (DEBUG_THREADS) printf("LOTW MAIN: Uploading QSOs to LotW\n");
+				book_->enable_save(false, "Uploading to LotW");
 				upload_lock_.lock();
 				upload_done_szq_.push(book->size());
 				for (size_t ix = 0; ix < book->size(); ix++) {
@@ -405,6 +406,7 @@ bool lotw_handler::upload_done(int result) {
 		}
 	}
 	book_->modified(updated);
+	book_->enable_save(true, "Uploaded to LotW");
 	return ok;
 }
 

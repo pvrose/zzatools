@@ -612,7 +612,7 @@ void qso_data::action_start(qso_init_t mode) {
 	// Add to book
 	// action_new_qso(current_qso(), mode);
 	g_entry_->append_qso();
-	book_->enable_save(false);
+	book_->enable_save(false, "Starting real-time QSO");
 	book_->selection(book_->item_number(g_entry_->qso_number()), HT_INSERTED);
 	switch (mode) {
 	case QSO_NONE:
@@ -703,7 +703,7 @@ bool qso_data::action_save() {
 
 	book_->add_use_data(qso);
 
-	book_->enable_save(true);
+	book_->enable_save(true, "Saving QSO");
 
 	// Upload QSO to QSL servers
 	book_->upload_qso(qso_number);
@@ -1137,7 +1137,7 @@ void qso_data::action_add_net_qso() {
 void qso_data::action_save_net_all() {
 	// printf("DEBUG: action_save_net_all\n");
 	// Only save the book once all records have been saved
-	book_->enable_save(false);
+	book_->enable_save(false, "Starting multi-QSO save");
 	book_->allow_upload(false);
 	bool ok = true;
 	while (g_net_entry_->entries() && ok) {
@@ -1152,7 +1152,7 @@ void qso_data::action_save_net_all() {
 	}
 	// Restore the place-holder entry
 	if (ok) g_net_entry_->add_entry();
-	book_->enable_save(true);
+	book_->enable_save(true, "Finished multi-QSO save");
 	book_->allow_upload(true);
 	enable_widgets();
 }
@@ -1176,7 +1176,7 @@ void qso_data::action_save_net_edit() {
 // Cancel the whole net
 void qso_data::action_cancel_net_all() {
 	// printf("DEBUG: action_cancel_net_all\n");
-	book_->enable_save(false);
+	book_->enable_save(false, "Starting multi-QSO cancel");
 	while (g_net_entry_->entries()) {
 		switch(logging_state_) {
 		case NET_STARTED: 
@@ -1187,7 +1187,7 @@ void qso_data::action_cancel_net_all() {
 			break;
 		}
 	}
-	book_->enable_save(true);
+	book_->enable_save(true, "Finished multi-QSO cancel");
 	// Restore the place-holder entry
 	g_net_entry_->add_entry();
 	enable_widgets();
@@ -1206,7 +1206,7 @@ void qso_data::action_cancel_net_edit() {
 		g_net_entry_->entry()->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
 		logging_state_ = NET_EDIT;
 	}
-	book_->enable_save(true);
+	book_->enable_save(true, "Cancelled multi-QSO edit");
 	enable_widgets();
 }
 
@@ -1214,7 +1214,7 @@ void qso_data::action_cancel_net_edit() {
 void qso_data::action_log_modem() {
 	// printf("DEBUG: action_add_modem\n");
 	// Add to book
-	book_->enable_save(false);
+	book_->enable_save(false, "Logging real-time modem QSO");
 	record* qso = current_qso();
 	if (qso->item("TX_PWR") == "") {
 		// Get power from rig
@@ -1227,7 +1227,7 @@ void qso_data::action_log_modem() {
 	action_view();
 	
 	book_->selection(book_->item_number(g_entry_->qso_number()), HT_INSERTED);
-	book_->enable_save(true);
+	book_->enable_save(true, "Logged real-time modem QSO");
 	enable_widgets();
 }
 
@@ -1238,7 +1238,7 @@ void qso_data::action_cancel_modem() {
 	wsjtx_handler_->delete_qso(current_qso()->item("CALL"));
 	g_entry_->delete_qso();
 	book_->delete_record(true);
-	book_->enable_save(true);
+	book_->enable_save(true, "Cancel real-time modem QSO");
 	enable_widgets();
 }
 

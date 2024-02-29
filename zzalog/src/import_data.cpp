@@ -310,7 +310,7 @@ void import_data::update_book() {
 		// Prevent view update with every record imported
 		inhibit_view_update_ = true;
 		if (!update_in_progress_) {
-			book_->enable_save(false);
+			book_->enable_save(false, "Starting update from import");
 		}
 		// Clear flags
 		update_in_progress_ = false;
@@ -653,7 +653,7 @@ void import_data::finish_update(bool merged /*= true*/) {
 	}
 	number_modified_ = 0;
 	// Restore state of save_enabled
-	book_->enable_save(true);
+	book_->enable_save(true, "Finished update from import");
 }
 
 // Where an update has come from a QSL server, some ADIF fields are renamed to the viewpoiint of this 

@@ -640,7 +640,7 @@ void menu::cb_mi_parse_log(Fl_Widget* w, void* v) {
 	fl_cursor(FL_CURSOR_WAIT);
 	// Get parse mode
 	int num_items = navigation_book_->size();
-	book_->enable_save(false);
+	book_->enable_save(false, "Starting parsing log");
 	if (true) {	
 		// If command parsing allowed
 		bool abandon = false;
@@ -669,7 +669,7 @@ void menu::cb_mi_parse_log(Fl_Widget* w, void* v) {
 		status_->misc_status(ST_OK, "LOG: Parsing done!");
 		navigation_book_->selection(item_number, HT_CHANGED);
 	}
-	book_->enable_save(false);
+	book_->enable_save(true, "Ended parsing log");
 	fl_cursor(FL_CURSOR_DEFAULT);
 }
 
@@ -678,7 +678,7 @@ void menu::cb_mi_parse_log(Fl_Widget* w, void* v) {
 void menu::cb_mi_valid8_qso(Fl_Widget* w, void* v) {
 	record* record = navigation_book_->get_record();
 	qso_num_t record_num = navigation_book_->record_number(navigation_book_->selection());
-	book_->enable_save(false);
+	book_->enable_save(false, "Started validate QSO");
 	// If command validation is enabled
 	bool changed = spec_data_->validate(record, record_num);
 	if (changed) {
@@ -687,7 +687,7 @@ void menu::cb_mi_valid8_qso(Fl_Widget* w, void* v) {
 		navigation_book_->selection(item_num, HT_MINOR_CHANGE);
 		book_->modified(true);
 	}
-	book_->enable_save(true);
+	book_->enable_save(true, "Ended validate QSO");
 }
  
 // Log->Validate Log - validate all records in selected log
@@ -700,7 +700,7 @@ void menu::cb_mi_valid8_log(Fl_Widget* w, void* v) {
 	int num_items = navigation_book_->size();
 	bool changed = false;
 	// Initialse progress
-	book_->enable_save(false);
+	book_->enable_save(false, "Started validate log");
 	status_->misc_status(ST_NOTE, "VALIDATE: Started");
 	status_->progress(num_items, navigation_book_->book_type(), "Validating log", "records");
 	spec_data_->reset_continue();
@@ -719,7 +719,7 @@ void menu::cb_mi_valid8_log(Fl_Widget* w, void* v) {
 	if (changed) {
 		navigation_book_->selection(item_number, HT_MINOR_CHANGE);
 	}
-	book_->enable_save(false);
+	book_->enable_save(true, "Ended validate log");
 	fl_cursor(FL_CURSOR_DEFAULT);
 }
 
@@ -922,9 +922,9 @@ void menu::cb_mi_log_ssave(Fl_Widget* w, void* v) {
 	const Fl_Menu_Item* item = m->mvalue();
 	bool value = item->value();
 	if (value) {
-		book_->enable_save(false);
+		book_->enable_save(false, "Disabling from menu");
 	} else {
-		while(!book_->enable_save()) book_->enable_save(true);
+		while(!book_->enable_save()) book_->enable_save(true, "Enabling from menu");
 	}
 }
 

@@ -196,7 +196,7 @@ using namespace std;
 		// And all data
 		void add_use_data(record* record);
 		// Enable/Disable auto-save
-		void enable_save(bool enable);
+		void enable_save(bool enable, const char* reason);
 		// Save enabled
 		bool enable_save();
 		// Delete enabled

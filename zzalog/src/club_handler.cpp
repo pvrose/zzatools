@@ -72,7 +72,7 @@ bool club_handler::upload_log(book* book) {
 		else {
 			// Update all records sent with the fact that they have been uploaded and when
 			status_->misc_status(ST_OK, "CLUBLOG: Upload successful");
-			book_->enable_save(false);
+			book_->enable_save(false, "Updating Clublog status");
 			ok = true;
 			string today = now(false, "%Y%m%d");
 			for (auto it = book->begin(); it != book->end(); it++) {
@@ -83,7 +83,7 @@ bool club_handler::upload_log(book* book) {
 			book_->selection(book_->size() - 1, HT_SELECTED);
 			// Force the book to save itself with these changes
 			book_->modified(true);
-			book_->enable_save(true);
+			book_->enable_save(true, "Updated Clublog status");
 		}
 		fl_cursor(FL_CURSOR_DEFAULT);
 		return ok;
@@ -272,6 +272,8 @@ bool club_handler::upload_single_qso(qso_num_t record_num) {
 		upload_qso = false;
 	}
 	if (upload_qso) {
+		// Suspend saving
+		book_->enable_save(false, "Uploading to Clublog");
 		record* this_record = book_->get_record(record_num, false);
 		if (DEBUG_THREADS) printf("CLUBLOG MAIN: Queueing request %s\n", this_record->item("CALL").c_str());
 		upload_lock_.lock();
@@ -330,6 +332,7 @@ bool club_handler::upload_done(bool response) {
 		this_record->item("CLUBLOG_QSO_UPLOAD_STATUS", string("Y"));
 		// Force the book to save itself with these changes
 		book_->modified(true);
+		book_->enable_save(true, "Uploaded to Clublog");
 	}
 	upload_done_queue_.pop();
 	return response;

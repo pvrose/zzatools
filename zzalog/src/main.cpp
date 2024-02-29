@@ -199,10 +199,12 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 			switch (fl_choice("You are currently modifying a record? Save or Quit?", "Save", "Quit", nullptr)) {
 			case 0:
 				// Save
+				status_->misc_status(ST_NOTE, "ZZALOG: Saving current open record");
 				qso_manager_->end_qso();
 				break;
 			case 1:
 				// Quit - delete any new record
+				status_->misc_status(ST_WARNING, "ZZALOG: Quitting current unsaved record");
 				book_->delete_record(book_->new_record());
 				break;
 			}
@@ -214,11 +216,13 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 				switch (fl_choice("There is an import in process. Do you want to let it finish or abandon it?", "Finish", "Abandon", nullptr)) {
 				case 0:
 					// Gracefully wait for import to complete
+					status_->misc_status(ST_NOTE, "ZZALOG: Allowing current import to complete before closing");
 					import_data_->stop_update(false);
 					while (!import_data_->update_complete()) Fl::check();
 					break;
 				case 1:
 					// Immediately stop the import
+					status_->misc_status(ST_WARNING, "ZZALOG: Abandonimg current import");
 					import_data_->stop_update(true);
 					break;
 				}
@@ -230,14 +234,17 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 			switch (fl_choice("There are outstanding eQSL card image requests. Do you want to cancel download, wait or cancel exit?", "Cancel download", "Wait", "Cancel exit")) {
 			case 0:
 				// Cancel the download immediately
+				status_->misc_status(ST_WARNING, "ZZALOG: Abandonning outstanding card image fetches");
 				eqsl_handler_->enable_fetch(eqsl_handler::EQ_ABANDON);
 				break;
 			case 1:
 				// Wait for the request queue to empty
+				status_->misc_status(ST_NOTE, "ZZALOG: Continuing card image download before closing");
 				while (eqsl_handler_->requests_queued()) Fl::check();
 				break;
 			case 2:
 				// Cancel Exit - don't doing anything else
+				status_->misc_status(ST_WARNING, "ZZALOG: Abandoning close down!");
 				closing_ = false;
 				return;
 			}
@@ -249,8 +256,10 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 			switch (fl_choice("Book has been modified. Do you want to save and exit, exit or cancel exit?", "Exit", "Save && Exit", "Cancel Exit")) {
 			case 0:
 				// Exit
+				status_->misc_status(ST_WARNING, "ZZALOG: Closing without saving recent changes");
 				break;
 			case 1:
+				status_->misc_status(ST_NOTE, "ZZALOG: Saving changes before closing");
 				// Save and Exit
 				if (READ_ONLY) {
 					// Open the Save As dialog and save
@@ -263,6 +272,7 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 				break;
 			case 2:
 				// Cancel Exit - don't doing anything else
+				status_->misc_status(ST_WARNING, "ZZALOG: Abandoning close down");
 				closing_ = false;
 				return;
 			}

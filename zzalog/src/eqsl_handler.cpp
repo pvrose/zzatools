@@ -66,7 +66,7 @@ eqsl_handler::~eqsl_handler()
 void eqsl_handler::enqueue_request(qso_num_t record_num, bool force /*=false*/) {
 	// eQSL requests can be disabled when compiled with _DEBUG
 	// Inhibit saving log
-	book_->enable_save(false);
+	book_->enable_save(false, "Enqueuing eQSL image request");
 	// Enqueue request
 	request_queue_.push(request_t(record_num, force));
 	// Update status
@@ -104,14 +104,14 @@ void eqsl_handler::cb_timer_deq(void* v) {
 				// Cancel - delete all requests in the queue
 				while (!request_queue->empty()) {
 					request_queue->pop();
-					book_->enable_save(true);
+					book_->enable_save(true, "Cancelling eQSL image request");
 				}
 				cards_skipped = true;
 				break;
 			case 2:
 				// Request failed and repeat not wanted - remove request from queue
 				request_queue->pop();
-				book_->enable_save(true);
+				book_->enable_save(true, "Failed eQSL image request");
 				cards_skipped = true;
 				break;
 			}
@@ -119,12 +119,12 @@ void eqsl_handler::cb_timer_deq(void* v) {
 		case ER_OK:
 			// request succeeded - remove request from queue
 			request_queue->pop();
-			book_->enable_save(true);
+			book_->enable_save(true, "Dequeued eQSL image request");
 			break;
 		case ER_SKIPPED:
 			// request skipped - remove request from queue
 			request_queue->pop();
-			book_->enable_save(true);
+			book_->enable_save(true, "Skipped eQSL image request");
 			break;
 		case ER_THROTTLED:
 			// Request remains on queue to be tried again
@@ -140,14 +140,14 @@ void eqsl_handler::cb_timer_deq(void* v) {
 				// Cancel - delete all requests in the queue
 				while (!request_queue->empty()) {
 					request_queue->pop();
-					book_->enable_save(true);
+					book_->enable_save(true, "Failed eqSL image request");
 				}
 				cards_skipped = true;
 				break;
 			case 2:
 				// Request failed and repeat not wanted - delete request from queue
 				request_queue->pop();
-				book_->enable_save(true);
+				book_->enable_save(true, "Failed eQSL image request");
 				cards_skipped = true;
 				break;
 			}
@@ -816,7 +816,7 @@ bool eqsl_handler::upload_eqsl_log(book* book) {
 		response.seekg(response.beg);
 		display_response(response.str());
 		// now update book - don't try and save after each record
-		book_->enable_save(false);
+		book_->enable_save(false, "Updating eQSL upload status");
 		for (size_t pos = 0; pos < book->size(); pos++) {
 			record* record = book->get_record(pos, false);
 			bool dont_update = false;
@@ -834,7 +834,7 @@ bool eqsl_handler::upload_eqsl_log(book* book) {
 				record->item("EQSL_QSL_SENT", string("Y"));
 			}
 		}
-		book_->enable_save(true);
+		book_->enable_save(true, "Updated eQSL upload status");
 
 		// Update status with succesful uploads and remove extracted records
 		if (num_errors || num_warnings) {
@@ -949,6 +949,7 @@ bool eqsl_handler::upload_single_qso(qso_num_t record_num) {
 		this_record->item("QSLMSG", this_message);
 		// Only upload valid records or reply to SWL reports
 		if (this_record->is_valid() || this_record->item("SWL") == "Y") {
+			book_->enable_save(false, "Uploading to eQSL");
 			// Now send to upload thread to process
 			upload_lock_.lock();
 			if (DEBUG_THREADS) printf("EQSL MAIN: Enqueueing eQSL request %s\n", this_record->item("CALL").c_str());
@@ -1148,6 +1149,7 @@ bool eqsl_handler::upload_done(upload_response_t* response) {
 		status_->misc_status(ST_OK, ok_message);
 		book_->modified(true);
 	}
+	book_->enable_save(true, "Uploaded to eQSL");
 	return passed;
 }
 
