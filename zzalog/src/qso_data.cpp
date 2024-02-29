@@ -1097,6 +1097,7 @@ void qso_data::action_create_net() {
 	// Now add the remaining QSOs in the net - first look earlier
 	qso_num_t other_number = qso_number - 1;
 	while (qso->match_records(book_->get_record(other_number, false)) == MT_OVERLAP) {
+		book_->enable_save(false, "Adding QSO to net");
 		g_net_entry_->add_entry();
 		g_net_entry_->set_qso(other_number);
 		g_net_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
@@ -1105,6 +1106,7 @@ void qso_data::action_create_net() {
 	// Now look later
 	other_number = qso_number + 1;
 	while (qso->match_records(book_->get_record(other_number, false)) == MT_OVERLAP) {
+		book_->enable_save(false, "Adding QSO to net");
 		g_net_entry_->add_entry();
 		g_net_entry_->set_qso(other_number);
 		g_net_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
@@ -1134,6 +1136,7 @@ void qso_data::action_add_net_qso() {
 		break;
 	}
 	// Add it to the book
+	book_->enable_save(false, "Adding a QSO to a net");
 	g_net_entry_->append_qso();
 	book_->selection(book_->item_number(g_net_entry_->qso_number()), HT_INSERTED);
 	enable_widgets();
@@ -1169,6 +1172,7 @@ void qso_data::action_save_net_edit() {
 	// We no longer need to maintain the copy of the original QSO
 	book_->add_use_data(g_net_entry_->qso());
 	book_->modified(true);
+	book_->enable_save(true, "Saving net edit QSO");
 	g_net_entry_->remove_entry();
 	if (g_net_entry_->entries() == 0) {
 		logging_state_ = QSO_INACTIVE;
