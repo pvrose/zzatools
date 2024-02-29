@@ -163,9 +163,12 @@ void wx_handler::update() {
     snprintf(msg, sizeof(msg), "WX_HANDLER: Fetching %s", url);
     status_->misc_status(ST_NOTE, msg);
     if (url_handler_->read_url(string(url), &ss)) {
-        status_->misc_status(ST_OK, "WX_HANDLER - Weather read OK");
+        char msg[128];
         ss.seekg(ios::beg);
         parse(ss);
+        snprintf(msg, sizeof(msg), "WX_HANDLER: Weather read OK: %s %0.0f\302\260C %0.0fm/s %s.",
+            description().c_str(), temperature(), wind_speed(), wind_direction().c_str());
+        status_->misc_status(ST_OK, msg);
     } else {
         status_->misc_status(ST_ERROR, "WX_HANDLER: WX read failed - see pop-up help wiindow");
         Fl_Help_Dialog* dlg = new Fl_Help_Dialog();
