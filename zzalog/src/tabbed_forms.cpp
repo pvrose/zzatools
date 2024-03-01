@@ -75,8 +75,8 @@ void tabbed_forms::add_view(const char* label, field_ordering_t column_data, obj
 	// label - a bit bigger than text font size
 	// view->labelsize(FL_NORMAL_SIZE + 1);
 	// standard colour used to represent this view - its tab, selected record/item and progress bar
-	// Fl_Color bg_colour = OBJECT_COLOURS.at(object);
-	// view->selection_color(bg_colour);
+	Fl_Color bg_colour = OBJECT_COLOURS.at(object);
+	view->selection_color(bg_colour);
 	// // The colour for undrawn parts of the view - 25% colour, 75% white
 	// view->color(fl_color_average(bg_colour, FL_WHITE, 0.25));
 	// // Draw the label text in a contrasting colour

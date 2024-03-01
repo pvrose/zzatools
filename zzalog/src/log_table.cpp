@@ -481,6 +481,8 @@ void log_table::adjust_row_sizes() {
  
 // Override of Fl_Table_Row method to provide data and formats for each cell
 void log_table::draw_cell(TableContext context, int R, int C, int X, int Y, int W, int H) {
+
+	Fl_Color line_colour = fl_color_average(FL_BACKGROUND_COLOR, selection_color(), 0.5);
 	string text;
 	switch (context) {
 
@@ -500,7 +502,10 @@ void log_table::draw_cell(TableContext context, int R, int C, int X, int Y, int 
 		int Y1 = Fl_Table_Row::wiy;
 		int W1 = row_header_width();
 		int H1 = col_header_height();
-		fl_draw_box(FL_BORDER_BOX, X1, Y1, W1, H1, col_header_color());
+		fl_color(col_header_color());
+		fl_rectf(X1, Y1, W1, H1);
+		fl_color(line_colour);
+		fl_yxline(X1, Y1, Y1 + H1 - 1, X1 + W1);
 		// Text color
 		fl_color(FL_BLACK);
 		fl_draw("QSO No.", X1, Y1, W1, H1, FL_ALIGN_CENTER);
@@ -519,6 +524,8 @@ void log_table::draw_cell(TableContext context, int R, int C, int X, int Y, int 
 			if (this_record && this_record->is_dirty()) bg_colour = fl_lighter(bg_colour);
 			fl_color(bg_colour);
 			fl_rectf(X, Y, W, H);
+			fl_color(line_colour);
+			fl_yxline(X, Y, Y + H - 1, X + W);
 
 			// TEXT - contrast its colour to the bg colour.
 			if (this_record && this_record->is_dirty()) {
@@ -542,7 +549,12 @@ void log_table::draw_cell(TableContext context, int R, int C, int X, int Y, int 
 		// put field header text into header (top-most row)
 		fl_push_clip(X, Y, W, H);
 		{
-			fl_draw_box(FL_BORDER_BOX, X, Y, W, H, col_header_color());
+			// Colour cell fill and edges (left and bottom only)
+			fl_color(col_header_color());
+			fl_rectf(X, Y, W, H);
+			fl_color(line_colour);
+			fl_yxline(X, Y, Y + H - 1, X + W);
+
 			fl_color(FL_BLACK);
 			// text is field header
 			text = fields_[C].header;
@@ -570,6 +582,9 @@ void log_table::draw_cell(TableContext context, int R, int C, int X, int Y, int 
 				if (this_record && this_record->is_dirty()) bg_colour = fl_lighter(bg_colour);
 				fl_color(bg_colour);
 				fl_rectf(X, Y, W, H);
+				// Add a cell border
+				fl_color(line_colour);
+				fl_yxline(X, Y, Y + H - 1, X + W);
 
 				// TEXT - contrast its colour to the bg colour.
 				if (this_record && this_record->is_dirty()) {
@@ -584,7 +599,7 @@ void log_table::draw_cell(TableContext context, int R, int C, int X, int Y, int 
 				Fl_Font save = fl_font();
 				if (direct == text) fl_font(save & ~FL_ITALIC, fontsize_);
 				else fl_font(save | FL_ITALIC, fontsize_);
-				fl_draw(text.c_str(), X + 1, Y, W - 1, H, FL_ALIGN_LEFT);
+				fl_draw(text.c_str(), X + 2, Y, W - 2, H, FL_ALIGN_LEFT);
 				fl_font(save, fontsize_);
 
 			}
