@@ -577,7 +577,7 @@ void log_table::draw_cell(TableContext context, int R, int C, int X, int Y, int 
 				item_num_t item_number = (order_ == LAST_TO_FIRST) ? my_book_->size() - 1 - R : R;
 				record* this_record = my_book_->get_record(item_number, false);
 				// Selected rows will have table specific colour, others in current sesson grey, rest white
-				Fl_Color default_bg_colour = in_current_session(this_record) ? COLOUR_GREY : (DARK ? FL_BLACK : FL_WHITE);
+				Fl_Color default_bg_colour = in_current_session(this_record) ? COLOUR_GREY : (DARK ? FL_BACKGROUND2_COLOR : FL_WHITE);
 				Fl_Color bg_colour = row_selected(R) ? selection_color() : default_bg_colour;
 				if (this_record && this_record->is_dirty()) bg_colour = fl_lighter(bg_colour);
 				fl_color(bg_colour);
@@ -599,8 +599,8 @@ void log_table::draw_cell(TableContext context, int R, int C, int X, int Y, int 
 				Fl_Font font = font_;
 				if (direct == text) font &= ~FL_ITALIC;
 				else font |= FL_ITALIC;
-				if (DARK) font |= FL_BOLD;
-				else font &= ~FL_BOLD;
+				// if (DARK) font |= FL_BOLD;
+				// else font &= ~FL_BOLD;
 				fl_font(font, fontsize_);
 				fl_draw(text.c_str(), X + 2, Y, W - 2, H, FL_ALIGN_LEFT);
 				fl_font(font_, fontsize_);
