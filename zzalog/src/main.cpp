@@ -769,13 +769,18 @@ void customise_fltk() {
 	Fl::set_font(FL_COURIER,            "Courier New");
 	Fl::set_font(FL_COURIER_BOLD,       "Courier New Bold");
 	Fl::set_font(FL_COURIER_ITALIC,     "Courier New Italic");
-	Fl::set_font(FL_COURIER_BOLD_ITALIC,"Courier New Bold Italic");
+	Fl::set_font(FL_COURIER_BOLD_ITALIC,"Courier New Bold Italic");	
+	// Customise colours in dark mode
+	if (DARK) {
+		Fl::foreground(240, 240, 240);
+		Fl::background2(31, 31, 31);
+		Fl::background(0, 0, 0);
+	}
 }
 
 // The main app entry point
 int main(int argc, char** argv)
 {
-	customise_fltk();
 	// Allow the main thread to respond to Fl::awake() requests
 	Fl::lock();
 	// Set default Fil Chooser on non-windows
@@ -787,16 +792,13 @@ int main(int argc, char** argv)
 	// Parse command-line arguments - accept FLTK standard arguments and custom ones (in cb_args)
 	int i = 1;
 	Fl::args(argc, argv, i, cb_args);
-	if (DARK) {
-		Fl::foreground(240, 240, 240);
-		Fl::background2(31, 31, 31);
-		Fl::background(0, 0, 0);
-	}
 	if (HELP) {
 		// Help requested - display help text and exit
 		show_help();
 		return 0;
 	}
+	// Switches affect the customisation
+	customise_fltk();
 	// Create window
 	add_icon(argv[0]);
 	create_window();
