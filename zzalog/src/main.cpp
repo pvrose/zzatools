@@ -91,7 +91,7 @@ bool RESUME_SESSION = false;
 bool VERBOSE = false;
 bool HELP = false;
 bool PRIVATE = false;
-bool DARK = true;
+bool DARK = false;
 
 // Ticker values
 const double TICK = 0.1;      // 100 ms
@@ -760,12 +760,22 @@ bool in_current_session(record* this_record) {
 	return difftime(this_record->timestamp(), session_start_) >= 0;
 }
 
-// The main app entry point
-int main(int argc, char** argv)
-{
+// Customise FLTK feature
+void customise_fltk() {
 	// Set default font size for all widgets
 	FL_NORMAL_SIZE = 10;
 	fl_contrast_mode(FL_CONTRAST_CIELAB);
+	// Set courier font - ensure it's Courier New
+	Fl::set_font(FL_COURIER,            "Courier New");
+	Fl::set_font(FL_COURIER_BOLD,       "Courier New Bold");
+	Fl::set_font(FL_COURIER_ITALIC,     "Courier New Italic");
+	Fl::set_font(FL_COURIER_BOLD_ITALIC,"Courier New Bold Italic");
+}
+
+// The main app entry point
+int main(int argc, char** argv)
+{
+	customise_fltk();
 	// Allow the main thread to respond to Fl::awake() requests
 	Fl::lock();
 	// Set default Fil Chooser on non-windows
@@ -773,6 +783,7 @@ int main(int argc, char** argv)
 	settings_ = new Fl_Preferences(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
 	// Ctreate status to handle status messages
 	status_ = new status();
+
 	// Parse command-line arguments - accept FLTK standard arguments and custom ones (in cb_args)
 	int i = 1;
 	Fl::args(argc, argv, i, cb_args);

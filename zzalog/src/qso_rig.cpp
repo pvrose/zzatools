@@ -17,6 +17,7 @@ extern Fl_Preferences* settings_;
 extern status* status_;
 extern band_data* band_data_;
 extern spec_data* spec_data_;
+extern bool DARK;
 
 
 // Constructor
@@ -461,21 +462,21 @@ void qso_rig::enable_widgets() {
 	// Status
 	if (!rig_) {
 		op_status_->value("No rig specified");
-		op_status_->textcolor(FL_YELLOW);
+		op_status_->textcolor(DARK ? FL_YELLOW : fl_darker(FL_YELLOW));
 	} else if (rig_->is_opening()) {
 		op_status_->value("Opening rig");
-		op_status_->textcolor(FL_CYAN);
+		op_status_->textcolor(DARK ? FL_CYAN : fl_darker(FL_CYAN));
 	} else if (rig_->is_open()) {
 		if (rig_->get_ptt()) {
 			op_status_->value("Transmitting");
 			op_status_->textcolor(FL_RED);
 		} else {
 			op_status_->value("Receiving");
-			op_status_->textcolor(FL_GREEN);
+			op_status_->textcolor(DARK ? FL_GREEN : fl_darker(FL_GREEN));
 		}
 	} else {
 		op_status_->value("Disconnected");
-		op_status_->textcolor(COLOUR_ORANGE);
+		op_status_->textcolor(DARK ? COLOUR_ORANGE : fl_darker(COLOUR_ORANGE));
 	}
 	// CAT control widgets - allow only when select button active
 	if (bn_select_->value()) {
