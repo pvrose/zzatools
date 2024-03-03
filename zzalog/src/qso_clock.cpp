@@ -71,41 +71,49 @@ void qso_clock::create_form(int X, int Y) {
 	const int WT3 = WTEXT / 3;
 	const int WX_SIZE = FL_NORMAL_SIZE + 2;
 
+	bn_location_ = new Fl_Button(curr_x, curr_y, WTEXT, WX_SIZE);
+	bn_location_->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
+	bn_location_->box(FL_FLAT_BOX);
+	bn_location_->labelsize(WX_SIZE);
+
+	curr_y += WX_SIZE;
+
+	bn_latlong_ = new Fl_Button(curr_x, curr_y, WTEXT, WX_SIZE);
+	bn_latlong_->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
+	bn_latlong_->box(FL_FLAT_BOX);
+	bn_latlong_->labelsize(WX_SIZE);
+
+	curr_y += WX_SIZE + GAP;
+	
 	bn_wx_icon_ = new Fl_Button(curr_x, curr_y, WICON, WICON);
 	bn_wx_icon_->color(COLOUR_GREY);
 	bn_wx_icon_->box(FL_FLAT_BOX);
 	bn_wx_icon_->callback(cb_bn_icon, nullptr);
 
 	curr_x += WICON + GAP;
-	bn_location_ = new Fl_Button(curr_x, curr_y, WTEXT, WX_SIZE);
-	bn_location_->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE);
-	bn_location_->box(FL_FLAT_BOX);
-	bn_location_->labelsize(WX_SIZE);
-
-	curr_y += WX_SIZE;
 
 	bn_wx_description_ = new Fl_Button(curr_x, curr_y, WTEXT, WX_SIZE);
-	bn_wx_description_->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE);
+	bn_wx_description_->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
 	bn_wx_description_->box(FL_FLAT_BOX);
 	bn_wx_description_->labelsize(WX_SIZE);
 
 	curr_y += WX_SIZE;
 	bn_temperature_ = new Fl_Button(curr_x, curr_y, WT3, WX_SIZE);
-	bn_temperature_->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE);
+	bn_temperature_->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
 	bn_temperature_->box(FL_FLAT_BOX);
 	bn_temperature_->labelsize(WX_SIZE);
 	bn_temperature_->callback(cb_bn_temperature, nullptr);
 
 	curr_x += WT3;
 	bn_speed_ = new Fl_Button(curr_x, curr_y, WT3, WX_SIZE);
-	bn_speed_->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE);
+	bn_speed_->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
 	bn_speed_->box(FL_FLAT_BOX);
 	bn_speed_->labelsize(WX_SIZE);
 	bn_speed_->callback(cb_bn_speed, nullptr);
 
 	curr_x += WT3;
 	bn_direction_ = new Fl_Button(curr_x, curr_y, WT3, WX_SIZE);
-	bn_direction_->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE);
+	bn_direction_->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
 	bn_direction_->box(FL_FLAT_BOX);
 	bn_direction_->labelsize(WX_SIZE);
 	bn_direction_->callback(cb_bn_direction, nullptr);
@@ -114,14 +122,14 @@ void qso_clock::create_form(int X, int Y) {
 	curr_y += WX_SIZE;
 
 	bn_sun_times_ = new Fl_Button(curr_x, curr_y, WTEXT, WX_SIZE);
-	bn_sun_times_->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE);
+	bn_sun_times_->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
 	bn_sun_times_->box(FL_FLAT_BOX);
 	bn_sun_times_->labelsize(WX_SIZE);
 
 	curr_y += WX_SIZE;
 
 	bn_updated_ = new Fl_Button(curr_x, curr_y, WTEXT, WX_SIZE);
-	bn_updated_->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE);
+	bn_updated_->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
 	bn_updated_->box(FL_FLAT_BOX);
 	bn_updated_->labelsize(WX_SIZE);
 
@@ -146,6 +154,7 @@ void qso_clock::enable_widgets() {
 	Fl_Image* icon = wx_handler_ ? wx_handler_->icon() : nullptr;
 	time_t updated = wx_handler_ ? wx_handler_->last_updated() : 0;
 	string wx_location = wx_handler_ ? wx_handler_->location() : "";
+	string wx_latlong = wx_handler_ ? wx_handler_->latlong() : "";
 
 	tm value;
 	tm sunup_time;
@@ -182,6 +191,7 @@ void qso_clock::enable_widgets() {
 		updated_time = *gmtime(&updated);
 	}
 	bn_location_->copy_label(wx_location.c_str());
+	bn_latlong_->copy_label(wx_latlong.c_str());
 	bn_wx_description_->copy_label(wx_descr.c_str());
 	char label[128];
 	switch(display_temperature_) {
@@ -193,6 +203,9 @@ void qso_clock::enable_widgets() {
 			snprintf(label, sizeof(label), "%0.0f \302\260F", (temperature * 9 / 5) + 32);
 			break;
 		}
+		default:
+			strcpy(label, "");
+			break;
 	}
 	bn_temperature_->copy_label(label);
 	switch(display_speed_) {
@@ -204,6 +217,10 @@ void qso_clock::enable_widgets() {
 			snprintf(label, sizeof(label), "%0.0f m/s", wind_speed * 1760 * 36 *25.4 / 3600000);
 			break;
 		}
+		default:
+			strcpy(label, "");
+			break;
+
 	}
 	bn_speed_->copy_label(label);
 	switch(display_direction_) {
@@ -215,6 +232,9 @@ void qso_clock::enable_widgets() {
 			snprintf(label, sizeof(label), "%03d\302\260", wind_degree);
 			break;
 		}
+		default:
+			strcpy(label, "");
+			break;
 	}
 	bn_direction_->copy_label(label);
 	char sunup[16];

@@ -604,10 +604,10 @@ string unescape_string(const string text) {
 string degrees_to_dms(float value, bool is_latitude) {
 	int num_degrees;
 	int num_minutes;
-	double num_seconds;
+	int num_seconds;
 	string text;
 	// Strip sign off
-	num_seconds = abs(value * 60.0 * 60.0);
+	num_seconds = abs(round(value * 60.0 * 60.0));
 	// Divide by 60 to get number of whole minutes
 	num_minutes = (int)num_seconds / 60;
 	// Get the number of additional seconds
@@ -618,7 +618,7 @@ string degrees_to_dms(float value, bool is_latitude) {
 	num_minutes = num_minutes % 60;
 	// Now format the text 
 	char temp[20]; // I count 11 but add a bit
-	snprintf(temp, 20, "%d�%d'%.1f\"%c", num_degrees, num_minutes, num_seconds, value < 0 ? (is_latitude ? 'S' : 'W') : (is_latitude ? 'N' : 'E'));
+	snprintf(temp, 20, "%d\302\260%d'%d\"%c", num_degrees, num_minutes, num_seconds, value < 0 ? (is_latitude ? 'S' : 'W') : (is_latitude ? 'N' : 'E'));
 	text = temp;
 	return text;
 }

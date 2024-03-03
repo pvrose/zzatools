@@ -116,6 +116,8 @@ public:
     time_t last_updated();
     // Location
     string location();
+    // Location lat/long
+    string latlong();
 
 protected:
 

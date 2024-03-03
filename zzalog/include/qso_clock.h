@@ -51,5 +51,6 @@ protected:
 	Fl_Button* bn_sun_times_;
 	Fl_Button* bn_updated_;
 	Fl_Button* bn_location_;
+	Fl_Button* bn_latlong_;
 };
 

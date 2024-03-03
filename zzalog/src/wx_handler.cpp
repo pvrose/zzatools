@@ -240,6 +240,14 @@ string wx_handler::location() {
     return report_.city_name;
 }
 
+// Latlong location
+string wx_handler::latlong() {
+    string result = degrees_to_dms(report_.city_location.latitude, true);
+    result += " ";
+    result += degrees_to_dms(report_.city_location.longitude, false);
+    return result;
+}
+
 // The overall XML container
 bool wx_handler::start_current() {
     if (elements_.size()) {

@@ -133,6 +133,7 @@ list<string> recent_files_;
 // Forward declarations
 void backup_file();
 void set_recent_file(string filename);
+void save_switches();
 
 // Display the time in the local timezone rather than UTC
 bool use_local_ = false;
@@ -298,6 +299,9 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 		window_settings.set("Width", main_window_->w());
 		window_settings.set("Height", main_window_->h());
 
+		// Save sticky switches
+		save_switches();
+
 		// Hide all the open windows - this will allow Fl to close the app.
 		for (Fl_Window* wx = Fl::first_window(); wx; wx = Fl::first_window()) wx->hide();
 		// Leave the status file viewer visible if a severe or fatal error forced the shutdown.
@@ -331,9 +335,19 @@ int cb_args(int argc, char** argv, int& i) {
 		AUTO_UPLOAD = false;
 		i += 1;
 	} 
+	// auto upload
+	else if (strcmp("-noq", argv[i]) == 0 || strcmp("--noquiet", argv[i]) == 0) {
+		AUTO_UPLOAD = true;
+		i += 1;
+	} 
 	// No auto save
 	else if (strcmp("-w", argv[i]) == 0 || strcmp("--wait_save", argv[i]) == 0) {
 		AUTO_SAVE = false;
+		i += 1;
+	}
+	// auto save
+	else if (strcmp("-now", argv[i]) == 0 || strcmp("--nowait_save", argv[i]) == 0) {
+		AUTO_SAVE = true;
 		i += 1;
 	}
 	// Resume session
@@ -458,14 +472,16 @@ void show_help() {
 	"\t\tt|threads\tProvide debug tracing on thread use\n"
 	"\t\t\tnot|nothreads\n"
 	"\t-h|--help\tPrint this\n"
-	"\t-k|--dark\tDark mode\n"
-	"\t-l|--light\tLight mode\n"
+	"\t-k|--dark\tDark mode (sticky)\n"
+	"\t-l|--light\tLight mode (sticky)\n"
 	"\t-m|--resume\tResume the previous session\n"
 	"\t-p|--private\tDo not update recent files list\n"
-	"\t-q|--quiet\tDo not publish QSOs to online sites\n"
+	"\t-q|--quiet\tDo not publish QSOs to online sites (sticky)\n"
+	"\t-noq|--noquiet\tDo publish QSOs to online sites (sticky)\n"
 	"\t-r|--read_only\tOpen file in read only mode\n"
 	"\t-t|--test\tTest mode: infers -q -w\n"
-	"\t-w|--wait_save\tDo not automatically save each change\n"
+	"\t-w|--wait_save\tDo not automatically save each change (sticky)\n"
+	"\t-now|--nowait_save\tDo automatically save each change (sticky)\n"
 	"\n";
 	printf(text);
 }
@@ -778,6 +794,24 @@ void customise_fltk() {
 	}
 }
 
+void read_saved_switches() {
+	Fl_Preferences switch_settings(settings_, "Switches");
+	int temp;
+	switch_settings.get("Dark Mode", temp, false);
+	DARK = (bool)temp;
+	switch_settings.get("Auto Update QSOs", temp, false);
+	AUTO_UPLOAD = (bool)temp;
+	switch_settings.get("Auto Save QSOs", temp, false);
+	AUTO_SAVE = (bool)temp;
+}
+
+void save_switches() {
+	Fl_Preferences switch_settings(settings_, "Switches");
+	switch_settings.set("Dark Mode", (int)DARK);
+	switch_settings.set("Auto Update QSOs", (int)AUTO_UPLOAD);
+	switch_settings.set("Auto Save QSOs", (bool)AUTO_SAVE);
+}
+
 // The main app entry point
 int main(int argc, char** argv)
 {
@@ -789,6 +823,8 @@ int main(int argc, char** argv)
 	// Ctreate status to handle status messages
 	status_ = new status();
 
+	// Read any switches that stick between calls
+	read_saved_switches();
 	// Parse command-line arguments - accept FLTK standard arguments and custom ones (in cb_args)
 	int i = 1;
 	Fl::args(argc, argv, i, cb_args);
