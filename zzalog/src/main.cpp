@@ -72,7 +72,7 @@ using namespace std;
 string COPYRIGHT = "\xA9 Philip Rose GM3ZZA 2018. All rights reserved.\nPrefix data courtesy of clublog.org";
 string PROGRAM_ID = "ZZALOG";
 string PROG_ID = "ZLG";
-string PROGRAM_VERSION = "3.4.64";
+string PROGRAM_VERSION = "3.4.65";
 string TIMESTAMP = __DATE__ + string(" ") + __TIME__;
 string VENDOR = "GM3ZZA";
 
@@ -316,7 +316,7 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 }
 
 // Callback to parse arguments
-// -r | --read_only : marks the file read-only
+// See show_help() for meaning of switches
 int cb_args(int argc, char** argv, int& i) {
 	// printf("DEBUG: parsing parameter %s\n", argv[i]);
 	// Look for read_only (-r or --read_only)
@@ -336,18 +336,18 @@ int cb_args(int argc, char** argv, int& i) {
 		i += 1;
 	} 
 	// auto upload
-	else if (strcmp("-noq", argv[i]) == 0 || strcmp("--noquiet", argv[i]) == 0) {
+	else if (strcmp("-n", argv[i]) == 0 || strcmp("--noisy", argv[i]) == 0) {
 		AUTO_UPLOAD = true;
 		i += 1;
 	} 
+	// auto save
+	else if (strcmp("-i", argv[i]) == 0 || strcmp("--immediate_save", argv[i]) == 0) {
+		AUTO_SAVE = true;
+		i += 1;
+	}
 	// No auto save
 	else if (strcmp("-w", argv[i]) == 0 || strcmp("--wait_save", argv[i]) == 0) {
 		AUTO_SAVE = false;
-		i += 1;
-	}
-	// auto save
-	else if (strcmp("-now", argv[i]) == 0 || strcmp("--nowait_save", argv[i]) == 0) {
-		AUTO_SAVE = true;
 		i += 1;
 	}
 	// Resume session
@@ -472,16 +472,16 @@ void show_help() {
 	"\t\tt|threads\tProvide debug tracing on thread use\n"
 	"\t\t\tnot|nothreads\n"
 	"\t-h|--help\tPrint this\n"
+	"\t-i|--immediate_save\tDo automatically save each change (sticky)\n"
 	"\t-k|--dark\tDark mode (sticky)\n"
 	"\t-l|--light\tLight mode (sticky)\n"
 	"\t-m|--resume\tResume the previous session\n"
 	"\t-p|--private\tDo not update recent files list\n"
 	"\t-q|--quiet\tDo not publish QSOs to online sites (sticky)\n"
-	"\t-noq|--noquiet\tDo publish QSOs to online sites (sticky)\n"
+	"\t-n|--noisy\tDo publish QSOs to online sites (sticky)\n"
 	"\t-r|--read_only\tOpen file in read only mode\n"
 	"\t-t|--test\tTest mode: infers -q -w\n"
 	"\t-w|--wait_save\tDo not automatically save each change (sticky)\n"
-	"\t-now|--nowait_save\tDo automatically save each change (sticky)\n"
 	"\n";
 	printf(text);
 }
@@ -797,12 +797,22 @@ void customise_fltk() {
 void read_saved_switches() {
 	Fl_Preferences switch_settings(settings_, "Switches");
 	int temp;
+	char msg[128];
+	memset(msg, 0, sizeof(msg));
+	strcpy(msg, "ZZALOG: Sticky switches: ");
 	switch_settings.get("Dark Mode", temp, false);
 	DARK = (bool)temp;
+	if (DARK) strcat(msg, "-k ");
+	else strcat(msg, "-l ");
 	switch_settings.get("Auto Update QSOs", temp, false);
 	AUTO_UPLOAD = (bool)temp;
+	if (AUTO_UPLOAD) strcat(msg, "-n ");
+	else strcat(msg, "-q ");
 	switch_settings.get("Auto Save QSOs", temp, false);
 	AUTO_SAVE = (bool)temp;
+	if (AUTO_SAVE) strcat(msg, "-i");
+	else strcat(msg, "-w");
+	status_->misc_status(ST_NOTE, msg);	
 }
 
 void save_switches() {
