@@ -341,7 +341,7 @@ int cb_args(int argc, char** argv, int& i) {
 		i += 1;
 	} 
 	// auto save
-	else if (strcmp("-i", argv[i]) == 0 || strcmp("--immediate_save", argv[i]) == 0) {
+	else if (strcmp("-a", argv[i]) == 0 || strcmp("--auto_save", argv[i]) == 0) {
 		AUTO_SAVE = true;
 		i += 1;
 	}
@@ -460,7 +460,8 @@ void show_help() {
 	"zzalog [switches] [filename] \n"
 	"\n"
 	"switches:\n"
-	"\t-d|--debug [mode...]\n"
+	"\t-a|--auto_save\tDo automatically save each change (sticky)\n"
+  	"\t-d|--debug [mode...]\n"
 	"\t\tc|curl\tincrease verbosity from libcurl\n"
 	"\t\t\tnoc|nocurl\n"
 	"\t\te|errors\tprovide more details on errors\n"
@@ -472,7 +473,6 @@ void show_help() {
 	"\t\tt|threads\tProvide debug tracing on thread use\n"
 	"\t\t\tnot|nothreads\n"
 	"\t-h|--help\tPrint this\n"
-	"\t-i|--immediate_save\tDo automatically save each change (sticky)\n"
 	"\t-k|--dark\tDark mode (sticky)\n"
 	"\t-l|--light\tLight mode (sticky)\n"
 	"\t-m|--resume\tResume the previous session\n"
@@ -810,7 +810,7 @@ void read_saved_switches() {
 	else strcat(msg, "-q ");
 	switch_settings.get("Auto Save QSOs", temp, false);
 	AUTO_SAVE = (bool)temp;
-	if (AUTO_SAVE) strcat(msg, "-i");
+	if (AUTO_SAVE) strcat(msg, "-a");
 	else strcat(msg, "-w");
 	status_->misc_status(ST_NOTE, msg);	
 }
