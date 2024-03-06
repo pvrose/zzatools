@@ -229,7 +229,8 @@ void qso_clock::enable_widgets() {
 			break;
 		}
 		case DEGREES: {
-			snprintf(label, sizeof(label), "%03d\302\260", wind_degree);
+			if (wind_degree == -1) strcpy(label, "---"); 
+			else snprintf(label, sizeof(label), "%03d\302\260", wind_degree);
 			break;
 		}
 		default:

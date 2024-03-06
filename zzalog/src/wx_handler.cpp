@@ -212,12 +212,14 @@ float wx_handler::wind_speed() {
 
 // Wind direction (16th cardinals)
 string wx_handler::wind_direction() {
-    return report_.wind_cardinal;
+    if (report_.wind_cardinal == "") return "---";
+    else return report_.wind_cardinal;
 }
 
 // Wind direction (degrees)
 unsigned int wx_handler::wind_degrees() {
-    return report_.wind_dirn;
+    if (report_.wind_cardinal == "") return -1;
+    else return report_.wind_dirn;
 }
 
 // Sunris
