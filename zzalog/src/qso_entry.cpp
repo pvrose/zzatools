@@ -11,6 +11,7 @@ extern status* status_;
 extern spec_data* spec_data_;
 extern tabbed_forms* tabbed_forms_;
 extern book* book_;
+extern bool DARK;
 
 extern double prev_freq_;
 
@@ -161,7 +162,7 @@ void qso_entry::enable_widgets() {
 				if (ix < number_locked_ + NUMBER_FIXED) ch_field_[ix]->deactivate();
 				else ch_field_[ix]->activate();
 			ip_field_[ix]->activate();
-			ip_field_[ix]->input()->color(FL_BACKGROUND_COLOR);
+			ip_field_[ix]->input()->color(FL_BACKGROUND2_COLOR);
 			ip_field_[ix]->type(FL_NORMAL_INPUT);
 		}
 		for (int ix = number_fields_in_use_ + 1; ix < NUMBER_TOTAL; ix++) {
@@ -169,7 +170,7 @@ void qso_entry::enable_widgets() {
 			ip_field_[ix]->deactivate();
 		}
 		ip_notes_->activate();
-		ip_notes_->color(FL_BACKGROUND_COLOR);
+		ip_notes_->color(FL_BACKGROUND2_COLOR);
 		ip_notes_->type(FL_NORMAL_INPUT);
 		misc_->activate();
 		misc_->enable_widgets();
