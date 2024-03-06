@@ -287,12 +287,14 @@ void qso_rig::create_form(int X, int Y) {
 	curr_x = x() + GAP;
 	curr_y += ip_antenna_->h() + GAP;
 
-	modifier_grp_ = new Fl_Group(curr_x, curr_y, 10, 10);
+	modifier_grp_ = new Fl_Group(curr_x, curr_y, 10, 10, "Transverter/Amplifier");
 	modifier_grp_->box(FL_FLAT_BOX);
+	modifier_grp_->align(FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 
 	curr_x = modifier_grp_->x() + WLABEL;
+	curr_y += (HTEXT + GAP)/2;
 
-	bn_mod_freq_ = new Fl_Check_Button(curr_x, curr_y, WRADIO, HRADIO, "\316\224 F (MHz)");
+	bn_mod_freq_ = new Fl_Check_Button(curr_x, curr_y, WRADIO, HRADIO, "\316\224F (MHz)");
 	bn_mod_freq_->align(FL_ALIGN_LEFT);
 	bn_mod_freq_->callback(cb_bn_mod_freq, (void*)&modify_freq_);
 	bn_mod_freq_->tooltip("Allow frequency to be offset - eg transverter");
