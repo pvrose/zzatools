@@ -319,6 +319,7 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 // See show_help() for meaning of switches
 int cb_args(int argc, char** argv, int& i) {
 	// printf("DEBUG: parsing parameter %s\n", argv[i]);
+	int i_orig = i;
 	// Look for read_only (-r or --read_only)
 	if (strcmp("-r", argv[i]) == 0 || strcmp("--read_only", argv[i]) == 0) {
 		READ_ONLY = true;
@@ -431,7 +432,8 @@ int cb_args(int argc, char** argv, int& i) {
 			if (i == save_i) debugs = false;
 		}
 	}
-	if (i <= (argc - 1)) {
+	if (i == i_orig ) {
+		// Not processed any argumant
 		if (*argv[i] == '-') {
 			char msg[128];
 			snprintf(msg, sizeof(msg), "ZZALOG: Unrecognised switch %s", argv[i]);
