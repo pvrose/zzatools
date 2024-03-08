@@ -331,6 +331,12 @@ int cb_args(int argc, char** argv, int& i) {
 		AUTO_SAVE = false;
 		i += 1;
 	}
+	// Look for normal mode (-u or --usual) 
+	else if (strcmp("-u", argv[i]) == 0 || strcmp("--usual", argv[i]) == 0) {
+		AUTO_UPLOAD = true;
+		AUTO_SAVE = true;
+		i += 1;
+	}
 	// No auto upload
 	else if (strcmp("-q", argv[i]) == 0 || strcmp("--quiet", argv[i]) == 0) {
 		AUTO_UPLOAD = false;
@@ -478,11 +484,12 @@ void show_help() {
 	"\t-k|--dark\tDark mode (sticky)\n"
 	"\t-l|--light\tLight mode (sticky)\n"
 	"\t-m|--resume\tResume the previous session\n"
+	"\t-n|--noisy\tDo publish QSOs to online sites (sticky)\n"
 	"\t-p|--private\tDo not update recent files list\n"
 	"\t-q|--quiet\tDo not publish QSOs to online sites (sticky)\n"
-	"\t-n|--noisy\tDo publish QSOs to online sites (sticky)\n"
 	"\t-r|--read_only\tOpen file in read only mode\n"
 	"\t-t|--test\tTest mode: infers -q -w\n"
+	"\t-u|--usual\tNormal mode: infers -a -n\n"
 	"\t-w|--wait_save\tDo not automatically save each change (sticky)\n"
 	"\n";
 	printf(text);
@@ -656,7 +663,7 @@ void main_window_label(string text) {
 	const char* current = main_window_->label();
 	if (!current || label != string(current)) {
 		main_window_->copy_label(label.c_str());
-		printf("%s\n", label.c_str());
+		if (!DEBUG_STATUS) printf("%s\n", label.c_str());
 	}
 }
 
@@ -771,6 +778,25 @@ void print_args(int argc, char** argv) {
 	status_->misc_status(ST_NOTE, message);
 	snprintf(message, sizeof(message), "ZZALOG: Compiled %s", TIMESTAMP.c_str());
 	status_->misc_status(ST_NOTE, message);
+
+	if (DEBUG_ERRORS) status_->misc_status(ST_NOTE, "ZZALOG: -d e - Displaying debug error messages");
+	if (DEBUG_THREADS) status_->misc_status(ST_NOTE, "ZZALOG: -d t - Displaying thread debug messages");
+	if (DEBUG_CURL) status_->misc_status(ST_NOTE, "ZZALOG: -d -c - Displaying more verbosity from libcurl");
+	if (DEBUG_STATUS) status_->misc_status(ST_NOTE, "ZZALOG: -d s - Displaying status messages");
+	if (DEBUG_QUICK) status_->misc_status(ST_WARNING, "ZZALOG: Reducing periods of some reguat events");
+	snprintf(message, sizeof(message), "ZZALOG: -d -h=%d - Hamlib debug level %d", 
+		(int)HAMLIB_DEBUG_LEVEL, (int)HAMLIB_DEBUG_LEVEL);
+	status_->misc_status(ST_NOTE, message);
+	if (AUTO_UPLOAD) status_->misc_status(ST_NOTE, "ZZALOG: -n - QSOs uploaded to QSL sites automatically");
+	else status_->misc_status(ST_WARNING, "ZZALOG: -q - QSOs are not being uploaded to QSL sites");
+	if (AUTO_SAVE) status_->misc_status(ST_NOTE, "ZZALOG: -a - QSOs being saved automatically");
+	else status_->misc_status(ST_WARNING, "ZZALOG: -w - QSOs are not being saved automatically");
+	if (READ_ONLY) status_->misc_status(ST_WARNING, "ZZALOG: -r - File opened read-only");
+	if (RESUME_SESSION) status_->misc_status(ST_NOTE, "ZZALOG: -m - Resuming previous session");
+	if (PRIVATE) status_->misc_status(ST_WARNING, "ZZALOG: -p - This file not being noted on recent files list");
+	if (DARK) status_->misc_status(ST_NOTE, "ZZALOG: -k - Opening in dark mode");
+	else status_->misc_status(ST_NOTE, "ZZALOG: -l - Opening in normal FLTK colours");
+
 }
 
 // Returns true if record is within current session.
