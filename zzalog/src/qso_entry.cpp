@@ -364,6 +364,7 @@ void qso_entry::copy_cat_to_qso() {
 			string freqy = rig->get_frequency(true);
 			string mode;
 			string submode;
+			char message[128];
 			rig->get_string_mode(mode, submode);
 			// Get the maximum power over course of QSO.
 			double tx_power;
@@ -394,7 +395,6 @@ void qso_entry::copy_cat_to_qso() {
 			}
 			case qso_data::QSO_STARTED: {
 				// Ignore values except TX_PWR which accumulates maximum value
-				char message[128];
 				if (qso_->item("MY_RIG") != rig_name) {
 					snprintf(message, 128, "DASH: Rig changed during QSO, New value %s", rig_name.c_str());
 					status_->misc_status(ST_WARNING, message);
@@ -428,6 +428,46 @@ void qso_entry::copy_cat_to_qso() {
 				copy_qso_to_display(CF_CAT);
 				break;
 			}
+			case qso_data::QSO_EDIT: {
+				// Ignore values except TX_PWR which accumulates maximum value
+				if (qso_->item("MY_RIG") == "") {
+					snprintf(message, 128, "DASH: Rig not specified, New value '%s'", rig_name.c_str());
+					status_->misc_status(ST_WARNING, message);
+					qso_->item("MY_RIG", rig_name);
+				}
+				if (qso_->item("MY_ANTENNA") == "") {
+					snprintf(message, 128, "DASH: Antenna not specified, New value '%s'", rig_name.c_str());
+					status_->misc_status(ST_WARNING, message);
+					qso_->item("MY_ANTENNA", antenna);
+				}
+				if (qso_->item("FREQ") == "") {
+					snprintf(message, 128, "DASH: Frequency not specified, New value '%s'", freqy.c_str());
+					status_->misc_status(ST_WARNING, message);
+					qso_->item("FREQ", freqy);
+				}
+				if (qso_->item("MODE") == "") {
+					snprintf(message, 128, "DASH: Mode not specified, New value '%s'", mode.c_str());
+					status_->misc_status(ST_WARNING, message);
+					qso_->item("MODE", mode);
+				}
+				if (qso_->item("SUBMODE") == "") {
+					snprintf(message, 128, "DASH: Submode not specified, New value '%s'", submode.c_str());
+					status_->misc_status(ST_WARNING, message);
+					qso_->item("SUBMODE", submode);
+				}
+				string old_txp = qso_->item("TX_POWER");
+				qso_->item("TX_PWR", tx_power);
+				if (isnan(tx_power)) tx_power = 0.0;
+				tx_power = max(tx_power, rig->get_dpower(true));
+				snprintf(txp, sizeof(txp), "%0.0f", tx_power);
+				qso_->item("TX_PWR", string(txp));
+				snprintf(message, sizeof(message), "DASH: TX_power changed from '%s' to '%s'", old_txp.c_str(), txp);
+				status_->misc_status(ST_WARNING, message);
+				copy_qso_to_display(CF_CAT);
+				tabbed_forms_->update_views(nullptr, HT_MINOR_CHANGE, qso_number_);
+				break;
+			}
+
 			}
 		}
 	}

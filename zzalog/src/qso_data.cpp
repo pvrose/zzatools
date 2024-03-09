@@ -1506,7 +1506,13 @@ qso_num_t qso_data::current_number() {
 void qso_data::ticker() {
 	g_entry_->copy_clock_to_qso();
 	g_net_entry_->ticker();
-	g_entry_->copy_cat_to_qso();
+	switch(logging_state_) {
+		case QSO_PENDING:
+		case QSO_STARTED:
+		case NET_STARTED:
+			g_entry_->copy_cat_to_qso();
+			break;
+	}
 }
 
 // Call in editor
