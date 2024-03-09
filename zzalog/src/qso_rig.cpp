@@ -481,12 +481,21 @@ void qso_rig::enable_widgets() {
 		op_status_->textcolor(DARK ? COLOUR_ORANGE : fl_darker(COLOUR_ORANGE));
 	}
 	// CAT control widgets - allow only when select button active
-	if (bn_select_->value()) {
-		serial_grp_->clear_output();
-		network_grp_->clear_output();
+	if (rig_->is_open()) {
+		ch_rig_model_->deactivate();
+		serial_grp_->deactivate();
+		network_grp_->deactivate();
 	} else {
-		serial_grp_->set_output();
-		network_grp_->set_output();
+		ch_rig_model_->activate();
+		serial_grp_->activate();
+		network_grp_->activate();
+		if (bn_select_->value()) {
+			serial_grp_->clear_output();
+			network_grp_->clear_output();
+		} else {
+			serial_grp_->set_output();
+			network_grp_->set_output();
+		}
 	}
 	switch (mode_) {
 	case RIG_PORT_SERIAL:
