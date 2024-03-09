@@ -257,7 +257,15 @@ void rig_if::close() {
 
 // Opens the connection associated with the rig
 bool rig_if::open() {
-	if (hamlib_data_->port_name.length() == 0) {
+	if (hamlib_data_->port_type == RIG_PORT_NONE) {
+		char msg[256];
+		snprintf(msg, 256, "RIG: Connection %s/%s No port to connect",
+			hamlib_data_->mfr.c_str(),
+			hamlib_data_->model.c_str()
+		);
+		status_->misc_status(ST_WARNING, msg);
+ 	} 
+	else if (hamlib_data_->port_name.length() == 0) {
 		char msg[256];
 		snprintf(msg, 256, "RIG: Connection %s/%s No port supplied - open failed",
 			hamlib_data_->mfr.c_str(),
@@ -386,6 +394,9 @@ void rig_if::th_run_rig(rig_if* that) {
 }
 
 void rig_if::th_read_values() {
+	if (hamlib_data_->port_type == RIG_PORT_NONE) {
+		return;
+	}
 	// Read TX frequency
 	double d_temp;
 	if (opened_ok_) error_code_ = rig_get_freq(rig_, RIG_VFO_TX, &d_temp);
