@@ -72,7 +72,7 @@ using namespace std;
 string COPYRIGHT = "\xA9 Philip Rose GM3ZZA 2018. All rights reserved.\nPrefix data courtesy of clublog.org";
 string PROGRAM_ID = "ZZALOG";
 string PROG_ID = "ZLG";
-string PROGRAM_VERSION = "3.4.65";
+string PROGRAM_VERSION = "3.4.66";
 string TIMESTAMP = __DATE__ + string(" ") + __TIME__;
 string VENDOR = "GM3ZZA";
 
@@ -665,8 +665,8 @@ void add_book(char* arg) {
 			string backup = temp;
 			// Cannot access book - try backup
 			char msg[100];
-			snprintf(msg, sizeof(msg), "ZZALOG: Load failed trying backup %s", backup.c_str());
-			status_->misc_status(ST_ERROR, msg);
+			snprintf(msg, sizeof(msg), "ZZALOG: Load failed, trying backup %s", backup.c_str());
+			status_->misc_status(ST_WARNING, msg);
 			if (book_->load_data(backup)) {
 				using_backup_ = true;
 				status_->misc_status(ST_OK, "ZZALOG: Load backup successful");
