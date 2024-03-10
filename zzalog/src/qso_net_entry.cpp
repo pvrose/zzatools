@@ -230,7 +230,7 @@ void qso_net_entry::navigate(navigate_t target) {
 	int ix = 0;
 	bool found = false;
 	Fl_Widget* curr = entries_->value();
-	for (int i = 0; i < entries() && ~found; i ++) {
+	for (int i = 0; i < entries() && !found; i ++) {
 		if (curr == entries_->child(i)) {
 			found = true;
 			ix = i;
