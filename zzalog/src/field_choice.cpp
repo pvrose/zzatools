@@ -174,6 +174,9 @@ const char* field_input::value() {
 }
 
 void field_input::value(const char* v) {
+	if (field_name_ == "MY_RIG") {
+		printf("Updating MY_RIG with %s\n", v);
+	}
 	Fl_Input_Choice::value(v);
 	if (is_string(field_name_)) populate_case_choice();
 }

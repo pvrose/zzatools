@@ -41,7 +41,7 @@ public:
 	const map < copy_flags, set<string> > COPY_FIELDS =
 	{
 		{ CF_RIG_ETC, { "MY_RIG", "MY_ANTENNA", "STATION_CALLSIGN", "APP_ZZA_QTH", "APP_ZZA_OP" } },
-		{ CF_CAT, { "MODE", "FREQ", "SUBMODE", "TX_PWR", "BAND", "MY_RIG", "MY_ANTENNA" } },
+		{ CF_CAT, { "MODE", "FREQ", "SUBMODE", "TX_PWR", "BAND" } },
 		{ CF_DATE, { "QSO_DATE" } },
 		{ CF_TIME, { "QSO_DATE_OFF", "TIME_ON", "TIME_OFF" } },
 		{ CF_CALL, { "CALL" }},
@@ -98,7 +98,7 @@ public:
 	// Copy from an existing record
 	void copy_qso_to_qso(record* old_record, int flags);
 	// Copy fields from CAT
-	void copy_cat_to_qso();
+	void copy_cat_to_qso(bool clear = false);
 	// Copy clock to QSO
 	void copy_clock_to_qso();
 	// Copy default value to QSO
@@ -113,6 +113,8 @@ public:
 	void clear_qso();
 	// Copy fields from record
 	void copy_qso_to_display(int flags);
+	// Update rig
+	void update_rig();
 
 	// Action add field to widgets
 	void action_add_field(int ix, string field);

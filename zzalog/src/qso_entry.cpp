@@ -352,15 +352,30 @@ void qso_entry::copy_qso_to_qso(record* old_record, int flags) {
 	copy_qso_to_display(CF_ALL_FLAGS);
 }
 
+// Update MY_RIG and MY_ANTENNA when switch rig tab
+void qso_entry::update_rig() {
+	qso_rig* rig_control = ((qso_manager*)qso_data_->parent())->rig_control();
+	if (rig_control && qso_) {
+		qso_->item("MY_RIG", string(rig_control->label()));
+		qso_->item("MY_ANTENNA", rig_control->antenna());
+		copy_qso_to_display(CF_RIG_ETC);
+	}
+}
+
 // Copy fields from CAT and default rig etc.
-void qso_entry::copy_cat_to_qso() {
+void qso_entry::copy_cat_to_qso(bool clear) {
 	qso_rig* rig_control = ((qso_manager*)qso_data_->parent())->rig_control();
 	if (rig_control){
 		rig_if* rig = rig_control->rig();
+		// Clear values before reloading them - called when switching rigs
+		if (clear && qso_ != nullptr) {
+			qso_->item("FREQ", string(""));
+			qso_->item("MODE", string(""));
+			qso_->item("SUBMODE", string(""));
+			qso_->item("TX_PWR", string(""));
+		}
 		// Rig can be temporarily missing q
 		if (rig && rig->is_good() && qso_ != nullptr) {
-			string rig_name = rig_control->label();
-			string antenna = rig_control->antenna();
 			string freqy = rig->get_frequency(true);
 			string mode;
 			string submode;
@@ -373,9 +388,6 @@ void qso_entry::copy_cat_to_qso() {
 			case qso_data::QSO_PENDING:
 			case qso_data::NET_STARTED:
 			{
-				// Load rig label
-				qso_->item("MY_RIG", rig_name);
-				qso_->item("MY_ANTENNA", antenna);
 				// Load values from rig
 				qso_->item("FREQ", freqy);
 				// Get mode - NB USB/LSB need further processing
@@ -395,16 +407,6 @@ void qso_entry::copy_cat_to_qso() {
 			}
 			case qso_data::QSO_STARTED: {
 				// Ignore values except TX_PWR which accumulates maximum value
-				if (qso_->item("MY_RIG") != rig_name) {
-					snprintf(message, 128, "DASH: Rig changed during QSO, New value %s", rig_name.c_str());
-					status_->misc_status(ST_WARNING, message);
-					qso_->item("MY_RIG", rig_name);
-				}
-				if (qso_->item("MY_ANTENNA") != antenna) {
-					snprintf(message, 128, "DASH: Antenna changed during QSO, New value %s", rig_name.c_str());
-					status_->misc_status(ST_WARNING, message);
-					qso_->item("MY_ANTENNA", antenna);
-				}
 				if (qso_->item("FREQ") != freqy) {
 					snprintf(message, 128, "DASH: Rig frequency changed during QSO, New value %s", freqy.c_str());
 					status_->misc_status(ST_WARNING, message);
@@ -430,16 +432,6 @@ void qso_entry::copy_cat_to_qso() {
 			}
 			case qso_data::QSO_EDIT: {
 				// Ignore values except TX_PWR which accumulates maximum value
-				if (qso_->item("MY_RIG") == "") {
-					snprintf(message, 128, "DASH: Rig not specified, New value '%s'", rig_name.c_str());
-					status_->misc_status(ST_WARNING, message);
-					qso_->item("MY_RIG", rig_name);
-				}
-				if (qso_->item("MY_ANTENNA") == "") {
-					snprintf(message, 128, "DASH: Antenna not specified, New value '%s'", rig_name.c_str());
-					status_->misc_status(ST_WARNING, message);
-					qso_->item("MY_ANTENNA", antenna);
-				}
 				if (qso_->item("FREQ") == "") {
 					snprintf(message, 128, "DASH: Frequency not specified, New value '%s'", freqy.c_str());
 					status_->misc_status(ST_WARNING, message);
@@ -467,7 +459,6 @@ void qso_entry::copy_cat_to_qso() {
 				tabbed_forms_->update_views(nullptr, HT_MINOR_CHANGE, qso_number_);
 				break;
 			}
-
 			}
 		}
 	}
@@ -759,6 +750,7 @@ void qso_entry::cb_ip_field(Fl_Widget* w, void* v) {
 	else if (field == "MY_RIG") {
 		// Update the selected rig CAT group
 		((qso_manager*)that->qso_data_->parent())->change_rig(value);
+		that->copy_cat_to_qso(true);
 	}
 	else if (field == "QSO_DATE" || field == "TIME_ON") {
 		if (that->qso_number_ != -1) {

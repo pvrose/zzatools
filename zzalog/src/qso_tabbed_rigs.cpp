@@ -141,6 +141,8 @@ void qso_tabbed_rigs::cb_tabs(Fl_Widget* w, void* v) {
 	qso_tabbed_rigs* that = (qso_tabbed_rigs*)w;
 	that->label(that->value()->label());
 	that->enable_widgets();
+	qso_manager* mgr = ancestor_view<qso_manager>(that);
+	mgr->update_rig();
 }
 
 // 1s clock interface

@@ -1370,6 +1370,7 @@ void qso_data::update_rig() {
 // Get present values data from rig
 	if (logging_state_ == QSO_PENDING) {
 		if (((qso_manager*)parent())->rig()->is_good()) {
+			g_entry_->update_rig();
 			g_entry_->copy_cat_to_qso();
 		}
 	}
