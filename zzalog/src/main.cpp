@@ -157,6 +157,8 @@ char* filename_ = nullptr;
 string default_station_ = "";
 // Main logo
 Fl_PNG_Image main_icon_("ZZALOG_ICON", ___rose_png, ___rose_png_len);
+// Using backp
+bool using_backup_ = false;
 
 static void cb_ticker(void* v) {
 	// Units that require 1s tick
@@ -178,6 +180,51 @@ static void cb_ticker(void* v) {
 	}
 	ticks_++;
 	Fl::repeat_timeout(TICK, cb_ticker);
+}
+
+// Get the backup filename
+string backup_filename(string source) {
+	// This needs to be int and not bool as the settings.get() would corrupt the stack.
+	Fl_Preferences backup_settings(settings_, "Backup");
+	// Get back-up directory
+	char* temp;
+	backup_settings.get("Path", temp, "");
+	string backup = temp;
+	free(temp);
+	while (backup.length() == 0) {
+		Fl_Native_File_Chooser* chooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_DIRECTORY);
+		chooser->title("Select directory for backup");
+		if (chooser->show() == 0) {
+			backup = chooser->filename();
+		}
+		delete chooser;
+	}
+	// Save the result of the chooser
+	backup_settings.set("Path", backup.c_str());
+
+	// ensure the correct delimiiter is appendded
+	if (backup.back() != '/' && backup.back() != '\\') {
+#ifdef _WIN32
+		backup += '\\';
+#else
+		backup += '/';
+#endif
+	}
+	// Create backup filename - use back-up directory and current file-name plus timestamp
+	size_t last_period = source.find_last_of('.');
+	size_t last_slash = source.find_last_of("/\\");
+	string suffix = source.substr(last_period);
+	string base_name;
+	if (last_slash == string::npos) {
+		base_name = source.substr(0, last_period);
+	}
+	else {
+		base_name = source.substr(last_slash + 1, last_period - last_slash - 1);
+	}
+	record* last_record = book_->get_latest();
+	string timestamp = now(false, "%Y%m%d_%H%MZ");
+	backup += base_name + "_" + timestamp + suffix;
+	return backup;
 }
 
 // This callback intercepts the close command and performs checks and tidies up
@@ -281,7 +328,10 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 
 		// Back up the book
 		if (book_ && book_->been_modified()) {
-			if (book_->filename().length()) {
+			if (using_backup_) {
+				status_->misc_status(ST_WARNING, "ZZALOG: Data saved to backup, not to last file");
+			}
+			else if (book_->filename().length()) {
 				backup_file();
 			} else {
 				status_->misc_status(ST_WARNING, "ZZALOG: No filename: any changes will not be backed up");
@@ -608,8 +658,23 @@ void add_book(char* arg) {
 		// Get filename and load the data
 		string log_file = get_file(arg);
 
-		if (book_->load_data(log_file)) {
-			// All actions now performed in book_
+		if (!book_->load_data(log_file)) {
+			Fl_Preferences backup_settings(settings_, "Backup");
+			char * temp;
+			backup_settings.get("Last Backup", temp, "");
+			string backup = temp;
+			// Cannot access book - try backup
+			char msg[100];
+			snprintf(msg, sizeof(msg), "ZZALOG: Load failed trying backup %s", backup.c_str());
+			status_->misc_status(ST_ERROR, msg);
+			if (book_->load_data(backup)) {
+				using_backup_ = true;
+				status_->misc_status(ST_OK, "ZZALOG: Load backup successful");
+			} else {
+				status_->misc_status(ST_ERROR, "ZZALOG: Load backup failed");
+			}
+		} else {
+			
 		}
 	}
 }
@@ -928,50 +993,11 @@ int main(int argc, char** argv)
 	return code;
 }
 
+
 // Copy existing data to back up file. force = true used by menu command, 
 void backup_file() {
-	// This needs to be int and not bool as the settings.get() would corrupt the stack.
-	Fl_Preferences backup_settings(settings_, "Backup");
-	// Get back-up directory
-	char* temp;
-	backup_settings.get("Path", temp, "");
-	string backup = temp;
-	free(temp);
-	while (backup.length() == 0) {
-		Fl_Native_File_Chooser* chooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_DIRECTORY);
-		chooser->title("Select directory for backup");
-		if (chooser->show() == 0) {
-			backup = chooser->filename();
-		}
-		delete chooser;
-	}
-	// Save the result of the chooser
-	backup_settings.set("Path", backup.c_str());
-
-	// ensure the correct delimiiter is appendded
-	if (backup.back() != '/' && backup.back() != '\\') {
-#ifdef _WIN32
-		backup += '\\';
-#else
-		backup += '/';
-#endif
-	}
-	// Get source filename
-	string source = book_->filename(true);
-	// Create backup filename - use back-up directory and current file-name plus timestamp
-	size_t last_period = source.find_last_of('.');
-	size_t last_slash = source.find_last_of("/\\");
-	string suffix = source.substr(last_period);
-	string base_name;
-	if (last_slash == string::npos) {
-		base_name = source.substr(0, last_period);
-	}
-	else {
-		base_name = source.substr(last_slash + 1, last_period - last_slash - 1);
-	}
-	record* last_record = book_->get_latest();
-	string timestamp = now(false, "%Y%m%d_%H%MZ");
-	backup += base_name + "_" + timestamp + suffix;
+	string source = book_->filename();
+	string backup = backup_filename(source);
 	char* message = new char[backup.length() + 25];
 	sprintf(message, "BACKUP: Writing %s", backup.c_str());
 	status_->misc_status(ST_NOTE, message);
@@ -1003,13 +1029,15 @@ void backup_file() {
 		status_->misc_status(ST_ERROR, "BACKUP: failed");
 	} else {
 		status_->misc_status(ST_OK, "BACKUP: Done");
+		Fl_Preferences backup_settings(settings_, "Backup");
+		backup_settings.set("Last Backup", backup.c_str());
 	}
 }
 
 // Add the current file to the recent files list
 void set_recent_file(string filename) {
-
-	if (!PRIVATE) {
+	// Do not add to recent file list if using backup or CLI inihibited
+	if (!PRIVATE && !using_backup_) {
 
 		// Add or move the file to the front of list
 		recent_files_.remove(filename);
