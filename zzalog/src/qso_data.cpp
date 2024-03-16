@@ -487,6 +487,24 @@ void qso_data::update_modem_qso(bool log_it) {
 	}
 }
 
+// Enter modem QSO
+void qso_data::enter_modem_qso(record* qso) {
+	switch (logging_state_) {
+		case QSO_INACTIVE:
+		case QSO_PENDING: {
+			g_entry_->qso(qso);
+			g_entry_->append_qso();
+			logging_state_= QSO_EDIT;
+			g_entry_->update_rig();
+			g_entry_->copy_cat_to_qso();
+			g_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
+			action_save_edit();
+			tabbed_forms_->update_views(nullptr, HT_INSERTED, g_entry_->qso_number());
+			enable_widgets();
+		}
+	}
+}
+
 // Save the settings
 void qso_data::save_values() {
 	// Dashboard configuration

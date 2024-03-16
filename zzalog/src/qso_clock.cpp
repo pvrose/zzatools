@@ -1,15 +1,10 @@
 #include "qso_clock.h"
 #include "qso_manager.h"
 #include "drawing.h"
-#include "wx_handler.h"
-#include "drawing.h"
 
 #include<ctime>
 
 #include <FL/Fl_Image.H>
-
-extern bool closing_;
-extern wx_handler* wx_handler_;
 
 // Clock group - constructor
 qso_clock::qso_clock
@@ -20,8 +15,6 @@ qso_clock::qso_clock
 	labelfont(FL_BOLD);
 	labelsize(FL_NORMAL_SIZE + 2);
 	box(FL_BORDER_BOX);
-	display_speed_ = MILE_PER_HOUR;
-	display_temperature_ = CELSIUS;
 	load_values();
 	create_form(X, Y);
 }
@@ -65,76 +58,8 @@ void qso_clock::create_form(int X, int Y) {
 	bn_date_->box(FL_FLAT_BOX);
 	bn_date_->when(FL_WHEN_RELEASE);
 
-	curr_y += bn_date_->h() + GAP;
-	const int WICON = 2 * HBUTTON;
-	const int WTEXT = WCLOCKS - WICON - GAP;
-	const int WT3 = WTEXT / 3;
-	const int WX_SIZE = FL_NORMAL_SIZE + 2;
-
-	bn_location_ = new Fl_Button(curr_x, curr_y, WTEXT, WX_SIZE);
-	bn_location_->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
-	bn_location_->box(FL_FLAT_BOX);
-	bn_location_->labelsize(WX_SIZE);
-
-	curr_y += WX_SIZE;
-
-	bn_latlong_ = new Fl_Button(curr_x, curr_y, WTEXT, WX_SIZE);
-	bn_latlong_->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
-	bn_latlong_->box(FL_FLAT_BOX);
-	bn_latlong_->labelsize(WX_SIZE);
-
-	curr_y += WX_SIZE + GAP;
-	
-	bn_wx_icon_ = new Fl_Button(curr_x, curr_y, WICON, WICON);
-	bn_wx_icon_->color(COLOUR_GREY);
-	bn_wx_icon_->box(FL_FLAT_BOX);
-	bn_wx_icon_->callback(cb_bn_icon, nullptr);
-
-	curr_x += WICON + GAP;
-
-	bn_wx_description_ = new Fl_Button(curr_x, curr_y, WTEXT, WX_SIZE);
-	bn_wx_description_->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
-	bn_wx_description_->box(FL_FLAT_BOX);
-	bn_wx_description_->labelsize(WX_SIZE);
-
-	curr_y += WX_SIZE;
-	bn_temperature_ = new Fl_Button(curr_x, curr_y, WT3, WX_SIZE);
-	bn_temperature_->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
-	bn_temperature_->box(FL_FLAT_BOX);
-	bn_temperature_->labelsize(WX_SIZE);
-	bn_temperature_->callback(cb_bn_temperature, nullptr);
-
-	curr_x += WT3;
-	bn_speed_ = new Fl_Button(curr_x, curr_y, WT3, WX_SIZE);
-	bn_speed_->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
-	bn_speed_->box(FL_FLAT_BOX);
-	bn_speed_->labelsize(WX_SIZE);
-	bn_speed_->callback(cb_bn_speed, nullptr);
-
-	curr_x += WT3;
-	bn_direction_ = new Fl_Button(curr_x, curr_y, WT3, WX_SIZE);
-	bn_direction_->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
-	bn_direction_->box(FL_FLAT_BOX);
-	bn_direction_->labelsize(WX_SIZE);
-	bn_direction_->callback(cb_bn_direction, nullptr);
-
-	curr_x = X + GAP + WICON + GAP;
-	curr_y += WX_SIZE;
-
-	bn_sun_times_ = new Fl_Button(curr_x, curr_y, WTEXT, WX_SIZE);
-	bn_sun_times_->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
-	bn_sun_times_->box(FL_FLAT_BOX);
-	bn_sun_times_->labelsize(WX_SIZE);
-
-	curr_y += WX_SIZE;
-
-	bn_updated_ = new Fl_Button(curr_x, curr_y, WTEXT, WX_SIZE);
-	bn_updated_->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
-	bn_updated_->box(FL_FLAT_BOX);
-	bn_updated_->labelsize(WX_SIZE);
-
 	curr_x = X + WCLOCKS + GAP + GAP;
-	curr_y += WX_SIZE + GAP;
+	curr_y += bn_date_->h() + GAP;
 
 	resizable(nullptr);
 	size(curr_x - X, curr_y - Y);
@@ -144,22 +69,8 @@ void qso_clock::create_form(int X, int Y) {
 // Enable/disab;e widgets
 void qso_clock::enable_widgets() {
 	time_t now = time(nullptr);
-	time_t sunrise = wx_handler_ ? wx_handler_->sun_rise() : 0;
-	time_t sunset = wx_handler_ ? wx_handler_->sun_set() : 0;
-	string wx_descr = wx_handler_ ? wx_handler_->description() : "";
-	float temperature = wx_handler_ ? wx_handler_->temperature() : 0.0; 
-	float wind_speed = wx_handler_ ? wx_handler_->wind_speed() : 0.0;
-	string wind_dirn = wx_handler_ ? wx_handler_->wind_direction() : "";
-	unsigned int wind_degree = wx_handler_ ? wx_handler_->wind_degrees() : 0;
-	Fl_Image* icon = wx_handler_ ? wx_handler_->icon() : nullptr;
-	time_t updated = wx_handler_ ? wx_handler_->last_updated() : 0;
-	string wx_location = wx_handler_ ? wx_handler_->location() : "";
-	string wx_latlong = wx_handler_ ? wx_handler_->latlong() : "";
 
 	tm value;
-	tm sunup_time;
-	tm sundown_time;
-	tm updated_time;
 	char result[100];
 	if (display_local_) {
 		value = *localtime(&now);
@@ -171,10 +82,6 @@ void qso_clock::enable_widgets() {
 		bn_date_->labelcolor(FL_RED);
 		strftime(result, 99, "%a %d %b %Y", &value);
 		bn_date_->copy_label(result);
-		// Sunrise and sunset
-		sunup_time = *localtime(&sunrise);
-		sundown_time = *localtime(&sunset);
-		updated_time = *localtime(&updated);
 	}
 	else {
 		value = *gmtime(&now);
@@ -185,71 +92,7 @@ void qso_clock::enable_widgets() {
 		bn_date_->labelcolor(FL_YELLOW);
 		strftime(result, 99, "%a %d %b %Y", &value);
 		bn_date_->copy_label(result);
-		// Sunrise and sunset
-		sunup_time = *gmtime(&sunrise);
-		sundown_time = *gmtime(&sunset);
-		updated_time = *gmtime(&updated);
 	}
-	bn_location_->copy_label(wx_location.c_str());
-	bn_latlong_->copy_label(wx_latlong.c_str());
-	bn_wx_description_->copy_label(wx_descr.c_str());
-	char label[128];
-	switch(display_temperature_) {
-		case CELSIUS: {
-			snprintf(label, sizeof(label), "%0.0f \302\260C", temperature);
-			break;
-		}
-		case FAHRENHEIT: {
-			snprintf(label, sizeof(label), "%0.0f \302\260F", (temperature * 9 / 5) + 32);
-			break;
-		}
-		default:
-			strcpy(label, "");
-			break;
-	}
-	bn_temperature_->copy_label(label);
-	switch(display_speed_) {
-		case MILE_PER_HOUR: {
-			snprintf(label, sizeof(label), "%0.0f MPH", wind_speed);
-			break;
-		}
-		case METRE_PER_SECOND: {
-			snprintf(label, sizeof(label), "%0.0f m/s", wind_speed * 1760 * 36 *25.4 / 3600000);
-			break;
-		}
-		default:
-			strcpy(label, "");
-			break;
-
-	}
-	bn_speed_->copy_label(label);
-	switch(display_direction_) {
-		case CARDINAL: {
-			snprintf(label, sizeof(label), "%s", wind_dirn.c_str());
-			break;
-		}
-		case DEGREES: {
-			if (wind_degree == -1) strcpy(label, "---"); 
-			else snprintf(label, sizeof(label), "%03d\302\260", wind_degree);
-			break;
-		}
-		default:
-			strcpy(label, "");
-			break;
-	}
-	bn_direction_->copy_label(label);
-	char sunup[16];
-	char sundown[16];
-	char update_value[16];
-	strftime(sunup, sizeof(sunup), "%H:%M", &sunup_time);
-	strftime(sundown, sizeof(sundown), "%H:%M", &sundown_time);
-	snprintf(label, sizeof(label), "Sun rise %s set %s", sunup, sundown);
-	bn_sun_times_->copy_label(label);
-	strftime(label, sizeof(label), "Updated %H:%M:%S", &updated_time);
-	bn_updated_->copy_label(label);
-	bn_wx_icon_->image(icon);
-	bn_wx_icon_->deimage(icon);
-	bn_wx_icon_->redraw();
 }
 
 // save value
@@ -257,57 +100,3 @@ void qso_clock::save_values() {
 	// No code
 }
 
-// Icon clicked'
-void qso_clock::cb_bn_icon(Fl_Widget* w, void* v) {
-	qso_clock* that = ancestor_view<qso_clock>(w);
-	wx_handler_->update();
-	that->enable_widgets();
-}
-
-// Temperetaure clicked
-void qso_clock::cb_bn_temperature(Fl_Widget* w, void * v) {
-	qso_clock* that = ancestor_view<qso_clock>(w);
-	switch (that->display_temperature_) {
-		case CELSIUS: {
-			that->display_temperature_ = FAHRENHEIT;
-			break;
-		}
-		case FAHRENHEIT: {
-			that->display_temperature_ = CELSIUS;
-			break;
-		}
-	}
-	that->enable_widgets();
-}
-
-// Speed clicked
-void qso_clock::cb_bn_speed(Fl_Widget* w, void * v) {
-	qso_clock* that = ancestor_view<qso_clock>(w);
-	switch (that->display_speed_) {
-		case MILE_PER_HOUR: {
-			that->display_speed_ = METRE_PER_SECOND;
-			break;
-		}
-		case METRE_PER_SECOND: {
-			that->display_speed_ = MILE_PER_HOUR;
-			break;
-		}
-	}
-	that->enable_widgets();
-}
-
-// Direction clicked
-void qso_clock::cb_bn_direction(Fl_Widget* w, void * v) {
-	qso_clock* that = ancestor_view<qso_clock>(w);
-	switch (that->display_direction_) {
-		case CARDINAL: {
-			that->display_direction_ = DEGREES;
-			break;
-		}
-		case DEGREES: {
-			that->display_direction_ = CARDINAL;
-			break;
-		}
-	}
-	that->enable_widgets();
-}

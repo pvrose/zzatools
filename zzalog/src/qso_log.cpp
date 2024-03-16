@@ -48,6 +48,11 @@ void qso_log::create_form(int X, int Y) {
 	rw = max(rw, server_ctrl_->w());
 	rh = max(rh, server_ctrl_->h());
 
+	wx_ctrl_ = new qso_wx(rx, ry, rw, rh, "WX");
+	wx_ctrl_->labelsize(FL_NORMAL_SIZE + 2);
+	rw = max(rw, wx_ctrl_->w());
+	rh = max(rh, wx_ctrl_->h());
+
 	resizable(nullptr);
 	size(w() + rw - saved_rw, h() + rh - saved_rh);
 	end();
@@ -74,6 +79,7 @@ void qso_log::enable_widgets() {
 	log_info_->enable_widgets();
 	qsl_ctrl_->enable_widgets();
 	server_ctrl_->enable_widgets();
+	wx_ctrl_->enable_widgets();
 }
 
 // Save changes

@@ -214,7 +214,7 @@ int fllog_emul::add_record(rpc_data_item::rpc_list& params, rpc_data_item& respo
 		reader->load_record(that_->current_record_, ss, dummy);
 		// Frig - fldigi sets MY_STATE incorrectly
 		that_->current_record_->item("MY_STATE", string(""));
-		qso_manager_->update_modem_qso(that_->current_record_);
+		qso_manager_->enter_modem_qso(that_->current_record_);
 		status_->misc_status(ST_NOTE, "FLLOG_EMUL: Logged QSO");
 		return 0;
 	}

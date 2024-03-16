@@ -426,6 +426,11 @@ record* qso_manager::start_modem_qso(string call) {
 	return data_group_->start_modem_qso(call);
 }
 
+// Enter a modem QSO
+void qso_manager::enter_modem_qso(record * qso) {
+	data_group_->enter_modem_qso(qso);
+}
+
 // Download QSLs;
 void qso_manager::qsl_download(import_data::update_mode_t server) {
 	qsl_control()->qsl_download(server);

@@ -97,6 +97,8 @@ using namespace std;
 		record* start_modem_qso(string call);
 		// Log modem record
 		void update_modem_qso(bool log_it);
+		// Log modem record
+		void enter_modem_qso(record* qso);
 		// QSO i n progress
 		bool qso_in_progress();
 		// Start QSO

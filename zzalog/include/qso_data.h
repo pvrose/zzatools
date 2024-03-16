@@ -101,6 +101,8 @@ public:
 	record* start_modem_qso(string call);
 	// Update modem QSO
 	void update_modem_qso(bool log_it);
+	//. Add a modemm QSO
+	void enter_modem_qso(record*);
 	// Get default copy record
 	qso_num_t get_default_number();
 	// // Initialise fields
@@ -219,11 +221,6 @@ protected:
 	//record* current_qso_;
 	// Selected record
 	record* selected_qso_;
-	//// Saved current record
-	//record* original_qso_;
-	//// Presented query 
-	//record* query_qso_;
-	//// Current record number
 	//qso_num_t current_rec_num_;
 	//// Query record number
 	//qso_num_t query_rec_num_;
