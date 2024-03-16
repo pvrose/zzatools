@@ -168,8 +168,8 @@ void wx_handler::update() {
         char msg[128];
         ss.seekg(ios::beg);
         parse(ss);
-        snprintf(msg, sizeof(msg), "WX_HANDLER: Weather read OK: %s %0.0f\302\260C %0.0fMPH %s.",
-            description().c_str(), temperature(), wind_speed(), wind_direction().c_str());
+        snprintf(msg, sizeof(msg), "WX_HANDLER: Weather read OK: %s %0.0f\302\260C %0.0fMPH %s %0.0f hPa.",
+            description().c_str(), temperature(), wind_speed(), wind_direction().c_str(), pressure());
         status_->misc_status(ST_OK, msg);
     } else {
         status_->misc_status(ST_ERROR, "WX_HANDLER: WX read failed - see pop-up help window");
@@ -248,6 +248,11 @@ string wx_handler::latlong() {
     result += " ";
     result += degrees_to_dms(report_.city_location.longitude, false);
     return result;
+}
+
+// Pressure
+float wx_handler::pressure() {
+    return report_.pressure_hPa;
 }
 
 // The overall XML container

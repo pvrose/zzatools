@@ -118,6 +118,8 @@ public:
     string location();
     // Location lat/long
     string latlong();
+    // Atmospheric pressue (hPa)
+    float pressure();
 
 protected:
 
