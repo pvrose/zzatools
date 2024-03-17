@@ -41,7 +41,8 @@ protected:
 	} display_speed_;
 	enum {
 		CARDINAL,
-		DEGREES
+		DEGREES,
+		ARROW
 	} display_direction_;
     enum {
         HECTOPASCAL,

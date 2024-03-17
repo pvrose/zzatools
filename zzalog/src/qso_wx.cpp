@@ -134,7 +134,7 @@ void qso_wx::create_form(int X, int Y) {
 	bn_sunset_->box(FL_FLAT_BOX);
 	bn_sunset_->labelsize(WX_SIZE);
 
-	curr_y += WX_SIZE;
+	curr_y += HTEXT;
 	curr_x = X + GAP;
 
 	bn_updated_ = new Fl_Button(curr_x, curr_y, WTEXT, WX_SIZE);
@@ -227,6 +227,19 @@ void qso_wx::enable_widgets() {
 		case DEGREES: {
 			if (wind_degree == -1) strcpy(label, "---"); 
 			else snprintf(label, sizeof(label), "%03d\302\260", wind_degree);
+			break;
+		}
+		case ARROW: {
+			if (wind_degree == -1) strcpy(label, "@line");
+			else if (wind_degree < 23) strcpy(label, "@2arrow");
+			else if (wind_degree < 68) strcpy(label, "@1arrow");
+			else if (wind_degree < 113) strcpy(label, "@4arrow");
+			else if (wind_degree < 158) strcpy(label, "@7arrow");
+			else if (wind_degree < 203) strcpy(label, "@8arrow");
+			else if (wind_degree < 248) strcpy(label, "@9arrow");
+			else if (wind_degree < 293) strcpy(label, "@6arrow");
+			else if (wind_degree < 338) strcpy(label, "@3arrow");
+			else strcpy(label, "@2arrow");
 			break;
 		}
 		default:
@@ -359,6 +372,10 @@ void qso_wx::cb_bn_direction(Fl_Widget* w, void * v) {
 			break;
 		}
 		case DEGREES: {
+			that->display_direction_ = ARROW;
+			break;
+		}
+		case ARROW: {
 			that->display_direction_ = CARDINAL;
 			break;
 		}
