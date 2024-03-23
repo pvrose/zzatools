@@ -42,6 +42,14 @@ void qso_server::create_form() {
     bn_fldigi_->callback(cb_bn_change, (void*)FLDIGI);
     bn_fldigi_->tooltip("Change the state of the FLDIGI handler");
 
+    curr_x += WBUTTON;
+    // Start fldigi
+    bn_start_f_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Launch");
+    bn_start_f_->callback(cb_bn_start, (void*)FLDIGI);
+    bn_start_f_->tooltip("Launch fldigi");
+    bn_start_f_->color(FL_DARK_GREEN);
+    bn_start_f_->labelcolor(FL_WHITE);
+
     curr_x = x() + GAP + WLABEL;
     curr_y += HBUTTON;
 
@@ -56,8 +64,17 @@ void qso_server::create_form() {
     // Switch state button
     bn_wsjtx_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Start");
     bn_wsjtx_->callback(cb_bn_change, (void*)WSJTX);
-    bn_fldigi_->tooltip("Change the state of the WSJT-X handler");
+    bn_wsjtx_->tooltip("Change the state of the WSJT-X handler");
 
+    curr_x += WBUTTON;
+    // Start fldigi
+    bn_start_w_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Launch");
+    bn_start_w_->callback(cb_bn_start, (void*)WSJTX);
+    bn_start_w_->tooltip("Launch fldigi");
+    bn_start_w_->color(FL_DARK_GREEN);
+    bn_start_w_->labelcolor(FL_WHITE);
+
+    resizable(nullptr);
     end();
 }
 
@@ -71,10 +88,12 @@ void qso_server::enable_widgets() {
         bn_fldigi_on_->value(true);
         bn_fldigi_->label("Stop");
         bn_fldigi_->color(fl_lighter(FL_RED));
+        bn_start_f_->activate();
     } else {
         bn_fldigi_on_->value(false);
         bn_fldigi_->label("Start");
         bn_fldigi_->color(fl_lighter(FL_GREEN));
+        bn_start_f_->deactivate();
     }
     bn_fldigi_->labelcolor(fl_contrast(FL_FOREGROUND_COLOR, bn_fldigi_->color()));
     // WSJTX widgets
@@ -82,10 +101,12 @@ void qso_server::enable_widgets() {
         bn_wsjtx_on_->value(true);
         bn_wsjtx_->label("Stop");
         bn_wsjtx_->color(fl_lighter(FL_RED));
+        bn_start_w_->activate();
     } else {
         bn_wsjtx_on_->value(false);
         bn_wsjtx_->label("Start");
         bn_wsjtx_->color(fl_lighter(FL_GREEN));
+        bn_start_w_->deactivate();
    }
     bn_wsjtx_->labelcolor(fl_contrast(FL_FOREGROUND_COLOR, bn_wsjtx_->color()));
 }
@@ -111,4 +132,20 @@ void qso_server::cb_bn_change(Fl_Widget* w, void* v) {
         break;
     }
     that->enable_widgets();
+}
+
+// Start button callback
+void qso_server::cb_bn_start(Fl_Widget* w, void* v) {
+      qso_server* that = ancestor_view<qso_server>(w);
+    server_t server = (server_t)(intptr_t)v;
+    switch (server) {
+    case FLDIGI: 
+        system("fldigi &");
+        break;
+    case WSJTX:
+        system("wsjtx &");
+        break;
+    }
+    that->enable_widgets();
+  
 }

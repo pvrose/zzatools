@@ -33,6 +33,12 @@ fllog_emul::fllog_emul() {
 	connected_ = false;
 }
 
+// DEstructor
+fllog_emul::~fllog_emul() {
+	// Disconnect port
+	close_server();
+}
+
 // Start and run the RPC Server
 void fllog_emul::run_server() {
 	if (!rpc_handler_) {

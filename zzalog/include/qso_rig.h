@@ -80,6 +80,8 @@ protected:
 	static void cb_ip_gain(Fl_Widget* w, void* v);
 	// Callback - input power
 	static void cb_ip_power(Fl_Widget* w, void* v);
+	// Call back start flrig
+	static void cb_bn_start(Fl_Widget* w, void* v);
 
 	// Get hamlib data
 	void find_hamlib_data();
@@ -107,6 +109,8 @@ protected:
 	Fl_Button* bn_connect_;
 	Fl_Light_Button* bn_select_;
 	field_input* ip_antenna_;
+	Fl_Button* bn_start_;
+	Fl_Input* ip_flrig_params_;
 	// Modifier widgets
 	Fl_Group* modifier_grp_;
 	Fl_Check_Button* bn_mod_freq_;
@@ -132,6 +136,8 @@ protected:
 	rig_port_e mode_;
 	// Current antenna
 	string antenna_;
+	// flrig config paramaters
+	string flrig_params_;
 	
 
 	// Modifier attributes

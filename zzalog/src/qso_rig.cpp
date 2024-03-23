@@ -87,6 +87,12 @@ void qso_rig::load_values() {
 			hamlib_data_.port_type = capabilities->port_type;
 		};
 		
+		// If hamlib and FLRig - start parameters
+		if (hamlib_data_.model == "FLRig") {
+			hamlib_settings.get("FLRig Parameters", temp, "");
+			flrig_params_ = temp;
+			free(temp);
+		}
 		// Preferred antenna
 		rig_settings.get("Antenna", temp, "");
 		antenna_ = temp;
@@ -186,6 +192,12 @@ void qso_rig::create_form(int X, int Y) {
 	bn_select_->tooltip("Select the rig to connect");
 	bn_select_->value(false);
 	bn_select_->callback(cb_bn_select, nullptr);
+
+	curr_x += bn_select_->w();
+	bn_start_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Start Flrig");
+	bn_start_->color(FL_DARK_GREEN);
+	bn_start_->tooltip("Start flrig for this connection");
+	bn_start_->callback(cb_bn_start, &flrig_params_);
 	
 	curr_x = X + GAP + WLABEL;
 	curr_y += HBUTTON + GAP;
@@ -266,8 +278,16 @@ void qso_rig::create_form(int X, int Y) {
 	ip_port_->tooltip("Enter the network/USB port to use");
 	ip_port_->value(hamlib_data_.port_name.c_str());
 
-	curr_x += WSMEDIT + GAP;
 	curr_y += HTEXT + GAP;
+
+	ip_flrig_params_= new Fl_Input(curr_x, curr_y, WSMEDIT, HTEXT, "Params");
+	ip_flrig_params_->align(FL_ALIGN_LEFT);
+	ip_flrig_params_->callback(cb_value<Fl_Input, string>, &flrig_params_);
+	ip_flrig_params_->tooltip("Enter the paramters for flrig to connect to the rig");
+	ip_flrig_params_->value(flrig_params_.c_str());
+	
+	curr_y += HTEXT + GAP;
+	curr_x += WSMEDIT + GAP;
 	network_grp_->resizable(nullptr);
 	network_grp_->size(curr_x - network_grp_->x(), curr_y - network_grp_->y());
 
@@ -411,6 +431,9 @@ void qso_rig::save_values() {
 		hamlib_settings.set("Port", hamlib_data_.port_name.c_str());
 		hamlib_settings.set("Baud Rate", hamlib_data_.baud_rate);
 		hamlib_settings.set("Model ID", (int)hamlib_data_.model_id);
+		if (hamlib_data_.model == "FLRig") {
+			hamlib_settings.set("FLRig Parameters", flrig_params_.c_str());
+		}
 		// Preferred antenna
 		rig_settings.set("Antenna", antenna_.c_str());
 		// Modifier settings
@@ -441,6 +464,7 @@ void qso_rig::enable_widgets() {
 		} else {
 			bn_select_->label("Select");
 		}
+		bn_start_->activate();
 	} else if (rig_->is_open()) {
 		bn_connect_->activate();
 		bn_connect_->color(fl_lighter(FL_RED));
@@ -448,6 +472,7 @@ void qso_rig::enable_widgets() {
 		bn_select_->deactivate();
 		bn_select_->label("");
 		bn_select_->value(false);
+		bn_start_->deactivate();
 	} else {
 		bn_connect_->activate();
 		bn_connect_->color(fl_lighter(FL_GREEN));
@@ -458,6 +483,7 @@ void qso_rig::enable_widgets() {
 		} else {
 			bn_select_->label("Select");
 		}
+		bn_start_->activate();
 	}
 	bn_connect_->labelcolor(fl_contrast(FL_FOREGROUND_COLOR, bn_connect_->color()));
 	bn_select_->labelcolor(fl_contrast(FL_FOREGROUND_COLOR, bn_select_->color()));
@@ -508,6 +534,13 @@ void qso_rig::enable_widgets() {
 		network_grp_->show();
 		if (!bn_select_->value()) {
 			ip_port_->value(hamlib_data_.port_name.c_str());
+		}
+		if (hamlib_data_.model == "FLRig") {
+			ip_flrig_params_->show();
+			bn_start_->show();
+		} else {
+			ip_flrig_params_->hide();
+			bn_start_->hide();
 		}
 		break;
 	case RIG_PORT_NONE:
@@ -875,6 +908,21 @@ void qso_rig::cb_ip_power(Fl_Widget* w, void* v) {
 	*(double*)v = (double)f;
 	that->modify_rig();
 	that->enable_widgets();
+}
+
+// Clicked start button
+void qso_rig::cb_bn_start(Fl_Widget* w, void * v) {
+	string* params = (string*)v;
+	string command = "flrig " + *params + "&";
+	int result = system(command.c_str());
+	char msg[100];
+	if (result == 0) {
+		snprintf(msg, sizeof(msg), "RIG: Started %s OK", command.c_str());
+		status_->misc_status(ST_OK, msg);
+	} else {
+		snprintf(msg, sizeof(msg), "RIG: Failed to start %s", command.c_str());
+		status_->misc_status(ST_ERROR, msg);
+	}
 }
 
 // Connect rig if disconnected and vice-versa

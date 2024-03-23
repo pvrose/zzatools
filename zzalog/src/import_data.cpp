@@ -311,6 +311,11 @@ void import_data::update_book() {
 		inhibit_view_update_ = true;
 		if (!update_in_progress_) {
 			book_->enable_save(false, "Starting update from import");
+		} else {
+			// Fetch QSL card for the queried QSO
+			if (update_mode_ == EQSL_UPDATE) {
+				eqsl_handler_->enqueue_request(record_number(0));
+			}
 		}
 		// Clear flags
 		update_in_progress_ = false;
@@ -326,6 +331,7 @@ void import_data::update_book() {
 		update_in_progress_ = false;
 		update_is_new_ = false;
 		int offset = 0;
+		char message[256];
 		// Process the records - always process the zeroth one as it gets deleted
 		// update_in_progress_ indicates we want to drop out to present user with a 
 		// choice.
@@ -392,7 +398,6 @@ void import_data::update_book() {
 						had_swl_match = false;
 						// merge_records the matching record from the import record and delete the import record
 						if (record->merge_records(import_record, update_mode_ == LOTW_UPDATE)) {
-							char message[256];
 							snprintf(message, 256, "IMPORT: Updated record. %s %s %s %s %s",
 								record->item("QSO_DATE").c_str(), record->item("TIME_ON").c_str(),
 								record->item("CALL").c_str(),
@@ -448,6 +453,8 @@ void import_data::update_book() {
 					case MT_POSSIBLE:
 						update_in_progress_ = true;
 						match_question_ = "Call, band and mode match - some fields differ. Please select correct values.";
+						snprintf(message, sizeof(message), "LOG: Possible match found with %s", import_record->item("CALL").c_str());
+						status_->misc_status(ST_LOG, message);
 						book_->selection(test_record, HT_IMPORT_QUERY);
 						found_match = true;
 						break;

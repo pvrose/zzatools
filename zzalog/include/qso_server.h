@@ -25,11 +25,14 @@ protected:
     };
     // Button callback
     static void cb_bn_change(Fl_Widget* w, void* v);
+    static void cb_bn_start(Fl_Widget* w, void* v);
 
     // Widgets
     Fl_Check_Button* bn_wsjtx_on_;
     Fl_Check_Button* bn_fldigi_on_;
     Fl_Button* bn_wsjtx_;
     Fl_Button* bn_fldigi_;
+    Fl_Button* bn_start_w_;
+    Fl_Button* bn_start_f_;
 
 };
