@@ -521,7 +521,7 @@ void QBS_window::update_new_batch() {
 	bn_b_action_->label("New box");
 	if (batch_op_done_) bn_b_action_->deactivate();
 	else bn_b_action_->activate();
-	update_batches(false);
+	update_batches(false, true);
 	// Call input - get first call in box
 	ip_call_->deactivate();
 	// Action button
@@ -1484,9 +1484,9 @@ void QBS_window::update_action_values() {
 }
 
 // Update batches
-void QBS_window::update_batches(bool enable_nav) {
+void QBS_window::update_batches(bool enable_nav, bool add) {
 	if (ch_batch_->active()) {
-		populate_batch(enable_nav);
+		populate_batch(enable_nav, add);
 		ch_batch_->value(selected_box_);
 	}
 }
@@ -1919,9 +1919,11 @@ void QBS_window::append_batch_log(const char* text) {
 }
 
 // Populate batch choice
-void QBS_window::populate_batch(bool enable_change) {
+void QBS_window::populate_batch(bool enable_change, bool add) {
 	ch_batch_->clear();
-	for (int b = 0; b <= data_->get_current(); b++) {
+	int last_box = data_->get_current();
+	if (add) last_box++;
+	for (int b = 0; b <= last_box; b++) {
 		ch_batch_->add(data_->get_batch(b).c_str());
 		if (!enable_change && b != selected_box_) {
 			ch_batch_->mode(b, FL_MENU_INACTIVE);

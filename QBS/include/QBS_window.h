@@ -90,7 +90,7 @@ protected:
     void update_post_cards();
     void update_recycle_cards();
     void update_dispose_sase();
-    void update_batches(bool enable_nav);
+    void update_batches(bool enable_nav, bool add = false);
     void update_calls(int box_num);
     void update_batch_summary();
     void update_batch_listing();
@@ -107,7 +107,7 @@ protected:
     // Write batch log
     void append_batch_log(const char* text);
     // Populate batch choice
-    void populate_batch(bool enable_change);
+    void populate_batch(bool enable_change, bool add = false);
 
     // Various data items accessible by most classes
     Fl_Preferences settings_;
