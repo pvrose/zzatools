@@ -369,7 +369,7 @@ bool lotw_handler::upload_done(int result) {
 		break;
 	case 8:
 		status_->misc_status(ST_WARNING, "LOTW: No QSOs were processed since some QSOs were duplicates or out of date range");
-		ok = false;
+		ok = true;
 		break;
 	case 9:
 		status_->misc_status(ST_WARNING, "LOTW: Some QSOs were processed, and some QSOs were ignored because they were duplicates or out of date range");
