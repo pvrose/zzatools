@@ -495,6 +495,7 @@ void qso_data::enter_modem_qso(record* qso) {
 			g_entry_->qso(qso);
 			g_entry_->append_qso();
 			logging_state_= QSO_EDIT;
+			g_entry_->copy_default_to_qso();
 			g_entry_->update_rig();
 			g_entry_->copy_cat_to_qso();
 			g_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
