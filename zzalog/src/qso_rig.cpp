@@ -196,6 +196,7 @@ void qso_rig::create_form(int X, int Y) {
 	curr_x += bn_select_->w();
 	bn_start_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Start Flrig");
 	bn_start_->color(FL_DARK_GREEN);
+	bn_start_->labelcolor(FL_WHITE);
 	bn_start_->tooltip("Start flrig for this connection");
 	bn_start_->callback(cb_bn_start, &flrig_params_);
 	
