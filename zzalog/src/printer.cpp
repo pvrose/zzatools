@@ -327,7 +327,9 @@ int printer::print_cards() {
 }
 
 int printer::print_page_cards(size_t &item_num) {
-	origin(0, 0);
+	int x, y;
+	origin(&x, &y);
+	printf("PRINTER: Current drawing origin is (%d, %d)\n", x, y);
 	Fl_Window* win = new Fl_Window(cwin_x_, cwin_y_, cwin_w_, cwin_h_);
 	win->clear_border();
 	win->color(FL_WHITE);
@@ -356,9 +358,9 @@ int printer::print_page_cards(size_t &item_num) {
 	win->end();
 	win->show();
 	begin_page();
-	print_window(win, 0, 0);
-	Fl::delete_widget(win);
+	print_window(win, x, y);
 	end_page();
+	Fl::delete_widget(win);
 	return 0;
 }
 

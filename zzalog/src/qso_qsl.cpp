@@ -398,9 +398,6 @@ void qso_qsl::qsl_print() {
 		status_->misc_status(ST_OK, "DASH: Printing cards OK");
 	}
 	delete ptr;
-	if (!Fl_Display_Device::display_device()->is_current()) {
-		printf("Drawing surfcae is not current\n");
-	}
 	enable_widgets();
 }
 
