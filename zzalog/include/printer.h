@@ -22,7 +22,6 @@ using namespace std;
 	public:
 		// Constructor - defines whether the main log in book format, extracted log in book format or as QSL cards 
 		printer(object_t object);
-		virtual ~printer();
 
 		// Does the printing
 		int do_job();

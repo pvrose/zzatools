@@ -392,6 +392,7 @@ void qso_qsl::qsl_upload() {
 // Print
 void qso_qsl::qsl_print() {
 	printer* ptr = new printer(OT_CARD);
+	ptr->do_job();
 	delete ptr;
 	enable_widgets();
 }
