@@ -77,6 +77,10 @@ const float IN_TO_POINT = 72.0f;
 		string filename_;
 		// The QSL card HTML view
 		qsl_html_view* card_view_;
+		// HTML buffer
+		static char* html_;
+		// Callsign
+		static string callsign_;
 	};
 
 #endif

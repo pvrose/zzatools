@@ -438,6 +438,7 @@ void menu::cb_mi_file_print(Fl_Widget* w, void* v) {
 		type = navigation_book_->book_type();
 	}
 	printer* ptr = new printer(type);
+	ptr->do_job();
 	delete ptr;
 }
 

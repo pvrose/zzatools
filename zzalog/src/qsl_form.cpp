@@ -22,6 +22,9 @@ extern Fl_Preferences* settings_;
 extern status* status_;
 extern qso_manager* qso_manager_;
 
+char * qsl_form::html_ = nullptr;
+string qsl_form::callsign_ = "";
+
 // Constructor
 qsl_form::qsl_form(int X, int Y, record** records, int num_records) :
 	Fl_Group(X, Y, 0, 0) {
@@ -60,40 +63,47 @@ void qsl_form::load_data() {
 		snprintf(msg, sizeof(msg), "QSL: Incorrect info W=%f, H=%f, File=%s", width_, height_, temp);
 		status_->misc_status(ST_ERROR, msg);
 	}
+	if (html_ == nullptr || callsign != callsign_) {
+		if (html_) {
+			delete html_;
+		}
+		callsign_ = callsign;
+		char message[256];
+		snprintf(message, 256, "QSL: Starting reading QSL template %s", filename_.c_str());
+		status_->misc_status(ST_NOTE, message);
+		ifstream ifile;
+		ifile.open(filename_.c_str());
+		if (!ifile.good()) {
+			snprintf(message, 256, "QSL: Failed to open %s", filename_.c_str());
+			status_->misc_status(ST_ERROR, message);
+			return;
+		}
+
+		// read the entire file into a buffer
+		ifile.seekg(0, ifile.end);
+		int length = (int)ifile.tellg();
+		ifile.seekg(0, ifile.beg);
+		html_ = new char[length];
+		memset(html_, 0, length);
+		ifile.read(html_, length);
+		if (!ifile.eof() && !ifile.good()) {
+			snprintf(message, 256, "QSL: Failed to read %s", filename_.c_str());
+			status_->misc_status(ST_ERROR, message);
+			delete html_;
+			html_ = nullptr;
+			ifile.close();
+			return;
+		}
+
+		ifile.close();
+
+	}
 }
 
 // Create the card design
 void qsl_form::create_form(int X, int Y) {
 	card_view_ = new qsl_html_view(X, Y, to_points(width_), to_points(height_));
-	char message[256];
-	snprintf(message, 256, "QSL: Starting reading QSL template %s", filename_.c_str());
-	status_->misc_status(ST_NOTE, message);
-	ifstream ifile;
-	ifile.open(filename_.c_str());
-	if (!ifile.good()) {
-		snprintf(message, 256, "QSL: Failed to open %s", filename_.c_str());
-		status_->misc_status(ST_ERROR, message);
-		return;
-	}
-
-	// read the entire file into a buffer
-	ifile.seekg(0, ifile.end);
-	int length = (int)ifile.tellg();
-	ifile.seekg(0, ifile.beg);
-	char* buffer = new char[length];
-	memset(buffer, 0, length);
-	ifile.read(buffer, length);
-	if (!ifile.eof() && !ifile.good()) {
-		snprintf(message, 256, "QSL: Failed to read %s", filename_.c_str());
-		status_->misc_status(ST_ERROR, message);
-		delete buffer;
-		ifile.close();
-		return;
-	}
-
-	ifile.close();
-	card_view_->value(buffer, records_, num_records_);
-	delete buffer;
+	card_view_->value(html_, records_, num_records_);
 
 	resizable(nullptr);
 	size(card_view_->w(), card_view_->h());

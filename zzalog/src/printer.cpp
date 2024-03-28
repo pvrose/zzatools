@@ -99,7 +99,7 @@ int printer::print_book() {
 	// Get field data and calculate field widths
 	book_properties();
 	// Start the page - exit on error
-	if (start_page()) return 1;
+	if (begin_page()) return 1;
 	// For each record
 	int page_number = from_page;
 	int error = 0;
@@ -121,7 +121,7 @@ int printer::print_book() {
 				// Update progress
 				status_->progress(page_number - from_page, type_);
 				// Start the next page
-				if (!error) error = start_page();
+				if (!error) error = begin_page();
 				if (!error) print_page_header(page_number);
 			}
 		}
@@ -135,8 +135,8 @@ int printer::print_book() {
 		}
 	}
 	// End the page
-	if (!error) error = end_page();
-	if (!error) end_job();
+	end_page();
+	end_job();
 	// Final progress
 	status_->progress(min(to_page + 1 - from_page, number_pages_), type_);
 	fl_cursor(FL_CURSOR_DEFAULT);
@@ -302,29 +302,12 @@ int printer::print_cards() {
 	size_t i = (from_page - 1) * items_per_page_;
 
 	while ((i < navigation_book_->size()) && page_number <= to_page && !error) {
-		error = start_page();
-		// Print the record
+		// Print the record and those following
 		error = print_page_cards(i);
 		// When the record would be the last on the page and is not the last in the book
-		if (!error) {
-			page_number++;
-			// not yet reached the last wanted page
-			if ((page_number <= to_page) && i) {
-				// End the page
-				error = end_page();
-				// Update progress
-				status_->progress(page_number - from_page, type_);
-				// Start the next page
-				if (i < navigation_book_->size() && !error) {
-					error = start_page();
-				}
-			}
-			else {
-				error = end_page();
-			}
-		}
+		page_number++;
 	}
-	if (!error) end_job();
+	end_job();
 	// Final progress
 	status_->progress(min(to_page + 1 - from_page, number_pages_), type_);
 	fl_cursor(FL_CURSOR_DEFAULT);
@@ -344,6 +327,7 @@ int printer::print_cards() {
 }
 
 int printer::print_page_cards(size_t &item_num) {
+	origin(0, 0);
 	Fl_Window* win = new Fl_Window(cwin_x_, cwin_y_, cwin_w_, cwin_h_);
 	win->clear_border();
 	win->color(FL_WHITE);
@@ -371,8 +355,10 @@ int printer::print_page_cards(size_t &item_num) {
 	}
 	win->end();
 	win->show();
-	print_window(win);
+	begin_page();
+	print_window(win, 0, 0);
 	Fl::delete_widget(win);
+	end_page();
 	return 0;
 }
 
@@ -423,7 +409,7 @@ int printer::card_properties() {
 	//
 	int last_item = navigation_book_->size() - 1;
 	number_pages_ = (last_item / items_per_page_) + 1;
-	printf("PRINTER: #Q=%d, Q/P=%d, #P=%d\n", last_item, items_per_page_, number_pages_);
+	printf("PRINTER: #Q=%d, Q/P=%d, #P=%d\n", last_item + 1, items_per_page_, number_pages_);
 
 	return 0;
 }

@@ -392,8 +392,15 @@ void qso_qsl::qsl_upload() {
 // Print
 void qso_qsl::qsl_print() {
 	printer* ptr = new printer(OT_CARD);
-	ptr->do_job();
+	if (ptr->do_job()) {
+		status_->misc_status(ST_ERROR, "DASH: Printing cards failed");
+	} else {
+		status_->misc_status(ST_OK, "DASH: Printing cards OK");
+	}
 	delete ptr;
+	if (!Fl_Display_Device::display_device()->is_current()) {
+		printf("Drawing surfcae is not current\n");
+	}
 	enable_widgets();
 }
 
