@@ -161,8 +161,8 @@ qso_dxcc::wb4_buttons::wb4_buttons(int X, int Y, int W, int H, const char* L) :
 qso_dxcc::wb4_buttons::~wb4_buttons() {}
 
 void qso_dxcc::wb4_buttons::create_form() {
-	const int NUM_WIDE = 5;
-	const int BWIDTH = w() / NUM_WIDE;
+	const int NUM_WIDE = 4;
+	const int BWIDTH = (w() - Fl::scrollbar_size()) / NUM_WIDE;
 	int bn_number = 0;
 	clear();
 	begin();
