@@ -101,6 +101,7 @@ void socket_server::close_server(bool external)
 		closesocket(server_);
 		WSACleanup();
 #else
+		shutdown(server_, 2);
 		close(server_);
 #endif
 		server_ = INVALID_SOCKET;

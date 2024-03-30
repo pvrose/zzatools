@@ -799,6 +799,7 @@ void tidy() {
 	delete lotw_handler_;
 	delete eqsl_handler_;
 	delete url_handler_;
+	delete fllog_emul_;
 	delete extract_records_;
 	delete import_data_;
 	delete book_;
