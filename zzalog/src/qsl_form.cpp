@@ -81,7 +81,7 @@ void qsl_form::load_data() {
 
 		// read the entire file into a buffer
 		ifile.seekg(0, ifile.end);
-		int length = (int)ifile.tellg();
+		int length = (int)ifile.tellg() + 1;
 		ifile.seekg(0, ifile.beg);
 		html_ = new char[length];
 		memset(html_, 0, length);

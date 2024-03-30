@@ -284,8 +284,8 @@ extern bool DEBUG_ERRORS;
 		choice->item_pathname(temp, sizeof(temp) - 1);
 		// If there is a value get its text - note as pathname it will be preceded by a '/'.
 		if (temp[0] != 0) {
-			char* last_slash = strrchr(temp, '/');
-			*enum_value = &last_slash[1];
+			char* first_slash = strchr(temp, '/');
+			*enum_value = &first_slash[1];
 		}
 		else {
 			*enum_value = "";
