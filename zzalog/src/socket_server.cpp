@@ -229,6 +229,15 @@ int socket_server::create_server()
 				break;
 		}
 #endif
+	} else {
+		int set_option_on = 1;
+		// Allow address to be reused - it may be hanging around from a previous
+		result = setsockopt(server_, SOL_SOCKET, SO_REUSEADDR, (char*)&set_option_on,
+			sizeof(set_option_on));
+		if (result < 0) {
+			handle_error("Unable to set socket reusable");
+			return result;
+		}
 	}
 	// Associate the socket with this address data
 	result = bind(server_, (SOCKADDR *)&server_addr, len_server_addr);
@@ -474,7 +483,8 @@ void socket_server::handle_error(const char *phase)
 		snprintf(message, 1028, "SOCKET: %s", phase);
 	}
 #else
-	snprintf(message, 1028, "SOCKET: %s", phase);
+	char* error_msg = strerror(errno);
+	snprintf(message, 1028, "SOCKET: %s %s(%d): %s", phase, address_.c_str(), port_num_, error_msg);
 #endif
 	status_->misc_status(ST_ERROR, message);
 	close_server(false);
