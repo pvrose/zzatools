@@ -492,10 +492,13 @@ int cb_args(int argc, char** argv, int& i) {
 	if (i == i_orig ) {
 		// Not processed any argumant
 		if (*argv[i] == '-') {
-			char msg[128];
-			snprintf(msg, sizeof(msg), "ZZALOG: Unrecognised switch %s", argv[i]);
-			status_->misc_status(ST_ERROR, msg);
-			i += 1;
+			int i_fltk = Fl::arg(argc, argv, i);
+			if (i_fltk == 0) {
+				char msg[128];
+				snprintf(msg, sizeof(msg), "ZZALOG: Unrecognised switch %s", argv[i]);
+				status_->misc_status(ST_ERROR, msg);
+				i += 1;
+			}
 			return i;
 			// printf ("DEBUG: Not recognised switch %d %s passing to fltk", i, argv[i]);
 			// // Unrecognised switch - try Fl speciific ones

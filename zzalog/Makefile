@@ -58,7 +58,7 @@ CXXFLAGS += -g
 # DEBUG_FLAG := -Og
 
 # The final build step.
-$(EXEC_DIR)/$(TARGET_EXEC): $(OBJS)
+$(EXEC_DIR)/$(TARGET_EXEC): $(OBJS) ${INSTALL_DIR}/fltk-config
 	@echo $@
 	@$(CXX) $(OBJS) -o $@ $(LDFLAGS)
 
@@ -105,6 +105,8 @@ install: $(INSTALL_DIR)/$(TARGET_EXEC)
 
 $(INSTALL_DIR)/$(TARGET_EXEC): $(EXEC_DIR)/$(TARGET_EXEC)
 	sudo cp $(EXEC_DIR)/$(TARGET_EXEC) $(INSTALL_DIR)
+
+
 
 # Include the .d makefiles. The - at the front suppresses the errors of missing
 # Makefiles. Initially, all the .d files will be missing, and we don't want those
