@@ -93,6 +93,7 @@ bool VERBOSE = false;
 bool HELP = false;
 bool PRIVATE = false;
 bool DARK = false;
+bool DISPLAY_VERSION = false;
 
 // Ticker values
 const double TICK = 0.1;      // 100 ms
@@ -160,6 +161,8 @@ string default_station_ = "";
 Fl_PNG_Image main_icon_("ZZALOG_ICON", ___rose_png, ___rose_png_len);
 // Using backp
 bool using_backup_ = false;
+// Sticky switches mesasge
+string sticky_message_ = "";
 
 static void cb_ticker(void* v) {
 	// Units that require 1s tick
@@ -432,6 +435,11 @@ int cb_args(int argc, char** argv, int& i) {
 	else if (strcmp("-l", argv[i]) == 0 || strcmp("--light", argv[i]) == 0) {
 		DARK = false;
 		i += 1;
+	}
+	// Version
+	else if (strcmp("-v", argv[i]) == 0 || strcmp("--version", argv[i]) == 0) {
+		DISPLAY_VERSION = true;
+		i+= 1;
 	}
 	// Debug
 	else if (strcmp("-d", argv[i]) == 0 || strcmp("--debug", argv[i]) == 0) {
@@ -910,7 +918,7 @@ void read_saved_switches() {
 	AUTO_SAVE = (bool)temp;
 	if (AUTO_SAVE) strcat(msg, "-a");
 	else strcat(msg, "-w");
-	status_->misc_status(ST_NOTE, msg);	
+	sticky_message_ = msg;
 }
 
 void save_switches() {
@@ -936,11 +944,19 @@ int main(int argc, char** argv)
 	// Parse command-line arguments - accept FLTK standard arguments and custom ones (in cb_args)
 	int i = 1;
 	Fl::args(argc, argv, i, cb_args);
+	if (DISPLAY_VERSION) {
+		// Display version
+		printf("%s Version %s\n", PROGRAM_ID.c_str(), PROGRAM_VERSION.c_str());
+		return 0;
+	}
 	if (HELP) {
 		// Help requested - display help text and exit
 		show_help();
 		return 0;
 	}
+	// Now display sticky switch message
+	status_->misc_status(ST_NOTE, sticky_message_.c_str());	
+
 	// Switches affect the customisation
 	customise_fltk();
 	// Create window
