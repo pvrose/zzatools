@@ -729,6 +729,12 @@ bool qso_data::action_save() {
 
 	switch (logging_state_) {
 	case QSO_STARTED:
+		logging_state_ = SWITCHING;
+		book_->modified(true);
+		book_->selection(item_number, HT_INSERTED);
+		logging_state_ = QSO_INACTIVE;
+		action_activate(previous_mode_);
+		break;
 	case QSO_MODEM:
 		logging_state_ = SWITCHING;
 		book_->modified(true);

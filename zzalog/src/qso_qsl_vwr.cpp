@@ -28,6 +28,7 @@ qso_qsl_vwr::qso_qsl_vwr(int X, int Y, int W, int H, const char* L) :
 	, selected_image_(QI_EQSL)
 	, raw_image_(nullptr)
 	, scaled_image_(nullptr)
+	, desat_image_(nullptr)
 	, current_qso_(nullptr)
 {
 	labelfont(FL_BOLD);
@@ -345,7 +346,9 @@ void qso_qsl_vwr::set_image() {
 			delete raw_image_;
 			raw_image_ = nullptr;
 			delete scaled_image_;
+			delete desat_image_;
 			scaled_image_ = nullptr;
+			desat_image_ = nullptr;
 			string station = current_qso_->item("STATION_CALLSIGN");
 			// Select the image type: eQSL or scanned in card (front or back)
 			switch (selected_image_) {
@@ -460,6 +463,8 @@ void qso_qsl_vwr::set_image() {
 				else {
 					scaled_image_ = raw_image_->copy(bn_card_display_->w(), (int)(raw_image_->h() / scale_w));
 				}
+				desat_image_ = scaled_image_->copy();
+				desat_image_->desaturate();
 				update_full_view();
 				// Test Whether we've used default station callsign
 			}
@@ -593,7 +598,7 @@ void qso_qsl_vwr::draw_image() {
 			// we have an image
 			// Set the resized image as the selected and unselected image for the control
 			bn_card_display_->image(scaled_image_);
-			bn_card_display_->deimage(scaled_image_);
+			bn_card_display_->deimage(desat_image_);
 		}
 		else {
 			// Display the error message in red.

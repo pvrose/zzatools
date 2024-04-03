@@ -39,6 +39,7 @@ main.cpp - application entry point
 #include "qso_manager.h"
 #include "logo.h"
 #include "wx_handler.h"
+#include "timestamp.h"
 
 // C/C++ header files
 #include <ctime>
@@ -72,8 +73,7 @@ using namespace std;
 string COPYRIGHT = "\302\251 Philip Rose GM3ZZA 2018. All rights reserved.\nPrefix data courtesy of clublog.org";
 string PROGRAM_ID = "ZZALOG";
 string PROG_ID = "ZLG";
-string PROGRAM_VERSION = "3.4.67";
-string TIMESTAMP = __DATE__ + string(" ") + __TIME__;
+string PROGRAM_VERSION = "3.4.68";
 string VENDOR = "GM3ZZA";
 string LOGO_CHAR = "\360\237\214\271";
 
@@ -946,7 +946,10 @@ int main(int argc, char** argv)
 	Fl::args(argc, argv, i, cb_args);
 	if (DISPLAY_VERSION) {
 		// Display version
-		printf("%s Version %s\n", PROGRAM_ID.c_str(), PROGRAM_VERSION.c_str());
+		printf("%s Version %s Compiled %s\n", 
+			PROGRAM_ID.c_str(), 
+			PROGRAM_VERSION.c_str(),
+			TIMESTAMP.c_str());
 		return 0;
 	}
 	if (HELP) {
@@ -1011,6 +1014,7 @@ int main(int argc, char** argv)
 	}
 	// Delete everything we've created
 	tidy();
+	printf("ZZALOG Closed\n");
 	return code;
 }
 
