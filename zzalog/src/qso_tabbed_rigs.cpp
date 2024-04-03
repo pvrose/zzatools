@@ -94,7 +94,7 @@ void qso_tabbed_rigs::enable_widgets() {
 			}
 			else {
 				w->labelfont((w->labelfont() & (~FL_BOLD)) | FL_ITALIC);
-				w->labelcolor(COLOUR_GREY);
+				w->labelcolor(FL_FOREGROUND_COLOR);
 			}
 		}
 	}

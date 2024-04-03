@@ -57,7 +57,7 @@ void qso_clocks::enable_widgets() {
 		}
 		else {
 			wx->labelfont((wx->labelfont() & (~FL_BOLD)) | FL_ITALIC);
-			wx->labelcolor(COLOUR_GREY);
+			wx->labelcolor(FL_FOREGROUND_COLOR);
 		}
 	}
 	utc_clock_->enable_widgets();

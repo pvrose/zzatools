@@ -158,7 +158,7 @@ void settings::enable_widgets() {
 		}
 		else {
 			wx->labelfont((wx->labelfont() & (~FL_BOLD)) | FL_ITALIC);
-			wx->labelcolor(COLOUR_GREY);
+			wx->labelcolor(FL_FOREGROUND_COLOR);
 		}
 	}
 	set_label(dlg);

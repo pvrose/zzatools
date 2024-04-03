@@ -87,7 +87,7 @@ void qso_net_entry::enable_widgets() {
 		}
 		else {
 			wx->labelfont((wx->labelfont() & (~FL_BOLD)) | FL_ITALIC);
-			wx->labelcolor(COLOUR_GREY);
+			wx->labelcolor(FL_FOREGROUND_COLOR);
 		}
 		qso_entry* qe = (qso_entry*)wx;
 		if (qe->qso()) qe->copy_label(qe->qso()->item("CALL").c_str());

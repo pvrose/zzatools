@@ -59,7 +59,7 @@ void qso_misc::enable_widgets() {
 		}
 		else {
 			wx->labelfont((wx->labelfont() & (~FL_BOLD)) | FL_ITALIC);
-			wx->labelcolor(COLOUR_GREY);
+			wx->labelcolor(FL_FOREGROUND_COLOR);
 		}
 	}
 	qth_->enable_widgets();
