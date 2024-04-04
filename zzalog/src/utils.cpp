@@ -270,11 +270,11 @@ string now(bool local, const char* format, bool add_ms) {
 
 	seconds s = duration_cast<seconds>(ms);
 	time_t t = s.count();
-	tm* utc = gmtime(&t);
+	tm* now = local ? localtime(&t) : gmtime(&t);
 	size_t fractional_seconds = ms.count() % 1000;
 
 	char result[50];
-	strftime(result, sizeof(result), format, utc);
+	strftime(result, sizeof(result), format, now);
 	if (add_ms) {
 		char ms[5];
 		snprintf(ms, sizeof(ms), ".%03d", (int)fractional_seconds);

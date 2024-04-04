@@ -1,5 +1,9 @@
+#include "utils.h"
 #include <string>
 
 using namespace std;
 
-string TIMESTAMP = __DATE__ + string(" ") + __TIME__;
+string TIMESTAMP = now(true, "%Y/%m/%d %H:%M:%S %Z");
+
+
+
