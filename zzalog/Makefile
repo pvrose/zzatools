@@ -107,9 +107,9 @@ $(INSTALL_DIR)/$(TARGET_EXEC): $(EXEC_DIR)/$(TARGET_EXEC)
 	@echo $(INSTALL_DIR)/$(TARGET_EXEC)
 	@sudo cp $(EXEC_DIR)/$(TARGET_EXEC) $(INSTALL_DIR)
 
-.PHONY: force
-force:
-	@touch include/timestamp.h
+.PHONY: ts
+ts:
+	@touch src/timestamp.cpp
 
 # Include the .d makefiles. The - at the front suppresses the errors of missing
 # Makefiles. Initially, all the .d files will be missing, and we don't want those

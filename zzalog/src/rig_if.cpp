@@ -45,35 +45,6 @@ string rig_if::get_smeter(bool max) {
 	return text;
 }
 
-// Returns the string displaying the rig information for the rig status
-// e.g. Hamlib: TS-2000 14.123456 MHz 10 W USB S9+20
-string rig_if::rig_info() {
-	string rig_info = hamlib_data_->model;
-	// Valid rig - get data from it. TX frequency
-	if (rig_data_.split) {
-		if (is_good()) rig_info += " TX:" + get_frequency(true) + " MHz";
-		if (is_good()) rig_info += " RX:" + get_frequency(false) + " MHz";
-	}
-	else {
-		if (is_good()) rig_info += " " + get_frequency(true) + " MHz";
-	}
-	if (is_good()) rig_info += " " + get_tx_power(false) + " W";
-	string mode;
-	string submode;
-	if (is_good()) {
-		get_string_mode(mode, submode);
-		if (submode.length()) {
-			rig_info += " " + mode + "(" + submode + ")";
-		}
-		else {
-			rig_info += " " + mode;
-		}
-	}
-	if (is_good()) rig_info += " " + get_smeter(false);
-	//if (is_good()) rig_info += " " + get_swr_meter();
-	return rig_info;
-}
-
 // Return the transmit or receive frequency
 double rig_if::get_dfrequency(bool tx) {
 	// Read the frequency (in MHz)

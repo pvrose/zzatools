@@ -39,7 +39,6 @@ main.cpp - application entry point
 #include "qso_manager.h"
 #include "logo.h"
 #include "wx_handler.h"
-#include "timestamp.h"
 
 // C/C++ header files
 #include <ctime>
@@ -67,8 +66,6 @@ main.cpp - application entry point
 
 using namespace std;
 
-
-
 // Program strings
 string COPYRIGHT = "\302\251 Philip Rose GM3ZZA 2018. All rights reserved.\nPrefix data courtesy of clublog.org";
 string PROGRAM_ID = "ZZALOG";
@@ -76,6 +73,7 @@ string PROG_ID = "ZLG";
 string PROGRAM_VERSION = "3.4.68";
 string VENDOR = "GM3ZZA";
 string LOGO_CHAR = "\360\237\214\271";
+extern string TIMESTAMP;
 
 // switches
 // Debug levels

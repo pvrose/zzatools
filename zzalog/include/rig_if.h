@@ -92,8 +92,6 @@ using namespace std;
 		bool open();
 		// Return rig name
 		string& rig_name();
-		// Formatted values
-		string rig_info();
 		// Return the most recent error message
 		string error_message(const char* func_name);
 
