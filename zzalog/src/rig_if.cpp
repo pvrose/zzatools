@@ -181,6 +181,8 @@ rig_if::rig_if(const char* name, hamlib_data_t* data)
 	freq_modifier_ = 0.0;
 	modify_power_ = UNMODIFIED;
 	power_modifier_ = 0.0;
+	// Last PTT off
+	last_ptt_off_ = system_clock::now();;
 	
 	// If the name has been set, there is a rig
 	if (my_rig_name_.length()) {
@@ -452,6 +454,10 @@ void rig_if::th_read_values() {
 		return;
 	}
 	rig_data_.ptt = ptt == ptt_t::RIG_PTT_ON;
+	// If we are releasing PTT record the time
+	if (current_ptt & !ptt) {
+		last_ptt_off_ = system_clock::now();
+	}
 	// S-meter - set to max value during RX and last RX value during TX
 	value_t meter_value;
 	if (opened_ok_) error_code_ = rig_get_level(rig_, RIG_VFO_CURR, RIG_LEVEL_STRENGTH, &meter_value);
@@ -478,9 +484,13 @@ void rig_if::th_read_values() {
 		opened_ok_ = false;
 		return;
 	}
-	// RX->TX - use read value
+	// RX->TX - reset the power level unless...
 	if (!current_ptt && rig_data_.ptt) {
-		rig_data_.pwr_value = meter_value.f;
+		// ...PTT is released for only a few seconds (e.g. CW break-in or SSB VOX)
+		seconds gap = duration_cast<seconds>(system_clock::now() - last_ptt_off_);
+		if ( gap > seconds(10)) {
+			rig_data_.pwr_value = meter_value.f;
+		}
 	}
 	// TX use accumulated maximum value
 	else if (rig_data_.ptt) {
@@ -488,6 +498,7 @@ void rig_if::th_read_values() {
 			rig_data_.pwr_value = (double)meter_value.f;
 		}
 	}
+	// Also store iommediate value
 	rig_data_.pwr_meter = (double)meter_value.f;
 	// All successful
 	count_down_ = FAST_RIG_TIMER;

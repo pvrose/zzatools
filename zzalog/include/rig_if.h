@@ -16,8 +16,10 @@
 #include <thread>
 #include <atomic>
 #include <mutex>
+#include <chrono>
 
 using namespace std;
+using namespace std::chrono;
 
 	// Encoding of result from reading the mode from the rig
 	enum rig_mode_t {
@@ -184,5 +186,10 @@ using namespace std;
 			ABS_POWER
 		} modify_power_;
 		double power_modifier_; 
+
+		// The time of the last PTT off - to decide if it's a new over
+		system_clock::time_point last_ptt_off_;
+
+
 };
 #endif
