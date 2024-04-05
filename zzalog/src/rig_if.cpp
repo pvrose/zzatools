@@ -488,7 +488,7 @@ void rig_if::th_read_values() {
 	if (!current_ptt && rig_data_.ptt) {
 		// ...PTT is released for only a few seconds (e.g. CW break-in or SSB VOX)
 		seconds gap = duration_cast<seconds>(system_clock::now() - last_ptt_off_);
-		if ( gap > seconds(10)) {
+		if ( gap > seconds(5)) {
 			rig_data_.pwr_value = meter_value.f;
 		}
 	}

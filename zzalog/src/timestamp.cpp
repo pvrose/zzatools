@@ -3,7 +3,7 @@
 
 using namespace std;
 
-string TIMESTAMP = now(true, "%Y/%m/%d %H:%M:%S %Z");
+string TIMESTAMP = __DATE__ " " __TIME__;
 
 
 

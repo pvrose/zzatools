@@ -209,6 +209,10 @@ void qso_wx::enable_widgets() {
 			snprintf(label, sizeof(label), "%0.0f\nm/s", wind_speed * 1760 * 36 *25.4 / 3600000);
 			break;
 		}
+		case KM_PER_HOUR: {
+			snprintf(label, sizeof(label), "%0.0f\nkm/h", wind_speed * 1760 * 36 *25.4 / 1000000);
+			break;
+		}
 		case KNOTS: {
 			snprintf(label, sizeof(label), "%0.0f\nknot", wind_speed * 0.868976);
 			break;
@@ -328,6 +332,10 @@ void qso_wx::cb_bn_speed(Fl_Widget* w, void * v) {
 			break;
 		}
 		case METRE_PER_SECOND: {
+			that->display_speed_ = KM_PER_HOUR;
+			break;
+		}
+		case KM_PER_HOUR: {
 			that->display_speed_ = KNOTS;
 			break;
 		}

@@ -37,6 +37,7 @@ protected:
 	enum {
 		METRE_PER_SECOND,
 		MILE_PER_HOUR,
+		KM_PER_HOUR,
         KNOTS
 	} display_speed_;
 	enum {
