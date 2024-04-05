@@ -108,6 +108,8 @@ using namespace std::chrono;
 		bool is_opening();
 		// Rig timer callback
 		void ticker();
+		// Port has no CAT
+		bool has_no_cat();
 
 		// return mode/submode
 		void get_string_mode(string& mode, string& submode);

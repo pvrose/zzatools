@@ -622,7 +622,7 @@ void qso_data::action_activate(qso_init_t mode) {
 	qso_manager* mgr = ancestor_view<qso_manager>(this);
 	logging_state_ = QSO_PENDING;
 	action_new_qso(source_record, mode);
-	enable_widgets();
+	update_rig();
 }
 
 // Action START - transition from QSO_PENDING to QSO_STARTED
@@ -1394,7 +1394,8 @@ void qso_data::update_rig() {
 	// Get freq etc from QSO or rig
 // Get present values data from rig
 	if (logging_state_ == QSO_PENDING) {
-		if (((qso_manager*)parent())->rig()->is_good()) {
+		rig_if* rig = ((qso_manager*)parent())->rig();
+		if (rig->is_good() || rig->has_no_cat()) {
 			g_entry_->update_rig();
 			g_entry_->copy_cat_to_qso();
 		}

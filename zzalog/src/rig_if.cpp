@@ -595,3 +595,7 @@ void rig_if::clear_power_modifier() {
 	modify_power_ = UNMODIFIED;
 	power_modifier_ = 0;
 }
+
+bool rig_if::has_no_cat() {
+	return (hamlib_data_->port_type == RIG_PORT_NONE);
+}

@@ -491,7 +491,7 @@ void qso_rig::enable_widgets() {
 	// Status
 	if (!rig_) {
 		op_status_->value("No rig specified");
-		op_status_->textcolor(DARK ? FL_YELLOW : fl_darker(FL_YELLOW));
+		op_status_->textcolor(FL_MAGENTA);
 	} else if (rig_->is_opening()) {
 		op_status_->value("Opening rig");
 		op_status_->textcolor(DARK ? FL_CYAN : fl_darker(FL_CYAN));
@@ -503,6 +503,9 @@ void qso_rig::enable_widgets() {
 			op_status_->value("Receiving");
 			op_status_->textcolor(DARK ? FL_GREEN : fl_darker(FL_GREEN));
 		}
+	} else if (rig_->has_no_cat()) {
+		op_status_->value("No CAT Available");
+		op_status_->textcolor(FL_MAGENTA);
 	} else {
 		op_status_->value("Disconnected");
 		op_status_->textcolor(DARK ? COLOUR_ORANGE : fl_darker(COLOUR_ORANGE));
