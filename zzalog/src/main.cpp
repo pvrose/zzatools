@@ -581,8 +581,6 @@ string get_file(char * arg_filename) {
 	else {
 		result = arg_filename;
 	}
-	// Add the selected file to the front of the recent file list (and update menu)
-	set_recent_file(result);
 	return result;
 }
 
@@ -674,17 +672,20 @@ void add_book(char* arg) {
 			backup_settings.get("Last Backup", temp, "");
 			string backup = temp;
 			// Cannot access book - try backup
-			char msg[100];
-			snprintf(msg, sizeof(msg), "ZZALOG: Load failed, trying backup %s", backup.c_str());
-			status_->misc_status(ST_WARNING, msg);
-			if (book_->load_data(backup)) {
-				using_backup_ = true;
-				status_->misc_status(ST_OK, "ZZALOG: Load backup successful");
-			} else {
-				status_->misc_status(ST_ERROR, "ZZALOG: Load backup failed");
+			if (fl_choice("Load %s failed - load from backup %s", "Yes", "No", nullptr, log_file.c_str(), backup.c_str()) == 0) {
+				char msg[100];
+				snprintf(msg, sizeof(msg), "ZZALOG: Load failed, trying backup %s", backup.c_str());
+				status_->misc_status(ST_WARNING, msg);
+				if (book_->load_data(backup)) {
+					using_backup_ = true;
+					status_->misc_status(ST_OK, "ZZALOG: Load backup successful");
+				} else {
+					status_->misc_status(ST_ERROR, "ZZALOG: Load backup failed");
+				}
 			}
 		} else {
-			
+			// Set recent file
+			set_recent_file(log_file);
 		}
 	}
 }
