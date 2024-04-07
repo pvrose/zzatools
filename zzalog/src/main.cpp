@@ -674,7 +674,7 @@ void add_book(char* arg) {
 			// Cannot access book - try backup
 			if (fl_choice("Load %s failed - load from backup %s", "Yes", "No", nullptr, log_file.c_str(), backup.c_str()) == 0) {
 				char msg[100];
-				snprintf(msg, sizeof(msg), "ZZALOG: Load failed, trying backup %s", backup.c_str());
+				snprintf(msg, sizeof(msg), "ZZALOG: Load %s failed, trying backup %s", log_file.c_str(), backup.c_str());
 				status_->misc_status(ST_WARNING, msg);
 				if (book_->load_data(backup)) {
 					using_backup_ = true;
@@ -682,6 +682,10 @@ void add_book(char* arg) {
 				} else {
 					status_->misc_status(ST_ERROR, "ZZALOG: Load backup failed");
 				}
+			} else {
+				char msg[100];
+				snprintf(msg, sizeof(msg), "ZZALOG: Load %s failed, no backup loaded", log_file.c_str());
+				status_->misc_status(ST_ERROR, msg);
 			}
 		} else {
 			// Set recent file
