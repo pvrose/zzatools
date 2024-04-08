@@ -45,7 +45,9 @@
 		void check_connected();
 
 		// The currently selected record
-		record* current_record_;
+		record* current_qso_;
+		// The record possibly being created
+		record* putative_qso_;
 		// RPC handler
 		rpc_handler* rpc_handler_;
 

@@ -80,6 +80,7 @@ istream& adi_reader::load_record(record* in_record, istream& in, load_result_t& 
 		// Each ADIF item is "<NAME:l[:T]>VALUE    " until <EOR> or <EOH>
 		string field = "";
 		string value = "";
+		string old_value = "";
 		// Until : or > is read
 		in.get(c);
 		while (c != ':' && c != '>' && in.good()) {
@@ -189,11 +190,13 @@ istream& adi_reader::load_record(record* in_record, istream& in, load_result_t& 
 							validity = INVALID_TYPE;
 						}
 						// Multiple instances of field
-						if (validity == NO_ERROR && in_record->item(field) != "") {
+						if (validity == NO_ERROR && in_record->item(field) != "" &&
+							in_record->item(field) != value) {
 							validity = DUPLICATE;
+							old_value = in_record->item(field);
 						}
 						// If the user or app. defined field is valid or it's an ADIF defined field
-						if (validity == NO_ERROR) {
+						if (validity == NO_ERROR || validity == DUPLICATE) {
 							// Get the expected datatype
 							char data_type_indicator = spec_data_->datatype_indicator(field);
 							// All enumerated values are treated as upper-case
@@ -233,12 +236,14 @@ istream& adi_reader::load_record(record* in_record, istream& in, load_result_t& 
 							status_->misc_status(ST_ERROR, message);
 							break;
 						case DUPLICATE:
-							sprintf(message, "LOG: %s %s %s - duplicate field %s",
+							sprintf(message, "LOG: %s %s %s - duplicate field %s: was %s is %s",
 								in_record->item("QSO_DATE").c_str(),
 								in_record->item("TIME_ON").c_str(),
 								in_record->item("CALL").c_str(),
-								bad_field.c_str());
-							status_->misc_status(ST_ERROR, message);
+								bad_field.c_str(),
+								old_value.c_str(),
+								value.c_str());
+							status_->misc_status(ST_WARNING, message);
 							break;
 						}
 					}

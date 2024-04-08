@@ -47,7 +47,8 @@ public:
 		NET_EDIT,        // Converting sngle QSO into a net by adding callsigns
 		NET_ADDING,      // Adding a new QSO to the started net.
 		SWITCHING,       // Switching state - used to ignore stuff
-		QSO_MODEM,       // Recording QSOs from a modem - allows editing of recveived qso
+		QSO_WSJTX,       // Recording QSOs from WSJT-X - allows editing of recveived qso
+		QSO_FLDIGI,      // Recording QSos from FlDIGI
 		MANUAL_ENTRY,    // Allow the definition of a record to query
 	};
 
@@ -66,7 +67,8 @@ public:
 		QSO_COPY_CONDX,     // Start a QSO copying station details and CAT conditions
 		QSO_COPY_FOR_NET,   // Start a QSO copyin station details, CAT conditions and start time
 		QSO_AS_WAS,         // Used with action_activate() to maintain the existing one
-		QSO_COPY_MODEM,     // Copy QSO to modem
+		QSO_COPY_WSJTX,     // Copy QSO to modem
+		QSO_COPY_FLDIGI,    // Copy QSO from Fldigi
 	};
 
 public:
@@ -98,7 +100,7 @@ public:
 	// Update query
 	void update_query(logging_state_t query, qso_num_t match_num, qso_num_t query_num);
 	// start a ,mode QSO
-	record* start_modem_qso(string call);
+	record* start_modem_qso(string call, qso_init_t source);
 	// Update modem QSO
 	void update_modem_qso(bool log_it);
 	//. Add a modemm QSO

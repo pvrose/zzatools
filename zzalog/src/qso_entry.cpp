@@ -177,7 +177,8 @@ void qso_entry::enable_widgets() {
 		break;
 	case qso_data::QSO_STARTED:
 	case qso_data::NET_STARTED:
-	case qso_data::QSO_MODEM:
+	case qso_data::QSO_WSJTX:
+	case qso_data::QSO_FLDIGI:
 	case qso_data::QSO_EDIT:
 	case qso_data::NET_EDIT:
 	case qso_data::QSO_ENTER:

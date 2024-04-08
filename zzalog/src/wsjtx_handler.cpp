@@ -160,7 +160,6 @@ int wsjtx_handler::send_hbeat() {
 int wsjtx_handler::handle_close(stringstream& ss) {
 	status_->misc_status(ST_NOTE, "WSJT-X: Received Closing down");
 	// Clear any WSJT-X related items
-	// qso_manager_->update_modem_qso(nullptr);
 	menu_->update_items();
 	return 1;
 }
@@ -210,7 +209,6 @@ int wsjtx_handler::handle_decode(stringstream& ss) {
 	snprintf(t, sizeof(t), "%02d%02d%02.0f", hours, minutes, seconds);
 	record* qso = update_qso(false, string(t), (double)decode.d_freq, decode.message);
 	if (qso) qso_manager_->update_modem_qso(false);
-	// if (qso) qso_manager_->update_modem_qso(qso);
 	return 0;
 }
 
@@ -237,7 +235,6 @@ int wsjtx_handler::handle_reply(stringstream& ss) {
 	snprintf(t, sizeof(t), "%02d%02d%02.0f", hours, minutes, seconds);
 	record* qso = update_qso(false, string(t), (double)decode.d_freq, decode.message);
 	if (qso) qso_manager_->update_modem_qso(false);
-	// if (qso) qso_manager_->update_modem_qso(qso);
 	return 0;
 }
 
@@ -301,7 +298,6 @@ int wsjtx_handler::handle_status(stringstream& ss) {
 		if (!tx_semaphore_.test_and_set()) {
 			record* qso = update_qso(true, now(false, "%H%M%S"), (double)status.tx_offset, status.tx_message);
 			if (qso && qso->item("CALL").substr(0,2) != "CQ") qso_manager_->update_modem_qso(false);
-			// if (qso) qso_manager_->update_modem_qso(qso);
 			tx_semaphore_.clear();
 		}
 	}
@@ -712,7 +708,7 @@ record* wsjtx_handler::update_qso(bool tx, string time, double audio_freq, strin
 
 record* wsjtx_handler::new_qso(string call) {
 	qsos_[call] = nullptr;
-	record * qso = qso_manager_->start_modem_qso(call);
+	record * qso = qso_manager_->start_modem_qso(call, qso_data::QSO_COPY_WSJTX);
 	qso->item("CALL", call);
 	qso->item("BAND", spec_data_->band_for_freq(dial_frequency_));
 	qso->item("MODE", mode_);

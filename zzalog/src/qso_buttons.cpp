@@ -52,7 +52,8 @@ map<qso_data::logging_state_t, list<qso_buttons::button_type> > button_map_ =
 		qso_buttons::NAV_FIRST, qso_buttons::NAV_PREV, qso_buttons::NAV_NEXT, qso_buttons::NAV_LAST,
 	    qso_buttons::ADD_NET_QSO, qso_buttons::UPDATE_CAT, qso_buttons::QRZ_COM }},
 	{ qso_data::MANUAL_ENTRY, { qso_buttons::EXEC_QUERY, qso_buttons::IMPORT_QUERY, qso_buttons::CANCEL_QUERY, qso_buttons::LOOK_ALL_TXT }},
-	{ qso_data::QSO_MODEM, { qso_buttons::CANCEL_QSO }},
+	{ qso_data::QSO_WSJTX, { qso_buttons::CANCEL_QSO }},
+	{ qso_data::QSO_FLDIGI, { qso_buttons::CANCEL_QSO }},
 };
 
 map<qso_buttons::button_type, qso_buttons::button_action> action_map_ =
@@ -303,7 +304,8 @@ void qso_buttons::cb_cancel(Fl_Widget* w, void* v) {
 	case qso_data::NET_EDIT:
 		data->action_cancel_net_edit();
 		break;
-	case qso_data::QSO_MODEM:
+	case qso_data::QSO_WSJTX:
+	case qso_data::QSO_FLDIGI:
 		data->action_cancel_modem();
 		break;
 	}

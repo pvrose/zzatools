@@ -94,7 +94,7 @@ using namespace std;
 		// Present query (uses view update mechanism)
 		void update_qso(hint_t hint, qso_num_t match_num, qso_num_t query_num);
 		// Start modem - returns a new record
-		record* start_modem_qso(string call);
+		record* start_modem_qso(string call, qso_data::qso_init_t source);
 		// Log modem record
 		void update_modem_qso(bool log_it);
 		// Log modem record

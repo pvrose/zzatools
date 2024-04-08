@@ -246,8 +246,17 @@ void qso_data::enable_widgets() {
 			g_net_entry_->enable_widgets();
 			g_qy_entry_->hide();
 			break;
-		case QSO_MODEM:
-			snprintf(l, sizeof(l), "QSO Entry - %s - record received from modem app", current_qso()->item("CALL").c_str());
+		case QSO_WSJTX:
+			snprintf(l, sizeof(l), "QSO Entry - %s - record received from WSJTX", current_qso()->item("CALL").c_str());
+			g_entry_->copy_label(l);
+			g_entry_->show();
+			g_entry_->enable_widgets();
+			g_net_entry_->hide();
+			g_query_->hide();
+			g_qy_entry_->hide();
+			break;
+		case QSO_FLDIGI:
+			snprintf(l, sizeof(l), "QSO Entry - %s - record received from FLDIGI", current_qso()->item("CALL").c_str());
 			g_entry_->copy_label(l);
 			g_entry_->show();
 			g_entry_->enable_widgets();
@@ -411,7 +420,7 @@ void qso_data::update_query(logging_state_t query, qso_num_t match_num, qso_num_
 }
 
 // Update modem QSO
-record* qso_data::start_modem_qso(string call) {
+record* qso_data::start_modem_qso(string call, qso_init_t source) {
 	bool allow_modem = true;
 	switch (logging_state_) {
 	case QSO_PENDING:
@@ -446,7 +455,8 @@ record* qso_data::start_modem_qso(string call) {
 		action_cancel_edit();
 		break;
 
-	case QSO_MODEM:
+	case QSO_WSJTX:
+	case QSO_FLDIGI:
 	// We are altready displaying a modem QSO
 		action_cancel_modem();
 		break;
@@ -457,8 +467,8 @@ record* qso_data::start_modem_qso(string call) {
 	}
 	if (allow_modem) {
 		// printf("DEBUG DASH Received request to create a record for %s\n", call.c_str());
-		action_activate(QSO_COPY_MODEM);
-		action_start(QSO_COPY_MODEM);
+		action_activate(source);
+		action_start(source);
 		current_qso()->item("CALL", call);
 		// printf("DEBUG DASH generated %s - %p\n", call.c_str(), current_qso());
 		return current_qso();
@@ -470,7 +480,8 @@ record* qso_data::start_modem_qso(string call) {
 // Update modem QSO
 void qso_data::update_modem_qso(bool log_it) {
 	switch (logging_state_) {
-	case QSO_MODEM: {
+	case QSO_WSJTX:
+	case QSO_FLDIGI: {
 		if (log_it) {
 			action_log_modem();
 			logging_state_ = QSO_INACTIVE;
@@ -602,7 +613,8 @@ void qso_data::action_new_qso(record* qso, qso_init_t mode) {
 		qe->copy_qso_to_qso(qso, qso_entry::CF_TIME | qso_entry::CF_DATE | qso_entry::CF_RIG_ETC | qso_entry::CF_CAT);
 		qe->copy_clock_to_qso();
 		break;
-	case QSO_COPY_MODEM:
+	case QSO_COPY_WSJTX:
+	case QSO_COPY_FLDIGI:
 		// Set QSO and Update the display
 		qe->qso(-1);
 		// ancestor_view<qso_manager>(this)->update_import_qso(qso);
@@ -637,8 +649,11 @@ void qso_data::action_start(qso_init_t mode) {
 	case QSO_NONE:
 		logging_state_ = QSO_ENTER;
 		break;
-	case QSO_COPY_MODEM:
-		logging_state_ = QSO_MODEM;
+	case QSO_COPY_WSJTX:
+		logging_state_ = QSO_WSJTX;
+		break;
+	case QSO_COPY_FLDIGI:
+		logging_state_ = QSO_FLDIGI;
 		break;
 	default:
 		logging_state_ = QSO_STARTED;
@@ -655,7 +670,8 @@ bool qso_data::action_save() {
 	qso_num_t qso_number = -1;
 	switch (logging_state_) {
 	case QSO_STARTED:
-	case QSO_MODEM:
+	case QSO_WSJTX:
+	case QSO_FLDIGI:
 	case QSO_ENTER:
 		item_number = book_->item_number(g_entry_->qso_number());
 		qso = g_entry_->qso();
@@ -705,7 +721,8 @@ bool qso_data::action_save() {
 		qso_number = book_->record_number(item_number);
 		break;
 	case QSO_NONE:
-	case QSO_COPY_MODEM:
+	case QSO_COPY_WSJTX:
+	case QSO_COPY_FLDIGI:
 		// Put the record in its correct position and save that position
 		item_number = book_->correct_record_position(item_number);
 		qso_number = book_->record_number(item_number);
@@ -735,7 +752,8 @@ bool qso_data::action_save() {
 		logging_state_ = QSO_INACTIVE;
 		action_activate(previous_mode_);
 		break;
-	case QSO_MODEM:
+	case QSO_WSJTX:
+	case QSO_FLDIGI:
 		logging_state_ = SWITCHING;
 		book_->modified(true);
 		book_->selection(item_number, HT_INSERTED);
@@ -774,7 +792,8 @@ void qso_data::action_cancel() {
 		g_entry_->delete_qso();
 		logging_state_ = QSO_INACTIVE;
 		break;
-	case QSO_MODEM:
+	case QSO_WSJTX:
+	case QSO_FLDIGI:
 		logging_state_ = QSO_INACTIVE;
 		break;
 	case NET_STARTED:
@@ -1269,8 +1288,10 @@ void qso_data::action_log_modem() {
 // Cacncel a modem record
 void qso_data::action_cancel_modem() {
 	// printf("DEBUG DASH - Cancelling modem %s - %p\n", current_qso()->item("CALL").c_str(), current_qso());
+	if (logging_state_ == QSO_WSJTX) {
+		wsjtx_handler_->delete_qso(current_qso()->item("CALL"));
+	}
 	logging_state_ = QSO_INACTIVE;
-	wsjtx_handler_->delete_qso(current_qso()->item("CALL"));
 	g_entry_->delete_qso();
 	book_->delete_record(true);
 	book_->enable_save(true, "Cancel real-time modem QSO");
@@ -1482,7 +1503,8 @@ record* qso_data::current_qso() {
 	case QSO_ENTER:
 	case QSO_EDIT:
 	case QSO_VIEW:
-	case QSO_MODEM:
+	case QSO_WSJTX:
+	case QSO_FLDIGI:
 		return g_entry_->qso();
 	case QSO_BROWSE:
 	case QUERY_DUPE:
@@ -1510,7 +1532,8 @@ qso_num_t qso_data::current_number() {
 	case QSO_ENTER:
 	case QSO_EDIT:
 	case QSO_VIEW:
-	case QSO_MODEM:
+	case QSO_WSJTX:
+	case QSO_FLDIGI:
 		return g_entry_->qso_number();
 	case QSO_BROWSE:
 	case QUERY_DUPE:

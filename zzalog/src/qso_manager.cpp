@@ -227,7 +227,8 @@ bool qso_manager::editing() {
 	case qso_data::NET_STARTED:
 	case qso_data::NET_ADDING:
 	case qso_data::NET_EDIT:
-	case qso_data::QSO_MODEM:
+	case qso_data::QSO_WSJTX:
+	case qso_data::QSO_FLDIGI:
 		return true;
 	case qso_data::QSO_EDIT:
 	case qso_data::QSO_STARTED:
@@ -254,7 +255,8 @@ bool qso_manager::qso_in_progress() {
 	case qso_data::QSO_ENTER:
 		return false;
 	case qso_data::QSO_STARTED:
-	case qso_data::QSO_MODEM:
+	case qso_data::QSO_WSJTX:
+	case qso_data::QSO_FLDIGI:
 	case qso_data::NET_STARTED:
 		return true;
 	}
@@ -422,8 +424,8 @@ void qso_manager::update_modem_qso(bool log_it) {
 }
 
 // Start a modem QSO
-record* qso_manager::start_modem_qso(string call) {
-	return data_group_->start_modem_qso(call);
+record* qso_manager::start_modem_qso(string call, qso_data::qso_init_t source) {
+	return data_group_->start_modem_qso(call, source);
 }
 
 // Enter a modem QSO
