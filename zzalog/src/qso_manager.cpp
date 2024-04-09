@@ -198,6 +198,7 @@ void qso_manager::enable_widgets() {
 
 	data_group_->enable_widgets();
 	rig_group_->enable_widgets();
+	info_group_->enable_widgets();
 
 }
 

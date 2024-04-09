@@ -237,15 +237,18 @@ void qso_wx::enable_widgets() {
 	}
 	bn_speed_->copy_label(label);
 
+	bn_direction_->label(nullptr);
 	bn_direction_->image(nullptr);
 	switch(display_direction_) {
 		case CARDINAL: {
 			snprintf(label, sizeof(label), "%s", wind_dirn.c_str());
+			bn_direction_->copy_label(label);
 			break;
 		}
 		case DEGREES: {
 			if (wind_degree == -1) strcpy(label, "---"); 
 			else snprintf(label, sizeof(label), "%03d\302\260", wind_degree);
+			bn_direction_->copy_label(label);
 			break;
 		}
 		case ARROW: {
@@ -259,15 +262,12 @@ void qso_wx::enable_widgets() {
 			// else if (wind_degree < 293) strcpy(label, "@6arrow");
 			// else if (wind_degree < 338) strcpy(label, "@3arrow");
 			// else strcpy(label, "@2arrow");
-			strcpy(label, "");
 			draw_wind_dirn(bn_direction_, wind_degree);
 			break;
 		}
 		default:
-			strcpy(label, "");
 			break;
 	}
-	bn_direction_->copy_label(label);
 	switch(display_pressure_) {
 		case HECTOPASCAL: {
 			snprintf(label, sizeof(label), "%0.0f\nhPa", pressure);
@@ -445,7 +445,7 @@ void qso_wx::cb_bn_cloud(Fl_Widget* w, void* v) {
 void qso_wx::draw_wind_dirn(Fl_Widget* w, unsigned int dirn) {
 	// Find central position
 	int x_zero = w->w() / 2;
-	int y_zero = w->h() / 2 + 5;
+	int y_zero = w->h() / 2;
 	// arrow will fill 80% widget
 	int radius = min(x_zero, y_zero) * 7 / 10;
 	float angle = dirn * DEGREE_RADIAN;
@@ -468,7 +468,6 @@ void qso_wx::draw_wind_dirn(Fl_Widget* w, unsigned int dirn) {
 		fl_arc(x_zero-(radius/2), y_zero-(radius/2), radius, radius	, 0, 360);
 	} else {
 		fl_line(x_start, y_start, x_end, y_end);
-		// TODO add an arrow head
 		float rad45 = 15 * DEGREE_RADIAN;
 		int arrow_len = radius;
 		float arrow_l = angle + rad45;
@@ -487,6 +486,6 @@ void qso_wx::draw_wind_dirn(Fl_Widget* w, unsigned int dirn) {
 	Fl_Surface_Device::pop_current();
 
 	// Now put the image into the widget
-	w->label("");
+	w->label(nullptr);
 	w->image(image);
 }

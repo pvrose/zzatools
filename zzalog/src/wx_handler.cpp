@@ -187,7 +187,7 @@ void wx_handler::update() {
 // Timer 
 void wx_handler::ticker() {
     update();
-
+    qso_manager_->enable_widgets();
 }
 
 // Get the various weather items - 
