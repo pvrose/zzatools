@@ -152,7 +152,6 @@ void status::progress(int value, object_t object) {
 					update_progress(progress_stack_.back());
 				}
 			}
-			Fl::check();
 		}
 	}
 }

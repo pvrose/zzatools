@@ -4,11 +4,14 @@
 #include "qso_manager.h"
 #include "drawing.h"
 #include "wx_handler.h"
+#include "utils.h"
 
 #include<ctime>
 
 #include <FL/Fl_Image.H>
 #include <FL/Fl_Preferences.H>
+#include <FL/Fl_Image_Surface.H>
+#include <FL/Fl_RGB_Image.H>
 
 extern wx_handler* wx_handler_;
 extern Fl_Preferences* settings_;
@@ -33,6 +36,8 @@ qso_wx::qso_wx
 qso_wx::~qso_wx()
 {
 	save_values();
+	// Delete any created images
+	bn_direction_->image(nullptr);
 }
 
 // get settings
@@ -43,6 +48,7 @@ void qso_wx::load_values() {
 	wx_settings.get("Direction", (int&)display_direction_, CARDINAL);
 	wx_settings.get("Temperature", (int&)display_temperature_, CELSIUS);
 	wx_settings.get("Pressure", (int&)display_pressure_, HECTOPASCAL);
+	wx_settings.get("Cloud", (int&)display_cloud_, PERCENT);
 }
 
 // Create form
@@ -59,7 +65,7 @@ void qso_wx::create_form(int X, int Y) {
 	const int WICON = 2 * HBUTTON;
 	const int WTEXT = WCLOCKS - WICON - GAP;
 	const int WWX = WCLOCKS - GAP;
-    const int WT4 = WWX / 4;
+    const int WT4 = WWX / 5;
     const int WT2 = WWX / 2;
 	const int WX_SIZE = FL_NORMAL_SIZE + 2;
 
@@ -90,7 +96,7 @@ void qso_wx::create_form(int X, int Y) {
 	bn_wx_description_->box(FL_FLAT_BOX);
 	bn_wx_description_->labelsize(WX_SIZE);
 
-	curr_y += WICON;
+	curr_y += WICON + GAP;
 	curr_x = X + GAP;
 	bn_temperature_ = new Fl_Button(curr_x, curr_y, WT4, WICON);
 	bn_temperature_->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE);
@@ -118,6 +124,13 @@ void qso_wx::create_form(int X, int Y) {
 	bn_pressure_->box(FL_FLAT_BOX);
 	bn_pressure_->labelsize(WX_SIZE);
 	bn_pressure_->callback(cb_bn_pressure, nullptr);
+
+	curr_x += WT4;
+	bn_cloud_ = new Fl_Button(curr_x, curr_y, WT4, WICON);
+	bn_cloud_->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE);
+	bn_cloud_->box(FL_FLAT_BOX);
+	bn_cloud_->labelsize(WX_SIZE);
+	bn_cloud_->callback(cb_bn_cloud, nullptr);
 
 	curr_x = X + GAP;
 	curr_y += WICON;
@@ -157,9 +170,12 @@ void qso_wx::enable_widgets() {
 	string wx_descr = wx_handler_ ? wx_handler_->description() : "";
 	float temperature = wx_handler_ ? wx_handler_->temperature() : 0.0; 
 	float wind_speed = wx_handler_ ? wx_handler_->wind_speed() : 0.0;
+	string wind_descr = wx_handler_ ? wx_handler_->wind_name() : "";
 	string wind_dirn = wx_handler_ ? wx_handler_->wind_direction() : "";
 	unsigned int wind_degree = wx_handler_ ? wx_handler_->wind_degrees() : 0;
 	float pressure = wx_handler_ ? wx_handler_->pressure() : 0.0;
+	float cloud_cover = wx_handler_ ? wx_handler_->cloud() : 0.0;
+	string cloud_descr = wx_handler_ ? wx_handler_->cloud_name() : "";
 	Fl_Image* icon = wx_handler_ ? wx_handler_->icon() : nullptr;
 	time_t updated = wx_handler_ ? wx_handler_->last_updated() : 0;
 	string wx_location = wx_handler_ ? wx_handler_->location() : "";
@@ -170,22 +186,19 @@ void qso_wx::enable_widgets() {
 	tm sundown_time;
 	tm updated_time;
 	char result[100];
-	if (display_local_) {
-		// Sunrise and sunset
-		sunup_time = *localtime(&sunrise);
-		sundown_time = *localtime(&sunset);
-		updated_time = *localtime(&updated);
-	}
-	else {
-		// Sunrise and sunset
-		sunup_time = *gmtime(&sunrise);
-		sundown_time = *gmtime(&sunset);
-		updated_time = *gmtime(&updated);
-	}
+	// Sunrise and sunset
+	sunup_time = *localtime(&sunrise);
+	sundown_time = *localtime(&sunset);
+	updated_time = *localtime(&updated);
 	bn_location_->copy_label(wx_location.c_str());
 	bn_latlong_->copy_label(wx_latlong.c_str());
-	bn_wx_description_->copy_label(wx_descr.c_str());
 	char label[128];
+	strcpy(label, wx_descr.c_str());
+	strcat(label, "\n");
+	strcat(label, to_lower(wind_descr).c_str());
+	strcat(label, "\n");
+	strcat(label, cloud_descr.c_str());
+	bn_wx_description_->copy_label(label);
 	switch(display_temperature_) {
 		case CELSIUS: {
 			snprintf(label, sizeof(label), "%0.0f\n\302\260C", temperature);
@@ -223,6 +236,8 @@ void qso_wx::enable_widgets() {
 
 	}
 	bn_speed_->copy_label(label);
+
+	bn_direction_->image(nullptr);
 	switch(display_direction_) {
 		case CARDINAL: {
 			snprintf(label, sizeof(label), "%s", wind_dirn.c_str());
@@ -234,16 +249,18 @@ void qso_wx::enable_widgets() {
 			break;
 		}
 		case ARROW: {
-			if (wind_degree == -1) strcpy(label, "@line");
-			else if (wind_degree < 23) strcpy(label, "@2arrow");
-			else if (wind_degree < 68) strcpy(label, "@1arrow");
-			else if (wind_degree < 113) strcpy(label, "@4arrow");
-			else if (wind_degree < 158) strcpy(label, "@7arrow");
-			else if (wind_degree < 203) strcpy(label, "@8arrow");
-			else if (wind_degree < 248) strcpy(label, "@9arrow");
-			else if (wind_degree < 293) strcpy(label, "@6arrow");
-			else if (wind_degree < 338) strcpy(label, "@3arrow");
-			else strcpy(label, "@2arrow");
+			// if (wind_degree == -1) strcpy(label, "@line");
+			// else if (wind_degree < 23) strcpy(label, "@2arrow");
+			// else if (wind_degree < 68) strcpy(label, "@1arrow");
+			// else if (wind_degree < 113) strcpy(label, "@4arrow");
+			// else if (wind_degree < 158) strcpy(label, "@7arrow");
+			// else if (wind_degree < 203) strcpy(label, "@8arrow");
+			// else if (wind_degree < 248) strcpy(label, "@9arrow");
+			// else if (wind_degree < 293) strcpy(label, "@6arrow");
+			// else if (wind_degree < 338) strcpy(label, "@3arrow");
+			// else strcpy(label, "@2arrow");
+			strcpy(label, "");
+			draw_wind_dirn(bn_direction_, wind_degree);
 			break;
 		}
 		default:
@@ -273,6 +290,22 @@ void qso_wx::enable_widgets() {
 			break;
 	}
 	bn_pressure_->copy_label(label);
+	switch(display_cloud_) {
+		case PERCENT: {
+			snprintf(label, sizeof(label), "%d%%\ncloud", (int)(cloud_cover * 100));
+			break;
+		}
+		case OKTA: {
+			if (cloud_cover == 0.0) strcpy(label, "0\nokta");
+			else if (cloud_cover == 1.0) strcpy(label, "8\nokta");
+			else {
+				int okta = (int)(cloud_cover * 6.0) + 1;
+				snprintf(label, sizeof(label), "%d\nokta", okta);
+			}
+			break;
+		}
+	}
+	bn_cloud_->copy_label(label);
 
 	char sunup[16];
 	char sundown[16];
@@ -298,6 +331,7 @@ void qso_wx::save_values() {
 	wx_settings.set("Direction", (int&)display_direction_);
 	wx_settings.set("Temperature", (int&)display_temperature_);
 	wx_settings.set("Pressure", (int&)display_pressure_);
+	wx_settings.set("Cloud", (int&)display_cloud_);
 }
 
 // Icon clicked'
@@ -389,4 +423,70 @@ void qso_wx::cb_bn_direction(Fl_Widget* w, void * v) {
 		}
 	}
 	that->enable_widgets();
+}
+
+// Cloud clicked
+void qso_wx::cb_bn_cloud(Fl_Widget* w, void* v) {
+	qso_wx* that = ancestor_view<qso_wx>(w);
+	switch (that->display_cloud_) {
+		case PERCENT: {
+			that->display_cloud_ = OKTA;
+			break;
+		}
+		case OKTA: {
+			that->display_cloud_ = PERCENT;
+			break;
+		}
+	}
+	that->enable_widgets();
+}
+
+// Draw wind direction arrow in the supplied widget
+void qso_wx::draw_wind_dirn(Fl_Widget* w, unsigned int dirn) {
+	// Find central position
+	int x_zero = w->w() / 2;
+	int y_zero = w->h() / 2 + 5;
+	// arrow will fill 80% widget
+	int radius = min(x_zero, y_zero) * 7 / 10;
+	float angle = dirn * DEGREE_RADIAN;
+	int x_disp = radius * sin(angle);
+	int y_disp = radius * cos(angle);
+	int x_start = x_zero + x_disp;
+	int y_start = y_zero - y_disp;
+	int x_end = x_zero - x_disp;
+	int y_end = y_zero + y_disp;
+	// Create the drawing surface
+	Fl_Image_Surface* image_surface = new Fl_Image_Surface(w->w(), w->h());
+	Fl_Surface_Device::push_current(image_surface);
+	// Draw the background
+	fl_color(FL_BACKGROUND_COLOR);
+	fl_rectf(0, 0, w->w(), w->h());
+	// Draw the line
+	fl_color(FL_FOREGROUND_COLOR);
+	if  (dirn == -1) {
+		// No wind draw a circle
+		fl_arc(x_zero-(radius/2), y_zero-(radius/2), radius, radius	, 0, 360);
+	} else {
+		fl_line(x_start, y_start, x_end, y_end);
+		// TODO add an arrow head
+		float rad45 = 15 * DEGREE_RADIAN;
+		int arrow_len = radius;
+		float arrow_l = angle + rad45;
+		int x_arrow_l = x_end + (arrow_len * sin(arrow_l));
+		int y_arrow_l = y_end - (arrow_len * cos(arrow_l));
+		// fl_line(x_end, y_end, x_arrow_l, y_arrow_l);
+		float arrow_r = angle - rad45;
+		int x_arrow_r = x_end + (arrow_len * sin(arrow_r));
+		int y_arrow_r = y_end - (arrow_len * cos(arrow_r));
+		// fl_line(x_end, y_end, x_arrow_r, y_arrow_r);
+		fl_polygon(x_end, y_end, x_arrow_l, y_arrow_l, x_arrow_r, y_arrow_r);
+	}
+
+	Fl_RGB_Image* image = image_surface->image();
+	// Restore window before drawing widget
+	Fl_Surface_Device::pop_current();
+
+	// Now put the image into the widget
+	w->label("");
+	w->image(image);
 }

@@ -165,11 +165,12 @@ void wx_handler::update() {
     snprintf(msg, sizeof(msg), "WX_HANDLER: Fetching %s", url);
     status_->misc_status(ST_NOTE, msg);
     if (url_handler_->read_url(string(url), &ss)) {
+        printf("DEBUG: WX: %s\n", ss.str().c_str());
         char msg[128];
         ss.seekg(ios::beg);
         parse(ss);
-        snprintf(msg, sizeof(msg), "WX_HANDLER: Weather read OK: %s %0.0f\302\260C %0.0fMPH %s %0.0f hPa.",
-            description().c_str(), temperature(), wind_speed(), wind_direction().c_str(), pressure());
+        snprintf(msg, sizeof(msg), "WX_HANDLER: Weather read OK: %s %0.0f\302\260C %0.0fMPH %s %0.0f hPa. %0.0f%% cloud",
+            description().c_str(), temperature(), wind_speed(), wind_direction().c_str(), pressure(), cloud() * 100);
         status_->misc_status(ST_OK, msg);
     } else {
         status_->misc_status(ST_ERROR, "WX_HANDLER: WX read failed - see pop-up help window");
@@ -210,6 +211,11 @@ float wx_handler::wind_speed() {
     return report_.wind_speed_ms / MPH2MPS;
 }
 
+// Wind-speed name
+string wx_handler::wind_name() {
+    return report_.wind_name;
+}
+
 // Wind direction (16th cardinals)
 string wx_handler::wind_direction() {
     if (report_.wind_cardinal == "") return "---";
@@ -220,6 +226,16 @@ string wx_handler::wind_direction() {
 unsigned int wx_handler::wind_degrees() {
     if (report_.wind_cardinal == "") return -1;
     else return report_.wind_dirn;
+}
+
+// Cloud cover
+float wx_handler::cloud() {
+    return ((float)report_.cloud_cover)/ 100.0;
+}
+
+// Cloud description
+string wx_handler::cloud_name() {
+    return report_.cloud_name;
 }
 
 // Sunris
@@ -470,26 +486,25 @@ bool wx_handler::end_wind() {
 // Wind speed
 bool wx_handler::start_wind_speed(map<string, string>* attributes) {
     elements_.push_back(WXE_SPEED);
+    float value;
     for (auto it = attributes->begin(); it != attributes->end(); it++) {
         string att_name = to_upper(it->first);
         if (att_name == "VALUE") {
-            float value = stof(it->second);
-            report_.wind_speed_ms = value;
+            value = stof(it->second);
         } else if (att_name == "UNIT") {
             unit_ = it->second;
         } else if (att_name == "NAME") {
             report_.wind_name = it->second;
         }
     }
+    if (unit_ == "mph") {
+        value *= MPH2MPS;
+    } // default is m/s
+    report_.wind_speed_ms = value;
     return true;
 }
 
 bool wx_handler::end_wind_speed() {
-    float f = report_.wind_speed_ms;
-    if (unit_ == "mph") {
-        f *= MPH2MPS;
-    } // default is m/s
-    report_.wind_speed_ms = f;
     return true;
 }
 
@@ -544,7 +559,7 @@ bool wx_handler::start_clouds(map<string, string>* attributes) {
         string att_name = to_upper(it->first);
         if (att_name == "VALUE") {
             int value = stoi(it->second);
-            report_.cloud_pc = value;
+            report_.cloud_cover = value;
         } else if (att_name == "NAME") {
             report_.cloud_name = it->second;
         }

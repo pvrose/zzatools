@@ -26,6 +26,9 @@ protected:
 	static void cb_bn_speed(Fl_Widget* w, void* v);
 	static void cb_bn_direction(Fl_Widget* w, void* v);
 	static void cb_bn_pressure(Fl_Widget* w, void* v);
+	static void cb_bn_cloud(Fl_Widget* w, void* v);
+
+	void draw_wind_dirn(Fl_Widget* w, unsigned int dirn); 
 
 	// Display local time rather than UTC
 	bool display_local_;
@@ -51,6 +54,10 @@ protected:
         IN_MERCURY,
         MILLIBARS
     } display_pressure_;
+	enum {
+		PERCENT,
+		OKTA
+	} display_cloud_;
 
     // Widgets
 	Fl_Button* bn_wx_icon_;
@@ -64,5 +71,6 @@ protected:
 	Fl_Button* bn_location_;
 	Fl_Button* bn_latlong_;
     Fl_Button* bn_pressure_;
+	Fl_Button* bn_cloud_;
 
 };

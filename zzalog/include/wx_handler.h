@@ -56,7 +56,7 @@ struct wx_report {
     unsigned int wind_dirn;     // Wind direction (degrees);
     string wind_cardinal;       // Cardinal (sixteenth) whence the wind
     float gusting_ms;           // Gusting up to ... (m/s)
-    unsigned int cloud_pc;      // Percentage cloud cover
+    unsigned int cloud_cover;   // Percentage cloud cover
     string cloud_name;          // Cloud cover description
     unsigned int visibility_m;  // Visibility (m - max 10 km)
     string precipitation;       // Precipitation "no", "rain", "snow"
@@ -104,10 +104,16 @@ public:
     float temperature();
     // Wind-speed (m/s)
     float wind_speed();
+    // Wind speed name
+    string wind_name();
     // Wind direction (16th cardinals)
     string wind_direction();
     // Wind direction (degrees)
     unsigned int wind_degrees();
+    // Cloudiness
+    float cloud();
+    // Name
+    string cloud_name();
     // Sunris
     time_t sun_rise();
     // Sun set
