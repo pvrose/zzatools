@@ -290,22 +290,28 @@ void qso_wx::enable_widgets() {
 			break;
 	}
 	bn_pressure_->copy_label(label);
+	unsigned int okta;
+	if (cloud_cover == 0.0) okta = 0;
+	else if (cloud_cover == 1.0) okta = 8;
+	else okta = floor(cloud_cover * 7.0) + 1;
+	bn_cloud_->label(nullptr);
+	bn_cloud_->image(nullptr);
 	switch(display_cloud_) {
 		case PERCENT: {
 			snprintf(label, sizeof(label), "%d%%\ncloud", (int)(cloud_cover * 100));
+			bn_cloud_->copy_label(label);
 			break;
 		}
 		case OKTA: {
-			if (cloud_cover == 0.0) strcpy(label, "0\nokta");
-			else if (cloud_cover == 1.0) strcpy(label, "8\nokta");
-			else {
-				int okta = (int)(cloud_cover * 6.0) + 1;
-				snprintf(label, sizeof(label), "%d\nokta", okta);
-			}
+			snprintf(label, sizeof(label), "%d\nokta", okta);
+			bn_cloud_->copy_label(label);
+			break;
+		}
+		case PIE: {
+			draw_cloud_okta(bn_cloud_, okta);
 			break;
 		}
 	}
-	bn_cloud_->copy_label(label);
 
 	char sunup[16];
 	char sundown[16];
@@ -434,6 +440,10 @@ void qso_wx::cb_bn_cloud(Fl_Widget* w, void* v) {
 			break;
 		}
 		case OKTA: {
+			that->display_cloud_ = PIE;
+			break;
+		}
+		case PIE: {
 			that->display_cloud_ = PERCENT;
 			break;
 		}
@@ -448,13 +458,6 @@ void qso_wx::draw_wind_dirn(Fl_Widget* w, unsigned int dirn) {
 	int y_zero = w->h() / 2;
 	// arrow will fill 80% widget
 	int radius = min(x_zero, y_zero) * 7 / 10;
-	float angle = dirn * DEGREE_RADIAN;
-	int x_disp = radius * sin(angle);
-	int y_disp = radius * cos(angle);
-	int x_start = x_zero + x_disp;
-	int y_start = y_zero - y_disp;
-	int x_end = x_zero - x_disp;
-	int y_end = y_zero + y_disp;
 	// Create the drawing surface
 	Fl_Image_Surface* image_surface = new Fl_Image_Surface(w->w(), w->h());
 	Fl_Surface_Device::push_current(image_surface);
@@ -467,18 +470,23 @@ void qso_wx::draw_wind_dirn(Fl_Widget* w, unsigned int dirn) {
 		// No wind draw a circle
 		fl_arc(x_zero-(radius/2), y_zero-(radius/2), radius, radius	, 0, 360);
 	} else {
-		fl_line(x_start, y_start, x_end, y_end);
-		float rad45 = 15 * DEGREE_RADIAN;
-		int arrow_len = radius;
-		float arrow_l = angle + rad45;
-		int x_arrow_l = x_end + (arrow_len * sin(arrow_l));
-		int y_arrow_l = y_end - (arrow_len * cos(arrow_l));
-		// fl_line(x_end, y_end, x_arrow_l, y_arrow_l);
-		float arrow_r = angle - rad45;
-		int x_arrow_r = x_end + (arrow_len * sin(arrow_r));
-		int y_arrow_r = y_end - (arrow_len * cos(arrow_r));
-		// fl_line(x_end, y_end, x_arrow_r, y_arrow_r);
-		fl_polygon(x_end, y_end, x_arrow_l, y_arrow_l, x_arrow_r, y_arrow_r);
+		fl_push_matrix();
+		// Set the drawing to be centred in the widget and rotated by the wind direction
+		fl_translate(x_zero, y_zero);
+		fl_rotate(-(double)dirn);
+		fl_begin_complex_polygon();
+		// Draw an arrow down from North
+		fl_vertex(1, -radius);
+		fl_vertex(1, radius/2);
+		fl_vertex(5, radius/2);
+		fl_vertex(0, radius);
+		fl_vertex(-5, radius/2);
+		fl_vertex(-1, radius/2);
+		fl_vertex(-1, -radius);
+		//
+		fl_end_complex_polygon();
+		
+		fl_pop_matrix();
 	}
 
 	Fl_RGB_Image* image = image_surface->image();
@@ -488,4 +496,120 @@ void qso_wx::draw_wind_dirn(Fl_Widget* w, unsigned int dirn) {
 	// Now put the image into the widget
 	w->label(nullptr);
 	w->image(image);
+}
+
+void qso_wx::draw_cloud_okta(Fl_Widget* w, unsigned int okta) {
+
+	// Create the drawing surface
+	Fl_Image_Surface* image_surface = new Fl_Image_Surface(w->w(), w->h());
+	Fl_Surface_Device::push_current(image_surface);
+	// Draw the background
+	fl_color(FL_BACKGROUND_COLOR);
+	fl_rectf(0, 0, w->w(), w->h());
+	// Draw the line
+	fl_color(FL_FOREGROUND_COLOR);
+	fl_push_matrix();
+	fl_translate(w->w() / 2.0, w->h() / 2.0);
+	double radius = min(w->h(), w->w()) * 0.35;
+	switch(okta) {
+		case 0: {
+			fl_begin_line();
+			fl_arc(0, 0, radius, 0, 360);
+			fl_end_line();
+			break;
+		}
+		case 1: {
+			fl_begin_line();
+			fl_arc(0, 0, radius, 0, 360);
+			fl_end_line();
+			fl_begin_line();
+			fl_vertex(0, -radius);
+			fl_vertex(0, radius);
+			fl_end_line();
+			break;
+		}
+		case 2: {
+			fl_begin_line();
+			fl_arc(0, 0, radius, 0, 360);
+			fl_end_line();
+			fl_begin_polygon();
+			fl_vertex(0,0);
+			fl_arc(0, 0, radius, 0, 90);
+			fl_end_polygon();
+			break;
+		}
+		case 3: {
+			fl_begin_line();
+			fl_arc(0, 0, radius, 0, 360);
+			fl_end_line();
+			fl_begin_polygon();
+			fl_vertex(0,0);
+			fl_arc(0, 0, radius, 0, 90);
+			fl_end_polygon();
+			fl_begin_line();
+			fl_vertex(0, 0);
+			fl_vertex(0, radius);
+			fl_end_line();
+			break;
+		}
+		case 4: {
+			fl_begin_line();
+			fl_arc(0, 0, radius, 0, 360);
+			fl_end_line();
+			fl_begin_polygon();
+			fl_arc(0, 0, radius, 270, 450);
+			fl_end_polygon();
+			break;
+		}
+		case 5: {
+			fl_begin_line();
+			fl_arc(0, 0, radius, 0, 360);
+			fl_end_line();
+			fl_begin_polygon();
+			fl_arc(0, 0, radius, 270, 450);
+			fl_end_polygon();
+			fl_begin_line();
+			fl_vertex(0, 0);
+			fl_vertex(-radius, 0);
+			fl_end_line();
+			break;
+		}
+		case 6: {
+			fl_begin_line();
+			fl_arc(0, 0, radius, 0, 360);
+			fl_end_line();
+			fl_begin_complex_polygon();
+			fl_vertex(0,0);
+			fl_arc(0, 0, radius, 180, 450);
+			fl_end_complex_polygon();
+			break;
+		}
+		case 7: {
+			fl_begin_line();
+			fl_arc(0, 0, radius, 0, 360);
+			fl_end_line();
+			fl_begin_polygon();
+			fl_arc(0, 0, radius, 280, 440);
+			fl_end_polygon();
+			fl_begin_polygon();
+			fl_arc(0, 0, radius, 100, 260);
+			fl_end_polygon();
+			break;
+		}
+		case 8: {
+			fl_begin_polygon();
+			fl_arc(0, 0, radius, 0, 360);
+			fl_end_polygon();
+			break;
+		}
+	}
+	fl_pop_matrix();
+
+	Fl_RGB_Image* image = image_surface->image();
+	// Restore window before drawing widget
+	Fl_Surface_Device::pop_current();
+
+	// Now put the image into the widget
+	w->image(image);
+
 }

@@ -29,6 +29,7 @@ protected:
 	static void cb_bn_cloud(Fl_Widget* w, void* v);
 
 	void draw_wind_dirn(Fl_Widget* w, unsigned int dirn); 
+	void draw_cloud_okta(Fl_Widget* w, unsigned int okta);
 
 	// Display local time rather than UTC
 	bool display_local_;
@@ -56,7 +57,8 @@ protected:
     } display_pressure_;
 	enum {
 		PERCENT,
-		OKTA
+		OKTA,
+		PIE
 	} display_cloud_;
 
     // Widgets
