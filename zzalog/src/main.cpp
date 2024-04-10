@@ -901,6 +901,7 @@ void customise_fltk() {
 		Fl::background2(31, 31, 31);
 		Fl::background(0, 0, 0);
 	}
+	Fl::scheme("gleam");
 }
 
 void read_saved_switches() {
