@@ -900,6 +900,10 @@ void customise_fltk() {
 		Fl::foreground(240, 240, 240);
 		Fl::background2(31, 31, 31);
 		Fl::background(0, 0, 0);
+	// } else {
+	// 	Fl::foreground(0, 0, 0);
+	// 	Fl::background(196, 196, 255);
+	// 	Fl::background2(248, 248, 255);
 	}
 	Fl::scheme("gleam");
 }
