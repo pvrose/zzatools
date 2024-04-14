@@ -91,6 +91,7 @@ bool VERBOSE = false;
 bool HELP = false;
 bool PRIVATE = false;
 bool DARK = false;
+uchar THEME;
 bool DISPLAY_VERSION = false;
 
 // Ticker values
@@ -439,6 +440,15 @@ int cb_args(int argc, char** argv, int& i) {
 		DISPLAY_VERSION = true;
 		i+= 1;
 	}
+	// Colour
+	else if (strncmp("-c=", argv[i], 3) == 0) {
+		THEME = *(argv[i] + 3);
+		i+=1;
+	}
+	else if (strncmp("--colour=", argv[i], 9) == 0) {
+		THEME = *(argv[i] + 9);
+		i+=1;
+	}
 	// Debug
 	else if (strcmp("-d", argv[i]) == 0 || strcmp("--debug", argv[i]) == 0) {
 		i += 1;
@@ -529,6 +539,8 @@ void show_help() {
 	"\n"
 	"switches:\n"
 	"\t-a|--auto_save\tDo automatically save each change (sticky)\n"
+	"\t-c=s|--colour=S\tUse colour theme ""s"" (sticky)\n"
+	"\t\ts=[r|g|b|m|c|y|n]\n"
   	"\t-d|--debug [mode...]\n"
 	"\t\tc|curl\tincrease verbosity from libcurl\n"
 	"\t\t\tnoc|nocurl\n"
@@ -838,6 +850,16 @@ void add_icon(const char* arg0) {
 	Fl_Window::default_icon(&main_icon_);
 }
 
+map<uchar, string> colours = {
+	{ 'n', "None" },
+	{ 'r', "Red" },
+	{ 'g', "Green" },
+	{ 'b', "Blue" },
+	{ 'm', "Magenta" },
+	{ 'c', "Cyan" },
+	{ 'y', "Yellow" } 
+};
+
 // Display the arguments in the status log
 void print_args(int argc, char** argv) {
 	// Create a string to hold all the info
@@ -877,7 +899,8 @@ void print_args(int argc, char** argv) {
 	if (PRIVATE) status_->misc_status(ST_WARNING, "ZZALOG: -p - This file not being noted on recent files list");
 	if (DARK) status_->misc_status(ST_NOTE, "ZZALOG: -k - Opening in dark mode");
 	else status_->misc_status(ST_NOTE, "ZZALOG: -l - Opening in normal FLTK colours");
-
+	snprintf(message, sizeof(message), "ZZALOG: -c=%c - Thematic colour: %s", THEME, colours[THEME].c_str());
+	status_->misc_status(ST_NOTE, message);
 }
 
 // Returns true if record is within current session.
@@ -895,15 +918,62 @@ void customise_fltk() {
 	Fl::set_font(FL_COURIER_BOLD,       "Courier New Bold");
 	Fl::set_font(FL_COURIER_ITALIC,     "Courier New Italic");
 	Fl::set_font(FL_COURIER_BOLD_ITALIC,"Courier New Bold Italic");	
-	// Customise colours in dark mode
+	// Customise colours
+	bool vr, vg, vb;
+	switch(THEME) {
+		case 'r': {
+			vr = true;
+			vg = false;
+			vb = false;
+			break;
+		}
+		case 'g': {
+			vr = false;
+			vg = true;
+			vb = false;
+			break;
+		}
+		case 'b': {
+			vr = false;
+			vg = false;
+			vb = true;
+			break;
+		}
+		case 'm': {
+			vr = true;
+			vg = false;
+			vb = true;
+			break;
+		}
+		case 'c': {
+			vr = false;
+			vg = true;
+			vb = true;
+			break;
+		}
+		case 'y': {
+			vr = true;
+			vg = true;
+			vb = false;
+			break;
+		}
+		case 'n':
+		default: {
+			vr = true;
+			vg = true;
+			vb = true;
+			break;
+		}
+	}
+
 	if (DARK) {
 		Fl::foreground(240, 240, 240);
-		Fl::background2(31, 31, 31);
-		Fl::background(0, 0, 0);
-	// } else {
-	// 	Fl::foreground(0, 0, 0);
-	// 	Fl::background(196, 196, 255);
-	// 	Fl::background2(248, 248, 255);
+		Fl::background(vr ? 32 : 0, vg ? 32 : 0, vb ? 32 : 0);
+		Fl::background2(vr ? 64 : 48, vg ? 64 : 48, vb ? 64 : 48);
+	} else {
+		Fl::foreground(0, 0, 0);
+		Fl::background2(vr ? 255 : 240, vg ? 255 : 240, vb ? 255 : 240);
+		Fl::background(vr ? 192 : 174, vg ? 192 : 174, vb ? 192 : 174);
 	}
 	// Fl::scheme("gleam");
 }
@@ -911,6 +981,7 @@ void customise_fltk() {
 void read_saved_switches() {
 	Fl_Preferences switch_settings(settings_, "Switches");
 	int temp;
+	char* stemp;
 	char msg[128];
 	memset(msg, 0, sizeof(msg));
 	strcpy(msg, "ZZALOG: Sticky switches: ");
@@ -918,6 +989,12 @@ void read_saved_switches() {
 	DARK = (bool)temp;
 	if (DARK) strcat(msg, "-k ");
 	else strcat(msg, "-l ");
+	switch_settings.get("Theme Colour", stemp, "n");
+	THEME = stemp[0];
+	strcat(msg, "-c=");
+	size_t pos = strlen(msg);
+	msg[pos++] = THEME;
+	msg[pos++] = ' ';
 	switch_settings.get("Auto Update QSOs", temp, false);
 	AUTO_UPLOAD = (bool)temp;
 	if (AUTO_UPLOAD) strcat(msg, "-n ");
@@ -931,7 +1008,11 @@ void read_saved_switches() {
 
 void save_switches() {
 	Fl_Preferences switch_settings(settings_, "Switches");
+	char temp[2];
+	temp[0] = THEME;
+	temp[1] = '\0';
 	switch_settings.set("Dark Mode", (int)DARK);
+	switch_settings.set("Theme Colour", temp);
 	switch_settings.set("Auto Update QSOs", (int)AUTO_UPLOAD);
 	switch_settings.set("Auto Save QSOs", (bool)AUTO_SAVE);
 }
