@@ -3,6 +3,8 @@
 #include "wsjtx_handler.h"
 
 #include "qso_server.h"
+#include "qso_manager.h"
+#include "qso_rig.h"
 
 using namespace std;
 
@@ -136,16 +138,23 @@ void qso_server::cb_bn_change(Fl_Widget* w, void* v) {
 
 // Start button callback
 void qso_server::cb_bn_start(Fl_Widget* w, void* v) {
-      qso_server* that = ancestor_view<qso_server>(w);
+    qso_server* that = ancestor_view<qso_server>(w);
     server_t server = (server_t)(intptr_t)v;
+    qso_manager* mgr = ancestor_view<qso_manager>(that);
+    string suffix = mgr->rig_control()->app_suffix();
+    // Defualt app is a comment
+    string app = "bash -i -c ";
     switch (server) {
     case FLDIGI: 
-        system("fldigi &");
+        app += "fldigi" + suffix + " &";
         break;
     case WSJTX:
-        system("wsjtx &");
+        app += "wsjtx" + suffix + " &";
         break;
+    default:
+        app = "# ";
     }
+    system(app.c_str());
     that->enable_widgets();
   
 }

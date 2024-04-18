@@ -51,6 +51,8 @@ public:
 	Fl_Color alert_colour();
 	// Preferred antenna
 	string antenna();
+	// Suffix to apply to app invocations
+	string app_suffix();
 
 protected:
 	// Callback - model choice
@@ -137,7 +139,7 @@ protected:
 	// Current antenna
 	string antenna_;
 	// flrig config paramaters
-	string flrig_params_;
+	string app_suffix_;
 	
 
 	// Modifier attributes

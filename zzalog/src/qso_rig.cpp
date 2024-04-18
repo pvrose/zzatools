@@ -88,11 +88,9 @@ void qso_rig::load_values() {
 		};
 		
 		// If hamlib and FLRig - start parameters
-		if (hamlib_data_.model == "FLRig") {
-			hamlib_settings.get("FLRig Parameters", temp, "");
-			flrig_params_ = temp;
-			free(temp);
-		}
+		hamlib_settings.get("App Suffix", temp, "");
+		app_suffix_ = temp;
+		free(temp);
 		// Preferred antenna
 		rig_settings.get("Antenna", temp, "");
 		antenna_ = temp;
@@ -198,7 +196,7 @@ void qso_rig::create_form(int X, int Y) {
 	bn_start_->color(FL_DARK_GREEN);
 	bn_start_->labelcolor(FL_WHITE);
 	bn_start_->tooltip("Start flrig for this connection");
-	bn_start_->callback(cb_bn_start, &flrig_params_);
+	bn_start_->callback(cb_bn_start, &app_suffix_);
 	
 	curr_x = X + GAP + WLABEL;
 	curr_y += HBUTTON + GAP;
@@ -281,13 +279,6 @@ void qso_rig::create_form(int X, int Y) {
 
 	curr_y += HTEXT + GAP;
 
-	ip_flrig_params_= new Fl_Input(curr_x, curr_y, WSMEDIT, HTEXT, "Params");
-	ip_flrig_params_->align(FL_ALIGN_LEFT);
-	ip_flrig_params_->callback(cb_value<Fl_Input, string>, &flrig_params_);
-	ip_flrig_params_->tooltip("Enter the paramters for flrig to connect to the rig");
-	ip_flrig_params_->value(flrig_params_.c_str());
-	
-	curr_y += HTEXT + GAP;
 	curr_x += WSMEDIT + GAP;
 	network_grp_->resizable(nullptr);
 	network_grp_->size(curr_x - network_grp_->x(), curr_y - network_grp_->y());
@@ -296,8 +287,16 @@ void qso_rig::create_form(int X, int Y) {
 
 	curr_x = x() + GAP;
 	curr_y = max(serial_grp_->y() + serial_grp_->h(), network_grp_->y() + network_grp_->h());
-	
 	curr_x += WLABEL;
+	
+	ip_flrig_params_= new Fl_Input(curr_x, curr_y, WSMEDIT, HTEXT, "App Suffix");
+	ip_flrig_params_->align(FL_ALIGN_LEFT);
+	ip_flrig_params_->callback(cb_value<Fl_Input, string>, &app_suffix_);
+	ip_flrig_params_->tooltip("Enter the paramters for flrig to connect to the rig");
+	ip_flrig_params_->value(app_suffix_.c_str());
+	
+	curr_y += HTEXT + GAP;
+
 	ip_antenna_ = new field_input(curr_x, curr_y, WSMEDIT, HTEXT, "Antenna");
 	ip_antenna_->align(FL_ALIGN_LEFT);
 	ip_antenna_->callback(cb_value<field_input, string>, &antenna_);
@@ -432,9 +431,7 @@ void qso_rig::save_values() {
 		hamlib_settings.set("Port", hamlib_data_.port_name.c_str());
 		hamlib_settings.set("Baud Rate", hamlib_data_.baud_rate);
 		hamlib_settings.set("Model ID", (int)hamlib_data_.model_id);
-		if (hamlib_data_.model == "FLRig") {
-			hamlib_settings.set("FLRig Parameters", flrig_params_.c_str());
-		}
+		hamlib_settings.set("App Suffix", app_suffix_.c_str());
 		// Preferred antenna
 		rig_settings.set("Antenna", antenna_.c_str());
 		// Modifier settings
@@ -540,10 +537,8 @@ void qso_rig::enable_widgets() {
 			ip_port_->value(hamlib_data_.port_name.c_str());
 		}
 		if (hamlib_data_.model == "FLRig") {
-			ip_flrig_params_->show();
 			bn_start_->show();
 		} else {
-			ip_flrig_params_->hide();
 			bn_start_->hide();
 		}
 		break;
@@ -916,8 +911,8 @@ void qso_rig::cb_ip_power(Fl_Widget* w, void* v) {
 
 // Clicked start button
 void qso_rig::cb_bn_start(Fl_Widget* w, void * v) {
-	string* params = (string*)v;
-	string command = "flrig " + *params + "&";
+	string* suffix = (string*)v;
+	string command = "bash -i -c flrig" + *suffix + "&";
 	int result = system(command.c_str());
 	char msg[100];
 	if (result == 0) {
@@ -994,4 +989,9 @@ void qso_rig::modify_rig() {
 // Return the preferred antenna
 string qso_rig::antenna() {
 	return antenna_;
+}
+
+// Return the application suffix
+string qso_rig::app_suffix() {
+	return app_suffix_;
 }

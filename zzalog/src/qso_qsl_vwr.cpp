@@ -601,7 +601,6 @@ void qso_qsl_vwr::draw_image() {
 			bn_card_display_->deimage(desat_image_);
 		}
 		else {
-			// Display the error message in red.
 			// Display a label instead in large letters - 36 pt.
 			// Make font smaller if callsign wouldn't fit
 			bn_card_display_->copy_label(current_qso_->item("CALL").c_str());
@@ -615,7 +614,7 @@ void qso_qsl_vwr::draw_image() {
 				fl_measure(bn_card_display_->label(), w, h);
 			}
 			bn_card_display_->labelsize(size);
-			bn_card_display_->labelcolor(FL_BLACK);
+			bn_card_display_->labelcolor(FL_FOREGROUND_COLOR);
 			//bn_card_display_->color(FL_WHITE);
 		}
 		break;
