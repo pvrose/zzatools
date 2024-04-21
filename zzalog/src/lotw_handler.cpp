@@ -333,7 +333,8 @@ bool lotw_handler::upload_single_qso(item_num_t record_num) {
 bool lotw_handler::upload_done(int result) {
 	// Analyse result received from TQSL - responses documented in TQSL help
 	bool ok = false;
-	string default_message = "LOTW: Unknown response";
+	char default_message[100];
+	snprintf(default_message, sizeof(default_message), "LOTW: Unknown reponse %d", result);
 	switch (result) {
 	case 0:
 		status_->misc_status(ST_OK, "LOTW: all qsos submitted were signed and uploaded");
@@ -384,8 +385,12 @@ bool lotw_handler::upload_done(int result) {
 		ok = false;
 		break;
 	default:
-		status_->misc_status(ST_ERROR, default_message.c_str());
-		ok = false;
+		status_->misc_status(ST_ERROR, default_message);
+		if (fl_choice("Please say if upload successful or not.", "Yes", "No", nullptr) == 0) {
+			ok = true;
+		} else {
+			ok = false;
+		}
 		break;
 	}
 	bool updated = false;
