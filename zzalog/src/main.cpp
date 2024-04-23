@@ -967,11 +967,14 @@ void customise_fltk() {
 	}
 
 	if (DARK) {
-		Fl::foreground(240, 240, 240);
-		Fl::background2(vr ? 32 : 0, vg ? 32 : 0, vb ? 32 : 0);
+		// Fl::foreground(240, 240, 240);
+		// Fl::background2(vr ? 32 : 0, vg ? 32 : 0, vb ? 32 : 0);
+		// Fl::background(vr ? 64 : 48, vg ? 64 : 48, vb ? 64 : 48);
+		Fl::foreground(vr ? 255 : 240, vg ? 255 : 240, vb ? 255 : 240);
+		Fl::background2(vr ? 16 : 0, vg ? 16 : 0, vb ? 16 : 0);
 		Fl::background(vr ? 64 : 48, vg ? 64 : 48, vb ? 64 : 48);
 	} else {
-		Fl::foreground(0, 0, 0);
+		Fl::foreground(vr ? 16 : 0, vg ? 16 : 0, vb ? 16 : 0);
 		Fl::background2(vr ? 255 : 240, vg ? 255 : 240, vb ? 255 : 240);
 		Fl::background(vr ? 192 : 174, vg ? 192 : 174, vb ? 192 : 174);
 	}

@@ -9,6 +9,7 @@
 extern book* book_;
 extern status* status_;
 extern spec_data* spec_data_;
+extern bool DARK;
 
 qso_details::qso_details(int X, int Y, int W, int H, const char* L) :
 	Fl_Group(X, Y, W, H, L)
@@ -35,7 +36,7 @@ void qso_details::create_form() {
 	op_call_->color(FL_BACKGROUND_COLOR);
 	op_call_->textfont(FL_BOLD);
 	op_call_->textsize(FL_NORMAL_SIZE + 2);
-	op_call_->textcolor(COLOUR_CLARET);
+	op_call_->textcolor(DARK ? FL_RED : COLOUR_CLARET);
 
 	curr_y += op_call_->h() + GAP;
 	// Add table
@@ -254,7 +255,7 @@ void qso_details::table_q::draw_cell(TableContext context, int R, int C, int X, 
 			break;
 		}
 		// TEXT
-		Fl_Color fg_colour = FL_BLACK;
+		Fl_Color fg_colour = FL_FOREGROUND_COLOR;
 		if (!active_r()) fg_colour = fl_inactive(fg_colour);
 		fl_color(fg_colour);
 		fl_font(FL_BOLD | FL_ITALIC, FL_NORMAL_SIZE);

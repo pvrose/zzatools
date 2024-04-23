@@ -16,6 +16,7 @@ extern book* book_;
 extern extract_data* extract_records_;
 extern book* navigation_book_;
 extern tabbed_forms* tabbed_forms_;
+extern bool DARK;
 
 qso_dxcc::qso_dxcc(int X, int Y, int W, int H, const char* L) :
 	Fl_Group(X, Y, W, H, L)
@@ -46,7 +47,7 @@ void qso_dxcc::create_form() {
 	op_call_->color(FL_BACKGROUND_COLOR);
 	op_call_->textfont(FL_BOLD);
 	op_call_->textsize(FL_NORMAL_SIZE + 2);
-	op_call_->textcolor(COLOUR_CLARET);
+	op_call_->textcolor(DARK ? FL_RED : COLOUR_CLARET);
 	curr_x += op_call_->w();
 
 	// QRZ.com button
@@ -60,7 +61,7 @@ void qso_dxcc::create_form() {
 	op_prefix_->box(FL_FLAT_BOX);
 	op_prefix_->color(FL_BACKGROUND_COLOR);
 	op_prefix_->textfont(FL_BOLD);
-	op_prefix_->textcolor(COLOUR_CLARET);
+	op_prefix_->textcolor(DARK ? FL_RED : COLOUR_CLARET);
 	curr_y += ROW_HEIGHT;
 
 	op_source_ = new Fl_Output(curr_x, curr_y, avail_width, ROW_HEIGHT);
