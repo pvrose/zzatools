@@ -42,6 +42,7 @@ fllog_emul::~fllog_emul() {
 
 // Start and run the RPC Server
 void fllog_emul::run_server() {
+	status_->misc_status(ST_NOTE, "FLLOG_EMUL: Creating new socket");
 	if (!rpc_handler_) {
 		// TODO - Do we need server address - it IS available 
 		Fl_Preferences nw_settings(settings_, "Network");
@@ -69,6 +70,7 @@ void fllog_emul::run_server() {
 
 void fllog_emul::close_server() {
 	if (rpc_handler_) {
+		status_->misc_status(ST_NOTE, "FLLOG_EMUL: Closing server");
 		rpc_handler_->close_server();
 		delete rpc_handler_;
 		rpc_handler_ = nullptr;

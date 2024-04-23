@@ -58,10 +58,7 @@ wsjtx_handler::wsjtx_handler()
 
 // Destructor
 wsjtx_handler::~wsjtx_handler() {
-	if (server_) {
-		server_->close_server(true);
-		delete server_;
-	}
+	close_server();
 };
 
 // This callback must be static
@@ -420,7 +417,7 @@ void wsjtx_handler::run_server() {
 // Close the server
 void wsjtx_handler::close_server() {
 	if (server_) {
-		status_->misc_status(ST_OK, "WSJT-X: Closing server");
+		status_->misc_status(ST_NOTE, "WSJT-X: Closing server");
 		server_->close_server(true);
 		delete server_;
 		server_ = nullptr;
