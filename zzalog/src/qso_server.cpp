@@ -1,7 +1,7 @@
 #include "drawing.h"
 #include "fllog_emul.h"
 #include "wsjtx_handler.h"
-
+#include "status.h"
 #include "qso_server.h"
 #include "qso_manager.h"
 #include "qso_rig.h"
@@ -10,6 +10,7 @@ using namespace std;
 
 extern fllog_emul* fllog_emul_;
 extern wsjtx_handler* wsjtx_handler_;
+extern status* status_;
 
 qso_server::qso_server(int X, int Y, int W, int H, const char* L) :
     Fl_Group(X, Y, W, H, L)
@@ -154,6 +155,9 @@ void qso_server::cb_bn_start(Fl_Widget* w, void* v) {
     default:
         app = "# ";
     }
+    char msg[128];
+    snprintf(msg, sizeof(msg), "DASH: Starting app: %s", app.c_str());
+    status_->misc_status(ST_NOTE, msg);
     system(app.c_str());
     that->enable_widgets();
   
