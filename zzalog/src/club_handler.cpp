@@ -157,7 +157,7 @@ bool club_handler::download_exception(string filename) {
 	status_->misc_status(ST_NOTE, "CLUBLOG: Starting to download exception file");
 	string zip_filename = filename + ".gz";
 	ofstream os(zip_filename, ios::trunc | ios::out | ios::binary);
-	string url = "https://cdn.clublog.org/cty.php?api=" + string(api_key_);
+	string url = "http://cdn.clublog.org/cty.php?api=" + string(api_key_);
 	if (url_handler_->read_url(url, &os)) {
 		os.close();
 		status_->misc_status(ST_NOTE, "CLUBLOG: Exception file downloaded successfully - unzipping it");
@@ -176,7 +176,7 @@ bool club_handler::unzip_exception(string filename) {
 	get_reference(ref_dir);
 	char cmd[256];
 #ifdef _WIN32
-	snprintf(cmd, sizeof(cmd), "7z e %s -o%s -y", filename.c_str(), ref_dir.c_str());
+	snprintf(cmd, sizeof(cmd), "\"%s\" e %s -o%s -y", "C:/Program Files/7-Zip/7z", filename.c_str(), ref_dir.c_str());
 #else
 	snprintf(cmd, sizeof(cmd), "gunzip -f %s", filename.c_str());
 #endif
