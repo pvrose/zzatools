@@ -173,11 +173,13 @@
     <ClCompile Include="zzalog\src\qso_server.cpp" />
     <ClCompile Include="zzalog\src\qso_tabbed_qth.cpp" />
     <ClCompile Include="zzalog\src\qso_tabbed_rigs.cpp" />
+    <ClCompile Include="zzalog\src\qso_wx.cpp" />
     <ClCompile Include="zzalog\src\rig_if.cpp" />
     <ClCompile Include="zzalog\src\rpc_data_item.cpp" />
     <ClCompile Include="zzalog\src\rpc_handler.cpp" />
     <ClCompile Include="zzalog\src\serial.cpp" />
     <ClCompile Include="zzalog\src\socket_server.cpp" />
+    <ClCompile Include="zzalog\src\timestamp.cpp" />
     <ClCompile Include="zzalog\src\url_handler.cpp" />
     <ClCompile Include="zzalog\src\utils.cpp" />
     <ClCompile Include="zzalog\src\win_dialog.cpp" />
@@ -265,6 +267,7 @@
     <ClInclude Include="zzalog\include\qso_server.h" />
     <ClInclude Include="zzalog\include\qso_tabbed_qth.h" />
     <ClInclude Include="zzalog\include\qso_tabbed_rigs.h" />
+    <ClInclude Include="zzalog\include\qso_wx.h" />
     <ClInclude Include="zzalog\include\regices.h" />
     <ClInclude Include="zzalog\include\rig_if.h" />
     <ClInclude Include="zzalog\include\rpc_data_item.h" />

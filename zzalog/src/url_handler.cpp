@@ -25,6 +25,7 @@ url_handler::~url_handler()
 size_t url_handler::cb_write(char* data, size_t size, size_t nmemb, void* os) {
 	// calculate the number of bytes in data
 	size_t real_size = size * nmemb;
+	printf("DEBUG: Getting %d bytes\n", real_size);
 	// Send data to the output stream
 	((ostream*)os)->write((char*)data, real_size);
 	if (((ostream*)os)->good()) {
@@ -41,6 +42,7 @@ size_t url_handler::cb_write(char* data, size_t size, size_t nmemb, void* os) {
 size_t url_handler::cb_read(char* data, size_t size, size_t nmemb, void* is) {
 	// Calculate the number of bytes in data
 	size_t read_size = size * nmemb;
+	printf("DEBUG: Getting %d bytes\n", read_size);
 	// Read data from the input stream and send to CURL
 	((istream*)is)->read((char*)data, read_size);
 	// If successful - tell CURL number of bytes actually sent
@@ -62,14 +64,22 @@ bool url_handler::read_url(string url, ostream* os) {
 	curl_ = curl_easy_init();
 
 	/* specify URL to get */
+	printf("DEBUG: Fetching %s\n", url.c_str());
 	curl_easy_setopt(curl_, CURLOPT_URL, url.c_str());
 	/* send all data to this function  */
 	curl_easy_setopt(curl_, CURLOPT_WRITEFUNCTION, cb_write);
 	/* we pass the output stream to the callback function */
 	curl_easy_setopt(curl_, CURLOPT_WRITEDATA, os);
+
 	/* some servers don't like requests that are made without a user-agent
 	field, so we provide one */
 	curl_easy_setopt(curl_, CURLOPT_USERAGENT, "libcurl-agent/1.0");
+
+	if (DEBUG_CURL) {
+		// Add extra verbosity
+		curl_easy_setopt(curl_, CURLOPT_DEBUGFUNCTION, cb_debug);
+		curl_easy_setopt(curl_, CURLOPT_VERBOSE, 1);
+	}
 	/* get it! */
 	result = curl_easy_perform(curl_);
 
