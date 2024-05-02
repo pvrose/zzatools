@@ -1,8 +1,10 @@
 #include "url_handler.h"
+#include "status.h"
 
 #include <FL/fl_ask.H>
 
 extern bool DEBUG_CURL;
+extern status* status_;
 
 mutex url_handler::lock_;
 
@@ -25,7 +27,6 @@ url_handler::~url_handler()
 size_t url_handler::cb_write(char* data, size_t size, size_t nmemb, void* os) {
 	// calculate the number of bytes in data
 	size_t real_size = size * nmemb;
-	printf("DEBUG: Getting %d bytes\n", real_size);
 	// Send data to the output stream
 	((ostream*)os)->write((char*)data, real_size);
 	if (((ostream*)os)->good()) {
@@ -42,7 +43,6 @@ size_t url_handler::cb_write(char* data, size_t size, size_t nmemb, void* os) {
 size_t url_handler::cb_read(char* data, size_t size, size_t nmemb, void* is) {
 	// Calculate the number of bytes in data
 	size_t read_size = size * nmemb;
-	printf("DEBUG: Getting %d bytes\n", read_size);
 	// Read data from the input stream and send to CURL
 	((istream*)is)->read((char*)data, read_size);
 	// If successful - tell CURL number of bytes actually sent
@@ -63,8 +63,8 @@ bool url_handler::read_url(string url, ostream* os) {
 	// Start a new transfer
 	curl_ = curl_easy_init();
 
+
 	/* specify URL to get */
-	printf("DEBUG: Fetching %s\n", url.c_str());
 	curl_easy_setopt(curl_, CURLOPT_URL, url.c_str());
 	/* send all data to this function  */
 	curl_easy_setopt(curl_, CURLOPT_WRITEFUNCTION, cb_write);
@@ -74,6 +74,9 @@ bool url_handler::read_url(string url, ostream* os) {
 	/* some servers don't like requests that are made without a user-agent
 	field, so we provide one */
 	curl_easy_setopt(curl_, CURLOPT_USERAGENT, "libcurl-agent/1.0");
+	// Error buffer
+	char* error_msg = new char[CURL_ERROR_SIZE];
+	curl_easy_setopt(curl_, CURLOPT_ERRORBUFFER, error_msg);
 
 	if (DEBUG_CURL) {
 		// Add extra verbosity
@@ -85,6 +88,9 @@ bool url_handler::read_url(string url, ostream* os) {
 
 	/* check for errors */
 	if (result != CURLE_OK) {
+		char msg[256];
+		snprintf(msg, sizeof(msg), "URL_HANDLER: %s", error_msg);
+		status_->misc_status(ST_ERROR, msg);
 		curl_easy_cleanup(curl_);
 		lock_.unlock();
 		return false;
@@ -131,6 +137,9 @@ bool url_handler::post_url(string url, string resource, istream* req, ostream* r
 	/* some servers don't like requests that are made without a user-agent
 	field, so we provide one */
 	curl_easy_setopt(curl_, CURLOPT_USERAGENT, "libcurl-agent/1.0");
+	// Error buffer
+	char* error_msg = new char[CURL_ERROR_SIZE];
+	curl_easy_setopt(curl_, CURLOPT_ERRORBUFFER, error_msg);
 
 	if (DEBUG_CURL) {
 		// Add extra verbosity
@@ -143,6 +152,9 @@ bool url_handler::post_url(string url, string resource, istream* req, ostream* r
 	/* check for errors */
 	if (result != CURLE_OK) {
 		// TODO: This doesn't clean up all the memory
+		char msg[256];
+		snprintf(msg, sizeof(msg), "URL_HANDLER: %s", error_msg);
+		status_->misc_status(ST_ERROR, msg);
 		// Reset the operation and clean up
 
 		curl_easy_reset(curl_);
