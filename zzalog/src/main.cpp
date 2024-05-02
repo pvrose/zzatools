@@ -884,10 +884,10 @@ void print_args(int argc, char** argv) {
 
 	if (DEBUG_ERRORS) status_->misc_status(ST_NOTE, "ZZALOG: -d e - Displaying debug error messages");
 	if (DEBUG_THREADS) status_->misc_status(ST_NOTE, "ZZALOG: -d t - Displaying thread debug messages");
-	if (DEBUG_CURL) status_->misc_status(ST_NOTE, "ZZALOG: -d -c - Displaying more verbosity from libcurl");
+	if (DEBUG_CURL) status_->misc_status(ST_NOTE, "ZZALOG: -d c - Displaying more verbosity from libcurl");
 	if (DEBUG_STATUS) status_->misc_status(ST_NOTE, "ZZALOG: -d s - Displaying status messages");
-	if (DEBUG_QUICK) status_->misc_status(ST_WARNING, "ZZALOG: Reducing periods of some reguat events");
-	snprintf(message, sizeof(message), "ZZALOG: -d -h=%d - Hamlib debug level %d", 
+	if (DEBUG_QUICK) status_->misc_status(ST_WARNING, "ZZALOG: -d q - Reducing periods of some reguat events");
+	snprintf(message, sizeof(message), "ZZALOG: -d h=%d - Hamlib debug level %d", 
 		(int)HAMLIB_DEBUG_LEVEL, (int)HAMLIB_DEBUG_LEVEL);
 	status_->misc_status(ST_NOTE, message);
 	if (AUTO_UPLOAD) status_->misc_status(ST_NOTE, "ZZALOG: -n - QSOs uploaded to QSL sites automatically");

@@ -158,7 +158,11 @@ void wx_handler::update() {
     }
     char url[1024];
     stringstream ss;
+#ifdef WIN32
+    snprintf(url, sizeof(url), "http://api.openweathermap.org/data/2.5/weather?lat=%f&lon=%f&appid=%s&mode=xml",
+#else
     snprintf(url, sizeof(url), "https://api.openweathermap.org/data/2.5/weather?lat=%f&lon=%f&appid=%s&mode=xml",
+#endif 
         location.latitude,
         location.longitude,
         key_);
