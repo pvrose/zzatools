@@ -5,12 +5,95 @@
 #include "qso_server.h"
 #include "qso_manager.h"
 #include "qso_rig.h"
+#include "utils.h"
 
 using namespace std;
 
 extern fllog_emul* fllog_emul_;
 extern wsjtx_handler* wsjtx_handler_;
 extern status* status_;
+
+server_grp::server_grp(int X, int Y, int W, int H, const char* L) :
+    Fl_Group(X, Y, W, H, L)
+{
+    create_form();
+}
+
+server_grp::~server_grp() {
+
+}
+
+void server_grp::load_values() {
+    // Null
+}
+
+void server_grp::save_values() {
+    // Null
+}
+
+void server_grp::create_form() {
+    int curr_x = x();
+    int curr_y = y() + HTEXT;
+
+    box(FL_BORDER_FRAME);
+    align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
+
+    bn_listening_ = new Fl_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Listen");
+    bn_listening_->selection_color(FL_GREEN);
+    bn_listening_->callback(cb_bn_listen);
+    bn_listening_->tooltip("Listen or block messages from this modem");
+
+    curr_x += WBUTTON;
+    bn_launch_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Launch");
+    bn_launch_->callback(cb_bn_launch);
+    bn_launch_->tooltip("Laiunch the modem app");
+
+    curr_x += WBUTTON;
+    bn_receiving_ = new Fl_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Connect'd");
+    bn_receiving_->tooltip("Packets received from modem app");
+    bn_receiving_->callback(cb_bn_receive);
+
+    resizable(nullptr);
+
+    w(curr_x + WBUTTON - x());
+    h(curr_y + HBUTTON + GAP - y());
+
+    end();
+}
+
+void server_grp::enable_widgets() {
+    bool listening = false;
+    bool hearing = false;
+    switch(modem()) {
+        case FLDIGI:
+        {
+            listening = fllog_emul_ && fllog_emul_->has_server();
+            hearing = fllog_emul_ && fllog_emul_->has_data();
+            break;
+        }
+        case WSJTX:
+        {
+            listening = wsjtx_handler_ && wsjtx_handler_->has_server();
+            hearing = wsjtx_handler_ && wsjtx_handler_->has_data();
+            break;
+        }
+    }
+    if (listening) {
+        bn_listening_->value(true);
+        bn_launch_->activate();
+        bn_receiving_->activate();
+        if (hearing) {
+            bn_receiving_->value(true);
+        } else {
+            bn_receiving_->value(false);
+        }
+    } else {
+        bn_listening_->value(false);
+        bn_launch_->deactivate();
+        bn_receiving_->deactivate();
+    }
+}
+
 
 qso_server::qso_server(int X, int Y, int W, int H, const char* L) :
     Fl_Group(X, Y, W, H, L)
@@ -21,103 +104,49 @@ qso_server::qso_server(int X, int Y, int W, int H, const char* L) :
 }
 
 qso_server::~qso_server() {
-    save_values();
+    fldigi_->save_values();
+    wsjtx_->save_values();
 }
 
 void qso_server::load_values() {
-    // NULL action
+    fldigi_->load_values();
+    wsjtx_->load_values();
 }
 
 void qso_server::create_form() {
-    int curr_x = x() + GAP + WLABEL;
+    int curr_x = x() + GAP;
     int curr_y = y() + GAP;
-    
-    // Chack button for FLDIGI
-    bn_fldigi_on_ = new Fl_Check_Button(curr_x, curr_y, HBUTTON, HBUTTON, "FLDIGI");
-    bn_fldigi_on_->when(FL_WHEN_NEVER);
-    bn_fldigi_on_->type(FL_NORMAL_BUTTON);
-    bn_fldigi_on_->align(FL_ALIGN_LEFT);
-    bn_fldigi_on_->tooltip("Indicates that the FLDIGI handler is active");
 
-    curr_x += HBUTTON;
-    // Switch state button
-    bn_fldigi_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Start");
-    bn_fldigi_->callback(cb_bn_change, (void*)FLDIGI);
-    bn_fldigi_->tooltip("Change the state of the FLDIGI handler");
+    fldigi_ = new server_grp(curr_x, curr_y, 100, 100, "FLDIGI");
+    fldigi_->modem(FLDIGI);
+    curr_y += fldigi_->h();
 
-    curr_x += WBUTTON;
-    // Start fldigi
-    bn_start_f_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Launch");
-    bn_start_f_->callback(cb_bn_start, (void*)FLDIGI);
-    bn_start_f_->tooltip("Launch fldigi");
-    bn_start_f_->color(FL_DARK_GREEN);
-    bn_start_f_->labelcolor(FL_WHITE);
-
-    curr_x = x() + GAP + WLABEL;
-    curr_y += HBUTTON;
-
-    // Chack button for WSJT-X
-    bn_wsjtx_on_ = new Fl_Check_Button(curr_x, curr_y, HBUTTON, HBUTTON, "WSJT-X");
-    bn_wsjtx_on_->when(FL_WHEN_NEVER);
-    bn_wsjtx_on_->type(FL_NORMAL_BUTTON);
-    bn_wsjtx_on_->align(FL_ALIGN_LEFT);
-    bn_wsjtx_on_->tooltip("Indicates that the WSJT-X handler is active");
-
-    curr_x += HBUTTON;
-    // Switch state button
-    bn_wsjtx_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Start");
-    bn_wsjtx_->callback(cb_bn_change, (void*)WSJTX);
-    bn_wsjtx_->tooltip("Change the state of the WSJT-X handler");
-
-    curr_x += WBUTTON;
-    // Start fldigi
-    bn_start_w_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Launch");
-    bn_start_w_->callback(cb_bn_start, (void*)WSJTX);
-    bn_start_w_->tooltip("Launch fldigi");
-    bn_start_w_->color(FL_DARK_GREEN);
-    bn_start_w_->labelcolor(FL_WHITE);
+    wsjtx_ = new server_grp(curr_x, curr_y, 100, 200, "WSJT-X");
+    wsjtx_->modem(WSJTX);
+    curr_y += wsjtx_->h();
 
     resizable(nullptr);
+    curr_x += fldigi_->w() + GAP;
+    w(curr_x - x());
+    curr_y += GAP;
+    h(curr_y - y());
     end();
 }
 
 void qso_server::save_values() {
-    // NULL Function
+    fldigi_->save_values();
+    wsjtx_->save_values();
 }
 
 void qso_server::enable_widgets() {
-    // Fldigi widgets
-    if (fllog_emul_ && fllog_emul_->has_server()) {
-        bn_fldigi_on_->value(true);
-        bn_fldigi_->label("Stop");
-        bn_fldigi_->color(fl_lighter(FL_RED));
-        bn_start_f_->activate();
-    } else {
-        bn_fldigi_on_->value(false);
-        bn_fldigi_->label("Start");
-        bn_fldigi_->color(fl_lighter(FL_GREEN));
-        bn_start_f_->deactivate();
-    }
-    bn_fldigi_->labelcolor(fl_contrast(FL_FOREGROUND_COLOR, bn_fldigi_->color()));
-    // WSJTX widgets
-    if (wsjtx_handler_ && wsjtx_handler_->has_server()) {
-        bn_wsjtx_on_->value(true);
-        bn_wsjtx_->label("Stop");
-        bn_wsjtx_->color(fl_lighter(FL_RED));
-        bn_start_w_->activate();
-    } else {
-        bn_wsjtx_on_->value(false);
-        bn_wsjtx_->label("Start");
-        bn_wsjtx_->color(fl_lighter(FL_GREEN));
-        bn_start_w_->deactivate();
-   }
-    bn_wsjtx_->labelcolor(fl_contrast(FL_FOREGROUND_COLOR, bn_wsjtx_->color()));
+    fldigi_->enable_widgets();
+    wsjtx_->enable_widgets();
 }
 
 // Button callback
-void qso_server::cb_bn_change(Fl_Widget* w, void* v) {
-    qso_server* that = ancestor_view<qso_server>(w);
-    server_t server = (server_t)(intptr_t)v;
+void server_grp::cb_bn_listen(Fl_Widget* w, void* v) {
+    server_grp* that = ancestor_view<server_grp>(w);
+    server_t server = that->modem();
     switch (server) {
     case FLDIGI:
         if (fllog_emul_->has_server()) {
@@ -138,9 +167,9 @@ void qso_server::cb_bn_change(Fl_Widget* w, void* v) {
 }
 
 // Start button callback
-void qso_server::cb_bn_start(Fl_Widget* w, void* v) {
-    qso_server* that = ancestor_view<qso_server>(w);
-    server_t server = (server_t)(intptr_t)v;
+void server_grp::cb_bn_launch(Fl_Widget* w, void* v) {
+    server_grp* that = ancestor_view<server_grp>(w);
+    server_t server = that->modem();
     qso_manager* mgr = ancestor_view<qso_manager>(that);
     string suffix = mgr->rig_control()->app_suffix();
     // Defualt app is a comment
@@ -161,4 +190,19 @@ void qso_server::cb_bn_start(Fl_Widget* w, void* v) {
     system(app.c_str());
     that->enable_widgets();
   
+}
+
+// This needs to verride the deafult action in Fl_Light_Button and NOT switch value
+void server_grp::cb_bn_receive(Fl_Widget* w, void* v) {
+    server_grp* that = ancestor_view<server_grp>(w);
+    that->enable_widgets();
+}
+
+// Set modem
+void server_grp::modem(server_t t) {
+    modem_ = t;
+}
+
+server_t server_grp::modem() {
+    return modem_;
 }

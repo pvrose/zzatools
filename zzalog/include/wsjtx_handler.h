@@ -40,6 +40,9 @@ using namespace std;
 		// Remove QSO from cache
 		void delete_qso(string call);
 
+		// Received a packet
+		bool has_data();
+
 		// Used in static methods to point to the single instance of this class
 		static wsjtx_handler* that_;
 

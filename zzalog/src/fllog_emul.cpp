@@ -305,11 +305,14 @@ int fllog_emul::list_methods(rpc_data_item::rpc_list& params, rpc_data_item& res
 }
 
 void fllog_emul::check_connected() {
-	// if (!connected_) {
-	// 	connected_ = true;
-	// 	fl_beep(FL_BEEP_NOTIFICATION);
-	// 	fl_alert("FLDIGI has connected, please ensure station details will be logged correctly!");
-	// }
+	if (!connected_) {
+		connected_ = true;
+		qso_manager_->enable_widgets();
+	}
+}
+
+bool fllog_emul::has_data() {
+	return connected_;
 }
 
 // server state

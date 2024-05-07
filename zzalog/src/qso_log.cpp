@@ -43,7 +43,7 @@ void qso_log::create_form(int X, int Y) {
 	rw = max(rw, qsl_ctrl_->w());
 	rh = max(rh, qsl_ctrl_->h());
 
-	server_ctrl_ = new qso_server(rx, ry, rw, rh, "Servers");
+	server_ctrl_ = new qso_server(rx, ry, rw, rh, "Modems");
 	server_ctrl_->labelsize(FL_NORMAL_SIZE + 2);
 	rw = max(rw, server_ctrl_->w());
 	rh = max(rh, server_ctrl_->h());

@@ -81,11 +81,10 @@ int wsjtx_handler::rcv_dgram(stringstream & ss) {
 	}
 	id_ = get_utf8(ss);
 
-	// if (!connected_) {
-	// 	connected_ = true;
-	// 	fl_beep(FL_BEEP_NOTIFICATION);
-	// 	fl_alert("WSJT-X has connected, please ensure correct station details will get logged!");
-	// }
+	if (!connected_) {
+		connected_ = true;
+		qso_manager_->enable_widgets();
+	}
 
 	// Select method to interpret datagram
 	switch (dgram_type) {
@@ -156,6 +155,8 @@ int wsjtx_handler::send_hbeat() {
 // Close datagram: shut the server down 
 int wsjtx_handler::handle_close(stringstream& ss) {
 	status_->misc_status(ST_NOTE, "WSJT-X: Received Closing down");
+	connected_ = false;
+	qso_manager_->enable_widgets();
 	// Clear any WSJT-X related items
 	menu_->update_items();
 	return 1;
@@ -943,4 +944,9 @@ void wsjtx_handler::delete_qso(string call) {
 		snprintf(msg, sizeof(msg),"WSJTX: Request to delete unknown record from cache", call.c_str());
 		status_->misc_status(ST_ERROR, msg);
 	}
+}
+
+// Received data
+bool wsjtx_handler::has_data() {
+	return connected_;
 }

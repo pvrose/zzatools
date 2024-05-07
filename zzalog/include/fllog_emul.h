@@ -25,6 +25,8 @@
 		void close_server();
 		// Return server state
 		bool has_server();
+		// Received a packet
+		bool has_data();
 
 	protected:
 		// Get ADIF string for first record with callsign
