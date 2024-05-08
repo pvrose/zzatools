@@ -151,6 +151,9 @@ void status::progress(int value, object_t object) {
 					// Revert to previous progress item (current top-of-stack)
 					update_progress(progress_stack_.back());
 				}
+			} else {
+				// Let the time come in if it's waiting
+				Fl::check();
 			}
 		}
 	}
