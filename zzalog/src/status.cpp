@@ -117,7 +117,9 @@ void status::update_progress(object_t object) {
 		if (item->value != previous_value_) {
 			Fl_Color bar_colour = OBJECT_COLOURS.at(object);
 			char label[100];
-			sprintf(label, "PROGRESS: %d/%d %s", item->value, item->max_value, item->suffix);
+			int pc = item->value * 100 / item->max_value;
+			sprintf(label, "PROGRESS: %d/%d %s (%d%%)", 
+				item->value, item->max_value, item->suffix, pc);
 			// progress_->copy_label(label);
 			misc_status(ST_LOG, label);
 			previous_value_ = item->value;
