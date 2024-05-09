@@ -751,7 +751,20 @@ void qso_entry::cb_ip_field(Fl_Widget* w, void* v) {
 	else if (field == "MY_RIG") {
 		// Update the selected rig CAT group
 		((qso_manager*)that->qso_data_->parent())->change_rig(value);
-		that->copy_cat_to_qso(true);
+		switch(that->qso_data_->logging_state()) {
+			case qso_data::QSO_INACTIVE:
+			case qso_data::QSO_PENDING:
+			case qso_data::QSO_STARTED:
+			case qso_data::QSO_ENTER:
+			case qso_data::NET_STARTED:
+			case qso_data::NET_ADDING:
+			case qso_data::QSO_WSJTX:
+			case qso_data::QSO_FLDIGI:
+			{
+				that->copy_cat_to_qso(true);
+				break;
+			}
+		}
 	}
 	else if (field == "QSO_DATE" || field == "TIME_ON") {
 		if (that->qso_number_ != -1) {
