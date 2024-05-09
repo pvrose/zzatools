@@ -60,7 +60,7 @@ search_dialog::search_dialog() :
 	const int HG1A = R13 + HBN;
 	const int R14 = R13 + HBN + GAP;
 	const int HG1B = R14 + HBN;
-	const int R15 = R14 + HBN + GAP;
+	const int R15 = R14 + HBN + HTEXT;
 	const int HG1 = R15 + HBN + GAP - YG1;
 	// Group 2 - Refinement
 	const int YG2 = YG1 + HG1 + GAP;
@@ -156,7 +156,7 @@ search_dialog::search_dialog() :
 	field_choice* ch12 = new field_choice(C13, R13, WCHOICE, HTEXT);
 	ch12->set_dataset("Fields",criteria_->field_name);
 	ch12->tooltip("Select field to search on");
-	ch12->callback(cb_value<field_choice, string>, (void*)&criteria_->field_name);
+	ch12->callback(cb_ch_field, (void*)&criteria_->field_name);
 	ch12->when(FL_WHEN_RELEASE);
 	field_name_ = ch12;
 	gp1a->end();
@@ -187,7 +187,7 @@ search_dialog::search_dialog() :
 	field_input* ip14 = new field_input(C11, R15
 		, WEDIT, HTEXT, "Search text");
 	ip14->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
-	ip14->callback(cb_ch_field, (void*)&criteria_->pattern);
+	ip14->callback(cb_value<field_input, string>, (void*)&criteria_->pattern);
 	ip14->when(FL_WHEN_CHANGED);
 	ip14->value(criteria_->pattern.c_str());
 	ip14->tooltip("The expression to match records against");
@@ -535,7 +535,8 @@ void search_dialog::cb_bn_condx(Fl_Widget* w, void* v) {
 // Field name choice
 void search_dialog::cb_ch_field(Fl_Widget* w, void* v) {
 	search_dialog* that = ancestor_view<search_dialog>(w);
-	cb_value<field_input, string>(w, v);
+	cb_value<field_choice, string>(w, v);
+	that->criteria_->pattern = "";
 	that->enable_widgets();
 }
 
@@ -544,6 +545,7 @@ void search_dialog::enable_widgets() {
 	if (criteria_->condition == XC_FIELD) {
 		field_name_->activate();
 		((field_input*)search_text_)->field_name(criteria_->field_name.c_str());
+		((field_input*)search_text_)->value(criteria_->pattern.c_str());
 	} else {
 		field_name_->deactivate();
 		((field_input*)search_text_)->field_name("");
