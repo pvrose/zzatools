@@ -1020,6 +1020,60 @@ void save_switches() {
 	switch_settings.set("Auto Save QSOs", (bool)AUTO_SAVE);
 }
 
+// Open preferences and save them
+bool open_settings() {
+	// Open the settings file 
+	settings_ = new Fl_Preferences(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+
+	char source[256];
+	Fl_Preferences::Root root = settings_->filename(source, sizeof(source));
+	if (root == Fl_Preferences::USER) {
+		printf("ZZALOG: Opened settings %s\n", source);
+	}
+	char backup[256];
+	strcpy(backup, source);
+	strcat(backup, ".save");
+	// In and out streams
+	ifstream in(source);
+	in.seekg(0, in.end);
+	int length = (int)in.tellg();
+	if (in.good() && length) {
+		const int increment = 8000;
+		in.seekg(0, in.beg);
+		ofstream out(backup);
+		bool ok = in.good() && out.good();
+		char buffer[increment];
+		int count = 0;
+		// Copy file in 7999 byte chunks
+		while (!in.eof() && ok) {
+			in.read(buffer, increment);
+			out.write(buffer, in.gcount());
+			count += (int)in.gcount();
+			ok = out.good() && (in.good() || in.eof());
+		}
+		in.close();
+		out.close();
+
+		if (ok) {
+			printf("ZZALOG: Settings saved as %s\n", backup);
+		}
+	}
+	else {
+		switch(fl_choice("This appears to be a new installation, Continue?", "Yes", "No", nullptr)) {
+			case 0: {
+				printf("ZZALOG: No settings file - creating new settings\n");
+				break;
+			}
+			case 1: {
+				printf("ZZALOG: Corrupt settings - abandoning\n");
+				return false;
+			}
+			
+		}
+	}
+	return true;
+}
+
 // The main app entry point
 int main(int argc, char** argv)
 {
@@ -1027,7 +1081,10 @@ int main(int argc, char** argv)
 	Fl::lock();
 	// Set default Fil Chooser on non-windows
 	// Create the settings before anything else 
-	settings_ = new Fl_Preferences(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	if (!open_settings()) {
+		return 255;
+	}
+
 	// Ctreate status to handle status messages
 	status_ = new status();
 
