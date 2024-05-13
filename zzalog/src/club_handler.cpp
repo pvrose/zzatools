@@ -157,7 +157,7 @@ bool club_handler::download_exception(string filename) {
 	status_->misc_status(ST_NOTE, "CLUBLOG: Starting to download exception file");
 	string zip_filename = filename + ".gz";
 	ofstream os(zip_filename, ios::trunc | ios::out | ios::binary);
-	string url = "http://cdn.clublog.org/cty.php?api=" + string(api_key_);
+	string url = "https://cdn.clublog.org/cty.php?api=" + string(api_key_);
 	if (url_handler_->read_url(url, &os)) {
 		os.close();
 		status_->misc_status(ST_NOTE, "CLUBLOG: Exception file downloaded successfully - unzipping it");
@@ -200,6 +200,7 @@ bool club_handler::unzip_exception(string filename) {
 	snprintf(msg, sizeof(msg), "CLUBLOG: Unzipping started: %s", cmd);
 	status_->misc_status(ST_NOTE, msg);
 	int result = system(cmd);
+#ifdef _WIN32
 	if (result < 0) {
 		status_->misc_status(ST_ERROR, "CLUBLOG: Unzipping failed");
 		return false;
@@ -226,6 +227,15 @@ bool club_handler::unzip_exception(string filename) {
 		return false;
 	}
 	return true;
+#else
+	if (result != 0) {
+		status_->misc_status(ST_ERROR, "CLUBLOG: Unzipping failed");
+		return false;
+	} else {
+		status_->misc_status(ST_OK, "CLUBLOG: Unzipping successful");
+		return true;
+	}
+#endif
 }
 
 // Get reference directory
