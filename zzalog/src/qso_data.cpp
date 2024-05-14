@@ -422,6 +422,7 @@ void qso_data::update_query(logging_state_t query, qso_num_t match_num, qso_num_
 // Update modem QSO
 record* qso_data::start_modem_qso(string call, qso_init_t source) {
 	bool allow_modem = true;
+	bool cancelled = false;
 	switch (logging_state_) {
 	case QSO_PENDING:
 		action_deactivate();
@@ -458,6 +459,8 @@ record* qso_data::start_modem_qso(string call, qso_init_t source) {
 	case QSO_WSJTX:
 	case QSO_FLDIGI:
 	// We are altready displaying a modem QSO
+		cancelled = true;
+		book_->enable_save(false, "Prevent save ehen cancelling to create a new QSO");
 		action_cancel_modem();
 		break;
 
@@ -469,6 +472,7 @@ record* qso_data::start_modem_qso(string call, qso_init_t source) {
 		// printf("DEBUG DASH Received request to create a record for %s\n", call.c_str());
 		action_activate(source);
 		action_start(source);
+		if (cancelled) book_->enable_save(true, "Remove temporary block");
 		current_qso()->item("CALL", call);
 		// printf("DEBUG DASH generated %s - %p\n", call.c_str(), current_qso());
 		return current_qso();
