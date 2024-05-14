@@ -44,16 +44,11 @@ void server_grp::create_form() {
     bn_listening_->tooltip("Listen or block messages from this modem");
 
     curr_x += WBUTTON;
-    bn_launch_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Launch");
-    bn_launch_->callback(cb_bn_launch);
-    bn_launch_->tooltip("Laiunch the modem app");
+    bn_connect_ = new Fl_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Connect");
+    bn_connect_->callback(cb_bn_connect);
+    bn_connect_->tooltip("Launch the modem app");
 
-    curr_x += WBUTTON;
-    bn_receiving_ = new Fl_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Connect'd");
-    bn_receiving_->tooltip("Packets received from modem app");
-    bn_receiving_->callback(cb_bn_receive);
-
-    resizable(nullptr);
+     resizable(nullptr);
 
     w(curr_x + WBUTTON - x());
     h(curr_y + HBUTTON + GAP - y());
@@ -80,17 +75,15 @@ void server_grp::enable_widgets() {
     }
     if (listening) {
         bn_listening_->value(true);
-        bn_launch_->activate();
-        bn_receiving_->activate();
+        bn_connect_->activate();
         if (hearing) {
-            bn_receiving_->value(true);
+            bn_connect_->value(true);
         } else {
-            bn_receiving_->value(false);
+            bn_connect_->value(false);
         }
     } else {
         bn_listening_->value(false);
-        bn_launch_->deactivate();
-        bn_receiving_->deactivate();
+        bn_connect_->deactivate();
     }
 }
 
@@ -167,7 +160,7 @@ void server_grp::cb_bn_listen(Fl_Widget* w, void* v) {
 }
 
 // Start button callback
-void server_grp::cb_bn_launch(Fl_Widget* w, void* v) {
+void server_grp::cb_bn_connect(Fl_Widget* w, void* v) {
     server_grp* that = ancestor_view<server_grp>(w);
     server_t server = that->modem();
     qso_manager* mgr = ancestor_view<qso_manager>(that);
@@ -190,12 +183,6 @@ void server_grp::cb_bn_launch(Fl_Widget* w, void* v) {
     system(app.c_str());
     that->enable_widgets();
   
-}
-
-// This needs to verride the deafult action in Fl_Light_Button and NOT switch value
-void server_grp::cb_bn_receive(Fl_Widget* w, void* v) {
-    server_grp* that = ancestor_view<server_grp>(w);
-    that->enable_widgets();
 }
 
 // Set modem

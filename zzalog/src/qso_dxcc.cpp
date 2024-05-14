@@ -232,33 +232,35 @@ void qso_dxcc::wb4_buttons::enable_widgets() {
 		bn->value(false);
 	}
 	// Mark QSO buttons
-	if (qso_band.length()) {
-		Fl_Toggle_Button* bn = (Fl_Toggle_Button*)map_.at(qso_band);
-		bn->color(COLOUR_CLARET, COLOUR_CLARET);
-		bn->labelcolor(fl_contrast(FL_BLACK, bn->color()));
-		bn->value(true);
-	}
-	if (qso_mode.length()) {
-		Fl_Toggle_Button* bn = (Fl_Toggle_Button*)map_.at(qso_mode);
-		bn->color(FL_DARK_GREEN, FL_DARK_GREEN);
-		bn->labelcolor(fl_contrast(FL_BLACK, bn->color()));
-		bn->value(true);
-	}
-	// Set band colours - CLARET this QSO, MAUVE other QSOs
-	// Set this band to CLARET - overwrite tp MAUVE if wkb4
-	if (dxcc_bands_) {
-		for (auto ix = dxcc_bands_->begin(); ix != dxcc_bands_->end(); ix++) {
-			Fl_Toggle_Button * bn = (Fl_Toggle_Button*)map_.at(*ix);
-			bn->color(COLOUR_MAUVE, COLOUR_MAUVE);
+	if (qso && qso->item("CALL").length()) {
+		if (qso_band.length()) {
+			Fl_Toggle_Button* bn = (Fl_Toggle_Button*)map_.at(qso_band);
+			bn->color(COLOUR_CLARET, COLOUR_CLARET);
 			bn->labelcolor(fl_contrast(FL_BLACK, bn->color()));
+			bn->value(true);
 		}
-	}
-	// Set mode colours - CALRET this QSO, APPLE other QSOs
-	if (dxcc_modes_) {
-		for (auto ix = dxcc_modes_->begin(); ix != dxcc_modes_->end(); ix++) {
-			Fl_Toggle_Button* bn = (Fl_Toggle_Button*)map_.at(*ix);
-			bn->color(COLOUR_APPLE, COLOUR_APPLE);
+		if (qso_mode.length()) {
+			Fl_Toggle_Button* bn = (Fl_Toggle_Button*)map_.at(qso_mode);
+			bn->color(FL_DARK_GREEN, FL_DARK_GREEN);
 			bn->labelcolor(fl_contrast(FL_BLACK, bn->color()));
+			bn->value(true);
+		}
+		// Set band colours - CLARET this QSO, MAUVE other QSOs
+		// Set this band to CLARET - overwrite tp MAUVE if wkb4
+		if (dxcc_bands_) {
+			for (auto ix = dxcc_bands_->begin(); ix != dxcc_bands_->end(); ix++) {
+				Fl_Toggle_Button * bn = (Fl_Toggle_Button*)map_.at(*ix);
+				bn->color(COLOUR_MAUVE, COLOUR_MAUVE);
+				bn->labelcolor(fl_contrast(FL_BLACK, bn->color()));
+			}
+		}
+		// Set mode colours - CALRET this QSO, APPLE other QSOs
+		if (dxcc_modes_) {
+			for (auto ix = dxcc_modes_->begin(); ix != dxcc_modes_->end(); ix++) {
+				Fl_Toggle_Button* bn = (Fl_Toggle_Button*)map_.at(*ix);
+				bn->color(COLOUR_APPLE, COLOUR_APPLE);
+				bn->labelcolor(fl_contrast(FL_BLACK, bn->color()));
+			}
 		}
 	}
 }

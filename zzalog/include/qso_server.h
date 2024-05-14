@@ -24,13 +24,11 @@ class server_grp :
         void enable_widgets();
 
         static void cb_bn_listen(Fl_Widget* w, void* v);
-        static void cb_bn_launch(Fl_Widget* w, void* v);
-        static void cb_bn_receive(Fl_Widget* w, void* v);
+        static void cb_bn_connect(Fl_Widget* w, void* v);
         
     protected:
         Fl_Light_Button* bn_listening_;
-        Fl_Button* bn_launch_;
-        Fl_Light_Button* bn_receiving_;
+        Fl_Light_Button* bn_connect_;
 
         server_t modem_;
 
