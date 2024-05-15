@@ -1652,6 +1652,7 @@ string menu::get_browser() {
 		delete chooser;
 	}
 	datapath_settings.set("Web Browser", browser.c_str());
+	settings_->flush();
 	return browser;
 }
 

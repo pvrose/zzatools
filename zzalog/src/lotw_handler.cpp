@@ -159,6 +159,7 @@ bool lotw_handler::upload_lotw_log(book* book, bool mine) {
 	}
 	delete chooser;
 	fl_cursor(FL_CURSOR_DEFAULT);
+	settings_->flush();
 	return ok;
 }
 
@@ -224,6 +225,7 @@ bool lotw_handler::download_lotw_log(stringstream* adif) {
 		lotw_settings.set("Last Accessed", now(false, "%Y%m%d").c_str());
 	}
 	fl_cursor(FL_CURSOR_DEFAULT);
+	settings_->flush();
 	return ok;
 }
 

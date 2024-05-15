@@ -254,6 +254,7 @@ string eqsl_handler::card_filename_l(record* record, bool use_default) {
 		while (chooser->show()) {}
 		qsl_directory = chooser->filename();
 		datapath_settings.set("QSLs", qsl_directory.c_str());
+		settings_->flush();
 		delete chooser;
 	}
 	char save_filename[2048];
@@ -608,6 +609,7 @@ eqsl_handler::response_t eqsl_handler::adif_filename(string& filename) {
 		Fl_Preferences qsl_settings(settings_, "QSL");
 		Fl_Preferences eqsl_settings(qsl_settings, "eQSL");
 		eqsl_settings.set("Last Accessed", last_access.c_str());
+		settings_->flush();
 	}
 
 	return result;

@@ -23,7 +23,6 @@
 
 
 
-extern Fl_Preferences* settings_;
 extern cty_data* cty_data_;
 extern status* status_;
 extern tabbed_forms* tabbed_forms_;

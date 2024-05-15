@@ -18,7 +18,6 @@ using namespace std;
 
 
 extern spec_data* spec_data_;
-extern Fl_Preferences* settings_;
 
 // Constructor - calls the dialog constructor with placeholders for size
 change_dialog::change_dialog(const char* label) :

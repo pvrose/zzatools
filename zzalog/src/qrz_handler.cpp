@@ -82,6 +82,7 @@ bool qrz_handler::open_session() {
 					use_xml_database_ = false;
 					Fl_Preferences qrz_settings(settings_, "QRZ");
 					qrz_settings.set("Use XML Database", false);
+					settings_->flush();
 					return false;
 				}
 			}

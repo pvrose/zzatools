@@ -181,21 +181,6 @@ bool club_handler::unzip_exception(string filename) {
 	snprintf(cmd, sizeof(cmd), "gunzip -f %s", filename.c_str());
 #endif
 
-	//Fl_Preferences qsl_settings(settings_, "QSL");
-	//Fl_Preferences clublog_settings(qsl_settings, "ClubLog");
-	//char* cmd_executable;
-	//clublog_settings.get("Unzip Command", cmd_executable, "C:/Program Files (x86)/7-Zip/7z");
-	//char* switch_format;
-	//clublog_settings.get("Unzip Switches", switch_format, "e %s -o%s -y");
-	//char* cmd_format = new char[strlen(switch_format) + strlen(cmd_executable) + 10];
-	//// Add quotes around the executable in case it is in C:\Program Files (x86)
-	//sprintf(cmd_format, "\"%s\" %s", cmd_executable, switch_format);
-	//char cmd[200];
-	//snprintf(cmd, 199, cmd_format, filename.c_str(), ref_dir.c_str());
-
-	//delete[] cmd_format;
-	//free(cmd_executable);
-	//free(switch_format);
 	char msg[128];
 	snprintf(msg, sizeof(msg), "CLUBLOG: Unzipping started: %s", cmd);
 	status_->misc_status(ST_NOTE, msg);
@@ -260,6 +245,7 @@ void club_handler::get_reference(string& dir_name) {
 		dir_name = temp;
 	}
 	if (temp) free(temp);
+	settings_->flush();
 }
 
 // Upload the single specified QSO in real time

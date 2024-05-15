@@ -240,6 +240,7 @@ void status::misc_status(status_t status, const char* label) {
 					report_filename_ = chooser->filename();
 					Fl_Preferences status_settings(settings_, "Status");
 					status_settings.set("Report File", report_filename_.c_str());
+					settings_->flush();
 				}
 				delete chooser;
 			}

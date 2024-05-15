@@ -112,6 +112,7 @@ string spec_data::get_path(bool force) {
 	}
 	if (dirname) free(dirname);
 	datapath.set("Reference", directory_name.c_str());
+	settings_->flush();
 	return directory_name;
 }
 
@@ -2148,7 +2149,6 @@ bool spec_data::auto_correction(valn_error_t error_code, const string&  data, co
 				char temp[10];
 				strftime(temp, sizeof(temp), "%Y%m%d", gmtime(&new_off));
 				record_->item("QSO_DATE_OFF", string(temp));
-				//Fl_Preferences log_settings(settings_, "Log");
 				strftime(temp, sizeof(temp), "%H%M%S", gmtime(&new_off));
 				record_->item("TIME_OFF", string(temp));
 				correction_message_ = field + "=" + display_item + "auto-corrected to " +

@@ -600,6 +600,8 @@ void files_dialog::save_values() {
 		autos_changed_ = false;
 	}
 
+	settings_->flush();
+
 }
 
 // Method provided as needed to overload the page_dialog version

@@ -204,6 +204,7 @@ string backup_filename(string source) {
 	}
 	// Save the result of the chooser
 	backup_settings.set("Path", backup.c_str());
+	settings_->flush();
 
 	// ensure the correct delimiiter is appendded
 	if (backup.back() != '/' && backup.back() != '\\') {
@@ -351,6 +352,7 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 		window_settings.set("Top", main_window_->y_root());
 		window_settings.set("Width", main_window_->w());
 		window_settings.set("Height", main_window_->h());
+		settings_->flush();
 
 		// Save sticky switches
 		save_switches();
@@ -1018,6 +1020,7 @@ void save_switches() {
 	switch_settings.set("Theme Colour", temp);
 	switch_settings.set("Auto Update QSOs", (int)AUTO_UPLOAD);
 	switch_settings.set("Auto Save QSOs", (bool)AUTO_SAVE);
+	settings_->flush();
 }
 
 // Open preferences and save them
@@ -1205,6 +1208,7 @@ void backup_file() {
 		status_->misc_status(ST_OK, "BACKUP: Done");
 		Fl_Preferences backup_settings(settings_, "Backup");
 		backup_settings.set("Last Backup", backup.c_str());
+		settings_->flush();
 	}
 }
 
@@ -1228,6 +1232,7 @@ void set_recent_file(string filename) {
 			sprintf(path, "File%d", i);
 			recent_settings.set(path, (*it).c_str());
 		}
+		settings_->flush();
 
 		menu_->add_recent_files();
 

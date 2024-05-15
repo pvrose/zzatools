@@ -252,6 +252,8 @@ void qsl_design::save_values() {
 	call_settings.set("First Column", col_left_);
 	call_settings.set("Max QSOs per Card", number_qsos_);
 
+	settings_->flush();
+
 }
 
 // Call back when a radio button is pressed - v indicates which button

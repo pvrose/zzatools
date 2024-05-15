@@ -338,6 +338,7 @@ void qso_wx::save_values() {
 	wx_settings.set("Temperature", (int&)display_temperature_);
 	wx_settings.set("Pressure", (int&)display_pressure_);
 	wx_settings.set("Cloud", (int&)display_cloud_);
+	settings_->flush();
 }
 
 // Icon clicked'

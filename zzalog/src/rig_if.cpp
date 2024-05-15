@@ -12,9 +12,6 @@
 #include <FL/fl_ask.H>
 #include <FL/Fl_Window.H>
 
-
-
-extern Fl_Preferences* settings_;
 extern status* status_;
 
 // Returns if the rig opened OK

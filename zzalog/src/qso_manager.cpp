@@ -183,6 +183,7 @@ void qso_manager::save_values() {
 	Fl_Preferences dash_settings(windows_settings, "Dashboard");
 	dash_settings.set("Left", x_root());
 	dash_settings.set("Top", y_root());
+	settings_->flush();
 
 //	Fl_Preferences stations_settings(settings_, "Stations");
 	data_group_->save_values();

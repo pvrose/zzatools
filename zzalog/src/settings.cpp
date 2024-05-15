@@ -141,6 +141,8 @@ settings::~settings()
 	Fl_Preferences window_settings(windows_settings, "Settings");
 	window_settings.set("Left", x_root());
 	window_settings.set("Top", y_root());
+
+	settings_->flush();
 }
 
 // Enable widgets

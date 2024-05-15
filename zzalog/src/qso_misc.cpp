@@ -78,6 +78,7 @@ void qso_misc::save_values() {
 			display_settings.set("QSO Entry Tab", ix);
 		}
 	}
+	settings_->flush();
 }
 
 void qso_misc::qso(record* qso, qso_num_t number) {

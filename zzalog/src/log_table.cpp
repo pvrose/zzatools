@@ -675,6 +675,7 @@ void log_table::get_fields() {
 			field_settings.set("Name", field.field.c_str());
 		}
 	}
+	settings_->flush();
 }
 
 // Returns the field set
@@ -914,6 +915,7 @@ void log_table::dbl_click_column(int col) {
 		snprintf(message, 128, "LOG: Sort on %s not available with this log type. Sort ignored", field_info.field.c_str());
 		status_->misc_status(ST_WARNING, message);
 	}
+	settings_->flush();
 }
 
 // Select and go to item 
@@ -946,6 +948,8 @@ void log_table::drag_column(int C) {
 		// This is the Cth group.
 		Fl_Preferences field_settings(field_set_settings, field_set_settings.group(C));
 		field_settings.set("Width", new_width);
+
+		settings_->flush();
 	}
 }
 

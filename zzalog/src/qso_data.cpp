@@ -530,6 +530,7 @@ void qso_data::save_values() {
 	for (auto ix = qso_entry::field_map_.begin(); ix != qso_entry::field_map_.end(); ix++) {
 		field_settings.set(ix->first.c_str(), join_line(ix->second, ',').c_str());
 	}
+	settings_->flush();
 }
 
 string qso_data::get_defined_fields() {

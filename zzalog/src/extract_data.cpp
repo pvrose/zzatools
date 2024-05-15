@@ -26,7 +26,6 @@ extern eqsl_handler* eqsl_handler_;
 extern lotw_handler* lotw_handler_;
 extern club_handler* club_handler_;
 extern spec_data* spec_data_;
-extern Fl_Preferences* settings_;
 extern qso_manager* qso_manager_;
 
 // Constructor

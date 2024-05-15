@@ -213,6 +213,7 @@ void qso_qsl::save_values() {
 	// Clublog
 	Fl_Preferences club_settings(qsl_settings, "ClubLog");
 	club_settings.set("Upload per QSO", auto_club_);
+	settings_->flush();
 }
 
 void qso_qsl::enable_widgets() {

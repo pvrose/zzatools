@@ -484,6 +484,8 @@ void search_dialog::save_values() {
 	search_settings.set("Condition", criteria_->pattern.c_str());
 	search_settings.set("Field", criteria_->field_name.c_str());
 	search_settings.set("Mode", criteria_->mode.c_str());
+
+	settings_->flush();
 }
 
 // get the extract criteria

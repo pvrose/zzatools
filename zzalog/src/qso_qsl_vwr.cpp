@@ -57,6 +57,7 @@ void qso_qsl_vwr::load_values() {
 			qsl_directory_ = chooser->filename();
 		}
 		datapath.set("QSLs", qsl_directory_.c_str());
+		settings_->flush();
 		delete chooser;
 	}
 	else {
@@ -70,6 +71,7 @@ void qso_qsl_vwr::save_values() {
 	display_settings.set("Image Type", selected_image_);
 	Fl_Preferences datapath(settings_, "Datapath");
 	datapath.set("QSLs", qsl_directory_.c_str());
+	settings_->flush();
 }
 
 // Create form

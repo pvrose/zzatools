@@ -624,6 +624,8 @@ void web_dialog::save_values() {
 	wsjtx_settings.set("Port Number", wsjtx_udp_port_);
 	fllog_settings.set("Address", fldigi_rpc_addr_.c_str());
 	fllog_settings.set("Port Number", fldigi_rpc_port_);
+
+	settings_->flush();
 }
 
 // Enable widgets after enabling/disabling stuff

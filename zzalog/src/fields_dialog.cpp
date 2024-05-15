@@ -475,6 +475,7 @@ void fields_dialog::save_values() {
 		sprintf(app_path, "App%d", i);
 		fields_settings.set(app_path, field_set_by_app_[(field_ordering_t)i].c_str());
 	}
+	settings_->flush();
 	// For each field set
 	auto it = field_sets_.begin();
 	for (int i = 0; it != field_sets_.end(); i++, it++) {

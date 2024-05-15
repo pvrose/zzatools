@@ -253,6 +253,7 @@ string cty_data::get_filename() {
 	}
 	if (dirname) free(dirname);
 	datapath.set("Reference", directory_name.c_str());
+	settings_->flush();
 	return directory_name + "cty.xml";
 }
 

@@ -323,6 +323,7 @@ bool book::load_data(string filename)
 		status_->misc_status(ST_ERROR, "LOG: An extract or export type of book cannot be constructed by reading a file");
 		ok = false;
 	}
+	settings_->flush();
 	return ok;
 }
 
@@ -498,6 +499,7 @@ bool book::store_data(string filename, bool force, set<string>* fields) {
 	// Update menu item activeness - redraw log tables to remove modified hue
 	tabbed_forms_->update_views(nullptr, HT_FORMAT, 0);
 	menu_->update_items();
+	settings_->flush();
 	return ok;
 }
 

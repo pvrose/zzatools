@@ -257,6 +257,8 @@ void user_dialog::save_values() {
 
 	// Now tell all views to update formats
 	book_->selection(-1, HT_FORMAT);
+
+	settings_->flush();
 }
 
 // Used to enable/disable specific widget - any widgets enabled must be attributes

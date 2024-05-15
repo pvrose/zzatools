@@ -446,6 +446,7 @@ void qso_rig::save_values() {
 		if (modify_power_) {
 			modr_settings.set("Power", power_);
 		}
+		settings_->flush();
 	}
 }
 

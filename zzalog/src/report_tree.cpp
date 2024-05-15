@@ -688,6 +688,7 @@ void report_tree::add_filter(report_filter_t filter) {
 	report_settings.set("Filter", filter_);
 	populate_tree(true);
 	redraw();
+	settings_->flush();
 }
 
 // Add category and redraw
@@ -766,6 +767,7 @@ void report_tree::add_category(int level, report_cat_t category, string custom) 
 		// Create the report
 		populate_tree(true);
 		redraw();
+		settings_->flush();
 	}
 }
 

@@ -636,6 +636,7 @@ void import_data::finish_update(bool merged /*= true*/) {
 			Fl_Preferences modem_settings(files_settings, sources_[i].c_str());
 			modem_settings.set("Timestamp", last_timestamps_[i].c_str());
 		}
+		settings_->flush();
 		repeat_auto_timer();
 		// Get book to update the progress 
 		book_->modified(book_->modified());
