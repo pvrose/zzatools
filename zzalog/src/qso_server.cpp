@@ -33,10 +33,9 @@ void server_grp::save_values() {
 
 void server_grp::create_form() {
     int curr_x = x();
-    int curr_y = y() + HTEXT;
+    int curr_y = y();
 
     box(FL_BORDER_FRAME);
-    align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 
     bn_listening_ = new Fl_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Listen");
     bn_listening_->selection_color(FL_GREEN);
@@ -51,7 +50,7 @@ void server_grp::create_form() {
      resizable(nullptr);
 
     w(curr_x + WBUTTON - x());
-    h(curr_y + HBUTTON + GAP - y());
+    h(curr_y + HBUTTON - y());
 
     end();
 }
@@ -107,21 +106,28 @@ void qso_server::load_values() {
 }
 
 void qso_server::create_form() {
-    int curr_x = x() + GAP;
+    int curr_x = x() + GAP + WBUTTON;
     int curr_y = y() + GAP;
 
+    rig_ = new Fl_Box(curr_x, curr_y, WBUTTON, HBUTTON);
+    rig_->box(FL_FLAT_BOX);
+    rig_->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE);
+
+    curr_y += HBUTTON;
+
     fldigi_ = new server_grp(curr_x, curr_y, 100, 100, "FLDIGI");
+    fldigi_->align(FL_ALIGN_LEFT | FL_ALIGN_CENTER);
     fldigi_->modem(FLDIGI);
     curr_y += fldigi_->h();
 
     wsjtx_ = new server_grp(curr_x, curr_y, 100, 200, "WSJT-X");
+    wsjtx_->align(FL_ALIGN_LEFT | FL_ALIGN_CENTER);
     wsjtx_->modem(WSJTX);
     curr_y += wsjtx_->h();
 
     resizable(nullptr);
     curr_x += fldigi_->w() + GAP;
     w(curr_x - x());
-    curr_y += GAP;
     h(curr_y - y());
     end();
 }
@@ -132,6 +138,9 @@ void qso_server::save_values() {
 }
 
 void qso_server::enable_widgets() {
+    qso_manager* mgr = ancestor_view<qso_manager>(this);
+    string name = mgr->rig_control()->rig()->rig_name();
+    rig_->copy_label(name.c_str());
     fldigi_->enable_widgets();
     wsjtx_->enable_widgets();
 }

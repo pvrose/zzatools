@@ -3,6 +3,7 @@
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Light_Button.H>
 #include <FL/Fl_Button.H>
+#include <FL/Fl_Box.H>
 
 enum server_t {
     WSJTX = (1 << 0),
@@ -51,6 +52,7 @@ public:
 
 protected:
 
+    Fl_Box* rig_;
     server_grp* fldigi_;
     server_grp* wsjtx_;
 };

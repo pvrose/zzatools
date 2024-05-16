@@ -273,6 +273,7 @@ void qso_manager::switch_rig() {
 // Get QSO information from previous record not rig
 void qso_manager::update_rig() {
 	data_group_->update_rig();
+	info_group_->enable_widgets();
 }
 
 // Change rig
