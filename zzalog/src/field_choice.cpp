@@ -104,6 +104,7 @@ field_input::field_input(int X, int Y, int W, int H, const char* label) :
 
 {
 	type(FL_NORMAL_INPUT);
+	resize(X, Y, W, H);
 }
 
 field_input::~field_input() {

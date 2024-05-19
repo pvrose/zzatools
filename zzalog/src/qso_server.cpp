@@ -6,6 +6,7 @@
 #include "qso_manager.h"
 #include "qso_rig.h"
 #include "utils.h"
+#include "modems.h"
 
 using namespace std;
 
@@ -115,12 +116,14 @@ void qso_server::create_form() {
 
     curr_y += HBUTTON;
 
-    fldigi_ = new server_grp(curr_x, curr_y, 100, 100, "FLDIGI");
+    fldigi_ = new server_grp(curr_x, curr_y, 100, 100);
+    fldigi_->copy_label(MODEM_NAMES[FLDIGI].c_str());
     fldigi_->align(FL_ALIGN_LEFT | FL_ALIGN_CENTER);
     fldigi_->modem(FLDIGI);
     curr_y += fldigi_->h();
 
-    wsjtx_ = new server_grp(curr_x, curr_y, 100, 200, "WSJT-X");
+    wsjtx_ = new server_grp(curr_x, curr_y, 100, 200);
+    wsjtx_->copy_label(MODEM_NAMES[WSJTX].c_str());
     wsjtx_->align(FL_ALIGN_LEFT | FL_ALIGN_CENTER);
     wsjtx_->modem(WSJTX);
     curr_y += wsjtx_->h();
@@ -139,7 +142,7 @@ void qso_server::save_values() {
 
 void qso_server::enable_widgets() {
     qso_manager* mgr = ancestor_view<qso_manager>(this);
-    string name = mgr->rig_control()->rig()->rig_name();
+    string name = mgr->rig_control()->label();
     rig_->copy_label(name.c_str());
     fldigi_->enable_widgets();
     wsjtx_->enable_widgets();
@@ -148,7 +151,7 @@ void qso_server::enable_widgets() {
 // Button callback
 void server_grp::cb_bn_listen(Fl_Widget* w, void* v) {
     server_grp* that = ancestor_view<server_grp>(w);
-    server_t server = that->modem();
+    modem_t server = that->modem();
     switch (server) {
     case FLDIGI:
         if (fllog_emul_->has_server()) {
@@ -171,21 +174,9 @@ void server_grp::cb_bn_listen(Fl_Widget* w, void* v) {
 // Start button callback
 void server_grp::cb_bn_connect(Fl_Widget* w, void* v) {
     server_grp* that = ancestor_view<server_grp>(w);
-    server_t server = that->modem();
+    modem_t modem = that->modem();
     qso_manager* mgr = ancestor_view<qso_manager>(that);
-    string suffix = mgr->rig_control()->app_suffix();
-    // Defualt app is a comment
-    string app = "bash -i -c ";
-    switch (server) {
-    case FLDIGI: 
-        app += "fldigi" + suffix + " &";
-        break;
-    case WSJTX:
-        app += "wsjtx" + suffix + " &";
-        break;
-    default:
-        app = "# ";
-    }
+    string app = "bash -i -c " + mgr->rig_control()->app(modem);
     char msg[128];
     snprintf(msg, sizeof(msg), "DASH: Starting app: %s", app.c_str());
     status_->misc_status(ST_NOTE, msg);
@@ -195,10 +186,10 @@ void server_grp::cb_bn_connect(Fl_Widget* w, void* v) {
 }
 
 // Set modem
-void server_grp::modem(server_t t) {
+void server_grp::modem(modem_t t) {
     modem_ = t;
 }
 
-server_t server_grp::modem() {
+modem_t server_grp::modem() {
     return modem_;
 }

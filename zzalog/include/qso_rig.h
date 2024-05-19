@@ -3,6 +3,7 @@
 #include "rig_if.h"
 #include "hamlib/rig.h"
 #include "field_choice.h"
+#include "modems.h"
 
 #include <string>
 
@@ -16,10 +17,9 @@
 #include <FL/Fl_Float_Input.H>
 #include <FL/Fl_Int_Input.H>
 #include <FL/Fl_Box.H>
+#include <FL/Fl_Tabs.H>
 
 using namespace std;
-
-
 
 class qso_rig :
     public Fl_Group
@@ -52,7 +52,7 @@ public:
 	// Preferred antenna
 	string antenna();
 	// Suffix to apply to app invocations
-	string app_suffix();
+	string app(modem_t m);
 
 protected:
 	// Callback - model choice
@@ -84,6 +84,8 @@ protected:
 	static void cb_ip_power(Fl_Widget* w, void* v);
 	// Call back start flrig
 	static void cb_bn_start(Fl_Widget* w, void* v);
+	// Tabs clicked
+	static void cb_config(Fl_Widget* w, void* v);
 
 	// Get hamlib data
 	void find_hamlib_data();
@@ -94,37 +96,61 @@ protected:
 	void populate_model_choice();
 	//Populate baud rate choice
 	void populate_baud_choice();
+	// Create the various parts of the form
+	void create_status(int& x, int& y);
+	void create_buttons(int& x, int& y);
+	void create_rig_ant(int& x, int& y);
+	void create_config(int& x, int& y);
+	void create_connex(int& x, int& y);
+	void create_serial(int& x, int& y);
+	void create_network(int& x, int& y);
+	void create_apps(int& x, int& y);
+	void create_modifier(int& x, int& y);
 
 	// Update rig with modifiers
 	void modify_rig();
 
-	Fl_Group* serial_grp_;
-	Fl_Group* network_grp_;
-	// Hamlib widgets to revalue when rig selected changes
-	Fl_Choice* ch_rig_model_;
-	Fl_Choice* ch_port_name_;
-	Fl_Input* ip_port_;
-	Fl_Choice* ch_baud_rate_;
-	Fl_Check_Button* bn_all_rates_;
-	Fl_Check_Button* bn_all_ports_;
+	// Rig status
 	Fl_Output* op_status_;
+	// Freq/Mode display
+	Fl_Box* op_freq_mode_;
+
+	// Control buttons
 	Fl_Button* bn_connect_;
 	Fl_Light_Button* bn_select_;
-	field_input* ip_antenna_;
 	Fl_Button* bn_start_;
-	Fl_Input* ip_flrig_params_;
+
+	// Rig and antenna selection
+	Fl_Choice* ch_rig_model_;
+	field_input* ip_antenna_;
+
+	// Configuartion - 3 tabs
+	Fl_Tabs* config_tabs_;
+	// Connection tab - either serial or network
+	Fl_Group* connect_tab_;
+	Fl_Group* serial_grp_;
+
+	Fl_Choice* ch_port_name_;
+	Fl_Check_Button* bn_all_ports_;
+	Fl_Choice* ch_baud_rate_;
+	Fl_Check_Button* bn_all_rates_;
+
+	Fl_Group* network_grp_;
+	// Hamlib widgets to revalue when rig selected changes
+	Fl_Input* ip_port_;
+	// Application tab
+	Fl_Group* app_tab_;
+	Fl_Input* ip_rig_app_;
+	Fl_Input* ip_app_[NUMBER_APPS];
+
 	// Modifier widgets
-	Fl_Group* modifier_grp_;
+	Fl_Group* modifier_tab_;
 	Fl_Check_Button* bn_mod_freq_;
 	Fl_Float_Input* ip_freq_;
 	Fl_Check_Button* bn_gain_;
 	Fl_Int_Input* ip_gain_;
 	Fl_Check_Button* bn_power_;
 	Fl_Float_Input* ip_power_;
-	// Freq/Mode display
-	Fl_Group* display_grp_;
-	Fl_Box* op_summary_;
-	Fl_Box* op_freq_mode_;
 
 	// Add all ports to port choice
 	bool use_all_ports_;
@@ -139,7 +165,8 @@ protected:
 	// Current antenna
 	string antenna_;
 	// flrig config paramaters
-	string app_suffix_;
+	string app_flrig_;
+	string apps_[NUMBER_APPS];
 	
 
 	// Modifier attributes

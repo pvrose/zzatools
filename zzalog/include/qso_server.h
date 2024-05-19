@@ -1,14 +1,10 @@
 #pragma once
+#include "modems.h"
 
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Light_Button.H>
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Box.H>
-
-enum server_t {
-    WSJTX = (1 << 0),
-    FLDIGI = (1 << 1)
-};
 
 class server_grp :
     public Fl_Group 
@@ -17,8 +13,8 @@ class server_grp :
         server_grp(int X, int Y, int W, int H, const char* L = nullptr);
         ~server_grp();
 
-        void modem(server_t t);
-        server_t modem();
+        void modem(modem_t t);
+        modem_t modem();
         void load_values();
         void create_form();
         void save_values();
@@ -31,7 +27,7 @@ class server_grp :
         Fl_Light_Button* bn_listening_;
         Fl_Light_Button* bn_connect_;
 
-        server_t modem_;
+        modem_t modem_;
 
 };
 

@@ -88,9 +88,15 @@ void qso_rig::load_values() {
 		};
 		
 		// If hamlib and FLRig - start parameters
-		hamlib_settings.get("App Suffix", temp, "");
-		app_suffix_ = temp;
+		Fl_Preferences app_settings(rig_settings, "Apps");
+		app_settings.get("FLRig", temp, "");
+		app_flrig_ = temp;
 		free(temp);
+		for (int i = 0; i < NUMBER_APPS; i++) {
+			app_settings.get(MODEM_NAMES[i].c_str(), temp, "");
+			apps_[(modem_t)i] = temp;
+			free(temp);
+		}
 		// Preferred antenna
 		rig_settings.get("Antenna", temp, "");
 		antenna_ = temp;
@@ -159,19 +165,11 @@ void qso_rig::find_hamlib_data() {
 	}
 }
 
-// Create CAT control widgets
-void qso_rig::create_form(int X, int Y) {
-
-	begin();
-
-	int max_w = 0;
-	int max_h = 0;
-
-	int curr_x = X + GAP;
-	int curr_y = Y + 1;
-	
+const int WDISPLAY = 3 * WBUTTON;
+// Create 
+void qso_rig::create_status(int& curr_x, int& curr_y) {
 	// "Label" - rig status
-	op_status_ = new Fl_Output(curr_x, curr_y, WEDIT, HBUTTON);
+	op_status_ = new Fl_Output(curr_x, curr_y, WDISPLAY, HBUTTON);
 	op_status_->color(FL_BACKGROUND_COLOR);
 	op_status_->textfont(FL_BOLD);
 	op_status_->textsize(FL_NORMAL_SIZE + 2);
@@ -179,6 +177,19 @@ void qso_rig::create_form(int X, int Y) {
 	
 	curr_y += op_status_->h();
 
+	op_freq_mode_ = new Fl_Box(curr_x, curr_y, WDISPLAY, HTEXT * 2);
+	op_freq_mode_->tooltip("Current displayed mode");
+	op_freq_mode_->box(FL_FLAT_BOX);
+	op_freq_mode_->color(FL_BLACK);
+	op_freq_mode_->align(FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
+	op_freq_mode_->labelcolor(FL_YELLOW);
+	op_freq_mode_->labelfont(FL_BOLD);
+	op_freq_mode_->labelsize(FL_NORMAL_SIZE + 6);
+
+	curr_y += op_freq_mode_->h();
+	curr_x += op_freq_mode_->w();
+}
+void qso_rig::create_buttons(int& curr_x, int& curr_y) {
 	// First button - connect/disconnect or add
 	bn_connect_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Connect");
 	bn_connect_->tooltip("Select to attempt to connect/disconnect rig");
@@ -196,11 +207,14 @@ void qso_rig::create_form(int X, int Y) {
 	bn_start_->color(FL_DARK_GREEN);
 	bn_start_->labelcolor(FL_WHITE);
 	bn_start_->tooltip("Start flrig for this connection");
-	bn_start_->callback(cb_bn_start, &app_suffix_);
-	
-	curr_x = X + GAP + WLABEL;
-	curr_y += HBUTTON + GAP;
+	bn_start_->callback(cb_bn_start, &app_flrig_);
 
+	curr_x += bn_start_->w();
+	curr_y += bn_start_->h();
+}
+
+void qso_rig::create_rig_ant(int& curr_x, int& curr_y) {
+	curr_x += WBUTTON;
 	// Choice - Select the rig model (Manufacturer/Model)
 	ch_rig_model_ = new Fl_Choice(curr_x, curr_y, WSMEDIT, HTEXT, "Rig");
 	ch_rig_model_->align(FL_ALIGN_LEFT);
@@ -210,32 +224,100 @@ void qso_rig::create_form(int X, int Y) {
 	// Populate the manufacturere and model choice widgets
 	populate_model_choice();
 
-	// Hamlib control grp
-	// RIG=====v
-	// PORTv  ALL*
-	// BAUDv  OVR*
-	curr_y += HTEXT;
-	serial_grp_ = new Fl_Group(X + GAP, curr_y, 10, 10);
+	curr_y += HBUTTON;
+
+	ip_antenna_ = new field_input(curr_x, curr_y, WSMEDIT, HBUTTON, "Antenna");
+	ip_antenna_->align(FL_ALIGN_LEFT);
+	ip_antenna_->callback(cb_value<field_input, string>, &antenna_);
+	ip_antenna_->tooltip("Select the preferred antenna for this rig");
+	ip_antenna_->field_name("MY_ANTENNA");
+	ip_antenna_->value(antenna_.c_str());
+
+	curr_x += WSMEDIT;
+	curr_y += HBUTTON;
+
+}
+void qso_rig::create_config(int& curr_x, int& curr_y) {
+	config_tabs_ = new Fl_Tabs(curr_x, curr_y, 10, 10);
+	config_tabs_->callback(cb_config);
+	config_tabs_->when(FL_WHEN_CHANGED);
+	int rx = 0;
+	int ry = 0;
+	int rw = 0;
+	int rh = 0;
+	config_tabs_->client_area(rx, ry, rw, rh, 0);
+	int saved_rw = rw;
+	int saved_rh = rh;
+	curr_x = rx;
+	curr_y = ry;
+	create_connex(curr_x, curr_y);
+	rw = max(rw, curr_x - rx);
+	rh = max(rh, curr_y - ry);
+	curr_x = rx;
+	curr_y = ry;
+	create_apps(curr_x, curr_y);
+	rw = max(rw, curr_x - rx);
+	rh = max(rh, curr_y - ry);
+	curr_x = rx;
+	curr_y = ry;
+	create_modifier(curr_x, curr_y);
+	rw = max(rw, curr_x - rx);
+	rh = max(rh, curr_y - ry);
+	config_tabs_->resizable(nullptr);
+	config_tabs_->size(config_tabs_->w() + rw - saved_rw, config_tabs_->h() + rh - saved_rh);
+	end();
+	curr_x = config_tabs_->x() + config_tabs_->w();
+	curr_y = config_tabs_->y() + config_tabs_->h();
+
+}
+
+void qso_rig::create_connex(int& curr_x, int& curr_y) {
+	connect_tab_ = new Fl_Group(curr_x, curr_y, 10, 10, "Connection");
+	curr_y += GAP;
+	int max_x = curr_x;
+	int max_y = curr_y;
+	create_serial(curr_x, curr_y);
+	max_x = max(max_x, curr_x);
+	max_y = max(max_y, curr_y);
+	curr_x = connect_tab_->x();
+	curr_y = connect_tab_->y() + GAP;
+	create_network(curr_x, curr_y);
+	max_x = max(max_x, curr_x);
+	max_y = max(max_y, curr_y);
+
+	connect_tab_->resizable(nullptr);
+	connect_tab_->size(max_x - connect_tab_->x(), max_y - connect_tab_->y());
+
+	connect_tab_->end();
+
+}
+
+void qso_rig::create_serial(int& curr_x, int& curr_y) {
+	serial_grp_ = new Fl_Group(curr_x, curr_y, 10, 10);
 	serial_grp_->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 	serial_grp_->box(FL_NO_BOX);
 
 	// Choice port name - serial
-	curr_x = serial_grp_->x() + WLABEL;
+	curr_x = serial_grp_->x() + WBUTTON;
 	curr_y = serial_grp_->y();
 	ch_port_name_ = new Fl_Choice(curr_x, curr_y, WBUTTON, HTEXT, "Port");
 	ch_port_name_->align(FL_ALIGN_LEFT);
 	ch_port_name_->callback(cb_ch_port, nullptr);
 	ch_port_name_->tooltip("Select the comms port to use");
 
+	// Calculate  width necessary for "All"
+	int tw = 0;
+	int th = 0;
+	fl_measure("All", tw, th);
 	// Use all ports
 	int save_x = curr_x;
 	curr_x += WBUTTON + GAP;
-	bn_all_ports_ = new Fl_Check_Button(curr_x, curr_y, HBUTTON, HBUTTON, "All ports");
+	bn_all_ports_ = new Fl_Check_Button(curr_x, curr_y, HBUTTON, HBUTTON, "All");
 	bn_all_ports_->align(FL_ALIGN_RIGHT);
 	bn_all_ports_->tooltip("Select all existing ports, not just those available");
 	bn_all_ports_->callback(cb_bn_all, &use_all_ports_);
 	populate_port_choice();
-	curr_x += HBUTTON + WLABEL + GAP;
+	curr_x += HBUTTON + tw + GAP;
 	int max_x = curr_x;
 
 	// Baud rate input 
@@ -249,27 +331,30 @@ void qso_rig::create_form(int X, int Y) {
 
 	// Override capabilities (as coded in hamlib)
 	curr_x += WBUTTON + GAP;
-	bn_all_rates_ = new Fl_Check_Button(curr_x, curr_y, HBUTTON, HBUTTON, "All rates");
+	bn_all_rates_ = new Fl_Check_Button(curr_x, curr_y, HBUTTON, HBUTTON, "All");
 	bn_all_rates_->align(FL_ALIGN_RIGHT);
 	bn_all_rates_->tooltip("Allow full baud rate selection");
 	bn_all_rates_->callback(cb_ch_over, &use_all_rates_);
 	populate_baud_choice();
-	curr_x += HBUTTON + WLABEL + GAP;
-	max_x = max(max_x, curr_x);
+	curr_x += HBUTTON + tw;
+	curr_x = max(max_x, curr_x);
 
 	curr_y += HBUTTON + GAP;
-	max_y = max(max_y, curr_y);
+	curr_y = max(max_y, curr_y);
 	serial_grp_->resizable(nullptr);
-	serial_grp_->size(max_x - serial_grp_->x(), max_y - serial_grp_->y());
+	serial_grp_->size(curr_x - serial_grp_->x(), curr_y - serial_grp_->y());
 
 	serial_grp_->end();
 
-	network_grp_ = new Fl_Group(serial_grp_->x(), serial_grp_->y(), 10, 10);
+}
+
+void qso_rig::create_network(int& curr_x, int& curr_y) {
+	network_grp_ = new Fl_Group(curr_x, curr_y, 10, 10);
 	network_grp_->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 	network_grp_->box(FL_NO_BOX);
 
 	// Input port name - network
-	curr_x = network_grp_->x() + WLABEL;
+	curr_x = network_grp_->x() + WBUTTON;
 	curr_y = network_grp_->y();
 	ip_port_ = new Fl_Input(curr_x, curr_y, WSMEDIT, HTEXT, "Port");
 	ip_port_->align(FL_ALIGN_LEFT);
@@ -279,39 +364,50 @@ void qso_rig::create_form(int X, int Y) {
 
 	curr_y += HTEXT + GAP;
 
-	curr_x += WSMEDIT + GAP;
+	curr_x += WSMEDIT;
 	network_grp_->resizable(nullptr);
 	network_grp_->size(curr_x - network_grp_->x(), curr_y - network_grp_->y());
 
 	network_grp_->end();
 
-	curr_x = x() + GAP;
-	curr_y = max(serial_grp_->y() + serial_grp_->h(), network_grp_->y() + network_grp_->h());
-	curr_x += WLABEL;
+}
+
+void qso_rig::create_apps(int& curr_x, int& curr_y) {
+	app_tab_ = new Fl_Group(curr_x, curr_y, 10, 10, "Apps");
+	curr_x += WBUTTON;
+	curr_y += GAP;
+
+	ip_rig_app_= new Fl_Input(curr_x, curr_y, WSMEDIT, HTEXT, "FlRig");
+	ip_rig_app_->align(FL_ALIGN_LEFT);
+	ip_rig_app_->callback(cb_value<Fl_Input, string>, &app_flrig_);
+	ip_rig_app_->tooltip("Enter the command for flrig to connect to the rig");
+	ip_rig_app_->value(app_flrig_.c_str());
 	
-	ip_flrig_params_= new Fl_Input(curr_x, curr_y, WSMEDIT, HTEXT, "App Suffix");
-	ip_flrig_params_->align(FL_ALIGN_LEFT);
-	ip_flrig_params_->callback(cb_value<Fl_Input, string>, &app_suffix_);
-	ip_flrig_params_->tooltip("Enter the paramters for flrig to connect to the rig");
-	ip_flrig_params_->value(app_suffix_.c_str());
+	curr_y += HTEXT;
+	for(int i = 0; i < NUMBER_APPS; i++) {
+		ip_app_[i]= new Fl_Input(curr_x, curr_y, WSMEDIT, HTEXT);
+		ip_app_[i]->copy_label(MODEM_NAMES[i].c_str());
+		ip_app_[i]->align(FL_ALIGN_LEFT);
+		ip_app_[i]->callback(cb_value<Fl_Input, string>, &apps_[(modem_t)i]);
+		ip_app_[i]->tooltip("Enter the command for modem app to connect to the rig");
+		ip_app_[i]->value(apps_[i].c_str());
+		
+		curr_y += HTEXT;
+	}
 	
-	curr_y += HTEXT + GAP;
+	curr_x += WSMEDIT;
 
-	ip_antenna_ = new field_input(curr_x, curr_y, WSMEDIT, HTEXT, "Antenna");
-	ip_antenna_->align(FL_ALIGN_LEFT);
-	ip_antenna_->callback(cb_value<field_input, string>, &antenna_);
-	ip_antenna_->tooltip("Select the preferred antenna for this rig");
-	ip_antenna_->field_name("MY_ANTENNA");
-	ip_antenna_->value(antenna_.c_str());
+	app_tab_->resizable(nullptr);
+	app_tab_->size(curr_x - app_tab_->x(), curr_y - app_tab_->y());
+	app_tab_->end();
 
-	curr_x = x() + GAP;
-	curr_y += ip_antenna_->h() + GAP;
 
-	modifier_grp_ = new Fl_Group(curr_x, curr_y, 10, 10, "Transverter/Amplifier");
-	modifier_grp_->box(FL_FLAT_BOX);
-	modifier_grp_->align(FL_ALIGN_TOP | FL_ALIGN_INSIDE);
+}
+void qso_rig::create_modifier(int& curr_x, int& curr_y) {
+	modifier_tab_ = new Fl_Group(curr_x, curr_y, 10, 10, "Transverter/Amp");
+	modifier_tab_->box(FL_FLAT_BOX);
 
-	curr_x = modifier_grp_->x() + WLABEL;
+	curr_x = modifier_tab_->x() + WBUTTON;
 	curr_y += (HTEXT + GAP)/2;
 
 	bn_mod_freq_ = new Fl_Check_Button(curr_x, curr_y, WRADIO, HRADIO, "\316\224F (MHz)");
@@ -330,7 +426,7 @@ void qso_rig::create_form(int X, int Y) {
 	ip_freq_->value(text);
 
 	curr_y += HBUTTON;
-	curr_x = modifier_grp_->x() + WLABEL;
+	curr_x = modifier_tab_->x() + WBUTTON;
 
 	bn_gain_ = new Fl_Check_Button(curr_x, curr_y, WRADIO, HRADIO, "Gain (dB)");
 	bn_gain_->align(FL_ALIGN_LEFT);
@@ -347,7 +443,7 @@ void qso_rig::create_form(int X, int Y) {
 	ip_gain_->value(text);
 
 	curr_y += HBUTTON;
-	curr_x = modifier_grp_->x() + WLABEL;
+	curr_x = modifier_tab_->x() + WBUTTON;
 
 	bn_power_ = new Fl_Check_Button(curr_x, curr_y, WRADIO, HRADIO, "Pwr (W)");
 	bn_power_->align(FL_ALIGN_LEFT);
@@ -365,48 +461,47 @@ void qso_rig::create_form(int X, int Y) {
 
 	curr_x += WBUTTON;
 	curr_y += HBUTTON + GAP;
-	modifier_grp_->resizable(nullptr);
-	modifier_grp_->size(curr_x - modifier_grp_->x(), curr_y - modifier_grp_->y());
+	modifier_tab_->resizable(nullptr);
+	modifier_tab_->size(curr_x - modifier_tab_->x(), curr_y - modifier_tab_->y());
+}
 
-	curr_x = x() + GAP;
+// Create CAT control widgets
+void qso_rig::create_form(int X, int Y) {
 
-	display_grp_ = new Fl_Group(curr_x, curr_y, 10, 10);
-	display_grp_->box(FL_NO_BOX);
+	begin();
 
-	op_summary_ = new Fl_Box(curr_x, curr_y, WSMEDIT + WBUTTON, HTEXT);
-	op_summary_->tooltip("Frequency summary");
-	op_summary_->box(FL_FLAT_BOX);
-	op_summary_->color(FL_BLACK);
-	op_summary_->align(FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
-	op_summary_->labelsize(FL_NORMAL_SIZE + 2);
+	int max_x = 0;
+	int max_y = 0;
 
-	curr_y += op_summary_->h();
-
-	curr_x = op_summary_->x();
-	op_freq_mode_ = new Fl_Box(curr_x, curr_y, op_summary_->w(), op_summary_->h());
-	op_freq_mode_->tooltip("Current displayed mode");
-	op_freq_mode_->box(FL_FLAT_BOX);
-	op_freq_mode_->color(FL_BLACK);
-	op_freq_mode_->align(FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
-	op_freq_mode_->labelcolor(FL_YELLOW);
-	op_freq_mode_->labelfont(FL_BOLD);
-	op_freq_mode_->labelsize(FL_NORMAL_SIZE + 4);
-
-	curr_y += op_freq_mode_->h();
-	curr_x += op_freq_mode_->w() + GAP;
-
-	display_grp_->resizable(nullptr);
-	display_grp_->size(curr_x - display_grp_->x(), curr_y - display_grp_->y());
-
-	display_grp_->end();
+	int curr_x = X + GAP;
+	int curr_y = Y + 1;
 
 
-	max_x = max(
-		max(serial_grp_->x() + serial_grp_->w(), network_grp_->x() + network_grp_->w()),
-		display_grp_->x() + display_grp_->w());
+	create_status(curr_x, curr_y);
+	max_x = max(max_x, curr_x);
+	max_y = max(max_y, curr_y);
+	
+	curr_x = X + GAP;
+	create_buttons(curr_x, curr_y);
+	max_x = max(max_x, curr_x);
+	max_y = max(max_y, curr_y);
 
-	curr_y = curr_y + GAP;
-	curr_x = save_x;
+	curr_x = X + GAP;
+	curr_y += GAP;
+
+	create_rig_ant(curr_x, curr_y);
+	max_x = max(max_x, curr_x);
+	max_y = max(max_y, curr_y);
+
+	curr_x = X + GAP;
+	curr_y += GAP;
+
+	create_config(curr_x, curr_y);
+	max_x = max(max_x, curr_x);
+	max_y = max(max_y, curr_y);
+
+
+
 
 	// Connected status
 
@@ -414,8 +509,11 @@ void qso_rig::create_form(int X, int Y) {
 	modify_rig();
 	enable_widgets();
 
+	max_x += GAP;
+	max_y += GAP;
+
 	resizable(nullptr);
-	size(max_x - x(), curr_y - y());
+	size(max_x - x(), max_y - y());
 	end();
 }
 
@@ -431,7 +529,13 @@ void qso_rig::save_values() {
 		hamlib_settings.set("Port", hamlib_data_.port_name.c_str());
 		hamlib_settings.set("Baud Rate", hamlib_data_.baud_rate);
 		hamlib_settings.set("Model ID", (int)hamlib_data_.model_id);
-		hamlib_settings.set("App Suffix", app_suffix_.c_str());
+		// Apps
+		Fl_Preferences app_settings(rig_settings, "Apps");
+		app_settings.set("FLRig", app_flrig_.c_str());
+		for (int i = 0; i < NUMBER_APPS; i++) {
+			app_settings.set(MODEM_NAMES[i].c_str(), apps_[i].c_str());
+			char app_num[10];
+		}
 		// Preferred antenna
 		rig_settings.set("Antenna", antenna_.c_str());
 		// Modifier settings
@@ -486,27 +590,65 @@ void qso_rig::enable_widgets() {
 	}
 	bn_connect_->labelcolor(fl_contrast(FL_FOREGROUND_COLOR, bn_connect_->color()));
 	bn_select_->labelcolor(fl_contrast(FL_FOREGROUND_COLOR, bn_select_->color()));
+	double freq;
 	// Status
 	if (!rig_) {
 		op_status_->value("No rig specified");
 		op_status_->textcolor(FL_MAGENTA);
+		op_freq_mode_->deactivate();
+		op_freq_mode_->label("");
 	} else if (rig_->is_opening()) {
 		op_status_->value("Opening rig");
 		op_status_->textcolor(DARK ? FL_CYAN : fl_darker(FL_CYAN));
+		op_freq_mode_->deactivate();
+		op_freq_mode_->label("");
 	} else if (rig_->is_open()) {
+		string rig_text;
 		if (rig_->get_ptt()) {
-			op_status_->value("Transmitting");
+			rig_text = "Transmitting: ";
 			op_status_->textcolor(FL_RED);
 		} else {
-			op_status_->value("Receiving");
+			rig_text = "Receiving: ";
 			op_status_->textcolor(DARK ? FL_GREEN : fl_darker(FL_GREEN));
 		}
+		freq = rig_->get_dfrequency(true);
+		band_data::band_entry_t* entry = band_data_->get_entry(freq * 1000);
+		if (entry) {
+			char l[50];
+			snprintf(l, sizeof(l), "%s", spec_data_->band_for_freq(freq).c_str());
+			rig_text += string(l);
+		}
+		else {
+			rig_text += "Out of band!";
+			op_status_->textcolor(COLOUR_ORANGE);
+		}
+		op_status_->value(rig_text.c_str());
+		op_freq_mode_->activate();
+		if (rig_->get_ptt()) {
+			op_freq_mode_->color(FL_RED);
+		} else {
+			op_freq_mode_->color(FL_BLACK);
+		}
+		char msg[100];
+		string rig_mode;
+		string submode;
+		rig_->get_string_mode(rig_mode, submode);
+		snprintf(msg, sizeof(msg), "  %0.3f MHz %s %sW" , 
+			freq, 
+			submode.length() ? submode.c_str() : rig_mode.c_str(),
+			rig_->get_tx_power(true).c_str()
+		);
+		op_freq_mode_->copy_label(msg);
 	} else if (rig_->has_no_cat()) {
 		op_status_->value("No CAT Available");
 		op_status_->textcolor(FL_MAGENTA);
+		op_freq_mode_->deactivate();
+		op_freq_mode_->label("");
 	} else {
 		op_status_->value("Disconnected");
 		op_status_->textcolor(DARK ? COLOUR_ORANGE : fl_darker(COLOUR_ORANGE));
+		op_freq_mode_->deactivate();
+		op_freq_mode_->label("");
 	}
 	// CAT control widgets - allow only when select button active
 	if (rig_->is_open()) {
@@ -567,47 +709,19 @@ void qso_rig::enable_widgets() {
 	} else {
 		ip_power_->deactivate();
 	}
-	// Update display values
-	if (rig_ && rig_->is_open()) {
-		op_summary_->activate();
-		op_summary_->color(FL_BLACK);
-		op_freq_mode_->activate();
-		if (rig_->get_ptt()) {
-			op_freq_mode_->color(FL_RED);
-		} else {
-			op_freq_mode_->color(FL_BLACK);
-		}
-		double freq = rig_->get_dfrequency(true);
-		band_data::band_entry_t* entry = band_data_->get_entry(freq * 1000);
-		if (entry) {
-			char l[50];
-			snprintf(l, sizeof(l), "%s %s", spec_data_->band_for_freq(freq).c_str(), entry->mode.c_str());
-			op_summary_->copy_label(l);
-			op_summary_->labelcolor(FL_YELLOW);
+	// Now use standard TAB highlighting
+	for (int ix = 0; ix < config_tabs_->children(); ix++) {
+		Fl_Widget* wx = config_tabs_->child(ix);
+		if (wx == config_tabs_->value()) {
+			wx->labelfont((wx->labelfont() | FL_BOLD) & (~FL_ITALIC));
+			wx->labelcolor(FL_FOREGROUND_COLOR);
 		}
 		else {
-			op_summary_->label("Out of band!");
-			op_summary_->labelcolor(FL_RED);
+			wx->labelfont((wx->labelfont() & (~FL_BOLD)) | FL_ITALIC);
+			wx->labelcolor(FL_FOREGROUND_COLOR);
 		}
-		char msg[100];
-		string rig_mode;
-		string submode;
-		rig_->get_string_mode(rig_mode, submode);
-		snprintf(msg, sizeof(msg), "  %0.3fMHz %s %sW" , 
-			freq, 
-			submode.length() ? submode.c_str() : rig_mode.c_str(),
-			rig_->get_tx_power(true).c_str()
-		);
-		op_freq_mode_->copy_label(msg);
 	}
-	else {
-		op_summary_->deactivate();
-		op_summary_->label("");
-		op_summary_->color(FL_BACKGROUND_COLOR);
-		op_freq_mode_->deactivate();
-		op_freq_mode_->label("");
-		op_freq_mode_->color(FL_BACKGROUND_COLOR);
-	}
+
 	redraw();
 }
 
@@ -912,8 +1026,8 @@ void qso_rig::cb_ip_power(Fl_Widget* w, void* v) {
 
 // Clicked start button
 void qso_rig::cb_bn_start(Fl_Widget* w, void * v) {
-	string* suffix = (string*)v;
-	string command = "bash -i -c flrig" + *suffix + "&";
+	string* app = (string*)v;
+	string command = "bash -i -c " + *app + "&";
 	int result = system(command.c_str());
 	char msg[100];
 	if (result == 0) {
@@ -923,6 +1037,12 @@ void qso_rig::cb_bn_start(Fl_Widget* w, void * v) {
 		snprintf(msg, sizeof(msg), "RIG: Failed to start %s", command.c_str());
 		status_->misc_status(ST_ERROR, msg);
 	}
+}
+
+// Selecting config tab
+void qso_rig::cb_config(Fl_Widget* w, void *v) {
+	qso_rig* that = ancestor_view<qso_rig>(w);
+	that->enable_widgets();
 }
 
 // Connect rig if disconnected and vice-versa
@@ -992,7 +1112,8 @@ string qso_rig::antenna() {
 	return antenna_;
 }
 
-// Return the application suffix
-string qso_rig::app_suffix() {
-	return app_suffix_;
+// Return call for particular app
+string qso_rig::app(modem_t m) {
+	return apps_[(int)m];
 }
+
