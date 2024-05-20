@@ -55,7 +55,7 @@ using namespace std;
 		// Make the others virtual as well
 		virtual void value(const char* val);
 		virtual void value(int i);
-
+	
 		void field_name(const char* field_name, record* qso = nullptr);
 		const char* field_name();
 
