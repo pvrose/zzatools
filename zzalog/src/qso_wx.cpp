@@ -322,7 +322,7 @@ void qso_wx::enable_widgets() {
 	bn_sunrise_->copy_label(label);
 	snprintf(label, sizeof(label), "\360\237\214\236Set %s", sundown);
 	bn_sunset_->copy_label(label);
-	strftime(label, sizeof(label), "Updated %H:%M:%S", &updated_time);
+	strftime(label, sizeof(label), "Updated %H:%M:%S %Z", &updated_time);
 	bn_updated_->copy_label(label);
 	bn_wx_icon_->image(icon);
 	bn_wx_icon_->deimage(icon);
