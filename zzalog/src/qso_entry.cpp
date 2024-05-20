@@ -714,97 +714,100 @@ void qso_entry::cb_ip_field(Fl_Widget* w, void* v) {
 	field_input* ip = (field_input*)w;
 	string field = ip->field_name();
 	string value = ip->value();
-	that->qso_->item(field, value);
+	string old_value = that->qso_->item(field);
+	if (old_value != value) {
+		that->qso_->item(field, value);
 
-	if (field == "FREQ") {
-		double freq_MHz = atof(value.c_str());
-		double freq_kHz = freq_MHz * 1000.0;
-		prev_freq_ = freq_kHz;
-		that->qso_->item("BAND", spec_data_->band_for_freq(freq_MHz));
-	}
-	else if (field == "MODE") {
-		if (spec_data_->is_submode(value)) {
-			that->qso_->item("SUBMODE", value);
-			that->qso_->item("MODE", spec_data_->mode_for_submode(value));
+		if (field == "FREQ") {
+			double freq_MHz = atof(value.c_str());
+			double freq_kHz = freq_MHz * 1000.0;
+			prev_freq_ = freq_kHz;
+			that->qso_->item("BAND", spec_data_->band_for_freq(freq_MHz));
 		}
-		else {
-			that->qso_->item("MODE", value);
-			that->qso_->item("SUBMODE", string(""));
-		}
-	}
-	else if (field == "APP_ZZA_QTH") {
-		// Send new value to spec_data to create an empty entry if it's a new one
-		if (!ip->menubutton()->changed()) {
-			macro_defn entry = { nullptr, "" };
-			spec_data_->add_user_macro(field, value, entry);
-		}
-		that->check_qth_changed();
-	}
-	else if (field == "APP_ZZA_OP") {
-		// Send new value to spec_data to create an empty entry if it's a new one
-		if (!ip->menubutton()->changed()) {
-			macro_defn entry = { nullptr, "" };
-			spec_data_->add_user_macro(field, value, entry);
-		}
-		that->check_qth_changed();
-	}
-	else if (field == "MY_RIG") {
-		// Update the selected rig CAT group
-		((qso_manager*)that->qso_data_->parent())->change_rig(value);
-		switch(that->qso_data_->logging_state()) {
-			case qso_data::QSO_INACTIVE:
-			case qso_data::QSO_PENDING:
-			case qso_data::QSO_STARTED:
-			case qso_data::QSO_ENTER:
-			case qso_data::NET_STARTED:
-			case qso_data::NET_ADDING:
-			case qso_data::QSO_WSJTX:
-			case qso_data::QSO_FLDIGI:
-			{
-				that->copy_cat_to_qso(true);
-				break;
+		else if (field == "MODE") {
+			if (spec_data_->is_submode(value)) {
+				that->qso_->item("SUBMODE", value);
+				that->qso_->item("MODE", spec_data_->mode_for_submode(value));
+			}
+			else {
+				that->qso_->item("MODE", value);
+				that->qso_->item("SUBMODE", string(""));
 			}
 		}
-	}
-	else if (field == "QSO_DATE" || field == "TIME_ON") {
-		if (that->qso_number_ != -1) {
-			// Reposition QSO in book
-			item_num_t item = book_->item_number(that->qso_number_);
-			item = book_->correct_record_position(item);
-			that->qso_number_ = book_->record_number(item);
+		else if (field == "APP_ZZA_QTH") {
+			// Send new value to spec_data to create an empty entry if it's a new one
+			if (!ip->menubutton()->changed()) {
+				macro_defn entry = { nullptr, "" };
+				spec_data_->add_user_macro(field, value, entry);
+			}
+			that->check_qth_changed();
 		}
-	}
-	else if (field == "CALL") {
-		// Remove any dependent fields that may be left over from previous edits
-		that->qso_->unparse();
-	}
-	// QSO has changed, change QSL servers' status 
-	if (field == "FREQ" || field == "BAND" || field == "MODE" || field == "CALL" ||
-		field == "QSO_DATE" || field == "TIME_ON") {
-		that->qso_->invalidate_qsl_status();
-	}
-	// Update other views if editing or logging
-	switch (that->qso_data_->logging_state()) {
-	case qso_data::QSO_INACTIVE:
-	case qso_data::QSO_VIEW:
-		break;
-	case qso_data::NET_STARTED:
-	case qso_data::NET_EDIT:
-		if (field == "CALL") {
-			that->copy_label(that->qso_->item("CALL").c_str());
-			that->parent()->redraw();
+		else if (field == "APP_ZZA_OP") {
+			// Send new value to spec_data to create an empty entry if it's a new one
+			if (!ip->menubutton()->changed()) {
+				macro_defn entry = { nullptr, "" };
+				spec_data_->add_user_macro(field, value, entry);
+			}
+			that->check_qth_changed();
 		}
-		// drop through
-	case qso_data::QSO_PENDING:
-	case qso_data::QSO_STARTED:
-	case qso_data::QSO_EDIT:
-	case qso_data::QSO_ENTER:
-		that->enable_widgets();
-		that->qso_data_->enable_widgets();
-		tabbed_forms_->update_views(nullptr, HT_MINOR_CHANGE, that->qso_number_);
-		break;
-	default:
-		break;
+		else if (field == "MY_RIG") {
+			// Update the selected rig CAT group
+			((qso_manager*)that->qso_data_->parent())->change_rig(value);
+			switch(that->qso_data_->logging_state()) {
+				case qso_data::QSO_INACTIVE:
+				case qso_data::QSO_PENDING:
+				case qso_data::QSO_STARTED:
+				case qso_data::QSO_ENTER:
+				case qso_data::NET_STARTED:
+				case qso_data::NET_ADDING:
+				case qso_data::QSO_WSJTX:
+				case qso_data::QSO_FLDIGI:
+				{
+					that->copy_cat_to_qso(true);
+					break;
+				}
+			}
+		}
+		else if (field == "QSO_DATE" || field == "TIME_ON") {
+			if (that->qso_number_ != -1) {
+				// Reposition QSO in book
+				item_num_t item = book_->item_number(that->qso_number_);
+				item = book_->correct_record_position(item);
+				that->qso_number_ = book_->record_number(item);
+			}
+		}
+		else if (field == "CALL") {
+			// Remove any dependent fields that may be left over from previous edits
+			that->qso_->unparse();
+		}
+		// QSO has changed, change QSL servers' status 
+		if (field == "FREQ" || field == "BAND" || field == "MODE" || field == "CALL" ||
+			field == "QSO_DATE" || field == "TIME_ON") {
+			that->qso_->invalidate_qsl_status();
+		}
+		// Update other views if editing or logging
+		switch (that->qso_data_->logging_state()) {
+		case qso_data::QSO_INACTIVE:
+		case qso_data::QSO_VIEW:
+			break;
+		case qso_data::NET_STARTED:
+		case qso_data::NET_EDIT:
+			if (field == "CALL") {
+				that->copy_label(that->qso_->item("CALL").c_str());
+				that->parent()->redraw();
+			}
+			// drop through
+		case qso_data::QSO_PENDING:
+		case qso_data::QSO_STARTED:
+		case qso_data::QSO_EDIT:
+		case qso_data::QSO_ENTER:
+			that->enable_widgets();
+			that->qso_data_->enable_widgets();
+			tabbed_forms_->update_views(nullptr, HT_MINOR_CHANGE, that->qso_number_);
+			break;
+		default:
+			break;
+		}
 	}
 }
 
