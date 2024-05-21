@@ -752,7 +752,8 @@ void qso_entry::cb_ip_field(Fl_Widget* w, void* v) {
 		}
 		else if (field == "MY_RIG") {
 			// Update the selected rig CAT group
-			((qso_manager*)that->qso_data_->parent())->change_rig(value);
+			qso_manager* mgr = (qso_manager*)that->qso_data_->parent();
+			mgr->change_rig(value);
 			switch(that->qso_data_->logging_state()) {
 				case qso_data::QSO_INACTIVE:
 				case qso_data::QSO_PENDING:
@@ -763,6 +764,13 @@ void qso_entry::cb_ip_field(Fl_Widget* w, void* v) {
 				case qso_data::QSO_WSJTX:
 				case qso_data::QSO_FLDIGI:
 				{
+					// Copy matching antenna
+					qso_rig* rig_control = mgr->rig_control();
+					string antenna;
+					if (rig_control) {
+						antenna = rig_control->antenna();
+						that->qso_->item("MY_ANTENNA", antenna);
+					}
 					that->copy_cat_to_qso(true);
 					break;
 				}
