@@ -177,14 +177,14 @@ void qso_rig::create_status(int& curr_x, int& curr_y) {
 	
 	curr_y += op_status_->h();
 
-	op_freq_mode_ = new Fl_Box(curr_x, curr_y, WDISPLAY, HTEXT * 2);
+	op_freq_mode_ = new Fl_Box(curr_x, curr_y, WDISPLAY, HTEXT * 3);
 	op_freq_mode_->tooltip("Current displayed mode");
 	op_freq_mode_->box(FL_FLAT_BOX);
 	op_freq_mode_->color(FL_BLACK);
 	op_freq_mode_->align(FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
 	op_freq_mode_->labelcolor(FL_YELLOW);
 	op_freq_mode_->labelfont(FL_BOLD);
-	op_freq_mode_->labelsize(FL_NORMAL_SIZE + 6);
+	op_freq_mode_->labelsize(FL_NORMAL_SIZE + 10);
 
 	curr_y += op_freq_mode_->h();
 	curr_x += op_freq_mode_->w();
@@ -624,16 +624,17 @@ void qso_rig::enable_widgets() {
 		}
 		op_status_->value(rig_text.c_str());
 		op_freq_mode_->activate();
+		op_freq_mode_->color(FL_BLACK);
 		if (rig_->get_ptt()) {
-			op_freq_mode_->color(FL_RED);
+			op_freq_mode_->labelcolor(FL_RED);
 		} else {
-			op_freq_mode_->color(FL_BLACK);
+			op_freq_mode_->labelcolor(FL_YELLOW);
 		}
 		char msg[100];
 		string rig_mode;
 		string submode;
 		rig_->get_string_mode(rig_mode, submode);
-		snprintf(msg, sizeof(msg), "  %0.3f MHz %s %sW" , 
+		snprintf(msg, sizeof(msg), "%0.3f MHz\n%s %sW" , 
 			freq, 
 			submode.length() ? submode.c_str() : rig_mode.c_str(),
 			rig_->get_tx_power(true).c_str()

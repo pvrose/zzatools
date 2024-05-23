@@ -38,8 +38,10 @@ class qso_dxcc :
     protected:
         set<string>* dxcc_bands_;
         set<string>* dxcc_modes_;
+        set<string>* dxcc_submodes_;
         set<string>* all_bands_;
         set<string>* all_modes_;
+        set<string>* all_submodes_;
     };
 
 public:
