@@ -936,7 +936,8 @@ bool book::basic_match(record* record) {
 	{
 		// See if it is a valid nickname
 		int dxcc = cty_data_->entity(criteria_->pattern);
-		if (dxcc == -1) {
+		if (dxcc == -1 || criteria_->comparator == XP_LT || criteria_->comparator == XP_LE ||
+			criteria_->comparator == XP_GE || criteria_->comparator == XP_GT) {
 			// Not a nickname so match against the raw value
 			return match_int(criteria_->pattern, criteria_->comparator, record->item("DXCC"));
 		}
@@ -1041,9 +1042,9 @@ bool book::match_string(string test, search_comp_t comparator, string value) {
 }
 
 // integer item matching - ignores things like leading zeros and trailing non numeric characters
-bool book::match_int(string value, search_comp_t comparator, string test) {
+bool book::match_int(string test, search_comp_t comparator, string value) {
 	try {
-		return match_int(stoi(value), comparator, stoi(test));
+		return match_int(stoi(test), comparator, stoi(value));
 	}
 	catch (const invalid_argument&) {
 		return false;
@@ -1051,7 +1052,7 @@ bool book::match_int(string value, search_comp_t comparator, string test) {
 }
 
 // integer item matching - integer vs integer
-bool book::match_int(int value, search_comp_t comparator, int test) {
+bool book::match_int(int test, search_comp_t comparator, int value) {
 	switch (comparator) {
 	case XP_NE:
 		return (value != test);
