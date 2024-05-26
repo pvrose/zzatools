@@ -612,6 +612,7 @@ void qso_rig::enable_widgets() {
 			op_status_->textcolor(DARK ? FL_GREEN : fl_darker(FL_GREEN));
 		}
 		freq = rig_->get_dfrequency(true);
+		uint64_t freq_Hz = (uint64_t)(freq * 1000000) % 1000;
 		band_data::band_entry_t* entry = band_data_->get_entry(freq * 1000);
 		if (entry) {
 			char l[50];
@@ -620,7 +621,7 @@ void qso_rig::enable_widgets() {
 		}
 		else {
 			rig_text += "Out of band!";
-			op_status_->textcolor(COLOUR_ORANGE);
+			op_status_->textcolor(DARK ? COLOUR_ORANGE : fl_darker(COLOUR_ORANGE));
 		}
 		op_status_->value(rig_text.c_str());
 		op_freq_mode_->activate();
@@ -634,8 +635,8 @@ void qso_rig::enable_widgets() {
 		string rig_mode;
 		string submode;
 		rig_->get_string_mode(rig_mode, submode);
-		snprintf(msg, sizeof(msg), "%0.3f MHz\n%s %sW" , 
-			freq, 
+		snprintf(msg, sizeof(msg), "%0.3f %03d MHz\n%s %sW" , 
+			freq, freq_Hz,
 			submode.length() ? submode.c_str() : rig_mode.c_str(),
 			rig_->get_tx_power(true).c_str()
 		);
