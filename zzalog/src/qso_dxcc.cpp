@@ -91,7 +91,17 @@ void qso_dxcc::enable_widgets() {
 	if (callsign_.length()) {
 		op_call_->value(callsign_.c_str());
 		char text[64];
-		snprintf(text, sizeof(text), "%s: %s", nickname_.c_str(), name_.c_str());
+		switch (dxcc_) {
+			case -1:
+				strcpy(text, "Invalid DXCC");
+				break;
+			case 0:
+				strcpy(text, "Not in a DXCC");
+				break;
+			default:
+				snprintf(text, sizeof(text), "%s: %s", nickname_.c_str(), name_.c_str());
+				break;
+		}
 		op_prefix_->value(text);
 		switch (source_) {
 		case cty_data::INVALID:
@@ -111,9 +121,13 @@ void qso_dxcc::enable_widgets() {
 			op_source_->color(FL_BACKGROUND_COLOR);
 			break;
 		}
-		snprintf(text, sizeof(text), "CQ Zone %d. %.0f\302\260%c %.0f\302\260%c",
-			cq_zone_, abs(location_.latitude), location_.latitude > 0 ? 'N' : 'S',
-			abs(location_.longitude), location_.longitude > 0 ? 'E' : 'W');
+		if (location_.is_nan()) {
+			snprintf(text, sizeof(text), "CQ Zone %d.", cq_zone_);
+		} else {
+			snprintf(text, sizeof(text), "CQ Zone %d. %.0f\302\260%c %.0f\302\260%c",
+				cq_zone_, abs(location_.latitude), location_.latitude > 0 ? 'N' : 'S',
+				abs(location_.longitude), location_.longitude > 0 ? 'E' : 'W');
+		}
 		op_geo_->value(text);
 	} else {
 		op_call_->value("No Contact");
@@ -139,7 +153,7 @@ void qso_dxcc::set_data() {
 		source_ = cty_data_->get_source(qso);
 		cq_zone_ = cty_data_->cq_zone(qso);
 		location_ = cty_data_->location(qso);
-		int dxcc = cty_data_->entity(qso);;
+		dxcc_ = cty_data_->entity(qso);
 	}
 
 }

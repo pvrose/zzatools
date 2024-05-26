@@ -79,6 +79,7 @@ protected:
     string nickname_;
     string name_;
     int cq_zone_;
+    int dxcc_;
     lat_long_t location_;
     cty_data::parse_source_t source_;
 

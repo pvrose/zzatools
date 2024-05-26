@@ -11,6 +11,7 @@ utils.h - various utility methods
 #include <string>
 #include <ctime>
 #include <vector>
+#include <cmath>
 
 #include <FL/Fl_Widget.H>
 
@@ -22,6 +23,10 @@ using namespace std;
 	struct lat_long_t {
 		double latitude;    // latitude (positive = N)
 		double longitude;   // longitude (positive = E)
+
+		bool is_nan() {
+			return isnan(latitude) || isnan(longitude);
+		}
 	};
 
 	// The status of the various messages
