@@ -185,24 +185,9 @@ void record::item(string field, string value, bool formatted/* = false*/, bool d
 			char type_indicator = spec_data_->datatype_indicator(field);
 			double as_d = 0.0;
 			int as_i = 0;
+			char c;
 			Fl_Preferences display_settings(settings_, "Display");
 			switch (type_indicator) {
-			case 'D': {
-				// Date type
-				display_date_t format;
-				display_settings.get("Date", (int&)format, DATE_YYYYMMDD);
-				formatted_value = unformat_date(format, upper_value);
-				break;
-			}
-			case 'T': {
-				bool ok = false;
-				// Time type
-				display_time_t format;
-				display_settings.get("Time", (int&)format, TIME_HHMMSS);
-				formatted_value = unformat_time(format, upper_value);
-				break;
-				break;
-			}
 			case 'N':
 			case 'S':
 			case 'I':
@@ -215,11 +200,6 @@ void record::item(string field, string value, bool formatted/* = false*/, bool d
 						item(field + "_EXT", upper_value.substr(8), formatted);
 						formatted_value = upper_value.substr(0, 8);
 					}
-				}
-				else if (field == "FREQ" || field == "FREQ_RX") {
-					display_freq_t format;
-					display_settings.get("Frequency", (int&)format, FREQ_MHz);
-					formatted_value = unformat_freq(format, upper_value);
 				}
 				else {
 					// No formatting
@@ -244,7 +224,6 @@ void record::item(string field, string value, bool formatted/* = false*/, bool d
 			case 'L':
 				// Convert signed decimal degree to ADIF spec LAT or LON value.
 				as_d = stod(upper_value);
-				char c;
 				if (as_d < 0.0) {
 					// Negative - West for LON, South for LAT. Covert degrees to positive number
 					as_d = -as_d;
@@ -375,18 +354,6 @@ string record::item(string field, bool formatted/* = false*/, bool indirect/* = 
 			double as_d = 0.0;
 			char as_c[15];
 			switch (type_indicator) {
-			case 'D': {
-				display_date_t format;
-				display_settings.get("Date", (int&)format, DATE_YYYYMMDD);
-				result = format_date(format, unformatted_value);
-				break;
-			}
-			case 'T': {
-				display_time_t format;
-				display_settings.get("Time", (int&)format, TIME_HHMMSS);
-				result = format_time(format, unformatted_value);
-				break;
-			}
 			case 'N':
 			case ' ':
 			case 'S':
@@ -402,11 +369,6 @@ string record::item(string field, bool formatted/* = false*/, bool indirect/* = 
 					else if (item_exists(field + "_EXT")) {
 						result = unformatted_value + item(field + "_EXT", formatted, indirect);
 					}
-				}
-				else if (field == "FREQ" || field == "FREQ_RX") {
-					display_freq_t format;
-					display_settings.get("Frequency", (int&)format, FREQ_MHz);
-					result = format_freq(format, unformatted_value);
 				}
 				else {
 					// No formatting
@@ -1199,222 +1161,6 @@ string record::item_merge(string data, bool indirect /*=false*/) {
 		right = result.find('>');
 	}
 	return result;
-}
-
-// Convert frequency from ADIF (MHz) to display format
-string record::format_freq(display_freq_t format, string value) {
-	double frequency = stod(value);
-	char temp[25] = "";
-	switch (format) {
-	case FREQ_Hz:
-		snprintf(temp, 25, "%.0f", frequency * 1000000);
-		break;
-	case FREQ_kHz:
-		snprintf(temp, 25, "%.3f", frequency * 1000);
-		break;
-	case FREQ_MHz:
-		snprintf(temp, 25, "%.6f", frequency);
-		break;
-	default:
-		strcpy(temp, "Invalid");
-		break;
-	}
-	return string(temp);
-}
-
-// Convert date from ADIF (YYYYMMDD) to display format
-string record::format_date(display_date_t format, string value) {
-	
-	// Convert date to display format
-	tm date;
-	// Get start timestamp
-	if (value.length() >= 8) {
-		date.tm_year = stoi(value.substr(0, 4)) - 1900;
-		date.tm_mon = stoi(value.substr(4, 2)) - 1;
-		date.tm_mday = stoi(value.substr(6, 2));
-		date.tm_hour = 0;
-		date.tm_min = 0;
-		date.tm_sec = 0;
-		date.tm_isdst = false;
-		char temp[20] = "";
-		if (date.tm_mon < 13 && date.tm_mday <= days_in_month(&date)) {
-			switch (format) {
-			case DATE_YYYYMMDD:
-				strftime(temp, 20, "%Y%m%d", &date);
-				break;
-			case DATE_YYYY_MM_DD:
-				strftime(temp, 20, "%Y_%m_%d", &date);
-				break;
-			case DATE_DD_MM_YYYY:
-				strftime(temp, 20, "%d_%m_%Y", &date);
-				break;
-			case DATE_MM_DD_YYYY:
-				strftime(temp, 20, "%m_%d_%Y", &date);
-				break;
-			case DATE_DD_MON_YYYY:
-				strftime(temp, 20, "%d-%b-%Y", &date);
-				break;
-			}
-			return string(temp);
-		} else {
-			char message[100];
-			snprintf(message, 100, "LOG: Invalid date %s", value.c_str());
-			status_->misc_status(ST_ERROR, message);
-			return "";
-		}
-	}
-	else {
-		char message[100];
-		snprintf(message, 100, "LOG: Invalid date %s", value.c_str());
-		status_->misc_status(ST_ERROR, message);
-		return "";
-	}
-}
-
-// Convert time from ADIF (HHMM or HHMMSS) to display format
-string record::format_time(display_time_t format, string value) {
-	tm date;
-	if (value.length() >= 4) {
-		date.tm_year = 70;
-		date.tm_mon = 0;
-		date.tm_mday = 1;
-		date.tm_hour = stoi(value.substr(0, 2));
-		date.tm_min = stoi(value.substr(2, 2));
-		if (value.length() == 6) {
-			date.tm_sec = stoi(value.substr(4, 2));
-		}
-		else {
-			date.tm_sec = 0;
-		}
-		date.tm_isdst = false;
-		char temp[20] = "";
-		if (date.tm_hour < 24 && date.tm_min < 60 && date.tm_sec < 61) {
-			switch (format) {
-			case TIME_HHMMSS:
-				strftime(temp, 20, "%H%M%S", &date);
-				break;
-			case TIME_HHMM:
-				strftime(temp, 20, "%H%M", &date);
-				break;
-			case TIME_HH_MM_SS:
-				strftime(temp, 20, "%H:%M:%S", &date);
-				break;
-			case TIME_HH_MM:
-				strftime(temp, 20, "%H:%M", &date);
-				break;
-			}
-			return string(temp);
-		}
-		else {
-			char message[100];
-			snprintf(message, 100, "LOG: Invalid time %s", value.c_str());
-			status_->misc_status(ST_ERROR, message);
-			return "";
-		}
-	}
-	else {
-		char message[100];
-		snprintf(message, 100, "LOG: Invalid time %s", value.c_str());
-		status_->misc_status(ST_ERROR, message);
-		return "";
-	}
-}
-
-
-// Convert frequency from display format to ADIF (MHz)
-string record::unformat_freq(display_freq_t format, string value) {
-	double frequency = stod(value);
-	char temp[25];
-	switch (format) {
-	case FREQ_Hz:
-		snprintf(temp, 25, "%.6f", frequency / 1000000);
-		break;
-	case FREQ_kHz:
-		snprintf(temp, 25, "%.6f", frequency / 1000);
-		break;
-	case FREQ_MHz:
-		snprintf(temp, 25, "%.6f", frequency);
-		break;
-	default:
-		strcpy(temp, "Invalid");
-		break;
-	}
-	return string(temp);
-}
-
-// Convert date from display format to ADIF (YYYYMMDD)
-string record::unformat_date(display_date_t format, string value) {
-	tm date;
-	bool ok;
-	switch (format) {
-	case DATE_YYYYMMDD:
-		ok = string_to_tm(value, date, "%Y%m%d");
-		break;
-	case DATE_YYYY_MM_DD:
-		ok = string_to_tm(value, date, "%Y_%m_%d");
-		break;
-	case DATE_DD_MM_YYYY:
-		ok = string_to_tm(value, date, "%d_%m_%Y");
-		break;
-	case DATE_MM_DD_YYYY:
-		ok = string_to_tm(value, date, "%m_%d_%Y");
-		break;
-	case DATE_DD_MON_YYYY:
-		ok = string_to_tm(value, date, "%d-%b-%YYYY");
-		break;
-	default:
-		value = "Invalid";
-		ok = false;
-		date = tm();
-		break;
-	}
-	char temp[9];
-	strftime(temp, 9, "%Y%m%d", &date);
-	if (!ok) {
-		char message[120];
-		snprintf(message, 120, "LOG: Invalid date %s for display format", value.c_str());
-		status_->misc_status(ST_ERROR, message);
-	}
-	return string(temp);
-}
-
-// Convert time from display format to ADIF (HHMMSS or HHMM)
-string record::unformat_time(display_time_t format, string value) {
-	string temp;
-	bool ok = false;
-	switch (format) {
-	case TIME_HHMMSS:
-	case TIME_HHMM:
-		switch (value.length()) {
-		case 4:
-		case 6:
-			temp = value;
-			ok = true;
-			break;
-		}
-		break;
-	case TIME_HH_MM_SS:
-		if (value.length() == 8) {
-			temp = value.substr(0, 2) + value.substr(3, 2) + value.substr(6, 2);
-			ok = true;
-		}
-		break;
-	case TIME_HH_MM:
-		if (value.length() == 5) {
-			temp = value.substr(0, 2) + value.substr(3, 2);
-			ok = true;
-		}
-		break;
-	default:
-		temp = "";
-		break;
-	}
-	if (!ok) {
-		char message[120];
-		snprintf(message, 120, "LOG: Invalid time %s for display format", value.c_str());
-		status_->misc_status(ST_ERROR, message);
-	}
-	return string(temp);
 }
 
 // Return dirtty flag

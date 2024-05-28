@@ -41,34 +41,6 @@ using namespace std;
 		LOC_GRID8        // 8-character
 	};
 
-	// record display format and save precision for frequency
-	enum display_freq_t : int {
-		FREQ_Hz,
-		FREQ_kHz,
-		FREQ_MHz,
-		FREQ_END,
-	};
-
-	// record display format for dates
-	enum display_date_t {
-		DATE_YYYYMMDD,
-		DATE_YYYY_MM_DD,
-		DATE_DD_MM_YYYY,
-		DATE_MM_DD_YYYY,
-		DATE_DD_MON_YYYY,
-		DATE_END,
-	};
-
-	// record display format for times
-	enum display_time_t {
-		TIME_HHMMSS,
-		TIME_HHMM,
-		TIME_HH_MM_SS,
-		TIME_HH_MM,
-		TIME_END,
-	};
-
-
 	// forward declaration
 	enum hint_t : unsigned char;
 
@@ -135,13 +107,6 @@ using namespace std;
 		time_t timestamp(bool time_off = false);
 		// items match between records
 		bool items_match(record* record, string field_name);
-		// Formatting methos
-		static string format_freq(display_freq_t format, string value);
-		static string format_date(display_date_t format, string value);
-		static string format_time(display_time_t format, string value);
-		static string unformat_freq(display_freq_t format, string value);
-		static string unformat_date(display_date_t format, string value);
-		static string unformat_time(display_time_t format, string value);
 		// Record is dirty
 		bool is_dirty();
 		// Clear dirty marker

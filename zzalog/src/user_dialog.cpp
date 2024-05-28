@@ -28,9 +28,6 @@ user_dialog::user_dialog(int X, int Y, int W, int H, const char* label) :
 	tip_duration_ = Fl_Tooltip::delay();
 	tip_font_ = Fl_Tooltip::font();
 	tip_size_ = Fl_Tooltip::size();
-	date_format_ = DATE_YYYYMMDD;
-	time_format_ = TIME_HHMMSS;
-	freq_format_ = FREQ_MHz;
 	session_elapse_ = 30.0;
 
 	do_creation(X, Y);
@@ -55,11 +52,6 @@ void user_dialog::load_values() {
 	Fl_Preferences tree_settings(user_settings, "Tree Views");
 	tree_settings.get("Font Name", (int&)tree_font_, 0);
 	tree_settings.get("Font Size", (int&)tree_size_, FL_NORMAL_SIZE);
-	// Formats
-	Fl_Preferences display_settings(settings_, "Display");
-	display_settings.get("Frequency", (int&)freq_format_, FREQ_MHz);
-	display_settings.get("Date", (int&)date_format_, DATE_YYYYMMDD);
-	display_settings.get("Time", (int&)time_format_, TIME_HHMMSS);
 }
 
 // Used to create the form
@@ -179,46 +171,6 @@ void user_dialog::create_form(int X, int Y) {
 	g4->size(pos_x - g4->x(), pos_y - g4->y());
 	g4->end();
 
-	// Group 5 - user formats
-	pos_y += GAP;
-	pos_x = g4->x();
-	Fl_Group* g5 = new Fl_Group(pos_x, pos_y, 0, 10, "User Formats");
-	g5->align(FL_ALIGN_TOP_LEFT | FL_ALIGN_INSIDE);
-	g5->labelfont(FL_BOLD);
-	g5->labelsize(FL_NORMAL_SIZE + 2);
-	g5->box(FL_BORDER_BOX);
-	// Add choices - frequency 
-	pos_x += GAP + WLABEL;
-	pos_y += HTEXT;
-	Fl_Choice* ch1 = new Fl_Choice(pos_x, pos_y, WEDIT, HBUTTON, "Frequency");
-	ch1->align(FL_ALIGN_LEFT);
-	ch1->callback(cb_value<Fl_Choice, display_freq_t>, (void*)&freq_format_);
-	ch1->when(FL_WHEN_RELEASE);
-	populate_freq(ch1, freq_format_);
-
-	// Add Date choice
-	pos_y += ch1->h();
-	Fl_Choice* ch2 = new Fl_Choice(pos_x, pos_y, WEDIT, HBUTTON, "Date");
-	ch2->align(FL_ALIGN_LEFT);
-	ch2->callback(cb_value<Fl_Choice, display_date_t>, (void*)&date_format_);
-	ch2->when(FL_WHEN_RELEASE);
-	populate_date(ch2, date_format_);
-
-	// Add Time choice
-	pos_y += ch2->h();
-	Fl_Choice* ch3 = new Fl_Choice(pos_x, pos_y, WEDIT, HBUTTON, "Time");
-	ch3->align(FL_ALIGN_LEFT);
-	ch3->callback(cb_value<Fl_Choice, display_time_t>, (void*)&time_format_);
-	ch3->when(FL_WHEN_RELEASE);
-	populate_time(ch3, time_format_);
-
-	// End group - fit to size
-	g5->resizable(nullptr);
-	pos_y = ch3->y() + ch3->h() + GAP;
-	pos_x = ch3->x() + ch3->w() + GAP;
-	g5->size(pos_x - g5->x(), pos_y - g5->y());
-	g5->end();
-
 	end();
 	show();
 }
@@ -249,11 +201,6 @@ void user_dialog::save_values() {
 	//((pfx_tree*)tabbed_forms_->get_view(OT_PREFIX))->set_font(tree_font_, tree_size_);
 	((report_tree*)tabbed_forms_->get_view(OT_REPORT))->set_font(tree_font_, tree_size_);
 	((spec_tree*)tabbed_forms_->get_view(OT_ADIF))->set_font(tree_font_, tree_size_);
-
-	Fl_Preferences display_settings(settings_, "Display");
-	display_settings.set("Frequency", (int)freq_format_);
-	display_settings.set("Date", (int)date_format_);
-	display_settings.set("Time", (int)time_format_);
 
 	// Now tell all views to update formats
 	book_->selection(-1, HT_FORMAT);
@@ -349,62 +296,3 @@ void user_dialog::populate_size(Fl_Hold_Browser* br, const Fl_Font* font, const 
 	}
 }
 
-// Populate frequency
-void user_dialog::populate_freq(Fl_Choice* ch, display_freq_t format) {
-	string freq = "14.000000";
-	rig_if* rig = qso_manager_->rig();
-	if (rig && rig->is_good()) {
-		freq = rig->get_frequency(false);
-	}
-	ch->clear();
-	char temp[25];
-	// Display the current frequency in the selected format
-	for (int i = 0; i < (int)FREQ_END; i++) {
-		snprintf(temp, 25, "%d: %s", i, record::format_freq((display_freq_t)i, freq).c_str());
-		ch->add(temp);
-	}
-	if (format < FREQ_END) {
-		ch->value((int)format);
-	}
-	else {
-		ch->value(0);
-	}
-}
-
-// Populate date choice
-void user_dialog::populate_date(Fl_Choice* ch, display_date_t format) {
-	string date = now(false, "%Y%m%d");
-	// Avoid dates where the month and day are the same
-	if (now(false, "%m") == now(false, "%d")) {
-		date = "20201231";
-	}
-	ch->clear();
-	char temp[25];
-	for (int i = 0; i < (int)DATE_END; i++) {
-		snprintf(temp, 25, "%d: %s", i, record::format_date((display_date_t)i, date).c_str());
-		ch->add(temp);
-	}
-	if (format < DATE_END) {
-		ch->value((int)format);
-	}
-	else {
-		ch->value(0);
-	}
-}
-
-// Populate time choice
-void user_dialog::populate_time(Fl_Choice* ch, display_time_t format) {
-	string time = now(false, "%H%M%S");
-	ch->clear();
-	char temp[25];
-	for (int i = 0; i < (int)TIME_END; i++) {
-		snprintf(temp, 25, "%d: %s", i, record::format_time((display_time_t)i, time).c_str());
-		ch->add(temp);
-	}
-	if (format < TIME_END) {
-		ch->value((int)format);
-	}
-	else {
-		ch->value(0);
-	}
-}

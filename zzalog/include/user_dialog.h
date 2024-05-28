@@ -38,10 +38,6 @@
 		// Populate font and size browsers
 		void populate_font(Fl_Hold_Browser* b, const Fl_Font* font);
 		void populate_size(Fl_Hold_Browser* b, const Fl_Font* font, const Fl_Fontsize* size);
-		// Populate format selectors
-		void populate_freq(Fl_Choice*, const display_freq_t format);
-		void populate_date(Fl_Choice*, const display_date_t format);
-		void populate_time(Fl_Choice*, const display_time_t format);
 
 		// Font for log_table contents
 		Fl_Font log_font_;
@@ -59,10 +55,6 @@
 		Fl_Font tree_font_;
 		// and its size
 		Fl_Fontsize tree_size_;
-		// User formats
-		display_date_t date_format_;
-		display_time_t time_format_;
-		display_freq_t freq_format_;
 	};
 #endif
 
