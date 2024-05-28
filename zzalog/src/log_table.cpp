@@ -926,7 +926,9 @@ void log_table::display_current() {
 	int r1 = 0, r2 = 0, c1 = 0, c2 = 0;
 	visible_cells(r1, r2, c1, c2);
 	if ((unsigned)r1 >= current_item_num_ || (unsigned)r2 <= current_item_num_) {
-		top_row(current_item_num_);
+		if (current_item_num_ == 0)
+			top_row(current_item_num_);
+		else top_row(current_item_num_ - 1);
 	}
 }
 
