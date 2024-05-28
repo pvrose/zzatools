@@ -48,7 +48,7 @@ using namespace std;
 
 	// qso_manager
 	public:
-		qso_manager(int W, int H, const char* label);
+		qso_manager(int W, int H, const char* label = nullptr);
 		virtual ~qso_manager();
 
 		// Override to tell menu when it opens and closes

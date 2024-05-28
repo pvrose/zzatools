@@ -738,7 +738,8 @@ void add_dashboard() {
 		if (!qso_manager_) {
 			char l[128];
 			snprintf(l, sizeof(l), "%s %s: Operating Dashboard", PROGRAM_ID.c_str(), PROGRAM_VERSION.c_str());
-			qso_manager_ = new qso_manager(10, 10, l);
+			qso_manager_ = new qso_manager(10, 10);
+			qso_manager_->copy_label(l);
 		}
 		// Get the Operation window
 		// Show the scratchpad at the saved position
