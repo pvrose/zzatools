@@ -202,7 +202,7 @@ void qso_qsl_vwr::create_form() {
 	curr_x += WBN;
 	// Button - Set QSL_SENT=R in current QSO
 	bn_card_reqd_ = new Fl_Button(curr_x, curr_y, WBN, HBUTTON, "Requested");
-	bn_card_reqd_->tooltip("Marl QSL as wanting a card QSL");
+	bn_card_reqd_->tooltip("Mark QSO as wanting a card QSL");
 	bn_card_reqd_->callback(cb_bn_card_reqd);
 	bn_card_reqd_->when(FL_WHEN_RELEASE);
 	curr_x += WBN;
