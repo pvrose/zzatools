@@ -2,6 +2,7 @@
 
 #include "prefix.h"
 #include "cty_data.h"
+#include "book.h"
 
 #include <set>
 #include <vector>
@@ -36,10 +37,10 @@ class qso_dxcc :
 
  
     protected:
-        set<string>* dxcc_bands_;
+        band_set* dxcc_bands_;
         set<string>* dxcc_modes_;
         set<string>* dxcc_submodes_;
-        set<string>* all_bands_;
+        band_set* all_bands_;
         set<string>* all_modes_;
         set<string>* all_submodes_;
     };
@@ -84,7 +85,7 @@ protected:
     cty_data::parse_source_t source_;
 
     // BAnd worked
-    set<string>* bands_worked_;
+    band_set* bands_worked_;
     // Modes worked
     set<string>* modes_worked_;
     // Source of prefix parsing

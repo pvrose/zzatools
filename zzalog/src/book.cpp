@@ -1273,15 +1273,15 @@ bool book::get_macro(record* use_record, string macro_name, set<string> field_na
 }
 
 // get used bands
-set<string>* book::used_bands(int32_t dxcc, string call) { 
-	set<string>* result = nullptr;
+band_set* book::used_bands(int32_t dxcc, string call) { 
+	set<string, band_lt>* result = nullptr;
 	if (dxcc == INT32_MIN) return &used_bands_;
 	else if (bands_per_dxcc_.find(call) == bands_per_dxcc_.end());
 	else {
 		auto it = bands_per_dxcc_.at(call);
 		if (it.find(dxcc) == it.end());
 		else {
-			result = new set<string>(it[dxcc]);
+			result = new band_set(it[dxcc]);
 		}
 	}
 	return result;

@@ -5,6 +5,7 @@
 #include "spec_data.h"
 #include "drawing.h"
 #include "search.h"
+#include "band.h"
 
 #include <string>
 #include <vector>
@@ -68,6 +69,8 @@ using namespace std;
 	class adx_reader;
 	class adi_writer;
 	class adx_writer;
+
+	extern spec_data* spec_data_;
 
 	// This class is the container for the ADIF records. These are held in chronological order.
 	// As well as standing alone it is used as a base class for extract_data and import_data
@@ -140,7 +143,7 @@ using namespace std;
 		// set book type
 		void book_type(object_t);
 		// get used bands - INTMAX_MIN = all DXCC
-		set<string>* used_bands(int32_t dxcc = INT32_MIN, string call = "");
+		band_set* used_bands(int32_t dxcc = INT32_MIN, string call = "");
 		// get used modes 
 		set<string>* used_modes(int32_t dxcc = INT32_MIN, string call = "");
 		// get used submodes
@@ -252,7 +255,7 @@ using namespace std;
 		// Most recent search result
 		item_num_t last_search_result_;
 		// used bands
-		set<string> used_bands_;
+		band_set used_bands_;
 		// used modes
 		set<string> used_modes_;
 		// used submodes
@@ -270,7 +273,7 @@ using namespace std;
 		// Ignore null macros
 		bool ignore_null_;
 		// Bands worked per DXCC
-		map < string, map < int, set<string> > > bands_per_dxcc_;
+		map < string, map < int, band_set > > bands_per_dxcc_;
 		// mOdes worked per DXCC
 		map < string, map < int, set<string> > > modes_per_dxcc_;
 		// submOdes worked per DXCC
