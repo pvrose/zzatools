@@ -139,12 +139,12 @@ using namespace std;
 		object_t book_type();
 		// set book type
 		void book_type(object_t);
-		// get used bands - -1 = all DXCC
-		set<string>* used_bands(int dxcc = -1, string call = "");
-		// get used modes = -1 = all DXCC
-		set<string>* used_modes(int dxcc = -1, string call = "");
+		// get used bands - INTMAX_MIN = all DXCC
+		set<string>* used_bands(int32_t dxcc = INT32_MIN, string call = "");
+		// get used modes 
+		set<string>* used_modes(int32_t dxcc = INT32_MIN, string call = "");
 		// get used submodes
-		set<string>* used_submodes(int dxcc = -1, string call = "");
+		set<string>* used_submodes(int32_t dxcc = INT32_MIN, string call = "");
 		// Enterring record
 		bool modified_record();
 		// Set entering record

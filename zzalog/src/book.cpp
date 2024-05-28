@@ -1273,9 +1273,9 @@ bool book::get_macro(record* use_record, string macro_name, set<string> field_na
 }
 
 // get used bands
-set<string>* book::used_bands(int dxcc, string call) { 
+set<string>* book::used_bands(int32_t dxcc, string call) { 
 	set<string>* result = nullptr;
-	if (dxcc == -1) return &used_bands_;
+	if (dxcc == INT32_MIN) return &used_bands_;
 	else if (bands_per_dxcc_.find(call) == bands_per_dxcc_.end());
 	else {
 		auto it = bands_per_dxcc_.at(call);
@@ -1288,9 +1288,9 @@ set<string>* book::used_bands(int dxcc, string call) {
 }
 
 // get used modes
-set<string>* book::used_modes(int dxcc, string call) {
+set<string>* book::used_modes(int32_t dxcc, string call) {
 	set<string>* result = nullptr;
-	if (dxcc == -1) return &used_modes_;
+	if (dxcc == INT32_MIN) return &used_modes_;
 	else if (modes_per_dxcc_.find(call) == modes_per_dxcc_.end());
 	else {
 		auto it = modes_per_dxcc_.at(call);
@@ -1303,9 +1303,9 @@ set<string>* book::used_modes(int dxcc, string call) {
 }
 
 // get used submodes
-set<string>* book::used_submodes(int dxcc, string call) {
+set<string>* book::used_submodes(int32_t dxcc, string call) {
 	set<string>* result = nullptr;
-	if (dxcc == -1) return &used_submodes_;
+	if (dxcc == INT32_MIN) return &used_submodes_;
 	else if (submodes_per_dxcc_.find(call) == submodes_per_dxcc_.end());
 	else {
 		auto it = submodes_per_dxcc_.at(call);
