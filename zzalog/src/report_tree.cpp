@@ -453,6 +453,7 @@ void report_tree::copy_map_to_tree(int type, void* this_map, Fl_Tree_Item* item,
 // Copy the list of records in a map entry to the tree control
 void report_tree::copy_records_to_tree(record_list_t* record_list, Fl_Tree_Item* item, int& num_records, int& num_eqsl, int& num_lotw, int& num_card, int& num_dxcc, int& num_any) {
 	if (record_list != nullptr) {
+		Fl_Tree_Sort saved = sortorder();
 		sortorder(FL_TREE_SORT_ASCENDING);
 		// We have records to copy - return the number of recordsf
 		num_records = record_list->size();
@@ -513,7 +514,7 @@ void report_tree::copy_records_to_tree(record_list_t* record_list, Fl_Tree_Item*
 			record_item->labelfont(item_labelfont() | FL_ITALIC);
 		}
 		delete[] text;
-		sortorder(FL_TREE_SORT_NONE);
+		sortorder(saved);
 	}
 }
 
