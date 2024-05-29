@@ -4,6 +4,7 @@
 
 #include <string>
 #include <set>
+#include <map> 
 
 using namespace std;
 
@@ -15,4 +16,9 @@ struct band_lt {
         return spec_data_->freq_for_band(l) < spec_data_->freq_for_band(r);
     }
 };
-typedef set<string, band_lt> band_set;
+
+class band_set : public set<string, band_lt>{};
+
+template <class T>
+class band_map : public map<string, T, band_lt>{
+};
