@@ -33,6 +33,7 @@ extern main_window* main_window_;
 extern qso_manager* qso_manager_;
 extern import_data* import_data_;
 extern intl_dialog* intl_dialog_;
+extern bool DARK;
 
 // Constructor - most buttons invoke a menu item
 toolbar::toolbar(int X, int Y, int W, int H, const char* label) :
@@ -101,14 +102,14 @@ toolbar::toolbar(int X, int Y, int W, int H, const char* label) :
 	curr_x += H;
 	// Navigate->Find->New
 	bn = new Fl_Button(curr_x, Y, H, H, "@search");
-	bn->labelcolor(FL_BLUE);
+	bn->labelcolor(DARK ? fl_lighter(FL_BLUE) : FL_BLUE);
 	bn->callback(cb_bn_menu, (void*)"&Navigate/F&ind/&New");
 	bn->when(FL_WHEN_RELEASE);
 	bn->tooltip("Go to matching record");
 	curr_x += H;
 	// Navigate->Find->Next
 	bn = new Fl_Button(curr_x, Y, H, H, "@>>");
-	bn->labelcolor(FL_BLUE);
+	bn->labelcolor(DARK ? fl_lighter(FL_BLUE) : FL_BLUE);
 	bn->callback(cb_bn_menu, (void*)"&Navigate/F&ind/Ne&xt");
 	bn->when(FL_WHEN_RELEASE);
 	bn->tooltip("Go to next matching record");
