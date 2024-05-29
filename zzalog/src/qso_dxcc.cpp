@@ -309,7 +309,9 @@ void qso_dxcc::wb4_buttons::cb_bn_mode(Fl_Widget* w, void* v) {
 	qso_dxcc* qd = ancestor_view<qso_dxcc>(w);
 	qso_entry* qe = ancestor_view<qso_entry>(qd);
 	record* qso = qe->qso();
-	string mode = string((char*)v);
+	Fl_Button* bn = (Fl_Button*)w;
+	string mode = string(bn->label());
+	bool save = bn->value();
 	// Extract those records not sent to QSL server !(*QSL_SENT==Y) 
 	search_criteria_t	new_criteria = {
 		/*search_cond_t condition*/ XC_DXCC,
@@ -331,6 +333,7 @@ void qso_dxcc::wb4_buttons::cb_bn_mode(Fl_Widget* w, void* v) {
 	tabbed_forms_->activate_pane(OT_EXTRACT, true);
 	item_num_t item = navigation_book_->item_number(qe->qso_number());
 	navigation_book_->selection(item, HT_EXTRACTION);
+	bn->value(!save);
 }
 
 // Get records that match nickname, station and pressed button
@@ -338,7 +341,9 @@ void qso_dxcc::wb4_buttons::cb_bn_band(Fl_Widget* w, void* v) {
 	qso_dxcc* qd = ancestor_view<qso_dxcc>(w);
 	qso_entry* qe = ancestor_view<qso_entry>(qd);
 	record* qso = qe->qso();
+	Fl_Button* bn = (Fl_Button*)w;
 	string band = string((char*)v);
+	bool save = bn->value();
 	// Extract those records not sent to QSL server !(*QSL_SENT==Y) 
 	search_criteria_t	new_criteria = {
 		/*search_cond_t condition*/ XC_DXCC,
@@ -360,4 +365,5 @@ void qso_dxcc::wb4_buttons::cb_bn_band(Fl_Widget* w, void* v) {
 	tabbed_forms_->activate_pane(OT_EXTRACT, true);
 	item_num_t item = navigation_book_->item_number(qe->qso_number());
 	navigation_book_->selection(item, HT_EXTRACTION);
+	bn->value(!save);
 }
