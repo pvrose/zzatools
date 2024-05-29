@@ -328,7 +328,6 @@ void report_tree::add_record(item_num_t record_num, report_map_entry_t* entry) {
 // Copy the map to the tree control and totalise record counts
 void report_tree::copy_map_to_tree(int type, void* this_map, Fl_Tree_Item* item, int& num_records, int& num_eqsl, int& num_lotw, int& num_card, int& num_dxcc, int &num_any) {
 	report_cat_t cat = adj_order_[type];
-	printf("DEBUG - reading map type %d\n", (int)cat);
 	report_map_entry_t* next_entry;
 	string map_key;
 	char* text = new char[1024];
@@ -844,9 +843,6 @@ void report_tree::add_category(int level, report_cat_t category, string custom) 
 			}
 			adj_order_.push_back(map_order_[i]);
 		}
-		printf("DEBUG: Report order");
-		for(int i = 0; i < adj_order_.size(); i++) printf("%d ", adj_order_[i]);
-		printf("\n");
 		// Update menu
 		menu_->report_mode(map_order_, filter_);
 		// Update settings

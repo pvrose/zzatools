@@ -14,15 +14,13 @@
 #include "main_window.h"
 #include "qso_manager.h"
 #include "import_data.h"
+#include "intl_dialog.h"
 
 #include <FL/Fl_Button.H>
 #include <FL/Fl_RGB_Image.H>
 #include <FL/fl_ask.H>
 #include <FL/Fl_Tooltip.H>
 #include <FL/Fl_Single_Window.H>
-
-
-
 
 extern menu* menu_;
 extern book* navigation_book_;
@@ -34,6 +32,7 @@ extern status* status_;
 extern main_window* main_window_;
 extern qso_manager* qso_manager_;
 extern import_data* import_data_;
+extern intl_dialog* intl_dialog_;
 
 // Constructor - most buttons invoke a menu item
 toolbar::toolbar(int X, int Y, int W, int H, const char* label) :
@@ -262,7 +261,7 @@ toolbar::toolbar(int X, int Y, int W, int H, const char* label) :
 	curr_x += H;
 	// Help->Intl
 	bn = new Fl_Button(curr_x, Y, H, H, "\303\206");
-	bn->callback(cb_bn_menu, (void*)"&Help/&Intl");
+	bn->callback(cb_bn_intl, nullptr);
 	bn->when(FL_WHEN_RELEASE);
 	bn->tooltip("Hide/Show International character set");
 	add(bn);
@@ -452,6 +451,16 @@ void toolbar::cb_bn_import(Fl_Widget* w, void* v) {
 // v is not used
 void toolbar::cb_bn_rig(Fl_Widget* w, void* v) {
 	qso_manager_->switch_rig();
+}
+
+// Open or close intl dialog
+// v is not used
+void toolbar::cb_bn_intl(Fl_Widget* w, void* v) {
+	if (intl_dialog_->visible()) {
+		intl_dialog_->hide();
+	} else {
+		intl_dialog_->show();
+	}
 }
 
 // Return the minimum width required

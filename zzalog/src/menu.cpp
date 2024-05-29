@@ -216,7 +216,6 @@ settings* config_ = nullptr;
 	// Program help features
 	{ "&Help", 0, 0, 0, FL_SUBMENU },
 		{ "&About", 0, menu::cb_mi_help_abt },
-		{ "&Intl", 0, menu::cb_mi_help_intl, nullptr, FL_MENU_TOGGLE },
 		{ 0 },
 	{ 0 }
 	};
@@ -1225,17 +1224,6 @@ void menu::cb_mi_help_abt(Fl_Widget* w, void* v) {
 	dialog->display();
 	//remove_sub_window(dialog);
 	delete dialog;
-}
-
-// Help->Intl - show/hide international character set
-// v is not used
-void menu::cb_mi_help_intl(Fl_Widget* w, void* v) {
-	if (intl_dialog_->visible()) {
-		intl_dialog_->hide();
-	}
-	else {
-		intl_dialog_->show();
-	}
 }
 
 // Enable/disable menu 

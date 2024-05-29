@@ -31,6 +31,8 @@ using namespace std;
 		static void cb_bn_import(Fl_Widget* w, void* v);
 		// Callback to (dis)connect rig
 		static void cb_bn_rig(Fl_Widget* w, void* v);
+		// Callback to open international dialog
+		static void cb_bn_intl(Fl_Widget* w, void* v);
 		// Supply minimum width of toolbar
 		int min_w();
 		// Add selected callsign as default input
