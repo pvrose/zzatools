@@ -42,14 +42,13 @@ report_tree::report_tree(int X, int Y, int W, int H, const char* label, field_or
 	, custom_field_("")
 {
 	map_order_.clear();
-
 	Fl_Preferences user_settings(settings_, "User Settings");
 	Fl_Preferences tree_settings(user_settings, "Tree Views");
 	tree_settings.get("Font Name", (int&)font_, 0);
 	tree_settings.get("Font Size", (int&)fontsize_, FL_NORMAL_SIZE);
 
 	// Set tree properties
-	sortorder(FL_TREE_SORT_ASCENDING);
+	sortorder(FL_TREE_SORT_NONE);
 	item_labelfont(font_);
 	item_labelsize(fontsize_);
 	// Get initial filter
@@ -147,12 +146,13 @@ void report_tree::add_record(item_num_t record_num, report_map_entry_t* entry) {
 	string custom_code;
 	// Get record
 	record* record = get_book()->get_record(record_num, false);
+	report_cat_t category;
+	report_cat_t next_category;
 	// Entry type is valid
 	bool skip_state = false;
 	if (entry->entry_type != -1 && (size_t)entry->entry_type < adj_order_.size()) {
 		// The user wants to display this entry type
-		report_cat_t category = adj_order_[entry->entry_type];
-		report_cat_t next_category;
+		category = adj_order_[entry->entry_type];
 		if (adj_order_.size() > (unsigned)entry->entry_type + 1) {
 			next_category = adj_order_[entry->entry_type + 1];
 		}
@@ -261,26 +261,54 @@ void report_tree::add_record(item_num_t record_num, report_map_entry_t* entry) {
 			add_record(record_num, entry);
 		}
 		else {
-			// First find the map at this entry - create a new one if one doesn't exist
-			if (entry->next_entry == nullptr) {
-				entry->next_entry = new report_map_t;
-			}
-			// now look in the map for the entry
 			report_map_entry_t* next_entry;
-			// Find any existing entry with the label
-			auto it = entry->next_entry->find(map_key);
-			if (it == entry->next_entry->end()) {
-				// A map doesn't exist for this key - so create one and add it
-				next_entry = new report_map_entry_t;
-				next_entry->entry_type = entry->entry_type + 1;
-				next_entry->entry_cat = adj_order_[entry->entry_type];
-				next_entry->next_entry = nullptr;
-				next_entry->record_list = nullptr;
-				(*entry->next_entry)[map_key] = next_entry;
-			}
-			else {
-				// Step to the next entry in the map
-				next_entry = it->second;
+			switch(category) {
+				case RC_BAND: {
+					// First find the map at this entry - create a new one if one doesn't exist
+					if (entry->next_entry == nullptr) {
+						entry->next_entry = new report_band_map_t;
+					}
+					// now look in the map for the entry
+					// Find any existing entry with the label
+					auto it = ((report_band_map_t*)entry->next_entry)->find(map_key);
+					if (it == ((report_band_map_t*)entry->next_entry)->end()) {
+						// A map doesn't exist for this key - so create one and add it
+						next_entry = new report_map_entry_t;
+						next_entry->entry_type = entry->entry_type + 1;
+						// next_entry->entry_cat = adj_order_[entry->entry_type];
+						next_entry->next_entry = nullptr;
+						next_entry->record_list = nullptr;
+						(*(report_band_map_t*)entry->next_entry)[map_key] = next_entry;
+					}
+					else {
+						// Step to the next entry in the map
+						next_entry = it->second;
+					}
+					break;
+				}
+				default: {
+					// First find the map at this entry - create a new one if one doesn't exist
+					if (entry->next_entry == nullptr) {
+						entry->next_entry = new report_map_t;
+					}
+					// now look in the map for the entry
+					// Find any existing entry with the label
+					auto it = ((report_map_t*)entry->next_entry)->find(map_key);
+					if (it == ((report_map_t*)entry->next_entry)->end()) {
+						// A map doesn't exist for this key - so create one and add it
+						next_entry = new report_map_entry_t;
+						next_entry->entry_type = entry->entry_type + 1;
+						// next_entry->entry_cat = adj_order_[entry->entry_type];
+						next_entry->next_entry = nullptr;
+						next_entry->record_list = nullptr;
+						(*(report_map_t*)entry->next_entry)[map_key] = next_entry;
+					}
+					else {
+						// Step to the next entry in the map
+						next_entry = it->second;
+					}
+					break;
+				}
 			}
 			// Hang the record at the new entry
 			add_record(record_num, next_entry);
@@ -298,7 +326,9 @@ void report_tree::add_record(item_num_t record_num, report_map_entry_t* entry) {
 }
 
 // Copy the map to the tree control and totalise record counts
-void report_tree::copy_map_to_tree(report_map_t* this_map, Fl_Tree_Item* item, int& num_records, int& num_eqsl, int& num_lotw, int& num_card, int& num_dxcc, int &num_any) {
+void report_tree::copy_map_to_tree(int type, void* this_map, Fl_Tree_Item* item, int& num_records, int& num_eqsl, int& num_lotw, int& num_card, int& num_dxcc, int &num_any) {
+	report_cat_t cat = adj_order_[type];
+	printf("DEBUG - reading map type %d\n", (int)cat);
 	report_map_entry_t* next_entry;
 	string map_key;
 	char* text = new char[1024];
@@ -306,7 +336,10 @@ void report_tree::copy_map_to_tree(report_map_t* this_map, Fl_Tree_Item* item, i
 	char format[] = "%s %d QSOs - Confirmed %d (%d eQSL, %d LotW, %d Card, %d DXCC)";
 	size_t count = 1;
 	// For all entries at this level of the map
-	for (auto it = this_map->begin(); it != this_map->end(); it++, count++) {
+	bool done = false;
+	auto ita = ((report_map_t*)this_map)->begin();
+	auto itb = ((report_band_map_t*)this_map)->begin(); 
+	do {
 		// Initialise totals for this map
 		int count_records = 0;
 		int count_eqsl = 0;
@@ -315,9 +348,18 @@ void report_tree::copy_map_to_tree(report_map_t* this_map, Fl_Tree_Item* item, i
 		int count_dxcc = 0;  // For LotW OR Card
 		int count_any = 0;
 		// Get entry in the map
-		map_key = it->first;
-		next_entry = it->second;
-
+		switch (adj_order_[type]) {
+			case RC_BAND: {
+				map_key = itb->first;
+				next_entry = itb->second;
+				break;
+			}
+			default: {
+				map_key = ita->first;
+				next_entry = ita->second;
+				break;
+			}
+		}
 		if (next_entry->record_list != nullptr) {
 			// There is a valid record list in the entry
 			// Hang a placeholder text line on the trees - key won't change so unlikely to affect sort order
@@ -356,7 +398,7 @@ void report_tree::copy_map_to_tree(report_map_t* this_map, Fl_Tree_Item* item, i
 				next_item = item->add(prefs(), text);
 			}
 			// Copy the next level down of the map to the tree
-			copy_map_to_tree(next_entry->next_entry, next_item, count_records, count_eqsl, count_lotw, count_card, count_dxcc, count_any);
+			copy_map_to_tree(next_entry->entry_type, next_entry->next_entry, next_item, count_records, count_eqsl, count_lotw, count_card, count_dxcc, count_any);
 			// Update the text with actual total record counts
 			sprintf(text, format, map_key.c_str(), count_records, count_any, count_eqsl, count_lotw, count_card, count_dxcc);
 			next_item->label(text);
@@ -387,7 +429,20 @@ void report_tree::copy_map_to_tree(report_map_t* this_map, Fl_Tree_Item* item, i
 			}
 			status_->progress(count, OT_REPORT);
 		}
+		switch (adj_order_[type]) {
+			case RC_BAND: {
+				itb++;
+				if (itb == ((report_band_map_t*)this_map)->end()) done = true;
+				break;
+			}
+			default: {
+				ita++;
+				if (ita == ((report_map_t*)this_map)->end()) done = true;
+				break;
+			}
+		}
 	}
+	while (!done);
 	// Only display this on top-level map
 	if (item == nullptr) {
 		status_->misc_status(ST_OK, "LOG: Report display done!");
@@ -398,6 +453,7 @@ void report_tree::copy_map_to_tree(report_map_t* this_map, Fl_Tree_Item* item, i
 // Copy the list of records in a map entry to the tree control
 void report_tree::copy_records_to_tree(record_list_t* record_list, Fl_Tree_Item* item, int& num_records, int& num_eqsl, int& num_lotw, int& num_card, int& num_dxcc, int& num_any) {
 	if (record_list != nullptr) {
+		sortorder(FL_TREE_SORT_ASCENDING);
 		// We have records to copy - return the number of recordsf
 		num_records = record_list->size();
 		char* text = new char[1024];
@@ -457,6 +513,7 @@ void report_tree::copy_records_to_tree(record_list_t* record_list, Fl_Tree_Item*
 			record_item->labelfont(item_labelfont() | FL_ITALIC);
 		}
 		delete[] text;
+		sortorder(FL_TREE_SORT_NONE);
 	}
 }
 
@@ -484,6 +541,7 @@ void report_tree::create_map() {
 	report_cat_t category = adj_order_[0];
 	string selector_name;
 	string field_name;
+	// map_.entry_cat = category;
 	// Get the field we use from the selected record to get our report criterion
 	switch (category) {
 	case RC_DXCC:
@@ -528,17 +586,38 @@ void report_tree::create_map() {
 // Delete the map in a specific map entry
 void report_tree::delete_map(report_map_entry_t* entry) {
 	if (entry->next_entry != nullptr) {
-		// We have a child map, for each entry in it, 
-		for (auto it = entry->next_entry->begin(); it != entry->next_entry->end(); it++) {
-			// Delete the entry and release memory 
-			report_map_entry_t* next_entry = it->second;
-			string map_key = it->first;
-			delete_map(next_entry);
-			delete next_entry;
+		switch (adj_order_[entry->entry_type]) {
+			case RC_BAND: {
+				// We have a child map, for each entry in it, 
+				for (auto it = ((report_band_map_t*)entry->next_entry)->begin(); 
+					it != ((report_band_map_t*)entry->next_entry)->end(); it++) {
+					// Delete the entry and release memory 
+					report_map_entry_t* next_entry = it->second;
+					string map_key = it->first;
+					delete_map(next_entry);
+					delete next_entry;
+				}
+				// Tidy up
+				((report_band_map_t*)entry->next_entry)->clear();
+				delete (report_band_map_t*)entry->next_entry;
+				break;
+			}
+			default: {
+				// We have a child map, for each entry in it, 
+				for (auto it = ((report_map_t*)entry->next_entry)->begin(); 
+					it != ((report_map_t*)entry->next_entry)->end(); it++) {
+					// Delete the entry and release memory 
+					report_map_entry_t* next_entry = it->second;
+					string map_key = it->first;
+					delete_map(next_entry);
+					delete next_entry;
+				}
+				// Tidy up
+				((report_map_t*)entry->next_entry)->clear();
+				delete (report_map_t*)entry->next_entry;
+				break;
+			}
 		}
-		// Tidy up
-		entry->next_entry->clear();
-		delete entry->next_entry;
 		entry->next_entry = nullptr;
 	}
 	if (entry->record_list != nullptr) {
@@ -582,8 +661,17 @@ void report_tree::populate_tree(bool activate) {
 			// This then iterates down to the record entries
 			// Initialise progress bar
 			status_->misc_status(ST_NOTE, "LOG: Report display started");
-			status_->progress(map_.next_entry->size(), OT_REPORT, "Displaying the log analysis tree", "entries");
-			copy_map_to_tree(map_.next_entry, nullptr, count_records, num_eqsl, num_lotw, num_card, num_dxcc, num_any);
+			switch(adj_order_[0]) {
+				case RC_BAND: {
+					status_->progress(((report_band_map_t*)map_.next_entry)->size(), OT_REPORT, "Displaying the log analysis tree - bands", "entries");
+					break;
+				}
+				default: {
+					status_->progress(((report_map_t*)map_.next_entry)->size(), OT_REPORT, "Displaying the log analysis tree", "entries");
+					break;
+				}
+			}
+			copy_map_to_tree(0, map_.next_entry, nullptr, count_records, num_eqsl, num_lotw, num_card, num_dxcc, num_any);
 			
 			// Add the root label
 			char text[1028];
@@ -755,6 +843,9 @@ void report_tree::add_category(int level, report_cat_t category, string custom) 
 			}
 			adj_order_.push_back(map_order_[i]);
 		}
+		printf("DEBUG: Report order");
+		for(int i = 0; i < adj_order_.size(); i++) printf("%d ", adj_order_[i]);
+		printf("\n");
 		// Update menu
 		menu_->report_mode(map_order_, filter_);
 		// Update settings

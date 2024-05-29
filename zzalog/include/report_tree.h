@@ -3,6 +3,7 @@
 
 #include "view.h"
 #include "fields.h"
+#include "band.h"
 
 #include <string>
 #include <vector>
@@ -74,27 +75,32 @@ using namespace std;
 		struct report_map_entry_t {
 			// Depth of entry
 			int entry_type;
-			// what sort of entry
-			report_cat_t entry_cat;
+			// // what sort of entry
+			// report_cat_t entry_cat;
 			// list of records in this entry
 			record_list_t* record_list;
 			// map of entries to display under this entry
-			map<string, report_map_entry_t*>* next_entry;
+			// map<string, report_map_entry_t*>* next_entry;
+			// This will either be as above, or:
+			// base_map<report_map_entry_t*>* 
+			// depending on the context 
+			void* next_entry;
 			// Default constructor
 			report_map_entry_t() {
 				entry_type = 0;
-				entry_cat = RC_DXCC;
+				// entry_cat = RC_DXCC;
 				record_list = nullptr;
 				next_entry = nullptr;
 			}
 		};
 		// The map of entries
 		typedef map<string, report_map_entry_t*> report_map_t;
+		typedef band_map<report_map_entry_t*> report_band_map_t;
 		// methods
 		// Add record details to a specific map entry
 		void add_record(qso_num_t iRecord, report_map_entry_t* entry);
 		// Copy the map to the tree control
-		void copy_map_to_tree(report_map_t* pMap, Fl_Tree_Item* item, int& num_records, int& num_eqsl, int& num_lotw, int& num_card, int& num_dxcc, int &num_any);
+		void copy_map_to_tree(int type, void* pMap, Fl_Tree_Item* item, int& num_records, int& num_eqsl, int& num_lotw, int& num_card, int& num_dxcc, int &num_any);
 		// Copy the list of records at a map entry to the tree control
 		void copy_records_to_tree(record_list_t* pRecords, Fl_Tree_Item* item, int& num_records, int& num_eqsl, int& num_lotw, int& num_card, int& num_dxcc, int& num_any);
 		// Create the map top-down
