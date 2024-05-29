@@ -211,14 +211,6 @@ toolbar::toolbar(int X, int Y, int W, int H, const char* label) :
 	bn->tooltip("Connect or disconnect rig");
 	add(bn);
 	curr_x += H;
-	// Log->Mode->Import
-	bn = new Fl_Button(curr_x, Y, H, H, 0);
-	bn->callback(cb_bn_import, nullptr);
-	bn->when(FL_WHEN_RELEASE);
-	bn->image(new Fl_RGB_Image(ICON_IMPORT, 16, 16, 4));
-	bn->tooltip("Switch to auto-import data mode (disconnects rig and gets data from other apps)");
-	add(bn);
-	curr_x += H + TOOL_GAP;
 	// Extract->Criteria
 	bn = new Fl_Button(curr_x, Y, H, H, 0);
 	bn->callback(cb_bn_menu, (void*)"E&xtract/&Criteria");
