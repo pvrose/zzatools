@@ -2,7 +2,7 @@
 #include "log_table.h"
 #include "tabbed_forms.h"
 #include "status.h"
-#include "qsl_form.h"
+#include "qsl_display.h"
 #include "drawing.h"
 #include "qso_manager.h"
 
@@ -49,7 +49,7 @@ printer::printer(object_t type) :
 	, col_width_(nan(""))
 	, row_height_(nan(""))
 	, row_top_(nan(""))
-	, unit_(qsl_form::MILLIMETER)
+	, unit_(qsl_display::MILLIMETER)
 	, max_number_qsos_(0)
 {
 	fields_.clear();
@@ -344,7 +344,8 @@ int printer::print_page_cards(size_t &item_num) {
 			for (int i = 0; i < print_records; i++) {
 				records[i] = navigation_book_->get_record(item_num + i, false);
 			}
-			qsl_form* qsl = new qsl_form(cwin_x_ + ((card % num_cols_) * card_w_), cwin_y_ + (((card / num_cols_) % num_rows_) * card_h_), records, print_records);
+			qsl_display* qsl = new qsl_display(cwin_x_ + ((card % num_cols_) * card_w_), cwin_y_ + (((card / num_cols_) % num_rows_) * card_h_), 10, 10);
+			qsl->value(records[0]->item("STATION_CALLSIGN"), records, print_records);
 			item_num += print_records;
 			num_records -= print_records;
 			// If did not print all with this callsign create a new label to print
@@ -377,20 +378,20 @@ int printer::card_properties() {
 	call_settings.get("Row Height", row_height_, 67.7);
 	call_settings.get("First Row", row_top_, 12.9);
 	call_settings.get("First Column", col_left_, 4.6);
-	call_settings.get("Unit", (int&)unit_, (int)qsl_form::MILLIMETER);
+	call_settings.get("Unit", (int&)unit_, (int)qsl_display::MILLIMETER);
 	items_per_page_ = num_rows_ * num_cols_;
 	int top_margin = 0;
 	int left_margin = 0;
 	margins(&left_margin, &top_margin, nullptr, nullptr);
 	double conversion = nan("");
 	switch (unit_) {
-		case qsl_form::INCH:
+		case qsl_display::INCH:
 			conversion = IN_TO_POINT;
 			break;
-		case qsl_form::MILLIMETER:
+		case qsl_display::MILLIMETER:
 			conversion = MM_TO_POINT;
 			break;
-		case qsl_form::POINT:
+		case qsl_display::POINT:
 			conversion = 1.0;
 			break;
 	}

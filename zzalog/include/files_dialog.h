@@ -32,10 +32,6 @@ using namespace std;
 		// Special version of cb_value to set auto_changed_
 		template <class WIDGET, class DATA>
 		static void cb_value_auto(Fl_Widget* w, void* v);
-		// Callback to displat QSL label dimensions dialog
-		static void cb_bn_qslt(Fl_Widget* w, void* v);
-		// Callback for callsign choice
-		static void cb_ch_callsign(Fl_Widget* w, void* v);
 		// Load the settings data
 		virtual void load_values();
 		// create the form
@@ -74,8 +70,6 @@ using namespace std;
 		string unzipper_;
 		// Unzipper switches
 		string unzip_switches_;
-		// QSL Template 
-		string qsl_template_;
 		// Empty auto-import files after importing them
 		bool auto_empty_[AUTO_COUNT];
 		// callback data for the auto-import browse buttons
@@ -96,23 +90,11 @@ using namespace std;
 		browser_data_t wsjtx_data_;
 		// callback data for the unzipper command
 		browser_data_t unzipper_data_;
-		// callback data for QSL template
-		browser_data_t template_data_;
 		// Poll interval (in seconds) for auto-importing
 		double auto_poll_;
 		// The specification of auto-import has changed
 		bool autos_changed_;
 		// Stations callsign
 		string station_callsign_;
-
-		// QSL Params widget
-		Fl_Widget* bn_params_;
-		// Callsign choice
-		field_input* ch_callsign_;
-		// QSL template filename
-		intl_input* ip_qsl_template_;
-
-
-
 	};
 #endif

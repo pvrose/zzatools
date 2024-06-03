@@ -4,7 +4,6 @@
 #include "utils.h"
 #include "import_data.h"
 #include "intl_widgets.h"
-#include "qsl_design.h"
 #include "main_window.h"
 #include "qso_manager.h"
 
@@ -44,17 +43,12 @@ files_dialog::files_dialog(int X, int Y, int W, int H, const char* label) :
 	backup_directory_ = "";
 	status_log_file_ = "";
 	unzipper_ = "";
-	qsl_template_ = "";
 	tqsl_data_ = { "", "", nullptr, nullptr, nullptr, nullptr };
 	card_data_ = { "", "", nullptr, nullptr, nullptr, nullptr };
 	ref_data_data_ = { "", "", nullptr, nullptr, nullptr, nullptr };
 	backup_data_ = { "", "", nullptr, nullptr, nullptr, nullptr };
 	status_data_ = { "", "", nullptr, nullptr, nullptr, nullptr };
 	unzipper_data_ = { "", "", nullptr, nullptr, nullptr, nullptr };
-	template_data_ = { "", "", nullptr, nullptr, nullptr, nullptr };
-
-	bn_params_ = nullptr;
-
 	auto_poll_ = nan("");
 	autos_changed_ = false;
 
@@ -170,14 +164,6 @@ void files_dialog::load_values() {
 	free(temp_string);
 
 	Fl_Preferences call_settings(qsl_settings, station_callsign_.c_str());
-
-	// Callsign for QSL template
-	station_callsign_ = qso_manager_->get_default(qso_manager::CALLSIGN);
-	// QSL Template
-	call_settings.get("Filename", temp_string, "");
-	qsl_template_ = temp_string;
-	free(temp_string);
-
 }
 
 // create the form
@@ -483,44 +469,6 @@ void files_dialog::create_form(int X, int Y) {
 
 	grp_unzip->end();
 
-	Fl_Group* grp_qsld = new Fl_Group(X + XGRP, Y + GRP9, XMAX, HGRP9, "QSL Template: - ");
-	grp_qsld->labelsize(FL_NORMAL_SIZE + 2);
-	grp_qsld->labelfont(FL_BOLD);
-	grp_qsld->box(FL_BORDER_BOX);
-	grp_qsld->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
-
-	ch_callsign_ = new field_input(grp_qsld->x() + WLABEL * 2, grp_qsld->y(), WSMEDIT, HBUTTON);
-	ch_callsign_->value(station_callsign_.c_str());
-	ch_callsign_->callback(cb_ch_callsign, &station_callsign_);
-	ch_callsign_->field_name("STATION_CALLSIGN");
-	ch_callsign_->tooltip("Select the callsign to change QSL template parameters for");
-
-	// Input - QSL Template file name
-	ip_qsl_template_ = new intl_input(X + COL2, Y + ROW9_1, WEDIT + GAP + WBUTTON + GAP + WBUTTON, HTEXT);
-	ip_qsl_template_->callback(cb_value<intl_input, string>, &qsl_template_);
-	ip_qsl_template_->when(FL_WHEN_CHANGED);
-	ip_qsl_template_->value(qsl_template_.c_str());
-	ip_qsl_template_->tooltip("Location of QSL Template file");
-
-	// Button - opens file browser
-	Fl_Button* bn_browse_qsld = new Fl_Button(X + COL5, Y + ROW9_1, WBUTTON, HBUTTON, "Browse");
-	bn_browse_qsld->align(FL_ALIGN_INSIDE);
-	template_data_ = { "Please enter the QSL Template", "HTML\t*.{htm,html}", &qsl_template_, nullptr, ip_qsl_template_, nullptr };
-	bn_browse_qsld->callback(cb_bn_browsefile, &template_data_);
-	bn_browse_qsld->when(FL_WHEN_RELEASE);
-	bn_browse_qsld->tooltip("Opens a file browser to locate the QSL template file");
-
-	// Button - open dimansions dialog
-	Fl_Button* bn_qsl_dim = new Fl_Button(X + COL6, Y + ROW9_1, WBUTTON, HBUTTON, "Params");
-	bn_qsl_dim->align(FL_ALIGN_INSIDE);
-	bn_qsl_dim->callback(cb_bn_qslt, nullptr);
-	bn_qsl_dim->when(FL_WHEN_RELEASE);
-	bn_qsl_dim->tooltip("Opens dialog to set label size and printer details");
-	bn_params_ = bn_qsl_dim;
-
-	grp_qsld->end();
-
-
 	Fl_Group::end();
 
 	enable_widgets();
@@ -587,10 +535,6 @@ void files_dialog::save_values() {
 	clublog_settings.set("Unzip Command", unzipper_.c_str());
 	clublog_settings.set("Unzip Switches", unzip_switches_.c_str());
 
-
-	// QSL Template
-	call_settings.set("Filename", qsl_template_.c_str());
-
 	// Restart any auto-update if any of the information may have changed
 	if (autos_changed_ && import_data_->is_auto_update()) {
 		import_data_->stop_update(false);
@@ -606,18 +550,6 @@ void files_dialog::save_values() {
 
 // Method provided as needed to overload the page_dialog version
 void files_dialog::enable_widgets() {
-	Fl_Preferences qsld_settings(settings_, "QSL Design");
-	Fl_Preferences call_settings(qsld_settings, station_callsign_.c_str());
-
-	// Callsign for QSL template
-	ch_callsign_->value(station_callsign_.c_str());
-	// QSL Template
-	char* temp_string;
-	call_settings.get("Filename", temp_string, "");
-	qsl_template_ = temp_string;
-	((intl_input*)ip_qsl_template_)->value(temp_string);
-	free(temp_string);
-
 }
 
 // Special version of cb_value callback that also sets auto_changed_
@@ -626,19 +558,4 @@ void files_dialog::cb_value_auto(Fl_Widget* w, void* v) {
 	cb_value<WIDGET, DATA>(w, v);
 	files_dialog* that = ancestor_view<files_dialog>(w);
 	that->autos_changed_ = true;
-}
-
-// Callback to open dialog
-void files_dialog::cb_bn_qslt(Fl_Widget* w, void* v) {
-	files_dialog* that = ancestor_view<files_dialog>(w);
-	int target_x = main_window_->x_root() + that->bn_params_->x();
-	int target_y = main_window_->y_root() + that->bn_params_->y();
-	qsl_design* dialog = new qsl_design(target_x, target_y, 0, 0, that->station_callsign_.c_str());
-}
-
-// Callback for changing callsign
-void files_dialog::cb_ch_callsign(Fl_Widget* w, void* v) {
-	files_dialog* that = ancestor_view<files_dialog>(w);
-	cb_value<field_input, string>(w, v);
-	that->enable_widgets();
 }

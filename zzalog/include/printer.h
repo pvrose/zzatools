@@ -4,7 +4,7 @@
 #include "record.h"
 #include "view.h"
 #include "fields.h"
-#include "qsl_form.h"
+#include "qsl_display.h"
 
 #include <vector>
 #include <string>
@@ -68,7 +68,7 @@ using namespace std;
 		int cwin_w_;
 		int cwin_h_;
 		// Card parameters
-		qsl_form::dim_unit unit_;
+		qsl_display::dim_unit unit_;
 		int card_w_;
 		int card_h_;
 		// Label parameters

@@ -2,11 +2,15 @@
 #define __QSL_DESIGN__
 
 #include "qsl_form.h"
+#include "qsl_display.h"
+
+#include <vector>
 
 #include <FL/Fl_Window.H>
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Hold_Browser.H>
 #include <FL/Fl_Light_Button.H>
+#include <FL/Fl_Group.H>
 
 
 	// This class allows the user to customise the way the QSL card is printed.
@@ -14,6 +18,7 @@
 	{
 
 	public:
+
 		qsl_design(int X, int Y, int W, int H, const char* callsign);
 		~qsl_design();
 
@@ -24,6 +29,19 @@
 		void create_form(int X, int Y);
 		// Used to write settings back
 		void save_values();
+		// Load data
+		void load_data(string filename);
+		// Save data
+		void save_data(string filename);
+		// Add data item
+		void add_item(qsl_display::item_def* item);
+		// Delete data item
+		void delete_item(int number);
+		// Create item groups
+		void draw_items();
+		// Resize the group after adding or deleting an item
+		void resize();
+
 
 		// Callbacks
 		// Dimension radio 
@@ -32,6 +50,16 @@
 		static void cb_bn_ok(Fl_Widget* w, void* v);
 		// Cancel button
 		static void cb_bn_can(Fl_Widget* w, void* v);
+		// Design edited
+		static void cb_design(Fl_Widget* w, void* v);
+		// Item field name
+		static void cb_ch_field(Fl_Widget* w, void* v);
+		// Style edited
+		static void cb_bn_style(Fl_Widget* w, void* v);
+		// label position: 0 = above, 1 = left
+		static void cb_bn_align(Fl_Widget* w, void* v);
+		// Draw box around field
+		static void cb_bn_box(Fl_Widget* w, void* v);
 
 		// Number of rows in print
 		int num_rows_;
@@ -55,6 +83,20 @@
 		int number_qsos_;
 		// Callsign to read parameters
 		string callsign_;
+		// The card design
+		vector<qsl_display::item_def*> card_data_;
+		// String filename
+		string filename_;
+
+		//Widgets to reference
+		Fl_Group* grp_sizes_;
+		Fl_Group* grp_actions_;
+		// Contains the item editing buttons
+		Fl_Group* grp_items_;
+		// Card display
+		qsl_display* display_;
+
+		
 
 	};
 

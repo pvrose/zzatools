@@ -24,6 +24,7 @@
 			DLG_COLUMN,
 			DLG_ADIF,
 			DLG_USER,
+			DLG_QSLE,
 			DLG_ALL,
 			DLG_X
 		};

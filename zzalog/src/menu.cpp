@@ -89,6 +89,7 @@ settings* config_ = nullptr;
 		{ "&Web/Network", 0, menu::cb_mi_settings, (void*)settings::DLG_WEB },
 		{ "&Fields", 0, menu::cb_mi_settings, (void*)settings::DLG_COLUMN },
 		{ "&User settings", 0, menu::cb_mi_settings, (void*)settings::DLG_USER },
+		{ "&QSL design", 0, menu::cb_mi_settings, (void*)settings::DLG_QSLE },
 		{ "&All", 0, menu::cb_mi_settings, (void*)settings::DLG_ALL },
 		{ 0 },
 

@@ -4,6 +4,7 @@
 #include "fields_dialog.h"
 #include "user_dialog.h"
 #include "config_tree.h"
+#include "qsl_editor.h"
 
 #include "utils.h"
 
@@ -68,6 +69,12 @@ settings::settings(int W, int H, const char* label, cfg_dialog_t active) :
 	user->labelsize(FL_NORMAL_SIZE + 2);
 	user->tooltip("Allows limited configuration of fonts and tip timeouts");
 	children_ids_.push_back(DLG_USER);
+	// QSL design
+	qsl_editor* qsle = new qsl_editor(rx, ry, rw, rh, "QSL Design");
+	qsle->labelfont(FL_BOLD);
+	qsle->labelsize(FL_NORMAL_SIZE + 2);
+	qsle->tooltip("Allows limited configuration of fonts and tip timeouts");
+	children_ids_.push_back(DLG_QSLE);
 
 	// Lastly - a tree display showing all settings
 	Fl_Group* all_settings = new Fl_Group(rx, ry, rw, rh, "All Settings");
@@ -95,6 +102,9 @@ settings::settings(int W, int H, const char* label, cfg_dialog_t active) :
 		break;
 	case DLG_USER:
 		tabs->value(user);
+		break;
+	case DLG_QSLE:
+		tabs->value(qsle);
 		break;
 	case DLG_ALL:
 		tabs->value(all_settings);
@@ -213,6 +223,9 @@ void settings::set_label(settings::cfg_dialog_t active) {
 		break;
 	case DLG_USER:
 		label("Configuration: Define the way certain items are viewed");
+		break;
+	case DLG_QSLE:
+		label("Configuration: Define QSL layout and print configuration");
 		break;
 	case DLG_ALL:
 		label("Configuration: Display all options in tree format");
