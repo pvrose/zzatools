@@ -5,6 +5,7 @@
 #include <string>
 
 #include <FL/Fl_Widget.H>
+#include <FL/Fl_Output.H>
 
 using namespace std;
 
@@ -13,7 +14,7 @@ using namespace std;
 		public win_dialog
 	{
 	public:
-		font_dialog(Fl_Font f, Fl_Fontsize sz, Fl_Color c);
+		font_dialog(Fl_Font f, Fl_Fontsize sz, Fl_Color c, const char* L = nullptr);
 		virtual ~font_dialog();
 
         Fl_Font font();
@@ -37,8 +38,12 @@ using namespace std;
         void populate_font(Fl_Widget* w, const Fl_Font* f);
         void populate_size(Fl_Widget* w, const Fl_Font* f, const Fl_Fontsize* sz);
 
+        void set_sample();
+
         Fl_Font font_;
         Fl_Fontsize fontsize_;
         Fl_Color colour_;
+
+        Fl_Output* op_sample_;
 
 	};

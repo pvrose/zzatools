@@ -1,6 +1,7 @@
 #pragma once
 
 #include "record.h"
+#include "drawing.h"
 
 #include <vector>
 
@@ -18,20 +19,45 @@ class qsl_display : public Fl_Group
 
     public:
 
+    struct style_def {
+        Fl_Font font;       // Font
+        Fl_Fontsize size;   // Size
+        Fl_Color colour;    // Colour
+
+        style_def() {
+            font = FL_HELVETICA;
+            size = FL_NORMAL_SIZE;
+            colour = FL_BLACK;
+        }
+    };
+
     struct item_def {
-        bool enabled;        // The item forms part of the QSL
-        bool multi_qso;      // The item is repeated per QSO
-        char* label;         // The label on the QSL (e.g. "To:" for CALL)
-        Fl_Font font;        // The font
-        Fl_Fontsize size;    // The size of the characters
-        Fl_Color colour;     // The colour used
+        string field;        // Field name
+        string label;        // The label on the QSL (e.g. "To:" for CALL)
+        style_def l_style;   // Style of the label
+        style_def t_style;   // Style of the text
         int dx;              // Position within the QSL card
         int dy;
         int dw;
         int dh;
         Fl_Align align;      // The alignment
         Fl_Boxtype box;      // Box type
-        string field;        // Field name
+        bool multi_qso;      // The item is repeated per QSO
+        bool display_empty;  // Display the field if it is empty
+
+        item_def() {
+            field = "";
+            label = "Label";
+            dx = WLABEL;
+            dy = 0;
+            dw = WBUTTON;
+            dh = HBUTTON;
+            align = FL_ALIGN_LEFT;
+            box = FL_BORDER_BOX;
+            field = "";
+            multi_qso = false;
+            display_empty = false;
+        }
     };
 
     // Units of measurement

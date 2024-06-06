@@ -5,6 +5,8 @@
 #include "utils.h"
 
 #include <FL/Fl_Group.H>
+#include <FL/Fl_Window.H>
+#include <FL/Fl_Output.H>
 
 
 // This class provides the dialog to allow the design of a QSL card 
@@ -34,6 +36,10 @@ class qsl_editor : public page_dialog
     void resize();
     // Redraw dislay
     void redraw_display();
+    // Create display
+    void create_display();
+    // Update size
+    void update_size();
 
     // Callbacks
     // Callsign
@@ -87,14 +93,18 @@ class qsl_editor : public page_dialog
     string filename_;
     // Data for file browser
     browser_data_t filedata_;
+    // display window coordinates
+    int win_x_;
+    int win_y_;
 
     //Widgets to reference
     Fl_Group* g_1_;
     Fl_Group* g_2_;
-    Fl_Group* g_3_;
     // Contains the item editing buttons
     Fl_Group* g_4_;
     // Card display
     qsl_display* display_;
+    Fl_Window* w_display_;
+    Fl_Output* op_size_;
 };
 

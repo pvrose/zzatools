@@ -5,7 +5,7 @@
 #include <set>
 #include <string>
 
-#include <FL/Fl_Output.H>
+#include <FL/Fl_Multiline_Output.H>
 #include <FL/Fl_Preferences.H>
 
 using namespace std;
@@ -47,36 +47,52 @@ void qsl_display::create_form() {
 
     for (auto it = data_.begin(); it != data_.end(); it++) {
         item_def& item = *(*it);
-        if (item.enabled) {
-            Fl_Output* op = new Fl_Output(x() + item.dx, y() + item.dy, item.dw, item.dh, item.label); 
-            op->align(item.align);
-            op->box(item.box);
-            op->labelfont(0);
-            op->labelsize(FL_NORMAL_SIZE);
-            op->labelcolor(FL_BLACK);
-            op->textfont(item.font);
-            op->textsize(item.size);
-            op->textcolor(item.colour);
-            string text = "";
-            if (item.multi_qso) {
-                for (int i = 0; i < num_records_; i++) {
-                    if (i > 0) text += '\n';
-                    text += qsos_[i]->item(item.field);
-                }
-            } else {
-                set<string> values;
-                // Uniquify values
-                for (int i = 0; i < num_records_; i++) {
-                    values.insert(qsos_[i]->item(item.field));
-                }
-                for (auto it = values.begin(); it != values.end(); it++) {
-                    if (it != values.begin()) text += ' ';
-                    text += *it;
-                }
-            }
-            op->value(text.c_str());
-        }
-    }
+		Fl_Multiline_Output* op = new Fl_Multiline_Output(x() + item.dx, y() + item.dy, item.dw, item.dh, item.label.c_str()); 
+		op->align(item.align);
+		op->box(item.box);
+		op->labelfont(item.l_style.font);
+		op->labelsize(item.l_style.size);
+		op->labelcolor(item.l_style.colour);
+		op->textfont(item.t_style.font);
+		op->textsize(item.t_style.size);
+		op->textcolor(item.t_style.colour);
+		op->color(FL_WHITE);
+		string text = "";
+		if (num_records_ == 0) {
+			text = item.field;
+			if (item.multi_qso) {
+				text += "\nditto.";
+			}
+		} else if (item.multi_qso) {
+			for (int i = 0; i < num_records_; i++) {
+				if (i > 0) text += '\n';
+				text += qsos_[i]->item(item.field);
+			}
+		} else {
+			set<string> values;
+			// Uniquify values
+			for (int i = 0; i < num_records_; i++) {
+				values.insert(qsos_[i]->item(item.field));
+			}
+			for (auto it = values.begin(); it != values.end(); it++) {
+				if (it != values.begin()) text += ' ';
+				text += *it;
+			}
+		}
+		if (item.display_empty) {
+			op->show();
+			op->activate();
+		} else if (num_records_ == 0) {
+			op->show();
+			op->deactivate();
+		} else if (text == "") {
+			op->hide();
+		} else {
+			op->show();
+			op->activate();
+		}
+		op->value(text.c_str());
+	}
     // Restore original current Fl_Group
 	Fl_Group::current(save);
     show();
@@ -123,12 +139,12 @@ void qsl_display::load_data() {
 	call_settings.get("Width", width_, 0);
 	call_settings.get("Height", height_, 0);
 	call_settings.get("Unit", (int&)unit_, (int)MILLIMETER);
-	call_settings.get("Filename", temp, "");
+	call_settings.get("Card Design", temp, "");
 	filename_ = temp;
 	free(temp);
 	// Check it's a TSV file
 	size_t pos = filename_.find_last_of('.');
-	if (filename_.substr(pos) != ".tsv") {
+	if (pos == string::npos || filename_.substr(pos) != ".tsv") {
 		char msg[256];
 		snprintf(msg, sizeof(msg), "QSL: Invalid filename %s - setting to no value", filename_.c_str());
 		status_->misc_status(ST_WARNING, msg);
@@ -148,14 +164,32 @@ void qsl_display::load_data() {
 		ifstream ip;
 		ip.open(filename_.c_str(), fstream::in);
 		string line;
-		int pos = 0;
+		vector<string> words;
 		while(ip.good()) {
-			qsl_display::item_def* item = new qsl_display::item_def;
-			ip >> item->field >> item->label >> (int&)item->font >> (int&)item->size >>
-				(int&)item->colour >> item->dx >> item->dy >> item->dw >> item->dh >>
-				(int&)item->align >> (int&)item->multi_qso >> (int&)item->box;
-			data_.push_back(item);
+			getline(ip, line);
+			split_line(line, words, ' ');
+			if (words.size() == 16) {	
+				qsl_display::item_def* item = new qsl_display::item_def;
+				item->field = words[0];
+				item->label = words[1];
+				item->l_style.font = (Fl_Font)stoi(words[2]);
+				item->l_style.size = (Fl_Fontsize)stoi(words[3]);
+				item->l_style.colour = (Fl_Color)stoi(words[4]);
+				item->t_style.font = (Fl_Font)stoi(words[5]);
+				item->t_style.size = (Fl_Fontsize)stoi(words[6]);
+				item->t_style.colour = (Fl_Color)stoi(words[7]);
+				item->dx = stoi(words[8]);
+				item->dy = stoi(words[9]);
+				item->dw = stoi(words[10]);
+				item->dh = stoi(words[11]);
+				item->align = (Fl_Align)stoi(words[12]);
+				item->multi_qso = (bool)stoi(words[13]);
+				item->box = (Fl_Boxtype)stoi(words[14]);
+				item->display_empty = (bool)stoi(words[15]);
+				data_.push_back(item);
+			}
 		}
+		ip.close();
 		snprintf(msg, sizeof(msg), "QSL: %d items read from %s", data_.size(), filename_.c_str());
 		status_->misc_status(ST_OK, msg);
 	}
@@ -171,7 +205,7 @@ void qsl_display::save_data() {
 	call_settings.set("Unit", (int)unit_);
 	call_settings.set("Filename", filename_.c_str());
    	char msg[100];
-	snprintf(msg, sizeof(msg), "Writing card image data to %s", filename_.c_str());
+	snprintf(msg, sizeof(msg), "QSL: Writing card image data to %s", filename_.c_str());
 	status_->misc_status(ST_LOG, msg);
 	ofstream op;
 	op.open(filename_.c_str(), fstream::out);
@@ -179,12 +213,25 @@ void qsl_display::save_data() {
 	int pos = 0;
 	for (int ix = 0; ix < data_.size() && op.good(); ix++) {
 		qsl_display::item_def* item = data_[ix];
-		op << item->field << ' ' << item->label << ' ' << (int&)item->font << ' ' << (int&)item->size <<
-			' ' << (int&)item->colour << ' ' << item->dx << ' ' << item->dy << ' ' << item->dw << ' ' << item->dh <<
-			' ' << (int&)item->align << ' ' << (int&)item->multi_qso << ' ' << (int&)item->box << endl;
-		data_.push_back(item);
+		op << item->field << ' ' << 
+			item->label << ' ' << 
+			(int)item->l_style.font << ' ' << 
+			(int)item->l_style.size << ' ' <<
+			(int)item->l_style.colour << ' ' <<
+			(int)item->t_style.font << ' ' << 
+			(int)item->t_style.size <<	' ' << 
+			(int)item->t_style.colour << ' ' << 
+			item->dx << ' ' << 
+			item->dy << ' ' << 
+			item->dw << ' ' << 
+			item->dh << ' ' << 
+			(int)item->align << ' ' << 
+			(int)item->multi_qso << ' ' << 
+			(int)item->box << ' ' <<
+			(int)item->display_empty << endl;
 	}
-	snprintf(msg, sizeof(msg), "%d items written to %s", data_.size(), filename_.c_str());
+	op.close();
+	snprintf(msg, sizeof(msg), "QSL: %d items written to %s", data_.size(), filename_.c_str());
 	status_->misc_status(ST_OK, msg);
 }
 

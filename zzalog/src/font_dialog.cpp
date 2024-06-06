@@ -4,9 +4,11 @@
 
 #include <FL/Fl_Hold_Browser.H>
 #include <FL/Fl_Color_Chooser.H>
+#include <FL/Fl_Button.H>
+#include <FL/Fl_Output.H>
 
-font_dialog::font_dialog(Fl_Font f, Fl_Fontsize sz, Fl_Color c) :
-    win_dialog(10, 10),
+font_dialog::font_dialog(Fl_Font f, Fl_Fontsize sz, Fl_Color c, const char* L) :
+    win_dialog(10, 10, L),
     font_(f),
     fontsize_(sz),
     colour_(c)
@@ -22,10 +24,11 @@ font_dialog::font_dialog(Fl_Font f, Fl_Fontsize sz, Fl_Color c) :
     curr_x += w01->w();
     Fl_Hold_Browser* w02 = new Fl_Hold_Browser(curr_x, curr_y, WBUTTON, HMLIN, "Size");
     w02->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
-    w02->callback(cb_size, &font_);
+    w02->callback(cb_size, &fontsize_);
  	w02->tooltip("Please select the font size used for the QSL card field entry");
     w01->callback(cb_font, w02);
-
+	populate_size(w02, &font_, &fontsize_);
+	
     curr_x += w02->w();
     Fl_Color_Chooser* w03 = new Fl_Color_Chooser(curr_x, curr_y, 200, 94, "Colour");
     w03->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
@@ -36,11 +39,42 @@ font_dialog::font_dialog(Fl_Font f, Fl_Fontsize sz, Fl_Color c) :
     w03->rgb((double)r / 255.0, (double)g / 255.0, (double)b / 255.0);
 
     curr_x += w03->w() + GAP;
-    curr_y += max(w01->h(), w03->h()) + GAP;
+    curr_y += w01->h() + GAP;
+	int max_x = curr_x;
+	curr_x = x() + GAP + WLABEL;
 
+	op_sample_ = new Fl_Output(curr_x, curr_y, WSMEDIT, HBUTTON, "Sample");
+	op_sample_->value("Example data");
+	op_sample_->align(FL_ALIGN_LEFT);
+	op_sample_->box(FL_BORDER_BOX);
+	op_sample_->color(FL_WHITE);
+	op_sample_->tooltip("Selected font, size and colour will be shown here");
+	set_sample();
+
+	int max_y = max(op_sample_->y() + op_sample_->h(), w03->y() + w03->h()) + GAP;
+	curr_x = w03->x();
+	curr_y = w03->y() + w03->h() + GAP;
+
+	Fl_Button* w04 = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Save");
+	w04->callback(cb_bn_ok);
+	w04->tooltip("Accept these changes");
+
+	curr_x += WBUTTON;
+	Fl_Button* w05 = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Cancel");
+	w05->callback(cb_bn_cancel);
+	w05->tooltip("Cancel these changes");
+
+	curr_x += WBUTTON;
+	curr_y += HBUTTON;
+
+	max_x = max(max_x, curr_x) + GAP;
+	max_y = max(max_y, curr_y) + GAP;
+	
     resizable(nullptr);
-    size(curr_x - x(), curr_y - h());
+    size(max_x - x(), max_y - y());
     end();
+
+	show();
 
 }
 
@@ -65,6 +99,7 @@ void font_dialog::cb_font(Fl_Widget* w, void* v) {
     font_dialog* that = ancestor_view<font_dialog>(w);
     that->font_ = (Fl_Font)br->value() - 1;
     that->populate_size((Fl_Widget*)v, &that->font_, &that->fontsize_);
+	that->set_sample();
 }
 
 // size chooser
@@ -73,6 +108,7 @@ void font_dialog::cb_size(Fl_Widget* w, void* v) {
     font_dialog* that = ancestor_view<font_dialog>(w);
     int line = br->value();
     *(Fl_Fontsize*)v = stoi(br->text(line));
+	that->set_sample();
 }
 
 // Colour chooser
@@ -80,6 +116,7 @@ void font_dialog::cb_colour(Fl_Widget* w, void* v) {
     Fl_Color_Chooser* cc = (Fl_Color_Chooser*)w;
     font_dialog* that = ancestor_view<font_dialog>(w);
     that->colour_ = fl_rgb_color(255 * cc->r(), 255 * cc->g(), 255 * cc->b());
+	that->set_sample();
 }
 
 void font_dialog::populate_font(Fl_Widget* w, const Fl_Font* font) {
@@ -141,4 +178,11 @@ Fl_Fontsize font_dialog::font_size() {
 
 Fl_Color font_dialog::colour() {
 	return colour_;
+}
+
+void font_dialog::set_sample() {
+	op_sample_->textfont(font_);
+	op_sample_->textsize(fontsize_);
+	op_sample_->textcolor(colour_);
+	op_sample_->redraw();
 }
