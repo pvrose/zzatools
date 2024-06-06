@@ -1,6 +1,7 @@
 #pragma once
 
 #include "record.h"
+#include "qsl_display.h"
 
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Button.H>
@@ -16,6 +17,7 @@ class qso_qsl_vwr :
 		QI_CARD_FRONT,      // Scanned-in front of a card
 		QI_CARD_BACK,       // Scanned-in back of a card
 		QI_EMAIL,          	// e-mailed image
+		QI_MY_QSL,          // My QSL image for QSO
 	};
 
 public:
@@ -41,6 +43,8 @@ public:
 	static void cb_bn_log_card(Fl_Widget* w, void* v);
 	// Set "Card requested"
 	static void cb_bn_card_reqd(Fl_Widget* w, void* v);
+	// My QSL button
+	static void cb_bn_myqsl(Fl_Widget* w, void* v);
 
 	// Set record
 	void set_qso(record* qso, qso_num_t number);
@@ -86,6 +90,7 @@ protected:
 	Fl_Radio_Light_Button* radio_card_front_;
 	Fl_Radio_Light_Button* radio_card_back_;
 	Fl_Radio_Light_Button* radio_email_;
+	Fl_Radio_Light_Button* radio_myqsl_;
 	Fl_Button* bn_fetch_;
 	Fl_Button* bn_log_bureau_;
 	Fl_Button* bn_log_email_;
@@ -100,6 +105,7 @@ protected:
 	// Button
 	Fl_Button* bn_full_view_;
 	Fl_Button* bn_no_image_;
+	qsl_display* display_myqsl_;
 
 
 };

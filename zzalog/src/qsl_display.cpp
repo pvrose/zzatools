@@ -44,6 +44,7 @@ void qsl_display::create_form() {
 	// Because this gets called randomly need to be explicit in current_ handling
 	Fl_Group* save = Fl_Group::current();
     begin();
+	resizable(nullptr);
 
     for (auto it = data_.begin(); it != data_.end(); it++) {
         item_def& item = *(*it);

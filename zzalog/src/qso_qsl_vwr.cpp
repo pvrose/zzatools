@@ -89,6 +89,7 @@ void qso_qsl_vwr::create_form() {
 	const int WIMAGE = w();
 	const int HIMAGE = w() * HCARD / WCARD;
 	const int WBN = WIMAGE / 4;
+	const int WBN5 = WIMAGE / 5;
 
 
 	// Box - for the display of a card image or if no card exists the callsign in large text
@@ -131,36 +132,44 @@ void qso_qsl_vwr::create_form() {
 	grp_card_type_->box(FL_FLAT_BOX);
 
 	// Radio - Display eQSL.cc card image
-	radio_eqsl_ = new Fl_Radio_Light_Button(curr_x, curr_y, WBN, HBUTTON, "eQSL");
+	radio_eqsl_ = new Fl_Radio_Light_Button(curr_x, curr_y, WBN5, HBUTTON, "eQSL");
 	radio_eqsl_->align(FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
 	radio_eqsl_->selection_color(FL_FOREGROUND_COLOR);
 	radio_eqsl_->callback(cb_rad_card, (void*)QI_EQSL);
 	radio_eqsl_->when(FL_WHEN_RELEASE);
 	radio_eqsl_->tooltip("Select image downloaded from eQSL");
-	curr_x += WBN;
+	curr_x += WBN5;
 	// Radio - display scanned image of front of paper card
-	radio_card_front_ = new Fl_Radio_Light_Button(curr_x, curr_y, WBN, HBUTTON, "Card(F)");
+	radio_card_front_ = new Fl_Radio_Light_Button(curr_x, curr_y, WBN5, HBUTTON, "Front");
 	radio_card_front_->align(FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
 	radio_card_front_->selection_color(FL_FOREGROUND_COLOR);
 	radio_card_front_->callback(cb_rad_card, (void*)QI_CARD_FRONT);
 	radio_card_front_->when(FL_WHEN_RELEASE);
 	radio_card_front_->tooltip("Select image scanned of paper card front");
-	curr_x += WBN;
+	curr_x += WBN5;
 	// Radio - display scanned image of reverse of paper card
-	radio_card_back_ = new Fl_Radio_Light_Button(curr_x, curr_y, WBN, HBUTTON, "Card(B)");
+	radio_card_back_ = new Fl_Radio_Light_Button(curr_x, curr_y, WBN5, HBUTTON, "Back");
 	radio_card_back_->align(FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
 	radio_card_back_->selection_color(FL_FOREGROUND_COLOR);
 	radio_card_back_->callback(cb_rad_card, (void*)QI_CARD_BACK);
 	radio_card_back_->when(FL_WHEN_RELEASE);
 	radio_card_back_->tooltip("Select image scanned of paper card back");
-	curr_x += WBN;
+	curr_x += WBN5;
 	// Radio - display received e-mail image
-	radio_email_ = new Fl_Radio_Light_Button(curr_x, curr_y, WBN, HBUTTON, "e-mail");
+	radio_email_ = new Fl_Radio_Light_Button(curr_x, curr_y, WBN5, HBUTTON, "eMail");
 	radio_email_->align(FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
 	radio_email_->selection_color(FL_FOREGROUND_COLOR);
 	radio_email_->callback(cb_rad_card, (void*)QI_EMAIL);
 	radio_email_->when(FL_WHEN_RELEASE);
 	radio_email_->tooltip("Select image received by e-mail");
+	curr_x += WBN5;
+	// Radio - display my QSL
+	radio_myqsl_ = new Fl_Radio_Light_Button(curr_x, curr_y, WBN5, HBUTTON, "MyQSL");
+	radio_myqsl_->align(FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
+	radio_myqsl_->selection_color(FL_FOREGROUND_COLOR);
+	radio_myqsl_->callback(cb_rad_card, (void*)QI_MY_QSL);
+	radio_myqsl_->when(FL_WHEN_RELEASE);
+	radio_myqsl_->tooltip("Select my QSL as printed");
 
 	grp_card_type_->end();
 
@@ -223,6 +232,7 @@ void qso_qsl_vwr::create_form() {
 	bn_no_image_->label("No image available!");
 	bn_no_image_->labelsize(FL_NORMAL_SIZE * 3);
 	bn_no_image_->labelcolor(FL_RED);
+	display_myqsl_ = new qsl_display(0, 0, WCARD, HCARD);
 	win_full_view_->resizable(bn_full_view_);
 	win_full_view_->end();
 	win_full_view_->hide();
@@ -324,200 +334,205 @@ void qso_qsl_vwr::enable_widgets() {
 
 // Get the card image to display and put it in the image widget.
 void qso_qsl_vwr::set_image() {
-	bool use_default = false;
-	bool found_image = false;
-	bool png_is_jpeg = false;
-	char filename[256];
-	string target_name = "";
-	// string default_name;
-	if (current_qso_ != nullptr) {
-		// We want to display the received card (eQSL or scanned image)
-		// Get callsign
-		string call = current_qso_->item("CALL");
-		// OPtional file types
-		string file_types[] = { ".png", ".jpg", ".bmp" };
-		const int num_types = 3;
-		if (call != "") {
-			// Replace all / with _ - e.g. PA/GM3ZZA/P => PA_GM3ZZA_P
-			size_t pos = call.find('/');
-			while (pos != call.npos) {
-				call[pos] = '_';
-				pos = call.find('/', pos + 1);
-			}
-			// Look for a possible image file and try and load into the image object
-			delete raw_image_;
-			raw_image_ = nullptr;
-			delete scaled_image_;
-			delete desat_image_;
-			scaled_image_ = nullptr;
-			desat_image_ = nullptr;
-			string station = current_qso_->item("STATION_CALLSIGN");
-			// Select the image type: eQSL or scanned in card (front or back)
-			switch (selected_image_) {
-			case QI_EQSL:
-				// Card image downloaded from eQSL
-				// Find the filename saved when card was downloaded - i.e. use same algorithm
-				strcpy(filename, eqsl_handler_->card_filename_l(current_qso_).c_str());
-				break;
-			case QI_CARD_FRONT:
-				// Card image of a scanned-in paper QSL card (front - i.e. callsign side)
-				// File name e.g.= <root>/<MY_CALL>\scans\<received date>\PA_GM3ZZA_P__<QSO date>.png
-				sprintf(filename, "%s/%s/scans/%s/%s__%s",
-					qsl_directory_.c_str(),
-					station.c_str(),
-					current_qso_->item("QSLRDATE").c_str(),
-					call.c_str(),
-					current_qso_->item("QSO_DATE").c_str());
-				break;
-			case QI_CARD_BACK:
-				// Card image of a scanned-in paper QSL card (back - i.e. QSO details side)
-				// File name e.g.= <root>\scans\<received date>\PA_GM3ZZA_P++<QSO date>.png
-				sprintf(filename, "%s/%s/scans/%s/%s++%s",
-					qsl_directory_.c_str(),
-					station.c_str(),
-					current_qso_->item("QSLRDATE").c_str(),
-					call.c_str(),
-					current_qso_->item("QSO_DATE").c_str());
-				break;
-			case QI_EMAIL:
-				// Card image of a scanned-in paper QSL card (front - i.e. callsign side)
-				// File name e.g.= <root>\emails\PA_GM3ZZA_P__<QSO date>.png
-				sprintf(filename, "%s/%s/email/%s__%s",
-					qsl_directory_.c_str(),
-					station.c_str(),
-					call.c_str(),
-					current_qso_->item("QSO_DATE").c_str());
-				break;
-			}
-			// Images could be any graphic format
-			// Test first with existing filename then replace with default station
-			for (int ia = 0; ia < 2 && !found_image; ia++) {
-				string testname = filename;
-				if (ia == 1) {
-					size_t pos = testname.find(station);
-					testname.replace(pos, station.length(), default_station_);
-					use_default = true;
+	if (selected_image_ != QI_MY_QSL) {
+		bool use_default = false;
+		bool found_image = false;
+		bool png_is_jpeg = false;
+		char filename[256];
+		string target_name = "";
+		// string default_name;
+		if (current_qso_ != nullptr) {
+			// We want to display the received card (eQSL or scanned image)
+			// Get callsign
+			string call = current_qso_->item("CALL");
+			// OPtional file types
+			string file_types[] = { ".png", ".jpg", ".bmp" };
+			const int num_types = 3;
+			if (call != "") {
+				// Replace all / with _ - e.g. PA/GM3ZZA/P => PA_GM3ZZA_P
+				size_t pos = call.find('/');
+				while (pos != call.npos) {
+					call[pos] = '_';
+					pos = call.find('/', pos + 1);
 				}
-				for (int i = 0; i < num_types && !found_image; i++) {
-					full_name_ = testname + file_types[i];
-					target_name = filename + file_types[i];
-					// printf("DEBUG QSO_QSL_VWR: Image file %s\n", full_name_.c_str());
-					// Read files depending on file type
-					if (file_types[i] == ".jpg") {
-						raw_image_ = new Fl_JPEG_Image(full_name_.c_str());
+				// Look for a possible image file and try and load into the image object
+				delete raw_image_;
+				raw_image_ = nullptr;
+				delete scaled_image_;
+				delete desat_image_;
+				scaled_image_ = nullptr;
+				desat_image_ = nullptr;
+				string station = current_qso_->item("STATION_CALLSIGN");
+				// Select the image type: eQSL or scanned in card (front or back)
+				switch (selected_image_) {
+				case QI_EQSL:
+					// Card image downloaded from eQSL
+					// Find the filename saved when card was downloaded - i.e. use same algorithm
+					strcpy(filename, eqsl_handler_->card_filename_l(current_qso_).c_str());
+					break;
+				case QI_CARD_FRONT:
+					// Card image of a scanned-in paper QSL card (front - i.e. callsign side)
+					// File name e.g.= <root>/<MY_CALL>\scans\<received date>\PA_GM3ZZA_P__<QSO date>.png
+					sprintf(filename, "%s/%s/scans/%s/%s__%s",
+						qsl_directory_.c_str(),
+						station.c_str(),
+						current_qso_->item("QSLRDATE").c_str(),
+						call.c_str(),
+						current_qso_->item("QSO_DATE").c_str());
+					break;
+				case QI_CARD_BACK:
+					// Card image of a scanned-in paper QSL card (back - i.e. QSO details side)
+					// File name e.g.= <root>\scans\<received date>\PA_GM3ZZA_P++<QSO date>.png
+					sprintf(filename, "%s/%s/scans/%s/%s++%s",
+						qsl_directory_.c_str(),
+						station.c_str(),
+						current_qso_->item("QSLRDATE").c_str(),
+						call.c_str(),
+						current_qso_->item("QSO_DATE").c_str());
+					break;
+				case QI_EMAIL:
+					// Card image of a scanned-in paper QSL card (front - i.e. callsign side)
+					// File name e.g.= <root>\emails\PA_GM3ZZA_P__<QSO date>.png
+					sprintf(filename, "%s/%s/email/%s__%s",
+						qsl_directory_.c_str(),
+						station.c_str(),
+						call.c_str(),
+						current_qso_->item("QSO_DATE").c_str());
+					break;
+				}
+				// Images could be any graphic format
+				// Test first with existing filename then replace with default station
+				for (int ia = 0; ia < 2 && !found_image; ia++) {
+					string testname = filename;
+					if (ia == 1) {
+						size_t pos = testname.find(station);
+						testname.replace(pos, station.length(), default_station_);
+						use_default = true;
 					}
-					else if (file_types[i] == ".png") {
-						raw_image_ = new Fl_PNG_Image(full_name_.c_str());
-						// Some JPEGs may have been saved as .png
-						if (raw_image_->fail()) {
-							delete raw_image_;
+					for (int i = 0; i < num_types && !found_image; i++) {
+						full_name_ = testname + file_types[i];
+						target_name = filename + file_types[i];
+						// printf("DEBUG QSO_QSL_VWR: Image file %s\n", full_name_.c_str());
+						// Read files depending on file type
+						if (file_types[i] == ".jpg") {
 							raw_image_ = new Fl_JPEG_Image(full_name_.c_str());
+						}
+						else if (file_types[i] == ".png") {
+							raw_image_ = new Fl_PNG_Image(full_name_.c_str());
+							// Some JPEGs may have been saved as .png
 							if (raw_image_->fail()) {
 								delete raw_image_;
-								raw_image_ = nullptr;
-							} else {
-								png_is_jpeg = true;
+								raw_image_ = new Fl_JPEG_Image(full_name_.c_str());
+								if (raw_image_->fail()) {
+									delete raw_image_;
+									raw_image_ = nullptr;
+								} else {
+									png_is_jpeg = true;
+								}
 							}
 						}
-					}
-					else if (file_types[i] == ".bmp") {
-						raw_image_ = new Fl_BMP_Image(full_name_.c_str());
-					}
-					else {
-						raw_image_ = nullptr;
-					}
-					if (raw_image_) {
-						char msg[128];
-						switch(raw_image_->fail()) {
-							case 0: {
-								if (ia == 1) use_default = true;
-								found_image = true;
-								break;
-							}
-							case Fl_Image::ERR_NO_IMAGE:
-							case Fl_Image::ERR_FILE_ACCESS: {
-								// snprintf(msg, sizeof(msg), "QSL: Error %s - %s", full_name_.c_str(), strerror(errno));
-								// status_->misc_status(ST_WARNING, msg);
-								break;
-							}
-							case Fl_Image::ERR_FORMAT: {
-								snprintf(msg, sizeof(msg), "QSL: Error format of %s incorrect", full_name_.c_str());
-								status_->misc_status(ST_WARNING, msg);
-								break;
-							}
+						else if (file_types[i] == ".bmp") {
+							raw_image_ = new Fl_BMP_Image(full_name_.c_str());
 						}
-						if (!found_image) {
-							delete raw_image_;
+						else {
 							raw_image_ = nullptr;
 						}
+						if (raw_image_) {
+							char msg[128];
+							switch(raw_image_->fail()) {
+								case 0: {
+									if (ia == 1) use_default = true;
+									found_image = true;
+									break;
+								}
+								case Fl_Image::ERR_NO_IMAGE:
+								case Fl_Image::ERR_FILE_ACCESS: {
+									// snprintf(msg, sizeof(msg), "QSL: Error %s - %s", full_name_.c_str(), strerror(errno));
+									// status_->misc_status(ST_WARNING, msg);
+									break;
+								}
+								case Fl_Image::ERR_FORMAT: {
+									snprintf(msg, sizeof(msg), "QSL: Error format of %s incorrect", full_name_.c_str());
+									status_->misc_status(ST_WARNING, msg);
+									break;
+								}
+							}
+							if (!found_image) {
+								delete raw_image_;
+								raw_image_ = nullptr;
+							}
+						}
 					}
 				}
-			}
-			if (found_image) {
-				// printf("DEBUG: Found image %s\n", full_name_.c_str());
-				// Resize the image to fit the control
-				// Resize keeping original height/width ratio
-				float scale_w = (float)raw_image_->w() / (float)bn_card_display_->w();
-				float scale_h = (float)raw_image_->h() / (float)bn_card_display_->h();
-				if (scale_w < scale_h) {
-					scaled_image_ = raw_image_->copy((int)(raw_image_->w() / scale_h), bn_card_display_->h());
+				if (found_image) {
+					// printf("DEBUG: Found image %s\n", full_name_.c_str());
+					// Resize the image to fit the control
+					// Resize keeping original height/width ratio
+					float scale_w = (float)raw_image_->w() / (float)bn_card_display_->w();
+					float scale_h = (float)raw_image_->h() / (float)bn_card_display_->h();
+					if (scale_w < scale_h) {
+						scaled_image_ = raw_image_->copy((int)(raw_image_->w() / scale_h), bn_card_display_->h());
+					}
+					else {
+						scaled_image_ = raw_image_->copy(bn_card_display_->w(), (int)(raw_image_->h() / scale_w));
+					}
+					desat_image_ = scaled_image_->copy();
+					desat_image_->desaturate();
+					update_full_view();
+					// Test Whether we've used default station callsign
 				}
-				else {
-					scaled_image_ = raw_image_->copy(bn_card_display_->w(), (int)(raw_image_->h() / scale_w));
-				}
-				desat_image_ = scaled_image_->copy();
-				desat_image_->desaturate();
-				update_full_view();
-				// Test Whether we've used default station callsign
 			}
 		}
-	}
-	// Got an image: draw it
-	draw_image();
-	// If we've found an image under the default station intended for this station 
-	// move (rename) it
-	if (found_image && use_default) {
-		char message[200];
-		switch(fl_choice("Image for station call: %s found looking for %s - Replace?", 
-			"no", "yes", nullptr, default_station_.c_str(),
-			current_qso_->item("STATION_CALLSIGN").c_str())) {
-		case 0:
-			snprintf(message, sizeof(message), 
-				"QSL: Ignoring %s", full_name_.c_str());
-			status_->misc_status(ST_WARNING, message);
-			break;
-		case 1:
-			snprintf(message, sizeof(message),
-				"QSL: Renaming station %s as %s", full_name_.c_str(), target_name.c_str());
-			status_->misc_status(ST_WARNING, message);
-			fl_make_path_for_file(target_name.c_str());
-			rename(full_name_.c_str(), target_name.c_str());
-			full_name_ = target_name;
-			break;
+		// Got an image: draw it
+		draw_image();
+		// If we've found an image under the default station intended for this station 
+		// move (rename) it
+		if (found_image && use_default) {
+			char message[200];
+			switch(fl_choice("Image for station call: %s found looking for %s - Replace?", 
+				"no", "yes", nullptr, default_station_.c_str(),
+				current_qso_->item("STATION_CALLSIGN").c_str())) {
+			case 0:
+				snprintf(message, sizeof(message), 
+					"QSL: Ignoring %s", full_name_.c_str());
+				status_->misc_status(ST_WARNING, message);
+				break;
+			case 1:
+				snprintf(message, sizeof(message),
+					"QSL: Renaming station %s as %s", full_name_.c_str(), target_name.c_str());
+				status_->misc_status(ST_WARNING, message);
+				fl_make_path_for_file(target_name.c_str());
+				rename(full_name_.c_str(), target_name.c_str());
+				full_name_ = target_name;
+				break;
+			}
 		}
-	}
-	// If we've found a .png that is actually a JPEG - rename it
-	if (found_image && png_is_jpeg) {
-		char message[200];
-		switch(fl_choice("Image for station call: JPEG found looking for PNG - Replace?", 
-			"no", "yes", nullptr)) {
-		case 0:
-			snprintf(message, sizeof(message), 
-				"QSL: Leaving %s as a JPED without renaming", full_name_.c_str());
-			status_->misc_status(ST_WARNING, message);
-			break;
-		case 1:
-			string jpeg_name = full_name_;
-			size_t pos = jpeg_name.find(".png");
-			jpeg_name.replace(pos, 4, ".jpg");
-			snprintf(message, sizeof(message),
-				"QSL: Renaming type %s as %s", full_name_.c_str(), jpeg_name.c_str());
-			status_->misc_status(ST_WARNING, message);
-			fl_make_path_for_file(jpeg_name.c_str());
-			rename(full_name_.c_str(), jpeg_name.c_str());
-			full_name_ = jpeg_name;
-			break;
+		// If we've found a .png that is actually a JPEG - rename it
+		if (found_image && png_is_jpeg) {
+			char message[200];
+			switch(fl_choice("Image for station call: JPEG found looking for PNG - Replace?", 
+				"no", "yes", nullptr)) {
+			case 0:
+				snprintf(message, sizeof(message), 
+					"QSL: Leaving %s as a JPED without renaming", full_name_.c_str());
+				status_->misc_status(ST_WARNING, message);
+				break;
+			case 1:
+				string jpeg_name = full_name_;
+				size_t pos = jpeg_name.find(".png");
+				jpeg_name.replace(pos, 4, ".jpg");
+				snprintf(message, sizeof(message),
+					"QSL: Renaming type %s as %s", full_name_.c_str(), jpeg_name.c_str());
+				status_->misc_status(ST_WARNING, message);
+				fl_make_path_for_file(jpeg_name.c_str());
+				rename(full_name_.c_str(), jpeg_name.c_str());
+				full_name_ = jpeg_name;
+				break;
+			}
 		}
+	} else {
+		draw_image();
+		update_full_view();
 	}
 }
 
@@ -530,6 +545,7 @@ void qso_qsl_vwr::set_image_buttons() {
 		radio_card_front_->value(false);
 		radio_card_back_->value(false);
 		radio_email_->value(false);
+		radio_myqsl_->value(false);
 		break;
 	case QI_CARD_FRONT:
 		// Display the front of a scanned-in paper card
@@ -537,6 +553,7 @@ void qso_qsl_vwr::set_image_buttons() {
 		radio_card_front_->value(true);
 		radio_card_back_->value(false);
 		radio_email_->value(false);
+		radio_myqsl_->value(false);
 		break;
 	case QI_CARD_BACK:
 		// Display the back of a scanned-in paper card
@@ -544,6 +561,7 @@ void qso_qsl_vwr::set_image_buttons() {
 		radio_card_front_->value(false);
 		radio_card_back_->value(true);
 		radio_email_->value(false);
+		radio_myqsl_->value(false);
 		break;
 	case QI_EMAIL:
 		// Display the back of a scanned-in paper card
@@ -551,6 +569,15 @@ void qso_qsl_vwr::set_image_buttons() {
 		radio_card_front_->value(false);
 		radio_card_back_->value(false);
 		radio_email_->value(true);
+		radio_myqsl_->value(false);
+		break;
+	case QI_MY_QSL:
+		// Display the back of a scanned-in paper card
+		radio_eqsl_->value(false);
+		radio_card_front_->value(false);
+		radio_card_back_->value(false);
+		radio_email_->value(false);
+		radio_myqsl_->value(true);
 		break;
 	default:
 		// Shouldn't get here
@@ -558,6 +585,7 @@ void qso_qsl_vwr::set_image_buttons() {
 		radio_card_front_->value(false);
 		radio_card_back_->value(false);
 		radio_email_->value(false);
+		radio_myqsl_->value(false);
 		break;
 	}
 	if (current_qso_ && current_qso_->item("EQSL_QSL_RCVD") == "Y") {
@@ -620,6 +648,12 @@ void qso_qsl_vwr::draw_image() {
 			//bn_card_display_->color(FL_WHITE);
 		}
 		break;
+	case QI_MY_QSL:
+		bn_card_display_->label("My QSL is displayed in separate window - click to show");
+		bn_card_display_->labelcolor(FL_FOREGROUND_COLOR);
+		bn_card_display_->labelsize(FL_NORMAL_SIZE);
+		display_myqsl_->value(current_qso_->item("STATION_CALLSIGN"), &current_qso_, 1);
+		break;
 	}
 
 	bn_card_display_->redraw();
@@ -666,15 +700,30 @@ void qso_qsl_vwr::set_qsl_status() {
 }
 
 void qso_qsl_vwr::update_full_view() {
-	bn_full_view_->image(raw_image_);
-	bn_full_view_->deimage(raw_image_);
-	if (raw_image_) {
-		bn_full_view_->show();
-		bn_no_image_->hide();
-		win_full_view_->size(raw_image_->w(), raw_image_->h());
-	} else {
-		bn_full_view_->hide();
-		bn_no_image_->show();
+	switch(selected_image_) {
+		case QI_EQSL:
+		case QI_CARD_BACK:
+		case QI_EMAIL:
+		case QI_CARD_FRONT: {
+			bn_full_view_->image(raw_image_);
+			bn_full_view_->deimage(raw_image_);
+			if (raw_image_) {
+				bn_full_view_->show();
+				bn_no_image_->hide();
+				win_full_view_->size(raw_image_->w(), raw_image_->h());
+			} else {
+				bn_full_view_->hide();
+				bn_no_image_->show();
+			}
+			display_myqsl_->hide();
+			break;
+		}
+		case QI_MY_QSL:
+			display_myqsl_->show();
+			bn_full_view_->hide();
+			bn_no_image_->hide();
+			win_full_view_->size(display_myqsl_->w(), display_myqsl_->h());
+			break;
 	}
 	win_full_view_->redraw();
 }
