@@ -26,12 +26,13 @@ class qsl_editor : public page_dialog
     void create_form(int X, int Y);
     void enable_widgets();
 
-    // Add data item
-    void add_item(string field);
-    // Delete data item
-    void delete_item(int number);
+    virtual int handle(int event);
+
     // Create item groups
-    void draw_items();
+    void create_items();
+    void create_fparams(int& x, int& y, qsl_display::field_def& params);
+    void create_tparams(int& x, int& y, qsl_display::text_def& params);
+    void create_iparams(int& x, int& y, qsl_display::image_def& params);
     // Resize the group after adding or deleting an item
     void resize();
     // Redraw dislay
@@ -56,16 +57,16 @@ class qsl_editor : public page_dialog
     static void cb_ch_field(Fl_Widget* w, void* v);
     // Style edited
     static void cb_bn_style(Fl_Widget* w, void* v);
-    // label position: 0 = above, 1 = left
-    static void cb_bn_align(Fl_Widget* w, void* v);
-    // Draw box around field
-    static void cb_bn_box(Fl_Widget* w, void* v);
     // String value updated
     static void cb_ip_string(Fl_Widget* w, void* v);
     static void cb_ip_int(Fl_Widget* w, void* v);
     static void cb_ip_bool(Fl_Widget* w, void* v);
     // New item field name
-    static void cb_new_field(Fl_Widget* w, void* v);
+    static void cb_new_item(Fl_Widget* w, void* v);
+    // Change an item type
+    static void cb_ch_type(Fl_Widget* w, void* v);
+
+    void populate_type(Fl_Choice* ch);
 
     // Number of rows in print
     int num_rows_;

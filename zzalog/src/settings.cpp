@@ -166,11 +166,13 @@ void settings::enable_widgets() {
 		if (wx == tab) {
 			wx->labelfont((wx->labelfont() | FL_BOLD) & (~FL_ITALIC));
 			wx->labelcolor(FL_FOREGROUND_COLOR);
+			wx->activate();
 			dlg = children_ids_[ix];
 		}
 		else {
 			wx->labelfont((wx->labelfont() & (~FL_BOLD)) | FL_ITALIC);
 			wx->labelcolor(FL_FOREGROUND_COLOR);
+			wx->deactivate();
 		}
 	}
 	set_label(dlg);

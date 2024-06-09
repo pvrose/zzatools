@@ -30,6 +30,9 @@ qsl_editor::qsl_editor(int X, int Y, int W, int H, const char* L) :
     display_->value(callsign_);
     display_->size(width_, height_, unit_);
     display_->editable(true);
+
+	if (active()) w_display_->show();
+	else w_display_->hide();
  
     create_form(X, Y);
 
@@ -37,6 +40,20 @@ qsl_editor::qsl_editor(int X, int Y, int W, int H, const char* L) :
 
 qsl_editor::~qsl_editor() {
 	Fl::delete_widget(w_display_);
+}
+
+int qsl_editor::handle(int event) {
+	switch(event) {
+	case FL_DEACTIVATE: {
+		if (display_) w_display_->hide();
+		break;
+	}
+	case FL_ACTIVATE: {
+		if (display_) w_display_->show();
+		break;
+	}
+	}
+	return page_dialog::handle(event);
 }
 
 void qsl_editor::load_values() {
@@ -248,7 +265,7 @@ void qsl_editor::create_form(int X, int Y) {
     max_x = max(max_x, g_2_->x() + g_2_->w());
 
     curr_x = x() + GAP;
-    curr_y = g_2_->y() + g_2_->h() + GAP;
+    curr_y = g_2_->y() + g_2_->h();
 
     curr_x = x() + GAP;
 
@@ -259,7 +276,7 @@ void qsl_editor::create_form(int X, int Y) {
     g_4_->box(FL_BORDER_BOX);
 	g_4_->end();
 
-    draw_items();
+    create_items();
 
     end();
 
@@ -312,235 +329,295 @@ void qsl_editor::save_values() {
 	settings_->flush();
 }
 
-// Add data item - append it to the list of data items
-void qsl_editor::add_item(string field) {
-	qsl_display::item_def* item = new qsl_display::item_def;
-	item->field = field;
-	display_->data()->push_back(item);
-	// Redraw the group
-	redraw_display();
-	draw_items();
-	resize();
-}
-
-// Delete data item
-void qsl_editor::delete_item(int number) {
-	display_->data()->erase(display_->data()->begin() + number);
-	// Redraw the group
-	draw_items();
-	resize();
-}
-
 // Create item groups
-void qsl_editor::draw_items() {
+void qsl_editor::create_items() {
 	int curr_x = g_4_->x() + GAP;
 	int save_x = curr_x;
 	int curr_y = g_4_->y() + HBUTTON + GAP;
 	int top_y = g_4_->y() + GAP;
-	char temp[16];
+	int max_x = curr_x;
 	g_4_->clear();
 	Fl_Group* save = Fl_Group::current();
 	g_4_->begin();
 	for (int ix = 0; ix < display_->data()->size(); ix++) {
-		Fl_Group* g_401 = new Fl_Group(save_x + WLABEL, curr_y, 100, HBUTTON);
-		char id[5];
-		snprintf(id, 5, "%2d", ix);
-		g_401->copy_label(id);
-		g_401->align(FL_ALIGN_LEFT);
-		g_401->box(FL_FLAT_BOX);
-
-		curr_x = save_x + WLABEL;
 		qsl_display::item_def* item = (*display_->data())[ix];
-		// Now the varioius widgets
-		field_choice* w_40101 = new field_choice(curr_x, curr_y, WBUTTON * 3 / 2, HBUTTON);
-		w_40101->set_dataset("Fields");
-		w_40101->tooltip("Select the field to display");
-		w_40101->value(item->field.c_str());
-		w_40101->callback(cb_ch_field, (void*)(intptr_t)ix);
 
-		curr_x += w_40101->w();
-		Fl_Input* w_40102 = new Fl_Input(curr_x, curr_y, WBUTTON, HBUTTON);
-		w_40102->tooltip("Enter the label to appear beside the item");
-		w_40102->value(item->label.c_str());
-		w_40102->callback(cb_ip_string, &(item->label));
-		w_40102->when(FL_WHEN_ENTER_KEY);
-		w_40102->textcolor(item->l_style.colour);
-		w_40102->textfont(item->l_style.font);
-		w_40102->textsize(item->l_style.size);
-		w_40102->color(FL_WHITE);
+		if (item->type != qsl_display::NONE) {
+			Fl_Group* g_401 = new Fl_Group(save_x, curr_y, 100, HBUTTON);
+			char id[5];
+			snprintf(id, 5, "%2d", ix);
+			g_401->copy_label(id);
+			g_401->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
+			g_401->box(FL_FLAT_BOX);
 
-		curr_x += w_40102->w();
-		Fl_Button* w_40102a = new Fl_Button(curr_x, curr_y, HBUTTON, HBUTTON, "Value");
-		w_40102a->align(FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
-		w_40102a->tooltip("Opens up a dialog to set font style and colour");
-		w_40102a->callback(cb_bn_style, (void*)&item->l_style);
-		w_40102a->when(FL_WHEN_RELEASE);
-		w_40102a->color(FL_WHITE);
-		w_40102a->labelcolor(item->l_style.colour);
-		w_40102a->labelfont(item->l_style.font);
-		w_40102a->labelsize(item->l_style.size);
+			curr_x = save_x + WLABEL / 2;
+			Fl_Choice* w_40101 = new Fl_Choice(curr_x, curr_y, WBUTTON, HBUTTON);
+			w_40101->tooltip("Select the item type - NONE to ignore");
+			w_40101->callback(cb_ch_type, &item->type);
+			populate_type(w_40101);
+			w_40101->value((int)item->type);
 
-		curr_x += w_40102a->w();
-		Fl_Button* w_40103 = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Value");
-		w_40103->align(FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
-		w_40103->tooltip("Opens up a dialog to set font style and colour");
-		w_40103->callback(cb_bn_style, (void*)&item->t_style);
-		w_40103->when(FL_WHEN_RELEASE);
-		w_40103->color(FL_WHITE);
-		w_40103->labelcolor(item->t_style.colour);
-		w_40103->labelfont(item->t_style.font);
-		w_40103->labelsize(item->t_style.size);
+			curr_x += w_40101->w() + GAP;
 
-		curr_x += w_40103->w();
-		Fl_Input* w_40104 = new Fl_Int_Input(curr_x, curr_y, WBUTTON / 2, HBUTTON);
-		w_40104->tooltip("Enter the X-coordinates of the item");
-		w_40104->callback(cb_ip_int, &(item->dx));
-		w_40104->when(FL_WHEN_ENTER_KEY);
-		snprintf(temp, sizeof(temp), "%d", item->dx);
-		w_40104->value(temp);
-
-		curr_x += w_40104->w();
-		Fl_Input* w_40105 = new Fl_Int_Input(curr_x, curr_y, WBUTTON / 2, HBUTTON);
-		w_40105->tooltip("Enter the X-coordinates of the item");
-		w_40105->callback(cb_ip_int, &(item->dy));
-		w_40105->when(FL_WHEN_ENTER_KEY);
-		snprintf(temp, sizeof(temp), "%d", item->dy);
-		w_40105->value(temp);
-
-		curr_x += w_40105->w();
-		Fl_Input* w_40106 = new Fl_Int_Input(curr_x, curr_y, WBUTTON / 2, HBUTTON);
-		w_40106->tooltip("Enter the X-coordinates of the item");
-		w_40106->callback(cb_ip_int, &(item->dw));
-		w_40106->when(FL_WHEN_ENTER_KEY);
-		snprintf(temp, sizeof(temp), "%d", item->dw);
-		w_40106->value(temp);
-
-		curr_x += w_40106->w();
-		Fl_Input* w_40107 = new Fl_Int_Input(curr_x, curr_y, WBUTTON / 2, HBUTTON);
-		w_40107->tooltip("Enter the X-coordinates of the item");
-		w_40107->callback(cb_ip_int, &(item->dh));
-		w_40107->when(FL_WHEN_ENTER_KEY);
-		snprintf(temp, sizeof(temp), "%d", item->dh);
-		w_40107->value(temp);
-
-		curr_x += w_40107->w();
-		Fl_Button* w_40108 = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON);
-		w_40108->tooltip("Select the position of the label to the item: Above or Left");
-		w_40108->callback(cb_bn_align, (void*)(intptr_t)ix);
-		w_40108->type(FL_TOGGLE_BUTTON);
-		w_40108->when(FL_WHEN_RELEASE);
-		switch(item->align) {
-			case FL_ALIGN_LEFT: 
-				strcpy(temp, "Left");
-				w_40108->value(false);
+			// Now create the individual row
+			switch(item->type) {
+			case qsl_display::FIELD: {
+				create_fparams(curr_x, curr_y, item->field);
 				break;
-			case FL_ALIGN_TOP:
-				strcpy(temp, "Above");
-				w_40108->value(true);
+			}
+			case qsl_display::TEXT: {
+				create_tparams(curr_x, curr_y, item->text);
 				break;
-			default:
-				strcpy(temp, "Invalid");
+			}
+			case qsl_display::IMAGE: {
+				create_iparams(curr_x, curr_y, item->image);
 				break;
+			}
+			}
+			g_401->resizable(nullptr);
+			g_401->size(curr_x - g_401->x(), g_401->h());
+			g_401->end();
+			max_x = max(max_x, curr_x);
 		}
-		w_40108->copy_label(temp);
-
-		curr_x += w_40108->w();
-		Fl_Check_Button* w_40109 = new Fl_Check_Button(curr_x, curr_y, HBUTTON, HBUTTON);
-		w_40109->tooltip("Select if multiple QSOs are displayed on separate lines");
-		w_40109->callback(cb_ip_bool, &(item->multi_qso));
-		w_40109->when(FL_WHEN_RELEASE);
-		w_40109->value(item->multi_qso);
-
-		curr_x += w_40109->w();
-		Fl_Check_Button* w_40110 = new Fl_Check_Button(curr_x, curr_y, HBUTTON, HBUTTON);
-		w_40110->tooltip("Select if the item is to be enclosed in a box");
-		w_40110->callback(cb_bn_box, (void*)(intptr_t)ix);
-		w_40110->value(item->box == FL_BORDER_BOX);
-		w_40110->when(FL_WHEN_RELEASE);
-
-		curr_x += w_40110->w();
-		Fl_Check_Button* w_40111 = new Fl_Check_Button(curr_x, curr_y, HBUTTON, HBUTTON);
-		w_40111->tooltip("Select if the item is to be displayed if null value");
-		w_40111->callback(cb_ip_bool, (void*)&item->display_empty);
-		w_40111->value(item->display_empty);
-		w_40111->when(FL_WHEN_RELEASE);
-
-		curr_x += w_40110->w();
-		g_401->resizable(nullptr);
-		g_401->size(curr_x - g_401->x(), g_401->h());			
-		g_401->end();
-
-		if (ix == 0) {
-			Fl_Box* b1 = new Fl_Box(w_40101->x(), top_y, w_40101->w(), HBUTTON, "Field");
-			b1->align(FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
-			Fl_Box* b2 = new Fl_Box(w_40102->x(), top_y, w_40102->w(), HBUTTON, "Label");
-			b2->align(FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
-			Fl_Box* b2a = new Fl_Box(w_40102a->x(), top_y, w_40102a->w(), HBUTTON, "St");
-			b2a->align(FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
-			Fl_Box* b3 = new Fl_Box(w_40103->x(), top_y, w_40103->w(), HBUTTON, "Style");
-			b3->align(FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
-			Fl_Box* b4 = new Fl_Box(w_40104->x(), top_y, w_40104->w(), HBUTTON, "X");
-			b4->align(FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
-			Fl_Box* b5 = new Fl_Box(w_40105->x(), top_y, w_40105->w(), HBUTTON, "Y");
-			b5->align(FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
-			Fl_Box* b6 = new Fl_Box(w_40106->x(), top_y, w_40106->w(), HBUTTON, "W");
-			b6->align(FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
-			Fl_Box* b7 = new Fl_Box(w_40107->x(), top_y, w_40107->w(), HBUTTON, "H");
-			b7->align(FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
-			Fl_Box* b8 = new Fl_Box(w_40108->x(), top_y, w_40108->w(), HBUTTON, "Align");
-			b8->align(FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
-			Fl_Box* b9 = new Fl_Box(w_40109->x(), top_y, w_40109->w(), HBUTTON, "*1");
-			b9->align(FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
-			Fl_Box* b10 = new Fl_Box(w_40110->x(), top_y, w_40110->w(), HBUTTON, "*2");
-			b10->align(FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
-			Fl_Box* b11 = new Fl_Box(w_40111->x(), top_y, w_40111->w(), HBUTTON, "*3");
-			b11->align(FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
-		}
-
-		curr_y += HBUTTON;
-		
-		curr_x += GAP;
-
 	}
-	int max_x = curr_x;
-
-	Fl_Group* g_402 = new Fl_Group(save_x + WLABEL, curr_y, 100, HBUTTON, "New item");
-	g_402->align(FL_ALIGN_LEFT);
+	Fl_Group* g_402 = new Fl_Group(save_x + WLABEL, curr_y, 100, HBUTTON);
 	g_402->box(FL_FLAT_BOX);
 
-	curr_x = save_x + WLABEL;
+	curr_x = save_x + WLABEL / 2;
+	curr_y += GAP;
 	// Now the varioius widgets
-	field_choice* w_40201 = new field_choice(curr_x, curr_y, WBUTTON * 3 / 2, HBUTTON);
-	w_40201->set_dataset("Fields");
-	w_40201->tooltip("Select the field to add");
-	w_40201->value("");
-	w_40201->callback(cb_new_field);
-
-	if (display_->data()->size()) {
-		curr_x += w_40201->w() + GAP;
-		Fl_Box* b20 = new Fl_Box(curr_x, curr_y, WEDIT, HBUTTON, "*1 Multiple QSOs, *2 Show box, *3 Show if empty");
-		b20->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
-
-		max_x = max(max_x, b20->x() + b20->w()) + GAP;
-	} else {
-		max_x = max(max_x, w_40201->x() + w_40201->w()) + GAP;
-
-	}
+	Fl_Choice* w_40201 = new Fl_Choice(curr_x, curr_y, WBUTTON, HBUTTON, "New");
+	w_40201->tooltip("Select the new type to add");
+	w_40201->callback(cb_new_item);
+	populate_type(w_40201);
+	w_40201->value((int)qsl_display::NONE);
 
 	curr_y += HBUTTON + GAP;
+	curr_x += w_40201->w() + GAP;
+	max_x = max(max_x, curr_x);
 
 	g_4_->resizable(nullptr);
 	g_4_->size(max_x - g_4_->x(), curr_y - g_4_->y());
 	Fl_Group::current(save);
 
 	redraw();
+};
 
+void qsl_editor::create_fparams(int& curr_x, int& curr_y, qsl_display::field_def& field) {
+	char temp[100];
+
+	Fl_Input* f_dx = new Fl_Int_Input(curr_x, curr_y, WBUTTON / 2, HBUTTON);
+	f_dx->tooltip("Enter the X-coordinates of the item");
+	f_dx->callback(cb_ip_int, &(field.dx));
+	f_dx->when(FL_WHEN_CHANGED);
+	snprintf(temp, sizeof(temp), "%d", field.dx);
+	f_dx->value(temp);
+
+	curr_x += f_dx->w();
+	Fl_Input* f_dy = new Fl_Int_Input(curr_x, curr_y, WBUTTON / 2, HBUTTON);
+	f_dy->tooltip("Enter the X-coordinates of the item");
+	f_dy->callback(cb_ip_int, &(field.dy));
+	f_dy->when(FL_WHEN_CHANGED);
+	snprintf(temp, sizeof(temp), "%d", field.dy);
+	f_dy->value(temp);
+	curr_x += WBUTTON / 2 * 3;
+
+	Fl_Input* f_label = new Fl_Input(curr_x, curr_y, WBUTTON, HBUTTON);
+	f_label->tooltip("Enter the label to appear beside the item");
+	f_label->value(field.label.c_str());
+	f_label->callback(cb_ip_string, &(field.label));
+	f_label->when(FL_WHEN_CHANGED);
+	curr_x += f_label->w();
+
+	Fl_Button* f_lstyle = new Fl_Button(curr_x, curr_y, HBUTTON, HBUTTON, "S");
+	f_lstyle->align(FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
+	f_lstyle->tooltip("Opens up a dialog to set font style and colour");
+	f_lstyle->callback(cb_bn_style, (void*)&field.l_style);
+	f_lstyle->when(FL_WHEN_RELEASE);
+	f_lstyle->color(FL_WHITE);
+	f_lstyle->labelcolor(field.l_style.colour);
+	f_lstyle->labelfont(field.l_style.font);
+	f_lstyle->labelsize(field.l_style.size);
+
+	curr_x += f_lstyle->w();
+	// Now the varioius widgets
+	field_choice* f_field = new field_choice(curr_x, curr_y, WBUTTON * 3 / 2, HBUTTON);
+	f_field->set_dataset("Fields");
+	f_field->tooltip("Select the field to display");
+	f_field->value(field.field.c_str());
+	f_field->callback(cb_ch_field, &field);
+
+	curr_x += f_field->w();
+	Fl_Button* f_tstyle = new Fl_Button(curr_x, curr_y, HBUTTON, HBUTTON, "S");
+	f_tstyle->align(FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
+	f_tstyle->tooltip("Opens up a dialog to set font style and colour");
+	f_tstyle->callback(cb_bn_style, (void*)&field.t_style);
+	f_tstyle->when(FL_WHEN_RELEASE);
+	f_tstyle->color(FL_WHITE);
+	f_tstyle->labelcolor(field.t_style.colour);
+	f_tstyle->labelfont(field.t_style.font);
+	f_tstyle->labelsize(field.t_style.size);
+
+	curr_x += f_tstyle->w();
+	Fl_Check_Button* f_vert = new Fl_Check_Button(curr_x, curr_y, HBUTTON, HBUTTON);
+	f_vert->tooltip("Select vertical positioning of label and text");
+	f_vert->callback(cb_ip_bool, &(field.vertical));
+	f_vert->when(FL_WHEN_RELEASE);
+	f_vert->value(field.vertical);
+
+	curr_x += f_vert->w();
+	Fl_Check_Button* f_mqso = new Fl_Check_Button(curr_x, curr_y, HBUTTON, HBUTTON);
+	f_mqso->tooltip("Select if multiple QSOs are displayed on separate lines");
+	f_mqso->callback(cb_ip_bool, &(field.multi_qso));
+	f_mqso->when(FL_WHEN_RELEASE);
+	f_mqso->value(field.multi_qso);
+
+	curr_x += f_mqso->w();
+	Fl_Check_Button* f_box = new Fl_Check_Button(curr_x, curr_y, HBUTTON, HBUTTON);
+	f_box->tooltip("Select if the item is to be enclosed in a box");
+	f_box->callback(cb_ip_bool, &(field.box));
+	f_box->value(field.box);
+	f_box->when(FL_WHEN_RELEASE);
+
+	curr_x += f_box->w();
+	Fl_Check_Button* f_ignore = new Fl_Check_Button(curr_x, curr_y, HBUTTON, HBUTTON);
+	f_ignore->tooltip("Select if the item is to be displayed if null value");
+	f_ignore->callback(cb_ip_bool, (void*)&field.display_empty);
+	f_ignore->value(field.display_empty);
+	f_ignore->when(FL_WHEN_RELEASE);
+
+	curr_x += f_ignore->w();
+	curr_y += HBUTTON;
 }
+
+
+
+	// if (ix == 0) {
+	// 	Fl_Box* b1 = new Fl_Box(w_40101->x(), top_y, w_40101->w(), HBUTTON, "Field");
+	// 	b1->align(FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
+	// 	Fl_Box* b2 = new Fl_Box(w_40102->x(), top_y, w_40102->w(), HBUTTON, "Label");
+	// 	b2->align(FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
+	// 	Fl_Box* b2a = new Fl_Box(w_40102a->x(), top_y, w_40102a->w(), HBUTTON, "St");
+	// 	b2a->align(FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
+	// 	Fl_Box* b3 = new Fl_Box(w_40103->x(), top_y, w_40103->w(), HBUTTON, "Style");
+	// 	b3->align(FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
+	// 	Fl_Box* b4 = new Fl_Box(w_40104->x(), top_y, w_40104->w(), HBUTTON, "X");
+	// 	b4->align(FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
+	// 	Fl_Box* b5 = new Fl_Box(w_40105->x(), top_y, w_40105->w(), HBUTTON, "Y");
+	// 	b5->align(FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
+	// 	Fl_Box* b6 = new Fl_Box(w_40106->x(), top_y, w_40106->w(), HBUTTON, "W");
+	// 	b6->align(FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
+	// 	Fl_Box* b7 = new Fl_Box(w_40107->x(), top_y, w_40107->w(), HBUTTON, "H");
+	// 	b7->align(FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
+	// 	Fl_Box* b8 = new Fl_Box(w_40108->x(), top_y, w_40108->w(), HBUTTON, "Align");
+	// 	b8->align(FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
+	// 	Fl_Box* b9 = new Fl_Box(w_40109->x(), top_y, w_40109->w(), HBUTTON, "*1");
+	// 	b9->align(FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
+	// 	Fl_Box* b10 = new Fl_Box(w_40110->x(), top_y, w_40110->w(), HBUTTON, "*2");
+	// 	b10->align(FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
+	// 	Fl_Box* b11 = new Fl_Box(w_40111->x(), top_y, w_40111->w(), HBUTTON, "*3");
+	// 	b11->align(FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
+	// }
+
+void qsl_editor::create_tparams(int& curr_x, int& curr_y, qsl_display::text_def& text) {
+	char temp[100];
+
+	Fl_Input* t_dx = new Fl_Int_Input(curr_x, curr_y, WBUTTON / 2, HBUTTON);
+	t_dx->tooltip("Enter the X-coordinates of the item");
+	t_dx->callback(cb_ip_int, &(text.dx));
+	t_dx->when(FL_WHEN_ENTER_KEY);
+	snprintf(temp, sizeof(temp), "%d", text.dx);
+	t_dx->value(temp);
+
+	curr_x += t_dx->w();
+	Fl_Input* t_dy = new Fl_Int_Input(curr_x, curr_y, WBUTTON / 2, HBUTTON);
+	t_dy->tooltip("Enter the X-coordinates of the item");
+	t_dy->callback(cb_ip_int, &(text.dy));
+	t_dy->when(FL_WHEN_ENTER_KEY);
+	snprintf(temp, sizeof(temp), "%d", text.dy);
+	t_dy->value(temp);
+	curr_x += WBUTTON / 2 * 2;
+
+	Fl_Input* t_text = new Fl_Input(curr_x, curr_y, WEDIT, HBUTTON);
+	t_text->tooltip("Please enter the text to display");
+	t_text->callback(cb_ip_string, &text.text);
+	t_text->textfont(text.t_style.font);
+	t_text->textsize(text.t_style.size);
+	t_text->textcolor(text.t_style.colour);
+	t_text->color(FL_WHITE);
+	curr_x += t_text->w();
+
+	Fl_Button* t_tstyle = new Fl_Button(curr_x, curr_y, HBUTTON, HBUTTON, "S");
+	t_tstyle->align(FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
+	t_tstyle->tooltip("Opens up a dialog to set font style and colour");
+	t_tstyle->callback(cb_bn_style, (void*)&text.t_style);
+	t_tstyle->when(FL_WHEN_RELEASE);
+	t_tstyle->color(FL_WHITE);
+	t_tstyle->labelcolor(text.t_style.colour);
+	t_tstyle->labelfont(text.t_style.font);
+	t_tstyle->labelsize(text.t_style.size);
+
+	curr_x += t_tstyle->w();
+	curr_y += HBUTTON;
+}
+
+void qsl_editor::create_iparams(int& curr_x, int& curr_y, qsl_display::image_def& image) {
+	char temp[100];
+
+	Fl_Input* i_dx = new Fl_Int_Input(curr_x, curr_y, WBUTTON / 2, HBUTTON);
+	i_dx->tooltip("Enter the X-coordinates of the item");
+	i_dx->callback(cb_ip_int, &(image.dx));
+	i_dx->when(FL_WHEN_ENTER_KEY);
+	snprintf(temp, sizeof(temp), "%d", image.dx);
+	i_dx->value(temp);
+
+	curr_x += i_dx->w();
+	Fl_Input* i_dy = new Fl_Int_Input(curr_x, curr_y, WBUTTON / 2, HBUTTON);
+	i_dy->tooltip("Enter the X-coordinates of the item");
+	i_dy->callback(cb_ip_int, &(image.dy));
+	i_dy->when(FL_WHEN_ENTER_KEY);
+	snprintf(temp, sizeof(temp), "%d", image.dy);
+	i_dy->value(temp);
+	curr_x += i_dy->w();
+
+	Fl_Input* i_dw = new Fl_Int_Input(curr_x, curr_y, WBUTTON / 2, HBUTTON);
+	i_dw->tooltip("Enter the X-coordinates of the item");
+	i_dw->callback(cb_ip_int, &(image.dw));
+	i_dw->when(FL_WHEN_ENTER_KEY);
+	snprintf(temp, sizeof(temp), "%d", image.dw);
+	i_dw->value(temp);
+	curr_x += i_dw->w();
+
+	Fl_Input* i_dh = new Fl_Int_Input(curr_x, curr_y, WBUTTON / 2, HBUTTON);
+	i_dh->tooltip("Enter the X-coordinates of the item");
+	i_dh->callback(cb_ip_int, &(image.dh));
+	i_dh->when(FL_WHEN_ENTER_KEY);
+	snprintf(temp, sizeof(temp), "%d", image.dh);
+	i_dh->value(temp);
+	curr_x += i_dh->w();
+
+	// Input - image filename
+	Fl_Input* i_filename = new Fl_Input(curr_x, curr_y, WEDIT, HBUTTON);
+	i_filename->callback(cb_value<intl_input, string>, &image.filename);
+	i_filename->when(FL_WHEN_CHANGED);
+	i_filename->value(image.filename.c_str());
+	i_filename->tooltip("Location of TQSL executable");
+	curr_x += i_filename->w();
+
+	// Button - Opens file browser to locate executable
+	Fl_Button* bn_browse_tqsl = new Fl_Button(curr_x, curr_y, HBUTTON, HBUTTON, "?");
+	bn_browse_tqsl->align(FL_ALIGN_INSIDE);
+	browser_data_t bd = { "Please enter the image file", "\t*.png|*.jpg|*.bmp", &image.filename, nullptr, i_filename, nullptr };
+	bn_browse_tqsl->callback(cb_bn_browsefile, &bd);
+	bn_browse_tqsl->when(FL_WHEN_RELEASE);
+	bn_browse_tqsl->tooltip("Opens a file browser to locate the image file");
+}
+
 
 void qsl_editor::redraw_display() {
 	display_->size(width_, height_, unit_);
 	w_display_->size(display_->w(), display_->h());
-	display_->create_form();
+	display_->redraw();
 }
 
 // Update teh size display
@@ -568,7 +645,7 @@ void qsl_editor::update_size() {
 
 void qsl_editor::enable_widgets() {
 	update_size();
-	draw_items();
+	create_items();
 	resize();
 	redraw_display();
 }
@@ -583,7 +660,7 @@ void qsl_editor::cb_radio_dim(Fl_Widget* w, void* v) {
 // The design has been interactively edited
 void qsl_editor::cb_design(Fl_Widget* w, void* v) {
 	qsl_editor* that = ancestor_view<qsl_editor>(w);
-    that->draw_items();
+    that->create_items();
     that->resize();
 }
 
@@ -598,33 +675,9 @@ void qsl_editor::cb_bn_style(Fl_Widget* w, void* v) {
         style->size = d->font_size();
         style->colour = d->colour();
         that->redraw_display();
-		that->draw_items();
+		that->create_items();
     }
     Fl::delete_widget(d);
-}
-
-// Want to change the alignment of accompanying text
-void qsl_editor::cb_bn_align(Fl_Widget* w, void* v) {
-    qsl_editor* that = ancestor_view<qsl_editor>(w);
-    int ix = (intptr_t)(v);
-    bool value;
-    cb_value<Fl_Check_Button, bool>(w, (void*)&value);
-    qsl_display::item_def* item = (*that->display_->data())[ix];
-    item->align = value ? FL_ALIGN_TOP : FL_ALIGN_LEFT;
-    that->redraw_display();
-	that->draw_items();
-}
-
-// Want to change the box style 
-void qsl_editor::cb_bn_box(Fl_Widget* w, void* v) {
-    qsl_editor* that = ancestor_view<qsl_editor>(w);
-    int ix = (intptr_t)(v);
-    bool value;
-    cb_value<Fl_Check_Button, bool>(w, (void*)&value);
-    qsl_display::item_def* item = (*that->display_->data())[ix];
-    item->box = value ? FL_BORDER_BOX : FL_FLAT_BOX;
-    that->redraw_display();
-	that->draw_items();
 }
 
 // Want to change a size parameter (widgth or height of label)
@@ -639,7 +692,7 @@ void qsl_editor::cb_ip_string(Fl_Widget* w, void* v) {
     qsl_editor* that = ancestor_view<qsl_editor>(w);
     cb_value<Fl_Input, string>(w, v);
     that->redraw_display();  
-	that->draw_items();
+	// that->create_items();
 }
 
 // integer input
@@ -647,7 +700,7 @@ void qsl_editor::cb_ip_int(Fl_Widget* w, void* v) {
     qsl_editor* that = ancestor_view<qsl_editor>(w);
     cb_value_int<Fl_Int_Input>(w, v);
     that->redraw_display();  
-	that->draw_items();
+	// that->create_items();
 }
 
 // Bool input
@@ -655,7 +708,7 @@ void qsl_editor::cb_ip_bool(Fl_Widget* w, void* v) {
     qsl_editor* that = ancestor_view<qsl_editor>(w);
     cb_value<Fl_Check_Button, bool>(w, v);
     that->redraw_display();  
-	that->draw_items();
+	// that->create_items();
 }
 
 // Callsign
@@ -663,7 +716,7 @@ void qsl_editor::cb_callsign(Fl_Widget* w, void* v) {
     qsl_editor* that = ancestor_view<qsl_editor>(w);
     cb_value<field_input, string>(w, v);
     that->redraw_display();  
-	that->draw_items();
+	that->create_items();
 }
 
 // Field
@@ -671,22 +724,10 @@ void qsl_editor::cb_ch_field(Fl_Widget* w, void* v) {
     qsl_editor* that = ancestor_view<qsl_editor>(w);
 	field_choice* ch = (field_choice*)w;
 	const char* field = ch->value();
-	int ix = (int)(intptr_t)v;
-	if (!strlen(field)) {
-		that->delete_item(ix);
-	}
-}
-
-// New field
-void qsl_editor::cb_new_field(Fl_Widget* w, void* v) {
-    qsl_editor* that = ancestor_view<qsl_editor>(w);
-	field_choice* ch = (field_choice*)w;
-	const char* field = ch->value();
-	int ix = (int)(intptr_t)v;
-	if (strlen(field)) {
-		that->add_item(string(field));
-	}
-
+	string* item_field = (string*)v;
+	*item_field = field;
+	that->redraw_display();
+	// that->create_items();
 }
 
 // Filename changed so update display
@@ -695,6 +736,28 @@ void qsl_editor::cb_filename(Fl_Widget* w, void* v) {
 	cb_value<intl_input, string>(w, v);
 	that->save_values();
 	that->redraw_display();
+}
+
+// Type choice
+void qsl_editor::cb_ch_type(Fl_Widget* w, void* v) {
+	qsl_editor* that = ancestor_view<qsl_editor>(w);
+	Fl_Choice* ch = (Fl_Choice*)w;
+	qsl_display::item_type* type = (qsl_display::item_type*)v;
+	*type = (qsl_display::item_type)ch->value();
+	that->redraw_display();
+	that->create_items();
+}
+
+// New item
+void qsl_editor::cb_new_item(Fl_Widget* w, void* v) {
+	qsl_editor* that = ancestor_view<qsl_editor>(w);
+	Fl_Choice* ch = (Fl_Choice*)w;
+	qsl_display::item_type* type = (qsl_display::item_type*)v;
+	qsl_display::item_def* item = new qsl_display::item_def();
+	item->type = (qsl_display::item_type)ch->value();
+	that->display_->data()->push_back(item);
+	that->redraw_display();
+	that->create_items();
 }
 
 void qsl_editor::create_display() {
@@ -711,5 +774,14 @@ void qsl_editor::create_display() {
 	w_display_->end();
 	w_display_->show();
 	Fl_Group::current(save);
+}
+
+// Populate the type choices
+void qsl_editor::populate_type(Fl_Choice* ch) {
+	ch->clear();
+	ch->add("NONE");
+	ch->add("Field");
+	ch->add("Text");
+	ch->add("Image");
 }
 
