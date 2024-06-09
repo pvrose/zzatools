@@ -525,26 +525,24 @@ void qsl_editor::create_tparams(int& curr_x, int& curr_y, qsl_display::text_def&
 	Fl_Input* t_dx = new Fl_Int_Input(curr_x, curr_y, WBUTTON / 2, HBUTTON);
 	t_dx->tooltip("Enter the X-coordinates of the item");
 	t_dx->callback(cb_ip_int, &(text.dx));
-	t_dx->when(FL_WHEN_ENTER_KEY);
+	t_dx->when(FL_WHEN_CHANGED);
 	snprintf(temp, sizeof(temp), "%d", text.dx);
 	t_dx->value(temp);
 
 	curr_x += t_dx->w();
 	Fl_Input* t_dy = new Fl_Int_Input(curr_x, curr_y, WBUTTON / 2, HBUTTON);
-	t_dy->tooltip("Enter the X-coordinates of the item");
+	t_dy->tooltip("Enter the Y-coordinates of the item");
 	t_dy->callback(cb_ip_int, &(text.dy));
-	t_dy->when(FL_WHEN_ENTER_KEY);
+	t_dy->when(FL_WHEN_CHANGED);
 	snprintf(temp, sizeof(temp), "%d", text.dy);
 	t_dy->value(temp);
-	curr_x += WBUTTON / 2 * 2;
+	curr_x += WBUTTON / 2 * 3;
 
 	Fl_Input* t_text = new Fl_Input(curr_x, curr_y, WEDIT, HBUTTON);
 	t_text->tooltip("Please enter the text to display");
 	t_text->callback(cb_ip_string, &text.text);
-	t_text->textfont(text.t_style.font);
-	t_text->textsize(text.t_style.size);
-	t_text->textcolor(text.t_style.colour);
-	t_text->color(FL_WHITE);
+	t_text->when(FL_WHEN_CHANGED);
+	t_text->value(text.text.c_str());
 	curr_x += t_text->w();
 
 	Fl_Button* t_tstyle = new Fl_Button(curr_x, curr_y, HBUTTON, HBUTTON, "S");

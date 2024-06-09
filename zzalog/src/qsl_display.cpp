@@ -161,7 +161,7 @@ void qsl_display::draw_text(text_def& text) {
 	fl_font(text.t_style.font, text.t_style.size);
 	fl_color(text.t_style.colour);
 	// Draw the text
-	fl_draw(text.text.c_str(), text.dx, text.dy);
+	fl_draw(text.text.c_str(), text.dx, text.dy + fl_height() - fl_descent());
 }
 
 void qsl_display::draw_image(image_def& image) {
@@ -264,13 +264,13 @@ void qsl_display::load_data() {
 					break;
 				}
 				case TEXT: {
-					if (words.size() == 8) {
+					if (words.size() == 7) {
 						item->text.text = words[1];
 						item->text.t_style.font = (Fl_Font)stoi(words[2]);
 						item->text.t_style.size = (Fl_Fontsize)stoi(words[3]);
 						item->text.t_style.colour = (Fl_Color)stoi(words[4]);
-						item->text.dx = stoi(words[6]);
-						item->text.dy = stoi(words[7]);
+						item->text.dx = stoi(words[5]);
+						item->text.dy = stoi(words[6]);
 					}
 					break;
 				}
