@@ -142,7 +142,9 @@ void qsl_display::draw_field(field_def& field) {
 			ly = fy + (fh + fl_height() - fl_descent()) / 2;
 		}
 		// Drae the label
-		fl_draw(field.label.c_str(), lx, ly);
+		if (field.display_empty || text.length()) {
+			fl_draw(field.label.c_str(), lx, ly);
+		}
 	}
 
 	// set the next X,Y position
@@ -166,7 +168,7 @@ void qsl_display::draw_text(text_def& text) {
 
 void qsl_display::draw_image(image_def& image) {
 	if (image.image) {
-		image.image->draw(image.dx, image.dy, image.dw, image.dh, 0, 0);
+		image.image->draw(image.dx, image.dy);
 	}
 }
 
@@ -245,7 +247,7 @@ void qsl_display::load_data() {
 				item->type = (item_type)stoi(words[0]);
 				switch(item->type) {
 				case FIELD: {
-					if (words.size() == 15) {
+					if (words.size() >= 15) {
 						item->field.field = words[1];
 						item->field.label = words[2];
 						item->field.l_style.font = (Fl_Font)stoi(words[3]);
@@ -264,7 +266,7 @@ void qsl_display::load_data() {
 					break;
 				}
 				case TEXT: {
-					if (words.size() == 7) {
+					if (words.size() >= 7) {
 						item->text.text = words[1];
 						item->text.t_style.font = (Fl_Font)stoi(words[2]);
 						item->text.t_style.size = (Fl_Fontsize)stoi(words[3]);
@@ -275,12 +277,10 @@ void qsl_display::load_data() {
 					break;
 				}
 				case IMAGE: {
-					if (words.size() == 6) {
+					if (words.size() >= 6) {
 						item->image.filename = words[1];
 						item->image.dx = stoi(words[2]);
 						item->image.dy = stoi(words[3]);
-						item->image.dw = stoi(words[4]);
-						item->image.dh = stoi(words[5]);
 						item->image.image = get_image(words[1]);
 					}
 					break;
@@ -344,9 +344,7 @@ void qsl_display::save_data() {
 			case IMAGE: {
 				op << item->image.filename << '\t' <<
 					item->image.dx << '\t' <<
-					item->image.dy << '\t' <<
-					item->image.dw << '\t' <<
-					item->image.dh << endl;
+					item->image.dy << endl;
 				break;
 			}
 			}			

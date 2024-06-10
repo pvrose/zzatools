@@ -705,6 +705,7 @@ void qso_qsl_vwr::update_full_view() {
 		case QI_CARD_BACK:
 		case QI_EMAIL:
 		case QI_CARD_FRONT: {
+			win_full_view_->resizable(bn_full_view_);
 			bn_full_view_->image(raw_image_);
 			bn_full_view_->deimage(raw_image_);
 			if (raw_image_) {
@@ -719,10 +720,12 @@ void qso_qsl_vwr::update_full_view() {
 			break;
 		}
 		case QI_MY_QSL:
-			display_myqsl_->show();
+		win_full_view_->resizable(nullptr);
 			bn_full_view_->hide();
 			bn_no_image_->hide();
 			win_full_view_->size(display_myqsl_->w(), display_myqsl_->h());
+			display_myqsl_->show();
+			display_myqsl_->redraw();
 			break;
 	}
 	win_full_view_->redraw();

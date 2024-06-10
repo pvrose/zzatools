@@ -59,8 +59,6 @@ class qsl_display : public Fl_Group
         Fl_Image* image { nullptr };
         int dx { 0 };
         int dy { 0 };
-        int dw { 50 };
-        int dh { 50 };
     };
 
     struct item_def {

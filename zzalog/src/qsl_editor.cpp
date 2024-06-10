@@ -420,7 +420,7 @@ void qsl_editor::create_fparams(int& curr_x, int& curr_y, qsl_display::field_def
 	f_dy->when(FL_WHEN_CHANGED);
 	snprintf(temp, sizeof(temp), "%d", field.dy);
 	f_dy->value(temp);
-	curr_x += WBUTTON / 2 * 3;
+	curr_x += f_dy->w() + GAP;
 
 	Fl_Input* f_label = new Fl_Input(curr_x, curr_y, WBUTTON, HBUTTON);
 	f_label->tooltip("Enter the label to appear beside the item");
@@ -441,7 +441,8 @@ void qsl_editor::create_fparams(int& curr_x, int& curr_y, qsl_display::field_def
 
 	curr_x += f_lstyle->w();
 	// Now the varioius widgets
-	field_choice* f_field = new field_choice(curr_x, curr_y, WBUTTON * 3 / 2, HBUTTON);
+	const int WFIELD = WEDIT - WBUTTON - HBUTTON;
+	field_choice* f_field = new field_choice(curr_x, curr_y, WFIELD, HBUTTON);
 	f_field->set_dataset("Fields");
 	f_field->tooltip("Select the field to display");
 	f_field->value(field.field.c_str());
@@ -536,7 +537,7 @@ void qsl_editor::create_tparams(int& curr_x, int& curr_y, qsl_display::text_def&
 	t_dy->when(FL_WHEN_CHANGED);
 	snprintf(temp, sizeof(temp), "%d", text.dy);
 	t_dy->value(temp);
-	curr_x += WBUTTON / 2 * 3;
+	curr_x += t_dy->w() + GAP;
 
 	Fl_Input* t_text = new Fl_Input(curr_x, curr_y, WEDIT, HBUTTON);
 	t_text->tooltip("Please enter the text to display");
@@ -565,7 +566,7 @@ void qsl_editor::create_iparams(int& curr_x, int& curr_y, qsl_display::image_def
 	Fl_Input* i_dx = new Fl_Int_Input(curr_x, curr_y, WBUTTON / 2, HBUTTON);
 	i_dx->tooltip("Enter the X-coordinates of the item");
 	i_dx->callback(cb_ip_int, &(image.dx));
-	i_dx->when(FL_WHEN_ENTER_KEY);
+	i_dx->when(FL_WHEN_CHANGED);
 	snprintf(temp, sizeof(temp), "%d", image.dx);
 	i_dx->value(temp);
 
@@ -573,26 +574,10 @@ void qsl_editor::create_iparams(int& curr_x, int& curr_y, qsl_display::image_def
 	Fl_Input* i_dy = new Fl_Int_Input(curr_x, curr_y, WBUTTON / 2, HBUTTON);
 	i_dy->tooltip("Enter the X-coordinates of the item");
 	i_dy->callback(cb_ip_int, &(image.dy));
-	i_dy->when(FL_WHEN_ENTER_KEY);
+	i_dy->when(FL_WHEN_CHANGED);
 	snprintf(temp, sizeof(temp), "%d", image.dy);
 	i_dy->value(temp);
-	curr_x += i_dy->w();
-
-	Fl_Input* i_dw = new Fl_Int_Input(curr_x, curr_y, WBUTTON / 2, HBUTTON);
-	i_dw->tooltip("Enter the X-coordinates of the item");
-	i_dw->callback(cb_ip_int, &(image.dw));
-	i_dw->when(FL_WHEN_ENTER_KEY);
-	snprintf(temp, sizeof(temp), "%d", image.dw);
-	i_dw->value(temp);
-	curr_x += i_dw->w();
-
-	Fl_Input* i_dh = new Fl_Int_Input(curr_x, curr_y, WBUTTON / 2, HBUTTON);
-	i_dh->tooltip("Enter the X-coordinates of the item");
-	i_dh->callback(cb_ip_int, &(image.dh));
-	i_dh->when(FL_WHEN_ENTER_KEY);
-	snprintf(temp, sizeof(temp), "%d", image.dh);
-	i_dh->value(temp);
-	curr_x += i_dh->w();
+	curr_x += i_dy->w() + GAP;
 
 	// Input - image filename
 	Fl_Input* i_filename = new Fl_Input(curr_x, curr_y, WEDIT, HBUTTON);
@@ -605,10 +590,13 @@ void qsl_editor::create_iparams(int& curr_x, int& curr_y, qsl_display::image_def
 	// Button - Opens file browser to locate executable
 	Fl_Button* bn_browse_tqsl = new Fl_Button(curr_x, curr_y, HBUTTON, HBUTTON, "?");
 	bn_browse_tqsl->align(FL_ALIGN_INSIDE);
-	browser_data_t bd = { "Please enter the image file", "\t*.png|*.jpg|*.bmp", &image.filename, nullptr, i_filename, nullptr };
-	bn_browse_tqsl->callback(cb_bn_browsefile, &bd);
+	bn_browse_tqsl->callback(cb_image, &image);
 	bn_browse_tqsl->when(FL_WHEN_RELEASE);
 	bn_browse_tqsl->tooltip("Opens a file browser to locate the image file");
+
+	curr_x += bn_browse_tqsl->w();
+	curr_y += HBUTTON;
+
 }
 
 
@@ -754,6 +742,19 @@ void qsl_editor::cb_new_item(Fl_Widget* w, void* v) {
 	qsl_display::item_def* item = new qsl_display::item_def();
 	item->type = (qsl_display::item_type)ch->value();
 	that->display_->data()->push_back(item);
+	that->redraw_display();
+	that->create_items();
+}
+
+// Image
+void qsl_editor::cb_image(Fl_Widget* w, void* v) {
+	qsl_display::image_def& image = *(qsl_display::image_def*)v;
+	browser_data_t bd = {
+		"Please select image file", "*.png|*.bmp|*.jpg", &image.filename, nullptr, nullptr, nullptr };
+	
+	cb_bn_browsefile(w, (void*)&bd);
+	qsl_editor* that = ancestor_view<qsl_editor>(w);
+	image.image = that->display_->get_image(image.filename);
 	that->redraw_display();
 	that->create_items();
 }

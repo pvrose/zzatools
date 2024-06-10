@@ -9,6 +9,7 @@
 #include <FL/Fl_Output.H>
 
 
+
 // This class provides the dialog to allow the design of a QSL card 
 // and the parameters used for printing
 
@@ -61,10 +62,12 @@ class qsl_editor : public page_dialog
     static void cb_ip_string(Fl_Widget* w, void* v);
     static void cb_ip_int(Fl_Widget* w, void* v);
     static void cb_ip_bool(Fl_Widget* w, void* v);
-    // New item field name
+ 
     static void cb_new_item(Fl_Widget* w, void* v);
     // Change an item type
     static void cb_ch_type(Fl_Widget* w, void* v);
+    // Image
+    static void cb_image(Fl_Widget* w, void* v);
 
     void populate_type(Fl_Choice* ch);
 
