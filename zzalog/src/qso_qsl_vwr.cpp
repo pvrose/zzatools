@@ -649,7 +649,7 @@ void qso_qsl_vwr::draw_image() {
 		}
 		break;
 	case QI_MY_QSL:
-		bn_card_display_->label("My QSL is displayed in separate window - click to show");
+		bn_card_display_->label("My QSL is displayed in separate window\nclick to show");
 		bn_card_display_->labelcolor(FL_FOREGROUND_COLOR);
 		bn_card_display_->labelsize(FL_NORMAL_SIZE);
 		display_myqsl_->value(current_qso_->item("STATION_CALLSIGN"), &current_qso_, 1);

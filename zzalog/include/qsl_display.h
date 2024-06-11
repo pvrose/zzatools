@@ -88,7 +88,7 @@ class qsl_display : public Fl_Group
     // Set the widget parameters - passed by reference to enable editing
     void value(string callsign, record** qsos = nullptr, int num_records = 0);
     // Set the size
-    void size(float w, float h, dim_unit unit);
+    void size(float w, float h, dim_unit unit, int max_records);
 
     // Handle widget movement and sizing actions
     virtual int handle(int event);
@@ -132,6 +132,8 @@ class qsl_display : public Fl_Group
     // Positions to use if dx or dy are -1
     int next_x_;
     int next_y_;
+    // Maximum number of records
+    int max_records_;
 
 
     // Convert to points

@@ -27,6 +27,7 @@ qsl_display::qsl_display(int X, int Y, int W, int H, const char* L) : Fl_Group(X
 	callsign_ = "";
     data_.clear();
     editable_ = false;
+	end();
 
 }
 qsl_display::~qsl_display() {};
@@ -73,7 +74,9 @@ void qsl_display::draw_field(field_def& field) {
 	if (num_records_ == 0) {
 		text = field.field;
 		if (field.multi_qso) {
-			text += "\nditto.";
+			for (int ix = 1; ix < max_records_; ix++) {
+				text +="\nditto";
+			}
 		}
 	} else if (field.multi_qso) {
 		for (int i = 0; i < num_records_; i++) {
@@ -94,23 +97,27 @@ void qsl_display::draw_field(field_def& field) {
 	// Get the size of the text
 	int fw = 0;
 	int fh = 0;
+	int box_gap = 0;
 	fl_font(field.t_style.font, field.t_style.size);
 	fl_measure(text.c_str(), fw, fh);
 	fw = max(fw, 45);
 	fh = max(fh, 15);
 	// Get the X and Y positions
-	int fx = (field.dx == -1) ? next_x_ : field.dx;
-	int fy = (field.dy == -1) ? next_y_ : field.dy;
+	int fx = (field.dx == -1) ? next_x_ : field.dx + x();
+	int fy = (field.dy == -1) ? next_y_ : field.dy + y();
 	// Are we displaying the text?
 	if (field.display_empty || text.length()) {
 		// Draw the box if necessary
 		fl_color(FL_BLACK);
 		if (field.box) {
+			box_gap = 2;
 			if (field.display_empty) {
-				fl_rect(fx, fy, fw + 4, fh + 4, FL_BLACK);
+				fl_rect(fx, fy, fw + 2 * box_gap, fh + 2 * box_gap, FL_BLACK);
 			} else {
-				fl_rect(fx, fy, fw + 4, fh + 4, fl_lighter(FL_BLACK));
+				fl_rect(fx, fy, fw + 2 * box_gap, fh + 2 * box_gap, fl_lighter(FL_BLACK));
 			}
+		} else {
+			box_gap = 0;
 		}
 		// Draw the text
 		if (!field.display_empty) {
@@ -118,7 +125,7 @@ void qsl_display::draw_field(field_def& field) {
 		} else {
 			fl_color(field.t_style.colour);
 		}
-		fl_draw(text.c_str(), fx + 2, fy + 2 + fl_height() - fl_descent());
+		fl_draw(text.c_str(), fx + box_gap, fy + box_gap + fl_height() - fl_descent());
 		// Now display the label
 		int lw = 0;
 		int lh = 0;
@@ -135,11 +142,11 @@ void qsl_display::draw_field(field_def& field) {
 		if (field.vertical) { 
 			// Position it above the text centred
 			ly = fy - lh + fl_height() - fl_descent() - 1;
-			lx = fx + 2 + (fw - lw) / 2;
+			lx = fx + box_gap + (fw - lw) / 2;
 		} else {
 			// Position it to the left of the text (and centred
 			lx = fx - lw - 1;
-			ly = fy + (fh + fl_height() - fl_descent()) / 2;
+			ly = fy + box_gap + (fh - lh) / 2 + fl_height() - fl_descent();
 		}
 		// Drae the label
 		if (field.display_empty || text.length()) {
@@ -150,11 +157,12 @@ void qsl_display::draw_field(field_def& field) {
 	// set the next X,Y position
 	if (field.vertical) {
 		// We are actually drawing to the right
-		next_x_ = fx + fw + 4;
+		if (field.box)
+		next_x_ = fx + fw + 2 * box_gap;
 		next_y_ = fy;
 	} else {
 		next_x_ = fx;
-		next_y_ = fy + fh + 4;
+		next_y_ = fy + fh + 2 * box_gap;
 	}
 }
 
@@ -163,12 +171,12 @@ void qsl_display::draw_text(text_def& text) {
 	fl_font(text.t_style.font, text.t_style.size);
 	fl_color(text.t_style.colour);
 	// Draw the text
-	fl_draw(text.text.c_str(), text.dx, text.dy + fl_height() - fl_descent());
+	fl_draw(text.text.c_str(), text.dx + x(), text.dy + y() + fl_height() - fl_descent());
 }
 
 void qsl_display::draw_image(image_def& image) {
 	if (image.image) {
-		image.image->draw(image.dx, image.dy);
+		image.image->draw(image.dx + x(), image.dy + y());
 	}
 }
 
@@ -355,10 +363,11 @@ void qsl_display::save_data() {
 	status_->misc_status(ST_OK, msg);
 }
 
-void qsl_display::size(float w, float h, dim_unit unit) {
+void qsl_display::size(float w, float h, dim_unit unit, int max_records) {
     width_ = w;
     height_ = h;
     unit_ = unit;
+	max_records_ = max_records;
 
     Fl_Group::size(to_points(width_), to_points(height_));
     redraw();

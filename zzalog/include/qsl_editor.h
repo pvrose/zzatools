@@ -31,6 +31,7 @@ class qsl_editor : public page_dialog
 
     // Create item groups
     void create_items();
+    void create_labels();
     void create_fparams(int& x, int& y, qsl_display::field_def& params);
     void create_tparams(int& x, int& y, qsl_display::text_def& params);
     void create_iparams(int& x, int& y, qsl_display::image_def& params);
