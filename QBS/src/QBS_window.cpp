@@ -1854,6 +1854,7 @@ void QBS_window::cb_input_call(Fl_Widget* w, void* v) {
 	QBS_window* that = ancestor_view<QBS_window>(w);
 	cb_value<Fl_Input, string>(w, v);
 	string* call = (string*)v;
+	if ((*call)[0] != 'G') *call = "GM" + *call;
 	*call = to_upper(*call);
 	switch (that->action_) {
 	case SORT_CARDS:

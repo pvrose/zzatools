@@ -3,6 +3,12 @@
 
 #include <set>
 
+#include <FL/Fl_Tooltip.H>
+#include <FL/Fl_Window.H>
+#include <FL/Fl_Multiline_Output.H>
+#include <FL/names.h>
+
+
 using namespace std;
 
 const Fl_Color COLOUR_RECEIVED = FL_YELLOW;
@@ -15,6 +21,9 @@ QBS_charth::QBS_charth(int X, int Y, int W, int H, const char* L) :
 {
 	data_ = nullptr;
 	max_ = 15;
+	number_boxes_ = 0;
+	start_box_ = 0;
+	win_tip_ = nullptr;
 	create_form();
 }
 
@@ -58,7 +67,11 @@ void QBS_charth::update(string call) {
 	int stop_box = data_->get_current();
 	int start_box = stop_box > 11 ? stop_box - 11 : 0;
 	int head_box = data_->get_head();
+	// Save start and count for handle
+	start_box_ = start_box;
+	number_boxes_ = stop_box - start_box + 1;
 	max_ = 0;
+	chart_counts_.resize(number_boxes_);
 
 	ct_received_->clear();
 	ct_recycled_->clear();
@@ -66,7 +79,7 @@ void QBS_charth::update(string call) {
 
 	char err_msg[64];
 
-	for (int b = start_box; b <= stop_box; b++) {
+	for (int b = start_box, ix = 0; b <= stop_box; b++, ix++) {
 		string box_name = data_->get_batch(b);
 		string label = "";
 		if (box_name.substr(5, 2) == "Q1") {
@@ -87,6 +100,7 @@ void QBS_charth::update(string call) {
 			}
 			max_ = max(max_, rcvd);
 		}
+		chart_counts_[ix].rcvd = rcvd;
 		ct_received_->add((double)rcvd, label.c_str(), COLOUR_RECEIVED);
 		// Add recycled and sent data
 		int rcyc = 0;
@@ -99,6 +113,7 @@ void QBS_charth::update(string call) {
 				sent = 0;
 			}
 		}
+		chart_counts_[ix].sent = sent;
 		if (b < head_box && box->counts->find(call) != box->counts->end()) {
 			rcyc = box->counts->at(call);
 			if (rcyc < 0) {
@@ -107,6 +122,7 @@ void QBS_charth::update(string call) {
 				rcyc = 0;
 			}
 		}
+		chart_counts_[ix].rcyc = rcyc;
 		max_ = max(max_, sent + rcyc);
 		ct_recycled_->add((double)(rcyc + sent), "", COLOUR_RECYCLED);
 		ct_sent_->add((double)sent, "", COLOUR_SENT);
@@ -175,4 +191,72 @@ void QBS_charth::draw_y_axis() {
 void QBS_charth::draw() {
 	Fl_Group::draw();
 	draw_y_axis();
+}
+
+//Place holder for now
+int QBS_charth::handle(int event) {
+	switch(event) {
+		case FL_PUSH: {
+			int x = Fl::event_x() - ct_sent_->x();
+			int y = Fl::event_y() - ct_sent_->y();
+			if (x > 0 && x < ct_sent_->w() &&
+				y > 0 && y < ct_sent_->h()) {
+				chart_tip();
+				return true;
+			}
+		}
+		case FL_RELEASE: {
+			if (win_tip_) Fl::delete_widget(win_tip_);
+			win_tip_ = nullptr;
+			return true;
+		}
+	}
+	return Fl_Group::handle(event);
+}
+
+void QBS_charth::chart_tip() {
+	int x = Fl::event_x() - ct_sent_->x();
+	float bar_width = (float)ct_sent_->w() / (float)number_boxes_;
+	int bar = trunc((float)x / bar_width);
+	int rcvd = chart_counts_[bar].rcvd;
+	int rcyc = chart_counts_[bar].rcyc;
+	int sent = chart_counts_[bar].sent;
+	int i_box = start_box_ + bar;
+	string id = data_->get_box(i_box)->id;
+
+	// Create text for tooltip
+	char text[256];
+	snprintf(text, sizeof(text), "Box %d %s\nReceived %d\nSent %d\nRecycled %d",
+		i_box, id.c_str(), rcvd, sent, rcyc); 
+	// get the size of the text, set the font, default width
+	fl_font(Fl_Tooltip::font(), Fl_Tooltip::size());
+	int width = Fl_Tooltip::wrap_width();
+	int height = 0;
+	// Now get the actual width and height
+	fl_measure(text, width, height, 0);
+	// adjust sizes to allow for margins - use Fl_Tooltip margins.
+	width += (2 * Fl_Tooltip::margin_width());
+	height += (2 * Fl_Tooltip::margin_height());
+	// Create the window
+	win_tip_ = new Fl_Window(Fl::event_x_root(), Fl::event_y_root(), width, height, 0);
+	win_tip_->clear_border();
+	
+	// Create the output widget.
+	Fl_Multiline_Output* op = new Fl_Multiline_Output(0, 0, width, height, 0);
+	// Copy the attributes of tool-tips
+	op->color(Fl_Tooltip::color());
+	op->textcolor(Fl_Tooltip::textcolor());
+	op->textfont(Fl_Tooltip::font());
+	op->textsize(Fl_Tooltip::size());
+	op->wrap(true);
+	op->box(FL_BORDER_BOX);
+	op->value(text);
+	win_tip_->add(op);
+	win_tip_->end();
+	// set the window parameters: always on top, tooltip
+	win_tip_->set_non_modal();
+	win_tip_->set_tooltip_window();
+	// Must be after set_tooltip_window.
+	win_tip_->show();
+
 }

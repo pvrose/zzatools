@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Chart.H>
@@ -25,6 +26,8 @@ public:
 
     virtual void draw();
 
+    virtual int handle(int event);
+
 protected:
 
     QBS_data* data_;
@@ -34,9 +37,26 @@ protected:
     Fl_Chart* ct_recycled_;
     Fl_Chart* ct_sent_;
 
+    Fl_Window* win_tip_;
+
     void draw_y_axis();
 
+    // Create a tooltip for chart bar
+    void chart_tip();
+
     int max_;
+
+    // Number of bars in bar chart
+    int start_box_;
+    int number_boxes_;
+    
+    // Counts in the charts
+    struct counts {
+        int rcvd;
+        int rcyc;
+        int sent;
+    };
+    vector<counts> chart_counts_;
 
 };
 

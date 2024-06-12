@@ -12,7 +12,7 @@ using namespace std;
 
 const char* DATE_FORMAT = "%Y-%m-%d";
 extern int FL_NORMAL_SIZE;
-const char* VERSION = "1.0.12";
+const char* VERSION = "1.0.13";
 // Main logo
 Fl_PNG_Image main_icon_("QBS_ICON", qbs_png, qbs_png_len);
 
