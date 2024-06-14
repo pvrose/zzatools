@@ -210,6 +210,8 @@ public:
 	void action_qrz_com();
 	// Update selected QSO with current CAT conditions
 	void action_update_cat();
+	// Remember state before edit or view
+	void action_remember_state();
 
 	// Edit - saved logging state
 	logging_state_t edit_return_state_;

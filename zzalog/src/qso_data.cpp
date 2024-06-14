@@ -804,7 +804,7 @@ void qso_data::action_cancel() {
 	case NET_STARTED:
 		g_net_entry_->remove_entry();
 		if (g_net_entry_->entries() == 0) {
-			logging_state_ = QSO_INACTIVE;
+			logging_state_ = edit_return_state_;
 		}
 		break;
 	}
@@ -847,7 +847,6 @@ void qso_data::action_edit() {
 	// printf("DEBUG: action_edit\n");
 	// Save a copy of the current record
 	qso_num_t qso_number = get_default_number();
-	edit_return_state_ = logging_state_;
 	g_entry_->qso(qso_number);
 	record* qso = g_entry_->qso();
 	// If the QSO looks incomplete ask if it is so and restart it else edit it
@@ -873,7 +872,6 @@ void qso_data::action_view() {
 	// printf("DEBUG: action_view\n");
 	// Save a copy of the current record
 	qso_num_t qso_number = get_default_number();
-	edit_return_state_ = logging_state_;
 	logging_state_ = QSO_VIEW;
 	g_entry_->qso(qso_number);
 	g_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
@@ -888,7 +886,7 @@ void qso_data::action_save_edit() {
 	book_->add_use_data(qso);
 	if (qso->is_dirty()) book_->modified(true);
 	g_entry_->delete_qso();
-	logging_state_ = QSO_INACTIVE;
+	logging_state_ = edit_return_state_;
 	enable_widgets();
 }
 
@@ -900,7 +898,7 @@ void qso_data::action_cancel_edit() {
 		*book_->get_record(g_entry_->qso_number(), false) = *g_entry_->original_qso();
 	}
 	g_entry_->delete_qso();
-	logging_state_ = QSO_INACTIVE;
+	logging_state_ = edit_return_state_;
 	g_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
 	enable_widgets();
 }
@@ -910,7 +908,7 @@ void qso_data::action_cancel_browse() {
 	// printf("DEBUG: action_cancel_browse\n");
 	g_entry_->qso(g_query_->qso_number());
 	g_query_->clear_query();
-	logging_state_ = QSO_INACTIVE;
+	logging_state_ = edit_return_state_;
 	g_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
 	enable_widgets();
 }
@@ -1341,7 +1339,6 @@ void qso_data::action_exec_query() {
 	if (extract_records_->size()) {
 		snprintf(msg, sizeof(msg), "DASH: %zu matching records found", extract_records_->size());
 		status_->misc_status(ST_NOTE, msg);
-		edit_return_state_ = logging_state_;
 		logging_state_ = QSO_EDIT;
 		// Display the first record
 		g_entry_->qso(extract_records_->record_number(0));
@@ -1394,6 +1391,11 @@ void qso_data::action_update_cat() {
 			break;
 		}
 	}
+}
+
+// Remember the state before an edit or view
+void qso_data::action_remember_state() {
+	edit_return_state_ = logging_state_;
 }
 
 // Dummy QSO

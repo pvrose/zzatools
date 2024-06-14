@@ -317,6 +317,7 @@ void qso_buttons::cb_cancel(Fl_Widget* w, void* v) {
 void qso_buttons::cb_edit(Fl_Widget* w, void* v) {
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
 	that->disable_widgets();
+	that->qso_data_->action_remember_state();
 	switch (that->qso_data_->logging_state()) {
 	case qso_data::QSO_INACTIVE:
 		that->qso_data_->action_edit();
@@ -340,6 +341,7 @@ void qso_buttons::cb_edit(Fl_Widget* w, void* v) {
 void qso_buttons::cb_bn_view_qso(Fl_Widget* w, void* v) {
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
 	that->disable_widgets();
+	that->qso_data_->action_remember_state();
 	switch (that->qso_data_->logging_state()) {
 	case qso_data::QSO_INACTIVE:
 		that->qso_data_->action_view();
@@ -609,6 +611,7 @@ void qso_buttons::cb_bn_query_entry(Fl_Widget* w, void* v) {
 void qso_buttons::cb_bn_execute_query(Fl_Widget* w, void* v) {
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
 	that->disable_widgets();
+	that->qso_data_->action_remember_state();
 	switch (that->qso_data_->logging_state()) {
 	case qso_data::MANUAL_ENTRY:
 		that->qso_data_->action_exec_query();
