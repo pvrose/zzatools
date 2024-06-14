@@ -635,7 +635,7 @@ void qso_rig::enable_widgets() {
 		string rig_mode;
 		string submode;
 		rig_->get_string_mode(rig_mode, submode);
-		snprintf(msg, sizeof(msg), "%0.3f %03d MHz\n%s %sW" , 
+		snprintf(msg, sizeof(msg), "%0.3f.%03d MHz\n%s %sW" , 
 			freq, freq_Hz,
 			submode.length() ? submode.c_str() : rig_mode.c_str(),
 			rig_->get_tx_power(true).c_str()
