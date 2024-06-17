@@ -24,7 +24,8 @@ QBS_window::QBS_window(int W, int H, const char* L, const char* filename) :
 	qbs_filename_(filename),
 	batch_op_done_(false),
 	pos_batch_log_(0),
-	default_inputs_(true)
+	default_inputs_(true),
+	blog_file_(nullptr)
 {
 	data_ = new QBS_data;
 	// Get CSV directory name from settings
@@ -1400,6 +1401,12 @@ void QBS_window::update_actions() {
 		update_history(false);
 
 		g_input_->activate();
+		// Deactivate the import if we altready have a .qbs file
+		if (qbs_filename_.length()) {
+			bn_import_->deactivate();
+		} else {
+			bn_import_->activate();
+		}
 		break;
 	case DORMANT:
 		// Not in an active sorting phase - omly allow command for

@@ -15,6 +15,7 @@ const Fl_Color COLOUR_RECEIVED = FL_YELLOW;
 const Fl_Color COLOUR_RECYCLED = FL_RED;
 const Fl_Color COLOUR_SENT = FL_GREEN;
 const int AXIS_WIDTH = 16;
+const int LEGEND_HEIGHT = 7;
 
 QBS_charth::QBS_charth(int X, int Y, int W, int H, const char* L) :
 	Fl_Group(X, Y, W, H, L)
@@ -32,7 +33,6 @@ QBS_charth::~QBS_charth() {
 }
 
 void QBS_charth::create_form() {
-	begin();
 	box(FL_FLAT_BOX);
 	color(FL_BACKGROUND2_COLOR);
 
@@ -40,21 +40,10 @@ void QBS_charth::create_form() {
 	int curr_x = x() + AXIS_WIDTH;
 	int curr_w = w() - AXIS_WIDTH;
 
-	// Create the charts on top of each other - assumes draw order will remain
-	ct_received_ = new Fl_Chart(curr_x, y(), curr_w, h());
-	ct_received_->box(FL_NO_BOX);
-	ct_received_->type(FL_BAR_CHART);
-	ct_received_->autosize(true);
-
-	ct_recycled_ = new Fl_Chart(curr_x, y(), curr_w, h());
-	ct_recycled_->box(FL_NO_BOX);
-	ct_recycled_->type(FL_BAR_CHART);
-	ct_recycled_->autosize(true);
-
-	ct_sent_ = new Fl_Chart(curr_x, y(), curr_w, h());
-	ct_sent_->box(FL_NO_BOX);
-	ct_sent_->type(FL_BAR_CHART);
-	ct_sent_->autosize(true);
+	chart_ = new Fl_Chart(curr_x, y(), curr_w, h() - LEGEND_HEIGHT);
+	chart_->box(FL_NO_BOX);
+	chart_->type(FL_BAR_CHART);
+	chart_->autosize(true);
 
 	end();
 }
@@ -71,11 +60,9 @@ void QBS_charth::update(string call) {
 	start_box_ = start_box;
 	number_boxes_ = stop_box - start_box + 1;
 	max_ = 0;
-	chart_counts_.resize(number_boxes_);
+	chart_counts_.resize(number_boxes_ * 4);
 
-	ct_received_->clear();
-	ct_recycled_->clear();
-	ct_sent_->clear();
+	chart_->clear();
 
 	char err_msg[64];
 
@@ -100,8 +87,8 @@ void QBS_charth::update(string call) {
 			}
 			max_ = max(max_, rcvd);
 		}
-		chart_counts_[ix].rcvd = rcvd;
-		ct_received_->add((double)rcvd, label.c_str(), COLOUR_RECEIVED);
+		chart_counts_[ix] = rcvd;
+		chart_->add((double)rcvd, label.c_str(), COLOUR_RECEIVED);
 		// Add recycled and sent data
 		int rcyc = 0;
 		int sent = 0;
@@ -113,7 +100,9 @@ void QBS_charth::update(string call) {
 				sent = 0;
 			}
 		}
-		chart_counts_[ix].sent = sent;
+		ix++;
+		chart_counts_[ix] = sent;
+		chart_->add((double)sent, "", COLOUR_SENT);
 		if (b < head_box && box->counts->find(call) != box->counts->end()) {
 			rcyc = box->counts->at(call);
 			if (rcyc < 0) {
@@ -122,10 +111,14 @@ void QBS_charth::update(string call) {
 				rcyc = 0;
 			}
 		}
-		chart_counts_[ix].rcyc = rcyc;
-		max_ = max(max_, sent + rcyc);
-		ct_recycled_->add((double)(rcyc + sent), "", COLOUR_RECYCLED);
-		ct_sent_->add((double)sent, "", COLOUR_SENT);
+		ix++;
+		chart_counts_[ix] = rcyc;
+		max_ = max(max_, rcyc);
+		chart_->add((double)(rcyc), "", COLOUR_RECYCLED);
+
+		ix++;
+		chart_counts_[ix] = 0;
+		chart_->add(0, "", color());
 	}
 
 	if (max_ > 50) max_ = 100;
@@ -134,10 +127,7 @@ void QBS_charth::update(string call) {
 	else max_ = 15;
 
 	// Set boiunds of recycled and sent to those of received
-	ct_received_->bounds(0, max_);
-	ct_recycled_->bounds(0, max_);
-	ct_sent_->bounds(0, max_);
-	
+	chart_->bounds(0, max_);
 	redraw();
 }
 
@@ -147,11 +137,13 @@ void QBS_charth::draw_y_axis() {
 	int ax = x() + AXIS_WIDTH;
 	int dh = fl_height();
 	int ay = y();
-	int ah = h() - dh - 1;
+	int ah = chart_->h() - dh - 1;
 
 	fl_line(ax, ay, ax, ay + ah);
+
 	// Now add the ticks - generate values
 	set<double> ticks;
+	ticks.clear();
 	double tick = 0.0;
 	double gap;
 	if (max_ >= 100) {
@@ -188,19 +180,45 @@ void QBS_charth::draw_y_axis() {
 	}
 }
 
+void QBS_charth::draw_legend() {
+	int x = Fl_Group::x();
+	int y = Fl_Group::y() + chart_->h();
+
+	fl_color(COLOUR_RECEIVED);
+	fl_rectf(x + 1, y + 1, LEGEND_HEIGHT -1, LEGEND_HEIGHT - 1);
+	fl_color(FL_FOREGROUND_COLOR);
+	x += LEGEND_HEIGHT;
+	fl_draw("RCVD", x, y + LEGEND_HEIGHT - 1);
+	x += w()/3 - LEGEND_HEIGHT;
+
+	fl_color(COLOUR_SENT);
+	fl_rectf(x + 1, y + 1, LEGEND_HEIGHT -1, LEGEND_HEIGHT - 1);
+	fl_color(FL_FOREGROUND_COLOR);
+	x += LEGEND_HEIGHT;
+	fl_draw("SENT", x, y + LEGEND_HEIGHT - 1);
+	x += w()/3 - LEGEND_HEIGHT;
+
+	fl_color(COLOUR_RECYCLED);
+	fl_rectf(x + 1, y + 1, LEGEND_HEIGHT -1, LEGEND_HEIGHT - 1);
+	fl_color(FL_FOREGROUND_COLOR);
+	x += LEGEND_HEIGHT;
+	fl_draw("RCYC", x, y + LEGEND_HEIGHT - 1);
+}
+
 void QBS_charth::draw() {
 	Fl_Group::draw();
 	draw_y_axis();
+	draw_legend();
 }
 
 //Place holder for now
 int QBS_charth::handle(int event) {
 	switch(event) {
 		case FL_PUSH: {
-			int x = Fl::event_x() - ct_sent_->x();
-			int y = Fl::event_y() - ct_sent_->y();
-			if (x > 0 && x < ct_sent_->w() &&
-				y > 0 && y < ct_sent_->h()) {
+			int x = Fl::event_x() - chart_->x();
+			int y = Fl::event_y() - chart_->y();
+			if (x > 0 && x < chart_->w() &&
+				y > 0 && y < chart_->h()) {
 				chart_tip();
 				return true;
 			}
@@ -215,12 +233,12 @@ int QBS_charth::handle(int event) {
 }
 
 void QBS_charth::chart_tip() {
-	int x = Fl::event_x() - ct_sent_->x();
-	float bar_width = (float)ct_sent_->w() / (float)number_boxes_;
+	int x = Fl::event_x() - chart_->x();
+	float bar_width = (float)chart_->w() / (float)number_boxes_;
 	int bar = trunc((float)x / bar_width);
-	int rcvd = chart_counts_[bar].rcvd;
-	int rcyc = chart_counts_[bar].rcyc;
-	int sent = chart_counts_[bar].sent;
+	int rcvd = chart_counts_[bar * 4];
+	int rcyc = chart_counts_[bar * 4 + 1];
+	int sent = chart_counts_[bar * 4 + 2];
 	int i_box = start_box_ + bar;
 	string id = data_->get_box(i_box)->id;
 

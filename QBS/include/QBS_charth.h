@@ -33,13 +33,13 @@ protected:
     QBS_data* data_;
 
     // Widgets
-    Fl_Chart* ct_received_;
-    Fl_Chart* ct_recycled_;
-    Fl_Chart* ct_sent_;
+    Fl_Chart* chart_;
 
     Fl_Window* win_tip_;
 
     void draw_y_axis();
+    void draw_legend();
+    
 
     // Create a tooltip for chart bar
     void chart_tip();
@@ -50,13 +50,7 @@ protected:
     int start_box_;
     int number_boxes_;
     
-    // Counts in the charts
-    struct counts {
-        int rcvd;
-        int rcyc;
-        int sent;
-    };
-    vector<counts> chart_counts_;
+    vector<int> chart_counts_;
 
 };
 
