@@ -1393,9 +1393,16 @@ void qso_data::action_update_cat() {
 	}
 }
 
-// Remember the state before an edit or view
+// Remember whether inactive or pending before an edit or view
 void qso_data::action_remember_state() {
-	edit_return_state_ = logging_state_;
+	switch (logging_state_) {
+		case QSO_INACTIVE:
+		case QSO_PENDING:
+			edit_return_state_ = logging_state_;
+			break;
+		default:
+			break;
+	}
 }
 
 // Dummy QSO

@@ -55,6 +55,10 @@ CPPFLAGS := $(INC_FLAGS) -MMD -MP
 CFLAGS += -g
 CXXFLAGS += -g
 
+ifeq ($(BUILD_TYPE), Anal)
+CXXFLAGS += -fsanitize=address
+LDFLAGS += -fsanitize=address -static-libasan
+endif
 # DEBUG_FLAG := -Og
 
 # The final build step.
