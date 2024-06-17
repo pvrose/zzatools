@@ -96,6 +96,7 @@ protected:
 	Fl_Button* bn_log_email_;
 	Fl_Button* bn_log_direct_;
 	Fl_Button* bn_card_reqd_;
+	Fl_Button* bn_card_decl_;
 	// QSL status
 	Fl_Light_Button* bn_eqsl_status_;
 	Fl_Light_Button* bn_lotw_status_;

@@ -6,6 +6,7 @@
 #include "qsl_display.h"
 #include "callback.h"
 #include "drawing.h"
+#include "tabbed_forms.h"
 
 #include <FL/Fl_Preferences.H>
 #include <FL/Fl_JPEG_Image.H>
@@ -22,7 +23,7 @@ extern Fl_Preferences* settings_;
 extern status* status_;
 extern book* book_;
 extern string default_station_;
-
+extern tabbed_forms* tabbed_forms_;
 qso_qsl_vwr::qso_qsl_vwr(int X, int Y, int W, int H, const char* L) :
 	Fl_Group(X, Y, W, H, L)
 	, selected_image_(QI_EQSL)
@@ -212,10 +213,16 @@ void qso_qsl_vwr::create_form() {
 	// Button - Set QSL_SENT=R in current QSO
 	bn_card_reqd_ = new Fl_Button(curr_x, curr_y, WBN, HBUTTON, "Requested");
 	bn_card_reqd_->tooltip("Mark QSO as wanting a card QSL");
-	bn_card_reqd_->callback(cb_bn_card_reqd);
+	bn_card_reqd_->callback(cb_bn_card_reqd, (void*)"R");
 	bn_card_reqd_->when(FL_WHEN_RELEASE);
 	curr_x += WBN;
-
+	// Button - QSO partner declines a card - set QSL_SENT=N
+	bn_card_decl_ = new Fl_Button(curr_x, curr_y, WBN, HBUTTON, "Declined");
+	bn_card_decl_->tooltip("Mark QSO as declining a card QSL");
+	bn_card_decl_->callback(cb_bn_card_reqd, (void*)"N");
+	bn_card_decl_->when(FL_WHEN_RELEASE);
+	
+	curr_x += WBN;
 
 	end();
 	show();
@@ -298,12 +305,15 @@ void qso_qsl_vwr::cb_bn_image(Fl_Widget* w, void* v) {
 	}
 }
 
-// Set card requested "QSL_SENT=R"
+// Set card requested "QSL_SENT=[v]"
 void qso_qsl_vwr::cb_bn_card_reqd(Fl_Widget* w, void* v) {
 	qso_qsl_vwr* that = ancestor_view<qso_qsl_vwr>(w);
-	that->current_qso_->item("QSL_SENT", string("R"));
+	char* value = (char*)v;
+	that->current_qso_->item("QSL_SENT", string(value));
 	qso_data* data = ancestor_view<qso_data>(that);
 	data->enable_widgets();
+	tabbed_forms_->update_views(nullptr, HT_MINOR_CHANGE, that->current_qso_num_);
+
 }
 
 void qso_qsl_vwr::set_qso(record* qso, qso_num_t number) {
