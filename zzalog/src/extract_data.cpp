@@ -420,19 +420,19 @@ void extract_data::extract_qsl(extract_data::extract_mode_t server) {
 	// Define the field that shows it's not been sent
 	switch (server) {
 	case EQSL:
-		reason = "eQSL";
+		reason = "upload to eQSL";
 		field_name = "EQSL_QSL_SENT";
 		break;
 	case LOTW:
-		reason = "LotW";
+		reason = "upload to LotW";
 		field_name = "LOTW_QSL_SENT";
 		break;
 	case CARD:
-		reason = "Printed card";
+		reason = "printing labels";
 		field_name = "QSL_SENT";
 		break;
 	case CLUBLOG:
-		reason = "ClubLog";
+		reason = "upload to clubLog";
 		field_name = "CLUBLOG_QSO_UPLOAD_STATUS";
 		break;
 	}
@@ -527,7 +527,7 @@ void extract_data::extract_qsl(extract_data::extract_mode_t server) {
 	if (size() == 0) {
 		// No records match these criteria
 		char message[128];
-		snprintf(message, 128, "EXTRACT: No records to upload for %s!", reason.c_str());
+		snprintf(message, 128, "EXTRACT: No records for %s!", reason.c_str());
 		status_->misc_status(ST_WARNING, message);
 		// Clear the criteria - which also clears upload_in_progress
 		clear_criteria();
@@ -537,7 +537,7 @@ void extract_data::extract_qsl(extract_data::extract_mode_t server) {
 	}
 	else {
 		// Records match
-		char format[] = "EXTRACT: %d records extracted for sending to %s";
+		char format[] = "EXTRACT: %d records extracted for %s";
 		char* message = new char[strlen(format) + reason.length() + 10];
 		sprintf(message, format, size(), reason.c_str());
 		status_->misc_status(ST_OK, message);
