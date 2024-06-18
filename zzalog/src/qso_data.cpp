@@ -101,7 +101,7 @@ void qso_data::create_form(int X, int Y) {
 	g_qy_entry_->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 	g_qy_entry_->labelfont(FL_BOLD);
 	g_qy_entry_->labelsize(FL_NORMAL_SIZE + 2);
-	g_qy_entry_->labelcolor(FL_DARK_MAGENTA);
+	g_qy_entry_->labelcolor(DARK ? FL_MAGENTA : FL_DARK_MAGENTA);
 	max_x = max(max_x, g_qy_entry_->x() + g_qy_entry_->w());
 
 	curr_y = max(g_entry_->y() + g_entry_->h(), g_query_->y() + g_query_->h());
@@ -1398,6 +1398,7 @@ void qso_data::action_remember_state() {
 	switch (logging_state_) {
 		case QSO_INACTIVE:
 		case QSO_PENDING:
+		case MANUAL_ENTRY:
 			edit_return_state_ = logging_state_;
 			break;
 		default:
