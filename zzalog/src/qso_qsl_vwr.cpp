@@ -7,6 +7,7 @@
 #include "callback.h"
 #include "drawing.h"
 #include "tabbed_forms.h"
+#include "utils.h"
 
 #include <FL/Fl_Preferences.H>
 #include <FL/Fl_JPEG_Image.H>
@@ -373,6 +374,8 @@ void qso_qsl_vwr::set_image() {
 				scaled_image_ = nullptr;
 				desat_image_ = nullptr;
 				string station = current_qso_->item("STATION_CALLSIGN");
+				de_slash(station);
+
 				// Select the image type: eQSL or scanned in card (front or back)
 				switch (selected_image_) {
 				case QI_EQSL:
