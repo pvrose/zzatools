@@ -42,6 +42,18 @@ void qsl_display::value(string callsign, record** qsos, int num_records) {
     Fl_Group::size(to_points(width_), to_points(height_));
 }
 
+void qsl_display::example_qso(record* qso) {
+	if (qso) {
+		qsos_ = new record*[1];
+		qsos_[0] = qso;
+		num_records_ = 1;
+	} else {
+		qsos_ = nullptr;
+		num_records_ = 0;
+	}
+	redraw();
+}
+
 void qsl_display::draw() {
 	// Colour the whole display
 	fl_rectf(x(), y(), w(), h(), FL_WHITE);
@@ -81,13 +93,30 @@ void qsl_display::draw_field(field_def& field) {
 	} else if (field.multi_qso) {
 		for (int i = 0; i < num_records_; i++) {
 			if (i > 0) text += '\n';
-			text += qsos_[i]->item(field.field);
+			string value = qsos_[i]->item(field.field);
+			if (field.field == "QSO_DATE" ||
+				field.field == "QSO_DATE_OFF") {
+				text += convert_date(value);
+			} else if (field.field == "TIME_ON" ||
+				field.field == "TIME_OFF") {
+				text += convert_time(value);
+			} else {
+				text += value;
+			}
 		}
 	} else {
 		set<string> values;
 		// Uniquify values
 		for (int i = 0; i < num_records_; i++) {
-			values.insert(qsos_[i]->item(field.field));
+			string value = qsos_[i]->item(field.field);
+			if (field.field == "QSO_DATE" ||
+				field.field == "QSO_DATE_OFF") {
+				value = convert_date(value);
+			} else if (field.field == "TIME_ON" ||
+				field.field == "TIME_OFF") {
+				value = convert_time(value);
+			}
+			values.insert(value);
 		}
 		for (auto it = values.begin(); it != values.end(); it++) {
 			if (it != values.begin()) text += ' ';
@@ -222,6 +251,8 @@ void qsl_display::load_data() {
 	call_settings.get("Height", height_, 0);
 	call_settings.get("Unit", (int&)unit_, (int)MILLIMETER);
 	call_settings.get("Card Design", temp, "");
+	call_settings.get("Date Format", (int&)date_format_, FMT_Y4MD_ADIF);
+	call_settings.get("Time Format", (int&)time_format_, FMT_HMS_ADIF);
 	filename_ = temp;
 	free(temp);
 	// Check it's a TSV file
@@ -373,6 +404,12 @@ void qsl_display::size(float w, float h, dim_unit unit, int max_records) {
     redraw();
 }
 
+void qsl_display::formats(date_format d, time_format t) {
+	date_format_ = d;
+	time_format_ = t;
+	redraw();
+}
+
 vector<qsl_display::item_def*>* qsl_display::data() {
 	return &data_;
 }
@@ -402,3 +439,63 @@ Fl_Image* qsl_display::get_image(string filename) {
 	}
 }
 
+string qsl_display::convert_date(string value) {
+	// Input format is YYYYMMDD
+	string result;
+	switch(date_format_) {
+		case FMT_Y4MD_ADIF:
+		result = value;
+			return result;
+		case FMT_Y4MD:
+			result = value.substr(0, 4) + '/' + value.substr(4, 2) + '/' + value.substr(6, 2);
+			return result;
+		case FMT_Y2MD:
+			result = value.substr(0, 4) + '/' + value.substr(4, 2) + '/' + value.substr(6, 2);
+			return result;
+		case FMT_DMY2:
+			result = value.substr(6,2) + '/' + value.substr(4,2) + '/' + value.substr(2,2);
+			return result;
+		case FMT_MDY2:
+			result = value.substr(4,2) + '/' + value.substr(6,2) + '/' + value.substr(2,2);
+			return result;
+		default:
+			return "Invalid";
+	}
+}
+
+string qsl_display::convert_time(string value) {
+	// Input format may be HHMMSS or HHMM
+	string result;
+	if (value.length() == 4) {
+		// input is HHMM - do not halucinate seconds
+		switch(time_format_) {
+			case FMT_HMS_ADIF:
+			case FMT_HM_ADIF:
+				result = value;
+				return result;
+			case FMT_HMS:
+			case FMT_HM:
+				result = value.substr(0,2) + ':' + value.substr(2,2);
+				return result;
+			default:
+				return "Invalid";
+		}
+	} else {
+		switch(time_format_) {
+			case FMT_HMS_ADIF:
+				result = value;
+				return result;
+			case FMT_HMS:
+				result = value.substr(0,2) + ':' + value.substr(2,2) + ':' + value.substr(4,2);
+				return result;
+			case FMT_HM_ADIF:
+				result = value.substr(0,4);
+				return result;
+			case FMT_HM:
+				result = value.substr(0,2) + ':' + value.substr(2,2);
+				return result;
+			default:
+				return "Invalid";
+		}
+	}
+}

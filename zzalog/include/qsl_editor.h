@@ -7,6 +7,7 @@
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Window.H>
 #include <FL/Fl_Output.H>
+#include <FL/Fl_Scroll.H>
 
 
 
@@ -32,9 +33,9 @@ class qsl_editor : public page_dialog
     // Create item groups
     void create_items();
     void create_labels();
-    void create_fparams(int& x, int& y, qsl_display::field_def& params);
-    void create_tparams(int& x, int& y, qsl_display::text_def& params);
-    void create_iparams(int& x, int& y, qsl_display::image_def& params);
+    void create_fparams(int& x, int& y, qsl_display::field_def* params);
+    void create_tparams(int& x, int& y, qsl_display::text_def* params);
+    void create_iparams(int& x, int& y, qsl_display::image_def* params);
     // Resize the group after adding or deleting an item
     void resize();
     // Redraw dislay
@@ -69,8 +70,15 @@ class qsl_editor : public page_dialog
     static void cb_ch_type(Fl_Widget* w, void* v);
     // Image
     static void cb_image(Fl_Widget* w, void* v);
+    // Date and time format
+    template<class ENUM> 
+    static void cb_datetime(Fl_Widget* w, void* v);
+    // Example QSO
+    static void cb_example(Fl_Widget* w, void* v);
 
     void populate_type(Fl_Choice* ch);
+    void populate_date(Fl_Choice* ch);
+    void populate_time(Fl_Choice* ch);
 
     // Number of rows in print
     int num_rows_;
@@ -101,6 +109,13 @@ class qsl_editor : public page_dialog
     // display window coordinates
     int win_x_;
     int win_y_;
+    // Date/Time formats
+    qsl_display::date_format date_format_;
+    qsl_display::time_format time_format_;
+    // Use current QSO
+    bool show_example_;
+    // Current QSO to use
+    record* example_qso_;
 
     //Widgets to reference
     Fl_Group* g_1_;

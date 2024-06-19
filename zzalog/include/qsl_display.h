@@ -77,6 +77,23 @@ class qsl_display : public Fl_Group
         POINT       // = 1/72 in.
     };
 
+    // Date format
+    enum date_format {
+        FMT_Y4MD_ADIF,     // 20240618
+        FMT_Y4MD,          // 2024/06/18
+        FMT_Y2MD,          // 24/06/18
+        FMT_DMY2,          // 18/06/24
+        FMT_MDY2           // 06/18/24
+    };
+
+    // Time format
+    enum time_format {
+        FMT_HMS_ADIF,      // 171033
+        FMT_HMS,           // 17:10:33
+        FMT_HM_ADIF,       // 1710
+        FMT_HM             // 17:10
+    };
+
     qsl_display(int X, int Y, int W, int H, const char* L = nullptr);
     ~qsl_display();
 
@@ -87,8 +104,11 @@ class qsl_display : public Fl_Group
 
     // Set the widget parameters - passed by reference to enable editing
     void value(string callsign, record** qsos = nullptr, int num_records = 0);
+    void example_qso(record* qso);
     // Set the size
     void size(float w, float h, dim_unit unit, int max_records);
+    // Set Date and Time formats - use settings_;
+    void formats(date_format d_format, time_format t_format);
 
     // Handle widget movement and sizing actions
     virtual int handle(int event);
@@ -110,6 +130,9 @@ class qsl_display : public Fl_Group
     void draw_field(field_def& field);
     void draw_text(text_def& text);
     void draw_image(image_def& image);
+
+    string convert_date(string text);
+    string convert_time(string text);
 
     // The widget parameters
     vector<item_def*> data_;
@@ -134,6 +157,9 @@ class qsl_display : public Fl_Group
     int next_y_;
     // Maximum number of records
     int max_records_;
+    // Formats
+    date_format date_format_;
+    time_format time_format_;
 
 
     // Convert to points
