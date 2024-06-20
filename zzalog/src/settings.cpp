@@ -198,8 +198,6 @@ void settings::cb_bn_cal(Fl_Widget* w, long arg) {
 	case CA_SAVE:
 		// Save values in active tab - recreate all_settings view
 		active_tab->do_callback(active_tab);
-		// TODO: This creates an exception
-		// ((config_tree*)that->settings_view_)->create_tree();
 		break;
 	}
 }

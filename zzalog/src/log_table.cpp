@@ -866,7 +866,6 @@ void log_table::dbl_click_column(int col) {
 		// Redraw the window
 		redraw();
 	}
-	// TODO: Condider whether this should be in an inherited class
 	else if (my_book_->book_type() == OT_EXTRACT || my_book_->book_type() == OT_DXATLAS) {
 		// Sorting on any other column is only available in extracted records
 		// Remember the record number

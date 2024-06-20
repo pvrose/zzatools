@@ -126,7 +126,6 @@ bool lotw_handler::upload_lotw_log(book* book, bool mine) {
 				string callsign = record_0->item("STATION_CALLSIGN");
 				// Generate TQSL command line - note the executable may have spaces in its filename
 				char* command = new char[256];
-				// TODO: Check command format in Linux
 				snprintf(command, 256, "\"%s\" -x -u -d %s -c %s", tqsl_executable.c_str(), new_filename.c_str(), callsign.c_str());
 				status_->misc_status(ST_NOTE, "LOTW: Signing and uploading QSLs to LotW");
 				status_->misc_status(ST_LOG, command);

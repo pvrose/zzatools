@@ -338,7 +338,6 @@ void qso_manager::start_qso() {
 }
 
 // End QSO - add time off
-// TODO: Can be called without current_qso_ - needs to be set by something.
 void qso_manager::end_qso() {
 	data_group_->end_qso();
 }

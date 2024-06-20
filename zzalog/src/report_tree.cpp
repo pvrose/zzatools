@@ -129,10 +129,6 @@ void report_tree::update(hint_t hint, qso_num_t record_num_1, qso_num_t record_n
 
 // Delete the tree
 void report_tree::delete_tree() {
-	// TODO: clear() doesn't appear to delete the Fl_Menu_Items
-	//Fl_Tree_Item* root_item = root();
-	//delete_children(root_item);
-	//delete root_item;
 	clear();
 }
 

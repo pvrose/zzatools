@@ -151,7 +151,6 @@ bool url_handler::post_url(string url, string resource, istream* req, ostream* r
 
 	/* check for errors */
 	if (result != CURLE_OK) {
-		// TODO: This doesn't clean up all the memory
 		char msg[256];
 		snprintf(msg, sizeof(msg), "URL_HANDLER: %s", error_msg);
 		status_->misc_status(ST_ERROR, msg);

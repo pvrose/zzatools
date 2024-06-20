@@ -309,7 +309,6 @@ void files_dialog::create_form(int X, int Y) {
 #ifdef _WIN32
 	tqsl_data_ = { "Please enter the TQSL executable", "Executable\t*.exe", &tqsl_executable_, &enable_tqsl_, in_tqsl_file, bn_tqsl_en };
 #else
-	// TODO: Change the file pattern for Posix 
 	tqsl_data_ = { "Please enter the TQSL executable", "Executable\t*", &tqsl_executable_, &enable_tqsl_, in_tqsl_file, bn_tqsl_en };
 #endif
 	bn_browse_tqsl->callback(cb_bn_browsefile, &tqsl_data_);
@@ -460,7 +459,6 @@ void files_dialog::create_form(int X, int Y) {
 #ifdef _WIN32
 	unzipper_data_ = { "Please select the unzip tool", "Executable\t*.exe", &unzipper_, nullptr, in_unzipper, nullptr };
 #else
-	// TODO: Change file pattern for Posix executables
 	unzipper_data_ = { "Please select the unzip tool", "", &unzipper_, nullptr, in_unzipper, nullptr };
 #endif
 	bn_browse_unzip->callback(cb_bn_browsefile, &unzipper_data_);

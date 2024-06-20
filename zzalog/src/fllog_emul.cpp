@@ -44,7 +44,6 @@ fllog_emul::~fllog_emul() {
 void fllog_emul::run_server() {
 	status_->misc_status(ST_NOTE, "FLLOG_EMUL: Creating new socket");
 	if (!rpc_handler_) {
-		// TODO - Do we need server address - it IS available 
 		Fl_Preferences nw_settings(settings_, "Network");
 		Fl_Preferences fllog_settings(nw_settings, "Fllog");
 		int rpc_port = 8421;

@@ -819,7 +819,6 @@ void qso_data::action_delete_qso() {
 	logging_state_t saved_state = logging_state_;
 	logging_state_ = QSO_INACTIVE;
 	book_->delete_record(true);
-	// TODO: Probably a frig - ne need to set up the qso_entry that is now exposed
 	action_activate(QSO_NONE);
 
 	// Now restore the original state
