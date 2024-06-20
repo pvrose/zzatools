@@ -3,7 +3,6 @@
 #include "rig_if.h"
 
 #include "record.h"
-#include "prefix.h"
 #include "status.h"
 #include "tabbed_forms.h"
 #include "intl_widgets.h"

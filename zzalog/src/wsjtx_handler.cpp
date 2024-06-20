@@ -2,7 +2,6 @@
 #include "status.h"
 #include "menu.h"
 #include "utils.h"
-#include "prefix.h"
 #include "toolbar.h"
 #include "qso_manager.h"
 #include "adi_reader.h"

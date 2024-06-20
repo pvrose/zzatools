@@ -12,10 +12,6 @@
 
 using namespace std;
 
-// TODO: Why can't this be in zzalib?
-
-
-
 	// text is column header
 	const char WEEKDAY[7][2] = { "S", "M", "T", "W", "T", "F", "S" };
 	// Format date is represented in ADIF

@@ -10,9 +10,6 @@
 // This class provides an emulation for fllog software, the logging application
 // for the fldigi suite of applications. It allows the log to be updated 
 // directly from fldigi
-// TODO: Currently fldigi crashes as soon as we reply to it.
-
-
 
 	class fllog_emul
 	{
