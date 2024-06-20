@@ -37,20 +37,11 @@ printer::printer(object_t type) :
 	, type_(type)
 	, current_y_(0)
 	, number_pages_(0)
-	, card_h_(0)
-	, card_w_(0)
 	, cwin_h_(0)
 	, cwin_w_(0)
 	, cwin_x_(0)
 	, cwin_y_(0)
-	, num_cols_(0)
-	, num_rows_(0)
-	, col_left_(nan(""))
-	, col_width_(nan(""))
-	, row_height_(nan(""))
-	, row_top_(nan(""))
-	, unit_(qsl_display::MILLIMETER)
-	, max_number_qsos_(0)
+	, card_data_(nullptr)
 {
 	fields_.clear();
 }
@@ -339,12 +330,14 @@ int printer::print_page_cards(size_t &item_num) {
 			num_records++;
 		}
 		while (num_records > 0) {
-			int print_records = num_records > max_number_qsos_ ? max_number_qsos_ : num_records;
+			int print_records = num_records > card_data_->max_qsos ? card_data_->max_qsos : num_records;
 			record** records = new record * [print_records];
 			for (int i = 0; i < print_records; i++) {
 				records[i] = navigation_book_->get_record(item_num + i, false);
 			}
-			qsl_display* qsl = new qsl_display(cwin_x_ + ((card % num_cols_) * card_w_), cwin_y_ + (((card / num_cols_) % num_rows_) * card_h_), 10, 10);
+			qsl_display* qsl = new qsl_display(
+				cwin_x_ + ((card % card_data_->columns) * card_data_->width), 
+				cwin_y_ + (((card / card_data_->columns) % card_data_->rows) * card_data_->height), 10, 10);
 			qsl->value(records[0]->item("STATION_CALLSIGN"), records, print_records);
 			item_num += print_records;
 			num_records -= print_records;
@@ -363,28 +356,15 @@ int printer::print_page_cards(size_t &item_num) {
 
 // Get the various dimensions of the card page 
 int printer::card_properties() {
-	Fl_Preferences qsl_settings(settings_, "QSL Design");
-	// Callsign specific settings
 	string callsign = qso_manager_->get_default(qso_manager::CALLSIGN);
-	Fl_Preferences call_settings(qsl_settings, callsign.c_str());
-	char* filename;
-	call_settings.get("Filename", filename, "");
-	card_filename_ = filename;
-	free(filename);
-	call_settings.get("Max QSOs per Card", max_number_qsos_, 1);
-	call_settings.get("Number Rows", num_rows_, 4);
-	call_settings.get("Number Columns", num_cols_, 2);
-	call_settings.get("Column Width", col_width_, 101.6);
-	call_settings.get("Row Height", row_height_, 67.7);
-	call_settings.get("First Row", row_top_, 12.9);
-	call_settings.get("First Column", col_left_, 4.6);
-	call_settings.get("Unit", (int&)unit_, (int)qsl_display::MILLIMETER);
-	items_per_page_ = num_rows_ * num_cols_;
+	card_data_ = qsl_display::data(callsign);
+	
+	items_per_page_ = card_data_->rows * card_data_->columns;
 	int top_margin = 0;
 	int left_margin = 0;
 	margins(&left_margin, &top_margin, nullptr, nullptr);
 	double conversion = nan("");
-	switch (unit_) {
+	switch (card_data_->unit) {
 		case qsl_display::INCH:
 			conversion = IN_TO_POINT;
 			break;
@@ -395,12 +375,12 @@ int printer::card_properties() {
 			conversion = 1.0;
 			break;
 	}
-	cwin_x_ = (int)(conversion * col_left_) - left_margin;
-	cwin_y_ =  (int)(conversion * row_top_) - top_margin;
-	card_w_ = (int)(conversion * col_width_);
-	cwin_w_ = num_cols_ * card_w_;
-	card_h_ = (int)(conversion * row_height_);
-	cwin_h_ = num_rows_ * card_h_;
+	cwin_x_ = (int)(conversion * card_data_->col_left) - left_margin;
+	cwin_y_ =  (int)(conversion * card_data_->row_top) - top_margin;
+	card_data_->width = (int)(conversion * card_data_->col_width);
+	cwin_w_ = card_data_->columns * card_data_->width;
+	card_data_->height = (int)(conversion * card_data_->row_height);
+	cwin_h_ = card_data_->rows * card_data_->height;
 	//
 	int last_item = navigation_book_->size() - 1;
 	number_pages_ = (last_item / items_per_page_) + 1;

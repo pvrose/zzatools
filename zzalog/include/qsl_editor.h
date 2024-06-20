@@ -32,7 +32,7 @@ class qsl_editor : public page_dialog
 
     // Create item groups
     void create_items();
-    void create_labels();
+    void create_labels(int curr_y);
     void create_fparams(int& x, int& y, qsl_display::field_def* params);
     void create_tparams(int& x, int& y, qsl_display::text_def* params);
     void create_iparams(int& x, int& y, qsl_display::image_def* params);
@@ -50,6 +50,8 @@ class qsl_editor : public page_dialog
     static void cb_callsign(Fl_Widget* w, void* v);
     // Filename
     static void cb_filename(Fl_Widget* w, void* v);
+    // Browse 
+    static void cb_browse(Fl_Widget* w, void* v);
     // Dimension radio 
     static void cb_radio_dim(Fl_Widget* w, void* v);
     // Size parameter changed
@@ -80,38 +82,13 @@ class qsl_editor : public page_dialog
     void populate_date(Fl_Choice* ch);
     void populate_time(Fl_Choice* ch);
 
-    // Number of rows in print
-    int num_rows_;
-    // Number of columns to print
-    int num_cols_;
-    // dimension usnits
-    qsl_display::dim_unit unit_;
-    // Label width
-    double width_;
-    // Label height
-    double height_;
-    // Column width
-    double col_width_;
-    // Row height
-    double row_height_;
-    // First column position
-    double col_left_;
-    // First row position
-    double row_top_;
-    // Number of QSOs per card
-    int number_qsos_;
-    // Callsign to read parameters
+     // Callsign to read parameters
     string callsign_;
-    // String filename
-    string filename_;
     // Data for file browser
     browser_data_t filedata_;
     // display window coordinates
     int win_x_;
     int win_y_;
-    // Date/Time formats
-    qsl_display::date_format date_format_;
-    qsl_display::time_format time_format_;
     // Use current QSO
     bool show_example_;
     // Current QSO to use

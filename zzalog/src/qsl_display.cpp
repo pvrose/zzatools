@@ -18,6 +18,8 @@ extern status* status_;
 extern Fl_Preferences* settings_;
 // Dynamically drawn QSL card label
 
+map<string, qsl_display::card_data> qsl_display::all_data_;
+
 qsl_display::qsl_display(int X, int Y, int W, int H, const char* L) : Fl_Group(X, Y, W, H, L) {
     color(FL_WHITE);
 	box(FL_FLAT_BOX);
@@ -25,21 +27,27 @@ qsl_display::qsl_display(int X, int Y, int W, int H, const char* L) : Fl_Group(X
     qsos_ = nullptr;
     num_records_ = 0;
 	callsign_ = "";
-    data_.clear();
     editable_ = false;
 	end();
 
 }
-qsl_display::~qsl_display() {};
+qsl_display::~qsl_display() {
+	save_data();
+};
 
 void qsl_display::value(string callsign, record** qsos, int num_records) {
     qsos_ = qsos;
     num_records_ = num_records;
     callsign_ = callsign;
-    load_data();
+    if (all_data_.find(callsign) == all_data_.end()) {
+		load_data(callsign);
+	}
+	data_ = &all_data_.at(callsign);
     redraw();
-
-    Fl_Group::size(to_points(width_), to_points(height_));
+	resize();
+}
+void qsl_display::resize() {
+    Fl_Group::size(to_points(data_->width), to_points(data_->height));
 }
 
 void qsl_display::example_qso(record* qso) {
@@ -59,7 +67,7 @@ void qsl_display::draw() {
 	fl_rectf(x(), y(), w(), h(), FL_WHITE);
 	// Save the current font/size
 
-    for (auto it = data_.begin(); it != data_.end(); it++) {
+    for (auto it = data_->items.begin(); it != data_->items.end(); it++) {
         item_def& item = *(*it);
 		switch(item.type) {
 			case FIELD: {
@@ -86,7 +94,7 @@ void qsl_display::draw_field(field_def& field) {
 	if (num_records_ == 0) {
 		text = field.field;
 		if (field.multi_qso) {
-			for (int ix = 1; ix < max_records_; ix++) {
+			for (int ix = 1; ix < data_->max_qsos; ix++) {
 				text +="\nditto";
 			}
 		}
@@ -227,7 +235,7 @@ int qsl_display::handle(int event) {
 
 // Convert value from specified unit to points
 int qsl_display::to_points(float value) {
-	switch (unit_) {
+	switch (data_->unit) {
 	case INCH:
 		// 72 points per inch
 		return (int)(value * IN_TO_POINT);
@@ -242,40 +250,48 @@ int qsl_display::to_points(float value) {
 }
 
 // Load data
-void qsl_display::load_data() {
+void qsl_display::load_data(string callsign) {
+	card_data* data = &(all_data_[callsign]);
     	// Get width and height of label
 	Fl_Preferences qsl_settings(settings_, "QSL Design");
 	char* temp;
-	Fl_Preferences call_settings(qsl_settings, callsign_.c_str());
-	call_settings.get("Width", width_, 0);
-	call_settings.get("Height", height_, 0);
-	call_settings.get("Unit", (int&)unit_, (int)MILLIMETER);
+	Fl_Preferences call_settings(qsl_settings, callsign.c_str());
+	call_settings.get("Width", data->width, 0);
+	call_settings.get("Height", data->height, 0);
+	call_settings.get("Unit", (int&)data->unit, (int)MILLIMETER);
+	call_settings.get("Number Rows", data->rows, 4);
+	call_settings.get("Number Columns", data->columns, 2);
+	call_settings.get("Column Width", data->col_width, 101.6);
+	call_settings.get("Row Height", data->row_height, 67.7);
+	call_settings.get("First Row", data->row_top, 12.9);
+	call_settings.get("First Column", data->col_left, 4.6);
+	call_settings.get("Max QSOs per Card", data->max_qsos, 1);
+	call_settings.get("Date Format", (int&)data->f_date, FMT_Y4MD_ADIF);
+	call_settings.get("Time Format", (int&)data->f_time, FMT_HMS_ADIF);
 	call_settings.get("Card Design", temp, "");
-	call_settings.get("Date Format", (int&)date_format_, FMT_Y4MD_ADIF);
-	call_settings.get("Time Format", (int&)time_format_, FMT_HMS_ADIF);
-	filename_ = temp;
+	data->filename = temp;
 	free(temp);
 	// Check it's a TSV file
-	size_t pos = filename_.find_last_of('.');
-	if (pos == string::npos || filename_.substr(pos) != ".tsv") {
+	size_t pos = data->filename.find_last_of('.');
+	if (pos == string::npos || data->filename.substr(pos) != ".tsv") {
 		char msg[256];
-		snprintf(msg, sizeof(msg), "QSL: Invalid filename %s - setting to no value", filename_.c_str());
+		snprintf(msg, sizeof(msg), "QSL: Invalid filename %s - setting to no value", data->filename.c_str());
 		status_->misc_status(ST_WARNING, msg);
-		filename_ = "";
+		data->filename = "";
 	}
-	if (width_ == 0 || height_ == 0 || filename_.length() == 0) {
+	if (data->width == 0 || data->height == 0 || data->filename.length() == 0) {
 		// We have either width or height not defined - so load the edfault data
 		char msg[256];
-		snprintf(msg, sizeof(msg), "QSL: Incorrect info W=%g, H=%g, File=%s", width_, height_, filename_.c_str());
+		snprintf(msg, sizeof(msg), "QSL: Incorrect info W=%g, H=%g, File=%s", data->width, data->height, data->filename.c_str());
 		status_->misc_status(ST_ERROR, msg);
-		data_.clear();
+		data->items.clear();
 	} else {
 		char msg[100];
-		snprintf(msg, sizeof(msg), "QSL: Reading card image data from %s", filename_.c_str());
-		data_.clear();
+		snprintf(msg, sizeof(msg), "QSL: Reading card image data from %s", data->filename.c_str());
+		data->items.clear();
 		status_->misc_status(ST_LOG, msg);
 		ifstream ip;
-		ip.open(filename_.c_str(), fstream::in);
+		ip.open(data->filename.c_str(), fstream::in);
 		string line;
 		vector<string> words;
 		while(ip.good()) {
@@ -325,11 +341,11 @@ void qsl_display::load_data() {
 					break;
 				}
 				}
-				data_.push_back(item);
+				data->items.push_back(item);
 			}
 		}
 		ip.close();
-		snprintf(msg, sizeof(msg), "QSL: %d items read from %s", data_.size(), filename_.c_str());
+		snprintf(msg, sizeof(msg), "QSL: %d items read from %s", data->items.size(), data->filename.c_str());
 		status_->misc_status(ST_OK, msg);
 	}
 }
@@ -338,19 +354,28 @@ void qsl_display::save_data() {
     // Get width and height of label
 	Fl_Preferences qsl_settings(settings_, "QSL Design");
 	Fl_Preferences call_settings(qsl_settings, callsign_.c_str());
-	call_settings.set("Width", width_);
-	call_settings.set("Height", height_);
-	call_settings.set("Unit", (int)unit_);
-	call_settings.set("Filename", filename_.c_str());
+	call_settings.set("Width", data_->width);
+	call_settings.set("Height", data_->height);
+	call_settings.set("Unit", (int)data_->unit);
+	call_settings.set("Number Rows", data_->rows);
+	call_settings.set("Number Columns", data_->columns);
+	call_settings.set("Column Width", data_->col_width);
+	call_settings.set("Row Height", data_->row_height);
+	call_settings.set("First Row", data_->row_top);
+	call_settings.set("First Column", data_->col_left);
+	call_settings.set("Max QSOs per Card", data_->max_qsos);
+	call_settings.set("Date Format", (int)data_->f_date);
+	call_settings.set("Time Format", (int)data_->f_time);
+	call_settings.set("Card Design", data_->filename.c_str());
    	char msg[100];
-	snprintf(msg, sizeof(msg), "QSL: Writing card image data to %s", filename_.c_str());
+	snprintf(msg, sizeof(msg), "QSL: Writing card image data to %s", data_->filename.c_str());
 	status_->misc_status(ST_LOG, msg);
 	ofstream op;
-	op.open(filename_.c_str(), fstream::out);
+	op.open(data_->filename.c_str(), fstream::out);
 	string line;
 	int pos = 0;
-	for (int ix = 0; ix < data_.size() && op.good(); ix++) {
-		qsl_display::item_def* item = data_[ix];
+	for (int ix = 0; ix < data_->items.size() && op.good(); ix++) {
+		qsl_display::item_def* item = data_->items[ix];
 		if (item->type != NONE) {
 			op << (int)item->type << '\t';
 			switch (item->type) {
@@ -390,28 +415,15 @@ void qsl_display::save_data() {
 		}
 	}
 	op.close();
-	snprintf(msg, sizeof(msg), "QSL: %d items written to %s", data_.size(), filename_.c_str());
+	snprintf(msg, sizeof(msg), "QSL: %d items written to %s", data_->items.size(), data_->filename.c_str());
 	status_->misc_status(ST_OK, msg);
 }
 
-void qsl_display::size(float w, float h, dim_unit unit, int max_records) {
-    width_ = w;
-    height_ = h;
-    unit_ = unit;
-	max_records_ = max_records;
-
-    Fl_Group::size(to_points(width_), to_points(height_));
-    redraw();
-}
-
-void qsl_display::formats(date_format d, time_format t) {
-	date_format_ = d;
-	time_format_ = t;
-	redraw();
-}
-
-vector<qsl_display::item_def*>* qsl_display::data() {
-	return &data_;
+qsl_display::card_data* qsl_display::data(string callsign) {
+	if (all_data_.find(callsign) == all_data_.end()) {
+		load_data(callsign);
+	}
+	return &all_data_.at(callsign);
 }
     
 Fl_Image* qsl_display::get_image(string filename) {
@@ -442,7 +454,7 @@ Fl_Image* qsl_display::get_image(string filename) {
 string qsl_display::convert_date(string value) {
 	// Input format is YYYYMMDD
 	string result;
-	switch(date_format_) {
+	switch(data_->f_date) {
 		case FMT_Y4MD_ADIF:
 		result = value;
 			return result;
@@ -468,7 +480,7 @@ string qsl_display::convert_time(string value) {
 	string result;
 	if (value.length() == 4) {
 		// input is HHMM - do not halucinate seconds
-		switch(time_format_) {
+		switch(data_->f_time) {
 			case FMT_HMS_ADIF:
 			case FMT_HM_ADIF:
 				result = value;
@@ -481,7 +493,7 @@ string qsl_display::convert_time(string value) {
 				return "Invalid";
 		}
 	} else {
-		switch(time_format_) {
+		switch(data_->f_time) {
 			case FMT_HMS_ADIF:
 				result = value;
 				return result;

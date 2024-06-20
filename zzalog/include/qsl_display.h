@@ -94,22 +94,38 @@ class qsl_display : public Fl_Group
         FMT_HM             // 17:10
     };
 
+    // Card definition data
+    struct card_data {
+        dim_unit unit;      // Dimensions i=unit
+        double width;       // Individual label width
+        double height;      // Individial label height
+        int rows;           // Number of rows per sheet
+        int columns;        // Number of columns per sheet
+        double col_width;   // Column separation
+        double row_height;  // Row separation
+        double row_top;     // Top margin
+        double col_left;    // Left margin
+        int max_qsos;       // maximum number of QSOs per label
+        date_format f_date; // Format for date to be printed
+        time_format f_time; // Format for time to be printed
+        string filename;    // Filename of layout data file
+        vector<item_def*> items; // layout items read in from file 
+    };
+
     qsl_display(int X, int Y, int W, int H, const char* L = nullptr);
     ~qsl_display();
 
     // Load data
-    void load_data();
+    static void load_data(string callsign);
     // Save data
     void save_data();
+    // Load items
+    void load_items();
 
     // Set the widget parameters - passed by reference to enable editing
+    void resize();
     void value(string callsign, record** qsos = nullptr, int num_records = 0);
     void example_qso(record* qso);
-    // Set the size
-    void size(float w, float h, dim_unit unit, int max_records);
-    // Set Date and Time formats - use settings_;
-    void formats(date_format d_format, time_format t_format);
-
     // Handle widget movement and sizing actions
     virtual int handle(int event);
     // Draw the objects explicitly
@@ -120,10 +136,10 @@ class qsl_display : public Fl_Group
     bool editable();
 
     // Pointer to the data for editor to use
-    vector<item_def*>* data();
+    static card_data* data(string callsign);
 
     // Get the image at that filename
-    Fl_Image* get_image(string filename);
+    static Fl_Image* get_image(string filename);
 
     protected:
 
@@ -135,33 +151,20 @@ class qsl_display : public Fl_Group
     string convert_time(string text);
 
     // The widget parameters
-    vector<item_def*> data_;
+    static map<string, card_data> all_data_;
+    card_data* data_;
     // The array of QSOs to be displayed on the card
     record** qsos_;
     // The size of the above array
     int num_records_;
     // Set callsign
     bool editable_;
-    // Width of each instance of qsl_card (in units)
-    float width_;
-    // Height of each instance of qsl_card (in units)
-    float height_;
-    // Unit of width and height
-    dim_unit unit_;
-    // Filename
-    string filename_;
     // Callsign
     string callsign_;
     // Positions to use if dx or dy are -1
     int next_x_;
     int next_y_;
-    // Maximum number of records
-    int max_records_;
-    // Formats
-    date_format date_format_;
-    time_format time_format_;
-
-
+ 
     // Convert to points
     int to_points(float value);
 

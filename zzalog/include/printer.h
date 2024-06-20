@@ -68,19 +68,7 @@ using namespace std;
 		int cwin_w_;
 		int cwin_h_;
 		// Card parameters
-		qsl_display::dim_unit unit_;
-		int card_w_;
-		int card_h_;
-		// Label parameters
-		int num_rows_;
-		int num_cols_;
-		double col_left_;
-		double col_width_;
-		double row_top_;
-		double row_height_;
-		// Callsign specific
-		int max_number_qsos_;
-		string card_filename_;
+		qsl_display::card_data* card_data_;
 	};
 
 #endif
