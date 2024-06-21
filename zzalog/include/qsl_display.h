@@ -5,20 +5,27 @@
 
 #include <vector>
 
-#include <FL/Fl_Group.H>
+#include <FL/Fl_Widget.H>
 #include <FL/Fl_Box.H>
 
 using namespace std;
+
+// This class provides the drawing of a QSL label. It is used as part of the
+// editor, the QSL viewer in QSO dashboard and tne printer.
 
 // unit conversions: 1" = 72pt = 25.4 mm
 const float MM_TO_POINT = 72.0f / 25.4f;
 const float IN_TO_POINT = 72.0f;
 
-class qsl_display : public Fl_Group 
+class qsl_display : public Fl_Widget 
 {
 
     public:
 
+    // Specifies the drawing element; 
+    // FIELD: A field taken from the QSO record
+    // TEXT: Justa  textual comment on the QSL card
+    // IMAGE: An image to be printed on the card
     enum item_type {
         NONE,   // Used to mark an item for removal
         FIELD,  // Draw the field text and its label
@@ -26,12 +33,15 @@ class qsl_display : public Fl_Group
         IMAGE,  // An Fl_Box displaying an image 
     };
 
+    // Specifies the font, size and colour to be used for
+    // field values, field labels and text values
     struct style_def {
         Fl_Font font { FL_HELVETICA };       // Font
         Fl_Fontsize size { FL_NORMAL_SIZE };   // Size
         Fl_Color colour { FL_BLACK };    // Colour  
     };
 
+    // Structure describing the parameters of a field and its label
     struct field_def {
         string field { "" };        // Field name
         string label { "" };        // The label on the QSL (e.g. "To:" for CALL)
@@ -46,6 +56,7 @@ class qsl_display : public Fl_Group
 
     };
 
+    // Structure describing the paarmeters of a text item
     struct text_def {
         string text { "Here be dragons!"};
         style_def t_style;
@@ -54,6 +65,7 @@ class qsl_display : public Fl_Group
 
     };
 
+    // Structure describing the paarmeters of an image item
     struct image_def {
         string filename { "" };
         Fl_Image* image { nullptr };
@@ -61,6 +73,7 @@ class qsl_display : public Fl_Group
         int dy { 0 };
     };
 
+    // Structure describing the paarmeters of an item
     struct item_def {
         item_type type;
         field_def field;
@@ -122,13 +135,13 @@ class qsl_display : public Fl_Group
     // Load items
     void load_items();
 
-    // Set the widget parameters - passed by reference to enable editing
+    // Resize the drawing according to the card label width and height parameters
     void resize();
+    // Set the callsign to be used and the records to include in the label
     void value(string callsign, record** qsos = nullptr, int num_records = 0);
+    // Short-cut version of above with one QSO and callsign to be taken from it
     void example_qso(record* qso);
-    // Handle widget movement and sizing actions
-    virtual int handle(int event);
-    // Draw the objects explicitly
+    // Overide the Fl_Group::draw() to impelment the drawing.
     virtual void draw();
 
     // Editable flag to allow widgets to be edited in situ
@@ -143,15 +156,22 @@ class qsl_display : public Fl_Group
 
     protected:
 
+    // Draw an individual field item
     void draw_field(field_def& field);
+    // Draw an individual text item
     void draw_text(text_def& text);
+    // Draw an individual image iotem
     void draw_image(image_def& image);
 
+    // Convert the ADIF format date to the required format
     string convert_date(string text);
+    // Convert the aDIF format yime to the required format
     string convert_time(string text);
 
-    // The widget parameters
+    // Drawing data for all callsigns - needs to be static to access the 
+    // label size data outwith a specific instance of the drawing 
     static map<string, card_data> all_data_;
+    // Drawing data for the current instance
     card_data* data_;
     // The array of QSOs to be displayed on the card
     record** qsos_;

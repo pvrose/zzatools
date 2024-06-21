@@ -22,47 +22,57 @@ extern Fl_Preferences* settings_;
 extern qso_manager* qso_manager_;
 extern status* status_;
 
+// Constructor
 qsl_editor::qsl_editor(int X, int Y, int W, int H, const char* L) :
     page_dialog(X, Y, W, H, L),
 	show_example_(false)
 {
-
+	// Load settings
     load_values();
+	// Create the qsl_display instance
 	create_display();
-
+	// Load the display settings for this callsign
     display_->value(callsign_);
+	// We shall be editing the display
     display_->editable(true);
 
-
-
+	// Only show the dipslay window if this dialog is active
 	if (active()) w_display_->show();
 	else w_display_->hide();
- 
+	// Add all the widgets in this dialog
     create_form(X, Y);
 
 }
 
+// Destructor
 qsl_editor::~qsl_editor() {
+	// delete the display window
 	Fl::delete_widget(w_display_);
 }
 
+// Overload of handle() to intercept ACTIVATE and DEACTIVATE events
 int qsl_editor::handle(int event) {
 	switch(event) {
 	case FL_DEACTIVATE: {
+		// This is being deactivated, so hide the display window
 		if (display_) w_display_->hide();
 		break;
 	}
 	case FL_ACTIVATE: {
+		// This is being activated so show the display window
 		if (display_) w_display_->show();
 		break;
 	}
 	}
+	// Pass all events to page_dialog
 	return page_dialog::handle(event);
 }
 
+// Load the settings
 void qsl_editor::load_values() {
+	// Get the current or default callsign to use initially
     callsign_ = qso_manager_->get_default(qso_manager::CALLSIGN);
-
+	// Get the display window position
 	Fl_Preferences windows_settings(settings_, "Windows");
 	Fl_Preferences qsl_win_settings(windows_settings, "QSL Design");
 	qsl_win_settings.get("Top", win_y_, 10);
@@ -70,14 +80,17 @@ void qsl_editor::load_values() {
 
 }
 
+// Instantiate all widgets
 void qsl_editor::create_form(int X, int Y) {
 	
     int curr_x = X + GAP;
     int curr_y = Y + GAP;
     int max_x;
 
+	// Get any existing data for this callsign
 	qsl_display::card_data* data = qsl_display::data(callsign_);
 
+	// Group 1: Template file
     g_1_ = new Fl_Group(curr_x, curr_y, 100, 100, "Template File");
     g_1_->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
     g_1_->labelfont(FL_BOLD);
@@ -86,6 +99,7 @@ void qsl_editor::create_form(int X, int Y) {
 
 	curr_y += HTEXT;
 
+	// Input choice to select callsign to use
     field_input* w101 = new field_input(curr_x + WLLABEL, curr_y, WSMEDIT, HBUTTON, "Callsign for QSL");
     w101->value(callsign_.c_str());
     w101->callback(cb_callsign, &callsign_);
@@ -93,6 +107,7 @@ void qsl_editor::create_form(int X, int Y) {
 	w101->tooltip("Select the callsign to change QSL template parameters for");
 
     curr_y += HBUTTON;
+	// Input field to specify filename
     intl_input* w102 = new intl_input(curr_x + GAP, curr_y, WEDIT * 2, HBUTTON);
     w102->callback(cb_filename, &data->filename);
     w102->when(FL_WHEN_CHANGED);
@@ -101,6 +116,7 @@ void qsl_editor::create_form(int X, int Y) {
 
     curr_x += w102->w() + GAP;
 
+	// Button to open a file browser to get file
     Fl_Button* w103 = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Browse");
     w103->align(FL_ALIGN_INSIDE);
     filedata_ = { "Please enter the QSL template", "TSV\t*.tsv", &data->filename, nullptr, w102, nullptr};
@@ -118,6 +134,7 @@ void qsl_editor::create_form(int X, int Y) {
 
     curr_x = x() + GAP;
 
+	// Group 2: Size and Format parameters
     g_2_ = new Fl_Group(curr_x, curr_y, 100, 100, "Size & format parameters");
     g_2_->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
     g_2_->labelfont(FL_BOLD);
@@ -126,8 +143,8 @@ void qsl_editor::create_form(int X, int Y) {
 
 	curr_y += HTEXT;
 
-	// radio buttons to select size units
 	curr_x += GAP;
+	// Group 2.1 - radio buttons for units
 	Fl_Group* g_201 = new Fl_Group(curr_x, curr_y, WBUTTON, HBUTTON * 3);
 	g_201->box(FL_FLAT_BOX);
 	// Radio to select inches
@@ -157,6 +174,7 @@ void qsl_editor::create_form(int X, int Y) {
 
     curr_x += g_201->w();
     curr_y = g_201->y();
+	// Group 2.2 - All the size buttons
     Fl_Group* g_202 = new Fl_Group(curr_x, curr_y, 4*(WBUTTON + WLABEL), 3*HBUTTON + HTEXT + GAP);
     g_202->box(FL_FLAT_BOX);
 
@@ -166,7 +184,6 @@ void qsl_editor::create_form(int X, int Y) {
 	w_20201->value(data->columns);
 	w_20201->align(FL_ALIGN_LEFT);
 	w_20201->callback(cb_value<Fl_Value_Input, int>, &data->columns);
-//	w_20201->when(FL_WHEN_ENTER_KEY);
 	w_20201->tooltip("Please specify the number of columns when printing");
     curr_x += WLABEL + WBUTTON;;
 	// Input to specify the width of the label
@@ -182,15 +199,13 @@ void qsl_editor::create_form(int X, int Y) {
 	w_20203->value(data->col_left);
 	w_20203->align(FL_ALIGN_LEFT);
 	w_20203->callback(cb_value<Fl_Value_Input, double>, &data->col_left);
-//	w_20203->when(FL_WHEN_ENTER_KEY);
 	w_20203->tooltip("Please specify the position of the first column");
     curr_x += WLABEL + WBUTTON;;
-	// Input to specify the gap between columns
+	// Input to specify the spacing between columns (between left edges)
 	Fl_Value_Input* w_20204 = new Fl_Value_Input(curr_x, curr_y, WBUTTON, HBUTTON, "Spacing");
 	w_20204->value(data->col_width);
 	w_20204->align(FL_ALIGN_LEFT);
 	w_20204->callback(cb_value<Fl_Value_Input, double>, &data->col_width);
-//	w_20204->when(FL_WHEN_ENTER_KEY);
 	w_20204->tooltip("Please specify the spacing between columns");
     curr_x = g_202->x();
     curr_x += WLABEL;
@@ -201,7 +216,6 @@ void qsl_editor::create_form(int X, int Y) {
 	w_20205->value(data->rows);
 	w_20205->align(FL_ALIGN_LEFT);
 	w_20205->callback(cb_value<Fl_Value_Input, int>, &data->rows);
-//	w_20205->when(FL_WHEN_ENTER_KEY);
 	w_20205->tooltip("Please specify the number of rows when printing");
     curr_x += WLABEL + WBUTTON;;
 	// Input to specify the height of each label
@@ -209,7 +223,6 @@ void qsl_editor::create_form(int X, int Y) {
 	w_20206->value(data->height);
 	w_20206->align(FL_ALIGN_LEFT);
 	w_20206->callback(cb_size_double, &data->height);
-	w_20206->when(FL_WHEN_ENTER_KEY);
 	w_20206->tooltip("Please specify the width of the label in the selected label");
     curr_x += WLABEL + WBUTTON;;
 	// Input to specify the top of the first label
@@ -217,7 +230,6 @@ void qsl_editor::create_form(int X, int Y) {
 	w_20207->value(data->row_top);
 	w_20207->align(FL_ALIGN_LEFT);
 	w_20207->callback(cb_value<Fl_Value_Input, double>, &data->row_top);
-//	w_20207->when(FL_WHEN_ENTER_KEY);
 	w_20207->tooltip("Please specify the position of the first row");
     curr_x += WLABEL + WBUTTON;;
 	// Input to specify the gap between each row
@@ -225,7 +237,6 @@ void qsl_editor::create_form(int X, int Y) {
 	w_20208->value(data->row_height);
 	w_20208->align(FL_ALIGN_LEFT);
 	w_20208->callback(cb_value<Fl_Value_Input, double>, &data->row_height);
-//	w_20208->when(FL_WHEN_ENTER_KEY);
 	w_20208->tooltip("Please specify the spacing between rows");
     curr_x = g_202->x();
 	curr_x += WLABEL;
@@ -235,7 +246,6 @@ void qsl_editor::create_form(int X, int Y) {
 	w_20209->value(data->max_qsos);
 	w_20209->align(FL_ALIGN_LEFT);
 	w_20209->callback(cb_value<Fl_Value_Input, int>, &data->max_qsos);
-//	w_20209->when(FL_WHEN_ENTER_KEY);
 	w_20209->tooltip("Please specify the number of QSOs per Card");
 	// Output to display size in points
 	curr_x += WBUTTON + WLABEL;
@@ -250,9 +260,11 @@ void qsl_editor::create_form(int X, int Y) {
 
 	curr_x = x() + GAP;
 	curr_y += GAP;
+	// Group 2.3 - date and time formats
 	Fl_Group* g_203 = new Fl_Group(curr_x, curr_y, 2 * WSMEDIT + 2 * WLLABEL+ GAP, HBUTTON * 2);
 
 	curr_x += WLLABEL;
+	// Date format choice
 	Fl_Choice* w_20301 = new Fl_Choice(curr_x, curr_y, WSMEDIT, HBUTTON, "Date Format");
 	w_20301->align(FL_ALIGN_LEFT);
 	w_20301->tooltip("Select the way date is output on the QSL card");
@@ -261,16 +273,17 @@ void qsl_editor::create_form(int X, int Y) {
 	w_20301->callback(cb_datetime<qsl_display::date_format>, (void*)&data->f_date);
 
 	curr_x += w_20301->w() + WLLABEL;
+	// Time format choice
 	Fl_Choice* w_20302 = new Fl_Choice(curr_x, curr_y, WSMEDIT, HBUTTON, "Time Format");
 	w_20302->align(FL_ALIGN_LEFT);
-	w_20302->tooltip("Select the way date is output on the QSL card");
+	w_20302->tooltip("Select the way time is output on the QSL card");
 	populate_time(w_20302);
 	w_20302->value(data->f_time);
 	w_20302->callback(cb_datetime<qsl_display::time_format>, (void*)&data->f_time);
 
 	curr_x = x() + GAP + WLLABEL;
 	curr_y += HBUTTON;
-
+	// A button to disable/enable using the current QSO as an example QSO
 	Fl_Light_Button* w_20303 = new Fl_Light_Button(curr_x, curr_y, HBUTTON, HBUTTON, "Use Example QSO");
 	w_20303->align(FL_ALIGN_LEFT);
 	w_20303->tooltip("Show an example QSO rather than the template");
@@ -296,13 +309,17 @@ void qsl_editor::create_form(int X, int Y) {
 
 	int avail_height = Fl_Group::h() - (curr_y - y());
 
-	g_4_ = new Fl_Group(curr_x, curr_y, 10, avail_height, "Design widgets");
+	// There is no Group 3
+
+	// Group 4 - show the drawing item data
+	g_4_ = new Fl_Group(curr_x, curr_y, 10, avail_height, "Design items");
     g_4_->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
     g_4_->labelfont(FL_BOLD);
     g_4_->labelsize(FL_NORMAL_SIZE + 2);
     g_4_->box(FL_BORDER_BOX);
 	g_4_->end();
 
+	// Add all the items to Group 4
     create_items();
 
     end();
@@ -313,6 +330,7 @@ void qsl_editor::create_form(int X, int Y) {
 	show();
 }
 
+// Resize qsl_editor to fit all three groups
 void qsl_editor::resize() {
     // Find size of display and adjust g_3_
     int w = display_->w();
@@ -331,19 +349,22 @@ void qsl_editor::resize() {
 // Save the new design
 void qsl_editor::save_values() {
 
+	// Save the current callsign's card data
     display_->save_data();
-
+	
+	// Sabe the display window position
 	Fl_Preferences windows_settings(settings_, "Windows");
 	Fl_Preferences qsl_win_settings(windows_settings, "QSL Design");
-	qsl_win_settings.set("Top", win_y_);
+	qsl_win_settings.set("Top"
+, win_y_);
 	qsl_win_settings.set("Left", win_x_);
 
 	settings_->flush();
 }
-
-// Create item groups
+// Create the card data item data widgets
 void qsl_editor::create_items() {
 
+	// Remove all existing widgets
 	g_4_->clear();
 	// Redraw with no widgets to force screen to clear
 	g_4_->redraw();
@@ -354,13 +375,15 @@ void qsl_editor::create_items() {
 	int max_x = curr_x;
 	g_4_->begin();
 
+	// Get the card data for this callsign
 	qsl_display::card_data* data = qsl_display::data(callsign_);
 
+	// Group 4.2 - New item (NB group ordering has changes 4.2 is before 4.1)
 	Fl_Group* g_402 = new Fl_Group(save_x + WLABEL, curr_y, 100, HBUTTON);
 	g_402->box(FL_FLAT_BOX);
 
 	curr_x = save_x + WLABEL / 2;
-	// Now the varioius widgets
+	// Nrew item choice selects item type
 	Fl_Choice* w_40201 = new Fl_Choice(curr_x, curr_y, WBUTTON, HBUTTON, "New");
 	w_40201->tooltip("Select the new type to add");
 	w_40201->callback(cb_new_item);
@@ -371,21 +394,26 @@ void qsl_editor::create_items() {
 	curr_x += w_40201->w();
 	g_402->end();
 
+	// Only display column labels if there is data to display
 	if (data->items.size()) {
 		create_labels(curr_y);
 		curr_y += HBUTTON;
 	}
-	// Leave space for the New Item button
+	// Use the remainder of the space for an Fl_Scroll containing the items
 	int available_h = g_4_->y() + g_4_->h() - curr_y - GAP;
 	curr_x = g_4_->x() + GAP;
 
+	// Fl_Scroll encapsulates a set of Group 4.1.x
 	Fl_Scroll* gg_401 = new Fl_Scroll(curr_x, curr_y, 100, available_h);
 	gg_401->type(Fl_Scroll::VERTICAL);
 	
+	// For each item...
 	for (int ix = 0; ix < data->items.size(); ix++) {
+		// Get the item
 		qsl_display::item_def* item = data->items[ix];
 
 		if (item->type != qsl_display::NONE) {
+			// Group 4.1.x (1 per item) - The item design data for editing
 			Fl_Group* g_401 = new Fl_Group(save_x, curr_y, 100, HBUTTON);
 			char id[5];
 			snprintf(id, 5, "%2d", ix);
@@ -394,6 +422,7 @@ void qsl_editor::create_items() {
 			g_401->box(FL_FLAT_BOX);
 
 			curr_x = save_x + WLABEL / 2;
+			// Choice to allow item type to be changed (NONE effectively deletes it)
 			Fl_Choice* w_40101 = new Fl_Choice(curr_x, curr_y, WBUTTON, HBUTTON);
 			w_40101->tooltip("Select the item type - NONE to ignore");
 			w_40101->callback(cb_ch_type, &item->type);
@@ -405,14 +434,17 @@ void qsl_editor::create_items() {
 			// Now create the individual row
 			switch(item->type) {
 			case qsl_display::FIELD: {
+				// The widgets to edit a field item
 				create_fparams(curr_x, curr_y, &item->field);
 				break;
 			}
 			case qsl_display::TEXT: {
+				// The widgets to edit a text item
 				create_tparams(curr_x, curr_y, &item->text);
 				break;
 			}
 			case qsl_display::IMAGE: {
+				// The widgets to edit an image item
 				create_iparams(curr_x, curr_y, &item->image);
 				break;
 			}
@@ -438,6 +470,7 @@ void qsl_editor::create_items() {
 	redraw();
 };
 
+// Create the boxes containing column headers
 void qsl_editor::create_labels(int curr_y) {
 	int curr_x = g_4_->x() + GAP + WLABEL / 2;
 	Fl_Box* b_type = new Fl_Box(curr_x, curr_y, WBUTTON, HBUTTON, "Type");
@@ -467,9 +500,11 @@ void qsl_editor::create_labels(int curr_y) {
 	b_dn->tooltip("Select if the item is to be displayed if null value");
 }
 
+// Create the widgets to edit field item values
 void qsl_editor::create_fparams(int& curr_x, int& curr_y, qsl_display::field_def* field) {
 	char temp[100];
 
+	// Item position (X-coordinate relative to display)
 	Fl_Input* f_dx = new Fl_Int_Input(curr_x, curr_y, WBUTTON / 2, HBUTTON);
 	f_dx->tooltip("Enter the X-coordinates of the item");
 	f_dx->callback(cb_ip_int, &(field->dx));
@@ -478,6 +513,7 @@ void qsl_editor::create_fparams(int& curr_x, int& curr_y, qsl_display::field_def
 	f_dx->value(temp);
 
 	curr_x += f_dx->w();
+	// Item position (Y-coordinate relative to display)
 	Fl_Input* f_dy = new Fl_Int_Input(curr_x, curr_y, WBUTTON / 2, HBUTTON);
 	f_dy->tooltip("Enter the Y-coordinates of the item");
 	f_dy->callback(cb_ip_int, &(field->dy));
@@ -486,6 +522,7 @@ void qsl_editor::create_fparams(int& curr_x, int& curr_y, qsl_display::field_def
 	f_dy->value(temp);
 	curr_x += f_dy->w() + GAP;
 
+	// Label to add to the left or above the item value
 	Fl_Input* f_label = new Fl_Input(curr_x, curr_y, WBUTTON, HBUTTON);
 	f_label->tooltip("Enter the label to appear beside the item");
 	f_label->value(field->label.c_str());
@@ -493,6 +530,8 @@ void qsl_editor::create_fparams(int& curr_x, int& curr_y, qsl_display::field_def
 	f_label->when(FL_WHEN_CHANGED);
 	curr_x += f_label->w();
 
+	// Button opens a font, size and colour dialog for the label
+	// The button's label will be displayed in the selected font, size and colour
 	Fl_Button* f_lstyle = new Fl_Button(curr_x, curr_y, HBUTTON, HBUTTON, "S");
 	f_lstyle->align(FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
 	f_lstyle->callback(cb_bn_style, (void*)&field->l_style);
@@ -507,8 +546,8 @@ void qsl_editor::create_fparams(int& curr_x, int& curr_y, qsl_display::field_def
 	f_lstyle->copy_tooltip(temp);
 
 	curr_x += f_lstyle->w();
-	// Now the varioius widgets
 	const int WFIELD = WEDIT - WBUTTON - HBUTTON;
+	// A choice to allow the ADIF field to use
 	field_choice* f_field = new field_choice(curr_x, curr_y, WFIELD, HBUTTON);
 	f_field->set_dataset("Fields");
 	f_field->tooltip("Select the field to display");
@@ -516,6 +555,8 @@ void qsl_editor::create_fparams(int& curr_x, int& curr_y, qsl_display::field_def
 	f_field->callback(cb_ch_field, &field->field);
 
 	curr_x += f_field->w();
+	// Button opens a font, size and colour dialog for the value
+	// The button's label will be displayed in the selected font, size and colour
 	Fl_Button* f_tstyle = new Fl_Button(curr_x, curr_y, HBUTTON, HBUTTON, "S");
 	f_tstyle->align(FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
 	f_tstyle->callback(cb_bn_style, (void*)&field->t_style);
@@ -530,6 +571,7 @@ void qsl_editor::create_fparams(int& curr_x, int& curr_y, qsl_display::field_def
 	f_tstyle->copy_tooltip(temp);
 
 	curr_x += f_tstyle->w();
+	// Button to select vertical (label above value) or horizontal (label left of value)
 	Fl_Check_Button* f_vert = new Fl_Check_Button(curr_x, curr_y, HBUTTON, HBUTTON);
 	f_vert->tooltip("Select vertical positioning of label and text");
 	f_vert->callback(cb_ip_bool, &(field->vertical));
@@ -537,6 +579,7 @@ void qsl_editor::create_fparams(int& curr_x, int& curr_y, qsl_display::field_def
 	f_vert->value(field->vertical);
 
 	curr_x += f_vert->w();
+	// Button to select how values from multiple QSOs are displayed
 	Fl_Check_Button* f_mqso = new Fl_Check_Button(curr_x, curr_y, HBUTTON, HBUTTON);
 	f_mqso->tooltip("Select if multiple QSOs are displayed on separate lines");
 	f_mqso->callback(cb_ip_bool, &(field->multi_qso));
@@ -544,6 +587,7 @@ void qsl_editor::create_fparams(int& curr_x, int& curr_y, qsl_display::field_def
 	f_mqso->value(field->multi_qso);
 
 	curr_x += f_mqso->w();
+	// Button to select whether a box is displayed around the item value
 	Fl_Check_Button* f_box = new Fl_Check_Button(curr_x, curr_y, HBUTTON, HBUTTON);
 	f_box->tooltip("Select if the item is to be enclosed in a box");
 	f_box->callback(cb_ip_bool, &(field->box));
@@ -551,6 +595,7 @@ void qsl_editor::create_fparams(int& curr_x, int& curr_y, qsl_display::field_def
 	f_box->when(FL_WHEN_RELEASE);
 
 	curr_x += f_box->w();
+	// Button to select whether the label and box are displayed if the value is an empty string
 	Fl_Check_Button* f_ignore = new Fl_Check_Button(curr_x, curr_y, HBUTTON, HBUTTON);
 	f_ignore->tooltip("Select if the item is to be displayed if null value");
 	f_ignore->callback(cb_ip_bool, (void*)&field->display_empty);
@@ -561,12 +606,11 @@ void qsl_editor::create_fparams(int& curr_x, int& curr_y, qsl_display::field_def
 	curr_y += HBUTTON;
 }
 
-
-
-
+// Craete the widgets to edit a text item
 void qsl_editor::create_tparams(int& curr_x, int& curr_y, qsl_display::text_def* text) {
 	char temp[100];
 
+	// X-position of the item relative to the display
 	Fl_Input* t_dx = new Fl_Int_Input(curr_x, curr_y, WBUTTON / 2, HBUTTON);
 	t_dx->tooltip("Enter the X-coordinates of the item");
 	t_dx->callback(cb_ip_int, &(text->dx));
@@ -575,6 +619,7 @@ void qsl_editor::create_tparams(int& curr_x, int& curr_y, qsl_display::text_def*
 	t_dx->value(temp);
 
 	curr_x += t_dx->w();
+	// Y-position of the item relativ eto the display window
 	Fl_Input* t_dy = new Fl_Int_Input(curr_x, curr_y, WBUTTON / 2, HBUTTON);
 	t_dy->tooltip("Enter the Y-coordinates of the item");
 	t_dy->callback(cb_ip_int, &(text->dy));
@@ -583,13 +628,16 @@ void qsl_editor::create_tparams(int& curr_x, int& curr_y, qsl_display::text_def*
 	t_dy->value(temp);
 	curr_x += t_dy->w() + GAP;
 
-	Fl_Input* t_text = new Fl_Input(curr_x, curr_y, WEDIT, HBUTTON);
+	// Input to display text to wroite on card
+	Fl_Input* t_text = new intl_input(curr_x, curr_y, WEDIT, HBUTTON);
 	t_text->tooltip("Please enter the text to display");
 	t_text->callback(cb_ip_string, &text->text);
 	t_text->when(FL_WHEN_CHANGED);
 	t_text->value(text->text.c_str());
 	curr_x += t_text->w();
 
+	// Button to open a font, size and colour dialog for the text value
+	// The button's label will be displayed in the selected font, size and colour
 	Fl_Button* t_tstyle = new Fl_Button(curr_x, curr_y, HBUTTON, HBUTTON, "S");
 	t_tstyle->align(FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
 	t_tstyle->tooltip("Opens up a dialog to set font style and colour");
@@ -604,9 +652,11 @@ void qsl_editor::create_tparams(int& curr_x, int& curr_y, qsl_display::text_def*
 	curr_y += HBUTTON;
 }
 
+// Create the widgets to edit image items
 void qsl_editor::create_iparams(int& curr_x, int& curr_y, qsl_display::image_def* image) {
 	char temp[100];
 
+	// X-position of the image relative to the display window
 	Fl_Input* i_dx = new Fl_Int_Input(curr_x, curr_y, WBUTTON / 2, HBUTTON);
 	i_dx->tooltip("Enter the X-coordinates of the item");
 	i_dx->callback(cb_ip_int, &(image->dx));
@@ -615,6 +665,7 @@ void qsl_editor::create_iparams(int& curr_x, int& curr_y, qsl_display::image_def
 	i_dx->value(temp);
 
 	curr_x += i_dx->w();
+	// Y-position of the image relative to the display window
 	Fl_Input* i_dy = new Fl_Int_Input(curr_x, curr_y, WBUTTON / 2, HBUTTON);
 	i_dy->tooltip("Enter the X-coordinates of the item");
 	i_dy->callback(cb_ip_int, &(image->dy));
@@ -624,14 +675,14 @@ void qsl_editor::create_iparams(int& curr_x, int& curr_y, qsl_display::image_def
 	curr_x += i_dy->w() + GAP;
 
 	// Input - image filename
-	Fl_Input* i_filename = new Fl_Input(curr_x, curr_y, WEDIT, HBUTTON);
-	i_filename->callback(cb_value<intl_input, string>, &image->filename);
+	Fl_Input* i_filename = new intl_input(curr_x, curr_y, WEDIT, HBUTTON);
+	i_filename->callback(cb_ip_string, &image->filename);
 	i_filename->when(FL_WHEN_CHANGED);
 	i_filename->value(image->filename.c_str());
 	i_filename->tooltip("Location of TQSL executable");
 	curr_x += i_filename->w();
 
-	// Button - Opens file browser to locate executable
+	// Button - Opens file browser to locate iamge file
 	Fl_Button* bn_browse_tqsl = new Fl_Button(curr_x, curr_y, HBUTTON, HBUTTON, "?");
 	bn_browse_tqsl->align(FL_ALIGN_INSIDE);
 	bn_browse_tqsl->callback(cb_image, &image);
@@ -643,15 +694,17 @@ void qsl_editor::create_iparams(int& curr_x, int& curr_y, qsl_display::image_def
 
 }
 
-
+// After editing the item data, redraw the window
 void qsl_editor::redraw_display() {
 	display_->resize();
 	w_display_->size(display_->w(), display_->h());
 	if (show_example_) {
 		example_qso_ = qso_manager_->data()->current_qso();
 		if (example_qso_ && example_qso_->item("STATION_CALLSIGN") == callsign_) {
+			// Showing the example qSO as it exists and matches the callsign 
 			display_->example_qso(example_qso_);
 		} else {
+			// Either there is no qSO ipor a different callsign was used
 			char msg[100];
 			snprintf(msg, sizeof(msg), "QSL: Current QSO does not match callsign %s",
 				callsign_.c_str());
@@ -659,17 +712,19 @@ void qsl_editor::redraw_display() {
 			display_->example_qso(nullptr);
 		} 
 	} else {
+		// Do not show an example QSO
 		display_->example_qso(nullptr);
 	}
 	display_->redraw();
 }
 
-// Update teh size display
+// Update the size widget
 void qsl_editor::update_size() {
 	qsl_display::card_data* data = qsl_display::data(callsign_);
 	char temp[64];
 	int pw;
 	int ph;
+	// Convert supplied data to pixels
 	switch(data->unit) {
 		case qsl_display::INCH: 
 			pw = data->width * IN_TO_POINT;
@@ -688,6 +743,7 @@ void qsl_editor::update_size() {
 	op_size_->value(temp);
 }
 
+// Uodate the dialog widgets
 void qsl_editor::enable_widgets() {
 	update_size();
 	create_items();
@@ -702,17 +758,12 @@ void qsl_editor::cb_radio_dim(Fl_Widget* w, void* v) {
     that->redraw_display();
 }
 
-// The design has been interactively edited
-void qsl_editor::cb_design(Fl_Widget* w, void* v) {
-	qsl_editor* that = ancestor_view<qsl_editor>(w);
-    that->create_items();
-    that->resize();
-}
-
-// Want to change the style of the text
+// Want to change the style (font, size and colour) of the text
 void qsl_editor::cb_bn_style(Fl_Widget* w, void* v) {
+	// Get the current style
    	qsl_editor* that = ancestor_view<qsl_editor>(w);
 	qsl_display::style_def* style = (qsl_display::style_def*)v;
+	// Open a font, size and colour dialog
     font_dialog* d = new font_dialog(style->font, style->size, style->colour, "QSL Editor - text style chooser");
     button_t result = d->display();
     if (result == BN_OK) {
@@ -736,7 +787,7 @@ void qsl_editor::cb_size_double(Fl_Widget* w, void* v) {
 // String input
 void qsl_editor::cb_ip_string(Fl_Widget* w, void* v) {
     qsl_editor* that = ancestor_view<qsl_editor>(w);
-    cb_value<Fl_Input, string>(w, v);
+    cb_value<intl_input, string>(w, v);
     that->redraw_display();  
 	// that->create_items();
 }
@@ -774,7 +825,6 @@ void qsl_editor::cb_ch_field(Fl_Widget* w, void* v) {
 	string* item_field = (string*)v;
 	*item_field = field;
 	that->redraw_display();
-	// that->create_items();
 }
 
 // Filename changed so update display
@@ -801,6 +851,7 @@ void qsl_editor::cb_browse(Fl_Widget* w, void* v) {
 void qsl_editor::cb_ch_type(Fl_Widget* w, void* v) {
 	qsl_editor* that = ancestor_view<qsl_editor>(w);
 	Fl_Choice* ch = (Fl_Choice*)w;
+	// v points to the type field of that item
 	qsl_display::item_type* type = (qsl_display::item_type*)v;
 	*type = (qsl_display::item_type)ch->value();
 	that->redraw_display();
@@ -832,7 +883,7 @@ void qsl_editor::cb_image(Fl_Widget* w, void* v) {
 	that->create_items();
 }
 
-// Date time
+// Select date or time formats
 template<class ENUM>
 void qsl_editor::cb_datetime(Fl_Widget* w, void* v) {
 	cb_value<Fl_Choice, ENUM>(w, v);
@@ -841,7 +892,7 @@ void qsl_editor::cb_datetime(Fl_Widget* w, void* v) {
 	that->redraw_display();
 }
 
-// Show example
+// Use example qSO in display
 void qsl_editor::cb_example(Fl_Widget* w, void* v) {
 	cb_value<Fl_Light_Button, bool>(w, v);
 	qsl_editor* that = ancestor_view<qsl_editor>(w);
