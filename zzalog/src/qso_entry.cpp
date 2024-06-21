@@ -134,7 +134,7 @@ void qso_entry::create_form(int X, int Y) {
 
 	ip_notes_ = new intl_input(curr_x, curr_y, max_x - curr_x - GAP, HBUTTON, "NOTES");
 	ip_notes_->callback(cb_ip_notes, nullptr);
-	ip_notes_->when(FL_WHEN_RELEASE_ALWAYS);
+	ip_notes_->when(FL_WHEN_CHANGED);
 	ip_notes_->tooltip("Add any notes for the QSO");
 
 	curr_y += HBUTTON + GAP;
@@ -277,21 +277,8 @@ void qso_entry::copy_qso_to_display(int flags) {
 			}
 		}
 		// Handle NOTES separately 
-		if (flags == CF_ALL_FLAGS) {
-			// ALL_FLAGS includes NOTES
-			ip_notes_->value(qso_->item("NOTES", false, true).c_str());
-		} else {
-			// Check if each flag includes it
-			for (auto sf = COPY_SET.begin(); sf != COPY_SET.end(); sf++) {
-				copy_flags f = (*sf);
-				if (flags & f) {
-					for (auto fx = COPY_FIELDS.at(f).begin(); fx != COPY_FIELDS.at(f).end(); fx++) {
-						if ((*fx) == "NOTES")	
-							ip_notes_->value(qso_->item("NOTES", false, true).c_str());
-					}
-				}
-			}
-		}
+		ip_notes_->value(qso_->item("NOTES", false, true).c_str());
+
 		// If QTH changes tell DXA-IF to update home_location
 		switch (qso_data_->logging_state()) {
 		case qso_data::QSO_EDIT:
