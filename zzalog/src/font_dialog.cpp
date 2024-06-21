@@ -7,6 +7,8 @@
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Output.H>
 
+// Constructor - includes widget instantiation
+// Size will be fixed - only supply current font, size and colour
 font_dialog::font_dialog(Fl_Font f, Fl_Fontsize sz, Fl_Color c, const char* L) :
     win_dialog(10, 10, L),
     font_(f),
@@ -16,12 +18,14 @@ font_dialog::font_dialog(Fl_Font f, Fl_Fontsize sz, Fl_Color c, const char* L) :
     int curr_x = GAP;
     int curr_y = GAP + HTEXT;
 
+	// Font selection browser
     Fl_Hold_Browser* w01 = new Fl_Hold_Browser(curr_x, curr_y, WEDIT, HMLIN, "Font");
     w01->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
     w01->tooltip("Please select the font used for the QSL card field entry");
     populate_font(w01, &font_);
 
     curr_x += w01->w();
+	// Size selection browser
     Fl_Hold_Browser* w02 = new Fl_Hold_Browser(curr_x, curr_y, WBUTTON, HMLIN, "Size");
     w02->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
     w02->callback(cb_size, &fontsize_);
@@ -30,11 +34,13 @@ font_dialog::font_dialog(Fl_Font f, Fl_Fontsize sz, Fl_Color c, const char* L) :
 	populate_size(w02, &font_, &fontsize_);
 	
     curr_x += w02->w();
+	// Colour chooser
     Fl_Color_Chooser* w03 = new Fl_Color_Chooser(curr_x, curr_y, 200, 94, "Colour");
     w03->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
     w03->callback(cb_colour);
     w03->tooltip("Please select the colour to be used for the QSL card field entry");
     uchar r, g, b;
+	// Fl_Color_Chooser uses RGB values 0->1.0
     Fl::get_color(colour_, r, g, b);
     w03->rgb((double)r / 255.0, (double)g / 255.0, (double)b / 255.0);
 
@@ -43,6 +49,7 @@ font_dialog::font_dialog(Fl_Font f, Fl_Fontsize sz, Fl_Color c, const char* L) :
 	int max_x = curr_x;
 	curr_x = x() + GAP + WLABEL;
 
+	// Output to display sample text in the chosen font, size and colour
 	op_sample_ = new Fl_Output(curr_x, curr_y, WSMEDIT, HBUTTON, "Sample");
 	op_sample_->value("Example data");
 	op_sample_->align(FL_ALIGN_LEFT);
@@ -55,11 +62,13 @@ font_dialog::font_dialog(Fl_Font f, Fl_Fontsize sz, Fl_Color c, const char* L) :
 	curr_x = w03->x();
 	curr_y = w03->y() + w03->h() + GAP;
 
+	// Save button
 	Fl_Button* w04 = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Save");
 	w04->callback(cb_bn_ok);
 	w04->tooltip("Accept these changes");
 
 	curr_x += WBUTTON;
+	// Cancel button
 	Fl_Button* w05 = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Cancel");
 	w05->callback(cb_bn_cancel);
 	w05->tooltip("Cancel these changes");
@@ -78,6 +87,7 @@ font_dialog::font_dialog(Fl_Font f, Fl_Fontsize sz, Fl_Color c, const char* L) :
 
 }
 
+// Destructor
 font_dialog::~font_dialog() {}
 
 // callback - OK button
@@ -93,11 +103,12 @@ void font_dialog::cb_bn_cancel(Fl_Widget* w, void * v) {
 
 }
 
-// Callback - font chooser
+// Callback - font chooser 
 void font_dialog::cb_font(Fl_Widget* w, void* v) {
     Fl_Hold_Browser* br = (Fl_Hold_Browser*)w;
     font_dialog* that = ancestor_view<font_dialog>(w);
     that->font_ = (Fl_Font)br->value() - 1;
+	// The chosen font may affect sizes available so  update size chooser
     that->populate_size((Fl_Widget*)v, &that->font_, &that->fontsize_);
 	that->set_sample();
 }
@@ -115,10 +126,13 @@ void font_dialog::cb_size(Fl_Widget* w, void* v) {
 void font_dialog::cb_colour(Fl_Widget* w, void* v) {
     Fl_Color_Chooser* cc = (Fl_Color_Chooser*)w;
     font_dialog* that = ancestor_view<font_dialog>(w);
+	// Convert RGB 0->1.0 to 0->255
     that->colour_ = fl_rgb_color(255 * cc->r(), 255 * cc->g(), 255 * cc->b());
 	that->set_sample();
 }
 
+// Populate the font chooser - using only FLTK fonts for poratbility
+// Note FL_COURIER is forced to Courier New in main.cpp
 void font_dialog::populate_font(Fl_Widget* w, const Fl_Font* font) {
     Fl_Hold_Browser* br = (Fl_Hold_Browser*)w;
   	br->clear();
@@ -134,16 +148,18 @@ void font_dialog::populate_font(Fl_Widget* w, const Fl_Font* font) {
 	br->value(*font + 1); 
 }
 
+// Populate the size chhoser - use sizes available for the font, but top out at 64 pt.
 void font_dialog::populate_size(Fl_Widget* w, const Fl_Font* font, const Fl_Fontsize* size) {
     Fl_Hold_Browser* br = (Fl_Hold_Browser*)w;
 	br->clear();
-	// To receive the array of sizes
 	int* sizes;
+	// Get the array of sizes available for thsi font
 	int num_sizes = Fl::get_font_sizes(*font, sizes);
 	if (num_sizes) {
-		// We have some sizes
+		// We have sizes available
 		if (sizes[0] == 0) {
-			// Scaleable font - so any size available 
+			// {0} indicates a scaleable font - so any size available 
+			// Add 1 to largest available (limited to 64)
 			for (int i = 1; i < max(64, sizes[num_sizes - 1]); i++) {
 				char buff[20];
 				sprintf(buff, "%d", i);
@@ -152,10 +168,10 @@ void font_dialog::populate_size(Fl_Widget* w, const Fl_Font* font, const Fl_Font
 			br->value(*size);
 		}
 		else {
-			// Only list available sizes
+			// The font only comes in defined sizes
 			int select = 0;
 			for (int i = 0; i < num_sizes; i++) {
-				// while the current value is less than required up the selected value
+				// The selected size will the largest <= the current size 
 				if (sizes[i] < *size) {
 					select = i;
 				}
@@ -168,18 +184,22 @@ void font_dialog::populate_size(Fl_Widget* w, const Fl_Font* font, const Fl_Font
 	}   
 }
 
+// Return selected font
 Fl_Font font_dialog::font() {
 	return font_;
 }
 
+// Return selected size
 Fl_Fontsize font_dialog::font_size() {
 	return fontsize_;
 }
 
+// Return selected colour
 Fl_Color font_dialog::colour() {
 	return colour_;
 }
 
+// Show the sample text in the selected font, size and colour
 void font_dialog::set_sample() {
 	op_sample_->textfont(font_);
 	op_sample_->textsize(fontsize_);
