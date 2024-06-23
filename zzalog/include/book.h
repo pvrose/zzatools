@@ -303,8 +303,8 @@ using namespace std;
 		adx_reader* adx_reader_;
 		adi_writer* adi_writer_;
 		adx_writer* adx_writer_;
-		// Update allowed
-		bool update_allowed_;
+		// Upload allowed
+		bool upload_allowed_;
 
 	};
 

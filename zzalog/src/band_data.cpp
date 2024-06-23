@@ -109,8 +109,6 @@ string band_data::get_path() {
 	// get the value from settings or force new browse
 	if (!datapath.get("Reference", dirname, "")) {
 		// We do not have one - so open chooser to get one
-//		Fl_File_Chooser* chooser = new Fl_File_Chooser(dirname, nullptr, Fl_File_Chooser::DIRECTORY,
-//			"Select reference file directory");
 		Fl_Native_File_Chooser* chooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_DIRECTORY);
 		chooser->title("Select reference file directory");
 		chooser->preset_file(dirname);
@@ -132,6 +130,7 @@ string band_data::get_path() {
 
 }
 
+// Get the band plan data entry for the specified frequency
 band_data::band_entry_t* band_data::get_entry(double frequency) {
 	for (unsigned int ix = 0; ix < entries_.size(); ix++) {
 		if (entries_[ix]->lower <= frequency && entries_[ix]->upper >= frequency) {

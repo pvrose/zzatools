@@ -84,7 +84,7 @@ book::book(object_t type)
 	, adi_writer_(nullptr)
 	, adx_writer_(nullptr)
 	, ignore_null_(false)
-	, update_allowed_(true)
+	, upload_allowed_(true)
 {
 	used_bands_.clear();
 	used_modes_.clear();
@@ -1581,7 +1581,7 @@ bool book::delete_enabled() {
 
 // Upload the latest QSO imported to eQSL, LotW and Clublog
 bool book::upload_qso(qso_num_t record_num) {
-	if (AUTO_UPLOAD && update_allowed_) {
+	if (AUTO_UPLOAD && upload_allowed_) {
 		enable_save(false, "Uploading to QSL sites");
 		bool ok = eqsl_handler_->upload_single_qso(record_num);
 		if (!lotw_handler_->upload_single_qso(record_num)) ok = false;
@@ -1638,6 +1638,7 @@ void book::set_session_start() {
 	status_->misc_status(ST_NOTE, message);
 }
 
+// Get the fraction of file loaded or stored - used in qso_log_info display
 double book::get_complete() {
 	if (adi_reader_) return adi_reader_->progress();
 	else if (adi_writer_) return adi_writer_->progress();
@@ -1646,14 +1647,17 @@ double book::get_complete() {
 	else return 0.0;
 }
 
+// The book is being loaded (one of the readers is active)
 bool book::loading() {
 	return (adi_reader_ != nullptr || adx_reader_ != nullptr);
 }
 
+// The book is being stored (on of the writers is active)
 bool book::storing() {
 	return (adi_writer_ != nullptr || adx_writer_ != nullptr);
 }
 
+// Used to temporarily disable the upload of QSLs
 void book::allow_upload(bool enable) {
-	update_allowed_ = enable && AUTO_UPLOAD;
+	upload_allowed_ = enable && AUTO_UPLOAD;
 }

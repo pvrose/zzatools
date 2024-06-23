@@ -283,6 +283,7 @@ bool adx_writer::write_element(adx_element_t element) {
 	return ok;
 }
 
+// Calculate progress towards saving file
 double adx_writer::progress() {
 	return (double)current_ / (double)my_book_->size();
 }

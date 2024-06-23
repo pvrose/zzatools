@@ -189,7 +189,7 @@ void change_dialog::create_form() {
 	end();
 }
 
-
+// destructor
 change_dialog::~change_dialog()
 {
 }

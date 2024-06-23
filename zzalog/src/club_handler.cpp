@@ -36,12 +36,12 @@ club_handler::club_handler() {
 
 }
 
+// Destructor
 club_handler::~club_handler() {
 	run_threads_ = false;
 	th_upload_->join();
 	delete th_upload_;
 }
-
 
 // Upload the saved log to ClubLog using putlogs.php interface
 bool club_handler::upload_log(book* book) {
@@ -307,6 +307,9 @@ void club_handler::th_upload(record* this_record) {
 	this_thread::yield();
 }
 
+// Method in the main thread that is 
+// called when the thread handling upload has finished
+// Updates the QSO recotrd that the update has been completed
 bool club_handler::upload_done(bool response) {
 	if (response == false) {
 		// Display error message received from post
@@ -334,12 +337,14 @@ bool club_handler::upload_done(bool response) {
 	return response;
 }
 
+// Static interface between upload thread and main thread to handle upload complete
 void club_handler::cb_upload_done(void* v) {
 	if (DEBUG_THREADS) printf("CLUBLOG MAIN: Entered thread callback handler\n");
 	club_handler* that = (club_handler*)v;
 	that->upload_done(that->upload_response_);
 }
 
+// Start and progress the thread that handles uploads without stalling main thread
 void club_handler::thread_run(club_handler* that) {
 	if (DEBUG_THREADS) printf("CLUBLOG THREAD: Thread started\n");
 	while (that->run_threads_) {
@@ -363,6 +368,7 @@ void club_handler::thread_run(club_handler* that) {
 	}
 }
 
+// Convert this record to ADIF: uses adi_writer
 string club_handler::to_adif(record* this_record, set<string> &fields) {
 	string result = "";
 	for (auto it = fields.begin(); it != fields.end(); it++) {

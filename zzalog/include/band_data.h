@@ -5,6 +5,8 @@
 
 using namespace std;
 
+// This class reads in the IARU band-plan in TSV form into a database
+// It provides access to this database
 class band_data
 {
 public:

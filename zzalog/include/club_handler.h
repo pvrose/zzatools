@@ -13,7 +13,7 @@
 
 #include <FL/Fl_Help_Dialog.H>
 
-
+	// This class handles access to the ClubLog website
 	class club_handler
 	{
 	private:

@@ -177,6 +177,7 @@ void adi_writer::to_adif(record* record, ostream& out, set<string>* fields /* = 
 	}
 }
 
+// Calculate the progress towards saving
 double adi_writer::progress() {
 	return (double)current_ / (double)out_book_->size();
 }

@@ -563,6 +563,7 @@ bool adx_reader::start_field(string field_name) {
 	return false;
 }
 
+// Calculate progress towards loading file
 double adx_reader::progress() {
 	return (double)current_count_ / (double)file_size_;
 }
