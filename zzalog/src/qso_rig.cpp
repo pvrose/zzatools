@@ -605,18 +605,22 @@ void qso_rig::enable_widgets() {
 	} else if (rig_->is_open()) {
 		string rig_text;
 		if (rig_->get_ptt()) {
-			rig_text = "Transmitting: ";
+			rig_text = "TX: ";
 			op_status_->textcolor(FL_RED);
 		} else {
-			rig_text = "Receiving: ";
+			rig_text = "RX: ";
 			op_status_->textcolor(DARK ? FL_GREEN : fl_darker(FL_GREEN));
 		}
 		freq = rig_->get_dfrequency(true);
 		uint64_t freq_Hz = (uint64_t)(freq * 1000000) % 1000;
+		uint64_t freq_kHz = (uint64_t)(freq * 1000) % 1000;
+		uint64_t freq_MHz = (uint64_t)freq;
 		band_data::band_entry_t* entry = band_data_->get_entry(freq * 1000);
 		if (entry) {
 			char l[50];
-			snprintf(l, sizeof(l), "%s", spec_data_->band_for_freq(freq).c_str());
+			snprintf(l, sizeof(l), "%s (%s)", 
+				spec_data_->band_for_freq(freq).c_str(),
+				entry->mode.c_str());
 			rig_text += string(l);
 		}
 		else {
@@ -635,8 +639,8 @@ void qso_rig::enable_widgets() {
 		string rig_mode;
 		string submode;
 		rig_->get_string_mode(rig_mode, submode);
-		snprintf(msg, sizeof(msg), "%0.3f.%03d MHz\n%s %sW" , 
-			freq, freq_Hz,
+		snprintf(msg, sizeof(msg), "%d.%03d.%03d MHz\n%s %sW" , 
+			freq_MHz, freq_kHz, freq_Hz,
 			submode.length() ? submode.c_str() : rig_mode.c_str(),
 			rig_->get_tx_power(true).c_str()
 		);
