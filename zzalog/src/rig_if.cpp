@@ -188,7 +188,7 @@ rig_if::rig_if(const char* name, hamlib_data_t* data)
 		}
 		else {
 			char msg[128];
-			snprintf(msg, 128, "RIG: Not opening %s - no hamlib available", my_rig_name_.c_str());
+			snprintf(msg, 128, "RIG: Not opening %s - no CAT available", my_rig_name_.c_str());
 			status_->misc_status(ST_WARNING, msg);
 		}
 	}
