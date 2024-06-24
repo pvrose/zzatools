@@ -21,6 +21,8 @@
 
 using namespace std;
 
+// Displays and controls the status of a single rig connection
+// Controls c
 class qso_rig :
     public Fl_Group
 {
@@ -170,11 +172,17 @@ protected:
 	
 
 	// Modifier attributes
+	// Add a fixed offset - eg for transverters
 	bool modify_freq_;
+	// The fixed frequency offset
 	double freq_offset_;
+	// Change the power by a gain ration
 	bool modify_gain_;
+	// The gain of an amplifier
 	int gain_;
+	// Use fixed power - eg non-CAT rigs
 	bool modify_power_;
+	// The fixed power to use
 	double power_;
 
 

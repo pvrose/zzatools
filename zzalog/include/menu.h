@@ -130,8 +130,6 @@
 		void report_mode(vector<report_cat_t> mode, report_filter_t filter);
 		// Set append status
 		void append_file(bool append);
-		// // Set ststus level
-		// void status_level(status_t level);
 		// Add the recent files to the menu
 		void add_recent_files();
 		// Update menu items - activeness

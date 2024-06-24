@@ -38,8 +38,6 @@ using namespace std;
 
 		// Protected methods
 	protected:
-
-	protected:
 		// The fields being displayed
 		vector<field_info_t>* fields_;
 	};

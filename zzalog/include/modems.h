@@ -5,7 +5,7 @@
 
 using namespace std;
 
-// List of modem apps
+// List of modem apps used in a couple of objects
 enum modem_t {
     FLDIGI,
     WSJTX,

@@ -35,8 +35,11 @@ using namespace std;
 
 	protected:
 		// Callbacks
+		// Display password in plain text
 		static void cb_bn_plain(Fl_Widget* w, void* v);
+		// Enable WSJT-X
 		static void cb_bn_wsjtx(Fl_Widget* w, void* v);
+		// Enable FLDIGI
 		static void cb_bn_fldigi(Fl_Widget* w, void* v);
 
 		// Widgets for eQSL

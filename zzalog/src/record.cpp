@@ -12,7 +12,6 @@ record.cpp - Individual record data item: implementation file
 #include "spec_data.h"
 #include "status.h"
 #include "view.h"
-#include "formats.h"
 #include "book.h"
 
 #include <ctime>

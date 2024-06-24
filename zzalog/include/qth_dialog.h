@@ -85,6 +85,7 @@ using namespace std;
 
 		// Current QTH
 		qth_info_t current_qth_;
+		// Pre-edit data
 		qth_info_t original_qth_;
 		// QTH macro expansion
 		record* qth_details_;
@@ -113,9 +114,9 @@ using namespace std;
 
 		// Parameters for each of the QTH input widgets
 		enum input_type {
-			INTEGER,
-			MIXED,
-			UPPER
+			INTEGER,		// Only accept integers - eg CQ Zone
+			MIXED,			// Accept mixed case strings
+			UPPER			// Accept upper case strings (enumerations)
 		};
 	};
 

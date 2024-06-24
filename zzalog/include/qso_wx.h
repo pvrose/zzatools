@@ -4,7 +4,8 @@
 #include <FL/Fl_Output.H>
 #include <FL/Fl_Button.H>
 
-
+// Displays the current weather report; summary, temperature, wind speed & direction,
+// Cloud cover and pressure
 class qso_wx :
     public Fl_Group 
     
@@ -13,22 +14,32 @@ public:
     qso_wx(int X, int Y, int W, int H, const char* L = nullptr);
     ~qso_wx();
 
-
+	// LLoad settings
     void load_values();
+	// Create widgets
     void create_form(int X, int Y);
+	// Save settimngs
     void save_values();
+	// Configure widgets
     void enable_widgets();
 
 protected:
-
+	// Callback on the WX icon clicked - fetches report again
 	static void cb_bn_icon(Fl_Widget* w, void *v);
+	// Callback - changes the temperature between C and F
 	static void cb_bn_temperature(Fl_Widget* w, void* v);
+	// Callback - changes the windspeed MPH, km/h, m/s, knots
 	static void cb_bn_speed(Fl_Widget* w, void* v);
+	// Calback - changes the direction cardinal, degree, arrow
 	static void cb_bn_direction(Fl_Widget* w, void* v);
+	// Callback - changes the pressure - hPa, mbar, in Hg, mm Hg
 	static void cb_bn_pressure(Fl_Widget* w, void* v);
+	// Callback - changes the cloud - %, okta, pictogram
 	static void cb_bn_cloud(Fl_Widget* w, void* v);
 
+	// Draw the wind direction arrow 
 	void draw_wind_dirn(Fl_Widget* w, unsigned int dirn); 
+	// Draw the cloud cover okta pictogram
 	void draw_cloud_okta(Fl_Widget* w, unsigned int okta);
 
 	// Display local time rather than UTC

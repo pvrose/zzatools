@@ -9,6 +9,8 @@
 
 using namespace std;
 
+// Displays the current state of the log, whether it is "dirty"
+// and controls around this
 class qso_log_info :
 	public Fl_Group
 {
@@ -41,11 +43,17 @@ public:
 	static void cb_bn_auto(Fl_Widget* w, void* v);
 
 protected:
+	// Log status
 	Fl_Output* op_status_;
+	// Load/Save progress bar
 	Fl_Progress* pr_loadsave_;
+	// Saved after every QSO?
 	Fl_Check_Button* bn_save_enable_;
+	// Save it!
 	Fl_Button* bn_save_;
+	// Are QSOs being updated from modems?
 	Fl_Check_Button* bn_auto_update_;
+	// Force an update
 	Fl_Output* op_update_;
 
 };

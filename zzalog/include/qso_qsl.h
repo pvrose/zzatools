@@ -9,6 +9,8 @@
 #include <FL/Fl_Output.H>
 #include <FL/Fl_Progress.H>
 
+// This controls the download and upload of QSLs to the various servers
+// and for printing off labels
 class qso_qsl :
     public Fl_Group
 {
@@ -16,9 +18,13 @@ public:
     qso_qsl(int X, int Y, int W, int H, const char* L);
     ~qso_qsl();
 
+    // Load settings
     void load_values();
+    // Create the widgets
     void create_form();
+    // Save the settings
     void save_values();
+    // Configure the widgets
     void enable_widgets();
 
    // Shared download method
@@ -32,6 +38,7 @@ public:
     // Update eQSL image download count
     void update_eqsl(int count);
 
+    // 1 second clock. Used to update eQSL throttle timer display
     void ticker();
 
 protected:

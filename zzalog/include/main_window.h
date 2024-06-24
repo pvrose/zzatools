@@ -8,6 +8,7 @@ using namespace std;
 
 
 	// This calss inherits from Fl_Single_Window and is the main application window
+	// It allows custom handling FL_SHOW and FL_HIDE events
 	class main_window :
 		public Fl_Single_Window
 	{

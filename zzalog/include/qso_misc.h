@@ -7,6 +7,8 @@
 #include "qso_qsl_vwr.h"
 
 #include <FL/Fl_Tabs.H>
+
+// This displays a set of tabs for qso_qth, qso_details, qso_dxcc and qso_qsl_vwr
 class qso_misc :
     public Fl_Tabs
 {
@@ -23,9 +25,11 @@ public:
 	// save value
 	void save_values();
 
+	// Set the QSO and QSO number to all objects
 	void qso(record* qso, qso_num_t qso_number);
 
 protected:
+	// callback when t he tab is changed
 	static void cb_tabs(Fl_Widget* w, void* v);
 
 	// The QSO to base all displays on
@@ -36,7 +40,7 @@ protected:
 	qso_details* details_;
 	qso_dxcc* dxcc_;
 	qso_qsl_vwr* qsl_;
-
+	// Used to reopen the tab that was opened when the app was shut down
 	int default_tab_;
 };
 

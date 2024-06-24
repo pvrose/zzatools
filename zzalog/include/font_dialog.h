@@ -10,7 +10,6 @@
 using namespace std;
 
 	// Dialog to display a font chooser, size chooser and colour chooser
-
 	class font_dialog :
 		public win_dialog
 	{

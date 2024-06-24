@@ -5,7 +5,6 @@
 #include "qso_buttons.h"
 #include "qso_net_entry.h"
 #include "field_choice.h"
-#include "record_table.h"
 #include "book.h"
 
 #include <string>
@@ -24,6 +23,7 @@
 
 using namespace std;
 
+// This data contains the various QSO viewer and editor classes
 class qso_data :
     public Fl_Group
 {
@@ -52,11 +52,12 @@ public:
 		MANUAL_ENTRY,    // Allow the definition of a record to query
 	};
 
+	// Used in dupe checking to control how dupe QSOs are handled
 	enum dupe_flags : int {
-		DF_1,
-		DF_2,
-		DF_MERGE,
-		DF_BOTH
+		DF_1,			// Select the first QSO
+		DF_2,           // Select the second QSO
+		DF_MERGE,		// Merge the two QSOs
+		DF_BOTH			// Use both (ie they are not dupes)
 	};
 
 	// Source of editing
@@ -115,10 +116,6 @@ public:
 	record* current_qso();
 	// Current QSO number
 	qso_num_t current_number();
-	//// Query QSO
-	//record* query_qso();
-	//// Original QSO
-	//record* original_qso();
 	// Update view and 
 	void update_rig();
 	// Gt call
@@ -152,8 +149,6 @@ public:
 	void action_cancel_edit();
 	// Navigate
 	void action_navigate(int target);
-	// // Update QSL viewer
-	// void action_view_qsl(bool force = false);
 	// Browse record
 	void action_browse();
 	// Action cancel browse
@@ -176,8 +171,6 @@ public:
 	void action_save_merge();
 	// Look in all.txt
 	void action_look_all_txt();
-	// // Copy found text
-	// void action_copy_all_text(string text);
 	// Create a net from current QSO
 	void action_create_net();
 	// Add a QSO to the net - copy existing qso start times or not
@@ -221,13 +214,8 @@ protected:
 
 	// Logging state
 	logging_state_t logging_state_;
-	//// Current record - being entered or edited
-	//record* current_qso_;
 	// Selected record
 	record* selected_qso_;
-	//qso_num_t current_rec_num_;
-	//// Query record number
-	//qso_num_t query_rec_num_;
 	// Disable drawing update
 	bool inhibit_drawing_;
 	// Current starting mode

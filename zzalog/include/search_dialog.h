@@ -1,5 +1,5 @@
-﻿#ifndef __EXTRACT_DIALOG__
-#define __EXTRACT_DIALOG__
+﻿#ifndef __SEARCH_DIALOG__
+#define __SEARCH_DIALOG__
 
 #include "win_dialog.h"
 #include "calendar.h"

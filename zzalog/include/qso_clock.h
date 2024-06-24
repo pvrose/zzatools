@@ -2,6 +2,8 @@
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Button.H>
 
+// This calss provides a ticking display of the current time
+// It cna be configured for UTC or local time 
 class qso_clock :
     public Fl_Group
 {
@@ -23,6 +25,7 @@ protected:
 	// Display local time rather than UTC
 	bool display_local_;
 
+	// The date and time displays
 	Fl_Button* bn_time_;
 	Fl_Button* bn_date_;
 };

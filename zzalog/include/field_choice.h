@@ -31,6 +31,7 @@ using namespace std;
 		void hierarchic(bool h);
 
 	protected:
+		// Pointer to the dataet inside spec_data containing the list of fields 
 		spec_dataset* dataset_;
 		// Drop down list is hierarchic
 		bool hierarchic_;
@@ -70,8 +71,9 @@ using namespace std;
 		};
 		exit_reason_t reason();
 
+		// Reloas the choice values and possibly select that in the given QSO
 		void reload_choice(record* qso = nullptr);
-
+		// Allow the Fl_Input component to be either INPUT or OUTPUT
 		virtual void type(uchar t);
 
 	protected:

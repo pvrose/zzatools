@@ -14,6 +14,7 @@
 
 using namespace std;
 
+// A class which displays information about previous QSOs with this contact
 class qso_details :
     public Fl_Group
 {
@@ -24,9 +25,11 @@ public:
     void create_form();
     void enable_widgets();
 
+    // Set the call to display details for
     void set_call(string name);
 
 protected:
+    // A table to show collected details about the contacted station 
     class table_d : public Fl_Table
     {
     public:
@@ -44,24 +47,28 @@ protected:
 
     protected:
 
+        // Item to show in the row
         enum item_type {
             NAME,
             QTH,
             LOCATOR
         };
 
+        // The row contents
         struct item_details {
             item_type type;
             string value;
         };
 
+        // The items to display
         vector<item_details> items_;
 
+        // The headers
         struct item_names {
             const char* heading;
             const char* field;
         };
-
+        // Relates the item type, its header text and the record field
         const map<item_type, item_names> name_map_ = {
             {NAME, {"NAME ", "NAME"}},
             {QTH, {"QTH ", "QTH"}},
@@ -70,6 +77,7 @@ protected:
 
     };
 
+    // Table to display the previous QSOs with this contact
     class table_q : Fl_Table
     {
     public:
@@ -85,14 +93,15 @@ protected:
         void set_data(set<qso_num_t> items);
             
     protected:
+        // The previous QSOs
         vector<qso_num_t> items_;
 
     };
 
 protected:
-
+    // Search the book for the previous qSOs
     void get_qsos();
-
+    // Callsign of contacted station
     string callsign_;
 
     //widgets

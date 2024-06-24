@@ -95,6 +95,7 @@ const int ROW_HEIGHT = DEFAULT_SIZE + 4;
 	const unsigned int WIDTH = 1000;
 	const unsigned int HEIGHT = 650;
 
+	// Colours to use for buttons - defined using FLTK colour palette
 	const Fl_Color COLOUR_ORANGE = 93;       /* R=4/4, B=0/4, G=5/7 */
 	const Fl_Color COLOUR_APPLE = 87;        /* R=3/4, B=0/4, G=7/7 */
 	const Fl_Color COLOUR_PINK = 170;        /* R=4/4, B=2/4, G=2/7 */

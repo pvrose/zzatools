@@ -49,7 +49,7 @@
 		record* putative_qso_;
 		// RPC handler
 		rpc_handler* rpc_handler_;
-
+		// The list of methods supported by the RPC interface
 		list<rpc_handler::method_entry> method_list_;
 		
 		// The only instance

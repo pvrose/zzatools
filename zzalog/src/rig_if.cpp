@@ -1,5 +1,4 @@
 ﻿#include "rig_if.h"
-#include "formats.h"
 #include "utils.h"
 #include "status.h"
 

@@ -11,7 +11,6 @@
 #include "record.h"
 #include "intl_widgets.h"
 #include "field_choice.h"
-#include "record_table.h"
 #include "book.h"
 #include "import_data.h"
 #include "extract_data.h"
@@ -28,20 +27,22 @@
 
 using namespace std;
 
-	// This class provides the dialog to chage the current station settings: rig, antenna and QTH
+	// This class provides the main dashboard functionality of the app.
+	// It contains all the objects used during a QSO in a hierarchy
+	// of Fl_Group and Fl_Tabss
 	class qso_manager :
 		public Fl_Double_Window
 	{
 		// Logging mode - used when initialising a record
 	public:
 
-		// A bit of a misnomer - but the category of settings
+		// Used in get_default to identify the object
 		enum stn_item_t {
-			RIG = 1,
-			ANTENNA = 2,
-			CALLSIGN = 4,
-			QTH = 8,
-			OP = 16,
+			RIG = 1,        // MY_RIG
+			ANTENNA = 2,    // MY_ANTENNA
+			CALLSIGN = 4,   // STATION_CALLSIGN
+			QTH = 8,        // APP_ZZA_QTH
+			OP = 16,        // APP_ZZA_OP
 			NONE = 0
 		};
 
@@ -71,17 +72,6 @@ using namespace std;
 
 		// Callback - close button
 		static void cb_close(Fl_Widget* w, void* v);
-
-		// Actions attached to the various buttons and keyboard shortcuts
-		enum actions {
-			WRITE_CALL,
-			WRITE_NAME,
-			WRITE_QTH,
-			WRITE_GRID,
-			WRITE_RST_SENT,
-			WRITE_RST_RCVD,
-			WRITE_FIELD
-		};
 
 		// In a state that does not allow interference
 		bool editing();

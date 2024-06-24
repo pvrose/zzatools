@@ -44,8 +44,6 @@ using namespace std;
 
 		// Returns the name and attributes of the fields currently being displayed
 		vector<field_info_t>& fields();
-		//// Display edit menu
-		//void open_edit_menu();
 
 		// Protected methods
 	protected:
@@ -53,15 +51,6 @@ using namespace std;
 		static void cb_tab_log(Fl_Widget* w, void* v);
 		// Call back to handle edit input
 		static void cb_input(Fl_Widget* w, void* v);
-		//// Enumerated type for below callback
-		//enum edit_menu_t {
-		//	UPPER,          // Convert to upper case
-		//	LOWER,          // Convert to lower case
-		//	MIXED,          // First letter upper, rest lower
-		//};
-		//// call back on endit menu
-		//static void cb_menu(Fl_Widget* w, void* v);
-	
 
 		// Read fields
 		void get_fields();
@@ -109,8 +98,6 @@ using namespace std;
 		// The edit input
 		//edit_input* edit_input_;
 		field_input* edit_input_;
-		//// Menu button for the edit input
-		//Fl_Menu_Button* edit_menu_;
 		// Edit row
 		unsigned int edit_row_;
 		unsigned int edit_col_;

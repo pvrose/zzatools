@@ -849,7 +849,6 @@ void tidy() {
 // Add the icon
 void add_icon(const char* arg0) {
 	// set the default Icon
-	// Fl_Window::default_icon(new Fl_RGB_Image(ICON_MAIN, 16, 16, 4));
 	Fl_Window::default_icon(&main_icon_);
 }
 

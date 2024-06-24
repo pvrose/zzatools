@@ -8,6 +8,9 @@
 #include <FL/Fl_Radio_Light_Button.H>
 #include <FL/Fl_Light_Button.H>
 
+// This displays the QSL status of this QSO.
+// It displays images received and the label that can be printed
+// It allows update of QSL status
 class qso_qsl_vwr :
     public Fl_Group
 {

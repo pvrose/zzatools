@@ -139,7 +139,7 @@ using namespace std;
 
 		// main-side upload complete
 		bool upload_done(upload_response_t* response);
-
+		// Opne the Help Viewer to display the response from eQSL.
 		void display_response(string response);
 
 	protected:

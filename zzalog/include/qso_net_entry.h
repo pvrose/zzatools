@@ -8,6 +8,8 @@
 
 using namespace std;
 
+// This provides a tabbed collection of qso_entry used when contacting more than 
+// 1 station at once
 class qso_net_entry : 
 	public Fl_Group
 {
@@ -62,6 +64,7 @@ public:
 	void navigate(navigate_t target);
 
 protected:
+	// The tabbed qso_entry
 	Fl_Tabs* entries_;
 
 	

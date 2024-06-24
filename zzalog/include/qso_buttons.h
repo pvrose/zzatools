@@ -9,6 +9,9 @@ using namespace std;
 
 class qso_data;
 
+// This class provides the user controls within the qsl_manager dashboard
+// It defines all possible buttons, but only a selection are used in any
+// one logging state
 class qso_buttons :
     public Fl_Group
 {
@@ -25,6 +28,7 @@ public:
 	// save value
 	void save_values();
 
+	// All the possible buttons
 	enum button_type {
 		ACTIVATE,
 		START_QSO,
@@ -74,13 +78,13 @@ public:
 		UPDATE_CAT,
 	};
 
-
+	// Parameters for the button
 	struct button_action {
-		const char* label;
-		const char* tooltip;
-		Fl_Color colour;
-		Fl_Callback* callback;
-		void* userdata;
+		const char* label;      // Its label
+		const char* tooltip;    // The tooltip to display
+		Fl_Color colour;        // The background colour
+		Fl_Callback* callback;  // Callback action
+		void* userdata;         // Callback data
 	};
 
 	// Log QSO (start first if in QSO_PENDING)
@@ -97,8 +101,6 @@ public:
 	static void cb_wkb4(Fl_Widget* w, void* v);
 	// Callback - Parse callsign
 	static void cb_parse(Fl_Widget* w, void* v);
-	//// Edit QTH details
-	//static void cb_bn_edit_qth(Fl_Widget* w, void* v);
 	// Navigate buttons
 	static void cb_bn_navigate(Fl_Widget*, void* v);
 	// Browse call back
@@ -150,9 +152,6 @@ protected:
 	// Disanle all buttons
 	void disable_widgets();
 
-	// Maps that require both qso_data a
-	//static map<qso_data::logging_state_t, list<qso_buttons::button_type> > button_map_;
-	//static map<button_type, button_action> action_map_;
 	// Number of buttons
 	static const int MAX_ACTIONS = 12;
 

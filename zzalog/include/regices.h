@@ -4,6 +4,9 @@
 
 using namespace std;
 
+// This file contains all the regex comparison strings used in checking field
+// values
+
 // regular expressions used in validation
 // e.g. 3.1.0
 const basic_regex<char> REGEX_ADIF_VERSION("[0-9]\\.[0-9]\\.[0-9]");

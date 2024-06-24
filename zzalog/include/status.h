@@ -44,20 +44,6 @@ using namespace std;
 		{ ST_FATAL, 'F'}
 	};
 
-	// Description for filter
-	const map<status_t, string> STATUS_TEXTS = {
-		{ ST_NONE, "All"},
-		{ ST_LOG, "Information"},
-		{ ST_DEBUG, "Debug info"},
-		{ ST_NOTE, "Action starting"},
-		{ ST_OK, "Action complete"},
-		{ ST_WARNING, "Warnings"},
-		{ ST_NOTIFY, "Notifications"},
-		{ ST_ERROR, "Recoverable errors"},
-		{ ST_SEVERE, "Severe errors"},
-		{ ST_FATAL, "Irrecoverable errors"}
-	};
-
 	// 
 	enum object_t;
 

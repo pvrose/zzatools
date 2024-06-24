@@ -116,9 +116,6 @@ using namespace std;
 		// Invalidate QSL statuses
 		void invalidate_qsl_status();
 
-
-		// protected methods
-	protected:
 		// protected attributes
 	protected:
 		// record is a header

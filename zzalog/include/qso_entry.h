@@ -17,12 +17,14 @@ class qso_data;
 static vector<string> DEFAULT_CONTEST = {"RST_RCVD","SRX","RST_SENT","STX"};
 static vector<string> DEFAULT_NONTEST = {"RST_RCVD","RST_SENT","NAME","QTH","GRIDSQUARE"};
 
+// A class that allows the entry of a QSO
 class qso_entry :
     public Fl_Group
 {
 
 public:
-
+	// Bitwise flags to define which fields get copied from 1 QSO to another
+	// See below for which fields get copied
 	enum copy_flags : int {
 		CF_NONE = 0,
 		CF_RIG_ETC = 1,
@@ -38,6 +40,7 @@ public:
 		CF_ALL_FLAGS = -1
 	};
 
+	// Map indicating which fields get copied per the above flags
 	const map < copy_flags, set<string> > COPY_FIELDS =
 	{
 		{ CF_RIG_ETC, { "MY_RIG", "MY_ANTENNA", "STATION_CALLSIGN", "APP_ZZA_QTH", "APP_ZZA_OP" } },
@@ -49,6 +52,7 @@ public:
 		{ CF_REPORTS, { "RST_SENT", "RST_RCVD", "SRX", "STX" }}
 	};
 
+	// The set of all copy flags
 	const set < copy_flags > COPY_SET = { CF_RIG_ETC, CF_CAT, CF_DATE, CF_TIME, CF_CALL, CF_DETAILS, CF_REPORTS };
 
 	// Loggable field names
@@ -59,12 +63,16 @@ public:
 	static map <string, vector<string> > field_map_;
 
 protected:
+	// The fields that are always present in QSO Entry
 	const string fixed_names_[NUMBER_FIXED] = {
 		"MY_RIG", "MY_ANTENNA", "APP_ZZA_QTH", "STATION_CALLSIGN",
 		"QSO_DATE", "TIME_ON", "TIME_OFF", "CALL", "FREQ",
 		"MODE", "TX_PWR" };
+	// Maps fieldname to index of the Input used for its value
 	map<string, int> field_ip_map_;
+	// All the field names that are being displayed
 	string field_names_[NUMBER_TOTAL];
+	// How many inputs are currently in use.
 	int number_fields_in_use_;
 
 public:
@@ -87,7 +95,9 @@ public:
 	record* qso();
 	void qso(qso_num_t qso_number);
 	void qso(record* qso);
+	// Return the original QSO data (pre-edit)
 	record* original_qso();
+	// The current QSO number
 	qso_num_t qso_number();
 
 	// Append QSO to book
@@ -156,7 +166,9 @@ protected:
 	int number_locked_;
 	// Records
 	record* qso_;
+	// A copy of the original QSO before any editing
 	record* original_qso_;
+	// Current QSO number
 	qso_num_t qso_number_;
 	// Previous value
 	string previous_qth_;

@@ -10,6 +10,8 @@ using namespace std;
 
 class qso_data;
 
+// Displays one record when importing from a QSL site) or two records
+// if they may possibly be the same record
 class qso_query :
     public Fl_Group
 {

@@ -7,6 +7,8 @@
 
 #include <FL/Fl_Tabs.H>
 
+// This calss collects the qso_log_info, qso_qsl, qso_server and qso_wx objects
+// into a tabbed object 
 class qso_log :
     public Fl_Tabs
 {
@@ -25,7 +27,9 @@ public:
 	// 1s clock interface
 	void ticker();
 
+	// Return a refernece to the qso_qsl object
 	qso_qsl* qsl_control();
+	// Returns a reference to the qso_log-info object
 	qso_log_info* log_info();
 	
 
@@ -33,9 +37,8 @@ protected:
 
 	// Callback
 	static void cb_tabs(Fl_Widget* w, void* v);
-	//// Redesign tab_positions
-	//virtual int tab_positions();
 
+	// The four objects
 	qso_log_info* log_info_;
 	qso_qsl* qsl_ctrl_;
 	qso_server* server_ctrl_;

@@ -9,6 +9,9 @@
 
 using namespace std;
 
+// A tabbed display of qso_rig showing all the rigs recently refered to in QSOs
+// Initially only rigs actively connectable are shown, but if a QSO refers to another
+// that will get shown
 class qso_tabbed_rigs :
     public Fl_Tabs
 {
