@@ -9,6 +9,7 @@ extern menu* menu_;
 extern import_data* import_data_;
 extern status* status_;
 
+// Create the window
 main_window::main_window(int W, int H, const char* label) :
 	Fl_Single_Window(W, H, label)
 {
@@ -17,6 +18,7 @@ main_window::main_window(int W, int H, const char* label) :
 main_window::~main_window() {}
 
 // Handle FL_HIDE and FL_SHOW to get menu to update itself
+// Handle FL_PASTE to import QSOs from the clipboard
 int main_window::handle(int event) {
 
 	switch (event) {

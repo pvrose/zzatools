@@ -4,6 +4,7 @@
 #include "xml_reader.h"
 #include "utils.h"
 #include "status.h"
+#include "regices.h"
 
 #include <sstream>
 #include <iostream>

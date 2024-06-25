@@ -446,6 +446,7 @@ bool eqsl_handler::user_details(
 	string callsign = qso_manager_->get_default(qso_manager::CALLSIGN);
 
 	char * temp;
+	// Check user name
 	if (username != nullptr) {
 		eqsl_settings.get("User", temp, "");
 		*username = temp;
@@ -457,21 +458,25 @@ bool eqsl_handler::user_details(
 			*username = callsign;
 		}
 	}
+	// Check password
 	if (password != nullptr) {
 		eqsl_settings.get("Password", temp, "");
 		*password = temp;
 		free(temp);
 	}
+	// Check date last access
 	if (last_access != nullptr) {
 		eqsl_settings.get("Last Accessed", temp, "19700101");
 		*last_access = temp;
 		free(temp);
 	}
+	// Get any message for QSL_MSG
 	if (qsl_message != nullptr) {
 		eqsl_settings.get("QSL Message", temp, "");
 		*qsl_message = temp;
 		free(temp);
 	}
+	// Get any message for QSL_MSG_SWL
 	if (swl_message != nullptr) {
 		eqsl_settings.get("SWL Message", temp, "");
 		*swl_message = temp;
@@ -962,6 +967,7 @@ bool eqsl_handler::upload_single_qso(qso_num_t record_num) {
 	return upload_qso;
 }
 
+// Upload the QSO. This is running in a separate thread
 bool eqsl_handler::th_upload_qso(record* this_record) {
 	if (DEBUG_THREADS) printf("EQSL THREAD: Uploading eQSL %s\n", this_record->item("CALL").c_str());
 	bool update = false;
@@ -1088,10 +1094,6 @@ bool eqsl_handler::th_upload_qso(record* this_record) {
 		response->status = ER_HTML_ERR;
 		if (DEBUG_THREADS) printf("EQSL THREAD: Bad HTML received\n");
 	}
-	//// Stopped  editing record
-	//if (update) {
-	//	book_->modified(true);
-	//}
 	resp.seekg(resp.beg);
 	response->html = resp.str();
 	// Send response back to 
@@ -1103,13 +1105,14 @@ bool eqsl_handler::th_upload_qso(record* this_record) {
 	return true;
 }
 
-// Handle call back 
+// Handle call back from upload thread
 void eqsl_handler::cb_upload_done(void* v) {
 	if (DEBUG_THREADS) printf("EQSL MAIN: Entered thread callback handler\n");
 	eqsl_handler* that = (eqsl_handler*)v;
 	that->upload_done(that->upload_response_);
 }
 
+// Upload is complete - checking result
 bool eqsl_handler::upload_done(upload_response_t* response) {
 	char* message = new char[256];
 	snprintf(message, 256, "EQSL: %s", response->error_message.c_str());
@@ -1122,6 +1125,7 @@ bool eqsl_handler::upload_done(upload_response_t* response) {
 		passed = true;
 		break;
 	case ER_DUPLICATE:
+		// This has been uploaded before
 		if (response->qso->item("EQSL_QSLSDATE") == "") {
 			response->qso->item("EQSL_QSLSDATE", now(false, "%Y%m%d"));
 		}
@@ -1155,11 +1159,13 @@ bool eqsl_handler::upload_done(upload_response_t* response) {
 	return passed;
 }
 
+// Display the received message in a Help Viewer
 void eqsl_handler::display_response(string response) {
 	help_viewer_->value(response.c_str());
 	help_window_->show();
 }
 
+// Run the thread to handle eQSL interface
 void eqsl_handler::thread_run(eqsl_handler* that) {
 	if (DEBUG_THREADS) printf("EQSL THREAD: Thread started\n");
 	while (that->run_threads_) {

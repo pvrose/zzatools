@@ -38,6 +38,7 @@ enum wxe_element_t {
     WXE_MESSAGE,                // ERror message
 };
 
+// The data received in a weather reports
 struct wx_report {
 
     unsigned int city_id;       // City ID number
@@ -67,6 +68,8 @@ struct wx_report {
 
 };
 
+// This class decodes a weather report receved from openweathermap.org
+// as an XML file
 class wx_handler : public xml_reader {
 
 public:
@@ -189,8 +192,10 @@ protected:
     // Error handling
     bool start_clienterror();
     bool end_clienterror();
+    // Error code
     bool start_cod();
     bool end_cod();
+    // Error message
     bool start_message();
     bool end_message();
 
@@ -212,7 +217,5 @@ protected:
     int error_code_;
     // Error message
     string error_message_;
-
-
 
 };

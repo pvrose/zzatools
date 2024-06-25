@@ -98,6 +98,7 @@ void field_choice::hierarchic(bool h) {
 	hierarchic_ = h;
 }
 
+// field_input constructor
 field_input::field_input(int X, int Y, int W, int H, const char* label) :
 	Fl_Input_Choice(X, Y, W, H, label)
 	, field_name_("")
@@ -113,6 +114,7 @@ field_input::~field_input() {
 	}
 }
 
+// Override a few events
 int field_input::handle(int event) {
 	reason_ = IR_NULL;
 	// Tell international character dialog to paste to this widget
@@ -124,7 +126,7 @@ int field_input::handle(int event) {
 		if (input()->take_focus()) return true;
 		return Fl_Input_Choice::handle(event);
 	case FL_KEYBOARD:
-		// TODO: Compromise to use ALT/Nav keys 
+		// Convert navigation keys to commands
 		switch (Fl::event_key()) {
 		case FL_Tab:
 			// Send to parent to handle
@@ -169,20 +171,26 @@ int field_input::handle(int event) {
 	}
 }
 
+// Intercept the value to re-populate choice
 const char* field_input::value() {
 	if (is_string(field_name_)) populate_case_choice();
 	return Fl_Input_Choice::value();
 }
 
+// Intercept the value to re-populate choice
 void field_input::value(const char* v) {
 	Fl_Input_Choice::value(v);
 	if (is_string(field_name_)) populate_case_choice();
 }
 
+// 
 void field_input::value(int i) {
 	Fl_Input_Choice::value(i);
 }
 
+// Set the fielname - results in choice being populated from
+// enumeration values if it is one
+// Otherwise widget behaves as an input
 void field_input::field_name(const char* field_name, record* qso /*= nullptr*/) {
 	field_name_ = field_name;
 	string enum_name;
@@ -202,6 +210,7 @@ void field_input::field_name(const char* field_name, record* qso /*= nullptr*/) 
 	}
 }
 
+// Return the field name 
 const char* field_input::field_name() {
 	return field_name_.c_str();
 }
@@ -212,6 +221,7 @@ void field_input::populate_choice(string name) {
 	spec_dataset* dataset = spec_data_->dataset(name);
 	// Initialsie
 	clear();
+	// Add a blank line for "write-in" values
 	add("");
 
 	// For all dataset
@@ -322,15 +332,19 @@ field_input::exit_reason_t field_input::reason() {
 	return result;
 }
 
-// Type
+// Type - allows the input_choice to be used as an Fl_Output
 void field_input::type(uchar t) {
 	switch(t) {
 	case FL_NORMAL_INPUT:
+		// input widget is an input
 		input()->type(FL_NORMAL_INPUT);
+		// Enable the drop-down menu
 		menubutton()->activate();
 		break;
 	case FL_NORMAL_OUTPUT:
+	// input widget is an output
 		input()->type(FL_NORMAL_OUTPUT);
+		// disable the drop-doen menu
 		menubutton()->deactivate();
 		break;
 	}

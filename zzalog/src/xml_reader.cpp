@@ -1,4 +1,5 @@
 #include "xml_reader.h"
+#include "regices.h"
 
 #include <regex>
 #include <ctime>

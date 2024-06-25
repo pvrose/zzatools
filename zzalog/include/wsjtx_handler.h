@@ -48,6 +48,7 @@ using namespace std;
 
 	protected:
 
+		// The datagram gets sent for every decode
 		struct decode_dg {
 			string id;
 			bool new_decode;
@@ -74,6 +75,7 @@ using namespace std;
 			}
 		};
 
+		// The datagram gets sent every change in the status
 		struct status_dg {
 			/*Status        Out       1                      quint32
 				* Id(unique key)        utf8
@@ -123,6 +125,8 @@ using namespace std;
 			string tx_message;
 		};
 
+		// Represents the message format being sent (and received)
+		// So represents the state of the QSO
 		enum message_t {
 			TX1,       // CALL1 CALL2 GRID
 			TX1A,      // CALL1 CALL2 - no excahnge 
@@ -137,11 +141,12 @@ using namespace std;
 			TEXT,      // Any other decode
 		};
 
+		// The message decoded
 		struct decoded_msg {
-			message_t type;
-			string target;
-			string sender;
-			string exchange;
+			message_t type;		// Message format
+			string target;		// The call the message is for
+			string sender;		// The call the message is from
+			string exchange;	// The message payload (grid, report)
 		};
 
 		// Receive a datagram from WSJT-X
@@ -181,12 +186,6 @@ using namespace std;
 		void put_utf8(stringstream& os, string s);
 		// Add 32-but unsigned integer
 		void put_uint32(stringstream& os, const unsigned int i);
-		//// Add RX message to QSO
-		//void add_rx_message(const decode_dg& decode);
-		//// Add TX message to QSO
-		//void add_tx_message(const status_dg& status);
-		//// Check message validity
-		//bool check_message(record* qso, string message, bool tx);
 
 		// Decode the message
 		decoded_msg decode_message(string message);

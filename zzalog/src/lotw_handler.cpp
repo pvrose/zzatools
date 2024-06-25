@@ -331,6 +331,7 @@ bool lotw_handler::upload_single_qso(item_num_t record_num) {
 	return false;
 }
 
+// LotW upload ic complete - tidy up QSos affected
 bool lotw_handler::upload_done(int result) {
 	// Analyse result received from TQSL - responses documented in TQSL help
 	bool ok = false;
@@ -416,6 +417,7 @@ bool lotw_handler::upload_done(int result) {
 	return ok;
 }
 
+// Run tne thread to handle the LotW interface
 void lotw_handler::thread_run(lotw_handler* that) {
 	if (DEBUG_THREADS) printf("LOTW THREAD: Thread started\n");
 	while (that->run_threads_) {
@@ -439,6 +441,7 @@ void lotw_handler::thread_run(lotw_handler* that) {
 	}
 }
 
+// Run TQSL and wait for response - runs in separate thread
 void lotw_handler::th_upload(const char* command) {
 	// Blocking system request
 	int result = system(command);
@@ -449,6 +452,7 @@ void lotw_handler::th_upload(const char* command) {
 	this_thread::yield();
 }
 
+// Callback in main thread after upload complete
 void lotw_handler::cb_upload_done(void* v) {
 	if (DEBUG_THREADS) printf("LOTW MAIN: Entered thread callback handler\n");
 	lotw_handler* that = (lotw_handler*)v;

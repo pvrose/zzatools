@@ -295,7 +295,7 @@ cty_data::prefix_entry* cty_data::prefix(record* qso) {
 			return prefix;
 		}
 		else if (suffix.length() == 1 || suffix == "MM" || suffix == "AM") {
-			// Callsign has a roving style suffix - e.g. /M
+			// Callsign has a roving style suffix - e.g. /M, /1 etc.
 			suffix = "";
 			body = words[0];
 		}
@@ -334,10 +334,6 @@ cty_data::prefix_entry* cty_data::prefix(record* qso) {
 					prefix_entry* prefix = *it;
 					if ((prefix->end == -1 || prefix->end > timestamp) &&
 						(prefix->start == -1 || timestamp > prefix->start)) {
-						//char message[160];
-						//snprintf(message, 160, "CTY DATA: Contact %s at %s %s is in entity %d",
-						//	call.c_str(), qso->item("QSO_DATE").c_str(), qso->item("TIME_ON").c_str(), prefix->adif_id);
-						//status_->misc_status(ST_NOTE, message);
 						return prefix;
 					}
 				}
@@ -356,10 +352,6 @@ cty_data::prefix_entry* cty_data::prefix(record* qso) {
 					prefix_entry* prefix = *it;
 					if ((prefix->end == -1 || prefix->end > timestamp) &&
 						(prefix->start == -1 || timestamp > prefix->start)) {
-						//char message[160];
-						//snprintf(message, 160, "CTY DATA: Contact %s at %s %s is in entity %d",
-						//	call.c_str(), qso->item("QSO_DATE").c_str(), qso->item("TIME_ON").c_str(), prefix->adif_id);
-						//status_->misc_status(ST_NOTE, message);
 						return prefix;
 					}
 				}
@@ -414,6 +406,7 @@ string cty_data::continent(record* qso) {
 	}
 }
 
+// Return CQ zone
 int cty_data::cq_zone(record* qso) {
 	parse(qso);
 	if (parse_result_->invalid) return -1;
@@ -428,6 +421,7 @@ int cty_data::cq_zone(record* qso) {
 	}
 }
 
+// Return location (latitude and longitude)
 lat_long_t cty_data::location(record* qso) {
 	parse(qso);
 	lat_long_t result = { nan(""), nan("") };
@@ -496,7 +490,7 @@ string cty_data::get_tip(record* qso) {
 	return message;
 }
 
-// Get default values for entity n
+// Get default name for entity n
 string cty_data::name(int adif_id) {
 	if (adif_id == 0) {
 		return "";
@@ -512,6 +506,7 @@ string cty_data::name(int adif_id) {
 	}
 }
 
+// Get the continent for entity n
 string cty_data::continent(int adif_id) {
 	if (adif_id == 0) {
 		return "";
@@ -527,6 +522,7 @@ string cty_data::continent(int adif_id) {
 	}
 }
 
+// Return the nickname for entity n
 string cty_data::nickname(int adif_id) {
 	if (adif_id == 0) {
 		return "";
@@ -542,6 +538,7 @@ string cty_data::nickname(int adif_id) {
 	}
 }
 
+// Return the default CQ zone for entity n
 int cty_data::cq_zone(int adif_id) {
 	if (adif_id == 0) {
 		return 0;
@@ -557,15 +554,13 @@ int cty_data::cq_zone(int adif_id) {
 	}
 };
 
+// Return the entity number for the nickname
 int cty_data::entity(string nickname) {
 	for (auto it = entities_.begin(); it != entities_.end(); it++) {
 		if ((*it).second->prefix == nickname) {
 			return (*it).first;
 		}
 	}
-	//char msg[160];
-	//snprintf(msg, sizeof(msg), "CTY DATA: %s is not a valid 'nickname' for an entity", nickname.c_str());
-	//status_->misc_status(ST_ERROR, msg);
 	return -1;
 }
 

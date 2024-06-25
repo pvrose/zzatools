@@ -11,14 +11,6 @@
 
 using namespace std;
 
-
-
-	// Definition of valid white-space
-	const basic_regex<char> REGEX_WHITE_SPACE("\\s*");
-	// RPC date time format - YYYYMMDDTHH:MM:SS or YYYY-MM-DDTHH:MM:SS
-	const basic_regex<char> REGEX_ISO_DATETIME("[0-9]*4-?[0-9]*2-?[0-9]*2T[0123][0-9]:?[0-5][0-9]:?[0-5][0-9]");
-
-
 	// This class reads XML text and generates an XML element containing the contents 
 	// as a family tree of other elements. It can be used in derived classes which can
 	// then interpret the XML elements

@@ -72,7 +72,6 @@ string PROGRAM_ID = "ZZALOG";
 string PROG_ID = "ZLG";
 string PROGRAM_VERSION = "3.4.76";
 string VENDOR = "GM3ZZA";
-string LOGO_CHAR = "\360\237\214\271";
 extern string TIMESTAMP;
 
 // switches
@@ -94,7 +93,8 @@ bool DARK = false;
 uchar THEME;
 bool DISPLAY_VERSION = false;
 
-// Ticker values
+// Ticker values - main clock runs at 10 Hz - individual objects
+// will get a divided down version
 const double TICK = 0.1;      // 100 ms
 const unsigned int TICK_SECOND = 10;
 
@@ -136,8 +136,6 @@ void backup_file();
 void set_recent_file(string filename);
 void save_switches();
 
-// Display the time in the local timezone rather than UTC
-bool use_local_ = false;
 // Flag to prevent more than one closure process at the same time
 bool closing_ = false;
 // Flag to mark everything loaded
@@ -163,6 +161,7 @@ bool using_backup_ = false;
 // Sticky switches mesasge
 string sticky_message_ = "";
 
+// Basic 10 Hz clock to control timer related object updates
 static void cb_ticker(void* v) {
 	// Units that require 1s tick
 	if (ticks_ % TICK_SECOND == 0) {
@@ -177,7 +176,7 @@ static void cb_ticker(void* v) {
 	if (ticks_ % (TICK_SECOND * 15) == 0) {
 		if (wsjtx_handler_) wsjtx_handler_->ticker();
 	}
-	// Units that require 30 minute tick
+	// Units that require 30 minute tick (5 minutes in debug mode)
 	if (ticks_ % (TICK_SECOND * 60 * (DEBUG_QUICK ? 5 : 30)) == 0) {
 		if (wx_handler_) wx_handler_->ticker();
 	}
@@ -359,10 +358,6 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 
 		// Hide all the open windows - this will allow Fl to close the app.
 		for (Fl_Window* wx = Fl::first_window(); wx; wx = Fl::first_window()) wx->hide();
-		// Leave the status file viewer visible if a severe or fatal error forced the shutdown.
-		// if (close_by_error_ && status_->file_viewer()) {
-		// 	status_->file_viewer()->show();
-		// }
 
 		// Exit and close application
 		status_->misc_status(ST_OK, "ZZALOG: Closed");
@@ -518,12 +513,6 @@ int cb_args(int argc, char** argv, int& i) {
 				i += 1;
 			}
 			return i;
-			// printf ("DEBUG: Not recognised switch %d %s passing to fltk", i, argv[i]);
-			// // Unrecognised switch - try Fl speciific ones
-			// int n = Fl::arg(argc, argv, i);
-			// printf(" %d words processed\n");
-			// if (n == 0) return 0;
-			// else return i;
 		} else {
 			filename_ = argv[i];
 			i += 1;
@@ -664,7 +653,6 @@ void add_data() {
 	}
 }
 
-
 // read in the log data
 void add_book(char* arg) {
 	if (!closing_) {
@@ -702,13 +690,13 @@ void add_book(char* arg) {
 				status_->misc_status(ST_ERROR, msg);
 			}
 		} else {
-			// Set recent file
+			// Move this file to the top of the recent file list
 			set_recent_file(log_file);
 		}
 	}
 }
 
-// Add the various HTML handlers
+// Add the various interface handlers
 void add_qsl_handlers() {
 	if (!closing_) {
 		// URL handler - basic HTML POST and GET
@@ -732,7 +720,7 @@ void add_qsl_handlers() {
 	}
 }
 
-// Add operating qso_manager
+// Add operating qso_manager (AKA "Dashboard")
 void add_dashboard() {
 	if (!closing_) {
 		if (!qso_manager_) {
@@ -852,6 +840,7 @@ void add_icon(const char* arg0) {
 	Fl_Window::default_icon(&main_icon_);
 }
 
+// Map argument letter to colour name
 map<uchar, string> colours = {
 	{ 'n', "None" },
 	{ 'r', "Red" },
@@ -914,6 +903,7 @@ bool in_current_session(record* this_record) {
 void customise_fltk() {
 	// Set default font size for all widgets
 	FL_NORMAL_SIZE = 10;
+	// FLTK 1.4 default contrast algorithm
 	fl_contrast_mode(FL_CONTRAST_CIELAB);
 	// Set courier font - ensure it's Courier New
 	Fl::set_font(FL_COURIER,            "Courier New");
@@ -983,6 +973,7 @@ void customise_fltk() {
 	// Fl::scheme("gleam");
 }
 
+// Some switches get saved between sessions - so-called sticky switches
 void read_saved_switches() {
 	Fl_Preferences switch_settings(settings_, "Switches");
 	int temp;
@@ -1011,6 +1002,7 @@ void read_saved_switches() {
 	sticky_message_ = msg;
 }
 
+// Save "sticky" switches
 void save_switches() {
 	Fl_Preferences switch_settings(settings_, "Switches");
 	char temp[2];
@@ -1023,7 +1015,8 @@ void save_switches() {
 	settings_->flush();
 }
 
-// Open preferences and save them
+// Open preferences and save them - it is possible to corrupt the settings
+// file if an exception occurs while they are being saved.
 bool open_settings() {
 	// Open the settings file 
 	settings_ = new Fl_Preferences(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
@@ -1041,6 +1034,7 @@ bool open_settings() {
 	in.seekg(0, in.end);
 	int length = (int)in.tellg();
 	if (in.good() && length) {
+		// We do have a (probably) valid settings file
 		const int increment = 8000;
 		in.seekg(0, in.beg);
 		ofstream out(backup);
@@ -1062,6 +1056,7 @@ bool open_settings() {
 		}
 	}
 	else {
+		// No settings file - check a new installation
 		switch(fl_choice("This appears to be a new installation, Continue?", "Yes", "No", nullptr)) {
 			case 0: {
 				printf("ZZALOG: No settings file - creating new settings\n");
@@ -1141,12 +1136,8 @@ int main(int argc, char** argv)
 	rig_load_all_backends();
 	// Add qso_manager
 	add_dashboard();
-	// Add band-plan 
-//	add_band_view();
 	// Add qsl_handlers - note add_rig_if() may have added URL handler
 	add_qsl_handlers();
-	// Add DxAtlas interface
-//	add_dxatlas();
 	int code = 0;
 	// We are now initialised
 	initialised_ = true;
@@ -1167,7 +1158,6 @@ int main(int argc, char** argv)
 	printf("ZZALOG Closed\n");
 	return code;
 }
-
 
 // Copy existing data to back up file. force = true used by menu command, 
 void backup_file() {

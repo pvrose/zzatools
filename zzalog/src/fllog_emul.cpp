@@ -67,6 +67,7 @@ void fllog_emul::run_server() {
 	rpc_handler_->run_server();
 }
 
+// Close the RPC server
 void fllog_emul::close_server() {
 	if (rpc_handler_) {
 		status_->misc_status(ST_NOTE, "FLLOG_EMUL: Closing server");
@@ -303,6 +304,7 @@ int fllog_emul::list_methods(rpc_data_item::rpc_list& params, rpc_data_item& res
 
 }
 
+// Sets connected flag and redraws dashboard
 void fllog_emul::check_connected() {
 	if (!connected_) {
 		connected_ = true;
@@ -310,6 +312,7 @@ void fllog_emul::check_connected() {
 	}
 }
 
+// Returns connected state
 bool fllog_emul::has_data() {
 	return connected_;
 }

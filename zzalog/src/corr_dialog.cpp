@@ -1,7 +1,6 @@
 #include "corr_dialog.h"
 
 #include "callback.h"
-//#include "spec_data.h"
 #include "utils.h"
 #include "field_choice.h"
 #include "intl_widgets.h"
