@@ -16,7 +16,7 @@
 extern wx_handler* wx_handler_;
 extern Fl_Preferences* settings_;
 
-// Clock group - constructor
+// Weather group - constructor
 qso_wx::qso_wx
 (int X, int Y, int W, int H, const char* L) :
 	Fl_Group(X, Y, W, H, L)
@@ -32,7 +32,7 @@ qso_wx::qso_wx
 	create_form(X, Y);
 }
 
-// Clock group destructor
+// Weather group destructor
 qso_wx::~qso_wx()
 {
 	save_values();
@@ -42,6 +42,7 @@ qso_wx::~qso_wx()
 
 // get settings
 void qso_wx::load_values() {
+	// Get last used display formats
 	Fl_Preferences user_settings(settings_, "User Settings");
 	Fl_Preferences wx_settings(user_settings, "Weather");
 	wx_settings.get("Speed", (int&)display_speed_, MILE_PER_HOUR);
@@ -69,6 +70,7 @@ void qso_wx::create_form(int X, int Y) {
     const int WT2 = WWX / 2;
 	const int WX_SIZE = FL_NORMAL_SIZE + 2;
 
+	// Button that displays the received location
 	bn_location_ = new Fl_Button(curr_x, curr_y, WTEXT, WX_SIZE);
 	bn_location_->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
 	bn_location_->box(FL_FLAT_BOX);
@@ -77,6 +79,7 @@ void qso_wx::create_form(int X, int Y) {
 
 	curr_y += WX_SIZE;
 
+	// Button that displays the longitude and latitude
 	bn_latlong_ = new Fl_Button(curr_x, curr_y, WTEXT, WX_SIZE);
 	bn_latlong_->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
 	bn_latlong_->box(FL_FLAT_BOX);
@@ -84,6 +87,7 @@ void qso_wx::create_form(int X, int Y) {
 
 	curr_y += WX_SIZE + GAP;
 	
+	// Button that displays the received weather icon
 	bn_wx_icon_ = new Fl_Button(curr_x, curr_y, WICON, WICON);
 	bn_wx_icon_->color(COLOUR_GREY);
 	bn_wx_icon_->box(FL_FLAT_BOX);
@@ -91,6 +95,7 @@ void qso_wx::create_form(int X, int Y) {
 
 	curr_x += WICON + GAP;
 
+	// Button that displays the description of the weather
 	bn_wx_description_ = new Fl_Button(curr_x, curr_y, WTEXT, WICON);
 	bn_wx_description_->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
 	bn_wx_description_->box(FL_FLAT_BOX);
@@ -98,6 +103,7 @@ void qso_wx::create_form(int X, int Y) {
 
 	curr_y += WICON + GAP;
 	curr_x = X + GAP;
+	// Button that displays the temperature
 	bn_temperature_ = new Fl_Button(curr_x, curr_y, WT4, WICON);
 	bn_temperature_->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE);
 	bn_temperature_->box(FL_FLAT_BOX);
@@ -105,6 +111,7 @@ void qso_wx::create_form(int X, int Y) {
 	bn_temperature_->callback(cb_bn_temperature, nullptr);
 
 	curr_x += WT4;
+	// Button that displays the wind speed
 	bn_speed_ = new Fl_Button(curr_x, curr_y, WT4, WICON);
 	bn_speed_->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE);
 	bn_speed_->box(FL_FLAT_BOX);
@@ -112,6 +119,7 @@ void qso_wx::create_form(int X, int Y) {
 	bn_speed_->callback(cb_bn_speed, nullptr);
 
 	curr_x += WT4;
+	// Button that displays the wind direction
 	bn_direction_ = new Fl_Button(curr_x, curr_y, WT4, WICON);
 	bn_direction_->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE);
 	bn_direction_->box(FL_FLAT_BOX);
@@ -119,6 +127,7 @@ void qso_wx::create_form(int X, int Y) {
 	bn_direction_->callback(cb_bn_direction, nullptr);
 
 	curr_x += WT4;
+	// Button that displays the air pressure
 	bn_pressure_ = new Fl_Button(curr_x, curr_y, WT4, WICON);
 	bn_pressure_->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE);
 	bn_pressure_->box(FL_FLAT_BOX);
@@ -126,6 +135,7 @@ void qso_wx::create_form(int X, int Y) {
 	bn_pressure_->callback(cb_bn_pressure, nullptr);
 
 	curr_x += WT4;
+	// Button that displays the cloud cover
 	bn_cloud_ = new Fl_Button(curr_x, curr_y, WT4, WICON);
 	bn_cloud_->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE);
 	bn_cloud_->box(FL_FLAT_BOX);
@@ -135,6 +145,7 @@ void qso_wx::create_form(int X, int Y) {
 	curr_x = X + GAP;
 	curr_y += WICON;
 
+	// Button that displays the sunrise time
 	bn_sunrise_ = new Fl_Button(curr_x, curr_y, WT2, WX_SIZE);
 	bn_sunrise_->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
 	bn_sunrise_->box(FL_FLAT_BOX);
@@ -142,6 +153,7 @@ void qso_wx::create_form(int X, int Y) {
 
     curr_x += WT2;
 
+	// Button thst displays the sunset time
 	bn_sunset_ = new Fl_Button(curr_x, curr_y, WT2, WX_SIZE);
 	bn_sunset_->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
 	bn_sunset_->box(FL_FLAT_BOX);
@@ -150,6 +162,7 @@ void qso_wx::create_form(int X, int Y) {
 	curr_y += HTEXT;
 	curr_x = X + GAP;
 
+	// Button that displays when the data was last updated
 	bn_updated_ = new Fl_Button(curr_x, curr_y, WTEXT, WX_SIZE);
 	bn_updated_->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
 	bn_updated_->box(FL_FLAT_BOX);
@@ -165,6 +178,7 @@ void qso_wx::create_form(int X, int Y) {
 
 // Enable/disab;e widgets
 void qso_wx::enable_widgets() {
+	// Get the data from the WX Handler object
 	time_t sunrise = wx_handler_ ? wx_handler_->sun_rise() : 0;
 	time_t sunset = wx_handler_ ? wx_handler_->sun_set() : 0;
 	string wx_descr = wx_handler_ ? wx_handler_->description() : "";
@@ -190,15 +204,21 @@ void qso_wx::enable_widgets() {
 	sunup_time = *localtime(&sunrise);
 	sundown_time = *localtime(&sunset);
 	updated_time = *localtime(&updated);
+	// Latitude and Longitude 
 	bn_location_->copy_label(wx_location.c_str());
 	bn_latlong_->copy_label(wx_latlong.c_str());
+	// Set the weather description
 	char label[128];
-	strcpy(label, wx_descr.c_str());
-	strcat(label, "\n");
+	memset(label, '\0', sizeof(label));
+	if (wx_descr != cloud_descr) {
+		strcat(label, wx_descr.c_str());
+		strcat(label, "\n");
+	}
 	strcat(label, to_lower(wind_descr).c_str());
 	strcat(label, "\n");
 	strcat(label, cloud_descr.c_str());
 	bn_wx_description_->copy_label(label);
+	// Set temperature
 	switch(display_temperature_) {
 		case CELSIUS: {
 			snprintf(label, sizeof(label), "%0.0f\n\302\260C", temperature);
@@ -213,6 +233,7 @@ void qso_wx::enable_widgets() {
 			break;
 	}
 	bn_temperature_->copy_label(label);
+	// Set wind-speed
 	switch(display_speed_) {
 		case MILE_PER_HOUR: {
 			snprintf(label, sizeof(label), "%0.0f\nMPH", wind_speed);
@@ -237,6 +258,7 @@ void qso_wx::enable_widgets() {
 	}
 	bn_speed_->copy_label(label);
 
+	// Set wind direction - either text or an image
 	bn_direction_->label(nullptr);
 	bn_direction_->image(nullptr);
 	switch(display_direction_) {
@@ -252,22 +274,13 @@ void qso_wx::enable_widgets() {
 			break;
 		}
 		case ARROW: {
-			// if (wind_degree == -1) strcpy(label, "@line");
-			// else if (wind_degree < 23) strcpy(label, "@2arrow");
-			// else if (wind_degree < 68) strcpy(label, "@1arrow");
-			// else if (wind_degree < 113) strcpy(label, "@4arrow");
-			// else if (wind_degree < 158) strcpy(label, "@7arrow");
-			// else if (wind_degree < 203) strcpy(label, "@8arrow");
-			// else if (wind_degree < 248) strcpy(label, "@9arrow");
-			// else if (wind_degree < 293) strcpy(label, "@6arrow");
-			// else if (wind_degree < 338) strcpy(label, "@3arrow");
-			// else strcpy(label, "@2arrow");
 			draw_wind_dirn(bn_direction_, wind_degree);
 			break;
 		}
 		default:
 			break;
 	}
+	// Set air pressure
 	switch(display_pressure_) {
 		case HECTOPASCAL: {
 			snprintf(label, sizeof(label), "%0.0f\nhPa", pressure);
@@ -290,6 +303,7 @@ void qso_wx::enable_widgets() {
 			break;
 	}
 	bn_pressure_->copy_label(label);
+	// Set cloud cover - either text or an image
 	unsigned int okta;
 	if (cloud_cover == 0.0) okta = 0;
 	else if (cloud_cover == 1.0) okta = 8;
@@ -316,6 +330,7 @@ void qso_wx::enable_widgets() {
 	char sunup[16];
 	char sundown[16];
 	char update_value[16];
+	// Set sunrise and sunset times and last updated time (local)
 	strftime(sunup, sizeof(sunup), "%H:%M", &sunup_time);
 	strftime(sundown, sizeof(sundown), "%H:%M", &sundown_time);
 	snprintf(label, sizeof(label), "\360\237\214\236Rise %s", sunup);
@@ -341,14 +356,16 @@ void qso_wx::save_values() {
 	settings_->flush();
 }
 
-// Icon clicked'
+// Icon clicked' - reload weather
+// v is not used
 void qso_wx::cb_bn_icon(Fl_Widget* w, void* v) {
 	qso_wx* that = ancestor_view<qso_wx>(w);
 	wx_handler_->update();
 	that->enable_widgets();
 }
 
-// Temperetaure clicked
+// Temperetaure clicked - cycle units
+// v is not used
 void qso_wx::cb_bn_temperature(Fl_Widget* w, void * v) {
 	qso_wx* that = ancestor_view<qso_wx>(w);
 	switch (that->display_temperature_) {
@@ -364,7 +381,8 @@ void qso_wx::cb_bn_temperature(Fl_Widget* w, void * v) {
 	that->enable_widgets();
 }
 
-// Speed clicked
+// Speed clicked - cycled units
+// v is not used
 void qso_wx::cb_bn_speed(Fl_Widget* w, void * v) {
 	qso_wx* that = ancestor_view<qso_wx>(w);
 	switch (that->display_speed_) {
@@ -388,7 +406,8 @@ void qso_wx::cb_bn_speed(Fl_Widget* w, void * v) {
 	that->enable_widgets();
 }
 
-// Pressure clicked
+// Pressure clicked - cycle units
+// v is not used
 void qso_wx::cb_bn_pressure(Fl_Widget* w, void * v) {
 	qso_wx* that = ancestor_view<qso_wx>(w);
 	switch (that->display_pressure_) {
@@ -412,7 +431,8 @@ void qso_wx::cb_bn_pressure(Fl_Widget* w, void * v) {
 	that->enable_widgets();
 }
 
-// Direction clicked
+// Direction clicked - cycle display format
+// v is not used
 void qso_wx::cb_bn_direction(Fl_Widget* w, void * v) {
 	qso_wx* that = ancestor_view<qso_wx>(w);
 	switch (that->display_direction_) {
@@ -432,7 +452,8 @@ void qso_wx::cb_bn_direction(Fl_Widget* w, void * v) {
 	that->enable_widgets();
 }
 
-// Cloud clicked
+// Cloud clicked - cycle formats
+// v is not used
 void qso_wx::cb_bn_cloud(Fl_Widget* w, void* v) {
 	qso_wx* that = ancestor_view<qso_wx>(w);
 	switch (that->display_cloud_) {
@@ -459,7 +480,7 @@ void qso_wx::draw_wind_dirn(Fl_Widget* w, unsigned int dirn) {
 	int y_zero = w->h() / 2;
 	// arrow will fill 80% widget
 	int radius = min(x_zero, y_zero) * 7 / 10;
-	// Create the drawing surface
+	// Create the drawing surface - origin will be top-left of the widget
 	Fl_Image_Surface* image_surface = new Fl_Image_Surface(w->w(), w->h());
 	Fl_Surface_Device::push_current(image_surface);
 	// Draw the background
@@ -499,6 +520,7 @@ void qso_wx::draw_wind_dirn(Fl_Widget* w, unsigned int dirn) {
 	w->image(image);
 }
 
+// Draw the cloud cover okta pictogram
 void qso_wx::draw_cloud_okta(Fl_Widget* w, unsigned int okta) {
 
 	// Create the drawing surface
@@ -514,12 +536,14 @@ void qso_wx::draw_cloud_okta(Fl_Widget* w, unsigned int okta) {
 	double radius = min(w->h(), w->w()) * 0.35;
 	switch(okta) {
 		case 0: {
+			// 0 okta - empty circle
 			fl_begin_line();
 			fl_arc(0, 0, radius, 0, 360);
 			fl_end_line();
 			break;
 		}
 		case 1: {
+			// 1 okta - circle plus single line at from 6 o'clock to 12 o'clock
 			fl_begin_line();
 			fl_arc(0, 0, radius, 0, 360);
 			fl_end_line();
@@ -530,6 +554,7 @@ void qso_wx::draw_cloud_okta(Fl_Widget* w, unsigned int okta) {
 			break;
 		}
 		case 2: {
+			// 2 okta - circle plus filled pie from 3 o'clock to 12 o'clock
 			fl_begin_line();
 			fl_arc(0, 0, radius, 0, 360);
 			fl_end_line();
@@ -540,6 +565,7 @@ void qso_wx::draw_cloud_okta(Fl_Widget* w, unsigned int okta) {
 			break;
 		}
 		case 3: {
+			// 3 okta - as 2 okta plus line down to 6 o'clock
 			fl_begin_line();
 			fl_arc(0, 0, radius, 0, 360);
 			fl_end_line();
@@ -554,6 +580,7 @@ void qso_wx::draw_cloud_okta(Fl_Widget* w, unsigned int okta) {
 			break;
 		}
 		case 4: {
+			// 4 okta - circle plus filled pie in right half
 			fl_begin_line();
 			fl_arc(0, 0, radius, 0, 360);
 			fl_end_line();
@@ -563,6 +590,7 @@ void qso_wx::draw_cloud_okta(Fl_Widget* w, unsigned int okta) {
 			break;
 		}
 		case 5: {
+			// 5 okta - as 4 okta plus line to 9 o'clock
 			fl_begin_line();
 			fl_arc(0, 0, radius, 0, 360);
 			fl_end_line();
@@ -576,6 +604,7 @@ void qso_wx::draw_cloud_okta(Fl_Widget* w, unsigned int okta) {
 			break;
 		}
 		case 6: {
+			// 6 okta - circle plus filled pie from 12 o'clock to 9 o'clock
 			fl_begin_line();
 			fl_arc(0, 0, radius, 0, 360);
 			fl_end_line();
@@ -586,6 +615,7 @@ void qso_wx::draw_cloud_okta(Fl_Widget* w, unsigned int okta) {
 			break;
 		}
 		case 7: {
+			// 7 okta - circle plus to sectors filled on left and right with a small gap
 			fl_begin_line();
 			fl_arc(0, 0, radius, 0, 360);
 			fl_end_line();
@@ -598,6 +628,7 @@ void qso_wx::draw_cloud_okta(Fl_Widget* w, unsigned int okta) {
 			break;
 		}
 		case 8: {
+			// 8 okta - filled  in circle
 			fl_begin_polygon();
 			fl_arc(0, 0, radius, 0, 360);
 			fl_end_polygon();

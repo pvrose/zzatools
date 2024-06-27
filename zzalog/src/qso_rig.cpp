@@ -102,17 +102,21 @@ void qso_rig::load_values() {
 		antenna_ = temp;
 		free(temp);
 
+		// Get the CAT value modifiers
 		Fl_Preferences modifier_settings(rig_settings, "Modifiers");
+		// Transverter offset
 		if (modifier_settings.get("Frequency", freq_offset_, 0.0)) {
 			modify_freq_ = true;
 		} else {
 			modify_freq_ = false;
 		}
+		// Amplifier gain
 		if (modifier_settings.get("Gain", gain_, 0)) {
 			modify_gain_ = true;
 		} else {
 			modify_gain_ = false;
 		}
+		// Fixed power device
 		if (modifier_settings.get("Power", power_, 0.0)) {
 			modify_power_ = true;
 		} else {
@@ -138,11 +142,13 @@ void qso_rig::load_values() {
 	mode_ = hamlib_data_.port_type;
 }
 
+// Get the hamlib data for the rig
 void qso_rig::find_hamlib_data() {
 	// Now search hamlib for the model_id
 	// Search through the rig database until we find the required rig.
 	const rig_caps* capabilities = nullptr;
 	rig_model_t max_rig_num = 40 * MAX_MODELS_PER_BACKEND;
+	// Serach the list for the rig. Stop when it's found
 	for (rig_model_t i = 0; i < max_rig_num && hamlib_data_.model_id == -1; i++) {
 		// Read each rig's capabilities
 		capabilities = rig_get_caps(i);
@@ -165,8 +171,9 @@ void qso_rig::find_hamlib_data() {
 	}
 }
 
+// Keep the display 3 buttons wide
 const int WDISPLAY = 3 * WBUTTON;
-// Create 
+// Create the status part of the display
 void qso_rig::create_status(int& curr_x, int& curr_y) {
 	// "Label" - rig status
 	op_status_ = new Fl_Output(curr_x, curr_y, WDISPLAY, HBUTTON);
@@ -177,6 +184,7 @@ void qso_rig::create_status(int& curr_x, int& curr_y) {
 	
 	curr_y += op_status_->h();
 
+	// Display frequency and mode information
 	op_freq_mode_ = new Fl_Box(curr_x, curr_y, WDISPLAY, HTEXT * 3);
 	op_freq_mode_->tooltip("Current displayed mode");
 	op_freq_mode_->box(FL_FLAT_BOX);
@@ -189,6 +197,8 @@ void qso_rig::create_status(int& curr_x, int& curr_y) {
 	curr_y += op_freq_mode_->h();
 	curr_x += op_freq_mode_->w();
 }
+
+// Create the control buttons
 void qso_rig::create_buttons(int& curr_x, int& curr_y) {
 	// First button - connect/disconnect or add
 	bn_connect_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Connect");
@@ -196,6 +206,7 @@ void qso_rig::create_buttons(int& curr_x, int& curr_y) {
 	bn_connect_->callback(cb_bn_connect, nullptr);
 	
 	curr_x += bn_connect_->w();
+	// Selects the rig or allows a rig to be selected
 	bn_select_ = new Fl_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Select");
 	bn_select_->color(FL_YELLOW);
 	bn_select_->tooltip("Select the rig to connect");
@@ -203,6 +214,7 @@ void qso_rig::create_buttons(int& curr_x, int& curr_y) {
 	bn_select_->callback(cb_bn_select, nullptr);
 
 	curr_x += bn_select_->w();
+	// Start flrig (if that is the hamlib rig)
 	bn_start_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Start Flrig");
 	bn_start_->color(FL_DARK_GREEN);
 	bn_start_->labelcolor(FL_WHITE);
@@ -213,6 +225,7 @@ void qso_rig::create_buttons(int& curr_x, int& curr_y) {
 	curr_y += bn_start_->h();
 }
 
+// Create rig and antenna choosers
 void qso_rig::create_rig_ant(int& curr_x, int& curr_y) {
 	curr_x += WBUTTON;
 	// Choice - Select the rig model (Manufacturer/Model)
@@ -226,6 +239,7 @@ void qso_rig::create_rig_ant(int& curr_x, int& curr_y) {
 
 	curr_y += HBUTTON;
 
+	// field input to select an antenna from the ones previously logged or type in new
 	ip_antenna_ = new field_input(curr_x, curr_y, WSMEDIT, HBUTTON, "Antenna");
 	ip_antenna_->align(FL_ALIGN_LEFT);
 	ip_antenna_->callback(cb_value<field_input, string>, &antenna_);
@@ -237,7 +251,10 @@ void qso_rig::create_rig_ant(int& curr_x, int& curr_y) {
 	curr_y += HBUTTON;
 
 }
+
+// Create tabbed form for configuration data
 void qso_rig::create_config(int& curr_x, int& curr_y) {
+	// Tabbed form
 	config_tabs_ = new Fl_Tabs(curr_x, curr_y, 10, 10);
 	config_tabs_->callback(cb_config);
 	config_tabs_->when(FL_WHEN_CHANGED);
@@ -250,16 +267,19 @@ void qso_rig::create_config(int& curr_x, int& curr_y) {
 	int saved_rh = rh;
 	curr_x = rx;
 	curr_y = ry;
+	// Create connection tab
 	create_connex(curr_x, curr_y);
 	rw = max(rw, curr_x - rx);
 	rh = max(rh, curr_y - ry);
 	curr_x = rx;
 	curr_y = ry;
+	// Create apps tab
 	create_apps(curr_x, curr_y);
 	rw = max(rw, curr_x - rx);
 	rh = max(rh, curr_y - ry);
 	curr_x = rx;
 	curr_y = ry;
+	// Create mofifier tab
 	create_modifier(curr_x, curr_y);
 	rw = max(rw, curr_x - rx);
 	rh = max(rh, curr_y - ry);
@@ -271,16 +291,20 @@ void qso_rig::create_config(int& curr_x, int& curr_y) {
 
 }
 
+// Create form to configure the hamlib port connection
+// Create two versions: 1 for serial ports and one for networked ports
 void qso_rig::create_connex(int& curr_x, int& curr_y) {
 	connect_tab_ = new Fl_Group(curr_x, curr_y, 10, 10, "Connection");
 	curr_y += GAP;
 	int max_x = curr_x;
 	int max_y = curr_y;
+	// Create serial port
 	create_serial(curr_x, curr_y);
 	max_x = max(max_x, curr_x);
 	max_y = max(max_y, curr_y);
 	curr_x = connect_tab_->x();
 	curr_y = connect_tab_->y() + GAP;
+	// Create network port
 	create_network(curr_x, curr_y);
 	max_x = max(max_x, curr_x);
 	max_y = max(max_y, curr_y);
@@ -292,14 +316,15 @@ void qso_rig::create_connex(int& curr_x, int& curr_y) {
 
 }
 
+// Create form for defining a serial port connection
 void qso_rig::create_serial(int& curr_x, int& curr_y) {
 	serial_grp_ = new Fl_Group(curr_x, curr_y, 10, 10);
 	serial_grp_->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 	serial_grp_->box(FL_NO_BOX);
 
-	// Choice port name - serial
 	curr_x = serial_grp_->x() + WBUTTON;
 	curr_y = serial_grp_->y();
+	// Choice to select from available ports
 	ch_port_name_ = new Fl_Choice(curr_x, curr_y, WBUTTON, HTEXT, "Port");
 	ch_port_name_->align(FL_ALIGN_LEFT);
 	ch_port_name_->callback(cb_ch_port, nullptr);
@@ -309,9 +334,9 @@ void qso_rig::create_serial(int& curr_x, int& curr_y) {
 	int tw = 0;
 	int th = 0;
 	fl_measure("All", tw, th);
-	// Use all ports
 	int save_x = curr_x;
 	curr_x += WBUTTON + GAP;
+	// Check flag to populate above choice with all ports not just unused ones
 	bn_all_ports_ = new Fl_Check_Button(curr_x, curr_y, HBUTTON, HBUTTON, "All");
 	bn_all_ports_->align(FL_ALIGN_RIGHT);
 	bn_all_ports_->tooltip("Select all existing ports, not just those available");
@@ -320,17 +345,18 @@ void qso_rig::create_serial(int& curr_x, int& curr_y) {
 	curr_x += HBUTTON + tw + GAP;
 	int max_x = curr_x;
 
-	// Baud rate input 
 	curr_x = save_x;
 	curr_y += HBUTTON;
 	int max_y = curr_y;
+	// Choice to select from available baud rates
 	ch_baud_rate_ = new Fl_Choice(curr_x, curr_y, WBUTTON, HTEXT, "Baud rate");
 	ch_baud_rate_->align(FL_ALIGN_LEFT);
 	ch_baud_rate_->tooltip("Enter baud rate");
 	ch_baud_rate_->callback(cb_ch_baud, nullptr);
 
-	// Override capabilities (as coded in hamlib)
 	curr_x += WBUTTON + GAP;
+	// Check flag to populate above choice with all baud rates not just 
+	// those defined in hamlibs capabilities structure for the rig
 	bn_all_rates_ = new Fl_Check_Button(curr_x, curr_y, HBUTTON, HBUTTON, "All");
 	bn_all_rates_->align(FL_ALIGN_RIGHT);
 	bn_all_rates_->tooltip("Allow full baud rate selection");
@@ -348,14 +374,15 @@ void qso_rig::create_serial(int& curr_x, int& curr_y) {
 
 }
 
+// Create for to configure a network connection
 void qso_rig::create_network(int& curr_x, int& curr_y) {
 	network_grp_ = new Fl_Group(curr_x, curr_y, 10, 10);
 	network_grp_->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 	network_grp_->box(FL_NO_BOX);
 
-	// Input port name - network
 	curr_x = network_grp_->x() + WBUTTON;
 	curr_y = network_grp_->y();
+	// Input to type in network address and port number
 	ip_port_ = new Fl_Input(curr_x, curr_y, WSMEDIT, HTEXT, "Port");
 	ip_port_->align(FL_ALIGN_LEFT);
 	ip_port_->callback(cb_ip_port, nullptr);
@@ -372,11 +399,14 @@ void qso_rig::create_network(int& curr_x, int& curr_y) {
 
 }
 
+// Create the tab to defined the application command to invoke flrig and the 
+// various modem applications for the selected rig
 void qso_rig::create_apps(int& curr_x, int& curr_y) {
 	app_tab_ = new Fl_Group(curr_x, curr_y, 10, 10, "Apps");
 	curr_x += WBUTTON;
 	curr_y += GAP;
 
+	// Input the command to invoke flrig for this rig
 	ip_rig_app_= new Fl_Input(curr_x, curr_y, WSMEDIT, HTEXT, "FlRig");
 	ip_rig_app_->align(FL_ALIGN_LEFT);
 	ip_rig_app_->callback(cb_value<Fl_Input, string>, &app_flrig_);
@@ -384,7 +414,9 @@ void qso_rig::create_apps(int& curr_x, int& curr_y) {
 	ip_rig_app_->value(app_flrig_.c_str());
 	
 	curr_y += HTEXT;
+	// For each modem application...
 	for(int i = 0; i < NUMBER_APPS; i++) {
+		// ... input the command to invoke the application
 		ip_app_[i]= new Fl_Input(curr_x, curr_y, WSMEDIT, HTEXT);
 		ip_app_[i]->copy_label(MODEM_NAMES[i].c_str());
 		ip_app_[i]->align(FL_ALIGN_LEFT);
@@ -403,6 +435,8 @@ void qso_rig::create_apps(int& curr_x, int& curr_y) {
 
 
 }
+
+// Create the form to configure any rig add-ons (transverter or amplifier)
 void qso_rig::create_modifier(int& curr_x, int& curr_y) {
 	modifier_tab_ = new Fl_Group(curr_x, curr_y, 10, 10, "Transverter/Amp");
 	modifier_tab_->box(FL_FLAT_BOX);
@@ -410,6 +444,7 @@ void qso_rig::create_modifier(int& curr_x, int& curr_y) {
 	curr_x = modifier_tab_->x() + WBUTTON;
 	curr_y += (HTEXT + GAP)/2;
 
+	// Check flag to enable frequency to be offset (for a transverter)
 	bn_mod_freq_ = new Fl_Check_Button(curr_x, curr_y, WRADIO, HRADIO, "\316\224F (MHz)");
 	bn_mod_freq_->align(FL_ALIGN_LEFT);
 	bn_mod_freq_->callback(cb_bn_mod_freq, (void*)&modify_freq_);
@@ -417,6 +452,7 @@ void qso_rig::create_modifier(int& curr_x, int& curr_y) {
 	bn_mod_freq_->value(modify_freq_);
 	
 	curr_x += WRADIO;
+	// Input for the frequency offset (in MHz)
 	ip_freq_ = new Fl_Float_Input(curr_x, curr_y, WBUTTON, HBUTTON);
 	ip_freq_->callback(cb_ip_freq, (void*)&freq_offset_);
 	ip_freq_->tooltip("Enter frequency offset");
@@ -428,6 +464,7 @@ void qso_rig::create_modifier(int& curr_x, int& curr_y) {
 	curr_y += HBUTTON;
 	curr_x = modifier_tab_->x() + WBUTTON;
 
+	// Check flag to enable the power to be adjusted 
 	bn_gain_ = new Fl_Check_Button(curr_x, curr_y, WRADIO, HRADIO, "Gain (dB)");
 	bn_gain_->align(FL_ALIGN_LEFT);
 	bn_gain_->callback(cb_bn_power, (void*)(intptr_t)false);
@@ -435,6 +472,7 @@ void qso_rig::create_modifier(int& curr_x, int& curr_y) {
 	bn_gain_->value(modify_gain_);
 
 	curr_x += WRADIO;
+	// Input for the amplifier gain
 	ip_gain_ = new Fl_Int_Input(curr_x, curr_y, WBUTTON, HBUTTON);
 	ip_gain_->callback(cb_ip_gain, (void*)&gain_);
 	ip_gain_->when(FL_WHEN_CHANGED);
@@ -445,6 +483,7 @@ void qso_rig::create_modifier(int& curr_x, int& curr_y) {
 	curr_y += HBUTTON;
 	curr_x = modifier_tab_->x() + WBUTTON;
 
+	// Check flag to define a fixed power output (for rigs that do not supply this)
 	bn_power_ = new Fl_Check_Button(curr_x, curr_y, WRADIO, HRADIO, "Pwr (W)");
 	bn_power_->align(FL_ALIGN_LEFT);
 	bn_power_->callback(cb_bn_power, (void*)(intptr_t)true);
@@ -452,6 +491,7 @@ void qso_rig::create_modifier(int& curr_x, int& curr_y) {
 	bn_power_->value(modify_power_);
 
 	curr_x += WRADIO;
+	// Input for the rig power output
 	ip_power_ = new Fl_Float_Input(curr_x, curr_y, WBUTTON, HBUTTON);
 	ip_power_->callback(cb_ip_power, (void*)&power_);
 	ip_power_->when(FL_WHEN_CHANGED);
@@ -465,7 +505,7 @@ void qso_rig::create_modifier(int& curr_x, int& curr_y) {
 	modifier_tab_->size(curr_x - modifier_tab_->x(), curr_y - modifier_tab_->y());
 }
 
-// Create CAT control widgets
+// Create the overall form
 void qso_rig::create_form(int X, int Y) {
 
 	begin();
@@ -476,12 +516,13 @@ void qso_rig::create_form(int X, int Y) {
 	int curr_x = X + GAP;
 	int curr_y = Y + 1;
 
-
+	// Create the frqeuency and mode display
 	create_status(curr_x, curr_y);
 	max_x = max(max_x, curr_x);
 	max_y = max(max_y, curr_y);
 	
 	curr_x = X + GAP;
+	// Create the control buttons
 	create_buttons(curr_x, curr_y);
 	max_x = max(max_x, curr_x);
 	max_y = max(max_y, curr_y);
@@ -489,6 +530,7 @@ void qso_rig::create_form(int X, int Y) {
 	curr_x = X + GAP;
 	curr_y += GAP;
 
+	// Create the rig and antenna choices
 	create_rig_ant(curr_x, curr_y);
 	max_x = max(max_x, curr_x);
 	max_y = max(max_y, curr_y);
@@ -496,12 +538,10 @@ void qso_rig::create_form(int X, int Y) {
 	curr_x = X + GAP;
 	curr_y += GAP;
 
+	// Create the configuration controls
 	create_config(curr_x, curr_y);
 	max_x = max(max_x, curr_x);
 	max_y = max(max_y, curr_y);
-
-
-
 
 	// Connected status
 
@@ -558,6 +598,7 @@ void qso_rig::save_values() {
 void qso_rig::enable_widgets() {
 	// CAT access buttons
 	if (!rig_) {
+		// No rig
 		bn_connect_->deactivate();
 		bn_connect_->color(FL_BACKGROUND_COLOR);
 		bn_connect_->label("");
@@ -569,6 +610,7 @@ void qso_rig::enable_widgets() {
 		}
 		bn_start_->activate();
 	} else if (rig_->is_open()) {
+		// Rig is connected
 		bn_connect_->activate();
 		bn_connect_->color(fl_lighter(FL_RED));
 		bn_connect_->label("Disconnect");
@@ -577,6 +619,7 @@ void qso_rig::enable_widgets() {
 		bn_select_->value(false);
 		bn_start_->deactivate();
 	} else {
+		// Rig is not connected
 		bn_connect_->activate();
 		bn_connect_->color(fl_lighter(FL_GREEN));
 		bn_connect_->label("Connect");
@@ -591,18 +634,21 @@ void qso_rig::enable_widgets() {
 	bn_connect_->labelcolor(fl_contrast(FL_FOREGROUND_COLOR, bn_connect_->color()));
 	bn_select_->labelcolor(fl_contrast(FL_FOREGROUND_COLOR, bn_select_->color()));
 	double freq;
-	// Status
+	// Status and frequency/mode
 	if (!rig_) {
+		// No rig - decativate freq/mode
 		op_status_->value("No rig specified");
 		op_status_->textcolor(FL_MAGENTA);
 		op_freq_mode_->deactivate();
 		op_freq_mode_->label("");
 	} else if (rig_->is_opening()) {
+		// Rig is connecting - deactivate freq/mode
 		op_status_->value("Opening rig");
 		op_status_->textcolor(DARK ? FL_CYAN : fl_darker(FL_CYAN));
 		op_freq_mode_->deactivate();
 		op_freq_mode_->label("");
 	} else if (rig_->is_open()) {
+		// Rig is connected
 		string rig_text;
 		if (rig_->get_ptt()) {
 			rig_text = "TX: ";
@@ -627,6 +673,7 @@ void qso_rig::enable_widgets() {
 			rig_text += "Out of band!";
 			op_status_->textcolor(DARK ? COLOUR_ORANGE : fl_darker(COLOUR_ORANGE));
 		}
+		// Set status to "RX/TX: Band (bandplan)"
 		op_status_->value(rig_text.c_str());
 		op_freq_mode_->activate();
 		op_freq_mode_->color(FL_BLACK);
@@ -639,6 +686,7 @@ void qso_rig::enable_widgets() {
 		string rig_mode;
 		string submode;
 		rig_->get_string_mode(rig_mode, submode);
+		// Set Freq/Mode to Frequency (MHz with kHz seperator), mode, power (W)
 		snprintf(msg, sizeof(msg), "%d.%03d.%03d MHz\n%s %sW" , 
 			freq_MHz, freq_kHz, freq_Hz,
 			submode.length() ? submode.c_str() : rig_mode.c_str(),
@@ -646,11 +694,13 @@ void qso_rig::enable_widgets() {
 		);
 		op_freq_mode_->copy_label(msg);
 	} else if (rig_->has_no_cat()) {
+		// No rig available - deactivate freq/mode
 		op_status_->value("No CAT Available");
 		op_status_->textcolor(FL_MAGENTA);
 		op_freq_mode_->deactivate();
 		op_freq_mode_->label("");
 	} else {
+		// Rig is not connected - deactivate freq/mode
 		op_status_->value("Disconnected");
 		op_status_->textcolor(DARK ? COLOUR_ORANGE : fl_darker(COLOUR_ORANGE));
 		op_freq_mode_->deactivate();
@@ -658,28 +708,34 @@ void qso_rig::enable_widgets() {
 	}
 	// CAT control widgets - allow only when select button active
 	if (rig_->is_open()) {
+		// Rig is open - disable connection configuration controls
 		ch_rig_model_->deactivate();
 		serial_grp_->deactivate();
 		network_grp_->deactivate();
 	} else {
+		// Rig is not open - allow it to be configured
 		ch_rig_model_->activate();
 		serial_grp_->activate();
 		network_grp_->activate();
 		if (bn_select_->value()) {
+			// Set configuration widgets to accept input
 			serial_grp_->clear_output();
 			network_grp_->clear_output();
 		} else {
+			// Set configuration widgets to inhibit input
 			serial_grp_->set_output();
 			network_grp_->set_output();
 		}
 	}
 	switch (mode_) {
 	case RIG_PORT_SERIAL:
+		// Serial port - show serial configuration, hide network
 		serial_grp_->show();
 		network_grp_->hide();
 		break;
 	case RIG_PORT_NETWORK:
 	case RIG_PORT_USB:
+		// Network or USB port - show network, hide serial
 		serial_grp_->hide();
 		network_grp_->show();
 		if (!bn_select_->value()) {
@@ -692,6 +748,7 @@ void qso_rig::enable_widgets() {
 		}
 		break;
 	case RIG_PORT_NONE:
+		// Hide both sets of configuration
 		serial_grp_->hide();
 		network_grp_->hide();
 		break;
@@ -767,7 +824,8 @@ void qso_rig::populate_model_choice() {
 			}
 			// Generate the item pathname - e.g. "Icom/IC-736 (untested)"
 			char* temp = new char[256];
-			// The '/' ensures all rigs from same manufacturer are in a sub-menu to Icom
+			// The '/' ensures all rigs from same manufacturer are in a 
+			// a sub-menu to the manufacturer
 			string mfg = escape_menu(capabilities->mfg_name);
 			string model = escape_menu(capabilities->model_name);
 			snprintf(temp, 256, "%s/%s%s", mfg.c_str(), model.c_str(), status);
@@ -780,11 +838,13 @@ void qso_rig::populate_model_choice() {
 			}
 		}
 	}
-	// Add the rigs in alphabetical order to the choice widget, set widget's value to intended
+	// Add the rigs in alphabetical order to the choice widget,
+	// set widget's value to intended
 	ch_rig_model_->add("");
 	for (auto ix = rig_list.begin(); ix != rig_list.end(); ix++) {
 		string name = *ix;
 		rig_model_t id = rig_ids.at(name);
+		// Add the id as user data for the menu item
 		int pos = ch_rig_model_->add(name.c_str(), 0, nullptr, (void*)(intptr_t)id);
 		if (id == hamlib_data_.model_id) {
 			ch_rig_model_->value(pos);
@@ -860,13 +920,13 @@ void qso_rig::populate_baud_choice() {
 	}
 }
 
-
 // Model input choice selected
 // v is not used
 void qso_rig::cb_ch_model(Fl_Widget* w, void* v) {
 	Fl_Choice* ch = (Fl_Choice*)w;
 	qso_rig* that = ancestor_view<qso_rig>(w);
 	const Fl_Menu_Item* item = ch->mvalue();
+	// The rig id was passed as user data to the menu item when it was added
 	rig_model_t id = (intptr_t)item->user_data();
 	const char* label = ch->text();
 	const rig_caps* capabilities = rig_get_caps(id);
@@ -896,14 +956,14 @@ void qso_rig::cb_ch_model(Fl_Widget* w, void* v) {
 	that->enable_widgets();
 }
 
-// Callback selecting port
+// Callback selecting serial port
 // v is unused
 void qso_rig::cb_ch_port(Fl_Widget* w, void* v) {
 	qso_rig* that = ancestor_view<qso_rig>(w);
 	cb_text<Fl_Choice, string>(w, (void*)&that->hamlib_data_.port_name);
 }
 
-// Callback entering port
+// Callback entering named port
 // v is unused
 void qso_rig::cb_ip_port(Fl_Widget* w, void* v) {
 	qso_rig* that = ancestor_view<qso_rig>(w);
@@ -1013,6 +1073,7 @@ void qso_rig::cb_bn_power(Fl_Widget* w, void* v) {
 }
 
 // Entered gain value
+// v points the the gain attribute
 void qso_rig::cb_ip_gain(Fl_Widget* w, void* v) {
 	qso_rig* that = ancestor_view<qso_rig>(w);
 	cb_value_int<Fl_Int_Input>(w, v);
@@ -1021,8 +1082,10 @@ void qso_rig::cb_ip_gain(Fl_Widget* w, void* v) {
 }
 
 // Entered power value
+// v points to the absolute power attribute
 void qso_rig::cb_ip_power(Fl_Widget* w, void* v) {
 	qso_rig* that = ancestor_view<qso_rig>(w);
+	// A frig to convert the float value of the widget to the double attribute
 	float f;
 	cb_value_float<Fl_Float_Input>(w, &f);
 	*(double*)v = (double)f;
@@ -1031,6 +1094,7 @@ void qso_rig::cb_ip_power(Fl_Widget* w, void* v) {
 }
 
 // Clicked start button
+// v points to the string containing the command to  invoke flrig
 void qso_rig::cb_bn_start(Fl_Widget* w, void * v) {
 	string* app = (string*)v;
 	string command = "bash -i -c " + *app + "&";
@@ -1046,6 +1110,7 @@ void qso_rig::cb_bn_start(Fl_Widget* w, void * v) {
 }
 
 // Selecting config tab
+// v is not used
 void qso_rig::cb_config(Fl_Widget* w, void *v) {
 	qso_rig* that = ancestor_view<qso_rig>(w);
 	that->enable_widgets();
@@ -1064,14 +1129,8 @@ void qso_rig::switch_rig() {
 }
 
 // 1 s clock interface - read rig and update status
-//RS_OFF,              // The rig is off or disconnected
-//RS_ERROR,            // An error with the rig occured
-//RS_RX,               // The rig is connected and in RX mode
-//RS_TX,               // The rig is connected and in TX mode
-//RS_HIGH              // The rig is in TX mode but SWR is too high
 void qso_rig::ticker() {
 	if (rig_) {
-		rig_->ticker();
 		// The rig may have disconnected - update connect/select buttons
 		enable_widgets();
 	}
@@ -1083,7 +1142,7 @@ void qso_rig::new_rig() {
 	enable_widgets();
 }
 
-// Return rig pointer
+// Return pointer to rig_if object
 rig_if* qso_rig::rig() {
 	return rig_;
 }
@@ -1093,7 +1152,7 @@ Fl_Color qso_rig::alert_colour() {
 	return bn_connect_->color();
 }
 
-// Enable rig values
+// Modify the values returned from the rig according to the modifier attributes
 void qso_rig::modify_rig() {
 	if (rig_) {
 		if (modify_freq_) {

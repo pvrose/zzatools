@@ -18,6 +18,7 @@ extern tabbed_forms* tabbed_forms_;
 extern status* status_;
 extern book* book_;
 
+// Constructor
 qso_qsl::qso_qsl(int X, int Y, int W, int H, const char* L) :
 	Fl_Group(X, Y, W, H, L)
 {
@@ -33,6 +34,7 @@ qso_qsl::qso_qsl(int X, int Y, int W, int H, const char* L) :
 	enable_widgets();
 }
 
+// Destructor
 qso_qsl::~qso_qsl() {
 	save_values();
 }
@@ -57,6 +59,7 @@ void qso_qsl::load_values() {
 	auto_club_ = upload_qso;
 }
 
+// Draw the widgets
 void qso_qsl::create_form() {
 
 
@@ -113,9 +116,6 @@ void qso_qsl::create_form() {
 	op_eqsl_count_->maximum(1.0);
 	op_eqsl_count_->value(0.0);
 	op_eqsl_count_->color(FL_WHITE, FL_YELLOW);
-	//bn_down_ecard_ = new Fl_Button(C6, curr_y, W6, HBUTTON, "eCards");
-	//bn_down_ecard_->callback(cb_fetch);
-	//bn_down_ecard_->tooltip("Fetch any eQSL card images missing");
 
 	curr_y += HBUTTON;
 
@@ -155,10 +155,6 @@ void qso_qsl::create_form() {
 	bn_auto_club_->value(auto_club_);
 	bn_auto_club_->callback(cb_auto, (void*)extract_data::CLUBLOG);
 	bn_auto_club_->tooltip("Enable automatic upload of ClubLog after logging");
-	//// Download
-	//bn_down_club_ = new Fl_Button(C3, curr_y, W3, HBUTTON, "@2->");
-	//bn_down_club_->callback(cb_download, (void*)extract_data::CLUBLOG);
-	//bn_down_club_->tooltip("Download latest records from ClubLog");
 	// Extract
 	bn_extr_club_ = new Fl_Button(C4, curr_y, W4, HBUTTON, "@search");
 	bn_extr_club_->callback(cb_extract, (void*)extract_data::CLUBLOG);
@@ -202,6 +198,8 @@ void qso_qsl::create_form() {
 	end();
 
 }
+
+// Save settings
 void qso_qsl::save_values() {
 	// eQSL
 	Fl_Preferences qsl_settings(settings_, "QSL");
@@ -216,6 +214,7 @@ void qso_qsl::save_values() {
 	settings_->flush();
 }
 
+// Configure widgets
 void qso_qsl::enable_widgets() {
 	// Disable download and extract buttons if not is the correct state
 	qso_manager* mgr = ancestor_view<qso_manager>(this);

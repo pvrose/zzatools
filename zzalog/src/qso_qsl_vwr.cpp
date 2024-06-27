@@ -25,6 +25,8 @@ extern status* status_;
 extern book* book_;
 extern string default_station_;
 extern tabbed_forms* tabbed_forms_;
+
+// Constructor
 qso_qsl_vwr::qso_qsl_vwr(int X, int Y, int W, int H, const char* L) :
 	Fl_Group(X, Y, W, H, L)
 	, selected_image_(QI_EQSL)
@@ -104,24 +106,27 @@ void qso_qsl_vwr::create_form() {
 
 	curr_x = x();
 
-
+	// Row header
 	Fl_Box* label1 = new Fl_Box(curr_x, curr_y, WBN, HBUTTON, "Rcvd");
 	label1->box(FL_FLAT_BOX);
 	label1->color(FL_BACKGROUND_COLOR);
 
 	curr_x += WBN;
+	// Light to indicate received eQSL
 	bn_eqsl_status_ = new Fl_Light_Button(curr_x, curr_y, WBN, HBUTTON, "eQSL");
 	bn_eqsl_status_->box(FL_FLAT_BOX);
 	bn_eqsl_status_->value(true);
 	bn_eqsl_status_->type(bn_eqsl_status_->type() & ~FL_TOGGLE_BUTTON);
 
 	curr_x += WBN;
+	// Light to indicate received LotW
 	bn_lotw_status_ = new Fl_Light_Button(curr_x, curr_y, WBN, HBUTTON, "LotW");
 	bn_lotw_status_->box(FL_FLAT_BOX);
 	bn_lotw_status_->value(true);
 	bn_lotw_status_->type(bn_lotw_status_->type() & ~FL_TOGGLE_BUTTON);
 
 	curr_x += WBN;
+	// Light to indicate received a paper card
 	bn_card_status_ = new Fl_Light_Button(curr_x, curr_y, WBN, HBUTTON, "Card");
 	bn_card_status_->box(FL_FLAT_BOX);
 	bn_card_status_->value(true);
@@ -130,6 +135,7 @@ void qso_qsl_vwr::create_form() {
 	curr_y += HBUTTON;
 	curr_x = x();
 
+	// Group the following radio buttons
 	grp_card_type_ = new Fl_Group(curr_x, curr_y, WBN * 4, HBUTTON);
 	grp_card_type_->box(FL_FLAT_BOX);
 
@@ -180,6 +186,7 @@ void qso_qsl_vwr::create_form() {
 	curr_y += HBUTTON;
 	curr_x = x();
 
+	// Row header
 	Fl_Box* label2 = new Fl_Box(curr_x, curr_y, WBN, HBUTTON, "Log");
 	label2->box(FL_FLAT_BOX);
 	label2->color(FL_BACKGROUND_COLOR);
@@ -192,10 +199,10 @@ void qso_qsl_vwr::create_form() {
 	bn_log_bureau_->when(FL_WHEN_RELEASE);
 	curr_x += WBN;
 	// Button - Mark e-mail received
-	bn_log_bureau_ = new Fl_Button(curr_x, curr_y, WBN, HBUTTON, "e-mail");
-	bn_log_bureau_->tooltip("Log an e-mail card received on today's date");
-	bn_log_bureau_->callback(cb_bn_log_card, (void*)"E");
-	bn_log_bureau_->when(FL_WHEN_RELEASE);
+	bn_log_email_ = new Fl_Button(curr_x, curr_y, WBN, HBUTTON, "e-mail");
+	bn_log_email_->tooltip("Log an e-mail card received on today's date");
+	bn_log_email_->callback(cb_bn_log_card, (void*)"E");
+	bn_log_email_->when(FL_WHEN_RELEASE);
 	curr_x += WBN;
 	// Button - Mark e-mail received
 	bn_log_direct_ = new Fl_Button(curr_x, curr_y, WBN, HBUTTON, "Direct");
@@ -228,24 +235,23 @@ void qso_qsl_vwr::create_form() {
 	end();
 	show();
 
-	// Now create the full view window
+	// Now create the full view window - this has three alternate widgets
 	win_full_view_ = new Fl_Window(WCARD, HCARD);
+	// Display the received image at full size
 	bn_full_view_ = new Fl_Button(0, 0, WCARD, HCARD);
 	bn_full_view_->box(FL_FLAT_BOX);
-	// bn_full_view_->labelcolor(FL_RED);
-	// bn_full_view_->labelsize(FL_NORMAL_SIZE * 3);
-	// bn_full_view_->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE);
+	// Display a warning - No image available!
 	bn_no_image_ = new Fl_Button(0, 0, WCARD, HCARD);
 	bn_no_image_->box(FL_FLAT_BOX);
 	bn_no_image_->label("No image available!");
 	bn_no_image_->labelsize(FL_NORMAL_SIZE * 3);
 	bn_no_image_->labelcolor(FL_RED);
+	// Display My QSL generated image
 	display_myqsl_ = new qsl_display(0, 0, WCARD, HCARD);
 	win_full_view_->resizable(bn_full_view_);
 	win_full_view_->end();
 	win_full_view_->hide();
 }
-
 
 // Call-backs
 // called when any of the image selection radio buttons is released
@@ -296,6 +302,7 @@ void qso_qsl_vwr::cb_bn_log_card(Fl_Widget* w, void* v) {
 }
 
 // Show/hide full view window
+// v is not used
 void qso_qsl_vwr::cb_bn_image(Fl_Widget* w, void* v) {
 	qso_qsl_vwr* that = ancestor_view<qso_qsl_vwr>(w);
 	if (that->win_full_view_->visible()) {
@@ -307,6 +314,7 @@ void qso_qsl_vwr::cb_bn_image(Fl_Widget* w, void* v) {
 }
 
 // Set card requested "QSL_SENT=[v]"
+// v is a pointer to const char - either R
 void qso_qsl_vwr::cb_bn_card_reqd(Fl_Widget* w, void* v) {
 	qso_qsl_vwr* that = ancestor_view<qso_qsl_vwr>(w);
 	char* value = (char*)v;
@@ -317,6 +325,7 @@ void qso_qsl_vwr::cb_bn_card_reqd(Fl_Widget* w, void* v) {
 
 }
 
+// set the current QSO
 void qso_qsl_vwr::set_qso(record* qso, qso_num_t number) {
 	current_qso_ = qso;
 	current_qso_num_ = number;
@@ -425,7 +434,6 @@ void qso_qsl_vwr::set_image() {
 					for (int i = 0; i < num_types && !found_image; i++) {
 						full_name_ = testname + file_types[i];
 						target_name = filename + file_types[i];
-						// printf("DEBUG QSO_QSL_VWR: Image file %s\n", full_name_.c_str());
 						// Read files depending on file type
 						if (file_types[i] == ".jpg") {
 							raw_image_ = new Fl_JPEG_Image(full_name_.c_str());
@@ -478,7 +486,6 @@ void qso_qsl_vwr::set_image() {
 					}
 				}
 				if (found_image) {
-					// printf("DEBUG: Found image %s\n", full_name_.c_str());
 					// Resize the image to fit the control
 					// Resize keeping original height/width ratio
 					float scale_w = (float)raw_image_->w() / (float)bn_card_display_->w();
@@ -585,7 +592,7 @@ void qso_qsl_vwr::set_image_buttons() {
 		radio_myqsl_->value(false);
 		break;
 	case QI_MY_QSL:
-		// Display the back of a scanned-in paper card
+		// Display my QSL as generated image
 		radio_eqsl_->value(false);
 		radio_card_front_->value(false);
 		radio_card_back_->value(false);
@@ -601,6 +608,7 @@ void qso_qsl_vwr::set_image_buttons() {
 		radio_myqsl_->value(false);
 		break;
 	}
+	// Deactivate radio buttons according to whether QSLs of that type have been received
 	if (current_qso_ && current_qso_->item("EQSL_QSL_RCVD") == "Y") {
 		radio_eqsl_->activate();
 	}
@@ -712,6 +720,7 @@ void qso_qsl_vwr::set_qsl_status() {
 	}
 }
 
+// Update  the full view window
 void qso_qsl_vwr::update_full_view() {
 	switch(selected_image_) {
 		case QI_EQSL:

@@ -85,22 +85,6 @@ string rig_if::get_tx_power(bool max) {
 	return text;
 }
 
-// 1 second time from clock 
-void rig_if::ticker() {
-	//count_down_--;
-	//if (count_down_ == 0) {
-	//	// Set count to a large value so that if read takes > 1s it doesn't stack up
-	//	count_down_ = INT_MAX;
-	//	read_values();
-	//} 
-	//if (opened_ok_) {
-	//	count_down_ = FAST_RIG_TIMER;
-	//}
-	//else {
-	//	count_down_ = SLOW_RIG_TIMER;
-	//}
-}
-
 // Converts rig mode to ADIF mode/submode
 void rig_if::get_string_mode(string& mode, string& submode) {
 	rig_mode_t rig_mode = rig_data_.mode;
@@ -143,20 +127,11 @@ void rig_if::get_string_mode(string& mode, string& submode) {
 	}
 }
 
+// Get current PTT state
 bool rig_if::get_ptt() {
 	return rig_data_.ptt;
 }
 
-///////////////////////////////////////////////////////////////////////////////////////
-//    H a M L I B implementation
-//
-// hamlib is a library API compiled with zzalib and provides standard API connecting
-// many different rig models using a serial port.(PowerSDR emulates TS2000)
-// It has an issue that only a single app (logger or digital modem) may access the 
-// rig at the same time
-// This is gettable round using omnirig or flrig as the rig slecetd by hamlib 
-// to muliplex accesses
-///////////////////////////////////////////////////////////////////////////////////////
 // Constructor
 rig_if::rig_if(const char* name, hamlib_data_t* data) 
 {
@@ -196,11 +171,11 @@ rig_if::rig_if(const char* name, hamlib_data_t* data)
 // Destructor
 rig_if::~rig_if()
 {
-	// close the serial port
+	// close the connection
 	close();
 }
 
-// Clsoe the serial port
+// Clsoe the connection
 void rig_if::close() {
 
 
@@ -354,6 +329,7 @@ void rig_if::th_run_rig(rig_if* that) {
 		that->opening_ = false;
 		that->run_read_ = true;
 		while (that->run_read_) {
+			// Read the values from the rig once per second
 			that->th_read_values();
 			this_thread::sleep_for(chrono::milliseconds(1000));
 		}
@@ -362,6 +338,7 @@ void rig_if::th_run_rig(rig_if* that) {
 	}
 }
 
+// Read the data from the rig
 void rig_if::th_read_values() {
 	if (hamlib_data_->port_type == RIG_PORT_NONE) {
 		return;
@@ -559,39 +536,41 @@ const char* rig_if::error_text(rig_errcode_e code) {
 	}
 };
 
-int rig_if::cb_hl_freq(RIG* rig, vfo_t vfo, freq_t freq, rig_ptr_t data) {
-	rig_if* that = (rig_if*)data;
-	return RIG_OK;
-}
-
+// returns true if the connection is in the process of being opened
 bool rig_if::is_opening() {
 	return opening_;
 }
 
+// Set the frqeuency modifier (for whan a transverter is attached)
 void rig_if::set_freq_modifier(double delta_freq) {
 	modify_freq_ = true;
 	freq_modifier_ = delta_freq;
 }
 
+// Clear the frequency modiier
 void rig_if::clear_freq_modifier() {
 	modify_freq_ = false;
 }
 
+// Set power modifier to a gain (in dB)
 void rig_if::set_power_modifier(int gain) {
 	modify_power_ = GAIN;
 	power_modifier_ = pow(10.0, (double)gain/10.0);
 }
 
+// Set power modifier to an aboslute power (in W)
 void rig_if::set_power_modifier(double power) {
 	modify_power_ = ABS_POWER;
 	power_modifier_ = power;
 }
 
+// Clear power modifier
 void rig_if::clear_power_modifier() {
 	modify_power_ = UNMODIFIED;
 	power_modifier_ = 0;
 }
 
+// Returns true if the rig has CAT control
 bool rig_if::has_no_cat() {
 	return (hamlib_data_->port_type == RIG_PORT_NONE);
 }

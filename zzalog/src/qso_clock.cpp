@@ -41,6 +41,7 @@ void qso_clock::create_form(int X, int Y) {
 	const int TIME_SZ = 4 * FL_NORMAL_SIZE;
 	const int DATE_SZ = 3 * FL_NORMAL_SIZE / 2;
 
+	// Button in which to display time
 	bn_time_ = new Fl_Button(curr_x, curr_y, WCLOCKS, TIME_SZ + 2);
 	bn_time_->color(FL_BLACK);
 	bn_time_->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE);
@@ -51,6 +52,7 @@ void qso_clock::create_form(int X, int Y) {
 
 	curr_y += bn_time_->h();
 
+	// Button in which to display date
 	bn_date_ = new Fl_Button(curr_x, curr_y, WCLOCKS, DATE_SZ + 2 + GAP);
 	bn_date_->color(FL_BLACK);
 	bn_date_->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE);
@@ -68,12 +70,15 @@ void qso_clock::create_form(int X, int Y) {
 
 // Enable/disab;e widgets
 void qso_clock::enable_widgets() {
+	// Get the current time
 	time_t now = time(nullptr);
 
 	tm value;
 	char result[100];
 	if (display_local_) {
+		// Display in local timezone
 		value = *localtime(&now);
+		// Copy timezone to tab's label
 		strftime(result, 99, "%Z", &value);
 		copy_label(result);
 		bn_time_->labelcolor(FL_RED);
@@ -84,6 +89,7 @@ void qso_clock::enable_widgets() {
 		bn_date_->copy_label(result);
 	}
 	else {
+		// Display in UTC (aka GMT)
 		value = *gmtime(&now);
 		label("UTC");
 		bn_time_->labelcolor(FL_YELLOW);

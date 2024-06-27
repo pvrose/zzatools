@@ -6,6 +6,7 @@
 
 extern Fl_Preferences* settings_;
 
+// Constructor
 qso_misc::qso_misc(int X, int Y, int W, int H, const char* L) :
 	Fl_Tabs(X, Y, W, H, L)
 {
@@ -13,6 +14,7 @@ qso_misc::qso_misc(int X, int Y, int W, int H, const char* L) :
 	create_form();
 }
 
+// Destructor
 qso_misc::~qso_misc() {
 	save_values();
 }
@@ -39,15 +41,20 @@ void qso_misc::create_form() {
 	int rh = 0;
 	client_area(rx, ry, rw, rh, 0);
 
+	// Previous details form
 	details_ = new qso_details(rx, ry, rw, rh, "Previous");
+	// DXCC and worked before status form
 	dxcc_ = new qso_dxcc(rx, ry, rw, rh, "DX?");
+	// Edit my QTH form
 	qth_ = new qso_qth(rx, ry, rw, rh, "My QTH");
+	// QSL details form
 	qsl_ = new qso_qsl_vwr(rx, ry, rw, rh, "QSL");
 
 	end();
 
 	value(child(default_tab_));
 }
+
 // Enable/disab;e widgets
 void qso_misc::enable_widgets() {
 	// Set the label of the selected tab to BOLD, others to ITALIC
@@ -81,6 +88,7 @@ void qso_misc::save_values() {
 	settings_->flush();
 }
 
+// set the QSO details into the various forms
 void qso_misc::qso(record* qso, qso_num_t number) {
 	qso_ = qso;
 	qth_->set_qth(qso_->item("APP_ZZA_QTH"));

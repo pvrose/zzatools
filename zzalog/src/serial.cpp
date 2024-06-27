@@ -61,6 +61,7 @@ bool serial::available_ports(int num_ports, string* ports, bool all_ports, int& 
 		}
 	}
 #else
+	// Currently limited to USB TTY ports
 	const char* tty_fmt[] = {
 //		"/dev/tty%u",
 //		"/dev/ttyS%u",

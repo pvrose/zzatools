@@ -20,16 +20,20 @@ qso_query::qso_query(int X, int Y, int W, int H, const char* L) :
 	enable_widgets();
 }
 
+// Destructor
 qso_query::~qso_query() {
 	save_values();
 }
 
+// Load Settings
 void qso_query::load_values() {
 }
 
+// Sabe settings
 void qso_query::save_values() {
 }
 
+// Create the widgets
 void qso_query::create_form(int X, int Y) {
 	int curr_x = X;
 	int curr_y = Y;
@@ -46,6 +50,7 @@ void qso_query::create_form(int X, int Y) {
 	curr_x += GAP;
 	curr_y += HTEXT;
 
+	// Tabular display to allow all fields in the record to be displayed
 	tab_query_ = new record_table(curr_x, curr_y, WTABLE, HTABLE);
 	tab_query_->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
 	tab_query_->callback(cb_tab_qso, nullptr);
@@ -58,6 +63,7 @@ void qso_query::create_form(int X, int Y) {
 	end();
 }
 
+// Configure the widgets
 void qso_query::enable_widgets() {
 	switch (qso_data_->logging_state()) {
 	case qso_data::QSO_BROWSE:
@@ -83,7 +89,8 @@ string qso_query::query_message() {
 	return query_message_;
 }
 
-// Callback - table
+// Callback - table 
+// v is not used
 void qso_query::cb_tab_qso(Fl_Widget* w, void* v) {
 	qso_query* that = ancestor_view<qso_query>(w);
 	record_table* table = (record_table*)w;
@@ -92,6 +99,7 @@ void qso_query::cb_tab_qso(Fl_Widget* w, void* v) {
 	int button = Fl::event_button();
 	bool double_click = Fl::event_clicks();
 	string field = table->field(row);
+	// Handle double left click in both the row header and each column 
 	switch (table->callback_context()) {
 	case Fl_Table::CONTEXT_ROW_HEADER:
 		if (button == FL_LEFT_MOUSE && double_click) {
@@ -106,7 +114,7 @@ void qso_query::cb_tab_qso(Fl_Widget* w, void* v) {
 	}
 }
 
-//Set QSOs
+//Set QSOs into query
 void qso_query::set_query(string message, qso_num_t log_number, record* query_qso, bool save_original) {
 	query_message_ = message;
 	log_number_ = log_number;

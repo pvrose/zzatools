@@ -80,13 +80,14 @@ report_tree::report_tree(int X, int Y, int W, int H, const char* label, field_or
 
 }
 
-// Destructor
+// Delete all contents
 void report_tree::delete_all()
 {
 	delete_tree();
 	delete_map(&map_);
 }
 
+// Destructor
 report_tree::~report_tree() {
 	delete_all();
 }

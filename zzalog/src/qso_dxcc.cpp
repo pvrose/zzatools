@@ -20,6 +20,7 @@ extern tabbed_forms* tabbed_forms_;
 extern spec_data* spec_data_;
 extern bool DARK;
 
+// Constructor
 qso_dxcc::qso_dxcc(int X, int Y, int W, int H, const char* L) :
 	Fl_Group(X, Y, W, H, L)
 	, bands_worked_(nullptr)
@@ -27,23 +28,24 @@ qso_dxcc::qso_dxcc(int X, int Y, int W, int H, const char* L) :
 {
 	labelfont(FL_BOLD);
 	labelsize(FL_NORMAL_SIZE + 2);
-	//align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 	create_form();
 	enable_widgets();
 	end();
 }
 
+// Destructor
 qso_dxcc::~qso_dxcc() {
 
 }
 
+// Create the widgets
 void qso_dxcc::create_form() {
 	int avail_width = w() - GAP - GAP;
 	int avail_height = h() - GAP;
 	int curr_x = x() + GAP;
 	int curr_y = y() + 1;
 
-	// "Title" is callsign
+	// Display callsign
 	op_call_ = new Fl_Output(curr_x, curr_y, avail_width - WBUTTON, HBUTTON);
 	op_call_->box(FL_FLAT_BOX);
 	op_call_->color(FL_BACKGROUND_COLOR);
@@ -59,6 +61,7 @@ void qso_dxcc::create_form() {
 	curr_x = x() + GAP;
 	curr_y += op_call_->h();
 
+	// Display the DXCC prefix
 	op_prefix_ = new Fl_Output(curr_x, curr_y, avail_width, ROW_HEIGHT);
 	op_prefix_->box(FL_FLAT_BOX);
 	op_prefix_->color(FL_BACKGROUND_COLOR);
@@ -66,11 +69,13 @@ void qso_dxcc::create_form() {
 	op_prefix_->textcolor(DARK ? FL_RED : COLOUR_CLARET);
 	curr_y += ROW_HEIGHT;
 
+	// Display how the DXCC was found (decoded or from exception file)
 	op_source_ = new Fl_Output(curr_x, curr_y, avail_width, ROW_HEIGHT);
 	op_source_->box(FL_FLAT_BOX);
 	op_source_->color(FL_BACKGROUND_COLOR);
 	curr_y += ROW_HEIGHT;
 
+	// Display geographic information
 	op_geo_ = new Fl_Output(curr_x, curr_y, avail_width, ROW_HEIGHT);
 	op_geo_->box(FL_FLAT_BOX);
 	op_geo_->color(FL_BACKGROUND_COLOR);
@@ -78,6 +83,7 @@ void qso_dxcc::create_form() {
 
 	avail_height -= (curr_y - y());
 
+	// Display worked before status (bands and modes)
 	g_wb4_ = new wb4_buttons(curr_x, curr_y, avail_width, avail_height, "DXCC worked before");
 	g_wb4_->align(FL_ALIGN_TOP);
 
@@ -165,6 +171,7 @@ void qso_dxcc::cb_bn_qrz(Fl_Widget* w, void* v) {
 }
 
 // The "worked before" lights
+// Inherit from Fl_Scroll as there are too many buttons for the available display
 qso_dxcc::wb4_buttons::wb4_buttons(int X, int Y, int W, int H, const char* L) :
 	Fl_Scroll(X, Y, W, H, L),
 	dxcc_bands_(nullptr),
@@ -176,8 +183,10 @@ qso_dxcc::wb4_buttons::wb4_buttons(int X, int Y, int W, int H, const char* L) :
 	end();
 }
 
+// Destructor
 qso_dxcc::wb4_buttons::~wb4_buttons() {}
 
+// Create the buttons
 void qso_dxcc::wb4_buttons::create_form() {
 	const int NUM_WIDE = 4;
 	const int BWIDTH = (w() - Fl::scrollbar_size()) / NUM_WIDE;
@@ -186,7 +195,9 @@ void qso_dxcc::wb4_buttons::create_form() {
 	begin();
 	int curr_x = x();
 	int curr_y = y();
+	// For all bands in the log...
 	for (auto it = all_bands_->begin(); it != all_bands_->end(); it++) {
+		// ... create a button
 		Fl_Toggle_Button* bn = new Fl_Toggle_Button(curr_x, curr_y, BWIDTH, HBUTTON);
 		bn->copy_label((*it).c_str());
 		bn->callback(cb_bn_band, (void*)(*it).c_str());
@@ -204,10 +215,13 @@ void qso_dxcc::wb4_buttons::create_form() {
 	}
 	bn_number = 0;
 	set<string> modes = *all_modes_;
+	// Add submodes to the list of modes (all in the log)
 	for(auto ix = all_submodes_->begin(); ix != all_submodes_->end(); ix++) {
 		modes.insert(*ix);
 	}
+	// For all modes and submodes in the log...
 	for (auto it = modes.begin(); it != modes.end(); it++) {
+		// ... add a log
 		Fl_Toggle_Button* bn = new Fl_Toggle_Button(curr_x, curr_y, BWIDTH, HBUTTON);
 		bn->copy_label((*it).c_str());
 		bn->callback(cb_bn_mode, (void*)(*it).c_str());
@@ -233,14 +247,17 @@ void qso_dxcc::wb4_buttons::enable_widgets() {
 	all_modes_ = book_->used_modes();
 	all_submodes_ = book_->used_submodes();
 	if (qso) {
+		// Get the details for this QSO
 		qso_band = qso->item("BAND");
 		qso_submode = qso->item("SUBMODE");
 		qso_mode = qso->item("MODE");
 		int dxcc = cty_data_->entity(qso);
 		string my_call = qso->item("STATION_CALLSIGN");
+		// Add this QSOs band and mode to the list of logged 
 		if (qso_band.length()) all_bands_->insert(qso_band);
 		if (qso_mode.length()) all_modes_->insert(qso_mode);
 		if (qso_submode.length()) all_modes_->insert(qso_submode);
+		// Get the bands and modes worked for this DXCC
 		dxcc_bands_ = book_->used_bands(dxcc, my_call);
 		dxcc_modes_ = book_->used_modes(dxcc, my_call);
 		dxcc_submodes_ = book_->used_submodes(dxcc, my_call);
@@ -250,14 +267,14 @@ void qso_dxcc::wb4_buttons::enable_widgets() {
 	}
 	// Create all the buttons
 	create_form();
-	// Clear all widgets
+	// Reset all the buttons' colouring
 	for (int ix = 0; ix < children(); ix++) {
 		Fl_Toggle_Button* bn = (Fl_Toggle_Button*)child(ix);
 		bn->color(FL_BACKGROUND_COLOR);
 		bn->labelcolor(fl_inactive(FL_FOREGROUND_COLOR));
 		bn->value(false);
 	}
-	// Mark QSO buttons
+	// Mark this QSO buttons: Band in claret, Mode in dark green
 	if (qso && qso->item("CALL").length()) {
 		if (qso_band.length()) {
 			Fl_Toggle_Button* bn = (Fl_Toggle_Button*)map_.at(qso_band);
@@ -277,8 +294,8 @@ void qso_dxcc::wb4_buttons::enable_widgets() {
 			bn->labelcolor(fl_contrast(FL_BLACK, bn->color()));
 			bn->value(true);
 		}
-		// Set band colours - CLARET this QSO, MAUVE other QSOs
-		// Set this band to CLARET - overwrite tp MAUVE if wkb4
+		// Set bands worked for this DXCC in mauve - this will overwrite this
+		// QSO's if it has been worked before
 		if (dxcc_bands_) {
 			for (auto ix = dxcc_bands_->begin(); ix != dxcc_bands_->end(); ix++) {
 				Fl_Toggle_Button * bn = (Fl_Toggle_Button*)map_.at(*ix);
@@ -286,7 +303,8 @@ void qso_dxcc::wb4_buttons::enable_widgets() {
 				bn->labelcolor(fl_contrast(FL_BLACK, bn->color()));
 			}
 		}
-		// Set mode colours - CALRET this QSO, APPLE other QSOs
+		// Set modes worked for this DXCC in apple green - this will overwrite this
+		// QSO's if it has been worked before
 		if (dxcc_modes_) {
 			for (auto ix = dxcc_modes_->begin(); ix != dxcc_modes_->end(); ix++) {
 				Fl_Toggle_Button* bn = (Fl_Toggle_Button*)map_.at(*ix);

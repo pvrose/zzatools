@@ -11,6 +11,7 @@ extern status* status_;
 extern spec_data* spec_data_;
 extern bool DARK;
 
+// Constructor
 qso_details::qso_details(int X, int Y, int W, int H, const char* L) :
 	Fl_Group(X, Y, W, H, L)
 	, callsign_("")
@@ -22,8 +23,10 @@ qso_details::qso_details(int X, int Y, int W, int H, const char* L) :
 	enable_widgets();
 }
 
+// Destructor
 qso_details::~qso_details() {}
 
+// Create the widgets
 void qso_details::create_form() {
 	int avail_width = w() - GAP - GAP;
 	int avail_height = h() - GAP;
@@ -39,22 +42,25 @@ void qso_details::create_form() {
 	op_call_->textcolor(DARK ? FL_RED : COLOUR_CLARET);
 
 	curr_y += op_call_->h() + GAP;
-	// Add table
+	// Add table for the contact's details
 	table_details_ = new table_d(curr_x, curr_y, avail_width, 5 * ROW_HEIGHT);
 
 	curr_y += table_details_->h() + GAP;
 
+	// Add the table for the previous QSOs with this callsign
 	table_qsos_ = new table_q(curr_x, curr_y, avail_width, y() + avail_height - curr_y);
 
 	end();
 	enable_widgets();
 }
 
+// Update and configure widgets
 void qso_details::enable_widgets() {
 	op_call_->value(callsign_.c_str());
 	get_qsos();
 }
 
+// Get the previous QSOs with this callsign
 void qso_details::get_qsos() {
 	set<string> names;
 	set<string> qths;
@@ -63,21 +69,26 @@ void qso_details::get_qsos() {
 	qso_entry* qe = ancestor_view<qso_entry>(this);
 	record* qso = qe->qso();
 
+	// Scan the book for all records with this callsign
 	for (qso_num_t ix = 0; qso && ix < book_->size(); ix++) {
 		record* it = book_->get_record(ix, false);
 		if (it->item("CALL") == callsign_) {
+			// Get all NAME fields
 			string name = it->item("NAME");
 			if (name.length()) {
 				names.insert(name);
 			}
+			// Get all QTH fields
 			string qth = it->item("QTH");
 			if (qth.length()) {
 				qths.insert(qth);
 			}
+			// Get all GRIDSQUARE fields
 			string locator = it->item("GRIDSQUARE");
 			if (locator.length()) {
 				locators.insert(locator);
 			}
+			// Ignore current QSO
 			if (qso->timestamp() != it->timestamp()) {
 				items.insert(ix);
 			}
@@ -87,10 +98,12 @@ void qso_details::get_qsos() {
 	table_qsos_->set_data(items);
 }
 
+// Set the callsign
 void qso_details::set_call(string callsign) {
 	callsign_ = callsign;
 }
 
+// Constructor for details table
 qso_details::table_d::table_d(int X, int Y, int W, int H, const char* L) :
 	Fl_Table(X, Y, W, H, L)
 {
@@ -102,9 +115,11 @@ qso_details::table_d::table_d(int X, int Y, int W, int H, const char* L) :
 	when(FL_WHEN_RELEASE);
 }
 
+// Destructor
 qso_details::table_d::~table_d() {
 }
 
+// Draw the cells of the table of details
 void qso_details::table_d::draw_cell(TableContext context, int R, int C, int X, int Y, int W, int H)
 {
 	string text;
@@ -121,6 +136,7 @@ void qso_details::table_d::draw_cell(TableContext context, int R, int C, int X, 
 		return;
 
 	case CONTEXT_ROW_HEADER:
+		// Add the headings (only for the first row of each type)
 		fl_push_clip(X, Y, W, H);
 		{
 			fl_draw_box(FL_THIN_UP_BOX, X, Y, W, H, row_header_color());
@@ -134,6 +150,7 @@ void qso_details::table_d::draw_cell(TableContext context, int R, int C, int X, 
 		return;
 
 	case CONTEXT_CELL:
+		// Draw the individual table cells
 		// Column indicates which record, R the field
 		fl_push_clip(X, Y, W, H);
 		{
@@ -169,6 +186,7 @@ void qso_details::table_d::draw_cell(TableContext context, int R, int C, int X, 
 	}
 }
 
+// Concatenate NAME, QTH and GRIDSQUARE lists into a single dataset for the table
 void qso_details::table_d::set_data(set<string>names, set < string>qths, set<string> locators) {
 	items_.clear();
 	for (auto it = names.begin(); it != names.end(); it++) {
@@ -204,6 +222,7 @@ void qso_details::table_d::cb_table(Fl_Widget* w, void* v) {
 	}
 }
 
+// Previous qSO table constructor
 qso_details::table_q::table_q(int X, int Y, int W, int H, const char* L) :
 	Fl_Table(X, Y, W, H, L)
 {
@@ -219,9 +238,11 @@ qso_details::table_q::table_q(int X, int Y, int W, int H, const char* L) :
 	end();
 }
 
+// Destructor
 qso_details::table_q::~table_q() {
 }
 
+// Draw the previous QSOs tale
 void qso_details::table_q::draw_cell(TableContext context, int R, int C, int X, int Y, int W, int H)
 {
 	string text;
@@ -238,6 +259,7 @@ void qso_details::table_q::draw_cell(TableContext context, int R, int C, int X, 
 		return;
 
 	case CONTEXT_COL_HEADER:
+	// Column headers
 	{
 		fl_push_clip(X, Y, W, H);
 		switch (C) {
@@ -268,6 +290,7 @@ void qso_details::table_q::draw_cell(TableContext context, int R, int C, int X, 
 		return;
 	}
 	case CONTEXT_CELL:
+		// Individual table cells
 		// Column indicates which record, R the field
 		fl_push_clip(X, Y, W, H);
 		{
@@ -330,6 +353,7 @@ void qso_details::table_q::cb_table(Fl_Widget* w, void* v) {
 	}
 }
 
+// Set the table items
 void qso_details::table_q::set_data(set<qso_num_t> items) {
 	items_.clear();
 	for (auto it = items.begin(); it != items.end(); it++) {

@@ -83,6 +83,8 @@ void qso_data::create_form(int X, int Y) {
 	int curr_x = X + GAP;
 
 	// One or the other of the two groups below will be shown at a time
+
+	// Single QSO entry 
 	g_entry_ = new qso_entry(curr_x, curr_y, 10, 10);
 	g_entry_->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 	g_entry_->labelfont(FL_BOLD);
@@ -90,13 +92,16 @@ void qso_data::create_form(int X, int Y) {
 	g_entry_->labelcolor(FL_DARK_BLUE);
 
 	max_x = max(max_x, g_entry_->x() + g_entry_->w());
+	// Query form
 	g_query_ = new qso_query(curr_x, curr_y, 10, 10);
 
 	max_x = max(max_x, g_query_->x() + g_query_->w());
 
+	// Multiple QSO entry
 	g_net_entry_ = new qso_net_entry(curr_x, curr_y, 10, 10);
 	max_x = max(max_x, g_net_entry_->x() + g_net_entry_->w());
 
+	// Manual QSO query - displays a qso_entry form
 	g_qy_entry_ = new qso_entry(curr_x, curr_y, 10, 10);
 	g_qy_entry_->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 	g_qy_entry_->labelfont(FL_BOLD);
@@ -108,6 +113,7 @@ void qso_data::create_form(int X, int Y) {
 	curr_y = max(curr_y, g_net_entry_->y() + g_net_entry_->h());
 	curr_y += GAP;
 
+	// Display the buttons for the particular logging_stte_
 	g_buttons_ = new qso_buttons(curr_x, curr_y, 10, 10);
 
 	max_x = max(max_x, g_buttons_->x() + g_buttons_->w());
@@ -136,6 +142,7 @@ void qso_data::enable_widgets() {
 		char l[128];
 		switch (logging_state_) {
 		case QSO_INACTIVE:
+			// No QSO - show the entry form, hide the others
 			g_entry_->label("QSO Entry is not enabled");
 			g_entry_->labelcolor(DARK ? fl_lighter(FL_RED) : FL_RED);
 			g_entry_->show();
@@ -145,6 +152,7 @@ void qso_data::enable_widgets() {
 			g_qy_entry_->hide();
 			break;
 		case QSO_PENDING:
+			// Real-time logging - waiting to start QSO
 			g_entry_->label("QSO Entry - prepared for real-time logging.");
 			g_entry_->labelcolor(DARK ? fl_lighter(FL_BLUE) : FL_BLUE);
 			g_entry_->show();
@@ -154,6 +162,7 @@ void qso_data::enable_widgets() {
 			g_qy_entry_->hide();
 			break;
 		case QSO_STARTED:
+			// Real-time logging - QSO started
 			snprintf(l, sizeof(l), "QSO Entry - %s - logging new contact", current_qso()->item("CALL").c_str());
 			g_entry_->copy_label(l);
 			g_entry_->labelcolor(DARK ? fl_lighter(FL_BLUE) : FL_BLUE);
@@ -164,6 +173,7 @@ void qso_data::enable_widgets() {
 			g_qy_entry_->hide();
 			break;
 		case QSO_ENTER:
+			// Back-logging - enter QSO details
 			snprintf(l, sizeof(l), "QSO Entry - %s - logging old contact", current_qso()->item("CALL").c_str());
 			g_entry_->copy_label(l);
 			g_entry_->labelcolor(DARK ? fl_lighter(FL_BLUE) : FL_BLUE);
@@ -174,6 +184,7 @@ void qso_data::enable_widgets() {
 			g_qy_entry_->hide();
 			break;
 		case QSO_EDIT:
+			// Editing an existing QSO
 			snprintf(l, sizeof(l), "QSO Entry - %s - editing existing contact", current_qso()->item("CALL").c_str());
 			g_entry_->copy_label(l);
 			g_entry_->labelcolor(DARK ? fl_lighter(FL_BLUE) : FL_BLUE);
@@ -184,6 +195,7 @@ void qso_data::enable_widgets() {
 			g_qy_entry_->hide();
 			break;
 		case QSO_VIEW:
+			// Viewing (read-only) an existing QSO
 			snprintf(l, sizeof(l), "QSO Entry - %s - read only", current_qso()->item("CALL").c_str());
 			g_entry_->copy_label(l);
 			g_entry_->labelcolor(DARK ? fl_lighter(FL_BLUE) : FL_BLUE);
@@ -194,6 +206,7 @@ void qso_data::enable_widgets() {
 			g_qy_entry_->hide();
 			break;
 		case QSO_BROWSE:
+			// Browsing - display using tabular view
 			g_entry_->hide();
 			snprintf(l, sizeof(l), "QSO Query - %s - %s", g_query_->qso()->item("CALL").c_str(), g_query_->query_message().c_str());
 			g_query_->copy_label(l);
@@ -203,7 +216,9 @@ void qso_data::enable_widgets() {
 			g_qy_entry_->hide();
 			break;
 		case QUERY_DUPE:
+			// Show two logged QSOs in query form to check for duplicate
 		case QUERY_MATCH:
+			// Show an imported QSO and possible match in log check if matcehd
 			g_entry_->hide();
 			snprintf(l, sizeof(l), "QSO Query - %s - %s", g_query_->qso()->item("CALL").c_str(), g_query_->query_message().c_str());
 			g_query_->copy_label(l);
@@ -213,6 +228,7 @@ void qso_data::enable_widgets() {
 			g_qy_entry_->hide();
 			break;
 		case QUERY_NEW:
+			// Show an imported QSO (no match found) and check if real
 			g_entry_->hide();
 			snprintf(l, sizeof(l), "QSO Query - %s - %s", g_query_->query_qso()->item("CALL").c_str(), g_query_->query_message().c_str());
 			g_query_->copy_label(l);
@@ -222,6 +238,7 @@ void qso_data::enable_widgets() {
 			g_qy_entry_->hide();
 			break;
 		case QUERY_WSJTX:
+			// Show an imported QSO and possible match found in WSJTX All.TXT file
 			g_entry_->hide();
 			snprintf(l, sizeof(l), "QSO Query - %s - Possible match found in ALL.TXT", g_query_->query_qso()->item("CALL").c_str());
 			g_query_->copy_label(l);
@@ -231,6 +248,7 @@ void qso_data::enable_widgets() {
 			g_qy_entry_->hide();
 			break;
 		case NET_STARTED:
+			// Display multiple QSOs in real-time
 			g_entry_->hide();
 			g_query_->hide();
 			g_net_entry_->label("Net Entry - active real-time logging");
@@ -239,6 +257,7 @@ void qso_data::enable_widgets() {
 			g_qy_entry_->hide();
 			break;
 		case NET_EDIT:
+			// Display looged QSOs that (may be) a net
 			g_entry_->hide();
 			g_query_->hide();
 			g_net_entry_->label("Net Entry - off-air logging");
@@ -247,6 +266,7 @@ void qso_data::enable_widgets() {
 			g_qy_entry_->hide();
 			break;
 		case QSO_WSJTX:
+			// Display real-time Qso from WSJT-X
 			snprintf(l, sizeof(l), "QSO Entry - %s - record received from WSJTX", current_qso()->item("CALL").c_str());
 			g_entry_->copy_label(l);
 			g_entry_->show();
@@ -256,6 +276,7 @@ void qso_data::enable_widgets() {
 			g_qy_entry_->hide();
 			break;
 		case QSO_FLDIGI:
+			// Display real-time QSO received from FLDID
 			snprintf(l, sizeof(l), "QSO Entry - %s - record received from FLDIGI", current_qso()->item("CALL").c_str());
 			g_entry_->copy_label(l);
 			g_entry_->show();
@@ -265,6 +286,7 @@ void qso_data::enable_widgets() {
 			g_qy_entry_->hide();
 			break;
 		case MANUAL_ENTRY:
+			// Display entry form to search for qSOs in log
 			g_entry_->hide();
 			g_query_->hide();
 			g_qy_entry_->show();
@@ -394,7 +416,6 @@ void qso_data::update_qso(qso_num_t log_num) {
 		}
 		break;
 	}
-	// action_view_qsl();
 }
 
 // Update query
@@ -469,12 +490,10 @@ record* qso_data::start_modem_qso(string call, qso_init_t source) {
 		return nullptr;
 	}
 	if (allow_modem) {
-		// printf("DEBUG DASH Received request to create a record for %s\n", call.c_str());
 		action_activate(source);
 		action_start(source);
 		if (cancelled) book_->enable_save(true, "Remove temporary block");
 		current_qso()->item("CALL", call);
-		// printf("DEBUG DASH generated %s - %p\n", call.c_str(), current_qso());
 		return current_qso();
 	} else {
 		return nullptr;
@@ -564,7 +583,6 @@ qso_num_t qso_data::get_default_number() {
 
 // Action - create a new QSL in the appropriate copy of qso_entry
 void qso_data::action_new_qso(record* qso, qso_init_t mode) {
-	// printf("DEBUG: action_new_qso %p\n", qso);
 	qso_entry* qe;
 	switch (logging_state_) {
 	case NET_STARTED:
@@ -579,19 +597,16 @@ void qso_data::action_new_qso(record* qso, qso_init_t mode) {
 		qe = g_entry_;
 		break;
 	}
-	// printf("DEBUG: Creating QSO in %p\n", qe);
 	rig_if* rig = ((qso_manager*)parent())->rig();
 	qso_init_t new_mode = (mode == QSO_AS_WAS) ? previous_mode_ : mode;
 	switch (new_mode) {
 	case QSO_NONE:
 		// Just copy the station details
-		// printf("DEBUG: Off-line contact\n");
 		qe->copy_qso_to_qso(qso, qso_entry::CF_COPY);
 		break;
 	case QSO_ON_AIR:
 		// Copy station details and get read rig details for band etc. 
 		// If rig not connected use same as original
-		// printf("DEBUG: On-air contact\n");
 		if (rig && rig->is_good()) {
 			qe->copy_qso_to_qso(qso, qso_entry::CF_RIG_ETC);
 			qe->copy_cat_to_qso();
@@ -602,19 +617,16 @@ void qso_data::action_new_qso(record* qso, qso_init_t mode) {
 		break;
 	case QSO_COPY_CONDX:
 		// Clone the QSO - get station and band from original QSO
-		// printf("DEBUG: clone ontact\n");
 		qe->copy_qso_to_qso(qso, qso_entry::CF_RIG_ETC | qso_entry::CF_CAT);
 		qe->copy_clock_to_qso();
 		break;
 	case QSO_COPY_CALL:
 		// Copy the QSO - as abobe but also same callsign and details
-		// printf("DEBUG: Clone+ contact\n");
 		qe->copy_qso_to_qso(qso, qso_entry::CF_RIG_ETC | qso_entry::CF_CAT | qso_entry::CF_CONTACT);
 		qe->copy_clock_to_qso();
 		break;
 	case QSO_COPY_FOR_NET:
 		// Clone the QSO - get time, station and band from original QSO
-		// printf("DEBUG: Clone++ contact\n");
 		qe->copy_qso_to_qso(qso, qso_entry::CF_TIME | qso_entry::CF_DATE | qso_entry::CF_RIG_ETC | qso_entry::CF_CAT);
 		qe->copy_clock_to_qso();
 		break;
@@ -622,7 +634,6 @@ void qso_data::action_new_qso(record* qso, qso_init_t mode) {
 	case QSO_COPY_FLDIGI:
 		// Set QSO and Update the display
 		qe->qso(-1);
-		// ancestor_view<qso_manager>(this)->update_import_qso(qso);
 		qe->copy_default_to_qso();
 		qe->copy_clock_to_qso();
 		qe->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
@@ -634,7 +645,6 @@ void qso_data::action_new_qso(record* qso, qso_init_t mode) {
 
 // Action ACTIVATE: transition from QSO_INACTIVE to QSO_PENDING
 void qso_data::action_activate(qso_init_t mode) {
-	// printf("DEBUG: action_activate\n");
 	record* source_record = book_->get_record();
 	qso_manager* mgr = ancestor_view<qso_manager>(this);
 	logging_state_ = QSO_PENDING;
@@ -644,9 +654,6 @@ void qso_data::action_activate(qso_init_t mode) {
 
 // Action START - transition from QSO_PENDING to QSO_STARTED
 void qso_data::action_start(qso_init_t mode) {
-	// printf("DEBUG: action_start\n");
-	// Add to book
-	// action_new_qso(current_qso(), mode);
 	g_entry_->append_qso();
 	book_->enable_save(false, "Starting real-time QSO");
 	book_->selection(book_->item_number(g_entry_->qso_number()), HT_INSERTED);
@@ -669,7 +676,6 @@ void qso_data::action_start(qso_init_t mode) {
 
 // Action SAVE - transition from QSO_STARTED to QSO_INACTIVE while saving record
 bool qso_data::action_save() {
-	// printf("DEBUG: action_save\n");
 	record* qso = nullptr;
 	item_num_t item_number = -1;
 	qso_num_t qso_number = -1;
@@ -706,8 +712,6 @@ bool qso_data::action_save() {
 			// Time as HHMMSS - always log seconds.
 			qso->item("TIME_OFF", timestamp.substr(8));
 		}
-		// // Increment contest serial number
-		// g_contest_->increment_serial();
 		break;
 	case QSO_COPY_CALL:
 	case QSO_COPY_CONDX:
@@ -785,8 +789,6 @@ bool qso_data::action_save() {
 
 // Action CANCEL - Transition from QSO_STARTED to QSO_INACTIVE without saving record
 void qso_data::action_cancel() {
-	// printf("DEBUG: action_cancel\n");
-	// book_->delete_record() will change the selected record - we need ti be inactive to ignore it
 	logging_state_t saved_state = logging_state_;
 	logging_state_ = QSO_INACTIVE;
 	book_->delete_record(true);
@@ -814,8 +816,6 @@ void qso_data::action_cancel() {
 
 // Action DELETE - we should be inactive but leave this code 
 void qso_data::action_delete_qso() {
-	// printf("DEBUG: action_delete_qso\n");
-	// book_->delete_record() will change the selected record - we need ti be inactive to ignore it
 	logging_state_t saved_state = logging_state_;
 	logging_state_ = QSO_INACTIVE;
 	book_->delete_record(true);
@@ -835,7 +835,6 @@ void qso_data::action_delete_qso() {
 
 // Action DEACTIVATE - Transition from QSO_PENDING to QSO_INACTIVE
 void qso_data::action_deactivate() {
-	// printf("DEBUG: action_deactivate\n");
 	g_entry_->delete_qso();
 	logging_state_ = QSO_INACTIVE;
 	enable_widgets();
@@ -843,7 +842,6 @@ void qso_data::action_deactivate() {
 
 // Action EDIT - Transition from QSO_INACTIVE to QSO_EDIT
 void qso_data::action_edit() {
-	// printf("DEBUG: action_edit\n");
 	// Save a copy of the current record
 	qso_num_t qso_number = get_default_number();
 	g_entry_->qso(qso_number);
@@ -868,7 +866,6 @@ void qso_data::action_edit() {
 
 // Action VIEW - Transition from QSO_INACTIVE to QSO_VIEW
 void qso_data::action_view() {
-	// printf("DEBUG: action_view\n");
 	// Save a copy of the current record
 	qso_num_t qso_number = get_default_number();
 	logging_state_ = QSO_VIEW;
@@ -879,7 +876,6 @@ void qso_data::action_view() {
 
 // Action SAVE EDIT - Transition from QSO_EDIT to QSO_INACTIVE while saving changes
 void qso_data::action_save_edit() {
-	// printf("DEBUG: action_save_edit\n");
 	// We no longer need to maintain the copy of the original QSO
 	record* qso = g_entry_->qso();
 	book_->add_use_data(qso);
@@ -891,7 +887,6 @@ void qso_data::action_save_edit() {
 
 // ACtion CANCEL EDIT - Transition from QSO_EDIT to QSO_INACTIVE scrapping changes
 void qso_data::action_cancel_edit() {
-	// printf("DEBUG: action_cancel_edit\n");
 	// Copy original back to the book
 	if (g_entry_->original_qso()) {
 		*book_->get_record(g_entry_->qso_number(), false) = *g_entry_->original_qso();
@@ -904,7 +899,6 @@ void qso_data::action_cancel_edit() {
 
 // Action CANCEL in BROWSE 
 void qso_data::action_cancel_browse() {
-	// printf("DEBUG: action_cancel_browse\n");
 	g_entry_->qso(g_query_->qso_number());
 	g_query_->clear_query();
 	logging_state_ = edit_return_state_;
@@ -914,7 +908,6 @@ void qso_data::action_cancel_browse() {
 
 // Action navigate button
 void qso_data::action_navigate(int target) {
-	// printf("DEBUG: action_navigate\n");
 	inhibit_drawing_ = true;
 	switch (logging_state_) {
 	case QSO_EDIT:
@@ -922,28 +915,24 @@ void qso_data::action_navigate(int target) {
 		action_save_edit();
 		navigation_book_->navigate((navigate_t)target);
 		action_edit();
-		// action_view_qsl();
 		break;
 	case QSO_VIEW:
 		// Save, navigate to new QSO and open editor
 		action_cancel_edit();
 		navigation_book_->navigate((navigate_t)target);
 		action_view();
-		// action_view_qsl();
 		break;
 	case QSO_PENDING:
 		// Deactivate, navigate and go pending again
 		action_deactivate();
 		navigation_book_->navigate((navigate_t)target);
 		action_activate(previous_mode_);
-		// action_view_qsl();
 		break;
 	case QSO_BROWSE:
 		// Close browser, navigate and reopen browser
 		action_cancel_browse();
 		navigation_book_->navigate((navigate_t)target);
 		action_browse();
-		// action_view_qsl();
 		break;
 	case QUERY_MATCH:
 		// Navigate book to new compare record and reopen query
@@ -963,7 +952,6 @@ void qso_data::action_navigate(int target) {
 
 // Action browse
 void qso_data::action_browse() {
-	// printf("DEBUG: action_browse\n");
 	qso_num_t qso_number = get_default_number();
 	logging_state_ = QSO_BROWSE;
 	g_query_->set_query("Browsing record",qso_number);
@@ -972,7 +960,6 @@ void qso_data::action_browse() {
 
 // Action query
 void qso_data::action_query(logging_state_t query, qso_num_t match_number, qso_num_t query_number) {
-	// printf("DEBUG: action_query\n");
 	switch (query) {
 	case QUERY_MATCH:
 		g_query_->set_query(import_data_->match_question(), match_number, import_data_->get_record(query_number, false));
@@ -1002,7 +989,6 @@ void qso_data::action_query(logging_state_t query, qso_num_t match_number, qso_n
 
 // Action add query - add query QSO to book
 void qso_data::action_add_query() {
-	// printf("DEBUG: action_add_query\n");
 	import_data_->save_update();
 	g_query_->clear_query();
 	logging_state_ = QSO_INACTIVE;
@@ -1014,7 +1000,6 @@ void qso_data::action_add_query() {
 
 // Action reject query - do nothing
 void qso_data::action_reject_query() {
-	// printf("DEBUG: action_reject_query\n");
 	import_data_->discard_update(true);
 	g_query_->clear_query();
 	logging_state_ = QSO_INACTIVE;
@@ -1025,7 +1010,6 @@ void qso_data::action_reject_query() {
 
 // Action reject manual query - do nothing
 void qso_data::action_reject_manual() {
-	// printf("DEBUG: action_reject_manual\n");
 	g_query_->clear_query();
 	logging_state_ = QSO_INACTIVE;
 	enable_widgets();
@@ -1033,7 +1017,6 @@ void qso_data::action_reject_manual() {
 
 // Action merge query
 void qso_data::action_merge_query() {
-	// printf("DEBUG: action_merge_query\n");
 	import_data_->merge_update();
 	g_query_->clear_query();
 	logging_state_ = QSO_INACTIVE;
@@ -1044,13 +1027,11 @@ void qso_data::action_merge_query() {
 
 // ACtion find match
 void qso_data::action_find_match() {
-	// printf("DEBUG: action_find_match\n");
 	update_query(QUERY_MATCH, potential_match_, query_number_);
 }
 
 // Action handle dupe
 void qso_data::action_handle_dupe(dupe_flags action) {
-	// printf("DEBUG: action_handle_dupe\n");
 	switch (action) {
 	case DF_1:
 		// Discard the queried possible duplicate
@@ -1079,7 +1060,6 @@ void qso_data::action_handle_dupe(dupe_flags action) {
 
 // Action save as a result of a merge
 void qso_data::action_save_merge() {
-	// printf("DEBUG: action_save_merge\n");
 	// We no longer need to maintain the copy of the original QSO
 	book_->add_use_data(g_query_->qso());
 	book_->modified(true);
@@ -1091,7 +1071,6 @@ void qso_data::action_save_merge() {
 
 // ACtion look in ALL.TXT
 void qso_data::action_look_all_txt() {
-	// printf("DEBUG: action_look_all_txt\n");
 	switch(logging_state_) {
 		case QUERY_NEW:
 		case QUERY_MATCH:
@@ -1119,7 +1098,6 @@ void qso_data::action_look_all_txt() {
 
 // Create a net from current QSO and others which overlap
 void qso_data::action_create_net() {
-	// printf("DEBUG: action_create_net\n");
 	qso_num_t qso_number = g_entry_->qso_number();
 	record* qso = g_entry_->qso();
 	string call = get_call();
@@ -1165,7 +1143,6 @@ void qso_data::action_create_net() {
 
 // Add a QSO to the net - copy existing qso start times or not
 void qso_data::action_add_net_qso() {
-	// printf("DEBUG: action_add_net_qso\n");
 	record* qso = g_net_entry_->qso();
 	// Create the entry tab
 	g_net_entry_->add_entry();
@@ -1214,7 +1191,6 @@ void qso_data::action_save_net_all() {
 
 // Save a QSO in NET_EDIT
 void qso_data::action_save_net_edit() {
-	// printf("DEBUG: action_save_net_edit\n");
 	// We no longer need to maintain the copy of the original QSO
 	book_->add_use_data(g_net_entry_->qso());
 	book_->modified(true);
@@ -1231,7 +1207,6 @@ void qso_data::action_save_net_edit() {
 
 // Cancel the whole net
 void qso_data::action_cancel_net_all() {
-	// printf("DEBUG: action_cancel_net_all\n");
 	book_->enable_save(false, "Starting multi-QSO cancel");
 	while (g_net_entry_->entries()) {
 		switch(logging_state_) {
@@ -1251,7 +1226,6 @@ void qso_data::action_cancel_net_all() {
 
 // Cancel an individual QSO in net edit
 void qso_data::action_cancel_net_edit() {
-	// printf("DEBUG: action_cancel_net_edit\n");
 	// Copy original back to the book
 	*book_->get_record(g_net_entry_->qso_number(), false) = *g_net_entry_->original_qso();
 	g_net_entry_->remove_entry();
@@ -1268,7 +1242,6 @@ void qso_data::action_cancel_net_edit() {
 
 // Start a modem record
 void qso_data::action_log_modem() {
-	// printf("DEBUG: action_add_modem\n");
 	// Add to book
 	book_->enable_save(false, "Logging real-time modem QSO");
 	record* qso = current_qso();
@@ -1297,7 +1270,6 @@ void qso_data::action_log_modem() {
 
 // Cacncel a modem record
 void qso_data::action_cancel_modem() {
-	// printf("DEBUG DASH - Cancelling modem %s - %p\n", current_qso()->item("CALL").c_str(), current_qso());
 	if (logging_state_ == QSO_WSJTX) {
 		wsjtx_handler_->delete_qso(current_qso()->item("CALL"));
 	}
@@ -1310,7 +1282,6 @@ void qso_data::action_cancel_modem() {
 
 // Create a query entry
 void qso_data::action_query_entry() {
-	// printf("DEBUG: action_query_entry\n");
 	g_qy_entry_->qso(-1);
 	logging_state_ = MANUAL_ENTRY;
 	g_qy_entry_->copy_default_to_qso();
@@ -1320,7 +1291,6 @@ void qso_data::action_query_entry() {
 
 // Execute the query
 void qso_data::action_exec_query() {
-	// printf("DEBUG: action_exec_query\n");
 	record* qso = g_qy_entry_->qso();
 	extract_records_->clear_criteria();
 	qso->update_band();
@@ -1353,7 +1323,6 @@ void qso_data::action_exec_query() {
 
 // Abandon the query
 void qso_data::action_cancel_query() {
-	// printf("DEBUG: action_cancel_query\n");
 	g_qy_entry_->delete_qso();
 	logging_state_ = QSO_INACTIVE;
 	enable_widgets();
@@ -1361,7 +1330,6 @@ void qso_data::action_cancel_query() {
 
 // Import the query
 void qso_data::action_import_query() {
-	// printf("DEBUG: action_import_query\n");
 	import_data_->stop_update(false);
 	while (!import_data_->update_complete()) Fl::check();
 	import_data_->load_record(g_qy_entry_->qso());
@@ -1373,7 +1341,6 @@ void qso_data::action_import_query() {
 
 // Open QRZ.com page
 void qso_data::action_qrz_com() {
-	// printf("DEBUG: action_qrz_com\n");
 	record* qso = current_qso();
 	qrz_handler_->open_web_page(qso->item("CALL"));
 }
@@ -1433,6 +1400,7 @@ record* qso_data::dummy_qso() {
 	return dummy;
 }
 
+// Update QSO with info from rig
 void qso_data::update_rig() {
 	// Get freq etc from QSO or rig
 // Get present values data from rig
@@ -1598,7 +1566,6 @@ string qso_data::get_call() {
 	}
 }
 
-
 // The supplied QSO number is being edited
 bool qso_data::qso_editing(qso_num_t number) {
 	switch (logging_state_) {
@@ -1613,7 +1580,7 @@ bool qso_data::qso_editing(qso_num_t number) {
 	}
 }
 
-// Inactive
+// We are not actively doing anything
 bool qso_data::inactive() {
 	switch(logging_state_) {
 	case QSO_INACTIVE:

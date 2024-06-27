@@ -15,6 +15,7 @@ extern book* book_;
 extern cty_data* cty_data_;
 extern spec_data* spec_data_;
 
+// Map showing the buttons available in each qso_data logging_state
 map<qso_data::logging_state_t, list<qso_buttons::button_type> > button_map_ =
 {
 	{ qso_data::QSO_INACTIVE, {qso_buttons::ACTIVATE, qso_buttons::START_QSO, qso_buttons::ADD_QSO, 
@@ -57,6 +58,7 @@ map<qso_data::logging_state_t, list<qso_buttons::button_type> > button_map_ =
 	{ qso_data::QSO_FLDIGI, { qso_buttons::CANCEL_QSO }},
 };
 
+// Map describing all the parameters for each button
 map<qso_buttons::button_type, qso_buttons::button_action> action_map_ =
 {
 	{ qso_buttons::ACTIVATE, { "Activate", "Pre-load QSO fields based on logging mode", FL_CYAN, qso_buttons::cb_activate, 0 } },
@@ -107,6 +109,7 @@ map<qso_buttons::button_type, qso_buttons::button_action> action_map_ =
 	{ qso_buttons::UPDATE_CAT, { "Update CAT", "Update QSO with current CAT info", FL_DARK_BLUE, qso_buttons::cb_bn_update_cat, 0 }},
 };
 
+// Constructor
 qso_buttons::qso_buttons(int X, int Y, int W, int H, const char* L) :
 	Fl_Group(X, Y, W, H, L),
 	qso_data_((qso_data*)parent())
@@ -116,16 +119,20 @@ qso_buttons::qso_buttons(int X, int Y, int W, int H, const char* L) :
 	enable_widgets();
 }
 
+// Destructor
 qso_buttons::~qso_buttons() {
 	save_values();
 }
 
+// Load settings - no actions
 void qso_buttons::load_values() {
 }
 
+// Save settings - no actions
 void qso_buttons::save_values() {
 }
 
+// Create all the buttons
 void qso_buttons::create_form(int X, int Y) {
 	int curr_x = X;
 	int curr_y = Y;
@@ -141,6 +148,7 @@ void qso_buttons::create_form(int X, int Y) {
 	int max_x = curr_x;
 
 	const int NUMBER_PER_ROW = 10;
+	// Create the maximum number of buttons (MAX_ACTIONS) in rows of (NUMBER_PER_ROW)
 	for (int ix = 0; ix < MAX_ACTIONS; ix++) {
 		bn_action_[ix] = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "");
 		if ((ix + 1) % NUMBER_PER_ROW == 0 && ix < MAX_ACTIONS) {
@@ -165,11 +173,13 @@ void qso_buttons::create_form(int X, int Y) {
 	end();
 }
 
+// Configure the buttons according to the logging_state
 void qso_buttons::enable_widgets() {
 	int ix = 0;
 	if (button_map_.find(qso_data_->logging_state()) != button_map_.end()) {
 		// If we have a button map for the state use it - else deactivate all buttons
 		const list<button_type>& buttons = button_map_.at(qso_data_->logging_state());
+		// Activate the buttons we need and set their parameters
 		for (auto bn = buttons.begin(); bn != buttons.end() && ix < MAX_ACTIONS; bn++, ix++) {
 			const button_action& action = action_map_.at(*bn);
 			bn_action_[ix]->label(action.label);
@@ -180,6 +190,7 @@ void qso_buttons::enable_widgets() {
 			bn_action_[ix]->activate();
 		}
 	}
+	// Deactivate any remaining buttons
 	for (; ix < MAX_ACTIONS; ix++) {
 		bn_action_[ix]->label("");
 		bn_action_[ix]->tooltip("");
@@ -198,6 +209,7 @@ void qso_buttons::disable_widgets() {
 }
 
 // Activate- Go from qso_data::QSO_INACTIVE to qso_data::QSO_PENDING
+// v is not used
 void qso_buttons::cb_activate(Fl_Widget* w, void* v) {
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
 	that->disable_widgets();
@@ -210,6 +222,7 @@ void qso_buttons::cb_activate(Fl_Widget* w, void* v) {
 }
 
 // Start QSO - transition from qso_data::QSO_INACTIVE->qso_data::QSO_PENDING->qso_data::QSO_STARTED
+// v is not used
 void qso_buttons::cb_start(Fl_Widget* w, void* v) {
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
 	that->disable_widgets();
@@ -226,6 +239,7 @@ void qso_buttons::cb_start(Fl_Widget* w, void* v) {
 }
 
 // Save QSO - transition through qso_data::QSO_PENDING->qso_data::QSO_STARTED->qso_data::QSO_INACTIVE saving QSO
+// v is used in QSO_EDIT state to indicate type of save.
 void qso_buttons::cb_save(Fl_Widget* w, void* v) {
 	qso_data* data = ancestor_view<qso_data>(w);
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
@@ -279,6 +293,7 @@ void qso_buttons::cb_save(Fl_Widget* w, void* v) {
 }
 
 // Cancel QSO - delete QSO; clear fields
+// v is not used
 void qso_buttons::cb_cancel(Fl_Widget* w, void* v) {
 	qso_data* data = ancestor_view<qso_data>(w);
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
@@ -314,6 +329,7 @@ void qso_buttons::cb_cancel(Fl_Widget* w, void* v) {
 }
 
 // Edit QSO - transition to qso_data::QSO_EDIT
+// v is not used
 void qso_buttons::cb_edit(Fl_Widget* w, void* v) {
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
 	that->disable_widgets();
@@ -338,6 +354,7 @@ void qso_buttons::cb_edit(Fl_Widget* w, void* v) {
 }
 
 // View QSO - transition to qso_data::QSO_VIEW
+// v is not used
 void qso_buttons::cb_bn_view_qso(Fl_Widget* w, void* v) {
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
 	that->disable_widgets();
@@ -359,6 +376,7 @@ void qso_buttons::cb_bn_view_qso(Fl_Widget* w, void* v) {
 }
 
 // Callback - Worked B4? button
+// v is not used
 void qso_buttons::cb_wkb4(Fl_Widget* w, void* v) {
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
 	that->disable_widgets();
@@ -368,6 +386,7 @@ void qso_buttons::cb_wkb4(Fl_Widget* w, void* v) {
 }
 
 // Callback - Parse callsign
+// v is not used
 void qso_buttons::cb_parse(Fl_Widget* w, void* v) {
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
 	that->disable_widgets();
@@ -398,6 +417,7 @@ void qso_buttons::cb_bn_navigate(Fl_Widget* w, void* v) {
 }
 
 // Callback - browse
+// v is not used
 void qso_buttons::cb_bn_browse(Fl_Widget* w, void* v) {
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
 	that->disable_widgets();
@@ -415,6 +435,7 @@ void qso_buttons::cb_bn_browse(Fl_Widget* w, void* v) {
 }
 
 // Callback - add query record
+// v is not used
 void qso_buttons::cb_bn_add_query(Fl_Widget* w, void* v) {
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
 	that->disable_widgets();
@@ -431,6 +452,7 @@ void qso_buttons::cb_bn_add_query(Fl_Widget* w, void* v) {
 }
 
 // Callback - add query record
+// v is not used
 void qso_buttons::cb_bn_reject_query(Fl_Widget* w, void* v) {
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
 	that->disable_widgets();
@@ -447,6 +469,7 @@ void qso_buttons::cb_bn_reject_query(Fl_Widget* w, void* v) {
 }
 
 // Callback - add query record
+// v is not used
 void qso_buttons::cb_bn_merge_query(Fl_Widget* w, void* v) {
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
 	that->disable_widgets();
@@ -462,6 +485,7 @@ void qso_buttons::cb_bn_merge_query(Fl_Widget* w, void* v) {
 }
 
 // Callback - add query record
+// v is not used
 void qso_buttons::cb_bn_find_match(Fl_Widget* w, void* v) {
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
 	that->disable_widgets();
@@ -476,6 +500,7 @@ void qso_buttons::cb_bn_find_match(Fl_Widget* w, void* v) {
 }
 
 // Callback - dupe action
+// v is not used
 void qso_buttons::cb_bn_dupe(Fl_Widget* w, void* v) {
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
 	that->disable_widgets();
@@ -491,6 +516,7 @@ void qso_buttons::cb_bn_dupe(Fl_Widget* w, void* v) {
 }
 
 // Callback QRZ merge action
+// v is not used
 void qso_buttons::cb_bn_save_merge(Fl_Widget* w, void* v) {
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
 	that->disable_widgets();
@@ -505,6 +531,7 @@ void qso_buttons::cb_bn_save_merge(Fl_Widget* w, void* v) {
 }
 
 // Callback Find QSO in WSJT-X
+// v is not used
 void qso_buttons::cb_bn_all_txt(Fl_Widget* w, void* v) {
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
 	that->disable_widgets();
@@ -522,6 +549,7 @@ void qso_buttons::cb_bn_all_txt(Fl_Widget* w, void* v) {
 }
 
 // Save all qsos
+// v is not used
 void qso_buttons::cb_bn_save_all(Fl_Widget* w, void* v) {
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
 	that->disable_widgets();
@@ -535,6 +563,7 @@ void qso_buttons::cb_bn_save_all(Fl_Widget* w, void* v) {
 }
 
 // Cancel all QSOs
+// v is not used
 void qso_buttons::cb_bn_cancel_all(Fl_Widget* w, void* v) {
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
 	that->disable_widgets();
@@ -548,6 +577,7 @@ void qso_buttons::cb_bn_cancel_all(Fl_Widget* w, void* v) {
 }
 
 // Add a QSO to the net
+// v is not used
 void qso_buttons::cb_bn_add_net(Fl_Widget* w, void* v) {
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
 	that->disable_widgets();
@@ -567,6 +597,7 @@ void qso_buttons::cb_bn_add_net(Fl_Widget* w, void* v) {
 }
 
 // Start a net
+// v is not used
 void qso_buttons::cb_bn_start_net(Fl_Widget* w, void* v) {
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
 	that->disable_widgets();
@@ -583,6 +614,7 @@ void qso_buttons::cb_bn_start_net(Fl_Widget* w, void* v) {
 }
 
 // Delete the current QSO
+// v is not used
 void qso_buttons::cb_bn_delete_qso(Fl_Widget* w, void* v) {
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
 	that->disable_widgets();
@@ -596,6 +628,7 @@ void qso_buttons::cb_bn_delete_qso(Fl_Widget* w, void* v) {
 }
 
 // Open a qso_query to define search criteria
+// v is not used
 void qso_buttons::cb_bn_query_entry(Fl_Widget* w, void* v) {
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
 	that->disable_widgets();
@@ -608,6 +641,7 @@ void qso_buttons::cb_bn_query_entry(Fl_Widget* w, void* v) {
 }
 
 // Open a qso_query to define search criteria
+// v is not used
 void qso_buttons::cb_bn_execute_query(Fl_Widget* w, void* v) {
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
 	that->disable_widgets();
@@ -621,6 +655,7 @@ void qso_buttons::cb_bn_execute_query(Fl_Widget* w, void* v) {
 }
 
 // Open a qso_query to define search criteria
+// v is not used
 void qso_buttons::cb_bn_cancel_query(Fl_Widget* w, void* v) {
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
 	that->disable_widgets();
@@ -633,6 +668,7 @@ void qso_buttons::cb_bn_cancel_query(Fl_Widget* w, void* v) {
 }
 
 // Open a qso_query to define search criteria
+// v is not used
 void qso_buttons::cb_bn_import_query(Fl_Widget* w, void* v) {
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
 	that->disable_widgets();
@@ -645,6 +681,7 @@ void qso_buttons::cb_bn_import_query(Fl_Widget* w, void* v) {
 }
 
 // Open a browser with QRZ.com
+// v is not used
 void qso_buttons::cb_bn_qrz_com(Fl_Widget* w, void* v) {
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
 	that->disable_widgets();
@@ -664,6 +701,7 @@ void qso_buttons::cb_bn_qrz_com(Fl_Widget* w, void* v) {
 }
 
 // Update QSO with CAT data
+// v is not used
 void qso_buttons::cb_bn_update_cat(Fl_Widget* w, void* v) {
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
 	that->disable_widgets();

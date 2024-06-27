@@ -45,6 +45,7 @@ rpc_handler::~rpc_handler()
 	method_list_.clear();
 }
 
+// Close the RPC server
 void rpc_handler::close_server() {
 	if (server_) {
 		server_->close_server(true);
@@ -846,6 +847,7 @@ int rpc_handler::list_methods(rpc_data_item::rpc_list& params, rpc_data_item& re
 	return 0;
 }
 
+// system.MethodHelp
 int rpc_handler::method_help(rpc_data_item::rpc_list& params, rpc_data_item& response) {
 	if (params.size() == 1) {
 		rpc_data_item* item_0 = params.front();
@@ -862,6 +864,7 @@ int rpc_handler::method_help(rpc_data_item::rpc_list& params, rpc_data_item& res
 	return 1;
 }
 
+// Generate an error item for RPC response
 void rpc_handler::generate_error(int code, string message, rpc_data_item & response) {
 	rpc_data_item error_code;
 	error_code.set(-2, XRT_INT);

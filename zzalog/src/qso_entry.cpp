@@ -15,8 +15,11 @@ extern bool DARK;
 
 extern double prev_freq_;
 
+// Map showing what fields to display for what usage
+// Used for contest, but not currently used
 map <string, vector<string> > qso_entry::field_map_;
 
+// Constructor
 qso_entry::qso_entry(int X, int Y, int W, int H, const char* L) :
 	Fl_Group(X, Y, W, H, L)
 	, number_locked_(0)
@@ -41,6 +44,7 @@ qso_entry::qso_entry(int X, int Y, int W, int H, const char* L) :
 	enable_widgets();
 }
 
+// Destructor
 qso_entry::~qso_entry() {
 	save_values();
 }
@@ -66,6 +70,7 @@ void qso_entry::load_values() {
 void qso_entry::save_values() {
 }
 
+// Create the widgets
 void qso_entry::create_form(int X, int Y) {
 	int curr_x = X;
 	int curr_y = Y;
@@ -79,12 +84,15 @@ void qso_entry::create_form(int X, int Y) {
 
 	int save_y = curr_y;
 
-	// Fixed fields
 	// N rows of NUMBER_PER_ROW
 	const int NUMBER_PER_ROW = 2;
 	const int WCHOICE = WBUTTON * 3 / 2;
 	const int WINPUT = WBUTTON * 7 / 4;
+
+	// For all the fields we can support
 	for (int ix = 0; ix < NUMBER_TOTAL; ix++) {
+		// Only allow the userto choose the filed to display for those
+		// inputs that are not for fixed fields
 		if (ix >= NUMBER_FIXED) {
 			ch_field_[ix] = new field_choice(curr_x, curr_y, WCHOICE, HBUTTON);
 			ch_field_[ix]->align(FL_ALIGN_RIGHT);
@@ -93,12 +101,15 @@ void qso_entry::create_form(int X, int Y) {
 			ch_field_[ix]->set_dataset("Fields");
 		}
 		curr_x += WCHOICE;
+		// Add a field_inpu widget
 		ip_field_[ix] = new field_input(curr_x, curr_y, WINPUT, HBUTTON);
 		ip_field_[ix]->align(FL_ALIGN_LEFT);
 		ip_field_[ix]->tooltip("Enter required value to log");
 		ip_field_[ix]->callback(cb_ip_field, (void*)(intptr_t)ix);
 		ip_field_[ix]->input()->when(FL_WHEN_RELEASE_ALWAYS);
 		if (ix < NUMBER_FIXED) {
+			// For a fixed field add the name of the field as a label where
+			// the field choice would have been
 			ip_field_[ix]->field_name(fixed_names_[ix].c_str(), qso_);
 			field_ip_map_[fixed_names_[ix]] = ix;
 			field_names_[ix] = fixed_names_[ix];
@@ -122,6 +133,7 @@ void qso_entry::create_form(int X, int Y) {
 	curr_x = max_x;
 	curr_y = save_y;
 
+	// Add a set of tabs for more information on the QSO
 	misc_ = new qso_misc(curr_x, curr_y, WCHOICE + WINPUT + GAP, max_y - curr_y);
 	curr_x += misc_->w();
 	curr_y += misc_->h();
@@ -132,6 +144,7 @@ void qso_entry::create_form(int X, int Y) {
 	curr_x = X + WCHOICE;
 	curr_y += HBUTTON;
 
+	// Input for the NOTES field of the QSO record
 	ip_notes_ = new intl_input(curr_x, curr_y, max_x - curr_x - GAP, HBUTTON, "NOTES");
 	ip_notes_->callback(cb_ip_notes, nullptr);
 	ip_notes_->when(FL_WHEN_CHANGED);
@@ -145,10 +158,12 @@ void qso_entry::create_form(int X, int Y) {
 	initialise_fields();
 }
 
+// Configure the various widgets
 void qso_entry::enable_widgets() {
 	// Now enable disan=
 	switch (qso_data_->logging_state()) {
 	case qso_data::QSO_INACTIVE:
+		// Doing nothing - deactivate all widgets
 		for (int ix = 0; ix < NUMBER_TOTAL; ix++) {
 			if (ch_field_[ix]) ch_field_[ix]->deactivate();
 			ip_field_[ix]->deactivate();
@@ -157,6 +172,7 @@ void qso_entry::enable_widgets() {
 		misc_->deactivate();
 		break;
 	case qso_data::QSO_PENDING:
+		// Waiting to start a QSO - activate all fields in use ...
 		for (int ix = 0; ix <= number_fields_in_use_ && ix < NUMBER_TOTAL; ix++) {
 			if (ch_field_[ix])
 				if (ix < number_locked_ + NUMBER_FIXED) ch_field_[ix]->deactivate();
@@ -165,6 +181,7 @@ void qso_entry::enable_widgets() {
 			ip_field_[ix]->input()->color(FL_BACKGROUND2_COLOR);
 			ip_field_[ix]->type(FL_NORMAL_INPUT);
 		}
+		// ... and deactivate the others
 		for (int ix = number_fields_in_use_ + 1; ix < NUMBER_TOTAL; ix++) {
 			ch_field_[ix]->deactivate();
 			ip_field_[ix]->deactivate();
@@ -182,6 +199,7 @@ void qso_entry::enable_widgets() {
 	case qso_data::QSO_EDIT:
 	case qso_data::NET_EDIT:
 	case qso_data::QSO_ENTER:
+		// Entering a QSO - activate all fields in use ...
 		for (int ix = 0; ix <= number_fields_in_use_ && ix < NUMBER_TOTAL; ix++) {
 			if (ch_field_[ix])
 				if (ix < number_locked_ + NUMBER_FIXED) ch_field_[ix]->deactivate();
@@ -190,6 +208,7 @@ void qso_entry::enable_widgets() {
 			ip_field_[ix]->input()->color(FL_BACKGROUND2_COLOR);
 			ip_field_[ix]->type(FL_NORMAL_INPUT);
 		}
+		// ... and deactivate the others
 		for (int ix = number_fields_in_use_ + 1; ix < NUMBER_TOTAL; ix++) {
 			ch_field_[ix]->deactivate();
 			ip_field_[ix]->deactivate();
@@ -201,6 +220,7 @@ void qso_entry::enable_widgets() {
 		misc_->enable_widgets();
 		break;
 	case qso_data::QSO_VIEW:
+		// Viewing a QSO - activate all fields in use, but don't enable data entry
 		for (int ix = 0; ix <= number_fields_in_use_ && ix < NUMBER_TOTAL; ix++) {
 			if (ch_field_[ix])
 				if (ix < number_locked_ + NUMBER_FIXED) ch_field_[ix]->deactivate();
@@ -209,6 +229,7 @@ void qso_entry::enable_widgets() {
 			ip_field_[ix]->input()->color(FL_BACKGROUND_COLOR);
 			ip_field_[ix]->type(FL_NORMAL_OUTPUT);
 		}
+		// Deactivate all field not in use
 		for (int ix = number_fields_in_use_ + 1; ix < NUMBER_TOTAL; ix++) {
 			ch_field_[ix]->deactivate();
 			ip_field_[ix]->deactivate();
@@ -220,6 +241,7 @@ void qso_entry::enable_widgets() {
 		misc_->enable_widgets();
 		break;
 	case qso_data::MANUAL_ENTRY:
+		// Entering data for search - enable all fields in use...
 		for (int ix = 0; ix <= number_fields_in_use_ && ix < NUMBER_TOTAL; ix++) {
 			if (ch_field_[ix])
 				if (ix < number_locked_ + NUMBER_FIXED) ch_field_[ix]->deactivate();
@@ -228,6 +250,7 @@ void qso_entry::enable_widgets() {
 			ip_field_[ix]->input()->color(FL_BACKGROUND2_COLOR);
 			ip_field_[ix]->type(FL_NORMAL_INPUT);
 		}
+		// ... and deactivate all those not in use
 		for (int ix = number_fields_in_use_ + 1; ix < NUMBER_TOTAL; ix++) {
 			ch_field_[ix]->deactivate();
 			ip_field_[ix]->deactivate();
@@ -245,7 +268,7 @@ void qso_entry::enable_widgets() {
 	set_initial_focus();
 }
 
-// Copy record to the fields - reverse of above
+// Copy record to the fields - flags indicate specific subsets
 void qso_entry::copy_qso_to_display(int flags) {
 	if (qso_) {
 		// Uodate band
@@ -532,12 +555,15 @@ void qso_entry::initialise_fields() {
 	initialise_field_map();
 	size_t ix = 0;
 	int iy;
+	// For non-fixed fields - set field name into field choice and populate
+	// drop-down menu into field input with permitted values
 	for (ix = 0, iy = NUMBER_FIXED; ix < field_names.size(); ix++, iy++) {
 		ch_field_[iy]->value(field_names[ix].c_str());
 		ip_field_[iy]->field_name(field_names[ix].c_str(), qso_);
 		field_names_[iy] = field_names[ix];
 	}
 	number_fields_in_use_ = iy;
+	// And removed such info for inputs that are not used
 	for (; iy < NUMBER_TOTAL; iy++) {
 		ch_field_[iy]->value("");
 		ip_field_[iy]->value("");
@@ -687,9 +713,11 @@ void qso_entry::cb_ch_field(Fl_Widget* w, void* v) {
 	const char* field = ch->value();
 	int ix = (int)(intptr_t)v;
 	if (strlen(field)) {
+		// Add a field to the list if its not null
 		that->action_add_field(ix, field);
 	}
 	else {
+		// Delete it if the name is null string
 		that->action_del_field(ix);
 	}
 }

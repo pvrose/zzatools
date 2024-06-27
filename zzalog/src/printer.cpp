@@ -314,6 +314,7 @@ int printer::print_cards() {
 	return error;
 }
 
+// Print a single page of cards - update item_num when finished
 int printer::print_page_cards(size_t &item_num) {
 	int x, y;
 	origin(&x, &y);
@@ -321,6 +322,7 @@ int printer::print_page_cards(size_t &item_num) {
 	win->clear_border();
 	win->color(FL_WHITE);
 	int card;
+	// Instantiate the cards that will fit on the page
 	for (card = 0; item_num < navigation_book_->size() && card < items_per_page_; card++) {
 		// Get the number of items with the same callsign
 		record* record_1 = navigation_book_->get_record(item_num, false);

@@ -106,8 +106,6 @@ using namespace std::chrono;
 		bool is_open();
 		// Port is being opened
 		bool is_opening();
-		// Rig timer callback
-		void ticker();
 		// Port has no CAT
 		bool has_no_cat();
 
@@ -127,9 +125,6 @@ using namespace std::chrono;
 		bool get_ptt();
 		// Get the data from the rig
 		static void th_run_rig(rig_if* that);
-
-		// Testing hamlib callbacks
-		static int cb_hl_freq(RIG* rig, vfo_t vfo, freq_t freq, rig_ptr_t data);
 
 		// Set modifiers
 		void set_freq_modifier(double delta_freq);

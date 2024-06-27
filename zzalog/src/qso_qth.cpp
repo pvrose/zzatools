@@ -8,6 +8,7 @@
 extern spec_data* spec_data_;
 extern bool DARK;
 
+// Constructor
 qso_qth::qso_qth(int X, int Y, int W, int H, const char* L) :
 	Fl_Group(X, Y, W, H, L)
 	, qth_details_(nullptr)
@@ -22,13 +23,16 @@ qso_qth::qso_qth(int X, int Y, int W, int H, const char* L) :
 	create_form(X, Y);
 }
 
+// Destructor
 qso_qth::~qso_qth() {
 	save_values();
 }
 
+// LOad settings
 void qso_qth::load_values() {
 }
 
+// Create the widgets
 void qso_qth::create_form(int X, int Y) {
 	int curr_x = X + GAP;
 	int curr_y = Y + 1;
@@ -36,6 +40,7 @@ void qso_qth::create_form(int X, int Y) {
 
 	int width = w() - GAP - GAP;
 
+	// NAme of the APP_MY_QTH macro
 	op_name_ = new Fl_Output(curr_x, curr_y, width, HTEXT);
 	op_name_->box(FL_FLAT_BOX);
 	op_name_->color(FL_BACKGROUND_COLOR);
@@ -46,6 +51,7 @@ void qso_qth::create_form(int X, int Y) {
 	max_x = max(curr_x, op_name_->x() + op_name_->y());
 	curr_y += HTEXT;
 
+	// Description
 	op_descr_ = new Fl_Output(curr_x, curr_y, width, HTEXT);
 	op_descr_->box(FL_FLAT_BOX);
 	op_descr_->color(FL_BACKGROUND_COLOR);
@@ -59,6 +65,7 @@ void qso_qth::create_form(int X, int Y) {
 
 	curr_y = y() + h() - GAP - HBUTTON;
 
+	// Edit button
 	bn_edit_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Edit");
 	bn_edit_->color(COLOUR_MAUVE);
 	bn_edit_->labelcolor(FL_BLACK);
@@ -66,6 +73,7 @@ void qso_qth::create_form(int X, int Y) {
 	bn_edit_->tooltip("Open window to allow QTH to be edited");
 	max_x = max(max_x, bn_edit_->x() + bn_edit_->w());
 
+	// Table showing details
 	table_ = new table(curr_x, save_y, width, curr_y - save_y, "Macro definition");
 	table_->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
 	table_->tooltip("The macro substitution used for this QTH");
@@ -77,11 +85,14 @@ void qso_qth::create_form(int X, int Y) {
 	enable_widgets();
 }
 
+// Save settings
 void qso_qth::save_values() {
 	// No action
 }
 
+// Enable widgets
 void qso_qth::enable_widgets() {
+	// If we have details then display them
 	if (qth_details_) {
 		op_name_->value(qth_name_.c_str());
 		op_descr_->value(qth_details_->item("APP_ZZA_QTH_DESCR").c_str());
@@ -98,11 +109,14 @@ void qso_qth::enable_widgets() {
 	qso_data* data = ancestor_view<qso_data>(this);
 }
 
+// Set the QTH details
 void qso_qth::set_qth(string name) {
 	qth_name_ = name;
 	qth_details_ = spec_data_->expand_macro("APP_ZZA_QTH", qth_name_);
 }
 
+// Callback - edit button
+// v is not used
 void qso_qth::cb_bn_edit(Fl_Widget* w, void* v) {
 	qso_qth* that = ancestor_view<qso_qth>(w);
 	qso_entry* qe = ancestor_view<qso_entry>(that);
@@ -131,6 +145,7 @@ void qso_qth::cb_bn_edit(Fl_Widget* w, void* v) {
 	that->enable_widgets();
 }
 
+// QSO details table: constructor
 qso_qth::table::table(int X, int Y, int W, int H, const char* L) :
 	Fl_Table_Row(X, Y, W, H, L)
 	, macro_(nullptr)
@@ -142,9 +157,13 @@ qso_qth::table::table(int X, int Y, int W, int H, const char* L) :
 	end();
 }
 
+// Destructor
 qso_qth::table::~table() {
 }
 
+// Draw table
+// Column 0: Field name 
+// Column 1: Field value
 void qso_qth::table::draw_cell(TableContext context, int R, int C, int X, int Y, int W, int H)
 {
 	string text;
@@ -192,10 +211,13 @@ void qso_qth::table::draw_cell(TableContext context, int R, int C, int X, int Y,
 	}
 }
 
+// Set the database for the table
 void qso_qth::table::set_data(record* macro) {
 	macro_ = macro;
 	fields_.clear();
 	if (macro_) {
+		// Copy each of the field definitions in the macro into the dataset
+		// (but not APP_ZZA_QTH_DESCR as that is already being shown)
 		for (auto it = macro_->begin(); it != macro_->end(); it++) {
 			if ((*it).first != "APP_ZZA_QTH_DESCR" && (*it).second.length()) {
 				fields_.push_back((*it).first);

@@ -101,7 +101,6 @@ void record::delete_contents() {
 }
 
 // Set an item pair.
-// Return true if successful, false if not
 void record::item(string field, string value, bool formatted/* = false*/, bool dirty /*=true*/) {
 	// Check we are not deleting an important field - crash the program if this was unintentional
 	char message[256];

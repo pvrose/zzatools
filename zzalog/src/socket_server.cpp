@@ -324,6 +324,7 @@ socket_server::client_status socket_server::accept_client()
 }
 const int MAX_SOCKET = 10240;
 
+// Receive the packet
 int socket_server::rcv_packet()
 {
 	closed_ = false;
@@ -415,6 +416,7 @@ int socket_server::rcv_packet()
 	return 0;
 }
 
+// Send a response back
 int socket_server::send_response(istream &response)
 {
 	// calculate the data size
@@ -446,20 +448,6 @@ int socket_server::send_response(istream &response)
 	}
 	return 0;
 }
-
-// // Call back to restart attempt to restart datagram
-// void socket_server::cb_timer_rcv(void *v)
-// {
-// 	socket_server *that = (socket_server *)v;
-// 	that->rcv_packet();
-// }
-
-// // Callback to restart attempt to accept client
-// void socket_server::cb_timer_acc(void *v)
-// {
-// 	socket_server *that = (socket_server *)v;
-// 	that->accept_client();
-// }
 
 // Has a server
 bool socket_server::has_server()

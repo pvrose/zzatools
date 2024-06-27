@@ -78,7 +78,8 @@ qso_manager::~qso_manager()
 	save_values();
 }
 
-// Handle FL_HIDE and FL_SHOW to get menu to update itself
+// Handle FL_HIDE and FL_SHOW to get menu to update itself - 
+// Handle CTRL-V to paste clipboard into log
 int qso_manager::handle(int event) {
 
 	switch (event) {
@@ -116,6 +117,7 @@ void qso_manager::create_form(int X, int Y) {
 
 	begin();
 
+	// QSO Data form
 	data_group_ = new qso_data(curr_x, curr_y, 0, 0, nullptr);
 	data_group_->create_form(curr_x, curr_y);
 	curr_x += data_group_->w();
@@ -127,13 +129,16 @@ void qso_manager::create_form(int X, int Y) {
 	curr_y += GAP;
 	int save_y = curr_y;
 
+	// Rig control tabbed form
 	rig_group_ = new qso_tabbed_rigs(curr_x, curr_y, 0, 0, nullptr);
 
 	curr_x += rig_group_->w() + GAP;
 
+	// Clocks tabbed form
 	clock_group_ = new qso_clocks(curr_x, curr_y, 0, 0, nullptr);
 	curr_x += clock_group_->w() + GAP;
 
+	// Information tabbed form
 	info_group_ = new qso_log(curr_x, curr_y, 0, 0, nullptr);
 	curr_x += info_group_->w() + GAP;
 
@@ -152,15 +157,6 @@ void qso_manager::create_form(int X, int Y) {
 	show();
 
 	enable_widgets();
-
-	// // If contest mode go straight to QSO_PENDING
-	// if (data_group_->contest_mode() == qso_contest::CONTEST) {
-	// 	// Automatically create a pending QSO
-	// 	if (data_group_->logging_state() == qso_data::QSO_INACTIVE) {
-	// 		data_group_->action_activate(qso_data::QSO_NONE);
-	// 	}
-	// }
-
 }
 
 // Load values

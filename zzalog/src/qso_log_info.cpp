@@ -6,6 +6,7 @@
 extern book* book_;
 extern import_data* import_data_;
 
+// Constructor
 qso_log_info::qso_log_info(int X, int Y, int W, int H, const char* l) :
 	Fl_Group(X, Y, W, H, l)
 {
@@ -19,6 +20,7 @@ qso_log_info::qso_log_info(int X, int Y, int W, int H, const char* l) :
 	enable_widgets();
 }
 
+// Destructor
 qso_log_info::~qso_log_info() {
 
 }
@@ -33,6 +35,7 @@ void qso_log_info::create_form(int X, int Y) {
 	int curr_x = X + GAP;
 	int curr_y = Y + 1;
 
+	// Display current status of the log
 	op_status_ = new Fl_Output(curr_x, curr_y, WSMEDIT, HBUTTON + 2);
 	op_status_->box(FL_FLAT_BOX);
 	op_status_->color(FL_BACKGROUND_COLOR);
@@ -42,6 +45,7 @@ void qso_log_info::create_form(int X, int Y) {
 	curr_y += op_status_->h();
 	int max_x = op_status_->x() + op_status_->w() + GAP;
 
+	// Display progress in loading or saving the log
 	pr_loadsave_ = new Fl_Progress(curr_x, curr_y, WSMEDIT, HBUTTON);
 	pr_loadsave_->color(FL_BACKGROUND_COLOR, FL_BLUE);
 	pr_loadsave_->tooltip("Displays loading or saving progress");
@@ -51,6 +55,7 @@ void qso_log_info::create_form(int X, int Y) {
 	curr_y += pr_loadsave_->h();
 	max_x = max(max_x, pr_loadsave_->x() + pr_loadsave_->w() + GAP);
 
+	// Check to enable saving after each QSO
 	bn_save_enable_ = new Fl_Check_Button(curr_x, curr_y, HBUTTON, HBUTTON, "Save after each QSO");
 	bn_save_enable_->align(FL_ALIGN_RIGHT);
 	bn_save_enable_->tooltip("Enable/Disable save");
@@ -58,6 +63,7 @@ void qso_log_info::create_form(int X, int Y) {
 	bn_save_enable_->value(true);
 
 	curr_x += WSMEDIT;
+	// Button to trigger saving the log
 	bn_save_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Save!");
 	bn_save_->align(FL_ALIGN_CENTER);
 	bn_save_->tooltip("Force save now");
@@ -65,12 +71,14 @@ void qso_log_info::create_form(int X, int Y) {
 	
 	curr_x = X + GAP;
 	curr_y += bn_save_enable_->h() + GAP;
+	// Check to enable checking for any auto-updates 
 	bn_auto_update_ = new Fl_Check_Button(curr_x, curr_y, HBUTTON, HBUTTON, "Auto-update");
 	bn_auto_update_->align(FL_ALIGN_RIGHT);
 	bn_auto_update_->tooltip("Enable/Disable auto-update");
 	bn_auto_update_->callback(cb_bn_auto);
 
 	curr_x += WSMEDIT;
+	// Output to show source of current auto-update
 	op_update_ = new Fl_Output(curr_x, curr_y, WBUTTON, HBUTTON);
 	op_update_->box(FL_FLAT_BOX);
 	op_update_->color(FL_BACKGROUND_COLOR);
@@ -91,7 +99,7 @@ void qso_log_info::create_form(int X, int Y) {
 
 // Enable widgets
 void qso_log_info::enable_widgets() {
-
+	// Depending on state of book, output status, load/save progress, enable save button
 	if (book_->empty()) {
 		op_status_->value("No Data");
 		pr_loadsave_->color(FL_BACKGROUND_COLOR, FL_BACKGROUND_COLOR);
@@ -129,6 +137,7 @@ void qso_log_info::enable_widgets() {
 			bn_save_enable_->value(false);
 		}
 	}
+	// Update auto-update button
 	if (import_data_->is_auto_update()) {
 		bn_auto_update_->value(true);
 	} else {
@@ -147,6 +156,7 @@ void qso_log_info::ticker() {
 }
 
 // Callback on Save Enable button
+// v is not used
 void qso_log_info::cb_bn_enable(Fl_Widget* w, void* v) {
 	qso_log_info* that = ancestor_view<qso_log_info>(w);
 	bool value = ((Fl_Check_Button*)w)->value();
@@ -160,11 +170,13 @@ void qso_log_info::cb_bn_enable(Fl_Widget* w, void* v) {
 }
 
 // Callback to force save
+// v is not used
 void qso_log_info::cb_bn_save(Fl_Widget* w, void* v) {
 	book_->store_data();
 }
 
 // Callback on auto-state
+// v is not used
 void qso_log_info::cb_bn_auto(Fl_Widget* w, void* v) {
 	qso_log_info* that = ancestor_view<qso_log_info>(w);
 	if (((Fl_Check_Button*)w)->value()) {

@@ -443,7 +443,7 @@ void menu::cb_mi_file_print(Fl_Widget* w, void* v) {
 }
 
 // File->Backup
-// v is bool. false = backup; true = retrieve
+// v is not used
 void menu::cb_mi_file_backup(Fl_Widget*, void* v) {
 	// Back up
 	backup_file();
@@ -778,7 +778,7 @@ void menu::cb_mi_log_retime(Fl_Widget* w, void* v) {
 	that->update_items();
 }
 
-// Log->Bulk Change - Do the same mod on all records
+// Log->Bulk Change - Do the same mod on all extracted records (all if none extracted)
 // v is not used
 void menu::cb_mi_log_bulk(Fl_Widget* w, void* v) {
 	// Open dialog to allow user to define change
@@ -864,7 +864,7 @@ void menu::cb_mi_log_bulk(Fl_Widget* w, void* v) {
 	Fl::delete_widget(dialog);
 }
 
-// Log->Check Duplicates - call books check duplicates
+// Log->Check Duplicates - call book's check duplicates
 // v is not used
 void menu::cb_mi_log_dupes(Fl_Widget* w, void* v) {
 	navigation_book_->check_dupes(false);
@@ -877,7 +877,7 @@ void menu::cb_mi_log_edith(Fl_Widget* w, void* v) {
 }
 
 // Operate->Start Session
-// v is long: 0 is now, 1 is selected QSO
+// v is long: 0 is now, 1 is selected QSO, 2 is mos recent QSO
 void menu::cb_mi_log_start(Fl_Widget* w, void* v) {
 	long mode = (intptr_t)v;
 	item_num_t save_pos = book_->selection();
@@ -915,8 +915,9 @@ void menu::cb_mi_log_start(Fl_Widget* w, void* v) {
 	tabbed_forms_->update_views(nullptr, HT_ALL, save_pos);
 }
 
-// Log->Zuspend Save
+// Log->Suspend Save
 // If suspeneded remove all bars on saving
+// v is not used
 void menu::cb_mi_log_ssave(Fl_Widget* w, void* v) {
 	// Get the value of the checked menu item
 	Fl_Menu_* m = (Fl_Menu_*)w;
@@ -930,7 +931,7 @@ void menu::cb_mi_log_ssave(Fl_Widget* w, void* v) {
 }
 
 // Import->File
-// v 
+// v is not used
 void menu::cb_mi_imp_file(Fl_Widget* w, void* v) {
 	// Cancel any existing update
 	import_data_->stop_update(false);
@@ -962,6 +963,7 @@ void menu::cb_mi_download(Fl_Widget* w, void* v) {
 }
 
 // Import->WSJT-X - start the WSJT-X listener for logging datagrams
+// v is not used
 void menu::cb_mi_imp_wsjtx(Fl_Widget* w, void* v) {
 	if (!wsjtx_handler_) {
 		// Create new listener
@@ -974,6 +976,7 @@ void menu::cb_mi_imp_wsjtx(Fl_Widget* w, void* v) {
 }
 
 // Import->Clipboard - send FL_PASTE eveny to main_window to handle paste
+// v is not used
 void menu::cb_mi_imp_clipb(Fl_Widget* w, void* v) {
 	Fl::paste(*main_window_, 1);
 }
@@ -1067,7 +1070,8 @@ void menu::cb_mi_ext_special(Fl_Widget* w, void* v) {
 	tabbed_forms_->activate_pane(OT_EXTRACT, true);
 }
 
-// Extract->No Image- 
+// Extract->No Image-
+// v is not used 
 void menu::cb_mi_ext_no_image(Fl_Widget* w, void* v) {
 	menu* that = (menu*)w;
 	// v passes the particular option

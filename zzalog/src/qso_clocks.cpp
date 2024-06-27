@@ -13,6 +13,7 @@ extern status* status_;
 extern wsjtx_handler* wsjtx_handler_;
 extern bool closing_;
 
+// Constructor
 qso_clocks::qso_clocks(int X, int Y, int W, int H, const char* L) :
     Fl_Tabs(X, Y, W, H, L)
 {
@@ -22,9 +23,11 @@ qso_clocks::qso_clocks(int X, int Y, int W, int H, const char* L) :
     enable_widgets();
 }
 
+// Destructor
 qso_clocks::~qso_clocks() {
 }
 
+// Create two tabs - one each for UTC and local timezone
 void qso_clocks::create_form() {
 	int rx = 0;
 	int ry = 0;
@@ -34,7 +37,7 @@ void qso_clocks::create_form() {
 	int saved_rw = rw;
 	int saved_rh = rh;
 	utc_clock_ = new qso_clock(rx, ry, rw, rh, false);
-	// All versions of qso_rig should be the same size, but...
+	// All versions of qso_clock should be the same size, but...
 	rw = max(rw, utc_clock_->w());
 	rh = max(rh, utc_clock_->h());
 
@@ -47,6 +50,7 @@ void qso_clocks::create_form() {
 	end();
 }
 
+// Enable the widgets
 void qso_clocks::enable_widgets() {
 	// Set the label of the selected tab to BOLD, others to ITALIC
 	for (int ix = 0; ix < children(); ix++) {
@@ -60,14 +64,17 @@ void qso_clocks::enable_widgets() {
 			wx->labelcolor(FL_FOREGROUND_COLOR);
 		}
 	}
+	// Enable the two qso_clock widgets
 	utc_clock_->enable_widgets();
 	local_clock_->enable_widgets();	
 }
 
+// 1 Hz ticker - enables both clocks
 void qso_clocks::ticker() {
 	enable_widgets();
 }
 
+// Selecting either tab - redraws with the new tab selected
 void qso_clocks::cb_tabs(Fl_Widget* w, void* v) {
 	qso_clocks* that = ancestor_view<qso_clocks>(w);
 	that->enable_widgets();

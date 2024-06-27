@@ -6,6 +6,8 @@
 #include "icons.h"
 #include "utils.h"
 #include "spec_data.h"
+#include "band.h"
+#include "book.h"
 
 #include <set>
 #include <string>
@@ -23,6 +25,7 @@ using namespace std;
 extern Fl_Preferences* settings_;
 extern spec_data* spec_data_;
 extern cty_data* cty_data_;
+extern book* book_;
 
 // Constructor
 search_dialog::search_dialog() :
@@ -44,9 +47,8 @@ search_dialog::search_dialog() :
 	// Group 1 - conditions
 	// rows 1-2   o radio o radio o radio o radio
 	// rows 3     o radio o radio [ text ]
-	// rows 4     o radio o radio o radio o radio
-	// row 5      <space> o radio o radio o radio
-	// row 6      [ text ]
+	// rows 4     o radio o radio o radio o radio o radio o radio o radio
+	// row 5     [ text ]
 	const int C11 = XG + GAP;
 	const int C12 = C11 + WBN;
 	const int C13 = C12 + WBN;
@@ -122,6 +124,7 @@ search_dialog::search_dialog() :
 	// Read initial settings
 	load_values();
 
+	// Group to spcifiy the condition to use as the search criterion
 	Fl_Group* gp1 = new Fl_Group(XG, YG1, WG1, HG1, "Match condition");
 	gp1->labelsize(FL_NORMAL_SIZE + 2);
 	gp1->labelfont(FL_BOLD);
@@ -132,6 +135,7 @@ search_dialog::search_dialog() :
 	// Group the field selection buttons
 	Fl_Group* gp1a = new Fl_Group(XG, YG1, WG1, HG1A);
 	gp1a->box(FL_NO_BOX);
+	// Set the positions of the buttons
 	const int col1[10] = { C11, C12, C13, C14, C11, C12, C13, C14, C11, C12 };
 	const int row1[10] = { R11, R11, R11, R11, R12, R12, R12, R12, R13, R13 };
 	// For each condition
@@ -160,6 +164,7 @@ search_dialog::search_dialog() :
 	field_name_ = ch12;
 	gp1a->end();
 	
+	// Group the comparsion operators
 	Fl_Group* gp1b = new Fl_Group(XG, R14, WG1, HG1B);
 	gp1b->box(FL_NO_BOX);
 	// Position of the 7 comparator buttons
@@ -182,7 +187,7 @@ search_dialog::search_dialog() :
 		bn13->when(FL_WHEN_RELEASE);
 	}
 	gp1b->end();
-	// Input - text to match
+	// Use field input to offer eneumerated type values plus a any other text
 	field_input* ip14 = new field_input(C11, R15
 		, WEDIT, HTEXT, "Search text");
 	ip14->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
@@ -194,6 +199,7 @@ search_dialog::search_dialog() :
 
 	gp1->end();
 
+	// Refine the search by date, band, mode or station callsign
 	Fl_Group* gp2 = new Fl_Group(XG, YG2, WG2, HG2, "Refinement");
 	gp2->labelsize(FL_NORMAL_SIZE + 2);
 	gp2->labelfont(FL_BOLD);
@@ -243,7 +249,7 @@ search_dialog::search_dialog() :
 	Fl_Choice* ch26 = new Fl_Choice(C221, R22, W221, HTEXT, "Band");
 	ch26->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
 	// Get the list of bands from ADIF specification
-	spec_dataset* bands = spec_data_->dataset("Band");
+	band_set* bands = book_->used_bands();
 	// Start with "Any"
 	ch26->add("Any");
 	if (criteria_->band == "Any") {
@@ -251,9 +257,9 @@ search_dialog::search_dialog() :
 	}
 	int ix = 1;
 	// Append all the bands in the dataset
-	for (auto it = bands->data.begin(); it != bands->data.end(); it++, ix++) {
-		ch26->add(it->first.c_str());
-		if (it->first == criteria_->band) {
+	for (auto it = bands->begin(); it != bands->end(); it++, ix++) {
+		ch26->add((*it).c_str());
+		if (*it == criteria_->band) {
 			ch26->value(ix);
 		}
 	}
@@ -264,7 +270,7 @@ search_dialog::search_dialog() :
 	Fl_Choice* ch27 = new Fl_Choice(C222, R22, W222, HTEXT, "Mode");
 	ch27->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
 	// Get the list of modes from the ADIF specification
-	spec_dataset* modes = spec_data_->dataset("Mode");
+	set<string>* modes = book_->used_submodes();
 	// Start with "Any"
 	ch27->add("Any");
 	if (criteria_->mode == "Any") {
@@ -272,9 +278,9 @@ search_dialog::search_dialog() :
 	}
 	ix = 1;
 	// Append all the modes in the data set
-	for (auto it = modes->data.begin(); it != modes->data.end(); it++, ix++) {
-		ch27->add(it->first.c_str());
-		if (it->first == criteria_->mode) {
+	for (auto it = modes->begin(); it != modes->end(); it++, ix++) {
+		ch27->add((*it).c_str());
+		if (*it == criteria_->mode) {
 			ch27->value(ix);
 		}
 	}

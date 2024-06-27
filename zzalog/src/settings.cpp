@@ -210,6 +210,7 @@ void settings::cb_tab(Fl_Widget* w, void* v) {
 	that->enable_widgets();
 }
 
+// Set the window label depending on the tap selected
 void settings::set_label(settings::cfg_dialog_t active) {
 	switch (active) {
 	case DLG_FILES:

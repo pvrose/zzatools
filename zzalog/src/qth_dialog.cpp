@@ -68,8 +68,6 @@ void qth_dialog::load_values() {
 	current_qth_.cq_zone = qth_details_->item("MY_CQ_ZONE");
 	// ITU_ZONE is not supported by ClubLog cty.xml
 	//current_qth_.itu_zone = qth_details_->item("MY_ITU_ZONE");
-	// MY_CONT is not a valid ADIF field
-	//current_qth_.continent = qth_details_->item("MY_CONT");
 	current_qth_.iota = qth_details_->item("MY_IOTA");
 	current_qth_.description = qth_details_->item("APP_ZZA_QTH_DESCR");
 	original_qth_ = current_qth_;
@@ -267,8 +265,6 @@ void qth_dialog::save_values() {
 		qth_details_->item("MY_CNTY", current_qth_.county);
 		qth_details_->item("MY_CQ_ZONE", current_qth_.cq_zone);
 		qth_details_->item("MY_ITU_ZONE", current_qth_.itu_zone);
-		// MY_CONT is not a valid ADIF field
-		//qth_details_->item("MY_CONT", current_qth_.continent);
 		qth_details_->item("MY_IOTA", current_qth_.iota);
 		qth_details_->item("APP_ZZA_QTH_DESCR", current_qth_.description);
 		spec_data_->add_user_macro("APP_ZZA_QTH", qth_name_, { qth_details_, current_qth_.description });
@@ -293,10 +289,8 @@ void qth_dialog::enable_widgets() {
 	ip_admin2_->value(current_qth_.county.c_str());
 	ip_cq_zone_->value(current_qth_.cq_zone.c_str());
 	ip_itu_zone_->value(current_qth_.itu_zone.c_str());
-	ip_cont_->value(current_qth_.continent.c_str());
 	ip_iota_->value(current_qth_.iota.c_str());
 	ip_description_->value(current_qth_.description.c_str());
-	// TODO - there isn't a MY_CONT in ADIF
 	ip_cont_->deactivate();
 }
 
@@ -326,6 +320,8 @@ void qth_dialog::cb_ip_cty(Fl_Widget* w, void* v) {
 	that->redraw();
 }
 
+// OK button
+// v is not used
 void qth_dialog::cb_bn_ok(Fl_Widget * w, void* v) {
 	qth_dialog* that = ancestor_view<qth_dialog>(w);
 	that->save_values();
@@ -334,6 +330,8 @@ void qth_dialog::cb_bn_ok(Fl_Widget * w, void* v) {
 	else that->do_button(BN_CANCEL);
 }
 
+// Cancel button
+// v is not used
 void qth_dialog::cb_bn_cancel(Fl_Widget* w, void* v) {
 	qth_dialog* that = ancestor_view<qth_dialog>(w);
 	that->do_button(BN_CANCEL);

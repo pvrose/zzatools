@@ -12,6 +12,7 @@ extern spec_data* spec_data_;
 extern status* status_;
 extern bool closing_;
 
+// Constructor for the rigs set of tabs
 qso_tabbed_rigs::qso_tabbed_rigs(int X, int Y, int W, int H, const char* L) :
 	Fl_Tabs(X, Y, W, H, L)
 {
@@ -23,6 +24,7 @@ qso_tabbed_rigs::qso_tabbed_rigs(int X, int Y, int W, int H, const char* L) :
 	enable_widgets();
 }
 
+// Destructor
 qso_tabbed_rigs::~qso_tabbed_rigs() {
 	for (auto ix = label_map_.begin(); ix != label_map_.end(); ix++) {
 		delete ((qso_rig*)(*ix).second);
@@ -56,6 +58,7 @@ void qso_tabbed_rigs::create_form(int X, int Y) {
 	client_area(rx, ry, rw, rh, 0);
 	int saved_rw = rw;
 	int saved_rh = rh;
+	// For each currently salient rig...
 	for (auto ix = label_map_.begin(); ix != label_map_.end(); ix++) {
 		char msg[128];
 		snprintf(msg, sizeof(msg), "RIG: Creating rig interface for \"%s\"", (*ix).first.c_str());
@@ -86,6 +89,7 @@ void qso_tabbed_rigs::enable_widgets() {
 			name = label();
 		}
 		value(label_map_.at(name));
+		// Set standard tab label format
 		for (auto ix = label_map_.begin(); ix != label_map_.end(); ix++) {
 			Fl_Widget* w = (*ix).second;
 			if (w == value()) {
@@ -104,7 +108,7 @@ void qso_tabbed_rigs::enable_widgets() {
 void qso_tabbed_rigs::save_values() {
 }
 
-// Switch the rig on or off
+// Switch to the selected rig
 void qso_tabbed_rigs::switch_rig() {
 	string rig_name = label();
 	if (rig_name.length()) {
@@ -137,6 +141,9 @@ void qso_tabbed_rigs::switch_rig() {
 	enable_widgets();
 }
 
+// Callback when changing tab - causes the dashboard to use the selection as 
+// the default rig
+// v is not used
 void qso_tabbed_rigs::cb_tabs(Fl_Widget* w, void* v) {
 	qso_tabbed_rigs* that = (qso_tabbed_rigs*)w;
 	that->label(that->value()->label());
@@ -161,67 +168,3 @@ rig_if* qso_tabbed_rigs::rig() {
 	// Otherwise return the rig in the selected tab
 	return ((qso_rig*)value())->rig();
 }
-
-//#define BORDER 2
-//#define EXTRASPACE 10
-//#define SELECTION_BORDER 5
-//
-//// Copy of Fl_Tabs - verbatim until noted otherwise
-//int qso_tabbed_rigs::tab_positions() {
-//	const int nc = children();
-//	if (nc != tab_count) {
-//		clear_tab_positions();
-//		if (nc) {
-//			tab_pos = (int*)malloc((nc + 1) * sizeof(int));
-//			tab_width = (int*)malloc((nc) * sizeof(int));
-//		}
-//		tab_count = nc;
-//	}
-//	if (nc == 0) return 0;
-//	int selected = 0;
-//	Fl_Widget* const* a = array();
-//	int i;
-//	char prev_draw_shortcut = fl_draw_shortcut;
-//	fl_draw_shortcut = 1;
-//
-//	tab_pos[0] = Fl::box_dx(box());
-//	for (i = 0; i < nc; i++) {
-//		Fl_Widget* o = *a++;
-//		if (o->visible()) selected = i;
-//
-//		int wt = 0; int ht = 0;
-//		Fl_Labeltype ot = o->labeltype();
-//		Fl_Align oa = o->align();
-//		if (ot == FL_NO_LABEL) {
-//			o->labeltype(FL_NORMAL_LABEL);
-//		}
-//		o->align(tab_align());
-//		o->measure_label(wt, ht);
-//		o->labeltype(ot);
-//		o->align(oa);
-//
-//		tab_width[i] = wt + EXTRASPACE;
-//		tab_pos[i + 1] = tab_pos[i] + tab_width[i] + BORDER;
-//	}
-//	fl_draw_shortcut = prev_draw_shortcut;
-//
-//	int r = w();
-//	if (tab_pos[i] <= r) return selected;
-//
-//	// Change the algorithm if they are too big
-//	// Reduce all deselected widths by the apportioned oversize
-//	// Use fixed point arithmetic (x2^10) to reduce rounding error
-//	int delta = 1024 * (r - tab_width[selected]) / (tab_pos[i] - tab_width[selected]);
-//	for (i = 0; i < nc; i++) {
-//		if (i != selected) {
-//			tab_width[i] = tab_width[i] * delta / 1024;
-//		}
-//		tab_pos[i + 1] = tab_pos[i] + tab_width[i] + BORDER;
-//	}
-//	// If we haven't used the full width, increase the size of the last tab to compensate
-//	if (tab_pos[i] < r) {
-//		tab_width[i - 1] = r - tab_pos[i];
-//		tab_pos[i] = r;
-//	}
-//	return selected;
-//}

@@ -33,6 +33,7 @@ void qso_net_entry::create_form(int X, int Y) {
 	labelsize(FL_NORMAL_SIZE + 2);
 	labelcolor(fl_darker(FL_GREEN));
 
+	// Tabbed set of qso_entry forms
 	entries_ = new Fl_Tabs(X, Y + HTEXT, w(), h());
 	entries_->callback(cb_entries);
 	int rx = 0;
@@ -55,24 +56,29 @@ void qso_net_entry::create_form(int X, int Y) {
 	end();
 }
 
+// Returns the currently displayed qso_entry
 qso_entry* qso_net_entry::entry() {
 	return (qso_entry*)entries_->value();
 }
 
+// Set the entry
 void qso_net_entry::entry(qso_entry* w) {
 	int ok = entries_->value(w);
 }
 
+// Returns the number of qso_entry forms
 int qso_net_entry::entries() {
 	return entries_->children();
 }
 
+// Returns the last entry
 qso_entry* qso_net_entry::last_entry() {
 	int ix = entries_->children() - 1;
 	Fl_Widget* w = entries_->child(ix);
 	return (qso_entry*)w;
 }
 
+// Returns the first enytty
 qso_entry* qso_net_entry::first_entry() {
 	return (qso_entry*)entries_->child(0);
 }

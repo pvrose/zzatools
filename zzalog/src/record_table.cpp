@@ -270,7 +270,7 @@ void record_table::set_records(record* log_record, record* query_record, record*
 		cols(3);
 	}
 	else if (log_record_ != NULL && query_record_ != NULL && saved_record == NULL) {
-		// Display modified log, query and original log
+		// Display both log entries
 		display_mode_ = DUPE_QUERY;
 		cols(2);
 	}
