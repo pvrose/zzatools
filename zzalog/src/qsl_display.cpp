@@ -185,7 +185,8 @@ void qsl_display::draw_field(field_def& field) {
 		} else {
 			fl_color(field.t_style.colour);
 		}
-		fl_draw(text.c_str(), fx + box_gap, fy + box_gap + fl_height() - fl_descent());
+		fl_draw(text.c_str(), fx + box_gap, fy + box_gap,
+			fw, fh, FL_ALIGN_LEFT, nullptr, false);
 		// Now display the label
 		int lw = 0;
 		int lh = 0;
@@ -370,7 +371,7 @@ void qsl_display::load_data(string callsign) {
 			}
 		}
 		ip.close();
-		snprintf(msg, sizeof(msg), "QSL: %d items read from %s", data->items.size(), data->filename.c_str());
+		snprintf(msg, sizeof(msg), "QSL: %zd items read from %s", data->items.size(), data->filename.c_str());
 		status_->misc_status(ST_OK, msg);
 	}
 }
@@ -448,7 +449,7 @@ void qsl_display::save_data() {
 		}
 	}
 	op.close();
-	snprintf(msg, sizeof(msg), "QSL: %d items written to %s", data_->items.size(), data_->filename.c_str());
+	snprintf(msg, sizeof(msg), "QSL: %zd items written to %s", data_->items.size(), data_->filename.c_str());
 	status_->misc_status(ST_OK, msg);
 }
 
@@ -468,7 +469,7 @@ Fl_Image* qsl_display::get_image(string filename) {
 	Fl_Image* image = nullptr;
 	if (pos == string::npos) {
 		char msg[128];
-		snprintf(msg, sizeof(msg), "QSL: File %s cannot be identified");
+		snprintf(msg, sizeof(msg), "QSL: File %s cannot be identified", filename.c_str());
 		status_->misc_status(ST_ERROR, msg);
 	} else if (filename.substr(pos) == ".jpg") {
 		// Open as JPEG

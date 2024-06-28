@@ -153,7 +153,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="zzalog\src\band_data.cpp" />
+    <ClCompile Include="zzalog\src\font_dialog.cpp" />
     <ClCompile Include="zzalog\src\page_dialog.cpp" />
+    <ClCompile Include="zzalog\src\qsl_display.cpp" />
+    <ClCompile Include="zzalog\src\qsl_editor.cpp" />
     <ClCompile Include="zzalog\src\qso_buttons.cpp" />
     <ClCompile Include="zzalog\src\qso_clock.cpp" />
     <ClCompile Include="zzalog\src\qso_clocks.cpp" />
@@ -171,7 +174,6 @@
     <ClCompile Include="zzalog\src\qso_entry.cpp" />
     <ClCompile Include="zzalog\src\qso_query.cpp" />
     <ClCompile Include="zzalog\src\qso_server.cpp" />
-    <ClCompile Include="zzalog\src\qso_tabbed_qth.cpp" />
     <ClCompile Include="zzalog\src\qso_tabbed_rigs.cpp" />
     <ClCompile Include="zzalog\src\qso_wx.cpp" />
     <ClCompile Include="zzalog\src\rig_if.cpp" />
@@ -218,9 +220,6 @@
     <ClCompile Include="zzalog\src\menu.cpp" />
     <ClCompile Include="zzalog\src\printer.cpp" />
     <ClCompile Include="zzalog\src\qrz_handler.cpp" />
-    <ClCompile Include="zzalog\src\qsl_design.cpp" />
-    <ClCompile Include="zzalog\src\qsl_form.cpp" />
-    <ClCompile Include="zzalog\src\qsl_html_view.cpp" />
     <ClCompile Include="zzalog\src\qth_dialog.cpp" />
     <ClCompile Include="zzalog\src\record.cpp" />
     <ClCompile Include="zzalog\src\record_table.cpp" />
@@ -245,9 +244,12 @@
     <ClInclude Include="zzalog\include\band_data.h" />
     <ClInclude Include="zzalog\include\callback.h" />
     <ClInclude Include="zzalog\include\drawing.h" />
+    <ClInclude Include="zzalog\include\font_dialog.h" />
     <ClInclude Include="zzalog\include\formats.h" />
     <ClInclude Include="zzalog\include\logo.h" />
     <ClInclude Include="zzalog\include\page_dialog.h" />
+    <ClInclude Include="zzalog\include\qsl_display.h" />
+    <ClInclude Include="zzalog\include\qsl_editor.h" />
     <ClInclude Include="zzalog\include\qso_buttons.h" />
     <ClInclude Include="zzalog\include\qso_clock.h" />
     <ClInclude Include="zzalog\include\qso_clocks.h" />
@@ -265,7 +267,6 @@
     <ClInclude Include="zzalog\include\qso_entry.h" />
     <ClInclude Include="zzalog\include\qso_query.h" />
     <ClInclude Include="zzalog\include\qso_server.h" />
-    <ClInclude Include="zzalog\include\qso_tabbed_qth.h" />
     <ClInclude Include="zzalog\include\qso_tabbed_rigs.h" />
     <ClInclude Include="zzalog\include\qso_wx.h" />
     <ClInclude Include="zzalog\include\regices.h" />
@@ -314,9 +315,6 @@
     <ClInclude Include="zzalog\include\pfx_data.old.h" />
     <ClInclude Include="zzalog\include\prefix.h" />
     <ClInclude Include="zzalog\include\printer.h" />
-    <ClInclude Include="zzalog\include\qsl_design.h" />
-    <ClInclude Include="zzalog\include\qsl_form.h" />
-    <ClInclude Include="zzalog\include\qsl_html_view.h" />
     <ClInclude Include="zzalog\include\qth_dialog.h" />
     <ClInclude Include="zzalog\include\record.h" />
     <ClInclude Include="zzalog\include\record_table.h" />

@@ -126,9 +126,6 @@
     <ClCompile Include="zzalog\src\web_dialog.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="zzalog\src\qsl_form.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="zzalog\src\intl_widgets.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -157,9 +154,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="zzalog\src\qth_dialog.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\qsl_html_view.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="zzalog\src\page_dialog.cpp">
@@ -198,9 +192,6 @@
     <ClCompile Include="zzalog\src\xml_writer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="zzalog\src\qsl_design.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="zzalog\src\qso_rig.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -226,9 +217,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="zzalog\src\qso_qth.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zzalog\src\qso_tabbed_qth.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="zzalog\src\qso_misc.cpp">
@@ -268,6 +256,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="zzalog\src\timestamp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zzalog\src\qsl_display.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zzalog\src\qsl_editor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zzalog\src\font_dialog.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -398,9 +395,6 @@
     <ClInclude Include="zzalog\include\web_dialog.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="zzalog\include\qsl_form.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="zzalog\include\intl_widgets.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -429,9 +423,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="zzalog\include\qth_dialog.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\qsl_html_view.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="packages\pthreads.2.9.1.4\build\native\include\pthread.h">
@@ -479,9 +470,6 @@
     <ClInclude Include="zzalog\include\xml_writer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="zzalog\include\qsl_design.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="zzalog\include\qso_rig.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -510,9 +498,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="zzalog\include\drawing.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\qso_tabbed_qth.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="zzalog\include\qso_misc.h">
@@ -555,6 +540,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="zzalog\include\qso_wx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zzalog\include\qsl_display.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zzalog\include\qsl_editor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zzalog\include\font_dialog.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
