@@ -26,14 +26,6 @@ extern qso_manager* qso_manager_;
 files_dialog::files_dialog(int X, int Y, int W, int H, const char* label) :
 	page_dialog(X, Y, W, H, label)
 {
-	// Auto-import enables
-	for (int i = 0; i < AUTO_COUNT; i++) {
-		enable_auto_[i] = false;
-		auto_file_[i] = "";
-		auto_src_[i] = "";
-		auto_empty_[i] = false;
-		auto_data_[i] = { "", "", nullptr, nullptr, nullptr, nullptr };
-	}
 	enable_tqsl_ = false;;
 	enable_card_ = false;
 	enable_backup_ = false;
@@ -49,8 +41,6 @@ files_dialog::files_dialog(int X, int Y, int W, int H, const char* label) :
 	backup_data_ = { "", "", nullptr, nullptr, nullptr, nullptr };
 	status_data_ = { "", "", nullptr, nullptr, nullptr, nullptr };
 	unzipper_data_ = { "", "", nullptr, nullptr, nullptr, nullptr };
-	auto_poll_ = nan("");
-	autos_changed_ = false;
 
 	// initialise and create form
 	load_values();
@@ -69,36 +59,9 @@ files_dialog::~files_dialog()
 
 // Load initial values of the fields from the settings
 void files_dialog::load_values() {
-	Fl_Preferences rtu_settings(settings_, "Real Time Update");
-	Fl_Preferences files_settings(rtu_settings, "Files");
 	// Get number of auto-import files
-	int num_files = files_settings.groups();
 	int temp_bool = false;
 	char * temp_string;
-	// For each auto-import file - prevent a manual edit creating more files than we can handle
-	for (int i = 0; i < num_files && i < AUTO_COUNT; i++) {
-		// Get name of app from the name of the settings group
-		auto_src_[i] = files_settings.group(i);
-		Fl_Preferences file_settings(files_settings, i);
-		// Get the various information for this file
-		file_settings.get("Filename", temp_string, "");
-		auto_file_[i] = temp_string;
-		free(temp_string);
-		file_settings.get("Empty On Read", temp_bool, false);
-		auto_empty_[i] = temp_bool;
-		enable_auto_[i] = true;
-		file_settings.get("Timestamp", temp_string, "20190601000000");
-		auto_ts_[i] = temp_string;
-		free(temp_string);
-	}
-	// If less files than the default dialog provision, add default data
-	for (int i = num_files; i < AUTO_COUNT; i++) {
-		auto_file_[i] = "";
-		auto_src_[i] = "";
-		auto_empty_[i] = false;
-		enable_auto_[i] = false;
-	}
-	rtu_settings.get("Polling Interval", auto_poll_, AUTO_IP_DEF);
 
 	// Settings groups required below
 	Fl_Preferences qsl_settings(settings_, "QSL");
@@ -179,16 +142,8 @@ void files_dialog::create_form(int X, int Y) {
 	const int COL6 = COL5 + WBUTTON + GAP;
 	const int XMAX = COL6 + WBUTTON + EDGE;
 	// widget position - rows
-	// Group 1, rows 1 to 4
-	const int GRP1 = EDGE;
-	const int ROW1_1 = GRP1 + HTEXT;
-	const int ROW1_2 = ROW1_1 + max(HBUTTON, HTEXT);
-	const int ROW1_3 = ROW1_2 + max(HBUTTON, HTEXT);
-	const int* const ROW1[files_dialog::AUTO_COUNT + 1] =
-	{ &ROW1_1, &ROW1_2, &ROW1_3 };
-	const int HGRP1 = ROW1_3 + HTEXT;
 	// Group 2, row 1
-	const int GRP2 = GRP1 + HGRP1;
+	const int GRP2 = EDGE;
 	const int ROW2_1 = GRP2 + HTEXT;
 	const int HGRP2 = ROW2_1 - GRP2 + max(HBUTTON, HTEXT) + GAP;
 	// Group 3, row 1
@@ -223,69 +178,6 @@ void files_dialog::create_form(int X, int Y) {
 	// Bottom of required dialog
 	const int YMAX = GRP8 + HGRP8 + EDGE;
 	
-	Fl_Group* grp_auto = new Fl_Group (X + XGRP, Y + GRP1, XMAX, HGRP1, "Auto-import files");
-	grp_auto->labelsize(FL_NORMAL_SIZE + 2);
-	grp_auto->labelfont(FL_BOLD);
-	grp_auto->box(FL_BORDER_BOX);
-	grp_auto->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
-
-	// widgets required for auto-import
-	Fl_Check_Button* bn_auto_en[AUTO_COUNT];
-	intl_input* in_auto_file[AUTO_COUNT];
-	intl_input* in_auto_src[AUTO_COUNT];
-	Fl_Check_Button* bn_auto_mt[AUTO_COUNT];
-	Fl_Button* bn_browse_auto[AUTO_COUNT];
-
-	for (int i = 0; i < AUTO_COUNT; i++) {
-		// Check box - enable this file in auto-import
-		bn_auto_en[i] = new Fl_Check_Button(X + COL1, Y + *ROW1[i], WRADIO, HBUTTON);
-		bn_auto_en[i]->callback(cb_value_auto<Fl_Check_Button, bool>, &(enable_auto_[i]));
-		bn_auto_en[i]->when(FL_WHEN_CHANGED);
-		bn_auto_en[i]->value(enable_auto_[i]);
-		bn_auto_en[i]->tooltip("Enable this auto-import");
-		// Input - file name for auto-import
-		in_auto_file[i] = new intl_input(X + COL2, Y + *ROW1[i], WEDIT, HTEXT);
-		in_auto_file[i]->callback(cb_value_auto<intl_input, string>, &(auto_file_[i]));
-		in_auto_file[i]->when(FL_WHEN_CHANGED);
-		in_auto_file[i]->value(auto_file_[i].c_str());
-		in_auto_file[i]->tooltip("File name for auto-import");
-		// Input - name of application generating the auto-import
-		in_auto_src[i] = new intl_input(X + COL3, Y + *ROW1[i], WBUTTON, HTEXT);
-		in_auto_src[i]->callback(cb_value_auto<intl_input, string>, &(auto_src_[i]));
-		in_auto_src[i]->when(FL_WHEN_CHANGED);
-		in_auto_src[i]->value(auto_src_[i].c_str());
-		in_auto_src[i]->tooltip("Application generating the auto-import");
-		// Button - file will be cleared after auto-import
-		bn_auto_mt[i] = new Fl_Check_Button(X + COL4, Y + *ROW1[i], WRADIO, HBUTTON, "Empty");
-		bn_auto_mt[i]->align(FL_ALIGN_RIGHT);
-		bn_auto_mt[i]->callback(cb_value_auto<Fl_Check_Button, bool>, &(auto_empty_[i]));
-		bn_auto_mt[i]->when(FL_WHEN_CHANGED);
-		bn_auto_mt[i]->value(auto_empty_[i]);
-		bn_auto_mt[i]->tooltip("Empty the file after import");
-		// Button - opens a file browser to get the filename
-		bn_browse_auto[i] = new Fl_Button(X + COL5, Y + *ROW1[i], WBUTTON, HBUTTON, "Browse");
-		bn_browse_auto[i]->align(FL_ALIGN_INSIDE);
-		auto_data_[i] = { "Please enter a file to auto-import", "ADI Files\t*.adi\nADX Files\t*.adx", &auto_file_[i], &enable_auto_[i], in_auto_file[i], bn_auto_en[i] };
-		bn_browse_auto[i]->callback(cb_bn_browsefile, &(auto_data_[i]));
-		bn_browse_auto[i]->when(FL_WHEN_RELEASE);
-		bn_browse_auto[i]->tooltip("Open file browser to locate auto-import file");
-	}
-	// Spinner - sets  the polling interval for auto-import
-	Fl_Spinner* spin_auto = new Fl_Spinner(X + COL6, Y + ROW1_2, WBUTTON, HBUTTON, "Polling\nint. (secs)");
-	spin_auto->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
-	spin_auto->type(FL_FLOAT_INPUT);
-	spin_auto->maximum(AUTO_IP_MAX);
-	spin_auto->minimum(AUTO_IP_MIN);
-	spin_auto->step(5.0);
-	spin_auto->callback(cb_value<Fl_Spinner, double>, &auto_poll_);
-	spin_auto->when(FL_WHEN_RELEASE);
-	spin_auto->value(auto_poll_);
-	char tip[128];
-	sprintf(tip, "Select the required polling period (s). Min = %d, Max = %d", AUTO_IP_MIN, AUTO_IP_MAX);
-	spin_auto->copy_tooltip(tip);
-
-	grp_auto->end();
-
 	Fl_Group* grp_tqsl = new Fl_Group(X + XGRP, Y + GRP2, XMAX, HGRP2, "TQSL Executable");
 	grp_tqsl->box(FL_BORDER_BOX);
 	grp_tqsl->labelsize(FL_NORMAL_SIZE + 2);
@@ -475,25 +367,6 @@ void files_dialog::create_form(int X, int Y) {
 
 // save values to the settings
 void files_dialog::save_values() {
-	Fl_Preferences rtu_settings(settings_, "Real Time Update");
-	// Auto Import files
-	Fl_Preferences files_settings(rtu_settings, "Files");
-	// Delete existing files information
-	files_settings.clear();
-	int file_ix = 0;
-	// For all the possible auto-import data
-	for (int i = 0; i < AUTO_COUNT; i++) {
-		if (enable_auto_[i]) {
-			// Only set those enabled - note this will start afresh so gaps are closed up
-			Fl_Preferences file_settings(files_settings, auto_src_[i].c_str());
-			file_settings.set("Filename", auto_file_[i].c_str());
-			file_settings.set("Empty On Read", auto_empty_[i]);
-			file_settings.set("Timestamp", auto_ts_[i].c_str());
-			file_ix++;
-		}
-	}
-	rtu_settings.set("Polling Interval", auto_poll_);
-
 	// Settings groups for below
 	Fl_Preferences qsl_settings(settings_, "QSL");
 	Fl_Preferences lotw_settings(qsl_settings, "LotW");
@@ -533,15 +406,6 @@ void files_dialog::save_values() {
 	clublog_settings.set("Unzip Command", unzipper_.c_str());
 	clublog_settings.set("Unzip Switches", unzip_switches_.c_str());
 
-	// Restart any auto-update if any of the information may have changed
-	if (autos_changed_ && import_data_->is_auto_update()) {
-		import_data_->stop_update(false);
-		while (!import_data_->update_complete()) Fl::check();
-		import_data_->start_auto_update();
-		// Clear ths flag in case "Save" not "OK" was clicked to get here
-		autos_changed_ = false;
-	}
-
 	settings_->flush();
 
 }
@@ -550,10 +414,3 @@ void files_dialog::save_values() {
 void files_dialog::enable_widgets() {
 }
 
-// Special version of cb_value callback that also sets auto_changed_
-template<class WIDGET, class DATA>
-void files_dialog::cb_value_auto(Fl_Widget* w, void* v) {
-	cb_value<WIDGET, DATA>(w, v);
-	files_dialog* that = ancestor_view<files_dialog>(w);
-	that->autos_changed_ = true;
-}

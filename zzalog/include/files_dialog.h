@@ -21,17 +21,10 @@ using namespace std;
 	class files_dialog : public page_dialog
 	{
 	public:
-		// Default number of auto-import files
-		static const int AUTO_COUNT = 3;
-
-	public:
 		files_dialog(int X, int Y, int W, int H, const char* label);
 		~files_dialog();
 
 	protected:
-		// Special version of cb_value to set auto_changed_
-		template <class WIDGET, class DATA>
-		static void cb_value_auto(Fl_Widget* w, void* v);
 		// Load the settings data
 		virtual void load_values();
 		// create the form
@@ -42,16 +35,12 @@ using namespace std;
 		virtual void enable_widgets();
 
 		// attributes
-		// Auto-import enables
-		bool enable_auto_[AUTO_COUNT];
 		// Enable TQSL executable
 		bool enable_tqsl_;
 		// Enable eQSL cards
 		bool enable_card_;
 		// Enable auto-backup
 		bool enable_backup_;
-		// Auto-import files
-		string auto_file_[AUTO_COUNT];
 		// The TQSL executable
 		string tqsl_executable_;
 		// eQSL e-card directory
@@ -64,18 +53,10 @@ using namespace std;
 		string status_log_file_;
 		// All.txt file
 		string wsjtx_directory_;
-		// Names of the modem applications providiing auto-import data
-		string auto_src_[AUTO_COUNT];
 		// Unzipper location
 		string unzipper_;
 		// Unzipper switches
 		string unzip_switches_;
-		// Empty auto-import files after importing them
-		bool auto_empty_[AUTO_COUNT];
-		// callback data for the auto-import browse buttons
-		browser_data_t auto_data_[AUTO_COUNT];
-		// Timestamps for files - not editable here
-		string auto_ts_[AUTO_COUNT];
 		// callback data for the TQSL executable browse button
 		browser_data_t tqsl_data_;
 		// callback data for the eQSL card directory browse button
@@ -90,10 +71,6 @@ using namespace std;
 		browser_data_t wsjtx_data_;
 		// callback data for the unzipper command
 		browser_data_t unzipper_data_;
-		// Poll interval (in seconds) for auto-importing
-		double auto_poll_;
-		// The specification of auto-import has changed
-		bool autos_changed_;
 		// Stations callsign
 		string station_callsign_;
 	};

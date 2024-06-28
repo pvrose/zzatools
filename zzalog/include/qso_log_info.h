@@ -32,15 +32,10 @@ public:
 
 	void ticker();
 
-	// auto_update in progress
-	void auto_source(const char* source);
-
 	// Call back for enable check box
 	static void cb_bn_enable(Fl_Widget* w, void* v);
 	// Callback to force save
 	static void cb_bn_save(Fl_Widget* w, void* v);
-	// Callback to start/stop auto_update
-	static void cb_bn_auto(Fl_Widget* w, void* v);
 
 protected:
 	// Log status
@@ -51,9 +46,5 @@ protected:
 	Fl_Check_Button* bn_save_enable_;
 	// Save it!
 	Fl_Button* bn_save_;
-	// Are QSOs being updated from modems?
-	Fl_Check_Button* bn_auto_update_;
-	// Force an update
-	Fl_Output* op_update_;
 
 };

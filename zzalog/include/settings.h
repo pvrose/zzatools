@@ -18,11 +18,9 @@
 
 		// The tab types in the settings dialog
 		enum cfg_dialog_t {
-			DLG_FORMAT,
 			DLG_FILES,
 			DLG_WEB,
 			DLG_COLUMN,
-			DLG_ADIF,
 			DLG_USER,
 			DLG_QSLE,
 			DLG_ALL,

@@ -434,12 +434,6 @@ void toolbar::cb_bn_explain(Fl_Widget* w, void* v) {
 	delete tip_record;
 }
 
-// Set logging mode
-// v is not used
-void toolbar::cb_bn_import(Fl_Widget* w, void* v) {
-	import_data_->start_auto_update();
-}
-
 // Connect or disconnect rig
 // v is not used
 void toolbar::cb_bn_rig(Fl_Widget* w, void* v) {

@@ -62,7 +62,7 @@ settings::settings(int W, int H, const char* label, cfg_dialog_t active) :
 	fields->labelfont(FL_BOLD);
 	fields->labelsize(FL_NORMAL_SIZE + 2);
 	fields->tooltip("Allows the specification of which fields to display in the various applications");
-	children_ids_.push_back(DLG_FORMAT);
+	children_ids_.push_back(DLG_COLUMN);
 	// User settings - allows user to control cetain aspects of the displayed information
 	user_dialog* user = new user_dialog(rx, ry, rw, rh, "User settings");
 	user->labelfont(FL_BOLD);

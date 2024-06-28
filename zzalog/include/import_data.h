@@ -9,14 +9,6 @@
 
 using namespace std;
 
-
-
-	// auto-import polling period - 15s -> 5 min (default 1 min)
-	const int AUTO_IP_MAX = 300;
-	const int AUTO_IP_MIN = 15;
-	const int AUTO_IP_DEF = 60;
-
-
 	// This class inherits book and provides the additional functionality required
 	// for importing additional data to the main log. Pointers to imported Records are initially held in this book
 	// and pointers copied or records merged into the main log. Any problems encountered are refered to the 
@@ -28,13 +20,10 @@ using namespace std;
 		enum update_mode_t {
 			NONE,            // Book has no data
 			EXISTING,        // Use existing update mode
-			AUTO_IMPORT,     // Book contains data being auto-imported 
 			FILE_IMPORT,     // Book contains data manually loaded from a file (assume new records are correct)
 			FILE_UPDATE,     // Book contains data to be merged from a file (i.e. check it exists)
 			EQSL_UPDATE,     // Book contains data downloaded from eQSL.cc
 			LOTW_UPDATE,     // Book contains data downloaded from arrl.org/lotw
-			WAIT_AUTO,       // Book is reserved for the next auto-import session
-			READ_AUTO,       // Data is being read - we can interrupt the process
 			DATAGRAM,        // Book contains data received from WSJT-X datagram
 			CLIPBOARD,       // Book is being imported from clipboard
 			SINGLE_ADIF,     // Import a single ADIF
@@ -46,10 +35,6 @@ using namespace std;
 
 		// public methods
 	public:
-		// Start the auto update process
-		bool start_auto_update();
-		// Start an automatic (on timer) update from the defined locations
-		void auto_update();
 		// Delete the mismatch record in the update 
 		void discard_update(bool notify);
 		// Accept the record from the update
@@ -76,14 +61,10 @@ using namespace std;
 		void load_stream(stringstream& adif, update_mode_t mode);
 		// Load record
 		void load_record(record* qso, update_mode_t mode = SINGLE_ADIF);
-		// Import process is auto-update or timer set for one
-		bool is_auto_update();
 		// 1 second ticker
 		void ticker();
 
 	protected:
-		// repeat the auto-import timer
-		void repeat_auto_timer();
 		// Finish the update process
 		void finish_update(bool merged = true);
 		// Convert the update record
@@ -121,18 +102,8 @@ using namespace std;
 		string* update_files_;
 		// That they should be emptied - use of bool or char gets confused with C-strings
 		int* empty_files_;
-		// The sources of the auto-imports
-		string* sources_;
-		// Last read timestamps of update files
-		string* last_timestamps_;
-		// Earliest last update
-		string last_timestamp_;
 		// Close is pending
 		bool close_pending_;
-		// Time count
-		int auto_count_;
-		// Timer period
-		int auto_period_;
 		// Last added record number
 		qso_num_t last_added_number_;
 
