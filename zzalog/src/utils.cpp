@@ -697,7 +697,6 @@ lat_long_t grid_to_latlong(string gridsquare) {
 	return lat_long;
 }
 
-
 // Convert from base64 encoding - single character
 unsigned char decode_base_64(unsigned char c) {
 	// A-Z => 0x00 to 0x19
@@ -1033,6 +1032,8 @@ void great_circle(lat_long_t source, lat_long_t destination, double& bearing, do
 	distance = EARTH_RADIUS * acos(cos_angle);
 }
 
+// Replace all / characters in a string with _ - used for callsigns as filenames 
+// menu items
 void de_slash(string& data) {
 	for (size_t ix = 0; ix < data.length(); ix++) {
 		if (data[ix] == '/') data[ix] = '_';

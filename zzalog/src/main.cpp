@@ -70,7 +70,7 @@ using namespace std;
 string COPYRIGHT = "\302\251 Philip Rose GM3ZZA 2018. All rights reserved.\nPrefix data courtesy of clublog.org";
 string PROGRAM_ID = "ZZALOG";
 string PROG_ID = "ZLG";
-string PROGRAM_VERSION = "3.4.76";
+string PROGRAM_VERSION = "3.4.77";
 string VENDOR = "GM3ZZA";
 extern string TIMESTAMP;
 
@@ -106,7 +106,6 @@ extern int FL_NORMAL_SIZE;
 book* book_ = nullptr;
 import_data* import_data_ = nullptr;
 extract_data* extract_records_ = nullptr;
-extract_data* dxatlas_records_ = nullptr;
 book* navigation_book_ = nullptr;
 tabbed_forms* tabbed_forms_ = nullptr;
 menu* menu_ = nullptr;
@@ -661,8 +660,6 @@ void add_book(char* arg) {
 		navigation_book_ = book_;
 		import_data_ = new import_data;
 		extract_records_ = new extract_data;
-		dxatlas_records_ = new extract_data;
-		dxatlas_records_->book_type(OT_DXATLAS);
 		// Tell the views that a book now exists
 		tabbed_forms_->books();
 		// Get filename and load the data

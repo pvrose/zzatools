@@ -19,6 +19,7 @@ extern book* book_;
 extern qso_manager* qso_manager_;
 extern tabbed_forms* tabbed_forms_;
 
+// constructor
 user_dialog::user_dialog(int X, int Y, int W, int H, const char* label) :
 	page_dialog(X, Y, W, H, label) 
 {
@@ -33,6 +34,7 @@ user_dialog::user_dialog(int X, int Y, int W, int H, const char* label) :
 	do_creation(X, Y);
 }
 
+// Destructor
 user_dialog::~user_dialog() {}
 
 // Load values from settings_

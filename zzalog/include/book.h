@@ -56,7 +56,6 @@ using namespace std;
 		HT_RESET_ORDER,           // Reset order as first to last
 		HT_MEMORIES,              // Read mmemories from rig
 		HT_START_CHANGED,         // The start date or time has changed
-		HT_DXATLAS,               // DxAtlas selection has changed
 		HT_IGNORE,                // Ignore the change
 		HT_INSERTED_NODXA,         // As HT_INSERTED but do not update DxAtlas
 	};

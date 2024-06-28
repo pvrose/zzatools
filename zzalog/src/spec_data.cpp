@@ -77,12 +77,6 @@ spec_data::~spec_data()
 	userdef_names_.clear();
 	appdef_names_.clear();
 	datatype_indicators_.clear();
-
-	// close any report file 
-	char message[1024];
-	sprintf(message, "VALIDATE: %d errors found, %d records with errors, %d records checked.\n",
-		error_count_, error_record_count_, record_count_);
-	status_->misc_status(error_count_ ? ST_WARNING : ST_OK, message);
 }
 
 // Get the data path to the files - returns directory name
@@ -131,7 +125,6 @@ bool spec_data::load_data(bool force) {
 	string directory = get_path(force);
 	// Open an ADIF Specification input interpreter
 	specx_reader* reader = new specx_reader;
-	// For each file
 	// Create an input stream from the file
 	string file_name = directory + ADIF_FILE;
 	ifstream file;
@@ -154,6 +147,7 @@ bool spec_data::load_data(bool force) {
 	file.close();
 	delete reader;
 	if (ok) {
+		// File read in OK
 		process_fieldnames();
 		process_modes();
 		add_my_appdefs();
@@ -975,6 +969,7 @@ bool spec_data::add_user_macro(string field, string value, macro_defn macro) {
 	return true;
 }
 
+// Expand a macro into it's various fields - data returned in a record object
 record* spec_data::expand_macro(string field, string value) {
 	char message[128];
 	if (macros_.size() == 0) {
@@ -987,6 +982,7 @@ record* spec_data::expand_macro(string field, string value) {
 		return nullptr;
 	}
 	else {
+		// We have a macroof thata name
 		macro_map* field_macros = macros_.at(field);
 		if (field_macros->find(value) == field_macros->end()) {
 			if (value == "") {
@@ -1012,7 +1008,7 @@ set<string> spec_data::get_macro_changes() {
 	return macro_changes_;
 }
 
-// The DXCC has ADIF defined primary administrative districts
+// The DXCC has ADIF defined primary administrative subdivisions
 bool spec_data::has_states(int dxcc) {
 	// Look up DXCC name in list of DXCCs with "states".
 	if (dataset("Primary_Administrative_Subdivision[" + to_string(dxcc) + "]")) {
@@ -2244,7 +2240,6 @@ bool spec_data::validate(record* record, qso_num_t number)
 	return record_corrected_;
 }
 
-
 // Remove CR and LF from a string to convert multi-line to a non-multi-line string
 string spec_data::convert_ml_string(const string& data) {
 	// Create a string to return and pre-allocate a buffer big enough.
@@ -2425,6 +2420,8 @@ void spec_data::add_my_appdefs() {
 		"APP_ZZA_OP",
 		"APP_ZZA_OP_DESCR",
 		"APP_ZZA_OPERATOR",    // Operator of QSL partner - provided in OPERATOR
+		"APP_ZZA_QTH",         // Macro
+		"APP_ZZA_QTH_DESCR",
 		"APP_LOTW_NUMREC",
 		"APP_LOTW_LASTQSL",
 		""

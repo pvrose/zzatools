@@ -18,6 +18,7 @@ extern qso_manager* qso_manager_;
 
 const double MPH2MPS = 1.0 / 3600.0 * (1760.0 * 36.0) * 25.4 / 1000.0;
 
+// Constructor
 wx_handler::wx_handler() :
     xml_reader() {
 
@@ -26,7 +27,8 @@ wx_handler::wx_handler() :
     update();
 
 };
-    
+
+// Destructor   
 wx_handler::~wx_handler() {};
 
 
@@ -76,6 +78,7 @@ bool wx_handler::start_element(string name, map<string, string>* attributes) {
 	return result;
 
 }
+
 // End
 bool wx_handler::end_element(string name) {
     string element_name = to_upper(name);
@@ -184,7 +187,7 @@ void wx_handler::update() {
     }
 }
 
-// Timer 
+// Timer - called every 30 minutes
 void wx_handler::ticker() {
     update();
     qso_manager_->enable_widgets();
@@ -271,7 +274,7 @@ float wx_handler::pressure() {
     return report_.pressure_hPa;
 }
 
-// The overall XML container
+// The overall XML container CURRENT
 bool wx_handler::start_current() {
     if (elements_.size()) {
         status_->misc_status(ST_ERROR, "WX_HANDLER: Incorrect XML - unexpected adif element");
@@ -284,6 +287,7 @@ bool wx_handler::start_current() {
     }
 }
 
+// End the overall element CURRENT
 bool wx_handler::end_current() {
     // printf("Location #%d, %s (%f, %f)\n", report_.city_id, report_.city_name.c_str(), report_.city_location.longitude, report_.city_location.latitude);
     // printf("%s %d\n", report_.iso_country.c_str(), report_.timezone_hr);
@@ -293,7 +297,7 @@ bool wx_handler::end_current() {
     return true;
 }
 
-// City data
+// Start CITY element
 bool wx_handler::start_city(map<string, string>* attributes) {
     elements_.push_back(WXE_CITY);
     for (auto it = attributes->begin(); it != attributes->end(); it++) {
@@ -308,11 +312,12 @@ bool wx_handler::start_city(map<string, string>* attributes) {
     return true;
 }
 
+// End CITY element
 bool wx_handler::end_city() {
     return true;
 }
 
-// City coordinates
+// City coordinates - start COORD element
 bool wx_handler::start_coord(map<string, string>* attributes) {
     elements_.push_back(WXE_COORD);
     for (auto it = attributes->begin(); it != attributes->end(); it++) {
@@ -329,34 +334,37 @@ bool wx_handler::start_coord(map<string, string>* attributes) {
   
 }
 
+// End COORD element
 bool wx_handler::end_coord() {
     return true;
 }
 
-// Country
+// Country - start COUNTRY element (this won't be DXCC country)
 bool wx_handler::start_country() {
     elements_.push_back(WXE_COUNTRY);
     return true;
 }
 
+// End COUNTRY element
 bool wx_handler::end_country() {
     report_.iso_country = element_data_;
     return true;
 }
 
-// Timezone
+// Start TIMEZONE element
 bool wx_handler::start_timezone() {
     elements_.push_back(WXE_TIMEZONE);
     return true;
 }
 
+// End TIMEZONE element
 bool wx_handler::end_timezone() {
     float tz = stof(element_data_) / 3600.0;
     report_.timezone_hr = tz;
     return true;
 }
 
-// Sunrise/set
+// Start SUN element - sunrise and sunset times
 bool wx_handler::start_sun(map<string, string>* attributes) {
     elements_.push_back(WXE_SUN);
     for (auto it = attributes->begin(); it != attributes->end(); it++) {
@@ -372,11 +380,12 @@ bool wx_handler::start_sun(map<string, string>* attributes) {
     return true;
 }
 
+// End SUN element
 bool wx_handler::end_sun() {
     return true;
 }
 
-// Gemperature
+// Start TEMPERATURE element
 bool wx_handler::start_temperature(map<string, string>* attributes) {
     elements_.push_back(WXE_TEMPERATURE);
     for (auto it = attributes->begin(); it != attributes->end(); it++) {
@@ -405,7 +414,7 @@ bool wx_handler::end_temperature() {
     return true;
 }
 
-// Feelslike
+// Start SUBJECTIVE element - 
 bool wx_handler::start_subjective(map<string, string>* attributes) {
     elements_.push_back(WXE_FEELS_LIKE);
     for (auto it = attributes->begin(); it != attributes->end(); it++) {
@@ -420,6 +429,7 @@ bool wx_handler::start_subjective(map<string, string>* attributes) {
     return true;
 }
 
+// End SUBJECTIVE element
 bool wx_handler::end_subjective() {
     if (unit_ == "celsius") {
         report_.subjective_K += 273.15;
@@ -433,7 +443,7 @@ bool wx_handler::end_subjective() {
     return true;
 }
 
-// Humidity
+// Start HUMIDITY element
 bool wx_handler::start_humidity(map<string, string>* attributes) {
     elements_.push_back(WXE_HUMIDITY);
     for (auto it = attributes->begin(); it != attributes->end(); it++) {
@@ -448,12 +458,13 @@ bool wx_handler::start_humidity(map<string, string>* attributes) {
     return true;
 }
 
+// End humidity element
 bool wx_handler::end_humidity() {
     // TODO are any other units other than % expected?
     return true;
 }
 
-// Pressure
+// Start PRESSURE element
 bool wx_handler::start_pressure(map<string, string>* attributes) {
     elements_.push_back(WXE_PRESSURE);
     for (auto it = attributes->begin(); it != attributes->end(); it++) {
@@ -468,22 +479,25 @@ bool wx_handler::start_pressure(map<string, string>* attributes) {
     return true;
  
 }
+
+// End PRESSURE element
 bool wx_handler::end_pressure() {
     // TDOD Are any other units that hectopascal expected
     return true;
 }
 
-//Wind
+// Start WIND element
 bool wx_handler::start_wind() {
     elements_.push_back(WXE_WIND);
     return true;
 }
 
+// End WIND element
 bool wx_handler::end_wind() {
     return true;
 }
 
-// Wind speed
+// Start SPEED elements - for wind speed
 bool wx_handler::start_wind_speed(map<string, string>* attributes) {
     elements_.push_back(WXE_SPEED);
     float value;
@@ -504,11 +518,12 @@ bool wx_handler::start_wind_speed(map<string, string>* attributes) {
     return true;
 }
 
+// End SPEED element
 bool wx_handler::end_wind_speed() {
     return true;
 }
 
-// Wind direction
+// Start DIRECTION element - for wind direction
 bool wx_handler::start_wind_dirn(map<string, string>* attributes) {
        elements_.push_back(WXE_DIRECTION);
     for (auto it = attributes->begin(); it != attributes->end(); it++) {
@@ -518,17 +533,17 @@ bool wx_handler::start_wind_dirn(map<string, string>* attributes) {
             report_.wind_dirn = value;
         } else if (att_name == "CODE") {
             report_.wind_cardinal = it->second;
-        // } else if (att_name == "NAME") {
-        //     report_.wind_name = it->second;
         }
     }
     return true;
 }
 
+// End DIRECTION element
 bool wx_handler::end_wind_dirn() {
     return true;
 }
-// Win d gusts
+
+// Start GUSTS element - with gusts up to...
 bool wx_handler::start_gusts(map<string, string>* attributes) {
       elements_.push_back(WXE_GUSTS);
     for (auto it = attributes->begin(); it != attributes->end(); it++) {
@@ -543,6 +558,8 @@ bool wx_handler::start_gusts(map<string, string>* attributes) {
     return true;
   
 }
+
+// End GUSTS element
 bool wx_handler::end_gusts() {
       float f = report_.gusting_ms;
     if (unit_ == "mph") {
@@ -552,7 +569,7 @@ bool wx_handler::end_gusts() {
     return true;
 }
 
-// Cloud cover
+// Start CLOUDS element - for cloud cover
 bool wx_handler::start_clouds(map<string, string>* attributes) {
     elements_.push_back(WXE_CLOUDS);
     for (auto it = attributes->begin(); it != attributes->end(); it++) {
@@ -567,11 +584,12 @@ bool wx_handler::start_clouds(map<string, string>* attributes) {
     return true;
 }
 
+// End CLOUDS element
 bool wx_handler::end_clouds() {
     return true;
 }
 
-// Visibility
+// Start VISIBILITY eleemnt
 bool wx_handler::start_visibility(map<string, string>* attributes) {
     elements_.push_back(WXE_VISIBILITY);
     for (auto it = attributes->begin(); it != attributes->end(); it++) {
@@ -584,11 +602,12 @@ bool wx_handler::start_visibility(map<string, string>* attributes) {
     return true;
 }
 
+// End VISIBILITY element
 bool wx_handler::end_visibility() {
     return true;
 }
 
-// Precipitation
+// Start PRECIPITATION element
 bool wx_handler::start_precipitation(map<string, string>* attributes) {
     elements_.push_back(WXE_PRECIPITATION);
     for (auto it = attributes->begin(); it != attributes->end(); it++) {
@@ -605,12 +624,13 @@ bool wx_handler::start_precipitation(map<string, string>* attributes) {
     return true;
 }
 
+// End PRECIPITATION element
 bool wx_handler::end_precipitation() {
     // TODO any unit other than 1h (last hour's rain)
     return true;
 }
 
-// Overall weathre
+// Start WEATHER element - overall description and icon reference
 bool wx_handler::start_weather(map<string, string>* attributes) {
     elements_.push_back(WXE_WEATHER);
     for (auto it = attributes->begin(); it != attributes->end(); it++) {
@@ -624,11 +644,12 @@ bool wx_handler::start_weather(map<string, string>* attributes) {
     return true;
 }
 
+// End WEATHER element
 bool wx_handler::end_weather() {
     return true;
 }
 
-// Last updat
+// Start LASTUPDATE element
 bool wx_handler::start_updated(map<string, string>* attributes) {
     elements_.push_back(WXE_LASTUPDATE);
     for (auto it = attributes->begin(); it != attributes->end(); it++) {
@@ -641,16 +662,18 @@ bool wx_handler::start_updated(map<string, string>* attributes) {
     return true;
 }
 
+// End LASTUPDATE elememnt
 bool wx_handler::end_update() {
     return true;
 }
 
-// Error elements
+// Start CLIENTERROR element
 bool wx_handler::start_clienterror() {
     elements_.push_back(WXE_CLIENTERROR);
     return true;
 }
 
+// End CLIENTERROR element
 bool wx_handler::end_clienterror() {
     char msg[128];
     snprintf(msg, sizeof(msg), "WX_HANDLER: Rejected: %d (%s)", error_code_, error_message_.c_str());
@@ -658,21 +681,25 @@ bool wx_handler::end_clienterror() {
     return true;
 }
 
+// Start COD (error code) element
 bool wx_handler::start_cod() {
     elements_.push_back(WXE_COD);
     return true;
 }
 
+// End COD element
 bool wx_handler::end_cod() {
     error_code_ = stoi(element_data_);
     return true;
 }
 
+// Start MESSAGE (Error message) eleemnt
 bool wx_handler::start_message() {
     elements_.push_back(WXE_MESSAGE);
     return true;
 }
 
+// End MESSAGE element
 bool wx_handler::end_message() {
     error_message_ = element_data_;
     return true;

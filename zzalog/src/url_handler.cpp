@@ -6,6 +6,7 @@
 extern bool DEBUG_CURL;
 extern status* status_;
 
+// Make sure only one HTML transfer happens at once
 mutex url_handler::lock_;
 
 // Constructor

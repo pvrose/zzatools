@@ -403,7 +403,6 @@ void wsjtx_handler::run_server() {
 		wsjtx_settings.get("Address", temp, "127.0.0.1");
 		status_->misc_status(ST_NOTE, "WSJT-X: Creating new socket");
 		server_ = new socket_server(socket_server::UDP, string(temp), udp_port);
-//		server_ = new socket_server(socket_server::UDP, "0.0.0.0", udp_port);
 		server_->callback(rcv_request);
 		free(temp);
 	}
@@ -510,7 +509,6 @@ wsjtx_handler::decoded_msg wsjtx_handler::decode_message(string message) {
 	}
 	return decode;
 }
-
 
 // Update QSO - returns true if updated and let qso_manager know
 record* wsjtx_handler::update_qso(bool tx, string time, double audio_freq, string message, record* match, double dial, string mode) {
@@ -703,6 +701,7 @@ record* wsjtx_handler::update_qso(bool tx, string time, double audio_freq, strin
 	}
 }
 
+// Create a new record to hold data received from WSJT-X
 record* wsjtx_handler::new_qso(string call) {
 	qsos_[call] = nullptr;
 	record * qso = qso_manager_->start_modem_qso(call, qso_data::QSO_COPY_WSJTX);
@@ -752,6 +751,7 @@ record* wsjtx_handler::qso_call(string call, bool create) {
 	return qso;
 }
 
+// Parse a record in the "ALL.TXT" file
 bool wsjtx_handler::parse_all_txt(record* qso, string line) {
 	bool tx_record;
 	double dial_frequency = 0.0;
@@ -810,6 +810,7 @@ bool wsjtx_handler::parse_all_txt(record* qso, string line) {
 	}
 }
 
+// Look for details of the supplied QSO in the "ALL.TXT" file
 bool wsjtx_handler::match_all_txt(record* qso, bool update_qso) {
 	Fl_Preferences datapath_settings(settings_, "Datapath");
 	char* temp;

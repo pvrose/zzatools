@@ -109,7 +109,7 @@ void status::progress(int max_value, object_t object, const char* description, c
 	}
 }
 
-// Update the progress bar for the specified object
+// Update the progress for the specified object
 void status::update_progress(object_t object) {
 	if (progress_stack_.size() && progress_stack_.back() == object) {
 		// The progress bar is top of the stack - don't update the bar if it isn't
@@ -130,7 +130,7 @@ void status::update_progress(object_t object) {
 	}
 }
 
-// Update progress bar to the new specified value
+// Update progress to the new specified value
 void status::progress(int value, object_t object) {
 	if (progress_stack_.size()) {
 		if (progress_items_.find(object) == progress_items_.end()) {
@@ -164,7 +164,7 @@ void status::progress(int value, object_t object) {
 	}
 }
 
-// Update progress bar with a message - e.g. cancel it and display why cancelled
+// Update progress with a message - e.g. cancel it and display why cancelled
 void status::progress(const char* message, object_t object) {
 	if (progress_stack_.size()) {
 		if (progress_items_.find(object) == progress_items_.end()) {
@@ -189,12 +189,12 @@ void status::progress(const char* message, object_t object) {
 	}
 }
 
-// 200 millisecond ticker - redraw progress bar
+// 200 millisecond ticker - display latest progress
 void status::ticker() {
 	// Redraw all status 
-	if (progress_stack_.size()) {
+	for (auto it = progress_stack_.begin(); it != progress_stack_.end(); it++) {
 		// Display progress item at top of stack
-		update_progress(progress_stack_.back());
+		update_progress(*it);
 	}
 }
 
@@ -291,6 +291,7 @@ void status::misc_status(status_t status, const char* label) {
 	}
 }
 
+// Return the terminal escape code for the particular colour
 string status::colour_code(status_t status, bool fg) {
 	char result[25];
 	unsigned char r, g, b;

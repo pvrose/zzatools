@@ -125,7 +125,7 @@ using namespace std;
 		Fl_Group* table_group_;
 		Fl_Group* app_group_;
 
-		const string APP_NAMES[FO_LAST] = { "Log", "Extract", "DX Atlas", "Record", "Import", "TSV", "Choice" };
+		const string APP_NAMES[FO_LAST] = { "Log", "Extract", "Record", "Import", "TSV", "Choice" };
 
 	};
 #endif

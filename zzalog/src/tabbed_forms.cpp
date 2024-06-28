@@ -35,12 +35,6 @@ tabbed_forms::tabbed_forms(int X, int Y, int W, int H, const char* label) :
 	add_view<log_table>("Records for import", FO_IMPORTLOG, OT_IMPORT, "Displays all the records currently being imported");
 	// Extracted data - subset of records for search or exporting
 	add_view<log_table>("Extracted records", FO_EXTRACTLOG, OT_EXTRACT, "Displays the records extracted according to the current criteria");
-#ifdef _WIN32
-	// Records displayed in DxAtlas
-	add_view<log_table>("Records in DxAtlas", FO_DXATLAS, OT_DXATLAS, "Displays the records being displayed in DxAtlas");
-#endif
-	//// Prefix reference data
-	//add_view<pfx_tree>("Prefix Reference", FO_LAST, OT_PREFIX, "Displays the prefix reference data in tree format");
 	// ADIF reference data
 	add_view<spec_tree>("Specifications", FO_LAST, OT_ADIF, "Displays the ADIF specification data in tree format");
 	// Report view
@@ -72,15 +66,9 @@ void tabbed_forms::add_view(const char* label, field_ordering_t column_data, obj
 	container->labelsize(FL_NORMAL_SIZE + 2);
 	// Create the view
 	VIEW* view = new VIEW(rx, ry, rw, rh, label, column_data);
-	// label - a bit bigger than text font size
-	// view->labelsize(FL_NORMAL_SIZE + 1);
 	// standard colour used to represent this view - its tab, selected record/item and progress bar
 	Fl_Color bg_colour = OBJECT_COLOURS.at(object);
 	view->selection_color(bg_colour);
-	// // The colour for undrawn parts of the view - 25% colour, 75% white
-	// view->color(fl_color_average(bg_colour, FL_WHITE, 0.25));
-	// // Draw the label text in a contrasting colour
-	// view->labelcolor(fl_contrast(FL_FOREGROUND_COLOR, bg_colour));
 	// Add the tooltip
 	view->tooltip(tooltip);
 	// Add the view to the Fl_Tabs widget
@@ -169,7 +157,6 @@ void tabbed_forms::activate_pane(object_t pane, bool active) {
 			// selection_color(value()->color());
 			navigation_book_ = book_;
 		}
-		// w->labelcolor(fl_contrast(FL_FOREGROUND_COLOR, w->color()));
 		g->deactivate();
 	}
 	enable_widgets();
@@ -191,8 +178,6 @@ void tabbed_forms::books() {
 		case OT_IMPORT:
 			v->set_book(import_data_);
 			break;
-		case OT_DXATLAS:
-			v->set_book(dxatlas_records_);
 		}
 	}
 }
@@ -206,9 +191,6 @@ view* tabbed_forms::get_view(object_t view_name) {
 // v is unused
 void tabbed_forms::cb_tab_change(Fl_Widget* w, void* v) {
 	tabbed_forms* that = (tabbed_forms*)w;
-	// Set the colour to that of the pane
-	// that->selection_color(that->value()->color());
-	// that->value()->labelcolor(fl_contrast(FL_FOREGROUND_COLOR, that->value()->color()));
 	that->enable_widgets();
 
 	log_table* table = dynamic_cast<log_table*>(that->value());
@@ -254,6 +236,7 @@ int tabbed_forms::min_h() {
 void tabbed_forms::enable_widgets() {
 	// value() returns the selected widget. We need to test which widget it is.
 	Fl_Widget* tab = value();
+	// Set the application standard format for labels in tabbed items
 	for (int ix = 0; ix < children(); ix++) {
 		Fl_Widget* wx = child(ix);
 		if (wx == tab) {

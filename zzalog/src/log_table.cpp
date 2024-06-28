@@ -866,7 +866,7 @@ void log_table::dbl_click_column(int col) {
 		// Redraw the window
 		redraw();
 	}
-	else if (my_book_->book_type() == OT_EXTRACT || my_book_->book_type() == OT_DXATLAS) {
+	else if (my_book_->book_type() == OT_EXTRACT) {
 		// Sorting on any other column is only available in extracted records
 		// Remember the record number
 		qso_num_t selected_record = my_book_->record_number(my_book_->selection());

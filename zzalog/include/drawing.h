@@ -54,7 +54,6 @@ const int ROW_HEIGHT = DEFAULT_SIZE + 4;
 		OT_REPORT,           // Report view (view)
 		OT_BAND,             // Band-plan data
 		OT_SCRATCH,          // Scratchpad 
-		OT_DXATLAS,          // DxAtlas control view
 		OT_CARD,             // Used for printing QSL card labels
 		OT_MEMORY,           // Memory table (view)
 	};
@@ -70,7 +69,6 @@ const int ROW_HEIGHT = DEFAULT_SIZE + 4;
 		{ OT_ADIF, fl_color_average(FL_RED, FL_YELLOW, (float)(1.0 / 3.0)) },
 		{ OT_REPORT, fl_color_average(FL_RED, FL_WHITE, 0.25) },
 		{ OT_BAND, FL_GRAY },
-		{ OT_DXATLAS, fl_color_average(FL_BLUE, FL_MAGENTA, (float)(1.0 / 3.0)) },
 		{ OT_CARD, fl_color_average(FL_BLUE, FL_WHITE, 0.25) },
 		{ OT_MEMORY, fl_color_average(FL_GREEN, FL_WHITE, 0.25) }
 	};
@@ -86,7 +84,6 @@ const int ROW_HEIGHT = DEFAULT_SIZE + 4;
 		{ OT_ADIF, "OT_ADIF" },
 		{ OT_REPORT, "OT_REPORT" },
 		{ OT_BAND, "OT_BAND" },
-		{ OT_DXATLAS, "OT_DXATLAS" },
 		{ OT_CARD, "OT_CARD" },
 		{ OT_MEMORY, "OT_MEMORY" }
 	};
