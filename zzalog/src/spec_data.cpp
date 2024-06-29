@@ -9,6 +9,7 @@
 #include "corr_dialog.h"
 #include "callback.h"
 #include "adi_writer.h"
+#include "band.h"
 
 #include <fstream>
 #include <ostream>
@@ -48,6 +49,7 @@ spec_data::spec_data()
 	, saved_record_(nullptr)
 	, inhibit_error_report_(false)
 	, loaded_filename_("")
+	, bands_(nullptr)
 {
 	// get data and load it
 	load_data(false);
@@ -2457,6 +2459,21 @@ void spec_data::process_modes() {
 		}
 	}
 	(*this)["Combined"] = combined;
+}
+
+// Copy the bands into an set ordered by frequency
+void spec_data::process_bands() {
+	if (bands_) delete bands_;
+	bands_ = new band_set;
+	spec_dataset* bands = dataset("Band");
+	for (auto it = bands->data.begin(); it != bands->data.end(); it++) {
+		bands_->insert(it->first);
+	}
+}
+
+// Return bands
+band_set* spec_data::bands() {
+	return bands_;
 }
 
 // Return a string that describes the enumeration and the meaning of the given value

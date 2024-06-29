@@ -7,7 +7,6 @@
 #include "utils.h"
 #include "spec_data.h"
 #include "band.h"
-#include "book.h"
 
 #include <set>
 #include <string>
@@ -25,7 +24,6 @@ using namespace std;
 extern Fl_Preferences* settings_;
 extern spec_data* spec_data_;
 extern cty_data* cty_data_;
-extern book* book_;
 
 // Constructor
 search_dialog::search_dialog() :
@@ -249,7 +247,7 @@ search_dialog::search_dialog() :
 	Fl_Choice* ch26 = new Fl_Choice(C221, R22, W221, HTEXT, "Band");
 	ch26->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
 	// Get the list of bands from ADIF specification
-	band_set* bands = book_->used_bands();
+	band_set* bands = spec_data_->bands();
 	// Start with "Any"
 	ch26->add("Any");
 	if (criteria_->band == "Any") {
@@ -270,7 +268,7 @@ search_dialog::search_dialog() :
 	Fl_Choice* ch27 = new Fl_Choice(C222, R22, W222, HTEXT, "Mode");
 	ch27->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
 	// Get the list of modes from the ADIF specification
-	set<string>* modes = book_->used_submodes();
+	spec_dataset* modes = spec_data_->dataset("Mode");
 	// Start with "Any"
 	ch27->add("Any");
 	if (criteria_->mode == "Any") {
@@ -278,9 +276,9 @@ search_dialog::search_dialog() :
 	}
 	ix = 1;
 	// Append all the modes in the data set
-	for (auto it = modes->begin(); it != modes->end(); it++, ix++) {
-		ch27->add((*it).c_str());
-		if (*it == criteria_->mode) {
+	for (auto it = modes->data.begin(); it != modes->data.end(); it++, ix++) {
+		ch27->add(it->first.c_str());
+		if (it->first == criteria_->mode) {
 			ch27->value(ix);
 		}
 	}

@@ -1,5 +1,4 @@
-#ifndef __ADIF_DATA__
-#define __ADIF_DATA__
+#pragma once
 
 #include "record.h"
 
@@ -14,6 +13,8 @@
 #include <FL/Fl_Choice.H>
 
 using namespace std;
+
+class band_set;
 
 
 
@@ -137,6 +138,11 @@ using namespace std;
 		record* expand_macro(string field, string value);
 		// Remove user enums and macros - and restore originals
 		void delete_user_data();
+		// REturn list of bands in frequency order
+		band_set* bands();
+		// Create a list of bands in frequency order
+		void process_bands();
+
 
 	// protected methods
 	protected:
@@ -218,6 +224,7 @@ using namespace std;
 		string loaded_filename_;
 		// Abandon validate 
 		bool abandon_validation_;
+		// List of bands in frrequency order
+		band_set* bands_;
 
 	};
-#endif

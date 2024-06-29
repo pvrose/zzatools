@@ -638,6 +638,8 @@ void add_data() {
 	if (!closing_) {
 		// add ADIF specification data.
 		spec_data_ = new spec_data;
+		// This can only be done once it has been fully created
+		spec_data_->process_bands();
 		// Draw the specification view
 		((spec_tree*)tabbed_forms_->get_view(OT_ADIF))->populate_tree(false);
 	}
