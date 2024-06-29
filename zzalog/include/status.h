@@ -75,6 +75,8 @@ using namespace std;
 		void misc_status(status_t status, const char* label);
 		// 200 ms ticker
 		void ticker();
+		// Static version
+		static void cb_ticker(void* v);
 
 	protected:
 		// Re-initialise progress bar

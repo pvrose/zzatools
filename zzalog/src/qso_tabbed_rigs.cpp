@@ -152,15 +152,6 @@ void qso_tabbed_rigs::cb_tabs(Fl_Widget* w, void* v) {
 	mgr->update_rig();
 }
 
-// 1s clock interface
-void qso_tabbed_rigs::ticker() {
-	if (!closing_) {
-		// Only send ticker to active rig
-		Fl_Widget* w = value();
-		if (w) ((qso_rig*)w)->ticker();
-	}
-}
-
 // Get the rig
 rig_if* qso_tabbed_rigs::rig() {
 	// No child tabs so return no rig

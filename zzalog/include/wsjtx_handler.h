@@ -37,6 +37,8 @@ using namespace std;
 
 		// 15s ticker
 		void ticker();
+		// Static version
+		static void cb_ticker(void* v);
 		// Remove QSO from cache
 		void delete_qso(string call);
 

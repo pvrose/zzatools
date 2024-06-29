@@ -16,9 +16,6 @@ public:
 
     void enable_widgets();
 
-    // Update the clock value (to be called every second)
-    void ticker();
- 
 protected:
     // Callback when the tab is changed
     static void cb_tabs(Fl_Widget* w, void* v);

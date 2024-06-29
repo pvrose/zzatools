@@ -74,11 +74,6 @@ import_data::~import_data()
 	delete[] update_files_;
 }
 
-// Timer callback - Called every second between auto-updates so that a countdown can be displayed
-void import_data::ticker() {
-
-}
-
 // Delete the mismatch record in the update - delete it and erase 
 void import_data::discard_update(bool notify /*= true*/) {
 	// Delete the record and remove from this book

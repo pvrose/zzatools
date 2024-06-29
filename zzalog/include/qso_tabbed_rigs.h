@@ -29,8 +29,6 @@ public:
 	void save_values();
 	// Switch the rig on or off
 	void switch_rig();
-	// 1s clock interface
-	void ticker();
 	// Get the rig
 	rig_if* rig();
 

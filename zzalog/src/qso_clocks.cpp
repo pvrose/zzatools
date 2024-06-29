@@ -69,11 +69,6 @@ void qso_clocks::enable_widgets() {
 	local_clock_->enable_widgets();	
 }
 
-// 1 Hz ticker - enables both clocks
-void qso_clocks::ticker() {
-	enable_widgets();
-}
-
 // Selecting either tab - redraws with the new tab selected
 void qso_clocks::cb_tabs(Fl_Widget* w, void* v) {
 	qso_clocks* that = ancestor_view<qso_clocks>(w);

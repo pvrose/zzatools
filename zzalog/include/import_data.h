@@ -61,8 +61,6 @@ using namespace std;
 		void load_stream(stringstream& adif, update_mode_t mode);
 		// Load record
 		void load_record(record* qso, update_mode_t mode = SINGLE_ADIF);
-		// 1 second ticker
-		void ticker();
 
 	protected:
 		// Finish the update process

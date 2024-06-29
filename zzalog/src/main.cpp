@@ -39,6 +39,7 @@ main.cpp - application entry point
 #include "qso_manager.h"
 #include "logo.h"
 #include "wx_handler.h"
+#include "ticker.h"
 
 // C/C++ header files
 #include <ctime>
@@ -126,6 +127,7 @@ wsjtx_handler* wsjtx_handler_ = nullptr;
 fllog_emul* fllog_emul_ = nullptr;
 qso_manager* qso_manager_ = nullptr;
 wx_handler* wx_handler_ = nullptr;
+ticker* ticker_ = nullptr;
 
 // Recent files opened
 list<string> recent_files_;
@@ -159,29 +161,6 @@ Fl_PNG_Image main_icon_("ZZALOG_ICON", ___rose_png, ___rose_png_len);
 bool using_backup_ = false;
 // Sticky switches mesasge
 string sticky_message_ = "";
-
-// Basic 10 Hz clock to control timer related object updates
-static void cb_ticker(void* v) {
-	// Units that require 1s tick
-	if (ticks_ % TICK_SECOND == 0) {
-		if (qso_manager_) qso_manager_->ticker();
-		if (import_data_) import_data_->ticker();
-	}
-	// Units that require a 200ms tick
-	if (ticks_ % (TICK_SECOND * 2 / 10) == 0) {
-		if (status_) status_->ticker();
-	}
-	// Units that require 15s tick
-	if (ticks_ % (TICK_SECOND * 15) == 0) {
-		if (wsjtx_handler_) wsjtx_handler_->ticker();
-	}
-	// Units that require 30 minute tick (5 minutes in debug mode)
-	if (ticks_ % (TICK_SECOND * 60 * (DEBUG_QUICK ? 5 : 30)) == 0) {
-		if (wx_handler_) wx_handler_->ticker();
-	}
-	ticks_++;
-	Fl::repeat_timeout(TICK, cb_ticker);
-}
 
 // Get the backup filename
 string backup_filename(string source) {
@@ -240,7 +219,6 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 	else {
 		closing_ = true;
 		// Stop the ticker
-		Fl::remove_timeout(cb_ticker);
 		status_->misc_status(ST_NOTE, "ZZALOG: Closing...");
 		// Delete band view
 		// Currently modifying a (potentially new) record
@@ -1082,6 +1060,9 @@ int main(int argc, char** argv)
 		return 255;
 	}
 
+	// Create the ticker first of all
+	ticker_ = new ticker();
+
 	// Ctreate status to handle status messages
 	status_ = new status();
 
@@ -1116,8 +1097,6 @@ int main(int argc, char** argv)
 
 	// now show the window
 	main_window_->show(argc, argv);
-	// Start the ticker
-	Fl::add_timeout(TICK, cb_ticker);
 	// add the various drawn items
 	int curr_y = 0;
 	add_widgets(curr_y);

@@ -48,8 +48,6 @@ public:
 	void select_qso(qso_num_t qso_number);
 	// Append the created QSO to the book
 	void append_qso();
-	// Ticker
-	void ticker();
 	// SElected entry
 	qso_entry* entry();
 	// Most recent entry

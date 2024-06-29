@@ -30,7 +30,7 @@ public:
 	// Save changes
 	void save_values();
 
-	void ticker();
+	static void cb_ticker(void* v);
 
 	// Call back for enable check box
 	static void cb_bn_enable(Fl_Widget* w, void* v);

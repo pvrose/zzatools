@@ -6,12 +6,14 @@
 #include "spec_data.h"
 #include "tabbed_forms.h"
 #include "book.h"
+#include "ticker.h"
 
 extern status* status_;
 extern spec_data* spec_data_;
 extern tabbed_forms* tabbed_forms_;
 extern book* book_;
 extern bool DARK;
+extern ticker* ticker_;
 
 extern double prev_freq_;
 
@@ -42,11 +44,15 @@ qso_entry::qso_entry(int X, int Y, int W, int H, const char* L) :
 	load_values();
 	create_form(X, Y);
 	enable_widgets();
+
+	// Add 1s ticker
+	ticker_->add_ticker(this, cb_ticker, 10);
 }
 
 // Destructor
 qso_entry::~qso_entry() {
 	save_values();
+	ticker_->remove_ticker(this);
 }
 
 // When shown set the focus to the most likely input widgets
@@ -929,5 +935,18 @@ void qso_entry::check_qth_changed() {
 			previous_locator_ = qso_->item("MY_GRIDSQUARE", true);
 			previous_qth_ = qso_->item("APP_ZZA_QTH");
 		}
+	}
+}
+
+// 1 second clock
+void qso_entry::cb_ticker(void* v) {
+	qso_entry* that = (qso_entry*)v;
+	that->copy_clock_to_qso();
+	switch(that->qso_data_->logging_state()) {
+		case qso_data::QSO_PENDING:
+		case qso_data::QSO_STARTED:
+		case qso_data::NET_STARTED:
+			that->copy_cat_to_qso();
+			break;
 	}
 }

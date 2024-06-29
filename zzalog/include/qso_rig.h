@@ -45,6 +45,8 @@ public:
 	void switch_rig();
 	// 1s clock interface
 	void ticker();
+	// Static version
+	static void cb_ticker(void* v);
 	// New rig
 	void new_rig();
 	// Get the rig

@@ -90,6 +90,8 @@ public:
 
 	// Handle override
 	int handle(int event);
+	// Clock ticker
+	static void cb_ticker(void* v);
 
 	// Set/get records
 	record* qso();

@@ -6,6 +6,7 @@
 #include "intl_widgets.h"
 #include "main_window.h"
 #include "qso_manager.h"
+#include "ticker.h"
 
 #include <iostream>
 
@@ -26,6 +27,7 @@ extern bool close_by_error_;
 extern string PROGRAM_ID;
 extern string PROGRAM_VERSION;
 extern bool DEBUG_STATUS;
+extern ticker* ticker_;
 
 // Constructor
 status::status() :
@@ -57,11 +59,15 @@ status::status() :
 		delete chooser;
 	}
 
+	// Set 200 ms ticker
+	ticker_->add_ticker(this, cb_ticker, 2);
+
 }
 
 // Destructor
 status::~status()
 {
+	ticker_->remove_ticker(this);
 	// if (!close_by_error_) delete status_file_viewer_;
 	if (report_file_) report_file_->close();
 	for (auto it = progress_items_.begin(); it != progress_items_.end(); it++) {
@@ -196,6 +202,11 @@ void status::ticker() {
 		// Display progress item at top of stack
 		update_progress(*it);
 	}
+}
+
+// Static version
+void status::cb_ticker(void* v) {
+	((status*)v)->ticker();
 }
 
 // Update miscellaneous status - set text and colour, log the status

@@ -1542,19 +1542,6 @@ qso_num_t qso_data::current_number() {
 	}
 }
 
-// Update time and rig infoF
-void qso_data::ticker() {
-	g_entry_->copy_clock_to_qso();
-	g_net_entry_->ticker();
-	switch(logging_state_) {
-		case QSO_PENDING:
-		case QSO_STARTED:
-		case NET_STARTED:
-			g_entry_->copy_cat_to_qso();
-			break;
-	}
-}
-
 // Call in editor
 string qso_data::get_call() {
 	record* qso = current_qso();

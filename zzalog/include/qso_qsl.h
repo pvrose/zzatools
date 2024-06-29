@@ -40,6 +40,8 @@ public:
 
     // 1 second clock. Used to update eQSL throttle timer display
     void ticker();
+    // Static interface to above
+    static void cb_ticker(void* v);
 
 protected:
     // callbacks

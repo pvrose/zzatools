@@ -1,10 +1,13 @@
 #include "qso_clock.h"
 #include "qso_manager.h"
 #include "drawing.h"
+#include "ticker.h"
 
 #include<ctime>
 
 #include <FL/Fl_Image.H>
+
+extern ticker* ticker_;
 
 // Clock group - constructor
 qso_clock::qso_clock
@@ -17,6 +20,10 @@ qso_clock::qso_clock
 	box(FL_BORDER_BOX);
 	load_values();
 	create_form(X, Y);
+
+	// Add 1s clock
+	ticker_->add_ticker(this, cb_ticker, 10);
+
 }
 
 // Clock group destructor
@@ -104,5 +111,10 @@ void qso_clock::enable_widgets() {
 // save value
 void qso_clock::save_values() {
 	// No code
+}
+
+// Clock
+void qso_clock::cb_ticker(void* v) {
+	((qso_clock*)v)->enable_widgets();
 }
 

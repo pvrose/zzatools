@@ -94,12 +94,6 @@ void qso_log::save_values() {
 	// Null method
 }
 
-// 1s clock interface
-void qso_log::ticker() {
-	log_info_->ticker();
-	qsl_ctrl_->ticker();
-}
-
 // Callback on switching tab
 void qso_log::cb_tabs(Fl_Widget* w, void* v) {
 	qso_log* that = (qso_log*)w;

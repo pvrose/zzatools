@@ -7,6 +7,7 @@
 #include "printer.h"
 #include "status.h"
 #include "book.h"
+#include "ticker.h"
 
 #include <FL/Fl_Preferences.H>
 #include <FL/Fl_Box.H>
@@ -17,6 +18,7 @@ extern extract_data* extract_records_;
 extern tabbed_forms* tabbed_forms_;
 extern status* status_;
 extern book* book_;
+extern ticker* ticker_;
 
 // Constructor
 qso_qsl::qso_qsl(int X, int Y, int W, int H, const char* L) :
@@ -32,11 +34,14 @@ qso_qsl::qso_qsl(int X, int Y, int W, int H, const char* L) :
 	load_values();
 	create_form();
 	enable_widgets();
+
+	ticker_->add_ticker(this, cb_ticker, 10);
 }
 
 // Destructor
 qso_qsl::~qso_qsl() {
 	save_values();
+	ticker_->remove_ticker(this);
 }
 
 // Load settings data
@@ -443,4 +448,9 @@ void qso_qsl::ticker() {
 			enable_widgets();
 		}
 	}
+}
+
+// 1 s ticker
+void qso_qsl::cb_ticker(void* v) {
+	((qso_qsl*)v)->ticker();
 }

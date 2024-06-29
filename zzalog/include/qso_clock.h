@@ -20,6 +20,9 @@ public:
 	// save value
 	void save_values();
 
+	// Clock callback
+	static void cb_ticker(void* v);
+
 protected:
 
 	// Display local time rather than UTC

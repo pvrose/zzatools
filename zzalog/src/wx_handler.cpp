@@ -4,6 +4,7 @@
 #include "url_handler.h"
 #include "qso_manager.h"
 #include "record.h"
+#include "ticker.h"
 
 #include <sstream>
 
@@ -15,6 +16,7 @@ using namespace std;
 extern status* status_;
 extern url_handler* url_handler_;
 extern qso_manager* qso_manager_;
+extern ticker* ticker_;
 
 const double MPH2MPS = 1.0 / 3600.0 * (1760.0 * 36.0) * 25.4 / 1000.0;
 
@@ -25,11 +27,15 @@ wx_handler::wx_handler() :
     report_.icon = nullptr;
     elements_.clear();
     update();
+    // Start ticker - 30 minutes
+    ticker_->add_ticker(this, cb_ticker, 30 * 60 * 10);
 
 };
 
 // Destructor   
-wx_handler::~wx_handler() {};
+wx_handler::~wx_handler() {
+    ticker_->remove_ticker(this);
+};
 
 
 // XML reader overloads
@@ -191,6 +197,11 @@ void wx_handler::update() {
 void wx_handler::ticker() {
     update();
     qso_manager_->enable_widgets();
+}
+
+// Static
+void wx_handler::cb_ticker(void* v) {
+    ((wx_handler*)v)->ticker();
 }
 
 // Get the various weather items - 

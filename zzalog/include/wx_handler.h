@@ -97,6 +97,7 @@ public:
     void update();
     // Timer 
     void ticker();
+    static void cb_ticker(void* v);
     
     // Get the various weather items - 
     // summation icon

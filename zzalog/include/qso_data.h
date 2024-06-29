@@ -120,8 +120,6 @@ public:
 	void update_rig();
 	// Gt call
 	string get_call();
-	// Ticker clock
-	void ticker();
 	// The QSO is being edited
 	bool qso_editing(qso_num_t number);
 	// Not actively editing

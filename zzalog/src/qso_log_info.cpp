@@ -2,9 +2,11 @@
 #include "drawing.h"
 #include "book.h"
 #include "import_data.h"
+#include "ticker.h"
 
 extern book* book_;
 extern import_data* import_data_;
+extern ticker* ticker_;
 
 // Constructor
 qso_log_info::qso_log_info(int X, int Y, int W, int H, const char* l) :
@@ -18,11 +20,14 @@ qso_log_info::qso_log_info(int X, int Y, int W, int H, const char* l) :
 	load_values();
 	create_form(X, Y);
 	enable_widgets();
+
+	// Add 1s clock
+	ticker_->add_ticker(this, cb_ticker, 10);
 }
 
 // Destructor
 qso_log_info::~qso_log_info() {
-
+	ticker_->remove_ticker(this);
 }
 
 // get settings 
@@ -128,8 +133,8 @@ void qso_log_info::save_values() {
 }
 
 // On 1s ticker - reevaluate the widgets
-void qso_log_info::ticker() {
-	enable_widgets();
+void qso_log_info::cb_ticker(void* v) {
+	((qso_log_info*)v)->enable_widgets();
 }
 
 // Callback on Save Enable button

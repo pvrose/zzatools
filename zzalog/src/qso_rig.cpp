@@ -5,6 +5,7 @@
 #include "qso_manager.h"
 #include "band_data.h"
 #include "spec_data.h"
+#include "ticker.h"
 
 #include <set>
 #include <string>
@@ -18,6 +19,7 @@ extern status* status_;
 extern band_data* band_data_;
 extern spec_data* spec_data_;
 extern bool DARK;
+extern ticker* ticker_;
 
 
 // Constructor
@@ -43,6 +45,8 @@ qso_rig::qso_rig(int X, int Y, int W, int H, const char* L) :
 	rig_ = new rig_if(label(), &hamlib_data_);
 	create_form(X, Y);
 	enable_widgets();
+
+	ticker_->add_ticker(this, cb_ticker, 10);
 }
 
 // DEstructor
@@ -658,9 +662,9 @@ void qso_rig::enable_widgets() {
 			op_status_->textcolor(DARK ? FL_GREEN : fl_darker(FL_GREEN));
 		}
 		freq = rig_->get_dfrequency(true);
-		uint64_t freq_Hz = (uint64_t)(freq * 1000000) % 1000;
-		uint64_t freq_kHz = (uint64_t)(freq * 1000) % 1000;
-		uint64_t freq_MHz = (uint64_t)freq;
+		int freq_Hz = (int)(freq * 1000000) % 1000;
+		int freq_kHz = (int)(freq * 1000) % 1000;
+		int freq_MHz = (int)freq;
 		band_data::band_entry_t* entry = band_data_->get_entry(freq * 1000);
 		if (entry) {
 			char l[50];
@@ -682,12 +686,12 @@ void qso_rig::enable_widgets() {
 		} else {
 			op_freq_mode_->labelcolor(FL_YELLOW);
 		}
-		char msg[100];
+		char msg[200];
 		string rig_mode;
 		string submode;
 		rig_->get_string_mode(rig_mode, submode);
 		// Set Freq/Mode to Frequency (MHz with kHz seperator), mode, power (W)
-		snprintf(msg, sizeof(msg), "%I64d.%03I64d.%03I64d MHz\n%s %sW" , 
+		snprintf(msg, sizeof(msg), "%d.%03d.%03d MHz\n%s %sW" , 
 			freq_MHz, freq_kHz, freq_Hz,
 			submode.length() ? submode.c_str() : rig_mode.c_str(),
 			rig_->get_tx_power(true).c_str()
@@ -1134,6 +1138,14 @@ void qso_rig::ticker() {
 		// The rig may have disconnected - update connect/select buttons
 		enable_widgets();
 	}
+}
+
+// Static 1s ticker
+void qso_rig::cb_ticker(void* v) {
+	// temporarily remove onself from the ticker list as this may take for than 1 s
+	ticker_->remove_ticker(v);
+	((qso_rig*)v)->ticker();
+	ticker_->add_ticker(v, cb_ticker, 10);
 }
 
 // New rig 

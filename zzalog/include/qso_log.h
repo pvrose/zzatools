@@ -24,8 +24,6 @@ public:
 	void enable_widgets();
 	// Save changes
 	void save_values();
-	// 1s clock interface
-	void ticker();
 
 	// Return a refernece to the qso_qsl object
 	qso_qsl* qsl_control();

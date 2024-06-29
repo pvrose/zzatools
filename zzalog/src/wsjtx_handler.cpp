@@ -8,6 +8,7 @@
 #include "menu.h"
 #include "regices.h"
 #include "spec_data.h"
+#include "ticker.h"
 
 #include <stdio.h>
 #include <sstream>
@@ -36,6 +37,7 @@ extern qso_manager* qso_manager_;
 extern spec_data* spec_data_;
 extern string PROGRAM_ID;
 extern string PROGRAM_VERSION;
+extern ticker* ticker_;
 
 wsjtx_handler* wsjtx_handler::that_ = nullptr;
 
@@ -53,10 +55,12 @@ wsjtx_handler::wsjtx_handler()
 	my_call_ = qso_manager_->get_default(qso_manager::CALLSIGN);
 	my_bracketed_call_ = "<" + my_call_ + ">";
 	connected_ = false;
+	ticker_->add_ticker(this, cb_ticker, 150);
 }
 
 // Destructor
 wsjtx_handler::~wsjtx_handler() {
+	ticker_->remove_ticker(this);
 	close_server();
 };
 
@@ -933,6 +937,11 @@ void wsjtx_handler::ticker() {
 		}
 		received_beats_.clear();
 	}
+}
+
+// Sattic interface
+void wsjtx_handler::cb_ticker(void* v) {
+	((wsjtx_handler*)v)->ticker();
 }
 
 // Erase cache entry for callsign

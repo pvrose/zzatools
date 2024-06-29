@@ -206,15 +206,6 @@ void qso_net_entry::select_qso(qso_num_t qso_number) {
 	if (found) entries_->value(qe);
 }
 
-// Ticker - update all children
-void qso_net_entry::ticker() {
-	for (int cx = 0; cx < entries_->children(); cx++) {
-		qso_entry* qe = (qso_entry*)entries_->child(cx);
-		qe->copy_clock_to_qso();
-		qe->copy_cat_to_qso();
-	}
-}
-
 // Append the selected QSO to the book
 void qso_net_entry::append_qso() {
 	qso_entry* qe = (qso_entry*)entries_->value();
