@@ -716,6 +716,7 @@ void qsl_editor::redraw_display() {
 		display_->example_qso(nullptr);
 	}
 	display_->redraw();
+	display_->dirty();
 }
 
 // Update the size widget

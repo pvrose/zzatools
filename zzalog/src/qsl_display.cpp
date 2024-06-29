@@ -29,6 +29,7 @@ qsl_display::qsl_display(int X, int Y, int W, int H, const char* L) : Fl_Widget(
     num_records_ = 0;
 	callsign_ = "";
     editable_ = false;
+	dirty_data_ = false;
 }
 
 // Destructor - save the data
@@ -395,62 +396,65 @@ void qsl_display::save_data() {
 	call_settings.set("Time Format", (int)data_->f_time);
 	call_settings.set("Card Design", data_->filename.c_str());
 	// Writing the file with the drawing data
-   	char msg[100];
-	snprintf(msg, sizeof(msg), "QSL: Writing card image data to %s", data_->filename.c_str());
-	status_->misc_status(ST_LOG, msg);
-	ofstream op;
-	op.open(data_->filename.c_str(), fstream::out);
-	string line;
-	int pos = 0;
-	// For all drawing items...
-	for (int ix = 0; ix < data_->items.size() && op.good(); ix++) {
-		qsl_display::item_def* item = data_->items[ix];
-		// Ignore any item marked with type NONE
-		if (item->type != NONE) {
-			// Write type the a tab
-			op << (int)item->type << '\t';
-			switch (item->type) {
-			case FIELD: {
-				// Write field item data separated by tabs
-				op << item->field.field << '\t' << 
-					item->field.label << '\t' << 
-					(int)item->field.l_style.font << '\t' << 
-					(int)item->field.l_style.size << '\t' <<
-					(int)item->field.l_style.colour << '\t' <<
-					(int)item->field.t_style.font << '\t' << 
-					(int)item->field.t_style.size <<	'\t' << 
-					(int)item->field.t_style.colour << '\t' << 
-					item->field.dx << '\t' << 
-					item->field.dy << '\t' << 
-					(int)item->field.vertical << '\t' << 
-					(int)item->field.multi_qso << '\t' << 
-					(int)item->field.box << '\t' <<
-					(int)item->field.display_empty << endl;
-				break;
+ 	if (dirty_data_) {
+		char msg[100];
+		snprintf(msg, sizeof(msg), "QSL: Writing card image data to %s", data_->filename.c_str());
+		status_->misc_status(ST_LOG, msg);
+		ofstream op;
+		op.open(data_->filename.c_str(), fstream::out);
+		string line;
+		int pos = 0;
+		// For all drawing items...
+		for (int ix = 0; ix < data_->items.size() && op.good(); ix++) {
+			qsl_display::item_def* item = data_->items[ix];
+			// Ignore any item marked with type NONE
+			if (item->type != NONE) {
+				// Write type the a tab
+				op << (int)item->type << '\t';
+				switch (item->type) {
+				case FIELD: {
+					// Write field item data separated by tabs
+					op << item->field.field << '\t' << 
+						item->field.label << '\t' << 
+						(int)item->field.l_style.font << '\t' << 
+						(int)item->field.l_style.size << '\t' <<
+						(int)item->field.l_style.colour << '\t' <<
+						(int)item->field.t_style.font << '\t' << 
+						(int)item->field.t_style.size <<	'\t' << 
+						(int)item->field.t_style.colour << '\t' << 
+						item->field.dx << '\t' << 
+						item->field.dy << '\t' << 
+						(int)item->field.vertical << '\t' << 
+						(int)item->field.multi_qso << '\t' << 
+						(int)item->field.box << '\t' <<
+						(int)item->field.display_empty << endl;
+					break;
+				}
+				case TEXT: {
+					// Write text item data separated by tabs
+					op << item->text.text << '\t' <<
+						(int)item->text.t_style.font << '\t' <<
+						(int)item->text.t_style.size << '\t' <<
+						(int)item->text.t_style.colour << '\t' <<
+						item->text.dx << '\t' <<
+						item->text.dy << endl; 
+					break;
+				}
+				case IMAGE: {
+					// Write image item data separted by tabs
+					op << item->image.filename << '\t' <<
+						item->image.dx << '\t' <<
+						item->image.dy << endl;
+					break;
+				}
+				}			
 			}
-			case TEXT: {
-				// Write text item data separated by tabs
-				op << item->text.text << '\t' <<
-					(int)item->text.t_style.font << '\t' <<
-					(int)item->text.t_style.size << '\t' <<
-					(int)item->text.t_style.colour << '\t' <<
-					item->text.dx << '\t' <<
-					item->text.dy << endl; 
-				break;
-			}
-			case IMAGE: {
-				// Write image item data separted by tabs
-				op << item->image.filename << '\t' <<
-					item->image.dx << '\t' <<
-					item->image.dy << endl;
-				break;
-			}
-			}			
 		}
+		op.close();
+		snprintf(msg, sizeof(msg), "QSL: %zd items written to %s", data_->items.size(), data_->filename.c_str());
+		status_->misc_status(ST_OK, msg);
+		dirty_data_ = false;
 	}
-	op.close();
-	snprintf(msg, sizeof(msg), "QSL: %zd items written to %s", data_->items.size(), data_->filename.c_str());
-	status_->misc_status(ST_OK, msg);
 }
 
 // Get a pointer to the card drawing data for the specified callsign
@@ -566,4 +570,8 @@ string qsl_display::convert_time(string value) {
 				return "Invalid";
 		}
 	}
+}
+
+void qsl_display::dirty() {
+	dirty_data_ = true;
 }

@@ -147,6 +147,8 @@ class qsl_display : public Fl_Widget
     // Editable flag to allow widgets to be edited in situ
     void editable(bool enable); 
     bool editable();
+    // Set dirty flag
+    void dirty();
 
     // Pointer to the data for editor to use
     static card_data* data(string callsign);
@@ -167,6 +169,9 @@ class qsl_display : public Fl_Widget
     string convert_date(string text);
     // Convert the aDIF format yime to the required format
     string convert_time(string text);
+ 
+    // Convert to points
+    int to_points(float value);
 
     // Drawing data for all callsigns - needs to be static to access the 
     // label size data outwith a specific instance of the drawing 
@@ -184,8 +189,8 @@ class qsl_display : public Fl_Widget
     // Positions to use if dx or dy are -1
     int next_x_;
     int next_y_;
- 
-    // Convert to points
-    int to_points(float value);
+
+    // Card data has been modified
+    bool dirty_data_;
 
 };
