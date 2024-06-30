@@ -29,20 +29,6 @@ using namespace std;
 		}
 	};
 
-	// The status of the various messages
-	enum status_t {
-		ST_NONE,             // Uninitialised
-		ST_LOG,              // Only log the message, do not display it in status
-		ST_DEBUG,            // Debug message
-		ST_NOTE,             // An information message
-		ST_OK,               // Task successful
-		ST_WARNING,          // A warning message
-		ST_NOTIFY,           // A notification to the user
-		ST_ERROR,            // An error has been signaled
-		ST_SEVERE,           // A sever error that will result in reduced capability
-		ST_FATAL             // A fatal (non-recoverable) error has been signaled
-	};
-
 	// Tip display - 2 seconds
 	const double TIP_SHOW = 2.0;
 	// π to maximum precision in double - let the compiler take the strain
@@ -123,8 +109,6 @@ using namespace std;
 	string string_to_hex(string, bool escape = false);
 	// Convert string to hex
 	string hex_to_string(string);
-	// Default error message
-	void default_error_message(status_t level, const char* message);
 	// Calculate the great circle bearing and distance between two locations on the Earth's surface
 	void great_circle(lat_long_t source, lat_long_t destination, double& bearing, double& distance);
 	// Replace '/' with '_' throught

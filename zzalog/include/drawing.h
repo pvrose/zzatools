@@ -55,7 +55,6 @@ const int ROW_HEIGHT = DEFAULT_SIZE + 4;
 		OT_BAND,             // Band-plan data
 		OT_SCRATCH,          // Scratchpad 
 		OT_CARD,             // Used for printing QSL card labels
-		OT_MEMORY,           // Memory table (view)
 	};
 
 	// Default colours to use in tab view labels and/or progress bar
@@ -70,22 +69,20 @@ const int ROW_HEIGHT = DEFAULT_SIZE + 4;
 		{ OT_REPORT, fl_color_average(FL_RED, FL_WHITE, 0.25) },
 		{ OT_BAND, FL_GRAY },
 		{ OT_CARD, fl_color_average(FL_BLUE, FL_WHITE, 0.25) },
-		{ OT_MEMORY, fl_color_average(FL_GREEN, FL_WHITE, 0.25) }
 	};
 
 	// Names of the objects
 	const map<object_t, const char*> OBJECT_NAMES = {
-		{ OT_NONE, "OT_NONE" },
-		{ OT_MAIN, "OT_MAIN" },
-		{ OT_EXTRACT, "OT_EXTRACT" },
-		{ OT_IMPORT, "OT_IMPORT" },
-		{ OT_RECORD, "OT_RECORD" },
-		{ OT_PREFIX,"OT_PREFIX" },
-		{ OT_ADIF, "OT_ADIF" },
-		{ OT_REPORT, "OT_REPORT" },
-		{ OT_BAND, "OT_BAND" },
-		{ OT_CARD, "OT_CARD" },
-		{ OT_MEMORY, "OT_MEMORY" }
+		{ OT_NONE, "NOTHING" },
+		{ OT_MAIN, "LOG" },
+		{ OT_EXTRACT, "EXTRACT" },
+		{ OT_IMPORT, "IMPORT" },
+		{ OT_RECORD, "RECORD" },
+		{ OT_PREFIX,"PREFIX" },
+		{ OT_ADIF, "ADIF" },
+		{ OT_REPORT, "REPORT" },
+		{ OT_BAND, "BAND" },
+		{ OT_CARD, "QSL" },
 	};
 
 	// Main window default sizes

@@ -37,7 +37,6 @@ status::status() :
 	, previous_value_(-1)
 {
 	// Initialise attributes
-	progress_stack_.clear();
 	progress_items_.clear();
 
 	// Get report filename from the settings
@@ -74,7 +73,6 @@ status::~status()
 		delete (it->second);
 	}
 	progress_items_.clear();
-	progress_stack_.clear();
 }
 
 // Add a progress item to the stack
@@ -85,15 +83,16 @@ void status::progress(int max_value, object_t object, const char* description, c
 	if (progress_items_.find(object) != progress_items_.end()) {
 		// We already have a progress bar process in place for this object
 		char message[100];
-		snprintf(message, 100, "PROGRESS: Already started progress for %s", OBJECT_NAMES.at(object));
+		snprintf(message, 100, "%s PROGRESS: Already started progress", OBJECT_NAMES.at(object));
 		misc_status(ST_ERROR, message);
 	} else {
 		// Reset previous value as a new progress
 		previous_value_ = -1;
 		// Start a new progress bar process - create the progress item (total expected count, objects being counted, up/down and what view it's for)
 		char message[100];
-		snprintf(message, 100, "PROGRESS: Starting %s - %d %s", description, max_value, suffix);
-		misc_status(ST_LOG, message);
+		snprintf(message, 100, "%s: PROGRESS: Starting %s - %d %s", 
+			OBJECT_NAMES.at(object), description, max_value, suffix);
+		misc_status(ST_PROGRESS, message);
 		progress_item* item = new progress_item;
 		item->max_value = max_value;
 		if (countdown) {
@@ -109,98 +108,80 @@ void status::progress(int max_value, object_t object, const char* description, c
 		strcpy(item->suffix, suffix);
 		strcpy(item->description, description);
 		progress_items_[object] = item;
-		// Push it onto the stack of progess bar processes
-		progress_stack_.push_back(object);
 		update_progress(object);
 	}
 }
 
 // Update the progress for the specified object
 void status::update_progress(object_t object) {
-	if (progress_stack_.size() && progress_stack_.back() == object) {
-		// The progress bar is top of the stack - don't update the bar if it isn't
-		progress_item* item = progress_items_.at(object);
-		if (item->value != previous_value_) {
-			Fl_Color bar_colour = OBJECT_COLOURS.at(object);
-			char label[100];
-			int pc = 100;
-			if (item->max_value > 0) {
-				pc = item->value * 100 / item->max_value;
-			}
-			sprintf(label, "PROGRESS: %d/%d %s (%d%%)", 
-				item->value, item->max_value, item->suffix, pc);
-			// progress_->copy_label(label);
-			misc_status(ST_LOG, label);
-			previous_value_ = item->value;
+	progress_item* item = progress_items_.at(object);
+	if (item->value != previous_value_) {
+		char label[100];
+		int pc = 100;
+		if (item->max_value > 0) {
+			pc = item->value * 100 / item->max_value;
 		}
+		sprintf(label, "%s: PROGRESS: %d/%d %s (%d%%)", 
+			OBJECT_NAMES.at(object), item->value, item->max_value, item->suffix, pc);
+		misc_status(ST_PROGRESS, label);
+		previous_value_ = item->value;
 	}
 }
 
 // Update progress to the new specified value
 void status::progress(int value, object_t object) {
-	if (progress_stack_.size()) {
-		if (progress_items_.find(object) == progress_items_.end()) {
+	if (progress_items_.find(object) == progress_items_.end()) {
+		char message[100];
+		snprintf(message, 100, "%s: PROGRESS: has not started but %d done", OBJECT_NAMES.at(object), value);
+		misc_status(ST_ERROR, message);
+	} else {
+		// Update progress item
+		progress_item* item = progress_items_.at(object);
+		item->value = value;
+		// update_progress(object);
+		// If it's 100% (or 0% if counting down) delete item and draw the next in the stack - certain objects can overrun (this will give an error)
+		if ((item->countdown && value <= 0) || (!item->countdown && value >= item->max_value)) {
 			char message[100];
-			snprintf(message, 100, "PROGRESS: %s not started but %d done", OBJECT_NAMES.at(object), value);
-			misc_status(ST_ERROR, message);
+			update_progress(object);
+			snprintf(message, 100, "%s: PROGRESS: %s finished (%d %s)", 
+				OBJECT_NAMES.at(object), item->description, item->max_value, item->suffix);
+			misc_status(ST_PROGRESS, message);
+			// Remove the item from the stack - even if it's not top of the stack
+			delete item;
+			progress_items_.erase(object);
 		} else {
-			// Update progress item
-			progress_item* item = progress_items_.at(object);
-			item->value = value;
-			// update_progress(object);
-			// If it's 100% (or 0% if counting down) delete item and draw the next in the stack - certain objects can overrun (this will give an error)
-			if ((item->countdown && value <= 0) || (!item->countdown && value >= item->max_value)) {
-				char message[100];
-				snprintf(message, 100, "PROGRESS: %s finished (%d %s)", item->description, item->max_value, item->suffix);
-				misc_status(ST_LOG, message);
-				update_progress(object);
-				// Remove the item from the stack - even if it's not top of the stack
-				delete item;
-				progress_items_.erase(object);
-				progress_stack_.remove(object);
-				if (progress_stack_.size()) {
-					// Revert to previous progress item (current top-of-stack)
-					update_progress(progress_stack_.back());
-				}
-			} else {
-				// Let the time come in if it's waiting
-				Fl::check();
-			}
+			// Let the time come in if it's waiting
+			Fl::check();
 		}
 	}
 }
 
 // Update progress with a message - e.g. cancel it and display why cancelled
 void status::progress(const char* message, object_t object) {
-	if (progress_stack_.size()) {
-		if (progress_items_.find(object) == progress_items_.end()) {
-			// WE didn't start the bar in the first place
-			char msg[100];
-			snprintf(msg, 100, "PROGRESS: %s not started %s", OBJECT_NAMES.at(object), message);
-			misc_status(ST_ERROR, msg);
-		}
-		else {
-			progress_item* item = progress_items_.at(object);
-			char msg[100];
-			snprintf(msg, 100, "PROGRESS: %s abandoned %s (%d %s)", OBJECT_NAMES.at(object), message, item->value, item->suffix);
-			misc_status(ST_NOTE, msg);
-			// Mark progress bar complete
-			if (item->countdown) {
-				progress((int)0, object);
-			}
-			else {
-				progress(item->max_value, object);
-			}
-		}
+	if (progress_items_.find(object) == progress_items_.end()) {
+		// WE didn't start the bar in the first place
+		char msg[100];
+		snprintf(msg, 100, "%s: PROGRESS: has not started %s", OBJECT_NAMES.at(object), message);
+		misc_status(ST_ERROR, msg);
+	}
+	else {
+		progress_item* item = progress_items_.at(object);
+		char msg[100];
+		update_progress(object);
+		snprintf(msg, 100, "%s: PROGRESS: abandoned %s (%d %s)", OBJECT_NAMES.at(object), message, item->value, item->suffix);
+		misc_status(ST_PROGRESS, msg);
+		delete item;
+		progress_items_.erase(object);
+		
 	}
 }
 
 // 200 millisecond ticker - display latest progress
 void status::ticker() {
 	// Redraw all status 
-	for (auto it = progress_stack_.begin(); it != progress_stack_.end(); it++) {
+	for (auto it = progress_items_.begin(); it != progress_items_.end(); it++) {
 		// Display progress item at top of stack
-		update_progress(*it);
+		update_progress(it->first);
 	}
 }
 

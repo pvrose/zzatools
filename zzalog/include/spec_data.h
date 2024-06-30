@@ -58,6 +58,8 @@ class band_set;
 	};
 	typedef map<string, macro_defn*> macro_map;
 
+	enum status_t : char;
+
 	// This class provides the ADIF specification reference database as a set of named datasets. 
 	// It provides the access to the database and methods to validate the ADIF data against the specification
 	// The database is a map of the dataset name to a dataset

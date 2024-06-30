@@ -256,7 +256,6 @@ bool cty_reader::load_data(cty_data* data, istream& in, string& version) {
 	if (parse(in)) {
 		// Read successful - complete progress
 		status_->misc_status(ST_OK, "EXCEPTION: Extraction done!");
-		status_->progress(file_size, OT_PREFIX);
 		version = timestamp_;
 		fl_cursor(FL_CURSOR_DEFAULT);
 		return true;

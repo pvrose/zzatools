@@ -17,17 +17,34 @@ using namespace std;
 		Fl_Color fg;
 		Fl_Color bg;
 	};
+
+	// The status of the various messages
+	enum status_t : char {
+		ST_NONE,             // Uninitialised
+		ST_LOG,              // Only log the message, do not display it in status
+		ST_DEBUG,            // Debug message
+		ST_NOTE,             // An information message
+		ST_PROGRESS,         // A progress note
+		ST_OK,               // Task successful
+		ST_WARNING,          // A warning message
+		ST_NOTIFY,           // A notification to the user
+		ST_ERROR,            // An error has been signaled
+		ST_SEVERE,           // A sever error that will result in reduced capability
+		ST_FATAL             // A fatal (non-recoverable) error has been signaled
+	};
+
 	const map<status_t, colours_t> STATUS_COLOURS = {
 		{ ST_NONE, { FL_BLUE, FL_BLACK } },
 		{ ST_LOG, { fl_lighter(FL_BLUE), FL_BLACK } },
 		{ ST_DEBUG, { fl_lighter(FL_MAGENTA), FL_BLACK } },
 		{ ST_NOTE, { fl_lighter(FL_CYAN), FL_BLACK } },
+		{ ST_PROGRESS, { fl_darker(FL_WHITE), FL_BLACK } },
 		{ ST_OK, { fl_lighter(FL_GREEN), FL_BLACK } },
 		{ ST_WARNING, { FL_YELLOW, FL_BLACK } },
 		{ ST_NOTIFY, { fl_darker(FL_YELLOW), FL_BLACK } },
 		{ ST_ERROR, { FL_RED, FL_BLACK } },
 		{ ST_SEVERE, { FL_RED, FL_WHITE } },
-		{ ST_FATAL, { FL_BLACK, FL_RED } }
+		{ ST_FATAL, { FL_BLACK, FL_RED } },
 	};
 
 	// Code - letters witten to log file to indicate severity of the logged status
@@ -36,6 +53,7 @@ using namespace std;
 		{ ST_LOG, 'L'},
 		{ ST_DEBUG, 'B' },
 		{ ST_NOTE, 'N'},
+		{ ST_PROGRESS, 'P'},
 		{ ST_OK, 'D'},
 		{ ST_WARNING, 'W'},
 		{ ST_NOTIFY, 'Y'},
@@ -56,7 +74,7 @@ using namespace std;
 		bool countdown;
 		int prev_value;
 	};
-
+	
 	// This class provides the status bar and manages access to the various status information
 	class status 
 	{
@@ -90,8 +108,6 @@ using namespace std;
 		// Status report file
 		string report_filename_;
 		ofstream* report_file_;
-		// The progress item stack
-		list<object_t> progress_stack_;
 		// The progress items in the stack
 		map<object_t, progress_item*> progress_items_;
 		// Report file unusable

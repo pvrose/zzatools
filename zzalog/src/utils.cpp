@@ -981,24 +981,6 @@ string hex_to_string(string data) {
 	return result;
 }
 
-// Default message function
-void default_error_message(status_t level, const char* message) {
-	switch (level) {
-	case ST_NONE:             // Uninitialised
-	case ST_LOG:              // Only log the message, do not display it in status
-	case ST_NOTE:             // An information message
-	case ST_OK:               // Task successful
-	case ST_WARNING:          // A warning message
-		fl_message(message);
-		break;
-	case ST_ERROR:            // An error has been signaled
-	case ST_SEVERE:           // A sever error that will result in reduced capability
-	case ST_FATAL:             // A fatal (non-recoverable) error has been signaled
-		fl_alert(message);
-		break;
-	}
-}
-
 // Calculate the great circle bearing and distance between two locations on the Earth's surface
 void great_circle(lat_long_t source, lat_long_t destination, double& bearing, double& distance)
 {
