@@ -205,8 +205,6 @@ void settings::cb_bn_cal(Fl_Widget* w, long arg) {
 // Callback on changing tab
 void settings::cb_tab(Fl_Widget* w, void* v) {
 	settings* that = ancestor_view<settings>(w);
-	Fl_Tabs* tabs = (Fl_Tabs*)that->child(0);
-	// value() returns the selected widget. We need to test which widget it is.
 	that->enable_widgets();
 }
 

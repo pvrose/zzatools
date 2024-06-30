@@ -41,6 +41,20 @@ using namespace std;
 		static void cb_bn_wsjtx(Fl_Widget* w, void* v);
 		// Enable FLDIGI
 		static void cb_bn_fldigi(Fl_Widget* w, void* v);
+		// Switch tabs
+		static void cb_tab(Fl_Widget* w, void* v);
+
+		// Create the eQSL group
+		void create_eqsl(int rx, int ry, int rw, int rh);
+		// Create the LotW group
+		void create_lotw(int rx, int ry, int rw, int rh);
+		// Create the QRZ.com group
+		void create_qrz(int rx, int ry, int rw, int rh);
+		// Create the Club log group
+		void create_club(int rx, int ry, int rw, int rh);
+		// Create the server group
+		void create_server(int rx, int ry, int rw, int rh);
+		
 
 		// Widgets for eQSL
 		Fl_Group* grp_eqsl_;
