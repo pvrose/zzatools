@@ -96,8 +96,9 @@ void extract_data::extract_records() {
 			header_ = new record;
 			header_->header(comment());
 		}
+		status_->progress(book_->get_count(), OT_EXTRACT, "Extracting New", "records");
 		// For all records in main log book
-		for (item_num_t ixb = 0; ixb < book_->size(); ixb++) {
+		for (item_num_t ixb = 0; ixb < book_->get_count(); ixb++) {
 			record* ext_record = book_->get_record(ixb, false);
 			// Compare record against seaarch criteria
 			if (match_record(ext_record)) {
@@ -109,6 +110,7 @@ void extract_data::extract_records() {
 				rev_mapping_[ixb] = ixe;
 				count += 1;
 			}
+			status_->progress(ixb + 1, OT_EXTRACT);
 		}
 		snprintf(message, 100, "EXTRACT: %zu records extracted, %zu total", count, size());
 		break;
@@ -117,8 +119,9 @@ void extract_data::extract_records() {
 		// Append new reason for search to header
 		if (header_ == nullptr) header_ = new record;
 		header_->header(header_->header() + '\n' + comment());
+		status_->progress(get_count(), OT_EXTRACT, "Extracting AND", "records");
 		// For all records in this book
-		for (item_num_t ixe = 0; ixe < get_count(); ) {
+		for (item_num_t ixe = 0, ixb =  0; ixe < get_count(); ) {
 			// Compare record against these search criteria
 			if (!match_record(get_record(ixe, false))) {
 				// If it doesn't match, remove the record pointer from this book
@@ -133,6 +136,7 @@ void extract_data::extract_records() {
 				rev_mapping_[mapping_[ixe]] = ixe;
 				ixe++;
 			}
+			status_->progress(++ixb, OT_EXTRACT);
 		}
 		snprintf(message, 100, "EXTRACT: %zu records deleted, %zu total", count, size());
 		break;
@@ -141,6 +145,7 @@ void extract_data::extract_records() {
 		// Append new reason for search to header
 		if (header_ == nullptr) header_ = new record;
 		header_->header(header_->header() + '\n' + comment());
+		status_->progress(book_->get_count(), OT_EXTRACT, "Extracting OR", "records");
 		// For all records in main log book
 		for (item_num_t ixb = 0; ixb < book_->get_count(); ixb++) {
 			record* test_record = book_->get_record(ixb, false);
@@ -157,6 +162,7 @@ void extract_data::extract_records() {
 					count += 1;
 				}
 			}
+			status_->progress(ixb + 1, OT_EXTRACT);
 		}
 		snprintf(message, 100, "EXTRACT: %zu records added, %zu total", count, size());
 		break;

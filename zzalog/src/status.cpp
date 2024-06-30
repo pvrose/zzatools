@@ -70,6 +70,7 @@ status::~status()
 	// if (!close_by_error_) delete status_file_viewer_;
 	if (report_file_) report_file_->close();
 	for (auto it = progress_items_.begin(); it != progress_items_.end(); it++) {
+		update_progress(it->first);
 		delete (it->second);
 	}
 	progress_items_.clear();
