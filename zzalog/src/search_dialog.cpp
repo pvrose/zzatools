@@ -547,12 +547,23 @@ void search_dialog::cb_ch_field(Fl_Widget* w, void* v) {
 
 // Enable widgets
 void search_dialog::enable_widgets() {
-	if (criteria_->condition == XC_FIELD) {
-		field_name_->activate();
-		((field_input*)search_text_)->field_name(criteria_->field_name.c_str());
-		((field_input*)search_text_)->value(criteria_->pattern.c_str());
-	} else {
-		field_name_->deactivate();
-		((field_input*)search_text_)->field_name("");
+	switch(criteria_->condition) {
+		case XC_FIELD: {
+			field_name_->activate();
+			((field_input*)search_text_)->field_name(criteria_->field_name.c_str());
+			((field_input*)search_text_)->value(criteria_->pattern.c_str());
+			break;
+		}
+		case XC_CONT: {
+			field_name_->deactivate();
+			((field_input*)search_text_)->field_name("CONT");
+			((field_input*)search_text_)->value(criteria_->pattern.c_str());
+			break;
+		}
+		default: {
+			field_name_->deactivate();
+			((field_input*)search_text_)->field_name("");
+			((field_input*)search_text_)->value("");
+		}
 	}
 }
