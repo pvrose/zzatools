@@ -3,7 +3,6 @@
 #include "adi_writer.h"
 #include "adx_reader.h"
 #include "adx_writer.h"
-#include "tsv_writer.h"
 #include "view.h"
 #include "status.h"
 #include "menu.h"
@@ -436,25 +435,6 @@ bool book::store_data(string filename, bool force, set<string>* fields) {
 					}
 					delete adx_writer_;
 					adx_writer_ = nullptr;
-				}
-				// check for .tsv format
-				else if (filetype == ".tsv" || filetype == ".tab") {
-					// Connect file to output stream and store data
-					file.open(filename_.c_str(), fstream::out);
-					tsv_writer* writer = new tsv_writer;
-					if (!writer->store_book(this, file, fields)) {
-						// Store failed
-						char * message = new char[filename_.length() + 100];
-						sprintf(message, "LOG: Failed to open %s", filename_.c_str());
-						status_->misc_status(ST_ERROR, message);
-						delete[] message;
-						file.close();
-						ok = false;
-					}
-					else {
-						ok = true;
-					}
-					delete writer;
 				}
 				else {
 					// Unknown file type

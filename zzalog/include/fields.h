@@ -30,13 +30,14 @@ using namespace std;
 
 
 	// ADIF field ordering applications - order used for radio button and 
-	enum field_ordering_t {
+	enum field_ordering_t : char {
 		FO_MAINLOG,          // Main log
 		FO_EXTRACTLOG,       // Extract log
 		FO_QSOVIEW,          // QSO View
 		FO_IMPORTLOG,        // Records for import
-		FO_EXPORTTSV,        // Export tab-separated-file
-		FO_CHOICE,           // Only present in field choice drop-down lists
+		FO_EQSL,             // Fields to export to EQSL
+		FO_LOTW,             // Fields to export to LotW
+		FO_CLUBLOG,          // Fields to export to ClubLog
 		FO_LAST              // Keep at end to supply extent of enum
 	};
 
