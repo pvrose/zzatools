@@ -34,6 +34,8 @@ club_handler::club_handler() {
 	if (DEBUG_THREADS) printf("CLUBLOG MAIN: Starting thread\n");
 	th_upload_ = new thread(thread_run, this);
 
+	set_adif_fields();
+
 }
 
 // Destructor
@@ -52,8 +54,7 @@ bool club_handler::upload_log(book* book) {
 		stringstream ss;
 		adi_writer* writer = new adi_writer;
 		set<string> adif_fields;
-		generate_adif(adif_fields);
-		writer->store_book(book, ss, &adif_fields);
+		writer->store_book(book, ss, &adif_fields_);
 		// Get back to start of stream
 		ss.seekg(ss.beg);
 		// Get the parameters and make available for the HTTP POST FORM
@@ -124,31 +125,6 @@ void club_handler::generate_form(vector<url_handler::field_pair>& fields, record
 	}
 	// Hard-coded API Key for this application
 	fields.push_back({ "api", api_key_, "", "" });
-}
-
-// Identify the ADIF fields to export
-void club_handler::generate_adif(set < string > &adif_fields) {
-	adif_fields.insert("QSO_DATE");
-	adif_fields.insert("TIME_ON");
-	adif_fields.insert("TIME_OFF");
-	adif_fields.insert("QSLRDATE");
-	adif_fields.insert("QSLSDATE");
-	adif_fields.insert("CALL");
-	adif_fields.insert("OPERATOR");
-	adif_fields.insert("MODE");
-	adif_fields.insert("BAND");
-	adif_fields.insert("BAND_RX");
-	adif_fields.insert("FREQ");
-	adif_fields.insert("QSL_RCVD");
-	adif_fields.insert("LOTW_QSL_RCVD");
-	adif_fields.insert("QSL_SENT");
-	adif_fields.insert("DXCC");
-	adif_fields.insert("PROP_MODE");
-	adif_fields.insert("CREDIT_GRANTED");
-	adif_fields.insert("RST_SENT");
-	adif_fields.insert("RST_RCVD");
-	adif_fields.insert("NOTES");
-	adif_fields.insert("GRIDSQUARE");
 }
 
 // Download the exception file
@@ -283,8 +259,7 @@ bool club_handler::upload_single_qso(qso_num_t record_num) {
 // Upload QSO to clublog (in thread)
 void club_handler::th_upload(record* this_record) {
 	set<string> adif_fields;
-	generate_adif(adif_fields);
-	single_qso_ = to_adif(this_record, adif_fields);
+	single_qso_ = to_adif(this_record, adif_fields_);
 	// Get the parameters and make available for the HTTP POST FORM
 	vector<url_handler::field_pair> fields;
 	generate_form(fields, this_record);
@@ -377,3 +352,58 @@ string club_handler::to_adif(record* this_record, set<string> &fields) {
 	result += " <EOR>";
 	return result;
 }
+
+// Specify the fields requested by eQSL.cc
+void club_handler::set_adif_fields() {
+	vector<field_info_t>* club_fields = new vector<field_info_t>; 
+	if (settings_->group_exists("Display/Fields/ClubLog Upload")) {
+		Fl_Preferences colln_settings(settings_, "Display/Fields/ClubLog Upload");
+		// Create an initial array for the number of fields in the settings
+		int num_fields = colln_settings.groups();
+		club_fields->resize(num_fields);
+		// For each field in the field set
+		for (int j = 0; j < num_fields; j++) {
+			// Read the field info: name, width and heading from the settings
+			field_info_t field;
+			string field_id = colln_settings.group(j);
+			int field_num = stoi(field_id.substr(6)); // "Field n"
+			Fl_Preferences field_settings(colln_settings, field_id.c_str());
+			field_settings.get("Width", (int&)field.width, 50);
+			char * temp;
+			field_settings.get("Header", temp, "");
+			field.header = temp;
+			free(temp);
+			field_settings.get("Name", temp, "");
+			field.field = temp;
+			free(temp);
+			(*club_fields)[j] = field;
+		}
+	} else {
+		// For all fields in default field set add it to the new field set
+		for (unsigned int i = 0; CLUBLOG_FIELDS[i].field.size() > 0; i++) {
+			club_fields->push_back(CLUBLOG_FIELDS[i]);
+		}
+	}
+	// Now copy to the set 
+	adif_fields_.clear();
+	for (auto it = club_fields->begin(); it != club_fields->end(); it++) {
+		adif_fields_.insert((*it).field);
+	}
+	// And write the settings back
+	Fl_Preferences colln_settings(settings_, "Display/Fields/ClubLog Upload");
+	int num_fields = club_fields->size();
+	// For each field in the set
+	for (int j = 0; j < num_fields; j++) {
+		char field_id[10];
+		sprintf(field_id, "Field %d", j);
+		Fl_Preferences field_settings(colln_settings, field_id);
+		field_info_t field = (*club_fields)[j];
+		field_settings.set("Name", field.field.c_str());
+		field_settings.set("Width", (int)field.width);
+		field_settings.set("Header", field.header.c_str());
+	}
+	settings_->flush();
+}
+
+
+

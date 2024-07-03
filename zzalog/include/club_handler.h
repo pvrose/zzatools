@@ -4,6 +4,7 @@
 #include "record.h"
 #include "book.h"
 #include "url_handler.h"
+#include "fields.h"
 
 #include <vector>
 #include <queue>
@@ -12,6 +13,33 @@
 #include <mutex>
 
 #include <FL/Fl_Help_Dialog.H>
+
+	// Default fiels to use in Clublog 
+	const field_info_t CLUBLOG_FIELDS[] = {
+		{ "QSO_DATE", "Date", 120 },
+		{ "TIME_ON", "Start", 50 },
+		{ "TIME_OFF", "Start", 50 },
+		{ "QSLRDATE", "QSL date", 50},
+		{ "QSLSDATE", "QSL rcvd", 50},
+		{ "CALL", "Callsign", 100 },
+		{ "OPERATOR", "Operator", 50},
+		{ "MODE", "Mode", 50 },
+		{ "BAND", "Band", 45 },
+		{ "BAND_RX", "Band", 45 },
+		{ "FREQ", "MHz", 50 },
+		{ "QSL_RCVD", "QSL rcvd", 50 },
+		{ "LOTW_QSL_RCVD", "QSL rcvd", 50 },
+		{ "QSL_SENT", "QSL rcvd", 50 },
+		{ "DXCC", "DXCC", 50 },
+		{ "PROP_MODE", "Prop", 50 },
+		{ "CREDIT_GRANTED", "Credit", 50 },
+		{ "RST_SENT", "Sent", 40 },
+		{ "RST_RCVD", "Sent", 40 },
+		{ "NOTES", "Notes", 100 },
+		{ "GRIDSQUARE", "Grid", 100 },
+		{ "", "", 0 }
+	};
+
 
 	// This class handles access to the ClubLog website
 	class club_handler
@@ -33,8 +61,6 @@
 	protected:
 		// Generate the fields for posting the log
 		void generate_form(vector<url_handler::field_pair>& fields, record* the_qso);
-		// Get names of ADIF fields to export
-		void generate_adif(set < string > &fields);
 		// Unzip the downloaded  exceptions file
 		bool unzip_exception(string filename);
 		// Get reference directory
@@ -49,6 +75,8 @@
 		static void thread_run(club_handler* that);
 		// main-side upload complete
 		bool upload_done(bool response);
+		// Set ADIF fields
+		void set_adif_fields();
 		// Upload thread
 		thread* th_upload_;
 		// Enable for threads
@@ -64,6 +92,8 @@
 		atomic<bool> upload_response_;
 		// Single QSO ADIF
 		string single_qso_;
+		// ADIF Fields
+		set<string> adif_fields_;
 	};
 
 #endif

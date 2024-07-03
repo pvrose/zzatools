@@ -5,6 +5,7 @@
 #include "import_data.h"
 #include "adi_reader.h"
 #include "url_handler.h"
+#include "fields.h"
 
 #include <deque>
 #include <queue>
@@ -24,6 +25,20 @@ using namespace std;
 	// eQSL throttling - 10s
 	const double EQSL_THROTTLE = 10.0;
 	const char EQSL_TIMEFORMAT[] = "%Y%m%d";
+
+	// Default fiels to use in eqsl 
+	const field_info_t EQSL_FIELDS[] = {
+		{ "QSO_DATE", "Date", 70 },
+		{ "TIME_ON", "Start", 50 },
+		{ "TIME_OFF", "End", 50 },
+		{ "BAND", "Band", 45 },
+		{ "MODE", "Mode", 50 },
+		{ "CALL", "Callsign", 100 },
+		{ "RST_SENT", "Sent", 40 },
+		{ "QSL_MSG", "Message", 150 },
+		{ "", "", 0 }
+	};
+
 
 	// This class manages the requirements for uploading data to and downloading data from eQSL.cc
 	class eqsl_handler
@@ -125,7 +140,7 @@ using namespace std;
 		// Download the data
 		response_t download_adif(string& filename, stringstream* adif);
 		// Generate list of adif fields
-		void adif_fields(set<string>& fields);
+		void set_adif_fields();
 		// Generate list of POST FORM fields
 		void form_fields(vector<url_handler::field_pair>&);
 		// parse bad record
@@ -163,6 +178,8 @@ using namespace std;
 		mutex upload_lock_;
 		// Upload response queue
 		atomic<upload_response_t*> upload_response_;
+		// Set of field names
+		set<string> adif_fields_;
 		
 		// Window and Help viewer for displaying response
 		Fl_Window* help_window_;

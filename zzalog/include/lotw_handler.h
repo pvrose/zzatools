@@ -2,6 +2,7 @@
 #define __LOTW_HANDLER__
 
 #include "book.h"
+#include "fields.h"
 
 #include <sstream>
 #include <string>
@@ -13,6 +14,20 @@
 
 	// The timestamp format required by the ARRL header record.
 	const char LOTW_TIMEFORMAT[] = "%Y-%m-%d %H:%M:%S";
+
+	// Default fiels to use in LotW 
+	const field_info_t LOTW_FIELDS[] = {
+		{ "CALL", "Callsign", 100 },
+		{ "QSO_DATE", "Date", 120 },
+		{ "TIME_ON", "Start", 50 },
+		{ "TIME_OFF", "Start", 50 },
+		{ "BAND", "Band", 45 },
+		{ "MODE", "Mode", 50 },
+		{ "SUBMODE", "Mode", 50 },
+		{ "RST_SENT", "Sent", 40 },
+		{ "STATION_CALLSIGN", "My call", 100 },
+		{ "", "", 0 }
+	};
 
 
 	// This class handles the interface to ARRL's Logbook-of-the-World application
@@ -44,6 +59,8 @@
 		bool download_adif(const char* url, stringstream* adif);
 		// Validate the data
 		bool validate_adif(stringstream* adif);
+		// Set the list of QSO fields
+		void set_adif_fields();
 
 		// Upload thread
 		thread* th_upload_;
@@ -58,6 +75,8 @@
 		mutex upload_lock_;
 		// Upload response queue
 		atomic<int> upload_response_;
+		// ADIF Fields
+		set<string> adif_fields_;
 
 	};
 #endif // !__LOTW_HANDLER__

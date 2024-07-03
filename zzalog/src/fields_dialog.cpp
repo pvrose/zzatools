@@ -24,6 +24,7 @@ fields_table::fields_table(int X, int Y, int W, int H, const char* L) :
     row_header(0);
     row_resize(0);
     cols(3);
+    col_width_all((W - Fl::scrollbar_size()) / 3);
     // Create the editing widgets
     ch_field_ = new field_choice(X + W/2, Y + H/2, 10, 10);
     ch_field_->set_dataset("Fields");
