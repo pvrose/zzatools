@@ -89,6 +89,8 @@ public:
     static void cb_collection(Fl_Widget* w, void* v);
     // Move selected row up or down
     static void cb_move(Fl_Widget* w, void* v);
+    // Reset definition of "Default"
+    static void cb_default(Fl_Widget* w, void* v);
 
 protected:
 
@@ -98,6 +100,8 @@ protected:
     void populate_coll(Fl_Input_Choice* w);
 
     void navigate_table(bool up);
+    // Generate default collection
+    vector<field_info_t>* default_collection();
 
 
 
@@ -121,6 +125,8 @@ protected:
     Fl_Button* bn_up_;
     // Down button
     Fl_Button* bn_down_;
+    // Restore defaulr button
+    Fl_Button* bn_restore_;
 
 
 };

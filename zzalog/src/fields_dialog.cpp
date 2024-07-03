@@ -321,14 +321,9 @@ void fields_dialog::load_values() {
 	// Read all the field field sets
 	if (num_field_sets == 0) {
 		// No field sets in setting, initialise a new one with default field set
-		vector<field_info_t>* field_set = new vector<field_info_t>;
-		// For all fields in default field set add it to the new field set
-		for (unsigned int i = 0; DEFAULT_FIELDS[i].field.size() > 0; i++) {
-			field_set->push_back(DEFAULT_FIELDS[i]);
-		}
-		coll_map_["Default"] = field_set;
-	}
-	else {
+		vector<field_info_t>* field_set = default_collection();
+ 		coll_map_["Default"] = field_set;
+    } else {
 		// For all the field sets in the settings
 		for (int i = 0; i < num_field_sets; i++) {
 			vector<field_info_t>* field_set = new vector<field_info_t>;
@@ -404,7 +399,7 @@ void fields_dialog::create_form(int X, int Y) {
 
     curr_y += w200->h() + GAP;
 
-    curr_x = X + GAP + curr_w - WBUTTON - WBUTTON - GAP;
+    curr_x = X + GAP;
 
     Fl_Button* w301 = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Up");
     w301->align(FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
@@ -418,6 +413,13 @@ void fields_dialog::create_form(int X, int Y) {
     w302->callback(cb_move, (void*)(intptr_t)false);
     w302->tooltip("Move the selected field down the list");
     bn_down_ = w302;
+
+    curr_x += w302->w() + GAP;
+    Fl_Button* w303 = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Restore");
+    w303->align(FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
+    w303->callback(cb_default, nullptr);
+    w303->tooltip("Restore \"Default\" collection");
+    bn_restore_ = w303;
 
     end();
 
@@ -476,6 +478,11 @@ void fields_dialog::enable_widgets() {
     } else {
         bn_down_->activate();
     }
+    if (collection_ == "Default") {
+        bn_restore_->activate();
+    } else {
+        bn_restore_->deactivate();
+    }
 }
 
 // Application choice callback
@@ -517,6 +524,14 @@ void fields_dialog::cb_move(Fl_Widget* w, void* v) {
     that->navigate_table(up);
 }
 
+// Restore default collection
+void fields_dialog::cb_default(Fl_Widget* w, void* v) {
+    fields_dialog* that = ancestor_view<fields_dialog>(w);
+    delete that->coll_map_.at("Default");
+    that->coll_map_["Default"] = that->default_collection();
+    that->table_->data(that->coll_map_.at("Default"));
+}
+
 // Implement the up/down
 void fields_dialog::navigate_table(bool up) {
     vector<field_info_t>* coll = coll_map_.at(collection_);
@@ -545,5 +560,15 @@ void fields_dialog::populate_coll(Fl_Input_Choice* ch) {
     for (auto it = coll_map_.begin(); it != coll_map_.end(); it++) {
         ch->add(it->first.c_str());
     }
+}
+
+// Create default collection
+vector<field_info_t>* fields_dialog::default_collection() {
+    vector<field_info_t>* result = new vector<field_info_t>;
+    // For all fields in default field set add it to the new field set
+    for (unsigned int i = 0; DEFAULT_FIELDS[i].field.size() > 0; i++) {
+        result->push_back(DEFAULT_FIELDS[i]);
+    }
+    return result;
 }
 
