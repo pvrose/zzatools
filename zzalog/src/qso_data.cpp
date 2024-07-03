@@ -39,6 +39,7 @@ qso_data::qso_data(int X, int Y, int W, int H, const char* l) :
 	, logging_state_(QSO_INACTIVE)
 	, inhibit_drawing_(false)
 	, previous_mode_(QSO_NONE)
+	, edit_return_state_(QSO_INACTIVE)
 {
 	load_values();
 }
