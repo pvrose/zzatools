@@ -306,11 +306,11 @@ void record_table::assess_fields() {
 			field_settings.get("Name", temp, "");
 			string field_name = temp;
 			free(temp);
-			if ((log_record_ != NULL && log_record_->item_exists(field_name)) ||
-				(query_record_ != NULL && query_record_->item_exists(field_name))) {
+			// if ((log_record_ != NULL && log_record_->item_exists(field_name)) ||
+			// 	(query_record_ != NULL && query_record_->item_exists(field_name))) {
 				// If the field has a valid entry in either record add it to the list to display
 				fields_.push_back(field_name);
-			}
+			// }
 		}
 		if (num_fields == 0) {
 			// No fields provided in the settings - use default field set
