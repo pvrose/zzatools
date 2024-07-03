@@ -58,7 +58,7 @@ using namespace std;
 	{
 	public:
 		// Constructor initialises Fl_Tree and view
-		report_tree(int X, int Y, int W, int H, const char* label, field_ordering_t app);
+		report_tree(int X, int Y, int W, int H, const char* label, field_app_t app);
 		~report_tree();
 
 		// inherited from view

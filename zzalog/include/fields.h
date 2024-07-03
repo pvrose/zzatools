@@ -5,6 +5,7 @@
 #define __FIELDS__
 
 #include <string>
+#include <map>
 
 using namespace std;
 
@@ -30,14 +31,12 @@ using namespace std;
 
 
 	// ADIF field ordering applications - order used for radio button and 
-	enum field_ordering_t : char {
+	enum field_app_t : char {
+		FO_NONE,             // No application
 		FO_MAINLOG,          // Main log
 		FO_EXTRACTLOG,       // Extract log
 		FO_QSOVIEW,          // QSO View
 		FO_IMPORTLOG,        // Records for import
-		FO_EQSL,             // Fields to export to EQSL
-		FO_LOTW,             // Fields to export to LotW
-		FO_CLUBLOG,          // Fields to export to ClubLog
 		FO_LAST              // Keep at end to supply extent of enum
 	};
 
@@ -58,4 +57,14 @@ using namespace std;
 		{ "GRIDSQUARE", "Loc", 62 },
 		{ "", "", 0 }
 	};
+
+	// Anglicise collection names
+	const map<field_app_t, string> APPLICATION_LABELS = {
+		{ FO_NONE, "None" },
+		{ FO_MAINLOG, "Main Log" },
+		{ FO_EXTRACTLOG, "Extracted" },
+		{ FO_QSOVIEW, "Record browser" },
+		{ FO_IMPORTLOG, "Imported data" }
+	};
+
 #endif

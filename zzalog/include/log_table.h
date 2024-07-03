@@ -24,7 +24,7 @@ using namespace std;
 	{
 		// Constructor and Destructor
 	public:
-		log_table(int X, int Y, int W, int H, const char* label, field_ordering_t app);
+		log_table(int X, int Y, int W, int H, const char* label, field_app_t app);
 		virtual ~log_table();
 
 		// Public methods
@@ -88,7 +88,7 @@ using namespace std;
 		// Alt GR is currently pressed
 		bool alt_gr_;
 		// field aplication
-		field_ordering_t application_;
+		field_app_t application_;
 		// Rows per page
 		int rows_per_page_;
 		// Inverse display order

@@ -55,7 +55,7 @@ tabbed_forms::~tabbed_forms()
 
 // Template method to add a view of class VIEW, 
 template <class VIEW>
-void tabbed_forms::add_view(const char* label, field_ordering_t column_data, object_t object, const char* tooltip) {
+void tabbed_forms::add_view(const char* label, field_app_t column_data, object_t object, const char* tooltip) {
 	// Get the available area of the tabs. 
 	int rx = 0;
 	int ry = 0;

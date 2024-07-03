@@ -20,7 +20,7 @@ using namespace std;
 
 	{
 	public:
-		spec_tree(int X, int Y, int W, int H, const char* label, field_ordering_t app);
+		spec_tree(int X, int Y, int W, int H, const char* label, field_app_t app);
 		~spec_tree();
 
 		// inherited from view

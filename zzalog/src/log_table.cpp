@@ -40,7 +40,7 @@ Fl_Font log_table::font_;
 Fl_Fontsize log_table::fontsize_;
 
 // constructor - passes parameters  to the two base classes
-log_table::log_table(int X, int Y, int W, int H, const char* label, field_ordering_t app) :
+log_table::log_table(int X, int Y, int W, int H, const char* label, field_app_t app) :
   Fl_Table_Row(X, Y, W, H, label)
 , view()
 {
