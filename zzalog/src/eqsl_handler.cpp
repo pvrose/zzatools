@@ -9,6 +9,7 @@
 #include "utils.h"
 #include "url_handler.h"
 #include "callback.h"
+#include "fields.h"
 
 #include <cstdio>
 #include <fstream>
@@ -30,6 +31,8 @@ extern qso_manager* qso_manager_;
 extern url_handler* url_handler_;
 extern bool DEBUG_THREADS;
 extern string default_station_;
+extern fields* fields_;
+
 
 // Constructor
 eqsl_handler::eqsl_handler()
@@ -856,54 +859,11 @@ bool eqsl_handler::upload_eqsl_log(book* book) {
 
 // Specify the fields requested by eQSL.cc
 void eqsl_handler::set_adif_fields() {
-	vector<field_info_t>* eqsl_fields = new vector<field_info_t>; 
-	if (settings_->group_exists("Display/Fields/eQSL Upload")) {
-		Fl_Preferences colln_settings(settings_, "Display/Fields/eQSL Upload");
-		// Create an initial array for the number of fields in the settings
-		int num_fields = colln_settings.groups();
-		eqsl_fields->resize(num_fields);
-		// For each field in the field set
-		for (int j = 0; j < num_fields; j++) {
-			// Read the field info: name, width and heading from the settings
-			field_info_t field;
-			string field_id = colln_settings.group(j);
-			int field_num = stoi(field_id.substr(6)); // "Field n"
-			Fl_Preferences field_settings(colln_settings, field_id.c_str());
-			field_settings.get("Width", (int&)field.width, 50);
-			char * temp;
-			field_settings.get("Header", temp, "");
-			field.header = temp;
-			free(temp);
-			field_settings.get("Name", temp, "");
-			field.field = temp;
-			free(temp);
-			(*eqsl_fields)[j] = field;
-		}
-	} else {
-		// For all fields in default field set add it to the new field set
-		for (unsigned int i = 0; EQSL_FIELDS[i].field.size() > 0; i++) {
-			eqsl_fields->push_back(EQSL_FIELDS[i]);
-		}
-	}
+	// Ser default values if necessary
+	(void)fields_->collection("eQSL Upload", EQSL_FIELDS);
 	// Now copy to the set 
-	adif_fields_.clear();
-	for (auto it = eqsl_fields->begin(); it != eqsl_fields->end(); it++) {
-		adif_fields_.insert((*it).field);
-	}
+	adif_fields_ = fields_->field_names("eQSL Upload");
 	// And write the settings back
-	Fl_Preferences colln_settings(settings_, "Display/Fields/eQSL Upload");
-	int num_fields = eqsl_fields->size();
-	// For each field in the set
-	for (int j = 0; j < num_fields; j++) {
-		char field_id[10];
-		sprintf(field_id, "Field %d", j);
-		Fl_Preferences field_settings(colln_settings, field_id);
-		field_info_t field = (*eqsl_fields)[j];
-		field_settings.set("Name", field.field.c_str());
-		field_settings.set("Width", (int)field.width);
-		field_settings.set("Header", field.header.c_str());
-	}
-	settings_->flush();
 }
 
 // Specify the fields required by eQSL.cc in the HTTP POST FORM

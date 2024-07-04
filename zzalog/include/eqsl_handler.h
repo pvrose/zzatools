@@ -5,7 +5,6 @@
 #include "import_data.h"
 #include "adi_reader.h"
 #include "url_handler.h"
-#include "fields.h"
 
 #include <deque>
 #include <queue>
@@ -27,18 +26,16 @@ using namespace std;
 	const char EQSL_TIMEFORMAT[] = "%Y%m%d";
 
 	// Default fiels to use in eqsl 
-	const field_info_t EQSL_FIELDS[] = {
-		{ "QSO_DATE", "Date", 70 },
-		{ "TIME_ON", "Start", 50 },
-		{ "TIME_OFF", "End", 50 },
-		{ "BAND", "Band", 45 },
-		{ "MODE", "Mode", 50 },
-		{ "CALL", "Callsign", 100 },
-		{ "RST_SENT", "Sent", 40 },
-		{ "QSL_MSG", "Message", 150 },
-		{ "", "", 0 }
+	const set<string> EQSL_FIELDS = {
+		"QSO_DATE",
+		"TIME_ON",
+	    "TIME_OFF",
+		"BAND",
+		"MODE", 
+		"CALL",
+		"RST_SENT",
+		"QSL_MSG"
 	};
-
 
 	// This class manages the requirements for uploading data to and downloading data from eQSL.cc
 	class eqsl_handler

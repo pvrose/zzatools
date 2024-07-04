@@ -30,7 +30,7 @@ public:
     virtual void draw_cell(TableContext context, int R = 0, int C = 0, int X = 0, int Y = 0,
         int W = 0, int H = 0);
     // Set the contents - by reference
-    void data(vector<field_info_t>* d);
+    void data(collection_t* d);
     // Selected row
     int selected_row();
     // Set selection - single row
@@ -46,7 +46,7 @@ protected:
     // Table callback
     static void cb_table(Fl_Widget* w, void* v);
     // The data
-    vector<field_info_t>* data_;
+    collection_t* data_;
     // The cell being edited
     int edit_row_;
     int edit_col_;
@@ -89,8 +89,8 @@ public:
     static void cb_collection(Fl_Widget* w, void* v);
     // Move selected row up or down
     static void cb_move(Fl_Widget* w, void* v);
-    // Reset definition of "Default"
-    static void cb_default(Fl_Widget* w, void* v);
+    // Delete collection
+    static void cb_del_coll(Fl_Widget* w, void* v);
 
 protected:
 
@@ -100,10 +100,6 @@ protected:
     void populate_coll(Fl_Input_Choice* w);
 
     void navigate_table(bool up);
-    // Generate default collection
-    vector<field_info_t>* default_collection();
-
-
 
     // Current application
     field_app_t application_;
@@ -111,10 +107,6 @@ protected:
     string collection_;
     // Application and collection are linked
     bool linked_;
-    // Aopplication to collectio map
-    map<field_app_t, string> app_map_;
-    // Collection to fields map
-    map<string, vector<field_info_t>* > coll_map_;
     // The application choice widget
     Fl_Choice* ch_app_;
     // The collection choice widget
@@ -125,8 +117,5 @@ protected:
     Fl_Button* bn_up_;
     // Down button
     Fl_Button* bn_down_;
-    // Restore defaulr button
-    Fl_Button* bn_restore_;
-
 
 };

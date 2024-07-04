@@ -40,6 +40,7 @@ main.cpp - application entry point
 #include "logo.h"
 #include "wx_handler.h"
 #include "ticker.h"
+#include "fields.h"
 
 // C/C++ header files
 #include <ctime>
@@ -128,6 +129,7 @@ fllog_emul* fllog_emul_ = nullptr;
 qso_manager* qso_manager_ = nullptr;
 wx_handler* wx_handler_ = nullptr;
 ticker* ticker_ = nullptr;
+fields* fields_ = nullptr;
 
 // Recent files opened
 list<string> recent_files_;
@@ -1065,6 +1067,9 @@ int main(int argc, char** argv)
 
 	// Ctreate status to handle status messages
 	status_ = new status();
+
+	// Read the fields data
+	fields_ = new fields;
 
 	// Read any switches that stick between calls
 	read_saved_switches();

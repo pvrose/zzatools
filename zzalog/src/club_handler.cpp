@@ -6,6 +6,7 @@
 #include "cty_data.h"
 #include "book.h"
 #include "qso_manager.h"
+#include "fields.h"
 
 #include <sstream>
 
@@ -23,6 +24,7 @@ extern status* status_;
 extern book* book_;
 extern qso_manager* qso_manager_;
 extern bool DEBUG_THREADS;
+extern fields* fields_;
 
 // Constructor 
 club_handler::club_handler() {
@@ -355,54 +357,10 @@ string club_handler::to_adif(record* this_record, set<string> &fields) {
 
 // Specify the fields requested by eQSL.cc
 void club_handler::set_adif_fields() {
-	vector<field_info_t>* club_fields = new vector<field_info_t>; 
-	if (settings_->group_exists("Display/Fields/ClubLog Upload")) {
-		Fl_Preferences colln_settings(settings_, "Display/Fields/ClubLog Upload");
-		// Create an initial array for the number of fields in the settings
-		int num_fields = colln_settings.groups();
-		club_fields->resize(num_fields);
-		// For each field in the field set
-		for (int j = 0; j < num_fields; j++) {
-			// Read the field info: name, width and heading from the settings
-			field_info_t field;
-			string field_id = colln_settings.group(j);
-			int field_num = stoi(field_id.substr(6)); // "Field n"
-			Fl_Preferences field_settings(colln_settings, field_id.c_str());
-			field_settings.get("Width", (int&)field.width, 50);
-			char * temp;
-			field_settings.get("Header", temp, "");
-			field.header = temp;
-			free(temp);
-			field_settings.get("Name", temp, "");
-			field.field = temp;
-			free(temp);
-			(*club_fields)[j] = field;
-		}
-	} else {
-		// For all fields in default field set add it to the new field set
-		for (unsigned int i = 0; CLUBLOG_FIELDS[i].field.size() > 0; i++) {
-			club_fields->push_back(CLUBLOG_FIELDS[i]);
-		}
-	}
+	// Ser default values if necessary
+	(void)fields_->collection("ClubLog Upload", CLUBLOG_FIELDS);
 	// Now copy to the set 
-	adif_fields_.clear();
-	for (auto it = club_fields->begin(); it != club_fields->end(); it++) {
-		adif_fields_.insert((*it).field);
-	}
-	// And write the settings back
-	Fl_Preferences colln_settings(settings_, "Display/Fields/ClubLog Upload");
-	int num_fields = club_fields->size();
-	// For each field in the set
-	for (int j = 0; j < num_fields; j++) {
-		char field_id[10];
-		sprintf(field_id, "Field %d", j);
-		Fl_Preferences field_settings(colln_settings, field_id);
-		field_info_t field = (*club_fields)[j];
-		field_settings.set("Name", field.field.c_str());
-		field_settings.set("Width", (int)field.width);
-		field_settings.set("Header", field.header.c_str());
-	}
-	settings_->flush();
+	adif_fields_ = fields_->field_names("ClubLog Upload");
 }
 
 

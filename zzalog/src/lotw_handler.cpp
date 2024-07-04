@@ -22,6 +22,7 @@ extern status* status_;
 extern book* book_;
 extern url_handler* url_handler_;
 extern bool DEBUG_THREADS;
+extern fields* fields_;
 
 // Constructor
 lotw_handler::lotw_handler()
@@ -454,54 +455,10 @@ void lotw_handler::cb_upload_done(void* v) {
 
 // Specify the fields requested by eQSL.cc
 void lotw_handler::set_adif_fields() {
-	vector<field_info_t>* lotw_fields = new vector<field_info_t>; 
-	if (settings_->group_exists("Display/Fields/LotW Upload")) {
-		Fl_Preferences colln_settings(settings_, "Display/Fields/LotW Upload");
-		// Create an initial array for the number of fields in the settings
-		int num_fields = colln_settings.groups();
-		lotw_fields->resize(num_fields);
-		// For each field in the field set
-		for (int j = 0; j < num_fields; j++) {
-			// Read the field info: name, width and heading from the settings
-			field_info_t field;
-			string field_id = colln_settings.group(j);
-			int field_num = stoi(field_id.substr(6)); // "Field n"
-			Fl_Preferences field_settings(colln_settings, field_id.c_str());
-			field_settings.get("Width", (int&)field.width, 50);
-			char * temp;
-			field_settings.get("Header", temp, "");
-			field.header = temp;
-			free(temp);
-			field_settings.get("Name", temp, "");
-			field.field = temp;
-			free(temp);
-			(*lotw_fields)[j] = field;
-		}
-	} else {
-		// For all fields in default field set add it to the new field set
-		for (unsigned int i = 0; LOTW_FIELDS[i].field.size() > 0; i++) {
-			lotw_fields->push_back(LOTW_FIELDS[i]);
-		}
-	}
+	// Ser default values if necessary
+	(void)fields_->collection("LotW Upload", LOTW_FIELDS);
 	// Now copy to the set 
-	adif_fields_.clear();
-	for (auto it = lotw_fields->begin(); it != lotw_fields->end(); it++) {
-		adif_fields_.insert((*it).field);
-	}
-	// And write the settings back
-	Fl_Preferences colln_settings(settings_, "Display/Fields/LotW Upload");
-	int num_fields = lotw_fields->size();
-	// For each field in the set
-	for (int j = 0; j < num_fields; j++) {
-		char field_id[10];
-		sprintf(field_id, "Field %d", j);
-		Fl_Preferences field_settings(colln_settings, field_id);
-		field_info_t field = (*lotw_fields)[j];
-		field_settings.set("Name", field.field.c_str());
-		field_settings.set("Width", (int)field.width);
-		field_settings.set("Header", field.header.c_str());
-	}
-	settings_->flush();
+	adif_fields_ = fields_->field_names("LotW Upload");
 }
 
 

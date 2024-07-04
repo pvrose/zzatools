@@ -16,17 +16,16 @@
 	const char LOTW_TIMEFORMAT[] = "%Y-%m-%d %H:%M:%S";
 
 	// Default fiels to use in LotW 
-	const field_info_t LOTW_FIELDS[] = {
-		{ "CALL", "Callsign", 100 },
-		{ "QSO_DATE", "Date", 120 },
-		{ "TIME_ON", "Start", 50 },
-		{ "TIME_OFF", "Start", 50 },
-		{ "BAND", "Band", 45 },
-		{ "MODE", "Mode", 50 },
-		{ "SUBMODE", "Mode", 50 },
-		{ "RST_SENT", "Sent", 40 },
-		{ "STATION_CALLSIGN", "My call", 100 },
-		{ "", "", 0 }
+	const set<string> LOTW_FIELDS = {
+		"CALL",
+		"QSO_DATE",
+		"TIME_ON",
+		"TIME_OFF",
+		"BAND",
+		"MODE",
+		"SUBMODE",
+		"RST_SENT",
+		"STATION_CALLSIGN"
 	};
 
 

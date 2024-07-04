@@ -57,7 +57,7 @@ using namespace std;
 		int printable_width_;
 		int printable_height_;
 		// field data
-		vector<field_info_t> fields_;
+		collection_t fields_;
 		// Page title
 		string page_title_;
 		// Object being printed

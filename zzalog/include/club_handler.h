@@ -4,7 +4,6 @@
 #include "record.h"
 #include "book.h"
 #include "url_handler.h"
-#include "fields.h"
 
 #include <vector>
 #include <queue>
@@ -15,29 +14,28 @@
 #include <FL/Fl_Help_Dialog.H>
 
 	// Default fiels to use in Clublog 
-	const field_info_t CLUBLOG_FIELDS[] = {
-		{ "QSO_DATE", "Date", 120 },
-		{ "TIME_ON", "Start", 50 },
-		{ "TIME_OFF", "Start", 50 },
-		{ "QSLRDATE", "QSL date", 50},
-		{ "QSLSDATE", "QSL rcvd", 50},
-		{ "CALL", "Callsign", 100 },
-		{ "OPERATOR", "Operator", 50},
-		{ "MODE", "Mode", 50 },
-		{ "BAND", "Band", 45 },
-		{ "BAND_RX", "Band", 45 },
-		{ "FREQ", "MHz", 50 },
-		{ "QSL_RCVD", "QSL rcvd", 50 },
-		{ "LOTW_QSL_RCVD", "QSL rcvd", 50 },
-		{ "QSL_SENT", "QSL rcvd", 50 },
-		{ "DXCC", "DXCC", 50 },
-		{ "PROP_MODE", "Prop", 50 },
-		{ "CREDIT_GRANTED", "Credit", 50 },
-		{ "RST_SENT", "Sent", 40 },
-		{ "RST_RCVD", "Sent", 40 },
-		{ "NOTES", "Notes", 100 },
-		{ "GRIDSQUARE", "Grid", 100 },
-		{ "", "", 0 }
+	const set<string> CLUBLOG_FIELDS = {
+		"QSO_DATE",
+		"TIME_ON",
+		"TIME_OFF",
+		"QSLRDATE",
+		"QSLSDATE",
+		"CALL",
+		"OPERATOR",
+		"MODE",
+		"BAND",
+		"BAND_RX",
+		"FREQ",
+		"QSL_RCVD",
+		"LOTW_QSL_RCVD",
+		"QSL_SENT",
+		"DXCC",
+		"PROP_MODE",
+		"CREDIT_GRANTED",
+		"RST_SENT",
+		"RST_RCVD",
+		"NOTES",
+		"GRIDSQUARE"
 	};
 
 

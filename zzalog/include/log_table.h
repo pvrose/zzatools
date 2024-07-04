@@ -43,7 +43,7 @@ using namespace std;
 		static void set_font(Fl_Font font, Fl_Fontsize size);
 
 		// Returns the name and attributes of the fields currently being displayed
-		vector<field_info_t>& fields();
+		collection_t& fields();
 
 		// Protected methods
 	protected:
@@ -72,7 +72,7 @@ using namespace std;
 		// Protected attributes:
 	protected:
 		// Column definition
-		vector<field_info_t> fields_;
+		collection_t* log_fields_;
 		// current selected item
 		unsigned int current_item_num_;
 		// last event

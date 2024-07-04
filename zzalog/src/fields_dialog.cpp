@@ -5,6 +5,7 @@
 #include "utils.h"
 #include "callback.h"
 #include "book.h"
+#include "fields.h"
 
 #include <FL/Fl_Int_Input.H>
 #include <FL/Fl_Preferences.H>
@@ -13,6 +14,7 @@
 
 extern Fl_Preferences* settings_;
 extern book* book_;
+extern fields* fields_;
 
 // Constructor
 fields_table::fields_table(int X, int Y, int W, int H, const char* L) :
@@ -123,7 +125,7 @@ void fields_table::draw_cell(TableContext context, int R, int C, int X, int Y,
 }
 
 // Set the data
-void fields_table::data(vector<field_info_t>* d) {
+void fields_table::data(collection_t* d) {
     data_ = d;
     rows(data_->size() + 1);
     row_height_all(fl_height() + 2);
@@ -277,9 +279,8 @@ fields_dialog::fields_dialog(int X, int Y, int W, int H, const char* L) :
     ch_coll_ = nullptr;
     table_ = nullptr;
     application_ = FO_MAINLOG;
-    collection_ = "";
-    app_map_.clear();
-    coll_map_.clear();
+    collection_ = fields_->coll_name(application_);
+    linked_ = true;
     // use page_dialog default
     do_creation(X, Y);
     enable_widgets();
@@ -289,72 +290,7 @@ fields_dialog::fields_dialog(int X, int Y, int W, int H, const char* L) :
 fields_dialog::~fields_dialog() {}
 
 // Load data from settings
-// Load data from settings
 void fields_dialog::load_values() {
-	// Read the field data from the settings
-	Fl_Preferences display_settings(settings_, "Display");
-	Fl_Preferences fields_settings(display_settings, "Fields");
-	// Number of field sets (a field set is a set of fields and their ordering)
-	int num_field_sets = fields_settings.groups();
-	// First read the default application to display first
-	fields_settings.get("Active Application", (int&)application_, FO_MAINLOG);
-	// Then get the field sets for each
-	char app_path[128];
-	char* temp;
-	// For each field ordering application
-	for (int i = 0; i < FO_LAST; i++) {
-		// Get the field set name
-		sprintf(app_path, "App%d", i);
-		fields_settings.get(app_path, temp, "Default");
-		app_map_[(field_app_t)i] = string(temp);
-		free(temp);
-	}
-	// Default the field set to display that for the active application
-	collection_ = app_map_[application_];
-    linked_ = true;
-	// Delete the existing field data
-	for (auto it = app_map_.begin(); it != app_map_.end(); it++) {
-        if (coll_map_.find(it->second) != coll_map_.end()) {
-            delete coll_map_.at(it->second);
-        }
-    }
-	coll_map_.clear();
-	// Read all the field field sets
-	if (num_field_sets == 0) {
-		// No field sets in setting, initialise a new one with default field set
-		vector<field_info_t>* field_set = default_collection();
- 		coll_map_["Default"] = field_set;
-    } else {
-		// For all the field sets in the settings
-		for (int i = 0; i < num_field_sets; i++) {
-			vector<field_info_t>* field_set = new vector<field_info_t>;
-			// Get the name of the i'th field set
-			string colln_name = fields_settings.group(i);
-			Fl_Preferences colln_settings(fields_settings, colln_name.c_str());
-			// Create an initial array for the number of fields in the settings
-			int num_fields = colln_settings.groups();
-			field_set->resize(num_fields);
-			// For each field in the field set
-			for (int j = 0; j < num_fields; j++) {
-				// Read the field info: name, width and heading from the settings
-				field_info_t field;
-				string field_id = colln_settings.group(j);
-				int field_num = stoi(field_id.substr(6)); // "Field n"
-				Fl_Preferences field_settings(colln_settings, field_id.c_str());
-                field_settings.get("Width", (int&)field.width, 50);
-                char * temp;
-                field_settings.get("Header", temp, "");
-                field.header = temp;
-                free(temp);
-				field_settings.get("Name", temp, "");
-				field.field = temp;
-				free(temp);
-				(*field_set)[j] = field;
-			}
-			// Add the field set to the list of field sets
-			coll_map_[colln_name] = field_set;
-		}
-	}
 }
 
 void fields_dialog::create_form(int X, int Y) {
@@ -378,6 +314,7 @@ void fields_dialog::create_form(int X, int Y) {
     w102->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
     w102->callback(cb_collection, nullptr);
     w102->tooltip("Select the collection to edit");
+    w102->input()->when(FL_WHEN_ENTER_KEY);
     populate_coll(w102);
     ch_coll_ = w102;
 
@@ -387,6 +324,12 @@ void fields_dialog::create_form(int X, int Y) {
     w103->callback(cb_value<Fl_Light_Button, bool>, &linked_);
     w103->tooltip("Changes to application and collection values are linked");
     w103->value(linked_);
+
+    curr_y += HBUTTON;
+    Fl_Button* w113 = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Delete");
+    w113->align(FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
+    w113->callback(cb_del_coll, nullptr);
+    w113->tooltip("Delete the displayed collection");
 
     curr_x = X + GAP;
     curr_y += HBUTTON + GAP + HTEXT;
@@ -415,51 +358,12 @@ void fields_dialog::create_form(int X, int Y) {
     w302->tooltip("Move the selected field down the list");
     bn_down_ = w302;
 
-    curr_x += w302->w() + GAP;
-    Fl_Button* w303 = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Restore");
-    w303->align(FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
-    w303->callback(cb_default, nullptr);
-    w303->tooltip("Restore \"Default\" collection");
-    bn_restore_ = w303;
-
     end();
 
 }
 
 void fields_dialog::save_values() {
-	// Read the field data from the registry
-	Fl_Preferences display_settings(settings_, "Display");
-	Fl_Preferences fields_settings(display_settings, "Fields");
-	// Delete current settings
-	fields_settings.clear();
-	// First store the default application
-	fields_settings.set("Active Application", application_);
-	// Then get the field sets for the applications
-	char app_path[128];
-	for (int i = 0; i < FO_LAST; i++) {
-		sprintf(app_path, "App%d", i);
-		fields_settings.set(app_path, app_map_[(field_app_t)i].c_str());
-	}
-	settings_->flush();
-	// For each field set
-	auto it = coll_map_.begin();
-	for (int i = 0; it != coll_map_.end(); i++, it++) {
-		int num_fields = it->second->size();
-		Fl_Preferences colln_settings(fields_settings, it->first.c_str());
-		// For each field in the set
-		for (int j = 0; j < num_fields; j++) {
-			char field_id[10];
-			sprintf(field_id, "Field %d", j);
-			Fl_Preferences field_settings(colln_settings, field_id);
-			field_info_t field = (it->second)->at(j);
-			field_settings.set("Name", field.field.c_str());
-            field_settings.set("Width", (int)field.width);
-            field_settings.set("Header", field.header.c_str());
-		}
-	}
-
-	// Tell the views that formatting has changed
-	book_->selection(-1, HT_FORMAT);
+    book_->selection(-1, HT_FORMAT);
 }
 
 // Enable widgets - update them per application 
@@ -467,22 +371,18 @@ void fields_dialog::enable_widgets() {
     // Update displayed data dependant on application
     ch_app_->value((int)application_);
     ch_coll_->value(collection_.c_str());
-    table_->data(coll_map_[collection_]);
+    collection_t* coll = fields_->collection(collection_);
+    table_->data(coll);
     // Inhibit up or down buttons
     if (table_->selected_row() == 0) {
         bn_up_->deactivate();
     } else {
         bn_up_->activate();
     }
-    if (table_->selected_row() == coll_map_[collection_]->size() - 1) {
+    if (table_->selected_row() == coll->size() - 1) {
         bn_down_->deactivate();
     } else {
         bn_down_->activate();
-    }
-    if (collection_ == "Default") {
-        bn_restore_->activate();
-    } else {
-        bn_restore_->deactivate();
     }
 }
 
@@ -493,7 +393,7 @@ void fields_dialog::cb_application(Fl_Widget* w, void* v) {
     fields_dialog* that = ancestor_view<fields_dialog>(w);
     that->application_ = (field_app_t)ch->value();
     if (that->linked_) {
-        that->collection_ = that->app_map_[that->application_];
+        that->collection_ = fields_->coll_name(that->application_);
     }
     that->enable_widgets();
 }
@@ -506,13 +406,11 @@ void fields_dialog::cb_collection(Fl_Widget* w, void* v) {
     that->collection_ = ch->value();
     if (ch->menubutton()->changed() == 0) {
         // New collection - initialise as copy of "Default"
-        vector<field_info_t>* newc = new vector<field_info_t>;
-        *newc = *(that->coll_map_.at("Default"));
-        that->coll_map_[that->collection_] = newc;
+        collection_t* newc = fields_->collection(that->collection_, "Default");
     }
     // Change application to this collection
     if (that->linked_) {
-        that->app_map_[that->application_] = that->collection_;
+        fields_->link_app(that->application_, that->collection_);
     }
     that->enable_widgets();
 }
@@ -525,17 +423,19 @@ void fields_dialog::cb_move(Fl_Widget* w, void* v) {
     that->navigate_table(up);
 }
 
-// Restore default collection
-void fields_dialog::cb_default(Fl_Widget* w, void* v) {
+// Delete the displayed collection
+void fields_dialog::cb_del_coll(Fl_Widget* w, void* v) {
     fields_dialog* that = ancestor_view<fields_dialog>(w);
-    delete that->coll_map_.at("Default");
-    that->coll_map_["Default"] = that->default_collection();
-    that->table_->data(that->coll_map_.at("Default"));
+    if (fields_->delete_coll(that->collection_)) {
+        that->collection_ = fields_->coll_name(that->application_);
+        that->enable_widgets();
+        that->populate_coll(that->ch_coll_);
+    }
 }
 
 // Implement the up/down
 void fields_dialog::navigate_table(bool up) {
-    vector<field_info_t>* coll = coll_map_.at(collection_);
+    collection_t* coll = fields_->collection(collection_);
     int row = table_->selected_row();
     field_info_t data = (*coll)[row];
     auto selected = coll->begin() + row;
@@ -558,18 +458,10 @@ void fields_dialog::populate_app(Fl_Choice* ch) {
 // :Populate the collection choice
 void fields_dialog::populate_coll(Fl_Input_Choice* ch) {
     ch->clear();
-    for (auto it = coll_map_.begin(); it != coll_map_.end(); it++) {
-        ch->add(it->first.c_str());
+    set<string> names = fields_->coll_names();
+    for (auto it = names.begin(); it != names.end(); it++) {
+        ch->add((*it).c_str());
     }
 }
 
-// Create default collection
-vector<field_info_t>* fields_dialog::default_collection() {
-    vector<field_info_t>* result = new vector<field_info_t>;
-    // For all fields in default field set add it to the new field set
-    for (unsigned int i = 0; DEFAULT_FIELDS[i].field.size() > 0; i++) {
-        result->push_back(DEFAULT_FIELDS[i]);
-    }
-    return result;
-}
 

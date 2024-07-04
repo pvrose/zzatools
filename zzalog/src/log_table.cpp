@@ -14,6 +14,7 @@
 #include "cty_data.h"
 #include "main_window.h"
 #include "qso_manager.h"
+#include "fields.h"
 
 #include <FL/fl_draw.H>
 #include <FL/Fl_Preferences.H>
@@ -35,6 +36,7 @@ extern cty_data* cty_data_;
 extern qso_manager* qso_manager_;
 extern bool in_current_session(record*);
 extern bool DARK;
+extern fields* fields_;
 
 Fl_Font log_table::font_;
 Fl_Fontsize log_table::fontsize_;
@@ -44,7 +46,7 @@ log_table::log_table(int X, int Y, int W, int H, const char* label, field_app_t 
   Fl_Table_Row(X, Y, W, H, label)
 , view()
 {
-	fields_.clear();
+	log_fields_ = nullptr;
 	current_item_num_ = 0;
 	last_event_ = 0;
 	last_button_ = 0;
@@ -94,10 +96,10 @@ log_table::log_table(int X, int Y, int W, int H, const char* label, field_app_t 
 	// Get the fields to display
 	get_fields();
 	// set number of fields
-	cols(fields_.size());
+	cols(log_fields_->size());
 	// For each field set the column width
-	for (unsigned int i = 0; i < fields_.size(); i++) {
-		col_width(i, fields_[i].width);
+	for (unsigned int i = 0; i < log_fields_->size(); i++) {
+		col_width(i, (*log_fields_)[i].width);
 	}
 	// number of rows - available internal height / default row height
 	rows_per_page_ = Fl_Table_Row::tih / (row_height);
@@ -116,7 +118,7 @@ log_table::log_table(int X, int Y, int W, int H, const char* label, field_app_t 
 log_table::~log_table()
 {
 	// Remove data items
-	fields_.clear();
+	log_fields_->clear();
 	clear();
 	// The destructor for this uses itself
 	edit_input_ = nullptr;
@@ -230,7 +232,7 @@ void log_table::edit_save(field_input::exit_reason_t exit_type) {
 	case field_input::exit_reason_t::IR_RIGHT:
 		// Save and edit next column
 		done_edit(true);
-		if (edit_col_ < fields_.size() - 1) {
+		if (edit_col_ < log_fields_->size() - 1) {
 			edit_cell(edit_row_, ++edit_col_);
 		}
 		else {
@@ -420,7 +422,7 @@ void log_table::update(hint_t hint, qso_num_t record_num_1, qso_num_t record_num
 			old_record->item("QSO_DATE").c_str(),
 			old_record->item("TIME_ON").c_str(),
 			old_record->item("CALL").c_str(),
-			fields_[edit_col_].field.c_str());
+			(*log_fields_)[edit_col_].field.c_str());
 		status_->misc_status(ST_WARNING, message);
 		edit_input_->hide();
 	}
@@ -429,10 +431,10 @@ void log_table::update(hint_t hint, qso_num_t record_num_1, qso_num_t record_num
 		// format has changed - it may be fields so update them
 		get_fields();
 		// set number of fields
-		cols(fields_.size());
+		cols(log_fields_->size());
 		// and each one's width
-		for (unsigned int i = 0; i < fields_.size(); i++) {
-			col_width(i, fields_[i].width);
+		for (unsigned int i = 0; i < log_fields_->size(); i++) {
+			col_width(i, (*log_fields_)[i].width);
 		}
 		// font size may have changed
 		adjust_row_sizes();
@@ -557,7 +559,7 @@ void log_table::draw_cell(TableContext context, int R, int C, int X, int Y, int 
 
 			fl_color(FL_BLACK);
 			// text is field header
-			text = fields_[C].header;
+			text = (*log_fields_)[C].header;
 			fl_draw(text.c_str(), X, Y, W, H, FL_ALIGN_CENTER);
 		}
 		fl_pop_clip();
@@ -594,8 +596,8 @@ void log_table::draw_cell(TableContext context, int R, int C, int X, int Y, int 
 					fl_color(fl_contrast(FL_FOREGROUND_COLOR, bg_colour));
 				}
 				// get the formatted data from the field of the record
-				string direct = this_record->item(fields_[C].field, true, false);
-				text = this_record->item(fields_[C].field, true, true);
+				string direct = this_record->item((*log_fields_)[C].field, true, false);
+				text = this_record->item((*log_fields_)[C].field, true, true);
 				Fl_Font font = font_;
 				if (direct == text) font &= ~FL_ITALIC;
 				else font |= FL_ITALIC;
@@ -622,65 +624,12 @@ void log_table::draw_cell(TableContext context, int R, int C, int X, int Y, int 
 
 // Get the appropriate field set for the application using this view
 void log_table::get_fields() {
-	// Read the field data from the registry
-	Fl_Preferences display_settings(settings_, "Display");
-	Fl_Preferences fields_settings(display_settings, "Fields");
-	int num_field_sets = fields_settings.groups();
-	// Then get the field_sets for the applications
-	char app_path[128];
-	char* field_set_name = nullptr;
-	int num_fields = 0;
-	sprintf(app_path, "App%d", (int)application_);
-	if (fields_settings.groups() > 0) {
-		fields_settings.get(app_path, field_set_name, "Default");
-		// Read all the field field_sets
-		fields_.clear();
-		Fl_Preferences field_set_settings(fields_settings, field_set_name);
-		num_fields = field_set_settings.groups();
-		// now get the field data for each field in the set
-		for (int j = 0; j < num_fields; j++) {
-			Fl_Preferences field_settings(field_set_settings, field_set_settings.group(j));
-			field_info_t field;
-			field_settings.get("Width", (int&)field.width, 50);
-			char * temp;
-			field_settings.get("Header", temp, "");
-			field.header = temp;
-			free(temp);
-			field_settings.get("Name", temp, "");
-			field.field = temp;
-			free(temp);
-			fields_.push_back(field);
-		}
-		free(field_set_name);
-	}
-	else {
-		field_set_name = new char[128];
-		strcpy(field_set_name, "Default");
-	}
-	// If the field_set is empty - use the default set
-	if (num_fields == 0) {
-		fields_.clear();
-		Fl_Preferences field_set_settings(fields_settings, field_set_name);
-		// For each field in the default field set
-		for (unsigned int i = 0; DEFAULT_FIELDS[i].field.size() > 0; i++) {
-			// Copy the field information
-			field_info_t field = DEFAULT_FIELDS[i];
-			fields_.push_back(field);
-			// Save the field definitions to settings
-			char g_name[15];
-			snprintf(g_name, sizeof(g_name), "Field %d", i);
-			Fl_Preferences field_settings(field_set_settings, g_name);
-			field_settings.set("Width", (signed)field.width);
-			field_settings.set("Header", field.header.c_str());
-			field_settings.set("Name", field.field.c_str());
-		}
-	}
-	settings_->flush();
+	log_fields_ = fields_->collection(application_);
 }
 
 // Returns the field set
-vector<field_info_t>& log_table::fields() {
-	return fields_;
+collection_t& log_table::fields() {
+	return *log_fields_;
 }
 
 // Open an input dialog to allow user to edit the cell 
@@ -688,7 +637,7 @@ void log_table::edit_cell(int row, int col) {
 	// get the field item under the mouse
 	item_num_t item_number = (order_ == LAST_TO_FIRST) ? my_book_->size() - 1 - row : row;
 	record* record = my_book_->get_record(item_number, true);
-	field_info_t field_info = fields_[col];
+	field_info_t field_info = (*log_fields_)[col];
 	string text = record->item(field_info.field, true);
 	//intl_input* input = (intl_input*)edit_input_;
 	edit_row_ = row;
@@ -718,7 +667,7 @@ void log_table::done_edit(bool keep_row) {
 		// Get the record and field
 		item_num_t item_number = (order_ == LAST_TO_FIRST) ? my_book_->size() - 1 - edit_row_ : edit_row_;
 		record* record = my_book_->get_record(item_number, true);
-		field_info_t field_info = fields_[edit_col_];
+		field_info_t field_info = (*log_fields_)[edit_col_];
 		string old_text = record->item(field_info.field);
 		string text = edit_input_->value();
 		if (old_text != text) {
@@ -811,7 +760,7 @@ void log_table::describe_cell(int item, int col) {
 	if (tip.length() == 0) {
 		// Get the field item under the mouse
 		record* record = my_book_->get_record(item_number, true);
-		field_info_t field_info = fields_[col];
+		field_info_t field_info = (*log_fields_)[col];
 		// get the tip - for Call parse the call and provide prefix info, otherwise the ADIF description
 		if (field_info.field == "CALL") {
 			tip = cty_data_->get_tip(record);
@@ -836,7 +785,7 @@ void log_table::describe_cell(int item, int col) {
 
 // Column header was double clicked - if it was for a date/time field reverse direction of display
 void log_table::dbl_click_column(int col) {
-	field_info_t field_info = fields_[col];
+	field_info_t field_info = (*log_fields_)[col];
 	if (field_info.field == "QSO_DATE" ||
 		field_info.field == "TIME_ON" ||
 		field_info.field == "QSO_DATE_OFF" ||
@@ -935,17 +884,17 @@ void log_table::display_current() {
 void log_table::drag_column(int C) {
 	// save the new width - note this gets called for both columns either side of the drag point
 	// So ignore if it tries to do this for the "column" tp the right of the last one.
-	if ((unsigned)C < fields_.size()) {
+	if ((unsigned)C < log_fields_->size()) {
 		int new_width = col_width(C);
-		fields_[C].width = new_width;
+		(*log_fields_)[C].width = new_width;
 		// Write the new value to settings Display/Fields/AppN/Field N
 		Fl_Preferences display_settings(settings_, "Display");
-		Fl_Preferences fields_settings(display_settings, "Fields");
+		Fl_Preferences log_fields_settings(display_settings, "Fields");
 		char app_path[128];
 		char* field_set_name;
 		sprintf(app_path, "App%d", (int)application_);
-		fields_settings.get(app_path, field_set_name, "Default");
-		Fl_Preferences field_set_settings(fields_settings, field_set_name);
+		log_fields_settings.get(app_path, field_set_name, "Default");
+		Fl_Preferences field_set_settings(log_fields_settings, field_set_name);
 		// This is the Cth group.
 		Fl_Preferences field_settings(field_set_settings, field_set_settings.group(C));
 		field_settings.set("Width", new_width);
