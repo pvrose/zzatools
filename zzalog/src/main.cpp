@@ -807,6 +807,7 @@ void tidy() {
 	delete cty_data_;
 	delete tabbed_forms_;
 	delete toolbar_;
+	delete fields_;
 	delete status_;
 	delete menu_;
 	delete main_window_;

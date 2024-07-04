@@ -219,6 +219,7 @@ void fields_table::cb_field(Fl_Widget* w, void* v) {
         field_info_t* info = &(*that->data_)[row];
         info->field = ch->value();
         info->header = ch->value();
+        info->width = 50;
     }
     w->hide();
     that->edit_row_ = -1;
@@ -319,11 +320,12 @@ void fields_dialog::create_form(int X, int Y) {
     ch_coll_ = w102;
 
     curr_x += w102->w() + GAP;
-    Fl_Button* w103 = new Fl_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Linked");
+    Fl_Light_Button* w103 = new Fl_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Linked");
     w103->align(FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
-    w103->callback(cb_value<Fl_Light_Button, bool>, &linked_);
+    w103->callback(cb_linked, &linked_);
     w103->tooltip("Changes to application and collection values are linked");
     w103->value(linked_);
+    bn_linked_ = w103;
 
     curr_y += HBUTTON;
     Fl_Button* w113 = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Delete");
@@ -384,6 +386,11 @@ void fields_dialog::enable_widgets() {
     } else {
         bn_down_->activate();
     }
+    bn_linked_->value(linked_);
+    char title[50];
+    snprintf(title, sizeof(title), "Fields - %s", collection_.c_str());
+    table_->copy_label(title);
+    redraw();
 }
 
 // Application choice callback
@@ -391,10 +398,10 @@ void fields_dialog::enable_widgets() {
 void fields_dialog::cb_application(Fl_Widget* w, void* v) {
     Fl_Choice* ch = (Fl_Choice*)w;
     fields_dialog* that = ancestor_view<fields_dialog>(w);
+    // Set the application, get the associated collection and link them
     that->application_ = (field_app_t)ch->value();
-    if (that->linked_) {
-        that->collection_ = fields_->coll_name(that->application_);
-    }
+    that->collection_ = fields_->coll_name(that->application_);
+    that->linked_ = true;
     that->enable_widgets();
 }
 
@@ -406,12 +413,11 @@ void fields_dialog::cb_collection(Fl_Widget* w, void* v) {
     that->collection_ = ch->value();
     if (ch->menubutton()->changed() == 0) {
         // New collection - initialise as copy of "Default"
-        collection_t* newc = fields_->collection(that->collection_, "Default");
+        (void)fields_->collection(that->collection_, "Default");
     }
-    // Change application to this collection
-    if (that->linked_) {
-        fields_->link_app(that->application_, that->collection_);
-    }
+    // Delete linkage
+    that->linked_ = false;
+    // Redraw 
     that->enable_widgets();
 }
 
@@ -431,6 +437,18 @@ void fields_dialog::cb_del_coll(Fl_Widget* w, void* v) {
         that->enable_widgets();
         that->populate_coll(that->ch_coll_);
     }
+}
+
+// Link the application
+void fields_dialog::cb_linked(Fl_Widget* w, void* v) {
+    // Gete the new value of the button
+    cb_value<Fl_Light_Button, bool>(w, v);
+    fields_dialog* that = ancestor_view<fields_dialog>(w);
+    if (that->linked_) {
+        fields_->link_app(that->application_, that->collection_);
+    }
+    that->enable_widgets();
+   
 }
 
 // Implement the up/down

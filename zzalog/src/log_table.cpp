@@ -117,8 +117,6 @@ log_table::log_table(int X, int Y, int W, int H, const char* label, field_app_t 
 // Destructor
 log_table::~log_table()
 {
-	// Remove data items
-	log_fields_->clear();
 	clear();
 	// The destructor for this uses itself
 	edit_input_ = nullptr;

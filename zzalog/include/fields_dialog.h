@@ -58,6 +58,7 @@ protected:
     intl_input* ip_header_;
     Fl_Int_Input* ip_width_;
     
+    
 };
 
 // This class displays a dialog that allows the user to select and order fields that are to be used
@@ -91,6 +92,8 @@ public:
     static void cb_move(Fl_Widget* w, void* v);
     // Delete collection
     static void cb_del_coll(Fl_Widget* w, void* v);
+    // Set linked
+    static void cb_linked(Fl_Widget* w, void* v);
 
 protected:
 
@@ -117,5 +120,7 @@ protected:
     Fl_Button* bn_up_;
     // Down button
     Fl_Button* bn_down_;
+    // Linked button
+    Fl_Light_Button* bn_linked_;
 
 };
