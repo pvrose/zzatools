@@ -1,5 +1,6 @@
 #include "qso_dxcc.h"
 #include "qso_entry.h"
+#include "qso_data.h"
 #include "cty_data.h"
 #include "book.h"
 #include "drawing.h"
@@ -145,21 +146,20 @@ void qso_dxcc::enable_widgets() {
 }
 
 // Set the data - parse the callsign in the current qso
-void qso_dxcc::set_data() {
-	qso_entry* qe = ancestor_view<qso_entry>(this);
-	record* qso = qe->qso();
+void qso_dxcc::set_data(record* qso) {
+	qso_ = qso;
 	callsign_ = "";
 	bands_worked_ = nullptr;
 	modes_worked_ = nullptr;
-	if (qso) {
-		callsign_ = qso->item("CALL");
+	if (qso_) {
+		callsign_ = qso_->item("CALL");
 		// Is a prefix supplied
-		nickname_ = cty_data_->nickname(qso);
-		name_ = cty_data_->name(qso);
-		source_ = cty_data_->get_source(qso);
-		cq_zone_ = cty_data_->cq_zone(qso);
-		location_ = cty_data_->location(qso);
-		dxcc_ = cty_data_->entity(qso);
+		nickname_ = cty_data_->nickname(qso_);
+		name_ = cty_data_->name(qso_);
+		source_ = cty_data_->get_source(qso_);
+		cq_zone_ = cty_data_->cq_zone(qso_);
+		location_ = cty_data_->location(qso_);
+		dxcc_ = cty_data_->entity(qso_);
 	}
 
 }
@@ -238,8 +238,7 @@ void qso_dxcc::wb4_buttons::create_form() {
 
 // Light the buttons that have been worked: 
 void qso_dxcc::wb4_buttons::enable_widgets() {
-	qso_entry* qe = ancestor_view<qso_entry>(this);
-	record* qso = qe->qso();
+	record* qso = ((qso_dxcc*)parent())->qso_;
 	string qso_band = "";
 	string qso_mode = "";
 	string qso_submode = "";
@@ -325,8 +324,8 @@ void qso_dxcc::wb4_buttons::enable_widgets() {
 // Get records that match nickname, station and pressed button
 void qso_dxcc::wb4_buttons::cb_bn_mode(Fl_Widget* w, void* v) {
 	qso_dxcc* qd = ancestor_view<qso_dxcc>(w);
-	qso_entry* qe = ancestor_view<qso_entry>(qd);
-	record* qso = qe->qso();
+	qso_data* qdd = ancestor_view<qso_data>(qd);
+	record* qso = qd->qso_;
 	Fl_Button* bn = (Fl_Button*)w;
 	string mode = string(bn->label());
 	bool save = bn->value();
@@ -349,7 +348,7 @@ void qso_dxcc::wb4_buttons::cb_bn_mode(Fl_Widget* w, void* v) {
 	};
 	extract_records_->criteria(new_criteria);
 	tabbed_forms_->activate_pane(OT_EXTRACT, true);
-	item_num_t item = navigation_book_->item_number(qe->qso_number());
+	item_num_t item = navigation_book_->item_number(qdd->current_number());
 	navigation_book_->selection(item, HT_EXTRACTION);
 	bn->value(!save);
 }
@@ -357,8 +356,8 @@ void qso_dxcc::wb4_buttons::cb_bn_mode(Fl_Widget* w, void* v) {
 // Get records that match nickname, station and pressed button
 void qso_dxcc::wb4_buttons::cb_bn_band(Fl_Widget* w, void* v) {
 	qso_dxcc* qd = ancestor_view<qso_dxcc>(w);
-	qso_entry* qe = ancestor_view<qso_entry>(qd);
-	record* qso = qe->qso();
+	qso_data* qdd = ancestor_view<qso_data>(qd);
+	record* qso = qd->qso_;
 	Fl_Button* bn = (Fl_Button*)w;
 	string band = string((char*)v);
 	bool save = bn->value();
@@ -381,7 +380,7 @@ void qso_dxcc::wb4_buttons::cb_bn_band(Fl_Widget* w, void* v) {
 	};
 	extract_records_->criteria(new_criteria);
 	tabbed_forms_->activate_pane(OT_EXTRACT, true);
-	item_num_t item = navigation_book_->item_number(qe->qso_number());
+	item_num_t item = navigation_book_->item_number(qdd->current_number());
 	navigation_book_->selection(item, HT_EXTRACTION);
 	bn->value(!save);
 }

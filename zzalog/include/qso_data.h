@@ -3,6 +3,7 @@
 #include "qso_entry.h"
 #include "qso_query.h"
 #include "qso_buttons.h"
+#include "qso_misc.h"
 #include "qso_net_entry.h"
 #include "field_choice.h"
 #include "book.h"
@@ -236,6 +237,8 @@ protected:
 	qso_net_entry* g_net_entry_;
 	// Query entry group
 	qso_entry* g_qy_entry_;
+	// Misc info group
+	qso_misc* g_misc_;
 	// Button group
 	qso_buttons* g_buttons_;
 	// Group for freq/power/mode

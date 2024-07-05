@@ -71,6 +71,7 @@ void qso_data::load_values() {
 // Create qso_data
 void qso_data::create_form(int X, int Y) {
 	int max_x = X;
+	int max_y = Y;
 
 	begin();
 	align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
@@ -93,14 +94,17 @@ void qso_data::create_form(int X, int Y) {
 	g_entry_->labelcolor(FL_DARK_BLUE);
 
 	max_x = max(max_x, g_entry_->x() + g_entry_->w());
+	max_y = max(max_y, g_entry_->y() + g_entry_->h());
 	// Query form
 	g_query_ = new qso_query(curr_x, curr_y, 10, 10);
 
 	max_x = max(max_x, g_query_->x() + g_query_->w());
+	max_y = max(max_y, g_query_->y() + g_query_->h());
 
 	// Multiple QSO entry
 	g_net_entry_ = new qso_net_entry(curr_x, curr_y, 10, 10);
 	max_x = max(max_x, g_net_entry_->x() + g_net_entry_->w());
+	max_y = max(max_y, g_net_entry_->y() + g_net_entry_->h());
 
 	// Manual QSO query - displays a qso_entry form
 	g_qy_entry_ = new qso_entry(curr_x, curr_y, 10, 10);
@@ -109,10 +113,18 @@ void qso_data::create_form(int X, int Y) {
 	g_qy_entry_->labelsize(FL_NORMAL_SIZE + 2);
 	g_qy_entry_->labelcolor(DARK ? FL_MAGENTA : FL_DARK_MAGENTA);
 	max_x = max(max_x, g_qy_entry_->x() + g_qy_entry_->w());
+	max_y = max(max_y, g_qy_entry_->y() + g_qy_entry_->h());
 
-	curr_y = max(g_entry_->y() + g_entry_->h(), g_query_->y() + g_query_->h());
-	curr_y = max(curr_y, g_net_entry_->y() + g_net_entry_->h());
+	// Misc info
+	curr_x = max_x + GAP;
+	g_misc_ = new qso_misc(curr_x, curr_y, WBUTTON * 7 / 2, max_y - curr_y);
+
+	max_x = max(max_x, g_misc_->x() + g_misc_->w());
+
+
+	curr_y = max_y;
 	curr_y += GAP;
+	curr_x = X + GAP;
 
 	// Display the buttons for the particular logging_stte_
 	g_buttons_ = new qso_buttons(curr_x, curr_y, 10, 10);
@@ -151,6 +163,7 @@ void qso_data::enable_widgets() {
 			g_net_entry_->hide();
 			g_query_->hide();
 			g_qy_entry_->hide();
+			g_misc_->deactivate();
 			break;
 		case QSO_PENDING:
 			// Real-time logging - waiting to start QSO
@@ -161,6 +174,8 @@ void qso_data::enable_widgets() {
 			g_net_entry_->hide();
 			g_query_->hide();
 			g_qy_entry_->hide();
+			g_misc_->activate();
+			g_misc_->enable_widgets();
 			break;
 		case QSO_STARTED:
 			// Real-time logging - QSO started
@@ -172,6 +187,8 @@ void qso_data::enable_widgets() {
 			g_net_entry_->hide();
 			g_query_->hide();
 			g_qy_entry_->hide();
+			g_misc_->activate();
+			g_misc_->enable_widgets();
 			break;
 		case QSO_ENTER:
 			// Back-logging - enter QSO details
@@ -183,6 +200,8 @@ void qso_data::enable_widgets() {
 			g_net_entry_->hide();
 			g_query_->hide();
 			g_qy_entry_->hide();
+			g_misc_->activate();
+			g_misc_->enable_widgets();
 			break;
 		case QSO_EDIT:
 			// Editing an existing QSO
@@ -194,6 +213,8 @@ void qso_data::enable_widgets() {
 			g_net_entry_->hide();
 			g_query_->hide();
 			g_qy_entry_->hide();
+			g_misc_->activate();
+			g_misc_->enable_widgets();
 			break;
 		case QSO_VIEW:
 			// Viewing (read-only) an existing QSO
@@ -205,6 +226,8 @@ void qso_data::enable_widgets() {
 			g_net_entry_->hide();
 			g_query_->hide();
 			g_qy_entry_->hide();
+			g_misc_->activate();
+			g_misc_->enable_widgets();
 			break;
 		case QSO_BROWSE:
 			// Browsing - display using tabular view
@@ -215,6 +238,8 @@ void qso_data::enable_widgets() {
 			g_query_->enable_widgets();
 			g_net_entry_->hide();
 			g_qy_entry_->hide();
+			g_misc_->activate();
+			g_misc_->enable_widgets();
 			break;
 		case QUERY_DUPE:
 			// Show two logged QSOs in query form to check for duplicate
@@ -227,6 +252,8 @@ void qso_data::enable_widgets() {
 			g_query_->enable_widgets();
 			g_net_entry_->hide();
 			g_qy_entry_->hide();
+			g_misc_->activate();
+			g_misc_->enable_widgets();
 			break;
 		case QUERY_NEW:
 			// Show an imported QSO (no match found) and check if real
@@ -237,6 +264,8 @@ void qso_data::enable_widgets() {
 			g_query_->enable_widgets();
 			g_net_entry_->hide();
 			g_qy_entry_->hide();
+			g_misc_->activate();
+			g_misc_->enable_widgets();
 			break;
 		case QUERY_WSJTX:
 			// Show an imported QSO and possible match found in WSJTX All.TXT file
@@ -247,6 +276,8 @@ void qso_data::enable_widgets() {
 			g_query_->enable_widgets();
 			g_net_entry_->hide();
 			g_qy_entry_->hide();
+			g_misc_->activate();
+			g_misc_->enable_widgets();
 			break;
 		case NET_STARTED:
 			// Display multiple QSOs in real-time
@@ -256,6 +287,8 @@ void qso_data::enable_widgets() {
 			g_net_entry_->show();
 			g_net_entry_->enable_widgets();
 			g_qy_entry_->hide();
+			g_misc_->activate();
+			g_misc_->enable_widgets();
 			break;
 		case NET_EDIT:
 			// Display looged QSOs that (may be) a net
@@ -265,6 +298,8 @@ void qso_data::enable_widgets() {
 			g_net_entry_->show();
 			g_net_entry_->enable_widgets();
 			g_qy_entry_->hide();
+			g_misc_->activate();
+			g_misc_->enable_widgets();
 			break;
 		case QSO_WSJTX:
 			// Display real-time Qso from WSJT-X
@@ -275,6 +310,8 @@ void qso_data::enable_widgets() {
 			g_net_entry_->hide();
 			g_query_->hide();
 			g_qy_entry_->hide();
+			g_misc_->activate();
+			g_misc_->enable_widgets();
 			break;
 		case QSO_FLDIGI:
 			// Display real-time QSO received from FLDID
@@ -285,6 +322,8 @@ void qso_data::enable_widgets() {
 			g_net_entry_->hide();
 			g_query_->hide();
 			g_qy_entry_->hide();
+			g_misc_->activate();
+			g_misc_->enable_widgets();
 			break;
 		case MANUAL_ENTRY:
 			// Display entry form to search for qSOs in log
@@ -293,6 +332,8 @@ void qso_data::enable_widgets() {
 			g_qy_entry_->show();
 			g_qy_entry_->label("Enter QSO details for search");
 			g_qy_entry_->enable_widgets();
+			g_misc_->activate();
+			g_misc_->enable_widgets();
 			break;
 		}
 		g_buttons_->enable_widgets();
@@ -316,6 +357,7 @@ void qso_data::update_qso(qso_num_t log_num) {
 		}
 		else {
 			g_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
+			g_misc_->qso(current_qso(), current_number());
 		}
 		break;
 	case QSO_STARTED:
@@ -344,6 +386,7 @@ void qso_data::update_qso(qso_num_t log_num) {
 		}
 		else {
 			g_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
+			g_misc_->qso(current_qso(), current_number());
 		}
 		break;
 	case QSO_EDIT:
@@ -376,6 +419,7 @@ void qso_data::update_qso(qso_num_t log_num) {
 		}
 		else {
 			g_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
+			g_misc_->qso(current_qso(), current_number());
 		}
 		break;
 	case QSO_BROWSE:
@@ -414,6 +458,7 @@ void qso_data::update_qso(qso_num_t log_num) {
 				g_net_entry_->select_qso(log_num);
 			}
 			g_net_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
+			g_misc_->qso(current_qso(), current_number());
 		}
 		break;
 	}
@@ -511,6 +556,7 @@ void qso_data::update_modem_qso(bool log_it) {
 			logging_state_ = QSO_INACTIVE;
 		} else {
 			g_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
+			g_misc_->qso(current_qso(), current_number());
 			tabbed_forms_->update_views(nullptr, HT_MINOR_CHANGE, g_entry_->qso_number());
 			enable_widgets();
 		}
@@ -534,6 +580,7 @@ void qso_data::enter_modem_qso(record* qso) {
 			g_entry_->update_rig();
 			g_entry_->copy_cat_to_qso();
 			g_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
+			g_misc_->qso(current_qso(), current_number());
 			action_save_edit();
 			tabbed_forms_->update_views(nullptr, HT_INSERTED, g_entry_->qso_number());
 			enable_widgets();
@@ -604,6 +651,7 @@ void qso_data::action_new_qso(record* qso, qso_init_t mode) {
 	case QSO_NONE:
 		// Just copy the station details
 		qe->copy_qso_to_qso(qso, qso_entry::CF_COPY);
+		g_misc_->qso(current_qso(), current_number());
 		break;
 	case QSO_ON_AIR:
 		// Copy station details and get read rig details for band etc. 
@@ -615,21 +663,25 @@ void qso_data::action_new_qso(record* qso, qso_init_t mode) {
 			qe->copy_qso_to_qso(qso, qso_entry::CF_RIG_ETC | qso_entry::CF_CAT);
 		}
 		qe->copy_clock_to_qso();
+		g_misc_->qso(current_qso(), current_number());
 		break;
 	case QSO_COPY_CONDX:
 		// Clone the QSO - get station and band from original QSO
 		qe->copy_qso_to_qso(qso, qso_entry::CF_RIG_ETC | qso_entry::CF_CAT);
 		qe->copy_clock_to_qso();
+		g_misc_->qso(current_qso(), current_number());
 		break;
 	case QSO_COPY_CALL:
 		// Copy the QSO - as abobe but also same callsign and details
 		qe->copy_qso_to_qso(qso, qso_entry::CF_RIG_ETC | qso_entry::CF_CAT | qso_entry::CF_CONTACT);
 		qe->copy_clock_to_qso();
+		g_misc_->qso(current_qso(), current_number());
 		break;
 	case QSO_COPY_FOR_NET:
 		// Clone the QSO - get time, station and band from original QSO
 		qe->copy_qso_to_qso(qso, qso_entry::CF_TIME | qso_entry::CF_DATE | qso_entry::CF_RIG_ETC | qso_entry::CF_CAT);
 		qe->copy_clock_to_qso();
+		g_misc_->qso(current_qso(), current_number());
 		break;
 	case QSO_COPY_WSJTX:
 	case QSO_COPY_FLDIGI:
@@ -638,6 +690,7 @@ void qso_data::action_new_qso(record* qso, qso_init_t mode) {
 		qe->copy_default_to_qso();
 		qe->copy_clock_to_qso();
 		qe->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
+		g_misc_->qso(current_qso(), current_number());
 		break;
 	}
 	previous_mode_ = new_mode;
@@ -862,6 +915,7 @@ void qso_data::action_edit() {
 		logging_state_ = QSO_EDIT;
 	}
 	g_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
+	g_misc_->qso(current_qso(), current_number());
 	enable_widgets();
 }
 
@@ -872,6 +926,7 @@ void qso_data::action_view() {
 	logging_state_ = QSO_VIEW;
 	g_entry_->qso(qso_number);
 	g_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
+	g_misc_->qso(current_qso(), current_number());
 	enable_widgets();
 }
 
@@ -895,6 +950,7 @@ void qso_data::action_cancel_edit() {
 	g_entry_->delete_qso();
 	logging_state_ = edit_return_state_;
 	g_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
+	g_misc_->qso(current_qso(), current_number());
 	enable_widgets();
 }
 
@@ -904,6 +960,7 @@ void qso_data::action_cancel_browse() {
 	g_query_->clear_query();
 	logging_state_ = edit_return_state_;
 	g_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
+	g_misc_->qso(current_qso(), current_number());
 	enable_widgets();
 }
 
@@ -1119,6 +1176,7 @@ void qso_data::action_create_net() {
 		break;
 	}
 	g_net_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
+	g_misc_->qso(current_qso(), current_number());
 	// Now add the remaining QSOs in the net - first look earlier
 	qso_num_t other_number = qso_number - 1;
 	while (qso->match_records(book_->get_record(other_number, false)) == MT_OVERLAP) {
@@ -1126,6 +1184,7 @@ void qso_data::action_create_net() {
 		g_net_entry_->add_entry();
 		g_net_entry_->set_qso(other_number);
 		g_net_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
+		g_misc_->qso(current_qso(), current_number());
 		other_number--;
 	}
 	// Now look later
@@ -1135,6 +1194,7 @@ void qso_data::action_create_net() {
 		g_net_entry_->add_entry();
 		g_net_entry_->set_qso(other_number);
 		g_net_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
+		g_misc_->qso(current_qso(), current_number());
 		other_number++;
 	}
 	g_net_entry_->entry(w);
@@ -1235,6 +1295,7 @@ void qso_data::action_cancel_net_edit() {
 	}
 	else {
 		g_net_entry_->entry()->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
+		g_misc_->qso(current_qso(), current_number());
 		logging_state_ = NET_EDIT;
 	}
 	book_->enable_save(true, "Cancelled multi-QSO edit");
@@ -1287,6 +1348,7 @@ void qso_data::action_query_entry() {
 	logging_state_ = MANUAL_ENTRY;
 	g_qy_entry_->copy_default_to_qso();
 	g_qy_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
+	g_misc_->qso(current_qso(), current_number());
 	enable_widgets();
 }
 
@@ -1313,6 +1375,7 @@ void qso_data::action_exec_query() {
 		// Display the first record
 		g_entry_->qso(extract_records_->record_number(0));
 		g_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
+		g_misc_->qso(current_qso(), current_number());
 		enable_widgets();
 	}
 	else {

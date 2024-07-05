@@ -14,7 +14,7 @@ extern bool DARK;
 // Constructor
 qso_details::qso_details(int X, int Y, int W, int H, const char* L) :
 	Fl_Group(X, Y, W, H, L)
-	, callsign_("")
+	, qso_(nullptr)
 {
 	labelfont(FL_BOLD);
 	labelsize(FL_NORMAL_SIZE + 2);
@@ -56,8 +56,10 @@ void qso_details::create_form() {
 
 // Update and configure widgets
 void qso_details::enable_widgets() {
-	op_call_->value(callsign_.c_str());
-	get_qsos();
+	if (qso_) {
+		op_call_->value(qso_->item("CALL").c_str());
+		get_qsos();
+	}
 }
 
 // Get the previous QSOs with this callsign
@@ -66,13 +68,11 @@ void qso_details::get_qsos() {
 	set<string> qths;
 	set<string> locators;
 	set<qso_num_t> items;
-	qso_entry* qe = ancestor_view<qso_entry>(this);
-	record* qso = qe->qso();
 
 	// Scan the book for all records with this callsign
-	for (qso_num_t ix = 0; qso && ix < book_->size(); ix++) {
+	for (qso_num_t ix = 0; qso_ && ix < book_->size(); ix++) {
 		record* it = book_->get_record(ix, false);
-		if (it->item("CALL") == callsign_) {
+		if (it->item("CALL") == qso_->item("CALL")) {
 			// Get all NAME fields
 			string name = it->item("NAME");
 			if (name.length()) {
@@ -89,7 +89,7 @@ void qso_details::get_qsos() {
 				locators.insert(locator);
 			}
 			// Ignore current QSO
-			if (qso->timestamp() != it->timestamp()) {
+			if (qso_->timestamp() != it->timestamp()) {
 				items.insert(ix);
 			}
 		}
@@ -99,8 +99,8 @@ void qso_details::get_qsos() {
 }
 
 // Set the callsign
-void qso_details::set_call(string callsign) {
-	callsign_ = callsign;
+void qso_details::set_qso(record* qso) {
+	qso_ = qso;
 }
 
 // Constructor for details table
@@ -155,8 +155,7 @@ void qso_details::table_d::draw_cell(TableContext context, int R, int C, int X, 
 		fl_push_clip(X, Y, W, H);
 		{
 			// Get the details of the item
-			qso_entry* qe = ancestor_view<qso_entry>(this);
-			record* qso = qe->qso();
+			record* qso = ((qso_details*)parent())->qso_;
 			string s_value = "";
 			string field = name_map_.at(items_[R].type).field;
 			text = items_[R].value;
@@ -215,8 +214,7 @@ void qso_details::table_d::cb_table(Fl_Widget* w, void* v) {
 		int row = that->callback_row();
 		string field = that->name_map_.at(that->items_[row].type).field;
 		string value = that->items_[row].value;
-		qso_entry* qe = ancestor_view<qso_entry>(that);
-		record* qso = qe->qso();
+		record* qso = ((qso_details*)that->parent())->qso_;
 		qso->item(field, value);
 		book_->selection(-1, HT_CHANGED);
 	}
@@ -295,8 +293,7 @@ void qso_details::table_q::draw_cell(TableContext context, int R, int C, int X, 
 		fl_push_clip(X, Y, W, H);
 		{
 			// Get the details of the item
-			qso_entry* qe = ancestor_view<qso_entry>(this);
-			record* qso = qe->qso();
+			record* qso = ((qso_details*)parent())->qso_;
 			record* it = book_->get_record(items_[R], false);
 			string s_value = "";
 			string field;

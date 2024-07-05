@@ -26,7 +26,7 @@ public:
     void enable_widgets();
 
     // Set the call to display details for
-    void set_call(string name);
+    void set_qso(record* qso_);
 
 protected:
     // A table to show collected details about the contacted station 
@@ -101,8 +101,8 @@ protected:
 protected:
     // Search the book for the previous qSOs
     void get_qsos();
-    // Callsign of contacted station
-    string callsign_;
+    // Current QSO
+    record* qso_;
 
     //widgets
     Fl_Output* op_call_;

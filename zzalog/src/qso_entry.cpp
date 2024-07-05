@@ -137,18 +137,10 @@ void qso_entry::create_form(int X, int Y) {
 	// Clear QSO fields
 
 	curr_x = max_x;
-	curr_y = save_y;
-
-	// Add a set of tabs for more information on the QSO
-	misc_ = new qso_misc(curr_x, curr_y, WCHOICE + WINPUT + GAP, max_y - curr_y);
-	curr_x += misc_->w();
-	curr_y += misc_->h();
-	max_x = max(max_x, misc_->x() + misc_->w()) + GAP;
-	max_y = max(max_y, misc_->y() + misc_->h());
 
 	// nOtes input
 	curr_x = X + WCHOICE;
-	curr_y += HBUTTON;
+	curr_y += GAP;
 
 	// Input for the NOTES field of the QSO record
 	ip_notes_ = new intl_input(curr_x, curr_y, max_x - curr_x - GAP, HBUTTON, "NOTES");
@@ -175,7 +167,6 @@ void qso_entry::enable_widgets() {
 			ip_field_[ix]->deactivate();
 		}
 		ip_notes_->deactivate();
-		misc_->deactivate();
 		break;
 	case qso_data::QSO_PENDING:
 		// Waiting to start a QSO - activate all fields in use ...
@@ -195,8 +186,6 @@ void qso_entry::enable_widgets() {
 		ip_notes_->activate();
 		ip_notes_->color(FL_BACKGROUND2_COLOR);
 		ip_notes_->type(FL_NORMAL_INPUT);
-		misc_->activate();
-		misc_->enable_widgets();
 		break;
 	case qso_data::QSO_STARTED:
 	case qso_data::NET_STARTED:
@@ -222,8 +211,6 @@ void qso_entry::enable_widgets() {
 		ip_notes_->activate();
 		ip_notes_->color(FL_BACKGROUND2_COLOR);
 		ip_notes_->type(FL_NORMAL_INPUT);
-		misc_->activate();
-		misc_->enable_widgets();
 		break;
 	case qso_data::QSO_VIEW:
 		// Viewing a QSO - activate all fields in use, but don't enable data entry
@@ -243,8 +230,6 @@ void qso_entry::enable_widgets() {
 		ip_notes_->activate();
 		ip_notes_->color(FL_BACKGROUND_COLOR);
 		ip_notes_->type(FL_NORMAL_OUTPUT);
-		misc_->activate();
-		misc_->enable_widgets();
 		break;
 	case qso_data::MANUAL_ENTRY:
 		// Entering data for search - enable all fields in use...
@@ -264,7 +249,6 @@ void qso_entry::enable_widgets() {
 		ip_notes_->activate();
 		ip_notes_->color(FL_BACKGROUND2_COLOR);
 		ip_notes_->type(FL_NORMAL_INPUT);
-		misc_->deactivate();
 		break;
 	default:
 		// Reserver=d for Query states
@@ -322,10 +306,6 @@ void qso_entry::copy_qso_to_display(int flags) {
 		case qso_data::NET_EDIT:
 		case qso_data::NET_STARTED:
 			break;
-		}
-		if (flags == CF_ALL_FLAGS || (flags & CF_DETAILS)) {
-			misc_->qso(qso_, qso_number_);
-			misc_->enable_widgets();
 		}
 	}
 	else {

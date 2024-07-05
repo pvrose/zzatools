@@ -91,9 +91,9 @@ void qso_misc::save_values() {
 // set the QSO details into the various forms
 void qso_misc::qso(record* qso, qso_num_t number) {
 	qso_ = qso;
-	qth_->set_qth(qso_->item("APP_ZZA_QTH"));
-	details_->set_call(qso_->item("CALL"));
-	dxcc_->set_data();
+	qth_->set_qth(qso_ ? qso_->item("APP_ZZA_QTH") : "");
+	details_->set_qso(qso_);
+	dxcc_->set_data(qso);
 	qsl_->set_qso(qso_, number);
 }
 

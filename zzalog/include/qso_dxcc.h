@@ -66,7 +66,7 @@ public:
     void enable_widgets();
 
     // Set the data - parse the callsign in the current qso
-    void set_data();
+    void set_data(record* qso);
 
 protected:
 
@@ -101,6 +101,8 @@ protected:
     lat_long_t location_;
     // How has the callsign been parsed to get the DXCC - decoded or exception
     cty_data::parse_source_t source_;
+    // Current record
+    record* qso_;
 
     // BAnd worked
     band_set* bands_worked_;

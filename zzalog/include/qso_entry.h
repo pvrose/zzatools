@@ -2,7 +2,6 @@
 
 #include "book.h"
 #include "field_choice.h"
-#include "qso_misc.h"
 
 #include <map>
 #include <vector>
@@ -160,8 +159,6 @@ protected:
 	field_choice* ch_field_[NUMBER_TOTAL];
 	// field inputs
 	field_input* ip_field_[NUMBER_TOTAL];
-	// QTH Edit group
-	qso_misc* misc_;
 	// Parent qso_data
 	qso_data* qso_data_;
 	// Number of locked fields
