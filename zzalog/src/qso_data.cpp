@@ -96,7 +96,7 @@ void qso_data::create_form(int X, int Y) {
 	max_x = max(max_x, g_entry_->x() + g_entry_->w());
 	max_y = max(max_y, g_entry_->y() + g_entry_->h());
 	// Query form
-	g_query_ = new qso_query(curr_x, curr_y, 10, 10);
+	g_query_ = new qso_query(curr_x, curr_y, g_entry_->w(), g_entry_->h());
 
 	max_x = max(max_x, g_query_->x() + g_query_->w());
 	max_y = max(max_y, g_query_->y() + g_query_->h());
@@ -1013,6 +1013,7 @@ void qso_data::action_browse() {
 	qso_num_t qso_number = get_default_number();
 	logging_state_ = QSO_BROWSE;
 	g_query_->set_query("Browsing record",qso_number);
+	g_misc_->qso(current_qso(), current_number());
 	enable_widgets();
 }
 
@@ -1038,6 +1039,7 @@ void qso_data::action_query(logging_state_t query, qso_num_t match_number, qso_n
 		// TODO trap this sensibly
 		return;
 	}
+	g_misc_->qso(current_qso(), current_number());
 	logging_state_ = query;
 	enable_widgets();
 	g_buttons_->enable_widgets();

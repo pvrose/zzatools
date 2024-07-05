@@ -44,8 +44,8 @@ void qso_query::create_form(int X, int Y) {
 	labelsize(FL_NORMAL_SIZE + 2);
 	labelcolor(fl_lighter(FL_RED));
 
-	const int WTABLE = 420;
-	const int HTABLE = 250;
+	const int WTABLE = w() - GAP - GAP;
+	const int HTABLE = h() - HTEXT - GAP;
 
 	curr_x += GAP;
 	curr_y += HTEXT;
@@ -55,11 +55,7 @@ void qso_query::create_form(int X, int Y) {
 	tab_query_->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
 	tab_query_->callback(cb_tab_qso, nullptr);
 
-	curr_x += WTABLE + GAP;
-	curr_y += HTABLE + GAP;
-
 	resizable(nullptr);
-	size(curr_x - X, curr_y - Y);
 	end();
 }
 
