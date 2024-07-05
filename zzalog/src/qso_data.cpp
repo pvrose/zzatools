@@ -95,16 +95,16 @@ void qso_data::create_form(int X, int Y) {
 
 	max_x = max(max_x, g_entry_->x() + g_entry_->w());
 	max_y = max(max_y, g_entry_->y() + g_entry_->h());
-	// Query form
-	g_query_ = new qso_query(curr_x, curr_y, g_entry_->w(), g_entry_->h());
-
-	max_x = max(max_x, g_query_->x() + g_query_->w());
-	max_y = max(max_y, g_query_->y() + g_query_->h());
-
 	// Multiple QSO entry
 	g_net_entry_ = new qso_net_entry(curr_x, curr_y, 10, 10);
 	max_x = max(max_x, g_net_entry_->x() + g_net_entry_->w());
 	max_y = max(max_y, g_net_entry_->y() + g_net_entry_->h());
+
+	// Query form
+	g_query_ = new qso_query(curr_x, curr_y, g_net_entry_->w(), g_net_entry_->h());
+
+	max_x = max(max_x, g_query_->x() + g_query_->w());
+	max_y = max(max_y, g_query_->y() + g_query_->h());
 
 	// Manual QSO query - displays a qso_entry form
 	g_qy_entry_ = new qso_entry(curr_x, curr_y, 10, 10);
@@ -117,7 +117,10 @@ void qso_data::create_form(int X, int Y) {
 
 	// Misc info
 	curr_x = max_x + GAP;
-	g_misc_ = new qso_misc(curr_x, curr_y, WBUTTON * 7 / 2, max_y - curr_y);
+	g_misc_ = new qso_misc(curr_x, curr_y, WBUTTON * 7 / 2, g_net_entry_->h());
+
+	g_entry_->size(g_entry_->w(), g_net_entry_->h());
+	g_qy_entry_->size(g_entry_->w(), g_net_entry_->h());
 
 	max_x = max(max_x, g_misc_->x() + g_misc_->w());
 
