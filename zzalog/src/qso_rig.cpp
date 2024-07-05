@@ -1143,9 +1143,9 @@ void qso_rig::ticker() {
 // Static 1s ticker
 void qso_rig::cb_ticker(void* v) {
 	// temporarily remove onself from the ticker list as this may take for than 1 s
-	ticker_->remove_ticker(v);
+	ticker_->activate_ticker(v, false);
 	((qso_rig*)v)->ticker();
-	ticker_->add_ticker(v, cb_ticker, 10);
+	ticker_->activate_ticker(v, true);
 }
 
 // New rig 

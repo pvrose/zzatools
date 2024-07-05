@@ -153,6 +153,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="zzalog\src\band_data.cpp" />
+    <ClCompile Include="zzalog\src\fields.cpp" />
     <ClCompile Include="zzalog\src\font_dialog.cpp" />
     <ClCompile Include="zzalog\src\page_dialog.cpp" />
     <ClCompile Include="zzalog\src\qsl_display.cpp" />
@@ -181,6 +182,7 @@
     <ClCompile Include="zzalog\src\rpc_handler.cpp" />
     <ClCompile Include="zzalog\src\serial.cpp" />
     <ClCompile Include="zzalog\src\socket_server.cpp" />
+    <ClCompile Include="zzalog\src\ticker.cpp" />
     <ClCompile Include="zzalog\src\timestamp.cpp" />
     <ClCompile Include="zzalog\src\url_handler.cpp" />
     <ClCompile Include="zzalog\src\utils.cpp" />
@@ -233,7 +235,6 @@
     <ClCompile Include="zzalog\src\qso_manager.cpp" />
     <ClCompile Include="zzalog\src\tabbed_forms.cpp" />
     <ClCompile Include="zzalog\src\toolbar.cpp" />
-    <ClCompile Include="zzalog\src\tsv_writer.cpp" />
     <ClCompile Include="zzalog\src\user_dialog.cpp" />
     <ClCompile Include="zzalog\src\view.cpp" />
     <ClCompile Include="zzalog\src\web_dialog.cpp" />
@@ -275,6 +276,7 @@
     <ClInclude Include="zzalog\include\rpc_handler.h" />
     <ClInclude Include="zzalog\include\serial.h" />
     <ClInclude Include="zzalog\include\socket_server.h" />
+    <ClInclude Include="zzalog\include\ticker.h" />
     <ClInclude Include="zzalog\include\url_handler.h" />
     <ClInclude Include="zzalog\include\utils.h" />
     <ClInclude Include="zzalog\include\win_dialog.h" />
@@ -329,7 +331,6 @@
     <ClInclude Include="zzalog\include\qso_manager.h" />
     <ClInclude Include="zzalog\include\tabbed_forms.h" />
     <ClInclude Include="zzalog\include\toolbar.h" />
-    <ClInclude Include="zzalog\include\tsv_writer.h" />
     <ClInclude Include="zzalog\include\user_dialog.h" />
     <ClInclude Include="zzalog\include\view.h" />
     <ClInclude Include="zzalog\include\web_dialog.h" />

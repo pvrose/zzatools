@@ -25,18 +25,35 @@ void ticker::add_ticker(void* object, callback* cb, unsigned int interval) {
     ticker_entry* entry = new ticker_entry;
     entry->object = object;
     entry->tick = cb;
-    entry->period_ds = DEBUG_QUICK ? max(interval, 3000U) : interval;
+    entry->period_ds = DEBUG_QUICK ? min(interval, 3000U) : interval;
+    entry->active = true;
     tickers_.push_back(entry);
 }
 
 // Remove ticker
 void ticker::remove_ticker(void* object) {
     bool go_on = true;
+    auto itd = tickers_.begin();
     for (auto it = tickers_.begin(); it != tickers_.end() && go_on; it++) {
         if ((*it)->object == object) {
-            // We are removing this. it should be safe as we clear go_on
-            tickers_.erase(it);
+           go_on = false;
+           itd = it;
+        }
+    }
+    if (!go_on) {
+        // We are removing this. it should be safe as we clear go_on
+        tickers_.erase(itd);
+    }
+}
+
+// Activate ticker
+void ticker::activate_ticker(void* object, bool active) {
+    bool go_on = true;
+    auto it = tickers_.begin();
+    for (; it != tickers_.end() && go_on; it++) {
+        if ((*it)->object == object) {
             go_on = false;
+            (*it)->active = active;
         }
     }
 }
@@ -48,7 +65,9 @@ void ticker::cb_ticker(void * v) {
     for (auto it = that->tickers_.begin(); it != that->tickers_.end(); it++) {
         // Send ticks to all who need it at this time
         if (that->tick_count_ % (*it)->period_ds == 0) {
-            (*it)->tick((*it)->object);
+            if ((*it)->active) {
+                (*it)->tick((*it)->object);
+            }
         }
     }
     // Now repeat timer

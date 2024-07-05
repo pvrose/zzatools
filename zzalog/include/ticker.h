@@ -15,6 +15,7 @@ class ticker {
         void* object { nullptr };       // Pointer to the object - gets returned to the object
         callback* tick { nullptr };     // The static function to call
         unsigned int period_ds;         // Period in deciseconds
+        bool active;                    // Ticker active
     };
 
     public:
@@ -27,6 +28,8 @@ class ticker {
     void add_ticker(void* object, callback* cb, unsigned int interval);
     // Remove ticker
     void remove_ticker(void* object);
+    // Suspend/restart ticker
+    void activate_ticker(void* object, bool active);
     
     protected:
 

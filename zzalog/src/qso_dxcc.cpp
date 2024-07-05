@@ -26,6 +26,7 @@ qso_dxcc::qso_dxcc(int X, int Y, int W, int H, const char* L) :
 	Fl_Group(X, Y, W, H, L)
 	, bands_worked_(nullptr)
 	, modes_worked_(nullptr)
+	, qso_(nullptr)
 {
 	labelfont(FL_BOLD);
 	labelsize(FL_NORMAL_SIZE + 2);
