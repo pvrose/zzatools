@@ -5,6 +5,7 @@
 #include "import_data.h"
 #include "adi_reader.h"
 #include "url_handler.h"
+#include "fields.h"
 
 #include <deque>
 #include <queue>
@@ -26,7 +27,7 @@ using namespace std;
 	const char EQSL_TIMEFORMAT[] = "%Y%m%d";
 
 	// Default fiels to use in eqsl 
-	const set<string> EQSL_FIELDS = {
+	const field_list EQSL_FIELDS = {
 		"QSO_DATE",
 		"TIME_ON",
 	    "TIME_OFF",
@@ -176,7 +177,7 @@ using namespace std;
 		// Upload response queue
 		atomic<upload_response_t*> upload_response_;
 		// Set of field names
-		set<string> adif_fields_;
+		field_list adif_fields_;
 		
 		// Window and Help viewer for displaying response
 		Fl_Window* help_window_;

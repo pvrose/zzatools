@@ -346,7 +346,7 @@ void club_handler::thread_run(club_handler* that) {
 }
 
 // Convert this record to ADIF: uses adi_writer
-string club_handler::to_adif(record* this_record, set<string> &fields) {
+string club_handler::to_adif(record* this_record, field_list &fields) {
 	string result = "";
 	for (auto it = fields.begin(); it != fields.end(); it++) {
 		result += adi_writer::item_to_adif(this_record, *it) + " ";

@@ -4,6 +4,7 @@
 #include "book.h"
 #include "files.h"
 #include "spec_data.h"
+#include "fields.h"
 
 #include <string>
 #include <set>
@@ -23,9 +24,9 @@ using namespace std;
 		// public methods
 	public:
 		// write book to output stream
-		bool store_book(book* book, ostream& out, bool clean, set<string>* fields = nullptr);
+		bool store_book(book* book, ostream& out, bool clean, field_list* fields = nullptr);
 		// Convert record to ADIF format text and send to the output stream
-		static void to_adif(record* record, ostream& out, set<string>* fields = nullptr);
+		static void to_adif(record* record, ostream& out, field_list* fields = nullptr);
 		// Convert item to ADIF format text and send to the output stream
 		static string item_to_adif(record* record, string field);
 
@@ -35,7 +36,7 @@ using namespace std;
 		// protected methods
 	protected:
 		// write record to output stream
-		ostream & store_record(record* record, ostream& out, load_result_t& result, set<string>* fields = nullptr);
+		ostream & store_record(record* record, ostream& out, load_result_t& result, field_list* fields = nullptr);
 
 	protected:
 		bool clean_records_;

@@ -326,7 +326,7 @@ bool book::load_data(string filename)
 }
 
 // Store data - only if modified or force is true. If fields is defined only output specified fields
-bool book::store_data(string filename, bool force, set<string>* fields) {
+bool book::store_data(string filename, bool force, field_list* fields) {
 	bool ok = false;
 	if (save_in_progress_) {
 		// Race hazard - can instigate a second store before finished this one

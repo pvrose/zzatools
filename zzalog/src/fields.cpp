@@ -42,7 +42,7 @@ collection_t* fields::collection(string name, string source) {
 }
 
 // Get the collection named .. and if necessary pre-populate it
-collection_t* fields::collection(string name, set<string> values) {
+collection_t* fields::collection(string name, field_list values) {
     if (coll_map_.find(name) != coll_map_.end()) {
         // Return the named collection
         return coll_map_.at(name);
@@ -60,12 +60,12 @@ collection_t* fields::collection(string name, set<string> values) {
 }
 
 // Get the field names in the collection
-set<string> fields::field_names(string name) {
-    set<string> result;
+field_list fields::field_names(string name) {
+    field_list result;
     result.clear();
     collection_t* coll = collection(name);
     for (auto it = coll->begin(); it != coll->end(); it++) {
-        result.insert((*it).field);
+        result.push_back((*it).field);
     }
     return result;
 }

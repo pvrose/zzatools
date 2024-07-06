@@ -6,6 +6,7 @@
 #include "drawing.h"
 #include "search.h"
 #include "band.h"
+#include "fields.h"
 
 #include <string>
 #include <vector>
@@ -87,7 +88,7 @@ using namespace std;
 		// Load data
 		bool load_data(string filename);
 		// Store data - only if modified unless "force"d. Can specify limited fields
-		bool store_data(string filename = "", bool force = false, set<string>* fields = nullptr);
+		bool store_data(string filename = "", bool force = false, field_list* fields = nullptr);
 		// Get the current selected record
 		record* get_record();
 		// Set the numbered record and optionally select it

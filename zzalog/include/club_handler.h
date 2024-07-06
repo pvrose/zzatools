@@ -4,6 +4,7 @@
 #include "record.h"
 #include "book.h"
 #include "url_handler.h"
+#include "fields.h"
 
 #include <vector>
 #include <queue>
@@ -14,7 +15,7 @@
 #include <FL/Fl_Help_Dialog.H>
 
 	// Default fiels to use in Clublog 
-	const set<string> CLUBLOG_FIELDS = {
+	const field_list CLUBLOG_FIELDS = {
 		"QSO_DATE",
 		"TIME_ON",
 		"TIME_OFF",
@@ -64,7 +65,7 @@
 		// Get reference directory
 		void get_reference(string& dir_name);
 		// Copy QSO to ADIF string
-		string to_adif(record* this_record, set<string>& fields);
+		string to_adif(record* this_record, field_list& fields);
 		// thtread callback
 		static void cb_upload_done(void* v);
 		// thtead-side upload QSO
@@ -91,7 +92,7 @@
 		// Single QSO ADIF
 		string single_qso_;
 		// ADIF Fields
-		set<string> adif_fields_;
+		field_list adif_fields_;
 	};
 
 #endif

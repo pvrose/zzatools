@@ -6,6 +6,7 @@
 #include "files.h"
 #include "spec_data.h"
 #include "utils.h"
+#include "fields.h"
 
 #include <fstream>
 #include <ostream>
@@ -34,7 +35,7 @@ adi_writer::~adi_writer()
 }
 
 // write book to output stream. If fields is not null then only the specified fields
-bool adi_writer::store_book(book* out_book, ostream& out, bool clean, set<string>* fields /* = nullptr */) {
+bool adi_writer::store_book(book* out_book, ostream& out, bool clean, field_list* fields /* = nullptr */) {
 	// Takes a finite time so put the timer cursor up.
 	fl_cursor(FL_CURSOR_WAIT);
 	load_result_t result = LR_GOOD;
@@ -71,7 +72,7 @@ bool adi_writer::store_book(book* out_book, ostream& out, bool clean, set<string
 }
 
 // write record to output stream. If fields is not null, then only these fields. Output result not used
-ostream& adi_writer::store_record(record* record, ostream& out, load_result_t& result, set<string>* fields /* = nullptr */) {
+ostream& adi_writer::store_record(record* record, ostream& out, load_result_t& result, field_list* fields /* = nullptr */) {
 	// convert to text
 	to_adif(record, out, fields);
 	if (clean_records_) record->clean();
@@ -134,7 +135,7 @@ string adi_writer::item_to_adif(record* record, string field) {
 }
 
 // Convert record to ADIF format text
-void adi_writer::to_adif(record* record, ostream& out, set<string>* fields /* = nullptr */) {
+void adi_writer::to_adif(record* record, ostream& out, field_list* fields /* = nullptr */) {
 	string temp;
 
 	int len_line = 0;
@@ -147,8 +148,16 @@ void adi_writer::to_adif(record* record, ostream& out, set<string>* fields /* = 
 	for (auto it = record->begin(); it != record->end(); it++) {
 		string field = it->first;
 		string value = it->second;
+		bool in_filter = false;
+		if (fields) {
+			for (auto it = fields->begin(); it != fields->end() && !in_filter; it++) {
+				if ((*it) == field) {
+					in_filter = true;
+				}
+			}
+		}
 		// If field name is valid and either header record, no field filtering or the field is in the filter
-		if (field != "" && (record->is_header() || fields == nullptr || fields->find(field) != fields->end())) {
+		if (field != "" && (record->is_header() || fields == nullptr || in_filter)) {
 			// Test whether field name end in _INTL
 			if (field.length() > 5 && field.substr(field.length() - 5) == "_INTL") {
 				string non_intl_field = field.substr(0, field.length() - 5);

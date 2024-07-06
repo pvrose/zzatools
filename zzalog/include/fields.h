@@ -8,6 +8,7 @@
 #include <map>
 #include <set>
 #include <vector>
+#include <list>
 
 using namespace std;
 
@@ -69,6 +70,8 @@ const map<field_app_t, string> APPLICATION_LABELS = {
 
 // Field collection
 typedef vector<field_info_t> collection_t;
+// List of fields
+typedef list<string> field_list;
 
 class fields {
 
@@ -84,9 +87,9 @@ public:
 	// Get the collection named.. and if necessary copy the collection
 	collection_t* collection(string name, string source = "Default");
 	// Get the collection named .. and if necessary pre-populate it
-	collection_t* collection(string name, set<string> values);
+	collection_t* collection(string name, field_list values);
 	// Get the field names in the collection
-	set<string> field_names(string name);
+	field_list field_names(string name);
 
 	// Get the list of collection names
 	set<string> coll_names();

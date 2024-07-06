@@ -16,7 +16,7 @@
 	const char LOTW_TIMEFORMAT[] = "%Y-%m-%d %H:%M:%S";
 
 	// Default fiels to use in LotW 
-	const set<string> LOTW_FIELDS = {
+	const field_list LOTW_FIELDS = {
 		"CALL",
 		"QSO_DATE",
 		"TIME_ON",
@@ -75,7 +75,7 @@
 		// Upload response queue
 		atomic<int> upload_response_;
 		// ADIF Fields
-		set<string> adif_fields_;
+		field_list adif_fields_;
 
 	};
 #endif // !__LOTW_HANDLER__
