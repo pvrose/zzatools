@@ -50,7 +50,7 @@ using namespace std;
 		// The nature of the request
 		display_mode_t display_mode_;
 		// the fields to include
-		vector<string> fields_;
+		vector<string> display_fields_;
 
 	};
 #endif

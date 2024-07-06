@@ -64,7 +64,7 @@ const map<field_app_t, string> APPLICATION_LABELS = {
 	{ FO_NONE, "None" },
 	{ FO_MAINLOG, "Main Log" },
 	{ FO_EXTRACTLOG, "Extracted" },
-	{ FO_QSOVIEW, "Record browser" },
+	{ FO_QSOVIEW, "QSO Manager" },
 	{ FO_IMPORTLOG, "Imported data" }
 };
 

@@ -12,6 +12,7 @@
 
 extern Fl_Preferences* settings_;
 extern spec_data* spec_data_;
+extern fields* fields_;
 
 // Constructor
 record_table::record_table(int X, int Y, int W, int H, const char* label) :
@@ -22,7 +23,7 @@ record_table::record_table(int X, int Y, int W, int H, const char* label) :
 , display_mode_(NO_RECORD)
 
 {	// Set the various fixed attributes of the table
-	fields_.clear();
+	display_fields_.clear();
 	type(SELECT_SINGLE);
 	col_header(true);
 	col_resize(true);
@@ -61,7 +62,7 @@ void record_table::draw_cell(TableContext context, int R, int C, int X, int Y, i
 		{
 			fl_draw_box(FL_FLAT_BOX, X, Y, W, H, row_header_color());
 			// Use field name as header
-			string field_name = fields_[R];
+			string field_name = display_fields_[R];
 			if (display_mode_ == LOG_AND_QUERY && 
 				log_record_->item(field_name) != "" &&
 				query_record_->item(field_name) != "") {
@@ -183,7 +184,7 @@ void record_table::draw_cell(TableContext context, int R, int C, int X, int Y, i
 
 			// TEXT
 			fl_color(FL_FOREGROUND_COLOR);
-			string field_name = fields_[R];
+			string field_name = display_fields_[R];
 			switch (C) {
 			case 0:
 				switch(display_mode_) {
@@ -247,7 +248,7 @@ void record_table::set_records(record* log_record, record* query_record, record*
 	query_record_ = query_record;
 	saved_record_ = saved_record;
 	assess_fields();
-	rows(fields_.size());
+	rows(display_fields_.size());
 	row_height_all(ROW_HEIGHT);
 	if (log_record_ == NULL && query_record_ == NULL) {
 		// No record to display
@@ -280,53 +281,13 @@ void record_table::set_records(record* log_record, record* query_record, record*
 // Get the fields that will be displayed - those used in records being displayed plus the minimum set of records specified in settings
 void record_table::assess_fields() {
 	// Clear any existing fields
-	fields_.clear();
+	display_fields_.clear();
 
-	// Get the field_set for this view - this is the set of fields that will be
-	// displayed at the top of the table, followed by the remainder in alphabetical order
-	Fl_Preferences display_settings(settings_, "Display");
-	Fl_Preferences fields_settings(display_settings, "Fields");
-	char view_name[20];
-	// Get the name of the field_set for this application
-	sprintf(view_name, "App%d", FO_QSOVIEW);
-	char* field_set_name;
-	fields_settings.get(view_name, field_set_name, "Default");
-
-	// now get all the fields in the field_set
-	if (fields_settings.groups() > 0) {
-		// Settings has one or more field sets - get this one
-		Fl_Preferences field_set_settings(fields_settings, field_set_name);
-		int num_fields = field_set_settings.groups();
-		// For each field named in the field set
-		for (int i = 0; i < num_fields; i++) {
-			// Get the id of the field - numerical order
-			string field_id = field_set_settings.group(i);
-			// Get its settings - only interested in name
-			Fl_Preferences field_settings(field_set_settings, field_id.c_str());
-			char * temp;
-			field_settings.get("Name", temp, "");
-			string field_name = temp;
-			free(temp);
-			// if ((log_record_ != NULL && log_record_->item_exists(field_name)) ||
-			// 	(query_record_ != NULL && query_record_->item_exists(field_name))) {
-				// If the field has a valid entry in either record add it to the list to display
-				fields_.push_back(field_name);
-			// }
-		}
-		if (num_fields == 0) {
-			// No fields provided in the settings - use default field set
-			for (unsigned int i = 0; DEFAULT_FIELDS[i].field.size() > 0; i++) {
-				fields_.push_back(DEFAULT_FIELDS[i].field);
-			}
-		}
+	// Copy the fields from the collection
+	collection_t* ff = fields_->collection(FO_QSOVIEW);
+	for (auto it = ff->begin(); it != ff->end(); it++) {
+		display_fields_.push_back(it->field);
 	}
-	else {
-		// No field sets provided in the settings - use te default field set
-		for (unsigned int i = 0; DEFAULT_FIELDS[i].field.size() > 0; i++) {
-			fields_.push_back(DEFAULT_FIELDS[i].field);
-		}
-	}
-	free(field_set_name);
 
 	// now add all the remaining fields from the log record
 	if (log_record_ != NULL) {
@@ -334,14 +295,14 @@ void record_table::assess_fields() {
 		for (auto it = log_record_->begin(); it != log_record_->end(); it++) {
 			bool found = false;
 			// Compare against each field alteady selected
-			for (unsigned int i = 0; i < fields_.size() && !found; i++) {
-				if (fields_[i] == it->first) {
+			for (unsigned int i = 0; i < display_fields_.size() && !found; i++) {
+				if (display_fields_[i] == it->first) {
 					found = true;
 				}
 			}
 			if (!found) {
 				// Not already selected - add it to the list of fields to display
-				fields_.push_back(it->first);
+				display_fields_.push_back(it->first);
 			}
 		}
 	}
@@ -352,14 +313,14 @@ void record_table::assess_fields() {
 		for (auto it = query_record_->begin(); it != query_record_->end(); it++) {
 			bool found = false;
 			// Compare against each field already selected
-			for (unsigned int i = 0; i < fields_.size() && !found; i++) {
-				if (fields_[i] == it->first) {
+			for (unsigned int i = 0; i < display_fields_.size() && !found; i++) {
+				if (display_fields_[i] == it->first) {
 					found = true;
 				}
 			}
 			if (!found) {
 				// Not already selected - add it to the list of fields to display
-				fields_.push_back(it->first);
+				display_fields_.push_back(it->first);
 			}
 		}
 	}
@@ -367,5 +328,5 @@ void record_table::assess_fields() {
 
 // Return the field in specified row.
 string record_table::field(int row) {
-	return fields_[row];
+	return display_fields_[row];
 }
