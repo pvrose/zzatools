@@ -71,7 +71,7 @@ const map<field_app_t, string> APPLICATION_LABELS = {
 // Field collection
 typedef vector<field_info_t> collection_t;
 // List of fields
-typedef list<string> field_list;
+typedef vector<string> field_list;
 
 class fields {
 

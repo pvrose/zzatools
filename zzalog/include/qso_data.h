@@ -7,6 +7,7 @@
 #include "qso_net_entry.h"
 #include "field_choice.h"
 #include "book.h"
+#include "fields.h"
 
 #include <string>
 #include <set>
@@ -23,6 +24,25 @@
 #include <FL/Fl_Window.H>
 
 using namespace std;
+
+// Default field sets
+static const field_list QSO_FIELDS = {
+	"QSO_DATE",
+	"TIME_ON",
+	"TIME_OFF",
+	"CALL",
+	"FREQ",
+	"MODE",
+	"TX_PWR"
+};
+// Default fixed fields
+static const field_list STN_FIELDS = {
+	"MY_RIG",
+	"MY_ANTENNA",
+	"APP_ZZA_QTH",
+	"STATION_CALLSIGN"
+};
+
 
 // This data contains the various QSO viewer and editor classes
 class qso_data :

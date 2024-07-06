@@ -7,6 +7,7 @@
 #include "tabbed_forms.h"
 #include "book.h"
 #include "ticker.h"
+#include "fields.h"
 
 extern status* status_;
 extern spec_data* spec_data_;
@@ -14,12 +15,13 @@ extern tabbed_forms* tabbed_forms_;
 extern book* book_;
 extern bool DARK;
 extern ticker* ticker_;
+extern fields* fields_;
 
 extern double prev_freq_;
 
 // Map showing what fields to display for what usage
 // Used for contest, but not currently used
-map <string, vector<string> > qso_entry::field_map_;
+collection_t* qso_entry::field_map_ = nullptr;
 
 // Constructor
 qso_entry::qso_entry(int X, int Y, int W, int H, const char* L) :
@@ -116,15 +118,12 @@ void qso_entry::create_form(int X, int Y) {
 		if (ix < NUMBER_FIXED) {
 			// For a fixed field add the name of the field as a label where
 			// the field choice would have been
-			ip_field_[ix]->field_name(fixed_names_[ix].c_str(), qso_);
-			field_ip_map_[fixed_names_[ix]] = ix;
-			field_names_[ix] = fixed_names_[ix];
-			ip_field_[ix]->label(fixed_names_[ix].c_str());
+			string name = STN_FIELDS[ix];
+			ip_field_[ix]->field_name(name.c_str(), qso_);
+			field_ip_map_[name] = ix;
+			ip_field_[ix]->copy_label(name.c_str());
 		}
-		else {
-			field_names_[ix] = "";
-		}
-		number_fields_in_use_ = NUMBER_FIXED;
+
 		curr_x += ip_field_[ix]->w() + GAP;
 		if (ix % NUMBER_PER_ROW == (NUMBER_PER_ROW - 1)) {
 			max_x = max(max_x, curr_x);
@@ -170,7 +169,7 @@ void qso_entry::enable_widgets() {
 		break;
 	case qso_data::QSO_PENDING:
 		// Waiting to start a QSO - activate all fields in use ...
-		for (int ix = 0; ix <= number_fields_in_use_ && ix < NUMBER_TOTAL; ix++) {
+		for (int ix = 0; ix <= fields_in_use_.size() && ix < NUMBER_TOTAL; ix++) {
 			if (ch_field_[ix])
 				if (ix < number_locked_ + NUMBER_FIXED) ch_field_[ix]->deactivate();
 				else ch_field_[ix]->activate();
@@ -179,7 +178,7 @@ void qso_entry::enable_widgets() {
 			ip_field_[ix]->type(FL_NORMAL_INPUT);
 		}
 		// ... and deactivate the others
-		for (int ix = number_fields_in_use_ + 1; ix < NUMBER_TOTAL; ix++) {
+		for (int ix = fields_in_use_.size() + 1; ix < NUMBER_TOTAL; ix++) {
 			ch_field_[ix]->deactivate();
 			ip_field_[ix]->deactivate();
 		}
@@ -195,7 +194,7 @@ void qso_entry::enable_widgets() {
 	case qso_data::NET_EDIT:
 	case qso_data::QSO_ENTER:
 		// Entering a QSO - activate all fields in use ...
-		for (int ix = 0; ix <= number_fields_in_use_ && ix < NUMBER_TOTAL; ix++) {
+		for (int ix = 0; ix <= fields_in_use_.size() && ix < NUMBER_TOTAL; ix++) {
 			if (ch_field_[ix])
 				if (ix < number_locked_ + NUMBER_FIXED) ch_field_[ix]->deactivate();
 				else ch_field_[ix]->activate();
@@ -204,7 +203,7 @@ void qso_entry::enable_widgets() {
 			ip_field_[ix]->type(FL_NORMAL_INPUT);
 		}
 		// ... and deactivate the others
-		for (int ix = number_fields_in_use_ + 1; ix < NUMBER_TOTAL; ix++) {
+		for (int ix = fields_in_use_.size() + 1; ix < NUMBER_TOTAL; ix++) {
 			ch_field_[ix]->deactivate();
 			ip_field_[ix]->deactivate();
 		}
@@ -214,7 +213,7 @@ void qso_entry::enable_widgets() {
 		break;
 	case qso_data::QSO_VIEW:
 		// Viewing a QSO - activate all fields in use, but don't enable data entry
-		for (int ix = 0; ix <= number_fields_in_use_ && ix < NUMBER_TOTAL; ix++) {
+		for (int ix = 0; ix <= fields_in_use_.size() && ix < NUMBER_TOTAL; ix++) {
 			if (ch_field_[ix])
 				if (ix < number_locked_ + NUMBER_FIXED) ch_field_[ix]->deactivate();
 				else ch_field_[ix]->activate();
@@ -223,7 +222,7 @@ void qso_entry::enable_widgets() {
 			ip_field_[ix]->type(FL_NORMAL_OUTPUT);
 		}
 		// Deactivate all field not in use
-		for (int ix = number_fields_in_use_ + 1; ix < NUMBER_TOTAL; ix++) {
+		for (int ix = fields_in_use_.size() + 1; ix < NUMBER_TOTAL; ix++) {
 			ch_field_[ix]->deactivate();
 			ip_field_[ix]->deactivate();
 		}
@@ -233,7 +232,7 @@ void qso_entry::enable_widgets() {
 		break;
 	case qso_data::MANUAL_ENTRY:
 		// Entering data for search - enable all fields in use...
-		for (int ix = 0; ix <= number_fields_in_use_ && ix < NUMBER_TOTAL; ix++) {
+		for (int ix = 0; ix <= fields_in_use_.size() && ix < NUMBER_TOTAL; ix++) {
 			if (ch_field_[ix])
 				if (ix < number_locked_ + NUMBER_FIXED) ch_field_[ix]->deactivate();
 				else ch_field_[ix]->activate();
@@ -242,7 +241,7 @@ void qso_entry::enable_widgets() {
 			ip_field_[ix]->type(FL_NORMAL_INPUT);
 		}
 		// ... and deactivate all those not in use
-		for (int ix = number_fields_in_use_ + 1; ix < NUMBER_TOTAL; ix++) {
+		for (int ix = fields_in_use_.size() + 1; ix < NUMBER_TOTAL; ix++) {
 			ch_field_[ix]->deactivate();
 			ip_field_[ix]->deactivate();
 		}
@@ -266,7 +265,7 @@ void qso_entry::copy_qso_to_display(int flags) {
 		// For each field input
 		for (int i = 0; i < NUMBER_TOTAL; i++) {
 			string field;
-			if (i < NUMBER_FIXED) field = fixed_names_[i];
+			if (i < NUMBER_FIXED) field = STN_FIELDS[i];
 			else field = ch_field_[i]->value();
 			if (field.length()) {
 				if (flags == CF_ALL_FLAGS) {
@@ -312,7 +311,7 @@ void qso_entry::copy_qso_to_display(int flags) {
 		// Clear all fields
 		for (int i = 0; i < NUMBER_TOTAL; i++) {
 			string field;
-			if (i < NUMBER_FIXED) field = fixed_names_[i];
+			if (i < NUMBER_FIXED) field = STN_FIELDS[i];
 			else field = ch_field_[i]->value();
 			if (field.length()) {
 				ip_field_[i]->value("");
@@ -518,37 +517,30 @@ void qso_entry::clear_qso() {
 void qso_entry::initialise_field_map() {
 	field_ip_map_.clear();
 	for (int ix = 0; ix < NUMBER_FIXED; ix++) {
-		field_ip_map_[fixed_names_[ix]] = ix;
+		field_ip_map_[STN_FIELDS[ix]] = ix;
+		fields_in_use_[ix] = STN_FIELDS[ix];
 	}
 }
 
 // Initialise fields
 void qso_entry::initialise_fields() {
 	// Now set fields
-	string contest = qso_ ? qso_->item("CONTEST_ID") : "";
-	if (contest == "") {
-		if (field_map_.find("None") == field_map_.end()) {
-			field_map_["None"] = DEFAULT_NONTEST;
-		}
-		contest = "None";
-	} else {
-		if (field_map_.find(contest) == field_map_.end()) {
-			field_map_[contest] = DEFAULT_CONTEST;
-		}
-	}
-	vector<string>& field_names = field_map_.at(contest);
+	// TODO: this is where we configure for context
+	field_map_ = fields_->collection(fields_->coll_name(FO_QSOVIEW));
+	fields_in_use_.resize(field_map_->size() + NUMBER_FIXED);
 	// Clear field map
 	initialise_field_map();
 	size_t ix = 0;
 	int iy;
 	// For non-fixed fields - set field name into field choice and populate
 	// drop-down menu into field input with permitted values
-	for (ix = 0, iy = NUMBER_FIXED; ix < field_names.size(); ix++, iy++) {
-		ch_field_[iy]->value(field_names[ix].c_str());
-		ip_field_[iy]->field_name(field_names[ix].c_str(), qso_);
-		field_names_[iy] = field_names[ix];
+	for (ix = 0, iy = NUMBER_FIXED; ix < field_map_->size(); ix++, iy++) {
+		string name = (*field_map_)[ix].field;
+		ch_field_[iy]->value(name.c_str());
+		ip_field_[iy]->field_name(name.c_str(), qso_);
+		field_ip_map_[name] = iy;
+		fields_in_use_[iy] = name;
 	}
-	number_fields_in_use_ = iy;
 	// And removed such info for inputs that are not used
 	for (; iy < NUMBER_TOTAL; iy++) {
 		ch_field_[iy]->value("");
@@ -561,35 +553,34 @@ void qso_entry::initialise_fields() {
 void qso_entry::initialise_values() {
 	string contest = qso_ ? qso_->item("CONTEST_ID") : "";
 	if (contest == "") contest = "None";
-	vector<string>& fields = field_map_.at(contest);
 	int ix = NUMBER_FIXED;
-	for (size_t i = 0; i < fields.size(); i++, ix++) {
+	for (size_t i = 0; i < fields_in_use_.size(); i++, ix++) {
 		if (qso_) {
-			if (contest != "None") {
-				string contest_mode = spec_data_->dxcc_mode(qso_->item("MODE"));
-				if (fields[i] == "RST_SENT" || fields[i] == "RST_RCVD") {
-					if (contest_mode == "CW" || contest_mode == "DATA") {
-						qso_->item(fields[i], string("599"));
-					}
-					else {
-						qso_->item(fields[i], string("59"));
-					}
-				}
-				else if (fields[i] == "STX") {
-					char text[10];
-					snprintf(text, 10, "%03d", ++previous_serial_);
-					qso_->item(fields[i], string(text));
-				}
-				if (fields[i] == "CALL") {
-					ip_field_[ix]->value("");
-				}
-				else {
-					ip_field_[ix]->value(qso_->item(fields[i]).c_str());
-				}
-			}
-			else {
-				ip_field_[ix]->value(qso_->item(fields[i]).c_str());
-			}
+			//if (contest != "None") {
+			//	string contest_mode = spec_data_->dxcc_mode(qso_->item("MODE"));
+			//	if (fields[i] == "RST_SENT" || fields[i] == "RST_RCVD") {
+			//		if (contest_mode == "CW" || contest_mode == "DATA") {
+			//			qso_->item(fields[i], string("599"));
+			//		}
+			//		else {
+			//			qso_->item(fields[i], string("59"));
+			//		}
+			//	}
+			//	else if (fields[i] == "STX") {
+			//		char text[10];
+			//		snprintf(text, 10, "%03d", ++previous_serial_);
+			//		qso_->item(fields[i], string(text));
+			//	}
+			//	if (fields[i] == "CALL") {
+			//		ip_field_[ix]->value("");
+			//	}
+			//	else {
+			//		ip_field_[ix]->value(qso_->item(fields[i]).c_str());
+			//	}
+			//}
+			//else {
+				ip_field_[ix]->value(qso_->item(fields_in_use_[i]).c_str());
+			//}
 		}
 		else {
 			ip_field_[ix]->value("");
@@ -618,13 +609,13 @@ string qso_entry::get_defined_fields() {
 
 // Action add field - add the selected field to the set of entries
 void qso_entry::action_add_field(int ix, string field) {
-	if (ix == -1 && number_fields_in_use_ == NUMBER_TOTAL) {
+	if (ix == -1 && fields_in_use_.size() == NUMBER_TOTAL) {
 		char msg[128];
 		snprintf(msg, 128, "DASH: Cannot add any more fields to edit - %s ignored", field.c_str());
 		status_->misc_status(ST_ERROR, msg);
 	}
-	else if (ix >= 0 && ix < number_fields_in_use_) {
-		const char* old_field = field_names_[ix].c_str();
+	else if (ix >= 0 && ix < fields_in_use_.size()) {
+		const char* old_field = fields_in_use_[ix].c_str();
 		ip_field_[ix]->field_name(field.c_str(), qso_);
 		ip_field_[ix]->value(qso_->item(field).c_str());
 		// Change mapping
@@ -632,16 +623,16 @@ void qso_entry::action_add_field(int ix, string field) {
 			field_ip_map_.erase(old_field);
 		}
 		field_ip_map_[field] = ix;
-		field_names_[ix] = field;
+		(*field_map_)[ix].field = field;
 	}
-	else if (ix == number_fields_in_use_) {
+	else if (ix == fields_in_use_.size()) {
 		if (field_ip_map_.find(field) == field_ip_map_.end()) {
-			ch_field_[number_fields_in_use_]->value(field.c_str());
-			ip_field_[number_fields_in_use_]->field_name(field.c_str(), qso_);
-			ip_field_[number_fields_in_use_]->value(qso_->item(field).c_str());
-			field_ip_map_[field] = number_fields_in_use_;
-			field_names_[number_fields_in_use_] = field;
-			number_fields_in_use_++;
+			ch_field_[fields_in_use_.size()]->value(field.c_str());
+			ip_field_[fields_in_use_.size()]->field_name(field.c_str(), qso_);
+			ip_field_[fields_in_use_.size()]->value(qso_->item(field).c_str());
+			field_ip_map_[field] = fields_in_use_.size();
+			field_map_->push_back({ field, field, 50 });
+			fields_in_use_.push_back(field);
 		}
 		else {
 			char msg[128];
@@ -654,39 +645,30 @@ void qso_entry::action_add_field(int ix, string field) {
 	}
 
 	// Save the altered field names
-	string contest = qso_ ? qso_->item("CONTEST_ID") : "";
-	if (contest == "") contest = "None";
-	field_map_[contest].clear();
-	for (int iy = NUMBER_FIXED; iy < number_fields_in_use_; iy++) {
-		field_map_[contest].push_back(field_names_[iy]);
-	}
 	enable_widgets();
 }
 
 // Delete a field
 void qso_entry::action_del_field(int ix) {
-	string& old_field = field_names_[ix];
+	int iy = ix - NUMBER_FIXED;
+	string& old_field = (*field_map_)[iy].field;
+	int ip = field_ip_map_[old_field];
 	field_ip_map_.erase(old_field);
 	int pos = ix;
-	for (; pos < number_fields_in_use_ - 1; pos++) {
-		string& field = field_names_[pos + 1];
-		field_names_[pos] = field;
+	for (; pos < fields_in_use_.size() - 1; pos++) {
+		int posy = pos - NUMBER_FIXED;
+		string& field = (*field_map_)[posy + 1].field;
+		(*field_map_)[posy].field = field;
 		ch_field_[pos]->value(field.c_str());
 		ip_field_[pos]->field_name(field.c_str(), qso_);
 		ip_field_[pos]->value(qso_->item(field).c_str());
+		fields_in_use_[pos] = field;
 	}
 	ch_field_[pos]->value("");
 	ip_field_[pos]->field_name("");
 	ip_field_[pos]->value("");
-	number_fields_in_use_--;
-
-	// Save the altered field names
-	string contest = qso_ ? qso_->item("CONTEST_ID") : "";
-	if (contest == "") contest = "None";
-	field_map_[contest].clear();
-	for (int iy = NUMBER_FIXED; iy < number_fields_in_use_; iy++) {
-		field_map_[contest].push_back(field_names_[iy]);
-	}
+	field_map_->resize(field_map_->size() - 1);
+	fields_in_use_.resize(fields_in_use_.size() - 1);
 
 	enable_widgets();
 }

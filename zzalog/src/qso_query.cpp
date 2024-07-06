@@ -3,8 +3,10 @@
 #include "record_table.h"
 #include "qso_data.h"
 #include "book.h"
+#include "fields.h"
 
 extern book* book_;
+extern fields* fields_;
 
 // Constrctor
 qso_query::qso_query(int X, int Y, int W, int H, const char* L) :

@@ -2,6 +2,7 @@
 
 #include "book.h"
 #include "field_choice.h"
+#include "fields.h"
 
 #include <map>
 #include <vector>
@@ -11,10 +12,6 @@
 #include <FL/Fl_Input.H>
 
 class qso_data;
-
-// Default field sets - contest
-static vector<string> DEFAULT_CONTEST = {"RST_RCVD","SRX","RST_SENT","STX"};
-static vector<string> DEFAULT_NONTEST = {"RST_RCVD","RST_SENT","NAME","QTH","GRIDSQUARE"};
 
 // A class that allows the entry of a QSO
 class qso_entry :
@@ -55,24 +52,17 @@ public:
 	const set < copy_flags > COPY_SET = { CF_RIG_ETC, CF_CAT, CF_DATE, CF_TIME, CF_CALL, CF_DETAILS, CF_REPORTS };
 
 	// Loggable field names
-	static const int NUMBER_FIXED = 11;
-	static const int NUMBER_TOTAL = NUMBER_FIXED + 13;
+	static const int NUMBER_FIXED = 4;
+	static const int NUMBER_TOTAL = NUMBER_FIXED + 20;
 
 	// Variable fields - per usage
-	static map <string, vector<string> > field_map_;
+	static collection_t* field_map_;
 
 protected:
-	// The fields that are always present in QSO Entry
-	const string fixed_names_[NUMBER_FIXED] = {
-		"MY_RIG", "MY_ANTENNA", "APP_ZZA_QTH", "STATION_CALLSIGN",
-		"QSO_DATE", "TIME_ON", "TIME_OFF", "CALL", "FREQ",
-		"MODE", "TX_PWR" };
 	// Maps fieldname to index of the Input used for its value
 	map<string, int> field_ip_map_;
-	// All the field names that are being displayed
-	string field_names_[NUMBER_TOTAL];
-	// How many inputs are currently in use.
-	int number_fields_in_use_;
+	// Used field list
+	field_list fields_in_use_;
 
 public:
     qso_entry(int X, int Y, int W, int H, const char* L = nullptr);

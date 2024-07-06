@@ -32,6 +32,7 @@ extern wsjtx_handler* wsjtx_handler_;
 extern menu* menu_;
 extern double prev_freq_;
 extern bool DARK;
+extern fields* fields_;
 
 // qso_group_
 qso_data::qso_data(int X, int Y, int W, int H, const char* l) :
@@ -41,6 +42,10 @@ qso_data::qso_data(int X, int Y, int W, int H, const char* l) :
 	, previous_mode_(QSO_NONE)
 	, edit_return_state_(QSO_INACTIVE)
 {
+	// Register default field names for qso_entry and qso_query
+	fields_->collection("QSO Manager", QSO_FIELDS);
+	fields_->link_app(FO_QSOVIEW, "QSO Manager");
+
 	load_values();
 }
 
@@ -50,19 +55,19 @@ qso_data::~qso_data() {
 
 // Load values
 void qso_data::load_values() {
-	// Dashboard configuration
-	Fl_Preferences dash_settings(settings_, "Dashboard");
-	// Read field settings
-	Fl_Preferences field_settings(dash_settings, "Field Lists");
-	int num_contests = field_settings.entries();
-	for (int ix = 0; ix < num_contests; ix++) {
-		string contest = field_settings.entry(ix);
-		char* fields;
-		field_settings.get(field_settings.entry(ix), fields, "");
-		if (strlen(fields) > 0) {
-			split_line(string(fields), 	qso_entry::field_map_[contest], ',');
-		}
-	}
+	//// Dashboard configuration
+	//Fl_Preferences dash_settings(settings_, "Dashboard");
+	//// Read field settings
+	//Fl_Preferences field_settings(dash_settings, "Field Lists");
+	//int num_contests = field_settings.entries();
+	//for (int ix = 0; ix < num_contests; ix++) {
+	//	string contest = field_settings.entry(ix);
+	//	char* fields;
+	//	field_settings.get(field_settings.entry(ix), fields, "");
+	//	if (strlen(fields) > 0) {
+	//		split_line(string(fields), 	qso_entry::field_map_[contest], ',');
+	//	}
+	//}
 	// Set logging mode -default is On-air with or without rig connection
 	rig_if* rig = ((qso_manager*)parent())->rig();
 	bool have_rig = rig && rig->is_good();
@@ -593,14 +598,14 @@ void qso_data::enter_modem_qso(record* qso) {
 
 // Save the settings
 void qso_data::save_values() {
-	// Dashboard configuration
-	Fl_Preferences dash_settings(settings_, "Dashboard");
-	// Read field settings
-	Fl_Preferences field_settings(dash_settings, "Field Lists");
-	for (auto ix = qso_entry::field_map_.begin(); ix != qso_entry::field_map_.end(); ix++) {
-		field_settings.set(ix->first.c_str(), join_line(ix->second, ',').c_str());
-	}
-	settings_->flush();
+	//// Dashboard configuration
+	//Fl_Preferences dash_settings(settings_, "Dashboard");
+	//// Read field settings
+	//Fl_Preferences field_settings(dash_settings, "Field Lists");
+	//for (auto ix = qso_entry::field_map_.begin(); ix != qso_entry::field_map_.end(); ix++) {
+	//	field_settings.set(ix->first.c_str(), join_line(ix->second, ',').c_str());
+	//}
+	//settings_->flush();
 }
 
 string qso_data::get_defined_fields() {
