@@ -2,9 +2,9 @@
 #define __WEB_DIALOG__
 
 #include "page_dialog.h"
-#include "calendar.h"
 #include "callback.h"
 #include "intl_widgets.h"
+#include "input_cal.h"
 
 #include <string>
 #include <ctime>
@@ -73,10 +73,6 @@ using namespace std;
 		Fl_Group* grp_wsjtx_;
 		Fl_Group* grp_fldigi_;
 
-		// Callback data for eQSL calendars
-		cal_cb_data_t eqsl_cal_cb_data_;
-		// Callback data for LotW calendars
-		cal_cb_data_t lotw_cal_cb_data_;
 
 		// eQSL attributes
 
