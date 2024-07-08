@@ -58,8 +58,8 @@ status::status() :
 		delete chooser;
 	}
 
-	// Set 200 ms ticker
-	ticker_->add_ticker(this, cb_ticker, 2);
+	// Set 500 ms ticker
+	ticker_->add_ticker(this, cb_ticker, 5);
 
 }
 
