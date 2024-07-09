@@ -373,6 +373,7 @@ void fields_dialog::enable_widgets() {
     // Update displayed data dependant on application
     ch_app_->value((int)application_);
     ch_coll_->value(collection_.c_str());
+    ch_coll_->update_menubutton();
     collection_t* coll = fields_->collection(collection_);
     table_->data(coll);
     // Inhibit up or down buttons
@@ -410,10 +411,16 @@ void fields_dialog::cb_application(Fl_Widget* w, void* v) {
 void fields_dialog::cb_collection(Fl_Widget* w, void* v) {
     Fl_Input_Choice* ch = (Fl_Input_Choice*)w;
     fields_dialog* that = ancestor_view<fields_dialog>(w);
-    that->collection_ = ch->value();
     if (ch->menubutton()->changed() == 0) {
         // New collection - initialise as copy of "Default"
+        that->collection_ = ch->value();
         (void)fields_->collection(that->collection_, "Default");
+    }
+    else {
+        char* temp = new char[32];
+        ch->menubutton()->item_pathname(temp, 32);
+        if (*temp == '/') that->collection_ = temp + 1;
+        else that->collection_ = temp;
     }
     // Delete linkage
     that->linked_ = false;
