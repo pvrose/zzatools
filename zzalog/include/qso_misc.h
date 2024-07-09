@@ -5,6 +5,7 @@
 #include "qso_details.h"
 #include "qso_dxcc.h"
 #include "qso_qsl_vwr.h"
+#include "qso_contest.h"
 
 #include <FL/Fl_Tabs.H>
 
@@ -27,6 +28,8 @@ public:
 
 	// Set the QSO and QSO number to all objects
 	void qso(record* qso, qso_num_t qso_number);
+	// Return the contest dialog
+	qso_contest* contest();
 
 protected:
 	// callback when t he tab is changed
@@ -40,6 +43,8 @@ protected:
 	qso_details* details_;
 	qso_dxcc* dxcc_;
 	qso_qsl_vwr* qsl_;
+	qso_contest* contest_;
+
 	// Used to reopen the tab that was opened when the app was shut down
 	int default_tab_;
 };

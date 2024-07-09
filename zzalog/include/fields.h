@@ -10,6 +10,8 @@
 #include <vector>
 #include <list>
 
+#include <FL/Fl_Preferences.H>
+
 using namespace std;
 
 // Column info 
@@ -85,7 +87,7 @@ public:
 	// Get the collection for the application
 	collection_t* collection(field_app_t app);
 	// Get the collection named.. and if necessary copy the collection
-	collection_t* collection(string name, string source = "Default");
+	collection_t* collection(string name, string source = "Default", bool* copied = nullptr);
 	// Get the collection named .. and if necessary pre-populate it
 	collection_t* collection(string name, field_list values);
 	// Get the field names in the collection
@@ -107,6 +109,8 @@ protected:
 	void load_data();
 	// Store settings
 	void store_data();
+	// Load collections
+	void add_collections(Fl_Preferences& settings, string name);
 
 	// The data - mapping app to collection name
 	map<field_app_t, string> app_map_;

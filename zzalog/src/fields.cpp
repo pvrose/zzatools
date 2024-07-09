@@ -24,12 +24,14 @@ collection_t* fields::collection(field_app_t app) {
 }
 
 // Get the collection named.. and if necessary copy the collection
-collection_t* fields::collection(string name, string source) {
+collection_t* fields::collection(string name, string source, bool* copied) {
     if (coll_map_.find(name) != coll_map_.end()) {
         // Return the named collection
+        if (copied) *copied = false;
         return coll_map_.at(name);
     } else {
         // Create named collection by copying from source and return it
+        if (copied) *copied = true;
         if (coll_map_.find(source) != coll_map_.end()) {
             collection_t* coll = new collection_t(*coll_map_.at(source));
             coll_map_[name] = coll;
@@ -96,35 +98,7 @@ void fields::load_data() {
     }
 	coll_map_.clear();
 	// Read all the field field sets
-    // For all the field sets in the settings
-    for (int i = 0; i < num_field_sets; i++) {
-        collection_t* field_set = new collection_t;
-        // Get the name of the i'th field set
-        string colln_name = fields_settings.group(i);
-        Fl_Preferences colln_settings(fields_settings, colln_name.c_str());
-        // Create an initial array for the number of fields in the settings
-        int num_fields = colln_settings.groups();
-        field_set->resize(num_fields);
-        // For each field in the field set
-        for (int j = 0; j < num_fields; j++) {
-            // Read the field info: name, width and heading from the settings
-            field_info_t field;
-            string field_id = colln_settings.group(j);
-            int field_num = stoi(field_id.substr(6)); // "Field n"
-            Fl_Preferences field_settings(colln_settings, field_id.c_str());
-            field_settings.get("Width", (int&)field.width, 50);
-            char * temp;
-            field_settings.get("Header", temp, "");
-            field.header = temp;
-            free(temp);
-            field_settings.get("Name", temp, "");
-            field.field = temp;
-            free(temp);
-            (*field_set)[j] = field;
-        }
-        // Add the field set to the list of field sets
-        coll_map_[colln_name] = field_set;
-    }
+    add_collections(fields_settings, "");
     if (coll_map_.find("Default") == coll_map_.end()) {
         // Create the default collection
         collection_t* coll = new collection_t;
@@ -135,7 +109,48 @@ void fields::load_data() {
         coll_map_["Default"] = coll;
     }
 }
- 
+
+// Adding collections needs to iterate to cope with collections named "Contest/*"
+void fields::add_collections(Fl_Preferences& settings, string name) {
+    // For all the field sets in the settings
+    for (int i = 0; i < settings.groups(); i++) {
+        collection_t* field_set = new collection_t;
+        // Get the name of the i'th field set
+        string colln_name = settings.group(i);
+        string full_name = (name.length()) ? name + "/" + colln_name : colln_name;
+        Fl_Preferences colln_settings(settings, colln_name.c_str());
+        // Test for further iteration - first group name != "Field #"
+        string field_id = colln_settings.group(0);
+        if (field_id.length() <= 6 || field_id.substr(0, 6) != "Field ") {
+            add_collections(colln_settings, full_name);
+        }
+        else {
+            // Create an initial array for the number of fields in the settings
+            int num_fields = colln_settings.groups();
+            field_set->resize(num_fields);
+            // For each field in the field set
+            for (int j = 0; j < num_fields; j++) {
+                // Read the field info: name, width and heading from the settings
+                field_info_t field;
+                string field_id = colln_settings.group(j);
+                int field_num = stoi(field_id.substr(6)); // "Field n"
+                Fl_Preferences field_settings(colln_settings, field_id.c_str());
+                field_settings.get("Width", (int&)field.width, 50);
+                char* temp;
+                field_settings.get("Header", temp, "");
+                field.header = temp;
+                free(temp);
+                field_settings.get("Name", temp, "");
+                field.field = temp;
+                free(temp);
+                (*field_set)[j] = field;
+            }
+            // Add the field set to the list of field sets
+            printf("Adding collection %s\n", full_name.c_str());
+            coll_map_[full_name] = field_set;
+        }
+    }
+}
 
 // Store settings
 void fields::store_data() {

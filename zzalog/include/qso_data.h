@@ -71,6 +71,8 @@ public:
 		QSO_WSJTX,       // Recording QSOs from WSJT-X - allows editing of recveived qso
 		QSO_FLDIGI,      // Recording QSos from FlDIGI
 		MANUAL_ENTRY,    // Allow the definition of a record to query
+		TEST_PENDING,    // A contest QSO is pending
+		TEST_ACTIVE,     // A contest QSO is being logged
 	};
 
 	// Used in dupe checking to control how dupe QSOs are handled
@@ -224,6 +226,8 @@ public:
 	void action_update_cat();
 	// Remember state before edit or view
 	void action_remember_state();
+	// Enter contest mode
+	bool action_contest(bool enable);
 
 	// Edit - saved logging state
 	logging_state_t edit_return_state_;

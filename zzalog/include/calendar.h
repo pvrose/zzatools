@@ -1,14 +1,13 @@
 #ifndef __CALENDAR__
 #define __CALENDAR__
 
-#include "intl_widgets.h"
-
 #include <ctime>
 #include <string>
 #include <FL/Fl_Table.H>
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Window.H>
 #include <FL/Fl_Button.H>
+#include <FL/Fl_Input.H>
 
 using namespace std;
 
@@ -22,14 +21,14 @@ using namespace std;
 		// Date value in ADIF format YYYYMMDD
 		string* date_value;
 		// The input widget to receive the date
-		intl_input* date_input;
+		Fl_Input* date_input;
 		// Default constructor
 		cal_cb_data_t() {
 			date_value = nullptr;
 			date_input = nullptr;
 		}
 		// Initialising constructor
-		cal_cb_data_t(string* dv, intl_input* di) {
+		cal_cb_data_t(string* dv, Fl_Input* di) {
 			date_value = dv;
 			date_input = di;
 		}

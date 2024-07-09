@@ -171,7 +171,7 @@ void qso_data::enable_widgets() {
 			g_net_entry_->hide();
 			g_query_->hide();
 			g_qy_entry_->hide();
-			g_misc_->deactivate();
+			g_misc_->activate();
 			break;
 		case QSO_PENDING:
 			// Real-time logging - waiting to start QSO
@@ -1443,6 +1443,32 @@ void qso_data::action_remember_state() {
 			break;
 		default:
 			break;
+	}
+}
+
+// Set the dashboard int contest mode
+bool qso_data::action_contest(bool enable) {
+	if (enable) {
+		switch (logging_state_) {
+		case QSO_PENDING:
+			action_deactivate();
+			// Drop through
+		case QSO_INACTIVE:
+			logging_state_ = TEST_PENDING;
+			enable_widgets();
+			return true;
+		}
+		status_->misc_status(ST_ERROR, "Not in a valid state to start contest mode");
+		return false;
+	}
+	else {
+		switch (logging_state_) {
+		case TEST_PENDING:
+			action_deactivate();
+			return true;
+		}
+		status_->misc_status(ST_ERROR, "Not in a valid state to leave contest mode");
+		return false;
 	}
 }
 

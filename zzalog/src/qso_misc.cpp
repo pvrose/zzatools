@@ -47,6 +47,8 @@ void qso_misc::create_form() {
 	dxcc_ = new qso_dxcc(rx, ry, rw, rh, "DX?");
 	// Edit my QTH form
 	qth_ = new qso_qth(rx, ry, rw, rh, "My QTH");
+	// Contest form
+	contest_ = new qso_contest(rx, ry, rw, rh, "Contest");
 	// QSL details form
 	qsl_ = new qso_qsl_vwr(rx, ry, rw, rh, "QSL");
 
@@ -73,6 +75,7 @@ void qso_misc::enable_widgets() {
 	details_->enable_widgets();
 	dxcc_->enable_widgets();
 	qsl_->enable_widgets();
+	contest_->enable_widgets();
 }
 
 // save value
@@ -101,4 +104,9 @@ void qso_misc::qso(record* qso, qso_num_t number) {
 void qso_misc::cb_tabs(Fl_Widget* w, void* v) {
 	qso_misc* that = ancestor_view<qso_misc>(w);
 	that->enable_widgets();
+}
+
+// Return the contest form
+qso_contest* qso_misc::contest() {
+	return contest_;
 }
