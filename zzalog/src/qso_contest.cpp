@@ -55,7 +55,7 @@ void qso_contest::create_form() {
 
 	curr_y += ip_contest_id_->h();
 	// Collection
-	ip_collection_ = new Fl_Input_Choice(curr_x, curr_y, WSMEDIT, HBUTTON, "Fields\nto log");
+	ip_collection_ = new Fl_Input_Choice(curr_x, curr_y, WSMEDIT, HBUTTON, "Logging");
 	ip_collection_->align(FL_ALIGN_LEFT);
 	ip_collection_->callback(cb_collection, &collection_);
 	ip_collection_->tooltip("Selecet the name of the collections of fields to log");

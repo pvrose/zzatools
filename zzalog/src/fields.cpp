@@ -146,7 +146,6 @@ void fields::add_collections(Fl_Preferences& settings, string name) {
                 (*field_set)[j] = field;
             }
             // Add the field set to the list of field sets
-            printf("Adding collection %s\n", full_name.c_str());
             coll_map_[full_name] = field_set;
         }
     }
