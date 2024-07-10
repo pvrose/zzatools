@@ -272,7 +272,8 @@ void qso_manager::update_rig() {
 
 // Change rig
 void qso_manager::change_rig(string rig_name) {
-	if (rig_group_->label() == nullptr || strcmp(rig_name.c_str(), rig_group_->label())) {
+	const char* l = rig_group_->value()->label();
+	if (l == nullptr || strcmp(rig_name.c_str(), l)) {
 		// Change the rig's name and reload the connection data
 		rig_group_->copy_label(rig_name.c_str());
 		//rig_group_->load_values();
