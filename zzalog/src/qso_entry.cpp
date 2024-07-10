@@ -299,7 +299,9 @@ void qso_entry::copy_qso_to_display(int flags) {
 		case qso_data::QSO_VIEW:
 		case qso_data::QSO_INACTIVE:
 		case qso_data::QSO_PENDING:
+		case qso_data::TEST_PENDING:
 		case qso_data::QSO_STARTED:
+		case qso_data::TEST_ACTIVE:
 		case qso_data::QSO_ENTER:
 			check_qth_changed();
 			break;
@@ -582,49 +584,6 @@ void qso_entry::initialise_fields() {
 		ip_field_[iy]->field_name("");
 	}
 }
-
-//// Initialise the values of the above fields
-//void qso_entry::initialise_values() {
-//	string contest = qso_ ? qso_->item("CONTEST_ID") : "";
-//	if (contest == "") contest = "None";
-//	int ix = NUMBER_FIXED;
-//	for (size_t i = 0; i < fields_in_use_.size(); i++, ix++) {
-//		if (qso_) {
-//			//if (contest != "None") {
-//			//	string contest_mode = spec_data_->dxcc_mode(qso_->item("MODE"));
-//			//	if (fields[i] == "RST_SENT" || fields[i] == "RST_RCVD") {
-//			//		if (contest_mode == "CW" || contest_mode == "DATA") {
-//			//			qso_->item(fields[i], string("599"));
-//			//		}
-//			//		else {
-//			//			qso_->item(fields[i], string("59"));
-//			//		}
-//			//	}
-//			//	else if (fields[i] == "STX") {
-//			//		char text[10];
-//			//		snprintf(text, 10, "%03d", ++previous_serial_);
-//			//		qso_->item(fields[i], string(text));
-//			//	}
-//			//	if (fields[i] == "CALL") {
-//			//		ip_field_[ix]->value("");
-//			//	}
-//			//	else {
-//			//		ip_field_[ix]->value(qso_->item(fields[i]).c_str());
-//			//	}
-//			//}
-//			//else {
-//				ip_field_[ix]->value(qso_->item(fields_in_use_[i]).c_str());
-//			//}
-//		}
-//		else {
-//			ip_field_[ix]->value("");
-//		}
-//	}
-//	for (; ix < NUMBER_TOTAL; ix++) {
-//		ip_field_[ix]->value("");
-//	}
-//	ip_notes_->value("");
-//}
 
 // Return fields that have been defines as comma seperated list
 string qso_entry::get_defined_fields() {

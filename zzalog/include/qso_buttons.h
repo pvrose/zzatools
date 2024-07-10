@@ -76,7 +76,6 @@ public:
 		CANCEL_VIEW,
 		QRZ_COM,
 		UPDATE_CAT,
-		START_TEST,
 		SAVE_RESTART,
 		RESTART,
 	};

@@ -93,7 +93,6 @@ public:
 		QSO_AS_WAS,         // Used with action_activate() to maintain the existing one
 		QSO_COPY_WSJTX,     // Copy QSO to modem
 		QSO_COPY_FLDIGI,    // Copy QSO from Fldigi
-		QSO_CONTEST,        // Start a QSO using current time and CAT - initialise contest fields
 	};
 
 public:
@@ -227,10 +226,10 @@ public:
 	void action_update_cat();
 	// Remember state before edit or view
 	void action_remember_state();
-	// Enter contest mode
-	bool action_contest(bool enable);
 
 	qso_contest* contest();
+	// Contest mode is active
+	bool in_contest();
 
 	// Edit - saved logging state
 	logging_state_t edit_return_state_;

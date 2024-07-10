@@ -6,11 +6,13 @@
 #include "fields.h"
 #include "menu.h"
 #include "settings.h"
+#include "status.h"
 
 #include <FL/Fl_Preferences.H>
 
 extern Fl_Preferences* settings_;
 extern fields* fields_;
+extern status* status_;
 
 // Constructor
 qso_contest::qso_contest(int X, int Y, int W, int H, const char* L) :
@@ -261,7 +263,7 @@ void qso_contest::cb_contest_id(Fl_Widget* w, void* v) {
 	that->load_settings();
 	that->enable_widgets();
 	qso_data* data = ancestor_view<qso_data>(that);
-	data->action_contest(that->active_);
+	cb_active(that->bn_active_, &that->active_);
 }
 
 // Log data
@@ -302,12 +304,37 @@ void qso_contest::cb_rst_ser(Fl_Widget* w, void* v) {
 void qso_contest::cb_active(Fl_Widget* w, void* v) {
 	qso_contest* that = ancestor_view<qso_contest>(w);
 	qso_data* qd = ancestor_view<qso_data>(that);
-	cb_value<Fl_Light_Button, bool>(w, v);
-	bool* a = (bool*)v;
-	if (!qd->action_contest(*a)) {
-		*a = !(*a);
+	bool a;
+	char msg[128];
+	cb_value<Fl_Light_Button, bool>(w, &a);
+	if (a) {
+		switch (qd->logging_state()) {
+		case qso_data::QSO_INACTIVE:
+		case qso_data::QSO_PENDING:
+			that->active_ = true;
+			qd->action_activate(qso_data::QSO_ON_AIR);
+			snprintf(msg, sizeof(msg), "DASH: Starting contest %s.", that->contest_id_.c_str());
+			status_->misc_status(ST_OK, msg);
+			break;
+		default:
+			status_->misc_status(ST_ERROR, "DASH: Not in a state to start contest activity!");
+			break;
+		}
 	}
-	((Fl_Light_Button*)w)->value(*a);
+	else {
+		switch (qd->logging_state()) {
+		case qso_data::TEST_PENDING:
+			that->active_ = false;
+			qd->action_deactivate();
+			snprintf(msg, sizeof(msg), "DASH: Suspending contest %s.", that->contest_id_.c_str());
+			status_->misc_status(ST_OK, msg);
+			break;
+		default:
+			status_->misc_status(ST_ERROR, "DASH: Not in a state to suspend contest activity!");
+			break;
+		}
+	}
+	that->bn_active_->value(that->active_);
 	that->save_settings();
 }
 
