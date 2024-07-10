@@ -985,12 +985,12 @@ bool spec_data::add_user_macro(string field, string value, macro_defn macro) {
 record* spec_data::expand_macro(string field, string value) {
 	char message[128];
 	if (macros_.size() == 0) {
-		status_->misc_status(ST_NOTE, "ADIF SPEC: No macros defined yet");
+		//status_->misc_status(ST_NOTE, "ADIF SPEC: No macros defined yet");
 		return nullptr;
 	}
 	else if (macros_.find(field) == macros_.end()) {
-		snprintf(message, 128, "ADIF SPEC: No macros defined for field %s", field.c_str());
-		status_->misc_status(ST_WARNING, message);
+		//snprintf(message, 128, "ADIF SPEC: No macros defined for field %s", field.c_str());
+		//status_->misc_status(ST_WARNING, message);
 		return nullptr;
 	}
 	else {
