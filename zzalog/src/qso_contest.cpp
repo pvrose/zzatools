@@ -110,6 +110,13 @@ void qso_contest::create_form() {
 
 	curr_x = x() + GAP + WLABEL;
 	curr_y += ip_end_date_->h();
+	// Exchange
+	ip_exchange_ = new Fl_Input(curr_x, curr_y, WSMEDIT, HBUTTON, "Exchange");
+	ip_exchange_->align(FL_ALIGN_LEFT);
+	ip_exchange_->tooltip("Enter the default exchange for your transmission");
+	ip_exchange_->callback(cb_value<Fl_Input, string>, &exchange_);
+
+	curr_y += ip_exchange_->h();
 	op_serial_ = new Fl_Output(curr_x, curr_y, WBUTTON, HBUTTON, "Serial#");
 	op_serial_->align(FL_ALIGN_LEFT);
 	op_serial_->tooltip("Displays the next serial number to use");
@@ -230,9 +237,19 @@ string qso_contest::serial() {
 	return string(text);
 }
 
+// Get the exchange
+string qso_contest::exchange() {
+	return exchange_;
+}
+
 // Increment the serial number
 void qso_contest::increment_serial() {
 	serial_++;
+}
+
+// A contest is active
+bool qso_contest::contest_active() {
+	return active_;
 }
 
 // Contest ID
@@ -243,6 +260,8 @@ void qso_contest::cb_contest_id(Fl_Widget* w, void* v) {
 	// Read the data and load into the widgets
 	that->load_settings();
 	that->enable_widgets();
+	qso_data* data = ancestor_view<qso_data>(that);
+	data->action_contest(that->active_);
 }
 
 // Log data
@@ -283,6 +302,7 @@ void qso_contest::cb_rst_ser(Fl_Widget* w, void* v) {
 void qso_contest::cb_active(Fl_Widget* w, void* v) {
 	qso_contest* that = ancestor_view<qso_contest>(w);
 	qso_data* qd = ancestor_view<qso_data>(that);
+	cb_value<Fl_Light_Button, bool>(w, v);
 	bool* a = (bool*)v;
 	if (!qd->action_contest(*a)) {
 		*a = !(*a);

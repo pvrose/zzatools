@@ -104,6 +104,8 @@ public:
 	void copy_clock_to_qso();
 	// Copy default value to QSO
 	void copy_default_to_qso();
+	// Copy contest defaults to QSO
+	void copy_contest_to_qso();
 	// Initialise fields
 	void initialise_field_map();
 	// Get defined fields
@@ -124,7 +126,6 @@ public:
 
 	// Initialise fields
 	void initialise_fields();
-	void initialise_values();
 
 	// Set initial focus
 	void set_initial_focus();

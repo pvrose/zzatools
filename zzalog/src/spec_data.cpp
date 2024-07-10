@@ -695,6 +695,16 @@ string spec_data::enumeration_name(const string& field_name, record* record) {
 			// No dataset exists
 			return  "";
 		}
+		else if (it_field->second->at("Data Type") == "String" && it_field->second->find("Enumeration") != it_field->second->end()) {
+			// And if it's an enumeration - get the enumeration name
+			string enumeration_name = it_field->second->at("Enumeration");
+			if (dataset(enumeration_name) != nullptr) {
+				// A dataset exists for just the enumeration name
+				return enumeration_name;
+			}
+			// No dataset exists
+			return  "";
+		}
 		else if (it_field->second->at("Data Type") == "Dynamic" && it_field->second->find("Enumeration") != it_field->second->end()) {
 			// Return the enumeration name
 			string enumeration_name = it_field->second->at("Enumeration");

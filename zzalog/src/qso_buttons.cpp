@@ -56,6 +56,8 @@ map<qso_data::logging_state_t, list<qso_buttons::button_type> > button_map_ =
 	{ qso_data::MANUAL_ENTRY, { qso_buttons::EXEC_QUERY, qso_buttons::IMPORT_QUERY, qso_buttons::CANCEL_QUERY, qso_buttons::LOOK_ALL_TXT }},
 	{ qso_data::QSO_WSJTX, { qso_buttons::CANCEL_QSO }},
 	{ qso_data::QSO_FLDIGI, { qso_buttons::CANCEL_QSO }},
+	{ qso_data::TEST_PENDING, { qso_buttons::START_TEST }},
+	{ qso_data::TEST_ACTIVE, { qso_buttons::SAVE_QSO, qso_buttons::CANCEL_QSO, qso_buttons::SAVE_RESTART, qso_buttons::RESTART }}
 };
 
 // Map describing all the parameters for each button
@@ -107,6 +109,9 @@ map<qso_buttons::button_type, qso_buttons::button_action> action_map_ =
 	{ qso_buttons::IMPORT_QUERY, { "Test Import", "Test import query", FL_YELLOW, qso_buttons::cb_bn_import_query, 0 }},
 	{ qso_buttons::QRZ_COM, { "@search QRZ.com", "Display details in QRZ.com", FL_DARK_CYAN, qso_buttons::cb_bn_qrz_com, 0}},
 	{ qso_buttons::UPDATE_CAT, { "Update CAT", "Update QSO with current CAT info", FL_DARK_BLUE, qso_buttons::cb_bn_update_cat, 0 }},
+	{ qso_buttons::START_TEST, { "Start QSO", "Start a Contest QSO in real-time", FL_YELLOW, qso_buttons::cb_start, (void*)qso_data::QSO_CONTEST } },
+	{ qso_buttons::SAVE_RESTART, { "Save && Restart", "Save current QSO and start a new one", FL_GREEN, qso_buttons::cb_bn_save_restart, 0 }},
+	{ qso_buttons::RESTART, { "Restart", "Ditch current QSO and start anew", FL_RED, qso_buttons::cb_bn_restart, 0 }},
 };
 
 // Constructor
@@ -184,8 +189,8 @@ void qso_buttons::enable_widgets() {
 			const button_action& action = action_map_.at(*bn);
 			bn_action_[ix]->label(action.label);
 			bn_action_[ix]->tooltip(action.tooltip);
-			bn_action_[ix]->color(action.colour);
-			bn_action_[ix]->labelcolor(fl_contrast(FL_FOREGROUND_COLOR, action.colour));
+			//bn_action_[ix]->color(action.colour);
+			//bn_action_[ix]->labelcolor(fl_contrast(FL_FOREGROUND_COLOR, action.colour));
 			bn_action_[ix]->callback(action.callback, action.userdata);
 			bn_action_[ix]->activate();
 		}
@@ -229,6 +234,7 @@ void qso_buttons::cb_start(Fl_Widget* w, void* v) {
 	qso_data::qso_init_t mode = (qso_data::qso_init_t)(intptr_t)v;
 	switch (that->qso_data_->logging_state()) {
 	case qso_data::QSO_INACTIVE:
+	case qso_data::TEST_PENDING:
 		that->qso_data_->action_activate(mode);
 		// Fall into next state
 	case qso_data::QSO_PENDING:
@@ -251,6 +257,7 @@ void qso_buttons::cb_save(Fl_Widget* w, void* v) {
 		data->action_start(qso_data::QSO_AS_WAS);
 		// Two routes - QSO entry
 	case qso_data::QSO_STARTED:
+	case qso_data::TEST_ACTIVE:
 		// Realtime entry - do not start another
 		if(!data->action_save()) break;
 		data->action_activate(qso_data::QSO_AS_WAS);
@@ -304,6 +311,7 @@ void qso_buttons::cb_cancel(Fl_Widget* w, void* v) {
 		break;
 	case qso_data::QSO_STARTED:
 	case qso_data::QSO_ENTER:
+	case qso_data::TEST_ACTIVE:
 		data->action_cancel();
 		data->action_activate(qso_data::QSO_AS_WAS);
 		break;
@@ -711,6 +719,37 @@ void qso_buttons::cb_bn_update_cat(Fl_Widget* w, void* v) {
 			that->qso_data_->action_update_cat();
 			break;
 		}
+	}
+	that->enable_widgets();
+}
+
+// Save current QSO and restart
+void qso_buttons::cb_bn_save_restart(Fl_Widget* w, void* v) {
+	qso_buttons* that = ancestor_view<qso_buttons>(w);
+	that->disable_widgets();
+	switch (that->qso_data_->logging_state()) {
+	case qso_data::TEST_ACTIVE: {
+		// Realtime entry - do not start another
+		if (!that->qso_data_->action_save()) break;
+		that->qso_data_->action_activate(qso_data::QSO_AS_WAS);
+		that->qso_data_->action_start(qso_data::QSO_CONTEST);
+		break;
+	}
+	}
+	that->enable_widgets();
+}
+
+// Cancel current QSO and restart
+void qso_buttons::cb_bn_restart(Fl_Widget* w, void* v) {
+	qso_buttons* that = ancestor_view<qso_buttons>(w);
+	that->disable_widgets();
+	switch (that->qso_data_->logging_state()) {
+	case qso_data::TEST_ACTIVE: {
+		that->qso_data_->action_cancel();
+		that->qso_data_->action_activate(qso_data::QSO_AS_WAS);
+		that->qso_data_->action_start(qso_data::QSO_CONTEST);
+		break;
+	}
 	}
 	that->enable_widgets();
 }

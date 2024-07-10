@@ -313,6 +313,8 @@ void field_input::reload_choice(record* qso /* = nullptr */) {
 
 // Field is a string type - allow case choice
 bool field_input::is_string(string field) {
+	// Special case where a string is a suggested enumeation
+	if (spec_data_->enumeration_name(field_name_, nullptr).length()) return false;
 	char c = spec_data_->datatype_indicator(field);
 	switch (c) {
 	case 'S':

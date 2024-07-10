@@ -53,6 +53,10 @@ public:
     string serial();
     // Increment the serial number
     void increment_serial();
+    // Return the fixed exchange
+    string exchange();
+    // Contest active
+    bool contest_active();
 
 protected:
     // Contest ID
@@ -95,6 +99,8 @@ protected:
     string collection_;
     // Notes
     string notes_;
+    // My exchange
+    string exchange_;
     // Start date
     string start_date_;
     string start_time_;
@@ -121,6 +127,8 @@ protected:
     Fl_Input_Choice* ip_collection_;
     // Notes
     Fl_Input* ip_notes_;
+    // Exchange
+    Fl_Input* ip_exchange_;
     // Start date ip
     Fl_Input* ip_start_date_;
     Fl_Button* bn_start_date_;

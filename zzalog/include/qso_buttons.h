@@ -76,6 +76,9 @@ public:
 		CANCEL_VIEW,
 		QRZ_COM,
 		UPDATE_CAT,
+		START_TEST,
+		SAVE_RESTART,
+		RESTART,
 	};
 
 	// Parameters for the button
@@ -145,6 +148,10 @@ public:
 	static void cb_bn_qrz_com(Fl_Widget* w, void* v);
 	// Update CAT
 	static void cb_bn_update_cat(Fl_Widget* w, void* v);
+	// Save Contest QSO and restart
+	static void cb_bn_save_restart(Fl_Widget* w, void* v);
+	// Cancel current QSO and restart
+	static void cb_bn_restart(Fl_Widget* w, void* v);
 
 
 protected:

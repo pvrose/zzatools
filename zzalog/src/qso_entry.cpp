@@ -168,6 +168,7 @@ void qso_entry::enable_widgets() {
 		ip_notes_->deactivate();
 		break;
 	case qso_data::QSO_PENDING:
+	case qso_data::TEST_PENDING:
 		// Waiting to start a QSO - activate all fields in use ...
 		for (int ix = 0; ix <= fields_in_use_.size() && ix < NUMBER_TOTAL; ix++) {
 			if (ch_field_[ix])
@@ -193,6 +194,7 @@ void qso_entry::enable_widgets() {
 	case qso_data::QSO_EDIT:
 	case qso_data::NET_EDIT:
 	case qso_data::QSO_ENTER:
+	case qso_data::TEST_ACTIVE:
 		// Entering a QSO - activate all fields in use ...
 		for (int ix = 0; ix <= fields_in_use_.size() && ix < NUMBER_TOTAL; ix++) {
 			if (ch_field_[ix])
@@ -383,6 +385,7 @@ void qso_entry::copy_cat_to_qso(bool clear) {
 			switch (qso_data_->logging_state()) {
 			case qso_data::QSO_PENDING:
 			case qso_data::NET_STARTED:
+			case qso_data_->TEST_PENDING:
 			{
 				// Load values from rig
 				qso_->item("FREQ", freqy);
@@ -401,7 +404,9 @@ void qso_entry::copy_cat_to_qso(bool clear) {
 				copy_qso_to_display(CF_CAT);
 				break;
 			}
-			case qso_data::QSO_STARTED: {
+			case qso_data::QSO_STARTED:
+			case qso_data::TEST_ACTIVE:
+			{
 				// Ignore values except TX_PWR which accumulates maximum value
 				if (qso_->item("FREQ") != freqy) {
 					snprintf(message, 128, "DASH: Rig frequency changed during QSO, New value %s", freqy.c_str());
@@ -468,6 +473,7 @@ void qso_entry::copy_clock_to_qso() {
 		case qso_data::QSO_INACTIVE:
 		case qso_data::QSO_PENDING:
 		case qso_data::NET_ADDING:
+		case qso_data::TEST_PENDING:
 		{
 			time_t now = time(nullptr);
 			tm* value = gmtime(&now);
@@ -499,6 +505,26 @@ void qso_entry::copy_default_to_qso() {
 	}
 }
 
+// Copy contest values to QSO - 599 001 etc.
+void qso_entry::copy_contest_to_qso() {
+	if (qso_) {
+		string contest_mode = spec_data_->dxcc_mode(qso_->item("MODE"));
+		if (contest_mode == "CW" || contest_mode == "DATA") {
+			// CW/Data
+			qso_->item("RST_SENT", string("599"));
+			qso_->item("RST_RCVD", string("599"));
+		}
+		else {
+			// Phone
+			qso_->item("RST_SENT", string("59"));
+			qso_->item("RST_RCVD", string("59"));
+		}
+		// Exchange information: serial number, other doobry
+		qso_->item("STX", qso_data_->contest()->serial());
+		qso_->item("STX_STRING", qso_data_->contest()->exchange());
+	}
+}
+
 // Clear fields
 void qso_entry::clear_display() {
 	for (int i = 0; i < NUMBER_TOTAL; i++) {
@@ -526,7 +552,15 @@ void qso_entry::initialise_field_map() {
 void qso_entry::initialise_fields() {
 	// Now set fields
 	// TODO: this is where we configure for context
-	field_map_ = fields_->collection(fields_->coll_name(FO_QSOVIEW));
+	switch (qso_data_->logging_state()) {
+	case qso_data::TEST_ACTIVE:
+	case qso_data::TEST_PENDING:
+		field_map_ = fields_->collection(qso_data_->contest()->collection());
+		break;
+	default:
+		field_map_ = fields_->collection(fields_->coll_name(FO_QSOVIEW));
+		break;
+	}
 	fields_in_use_.resize(field_map_->size() + NUMBER_FIXED);
 	// Clear field map
 	initialise_field_map();
@@ -549,48 +583,48 @@ void qso_entry::initialise_fields() {
 	}
 }
 
-// Initialise the values of the above fields
-void qso_entry::initialise_values() {
-	string contest = qso_ ? qso_->item("CONTEST_ID") : "";
-	if (contest == "") contest = "None";
-	int ix = NUMBER_FIXED;
-	for (size_t i = 0; i < fields_in_use_.size(); i++, ix++) {
-		if (qso_) {
-			//if (contest != "None") {
-			//	string contest_mode = spec_data_->dxcc_mode(qso_->item("MODE"));
-			//	if (fields[i] == "RST_SENT" || fields[i] == "RST_RCVD") {
-			//		if (contest_mode == "CW" || contest_mode == "DATA") {
-			//			qso_->item(fields[i], string("599"));
-			//		}
-			//		else {
-			//			qso_->item(fields[i], string("59"));
-			//		}
-			//	}
-			//	else if (fields[i] == "STX") {
-			//		char text[10];
-			//		snprintf(text, 10, "%03d", ++previous_serial_);
-			//		qso_->item(fields[i], string(text));
-			//	}
-			//	if (fields[i] == "CALL") {
-			//		ip_field_[ix]->value("");
-			//	}
-			//	else {
-			//		ip_field_[ix]->value(qso_->item(fields[i]).c_str());
-			//	}
-			//}
-			//else {
-				ip_field_[ix]->value(qso_->item(fields_in_use_[i]).c_str());
-			//}
-		}
-		else {
-			ip_field_[ix]->value("");
-		}
-	}
-	for (; ix < NUMBER_TOTAL; ix++) {
-		ip_field_[ix]->value("");
-	}
-	ip_notes_->value("");
-}
+//// Initialise the values of the above fields
+//void qso_entry::initialise_values() {
+//	string contest = qso_ ? qso_->item("CONTEST_ID") : "";
+//	if (contest == "") contest = "None";
+//	int ix = NUMBER_FIXED;
+//	for (size_t i = 0; i < fields_in_use_.size(); i++, ix++) {
+//		if (qso_) {
+//			//if (contest != "None") {
+//			//	string contest_mode = spec_data_->dxcc_mode(qso_->item("MODE"));
+//			//	if (fields[i] == "RST_SENT" || fields[i] == "RST_RCVD") {
+//			//		if (contest_mode == "CW" || contest_mode == "DATA") {
+//			//			qso_->item(fields[i], string("599"));
+//			//		}
+//			//		else {
+//			//			qso_->item(fields[i], string("59"));
+//			//		}
+//			//	}
+//			//	else if (fields[i] == "STX") {
+//			//		char text[10];
+//			//		snprintf(text, 10, "%03d", ++previous_serial_);
+//			//		qso_->item(fields[i], string(text));
+//			//	}
+//			//	if (fields[i] == "CALL") {
+//			//		ip_field_[ix]->value("");
+//			//	}
+//			//	else {
+//			//		ip_field_[ix]->value(qso_->item(fields[i]).c_str());
+//			//	}
+//			//}
+//			//else {
+//				ip_field_[ix]->value(qso_->item(fields_in_use_[i]).c_str());
+//			//}
+//		}
+//		else {
+//			ip_field_[ix]->value("");
+//		}
+//	}
+//	for (; ix < NUMBER_TOTAL; ix++) {
+//		ip_field_[ix]->value("");
+//	}
+//	ip_notes_->value("");
+//}
 
 // Return fields that have been defines as comma seperated list
 string qso_entry::get_defined_fields() {
@@ -746,6 +780,8 @@ void qso_entry::cb_ip_field(Fl_Widget* w, void* v) {
 				case qso_data::NET_ADDING:
 				case qso_data::QSO_WSJTX:
 				case qso_data::QSO_FLDIGI:
+				case qso_data::TEST_PENDING:
+				case qso_data::TEST_ACTIVE:
 				{
 					// Copy matching antenna
 					qso_rig* rig_control = mgr->rig_control();
@@ -792,6 +828,8 @@ void qso_entry::cb_ip_field(Fl_Widget* w, void* v) {
 		case qso_data::QSO_STARTED:
 		case qso_data::QSO_EDIT:
 		case qso_data::QSO_ENTER:
+		case qso_data::TEST_PENDING:
+		case qso_data::TEST_ACTIVE:
 			that->enable_widgets();
 			that->qso_data_->enable_widgets();
 			tabbed_forms_->update_views(nullptr, HT_MINOR_CHANGE, that->qso_number_);
@@ -908,6 +946,8 @@ void qso_entry::cb_ticker(void* v) {
 		case qso_data::QSO_PENDING:
 		case qso_data::QSO_STARTED:
 		case qso_data::NET_STARTED:
+		case qso_data::TEST_PENDING:
+		case qso_data::TEST_ACTIVE:
 			that->copy_cat_to_qso();
 			break;
 	}

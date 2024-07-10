@@ -145,6 +145,10 @@ void qso_data::create_form(int X, int Y) {
 	size(max_x - X, curr_y - Y);
 	end();
 
+	// Check if contest is active
+	if (g_misc_->contest()->contest_active()) {
+		action_contest(true);
+	}
 	enable_widgets();
 
 }
@@ -343,6 +347,34 @@ void qso_data::enable_widgets() {
 			g_misc_->activate();
 			g_misc_->enable_widgets();
 			break;
+		case TEST_PENDING:
+			// Real-time logging - waiting to start QSO
+			snprintf(l, sizeof(l), "QSO Entry - Contest %s pending QSOs", g_misc_->contest()->contest_id().c_str());
+			g_entry_->copy_label(l);
+			g_entry_->labelcolor(DARK ? FL_MAGENTA : FL_DARK_MAGENTA);
+			g_entry_->show();
+			g_entry_->enable_widgets();
+			g_net_entry_->hide();
+			g_query_->hide();
+			g_qy_entry_->hide();
+			g_misc_->activate();
+			g_misc_->enable_widgets();
+			break;
+		case TEST_ACTIVE:
+			// Real-time logging - QSO started
+			snprintf(l, sizeof(l), "QSO Entry - Contest %s logging %s", 
+				g_misc_->contest()->contest_id().c_str(),
+				current_qso()->item("CALL").c_str());
+			g_entry_->copy_label(l);
+			g_entry_->labelcolor(DARK ? FL_MAGENTA : FL_DARK_MAGENTA);
+			g_entry_->show();
+			g_entry_->enable_widgets();
+			g_net_entry_->hide();
+			g_query_->hide();
+			g_qy_entry_->hide();
+			g_misc_->activate();
+			g_misc_->enable_widgets();
+			break;
 		}
 		g_buttons_->enable_widgets();
 		// Redraw this as some of the above labels may have extended into it.
@@ -359,6 +391,7 @@ void qso_data::update_qso(qso_num_t log_num) {
 		break;
 	}
 	case QSO_PENDING:
+	case TEST_PENDING:
 		if (log_num != g_entry_->qso_number()) {
 			// Deactivate then reactivate with new QSO
 			action_deactivate();
@@ -370,6 +403,7 @@ void qso_data::update_qso(qso_num_t log_num) {
 		break;
 	case QSO_STARTED:
 	case QSO_ENTER:
+	case TEST_ACTIVE:
 		// Ack whether to save or quit then activate new QSO
 		if (log_num != g_entry_->qso_number()) {
 			fl_beep(FL_BEEP_QUESTION);
@@ -624,6 +658,8 @@ qso_num_t qso_data::get_default_number() {
 	case QSO_STARTED:
 	case QSO_ENTER:
 	case QSO_EDIT:
+	case TEST_PENDING:
+	case TEST_ACTIVE:
 		return g_entry_->qso_number();
 	case QSO_BROWSE:
 	case QUERY_DUPE:
@@ -667,9 +703,24 @@ void qso_data::action_new_qso(record* qso, qso_init_t mode) {
 		if (rig && rig->is_good()) {
 			qe->copy_qso_to_qso(qso, qso_entry::CF_RIG_ETC);
 			qe->copy_cat_to_qso();
-		} else {
+		}
+		else {
 			qe->copy_qso_to_qso(qso, qso_entry::CF_RIG_ETC | qso_entry::CF_CAT);
 		}
+		qe->copy_clock_to_qso();
+		g_misc_->qso(current_qso(), current_number());
+		break;
+	case QSO_CONTEST:
+		// Copy station details and get read rig details for band etc. 
+		// If rig not connected use same as original
+		if (rig && rig->is_good()) {
+			qe->copy_qso_to_qso(qso, qso_entry::CF_RIG_ETC);
+			qe->copy_cat_to_qso();
+		}
+		else {
+			qe->copy_qso_to_qso(qso, qso_entry::CF_RIG_ETC | qso_entry::CF_CAT);
+		}
+		qe->copy_contest_to_qso();
 		qe->copy_clock_to_qso();
 		g_misc_->qso(current_qso(), current_number());
 		break;
@@ -709,7 +760,8 @@ void qso_data::action_new_qso(record* qso, qso_init_t mode) {
 void qso_data::action_activate(qso_init_t mode) {
 	record* source_record = book_->get_record();
 	qso_manager* mgr = ancestor_view<qso_manager>(this);
-	logging_state_ = QSO_PENDING;
+	if (g_misc_->contest()->contest_active()) logging_state_ = TEST_PENDING;
+	else logging_state_ = QSO_PENDING;
 	action_new_qso(source_record, mode);
 	update_rig();
 }
@@ -728,6 +780,9 @@ void qso_data::action_start(qso_init_t mode) {
 		break;
 	case QSO_COPY_FLDIGI:
 		logging_state_ = QSO_FLDIGI;
+		break;
+	case QSO_CONTEST:
+		logging_state_ = TEST_ACTIVE;
 		break;
 	default:
 		logging_state_ = QSO_STARTED;
@@ -755,6 +810,12 @@ bool qso_data::action_save() {
 		qso = g_net_entry_->qso();
 		qso_number = g_net_entry_->qso_number();
 		break;
+	case TEST_ACTIVE:
+		item_number = book_->item_number(g_entry_->qso_number());
+		qso = g_entry_->qso();
+		qso_number = g_entry_->qso_number();
+		contest()->increment_serial();
+		break;
 	default:
 		break;
 	}
@@ -765,6 +826,7 @@ bool qso_data::action_save() {
 	// On-air logging add date/time off
 	switch (previous_mode_) {
 	case QSO_ON_AIR:
+	case QSO_CONTEST:
 		// All on-air modes - set cime-off to now
 		if (qso->item("TIME_OFF") == "") {
 			// Add end date/time - current time of interactive entering
@@ -823,6 +885,13 @@ bool qso_data::action_save() {
 		logging_state_ = QSO_INACTIVE;
 		action_activate(previous_mode_);
 		break;
+	case TEST_ACTIVE:
+		logging_state_ = SWITCHING;
+		book_->modified(true);
+		book_->selection(item_number, HT_INSERTED);
+		logging_state_ = TEST_PENDING;
+		action_activate(previous_mode_);
+		break;
 	case QSO_WSJTX:
 	case QSO_FLDIGI:
 		logging_state_ = SWITCHING;
@@ -860,6 +929,10 @@ void qso_data::action_cancel() {
 	case QSO_STARTED:
 		g_entry_->delete_qso();
 		logging_state_ = QSO_INACTIVE;
+		break;
+	case TEST_ACTIVE:
+		g_entry_->delete_qso();
+		logging_state_ = TEST_PENDING;
 		break;
 	case QSO_WSJTX:
 	case QSO_FLDIGI:
@@ -1453,21 +1526,36 @@ bool qso_data::action_contest(bool enable) {
 		case QSO_PENDING:
 			action_deactivate();
 			// Drop through
-		case QSO_INACTIVE:
+		case QSO_INACTIVE:	
+			record* source_record = book_->get_record();
 			logging_state_ = TEST_PENDING;
+			action_new_qso(source_record, QSO_CONTEST);
+			g_entry_->initialise_fields();
 			enable_widgets();
+			g_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
+			string id = g_misc_->contest()->contest_id();
+			char msg[128];
+			snprintf(msg, sizeof(msg), "DASH: Starting contest mode for %s", id.c_str());
+			status_->misc_status(ST_OK, msg);
 			return true;
 		}
-		status_->misc_status(ST_ERROR, "Not in a valid state to start contest mode");
+		status_->misc_status(ST_ERROR, "DASH: Not in a valid state to start contest mode");
 		return false;
 	}
 	else {
 		switch (logging_state_) {
 		case TEST_PENDING:
 			action_deactivate();
+			g_entry_->initialise_fields();
+			enable_widgets();
+			g_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
+			string id = g_misc_->contest()->contest_id();
+			char msg[128];
+			snprintf(msg, sizeof(msg), "DASH: Leaving contest mode for %s", id.c_str());
+			status_->misc_status(ST_OK, msg);
 			return true;
 		}
-		status_->misc_status(ST_ERROR, "Not in a valid state to leave contest mode");
+		status_->misc_status(ST_ERROR, "DASH: Not in a valid state to leave contest mode");
 		return false;
 	}
 }
@@ -1595,6 +1683,8 @@ record* qso_data::current_qso() {
 	case QSO_VIEW:
 	case QSO_WSJTX:
 	case QSO_FLDIGI:
+	case TEST_ACTIVE:
+	case TEST_PENDING:
 		return g_entry_->qso();
 	case QSO_BROWSE:
 	case QUERY_DUPE:
@@ -1624,6 +1714,8 @@ qso_num_t qso_data::current_number() {
 	case QSO_VIEW:
 	case QSO_WSJTX:
 	case QSO_FLDIGI:
+	case TEST_PENDING:
+	case TEST_ACTIVE:
 		return g_entry_->qso_number();
 	case QSO_BROWSE:
 	case QUERY_DUPE:
@@ -1677,4 +1769,9 @@ bool qso_data::inactive() {
 	default:
 		return false;
 	}
+}
+
+// Return the contest form
+qso_contest* qso_data::contest() {
+	return g_misc_->contest();
 }
