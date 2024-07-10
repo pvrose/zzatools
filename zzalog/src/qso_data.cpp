@@ -919,6 +919,7 @@ void qso_data::action_cancel() {
 	}
 	enable_widgets();
 	g_entry_->check_qth_changed();
+	book_->enable_save(true, "Canceling real-time QSO");
 }
 
 // Action DELETE - we should be inactive but leave this code 
