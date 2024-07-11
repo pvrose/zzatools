@@ -323,6 +323,7 @@ void qso_contest::cb_active(Fl_Widget* w, void* v) {
 			extract_records_->extract_field("CONTEST_ID", that->contest_id_, false, that->start_date_, that->end_date_);
 			fields_->link_app(FO_EXTRACTLOG, that->collection_);
 			tabbed_forms_->activate_pane(OT_EXTRACT, true);
+			tabbed_forms_->update_views(nullptr, HT_EXTRACTION, qd->current_number());
 			break;
 		default:
 			status_->misc_status(ST_ERROR, "DASH: Not in a state to start contest activity!");

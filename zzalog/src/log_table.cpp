@@ -127,6 +127,12 @@ void log_table::cb_tab_log(Fl_Widget* w, void* v) {
 	// Get the item number and field clicked
 	log_table* that = (log_table*)w;
 	int row = that->callback_row();
+	int col = that->callback_col();
+#ifdef _WIN32
+	// There seems to be differnet behaviour in Windows - retutns -1 if click outside the table
+	if (row < 0) row = 0;
+	if (col < 0) col = 0;
+#endif
 	item_num_t item_num;
 	qso_num_t qso_number;
 	if (that->my_book_) {
@@ -137,7 +143,7 @@ void log_table::cb_tab_log(Fl_Widget* w, void* v) {
 		item_num = -1;
 		qso_number = -1;
 	}
-	int col = that->callback_col();
+	if (col < 0) col = 0;
 	item_num_t save_num = that->current_item_num_;
 	switch (that->callback_context()) {
 	case Fl_Table::CONTEXT_CELL:

@@ -947,3 +947,48 @@ bool extract_data::upload_in_progress() {
 extract_data::extract_mode_t extract_data::use_mode() {
 	return use_mode_;
 }
+
+// Check  that the record metches our current criteria and process it if it does
+void extract_data::check_add_record(qso_num_t record_num) {
+	record* qso = book_->get_record(book_->item_number(record_num), false);
+	if (meets_criteria(qso)) {
+		if (record_num == book_->size() - 1) {
+		// It's the last in the book so we can simply add it
+			add_record(record_num);
+		}
+		else {
+		// Else we have to re-extract
+			reextract();
+		}
+	} 
+}
+
+// Does the record meet our current criteria
+bool extract_data::meets_criteria(record* qso) {
+	bool match = false;
+	// For all sets of criteria in the history stack
+	for (auto it = extract_criteria_.begin(); it != extract_criteria_.end(); it++) {
+		// Repeat the extraction
+		criteria_ = &(*it);
+		switch (criteria_->combi_mode) {
+		case XM_NEW:
+			match = false;
+			//Compare record against seaarch criteria
+			if (match_record(qso)) {
+				match = true;
+			}
+			break;
+		case XM_AND:
+			if (match && !match_record(qso)) {
+				match = false;
+			}
+			break;
+		case XM_OR:
+			if (!match && match_record(qso)) {
+				match = true;
+			}
+			break;
+		}
+	}
+	return match;
+}

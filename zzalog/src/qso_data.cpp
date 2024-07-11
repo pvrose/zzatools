@@ -844,6 +844,7 @@ bool qso_data::action_save() {
 	}
 
 	book_->add_use_data(qso);
+	extract_records_->check_add_record(qso_number);
 
 	book_->enable_save(true, "Saving QSO");
 

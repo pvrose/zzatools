@@ -64,6 +64,8 @@ using namespace std;
 		bool upload_in_progress();
 		// Return extract mode
 		extract_mode_t use_mode();
+		// Check and add record
+		void check_add_record(qso_num_t record_num);
 
 		// return the real record number
 		virtual qso_num_t record_number(item_num_t item);
@@ -71,7 +73,6 @@ using namespace std;
 		virtual item_num_t item_number(qso_num_t record, bool nearest = false);
 		// Change the selected record (& update any necessary controls)
 		virtual item_num_t selection(item_num_t num_record, hint_t hint = HT_SELECTED, view* requester = nullptr, qso_num_t num_other = 0);
-
 
 	protected:
 		// Extract records for the criteria
@@ -82,6 +83,8 @@ using namespace std;
 		string short_comment();
 		// Swap two records
 		void swap_records(item_num_t record_num_1, item_num_t record_num_2);
+		// Check record is within the extraction criteria
+		bool meets_criteria(record* qso);
 
 		// The list of extract criteria
 		list<search_criteria_t> extract_criteria_;
