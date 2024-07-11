@@ -146,6 +146,7 @@ void tabbed_forms::activate_pane(object_t pane, bool active) {
 		// Restore any query
 		v->update(last_hint_, last_record_1_, last_record_2_);
 		g->redraw();
+		redraw();
 	}
 	else {
 		// "Hide" the object by switching to the main log

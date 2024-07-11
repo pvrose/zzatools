@@ -131,7 +131,7 @@ void log_table::cb_tab_log(Fl_Widget* w, void* v) {
 	qso_num_t qso_number;
 	if (that->my_book_) {
 		item_num = that->order_ == LAST_TO_FIRST ? that->my_book_->size() - 1 - row : row;
-		qso_number = qso_number = that->my_book_->record_number(item_num);
+		qso_number = that->my_book_->record_number(item_num);
 	}
 	else {
 		item_num = -1;

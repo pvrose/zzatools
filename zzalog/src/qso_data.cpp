@@ -697,6 +697,7 @@ void qso_data::action_new_qso(record* qso, qso_init_t mode) {
 			qe->copy_qso_to_qso(qso, qso_entry::CF_RIG_ETC | qso_entry::CF_CAT);
 		}
 		qe->copy_clock_to_qso();
+		if (in_contest()) qe->copy_contest_to_qso();
 		g_misc_->qso(current_qso(), current_number());
 		break;
 	case QSO_COPY_CONDX:

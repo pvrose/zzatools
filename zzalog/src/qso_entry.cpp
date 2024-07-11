@@ -524,6 +524,7 @@ void qso_entry::copy_contest_to_qso() {
 		// Exchange information: serial number, other doobry
 		qso_->item("STX", qso_data_->contest()->serial());
 		qso_->item("STX_STRING", qso_data_->contest()->exchange());
+		qso_->item("CONTEST_ID", qso_data_->contest()->contest_id());
 	}
 }
 

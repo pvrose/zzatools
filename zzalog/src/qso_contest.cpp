@@ -7,12 +7,16 @@
 #include "menu.h"
 #include "settings.h"
 #include "status.h"
+#include "extract_data.h"
+#include "tabbed_forms.h"
 
 #include <FL/Fl_Preferences.H>
 
 extern Fl_Preferences* settings_;
 extern fields* fields_;
 extern status* status_;
+extern extract_data* extract_records_;
+extern tabbed_forms* tabbed_forms_;
 
 // Constructor
 qso_contest::qso_contest(int X, int Y, int W, int H, const char* L) :
@@ -315,6 +319,10 @@ void qso_contest::cb_active(Fl_Widget* w, void* v) {
 			qd->action_activate(qso_data::QSO_ON_AIR);
 			snprintf(msg, sizeof(msg), "DASH: Starting contest %s.", that->contest_id_.c_str());
 			status_->misc_status(ST_OK, msg);
+			// Extract existing QSOs in this contest, use the collection and display the pane
+			extract_records_->extract_field("CONTEST_ID", that->contest_id_, false, that->start_date_, that->end_date_);
+			fields_->link_app(FO_EXTRACTLOG, that->collection_);
+			tabbed_forms_->activate_pane(OT_EXTRACT, true);
 			break;
 		default:
 			status_->misc_status(ST_ERROR, "DASH: Not in a state to start contest activity!");

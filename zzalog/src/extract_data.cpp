@@ -803,16 +803,16 @@ void extract_data::extract_call(string callsign) {
 }
 
 // Extract all records for specified field
-void extract_data::extract_field(string field_name, string value, bool and_search) {
+void extract_data::extract_field(string field_name, string value, bool and_search, string start, string endd) {
 	// Now check that they are all for the current station
 	string station = qso_manager_->get_default(qso_manager::CALLSIGN);
 	// Extract those records where CALL matches callsign 
 	search_criteria_t	new_criteria = {
 		/*search_cond_t condition*/ XC_FIELD,
 		/*search_comp_t comparator*/ XP_EQ,
-		/*bool by_dates*/ false,
-		/*string from_date*/"",
-		/*string to_date;*/"",
+		/*bool by_dates*/ start.length() != 0 || endd.length() != 0,
+		/*string from_date*/start,
+		/*string to_date;*/endd,
 		/*string band;*/ "Any",
 		/*string mode;*/ "Any",
 		/*bool confirmed_eqsl;*/ false,

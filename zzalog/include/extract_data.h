@@ -57,7 +57,7 @@ using namespace std;
 		// Special extract that requires additional action
 		void extract_no_image();
 		// Extract field only
-		void extract_field(string field_name, string value, bool and_search);
+		void extract_field(string field_name, string value, bool and_search, string start = "", string endd = "");
 		// Correct record order
 		void correct_record_order();
 		// Upload in progress
