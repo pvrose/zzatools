@@ -89,7 +89,8 @@ void qso_contest::create_form() {
 	bn_start_date_->tooltip("Open calendar to chnage date to fetch eQSL.cc");
 
 	curr_x += bn_start_date_->w();
-	ip_start_time_ = new Fl_Input(curr_x, curr_y, WBUTTON * 3 / 2, HBUTTON);
+	const int WTIME = WSMEDIT - WBUTTON - HBUTTON;
+	ip_start_time_ = new Fl_Input(curr_x, curr_y, WTIME, HBUTTON);
 	ip_start_time_->callback(cb_value<Fl_Input, string>, &start_time_);
 	ip_start_time_->tooltip("Enter the time the contest starts");
 
@@ -110,7 +111,7 @@ void qso_contest::create_form() {
 	bn_end_date_->tooltip("Open calendar to chnage date to fetch eQSL.cc");
 
 	curr_x += bn_end_date_->w();
-	ip_end_time_ = new Fl_Input(curr_x, curr_y, WBUTTON * 3 / 2, HBUTTON);
+	ip_end_time_ = new Fl_Input(curr_x, curr_y, WTIME, HBUTTON);
 	ip_end_time_->callback(cb_value<Fl_Input, string>, &end_time_);
 	ip_end_time_->tooltip("Enter the time the contest ends");
 
