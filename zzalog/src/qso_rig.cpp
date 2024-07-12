@@ -212,7 +212,7 @@ void qso_rig::create_buttons(int& curr_x, int& curr_y) {
 	curr_x += bn_connect_->w();
 	// Selects the rig or allows a rig to be selected
 	bn_select_ = new Fl_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Select");
-	bn_select_->color(FL_YELLOW);
+	// bn_select_->color(FL_YELLOW);
 	bn_select_->tooltip("Select the rig to connect");
 	bn_select_->value(false);
 	bn_select_->callback(cb_bn_select, nullptr);
@@ -220,8 +220,8 @@ void qso_rig::create_buttons(int& curr_x, int& curr_y) {
 	curr_x += bn_select_->w();
 	// Start flrig (if that is the hamlib rig)
 	bn_start_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Start Flrig");
-	bn_start_->color(FL_DARK_GREEN);
-	bn_start_->labelcolor(FL_WHITE);
+	// bn_start_->color(FL_DARK_GREEN);
+	// bn_start_->labelcolor(FL_WHITE);
 	bn_start_->tooltip("Start flrig for this connection");
 	bn_start_->callback(cb_bn_start, &app_flrig_);
 
@@ -604,7 +604,7 @@ void qso_rig::enable_widgets() {
 	if (!rig_) {
 		// No rig
 		bn_connect_->deactivate();
-		bn_connect_->color(FL_BACKGROUND_COLOR);
+		// bn_connect_->color(FL_BACKGROUND_COLOR);
 		bn_connect_->label("");
 		bn_select_->activate();
 		if (bn_select_->value()) {
@@ -616,7 +616,7 @@ void qso_rig::enable_widgets() {
 	} else if (rig_->is_open()) {
 		// Rig is connected
 		bn_connect_->activate();
-		bn_connect_->color(fl_lighter(FL_RED));
+		// bn_connect_->color(fl_lighter(FL_RED));
 		bn_connect_->label("Disconnect");
 		bn_select_->deactivate();
 		bn_select_->label("");
@@ -625,7 +625,7 @@ void qso_rig::enable_widgets() {
 	} else {
 		// Rig is not connected
 		bn_connect_->activate();
-		bn_connect_->color(fl_lighter(FL_GREEN));
+		// bn_connect_->color(fl_lighter(FL_GREEN));
 		bn_connect_->label("Connect");
 		bn_select_->activate();
 		if (bn_select_->value()) {

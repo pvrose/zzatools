@@ -67,8 +67,8 @@ void qso_qth::create_form(int X, int Y) {
 
 	// Edit button
 	bn_edit_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Edit");
-	bn_edit_->color(COLOUR_MAUVE);
-	bn_edit_->labelcolor(FL_BLACK);
+	// bn_edit_->color(COLOUR_MAUVE);
+	// bn_edit_->labelcolor(FL_BLACK);
 	bn_edit_->callback(cb_bn_edit, nullptr);
 	bn_edit_->tooltip("Open window to allow QTH to be edited");
 	max_x = max(max_x, bn_edit_->x() + bn_edit_->w());

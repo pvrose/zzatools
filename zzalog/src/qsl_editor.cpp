@@ -640,13 +640,16 @@ void qsl_editor::create_tparams(int& curr_x, int& curr_y, qsl_display::text_def*
 	// The button's label will be displayed in the selected font, size and colour
 	Fl_Button* t_tstyle = new Fl_Button(curr_x, curr_y, HBUTTON, HBUTTON, "S");
 	t_tstyle->align(FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
-	t_tstyle->tooltip("Opens up a dialog to set font style and colour");
 	t_tstyle->callback(cb_bn_style, (void*)&text->t_style);
 	t_tstyle->when(FL_WHEN_RELEASE);
 	t_tstyle->color(FL_WHITE);
 	t_tstyle->labelcolor(text->t_style.colour);
 	t_tstyle->labelfont(text->t_style.font);
 	t_tstyle->labelsize(text->t_style.size);
+	snprintf(temp, sizeof(temp), "%s: %d pt. Click to change", 
+		Fl::get_font_name(Fl_Font(text->t_style.font), nullptr), 
+		text->t_style.size);
+	t_tstyle->copy_tooltip(temp);
 
 	curr_x += t_tstyle->w();
 	curr_y += HBUTTON;

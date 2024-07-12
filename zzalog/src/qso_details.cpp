@@ -164,15 +164,16 @@ void qso_details::table_d::draw_cell(TableContext context, int R, int C, int X, 
 				s_value = qso->item(field);
 				if (s_value.length() && s_value == text) used = true;
 			}
-			Fl_Color bg_colour = used ? fl_lighter(COLOUR_CLARET) : FL_BACKGROUND_COLOR;
-			if (!active_r()) bg_colour = fl_inactive(bg_colour);
+			// Fl_Color bg_colour = used ? fl_lighter(COLOUR_CLARET) : FL_BACKGROUND_COLOR;
+			// if (!active_r()) bg_colour = fl_inactive(bg_colour);
 			// BOX
-			fl_draw_box(FL_THIN_UP_BOX, X, Y, W, H, bg_colour);
+			fl_draw_box(FL_THIN_UP_BOX, X, Y, W, H, FL_BACKGROUND_COLOR);
 			// TEXT
-			Fl_Color fg_colour = fl_contrast(FL_BLACK, bg_colour);
+			// Fl_Color fg_colour = fl_contrast(FL_BLACK, bg_colour);
+			Fl_Color fg_colour = FL_FOREGROUND_COLOR;
 			if (!active_r()) fg_colour = fl_inactive(fg_colour);
-			fl_color(fg_colour);
-			fl_font(0, FL_NORMAL_SIZE);
+			fl_color(fg_colour);	
+			fl_font(used ? FL_BOLD : 0, FL_NORMAL_SIZE);
 			fl_draw(text.c_str(), X + 1, Y, W - 1, H, FL_ALIGN_LEFT);
 
 			// BORDER
@@ -274,11 +275,13 @@ void qso_details::table_q::draw_cell(TableContext context, int R, int C, int X, 
 			text = "My Call";
 			break;
 		}
+		// BOX
+		fl_draw_box(FL_THIN_UP_BOX, X, Y, W, H, FL_BACKGROUND_COLOR);
 		// TEXT
 		Fl_Color fg_colour = FL_FOREGROUND_COLOR;
 		if (!active_r()) fg_colour = fl_inactive(fg_colour);
 		fl_color(fg_colour);
-		fl_font(FL_BOLD | FL_ITALIC, FL_NORMAL_SIZE);
+		fl_font(FL_ITALIC | FL_BOLD, FL_NORMAL_SIZE);
 		fl_draw(text.c_str(), X + 1, Y, W - 1, H, FL_ALIGN_LEFT);
 		// BORDER
 		fl_color(FL_LIGHT1);
@@ -319,15 +322,16 @@ void qso_details::table_q::draw_cell(TableContext context, int R, int C, int X, 
 				if (s_value.length() && s_value == text) used = true;
 				if (qso->item("STATION_CALLSIGN") == it->item("STATION_CALLSIGN")) same_call = true;
 			}
-			Fl_Color bg_colour = used ? (same_call ? fl_lighter(COLOUR_CLARET) : COLOUR_APPLE) : FL_BACKGROUND_COLOR;
-			if (!active_r()) bg_colour = fl_inactive(bg_colour);
+			// Fl_Color bg_colour = used ? (same_call ? fl_lighter(COLOUR_CLARET) : COLOUR_APPLE) : FL_BACKGROUND_COLOR;
+			// if (!active_r()) bg_colour = fl_inactive(bg_colour);
 			// BOX
-			fl_draw_box(FL_THIN_UP_BOX, X, Y, W, H, bg_colour);
+			fl_draw_box(FL_THIN_UP_BOX, X, Y, W, H, FL_BACKGROUND_COLOR);
 			// TEXT
-			Fl_Color fg_colour = fl_contrast(FL_BLACK, bg_colour);
+			Fl_Color fg_colour = FL_FOREGROUND_COLOR;
 			if (!active_r()) fg_colour = fl_inactive(fg_colour);
 			fl_color(fg_colour);
-			fl_font(0, FL_NORMAL_SIZE);
+			Fl_Font f = same_call ? (used ? FL_BOLD : 0 ) : FL_ITALIC;
+			fl_font(f, FL_NORMAL_SIZE);
 			fl_draw(text.c_str(), X + 1, Y, W - 1, H, FL_ALIGN_LEFT);
 
 			// BORDER
