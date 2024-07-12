@@ -1,5 +1,6 @@
 #include "qso_qsl_vwr.h"
 #include "qso_data.h"
+#include "qso_manager.h"
 #include "eqsl_handler.h"
 #include "status.h"
 #include "book.h"
@@ -673,7 +674,13 @@ void qso_qsl_vwr::draw_image() {
 		bn_card_display_->label("My QSL is displayed in separate window\nclick to show");
 		bn_card_display_->labelcolor(FL_FOREGROUND_COLOR);
 		bn_card_display_->labelsize(FL_NORMAL_SIZE);
-		display_myqsl_->value(current_qso_->item("STATION_CALLSIGN"), &current_qso_, 1);
+		if (current_qso_) {
+			display_myqsl_->value(current_qso_->item("STATION_CALLSIGN"), &current_qso_, 1);
+		} else {
+			qso_manager* mgr = ancestor_view<qso_manager>(this);
+			string def_call = mgr->get_default(qso_manager::CALLSIGN);
+			display_myqsl_->value(def_call, nullptr, 0);
+		}
 		break;
 	}
 
