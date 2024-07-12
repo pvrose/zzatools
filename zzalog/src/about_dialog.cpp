@@ -70,8 +70,6 @@ about_dialog::about_dialog() :
 	Fl_Button* bn_ok = new Fl_Button(C3, R4, WBUTTON, HBUTTON, "OK");
 	bn_ok->callback(cb_bn_ok);
 	bn_ok->when(FL_WHEN_RELEASE);
-	bn_ok->color(fl_lighter(FL_GREEN));
-	bn_ok->labelcolor(FL_BLACK);
 	const int HALL = R4 + HBUTTON + EDGE;
 
 	// now calculate where to put the icon - centralise its Y position

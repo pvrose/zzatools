@@ -143,8 +143,6 @@ search_dialog::search_dialog() :
 		bn11->box(FL_THIN_UP_BOX);
 		bn11->align(FL_ALIGN_RIGHT | FL_ALIGN_INSIDE);
 		bn11->value(criteria_->condition == i);
-		bn11->color(fl_lighter(FL_MAGENTA));
-		bn11->labelcolor(FL_BLACK);
 		char* temp = new char[128];
 		sprintf(temp, "Use %s to search for records", condition_labels_[i].c_str());
 		bn11->copy_tooltip(temp);
@@ -174,8 +172,6 @@ search_dialog::search_dialog() :
 		bn13->box(FL_THIN_UP_BOX);
 		bn13->align(FL_ALIGN_RIGHT | FL_ALIGN_INSIDE);
 		bn13->value(criteria_->comparator == i);
-		bn13->color(fl_lighter(FL_YELLOW));
-		bn13->labelcolor(FL_BLACK);
 		char* temp = new char[128];
 		sprintf(temp, "Use %s to compare records", comparator_labels_[i].c_str());
 		bn13->copy_tooltip(temp);
@@ -377,15 +373,11 @@ search_dialog::search_dialog() :
 	fail_box_ = box;
 	// Button - OK
 	Fl_Button* bn_ok = new Fl_Button(CX1, YGX, WBUTTON, HBUTTON, "OK");
-	bn_ok->color(fl_lighter(FL_GREEN));
-	bn_ok->labelcolor(FL_BLACK);
 	bn_ok->callback(cb_bn_ok);
 	bn_ok->when(FL_WHEN_RELEASE);
 	bn_ok->tooltip("Start the search");
 	// Button - Cancel
 	Fl_Button* bn_cancel = new Fl_Button(CX2, YGX, WBUTTON, HBUTTON, "Cancel");
-	bn_cancel->color(fl_lighter(FL_RED));
-	bn_cancel->labelcolor(FL_BLACK);
 	bn_cancel->callback(cb_bn_cancel);
 	bn_cancel->when(FL_WHEN_RELEASE);
 	bn_cancel->tooltip("Cancel the search");
