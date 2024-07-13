@@ -270,6 +270,9 @@ void menu::cb_mi_file_new(Fl_Widget* w, void* v) {
 			book_->store_data();
 		}
 	}
+
+	qso_manager_->deactivate_all();
+
 	// get book to delete contents by loading no data
 	book_->load_data("");
 	// Allow writes
@@ -297,6 +300,8 @@ void menu::cb_mi_file_open(Fl_Widget* w, void* v) {
 			cb_mi_file_save(w, v);
 		}
 	}
+
+	qso_manager_->deactivate_all();
 	
 	// Set to a recent file number (1 to 4) or 0 for file_chooser
 	char file_id = (char)(intptr_t)v;
@@ -426,6 +431,7 @@ void menu::cb_mi_file_close(Fl_Widget* w, void* v) {
 	// Gracefully stop import
 	import_data_->stop_update(false);
 	while (!import_data_->update_complete()) Fl::check();
+	qso_manager_->deactivate_all();
 	main_window_->do_callback();
 }
 

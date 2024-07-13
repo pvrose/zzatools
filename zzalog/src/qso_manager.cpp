@@ -450,3 +450,9 @@ qso_qsl* qso_manager::qsl_control() {
 qso_log_info* qso_manager::log_info() {
 	return info_group_->log_info();
 }
+
+// Deactivate any QSO entry and rigs to 
+void qso_manager::deactivate_all() {
+	data_group_->action_deactivate();
+	rig_group_->deactivate_rigs();
+}

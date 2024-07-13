@@ -499,11 +499,13 @@ void qso_entry::copy_clock_to_qso() {
 void qso_entry::copy_default_to_qso() {
 	if (qso_) {
 		record* latest = book_->get_latest();
-		qso_->item("STATION_CALLSIGN", latest->item("STATION_CALLSIGN"));
-		qso_->item("APP_ZZA_QTH", latest->item("APP_ZZA_QTH"));
-		qso_->item("MY_RIG", latest->item("MY_RIG"));
-		qso_->item("MY_ANTENNA", latest->item("MY_ANTENNA"));
-		qso_->item("APP_ZZA_OP", latest->item("APP_ZZA_OP"));
+		if (latest) {
+			qso_->item("STATION_CALLSIGN", latest->item("STATION_CALLSIGN"));
+			qso_->item("APP_ZZA_QTH", latest->item("APP_ZZA_QTH"));
+			qso_->item("MY_RIG", latest->item("MY_RIG"));
+			qso_->item("MY_ANTENNA", latest->item("MY_ANTENNA"));
+			qso_->item("APP_ZZA_OP", latest->item("APP_ZZA_OP"));
+		}
 	}
 }
 
@@ -828,7 +830,11 @@ void qso_entry::qso(qso_num_t number) {
 			qso_ = book_->get_record(number, false);
 		}
 		delete original_qso_;
-		original_qso_ = new record(*qso_);
+		if (qso_) {
+			original_qso_ = new record(*qso_);
+		} else {
+			original_qso_ = nullptr;
+		}
 	}
 }
 

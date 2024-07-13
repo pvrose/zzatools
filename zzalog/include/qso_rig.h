@@ -57,6 +57,8 @@ public:
 	string antenna();
 	// Suffix to apply to app invocations
 	string app(modem_t m);
+	// Disconnect rig
+	void disconnect();
 
 protected:
 	// Callback - model choice

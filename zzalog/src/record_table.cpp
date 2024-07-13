@@ -275,7 +275,7 @@ void record_table::set_records(record* log_record, record* query_record, record*
 		display_mode_ = DUPE_QUERY;
 		cols(2);
 	}
-	col_width_all(tow / cols());
+	if (cols())	col_width_all(tow / cols());
 }
 
 // Get the fields that will be displayed - those used in records being displayed plus the minimum set of records specified in settings

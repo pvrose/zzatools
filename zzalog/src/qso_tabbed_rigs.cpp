@@ -159,3 +159,16 @@ rig_if* qso_tabbed_rigs::rig() {
 	// Otherwise return the rig in the selected tab
 	return ((qso_rig*)value())->rig();
 }
+
+// Deactivae all rigs
+void qso_tabbed_rigs::deactivate_rigs() {
+	while (children()) {
+		qso_rig* rig = (qso_rig*)child(0);
+		rig->disconnect();
+		delete_child(0);
+	}
+	label_map_.clear();
+	load_values();
+	begin();
+	create_form(x(), y());
+}

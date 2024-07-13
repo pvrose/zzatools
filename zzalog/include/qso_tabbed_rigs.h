@@ -32,6 +32,9 @@ public:
 	// Get the rig
 	rig_if* rig();
 
+	// Deactivate all rigs
+	void deactivate_rigs();
+
 protected:
 
 	// Callback

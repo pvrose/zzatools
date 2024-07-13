@@ -116,6 +116,9 @@ using namespace std;
 		// Log info
 		qso_log_info* log_info();
 
+		// Deactivate all QSOs and Rigs
+		void deactivate_all();
+
 		// Shared QSL methods
 		void qsl_download(import_data::update_mode_t server);
 		void qsl_extract(extract_data::extract_mode_t server);

@@ -53,6 +53,7 @@ qso_rig::qso_rig(int X, int Y, int W, int H, const char* L) :
 qso_rig::~qso_rig() {
 	save_values();
 	delete rig_;
+	ticker_->remove_ticker(this);
 }
 
 // Get initial data from settings
@@ -1194,3 +1195,10 @@ string qso_rig::app(modem_t m) {
 	return apps_[(int)m];
 }
 
+// Force disconnect
+void qso_rig::disconnect() {
+	if (rig_ && rig_->is_open()) {
+		rig_->close();
+	}
+
+}

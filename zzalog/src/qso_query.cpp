@@ -118,7 +118,10 @@ void qso_query::set_query(string message, qso_num_t log_number, record* query_qs
 	log_number_ = log_number;
 	if (log_number != -1) {
 		log_qso_ = book_->get_record(book_->item_number(log_number_), false);
-		if (save_original) original_qso_ = new record(*log_qso_);
+		if (save_original) {
+			if (log_qso_) original_qso_ = new record(*log_qso_);
+			else original_qso_ = nullptr;
+		}
 		else original_qso_ = nullptr;
 	}
 	else {

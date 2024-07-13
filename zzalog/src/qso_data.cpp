@@ -151,6 +151,9 @@ void qso_data::enable_widgets() {
 			if (menu_) menu_->update_items();
 		}
 
+		string call;
+		if (current_qso()) call = current_qso()->item("CALL");
+		else call = "N/A";
 		char l[128];
 		switch (logging_state_) {
 		case QSO_INACTIVE:
@@ -191,7 +194,7 @@ void qso_data::enable_widgets() {
 			break;
 		case QSO_STARTED:
 			// Real-time logging - QSO started
-			snprintf(l, sizeof(l), "QSO Entry - %s - logging new contact", current_qso()->item("CALL").c_str());
+			snprintf(l, sizeof(l), "QSO Entry - %s - logging new contact", call.c_str());
 			g_entry_->copy_label(l);
 			g_entry_->labelcolor(DARK ? fl_lighter(FL_BLUE) : FL_BLUE);
 			g_entry_->show();
@@ -205,8 +208,7 @@ void qso_data::enable_widgets() {
 		case TEST_ACTIVE:
 			// Real-time logging - QSO started
 			snprintf(l, sizeof(l), "QSO Entry - Contest %s logging %s",
-				contest()->contest_id().c_str(),
-				current_qso()->item("CALL").c_str());
+				contest()->contest_id().c_str(), call.c_str());
 			g_entry_->copy_label(l);
 			g_entry_->labelcolor(DARK ? FL_MAGENTA : FL_DARK_MAGENTA);
 			g_entry_->show();
@@ -219,7 +221,7 @@ void qso_data::enable_widgets() {
 			break;
 		case QSO_ENTER:
 			// Back-logging - enter QSO details
-			snprintf(l, sizeof(l), "QSO Entry - %s - logging old contact", current_qso()->item("CALL").c_str());
+			snprintf(l, sizeof(l), "QSO Entry - %s - logging old contact", call.c_str());
 			g_entry_->copy_label(l);
 			g_entry_->labelcolor(DARK ? fl_lighter(FL_BLUE) : FL_BLUE);
 			g_entry_->show();
@@ -232,7 +234,7 @@ void qso_data::enable_widgets() {
 			break;
 		case QSO_EDIT:
 			// Editing an existing QSO
-			snprintf(l, sizeof(l), "QSO Entry - %s - editing existing contact", current_qso()->item("CALL").c_str());
+			snprintf(l, sizeof(l), "QSO Entry - %s - editing existing contact", call.c_str());
 			g_entry_->copy_label(l);
 			g_entry_->labelcolor(DARK ? fl_lighter(FL_BLUE) : FL_BLUE);
 			g_entry_->show();
@@ -245,7 +247,7 @@ void qso_data::enable_widgets() {
 			break;
 		case QSO_VIEW:
 			// Viewing (read-only) an existing QSO
-			snprintf(l, sizeof(l), "QSO Entry - %s - read only", current_qso()->item("CALL").c_str());
+			snprintf(l, sizeof(l), "QSO Entry - %s - read only", call.c_str());
 			g_entry_->copy_label(l);
 			g_entry_->labelcolor(DARK ? fl_lighter(FL_BLUE) : FL_BLUE);
 			g_entry_->show();
@@ -259,7 +261,7 @@ void qso_data::enable_widgets() {
 		case QSO_BROWSE:
 			// Browsing - display using tabular view
 			g_entry_->hide();
-			snprintf(l, sizeof(l), "QSO Query - %s - %s", g_query_->qso()->item("CALL").c_str(), g_query_->query_message().c_str());
+			snprintf(l, sizeof(l), "QSO Query - %s - %s", call.c_str(), g_query_->query_message().c_str());
 			g_query_->copy_label(l);
 			g_query_->show();
 			g_query_->enable_widgets();
@@ -273,7 +275,7 @@ void qso_data::enable_widgets() {
 		case QUERY_MATCH:
 			// Show an imported QSO and possible match in log check if matcehd
 			g_entry_->hide();
-			snprintf(l, sizeof(l), "QSO Query - %s - %s", g_query_->qso()->item("CALL").c_str(), g_query_->query_message().c_str());
+			snprintf(l, sizeof(l), "QSO Query - %s - %s", call.c_str(), g_query_->query_message().c_str());
 			g_query_->copy_label(l);
 			g_query_->show();
 			g_query_->enable_widgets();
@@ -285,7 +287,7 @@ void qso_data::enable_widgets() {
 		case QUERY_NEW:
 			// Show an imported QSO (no match found) and check if real
 			g_entry_->hide();
-			snprintf(l, sizeof(l), "QSO Query - %s - %s", g_query_->query_qso()->item("CALL").c_str(), g_query_->query_message().c_str());
+			snprintf(l, sizeof(l), "QSO Query - %s - %s", call.c_str(), g_query_->query_message().c_str());
 			g_query_->copy_label(l);
 			g_query_->show();
 			g_query_->enable_widgets();
@@ -297,7 +299,7 @@ void qso_data::enable_widgets() {
 		case QUERY_WSJTX:
 			// Show an imported QSO and possible match found in WSJTX All.TXT file
 			g_entry_->hide();
-			snprintf(l, sizeof(l), "QSO Query - %s - Possible match found in ALL.TXT", g_query_->query_qso()->item("CALL").c_str());
+			snprintf(l, sizeof(l), "QSO Query - %s - Possible match found in ALL.TXT", call.c_str());
 			g_query_->copy_label(l);
 			g_query_->show();
 			g_query_->enable_widgets();
@@ -330,7 +332,7 @@ void qso_data::enable_widgets() {
 			break;
 		case QSO_WSJTX:
 			// Display real-time Qso from WSJT-X
-			snprintf(l, sizeof(l), "QSO Entry - %s - record received from WSJTX", current_qso()->item("CALL").c_str());
+			snprintf(l, sizeof(l), "QSO Entry - %s - record received from WSJTX", call.c_str());
 			g_entry_->copy_label(l);
 			g_entry_->show();
 			g_entry_->enable_widgets();
@@ -342,7 +344,7 @@ void qso_data::enable_widgets() {
 			break;
 		case QSO_FLDIGI:
 			// Display real-time QSO received from FLDID
-			snprintf(l, sizeof(l), "QSO Entry - %s - record received from FLDIGI", current_qso()->item("CALL").c_str());
+			snprintf(l, sizeof(l), "QSO Entry - %s - record received from FLDIGI", call.c_str());
 			g_entry_->copy_label(l);
 			g_entry_->show();
 			g_entry_->enable_widgets();
@@ -945,7 +947,41 @@ void qso_data::action_delete_qso() {
 
 // Action DEACTIVATE - Transition from QSO_PENDING to QSO_INACTIVE
 void qso_data::action_deactivate() {
-	g_entry_->delete_qso();
+	switch(logging_state_) {
+	case QSO_INACTIVE: 
+		// do nothing
+		break;
+	case QSO_PENDING:
+	case QSO_STARTED:
+	case QSO_EDIT:
+	case QSO_ENTER:
+	case QSO_VIEW:
+	case QSO_WSJTX:
+	case QSO_FLDIGI:
+	case TEST_PENDING:
+	case TEST_ACTIVE:
+		g_entry_->delete_qso();
+		break;
+	case QSO_BROWSE:
+	case QUERY_MATCH:
+	case QUERY_NEW:
+	case QUERY_WSJTX:
+	case QUERY_DUPE:
+		g_query_->clear_query();
+		break;
+	case MANUAL_ENTRY:
+		g_qy_entry_->delete_qso();
+		break;
+	case NET_STARTED:
+	case NET_EDIT:
+	case NET_ADDING:
+		while (g_net_entry_->entries()) {
+			g_net_entry_->remove_entry();
+		}
+		// Restore holding entry
+		g_net_entry_->add_entry();
+		break;
+	}
 	logging_state_ = QSO_INACTIVE;
 	enable_widgets();
 }
@@ -957,7 +993,7 @@ void qso_data::action_edit() {
 	g_entry_->qso(qso_number);
 	record* qso = g_entry_->qso();
 	// If the QSO looks incomplete ask if it is so and restart it else edit it
-	if (qso->item("TIME_OFF") == "") {
+	if (qso && qso->item("TIME_OFF") == "") {
 		time_t now = time(nullptr);
 		time_t qso_start = qso->timestamp();
 		if (difftime(now, qso_start) < 1800.0) {
@@ -990,9 +1026,11 @@ void qso_data::action_view() {
 void qso_data::action_save_edit() {
 	// We no longer need to maintain the copy of the original QSO
 	record* qso = g_entry_->qso();
-	book_->add_use_data(qso);
-	if (qso->is_dirty()) book_->modified(true);
-	g_entry_->delete_qso();
+	if (qso) {
+		book_->add_use_data(qso);
+		if (qso->is_dirty()) book_->modified(true);
+		g_entry_->delete_qso();
+	}
 	logging_state_ = edit_return_state_;
 	enable_widgets();
 }
