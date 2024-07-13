@@ -117,6 +117,9 @@ protected:
         CABRILLO
     } write_format_;
 
+    // Extract collection
+    string saved_collection_;
+
     // Callback data for the calendars
     cal_cb_data_t start_data_;
     cal_cb_data_t end_data_;

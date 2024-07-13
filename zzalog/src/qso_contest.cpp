@@ -322,6 +322,7 @@ void qso_contest::cb_active(Fl_Widget* w, void* v) {
 			status_->misc_status(ST_OK, msg);
 			// Extract existing QSOs in this contest, use the collection and display the pane
 			extract_records_->extract_field("CONTEST_ID", that->contest_id_, false, that->start_date_, that->end_date_);
+			that->saved_collection_ = fields_->coll_name(FO_EXTRACTLOG);
 			fields_->link_app(FO_EXTRACTLOG, that->collection_);
 			tabbed_forms_->activate_pane(OT_EXTRACT, true);
 			tabbed_forms_->update_views(nullptr, HT_EXTRACTION, qd->current_number());
@@ -336,6 +337,9 @@ void qso_contest::cb_active(Fl_Widget* w, void* v) {
 		case qso_data::TEST_PENDING:
 			that->active_ = false;
 			qd->action_deactivate();
+			// restore saved collection for extract data
+			fields_->link_app(FO_EXTRACTLOG, that->saved_collection_);
+			tabbed_forms_->update_views(nullptr, HT_FORMAT, qd->current_number());
 			snprintf(msg, sizeof(msg), "DASH: Suspending contest %s.", that->contest_id_.c_str());
 			status_->misc_status(ST_OK, msg);
 			break;
