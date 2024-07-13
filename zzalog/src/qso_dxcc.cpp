@@ -144,6 +144,7 @@ void qso_dxcc::enable_widgets() {
 		op_geo_->value("");
 	}
 	g_wb4_->enable_widgets();
+	end();
 }
 
 // Set the data - parse the callsign in the current qso
@@ -285,8 +286,8 @@ void qso_dxcc::wb4_buttons::enable_widgets() {
 		if (child(ix)->type() == FL_TOGGLE_BUTTON) {
 			// Only for the band and mode toggle buttons
 			Fl_Toggle_Button* bn = (Fl_Toggle_Button*)child(ix);
-			bn->color(FL_BACKGROUND_COLOR);
-			bn->labelcolor(fl_inactive(FL_FOREGROUND_COLOR));
+			bn->labelcolor(FL_FOREGROUND_COLOR);
+			bn->deactivate();
 			bn->value(false);
 		}
 	}
@@ -294,24 +295,21 @@ void qso_dxcc::wb4_buttons::enable_widgets() {
 	if (qso && qso->item("CALL").length()) {
 		if (qso_band.length()) {
 			Fl_Toggle_Button* bn = (Fl_Toggle_Button*)map_.at(qso_band);
-			// bn->color(COLOUR_CLARET, COLOUR_CLARET);
-			// bn->labelcolor(fl_contrast(FL_BLACK, bn->color()));
+			bn->activate();
 			bn->labelcolor(FL_FOREGROUND_COLOR);
 			bn->labelfont(FL_BOLD);
 			bn->value(true);
 		}
 		if (qso_mode.length()) {
 			Fl_Toggle_Button* bn = (Fl_Toggle_Button*)map_.at(qso_mode);
-			// bn->color(FL_DARK_GREEN, FL_DARK_GREEN);
-			// bn->labelcolor(fl_contrast(FL_BLACK, bn->color()));
+			bn->activate();
 			bn->labelcolor(FL_FOREGROUND_COLOR);
 			bn->labelfont(FL_BOLD);
 			bn->value(true);
 		}
 		if (qso_submode.length()) {
 			Fl_Toggle_Button* bn = (Fl_Toggle_Button*)map_.at(qso_submode);
-			// bn->color(FL_DARK_GREEN, FL_DARK_GREEN);
-			// bn->labelcolor(fl_contrast(FL_BLACK, bn->color()));
+			bn->activate();
 			bn->labelcolor(FL_FOREGROUND_COLOR);
 			bn->labelfont(FL_BOLD);
 			bn->value(true);
@@ -321,8 +319,7 @@ void qso_dxcc::wb4_buttons::enable_widgets() {
 		if (dxcc_bands_) {
 			for (auto ix = dxcc_bands_->begin(); ix != dxcc_bands_->end(); ix++) {
 				Fl_Toggle_Button * bn = (Fl_Toggle_Button*)map_.at(*ix);
-				// bn->color(COLOUR_MAUVE, COLOUR_MAUVE);
-				// bn->labelcolor(fl_contrast(FL_BLACK, bn->color()));
+				bn->activate();
 				bn->labelcolor(FL_FOREGROUND_COLOR);
 				bn->labelfont(0);
 			}
@@ -332,8 +329,7 @@ void qso_dxcc::wb4_buttons::enable_widgets() {
 		if (dxcc_modes_) {
 			for (auto ix = dxcc_modes_->begin(); ix != dxcc_modes_->end(); ix++) {
 				Fl_Toggle_Button* bn = (Fl_Toggle_Button*)map_.at(*ix);
-				// bn->color(COLOUR_APPLE, COLOUR_APPLE);
-				// bn->labelcolor(fl_contrast(FL_BLACK, bn->color()));
+				bn->activate();
 				bn->labelcolor(FL_FOREGROUND_COLOR);
 				bn->labelfont(0);
 			}
@@ -341,8 +337,7 @@ void qso_dxcc::wb4_buttons::enable_widgets() {
 		if (dxcc_submodes_) {
 			for (auto ix = dxcc_submodes_->begin(); ix != dxcc_submodes_->end(); ix++) {
 				Fl_Toggle_Button* bn = (Fl_Toggle_Button*)map_.at(*ix);
-				// bn->color(COLOUR_APPLE, COLOUR_APPLE);
-				// bn->labelcolor(fl_contrast(FL_BLACK, bn->color()));
+				bn->activate();
 				bn->labelcolor(FL_FOREGROUND_COLOR);
 				bn->labelfont(0);
 			}

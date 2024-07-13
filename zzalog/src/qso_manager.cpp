@@ -128,6 +128,7 @@ void qso_manager::create_form(int X, int Y) {
 	curr_y += GAP;
 	int save_y = curr_y;
 
+	Fl_Group::current(this);
 	// Rig control tabbed form
 	rig_group_ = new qso_tabbed_rigs(curr_x, curr_y, 0, 0, nullptr);
 

@@ -76,6 +76,8 @@ void qso_misc::enable_widgets() {
 	dxcc_->enable_widgets();
 	qsl_->enable_widgets();
 	contest_->enable_widgets();
+	// dxcc_ and qsl_ create dynamic widgets - return current to this's parent
+	end();
 }
 
 // save value

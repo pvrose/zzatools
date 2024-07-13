@@ -137,6 +137,8 @@ void qso_data::create_form(int X, int Y) {
 		action_activate(QSO_ON_AIR);
 	}
 	enable_widgets();
+	// May have added widgets 
+	
 
 }
 
@@ -166,6 +168,7 @@ void qso_data::enable_widgets() {
 			g_query_->hide();
 			g_qy_entry_->hide();
 			g_misc_->activate();
+			g_misc_->enable_widgets();
 			break;
 		case QSO_PENDING:
 			// Real-time logging - waiting to start QSO
