@@ -74,10 +74,10 @@
     <LibraryPath>C:\Users\pvros\Documents\dev\deps\lib;C:\Users\pvros\Documents\dev\fltk-master\build\lib\RelWithDebInfo;C:\Users\pvros\Documents\dev\curl-7.65.1\builds\libcurl-vc15-x86-release-dll-ipv6-sspi-winssl\lib;C:\Users\pvros\Documents\dev\zzatools\Release;$(LibraryPath);C:\Program Files %28x86%29\hamlib-w32-4.5.3\lib\msvc</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LibraryPath>C:\Users\pvros\Downloads\curl-8.2.0\curl-8.2.0\build\Win64\VC14.30\LIB Release;C:\Program Files\hamlib-w64-4.5.5\lib\msvc;C:\Users\pvros\source\repos\fltk\build\lib\Release;${LibraryPath};C:\Users\pvros\source\repos\curlcpp\build\src\Release;$(LibraryPath)</LibraryPath>
+    <LibraryPath>C:\Program Files\hamlib-w64-4.5.5\lib\msvc;C:\Users\pvros\source\repos\fltk\build\lib\Release;${LibraryPath};C:\Users\pvros\Downloads\curl-8.2.0\curl-8.2.0\build\Win64\VC14.30\LIB Release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LibraryPath>C:\Users\pvros\Downloads\curl-8.2.0\curl-8.2.0\build\Win64\VC14.30\LIB Release;C:\Program Files\hamlib-w64-4.5.5\lib\msvc;C:\Users\pvros\source\repos\fltk\build\lib\Release;${LibraryPath};C:\Users\pvros\source\repos\curlcpp\build\src\Release;$(LibraryPath)</LibraryPath>
+    <LibraryPath>C:\Program Files\hamlib-w64-4.5.5\lib\msvc;C:\Users\pvros\source\repos\fltk\build\lib\Release;${LibraryPath};C:\Users\pvros\Downloads\curl-8.2.0\curl-8.2.0\build\Win64\VC14.30\LIB Release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -127,11 +127,11 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\pvros\source\repos\pvrose\zzatools\zzalog\include;C:\Users\pvros\source\repos\fltk\build;C:\Program Files\hamlib-w64-4.5.5\include;C:\Users\pvros\Downloads\curl-8.2.0\curl-8.2.0\include;C:\Users\pvros\source\repos\fltk;C:\Users\pvros\source\repos\pthread-win32;C:\Users\pvros\source\repos\curlcpp\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\pvros\source\repos\pvrose\zzatools\zzalog\include;C:\Users\pvros\source\repos\fltk\build;C:\Program Files\hamlib-w64-4.5.5\include;C:\Users\pvros\source\repos\fltk;C:\Users\pvros\source\repos\pthread-win32;C:\Users\pvros\Downloads\curl-8.2.0\curl-8.2.0\include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>CURL_STATICLIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>gdiplus.lib;gdi32.lib;libcurl.lib;Crypt32.lib;ws2_32.lib;winmm.lib;wldap32.lib;libhamlib-4.lib;fltk.lib;fltk_jpeg.lib;fltk_png.lib;fltk_z.lib;fltk_images.lib;comctl32.lib;comdlg32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>gdiplus.lib;gdi32.lib;libcurl.lib;Crypt32.lib;ws2_32.lib;normaliz.lib;winmm.lib;wldap32.lib;libhamlib-4.lib;fltk.lib;fltk_jpeg.lib;fltk_png.lib;fltk_z.lib;fltk_images.lib;comctl32.lib;comdlg32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>
       </IgnoreSpecificDefaultLibraries>
       <DelayLoadDLLs>%(DelayLoadDLLs)</DelayLoadDLLs>
@@ -140,11 +140,11 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\pvros\source\repos\pvrose\zzatools\zzalog\include;C:\Users\pvros\source\repos\fltk\build;C:\Program Files\hamlib-w64-4.5.5\include;C:\Users\pvros\Downloads\curl-8.2.0\curl-8.2.0\include;C:\Users\pvros\source\repos\fltk;C:\Users\pvros\source\repos\pthread-win32;C:\Users\pvros\source\repos\curlcpp\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\pvros\source\repos\pvrose\zzatools\zzalog\include;C:\Users\pvros\source\repos\fltk\build;C:\Program Files\hamlib-w64-4.5.5\include;C:\Users\pvros\source\repos\fltk;C:\Users\pvros\source\repos\pthread-win32;C:\Users\pvros\Downloads\curl-8.2.0\curl-8.2.0\include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>CURL_STATICLIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>gdiplus.lib;gdi32.lib;libcurl.lib;Crypt32.lib;ws2_32.lib;winmm.lib;wldap32.lib;libhamlib-4.lib;fltk.lib;fltk_jpeg.lib;fltk_png.lib;fltk_z.lib;fltk_images.lib;comctl32.lib;comdlg32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>gdiplus.lib;gdi32.lib;libcurl.lib;Crypt32.lib;ws2_32.lib;normaliz.lib;winmm.lib;wldap32.lib;libhamlib-4.lib;fltk.lib;fltk_jpeg.lib;fltk_png.lib;fltk_z.lib;fltk_images.lib;comctl32.lib;comdlg32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>
       </IgnoreSpecificDefaultLibraries>
       <DelayLoadDLLs>%(DelayLoadDLLs)</DelayLoadDLLs>
