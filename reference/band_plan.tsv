@@ -35,8 +35,8 @@ Lower	Upper	Bandwidth	Modes	Notes
 5313	5323	10	CW,Dig,Phone	All modes
 5317		6		AM Spot frequency
 5333	5338	5	CW,Dig,Phone	All modes
-5354	5358	4	CW,Dig,Phone	All modes – within WRC-15 Band
-5362	5374.5	12.5	CW,Dig,Phone	All modes – partly within WRC-15 band, WSPR
+5354	5358	4	CW,Dig,Phone	All modes   within WRC-15 Band
+5362	5374.5	12.5	CW,Dig,Phone	All modes   partly within WRC-15 band, WSPR
 5378	5382	4	CW,Dig,Phone	All modes
 5395	5401.5	6.5	CW,Dig,Phone	All modes
 5403.5	5406.5	3	CW,Dig,Phone	All modes
@@ -68,7 +68,7 @@ Lower	Upper	Bandwidth	Modes	Notes
 14112	14125	2.7	CW,Phone	All modes (excluding digimodes)
 14125	14300	2.7	CW,Dig,Phone	All modes -       SSB contest preferred segment 
 14130				digital voice Centre of Activity
-14195				±5  Priority for Dxpeditions
+14195				 5  Priority for Dxpeditions
 14230				Image Centre of Activity.
 14285				QRP Centre of Activity
 14300	14350	2.7	CW,Dig,Phone	All modes
@@ -158,3 +158,15 @@ Lower	Upper	Bandwidth	Modes	Notes
 145806	146000	12	CW,Dig,Phone	All modes - satellite exclusive
 146000	146900	500	Dig	Wideband digital modes (high-speed data or DATV)
 146900	147000	12	Dig	Narrow band digital (incl. DV)
+430000	432000	25	Phone	FM/DV Repeaters. DV Gateways
+432000	432400	2.7	CW,Dig,Phone	All Modes
+432400	432490	0.5	Beacons	Propagation Beacons
+432490	432994	25	Dig,Phone	Diverse Specialities
+432994	433394	25	Phone	FM/DV Repeater outputs
+433394	433581	25	Phone	FM Simplex
+433600	434000	25	Dig,Phone	Digital Communications
+434000	434594	25	Dig,Phone	DV/FM Gateways
+434594	434981	25	Phone	FM/DV Repeater inputs
+435000	436000	25	All	Satellites
+436000	438000		DATV	Experimental DATV
+438000	440000		Dig,Phone	Repeaters, hotspots, talkthrough
