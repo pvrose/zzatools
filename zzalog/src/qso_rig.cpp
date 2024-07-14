@@ -81,8 +81,10 @@ void qso_rig::load_values() {
 		if (capabilities->model_name != hamlib_data_.model ||
 			capabilities->mfg_name != hamlib_data_.mfr) {
 			char msg[128];
-			snprintf(msg, 128, "RIG: Saved model id %d does not match supplied rig model %s/%s using hamlib values",
+			snprintf(msg, 128, "RIG: Saved model id %d (%s/%s) does not match supplied rig model %s/%s using hamlib values",
 				hamlib_data_.model_id,
+				capabilities->mfg_name,
+				capabilities->model_name,
 				hamlib_data_.mfr.c_str(),
 				hamlib_data_.model.c_str());
 			status_->misc_status(ST_WARNING, msg);
