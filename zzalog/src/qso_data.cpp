@@ -163,6 +163,7 @@ void qso_data::enable_widgets() {
 			g_query_->hide();
 			g_qy_entry_->hide();
 			g_misc_->activate();
+			g_misc_->enable_widgets();
 			break;
 		case QSO_PENDING:
 			// Real-time logging - waiting to start QSO
@@ -364,6 +365,8 @@ void qso_data::enable_widgets() {
 			break;
 		}
 		g_buttons_->enable_widgets();
+
+		end();
 		// Redraw this as some of the above labels may have extended into it.
 		redraw();
 	}
@@ -947,6 +950,7 @@ void qso_data::action_delete_qso() {
 void qso_data::action_deactivate() {
 	g_entry_->delete_qso();
 	logging_state_ = QSO_INACTIVE;
+	g_misc_->qso(nullptr, -1);
 	enable_widgets();
 }
 
