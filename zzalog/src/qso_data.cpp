@@ -369,6 +369,8 @@ void qso_data::enable_widgets() {
 			break;
 		}
 		g_buttons_->enable_widgets();
+
+		end();
 		// Redraw this as some of the above labels may have extended into it.
 		redraw();
 	}
@@ -986,6 +988,7 @@ void qso_data::action_deactivate() {
 		break;
 	}
 	logging_state_ = QSO_INACTIVE;
+	g_misc_->qso(nullptr, -1);
 	enable_widgets();
 }
 

@@ -81,12 +81,12 @@ void qso_dxcc::create_form() {
 	op_geo_ = new Fl_Output(curr_x, curr_y, avail_width, ROW_HEIGHT);
 	op_geo_->box(FL_FLAT_BOX);
 	op_geo_->color(FL_BACKGROUND_COLOR);
-	curr_y += ROW_HEIGHT + HTEXT;
+	curr_y += ROW_HEIGHT + HTEXT + HTEXT / 2;
 
 	avail_height -= (curr_y - y());
 
 	// Display worked before status (bands and modes)
-	g_wb4_ = new wb4_buttons(curr_x, curr_y, avail_width, avail_height, "DXCC worked before");
+	g_wb4_ = new wb4_buttons(curr_x, curr_y, avail_width, avail_height);
 	g_wb4_->align(FL_ALIGN_TOP);
 
 	end();
@@ -257,9 +257,9 @@ void qso_dxcc::wb4_buttons::enable_widgets() {
 	string qso_band = "";
 	string qso_mode = "";
 	string qso_submode = "";
-	all_bands_ = book_->used_bands();
-	all_modes_ = book_->used_modes();
-	all_submodes_ = book_->used_submodes();
+	all_bands_ = navigation_book_->used_bands();
+	all_modes_ = navigation_book_->used_modes();
+	all_submodes_ = navigation_book_->used_submodes();
 	if (qso) {
 		// Get the details for this QSO
 		qso_band = qso->item("BAND");
@@ -272,12 +272,22 @@ void qso_dxcc::wb4_buttons::enable_widgets() {
 		if (qso_mode.length()) all_modes_->insert(qso_mode);
 		if (qso_submode.length()) all_modes_->insert(qso_submode);
 		// Get the bands and modes worked for this DXCC
-		dxcc_bands_ = book_->used_bands(dxcc, my_call);
-		dxcc_modes_ = book_->used_modes(dxcc, my_call);
-		dxcc_submodes_ = book_->used_submodes(dxcc, my_call);
+		dxcc_bands_ = navigation_book_->used_bands(dxcc, my_call);
+		dxcc_modes_ = navigation_book_->used_modes(dxcc, my_call);
+		dxcc_submodes_ = navigation_book_->used_submodes(dxcc, my_call);
+		string caveat = "";
+		if (book_ != navigation_book_) caveat = "\n(Extracted data only)";
 		char l[128];
-		snprintf(l, sizeof(l), "DXCC worked status as %s", my_call.c_str());
+		snprintf(l, sizeof(l), "DXCC worked status as %s%s", my_call.c_str(), caveat.c_str());
 		copy_label(l);
+	}
+	else {
+		string caveat = "";
+		if (book_ != navigation_book_) caveat = "\n(Extracted data only)";
+		char l[128];
+		snprintf(l, sizeof(l), "DXCC worked status%s", caveat.c_str());
+		copy_label(l);
+
 	}
 	// Create all the buttons
 	create_form();

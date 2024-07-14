@@ -168,7 +168,12 @@ void extract_data::extract_records() {
 		break;
 	}
 	status_->misc_status(ST_OK, message);
+	// Collect use data for the extraction
+	for (auto it = begin(); it != end(); it++) {
+		add_use_data(*it);
+	}
 	navigation_book_ = this;
+	qso_manager_->enable_widgets();
 
 }
 
@@ -203,6 +208,7 @@ void extract_data::clear_criteria(bool redraw) {
 		tabbed_forms_->activate_pane(OT_MAIN, true);
 		// Cause the views to be redrawn
 		selection(-1, HT_EXTRACTION);
+		qso_manager_->enable_widgets();
 	}
 }
 
@@ -833,6 +839,8 @@ void extract_data::add_record(qso_num_t record_num) {
 	insert_record_at(insert_point, record);
 	mapping_.insert(mapping_.begin() + insert_point, record_num);
 	rev_mapping_[record_num] = insert_point;
+	add_use_data(record);
+	qso_manager_->enable_widgets();
 }
 
 // Swap two records

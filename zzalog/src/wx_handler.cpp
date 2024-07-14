@@ -167,7 +167,7 @@ void wx_handler::update() {
     }
     char url[1024];
     stringstream ss;
-    snprintf(url, sizeof(url), "http://api.openweathermap.org/data/2.5/weather?lat=%f&lon=%f&appid=%s&mode=xml",
+    snprintf(url, sizeof(url), "https://api.openweathermap.org/data/2.5/weather?lat=%f&lon=%f&appid=%s&mode=xml",
         location.latitude,
         location.longitude,
         key_);

@@ -4,6 +4,7 @@
 #include "utils.h"
 
 #include "hamlib/rig.h"
+#include <curl/curl.h>
 
 #include <FL/Fl_Multiline_Output.H>
 #include <FL/fl_draw.H>
@@ -39,12 +40,15 @@ about_dialog::about_dialog() :
 	const int YG = EDGE;
 	const int R1 = YG;
 
+	curl_version_info_data* data = curl_version_info(CURLVERSION_LAST);
+
 	// Draw the two text boxes - first program ID and versions
 	string program_id = PROGRAM_ID + " " + PROGRAM_VERSION + "\n" +
 		"Compiled " + TIMESTAMP + "\n" +
 		"using ADIF Version " + spec_data_->adif_version() +
 		"\n hamlib version " + rig_version() +
-		"\n FLTK version " + to_string(FL_MAJOR_VERSION) + "." + to_string(FL_MINOR_VERSION) + "." + to_string(FL_PATCH_VERSION);
+		"\n FLTK version " + to_string(FL_MAJOR_VERSION) + "." + to_string(FL_MINOR_VERSION) + "." + to_string(FL_PATCH_VERSION) +
+		"\n CURL version " + string(data->version);
 	string copyright = COPYRIGHT + "\n (Hamlib " + rig_copyright() + ")";
 	int w = W2;
 	int h = 0;
