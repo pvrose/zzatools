@@ -158,3 +158,16 @@ Lower	Upper	Bandwidth	Modes	Notes
 145806	146000	12	CW,Dig,Phone	All modes - satellite exclusive
 146000	146900	500	Dig	Wideband digital modes (high-speed data or DATV)
 146900	147000	12	Dig	Narrow band digital (incl. DV)
+430000	432000	20	Phone	FM Repeater inputs
+432000	432100	0.5	CW	Telegraphy
+432100	432400	2.7	CW,Phone	SSB/Telegraphy
+432400	432490	0.5		Propagatrion beacons
+432490	432994	25	CW,Dig,Phone	All modes non-channelised
+432994	433394	25	FM,DV	Repeater outputs
+433394	433600	25	FM,DV	FM/DV Simplex
+433600	434000	25	DV	Digital Communications and experiments
+434000	434594	25	FM,DV	FM, DV Internet gateways
+434594	435000	25	FM,DV	Reopeater inputs (UK)
+435000	436000			Satellites
+436000	438000			Satellites and DATV
+438000	440000			All modes
