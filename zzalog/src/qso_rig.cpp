@@ -81,17 +81,15 @@ void qso_rig::load_values() {
 		if (capabilities->model_name != hamlib_data_.model ||
 			capabilities->mfg_name != hamlib_data_.mfr) {
 			char msg[128];
-			snprintf(msg, 128, "RIG: Saved model id %d does not match supplied rig model %s/%s",
+			snprintf(msg, 128, "RIG: Saved model id %d does not match supplied rig model %s/%s using hamlib values",
 				hamlib_data_.model_id,
 				hamlib_data_.mfr.c_str(),
 				hamlib_data_.model.c_str());
 			status_->misc_status(ST_WARNING, msg);
-			find_hamlib_data();
+			hamlib_data_.mfr = capabilities->mfg_name;
+			hamlib_data_.model = capabilities->model_name;
 		}
-		else {
-			hamlib_data_.port_type = capabilities->port_type;
-		};
-		
+		hamlib_data_.port_type = capabilities->port_type;
 		// If hamlib and FLRig - start parameters
 		Fl_Preferences app_settings(rig_settings, "Apps");
 		app_settings.get("FLRig", temp, "");
@@ -746,7 +744,7 @@ void qso_rig::enable_widgets() {
 		if (!bn_select_->value()) {
 			ip_port_->value(hamlib_data_.port_name.c_str());
 		}
-		if (hamlib_data_.model == "FLRig") {
+		if (hamlib_data_.model_id == 4)  {
 			bn_start_->show();
 		} else {
 			bn_start_->hide();
@@ -833,7 +831,11 @@ void qso_rig::populate_model_choice() {
 			// a sub-menu to the manufacturer
 			string mfg = escape_menu(capabilities->mfg_name);
 			string model = escape_menu(capabilities->model_name);
-			snprintf(temp, 256, "%s/%s%s", mfg.c_str(), model.c_str(), status);
+			if (model.length()) {
+				snprintf(temp, 256, "%s/%s%s", mfg.c_str(), model.c_str(), status);
+			}  else {
+				snprintf(temp, 256, "%s%s", mfg.c_str(), status);
+			}
 			rig_list.insert(temp);
 			rig_ids[temp] = capabilities->rig_model;
 			if (string(capabilities->mfg_name) == hamlib_data_.mfr &&
