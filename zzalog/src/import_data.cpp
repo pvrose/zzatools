@@ -391,8 +391,10 @@ void import_data::stop_update(bool immediate) {
 		break;
 	case NONE:
 		// Empty this book (used for immediate stop)
-		delete_contents(true);
-		status_->progress("Auto-update stopped", OT_IMPORT);
+		if (immediate) {
+			delete_contents(true);
+			status_->progress("Auto-update stopped", OT_IMPORT);
+		}
 		close_pending_ = false;
 		break;
 	}
@@ -427,7 +429,6 @@ void import_data::finish_update(bool merged /*= true*/) {
 				source.c_str(), number_to_import_, number_checked_, number_modified_, number_matched_, number_added_, number_swl_, number_rejected_);
 		}
 		status_->misc_status(ST_OK, message);
-		status_->progress(size(), book_type_);
 		if (number_modified_ || number_added_ || number_swl_) {
 			// Some records have been changed or added
 			book_->selection(book_->size() - 1, HT_ALL);
@@ -462,6 +463,7 @@ void import_data::finish_update(bool merged /*= true*/) {
 	// Allow the book to save (and save if modified)
 	close_pending_ = false;
 	number_modified_ = 0;
+	update_mode_ = NONE;
 	// Restore state of save_enabled
 	book_->enable_save(true, "Finished update from import");
 }
@@ -707,7 +709,6 @@ void import_data::process_lotw_header() {
 	}
 	else {
 		status_->misc_status(ST_OK, "IMPORT: LotW download done.");
-		status_->progress(size() + 1, book_type());
 	}
 }
 
