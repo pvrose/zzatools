@@ -833,11 +833,14 @@ void qso_rig::populate_model_choice() {
 			// a sub-menu to the manufacturer
 			string mfg = escape_menu(capabilities->mfg_name);
 			string model = escape_menu(capabilities->model_name);
-			if (model.length()) {
-				snprintf(temp, 256, "%s/%s%s", mfg.c_str(), model.c_str(), status);
-			}  else {
-				snprintf(temp, 256, "%s%s", mfg.c_str(), status);
+			if (model.length() == 0) {
+				model = mfg;
+				mfg = "Other";
+			} 
+			if (mfg.length() == 0) {
+				mfg = "Other";
 			}
+			snprintf(temp, 256, "%s/%s%s", mfg.c_str(), model.c_str(), status);
 			rig_list.insert(temp);
 			rig_ids[temp] = capabilities->rig_model;
 			if (string(capabilities->mfg_name) == hamlib_data_.mfr &&
