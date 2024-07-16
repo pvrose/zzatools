@@ -180,13 +180,21 @@ void qso_rig::find_hamlib_data() {
 const int WDISPLAY = 3 * WBUTTON;
 // Create the status part of the display
 void qso_rig::create_status(int& curr_x, int& curr_y) {
+	int save_x = curr_x;
+
 	// "Label" - rig status
-	op_status_ = new Fl_Output(curr_x, curr_y, WDISPLAY, HBUTTON);
+	op_status_ = new Fl_Output(curr_x, curr_y, WDISPLAY - HBUTTON, HBUTTON);
 	op_status_->color(FL_BACKGROUND_COLOR);
 	op_status_->textfont(FL_BOLD);
 	op_status_->textsize(FL_NORMAL_SIZE + 2);
 	op_status_->box(FL_FLAT_BOX);
+
+	curr_x += op_status_->w();
+	bn_tx_rx_ = new Fl_Button(curr_x, curr_y, HBUTTON, HBUTTON);
+	bn_tx_rx_->box(FL_FLAT_BOX);
+
 	
+	curr_x = save_x;
 	curr_y += op_status_->h();
 
 	// Display frequency and mode information
@@ -643,21 +651,19 @@ void qso_rig::enable_widgets() {
 	if (!rig_) {
 		// No rig - decativate freq/mode
 		op_status_->value("No rig specified");
+		bn_tx_rx_->label("NA");
+		bn_tx_rx_->color(FL_BACKGROUND_COLOR);
 		op_freq_mode_->deactivate();
 		op_freq_mode_->label("");
 	} else if (rig_->is_opening()) {
 		// Rig is connecting - deactivate freq/mode
 		op_status_->value("Opening rig");
+		bn_tx_rx_->label("NA");
+		bn_tx_rx_->color(FL_BACKGROUND_COLOR);
 		op_freq_mode_->deactivate();
 		op_freq_mode_->label("");
 	} else if (rig_->is_open()) {
 		// Rig is connected
-		string rig_text;
-		if (rig_->get_ptt()) {
-			rig_text = "TX: ";
-		} else {
-			rig_text = "RX: ";
-		}
 		freq = rig_->get_dfrequency(true);
 		int freq_Hz = (int)(freq * 1000000) % 1000;
 		int freq_kHz = (int)(freq * 1000) % 1000;
@@ -668,13 +674,26 @@ void qso_rig::enable_widgets() {
 			snprintf(l, sizeof(l), "%s (%s)", 
 				spec_data_->band_for_freq(freq).c_str(),
 				entry->mode.c_str());
-			rig_text += string(l);
+			op_status_->value(l);
+			if (rig_->get_ptt()) {
+				bn_tx_rx_->label("TX");
+				bn_tx_rx_->color(FL_RED);
+			} else {
+				bn_tx_rx_->label("RX");
+				bn_tx_rx_->color(FL_GREEN);
+			}
 		}
 		else {
-			rig_text += "*** Out of band! ***";
+			op_status_->value("Out of band!");
+			if (rig_->get_ptt()) {
+				bn_tx_rx_->label("TX");
+				bn_tx_rx_->color(FL_DARK_RED);
+			} else {
+				bn_tx_rx_->label("RX");
+				bn_tx_rx_->color(FL_DARK_GREEN);
+			}
+			
 		}
-		// Set status to "RX/TX: Band (bandplan)"
-		op_status_->value(rig_text.c_str());
 		op_freq_mode_->activate();
 		op_freq_mode_->color(FL_BLACK);
 		if (rig_->get_ptt()) {
@@ -696,14 +715,19 @@ void qso_rig::enable_widgets() {
 	} else if (rig_->has_no_cat()) {
 		// No rig available - deactivate freq/mode
 		op_status_->value("No CAT Available");
+		bn_tx_rx_->label("NA");
+		bn_tx_rx_->color(FL_BACKGROUND_COLOR);
 		op_freq_mode_->deactivate();
 		op_freq_mode_->label("");
 	} else {
 		// Rig is not connected - deactivate freq/mode
 		op_status_->value("Disconnected");
+		bn_tx_rx_->label("NA");
+		bn_tx_rx_->color(FL_BACKGROUND_COLOR);
 		op_freq_mode_->deactivate();
 		op_freq_mode_->label("");
 	}
+	bn_tx_rx_->labelcolor(fl_contrast(FL_FOREGROUND_COLOR, bn_tx_rx_->color()));
 	// CAT control widgets - allow only when select button active
 	if (rig_->is_open()) {
 		// Rig is open - disable connection configuration controls

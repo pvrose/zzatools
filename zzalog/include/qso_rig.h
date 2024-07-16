@@ -118,6 +118,8 @@ protected:
 
 	// Rig status
 	Fl_Output* op_status_;
+	// Rig TX/RX
+	Fl_Button* bn_tx_rx_;
 	// Freq/Mode display
 	Fl_Box* op_freq_mode_;
 
