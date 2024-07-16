@@ -229,3 +229,6 @@ bool fields::delete_coll(string name) {
     }
 }
 
+void fields::save_update() {
+    store_data();
+}

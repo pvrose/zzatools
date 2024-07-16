@@ -891,19 +891,10 @@ void log_table::drag_column(int C) {
 	if ((unsigned)C < log_fields_->size()) {
 		int new_width = col_width(C);
 		(*log_fields_)[C].width = new_width;
-		// Write the new value to settings Display/Fields/AppN/Field N
-		Fl_Preferences display_settings(settings_, "Display");
-		Fl_Preferences log_fields_settings(display_settings, "Fields");
-		char app_path[128];
-		char* field_set_name;
-		sprintf(app_path, "App%d", (int)application_);
-		log_fields_settings.get(app_path, field_set_name, "Default");
-		Fl_Preferences field_set_settings(log_fields_settings, field_set_name);
-		// This is the Cth group.
-		Fl_Preferences field_settings(field_set_settings, field_set_settings.group(C));
-		field_settings.set("Width", new_width);
-
-		settings_->flush();
+		collection_t* coll = fields_->collection(application_);
+		field_info_t* item = &(*coll)[C];
+		item->width = new_width;
+		fields_->save_update();
 	}
 }
 

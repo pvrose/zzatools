@@ -104,6 +104,8 @@ public:
 	// Delete colelction - returns false if failed
 	bool delete_coll(string coll);
 
+	void save_update();
+
 protected:
 	// Read settings
 	void load_data();
