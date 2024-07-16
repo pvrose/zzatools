@@ -116,21 +116,18 @@ void qso_qsl_vwr::create_form() {
 	// Light to indicate received eQSL
 	bn_eqsl_status_ = new Fl_Light_Button(curr_x, curr_y, WBN, HBUTTON, "eQSL");
 	bn_eqsl_status_->box(FL_FLAT_BOX);
-	bn_eqsl_status_->value(true);
 	bn_eqsl_status_->type(bn_eqsl_status_->type() & ~FL_TOGGLE_BUTTON);
 
 	curr_x += WBN;
 	// Light to indicate received LotW
 	bn_lotw_status_ = new Fl_Light_Button(curr_x, curr_y, WBN, HBUTTON, "LotW");
 	bn_lotw_status_->box(FL_FLAT_BOX);
-	bn_lotw_status_->value(true);
 	bn_lotw_status_->type(bn_lotw_status_->type() & ~FL_TOGGLE_BUTTON);
 
 	curr_x += WBN;
 	// Light to indicate received a paper card
 	bn_card_status_ = new Fl_Light_Button(curr_x, curr_y, WBN, HBUTTON, "Card");
 	bn_card_status_->box(FL_FLAT_BOX);
-	bn_card_status_->value(true);
 	bn_card_status_->type(bn_card_status_->type() & ~FL_TOGGLE_BUTTON);
 
 	curr_y += HBUTTON;
@@ -696,19 +693,19 @@ void qso_qsl_vwr::set_selected_image(image_t value) {
 void qso_qsl_vwr::set_qsl_status() {
 	if (current_qso_) {
 		if (current_qso_->item("EQSL_QSL_RCVD") == "Y") {
-			bn_eqsl_status_->selection_color(FL_GREEN);
+			bn_eqsl_status_->value(true);
 		}
 		else {
-			bn_eqsl_status_->selection_color(FL_RED);
+			bn_eqsl_status_->value(false);
 		}
 		if (current_qso_->item("LOTW_QSL_RCVD") == "Y") {
-			bn_lotw_status_->selection_color(FL_GREEN);
+			bn_lotw_status_->value(true);
 		}
 		else {
-			bn_lotw_status_->selection_color(FL_RED);
+			bn_lotw_status_->value(false);
 		}
 		if (current_qso_->item("QSL_RCVD") == "Y") {
-			bn_card_status_->selection_color(FL_GREEN);
+			bn_card_status_->value(true);
 			string s = current_qso_->item("QSL_RCVD_VIA");
 			if (s == "B") {
 				bn_card_status_->label("Bureau");
@@ -721,7 +718,7 @@ void qso_qsl_vwr::set_qsl_status() {
 			}
 		}
 		else {
-			bn_card_status_->selection_color(FL_RED);
+			bn_card_status_->value(false);
 			bn_card_status_->label("Card");
 		}
 	}
