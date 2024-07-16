@@ -373,7 +373,9 @@ void qsl_editor::create_items() {
 	int save_x = curr_x;
 	int curr_y = g_4_->y() + HTEXT;
 	int max_x = curr_x;
-	g_4_->begin();
+	
+	Fl_Group* saveg = Fl_Group::current();
+	Fl_Group::current(g_4_);
 
 	// Get the card data for this callsign
 	qsl_display::card_data* data = qsl_display::data(callsign_);
@@ -465,7 +467,8 @@ void qsl_editor::create_items() {
 
 	g_4_->resizable(nullptr);
 	g_4_->size(max_x - g_4_->x(), g_4_->h());
-	g_4_->end();
+
+	Fl_Group::current(saveg);
 
 	redraw();
 };

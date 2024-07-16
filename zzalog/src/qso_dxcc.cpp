@@ -144,7 +144,6 @@ void qso_dxcc::enable_widgets() {
 		op_geo_->value("");
 	}
 	g_wb4_->enable_widgets();
-	end();
 }
 
 // Set the data - parse the callsign in the current qso
@@ -196,7 +195,8 @@ void qso_dxcc::wb4_buttons::create_form() {
 	const int BWIDTH = AWIDTH / NUM_WIDE;
 	int bn_number = 0;
 	clear();
-	begin();
+	Fl_Group* saveg = Fl_Group::current();
+	Fl_Group::current(this);
 	int curr_x = x();
 	int curr_y = y();
 	Fl_Button* b1 = new Fl_Button(curr_x, curr_y, BWIDTH * NUM_WIDE, HBUTTON, "Bands:");
@@ -248,7 +248,7 @@ void qso_dxcc::wb4_buttons::create_form() {
 			curr_y += HBUTTON;
 		}
 	}
-	end();
+	Fl_Group::current(saveg);
 }
 
 // Light the buttons that have been worked: 

@@ -370,7 +370,6 @@ void qso_data::enable_widgets() {
 		}
 		g_buttons_->enable_widgets();
 
-		end();
 		// Redraw this as some of the above labels may have extended into it.
 		redraw();
 	}
