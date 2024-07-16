@@ -13,6 +13,7 @@
 #include <FL/Fl_Output.H>
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Multiline_Output.H>
+#include <FL/Fl_Light_Button.H>
 
 // This class displays the "worked before" status for the DX - band and mode
 class qso_dxcc :
@@ -72,6 +73,8 @@ protected:
 
     // Button for QRZ.com
     static void cb_bn_qrz(Fl_Widget* w, void* v);
+    // Button for show extract
+    static void cb_bn_show_xt(Fl_Widget* w, void* v);
     
 
     // Widgets:
@@ -86,6 +89,8 @@ protected:
     wb4_buttons* g_wb4_;
     // Call QRZ.com
     Fl_Button* bn_qrz_;
+    // Show all/extracted
+    Fl_Light_Button* bn_show_extract_;
 
     // Callsign
     string callsign_;
@@ -103,6 +108,8 @@ protected:
     cty_data::parse_source_t source_;
     // Current record
     record* qso_;
+    // Use extracted data for worked b4
+    bool show_extract_;
 
     // BAnd worked
     band_set* bands_worked_;

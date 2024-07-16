@@ -10,6 +10,7 @@
 #include "extract_data.h"
 #include "tabbed_forms.h"
 #include "spec_data.h"
+#include "callback.h"
 
 #include <FL/Fl_Toggle_Button.H>
 
@@ -27,6 +28,7 @@ qso_dxcc::qso_dxcc(int X, int Y, int W, int H, const char* L) :
 	, bands_worked_(nullptr)
 	, modes_worked_(nullptr)
 	, qso_(nullptr)
+	, show_extract_(false)
 {
 	labelfont(FL_BOLD);
 	labelsize(FL_NORMAL_SIZE + 2);
@@ -59,18 +61,26 @@ void qso_dxcc::create_form() {
 	bn_qrz_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "QRZ.com");
 	bn_qrz_->callback(cb_bn_qrz, nullptr);
 
+	curr_y += bn_qrz_->h();
+
+	// Show all button
+	bn_show_extract_ = new Fl_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Ext. Only");
+	bn_show_extract_->callback(cb_bn_show_xt, &show_extract_);
+	bn_show_extract_->value(show_extract_);
+
+
 	curr_x = x() + GAP;
-	curr_y += op_call_->h();
+	curr_y = op_call_->y() + op_call_->h();
 
 	// Display the DXCC prefix
-	op_prefix_ = new Fl_Output(curr_x, curr_y, avail_width, ROW_HEIGHT);
+	op_prefix_ = new Fl_Output(curr_x, curr_y, avail_width - WBUTTON, ROW_HEIGHT);
 	op_prefix_->box(FL_FLAT_BOX);
 	op_prefix_->color(FL_BACKGROUND_COLOR);
 	op_prefix_->textfont(FL_BOLD);
 	curr_y += ROW_HEIGHT;
 
 	// Display how the DXCC was found (decoded or from exception file)
-	op_source_ = new Fl_Output(curr_x, curr_y, avail_width, ROW_HEIGHT);
+	op_source_ = new Fl_Output(curr_x, curr_y, avail_width - WBUTTON, ROW_HEIGHT);
 	op_source_->box(FL_FLAT_BOX);
 	op_source_->color(FL_BACKGROUND_COLOR);
 	curr_y += ROW_HEIGHT;
@@ -141,6 +151,10 @@ void qso_dxcc::enable_widgets() {
 		op_source_->value("");
 		op_geo_->value("");
 	}
+	if (book_ == navigation_book_) {
+		show_extract_ = false;
+		bn_show_extract_->value(show_extract_);
+	}
 	g_wb4_->enable_widgets();
 }
 
@@ -167,6 +181,13 @@ void qso_dxcc::set_data(record* qso) {
 void qso_dxcc::cb_bn_qrz(Fl_Widget* w, void* v) {
 	qso_dxcc* that = ancestor_view<qso_dxcc>(w);
 	menu::cb_mi_info_qrz(w, (void*)&that->callsign_);
+}
+
+// Show extract
+void qso_dxcc::cb_bn_show_xt(Fl_Widget* w, void* v) {
+	cb_value<Fl_Light_Button, bool>(w, v);
+	qso_dxcc* that = ancestor_view<qso_dxcc>(w);
+	that->enable_widgets();
 }
 
 // The "worked before" lights
@@ -255,9 +276,15 @@ void qso_dxcc::wb4_buttons::enable_widgets() {
 	string qso_band = "";
 	string qso_mode = "";
 	string qso_submode = "";
-	all_bands_ = navigation_book_->used_bands();
-	all_modes_ = navigation_book_->used_modes();
-	all_submodes_ = navigation_book_->used_submodes();
+	if (((qso_dxcc*)parent())->show_extract_) {
+		all_bands_ = navigation_book_->used_bands();
+		all_modes_ = navigation_book_->used_modes();
+		all_submodes_ = navigation_book_->used_submodes();
+	} else {
+		all_bands_ = book_->used_bands();
+		all_modes_ = book_->used_modes();
+		all_submodes_ = book_->used_submodes();
+	}
 	if (qso) {
 		// Get the details for this QSO
 		qso_band = qso->item("BAND");
@@ -270,20 +297,22 @@ void qso_dxcc::wb4_buttons::enable_widgets() {
 		if (qso_mode.length()) all_modes_->insert(qso_mode);
 		if (qso_submode.length()) all_modes_->insert(qso_submode);
 		// Get the bands and modes worked for this DXCC
-		dxcc_bands_ = navigation_book_->used_bands(dxcc, my_call);
-		dxcc_modes_ = navigation_book_->used_modes(dxcc, my_call);
-		dxcc_submodes_ = navigation_book_->used_submodes(dxcc, my_call);
-		string caveat = "";
-		if (book_ != navigation_book_) caveat = "\n(Extracted data only)";
+		if (((qso_dxcc*)parent())->show_extract_) {
+			dxcc_bands_ = navigation_book_->used_bands(dxcc, my_call);
+			dxcc_modes_ = navigation_book_->used_modes(dxcc, my_call);
+			dxcc_submodes_ = navigation_book_->used_submodes(dxcc, my_call);
+		} else {
+			dxcc_bands_ = book_->used_bands(dxcc, my_call);
+			dxcc_modes_ = book_->used_modes(dxcc, my_call);
+			dxcc_submodes_ = book_->used_submodes(dxcc, my_call);
+		}
 		char l[128];
-		snprintf(l, sizeof(l), "DXCC worked status as %s%s", my_call.c_str(), caveat.c_str());
+		snprintf(l, sizeof(l), "DXCC worked status as %s", my_call.c_str());
 		copy_label(l);
 	}
 	else {
-		string caveat = "";
-		if (book_ != navigation_book_) caveat = "\n(Extracted data only)";
 		char l[128];
-		snprintf(l, sizeof(l), "DXCC worked status%s", caveat.c_str());
+		snprintf(l, sizeof(l), "DXCC worked status");
 		copy_label(l);
 
 	}
