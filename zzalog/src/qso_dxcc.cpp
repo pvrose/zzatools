@@ -53,7 +53,6 @@ void qso_dxcc::create_form() {
 	op_call_->color(FL_BACKGROUND_COLOR);
 	op_call_->textfont(FL_BOLD);
 	op_call_->textsize(FL_NORMAL_SIZE + 2);
-	op_call_->textcolor(DARK ? FL_RED : COLOUR_CLARET);
 	curr_x += op_call_->w();
 
 	// QRZ.com button
@@ -68,7 +67,6 @@ void qso_dxcc::create_form() {
 	op_prefix_->box(FL_FLAT_BOX);
 	op_prefix_->color(FL_BACKGROUND_COLOR);
 	op_prefix_->textfont(FL_BOLD);
-	op_prefix_->textcolor(DARK ? FL_RED : COLOUR_CLARET);
 	curr_y += ROW_HEIGHT;
 
 	// Display how the DXCC was found (decoded or from exception file)

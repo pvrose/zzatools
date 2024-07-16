@@ -31,7 +31,6 @@ void qso_net_entry::create_form(int X, int Y) {
 	box(FL_BORDER_BOX);
 	labelfont(FL_BOLD);
 	labelsize(FL_NORMAL_SIZE + 2);
-	labelcolor(fl_darker(FL_GREEN));
 
 	// Tabbed set of qso_entry forms
 	entries_ = new Fl_Tabs(X, Y + HTEXT, w(), h());

@@ -46,7 +46,6 @@ void qso_qth::create_form(int X, int Y) {
 	op_name_->color(FL_BACKGROUND_COLOR);
 	op_name_->textfont(FL_BOLD);
 	op_name_->textsize(FL_NORMAL_SIZE + 2);
-	op_name_->textcolor(DARK ? FL_RED : COLOUR_CLARET);
 
 	max_x = max(curr_x, op_name_->x() + op_name_->y());
 	curr_y += HTEXT;

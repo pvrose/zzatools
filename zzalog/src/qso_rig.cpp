@@ -643,13 +643,11 @@ void qso_rig::enable_widgets() {
 	if (!rig_) {
 		// No rig - decativate freq/mode
 		op_status_->value("No rig specified");
-		op_status_->textcolor(FL_MAGENTA);
 		op_freq_mode_->deactivate();
 		op_freq_mode_->label("");
 	} else if (rig_->is_opening()) {
 		// Rig is connecting - deactivate freq/mode
 		op_status_->value("Opening rig");
-		op_status_->textcolor(DARK ? FL_CYAN : fl_darker(FL_CYAN));
 		op_freq_mode_->deactivate();
 		op_freq_mode_->label("");
 	} else if (rig_->is_open()) {
@@ -657,10 +655,8 @@ void qso_rig::enable_widgets() {
 		string rig_text;
 		if (rig_->get_ptt()) {
 			rig_text = "TX: ";
-			op_status_->textcolor(FL_RED);
 		} else {
 			rig_text = "RX: ";
-			op_status_->textcolor(DARK ? FL_GREEN : fl_darker(FL_GREEN));
 		}
 		freq = rig_->get_dfrequency(true);
 		int freq_Hz = (int)(freq * 1000000) % 1000;
@@ -675,8 +671,7 @@ void qso_rig::enable_widgets() {
 			rig_text += string(l);
 		}
 		else {
-			rig_text += "Out of band!";
-			op_status_->textcolor(DARK ? COLOUR_ORANGE : fl_darker(COLOUR_ORANGE));
+			rig_text += "*** Out of band! ***";
 		}
 		// Set status to "RX/TX: Band (bandplan)"
 		op_status_->value(rig_text.c_str());
@@ -701,13 +696,11 @@ void qso_rig::enable_widgets() {
 	} else if (rig_->has_no_cat()) {
 		// No rig available - deactivate freq/mode
 		op_status_->value("No CAT Available");
-		op_status_->textcolor(FL_MAGENTA);
 		op_freq_mode_->deactivate();
 		op_freq_mode_->label("");
 	} else {
 		// Rig is not connected - deactivate freq/mode
 		op_status_->value("Disconnected");
-		op_status_->textcolor(DARK ? COLOUR_ORANGE : fl_darker(COLOUR_ORANGE));
 		op_freq_mode_->deactivate();
 		op_freq_mode_->label("");
 	}

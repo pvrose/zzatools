@@ -83,7 +83,6 @@ void qso_data::create_form(int X, int Y) {
 	g_entry_->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 	g_entry_->labelfont(FL_BOLD);
 	g_entry_->labelsize(FL_NORMAL_SIZE + 2);
-	g_entry_->labelcolor(FL_DARK_BLUE);
 
 	max_x = max(max_x, g_entry_->x() + g_entry_->w());
 	max_y = max(max_y, g_entry_->y() + g_entry_->h());
@@ -103,7 +102,6 @@ void qso_data::create_form(int X, int Y) {
 	g_qy_entry_->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 	g_qy_entry_->labelfont(FL_BOLD);
 	g_qy_entry_->labelsize(FL_NORMAL_SIZE + 2);
-	g_qy_entry_->labelcolor(DARK ? FL_MAGENTA : FL_DARK_MAGENTA);
 	max_x = max(max_x, g_qy_entry_->x() + g_qy_entry_->w());
 	max_y = max(max_y, g_qy_entry_->y() + g_qy_entry_->h());
 
@@ -161,7 +159,6 @@ void qso_data::enable_widgets() {
 		case QSO_INACTIVE:
 			// No QSO - show the entry form, hide the others
 			g_entry_->label("QSO Entry is not enabled");
-			g_entry_->labelcolor(DARK ? fl_lighter(FL_RED) : FL_RED);
 			g_entry_->show();
 			g_entry_->enable_widgets();
 			g_net_entry_->hide();
@@ -173,7 +170,6 @@ void qso_data::enable_widgets() {
 		case QSO_PENDING:
 			// Real-time logging - waiting to start QSO
 			g_entry_->label("QSO Entry - prepared for real-time logging.");
-			g_entry_->labelcolor(DARK ? fl_lighter(FL_BLUE) : FL_BLUE);
 			g_entry_->show();
 			g_entry_->enable_widgets();
 			g_net_entry_->hide();
@@ -186,7 +182,6 @@ void qso_data::enable_widgets() {
 			// Real-time logging - waiting to start QSO
 			snprintf(l, sizeof(l), "QSO Entry - Contest %s pending QSOs", contest()->contest_id().c_str());
 			g_entry_->copy_label(l);
-			g_entry_->labelcolor(DARK ? FL_MAGENTA : FL_DARK_MAGENTA);
 			g_entry_->show();
 			g_entry_->enable_widgets();
 			g_net_entry_->hide();
@@ -199,7 +194,6 @@ void qso_data::enable_widgets() {
 			// Real-time logging - QSO started
 			snprintf(l, sizeof(l), "QSO Entry - %s - logging new contact", call.c_str());
 			g_entry_->copy_label(l);
-			g_entry_->labelcolor(DARK ? fl_lighter(FL_BLUE) : FL_BLUE);
 			g_entry_->show();
 			g_entry_->enable_widgets();
 			g_net_entry_->hide();
@@ -213,7 +207,6 @@ void qso_data::enable_widgets() {
 			snprintf(l, sizeof(l), "QSO Entry - Contest %s logging %s",
 				contest()->contest_id().c_str(), call.c_str());
 			g_entry_->copy_label(l);
-			g_entry_->labelcolor(DARK ? FL_MAGENTA : FL_DARK_MAGENTA);
 			g_entry_->show();
 			g_entry_->enable_widgets();
 			g_net_entry_->hide();
@@ -226,7 +219,6 @@ void qso_data::enable_widgets() {
 			// Back-logging - enter QSO details
 			snprintf(l, sizeof(l), "QSO Entry - %s - logging old contact", call.c_str());
 			g_entry_->copy_label(l);
-			g_entry_->labelcolor(DARK ? fl_lighter(FL_BLUE) : FL_BLUE);
 			g_entry_->show();
 			g_entry_->enable_widgets();
 			g_net_entry_->hide();
@@ -239,7 +231,6 @@ void qso_data::enable_widgets() {
 			// Editing an existing QSO
 			snprintf(l, sizeof(l), "QSO Entry - %s - editing existing contact", call.c_str());
 			g_entry_->copy_label(l);
-			g_entry_->labelcolor(DARK ? fl_lighter(FL_BLUE) : FL_BLUE);
 			g_entry_->show();
 			g_entry_->enable_widgets();
 			g_net_entry_->hide();
@@ -252,7 +243,6 @@ void qso_data::enable_widgets() {
 			// Viewing (read-only) an existing QSO
 			snprintf(l, sizeof(l), "QSO Entry - %s - read only", call.c_str());
 			g_entry_->copy_label(l);
-			g_entry_->labelcolor(DARK ? fl_lighter(FL_BLUE) : FL_BLUE);
 			g_entry_->show();
 			g_entry_->enable_widgets();
 			g_net_entry_->hide();

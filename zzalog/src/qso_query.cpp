@@ -44,7 +44,6 @@ void qso_query::create_form(int X, int Y) {
 	box(FL_BORDER_BOX);
 	labelfont(FL_BOLD);
 	labelsize(FL_NORMAL_SIZE + 2);
-	labelcolor(fl_lighter(FL_RED));
 
 	const int WTABLE = w() - GAP - GAP;
 	const int HTABLE = h() - HTEXT - GAP;
