@@ -299,6 +299,11 @@ bool adi_reader::load_book(book* book, istream& in) {
 			status_->progress(byte_count_, book->book_type());
 		}
 		else {
+			if (result == LR_EOF && byte_count_ != file_size_) {
+				// We need one last telling of progress that it's done
+				byte_count_ = file_size_;
+				status_->progress(byte_count_, book->book_type());
+			}
 			// Bad record
 			delete in_record;
 		}
@@ -312,7 +317,6 @@ bool adi_reader::load_book(book* book, istream& in) {
 		return false;
 	}
 	else {
-		status_->progress(file_size_, book->book_type());
 		status_->misc_status(ST_OK, "LOG: Reading done!");
 		return true;
 	}

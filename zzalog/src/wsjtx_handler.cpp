@@ -175,7 +175,7 @@ int wsjtx_handler::handle_log(stringstream& ss) {
 	adif.str(utf8);
 	adi_reader* reader = new adi_reader;
 	// The stream received from WSJT-X is header and record so create a book from it
-	book* rcvd_book = new book(OT_NONE);
+	book* rcvd_book = new book(OT_WSJTX);
 	reader->load_book(rcvd_book, adif);
 	record* log_qso = rcvd_book->get_record(0, false);
 	record* qso = qso_call(log_qso->item("CALL"), true);

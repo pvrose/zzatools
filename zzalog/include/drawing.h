@@ -41,6 +41,15 @@ const int WEDIT = 3 * WBUTTON;
 const int WSMEDIT = 2 * WBUTTON;
 const int ROW_HEIGHT = DEFAULT_SIZE + 4;
 
+	// Colours to use for buttons - defined using FLTK colour palette
+	const Fl_Color COLOUR_ORANGE = 93;       /* R=4/4, B=0/4, G=5/7 */
+	const Fl_Color COLOUR_APPLE = 87;        /* R=3/4, B=0/4, G=7/7 */
+	const Fl_Color COLOUR_PINK = 170;        /* R=4/4, B=2/4, G=2/7 */
+	const Fl_Color COLOUR_MAUVE = 212;       /* R-4/4, B=3/4, G=4/7 */
+	const Fl_Color COLOUR_NAVY = 136;        /* R=0/4, B=2/4, G=0/7 */
+	const Fl_Color COLOUR_CLARET = 80;     /* R=3/4, B=0/4, G=0/4 */
+	const Fl_Color COLOUR_GREY = fl_color_average(FL_FOREGROUND_COLOR, FL_BACKGROUND_COLOR, 0.33);
+
 
 	// the various views and data objects
 	enum object_t {
@@ -55,6 +64,7 @@ const int ROW_HEIGHT = DEFAULT_SIZE + 4;
 		OT_BAND,             // Band-plan data
 		OT_SCRATCH,          // Scratchpad 
 		OT_CARD,             // Used for printing QSL card labels
+		OT_WSJTX,            // Import from WSJT-X
 	};
 
 	// Default colours to use in tab view labels and/or progress bar
@@ -69,6 +79,7 @@ const int ROW_HEIGHT = DEFAULT_SIZE + 4;
 		{ OT_REPORT, fl_color_average(FL_RED, FL_WHITE, 0.25) },
 		{ OT_BAND, FL_GRAY },
 		{ OT_CARD, fl_color_average(FL_BLUE, FL_WHITE, 0.25) },
+		{ OT_WSJTX, COLOUR_NAVY }
 	};
 
 	// Names of the objects
@@ -83,19 +94,12 @@ const int ROW_HEIGHT = DEFAULT_SIZE + 4;
 		{ OT_REPORT, "REPORT" },
 		{ OT_BAND, "BAND" },
 		{ OT_CARD, "QSL" },
+		{ OT_WSJTX, "WSJT-X" },
 	};
 
 	// Main window default sizes
 	const unsigned int WIDTH = 1000;
 	const unsigned int HEIGHT = 650;
 
-	// Colours to use for buttons - defined using FLTK colour palette
-	const Fl_Color COLOUR_ORANGE = 93;       /* R=4/4, B=0/4, G=5/7 */
-	const Fl_Color COLOUR_APPLE = 87;        /* R=3/4, B=0/4, G=7/7 */
-	const Fl_Color COLOUR_PINK = 170;        /* R=4/4, B=2/4, G=2/7 */
-	const Fl_Color COLOUR_MAUVE = 212;       /* R-4/4, B=3/4, G=4/7 */
-	const Fl_Color COLOUR_NAVY = 136;        /* R=0/4, B=2/4, G=0/7 */
-	const Fl_Color COLOUR_CLARET = 80;     /* R=3/4, B=0/4, G=0/4 */
-	const Fl_Color COLOUR_GREY = fl_color_average(FL_FOREGROUND_COLOR, FL_BACKGROUND_COLOR, 0.33);
 
 #endif

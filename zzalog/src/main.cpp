@@ -1170,7 +1170,13 @@ void backup_file() {
 		ok = out.good() && (in.good() || in.eof());
 		status_->progress(count, OT_MAIN);
 	}
-	status_->progress(length, OT_MAIN);
+	if (!ok) {
+		status_->progress("Failed before completion", OT_MAIN);
+	} else {
+		if (count != length) {
+			status_->progress(length, OT_MAIN);
+		}
+	}
 	in.close();
 	out.close();
 	if (!ok) {
