@@ -266,7 +266,7 @@ bool rig_if::open() {
 			hamlib_data_->model.c_str(),
 			hamlib_data_->port_name.c_str()
 			);
-		status_->misc_status(ST_ERROR, error_message(msg).c_str());
+		status_->misc_status(ST_WARNING, error_message(msg).c_str());
 		return false;
 	}
 }
