@@ -324,6 +324,7 @@ void qso_dxcc::wb4_buttons::enable_widgets() {
 			// Only for the band and mode toggle buttons
 			Fl_Toggle_Button* bn = (Fl_Toggle_Button*)child(ix);
 			bn->labelcolor(FL_FOREGROUND_COLOR);
+			bn->color(FL_BACKGROUND_COLOR);
 			bn->deactivate();
 			bn->value(false);
 		}
@@ -334,21 +335,24 @@ void qso_dxcc::wb4_buttons::enable_widgets() {
 			Fl_Toggle_Button* bn = (Fl_Toggle_Button*)map_.at(qso_band);
 			bn->activate();
 			bn->labelcolor(FL_FOREGROUND_COLOR);
-			bn->labelfont(FL_BOLD);
+			bn->color(FL_BACKGROUND_COLOR);
+			bn->labelfont(FL_BOLD | FL_ITALIC);
 			bn->value(true);
 		}
 		if (qso_mode.length()) {
 			Fl_Toggle_Button* bn = (Fl_Toggle_Button*)map_.at(qso_mode);
 			bn->activate();
 			bn->labelcolor(FL_FOREGROUND_COLOR);
-			bn->labelfont(FL_BOLD);
+			bn->color(FL_BACKGROUND_COLOR);
+			bn->labelfont(FL_BOLD | FL_ITALIC);
 			bn->value(true);
 		}
 		if (qso_submode.length()) {
 			Fl_Toggle_Button* bn = (Fl_Toggle_Button*)map_.at(qso_submode);
 			bn->activate();
 			bn->labelcolor(FL_FOREGROUND_COLOR);
-			bn->labelfont(FL_BOLD);
+			bn->color(FL_BACKGROUND_COLOR);
+			bn->labelfont(FL_BOLD |FL_ITALIC);
 			bn->value(true);
 		}
 		// Set bands worked for this DXCC in mauve - this will overwrite this
@@ -358,6 +362,7 @@ void qso_dxcc::wb4_buttons::enable_widgets() {
 				Fl_Toggle_Button * bn = (Fl_Toggle_Button*)map_.at(*ix);
 				bn->activate();
 				bn->labelcolor(FL_FOREGROUND_COLOR);
+				bn->color(FL_BACKGROUND_COLOR);
 				bn->labelfont(0);
 			}
 		}
@@ -368,6 +373,7 @@ void qso_dxcc::wb4_buttons::enable_widgets() {
 				Fl_Toggle_Button* bn = (Fl_Toggle_Button*)map_.at(*ix);
 				bn->activate();
 				bn->labelcolor(FL_FOREGROUND_COLOR);
+				bn->color(FL_BACKGROUND_COLOR);
 				bn->labelfont(0);
 			}
 		}
@@ -376,6 +382,7 @@ void qso_dxcc::wb4_buttons::enable_widgets() {
 				Fl_Toggle_Button* bn = (Fl_Toggle_Button*)map_.at(*ix);
 				bn->activate();
 				bn->labelcolor(FL_FOREGROUND_COLOR);
+				bn->color(FL_BACKGROUND_COLOR);
 				bn->labelfont(0);
 			}
 		}
