@@ -651,14 +651,14 @@ void qso_rig::enable_widgets() {
 	if (!rig_) {
 		// No rig - decativate freq/mode
 		op_status_->value("No rig specified");
-		bn_tx_rx_->label("NA");
+		bn_tx_rx_->label("N/A");
 		bn_tx_rx_->color(FL_BACKGROUND_COLOR);
 		op_freq_mode_->deactivate();
 		op_freq_mode_->label("");
 	} else if (rig_->is_opening()) {
 		// Rig is connecting - deactivate freq/mode
 		op_status_->value("Opening rig");
-		bn_tx_rx_->label("NA");
+		bn_tx_rx_->label("N/A");
 		bn_tx_rx_->color(FL_BACKGROUND_COLOR);
 		op_freq_mode_->deactivate();
 		op_freq_mode_->label("");
@@ -696,11 +696,8 @@ void qso_rig::enable_widgets() {
 		}
 		op_freq_mode_->activate();
 		op_freq_mode_->color(FL_BLACK);
-		if (rig_->get_ptt()) {
-			op_freq_mode_->labelcolor(FL_RED);
-		} else {
-			op_freq_mode_->labelcolor(FL_YELLOW);
-		}
+		op_freq_mode_->labelcolor(FL_YELLOW);
+
 		char msg[200];
 		string rig_mode;
 		string submode;
@@ -715,14 +712,14 @@ void qso_rig::enable_widgets() {
 	} else if (rig_->has_no_cat()) {
 		// No rig available - deactivate freq/mode
 		op_status_->value("No CAT Available");
-		bn_tx_rx_->label("NA");
+		bn_tx_rx_->label("N/A");
 		bn_tx_rx_->color(FL_BACKGROUND_COLOR);
 		op_freq_mode_->deactivate();
 		op_freq_mode_->label("");
 	} else {
 		// Rig is not connected - deactivate freq/mode
 		op_status_->value("Disconnected");
-		bn_tx_rx_->label("NA");
+		bn_tx_rx_->label("N/A");
 		bn_tx_rx_->color(FL_BACKGROUND_COLOR);
 		op_freq_mode_->deactivate();
 		op_freq_mode_->label("");
