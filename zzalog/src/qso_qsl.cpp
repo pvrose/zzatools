@@ -388,7 +388,6 @@ void qso_qsl::qsl_upload() {
 		extract_records_->upload();
 		tabbed_forms_->activate_pane(OT_MAIN, true);
 		enable_widgets();
-		book_->modified(true);
 	} else {
 		status_->misc_status(ST_ERROR, "Not ready to upload - finish operating");
 	}
