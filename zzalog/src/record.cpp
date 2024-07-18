@@ -839,13 +839,10 @@ void record::change_field_name(string from, string to) {
 	//MT_SWL_NOMATCH       // An SWL report that is no match for any activity
 	//MT_2XSWL_MATCH       // An SWL report matches an existing SWL report
 match_result_t record::match_records(record* record) {
-	printf("DEBUG match_records ");
 	// return NOMATCH if no record to compare
 	if (record == nullptr || this == nullptr) {
-		printf("NULL record\n");
 		return MT_NOMATCH;
 	}
-	printf("%s v %s: ", item("CALL").c_str(), record->item("CALL").c_str());
 	// Match conditions
 	int nondate_mismatch_count = 0; // Important fields mismatch
 	int trivial_mismatch_count = 0; // Trivial fields mismatch
@@ -919,12 +916,10 @@ match_result_t record::match_records(record* record) {
 	}
 	// All non-trivial fields match - EXACT
 	if (dates_match && location_match && nondate_mismatch_count == 0) {
-		printf("EXACT\n");
 		return MT_EXACT;
 	}
 	// One or more location field mismatches
 	else if (dates_match && !location_match && nondate_mismatch_count == 0) {
-		printf("but not location\n");
 		return MT_LOC_MISMATCH;
 	}
 	// Need more detailed analysis 
@@ -947,44 +942,36 @@ match_result_t record::match_records(record* record) {
 		bool other_swl = (record->item("SWL") == "Y");
 		// Both records are SWL and match
 		if (is_swl && other_swl && swl_match && within_30mins) {
-			printf("2xSWL match\n");
 			return MT_2XSWL_MATCH;
 		}
 		// is_swl and time within 30 - SWL_MATCH
 		else if (is_swl && !other_swl && swl_match && within_30mins) {
-			printf("SWL matches QSO\n");
 			return MT_SWL_MATCH;
 		}
 		// is_swl - no match
 		else if (is_swl && !other_swl && !(swl_match && within_30mins)) {
-			printf("SWL doesn't match\n");
 			return MT_SWL_NOMATCH;
 		}
 		else if (within_30mins && nondate_mismatch_count == 0) {
 			// Date fields match within 30 minutes and all fields match - PROBABLE
 			if (trivial_mismatch_count == 0) {
-				printf("+/- 30 mins \n");
 				return MT_PROBABLE;
 			}
 			// Date fields match within 30 minutes and important fields match match - POSSIBLE
 			else {
-				printf("+/- 30 mins - some difference\n");
 				return MT_POSSIBLE;
 			}
 		}
 		// Date fields out by > 30 mins and other fields agree - POSSIBLE
 		else if (nondate_mismatch_count == 0) {
-			printf("outwith 30 mins\n");
 			return MT_UNLIKELY;
 		}
 		// The two records overlap their times on and off 
 		else if (overlap && net_mismatch_count == 0 && !call_match) {
-			printf("QSOs overlap\n");
 			return MT_OVERLAP;
 		}
 		// Significant difference - NOMATCH
 		else {
-			printf("No match\n");
 			return MT_NOMATCH;
 		}
 	}
