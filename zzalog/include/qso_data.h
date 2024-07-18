@@ -33,7 +33,9 @@ static const field_list QSO_FIELDS = {
 	"CALL",
 	"FREQ",
 	"MODE",
-	"TX_PWR"
+	"TX_PWR",
+	"RST_RCVD",
+	"RST_SENT",
 };
 // Default fixed fields
 static const field_list STN_FIELDS = {
