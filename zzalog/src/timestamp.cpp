@@ -1,9 +1,4 @@
-#include "utils.h"
 #include <string>
-
-using namespace std;
-
-string TIMESTAMP = __DATE__ " " __TIME__;
-
-
-
+std::string TIMESTAMP = 
+"20240718__153513Z"
+;

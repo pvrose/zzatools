@@ -68,7 +68,7 @@ $(EXEC_DIR)/$(TARGET_EXEC): $(OBJS) ${INSTALL_DIR}/fltk-config
 
 # Build step for C source
 $(EXEC_DIR)/%.c.o: %.c
-	@echo $<
+	@echo $@
 	@mkdir -p $(dir $@)
 ifeq ($(BUILD_TYPE), Debug)
 	@$(CC) $(CPPFLAGS) $(CFLAGS) $(DEBUG_FLAG) -c $< -o $@
@@ -77,7 +77,7 @@ else
 endif
 # Build step for C++ source
 $(EXEC_DIR)/%.cpp.o: %.cpp
-	@echo $<
+	@echo $@
 	@mkdir -p $(dir $@)
 ifeq ($(BUILD_TYPE), Debug)
 	@$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(DEBUG_FLAG) -c $< -o $@
@@ -86,7 +86,7 @@ else
 endif
 # Create the logo includefile
 $(INC_DIRS)/logo.h: ../rose.png
-	@echo $<
+	@echo $@
 	@xxd -i $< > $@
 	
 # Create a target to run the compiled code
@@ -111,9 +111,14 @@ $(INSTALL_DIR)/$(TARGET_EXEC): $(EXEC_DIR)/$(TARGET_EXEC)
 	@echo $(INSTALL_DIR)/$(TARGET_EXEC)
 	@sudo cp $(EXEC_DIR)/$(TARGET_EXEC) $(INSTALL_DIR)
 
-.PHONY: ts
-ts:
-	@touch src/timestamp.cpp
+# timestamp file
+.PHONY: ts 
+ts: $(SRC_DIRS)/timestamp.cpp 
+	@echo "#include <string>" > $<
+	@echo "std::string TIMESTAMP = " >> $<
+	@date -u +"\"%Y%m%d__%H%M%SZ\"" >> $<
+	@echo ";" >> $<
+	@echo $<
 
 # Include the .d makefiles. The - at the front suppresses the errors of missing
 # Makefiles. Initially, all the .d files will be missing, and we don't want those
