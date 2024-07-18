@@ -123,7 +123,7 @@ istream& adi_reader::load_record(record* in_record, istream& in, load_result_t& 
 				}
 				// Read the >
 				in.get(c);
-				if (!in.good()) result = LR_BAD;
+				if (!in.good()) if (in.eof()) result = LR_EOF; else result = LR_BAD;
 				// Read data item value
 				for (unsigned int u = 0; u < count && in.good(); u++) {
 					// Add CR if LF seen without previous CR - TODO: do we need to handle CR only?
@@ -135,7 +135,7 @@ istream& adi_reader::load_record(record* in_record, istream& in, load_result_t& 
 					value += c;
 					in.get(c);
 				}
-				if (!in.good()) result = LR_BAD;
+				if (!in.good()) if (in.eof()) result = LR_EOF; else result = LR_BAD;
 				else {
 					// Ignore all data until next < (or EOF) - ADIF says ignore, LotW uses it as annotation
 					while (c != '<' && in.good()) {
