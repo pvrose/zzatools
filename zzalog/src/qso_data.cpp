@@ -1426,14 +1426,14 @@ void qso_data::action_cancel_modem() {
 	switch(logging_state_) {
 		case QSO_WSJTX: {
 			wsjtx_handler_->delete_qso(current_qso()->item("CALL"));
-			logging_state_ = QSO_INACTIVE;
+			action_deactivate();
 			g_entry_->delete_qso();
 			book_->delete_record(true);
 			book_->enable_save(true, "Cancel real-time modem QSO");
 			break;
 		}
 		case QSO_FLDIGI: {
-			logging_state_ = QSO_INACTIVE;
+			action_deactivate();
 			g_entry_->delete_qso();
 			book_->delete_record(true);
 			book_->enable_save(true, "Cancel real-time modem QSO");
