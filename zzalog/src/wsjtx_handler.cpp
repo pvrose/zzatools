@@ -159,7 +159,7 @@ int wsjtx_handler::send_hbeat() {
 int wsjtx_handler::handle_close(stringstream& ss) {
 	status_->misc_status(ST_NOTE, "WSJT-X: Received Closing down");
 	connected_ = false;
-	qso_manager_->enable_widgets();
+	qso_manager_->cancel_modem_qso();
 	// Clear any WSJT-X related items
 	menu_->update_items();
 	return 1;

@@ -419,6 +419,12 @@ void qso_manager::enter_modem_qso(record * qso) {
 	data_group_->enter_modem_qso(qso);
 }
 
+// Cancel modem QSO
+void qso_manager::cancel_modem_qso() {
+	data_group_->action_cancel_modem();
+	enable_widgets();
+}
+
 // Download QSLs;
 void qso_manager::qsl_download(import_data::update_mode_t server) {
 	qsl_control()->qsl_download(server);

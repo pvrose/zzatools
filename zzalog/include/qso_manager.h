@@ -89,6 +89,8 @@ using namespace std;
 		void update_modem_qso(bool log_it);
 		// Log modem record
 		void enter_modem_qso(record* qso);
+		// Cancel mode QSO
+		void cancel_modem_qso();
 		// QSO i n progress
 		bool qso_in_progress();
 		// Start QSO
