@@ -320,70 +320,39 @@ void qso_dxcc::wb4_buttons::enable_widgets() {
 	create_form();
 	// Reset all the buttons' colouring
 	for (int ix = 0; ix < children(); ix++) {
-		if (child(ix)->type() == FL_TOGGLE_BUTTON) {
+		Fl_Toggle_Button* bn = dynamic_cast<Fl_Toggle_Button*>(child(ix));
+			if (bn != nullptr) {
 			// Only for the band and mode toggle buttons
-			Fl_Toggle_Button* bn = (Fl_Toggle_Button*)child(ix);
-			bn->labelcolor(FL_FOREGROUND_COLOR);
-			bn->color(FL_BACKGROUND_COLOR);
-			bn->deactivate();
-			bn->value(false);
-		}
-	}
-	// Mark this QSO buttons: Band in claret, Mode in dark green
-	if (qso && qso->item("CALL").length()) {
-		if (qso_band.length()) {
-			Fl_Toggle_Button* bn = (Fl_Toggle_Button*)map_.at(qso_band);
-			bn->activate();
-			bn->labelcolor(FL_FOREGROUND_COLOR);
-			bn->color(FL_BACKGROUND_COLOR);
-			bn->labelfont(FL_BOLD | FL_ITALIC);
-			bn->value(true);
-		}
-		if (qso_mode.length()) {
-			Fl_Toggle_Button* bn = (Fl_Toggle_Button*)map_.at(qso_mode);
-			bn->activate();
-			bn->labelcolor(FL_FOREGROUND_COLOR);
-			bn->color(FL_BACKGROUND_COLOR);
-			bn->labelfont(FL_BOLD | FL_ITALIC);
-			bn->value(true);
-		}
-		if (qso_submode.length()) {
-			Fl_Toggle_Button* bn = (Fl_Toggle_Button*)map_.at(qso_submode);
-			bn->activate();
-			bn->labelcolor(FL_FOREGROUND_COLOR);
-			bn->color(FL_BACKGROUND_COLOR);
-			bn->labelfont(FL_BOLD |FL_ITALIC);
-			bn->value(true);
-		}
-		// Set bands worked for this DXCC in mauve - this will overwrite this
-		// QSO's if it has been worked before
-		if (dxcc_bands_) {
-			for (auto ix = dxcc_bands_->begin(); ix != dxcc_bands_->end(); ix++) {
-				Fl_Toggle_Button * bn = (Fl_Toggle_Button*)map_.at(*ix);
+			string l = bn->label();
+			// dxcc stuff not set up yet
+			if (dxcc_bands_ == nullptr || dxcc_modes_ == nullptr || dxcc_submodes_ == nullptr) {
+				bn->deactivate();
+			} else 
+			// If it's a band/submode worked for this DXCC - set normal
+			if (dxcc_bands_->find(l) != dxcc_bands_->end() ||
+				dxcc_submodes_->find(l) != dxcc_submodes_->end() ||
+				dxcc_modes_->find(l) != dxcc_modes_->end()) {
 				bn->activate();
+				bn->color(FL_BACKGROUND_COLOR, FL_BACKGROUND_COLOR);
 				bn->labelcolor(FL_FOREGROUND_COLOR);
-				bn->color(FL_BACKGROUND_COLOR);
 				bn->labelfont(0);
+			} else 
+			// If it's inthe current qso - set reversed
+			if (l == qso_band || l == qso_submode || l == qso_mode) {
+				bn->activate();
+				bn->color(FL_FOREGROUND_COLOR, FL_FOREGROUND_COLOR);
+				bn->labelcolor(FL_BACKGROUND_COLOR);
+				bn->labelfont(0);
+			} else 
+			// It's not used - deactivate
+			{
+				bn->deactivate();
 			}
-		}
-		// Set modes worked for this DXCC in apple green - this will overwrite this
-		// QSO's if it has been worked before
-		if (dxcc_modes_) {
-			for (auto ix = dxcc_modes_->begin(); ix != dxcc_modes_->end(); ix++) {
-				Fl_Toggle_Button* bn = (Fl_Toggle_Button*)map_.at(*ix);
-				bn->activate();
-				bn->labelcolor(FL_FOREGROUND_COLOR);
-				bn->color(FL_BACKGROUND_COLOR);
-				bn->labelfont(0);
-			}
-		}
-		if (dxcc_submodes_) {
-			for (auto ix = dxcc_submodes_->begin(); ix != dxcc_submodes_->end(); ix++) {
-				Fl_Toggle_Button* bn = (Fl_Toggle_Button*)map_.at(*ix);
-				bn->activate();
-				bn->labelcolor(FL_FOREGROUND_COLOR);
-				bn->color(FL_BACKGROUND_COLOR);
-				bn->labelfont(0);
+			// If it's the current QSO depress the button
+			if (l == qso_band || l == qso_mode || l == qso_submode) {
+				bn->value(true);
+			} else {
+				bn->value(false);
 			}
 		}
 	}
