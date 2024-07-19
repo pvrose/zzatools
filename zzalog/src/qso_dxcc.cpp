@@ -214,6 +214,7 @@ void qso_dxcc::wb4_buttons::create_form() {
 	const int BWIDTH = AWIDTH / NUM_WIDE;
 	int bn_number = 0;
 	clear();
+	// I am going to add widgets to this group - temporarily make it current
 	Fl_Group* saveg = Fl_Group::current();
 	Fl_Group::current(this);
 	int curr_x = x();
@@ -267,6 +268,7 @@ void qso_dxcc::wb4_buttons::create_form() {
 			curr_y += HBUTTON;
 		}
 	}
+	// Restore previous group as current
 	Fl_Group::current(saveg);
 }
 
@@ -309,12 +311,13 @@ void qso_dxcc::wb4_buttons::enable_widgets() {
 		char l[128];
 		snprintf(l, sizeof(l), "DXCC worked status as %s", my_call.c_str());
 		copy_label(l);
-	}
-	else {
+	} else {
 		char l[128];
 		snprintf(l, sizeof(l), "DXCC worked status");
 		copy_label(l);
-
+		if (dxcc_bands_) dxcc_bands_->clear();
+		if (dxcc_modes_) dxcc_modes_->clear();
+		if (dxcc_submodes_) dxcc_submodes_->clear();
 	}
 	// Create all the buttons
 	create_form();
