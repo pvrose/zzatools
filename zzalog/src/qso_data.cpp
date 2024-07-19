@@ -911,7 +911,7 @@ void qso_data::action_cancel() {
 	case NET_STARTED:
 		g_net_entry_->remove_entry();
 		if (g_net_entry_->entries() == 0) {
-			logging_state_ = edit_return_state_;
+			action_return_state();
 		}
 		break;
 	}
@@ -1026,7 +1026,7 @@ void qso_data::action_save_edit() {
 		if (qso->is_dirty()) book_->modified(true);
 		g_entry_->delete_qso();
 	}
-	logging_state_ = edit_return_state_;
+	action_return_state();
 	enable_widgets();
 }
 
@@ -1037,7 +1037,7 @@ void qso_data::action_cancel_edit() {
 		*book_->get_record(g_entry_->qso_number(), false) = *g_entry_->original_qso();
 	}
 	g_entry_->delete_qso();
-	logging_state_ = edit_return_state_;
+	action_return_state();
 	g_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
 	g_misc_->qso(current_qso(), current_number());
 	enable_widgets();
@@ -1047,7 +1047,7 @@ void qso_data::action_cancel_edit() {
 void qso_data::action_cancel_browse() {
 	g_entry_->qso(g_query_->qso_number());
 	g_query_->clear_query();
-	logging_state_ = edit_return_state_;
+	action_return_state();
 	g_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
 	g_misc_->qso(current_qso(), current_number());
 	enable_widgets();
@@ -1527,6 +1527,20 @@ void qso_data::action_remember_state() {
 	}
 }
 
+// REturn to remembered state
+void qso_data::action_return_state() {
+	action_deactivate();
+	switch (edit_return_state_) {
+		case QSO_INACTIVE:
+			break;
+		case QSO_PENDING:
+			action_activate(previous_mode_);
+			break;
+		case MANUAL_ENTRY:
+			action_query_entry();
+			break;
+	}
+}
 
 // Dummy QSO
 record* qso_data::dummy_qso() {

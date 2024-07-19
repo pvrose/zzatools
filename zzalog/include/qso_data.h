@@ -228,6 +228,8 @@ public:
 	void action_update_cat();
 	// Remember state before edit or view
 	void action_remember_state();
+	// Go to remembered state
+	void action_return_state();
 
 	qso_contest* contest();
 	// Contest mode is active
