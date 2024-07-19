@@ -841,6 +841,7 @@ bool eqsl_handler::upload_eqsl_log(book* book) {
 			if (!dont_update) {
 				record->item("EQSL_QSLSDATE", now(false, "%Y%m%d"));
 				record->item("EQSL_QSL_SENT", string("Y"));
+				book_->modified(true);
 			}
 		}
 		book_->enable_save(true, "Updated eQSL upload status");
