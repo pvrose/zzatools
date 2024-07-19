@@ -10,6 +10,7 @@ extern Fl_Preferences* settings_;
 qso_misc::qso_misc(int X, int Y, int W, int H, const char* L) :
 	Fl_Tabs(X, Y, W, H, L)
 {
+	box(FL_BORDER_BOX);
 	load_values();
 	create_form();
 }

@@ -269,6 +269,7 @@ void qso_rig::create_rig_ant(int& curr_x, int& curr_y) {
 void qso_rig::create_config(int& curr_x, int& curr_y) {
 	// Tabbed form
 	config_tabs_ = new Fl_Tabs(curr_x, curr_y, 10, 10);
+	config_tabs_->box(FL_BORDER_BOX);
 	config_tabs_->callback(cb_config);
 	config_tabs_->when(FL_WHEN_CHANGED);
 	int rx = 0;

@@ -9,6 +9,7 @@ qso_log::qso_log(int X, int Y, int W, int H, const char* l) :
 	Fl_Tabs(X, Y, W, H, l)
 {
 	labeltype(FL_NO_LABEL);
+	box(FL_BORDER_BOX);
 	callback(cb_tabs);
 	load_values();
 	create_form(X, Y);

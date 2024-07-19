@@ -18,6 +18,7 @@ qso_clocks::qso_clocks(int X, int Y, int W, int H, const char* L) :
     Fl_Tabs(X, Y, W, H, L)
 {
 	labeltype(FL_NO_LABEL);
+	box(FL_BORDER_BOX);
 	create_form();
 	callback(cb_tabs);
     enable_widgets();
