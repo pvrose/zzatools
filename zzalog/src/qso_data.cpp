@@ -484,6 +484,7 @@ void qso_data::update_qso(qso_num_t log_num) {
 			}
 			g_net_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
 			g_misc_->qso(current_qso(), current_number());
+			g_misc_->enable_widgets();
 		}
 		break;
 	}
@@ -1275,7 +1276,7 @@ void qso_data::action_create_net() {
 		g_net_entry_->add_entry();
 		g_net_entry_->set_qso(other_number);
 		g_net_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
-		g_misc_->qso(current_qso(), current_number());
+		// g_misc_->qso(current_qso(), current_number());
 		other_number--;
 	}
 	// Now look later
@@ -1285,10 +1286,11 @@ void qso_data::action_create_net() {
 		g_net_entry_->add_entry();
 		g_net_entry_->set_qso(other_number);
 		g_net_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
-		g_misc_->qso(current_qso(), current_number());
+		// g_misc_->qso(current_qso(), current_number());
 		other_number++;
 	}
 	g_net_entry_->entry(w);
+	g_misc_->qso(current_qso(), current_number());
 	enable_widgets();
 }
 	
@@ -1349,7 +1351,8 @@ void qso_data::action_save_net_edit() {
 	book_->enable_save(true, "Saving net edit QSO");
 	g_net_entry_->remove_entry();
 	if (g_net_entry_->entries() == 0) {
-		action_deactivate();;
+		// Do NOT use deactivate()
+		logging_state_ = QSO_INACTIVE;
 	}
 	else {
 		logging_state_ = NET_EDIT;
@@ -1382,7 +1385,8 @@ void qso_data::action_cancel_net_edit() {
 	*book_->get_record(g_net_entry_->qso_number(), false) = *g_net_entry_->original_qso();
 	g_net_entry_->remove_entry();
 	if (g_net_entry_->entries() == 0) {
-		action_deactivate();;
+		// do NOT use deactivate() - that sets 
+		logging_state_ = QSO_INACTIVE;
 	}
 	else {
 		g_net_entry_->entry()->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
