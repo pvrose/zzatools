@@ -335,7 +335,7 @@ void qso_qsl_vwr::enable_widgets() {
 	set_image();
 	set_qsl_status();
 	char title[128];
-	if (current_qso_ == nullptr) {
+	if (current_qso_ == nullptr || current_qso_->item("CALL").length() == 0) {
 		strcpy(title, "No contact");
 	}
 	else {
@@ -664,7 +664,7 @@ void qso_qsl_vwr::draw_image() {
 			// Display a label instead in large letters - 36 pt.
 			// Make font smaller if callsign wouldn't fit
 			int size = 32;
-			if (current_qso_) {
+			if (current_qso_ && current_qso_->item("CALL").length() != 0) {
 				bn_card_display_->copy_label(current_qso_->item("CALL").c_str());
 			}
 			else {

@@ -57,7 +57,9 @@ void qso_details::create_form() {
 // Update and configure widgets
 void qso_details::enable_widgets() {
 	if (qso_) {
-		op_call_->value(qso_->item("CALL").c_str());
+		string call = qso_->item("CALL");
+		if (call.length() == 0) call = "No contact";
+		op_call_->value(call.c_str());
 		get_qsos();
 	}
 	else {
