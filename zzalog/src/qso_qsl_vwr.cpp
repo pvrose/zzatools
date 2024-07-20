@@ -332,18 +332,21 @@ void qso_qsl_vwr::set_qso(record* qso, qso_num_t number) {
 
 // Redraw the form after stuff has changed
 void qso_qsl_vwr::enable_widgets() {
-	if (current_qso_ != nullptr) {
-		set_image();
-		set_qsl_status();
-		char title[128];
+	set_image();
+	set_qsl_status();
+	char title[128];
+	if (current_qso_ == nullptr) {
+		strcpy(title, "No contact");
+	}
+	else {
 		snprintf(title, 128, "QSL: %s %s %s %s %s",
 			current_qso_->item("CALL").c_str(),
 			current_qso_->item("QSO_DATE").c_str(),
 			current_qso_->item("TIME_ON").c_str(),
 			current_qso_->item("BAND").c_str(),
 			current_qso_->item("MODE", true, true).c_str());
-		win_full_view_->copy_label(title);
 	}
+	win_full_view_->copy_label(title);
 	// Display the image choice buttons
 	set_image_buttons();
 	update_full_view();
@@ -500,6 +503,13 @@ void qso_qsl_vwr::set_image() {
 					// Test Whether we've used default station callsign
 				}
 			}
+		} else {
+			delete raw_image_;
+			raw_image_ = nullptr;
+			delete scaled_image_;
+			delete desat_image_;
+			scaled_image_ = nullptr;
+			desat_image_ = nullptr;
 		}
 		// Got an image: draw it
 		draw_image();
@@ -648,29 +658,38 @@ void qso_qsl_vwr::draw_image() {
 			// Set the resized image as the selected and unselected image for the control
 			bn_card_display_->image(scaled_image_);
 			bn_card_display_->deimage(desat_image_);
+			bn_card_display_->box(FL_FLAT_BOX);
 		}
 		else {
 			// Display a label instead in large letters - 36 pt.
 			// Make font smaller if callsign wouldn't fit
-			bn_card_display_->copy_label(current_qso_->item("CALL").c_str());
-			int size = 36;
-			fl_font(0, size);
+			int size = 32;
+			if (current_qso_) {
+				bn_card_display_->copy_label(current_qso_->item("CALL").c_str());
+			}
+			else {
+				bn_card_display_->label("No contact");
+				size = FL_NORMAL_SIZE + 2;
+			}
+			fl_font(FL_BOLD, size);
 			int w, h;
 			fl_measure(bn_card_display_->label(), w, h);
 			while (w > bn_card_display_->w()) {
 				size--;
-				fl_font(0, size);
+				fl_font(FL_BOLD, size);
 				fl_measure(bn_card_display_->label(), w, h);
 			}
 			bn_card_display_->labelsize(size);
 			bn_card_display_->labelcolor(FL_FOREGROUND_COLOR);
-			//bn_card_display_->color(FL_WHITE);
+			bn_card_display_->labelfont(FL_BOLD);
+			bn_card_display_->box(FL_BORDER_BOX);
 		}
 		break;
 	case QI_MY_QSL:
 		bn_card_display_->label("My QSL is displayed in separate window\nclick to show");
 		bn_card_display_->labelcolor(FL_FOREGROUND_COLOR);
 		bn_card_display_->labelsize(FL_NORMAL_SIZE);
+		bn_card_display_->box(FL_BORDER_BOX);
 		if (current_qso_) {
 			display_myqsl_->value(current_qso_->item("STATION_CALLSIGN"), &current_qso_, 1);
 		} else {

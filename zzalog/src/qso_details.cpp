@@ -39,7 +39,7 @@ void qso_details::create_form() {
 	op_call_->color(FL_BACKGROUND_COLOR);
 	op_call_->textfont(FL_BOLD);
 	op_call_->textsize(FL_NORMAL_SIZE + 2);
-	op_call_->textcolor(DARK ? FL_RED : COLOUR_CLARET);
+	op_call_->textcolor(FL_FOREGROUND_COLOR);
 
 	curr_y += op_call_->h() + GAP;
 	// Add table for the contact's details
@@ -58,6 +58,10 @@ void qso_details::create_form() {
 void qso_details::enable_widgets() {
 	if (qso_) {
 		op_call_->value(qso_->item("CALL").c_str());
+		get_qsos();
+	}
+	else {
+		op_call_->value("No contact");
 		get_qsos();
 	}
 }

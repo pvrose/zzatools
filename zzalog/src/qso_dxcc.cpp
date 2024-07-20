@@ -146,7 +146,7 @@ void qso_dxcc::enable_widgets() {
 		}
 		op_geo_->value(text);
 	} else {
-		op_call_->value("No Contact");
+		op_call_->value("No contact");
 		op_prefix_->value("");
 		op_source_->value("");
 		op_geo_->value("");

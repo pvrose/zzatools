@@ -98,7 +98,7 @@ void qso_qth::enable_widgets() {
 		table_->set_data(qth_details_);
 	}
 	else {
-		op_name_->value("<No name>");
+		op_name_->value("No QTH supplied");
 		op_descr_->value("");
 		table_->set_data(nullptr);
 	}
