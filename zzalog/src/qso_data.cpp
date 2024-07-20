@@ -395,13 +395,13 @@ void qso_data::update_qso(qso_num_t log_num) {
 				// Save QSO
 				if(!action_save()) break;
 				book_->selection(book_->item_number(log_num));
-				logging_state_ = QSO_INACTIVE;
+				action_deactivate();;
 				break;
 			case 1:
 				// Cancel QSO
 				action_cancel();
 				book_->selection(book_->item_number(log_num));
-				logging_state_ = QSO_INACTIVE;
+				action_deactivate();;
 				break;
 			case 2:
 				// Ignore the selection request
@@ -464,12 +464,12 @@ void qso_data::update_qso(qso_num_t log_num) {
 			case 0:
 				// Save QSO
 				action_save_net_all();
-				logging_state_ = QSO_INACTIVE;
+				action_deactivate();;
 				break;
 			case 1:
 				// Cancel QSO
 				action_cancel_net_all();
-				logging_state_ = QSO_INACTIVE;
+				action_deactivate();;
 				break;
 			case 2:
 				// Ignore the selection request
@@ -578,7 +578,7 @@ void qso_data::update_modem_qso(bool log_it) {
 	case QSO_FLDIGI: {
 		if (log_it) {
 			action_log_modem();
-			logging_state_ = QSO_INACTIVE;
+			action_deactivate();;
 		} else {
 			g_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
 			g_misc_->qso(current_qso(), current_number());
@@ -852,7 +852,7 @@ bool qso_data::action_save() {
 		logging_state_ = SWITCHING;
 		book_->modified(true);
 		book_->selection(item_number, HT_INSERTED);
-		logging_state_ = QSO_INACTIVE;
+		action_deactivate();;
 		action_activate(previous_mode_);
 		break;
 	case TEST_ACTIVE:
@@ -867,7 +867,7 @@ bool qso_data::action_save() {
 		logging_state_ = SWITCHING;
 		book_->modified(true);
 		book_->selection(item_number, HT_INSERTED);
-		logging_state_ = QSO_INACTIVE;
+		action_deactivate();;
 		break;
 	case NET_STARTED:
 		g_net_entry_->remove_entry();
@@ -875,7 +875,7 @@ bool qso_data::action_save() {
 		if (g_net_entry_->entries() == 0) {
 			book_->modified(true);
 			book_->selection(item_number, HT_INSERTED);
-			logging_state_ = QSO_INACTIVE;
+			action_deactivate();;
 		}
 		else {
 			book_->modified(true);
@@ -891,14 +891,14 @@ bool qso_data::action_save() {
 // Action CANCEL - Transition from QSO_STARTED to QSO_INACTIVE without saving record
 void qso_data::action_cancel() {
 	logging_state_t saved_state = logging_state_;
-	logging_state_ = QSO_INACTIVE;
+	action_deactivate();;
 	book_->delete_record(true);
 	logging_state_ = saved_state;
 
 	switch (logging_state_) {
 	case QSO_STARTED:
 		g_entry_->delete_qso();
-		logging_state_ = QSO_INACTIVE;
+		action_deactivate();;
 		break;
 	case TEST_ACTIVE:
 		g_entry_->delete_qso();
@@ -906,7 +906,7 @@ void qso_data::action_cancel() {
 		break;
 	case QSO_WSJTX:
 	case QSO_FLDIGI:
-		logging_state_ = QSO_INACTIVE;
+		action_deactivate();;
 		break;
 	case NET_STARTED:
 		g_net_entry_->remove_entry();
@@ -923,7 +923,7 @@ void qso_data::action_cancel() {
 // Action DELETE - we should be inactive but leave this code 
 void qso_data::action_delete_qso() {
 	logging_state_t saved_state = logging_state_;
-	logging_state_ = QSO_INACTIVE;
+	action_deactivate();;
 	book_->delete_record(true);
 	action_activate(QSO_NONE);
 
@@ -1128,8 +1128,8 @@ void qso_data::action_query(logging_state_t query, qso_num_t match_number, qso_n
 		// TODO trap this sensibly
 		return;
 	}
-	g_misc_->qso(current_qso(), current_number());
 	logging_state_ = query;
+	g_misc_->qso(current_qso(), current_number());
 	enable_widgets();
 	g_buttons_->enable_widgets();
 	// Move window to top
@@ -1140,7 +1140,7 @@ void qso_data::action_query(logging_state_t query, qso_num_t match_number, qso_n
 void qso_data::action_add_query() {
 	import_data_->save_update();
 	g_query_->clear_query();
-	logging_state_ = QSO_INACTIVE;
+	action_deactivate();;
 	enable_widgets();
 	// Restart the update process
 	import_data_->update_book();
@@ -1151,7 +1151,7 @@ void qso_data::action_add_query() {
 void qso_data::action_reject_query() {
 	import_data_->discard_update(true);
 	g_query_->clear_query();
-	logging_state_ = QSO_INACTIVE;
+	action_deactivate();;
 	enable_widgets();
 	// Restart the update process
 	import_data_->update_book();
@@ -1160,7 +1160,7 @@ void qso_data::action_reject_query() {
 // Action reject manual query - do nothing
 void qso_data::action_reject_manual() {
 	g_query_->clear_query();
-	logging_state_ = QSO_INACTIVE;
+	action_deactivate();;
 	enable_widgets();
 }
 
@@ -1168,7 +1168,7 @@ void qso_data::action_reject_manual() {
 void qso_data::action_merge_query() {
 	import_data_->merge_update();
 	g_query_->clear_query();
-	logging_state_ = QSO_INACTIVE;
+	action_deactivate();;
 	enable_widgets();
 	// Restart the update process
 	import_data_->update_book();
@@ -1200,7 +1200,7 @@ void qso_data::action_handle_dupe(dupe_flags action) {
 		break;
 	}
 	g_query_->clear_query();
-	logging_state_ = QSO_INACTIVE;
+	action_deactivate();;
 	enable_widgets();
 	// Restart the duplicate check process
 	navigation_book_->check_dupes(true);
@@ -1213,7 +1213,7 @@ void qso_data::action_save_merge() {
 	book_->add_use_data(g_query_->qso());
 	book_->modified(true);
 	g_query_->clear_query();
-	logging_state_ = QSO_INACTIVE;
+	action_deactivate();;
 	enable_widgets();
 	qrz_handler_->merge_done();
 }
@@ -1349,7 +1349,7 @@ void qso_data::action_save_net_edit() {
 	book_->enable_save(true, "Saving net edit QSO");
 	g_net_entry_->remove_entry();
 	if (g_net_entry_->entries() == 0) {
-		logging_state_ = QSO_INACTIVE;
+		action_deactivate();;
 	}
 	else {
 		logging_state_ = NET_EDIT;
@@ -1382,7 +1382,7 @@ void qso_data::action_cancel_net_edit() {
 	*book_->get_record(g_net_entry_->qso_number(), false) = *g_net_entry_->original_qso();
 	g_net_entry_->remove_entry();
 	if (g_net_entry_->entries() == 0) {
-		logging_state_ = QSO_INACTIVE;
+		action_deactivate();;
 	}
 	else {
 		g_net_entry_->entry()->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
@@ -1489,7 +1489,7 @@ void qso_data::action_exec_query() {
 // Abandon the query
 void qso_data::action_cancel_query() {
 	g_qy_entry_->delete_qso();
-	logging_state_ = QSO_INACTIVE;
+	action_deactivate();;
 	enable_widgets();
 }
 

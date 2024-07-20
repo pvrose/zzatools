@@ -183,7 +183,8 @@ void record_table::draw_cell(TableContext context, int R, int C, int X, int Y, i
 			fl_rectf(X, Y, W, H);
 
 			// TEXT
-			fl_color(FL_FOREGROUND_COLOR);
+			Fl_Color bg_colour = fl_color();
+			fl_color(fl_contrast(FL_FOREGROUND_COLOR, bg_colour));
 			string field_name = display_fields_[R];
 			switch (C) {
 			case 0:
