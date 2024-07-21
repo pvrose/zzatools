@@ -495,6 +495,10 @@ string cty_data::name(int adif_id) {
 	if (adif_id == 0) {
 		return "";
 	}
+	else if (adif_id == -1) {
+		status_->misc_status(ST_WARNING, "CTY DATA: -1 is an invalid DXCC");
+		return "";
+	}
 	if (entities_.find(adif_id) == entities_.end()) {
 		char msg[160];
 		snprintf(msg, sizeof(msg), "CTY DATA: %d is not a valid DXCC entity number", adif_id);
@@ -509,6 +513,10 @@ string cty_data::name(int adif_id) {
 // Get the continent for entity n
 string cty_data::continent(int adif_id) {
 	if (adif_id == 0) {
+		return "";
+	}
+	else if (adif_id == -1) {
+		status_->misc_status(ST_WARNING, "CTY DATA: -1 is an invalid DXCC");
 		return "";
 	}
 	if (entities_.find(adif_id) == entities_.end()) {
@@ -526,6 +534,10 @@ string cty_data::continent(int adif_id) {
 string cty_data::nickname(int adif_id) {
 	if (adif_id == 0) {
 		return "";
+	} 
+	else if (adif_id == -1) {
+		status_->misc_status(ST_WARNING, "CTY DATA: -1 is an invalid DXCC");
+		return "";
 	}
 	if (entities_.find(adif_id) == entities_.end()) {
 		char msg[160];
@@ -541,6 +553,10 @@ string cty_data::nickname(int adif_id) {
 // Return the default CQ zone for entity n
 int cty_data::cq_zone(int adif_id) {
 	if (adif_id == 0) {
+		return 0;
+	}
+	else if (adif_id == -1) {
+		status_->misc_status(ST_WARNING, "CTY DATA: -1 is an invalid DXCC");
 		return 0;
 	}
 	if (entities_.find(adif_id) == entities_.end()) {
