@@ -424,6 +424,7 @@ void report_tree::copy_map_to_tree(int type, void* this_map, Fl_Tree_Item* item,
 				if (count_eqsl || count_lotw || count_card) entities_any_++;
 			}
 			status_->progress(count, OT_REPORT);
+			count++;
 		}
 		switch (adj_order_[type]) {
 			case RC_BAND: {
@@ -883,17 +884,3 @@ void report_tree::set_font(Fl_Font font, Fl_Fontsize size) {
 	fontsize_ = size;
 }
 
-// Handle the show event
-int report_tree::handle(int event) {
-	// Always check the Fl_Tree event
-	int base_event = Fl_Tree::handle(event);
-	switch(event) {
-		case FL_SHOW: {
-			// Update the report
-			update(HT_ALL, book_->selection());
-			return 1;
-			break;
-		}
-	}
-	return base_event;;
-}
