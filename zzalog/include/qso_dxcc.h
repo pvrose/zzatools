@@ -45,14 +45,10 @@ class qso_dxcc :
     protected:
         // A set of bands worked (ordered by frequency)
         band_set* dxcc_bands_;
-        // A set og the modes worked
-        set<string>* dxcc_modes_;
         // A set of submodes worked
         set<string>* dxcc_submodes_;
         // A set of all bands in the log (ordered by frequency)
         band_set* all_bands_;
-        // A set of all modes in the log
-        set<string>* all_modes_;
         // a set of all submodes in the log
         set<string>* all_submodes_;
     };

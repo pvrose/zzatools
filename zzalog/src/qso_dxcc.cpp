@@ -195,10 +195,8 @@ void qso_dxcc::cb_bn_show_xt(Fl_Widget* w, void* v) {
 qso_dxcc::wb4_buttons::wb4_buttons(int X, int Y, int W, int H, const char* L) :
 	Fl_Scroll(X, Y, W, H, L),
 	dxcc_bands_(nullptr),
-	dxcc_modes_(nullptr),
 	dxcc_submodes_(nullptr),
-	all_bands_(nullptr),
-	all_modes_(nullptr)
+	all_bands_(nullptr)
 {
 	type(VERTICAL_ALWAYS);
 	end();
@@ -249,13 +247,8 @@ void qso_dxcc::wb4_buttons::create_form() {
 	b2->labelcolor(FL_FOREGROUND_COLOR);
 	curr_y += HBUTTON;
 	bn_number = 0;
-	set<string> modes = *all_modes_;
-	// Add submodes to the list of modes (all in the log)
-	for(auto ix = all_submodes_->begin(); ix != all_submodes_->end(); ix++) {
-		modes.insert(*ix);
-	}
 	// For all modes and submodes in the log...
-	for (auto it = modes.begin(); it != modes.end(); it++) {
+	for (auto it = all_submodes_->begin(); it != all_submodes_->end(); it++) {
 		// ... add a log
 		Fl_Toggle_Button* bn = new Fl_Toggle_Button(curr_x, curr_y, BWIDTH, HBUTTON);
 		bn->copy_label((*it).c_str());
@@ -280,11 +273,9 @@ void qso_dxcc::wb4_buttons::enable_widgets() {
 	string qso_submode = "";
 	if (((qso_dxcc*)parent())->show_extract_) {
 		all_bands_ = navigation_book_->used_bands();
-		all_modes_ = navigation_book_->used_modes();
 		all_submodes_ = navigation_book_->used_submodes();
 	} else {
 		all_bands_ = book_->used_bands();
-		all_modes_ = book_->used_modes();
 		all_submodes_ = book_->used_submodes();
 	}
 	if (qso) {
@@ -296,16 +287,13 @@ void qso_dxcc::wb4_buttons::enable_widgets() {
 		string my_call = qso->item("STATION_CALLSIGN");
 		// Add this QSOs band and mode to the list of logged 
 		if (qso_band.length()) all_bands_->insert(qso_band);
-		if (qso_mode.length()) all_modes_->insert(qso_mode);
-		if (qso_submode.length()) all_modes_->insert(qso_submode);
+		if (qso_submode.length()) all_submodes_->insert(qso_submode);
 		// Get the bands and modes worked for this DXCC
 		if (((qso_dxcc*)parent())->show_extract_) {
 			dxcc_bands_ = navigation_book_->used_bands(dxcc, my_call);
-			dxcc_modes_ = navigation_book_->used_modes(dxcc, my_call);
 			dxcc_submodes_ = navigation_book_->used_submodes(dxcc, my_call);
 		} else {
 			dxcc_bands_ = book_->used_bands(dxcc, my_call);
-			dxcc_modes_ = book_->used_modes(dxcc, my_call);
 			dxcc_submodes_ = book_->used_submodes(dxcc, my_call);
 		}
 		char l[128];
@@ -316,7 +304,6 @@ void qso_dxcc::wb4_buttons::enable_widgets() {
 		snprintf(l, sizeof(l), "DXCC worked status");
 		copy_label(l);
 		if (dxcc_bands_) dxcc_bands_->clear();
-		if (dxcc_modes_) dxcc_modes_->clear();
 		if (dxcc_submodes_) dxcc_submodes_->clear();
 	}
 	// Create all the buttons
@@ -328,13 +315,17 @@ void qso_dxcc::wb4_buttons::enable_widgets() {
 			// Only for the band and mode toggle buttons
 			string l = bn->label();
 			// dxcc stuff not set up yet
-			if (dxcc_bands_ == nullptr || dxcc_modes_ == nullptr || dxcc_submodes_ == nullptr) {
+			if (dxcc_bands_ == nullptr || dxcc_submodes_ == nullptr) {
 				bn->deactivate();
 			} else 
 			// If it's a band/submode worked for this DXCC - set normal
-			if (dxcc_bands_->find(l) != dxcc_bands_->end() ||
-				dxcc_submodes_->find(l) != dxcc_submodes_->end() ||
-				dxcc_modes_->find(l) != dxcc_modes_->end()) {
+			if (dxcc_bands_->find(l) != dxcc_bands_->end()) {
+				bn->activate();
+				bn->color(FL_BACKGROUND_COLOR, FL_BACKGROUND_COLOR);
+				bn->labelcolor(FL_FOREGROUND_COLOR);
+				bn->labelfont(0);
+			} else 
+			if (dxcc_submodes_->find(l) != dxcc_submodes_->end()) {
 				bn->activate();
 				bn->color(FL_BACKGROUND_COLOR, FL_BACKGROUND_COLOR);
 				bn->labelcolor(FL_FOREGROUND_COLOR);

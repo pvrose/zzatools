@@ -308,6 +308,9 @@ void qso_manager::update_qso(hint_t hint, qso_num_t match_num, qso_num_t query_n
 	case HT_NEW_DATA:
 	case HT_RESET_ORDER:
 		data_group_->update_qso(match_num);
+		if (data_group_->logging_state() == qso_data::QSO_INACTIVE) {
+			data_group_->action_view();
+		}
 		if (target != nullptr) {
 			change_rig(book_->get_record(match_num, false)->item("MY_RIG"));
 		}
