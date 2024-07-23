@@ -16,6 +16,7 @@ class qso_qsl_vwr :
 {
 	// The specific image required - determines the file location of the image file
 	enum image_t {
+		QI_NONE,            // No image
 		QI_EQSL,            // Downloaded eQSL image
 		QI_CARD_FRONT,      // Scanned-in front of a card
 		QI_CARD_BACK,       // Scanned-in back of a card
@@ -59,12 +60,16 @@ protected:
 	void set_image();
 	// set the image radio buttons
 	void set_image_buttons();
+	// Set the log buttons
+	void set_log_buttons();
 	// draw the image
 	void draw_image();
 	// Set QSL status widgets
 	void set_qsl_status();
 	// Update full window
 	void update_full_view();
+	// Set full view size
+	void resize_full_view();
 
 protected:
 
