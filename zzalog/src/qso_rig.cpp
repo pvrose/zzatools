@@ -191,7 +191,7 @@ void qso_rig::create_status(int& curr_x, int& curr_y) {
 
 	curr_x += op_status_->w();
 	bn_tx_rx_ = new Fl_Button(curr_x, curr_y, HBUTTON, HBUTTON);
-	bn_tx_rx_->box(FL_FLAT_BOX);
+	bn_tx_rx_->box(FL_OFLAT_BOX);
 
 	
 	curr_x = save_x;
