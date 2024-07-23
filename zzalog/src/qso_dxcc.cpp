@@ -314,18 +314,14 @@ void qso_dxcc::wb4_buttons::enable_widgets() {
 			if (bn != nullptr) {
 			// Only for the band and mode toggle buttons
 			string l = bn->label();
-			// dxcc stuff not set up yet
-			if (dxcc_bands_ == nullptr || dxcc_submodes_ == nullptr) {
-				bn->deactivate();
-			} else 
 			// If it's a band/submode worked for this DXCC - set normal
-			if (dxcc_bands_->find(l) != dxcc_bands_->end()) {
+			if (dxcc_bands_ && dxcc_bands_->find(l) != dxcc_bands_->end()) {
 				bn->activate();
 				bn->color(FL_BACKGROUND_COLOR, FL_BACKGROUND_COLOR);
 				bn->labelcolor(FL_FOREGROUND_COLOR);
 				bn->labelfont(0);
 			} else 
-			if (dxcc_submodes_->find(l) != dxcc_submodes_->end()) {
+			if (dxcc_submodes_ && dxcc_submodes_->find(l) != dxcc_submodes_->end()) {
 				bn->activate();
 				bn->color(FL_BACKGROUND_COLOR, FL_BACKGROUND_COLOR);
 				bn->labelcolor(FL_FOREGROUND_COLOR);
