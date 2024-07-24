@@ -156,9 +156,12 @@ void qsl_display::draw_field(field_def& field) {
 	int fw = 0;
 	int fh = 0;
 	int box_gap = 0;
+	int text_gap = 0;
 	fl_font(field.t_style.font, field.t_style.size);
 	fl_measure(text.c_str(), fw, fh);
 	// Have a minimum size 
+	// First centre the text horizontally
+	int dx = max(45 - fw, 0) / 2;
 	fw = max(fw, 45);
 	fh = max(fh, 15);
 	// Get the X and Y positions - "-1" indicates abut it to previous item
@@ -177,8 +180,11 @@ void qsl_display::draw_field(field_def& field) {
 			} else {
 				fl_rect(fx, fy, fw + 2 * box_gap, fh + 2 * box_gap, fl_lighter(FL_BLACK));
 			}
+			// Now add the offset for text
+			text_gap = box_gap + dx;
 		} else {
 			box_gap = 0;
+			text_gap = 0;
 		}
 		// Draw the text - use a lighter shade if empty text is not displayed
 		if (!field.display_empty) {
@@ -186,7 +192,7 @@ void qsl_display::draw_field(field_def& field) {
 		} else {
 			fl_color(field.t_style.colour);
 		}
-		fl_draw(text.c_str(), fx + box_gap, fy + box_gap,
+		fl_draw(text.c_str(), fx + text_gap, fy + box_gap,
 			fw, fh, FL_ALIGN_LEFT, nullptr, false);
 		// Now display the label
 		int lw = 0;
