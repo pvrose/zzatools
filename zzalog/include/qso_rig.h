@@ -3,7 +3,6 @@
 #include "rig_if.h"
 #include "hamlib/rig.h"
 #include "field_choice.h"
-#include "modems.h"
 
 #include <string>
 
@@ -20,6 +19,9 @@
 #include <FL/Fl_Tabs.H>
 
 using namespace std;
+
+const int NUMBER_RIG_APPS = 2;
+const string RIG_APP_NAMES[NUMBER_RIG_APPS] = { "FLRig", "NET rigctl" };
 
 // Displays and controls the status of a single rig connection
 // Controls c
@@ -38,7 +40,7 @@ public:
 	// Create form
 	void create_form(int X, int Y);
 	// Enable widgets
-	void enable_widgets();
+	void enable_widgets(bool tick = false);
 	// Save changes
 	void save_values();
 	// Switch the rig on or off
@@ -55,8 +57,6 @@ public:
 	Fl_Color alert_colour();
 	// Preferred antenna
 	string antenna();
-	// Suffix to apply to app invocations
-	string app(modem_t m);
 	// Disconnect rig
 	void disconnect();
 
@@ -110,11 +110,14 @@ protected:
 	void create_connex(int& x, int& y);
 	void create_serial(int& x, int& y);
 	void create_network(int& x, int& y);
-	void create_apps(int& x, int& y);
 	void create_modifier(int& x, int& y);
 
 	// Update rig with modifiers
 	void modify_rig();
+	// The rig is controlled by an app
+	bool rig_is_app();
+	// Return the model (or mfr if model is "")
+	string rig_name();
 
 	// Rig status
 	Fl_Output* op_status_;
@@ -144,12 +147,9 @@ protected:
 	Fl_Check_Button* bn_all_rates_;
 
 	Fl_Group* network_grp_;
+	Fl_Input* ip_app_name_;
 	// Hamlib widgets to revalue when rig selected changes
 	Fl_Input* ip_port_;
-	// Application tab
-	Fl_Group* app_tab_;
-	Fl_Input* ip_rig_app_;
-	Fl_Input* ip_app_[NUMBER_APPS];
 
 	// Modifier widgets
 	Fl_Group* modifier_tab_;
@@ -173,10 +173,7 @@ protected:
 	// Current antenna
 	string antenna_;
 	// flrig config paramaters
-	string app_flrig_;
-	string apps_[NUMBER_APPS];
-	
-
+	map<string, string> app_names_;
 	// Modifier attributes
 	// Add a fixed offset - eg for transverters
 	bool modify_freq_;

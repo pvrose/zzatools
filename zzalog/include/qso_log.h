@@ -2,7 +2,7 @@
 
 #include "qso_log_info.h"
 #include "qso_qsl.h"
-#include "qso_server.h"
+#include "qso_apps.h"
 #include "qso_wx.h"
 
 #include <FL/Fl_Tabs.H>
@@ -39,7 +39,7 @@ protected:
 	// The four objects
 	qso_log_info* log_info_;
 	qso_qsl* qsl_ctrl_;
-	qso_server* server_ctrl_;
+	qso_apps* apps_ctrl_;
 	qso_wx* wx_ctrl_;
 
 };

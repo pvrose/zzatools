@@ -94,14 +94,11 @@ void qso_rig::load_values() {
 		hamlib_data_.port_type = capabilities->port_type;
 		// If hamlib and FLRig - start parameters
 		Fl_Preferences app_settings(rig_settings, "Apps");
-		app_settings.get("FLRig", temp, "");
-		app_flrig_ = temp;
-		free(temp);
-		for (int i = 0; i < NUMBER_APPS; i++) {
-			app_settings.get(MODEM_NAMES[i].c_str(), temp, "");
-			apps_[(modem_t)i] = temp;
-			free(temp);
+		for (int ix = 0; ix < NUMBER_RIG_APPS; ix++) {
+			app_settings.get(RIG_APP_NAMES[ix].c_str(), temp, "");
+			app_names_[RIG_APP_NAMES[ix]] = temp;
 		}
+		free(temp);
 		// Preferred antenna
 		rig_settings.get("Antenna", temp, "");
 		antenna_ = temp;
@@ -143,6 +140,15 @@ void qso_rig::load_values() {
 		modify_freq_ = false;
 		modify_power_ = false;
 		modify_gain_ = false;
+		char* temp;
+		// Create new settings and prepopulate apps
+		Fl_Preferences rig_settings(cat_settings, label());
+		Fl_Preferences app_settings(rig_settings, "Apps");
+		for (int ix = 0; ix < NUMBER_RIG_APPS; ix++) {
+			app_settings.get(RIG_APP_NAMES[ix].c_str(), temp, "");
+			app_names_[RIG_APP_NAMES[ix]] = temp;
+		}
+		free(temp);
 	}
 	mode_ = hamlib_data_.port_type;
 }
@@ -227,12 +233,12 @@ void qso_rig::create_buttons(int& curr_x, int& curr_y) {
 	bn_select_->callback(cb_bn_select, nullptr);
 
 	curr_x += bn_select_->w();
-	// Start flrig (if that is the hamlib rig)
-	bn_start_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Start Flrig");
+	// Start rig app (if that is the hamlib rig)
+	bn_start_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Start");
 	// bn_start_->color(FL_DARK_GREEN);
 	// bn_start_->labelcolor(FL_WHITE);
-	bn_start_->tooltip("Start flrig for this connection");
-	bn_start_->callback(cb_bn_start, &app_flrig_);
+	bn_start_->tooltip("Start rig app for this connection");
+	bn_start_->callback(cb_bn_start, nullptr);
 
 	curr_x += bn_start_->w();
 	curr_y += bn_start_->h();
@@ -287,12 +293,6 @@ void qso_rig::create_config(int& curr_x, int& curr_y) {
 	rh = max(rh, curr_y - ry);
 	curr_x = rx;
 	curr_y = ry;
-	// Create apps tab
-	create_apps(curr_x, curr_y);
-	rw = max(rw, curr_x - rx);
-	rh = max(rh, curr_y - ry);
-	curr_x = rx;
-	curr_y = ry;
 	// Create mofifier tab
 	create_modifier(curr_x, curr_y);
 	rw = max(rw, curr_x - rx);
@@ -309,6 +309,8 @@ void qso_rig::create_config(int& curr_x, int& curr_y) {
 // Create two versions: 1 for serial ports and one for networked ports
 void qso_rig::create_connex(int& curr_x, int& curr_y) {
 	connect_tab_ = new Fl_Group(curr_x, curr_y, 10, 10, "Connection");
+	connect_tab_->labelsize(FL_NORMAL_SIZE + 2);
+	connect_tab_->box(FL_FLAT_BOX);
 	curr_y += GAP;
 	int max_x = curr_x;
 	int max_y = curr_y;
@@ -396,6 +398,16 @@ void qso_rig::create_network(int& curr_x, int& curr_y) {
 
 	curr_x = network_grp_->x() + WBUTTON;
 	curr_y = network_grp_->y();
+
+	// App name (flrig or wfview to connect to rig
+	ip_app_name_ = new Fl_Input(curr_x, curr_y, WSMEDIT, HTEXT, "Command");
+	// Note user_data must beset in enable_widgets
+	ip_app_name_->callback(cb_value<Fl_Input, string>, nullptr);
+	ip_app_name_->tooltip("Please provide the command to use to connect");
+	ip_app_name_->value("");
+
+	curr_y += HTEXT;
+
 	// Input to type in network address and port number
 	ip_port_ = new Fl_Input(curr_x, curr_y, WSMEDIT, HTEXT, "Port");
 	ip_port_->align(FL_ALIGN_LEFT);
@@ -413,47 +425,11 @@ void qso_rig::create_network(int& curr_x, int& curr_y) {
 
 }
 
-// Create the tab to defined the application command to invoke flrig and the 
-// various modem applications for the selected rig
-void qso_rig::create_apps(int& curr_x, int& curr_y) {
-	app_tab_ = new Fl_Group(curr_x, curr_y, 10, 10, "Apps");
-	curr_x += WBUTTON;
-	curr_y += GAP;
-
-	// Input the command to invoke flrig for this rig
-	ip_rig_app_= new Fl_Input(curr_x, curr_y, WSMEDIT, HTEXT, "FlRig");
-	ip_rig_app_->align(FL_ALIGN_LEFT);
-	ip_rig_app_->callback(cb_value<Fl_Input, string>, &app_flrig_);
-	ip_rig_app_->tooltip("Enter the command for flrig to connect to the rig");
-	ip_rig_app_->value(app_flrig_.c_str());
-	
-	curr_y += HTEXT;
-	// For each modem application...
-	for(int i = 0; i < NUMBER_APPS; i++) {
-		// ... input the command to invoke the application
-		ip_app_[i]= new Fl_Input(curr_x, curr_y, WSMEDIT, HTEXT);
-		ip_app_[i]->copy_label(MODEM_NAMES[i].c_str());
-		ip_app_[i]->align(FL_ALIGN_LEFT);
-		ip_app_[i]->callback(cb_value<Fl_Input, string>, &apps_[(modem_t)i]);
-		ip_app_[i]->tooltip("Enter the command for modem app to connect to the rig");
-		ip_app_[i]->value(apps_[i].c_str());
-		
-		curr_y += HTEXT;
-	}
-	
-	curr_x += WSMEDIT;
-
-	app_tab_->resizable(nullptr);
-	app_tab_->size(curr_x - app_tab_->x(), curr_y - app_tab_->y());
-	app_tab_->end();
-
-
-}
-
 // Create the form to configure any rig add-ons (transverter or amplifier)
 void qso_rig::create_modifier(int& curr_x, int& curr_y) {
 	modifier_tab_ = new Fl_Group(curr_x, curr_y, 10, 10, "Transverter/Amp");
 	modifier_tab_->box(FL_FLAT_BOX);
+	modifier_tab_->labelsize(FL_NORMAL_SIZE + 2);
 
 	curr_x = modifier_tab_->x() + WBUTTON;
 	curr_y += (HTEXT + GAP)/2;
@@ -585,10 +561,8 @@ void qso_rig::save_values() {
 		hamlib_settings.set("Model ID", (int)hamlib_data_.model_id);
 		// Apps
 		Fl_Preferences app_settings(rig_settings, "Apps");
-		app_settings.set("FLRig", app_flrig_.c_str());
-		for (int i = 0; i < NUMBER_APPS; i++) {
-			app_settings.set(MODEM_NAMES[i].c_str(), apps_[i].c_str());
-			char app_num[10];
+		for (int ix = 0; ix < NUMBER_RIG_APPS; ix++) {
+			app_settings.set(RIG_APP_NAMES[ix].c_str(), app_names_.at(RIG_APP_NAMES[ix]).c_str());
 		}
 		// Preferred antenna
 		rig_settings.set("Antenna", antenna_.c_str());
@@ -609,7 +583,7 @@ void qso_rig::save_values() {
 }
 
 // Enable CAT Connection widgets
-void qso_rig::enable_widgets() {
+void qso_rig::enable_widgets(bool tick) {
 	// CAT access buttons
 	if (!rig_) {
 		// No rig
@@ -623,6 +597,9 @@ void qso_rig::enable_widgets() {
 			bn_select_->label("Select");
 		}
 		bn_start_->activate();
+		if (rig_is_app()) {
+			bn_start_->user_data(&app_names_.at(rig_name()));
+		}
 	} else if (rig_->is_open()) {
 		// Rig is connected
 		bn_connect_->activate();
@@ -644,6 +621,9 @@ void qso_rig::enable_widgets() {
 			bn_select_->label("Select");
 		}
 		bn_start_->activate();
+		if (rig_is_app()) {
+			bn_start_->user_data(&app_names_.at(rig_name()));
+		}
 	}
 	bn_connect_->labelcolor(fl_contrast(FL_FOREGROUND_COLOR, bn_connect_->color()));
 	bn_select_->labelcolor(fl_contrast(FL_FOREGROUND_COLOR, bn_select_->color()));
@@ -761,9 +741,15 @@ void qso_rig::enable_widgets() {
 		if (!bn_select_->value()) {
 			ip_port_->value(hamlib_data_.port_name.c_str());
 		}
-		if (hamlib_data_.model_id == 4)  {
+		// The hamlib model has an associated application (eg flrig or wfview)
+		if (rig_is_app()) {
+			ip_app_name_->user_data(&app_names_.at(rig_name()));
+			ip_app_name_->show();
+			if (!tick) ip_app_name_->value(app_names_.at(rig_name()).c_str());
 			bn_start_->show();
 		} else {
+			ip_app_name_->user_data(nullptr);
+			ip_app_name_->hide();
 			bn_start_->hide();
 		}
 		break;
@@ -1159,7 +1145,7 @@ void qso_rig::switch_rig() {
 void qso_rig::ticker() {
 	if (rig_) {
 		// The rig may have disconnected - update connect/select buttons
-		enable_widgets();
+		enable_widgets(true);
 	}
 }
 
@@ -1212,15 +1198,28 @@ string qso_rig::antenna() {
 	return antenna_;
 }
 
-// Return call for particular app
-string qso_rig::app(modem_t m) {
-	return apps_[(int)m];
-}
-
 // Force disconnect
 void qso_rig::disconnect() {
 	if (rig_ && rig_->is_open()) {
 		rig_->close();
 	}
 
+}
+
+// Rig is connected using another app
+bool qso_rig::rig_is_app() {
+	if (app_names_.find(rig_name()) != app_names_.end()) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+// Return rig anme
+string qso_rig::rig_name() {
+	if (hamlib_data_.model == "") {
+		return hamlib_data_.mfr;
+	} else {
+		return hamlib_data_.model;
+	}
 }

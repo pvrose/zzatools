@@ -49,10 +49,10 @@ void qso_log::create_form(int X, int Y) {
 	rh = max(rh, qsl_ctrl_->h());
 
 	// Modem clients tab
-	server_ctrl_ = new qso_server(rx, ry, rw, rh, "Modems");
-	server_ctrl_->labelsize(FL_NORMAL_SIZE + 2);
-	rw = max(rw, server_ctrl_->w());
-	rh = max(rh, server_ctrl_->h());
+	apps_ctrl_ = new qso_apps(rx, ry, rw, rh, "Apps");
+	apps_ctrl_->labelsize(FL_NORMAL_SIZE + 2);
+	rw = max(rw, apps_ctrl_->w());
+	rh = max(rh, apps_ctrl_->h());
 
 	// Weather display tab
 	wx_ctrl_ = new qso_wx(rx, ry, rw, rh, "WX");
@@ -86,7 +86,7 @@ void qso_log::enable_widgets() {
 	}
 	log_info_->enable_widgets();
 	qsl_ctrl_->enable_widgets();
-	server_ctrl_->enable_widgets();
+	apps_ctrl_->enable_widgets();
 	wx_ctrl_->enable_widgets();
 }
 
