@@ -77,6 +77,8 @@ protected:
 	static void cb_bn_connect(Fl_Widget* w, void* v);
 	// Callback - Select rig
 	static void cb_bn_select(Fl_Widget* w, void* v);
+	// Callback use app button
+	static void cb_bn_use_app(Fl_Widget* w, void* v);
 
 	// Callback - modify frequency
 	static void cb_bn_mod_freq(Fl_Widget* w, void* v);
@@ -114,10 +116,6 @@ protected:
 
 	// Update rig with modifiers
 	void modify_rig();
-	// The rig is controlled by an app
-	bool rig_is_app();
-	// Return the model (or mfr if model is "")
-	string rig_name();
 
 	// Rig status
 	Fl_Output* op_status_;
@@ -147,6 +145,7 @@ protected:
 	Fl_Check_Button* bn_all_rates_;
 
 	Fl_Group* network_grp_;
+	Fl_Light_Button* bn_use_app_;
 	Fl_Input* ip_app_name_;
 	// Hamlib widgets to revalue when rig selected changes
 	Fl_Input* ip_port_;
@@ -172,8 +171,6 @@ protected:
 	rig_port_e mode_;
 	// Current antenna
 	string antenna_;
-	// flrig config paramaters
-	map<string, string> app_names_;
 	// Modifier attributes
 	// Add a fixed offset - eg for transverters
 	bool modify_freq_;
@@ -187,6 +184,10 @@ protected:
 	bool modify_power_;
 	// The fixed power to use
 	double power_;
+	// command to connect to CAT
+	string cat_app_;
+	// Use app for cat
+	bool use_cat_app_;
 
 
 };

@@ -65,7 +65,8 @@ bool serial::available_ports(int num_ports, string* ports, bool all_ports, int& 
 	const char* tty_fmt[] = {
 //		"/dev/tty%u",
 //		"/dev/ttyS%u",
-		"/dev/ttyUSB%u" //,
+		"/dev/ttyUSB%u",
+		"/dev/ttyACM%u" //,
 //		"/dev/usb/ttyUSB%u"
 	};
 	for (size_t i = 0; i < sizeof(tty_fmt)/sizeof(*tty_fmt); i++) {

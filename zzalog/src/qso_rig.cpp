@@ -30,7 +30,9 @@ qso_rig::qso_rig(int X, int Y, int W, int H, const char* L) :
 	modify_gain_(false),
 	gain_(0),
 	modify_power_(false),
-	power_(0.0)
+	power_(0.0),
+	cat_app_(""),
+	use_cat_app_(false)
 {
 	// If no name is provided then get from qso_manager
 	if (L == nullptr || strlen(L) == 0) copy_label(ancestor_view<qso_manager>(this)->get_default(qso_manager::RIG).c_str());
@@ -62,42 +64,45 @@ void qso_rig::load_values() {
 	Fl_Preferences cat_settings(settings_, "CAT");
 	if (cat_settings.groupExists(label())) {
 		Fl_Preferences rig_settings(cat_settings, label());
-		Fl_Preferences hamlib_settings(rig_settings, "Hamlib");
 		char* temp;
-		hamlib_settings.get("Rig Model", temp, "dummy");
+		rig_settings.get("Rig Model", temp, "dummy");
 		hamlib_data_.model = temp;
 		free(temp);
-		hamlib_settings.get("Manufacturer", temp, "Hamlib");
+		rig_settings.get("Manufacturer", temp, "hamlib");
 		hamlib_data_.mfr = temp;
 		free(temp);
-		hamlib_settings.get("Port", temp, "COM6");
+		rig_settings.get("Port", temp, "COM6");
 		hamlib_data_.port_name = temp;
 		free(temp);
-		hamlib_settings.get("Baud Rate", hamlib_data_.baud_rate, 9600);
-		hamlib_settings.get("Model ID", (int&)hamlib_data_.model_id, -1);
+		rig_settings.get("Baud Rate", hamlib_data_.baud_rate, 9600);
+		rig_settings.get("Model ID", (int&)hamlib_data_.model_id, -1);
 
 		// Check that hamlib is currently OK
 		const rig_caps* capabilities = rig_get_caps(hamlib_data_.model_id);
-		if (capabilities->model_name != hamlib_data_.model ||
-			capabilities->mfg_name != hamlib_data_.mfr) {
+		if (capabilities == nullptr) {
 			char msg[128];
-			snprintf(msg, 128, "RIG: Saved model id %d (%s/%s) does not match supplied rig model %s/%s using hamlib values",
-				hamlib_data_.model_id,
-				capabilities->mfg_name,
-				capabilities->model_name,
-				hamlib_data_.mfr.c_str(),
-				hamlib_data_.model.c_str());
+			snprintf(msg, sizeof(msg), "RIG: No CAT details for %s", label());
 			status_->misc_status(ST_WARNING, msg);
-			hamlib_data_.mfr = capabilities->mfg_name;
-			hamlib_data_.model = capabilities->model_name;
 		}
-		hamlib_data_.port_type = capabilities->port_type;
-		// If hamlib and FLRig - start parameters
-		Fl_Preferences app_settings(rig_settings, "Apps");
-		for (int ix = 0; ix < NUMBER_RIG_APPS; ix++) {
-			app_settings.get(RIG_APP_NAMES[ix].c_str(), temp, "");
-			app_names_[RIG_APP_NAMES[ix]] = temp;
+		else {
+			if (capabilities->model_name != hamlib_data_.model ||
+				capabilities->mfg_name != hamlib_data_.mfr) {
+				char msg[128];
+				snprintf(msg, 128, "RIG: Saved model id %d (%s/%s) does not match supplied rig model %s/%s using hamlib values",
+					hamlib_data_.model_id,
+					capabilities->mfg_name,
+					capabilities->model_name,
+					hamlib_data_.mfr.c_str(),
+					hamlib_data_.model.c_str());
+				status_->misc_status(ST_WARNING, msg);
+				hamlib_data_.model = capabilities->model_name;
+				hamlib_data_.mfr = capabilities->mfg_name;
+			}
+			hamlib_data_.port_type = capabilities->port_type;
 		}
+		rig_settings.get("Command", temp, "");
+		cat_app_ = temp;
+		if (cat_app_ == "") use_cat_app_ = false;
 		free(temp);
 		// Preferred antenna
 		rig_settings.get("Antenna", temp, "");
@@ -105,29 +110,29 @@ void qso_rig::load_values() {
 		free(temp);
 
 		// Get the CAT value modifiers
-		Fl_Preferences modifier_settings(rig_settings, "Modifiers");
 		// Transverter offset
-		if (modifier_settings.get("Frequency", freq_offset_, 0.0)) {
+		if (rig_settings.get("Frequency", freq_offset_, 0.0)) {
 			modify_freq_ = true;
 		} else {
 			modify_freq_ = false;
 		}
 		// Amplifier gain
-		if (modifier_settings.get("Gain", gain_, 0)) {
+		if (rig_settings.get("Gain", gain_, 0)) {
 			modify_gain_ = true;
 		} else {
 			modify_gain_ = false;
 		}
 		// Fixed power device
-		if (modifier_settings.get("Power", power_, 0.0)) {
+		if (rig_settings.get("Power", power_, 0.0)) {
 			modify_power_ = true;
 		} else {
 			modify_power_ = false;
 		}
 		// If we cannot read power from hamlib - force modify_power_
-		if (!(capabilities->has_get_level & RIG_LEVEL_RFPOWER_METER_WATTS)) {
+		if (capabilities && !(capabilities->has_get_level & RIG_LEVEL_RFPOWER_METER_WATTS)) {
 			char msg[128];
-			snprintf(msg, sizeof(msg), "DASH: Rig %s does not supply power - set it", 
+			snprintf(msg, sizeof(msg), "DASH: Rig %s/%s does not supply power - set it", 
+				hamlib_data_.mfr.c_str(),
 				hamlib_data_.model.c_str());
 			status_->misc_status(ST_WARNING, msg);
 			modify_power_ = true;
@@ -140,15 +145,6 @@ void qso_rig::load_values() {
 		modify_freq_ = false;
 		modify_power_ = false;
 		modify_gain_ = false;
-		char* temp;
-		// Create new settings and prepopulate apps
-		Fl_Preferences rig_settings(cat_settings, label());
-		Fl_Preferences app_settings(rig_settings, "Apps");
-		for (int ix = 0; ix < NUMBER_RIG_APPS; ix++) {
-			app_settings.get(RIG_APP_NAMES[ix].c_str(), temp, "");
-			app_names_[RIG_APP_NAMES[ix]] = temp;
-		}
-		free(temp);
 	}
 	mode_ = hamlib_data_.port_type;
 }
@@ -168,7 +164,8 @@ void qso_rig::find_hamlib_data() {
 				// Not all numbers represent a rig as the mapping is sparse
 				// Check the model name
 				if (capabilities->model_name == hamlib_data_.model &&
-					capabilities->mfg_name == hamlib_data_.mfr) hamlib_data_.model_id = i;
+					capabilities->mfg_name == hamlib_data_.mfr)
+					hamlib_data_.model_id = i;
 			}
 		}
 		catch (exception*) {}
@@ -196,7 +193,7 @@ void qso_rig::create_status(int& curr_x, int& curr_y) {
 	op_status_->box(FL_FLAT_BOX);
 
 	curr_x += op_status_->w();
-	bn_tx_rx_ = new Fl_Button(curr_x, curr_y, HBUTTON, HBUTTON);
+	bn_tx_rx_ = new Fl_Button(curr_x + 1, curr_y + 1, HBUTTON - 2, HBUTTON - 2);
 	bn_tx_rx_->box(FL_OFLAT_BOX);
 
 	
@@ -227,16 +224,13 @@ void qso_rig::create_buttons(int& curr_x, int& curr_y) {
 	curr_x += bn_connect_->w();
 	// Selects the rig or allows a rig to be selected
 	bn_select_ = new Fl_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Select");
-	// bn_select_->color(FL_YELLOW);
 	bn_select_->tooltip("Select the rig to connect");
 	bn_select_->value(false);
 	bn_select_->callback(cb_bn_select, nullptr);
 
 	curr_x += bn_select_->w();
-	// Start rig app (if that is the hamlib rig)
+	// Start rig app
 	bn_start_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Start");
-	// bn_start_->color(FL_DARK_GREEN);
-	// bn_start_->labelcolor(FL_WHITE);
 	bn_start_->tooltip("Start rig app for this connection");
 	bn_start_->callback(cb_bn_start, nullptr);
 
@@ -299,7 +293,7 @@ void qso_rig::create_config(int& curr_x, int& curr_y) {
 	rh = max(rh, curr_y - ry);
 	config_tabs_->resizable(nullptr);
 	config_tabs_->size(config_tabs_->w() + rw - saved_rw, config_tabs_->h() + rh - saved_rh);
-	end();
+	config_tabs_->end();
 	curr_x = config_tabs_->x() + config_tabs_->w();
 	curr_y = config_tabs_->y() + config_tabs_->h();
 
@@ -336,7 +330,7 @@ void qso_rig::create_connex(int& curr_x, int& curr_y) {
 void qso_rig::create_serial(int& curr_x, int& curr_y) {
 	serial_grp_ = new Fl_Group(curr_x, curr_y, 10, 10);
 	serial_grp_->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
-	serial_grp_->box(FL_NO_BOX);
+	serial_grp_->box(FL_FLAT_BOX);
 
 	curr_x = serial_grp_->x() + WBUTTON;
 	curr_y = serial_grp_->y();
@@ -394,15 +388,21 @@ void qso_rig::create_serial(int& curr_x, int& curr_y) {
 void qso_rig::create_network(int& curr_x, int& curr_y) {
 	network_grp_ = new Fl_Group(curr_x, curr_y, 10, 10);
 	network_grp_->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
-	network_grp_->box(FL_NO_BOX);
+	network_grp_->box(FL_FLAT_BOX);
 
-	curr_x = network_grp_->x() + WBUTTON;
+	curr_x = network_grp_->x();
 	curr_y = network_grp_->y();
 
+	bn_use_app_ = new Fl_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Use app");
+	bn_use_app_->callback(cb_bn_use_app, &use_cat_app_);
+	bn_use_app_->tooltip("Set to allow a CAT app to be used");
+	bn_use_app_->value(use_cat_app_);
+
+	curr_x += WBUTTON;
+
 	// App name (flrig or wfview to connect to rig
-	ip_app_name_ = new Fl_Input(curr_x, curr_y, WSMEDIT, HTEXT, "Command");
-	// Note user_data must beset in enable_widgets
-	ip_app_name_->callback(cb_value<Fl_Input, string>, nullptr);
+	ip_app_name_ = new Fl_Input(curr_x, curr_y, WSMEDIT, HTEXT);
+	ip_app_name_->callback(cb_value<Fl_Input, string>, &cat_app_);
 	ip_app_name_->tooltip("Please provide the command to use to connect");
 	ip_app_name_->value("");
 
@@ -493,6 +493,8 @@ void qso_rig::create_modifier(int& curr_x, int& curr_y) {
 	curr_y += HBUTTON + GAP;
 	modifier_tab_->resizable(nullptr);
 	modifier_tab_->size(curr_x - modifier_tab_->x(), curr_y - modifier_tab_->y());
+
+	modifier_tab_->end();
 }
 
 // Create the overall form
@@ -535,9 +537,9 @@ void qso_rig::create_form(int X, int Y) {
 
 	// Connected status
 
-	// Display hamlib ot flrig settings as selected
-	modify_rig();
-	enable_widgets();
+	// // Display hamlib ot flrig settings as selected
+	// modify_rig();
+	// enable_widgets();
 
 	max_x += GAP;
 	max_y += GAP;
@@ -553,30 +555,26 @@ void qso_rig::save_values() {
 	if (hamlib_data_.port_type != RIG_PORT_NONE) {
 		Fl_Preferences cat_settings(settings_, "CAT");
 		Fl_Preferences rig_settings(cat_settings, label());
-		Fl_Preferences hamlib_settings(rig_settings, "Hamlib");
-		hamlib_settings.set("Rig Model", hamlib_data_.model.c_str());
-		hamlib_settings.set("Manufacturer", hamlib_data_.mfr.c_str());
-		hamlib_settings.set("Port", hamlib_data_.port_name.c_str());
-		hamlib_settings.set("Baud Rate", hamlib_data_.baud_rate);
-		hamlib_settings.set("Model ID", (int)hamlib_data_.model_id);
-		// Apps
-		Fl_Preferences app_settings(rig_settings, "Apps");
-		for (int ix = 0; ix < NUMBER_RIG_APPS; ix++) {
-			app_settings.set(RIG_APP_NAMES[ix].c_str(), app_names_.at(RIG_APP_NAMES[ix]).c_str());
+		rig_settings.clear();
+		rig_settings.set("Rig Model", hamlib_data_.model.c_str());
+		rig_settings.set("Manufacturer", hamlib_data_.mfr.c_str());
+		rig_settings.set("Port", hamlib_data_.port_name.c_str());
+		rig_settings.set("Baud Rate", hamlib_data_.baud_rate);
+		rig_settings.set("Model ID", (int)hamlib_data_.model_id);
+		if (use_cat_app_) {
+			rig_settings.set("Command", cat_app_.c_str());
 		}
 		// Preferred antenna
 		rig_settings.set("Antenna", antenna_.c_str());
 		// Modifier settings
-		Fl_Preferences modr_settings(rig_settings, "Modifiers");
-		modr_settings.clear();
 		if (modify_freq_) {
-			modr_settings.set("Frequency", freq_offset_);
+			rig_settings.set("Frequency", freq_offset_);
 		}
 		if (modify_gain_) {
-			modr_settings.set("Gain", gain_);
+			rig_settings.set("Gain", gain_);
 		}
 		if (modify_power_) {
-			modr_settings.set("Power", power_);
+			rig_settings.set("Power", power_);
 		}
 		settings_->flush();
 	}
@@ -596,10 +594,8 @@ void qso_rig::enable_widgets(bool tick) {
 		} else {
 			bn_select_->label("Select");
 		}
-		bn_start_->activate();
-		if (rig_is_app()) {
-			bn_start_->user_data(&app_names_.at(rig_name()));
-		}
+		if (use_cat_app_) bn_start_->activate();
+		else bn_start_->deactivate();
 	} else if (rig_->is_open()) {
 		// Rig is connected
 		bn_connect_->activate();
@@ -620,10 +616,8 @@ void qso_rig::enable_widgets(bool tick) {
 		} else {
 			bn_select_->label("Select");
 		}
-		bn_start_->activate();
-		if (rig_is_app()) {
-			bn_start_->user_data(&app_names_.at(rig_name()));
-		}
+		if (use_cat_app_) bn_start_->activate();
+		else bn_start_->deactivate();
 	}
 	bn_connect_->labelcolor(fl_contrast(FL_FOREGROUND_COLOR, bn_connect_->color()));
 	bn_select_->labelcolor(fl_contrast(FL_FOREGROUND_COLOR, bn_select_->color()));
@@ -732,6 +726,11 @@ void qso_rig::enable_widgets(bool tick) {
 		// Serial port - show serial configuration, hide network
 		serial_grp_->show();
 		network_grp_->hide();
+		if (!bn_select_->value()) {
+			serial_grp_->deactivate();
+ 		} else {
+			serial_grp_->activate();
+		}
 		break;
 	case RIG_PORT_NETWORK:
 	case RIG_PORT_USB:
@@ -740,17 +739,15 @@ void qso_rig::enable_widgets(bool tick) {
 		network_grp_->show();
 		if (!bn_select_->value()) {
 			ip_port_->value(hamlib_data_.port_name.c_str());
+			network_grp_->deactivate();
+ 		} else {
+			network_grp_->activate();
 		}
 		// The hamlib model has an associated application (eg flrig or wfview)
-		if (rig_is_app()) {
-			ip_app_name_->user_data(&app_names_.at(rig_name()));
-			ip_app_name_->show();
-			if (!tick) ip_app_name_->value(app_names_.at(rig_name()).c_str());
-			bn_start_->show();
+		if (use_cat_app_) {
+			ip_app_name_->activate();
 		} else {
-			ip_app_name_->user_data(nullptr);
-			ip_app_name_->hide();
-			bn_start_->hide();
+			ip_app_name_->deactivate();
 		}
 		break;
 	case RIG_PORT_NONE:
@@ -1109,8 +1106,8 @@ void qso_rig::cb_ip_power(Fl_Widget* w, void* v) {
 // Clicked start button
 // v points to the string containing the command to  invoke flrig
 void qso_rig::cb_bn_start(Fl_Widget* w, void * v) {
-	string* app = (string*)v;
-	string command = "bash -i -c " + *app + "&";
+	qso_rig* that = ancestor_view<qso_rig>(w);
+	string command = "bash -i -c " + that->cat_app_ + "&";
 	int result = system(command.c_str());
 	char msg[100];
 	if (result == 0) {
@@ -1125,6 +1122,13 @@ void qso_rig::cb_bn_start(Fl_Widget* w, void * v) {
 // Selecting config tab
 // v is not used
 void qso_rig::cb_config(Fl_Widget* w, void *v) {
+	qso_rig* that = ancestor_view<qso_rig>(w);
+	that->enable_widgets();
+}
+
+// Use application button
+void qso_rig::cb_bn_use_app(Fl_Widget* w, void* v) {
+	cb_value<Fl_Light_Button, bool>(w, v);
 	qso_rig* that = ancestor_view<qso_rig>(w);
 	that->enable_widgets();
 }
@@ -1204,22 +1208,4 @@ void qso_rig::disconnect() {
 		rig_->close();
 	}
 
-}
-
-// Rig is connected using another app
-bool qso_rig::rig_is_app() {
-	if (app_names_.find(rig_name()) != app_names_.end()) {
-		return true;
-	} else {
-		return false;
-	}
-}
-
-// Return rig anme
-string qso_rig::rig_name() {
-	if (hamlib_data_.model == "") {
-		return hamlib_data_.mfr;
-	} else {
-		return hamlib_data_.model;
-	}
 }
