@@ -393,7 +393,7 @@ void wsjtx_handler::put_utf8(stringstream& ss, string s) {
 
 // Return that the server is there
 bool wsjtx_handler::has_server() {
-	return (server_ != nullptr && server_->has_server());
+	return (that_->server_ != nullptr && that_->server_->has_server());
 }
 
 // Start the server
@@ -957,5 +957,5 @@ void wsjtx_handler::delete_qso(string call) {
 
 // Received data
 bool wsjtx_handler::has_data() {
-	return connected_;
+	return that_->connected_;
 }

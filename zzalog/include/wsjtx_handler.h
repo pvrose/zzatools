@@ -26,7 +26,7 @@ using namespace std;
 		~wsjtx_handler();
 
 		// We have a server
-		bool has_server();
+		static bool has_server();
 		// Start server
 		void run_server();
 		// Close servver
@@ -43,7 +43,7 @@ using namespace std;
 		void delete_qso(string call);
 
 		// Received a packet
-		bool has_data();
+		static bool has_data();
 
 		// Used in static methods to point to the single instance of this class
 		static wsjtx_handler* that_;

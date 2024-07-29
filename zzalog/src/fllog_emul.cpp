@@ -314,13 +314,13 @@ void fllog_emul::check_connected() {
 
 // Returns connected state
 bool fllog_emul::has_data() {
-	return connected_;
+	return that_->connected_;
 }
 
 // server state
 bool fllog_emul::has_server() {
-	if (rpc_handler_) {
-		return rpc_handler_->has_server();
+	if (that_->rpc_handler_) {
+		return that_->rpc_handler_->has_server();
 	} else {
 		return false;
 	}
