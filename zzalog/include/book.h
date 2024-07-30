@@ -36,7 +36,7 @@ using namespace std;
 
 
 	// Update hint
-	enum hint_t : unsigned char {
+	enum hint_t : uchar {
 		HT_ALL,                   // invalidate all records in view - select record if >= 0
 		HT_CHANGED,               // Invalidate only specified record
 		HT_MINOR_CHANGE,          // Invalidate the record, but not location, band or mode

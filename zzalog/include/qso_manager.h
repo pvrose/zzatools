@@ -1,21 +1,6 @@
 #ifndef __STN_DIALOG__
 #define __STN_DIALOG__
 
-#include "qso_clocks.h"
-#include "qso_data.h"
-#include "qso_tabbed_rigs.h"
-#include "qso_log.h"
-#include "qso_rig.h"
-
-#include "callback.h"
-#include "record.h"
-#include "intl_widgets.h"
-#include "field_choice.h"
-#include "book.h"
-#include "import_data.h"
-#include "extract_data.h"
-#include "rig_if.h"
-
 #include <string>
 #include <vector>
 #include <map>
@@ -26,6 +11,21 @@
 #include <FL/Fl_Double_Window.H>
 
 using namespace std;
+
+// Forward declarations
+class qso_clocks;
+class qso_data;
+class qso_tabbed_rigs;
+class qso_log_info;
+class qso_log;
+class qso_rig;
+class qso_qsl;
+class rig_if;
+class import_data;
+class record;
+
+typedef size_t qso_num_t;
+
 
 	// This class provides the main dashboard functionality of the app.
 	// It contains all the objects used during a QSO in a hierarchy
@@ -65,8 +65,6 @@ using namespace std;
 		virtual void save_values();
 		// Update record with MY_RIG etc. For use when importing 
 		void update_import_qso(record* import);
-		// Query/update
-		void update(hint_t hint, qso_num_t log_num, qso_num_t query_num);
 		// Update time
 		void update_time(time_t when);
 
@@ -82,9 +80,9 @@ using namespace std;
 		// Switch rig status
 		void switch_rig();
 		// Present query (uses view update mechanism)
-		void update_qso(hint_t hint, qso_num_t match_num, qso_num_t query_num);
+		void update_qso(uchar hint, qso_num_t match_num, qso_num_t query_num);
 		// Start modem - returns a new record
-		record* start_modem_qso(string call, qso_data::qso_init_t source);
+		record* start_modem_qso(string call, uchar source);
 		// Log modem record
 		void update_modem_qso(bool log_it);
 		// Log modem record
@@ -122,8 +120,8 @@ using namespace std;
 		void deactivate_all();
 
 		// Shared QSL methods
-		void qsl_download(import_data::update_mode_t server);
-		void qsl_extract(extract_data::extract_mode_t server);
+		void qsl_download(uchar server);
+		void qsl_extract(uchar server);
 		void qsl_upload();
 		void qsl_print();
 		void qsl_print_done();

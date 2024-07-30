@@ -1,5 +1,6 @@
 #include "qso_qsl.h"
 #include "qso_manager.h"
+#include "qso_data.h"
 #include "drawing.h"
 #include "extract_data.h"
 #include "import_data.h"

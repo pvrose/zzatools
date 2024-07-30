@@ -17,7 +17,7 @@ using namespace std;
 	{
 	public:
 		// Update or import mode
-		enum update_mode_t {
+		enum update_mode_t : uchar {
 			NONE,            // Book has no data
 			EXISTING,        // Use existing update mode
 			FILE_IMPORT,     // Book contains data manually loaded from a file (assume new records are correct)

@@ -4,6 +4,7 @@
 #include "utils.h"
 #include "toolbar.h"
 #include "qso_manager.h"
+#include "qso_data.h"
 #include "adi_reader.h"
 #include "menu.h"
 #include "regices.h"

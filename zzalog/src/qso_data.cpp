@@ -1,5 +1,6 @@
 #include "qso_data.h"
 #include "qso_manager.h"
+#include "qso_qsl.h"
 #include "qth_dialog.h"
 #include "settings.h"
 #include "rig_if.h"

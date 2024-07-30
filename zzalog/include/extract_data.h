@@ -19,7 +19,7 @@ using namespace std;
 	{
 	public:
 		// Reason for the extract
-		enum extract_mode_t {
+		enum extract_mode_t : uchar {
 			NONE,        // empty extract
 			SEARCH,      // search results
 			EQSL,        // upload to eQSL.cc

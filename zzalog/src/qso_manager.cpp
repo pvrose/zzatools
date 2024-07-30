@@ -1,4 +1,9 @@
 #include "qso_manager.h"
+#include "qso_data.h"
+#include "qso_log.h"
+#include "qso_misc.h"
+#include "qso_tabbed_rigs.h"
+#include "qso_clocks.h"
 #include "callback.h"
 #include "rig_if.h"
 
@@ -295,9 +300,9 @@ qso_rig* qso_manager::rig_control() {
 }
 
 // Called whenever another view updates a record (or selects a new one)
-void qso_manager::update_qso(hint_t hint, qso_num_t match_num, qso_num_t query_num) {
+void qso_manager::update_qso(uchar hint, qso_num_t match_num, qso_num_t query_num) {
 	record* target = book_->get_record(match_num, false);
-	switch (hint) {
+	switch ((hint_t)hint) {
 	case HT_SELECTED:
 	case HT_ALL:
 	case HT_CHANGED:
@@ -413,8 +418,8 @@ void qso_manager::update_modem_qso(bool log_it) {
 }
 
 // Start a modem QSO
-record* qso_manager::start_modem_qso(string call, qso_data::qso_init_t source) {
-	return data_group_->start_modem_qso(call, source);
+record* qso_manager::start_modem_qso(string call, uchar source) {
+	return data_group_->start_modem_qso(call, (qso_data::qso_init_t)source);
 }
 
 // Enter a modem QSO
@@ -429,13 +434,13 @@ void qso_manager::cancel_modem_qso() {
 }
 
 // Download QSLs;
-void qso_manager::qsl_download(import_data::update_mode_t server) {
-	qsl_control()->qsl_download(server);
+void qso_manager::qsl_download(uchar server) {
+	qsl_control()->qsl_download((import_data::update_mode_t)server);
 }
 
 // Extract QSLs;
-void qso_manager::qsl_extract(extract_data::extract_mode_t server) {
-	qsl_control()->qsl_extract(server);
+void qso_manager::qsl_extract(uchar server) {
+	qsl_control()->qsl_extract((extract_data::extract_mode_t)server);
 }
 
 // Upload QSLs;

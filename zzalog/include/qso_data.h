@@ -86,7 +86,7 @@ public:
 	};
 
 	// Source of editing
-	enum qso_init_t {
+	enum qso_init_t : uchar {
 		QSO_ON_AIR,         // Start a QSO using current time and CAT if connected
 		QSO_NONE,           // Start a QSO with no initial values
 		QSO_COPY_CALL,      // Start a QSO copying callsign, station details and CAT conditions

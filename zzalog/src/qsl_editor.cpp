@@ -1,6 +1,7 @@
 #include "qsl_editor.h"
 #include "status.h"
 #include "qso_manager.h"
+#include "qso_data.h"
 #include "settings.h"
 #include "utils.h"
 #include "field_choice.h"
@@ -508,7 +509,7 @@ void qsl_editor::create_fparams(int& curr_x, int& curr_y, qsl_display::field_def
 	char temp[100];
 
 	// Item position (X-coordinate relative to display)
-	Fl_Input* f_dx = new Fl_Int_Input(curr_x, curr_y, WBUTTON / 2, HBUTTON);
+	Fl_Input* f_dx = new Fl_Input(curr_x, curr_y, WBUTTON / 2, HBUTTON);
 	f_dx->tooltip("Enter the X-coordinates of the item");
 	f_dx->callback(cb_ip_int, &(field->dx));
 	f_dx->when(FL_WHEN_CHANGED);
@@ -517,7 +518,7 @@ void qsl_editor::create_fparams(int& curr_x, int& curr_y, qsl_display::field_def
 
 	curr_x += f_dx->w();
 	// Item position (Y-coordinate relative to display)
-	Fl_Input* f_dy = new Fl_Int_Input(curr_x, curr_y, WBUTTON / 2, HBUTTON);
+	Fl_Input* f_dy = new Fl_Input(curr_x, curr_y, WBUTTON / 2, HBUTTON);
 	f_dy->tooltip("Enter the Y-coordinates of the item");
 	f_dy->callback(cb_ip_int, &(field->dy));
 	f_dy->when(FL_WHEN_CHANGED);
@@ -614,7 +615,7 @@ void qsl_editor::create_tparams(int& curr_x, int& curr_y, qsl_display::text_def*
 	char temp[100];
 
 	// X-position of the item relative to the display
-	Fl_Input* t_dx = new Fl_Int_Input(curr_x, curr_y, WBUTTON / 2, HBUTTON);
+	Fl_Input* t_dx = new Fl_Input(curr_x, curr_y, WBUTTON / 2, HBUTTON);
 	t_dx->tooltip("Enter the X-coordinates of the item");
 	t_dx->callback(cb_ip_int, &(text->dx));
 	t_dx->when(FL_WHEN_CHANGED);
@@ -623,7 +624,7 @@ void qsl_editor::create_tparams(int& curr_x, int& curr_y, qsl_display::text_def*
 
 	curr_x += t_dx->w();
 	// Y-position of the item relativ eto the display window
-	Fl_Input* t_dy = new Fl_Int_Input(curr_x, curr_y, WBUTTON / 2, HBUTTON);
+	Fl_Input* t_dy = new Fl_Input(curr_x, curr_y, WBUTTON / 2, HBUTTON);
 	t_dy->tooltip("Enter the Y-coordinates of the item");
 	t_dy->callback(cb_ip_int, &(text->dy));
 	t_dy->when(FL_WHEN_CHANGED);
@@ -663,7 +664,7 @@ void qsl_editor::create_iparams(int& curr_x, int& curr_y, qsl_display::image_def
 	char temp[100];
 
 	// X-position of the image relative to the display window
-	Fl_Input* i_dx = new Fl_Int_Input(curr_x, curr_y, WBUTTON / 2, HBUTTON);
+	Fl_Input* i_dx = new Fl_Input(curr_x, curr_y, WBUTTON / 2, HBUTTON);
 	i_dx->tooltip("Enter the X-coordinates of the item");
 	i_dx->callback(cb_ip_int, &(image->dx));
 	i_dx->when(FL_WHEN_CHANGED);
@@ -672,7 +673,7 @@ void qsl_editor::create_iparams(int& curr_x, int& curr_y, qsl_display::image_def
 
 	curr_x += i_dx->w();
 	// Y-position of the image relative to the display window
-	Fl_Input* i_dy = new Fl_Int_Input(curr_x, curr_y, WBUTTON / 2, HBUTTON);
+	Fl_Input* i_dy = new Fl_Input(curr_x, curr_y, WBUTTON / 2, HBUTTON);
 	i_dy->tooltip("Enter the X-coordinates of the item");
 	i_dy->callback(cb_ip_int, &(image->dy));
 	i_dy->when(FL_WHEN_CHANGED);
@@ -802,7 +803,7 @@ void qsl_editor::cb_ip_string(Fl_Widget* w, void* v) {
 // integer input
 void qsl_editor::cb_ip_int(Fl_Widget* w, void* v) {
     qsl_editor* that = ancestor_view<qsl_editor>(w);
-    cb_value_int<Fl_Int_Input>(w, v);
+    cb_value_int<Fl_Input>(w, v);
     that->redraw_display();  
 	// that->create_items();
 }

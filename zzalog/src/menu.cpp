@@ -27,6 +27,7 @@
 #include "wsjtx_handler.h"
 #include "main_window.h"
 #include "qso_manager.h"
+#include "qso_data.h"
 
 #include <sstream>
 #include <list>

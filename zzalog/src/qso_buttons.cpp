@@ -7,6 +7,7 @@
 #include "qth_dialog.h"
 #include "spec_data.h"
 #include "drawing.h"
+#include "callback.h"
 
 #include <FL/Fl_Tooltip.H>
 

@@ -5,6 +5,7 @@
 #include "status.h"
 #include "adi_writer.h"
 #include "qso_manager.h"
+#include "qso_qsl.h"
 
 #include "utils.h"
 #include "url_handler.h"
