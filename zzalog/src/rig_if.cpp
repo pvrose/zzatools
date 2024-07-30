@@ -182,8 +182,9 @@ void rig_if::close() {
 	if (rig_ != nullptr) {
 		if (opened_ok_) {
 			char msg[128];
-			snprintf(msg, 128, "RIG: Closing connection %s (%s on port %s)",
+			snprintf(msg, 128, "RIG: Closing connection %s (%s/%s on port %s)",
 				my_rig_name_.c_str(),
+				hamlib_data_->mfr.c_str(),
 				hamlib_data_->model.c_str(),
 				hamlib_data_->port_name.c_str());
 			status_->misc_status(ST_NOTE, msg);
