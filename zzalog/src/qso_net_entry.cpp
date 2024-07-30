@@ -30,11 +30,11 @@ void qso_net_entry::create_form(int X, int Y) {
 	align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 	box(FL_BORDER_BOX);
 	labelfont(FL_BOLD);
-	labelsize(FL_NORMAL_SIZE + 2);
 
 	// Tabbed set of qso_entry forms
 	entries_ = new Fl_Tabs(X, Y + HTEXT, w(), h());
 	entries_->callback(cb_entries);
+	entries_->handle_overflow(Fl_Tabs::OVERFLOW_DRAG);
 	int rx = 0;
 	int ry = 0;
 	int rw = 0;

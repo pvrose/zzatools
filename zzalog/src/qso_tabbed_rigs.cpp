@@ -18,6 +18,7 @@ qso_tabbed_rigs::qso_tabbed_rigs(int X, int Y, int W, int H, const char* L) :
 {
 	labeltype(FL_NO_LABEL);
 	box(FL_BORDER_BOX);
+	handle_overflow(OVERFLOW_DRAG);
 	callback(cb_tabs);
 	label_map_.clear();
 	load_values();

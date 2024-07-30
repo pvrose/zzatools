@@ -321,6 +321,7 @@ void qso_apps::create_form() {
 
     tabs_ = new Fl_Tabs(curr_x, curr_y, avail_w, avail_h);
     tabs_->box(FL_BORDER_BOX);
+ 	tabs_->handle_overflow(Fl_Tabs::OVERFLOW_DRAG);
     create_tabs();
     tabs_->end();
  

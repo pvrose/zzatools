@@ -10,6 +10,7 @@ qso_log::qso_log(int X, int Y, int W, int H, const char* l) :
 {
 	labeltype(FL_NO_LABEL);
 	box(FL_BORDER_BOX);
+	handle_overflow(OVERFLOW_DRAG);
 	callback(cb_tabs);
 	load_values();
 	create_form(X, Y);
