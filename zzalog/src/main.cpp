@@ -98,7 +98,7 @@ bool DISPLAY_VERSION = false;
 // Ticker values - main clock runs at 10 Hz - individual objects
 // will get a divided down version
 const double TICK = 0.1;      // 100 ms
-const unsigned int TICK_SECOND = 10;
+const unsigned int TICK_SECOND = (int)(1.0 / TICK);
 
 
 // FLTK externals

@@ -102,7 +102,7 @@ void qso_rig::load_values() {
 		}
 		rig_settings.get("Command", temp, "");
 		cat_app_ = temp;
-		if (cat_app_ == "") use_cat_app_ = false;
+		if (cat_app_ != "") use_cat_app_ = true;
 		free(temp);
 		// Preferred antenna
 		rig_settings.get("Antenna", temp, "");
@@ -743,6 +743,8 @@ void qso_rig::enable_widgets(bool tick) {
  		} else {
 			network_grp_->activate();
 		}
+		bn_use_app_->value(use_cat_app_);
+		if (!tick) ip_app_name_->value(cat_app_.c_str());
 		// The hamlib model has an associated application (eg flrig or wfview)
 		if (use_cat_app_) {
 			ip_app_name_->activate();
