@@ -343,6 +343,7 @@ void qso_apps::save_values() {
 
 // Configure widgets
 void qso_apps::enable_widgets() {
+    add_servers(apps_data_.at(tabs_->value()->label()));
     for (int ix = 0; ix < tabs_->children(); ix++) {
         app_grp* ax = (app_grp*)tabs_->child(ix);
         ax->enable_widgets();

@@ -110,6 +110,10 @@ void status::progress(int max_value, object_t object, const char* description, c
 		strcpy(item->description, description);
 		progress_items_[object] = item;
 		update_progress(object);
+		// Use progress to check for 0 entries
+		if (max_value == 0) {
+			progress(0, object);
+		}
 	}
 }
 
