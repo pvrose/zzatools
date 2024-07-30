@@ -62,7 +62,7 @@ void app_grp::create_form() {
     bn_rig_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON);
     bn_rig_->when(FL_WHEN_NEVER);
     bn_rig_->box(FL_FLAT_BOX);
-    bn_rig_->tooltip("Displays the current rig - or ALL");
+    bn_rig_->tooltip("Displays the current rig - or COMMON");
 
     curr_x += WBUTTON;
 
@@ -99,7 +99,12 @@ void app_grp::create_form() {
 // Configure the widgets
 void app_grp::enable_widgets() {
     qso_manager* mgr = ancestor_view<qso_manager>(this);
-    const char* rig_name = mgr->rig_control()->label();
+    const char* rig_name;
+    if (app_data_->is_common) {
+        rig_name = "COMMON";
+    } else {
+        rig_name = mgr->rig_control()->label();
+    }
     // Update the various widgets
     bn_common_->value(app_data_->is_common);
     bn_server_->value(app_data_->server);
@@ -168,7 +173,9 @@ void app_grp::cb_bn_listen(Fl_Widget* w, void* v) {
 void app_grp::cb_bn_connect(Fl_Widget* w, void* v) {
     app_grp* that = ancestor_view<app_grp>(w);
     qso_manager* mgr = ancestor_view<qso_manager>(that);
-    const char* rig_name = mgr->rig_control()->label();
+    const char* rig_name;
+    if (that->app_data_->is_common) rig_name = "COMMON";
+    else rig_name = mgr->rig_control()->label();
     if (that->app_data_->commands.find(rig_name) == that->app_data_->commands.end()) {
         char msg[128];
         snprintf(msg, sizeof(msg), "APPS: App %s does not know how to connect %s", 
@@ -191,7 +198,9 @@ void app_grp::cb_ip_app(Fl_Widget* w, void* v) {
     string value;
     cb_value<Fl_Input, string>(w, &value);
     qso_manager* mgr = ancestor_view<qso_manager>(that);
-    const char* rig_name = mgr->rig_control()->label();
+    const char* rig_name;
+    if (that->app_data_->is_common) rig_name = "COMMON";
+    else rig_name = mgr->rig_control()->label();
     that->app_data_->commands[rig_name] = value; 
 }
 
@@ -401,7 +410,7 @@ void qso_apps::add_servers(app_data_t* data) {
             data->has_data = wsjtx_handler_->has_data;
         }
     }
-    else {
+    else if (data->has_server) {
         char msg[128];
         snprintf(msg, sizeof(msg), "APPS: Don't know how to serve %s", data->name.c_str());
         status_->misc_status(ST_WARNING, msg);
