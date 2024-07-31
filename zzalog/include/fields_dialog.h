@@ -2,8 +2,6 @@
 
 #include "fields.h"
 #include "page_dialog.h"
-#include "field_choice.h"
-#include "intl_widgets.h"
 
 #include <vector>
 #include <string>
@@ -16,6 +14,10 @@
 #include <FL/Fl_Int_Input.H>
 
 using namespace std;
+
+class field_choice;
+class intl_input;
+class Fl_Light_Button;
 
 
 class fields_table:

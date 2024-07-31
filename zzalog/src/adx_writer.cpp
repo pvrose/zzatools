@@ -1,6 +1,8 @@
 #include "adx_writer.h"
 #include "adx_reader.h"
 #include "spec_data.h"
+#include "book.h"
+#include "record.h"
 
 #include "status.h"
 #include "utils.h"

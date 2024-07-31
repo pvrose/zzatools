@@ -1,6 +1,7 @@
 #include "qsl_display.h"
 #include "qso_manager.h"
 #include "status.h"
+#include "record.h"
 
 #include <set>
 #include <string>

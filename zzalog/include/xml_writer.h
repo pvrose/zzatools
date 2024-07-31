@@ -2,14 +2,13 @@
 #define __XML_WRITER__
 
 #include "xml_reader.h"
-#include "xml_element.h"
 
 #include <string>
 #include <ostream>
 
 using namespace std;
 
-
+class xml_element;
 
 	// This class provides the means to write out the XML prolog and element to an output
 	// string. It derives from xml_reader as this provides the base API that the

@@ -4,6 +4,7 @@
 #include "qth_dialog.h"
 #include "spec_data.h"
 #include "drawing.h"
+#include "record.h"
 
 extern spec_data* spec_data_;
 extern bool DARK;

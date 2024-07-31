@@ -2,7 +2,6 @@
 #define __VIEW__
 
 #include "drawing.h"
-#include "record.h"
 
 #include <map>
 #include <string>
@@ -14,7 +13,8 @@ using namespace std;
 
 
 	class book;
-	enum hint_t : unsigned char;
+	enum hint_t : uchar;
+	typedef size_t qso_num_t;
 
 
 

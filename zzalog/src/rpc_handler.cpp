@@ -2,6 +2,7 @@
 #include "url_handler.h"
 #include "xml_writer.h"
 #include "xml_reader.h"
+#include "socket_server.h"
 #include "utils.h"
 #include "status.h"
 #include "regices.h"

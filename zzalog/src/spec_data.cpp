@@ -10,6 +10,7 @@
 #include "callback.h"
 #include "adi_writer.h"
 #include "band.h"
+#include "record.h"
 
 #include <fstream>
 #include <ostream>

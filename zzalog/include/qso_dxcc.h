@@ -1,11 +1,12 @@
 #pragma once
 
 #include "cty_data.h"
-#include "book.h"
+#include "utils.h"
 
 #include <set>
 #include <vector>
 #include <map>
+#include <string>
 
 #include <FL/Fl_Scroll.H>
 #include <FL/Fl_Group.H>
@@ -14,6 +15,12 @@
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Multiline_Output.H>
 #include <FL/Fl_Light_Button.H>
+
+using namespace std;
+
+class book;
+class band_set;
+
 
 // This class displays the "worked before" status for the DX - band and mode
 class qso_dxcc :

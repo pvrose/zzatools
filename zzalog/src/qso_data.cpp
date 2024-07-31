@@ -1,5 +1,11 @@
 #include "qso_data.h"
+#include "qso_entry.h"
+#include "qso_net_entry.h"
+#include "qso_query.h"
+#include "qso_misc.h"
+#include "qso_buttons.h"
 #include "qso_manager.h"
+#include "qso_contest.h"
 #include "qso_qsl.h"
 #include "qth_dialog.h"
 #include "settings.h"
@@ -15,6 +21,7 @@
 #include "wsjtx_handler.h"
 #include "menu.h"
 #include "utils.h"
+#include "record.h"
 
 #include <FL/Fl_Preferences.H>
 #include <FL/Fl_Tooltip.H>

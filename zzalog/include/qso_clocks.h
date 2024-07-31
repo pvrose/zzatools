@@ -1,8 +1,8 @@
 #pragma once
 
-#include "qso_clock.h"
-
 #include <FL/Fl_Tabs.H>
+
+class qso_clock;
 
 // This class provides a tabbed group of instances of qso_clock (UTC and Local time)
 class qso_clocks :

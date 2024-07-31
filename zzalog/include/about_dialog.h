@@ -3,8 +3,6 @@
 
 #include "win_dialog.h"
 
-#include <string>
-
 #include <FL/Fl_Widget.H>
 
 using namespace std;

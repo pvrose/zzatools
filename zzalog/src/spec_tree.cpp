@@ -4,6 +4,9 @@
 #include "tabbed_forms.h"
 #include "callback.h"
 #include "status.h"
+#include "band.h"
+#include "spec_data.h"
+#include "book.h"
 
 #include <map>
 #include <string>

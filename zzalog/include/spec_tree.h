@@ -2,7 +2,6 @@
 #define __ADIF_TREE__
 
 #include "view.h"
-#include "spec_data.h"
 #include "fields.h"
 
 #include <string>
@@ -12,6 +11,9 @@
 #include <FL/Fl_Widget.H>
 
 using namespace std;
+
+typedef size_t qso_num_t;
+struct spec_dataset;
 
 
 	// This class provides a view that draws the ADIF specification data into a tree

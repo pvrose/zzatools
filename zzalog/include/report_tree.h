@@ -3,7 +3,6 @@
 
 #include "view.h"
 #include "fields.h"
-#include "band.h"
 
 #include <string>
 #include <vector>
@@ -14,6 +13,8 @@
 #include <FL/Fl_Tree_Item.H>
 
 using namespace std;
+
+template <class T> class band_map;
 
 
 

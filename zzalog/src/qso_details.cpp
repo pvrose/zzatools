@@ -5,6 +5,7 @@
 #include "book.h"
 #include "status.h"
 #include "spec_data.h"
+#include "record.h"
 
 extern book* book_;
 extern status* status_;

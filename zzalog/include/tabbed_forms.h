@@ -2,7 +2,6 @@
 #define __TABBED_FORMS__
 
 #include "view.h"
-#include "book.h"
 #include "fields.h"
 #include "drawing.h"
 
@@ -10,6 +9,10 @@
 #include <map>
 #include <FL/Fl_Tabs.H>
 #include <FL/Fl_Widget.H>
+
+class book;
+enum hint_t : uchar;
+typedef size_t qso_num_t;
 
 
 

@@ -1,7 +1,6 @@
 #ifndef __EXC_DATA__
 #define __EXC_DATA__
 
-#include "record.h"
 #include "utils.h"
 
 #include <string>
@@ -11,6 +10,8 @@
 #include <cmath>
 
 using namespace std;
+
+class record;
 
 
 // This class provides a wrapper for all  the callsign exception data in cty.xml

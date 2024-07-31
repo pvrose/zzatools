@@ -9,6 +9,7 @@
 #include "status.h"
 #include "book.h"
 #include "ticker.h"
+#include "record.h"
 
 #include <FL/Fl_Preferences.H>
 #include <FL/Fl_Box.H>

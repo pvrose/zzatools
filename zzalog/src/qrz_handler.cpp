@@ -5,7 +5,9 @@
 #include "book.h"
 #include "url_handler.h"
 #include "xml_reader.h"
+#include "xml_element.h"
 #include "menu.h"
+#include "record.h"
 
 #include <sstream>
 

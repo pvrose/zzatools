@@ -1,6 +1,11 @@
 #include "qso_misc.h"
 #include "qso_qth.h"
+#include "qso_details.h"
+#include "qso_dxcc.h"
+#include "qso_contest.h"
+#include "qso_qsl_vwr.h"
 #include "drawing.h"
+#include "record.h"
 
 #include <FL/Fl_Preferences.H>
 

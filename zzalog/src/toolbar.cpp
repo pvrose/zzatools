@@ -15,6 +15,7 @@
 #include "qso_manager.h"
 #include "import_data.h"
 #include "intl_dialog.h"
+#include "record.h"
 
 #include <FL/Fl_Button.H>
 #include <FL/Fl_RGB_Image.H>

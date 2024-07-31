@@ -1,16 +1,17 @@
 #ifndef __MENU__
 #define __MENU__
 
-#include "book.h"
 #include "report_tree.h"
-#include "status.h"
-#include "extract_data.h"
 
 #include <vector>
 
 #include <FL/Fl_Menu_Bar.H>
 #include <FL/Fl_Menu_Item.H>
 
+class book;
+class status;
+class extract_data;
+struct search_criteria_t;
 
 
 	// This class provides the menu bar and handles all the menu item callbacks

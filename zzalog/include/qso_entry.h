@@ -1,7 +1,5 @@
 #pragma once
 
-#include "book.h"
-#include "field_choice.h"
 #include "fields.h"
 
 #include <map>
@@ -12,6 +10,11 @@
 #include <FL/Fl_Input.H>
 
 class qso_data;
+class record;
+class field_choice;
+class field_input;
+typedef size_t qso_num_t;
+
 
 // A class that allows the entry of a QSO
 class qso_entry :

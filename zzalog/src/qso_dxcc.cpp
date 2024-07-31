@@ -3,6 +3,7 @@
 #include "qso_data.h"
 #include "cty_data.h"
 #include "book.h"
+#include "record.h"
 #include "drawing.h"
 #include "utils.h"
 #include "menu.h"

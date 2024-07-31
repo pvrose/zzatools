@@ -9,6 +9,7 @@
 #include "status.h"
 #include "extract_data.h"
 #include "tabbed_forms.h"
+#include "field_choice.h"
 
 #include <FL/Fl_Preferences.H>
 

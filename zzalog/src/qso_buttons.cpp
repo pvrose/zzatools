@@ -8,6 +8,7 @@
 #include "spec_data.h"
 #include "drawing.h"
 #include "callback.h"
+#include "record.h"
 
 #include <FL/Fl_Tooltip.H>
 

@@ -2,7 +2,6 @@
 #define __TOOLBAR__
 
 #include "drawing.h"
-#include "record.h"
 
 #include <string>
 
@@ -11,6 +10,7 @@
 
 using namespace std;
 
+typedef size_t qso_num_t;
 
 	// This class provides a tool-bar providing buttons providing shortcuts to certain menu items
 	class toolbar : public Fl_Group

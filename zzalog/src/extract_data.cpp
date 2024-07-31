@@ -9,6 +9,7 @@
 #include "club_handler.h"
 #include "search_dialog.h"
 #include "qso_manager.h"
+#include "record.h"
 
 #include <sstream>
 

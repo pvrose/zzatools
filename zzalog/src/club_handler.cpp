@@ -7,6 +7,7 @@
 #include "book.h"
 #include "qso_manager.h"
 #include "fields.h"
+#include "record.h"
 
 #include <sstream>
 

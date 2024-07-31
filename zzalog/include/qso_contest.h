@@ -1,7 +1,6 @@
 #pragma once
 
 #include "fields.h"
-#include "field_choice.h"
 #include "calendar.h"
 
 #include <string>
@@ -17,6 +16,7 @@
 using namespace std;
 
 class qso_data;
+class field_input;
 
 const field_list CONTEST_FIELDS = {
     "QSO_DATE",

@@ -25,6 +25,7 @@ class import_data;
 class record;
 
 typedef size_t qso_num_t;
+enum hint_t : uchar;
 
 
 	// This class provides the main dashboard functionality of the app.
@@ -80,7 +81,7 @@ typedef size_t qso_num_t;
 		// Switch rig status
 		void switch_rig();
 		// Present query (uses view update mechanism)
-		void update_qso(uchar hint, qso_num_t match_num, qso_num_t query_num);
+		void update_qso(hint_t hint, qso_num_t match_num, qso_num_t query_num);
 		// Start modem - returns a new record
 		record* start_modem_qso(string call, uchar source);
 		// Log modem record

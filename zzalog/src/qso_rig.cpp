@@ -6,6 +6,7 @@
 #include "band_data.h"
 #include "spec_data.h"
 #include "ticker.h"
+#include "field_choice.h"
 
 #include <set>
 #include <string>

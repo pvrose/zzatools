@@ -1,13 +1,13 @@
 #pragma once
 
-#include "rig_if.h"
-
 #include <map>
 #include <string>
 
 #include <FL/Fl_Tabs.H>
 
 using namespace std;
+
+class rig_if;
 
 // A tabbed display of qso_rig showing all the rigs recently refered to in QSOs
 // Initially only rigs actively connectable are shown, but if a QSO refers to another

@@ -2,13 +2,17 @@
 #define __ADI_READER__
 
 #include "files.h"
-#include "book.h"
+// #include "book.h"
 
 #include <istream>
 #include <string>
+#include <set>
 
 using namespace std;
 
+// Forward declaration
+class book;
+class record;
 
 
 	// This class reads standard ADIF .adi format data and loads it into the specified book.

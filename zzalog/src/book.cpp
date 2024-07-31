@@ -1,4 +1,5 @@
 #include "book.h"
+#include "record.h"
 #include "adi_reader.h"
 #include "adi_writer.h"
 #include "adx_reader.h"

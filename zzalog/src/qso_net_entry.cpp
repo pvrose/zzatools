@@ -1,7 +1,9 @@
 #include "qso_net_entry.h"
 #include "qso_entry.h"
 #include "status.h"
+
 #include "book.h"
+#include "record.h"
 
 extern status* status_;
 extern book* book_;

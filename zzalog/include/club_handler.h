@@ -1,8 +1,6 @@
 #ifndef __CLUBLOG_HANDLER__
 #define __CLUBLOG_HANDLER__
 
-#include "record.h"
-#include "book.h"
 #include "url_handler.h"
 #include "fields.h"
 
@@ -13,6 +11,11 @@
 #include <mutex>
 
 #include <FL/Fl_Help_Dialog.H>
+
+class record;
+class book;
+class url_handler;
+typedef size_t qso_num_t;
 
 	// Default fiels to use in Clublog 
 	const field_list CLUBLOG_FIELDS = {

@@ -1,12 +1,5 @@
 #pragma once
 
-#include "qso_entry.h"
-#include "qso_query.h"
-#include "qso_buttons.h"
-#include "qso_misc.h"
-#include "qso_net_entry.h"
-#include "field_choice.h"
-#include "book.h"
 #include "fields.h"
 
 #include <string>
@@ -24,6 +17,16 @@
 #include <FL/Fl_Window.H>
 
 using namespace std;
+
+class qso_entry;
+class qso_query;
+class qso_buttons;
+class qso_misc;
+class qso_net_entry;
+class qso_contest;
+class record;
+typedef size_t qso_num_t;
+
 
 // Default field sets
 static const field_list QSO_FIELDS = {

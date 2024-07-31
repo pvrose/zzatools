@@ -1,7 +1,6 @@
 #ifndef __LOTW_HANDLER__
 #define __LOTW_HANDLER__
 
-#include "book.h"
 #include "fields.h"
 
 #include <sstream>
@@ -10,6 +9,10 @@
 #include <atomic>
 #include <queue>
 #include <mutex>
+
+class book;
+class record;
+typedef size_t item_num_t;
 
 
 	// The timestamp format required by the ARRL header record.

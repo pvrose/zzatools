@@ -1,9 +1,9 @@
 #ifndef __EQSL_HANDLER__
 #define __EQSL_HANDLER__
 
-#include "record.h"
-#include "import_data.h"
-#include "adi_reader.h"
+// #include "record.h"
+// #include "import_data.h"
+// #include "adi_reader.h"
 #include "url_handler.h"
 #include "fields.h"
 
@@ -21,6 +21,12 @@
 #include <FL/Fl_Help_View.H>
 
 using namespace std;
+
+class record;
+class book;
+typedef size_t item_num_t;
+typedef size_t qso_num_t;
+
 
 	// eQSL throttling - 10s
 	const double EQSL_THROTTLE = 10.0;

@@ -2,9 +2,6 @@
 #define __RPC_HANDLER__
 
 #include "rpc_data_item.h"
-#include "xml_element.h"
-#include "xml_writer.h"
-#include "socket_server.h"
 
 #include <string>
 #include <istream>
@@ -12,6 +9,11 @@
 #include <regex>
 #include <map>
 
+using namespace std;
+
+class xml_element;
+class xml_writer;
+class socket_server;
 
 	// 
 

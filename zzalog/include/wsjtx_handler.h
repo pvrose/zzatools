@@ -1,9 +1,6 @@
 #ifndef __WSJTX_HANDLER__
 #define __WSJTX_HANDLER__
 
-#include "socket_server.h"
-#include "record.h"
-
 #include <string>
 #include <cstdint>
 #include <map>
@@ -15,6 +12,9 @@
 #endif
 
 using namespace std;
+
+class record;
+class socket_server;
 
 	// This class provides the interface to handle UDP datagrams as a server to the
 	// WSJT-X client(s)

@@ -1,10 +1,6 @@
 #ifndef __FIELD_CHOICE__
 #define __FIELD_CHOICE__
 
-#include "spec_data.h"
-#include "intl_widgets.h"
-#include "record.h"
-
 #include <string>
 #include <FL/Fl_Choice.H>
 #include <FL/Fl_Group.H>
@@ -12,6 +8,9 @@
 #include <FL/Fl_Input_Choice.H>
 
 using namespace std;
+
+class record;
+struct spec_dataset;
 
 
 

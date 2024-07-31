@@ -1,7 +1,5 @@
 #pragma once
 
-#include "record.h"
-
 #include <vector>
 #include <string>
 #include <map>
@@ -15,8 +13,8 @@
 using namespace std;
 
 class band_set;
-
-
+class record;
+typedef size_t qso_num_t;
 
 	// validation status for each check
 	enum valn_error_t {

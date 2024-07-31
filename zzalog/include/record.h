@@ -42,7 +42,7 @@ using namespace std;
 	};
 
 	// forward declaration
-	enum hint_t : unsigned char;
+	enum hint_t : uchar;
 
 	typedef size_t qso_num_t;    // QSO number
 

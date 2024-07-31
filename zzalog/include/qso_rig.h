@@ -1,8 +1,6 @@
 #pragma once
 
 #include "rig_if.h"
-#include "hamlib/rig.h"
-#include "field_choice.h"
 
 #include <string>
 
@@ -19,6 +17,8 @@
 #include <FL/Fl_Tabs.H>
 
 using namespace std;
+
+class field_input;
 
 const int NUMBER_RIG_APPS = 2;
 const string RIG_APP_NAMES[NUMBER_RIG_APPS] = { "FLRig", "NET rigctl" };

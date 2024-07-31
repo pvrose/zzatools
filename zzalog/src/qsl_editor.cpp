@@ -7,6 +7,7 @@
 #include "field_choice.h"
 #include "intl_widgets.h"
 #include "font_dialog.h"
+#include "record.h"
 
 #include <string>
 #include <ctime>

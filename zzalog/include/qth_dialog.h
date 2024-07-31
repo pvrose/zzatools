@@ -3,7 +3,6 @@
 #define __QTH_DIALOG__
 
 #include "win_dialog.h"
-#include "record.h"
 
 #include <string>
 #include <vector>
@@ -17,6 +16,8 @@
 #include <FL/Fl_Float_Input.H>
 
 using namespace std;
+
+class record;
 
 	// This class provides the dialog to chage the current station settings: rig, aerial and QTH
 	class qth_dialog :

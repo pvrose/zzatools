@@ -1,11 +1,11 @@
 #pragma once
 
-#include "qso_log_info.h"
-#include "qso_qsl.h"
-#include "qso_apps.h"
-#include "qso_wx.h"
-
 #include <FL/Fl_Tabs.H>
+
+class qso_log_info;
+class qso_qsl;
+class qso_apps;
+class qso_wx;
 
 // This calss collects the qso_log_info, qso_qsl, qso_server and qso_wx objects
 // into a tabbed object 

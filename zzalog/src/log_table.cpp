@@ -1,6 +1,7 @@
 ﻿
 #include "log_table.h"
 #include "book.h"
+#include "record.h"
 #include "spec_data.h"
 #include "utils.h"
 #include "callback.h"
@@ -15,6 +16,7 @@
 #include "main_window.h"
 #include "qso_manager.h"
 #include "fields.h"
+#include "extract_data.h"
 
 #include <FL/fl_draw.H>
 #include <FL/Fl_Preferences.H>

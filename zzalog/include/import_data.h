@@ -9,6 +9,8 @@
 
 using namespace std;
 
+class book;
+
 	// This class inherits book and provides the additional functionality required
 	// for importing additional data to the main log. Pointers to imported Records are initially held in this book
 	// and pointers copied or records merged into the main log. Any problems encountered are refered to the 

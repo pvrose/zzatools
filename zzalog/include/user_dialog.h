@@ -2,13 +2,9 @@
 #define __USER_DIALOG__
 
 #include "page_dialog.h"
-#include "record.h"
 
 #include <FL/fl_draw.H>
 #include <FL/Fl_Hold_Browser.H>
-
-
-
 
 	// This class provides a dialog so that the user may modify the way certain
 	// features (fonts, data formats etc) may be displayed 

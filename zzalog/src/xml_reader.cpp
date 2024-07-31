@@ -1,4 +1,5 @@
 #include "xml_reader.h"
+#include "xml_element.h"
 #include "regices.h"
 
 #include <regex>

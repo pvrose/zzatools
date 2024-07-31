@@ -10,6 +10,9 @@
 #include "regices.h"
 #include "spec_data.h"
 #include "ticker.h"
+#include "book.h"
+#include "socket_server.h"
+#include "record.h"
 
 #include <stdio.h>
 #include <sstream>

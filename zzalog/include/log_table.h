@@ -2,7 +2,6 @@
 #define __LOG_TABLE__
 
 
-#include "book.h"
 #include "view.h"
 #include "fields.h"
 //#include "edit_input.h"
@@ -15,6 +14,9 @@
 #include <FL/Fl_Menu_Button.H>
 
 using namespace std;
+
+class book;
+class field_choice;
 
 
 	// This class implements a tabular view of a book. It inherits the tabular view from Fl_Table_Row

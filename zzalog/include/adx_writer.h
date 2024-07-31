@@ -1,17 +1,17 @@
 #ifndef __ADX_WRITER__
 #define __ADX_WRITER__
 
-#include "xml_element.h"
+// #include "xml_element.h"
 #include "xml_writer.h"
 #include "adx_reader.h"
-#include "book.h"
-#include "record.h"
 
 #include <string>
 
 using namespace std;
 
-
+class book;
+class record;
+typedef size_t item_num_t;
 
 	// This class generates the XML representation for ADIF (ADX) from the records in the book
 	// It writes them to an output stream

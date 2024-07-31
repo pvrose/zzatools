@@ -7,6 +7,7 @@
 #include "utils.h"
 #include "spec_data.h"
 #include "band.h"
+#include "intl_widgets.h"
 
 #include <set>
 #include <string>

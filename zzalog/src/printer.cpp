@@ -5,6 +5,8 @@
 #include "qsl_display.h"
 #include "drawing.h"
 #include "qso_manager.h"
+#include "book.h"
+#include "record.h"
 
 #include <climits>
 

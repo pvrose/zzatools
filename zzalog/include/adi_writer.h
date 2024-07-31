@@ -1,9 +1,7 @@
 #ifndef __ADI_WRITER__
 #define __ADI_WRITER__
 
-#include "book.h"
 #include "files.h"
-#include "spec_data.h"
 #include "fields.h"
 
 #include <string>
@@ -13,6 +11,7 @@ using namespace std;
 
 	class book;
 	class record;
+	typedef size_t item_num_t;
 
 	// This class will take a book and generate ADIF .adi format text onto the output stream
 	class adi_writer

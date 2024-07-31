@@ -1,12 +1,14 @@
 #pragma once
 
-#include "record.h"
-#include "qso_entry.h"
-
 #include <FL/Fl_Tabs.H>
 #include <FL/Fl_Group.H>
 
 using namespace std;
+
+enum navigate_t : uchar;
+typedef size_t qso_num_t;
+class record;
+class qso_entry;
 
 // This provides a tabbed collection of qso_entry used when contacting more than 
 // 1 station at once

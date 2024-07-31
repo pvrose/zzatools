@@ -1,10 +1,6 @@
 #ifndef __RIG_IF__
 #define __RIG_IF__
 
-// zzalib includes
-
-#include "rpc_data_item.h"
-#include "rpc_handler.h"
 #include "callback.h"
 #include "utils.h"
 

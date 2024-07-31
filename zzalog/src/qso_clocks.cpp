@@ -1,4 +1,5 @@
 #include "qso_clocks.h"
+#include "qso_clock.h"
 #include "qso_manager.h"
 #include "utils.h"
 #include "status.h"

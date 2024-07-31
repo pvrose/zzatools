@@ -1,12 +1,13 @@
 #ifndef __RECORD_TABLE__
 #define __RECORD_TABLE__
 
-#include "record.h"
 #include <vector>
 #include <string>
 #include <FL/Fl_Table_Row.H>
 
 using namespace std;
+
+class record;
 
 
 	// This class is the table used in qso_manager to display the field items in the displayed record.

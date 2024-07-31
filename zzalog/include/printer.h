@@ -1,8 +1,6 @@
 #ifndef __PRINTER__
 #define __PRINTER__
 
-#include "record.h"
-#include "view.h"
 #include "fields.h"
 #include "qsl_display.h"
 
@@ -10,9 +8,10 @@
 #include <string>
 
 #include <FL/Fl_Printer.H>
-#include <FL/Fl.H>
 
 using namespace std;
+
+class record;
 
 
 

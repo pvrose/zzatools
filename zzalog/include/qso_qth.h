@@ -1,7 +1,5 @@
 #pragma once
 
-#include "record.h"
-
 #include <string>
 #include <vector>
 
@@ -9,6 +7,10 @@
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Table_Row.H>
 #include <FL/Fl_Output.H>
+
+using namespace std;
+
+class record;
 
 // This displays the definition of the QTH defined by APP_ZZA_QTH
 // and allowd it to be edited

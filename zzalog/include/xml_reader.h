@@ -11,6 +11,7 @@
 
 using namespace std;
 
+
 	// This class reads XML text and generates an XML element containing the contents 
 	// as a family tree of other elements. It can be used in derived classes which can
 	// then interpret the XML elements

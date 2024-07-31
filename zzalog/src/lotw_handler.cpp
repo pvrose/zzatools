@@ -7,6 +7,7 @@
 #include "callback.h"
 #include "extract_data.h"
 #include "fields.h"
+#include "record.h"
 
 #include <cstdlib>
 

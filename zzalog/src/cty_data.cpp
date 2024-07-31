@@ -5,6 +5,7 @@
 #include "callback.h"
 #include "utils.h"
 #include "spec_data.h"
+#include "record.h"
 
 #include <fcntl.h>
 #include <fstream>

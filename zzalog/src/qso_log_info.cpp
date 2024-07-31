@@ -3,6 +3,7 @@
 #include "book.h"
 #include "import_data.h"
 #include "ticker.h"
+#include "utils.h"
 
 extern book* book_;
 extern import_data* import_data_;

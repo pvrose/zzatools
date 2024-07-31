@@ -1,12 +1,17 @@
 #pragma once
 
-#include "record.h"
-#include "qsl_display.h"
+#include <string>
 
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Radio_Light_Button.H>
 #include <FL/Fl_Light_Button.H>
+
+using namespace std;
+
+class record;
+class qsl_display;
+typedef size_t qso_num_t;
 
 // This displays the QSL status of this QSO.
 // It displays images received and the label that can be printed

@@ -1,11 +1,7 @@
 #ifndef __PAGE_DIALOG__
 #define __PAGE_DIALOG__
 
-#include "callback.h"
-#include "drawing.h"
-
 #include <FL/Fl_Group.H>
-#include <FL/Fl_Widget.H>
 
 
 	// Standard settings dialog ahs OK, Save and Cancel buttons - each settings tab needs to implement them.

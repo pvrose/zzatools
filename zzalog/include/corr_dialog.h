@@ -1,7 +1,6 @@
 #ifndef __CORR_DIALOG__
 #define __CORR_DIALOG__
 
-#include "record.h"
 #include "win_dialog.h"
 
 #include <string>
@@ -10,6 +9,8 @@
 #include <FL/Fl_Widget.H>
 
 using namespace std;
+
+class record;
 
 
 

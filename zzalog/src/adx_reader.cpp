@@ -3,6 +3,8 @@
 #include "spec_data.h"
 #include "status.h"
 #include "files.h"
+#include "book.h"
+#include "record.h"
 
 #include <FL/fl_draw.H>
 #include <FL/fl_ask.H>

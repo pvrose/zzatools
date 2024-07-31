@@ -1,7 +1,7 @@
 #ifndef __BOOK__
 #define __BOOK__
 
-#include "record.h"
+// #include "record.h"
 #include "spec_data.h"
 #include "drawing.h"
 #include "search.h"
@@ -16,6 +16,16 @@
 
 using namespace std;
 
+	class view;
+	class adi_reader;
+	class adx_reader;
+	class adi_writer;
+	class adx_writer;
+	class record;
+	class band_set;
+
+	// extern spec_data* spec_data_;
+
 
 
 	// File type
@@ -27,7 +37,7 @@ using namespace std;
 	};
 
 	// Navigation type
-	enum navigate_t {
+	enum navigate_t : uchar {
 		NV_FIRST,        // Go to the first record
 		NV_LAST,         // Go to the last record
 		NV_NEXT,         // Go to the next record
@@ -63,14 +73,7 @@ using namespace std;
 
 	// The records are kept in a container with size_t as index
 	typedef size_t item_num_t;    // Position of item within this book
-
-	class view;
-	class adi_reader;
-	class adx_reader;
-	class adi_writer;
-	class adx_writer;
-
-	extern spec_data* spec_data_;
+	typedef size_t qso_num_t;     // Position of item within book_ instance
 
 	// This class is the container for the ADIF records. These are held in chronological order.
 	// As well as standing alone it is used as a base class for extract_data and import_data

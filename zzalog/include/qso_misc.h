@@ -1,13 +1,14 @@
 #pragma once
 
-#include "record.h"
-#include "qso_qth.h"
-#include "qso_details.h"
-#include "qso_dxcc.h"
-#include "qso_qsl_vwr.h"
-#include "qso_contest.h"
-
 #include <FL/Fl_Tabs.H>
+
+class record;
+class qso_qth;
+class qso_details;
+class qso_dxcc;
+class qso_qsl_vwr;
+class qso_contest;
+typedef size_t qso_num_t;
 
 // This displays a set of tabs for qso_qth, qso_details, qso_dxcc and qso_qsl_vwr
 class qso_misc :

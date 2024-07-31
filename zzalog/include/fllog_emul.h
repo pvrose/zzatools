@@ -3,8 +3,8 @@
 
 #include "rpc_data_item.h"
 #include "rpc_handler.h"
-#include "record.h"
 
+class record;
 
 
 // This class provides an emulation for fllog software, the logging application

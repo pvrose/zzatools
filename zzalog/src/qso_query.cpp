@@ -4,6 +4,8 @@
 #include "qso_data.h"
 #include "book.h"
 #include "fields.h"
+#include "utils.h"
+#include "record.h"
 
 extern book* book_;
 extern fields* fields_;

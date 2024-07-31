@@ -3,11 +3,14 @@
 #include "page_dialog.h"
 #include "qsl_display.h"
 #include "utils.h"
+#include "callback.h"
 
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Window.H>
 #include <FL/Fl_Output.H>
 #include <FL/Fl_Scroll.H>
+
+class Fl_Choice;
 
 
 

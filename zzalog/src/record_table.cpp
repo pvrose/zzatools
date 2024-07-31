@@ -3,6 +3,7 @@
 #include "spec_data.h"
 #include "drawing.h"
 #include "fields.h"
+#include "record.h"
 
 #include <FL/fl_draw.H>
 #include <FL/Fl_Preferences.H>

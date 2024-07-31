@@ -1,14 +1,18 @@
 #include "qso_entry.h"
 #include "qso_data.h"
 #include "qso_manager.h"
+#include "qso_contest.h"
 #include "qso_rig.h"
 #include "rig_if.h"
 #include "status.h"
 #include "spec_data.h"
 #include "tabbed_forms.h"
 #include "book.h"
+#include "record.h"
 #include "ticker.h"
 #include "fields.h"
+#include "intl_widgets.h"
+#include "field_choice.h"
 
 extern status* status_;
 extern spec_data* spec_data_;

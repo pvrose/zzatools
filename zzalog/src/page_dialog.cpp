@@ -1,4 +1,5 @@
 #include "page_dialog.h"
+#include "callback.h"
 
 #include "utils.h"
 

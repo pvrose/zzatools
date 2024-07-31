@@ -8,6 +8,7 @@
 #include "rpc_data_item.h"
 #include "qso_manager.h"
 #include "qso_data.h"
+#include "record.h"
 
 #include <sstream>
 

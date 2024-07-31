@@ -2,8 +2,7 @@
 #define __FILES_DIALOG__
 
 #include "page_dialog.h"
-#include "intl_widgets.h"
-#include "field_choice.h"
+#include "callback.h"
 
 #include <string>
 

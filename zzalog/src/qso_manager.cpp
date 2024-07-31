@@ -4,6 +4,8 @@
 #include "qso_misc.h"
 #include "qso_tabbed_rigs.h"
 #include "qso_clocks.h"
+#include "qso_buttons.h"
+#include "qso_qsl.h"
 #include "callback.h"
 #include "rig_if.h"
 
@@ -300,9 +302,9 @@ qso_rig* qso_manager::rig_control() {
 }
 
 // Called whenever another view updates a record (or selects a new one)
-void qso_manager::update_qso(uchar hint, qso_num_t match_num, qso_num_t query_num) {
+void qso_manager::update_qso(hint_t hint, qso_num_t match_num, qso_num_t query_num) {
 	record* target = book_->get_record(match_num, false);
-	switch ((hint_t)hint) {
+	switch (hint) {
 	case HT_SELECTED:
 	case HT_ALL:
 	case HT_CHANGED:

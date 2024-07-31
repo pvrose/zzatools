@@ -1,4 +1,8 @@
 #include "qso_log.h"
+#include "qso_log_info.h"
+#include "qso_apps.h"
+#include "qso_wx.h"
+#include "qso_qsl.h"
 
 #include <algorithm>
 

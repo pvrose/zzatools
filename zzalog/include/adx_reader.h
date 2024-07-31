@@ -1,9 +1,6 @@
 #ifndef __ADX_READER__
 #define __ADX_READER__
 #include "xml_reader.h"
-#include "book.h"
-
-#include "record.h"
 
 #include <string>
 #include <map>
@@ -12,6 +9,9 @@
 #include <fstream>
 
 using namespace std;
+
+class book;
+class record;
 
 
 

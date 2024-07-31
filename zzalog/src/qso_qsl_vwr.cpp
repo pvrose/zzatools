@@ -4,6 +4,7 @@
 #include "eqsl_handler.h"
 #include "status.h"
 #include "book.h"
+#include "record.h"
 #include "qsl_display.h"
 #include "callback.h"
 #include "drawing.h"

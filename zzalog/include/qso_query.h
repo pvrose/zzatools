@@ -1,7 +1,5 @@
 #pragma once
 
-#include "record_table.h"
-
 #include <string>
 
 #include <FL/Fl_Group.H>
@@ -9,6 +7,9 @@
 using namespace std;
 
 class qso_data;
+class record;
+class record_table;
+typedef size_t qso_num_t;
 
 // Displays one record when importing from a QSL site) or two records
 // if they may possibly be the same record

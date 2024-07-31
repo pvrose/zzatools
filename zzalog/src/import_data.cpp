@@ -9,6 +9,8 @@
 #include "utils.h"
 #include "menu.h"
 #include "qso_manager.h"
+#include "adi_reader.h"
+#include "record.h"
 
 #include <sstream>
 #include <ctime>

@@ -1,13 +1,15 @@
 #ifndef __SETTINGS__
 #define __SETTINGS__
 
-#include "page_dialog.h"
-
 #include <set>
 #include <vector>
 
 #include <FL/Fl_Window.H>
 #include <FL/Fl_Widget.H>
+
+using namespace std;
+
+class page_dialog;
 
 	// This class provides a window to display all the settings dialogs as separate tabbed panes
 	class settings : public Fl_Window

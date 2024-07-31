@@ -1,6 +1,5 @@
 #pragma once
 
-#include "record.h"
 
 #include <string>
 #include <set>
@@ -13,6 +12,9 @@
 #include <FL/Fl_Table.H>
 
 using namespace std;
+
+class record;
+typedef size_t qso_num_t;
 
 // A class which displays information about previous QSOs with this contact
 class qso_details :

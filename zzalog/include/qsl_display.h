@@ -1,14 +1,16 @@
 #pragma once
 
-#include "record.h"
 #include "drawing.h"
 
 #include <vector>
+#include <string>
 
 #include <FL/Fl_Widget.H>
 #include <FL/Fl_Box.H>
 
 using namespace std;
+
+class record;
 
 // This class provides the drawing of a QSL label. It is used as part of the
 // editor, the QSL viewer in QSO dashboard and tne printer.
