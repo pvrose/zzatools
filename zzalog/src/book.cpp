@@ -27,7 +27,7 @@
 #include <FL/Fl_Menu_Item.H>
 #include <FL/Fl_Preferences.H>
 #include <FL/Fl_Single_Window.H>
-
+#include <FL/Fl_Button.H>
 
 
 using namespace std;

@@ -9,6 +9,7 @@
 #include "callback.h"
 
 #include <FL/Fl_Preferences.H>
+#include <FL/Fl_Tabs.H>
 
 using namespace std;
 

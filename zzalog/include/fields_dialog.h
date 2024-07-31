@@ -8,16 +8,16 @@
 #include <map>
 
 #include <FL/Fl_Table_Row.H>
-#include <FL/Fl_Input_Choice.H>
-#include <FL/Fl_Choice.H>
-#include <FL/Fl_Button.H>
-#include <FL/Fl_Int_Input.H>
 
 using namespace std;
 
 class field_choice;
 class intl_input;
 class Fl_Light_Button;
+class Fl_Input_Choice;
+class Fl_Int_Input;
+class Fl_Choice;
+class Fl_Button;
 
 
 class fields_table:

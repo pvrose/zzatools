@@ -6,9 +6,10 @@
 #include <string>
 
 #include <FL/Fl_Group.H>
-#include <FL/Fl_Widget.H>
 
 using namespace std;
+
+class Fl_Widget;
 
 typedef size_t qso_num_t;
 

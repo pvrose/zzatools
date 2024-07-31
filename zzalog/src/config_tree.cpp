@@ -4,8 +4,8 @@
 #include <map>
 
 #include <FL/fl_draw.H>
-
-
+#include <FL/Fl_Tree_Item.H>
+#include <FL/Fl_Preferences.H>
 
 extern Fl_Preferences* settings_;
 

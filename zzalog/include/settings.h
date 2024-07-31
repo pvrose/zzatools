@@ -5,9 +5,10 @@
 #include <vector>
 
 #include <FL/Fl_Window.H>
-#include <FL/Fl_Widget.H>
 
 using namespace std;
+
+class Fl_Widget;
 
 class page_dialog;
 

@@ -12,6 +12,7 @@
 #include <FL/Fl_Preferences.H>
 #include <FL/Fl_Image_Surface.H>
 #include <FL/Fl_RGB_Image.H>
+#include <FL/Fl_Button.H>
 
 extern wx_handler* wx_handler_;
 extern Fl_Preferences* settings_;

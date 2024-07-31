@@ -6,14 +6,7 @@
 
 #include <string>
 
-#include <FL/Fl_Group.H>
-#include <FL/Fl_Widget.H>
-#include <FL/Fl_Check_Button.H>
-
 using namespace std;
-
-
-
 
 	// This class provides the dialog used to enable the user to select file locations
 	// for the various operations and save them in the settings.

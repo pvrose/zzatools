@@ -4,10 +4,12 @@
 
 #include <string>
 
-#include <FL/Fl_Widget.H>
-#include <FL/Fl_Output.H>
+#include <FL/Enumerations.H>
 
 using namespace std;
+
+class Fl_Output;
+
 
 	// Dialog to display a font chooser, size chooser and colour chooser
 	class font_dialog :

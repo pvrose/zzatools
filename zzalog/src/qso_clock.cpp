@@ -6,6 +6,7 @@
 #include<ctime>
 
 #include <FL/Fl_Image.H>
+#include <FL/Fl_Button.H>
 
 extern ticker* ticker_;
 

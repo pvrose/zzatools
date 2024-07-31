@@ -6,17 +6,17 @@
 #include <string>
 
 #include <FL/Fl_Group.H>
-#include <FL/Fl_Input_Choice.H>
-#include <FL/Fl_Input.H>
-#include <FL/Fl_Button.H>
-#include <FL/Fl_Light_Button.H>
-#include <FL/Fl_Output.H>
-#include <FL/Fl_Radio_Light_Button.H>
 
 using namespace std;
 
 class qso_data;
 class field_input;
+class Fl_Input;
+class Fl_Input_Choice;
+class Fl_Button;
+class Fl_Output;
+class Fl_Light_Button;
+class Fl_Radio_Light_Button;
 
 const field_list CONTEST_FIELDS = {
     "QSO_DATE",

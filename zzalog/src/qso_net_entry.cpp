@@ -5,6 +5,8 @@
 #include "book.h"
 #include "record.h"
 
+#include <FL/Fl_Tabs.H>
+
 extern status* status_;
 extern book* book_;
 

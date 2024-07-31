@@ -7,12 +7,12 @@
 #include <set>
 
 #include <FL/Fl_Group.H>
-#include <FL/Fl_Input.H>
 
 class qso_data;
 class record;
 class field_choice;
 class field_input;
+class Fl_Input;
 typedef size_t qso_num_t;
 
 

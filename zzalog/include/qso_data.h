@@ -7,14 +7,7 @@
 #include <list>
 #include <map>
 
-#include <FL/Fl.H>
 #include <FL/Fl_Group.H>
-#include <FL/Fl_Button.H>
-#include <FL/Fl_Light_Button.H>
-#include <FL/Fl_Choice.H>
-#include <FL/Fl_Input_Choice.H>
-#include <FL/Fl_Output.H>
-#include <FL/Fl_Window.H>
 
 using namespace std;
 

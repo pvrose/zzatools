@@ -3,11 +3,11 @@
 #include <list>
 
 #include <FL/Fl_Group.H>
-#include <FL/Fl_Button.H>
 
 using namespace std;
 
 class qso_data;
+class Fl_Button;
 
 // This class provides the user controls within the qsl_manager dashboard
 // It defines all possible buttons, but only a selection are used in any

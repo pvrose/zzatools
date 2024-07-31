@@ -1,8 +1,8 @@
 #pragma once
 
 #include <FL/Fl_Group.H>
-#include <FL/Fl_Output.H>
-#include <FL/Fl_Button.H>
+
+class Fl_Button;
 
 // Displays the current weather report; summary, temperature, wind speed & direction,
 // Cloud cover and pressure

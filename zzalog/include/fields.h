@@ -10,9 +10,9 @@
 #include <vector>
 #include <list>
 
-#include <FL/Fl_Preferences.H>
-
 using namespace std;
+
+class Fl_Preferences;
 
 // Column info 
 struct field_info_t {

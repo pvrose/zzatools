@@ -6,7 +6,6 @@
 #include <vector>
 
 #include <FL/Fl_Menu_Bar.H>
-#include <FL/Fl_Menu_Item.H>
 
 class book;
 class status;

@@ -8,18 +8,16 @@
 #include <map>
 #include <string>
 
-#include <FL/Fl_Scroll.H>
 #include <FL/Fl_Group.H>
-#include <FL/Fl_Tree.H>
-#include <FL/Fl_Output.H>
-#include <FL/Fl_Button.H>
-#include <FL/Fl_Multiline_Output.H>
-#include <FL/Fl_Light_Button.H>
+#include <FL/Fl_Scroll.H>
 
 using namespace std;
 
 class book;
 class band_set;
+class Fl_Output;
+class Fl_Button;
+class Fl_Light_Button;
 
 
 // This class displays the "worked before" status for the DX - band and mode

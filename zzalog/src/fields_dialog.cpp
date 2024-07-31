@@ -11,6 +11,7 @@
 #include <FL/Fl_Preferences.H>
 #include <FL/Fl_Input_Choice.H>
 #include <FL/Fl_Button.H>
+#include <FL/Fl_Choice.H>
 
 extern Fl_Preferences* settings_;
 extern book* book_;

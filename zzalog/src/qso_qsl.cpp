@@ -13,6 +13,9 @@
 
 #include <FL/Fl_Preferences.H>
 #include <FL/Fl_Box.H>
+#include <FL/Fl_Button.H>
+#include <FL/Fl_Check_Button.H>
+#include <FL/Fl_Progress.H>
 
 extern Fl_Preferences* settings_;
 extern import_data* import_data_;

@@ -6,14 +6,10 @@
 #include <string>
 #include <set>
 
-#include <FL/Fl_Window.H>
-#include <FL/Fl_Group.H>
-#include <FL/Fl_Widget.H>
-
 using namespace std;
 
-
-
+class Fl_Widget;
+class Fl_Group;
 
 	// This class provides a window that can be used to paste non-ASCII characters into the specified editor widget.
 	// The editor widget tells this dialog when it opens.

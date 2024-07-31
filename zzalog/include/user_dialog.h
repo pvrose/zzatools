@@ -3,8 +3,10 @@
 
 #include "page_dialog.h"
 
-#include <FL/fl_draw.H>
-#include <FL/Fl_Hold_Browser.H>
+#include <FL/Enumerations.H>
+
+class Fl_Hold_Browser;
+class Fl_Widget;
 
 	// This class provides a dialog so that the user may modify the way certain
 	// features (fonts, data formats etc) may be displayed 

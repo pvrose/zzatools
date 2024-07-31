@@ -10,7 +10,7 @@
 #include <map>
 
 #include <FL/Fl_Tree.H>
-#include <FL/Fl_Tree_Item.H>
+#include <FL/Enumerations.H>
 
 using namespace std;
 

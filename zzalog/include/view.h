@@ -6,8 +6,6 @@
 #include <map>
 #include <string>
 
-#include <FL/Fl_Widget.H>
-
 using namespace std;
 
 

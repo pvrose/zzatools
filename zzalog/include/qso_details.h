@@ -7,13 +7,12 @@
 #include <map>
 
 #include <FL/Fl_Group.H>
-#include <FL/Fl_Output.H>
-#include <FL/Fl_Button.H>
 #include <FL/Fl_Table.H>
 
 using namespace std;
 
 class record;
+class Fl_Output;
 typedef size_t qso_num_t;
 
 // A class which displays information about previous QSOs with this contact

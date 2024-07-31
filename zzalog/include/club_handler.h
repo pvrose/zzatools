@@ -10,8 +10,6 @@
 #include <atomic>
 #include <mutex>
 
-#include <FL/Fl_Help_Dialog.H>
-
 class record;
 class book;
 class url_handler;

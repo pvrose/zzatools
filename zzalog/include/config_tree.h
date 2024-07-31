@@ -3,10 +3,11 @@
 
 #include <string>
 #include <FL/Fl_Tree.H>
-#include <FL/Fl_Tree_Item.H>
-#include <FL/Fl_Preferences.H>
 
 using namespace std;
+
+class Fl_Tree_Item;
+class Fl_Preferences;
 
 
 

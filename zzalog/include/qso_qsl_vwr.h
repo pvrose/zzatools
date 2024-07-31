@@ -3,14 +3,16 @@
 #include <string>
 
 #include <FL/Fl_Group.H>
-#include <FL/Fl_Button.H>
-#include <FL/Fl_Radio_Light_Button.H>
-#include <FL/Fl_Light_Button.H>
 
 using namespace std;
 
 class record;
 class qsl_display;
+class Fl_Button;
+class Fl_Light_Button;
+class Fl_Radio_Light_Button;
+class Fl_Image;
+
 typedef size_t qso_num_t;
 
 // This displays the QSL status of this QSO.

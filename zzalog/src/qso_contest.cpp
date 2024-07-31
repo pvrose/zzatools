@@ -12,6 +12,8 @@
 #include "field_choice.h"
 
 #include <FL/Fl_Preferences.H>
+#include <FL/Fl_Radio_Light_Button.H>
+#include <FL/Fl_Output.H>
 
 extern Fl_Preferences* settings_;
 extern fields* fields_;

@@ -17,6 +17,8 @@
 #include <FL/Fl_Radio_Round_Button.H>
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Value_Input.H>
+#include <FL/Fl_Scroll.H>
+#include <FL/Fl_Output.H>
 
 using namespace std;
 

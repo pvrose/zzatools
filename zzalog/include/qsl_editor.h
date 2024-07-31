@@ -5,14 +5,11 @@
 #include "utils.h"
 #include "callback.h"
 
-#include <FL/Fl_Group.H>
-#include <FL/Fl_Window.H>
-#include <FL/Fl_Output.H>
-#include <FL/Fl_Scroll.H>
-
 class Fl_Choice;
-
-
+class Fl_Widget;
+class Fl_Group;
+class Fl_Window;
+class Fl_Output;
 
 // This class provides the dialog to edit the card label parameters
 // and define the items used in drawing the card label

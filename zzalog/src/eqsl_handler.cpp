@@ -24,6 +24,8 @@
 #include <FL/fl_utf8.h>
 #include <FL/Fl_Native_File_Chooser.H>
 #include <FL/Fl_Help_Dialog.H>
+#include <FL/Fl_Window.H>
+#include <FL/Fl_Help_View.H>
 
 extern book* book_;
 extern status* status_;

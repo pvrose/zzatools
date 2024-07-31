@@ -4,9 +4,7 @@
 
 #include <FL/fl_draw.H>
 #include <FL/Fl_Button.H>
-
-
-
+#include <FL/Fl_Input.H>
 
 // Constructor for the calendar table
 calendar_table::calendar_table(int X, int Y, int W, int H, tm date) :

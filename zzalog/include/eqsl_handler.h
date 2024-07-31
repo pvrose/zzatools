@@ -17,13 +17,12 @@
 #include <atomic>
 #include <mutex>
 
-#include <FL/Fl_Window.H>
-#include <FL/Fl_Help_View.H>
-
 using namespace std;
 
 class record;
 class book;
+class Fl_Help_View;
+class Fl_Window;
 typedef size_t item_num_t;
 typedef size_t qso_num_t;
 

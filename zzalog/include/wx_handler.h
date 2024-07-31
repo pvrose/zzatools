@@ -6,10 +6,9 @@
 #include <string>
 #include <list>
 
-#include <FL/Fl_Image.H>
-
 using namespace std;
 
+class Fl_Image;
 
 // WX XML elements
 enum wxe_element_t {

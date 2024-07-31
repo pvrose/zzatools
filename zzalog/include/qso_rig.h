@@ -5,20 +5,20 @@
 #include <string>
 
 #include <FL/Fl_Group.H>
-#include <FL/Fl_Light_Button.H>
-#include <FL/Fl_Check_Button.H>
-#include <FL/Fl_Button.H>
-#include <FL/Fl_Choice.H>
-#include <FL/Fl_Input.H>
-#include <FL/Fl_Output.H>
-#include <FL/Fl_Float_Input.H>
-#include <FL/Fl_Int_Input.H>
-#include <FL/Fl_Box.H>
-#include <FL/Fl_Tabs.H>
 
 using namespace std;
 
 class field_input;
+class Fl_Output;
+class Fl_Button;
+class Fl_Box;
+class Fl_Light_Button;
+class Fl_Choice;
+class Fl_Tabs;
+class Fl_Check_Button;
+class Fl_Input;
+class Fl_Int_Input;
+class Fl_Float_Input;
 
 const int NUMBER_RIG_APPS = 2;
 const string RIG_APP_NAMES[NUMBER_RIG_APPS] = { "FLRig", "NET rigctl" };

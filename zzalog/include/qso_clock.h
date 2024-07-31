@@ -1,6 +1,7 @@
 #pragma once
 #include <FL/Fl_Group.H>
-#include <FL/Fl_Button.H>
+
+class Fl_Button;
 
 // This calss provides a ticking display of the current time
 // It cna be configured for UTC or local time 

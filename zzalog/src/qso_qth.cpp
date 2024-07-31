@@ -6,6 +6,9 @@
 #include "drawing.h"
 #include "record.h"
 
+#include <FL/Fl_Button.H>
+#include <FL/Fl_Output.H>
+
 extern spec_data* spec_data_;
 extern bool DARK;
 

@@ -4,11 +4,7 @@
 #include "win_dialog.h"
 #include "callback.h"
 
-#include <FL/Fl_Widget.H>
-
-
-
-
+class Fl_Widget;
 
 	// This enum is tied to a set of radio buttons in the dialog
 	enum change_action_t {

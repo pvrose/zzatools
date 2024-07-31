@@ -5,12 +5,11 @@
 #include <istream>
 #include <map>
 
-#include <FL/Fl_Help_Dialog.H>
-
 using namespace std;
 
 class record;
 class xml_element;
+class Fl_Help_Dialog;
 
 // This class provides the interface to the QRZ.com XML database look-up - it currently
 // is restricted to looking up details based on callsign. 

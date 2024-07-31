@@ -7,6 +7,8 @@
 #include "spec_data.h"
 #include "record.h"
 
+#include <FL/Fl_Output.H>
+
 extern book* book_;
 extern status* status_;
 extern spec_data* spec_data_;

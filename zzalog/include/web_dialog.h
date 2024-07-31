@@ -9,9 +9,10 @@
 #include <ctime>
 #include <set>
 
-#include <FL/Fl_Group.H>
-
 using namespace std;
+
+class Fl_Widget;
+class Fl_Group;
 
 	// This class provides a dialog to let the user supply web addresses, usernames and passwords
 	class web_dialog :

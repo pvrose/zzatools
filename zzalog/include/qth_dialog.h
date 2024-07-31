@@ -8,14 +8,12 @@
 #include <vector>
 #include <map>
 
-#include <FL/Fl_Window.H>
-#include <FL/Fl_Table.H>
-#include <FL/Fl_Browser.H>
-#include <FL/Fl_Preferences.H>
-#include <FL/Fl_Int_Input.H>
-#include <FL/Fl_Float_Input.H>
 
 using namespace std;
+
+class Fl_Input;
+class Fl_Int_Input;
+class Fl_Float_Input;
 
 class record;
 

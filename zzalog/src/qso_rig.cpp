@@ -12,6 +12,16 @@
 #include <string>
 
 #include <FL/Fl_Preferences.H>
+#include <FL/Fl_Light_Button.H>
+#include <FL/Fl_Check_Button.H>
+#include <FL/Fl_Button.H>
+#include <FL/Fl_Choice.H>
+#include <FL/Fl_Input.H>
+#include <FL/Fl_Output.H>
+#include <FL/Fl_Float_Input.H>
+#include <FL/Fl_Int_Input.H>
+#include <FL/Fl_Box.H>
+#include <FL/Fl_Tabs.H>
 
 using namespace std;
 

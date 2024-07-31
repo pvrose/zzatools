@@ -4,13 +4,12 @@
 #include <map>
 
 #include <FL/Fl_Group.H>
-#include <FL/Fl_Light_Button.H>
-#include <FL/Fl_Button.H>
-#include <FL/Fl_Box.H>
-#include <FL/Fl_Input.H>
-#include <FL/Fl_Tabs.H>
 
 using namespace std;
+class Fl_Input;
+class Fl_Light_Button;
+class Fl_Button;
+class Fl_Tabs;
 
 // The app related data
 struct app_data_t {

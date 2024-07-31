@@ -4,12 +4,12 @@
 #include <ctime>
 #include <string>
 #include <FL/Fl_Table.H>
-#include <FL/Fl_Group.H>
 #include <FL/Fl_Window.H>
-#include <FL/Fl_Button.H>
-#include <FL/Fl_Input.H>
 
 using namespace std;
+
+class Fl_Button;
+class Fl_Input;
 
 	// text is column header
 	const char WEEKDAY[7][2] = { "S", "M", "T", "W", "T", "F", "S" };

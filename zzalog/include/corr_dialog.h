@@ -6,12 +6,10 @@
 #include <string>
 #include <set>
 
-#include <FL/Fl_Widget.H>
-
 using namespace std;
 
 class record;
-
+class Fl_Widget;
 
 
 	// This class implements a dialog to allow user correction in response to valdation errors

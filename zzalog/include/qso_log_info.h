@@ -9,6 +9,11 @@
 
 using namespace std;
 
+class Fl_Output;
+class Fl_Progress;
+class Fl_Button;
+class Fl_Check_Button;
+
 // Displays the current state of the log, whether it is "dirty"
 // and controls around this
 class qso_log_info :

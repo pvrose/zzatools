@@ -14,6 +14,8 @@
 #include "callback.h"
 
 #include <FL/Fl_Toggle_Button.H>
+#include <FL/Fl_Output.H>
+#include <FL/Fl_Scroll.H>
 
 extern cty_data* cty_data_;
 extern book* book_;

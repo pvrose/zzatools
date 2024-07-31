@@ -8,7 +8,6 @@
 #include <vector>
 #include <map>
 #include <FL/Fl_Tabs.H>
-#include <FL/Fl_Widget.H>
 
 class book;
 enum hint_t : uchar;

@@ -6,9 +6,9 @@
 
 #include <string>
 
+#include <FL/Enumerations.H>
 #include <FL/Fl_Tree.H>
 #include <FL/Fl_Tree_Item.H>
-#include <FL/Fl_Widget.H>
 
 using namespace std;
 

@@ -4,10 +4,10 @@
 #include "extract_data.h"
 
 #include <FL/Fl_Group.H>
-#include <FL/Fl_Check_Button.H>
-#include <FL/Fl_Button.H>
-#include <FL/Fl_Output.H>
-#include <FL/Fl_Progress.H>
+
+class Fl_Button;
+class Fl_Check_Button;
+class Fl_Progress;
 
 // This controls the download and upload of QSLs to the various servers
 // and for printing off labels

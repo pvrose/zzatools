@@ -10,13 +10,13 @@
 #include <string>
 #include <vector>
 #include <FL/Fl_Table_Row.H>
-#include <FL/Fl_Window.H>
-#include <FL/Fl_Menu_Button.H>
+#include <FL/Enumerations.H>
 
 using namespace std;
 
 class book;
 class field_choice;
+class Fl_Window;
 
 
 	// This class implements a tabular view of a book. It inherits the tabular view from Fl_Table_Row
