@@ -30,6 +30,7 @@ using namespace std;
 			NO_QTH,      // Special search for empty QTH item
 			LOCATOR,     // Special seatch for non-6 or 8 character gridsquare
 			NO_EQSL_CARD,// Have eQSL but no card image
+			ALL,         // Upload to all sites
 			DUMMY        // end of enumeration
 		};
 
@@ -64,6 +65,8 @@ using namespace std;
 		bool upload_in_progress();
 		// Return extract mode
 		extract_mode_t use_mode();
+		// Set use mode
+		void use_mode(extract_mode_t mode);
 		// Check and add record
 		void check_add_record(qso_num_t record_num);
 

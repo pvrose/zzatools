@@ -734,6 +734,17 @@ void extract_data::upload() {
 			status_->misc_status(ST_OK, "EXTRACT: Clublog upload requested!");
 		}
 		break;
+	case ALL:
+		if (eqsl_handler_->upload_eqsl_log(this)) {
+			status_->misc_status(ST_OK, "EXTRACT: eQSL upload requested!");
+		}
+		if (lotw_handler_->upload_lotw_log(this)) {
+			status_->misc_status(ST_OK, "EXTRACT: LotW upload requested!");
+		}
+		if (club_handler_->upload_log(this)) {
+			status_->misc_status(ST_OK, "EXTRACT: Clublog upload requested!");
+		}
+		break;
 	default:
 		status_->misc_status(ST_ERROR, "EXTRACT: Unknown server!");
 		break;
@@ -955,6 +966,10 @@ bool extract_data::upload_in_progress() {
 
 extract_data::extract_mode_t extract_data::use_mode() {
 	return use_mode_;
+}
+
+void extract_data::use_mode(extract_data::extract_mode_t mode) {
+	use_mode_ = mode;
 }
 
 // Check  that the record metches our current criteria and process it if it does

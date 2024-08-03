@@ -1331,12 +1331,17 @@ void qso_data::action_add_net_qso() {
 void qso_data::action_save_net_all() {
 	// printf("DEBUG: action_save_net_all\n");
 	// Only save the book once all records have been saved
+	// Uplaod the QSOs after all have been saved
 	book_->enable_save(false, "Starting multi-QSO save");
 	book_->allow_upload(false);
 	bool ok = true;
+	extract_data* upload_qsos = new extract_data;
+	upload_qsos->use_mode(extract_data::ALL);
 	while (g_net_entry_->entries() && ok) {
 		switch (logging_state_) {
 		case NET_STARTED:
+			// SAving record number for later upload
+			upload_qsos->add_record(g_net_entry_->qso_number());
 			ok = action_save();
 			break;
 		case NET_EDIT:
@@ -1348,6 +1353,7 @@ void qso_data::action_save_net_all() {
 	if (ok) g_net_entry_->add_entry();
 	book_->enable_save(true, "Finished multi-QSO save");
 	book_->allow_upload(true);
+	if (upload_qsos->size()) upload_qsos->upload();
 	enable_widgets();
 }
 
