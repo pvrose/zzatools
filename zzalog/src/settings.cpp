@@ -37,7 +37,7 @@ settings::settings(int W, int H, const char* label, cfg_dialog_t active) :
 	Fl_Tabs* tabs = new Fl_Tabs(0, 0, W, H - HBUTTON - GAP);
 	tabs->callback(cb_tab);
 	tabs->box(FL_FLAT_BOX);
-	tabs->handle_overflow(Fl_Tabs::OVERFLOW_DRAG);
+	tabs->handle_overflow(Fl_Tabs::OVERFLOW_PULLDOWN);
 	border(true);
 	int rx = 0;
 	int ry = 0;

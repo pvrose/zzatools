@@ -15,7 +15,7 @@
 #include <FL/Fl_Box.H>
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Check_Button.H>
-#include <FL/Fl_Progress.H>
+#include <FL/Fl_Fill_Dial.H>
 
 extern Fl_Preferences* settings_;
 extern import_data* import_data_;
@@ -117,7 +117,7 @@ void qso_qsl::create_form() {
 	bn_cncl_eqsl_->callback(cb_cancel, (void*)extract_data::EQSL);
 	bn_cncl_eqsl_->tooltip("Cancel upload");
 	// Fetch cards
-	op_eqsl_count_ = new Fl_Progress(C7, curr_y, W7, HBUTTON);
+	op_eqsl_count_ = new Fl_Fill_Dial(C7 + W7 - HBUTTON, curr_y, HBUTTON, HBUTTON, nullptr);
 	char text[10];
 	snprintf(text, sizeof(text), "%d", os_eqsl_dnld_);
 	op_eqsl_count_->copy_label(text);
@@ -126,6 +126,8 @@ void qso_qsl::create_form() {
 	op_eqsl_count_->maximum(1.0);
 	op_eqsl_count_->value(0.0);
 	op_eqsl_count_->color(FL_WHITE, FL_YELLOW);
+	op_eqsl_count_->align(FL_ALIGN_INSIDE);
+	op_eqsl_count_->angles(180, 540);
 
 	curr_y += HBUTTON;
 

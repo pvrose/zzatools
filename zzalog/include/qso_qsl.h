@@ -7,7 +7,7 @@
 
 class Fl_Button;
 class Fl_Check_Button;
-class Fl_Progress;
+class Fl_Fill_Dial;
 
 // This controls the download and upload of QSLs to the various servers
 // and for printing off labels
@@ -90,7 +90,7 @@ protected:
     Fl_Button* bn_cncl_lotw_;
     Fl_Button* bn_cncl_club_;
     Fl_Button* bn_cncl_card_;
-    Fl_Progress* op_eqsl_count_;
+    Fl_Fill_Dial* op_eqsl_count_;
 
 };
 

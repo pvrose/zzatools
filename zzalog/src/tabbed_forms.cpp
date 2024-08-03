@@ -27,7 +27,7 @@ extern qso_manager* qso_manager_;
 tabbed_forms::tabbed_forms(int X, int Y, int W, int H, const char* label) :
 	Fl_Tabs(X, Y, W, H, label)
 {	
-	handle_overflow(OVERFLOW_DRAG);
+	handle_overflow(OVERFLOW_PULLDOWN);
 	forms_.clear();
 	// create the views -
 	// Full log view - displays selected items of all records

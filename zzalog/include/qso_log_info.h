@@ -1,16 +1,11 @@
 #pragma once
 
 #include <FL/Fl_Group.H>
-#include <FL/Fl_Progress.H>
-#include <FL/Fl_Check_Button.H>
-#include <FL/Fl_Output.H>
-#include <FL/Fl_Button.H>
-#include <FL/Fl_Light_Button.H>
 
 using namespace std;
 
 class Fl_Output;
-class Fl_Progress;
+class Fl_Fill_Dial;
 class Fl_Button;
 class Fl_Check_Button;
 
@@ -46,7 +41,7 @@ protected:
 	// Log status
 	Fl_Output* op_status_;
 	// Load/Save progress bar
-	Fl_Progress* pr_loadsave_;
+	Fl_Fill_Dial* pr_loadsave_;
 	// Saved after every QSO?
 	Fl_Check_Button* bn_save_enable_;
 	// Save it!

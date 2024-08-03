@@ -5,6 +5,12 @@
 #include "ticker.h"
 #include "utils.h"
 
+#include <FL/Fl_Fill_Dial.H>
+#include <FL/Fl_Check_Button.H>
+#include <FL/Fl_Output.H>
+#include <FL/Fl_Button.H>
+#include <FL/Fl_Light_Button.H>
+
 extern book* book_;
 extern import_data* import_data_;
 extern ticker* ticker_;
@@ -23,7 +29,7 @@ qso_log_info::qso_log_info(int X, int Y, int W, int H, const char* l) :
 	enable_widgets();
 
 	// Add 1s clock
-	ticker_->add_ticker(this, cb_ticker, 10);
+	ticker_->add_ticker(this, cb_ticker, 1);
 }
 
 // Destructor
@@ -39,27 +45,30 @@ void qso_log_info::load_values() {
 // Create form
 void qso_log_info::create_form(int X, int Y) {
 	int curr_x = X + GAP;
-	int curr_y = Y + 1;
+	int curr_y = Y;
+
+	// Display progress in loading or saving the log
+	pr_loadsave_ = new Fl_Fill_Dial(curr_x + 1, curr_y + 1, HBUTTON - 2, HBUTTON - 2, nullptr);
+	pr_loadsave_->color(FL_BACKGROUND_COLOR, FL_BLUE);
+	pr_loadsave_->tooltip("Displays loading or saving progress");
+	pr_loadsave_->minimum(0.0);
+	pr_loadsave_->maximum(1.0);
+	pr_loadsave_->angles(180, 540);
+
+	curr_x += HBUTTON;
 
 	// Display current status of the log
-	op_status_ = new Fl_Output(curr_x, curr_y, WSMEDIT, HBUTTON + 2);
+	op_status_ = new Fl_Output(curr_x, curr_y, WSMEDIT - HBUTTON, HBUTTON + 2);
 	op_status_->box(FL_FLAT_BOX);
 	op_status_->color(FL_BACKGROUND_COLOR);
 	op_status_->textsize(FL_NORMAL_SIZE + 2);
 	op_status_->textfont(FL_BOLD);
 
 	curr_y += op_status_->h();
-	int max_x = op_status_->x() + op_status_->w() + GAP;
+	
+	int max_x = pr_loadsave_->x() + pr_loadsave_->w() + GAP;
 
-	// Display progress in loading or saving the log
-	pr_loadsave_ = new Fl_Progress(curr_x, curr_y, WSMEDIT, HBUTTON);
-	pr_loadsave_->color(FL_BACKGROUND_COLOR, FL_BLUE);
-	pr_loadsave_->tooltip("Displays loading or saving progress");
-	pr_loadsave_->minimum(0.0);
-	pr_loadsave_->maximum(1.0);
-
-	curr_y += pr_loadsave_->h();
-	max_x = max(max_x, pr_loadsave_->x() + pr_loadsave_->w() + GAP);
+	curr_x = X + GAP;
 
 	// Check to enable saving after each QSO
 	bn_save_enable_ = new Fl_Check_Button(curr_x, curr_y, HBUTTON, HBUTTON, "Save after each QSO");
@@ -97,8 +106,8 @@ void qso_log_info::enable_widgets() {
 	}
 	else if (book_->storing()) {
 		op_status_->value("Storing");
-		pr_loadsave_->color(FL_GREEN, FL_RED);
-		pr_loadsave_->value(1.0F - (float)book_->get_complete());
+		pr_loadsave_->color(FL_RED, FL_GREEN);
+		pr_loadsave_->value((float)book_->get_complete());
 		bn_save_->deactivate();
 	}
 	else if (book_->loading()) {
@@ -126,6 +135,7 @@ void qso_log_info::enable_widgets() {
 			bn_save_enable_->value(false);
 		}
 	}
+	redraw();
 }
 
 // Save changes
