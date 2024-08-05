@@ -199,14 +199,11 @@ void field_input::field_name(const char* field_name, record* qso /*= nullptr*/) 
 	else enum_name= spec_data_->enumeration_name(field_name_, qso);
 	if (enum_name.length()) {
 		populate_choice(enum_name);
-		menubutton()->show();
 	}
 	else if (is_string(field_name_)) {
 		populate_case_choice();
-		menubutton()->show();
 	} else {
 		clear();
-		menubutton()->hide();
 	}
 }
 
