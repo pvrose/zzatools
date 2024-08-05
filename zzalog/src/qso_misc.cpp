@@ -16,7 +16,7 @@ qso_misc::qso_misc(int X, int Y, int W, int H, const char* L) :
 	Fl_Tabs(X, Y, W, H, L)
 {
 	box(FL_BORDER_BOX);
-	handle_overflow(OVERFLOW_PULLDOWN);
+	handle_overflow(OVERFLOW_DRAG);
 	load_values();
 	create_form();
 }
@@ -37,7 +37,6 @@ void qso_misc::load_values() {
 // Create form
 void qso_misc::create_form() {
 
-	align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 	labelfont(FL_BOLD);
 	labelsize(FL_NORMAL_SIZE + 2);
 	callback(cb_tabs);
@@ -54,12 +53,13 @@ void qso_misc::create_form() {
 	dxcc_ = new qso_dxcc(rx, ry, rw, rh, "DX?");
 	// Edit my QTH form
 	qth_ = new qso_qth(rx, ry, rw, rh, "My QTH");
-	// Contest form
-	contest_ = new qso_contest(rx, ry, rw, rh, "Contest");
 	// QSL details form
 	qsl_ = new qso_qsl_vwr(rx, ry, rw, rh, "QSL");
+	// Contest form
+	contest_ = new qso_contest(rx, ry, rw, rh, "Contest");
 
 	end();
+	show();
 
 	value(child(default_tab_));
 }

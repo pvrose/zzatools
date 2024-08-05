@@ -196,6 +196,11 @@ const int WDISPLAY = 3 * WBUTTON;
 void qso_rig::create_status(int& curr_x, int& curr_y) {
 	int save_x = curr_x;
 
+	bn_tx_rx_ = new Fl_Button(curr_x, curr_y, HBUTTON, HBUTTON);
+	bn_tx_rx_->box(FL_OVAL_BOX);
+
+	curr_x += HBUTTON;
+
 	// "Label" - rig status
 	op_status_ = new Fl_Output(curr_x, curr_y, WDISPLAY - HBUTTON, HBUTTON);
 	op_status_->color(FL_BACKGROUND_COLOR);
@@ -203,11 +208,6 @@ void qso_rig::create_status(int& curr_x, int& curr_y) {
 	op_status_->textsize(FL_NORMAL_SIZE + 2);
 	op_status_->box(FL_FLAT_BOX);
 
-	curr_x += op_status_->w();
-	bn_tx_rx_ = new Fl_Button(curr_x + 1, curr_y + 1, HBUTTON - 2, HBUTTON - 2);
-	bn_tx_rx_->box(FL_OFLAT_BOX);
-
-	
 	curr_x = save_x;
 	curr_y += op_status_->h();
 
@@ -341,7 +341,7 @@ void qso_rig::create_connex(int& curr_x, int& curr_y) {
 void qso_rig::create_serial(int& curr_x, int& curr_y) {
 	serial_grp_ = new Fl_Group(curr_x, curr_y, 10, 10);
 	serial_grp_->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
-	serial_grp_->box(FL_FLAT_BOX);
+	serial_grp_->box(FL_NO_BOX);
 
 	curr_x = serial_grp_->x() + WBUTTON;
 	curr_y = serial_grp_->y();
@@ -399,7 +399,7 @@ void qso_rig::create_serial(int& curr_x, int& curr_y) {
 void qso_rig::create_network(int& curr_x, int& curr_y) {
 	network_grp_ = new Fl_Group(curr_x, curr_y, 10, 10);
 	network_grp_->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
-	network_grp_->box(FL_FLAT_BOX);
+	network_grp_->box(FL_NO_BOX);
 
 	curr_x = network_grp_->x();
 	curr_y = network_grp_->y();
@@ -637,15 +637,15 @@ void qso_rig::enable_widgets(bool tick) {
 	if (!rig_) {
 		// No rig - decativate freq/mode
 		op_status_->value("No rig specified");
-		bn_tx_rx_->label("N/A");
-		bn_tx_rx_->color(FL_BACKGROUND_COLOR);
+		bn_tx_rx_->label("");
+		bn_tx_rx_->color(FL_BLACK);
 		op_freq_mode_->deactivate();
 		op_freq_mode_->label("");
 	} else if (rig_->is_opening()) {
 		// Rig is connecting - deactivate freq/mode
 		op_status_->value("Opening rig");
-		bn_tx_rx_->label("N/A");
-		bn_tx_rx_->color(FL_BACKGROUND_COLOR);
+		bn_tx_rx_->label("");
+		bn_tx_rx_->color(FL_YELLOW);
 		op_freq_mode_->deactivate();
 		op_freq_mode_->label("");
 	} else if (rig_->is_open()) {
@@ -698,15 +698,15 @@ void qso_rig::enable_widgets(bool tick) {
 	} else if (rig_->has_no_cat()) {
 		// No rig available - deactivate freq/mode
 		op_status_->value("No CAT Available");
-		bn_tx_rx_->label("N/A");
-		bn_tx_rx_->color(FL_BACKGROUND_COLOR);
+		bn_tx_rx_->label("");
+		bn_tx_rx_->color(COLOUR_GREY);
 		op_freq_mode_->deactivate();
 		op_freq_mode_->label("");
 	} else {
 		// Rig is not connected - deactivate freq/mode
 		op_status_->value("Disconnected");
-		bn_tx_rx_->label("N/A");
-		bn_tx_rx_->color(FL_BACKGROUND_COLOR);
+		bn_tx_rx_->label("");
+		bn_tx_rx_->color(FL_BLACK);
 		op_freq_mode_->deactivate();
 		op_freq_mode_->label("");
 	}

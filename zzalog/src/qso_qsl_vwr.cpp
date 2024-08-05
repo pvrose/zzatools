@@ -235,6 +235,9 @@ void qso_qsl_vwr::create_form() {
 	end();
 	show();
 
+	Fl_Group* sv = Fl_Group::current();
+	Fl_Group::current(nullptr);
+
 	// Now create the full view window - this has three alternate widgets
 	win_full_view_ = new Fl_Window(WCARD, HCARD);
 	// Display the received image at full size
@@ -251,6 +254,8 @@ void qso_qsl_vwr::create_form() {
 	win_full_view_->resizable(bn_full_view_);
 	win_full_view_->end();
 	win_full_view_->hide();
+
+	Fl_Group::current(sv);
 }
 
 // Call-backs

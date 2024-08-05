@@ -49,10 +49,13 @@ eqsl_handler::eqsl_handler()
 	// Create help window
 	const int WHELP = 400;
 	const int HHELP = 200;
+	Fl_Group* sv = Fl_Group::current();
+	Fl_Group::current(nullptr);
 	help_window_ = new Fl_Window(WHELP, HHELP, "eQSL Response");
 	help_viewer_ = new Fl_Help_View(0, 0, WHELP, HHELP);
 	help_window_->end();
 	help_window_->hide();
+	Fl_Group::current(sv);
 
 	set_adif_fields();
 

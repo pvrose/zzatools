@@ -1442,6 +1442,8 @@ void book::edit_header() {
 	// now read it into the text buffer
 	Fl_Text_Buffer* buffer = new Fl_Text_Buffer;
 	// Window to display the text editor and Save and Cancel buttons
+	Fl_Group* sv = Fl_Group::current();
+	Fl_Group::current(nullptr);
 	Fl_Window* win = new Fl_Window(640, 480);
 	win->label("Header comment");
 
@@ -1481,8 +1483,8 @@ void book::edit_header() {
 	win->callback(cb_cancel_edith, (void*)this);
 	win->end();
 	win->show();
-	// Add the display to the main window to delete it if the main window is deleted first.
-	//add_sub_window(win);
+
+	Fl_Group::current(sv);
 }
 
 // Call back to restore default header
