@@ -346,7 +346,7 @@ void field_input::type(uchar t) {
 
 // Draw the widget
 void field_input::draw() {
-	if (input()->type() == FL_NORMAL_OUTPUT) {
+	if (input()->type() & FL_INPUT_READONLY) {
 		menubutton()->deactivate();
 	} else if (use_menubutton_) {
 		menubutton()->activate();
