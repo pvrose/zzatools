@@ -105,18 +105,19 @@ protected:
 	//Populate baud rate choice
 	void populate_baud_choice();
 	// Create the various parts of the form
-	void create_status(int& x, int& y);
-	void create_buttons(int& x, int& y);
-	void create_rig_ant(int& x, int& y);
-	void create_config(int& x, int& y);
-	void create_connex(int& x, int& y);
-	void create_serial(int& x, int& y);
-	void create_network(int& x, int& y);
-	void create_modifier(int& x, int& y);
+	void create_status(int x, int y);
+	void create_buttons(int x, int y);
+	void create_rig_ant(int x, int y);
+	void create_config(int x, int y);
+	void create_connex(int x, int y);
+	void create_serial(int x, int y);
+	void create_network(int x, int y);
+	void create_modifier(int x, int y);
 
 	// Update rig with modifiers
 	void modify_rig();
 
+	Fl_Group* status_grp_;
 	// Rig status
 	Fl_Output* op_status_;
 	// Rig TX/RX
@@ -125,11 +126,13 @@ protected:
 	Fl_Box* op_freq_mode_;
 
 	// Control buttons
+	Fl_Group* buttons_grp_;
 	Fl_Button* bn_connect_;
 	Fl_Light_Button* bn_select_;
 	Fl_Button* bn_start_;
 
 	// Rig and antenna selection
+	Fl_Group* rig_ant_grp_;
 	Fl_Choice* ch_rig_model_;
 	field_input* ip_antenna_;
 

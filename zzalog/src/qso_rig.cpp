@@ -193,8 +193,11 @@ void qso_rig::find_hamlib_data() {
 // Keep the display 3 buttons wide
 const int WDISPLAY = 3 * WBUTTON;
 // Create the status part of the display
-void qso_rig::create_status(int& curr_x, int& curr_y) {
+void qso_rig::create_status(int curr_x, int curr_y) {
 	int save_x = curr_x;
+
+	status_grp_ = new Fl_Group(curr_x, curr_y, WDISPLAY, HBUTTON + HTEXT * 3);
+	status_grp_->box(FL_NO_BOX);
 
 	bn_tx_rx_ = new Fl_Button(curr_x, curr_y, HBUTTON, HBUTTON);
 	bn_tx_rx_->box(FL_OVAL_BOX);
@@ -221,12 +224,14 @@ void qso_rig::create_status(int& curr_x, int& curr_y) {
 	op_freq_mode_->labelfont(FL_BOLD);
 	op_freq_mode_->labelsize(FL_NORMAL_SIZE + 10);
 
-	curr_y += op_freq_mode_->h();
-	curr_x += op_freq_mode_->w();
+	status_grp_->end();
+
 }
 
 // Create the control buttons
-void qso_rig::create_buttons(int& curr_x, int& curr_y) {
+void qso_rig::create_buttons(int curr_x, int curr_y) {
+	buttons_grp_ = new Fl_Group(curr_x, curr_y, WBUTTON * 3, HBUTTON);
+	buttons_grp_->box(FL_NO_BOX);
 	// First button - connect/disconnect or add
 	bn_connect_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Connect");
 	bn_connect_->tooltip("Select to attempt to connect/disconnect rig");
@@ -245,12 +250,15 @@ void qso_rig::create_buttons(int& curr_x, int& curr_y) {
 	bn_start_->tooltip("Start rig app for this connection");
 	bn_start_->callback(cb_bn_start, nullptr);
 
-	curr_x += bn_start_->w();
-	curr_y += bn_start_->h();
+	buttons_grp_->end();
+
 }
 
 // Create rig and antenna choosers
-void qso_rig::create_rig_ant(int& curr_x, int& curr_y) {
+void qso_rig::create_rig_ant(int curr_x, int curr_y) {
+	rig_ant_grp_ = new Fl_Group(curr_x, curr_y, WBUTTON * 3, HTEXT + HBUTTON);
+	rig_ant_grp_->box(FL_NO_BOX);
+
 	curr_x += WBUTTON;
 	// Choice - Select the rig model (Manufacturer/Model)
 	ch_rig_model_ = new Fl_Choice(curr_x, curr_y, WSMEDIT, HTEXT, "Rig");
@@ -271,13 +279,13 @@ void qso_rig::create_rig_ant(int& curr_x, int& curr_y) {
 	ip_antenna_->field_name("MY_ANTENNA");
 	ip_antenna_->value(antenna_.c_str());
 
-	curr_x += WSMEDIT;
-	curr_y += HBUTTON;
+	rig_ant_grp_->end();
+
 
 }
 
 // Create tabbed form for configuration data
-void qso_rig::create_config(int& curr_x, int& curr_y) {
+void qso_rig::create_config(int curr_x, int curr_y) {
 	// Tabbed form
 	config_tabs_ = new Fl_Tabs(curr_x, curr_y, 10, 10);
 	config_tabs_->box(FL_BORDER_BOX);
@@ -294,14 +302,12 @@ void qso_rig::create_config(int& curr_x, int& curr_y) {
 	curr_y = ry;
 	// Create connection tab
 	create_connex(curr_x, curr_y);
-	rw = max(rw, curr_x - rx);
-	rh = max(rh, curr_y - ry);
-	curr_x = rx;
-	curr_y = ry;
+	rw = max(rw, connect_tab_->x() + connect_tab_->w() - rx);
+	rh = max(rh, connect_tab_->y() + connect_tab_->h() - ry);
 	// Create mofifier tab
 	create_modifier(curr_x, curr_y);
-	rw = max(rw, curr_x - rx);
-	rh = max(rh, curr_y - ry);
+	rw = max(rw, modifier_tab_->x() + modifier_tab_->w() - rx);
+	rh = max(rh, modifier_tab_->y() + modifier_tab_->h() - ry);
 	config_tabs_->resizable(nullptr);
 	config_tabs_->size(config_tabs_->w() + rw - saved_rw, config_tabs_->h() + rh - saved_rh);
 	config_tabs_->end();
@@ -312,23 +318,21 @@ void qso_rig::create_config(int& curr_x, int& curr_y) {
 
 // Create form to configure the hamlib port connection
 // Create two versions: 1 for serial ports and one for networked ports
-void qso_rig::create_connex(int& curr_x, int& curr_y) {
+void qso_rig::create_connex(int curr_x, int curr_y) {
 	connect_tab_ = new Fl_Group(curr_x, curr_y, 10, 10, "Connection");
 	connect_tab_->labelsize(FL_NORMAL_SIZE + 2);
-	connect_tab_->box(FL_FLAT_BOX);
+	curr_x += GAP;
 	curr_y += GAP;
 	int max_x = curr_x;
 	int max_y = curr_y;
 	// Create serial port
 	create_serial(curr_x, curr_y);
-	max_x = max(max_x, curr_x);
-	max_y = max(max_y, curr_y);
-	curr_x = connect_tab_->x();
-	curr_y = connect_tab_->y() + GAP;
+	max_x = max(max_x, serial_grp_->x() + serial_grp_->w());
+	max_y = max(max_y, serial_grp_->y() + serial_grp_->h());
 	// Create network port
 	create_network(curr_x, curr_y);
-	max_x = max(max_x, curr_x);
-	max_y = max(max_y, curr_y);
+	max_x = max(max_x, network_grp_->x() + network_grp_->w());
+	max_y = max(max_y, network_grp_->y() + network_grp_->h());
 
 	connect_tab_->resizable(nullptr);
 	connect_tab_->size(max_x - connect_tab_->x(), max_y - connect_tab_->y());
@@ -338,12 +342,12 @@ void qso_rig::create_connex(int& curr_x, int& curr_y) {
 }
 
 // Create form for defining a serial port connection
-void qso_rig::create_serial(int& curr_x, int& curr_y) {
+void qso_rig::create_serial(int curr_x, int curr_y) {
 	serial_grp_ = new Fl_Group(curr_x, curr_y, 10, 10);
 	serial_grp_->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 	serial_grp_->box(FL_NO_BOX);
 
-	curr_x = serial_grp_->x() + WBUTTON;
+	curr_x = serial_grp_->x() + WLABEL;
 	curr_y = serial_grp_->y();
 	// Choice to select from available ports
 	ch_port_name_ = new Fl_Choice(curr_x, curr_y, WBUTTON, HTEXT, "Port");
@@ -396,7 +400,7 @@ void qso_rig::create_serial(int& curr_x, int& curr_y) {
 }
 
 // Create for to configure a network connection
-void qso_rig::create_network(int& curr_x, int& curr_y) {
+void qso_rig::create_network(int curr_x, int curr_y) {
 	network_grp_ = new Fl_Group(curr_x, curr_y, 10, 10);
 	network_grp_->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 	network_grp_->box(FL_NO_BOX);
@@ -412,7 +416,7 @@ void qso_rig::create_network(int& curr_x, int& curr_y) {
 	curr_x += WBUTTON;
 
 	// App name (flrig or wfview to connect to rig
-	ip_app_name_ = new Fl_Input(curr_x, curr_y, WSMEDIT, HTEXT);
+	ip_app_name_ = new Fl_Input(curr_x, curr_y, w() - curr_x - (2 * GAP), HTEXT);
 	ip_app_name_->callback(cb_value<Fl_Input, string>, &cat_app_);
 	ip_app_name_->tooltip("Please provide the command to use to connect");
 	ip_app_name_->value("");
@@ -420,7 +424,7 @@ void qso_rig::create_network(int& curr_x, int& curr_y) {
 	curr_y += HTEXT;
 
 	// Input to type in network address and port number
-	ip_port_ = new Fl_Input(curr_x, curr_y, WSMEDIT, HTEXT, "Port");
+	ip_port_ = new Fl_Input(curr_x, curr_y, ip_app_name_->w(), HTEXT, "Port");
 	ip_port_->align(FL_ALIGN_LEFT);
 	ip_port_->callback(cb_ip_port, nullptr);
 	ip_port_->tooltip("Enter the network/USB port to use");
@@ -428,7 +432,7 @@ void qso_rig::create_network(int& curr_x, int& curr_y) {
 
 	curr_y += HTEXT + GAP;
 
-	curr_x += WSMEDIT;
+	curr_x += ip_app_name_->w();
 	network_grp_->resizable(nullptr);
 	network_grp_->size(curr_x - network_grp_->x(), curr_y - network_grp_->y());
 
@@ -437,9 +441,8 @@ void qso_rig::create_network(int& curr_x, int& curr_y) {
 }
 
 // Create the form to configure any rig add-ons (transverter or amplifier)
-void qso_rig::create_modifier(int& curr_x, int& curr_y) {
+void qso_rig::create_modifier(int curr_x, int curr_y) {
 	modifier_tab_ = new Fl_Group(curr_x, curr_y, 10, 10, "Transverter/Amp");
-	modifier_tab_->box(FL_FLAT_BOX);
 	modifier_tab_->labelsize(FL_NORMAL_SIZE + 2);
 
 	curr_x = modifier_tab_->x() + WBUTTON;
@@ -513,38 +516,29 @@ void qso_rig::create_form(int X, int Y) {
 
 	begin();
 
-	int max_x = 0;
-	int max_y = 0;
+	size(WBUTTON * 3 + GAP * 2, h());
 
 	int curr_x = X + GAP;
 	int curr_y = Y + 1;
 
 	// Create the frqeuency and mode display
 	create_status(curr_x, curr_y);
-	max_x = max(max_x, curr_x);
-	max_y = max(max_y, curr_y);
+
+	curr_y = status_grp_->y() + status_grp_->h();
 	
-	curr_x = X + GAP;
 	// Create the control buttons
 	create_buttons(curr_x, curr_y);
-	max_x = max(max_x, curr_x);
-	max_y = max(max_y, curr_y);
 
-	curr_x = X + GAP;
-	curr_y += GAP;
+	curr_y = buttons_grp_->y() + buttons_grp_->h() + GAP;
 
 	// Create the rig and antenna choices
 	create_rig_ant(curr_x, curr_y);
-	max_x = max(max_x, curr_x);
-	max_y = max(max_y, curr_y);
-
-	curr_x = X + GAP;
-	curr_y += GAP;
+	curr_y = rig_ant_grp_->y() + rig_ant_grp_->h() + GAP;
 
 	// Create the configuration controls
 	create_config(curr_x, curr_y);
-	max_x = max(max_x, curr_x);
-	max_y = max(max_y, curr_y);
+
+	curr_y = config_tabs_->y() + config_tabs_->h();
 
 	// Connected status
 
@@ -552,11 +546,8 @@ void qso_rig::create_form(int X, int Y) {
 	// modify_rig();
 	// enable_widgets();
 
-	max_x += GAP;
-	max_y += GAP;
-
 	resizable(nullptr);
-	size(max_x - x(), max_y - y());
+	size(w(), curr_y + GAP - y());
 	end();
 }
 
