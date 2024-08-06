@@ -78,6 +78,8 @@ report_tree::report_tree(int X, int Y, int W, int H, const char* label, field_ap
 	min_w_ = w() / 3; // One third the width
 	min_h_ = (item_labelsize() + linespacing()) * 7; // 7 lines 
 
+	end();
+
 }
 
 // Delete all contents

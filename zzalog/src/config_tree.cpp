@@ -13,10 +13,13 @@ extern Fl_Preferences* settings_;
 config_tree::config_tree(int X, int Y, int W, int H, const char* label) :
 	Fl_Tree(X, Y, W, H, label)
 {
+	begin();
 	// Set the tree parameters
 	sortorder(FL_TREE_SORT_ASCENDING);
 	// Create the tree
 	create_tree();
+
+	end();
 }
 
 // Destructor

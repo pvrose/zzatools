@@ -34,6 +34,7 @@ record_table::record_table(int X, int Y, int W, int H, const char* label) :
 	row_header_color(FL_BACKGROUND2_COLOR);
 	row_header_width(150);
 	selection_color(FL_YELLOW);
+	end();
 
 }
 

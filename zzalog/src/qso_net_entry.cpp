@@ -119,7 +119,6 @@ qso_num_t qso_net_entry::qso_number() {
 
 // Add QSO - add a tab
 void qso_net_entry::add_entry() {
-	begin();
 	int rx = 0;
 	int ry = 0;
 	int rw = 0;
@@ -131,7 +130,6 @@ void qso_net_entry::add_entry() {
 	wx->labelsize(FL_NORMAL_SIZE + 2);
 	entries_->add(wx);
 	entries_->end();
-	end();
 	entry(wx);
 	
 }

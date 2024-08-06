@@ -23,7 +23,8 @@ extern Fl_Preferences* settings_;
 map<string, qsl_display::card_data> qsl_display::all_data_;
 
 // Constructor - just initialises the data
-qsl_display::qsl_display(int X, int Y, int W, int H, const char* L) : Fl_Widget(X, Y, W, H, L) {
+qsl_display::qsl_display(int X, int Y, int W, int H, const char* L) : 
+	Fl_Widget(X, Y, W, H, L) {
     color(FL_WHITE);
 	box(FL_FLAT_BOX);
     qsos_ = nullptr;

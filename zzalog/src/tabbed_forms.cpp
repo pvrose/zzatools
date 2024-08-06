@@ -47,6 +47,8 @@ tabbed_forms::tabbed_forms(int X, int Y, int W, int H, const char* label) :
 	// Set the selected label colour the same as the view being selected
 	// selection_color(value()->color());
 	enable_widgets();
+
+	end();
 }
 
 // Desctructor

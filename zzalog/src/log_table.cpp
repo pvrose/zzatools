@@ -22,8 +22,6 @@
 #include <FL/Fl_Preferences.H>
 #include <FL/Enumerations.H>
 #include <FL/fl_ask.H>
-#include <FL/Fl_Tooltip.H>
-#include <FL/Fl_Single_Window.H>
 
 extern Fl_Preferences* settings_;
 extern spec_data* spec_data_;

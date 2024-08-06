@@ -238,6 +238,7 @@ menu::menu(int X, int Y, int W, int H, const char* label) :
 	// default text size - just larger than default font size
 	textsize(FL_NORMAL_SIZE + 1);
 	criteria_ = nullptr;
+	
 	show();
 }
 

@@ -29,7 +29,8 @@ intl_dialog::intl_dialog() :
 	if (load_data()) {
 		// create the dialog
 		create_form();
-	}
+	} 
+	end();
 }
 
 // Create the form
