@@ -72,6 +72,8 @@ struct spec_dataset;
 		void reload_choice(record* qso = nullptr);
 		// Allow the Fl_Input component to be either INPUT or OUTPUT
 		virtual void type(uchar t);
+		// Overload draw - deactivates menubeutton accordingly
+		virtual void draw();
 
 	protected:
 
@@ -85,6 +87,8 @@ struct spec_dataset;
 		string field_name_;
 		// Get reason for leaving -1 - LEFT TAB, +1 - RIGHT TAB, 0 any other
 		exit_reason_t reason_;
+		// activate the menubutton
+		bool use_menubutton_;
 	};
 #endif
 

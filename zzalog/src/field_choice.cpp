@@ -102,6 +102,7 @@ void field_choice::hierarchic(bool h) {
 field_input::field_input(int X, int Y, int W, int H, const char* label) :
 	Fl_Input_Choice(X, Y, W, H, label)
 	, field_name_("")
+	, use_menubutton_(false)
 
 {
 	type(FL_NORMAL_INPUT);
@@ -198,13 +199,20 @@ void field_input::field_name(const char* field_name, record* qso /*= nullptr*/) 
 	if (field_name_ == "MODE") enum_name = "Combined";
 	else enum_name= spec_data_->enumeration_name(field_name_, qso);
 	if (enum_name.length()) {
+		// Use enumeration values
 		populate_choice(enum_name);
+		use_menubutton_ = true;
 	}
 	else if (is_string(field_name_)) {
+		// Use supply case variants of the value
 		populate_case_choice();
+		use_menubutton_ = true;
 	} else {
+		// No choice - mask menu button
 		clear();
+		use_menubutton_ = false;
 	}
+	redraw();
 }
 
 // Return the field name 
@@ -333,18 +341,17 @@ field_input::exit_reason_t field_input::reason() {
 
 // Type - allows the input_choice to be used as an Fl_Output
 void field_input::type(uchar t) {
-	switch(t) {
-	case FL_NORMAL_INPUT:
-		// input widget is an input
-		input()->type(FL_NORMAL_INPUT);
-		// Enable the drop-down menu
-		menubutton()->activate();
-		break;
-	case FL_NORMAL_OUTPUT:
-	// input widget is an output
-		input()->type(FL_NORMAL_OUTPUT);
-		// disable the drop-doen menu
+	input()->type(t);
+}
+
+// Draw the widget
+void field_input::draw() {
+	if (input()->type() == FL_NORMAL_OUTPUT) {
 		menubutton()->deactivate();
-		break;
+	} else if (use_menubutton_) {
+		menubutton()->activate();
+	} else {
+		menubutton()->deactivate();
 	}
+	Fl_Input_Choice::draw();
 }

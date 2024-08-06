@@ -262,6 +262,9 @@ void qso_entry::enable_widgets() {
 		break;
 	}
 	set_initial_focus();
+	for (int ix = 0; ix < NUMBER_TOTAL; ix++) {
+		ip_field_[ix]->redraw();
+	}
 }
 
 // Copy record to the fields - flags indicate specific subsets
