@@ -95,8 +95,6 @@ void qso_qsl_vwr::create_form() {
 	// Create image size in ratio 540x340 to fit supplied width
 	const int WIMAGE = w();
 	const int HIMAGE = w() * HCARD / WCARD;
-	const int WBN = WIMAGE / 4;
-	const int WBN5 = WIMAGE / 5;
 
 
 	// Box - for the display of a card image or if no card exists the callsign in large text
@@ -107,72 +105,83 @@ void qso_qsl_vwr::create_form() {
 
 	curr_y += bn_card_display_->h();
 
-	curr_x = x();
+	curr_x = x() + GAP;
 
 	// Row header
-	Fl_Box* label1 = new Fl_Box(curr_x, curr_y, WBN, HBUTTON, "Rcvd");
+	Fl_Box* label1 = new Fl_Box(curr_x, curr_y, WSMEDIT, HTEXT, "QSL received...");
 	label1->box(FL_FLAT_BOX);
+	label1->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
 	label1->color(FL_BACKGROUND_COLOR);
 
-	curr_x += WBN;
+	curr_y += HTEXT;
+	curr_x = x() + GAP;
 	// Light to indicate received eQSL
-	bn_eqsl_status_ = new Fl_Light_Button(curr_x, curr_y, WBN, HBUTTON, "eQSL");
+	bn_eqsl_status_ = new Fl_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "eQSL");
 	bn_eqsl_status_->box(FL_FLAT_BOX);
 	bn_eqsl_status_->type(bn_eqsl_status_->type() & ~FL_TOGGLE_BUTTON);
 
-	curr_x += WBN;
+	curr_x += WBUTTON;
 	// Light to indicate received LotW
-	bn_lotw_status_ = new Fl_Light_Button(curr_x, curr_y, WBN, HBUTTON, "LotW");
+	bn_lotw_status_ = new Fl_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "LotW");
 	bn_lotw_status_->box(FL_FLAT_BOX);
 	bn_lotw_status_->type(bn_lotw_status_->type() & ~FL_TOGGLE_BUTTON);
 
-	curr_x += WBN;
+	curr_x += WBUTTON;
 	// Light to indicate received a paper card
-	bn_card_status_ = new Fl_Light_Button(curr_x, curr_y, WBN, HBUTTON, "Card");
+	bn_card_status_ = new Fl_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Card");
 	bn_card_status_->box(FL_FLAT_BOX);
 	bn_card_status_->type(bn_card_status_->type() & ~FL_TOGGLE_BUTTON);
 
 	curr_y += HBUTTON;
-	curr_x = x();
+	curr_x = x() + GAP;
 
+	// Row header
+	Fl_Box* label3 = new Fl_Box(curr_x, curr_y, WSMEDIT, HTEXT, "Display card...");
+	label3->box(FL_FLAT_BOX);
+	label3->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
+	label3->color(FL_BACKGROUND_COLOR);
+
+	curr_y += HTEXT;
+	curr_x = x() + GAP;
 	// Group the following radio buttons
-	grp_card_type_ = new Fl_Group(curr_x, curr_y, WBN * 4, HBUTTON);
+	grp_card_type_ = new Fl_Group(curr_x, curr_y, w() - GAP * 2, HBUTTON * 2);
 	grp_card_type_->box(FL_FLAT_BOX);
 
 	// Radio - Display eQSL.cc card image
-	radio_eqsl_ = new Fl_Radio_Light_Button(curr_x, curr_y, WBN5, HBUTTON, "eQSL");
+	radio_eqsl_ = new Fl_Radio_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "eQSL");
 	radio_eqsl_->align(FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
 	radio_eqsl_->selection_color(FL_FOREGROUND_COLOR);
 	radio_eqsl_->callback(cb_rad_card, (void*)QI_EQSL);
 	radio_eqsl_->when(FL_WHEN_RELEASE_ALWAYS);
 	radio_eqsl_->tooltip("Select image downloaded from eQSL");
-	curr_x += WBN5;
+	curr_x += WBUTTON;
 	// Radio - display scanned image of front of paper card
-	radio_card_front_ = new Fl_Radio_Light_Button(curr_x, curr_y, WBN5, HBUTTON, "Front");
+	radio_card_front_ = new Fl_Radio_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Front");
 	radio_card_front_->align(FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
 	radio_card_front_->selection_color(FL_FOREGROUND_COLOR);
 	radio_card_front_->callback(cb_rad_card, (void*)QI_CARD_FRONT);
 	radio_card_front_->when(FL_WHEN_RELEASE_ALWAYS);
 	radio_card_front_->tooltip("Select image scanned of paper card front");
-	curr_x += WBN5;
+	curr_x += WBUTTON;
 	// Radio - display scanned image of reverse of paper card
-	radio_card_back_ = new Fl_Radio_Light_Button(curr_x, curr_y, WBN5, HBUTTON, "Back");
+	radio_card_back_ = new Fl_Radio_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Back");
 	radio_card_back_->align(FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
 	radio_card_back_->selection_color(FL_FOREGROUND_COLOR);
 	radio_card_back_->callback(cb_rad_card, (void*)QI_CARD_BACK);
 	radio_card_back_->when(FL_WHEN_RELEASE_ALWAYS);
 	radio_card_back_->tooltip("Select image scanned of paper card back");
-	curr_x += WBN5;
+	curr_x = x() + GAP;
+	curr_y += HBUTTON;
 	// Radio - display received e-mail image
-	radio_email_ = new Fl_Radio_Light_Button(curr_x, curr_y, WBN5, HBUTTON, "eMail");
+	radio_email_ = new Fl_Radio_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "eMail");
 	radio_email_->align(FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
 	radio_email_->selection_color(FL_FOREGROUND_COLOR);
 	radio_email_->callback(cb_rad_card, (void*)QI_EMAIL);
 	radio_email_->when(FL_WHEN_RELEASE_ALWAYS);
 	radio_email_->tooltip("Select image received by e-mail");
-	curr_x += WBN5;
+	curr_x += WBUTTON;
 	// Radio - display my QSL
-	radio_myqsl_ = new Fl_Radio_Light_Button(curr_x, curr_y, WBN5, HBUTTON, "MyQSL");
+	radio_myqsl_ = new Fl_Radio_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "MyQSL");
 	radio_myqsl_->align(FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
 	radio_myqsl_->selection_color(FL_FOREGROUND_COLOR);
 	radio_myqsl_->callback(cb_rad_card, (void*)QI_MY_QSL);
@@ -181,56 +190,58 @@ void qso_qsl_vwr::create_form() {
 
 	grp_card_type_->end();
 
-	curr_x += WBN;
+	curr_x += WBUTTON;
 
 	curr_y += HBUTTON;
-	curr_x = x();
+	curr_x = x() + GAP;
 
 	// Row header
-	Fl_Box* label2 = new Fl_Box(curr_x, curr_y, WBN, HBUTTON, "Log");
+	Fl_Box* label2 = new Fl_Box(curr_x, curr_y, WSMEDIT, HTEXT, "Log received");
 	label2->box(FL_FLAT_BOX);
+	label2->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
 	label2->color(FL_BACKGROUND_COLOR);
 
-	curr_x += WBN;
+	curr_x = x() + GAP;
+	curr_y += HTEXT;
 	// Button - Mark paper card received
-	bn_log_bureau_ = new Fl_Button(curr_x, curr_y, WBN, HBUTTON, "Bureau");
+	bn_log_bureau_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Bureau");
 	bn_log_bureau_->tooltip("Log a paper card received from the bureau on today's date");
 	bn_log_bureau_->callback(cb_bn_log_card, (void*)"B");
 	bn_log_bureau_->when(FL_WHEN_RELEASE);
-	curr_x += WBN;
+	curr_x += WBUTTON;
 	// Button - Mark e-mail received
-	bn_log_email_ = new Fl_Button(curr_x, curr_y, WBN, HBUTTON, "e-mail");
+	bn_log_email_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "e-mail");
 	bn_log_email_->tooltip("Log an e-mail card received on today's date");
 	bn_log_email_->callback(cb_bn_log_card, (void*)"E");
 	bn_log_email_->when(FL_WHEN_RELEASE);
-	curr_x += WBN;
+	curr_x += WBUTTON;
 	// Button - Mark e-mail received
-	bn_log_direct_ = new Fl_Button(curr_x, curr_y, WBN, HBUTTON, "Direct");
+	bn_log_direct_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Direct");
 	bn_log_direct_->tooltip("Log a paper card received direct on today's date");
 	bn_log_direct_->callback(cb_bn_log_card, (void*)"D");
 	bn_log_direct_->when(FL_WHEN_RELEASE);
 
-	curr_x = x();
-	curr_y += HBUTTON;
+	curr_x = x() + GAP;
+	curr_y += HBUTTON + GAP;;
 	// Button - Fetch the card image from eQSL.cc
-	bn_fetch_ = new Fl_Button(curr_x, curr_y, WBN, HBUTTON, "Fetch");
+	bn_fetch_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Fetch");
 	bn_fetch_->tooltip("Request a fresh download of the eQSL image");
 	bn_fetch_->callback(cb_bn_fetch, nullptr);
 	bn_fetch_->when(FL_WHEN_RELEASE);
-	curr_x += WBN;
+	curr_x += WBUTTON;
 	// Button - Set QSL_SENT=R in current QSO
-	bn_card_reqd_ = new Fl_Button(curr_x, curr_y, WBN, HBUTTON, "Requested");
+	bn_card_reqd_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Requested");
 	bn_card_reqd_->tooltip("Mark QSO as wanting a card QSL");
 	bn_card_reqd_->callback(cb_bn_card_reqd, (void*)"R");
 	bn_card_reqd_->when(FL_WHEN_RELEASE);
-	curr_x += WBN;
+	curr_x += WBUTTON;
 	// Button - QSO partner declines a card - set QSL_SENT=N
-	bn_card_decl_ = new Fl_Button(curr_x, curr_y, WBN, HBUTTON, "Declined");
+	bn_card_decl_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Declined");
 	bn_card_decl_->tooltip("Mark QSO as declining a card QSL");
 	bn_card_decl_->callback(cb_bn_card_reqd, (void*)"N");
 	bn_card_decl_->when(FL_WHEN_RELEASE);
 	
-	curr_x += WBN;
+	curr_x += WBUTTON;
 
 	end();
 	show();
@@ -287,6 +298,7 @@ void qso_qsl_vwr::cb_bn_fetch(Fl_Widget* w, void* v) {
 	while (eqsl_handler_->requests_queued()) Fl::check();
 	that->set_selected_image(QI_EQSL);
 	that->set_image();
+	that->enable_widgets();
 }
 
 // Set the QSL_RCVD and QSLRDATE values in current record
