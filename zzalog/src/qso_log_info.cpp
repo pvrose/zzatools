@@ -50,6 +50,7 @@ void qso_log_info::create_form(int X, int Y) {
 	// Display progress in loading or saving the log
 	pr_loadsave_ = new Fl_Fill_Dial(curr_x + 1, curr_y + 1, HBUTTON - 2, HBUTTON - 2, nullptr);
 	pr_loadsave_->color(FL_BACKGROUND_COLOR, FL_BLUE);
+	pr_loadsave_->box(FL_OFLAT_BOX);
 	pr_loadsave_->tooltip("Displays loading or saving progress");
 	pr_loadsave_->minimum(0.0);
 	pr_loadsave_->maximum(1.0);
