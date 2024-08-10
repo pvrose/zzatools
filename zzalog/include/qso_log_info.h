@@ -41,7 +41,7 @@ protected:
 	// Log status
 	Fl_Output* op_status_;
 	// Load/Save progress bar
-	Fl_Fill_Dial* pr_loadsave_;
+	Fl_Button* pr_loadsave_;
 	// Saved after every QSO?
 	Fl_Check_Button* bn_save_enable_;
 	// Save it!

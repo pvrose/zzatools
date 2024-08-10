@@ -48,13 +48,10 @@ void qso_log_info::create_form(int X, int Y) {
 	int curr_y = Y;
 
 	// Display progress in loading or saving the log
-	pr_loadsave_ = new Fl_Fill_Dial(curr_x + 1, curr_y + 1, HBUTTON - 2, HBUTTON - 2, nullptr);
+	pr_loadsave_ = new Fl_Button(curr_x, curr_y, HBUTTON, HBUTTON, nullptr);
 	pr_loadsave_->color(FL_BACKGROUND_COLOR, FL_BLUE);
-	pr_loadsave_->box(FL_OFLAT_BOX);
+	pr_loadsave_->box(FL_OVAL_BOX);
 	pr_loadsave_->tooltip("Displays loading or saving progress");
-	pr_loadsave_->minimum(0.0);
-	pr_loadsave_->maximum(1.0);
-	pr_loadsave_->angles(180, 540);
 
 	curr_x += HBUTTON;
 
@@ -101,31 +98,28 @@ void qso_log_info::enable_widgets() {
 	// Depending on state of book, output status, load/save progress, enable save button
 	if (book_->empty()) {
 		op_status_->value("No Data");
-		pr_loadsave_->color(FL_BACKGROUND_COLOR, FL_BACKGROUND_COLOR);
-		pr_loadsave_->value(0.0);
+		pr_loadsave_->color(FL_BACKGROUND_COLOR);
 		bn_save_->deactivate();
 	}
 	else if (book_->storing()) {
 		op_status_->value("Storing");
-		pr_loadsave_->color(FL_RED, FL_GREEN);
-		pr_loadsave_->value((float)book_->get_complete());
+		pr_loadsave_->color(fl_color_average(FL_GREEN, FL_RED, (float)book_->get_complete()));
 		bn_save_->deactivate();
 	}
 	else if (book_->loading()) {
 		op_status_->value("Loading");
-		pr_loadsave_->color(FL_BACKGROUND_COLOR, FL_GREEN);
-		pr_loadsave_->value((float)book_->get_complete());
+		pr_loadsave_->color(fl_color_average(FL_GREEN, FL_BACKGROUND_COLOR, (float)book_->get_complete()));
 		bn_save_->deactivate();
 	} else {
 		if (book_->modified()) {
 			op_status_->value("Modified");
-			pr_loadsave_->color(FL_RED, FL_RED);
+			pr_loadsave_->color(FL_RED);
 			pr_loadsave_->value(0.0);
 			bn_save_->activate();
 		}
 		else {
 			op_status_->value("Unmodified");
-			pr_loadsave_->color(FL_GREEN, FL_GREEN);
+			pr_loadsave_->color(FL_GREEN);
 			pr_loadsave_->value(0.0);
 			bn_save_->deactivate();
 		}
