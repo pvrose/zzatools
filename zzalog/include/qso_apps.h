@@ -7,7 +7,9 @@
 
 using namespace std;
 class Fl_Input;
+class Fl_Secret_Input;
 class Fl_Light_Button;
+class Fl_Check_Button;
 class Fl_Button;
 class Fl_Tabs;
 
@@ -18,6 +20,7 @@ struct app_data_t {
     bool is_common;     // Same command used for all rigs
     map<string, string> commands;   
                         // The commands for each rig
+    bool admin;         // The command needs to be run in administrator mode
     bool (*has_server)();   // Function to call to see if serever is active
     bool (*has_data)();     // Function to call to see if server has request
 };
@@ -50,6 +53,12 @@ class app_grp :
         static void cb_ip_app(Fl_Widget* w, void* v);
         // Callback for changing params
         static void cb_bn_app(Fl_Widget* w, void* v);
+        // Call back for needing admin
+        static void cb_bn_admin(Fl_Widget* w, void* v);
+       // Callback for hiding/showing password
+        static void cb_bn_show_pw(Fl_Widget* w, void* v);
+        // Callback to delete the application
+        static void cb_bn_delete(Fl_Widget* w, void* v);
         
     protected:
 
@@ -60,6 +69,10 @@ class app_grp :
         Fl_Light_Button* bn_server_;
         Fl_Light_Button* bn_common_;
         Fl_Button* bn_rig_;
+        Fl_Check_Button* bn_admin_;
+        Fl_Secret_Input* ip_passw_;
+        Fl_Button* bn_show_pw_;
+        Fl_Button* bn_delete_;
 
         app_data_t* app_data_;
 };
@@ -83,6 +96,8 @@ public:
     void enable_widgets();
     // Add the server links
     void add_servers(app_data_t* data);
+    // Delete the application
+    void delete_app(app_grp* w);
 
     // Callback
     void static cb_bn_new(Fl_Widget* w, void* v);

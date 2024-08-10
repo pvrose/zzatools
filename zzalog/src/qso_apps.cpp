@@ -10,6 +10,7 @@
 
 #include <FL/Fl_Preferences.H>
 #include <FL/Fl_Tabs.H>
+#include <FL/Fl_Secret_Input.H>
 
 using namespace std;
 
@@ -54,7 +55,14 @@ void app_grp::create_form() {
     // Button to act as a log server
     bn_server_ = new Fl_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Server");
     bn_server_->callback(cb_bn_app, &(app_data_->server));
-    bn_server_->tooltip("Select if ZZALOG acts as a log server for this app");
+    bn_server_->tooltip("Select if ZZALOG acts as a log server for this application");
+
+    curr_x += WBUTTON;
+
+    // Button t o delete application
+    bn_delete_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Delete");
+    bn_delete_->callback(cb_bn_delete);
+    bn_delete_->tooltip("Remove the application");
 
     curr_x = x() + GAP;
     curr_y += HBUTTON;
@@ -74,7 +82,32 @@ void app_grp::create_form() {
     ip_app_name_->when(FL_WHEN_CHANGED);
 
     curr_y += HBUTTON;
+    curr_x = x() + GAP + WBUTTON - HBUTTON;
 
+    // Button to run application as administrator
+    bn_admin_ = new Fl_Check_Button(curr_x, curr_y, HBUTTON, HBUTTON, "Admin");
+    bn_admin_->align(FL_ALIGN_LEFT);
+    bn_admin_->callback(cb_bn_admin);
+    bn_admin_->tooltip("Run the application as adminstrator");
+
+    curr_x += HBUTTON;
+
+    // Password input
+    ip_passw_ = new Fl_Secret_Input(curr_x, curr_y, WBUTTON * 2 - HBUTTON, HBUTTON);
+    ip_passw_->tooltip("Enter the administrator's password");
+    ip_passw_->value("");
+
+    curr_x += ip_passw_->w();
+
+    // Show/Hide password
+    bn_show_pw_ = new Fl_Button(curr_x, curr_y, HBUTTON, HBUTTON, "@search");
+    bn_show_pw_->callback(cb_bn_show_pw);
+    bn_show_pw_->tooltip("Show/hide password");
+    bn_show_pw_->type(FL_TOGGLE_BUTTON);
+    bn_show_pw_->value(false);
+    
+    curr_x = x() + GAP + WBUTTON;
+    curr_y += HBUTTON;
     // Light to say that we are listening for the modem app to connect
     // Button will switch this on or off
     bn_listening_ = new Fl_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Listen");
@@ -134,6 +167,21 @@ void app_grp::enable_widgets() {
         bn_listening_->deactivate();
         bn_connect_->activate();
     }
+    if (app_data_->admin) {
+        bn_admin_->value(true);
+        ip_passw_->activate();
+        bn_show_pw_->activate();
+        if (bn_show_pw_->value()) {
+            ip_passw_->input_type(FL_NORMAL_INPUT);
+        } else {
+            ip_passw_->input_type(FL_SECRET_INPUT);
+        }
+    } else {
+        bn_admin_->value(false);
+        ip_passw_->value("");
+        ip_passw_->deactivate();
+        bn_show_pw_->deactivate();
+    }
 }
 
 // Set the dataa for this app
@@ -187,7 +235,14 @@ void app_grp::cb_bn_connect(Fl_Widget* w, void* v) {
         char msg[128];
         snprintf(msg, sizeof(msg), "DASH: Starting app: %s", app.c_str());
         status_->misc_status(ST_NOTE, msg);
-        system(app.c_str());
+        if (that->app_data_->admin) {
+            char sudo[128];
+            snprintf(sudo, sizeof(sudo), "echo %s | sudo -S -k %s", 
+                that->ip_passw_->value(), app.c_str());
+            system(sudo);
+        } else {
+            system(app.c_str());
+        }
     }
     that->enable_widgets();
   
@@ -211,6 +266,26 @@ void app_grp::cb_bn_app(Fl_Widget* w, void* v) {
     cb_value<Fl_Light_Button, bool>(w, v);
     ((qso_apps*)that->parent())->add_servers(that->app_data_);
     that->enable_widgets();
+}
+
+// Call back for needing admin
+void app_grp::cb_bn_admin(Fl_Widget* w, void* v) {
+    app_grp* that = ancestor_view<app_grp>(w);
+    cb_value<Fl_Check_Button, bool>(w, &that->app_data_->admin);
+    that->enable_widgets();
+}
+
+// Callback for hiding/showing password
+void app_grp::cb_bn_show_pw(Fl_Widget* w, void* v) {
+    app_grp* that = ancestor_view<app_grp>(w);
+    that->enable_widgets();
+}
+
+// Callback to delete the application
+void app_grp::cb_bn_delete(Fl_Widget* w, void* v) {
+    app_grp* that = ancestor_view<app_grp>(w);
+    qso_apps* apps = ancestor_view<qso_apps>(that);
+    apps->delete_app(that);
 }
 
 // Constructor for the tab form
@@ -243,6 +318,8 @@ void qso_apps::load_values() {
         data->server = tempi;
         data->has_server = nullptr;
         data->has_data = nullptr;
+        app_settings.get("Admininistrator", tempi, (int)false);
+        data->admin = tempi;
         if (data->server) add_servers(data);
         Fl_Preferences rigs_settings(app_settings, "Rigs");
         for (int iy = 0; iy < rigs_settings.entries(); iy++) {
@@ -344,6 +421,7 @@ void qso_apps::save_values() {
         Fl_Preferences app_settings(apps_settings, (*it).first.c_str());
         app_settings.set("Common", (*it).second->is_common);
         app_settings.set("Server", (*it).second->server);
+        app_settings.set("Administrator", (*it).second->admin);
         Fl_Preferences rigs_settings(app_settings, "Rigs");
         for (auto iu = (*it).second->commands.begin(); 
             iu != (*it).second->commands.end(); iu++) {
@@ -418,4 +496,13 @@ void qso_apps::add_servers(app_data_t* data) {
         status_->misc_status(ST_WARNING, msg);
     }
 
+}
+
+
+// Delete the application
+void qso_apps::delete_app(app_grp* w) {
+    apps_data_.erase(string(w->label()));
+    int ch = tabs_->find(w);
+    tabs_->delete_child(ch);
+    enable_widgets();
 }
