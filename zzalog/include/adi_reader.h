@@ -2,7 +2,6 @@
 #define __ADI_READER__
 
 #include "files.h"
-// #include "book.h"
 
 #include <istream>
 #include <string>

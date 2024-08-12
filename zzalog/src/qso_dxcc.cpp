@@ -164,7 +164,7 @@ void qso_dxcc::enable_widgets() {
 					strcpy(ls, "(GRID)");
 					break;
 			}
-			snprintf(text, sizeof(text), "CQ Zone %d. %.0f\302\260%c %.0f\302\260%c %s",
+			snprintf(text, sizeof(text), "CQ Zone %d. Loc: %.0f\302\260%c %.0f\302\260%c %s",
 				cq_zone_, abs(location_.latitude), location_.latitude > 0 ? 'N' : 'S',
 				abs(location_.longitude), location_.longitude > 0 ? 'E' : 'W',
 				ls);

@@ -1,7 +1,6 @@
 #ifndef __BOOK__
 #define __BOOK__
 
-// #include "record.h"
 #include "spec_data.h"
 #include "drawing.h"
 #include "search.h"
