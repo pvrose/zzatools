@@ -92,7 +92,13 @@ void qso_dxcc::create_form() {
 	op_geo_ = new Fl_Output(curr_x, curr_y, avail_width, ROW_HEIGHT);
 	op_geo_->box(FL_FLAT_BOX);
 	op_geo_->color(FL_BACKGROUND_COLOR);
-	curr_y += ROW_HEIGHT + HTEXT + HTEXT / 2;
+	curr_y += ROW_HEIGHT;
+
+	// Display geographic information
+	op_dist_bear_ = new Fl_Output(curr_x, curr_y, avail_width, ROW_HEIGHT);
+	op_dist_bear_->box(FL_FLAT_BOX);
+	op_dist_bear_->color(FL_BACKGROUND_COLOR);
+	curr_y += ROW_HEIGHT + HTEXT;
 
 	avail_height -= (curr_y - y());
 
@@ -143,16 +149,44 @@ void qso_dxcc::enable_widgets() {
 		if (location_.is_nan()) {
 			snprintf(text, sizeof(text), "CQ Zone %d.", cq_zone_);
 		} else {
-			snprintf(text, sizeof(text), "CQ Zone %d. %.0f\302\260%c %.0f\302\260%c",
+			char ls[10];
+			switch(loc_source_) {
+				case LOC_PREFIX:
+					strcpy(ls, "(PFX)");
+					break;
+				case LOC_NONE:
+					strcpy(ls, "(N/A)");
+					break;
+				case LOC_LATLONG:
+					strcpy(ls, "(QSO)");
+					break;
+				default:
+					strcpy(ls, "(GRID)");
+					break;
+			}
+			snprintf(text, sizeof(text), "CQ Zone %d. %.0f\302\260%c %.0f\302\260%c %s",
 				cq_zone_, abs(location_.latitude), location_.latitude > 0 ? 'N' : 'S',
-				abs(location_.longitude), location_.longitude > 0 ? 'E' : 'W');
+				abs(location_.longitude), location_.longitude > 0 ? 'E' : 'W',
+				ls);
 		}
 		op_geo_->value(text);
+		if (location_.is_nan() || my_location_.is_nan()) {
+			snprintf(text, sizeof(text), "Distance N/A");
+		} else {
+			double bearing;
+			double distance;
+			// Calculate bearing and distance
+			great_circle(my_location_, location_, bearing, distance);
+			snprintf(text, sizeof(text), "Distance %0.fkm, Bearing %0.f\302\260",
+				distance, bearing);
+		}
+		op_dist_bear_->value(text);
 	} else {
 		op_call_->value("No contact");
-		op_prefix_->value("");
-		op_source_->value("");
-		op_geo_->value("");
+		op_prefix_->value("Prefix N/A");
+		op_source_->value("Decode N/A");
+		op_geo_->value("Location N/A");
+		op_dist_bear_->value("Distance N/A");
 	}
 	if (book_ == navigation_book_) {
 		show_extract_ = false;
@@ -174,8 +208,9 @@ void qso_dxcc::set_data(record* qso) {
 		name_ = cty_data_->name(qso_);
 		source_ = cty_data_->get_source(qso_);
 		cq_zone_ = cty_data_->cq_zone(qso_);
-		location_ = cty_data_->location(qso_);
+		location_ = qso_->location(false, loc_source_);
 		dxcc_ = cty_data_->entity(qso_);
+		my_location_ = qso_->location(true);
 	}
 
 }

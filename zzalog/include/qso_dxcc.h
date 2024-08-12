@@ -19,6 +19,8 @@ class Fl_Output;
 class Fl_Button;
 class Fl_Light_Button;
 
+enum location_t : uchar;
+
 
 // This class displays the "worked before" status for the DX - band and mode
 class qso_dxcc :
@@ -85,6 +87,7 @@ protected:
     Fl_Output* op_source_;
     Fl_Output* op_prefix_;
     Fl_Output* op_geo_;
+    Fl_Output* op_dist_bear_;
     // 
     // Buttons showing worked before
     wb4_buttons* g_wb4_;
@@ -105,6 +108,9 @@ protected:
     int dxcc_;
     // The latitude and longitude of the DXCC centre
     lat_long_t location_;
+    location_t loc_source_;
+    // The latitude and longitude of the user station
+    lat_long_t my_location_;
     // How has the callsign been parsed to get the DXCC - decoded or exception
     cty_data::parse_source_t source_;
     // Current record

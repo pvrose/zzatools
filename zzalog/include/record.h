@@ -32,8 +32,9 @@ using namespace std;
 	};
 
 	// Location source
-	enum location_t {
+	enum location_t : uchar {
 		LOC_NONE,        // not derived
+		LOC_PREFIX,      // Obtained from prefix data
 		LOC_LATLONG,     // LAT/LON pair
 		LOC_GRID2,       // 2-letter gridsquare
 		LOC_GRID4,       // 4-character gridsquare
