@@ -86,8 +86,6 @@ protected:
 	Fl_Image* raw_image_;
 	// Image scaled to fit button
 	Fl_Image* scaled_image_;
-	// Desaturated image for deactivated dispaly
-	Fl_Image* desat_image_;
 	// Current QSO
 	record* current_qso_;
 	// Current QSO number

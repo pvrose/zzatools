@@ -231,13 +231,13 @@ void app_grp::cb_bn_connect(Fl_Widget* w, void* v) {
             that->app_data_->name.c_str(), rig_name);
         status_->misc_status(ST_ERROR, msg);
     } else {
-        string app = "bash -i -c " + that->app_data_->commands.at(rig_name);
+        string app = that->app_data_->commands.at(rig_name);
         char msg[128];
         snprintf(msg, sizeof(msg), "DASH: Starting app: %s", app.c_str());
         status_->misc_status(ST_NOTE, msg);
         if (that->app_data_->admin) {
             char sudo[128];
-            snprintf(sudo, sizeof(sudo), "echo %s | sudo -S -k %s", 
+            snprintf(sudo, sizeof(sudo), "MY_PW=%s; export MY_PW; %s", 
                 that->ip_passw_->value(), app.c_str());
             system(sudo);
         } else {
@@ -318,7 +318,7 @@ void qso_apps::load_values() {
         data->server = tempi;
         data->has_server = nullptr;
         data->has_data = nullptr;
-        app_settings.get("Admininistrator", tempi, (int)false);
+        app_settings.get("Administrator", tempi, (int)false);
         data->admin = tempi;
         if (data->server) add_servers(data);
         Fl_Preferences rigs_settings(app_settings, "Rigs");

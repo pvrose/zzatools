@@ -1111,7 +1111,7 @@ void qso_rig::cb_ip_power(Fl_Widget* w, void* v) {
 // v points to the string containing the command to  invoke flrig
 void qso_rig::cb_bn_start(Fl_Widget* w, void * v) {
 	qso_rig* that = ancestor_view<qso_rig>(w);
-	string command = "bash -i -c " + that->cat_app_ + "&";
+	string command = that->cat_app_ + "&";
 	int result = system(command.c_str());
 	char msg[100];
 	if (result == 0) {
