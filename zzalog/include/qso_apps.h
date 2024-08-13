@@ -21,6 +21,7 @@ struct app_data_t {
     map<string, string> commands;   
                         // The commands for each rig
     bool admin;         // The command needs to be run in administrator mode
+    bool can_disable;       // The app can be disconnected (Rig = NONE)
     bool (*has_server)();   // Function to call to see if serever is active
     bool (*has_data)();     // Function to call to see if server has request
 };
@@ -59,6 +60,12 @@ class app_grp :
         static void cb_bn_show_pw(Fl_Widget* w, void* v);
         // Callback to delete the application
         static void cb_bn_delete(Fl_Widget* w, void* v);
+        // Callback to set can_disable
+        static void cb_bn_disable(Fl_Widget* w, void* v);
+        // Callback to save disable app name
+        static void cb_ip_disable(Fl_Widget* w, void* v);
+        // Callback on enetring password
+        static void cb_ip_passw(Fl_Widget* w, void* v);
         
     protected:
 
@@ -73,6 +80,8 @@ class app_grp :
         Fl_Secret_Input* ip_passw_;
         Fl_Button* bn_show_pw_;
         Fl_Button* bn_delete_;
+        Fl_Check_Button* bn_disable_;
+        Fl_Input* ip_disable_app_;
 
         app_data_t* app_data_;
 };

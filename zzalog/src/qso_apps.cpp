@@ -84,6 +84,23 @@ void app_grp::create_form() {
     curr_y += HBUTTON;
     curr_x = x() + GAP + WBUTTON - HBUTTON;
 
+    // Allow the application to be disconnected
+    bn_disable_ = new Fl_Check_Button(curr_x, curr_y, HBUTTON, HBUTTON, "Undo?");
+    bn_disable_->align(FL_ALIGN_LEFT);
+    bn_disable_->callback(cb_bn_disable);
+    bn_disable_->tooltip("Select if able to disconnect from application");
+
+    curr_x += HBUTTON;
+
+    // The script needed to disconnect
+    ip_disable_app_ = new Fl_Input(curr_x, curr_y, WBUTTON * 2, HBUTTON);
+    ip_disable_app_->callback(cb_ip_disable);
+    ip_disable_app_->tooltip("Enter the command to disconnect the application");
+    ip_disable_app_->when(FL_WHEN_CHANGED);
+
+    curr_y += HBUTTON;
+    curr_x = x() + GAP + WBUTTON - HBUTTON;
+
     // Button to run application as administrator
     bn_admin_ = new Fl_Check_Button(curr_x, curr_y, HBUTTON, HBUTTON, "Admin");
     bn_admin_->align(FL_ALIGN_LEFT);
@@ -96,6 +113,8 @@ void app_grp::create_form() {
     ip_passw_ = new Fl_Secret_Input(curr_x, curr_y, WBUTTON * 2 - HBUTTON, HBUTTON);
     ip_passw_->tooltip("Enter the administrator's password");
     ip_passw_->value("");
+    ip_passw_->callback(cb_ip_passw);
+    ip_passw_->when(FL_WHEN_CHANGED);
 
     curr_x += ip_passw_->w();
 
@@ -152,11 +171,15 @@ void app_grp::enable_widgets() {
         if (app_data_->has_server && (*(app_data_->has_server))()) {
             bn_listening_->value(true);
             bn_listening_->activate();
-            bn_connect_->activate();
-            if (app_data_->has_data && (*(app_data_->has_data))()) {
-                bn_connect_->value(true);
+            if (!app_data_->admin || strlen(ip_passw_->value()) > 0) {
+                bn_connect_->activate();
+                if (app_data_->has_data && (*(app_data_->has_data))()) {
+                    bn_connect_->value(true);
+                } else {
+                    bn_connect_->value(false);
+                }
             } else {
-                bn_connect_->value(false);
+                bn_connect_->deactivate();
             }
         } else {
             bn_listening_->value(false);
@@ -165,7 +188,11 @@ void app_grp::enable_widgets() {
         }
     } else {
         bn_listening_->deactivate();
-        bn_connect_->activate();
+        if (app_data_->admin && strlen(ip_passw_->value()) > 0) {
+            bn_connect_->activate();
+        } else {
+            bn_connect_->deactivate();
+        }
     }
     if (app_data_->admin) {
         bn_admin_->value(true);
@@ -181,6 +208,15 @@ void app_grp::enable_widgets() {
         ip_passw_->value("");
         ip_passw_->deactivate();
         bn_show_pw_->deactivate();
+    }
+    if (app_data_->can_disable) {
+        bn_disable_->value(true);
+        ip_disable_app_->value(app_data_->commands["NONE"].c_str());
+        ip_disable_app_->activate();
+    } else {
+        bn_disable_->value(false);
+        ip_disable_app_->value("");
+        ip_disable_app_->deactivate();
     }
 }
 
@@ -223,7 +259,8 @@ void app_grp::cb_bn_connect(Fl_Widget* w, void* v) {
     app_grp* that = ancestor_view<app_grp>(w);
     qso_manager* mgr = ancestor_view<qso_manager>(that);
     const char* rig_name;
-    if (that->app_data_->is_common) rig_name = "COMMON";
+    if (that->app_data_->can_disable && !((Fl_Light_Button*)w)->value()) rig_name = "NONE";
+    else if (that->app_data_->is_common) rig_name = "COMMON";
     else rig_name = mgr->rig_control()->label();
     if (that->app_data_->commands.find(rig_name) == that->app_data_->commands.end()) {
         char msg[128];
@@ -288,6 +325,27 @@ void app_grp::cb_bn_delete(Fl_Widget* w, void* v) {
     apps->delete_app(that);
 }
 
+// Callback to set can_disable
+void app_grp::cb_bn_disable(Fl_Widget* w, void* v) {
+    app_grp* that = ancestor_view<app_grp>(w);
+    cb_value<Fl_Check_Button, bool>(w, &that->app_data_->can_disable);
+    that->enable_widgets();
+}
+
+// Callback to read disable command
+void app_grp::cb_ip_disable(Fl_Widget* w, void* v) {
+    app_grp* that = ancestor_view<app_grp>(w);
+    string value;
+    cb_value<Fl_Input, string>(w, &value);
+    that->app_data_->commands["NONE"] = value; 
+}
+
+// Callback on typing pasword
+void app_grp::cb_ip_passw(Fl_Widget* w, void* v) {
+    app_grp* that = ancestor_view<app_grp>(w);
+    that->enable_widgets();
+}
+
 // Constructor for the tab form
 qso_apps::qso_apps(int X, int Y, int W, int H, const char* L) :
     Fl_Group(X, Y, W, H, L)
@@ -320,6 +378,8 @@ void qso_apps::load_values() {
         data->has_data = nullptr;
         app_settings.get("Administrator", tempi, (int)false);
         data->admin = tempi;
+        app_settings.get("Can Disconnect", tempi, (int)false);
+        data->can_disable = tempi;
         if (data->server) add_servers(data);
         Fl_Preferences rigs_settings(app_settings, "Rigs");
         for (int iy = 0; iy < rigs_settings.entries(); iy++) {
@@ -328,7 +388,7 @@ void qso_apps::load_values() {
             rigs_settings.get(rig, temp, app);
             data->commands[string(rig)] = temp;
         }
-        if (data->is_common && data->commands.size() > 1) {
+        if (data->is_common && !data->can_disable && data->commands.size() > 1) {
             char msg[128];
             snprintf(msg, sizeof(msg), "APPS: Data error for app %s", app);
             status_->misc_status(ST_WARNING, msg);
@@ -370,6 +430,9 @@ void qso_apps::create_tabs(string name) {
 
     tabs_->resizable(nullptr);
     tabs_->size(tabs_->w() + rw - saved_rw, tabs_->h() + rh - saved_rh);
+
+    resizable(nullptr);
+    size(w(), tabs_->y() + tabs_->h() - y() + GAP);
 
     Fl_Group::current(save);
 }
@@ -422,6 +485,7 @@ void qso_apps::save_values() {
         app_settings.set("Common", (*it).second->is_common);
         app_settings.set("Server", (*it).second->server);
         app_settings.set("Administrator", (*it).second->admin);
+        app_settings.set("Can Disconnect", (*it).second->can_disable);
         Fl_Preferences rigs_settings(app_settings, "Rigs");
         for (auto iu = (*it).second->commands.begin(); 
             iu != (*it).second->commands.end(); iu++) {
