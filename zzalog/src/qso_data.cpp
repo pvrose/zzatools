@@ -173,6 +173,7 @@ void qso_data::enable_widgets() {
 			g_query_->hide();
 			g_qy_entry_->hide();
 			g_misc_->activate();
+			g_misc_->qso(nullptr, -1);
 			g_misc_->enable_widgets();
 			break;
 		case QSO_PENDING:
@@ -184,6 +185,7 @@ void qso_data::enable_widgets() {
 			g_query_->hide();
 			g_qy_entry_->hide();
 			g_misc_->activate();
+			g_misc_->qso(current_qso(), current_number());
 			g_misc_->enable_widgets();
 			break;
 		case TEST_PENDING:
@@ -196,6 +198,7 @@ void qso_data::enable_widgets() {
 			g_query_->hide();
 			g_qy_entry_->hide();
 			g_misc_->activate();
+			g_misc_->qso(current_qso(), current_number());
 			g_misc_->enable_widgets();
 			break;
 		case QSO_STARTED:
@@ -208,6 +211,7 @@ void qso_data::enable_widgets() {
 			g_query_->hide();
 			g_qy_entry_->hide();
 			g_misc_->activate();
+			g_misc_->qso(current_qso(), current_number());
 			g_misc_->enable_widgets();
 			break;
 		case TEST_ACTIVE:
@@ -221,6 +225,7 @@ void qso_data::enable_widgets() {
 			g_query_->hide();
 			g_qy_entry_->hide();
 			g_misc_->activate();
+			g_misc_->qso(current_qso(), current_number());
 			g_misc_->enable_widgets();
 			break;
 		case QSO_ENTER:
@@ -233,6 +238,7 @@ void qso_data::enable_widgets() {
 			g_query_->hide();
 			g_qy_entry_->hide();
 			g_misc_->activate();
+			g_misc_->qso(current_qso(), current_number());
 			g_misc_->enable_widgets();
 			break;
 		case QSO_EDIT:
@@ -245,6 +251,7 @@ void qso_data::enable_widgets() {
 			g_query_->hide();
 			g_qy_entry_->hide();
 			g_misc_->activate();
+			g_misc_->qso(current_qso(), current_number());
 			g_misc_->enable_widgets();
 			break;
 		case QSO_VIEW:
@@ -257,6 +264,7 @@ void qso_data::enable_widgets() {
 			g_query_->hide();
 			g_qy_entry_->hide();
 			g_misc_->activate();
+			g_misc_->qso(current_qso(), current_number());
 			g_misc_->enable_widgets();
 			break;
 		case QSO_BROWSE:
@@ -269,6 +277,7 @@ void qso_data::enable_widgets() {
 			g_net_entry_->hide();
 			g_qy_entry_->hide();
 			g_misc_->activate();
+			g_misc_->qso(current_qso(), current_number());
 			g_misc_->enable_widgets();
 			break;
 		case QUERY_DUPE:
@@ -283,6 +292,7 @@ void qso_data::enable_widgets() {
 			g_net_entry_->hide();
 			g_qy_entry_->hide();
 			g_misc_->activate();
+			g_misc_->qso(current_qso(), current_number());
 			g_misc_->enable_widgets();
 			break;
 		case QUERY_NEW:
@@ -295,6 +305,7 @@ void qso_data::enable_widgets() {
 			g_net_entry_->hide();
 			g_qy_entry_->hide();
 			g_misc_->activate();
+			g_misc_->qso(current_qso(), current_number());
 			g_misc_->enable_widgets();
 			break;
 		case QUERY_WSJTX:
@@ -307,6 +318,7 @@ void qso_data::enable_widgets() {
 			g_net_entry_->hide();
 			g_qy_entry_->hide();
 			g_misc_->activate();
+			g_misc_->qso(current_qso(), current_number());
 			g_misc_->enable_widgets();
 			break;
 		case NET_STARTED:
@@ -318,6 +330,7 @@ void qso_data::enable_widgets() {
 			g_net_entry_->enable_widgets();
 			g_qy_entry_->hide();
 			g_misc_->activate();
+			g_misc_->qso(current_qso(), current_number());
 			g_misc_->enable_widgets();
 			break;
 		case NET_EDIT:
@@ -329,6 +342,7 @@ void qso_data::enable_widgets() {
 			g_net_entry_->enable_widgets();
 			g_qy_entry_->hide();
 			g_misc_->activate();
+			g_misc_->qso(current_qso(), current_number());
 			g_misc_->enable_widgets();
 			break;
 		case QSO_WSJTX:
@@ -341,6 +355,7 @@ void qso_data::enable_widgets() {
 			g_query_->hide();
 			g_qy_entry_->hide();
 			g_misc_->activate();
+			g_misc_->qso(current_qso(), current_number());
 			g_misc_->enable_widgets();
 			break;
 		case QSO_FLDIGI:
@@ -353,6 +368,7 @@ void qso_data::enable_widgets() {
 			g_query_->hide();
 			g_qy_entry_->hide();
 			g_misc_->activate();
+			g_misc_->qso(current_qso(), current_number());
 			g_misc_->enable_widgets();
 			break;
 		case MANUAL_ENTRY:
@@ -363,6 +379,7 @@ void qso_data::enable_widgets() {
 			g_qy_entry_->label("Enter QSO details for search");
 			g_qy_entry_->enable_widgets();
 			g_misc_->activate();
+			g_misc_->qso(current_qso(), current_number());
 			g_misc_->enable_widgets();
 			break;
 		}

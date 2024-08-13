@@ -316,7 +316,7 @@ void qso_dxcc::wb4_buttons::enable_widgets() {
 		all_bands_ = book_->used_bands();
 		all_submodes_ = book_->used_submodes();
 	}
-	if (qso) {
+	if (qso && qso->item("CALL").length()) {
 		// Get the details for this QSO
 		qso_band = qso->item("BAND");
 		qso_submode = qso->item("SUBMODE");
