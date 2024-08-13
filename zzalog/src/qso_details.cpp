@@ -105,6 +105,12 @@ void qso_details::get_qsos() {
 	}
 	table_details_->set_data(names, qths, locators);
 	table_qsos_->set_data(items);
+	// Mark with either a tick or cross depending on whether there are any previous
+	if (items.size() == 0) {
+		label("Previous \342\234\230");
+	} else {
+		label("Previous \342\234\224");
+	}
 }
 
 // Set the callsign
