@@ -145,8 +145,6 @@ bool closing_ = false;
 bool initialised_ = false;
 // Time loaded
 time_t session_start_ = (time_t)0;
-// Close caused by an SEVERE or FATAL error
-bool close_by_error_ = false;
 // Previous frequency
 double prev_freq_ = 0.0;
 // Sessions is a resumption

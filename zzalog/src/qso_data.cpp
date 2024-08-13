@@ -831,6 +831,7 @@ bool qso_data::action_save() {
 			// Time as HHMMSS - always log seconds.
 			qso->item("TIME_OFF", timestamp.substr(8));
 		}
+		qso->item("QSO_COMPLETE", string(""));
 		break;
 	case QSO_COPY_CALL:
 	case QSO_COPY_CONDX:
@@ -844,11 +845,14 @@ bool qso_data::action_save() {
 			// Time as HHMMSS - always log seconds.
 			qso->item("TIME_OFF", timestamp.substr(8));
 		}
+		qso->item("QSO_COMPLETE", string(""));
 		// Put the record in its correct position and save that position
 		item_number = book_->correct_record_position(item_number);
 		qso_number = book_->record_number(item_number);
 		break;
 	case QSO_NONE:
+		qso->item("QSO_COMPLETE", string(""));
+		// Deliberately drop through
 	case QSO_COPY_WSJTX:
 	case QSO_COPY_FLDIGI:
 		// Put the record in its correct position and save that position

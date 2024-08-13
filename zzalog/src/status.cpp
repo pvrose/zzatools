@@ -23,7 +23,6 @@ extern main_window* main_window_;
 extern status* status_;
 extern qso_manager* qso_manager_;
 extern bool READ_ONLY;
-extern bool close_by_error_;
 extern string PROGRAM_ID;
 extern string PROGRAM_VERSION;
 extern bool DEBUG_STATUS;
@@ -67,7 +66,6 @@ status::status() :
 status::~status()
 {
 	ticker_->remove_ticker(this);
-	// if (!close_by_error_) delete status_file_viewer_;
 	if (report_file_) report_file_->close();
 	for (auto it = progress_items_.begin(); it != progress_items_.end(); it++) {
 		update_progress(it->first);
@@ -262,7 +260,6 @@ void status::misc_status(status_t status, const char* label) {
 		// A severe error - ask the user whether to continue
 		if (fl_choice("An error that resulted in reduced functionality occurred:\n%s\n\nDo you want to try to continue or quit?", "Continue", "Quit", nullptr, label, report_filename_.c_str()) == 1) {
 			// Set the flag to continue showing the file viewer after all other windows have been hidden.
-			close_by_error_ = true;
 			main_window_->do_callback();
 		}
 		break;
@@ -271,7 +268,6 @@ void status::misc_status(status_t status, const char* label) {
 		fl_beep(FL_BEEP_ERROR);
 		// A fatal error - quit the application
 		fl_message("An unrecoverable error has occurred, closing down - check status log");
-		close_by_error_ = true;
 		// Close the application down
 		main_window_->do_callback();
 		break;
