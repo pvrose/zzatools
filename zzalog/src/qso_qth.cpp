@@ -1,6 +1,7 @@
 #include "qso_qth.h"
 #include "qso_entry.h"
 #include "qso_data.h"
+#include "qso_manager.h"
 #include "qth_dialog.h"
 #include "spec_data.h"
 #include "drawing.h"
@@ -114,7 +115,12 @@ void qso_qth::enable_widgets() {
 
 // Set the QTH details
 void qso_qth::set_qth(string name) {
-	qth_name_ = name;
+	if (name.length()) {
+		qth_name_ = name;
+	} else {
+		qso_manager* mgr = ancestor_view<qso_manager>(this);
+		qth_name_ = mgr->get_default(qso_manager::QTH);
+	}
 	qth_details_ = spec_data_->expand_macro("APP_ZZA_QTH", qth_name_);
 }
 
