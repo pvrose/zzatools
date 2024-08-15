@@ -191,6 +191,8 @@ protected:
 	string cat_app_;
 	// Use app for cat
 	bool use_cat_app_;
+	// Rig was good
+	bool rig_ok_;
 
 
 };

@@ -98,6 +98,10 @@ using namespace std::chrono;
 		// close rig - may be null for some 
 		void close();
 
+		// Types of error
+		bool is_network_error();
+		bool is_rig_error();
+
 		// Port was successfully opened
 		bool is_open();
 		// Port is being opened

@@ -43,7 +43,8 @@ qso_rig::qso_rig(int X, int Y, int W, int H, const char* L) :
 	modify_power_(false),
 	power_(0.0),
 	cat_app_(""),
-	use_cat_app_(false)
+	use_cat_app_(false),
+	rig_ok_(false)
 {
 	// If no name is provided then get from qso_manager
 	if (L == nullptr || strlen(L) == 0) copy_label(ancestor_view<qso_manager>(this)->get_default(qso_manager::RIG).c_str());
@@ -56,6 +57,7 @@ qso_rig::qso_rig(int X, int Y, int W, int H, const char* L) :
 	box(FL_BORDER_BOX);
 	load_values();
 	rig_ = new rig_if(label(), &hamlib_data_);
+	if (rig_->is_good()) rig_ok_ = true;
 	create_form(X, Y);
 	enable_widgets();
 
@@ -694,6 +696,20 @@ void qso_rig::enable_widgets(bool tick) {
 		op_freq_mode_->deactivate();
 		op_freq_mode_->label("");
 	} else {
+		if (rig_ok_) {
+			// Rig has disconnected since last update
+			char msg[128];
+			if (rig_->is_network_error()) {
+				snprintf(msg, sizeof(msg), "RIG: Failed to access network app for %s",
+				label());
+			} else if (rig_->is_rig_error()) {
+				snprintf(msg, sizeof(msg), "Failed to access rig %s", label());
+			} else {
+				strcpy(msg, rig_->error_message(label()).c_str());
+			}
+			status_->misc_status(ST_WARNING, msg);
+			rig_ok_ = false;
+		}
 		// Rig is not connected - deactivate freq/mode
 		op_status_->value("Disconnected");
 		bn_tx_rx_->label("");
@@ -1014,13 +1030,15 @@ void qso_rig::cb_bn_connect(Fl_Widget* w, void* v) {
 	qso_rig* that = ancestor_view<qso_rig>(w);
 	if (!that->rig_) {
 		that->rig_ = new rig_if(that->label(), &that->hamlib_data_);
-		printf("Connected rig %s\n", that->label());
+		if (that->rig_->is_good()) that->rig_ok_ = true;
 	}
 	else if (that->rig_->is_open()) {
 		that->rig_->close();
+		that->rig_ok_ = false;
 
 	} else {
 		that->rig_->open();
+		if (that->rig_->is_good()) that->rig_ok_ = true;
 	}
 	that->enable_widgets();
 }

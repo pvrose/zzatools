@@ -493,6 +493,16 @@ bool rig_if::is_good() {
 	return opened_ok_ && error_code_ == RIG_OK;
 }
 
+// Error code is network error
+bool rig_if::is_network_error() {
+	return abs(error_code_) == (int)RIG_EIO;
+}
+
+// Error code is rig error
+bool rig_if::is_rig_error() {
+	return abs(error_code_) == (int)RIG_EPROTO;
+}
+
 // Return the text for the error code.
 const char* rig_if::error_text(rig_errcode_e code) {
 	switch (code) {
