@@ -1446,7 +1446,9 @@ void qso_data::action_log_modem() {
 		fl_message("Check which rig is selected as frequency from rig is different fro that being logged!");
 		fl_beep(FL_BEEP_ERROR);
 	} 
-	if (qso->item("TX_PWR") == "") {
+	int modem_pwr;
+	qso->item("TX_PWR", modem_pwr);
+	if (modem_pwr == 0) {
 		// Get power from rig
 		qso->item("TX_PWR", rig->get_tx_power(true));
 	}
