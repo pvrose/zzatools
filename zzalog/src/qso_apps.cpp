@@ -188,8 +188,11 @@ void app_grp::enable_widgets() {
         }
     } else {
         bn_listening_->deactivate();
-        if (app_data_->admin && strlen(ip_passw_->value()) > 0) {
+        if (!app_data_->admin || strlen(ip_passw_->value()) > 0) {
             bn_connect_->activate();
+            if (!app_data_->can_disable) {
+                bn_connect_->value(false);
+            }
         } else {
             bn_connect_->deactivate();
         }
@@ -523,6 +526,8 @@ void qso_apps::cb_bn_new(Fl_Widget* w, void* v) {
     new_data->server = false;
     new_data->has_data = nullptr;
     new_data->has_server = nullptr;
+    new_data->can_disable = false;
+    new_data->admin = false;
 
     if (new_data->server) that->add_servers(new_data);
 
