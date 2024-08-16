@@ -56,7 +56,7 @@ void qso_log_info::create_form(int X, int Y) {
 	curr_x += HBUTTON;
 
 	// Display current status of the log
-	op_status_ = new Fl_Output(curr_x, curr_y, WSMEDIT - HBUTTON, HBUTTON + 2);
+	op_status_ = new Fl_Output(curr_x, curr_y, WSMEDIT - HBUTTON, HBUTTON);
 	op_status_->box(FL_FLAT_BOX);
 	op_status_->color(FL_BACKGROUND_COLOR);
 	op_status_->textsize(FL_NORMAL_SIZE + 2);
@@ -69,10 +69,11 @@ void qso_log_info::create_form(int X, int Y) {
 	curr_x = X + GAP;
 
 	// Check to enable saving after each QSO
-	bn_save_enable_ = new Fl_Check_Button(curr_x, curr_y, HBUTTON, HBUTTON, "Save after each QSO");
-	bn_save_enable_->align(FL_ALIGN_RIGHT);
+	bn_save_enable_ = new Fl_Check_Button(curr_x + WLABEL, curr_y, HBUTTON, HBUTTON, "Save/QSO");
+	bn_save_enable_->align(FL_ALIGN_LEFT);
 	bn_save_enable_->tooltip("Enable/Disable save");
 	bn_save_enable_->callback(cb_bn_enable);
+	bn_save_enable_->when(FL_WHEN_RELEASE);
 	bn_save_enable_->value(true);
 
 	curr_x += WSMEDIT;
@@ -149,7 +150,7 @@ void qso_log_info::cb_bn_enable(Fl_Widget* w, void* v) {
 	qso_log_info* that = ancestor_view<qso_log_info>(w);
 	bool value = ((Fl_Check_Button*)w)->value();
 	if (!value) {
-		book_->enable_save(false, "Diabling save from QSO Manager");
+		book_->enable_save(false, "Disabling save from QSO Manager");
 	}
 	else {
 		while (!book_->enable_save()) book_->enable_save(true, "Enabling save from QSO manager");
