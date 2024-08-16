@@ -496,17 +496,19 @@ void qso_apps::save_values() {
 
 // Configure widgets
 void qso_apps::enable_widgets() {
-    add_servers(apps_data_.at(tabs_->value()->label()));
-    for (int ix = 0; ix < tabs_->children(); ix++) {
-        app_grp* ax = (app_grp*)tabs_->child(ix);
-        ax->enable_widgets();
-        if (ax == tabs_->value()) {
-            ax->labelfont((ax->labelfont() | FL_BOLD) & (~FL_ITALIC));
-            ax->labelcolor(FL_FOREGROUND_COLOR);
-        }
-        else {
-            ax->labelfont((ax->labelfont() & (~FL_BOLD)) | FL_ITALIC);
-            ax->labelcolor(FL_FOREGROUND_COLOR);
+    if (tabs_->value()) {
+        add_servers(apps_data_.at(tabs_->value()->label()));
+        for (int ix = 0; ix < tabs_->children(); ix++) {
+            app_grp* ax = (app_grp*)tabs_->child(ix);
+            ax->enable_widgets();
+            if (ax == tabs_->value()) {
+                ax->labelfont((ax->labelfont() | FL_BOLD) & (~FL_ITALIC));
+                ax->labelcolor(FL_FOREGROUND_COLOR);
+            }
+            else {
+                ax->labelfont((ax->labelfont() & (~FL_BOLD)) | FL_ITALIC);
+                ax->labelcolor(FL_FOREGROUND_COLOR);
+            }
         }
     }
 }
