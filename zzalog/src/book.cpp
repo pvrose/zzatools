@@ -551,7 +551,7 @@ item_num_t book::selection(item_num_t num_item, hint_t hint /* = HT_SELECTED */,
 		case HT_MINOR_CHANGE:
 			if (!inhibit_view_update_) {
 				// Set modified flag
-				modified(true);
+				if (!new_record_) modified(true);
 				// Update to this record
 				tabbed_forms_->update_views(requester, hint, record_num);
 			}
@@ -561,7 +561,7 @@ item_num_t book::selection(item_num_t num_item, hint_t hint /* = HT_SELECTED */,
 		case HT_DELETED:
 			if (!inhibit_view_update_) {
 				// Set modified flag
-				modified(true);
+				if (!new_record_) modified(true);
 				// Update to this record
 				tabbed_forms_->update_views(requester, hint, record_num);
 			}
@@ -571,7 +571,7 @@ item_num_t book::selection(item_num_t num_item, hint_t hint /* = HT_SELECTED */,
 			this_record = get_record(current_item_, false);
 			erase(begin() + current_item_);
 			record_num = insert_record(this_record);
-			modified(true);
+			if (!new_record_) modified(true);
 			tabbed_forms_->update_views(requester, HT_ALL, record_num);
 			break;
 		default:
@@ -792,6 +792,7 @@ void book::go_date(string date) {
 
 // Set the modified flag - conditionally update the status progress bar (as indication it's modified
 void book::modified(bool value, bool update_progress /*= true*/) {
+	record* qso = get_record();
 	// Set the flag
 	modified_ = value;
 	if (modified_) {
@@ -841,15 +842,15 @@ void book::delete_record(bool force) {
 				book_->erase(book_->begin() + record_number(current_item_));
 			} 
 			erase(begin() + current_item_);
-			new_record_ = false;
-			modified_record_ = false;
-			modified(true);
+			if (!new_record_) modified(true);
 			// if current record no longer exists decrement it (exept if already first record)
 			if (current_item_ == size() && current_item_ > 0) {
 				current_item_--;
 			}
 			// Tell the views a record has been deleted and to redraw from the current selection
 			selection(current_item_, HT_DELETED);
+			new_record_ = false;
+			modified_record_ = false;
 			// After selection has done its all can allow another delete
 			delete_in_progress_ = false;
 			menu_->update_items();
@@ -1310,6 +1311,11 @@ void book::modified_record(bool value) {
 
 // Returns true if a new record being entered
 bool book::new_record() { return new_record_; }
+
+// Set new record flag
+void book::new_record(bool value) {
+	new_record_ = value;
+}
 
 // Set save_enabled_ (and save if modified)
 void book::enable_save(bool enable, const char* reason) {

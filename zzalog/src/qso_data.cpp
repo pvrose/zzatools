@@ -767,6 +767,7 @@ void qso_data::action_activate(qso_init_t mode) {
 // Action START - transition from QSO_PENDING to QSO_STARTED
 void qso_data::action_start(qso_init_t mode) {
 	g_entry_->append_qso();
+	book_->new_record(true);
 	book_->enable_save(false, "Starting real-time QSO");
 	book_->selection(book_->item_number(g_entry_->qso_number()), HT_INSERTED);
 	switch (mode) {

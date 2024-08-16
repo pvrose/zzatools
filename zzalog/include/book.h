@@ -156,6 +156,8 @@ using namespace std;
 		void modified_record(bool value);
 		// New record
 		bool new_record();
+		// Set new record
+		void new_record(bool value);
 		// Record is not dupe
 		void accept_dupe();
 		// Record is an exact dupe: use_dupe = true, use the dupe record else keep the original entry
