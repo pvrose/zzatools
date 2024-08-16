@@ -243,9 +243,6 @@
     <ClCompile Include="zzalog\src\qso_qsl_vwr.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="zzalog\src\qso_server.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="zzalog\src\wx_handler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -271,6 +268,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="zzalog\src\qso_contest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zzalog\src\qso_apps.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -533,9 +533,6 @@
     <ClInclude Include="zzalog\include\regices.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="zzalog\include\qso_server.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="zzalog\include\logo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -558,6 +555,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="zzalog\include\qso_contest.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zzalog\include\qso_apps.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
