@@ -29,6 +29,8 @@ public:
 	void enable_widgets();
 	// Save changes
 	void save_values();
+	// Enable timer -dependent widgets
+	void enable_timer_widgets();
 
 	static void cb_ticker(void* v);
 

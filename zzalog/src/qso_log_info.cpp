@@ -94,34 +94,47 @@ void qso_log_info::create_form(int X, int Y) {
 	end();
 }
 
+// Configure timer dependent widgets
+void qso_log_info::enable_timer_widgets() {
+	if (book_->empty()) {
+		pr_loadsave_->color(FL_BACKGROUND_COLOR);
+	}
+	else if (book_->storing()) {
+		pr_loadsave_->color(fl_color_average(FL_GREEN, FL_RED, (float)book_->get_complete()));
+	}
+	else if (book_->loading()) {
+		pr_loadsave_->color(fl_color_average(FL_GREEN, FL_BACKGROUND_COLOR, (float)book_->get_complete()));
+	} else {
+		if (book_->modified()) {
+			pr_loadsave_->color(FL_RED);
+		}
+		else {
+			pr_loadsave_->color(FL_GREEN);
+		}
+	}
+}
+
 // Enable widgets
 void qso_log_info::enable_widgets() {
 	// Depending on state of book, output status, load/save progress, enable save button
 	if (book_->empty()) {
 		op_status_->value("No Data");
-		pr_loadsave_->color(FL_BACKGROUND_COLOR);
 		bn_save_->deactivate();
 	}
 	else if (book_->storing()) {
 		op_status_->value("Storing");
-		pr_loadsave_->color(fl_color_average(FL_GREEN, FL_RED, (float)book_->get_complete()));
 		bn_save_->deactivate();
 	}
 	else if (book_->loading()) {
 		op_status_->value("Loading");
-		pr_loadsave_->color(fl_color_average(FL_GREEN, FL_BACKGROUND_COLOR, (float)book_->get_complete()));
 		bn_save_->deactivate();
 	} else {
 		if (book_->modified()) {
 			op_status_->value("Modified");
-			pr_loadsave_->color(FL_RED);
-			pr_loadsave_->value(0.0);
 			bn_save_->activate();
 		}
 		else {
 			op_status_->value("Unmodified");
-			pr_loadsave_->color(FL_GREEN);
-			pr_loadsave_->value(0.0);
 			bn_save_->deactivate();
 		}
 		if (book_->enable_save()) {
@@ -141,7 +154,7 @@ void qso_log_info::save_values() {
 
 // On 1s ticker - reevaluate the widgets
 void qso_log_info::cb_ticker(void* v) {
-	((qso_log_info*)v)->enable_widgets();
+	((qso_log_info*)v)->enable_timer_widgets();
 }
 
 // Callback on Save Enable button
