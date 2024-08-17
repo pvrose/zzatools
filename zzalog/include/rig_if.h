@@ -71,6 +71,7 @@ using namespace std::chrono;
 			atomic<double> pwr_value;
 			atomic<double> pwr_meter;
 			atomic<bool> ptt;
+			atomic<bool> slow;
 			
 			rig_values() {
 				tx_frequency = 0.0;
@@ -83,6 +84,7 @@ using namespace std::chrono;
 				pwr_value = 0.0;
 				pwr_meter = 0.0;
 				ptt = false;
+				slow = false;
 			}
 		};
 
@@ -125,6 +127,8 @@ using namespace std::chrono;
 		bool get_ptt();
 		// Get the data from the rig
 		static void th_run_rig(rig_if* that);
+		// Get slow - rig taking over 1 s to access
+		bool get_slow();
 
 		// Set modifiers
 		void set_freq_modifier(double delta_freq);

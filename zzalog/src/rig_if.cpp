@@ -132,6 +132,11 @@ bool rig_if::get_ptt() {
 	return rig_data_.ptt;
 }
 
+// Get rig access is slow
+bool rig_if::get_slow() {
+	return rig_data_.slow;
+}
+
 // Constructor
 rig_if::rig_if(const char* name, hamlib_data_t* data) 
 {
@@ -341,6 +346,7 @@ void rig_if::th_run_rig(rig_if* that) {
 
 // Read the data from the rig
 void rig_if::th_read_values() {
+	system_clock::time_point start = system_clock::now();
 	if (hamlib_data_->port_type == RIG_PORT_NONE) {
 		return;
 	}
@@ -476,6 +482,19 @@ void rig_if::th_read_values() {
 	rig_data_.pwr_meter = (double)meter_value.f;
 	// All successful
 	count_down_ = FAST_RIG_TIMER;
+	// Check rig response time and inform use if it's slowed down or back to normal
+	system_clock::time_point finish = system_clock::now();
+	milliseconds response = duration_cast<milliseconds>(finish - start);
+	if (rig_data_.slow) {
+		if (response < milliseconds(100)) {
+			status_->misc_status(ST_NOTE, "RIG: Responding normally");
+			rig_data_.slow = false;
+		}
+	} else if (response > milliseconds(1000)) {
+		status_->misc_status(ST_ERROR, "RIG: Responding slowly");
+		rig_data_.slow = true;
+	}
+
 	return;
 }
 

@@ -643,51 +643,57 @@ void qso_rig::enable_widgets(bool tick) {
 		op_freq_mode_->label("");
 	} else if (rig_->is_open()) {
 		// Rig is connected
-		freq = rig_->get_dfrequency(true);
-		int freq_Hz = (int)(freq * 1000000) % 1000;
-		int freq_kHz = (int)(freq * 1000) % 1000;
-		int freq_MHz = (int)freq;
-		band_data::band_entry_t* entry = band_data_->get_entry(freq * 1000);
-		if (entry) {
-			char l[50];
-			snprintf(l, sizeof(l), "%s (%s)", 
-				spec_data_->band_for_freq(freq).c_str(),
-				entry->mode.c_str());
-			op_status_->value(l);
-			if (rig_->get_ptt()) {
-				bn_tx_rx_->label("TX");
-				bn_tx_rx_->color(FL_RED);
-			} else {
-				bn_tx_rx_->label("RX");
-				bn_tx_rx_->color(FL_GREEN);
+		if (rig_->get_slow()) {
+			// Do no change display
+			op_status_->value("Unresponsive");
+			bn_tx_rx_->label("");
+			bn_tx_rx_->color(COLOUR_ORANGE);
+		} else {
+			freq = rig_->get_dfrequency(true);
+			int freq_Hz = (int)(freq * 1000000) % 1000;
+			int freq_kHz = (int)(freq * 1000) % 1000;
+			int freq_MHz = (int)freq;
+			band_data::band_entry_t* entry = band_data_->get_entry(freq * 1000);
+			if (entry) {
+				char l[50];
+				snprintf(l, sizeof(l), "%s (%s)", 
+					spec_data_->band_for_freq(freq).c_str(),
+					entry->mode.c_str());
+				op_status_->value(l);
+				if (rig_->get_ptt()) {
+					bn_tx_rx_->label("TX");
+					bn_tx_rx_->color(FL_RED);
+				} else {
+					bn_tx_rx_->label("RX");
+					bn_tx_rx_->color(FL_GREEN);
+				}
 			}
-		}
-		else {
-			op_status_->value("Out of band!");
-			if (rig_->get_ptt()) {
-				bn_tx_rx_->label("TX");
-				bn_tx_rx_->color(FL_DARK_RED);
-			} else {
-				bn_tx_rx_->label("RX");
-				bn_tx_rx_->color(FL_DARK_GREEN);
+			else {
+				op_status_->value("Out of band!");
+				if (rig_->get_ptt()) {
+					bn_tx_rx_->label("TX");
+					bn_tx_rx_->color(FL_DARK_RED);
+				} else {
+					bn_tx_rx_->label("RX");
+					bn_tx_rx_->color(FL_DARK_GREEN);
+				}
 			}
-			
-		}
-		op_freq_mode_->activate();
-		op_freq_mode_->color(FL_BLACK);
-		op_freq_mode_->labelcolor(FL_YELLOW);
+			op_freq_mode_->activate();
+			op_freq_mode_->color(FL_BLACK);
+			op_freq_mode_->labelcolor(FL_YELLOW);
 
-		char msg[200];
-		string rig_mode;
-		string submode;
-		rig_->get_string_mode(rig_mode, submode);
-		// Set Freq/Mode to Frequency (MHz with kHz seperator), mode, power (W)
-		snprintf(msg, sizeof(msg), "%d.%03d.%03d MHz\n%s %sW" , 
-			freq_MHz, freq_kHz, freq_Hz,
-			submode.length() ? submode.c_str() : rig_mode.c_str(),
-			rig_->get_tx_power(true).c_str()
-		);
-		op_freq_mode_->copy_label(msg);
+			char msg[200];
+			string rig_mode;
+			string submode;
+			rig_->get_string_mode(rig_mode, submode);
+			// Set Freq/Mode to Frequency (MHz with kHz seperator), mode, power (W)
+			snprintf(msg, sizeof(msg), "%d.%03d.%03d MHz\n%s %sW" , 
+				freq_MHz, freq_kHz, freq_Hz,
+				submode.length() ? submode.c_str() : rig_mode.c_str(),
+				rig_->get_tx_power(true).c_str()
+			);
+			op_freq_mode_->copy_label(msg);
+		}
 	} else if (rig_->has_no_cat()) {
 		// No rig available - deactivate freq/mode
 		op_status_->value("No CAT Available");
