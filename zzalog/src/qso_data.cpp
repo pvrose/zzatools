@@ -154,7 +154,7 @@ void qso_data::enable_widgets() {
 		// Disable log mode menu item from CAT if no CAT
 		qso_manager* mgr = (qso_manager*)parent();
 		if (mgr->created_) {
-			rig_if* rig = mgr->rig();
+			// rig_if* rig = mgr->rig();
 			mgr->qsl_control()->enable_widgets();
 			if (menu_) menu_->update_items();
 		}

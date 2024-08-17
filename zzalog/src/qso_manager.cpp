@@ -7,7 +7,6 @@
 #include "qso_buttons.h"
 #include "qso_qsl.h"
 #include "callback.h"
-#include "rig_if.h"
 
 #include "record.h"
 #include "status.h"

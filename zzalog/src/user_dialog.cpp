@@ -6,8 +6,7 @@
 #include "spec_tree.h"
 #include "tabbed_forms.h"
 #include "qso_manager.h"
-#include "rig_if.h"
-
+#include "callback.h"
 #include <FL/Fl_Tooltip.H>
 #include <FL/Fl_Preferences.H>
 #include <FL/Fl_Hold_Browser.H>

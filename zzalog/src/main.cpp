@@ -16,7 +16,6 @@ main.cpp - application entry point
 #include "cty_data.h"
 #include "toolbar.h"
 #include "spec_data.h"
-#include "rig_if.h"
 #include "status.h"
 #include "tabbed_forms.h"
 #include "import_data.h"
