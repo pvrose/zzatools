@@ -137,6 +137,11 @@ bool rig_if::get_slow() {
 	return rig_data_.slow;
 }
 
+// Get current power state
+bool rig_if::get_powered() {
+	return rig_data_.powered_on;
+}
+
 // Constructor
 rig_if::rig_if(const char* name, hamlib_data_t* data) 
 {
@@ -349,6 +354,27 @@ void rig_if::th_read_values() {
 	system_clock::time_point start = system_clock::now();
 	if (hamlib_data_->port_type == RIG_PORT_NONE) {
 		return;
+	}
+	// Check powered on
+	powerstat_t power_state;
+	if (opened_ok_) error_code_ = rig_get_powerstat(rig_, &power_state);
+	else return;
+	if (error_code_ != RIG_OK) {
+		opened_ok_ = false;
+		return;
+	}
+	switch (power_state) {
+		case RIG_POWER_ON:
+		case RIG_POWER_STANDBY: 
+		{
+			rig_data_.powered_on = true;
+			break;
+		}
+		case RIG_POWER_OFF:
+		{
+			rig_data_.powered_on = false;
+			return;
+		}
 	}
 	// Read TX frequency
 	double d_temp;
@@ -604,3 +630,4 @@ void rig_if::clear_power_modifier() {
 bool rig_if::has_no_cat() {
 	return (hamlib_data_->port_type == RIG_PORT_NONE);
 }
+

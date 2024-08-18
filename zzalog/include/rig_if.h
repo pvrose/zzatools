@@ -36,25 +36,26 @@ using namespace std::chrono;
 	// fast rig polling - 20ms -> 2s (default 1s);
 	const int FAST_RIG_TIMER = 1;
 
+	// Hamlib parameters 
+	struct hamlib_data_t {
+		// Manufacturer
+		string mfr = "";
+		// Model
+		string model = "";
+		// Portname
+		string port_name = "";
+		// Baud rate
+		int baud_rate = 9600;
+		// Model ID - as known by hamlib
+		rig_model_t model_id = -1;
+		// Port type
+		rig_port_t port_type = RIG_PORT_NONE;
+	};
+
 	// This class is the base class for rig handlers. 
 	class rig_if
 	{
 	public:
-		// Hamlib parameters 
-		struct hamlib_data_t {
-			// Manufacturer
-			string mfr = "";
-			// Model
-			string model = "";
-			// Portname
-			string port_name = "";
-			// Baud rate
-			int baud_rate = 9600;
-			// Model ID - as known by hamlib
-			rig_model_t model_id = -1;
-			// Port type
-			rig_port_t port_type = RIG_PORT_NONE;
-		};
 
 		rig_if(const char* name, hamlib_data_t* data);
 		~rig_if();
@@ -72,6 +73,7 @@ using namespace std::chrono;
 			atomic<double> pwr_meter;
 			atomic<bool> ptt;
 			atomic<bool> slow;
+			atomic<bool> powered_on;
 			
 			rig_values() {
 				tx_frequency = 0.0;
@@ -85,6 +87,7 @@ using namespace std::chrono;
 				pwr_meter = 0.0;
 				ptt = false;
 				slow = false;
+				powered_on = false;
 			}
 		};
 
@@ -111,7 +114,7 @@ using namespace std::chrono;
 		// Port has no CAT
 		bool has_no_cat();
 
-		// return mode/submode
+		// return mode/submode  
 		void get_string_mode(string& mode, string& submode);
 		// return frequency
 		string get_frequency(bool tx);
@@ -129,6 +132,8 @@ using namespace std::chrono;
 		static void th_run_rig(rig_if* that);
 		// Get slow - rig taking over 1 s to access
 		bool get_slow();
+		// Power on-off
+		bool get_powered();
 
 		// Set modifiers
 		void set_freq_modifier(double delta_freq);

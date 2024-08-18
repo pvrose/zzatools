@@ -1,6 +1,6 @@
 #pragma once
 
-#include "rig_if.h"
+// #include "rig_if.h"
 
 #include <string>
 
@@ -9,6 +9,8 @@
 using namespace std;
 
 class field_input;
+class rig_if;
+struct hamlib_data_t;
 class Fl_Output;
 class Fl_Button;
 class Fl_Box;
@@ -169,9 +171,9 @@ protected:
 
 	rig_if* rig_;
 	// hamlib data
-	rig_if::hamlib_data_t hamlib_data_;
-	// Current mode
-	rig_port_e mode_;
+	hamlib_data_t* hamlib_data_;
+	// Current mode - note C enum in hamlib/rig.h
+	uint16_t mode_;
 	// Current antenna
 	string antenna_;
 	// Modifier attributes
@@ -193,7 +195,6 @@ protected:
 	bool use_cat_app_;
 	// Rig was good
 	bool rig_ok_;
-
 
 };
 
