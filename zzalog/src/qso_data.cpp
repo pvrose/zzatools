@@ -604,7 +604,8 @@ void qso_data::update_modem_qso(bool log_it) {
 	case QSO_FLDIGI: {
 		if (log_it) {
 			action_log_modem();
-			action_deactivate();;
+			action_deactivate();
+			action_view();
 		} else {
 			g_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
 			g_misc_->qso(current_qso(), current_number());
