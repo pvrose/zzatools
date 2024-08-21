@@ -1237,7 +1237,7 @@ bool book::get_macro(record* use_record, string macro_name, set<string> field_na
 					}
 				}
 				else if (old_value.length() == 0) {
-					defn->fields->item(*it, value);
+					defn->fields->item(*it, value, false, false);
 					update = true;
 				}
 			}

@@ -77,7 +77,7 @@ record& record::operator= (const record& rhs) {
 		for (auto iter = rhs.begin(); iter != rhs.end(); iter++) {
 			string field = iter->first;
 			string value = iter->second;
-			item(field, value);
+			item(field, value, false, false);
 		}
 		// Restore the original is_dirty_flag as the assignments will have set it.
 		this->is_dirty_ = rhs.is_dirty_;

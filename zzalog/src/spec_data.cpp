@@ -954,7 +954,7 @@ bool spec_data::add_user_macro(string field, string value, macro_defn macro) {
 					macro_changes_.insert(def_field);
 				}
 			}
-			defn->fields->item((*it).first, (*it).second);
+			defn->fields->item((*it).first, (*it).second, false, false);
 		}
 	}
 
