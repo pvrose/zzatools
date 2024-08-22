@@ -21,6 +21,7 @@ class Fl_Check_Button;
 class Fl_Input;
 class Fl_Int_Input;
 class Fl_Float_Input;
+class Fl_Value_Slider;
 
 const int NUMBER_RIG_APPS = 2;
 const string RIG_APP_NAMES[NUMBER_RIG_APPS] = { "FLRig", "NET rigctl" };
@@ -61,6 +62,8 @@ public:
 	string antenna();
 	// Disconnect rig
 	void disconnect();
+	// Get timeout value
+	double timeout();
 
 protected:
 	// Callback - model choice
@@ -96,6 +99,8 @@ protected:
 	static void cb_bn_start(Fl_Widget* w, void* v);
 	// Tabs clicked
 	static void cb_config(Fl_Widget* w, void* v);
+	// Timeout callback
+	static void cb_timeout(Fl_Widget* w, void* v);
 
 	// Get hamlib data
 	void find_hamlib_data();
@@ -137,6 +142,7 @@ protected:
 	Fl_Group* rig_ant_grp_;
 	Fl_Choice* ch_rig_model_;
 	field_input* ip_antenna_;
+	Fl_Value_Slider* v_timeout_;
 
 	// Configuartion - 3 tabs
 	Fl_Tabs* config_tabs_;

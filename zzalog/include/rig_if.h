@@ -50,6 +50,8 @@ using namespace std::chrono;
 		rig_model_t model_id = -1;
 		// Port type
 		rig_port_t port_type = RIG_PORT_NONE;
+		// Timeout value (not a hamlib item
+		double timeout = 1.0;
 	};
 
 	// This class is the base class for rig handlers. 

@@ -514,13 +514,15 @@ void rig_if::th_read_values() {
 	milliseconds response = duration_cast<milliseconds>(finish - start);
 	if (rig_data_.slow) {
 		if (response < milliseconds(100)) {
-			snprintf(msg, sizeof(msg), "RIG %s Responding normally", my_rig_name_.c_str());
+			snprintf(msg, sizeof(msg), "RIG %s Responding normally %dms", 
+				my_rig_name_.c_str(), response);
 			status_->misc_status(ST_NOTE, msg);
 			rig_data_.slow = false;
 		}
-	} else if (response > milliseconds(1000)) {
-			snprintf(msg, sizeof(msg), "RIG %s Responding slowly", my_rig_name_.c_str());
-			status_->misc_status(ST_NOTE, msg);
+	} else if (response > milliseconds((int)(hamlib_data_->timeout * 1000.0))) {
+			snprintf(msg, sizeof(msg), "RIG %s Responding slowly %dms", 
+				my_rig_name_.c_str(), response);
+			status_->misc_status(ST_ERROR, msg);
 		rig_data_.slow = true;
 	}
 

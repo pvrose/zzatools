@@ -22,6 +22,7 @@
 #include <FL/Fl_Int_Input.H>
 #include <FL/Fl_Box.H>
 #include <FL/Fl_Tabs.H>
+#include <FL/Fl_Value_Slider.H>
 
 using namespace std;
 
@@ -91,6 +92,8 @@ void qso_rig::load_values() {
 		free(temp);
 		rig_settings.get("Baud Rate", hamlib_data_->baud_rate, 9600);
 		rig_settings.get("Model ID", (int&)hamlib_data_->model_id, -1);
+		// Timeout value
+		rig_settings.get("Timeout", hamlib_data_->timeout, 1.0);
 
 		// Check that hamlib is currently OK
 		const rig_caps* capabilities = rig_get_caps(hamlib_data_->model_id);
@@ -261,7 +264,7 @@ void qso_rig::create_buttons(int curr_x, int curr_y) {
 
 // Create rig and antenna choosers
 void qso_rig::create_rig_ant(int curr_x, int curr_y) {
-	rig_ant_grp_ = new Fl_Group(curr_x, curr_y, WBUTTON * 3, HTEXT + HBUTTON);
+	rig_ant_grp_ = new Fl_Group(curr_x, curr_y, WBUTTON * 3, HTEXT + HBUTTON + HBUTTON);
 	rig_ant_grp_->box(FL_NO_BOX);
 
 	curr_x += WBUTTON;
@@ -283,6 +286,17 @@ void qso_rig::create_rig_ant(int curr_x, int curr_y) {
 	ip_antenna_->tooltip("Select the preferred antenna for this rig");
 	ip_antenna_->field_name("MY_ANTENNA");
 	ip_antenna_->value(antenna_.c_str());
+
+	curr_y += HBUTTON;
+	
+	v_timeout_ = new Fl_Value_Slider(curr_x, curr_y, WSMEDIT, HBUTTON, "Timeout sec.");
+	v_timeout_->align(FL_ALIGN_LEFT);
+	v_timeout_->type(FL_HOR_SLIDER);
+	v_timeout_->callback(cb_timeout);
+	v_timeout_->tooltip("Set the value for timeing out the rig (0.1 to 5 s)");
+	v_timeout_->range(0.1, 5.0);
+	v_timeout_->step(0.1);
+	v_timeout_->value(hamlib_data_ ? hamlib_data_->timeout : 1.0);
 
 	rig_ant_grp_->end();
 
@@ -568,6 +582,7 @@ void qso_rig::save_values() {
 		rig_settings.set("Port", hamlib_data_->port_name.c_str());
 		rig_settings.set("Baud Rate", hamlib_data_->baud_rate);
 		rig_settings.set("Model ID", (int)hamlib_data_->model_id);
+		rig_settings.set("Timeout", hamlib_data_->timeout);
 		if (use_cat_app_) {
 			rig_settings.set("Command", cat_app_.c_str());
 		}
@@ -1168,6 +1183,12 @@ void qso_rig::cb_bn_use_app(Fl_Widget* w, void* v) {
 	cb_value<Fl_Light_Button, bool>(w, v);
 	qso_rig* that = ancestor_view<qso_rig>(w);
 	that->enable_widgets();
+}
+
+// Timeout callback
+void qso_rig::cb_timeout(Fl_Widget* w, void* v) {
+	qso_rig* that = ancestor_view<qso_rig>(w);
+	cb_value<Fl_Value_Slider, double>(w, &that->hamlib_data_->timeout);
 }
 
 // Connect rig if disconnected and vice-versa
