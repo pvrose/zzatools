@@ -509,15 +509,18 @@ void rig_if::th_read_values() {
 	// All successful
 	count_down_ = FAST_RIG_TIMER;
 	// Check rig response time and inform use if it's slowed down or back to normal
+	char msg[128];
 	system_clock::time_point finish = system_clock::now();
 	milliseconds response = duration_cast<milliseconds>(finish - start);
 	if (rig_data_.slow) {
 		if (response < milliseconds(100)) {
-			status_->misc_status(ST_NOTE, "RIG: Responding normally");
+			snprintf(msg, sizeof(msg), "RIG %s Responding normally", my_rig_name_.c_str());
+			status_->misc_status(ST_NOTE, msg);
 			rig_data_.slow = false;
 		}
 	} else if (response > milliseconds(1000)) {
-		status_->misc_status(ST_ERROR, "RIG: Responding slowly");
+			snprintf(msg, sizeof(msg), "RIG %s Responding slowly", my_rig_name_.c_str());
+			status_->misc_status(ST_NOTE, msg);
 		rig_data_.slow = true;
 	}
 
