@@ -134,7 +134,8 @@ typedef size_t qso_num_t;
 		// copy the card to local file-store
 		response_t download(string remote_filename, string local_filename);
 		// get user details
-		bool user_details(string* username, string* password, string* last_access, string* qsl_message, string* swl_message);
+		bool user_details(string* username, string* password, string* last_access, 
+			string* qsl_message, string* swl_message, bool* confirmed);
 		// Get the ADIF filename
 		response_t adif_filename(string& filename);
 		// Download the data

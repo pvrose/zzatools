@@ -96,6 +96,8 @@ class Fl_Group;
 		string eqsl_swl_msg_;
 		// Upload QSOs as logged
 		bool eqsl_upload_qso_;
+		// Download confirmed as well
+		bool eqsl_confirmed_too_;
 
 		// LotW attributes
 

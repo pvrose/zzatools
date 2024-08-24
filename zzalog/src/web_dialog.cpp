@@ -96,6 +96,7 @@ void web_dialog::load_values() {
 	eqsl_last_got_ = temp;
 	free(temp);
 	eqsl_settings.get("Upload per QSO", (int&)eqsl_upload_qso_, false);
+	eqsl_settings.get("Download Confrmed", (int&)eqsl_confirmed_too_, false);
 	// LotW settings
 	lotw_settings.get("Enable", (int&)lotw_enable_, false);
 	lotw_settings.get("User", temp, "");
@@ -267,6 +268,14 @@ void web_dialog::create_eqsl(int rx, int ry, int rw, int rh) {
 	bn1_1A_1->callback(cb_value < Fl_Check_Button, bool>, &eqsl_upload_qso_);
 	bn1_1A_1->when(FL_WHEN_CHANGED);
 	bn1_1A_1->tooltip("Upload each QSO as it is logged");
+
+	// Row 1A Col 3 - Download Confirmed
+	Fl_Check_Button* bn1_1A_2 = new Fl_Check_Button(C3, R1_1A, HBUTTON, H1_1A, "Download Confirmed");
+	bn1_1A_2->align(FL_ALIGN_RIGHT);
+	bn1_1A_2->value(eqsl_confirmed_too_);
+	bn1_1A_2->callback(cb_value<Fl_Check_Button, bool>, &eqsl_confirmed_too_);
+	bn1_1A_2->when(FL_WHEN_CHANGED);
+	bn1_1A_2->tooltip("Include previously confirmed QSOs");
 
 	// Row 2 Col 1 - QSO Message enable
 	Fl_Check_Button* bn1_2_1 = new Fl_Check_Button(C1, R1_2, W1, H1_2, "Use QSO Message");
@@ -705,6 +714,7 @@ void web_dialog::save_values() {
 	eqsl_settings.set("Password", eqsl_password_.c_str());
 	eqsl_settings.set("Last Accessed", eqsl_last_got_.c_str());
 	eqsl_settings.set("Upload per QSO", eqsl_upload_qso_);
+	eqsl_settings.set("Download Confrmed", eqsl_confirmed_too_);
 	// LotW settings
 	lotw_settings.set("Enable", lotw_enable_);
 	lotw_settings.set("User", lotw_username_.c_str());

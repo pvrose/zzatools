@@ -316,7 +316,7 @@ eqsl_handler::response_t eqsl_handler::card_filename_r(
 	string password;
 	char message[256];
 	// Get users details
-	if (!user_details(&username, &password, nullptr, nullptr, nullptr)) {
+	if (!user_details(&username, &password, nullptr, nullptr, nullptr, nullptr)) {
 		sprintf(message, "EQSL: User or password is missing: U=%s, P=%s", username.c_str(), password.c_str());
 		status_->misc_status(ST_ERROR, message);
 		return ER_FAILED;
@@ -449,7 +449,8 @@ bool eqsl_handler::user_details(
 	string* password, 
 	string* last_access, 
 	string* qsl_message, 
-	string* swl_message) {
+	string* swl_message,
+	bool* confirmed) {
 
 	// Get username and password for building url to fetch card
 	Fl_Preferences qsl_settings(settings_, "QSL");
@@ -457,6 +458,7 @@ bool eqsl_handler::user_details(
 	string callsign = qso_manager_->get_default(qso_manager::CALLSIGN);
 
 	char * temp;
+	int tempi;
 	// Check user name
 	if (username != nullptr) {
 		eqsl_settings.get("User", temp, "");
@@ -493,6 +495,11 @@ bool eqsl_handler::user_details(
 		*swl_message = temp;
 		free(temp);
 	}
+	// Get confirmed 
+	if (confirmed != nullptr) {
+		eqsl_settings.get("Download Confirmed", tempi, false);
+		*confirmed = (bool)tempi;
+	}
 	if (username == nullptr || *username == "" || password == nullptr || *password == "") {
 		// User name or password not set
 		return false;
@@ -525,21 +532,23 @@ eqsl_handler::response_t eqsl_handler::adif_filename(string& filename) {
 	string username;
 	string password;
 	string last_access;
+	bool confirmed;
 	char message[256];
-	if (!user_details(&username, &password, &last_access, nullptr, nullptr)) {
+	if (!user_details(&username, &password, &last_access, nullptr, nullptr, &confirmed)) {
 		sprintf(message, "EQSL: User or password is missing: U=%s, P=%s", username.c_str(), password.c_str());
 		status_->misc_status(ST_ERROR, message);
 		return ER_FAILED;
 	}
 	// url for in-box at eQSL.cc
-	char url_format[] = "http://www.eqsl.cc/qslcard/DownloadInBox.cfm?Username=%s&Password=%s&RcvdSince=%s";
+	char url_format[] = "http://www.eqsl.cc/qslcard/DownloadInBox.cfm?Username=%s&Password=%s&RcvdSince=%s%s";
 	char url[2048];
 	// Get default callsign
 	string station = qso_manager_->get_default(qso_manager::CALLSIGN);
-	sprintf(url, url_format, station.c_str(), password.c_str(), last_access.c_str());
+	sprintf(url, url_format, station.c_str(), password.c_str(), last_access.c_str(),
+		confirmed ? "" : "&UnconfirmedOnly=1");
 	response_t result = ER_OK;
 	stringstream eqsl_ss;
-	strcpy(message, "EQSL: Querying in-box...");
+	snprintf(message, sizeof(message), "EQSL: Queryimg in-box for %s", station.c_str());
 	status_->misc_status(ST_NOTE, message);
 	// Fetch first page to get URL of ADIF file with update
 	if (url_handler_->read_url(url, &eqsl_ss)) {
@@ -686,7 +695,7 @@ bool eqsl_handler::upload_eqsl_log(book* book) {
 	string swl_message;
 	string error_message;
 	response_t status = ER_OK;
-	if (!user_details(&username_, &password_, nullptr, &qsl_message, &swl_message)) {
+	if (!user_details(&username_, &password_, nullptr, &qsl_message, &swl_message, nullptr)) {
 		// User details in settings are not all present
 		char* message = new char[50 + username_.length() + password_.length()];
 		sprintf(message, "EQSL: User or password is missing: U=%s, P=%s", username_.c_str(), password_.c_str());
@@ -927,7 +936,7 @@ bool eqsl_handler::upload_single_qso(qso_num_t record_num) {
 		string swl_message;
 		string error_message;
 		response_t status = ER_OK;
-		if (!user_details(&username, &password, nullptr, &qsl_message, &swl_message)) {
+		if (!user_details(&username, &password, nullptr, &qsl_message, &swl_message, nullptr)) {
 			char* message = new char[50 + username.length() + password.length()];
 			sprintf(message, "EQSL: User or password is missing: U=%s, P=%s", username.c_str(), password.c_str());
 			status_->misc_status(ST_ERROR, message);
@@ -995,7 +1004,7 @@ bool eqsl_handler::th_upload_qso(record* this_record) {
 	response->status = ER_OK;
 	response->error_message = "";
 	response->qso = this_record;
-	if (!user_details(&username, &password, nullptr, nullptr, nullptr)) {
+	if (!user_details(&username, &password, nullptr, nullptr, nullptr, nullptr)) {
 		char* message = new char[50 + username.length() + password.length()];
 		sprintf(message, "EQSL: User or password is missing: U=%s, P=%s", username.c_str(), password.c_str());
 		status_->misc_status(ST_ERROR, message);
