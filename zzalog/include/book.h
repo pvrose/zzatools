@@ -223,6 +223,11 @@ using namespace std;
 
 		// Process macro fields
 		bool get_macro(record* use_record, string macro_name, set<string> field_names, macro_map& map, bool allow_null = false);
+		// Set the filename
+		void set_filename(string filename);
+		// Get macro field
+		set<string> get_macro_fields(string name);
+
 
 		// Protected attributes
 	protected:
@@ -309,6 +314,11 @@ using namespace std;
 		adx_writer* adx_writer_;
 		// Upload allowed
 		bool upload_allowed_;
+		// "APP_ZZA_QTH" inplies a macro substitition. Description given in APP_ZZA_QTH_DESCR
+		// Allow compiler to optimise this
+		static set<string> qth_fields_;
+		// "APP_ZZA_OP" implies a macro substitution
+		static set<string> op_fields_;
 
 	};
 

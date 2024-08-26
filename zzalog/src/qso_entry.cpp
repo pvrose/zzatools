@@ -628,7 +628,7 @@ void qso_entry::action_add_field(int ix, string field) {
 			field_ip_map_.erase(old_field);
 		}
 		field_ip_map_[field] = ix;
-		(*field_map_)[ix].field = field;
+		(*field_map_)[ix - NUMBER_FIXED].field = field;
 	}
 	else if (ix == fields_in_use_.size()) {
 		if (field_ip_map_.find(field) == field_ip_map_.end()) {

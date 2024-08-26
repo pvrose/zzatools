@@ -913,11 +913,19 @@ bool spec_data::add_user_macro(string field, string value, macro_defn macro) {
 	macro_defn* defn;
 	if (this_map->find(value) == this_map->end()) {
 		// A new macro definition - create it and add to the macro set
-		char message[128];
-		snprintf(message, 128, "ADIF SPEC: Macro %s.%s being created",
+		char message[256];
+		snprintf(message, sizeof(message), "ADIF SPEC: Macro %s.%s being created",
 			field.c_str(),
 			value.c_str());
 		status_->misc_status(ST_NOTE, message);
+		strcpy(message, "ADIF SPEC: Please supply one or more of the following:");
+		set<string> mfields = book_->get_macro_fields(field);
+		for (auto it = mfields.begin(); it != mfields.end(); it++) {
+			strcat(message, "\n\t\t\t\t");
+			strcat(message, (*it).c_str());
+		}
+		status_->misc_status(ST_NOTE, message);
+
 		defn = new macro_defn;
 		defn->fields = new record;
 		(*this_map)[value] = defn;

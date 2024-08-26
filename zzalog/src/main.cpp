@@ -667,6 +667,7 @@ void add_book(char* arg) {
 				char msg[100];
 				snprintf(msg, sizeof(msg), "ZZALOG: Load %s failed, no backup loaded", log_file.c_str());
 				status_->misc_status(ST_ERROR, msg);
+				book_->set_filename(log_file);
 			}
 		} else {
 			// Move this file to the top of the recent file list
