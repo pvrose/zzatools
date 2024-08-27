@@ -1020,7 +1020,7 @@ void qso_data::action_edit() {
 	g_entry_->qso(qso_number);
 	record* qso = g_entry_->qso();
 	// If the QSO looks incomplete ask if it is so and restart it else edit it
-	if (qso && qso->item("TIME_OFF") == "") {
+	if (qso && qso->item("TIME_OFF") == "" && logging_state_ == QSO_STARTED) {
 		time_t now = time(nullptr);
 		time_t qso_start = qso->timestamp();
 		if (difftime(now, qso_start) < 1800.0) {

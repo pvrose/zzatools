@@ -329,10 +329,12 @@ string record::item(string field, bool formatted/* = false*/, bool indirect/* = 
 		}
 		if (result == "") {
 			string op_name = item("APP_ZZA_OP", false, false);
-			// Read APP_ZZA_OP field and get the settings for that value
-			record* macro = spec_data_->expand_macro("APP_ZZA_OP", op_name);
-			if (macro != nullptr) {
-				result = macro->item(field);
+			if (op_name.length()) {
+				// Read APP_ZZA_OP field and get the settings for that value
+				record* macro = spec_data_->expand_macro("APP_ZZA_OP", op_name);
+				if (macro != nullptr) {
+					result = macro->item(field);
+				}
 			}
 		}
 	}
