@@ -399,7 +399,8 @@ bool printer::start_printer(int& from_page, int& to_page) {
 	char* message = new char[266];
 	bool result;
 	// Start the job with unknown number of pages - exit if cancelled
-	switch (begin_job(0, &from_page, &to_page, &error_message)) {
+	int ecode = begin_job(0, &from_page, &to_page, &error_message);
+	switch (ecode) {
 	case 0:
 		// Successful
 		result = true;
@@ -411,7 +412,11 @@ bool printer::start_printer(int& from_page, int& to_page) {
 		result = false;
 		break;
 	default:
-		snprintf(message, 256, "PRINTER: %s", error_message);
+		if (strlen(error_message) == 0) {
+			snprintf(message, 256, "PRINTER: Unknown error - %d", ecode);
+		} else {
+			snprintf(message, 256, "PRINTER: %s", error_message);
+		}
 		status_->misc_status(ST_ERROR, message);
 		result = false;
 		break;
