@@ -881,6 +881,7 @@ bool qso_data::action_save() {
 
 	switch (logging_state_) {
 	case QSO_STARTED:
+	case QSO_ENTER:
 		logging_state_ = SWITCHING;
 		book_->modified(true);
 		book_->selection(item_number, HT_INSERTED);
