@@ -29,7 +29,7 @@ map<qso_data::logging_state_t, list<qso_buttons::button_type> > button_map_ =
 		qso_buttons::DELETE_QSO, qso_buttons::START_NET, qso_buttons::BROWSE, qso_buttons::VIEW_QSO } },
 	{ qso_data::QSO_STARTED, { qso_buttons::SAVE_QSO, qso_buttons::CANCEL_QSO, 
 		qso_buttons::START_NET, qso_buttons::WORKED_B4, qso_buttons::PARSE, qso_buttons::QRZ_COM } },
-	{ qso_data::QSO_ENTER, { qso_buttons::SAVE_QSO, qso_buttons::CANCEL_QSO } },
+	{ qso_data::QSO_ENTER, { qso_buttons::SAVE_QSO, qso_buttons::SAVE_EXIT, qso_buttons::CANCEL_QSO } },
 	{ qso_data::QSO_EDIT, { qso_buttons::SAVE_EDIT, qso_buttons::SAVE_EXIT, 
 		qso_buttons::SAVE_VIEW, qso_buttons::CANCEL_EDIT, 
 		qso_buttons::EDIT_NET, qso_buttons::NAV_FIRST,
@@ -74,7 +74,7 @@ map<qso_buttons::button_type, qso_buttons::button_action> action_map_ =
 	{ qso_buttons::CLONE_QSO, { "Clone QSO", "Create a new record (copy conditions)", FL_YELLOW, qso_buttons::cb_start, (void*)qso_data::QSO_COPY_CONDX }},
 	{ qso_buttons::BROWSE, { "Browse Log", "Browse the log without editing", FL_BLUE, qso_buttons::cb_bn_browse, 0}} ,
 	{ qso_buttons::QUIT_QSO, { "Quit", "Quit entry mode", FL_RED, qso_buttons::cb_cancel, 0 } },
-	{ qso_buttons::SAVE_QSO, { "Save QSO", "Log the QSO, activate a new one", FL_GREEN, qso_buttons::cb_save, 0 } },
+	{ qso_buttons::SAVE_QSO, { "Save QSO", "Log the QSO, activate a new one", FL_GREEN, qso_buttons::cb_save, (void*)qso_buttons::SAVE_QSO } },
 	{ qso_buttons::CANCEL_QSO, { "Quit QSO", "Cancel the current QSO entry", FL_RED, qso_buttons::cb_cancel, 0 } },
 	{ qso_buttons::DELETE_QSO, { "Delete QSO", "Delete the selected QSO", COLOUR_CLARET, qso_buttons::cb_bn_delete_qso, 0 } },
 	{ qso_buttons::WORKED_B4, { "B4?", "Display all previous QSOs with this callsign", FL_BACKGROUND_COLOR, qso_buttons::cb_wkb4, 0 } },
@@ -266,8 +266,17 @@ void qso_buttons::cb_save(Fl_Widget* w, void* v) {
 	case qso_data::QSO_ENTER:
 		// Batch entry - start another entry
 		if(!data->action_save()) break;
-		data->action_activate(qso_data::QSO_NONE);
-		data->action_start(qso_data::QSO_NONE);
+		switch(edit_button) {
+			case SAVE_QSO: {
+				data->action_activate(qso_data::QSO_NONE);
+				data->action_start(qso_data::QSO_NONE);
+				break;
+			}
+			case SAVE_EXIT: {
+				data->action_deactivate();
+				break;
+			}
+		}
 		break;
 		// QSO editing
 	case qso_data::QSO_EDIT:
