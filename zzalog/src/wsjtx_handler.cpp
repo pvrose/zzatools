@@ -528,7 +528,11 @@ record* wsjtx_handler::update_qso(bool tx, string time, double audio_freq, strin
 	string m = mode == "" ? mode_ : mode;
 	char msg[100];
 	if (tx) {
-		if (sender != my_call_) {
+		if (sender == "TUNE") {
+			// Quietly ignore
+			return nullptr;
+		}
+		else if (sender != my_call_) {
 			char msg[100];
 			snprintf(msg, sizeof(msg), "WSJTX: TX decode not for user %s: %s", my_call_.c_str(), message.c_str());
 			status_->misc_status(ST_WARNING, msg);
