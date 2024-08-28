@@ -93,6 +93,7 @@ bool PRIVATE = false;
 bool DARK = false;
 uchar THEME;
 bool DISPLAY_VERSION = false;
+bool NEW_BOOK = false;
 
 // Ticker values - main clock runs at 10 Hz - individual objects
 // will get a divided down version
@@ -422,6 +423,11 @@ int cb_args(int argc, char** argv, int& i) {
 		THEME = *(argv[i] + 9);
 		i+=1;
 	}
+	// New file
+	else if (strcmp("-e", argv[i]) == 0 || strcmp("--new", argv[i]) == 0) {
+		NEW_BOOK = true;
+		i+=1;
+	}
 	// Debug
 	else if (strcmp("-d", argv[i]) == 0 || strcmp("--debug", argv[i]) == 0) {
 		i += 1;
@@ -519,6 +525,7 @@ void show_help() {
 	"\t\t\tnos|nostatus\n"
 	"\t\tt|threads\tProvide debug tracing on thread use\n"
 	"\t\t\tnot|nothreads\n"
+	"\t-e|--new\tCreate new file\n"
 	"\t-h|--help\tPrint this\n"
 	"\t-k|--dark\tDark mode (sticky)\n"
 	"\t-l|--light\tLight mode (sticky)\n"
@@ -644,34 +651,37 @@ void add_book(char* arg) {
 		extract_records_ = new extract_data;
 		// Tell the views that a book now exists
 		tabbed_forms_->books();
-		// Get filename and load the data
-		string log_file = get_file(arg);
 
-		if (!book_->load_data(log_file)) {
-			Fl_Preferences backup_settings(settings_, "Backup");
-			char * temp;
-			backup_settings.get("Last Backup", temp, "");
-			string backup = temp;
-			// Cannot access book - try backup
-			if (fl_choice("Load %s failed - load from backup %s", "Yes", "No", nullptr, log_file.c_str(), backup.c_str()) == 0) {
-				char msg[100];
-				snprintf(msg, sizeof(msg), "ZZALOG: Load %s failed, trying backup %s", log_file.c_str(), backup.c_str());
-				status_->misc_status(ST_WARNING, msg);
-				if (book_->load_data(backup)) {
-					using_backup_ = true;
-					status_->misc_status(ST_OK, "ZZALOG: Load backup successful");
+		if (!NEW_BOOK || filename_) {
+			// Get filename and load the data
+			string log_file = get_file(arg);
+
+			if (!book_->load_data(log_file)) {
+				Fl_Preferences backup_settings(settings_, "Backup");
+				char * temp;
+				backup_settings.get("Last Backup", temp, "");
+				string backup = temp;
+				// Cannot access book - try backup
+				if (fl_choice("Load %s failed - load from backup %s", "Yes", "No", nullptr, log_file.c_str(), backup.c_str()) == 0) {
+					char msg[100];
+					snprintf(msg, sizeof(msg), "ZZALOG: Load %s failed, trying backup %s", log_file.c_str(), backup.c_str());
+					status_->misc_status(ST_WARNING, msg);
+					if (book_->load_data(backup)) {
+						using_backup_ = true;
+						status_->misc_status(ST_OK, "ZZALOG: Load backup successful");
+					} else {
+						status_->misc_status(ST_ERROR, "ZZALOG: Load backup failed");
+					}
 				} else {
-					status_->misc_status(ST_ERROR, "ZZALOG: Load backup failed");
+					char msg[100];
+					snprintf(msg, sizeof(msg), "ZZALOG: Load %s failed, no backup loaded", log_file.c_str());
+					status_->misc_status(ST_ERROR, msg);
+					book_->set_filename(log_file);
 				}
 			} else {
-				char msg[100];
-				snprintf(msg, sizeof(msg), "ZZALOG: Load %s failed, no backup loaded", log_file.c_str());
-				status_->misc_status(ST_ERROR, msg);
-				book_->set_filename(log_file);
+				// Move this file to the top of the recent file list
+				set_recent_file(log_file);
 			}
-		} else {
-			// Move this file to the top of the recent file list
-			set_recent_file(log_file);
 		}
 	}
 }
@@ -862,6 +872,8 @@ void print_args(int argc, char** argv) {
 	snprintf(message, sizeof(message), "ZZALOG: -d h=%d - Hamlib debug level %d", 
 		(int)HAMLIB_DEBUG_LEVEL, (int)HAMLIB_DEBUG_LEVEL);
 	status_->misc_status(ST_NOTE, message);
+	if (NEW_BOOK && !filename_) status_->misc_status(ST_NOTE, "ZZALOG: -e - Starting with empty file");
+	if (NEW_BOOK && filename_) status_->misc_status(ST_WARNING, "ZZALOG: -e - filename specified, switch ignored");
 	if (AUTO_UPLOAD) status_->misc_status(ST_NOTE, "ZZALOG: -n - QSOs uploaded to QSL sites automatically");
 	else status_->misc_status(ST_WARNING, "ZZALOG: -q - QSOs are not being uploaded to QSL sites");
 	if (AUTO_SAVE) status_->misc_status(ST_NOTE, "ZZALOG: -a - QSOs being saved automatically");
