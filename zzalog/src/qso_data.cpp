@@ -8,7 +8,7 @@
 #include "qso_contest.h"
 #include "qso_qsl.h"
 #include "qth_dialog.h"
-#include "settings.h"
+#include "config.h"
 #include "rig_if.h"
 #include "book.h"
 #include "status.h"

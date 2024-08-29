@@ -3,7 +3,7 @@
 #include "record.h"
 #include "cty_data.h"
 #include "spec_data.h"
-#include "settings.h"
+#include "config.h"
 #include "tabbed_forms.h"
 #include "import_data.h"
 #include "utils.h"
@@ -63,7 +63,7 @@ extern qrz_handler* qrz_handler_;
 extern wsjtx_handler* wsjtx_handler_;
 extern time_t session_start_;
 extern qso_manager* qso_manager_;
-settings* config_ = nullptr;
+config* config_ = nullptr;
 
 
 
@@ -86,12 +86,12 @@ settings* config_ = nullptr;
 
 	// Settings operations
 	{ "&Settings", 0, 0, 0, FL_SUBMENU },
-		{ "Fi&les", 0, menu::cb_mi_settings, (void*)settings::DLG_FILES },
-		{ "&Web/Network", 0, menu::cb_mi_settings, (void*)settings::DLG_WEB },
-		{ "&Fields", 0, menu::cb_mi_settings, (void*)settings::DLG_COLUMN },
-		{ "&User settings", 0, menu::cb_mi_settings, (void*)settings::DLG_USER },
-		{ "&QSL design", 0, menu::cb_mi_settings, (void*)settings::DLG_QSLE },
-		{ "&All", 0, menu::cb_mi_settings, (void*)settings::DLG_ALL },
+		{ "Fi&les", 0, menu::cb_mi_settings, (void*)config::DLG_FILES },
+		{ "&Web/Network", 0, menu::cb_mi_settings, (void*)config::DLG_WEB },
+		{ "&Fields", 0, menu::cb_mi_settings, (void*)config::DLG_COLUMN },
+		{ "&User config", 0, menu::cb_mi_settings, (void*)config::DLG_USER },
+		{ "&QSL design", 0, menu::cb_mi_settings, (void*)config::DLG_QSLE },
+		{ "&All", 0, menu::cb_mi_settings, (void*)config::DLG_ALL },
 		{ 0 },
 
 	// Windows viewing
@@ -458,13 +458,13 @@ void menu::cb_mi_file_backup(Fl_Widget*, void* v) {
 }
 
 // Config->any
-// v is enum cfg_dialog_t indicating which settings page to open at
+// v is enum cfg_dialog_t indicating which config page to open at
 void menu::cb_mi_settings(Fl_Widget* w, void* v) {
-	// v provides that id of the page of the settings dialogs to open with
-	settings::cfg_dialog_t active = (settings::cfg_dialog_t)(intptr_t)v;
+	// v provides that id of the page of the config dialogs to open with
+	config::cfg_dialog_t active = (config::cfg_dialog_t)(intptr_t)v;
 	if (!config_) {
 		// Open the config and wait for it to close
-		config_ = new settings(WCONFIG, HCONFIG + 100, "Configuration", active);
+		config_ = new config(WCONFIG, HCONFIG + 100, "Configuration", active);
 		config_ = nullptr;
 	}
 }
@@ -1208,7 +1208,7 @@ void menu::cb_mi_info_web(Fl_Widget* w, void* v) {
 	menu* that = ancestor_view<menu>(w);
 	if (record != nullptr && record->item_exists("WEB")) {
 		// Website logged for contact
-		// Get browser from settings
+		// Get browser from config
 		string browser = that->get_browser();
 		if (browser.length() == 0) {
 			return;
@@ -1630,9 +1630,9 @@ void menu::update_windows_items() {
 	redraw();
 }
 
-// Get the browser form settings or if not ask user
+// Get the browser form config or if not ask user
 string menu::get_browser() {
-	// Get browser from settings
+	// Get browser from config
 	char* temp;
 	Fl_Preferences datapath_settings(settings_, "Datapath");
 	datapath_settings.get("Web Browser", temp, "");

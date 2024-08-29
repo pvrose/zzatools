@@ -7,7 +7,7 @@
 #include "spec_tree.h"
 #include "report_tree.h"
 #include "toolbar.h"
-#include "settings.h"
+#include "config.h"
 #include "qso_manager.h"
 
 
@@ -19,7 +19,7 @@ extern extract_data* extract_records_;
 extern import_data* import_data_;
 extern extract_data* dxatlas_records_;
 extern toolbar* toolbar_;
-extern settings* config_;
+extern config* config_;
 extern bool closing_;
 extern qso_manager* qso_manager_;
 

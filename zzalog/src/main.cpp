@@ -10,7 +10,7 @@ main.cpp - application entry point
 
 #include "utils.h"
 #include "record.h"
-#include "settings.h"
+// #include "config.h"
 #include "menu.h"
 #include "book.h"
 #include "cty_data.h"

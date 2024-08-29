@@ -236,7 +236,7 @@
     <ClInclude Include="files_dialog.h" />
     <ClInclude Include="icons.h" />
     <ClInclude Include="page_dialog.h" />
-    <ClInclude Include="settings.h" />
+    <ClInclude Include="config.h" />
     <ClInclude Include="drawing.h" />
     <ClInclude Include="corr_dialog.h" />
     <ClInclude Include="printer.h" />

@@ -5,7 +5,7 @@
 #include "icons.h"
 #include "fields.h"
 #include "menu.h"
-#include "settings.h"
+#include "config.h"
 #include "status.h"
 #include "extract_data.h"
 #include "tabbed_forms.h"
@@ -390,7 +390,7 @@ void qso_contest::cb_wradio(Fl_Widget* w, void* v) {
 	that->write_format_ = (write_t)(intptr_t)v;
 }
 
-// Load settings for the contest ID
+// Load config for the contest ID
 void qso_contest::load_settings() {
 	char* temp;
 	if (contest_id_ == "") {
@@ -442,7 +442,7 @@ void qso_contest::load_settings() {
 	}
 }
 
-// SAve settings for the contest ID
+// SAve config for the contest ID
 void qso_contest::save_settings() {
 	Fl_Preferences contests(settings_, "Contests");
 	contests.set("Current", contest_id_.c_str());
@@ -473,8 +473,8 @@ void qso_contest::check_collection() {
 	bool copied = false;
 	fields_->collection(collection_, "Contest/General", &copied);
 	if (copied) {
-		// Open the settings->fields
-		menu::cb_mi_settings(this, (void*)settings::DLG_COLUMN);
+		// Open the config->fields
+		menu::cb_mi_settings(this, (void*)config::DLG_COLUMN);
 	}
 }
 

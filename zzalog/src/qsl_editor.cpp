@@ -2,7 +2,7 @@
 #include "status.h"
 #include "qso_manager.h"
 #include "qso_data.h"
-#include "settings.h"
+#include "config.h"
 #include "utils.h"
 #include "field_choice.h"
 #include "intl_widgets.h"
