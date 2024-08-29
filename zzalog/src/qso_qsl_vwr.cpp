@@ -814,19 +814,12 @@ void qso_qsl_vwr::set_qsl_status() {
 
 // Display log buttons 
 void qso_qsl_vwr::set_log_buttons() {
-	if (current_qso_) {
+	qso_data* data = ancestor_view<qso_data>(this);
+	if (current_qso_ && data->qso_editing(current_qso_num_)) {
 		bn_fetch_->activate();
-		qso_data* data = ancestor_view<qso_data>(this);
-		if (data->qso_editing(current_qso_num_)) {
-			bn_log_bureau_->activate();
-			bn_log_email_->activate();
-			bn_log_direct_->activate();
-		} else {
-			bn_log_bureau_->deactivate();
-			bn_log_email_->deactivate();
-			bn_log_direct_->deactivate();
-		}
-		
+		bn_log_bureau_->activate();
+		bn_log_email_->activate();
+		bn_log_direct_->activate();
 		bn_card_reqd_->activate();
 		bn_card_decl_->activate();
 	} else {
