@@ -886,18 +886,13 @@ void qso_entry::delete_qso() {
 	}
 }
 
-// Set initial focus - try QSO_DATE then CALL 
+// Set initial focus - go to first blank input
 void qso_entry::set_initial_focus() {
-	if (field_ip_map_.find("QSO_DATE") != field_ip_map_.end()) {
-		field_input* w = ip_field_[field_ip_map_["QSO_DATE"]];
+	bool found = false;
+	for (int ix = NUMBER_FIXED; !found && ix < fields_in_use_.size(); ix ++) {
+		field_input* w = ip_field_[ix];
 		if (w && strlen(w->value()) == 0) {
-			if (w->take_focus()) return;
-		}
-	}
-	if (field_ip_map_.find("CALL") != field_ip_map_.end()) {
-		field_input* w = ip_field_[field_ip_map_["CALL"]];
-		if (w && strlen(w->value()) == 0) {
-			if (w->take_focus()) return;
+			if (w->take_focus()) found = true;
 		}
 	}
 }
