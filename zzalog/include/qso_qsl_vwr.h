@@ -86,6 +86,8 @@ protected:
 	Fl_Image* raw_image_;
 	// Image scaled to fit button
 	Fl_Image* scaled_image_;
+	// Image scaled to fit the screen
+	Fl_Image* screen_image_;
 	// Current QSO
 	record* current_qso_;
 	// Current QSO number

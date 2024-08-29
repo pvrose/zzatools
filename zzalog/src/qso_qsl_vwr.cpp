@@ -35,6 +35,7 @@ qso_qsl_vwr::qso_qsl_vwr(int X, int Y, int W, int H, const char* L) :
 	, selected_image_(QI_NONE)
 	, raw_image_(nullptr)
 	, scaled_image_(nullptr)
+	, screen_image_(nullptr)
 	, current_qso_(nullptr)
 {
 	labelfont(FL_BOLD);
@@ -414,6 +415,8 @@ void qso_qsl_vwr::set_image() {
 					raw_image_ = nullptr;
 					delete scaled_image_;
 					scaled_image_ = nullptr;
+					delete screen_image_;
+					screen_image_ = nullptr;
 					string station = current_qso_->item("STATION_CALLSIGN");
 					de_slash(station);
 
@@ -528,6 +531,22 @@ void qso_qsl_vwr::set_image() {
 						else {
 							scaled_image_ = raw_image_->copy(bn_card_display_->w(), (int)(raw_image_->h() / scale_w));
 						}
+						// Resize the image to fit the screen
+						int sx, sy, sw, sh;
+						Fl::screen_work_area(sx, sy, sw, sh);
+						if (raw_image_->w() < sw && raw_image_->h() < sh) {
+							// Image fits in the screen
+							screen_image_ = raw_image_->copy();
+						} else {
+							scale_w = (float)raw_image_->w() / (float)sw;
+							scale_h = (float)raw_image_->h() / (float)sh;
+							if (scale_w < scale_h) {
+								screen_image_ = raw_image_->copy((int)(raw_image_->w() / scale_h), sh);
+							}
+							else {
+								screen_image_ = raw_image_->copy(sw, (int)(raw_image_->h() / scale_w));
+							}
+						}
 						update_full_view();
 						// Test Whether we've used default station callsign
 					}
@@ -537,6 +556,8 @@ void qso_qsl_vwr::set_image() {
 				raw_image_ = nullptr;
 				delete scaled_image_;
 				scaled_image_ = nullptr;
+				delete screen_image_;
+				screen_image_ = nullptr;
 			}
 			// Got an image: draw it
 			draw_image();
@@ -795,9 +816,17 @@ void qso_qsl_vwr::set_qsl_status() {
 void qso_qsl_vwr::set_log_buttons() {
 	if (current_qso_) {
 		bn_fetch_->activate();
-		bn_log_bureau_->activate();
-		bn_log_email_->activate();
-		bn_log_direct_->activate();
+		qso_data* data = ancestor_view<qso_data>(this);
+		if (data->qso_editing(current_qso_num_)) {
+			bn_log_bureau_->activate();
+			bn_log_email_->activate();
+			bn_log_direct_->activate();
+		} else {
+			bn_log_bureau_->deactivate();
+			bn_log_email_->deactivate();
+			bn_log_direct_->deactivate();
+		}
+		
 		bn_card_reqd_->activate();
 		bn_card_decl_->activate();
 	} else {
@@ -818,7 +847,7 @@ void qso_qsl_vwr::update_full_view() {
 		case QI_EMAIL:
 		case QI_CARD_FRONT: {
 			win_full_view_->resizable(bn_full_view_);
-			bn_full_view_->image(raw_image_);
+			bn_full_view_->image(screen_image_);
 			if (raw_image_) {
 				bn_full_view_->show();
 				bn_no_image_->hide();
@@ -862,7 +891,7 @@ void qso_qsl_vwr::resize_full_view() {
 		}
 		default: {
 			if (raw_image_) {
-				win_full_view_->size(raw_image_->w(), raw_image_->h());
+				win_full_view_->size(screen_image_->w(), screen_image_->h());
 			} else {
 				win_full_view_->size(bn_no_image_->w(), bn_no_image_->h());
 			}
