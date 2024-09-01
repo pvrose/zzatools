@@ -443,7 +443,7 @@ void qso_rig::create_network(int curr_x, int curr_y) {
 	curr_y += HTEXT;
 
 	// Input to type in network address and port number
-	ip_port_ = new Fl_Input(curr_x, curr_y, ip_app_name_->w(), HTEXT, "Port");
+	ip_port_ = new Fl_Input(curr_x, curr_y, ip_app_name_->w(), HTEXT, "Host:Port");
 	ip_port_->align(FL_ALIGN_LEFT);
 	ip_port_->callback(cb_ip_port, nullptr);
 	ip_port_->tooltip("Enter the network/USB port to use");
