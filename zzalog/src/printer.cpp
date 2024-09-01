@@ -339,10 +339,14 @@ int printer::print_page_cards(size_t &item_num) {
 			for (int i = 0; i < print_records; i++) {
 				records[i] = navigation_book_->get_record(item_num + i, false);
 			}
-			qsl_display* qsl = new qsl_display(
+			qsl_display* qsl = new qsl_display();
+			qsl->value(records[0]->item("STATION_CALLSIGN"), records, print_records);
+
+			Fl_Button* bn = new Fl_Button(
 				cwin_x_ + ((card % card_data_->columns) * card_data_->width), 
 				cwin_y_ + (((card / card_data_->columns) % card_data_->rows) * card_data_->height), 10, 10);
-			qsl->value(records[0]->item("STATION_CALLSIGN"), records, print_records);
+			bn->box(FL_FLAT_BOX);
+			bn->image(qsl->image());
 			item_num += print_records;
 			num_records -= print_records;
 			// If did not print all with this callsign create a new label to print

@@ -105,6 +105,8 @@ class qsl_editor : public page_dialog
     bool show_example_;
     // Current QSO to use
     record* example_qso_;
+    // Card display
+    qsl_display* qsl_;
 
     //Widgets to reference:-
 
@@ -114,10 +116,10 @@ class qsl_editor : public page_dialog
     Fl_Group* g_2_;
     // Contains the item editing buttons
     Fl_Group* g_4_;
-    // Card display
-    qsl_display* display_;
     // Window in which to show the display
     Fl_Window* w_display_;
+    // Display widget
+    Fl_Widget* display_;
     // Output contains calculated size of display (in pixels)
     Fl_Output* op_size_;
 };

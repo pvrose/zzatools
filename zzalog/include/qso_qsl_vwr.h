@@ -7,7 +7,6 @@
 using namespace std;
 
 class record;
-class qsl_display;
 class Fl_Button;
 class Fl_Light_Button;
 class Fl_Radio_Light_Button;
@@ -77,6 +76,8 @@ protected:
 	void update_full_view();
 	// Set full view size
 	void resize_full_view();
+	// Scale image to fit the target widgets
+	void scale_image();
 
 protected:
 
@@ -121,7 +122,4 @@ protected:
 	// Button
 	Fl_Button* bn_full_view_;
 	Fl_Button* bn_no_image_;
-	qsl_display* display_myqsl_;
-
-
 };

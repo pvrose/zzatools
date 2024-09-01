@@ -5,12 +5,12 @@
 #include <vector>
 #include <string>
 
-#include <FL/Fl_Widget.H>
 
 using namespace std;
 
 class record;
 class Fl_Image;
+class Fl_RGB_Image;
 
 // This class provides the drawing of a QSL label. It is used as part of the
 // editor, the QSL viewer in QSO dashboard and tne printer.
@@ -19,7 +19,7 @@ class Fl_Image;
 const float MM_TO_POINT = 72.0f / 25.4f;
 const float IN_TO_POINT = 72.0f;
 
-class qsl_display : public Fl_Widget 
+class qsl_display
 {
 
     public:
@@ -127,7 +127,7 @@ class qsl_display : public Fl_Widget
         vector<item_def*> items; // layout items read in from file 
     };
 
-    qsl_display(int X, int Y, int W, int H, const char* L = nullptr);
+    qsl_display();
     ~qsl_display();
 
     // Load data
@@ -137,14 +137,12 @@ class qsl_display : public Fl_Widget
     // Load items
     void load_items();
 
-    // Resize the drawing according to the card label width and height parameters
-    void resize();
     // Set the callsign to be used and the records to include in the label
     void value(string callsign, record** qsos = nullptr, int num_records = 0);
     // Short-cut version of above with one QSO and callsign to be taken from it
     void example_qso(record* qso);
     // Overide the Fl_Group::draw() to impelment the drawing.
-    virtual void draw();
+    void draw();
 
     // Editable flag to allow widgets to be edited in situ
     void editable(bool enable); 
@@ -157,6 +155,9 @@ class qsl_display : public Fl_Widget
 
     // Get the image at that filename
     static Fl_Image* get_image(string filename);
+
+    // Return the drawn image
+    Fl_RGB_Image* image();
 
     protected:
 
@@ -194,5 +195,7 @@ class qsl_display : public Fl_Widget
 
     // Card data has been modified
     bool dirty_data_;
-
+    
+    // The generated image
+    Fl_RGB_Image* image_;
 };

@@ -11,6 +11,7 @@
 #include <FL/Fl_JPEG_Image.H>
 #include <FL/Fl_BMP_Image.H>
 #include <FL/Fl_PNG_Image.H>
+#include <FL/Fl_Image_Surface.H>
 
 using namespace std;
 
@@ -23,15 +24,14 @@ extern Fl_Preferences* settings_;
 map<string, qsl_display::card_data> qsl_display::all_data_;
 
 // Constructor - just initialises the data
-qsl_display::qsl_display(int X, int Y, int W, int H, const char* L) : 
-	Fl_Widget(X, Y, W, H, L) {
-    color(FL_WHITE);
-	box(FL_FLAT_BOX);
+qsl_display::qsl_display()
+{
     qsos_ = nullptr;
     num_records_ = 0;
 	callsign_ = "";
     editable_ = false;
 	dirty_data_ = false;
+	image_ = nullptr;
 }
 
 // Destructor - save the data
@@ -51,15 +51,8 @@ void qsl_display::value(string callsign, record** qsos, int num_records) {
 	}
 	// Select the data for this callsign
 	data_ = &all_data_.at(callsign);
-	// Redraw all the items
-    redraw();
-	// And size the widget to fit.
-	resize();
-}
-
-// Set the size of the widget to size of the label
-void qsl_display::resize() {
-    Fl_Widget::size(to_points(data_->width), to_points(data_->height));
+	// draw the image
+	draw();
 }
 
 // Use this QSO to display an example card
@@ -72,13 +65,21 @@ void qsl_display::example_qso(record* qso) {
 		qsos_ = nullptr;
 		num_records_ = 0;
 	}
-	redraw();
+	draw();
 }
 
 // Overload of the Fl_Widget::draw() method
 void qsl_display::draw() {
+	int width = to_points(data_->width);
+	int height = to_points(data_->height);
+	// Delete the existingwidget
+	delete image_;
+	// Set the drawing surface
+	Fl_Image_Surface* surface = new Fl_Image_Surface(width, height);
+	Fl_Surface_Device::push_current(surface);
+
 	// Colour the whole display
-	fl_rectf(x(), y(), w(), h(), FL_WHITE);
+	fl_rectf(0, 0, width, height, FL_WHITE);
 	// For each item...
     for (auto it = data_->items.begin(); it != data_->items.end(); it++) {
         item_def& item = *(*it);
@@ -98,6 +99,11 @@ void qsl_display::draw() {
 			}
 		}
 	}
+	// Now save the image
+	image_ = surface->image();
+	// Restore graphicx surface
+	Fl_Surface_Device::pop_current();
+	
 }
 
 // Draw an individual field item 
@@ -167,8 +173,8 @@ void qsl_display::draw_field(field_def& field) {
 	fw = max(fw, 45);
 	fh = max(fh, 15);
 	// Get the X and Y positions - "-1" indicates abut it to previous item
-	int fx = (field.dx == -1) ? next_x_ : field.dx + x();
-	int fy = (field.dy == -1) ? next_y_ : field.dy + y();
+	int fx = (field.dx == -1) ? next_x_ : field.dx;
+	int fy = (field.dy == -1) ? next_y_ : field.dy;
 	// Are we displaying the field if its value is the empty string?
 	if (field.display_empty || text.length()) {
 		// Draw the box if necessary
@@ -243,13 +249,13 @@ void qsl_display::draw_text(text_def& text) {
 	fl_font(text.t_style.font, text.t_style.size);
 	fl_color(text.t_style.colour);
 	// Draw the text
-	fl_draw(text.text.c_str(), text.dx + x(), text.dy + y() + fl_height() - fl_descent());
+	fl_draw(text.text.c_str(), text.dx, text.dy + fl_height() - fl_descent());
 }
 
 // Draw an image item - note this draws the imageits actual size
 void qsl_display::draw_image(image_def& image) {
 	if (image.image) {
-		image.image->draw(image.dx + x(), image.dy + y());
+		image.image->draw(image.dx, image.dy);
 	}
 }
 
@@ -582,4 +588,8 @@ string qsl_display::convert_time(string value) {
 
 void qsl_display::dirty() {
 	dirty_data_ = true;
+}
+
+Fl_RGB_Image* qsl_display::image() { 
+	return image_;
 }

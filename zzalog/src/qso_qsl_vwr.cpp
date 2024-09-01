@@ -260,8 +260,7 @@ void qso_qsl_vwr::create_form() {
 	bn_no_image_->label("No image available!");
 	bn_no_image_->labelsize(FL_NORMAL_SIZE * 3);
 	bn_no_image_->labelcolor(FL_RED);
-	// Display My QSL generated image
-	display_myqsl_ = new qsl_display(0, 0, WCARD, HCARD);
+
 	win_full_view_->resizable(bn_full_view_);
 	win_full_view_->end();
 	win_full_view_->hide();
@@ -382,11 +381,26 @@ void qso_qsl_vwr::enable_widgets() {
 
 // Get the card image to display and put it in the image widget.
 void qso_qsl_vwr::set_image() {
+	qsl_display* qsl;
 	switch(selected_image_) {
-		case QI_NONE: 
-		case QI_MY_QSL: {
+		case QI_NONE: {
 			draw_image();
 			update_full_view();
+			break;
+		}
+		case QI_MY_QSL: {
+			qsl = new qsl_display();
+			if (current_qso_) {
+				qsl->value(current_qso_->item("STATION_CALLSIGN"), &current_qso_, 1);
+			} else {
+				qso_manager* mgr = ancestor_view<qso_manager>(this);
+				string def_call = mgr->get_default(qso_manager::CALLSIGN);
+				qsl->value(def_call, nullptr, 0);
+			}
+			raw_image_ = qsl->image();
+			scale_image();
+			update_full_view();
+			draw_image();
 			break;
 		}
 		default: {
@@ -521,32 +535,7 @@ void qso_qsl_vwr::set_image() {
 						}
 					}
 					if (found_image) {
-						// Resize the image to fit the control
-						// Resize keeping original height/width ratio
-						float scale_w = (float)raw_image_->w() / (float)bn_card_display_->w();
-						float scale_h = (float)raw_image_->h() / (float)bn_card_display_->h();
-						if (scale_w < scale_h) {
-							scaled_image_ = raw_image_->copy((int)(raw_image_->w() / scale_h), bn_card_display_->h());
-						}
-						else {
-							scaled_image_ = raw_image_->copy(bn_card_display_->w(), (int)(raw_image_->h() / scale_w));
-						}
-						// Resize the image to fit the screen
-						int sx, sy, sw, sh;
-						Fl::screen_work_area(sx, sy, sw, sh);
-						if (raw_image_->w() < sw && raw_image_->h() < sh) {
-							// Image fits in the screen
-							screen_image_ = raw_image_->copy();
-						} else {
-							scale_w = (float)raw_image_->w() / (float)sw;
-							scale_h = (float)raw_image_->h() / (float)sh;
-							if (scale_w < scale_h) {
-								screen_image_ = raw_image_->copy((int)(raw_image_->w() / scale_h), sh);
-							}
-							else {
-								screen_image_ = raw_image_->copy(sw, (int)(raw_image_->h() / scale_w));
-							}
-						}
+						scale_image();
 						update_full_view();
 						// Test Whether we've used default station callsign
 					}
@@ -607,6 +596,35 @@ void qso_qsl_vwr::set_image() {
 				}
 			}
 			break;
+		}
+	}
+}
+
+void qso_qsl_vwr::scale_image() {
+	// Resize the image to fit the control
+	// Resize keeping original height/width ratio
+	float scale_w = (float)raw_image_->w() / (float)bn_card_display_->w();
+	float scale_h = (float)raw_image_->h() / (float)bn_card_display_->h();
+	if (scale_w < scale_h) {
+		scaled_image_ = raw_image_->copy((int)(raw_image_->w() / scale_h), bn_card_display_->h());
+	}
+	else {
+		scaled_image_ = raw_image_->copy(bn_card_display_->w(), (int)(raw_image_->h() / scale_w));
+	}
+	// Resize the image to fit the screen
+	int sx, sy, sw, sh;
+	Fl::screen_work_area(sx, sy, sw, sh);
+	if (raw_image_->w() < sw && raw_image_->h() < sh) {
+		// Image fits in the screen
+		screen_image_ = raw_image_->copy();
+	} else {
+		scale_w = (float)raw_image_->w() / (float)sw;
+		scale_h = (float)raw_image_->h() / (float)sh;
+		if (scale_w < scale_h) {
+			screen_image_ = raw_image_->copy((int)(raw_image_->w() / scale_h), sh);
+		}
+		else {
+			screen_image_ = raw_image_->copy(sw, (int)(raw_image_->h() / scale_w));
 		}
 	}
 }
@@ -698,6 +716,7 @@ void qso_qsl_vwr::draw_image() {
 	case QI_CARD_BACK:
 	case QI_CARD_FRONT:
 	case QI_EMAIL:
+	case QI_MY_QSL:
 		// We want to display the saved QSL image
 		if (scaled_image_) {
 			// we have an image
@@ -728,19 +747,6 @@ void qso_qsl_vwr::draw_image() {
 			bn_card_display_->labelcolor(FL_FOREGROUND_COLOR);
 			bn_card_display_->labelfont(FL_BOLD);
 			bn_card_display_->box(FL_BORDER_BOX);
-		}
-		break;
-	case QI_MY_QSL:
-		bn_card_display_->label("My QSL is displayed in separate window\nclick to show");
-		bn_card_display_->labelcolor(FL_FOREGROUND_COLOR);
-		bn_card_display_->labelsize(FL_NORMAL_SIZE);
-		bn_card_display_->box(FL_BORDER_BOX);
-		if (current_qso_) {
-			display_myqsl_->value(current_qso_->item("STATION_CALLSIGN"), &current_qso_, 1);
-		} else {
-			qso_manager* mgr = ancestor_view<qso_manager>(this);
-			string def_call = mgr->get_default(qso_manager::CALLSIGN);
-			display_myqsl_->value(def_call, nullptr, 0);
 		}
 		break;
 	case QI_NONE:
@@ -838,7 +844,8 @@ void qso_qsl_vwr::update_full_view() {
 		case QI_EQSL:
 		case QI_CARD_BACK:
 		case QI_EMAIL:
-		case QI_CARD_FRONT: {
+		case QI_CARD_FRONT: 
+		case QI_MY_QSL: {
 			win_full_view_->resizable(bn_full_view_);
 			bn_full_view_->image(screen_image_);
 			if (raw_image_) {
@@ -848,20 +855,11 @@ void qso_qsl_vwr::update_full_view() {
 				bn_full_view_->hide();
 				bn_no_image_->show();
 			}
-			display_myqsl_->hide();
 			break;
 		}
-		case QI_MY_QSL:
-			win_full_view_->resizable(nullptr);
-			bn_full_view_->hide();
-			bn_no_image_->hide();
-			display_myqsl_->show();
-			display_myqsl_->redraw();
-			break;
 		case QI_NONE: {
 			if (win_full_view_->visible()) win_full_view_->hide();
 			bn_full_view_->hide();
-			display_myqsl_->hide();
 			bn_no_image_->show();
 			break;
 		}
@@ -876,10 +874,6 @@ void qso_qsl_vwr::resize_full_view() {
 	switch(selected_image_) {
 		case QI_NONE: {
 			win_full_view_->size(bn_no_image_->w(), bn_no_image_->h());
-			break;
-		}
-		case QI_MY_QSL: {
-			win_full_view_->size(display_myqsl_->w(), display_myqsl_->h());
 			break;
 		}
 		default: {

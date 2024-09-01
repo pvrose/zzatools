@@ -34,17 +34,21 @@ qsl_editor::qsl_editor(int X, int Y, int W, int H, const char* L) :
 	// Load settings
     load_values();
 	// Create the qsl_display instance
+	qsl_ = new qsl_display;
+	qsl_->load_data(callsign_);
 	create_display();
 	// Load the display settings for this callsign
-    display_->value(callsign_);
+    qsl_->value(callsign_);
 	// We shall be editing the display
-    display_->editable(true);
+    qsl_->editable(true);
 
 	// Only show the dipslay window if this dialog is active
 	if (active()) w_display_->show();
 	else w_display_->hide();
 	// Add all the widgets in this dialog
     create_form(X, Y);
+
+	if (active()) redraw_display();
 
 }
 
@@ -354,7 +358,7 @@ void qsl_editor::resize() {
 void qsl_editor::save_values() {
 
 	// Save the current callsign's card data
-    display_->save_data();
+    qsl_->save_data();
 	
 	// Sabe the display window position
 	Fl_Preferences windows_settings(settings_, "Windows");
@@ -706,27 +710,30 @@ void qsl_editor::create_iparams(int& curr_x, int& curr_y, qsl_display::image_def
 
 // After editing the item data, redraw the window
 void qsl_editor::redraw_display() {
-	display_->resize();
-	w_display_->size(display_->w(), display_->h());
 	if (show_example_) {
 		example_qso_ = qso_manager_->data()->current_qso();
 		if (example_qso_ && example_qso_->item("STATION_CALLSIGN") == callsign_) {
 			// Showing the example qSO as it exists and matches the callsign 
-			display_->example_qso(example_qso_);
+			qsl_->example_qso(example_qso_);
 		} else {
 			// Either there is no qSO ipor a different callsign was used
 			char msg[100];
 			snprintf(msg, sizeof(msg), "QSL: Current QSO does not match callsign %s",
 				callsign_.c_str());
 			status_->misc_status(ST_WARNING, msg);
-			display_->example_qso(nullptr);
+			qsl_->example_qso(nullptr);
 		} 
 	} else {
 		// Do not show an example QSO
-		display_->example_qso(nullptr);
+		qsl_->example_qso(nullptr);
 	}
-	display_->redraw();
-	display_->dirty();
+	// Card display
+	qsl_->draw();
+	Fl_Image* image = qsl_->image();
+	display_->size(image->w(), image->h());
+	w_display_->size(display_->w(), display_->h());
+	display_->image(image);
+	w_display_->redraw();
 }
 
 // Update the size widget
@@ -823,7 +830,7 @@ void qsl_editor::cb_ip_bool(Fl_Widget* w, void* v) {
 void qsl_editor::cb_callsign(Fl_Widget* w, void* v) {
     qsl_editor* that = ancestor_view<qsl_editor>(w);
     cb_value<field_input, string>(w, v);
-	that->display_->value(that->callsign_);
+	that->qsl_->value(that->callsign_);
     that->redraw_display();  
 	that->create_items();
 }
@@ -843,7 +850,7 @@ void qsl_editor::cb_filename(Fl_Widget* w, void* v) {
     qsl_editor* that = ancestor_view<qsl_editor>(w);
 	cb_value<intl_input, string>(w, v);
 	that->save_values();
-	that->display_->value(that->callsign_);
+	that->qsl_->value(that->callsign_);
 	that->redraw_display();
 	that->create_items();
 }
@@ -853,7 +860,7 @@ void qsl_editor::cb_browse(Fl_Widget* w, void* v) {
     qsl_editor* that = ancestor_view<qsl_editor>(w);
 	cb_bn_browsefile(w, v);
 	that->save_values();
-	that->display_->value(that->callsign_);
+	that->qsl_->value(that->callsign_);
 	that->redraw_display();
 	that->create_items();
 }
@@ -889,7 +896,7 @@ void qsl_editor::cb_image(Fl_Widget* w, void* v) {
 	
 	cb_bn_browsefile(w, (void*)&bd);
 	qsl_editor* that = ancestor_view<qsl_editor>(w);
-	image.image = that->display_->get_image(image.filename);
+	image.image = that->qsl_->get_image(image.filename);
 	that->redraw_display();
 	that->create_items();
 }
@@ -919,8 +926,8 @@ void qsl_editor::create_display() {
 	snprintf(l, sizeof(l), "QSL Card Design: %s", callsign_.c_str());
 	w_display_->copy_label(l);
 	w_display_->border(true);
-	display_ = new qsl_display(0, 0, 100, 100);
-
+	display_ = new Fl_Button(0, 0, 100, 100);
+	display_->box(FL_FLAT_BOX);
 	w_display_->end();
 	w_display_->show();
 	Fl_Group::current(save);
