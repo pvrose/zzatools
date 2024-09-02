@@ -127,7 +127,10 @@ class qsl_display
         vector<item_def*> items; // layout items read in from file 
     };
 
+    // Constructor to create a resizeable image
     qsl_display();
+    // Constructor to draw directly on the current drawing surface
+    qsl_display(int X, int Y);
     ~qsl_display();
 
     // Load data
@@ -160,6 +163,8 @@ class qsl_display
     Fl_RGB_Image* image();
 
     protected:
+
+    void draw_surface();
 
     // Draw an individual field item
     void draw_field(field_def& field);
@@ -198,4 +203,13 @@ class qsl_display
     
     // The generated image
     Fl_RGB_Image* image_;
+
+    // Draw directly
+    bool draw_direct_;
+    // Origin
+    int x_;
+    int y_;
+    // Width and height in points
+    int w_;
+    int h_;
 };

@@ -320,9 +320,7 @@ int printer::print_cards() {
 int printer::print_page_cards(size_t &item_num) {
 	int x, y;
 	origin(&x, &y);
-	Fl_Window* win = new Fl_Window(cwin_x_, cwin_y_, cwin_w_, cwin_h_);
-	win->clear_border();
-	win->color(FL_WHITE);
+	begin_page();
 	int card;
 	// Instantiate the cards that will fit on the page
 	for (card = 0; item_num < navigation_book_->size() && card < items_per_page_; card++) {
@@ -339,26 +337,18 @@ int printer::print_page_cards(size_t &item_num) {
 			for (int i = 0; i < print_records; i++) {
 				records[i] = navigation_book_->get_record(item_num + i, false);
 			}
-			qsl_display* qsl = new qsl_display();
+			int imagex = cwin_x_ + ((card % card_data_->columns) * card_data_->width);
+			int imagey = cwin_y_ + (((card / card_data_->columns) % card_data_->rows) * card_data_->height);
+			qsl_display* qsl = new qsl_display(imagex, imagey);
 			qsl->value(records[0]->item("STATION_CALLSIGN"), records, print_records);
 
-			Fl_Button* bn = new Fl_Button(
-				cwin_x_ + ((card % card_data_->columns) * card_data_->width), 
-				cwin_y_ + (((card / card_data_->columns) % card_data_->rows) * card_data_->height), 10, 10);
-			bn->box(FL_FLAT_BOX);
-			bn->image(qsl->image());
 			item_num += print_records;
 			num_records -= print_records;
 			// If did not print all with this callsign create a new label to print
 			if (num_records) card++;
 		}
 	}
-	win->end();
-	win->show();
-	begin_page();
-	print_window(win, x, y);
 	end_page();
-	Fl::delete_widget(win);
 	return 0;
 }
 
