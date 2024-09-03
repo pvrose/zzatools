@@ -95,6 +95,8 @@ void qso_details::get_qsos() {
 			string match = "^.+" + m[2].str() + "(/.+)?$";
 			body_match = match;
 		}
+	} else {
+		match_possible = false;
 	}
 
 	// Scan the book for all records with this callsign
