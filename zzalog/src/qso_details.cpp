@@ -6,6 +6,9 @@
 #include "status.h"
 #include "spec_data.h"
 #include "record.h"
+#include "regices.h"
+
+#include <regex>
 
 #include <FL/Fl_Output.H>
 
@@ -77,11 +80,25 @@ void qso_details::get_qsos() {
 	set<string> qths;
 	set<string> locators;
 	set<qso_num_t> items;
+	set<qso_num_t> possibles;
+	string call = qso_ ? qso_->item("CALL") : "";
+	basic_regex<char> body_match;
+	smatch m;
+	bool match_possible = true;
+	if (!regex_search(call, m, REGEX_CALL_BODY)) {
+		char msg[128];
+		snprintf(msg, sizeof(msg), "DASH: Call %s does not match a typical call", call.c_str());
+		status_->misc_status(ST_WARNING, msg);
+		match_possible = false;
+	} else {
+		string match = "^.+" + m[2].str() + "(/.+)?$";
+		body_match = match;
+	}
 
 	// Scan the book for all records with this callsign
 	for (qso_num_t ix = 0; qso_ && ix < book_->size(); ix++) {
 		record* it = book_->get_record(ix, false);
-		if (it->item("CALL") == qso_->item("CALL")) {
+		if (it->item("CALL") == call) {
 			// Get all NAME fields
 			string name = it->item("NAME");
 			if (name.length()) {
@@ -101,13 +118,23 @@ void qso_details::get_qsos() {
 			if (qso_->timestamp() != it->timestamp()) {
 				items.insert(ix);
 			}
+		} else if (match_possible) {
+			// Get call body (less prexix or suffix
+			if (regex_search(it->item("CALL"), body_match)) {
+				possibles.insert(ix);
+			}
 		}
+
 	}
 	table_details_->set_data(names, qths, locators);
-	table_qsos_->set_data(items);
+	table_qsos_->set_data(items, possibles);
 	// Mark with either a tick or cross depending on whether there are any previous
 	if (items.size() == 0) {
-		label("Previous \342\234\230");
+		if (possibles.size() == 0) {
+			label("Previous \342\234\230");
+		} else {
+			label("Previous ?");
+		}
 	} else {
 		label("Previous \342\234\224");
 	}
@@ -242,12 +269,13 @@ qso_details::table_q::table_q(int X, int Y, int W, int H, const char* L) :
 {
 	row_header(false);
 	col_header(true);
-	cols(4);
+	cols(5);
 	float wd = (float)tiw;
 	col_width(0, (int)(wd * 0.3) );
 	col_width(1, (int)(wd * 0.2) );
 	col_width(2, (int)(wd * 0.2) );
 	col_width(3, (int)(wd * 0.3) );
+	col_width(4, (int)(wd * 0.3) );
 	callback(cb_table);
 	end();
 }
@@ -289,6 +317,9 @@ void qso_details::table_q::draw_cell(TableContext context, int R, int C, int X, 
 		case 3:
 			text = "My Call";
 			break;
+		case 4:
+			text = "Wkd Call";
+			break;
 		}
 		// BOX
 		fl_draw_box(FL_THIN_UP_BOX, X, Y, W, H, FL_BACKGROUND_COLOR);
@@ -328,14 +359,20 @@ void qso_details::table_q::draw_cell(TableContext context, int R, int C, int X, 
 			case 3:
 				field = "STATION_CALLSIGN";
 				break;
+			case 4:
+				field = "CALL";
+				break;
+			
 			}
 			text = it->item(field);
 			bool used = false;
 			bool same_call = false;
+			bool match = false;
 			if (qso) {
 				s_value = qso->item(field);
 				if (s_value.length() && s_value == text) used = true;
 				if (qso->item("STATION_CALLSIGN") == it->item("STATION_CALLSIGN")) same_call = true;
+				if (qso->item("CALL") == it->item("CALL")) match = true;
 			}
 			// Fl_Color bg_colour = used ? (same_call ? fl_lighter(COLOUR_CLARET) : COLOUR_APPLE) : FL_BACKGROUND_COLOR;
 			// if (!active_r()) bg_colour = fl_inactive(bg_colour);
@@ -345,7 +382,7 @@ void qso_details::table_q::draw_cell(TableContext context, int R, int C, int X, 
 			Fl_Color fg_colour = FL_FOREGROUND_COLOR;
 			if (!active_r()) fg_colour = fl_inactive(fg_colour);
 			fl_color(fg_colour);
-			Fl_Font f = same_call ? (used ? FL_BOLD : 0 ) : FL_ITALIC;
+			Fl_Font f = match ? same_call ? (used ? FL_BOLD : 0 ) : FL_ITALIC : FL_ITALIC;
 			fl_font(f, FL_NORMAL_SIZE);
 			fl_draw(text.c_str(), X + 1, Y, W - 1, H, FL_ALIGN_LEFT);
 
@@ -370,8 +407,12 @@ void qso_details::table_q::cb_table(Fl_Widget* w, void* v) {
 }
 
 // Set the table items
-void qso_details::table_q::set_data(set<qso_num_t> items) {
+void qso_details::table_q::set_data(set<qso_num_t> items, set<qso_num_t> possibles) {
 	items_.clear();
+	// The vector is built up from the end - put the possibles at the end
+	for (auto it = possibles.begin(); it != possibles.end(); it++) {
+		items_.insert(items_.begin(), (*it));
+	}
 	for (auto it = items.begin(); it != items.end(); it++) {
 		items_.insert(items_.begin(), (*it));
 	}

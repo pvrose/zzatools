@@ -60,4 +60,5 @@ const basic_regex<char> REGEX_CQ("CQ(| [A-Z][0-9]{1,4})");
 const basic_regex<char> REGEX_WHITE_SPACE("\\s*");
 // RPC date time format - YYYYMMDDTHH:MM:SS or YYYY-MM-DDTHH:MM:SS
 const basic_regex<char> REGEX_ISO_DATETIME("[0-9]*4-?[0-9]*2-?[0-9]*2T[0123][0-9]:?[0-5][0-9]:?[0-5][0-9]");
-
+// Call sign body
+const basic_regex<char> REGEX_CALL_BODY("(^[0-9]?[A-Za-z]).*([0-9][A-Za-z]{1,})");

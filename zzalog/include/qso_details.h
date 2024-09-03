@@ -91,7 +91,7 @@ protected:
         // Click on row to peek 
         static void cb_table(Fl_Widget* w, void* v);
         // Set data
-        void set_data(set<qso_num_t> items);
+        void set_data(set<qso_num_t> items, set<qso_num_t> possibles);
             
     protected:
         // The previous QSOs
