@@ -85,14 +85,16 @@ void qso_details::get_qsos() {
 	basic_regex<char> body_match;
 	smatch m;
 	bool match_possible = true;
-	if (!regex_search(call, m, REGEX_CALL_BODY)) {
-		char msg[128];
-		snprintf(msg, sizeof(msg), "DASH: Call %s does not match a typical call", call.c_str());
-		status_->misc_status(ST_WARNING, msg);
-		match_possible = false;
-	} else {
-		string match = "^.+" + m[2].str() + "(/.+)?$";
-		body_match = match;
+	if (call.length()) {
+		if (!regex_search(call, m, REGEX_CALL_BODY)) {
+			char msg[128];
+			snprintf(msg, sizeof(msg), "DASH: Call %s does not match a typical call", call.c_str());
+			status_->misc_status(ST_WARNING, msg);
+			match_possible = false;
+		} else {
+			string match = "^.+" + m[2].str() + "(/.+)?$";
+			body_match = match;
+		}
 	}
 
 	// Scan the book for all records with this callsign

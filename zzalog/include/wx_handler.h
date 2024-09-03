@@ -5,6 +5,8 @@
 
 #include <string>
 #include <list>
+#include <thread>
+#include <atomic>
 
 using namespace std;
 
@@ -204,6 +206,16 @@ protected:
     time_t convert_date(string s);
     // Fetch icon
     Fl_Image* fetch_icon(string name);
+
+    // Run the fetch thread
+    static void do_thread(wx_handler* that);
+    // The thread
+    thread* wx_thread_;
+    // Thread control
+    atomic<bool> run_thread_;
+    atomic<bool> wx_fetch_;
+    atomic<bool> wx_valid_;
+
 
     // Current elements being processed
     list<wxe_element_t> elements_;

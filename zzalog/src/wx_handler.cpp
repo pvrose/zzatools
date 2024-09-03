@@ -17,8 +17,13 @@ extern status* status_;
 extern url_handler* url_handler_;
 extern qso_manager* qso_manager_;
 extern ticker* ticker_;
+extern bool DEBUG_THREADS;
+extern bool DEBUG_QUICK;
 
 const double MPH2MPS = 1.0 / 3600.0 * (1760.0 * 36.0) * 25.4 / 1000.0;
+
+const double LONG_DELAY = 30. * 60. * 10.;
+const double SHORT_DELAY = 3. * 60. * 10.;
 
 // Constructor
 wx_handler::wx_handler() :
@@ -26,17 +31,36 @@ wx_handler::wx_handler() :
 
     report_.icon = nullptr;
     elements_.clear();
-    update();
+    run_thread_ = true;
+    wx_fetch_ = false;
+    wx_valid_ = false;
+    wx_thread_ = new thread(do_thread, this);
+    wx_fetch_ = true;
     // Start ticker - 30 minutes
-    ticker_->add_ticker(this, cb_ticker, 30 * 60 * 10);
+    ticker_->add_ticker(this, cb_ticker, DEBUG_QUICK ? SHORT_DELAY : LONG_DELAY);
 
 };
 
 // Destructor   
 wx_handler::~wx_handler() {
     ticker_->remove_ticker(this);
+    run_thread_ = false;
 };
 
+void wx_handler::do_thread(wx_handler* that) {
+    while (that->run_thread_) {
+        if (DEBUG_THREADS) printf("WX Thread waiting for fetch\n");
+        while(!that->wx_fetch_) {
+            this_thread::sleep_for(chrono::milliseconds(1000));
+        }
+        if (DEBUG_THREADS) printf("WX Thread staring to fetch\n");
+        that->wx_valid_ = false;
+        that->update();
+        if (DEBUG_THREADS) printf("WX Thread fetching complete\n");
+        that->wx_fetch_ = false;
+        that->wx_valid_ = true;
+    }
+}
 
 // XML reader overloads
 // Overloadable XML handlers
@@ -195,7 +219,9 @@ void wx_handler::update() {
 
 // Timer - called every 30 minutes
 void wx_handler::ticker() {
-    update();
+    wx_fetch_ = true;
+    while(!wx_valid_) Fl::check();
+    
     qso_manager_->enable_widgets();
 }
 
