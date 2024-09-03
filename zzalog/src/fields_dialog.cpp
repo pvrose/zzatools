@@ -129,7 +129,12 @@ void fields_table::draw_cell(TableContext context, int R, int C, int X, int Y,
 void fields_table::data(collection_t* d) {
     data_ = d;
     rows(data_->size() + 1);
+    // Sometimes it seems we enter with a different font than expected
+    Fl_Font save_font = fl_font();
+    Fl_Fontsize save_size = fl_size();
+    fl_font(0, FL_NORMAL_SIZE);
     row_height_all(fl_height() + 2);
+    fl_font(save_font, save_size);
     redraw();
 }
 
