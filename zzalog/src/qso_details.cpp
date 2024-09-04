@@ -318,10 +318,10 @@ void qso_details::table_q::draw_cell(TableContext context, int R, int C, int X, 
 		case 2:
 			text = "Mode";
 			break;
-		case 3:
+		case 4:
 			text = "My Call";
 			break;
-		case 4:
+		case 3:
 			text = "Wkd Call";
 			break;
 		}
@@ -360,10 +360,10 @@ void qso_details::table_q::draw_cell(TableContext context, int R, int C, int X, 
 			case 2:
 				field = "MODE";
 				break;
-			case 3:
+			case 4:
 				field = "STATION_CALLSIGN";
 				break;
-			case 4:
+			case 3:
 				field = "CALL";
 				break;
 			
