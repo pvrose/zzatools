@@ -74,10 +74,10 @@
     <LibraryPath>C:\Users\pvros\Documents\dev\deps\lib;C:\Users\pvros\Documents\dev\fltk-master\build\lib\RelWithDebInfo;C:\Users\pvros\Documents\dev\curl-7.65.1\builds\libcurl-vc15-x86-release-dll-ipv6-sspi-winssl\lib;C:\Users\pvros\Documents\dev\zzatools\Release;$(LibraryPath);C:\Program Files %28x86%29\hamlib-w32-4.5.3\lib\msvc</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LibraryPath>C:\Program Files\hamlib-w64-4.5.5\lib\msvc;C:\Users\pvros\source\repos\fltk\build\lib\Release;${LibraryPath};C:\Users\pvros\Downloads\curl-8.2.0\curl-8.2.0\build\Win64\VC14.30\LIB Release;$(LibraryPath)</LibraryPath>
+    <LibraryPath>C:\Program Files\hamlib-w64-4.5.5\lib\msvc;C:\Users\pvros\source\repos\fltk\build\lib\Release;${LibraryPath};C:\Users\pvros\Downloads\curl-8.9.1\curl-8.9.1\builds\libcurl-vc17-x86-release-static-ipv6-sspi-schannel-obj-lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LibraryPath>C:\Program Files\hamlib-w64-4.5.5\lib\msvc;C:\Users\pvros\source\repos\fltk\build\lib\Release;${LibraryPath};C:\Users\pvros\Downloads\curl-8.2.0\curl-8.2.0\build\Win64\VC14.30\LIB Release;$(LibraryPath)</LibraryPath>
+    <LibraryPath>C:\Program Files\hamlib-w64-4.5.5\lib\msvc;C:\Users\pvros\source\repos\fltk\build\lib\Release;${LibraryPath};C:\Users\pvros\Downloads\curl-8.9.1\curl-8.9.1\builds\libcurl-vc17-x86-release-static-ipv6-sspi-schannel-obj-lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -127,7 +127,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\pvros\source\repos\pvrose\zzatools\zzalog\include;C:\Users\pvros\source\repos\fltk\build;C:\Program Files\hamlib-w64-4.5.5\include;C:\Users\pvros\source\repos\fltk;C:\Users\pvros\source\repos\pthread-win32;C:\Users\pvros\Downloads\curl-8.2.0\curl-8.2.0\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\pvros\source\repos\pvrose\zzatools\zzalog\include;C:\Users\pvros\source\repos\fltk\build;C:\Program Files\hamlib-w64-4.5.5\include;C:\Users\pvros\source\repos\fltk;C:\Users\pvros\source\repos\pthread-win32;C:\Users\pvros\Downloads\curl-8.9.1\curl-8.9.1\builds\libcurl-vc17-x64-release-dll-ipv6-sspi-schannel\include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>CURL_STATICLIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
@@ -136,11 +136,12 @@
       </IgnoreSpecificDefaultLibraries>
       <DelayLoadDLLs>%(DelayLoadDLLs)</DelayLoadDLLs>
       <ShowProgress>LinkVerbose</ShowProgress>
+      <AdditionalLibraryDirectories>C:\Users\pvros\Downloads\curl-8.9.1\curl-8.9.1\builds\libcurl-vc17-x64-release-dll-ipv6-sspi-schannel\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\pvros\source\repos\pvrose\zzatools\zzalog\include;C:\Users\pvros\source\repos\fltk\build;C:\Program Files\hamlib-w64-4.5.5\include;C:\Users\pvros\source\repos\fltk;C:\Users\pvros\source\repos\pthread-win32;C:\Users\pvros\Downloads\curl-8.2.0\curl-8.2.0\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\pvros\source\repos\pvrose\zzatools\zzalog\include;C:\Users\pvros\source\repos\fltk\build;C:\Program Files\hamlib-w64-4.5.5\include;C:\Users\pvros\source\repos\fltk;C:\Users\pvros\source\repos\pthread-win32;C:\Users\pvros\Downloads\curl-8.9.1\curl-8.9.1\builds\libcurl-vc17-x64-release-dll-ipv6-sspi-schannel\include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>CURL_STATICLIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
@@ -149,10 +150,12 @@
       </IgnoreSpecificDefaultLibraries>
       <DelayLoadDLLs>%(DelayLoadDLLs)</DelayLoadDLLs>
       <ShowProgress>LinkVerbose</ShowProgress>
+      <AdditionalLibraryDirectories>C:\Users\pvros\Downloads\curl-8.9.1\curl-8.9.1\builds\libcurl-vc17-x64-release-dll-ipv6-sspi-schannel\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="zzalog\src\band_data.cpp" />
+    <ClCompile Include="zzalog\src\config.cpp" />
     <ClCompile Include="zzalog\src\fields.cpp" />
     <ClCompile Include="zzalog\src\font_dialog.cpp" />
     <ClCompile Include="zzalog\src\page_dialog.cpp" />
@@ -228,7 +231,6 @@
     <ClCompile Include="zzalog\src\record_table.cpp" />
     <ClCompile Include="zzalog\src\report_tree.cpp" />
     <ClCompile Include="zzalog\src\search_dialog.cpp" />
-    <ClCompile Include="zzalog\src\settings.cpp" />
     <ClCompile Include="zzalog\src\specx_reader.cpp" />
     <ClCompile Include="zzalog\src\spec_data.cpp" />
     <ClCompile Include="zzalog\src\spec_tree.cpp" />
@@ -245,6 +247,7 @@
     <ClInclude Include="packages\pthreads.2.9.1.4\build\native\include\pthread.h" />
     <ClInclude Include="zzalog\include\band_data.h" />
     <ClInclude Include="zzalog\include\callback.h" />
+    <ClInclude Include="zzalog\include\config.h" />
     <ClInclude Include="zzalog\include\drawing.h" />
     <ClInclude Include="zzalog\include\font_dialog.h" />
     <ClInclude Include="zzalog\include\formats.h" />
@@ -325,7 +328,6 @@
     <ClInclude Include="zzalog\include\report_tree.h" />
     <ClInclude Include="zzalog\include\search.h" />
     <ClInclude Include="zzalog\include\search_dialog.h" />
-    <ClInclude Include="zzalog\include\settings.h" />
     <ClInclude Include="zzalog\include\specx_reader.h" />
     <ClInclude Include="zzalog\include\spec_data.h" />
     <ClInclude Include="zzalog\include\spec_tree.h" />

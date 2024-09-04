@@ -44,21 +44,27 @@ wx_handler::wx_handler() :
 // Destructor   
 wx_handler::~wx_handler() {
     ticker_->remove_ticker(this);
+    // Close the thread down cleanly
     run_thread_ = false;
+    wx_thread_->join();
 };
 
+// Do thread - when told to by wx_fetch_ fetch the WX data.
+// Abandon when run_thread_ is deasserted
 void wx_handler::do_thread(wx_handler* that) {
     while (that->run_thread_) {
         if (DEBUG_THREADS) printf("WX Thread waiting for fetch\n");
-        while(!that->wx_fetch_) {
+        while(!that->wx_fetch_ && that->run_thread_) {
             this_thread::sleep_for(chrono::milliseconds(1000));
         }
-        if (DEBUG_THREADS) printf("WX Thread staring to fetch\n");
-        that->wx_valid_ = false;
-        that->update();
-        if (DEBUG_THREADS) printf("WX Thread fetching complete\n");
-        that->wx_fetch_ = false;
-        that->wx_valid_ = true;
+        if (that->run_thread_) {
+            if (DEBUG_THREADS) printf("WX Thread staring to fetch\n");
+            that->wx_valid_ = false;
+            that->update();
+            if (DEBUG_THREADS) printf("WX Thread fetching complete\n");
+            that->wx_fetch_ = false;
+            that->wx_valid_ = true;
+        }
     }
 }
 

@@ -93,9 +93,6 @@
     <ClCompile Include="zzalog\src\search_dialog.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="zzalog\src\settings.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="zzalog\src\specx_reader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -273,6 +270,9 @@
     <ClCompile Include="zzalog\src\qso_apps.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="zzalog\src\config.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="zzalog\include\about_dialog.h">
@@ -366,9 +366,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="zzalog\include\search_dialog.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zzalog\include\settings.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="zzalog\include\specx_reader.h">
@@ -558,6 +555,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="zzalog\include\qso_apps.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zzalog\include\config.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
