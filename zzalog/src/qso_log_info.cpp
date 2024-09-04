@@ -4,6 +4,7 @@
 #include "import_data.h"
 #include "ticker.h"
 #include "utils.h"
+#include "record.h"
 
 #include <FL/Fl_Fill_Dial.H>
 #include <FL/Fl_Check_Button.H>
@@ -105,7 +106,7 @@ void qso_log_info::enable_timer_widgets() {
 	else if (book_->loading()) {
 		pr_loadsave_->color(fl_color_average(FL_GREEN, FL_BACKGROUND_COLOR, (float)book_->get_complete()));
 	} else {
-		if (book_->modified()) {
+		if (book_->modified() || book_->get_record()->is_dirty()) {
 			pr_loadsave_->color(FL_RED);
 		}
 		else {
@@ -129,7 +130,7 @@ void qso_log_info::enable_widgets() {
 		op_status_->value("Loading");
 		bn_save_->deactivate();
 	} else {
-		if (book_->modified()) {
+		if (book_->modified() || book_->get_record()->is_dirty()) {
 			op_status_->value("Modified");
 			bn_save_->activate();
 		}

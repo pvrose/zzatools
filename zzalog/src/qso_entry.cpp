@@ -699,6 +699,7 @@ void qso_entry::cb_ch_field(Fl_Widget* w, void* v) {
 // v - index of input widget
 void qso_entry::cb_ip_field(Fl_Widget* w, void* v) {
 	qso_entry* that = ancestor_view<qso_entry>(w);
+	qso_manager* mgr = ancestor_view<qso_manager>(that->qso_data_);
 	field_input* ip = (field_input*)w;
 	string field = ip->field_name();
 	string value = ip->value();
@@ -802,7 +803,7 @@ void qso_entry::cb_ip_field(Fl_Widget* w, void* v) {
 		case qso_data::TEST_PENDING:
 		case qso_data::TEST_ACTIVE:
 			that->enable_widgets();
-			that->qso_data_->enable_widgets();
+			mgr->enable_widgets();
 			tabbed_forms_->update_views(nullptr, HT_MINOR_CHANGE, that->qso_number_);
 			break;
 		default:
