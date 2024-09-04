@@ -711,10 +711,11 @@ void qso_rig::enable_widgets(bool tick) {
 			string submode;
 			rig_->get_string_mode(rig_mode, submode);
 			// Set Freq/Mode to Frequency (MHz with kHz seperator), mode, power (W)
-			snprintf(msg, sizeof(msg), "%d.%03d.%03d MHz\n%s %sW" , 
+			snprintf(msg, sizeof(msg), "%d.%03d.%03d MHz\n%s %sW %s" , 
 				freq_MHz, freq_kHz, freq_Hz,
 				submode.length() ? submode.c_str() : rig_mode.c_str(),
-				rig_->get_tx_power(true).c_str()
+				rig_->get_tx_power(true).c_str(),
+				rig_->get_smeter(true).c_str()
 			);
 			op_freq_mode_->copy_label(msg);
 		}

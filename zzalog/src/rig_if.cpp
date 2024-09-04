@@ -386,12 +386,15 @@ void rig_if::th_read_values() {
 	}
 	rig_data_.tx_frequency = d_temp;
 	// Read RX frequency
+	bool qsy = false;
 	if (opened_ok_) error_code_ = rig_get_freq(rig_, RIG_VFO_CURR, &d_temp);
 	else return;
 	if (error_code_ != RIG_OK) {
 		opened_ok_ = false;
 		return;
 	}
+	// Check if qSY since last report - used later to reset S-meter
+	if (d_temp != rig_data_.rx_frequency) qsy = true;
 	rig_data_.rx_frequency = d_temp;
 	// Read mode
 	rmode_t mode;
@@ -472,8 +475,8 @@ void rig_if::th_read_values() {
 		opened_ok_ = false;
 		return;
 	}
-	// TX->RX - use read value
-	if (current_ptt && !rig_data_.ptt) {
+	// TX->RX (or changed RX frequency - use read value
+	if (current_ptt && !rig_data_.ptt || qsy) {
 		rig_data_.s_value = meter_value.i;
 	}
 	// RX use accumulated maximum value
