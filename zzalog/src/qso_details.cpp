@@ -292,6 +292,8 @@ qso_details::table_q::~table_q() {
 void qso_details::table_q::draw_cell(TableContext context, int R, int C, int X, int Y, int W, int H)
 {
 	string text;
+	Fl_Font sv_font = fl_font();
+	Fl_Fontsize sv_size = fl_size();
 
 	switch (context) {
 
@@ -398,6 +400,8 @@ void qso_details::table_q::draw_cell(TableContext context, int R, int C, int X, 
 			return;
 		}
 	}
+	// Restore font saved on entry
+	fl_font(sv_font, sv_size);
 }
 
 // Table callback 
