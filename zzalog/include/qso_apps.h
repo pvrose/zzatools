@@ -10,14 +10,22 @@ class Fl_Input;
 class Fl_Secret_Input;
 class Fl_Light_Button;
 class Fl_Check_Button;
+class Fl_Radio_Light_Button;
 class Fl_Button;
 class Fl_Tabs;
+
+// App rig class
+enum app_rig_class_t {
+    ALL_RIGS,           // App applies to all rigs
+    RIG_NO_CAT,         // App applies to the rig without needing CAT access
+    RIG_CAT             // App requires CAT access to rig
+};
 
 // The app related data
 struct app_data_t {
     string name;        // The name of the app
     bool server;        // ZZALOG acts as a log server
-    bool is_common;     // Same command used for all rigs
+    app_rig_class_t rig_class;     // Same command used for all rigs
     map<string, string> commands;   
                         // The commands for each rig
     bool admin;         // The command needs to be run in administrator mode
@@ -74,7 +82,10 @@ class app_grp :
         Fl_Light_Button* bn_listening_;
         Fl_Light_Button* bn_connect_;
         Fl_Light_Button* bn_server_;
-        Fl_Light_Button* bn_common_;
+        Fl_Group* radio_class_;
+        Fl_Radio_Light_Button* bn_common_;
+        Fl_Radio_Light_Button* bn_rig_nocat_;
+        Fl_Radio_Light_Button* bn_rig_cat_;
         Fl_Button* bn_rig_;
         Fl_Check_Button* bn_admin_;
         Fl_Secret_Input* ip_passw_;
@@ -119,6 +130,8 @@ protected:
 
     // Add all the tabs
     void create_tabs(string name = "");
+
+    void adjust_size();
 
     // New app
     Fl_Button* bn_new_;
