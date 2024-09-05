@@ -3,6 +3,7 @@
 // #include "rig_if.h"
 
 #include <string>
+#include <vector>
 
 #include <FL/Fl_Group.H>
 
@@ -22,6 +23,8 @@ class Fl_Input;
 class Fl_Int_Input;
 class Fl_Float_Input;
 class Fl_Value_Slider;
+class Fl_Menu_Button;
+class Fl_Preferences;
 
 const int NUMBER_RIG_APPS = 2;
 const string RIG_APP_NAMES[NUMBER_RIG_APPS] = { "FLRig", "NET rigctl" };
@@ -62,10 +65,17 @@ public:
 	string antenna();
 	// Disconnect rig
 	void disconnect();
-	// Get timeout value
-	double timeout();
+	// Get the selected CAT - return null byte if none else return ASCII digit
+	uchar cat();
 
 protected:
+
+	struct cat_data_t {
+		hamlib_data_t* hamlib = nullptr;
+		bool use_cat_app = false;
+		string app = "";
+	};
+
 	// Callback - model choice
 	static void cb_ch_model(Fl_Widget* w, void* v);
 	// Callback - hamlib serial ports
@@ -101,6 +111,9 @@ protected:
 	static void cb_config(Fl_Widget* w, void* v);
 	// Timeout callback
 	static void cb_timeout(Fl_Widget* w, void* v);
+	// CAT index menu items
+	static void cb_select_cat(Fl_Widget* w, void* v);
+	static void cb_new_cat(Fl_Widget* w, void* v);
 
 	// Get hamlib data
 	void find_hamlib_data();
@@ -111,6 +124,8 @@ protected:
 	void populate_model_choice();
 	//Populate baud rate choice
 	void populate_baud_choice();
+	// Populate index menu button
+	void populate_index_menu();
 	// Create the various parts of the form
 	void create_status(int x, int y);
 	void create_buttons(int x, int y);
@@ -121,6 +136,10 @@ protected:
 	void create_network(int x, int y);
 	void create_modifier(int x, int y);
 
+	void load_cat_data(cat_data_t* data, Fl_Preferences settings);
+	void save_cat_data(cat_data_t* data, Fl_Preferences settings);
+
+
 	// Update rig with modifiers
 	void modify_rig();
 
@@ -129,6 +148,8 @@ protected:
 	Fl_Output* op_status_;
 	// Rig TX/RX
 	Fl_Button* bn_tx_rx_;
+	// CAT index
+	Fl_Menu_Button* bn_index_;
 	// Freq/Mode display
 	Fl_Box* op_freq_mode_;
 
@@ -177,7 +198,7 @@ protected:
 
 	rig_if* rig_;
 	// hamlib data
-	hamlib_data_t* hamlib_data_;
+	vector<cat_data_t*> cat_data_;
 	// Current mode - note C enum in hamlib/rig.h
 	uint16_t mode_;
 	// Current antenna
@@ -195,12 +216,10 @@ protected:
 	bool modify_power_;
 	// The fixed power to use
 	double power_;
-	// command to connect to CAT
-	string cat_app_;
-	// Use app for cat
-	bool use_cat_app_;
 	// Rig was good
 	bool rig_ok_;
+	// CAT index
+	int cat_index_;
 
 };
 

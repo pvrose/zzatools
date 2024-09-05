@@ -11,6 +11,7 @@
 #include <FL/Fl_Preferences.H>
 #include <FL/Fl_Tabs.H>
 #include <FL/Fl_Secret_Input.H>
+#include <FL/Fl_Radio_Light_Button.H>
 
 using namespace std;
 
@@ -45,12 +46,30 @@ void app_grp::create_form() {
 
     box(FL_BORDER_BOX);
 
+    radio_class_ = new Fl_Group(curr_x, curr_y, WBUTTON * 3, HBUTTON);
+    radio_class_->box(FL_FLAT_BOX);
+
     // Button to select common command for all rigs
-    bn_common_ = new Fl_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "All rigs");
-    bn_common_->callback(cb_bn_app, &(app_data_->is_common));
+    bn_common_ = new Fl_Radio_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "All rigs");
+    bn_common_->callback(cb_bn_app, (void*)(intptr_t)ALL_RIGS);
     bn_common_->tooltip("Select if the same command is used for all rigs");
 
     curr_x += WBUTTON;
+
+    // Button to select command for rig specific, CAT mnon-specific
+    bn_rig_nocat_ = new Fl_Radio_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Rig");
+    bn_rig_nocat_->callback(cb_bn_app, (void*)(intptr_t)RIG_NO_CAT);
+    bn_rig_nocat_->tooltip("Select if a separate command is required for the rig, but not CAT method");
+
+    curr_x += WBUTTON;
+
+    // Button to select command for rig and CAT specific
+    bn_rig_cat_ = new Fl_Radio_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Rig+CAT");
+    bn_rig_cat_->callback(cb_bn_app, (void*)(intptr_t)RIG_CAT);
+    bn_rig_cat_->tooltip("Select if a separate command is required for the rig and the CAT method");
+
+    curr_x = x() + GAP;
+    curr_y += HBUTTON;
 
     // Button to act as a log server
     bn_server_ = new Fl_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Server");
@@ -152,14 +171,28 @@ void app_grp::create_form() {
 // Configure the widgets
 void app_grp::enable_widgets() {
     qso_manager* mgr = ancestor_view<qso_manager>(this);
-    const char* rig_name;
-    if (app_data_->is_common) {
-        rig_name = "COMMON";
-    } else {
-        rig_name = mgr->rig_control()->label();
+    char rig_name[32];
+    switch (app_data_->rig_class) {
+    case ALL_RIGS: 
+        strcpy(rig_name, "COMMON");
+        break;
+    case RIG_NO_CAT:
+        strcpy(rig_name, mgr->rig_control()->label());
+        break;
+    case RIG_CAT:
+        if (mgr->rig_control()->cat()) {
+            snprintf(rig_name, sizeof(rig_name), "%s %c",
+                mgr->rig_control()->label(),
+                mgr->rig_control()->cat());
+        }
+        else {
+           strcpy(rig_name, mgr->rig_control()->label());
+        }
     }
     // Update the various widgets
-    bn_common_->value(app_data_->is_common);
+    bn_common_->value(app_data_->rig_class == ALL_RIGS);
+    bn_rig_nocat_->value(app_data_->rig_class == RIG_NO_CAT);
+    bn_rig_cat_->value(app_data_->rig_class == RIG_CAT);
     bn_server_->value(app_data_->server);
     bn_rig_->copy_label(rig_name);
     if (app_data_->commands.find(rig_name) != app_data_->commands.end()) {
@@ -227,7 +260,6 @@ void app_grp::enable_widgets() {
 void app_grp::set_data(app_data_t* data) {
     app_data_ = data;
     // Set button call backs to use the new data
-    bn_common_->user_data(&app_data_->is_common);
     bn_server_->user_data(&app_data_->server);
 
     enable_widgets();
@@ -263,7 +295,7 @@ void app_grp::cb_bn_connect(Fl_Widget* w, void* v) {
     qso_manager* mgr = ancestor_view<qso_manager>(that);
     const char* rig_name;
     if (that->app_data_->can_disable && !((Fl_Light_Button*)w)->value()) rig_name = "NONE";
-    else if (that->app_data_->is_common) rig_name = "COMMON";
+    else if (that->app_data_->rig_class == ALL_RIGS) rig_name = "COMMON";
     else rig_name = mgr->rig_control()->label();
     if (that->app_data_->commands.find(rig_name) == that->app_data_->commands.end()) {
         char msg[128];
@@ -295,7 +327,7 @@ void app_grp::cb_ip_app(Fl_Widget* w, void* v) {
     cb_value<Fl_Input, string>(w, &value);
     qso_manager* mgr = ancestor_view<qso_manager>(that);
     const char* rig_name;
-    if (that->app_data_->is_common) rig_name = "COMMON";
+    if (that->app_data_->rig_class == ALL_RIGS) rig_name = "COMMON";
     else rig_name = mgr->rig_control()->label();
     that->app_data_->commands[rig_name] = value; 
 }
@@ -303,7 +335,7 @@ void app_grp::cb_ip_app(Fl_Widget* w, void* v) {
 // Listen and server button callback
 void app_grp::cb_bn_app(Fl_Widget* w, void* v) {
     app_grp* that = ancestor_view<app_grp>(w);
-    cb_value<Fl_Light_Button, bool>(w, v);
+    that->app_data_->rig_class = (app_rig_class_t)(intptr_t)v;
     ((qso_apps*)that->parent())->add_servers(that->app_data_);
     that->enable_widgets();
 }
@@ -373,8 +405,8 @@ void qso_apps::load_values() {
         app_data_t* data = new app_data_t;
         data->name = app;
         int tempi;
-        app_settings.get("Common", tempi, (int)false);
-        data->is_common = tempi;
+        app_settings.get("Common", tempi, (int)RIG_CAT);
+        data->rig_class = (app_rig_class_t)tempi;
         app_settings.get("Server", tempi, (int)false);
         data->server = tempi;
         data->has_server = nullptr;
@@ -391,7 +423,7 @@ void qso_apps::load_values() {
             rigs_settings.get(rig, temp, app);
             data->commands[string(rig)] = temp;
         }
-        if (data->is_common && !data->can_disable && data->commands.size() > 1) {
+        if (data->rig_class == ALL_RIGS && !data->can_disable && data->commands.size() > 1) {
             char msg[128];
             snprintf(msg, sizeof(msg), "APPS: Data error for app %s", app);
             status_->misc_status(ST_WARNING, msg);
@@ -415,6 +447,13 @@ void qso_apps::create_tabs(string name) {
     tabs_->callback(cb_tabs);
     int saved_rh = rh;
     int saved_rw = rw;
+
+    // Create a dummy tab to size the upper group correctly
+    app_grp* dummy = new app_grp(rx, ry, rw, rh);
+    rh = max(rh, dummy->h());
+    rw = max(rw, dummy->w());
+    tabs_->remove(dummy);
+    Fl::delete_widget(dummy);
 
     for (auto it = apps_data_.begin(); it != apps_data_.end(); it++) {
         app_grp* g = new app_grp(rx, ry, rw, rh, (*it).second->name.c_str());
@@ -470,13 +509,18 @@ void qso_apps::create_form() {
     tabs_->end();
  
     resizable(nullptr);
+    adjust_size();
+    end();
+
+    redraw();
+}
+
+// Adjust size to fit the tabs
+void qso_apps::adjust_size() {
     int max_x = tabs_->x() + tabs_->w() + GAP;
     int max_y = tabs_->y() + tabs_->h() + GAP;
 
     size(max_x - x(), max_y - y());
-    end();
-
-    redraw();
 }
 
 // save settings
@@ -485,7 +529,7 @@ void qso_apps::save_values() {
     apps_settings.clear();
     for (auto it = apps_data_.begin(); it != apps_data_.end(); it++) {
         Fl_Preferences app_settings(apps_settings, (*it).first.c_str());
-        app_settings.set("Common", (*it).second->is_common);
+        app_settings.set("Common", (int)(*it).second->rig_class);
         app_settings.set("Server", (*it).second->server);
         app_settings.set("Administrator", (*it).second->admin);
         app_settings.set("Can Disconnect", (*it).second->can_disable);
@@ -524,7 +568,7 @@ void qso_apps::cb_bn_new(Fl_Widget* w, void* v) {
     app_data_t* new_data = new app_data_t;
     new_data->name = that->new_name_;
     new_data->commands = {};
-    new_data->is_common = false;
+    new_data->rig_class = RIG_CAT;
     new_data->server = false;
     new_data->has_data = nullptr;
     new_data->has_server = nullptr;
@@ -537,6 +581,7 @@ void qso_apps::cb_bn_new(Fl_Widget* w, void* v) {
 
     that->create_tabs(new_data->name);
     that->enable_widgets();
+    that->adjust_size();
 
     that->redraw();
 }

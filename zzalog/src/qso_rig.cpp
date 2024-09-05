@@ -43,10 +43,7 @@ qso_rig::qso_rig(int X, int Y, int W, int H, const char* L) :
 	gain_(0),
 	modify_power_(false),
 	power_(0.0),
-	cat_app_(""),
-	use_cat_app_(false),
-	rig_ok_(false),
-	hamlib_data_(nullptr)
+	rig_ok_(false)
 {
 	// If no name is provided then get from qso_manager
 	if (L == nullptr || strlen(L) == 0) copy_label(ancestor_view<qso_manager>(this)->get_default(qso_manager::RIG).c_str());
@@ -57,9 +54,8 @@ qso_rig::qso_rig(int X, int Y, int W, int H, const char* L) :
 	labelsize(FL_NORMAL_SIZE + 2);
 	//align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 	box(FL_BORDER_BOX);
-	hamlib_data_ = new hamlib_data_t;
 	load_values();
-	rig_ = new rig_if(label(), hamlib_data_);
+	rig_ = new rig_if(label(), cat_data_[cat_index_]->hamlib);
 	if (rig_->is_good()) rig_ok_ = true;
 	create_form(X, Y);
 	enable_widgets();
@@ -74,54 +70,83 @@ qso_rig::~qso_rig() {
 	ticker_->remove_ticker(this);
 }
 
+void qso_rig::load_cat_data(qso_rig::cat_data_t* cat_data, Fl_Preferences settings) {
+	char* temp;
+	settings.get("Rig Model", temp, "dummy");
+	cat_data->hamlib->model = temp;
+	free(temp);
+	settings.get("Manufacturer", temp, "hamlib");
+	cat_data->hamlib->mfr = temp;
+	free(temp);
+	settings.get("Port", temp, "COM6");
+	cat_data->hamlib->port_name = temp;
+	free(temp);
+	settings.get("Baud Rate", cat_data->hamlib->baud_rate, 9600);
+	settings.get("Model ID", (int&)cat_data->hamlib->model_id, -1);
+	// Timeout value
+	settings.get("Timeout", cat_data->hamlib->timeout, 1.0);
+
+	// Check that hamlib is currently OK
+	const rig_caps* capabilities = rig_get_caps(cat_data->hamlib->model_id);
+	if (capabilities == nullptr) {
+		char msg[128];
+		snprintf(msg, sizeof(msg), "RIG: No CAT details for %s", label());
+		status_->misc_status(ST_WARNING, msg);
+	}
+	else {
+		if (capabilities->model_name != cat_data->hamlib->model ||
+			capabilities->mfg_name != cat_data->hamlib->mfr) {
+			char msg[128];
+			snprintf(msg, 128, "RIG: Saved model id %d (%s/%s) does not match supplied rig model %s/%s using hamlib values",
+				cat_data->hamlib->model_id,
+				capabilities->mfg_name,
+				capabilities->model_name,
+				cat_data->hamlib->mfr.c_str(),
+				cat_data->hamlib->model.c_str());
+			status_->misc_status(ST_WARNING, msg);
+			cat_data->hamlib->model = capabilities->model_name;
+			cat_data->hamlib->mfr = capabilities->mfg_name;
+		}
+		cat_data->hamlib->port_type = capabilities->port_type;
+	}
+	if (settings.get("Command", temp, "")) {
+		cat_data->use_cat_app = true;
+	}
+	cat_data->app = temp;
+	
+	free(temp);
+
+}
+
 // Get initial data from settings
 void qso_rig::load_values() {
 	// Read hamlib configuration - manufacturer,  model, port and baud-rate
 	Fl_Preferences cat_settings(settings_, "CAT");
 	if (cat_settings.groupExists(label())) {
 		Fl_Preferences rig_settings(cat_settings, label());
-		char* temp;
-		rig_settings.get("Rig Model", temp, "dummy");
-		hamlib_data_->model = temp;
-		free(temp);
-		rig_settings.get("Manufacturer", temp, "hamlib");
-		hamlib_data_->mfr = temp;
-		free(temp);
-		rig_settings.get("Port", temp, "COM6");
-		hamlib_data_->port_name = temp;
-		free(temp);
-		rig_settings.get("Baud Rate", hamlib_data_->baud_rate, 9600);
-		rig_settings.get("Model ID", (int&)hamlib_data_->model_id, -1);
-		// Timeout value
-		rig_settings.get("Timeout", hamlib_data_->timeout, 1.0);
-
-		// Check that hamlib is currently OK
-		const rig_caps* capabilities = rig_get_caps(hamlib_data_->model_id);
-		if (capabilities == nullptr) {
-			char msg[128];
-			snprintf(msg, sizeof(msg), "RIG: No CAT details for %s", label());
-			status_->misc_status(ST_WARNING, msg);
+		int max_cat = rig_settings.groups();
+		if (max_cat > 0) cat_data_.resize(max_cat);
+		else cat_data_.resize(1);
+		if (max_cat != 0) {
+			for (int ix = 0; ix < max_cat; ix++) {
+				cat_data_t* data = new cat_data_t;
+				data->hamlib = new hamlib_data_t;
+				char g[5];
+				snprintf(g, sizeof(g), "%d", ix);
+				Fl_Preferences cat_settings(rig_settings, g);
+				load_cat_data(data, cat_settings);
+				cat_data_[ix] = data;
+			}
 		}
 		else {
-			if (capabilities->model_name != hamlib_data_->model ||
-				capabilities->mfg_name != hamlib_data_->mfr) {
-				char msg[128];
-				snprintf(msg, 128, "RIG: Saved model id %d (%s/%s) does not match supplied rig model %s/%s using hamlib values",
-					hamlib_data_->model_id,
-					capabilities->mfg_name,
-					capabilities->model_name,
-					hamlib_data_->mfr.c_str(),
-					hamlib_data_->model.c_str());
-				status_->misc_status(ST_WARNING, msg);
-				hamlib_data_->model = capabilities->model_name;
-				hamlib_data_->mfr = capabilities->mfg_name;
-			}
-			hamlib_data_->port_type = capabilities->port_type;
+			cat_data_t* data = new cat_data_t;
+			data->hamlib = new hamlib_data_t;
+			load_cat_data(data, rig_settings);
+			cat_data_[0] = data;
 		}
-		rig_settings.get("Command", temp, "");
-		cat_app_ = temp;
-		if (cat_app_ != "") use_cat_app_ = true;
-		free(temp);
+		char* temp;
+		// Get default cat type
+		rig_settings.get("Default CAT", cat_index_, 0);
 		// Preferred antenna
 		rig_settings.get("Antenna", temp, "");
 		antenna_ = temp;
@@ -146,26 +171,16 @@ void qso_rig::load_values() {
 		} else {
 			modify_power_ = false;
 		}
-		// If we cannot read power from hamlib - force modify_power_
-		if (capabilities && !(capabilities->has_get_level & RIG_LEVEL_RFPOWER_METER_WATTS)) {
-			char msg[128];
-			snprintf(msg, sizeof(msg), "DASH: Rig %s/%s does not supply power - set it", 
-				hamlib_data_->mfr.c_str(),
-				hamlib_data_->model.c_str());
-			status_->misc_status(ST_WARNING, msg);
-			modify_power_ = true;
-			modify_gain_ = false;
-		}
+		mode_ = (uint16_t)cat_data_[cat_index_]->hamlib->port_type;
 	}
 	else {
 		// New hamlib data
-		delete hamlib_data_;
-		hamlib_data_ = new hamlib_data_t();
+		cat_data_.clear();
 		modify_freq_ = false;
-		modify_power_ = false;
+		modify_power_ = true;
 		modify_gain_ = false;
+		mode_ = RIG_PORT_NONE;
 	}
-	mode_ = (uint16_t)hamlib_data_->port_type;
 }
 
 // Get the hamlib data for the rig
@@ -175,25 +190,25 @@ void qso_rig::find_hamlib_data() {
 	const rig_caps* capabilities = nullptr;
 	rig_model_t max_rig_num = 40 * MAX_MODELS_PER_BACKEND;
 	// Serach the list for the rig. Stop when it's found
-	for (rig_model_t i = 0; i < max_rig_num && hamlib_data_->model_id == -1; i++) {
+	for (rig_model_t i = 0; i < max_rig_num && cat_data_[cat_index_]->hamlib->model_id == -1; i++) {
 		// Read each rig's capabilities
 		capabilities = rig_get_caps(i);
 		try {
 			if (capabilities != nullptr) {
 				// Not all numbers represent a rig as the mapping is sparse
 				// Check the model name
-				if (capabilities->model_name == hamlib_data_->model &&
-					capabilities->mfg_name == hamlib_data_->mfr)
-					hamlib_data_->model_id = i;
+				if (capabilities->model_name == cat_data_[cat_index_]->hamlib->model &&
+					capabilities->mfg_name == cat_data_[cat_index_]->hamlib->mfr)
+					cat_data_[cat_index_]->hamlib->model_id = i;
 			}
 		}
 		catch (exception*) {}
 	}
-	if (hamlib_data_->model_id == -1) {
+	if (cat_data_[cat_index_]->hamlib->model_id == -1) {
 		char msg[128];
 		snprintf(msg, 128, "RIG: %s/%s not found in hamlib capabilities",
-			hamlib_data_->mfr.c_str(),
-			hamlib_data_->model.c_str());
+			cat_data_[cat_index_]->hamlib->mfr.c_str(),
+			cat_data_[cat_index_]->hamlib->model.c_str());
 		status_->misc_status(ST_ERROR, msg);
 	}
 }
@@ -213,11 +228,16 @@ void qso_rig::create_status(int curr_x, int curr_y) {
 	curr_x += HBUTTON;
 
 	// "Label" - rig status
-	op_status_ = new Fl_Output(curr_x, curr_y, WDISPLAY - HBUTTON, HBUTTON);
+	op_status_ = new Fl_Output(curr_x, curr_y, WDISPLAY - (2 * HBUTTON), HBUTTON);
 	op_status_->color(FL_BACKGROUND_COLOR);
 	op_status_->textfont(FL_BOLD);
 	op_status_->textsize(FL_NORMAL_SIZE + 2);
 	op_status_->box(FL_FLAT_BOX);
+
+	curr_x += op_status_->w();
+	bn_index_ = new Fl_Menu_Button(curr_x, curr_y, HBUTTON, HBUTTON);
+	bn_index_->box(FL_FLAT_BOX);
+	populate_index_menu();
 
 	curr_x = save_x;
 	curr_y += op_status_->h();
@@ -296,7 +316,7 @@ void qso_rig::create_rig_ant(int curr_x, int curr_y) {
 	v_timeout_->tooltip("Set the value for timeing out the rig (0.1 to 5 s)");
 	v_timeout_->range(0.1, 5.0);
 	v_timeout_->step(0.1);
-	v_timeout_->value(hamlib_data_ ? hamlib_data_->timeout : 1.0);
+	v_timeout_->value(cat_data_[cat_index_]->hamlib ? cat_data_[cat_index_]->hamlib->timeout : 1.0);
 
 	rig_ant_grp_->end();
 
@@ -428,15 +448,15 @@ void qso_rig::create_network(int curr_x, int curr_y) {
 	curr_y = network_grp_->y();
 
 	bn_use_app_ = new Fl_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Use app");
-	bn_use_app_->callback(cb_bn_use_app, &use_cat_app_);
+	bn_use_app_->callback(cb_bn_use_app, &cat_data_[cat_index_]->use_cat_app);
 	bn_use_app_->tooltip("Set to allow a CAT app to be used");
-	bn_use_app_->value(use_cat_app_);
+	bn_use_app_->value(cat_data_[cat_index_]->use_cat_app);
 
 	curr_x += WBUTTON;
 
 	// App name (flrig or wfview to connect to rig
 	ip_app_name_ = new Fl_Input(curr_x, curr_y, w() - curr_x - (2 * GAP), HTEXT);
-	ip_app_name_->callback(cb_value<Fl_Input, string>, &cat_app_);
+	ip_app_name_->callback(cb_value<Fl_Input, string>, &cat_data_[cat_index_]->app);
 	ip_app_name_->tooltip("Please provide the command to use to connect");
 	ip_app_name_->value("");
 
@@ -447,7 +467,7 @@ void qso_rig::create_network(int curr_x, int curr_y) {
 	ip_port_->align(FL_ALIGN_LEFT);
 	ip_port_->callback(cb_ip_port, nullptr);
 	ip_port_->tooltip("Enter the network/USB port to use");
-	ip_port_->value(hamlib_data_->port_name.c_str());
+	ip_port_->value(cat_data_[cat_index_]->hamlib->port_name.c_str());
 
 	curr_y += HTEXT + GAP;
 
@@ -570,22 +590,37 @@ void qso_rig::create_form(int X, int Y) {
 	end();
 }
 
+void qso_rig::save_cat_data(qso_rig::cat_data_t* cat_data, Fl_Preferences settings) {
+	settings.set("Rig Model", cat_data->hamlib->model.c_str());
+	settings.set("Manufacturer", cat_data->hamlib->mfr.c_str());
+	settings.set("Port", cat_data->hamlib->port_name.c_str());
+	settings.set("Baud Rate", cat_data->hamlib->baud_rate);
+	settings.set("Model ID", (int)cat_data->hamlib->model_id);
+	settings.set("Timeout", cat_data->hamlib->timeout);
+	if (cat_data->use_cat_app) {
+		settings.set("Command", cat_data->app.c_str());
+	}
+}
+
 // Save values in settings
 void qso_rig::save_values() {
 	// Read hamlib configuration - manufacturer,  model, port and baud-rate
-	if (hamlib_data_->port_type != RIG_PORT_NONE) {
+	if (cat_data_[cat_index_]->hamlib->port_type != RIG_PORT_NONE) {
 		Fl_Preferences cat_settings(settings_, "CAT");
 		Fl_Preferences rig_settings(cat_settings, label());
 		rig_settings.clear();
-		rig_settings.set("Rig Model", hamlib_data_->model.c_str());
-		rig_settings.set("Manufacturer", hamlib_data_->mfr.c_str());
-		rig_settings.set("Port", hamlib_data_->port_name.c_str());
-		rig_settings.set("Baud Rate", hamlib_data_->baud_rate);
-		rig_settings.set("Model ID", (int)hamlib_data_->model_id);
-		rig_settings.set("Timeout", hamlib_data_->timeout);
-		if (use_cat_app_) {
-			rig_settings.set("Command", cat_app_.c_str());
+		if (cat_data_.size() > 1) {
+			for (int ix = 0; ix < cat_data_.size(); ix++) {
+				char g[5];
+				snprintf(g, sizeof(g), "%d", ix);
+				Fl_Preferences cat_settings(rig_settings, g);
+				save_cat_data(cat_data_[ix], cat_settings);
+			}
 		}
+		else {
+			save_cat_data(cat_data_[0], rig_settings);
+		}
+		rig_settings.set("Default CAT", cat_index_);
 		// Preferred antenna
 		rig_settings.set("Antenna", antenna_.c_str());
 		// Modifier settings
@@ -616,7 +651,7 @@ void qso_rig::enable_widgets(bool tick) {
 		} else {
 			bn_select_->label("Select");
 		}
-		if (use_cat_app_) bn_start_->activate();
+		if (cat_data_[cat_index_]->use_cat_app) bn_start_->activate();
 		else bn_start_->deactivate();
 	} else if (rig_->is_open()) {
 		// Rig is connected
@@ -638,7 +673,7 @@ void qso_rig::enable_widgets(bool tick) {
 		} else {
 			bn_select_->label("Select");
 		}
-		if (use_cat_app_) bn_start_->activate();
+		if (cat_data_[cat_index_]->use_cat_app) bn_start_->activate();
 		else bn_start_->deactivate();
 	}
 	bn_connect_->labelcolor(fl_contrast(FL_FOREGROUND_COLOR, bn_connect_->color()));
@@ -787,15 +822,15 @@ void qso_rig::enable_widgets(bool tick) {
 		serial_grp_->hide();
 		network_grp_->show();
 		if (!bn_select_->value()) {
-			ip_port_->value(hamlib_data_->port_name.c_str());
+			ip_port_->value(cat_data_[cat_index_]->hamlib->port_name.c_str());
 			network_grp_->deactivate();
  		} else {
 			network_grp_->activate();
 		}
-		bn_use_app_->value(use_cat_app_);
-		if (!tick) ip_app_name_->value(cat_app_.c_str());
+		bn_use_app_->value(cat_data_[cat_index_]->use_cat_app);
+		if (!tick) ip_app_name_->value(cat_data_[cat_index_]->app.c_str());
 		// The hamlib model has an associated application (eg flrig or wfview)
-		if (use_cat_app_) {
+		if (cat_data_[cat_index_]->use_cat_app) {
 			ip_app_name_->activate();
 		} else {
 			ip_app_name_->deactivate();
@@ -838,6 +873,9 @@ void qso_rig::enable_widgets(bool tick) {
 			wx->labelcolor(FL_FOREGROUND_COLOR);
 		}
 	}
+	// Label the CAT method selection with the CAT method
+	char l[2] = { cat(), '\0' };
+	bn_index_->copy_label(l);
 
 	redraw();
 }
@@ -892,10 +930,10 @@ void qso_rig::populate_model_choice() {
 			snprintf(temp, 256, "%s/%s%s", mfg.c_str(), model.c_str(), status);
 			rig_list.insert(temp);
 			rig_ids[temp] = capabilities->rig_model;
-			if (string(capabilities->mfg_name) == hamlib_data_->mfr &&
-				string(capabilities->model_name) == hamlib_data_->model) {
-				hamlib_data_->model_id = capabilities->rig_model;
-				hamlib_data_->port_type = capabilities->port_type;
+			if (string(capabilities->mfg_name) == cat_data_[cat_index_]->hamlib->mfr &&
+				string(capabilities->model_name) == cat_data_[cat_index_]->hamlib->model) {
+				cat_data_[cat_index_]->hamlib->model_id = capabilities->rig_model;
+				cat_data_[cat_index_]->hamlib->port_type = capabilities->port_type;
 			}
 		}
 	}
@@ -907,7 +945,7 @@ void qso_rig::populate_model_choice() {
 		rig_model_t id = rig_ids.at(name);
 		// Add the id as user data for the menu item
 		int pos = ch_rig_model_->add(name.c_str(), 0, nullptr, (void*)(intptr_t)id);
-		if (id == hamlib_data_->model_id) {
+		if (id == cat_data_[cat_index_]->hamlib->model_id) {
 			ch_rig_model_->value(pos);
 		}
 	}
@@ -916,7 +954,7 @@ void qso_rig::populate_model_choice() {
 
 // Populate the choice with the available ports
 void qso_rig::populate_port_choice() {
-	if (hamlib_data_->port_type == RIG_PORT_SERIAL) {
+	if (cat_data_[cat_index_]->hamlib->port_type == RIG_PORT_SERIAL) {
 		ch_port_name_->clear();
 		ch_port_name_->add("NONE");
 		ch_port_name_->value(0);
@@ -937,7 +975,7 @@ void qso_rig::populate_port_choice() {
 			status_->misc_status(ST_LOG, message);
 			ch_port_name_->add(port);
 			// Set the value to the list of ports
-			if (strcmp(port, hamlib_data_->port_name.c_str()) == 0) {
+			if (strcmp(port, cat_data_[cat_index_]->hamlib->port_name.c_str()) == 0) {
 				ch_port_name_->value(i);
 			}
 		}
@@ -946,13 +984,13 @@ void qso_rig::populate_port_choice() {
 
 // Populate the baud rate choice menu
 void qso_rig::populate_baud_choice() {
-	if (hamlib_data_->port_type == RIG_PORT_SERIAL) {
+	if (cat_data_[cat_index_]->hamlib->port_type == RIG_PORT_SERIAL) {
 		ch_baud_rate_->clear();
 		// Override rig's capabilities?
 		bn_all_rates_->value(use_all_rates_);
 
 		// Get the baud-rates supported by the rig
-		const rig_caps* caps = rig_get_caps(hamlib_data_->model_id);
+		const rig_caps* caps = rig_get_caps(cat_data_[cat_index_]->hamlib->model_id);
 		int min_baud_rate = 300;
 		int max_baud_rate = 460800;
 		if (caps) {
@@ -972,13 +1010,28 @@ void qso_rig::populate_baud_choice() {
 			if (use_all_rates_ || (rate >= min_baud_rate && rate <= max_baud_rate)) {
 				// capabilities overridden or within the range supported by capabilities
 				ch_baud_rate_->add(to_string(rate).c_str());
-				if (rate == hamlib_data_->baud_rate) {
+				if (rate == cat_data_[cat_index_]->hamlib->baud_rate) {
 					ch_baud_rate_->value(index);
 					index++;
 				}
 			}
 		}
 	}
+}
+
+// Populate the cat select drop-down menu
+void qso_rig::populate_index_menu() {
+	bn_index_->clear();
+	// Add a menu item for each CAT if more than 1
+	if (cat_data_.size() > 1) {
+		for (int ix = 0; ix < cat_data_.size(); ix++) {
+			char l[5];
+			snprintf(l, sizeof(l), "%d", ix + 1);
+			bn_index_->add(l, 0, cb_select_cat, (void*)(intptr_t)ix);
+		}
+	}
+	// Add a menu item to add a new CAT
+	bn_index_->add("@+", 0, cb_new_cat);
 }
 
 // Model input choice selected
@@ -991,22 +1044,23 @@ void qso_rig::cb_ch_model(Fl_Widget* w, void* v) {
 	rig_model_t id = (intptr_t)item->user_data();
 	const char* label = ch->text();
 	const rig_caps* capabilities = rig_get_caps(id);
+	hamlib_data_t* hamlib = that->cat_data_[that->cat_index_]->hamlib;
 	if (capabilities != nullptr) {
-		that->hamlib_data_->model = capabilities->model_name;
-		that->hamlib_data_->mfr = capabilities->mfg_name;
-		that->hamlib_data_->model_id = id;
-		that->hamlib_data_->port_type = capabilities->port_type;
+		hamlib->model = capabilities->model_name;
+		hamlib->mfr = capabilities->mfg_name;
+		hamlib->model_id = id;
+		hamlib->port_type = capabilities->port_type;
 	}
 	else {
 		char message[128];
 		snprintf(message, 128, "DASH: Error reading hamlib details selecting %s", label);
 		status_->misc_status(ST_ERROR, message);
 	}
-	switch (that->hamlib_data_->port_type) {
+	switch (hamlib->port_type) {
 	case RIG_PORT_SERIAL:
 	case RIG_PORT_NETWORK:
 	case RIG_PORT_USB:
-		that->mode_ = that->hamlib_data_->port_type;
+		that->mode_ = hamlib->port_type;
 		break;
 	case RIG_PORT_NONE:
 		// Retain mode = NONE until the add button is clicked
@@ -1021,14 +1075,14 @@ void qso_rig::cb_ch_model(Fl_Widget* w, void* v) {
 // v is unused
 void qso_rig::cb_ch_port(Fl_Widget* w, void* v) {
 	qso_rig* that = ancestor_view<qso_rig>(w);
-	cb_text<Fl_Choice, string>(w, (void*)&that->hamlib_data_->port_name);
+	cb_text<Fl_Choice, string>(w, (void*)&that->cat_data_[that->cat_index_]->hamlib->port_name);
 }
 
 // Callback entering named port
 // v is unused
 void qso_rig::cb_ip_port(Fl_Widget* w, void* v) {
 	qso_rig* that = ancestor_view<qso_rig>(w);
-	cb_value<Fl_Input, string>(w, (void*)&that->hamlib_data_->port_name);
+	cb_value<Fl_Input, string>(w, (void*)&that->cat_data_[that->cat_index_]->hamlib->port_name);
 }
 
 // Callback selecting baud-rate
@@ -1036,7 +1090,7 @@ void qso_rig::cb_ip_port(Fl_Widget* w, void* v) {
 void qso_rig::cb_ch_baud(Fl_Widget* w, void* v) {
 	qso_rig* that = ancestor_view<qso_rig>(w);
 	const char* text = ((Fl_Choice*)w)->text();
-	that->hamlib_data_->baud_rate = atoi(text);
+	that->cat_data_[that->cat_index_]->hamlib->baud_rate = atoi(text);
 }
 
 // Override rig capabilities selected - repopulate the baud choice
@@ -1060,7 +1114,7 @@ void qso_rig::cb_bn_all(Fl_Widget* w, void* v) {
 void qso_rig::cb_bn_connect(Fl_Widget* w, void* v) {
 	qso_rig* that = ancestor_view<qso_rig>(w);
 	if (!that->rig_) {
-		that->rig_ = new rig_if(that->label(), that->hamlib_data_);
+		that->rig_ = new rig_if(that->label(), that->cat_data_[that->cat_index_]->hamlib);
 		if (that->rig_->is_good()) that->rig_ok_ = true;
 	}
 	else if (that->rig_->is_open()) {
@@ -1117,16 +1171,19 @@ void qso_rig::cb_bn_power(Fl_Widget* w, void* v) {
 		if (v) {
 			that->modify_power_ = true;
 			that->modify_gain_ = false;
-		} else {
+		}
+		else {
 			that->modify_power_ = false;
 			that->modify_gain_ = false;
 		}
-	} else {
+	}
+	else {
 		bool v = that->bn_gain_->value();
 		if (v) {
 			that->modify_power_ = false;
 			that->modify_gain_ = true;
-		} else {
+		}
+		else {
 			that->modify_power_ = false;
 			that->modify_gain_ = false;
 		}
@@ -1158,15 +1215,16 @@ void qso_rig::cb_ip_power(Fl_Widget* w, void* v) {
 
 // Clicked start button
 // v points to the string containing the command to  invoke flrig
-void qso_rig::cb_bn_start(Fl_Widget* w, void * v) {
+void qso_rig::cb_bn_start(Fl_Widget* w, void* v) {
 	qso_rig* that = ancestor_view<qso_rig>(w);
-	string command = that->cat_app_ + "&";
+	string command = that->cat_data_[that->cat_index_]->app + "&";
 	int result = system(command.c_str());
 	char msg[100];
 	if (result == 0) {
 		snprintf(msg, sizeof(msg), "RIG: Started %s OK", command.c_str());
 		status_->misc_status(ST_OK, msg);
-	} else {
+	}
+	else {
 		snprintf(msg, sizeof(msg), "RIG: Failed to start %s", command.c_str());
 		status_->misc_status(ST_ERROR, msg);
 	}
@@ -1174,7 +1232,7 @@ void qso_rig::cb_bn_start(Fl_Widget* w, void * v) {
 
 // Selecting config tab
 // v is not used
-void qso_rig::cb_config(Fl_Widget* w, void *v) {
+void qso_rig::cb_config(Fl_Widget* w, void* v) {
 	qso_rig* that = ancestor_view<qso_rig>(w);
 	that->enable_widgets();
 }
@@ -1189,7 +1247,24 @@ void qso_rig::cb_bn_use_app(Fl_Widget* w, void* v) {
 // Timeout callback
 void qso_rig::cb_timeout(Fl_Widget* w, void* v) {
 	qso_rig* that = ancestor_view<qso_rig>(w);
-	cb_value<Fl_Value_Slider, double>(w, &that->hamlib_data_->timeout);
+	cb_value<Fl_Value_Slider, double>(w, &that->cat_data_[that->cat_index_]->hamlib->timeout);
+}
+
+// Use selected CAT
+void qso_rig::cb_select_cat(Fl_Widget* w, void* v) {
+	qso_rig* that = ancestor_view<qso_rig>(w);
+	that->cat_index_ = (int)(intptr_t)v;
+	that->switch_rig();
+}
+
+// Generate a new CAT
+void qso_rig::cb_new_cat(Fl_Widget* w, void* v) {
+	qso_rig* that = ancestor_view<qso_rig>(w);
+	cat_data_t* data = new cat_data_t;
+	data->hamlib = new hamlib_data_t;
+	that->cat_data_.push_back(data);
+	that->populate_index_menu();
+	that->switch_rig();
 }
 
 // Connect rig if disconnected and vice-versa
@@ -1197,7 +1272,7 @@ void qso_rig::switch_rig() {
 	if (rig_) {
 		delete rig_;
 		rig_ = nullptr;
-		rig_ = new rig_if(label(), hamlib_data_);
+		rig_ = new rig_if(label(), cat_data_[cat_index_]->hamlib);
 	}
 	ancestor_view<qso_manager>(this)->update_rig();
 	modify_rig();
@@ -1222,7 +1297,7 @@ void qso_rig::cb_ticker(void* v) {
 
 // New rig 
 void qso_rig::new_rig() {
-	mode_ = (uint16_t)hamlib_data_->port_type;
+	mode_ = (uint16_t)cat_data_[cat_index_]->hamlib->port_type;
 	enable_widgets();
 }
 
@@ -1266,5 +1341,14 @@ void qso_rig::disconnect() {
 	if (rig_ && rig_->is_open()) {
 		rig_->close();
 	}
+}
 
+// Return selected CAT
+uchar qso_rig::cat() {
+	if (cat_data_.size() <= 1) {
+		return '\0';
+	}
+	else {
+		return cat_index_ + '1';
+	}
 }
