@@ -755,6 +755,16 @@ void qso_rig::enable_widgets(bool tick) {
 				rig_->get_smeter(true).c_str()
 			);
 			op_freq_mode_->copy_label(msg);
+			int size = FL_NORMAL_SIZE + 10;
+			fl_font(0, size);
+			int w, h;
+			fl_measure(msg, w, h);
+			while (w > op_freq_mode_->w()) {
+				size--;
+				fl_font(0, size);
+				fl_measure(msg, w, h);
+			}
+			op_freq_mode_->labelsize(size);
 		}
 	} else if (rig_->has_no_cat()) {
 		// No rig available - deactivate freq/mode
