@@ -60,8 +60,10 @@ class app_grp :
         static void cb_bn_connect(Fl_Widget* w, void* v);
         // Callback to save app name
         static void cb_ip_app(Fl_Widget* w, void* v);
-        // Callback for changing params
-        static void cb_bn_app(Fl_Widget* w, void* v);
+        // Callback for changing rig_class
+        static void cb_bn_class(Fl_Widget* w, void* v);
+        // Callback for changing server
+        static void cb_bn_server(Fl_Widget* w, void* v);
         // Call back for needing admin
         static void cb_bn_admin(Fl_Widget* w, void* v);
        // Callback for hiding/showing password
@@ -77,6 +79,10 @@ class app_grp :
         
     protected:
 
+        // Create rig name
+        const char* rig_id();
+
+ 
         // Widgets
         Fl_Input* ip_app_name_;
         Fl_Light_Button* bn_listening_;

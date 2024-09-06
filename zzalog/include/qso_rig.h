@@ -66,7 +66,7 @@ public:
 	// Disconnect rig
 	void disconnect();
 	// Get the selected CAT - return null byte if none else return ASCII digit
-	uchar cat();
+	const char* cat();
 
 protected:
 

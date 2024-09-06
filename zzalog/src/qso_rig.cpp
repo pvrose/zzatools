@@ -237,6 +237,8 @@ void qso_rig::create_status(int curr_x, int curr_y) {
 	curr_x += op_status_->w();
 	bn_index_ = new Fl_Menu_Button(curr_x, curr_y, HBUTTON, HBUTTON);
 	bn_index_->box(FL_FLAT_BOX);
+	bn_index_->align(FL_ALIGN_LEFT);
+	bn_index_->labelsize(FL_NORMAL_SIZE - 2);
 	populate_index_menu();
 
 	curr_x = save_x;
@@ -823,15 +825,19 @@ void qso_rig::enable_widgets(bool tick) {
 		network_grp_->show();
 		if (!bn_select_->value()) {
 			ip_port_->value(cat_data_[cat_index_]->hamlib->port_name.c_str());
+			ip_port_->user_data(&cat_data_[cat_index_]->hamlib->port_name);
 			network_grp_->deactivate();
  		} else {
 			network_grp_->activate();
 		}
 		bn_use_app_->value(cat_data_[cat_index_]->use_cat_app);
+		// Chaneg the user data for "use app" button
+		bn_use_app_->user_data(&cat_data_[cat_index_]->use_cat_app);
 		if (!tick) ip_app_name_->value(cat_data_[cat_index_]->app.c_str());
 		// The hamlib model has an associated application (eg flrig or wfview)
 		if (cat_data_[cat_index_]->use_cat_app) {
 			ip_app_name_->activate();
+			ip_app_name_->user_data(&cat_data_[cat_index_]->app);
 		} else {
 			ip_app_name_->deactivate();
 		}
@@ -874,7 +880,8 @@ void qso_rig::enable_widgets(bool tick) {
 		}
 	}
 	// Label the CAT method selection with the CAT method
-	char l[2] = { cat(), '\0' };
+	char l[5];
+	snprintf(l, sizeof(l), "CAT%d", cat_index_ + 1);
 	bn_index_->copy_label(l);
 
 	redraw();
@@ -1026,12 +1033,12 @@ void qso_rig::populate_index_menu() {
 	if (cat_data_.size() > 1) {
 		for (int ix = 0; ix < cat_data_.size(); ix++) {
 			char l[5];
-			snprintf(l, sizeof(l), "%d", ix + 1);
+			snprintf(l, sizeof(l), "CAT%d", ix + 1);
 			bn_index_->add(l, 0, cb_select_cat, (void*)(intptr_t)ix);
 		}
 	}
 	// Add a menu item to add a new CAT
-	bn_index_->add("@+", 0, cb_new_cat);
+	bn_index_->add("New", 0, cb_new_cat);
 }
 
 // Model input choice selected
@@ -1344,11 +1351,13 @@ void qso_rig::disconnect() {
 }
 
 // Return selected CAT
-uchar qso_rig::cat() {
+const char* qso_rig::cat() {
+	char* result = new char[5];
 	if (cat_data_.size() <= 1) {
-		return '\0';
+		strcpy(result, "");
 	}
 	else {
-		return cat_index_ + '1';
+		snprintf(result, 5, "CAT%d", cat_index_ + 1);
 	}
+	return result;
 }

@@ -51,29 +51,31 @@ void app_grp::create_form() {
 
     // Button to select common command for all rigs
     bn_common_ = new Fl_Radio_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "All rigs");
-    bn_common_->callback(cb_bn_app, (void*)(intptr_t)ALL_RIGS);
+    bn_common_->callback(cb_bn_class, (void*)(intptr_t)ALL_RIGS);
     bn_common_->tooltip("Select if the same command is used for all rigs");
 
     curr_x += WBUTTON;
 
     // Button to select command for rig specific, CAT mnon-specific
     bn_rig_nocat_ = new Fl_Radio_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Rig");
-    bn_rig_nocat_->callback(cb_bn_app, (void*)(intptr_t)RIG_NO_CAT);
+    bn_rig_nocat_->callback(cb_bn_class, (void*)(intptr_t)RIG_NO_CAT);
     bn_rig_nocat_->tooltip("Select if a separate command is required for the rig, but not CAT method");
 
     curr_x += WBUTTON;
 
     // Button to select command for rig and CAT specific
     bn_rig_cat_ = new Fl_Radio_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Rig+CAT");
-    bn_rig_cat_->callback(cb_bn_app, (void*)(intptr_t)RIG_CAT);
+    bn_rig_cat_->callback(cb_bn_class, (void*)(intptr_t)RIG_CAT);
     bn_rig_cat_->tooltip("Select if a separate command is required for the rig and the CAT method");
 
+    radio_class_->end();
+    
     curr_x = x() + GAP;
     curr_y += HBUTTON;
 
     // Button to act as a log server
     bn_server_ = new Fl_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Server");
-    bn_server_->callback(cb_bn_app, &(app_data_->server));
+    bn_server_->callback(cb_bn_server, &(app_data_->server));
     bn_server_->tooltip("Select if ZZALOG acts as a log server for this application");
 
     curr_x += WBUTTON;
@@ -87,12 +89,14 @@ void app_grp::create_form() {
     curr_y += HBUTTON;
 
     // Button to display rig name
-    bn_rig_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON);
+    bn_rig_ = new Fl_Button(curr_x, curr_y, 3 * WBUTTON, HBUTTON);
     bn_rig_->when(FL_WHEN_NEVER);
     bn_rig_->box(FL_FLAT_BOX);
+    bn_rig_->align(FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
     bn_rig_->tooltip("Displays the current rig - or COMMON");
 
     curr_x += WBUTTON;
+    curr_y += HBUTTON;
 
     // Input to specify the command for invoking the app
     ip_app_name_ = new Fl_Input(curr_x, curr_y, WBUTTON * 2, HBUTTON);
@@ -170,25 +174,7 @@ void app_grp::create_form() {
 
 // Configure the widgets
 void app_grp::enable_widgets() {
-    qso_manager* mgr = ancestor_view<qso_manager>(this);
-    char rig_name[32];
-    switch (app_data_->rig_class) {
-    case ALL_RIGS: 
-        strcpy(rig_name, "COMMON");
-        break;
-    case RIG_NO_CAT:
-        strcpy(rig_name, mgr->rig_control()->label());
-        break;
-    case RIG_CAT:
-        if (mgr->rig_control()->cat()) {
-            snprintf(rig_name, sizeof(rig_name), "%s %c",
-                mgr->rig_control()->label(),
-                mgr->rig_control()->cat());
-        }
-        else {
-           strcpy(rig_name, mgr->rig_control()->label());
-        }
-    }
+    const char* rig_name = rig_id();
     // Update the various widgets
     bn_common_->value(app_data_->rig_class == ALL_RIGS);
     bn_rig_nocat_->value(app_data_->rig_class == RIG_NO_CAT);
@@ -292,11 +278,9 @@ void app_grp::cb_bn_listen(Fl_Widget* w, void* v) {
 // v is not used
 void app_grp::cb_bn_connect(Fl_Widget* w, void* v) {
     app_grp* that = ancestor_view<app_grp>(w);
-    qso_manager* mgr = ancestor_view<qso_manager>(that);
     const char* rig_name;
     if (that->app_data_->can_disable && !((Fl_Light_Button*)w)->value()) rig_name = "NONE";
-    else if (that->app_data_->rig_class == ALL_RIGS) rig_name = "COMMON";
-    else rig_name = mgr->rig_control()->label();
+    else rig_name = that->rig_id();
     if (that->app_data_->commands.find(rig_name) == that->app_data_->commands.end()) {
         char msg[128];
         snprintf(msg, sizeof(msg), "APPS: App %s does not know how to connect %s", 
@@ -325,18 +309,22 @@ void app_grp::cb_ip_app(Fl_Widget* w, void* v) {
     app_grp* that = ancestor_view<app_grp>(w);
     string value;
     cb_value<Fl_Input, string>(w, &value);
-    qso_manager* mgr = ancestor_view<qso_manager>(that);
-    const char* rig_name;
-    if (that->app_data_->rig_class == ALL_RIGS) rig_name = "COMMON";
-    else rig_name = mgr->rig_control()->label();
+    const char* rig_name = that->rig_id();
     that->app_data_->commands[rig_name] = value; 
 }
 
 // Listen and server button callback
-void app_grp::cb_bn_app(Fl_Widget* w, void* v) {
+void app_grp::cb_bn_class(Fl_Widget* w, void* v) {
     app_grp* that = ancestor_view<app_grp>(w);
     that->app_data_->rig_class = (app_rig_class_t)(intptr_t)v;
     ((qso_apps*)that->parent())->add_servers(that->app_data_);
+    that->enable_widgets();
+}
+
+// Listen and server button callback
+void app_grp::cb_bn_server(Fl_Widget* w, void* v) {
+    cb_value<Fl_Light_Button, bool>(w, v);
+    app_grp* that = ancestor_view<app_grp>(w);
     that->enable_widgets();
 }
 
@@ -379,6 +367,26 @@ void app_grp::cb_ip_disable(Fl_Widget* w, void* v) {
 void app_grp::cb_ip_passw(Fl_Widget* w, void* v) {
     app_grp* that = ancestor_view<app_grp>(w);
     that->enable_widgets();
+}
+
+// Generate rig id 
+const char* app_grp::rig_id() {
+    char* result = new char[32];
+    qso_manager* mgr = ancestor_view<qso_manager>(this);
+    switch(app_data_->rig_class) {
+        case ALL_RIGS:
+            strcpy(result, "COMMON");
+            break;
+        case RIG_NO_CAT:
+            strcpy(result, mgr->rig_control()->label());
+            break;
+        case RIG_CAT:
+            snprintf(result, 32, "%s %s",
+                mgr->rig_control()->label(),
+                mgr->rig_control()->cat());
+            break;
+    }
+    return result;
 }
 
 // Constructor for the tab form
