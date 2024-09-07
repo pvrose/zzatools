@@ -296,7 +296,7 @@ void qso_rig::create_buttons(int curr_x, int curr_y) {
 
 // Create rig and antenna choosers
 void qso_rig::create_rig_ant(int curr_x, int curr_y) {
-	rig_ant_grp_ = new Fl_Group(curr_x, curr_y, WBUTTON * 3, HTEXT + HBUTTON * 3);
+	rig_ant_grp_ = new Fl_Group(curr_x, curr_y, WBUTTON * 3, HTEXT + HBUTTON);
 	rig_ant_grp_->box(FL_NO_BOX);
 
 	curr_x += WBUTTON;
@@ -319,28 +319,6 @@ void qso_rig::create_rig_ant(int curr_x, int curr_y) {
 	ip_antenna_->field_name("MY_ANTENNA");
 	ip_antenna_->value(antenna_.c_str());
 
-	curr_y += HBUTTON;
-	
-	v_timeout_ = new Fl_Value_Slider(curr_x, curr_y, WSMEDIT, HBUTTON, "Timeout sec.");
-	v_timeout_->align(FL_ALIGN_LEFT);
-	v_timeout_->type(FL_HOR_SLIDER);
-	v_timeout_->callback(cb_timeout);
-	v_timeout_->tooltip("Set the value for timeing out the rig (0.1 to 5 s)");
-	v_timeout_->range(0.1, 5.0);
-	v_timeout_->step(0.1);
-	v_timeout_->value(cat_data_[cat_index_]->hamlib ? cat_data_[cat_index_]->hamlib->timeout : 1.0);
-
-	curr_y += HBUTTON;
-
-	v_smeters_ = new Fl_Value_Slider(curr_x, curr_y, WSMEDIT, HBUTTON, "S-meter stack");
-	v_smeters_->align(FL_ALIGN_LEFT);
-	v_smeters_->type(FL_HOR_SLIDER);
-	v_smeters_->callback(cb_smeters);
-	v_smeters_->tooltip("Set the number of s-meter samples to provide peak");
-	v_smeters_->range(1, 20);
-	v_smeters_->step(1);
-	v_smeters_->value(cat_data_[cat_index_]->hamlib ? cat_data_[cat_index_]->hamlib->num_smeters : 5);
-
 	rig_ant_grp_->end();
 
 
@@ -353,6 +331,8 @@ void qso_rig::create_config(int curr_x, int curr_y) {
 	config_tabs_->box(FL_BORDER_BOX);
 	config_tabs_->callback(cb_config);
 	config_tabs_->when(FL_WHEN_CHANGED);
+	config_tabs_->handle_overflow(Fl_Tabs::OVERFLOW_PULLDOWN);
+
 	int rx = 0;
 	int ry = 0;
 	int rw = 0;
@@ -370,6 +350,11 @@ void qso_rig::create_config(int curr_x, int curr_y) {
 	create_modifier(curr_x, curr_y);
 	rw = max(rw, modifier_tab_->x() + modifier_tab_->w() - rx);
 	rh = max(rh, modifier_tab_->y() + modifier_tab_->h() - ry);
+	// Create timeout &c tab
+	create_timeout(curr_x, curr_y);
+	rw = max(rw, timeout_tab_->x() + timeout_tab_->w() - rx);
+	rh = max(rh, timeout_tab_->y() + timeout_tab_->h() - ry);
+
 	config_tabs_->resizable(nullptr);
 	config_tabs_->size(config_tabs_->w() + rw - saved_rw, config_tabs_->h() + rh - saved_rh);
 	config_tabs_->end();
@@ -571,6 +556,42 @@ void qso_rig::create_modifier(int curr_x, int curr_y) {
 	modifier_tab_->size(curr_x - modifier_tab_->x(), curr_y - modifier_tab_->y());
 
 	modifier_tab_->end();
+}
+
+void qso_rig::create_timeout(int curr_x, int curr_y) {
+	timeout_tab_ = new Fl_Group(curr_x, curr_y, 10, 10, "Timeout etc.");
+	timeout_tab_->labelsize(FL_NORMAL_SIZE + 2);
+
+	curr_x = timeout_tab_->x() + WBUTTON + GAP;
+	curr_y += (HTEXT + GAP) / 2;
+
+	v_timeout_ = new Fl_Value_Slider(curr_x, curr_y, WBUTTON * 3 / 2, HBUTTON, "Timeout sec.");
+	v_timeout_->align(FL_ALIGN_LEFT);
+	v_timeout_->type(FL_HOR_SLIDER);
+	v_timeout_->callback(cb_timeout);
+	v_timeout_->tooltip("Set the value for timeing out the rig (0.1 to 5 s)");
+	v_timeout_->range(0.1, 5.0);
+	v_timeout_->step(0.1);
+	v_timeout_->value(cat_data_[cat_index_]->hamlib ? cat_data_[cat_index_]->hamlib->timeout : 1.0);
+
+	curr_y += HBUTTON;
+
+	v_smeters_ = new Fl_Value_Slider(curr_x, curr_y, WBUTTON * 3 / 2, HBUTTON, "S-meter stack");
+	v_smeters_->align(FL_ALIGN_LEFT);
+	v_smeters_->type(FL_HOR_SLIDER);
+	v_smeters_->callback(cb_smeters);
+	v_smeters_->tooltip("Set the number of s-meter samples to provide peak");
+	v_smeters_->range(1, 20);
+	v_smeters_->step(1);
+	v_smeters_->value(cat_data_[cat_index_]->hamlib ? cat_data_[cat_index_]->hamlib->num_smeters : 5);
+
+	curr_x += v_smeters_->w();
+	curr_y += HBUTTON + GAP;
+	timeout_tab_->resizable(nullptr);
+	timeout_tab_->size(curr_x - timeout_tab_->x(), curr_y - timeout_tab_->y());
+
+	timeout_tab_->end();
+
 }
 
 // Create the overall form

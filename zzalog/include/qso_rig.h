@@ -137,6 +137,7 @@ protected:
 	void create_serial(int x, int y);
 	void create_network(int x, int y);
 	void create_modifier(int x, int y);
+	void create_timeout(int X, int Y);
 
 	void load_cat_data(cat_data_t* data, Fl_Preferences settings);
 	void save_cat_data(cat_data_t* data, Fl_Preferences settings);
@@ -165,8 +166,6 @@ protected:
 	Fl_Group* rig_ant_grp_;
 	Fl_Choice* ch_rig_model_;
 	field_input* ip_antenna_;
-	Fl_Value_Slider* v_timeout_;
-	Fl_Value_Slider* v_smeters_;
 
 	// Configuartion - 3 tabs
 	Fl_Tabs* config_tabs_;
@@ -193,6 +192,12 @@ protected:
 	Fl_Int_Input* ip_gain_;
 	Fl_Check_Button* bn_power_;
 	Fl_Float_Input* ip_power_;
+
+	// Operational settings
+	Fl_Group* timeout_tab_;
+	Fl_Value_Slider* v_timeout_;
+	Fl_Value_Slider* v_smeters_;
+
 
 	// Add all ports to port choice
 	bool use_all_ports_;
