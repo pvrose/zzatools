@@ -489,7 +489,7 @@ void qso_rig::create_network(int curr_x, int curr_y) {
 
 // Create the form to configure any rig add-ons (transverter or amplifier)
 void qso_rig::create_modifier(int curr_x, int curr_y) {
-	modifier_tab_ = new Fl_Group(curr_x, curr_y, 10, 10, "Transverter/Amp");
+	modifier_tab_ = new Fl_Group(curr_x, curr_y, 10, 10, "Modify Rig");
 	modifier_tab_->labelsize(FL_NORMAL_SIZE + 2);
 
 	curr_x = modifier_tab_->x() + WBUTTON;
