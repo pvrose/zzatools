@@ -57,6 +57,16 @@ qso_rig::qso_rig(int X, int Y, int W, int H, const char* L) :
 	load_values();
 	rig_ = new rig_if(label(), cat_data_[cat_index_]->hamlib);
 	if (rig_->is_good()) rig_ok_ = true;
+	const rig_caps* capabilities = rig_get_caps(cat_data_[cat_index_]->hamlib->model_id);
+	if (capabilities && !(capabilities->has_get_level & RIG_LEVEL_RFPOWER_METER_WATTS)) {
+		char msg[128];
+		snprintf(msg, sizeof(msg), "DASH: Rig %s does not supply power - set it",
+			cat_data_[cat_index_]->hamlib->model.c_str());
+		status_->misc_status(ST_WARNING, msg);
+		modify_power_ = true;
+		modify_gain_ = false;
+	}
+	modify_rig();
 	create_form(X, Y);
 	enable_widgets();
 
@@ -286,7 +296,7 @@ void qso_rig::create_buttons(int curr_x, int curr_y) {
 
 // Create rig and antenna choosers
 void qso_rig::create_rig_ant(int curr_x, int curr_y) {
-	rig_ant_grp_ = new Fl_Group(curr_x, curr_y, WBUTTON * 3, HTEXT + HBUTTON + HBUTTON);
+	rig_ant_grp_ = new Fl_Group(curr_x, curr_y, WBUTTON * 3, HTEXT + HBUTTON * 3);
 	rig_ant_grp_->box(FL_NO_BOX);
 
 	curr_x += WBUTTON;
@@ -319,6 +329,17 @@ void qso_rig::create_rig_ant(int curr_x, int curr_y) {
 	v_timeout_->range(0.1, 5.0);
 	v_timeout_->step(0.1);
 	v_timeout_->value(cat_data_[cat_index_]->hamlib ? cat_data_[cat_index_]->hamlib->timeout : 1.0);
+
+	curr_y += HBUTTON;
+
+	v_smeters_ = new Fl_Value_Slider(curr_x, curr_y, WSMEDIT, HBUTTON, "S-meter stack");
+	v_smeters_->align(FL_ALIGN_LEFT);
+	v_smeters_->type(FL_HOR_SLIDER);
+	v_smeters_->callback(cb_smeters);
+	v_smeters_->tooltip("Set the number of s-meter samples to provide peak");
+	v_smeters_->range(1, 20);
+	v_smeters_->step(1);
+	v_smeters_->value(cat_data_[cat_index_]->hamlib ? cat_data_[cat_index_]->hamlib->num_smeters : 5);
 
 	rig_ant_grp_->end();
 
@@ -1267,6 +1288,14 @@ void qso_rig::cb_timeout(Fl_Widget* w, void* v) {
 	cb_value<Fl_Value_Slider, double>(w, &that->cat_data_[that->cat_index_]->hamlib->timeout);
 }
 
+// Smeter stack length
+void qso_rig::cb_smeters(Fl_Widget* w, void* v) {
+	qso_rig* that = ancestor_view<qso_rig>(w);
+	double value;
+	cb_value<Fl_Value_Slider, double>(w, &value);
+	that->cat_data_[that->cat_index_]->hamlib->num_smeters = (int)value;;
+}
+
 // Use selected CAT
 void qso_rig::cb_select_cat(Fl_Widget* w, void* v) {
 	qso_rig* that = ancestor_view<qso_rig>(w);
@@ -1290,6 +1319,15 @@ void qso_rig::switch_rig() {
 		delete rig_;
 		rig_ = nullptr;
 		rig_ = new rig_if(label(), cat_data_[cat_index_]->hamlib);
+		const rig_caps* capabilities = rig_get_caps(cat_data_[cat_index_]->hamlib->model_id);
+		if (capabilities && !(capabilities->has_get_level & RIG_LEVEL_RFPOWER_METER_WATTS)) {
+			char msg[128];
+			snprintf(msg, sizeof(msg), "DASH: Rig %s does not supply power - set it",
+				cat_data_[cat_index_]->hamlib->model.c_str());
+			status_->misc_status(ST_WARNING, msg);
+			modify_power_ = true;
+			modify_gain_ = false;
+		}
 	}
 	ancestor_view<qso_manager>(this)->update_rig();
 	modify_rig();

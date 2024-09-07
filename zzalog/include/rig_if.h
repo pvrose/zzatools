@@ -13,6 +13,7 @@
 #include <atomic>
 #include <mutex>
 #include <chrono>
+#include <vector>
 
 using namespace std;
 using namespace std::chrono;
@@ -52,6 +53,8 @@ using namespace std::chrono;
 		rig_port_t port_type = RIG_PORT_NONE;
 		// Timeout value (not a hamlib item
 		double timeout = 1.0;
+		// S-meter reading queue length
+		int num_smeters = 5;
 	};
 
 	// This class is the base class for rig handlers. 
@@ -197,6 +200,11 @@ using namespace std::chrono;
 
 		// The time of the last PTT off - to decide if it's a new over
 		system_clock::time_point last_ptt_off_;
+
+		// Queue of s-meter readings
+		vector<int> smeters_;
+		// Cumulated value of smeter readings
+		int sum_smeters_;
 
 
 };

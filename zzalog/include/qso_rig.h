@@ -114,6 +114,8 @@ protected:
 	// CAT index menu items
 	static void cb_select_cat(Fl_Widget* w, void* v);
 	static void cb_new_cat(Fl_Widget* w, void* v);
+	// S-meter peak smapling
+	static void cb_smeters(Fl_Widget* w, void* v);
 
 	// Get hamlib data
 	void find_hamlib_data();
@@ -164,6 +166,7 @@ protected:
 	Fl_Choice* ch_rig_model_;
 	field_input* ip_antenna_;
 	Fl_Value_Slider* v_timeout_;
+	Fl_Value_Slider* v_smeters_;
 
 	// Configuartion - 3 tabs
 	Fl_Tabs* config_tabs_;
