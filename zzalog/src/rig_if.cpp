@@ -205,6 +205,10 @@ void rig_if::close() {
 			delete thread_;
 			rig_close(rig_);
 			rig_cleanup(rig_);
+		} else {
+			run_read_ = false;
+			thread_->join();
+			delete thread_;
 		}
 	}
 	opened_ok_ = false;

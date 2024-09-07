@@ -828,7 +828,11 @@ void qso_rig::enable_widgets(bool tick) {
 				strcpy(msg, rig_->error_message(label()).c_str());
 			}
 			status_->misc_status(ST_WARNING, msg);
+			// Tidy up if rig has disconnected
 			rig_ok_ = false;
+			delete rig_;
+			rig_ = nullptr;
+
 		}
 		// Rig is not connected - deactivate freq/mode
 		op_status_->value("Disconnected");
@@ -839,7 +843,7 @@ void qso_rig::enable_widgets(bool tick) {
 	}
 	bn_tx_rx_->labelcolor(fl_contrast(FL_FOREGROUND_COLOR, bn_tx_rx_->color()));
 	// CAT control widgets - allow only when select button active
-	if (rig_->is_open()) {
+	if (rig_ && rig_->is_open()) {
 		// Rig is open - disable connection configuration controls
 		ch_rig_model_->deactivate();
 		serial_grp_->deactivate();
