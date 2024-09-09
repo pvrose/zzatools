@@ -40,6 +40,7 @@ main.cpp - application entry point
 #include "wx_handler.h"
 #include "ticker.h"
 #include "fields.h"
+#include "symbols.h"
 
 // C/C++ header files
 #include <ctime>
@@ -903,6 +904,9 @@ void customise_fltk() {
 	Fl::set_font(FL_COURIER_BOLD,       "Courier New Bold");
 	Fl::set_font(FL_COURIER_ITALIC,     "Courier New Italic");
 	Fl::set_font(FL_COURIER_BOLD_ITALIC,"Courier New Bold Italic");	
+	// Add label symbols
+	fl_add_symbol("eyeshut", &draw_eyeshut, true);
+	fl_add_symbol("eyeopen", &draw_eyeopen, true);
 	// Customise colours
 	bool vr, vg, vb;
 	switch(THEME) {

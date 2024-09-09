@@ -74,10 +74,10 @@
     <LibraryPath>C:\Users\pvros\Documents\dev\deps\lib;C:\Users\pvros\Documents\dev\fltk-master\build\lib\RelWithDebInfo;C:\Users\pvros\Documents\dev\curl-7.65.1\builds\libcurl-vc15-x86-release-dll-ipv6-sspi-winssl\lib;C:\Users\pvros\Documents\dev\zzatools\Release;$(LibraryPath);C:\Program Files %28x86%29\hamlib-w32-4.5.3\lib\msvc</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LibraryPath>C:\Program Files\hamlib-w64-4.5.5\lib\msvc;C:\Users\pvros\source\repos\fltk\build\lib\Release;${LibraryPath};C:\Users\pvros\Downloads\curl-8.9.1\curl-8.9.1\builds\libcurl-vc17-x86-release-static-ipv6-sspi-schannel-obj-lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>C:\Program Files\hamlib-w64-4.6~git\lib\msvc;C:\Users\pvros\source\repos\fltk\build\lib\Release;${LibraryPath};C:\Users\pvros\Downloads\curl-8.9.1\curl-8.9.1\builds\libcurl-vc17-x86-release-static-ipv6-sspi-schannel-obj-lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LibraryPath>C:\Program Files\hamlib-w64-4.5.5\lib\msvc;C:\Users\pvros\source\repos\fltk\build\lib\Release;${LibraryPath};C:\Users\pvros\Downloads\curl-8.9.1\curl-8.9.1\builds\libcurl-vc17-x86-release-static-ipv6-sspi-schannel-obj-lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>C:\Program Files\hamlib-w64-4.6~git\lib\msvc;C:\Users\pvros\source\repos\fltk\build\lib\Release;${LibraryPath};C:\Users\pvros\Downloads\curl-8.9.1\curl-8.9.1\builds\libcurl-vc17-x86-release-static-ipv6-sspi-schannel-obj-lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -127,7 +127,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\pvros\source\repos\pvrose\zzatools\zzalog\include;C:\Users\pvros\source\repos\fltk\build;C:\Program Files\hamlib-w64-4.5.5\include;C:\Users\pvros\source\repos\fltk;C:\Users\pvros\source\repos\pthread-win32;C:\Users\pvros\Downloads\curl-8.9.1\curl-8.9.1\builds\libcurl-vc17-x64-release-dll-ipv6-sspi-schannel\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\pvros\source\repos\pvrose\zzatools\zzalog\include;C:\Users\pvros\source\repos\fltk\build;C:\Program Files\hamlib-w64-4.6~git\include;C:\Users\pvros\source\repos\fltk;C:\Users\pvros\source\repos\pthread-win32;C:\Users\pvros\Downloads\curl-8.9.1\curl-8.9.1\builds\libcurl-vc17-x64-release-dll-ipv6-sspi-schannel\include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>CURL_STATICLIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
@@ -141,7 +141,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\pvros\source\repos\pvrose\zzatools\zzalog\include;C:\Users\pvros\source\repos\fltk\build;C:\Program Files\hamlib-w64-4.5.5\include;C:\Users\pvros\source\repos\fltk;C:\Users\pvros\source\repos\pthread-win32;C:\Users\pvros\Downloads\curl-8.9.1\curl-8.9.1\builds\libcurl-vc17-x64-release-dll-ipv6-sspi-schannel\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\pvros\source\repos\pvrose\zzatools\zzalog\include;C:\Users\pvros\source\repos\fltk\build;C:\Program Files\hamlib-w64-4.6~git\include;C:\Users\pvros\source\repos\fltk;C:\Users\pvros\source\repos\pthread-win32;C:\Users\pvros\Downloads\curl-8.9.1\curl-8.9.1\builds\libcurl-vc17-x64-release-dll-ipv6-sspi-schannel\include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>CURL_STATICLIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
@@ -186,6 +186,7 @@
     <ClCompile Include="zzalog\src\rpc_handler.cpp" />
     <ClCompile Include="zzalog\src\serial.cpp" />
     <ClCompile Include="zzalog\src\socket_server.cpp" />
+    <ClCompile Include="zzalog\src\symbols.cpp" />
     <ClCompile Include="zzalog\src\ticker.cpp" />
     <ClCompile Include="zzalog\src\timestamp.cpp" />
     <ClCompile Include="zzalog\src\url_handler.cpp" />
@@ -281,6 +282,7 @@
     <ClInclude Include="zzalog\include\rpc_handler.h" />
     <ClInclude Include="zzalog\include\serial.h" />
     <ClInclude Include="zzalog\include\socket_server.h" />
+    <ClInclude Include="zzalog\include\symbols.h" />
     <ClInclude Include="zzalog\include\ticker.h" />
     <ClInclude Include="zzalog\include\url_handler.h" />
     <ClInclude Include="zzalog\include\utils.h" />

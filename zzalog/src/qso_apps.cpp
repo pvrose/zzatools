@@ -142,7 +142,7 @@ void app_grp::create_form() {
     curr_x += ip_passw_->w();
 
     // Show/Hide password
-    bn_show_pw_ = new Fl_Button(curr_x, curr_y, HBUTTON, HBUTTON, "@search");
+    bn_show_pw_ = new Fl_Button(curr_x, curr_y, HBUTTON, HBUTTON, "@eyeopen");
     bn_show_pw_->callback(cb_bn_show_pw);
     bn_show_pw_->tooltip("Show/hide password");
     bn_show_pw_->type(FL_TOGGLE_BUTTON);
