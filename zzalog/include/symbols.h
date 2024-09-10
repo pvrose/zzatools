@@ -30,7 +30,7 @@ void draw_iris();
 void draw_lash(int lash);
 
 // Drawing constants
-const double lid_arc = 120.0;
+const double lid_arc = 90.0;
 const double lid_angle = (lid_arc / 2.0) * DEGREE_RADIAN;
 const double lid_incr = lid_angle / 3.0;
 // Lid origion Y value
@@ -50,16 +50,16 @@ struct lash_xy {
 };
 // individual lashes
 const lash_xy lash1 = {
-	radius_i * cos(PI - lid_incr),
-	radius_i * sin(PI - lid_incr) - origin_y,
-	radius_o * cos(PI - lid_incr),
-	radius_o * sin(PI - lid_incr) - origin_y
+	radius_i * sin(lid_incr),
+	radius_i * cos(lid_incr) - origin_y,
+	radius_o * sin(lid_incr),
+	radius_o * cos(lid_incr) - origin_y
 };
 const lash_xy lash2 = {
-	radius_i * cos(PI - lid_incr - lid_incr),
-	radius_i * sin(PI - lid_incr - lid_incr) - origin_y,
-	radius_o * cos(PI - lid_incr - lid_incr),
-	radius_o * sin(PI - lid_incr - lid_incr) - origin_y
+	radius_i * sin(lid_incr + lid_incr),
+	radius_i * cos(lid_incr + lid_incr) - origin_y,
+	radius_o * sin(lid_incr + lid_incr),
+	radius_o * cos(lid_incr + lid_incr) - origin_y
 };
 // Lash co-ordinate table
 const lash_xy lash_lut[10] = {

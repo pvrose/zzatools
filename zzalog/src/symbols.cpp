@@ -11,7 +11,7 @@
 void draw_upper_lid() {
 
 	fl_begin_line();
-	fl_arc(0.0, -origin_y, radius_i, 90.0 - (lid_arc / 2), 90.0 + (lid_arc/2));
+	fl_arc(0.0, origin_y, radius_i, 90.0 - (lid_arc / 2), 90.0 + (lid_arc/2));
 	fl_end_line();
 }
 
@@ -19,7 +19,7 @@ void draw_upper_lid() {
 void draw_lower_lid() {
 
 	fl_begin_line();
-	fl_arc(0.0, origin_y, radius_i, 270.0 - (lid_arc / 2), 270.0 + (lid_arc / 2));
+	fl_arc(0.0, -origin_y, radius_i, 270.0 - (lid_arc / 2), 270.0 + (lid_arc / 2));
 	fl_end_line();
 }
 
