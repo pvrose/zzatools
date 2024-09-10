@@ -55,12 +55,12 @@ const lash_xy lash2 = {
 const lash_xy lash_lut[10] = {
 	{ -lash2.x0, lash2.y0, -lash2.x1, lash2.y1},
 	{ -lash1.x0, lash1.y0, -lash1.x1, lash1.y1},
-	{ 0.0, origin_y - radius_i, 0.0, -radius_o},
+	{ 0.0, origin_y - radius_i, 0.0, origin_y - radius_o},
 	lash1,
 	lash2,
 	{ -lash2.x0, -lash2.y0, -lash2.x1, -lash2.y1},
 	{ -lash1.x0, -lash1.y0, -lash1.x1, -lash1.y1},
-	{ 0.0, radius_i - origin_y, 0.0, radius_o},
+	{ 0.0, radius_i - origin_y, 0.0, radius_o - origin_y},
 	{ lash1.x0, -lash1.y0, lash1.x1, -lash1.y1},
 	{ lash2.x0, -lash2.y0, lash2.x1, -lash2.y1}
 };
