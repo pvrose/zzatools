@@ -58,9 +58,9 @@ qso_rig::qso_rig(int X, int Y, int W, int H, const char* L) :
 	rig_ = new rig_if(label(), cat_data_[cat_index_]->hamlib);
 	if (rig_->is_good()) rig_ok_ = true;
 	const rig_caps* capabilities = rig_get_caps(cat_data_[cat_index_]->hamlib->model_id);
-	if (capabilities && !(capabilities->has_get_level & RIG_LEVEL_RFPOWER_METER_WATTS)) {
+	if (rig_ok_ && capabilities && !(capabilities->has_get_level & RIG_LEVEL_RFPOWER_METER_WATTS)) {
 		char msg[128];
-		snprintf(msg, sizeof(msg), "DASH: Rig %s does not supply power - set it",
+		snprintf(msg, sizeof(msg), "RIG: Rig %s does not supply power - set it",
 			cat_data_[cat_index_]->hamlib->model.c_str());
 		status_->misc_status(ST_WARNING, msg);
 		modify_power_ = true;
