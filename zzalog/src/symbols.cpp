@@ -1,9 +1,69 @@
 #include "symbols.h"
+#include "utils.h"
 
+#include <cmath>
+
+#include <FL/Enumerations.H>
 #include <FL/fl_draw.H>
 
 
 // Contains the drawing routines for the label suymbols required in ZZALO
+
+// Draw the individual componnents...
+// An arc for the edge of the upper lid
+void draw_upper_lid();
+// An arc for the edge of the lower lid
+void draw_lower_lid();
+// A circle for the iris
+void draw_iris();
+// Individual eyelashes
+void draw_lash(int lash);
+
+// Drawing constants
+const double lid_arc = 90.0;
+const double lid_angle = (lid_arc / 2.0) * DEGREE_RADIAN;
+const double lid_incr = lid_angle / 3.0;
+// Lid origion Y value
+const double origin_y = 1 / tan(lid_angle);
+// Lid radius (inner)
+const double radius_i = 1 / sin(lid_angle);
+// Lash radius (outer)
+const double radius_o = 0.9 + origin_y;
+// Iris radius
+const double radius_c = (radius_i - origin_y) * 2.0 / 3.0;
+// eyelash coordinate struct
+struct lash_xy {
+	double x0;
+	double y0;
+	double x1;
+	double y1;
+};
+// individual lashes
+const lash_xy lash1 = {
+	radius_i * sin(lid_incr),
+	origin_y - (radius_i * cos(lid_incr)),
+	radius_o * sin(lid_incr),
+	origin_y - (radius_o * cos(lid_incr))
+};
+const lash_xy lash2 = {
+	radius_i * sin(lid_incr + lid_incr),
+	origin_y - (radius_i * cos(lid_incr + lid_incr)),
+	radius_o * sin(lid_incr + lid_incr),
+	origin_y - (radius_o * cos(lid_incr + lid_incr))
+};
+// Lash co-ordinate table
+const lash_xy lash_lut[10] = {
+	{ -lash2.x0, lash2.y0, -lash2.x1, lash2.y1},
+	{ -lash1.x0, lash1.y0, -lash1.x1, lash1.y1},
+	{ 0.0, origin_y - radius_i, 0.0, -radius_o},
+	lash1,
+	lash2,
+	{ -lash2.x0, -lash2.y0, -lash2.x1, -lash2.y1},
+	{ -lash1.x0, -lash1.y0, -lash1.x1, -lash1.y1},
+	{ 0.0, radius_i - origin_y, 0.0, radius_o},
+	{ lash1.x0, -lash1.y0, lash1.x1, -lash1.y1},
+	{ lash2.x0, -lash2.y0, lash2.x1, -lash2.y1}
+};
 
 
 // Draw the individual componnents...
@@ -25,9 +85,9 @@ void draw_lower_lid() {
 
 // A circle for the iris
 void draw_iris() {
-	fl_begin_line();
+	fl_begin_polygon();
 	fl_circle(0.0, 0.0, radius_c);
-	fl_end_line();
+	fl_end_polygon();
 }
 
 // Individual eyelashes
@@ -46,7 +106,7 @@ void draw_eyeopen(Fl_Color c) {
 	draw_upper_lid();
 	draw_lower_lid();
 	draw_iris();
-	for (int i = 0; i < 5; i++) {
+	for (int i = 0; i < 10; i++) {
 		draw_lash(i);
 	}
 	fl_color(save);

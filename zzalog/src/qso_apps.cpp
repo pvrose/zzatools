@@ -23,6 +23,7 @@ extern Fl_Preferences* settings_;
 // Constructor for one set of modem controls
 app_grp::app_grp(int X, int Y, int W, int H, const char* L) :
     Fl_Group(X, Y, W, H, L)
+    , password_visible_(false)
 {
     create_form();
 }
@@ -220,11 +221,14 @@ void app_grp::enable_widgets() {
         bn_admin_->value(true);
         ip_passw_->activate();
         bn_show_pw_->activate();
-        if (bn_show_pw_->value()) {
+        if (password_visible_) {
             ip_passw_->input_type(FL_NORMAL_INPUT);
+            bn_show_pw_->label("@eyeopen");
         } else {
             ip_passw_->input_type(FL_SECRET_INPUT);
+            bn_show_pw_->label("@eyeshut");
         }
+        ip_passw_->redraw();
     } else {
         bn_admin_->value(false);
         ip_passw_->value("");
@@ -338,6 +342,8 @@ void app_grp::cb_bn_admin(Fl_Widget* w, void* v) {
 // Callback for hiding/showing password
 void app_grp::cb_bn_show_pw(Fl_Widget* w, void* v) {
     app_grp* that = ancestor_view<app_grp>(w);
+    that->password_visible_ = that->password_visible_ ? false : true;
+    ((Fl_Button*)w)->value(false);
     that->enable_widgets();
 }
 

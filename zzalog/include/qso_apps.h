@@ -101,6 +101,8 @@ class app_grp :
         Fl_Input* ip_disable_app_;
 
         app_data_t* app_data_;
+
+        bool password_visible_;
 };
 
 // Displays and controls all the interfaces to the modem apps
