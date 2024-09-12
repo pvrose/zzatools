@@ -124,6 +124,41 @@ void draw_eyeshut(Fl_Color c) {
 	fl_color(save);
 }
 
+// Data for drawing calendar
+const double cal[8] = { -1.00, -5. / 7., -3. / 7., -1. / 7., 1. / 7., 3. / 7., 5. / 7., 1.0 };
+
+void draw_horizontal(int i) {
+	fl_begin_line();
+	fl_vertex(cal[0], cal[i]);
+	fl_vertex(cal[7], cal[i]);
+	fl_end_line();
+}
+
+void draw_vertical(int i, bool shrt) {
+	fl_begin_line();
+	fl_vertex(cal[i], cal[shrt ? 2 : 0]);
+	fl_vertex(cal[i], cal[7]);
+	fl_end_line();
+}
+
+// Draw the calendar symbole
+void draw_calendar(Fl_Color c) {
+	Fl_Color save = fl_color();
+	fl_color(c);
+	// Draw horizontal lines
+	draw_horizontal(0);
+	for (int i = 2; i < 8; i++) {
+		draw_horizontal(i);
+	}
+	// Draw vertical lines
+	draw_vertical(0, false);
+	for (int i = 1; i < 7; i++) {
+		draw_vertical(i, true);
+	}
+	draw_vertical(7, false);
+	fl_color(save);
+}
+
 
 
 

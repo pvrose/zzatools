@@ -229,13 +229,13 @@ void web_dialog::create_eqsl(int rx, int ry, int rw, int rh) {
 	in1_1_2->tooltip("Last time eQSL.cc accessed");
 
 	// Row 1 Col 3 - Calendar button
-	Fl_Button* bn1_1_3 = new Fl_Button(C3, R1_1, W3, H1_1);
-	bn1_1_3->image(new Fl_RGB_Image(ICON_CALENDAR, 16, 16, 4));
+	Fl_Button* bn1_1_3 = new Fl_Button(C3, R1_1, W3, H1_1, "@calendar");
+	//bn1_1_3->image(new Fl_RGB_Image(ICON_CALENDAR, 16, 16, 4));
 	eqsl_cal_cb_data_ = { &eqsl_last_got_, in1_1_2 };
 	bn1_1_3->callback(calendar::cb_cal_open, &eqsl_cal_cb_data_);
 	bn1_1_3->when(FL_WHEN_RELEASE);
 	bn1_1_3->tooltip("Open calendar to chnage date to fetch eQSL.cc");
-	image_widgets_.insert(bn1_1_3);
+	//image_widgets_.insert(bn1_1_3);
 
 	// Row 1 Col 4 - User entry field
 	intl_input* in1_1_4 = new intl_input(C4, R1_1, W4, H1_1, "User");

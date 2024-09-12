@@ -14,5 +14,7 @@
 void draw_eyeopen(Fl_Color c);
 // Draw the eye shut sybol
 void draw_eyeshut(Fl_Color c);
+// Draw the calendar symbol
+void draw_calendar(Fl_Color c);
 
 
