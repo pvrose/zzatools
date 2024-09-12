@@ -98,12 +98,10 @@ int fllog_emul::get_record(rpc_data_item::rpc_list& params, rpc_data_item& respo
 		record* qso = nullptr;
 		if (that_->current_qso_ && that_->current_qso_->item("CALL") == callsign) {
 			// Use this 
-			printf("DEBUG: Using previous get_record\n");
 			qso = that_->current_qso_;
 		} else {
 			if (extract_records_->size() == 0 || extract_records_->get_record(0, true)->item("CALL") != callsign) 
 				extract_records_->extract_call(callsign);
-			printf("DEBUG: get_record %s %zu records found\n", callsign.c_str(), extract_records_->size());
 			if (extract_records_->size()) {
 				qso = extract_records_->get_record(0, true);
 				extract_records_->selection(0, HT_SELECTED);
@@ -114,7 +112,6 @@ int fllog_emul::get_record(rpc_data_item::rpc_list& params, rpc_data_item& respo
 			adi_writer* writer = new adi_writer;
 			stringstream ss;
 			writer->to_adif(qso, ss);
-			printf("DEBUG: get_record: %s\n", ss.str().c_str());
 			response.set(ss.str(), XRT_STRING);
 			delete writer;
 		} else {
@@ -160,8 +157,6 @@ int fllog_emul::check_dup(rpc_data_item::rpc_list& params, rpc_data_item& respon
 		// Get all possible matches
 		if (extract_records_->size() == 0 || extract_records_->get_record(0, true)->item("CALL") != callsign) 
 			extract_records_->extract_call(callsign);
-		printf("DEBUG: check_dup %s Mode=%s Span=%d Freq=%d State=%s RST=%s", 
-		callsign.c_str(), mode.c_str(), span, freq_kHz, state.c_str(), rst_in.c_str());
 		time_t timestamp = time(nullptr);
 		if (extract_records_->size() && extract_records_->get_record(0, true) != that_->current_qso_) {
 			bool found = false;
@@ -232,7 +227,6 @@ int fllog_emul::add_record(rpc_data_item::rpc_list& params, rpc_data_item& respo
 		rpc_data_item* item = params.front();
 		stringstream ss;
 		ss.str(item->get_string());
-		printf("DEBUG: add_record: %s\n", item->get_string().c_str());
 		adi_reader* reader = new adi_reader();
 		load_result_t dummy;
 		record* qso = that_->putative_qso_;
@@ -258,7 +252,6 @@ int fllog_emul::update_record(rpc_data_item::rpc_list& params, rpc_data_item& re
 		rpc_data_item* item = params.front();
 		stringstream ss;
 		ss.str(item->get_string());
-		printf("DEBUG: update_record: %s\n", item->get_string().c_str());
 		adi_reader* reader = new adi_reader();
 		load_result_t dummy;
 		record* changes = new record();

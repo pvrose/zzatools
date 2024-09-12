@@ -298,12 +298,10 @@ bool book::load_data(string filename)
 				for (auto mx = used_qths_.begin(); mx != used_qths_.end(); mx++) {
 					spec_data_->add_user_macro("APP_ZZA_QTH", (*mx).first, *((*mx).second));
 				}
-				// printf("DEBUG: Updated APP_ZZA_QTH macro list\n");
 				// Update spec_data_item_
 				for (auto mx = used_ops_.begin(); mx != used_ops_.end(); mx++) {
 					spec_data_->add_user_macro("APP_ZZA_OP", (*mx).first, *((*mx).second));
 				}
-				// printf("DEBUG: Updated APP_ZZA_OP macro list\n");
 				set_session_start();
 
 				current_item_ = size() - 1;

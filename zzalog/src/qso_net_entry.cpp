@@ -234,7 +234,6 @@ void qso_net_entry::navigate(navigate_t target) {
 			ix = i;
 		}
 	}
-	printf("DEBUG: NET: Selected tab %d - call = %s\n", ix, ((qso_entry*)entries_->child(ix))->qso()->item("CALL").c_str());
 	switch(target) {
 		case NV_FIRST: {
 			entries_->value(first_entry());
@@ -261,6 +260,5 @@ void qso_net_entry::navigate(navigate_t target) {
 	}
 	enable_widgets();
 	qso_entry* qe = (qso_entry*)entries_->value();
-	printf("DEBUG: NET: Selected call - %s\n", qe->qso()->item("CALL").c_str());
 	book_->selection(qe->qso_number());
 }

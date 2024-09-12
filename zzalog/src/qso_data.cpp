@@ -1338,7 +1338,6 @@ void qso_data::action_add_net_qso() {
 	switch (logging_state_) {
 	case NET_STARTED:
 		logging_state_ = NET_ADDING;
-		// printf("DEBUG: Add net QSO\n");
 		action_new_qso(qso, QSO_ON_AIR);
 		logging_state_ = NET_STARTED;
 		break;
@@ -1355,7 +1354,6 @@ void qso_data::action_add_net_qso() {
 
 // Save the whole net
 void qso_data::action_save_net_all() {
-	// printf("DEBUG: action_save_net_all\n");
 	// Only save the book once all records have been saved
 	// Uplaod the QSOs after all have been saved
 	book_->enable_save(false, "Starting multi-QSO save");

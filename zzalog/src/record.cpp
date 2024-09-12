@@ -31,6 +31,7 @@ extern cty_data* cty_data_;
 extern spec_data* spec_data_;
 extern Fl_Preferences* settings_;
 extern status* status_;
+extern book* book_;
 
 // initialise the static variables
 bool record::expecting_header_ = true;
@@ -97,7 +98,7 @@ void record::delete_contents() {
 	is_incomplete_ = false;
 	is_dirty_ = false;
 	// Delete items
-	clear();
+	// clear();
 }
 
 // Set an item pair.

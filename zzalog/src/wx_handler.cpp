@@ -204,7 +204,6 @@ void wx_handler::update() {
     snprintf(msg, sizeof(msg), "WX_HANDLER: Fetching %s", url);
     status_->misc_status(ST_NOTE, msg);
     if (url_handler_->read_url(string(url), &ss)) {
-        // printf("DEBUG: WX: %s\n", ss.str().c_str());
         char msg[128];
         ss.seekg(ios::beg);
         parse(ss);

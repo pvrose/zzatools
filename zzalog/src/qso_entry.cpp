@@ -338,10 +338,6 @@ void qso_entry::copy_qso_to_qso(record* old_record, int flags) {
 	// Create a new record
 	qso(-1);
 	if (old_record) {
-		// printf("DEBUG: Copying QSO %p %s %s %s %s F=%d \n", old_record,
-		// old_record->item("QSO_DATE").c_str(),
-		// old_record->item("TIME_ON").c_str(), old_record->item("CALL").c_str(),
-		// old_record->item("APP_ZZA_OP").c_str(), flags);
 		// For all flag bits
 		for (auto sf = COPY_SET.begin(); sf != COPY_SET.end(); sf++) {
 			copy_flags f = (*sf);
@@ -835,6 +831,7 @@ void qso_entry::qso(qso_num_t number) {
 		qso_number_ = number;
 		if (number == -1) {
 			qso_ = new record();
+			printf("Created new qso %p\n", qso_);
 		}
 		else {
 			qso_ = book_->get_record(number, false);

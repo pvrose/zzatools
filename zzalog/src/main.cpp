@@ -346,7 +346,6 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 // Callback to parse arguments
 // See show_help() for meaning of switches
 int cb_args(int argc, char** argv, int& i) {
-	// printf("DEBUG: parsing parameter %s\n", argv[i]);
 	int i_orig = i;
 	// Look for read_only (-r or --read_only)
 	if (strcmp("-r", argv[i]) == 0 || strcmp("--read_only", argv[i]) == 0) {
