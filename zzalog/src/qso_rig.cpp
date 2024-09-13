@@ -925,7 +925,7 @@ void qso_rig::enable_widgets(bool tick) {
 			op_pwr_type_->value("Drive");
 			break;
 		case MAX_POWER:
-			op_pwr_type_->value("Specified");
+			op_pwr_type_->value("Specify");
 			break;
 		default:
 			op_pwr_type_->value("");
