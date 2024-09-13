@@ -122,6 +122,20 @@ extern bool DEBUG_ERRORS;
 		}
 		*target = f;
 	}
+	// Callback to get a double value from a widget that has char* - returns nan if not numeric
+	template <class WIDGET>
+	static void cb_value_double(Fl_Widget* w, void* v) {
+		const char* value = ((WIDGET*)w)->value();
+		double* target = (double*)v;
+		double d;
+		try {
+			d = stod(value);
+		}
+		catch (invalid_argument&) {
+			d = nan("");
+		}
+		*target = d;
+	}
 	// Call back  to get an tm value from a widget that has char*
 	template <class WIDGET>
 	static void cb_value_tm(Fl_Widget* w, void* v) {

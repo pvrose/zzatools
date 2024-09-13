@@ -7,10 +7,10 @@
 #include "qso_rig.h"
 #include "utils.h"
 #include "callback.h"
+#include "password_input.h"
 
 #include <FL/Fl_Preferences.H>
 #include <FL/Fl_Tabs.H>
-#include <FL/Fl_Secret_Input.H>
 #include <FL/Fl_Radio_Light_Button.H>
 
 using namespace std;
@@ -23,7 +23,6 @@ extern Fl_Preferences* settings_;
 // Constructor for one set of modem controls
 app_grp::app_grp(int X, int Y, int W, int H, const char* L) :
     Fl_Group(X, Y, W, H, L)
-    , password_visible_(false)
 {
     create_form();
 }
@@ -134,7 +133,7 @@ void app_grp::create_form() {
     curr_x += HBUTTON;
 
     // Password input
-    ip_passw_ = new Fl_Secret_Input(curr_x, curr_y, WBUTTON * 2 - HBUTTON, HBUTTON);
+    ip_passw_ = new password_input(curr_x, curr_y, WBUTTON * 2, HBUTTON);
     ip_passw_->tooltip("Enter the administrator's password");
     ip_passw_->value("");
     ip_passw_->callback(cb_ip_passw);
@@ -142,13 +141,6 @@ void app_grp::create_form() {
 
     curr_x += ip_passw_->w();
 
-    // Show/Hide password
-    bn_show_pw_ = new Fl_Button(curr_x, curr_y, HBUTTON, HBUTTON, "@eyeopen");
-    bn_show_pw_->callback(cb_bn_show_pw);
-    bn_show_pw_->tooltip("Show/hide password");
-    bn_show_pw_->type(FL_TOGGLE_BUTTON);
-    bn_show_pw_->value(false);
-    
     curr_x = x() + GAP + WBUTTON;
     curr_y += HBUTTON;
     // Light to say that we are listening for the modem app to connect
@@ -220,20 +212,11 @@ void app_grp::enable_widgets() {
     if (app_data_->admin) {
         bn_admin_->value(true);
         ip_passw_->activate();
-        bn_show_pw_->activate();
-        if (password_visible_) {
-            ip_passw_->input_type(FL_NORMAL_INPUT);
-            bn_show_pw_->label("@eyeopen");
-        } else {
-            ip_passw_->input_type(FL_SECRET_INPUT);
-            bn_show_pw_->label("@eyeshut");
-        }
-        ip_passw_->redraw();
+       ip_passw_->redraw();
     } else {
         bn_admin_->value(false);
         ip_passw_->value("");
         ip_passw_->deactivate();
-        bn_show_pw_->deactivate();
     }
     if (app_data_->can_disable) {
         bn_disable_->value(true);
@@ -336,14 +319,6 @@ void app_grp::cb_bn_server(Fl_Widget* w, void* v) {
 void app_grp::cb_bn_admin(Fl_Widget* w, void* v) {
     app_grp* that = ancestor_view<app_grp>(w);
     cb_value<Fl_Check_Button, bool>(w, &that->app_data_->admin);
-    that->enable_widgets();
-}
-
-// Callback for hiding/showing password
-void app_grp::cb_bn_show_pw(Fl_Widget* w, void* v) {
-    app_grp* that = ancestor_view<app_grp>(w);
-    that->password_visible_ = that->password_visible_ ? false : true;
-    ((Fl_Button*)w)->value(false);
     that->enable_widgets();
 }
 

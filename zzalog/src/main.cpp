@@ -906,6 +906,7 @@ void customise_fltk() {
 	// Add label symbols
 	fl_add_symbol("eyeshut", &draw_eyeshut, true);
 	fl_add_symbol("eyeopen", &draw_eyeopen, true);
+	fl_add_symbol("calendar", &draw_calendar, true);
 	// Customise colours
 	bool vr, vg, vb;
 	switch(THEME) {

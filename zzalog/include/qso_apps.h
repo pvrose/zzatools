@@ -6,8 +6,8 @@
 #include <FL/Fl_Group.H>
 
 using namespace std;
+class password_input;
 class Fl_Input;
-class Fl_Secret_Input;
 class Fl_Light_Button;
 class Fl_Check_Button;
 class Fl_Radio_Light_Button;
@@ -66,8 +66,6 @@ class app_grp :
         static void cb_bn_server(Fl_Widget* w, void* v);
         // Call back for needing admin
         static void cb_bn_admin(Fl_Widget* w, void* v);
-       // Callback for hiding/showing password
-        static void cb_bn_show_pw(Fl_Widget* w, void* v);
         // Callback to delete the application
         static void cb_bn_delete(Fl_Widget* w, void* v);
         // Callback to set can_disable
@@ -94,15 +92,12 @@ class app_grp :
         Fl_Radio_Light_Button* bn_rig_cat_;
         Fl_Button* bn_rig_;
         Fl_Check_Button* bn_admin_;
-        Fl_Secret_Input* ip_passw_;
-        Fl_Button* bn_show_pw_;
+        password_input* ip_passw_;
         Fl_Button* bn_delete_;
         Fl_Check_Button* bn_disable_;
         Fl_Input* ip_disable_app_;
 
         app_data_t* app_data_;
-
-        bool password_visible_;
 };
 
 // Displays and controls all the interfaces to the modem apps

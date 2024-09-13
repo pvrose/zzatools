@@ -37,12 +37,6 @@ extern ticker* ticker_;
 // Constructor
 qso_rig::qso_rig(int X, int Y, int W, int H, const char* L) :
 	Fl_Group(X, Y, W, H, nullptr),
-	modify_freq_(false),
-	freq_offset_(0.0),
-	modify_gain_(false),
-	gain_(0),
-	modify_power_(false),
-	power_(0.0),
 	rig_ok_(false)
 {
 	// If no name is provided then get from qso_manager
@@ -58,15 +52,7 @@ qso_rig::qso_rig(int X, int Y, int W, int H, const char* L) :
 	rig_ = new rig_if(label(), cat_data_[cat_index_]->hamlib);
 	if (rig_->is_good()) rig_ok_ = true;
 	const rig_caps* capabilities = rig_get_caps(cat_data_[cat_index_]->hamlib->model_id);
-	if (capabilities && !(capabilities->has_get_level & RIG_LEVEL_RFPOWER_METER_WATTS)) {
-		char msg[128];
-		snprintf(msg, sizeof(msg), "DASH: Rig %s does not supply power - set it",
-			cat_data_[cat_index_]->hamlib->model.c_str());
-		status_->misc_status(ST_WARNING, msg);
-		modify_power_ = true;
-		modify_gain_ = false;
-	}
-	modify_rig();
+	if (rig_ok_) modify_hamlib_data();
 	create_form(X, Y);
 	enable_widgets();
 
@@ -123,6 +109,20 @@ void qso_rig::load_cat_data(qso_rig::cat_data_t* cat_data, Fl_Preferences settin
 		cat_data->use_cat_app = true;
 	}
 	cat_data->app = temp;
+
+	// Read non-hamlib CAT data
+	int itemp;
+	settings.get("Power Mode", itemp, (int)power_mode_t::RF_METER);
+	cat_data->hamlib->power_mode = (power_mode_t)itemp;
+	settings.get("Maximum Power", cat_data->hamlib->max_power, 0.0);
+	settings.get("Frequency Mode", itemp, (int)freq_mode_t::VFO);
+	cat_data->hamlib->freq_mode = (freq_mode_t)itemp;
+	settings.get("Crystal Frequency", cat_data->hamlib->frequency, 0.0);
+	settings.get("Amplifier Gain", cat_data->hamlib->gain, 0);
+	settings.get("Transverter Offset", cat_data->hamlib->freq_offset, 0.0);
+	settings.get("Transverter Power", cat_data->hamlib->tvtr_power, 0.0);
+	settings.get("Accessories", itemp, (int)BAREBACK);
+	cat_data->hamlib->accessory = (accessory_t)itemp;
 	
 	free(temp);
 
@@ -162,33 +162,11 @@ void qso_rig::load_values() {
 		antenna_ = temp;
 		free(temp);
 
-		// Get the CAT value modifiers
-		// Transverter offset
-		if (rig_settings.get("Frequency", freq_offset_, 0.0)) {
-			modify_freq_ = true;
-		} else {
-			modify_freq_ = false;
-		}
-		// Amplifier gain
-		if (rig_settings.get("Gain", gain_, 0)) {
-			modify_gain_ = true;
-		} else {
-			modify_gain_ = false;
-		}
-		// Fixed power device
-		if (rig_settings.get("Power", power_, 0.0)) {
-			modify_power_ = true;
-		} else {
-			modify_power_ = false;
-		}
 		mode_ = (uint16_t)cat_data_[cat_index_]->hamlib->port_type;
 	}
 	else {
 		// New hamlib data
 		cat_data_.clear();
-		modify_freq_ = false;
-		modify_power_ = true;
-		modify_gain_ = false;
 		mode_ = RIG_PORT_NONE;
 	}
 }
@@ -346,10 +324,14 @@ void qso_rig::create_config(int curr_x, int curr_y) {
 	create_connex(curr_x, curr_y);
 	rw = max(rw, connect_tab_->x() + connect_tab_->w() - rx);
 	rh = max(rh, connect_tab_->y() + connect_tab_->h() - ry);
-	// Create mofifier tab
-	create_modifier(curr_x, curr_y);
-	rw = max(rw, modifier_tab_->x() + modifier_tab_->w() - rx);
-	rh = max(rh, modifier_tab_->y() + modifier_tab_->h() - ry);
+	// Create defaults tab
+	create_defaults(curr_x, curr_y);
+	rw = max(rw, defaults_tab_->x() + defaults_tab_->w() - rx);
+	rh = max(rh, defaults_tab_->y() + defaults_tab_->h() - ry);
+	// Create accessory tab
+	create_accessory(curr_x, curr_y);
+	rw = max(rw, accessory_tab_->x() + accessory_tab_->w() - rx);
+	rh = max(rh, accessory_tab_->y() + accessory_tab_->h() - ry);
 	// Create timeout &c tab
 	create_timeout(curr_x, curr_y);
 	rw = max(rw, timeout_tab_->x() + timeout_tab_->w() - rx);
@@ -487,77 +469,102 @@ void qso_rig::create_network(int curr_x, int curr_y) {
 
 }
 
-// Create the form to configure any rig add-ons (transverter or amplifier)
-void qso_rig::create_modifier(int curr_x, int curr_y) {
-	modifier_tab_ = new Fl_Group(curr_x, curr_y, 10, 10, "Modify Rig");
-	modifier_tab_->labelsize(FL_NORMAL_SIZE + 2);
+// Create the defaults tab to specify power and frequency if rig cannot supply
+void qso_rig::create_defaults(int curr_x, int curr_y) {
+	defaults_tab_ = new Fl_Group(curr_x, curr_y, 10, 10, "Defaults");
+	defaults_tab_->labelsize(FL_NORMAL_SIZE + 2);
 
-	curr_x = modifier_tab_->x() + WBUTTON;
-	curr_y += (HTEXT + GAP)/2;
+	curr_x += GAP;
+	curr_y += 15;
 
-	// Check flag to enable frequency to be offset (for a transverter)
-	bn_mod_freq_ = new Fl_Check_Button(curr_x, curr_y, WRADIO, HRADIO, "\316\224F (MHz)");
-	bn_mod_freq_->align(FL_ALIGN_LEFT);
-	bn_mod_freq_->callback(cb_bn_mod_freq, (void*)&modify_freq_);
-	bn_mod_freq_->tooltip("Allow frequency to be offset - eg transverter");
-	bn_mod_freq_->value(modify_freq_);
-	
-	curr_x += WRADIO;
-	// Input for the frequency offset (in MHz)
-	ip_freq_ = new Fl_Float_Input(curr_x, curr_y, WBUTTON, HBUTTON);
-	ip_freq_->callback(cb_ip_freq, (void*)&freq_offset_);
-	ip_freq_->tooltip("Enter frequency offset");
-	ip_freq_->when(FL_WHEN_CHANGED);
-	char text[20];
-	snprintf(text, sizeof(text), "%g", freq_offset_);
-	ip_freq_->value(text);
+	int save_y = curr_y;
 
-	curr_y += HBUTTON;
-	curr_x = modifier_tab_->x() + WBUTTON;
+	op_pwr_type_ = new Fl_Output(curr_x, curr_y, WBUTTON, HBUTTON, "Power");
+	op_pwr_type_->box(FL_FLAT_BOX);
+	op_pwr_type_->align(FL_ALIGN_TOP);
+	op_pwr_type_->tooltip("Shows how the power is calculated.");
 
-	// Check flag to enable the power to be adjusted 
-	bn_gain_ = new Fl_Check_Button(curr_x, curr_y, WRADIO, HRADIO, "Gain (dB)");
-	bn_gain_->align(FL_ALIGN_LEFT);
-	bn_gain_->callback(cb_bn_power, (void*)(intptr_t)false);
-	bn_gain_->tooltip("Allow amplifier");
-	bn_gain_->value(modify_gain_);
+	curr_y += HBUTTON + 15;
+	ip_max_pwr_ = new Fl_Float_Input(curr_x, curr_y, WBUTTON, HBUTTON, "Max. - W");
+	ip_max_pwr_->align(FL_ALIGN_TOP);
+	ip_max_pwr_->callback(cb_value_double<Fl_Float_Input>, nullptr);
+	ip_max_pwr_->tooltip("Specify the maximum power out from the rig");
 
-	curr_x += WRADIO;
-	// Input for the amplifier gain
-	ip_gain_ = new Fl_Int_Input(curr_x, curr_y, WBUTTON, HBUTTON);
-	ip_gain_->callback(cb_ip_gain, (void*)&gain_);
-	ip_gain_->when(FL_WHEN_CHANGED);
-	ip_gain_->tooltip("Specify the amplifier gain (dB)");
-	snprintf(text, sizeof(text), "%d", gain_);
-	ip_gain_->value(text);
+	int max_y = curr_y + HBUTTON + GAP;
 
-	curr_y += HBUTTON;
-	curr_x = modifier_tab_->x() + WBUTTON;
+	curr_y = save_y;
+	curr_x += WBUTTON + GAP;
 
-	// Check flag to define a fixed power output (for rigs that do not supply this)
-	bn_power_ = new Fl_Check_Button(curr_x, curr_y, WRADIO, HRADIO, "Pwr (W)");
-	bn_power_->align(FL_ALIGN_LEFT);
-	bn_power_->callback(cb_bn_power, (void*)(intptr_t)true);
-	bn_power_->tooltip("Specify absolute power");
-	bn_power_->value(modify_power_);
+	op_freq_type_ = new Fl_Output(curr_x, curr_y, WBUTTON, HBUTTON, "Frequency");
+	op_freq_type_->box(FL_FLAT_BOX);
+	op_freq_type_->align(FL_ALIGN_TOP);
+	op_freq_type_->tooltip("Shows hoe the frequency is generated");
 
-	curr_x += WRADIO;
-	// Input for the rig power output
-	ip_power_ = new Fl_Float_Input(curr_x, curr_y, WBUTTON, HBUTTON);
-	ip_power_->callback(cb_ip_power, (void*)&power_);
-	ip_power_->when(FL_WHEN_CHANGED);
-	ip_power_->tooltip("Specify power out ");
-	snprintf(text, sizeof(text), "%g", power_);
-	ip_power_->value(text);
+	curr_y += HBUTTON + 15;
+	ip_xtal_ = new Fl_Float_Input(curr_x, curr_y, WBUTTON, HBUTTON, "Fixed - MHz");
+	ip_xtal_->align(FL_ALIGN_TOP);
+	ip_xtal_->callback(cb_value_double<Fl_Float_Input>, nullptr);
+	ip_xtal_->tooltip("Provide a fixed frequency - eg crystal");
+	max_y = max(max_y, curr_y + HBUTTON + GAP);
+	int max_x = curr_x + WBUTTON + GAP;
 
-	curr_x += WBUTTON;
-	curr_y += HBUTTON + GAP;
-	modifier_tab_->resizable(nullptr);
-	modifier_tab_->size(curr_x - modifier_tab_->x(), curr_y - modifier_tab_->y());
+	defaults_tab_->resizable(nullptr);
+	defaults_tab_->size(max_x - defaults_tab_->x(), max_y - defaults_tab_->y());
+	defaults_tab_->end();
 
-	modifier_tab_->end();
 }
 
+// Create the tab for the accessories
+void qso_rig::create_accessory(int curr_x, int curr_y) {
+	accessory_tab_ = new Fl_Group(curr_x, curr_y, 10, 10, "Accessories");
+	accessory_tab_->labelsize(FL_NORMAL_SIZE + 2);
+
+	curr_x += GAP;
+	curr_y += GAP;
+	int save_y = curr_y;
+
+	bn_amplifier_ = new Fl_Check_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Amplifier");
+	bn_amplifier_->box(FL_FLAT_BOX);
+	bn_amplifier_->callback(cb_bn_amplifier, nullptr);
+	bn_amplifier_->tooltip("Select whether an ammplifier is fitted");
+
+	curr_y += HBUTTON + 15;
+	ip_gain_ = new Fl_Int_Input(curr_x, curr_y, WBUTTON, HBUTTON, "Gain - dB");
+	ip_gain_->align(FL_ALIGN_TOP);
+	ip_gain_->callback(cb_value_int<Fl_Int_Input>, nullptr);
+	ip_gain_->tooltip("Specify the amplifier gain in decibels");
+
+	int max_y = curr_y = HBUTTON + GAP;
+
+	curr_y = save_y;
+	curr_x += WBUTTON + GAP;
+
+	bn_transverter_ = new Fl_Check_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Transverter");
+	bn_transverter_->box(FL_FLAT_BOX);
+	bn_transverter_->callback(cb_bn_transverter, nullptr);
+	bn_transverter_->tooltip("Select to add a transverter");
+
+	curr_y += HBUTTON + 15;
+	ip_offset_ = new Fl_Float_Input(curr_x, curr_y, WBUTTON, HBUTTON, "Offset - MHz");
+	ip_offset_->align(FL_ALIGN_TOP);
+	ip_offset_->callback(cb_value_double<Fl_Float_Input>, nullptr);
+	ip_offset_->tooltip("Specify the Transverter frequency offset to apply");
+
+	curr_y += HBUTTON + 15;
+	ip_tvtr_pwr_ = new Fl_Float_Input(curr_x, curr_y, WBUTTON, HBUTTON, "Power - W");
+	ip_tvtr_pwr_->align(FL_ALIGN_TOP);
+	ip_tvtr_pwr_->callback(cb_value_double<Fl_Float_Input>, nullptr);
+	ip_tvtr_pwr_->tooltip("Specify the transverter power output");
+
+	max_y = max(max_y, curr_y + HBUTTON + GAP);
+	int max_x = curr_x + WBUTTON + GAP;
+
+	accessory_tab_->resizable(nullptr);
+	accessory_tab_->size(max_x - accessory_tab_->x(), max_y - accessory_tab_->y());
+	accessory_tab_->end();
+}
+
+// Cretae a tab to specify the timeout when the rig disappears.
 void qso_rig::create_timeout(int curr_x, int curr_y) {
 	timeout_tab_ = new Fl_Group(curr_x, curr_y, 10, 10, "Timeout etc.");
 	timeout_tab_->labelsize(FL_NORMAL_SIZE + 2);
@@ -644,6 +651,16 @@ void qso_rig::save_cat_data(qso_rig::cat_data_t* cat_data, Fl_Preferences settin
 	if (cat_data->use_cat_app) {
 		settings.set("Command", cat_data->app.c_str());
 	}
+	// Read non-hamlib CAT data
+	settings.set("Power Mode", cat_data->hamlib->power_mode);
+	settings.set("Maximum Power", cat_data->hamlib->max_power, 0.0);
+	settings.set("Frequency Mode", cat_data->hamlib->freq_mode);
+	settings.set("Crystal Frequency", cat_data->hamlib->frequency);
+	settings.set("Amplifier Gain", cat_data->hamlib->gain);
+	settings.set("Transverter Offset", cat_data->hamlib->freq_offset);
+	settings.set("Transverter Power", cat_data->hamlib->tvtr_power);
+	settings.set("Accessories", cat_data->hamlib->accessory);
+
 }
 
 // Save values in settings
@@ -667,22 +684,14 @@ void qso_rig::save_values() {
 		rig_settings.set("Default CAT", cat_index_);
 		// Preferred antenna
 		rig_settings.set("Antenna", antenna_.c_str());
-		// Modifier settings
-		if (modify_freq_) {
-			rig_settings.set("Frequency", freq_offset_);
-		}
-		if (modify_gain_) {
-			rig_settings.set("Gain", gain_);
-		}
-		if (modify_power_) {
-			rig_settings.set("Power", power_);
-		}
 		settings_->flush();
 	}
 }
 
 // Enable CAT Connection widgets
 void qso_rig::enable_widgets(bool tick) {
+	cat_data_t* cat_data = cat_data_[cat_index_];
+	hamlib_data_t* hamlib = cat_data->hamlib;
 	// CAT access buttons
 	if (!rig_) {
 		// No rig
@@ -695,7 +704,7 @@ void qso_rig::enable_widgets(bool tick) {
 		} else {
 			bn_select_->label("Select");
 		}
-		if (cat_data_[cat_index_]->use_cat_app) bn_start_->activate();
+		if (cat_data->use_cat_app) bn_start_->activate();
 		else bn_start_->deactivate();
 	} else if (rig_->is_open()) {
 		// Rig is connected
@@ -717,7 +726,7 @@ void qso_rig::enable_widgets(bool tick) {
 		} else {
 			bn_select_->label("Select");
 		}
-		if (cat_data_[cat_index_]->use_cat_app) bn_start_->activate();
+		if (cat_data->use_cat_app) bn_start_->activate();
 		else bn_start_->deactivate();
 	}
 	bn_connect_->labelcolor(fl_contrast(FL_FOREGROUND_COLOR, bn_connect_->color()));
@@ -880,20 +889,20 @@ void qso_rig::enable_widgets(bool tick) {
 		serial_grp_->hide();
 		network_grp_->show();
 		if (!bn_select_->value()) {
-			ip_port_->value(cat_data_[cat_index_]->hamlib->port_name.c_str());
-			ip_port_->user_data(&cat_data_[cat_index_]->hamlib->port_name);
+			ip_port_->value(hamlib->port_name.c_str());
+			ip_port_->user_data(&hamlib->port_name);
 			network_grp_->deactivate();
  		} else {
 			network_grp_->activate();
 		}
-		bn_use_app_->value(cat_data_[cat_index_]->use_cat_app);
+		bn_use_app_->value(cat_data->use_cat_app);
 		// Chaneg the user data for "use app" button
-		bn_use_app_->user_data(&cat_data_[cat_index_]->use_cat_app);
-		if (!tick) ip_app_name_->value(cat_data_[cat_index_]->app.c_str());
+		bn_use_app_->user_data(&cat_data->use_cat_app);
+		if (!tick) ip_app_name_->value(cat_data->app.c_str());
 		// The hamlib model has an associated application (eg flrig or wfview)
 		if (cat_data_[cat_index_]->use_cat_app) {
 			ip_app_name_->activate();
-			ip_app_name_->user_data(&cat_data_[cat_index_]->app);
+			ip_app_name_->user_data(&cat_data->app);
 		} else {
 			ip_app_name_->deactivate();
 		}
@@ -904,25 +913,79 @@ void qso_rig::enable_widgets(bool tick) {
 		network_grp_->hide();
 		break;
 	}
-	// Update modifier values
-	if (modify_freq_) {
-		ip_freq_->activate();
-	} else {
-		ip_freq_->deactivate();
+
+	// Only update these when not called by ticker
+	if (!tick) {
+		// Power defaults
+		switch (hamlib->power_mode) {
+		case RF_METER:
+			op_pwr_type_->value("RF Meter");
+			break;
+		case DRIVE_LEVEL:
+			op_pwr_type_->value("Drive");
+			break;
+		case MAX_POWER:
+			op_pwr_type_->value("Specified");
+			break;
+		default:
+			op_pwr_type_->value("");
+			break;
+		}
+		char text[25];
+		snprintf(text, sizeof(text), "%g", hamlib->max_power);
+		ip_max_pwr_->value(text);
+		ip_max_pwr_->user_data(&hamlib->max_power);
+
+		// Fequency defaults
+		switch (hamlib->freq_mode) {
+		case VFO:
+			op_freq_type_->value("VFO");
+			break;
+		case XTAL:
+			op_freq_type_->value("Fixed");
+			break;
+		default:
+			op_freq_type_->value("");
+			break;
+		}
+		snprintf(text, sizeof(text), "%0.6f", hamlib->frequency);
+		ip_xtal_->value(text);
+		ip_xtal_->user_data(&hamlib->frequency);
+
+		bn_amplifier_->value((hamlib->accessory & AMPLIFIER) == AMPLIFIER);
+		bn_amplifier_->user_data(&hamlib->accessory);
+
+		if (hamlib->accessory & AMPLIFIER) {
+			ip_gain_->activate();
+			snprintf(text, sizeof(text), "%d", hamlib->gain);
+			ip_gain_->value(text);
+			ip_gain_->user_data(&hamlib->gain);
+		}
+		else {
+			ip_gain_->deactivate();
+			ip_gain_->value("");
+		}
+
+		bn_transverter_->value((hamlib->accessory & TRANSVERTER) == TRANSVERTER);
+		bn_transverter_->user_data(&hamlib->accessory);
+		if (hamlib->accessory & TRANSVERTER) {
+			ip_offset_->activate();
+			snprintf(text, sizeof(text), "%0.6f", hamlib->freq_offset);
+			ip_offset_->value(text);
+			ip_offset_->user_data(&hamlib->freq_offset);
+			ip_tvtr_pwr_->activate();
+			snprintf(text, sizeof(text), "%g", hamlib->tvtr_power);
+			ip_tvtr_pwr_->value(text);
+			ip_tvtr_pwr_->user_data(&hamlib->tvtr_power);
+		}
+		else {
+			ip_offset_->deactivate();
+			ip_offset_->value("");
+			ip_tvtr_pwr_->deactivate();
+			ip_tvtr_pwr_->value("");
+		}
 	}
-	// We have modified the values so reload them
-	bn_gain_->value(modify_gain_);
-	bn_power_->value(modify_power_);
-	if (modify_gain_) {
-		ip_gain_->activate();
-	} else {
-		ip_gain_->deactivate();
-	}
-	if (modify_power_) {
-		ip_power_->activate();
-	} else {
-		ip_power_->deactivate();
-	}
+
 	// Now use standard TAB highlighting
 	for (int ix = 0; ix < config_tabs_->children(); ix++) {
 		Fl_Widget* wx = config_tabs_->child(ix);
@@ -1204,78 +1267,6 @@ void qso_rig::cb_bn_select(Fl_Widget* w, void* v) {
 	}
 }
 
-// Pressed the modify frequency
-// v is the bool
-void qso_rig::cb_bn_mod_freq(Fl_Widget* w, void* v) {
-	qso_rig* that = ancestor_view<qso_rig>(w);
-	cb_value<Fl_Check_Button, bool>(w, v);
-	that->modify_rig();
-	that->enable_widgets();
-}
-
-// Typed in freaquency value
-// v is the input
-void qso_rig::cb_ip_freq(Fl_Widget* w, void* v) {
-	qso_rig* that = ancestor_view<qso_rig>(w);
-	float f;
-	cb_value_float<Fl_Float_Input>(w, &f);
-	*(double*)v = (double)f;
-	that->modify_rig();
-	that->enable_widgets();
-}
-
-// Pressed either power or gain check button
-// v: false = gain, true = power
-void qso_rig::cb_bn_power(Fl_Widget* w, void* v) {
-	qso_rig* that = ancestor_view<qso_rig>(w);
-	bool bn_p = (bool)(intptr_t)v;
-	if (bn_p) {
-		bool v = that->bn_power_->value();
-		if (v) {
-			that->modify_power_ = true;
-			that->modify_gain_ = false;
-		}
-		else {
-			that->modify_power_ = false;
-			that->modify_gain_ = false;
-		}
-	}
-	else {
-		bool v = that->bn_gain_->value();
-		if (v) {
-			that->modify_power_ = false;
-			that->modify_gain_ = true;
-		}
-		else {
-			that->modify_power_ = false;
-			that->modify_gain_ = false;
-		}
-	}
-	that->modify_rig();
-	that->enable_widgets();
-}
-
-// Entered gain value
-// v points the the gain attribute
-void qso_rig::cb_ip_gain(Fl_Widget* w, void* v) {
-	qso_rig* that = ancestor_view<qso_rig>(w);
-	cb_value_int<Fl_Int_Input>(w, v);
-	that->modify_rig();
-	that->enable_widgets();
-}
-
-// Entered power value
-// v points to the absolute power attribute
-void qso_rig::cb_ip_power(Fl_Widget* w, void* v) {
-	qso_rig* that = ancestor_view<qso_rig>(w);
-	// A frig to convert the float value of the widget to the double attribute
-	float f;
-	cb_value_float<Fl_Float_Input>(w, &f);
-	*(double*)v = (double)f;
-	that->modify_rig();
-	that->enable_widgets();
-}
-
 // Clicked start button
 // v points to the string containing the command to  invoke flrig
 void qso_rig::cb_bn_start(Fl_Widget* w, void* v) {
@@ -1338,24 +1329,42 @@ void qso_rig::cb_new_cat(Fl_Widget* w, void* v) {
 	that->switch_rig();
 }
 
+// ACcessories
+void qso_rig::cb_bn_amplifier(Fl_Widget* w, void* v) {
+	qso_rig* that = ancestor_view<qso_rig>(w);
+	bool value = ((Fl_Check_Button*)w)->value();
+	accessory_t* t = (accessory_t*)v;
+	if (value) {
+		*t = (accessory_t)(*t | AMPLIFIER);
+	}
+	else {
+		*t = (accessory_t)(*t & ~AMPLIFIER);
+	}
+	that->enable_widgets();
+}
+
+void qso_rig::cb_bn_transverter(Fl_Widget* w, void* v) {
+	qso_rig* that = ancestor_view<qso_rig>(w);
+	bool value = ((Fl_Check_Button*)w)->value();
+	accessory_t* t = (accessory_t*)v;
+	if (value) {
+		*t = (accessory_t)(*t | TRANSVERTER);
+	}
+	else {
+		*t = (accessory_t)(*t & ~TRANSVERTER);
+	}
+	that->enable_widgets();
+}
+
 // Connect rig if disconnected and vice-versa
 void qso_rig::switch_rig() {
 	if (rig_) {
 		delete rig_;
 		rig_ = nullptr;
 		rig_ = new rig_if(label(), cat_data_[cat_index_]->hamlib);
-		const rig_caps* capabilities = rig_get_caps(cat_data_[cat_index_]->hamlib->model_id);
-		if (capabilities && !(capabilities->has_get_level & RIG_LEVEL_RFPOWER_METER_WATTS)) {
-			char msg[128];
-			snprintf(msg, sizeof(msg), "DASH: Rig %s does not supply power - set it",
-				cat_data_[cat_index_]->hamlib->model.c_str());
-			status_->misc_status(ST_WARNING, msg);
-			modify_power_ = true;
-			modify_gain_ = false;
-		}
+		modify_hamlib_data();
 	}
 	ancestor_view<qso_manager>(this)->update_rig();
-	modify_rig();
 	enable_widgets();
 }
 
@@ -1392,22 +1401,17 @@ Fl_Color qso_rig::alert_colour() {
 }
 
 // Modify the values returned from the rig according to the modifier attributes
-void qso_rig::modify_rig() {
-	if (rig_) {
-		if (modify_freq_) {
-			rig_->set_freq_modifier(freq_offset_);
-		} else {
-			rig_->clear_freq_modifier();
-		}
-		if (modify_gain_ && modify_power_) {
-			status_->misc_status(ST_SEVERE, "DASH: Trying to set both gain and absolute power");
-		} else if (modify_gain_) {
-			rig_->set_power_modifier(gain_);
-		} else if (modify_power_) {
-			rig_->set_power_modifier(power_);
-		} else {
-			rig_->clear_power_modifier();
-		}
+void qso_rig::modify_hamlib_data() {
+	hamlib_data_t* hamlib = cat_data_[cat_index_]->hamlib;
+	const rig_caps* capabilities = rig_get_caps(hamlib->model_id);
+	if (capabilities && !(capabilities->has_get_level & RIG_LEVEL_RFPOWER_METER_WATTS)) {
+		hamlib->power_mode = RF_METER;
+	}
+	else if (capabilities && !(capabilities->has_get_level & RIG_LEVEL_RFPOWER)) {
+		hamlib->power_mode = DRIVE_LEVEL;
+	}
+	else {
+		hamlib->power_mode = MAX_POWER;
 	}
 }
 

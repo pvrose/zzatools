@@ -159,6 +159,7 @@
     <ClCompile Include="zzalog\src\fields.cpp" />
     <ClCompile Include="zzalog\src\font_dialog.cpp" />
     <ClCompile Include="zzalog\src\page_dialog.cpp" />
+    <ClCompile Include="zzalog\src\password_input.cpp" />
     <ClCompile Include="zzalog\src\qsl_display.cpp" />
     <ClCompile Include="zzalog\src\qsl_editor.cpp" />
     <ClCompile Include="zzalog\src\qso_apps.cpp" />
@@ -247,6 +248,7 @@
   <ItemGroup>
     <ClInclude Include="packages\pthreads.2.9.1.4\build\native\include\pthread.h" />
     <ClInclude Include="zzalog\include\band_data.h" />
+    <ClInclude Include="zzalog\include\button_input.h" />
     <ClInclude Include="zzalog\include\callback.h" />
     <ClInclude Include="zzalog\include\config.h" />
     <ClInclude Include="zzalog\include\drawing.h" />
@@ -254,6 +256,7 @@
     <ClInclude Include="zzalog\include\formats.h" />
     <ClInclude Include="zzalog\include\logo.h" />
     <ClInclude Include="zzalog\include\page_dialog.h" />
+    <ClInclude Include="zzalog\include\password_input.h" />
     <ClInclude Include="zzalog\include\qsl_display.h" />
     <ClInclude Include="zzalog\include\qsl_editor.h" />
     <ClInclude Include="zzalog\include\qso_apps.h" />

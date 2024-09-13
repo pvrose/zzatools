@@ -95,16 +95,11 @@ protected:
 	// Callback use app button
 	static void cb_bn_use_app(Fl_Widget* w, void* v);
 
-	// Callback - modify frequency
-	static void cb_bn_mod_freq(Fl_Widget* w, void* v);
-	// Callback - input frequency
-	static void cb_ip_freq(Fl_Widget* w, void* v);
-	// Callback - use gain/power
-	static void cb_bn_power(Fl_Widget* w, void* v);
-	// Callback - input gain
-	static void cb_ip_gain(Fl_Widget* w, void* v);
-	// Callback - input power
-	static void cb_ip_power(Fl_Widget* w, void* v);
+	// Callback to add amplifier 
+	static void cb_bn_amplifier(Fl_Widget* w, void* v);
+	// Callback to add transverter
+	static void cb_bn_transverter(Fl_Widget* w, void* v);
+
 	// Call back start flrig
 	static void cb_bn_start(Fl_Widget* w, void* v);
 	// Tabs clicked
@@ -136,15 +131,14 @@ protected:
 	void create_connex(int x, int y);
 	void create_serial(int x, int y);
 	void create_network(int x, int y);
-	void create_modifier(int x, int y);
+	void create_defaults(int X, int Y);
+	void create_accessory(int X, int Y);
 	void create_timeout(int X, int Y);
 
 	void load_cat_data(cat_data_t* data, Fl_Preferences settings);
 	void save_cat_data(cat_data_t* data, Fl_Preferences settings);
 
-
-	// Update rig with modifiers
-	void modify_rig();
+	void modify_hamlib_data();
 
 	Fl_Group* status_grp_;
 	// Rig status
@@ -184,14 +178,18 @@ protected:
 	// Hamlib widgets to revalue when rig selected changes
 	Fl_Input* ip_port_;
 
-	// Modifier widgets
-	Fl_Group* modifier_tab_;
-	Fl_Check_Button* bn_mod_freq_;
-	Fl_Float_Input* ip_freq_;
-	Fl_Check_Button* bn_gain_;
+	Fl_Group* defaults_tab_;
+	Fl_Output* op_pwr_type_;
+	Fl_Float_Input* ip_max_pwr_;
+	Fl_Output* op_freq_type_;
+	Fl_Float_Input* ip_xtal_;
+
+	Fl_Group* accessory_tab_;
+	Fl_Check_Button* bn_amplifier_;
 	Fl_Int_Input* ip_gain_;
-	Fl_Check_Button* bn_power_;
-	Fl_Float_Input* ip_power_;
+	Fl_Check_Button* bn_transverter_;
+	Fl_Float_Input* ip_offset_;
+	Fl_Float_Input* ip_tvtr_pwr_;
 
 	// Operational settings
 	Fl_Group* timeout_tab_;
@@ -211,19 +209,6 @@ protected:
 	uint16_t mode_;
 	// Current antenna
 	string antenna_;
-	// Modifier attributes
-	// Add a fixed offset - eg for transverters
-	bool modify_freq_;
-	// The fixed frequency offset
-	double freq_offset_;
-	// Change the power by a gain ration
-	bool modify_gain_;
-	// The gain of an amplifier
-	int gain_;
-	// Use fixed power - eg non-CAT rigs
-	bool modify_power_;
-	// The fixed power to use
-	double power_;
 	// Rig was good
 	bool rig_ok_;
 	// CAT index

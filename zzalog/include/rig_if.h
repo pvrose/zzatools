@@ -37,6 +37,26 @@ using namespace std::chrono;
 	// fast rig polling - 20ms -> 2s (default 1s);
 	const int FAST_RIG_TIMER = 1;
 
+	enum power_mode_t : uchar {
+		NO_POWER,        // No power returnable
+		RF_METER,        // Can read the RF power out meter
+		DRIVE_LEVEL,     // else, can read the power drive level
+		MAX_POWER        // else supply a default value 
+	};
+
+	enum freq_mode_t : uchar {
+		NO_FREQ,         // No frequency available
+		VFO,             // Can read a VFO
+		XTAL             // else supply a specified (crystal) value
+	};
+
+	enum accessory_t : uchar {
+		BAREBACK,        // No accessory
+		AMPLIFIER = 1,   // Amplifer attached
+		TRANSVERTER = 2, // Transverter attached
+		BOTH = AMPLIFIER | TRANSVERTER
+	};
+
 	// Hamlib parameters 
 	struct hamlib_data_t {
 		// Manufacturer
@@ -51,10 +71,22 @@ using namespace std::chrono;
 		rig_model_t model_id = -1;
 		// Port type
 		rig_port_t port_type = RIG_PORT_NONE;
+		// additional features required by rig_if to return data
 		// Timeout value (not a hamlib item
 		double timeout = 1.0;
 		// S-meter reading queue length
 		int num_smeters = 5;
+		// Power defaults
+		power_mode_t power_mode = RF_METER;
+		double max_power = 0.0;
+		// Frequency defaults
+		freq_mode_t freq_mode = VFO;
+		double frequency = 0.0;
+		// Amplifer and transverter defaults
+		accessory_t accessory = BAREBACK;
+		int gain = 0;
+		double tvtr_power = 0.0;
+		double freq_offset = 0.0;
 	};
 
 	// This class is the base class for rig handlers. 
@@ -140,13 +172,6 @@ using namespace std::chrono;
 		// Power on-off
 		bool get_powered();
 
-		// Set modifiers
-		void set_freq_modifier(double delta_freq);
-		void clear_freq_modifier();
-		void set_power_modifier(int gain);
-		void set_power_modifier(double abs_power);
-		void clear_power_modifier();
-
 		// Protected attributes
 	protected:
 		void th_read_values();
@@ -186,17 +211,6 @@ using namespace std::chrono;
 		thread* thread_;
 		// Stop thread
 		atomic<bool> run_read_;
-
-		// Modifiers
-		bool modify_freq_;
-		double freq_modifier_;
-
-		enum {
-			UNMODIFIED,
-			GAIN,
-			ABS_POWER
-		} modify_power_;
-		double power_modifier_; 
 
 		// The time of the last PTT off - to decide if it's a new over
 		system_clock::time_point last_ptt_off_;

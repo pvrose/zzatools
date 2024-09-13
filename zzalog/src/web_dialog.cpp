@@ -5,11 +5,11 @@
 #include "icons.h"
 #include "wsjtx_handler.h"
 #include "fllog_emul.h"
+#include "password_input.h"
 
 #include <FL/Fl_Preferences.H>
 #include <FL/Fl_Check_Button.H>
 #include <FL/Fl_Button.H>
-#include <FL/Fl_Secret_Input.H>
 #include <FL/Fl_Group.H>
 #include <FL/Fl_RGB_Image.H>
 #include <FL/Fl_Int_Input.H>
@@ -229,13 +229,13 @@ void web_dialog::create_eqsl(int rx, int ry, int rw, int rh) {
 	in1_1_2->tooltip("Last time eQSL.cc accessed");
 
 	// Row 1 Col 3 - Calendar button
-	Fl_Button* bn1_1_3 = new Fl_Button(C3, R1_1, W3, H1_1);
-	bn1_1_3->image(new Fl_RGB_Image(ICON_CALENDAR, 16, 16, 4));
+	Fl_Button* bn1_1_3 = new Fl_Button(C3, R1_1, W3, H1_1, "@calendar");
+	//bn1_1_3->image(new Fl_RGB_Image(ICON_CALENDAR, 16, 16, 4));
 	eqsl_cal_cb_data_ = { &eqsl_last_got_, in1_1_2 };
 	bn1_1_3->callback(calendar::cb_cal_open, &eqsl_cal_cb_data_);
 	bn1_1_3->when(FL_WHEN_RELEASE);
 	bn1_1_3->tooltip("Open calendar to chnage date to fetch eQSL.cc");
-	image_widgets_.insert(bn1_1_3);
+	//image_widgets_.insert(bn1_1_3);
 
 	// Row 1 Col 4 - User entry field
 	intl_input* in1_1_4 = new intl_input(C4, R1_1, W4, H1_1, "User");
@@ -246,20 +246,12 @@ void web_dialog::create_eqsl(int rx, int ry, int rw, int rh) {
 	in1_1_4->tooltip("Enter user name for eQSL.cc");
 
 	// Row 1 Col 5 - Password entry field
-	Fl_Secret_Input* in1_1_5 = new Fl_Secret_Input(C5, R1_1, W5, H1_1, "Password");
+	password_input* in1_1_5 = new password_input(C5, R1_1, W5 + W6, H1_1, "Password");
 	in1_1_5->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
 	in1_1_5->value(eqsl_password_.c_str());
-	in1_1_5->callback(cb_value<Fl_Secret_Input, string>, &eqsl_password_);
+	in1_1_5->callback(cb_value<Fl_Input, string>, &eqsl_password_);
 	in1_1_5->when(FL_WHEN_CHANGED);
 	in1_1_5->tooltip("Enter password for eQSL.cc");
-
-	// Row 1 Col 6 - Password visible
-	Fl_Button* bn1_1_6 = new Fl_Button(C6, R1_1, W6, H1_1, "@search");
-	bn1_1_6->type(FL_TOGGLE_BUTTON);
-	bn1_1_6->align(FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
-	bn1_1_6->value(false);
-	bn1_1_6->callback(cb_bn_plain, in1_1_5);
-	bn1_1_6->tooltip("See password in plain");
 
 	// Row 1A Col 1 - Update evry QSO
 	Fl_Check_Button* bn1_1A_1 = new Fl_Check_Button(C1, R1_1A, W1, H1_1A, "Update each QSO");
@@ -387,20 +379,12 @@ void web_dialog::create_lotw(int rx, int ry, int rw, int rh) {
 	in2_1_4->tooltip("Enter user name for Logbook of the World");
 
 	// Row 1 Col 5 - Password entry field
-	Fl_Secret_Input* in2_1_5 = new Fl_Secret_Input(C5, R2_1, W5, H2_1, "Password");
+	password_input* in2_1_5 = new password_input(C5, R2_1, W5 + W6, H2_1, "Password");
 	in2_1_5->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
 	in2_1_5->value(lotw_password_.c_str());
-	in2_1_5->callback(cb_value<Fl_Secret_Input, string>, &lotw_password_);
+	in2_1_5->callback(cb_value<Fl_Input, string>, &lotw_password_);
 	in2_1_5->when(FL_WHEN_CHANGED);
 	in2_1_5->tooltip("Enter password for Logbook of the World");
-
-	// Row 1 Col 6 - Password visible
-	Fl_Button* bn2_1_6 = new Fl_Button(C6, R2_1, W6, H2_1, "@search");
-	bn2_1_6->type(FL_TOGGLE_BUTTON);
-	bn2_1_6->align(FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
-	bn2_1_6->value(false);
-	bn2_1_6->callback(cb_bn_plain, in2_1_5);
-	bn2_1_6->tooltip("See password in plain");
 
 	// Row 1A Col 1 - Update evry QSO
 	Fl_Check_Button* bn2_1A_1 = new Fl_Check_Button(C1, R2_1A, W1, H2_1A, "Update each QSO");
@@ -469,20 +453,12 @@ void web_dialog::create_qrz(int rx, int ry, int rw, int rh) {
 	in3_1_4->tooltip("Enter user name for QRZ.com");
 
 	// Row 1 Col 5 - Password entry field
-	Fl_Secret_Input* in3_1_5 = new Fl_Secret_Input(C5, R3_1, W5, H3_1, "Password");
+	password_input* in3_1_5 = new password_input(C5, R3_1, W5, H3_1, "Password");
 	in3_1_5->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
 	in3_1_5->value(qrz_password_.c_str());
-	in3_1_5->callback(cb_value<Fl_Secret_Input, string>, &qrz_password_);
+	in3_1_5->callback(cb_value<Fl_Input, string>, &qrz_password_);
 	in3_1_5->when(FL_WHEN_CHANGED);
 	in3_1_5->tooltip("Enter password for QRZ.com");
-
-	// Row 1 Col 6 - Password visible
-	Fl_Button* bn3_1_6 = new Fl_Button(C6, R3_1, W6, H3_1, "@search");
-	bn3_1_6->type(FL_TOGGLE_BUTTON);
-	bn3_1_6->align(FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
-	bn3_1_6->value(false);
-	bn3_1_6->callback(cb_bn_plain, in3_1_5);
-	bn3_1_6->tooltip("See password in plain");
 
 	// Row 2 Col 4 - Always use XML database
 	Fl_Check_Button* bn3_2_1 = new Fl_Check_Button(C4, R3_2, WRADIO, HRADIO, "Use XML Database");
@@ -553,20 +529,12 @@ void web_dialog::create_club(int rx, int ry, int rw, int rh) {
 	in4_1_4->tooltip("Enter e-mail address for ClubLog");
 
 	// Row 1 Col 5 - Password entry field
-	Fl_Secret_Input* in4_1_5 = new Fl_Secret_Input(C5, R4_1, W5, H4_1, "Password");
+	password_input* in4_1_5 = new password_input(C5, R4_1, W5, H4_1, "Password");
 	in4_1_5->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
 	in4_1_5->value(club_password_.c_str());
-	in4_1_5->callback(cb_value<Fl_Secret_Input, string>, &club_password_);
+	in4_1_5->callback(cb_value<Fl_Input, string>, &club_password_);
 	in4_1_5->when(FL_WHEN_CHANGED);
 	in4_1_5->tooltip("Enter password for ClubLog");
-
-	// Row 1 Col 6 - Password visible
-	Fl_Button* bn4_1_6 = new Fl_Button(C6, R4_1, W6, H4_1, "@search");
-	bn4_1_6->type(FL_TOGGLE_BUTTON);
-	bn4_1_6->align(FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
-	bn4_1_6->value(false);
-	bn4_1_6->callback(cb_bn_plain, in4_1_5);
-	bn4_1_6->tooltip("See password in plain");
 
 	// Row 2 Col 2 - Interval bewteen downloads
 	Fl_Int_Input* in4_2_2 = new Fl_Int_Input(C2, R4_2, W2, H4_2, "Interval");
@@ -809,18 +777,6 @@ void web_dialog::enable_widgets() {
 		}
 	}
 
-}
-
-// Callback to make passwords plain or secret
-void web_dialog::cb_bn_plain(Fl_Widget* w, void* v) {
-	Fl_Secret_Input* ip = (Fl_Secret_Input*)v;
-	if (((Fl_Button*)w)->value()) {
-		ip->input_type(FL_NORMAL_INPUT);
-	}
-	else {
-		ip->input_type(FL_SECRET_INPUT);
-	}
-	ip->redraw();
 }
 
 // Callback to implement WSJTX enable
