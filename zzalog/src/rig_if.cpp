@@ -51,8 +51,20 @@ double rig_if::get_dfrequency(bool tx) {
 	else {
 		frequency = rig_data_.rx_frequency / 1000000.0;
 	}
-	if (modify_freq_) return frequency + freq_modifier_;
-	else return frequency;
+	switch (hamlib_data_->freq_mode) {
+	case VFO:
+		break;
+	case XTAL:
+		frequency = hamlib_data_->frequency;
+		break;
+	default:
+		frequency = 0.0;
+		break;
+	}
+	if (hamlib_data_->accessory & TRANSVERTER) {
+		frequency += hamlib_data_->freq_offset;
+	}
+	return frequency;
 }
 
 string rig_if::get_frequency(bool tx) {
@@ -65,15 +77,24 @@ string rig_if::get_frequency(bool tx) {
 // Return the power
 double rig_if::get_dpower(bool max) {
 	double value = max ? (double)rig_data_.pwr_value : (double)rig_data_.pwr_meter;
-	switch(modify_power_) {
-		case UNMODIFIED: 
-			break;
-		case GAIN:
-			value *= power_modifier_;
-			break;
-		case ABS_POWER:
-			value = power_modifier_;
-			break;
+	switch (hamlib_data_->power_mode) {
+	case RF_METER:
+		break;
+	case DRIVE_LEVEL:
+		value = rig_data_.drive * hamlib_data_->max_power;
+		break;
+	case MAX_POWER:
+		value = hamlib_data_->max_power;
+		break;
+	default:
+		value = 0.0;
+	}
+	if (hamlib_data_->accessory & TRANSVERTER) {
+		value = hamlib_data_->tvtr_power;
+	}
+	if (hamlib_data_->accessory & AMPLIFIER) {
+		double gain = pow(10.0, ((double)hamlib_data_->gain) / 10.0);
+		value *= gain;
 	}
 	return value;
 }
@@ -157,11 +178,6 @@ rig_if::rig_if(const char* name, hamlib_data_t* data)
 	my_rig_name_ = name;
 	hamlib_data_ = data;
 	run_read_ = false;
-	// Modifiers
-	modify_freq_ = false;
-	freq_modifier_ = 0.0;
-	modify_power_ = UNMODIFIED;
-	power_modifier_ = 0.0;
 	// Last PTT off
 	last_ptt_off_ = system_clock::now();;
 	
@@ -610,35 +626,6 @@ const char* rig_if::error_text(rig_errcode_e code) {
 // returns true if the connection is in the process of being opened
 bool rig_if::is_opening() {
 	return opening_;
-}
-
-// Set the frqeuency modifier (for whan a transverter is attached)
-void rig_if::set_freq_modifier(double delta_freq) {
-	modify_freq_ = true;
-	freq_modifier_ = delta_freq;
-}
-
-// Clear the frequency modiier
-void rig_if::clear_freq_modifier() {
-	modify_freq_ = false;
-}
-
-// Set power modifier to a gain (in dB)
-void rig_if::set_power_modifier(int gain) {
-	modify_power_ = GAIN;
-	power_modifier_ = pow(10.0, (double)gain/10.0);
-}
-
-// Set power modifier to an aboslute power (in W)
-void rig_if::set_power_modifier(double power) {
-	modify_power_ = ABS_POWER;
-	power_modifier_ = power;
-}
-
-// Clear power modifier
-void rig_if::clear_power_modifier() {
-	modify_power_ = UNMODIFIED;
-	power_modifier_ = 0;
 }
 
 // Returns true if the rig has CAT control
