@@ -2,7 +2,6 @@
 #define __SEARCH_DIALOG__
 
 #include "win_dialog.h"
-#include "calendar.h"
 #include "callback.h"
 #include "search.h"
 
@@ -49,10 +48,6 @@ using namespace std;
 
 		// The current criteria
 		search_criteria_t* criteria_;
-		// Calendar callback parameters - from date
-		cal_cb_data_t from_params_;
-		// Calendar callback parameters - to date
-		cal_cb_data_t to_params_;
 
 		// Radio button callback parameters - basic condition
 		radio_param_t condition_params_[10] =
