@@ -1,7 +1,6 @@
 #pragma once
 
 #include "fields.h"
-#include "calendar.h"
 
 #include <string>
 
@@ -11,6 +10,7 @@ using namespace std;
 
 class qso_data;
 class field_input;
+class calendar_input;
 class Fl_Input;
 class Fl_Input_Choice;
 class Fl_Button;
@@ -120,11 +120,7 @@ protected:
     // Extract collection
     string saved_collection_;
 
-    // Callback data for the calendars
-    cal_cb_data_t start_data_;
-    cal_cb_data_t end_data_;
-
-    // Contest ID input
+     // Contest ID input
     field_input* ip_contest_id_;
     // Collection input
     Fl_Input_Choice* ip_collection_;
@@ -133,12 +129,10 @@ protected:
     // Exchange
     Fl_Input* ip_exchange_;
     // Start date ip
-    Fl_Input* ip_start_date_;
-    Fl_Button* bn_start_date_;
+    calendar_input* ip_start_date_;
     Fl_Input* ip_start_time_;
     // End date ip
-    Fl_Input* ip_end_date_;
-    Fl_Button* bn_end_date_;
+    calendar_input* ip_end_date_;
     Fl_Input* ip_end_time_;
     // Serial number
     Fl_Output* op_serial_;

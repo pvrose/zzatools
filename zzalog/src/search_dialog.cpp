@@ -1,6 +1,6 @@
 #include "search_dialog.h"
 
-#include "calendar.h"
+#include "calendar_input.h"
 #include "field_choice.h"
 #include "cty_data.h"
 #include "icons.h"
@@ -31,8 +31,6 @@ search_dialog::search_dialog() :
 	// Default size initially - will be resized
 	win_dialog(10, 10, "Search criteria")
 	, criteria_(nullptr)
-	, from_params_(cal_cb_data_t())
-	, to_params_(cal_cb_data_t())
 
 {
 	// Widget position - calculations
@@ -211,33 +209,19 @@ search_dialog::search_dialog() :
 	bn21->value(criteria_->by_dates);
 	bn21->tooltip("Use date range to limit records to match");
 	// Input - Start date
-	intl_input* in22 = new intl_input(C212, R21, W212, HTEXT, "From:");
+	calendar_input* in22 = new calendar_input(C212, R21, W212 + HBUTTON, HTEXT, "From:");
 	in22->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
 	in22->value(criteria_->from_date.c_str());
-	in22->callback(cb_value<intl_input, string>, &criteria_->from_date);
+	in22->callback(cb_value<Fl_Input, string>, &criteria_->from_date);
 	in22->when(FL_WHEN_CHANGED);
 	in22->tooltip("Select date to start matching records");
-	// Button - open calendar widget to get date
-	Fl_Button* bn23 = new Fl_Button(C213, R21, W213, HBUTTON);
-	bn23->image(new Fl_RGB_Image(ICON_CALENDAR, 16, 16, 4));
-	from_params_ = { &criteria_->from_date, in22 };
-	bn23->callback(calendar::cb_cal_open, &from_params_);
-	bn23->when(FL_WHEN_RELEASE);
-	bn23->tooltip("Opens calendar to select start date");
 	// Input - End date
-	intl_input* in24 = new intl_input(C214, R21, W214, HTEXT, "To:");
+	calendar_input* in24 = new calendar_input(C214, R21, W214 + HBUTTON , HTEXT, "To:");
 	in24->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
 	in24->value(criteria_->to_date.c_str());
-	in24->callback(cb_value<intl_input, string>, &criteria_->to_date);
+	in24->callback(cb_value<Fl_Input, string>, &criteria_->to_date);
 	in24->when(FL_WHEN_CHANGED);
 	in24->tooltip("Select date to end matching records");
-	// Button - open calendar widget to get date
-	Fl_Button* bn25 = new Fl_Button(C215, R21, W215, HBUTTON);
-	bn25->image(new Fl_RGB_Image(ICON_CALENDAR, 16, 16, 4));
-	to_params_ = { &criteria_->to_date, in24 };
-	bn25->callback(calendar::cb_cal_open, &to_params_);
-	bn25->when(FL_WHEN_RELEASE);
-	bn25->tooltip("Opens calendar to select end date");
 
 	// Row 2 - band and mode
 	// Choice - Band to limit search to

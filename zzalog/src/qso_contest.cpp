@@ -10,6 +10,7 @@
 #include "extract_data.h"
 #include "tabbed_forms.h"
 #include "field_choice.h"
+#include "calendar_input.h"
 
 #include <FL/Fl_Preferences.H>
 #include <FL/Fl_Radio_Light_Button.H>
@@ -78,20 +79,12 @@ void qso_contest::create_form() {
 
 	curr_y += ip_notes_->h() + GAP;
 	// Start date
-	ip_start_date_ = new Fl_Input(curr_x, curr_y, WBUTTON, HBUTTON, "Start");
+	ip_start_date_ = new calendar_input(curr_x, curr_y, WBUTTON + HBUTTON, HBUTTON, "Start");
 	ip_start_date_->align(FL_ALIGN_LEFT);
 	ip_start_date_->callback(cb_value<Fl_Input, string>, &start_date_);
 	ip_start_date_->tooltip("Enter date the contest starts (or use calendar)");
 
 	curr_x += ip_start_date_->w();
-	bn_start_date_ = new Fl_Button(curr_x, curr_y, HBUTTON, HBUTTON);
-	bn_start_date_->image(new Fl_RGB_Image(ICON_CALENDAR, 16, 16, 4));
-	start_data_ = { &start_date_, ip_start_date_ };
-	bn_start_date_->callback(calendar::cb_cal_open, &start_data_);
-	bn_start_date_->when(FL_WHEN_RELEASE);
-	bn_start_date_->tooltip("Open calendar to chnage date to fetch eQSL.cc");
-
-	curr_x += bn_start_date_->w();
 	const int WTIME = WSMEDIT - WBUTTON - HBUTTON;
 	ip_start_time_ = new Fl_Input(curr_x, curr_y, WTIME, HBUTTON);
 	ip_start_time_->callback(cb_value<Fl_Input, string>, &start_time_);
@@ -100,20 +93,12 @@ void qso_contest::create_form() {
 	curr_x = x() + GAP + WLABEL;
 	curr_y += ip_start_date_->h();
 	// end date
-	ip_end_date_ = new Fl_Input(curr_x, curr_y, WBUTTON, HBUTTON, "end");
+	ip_end_date_ = new calendar_input(curr_x, curr_y, WBUTTON + HBUTTON, HBUTTON, "end");
 	ip_end_date_->align(FL_ALIGN_LEFT);
 	ip_end_date_->callback(cb_value<Fl_Input, string>, &end_date_);
 	ip_end_date_->tooltip("Enter date the contest ends (or use calendar)");
 
 	curr_x += ip_end_date_->w();
-	bn_end_date_ = new Fl_Button(curr_x, curr_y, HBUTTON, HBUTTON);
-	bn_end_date_->image(new Fl_RGB_Image(ICON_CALENDAR, 16, 16, 4));
-	end_data_ = { &end_date_, ip_end_date_ };
-	bn_end_date_->callback(calendar::cb_cal_open, &end_data_);
-	bn_end_date_->when(FL_WHEN_RELEASE);
-	bn_end_date_->tooltip("Open calendar to chnage date to fetch eQSL.cc");
-
-	curr_x += bn_end_date_->w();
 	ip_end_time_ = new Fl_Input(curr_x, curr_y, WTIME, HBUTTON);
 	ip_end_time_->callback(cb_value<Fl_Input, string>, &end_time_);
 	ip_end_time_->tooltip("Enter the time the contest ends");

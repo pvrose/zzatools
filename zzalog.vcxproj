@@ -155,6 +155,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="zzalog\src\band_data.cpp" />
+    <ClCompile Include="zzalog\src\calendar_input.cpp" />
+    <ClCompile Include="zzalog\src\calendar_table.cpp" />
     <ClCompile Include="zzalog\src\config.cpp" />
     <ClCompile Include="zzalog\src\fields.cpp" />
     <ClCompile Include="zzalog\src\font_dialog.cpp" />
@@ -249,6 +251,8 @@
     <ClInclude Include="packages\pthreads.2.9.1.4\build\native\include\pthread.h" />
     <ClInclude Include="zzalog\include\band_data.h" />
     <ClInclude Include="zzalog\include\button_input.h" />
+    <ClInclude Include="zzalog\include\calendar_input.h" />
+    <ClInclude Include="zzalog\include\calendar_table.h" />
     <ClInclude Include="zzalog\include\callback.h" />
     <ClInclude Include="zzalog\include\config.h" />
     <ClInclude Include="zzalog\include\drawing.h" />

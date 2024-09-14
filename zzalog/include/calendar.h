@@ -10,65 +10,15 @@ using namespace std;
 
 class Fl_Button;
 class Fl_Input;
+class calendar_table;
 
-	// text is column header
-	const char WEEKDAY[7][2] = { "S", "M", "T", "W", "T", "F", "S" };
 	// Format date is represented in ADIF
 	const char ADIF_DATEFORMAT[] = "%Y%m%d";
-
-	// Datatype to pass to a calendar call back
-	struct cal_cb_data_t {
-		// Date value in ADIF format YYYYMMDD
-		string* date_value;
-		// The input widget to receive the date
-		Fl_Input* date_input;
-		// Default constructor
-		cal_cb_data_t() {
-			date_value = nullptr;
-			date_input = nullptr;
-		}
-		// Initialising constructor
-		cal_cb_data_t(string* dv, Fl_Input* di) {
-			date_value = dv;
-			date_input = di;
-		}
-	};
-
-	// This class provides the Fl_Table object to be used in calendar
-	class calendar_table : public Fl_Table
-	{
-	public:
-		calendar_table(int X, int Y, int W, int H, tm date);
-		virtual ~calendar_table();
-
-		// inherited from Fl_Table
-		virtual void draw_cell(TableContext context, int R = 0, int C = 0, int X = 0, int Y = 0,
-			int W = 0, int H = 0);
-
-		// set date
-		void value(tm date);
-		// get date
-		tm& value();
-		// get the date for the current cell
-		tm* get_date(int R, int C);
-
-	protected:
-
-		// attributes
-
-		// The date selected by user
-		tm selected_date_;
-		// The date of the 1st of displayed month
-		tm month_start_;
-		// Today's date
-		tm today_;
-
-
-	};
 
 	// This class provides a widget to be used for date selection
 	class calendar : public Fl_Window
 	{
+
 	public:
 		calendar(int X, int Y);
 		virtual ~calendar();
@@ -76,11 +26,6 @@ class Fl_Input;
 		// re-implement these
 		void value(const char * data);
 		const char * value();
-
-		// calendar close call back - v points to data item
-		static void cb_cal_close(Fl_Widget* w, void* v);
-		// open calendar drop-down call back - v points to calendar
-		static void cb_cal_open(Fl_Widget* w, void *v);
 
 	protected:
 		// callbacks
@@ -102,7 +47,7 @@ class Fl_Input;
 
 		// attributes
 		// the original value
-		string value_;
+		const char* value_;
 		// the date being displayed
 		tm display_date_;
 

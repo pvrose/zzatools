@@ -39,6 +39,10 @@ public:
 	virtual void when(uchar i) { ip_->when(i); }
 	virtual Fl_When when() { return ip_->when(); }
 
+	// Ditto for user data
+	virtual void user_data(void* v) { ip_->user_data(v); }
+	virtual void* user_data() { return ip_->user_data(); }
+
 	// Setting the input
 	void value(const char* d) { ip_->value(d); }
 	const char* value() { return ip_->value(); }

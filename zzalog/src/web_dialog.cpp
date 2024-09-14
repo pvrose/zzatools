@@ -1,6 +1,6 @@
 #include "web_dialog.h"
 #include "utils.h"
-#include "calendar.h"
+#include "calendar_input.h"
 #include "intl_widgets.h"
 #include "icons.h"
 #include "wsjtx_handler.h"
@@ -23,8 +23,6 @@ extern fllog_emul* fllog_emul_;
 web_dialog::web_dialog(int X, int Y, int W, int H, const char* label) :
 	page_dialog(X, Y, W, H, label)
 
-	, eqsl_cal_cb_data_(cal_cb_data_t())
-	, lotw_cal_cb_data_(cal_cb_data_t())
 	, eqsl_enable_(false)
 	, eqsl_last_got_("")
 	, eqsl_username_("")
@@ -221,21 +219,12 @@ void web_dialog::create_eqsl(int rx, int ry, int rw, int rh) {
 	gp1->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 
 	// Row 1 Col 2 - Date last accessed
-	intl_input* in1_1_2 = new intl_input(C2, R1_1, W2, H1_1, "Last accessed");
+	calendar_input* in1_1_2 = new calendar_input(C2, R1_1, W2 + H1_1, H1_1, "Last accessed");
 	in1_1_2->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
 	in1_1_2->value(eqsl_last_got_.c_str());
 	in1_1_2->callback(cb_value<intl_input, string>, &eqsl_last_got_);
 	in1_1_2->when(FL_WHEN_CHANGED);
 	in1_1_2->tooltip("Last time eQSL.cc accessed");
-
-	// Row 1 Col 3 - Calendar button
-	Fl_Button* bn1_1_3 = new Fl_Button(C3, R1_1, W3, H1_1, "@calendar");
-	//bn1_1_3->image(new Fl_RGB_Image(ICON_CALENDAR, 16, 16, 4));
-	eqsl_cal_cb_data_ = { &eqsl_last_got_, in1_1_2 };
-	bn1_1_3->callback(calendar::cb_cal_open, &eqsl_cal_cb_data_);
-	bn1_1_3->when(FL_WHEN_RELEASE);
-	bn1_1_3->tooltip("Open calendar to chnage date to fetch eQSL.cc");
-	//image_widgets_.insert(bn1_1_3);
 
 	// Row 1 Col 4 - User entry field
 	intl_input* in1_1_4 = new intl_input(C4, R1_1, W4, H1_1, "User");
@@ -353,24 +342,14 @@ void web_dialog::create_lotw(int rx, int ry, int rw, int rh) {
 	gp2->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 
 	// Row 1 Col 2 - Date last accessed
-	intl_input* in2_1_2 = new intl_input(C2, R2_1, W2, H2_1, "Last accessed");
+	calendar_input* in2_1_2 = new calendar_input(C2, R2_1, W2, H2_1, "Last accessed");
 	in2_1_2->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
 	in2_1_2->value(lotw_last_got_.c_str());
 	in2_1_2->callback(cb_value<intl_input, string>, &lotw_last_got_);
 	in2_1_2->when(FL_WHEN_CHANGED);
 	in2_1_2->tooltip("Last time Logbook of the World accessed");
 
-
-	// Row 1 Col 3 - Calendar button
-	Fl_Button* bn2_1_3 = new Fl_Button(C3, R2_1, W3, H2_1);
-	bn2_1_3->image(new Fl_RGB_Image(ICON_CALENDAR, 16, 16, 4));
-	lotw_cal_cb_data_ = { &lotw_last_got_, in2_1_2 };
-	bn2_1_3->callback(calendar::cb_cal_open, &lotw_cal_cb_data_);
-	bn2_1_3->when(FL_WHEN_RELEASE);
-	bn2_1_3->tooltip("Open calendar to chnage date to fetch from Logbook of the World");
-	image_widgets_.insert(bn2_1_3);
-
-	// Row 1 Col 4 - User entry field
+	                         // Row 1 Col 4 - User entry field
 	intl_input* in2_1_4 = new intl_input(C4, R2_1, W4, H2_1, "User");
 	in2_1_4->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
 	in2_1_4->value(lotw_username_.c_str());

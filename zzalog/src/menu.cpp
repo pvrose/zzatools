@@ -529,10 +529,9 @@ void menu::cb_mi_nav_date(Fl_Widget* w, void* v) {
 	string date;
 	if (qso) date = qso->item("QSO_DATE");
 	else date = now(false, "%Y%m%d");
-	cal_cb_data_t cb_data(&date, nullptr);
 	calendar* cal = new calendar(Fl::event_x_root(), Fl::event_y_root());
 	cal->value(date.c_str());
-	cal->callback(calendar::cb_cal_close, &cb_data);
+	cal->callback(cb_value<calendar, string>, &date);
 	cal->show();
 	Fl_Widget_Tracker wt(cal);
 	while (wt.exists()) Fl::check();
