@@ -372,9 +372,10 @@ void qsl_editor::save_values() {
 // Create the card data item data widgets
 void qsl_editor::create_items() {
 
-	// Remove all existing widgets
+	// Remove all existing widgets - hide them first 
+	g_4_->hide();
 	g_4_->clear();
-	// Redraw with no widgets to force screen to clear
+	g_4_->show();
 	g_4_->redraw();
 
 	int curr_x = g_4_->x() + GAP;
@@ -402,6 +403,7 @@ void qsl_editor::create_items() {
 
 	curr_y += HBUTTON + GAP;
 	curr_x += w_40201->w();
+	max_x = curr_x;
 	g_402->end();
 
 	// Only display column labels if there is data to display
@@ -693,7 +695,7 @@ void qsl_editor::create_iparams(int& curr_x, int& curr_y, qsl_display::image_def
 	i_filename->callback(cb_ip_string, &image->filename);
 	i_filename->when(FL_WHEN_CHANGED);
 	i_filename->value(image->filename.c_str());
-	i_filename->tooltip("Location of TQSL executable");
+	i_filename->tooltip("Location of image file");
 	curr_x += i_filename->w();
 
 	// Button - Opens file browser to locate iamge file
@@ -833,6 +835,7 @@ void qsl_editor::cb_callsign(Fl_Widget* w, void* v) {
 	that->qsl_->value(that->callsign_);
     that->redraw_display();  
 	that->create_items();
+	that->redraw();
 }
 
 // Field
@@ -853,6 +856,7 @@ void qsl_editor::cb_filename(Fl_Widget* w, void* v) {
 	that->qsl_->value(that->callsign_);
 	that->redraw_display();
 	that->create_items();
+	that->redraw();
 }
 
 // Filename browse
@@ -863,6 +867,7 @@ void qsl_editor::cb_browse(Fl_Widget* w, void* v) {
 	that->qsl_->value(that->callsign_);
 	that->redraw_display();
 	that->create_items();
+	that->redraw();
 }
 
 // Type choice
