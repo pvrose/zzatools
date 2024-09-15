@@ -104,13 +104,24 @@ void qsl_display::draw_surface() {
 void qsl_display::draw() {
 	// Delete the existingwidget
 
-	// Colour the whole display
-	fl_rectf(x_, y_, w_, h_, FL_WHITE);
-	// For each item...
-    for (auto it = data_->items.begin(); it != data_->items.end(); it++) {
-        item_def& item = *(*it);
-		// Call the draw_<type> method for this item type
-		switch(item.type) {
+	// Check valid data
+	if (data_->items.size() == 0) {
+		// Colour the whole display
+		fl_rectf(x_, y_, w_, h_, FL_WHITE);
+		Fl_Fontsize sz = fl_size();
+		fl_font(fl_font(), 48);
+		fl_color(FL_RED);
+		fl_draw("NO IMAGE!", x_, y_, w_, h_, FL_ALIGN_CENTER);
+		fl_font(fl_font(), sz);
+	}
+	else {
+		// Colour the whole display
+		fl_rectf(x_, y_, w_, h_, FL_WHITE);
+		// For each item...
+		for (auto it = data_->items.begin(); it != data_->items.end(); it++) {
+			item_def& item = *(*it);
+			// Call the draw_<type> method for this item type
+			switch (item.type) {
 			case FIELD: {
 				draw_field(item.field);
 				break;
@@ -122,6 +133,7 @@ void qsl_display::draw() {
 			case IMAGE: {
 				draw_image(item.image);
 				break;
+			}
 			}
 		}
 	}
@@ -323,6 +335,9 @@ void qsl_display::load_data(string callsign) {
 	call_settings.get("Card Design", temp, "");
 	data->filename = temp;
 	free(temp);
+	// Correct width and height if zero
+	if (data->width == 0) data->width = data->col_width;
+	if (data->height == 0) data->height = data->row_height;
 	// Check it's a TSV file
 	size_t pos = data->filename.find_last_of('.');
 	if (pos == string::npos || data->filename.substr(pos) != ".tsv") {
