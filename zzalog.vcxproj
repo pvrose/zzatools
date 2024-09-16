@@ -159,6 +159,7 @@
     <ClCompile Include="zzalog\src\calendar_table.cpp" />
     <ClCompile Include="zzalog\src\config.cpp" />
     <ClCompile Include="zzalog\src\fields.cpp" />
+    <ClCompile Include="zzalog\src\filename_input.cpp" />
     <ClCompile Include="zzalog\src\font_dialog.cpp" />
     <ClCompile Include="zzalog\src\page_dialog.cpp" />
     <ClCompile Include="zzalog\src\password_input.cpp" />
@@ -256,6 +257,7 @@
     <ClInclude Include="zzalog\include\callback.h" />
     <ClInclude Include="zzalog\include\config.h" />
     <ClInclude Include="zzalog\include\drawing.h" />
+    <ClInclude Include="zzalog\include\filename_input.h" />
     <ClInclude Include="zzalog\include\font_dialog.h" />
     <ClInclude Include="zzalog\include\formats.h" />
     <ClInclude Include="zzalog\include\logo.h" />

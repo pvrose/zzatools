@@ -354,6 +354,7 @@ void qsl_editor::resize() {
 void qsl_editor::save_values() {
 
 	// Save the current callsign's card data
+	qsl_->dirty();
     qsl_->save_data();
 	
 	// Sabe the display window position
@@ -843,7 +844,7 @@ void qsl_editor::cb_ch_field(Fl_Widget* w, void* v) {
 // Filename changed so update display
 void qsl_editor::cb_filename(Fl_Widget* w, void* v) {
     qsl_editor* that = ancestor_view<qsl_editor>(w);
-	cb_value<filename_input, string>(w, v);
+	cb_value<Fl_Input, string>(w, v);
 	that->save_values();
 	that->qsl_->value(that->callsign_);
 	that->redraw_display();

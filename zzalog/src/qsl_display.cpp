@@ -409,7 +409,7 @@ void qsl_display::load_data(string callsign) {
 				}
 				case IMAGE: {
 					// A line contains a single image item data (except actual image data)
-					if (words.size() >= 6) {
+					if (words.size() >= 4) {
 						if (directory(words[1]) == "")
 							item->image.filename = directory(data->filename) + '/' + words[1];
 						else 
@@ -417,7 +417,7 @@ void qsl_display::load_data(string callsign) {
 						item->image.dx = stoi(words[2]);
 						item->image.dy = stoi(words[3]);
 						// Load  the image data from the named file into the data structure
-						item->image.image = get_image(words[1]);
+						item->image.image = get_image(item->image.filename);
 					}
 					break;
 				}
@@ -489,8 +489,7 @@ void qsl_display::save_data() {
 					// Write text item data separated by tabs
 					op << item->text.text << '\t' <<
 						(int)item->text.t_style.font << '\t' <<
-						(int)item->text.t_style.size << '\t' <<
-						(int)item->text.t_style.colour << '\t' <<
+                         						(int)item->text.t_style.colour << '\t' <<
 						item->text.dx << '\t' <<
 						item->text.dy << endl; 
 					break;
