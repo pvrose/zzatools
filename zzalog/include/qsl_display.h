@@ -180,6 +180,7 @@ class qsl_display
  
     // Convert to points
     int to_points(float value);
+    
 
     // Drawing data for all callsigns - needs to be static to access the 
     // label size data outwith a specific instance of the drawing 

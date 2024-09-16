@@ -113,6 +113,9 @@ using namespace std;
 	void great_circle(lat_long_t source, lat_long_t destination, double& bearing, double& distance);
 	// Replace '/' with '_' throught
 	void de_slash(string& data);
+	// get the directroy part of a a filename
+	string directory(string filename);
+	string terminal(string filename);
 
 	// template function to find the enclosing widget of class WIDGET
 	template <class WIDGET>

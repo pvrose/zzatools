@@ -1021,3 +1021,23 @@ void de_slash(string& data) {
 		if (data[ix] == '/') data[ix] = '_';
 	}
 }
+
+// Return the directory part of the filenam
+string directory(string filename) {
+	size_t pos = filename.find_last_of("/\\");
+	if (pos == string::npos) {
+		return "";
+	} else {
+		return filename.substr(0, pos);
+	}
+}
+
+// Return the filename part of the filenam
+string terminal(string filename) {
+	size_t pos = filename.find_last_of("/\\");
+	if (pos == string::npos) {
+		return filename;
+	} else {
+		return filename.substr(pos + 1);
+	}
+}

@@ -2,6 +2,7 @@
 #include "qso_manager.h"
 #include "status.h"
 #include "record.h"
+#include "utils.h"
 
 #include <set>
 #include <string>
@@ -335,9 +336,6 @@ void qsl_display::load_data(string callsign) {
 	call_settings.get("Card Design", temp, "");
 	data->filename = temp;
 	free(temp);
-	// Correct width and height if zero
-	if (data->width == 0) data->width = data->col_width;
-	if (data->height == 0) data->height = data->row_height;
 	// Check it's a TSV file
 	size_t pos = data->filename.find_last_of('.');
 	if (pos == string::npos || data->filename.substr(pos) != ".tsv") {
@@ -354,6 +352,9 @@ void qsl_display::load_data(string callsign) {
 		snprintf(msg, sizeof(msg), "QSL: Incorrect info W=%g, H=%g, File=%s", data->width, data->height, data->filename.c_str());
 		status_->misc_status(ST_ERROR, msg);
 		data->items.clear();
+		// Default width and height if zero
+		if (data->width == 0) data->width = data->col_width;
+		if (data->height == 0) data->height = data->row_height;
 	} else {
 		// Data looks good so far
 		char msg[100];
@@ -409,7 +410,10 @@ void qsl_display::load_data(string callsign) {
 				case IMAGE: {
 					// A line contains a single image item data (except actual image data)
 					if (words.size() >= 6) {
-						item->image.filename = words[1];
+						if (directory(words[1]) == "")
+							item->image.filename = directory(data->filename) + '/' + words[1];
+						else 
+							item->image.filename = words[1];
 						item->image.dx = stoi(words[2]);
 						item->image.dy = stoi(words[3]);
 						// Load  the image data from the named file into the data structure

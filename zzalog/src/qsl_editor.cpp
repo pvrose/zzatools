@@ -8,6 +8,7 @@
 #include "intl_widgets.h"
 #include "font_dialog.h"
 #include "record.h"
+#include "filename_input.h"
 
 #include <string>
 #include <ctime>
@@ -115,25 +116,20 @@ void qsl_editor::create_form(int X, int Y) {
 	w101->tooltip("Select the callsign to change QSL template parameters for");
 
     curr_y += HBUTTON;
+	curr_x += GAP;
+
 	// Input field to specify filename
-    intl_input* w102 = new intl_input(curr_x + GAP, curr_y, WEDIT * 2, HBUTTON);
+    filename_input* w102 = new filename_input(curr_x, curr_y, WEDIT * 2, HBUTTON);
     w102->callback(cb_filename, &data->filename);
     w102->when(FL_WHEN_CHANGED);
     w102->value(data->filename.c_str());
     w102->tooltip("Please enter the QSL template");
+	w102->info("Please select QSL Template", "*.tsv" );
+	ip_filename_ = w102;
 
     curr_x += w102->w() + GAP;
+	curr_y += w102->h() + GAP;
 
-	// Button to open a file browser to get file
-    Fl_Button* w103 = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Browse");
-    w103->align(FL_ALIGN_INSIDE);
-    filedata_ = { "Please enter the QSL template", "TSV\t*.tsv", &data->filename, nullptr, w102, nullptr};
-    w103->callback(cb_browse, &filedata_);
-    w103->when(FL_WHEN_RELEASE);
-	w103->tooltip("Opens a file browser to locate the QSL template file");
-
-    curr_x += w103->w() + GAP;
-    curr_y += w103->h() + GAP;
     g_1_->resizable(nullptr);
     g_1_->size(curr_x - g_1_->x(), curr_y - g_1_->y());
     g_1_->end();
@@ -363,8 +359,7 @@ void qsl_editor::save_values() {
 	// Sabe the display window position
 	Fl_Preferences windows_settings(settings_, "Windows");
 	Fl_Preferences qsl_win_settings(windows_settings, "QSL Design");
-	qsl_win_settings.set("Top"
-, win_y_);
+	qsl_win_settings.set("Top", win_y_);
 	qsl_win_settings.set("Left", win_x_);
 
 	settings_->flush();
@@ -691,21 +686,14 @@ void qsl_editor::create_iparams(int& curr_x, int& curr_y, qsl_display::image_def
 	curr_x += i_dy->w() + GAP;
 
 	// Input - image filename
-	Fl_Input* i_filename = new intl_input(curr_x, curr_y, WEDIT, HBUTTON);
-	i_filename->callback(cb_ip_string, &image->filename);
+	filename_input* i_filename = new filename_input(curr_x, curr_y, WEDIT + HBUTTON, HBUTTON);
+	i_filename->callback(cb_image, image);
 	i_filename->when(FL_WHEN_CHANGED);
 	i_filename->value(image->filename.c_str());
 	i_filename->tooltip("Location of image file");
+	i_filename->info("Please select image file", "*.png|*.bmp|*.jpg");
+
 	curr_x += i_filename->w();
-
-	// Button - Opens file browser to locate iamge file
-	Fl_Button* bn_browse_tqsl = new Fl_Button(curr_x, curr_y, HBUTTON, HBUTTON, "?");
-	bn_browse_tqsl->align(FL_ALIGN_INSIDE);
-	bn_browse_tqsl->callback(cb_image, &image);
-	bn_browse_tqsl->when(FL_WHEN_RELEASE);
-	bn_browse_tqsl->tooltip("Opens a file browser to locate the image file");
-
-	curr_x += bn_browse_tqsl->w();
 	curr_y += HBUTTON;
 
 }
@@ -833,6 +821,10 @@ void qsl_editor::cb_callsign(Fl_Widget* w, void* v) {
     qsl_editor* that = ancestor_view<qsl_editor>(w);
     cb_value<field_input, string>(w, v);
 	that->qsl_->value(that->callsign_);
+	qsl_display::card_data* data = that->qsl_->data(that->callsign_);
+	that->filedata_.filename = &(data->filename);
+	that->ip_filename_->value(data->filename.c_str());
+	that->ip_filename_->user_data(&data->filename);
     that->redraw_display();  
 	that->create_items();
 	that->redraw();
@@ -851,18 +843,7 @@ void qsl_editor::cb_ch_field(Fl_Widget* w, void* v) {
 // Filename changed so update display
 void qsl_editor::cb_filename(Fl_Widget* w, void* v) {
     qsl_editor* that = ancestor_view<qsl_editor>(w);
-	cb_value<intl_input, string>(w, v);
-	that->save_values();
-	that->qsl_->value(that->callsign_);
-	that->redraw_display();
-	that->create_items();
-	that->redraw();
-}
-
-// Filename browse
-void qsl_editor::cb_browse(Fl_Widget* w, void* v) {
-    qsl_editor* that = ancestor_view<qsl_editor>(w);
-	cb_bn_browsefile(w, v);
+	cb_value<filename_input, string>(w, v);
 	that->save_values();
 	that->qsl_->value(that->callsign_);
 	that->redraw_display();
@@ -888,6 +869,9 @@ void qsl_editor::cb_new_item(Fl_Widget* w, void* v) {
 	qsl_display::item_type* type = (qsl_display::item_type*)v;
 	qsl_display::item_def* item = new qsl_display::item_def();
 	item->type = (qsl_display::item_type)ch->value();
+	if (item->type == qsl_display::IMAGE) {
+		item->image.filename = that->qsl_->data(that->callsign_)->filename;
+	}
 	qsl_display::data(that->callsign_)->items.push_back(item);
 	that->redraw_display();
 	that->create_items();
@@ -896,12 +880,20 @@ void qsl_editor::cb_new_item(Fl_Widget* w, void* v) {
 // Image
 void qsl_editor::cb_image(Fl_Widget* w, void* v) {
 	qsl_display::image_def& image = *(qsl_display::image_def*)v;
-	browser_data_t bd = {
-		"Please select image file", "*.png|*.bmp|*.jpg", &image.filename, nullptr, nullptr, nullptr };
-	
-	cb_bn_browsefile(w, (void*)&bd);
 	qsl_editor* that = ancestor_view<qsl_editor>(w);
+	qsl_display::card_data* data = that->qsl_->data(that->callsign_);
+	cb_value<Fl_Input, string>(w, &image.filename);
 	image.image = that->qsl_->get_image(image.filename);
+
+	size_t pos = image.filename.find_last_of("/\\");
+	if (directory(image.filename) != directory(data->filename)) {
+		char msg[256];
+		snprintf(msg, sizeof(msg), "QSL: Image %s not in same directory as QSL data %s",
+			image.filename.c_str(), data->filename.c_str());
+		status_->misc_status(ST_WARNING, msg);
+	} else {
+		image.filename = terminal(image.filename);
+	}
 	that->redraw_display();
 	that->create_items();
 }

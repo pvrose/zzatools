@@ -5,6 +5,7 @@
 #include "utils.h"
 #include "callback.h"
 
+class filename_input;
 class Fl_Choice;
 class Fl_Widget;
 class Fl_Group;
@@ -59,8 +60,6 @@ class qsl_editor : public page_dialog
     static void cb_callsign(Fl_Widget* w, void* v);
     // Filename
     static void cb_filename(Fl_Widget* w, void* v);
-    // Browse 
-    static void cb_browse(Fl_Widget* w, void* v);
     // Dimension radio 
     static void cb_radio_dim(Fl_Widget* w, void* v);
     // Size parameter changed
@@ -107,11 +106,13 @@ class qsl_editor : public page_dialog
     record* example_qso_;
     // Card display
     qsl_display* qsl_;
-
+    // Directory of filename
+    string dir_name_;
     //Widgets to reference:-
 
     // Filename input and browse button
     Fl_Group* g_1_;
+    filename_input* ip_filename_;
     // Inputs to define size and formats
     Fl_Group* g_2_;
     // Contains the item editing buttons
