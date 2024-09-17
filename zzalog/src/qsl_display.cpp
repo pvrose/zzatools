@@ -489,14 +489,15 @@ void qsl_display::save_data() {
 					// Write text item data separated by tabs
 					op << item->text.text << '\t' <<
 						(int)item->text.t_style.font << '\t' <<
-                         						(int)item->text.t_style.colour << '\t' <<
+						(int)item->text.t_style.size << '\t' <<
+   						(int)item->text.t_style.colour << '\t' <<
 						item->text.dx << '\t' <<
 						item->text.dy << endl; 
 					break;
 				}
 				case IMAGE: {
 					// Write image item data separted by tabs
-					op << item->image.filename << '\t' <<
+					op << terminal(item->image.filename) << '\t' <<
 						item->image.dx << '\t' <<
 						item->image.dy << endl;
 					break;
