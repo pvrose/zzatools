@@ -124,7 +124,7 @@ void qsl_editor::create_form(int X, int Y) {
     w102->when(FL_WHEN_CHANGED);
     w102->value(data->filename.c_str());
     w102->tooltip("Please enter the QSL template");
-	w102->info("Please select QSL Template", "*.tsv" );
+	w102->info("Please select QSL Template", "TSV\t*.tsv" );
 	ip_filename_ = w102;
 
     curr_x += w102->w() + GAP;
@@ -692,7 +692,7 @@ void qsl_editor::create_iparams(int& curr_x, int& curr_y, qsl_display::image_def
 	i_filename->when(FL_WHEN_CHANGED);
 	i_filename->value(image->filename.c_str());
 	i_filename->tooltip("Location of image file");
-	i_filename->info("Please select image file", "*.png|*.bmp|*.jpg");
+	i_filename->info("Please select image file", "Image Files\t*.{png,bmp,jpg}");
 
 	curr_x += i_filename->w();
 	curr_y += HBUTTON;
