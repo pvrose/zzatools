@@ -582,12 +582,10 @@ void add_properties() {
 	tip_settings.get("Duration", duration, (float)TIP_SHOW);
 	tip_settings.get("Font Name", font, 0);
 	tip_settings.get("Font Size", size, FL_NORMAL_SIZE);
-	tip_settings.get("Enabled", enabled, (int)true);
 	// Set the default tooltip properties
 	Fl_Tooltip::size(size);
 	Fl_Tooltip::font(font);
 	Fl_Tooltip::delay(duration);
-	Fl_Tooltip::enable(enabled);
 	// Default message properties
 	fl_message_size_ = FL_NORMAL_SIZE;
 	fl_message_font_ = 0;

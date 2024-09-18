@@ -49,7 +49,6 @@ void user_dialog::load_values() {
 	tip_settings.get("Duration", tip_duration_, Fl_Tooltip::delay());
 	tip_settings.get("Font Name", (int&)tip_font_, Fl_Tooltip::font());
 	tip_settings.get("Font Size", (int&)tip_size_, Fl_Tooltip::size());
-	tip_settings.get("Enabled", (int&)tip_enabled_, Fl_Tooltip::enabled());
 	// Tree views
 	Fl_Preferences tree_settings(user_settings, "Tree Views");
 	tree_settings.get("Font Name", (int&)tree_font_, 0);
@@ -113,11 +112,6 @@ void user_dialog::create_form(int X, int Y) {
 	// Add Enable
 	pos_x = g2->x() + GAP;
 	pos_y = g2->y() + HTEXT;
-	Fl_Check_Button* bn2_0 = new Fl_Check_Button(pos_x, pos_y, HBUTTON, HBUTTON, "Enabled");
-	bn2_0->align(FL_ALIGN_RIGHT);
-	bn2_0->tooltip("Check to allow tooltips to be displayed");
-	bn2_0->callback(cb_value<Fl_Check_Button, bool>, &tip_enabled_);
-	bn2_0->value(tip_enabled_);
 	// Add font browser
 	pos_y += HTEXT;
 	Fl_Hold_Browser* br3 = new Fl_Hold_Browser(pos_x, pos_y, WEDIT, HMLIN, "Font");
@@ -199,12 +193,10 @@ void user_dialog::save_values() {
 	tip_settings.set("Duration", tip_duration_);
 	tip_settings.set("Font Name", (int&)tip_font_);
 	tip_settings.set("Font Size", (int&)tip_size_);
-	tip_settings.set("Enabled", (int&)tip_enabled_);
 	// Tell the tooltips
 	Fl_Tooltip::delay(tip_duration_);
 	Fl_Tooltip::font(tip_font_);
 	Fl_Tooltip::size(tip_size_);
-	Fl_Tooltip::enable(tip_enabled_);
 	// Tree view settings
 	Fl_Preferences tree_settings(user_settings, "Tree Views");
 	tree_settings.set("Font Name", (int&)tree_font_);

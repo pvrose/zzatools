@@ -49,8 +49,6 @@ class Fl_Widget;
 		Fl_Font tip_font_;
 		// and its size
 		Fl_Fontsize tip_size_;
-		// Tooltip enabled
-		bool tip_enabled_;
 		// Font for tree-based views
 		Fl_Font tree_font_;
 		// and its size
