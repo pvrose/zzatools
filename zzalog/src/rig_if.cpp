@@ -12,6 +12,7 @@
 #include <FL/Fl_Window.H>
 
 extern status* status_;
+extern bool DEBUG_THREADS;
 
 // Returns if the rig opened OK
 bool rig_if::is_open() {
@@ -250,6 +251,8 @@ bool rig_if::open() {
 		return false;
 
 	}
+	if (DEBUG_THREADS) printf("RIG MAIN: Starting rig %s/%s access thread\n",
+		hamlib_data_->mfr.c_str(), hamlib_data_->model.c_str());
 	opening_.store(true, memory_order_seq_cst);
 	thread_ = new thread(th_run_rig, this);
 	// Lock until the rig has been opened - should wait 
@@ -298,6 +301,9 @@ bool rig_if::open() {
 			hamlib_data_->port_name.c_str()
 			);
 		status_->misc_status(ST_WARNING, error_message(msg).c_str());
+		thread_->join();
+		delete thread_;
+		if (DEBUG_THREADS) printf("RIG MAIN: Rig failed to open\n");
 		return false;
 	}
 }
@@ -349,14 +355,17 @@ string& rig_if::rig_name() {
 
 // Thraed method
 void rig_if::th_run_rig(rig_if* that) {
+	if (DEBUG_THREADS) printf("RIG THREAD: Rig access thread started\n");
 	// Open the rig
 	if (!that->th_open_rig()) {
 		that->opening_ = false;
+		if (DEBUG_THREADS) printf("RIG THREAD: Open failed\n");
 		return;
 	}
 	// run_read_ will be cleared when the rig closes or errors.
 	that->th_read_values();
 	if (that->opened_ok_) {
+		if (DEBUG_THREADS) printf("RIG THREAD: Reading from rig\n");
 		that->opening_ = false;
 		that->run_read_ = true;
 		while (that->run_read_) {
