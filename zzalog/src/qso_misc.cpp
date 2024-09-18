@@ -29,8 +29,8 @@ qso_misc::~qso_misc() {
 // get settings
 void qso_misc::load_values() {
 	// Load default tab value
-	Fl_Preferences display_settings(settings_, "Display");
-	display_settings.get("QSO Entry Tab", default_tab_, 0);
+	Fl_Preferences tab_settings(settings_, "Dashboard/Tabs");
+	tab_settings.get("Miscellaneous", default_tab_, 0);
 
 }
 
@@ -87,12 +87,12 @@ void qso_misc::enable_widgets() {
 
 // save value
 void qso_misc::save_values() {
-	Fl_Preferences display_settings(settings_, "Display");
+	Fl_Preferences tab_settings(settings_, "Dashboard/Tabs");
 	// Find the current selected tab and save its index
 	Fl_Widget* w = value();
 	for (int ix = 0; ix != children(); ix++) {
 		if (child(ix) == w) {
-			display_settings.set("QSO Entry Tab", ix);
+			tab_settings.set("Miscellaneous", ix);
 		}
 	}
 	settings_->flush();

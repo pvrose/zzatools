@@ -148,5 +148,7 @@ protected:
 
     // string new app name
     string new_name_;
+
+    int default_tab_;
   
 };

@@ -49,6 +49,9 @@ void qso_tabbed_rigs::load_values() {
 	if (label_map_.size() == 0) {
 		label_map_[string("")] = nullptr;
 	}
+	// Load default tab value
+	Fl_Preferences tab_settings(settings_, "Dashboard/Tabs");
+	tab_settings.get("Rigs", default_tab_, 0);
 }
 
 // Create form
@@ -78,6 +81,9 @@ void qso_tabbed_rigs::create_form(int X, int Y) {
 	resizable(nullptr);
 	size(w() + rw - saved_rw, h() + rh - saved_rh);
 	end();
+
+	if (children() > default_tab_) value(child(default_tab_));
+
 }
 
 // Enable widgets
@@ -108,6 +114,15 @@ void qso_tabbed_rigs::enable_widgets() {
 
 // Save changes
 void qso_tabbed_rigs::save_values() {
+	Fl_Preferences tab_settings(settings_, "Dashboard/Tabs");
+	// Find the current selected tab and save its index
+	Fl_Widget* w = value();
+	for (int ix = 0; ix != children(); ix++) {
+		if (child(ix) == w) {
+			tab_settings.set("Rigs", ix);
+		}
+	}
+	settings_->flush();
 }
 
 // Switch to the selected rig

@@ -42,5 +42,8 @@ protected:
 	qso_apps* apps_ctrl_;
 	qso_wx* wx_ctrl_;
 
+	// Default tab to open
+	int default_tab_;
+
 };
 

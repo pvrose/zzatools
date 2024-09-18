@@ -7,12 +7,15 @@
 
 #include <algorithm>
 
+#include <FL/Fl_Preferences.H>
+
 using namespace std;
 
 // basic tick is 200 ms 
 extern status* status_;
 extern wsjtx_handler* wsjtx_handler_;
 extern bool closing_;
+extern Fl_Preferences* settings_;
 
 // Constructor
 qso_clocks::qso_clocks(int X, int Y, int W, int H, const char* L) :
@@ -21,6 +24,7 @@ qso_clocks::qso_clocks(int X, int Y, int W, int H, const char* L) :
 	labeltype(FL_NO_LABEL);
 	box(FL_BORDER_BOX);
 	handle_overflow(OVERFLOW_PULLDOWN);
+	load_values();
 	create_form();
 	callback(cb_tabs);
     enable_widgets();
@@ -28,6 +32,13 @@ qso_clocks::qso_clocks(int X, int Y, int W, int H, const char* L) :
 
 // Destructor
 qso_clocks::~qso_clocks() {
+	save_values();
+}
+
+void qso_clocks::load_values() {
+	// Load default tab value
+	Fl_Preferences tab_settings(settings_, "Dashboard/Tabs");
+	tab_settings.get("Clocks", default_tab_, 0);
 }
 
 // Create two tabs - one each for UTC and local timezone
@@ -51,6 +62,20 @@ void qso_clocks::create_form() {
 	resizable(nullptr);
 	size(w() + rw - saved_rw, h() + rh - saved_rh);
 	end();
+
+	value(child(default_tab_));
+}
+
+void qso_clocks::save_values() {
+	Fl_Preferences tab_settings(settings_, "Dashboard/Tabs");
+	// Find the current selected tab and save its index
+	Fl_Widget* w = value();
+	for (int ix = 0; ix != children(); ix++) {
+		if (child(ix) == w) {
+			tab_settings.set("Clocks", ix);
+		}
+	}
+	settings_->flush();
 }
 
 // Enable the widgets

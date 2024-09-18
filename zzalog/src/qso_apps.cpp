@@ -419,6 +419,9 @@ void qso_apps::load_values() {
         }
         apps_data_[data->name] = data;
     }
+    // Load default tab value
+    Fl_Preferences tab_settings(settings_, "Dashboard/Tabs");
+    tab_settings.get("Apps", default_tab_, 0);
 }
 
 // Create the tabs
@@ -461,6 +464,7 @@ void qso_apps::create_tabs(string name) {
 
     tabs_->resizable(nullptr);
     tabs_->size(tabs_->w() + rw - saved_rw, tabs_->h() + rh - saved_rh);
+    if (tabs_->children() > 0) tabs_->value(child(default_tab_));
 
     resizable(nullptr);
     size(w(), tabs_->y() + tabs_->h() - y() + GAP);
@@ -528,6 +532,15 @@ void qso_apps::save_values() {
             rigs_settings.set((*iu).first.c_str(), (*iu).second.c_str());
         }
     }
+    Fl_Preferences tab_settings(settings_, "Dashboard/Tabs");
+    // Find the current selected tab and save its index
+    Fl_Widget* w = tabs_->value();
+    for (int ix = 0; ix != children(); ix++) {
+        if (child(ix) == w) {
+            tab_settings.set("Apps", ix);
+        }
+    }
+    settings_->flush();
 }
 
 // Configure widgets

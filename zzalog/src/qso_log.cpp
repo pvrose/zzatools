@@ -6,7 +6,11 @@
 
 #include <algorithm>
 
+#include <FL/Fl_Preferences.H>
+
 using namespace std;
+
+extern Fl_Preferences* settings_;
 
 // Constructor
 qso_log::qso_log(int X, int Y, int W, int H, const char* l) :
@@ -29,6 +33,9 @@ qso_log::~qso_log() {
 
 // get settings 
 void qso_log::load_values() {
+	// Load default tab value
+	Fl_Preferences tab_settings(settings_, "Dashboard/Tabs");
+	tab_settings.get("Log", default_tab_, 0);
 }
 
 // Create form
@@ -72,6 +79,9 @@ void qso_log::create_form(int X, int Y) {
 	for (int ix = 0; ix < children(); ix++) {
 		child(ix)->size(rw, rh);
 	}
+
+	value(child(default_tab_));
+
 	redraw();
 }
 
@@ -97,7 +107,15 @@ void qso_log::enable_widgets() {
 
 // Save changes
 void qso_log::save_values() {
-	// Null method
+	Fl_Preferences tab_settings(settings_, "Dashboard/Tabs");
+	// Find the current selected tab and save its index
+	Fl_Widget* w = value();
+	for (int ix = 0; ix != children(); ix++) {
+		if (child(ix) == w) {
+			tab_settings.set("Log", ix);
+		}
+	}
+	settings_->flush();
 }
 
 // Callback on switching tab

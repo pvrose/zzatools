@@ -43,5 +43,7 @@ protected:
 	// Map the labels to the widgets
 	map<string, Fl_Widget*> label_map_;
 
+	// Defauklt tab
+	int default_tab_;
 };
 
