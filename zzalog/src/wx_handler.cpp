@@ -31,11 +31,8 @@ wx_handler::wx_handler() :
 
     report_.icon = nullptr;
     elements_.clear();
-    run_thread_ = true;
-    wx_fetch_ = false;
     wx_valid_ = false;
-    wx_thread_ = new thread(do_thread, this);
-    wx_fetch_ = true;
+    ticker();
     // Start ticker - 30 minutes
     ticker_->add_ticker(this, cb_ticker, DEBUG_QUICK ? SHORT_DELAY : LONG_DELAY);
 
@@ -45,27 +42,16 @@ wx_handler::wx_handler() :
 wx_handler::~wx_handler() {
     ticker_->remove_ticker(this);
     // Close the thread down cleanly
-    run_thread_ = false;
-    wx_thread_->join();
+    if (wx_thread_) wx_thread_->join();
 };
 
 // Do thread - when told to by wx_fetch_ fetch the WX data.
 // Abandon when run_thread_ is deasserted
 void wx_handler::do_thread(wx_handler* that) {
-    while (that->run_thread_) {
-        if (DEBUG_THREADS) printf("WX Thread waiting for fetch\n");
-        while(!that->wx_fetch_ && that->run_thread_) {
-            this_thread::sleep_for(chrono::milliseconds(1000));
-        }
-        if (that->run_thread_) {
-            if (DEBUG_THREADS) printf("WX Thread staring to fetch\n");
-            that->wx_valid_ = false;
-            that->update();
-            if (DEBUG_THREADS) printf("WX Thread fetching complete\n");
-            that->wx_fetch_ = false;
-            that->wx_valid_ = true;
-        }
-    }
+    if (DEBUG_THREADS) printf("WX THREAD: staring to fetch\n");
+    that->update();
+    if (DEBUG_THREADS) printf("WX THREAD: fetching complete\n");
+    that->wx_valid_ = true;
 }
 
 // XML reader overloads
@@ -224,9 +210,14 @@ void wx_handler::update() {
 
 // Timer - called every 30 minutes
 void wx_handler::ticker() {
-    wx_fetch_ = true;
+    wx_valid_ = false;
+    if (DEBUG_THREADS) printf("WX MAIN: Starting WX fetch\n");
+    wx_thread_ = new thread(do_thread, this);
     while(!wx_valid_) Fl::check();
-    
+    wx_thread_->join();
+    if (DEBUG_THREADS) printf("WX MAIN: Finished WX fetch\n");
+    delete wx_thread_;
+    wx_thread_ = nullptr;
     qso_manager_->enable_widgets();
 }
 

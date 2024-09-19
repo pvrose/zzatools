@@ -255,25 +255,21 @@ bool rig_if::open() {
 		hamlib_data_->mfr.c_str(), hamlib_data_->model.c_str());
 	opening_.store(true, memory_order_seq_cst);
 	thread_ = new thread(th_run_rig, this);
-	// Lock until the rig has been opened - should wait 
-	int timer = 0;
-	const int interval = 100;
-	const int timeout = 150000;
+	chrono::system_clock::time_point wait_start = chrono::system_clock::now();
+	int timeout = 150000; 
 	while(opening_) {
 		// Allow FLTK scheduler in
 		Fl::check();
-		this_thread::sleep_for(chrono::milliseconds(interval));
-		timer += interval;
-		if (timer >= timeout) {
+		if (chrono::system_clock::now() - wait_start > chrono::milliseconds(timeout)) {
 			char msg[128];
-			snprintf(msg, sizeof(msg), "RIG: Connecting %s abandoned after %d s", 
+			snprintf(msg, sizeof(msg), "RIG: Connecting %s/%s abandoned after %d s", 
+				hamlib_data_->mfr.c_str(),
 				hamlib_data_->model.c_str(),
 				timeout / 1000);
 			status_->misc_status(ST_WARNING, msg);
 			opening_.store(false);
 		}
 	}
-	// And immediately unlock it
 		
 	char msg[256];
 	if (opened_ok_) {

@@ -212,8 +212,6 @@ protected:
     // The thread
     thread* wx_thread_;
     // Thread control
-    atomic<bool> run_thread_;
-    atomic<bool> wx_fetch_;
     atomic<bool> wx_valid_;
 
 
