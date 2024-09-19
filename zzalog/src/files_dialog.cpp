@@ -6,6 +6,7 @@
 #include "intl_widgets.h"
 #include "main_window.h"
 #include "qso_manager.h"
+#include "filename_input.h"
 
 #include <FL/Fl_Preferences.H>
 #include <FL/Fl_Group.H>
@@ -35,12 +36,6 @@ files_dialog::files_dialog(int X, int Y, int W, int H, const char* label) :
 	backup_directory_ = "";
 	status_log_file_ = "";
 	unzipper_ = "";
-	tqsl_data_ = { "", "", nullptr, nullptr, nullptr, nullptr };
-	card_data_ = { "", "", nullptr, nullptr, nullptr, nullptr };
-	ref_data_data_ = { "", "", nullptr, nullptr, nullptr, nullptr };
-	backup_data_ = { "", "", nullptr, nullptr, nullptr, nullptr };
-	status_data_ = { "", "", nullptr, nullptr, nullptr, nullptr };
-	unzipper_data_ = { "", "", nullptr, nullptr, nullptr, nullptr };
 
 	// initialise and create form
 	load_values();
@@ -190,22 +185,18 @@ void files_dialog::create_form(int X, int Y) {
 	bn_tqsl_en->value(enable_tqsl_);
 	bn_tqsl_en->tooltip("TQSL Executable filename is valid");
 	// Input - TQSL Executable filename
-	intl_input* in_tqsl_file = new intl_input(X + COL2, Y + ROW2_1, WEDIT + GAP + WBUTTON + GAP + WBUTTON, HTEXT);
-	in_tqsl_file->callback(cb_value<intl_input, string>, &tqsl_executable_);
+	filename_input* in_tqsl_file = new filename_input(X + COL2, Y + ROW2_1, WEDIT + GAP + WBUTTON + GAP + WBUTTON, HTEXT);
+	in_tqsl_file->callback(cb_value<Fl_Input_, string>, &tqsl_executable_);
 	in_tqsl_file->when(FL_WHEN_CHANGED);
 	in_tqsl_file->value(tqsl_executable_.c_str());
 	in_tqsl_file->tooltip("Location of TQSL executable");
-	// Button - Opens file browser to locate executable
-	Fl_Button* bn_browse_tqsl = new Fl_Button(X + COL5, Y + ROW2_1, WBUTTON, HBUTTON, "Browse");
-	bn_browse_tqsl->align(FL_ALIGN_INSIDE);
+	in_tqsl_file->type(filename_input::FILE);
+	in_tqsl_file->title("Please enter the TQSL executable");
 #ifdef _WIN32
-	tqsl_data_ = { "Please enter the TQSL executable", "Executable\t*.exe", &tqsl_executable_, &enable_tqsl_, in_tqsl_file, bn_tqsl_en };
+	in_tqsl_file->pattern("Executable\t*.exe");
 #else
-	tqsl_data_ = { "Please enter the TQSL executable", "Executable\t*", &tqsl_executable_, &enable_tqsl_, in_tqsl_file, bn_tqsl_en };
+	in_tqsl_file->pattern("Executable\t*");
 #endif
-	bn_browse_tqsl->callback(cb_bn_browsefile, &tqsl_data_);
-	bn_browse_tqsl->when(FL_WHEN_RELEASE);
-	bn_browse_tqsl->tooltip("Opens a file browsewr to locate the TQSL executable");
 
 	grp_tqsl->end();
 
@@ -221,18 +212,13 @@ void files_dialog::create_form(int X, int Y) {
 	bn_card_en->value(enable_card_);
 	bn_card_en->tooltip("Enable downloading of eQSL e-cards");
 	// Input - Card image directory
-	intl_input* in_card_file = new intl_input(X + COL2, Y + ROW3_1, WEDIT + GAP + WBUTTON + GAP + WBUTTON, HTEXT);
-	in_card_file->callback(cb_value<intl_input, string>, &card_directory_);
+	filename_input* in_card_file = new filename_input(X + COL2, Y + ROW3_1, WEDIT + GAP + WBUTTON + GAP + WBUTTON, HTEXT);
+	in_card_file->callback(cb_value<Fl_Input, string>, &card_directory_);
 	in_card_file->when(FL_WHEN_CHANGED);
 	in_card_file->value(card_directory_.c_str());
 	in_card_file->tooltip("Directory to which to download eQSL cards");
-	// Button - Opens directory browser to locate the directory
-	Fl_Button* bn_browse_card = new Fl_Button(X + COL5, Y + ROW3_1, WBUTTON, HBUTTON, "Browse");
-	bn_browse_card->align(FL_ALIGN_INSIDE);
-	card_data_ = { "Please enter the QSL card top-level directory", "", &card_directory_, &enable_card_, in_card_file, bn_card_en };
-	bn_browse_card->callback(cb_bn_browsedir, &card_data_);
-	bn_browse_card->when(FL_WHEN_RELEASE);
-	bn_browse_card->tooltip("Opens directory for saving eQSL e-cards");
+	in_card_file->type(filename_input::DIRECTORY);
+	in_card_file->title("Please enter the QSL card top-level directory");
 
 	grp_card->end();
 
@@ -242,18 +228,13 @@ void files_dialog::create_form(int X, int Y) {
 	grp_ref_data->box(FL_BORDER_BOX);
 	grp_ref_data->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 	// Input - directory name for the reference (ADIF spec, Prefix data and band plans)
-	intl_input* in_ref_data_file = new intl_input(X + COL2, Y + ROW4_1, WEDIT + GAP + WBUTTON + GAP + WBUTTON, HTEXT);
-	in_ref_data_file->callback(cb_value<intl_input, string>, &ref_data_directory_);
+	filename_input* in_ref_data_file = new filename_input(X + COL2, Y + ROW4_1, WEDIT + GAP + WBUTTON + GAP + WBUTTON, HTEXT);
+	in_ref_data_file->callback(cb_value<Fl_Input, string>, &ref_data_directory_);
 	in_ref_data_file->when(FL_WHEN_CHANGED);
 	in_ref_data_file->value(ref_data_directory_.c_str());
 	in_ref_data_file->tooltip("Directory containing reference data");
-	// Button - Opens directory browse
-	Fl_Button* bn_browse_ref_data = new Fl_Button(X + COL5, Y + ROW4_1, WBUTTON, HBUTTON, "Browse");
-	bn_browse_ref_data->align(FL_ALIGN_INSIDE);
-	ref_data_data_ = { "Please enter the reference data directory", "", &ref_data_directory_, nullptr, in_ref_data_file, nullptr };
-	bn_browse_ref_data->callback(cb_bn_browsedir, &ref_data_data_);
-	bn_browse_ref_data->when(FL_WHEN_RELEASE);
-	bn_browse_ref_data->tooltip("Opens directory browser to locate reference data directory");
+	in_ref_data_file->type(filename_input::DIRECTORY);
+	in_ref_data_file->title("Please enter the reference data directory");
 
 	grp_ref_data->end();
 
@@ -269,18 +250,13 @@ void files_dialog::create_form(int X, int Y) {
 	bn_backup_en->value(enable_backup_);
 	bn_backup_en->tooltip("Enable data back-up when closing logging session");
 	// Input - Backup directory name
-	intl_input* in_backup_file = new intl_input(X + COL2, Y + ROW5_1, WEDIT + GAP + WBUTTON + GAP + WBUTTON, HTEXT);
-	in_backup_file->callback(cb_value<intl_input, string>, &backup_directory_);
+	filename_input* in_backup_file = new filename_input(X + COL2, Y + ROW5_1, WEDIT + GAP + WBUTTON + GAP + WBUTTON, HTEXT);
+	in_backup_file->callback(cb_value<Fl_Input, string>, &backup_directory_);
 	in_backup_file->when(FL_WHEN_CHANGED);
 	in_backup_file->value(backup_directory_.c_str());
 	in_backup_file->tooltip("Directory to which to back-up the log");
-	// Button - opens directory browser
-	Fl_Button* bn_browse_backup = new Fl_Button(X + COL5, Y + ROW5_1, WBUTTON, HBUTTON, "Browse");
-	bn_browse_backup->align(FL_ALIGN_INSIDE);
-	backup_data_ = { "Please enter the backup directory", "", &backup_directory_, &enable_backup_, in_backup_file, bn_backup_en };
-	bn_browse_backup->callback(cb_bn_browsedir, &backup_data_);
-	bn_browse_backup->when(FL_WHEN_RELEASE);
-	bn_browse_backup->tooltip("Opens directory browser to locate back-up directory");
+	in_backup_file->type(filename_input::DIRECTORY);
+	in_backup_file->title("Please enter the backup directory");
 
 	grp_backup->end();
 
@@ -290,18 +266,14 @@ void files_dialog::create_form(int X, int Y) {
 	grp_status->box(FL_BORDER_BOX);
 	grp_status->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 	// Input - status log file name
-	intl_input* in_status_file = new intl_input(X + COL2, Y + ROW7_1, WEDIT + GAP + WBUTTON + GAP + WBUTTON, HTEXT);
-	in_status_file->callback(cb_value<intl_input, string>, &status_log_file_);
+	filename_input* in_status_file = new filename_input(X + COL2, Y + ROW7_1, WEDIT + GAP + WBUTTON + GAP + WBUTTON, HTEXT);
+	in_status_file->callback(cb_value<Fl_Input, string>, &status_log_file_);
 	in_status_file->when(FL_WHEN_CHANGED);
 	in_status_file->value(status_log_file_.c_str());
 	in_status_file->tooltip("Location of status log file");
-	// Button - opens file browser
-	Fl_Button* bn_browse_status = new Fl_Button(X + COL5, Y + ROW7_1, WBUTTON, HBUTTON, "Browse");
-	bn_browse_status->align(FL_ALIGN_INSIDE);
-	status_data_ = { "Please enter the status log file", "Text\t*.txt", &status_log_file_, nullptr, in_status_file, nullptr };
-	bn_browse_status->callback(cb_bn_browsefile, &status_data_);
-	bn_browse_status->when(FL_WHEN_RELEASE);
-	bn_browse_status->tooltip("Opens a file browsewr to locate the status file");
+	in_status_file->type(filename_input::FILE);
+	in_status_file->title("Please enter the status log file");
+	in_status_file->pattern("Text\t*.txt");
 
 	grp_status->end();
 
@@ -311,18 +283,13 @@ void files_dialog::create_form(int X, int Y) {
 	grp_wsjtx->box(FL_BORDER_BOX);
 	grp_wsjtx->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 	// Input - status log file name
-	intl_input* in_wsjtx_file = new intl_input(X + COL2, Y + ROW7A_1, WEDIT + GAP + WBUTTON + GAP + WBUTTON, HTEXT);
-	in_wsjtx_file->callback(cb_value<intl_input, string>, &wsjtx_directory_);
+	filename_input* in_wsjtx_file = new filename_input(X + COL2, Y + ROW7A_1, WEDIT + GAP + WBUTTON + GAP + WBUTTON, HTEXT);
+	in_wsjtx_file->callback(cb_value<Fl_Input, string>, &wsjtx_directory_);
 	in_wsjtx_file->when(FL_WHEN_CHANGED);
 	in_wsjtx_file->value(wsjtx_directory_.c_str());
 	in_wsjtx_file->tooltip("Location of WSJT-X directory");
-	// Button - opens file browser
-	Fl_Button* bn_browse_wsjtx = new Fl_Button(X + COL5, Y + ROW7A_1, WBUTTON, HBUTTON, "Browse");
-	bn_browse_wsjtx->align(FL_ALIGN_INSIDE);
-	wsjtx_data_ = { "Please enter the WSJT-X directory", "", &wsjtx_directory_, nullptr, in_wsjtx_file, nullptr };
-	bn_browse_wsjtx->callback(cb_bn_browsedir, &wsjtx_data_);
-	bn_browse_wsjtx->when(FL_WHEN_RELEASE);
-	bn_browse_wsjtx->tooltip("Opens a file browsewr to locate the status file");
+	in_wsjtx_file->type(filename_input::DIRECTORY);
+	in_wsjtx_file->title("Please enter the WSJT-X directory");
 
 	grp_wsjtx->end();
 
@@ -332,11 +299,18 @@ void files_dialog::create_form(int X, int Y) {
 	grp_unzip->box(FL_BORDER_BOX);
 	grp_unzip->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 	// Input - preferred web browser
-	intl_input* in_unzipper = new intl_input(X + COL2, Y + ROW8_1, WEDIT, HTEXT);
-	in_unzipper->callback(cb_value<intl_input, string>, &unzipper_);
+	filename_input* in_unzipper = new filename_input(X + COL2, Y + ROW8_1, WEDIT, HTEXT);
+	in_unzipper->callback(cb_value<Fl_Input, string>, &unzipper_);
 	in_unzipper->when(FL_WHEN_CHANGED);
 	in_unzipper->value(unzipper_.c_str());
 	in_unzipper->tooltip("Location of unzipper executable");
+	in_unzipper->type(filename_input::FILE);
+	in_unzipper->title("Please select the unzip tool");
+#ifdef _WIN32
+	in_unzipper->pattern("Executable\t*.exe");
+#else
+	in_unzipper->pattern("");
+#endif
 	// Input switches for unzip command
 	intl_input* in_switches = new intl_input(X + COL3, Y + ROW8_1, WSMEDIT, HTEXT, "Switches");
 	in_switches->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
@@ -344,18 +318,6 @@ void files_dialog::create_form(int X, int Y) {
 	in_switches->when(FL_WHEN_CHANGED);
 	in_switches->value(unzip_switches_.c_str());
 	in_switches->tooltip("Location of unzipper executable");
-
-	// Button - opens file browser
-	Fl_Button* bn_browse_unzip = new Fl_Button(X + COL5, Y + ROW8_1, WBUTTON, HBUTTON, "Browse");
-	bn_browse_unzip->align(FL_ALIGN_INSIDE);
-#ifdef _WIN32
-	unzipper_data_ = { "Please select the unzip tool", "Executable\t*.exe", &unzipper_, nullptr, in_unzipper, nullptr };
-#else
-	unzipper_data_ = { "Please select the unzip tool", "", &unzipper_, nullptr, in_unzipper, nullptr };
-#endif
-	bn_browse_unzip->callback(cb_bn_browsefile, &unzipper_data_);
-	bn_browse_unzip->when(FL_WHEN_RELEASE);
-	bn_browse_unzip->tooltip("Opens file browser to locate your preferred web browser");
 
 	grp_unzip->end();
 

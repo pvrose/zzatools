@@ -49,20 +49,6 @@ using namespace std;
 		string unzipper_;
 		// Unzipper switches
 		string unzip_switches_;
-		// callback data for the TQSL executable browse button
-		browser_data_t tqsl_data_;
-		// callback data for the eQSL card directory browse button
-		browser_data_t card_data_;
-		// callback data for the reference directory brose button
-		browser_data_t ref_data_data_;
-		// callback data for the Backup directory browse button
-		browser_data_t backup_data_;
-		// callback data for the status log file browse button
-		browser_data_t status_data_;
-		// callback data for all.txt file
-		browser_data_t wsjtx_data_;
-		// callback data for the unzipper command
-		browser_data_t unzipper_data_;
 		// Stations callsign
 		string station_callsign_;
 	};
