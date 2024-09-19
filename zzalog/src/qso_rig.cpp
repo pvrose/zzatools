@@ -1404,10 +1404,10 @@ Fl_Color qso_rig::alert_colour() {
 void qso_rig::modify_hamlib_data() {
 	hamlib_data_t* hamlib = cat_data_[cat_index_]->hamlib;
 	const rig_caps* capabilities = rig_get_caps(hamlib->model_id);
-	if (capabilities && !(capabilities->has_get_level & RIG_LEVEL_RFPOWER_METER_WATTS)) {
+	if (capabilities && (capabilities->has_get_level & RIG_LEVEL_RFPOWER_METER_WATTS)) {
 		hamlib->power_mode = RF_METER;
 	}
-	else if (capabilities && !(capabilities->has_get_level & RIG_LEVEL_RFPOWER)) {
+	else if (capabilities && (capabilities->has_get_level & RIG_LEVEL_RFPOWER)) {
 		hamlib->power_mode = DRIVE_LEVEL;
 	}
 	else {
