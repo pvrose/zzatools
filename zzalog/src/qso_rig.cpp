@@ -1425,6 +1425,7 @@ void qso_rig::ticker() {
 	rig_state_t current = rig_state();
 	if (current != rig_state_) {
 		rig_state_ = current;
+		printf("DEBUG: Rig state %d\n", (int)rig_state_);
 		// The rig may have disconnected - update connect/select buttons
 		enable_widgets();
 	}
