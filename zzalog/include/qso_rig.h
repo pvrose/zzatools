@@ -46,7 +46,7 @@ public:
 	// Create form
 	void create_form(int X, int Y);
 	// Enable widgets
-	void enable_widgets(bool tick = false);
+	void enable_widgets();
 	// Save changes
 	void save_values();
 	// Switch the rig on or off
@@ -74,6 +74,16 @@ protected:
 		hamlib_data_t* hamlib = nullptr;
 		bool use_cat_app = false;
 		string app = "";
+	};
+
+	enum rig_state_t : uchar {
+		NO_RIG,            // No rig specified
+		NO_CAT,            // No CAT available
+		DISCONNECTED,      // Rig not connected
+		OPENING,           // Opeining rig
+		OPEN,              // rig has been opened and is connected
+		POWERED_DOWN,      // Rig has powered down
+		UNRESPONSIVE,      // Rig has not responded for a while
 	};
 
 	// Callback - model choice
@@ -139,6 +149,8 @@ protected:
 	void save_cat_data(cat_data_t* data, Fl_Preferences settings);
 
 	void modify_hamlib_data();
+
+	rig_state_t rig_state();
 
 	Fl_Group* status_grp_;
 	// Rig status
@@ -213,6 +225,8 @@ protected:
 	bool rig_ok_;
 	// CAT index
 	int cat_index_;
+	// Previous rig state
+	rig_state_t rig_state_;
 
 };
 

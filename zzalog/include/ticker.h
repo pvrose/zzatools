@@ -40,7 +40,5 @@ class ticker {
     vector<ticker_entry*> tickers_;
     // Current time (in ds since started)
     unsigned int tick_count_;
-
-
     
 };

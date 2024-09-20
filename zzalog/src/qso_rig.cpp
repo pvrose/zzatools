@@ -37,7 +37,8 @@ extern ticker* ticker_;
 // Constructor
 qso_rig::qso_rig(int X, int Y, int W, int H, const char* L) :
 	Fl_Group(X, Y, W, H, nullptr),
-	rig_ok_(false)
+	rig_ok_(false),
+	rig_state_(NO_RIG)
 {
 	// If no name is provided then get from qso_manager
 	if (L == nullptr || strlen(L) == 0) copy_label(ancestor_view<qso_manager>(this)->get_default(qso_manager::RIG).c_str());
@@ -688,12 +689,26 @@ void qso_rig::save_values() {
 	}
 }
 
+// get rig sttaus
+qso_rig::rig_state_t qso_rig::rig_state() {
+	if (!rig_) return NO_RIG;
+	else if (rig_->is_opening()) return OPENING;
+	else if (rig_->is_open())
+		if (!rig_->get_powered()) return POWERED_DOWN;
+		else if (rig_->get_slow()) return UNRESPONSIVE;
+		else return OPEN;
+	else if (rig_->has_no_cat()) return NO_CAT;
+	else return DISCONNECTED;
+}
+
 // Enable CAT Connection widgets
-void qso_rig::enable_widgets(bool tick) {
+void qso_rig::enable_widgets() {
 	cat_data_t* cat_data = cat_data_[cat_index_];
 	hamlib_data_t* hamlib = cat_data->hamlib;
+	rig_state_ = rig_state();
 	// CAT access buttons
-	if (!rig_) {
+	switch (rig_state_) {
+	case NO_RIG: {
 		// No rig
 		bn_connect_->deactivate();
 		// bn_connect_->color(FL_BACKGROUND_COLOR);
@@ -701,12 +716,18 @@ void qso_rig::enable_widgets(bool tick) {
 		bn_select_->activate();
 		if (bn_select_->value()) {
 			bn_select_->label("Use");
-		} else {
+		}
+		else {
 			bn_select_->label("Select");
 		}
 		if (cat_data->use_cat_app) bn_start_->activate();
 		else bn_start_->deactivate();
-	} else if (rig_->is_open()) {
+		break;
+	}
+	case OPEN:
+	case POWERED_DOWN:
+	case UNRESPONSIVE:
+	{
 		// Rig is connected
 		bn_connect_->activate();
 		// bn_connect_->color(fl_lighter(FL_RED));
@@ -715,7 +736,10 @@ void qso_rig::enable_widgets(bool tick) {
 		bn_select_->label("");
 		bn_select_->value(false);
 		bn_start_->deactivate();
-	} else {
+		break;
+	}
+	default:
+	{
 		// Rig is not connected
 		bn_connect_->activate();
 		// bn_connect_->color(fl_lighter(FL_GREEN));
@@ -723,117 +747,140 @@ void qso_rig::enable_widgets(bool tick) {
 		bn_select_->activate();
 		if (bn_select_->value()) {
 			bn_select_->label("Use");
-		} else {
+		}
+		else {
 			bn_select_->label("Select");
 		}
 		if (cat_data->use_cat_app) bn_start_->activate();
 		else bn_start_->deactivate();
+		break;
+	}
 	}
 	bn_connect_->labelcolor(fl_contrast(FL_FOREGROUND_COLOR, bn_connect_->color()));
 	bn_select_->labelcolor(fl_contrast(FL_FOREGROUND_COLOR, bn_select_->color()));
 	double freq;
 	// Status and frequency/mode
-	if (!rig_) {
+	switch (rig_state_) {
+	case NO_RIG:
+	{
 		// No rig - decativate freq/mode
 		op_status_->value("No rig specified");
 		bn_tx_rx_->label("");
 		bn_tx_rx_->color(FL_BLACK);
 		op_freq_mode_->deactivate();
 		op_freq_mode_->label("");
-	} else if (rig_->is_opening()) {
+		break;
+	}
+	case OPENING:
+	{
 		// Rig is connecting - deactivate freq/mode
 		op_status_->value("Opening rig");
 		bn_tx_rx_->label("");
 		bn_tx_rx_->color(FL_YELLOW);
 		op_freq_mode_->deactivate();
 		op_freq_mode_->label("");
-	} else if (rig_->is_open()) {
-		// Rig is connected
-		if (!rig_->get_powered()) {
-			op_status_->value("Powered down");
-			bn_tx_rx_->label("");
-			bn_tx_rx_->color(COLOUR_ORANGE);
-		}
-		else if (rig_->get_slow()) {
-			// Do no change display
-			op_status_->value("Unresponsive");
-			bn_tx_rx_->label("");
-			bn_tx_rx_->color(COLOUR_ORANGE);
-		}
-		else {
-			freq = rig_->get_dfrequency(true);
-			int freq_Hz = (int)(freq * 1000000) % 1000;
-			int freq_kHz = (int)(freq * 1000) % 1000;
-			int freq_MHz = (int)freq;
-			band_data::band_entry_t* entry = band_data_->get_entry(freq * 1000);
-			if (entry) {
-				char l[50];
-				snprintf(l, sizeof(l), "%s (%s)", 
-					spec_data_->band_for_freq(freq).c_str(),
-					entry->mode.c_str());
-				op_status_->value(l);
-				if (rig_->get_ptt()) {
-					bn_tx_rx_->label("TX");
-					bn_tx_rx_->color(FL_RED);
-				} else {
-					bn_tx_rx_->label("RX");
-					bn_tx_rx_->color(FL_GREEN);
-				}
+		break;
+	}
+	case POWERED_DOWN:
+	{
+		op_status_->value("Powered down");
+		bn_tx_rx_->label("");
+		bn_tx_rx_->color(COLOUR_ORANGE);
+		break;
+	}
+	case UNRESPONSIVE:
+	{
+		// Do no change display
+		op_status_->value("Unresponsive");
+		bn_tx_rx_->label("");
+		bn_tx_rx_->color(COLOUR_ORANGE);
+		break;
+	}
+	case OPEN:
+	{
+		freq = rig_->get_dfrequency(true);
+		int freq_Hz = (int)(freq * 1000000) % 1000;
+		int freq_kHz = (int)(freq * 1000) % 1000;
+		int freq_MHz = (int)freq;
+		band_data::band_entry_t* entry = band_data_->get_entry(freq * 1000);
+		if (entry) {
+			char l[50];
+			snprintf(l, sizeof(l), "%s (%s)",
+				spec_data_->band_for_freq(freq).c_str(),
+				entry->mode.c_str());
+			op_status_->value(l);
+			if (rig_->get_ptt()) {
+				bn_tx_rx_->label("TX");
+				bn_tx_rx_->color(FL_RED);
 			}
 			else {
-				op_status_->value("Out of band!");
-				if (rig_->get_ptt()) {
-					bn_tx_rx_->label("TX");
-					bn_tx_rx_->color(FL_DARK_RED);
-				} else {
-					bn_tx_rx_->label("RX");
-					bn_tx_rx_->color(FL_DARK_GREEN);
-				}
+				bn_tx_rx_->label("RX");
+				bn_tx_rx_->color(FL_GREEN);
 			}
-			op_freq_mode_->activate();
-			op_freq_mode_->color(FL_BLACK);
-			op_freq_mode_->labelcolor(FL_YELLOW);
-
-			char msg[200];
-			string rig_mode;
-			string submode;
-			rig_->get_string_mode(rig_mode, submode);
-			// Set Freq/Mode to Frequency (MHz with kHz seperator), mode, power (W)
-			snprintf(msg, sizeof(msg), "%d.%03d.%03d MHz\n%s %sW %s" , 
-				freq_MHz, freq_kHz, freq_Hz,
-				submode.length() ? submode.c_str() : rig_mode.c_str(),
-				rig_->get_tx_power(true).c_str(),
-				rig_->get_smeter(true).c_str()
-			);
-			op_freq_mode_->copy_label(msg);
-			int size = FL_NORMAL_SIZE + 10;
-			fl_font(0, size);
-			int w, h;
-			fl_measure(msg, w, h);
-			while (w > op_freq_mode_->w()) {
-				size--;
-				fl_font(0, size);
-				fl_measure(msg, w, h);
-			}
-			op_freq_mode_->labelsize(size);
 		}
-	} else if (rig_->has_no_cat()) {
+		else {
+			op_status_->value("Out of band!");
+			if (rig_->get_ptt()) {
+				bn_tx_rx_->label("TX");
+				bn_tx_rx_->color(FL_DARK_RED);
+			}
+			else {
+				bn_tx_rx_->label("RX");
+				bn_tx_rx_->color(FL_DARK_GREEN);
+			}
+		}
+		op_freq_mode_->activate();
+		op_freq_mode_->color(FL_BLACK);
+		op_freq_mode_->labelcolor(FL_YELLOW);
+
+		char msg[200];
+		string rig_mode;
+		string submode;
+		rig_->get_string_mode(rig_mode, submode);
+		// Set Freq/Mode to Frequency (MHz with kHz seperator), mode, power (W)
+		snprintf(msg, sizeof(msg), "%d.%03d.%03d MHz\n%s %sW %s",
+			freq_MHz, freq_kHz, freq_Hz,
+			submode.length() ? submode.c_str() : rig_mode.c_str(),
+			rig_->get_tx_power(true).c_str(),
+			rig_->get_smeter(true).c_str()
+		);
+		op_freq_mode_->copy_label(msg);
+		int size = FL_NORMAL_SIZE + 10;
+		fl_font(0, size);
+		int w, h;
+		fl_measure(msg, w, h);
+		while (w > op_freq_mode_->w()) {
+			size--;
+			fl_font(0, size);
+			fl_measure(msg, w, h);
+		}
+		op_freq_mode_->labelsize(size);
+		break;
+	}
+	case NO_CAT:
+	{
 		// No rig available - deactivate freq/mode
 		op_status_->value("No CAT Available");
 		bn_tx_rx_->label("");
 		bn_tx_rx_->color(COLOUR_GREY);
 		op_freq_mode_->deactivate();
 		op_freq_mode_->label("");
-	} else {
+		break;
+	}
+	case DISCONNECTED:
+	default:
+	{
 		if (rig_ok_) {
 			// Rig has disconnected since last update
 			char msg[128];
 			if (rig_->is_network_error()) {
 				snprintf(msg, sizeof(msg), "RIG: Failed to access network app for %s",
-				label());
-			} else if (rig_->is_rig_error()) {
+					label());
+			}
+			else if (rig_->is_rig_error()) {
 				snprintf(msg, sizeof(msg), "Failed to access rig %s", label());
-			} else {
+			}
+			else {
 				strcpy(msg, rig_->error_message(label()).c_str());
 			}
 			status_->misc_status(ST_WARNING, msg);
@@ -849,6 +896,8 @@ void qso_rig::enable_widgets(bool tick) {
 		bn_tx_rx_->color(FL_BLACK);
 		op_freq_mode_->deactivate();
 		op_freq_mode_->label("");
+		break;
+	}
 	}
 	bn_tx_rx_->labelcolor(fl_contrast(FL_FOREGROUND_COLOR, bn_tx_rx_->color()));
 	// CAT control widgets - allow only when select button active
@@ -857,7 +906,8 @@ void qso_rig::enable_widgets(bool tick) {
 		ch_rig_model_->deactivate();
 		serial_grp_->deactivate();
 		network_grp_->deactivate();
-	} else {
+	}
+	else {
 		// Rig is not open - allow it to be configured
 		ch_rig_model_->activate();
 		serial_grp_->activate();
@@ -866,7 +916,8 @@ void qso_rig::enable_widgets(bool tick) {
 			// Set configuration widgets to accept input
 			serial_grp_->clear_output();
 			network_grp_->clear_output();
-		} else {
+		}
+		else {
 			// Set configuration widgets to inhibit input
 			serial_grp_->set_output();
 			network_grp_->set_output();
@@ -879,7 +930,8 @@ void qso_rig::enable_widgets(bool tick) {
 		network_grp_->hide();
 		if (!bn_select_->value()) {
 			serial_grp_->deactivate();
- 		} else {
+		}
+		else {
 			serial_grp_->activate();
 		}
 		break;
@@ -892,18 +944,20 @@ void qso_rig::enable_widgets(bool tick) {
 			ip_port_->value(hamlib->port_name.c_str());
 			ip_port_->user_data(&hamlib->port_name);
 			network_grp_->deactivate();
- 		} else {
+		}
+		else {
 			network_grp_->activate();
 		}
 		bn_use_app_->value(cat_data->use_cat_app);
 		// Chaneg the user data for "use app" button
 		bn_use_app_->user_data(&cat_data->use_cat_app);
-		if (!tick) ip_app_name_->value(cat_data->app.c_str());
+		ip_app_name_->value(cat_data->app.c_str());
 		// The hamlib model has an associated application (eg flrig or wfview)
 		if (cat_data_[cat_index_]->use_cat_app) {
 			ip_app_name_->activate();
 			ip_app_name_->user_data(&cat_data->app);
-		} else {
+		}
+		else {
 			ip_app_name_->deactivate();
 		}
 		break;
@@ -915,75 +969,73 @@ void qso_rig::enable_widgets(bool tick) {
 	}
 
 	// Only update these when not called by ticker
-	if (!tick) {
-		// Power defaults
-		switch (hamlib->power_mode) {
-		case RF_METER:
-			op_pwr_type_->value("RF Meter");
-			break;
-		case DRIVE_LEVEL:
-			op_pwr_type_->value("Drive");
-			break;
-		case MAX_POWER:
-			op_pwr_type_->value("Specify");
-			break;
-		default:
-			op_pwr_type_->value("");
-			break;
-		}
-		char text[25];
-		snprintf(text, sizeof(text), "%g", hamlib->max_power);
-		ip_max_pwr_->value(text);
-		ip_max_pwr_->user_data(&hamlib->max_power);
+	// Power defaults
+	switch (hamlib->power_mode) {
+	case RF_METER:
+		op_pwr_type_->value("RF Meter");
+		break;
+	case DRIVE_LEVEL:
+		op_pwr_type_->value("Drive");
+		break;
+	case MAX_POWER:
+		op_pwr_type_->value("Specify");
+		break;
+	default:
+		op_pwr_type_->value("");
+		break;
+	}
+	char text[25];
+	snprintf(text, sizeof(text), "%g", hamlib->max_power);
+	ip_max_pwr_->value(text);
+	ip_max_pwr_->user_data(&hamlib->max_power);
 
-		// Fequency defaults
-		switch (hamlib->freq_mode) {
-		case VFO:
-			op_freq_type_->value("VFO");
-			break;
-		case XTAL:
-			op_freq_type_->value("Fixed");
-			break;
-		default:
-			op_freq_type_->value("");
-			break;
-		}
-		snprintf(text, sizeof(text), "%0.6f", hamlib->frequency);
-		ip_xtal_->value(text);
-		ip_xtal_->user_data(&hamlib->frequency);
+	// Fequency defaults
+	switch (hamlib->freq_mode) {
+	case VFO:
+		op_freq_type_->value("VFO");
+		break;
+	case XTAL:
+		op_freq_type_->value("Fixed");
+		break;
+	default:
+		op_freq_type_->value("");
+		break;
+	}
+	snprintf(text, sizeof(text), "%0.6f", hamlib->frequency);
+	ip_xtal_->value(text);
+	ip_xtal_->user_data(&hamlib->frequency);
 
-		bn_amplifier_->value((hamlib->accessory & AMPLIFIER) == AMPLIFIER);
-		bn_amplifier_->user_data(&hamlib->accessory);
+	bn_amplifier_->value((hamlib->accessory & AMPLIFIER) == AMPLIFIER);
+	bn_amplifier_->user_data(&hamlib->accessory);
 
-		if (hamlib->accessory & AMPLIFIER) {
-			ip_gain_->activate();
-			snprintf(text, sizeof(text), "%d", hamlib->gain);
-			ip_gain_->value(text);
-			ip_gain_->user_data(&hamlib->gain);
-		}
-		else {
-			ip_gain_->deactivate();
-			ip_gain_->value("");
-		}
+	if (hamlib->accessory & AMPLIFIER) {
+		ip_gain_->activate();
+		snprintf(text, sizeof(text), "%d", hamlib->gain);
+		ip_gain_->value(text);
+		ip_gain_->user_data(&hamlib->gain);
+	}
+	else {
+		ip_gain_->deactivate();
+		ip_gain_->value("");
+	}
 
-		bn_transverter_->value((hamlib->accessory & TRANSVERTER) == TRANSVERTER);
-		bn_transverter_->user_data(&hamlib->accessory);
-		if (hamlib->accessory & TRANSVERTER) {
-			ip_offset_->activate();
-			snprintf(text, sizeof(text), "%0.6f", hamlib->freq_offset);
-			ip_offset_->value(text);
-			ip_offset_->user_data(&hamlib->freq_offset);
-			ip_tvtr_pwr_->activate();
-			snprintf(text, sizeof(text), "%g", hamlib->tvtr_power);
-			ip_tvtr_pwr_->value(text);
-			ip_tvtr_pwr_->user_data(&hamlib->tvtr_power);
-		}
-		else {
-			ip_offset_->deactivate();
-			ip_offset_->value("");
-			ip_tvtr_pwr_->deactivate();
-			ip_tvtr_pwr_->value("");
-		}
+	bn_transverter_->value((hamlib->accessory & TRANSVERTER) == TRANSVERTER);
+	bn_transverter_->user_data(&hamlib->accessory);
+	if (hamlib->accessory & TRANSVERTER) {
+		ip_offset_->activate();
+		snprintf(text, sizeof(text), "%0.6f", hamlib->freq_offset);
+		ip_offset_->value(text);
+		ip_offset_->user_data(&hamlib->freq_offset);
+		ip_tvtr_pwr_->activate();
+		snprintf(text, sizeof(text), "%g", hamlib->tvtr_power);
+		ip_tvtr_pwr_->value(text);
+		ip_tvtr_pwr_->user_data(&hamlib->tvtr_power);
+	}
+	else {
+		ip_offset_->deactivate();
+		ip_offset_->value("");
+		ip_tvtr_pwr_->deactivate();
+		ip_tvtr_pwr_->value("");
 	}
 
 	// Now use standard TAB highlighting
@@ -1370,9 +1422,11 @@ void qso_rig::switch_rig() {
 
 // 1 s clock interface - read rig and update status
 void qso_rig::ticker() {
-	if (rig_) {
+	rig_state_t current = rig_state();
+	if (current != rig_state_) {
+		rig_state_ = current;
 		// The rig may have disconnected - update connect/select buttons
-		enable_widgets(true);
+		enable_widgets();
 	}
 }
 

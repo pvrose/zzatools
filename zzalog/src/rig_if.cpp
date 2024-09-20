@@ -10,6 +10,7 @@
 #include <FL/Fl_Preferences.H>
 #include <FL/fl_ask.H>
 #include <FL/Fl_Window.H>
+#include <FL/Fl_Tooltip.H>
 
 extern status* status_;
 extern bool DEBUG_THREADS;
@@ -215,18 +216,14 @@ void rig_if::close() {
 				hamlib_data_->model.c_str(),
 				hamlib_data_->port_name.c_str());
 			status_->misc_status(ST_NOTE, msg);
-			// If we have a connection and it's open, close it and tidy memory used by hamlib
-			// Delete the thread that reads the required rig values
-			run_read_ = false;
-			thread_->join();
-			delete thread_;
-			rig_close(rig_);
-			rig_cleanup(rig_);
-		} else {
-			run_read_ = false;
-			thread_->join();
-			delete thread_;
 		}
+		// If we have a connection and it's open, close it and tidy memory used by hamlib
+		// Delete the thread that reads the required rig values
+		run_read_ = false;
+		thread_->join();
+		delete thread_;
+		rig_close(rig_);
+		rig_cleanup(rig_);
 	}
 	opened_ok_ = false;
 }
@@ -291,15 +288,14 @@ bool rig_if::open() {
 		return true;
 	}
 	else {
+		if (DEBUG_THREADS) printf("RIG MAIN: Rig failed to open\n");
 		snprintf(msg, 256, "open(): %s/%s port %s",
 			hamlib_data_->mfr.c_str(),
 			hamlib_data_->model.c_str(),
 			hamlib_data_->port_name.c_str()
-			);
+		);
 		status_->misc_status(ST_WARNING, error_message(msg).c_str());
-		thread_->join();
-		delete thread_;
-		if (DEBUG_THREADS) printf("RIG MAIN: Rig failed to open\n");
+		close();
 		return false;
 	}
 }
