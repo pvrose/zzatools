@@ -671,7 +671,7 @@ void qso_rig::save_cat_data(qso_rig::cat_data_t* cat_data, Fl_Preferences settin
 // Save values in settings
 void qso_rig::save_values() {
 	// Read hamlib configuration - manufacturer,  model, port and baud-rate
-	if (cat_data_.size() && cat_data_[cat_index_]->hamlib->port_type != RIG_PORT_NONE) {
+	if (cat_data_.size()) {
 		Fl_Preferences cat_settings(settings_, "CAT");
 		Fl_Preferences rig_settings(cat_settings, label());
 		rig_settings.clear();
@@ -999,6 +999,9 @@ void qso_rig::enable_widgets() {
 		// Fequency defaults
 		op_freq_type_->activate();
 		switch (hamlib->freq_mode) {
+		case NO_FREQ:
+			op_freq_type_->value("Enter in QSO");
+			break;
 		case VFO:
 			op_freq_type_->value("VFO");
 			break;
@@ -1256,12 +1259,25 @@ void qso_rig::cb_ch_model(Fl_Widget* w, void* v) {
 	rig_model_t id = (intptr_t)item->user_data();
 	const char* label = ch->text();
 	const rig_caps* capabilities = rig_get_caps(id);
-	hamlib_data_t* hamlib = that->cat_data_[that->cat_index_]->hamlib;
+	hamlib_data_t* hamlib;
+	if (that->cat_data_.size()) {
+		// Use existing CAT entry
+		hamlib = that->cat_data_[that->cat_index_]->hamlib;
+	}
+	else {
+		// Create new CAT entry
+		cat_data_t* cat_item = new cat_data_t;
+		cat_item->hamlib = new hamlib_data_t;
+		that->cat_index_ = that->cat_data_.size();
+		that->cat_data_.push_back(cat_item);
+		hamlib = cat_item->hamlib;
+	}
 	if (capabilities != nullptr) {
 		hamlib->model = capabilities->model_name;
 		hamlib->mfr = capabilities->mfg_name;
 		hamlib->model_id = id;
 		hamlib->port_type = capabilities->port_type;
+		that->modify_hamlib_data();
 	}
 	else {
 		char message[128];
@@ -1494,7 +1510,10 @@ Fl_Color qso_rig::alert_colour() {
 void qso_rig::modify_hamlib_data() {
 	hamlib_data_t* hamlib = cat_data_[cat_index_]->hamlib;
 	const rig_caps* capabilities = rig_get_caps(hamlib->model_id);
-	if (capabilities && (capabilities->has_get_level & RIG_LEVEL_RFPOWER_METER_WATTS)) {
+	if (capabilities->port_type == RIG_PORT_NONE) {
+		hamlib->power_mode = MAX_POWER;
+	}
+	else if (capabilities && (capabilities->has_get_level & RIG_LEVEL_RFPOWER_METER_WATTS)) {
 		hamlib->power_mode = RF_METER;
 	}
 	else if (capabilities && (capabilities->has_get_level & RIG_LEVEL_RFPOWER)) {
@@ -1502,6 +1521,13 @@ void qso_rig::modify_hamlib_data() {
 	}
 	else {
 		hamlib->power_mode = MAX_POWER;
+	}
+	if (capabilities->port_type == RIG_PORT_NONE) {
+		hamlib->freq_mode = NO_FREQ;
+	}
+	else {
+		// TODO - how do I know if it's fixed frequency?
+		hamlib->freq_mode = VFO;
 	}
 }
 
