@@ -745,7 +745,12 @@ void qso_rig::enable_widgets() {
 	default:
 	{
 		// Rig is not connected
-		bn_connect_->activate();
+		if (hamlib && hamlib->port_type != RIG_PORT_NONE) {
+			bn_connect_->activate();
+		}
+		else {
+			bn_connect_->deactivate();
+		}
 		// bn_connect_->color(fl_lighter(FL_GREEN));
 		bn_connect_->label("Connect");
 		bn_select_->activate();
