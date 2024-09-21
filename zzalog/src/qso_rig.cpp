@@ -50,10 +50,14 @@ qso_rig::qso_rig(int X, int Y, int W, int H, const char* L) :
 	//align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 	box(FL_BORDER_BOX);
 	load_values();
-	rig_ = new rig_if(label(), cat_data_[cat_index_]->hamlib);
-	if (rig_->is_good()) rig_ok_ = true;
-	const rig_caps* capabilities = rig_get_caps(cat_data_[cat_index_]->hamlib->model_id);
-	if (rig_ok_) modify_hamlib_data();
+	if (cat_data_.size()) {
+		rig_ = new rig_if(label(), cat_data_[cat_index_]->hamlib);
+		if (rig_->is_good()) rig_ok_ = true;
+		if (rig_ok_) modify_hamlib_data();
+	}
+	else {
+		rig_ = nullptr;
+	}
 	create_form(X, Y);
 	enable_widgets();
 
@@ -439,15 +443,15 @@ void qso_rig::create_network(int curr_x, int curr_y) {
 	curr_y = network_grp_->y();
 
 	bn_use_app_ = new Fl_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Use app");
-	bn_use_app_->callback(cb_bn_use_app, &cat_data_[cat_index_]->use_cat_app);
+	bn_use_app_->callback(cb_bn_use_app, nullptr);
 	bn_use_app_->tooltip("Set to allow a CAT app to be used");
-	bn_use_app_->value(cat_data_[cat_index_]->use_cat_app);
+	bn_use_app_->value(false);
 
 	curr_x += WBUTTON;
 
 	// App name (flrig or wfview to connect to rig
 	ip_app_name_ = new Fl_Input(curr_x, curr_y, w() - curr_x - (2 * GAP), HTEXT);
-	ip_app_name_->callback(cb_value<Fl_Input, string>, &cat_data_[cat_index_]->app);
+	ip_app_name_->callback(cb_value<Fl_Input, string>, nullptr);
 	ip_app_name_->tooltip("Please provide the command to use to connect");
 	ip_app_name_->value("");
 
@@ -458,7 +462,7 @@ void qso_rig::create_network(int curr_x, int curr_y) {
 	ip_port_->align(FL_ALIGN_LEFT);
 	ip_port_->callback(cb_ip_port, nullptr);
 	ip_port_->tooltip("Enter the network/USB port to use");
-	ip_port_->value(cat_data_[cat_index_]->hamlib->port_name.c_str());
+	ip_port_->value("");
 
 	curr_y += HTEXT + GAP;
 
@@ -580,7 +584,7 @@ void qso_rig::create_timeout(int curr_x, int curr_y) {
 	v_timeout_->tooltip("Set the value for timeing out the rig (0.1 to 5 s)");
 	v_timeout_->range(0.1, 5.0);
 	v_timeout_->step(0.1);
-	v_timeout_->value(cat_data_[cat_index_]->hamlib ? cat_data_[cat_index_]->hamlib->timeout : 1.0);
+	v_timeout_->value(1.0);
 
 	curr_y += HBUTTON;
 
@@ -591,7 +595,7 @@ void qso_rig::create_timeout(int curr_x, int curr_y) {
 	v_smeters_->tooltip("Set the number of s-meter samples to provide peak");
 	v_smeters_->range(1, 20);
 	v_smeters_->step(1);
-	v_smeters_->value(cat_data_[cat_index_]->hamlib ? cat_data_[cat_index_]->hamlib->num_smeters : 5);
+	v_smeters_->value(5);
 
 	curr_x += v_smeters_->w();
 	curr_y += HBUTTON + GAP;
@@ -667,7 +671,7 @@ void qso_rig::save_cat_data(qso_rig::cat_data_t* cat_data, Fl_Preferences settin
 // Save values in settings
 void qso_rig::save_values() {
 	// Read hamlib configuration - manufacturer,  model, port and baud-rate
-	if (cat_data_[cat_index_]->hamlib->port_type != RIG_PORT_NONE) {
+	if (cat_data_.size() && cat_data_[cat_index_]->hamlib->port_type != RIG_PORT_NONE) {
 		Fl_Preferences cat_settings(settings_, "CAT");
 		Fl_Preferences rig_settings(cat_settings, label());
 		rig_settings.clear();
@@ -703,8 +707,8 @@ qso_rig::rig_state_t qso_rig::rig_state() {
 
 // Enable CAT Connection widgets
 void qso_rig::enable_widgets() {
-	cat_data_t* cat_data = cat_data_[cat_index_];
-	hamlib_data_t* hamlib = cat_data->hamlib;
+	cat_data_t* cat_data = cat_data_.size() ? cat_data_[cat_index_] : nullptr;
+	hamlib_data_t* hamlib = cat_data ? cat_data->hamlib : nullptr;
 	rig_state_ = rig_state();
 	// CAT access buttons
 	switch (rig_state_) {
@@ -720,7 +724,7 @@ void qso_rig::enable_widgets() {
 		else {
 			bn_select_->label("Select");
 		}
-		if (cat_data->use_cat_app) bn_start_->activate();
+		if (cat_data && cat_data->use_cat_app) bn_start_->activate();
 		else bn_start_->deactivate();
 		break;
 	}
@@ -751,7 +755,7 @@ void qso_rig::enable_widgets() {
 		else {
 			bn_select_->label("Select");
 		}
-		if (cat_data->use_cat_app) bn_start_->activate();
+		if (cat_data && cat_data->use_cat_app) bn_start_->activate();
 		else bn_start_->deactivate();
 		break;
 	}
@@ -968,74 +972,102 @@ void qso_rig::enable_widgets() {
 		break;
 	}
 
-	// Only update these when not called by ticker
-	// Power defaults
-	switch (hamlib->power_mode) {
-	case RF_METER:
-		op_pwr_type_->value("RF Meter");
-		break;
-	case DRIVE_LEVEL:
-		op_pwr_type_->value("Drive");
-		break;
-	case MAX_POWER:
-		op_pwr_type_->value("Specify");
-		break;
-	default:
-		op_pwr_type_->value("");
-		break;
-	}
-	char text[25];
-	snprintf(text, sizeof(text), "%g", hamlib->max_power);
-	ip_max_pwr_->value(text);
-	ip_max_pwr_->user_data(&hamlib->max_power);
+	if (hamlib) {
+		// Only update these when not called by ticker
+		// Power defaults
+		op_pwr_type_->activate();
+		switch (hamlib->power_mode) {
+		case RF_METER:
+			op_pwr_type_->value("RF Meter");
+			break;
+		case DRIVE_LEVEL:
+			op_pwr_type_->value("Drive");
+			break;
+		case MAX_POWER:
+			op_pwr_type_->value("Specify");
+			break;
+		default:
+			op_pwr_type_->value("");
+			break;
+		}
+		ip_max_pwr_->activate();
+		char text[25];
+		snprintf(text, sizeof(text), "%g", hamlib->max_power);
+		ip_max_pwr_->value(text);
+		ip_max_pwr_->user_data(&hamlib->max_power);
 
-	// Fequency defaults
-	switch (hamlib->freq_mode) {
-	case VFO:
-		op_freq_type_->value("VFO");
-		break;
-	case XTAL:
-		op_freq_type_->value("Fixed");
-		break;
-	default:
-		op_freq_type_->value("");
-		break;
-	}
-	snprintf(text, sizeof(text), "%0.6f", hamlib->frequency);
-	ip_xtal_->value(text);
-	ip_xtal_->user_data(&hamlib->frequency);
+		// Fequency defaults
+		op_freq_type_->activate();
+		switch (hamlib->freq_mode) {
+		case VFO:
+			op_freq_type_->value("VFO");
+			break;
+		case XTAL:
+			op_freq_type_->value("Fixed");
+			break;
+		default:
+			op_freq_type_->value("");
+			break;
+		}
+		ip_xtal_->activate();
+		snprintf(text, sizeof(text), "%0.6f", hamlib->frequency);
+		ip_xtal_->value(text);
+		ip_xtal_->user_data(&hamlib->frequency);
 
-	bn_amplifier_->value((hamlib->accessory & AMPLIFIER) == AMPLIFIER);
-	bn_amplifier_->user_data(&hamlib->accessory);
+		bn_amplifier_->activate();
+		bn_amplifier_->value((hamlib->accessory & AMPLIFIER) == AMPLIFIER);
+		bn_amplifier_->user_data(&hamlib->accessory);
 
-	if (hamlib->accessory & AMPLIFIER) {
 		ip_gain_->activate();
-		snprintf(text, sizeof(text), "%d", hamlib->gain);
-		ip_gain_->value(text);
-		ip_gain_->user_data(&hamlib->gain);
-	}
-	else {
-		ip_gain_->deactivate();
-		ip_gain_->value("");
-	}
+		if (hamlib->accessory & AMPLIFIER) {
+			ip_gain_->activate();
+			snprintf(text, sizeof(text), "%d", hamlib->gain);
+			ip_gain_->value(text);
+			ip_gain_->user_data(&hamlib->gain);
+		}
+		else {
+			ip_gain_->deactivate();
+			ip_gain_->value("");
+		}
 
-	bn_transverter_->value((hamlib->accessory & TRANSVERTER) == TRANSVERTER);
-	bn_transverter_->user_data(&hamlib->accessory);
-	if (hamlib->accessory & TRANSVERTER) {
-		ip_offset_->activate();
-		snprintf(text, sizeof(text), "%0.6f", hamlib->freq_offset);
-		ip_offset_->value(text);
-		ip_offset_->user_data(&hamlib->freq_offset);
-		ip_tvtr_pwr_->activate();
-		snprintf(text, sizeof(text), "%g", hamlib->tvtr_power);
-		ip_tvtr_pwr_->value(text);
-		ip_tvtr_pwr_->user_data(&hamlib->tvtr_power);
+		bn_transverter_->activate();
+		bn_transverter_->value((hamlib->accessory & TRANSVERTER) == TRANSVERTER);
+		bn_transverter_->user_data(&hamlib->accessory);
+		if (hamlib->accessory & TRANSVERTER) {
+			ip_offset_->activate();
+			snprintf(text, sizeof(text), "%0.6f", hamlib->freq_offset);
+			ip_offset_->value(text);
+			ip_offset_->user_data(&hamlib->freq_offset);
+			ip_tvtr_pwr_->activate();
+			snprintf(text, sizeof(text), "%g", hamlib->tvtr_power);
+			ip_tvtr_pwr_->value(text);
+			ip_tvtr_pwr_->user_data(&hamlib->tvtr_power);
+		}
+		else {
+			ip_offset_->deactivate();
+			ip_offset_->value("");
+			ip_tvtr_pwr_->deactivate();
+			ip_tvtr_pwr_->value("");
+		}
+
+		// Timeout and S-meter tracking values
+		v_timeout_->activate();
+		v_timeout_->value(hamlib->timeout);
+		v_smeters_->activate();
+		v_smeters_->value(hamlib->num_smeters);
 	}
 	else {
+		op_pwr_type_->deactivate();
+		ip_max_pwr_->deactivate();
+		op_freq_type_->deactivate();
+		ip_xtal_->deactivate();
+		bn_amplifier_->deactivate();
+		ip_gain_->deactivate();
+		bn_transverter_->deactivate();
 		ip_offset_->deactivate();
-		ip_offset_->value("");
 		ip_tvtr_pwr_->deactivate();
-		ip_tvtr_pwr_->value("");
+		v_timeout_->deactivate();
+		v_smeters_->deactivate();
 	}
 
 	// Now use standard TAB highlighting
@@ -1108,10 +1140,12 @@ void qso_rig::populate_model_choice() {
 			snprintf(temp, 256, "%s/%s%s", mfg.c_str(), model.c_str(), status);
 			rig_list.insert(temp);
 			rig_ids[temp] = capabilities->rig_model;
-			if (string(capabilities->mfg_name) == cat_data_[cat_index_]->hamlib->mfr &&
-				string(capabilities->model_name) == cat_data_[cat_index_]->hamlib->model) {
-				cat_data_[cat_index_]->hamlib->model_id = capabilities->rig_model;
-				cat_data_[cat_index_]->hamlib->port_type = capabilities->port_type;
+			if (cat_data_.size()) {
+				if (string(capabilities->mfg_name) == cat_data_[cat_index_]->hamlib->mfr &&
+					string(capabilities->model_name) == cat_data_[cat_index_]->hamlib->model) {
+					cat_data_[cat_index_]->hamlib->model_id = capabilities->rig_model;
+					cat_data_[cat_index_]->hamlib->port_type = capabilities->port_type;
+				}
 			}
 		}
 	}
@@ -1123,7 +1157,7 @@ void qso_rig::populate_model_choice() {
 		rig_model_t id = rig_ids.at(name);
 		// Add the id as user data for the menu item
 		int pos = ch_rig_model_->add(name.c_str(), 0, nullptr, (void*)(intptr_t)id);
-		if (id == cat_data_[cat_index_]->hamlib->model_id) {
+		if (cat_data_.size() && id == cat_data_[cat_index_]->hamlib->model_id) {
 			ch_rig_model_->value(pos);
 		}
 	}
@@ -1132,7 +1166,7 @@ void qso_rig::populate_model_choice() {
 
 // Populate the choice with the available ports
 void qso_rig::populate_port_choice() {
-	if (cat_data_[cat_index_]->hamlib->port_type == RIG_PORT_SERIAL) {
+	if (cat_data_.size() && cat_data_[cat_index_]->hamlib->port_type == RIG_PORT_SERIAL) {
 		ch_port_name_->clear();
 		ch_port_name_->add("NONE");
 		ch_port_name_->value(0);
@@ -1162,7 +1196,7 @@ void qso_rig::populate_port_choice() {
 
 // Populate the baud rate choice menu
 void qso_rig::populate_baud_choice() {
-	if (cat_data_[cat_index_]->hamlib->port_type == RIG_PORT_SERIAL) {
+	if (cat_data_.size() && cat_data_[cat_index_]->hamlib->port_type == RIG_PORT_SERIAL) {
 		ch_baud_rate_->clear();
 		// Override rig's capabilities?
 		bn_all_rates_->value(use_all_rates_);
@@ -1413,7 +1447,7 @@ void qso_rig::switch_rig() {
 	if (rig_) {
 		delete rig_;
 		rig_ = nullptr;
-		rig_ = new rig_if(label(), cat_data_[cat_index_]->hamlib);
+		rig_ = new rig_if(label(), cat_data_.size() ?  cat_data_[cat_index_]->hamlib : nullptr);
 		modify_hamlib_data();
 	}
 	ancestor_view<qso_manager>(this)->update_rig();
@@ -1441,7 +1475,8 @@ void qso_rig::cb_ticker(void* v) {
 
 // New rig 
 void qso_rig::new_rig() {
-	mode_ = (uint16_t)cat_data_[cat_index_]->hamlib->port_type;
+	if (cat_data_.size()) mode_ = (uint16_t)cat_data_[cat_index_]->hamlib->port_type;
+	else mode_ = RIG_PORT_NONE;
 	enable_widgets();
 }
 
