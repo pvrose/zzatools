@@ -28,6 +28,12 @@ class Fl_Preferences;
 
 const int NUMBER_RIG_APPS = 2;
 const string RIG_APP_NAMES[NUMBER_RIG_APPS] = { "FLRig", "NET rigctl" };
+// Bit-wise flags for redarwing qso_rig
+const uchar DAMAGE_STATUS = 1;
+const uchar DAMAGE_VALUES = 2;
+const uchar DAMAGE_ADDONS = 4;
+const uchar DAMAGE_ALL = 0xFF;
+
 
 // Displays and controls the status of a single rig connection
 // Controls c
@@ -46,7 +52,7 @@ public:
 	// Create form
 	void create_form(int X, int Y);
 	// Enable widgets
-	void enable_widgets();
+	void enable_widgets(uchar damage);
 	// Save changes
 	void save_values();
 	// Switch the rig on or off
