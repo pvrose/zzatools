@@ -38,7 +38,8 @@ extern ticker* ticker_;
 qso_rig::qso_rig(int X, int Y, int W, int H, const char* L) :
 	Fl_Group(X, Y, W, H, nullptr),
 	rig_ok_(false),
-	rig_state_(NO_RIG)
+	rig_state_(NO_RIG),
+	cat_index_(-1)
 {
 	// If no name is provided then get from qso_manager
 	if (L == nullptr || strlen(L) == 0) copy_label(ancestor_view<qso_manager>(this)->get_default(qso_manager::RIG).c_str());
@@ -139,35 +140,27 @@ void qso_rig::load_values() {
 	Fl_Preferences cat_settings(settings_, "CAT");
 	if (cat_settings.groupExists(label())) {
 		Fl_Preferences rig_settings(cat_settings, label());
-		int max_cat = rig_settings.groups();
-		if (max_cat > 0) cat_data_.resize(max_cat);
-		else cat_data_.resize(1);
-		if (max_cat != 0) {
-			for (int ix = 0; ix < max_cat; ix++) {
-				cat_data_t* data = new cat_data_t;
-				data->hamlib = new hamlib_data_t;
-				char g[5];
-				snprintf(g, sizeof(g), "%d", ix);
-				Fl_Preferences cat_settings(rig_settings, g);
-				load_cat_data(data, cat_settings);
-				cat_data_[ix] = data;
-			}
-		}
-		else {
+		for (int ix = 0; ix < rig_settings.groups(); ix++) {
 			cat_data_t* data = new cat_data_t;
 			data->hamlib = new hamlib_data_t;
-			load_cat_data(data, rig_settings);
-			cat_data_[0] = data;
+			char g[5];
+			snprintf(g, sizeof(g), "%d", ix);
+			Fl_Preferences cat_settings(rig_settings, g);
+			load_cat_data(data, cat_settings);
+			cat_data_.push_back(data);
 		}
 		char* temp;
 		// Get default cat type
-		rig_settings.get("Default CAT", cat_index_, 0);
+		rig_settings.get("Default CAT", cat_index_, cat_index_);
+		if (cat_index_ >= cat_data_.size()) cat_index_ = cat_data_.size() - 1;
 		// Preferred antenna
 		rig_settings.get("Antenna", temp, "");
 		antenna_ = temp;
 		free(temp);
 
-		mode_ = (uint16_t)cat_data_[cat_index_]->hamlib->port_type;
+		mode_ = cat_data_.size() ? 
+			(uint16_t)cat_data_[cat_index_]->hamlib->port_type :
+			(uint16_t)RIG_PORT_NONE;
 	}
 	else {
 		// New hamlib data
@@ -671,25 +664,23 @@ void qso_rig::save_cat_data(qso_rig::cat_data_t* cat_data, Fl_Preferences settin
 // Save values in settings
 void qso_rig::save_values() {
 	// Read hamlib configuration - manufacturer,  model, port and baud-rate
+	Fl_Preferences cat_settings(settings_, "CAT");
 	if (cat_data_.size()) {
-		Fl_Preferences cat_settings(settings_, "CAT");
 		Fl_Preferences rig_settings(cat_settings, label());
 		rig_settings.clear();
-		if (cat_data_.size() > 1) {
-			for (int ix = 0; ix < cat_data_.size(); ix++) {
-				char g[5];
-				snprintf(g, sizeof(g), "%d", ix);
-				Fl_Preferences cat_settings(rig_settings, g);
-				save_cat_data(cat_data_[ix], cat_settings);
-			}
-		}
-		else {
-			save_cat_data(cat_data_[0], rig_settings);
+		for (int ix = 0; ix < cat_data_.size(); ix++) {
+			char g[5];
+			snprintf(g, sizeof(g), "%d", ix);
+			Fl_Preferences cat_type_settings(rig_settings, g);
+			save_cat_data(cat_data_[ix], cat_type_settings);
 		}
 		rig_settings.set("Default CAT", cat_index_);
 		// Preferred antenna
 		rig_settings.set("Antenna", antenna_.c_str());
 		settings_->flush();
+	} else {
+		// Remove this rig from the settings file
+		cat_settings.delete_group(label());
 	}
 }
 
@@ -1242,8 +1233,8 @@ void qso_rig::populate_baud_choice() {
 // Populate the cat select drop-down menu
 void qso_rig::populate_index_menu() {
 	bn_index_->clear();
-	// Add a menu item for each CAT if more than 1
-	if (cat_data_.size() > 1) {
+	// Add a menu item for each cat item
+	if (cat_data_.size()) {
 		for (int ix = 0; ix < cat_data_.size(); ix++) {
 			char l[5];
 			snprintf(l, sizeof(l), "CAT%d", ix + 1);
@@ -1252,6 +1243,10 @@ void qso_rig::populate_index_menu() {
 	}
 	// Add a menu item to add a new CAT
 	bn_index_->add("New", 0, cb_new_cat);
+	// Add a menu item to remove a CAT method
+	if (cat_data_.size()) {
+		bn_index_->add("Delete", 0, cb_del_cat);
+	}
 }
 
 // Model input choice selected
@@ -1432,6 +1427,18 @@ void qso_rig::cb_new_cat(Fl_Widget* w, void* v) {
 	cat_data_t* data = new cat_data_t;
 	data->hamlib = new hamlib_data_t;
 	that->cat_data_.push_back(data);
+	that->cat_index_ = that->cat_data_.size() - 1;
+	that->populate_index_menu();
+	that->switch_rig();
+}
+
+// Remove a CAT
+void qso_rig::cb_del_cat(Fl_Widget* w, void* v) {
+	qso_rig* that = ancestor_view<qso_rig>(w);
+	that->cat_data_.erase(that->cat_data_.begin() + that->cat_index_);
+	if (that->cat_index_ >= that->cat_data_.size()) {
+		that->cat_index_ = that->cat_data_.size() - 1;
+	}
 	that->populate_index_menu();
 	that->switch_rig();
 }

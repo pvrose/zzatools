@@ -118,7 +118,10 @@ protected:
 	static void cb_timeout(Fl_Widget* w, void* v);
 	// CAT index menu items
 	static void cb_select_cat(Fl_Widget* w, void* v);
+	// Add a new CAT method
 	static void cb_new_cat(Fl_Widget* w, void* v);
+	// Delete current CAT method
+	static void cb_del_cat(Fl_Widget* w, void* v);
 	// S-meter peak smapling
 	static void cb_smeters(Fl_Widget* w, void* v);
 
