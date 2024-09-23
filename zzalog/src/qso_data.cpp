@@ -663,6 +663,7 @@ qso_num_t qso_data::get_default_number() {
 	case QUERY_NEW:
 	case QUERY_WSJTX:
 	case QSO_VIEW:
+	case MANUAL_ENTRY:
 		return book_->selection();
 	case QSO_PENDING:
 	case QSO_STARTED:
@@ -1516,12 +1517,9 @@ void qso_data::action_exec_query() {
 	if (extract_records_->size()) {
 		snprintf(msg, sizeof(msg), "DASH: %zu matching records found", extract_records_->size());
 		status_->misc_status(ST_NOTE, msg);
-		logging_state_ = QSO_EDIT;
 		// Display the first record
-		g_entry_->qso(extract_records_->record_number(0));
-		g_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
-		g_misc_->qso(current_qso(), current_number());
-		enable_widgets();
+		book_->selection(extract_records_->record_number(0), HT_IGNORE);
+		action_edit();
 	}
 	else {
 		snprintf(msg, sizeof(msg), "DASH: No matching records found - try import");
