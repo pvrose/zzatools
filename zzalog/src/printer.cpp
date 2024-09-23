@@ -340,7 +340,7 @@ int printer::print_page_cards(size_t &item_num) {
 			int imagex = cwin_x_ + ((card % card_data_->columns) * card_data_->width);
 			int imagey = cwin_y_ + (((card / card_data_->columns) % card_data_->rows) * card_data_->height);
 			qsl_display* qsl = new qsl_display(imagex, imagey);
-			qsl->value(records[0]->item("STATION_CALLSIGN"), records, print_records);
+			qsl->value(records[0]->item("STATION_CALLSIGN"), qsl_display::LABEL, records, print_records);
 
 			item_num += print_records;
 			num_records -= print_records;
@@ -355,7 +355,8 @@ int printer::print_page_cards(size_t &item_num) {
 // Get the various dimensions of the card page 
 int printer::card_properties() {
 	string callsign = qso_manager_->get_default(qso_manager::CALLSIGN);
-	card_data_ = qsl_display::data(callsign);
+	qsl_display* qsl = new qsl_display();
+	card_data_ = qsl->data(callsign, qsl_display::LABEL);
 	
 	items_per_page_ = card_data_->rows * card_data_->columns;
 	int top_margin = 0;

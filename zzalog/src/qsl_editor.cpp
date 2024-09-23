@@ -36,10 +36,9 @@ qsl_editor::qsl_editor(int X, int Y, int W, int H, const char* L) :
     load_values();
 	// Create the qsl_display instance
 	qsl_ = new qsl_display;
-	qsl_->load_data(callsign_);
 	create_display();
 	// Load the display settings for this callsign
-    qsl_->value(callsign_);
+    qsl_->value(callsign_, qsl_display::LABEL);
 	// We shall be editing the display
     qsl_->editable(true);
 
@@ -97,7 +96,7 @@ void qsl_editor::create_form(int X, int Y) {
     int max_x;
 
 	// Get any existing data for this callsign
-	qsl_display::card_data* data = qsl_display::data(callsign_);
+	qsl_display::card_data* data = qsl_->data(callsign_, qsl_display::LABEL);
 
 	// Group 1: Template file
     g_1_ = new Fl_Group(curr_x, curr_y, 100, 100, "Template File");
@@ -385,7 +384,7 @@ void qsl_editor::create_items() {
 	Fl_Group::current(g_4_);
 
 	// Get the card data for this callsign
-	qsl_display::card_data* data = qsl_display::data(callsign_);
+	qsl_display::card_data* data = qsl_->data(callsign_, qsl_display::LABEL);
 
 	// Group 4.2 - New item (NB group ordering has changes 4.2 is before 4.1)
 	Fl_Group* g_402 = new Fl_Group(save_x + WLABEL, curr_y, 100, HBUTTON);
@@ -733,7 +732,7 @@ void qsl_editor::redraw_display() {
 
 // Update the size widget
 void qsl_editor::update_size() {
-	qsl_display::card_data* data = qsl_display::data(callsign_);
+	qsl_display::card_data* data = qsl_->data(callsign_, qsl_display::LABEL);
 	char temp[64];
 	int pw;
 	int ph;
@@ -767,7 +766,7 @@ void qsl_editor::enable_widgets() {
 // Call back when a radio button is pressed - v indicates which button
 void qsl_editor::cb_radio_dim(Fl_Widget* w, void* v) {
 	qsl_editor* that = ancestor_view<qsl_editor>(w);
-	qsl_display::data(that->callsign_)->unit = ((qsl_display::dim_unit)(intptr_t)v);
+	that->qsl_->data(that->callsign_, qsl_display::LABEL)->unit = ((qsl_display::dim_unit)(intptr_t)v);
     that->redraw_display();
 }
 
@@ -825,8 +824,8 @@ void qsl_editor::cb_ip_bool(Fl_Widget* w, void* v) {
 void qsl_editor::cb_callsign(Fl_Widget* w, void* v) {
     qsl_editor* that = ancestor_view<qsl_editor>(w);
     cb_value<field_input, string>(w, v);
-	that->qsl_->value(that->callsign_);
-	qsl_display::card_data* data = that->qsl_->data(that->callsign_);
+	that->qsl_->value(that->callsign_, qsl_display::LABEL);
+	qsl_display::card_data* data = that->qsl_->data(that->callsign_, qsl_display::LABEL);
 	that->filedata_.filename = &(data->filename);
 	that->ip_filename_->value(data->filename.c_str());
 	that->ip_filename_->user_data(&data->filename);
@@ -850,7 +849,7 @@ void qsl_editor::cb_filename(Fl_Widget* w, void* v) {
     qsl_editor* that = ancestor_view<qsl_editor>(w);
 	cb_value<Fl_Input, string>(w, v);
 	that->save_values();
-	that->qsl_->value(that->callsign_);
+	that->qsl_->value(that->callsign_, qsl_display::LABEL);
 	that->redraw_display();
 	that->create_items();
 	that->redraw();
@@ -875,9 +874,9 @@ void qsl_editor::cb_new_item(Fl_Widget* w, void* v) {
 	qsl_display::item_def* item = new qsl_display::item_def();
 	item->type = (qsl_display::item_type)ch->value();
 	if (item->type == qsl_display::IMAGE) {
-		item->image.filename = that->qsl_->data(that->callsign_)->filename;
+		item->image.filename = that->qsl_->data(that->callsign_, qsl_display::LABEL)->filename;
 	}
-	qsl_display::data(that->callsign_)->items.push_back(item);
+	that->qsl_->data(that->callsign_, qsl_display::LABEL)->items.push_back(item);
 	that->redraw_display();
 	that->create_items();
 }
@@ -886,7 +885,7 @@ void qsl_editor::cb_new_item(Fl_Widget* w, void* v) {
 void qsl_editor::cb_image(Fl_Widget* w, void* v) {
 	qsl_display::image_def& image = *(qsl_display::image_def*)v;
 	qsl_editor* that = ancestor_view<qsl_editor>(w);
-	qsl_display::card_data* data = that->qsl_->data(that->callsign_);
+	qsl_display::card_data* data = that->qsl_->data(that->callsign_, qsl_display::LABEL);
 	cb_value<Fl_Input, string>(w, &image.filename);
 	image.image = that->qsl_->get_image(image.filename);
 

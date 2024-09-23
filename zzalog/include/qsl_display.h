@@ -28,7 +28,7 @@ class qsl_display
     // FIELD: A field taken from the QSO record
     // TEXT: Justa  textual comment on the QSL card
     // IMAGE: An image to be printed on the card
-    enum item_type {
+    enum item_type : uchar {
         NONE,   // Used to mark an item for removal
         FIELD,  // Draw the field text and its label
         TEXT,   // Draw the quoted 
@@ -86,14 +86,20 @@ class qsl_display
     };
 
     // Units of measurement
-    enum dim_unit {
+    enum dim_unit : uchar {
         INCH,       // = 25.4 mm
         MILLIMETER,
         POINT       // = 1/72 in.
     };
 
+    // Type of display
+    enum qsl_type : uchar {
+        LABEL,              // Display/print on a label
+        FILE                // Display/print to PDF
+    };
+
     // Date format
-    enum date_format {
+    enum date_format : uchar {
         FMT_Y4MD_ADIF,     // 20240618
         FMT_Y4MD,          // 2024/06/18
         FMT_Y2MD,          // 24/06/18
@@ -102,7 +108,7 @@ class qsl_display
     };
 
     // Time format
-    enum time_format {
+    enum time_format : uchar {
         FMT_HMS_ADIF,      // 171033
         FMT_HMS,           // 17:10:33
         FMT_HM_ADIF,       // 1710
@@ -134,14 +140,12 @@ class qsl_display
     ~qsl_display();
 
     // Load data
-    static void load_data(string callsign);
+    void load_data(string callsign, qsl_type type);
     // Save data
     void save_data();
-    // Load items
-    void load_items();
 
     // Set the callsign to be used and the records to include in the label
-    void value(string callsign, record** qsos = nullptr, int num_records = 0);
+    void value(string callsign, qsl_type type, record** qsos = nullptr, int num_records = 0);
     // Short-cut version of above with one QSO and callsign to be taken from it
     void example_qso(record* qso);
     // Overide the Fl_Group::draw() to impelment the drawing.
@@ -154,10 +158,10 @@ class qsl_display
     void dirty();
 
     // Pointer to the data for editor to use
-    static card_data* data(string callsign);
+    card_data* data(string callsign, qsl_type type);
 
     // Get the image at that filename
-    static Fl_Image* get_image(string filename);
+    Fl_Image* get_image(string filename);
 
     // Return the drawn image
     Fl_RGB_Image* image();
@@ -181,10 +185,6 @@ class qsl_display
     // Convert to points
     int to_points(float value);
     
-
-    // Drawing data for all callsigns - needs to be static to access the 
-    // label size data outwith a specific instance of the drawing 
-    static map<string, card_data> all_data_;
     // Drawing data for the current instance
     card_data* data_;
     // The array of QSOs to be displayed on the card
@@ -195,6 +195,8 @@ class qsl_display
     bool editable_;
     // Callsign
     string callsign_;
+    // QSL type
+    qsl_type type_;
     // Positions to use if dx or dy are -1
     int next_x_;
     int next_y_;

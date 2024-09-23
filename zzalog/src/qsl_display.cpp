@@ -21,9 +21,6 @@ extern status* status_;
 extern Fl_Preferences* settings_;
 // Dynamically drawn QSL card label
 
-// Static data item containing all card parameters
-map<string, qsl_display::card_data> qsl_display::all_data_;
-
 // Constructor - just initialises the data
 qsl_display::qsl_display()
 {
@@ -34,6 +31,7 @@ qsl_display::qsl_display()
 	dirty_data_ = false;
 	image_ = nullptr;
 	draw_direct_ = false;
+	data_ = nullptr;
 	x_ = 0;
 	y_ = 0;
 }
@@ -54,16 +52,10 @@ qsl_display::~qsl_display() {
 
 // Set the callsign whose card design to display and 
 // Any QSOs to include in it.
-void qsl_display::value(string callsign, record** qsos, int num_records) {
+void qsl_display::value(string callsign, qsl_type type, record** qsos, int num_records) {
     qsos_ = qsos;
     num_records_ = num_records;
-    callsign_ = callsign;
-	// If we haven't loaded data for the callsign yet, do it now
-    if (all_data_.find(callsign) == all_data_.end()) {
-		load_data(callsign);
-	}
-	// Select the data for this callsign
-	data_ = &all_data_.at(callsign);
+	load_data(callsign, type);
 	w_ = to_points(data_->width);
 	h_ = to_points(data_->height);
 	// draw the image
@@ -315,54 +307,76 @@ int qsl_display::to_points(float value) {
 }
 
 // Load data
-void qsl_display::load_data(string callsign) {
-	card_data* data = &(all_data_[callsign]);
+void qsl_display::load_data(string callsign, qsl_display::qsl_type type) {
+	// Don't load data if it's alrteady loaded
+	if (callsign_ == callsign && type_ == type) return;
+	callsign_ = callsign;
+	type_ = type;
+	if (data_) {
+		delete data_;
+	}
+	data_ = new card_data;
 	Fl_Preferences qsl_settings(settings_, "QSL Design");
 	char* temp;
-	Fl_Preferences call_settings(qsl_settings, callsign.c_str());
-	// Get the card label data for this callsign
-	call_settings.get("Width", data->width, 0);
-	call_settings.get("Height", data->height, 0);
-	call_settings.get("Unit", (int&)data->unit, (int)MILLIMETER);
-	call_settings.get("Number Rows", data->rows, 4);
-	call_settings.get("Number Columns", data->columns, 2);
-	call_settings.get("Column Width", data->col_width, 101.6);
-	call_settings.get("Row Height", data->row_height, 67.7);
-	call_settings.get("First Row", data->row_top, 12.9);
-	call_settings.get("First Column", data->col_left, 4.6);
-	call_settings.get("Max QSOs per Card", data->max_qsos, 1);
-	call_settings.get("Date Format", (int&)data->f_date, FMT_Y4MD_ADIF);
-	call_settings.get("Time Format", (int&)data->f_time, FMT_HMS_ADIF);
+	char group_name[64];
+	if (type == LABEL && qsl_settings.group_exists("Label")) {
+		// We have already created the group "Label" - use it
+		strcpy(group_name, "Label/");
+		strcat(group_name, callsign.c_str());
+	}
+	else if (type == LABEL) {
+		// Default to not havoing the "Label" group layer
+		strcpy(group_name, callsign.c_str());
+	}
+	else {
+		// Always need the group "PDF"
+		strcpy(group_name, "PDF/");
+		strcat(group_name, callsign.c_str());
+	}
+	Fl_Preferences call_settings(qsl_settings, group_name);
+	// Get the card label data_ for this callsign
+	call_settings.get("Width", data_->width, 0);
+	call_settings.get("Height", data_->height, 0);
+	call_settings.get("Unit", (int&)data_->unit, (int)MILLIMETER);
+	call_settings.get("Number Rows", data_->rows, 4);
+	call_settings.get("Number Columns", data_->columns, 2);
+	call_settings.get("Column Width", data_->col_width, 101.6);
+	call_settings.get("Row Height", data_->row_height, 67.7);
+	call_settings.get("First Row", data_->row_top, 12.9);
+	call_settings.get("First Column", data_->col_left, 4.6);
+	call_settings.get("Max QSOs per Card", data_->max_qsos, 1);
+	call_settings.get("Date Format", (int&)data_->f_date, FMT_Y4MD_ADIF);
+	call_settings.get("Time Format", (int&)data_->f_time, FMT_HMS_ADIF);
 	call_settings.get("Card Design", temp, "");
-	data->filename = temp;
+	data_->filename = temp;
 	free(temp);
 	// Check it's a TSV file
-	size_t pos = data->filename.find_last_of('.');
-	if (pos == string::npos || data->filename.substr(pos) != ".tsv") {
+	size_t pos = data_->filename.find_last_of('.');
+	if (pos == string::npos || data_->filename.substr(pos) != ".tsv") {
 		// Not a TSV file (or no filename)
 		char msg[256];
-		snprintf(msg, sizeof(msg), "QSL: Invalid filename %s - setting to no value", data->filename.c_str());
+		snprintf(msg, sizeof(msg), "QSL: Invalid filename %s - setting to no value", data_->filename.c_str());
 		status_->misc_status(ST_WARNING, msg);
-		data->filename = "";
+		data_->filename = "";
 	}
-	// Minimum data required
-	if (data->width == 0 || data->height == 0 || data->filename.length() == 0) {
-		// We have either width or height not defined - so load the edfault data
+	// Minimum data_ required
+	if (data_->width == 0 || data_->height == 0 || data_->filename.length() == 0) {
+		// We have either width or height not defined - so load the edfault data_
 		char msg[256];
-		snprintf(msg, sizeof(msg), "QSL: Incorrect info W=%g, H=%g, File=%s", data->width, data->height, data->filename.c_str());
+		snprintf(msg, sizeof(msg), "QSL: Incorrect info W=%g, H=%g, File=%s", data_->width, data_->height, data_->filename.c_str());
 		status_->misc_status(ST_ERROR, msg);
-		data->items.clear();
+		data_->items.clear();
 		// Default width and height if zero
-		if (data->width == 0) data->width = data->col_width;
-		if (data->height == 0) data->height = data->row_height;
+		if (data_->width == 0) data_->width = data_->col_width;
+		if (data_->height == 0) data_->height = data_->row_height;
 	} else {
 		// Data looks good so far
 		char msg[100];
-		snprintf(msg, sizeof(msg), "QSL: Reading card image data from %s", data->filename.c_str());
-		data->items.clear();
+		snprintf(msg, sizeof(msg), "QSL: Reading card image data_ from %s", data_->filename.c_str());
+		data_->items.clear();
 		status_->misc_status(ST_LOG, msg);
 		ifstream ip;
-		ip.open(data->filename.c_str(), fstream::in);
+		ip.open(data_->filename.c_str(), fstream::in);
 		string line;
 		vector<string> words;
 		// For each line in the file.. 
@@ -371,12 +385,12 @@ void qsl_display::load_data(string callsign) {
 			// Split lines on the 'tab' character
 			split_line(line, words, '\t');
 			if (words.size() > 1 && (item_type)stoi(words[0]) != NONE) {
-				// The line probably contains good data
+				// The line probably contains good data_
 				qsl_display::item_def* item = new qsl_display::item_def;
 				item->type = (item_type)stoi(words[0]);
 				switch(item->type) {
 				case FIELD: {
-					// Line contains a single field item data
+					// Line contains a single field item data_
 					if (words.size() >= 15) {
 						item->field.field = words[1];
 						item->field.label = words[2];
@@ -396,7 +410,7 @@ void qsl_display::load_data(string callsign) {
 					break;
 				}
 				case TEXT: {
-					// A line contains a single text item data
+					// A line contains a single text item data_
 					if (words.size() >= 7) {
 						item->text.text = words[1];
 						item->text.t_style.font = (Fl_Font)stoi(words[2]);
@@ -408,26 +422,26 @@ void qsl_display::load_data(string callsign) {
 					break;
 				}
 				case IMAGE: {
-					// A line contains a single image item data (except actual image data)
+					// A line contains a single image item data_ (except actual image data_)
 					if (words.size() >= 4) {
 						if (directory(words[1]) == "")
-							item->image.filename = directory(data->filename) + '/' + words[1];
+							item->image.filename = directory(data_->filename) + '/' + words[1];
 						else 
 							item->image.filename = words[1];
 						item->image.dx = stoi(words[2]);
 						item->image.dy = stoi(words[3]);
-						// Load  the image data from the named file into the data structure
+						// Load  the image data_ from the named file into the data_ structure
 						item->image.image = get_image(item->image.filename);
 					}
 					break;
 				}
 				}
-				// Add the item's data to the data structure
-				data->items.push_back(item);
+				// Add the item's data_ to the data_ structure
+				data_->items.push_back(item);
 			}
 		}
 		ip.close();
-		snprintf(msg, sizeof(msg), "QSL: %zd items read from %s", data->items.size(), data->filename.c_str());
+		snprintf(msg, sizeof(msg), "QSL: %zd items read from %s", data_->items.size(), data_->filename.c_str());
 		status_->misc_status(ST_OK, msg);
 	}
 }
@@ -435,7 +449,17 @@ void qsl_display::load_data(string callsign) {
 // Save the data for the current callsign
 void qsl_display::save_data() {
 	Fl_Preferences qsl_settings(settings_, "QSL Design");
-	Fl_Preferences call_settings(qsl_settings, callsign_.c_str());
+	char type_name[32];
+	switch (type_) {
+	case LABEL:
+		strcpy(type_name, "Label");
+		break;
+	case FILE:
+		strcpy(type_name, "PDF");
+		break;
+	}
+	Fl_Preferences type_settings(qsl_settings, type_name);
+	Fl_Preferences call_settings(type_settings, callsign_.c_str());
 	// SAve the card label parameters
 	call_settings.set("Width", data_->width);
 	call_settings.set("Height", data_->height);
@@ -513,12 +537,12 @@ void qsl_display::save_data() {
 }
 
 // Get a pointer to the card drawing data for the specified callsign
-qsl_display::card_data* qsl_display::data(string callsign) {
+qsl_display::card_data* qsl_display::data(string callsign, qsl_type type) {
 	// If it hasn't been loaded, do so.
-	if (all_data_.find(callsign) == all_data_.end()) {
-		load_data(callsign);
+	if (callsign != callsign_ || type != type_) {
+		load_data(callsign, type);
 	}
-	return &all_data_.at(callsign);
+	return data_;
 }
 
 // Read the image data from the specified filename
