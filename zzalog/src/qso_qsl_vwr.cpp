@@ -108,31 +108,66 @@ void qso_qsl_vwr::create_form() {
 	curr_x = x() + GAP;
 
 	// Row header
-	Fl_Box* label1 = new Fl_Box(curr_x, curr_y, WSMEDIT, HTEXT, "QSL received...");
+	Fl_Box* label1 = new Fl_Box(curr_x, curr_y, WSMEDIT, HRADIO, "QSL status..");
 	label1->box(FL_FLAT_BOX);
 	label1->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
 	label1->color(FL_BACKGROUND_COLOR);
 
 	curr_y += HTEXT;
 	curr_x = x() + GAP;
+
+	Fl_Box* label1A = new Fl_Box(curr_x, curr_y, WRADIO, HRADIO, "R");
+	label1A->box(FL_FLAT_BOX);
+	label1A->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
+	label1A->color(FL_BACKGROUND_COLOR);
+
+	curr_x += WRADIO;
+
 	// Light to indicate received eQSL
-	bn_eqsl_status_ = new Fl_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "eQSL");
-	bn_eqsl_status_->box(FL_FLAT_BOX);
-	bn_eqsl_status_->type(bn_eqsl_status_->type() & ~FL_TOGGLE_BUTTON);
+	bn_eqsl_rstatus_ = new Fl_Light_Button(curr_x, curr_y, WBUTTON, HRADIO, "eQSL");
+	bn_eqsl_rstatus_->box(FL_FLAT_BOX);
+	bn_eqsl_rstatus_->type(bn_eqsl_rstatus_->type() & ~FL_TOGGLE_BUTTON);
 
 	curr_x += WBUTTON;
 	// Light to indicate received LotW
-	bn_lotw_status_ = new Fl_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "LotW");
-	bn_lotw_status_->box(FL_FLAT_BOX);
-	bn_lotw_status_->type(bn_lotw_status_->type() & ~FL_TOGGLE_BUTTON);
+	bn_lotw_rstatus_ = new Fl_Light_Button(curr_x, curr_y, WBUTTON, HRADIO, "LotW");
+	bn_lotw_rstatus_->box(FL_FLAT_BOX);
+	bn_lotw_rstatus_->type(bn_lotw_rstatus_->type() & ~FL_TOGGLE_BUTTON);
 
 	curr_x += WBUTTON;
 	// Light to indicate received a paper card
-	bn_card_status_ = new Fl_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Card");
-	bn_card_status_->box(FL_FLAT_BOX);
-	bn_card_status_->type(bn_card_status_->type() & ~FL_TOGGLE_BUTTON);
+	bn_card_rstatus_ = new Fl_Light_Button(curr_x, curr_y, WBUTTON, HRADIO, "Card");
+	bn_card_rstatus_->box(FL_FLAT_BOX);
+	bn_card_rstatus_->type(bn_card_rstatus_->type() & ~FL_TOGGLE_BUTTON);
 
-	curr_y += HBUTTON;
+	curr_y += HRADIO;
+	curr_x = x() + GAP;
+
+	Fl_Box* label1B = new Fl_Box(curr_x, curr_y, WRADIO, HRADIO, "S");
+	label1B->box(FL_FLAT_BOX);
+	label1B->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
+	label1B->color(FL_BACKGROUND_COLOR);
+
+	curr_x += WRADIO;
+
+	// Light to indicate received eQSL
+	bn_eqsl_sstatus_ = new Fl_Light_Button(curr_x, curr_y, WBUTTON, HRADIO, "eQSL");
+	bn_eqsl_sstatus_->box(FL_FLAT_BOX);
+	bn_eqsl_sstatus_->type(bn_eqsl_sstatus_->type() & ~FL_TOGGLE_BUTTON);
+
+	curr_x += WBUTTON;
+	// Light to indicate received LotW
+	bn_lotw_sstatus_ = new Fl_Light_Button(curr_x, curr_y, WBUTTON, HRADIO, "LotW");
+	bn_lotw_sstatus_->box(FL_FLAT_BOX);
+	bn_lotw_sstatus_->type(bn_lotw_sstatus_->type() & ~FL_TOGGLE_BUTTON);
+
+	curr_x += WBUTTON;
+	// Light to indicate received a paper card
+	bn_card_sstatus_ = new Fl_Light_Button(curr_x, curr_y, WBUTTON, HRADIO, "Card");
+	bn_card_sstatus_->box(FL_FLAT_BOX);
+	bn_card_sstatus_->type(bn_card_sstatus_->type() & ~FL_TOGGLE_BUTTON);
+
+	curr_y += HRADIO;
 	curr_x = x() + GAP;
 
 	// Row header
@@ -787,33 +822,68 @@ void qso_qsl_vwr::set_selected_image(image_t value) {
 void qso_qsl_vwr::set_qsl_status() {
 	if (current_qso_) {
 		if (current_qso_->item("EQSL_QSL_RCVD") == "Y") {
-			bn_eqsl_status_->value(true);
+			bn_eqsl_rstatus_->value(true);
 		}
 		else {
-			bn_eqsl_status_->value(false);
+			bn_eqsl_rstatus_->value(false);
 		}
 		if (current_qso_->item("LOTW_QSL_RCVD") == "Y") {
-			bn_lotw_status_->value(true);
+			bn_lotw_rstatus_->value(true);
 		}
 		else {
-			bn_lotw_status_->value(false);
+			bn_lotw_rstatus_->value(false);
 		}
 		if (current_qso_->item("QSL_RCVD") == "Y") {
-			bn_card_status_->value(true);
+			bn_card_rstatus_->value(true);
 			string s = current_qso_->item("QSL_RCVD_VIA");
 			if (s == "B") {
-				bn_card_status_->label("Bureau");
-			} else if (s == "D") {
-				bn_card_status_->label("Direct");
-			} else if (s == "E") {
-				bn_card_status_->label("e-mail");
-			} else {
-				bn_card_status_->label("Card");
+				bn_card_rstatus_->label("Bureau");
+			}
+			else if (s == "D") {
+				bn_card_rstatus_->label("Direct");
+			}
+			else if (s == "E") {
+				bn_card_rstatus_->label("e-mail");
+			}
+			else {
+				bn_card_rstatus_->label("Card");
 			}
 		}
 		else {
-			bn_card_status_->value(false);
-			bn_card_status_->label("Card");
+			bn_card_rstatus_->value(false);
+			bn_card_rstatus_->label("Card");
+		}
+		if (current_qso_->item("EQSL_QSL_SENT") == "Y") {
+			bn_eqsl_sstatus_->value(true);
+		}
+		else {
+			bn_eqsl_sstatus_->value(false);
+		}
+		if (current_qso_->item("LOTW_QSL_SENT") == "Y") {
+			bn_lotw_sstatus_->value(true);
+		}
+		else {
+			bn_lotw_sstatus_->value(false);
+		}
+		if (current_qso_->item("QSL_SENT") == "Y") {
+			bn_card_sstatus_->value(true);
+			string s = current_qso_->item("QSL_SENT_VIA");
+			if (s == "B") {
+				bn_card_sstatus_->label("Bureau");
+			}
+			else if (s == "D") {
+				bn_card_sstatus_->label("Direct");
+			}
+			else if (s == "E") {
+				bn_card_sstatus_->label("e-mail");
+			}
+			else {
+				bn_card_sstatus_->label("Card");
+			}
+		}
+		else {
+			bn_card_sstatus_->value(false);
+			bn_card_sstatus_->label("Card");
 		}
 	}
 }

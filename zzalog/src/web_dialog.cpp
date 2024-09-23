@@ -207,7 +207,7 @@ void web_dialog::create_eqsl(int rx, int ry, int rw, int rh) {
 	const int W6 = HBUTTON;
 	// offset columns
 	const int C2A = C1 + W1 + WLLABEL + GAP;
-	const int W2A = WMESS;
+	const int W2A = WEDIT;
 
 	Fl_Group* gp01 = new Fl_Group(rx, ry, rw, rh, "eQSL.cc");
 

@@ -24,22 +24,21 @@ const unsigned int BORDER_SIZE = 5;
 const unsigned int TAB_HEIGHT = 20;
 
 // drawing constants
-const int EDGE = 10;
-const int HBUTTON = 20;
-const int WBUTTON = 60;
-const int XLEFT = EDGE;
-const int YTOP = EDGE;
-const int GAP = 10;
-const int HTEXT = 20;
-const int WRADIO = 15;
-const int HRADIO = WRADIO;
-const int WMESS = 200;
-const int WLABEL = 50;
-const int WLLABEL = 100;
-const int HMLIN = 3 * HTEXT;
-const int WEDIT = 3 * WBUTTON;
-const int WSMEDIT = 2 * WBUTTON;
-const int ROW_HEIGHT = DEFAULT_SIZE + 4;
+const int EDGE = 10;                        // Gap between group edge and widget edge
+const int HBUTTON = 20;                     // Height of a normal button
+const int WBUTTON = 60;                     // Width of a normal button
+const int XLEFT = EDGE;                     // Start of widgets
+const int YTOP = EDGE;                      // Start of widgets
+const int GAP = 10;                         // Gap between non-related widgets
+const int HTEXT = 20;                       // Gap to leave for text
+const int WRADIO = 15;                      // Width of a box-less rado button
+const int HRADIO = WRADIO;                  // Height of a boxless button
+const int WLABEL = 50;                      // gap for a label outwith widget
+const int WLLABEL = 100;                    // gap for a large label outwith widget
+const int HMLIN = 3 * HTEXT;                // Height of a multi-line text box
+const int WEDIT = 3 * WBUTTON;              // Width of a text edit box
+const int WSMEDIT = 2 * WBUTTON;            // Width of a small text edit box
+const int ROW_HEIGHT = DEFAULT_SIZE + 4;    // Default height for table rows
 
 	// Colours to use for buttons - defined using FLTK colour palette
 	const Fl_Color COLOUR_ORANGE = 93;       /* R=4/4, B=0/4, G=5/7 */
