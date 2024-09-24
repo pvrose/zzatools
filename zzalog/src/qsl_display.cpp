@@ -55,7 +55,7 @@ qsl_display::~qsl_display() {
 void qsl_display::value(string callsign, qsl_type type, record** qsos, int num_records) {
     qsos_ = qsos;
     num_records_ = num_records;
-	load_data(callsign, type, true);
+	load_data(callsign, type);
 	w_ = to_points(data_->width);
 	h_ = to_points(data_->height);
 	// draw the image
@@ -307,49 +307,45 @@ int qsl_display::to_points(float value) {
 }
 
 // Load data
-void qsl_display::load_data(string callsign, qsl_display::qsl_type type, bool force) {
+void qsl_display::load_data(string callsign, qsl_display::qsl_type type) {
 	// Don't load data if it's alrteady loaded
-	if (callsign_ == callsign && type_ == type && !force) return;
-	callsign_ = callsign;
-	type_ = type;
-	if (data_) {
-		delete data_;
+	if (callsign_ != callsign || type_ != type) {
+		callsign_ = callsign;
+		type_ = type;
+		if (data_) {
+			delete data_;
+		}
+		data_ = new card_data;
+		Fl_Preferences qsl_settings(settings_, "QSL Design");
+		char* temp;
+		char group_name[64];
+		if (type == LABEL) {
+			// We have already created the group "Label" - use it
+			strcpy(group_name, "Label");
+		}
+		else {
+			// Always need the group "PDF"
+			strcpy(group_name, "PDF");
+		}
+		Fl_Preferences type_settings(qsl_settings, group_name);
+		Fl_Preferences call_settings(qsl_settings, callsign_.c_str());
+		// Get the card label data_ for this callsign
+		call_settings.get("Width", data_->width, 0);
+		call_settings.get("Height", data_->height, 0);
+		call_settings.get("Unit", (int&)data_->unit, (int)MILLIMETER);
+		call_settings.get("Number Rows", data_->rows, 4);
+		call_settings.get("Number Columns", data_->columns, 2);
+		call_settings.get("Column Width", data_->col_width, 101.6);
+		call_settings.get("Row Height", data_->row_height, 67.7);
+		call_settings.get("First Row", data_->row_top, 12.9);
+		call_settings.get("First Column", data_->col_left, 4.6);
+		call_settings.get("Max QSOs per Card", data_->max_qsos, 1);
+		call_settings.get("Date Format", (int&)data_->f_date, FMT_Y4MD_ADIF);
+		call_settings.get("Time Format", (int&)data_->f_time, FMT_HMS_ADIF);
+		call_settings.get("Card Design", temp, "");
+		data_->filename = temp;
+		free(temp);
 	}
-	data_ = new card_data;
-	Fl_Preferences qsl_settings(settings_, "QSL Design");
-	char* temp;
-	char group_name[64];
-	if (type == LABEL && qsl_settings.group_exists("Label")) {
-		// We have already created the group "Label" - use it
-		strcpy(group_name, "Label/");
-		strcat(group_name, callsign.c_str());
-	}
-	else if (type == LABEL) {
-		// Default to not havoing the "Label" group layer
-		strcpy(group_name, callsign.c_str());
-	}
-	else {
-		// Always need the group "PDF"
-		strcpy(group_name, "PDF/");
-		strcat(group_name, callsign.c_str());
-	}
-	Fl_Preferences call_settings(qsl_settings, group_name);
-	// Get the card label data_ for this callsign
-	call_settings.get("Width", data_->width, 0);
-	call_settings.get("Height", data_->height, 0);
-	call_settings.get("Unit", (int&)data_->unit, (int)MILLIMETER);
-	call_settings.get("Number Rows", data_->rows, 4);
-	call_settings.get("Number Columns", data_->columns, 2);
-	call_settings.get("Column Width", data_->col_width, 101.6);
-	call_settings.get("Row Height", data_->row_height, 67.7);
-	call_settings.get("First Row", data_->row_top, 12.9);
-	call_settings.get("First Column", data_->col_left, 4.6);
-	call_settings.get("Max QSOs per Card", data_->max_qsos, 1);
-	call_settings.get("Date Format", (int&)data_->f_date, FMT_Y4MD_ADIF);
-	call_settings.get("Time Format", (int&)data_->f_time, FMT_HMS_ADIF);
-	call_settings.get("Card Design", temp, "");
-	data_->filename = temp;
-	free(temp);
 	// Check it's a TSV file
 	size_t pos = data_->filename.find_last_of('.');
 	if (pos == string::npos || data_->filename.substr(pos) != ".tsv") {
@@ -541,11 +537,7 @@ void qsl_display::save_data() {
 }
 
 // Get a pointer to the card drawing data for the specified callsign
-qsl_display::card_data* qsl_display::data(string callsign, qsl_type type) {
-	// If it hasn't been loaded, do so.
-	if (callsign != callsign_ || type != type_) {
-		load_data(callsign, type);
-	}
+qsl_display::card_data* qsl_display::data() {
 	return data_;
 }
 

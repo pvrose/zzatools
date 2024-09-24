@@ -356,7 +356,8 @@ int printer::print_page_cards(size_t &item_num) {
 int printer::card_properties() {
 	string callsign = qso_manager_->get_default(qso_manager::CALLSIGN);
 	qsl_display* qsl = new qsl_display();
-	card_data_ = qsl->data(callsign, qsl_display::LABEL);
+	qsl->value(callsign, qsl_display::LABEL);
+	card_data_ = qsl->data();
 	
 	items_per_page_ = card_data_->rows * card_data_->columns;
 	int top_margin = 0;

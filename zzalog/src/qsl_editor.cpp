@@ -42,7 +42,7 @@ qsl_editor::qsl_editor(int X, int Y, int W, int H, const char* L) :
 	// We shall be editing the display
     qsl_->editable(true);
 	// Get the data
-	data_ = qsl_->data(callsign_, qsl_display::LABEL);
+	data_ = qsl_->data();
 
 	// Only show the dipslay window if this dialog is active
 	if (active()) w_display_->show();
@@ -847,7 +847,7 @@ void qsl_editor::cb_callsign(Fl_Widget* w, void* v) {
     qsl_editor* that = ancestor_view<qsl_editor>(w);
     cb_value<field_input, string>(w, v);
 	that->qsl_->value(that->callsign_, qsl_display::LABEL);
-	that->data_ = that->qsl_->data(that->callsign_, qsl_display::LABEL);
+	that->data_ = that->qsl_->data();
 	that->filedata_.filename = &(that->data_->filename);
 	that->ip_filename_->value(that->data_->filename.c_str());
 	that->ip_filename_->user_data(&that->data_->filename);

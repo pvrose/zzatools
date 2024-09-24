@@ -4,6 +4,7 @@
 
 #include <vector>
 #include <string>
+#include <cmath>
 
 
 using namespace std;
@@ -129,6 +130,10 @@ class qsl_display
         time_format f_time{ FMT_HMS };    // Format for time to be printed
         string filename{ "" };            // Filename of layout data file
         vector<item_def*> items;          // layout items read in from file 
+
+        card_data() {
+            items.clear();
+        }
     };
 
     // Constructor to create a resizeable image
@@ -138,7 +143,7 @@ class qsl_display
     ~qsl_display();
 
     // Load data
-    void load_data(string callsign, qsl_type type, bool force = false);
+    void load_data(string callsign, qsl_type type);
     // Save data
     void save_data();
 
@@ -156,7 +161,7 @@ class qsl_display
     void dirty();
 
     // Pointer to the data for editor to use
-    card_data* data(string callsign, qsl_type type);
+    card_data* data();
 
     // Get the image at that filename
     Fl_Image* get_image(string filename);
