@@ -41,6 +41,8 @@ qsl_editor::qsl_editor(int X, int Y, int W, int H, const char* L) :
     qsl_->value(callsign_, qsl_display::LABEL);
 	// We shall be editing the display
     qsl_->editable(true);
+	// Get the data
+	data_ = qsl_->data(callsign_, qsl_display::LABEL);
 
 	// Only show the dipslay window if this dialog is active
 	if (active()) w_display_->show();
@@ -95,9 +97,6 @@ void qsl_editor::create_form(int X, int Y) {
     int curr_y = Y + GAP;
     int max_x;
 
-	// Get any existing data for this callsign
-	qsl_display::card_data* data = qsl_->data(callsign_, qsl_display::LABEL);
-
 	// Group 1: Template file
     g_1_ = new Fl_Group(curr_x, curr_y, 100, 100, "Template File");
     g_1_->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
@@ -119,9 +118,9 @@ void qsl_editor::create_form(int X, int Y) {
 
 	// Input field to specify filename
     filename_input* w102 = new filename_input(curr_x, curr_y, WEDIT * 2, HBUTTON);
-    w102->callback(cb_filename, &data->filename);
+    w102->callback(cb_filename, &data_->filename);
     w102->when(FL_WHEN_CHANGED);
-    w102->value(data->filename.c_str());
+    w102->value(data_->filename.c_str());
     w102->tooltip("Please enter the QSL template");
 	w102->type(filename_input::FILE);
 	w102->title("Please select QSL Template");
@@ -154,7 +153,7 @@ void qsl_editor::create_form(int X, int Y) {
 	g_201->box(FL_FLAT_BOX);
 	// Radio to select inches
 	Fl_Radio_Round_Button* w_20101 = new Fl_Radio_Round_Button(curr_x, curr_y, HBUTTON, HBUTTON, "inch");
-	w_20101->value(data->unit == qsl_display::INCH);
+	w_20101->value(data_->unit == qsl_display::INCH);
 	w_20101->selection_color(FL_RED);
 	w_20101->align(FL_ALIGN_RIGHT);
 	w_20101->callback(cb_radio_dim, (void*)qsl_display::INCH);
@@ -162,7 +161,7 @@ void qsl_editor::create_form(int X, int Y) {
     curr_y += HBUTTON;
 	// Radio to select millimetres
 	Fl_Radio_Round_Button* w_20102 = new Fl_Radio_Round_Button(curr_x, curr_y, HBUTTON, HBUTTON, "mm");
-	w_20102->value(data->unit == qsl_display::MILLIMETER);
+	w_20102->value(data_->unit == qsl_display::MILLIMETER);
 	w_20102->selection_color(FL_RED);
 	w_20102->align(FL_ALIGN_RIGHT);
 	w_20102->callback(cb_radio_dim, (void*)qsl_display::MILLIMETER);
@@ -170,7 +169,7 @@ void qsl_editor::create_form(int X, int Y) {
 	// Radio to select points
     curr_y += HBUTTON;
 	Fl_Radio_Round_Button* w_20103 = new Fl_Radio_Round_Button(curr_x, curr_y, HBUTTON, HBUTTON, "point");
-	w_20103->value(data->unit == qsl_display::POINT);
+	w_20103->value(data_->unit == qsl_display::POINT);
 	w_20103->selection_color(FL_RED);
 	w_20103->align(FL_ALIGN_RIGHT);
 	w_20103->callback(cb_radio_dim, (void*)qsl_display::POINT);
@@ -186,72 +185,81 @@ void qsl_editor::create_form(int X, int Y) {
     curr_x += WLABEL;
     // Input to set number of columns to print
 	Fl_Value_Input* w_20201 = new Fl_Value_Input(curr_x, curr_y, WBUTTON, HBUTTON, "Columns");
-	w_20201->value(data->columns);
+	w_20201->value(data_->columns);
 	w_20201->align(FL_ALIGN_LEFT);
-	w_20201->callback(cb_value<Fl_Value_Input, int>, &data->columns);
+	w_20201->callback(cb_value<Fl_Value_Input, int>, &data_->columns);
 	w_20201->tooltip("Please specify the number of columns when printing");
+	ip_cols_ = w_20201;
     curr_x += WLABEL + WBUTTON;;
 	// Input to specify the width of the label
 	Fl_Value_Input* w_20202 = new Fl_Value_Input(curr_x, curr_y, WBUTTON, HBUTTON, "Width");
-	w_20202->value(data->width);
+	w_20202->value(data_->width);
 	w_20202->align(FL_ALIGN_LEFT);
-	w_20202->callback(cb_size_double, &data->width);
+	w_20202->callback(cb_size_double, &data_->width);
 	w_20202->when(FL_WHEN_ENTER_KEY);
 	w_20202->tooltip("Please specify the width of the label in the selected unit");
+	ip_width_ = w_20202;
     curr_x += WLABEL + WBUTTON;;
 	// Input to specify the position ofthe left edge of culmn 1
 	Fl_Value_Input* w_20203 = new Fl_Value_Input(curr_x, curr_y, WBUTTON, HBUTTON, "Position");
-	w_20203->value(data->col_left);
+	w_20203->value(data_->col_left);
 	w_20203->align(FL_ALIGN_LEFT);
-	w_20203->callback(cb_value<Fl_Value_Input, double>, &data->col_left);
+	w_20203->callback(cb_value<Fl_Value_Input, double>, &data_->col_left);
 	w_20203->tooltip("Please specify the position of the first column");
+	ip_cpos_ = w_20203;
     curr_x += WLABEL + WBUTTON;;
 	// Input to specify the spacing between columns (between left edges)
 	Fl_Value_Input* w_20204 = new Fl_Value_Input(curr_x, curr_y, WBUTTON, HBUTTON, "Spacing");
-	w_20204->value(data->col_width);
+	w_20204->value(data_->col_width);
 	w_20204->align(FL_ALIGN_LEFT);
-	w_20204->callback(cb_value<Fl_Value_Input, double>, &data->col_width);
+	w_20204->callback(cb_value<Fl_Value_Input, double>, &data_->col_width);
 	w_20204->tooltip("Please specify the spacing between columns");
+	ip_cspace_ = w_20204;
     curr_x = g_202->x();
     curr_x += WLABEL;
     curr_y += HBUTTON;
 	// Row 2A - height parameters
 	// Input to specify the number of rows of labels to print
 	Fl_Value_Input* w_20205 = new Fl_Value_Input(curr_x, curr_y, WBUTTON, HBUTTON, "Rows");
-	w_20205->value(data->rows);
+	w_20205->value(data_->rows);
 	w_20205->align(FL_ALIGN_LEFT);
-	w_20205->callback(cb_value<Fl_Value_Input, int>, &data->rows);
+	w_20205->callback(cb_value<Fl_Value_Input, int>, &data_->rows);
 	w_20205->tooltip("Please specify the number of rows when printing");
+	ip_rows_ = w_20205;
     curr_x += WLABEL + WBUTTON;;
 	// Input to specify the height of each label
 	Fl_Value_Input* w_20206 = new Fl_Value_Input(curr_x, curr_y, WBUTTON, HBUTTON, "Height");
-	w_20206->value(data->height);
+	w_20206->value(data_->height);
 	w_20206->align(FL_ALIGN_LEFT);
-	w_20206->callback(cb_size_double, &data->height);
+	w_20206->callback(cb_size_double, &data_->height);
 	w_20206->tooltip("Please specify the width of the label in the selected label");
+	ip_height_ = w_20206;
     curr_x += WLABEL + WBUTTON;;
 	// Input to specify the top of the first label
 	Fl_Value_Input* w_20207 = new Fl_Value_Input(curr_x, curr_y, WBUTTON, HBUTTON, "Position");
-	w_20207->value(data->row_top);
+	w_20207->value(data_->row_top);
 	w_20207->align(FL_ALIGN_LEFT);
-	w_20207->callback(cb_value<Fl_Value_Input, double>, &data->row_top);
+	w_20207->callback(cb_value<Fl_Value_Input, double>, &data_->row_top);
 	w_20207->tooltip("Please specify the position of the first row");
+	ip_rpos_ = w_20207;
     curr_x += WLABEL + WBUTTON;;
 	// Input to specify the gap between each row
 	Fl_Value_Input* w_20208 = new Fl_Value_Input(curr_x, curr_y, WBUTTON, HBUTTON, "Spacing");
-	w_20208->value(data->row_height);
+	w_20208->value(data_->row_height);
 	w_20208->align(FL_ALIGN_LEFT);
-	w_20208->callback(cb_value<Fl_Value_Input, double>, &data->row_height);
+	w_20208->callback(cb_value<Fl_Value_Input, double>, &data_->row_height);
 	w_20208->tooltip("Please specify the spacing between rows");
+	ip_rspace_ = w_20208;
     curr_x = g_202->x();
 	curr_x += WLABEL;
     curr_y += HBUTTON;
 	// Input to specify the (max) number of QSOs per QSL
 	Fl_Value_Input* w_20209 = new Fl_Value_Input(curr_x, curr_y, WBUTTON, HBUTTON, "QSOs/Card");
-	w_20209->value(data->max_qsos);
+	w_20209->value(data_->max_qsos);
 	w_20209->align(FL_ALIGN_LEFT);
-	w_20209->callback(cb_value<Fl_Value_Input, int>, &data->max_qsos);
+	w_20209->callback(cb_value<Fl_Value_Input, int>, &data_->max_qsos);
 	w_20209->tooltip("Please specify the number of QSOs per Card");
+	ip_qsos_ = w_20209;
 	// Output to display size in points
 	curr_x += WBUTTON + WLABEL;
 	Fl_Output* w_20210 = new Fl_Output(curr_x, curr_y, WBUTTON, HBUTTON, "Size in pt.");
@@ -274,8 +282,9 @@ void qsl_editor::create_form(int X, int Y) {
 	w_20301->align(FL_ALIGN_LEFT);
 	w_20301->tooltip("Select the way date is output on the QSL card");
 	populate_date(w_20301);
-	w_20301->value(data->f_date);
-	w_20301->callback(cb_datetime<qsl_display::date_format>, (void*)&data->f_date);
+	w_20301->value(data_->f_date);
+	w_20301->callback(cb_datetime<qsl_display::date_format>, (void*)&data_->f_date);
+	ch_data_ = w_20301;
 
 	curr_x += w_20301->w() + WLLABEL;
 	// Time format choice
@@ -283,8 +292,9 @@ void qsl_editor::create_form(int X, int Y) {
 	w_20302->align(FL_ALIGN_LEFT);
 	w_20302->tooltip("Select the way time is output on the QSL card");
 	populate_time(w_20302);
-	w_20302->value(data->f_time);
-	w_20302->callback(cb_datetime<qsl_display::time_format>, (void*)&data->f_time);
+	w_20302->value(data_->f_time);
+	w_20302->callback(cb_datetime<qsl_display::time_format>, (void*)&data_->f_time);
+	ch_time_ = w_20302;
 
 	curr_x = x() + GAP + WLLABEL;
 	curr_y += HBUTTON;
@@ -383,9 +393,6 @@ void qsl_editor::create_items() {
 	Fl_Group* saveg = Fl_Group::current();
 	Fl_Group::current(g_4_);
 
-	// Get the card data for this callsign
-	qsl_display::card_data* data = qsl_->data(callsign_, qsl_display::LABEL);
-
 	// Group 4.2 - New item (NB group ordering has changes 4.2 is before 4.1)
 	Fl_Group* g_402 = new Fl_Group(save_x + WLABEL, curr_y, 100, HBUTTON);
 	g_402->box(FL_FLAT_BOX);
@@ -404,7 +411,7 @@ void qsl_editor::create_items() {
 	g_402->end();
 
 	// Only display column labels if there is data to display
-	if (data->items.size()) {
+	if (data_->items.size()) {
 		create_labels(curr_y);
 		curr_y += HBUTTON;
 	}
@@ -417,9 +424,9 @@ void qsl_editor::create_items() {
 	gg_401->type(Fl_Scroll::VERTICAL);
 	
 	// For each item...
-	for (int ix = 0; ix < data->items.size(); ix++) {
+	for (int ix = 0; ix < data_->items.size(); ix++) {
 		// Get the item
-		qsl_display::item_def* item = data->items[ix];
+		qsl_display::item_def* item = data_->items[ix];
 
 		if (item->type != qsl_display::NONE) {
 			// Group 4.1.x (1 per item) - The item design data for editing
@@ -732,31 +739,46 @@ void qsl_editor::redraw_display() {
 
 // Update the size widget
 void qsl_editor::update_size() {
-	qsl_display::card_data* data = qsl_->data(callsign_, qsl_display::LABEL);
 	char temp[64];
 	int pw;
 	int ph;
 	// Convert supplied data to pixels
-	switch(data->unit) {
+	switch(data_->unit) {
 		case qsl_display::INCH: 
-			pw = data->width * IN_TO_POINT;
-			ph = data->height * IN_TO_POINT;
+			pw = data_->width * IN_TO_POINT;
+			ph = data_->height * IN_TO_POINT;
 			break;
 		case qsl_display::MILLIMETER:
-			pw = data->width * MM_TO_POINT;
-			ph = data->height * MM_TO_POINT;
+			pw = data_->width * MM_TO_POINT;
+			ph = data_->height * MM_TO_POINT;
 			break;
 		case qsl_display::POINT:
-			pw = data->width;
-			ph = data->height;
+			pw = data_->width;
+			ph = data_->height;
 			break;
 	}
 	snprintf(temp, sizeof(temp), "%d x %d", pw, ph);
 	op_size_->value(temp);
 }
 
+// Restore user_data fpor all widgets thatrequire access to data
+void qsl_editor::update_userdata() {
+	ip_cols_->user_data(&data_->columns);
+	ip_width_->user_data(&data_->width);
+	ip_cpos_->user_data(&data_->col_left);
+	ip_cspace_->user_data(&data_->col_width);
+	ip_rows_->user_data(&data_->rows);
+	ip_height_->user_data(&data_->height);
+	ip_rpos_->user_data(&data_->row_top);
+	ip_rspace_->user_data(&data_->row_height);
+	ip_qsos_->user_data(&data_->max_qsos);
+	ch_data_->user_data(&data_->f_date);
+	ch_time_->user_data(&data_->f_time);
+}
+
 // Uodate the dialog widgets
 void qsl_editor::enable_widgets() {
+	update_userdata();
 	update_size();
 	create_items();
 	resize();
@@ -766,7 +788,7 @@ void qsl_editor::enable_widgets() {
 // Call back when a radio button is pressed - v indicates which button
 void qsl_editor::cb_radio_dim(Fl_Widget* w, void* v) {
 	qsl_editor* that = ancestor_view<qsl_editor>(w);
-	that->qsl_->data(that->callsign_, qsl_display::LABEL)->unit = ((qsl_display::dim_unit)(intptr_t)v);
+	that->data_->unit = ((qsl_display::dim_unit)(intptr_t)v);
     that->redraw_display();
 }
 
@@ -825,10 +847,10 @@ void qsl_editor::cb_callsign(Fl_Widget* w, void* v) {
     qsl_editor* that = ancestor_view<qsl_editor>(w);
     cb_value<field_input, string>(w, v);
 	that->qsl_->value(that->callsign_, qsl_display::LABEL);
-	qsl_display::card_data* data = that->qsl_->data(that->callsign_, qsl_display::LABEL);
-	that->filedata_.filename = &(data->filename);
-	that->ip_filename_->value(data->filename.c_str());
-	that->ip_filename_->user_data(&data->filename);
+	that->data_ = that->qsl_->data(that->callsign_, qsl_display::LABEL);
+	that->filedata_.filename = &(that->data_->filename);
+	that->ip_filename_->value(that->data_->filename.c_str());
+	that->ip_filename_->user_data(&that->data_->filename);
     that->redraw_display();  
 	that->create_items();
 	that->redraw();
@@ -874,9 +896,9 @@ void qsl_editor::cb_new_item(Fl_Widget* w, void* v) {
 	qsl_display::item_def* item = new qsl_display::item_def();
 	item->type = (qsl_display::item_type)ch->value();
 	if (item->type == qsl_display::IMAGE) {
-		item->image.filename = that->qsl_->data(that->callsign_, qsl_display::LABEL)->filename;
+		item->image.filename = that->data_->filename;
 	}
-	that->qsl_->data(that->callsign_, qsl_display::LABEL)->items.push_back(item);
+	that->data_->items.push_back(item);
 	that->redraw_display();
 	that->create_items();
 }
@@ -885,15 +907,14 @@ void qsl_editor::cb_new_item(Fl_Widget* w, void* v) {
 void qsl_editor::cb_image(Fl_Widget* w, void* v) {
 	qsl_display::image_def& image = *(qsl_display::image_def*)v;
 	qsl_editor* that = ancestor_view<qsl_editor>(w);
-	qsl_display::card_data* data = that->qsl_->data(that->callsign_, qsl_display::LABEL);
 	cb_value<Fl_Input, string>(w, &image.filename);
 	image.image = that->qsl_->get_image(image.filename);
 
 	size_t pos = image.filename.find_last_of("/\\");
-	if (directory(image.filename) != directory(data->filename)) {
+	if (directory(image.filename) != directory(that->data_->filename)) {
 		char msg[256];
 		snprintf(msg, sizeof(msg), "QSL: Image %s not in same directory as QSL data %s",
-			image.filename.c_str(), data->filename.c_str());
+			image.filename.c_str(), that->data_->filename.c_str());
 		status_->misc_status(ST_WARNING, msg);
 	} else {
 		image.filename = terminal(image.filename);

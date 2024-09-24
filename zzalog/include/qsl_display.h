@@ -81,8 +81,6 @@ class qsl_display
         field_def field;
         text_def text;
         image_def image;
-
-        item_def() {}
     };
 
     // Units of measurement
@@ -117,20 +115,20 @@ class qsl_display
 
     // Card definition data
     struct card_data {
-        dim_unit unit;      // Dimensions i=unit
-        double width;       // Individual label width
-        double height;      // Individial label height
-        int rows;           // Number of rows per sheet
-        int columns;        // Number of columns per sheet
-        double col_width;   // Column separation
-        double row_height;  // Row separation
-        double row_top;     // Top margin
-        double col_left;    // Left margin
-        int max_qsos;       // maximum number of QSOs per label
-        date_format f_date; // Format for date to be printed
-        time_format f_time; // Format for time to be printed
-        string filename;    // Filename of layout data file
-        vector<item_def*> items; // layout items read in from file 
+        dim_unit unit{ MILLIMETER };      // Dimensions i=unit
+        double width{ nan("") };          // Individual label width
+        double height{ nan("") };         // Individial label height
+        int rows{ 0 };                    // Number of rows per sheet
+        int columns{ 0 };                 // Number of columns per sheet
+        double col_width{ nan("") };      // Column separation
+        double row_height{ nan("") };     // Row separation
+        double row_top{ nan("") };        // Top margin
+        double col_left{ nan("") };       // Left margin
+        int max_qsos{ 0 };                // maximum number of QSOs per label
+        date_format f_date{ FMT_Y4MD };   // Format for date to be printed
+        time_format f_time{ FMT_HMS };    // Format for time to be printed
+        string filename{ "" };            // Filename of layout data file
+        vector<item_def*> items;          // layout items read in from file 
     };
 
     // Constructor to create a resizeable image
@@ -140,7 +138,7 @@ class qsl_display
     ~qsl_display();
 
     // Load data
-    void load_data(string callsign, qsl_type type);
+    void load_data(string callsign, qsl_type type, bool force = false);
     // Save data
     void save_data();
 

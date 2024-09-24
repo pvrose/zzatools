@@ -11,6 +11,7 @@ class Fl_Widget;
 class Fl_Group;
 class Fl_Window;
 class Fl_Output;
+class Fl_Value_Input;
 
 // This class provides the dialog to edit the card label parameters
 // and define the items used in drawing the card label
@@ -54,6 +55,8 @@ class qsl_editor : public page_dialog
     void create_display();
     // Update size
     void update_size();
+    // Update vale user data
+    void update_userdata();
 
     // Callbacks
     // Callsign
@@ -108,6 +111,10 @@ class qsl_editor : public page_dialog
     qsl_display* qsl_;
     // Directory of filename
     string dir_name_;
+    // Pointer to card data item
+    qsl_display::card_data* data_;
+
+
     //Widgets to reference:-
 
     // Filename input and browse button
@@ -115,6 +122,17 @@ class qsl_editor : public page_dialog
     filename_input* ip_filename_;
     // Inputs to define size and formats
     Fl_Group* g_2_;
+    Fl_Value_Input* ip_cols_;
+    Fl_Value_Input* ip_width_;
+    Fl_Value_Input* ip_cpos_;
+    Fl_Value_Input* ip_cspace_;
+    Fl_Value_Input* ip_rows_;
+    Fl_Value_Input* ip_height_;
+    Fl_Value_Input* ip_rpos_;
+    Fl_Value_Input* ip_rspace_;
+    Fl_Value_Input* ip_qsos_;
+    Fl_Choice* ch_data_;
+    Fl_Choice* ch_time_;
     // Contains the item editing buttons
     Fl_Group* g_4_;
     // Window in which to show the display

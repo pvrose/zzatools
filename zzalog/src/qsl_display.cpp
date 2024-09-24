@@ -55,7 +55,7 @@ qsl_display::~qsl_display() {
 void qsl_display::value(string callsign, qsl_type type, record** qsos, int num_records) {
     qsos_ = qsos;
     num_records_ = num_records;
-	load_data(callsign, type);
+	load_data(callsign, type, true);
 	w_ = to_points(data_->width);
 	h_ = to_points(data_->height);
 	// draw the image
@@ -307,9 +307,9 @@ int qsl_display::to_points(float value) {
 }
 
 // Load data
-void qsl_display::load_data(string callsign, qsl_display::qsl_type type) {
+void qsl_display::load_data(string callsign, qsl_display::qsl_type type, bool force) {
 	// Don't load data if it's alrteady loaded
-	if (callsign_ == callsign && type_ == type) return;
+	if (callsign_ == callsign && type_ == type && !force) return;
 	callsign_ = callsign;
 	type_ = type;
 	if (data_) {
@@ -453,6 +453,10 @@ void qsl_display::save_data() {
 	switch (type_) {
 	case LABEL:
 		strcpy(type_name, "Label");
+		// Remove prebvious "non-label" entries
+		if (!qsl_settings.group_exists("Label")) {
+			qsl_settings.deleteAllEntries();
+		}
 		break;
 	case FILE:
 		strcpy(type_name, "PDF");
