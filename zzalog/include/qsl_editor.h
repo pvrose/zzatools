@@ -1,10 +1,12 @@
 #pragma once
 
 #include "page_dialog.h"
-#include "qsl_display.h"
+#include "qsl_data.h"
 #include "utils.h"
 #include "callback.h"
 
+class qsl_display;
+class record;
 class filename_input;
 class Fl_Choice;
 class Fl_Widget;
@@ -19,12 +21,12 @@ class Fl_Value_Input;
 class qsl_editor : public page_dialog
 {
 
-    public:
+public:
 
     qsl_editor(int x, int Y, int W, int H, const char* L = nullptr);
     ~qsl_editor();
  
-    protected:
+protected:
     // Load the settings
     void load_values();
     // Save settings
@@ -42,15 +44,15 @@ class qsl_editor : public page_dialog
     // Boxes to act as column headers
     void create_labels(int curr_y);
     // Create the widgets to edit one set of field parameters
-    void create_fparams(int& x, int& y, qsl_display::field_def* params);
+    void create_fparams(int& x, int& y, qsl_data::field_def* params);
     // Crreate the widgets to edit one set of text parameters
-    void create_tparams(int& x, int& y, qsl_display::text_def* params);
+    void create_tparams(int& x, int& y, qsl_data::text_def* params);
     // Create the widgets to edit one set of image parameters
-    void create_iparams(int& x, int& y, qsl_display::image_def* params);
+    void create_iparams(int& x, int& y, qsl_data::image_def* params);
     // Resize the group after adding or deleting an item
     void resize();
     // Redraw dislay
-    void redraw_display();
+    void redraw_display(bool dirty);
     // Create display
     void create_display();
     // Update size
@@ -112,7 +114,7 @@ class qsl_editor : public page_dialog
     // Directory of filename
     string dir_name_;
     // Pointer to card data item
-    qsl_display::card_data* data_;
+    qsl_data* data_;
 
 
     //Widgets to reference:-

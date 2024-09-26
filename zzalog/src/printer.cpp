@@ -3,6 +3,7 @@
 #include "tabbed_forms.h"
 #include "status.h"
 #include "qsl_display.h"
+#include "qsl_dataset.h"
 #include "drawing.h"
 #include "qso_manager.h"
 #include "book.h"
@@ -23,6 +24,7 @@ extern status* status_;
 extern book* navigation_book_;
 extern Fl_Preferences* settings_;
 extern qso_manager* qso_manager_;
+extern qsl_dataset* qsl_dataset_;
 
 const int LINE_MARGIN = 1;
 const int LINE_WIDTH = 1;
@@ -339,8 +341,9 @@ int printer::print_page_cards(size_t &item_num) {
 			}
 			int imagex = cwin_x_ + ((card % card_data_->columns) * card_data_->width);
 			int imagey = cwin_y_ + (((card / card_data_->columns) % card_data_->rows) * card_data_->height);
-			qsl_display* qsl = new qsl_display(imagex, imagey);
-			qsl->value(records[0]->item("STATION_CALLSIGN"), qsl_display::LABEL, records, print_records);
+			qsl_display* qsl = new qsl_display(imagex, imagey, qsl_display::IMAGE);
+			qsl->set_card(card_data_);
+			qsl->set_qsos(records, print_records);
 
 			item_num += print_records;
 			num_records -= print_records;
@@ -355,23 +358,26 @@ int printer::print_page_cards(size_t &item_num) {
 // Get the various dimensions of the card page 
 int printer::card_properties() {
 	string callsign = qso_manager_->get_default(qso_manager::CALLSIGN);
-	qsl_display* qsl = new qsl_display();
-	qsl->value(callsign, qsl_display::LABEL);
-	card_data_ = qsl->data();
-	
+	card_data_ = qsl_dataset_->get_card(callsign, qsl_data::LABEL, false);
+	if (card_data_ == nullptr) {
+		char msg[128];
+		snprintf(msg, sizeof(msg), "PRINTER: No QSL image for %s", callsign.c_str());
+		status_->misc_status(ST_ERROR, msg);
+		return 1;
+	}
 	items_per_page_ = card_data_->rows * card_data_->columns;
 	int top_margin = 0;
 	int left_margin = 0;
 	margins(&left_margin, &top_margin, nullptr, nullptr);
 	double conversion = nan("");
 	switch (card_data_->unit) {
-		case qsl_display::INCH:
+		case qsl_data::INCH:
 			conversion = IN_TO_POINT;
 			break;
-		case qsl_display::MILLIMETER:
+		case qsl_data::MILLIMETER:
 			conversion = MM_TO_POINT;
 			break;
-		case qsl_display::POINT:
+		case qsl_data::POINT:
 			conversion = 1.0;
 			break;
 	}

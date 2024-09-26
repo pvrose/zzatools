@@ -5,6 +5,7 @@
 #include "user_dialog.h"
 #include "config_tree.h"
 #include "qsl_editor.h"
+#include "page_dialog.h"
 
 #include "utils.h"
 

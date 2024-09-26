@@ -2,7 +2,7 @@
 #define __PRINTER__
 
 #include "fields.h"
-#include "qsl_display.h"
+#include "drawing.h"
 
 #include <vector>
 #include <string>
@@ -12,6 +12,7 @@
 using namespace std;
 
 class record;
+class qsl_data;
 
 
 
@@ -67,7 +68,7 @@ class record;
 		int cwin_w_;
 		int cwin_h_;
 		// Card parameters
-		qsl_display::card_data* card_data_;
+		qsl_data* card_data_;
 	};
 
 #endif

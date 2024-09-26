@@ -1,4 +1,6 @@
 #include "qsl_editor.h"
+#include "qsl_dataset.h"
+#include "qsl_display.h"
 #include "status.h"
 #include "qso_manager.h"
 #include "qso_data.h"
@@ -25,6 +27,7 @@ using namespace std;
 
 extern Fl_Preferences* settings_;
 extern qso_manager* qso_manager_;
+extern qsl_dataset* qsl_dataset_;
 extern status* status_;
 
 // Constructor
@@ -32,17 +35,18 @@ qsl_editor::qsl_editor(int X, int Y, int W, int H, const char* L) :
     page_dialog(X, Y, W, H, L),
 	show_example_(false)
 {
+	// Default callback
+	callback(cb_bn_ok);
 	// Load settings
     load_values();
 	// Create the qsl_display instance
-	qsl_ = new qsl_display;
+	qsl_ = new qsl_display(qsl_display::IMAGE);
 	create_display();
 	// Load the display settings for this callsign
-    qsl_->value(callsign_, qsl_display::LABEL);
-	// We shall be editing the display
-    qsl_->editable(true);
-	// Get the data
-	data_ = qsl_->data();
+	data_ = qsl_dataset_->get_card(callsign_, qsl_data::LABEL, true);
+	// If data does not exist 
+	// Set data into QSL Display
+	qsl_->set_card(data_);
 
 	// Only show the dipslay window if this dialog is active
 	if (active()) w_display_->show();
@@ -50,7 +54,7 @@ qsl_editor::qsl_editor(int X, int Y, int W, int H, const char* L) :
 	// Add all the widgets in this dialog
     create_form(X, Y);
 
-	if (active()) redraw_display();
+	if (active()) redraw_display(false);
 
 }
 
@@ -153,26 +157,26 @@ void qsl_editor::create_form(int X, int Y) {
 	g_201->box(FL_FLAT_BOX);
 	// Radio to select inches
 	Fl_Radio_Round_Button* w_20101 = new Fl_Radio_Round_Button(curr_x, curr_y, HBUTTON, HBUTTON, "inch");
-	w_20101->value(data_->unit == qsl_display::INCH);
+	w_20101->value(data_->unit == qsl_data::INCH);
 	w_20101->selection_color(FL_RED);
 	w_20101->align(FL_ALIGN_RIGHT);
-	w_20101->callback(cb_radio_dim, (void*)qsl_display::INCH);
+	w_20101->callback(cb_radio_dim, (void*)qsl_data::INCH);
 	w_20101->tooltip("Measurements in inches");
     curr_y += HBUTTON;
 	// Radio to select millimetres
 	Fl_Radio_Round_Button* w_20102 = new Fl_Radio_Round_Button(curr_x, curr_y, HBUTTON, HBUTTON, "mm");
-	w_20102->value(data_->unit == qsl_display::MILLIMETER);
+	w_20102->value(data_->unit == qsl_data::MILLIMETER);
 	w_20102->selection_color(FL_RED);
 	w_20102->align(FL_ALIGN_RIGHT);
-	w_20102->callback(cb_radio_dim, (void*)qsl_display::MILLIMETER);
+	w_20102->callback(cb_radio_dim, (void*)qsl_data::MILLIMETER);
 	w_20102->tooltip("Measurements in millimetres");
 	// Radio to select points
     curr_y += HBUTTON;
 	Fl_Radio_Round_Button* w_20103 = new Fl_Radio_Round_Button(curr_x, curr_y, HBUTTON, HBUTTON, "point");
-	w_20103->value(data_->unit == qsl_display::POINT);
+	w_20103->value(data_->unit == qsl_data::POINT);
 	w_20103->selection_color(FL_RED);
 	w_20103->align(FL_ALIGN_RIGHT);
-	w_20103->callback(cb_radio_dim, (void*)qsl_display::POINT);
+	w_20103->callback(cb_radio_dim, (void*)qsl_data::POINT);
 	w_20103->tooltip("Measurements in printer points");
 	g_201->end();
 
@@ -283,7 +287,7 @@ void qsl_editor::create_form(int X, int Y) {
 	w_20301->tooltip("Select the way date is output on the QSL card");
 	populate_date(w_20301);
 	w_20301->value(data_->f_date);
-	w_20301->callback(cb_datetime<qsl_display::date_format>, (void*)&data_->f_date);
+	w_20301->callback(cb_datetime<qsl_data::date_format>, (void*)&data_->f_date);
 	ch_data_ = w_20301;
 
 	curr_x += w_20301->w() + WLLABEL;
@@ -293,7 +297,7 @@ void qsl_editor::create_form(int X, int Y) {
 	w_20302->tooltip("Select the way time is output on the QSL card");
 	populate_time(w_20302);
 	w_20302->value(data_->f_time);
-	w_20302->callback(cb_datetime<qsl_display::time_format>, (void*)&data_->f_time);
+	w_20302->callback(cb_datetime<qsl_data::time_format>, (void*)&data_->f_time);
 	ch_time_ = w_20302;
 
 	curr_x = x() + GAP + WLLABEL;
@@ -345,6 +349,9 @@ void qsl_editor::create_form(int X, int Y) {
 	show();
 }
 
+// Added as page_dialog only has an abstract
+void qsl_editor::enable_widgets() {}
+
 // Resize qsl_editor to fit all three groups
 void qsl_editor::resize() {
     // Find size of display and adjust g_3_
@@ -364,15 +371,13 @@ void qsl_editor::resize() {
 // Save the new design
 void qsl_editor::save_values() {
 
-	// Save the current callsign's card data
-	qsl_->dirty();
-    qsl_->save_data();
-	
 	// Sabe the display window position
 	Fl_Preferences windows_settings(settings_, "Windows");
 	Fl_Preferences qsl_win_settings(windows_settings, "QSL Design");
 	qsl_win_settings.set("Top", win_y_);
 	qsl_win_settings.set("Left", win_x_);
+
+	qsl_dataset_->save_data();
 
 	settings_->flush();
 }
@@ -403,7 +408,7 @@ void qsl_editor::create_items() {
 	w_40201->tooltip("Select the new type to add");
 	w_40201->callback(cb_new_item);
 	populate_type(w_40201);
-	w_40201->value((int)qsl_display::NONE);
+	w_40201->value((int)qsl_data::NONE);
 
 	curr_y += HBUTTON + GAP;
 	curr_x += w_40201->w();
@@ -426,9 +431,9 @@ void qsl_editor::create_items() {
 	// For each item...
 	for (int ix = 0; ix < data_->items.size(); ix++) {
 		// Get the item
-		qsl_display::item_def* item = data_->items[ix];
+		qsl_data::item_def* item = data_->items[ix];
 
-		if (item->type != qsl_display::NONE) {
+		if (item->type != qsl_data::NONE) {
 			// Group 4.1.x (1 per item) - The item design data for editing
 			Fl_Group* g_401 = new Fl_Group(save_x, curr_y, 100, HBUTTON);
 			char id[5];
@@ -449,17 +454,17 @@ void qsl_editor::create_items() {
 
 			// Now create the individual row
 			switch(item->type) {
-			case qsl_display::FIELD: {
+			case qsl_data::FIELD: {
 				// The widgets to edit a field item
 				create_fparams(curr_x, curr_y, &item->field);
 				break;
 			}
-			case qsl_display::TEXT: {
+			case qsl_data::TEXT: {
 				// The widgets to edit a text item
 				create_tparams(curr_x, curr_y, &item->text);
 				break;
 			}
-			case qsl_display::IMAGE: {
+			case qsl_data::IMAGE: {
 				// The widgets to edit an image item
 				create_iparams(curr_x, curr_y, &item->image);
 				break;
@@ -518,7 +523,7 @@ void qsl_editor::create_labels(int curr_y) {
 }
 
 // Create the widgets to edit field item values
-void qsl_editor::create_fparams(int& curr_x, int& curr_y, qsl_display::field_def* field) {
+void qsl_editor::create_fparams(int& curr_x, int& curr_y, qsl_data::field_def* field) {
 	char temp[100];
 
 	// Item position (X-coordinate relative to display)
@@ -624,7 +629,7 @@ void qsl_editor::create_fparams(int& curr_x, int& curr_y, qsl_display::field_def
 }
 
 // Craete the widgets to edit a text item
-void qsl_editor::create_tparams(int& curr_x, int& curr_y, qsl_display::text_def* text) {
+void qsl_editor::create_tparams(int& curr_x, int& curr_y, qsl_data::text_def* text) {
 	char temp[100];
 
 	// X-position of the item relative to the display
@@ -673,7 +678,7 @@ void qsl_editor::create_tparams(int& curr_x, int& curr_y, qsl_display::text_def*
 }
 
 // Create the widgets to edit image items
-void qsl_editor::create_iparams(int& curr_x, int& curr_y, qsl_display::image_def* image) {
+void qsl_editor::create_iparams(int& curr_x, int& curr_y, qsl_data::image_def* image) {
 	char temp[100];
 
 	// X-position of the image relative to the display window
@@ -710,31 +715,35 @@ void qsl_editor::create_iparams(int& curr_x, int& curr_y, qsl_display::image_def
 }
 
 // After editing the item data, redraw the window
-void qsl_editor::redraw_display() {
+void qsl_editor::redraw_display(bool dirty) {
+	// Mark data dirty if done as a result of edit
+	if (dirty) {
+		qsl_dataset_->dirty(data_);
+	}
+	// Update qsl_display
 	if (show_example_) {
 		example_qso_ = qso_manager_->data()->current_qso();
 		if (example_qso_ && example_qso_->item("STATION_CALLSIGN") == callsign_) {
 			// Showing the example qSO as it exists and matches the callsign 
-			qsl_->example_qso(example_qso_);
+			qsl_->set_qsos(&example_qso_, 1);
 		} else {
 			// Either there is no qSO ipor a different callsign was used
 			char msg[100];
 			snprintf(msg, sizeof(msg), "QSL: Current QSO does not match callsign %s",
 				callsign_.c_str());
 			status_->misc_status(ST_WARNING, msg);
-			qsl_->example_qso(nullptr);
-		} 
+			qsl_->set_qsos(&example_qso_, 1);
+		}
 	} else {
 		// Do not show an example QSO
-		qsl_->example_qso(nullptr);
+		qsl_->set_qsos(nullptr, 0);
 	}
-	// Card display
-	qsl_->draw();
 	Fl_Image* image = qsl_->image();
 	display_->size(image->w(), image->h());
 	w_display_->size(display_->w(), display_->h());
 	display_->image(image);
 	w_display_->redraw();
+
 }
 
 // Update the size widget
@@ -744,15 +753,15 @@ void qsl_editor::update_size() {
 	int ph;
 	// Convert supplied data to pixels
 	switch(data_->unit) {
-		case qsl_display::INCH: 
+		case qsl_data::INCH: 
 			pw = data_->width * IN_TO_POINT;
 			ph = data_->height * IN_TO_POINT;
 			break;
-		case qsl_display::MILLIMETER:
+		case qsl_data::MILLIMETER:
 			pw = data_->width * MM_TO_POINT;
 			ph = data_->height * MM_TO_POINT;
 			break;
-		case qsl_display::POINT:
+		case qsl_data::POINT:
 			pw = data_->width;
 			ph = data_->height;
 			break;
@@ -776,27 +785,18 @@ void qsl_editor::update_userdata() {
 	ch_time_->user_data(&data_->f_time);
 }
 
-// Uodate the dialog widgets
-void qsl_editor::enable_widgets() {
-	update_userdata();
-	update_size();
-	create_items();
-	resize();
-	redraw_display();
-}
-
 // Call back when a radio button is pressed - v indicates which button
 void qsl_editor::cb_radio_dim(Fl_Widget* w, void* v) {
 	qsl_editor* that = ancestor_view<qsl_editor>(w);
-	that->data_->unit = ((qsl_display::dim_unit)(intptr_t)v);
-    that->redraw_display();
+	that->data_->unit = ((qsl_data::dim_unit)(intptr_t)v);
+    that->redraw_display(true);
 }
 
 // Want to change the style (font, size and colour) of the text
 void qsl_editor::cb_bn_style(Fl_Widget* w, void* v) {
 	// Get the current style
    	qsl_editor* that = ancestor_view<qsl_editor>(w);
-	qsl_display::style_def* style = (qsl_display::style_def*)v;
+	qsl_data::style_def* style = (qsl_data::style_def*)v;
 	// Open a font, size and colour dialog
     font_dialog* d = new font_dialog(style->font, style->size, style->colour, "QSL Editor - text style chooser");
     button_t result = d->display();
@@ -804,7 +804,7 @@ void qsl_editor::cb_bn_style(Fl_Widget* w, void* v) {
         style->font = d->font();
         style->size = d->font_size();
         style->colour = d->colour();
-        that->redraw_display();
+        that->redraw_display(true);
 		that->create_items();
     }
     Fl::delete_widget(d);
@@ -815,14 +815,14 @@ void qsl_editor::cb_size_double(Fl_Widget* w, void* v) {
     qsl_editor* that = ancestor_view<qsl_editor>(w);
     cb_value<Fl_Value_Input, double>(w, v);
 	that->update_size();
-    that->redraw_display();
+    that->redraw_display(true);
 }
 
 // String input
 void qsl_editor::cb_ip_string(Fl_Widget* w, void* v) {
     qsl_editor* that = ancestor_view<qsl_editor>(w);
     cb_value<intl_input, string>(w, v);
-    that->redraw_display();  
+    that->redraw_display(true);  
 	// that->create_items();
 }
 
@@ -830,7 +830,7 @@ void qsl_editor::cb_ip_string(Fl_Widget* w, void* v) {
 void qsl_editor::cb_ip_int(Fl_Widget* w, void* v) {
     qsl_editor* that = ancestor_view<qsl_editor>(w);
     cb_value_int<Fl_Input>(w, v);
-    that->redraw_display();  
+    that->redraw_display(true);  
 	// that->create_items();
 }
 
@@ -838,20 +838,21 @@ void qsl_editor::cb_ip_int(Fl_Widget* w, void* v) {
 void qsl_editor::cb_ip_bool(Fl_Widget* w, void* v) {
     qsl_editor* that = ancestor_view<qsl_editor>(w);
     cb_value<Fl_Check_Button, bool>(w, v);
-    that->redraw_display();  
+    that->redraw_display(true);  
 	// that->create_items();
 }
 
-// Callsign
+// Callsign 
 void qsl_editor::cb_callsign(Fl_Widget* w, void* v) {
     qsl_editor* that = ancestor_view<qsl_editor>(w);
     cb_value<field_input, string>(w, v);
-	that->qsl_->value(that->callsign_, qsl_display::LABEL);
-	that->data_ = that->qsl_->data();
+	that->data_ = qsl_dataset_->get_card(that->callsign_, qsl_data::LABEL, true);
+	that->qsl_->set_card(that->data_);
 	that->filedata_.filename = &(that->data_->filename);
 	that->ip_filename_->value(that->data_->filename.c_str());
 	that->ip_filename_->user_data(&that->data_->filename);
-    that->redraw_display();  
+	// Only using existing data - not edited
+    that->redraw_display(false);  
 	that->create_items();
 	that->redraw();
 }
@@ -863,16 +864,15 @@ void qsl_editor::cb_ch_field(Fl_Widget* w, void* v) {
 	const char* field = ch->value();
 	string* item_field = (string*)v;
 	*item_field = field;
-	that->redraw_display();
+	that->redraw_display(true);
 }
 
 // Filename changed so update display
 void qsl_editor::cb_filename(Fl_Widget* w, void* v) {
     qsl_editor* that = ancestor_view<qsl_editor>(w);
 	cb_value<Fl_Input, string>(w, v);
-	that->save_values();
-	that->qsl_->value(that->callsign_, qsl_display::LABEL);
-	that->redraw_display();
+	qsl_dataset_->load_items(that->data_);
+	that->redraw_display(true);
 	that->create_items();
 	that->redraw();
 }
@@ -882,9 +882,9 @@ void qsl_editor::cb_ch_type(Fl_Widget* w, void* v) {
 	qsl_editor* that = ancestor_view<qsl_editor>(w);
 	Fl_Choice* ch = (Fl_Choice*)w;
 	// v points to the type field of that item
-	qsl_display::item_type* type = (qsl_display::item_type*)v;
-	*type = (qsl_display::item_type)ch->value();
-	that->redraw_display();
+	qsl_data::item_type* type = (qsl_data::item_type*)v;
+	*type = (qsl_data::item_type)ch->value();
+	that->redraw_display(true);
 	that->create_items();
 }
 
@@ -892,23 +892,22 @@ void qsl_editor::cb_ch_type(Fl_Widget* w, void* v) {
 void qsl_editor::cb_new_item(Fl_Widget* w, void* v) {
 	qsl_editor* that = ancestor_view<qsl_editor>(w);
 	Fl_Choice* ch = (Fl_Choice*)w;
-	qsl_display::item_type* type = (qsl_display::item_type*)v;
-	qsl_display::item_def* item = new qsl_display::item_def();
-	item->type = (qsl_display::item_type)ch->value();
-	if (item->type == qsl_display::IMAGE) {
+	qsl_data::item_type* type = (qsl_data::item_type*)v;
+	qsl_data::item_def* item = new qsl_data::item_def();
+	item->type = (qsl_data::item_type)ch->value();
+	if (item->type == qsl_data::IMAGE) {
 		item->image.filename = that->data_->filename;
 	}
 	that->data_->items.push_back(item);
-	that->redraw_display();
+	that->redraw_display(true);
 	that->create_items();
 }
 
 // Image
 void qsl_editor::cb_image(Fl_Widget* w, void* v) {
-	qsl_display::image_def& image = *(qsl_display::image_def*)v;
+	qsl_data::image_def& image = *(qsl_data::image_def*)v;
 	qsl_editor* that = ancestor_view<qsl_editor>(w);
 	cb_value<Fl_Input, string>(w, &image.filename);
-	image.image = that->qsl_->get_image(image.filename);
 
 	size_t pos = image.filename.find_last_of("/\\");
 	if (directory(image.filename) != directory(that->data_->filename)) {
@@ -919,7 +918,7 @@ void qsl_editor::cb_image(Fl_Widget* w, void* v) {
 	} else {
 		image.filename = terminal(image.filename);
 	}
-	that->redraw_display();
+	that->redraw_display(true);
 	that->create_items();
 }
 
@@ -928,15 +927,14 @@ template<class ENUM>
 void qsl_editor::cb_datetime(Fl_Widget* w, void* v) {
 	cb_value<Fl_Choice, ENUM>(w, v);
 	qsl_editor* that = ancestor_view<qsl_editor>(w);
-	that->save_values();
-	that->redraw_display();
+	that->redraw_display(true);
 }
 
 // Use example qSO in display
 void qsl_editor::cb_example(Fl_Widget* w, void* v) {
 	cb_value<Fl_Light_Button, bool>(w, v);
 	qsl_editor* that = ancestor_view<qsl_editor>(w);
-	that->redraw_display();
+	that->redraw_display(true);
 }
 
 void qsl_editor::create_display() {

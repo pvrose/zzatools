@@ -41,6 +41,7 @@ main.cpp - application entry point
 #include "ticker.h"
 #include "fields.h"
 #include "symbols.h"
+#include "qsl_dataset.h"
 
 // C/C++ header files
 #include <ctime>
@@ -131,6 +132,7 @@ qso_manager* qso_manager_ = nullptr;
 wx_handler* wx_handler_ = nullptr;
 ticker* ticker_ = nullptr;
 fields* fields_ = nullptr;
+qsl_dataset* qsl_dataset_ = nullptr;
 
 // Recent files opened
 list<string> recent_files_;
@@ -636,6 +638,10 @@ void add_data() {
 	// And band plan data
 	if (!closing_) {
 		band_data_ = new band_data;
+	}
+	// Add the QSL design data
+	if (!closing_) {
+		qsl_dataset_ = new qsl_dataset;
 	}
 }
 

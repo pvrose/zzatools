@@ -6,6 +6,7 @@
 #include "book.h"
 #include "record.h"
 #include "qsl_display.h"
+#include "qsl_dataset.h"
 #include "callback.h"
 #include "drawing.h"
 #include "tabbed_forms.h"
@@ -28,6 +29,7 @@ extern status* status_;
 extern book* book_;
 extern string default_station_;
 extern tabbed_forms* tabbed_forms_;
+extern qsl_dataset* qsl_dataset_;
 
 // Constructor
 qso_qsl_vwr::qso_qsl_vwr(int X, int Y, int W, int H, const char* L) :
@@ -424,13 +426,18 @@ void qso_qsl_vwr::set_image() {
 			break;
 		}
 		case QI_MY_QSL: {
-			qsl = new qsl_display();
+			qsl = new qsl_display(0, 0, qsl_display::IMAGE);
+			qsl_data* card;
 			if (current_qso_) {
-				qsl->value(current_qso_->item("STATION_CALLSIGN"), qsl_display::LABEL, &current_qso_, 1);
+				card = qsl_dataset_->get_card(current_qso_->item("STATION_CALLSIGN"), qsl_data::LABEL, false);
+				qsl->set_card(card);
+				qsl->set_qsos(&current_qso_, 1);
 			} else {
 				qso_manager* mgr = ancestor_view<qso_manager>(this);
 				string def_call = mgr->get_default(qso_manager::CALLSIGN);
-				qsl->value(def_call, qsl_display::LABEL, nullptr, 0);
+				card = qsl_dataset_->get_card(def_call, qsl_data::LABEL, false);
+				qsl->set_card(card);
+				qsl->set_qsos(nullptr, 0);
 			}
 			raw_image_ = qsl->image();
 			scale_image();
