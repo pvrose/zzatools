@@ -341,7 +341,7 @@ int printer::print_page_cards(size_t &item_num) {
 			}
 			int imagex = cwin_x_ + ((card % card_data_->columns) * card_data_->width);
 			int imagey = cwin_y_ + (((card / card_data_->columns) % card_data_->rows) * card_data_->height);
-			qsl_display* qsl = new qsl_display(imagex, imagey, qsl_display::IMAGE);
+			qsl_display* qsl = new qsl_display(imagex, imagey, qsl_display::DEFAULT);
 			qsl->set_card(card_data_);
 			qsl->set_qsos(records, print_records);
 
