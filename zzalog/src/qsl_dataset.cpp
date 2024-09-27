@@ -57,11 +57,14 @@ void qsl_dataset::load_data() {
 			Fl_Preferences call_settings(type_settings, call.c_str());
 			qsl_data* data = new qsl_data;
 			(*type_data)[call] = data;
+			// Temporary values to convert char* and int to string and enums
 			char* temp;
+			int itemp;
 			// Get the card label data_ for this callsign
 			call_settings.get("Width", data->width, 0);
 			call_settings.get("Height", data->height, 0);
-			call_settings.get("Unit", (int&)data->unit, (int)qsl_data::MILLIMETER);
+			call_settings.get("Unit", itemp, (int)qsl_data::MILLIMETER);
+			data->unit = (qsl_data::dim_unit)itemp;
 			call_settings.get("Number Rows", data->rows, 4);
 			call_settings.get("Number Columns", data->columns, 2);
 			call_settings.get("Column Width", data->col_width, 101.6);
@@ -69,10 +72,12 @@ void qsl_dataset::load_data() {
 			call_settings.get("First Row", data->row_top, 12.9);
 			call_settings.get("First Column", data->col_left, 4.6);
 			call_settings.get("Max QSOs per Card", data->max_qsos, 1);
-			call_settings.get("Date Format", (int&)data->f_date, qsl_data::FMT_Y4MD_ADIF);
-			call_settings.get("Time Format", (int&)data->f_time, qsl_data::FMT_HMS_ADIF);
+			call_settings.get("Date Format", itemp, qsl_data::FMT_Y4MD_ADIF);
+			data->f_date = (qsl_data::date_format)itemp;
+			call_settings.get("Time Format", itemp, qsl_data::FMT_HMS_ADIF);
+			data->f_time = (qsl_data::time_format)itemp;
 			call_settings.get("Card Design", temp, "");
-			printf("Read data from file %d bytes, value =#%s#\n", strlen(temp), temp);
+			printf("Read data from file %d bytes, value ='%s'\n", strlen(temp), temp);
 			data->filename = temp;
 			free(temp);
 			// Check it's a TSV file
