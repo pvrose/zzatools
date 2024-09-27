@@ -36,6 +36,7 @@ qso_qsl::qso_qsl(int X, int Y, int W, int H, const char* L) :
 	box(FL_BORDER_BOX);
 	os_eqsl_dnld_ = 0;
 	tkr_value_ = 0.0;
+	extract_in_progress_ = false;
 	load_values();
 	create_form();
 	enable_widgets();
@@ -246,7 +247,7 @@ void qso_qsl::enable_widgets() {
 		bn_extr_card_->deactivate();
 	}
 	// Disable extract and upload buttons if auto-upload enabled
-	if (extract_records_->size() && extract_records_->use_mode() == extract_data::EQSL) {
+	if (!extract_in_progress_ && extract_records_->use_mode() == extract_data::EQSL) {
 		bn_upld_eqsl_->activate();
 		bn_cncl_eqsl_->activate();
 	}
@@ -254,7 +255,7 @@ void qso_qsl::enable_widgets() {
 		bn_upld_eqsl_->deactivate();
 		bn_cncl_eqsl_->deactivate();
 	}
-	if (extract_records_->size() && extract_records_->use_mode() == extract_data::LOTW) {
+	if (!extract_in_progress_ && extract_records_->use_mode() == extract_data::LOTW) {
 		bn_upld_lotw_->activate();
 		bn_cncl_lotw_->activate();
 	}
@@ -262,7 +263,7 @@ void qso_qsl::enable_widgets() {
 		bn_upld_lotw_->deactivate();
 		bn_cncl_lotw_->deactivate();
 	}
-	if (extract_records_->size() && extract_records_->use_mode() == extract_data::CLUBLOG) {
+	if (!extract_in_progress_ && extract_records_->use_mode() == extract_data::CLUBLOG) {
 		bn_upld_club_->activate();
 		bn_cncl_club_->activate();
 	}
@@ -270,7 +271,7 @@ void qso_qsl::enable_widgets() {
 		bn_upld_club_->deactivate();
 		bn_cncl_club_->deactivate();
 	}
-	if (extract_records_->size() && extract_records_->use_mode() == extract_data::CARD) {
+	if (!extract_in_progress_ && extract_records_->use_mode() == extract_data::CARD) {
 		bn_print_->activate();
 		bn_mark_done_->activate();
 		bn_cncl_card_->activate();
@@ -380,7 +381,10 @@ void qso_qsl::qsl_download(import_data::update_mode_t server) {
 void qso_qsl::qsl_extract(extract_data::extract_mode_t server) {
 	qso_manager* mgr = ancestor_view<qso_manager>(this);
 	if (mgr->data()->inactive()) {
+		// Set flag to indicate this is being done - used to disable further attempts
+		extract_in_progress_ = true;
 		extract_records_->extract_qsl(server);
+		extract_in_progress_ = false;
 		tabbed_forms_->activate_pane(OT_EXTRACT, true);
 		enable_widgets();
 	} else {

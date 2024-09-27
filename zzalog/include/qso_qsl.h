@@ -70,6 +70,8 @@ protected:
     int os_eqsl_dnld_;
     // Ticker count
     float tkr_value_;
+    // Extract in progress - update gets called while it is
+    bool extract_in_progress_;
 
     // Widgets
     Fl_Check_Button* bn_auto_eqsl_;
