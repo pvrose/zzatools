@@ -732,7 +732,7 @@ void qsl_editor::redraw_display(bool dirty) {
 			snprintf(msg, sizeof(msg), "QSL: Current QSO does not match callsign %s",
 				callsign_.c_str());
 			status_->misc_status(ST_WARNING, msg);
-			qsl_->set_qsos(&example_qso_, 1);
+			qsl_->set_qsos(nullptr, 0);
 		}
 	} else {
 		// Do not show an example QSO

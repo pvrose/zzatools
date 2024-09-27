@@ -33,7 +33,7 @@ protected:
 	// Read card designs
 	void load_data();
 
-	map<qsl_data::qsl_type, map<string, qsl_data*> > data_;
+	map<qsl_data::qsl_type, map<string, qsl_data*>* > data_;
 	// Dirty flags
 	map<qsl_data*, bool> dirty_;
 	

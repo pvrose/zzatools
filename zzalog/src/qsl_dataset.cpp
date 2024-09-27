@@ -22,13 +22,13 @@ qsl_dataset::~qsl_dataset() {
 qsl_data* qsl_dataset::get_card(string callsign, qsl_data::qsl_type type, bool create) {
 	if (data_.find(type) != data_.end()) {
 		auto call_map = data_.at(type);
-		if (call_map.find(callsign) != call_map.end()) {
-			return call_map.at(callsign);
+		if (call_map->find(callsign) != call_map->end()) {
+			return call_map->at(callsign);
 		}
 	}
 	qsl_data* data = new qsl_data;
 	if (create) {
-		data_[type][callsign] = data;
+		(*data_[type])[callsign] = data;
 		dirty_[data] = true;
 		return data;
 	}
@@ -47,7 +47,8 @@ void qsl_dataset::load_data() {
 	Fl_Preferences qsl_settings(settings_, "QSL Design");
 
 	for (int ix = 0; ix < (int)qsl_data::MAX_TYPE; ix++) {
-		auto type_data = data_[(qsl_data::qsl_type)ix];
+		map<string, qsl_data*>* type_data = new map<string, qsl_data*>;
+		data_[(qsl_data::qsl_type)ix] = type_data;
 		Fl_Preferences type_settings(qsl_settings, qsl_types[ix].c_str());
 		// Now fetch each callsign that is in the prefs file
 		int num_calls = type_settings.groups();
@@ -55,7 +56,7 @@ void qsl_dataset::load_data() {
 			string call = type_settings.group(iy);
 			Fl_Preferences call_settings(type_settings, call.c_str());
 			qsl_data* data = new qsl_data;
-			type_data[call] = data;
+			(*type_data)[call] = data;
 			char* temp;
 			// Get the card label data_ for this callsign
 			call_settings.get("Width", data->width, 0);
@@ -71,6 +72,7 @@ void qsl_dataset::load_data() {
 			call_settings.get("Date Format", (int&)data->f_date, qsl_data::FMT_Y4MD_ADIF);
 			call_settings.get("Time Format", (int&)data->f_time, qsl_data::FMT_HMS_ADIF);
 			call_settings.get("Card Design", temp, "");
+			printf("Read data from file %d bytes, value =#%s#\n", strlen(temp), temp);
 			data->filename = temp;
 			free(temp);
 			// Check it's a TSV file
@@ -93,7 +95,7 @@ void qsl_dataset::load_data() {
 				if (data->width == 0) data->width = data->col_width;
 				if (data->height == 0) data->height = data->row_height;
 			}
-			else {
+			if (data->filename.length()) {
 				// Data looks good so far
 				char msg[100];
 				snprintf(msg, sizeof(msg), "QSL: Reading card image data %s %s from %s",
@@ -185,7 +187,7 @@ void qsl_dataset::save_data() {
 	for (auto it = data_.begin(); it != data_.end(); it++) {
 		qsl_data::qsl_type type = it->first;
 		Fl_Preferences type_settings(qsl_settings, qsl_types[(int)type].c_str());
-		for (auto ita = it->second.begin(); ita != it->second.end(); ita++) {
+		for (auto ita = it->second->begin(); ita != it->second->end(); ita++) {
 			Fl_Preferences call_settings(type_settings, ita->first.c_str());
 			qsl_data* data = ita->second;
 			// SAve the card label parameters
