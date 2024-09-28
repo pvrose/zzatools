@@ -119,3 +119,7 @@ struct qsl_data {
         items.clear();
     }
 };
+
+// Initialise the 
+const string QSL_TYPES[qsl_data::MAX_TYPE] = {"Label", "PDF"};
+

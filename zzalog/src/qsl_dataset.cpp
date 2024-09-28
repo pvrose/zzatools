@@ -37,10 +37,6 @@ qsl_data* qsl_dataset::get_card(string callsign, qsl_data::qsl_type type, bool c
 	}
 } 
 
-// Associatedtext - used in load_data nd save_data
-string qsl_types[qsl_data::MAX_TYPE] = { "Label", "PDF" };
-
-
 // Read card designs
 void qsl_dataset::load_data() {
 	data_.clear();
@@ -49,7 +45,7 @@ void qsl_dataset::load_data() {
 	for (int ix = 0; ix < (int)qsl_data::MAX_TYPE; ix++) {
 		map<string, qsl_data*>* type_data = new map<string, qsl_data*>;
 		data_[(qsl_data::qsl_type)ix] = type_data;
-		Fl_Preferences type_settings(qsl_settings, qsl_types[ix].c_str());
+		Fl_Preferences type_settings(qsl_settings, QSL_TYPES[ix].c_str());
 		// Now fetch each callsign that is in the prefs file
 		int num_calls = type_settings.groups();
 		for (int iy = 0; iy < num_calls; iy++) {
@@ -105,7 +101,7 @@ void qsl_dataset::load_data() {
 				char msg[100];
 				snprintf(msg, sizeof(msg), "QSL: Reading card image data %s %s from %s",
 					call.c_str(),
-					qsl_types[ix].c_str(),
+					QSL_TYPES[ix].c_str(),
 					data->filename.c_str());
 				status_->misc_status(ST_LOG, msg);
 				load_items(data);
@@ -191,7 +187,7 @@ void qsl_dataset::save_data() {
 	qsl_settings.clear();
 	for (auto it = data_.begin(); it != data_.end(); it++) {
 		qsl_data::qsl_type type = it->first;
-		Fl_Preferences type_settings(qsl_settings, qsl_types[(int)type].c_str());
+		Fl_Preferences type_settings(qsl_settings, QSL_TYPES[(int)type].c_str());
 		for (auto ita = it->second->begin(); ita != it->second->end(); ita++) {
 			Fl_Preferences call_settings(type_settings, ita->first.c_str());
 			qsl_data* data = ita->second;
@@ -214,7 +210,7 @@ void qsl_dataset::save_data() {
 				char msg[100];
 				snprintf(msg, sizeof(msg), "QSL: Writing card image data for %s %s to %s", 
 					ita->first.c_str(),
-					qsl_types[(int)type].c_str(),
+					QSL_TYPES[(int)type].c_str(),
 					data->filename.c_str());
 				status_->misc_status(ST_LOG, msg);
 				ofstream op;

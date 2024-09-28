@@ -58,7 +58,7 @@ protected:
     // Update size
     void update_size();
     // Update vale user data
-    void update_userdata();
+    void update_dimensions();
 
     // Callbacks
     // Callsign
@@ -90,6 +90,8 @@ protected:
     static void cb_datetime(Fl_Widget* w, void* v);
     // Use Example QSO
     static void cb_example(Fl_Widget* w, void* v);
+    // Generate QSL type
+    static void cb_qsl_type(Fl_Widget* w, void* v);
     
     // Populate the item type choice widget
     void populate_type(Fl_Choice* ch);
@@ -97,6 +99,8 @@ protected:
     void populate_date(Fl_Choice* ch);
     // Populate the time format choice widget
     void populate_time(Fl_Choice* ch);
+    // Populate the QSL type choice
+    void populate_qsl_type(Fl_Choice* ch);
 
      // Callsign to read parameters
     string callsign_;
@@ -115,6 +119,8 @@ protected:
     string dir_name_;
     // Pointer to card data item
     qsl_data* data_;
+    // QSL type
+    qsl_data::qsl_type qsl_type_;
 
 
     //Widgets to reference:-

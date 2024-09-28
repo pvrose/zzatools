@@ -43,7 +43,7 @@ qsl_editor::qsl_editor(int X, int Y, int W, int H, const char* L) :
 	qsl_ = new qsl_display(qsl_display::IMAGE);
 	create_display();
 	// Load the display settings for this callsign
-	data_ = qsl_dataset_->get_card(callsign_, qsl_data::LABEL, true);
+	data_ = qsl_dataset_->get_card(callsign_, qsl_type_, true);
 	// If data does not exist 
 	// Set data into QSL Display
 	qsl_->set_card(data_);
@@ -86,6 +86,7 @@ int qsl_editor::handle(int event) {
 void qsl_editor::load_values() {
 	// Get the current or default callsign to use initially
     callsign_ = qso_manager_->get_default(qso_manager::CALLSIGN);
+	qsl_type_ = qsl_data::LABEL;
 	// Get the display window position
 	Fl_Preferences windows_settings(settings_, "Windows");
 	Fl_Preferences qsl_win_settings(windows_settings, "QSL Design");
@@ -117,8 +118,17 @@ void qsl_editor::create_form(int X, int Y) {
     w101->field_name("STATION_CALLSIGN");
 	w101->tooltip("Select the callsign to change QSL template parameters for");
 
+	curr_x += w101->x() + w101->w() + GAP + WLABEL;
+	Fl_Choice* w10101 = new Fl_Choice(curr_x, curr_y, WBUTTON, HBUTTON, "QSL Type");
+	w10101->align(FL_ALIGN_LEFT);
+	w10101->callback(cb_qsl_type, &qsl_type_);
+	populate_qsl_type(w10101);
+	w10101->value((int)qsl_type_);
+	w10101->tooltip("Select the type of QSL display you want, eg for a label for printing or a file for e-mailing");
+
+	max_x = w10101->x() + w10101->w() + GAP;
     curr_y += HBUTTON;
-	curr_x += GAP;
+	curr_x = g_1_->x() + GAP;
 
 	// Input field to specify filename
     filename_input* w102 = new filename_input(curr_x, curr_y, WEDIT * 2, HBUTTON);
@@ -134,8 +144,10 @@ void qsl_editor::create_form(int X, int Y) {
     curr_x += w102->w() + GAP;
 	curr_y += w102->h() + GAP;
 
+	max_x = max(max_x, curr_x);
+
     g_1_->resizable(nullptr);
-    g_1_->size(curr_x - g_1_->x(), curr_y - g_1_->y());
+    g_1_->size(max_x - g_1_->x(), curr_y - g_1_->y());
     g_1_->end();
 
     max_x = g_1_->x() + g_1_->w();
@@ -192,6 +204,7 @@ void qsl_editor::create_form(int X, int Y) {
 	w_20201->value(data_->columns);
 	w_20201->align(FL_ALIGN_LEFT);
 	w_20201->callback(cb_value<Fl_Value_Input, int>, &data_->columns);
+	w_20201->when(FL_WHEN_ENTER_KEY);
 	w_20201->tooltip("Please specify the number of columns when printing");
 	ip_cols_ = w_20201;
     curr_x += WLABEL + WBUTTON;;
@@ -209,6 +222,7 @@ void qsl_editor::create_form(int X, int Y) {
 	w_20203->value(data_->col_left);
 	w_20203->align(FL_ALIGN_LEFT);
 	w_20203->callback(cb_value<Fl_Value_Input, double>, &data_->col_left);
+	w_20203->when(FL_WHEN_ENTER_KEY);
 	w_20203->tooltip("Please specify the position of the first column");
 	ip_cpos_ = w_20203;
     curr_x += WLABEL + WBUTTON;;
@@ -217,6 +231,7 @@ void qsl_editor::create_form(int X, int Y) {
 	w_20204->value(data_->col_width);
 	w_20204->align(FL_ALIGN_LEFT);
 	w_20204->callback(cb_value<Fl_Value_Input, double>, &data_->col_width);
+	w_20204->when(FL_WHEN_ENTER_KEY);
 	w_20204->tooltip("Please specify the spacing between columns");
 	ip_cspace_ = w_20204;
     curr_x = g_202->x();
@@ -228,6 +243,7 @@ void qsl_editor::create_form(int X, int Y) {
 	w_20205->value(data_->rows);
 	w_20205->align(FL_ALIGN_LEFT);
 	w_20205->callback(cb_value<Fl_Value_Input, int>, &data_->rows);
+	w_20205->when(FL_WHEN_ENTER_KEY);
 	w_20205->tooltip("Please specify the number of rows when printing");
 	ip_rows_ = w_20205;
     curr_x += WLABEL + WBUTTON;;
@@ -236,6 +252,7 @@ void qsl_editor::create_form(int X, int Y) {
 	w_20206->value(data_->height);
 	w_20206->align(FL_ALIGN_LEFT);
 	w_20206->callback(cb_size_double, &data_->height);
+	w_20206->when(FL_WHEN_ENTER_KEY);
 	w_20206->tooltip("Please specify the width of the label in the selected label");
 	ip_height_ = w_20206;
     curr_x += WLABEL + WBUTTON;;
@@ -244,6 +261,7 @@ void qsl_editor::create_form(int X, int Y) {
 	w_20207->value(data_->row_top);
 	w_20207->align(FL_ALIGN_LEFT);
 	w_20207->callback(cb_value<Fl_Value_Input, double>, &data_->row_top);
+	w_20207->when(FL_WHEN_ENTER_KEY);
 	w_20207->tooltip("Please specify the position of the first row");
 	ip_rpos_ = w_20207;
     curr_x += WLABEL + WBUTTON;;
@@ -252,6 +270,7 @@ void qsl_editor::create_form(int X, int Y) {
 	w_20208->value(data_->row_height);
 	w_20208->align(FL_ALIGN_LEFT);
 	w_20208->callback(cb_value<Fl_Value_Input, double>, &data_->row_height);
+	w_20208->when(FL_WHEN_ENTER_KEY);
 	w_20208->tooltip("Please specify the spacing between rows");
 	ip_rspace_ = w_20208;
     curr_x = g_202->x();
@@ -262,6 +281,7 @@ void qsl_editor::create_form(int X, int Y) {
 	w_20209->value(data_->max_qsos);
 	w_20209->align(FL_ALIGN_LEFT);
 	w_20209->callback(cb_value<Fl_Value_Input, int>, &data_->max_qsos);
+	w_20209->when(FL_WHEN_ENTER_KEY);
 	w_20209->tooltip("Please specify the number of QSOs per Card");
 	ip_qsos_ = w_20209;
 	// Output to display size in points
@@ -377,6 +397,13 @@ void qsl_editor::save_values() {
 	qsl_win_settings.set("Top", win_y_);
 	qsl_win_settings.set("Left", win_x_);
 
+	if (data_->filename.length() == 0) {
+		char msg[128];
+		snprintf(msg, sizeof(msg), "QSL: No filename specified to save drawing items for %s %s - data may be lost",
+			callsign_.c_str(),
+			QSL_TYPES[qsl_type_].c_str());
+		status_->misc_status(ST_ERROR, msg);
+	}
 	qsl_dataset_->save_data();
 
 	settings_->flush();
@@ -738,6 +765,8 @@ void qsl_editor::redraw_display(bool dirty) {
 		// Do not show an example QSO
 		qsl_->set_qsos(nullptr, 0);
 	}
+	// We may have changed the size
+	qsl_->set_card(data_);
 	Fl_Image* image = qsl_->image();
 	display_->size(image->w(), image->h());
 	w_display_->size(display_->w(), display_->h());
@@ -771,25 +800,38 @@ void qsl_editor::update_size() {
 }
 
 // Restore user_data fpor all widgets thatrequire access to data
-void qsl_editor::update_userdata() {
+void qsl_editor::update_dimensions() {
 	ip_cols_->user_data(&data_->columns);
+	ip_cols_->value(data_->columns);
 	ip_width_->user_data(&data_->width);
+	ip_width_->value(data_->width);
 	ip_cpos_->user_data(&data_->col_left);
+	ip_cpos_->value(data_->col_left);
 	ip_cspace_->user_data(&data_->col_width);
+	ip_cspace_->value(data_->col_width);
 	ip_rows_->user_data(&data_->rows);
+	ip_rows_->value(data_->rows);
 	ip_height_->user_data(&data_->height);
+	ip_height_->value(data_->height);
 	ip_rpos_->user_data(&data_->row_top);
+	ip_rpos_->value(data_->row_top);
 	ip_rspace_->user_data(&data_->row_height);
+	ip_rspace_->value(data_->row_height);
 	ip_qsos_->user_data(&data_->max_qsos);
+	ip_qsos_->value(data_->max_qsos);
 	ch_data_->user_data(&data_->f_date);
+	ch_data_->value(data_->f_date);
 	ch_time_->user_data(&data_->f_time);
+	ch_time_->value(data_->f_time);
+	update_size();
 }
 
 // Call back when a radio button is pressed - v indicates which button
 void qsl_editor::cb_radio_dim(Fl_Widget* w, void* v) {
 	qsl_editor* that = ancestor_view<qsl_editor>(w);
 	that->data_->unit = ((qsl_data::dim_unit)(intptr_t)v);
-    that->redraw_display(true);
+	that->update_size();
+	that->redraw_display(true);
 }
 
 // Want to change the style (font, size and colour) of the text
@@ -846,11 +888,12 @@ void qsl_editor::cb_ip_bool(Fl_Widget* w, void* v) {
 void qsl_editor::cb_callsign(Fl_Widget* w, void* v) {
     qsl_editor* that = ancestor_view<qsl_editor>(w);
     cb_value<field_input, string>(w, v);
-	that->data_ = qsl_dataset_->get_card(that->callsign_, qsl_data::LABEL, true);
+	that->data_ = qsl_dataset_->get_card(that->callsign_, that->qsl_type_, true);
 	that->qsl_->set_card(that->data_);
 	that->filedata_.filename = &(that->data_->filename);
 	that->ip_filename_->value(that->data_->filename.c_str());
 	that->ip_filename_->user_data(&that->data_->filename);
+	that->update_dimensions();
 	// Only using existing data - not edited
     that->redraw_display(false);  
 	that->create_items();
@@ -937,6 +980,22 @@ void qsl_editor::cb_example(Fl_Widget* w, void* v) {
 	that->redraw_display(true);
 }
 
+// Seelect different QSL type
+void qsl_editor::cb_qsl_type(Fl_Widget* w, void* v) {
+	cb_value<Fl_Choice, int>(w, v);
+	qsl_editor* that = ancestor_view<qsl_editor>(w);
+	that->data_ = qsl_dataset_->get_card(that->callsign_, that->qsl_type_, true);
+	that->qsl_->set_card(that->data_);
+	that->filedata_.filename = &(that->data_->filename);
+	that->ip_filename_->value(that->data_->filename.c_str());
+	that->ip_filename_->user_data(&that->data_->filename);
+	that->update_dimensions();
+	// Only using existing data - not edited
+	that->redraw_display(false);
+	that->create_items();
+	that->redraw();
+}
+
 void qsl_editor::create_display() {
 	Fl_Group* save = Fl_Group::current();
 	Fl_Group::current(nullptr);
@@ -1005,5 +1064,12 @@ void qsl_editor::populate_time(Fl_Choice* ch) {
 	// HH:MM
 	strftime(value, sizeof(value), "%H:%M", utc);
 	ch->add(value);
+}
+
+void qsl_editor::populate_qsl_type(Fl_Choice* ch) {
+	ch->clear();
+	for (int ix = 0; ix < qsl_data::MAX_TYPE; ix++) {
+		ch->add(QSL_TYPES[ix].c_str());
+	}
 }
 

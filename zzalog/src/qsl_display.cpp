@@ -52,18 +52,21 @@ void qsl_display::draw_surface() {
 		draw();
 		break;
 	case IMAGE: {
-		delete image_;
+		// Only draw if we have size
+		if (data_->width > 10 && data_->height > 10) {
+			delete image_;
 
-		// Set the drawing surface
-		Fl_Image_Surface* surface = new Fl_Image_Surface(w_, h_, 1);
-		Fl_Surface_Device::push_current(surface);
+			// Set the drawing surface
+			Fl_Image_Surface* surface = new Fl_Image_Surface(w_, h_, 1);
+			Fl_Surface_Device::push_current(surface);
 
-		draw();
+			draw();
 
-		// Now save the image
-		image_ = surface->image();
-		// Restore graphicx surface
-		Fl_Surface_Device::pop_current();
+			// Now save the image
+			image_ = surface->image();
+			// Restore graphicx surface
+			Fl_Surface_Device::pop_current();
+		}
 		break;
 	}
 	case PDF:
@@ -131,7 +134,7 @@ void qsl_display::draw_field(qsl_data::field_def& field) {
 		for (int i = 0; i < num_records_; i++) {
 			// Separate each QSL's value with new-line
 			if (i > 0) text += '\n';
-			string value = qsos_[i]->item(field.field);
+			string value = qsos_[i]->item(field.field, false, true);
 			// Format date and time items, leave others as is
 			if (field.field == "QSO_DATE" ||
 				field.field == "QSO_DATE_OFF") {
@@ -148,7 +151,7 @@ void qsl_display::draw_field(qsl_data::field_def& field) {
 		set<string> values;
 		// Only print each values once
 		for (int i = 0; i < num_records_; i++) {
-			string value = qsos_[i]->item(field.field);
+			string value = qsos_[i]->item(field.field, false, true);
 			// Format date and time items, leave others as is
 			if (field.field == "QSO_DATE" ||
 				field.field == "QSO_DATE_OFF") {
@@ -254,7 +257,22 @@ void qsl_display::draw_text(qsl_data::text_def& text) {
 	fl_font(text.t_style.font, text.t_style.size);
 	fl_color(text.t_style.colour);
 	// Draw the text
-	fl_draw(text.text.c_str(), x_ + text.dx, y_ + text.dy + fl_height() - fl_descent());
+	string fulltext;
+	if (num_records_ == 0) {
+		fulltext = text.text;
+	}
+	else {
+		fulltext = qsos_[0]->item_merge(text.text, true);
+	}
+	// Get the X and Y positions - "-1" indicates abut it to previous item
+	int fx = (text.dx == -1) ? next_x_ : x_ + text.dx;
+	int fy = (text.dy == -1) ? next_y_ : y_ + text.dy;
+	fl_draw(fulltext.c_str(), x_ + fx, y_ + fy + fl_height() - fl_descent());
+	// The next item will be drawn below
+	int fw, fh;
+	fl_measure(fulltext.c_str(), fw, fh);
+	next_x_ = fx;
+	next_y_ = fy + fh + 2;
 }
 
 // Draw an image item - note this draws the imageits actual size
