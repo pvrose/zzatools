@@ -242,7 +242,6 @@ void qsl_display::draw_field(qsl_data::field_def& field) {
 	// set the next X,Y position
 	if (field.vertical) {
 		// The next item will be drawn to the right
-		if (field.box)
 		next_x_ = fx + fw + 2 * box_gap;
 		next_y_ = fy;
 	} else {
@@ -269,10 +268,19 @@ void qsl_display::draw_text(qsl_data::text_def& text) {
 	int fy = (text.dy == -1) ? next_y_ : y_ + text.dy;
 	fl_draw(fulltext.c_str(), x_ + fx, y_ + fy + fl_height() - fl_descent());
 	// The next item will be drawn below
-	int fw, fh;
+	int fw = 0, fh = 0;
 	fl_measure(fulltext.c_str(), fw, fh);
-	next_x_ = fx;
-	next_y_ = fy + fh + 2;
+	// set the next X,Y position
+	if (text.vertical) {
+		// The next item will be drawn to the right
+		next_x_ = fx + fw;
+		next_y_ = fy;
+	}
+	else {
+		// The next item will be drawn below
+		next_x_ = fx;
+		next_y_ = fy + fh;
+	}
 }
 
 // Draw an image item - note this draws the imageits actual size

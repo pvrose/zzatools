@@ -701,6 +701,15 @@ void qsl_editor::create_tparams(int& curr_x, int& curr_y, qsl_data::text_def* te
 	t_tstyle->copy_tooltip(temp);
 
 	curr_x += t_tstyle->w();
+
+	// Button to select vertical (label above value) or horizontal (label left of value)
+	Fl_Check_Button* t_vert = new Fl_Check_Button(curr_x, curr_y, HBUTTON, HBUTTON);
+	t_vert->tooltip("Select for vertical alignment of text item to next");
+	t_vert->callback(cb_ip_bool, &(text->vertical));
+	t_vert->when(FL_WHEN_RELEASE);
+	t_vert->value(text->vertical);
+
+	curr_x += t_vert->w();
 	curr_y += HBUTTON;
 }
 

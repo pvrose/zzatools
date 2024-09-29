@@ -46,10 +46,11 @@ struct qsl_data {
 
     // Structure describing the paarmeters of a text item
     struct text_def {
-        string text{ "Here be dragons!" };
+        string text{ "Text" };
         style_def t_style;
         int dx{ 0 };
         int dy{ 0 };
+        bool vertical{ false };      // If true the next item is alongside rather than below
 
     };
 

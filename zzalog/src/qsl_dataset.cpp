@@ -155,6 +155,9 @@ void qsl_dataset::load_items(qsl_data* data) {
 					item->text.t_style.colour = (Fl_Color)stoi(words[4]);
 					item->text.dx = stoi(words[5]);
 					item->text.dy = stoi(words[6]);
+					if (words.size() >= 8) {
+						item->text.vertical = (bool)stoi(words[7]);
+					}
 				}
 				break;
 			}
@@ -250,7 +253,8 @@ void qsl_dataset::save_data() {
 								(int)item->text.t_style.size << '\t' <<
 								(int)item->text.t_style.colour << '\t' <<
 								item->text.dx << '\t' <<
-								item->text.dy << endl;
+								item->text.dy << '\t' <<
+								(int)item->text.vertical << endl;
 							break;
 						}
 						case qsl_data::IMAGE: {
