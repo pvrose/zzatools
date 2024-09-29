@@ -1143,13 +1143,24 @@ void record::update_timeoff() {
 string record::item_merge(string data, bool indirect /*=false*/) {
 	string result = data;
 	size_t left = result.find('<');
-	size_t right = result.find('>');
+	size_t right = string::npos;
+	if (left != result.npos) right = result.substr(left).find_first_of(":>");
 	// while we still have an unprocessed <> pair
 	while (left != result.npos && right != result.npos) {
-		string field_name = result.substr(left + 1, right - left - 1);
-		result.replace(left, right - left + 1, item(field_name, indirect, true));
+		string field_name = result.substr(left + 1, right - 1);
+		if (result[left + right] == ':') {
+			size_t close = result.substr(left + right + 1).find('>');
+			int len = 0;
+			if (close != result.npos) {
+				len = atoi(result.substr(left + right + 1, close).c_str());
+			}
+			result.replace(left, right + close + 2, item(field_name, indirect, true).substr(0, len));
+		}
+		else {
+			result.replace(left, right + 1, item(field_name, indirect, true));
+		}
 		left = result.find('<');
-		right = result.find('>');
+		if (left != result.npos) right = result.substr(left).find_first_of(":>");
 	}
 	return result;
 }
