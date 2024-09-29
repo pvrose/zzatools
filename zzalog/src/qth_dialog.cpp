@@ -69,6 +69,7 @@ void qth_dialog::load_values() {
 	// ITU_ZONE is not supported by ClubLog cty.xml
 	//current_qth_.itu_zone = qth_details_->item("MY_ITU_ZONE");
 	current_qth_.iota = qth_details_->item("MY_IOTA");
+	current_qth_.wab = qth_details_->item("APP_ZZA_MY_WAB");
 	current_qth_.description = qth_details_->item("APP_ZZA_QTH_DESCR");
 	original_qth_ = current_qth_;
 }
@@ -192,6 +193,14 @@ void qth_dialog::create_form(int X, int Y) {
 	ip_iota_->value(current_qth_.iota.c_str());
 	ip_iota_->callback(cb_ip_upper, (void*)&current_qth_.iota);
 	ip_iota_->tooltip("Enter IOTA Reference - forms MY_IOTA");
+	// WAB
+	curr_y += HBUTTON + HTEXT;
+	ip_wab_ = new Fl_Input(curr_x, curr_y, WIP, HBUTTON, "Worked all Britain");
+	ip_wab_->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
+	ip_wab_->when(FL_WHEN_RELEASE);
+	ip_wab_->value(current_qth_.wab.c_str());
+	ip_wab_->callback(cb_ip_upper, (void*)&current_qth_.wab);
+	ip_wab_->tooltip("Enter Worked all Britain square - forms APP_ZZA_MY_WAB");
 
 	max_h = max(max_h, Y + HTEXT + 4 * (HBUTTON + HTEXT));
 	max_w += WIP + GAP;
@@ -266,6 +275,7 @@ void qth_dialog::save_values() {
 		qth_details_->item("MY_CQ_ZONE", current_qth_.cq_zone);
 		qth_details_->item("MY_ITU_ZONE", current_qth_.itu_zone);
 		qth_details_->item("MY_IOTA", current_qth_.iota);
+		qth_details_->item("APP_ZZA_MY_WAB", current_qth_.wab);
 		qth_details_->item("APP_ZZA_QTH_DESCR", current_qth_.description);
 		spec_data_->add_user_macro("APP_ZZA_QTH", qth_name_, { qth_details_, current_qth_.description });
 	}
@@ -290,6 +300,7 @@ void qth_dialog::enable_widgets() {
 	ip_cq_zone_->value(current_qth_.cq_zone.c_str());
 	ip_itu_zone_->value(current_qth_.itu_zone.c_str());
 	ip_iota_->value(current_qth_.iota.c_str());
+	ip_wab_->value(current_qth_.wab.c_str());
 	ip_description_->value(current_qth_.description.c_str());
 	ip_cont_->deactivate();
 }

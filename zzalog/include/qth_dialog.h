@@ -36,6 +36,7 @@ class record;
 			string itu_zone;       // MY_ITU_ZONE
 			string continent;      // MY_CONT
 			string iota;           // MY_IOTA
+			string wab;            // APP_ZZA_MY_WAB
 			string description;    // not ADIF - APP_ZZA_QTH_DESCR
 
 			bool operator==(qth_info_t rhs) {
@@ -51,6 +52,7 @@ class record;
 					itu_zone == rhs.itu_zone &&
 					continent == rhs.continent &&
 					iota == rhs.iota &&
+					wab == rhs.wab &&
 					description == rhs.description;
 			}
 		};
@@ -106,6 +108,7 @@ class record;
 		Fl_Int_Input* ip_itu_zone_;
 		Fl_Input* ip_cont_;
 		Fl_Input* ip_iota_;
+		Fl_Input* ip_wab_;
 		Fl_Input* ip_description_;
 
 		Fl_Float_Input* ip_latitude_;

@@ -1,5 +1,4 @@
 #include "qso_qth.h"
-#include "qso_entry.h"
 #include "qso_data.h"
 #include "qso_manager.h"
 #include "qth_dialog.h"
@@ -107,6 +106,9 @@ void qso_qth::enable_widgets() {
 		op_descr_->value("");
 		table_->set_data(nullptr);
 	}
+	qso_data* qd = ancestor_view<qso_data>(this);
+	if (qd->qso_editing(qd->current_number())) bn_edit_->activate();
+	else bn_edit_->deactivate();
 	table_->redraw();
 	redraw();
 
@@ -128,22 +130,20 @@ void qso_qth::set_qth(string name) {
 // v is not used
 void qso_qth::cb_bn_edit(Fl_Widget* w, void* v) {
 	qso_qth* that = ancestor_view<qso_qth>(w);
-	qso_entry* qe = ancestor_view<qso_entry>(that);
+	qso_data* qd = ancestor_view<qso_data>(that);
 	// Open QTH dialog
 	qth_dialog* dlg = new qth_dialog(that->qth_name_);
 	switch (dlg->display()) {
 	case BN_OK: 
 	{
 		set<string> changed_fields = spec_data_->get_macro_changes();
-		record* qso = qe->qso();
+		record* qso = qd->current_qso();
 		if (qso && qso->item("APP_ZZA_QTH") == that->qth_name_) {
 			for (auto fx = changed_fields.begin(); fx != changed_fields.end(); fx++) {
 				qso->item(*fx, that->qth_details_->item(*fx));
 			}
-			qe->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
+			qd->update_qso(qd->current_number());
 		}
-		qe->check_qth_changed();
-		qe->enable_widgets();
 		that->enable_widgets();
 		break;
 	}
@@ -193,6 +193,9 @@ void qso_qth::table::draw_cell(TableContext context, int R, int C, int X, int Y,
 		// Column indicates which record, row the field
 		fl_push_clip(X, Y, W, H);
 		{
+			Fl_Color bg_colour = FL_BACKGROUND_COLOR;
+			fl_color(bg_colour);
+			fl_rectf(X, Y, W, H);
 			// TEXT
 			Fl_Color fg_colour = FL_FOREGROUND_COLOR;
 			if (!active_r()) fg_colour = fl_inactive(fg_colour);

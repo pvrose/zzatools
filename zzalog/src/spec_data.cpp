@@ -913,7 +913,7 @@ bool spec_data::add_user_macro(string field, string value, macro_defn macro) {
 	macro_defn* defn;
 	if (this_map->find(value) == this_map->end()) {
 		// A new macro definition - create it and add to the macro set
-		char message[256];
+		char message[512];
 		snprintf(message, sizeof(message), "ADIF SPEC: Macro %s.%s being created",
 			field.c_str(),
 			value.c_str());
@@ -2442,6 +2442,7 @@ void spec_data::add_my_appdefs() {
 		"APP_ZZA_OP_DESCR",
 		"APP_ZZA_OPERATOR",    // Operator of QSL partner - provided in OPERATOR
 		"APP_ZZA_QTH",         // Macro
+		"APP_ZZA_MY_WAB",      // 
 		"APP_ZZA_QTH_DESCR",
 		"APP_LOTW_NUMREC",
 		"APP_LOTW_LASTQSL",
