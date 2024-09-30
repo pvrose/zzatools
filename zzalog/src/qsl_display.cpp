@@ -22,95 +22,76 @@ extern Fl_Preferences* settings_;
 // Dynamically drawn QSL card label
 
 // Constructor - just initialises the data
-qsl_display::qsl_display(qsl_display::qsl_surface surface)
+qsl_display::qsl_display(int X, int Y, int W, int H)
 {
     qsos_ = nullptr;
     num_records_ = 0;
-	image_ = nullptr;
+	alt_image_ = nullptr;
 	data_ = nullptr;
-	draw_surface_ = surface;
-	x_ = 0;
-	y_ = 0;
-}
-
-// Constructor to draw on current surface
-qsl_display::qsl_display(int X, int Y, qsl_display::qsl_surface surface) :
-	qsl_display(surface) 
-{
+	alt_text_ = nullptr;
 	x_ = X;
 	y_ = Y;
+	w_ = W;
+	h_ = H;
+	if (W == 0 || H == 0) {
+		do_scale_ = false;
+		scaling_ = 1.0;
+	}
+	else {
+		do_scale_ = true;
+		scaling_ = 1.0;
+	}
 }
 
 // Destructor - save the data
 qsl_display::~qsl_display() {
 };
 
-void qsl_display::draw_surface() {
-
-	switch (draw_surface_) {
-	case DEFAULT:
-		draw();
-		break;
-	case IMAGE: {
-		// Only draw if we have size
-		if (data_->width > 10 && data_->height > 10) {
-			delete image_;
-
-			// Set the drawing surface
-			Fl_Image_Surface* surface = new Fl_Image_Surface(w_, h_, 1);
-			Fl_Surface_Device::push_current(surface);
-
-			draw();
-
-			// Now save the image
-			image_ = surface->image();
-			// Restore graphicx surface
-			Fl_Surface_Device::pop_current();
-		}
-		break;
-	}
-	case PDF:
-		// TODO: Draw to Fl_PDF_File_Surface
-		break;
-	}
-}
-
 // Overload of the Fl_Widget::draw() method
 void qsl_display::draw() {
-	// Delete the existingwidget
-
-	if (data_->items.size() == 0) {
-		// Colour the whole display
-		fl_rectf(x_, y_, w_, h_, FL_WHITE);
-		Fl_Fontsize sz = fl_size();
-		fl_font(fl_font(), 48);
-		fl_color(FL_RED);
-		fl_draw("NO IMAGE!", x_, y_, w_, h_, FL_ALIGN_CENTER);
-		fl_font(fl_font(), sz);
-	}
-	else {
-		// Colour the whole display
-		fl_rectf(x_, y_, w_, h_, FL_WHITE);
-		// For each item...
-		for (auto it = data_->items.begin(); it != data_->items.end(); it++) {
-			qsl_data::item_def& item = *(*it);
-			// Call the draw_<type> method for this item type
-			switch (item.type) {
-			case qsl_data::FIELD: {
-				draw_field(item.field);
-				break;
-			}
-			case qsl_data::TEXT: {
-				draw_text(item.text);
-				break;
-			}
-			case qsl_data::IMAGE: {
-				draw_image(item.image);
-				break;
-			}
+	if (data_) {
+		calculate_scale(to_points(data_->width), to_points(data_->height));
+		if (data_->items.size() == 0) {
+			draw_text("NO IMAGE!", FL_RED);
+		}
+		else {
+			// Colour the whole display
+			if (do_scale_) fl_rectf(x_, y_, w_, h_, FL_BACKGROUND_COLOR);
+			// Now colour the drawing area
+			fl_rectf(draw_x_, draw_y_, draw_w_, draw_h_, FL_WHITE);
+			// For each item...
+			for (auto it = data_->items.begin(); it != data_->items.end(); it++) {
+				qsl_data::item_def& item = *(*it);
+				// Call the draw_<type> method for this item type
+				switch (item.type) {
+				case qsl_data::FIELD: {
+					draw_field(item.field);
+					break;
+				}
+				case qsl_data::TEXT: {
+					draw_text(item.text);
+					break;
+				}
+				case qsl_data::IMAGE: {
+					draw_image(item.image);
+					break;
+				}
+				}
 			}
 		}
 	}
+	else if (alt_image_) {
+		calculate_scale(alt_image_->w(), alt_image_->h());
+		draw_image(0, 0, alt_image_);
+	}
+	else if (alt_text_) {
+		draw_text(alt_text_, alt_colour_);
+	}
+	else {
+		draw_text("NO IMAGE!", FL_RED);
+	}
+	// Draw the box
+	fl_rect(x_, y_, w_, h_, FL_FOREGROUND_COLOR);
 	
 }
 
@@ -173,23 +154,24 @@ void qsl_display::draw_field(qsl_data::field_def& field) {
 	int fh = 0;
 	int box_gap = 0;
 	int text_gap = 0;
-	fl_font(field.t_style.font, field.t_style.size);
+	fl_font(field.t_style.font, scale(field.t_style.size));
 	fl_measure(text.c_str(), fw, fh);
 	// Have a minimum size 
+	int min_size = scale(45);
 	// First centre the text horizontally
-	int dx = max(45 - fw, 0) / 2;
-	fw = max(fw, 45);
-	fh = max(fh, 15);
+	int dx = max(min_size - fw, 0) / 2;
+	fw = max(fw, min_size);
+	fh = max(fh, (min_size / 3));
 	// Get the X and Y positions - "-1" indicates abut it to previous item
-	int fx = (field.dx == -1) ? next_x_ : x_ + field.dx;
-	int fy = (field.dy == -1) ? next_y_ : y_ + field.dy;
+	int fx = (field.dx == -1) ? next_x_ : draw_x_ + scale(field.dx);
+	int fy = (field.dy == -1) ? next_y_ : draw_y_ + scale(field.dy);
 	// Are we displaying the field if its value is the empty string?
 	if (field.display_empty || text.length()) {
 		// Draw the box if necessary
 		fl_color(FL_BLACK);
 		if (field.box) {
 			// Keep a 2 pixel border around the measured text
-			box_gap = 2;
+			box_gap = scale(2);
 			// If this item is not displayed if the qSo field is empty then loighten the box
 			if (field.display_empty) {
 				fl_rect(fx, fy, fw + 2 * box_gap, fh + 2 * box_gap, FL_BLACK);
@@ -213,7 +195,7 @@ void qsl_display::draw_field(qsl_data::field_def& field) {
 		// Now display the label
 		int lw = 0;
 		int lh = 0;
-		fl_font(field.l_style.font, field.l_style.size);
+		fl_font(field.l_style.font, scale(field.l_style.size));
 		// Display label ina lighter shade if an empty field is not displayed
 		if (!field.display_empty) {
 			fl_color(fl_lighter(field.l_style.colour));
@@ -253,7 +235,7 @@ void qsl_display::draw_field(qsl_data::field_def& field) {
 
 // Draw a text item
 void qsl_display::draw_text(qsl_data::text_def& text) {
-	fl_font(text.t_style.font, text.t_style.size);
+	fl_font(text.t_style.font,scale(text.t_style.size));
 	fl_color(text.t_style.colour);
 	// Draw the text
 	string fulltext;
@@ -264,8 +246,8 @@ void qsl_display::draw_text(qsl_data::text_def& text) {
 		fulltext = qsos_[0]->item_merge(text.text, true);
 	}
 	// Get the X and Y positions - "-1" indicates abut it to previous item
-	int fx = (text.dx == -1) ? next_x_ : x_ + text.dx;
-	int fy = (text.dy == -1) ? next_y_ : y_ + text.dy;
+	int fx = (text.dx == -1) ? next_x_ : draw_x_ + scale(text.dx);
+	int fy = (text.dy == -1) ? next_y_ : draw_y_ + scale(text.dy);
 	fl_draw(fulltext.c_str(), x_ + fx, y_ + fy + fl_height() - fl_descent());
 	// The next item will be drawn below
 	int fw = 0, fh = 0;
@@ -283,13 +265,46 @@ void qsl_display::draw_text(qsl_data::text_def& text) {
 	}
 }
 
-// Draw an image item - note this draws the imageits actual size
+// Draw an image item -
 void qsl_display::draw_image(qsl_data::image_def& image) {
 	Fl_Image* image_data = get_image(image.filename);
 	if (image_data) {
-		image_data->draw(x_ + image.dx, y_ + image.dy);
+		draw_image(image.dx, image.dy, image_data);
 	}
 }
+
+// Scale and dr5aw the iamge
+void qsl_display::draw_image(int x, int y, Fl_Image* image) {
+	if (do_scale_) {
+		Fl_Image* scale_image = image->copy(scale(image->w()), scale(image->h()));
+		scale_image->draw(draw_x_ + scale(x), draw_y_ + scale(y));
+	}
+	else {
+		image->draw(x_ + x, y_ + y);
+	}
+}
+
+// Scale and draw the text
+void qsl_display::draw_text(const char* text, Fl_Color colour) {
+	// Colour the whole display
+	fl_rectf(x_, y_, w_, h_, FL_BACKGROUND_COLOR);
+	Fl_Fontsize sz = fl_size();
+	Fl_Font f = fl_font();
+	int size = 48;
+	fl_font(0, size);
+	int w = 0, h = 0;
+	fl_measure(text, w, h);
+	while (w > w_) {
+		size--;
+		fl_font(FL_BOLD, size);
+		fl_measure(text, w, h);
+	}
+	fl_color(colour);
+	fl_draw(text, x_, y_, w_, h_, FL_ALIGN_CENTER);
+	fl_font(f, sz);
+}
+
+// Draw al
 
 // Convert value from specified unit to points
 int qsl_display::to_points(float value) {
@@ -413,22 +428,108 @@ string qsl_display::convert_time(string value) {
 	}
 }
 
-// Return the composed image (surface = IMAGE)
-Fl_RGB_Image* qsl_display::image() { 
-	return image_;
-}
 
 // Set new card design data
 void qsl_display::set_card(qsl_data* data) {
 	data_ = data;
-	w_ = to_points(data_->width);
-	h_ = to_points(data_->height);
-	draw_surface();
+	alt_image_ = nullptr;
+	alt_text_ = nullptr;
 }
 
 // Set the QSOs to display in the card
 void qsl_display::set_qsos(record** qsos, int num_qsos) {
 	qsos_ = qsos;
 	num_records_ = num_qsos;
-	draw_surface();
+}
+
+// Set alternate image
+void qsl_display::set_image(Fl_Image* image) {
+	alt_image_ = image;
+	data_ = nullptr;
+	alt_text_ = nullptr;
+}
+
+// set alternate text
+void qsl_display::set_text(const char* text, Fl_Color colour) {
+	delete alt_text_;
+	if (text == nullptr) alt_text_ = nullptr;
+	else {
+		alt_text_ = new char[strlen(text) + 1];
+		strcpy(alt_text_, text);
+	}
+	alt_image_ = nullptr;
+	data_ = nullptr;
+	alt_colour_ = colour;
+}
+
+// Scale 
+int qsl_display::scale(int value) {
+	if (do_scale_) {
+		return (int)((float)value * scaling_);
+	}
+	else {
+		return value;
+	}
+}
+
+// Calculate scaling factor
+void qsl_display::calculate_scale(int w, int h) {
+	if (w_ == 0 || h_ == 0 || (w_ == w && h_ == h)) {
+		// No scaling use supplied w and h values
+		w_ = w;
+		h_ = h;
+		do_scale_ = false;
+		scaling_ = 1.0;
+		draw_x_ = x_;
+		draw_y_ = y_;
+		draw_w_ = w_;
+		draw_h_ = h_;
+	}
+	else {
+		// What is the scale factor - minimum of w sca;ling and h scaling
+		float scale_w = (float)w_ / (float)w;
+		float scale_h = (float)h_ / (float)h;
+		do_scale_ = true;
+		if (scale_h < scale_w) {
+			scaling_ = scale_h;
+			// Set drawing coordinates
+			draw_x_ = x_ + (w_ - scale(w)) / 2;
+			draw_w_ = scale(w);
+			draw_y_ = y_;
+			draw_h_ = h_;
+		}
+		else {
+			scaling_ = scale_w;
+			// Set drawing coordinates
+			draw_x_ = x_;
+			draw_w_ = w_;
+			draw_y_ = y_ + (h_ - scale(h)) / 2;
+			draw_h_ = scale(h);
+		}
+	}
+}
+
+// Resize thedesign
+void qsl_display::resize(int w, int h) {
+	w_ = w;
+	h_ = h;
+}
+
+// Get the unscaled size
+void qsl_display::get_size(int& w, int& h) {
+	if (data_) {
+		// Unscaled size of the design
+		w = to_points(data_->width);
+		h = to_points(data_->height);
+	}
+	else if (alt_image_) {
+		// The unscaled size of the image
+		w = alt_image_->w();
+		h = alt_image_->h();
+	}
+	else {
+		// default to size of the widget
+		w = w_;
+		h = h_;
+	}
 }

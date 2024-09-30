@@ -166,6 +166,7 @@
     <ClCompile Include="zzalog\src\qsl_dataset.cpp" />
     <ClCompile Include="zzalog\src\qsl_display.cpp" />
     <ClCompile Include="zzalog\src\qsl_editor.cpp" />
+    <ClCompile Include="zzalog\src\qsl_widget.cpp" />
     <ClCompile Include="zzalog\src\qso_apps.cpp" />
     <ClCompile Include="zzalog\src\qso_buttons.cpp" />
     <ClCompile Include="zzalog\src\qso_clock.cpp" />
@@ -268,6 +269,7 @@
     <ClInclude Include="zzalog\include\qsl_dataset.h" />
     <ClInclude Include="zzalog\include\qsl_display.h" />
     <ClInclude Include="zzalog\include\qsl_editor.h" />
+    <ClInclude Include="zzalog\include\qsl_widget.h" />
     <ClInclude Include="zzalog\include\qso_apps.h" />
     <ClInclude Include="zzalog\include\qso_buttons.h" />
     <ClInclude Include="zzalog\include\qso_clock.h" />

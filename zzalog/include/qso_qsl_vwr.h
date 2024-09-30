@@ -11,6 +11,7 @@ class Fl_Button;
 class Fl_Light_Button;
 class Fl_Radio_Light_Button;
 class Fl_Image;
+class qsl_widget;
 
 typedef size_t qso_num_t;
 
@@ -68,16 +69,10 @@ protected:
 	void set_image_buttons();
 	// Set the log buttons
 	void set_log_buttons();
-	// draw the image
-	void draw_image();
 	// Set QSL status widgets
 	void set_qsl_status();
 	// Update full window
 	void update_full_view();
-	// Set full view size
-	void resize_full_view();
-	// Scale image to fit the target widgets
-	void scale_image();
 
 protected:
 
@@ -85,10 +80,6 @@ protected:
 	image_t selected_image_;
 	// the image file
 	Fl_Image* raw_image_;
-	// Image scaled to fit button
-	Fl_Image* scaled_image_;
-	// Image scaled to fit the screen
-	Fl_Image* screen_image_;
 	// Current QSO
 	record* current_qso_;
 	// Current QSO number
@@ -99,7 +90,7 @@ protected:
 	string full_name_;
 
 	// Card image and info
-	Fl_Button* bn_card_display_;
+	qsl_widget* qsl_thumb_;
 	// Card controls
 	Fl_Group* grp_card_type_;
 	Fl_Radio_Light_Button* radio_eqsl_;
@@ -123,6 +114,5 @@ protected:
 	// Window to contain full view
 	Fl_Window* win_full_view_;
 	// Button
-	Fl_Button* bn_full_view_;
-	Fl_Button* bn_no_image_;
+	qsl_widget* qsl_full_;
 };

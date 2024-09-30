@@ -1,6 +1,7 @@
 #include "qsl_editor.h"
 #include "qsl_dataset.h"
 #include "qsl_display.h"
+#include "qsl_widget.h"
 #include "status.h"
 #include "qso_manager.h"
 #include "qso_data.h"
@@ -40,8 +41,8 @@ qsl_editor::qsl_editor(int X, int Y, int W, int H, const char* L) :
 	// Load settings
     load_values();
 	// Create the qsl_display instance
-	qsl_ = new qsl_display(qsl_display::IMAGE);
 	create_display();
+	qsl_ = display_->display();
 	// Load the display settings for this callsign
 	data_ = qsl_dataset_->get_card(callsign_, qsl_type_, true);
 	// If data does not exist 
@@ -328,6 +329,12 @@ void qsl_editor::create_form(int X, int Y) {
 	w_20303->tooltip("Show an example QSO rather than the template");
 	w_20303->value(show_example_);
 	w_20303->callback(cb_example, (void*)&show_example_);
+
+	curr_x += w_20303->w() + GAP;
+	// A button to restore image to unscaled size
+	Fl_Button* w_20304 = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Actual size");
+	w_20304->tooltip("Restore the displayed image to actual size");
+	w_20304->callback(cb_descale);
 
 	curr_y += HBUTTON;
 
@@ -776,11 +783,17 @@ void qsl_editor::redraw_display(bool dirty) {
 	}
 	// We may have changed the size
 	qsl_->set_card(data_);
-	Fl_Image* image = qsl_->image();
-	display_->size(image->w(), image->h());
-	w_display_->size(display_->w(), display_->h());
-	display_->image(image);
-	w_display_->redraw();
+	if (!dirty) {
+		// Do not restore size of editing
+		int w, h;
+		qsl_->get_size(w, h);
+		display_->size(w, h);
+		w_display_->size(display_->w(), display_->h());
+		w_display_->redraw();
+	}
+	else {
+		w_display_->redraw();
+	}
 
 }
 
@@ -1005,6 +1018,12 @@ void qsl_editor::cb_qsl_type(Fl_Widget* w, void* v) {
 	that->redraw();
 }
 
+// Restore the drawing size
+void qsl_editor::cb_descale(Fl_Widget* w, void* v) {
+	qsl_editor* that = ancestor_view<qsl_editor>(w);
+	that->redraw_display(false);
+}
+
 void qsl_editor::create_display() {
 	Fl_Group* save = Fl_Group::current();
 	Fl_Group::current(nullptr);
@@ -1014,8 +1033,9 @@ void qsl_editor::create_display() {
 	snprintf(l, sizeof(l), "QSL Card Design: %s", callsign_.c_str());
 	w_display_->copy_label(l);
 	w_display_->border(true);
-	display_ = new Fl_Button(0, 0, 100, 100);
+	display_ = new qsl_widget(0, 0, w_display_->w(), w_display_->h());
 	display_->box(FL_FLAT_BOX);
+	w_display_->resizable(display_);
 	w_display_->end();
 	w_display_->show();
 	Fl_Group::current(save);

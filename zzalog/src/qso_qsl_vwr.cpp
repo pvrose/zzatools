@@ -6,6 +6,7 @@
 #include "book.h"
 #include "record.h"
 #include "qsl_display.h"
+#include "qsl_widget.h"
 #include "qsl_dataset.h"
 #include "callback.h"
 #include "drawing.h"
@@ -36,8 +37,6 @@ qso_qsl_vwr::qso_qsl_vwr(int X, int Y, int W, int H, const char* L) :
 	Fl_Group(X, Y, W, H, L)
 	, selected_image_(QI_NONE)
 	, raw_image_(nullptr)
-	, scaled_image_(nullptr)
-	, screen_image_(nullptr)
 	, current_qso_(nullptr)
 {
 	labelfont(FL_BOLD);
@@ -54,7 +53,7 @@ qso_qsl_vwr::~qso_qsl_vwr() {
 // Load values
 void qso_qsl_vwr::load_values() {
 	Fl_Preferences display_settings(settings_, "Display");
-	display_settings.get("Image Type", (int&)selected_image_, QI_EQSL);
+	display_settings.get("Image Type", (int&)selected_image_, QI_NONE);
 	Fl_Preferences datapath(settings_, "Datapath");
 	char* temp;
 	if (!datapath.get("QSLs", temp, "")) {
@@ -99,13 +98,14 @@ void qso_qsl_vwr::create_form() {
 	const int HIMAGE = w() * HCARD / WCARD;
 
 
-	// Box - for the display of a card image or if no card exists the callsign in large text
-	bn_card_display_ = new Fl_Button(curr_x, curr_y, WIMAGE, HIMAGE, "Image");
-	bn_card_display_->box(FL_FLAT_BOX);
-	bn_card_display_->tooltip("The card image is displayed here!");
-	bn_card_display_->callback(cb_bn_image, nullptr);
+	// Box - for the display of a card image 
+	qsl_thumb_ = new qsl_widget(curr_x, curr_y, WIMAGE, HIMAGE, "Image");
+	qsl_thumb_->box(FL_FLAT_BOX);
+	qsl_thumb_->tooltip("The card image is displayed here!");
+	qsl_thumb_->callback(cb_bn_image, nullptr);
+	qsl_thumb_->when(FL_WHEN_RELEASE);
 
-	curr_y += bn_card_display_->h();
+	curr_y += qsl_thumb_->h();
 
 	curr_x = x() + GAP;
 
@@ -289,16 +289,16 @@ void qso_qsl_vwr::create_form() {
 	// Now create the full view window - this has three alternate widgets
 	win_full_view_ = new Fl_Window(WCARD, HCARD);
 	// Display the received image at full size
-	bn_full_view_ = new Fl_Button(0, 0, WCARD, HCARD);
-	bn_full_view_->box(FL_FLAT_BOX);
-	// Display a warning - No image available!
-	bn_no_image_ = new Fl_Button(0, 0, WCARD, HCARD);
-	bn_no_image_->box(FL_FLAT_BOX);
-	bn_no_image_->label("No image available!");
-	bn_no_image_->labelsize(FL_NORMAL_SIZE * 3);
-	bn_no_image_->labelcolor(FL_RED);
+	qsl_full_ = new qsl_widget(0, 0, WCARD, HCARD);
+	qsl_full_->box(FL_FLAT_BOX);
+	//// Display a warning - No image available!
+	//bn_no_image_ = new Fl_Button(0, 0, WCARD, HCARD);
+	//bn_no_image_->box(FL_FLAT_BOX);
+	//bn_no_image_->label("No image available!");
+	//bn_no_image_->labelsize(FL_NORMAL_SIZE * 3);
+	//bn_no_image_->labelcolor(FL_RED);
 
-	win_full_view_->resizable(bn_full_view_);
+	win_full_view_->resizable(qsl_full_);
 	win_full_view_->end();
 	win_full_view_->hide();
 
@@ -368,7 +368,7 @@ void qso_qsl_vwr::cb_bn_image(Fl_Widget* w, void* v) {
 		that->win_full_view_->hide();
 	}
 	else {
-		that->resize_full_view();
+		that->update_full_view();
 		that->win_full_view_->show();
 	}
 }
@@ -418,31 +418,37 @@ void qso_qsl_vwr::enable_widgets() {
 
 // Get the card image to display and put it in the image widget.
 void qso_qsl_vwr::set_image() {
-	qsl_display* qsl;
+	qsl_display* full = qsl_full_->display();
+	qsl_display* thumb = qsl_thumb_->display();
 	switch(selected_image_) {
 		case QI_NONE: {
-			draw_image();
-			update_full_view();
+			if (current_qso_) {
+				thumb->set_text(current_qso_->item("CALL").c_str(), FL_BLACK);
+				full->set_text(nullptr, FL_BLACK);
+			}
+			else {
+				thumb->set_text(nullptr, FL_BLACK);
+				full->set_text(nullptr, FL_BLACK);
+			}
 			break;
 		}
 		case QI_MY_QSL: {
-			qsl = new qsl_display(0, 0, qsl_display::IMAGE);
 			qsl_data* card;
 			if (current_qso_) {
 				card = qsl_dataset_->get_card(current_qso_->item("STATION_CALLSIGN"), qsl_data::LABEL, false);
-				qsl->set_card(card);
-				qsl->set_qsos(&current_qso_, 1);
+				full->set_card(card);
+				full->set_qsos(&current_qso_, 1);
+				thumb->set_card(card);
+				thumb->set_qsos(&current_qso_, 1);
 			} else {
 				qso_manager* mgr = ancestor_view<qso_manager>(this);
 				string def_call = mgr->get_default(qso_manager::CALLSIGN);
 				card = qsl_dataset_->get_card(def_call, qsl_data::LABEL, false);
-				qsl->set_card(card);
-				qsl->set_qsos(nullptr, 0);
+				full->set_card(card);
+				full->set_qsos(nullptr, 0);
+				thumb->set_card(card);
+				thumb->set_qsos(nullptr, 0);
 			}
-			raw_image_ = qsl->image();
-			scale_image();
-			update_full_view();
-			draw_image();
 			break;
 		}
 		default: {
@@ -469,10 +475,6 @@ void qso_qsl_vwr::set_image() {
 					// Look for a possible image file and try and load into the image object
 					delete raw_image_;
 					raw_image_ = nullptr;
-					delete scaled_image_;
-					scaled_image_ = nullptr;
-					delete screen_image_;
-					screen_image_ = nullptr;
 					string station = current_qso_->item("STATION_CALLSIGN");
 					de_slash(station);
 
@@ -577,7 +579,6 @@ void qso_qsl_vwr::set_image() {
 						}
 					}
 					if (found_image) {
-						scale_image();
 						update_full_view();
 						// Test Whether we've used default station callsign
 					}
@@ -585,13 +586,10 @@ void qso_qsl_vwr::set_image() {
 			} else {
 				delete raw_image_;
 				raw_image_ = nullptr;
-				delete scaled_image_;
-				scaled_image_ = nullptr;
-				delete screen_image_;
-				screen_image_ = nullptr;
 			}
 			// Got an image: draw it
-			draw_image();
+			full->set_image(raw_image_);
+			thumb->set_image(raw_image_);
 			// If we've found an image under the default station intended for this station 
 			// move (rename) it
 			if (found_image && use_default) {
@@ -640,35 +638,9 @@ void qso_qsl_vwr::set_image() {
 			break;
 		}
 	}
-}
-
-void qso_qsl_vwr::scale_image() {
-	// Resize the image to fit the control
-	// Resize keeping original height/width ratio
-	float scale_w = (float)raw_image_->w() / (float)bn_card_display_->w();
-	float scale_h = (float)raw_image_->h() / (float)bn_card_display_->h();
-	if (scale_w < scale_h) {
-		scaled_image_ = raw_image_->copy((int)(raw_image_->w() / scale_h), bn_card_display_->h());
-	}
-	else {
-		scaled_image_ = raw_image_->copy(bn_card_display_->w(), (int)(raw_image_->h() / scale_w));
-	}
-	// Resize the image to fit the screen
-	int sx, sy, sw, sh;
-	Fl::screen_work_area(sx, sy, sw, sh);
-	if (raw_image_->w() < sw && raw_image_->h() < sh) {
-		// Image fits in the screen
-		screen_image_ = raw_image_->copy();
-	} else {
-		scale_w = (float)raw_image_->w() / (float)sw;
-		scale_h = (float)raw_image_->h() / (float)sh;
-		if (scale_w < scale_h) {
-			screen_image_ = raw_image_->copy((int)(raw_image_->w() / scale_h), sh);
-		}
-		else {
-			screen_image_ = raw_image_->copy(sw, (int)(raw_image_->h() / scale_w));
-		}
-	}
+	update_full_view();
+	qsl_full_->redraw();
+	qsl_thumb_->redraw();
 }
 
 // Set the values of the various buttons associated with the image.
@@ -747,78 +719,6 @@ void qso_qsl_vwr::set_image_buttons() {
 	}
 }
 
-// Draw the selected QSL card image (or callsign if no image)
-void qso_qsl_vwr::draw_image() {
-	// Remove existing images
-	bn_card_display_->label(nullptr);
-	bn_card_display_->image(nullptr);
-	bn_card_display_->deimage(nullptr);
-	switch (selected_image_) {
-	case QI_EQSL:
-	case QI_CARD_BACK:
-	case QI_CARD_FRONT:
-	case QI_EMAIL:
-	case QI_MY_QSL:
-		// We want to display the saved QSL image
-		if (scaled_image_) {
-			// we have an image
-			// Set the resized image as the selected and unselected image for the control
-			bn_card_display_->image(scaled_image_);
-			bn_card_display_->box(FL_FLAT_BOX);
-		}
-		else {
-			// Display a label instead in large letters - 36 pt.
-			// Make font smaller if callsign wouldn't fit
-			int size = 32;
-			if (current_qso_ && current_qso_->item("CALL").length() != 0) {
-				bn_card_display_->copy_label(current_qso_->item("CALL").c_str());
-			}
-			else {
-				bn_card_display_->label("No contact");
-				size = FL_NORMAL_SIZE + 2;
-			}
-			fl_font(FL_BOLD, size);
-			int w, h;
-			fl_measure(bn_card_display_->label(), w, h);
-			while (w > bn_card_display_->w()) {
-				size--;
-				fl_font(FL_BOLD, size);
-				fl_measure(bn_card_display_->label(), w, h);
-			}
-			bn_card_display_->labelsize(size);
-			bn_card_display_->labelcolor(FL_FOREGROUND_COLOR);
-			bn_card_display_->labelfont(FL_BOLD);
-			bn_card_display_->box(FL_BORDER_BOX);
-		}
-		break;
-	case QI_NONE:
-		// Display a label instead in large letters - 36 pt.
-		// Make font smaller if callsign wouldn't fit
-		int size = 32;
-		if (current_qso_ && current_qso_->item("CALL").length() != 0) {
-			bn_card_display_->copy_label(current_qso_->item("CALL").c_str());
-		}
-		else {
-			bn_card_display_->label("No contact");
-			size = FL_NORMAL_SIZE + 2;
-		}
-		fl_font(FL_BOLD, size);
-		int w, h;
-		fl_measure(bn_card_display_->label(), w, h);
-		while (w > bn_card_display_->w()) {
-			size--;
-			fl_font(FL_BOLD, size);
-			fl_measure(bn_card_display_->label(), w, h);
-		}
-		bn_card_display_->labelsize(size);
-		bn_card_display_->labelcolor(FL_FOREGROUND_COLOR);
-		bn_card_display_->labelfont(FL_BOLD);
-		bn_card_display_->box(FL_BORDER_BOX);
-		break;		
-	}
-
-	bn_card_display_->redraw();
-}
 
 // Set the selected image to that provided
 void qso_qsl_vwr::set_selected_image(image_t value) {
@@ -917,49 +817,17 @@ void qso_qsl_vwr::set_log_buttons() {
 
 // Update  the full view window
 void qso_qsl_vwr::update_full_view() {
-	switch(selected_image_) {
-		case QI_EQSL:
-		case QI_CARD_BACK:
-		case QI_EMAIL:
-		case QI_CARD_FRONT: 
-		case QI_MY_QSL: {
-			win_full_view_->resizable(bn_full_view_);
-			bn_full_view_->image(screen_image_);
-			if (raw_image_) {
-				bn_full_view_->show();
-				bn_no_image_->hide();
-			} else {
-				bn_full_view_->hide();
-				bn_no_image_->show();
-			}
-			break;
-		}
-		case QI_NONE: {
-			if (win_full_view_->visible()) win_full_view_->hide();
-			bn_full_view_->hide();
-			bn_no_image_->show();
-			break;
-		}
-
-	}
-	resize_full_view();
+	int w;
+	int h;
+	qsl_full_->display()->get_size(w, h);
+	int sx, sy, sw, sh;
+	Fl::screen_work_area(sx, sy, sw, sh);
+	// Keep the size within the screen work area
+	w = min(w, sw);
+	h = min(h, sh);
+	// And resize the full view window
+	win_full_view_->size(w, h);
+	qsl_full_->size(w, h);
 	win_full_view_->redraw();
 }
 
-// Resize full view
-void qso_qsl_vwr::resize_full_view() {
-	switch(selected_image_) {
-		case QI_NONE: {
-			win_full_view_->size(bn_no_image_->w(), bn_no_image_->h());
-			break;
-		}
-		default: {
-			if (raw_image_) {
-				win_full_view_->size(screen_image_->w(), screen_image_->h());
-			} else {
-				win_full_view_->size(bn_no_image_->w(), bn_no_image_->h());
-			}
-			break;
-		}
-	}
-}

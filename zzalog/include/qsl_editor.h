@@ -6,6 +6,7 @@
 #include "callback.h"
 
 class qsl_display;
+class qsl_widget;
 class record;
 class filename_input;
 class Fl_Choice;
@@ -92,6 +93,8 @@ protected:
     static void cb_example(Fl_Widget* w, void* v);
     // Generate QSL type
     static void cb_qsl_type(Fl_Widget* w, void* v);
+    // Reset image to unscaled
+    static void cb_descale(Fl_Widget* w, void* v);
     
     // Populate the item type choice widget
     void populate_type(Fl_Choice* ch);
@@ -146,7 +149,7 @@ protected:
     // Window in which to show the display
     Fl_Window* w_display_;
     // Display widget
-    Fl_Widget* display_;
+    qsl_widget* display_;
     // Output contains calculated size of display (in pixels)
     Fl_Output* op_size_;
 };
