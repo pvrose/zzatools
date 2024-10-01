@@ -29,10 +29,17 @@ qsl_display::qsl_display(int X, int Y, int W, int H)
 	alt_image_ = nullptr;
 	data_ = nullptr;
 	alt_text_ = nullptr;
+	alt_colour_ = FL_BLACK;
 	x_ = X;
 	y_ = Y;
 	w_ = W;
 	h_ = H;
+	draw_x_ = X;
+	draw_y_ = Y;
+	draw_w_ = W;
+	draw_h_ = H;
+	next_x_ = X;
+	next_y_ = Y;
 	if (W == 0 || H == 0) {
 		do_scale_ = false;
 		scaling_ = 1.0;
@@ -296,7 +303,7 @@ void qsl_display::draw_text(const char* text, Fl_Color colour) {
 	fl_measure(text, w, h);
 	while (w > w_) {
 		size--;
-		fl_font(FL_BOLD, size);
+		fl_font(0, size);
 		fl_measure(text, w, h);
 	}
 	fl_color(colour);
