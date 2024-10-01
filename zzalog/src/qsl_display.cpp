@@ -97,8 +97,6 @@ void qsl_display::draw() {
 	else {
 		draw_text("NO IMAGE!", FL_RED);
 	}
-	// Draw the box
-	fl_rect(x_, y_, w_, h_, FL_FOREGROUND_COLOR);
 	
 }
 
@@ -255,7 +253,7 @@ void qsl_display::draw_text(qsl_data::text_def& text) {
 	// Get the X and Y positions - "-1" indicates abut it to previous item
 	int fx = (text.dx == -1) ? next_x_ : draw_x_ + scale(text.dx);
 	int fy = (text.dy == -1) ? next_y_ : draw_y_ + scale(text.dy);
-	fl_draw(fulltext.c_str(), x_ + fx, y_ + fy + fl_height() - fl_descent());
+	fl_draw(fulltext.c_str(), fx, fy + fl_height() - fl_descent());
 	// The next item will be drawn below
 	int fw = 0, fh = 0;
 	fl_measure(fulltext.c_str(), fw, fh);

@@ -4,6 +4,7 @@
 qsl_widget::qsl_widget(int X, int Y, int W, int H, const char* L) :
 	Fl_Widget(X, Y, W, H, L)
 {
+	box(FL_BORDER_BOX);
 	display_ = new qsl_display(x(), y(), w(), h());
 }
 

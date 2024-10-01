@@ -344,6 +344,7 @@ int printer::print_page_cards(size_t &item_num) {
 			qsl_display* qsl = new qsl_display(imagex, imagey);
 			qsl->set_card(card_data_);
 			qsl->set_qsos(records, print_records);
+			qsl->draw();
 
 			item_num += print_records;
 			num_records -= print_records;

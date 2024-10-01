@@ -787,8 +787,7 @@ void qsl_editor::redraw_display(bool dirty) {
 		// Do not restore size of editing
 		int w, h;
 		qsl_->get_size(w, h);
-		display_->size(w, h);
-		w_display_->size(display_->w(), display_->h());
+		w_display_->size(w, h);
 		w_display_->redraw();
 	}
 	else {
