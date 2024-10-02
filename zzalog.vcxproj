@@ -163,9 +163,11 @@
     <ClCompile Include="zzalog\src\font_dialog.cpp" />
     <ClCompile Include="zzalog\src\page_dialog.cpp" />
     <ClCompile Include="zzalog\src\password_input.cpp" />
+    <ClCompile Include="zzalog\src\png_writer.cpp" />
     <ClCompile Include="zzalog\src\qsl_dataset.cpp" />
     <ClCompile Include="zzalog\src\qsl_display.cpp" />
     <ClCompile Include="zzalog\src\qsl_editor.cpp" />
+    <ClCompile Include="zzalog\src\qsl_image.cpp" />
     <ClCompile Include="zzalog\src\qsl_widget.cpp" />
     <ClCompile Include="zzalog\src\qso_apps.cpp" />
     <ClCompile Include="zzalog\src\qso_buttons.cpp" />
@@ -265,10 +267,12 @@
     <ClInclude Include="zzalog\include\logo.h" />
     <ClInclude Include="zzalog\include\page_dialog.h" />
     <ClInclude Include="zzalog\include\password_input.h" />
+    <ClInclude Include="zzalog\include\png_writer.h" />
     <ClInclude Include="zzalog\include\qsl_data.h" />
     <ClInclude Include="zzalog\include\qsl_dataset.h" />
     <ClInclude Include="zzalog\include\qsl_display.h" />
     <ClInclude Include="zzalog\include\qsl_editor.h" />
+    <ClInclude Include="zzalog\include\qsl_image.h" />
     <ClInclude Include="zzalog\include\qsl_widget.h" />
     <ClInclude Include="zzalog\include\qso_apps.h" />
     <ClInclude Include="zzalog\include\qso_buttons.h" />
