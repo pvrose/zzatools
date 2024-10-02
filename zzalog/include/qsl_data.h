@@ -122,5 +122,5 @@ struct qsl_data {
 };
 
 // Initialise the 
-const string QSL_TYPES[qsl_data::MAX_TYPE] = {"Label", "PDF"};
+const string QSL_TYPES[qsl_data::MAX_TYPE] = {"Label", "File"};
 

@@ -210,20 +210,28 @@ void qso_qsl_vwr::create_form() {
 	curr_x = x() + GAP;
 	curr_y += HBUTTON;
 	// Radio - display received e-mail image
-	radio_email_ = new Fl_Radio_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "eMail");
-	radio_email_->align(FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
-	radio_email_->selection_color(FL_FOREGROUND_COLOR);
-	radio_email_->callback(cb_rad_card, (void*)QI_EMAIL);
-	radio_email_->when(FL_WHEN_RELEASE_ALWAYS);
-	radio_email_->tooltip("Select image received by e-mail");
+	radio_emailr_ = new Fl_Radio_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "eMail (R)");
+	radio_emailr_->align(FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
+	radio_emailr_->selection_color(FL_FOREGROUND_COLOR);
+	radio_emailr_->callback(cb_rad_card, (void*)QI_EMAILR);
+	radio_emailr_->when(FL_WHEN_RELEASE_ALWAYS);
+	radio_emailr_->tooltip("Select image received by e-mail");
 	curr_x += WBUTTON;
 	// Radio - display my QSL
-	radio_myqsl_ = new Fl_Radio_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "MyQSL");
-	radio_myqsl_->align(FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
-	radio_myqsl_->selection_color(FL_FOREGROUND_COLOR);
-	radio_myqsl_->callback(cb_rad_card, (void*)QI_MY_QSL);
-	radio_myqsl_->when(FL_WHEN_RELEASE_ALWAYS);
-	radio_myqsl_->tooltip("Select my QSL as printed");
+	radio_label_ = new Fl_Radio_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Label");
+	radio_label_->align(FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
+	radio_label_->selection_color(FL_FOREGROUND_COLOR);
+	radio_label_->callback(cb_rad_card, (void*)QI_LABEL);
+	radio_label_->when(FL_WHEN_RELEASE_ALWAYS);
+	radio_label_->tooltip("Select QSL label as printed");
+	curr_x += WBUTTON;
+	// Radio - display sending e-mail image
+	radio_emails_ = new Fl_Radio_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "eMail (S)");
+	radio_emails_->align(FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
+	radio_emails_->selection_color(FL_FOREGROUND_COLOR);
+	radio_emails_->callback(cb_rad_card, (void*)QI_EMAILS);
+	radio_emails_->when(FL_WHEN_RELEASE_ALWAYS);
+	radio_emails_->tooltip("Select image to be sent by e-mail");
 
 	grp_card_type_->end();
 
@@ -353,7 +361,7 @@ void qso_qsl_vwr::cb_bn_log_card(Fl_Widget* w, void* v) {
 	}
 	// now pretend the Card Front radio button has been pressed
 	if (*source == 'E') {
-		cb_rad_card(that->radio_card_front_, (void*)QI_EMAIL);
+		cb_rad_card(that->radio_card_front_, (void*)QI_EMAILR);
 	} else {
 		cb_rad_card(that->radio_card_front_, (void*)QI_CARD_FRONT);
 	}
@@ -438,10 +446,12 @@ void qso_qsl_vwr::set_image() {
 			}
 			break;
 		}
-		case QI_MY_QSL: {
+		case QI_LABEL:
+		case QI_EMAILS: {
 			qsl_data* card;
+			qsl_data::qsl_type type = selected_image_ == QI_LABEL ? qsl_data::LABEL : qsl_data::FILE;
 			if (current_qso_) {
-				card = qsl_dataset_->get_card(current_qso_->item("STATION_CALLSIGN"), qsl_data::LABEL, false);
+				card = qsl_dataset_->get_card(current_qso_->item("STATION_CALLSIGN"), type, false);
 				full->set_card(card);
 				full->set_qsos(&current_qso_, 1);
 				thumb->set_card(card);
@@ -449,7 +459,7 @@ void qso_qsl_vwr::set_image() {
 			} else {
 				qso_manager* mgr = ancestor_view<qso_manager>(this);
 				string def_call = mgr->get_default(qso_manager::CALLSIGN);
-				card = qsl_dataset_->get_card(def_call, qsl_data::LABEL, false);
+				card = qsl_dataset_->get_card(def_call, type, false);
 				full->set_card(card);
 				full->set_qsos(nullptr, 0);
 				thumb->set_card(card);
@@ -511,7 +521,7 @@ void qso_qsl_vwr::set_image() {
 							call.c_str(),
 							current_qso_->item("QSO_DATE").c_str());
 						break;
-					case QI_EMAIL:
+					case QI_EMAILR:
 						// Card image of a scanned-in paper QSL card (front - i.e. callsign side)
 						// File name e.g.= <root>\emails\PA_GM3ZZA_P__<QSO date>.png
 						sprintf(filename, "%s/%s/email/%s__%s",
@@ -657,47 +667,62 @@ void qso_qsl_vwr::set_image_buttons() {
 		radio_eqsl_->value(true);
 		radio_card_front_->value(false);
 		radio_card_back_->value(false);
-		radio_email_->value(false);
-		radio_myqsl_->value(false);
+		radio_emailr_->value(false);
+		radio_emails_->value(false);
+		radio_label_->value(false);
 		break;
 	case QI_CARD_FRONT:
 		// Display the front of a scanned-in paper card
 		radio_eqsl_->value(false);
 		radio_card_front_->value(true);
 		radio_card_back_->value(false);
-		radio_email_->value(false);
-		radio_myqsl_->value(false);
+		radio_emailr_->value(false);
+		radio_label_->value(false);
+		radio_emails_->value(false);
 		break;
 	case QI_CARD_BACK:
 		// Display the back of a scanned-in paper card
 		radio_eqsl_->value(false);
 		radio_card_front_->value(false);
 		radio_card_back_->value(true);
-		radio_email_->value(false);
-		radio_myqsl_->value(false);
+		radio_emailr_->value(false);
+		radio_label_->value(false);
+		radio_emails_->value(false);
 		break;
-	case QI_EMAIL:
+	case QI_EMAILR:
 		// Display the back of a scanned-in paper card
 		radio_eqsl_->value(false);
 		radio_card_front_->value(false);
 		radio_card_back_->value(false);
-		radio_email_->value(true);
-		radio_myqsl_->value(false);
+		radio_emailr_->value(true);
+		radio_label_->value(false);
+		radio_emails_->value(false);
 		break;
-	case QI_MY_QSL:
-		// Display my QSL as generated image
+	case QI_LABEL:
+		// Display my QSL label as generated image
 		radio_eqsl_->value(false);
 		radio_card_front_->value(false);
 		radio_card_back_->value(false);
-		radio_email_->value(false);
-		radio_myqsl_->value(true);
+		radio_emailr_->value(false);
+		radio_label_->value(true);
+		radio_emails_->value(false);
+		break;
+	case QI_EMAILS:
+		// Display my QSL label as generated image
+		radio_eqsl_->value(false);
+		radio_card_front_->value(false);
+		radio_card_back_->value(false);
+		radio_emailr_->value(false);
+		radio_label_->value(false);
+		radio_emails_->value(true);
 		break;
 	default:
 		radio_eqsl_->value(false);
 		radio_card_front_->value(false);
 		radio_card_back_->value(false);
-		radio_email_->value(false);
-		radio_myqsl_->value(false);
+		radio_emailr_->value(false);
+		radio_label_->value(false);
+		radio_emails_->value(false);
 		break;
 	}
 	// Deactivate radio buttons according to whether QSLs of that type have been received
@@ -709,19 +734,19 @@ void qso_qsl_vwr::set_image_buttons() {
 	}
 	if (current_qso_ && current_qso_->item("QSL_RCVD") == "Y") {
 		if (current_qso_ && current_qso_->item("QSL_RCVD_VIA") == "E") {
-			radio_email_->activate();
+			radio_emailr_->activate();
 			radio_card_back_->deactivate();
 			radio_card_front_->deactivate();
 		} else {
 			radio_card_front_->activate();
 			radio_card_back_->activate();
-			radio_email_->deactivate();
+			radio_emailr_->deactivate();
 		}
 	}
 	else {
 		radio_card_front_->deactivate();
 		radio_card_back_->deactivate();
-		radio_email_->deactivate();
+		radio_emailr_->deactivate();
 	}
 }
 
@@ -798,6 +823,16 @@ void qso_qsl_vwr::set_qsl_status() {
 			bn_card_sstatus_->value(false);
 			bn_card_sstatus_->label("Card");
 		}
+	}
+	else {
+		bn_eqsl_rstatus_->value(false);
+		bn_lotw_rstatus_->value(false);
+		bn_card_rstatus_->value(false);
+		bn_card_rstatus_->label("Card");
+		bn_eqsl_sstatus_->value(false);
+		bn_lotw_sstatus_->value(false);
+		bn_card_sstatus_->value(false);
+		bn_card_sstatus_->label("Card");
 	}
 }
 

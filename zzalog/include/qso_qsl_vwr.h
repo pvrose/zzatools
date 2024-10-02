@@ -27,8 +27,10 @@ class qso_qsl_vwr :
 		QI_EQSL,            // Downloaded eQSL image
 		QI_CARD_FRONT,      // Scanned-in front of a card
 		QI_CARD_BACK,       // Scanned-in back of a card
-		QI_EMAIL,          	// e-mailed image
-		QI_MY_QSL,          // My QSL image for QSO
+		QI_EMAILR,         	// received e-mailed image
+		QI_LABEL,           // Image for printing label for cards
+		QI_EMAILS,          // Image for out-going e-mail
+
 	};
 
 public:
@@ -96,8 +98,9 @@ protected:
 	Fl_Radio_Light_Button* radio_eqsl_;
 	Fl_Radio_Light_Button* radio_card_front_;
 	Fl_Radio_Light_Button* radio_card_back_;
-	Fl_Radio_Light_Button* radio_email_;
-	Fl_Radio_Light_Button* radio_myqsl_;
+	Fl_Radio_Light_Button* radio_emailr_;
+	Fl_Radio_Light_Button* radio_label_;
+	Fl_Radio_Light_Button* radio_emails_;
 	Fl_Button* bn_fetch_;
 	Fl_Button* bn_log_bureau_;
 	Fl_Button* bn_log_email_;
