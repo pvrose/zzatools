@@ -5,7 +5,7 @@
 #include "qsl_data.h"
 #include "status.h"
 
-#include "png/png.h"
+#include "png.h"
 #include <FL/Fl_Preferences.H>
 
 

@@ -31,13 +31,13 @@ DEPS := $(OBJS:.o=.d)
 TARFILE = $(TARGET_EXEC:.exe=.tgz)
 
 # Every folder in ./src will need to be passed to GCC so that it can find header files
-INC_DIRS := ./include
+INC_DIRS := ./include 
 
 # Add a prefix to INC_DIRS. So moduleA would become -ImoduleA. GCC understands this -I flag
 INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 
 # Set up libraries
-FLTK_FLAGS := `fltk-config --use-images --ldflags`
+FLTK_FLAGS := `fltk-config --use-images --ldflags` 
 
 # Hamlib flags
 HAMLIB_FLAGS := -L/usr/local/lib -lhamlib -Wl,-rpath -Wl,/usr/local/lib
