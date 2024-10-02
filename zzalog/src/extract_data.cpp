@@ -447,6 +447,9 @@ void extract_data::extract_qsl(extract_data::extract_mode_t server) {
 		reason = "upload to clubLog";
 		field_name = "CLUBLOG_QSO_UPLOAD_STATUS";
 		break;
+	case EMAIL:
+		reason = "Generate e-mail and PNG";
+		field_name = "QSL_SENT";                    
 	}
 	// Now check that they are all for the current station
 	string station = qso_manager_->get_default(qso_manager::CALLSIGN);
@@ -531,9 +534,68 @@ void extract_data::extract_qsl(extract_data::extract_mode_t server) {
 		};
 		status_->misc_status(ST_NOTE, "EXTRACT: Extracting queued cards only");
 		criteria(new_criteria, server);
+		// Now those which received via bureau
+		new_criteria = {
+			/*search_cond_t condition*/ XC_FIELD,
+			/*search_comp_t comparator*/ XP_EQ,
+			/*bool by_dates*/ false,
+			/*string from_date*/"",
+			/*string to_date;*/"",
+			/*string band;*/ "Any",
+			/*string mode;*/ "Any",
+			/*bool confirmed_eqsl;*/ false,
+			/*bool confirmed_lotw;*/ false,
+			/*bool confirmed_card;*/ false,
+			/*search_combi_t combi_mode;*/ XM_AND,
+			/*string field_name; */ "QSL_SENT_VIA",
+			/*string pattern;*/ "B",
+			/*string my_call*/ station
+		};
+		status_->misc_status(ST_NOTE, "EXTRACT: Extracting cards for Bureau");
+		criteria(new_criteria, server);
 		sort_records("DXCC", false);
 		tabbed_forms_->update_views(nullptr, HT_RESET_ORDER, 0);
-
+	}
+	if (server == EMAIL) {
+		// Only those for which we intend to send a card (QSL_SENT==Q - Queued)
+		// QSL_SENT==R - Requested
+		new_criteria = {
+			/*search_cond_t condition*/ XC_FIELD,
+			/*search_comp_t comparator*/ XP_REGEX,
+			/*bool by_dates*/ false,
+			/*string from_date*/"",
+			/*string to_date;*/"",
+			/*string band;*/ "Any",
+			/*string mode;*/ "Any",
+			/*bool confirmed_eqsl;*/ false,
+			/*bool confirmed_lotw;*/ false,
+			/*bool confirmed_card;*/ false,
+			/*search_combi_t combi_mode;*/ XM_AND,
+			/*string field_name; */ "QSL_SENT",
+			/*string pattern;*/ "[QR]",
+			/*string my_call*/ station
+		};
+		status_->misc_status(ST_NOTE, "EXTRACT: Extracting queued cards only");
+		criteria(new_criteria, server);
+		// Now those which received via bureau
+		new_criteria = {
+			/*search_cond_t condition*/ XC_FIELD,
+			/*search_comp_t comparator*/ XP_EQ,
+			/*bool by_dates*/ false,
+			/*string from_date*/"",
+			/*string to_date;*/"",
+			/*string band;*/ "Any",
+			/*string mode;*/ "Any",
+			/*bool confirmed_eqsl;*/ false,
+			/*bool confirmed_lotw;*/ false,
+			/*bool confirmed_card;*/ false,
+			/*search_combi_t combi_mode;*/ XM_AND,
+			/*string field_name; */ "QSL_SENT_VIA",
+			/*string pattern;*/ "E",
+			/*string my_call*/ station
+		};
+		status_->misc_status(ST_NOTE, "EXTRACT: Extracting cards for sending by e-mail");
+		criteria(new_criteria, server);
 	}
 
 	if (size() == 0) {

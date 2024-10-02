@@ -155,11 +155,12 @@ config* config_ = nullptr;
 		{ "e&QSL", 0, menu::cb_mi_ext_qsl, (void*)extract_data::EQSL },
 		{ "&LotW", 0, menu::cb_mi_ext_qsl, (void*)extract_data::LOTW },
 		{ "Car&d", 0, menu::cb_mi_ext_qsl, (void*)extract_data::CARD },
+		{ "e-&Mail", 0, menu::cb_mi_ext_qsl, (void*)extract_data::EMAIL },
 		{ "Club&Log", 0, menu::cb_mi_ext_qsl, (void*)extract_data::CLUBLOG, FL_MENU_DIVIDER },
 		{ "&Save", 0, menu::cb_mi_file_saveas, (void*)OT_EXTRACT },
 		{ "&Upload", 0, menu::cb_mi_ext_upload, 0 },
 		{ "&Print", 0, menu::cb_mi_ext_print, 0 },
-		{ "&Mark sent", 0, menu::cb_mi_ext_mark, 0 },
+		{ "Mar&k sent", 0, menu::cb_mi_ext_mark, 0 },
 		{ 0 },
 
 	// Log import operations

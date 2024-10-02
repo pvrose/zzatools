@@ -25,6 +25,7 @@ using namespace std;
 			EQSL,        // upload to eQSL.cc
 			LOTW,        // upload to arrl.org/LotW
 			CARD,        // printing cards.
+			EMAIL,       // Generate PNG file and send as attachment to e-mail
 			CLUBLOG,     // upload to ClubLog
 			NO_NAME,     // Special search for empty NAME item
 			NO_QTH,      // Special search for empty QTH item

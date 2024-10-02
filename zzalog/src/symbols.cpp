@@ -159,6 +159,35 @@ void draw_calendar(Fl_Color c) {
 	fl_color(save);
 }
 
+// Draw the mail symbol
+void draw_mail(Fl_Color c) {
+	Fl_Color sv = fl_color();
+	// Fill in lower section]
+	fl_color(fl_lighter(c));
+	fl_begin_polygon();
+	fl_vertex(-0.7, -0.5);
+	fl_vertex(+0.7, -0.5);
+	fl_vertex(+0.7, +0.5);
+	fl_vertex(-0.7, +0.5);
+	fl_end_polygon();
+	// Fill in flap
+	fl_color(c);
+	fl_begin_polygon();
+	fl_vertex(-0.7, -0.5);
+	fl_vertex(+0.7, -0.5);
+	fl_vertex(0, +0.1);
+	fl_end_polygon();
+	// Draw the outline
+	fl_begin_loop();
+	fl_vertex(-0.7, -0.5);
+	fl_vertex(+0.7, -0.5);
+	fl_vertex(+0.7, +0.5);
+	fl_vertex(-0.7, +0.5);
+	fl_end_loop();
+	// Restore colour
+	fl_color(sv);
+}
+
 
 
 

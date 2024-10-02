@@ -55,7 +55,7 @@ void qso_log::create_form(int X, int Y) {
 	rh = max(rh, log_info_->h());
 
 	// On-line QSL upload/download tab
-	qsl_ctrl_ = new qso_qsl(rx, ry, rw, rh, "On-line QSL");
+	qsl_ctrl_ = new qso_qsl(rx, ry, rw, rh, "QSLs");
 	qsl_ctrl_->labelsize(FL_NORMAL_SIZE + 2);
 	rw = max(rw, qsl_ctrl_->w());
 	rh = max(rh, qsl_ctrl_->h());

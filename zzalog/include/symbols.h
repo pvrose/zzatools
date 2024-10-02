@@ -16,5 +16,6 @@ void draw_eyeopen(Fl_Color c);
 void draw_eyeshut(Fl_Color c);
 // Draw the calendar symbol
 void draw_calendar(Fl_Color c);
-
+// Draw a mail icon
+void draw_mail(Fl_Color c);
 

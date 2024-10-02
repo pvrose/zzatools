@@ -34,6 +34,8 @@ public:
     void qsl_print();
     void qsl_print_done();
     void qsl_cancel();
+    void qsl_generate_png();
+    void qsl_send_email();
 
     // Update eQSL image download count
     void update_eqsl(int count);
@@ -59,6 +61,10 @@ protected:
     static void cb_mark_done(Fl_Widget* w, void* v);
     // Cancel extract
     static void cb_cancel(Fl_Widget* w, void* v);
+    // generate PNG files
+    static void cb_png(Fl_Widget* w, void* v);
+    // generate e-mails
+    static void cb_email(Fl_Widget* w, void* v);
 
  
     // Attributes
@@ -83,15 +89,19 @@ protected:
     Fl_Button* bn_extr_lotw_;
     Fl_Button* bn_extr_club_;
     Fl_Button* bn_extr_card_;
+    Fl_Button* bn_extr_email_;
     Fl_Button* bn_upld_eqsl_;
     Fl_Button* bn_upld_lotw_;
     Fl_Button* bn_upld_club_;
     Fl_Button* bn_print_;
+    Fl_Button* bn_png_;
     Fl_Button* bn_mark_done_;
     Fl_Button* bn_cncl_eqsl_;
     Fl_Button* bn_cncl_lotw_;
     Fl_Button* bn_cncl_club_;
     Fl_Button* bn_cncl_card_;
+    Fl_Button* bn_cncl_email_;
+    Fl_Button* bn_send_email_;
     Fl_Fill_Dial* op_eqsl_count_;
 
 };

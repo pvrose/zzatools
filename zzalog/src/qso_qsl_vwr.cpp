@@ -349,6 +349,7 @@ void qso_qsl_vwr::cb_bn_log_card(Fl_Widget* w, void* v) {
 	that->current_qso_->item("QSL_RCVD_VIA", string(source));
 	if (!that->current_qso_->item("QSL_SENT").length()) {
 		that->current_qso_->item("QSL_SENT", string("Q"));
+		that->current_qso_->item("QSL_SENT_VIA", string(source));
 	}
 	// now pretend the Card Front radio button has been pressed
 	if (*source == 'E') {
@@ -374,11 +375,16 @@ void qso_qsl_vwr::cb_bn_image(Fl_Widget* w, void* v) {
 }
 
 // Set card requested "QSL_SENT=[v]"
-// v is a pointer to const char - either R
+// v is a pointer to const char - either R or N
 void qso_qsl_vwr::cb_bn_card_reqd(Fl_Widget* w, void* v) {
 	qso_qsl_vwr* that = ancestor_view<qso_qsl_vwr>(w);
 	char* value = (char*)v;
 	that->current_qso_->item("QSL_SENT", string(value));
+	switch (*value) {
+	case 'R':
+		that->current_qso_->item("QSL_SENT_VIA", that->current_qso_->item("QSL_RCVD_VIA"));
+		break;
+	}
 	qso_data* data = ancestor_view<qso_data>(that);
 	data->enable_widgets();
 	tabbed_forms_->update_views(nullptr, HT_MINOR_CHANGE, that->current_qso_num_);

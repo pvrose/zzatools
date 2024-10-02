@@ -161,8 +161,8 @@ void qso_qsl::create_form() {
 	curr_y += HBUTTON;
 
 	Fl_Box* box_c = new Fl_Box(C1, curr_y, W1, HBUTTON, "ClubLog");
-	box_e->box(FL_FLAT_BOX);
-	box_e->color(FL_BACKGROUND_COLOR);
+	box_c->box(FL_FLAT_BOX);
+	box_c->color(FL_BACKGROUND_COLOR);
 	// Auto upload
 	bn_auto_club_ = new Fl_Check_Button(C2, curr_y, W2, HBUTTON);
 	bn_auto_club_->value(auto_club_);
@@ -185,8 +185,8 @@ void qso_qsl::create_form() {
 
 	// Title
 	Fl_Box* box_q = new Fl_Box(C1, curr_y, W1, HBUTTON, "Cards");
-	box_e->box(FL_FLAT_BOX);
-	box_e->color(FL_BACKGROUND_COLOR);
+	box_q->box(FL_FLAT_BOX);
+	box_q->color(FL_BACKGROUND_COLOR);
 	// Extract
 	bn_extr_card_ = new Fl_Button(C4, curr_y, W4, HBUTTON, "@search");
 	bn_extr_card_->callback(cb_extract, (void*)extract_data::CARD);
@@ -203,6 +203,31 @@ void qso_qsl::create_form() {
 	bn_mark_done_ = new Fl_Button(C7, curr_y, W7, HBUTTON, "Done");
 	bn_mark_done_->callback(cb_mark_done);
 	bn_mark_done_->tooltip("Mark extracted records as printed");
+
+	curr_y += HBUTTON;
+
+	// Title
+	Fl_Box* box_m = new Fl_Box(C1, curr_y, W1, HBUTTON, "e-Mails");
+	box_m->box(FL_FLAT_BOX);
+	box_m->color(FL_BACKGROUND_COLOR);
+	// Extract
+	bn_extr_email_ = new Fl_Button(C4, curr_y, W4, HBUTTON, "@search");
+	bn_extr_email_->callback(cb_extract, (void*)extract_data::EMAIL);
+	bn_extr_email_->tooltip("Extract records for sending e-mails");
+	// print
+	bn_png_ = new Fl_Button(C5, curr_y, W5, HBUTTON, "@filesave");
+	bn_png_->callback(cb_png);
+	bn_png_->tooltip("Generate PNG files for sending");
+	// Cancel
+	bn_cncl_email_ = new Fl_Button(C6, curr_y, W6, HBUTTON, "@undo");
+	bn_cncl_email_->callback(cb_cancel, (void*)extract_data::EMAIL);
+	bn_cncl_email_->tooltip("Cancel extract");
+	// Send e-mail
+	bn_send_email_ = new Fl_Button(C7, curr_y, W7, HBUTTON, "@mail");
+	bn_send_email_->labelsize(HBUTTON - 2);
+	bn_send_email_->callback(cb_email);
+	bn_send_email_->tooltip("Send e-mails for extracetd QSOs");
+
 
 	curr_y += HBUTTON + GAP;
 
@@ -276,10 +301,20 @@ void qso_qsl::enable_widgets() {
 		bn_mark_done_->activate();
 		bn_cncl_card_->activate();
 	}
-	else { 
+	else {
 		bn_print_->deactivate();
 		bn_mark_done_->deactivate();
 		bn_cncl_card_->deactivate();
+	}
+	if (!extract_in_progress_ && extract_records_->use_mode() == extract_data::EMAIL) {
+		bn_png_->activate();
+		bn_send_email_->activate();
+		bn_cncl_email_->activate();
+	}
+	else {
+		bn_png_->deactivate();
+     	bn_send_email_->deactivate();
+		bn_cncl_email_->deactivate();
 	}
 	char text[10];
 	int curr = atoi(op_eqsl_count_->label());
@@ -366,6 +401,18 @@ void qso_qsl::cb_cancel(Fl_Widget* w, void* v) {
 	that->qsl_cancel();
 }
 
+// Generate PNG files
+void qso_qsl::cb_png(Fl_Widget* w, void* v) {
+	qso_qsl* that = ancestor_view<qso_qsl>(w);
+	that->qsl_generate_png();
+}
+
+// Send e-mails
+void qso_qsl::cb_email(Fl_Widget* w, void* v) {
+	qso_qsl* that = ancestor_view<qso_qsl>(w);
+	that->qsl_send_email();
+}
+
 // Download. v = eQSL/LotW (import data enum)
 void qso_qsl::qsl_download(import_data::update_mode_t server) {
 	qso_manager* mgr = ancestor_view<qso_manager>(this);
@@ -441,6 +488,16 @@ void qso_qsl::qsl_print_done() {
 void qso_qsl::qsl_cancel() {
 	extract_records_->clear_criteria();
 	enable_widgets();
+}
+
+// Generate PNG files
+void qso_qsl::qsl_generate_png() {
+	status_->misc_status(ST_WARNING, "QSL: generate_png is not yet implemented");
+}
+
+// Send e--mails
+void qso_qsl::qsl_send_email() {
+	status_->misc_status(ST_WARNING, "QSL: send_email is not yet implemented");
 }
 
 // Update eQSL download count
