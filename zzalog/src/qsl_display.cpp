@@ -56,14 +56,14 @@ qsl_display::~qsl_display() {
 
 // Overload of the Fl_Widget::draw() method
 void qsl_display::draw() {
+	// Colour the whole display
+	fl_rectf(x_, y_, w_, h_, FL_BACKGROUND_COLOR);
 	if (data_) {
 		calculate_scale(to_points(data_->width), to_points(data_->height));
 		if (data_->items.size() == 0) {
 			draw_text("NO IMAGE!", FL_RED);
 		}
 		else {
-			// Colour the whole display
-			if (do_scale_) fl_rectf(x_, y_, w_, h_, FL_BACKGROUND_COLOR);
 			// Now colour the drawing area
 			fl_rectf(draw_x_, draw_y_, draw_w_, draw_h_, FL_WHITE);
 			// For each item...
