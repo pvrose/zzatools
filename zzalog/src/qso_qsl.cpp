@@ -257,7 +257,7 @@ void qso_qsl::save_values() {
 void qso_qsl::enable_widgets() {
 	// Disable download and extract buttons if not is the correct state
 	qso_manager* mgr = ancestor_view<qso_manager>(this);
-	if (mgr->data()->inactive() && os_eqsl_dnld_ == 0) {
+	if (mgr->data()->inactive() && os_eqsl_dnld_ == 0 && !extract_in_progress_) {
 		bn_down_eqsl_->activate();
 		bn_down_lotw_->activate();
 		bn_extr_club_->activate();
@@ -431,6 +431,7 @@ void qso_qsl::qsl_extract(extract_data::extract_mode_t server) {
 	if (mgr->data()->inactive()) {
 		// Set flag to indicate this is being done - used to disable further attempts
 		extract_in_progress_ = true;
+		enable_widgets();
 		extract_records_->extract_qsl(server);
 		extract_in_progress_ = false;
 		tabbed_forms_->activate_pane(OT_EXTRACT, true);
