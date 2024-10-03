@@ -164,8 +164,9 @@ void qso_dxcc::enable_widgets() {
 					strcpy(ls, "(GRID)");
 					break;
 			}
-			snprintf(text, sizeof(text), "CQ Zone %d. Loc: %.0f\302\260%c %.0f\302\260%c %s",
-				cq_zone_, abs(location_.latitude), location_.latitude > 0 ? 'N' : 'S',
+			snprintf(text, sizeof(text), "%s: CQ Zone %d. Loc: %.0f\302\260%c %.0f\302\260%c %s",
+				continent_.c_str(), cq_zone_, 
+				abs(location_.latitude), location_.latitude > 0 ? 'N' : 'S',
 				abs(location_.longitude), location_.longitude > 0 ? 'E' : 'W',
 				ls);
 		}
@@ -211,6 +212,7 @@ void qso_dxcc::set_data(record* qso) {
 		location_ = qso_->location(false, loc_source_);
 		dxcc_ = cty_data_->entity(qso_);
 		my_location_ = qso_->location(true);
+		continent_ = cty_data_->continent(qso_);
 	}
 
 }

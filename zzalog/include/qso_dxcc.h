@@ -117,6 +117,8 @@ protected:
     record* qso_;
     // Use extracted data for worked b4
     bool show_extract_;
+    // The continent
+    string continent_;
 
     // BAnd worked
     band_set* bands_worked_;
