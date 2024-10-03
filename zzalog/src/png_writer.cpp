@@ -179,7 +179,7 @@ bool png_writer::finalise_png() {
 // Tidy up
 void png_writer::tidy_png() {
 	if (png_ && info_) {
-		fltk_png_destroy_write_struct(&png_, &info_);
+		png_destroy_write_struct(&png_, &info_);
 	}
 }
 
