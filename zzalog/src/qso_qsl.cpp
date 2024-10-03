@@ -10,6 +10,7 @@
 #include "book.h"
 #include "ticker.h"
 #include "record.h"
+#include "png_writer.h"
 
 #include <FL/Fl_Preferences.H>
 #include <FL/Fl_Box.H>
@@ -492,7 +493,14 @@ void qso_qsl::qsl_cancel() {
 
 // Generate PNG files
 void qso_qsl::qsl_generate_png() {
-	status_->misc_status(ST_WARNING, "QSL: generate_png is not yet implemented");
+	status_->misc_status(ST_LOG, "QSL: Starting to generate PNG files");
+	png_writer* png = new png_writer();
+	if (png->write_book(extract_records_)) {
+		status_->misc_status(ST_OK, "QSL: PNG file generation done!");
+	}
+	else {
+		status_->misc_status(ST_ERROR, "QSL: PNG file generation failed");
+	}
 }
 
 // Send e--mails
