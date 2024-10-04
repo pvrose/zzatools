@@ -38,6 +38,10 @@ using namespace std;
 		bool post_url(string url, string resource, istream* req, ostream* resp);
 		// Performa an HTTP POST FORM operation - fields provides the form fields - if fields[name] is nullptr it uses req in the read callback
 		bool post_form(string url, vector<field_pair> fields, istream* req, ostream* resp);
+		// Send an e-mail
+		bool send_email(string url, string user, string password,
+			vector<string> to_list, vector<string> cc_list, vector<string> bcc_list,
+			string subject, string payload, vector<string> attachments);
 
 	protected:
 		// Output the associated data to the stream for debugging purposes

@@ -259,6 +259,112 @@ bool url_handler::post_form(string url, vector<field_pair> fields, istream* req,
 	return true;
 }
 
+// Send an e-mail
+bool url_handler::send_email(string url, string user, string password,
+	vector<string> to_list, vector<string> cc_list, vector<string> bcc_list,
+	string subject, string payload, vector<string> attachments) {
+
+	lock_.lock();
+	CURLcode result;
+	// Start a new transfer
+	curl_ = curl_easy_init();
+
+	if (curl_ == nullptr) {
+		status_->misc_status(ST_ERROR, "URL_HANDLER: failed to get an instance of 'curl'");
+		return false;
+	}
+
+	// Set the URL address of the mail server
+	curl_easy_setopt(curl_, CURLOPT_URL, url.c_str());
+
+	// set the sender 
+	curl_easy_setopt(curl_, CURLOPT_MAIL_FROM, user.c_str());
+	// Add the recipients - which hopefully should not be seen
+	struct curl_slist* recipients;
+	for (auto it = to_list.begin(); it != to_list.end(); it++) {
+		recipients = curl_slist_append(recipients, (*it).c_str());
+	}
+	for (auto it = cc_list.begin(); it != cc_list.end(); it++) {
+		recipients = curl_slist_append(recipients, (*it).c_str());
+	}
+	for (auto it = bcc_list.begin(); it != bcc_list.end(); it++) {
+		recipients = curl_slist_append(recipients, (*it).c_str());
+	}
+	curl_easy_setopt(curl_, CURLOPT_MAIL_RCPT, recipients);
+	/* allow one of the recipients to fail and still consider it okay */
+	curl_easy_setopt(curl_, CURLOPT_MAIL_RCPT_ALLOWFAILS, 1L);
+
+	// Add the header Date:, To: From: Cc: Subject:
+	struct curl_slist* headers;
+	char text[128];
+	// Date
+	string date = now(true, "%s %c %z");
+	snprintf(text, sizeof(text), "Date: %s", date.c_str());
+	headers = curl_slist_append(headers, text);
+	for (auto it = to_list.begin(); it != to_list.end(); it++) {
+		snprintf(text, sizeof(text), "To: %s", (*it).c_str());
+		headers = curl_slist_append(headers, text);
+	}
+	snprintf(text, sizeof(text), "From %s", user.c_str());
+	headers = curl_slist_append(headers, text);
+	for (auto it = cc_list.begin(); it != cc_list.end(); it++) {
+		snprintf(text, sizeof(text), "Cc: %s", (*it).c_str());
+		headers = curl_slist_append(headers, text);
+	}
+	snprintf(text, sizeof(text), "Subject: %s", subject.c_str());
+	headers = curl_slist_append(headers, text);
+	curl_easy_setopt(curl_, CURLOPT_HTTPHEADER, headers);
+	// Now add the txt
+	curl_mime* mime = curl_mime_init(curl_);
+	curl_mimepart* part = curl_mime_addpart(mime);
+	curl_mime_data(part, payload.c_str(), CURL_ZERO_TERMINATED);
+	// Now add the attachments
+	for (auto it = attachments.begin(); it != attachments.end(); it++) {
+		part = curl_mime_addpart(mime);
+		curl_mime_filedata(part, (*it).c_str());
+	}
+	// Add the mime to the mail
+	curl_easy_setopt(curl_, CURLOPT_MIMEPOST, mime);
+
+	// Add debug and error stuff
+	char* error_msg = new char[CURL_ERROR_SIZE];
+	curl_easy_setopt(curl_, CURLOPT_ERRORBUFFER, error_msg);
+
+	if (DEBUG_CURL) {
+		// Add extra verbosity
+		curl_easy_setopt(curl_, CURLOPT_DEBUGFUNCTION, cb_debug);
+		curl_easy_setopt(curl_, CURLOPT_VERBOSE, 1);
+	}
+
+	// Now send the e-mail
+	result = curl_easy_perform(curl_);
+
+	/* check for errors */
+	if (result != CURLE_OK) {
+		char msg[256];
+		snprintf(msg, sizeof(msg), "URL_HANDLER: %s", error_msg);
+		status_->misc_status(ST_ERROR, msg);
+		// Reset the operation and clean up
+
+		curl_slist_free_all(recipients);
+		curl_slist_free_all(headers);
+		curl_easy_reset(curl_);
+		curl_easy_cleanup(curl_);
+		lock_.unlock();
+		return false;
+	}
+
+	// Now tidy up
+	curl_slist_free_all(recipients);
+	curl_slist_free_all(headers);
+
+	curl_easy_cleanup(curl_);
+
+	return true;
+
+}
+
+
 // Dump ptr to the file stream
 void url_handler::dump(const char* text,
 	FILE* stream, unsigned char* ptr, size_t size)
