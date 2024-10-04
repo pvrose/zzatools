@@ -48,6 +48,10 @@ web_dialog::web_dialog(int X, int Y, int W, int H, const char* label) :
 	, club_interval_(0)
 	, wsjtx_enable_(true)
 	, fldigi_enable_(true)
+	, email_server_("")
+	, email_account_("")
+	, email_password_("")
+	, email_sender_("")
 {
 	image_widgets_.clear();
 
@@ -80,6 +84,7 @@ void web_dialog::load_values() {
 	Fl_Preferences nw_settings(settings_, "Network");
 	Fl_Preferences wsjtx_settings(nw_settings, "WSJT-X");
 	Fl_Preferences fllog_settings(nw_settings, "Fllog");
+	Fl_Preferences email_settings(settings_, "e-Mail");
 
 	// eQSL User/Password
 	eqsl_settings.get("Enable", (int&)eqsl_enable_, false);
@@ -149,6 +154,20 @@ void web_dialog::load_values() {
 	free(temp);
 	fllog_settings.get("Port Number", fldigi_rpc_port_, 8421);
 
+	// e-Mail settings
+	email_settings.get("Server", temp, "");
+	email_server_ = temp;
+	free(temp);
+	email_settings.get("Account", temp, "");
+	email_account_ = temp;
+	free(temp);
+	email_settings.get("Password", temp, "");
+	email_password_ = temp;
+	free(temp);
+	email_settings.get("Sender", temp, email_account_.c_str());
+	email_sender_ = temp;
+	free(temp);
+
 }
 
 // Create the dialog
@@ -171,6 +190,7 @@ void web_dialog::create_form(int X, int Y) {
 	create_qrz(rx, ry, rw, rh);
 	create_club(rx, ry, rw, rh);
 	create_server(rx, ry, rw, rh);
+	create_email(rx, ry, rw, rh);
 
 	tabs->end();
 
@@ -643,6 +663,57 @@ void web_dialog::create_server(int rx, int ry, int rw, int rh) {
 
 }
 
+// Create the e-mail details screen
+void web_dialog::create_email(int rx, int ry, int rw, int rh) {
+
+	Fl_Group* gp06 = new Fl_Group(rx, ry, rw, rh, "e-Mail");
+
+	Fl_Group* gp6 = new Fl_Group(rx, ry, rw, rh);
+	gp6->labelsize(FL_NORMAL_SIZE + 2);
+	gp6->labelfont(FL_BOLD);
+	gp6->box(FL_BORDER_BOX);
+	gp6->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
+
+	int curr_x = rx + GAP + WLABEL;
+	int curr_y = ry + GAP;
+
+	Fl_Input* ip61 = new Fl_Input(curr_x, curr_y, WSMEDIT, HBUTTON, "Server");
+	ip61->align(FL_ALIGN_LEFT);
+	ip61->value(email_server_.c_str());
+	ip61->callback(cb_value< Fl_Input, string >, &email_server_);
+	ip61->when(FL_WHEN_CHANGED);
+	ip61->tooltip("Please enter the address of the SMTP server");
+
+	curr_x += ip61->w() + WLABEL;
+	Fl_Input* ip62 = new Fl_Input(curr_x, curr_y, WSMEDIT, HBUTTON, "User");
+	ip62->align(FL_ALIGN_LEFT);
+	ip62->value(email_account_.c_str());
+	ip62->callback(cb_value< Fl_Input, string >, &email_account_);
+	ip62->when(FL_WHEN_CHANGED);
+	ip62->tooltip("Please enter the account for the SMTP server (usually an e-mail address)");
+	
+	curr_y += HBUTTON;
+	password_input* ip63 = new password_input(curr_x, curr_y, WSMEDIT, HBUTTON, "Password");
+	ip63->align(FL_ALIGN_LEFT);
+	ip63->value(email_password_.c_str());
+	ip63->callback(cb_value< Fl_Input, string >, &email_password_);
+	ip63->when(FL_WHEN_CHANGED);
+	ip63->tooltip("Please enter the password for the above account");
+
+	curr_x = rx + GAP + WLABEL;
+	curr_y += HBUTTON + GAP;
+	Fl_Input* ip64 = new Fl_Input(curr_x, curr_y, WSMEDIT, HBUTTON, "Sender");
+	ip64->align(FL_ALIGN_LEFT);
+	ip64->value(email_password_.c_str());
+	ip64->callback(cb_value< Fl_Input, string >, &email_password_);
+	ip64->when(FL_WHEN_CHANGED);
+	ip64->tooltip("Please enter the e-mail address to use as sender");
+
+	gp6->end();
+
+	gp06->end();
+}
+
 // Save values to settings
 void web_dialog::save_values() {
 	// Get settings
@@ -655,6 +726,7 @@ void web_dialog::save_values() {
 	Fl_Preferences nw_settings(settings_, "Network");
 	Fl_Preferences wsjtx_settings(nw_settings, "WSJT-X");
 	Fl_Preferences fllog_settings(nw_settings, "Fllog");
+	Fl_Preferences email_settings(settings_, "e-Mail");
 	// eQSL Settings
 	eqsl_settings.set("Enable", eqsl_enable_);
 	eqsl_settings.set("User", eqsl_username_.c_str());
@@ -692,6 +764,12 @@ void web_dialog::save_values() {
 	wsjtx_settings.set("Port Number", wsjtx_udp_port_);
 	fllog_settings.set("Address", fldigi_rpc_addr_.c_str());
 	fllog_settings.set("Port Number", fldigi_rpc_port_);
+
+	// e-Mail settings
+	email_settings.set("Server", email_server_.c_str());
+	email_settings.set("Account", email_account_.c_str());
+	email_settings.set("Password", email_password_.c_str());
+	email_settings.set("Sender", email_sender_.c_str());
 
 	settings_->flush();
 }

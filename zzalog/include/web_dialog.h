@@ -51,6 +51,8 @@ class Fl_Group;
 		void create_club(int rx, int ry, int rw, int rh);
 		// Create the server group
 		void create_server(int rx, int ry, int rw, int rh);
+		// Create the e-mail group
+		void create_email(int rx, int ry, int rw, int rh);
 		
 
 		// Widgets for eQSL
@@ -63,6 +65,8 @@ class Fl_Group;
 		Fl_Group* grp_club_;
 		// Widgets for networking
 		Fl_Group* grp_server_;
+		// Widgets for e-mail
+		Fl_Group* grp_email_;
 		// Widgets containing images
 		set<Fl_Widget*> image_widgets_;
 
@@ -134,6 +138,15 @@ class Fl_Group;
 		int fldigi_rpc_port_;
 		string fldigi_rpc_addr_;
 		bool fldigi_enable_;
+
+		// e-mail URL 
+		string email_server_;
+		// Server account
+		string email_account_;
+		// Server password
+		string email_password_;
+		// Sender e-mail - for "From:....."
+		string email_sender_;
 
 	};
 #endif
