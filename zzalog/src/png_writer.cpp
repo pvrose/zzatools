@@ -78,6 +78,7 @@ bool png_writer::write_image(Fl_RGB_Image* image, string filename) {
 	}
 	bad |= finalise_png();
 	tidy_png();
+	fclose(out_file_);
 	return bad;
 }
 
@@ -172,7 +173,8 @@ bool png_writer::finalise_png() {
 		return true;
 	}
 	// Close
-	png_write_end(png_, nullptr);
+	status_->misc_status(ST_NOTE, "PNG: Finalising write");
+	png_write_end(png_, info_);
 	return false;
 }
 
