@@ -292,7 +292,7 @@ bool url_handler::send_email(string url, string user, string password,
 	}
 	curl_easy_setopt(curl_, CURLOPT_MAIL_RCPT, recipients);
 	/* allow one of the recipients to fail and still consider it okay */
-	curl_easy_setopt(curl_, CURLOPT_MAIL_RCPT_ALLOWFAILS, 1L);
+	curl_easy_setopt(curl_, CURLOPT_MAIL_RCPT_ALLLOWFAILS, 1L);
 
 	// Add the header Date:, To: From: Cc: Subject:
 	struct curl_slist* headers;
