@@ -145,8 +145,6 @@ class Fl_Group;
 		string email_account_;
 		// Server password
 		string email_password_;
-		// Sender e-mail - for "From:....."
-		string email_sender_;
 
 	};
 #endif

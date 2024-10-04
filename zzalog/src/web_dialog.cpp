@@ -51,7 +51,6 @@ web_dialog::web_dialog(int X, int Y, int W, int H, const char* label) :
 	, email_server_("")
 	, email_account_("")
 	, email_password_("")
-	, email_sender_("")
 {
 	image_widgets_.clear();
 
@@ -163,9 +162,6 @@ void web_dialog::load_values() {
 	free(temp);
 	email_settings.get("Password", temp, "");
 	email_password_ = temp;
-	free(temp);
-	email_settings.get("Sender", temp, email_account_.c_str());
-	email_sender_ = temp;
 	free(temp);
 
 }
@@ -700,15 +696,6 @@ void web_dialog::create_email(int rx, int ry, int rw, int rh) {
 	ip63->when(FL_WHEN_CHANGED);
 	ip63->tooltip("Please enter the password for the above account");
 
-	curr_x = rx + GAP + WLABEL;
-	curr_y += HBUTTON + GAP;
-	Fl_Input* ip64 = new Fl_Input(curr_x, curr_y, WSMEDIT, HBUTTON, "Sender");
-	ip64->align(FL_ALIGN_LEFT);
-	ip64->value(email_password_.c_str());
-	ip64->callback(cb_value< Fl_Input, string >, &email_password_);
-	ip64->when(FL_WHEN_CHANGED);
-	ip64->tooltip("Please enter the e-mail address to use as sender");
-
 	gp6->end();
 
 	gp06->end();
@@ -769,7 +756,6 @@ void web_dialog::save_values() {
 	email_settings.set("Server", email_server_.c_str());
 	email_settings.set("Account", email_account_.c_str());
 	email_settings.set("Password", email_password_.c_str());
-	email_settings.set("Sender", email_sender_.c_str());
 
 	settings_->flush();
 }
