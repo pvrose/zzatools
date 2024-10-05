@@ -271,6 +271,7 @@ bool url_handler::send_email(string url, string user, string password,
 
 	if (curl_ == nullptr) {
 		status_->misc_status(ST_ERROR, "URL_HANDLER: failed to get an instance of 'curl'");
+		lock_.unlock();
 		return false;
 	}
 
@@ -360,6 +361,7 @@ bool url_handler::send_email(string url, string user, string password,
 
 	curl_easy_cleanup(curl_);
 
+	lock_.unlock();
 	return true;
 
 }
