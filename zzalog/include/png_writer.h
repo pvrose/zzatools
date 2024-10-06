@@ -23,10 +23,10 @@ public:
 
 	bool write_book(book* qsos);
 
-protected:
-
 	// Write the RGB image out to a .png file
 	bool write_image(Fl_RGB_Image* image, string filename);
+
+protected:
 
 	// Initialise the PNG instance
 	bool initialise_png();

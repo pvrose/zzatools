@@ -96,7 +96,8 @@ bool qsl_emailer::send_email() {
 		{ },
 		subject_,
 		text_body_,
-		{ qsl_filename_ })) {
+		//{ qsl_filename_ })) {
+		{ })) {
 		status_->misc_status(ST_OK, "QSL: e-Mail successfully sent");
 		return true;
 	}

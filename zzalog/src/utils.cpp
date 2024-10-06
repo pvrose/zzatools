@@ -273,7 +273,7 @@ string now(bool local, const char* format, bool add_ms) {
 	tm* now = local ? localtime(&t) : gmtime(&t);
 	size_t fractional_seconds = ms.count() % 1000;
 
-	char result[50];
+	char result[128];
 	strftime(result, sizeof(result), format, now);
 	if (add_ms) {
 		char ms[5];

@@ -36,6 +36,11 @@ public:
     void qsl_cancel();
     void qsl_generate_png();
     void qsl_send_email();
+    // Single QSO versions 
+    void qsl_1_upload(extract_data::extract_mode_t server);
+    void qsl_1_generate_png();
+    void qsl_1_send_email();
+    void qsl_1_send_email(record* qso);
 
     // Update eQSL image download count
     void update_eqsl(int count);
@@ -65,6 +70,8 @@ protected:
     static void cb_png(Fl_Widget* w, void* v);
     // generate e-mails
     static void cb_email(Fl_Widget* w, void* v);
+    // Single QSO button
+    static void cb_single(Fl_Widget* w, void* v);
 
  
     // Attributes
@@ -78,8 +85,11 @@ protected:
     float tkr_value_;
     // Extract in progress - update gets called while it is
     bool extract_in_progress_;
+    // Upload only specified QSL
+    bool single_qso_;
 
     // Widgets
+    Fl_Check_Button* bn_single_qso_;
     Fl_Check_Button* bn_auto_eqsl_;
     Fl_Check_Button* bn_auto_lotw_;
     Fl_Check_Button* bn_auto_club_;

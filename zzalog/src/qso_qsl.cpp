@@ -11,6 +11,13 @@
 #include "ticker.h"
 #include "record.h"
 #include "png_writer.h"
+#include "callback.h"
+#include "eqsl_handler.h"
+#include "club_handler.h"
+#include "lotw_handler.h"
+#include "qsl_data.h"
+#include "qsl_image.h"
+#include "qsl_emailer.h"
 
 #include <FL/Fl_Preferences.H>
 #include <FL/Fl_Box.H>
@@ -25,6 +32,9 @@ extern tabbed_forms* tabbed_forms_;
 extern status* status_;
 extern book* book_;
 extern ticker* ticker_;
+extern eqsl_handler* eqsl_handler_;
+extern club_handler* club_handler_;
+extern lotw_handler* lotw_handler_;
 
 // Constructor
 qso_qsl::qso_qsl(int X, int Y, int W, int H, const char* L) :
@@ -38,6 +48,7 @@ qso_qsl::qso_qsl(int X, int Y, int W, int H, const char* L) :
 	os_eqsl_dnld_ = 0;
 	tkr_value_ = 0.0;
 	extract_in_progress_ = false;
+	single_qso_ = false;
 	load_values();
 	create_form();
 	enable_widgets();
@@ -91,6 +102,15 @@ void qso_qsl::create_form() {
 	const int W7 = WBUTTON / 2;
 	int max_x = C7 + W7 + GAP;
 	int curr_y = y() + GAP;
+
+	// Single QSO button
+	bn_single_qso_ = new Fl_Check_Button(C2, curr_y, W2, HBUTTON, "Only handle selected QSO");
+	bn_single_qso_->align(FL_ALIGN_RIGHT);
+	bn_single_qso_->value(single_qso_);
+	bn_single_qso_->callback(cb_single, &single_qso_);
+	bn_single_qso_->tooltip("Only uploads or send e-mail for the current selected QSO");
+
+	curr_y += HBUTTON + GAP;
 
 	// eQSL buttons
 	// Title
@@ -255,15 +275,23 @@ void qso_qsl::save_values() {
 
 // Configure widgets
 void qso_qsl::enable_widgets() {
-	// Disable download and extract buttons if not is the correct state
+	// Single QSO - do this first as the valeu of single_qso_ affects the others
 	qso_manager* mgr = ancestor_view<qso_manager>(this);
-	if (mgr->data()->inactive() && os_eqsl_dnld_ == 0 && !extract_in_progress_) {
+	if (mgr->data()->current_qso()) bn_single_qso_->activate();
+	else {
+		single_qso_ = false;
+		bn_single_qso_->value(single_qso_);
+		bn_single_qso_->deactivate();
+	}
+	// Disable download and extract buttons if not is the correct state
+	if (mgr->data()->inactive() && os_eqsl_dnld_ == 0 && !extract_in_progress_ && !single_qso_) {
 		bn_down_eqsl_->activate();
 		bn_down_lotw_->activate();
 		bn_extr_club_->activate();
 		bn_extr_eqsl_->activate();
 		bn_extr_lotw_->activate();
 		bn_extr_card_->activate();
+		bn_extr_email_->activate();
 	} else {
 		bn_down_eqsl_->deactivate();
 		bn_down_lotw_->deactivate();
@@ -271,11 +299,16 @@ void qso_qsl::enable_widgets() {
 		bn_extr_eqsl_->deactivate();
 		bn_extr_lotw_->deactivate();
 		bn_extr_card_->deactivate();
+		bn_extr_email_->deactivate();
 	}
 	// Disable extract and upload buttons if auto-upload enabled
 	if (!extract_in_progress_ && extract_records_->use_mode() == extract_data::EQSL) {
 		bn_upld_eqsl_->activate();
 		bn_cncl_eqsl_->activate();
+	}
+	else if (single_qso_) {
+		bn_upld_eqsl_->activate();
+		bn_cncl_eqsl_->deactivate();
 	}
 	else {
 		bn_upld_eqsl_->deactivate();
@@ -285,6 +318,10 @@ void qso_qsl::enable_widgets() {
 		bn_upld_lotw_->activate();
 		bn_cncl_lotw_->activate();
 	}
+	else if (single_qso_) {
+		bn_upld_lotw_->activate();
+		bn_cncl_lotw_->deactivate();
+	}
 	else {
 		bn_upld_lotw_->deactivate();
 		bn_cncl_lotw_->deactivate();
@@ -293,11 +330,15 @@ void qso_qsl::enable_widgets() {
 		bn_upld_club_->activate();
 		bn_cncl_club_->activate();
 	}
+	else if (single_qso_) {
+		bn_upld_club_->activate();
+		bn_cncl_club_->deactivate();
+	}
 	else {
 		bn_upld_club_->deactivate();
 		bn_cncl_club_->deactivate();
 	}
-	if (!extract_in_progress_ && extract_records_->use_mode() == extract_data::CARD) {
+	if (!extract_in_progress_ && extract_records_->use_mode() == extract_data::CARD && !single_qso_) {
 		bn_print_->activate();
 		bn_mark_done_->activate();
 		bn_cncl_card_->activate();
@@ -311,6 +352,11 @@ void qso_qsl::enable_widgets() {
 		bn_png_->activate();
 		bn_send_email_->activate();
 		bn_cncl_email_->activate();
+	}
+	else if (single_qso_) {
+		bn_png_->activate();
+		bn_send_email_->activate();
+		bn_cncl_email_->deactivate();
 	}
 	else {
 		bn_png_->deactivate();
@@ -381,7 +427,8 @@ void qso_qsl::cb_extract(Fl_Widget* w, void* v) {
 void qso_qsl::cb_upload(Fl_Widget* w, void* v) {
 	// extract_records has remembered the server
 	qso_qsl* that = ancestor_view<qso_qsl>(w);
-	that->qsl_upload();
+	if (that->single_qso_) that->qsl_1_upload((extract_data::extract_mode_t)(intptr_t)v);
+	else that->qsl_upload();
 }
 
 // Print . Card only
@@ -405,13 +452,22 @@ void qso_qsl::cb_cancel(Fl_Widget* w, void* v) {
 // Generate PNG files
 void qso_qsl::cb_png(Fl_Widget* w, void* v) {
 	qso_qsl* that = ancestor_view<qso_qsl>(w);
-	that->qsl_generate_png();
+	if (that->single_qso_) that->qsl_1_generate_png();
+	else that->qsl_generate_png();
 }
 
 // Send e-mails
 void qso_qsl::cb_email(Fl_Widget* w, void* v) {
 	qso_qsl* that = ancestor_view<qso_qsl>(w);
-	that->qsl_send_email();
+	if (that->single_qso_) that->qsl_1_send_email();
+	else that->qsl_send_email();
+}
+
+// Single QSO
+void qso_qsl::cb_single(Fl_Widget* w, void* v) {
+	qso_qsl* that = ancestor_view<qso_qsl>(w);
+	cb_value< Fl_Check_Button, bool >(w, v);
+	that->enable_widgets();
 }
 
 // Download. v = eQSL/LotW (import data enum)
@@ -450,6 +506,30 @@ void qso_qsl::qsl_upload() {
 		enable_widgets();
 	} else {
 		status_->misc_status(ST_ERROR, "Not ready to upload - finish operating");
+	}
+}
+
+// Upload single
+void qso_qsl::qsl_1_upload(extract_data::extract_mode_t mode) {
+	qso_manager* mgr = ancestor_view<qso_manager>(this);
+	qso_num_t number = mgr->data()->current_number();
+	if (number != -1) {
+		switch (mode) {
+		case extract_data::EQSL: {
+			eqsl_handler_->upload_single_qso(number);
+			break;
+		}
+		case extract_data::CLUBLOG: {
+			club_handler_->upload_single_qso(number);
+			break;
+		}
+		case extract_data::LOTW: {
+			lotw_handler_->upload_single_qso(number);
+			break;
+		}
+		}
+	} else {
+		status_->misc_status(ST_ERROR, "QSL: Have no QSO to upload");
 	}
 }
 
@@ -504,9 +584,61 @@ void qso_qsl::qsl_generate_png() {
 	}
 }
 
+// Generate single PNG file
+void qso_qsl::qsl_1_generate_png() {
+	qso_manager* mgr = ancestor_view<qso_manager>(this);
+	record* qso = mgr->data()->current_qso();
+	if (qso) {
+		png_writer* png = new png_writer();
+		Fl_RGB_Image* image = qsl_image::image(qso, qsl_data::FILE);
+		string filename = png_writer::png_filename(qso);
+		if (png->write_image(image, filename)) {
+			status_->misc_status(ST_ERROR, "QSL: Single PNG file generation failed");
+		}
+	}
+	else {
+		status_->misc_status(ST_ERROR, "QSL: No QSO to generate PNG file for");
+	}
+}
+
 // Send e--mails
 void qso_qsl::qsl_send_email() {
-	status_->misc_status(ST_WARNING, "QSL: send_email is not yet implemented");
+	for (auto it = extract_records_->begin(); it != extract_records_->end(); it++) {
+		qsl_1_send_email(*it);
+	}
+}
+
+// Send single e-mail
+void qso_qsl::qsl_1_send_email(record* qso) {
+	qsl_emailer* emailer = new qsl_emailer;
+	if (emailer->generate_email(qso)) {
+		if (emailer->send_email()) {
+			qso->item("QSL_SENT", string("Y"));
+			qso->item("QSL_SENT_VIA", string("E"));
+			qso->item("QSL_SDATE", now(false, "%Y%m%d"));
+			status_->misc_status(ST_OK, "QSL: E-mail sent");
+		}
+		else {
+			status_->misc_status(ST_ERROR, "QSL: E-mail not sent");
+		}
+	}
+	else {
+		char msg[128];
+		snprintf(msg, sizeof(msg), "QSL: Did not generate e-mail for %s", qso->item("CALL").c_str());
+		status_->misc_status(ST_ERROR, msg);
+	}
+}
+
+// Send single e-mail to current QSO
+void qso_qsl::qsl_1_send_email() {
+	qso_manager* mgr = ancestor_view<qso_manager>(this);
+	record* qso = mgr->data()->current_qso();
+	if (qso) {
+		qsl_1_send_email(qso);
+	}
+	else {
+		status_->misc_status(ST_ERROR, "QSL: No QSO selected for send_email");
+	}
 }
 
 // Update eQSL download count

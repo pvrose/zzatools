@@ -275,13 +275,22 @@ bool url_handler::send_email(string url, string user, string password,
 		return false;
 	}
 
+	if (DEBUG_CURL) {
+		// Add extra verbosity
+		curl_easy_setopt(curl_, CURLOPT_DEBUGFUNCTION, cb_debug);
+		curl_easy_setopt(curl_, CURLOPT_VERBOSE, 1);
+	}
+
+	// Set username and password
+	curl_easy_setopt(curl_, CURLOPT_USERNAME, user.c_str());
+	curl_easy_setopt(curl_, CURLOPT_PASSWORD, password.c_str());
 	// Set the URL address of the mail server
 	curl_easy_setopt(curl_, CURLOPT_URL, url.c_str());
 
 	// set the sender 
 	curl_easy_setopt(curl_, CURLOPT_MAIL_FROM, user.c_str());
 	// Add the recipients - which hopefully should not be seen
-	struct curl_slist* recipients;
+	struct curl_slist* recipients = nullptr;
 	for (auto it = to_list.begin(); it != to_list.end(); it++) {
 		recipients = curl_slist_append(recipients, (*it).c_str());
 	}
@@ -296,17 +305,17 @@ bool url_handler::send_email(string url, string user, string password,
 	curl_easy_setopt(curl_, CURLOPT_MAIL_RCPT_ALLLOWFAILS, 1L);
 
 	// Add the header Date:, To: From: Cc: Subject:
-	struct curl_slist* headers;
+	struct curl_slist* headers = nullptr;
 	char text[128];
 	// Date
-	string date = now(true, "%s %c %z");
+	string date = now(true, "%a, %d %b %Y %T %z");
 	snprintf(text, sizeof(text), "Date: %s", date.c_str());
 	headers = curl_slist_append(headers, text);
 	for (auto it = to_list.begin(); it != to_list.end(); it++) {
 		snprintf(text, sizeof(text), "To: %s", (*it).c_str());
 		headers = curl_slist_append(headers, text);
 	}
-	snprintf(text, sizeof(text), "From %s", user.c_str());
+	snprintf(text, sizeof(text), "From: %s", user.c_str());
 	headers = curl_slist_append(headers, text);
 	for (auto it = cc_list.begin(); it != cc_list.end(); it++) {
 		snprintf(text, sizeof(text), "Cc: %s", (*it).c_str());
@@ -314,6 +323,7 @@ bool url_handler::send_email(string url, string user, string password,
 	}
 	snprintf(text, sizeof(text), "Subject: %s", subject.c_str());
 	headers = curl_slist_append(headers, text);
+	headers = curl_slist_append(headers, "");
 	curl_easy_setopt(curl_, CURLOPT_HTTPHEADER, headers);
 	// Now add the txt
 	curl_mime* mime = curl_mime_init(curl_);
@@ -330,12 +340,6 @@ bool url_handler::send_email(string url, string user, string password,
 	// Add debug and error stuff
 	char* error_msg = new char[CURL_ERROR_SIZE];
 	curl_easy_setopt(curl_, CURLOPT_ERRORBUFFER, error_msg);
-
-	if (DEBUG_CURL) {
-		// Add extra verbosity
-		curl_easy_setopt(curl_, CURLOPT_DEBUGFUNCTION, cb_debug);
-		curl_easy_setopt(curl_, CURLOPT_VERBOSE, 1);
-	}
 
 	// Now send the e-mail
 	result = curl_easy_perform(curl_);
