@@ -32,7 +32,7 @@ public:
     void qsl_extract(extract_data::extract_mode_t server);
     void qsl_upload();
     void qsl_print();
-    void qsl_print_done();
+    void qsl_mark_done();
     void qsl_cancel();
     void qsl_generate_png();
     void qsl_send_email();
@@ -87,6 +87,8 @@ protected:
     bool extract_in_progress_;
     // Upload only specified QSL
     bool single_qso_;
+    // Flag for mark_done
+    string via_code_;
 
     // Widgets
     Fl_Check_Button* bn_single_qso_;
@@ -105,13 +107,10 @@ protected:
     Fl_Button* bn_upld_club_;
     Fl_Button* bn_print_;
     Fl_Button* bn_png_;
-    Fl_Button* bn_mark_done_;
-    Fl_Button* bn_cncl_eqsl_;
-    Fl_Button* bn_cncl_lotw_;
-    Fl_Button* bn_cncl_club_;
-    Fl_Button* bn_cncl_card_;
-    Fl_Button* bn_cncl_email_;
+    Fl_Button* bn_card_done_;
+    Fl_Button* bn_cancel_;
     Fl_Button* bn_send_email_;
+    Fl_Button* bn_email_done_;
     Fl_Fill_Dial* op_eqsl_count_;
 
 };

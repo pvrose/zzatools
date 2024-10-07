@@ -266,6 +266,7 @@ bool url_handler::send_email(string url, string user, string password,
 
 	lock_.lock();
 	CURLcode result;
+	char text[128];
 	// Start a new transfer
 	curl_ = curl_easy_init();
 
@@ -286,9 +287,12 @@ bool url_handler::send_email(string url, string user, string password,
 	curl_easy_setopt(curl_, CURLOPT_PASSWORD, password.c_str());
 	// Set the URL address of the mail server
 	curl_easy_setopt(curl_, CURLOPT_URL, url.c_str());
+	// Set SSL
+	curl_easy_setopt(curl_, CURLOPT_USE_SSL, CURLUSESSL_ALL);
 
 	// set the sender 
-	curl_easy_setopt(curl_, CURLOPT_MAIL_FROM, user.c_str());
+	snprintf(text, sizeof(text), "<%s>", user.c_str());
+	curl_easy_setopt(curl_, CURLOPT_MAIL_FROM, text);
 	// Add the recipients - which hopefully should not be seen
 	struct curl_slist* recipients = nullptr;
 	for (auto it = to_list.begin(); it != to_list.end(); it++) {
@@ -306,22 +310,21 @@ bool url_handler::send_email(string url, string user, string password,
 
 	// Add the header Date:, To: From: Cc: Subject:
 	struct curl_slist* headers = nullptr;
-	char text[128];
 	// Date
 	string date = now(true, "%a, %d %b %Y %T %z");
 	snprintf(text, sizeof(text), "Date: %s", date.c_str());
 	headers = curl_slist_append(headers, text);
 	for (auto it = to_list.begin(); it != to_list.end(); it++) {
-		snprintf(text, sizeof(text), "To: %s", (*it).c_str());
+		snprintf(text, sizeof(text), "To: <%s>", (*it).c_str());
 		headers = curl_slist_append(headers, text);
 	}
-	snprintf(text, sizeof(text), "From: %s", user.c_str());
+	snprintf(text, sizeof(text), "From: <%s>", user.c_str());
 	headers = curl_slist_append(headers, text);
 	for (auto it = cc_list.begin(); it != cc_list.end(); it++) {
-		snprintf(text, sizeof(text), "Cc: %s", (*it).c_str());
+		snprintf(text, sizeof(text), "Cc: <%s>", (*it).c_str());
 		headers = curl_slist_append(headers, text);
 	}
-	snprintf(text, sizeof(text), "Subject: %s", subject.c_str());
+	snprintf(text, sizeof(text), "Subject: %s", "Test"); // subject.c_str());
 	headers = curl_slist_append(headers, text);
 	headers = curl_slist_append(headers, "");
 	curl_easy_setopt(curl_, CURLOPT_HTTPHEADER, headers);

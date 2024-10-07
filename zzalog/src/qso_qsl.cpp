@@ -49,6 +49,7 @@ qso_qsl::qso_qsl(int X, int Y, int W, int H, const char* L) :
 	tkr_value_ = 0.0;
 	extract_in_progress_ = false;
 	single_qso_ = false;
+	via_code_ = "";
 	load_values();
 	create_form();
 	enable_widgets();
@@ -131,13 +132,9 @@ void qso_qsl::create_form() {
 	bn_extr_eqsl_->callback(cb_extract, (void*)extract_data::EQSL);
 	bn_extr_eqsl_->tooltip("Extract records for upload to eQSL");
 	// Upload
-	bn_upld_eqsl_ = new Fl_Button(C5, curr_y, W5, HBUTTON, "@8->");
+	bn_upld_eqsl_ = new Fl_Button(C6, curr_y, W6, HBUTTON, "@8->");
 	bn_upld_eqsl_->callback(cb_upload, (void*)extract_data::EQSL);
 	bn_upld_eqsl_->tooltip("Upload extracted records to eQSL");
-	// Cancel
-	bn_cncl_eqsl_ = new Fl_Button(C6, curr_y, W6, HBUTTON, "@undo");
-	bn_cncl_eqsl_->callback(cb_cancel, (void*)extract_data::EQSL);
-	bn_cncl_eqsl_->tooltip("Cancel upload");
 	// Fetch cards
 	op_eqsl_count_ = new Fl_Fill_Dial(C7 + W7 - HBUTTON, curr_y, HBUTTON, HBUTTON, nullptr);
 	char text[10];
@@ -171,13 +168,9 @@ void qso_qsl::create_form() {
 	bn_extr_lotw_->callback(cb_extract, (void*)extract_data::LOTW);
 	bn_extr_lotw_->tooltip("Extract records for upload to LotW");
 	// Upload
-	bn_upld_lotw_ = new Fl_Button(C5, curr_y, W5, HBUTTON, "@8->");
+	bn_upld_lotw_ = new Fl_Button(C6, curr_y, W6, HBUTTON, "@8->");
 	bn_upld_lotw_->callback(cb_upload, (void*)extract_data::LOTW);
 	bn_upld_lotw_->tooltip("Upload extracted records to LotW");
-	// Cancel
-	bn_cncl_lotw_ = new Fl_Button(C6, curr_y, W6, HBUTTON, "@undo");
-	bn_cncl_lotw_->callback(cb_cancel, (void*)extract_data::LOTW);
-	bn_cncl_lotw_->tooltip("Cancel upload");
 
 	curr_y += HBUTTON;
 
@@ -194,13 +187,9 @@ void qso_qsl::create_form() {
 	bn_extr_club_->callback(cb_extract, (void*)extract_data::CLUBLOG);
 	bn_extr_club_->tooltip("Extract records for upload to ClubLog");
 	// Upload
-	bn_upld_club_ = new Fl_Button(C5, curr_y, W5, HBUTTON, "@8->");
+	bn_upld_club_ = new Fl_Button(C6, curr_y, W6, HBUTTON, "@8->");
 	bn_upld_club_->callback(cb_upload, (void*)extract_data::CLUBLOG);
 	bn_upld_club_->tooltip("Upload extracted records to ClubLog");
-	// Cancel
-	bn_cncl_club_ = new Fl_Button(C6, curr_y, W6, HBUTTON, "@undo");
-	bn_cncl_club_->callback(cb_cancel, (void*)extract_data::CLUBLOG);
-	bn_cncl_club_->tooltip("Cancel upload");
 
 	curr_y += HBUTTON;
 
@@ -216,14 +205,10 @@ void qso_qsl::create_form() {
 	bn_print_ = new Fl_Button(C5, curr_y, W5, HBUTTON, "@fileprint");
 	bn_print_->callback(cb_print);
 	bn_print_->tooltip("Print labels from extracted records");
-	// Cancel
-	bn_cncl_card_ = new Fl_Button(C6, curr_y, W6, HBUTTON, "@undo");
-	bn_cncl_card_->callback(cb_cancel, (void*)extract_data::CARD);
-	bn_cncl_card_->tooltip("Cancel upload");
 	// Mark read
-	bn_mark_done_ = new Fl_Button(C7, curr_y, W7, HBUTTON, "Done");
-	bn_mark_done_->callback(cb_mark_done);
-	bn_mark_done_->tooltip("Mark extracted records as printed");
+	bn_card_done_ = new Fl_Button(C7, curr_y, W7, HBUTTON, "Done");
+	bn_card_done_->callback(cb_mark_done, (void*)(intptr_t)'B');
+	bn_card_done_->tooltip("Mark extracted records as printed");
 
 	curr_y += HBUTTON;
 
@@ -239,16 +224,21 @@ void qso_qsl::create_form() {
 	bn_png_ = new Fl_Button(C5, curr_y, W5, HBUTTON, "@filesave");
 	bn_png_->callback(cb_png);
 	bn_png_->tooltip("Generate PNG files for sending");
-	// Cancel
-	bn_cncl_email_ = new Fl_Button(C6, curr_y, W6, HBUTTON, "@undo");
-	bn_cncl_email_->callback(cb_cancel, (void*)extract_data::EMAIL);
-	bn_cncl_email_->tooltip("Cancel extract");
 	// Send e-mail
-	bn_send_email_ = new Fl_Button(C7, curr_y, W7, HBUTTON, "@mail");
+	bn_send_email_ = new Fl_Button(C6, curr_y, W6, HBUTTON, "@mail");
 	bn_send_email_->labelsize(HBUTTON - 2);
 	bn_send_email_->callback(cb_email);
 	bn_send_email_->tooltip("Send e-mails for extracetd QSOs");
+	// Mark read
+	bn_email_done_ = new Fl_Button(C7, curr_y, W7, HBUTTON, "Done");
+	bn_email_done_->callback(cb_mark_done, (void*)(intptr_t)'E');
+	bn_email_done_->tooltip("Mark extracted records as printed");
 
+	curr_y += HBUTTON;
+	// cacncel 
+	bn_cancel_ = new Fl_Button(C4, curr_y, W4, HBUTTON, "@undo");
+	bn_cancel_->callback(cb_cancel, nullptr);
+	bn_cancel_->tooltip("Cancel extract");
 
 	curr_y += HBUTTON + GAP;
 
@@ -301,67 +291,63 @@ void qso_qsl::enable_widgets() {
 		bn_extr_card_->deactivate();
 		bn_extr_email_->deactivate();
 	}
+	// Cancel button
+	if (!extract_in_progress_ && extract_records_->size()) {
+		bn_cancel_->activate();
+	}
+	else {
+		bn_cancel_->deactivate();
+	}
 	// Disable extract and upload buttons if auto-upload enabled
 	if (!extract_in_progress_ && extract_records_->use_mode() == extract_data::EQSL) {
 		bn_upld_eqsl_->activate();
-		bn_cncl_eqsl_->activate();
 	}
 	else if (single_qso_) {
 		bn_upld_eqsl_->activate();
-		bn_cncl_eqsl_->deactivate();
 	}
 	else {
 		bn_upld_eqsl_->deactivate();
-		bn_cncl_eqsl_->deactivate();
 	}
 	if (!extract_in_progress_ && extract_records_->use_mode() == extract_data::LOTW) {
 		bn_upld_lotw_->activate();
-		bn_cncl_lotw_->activate();
 	}
 	else if (single_qso_) {
 		bn_upld_lotw_->activate();
-		bn_cncl_lotw_->deactivate();
 	}
 	else {
 		bn_upld_lotw_->deactivate();
-		bn_cncl_lotw_->deactivate();
 	}
 	if (!extract_in_progress_ && extract_records_->use_mode() == extract_data::CLUBLOG) {
 		bn_upld_club_->activate();
-		bn_cncl_club_->activate();
 	}
 	else if (single_qso_) {
 		bn_upld_club_->activate();
-		bn_cncl_club_->deactivate();
 	}
 	else {
 		bn_upld_club_->deactivate();
-		bn_cncl_club_->deactivate();
 	}
 	if (!extract_in_progress_ && extract_records_->use_mode() == extract_data::CARD && !single_qso_) {
 		bn_print_->activate();
-		bn_mark_done_->activate();
-		bn_cncl_card_->activate();
+		bn_card_done_->activate();
 	}
 	else {
 		bn_print_->deactivate();
-		bn_mark_done_->deactivate();
-		bn_cncl_card_->deactivate();
+		bn_card_done_->deactivate();
 	}
 	if (!extract_in_progress_ && extract_records_->use_mode() == extract_data::EMAIL) {
 		bn_png_->activate();
 		bn_send_email_->activate();
-		bn_cncl_email_->activate();
+		bn_email_done_->activate();
 	}
 	else if (single_qso_) {
 		bn_png_->activate();
 		bn_send_email_->activate();
-		bn_cncl_email_->deactivate();
+		bn_email_done_->activate();
 	}
 	else {
 		bn_png_->deactivate();
      	bn_send_email_->deactivate();
-		bn_cncl_email_->deactivate();
+		bn_email_done_->deactivate();
 	}
 	char text[10];
 	int curr = atoi(op_eqsl_count_->label());
@@ -440,7 +426,8 @@ void qso_qsl::cb_print(Fl_Widget* w, void* v) {
 // Mark printing done
 void qso_qsl::cb_mark_done(Fl_Widget* w, void* v) {
 	qso_qsl* that = ancestor_view<qso_qsl>(w);
-	that->qsl_print_done();
+	string via = { (char)(intptr_t)v };
+	that->qsl_mark_done();
 }
 
 // Cancel extraction
@@ -540,23 +527,35 @@ void qso_qsl::qsl_print() {
 		status_->misc_status(ST_ERROR, "DASH: Printing cards failed");
 	} else {
 		status_->misc_status(ST_OK, "DASH: Printing cards OK");
+		via_code_ = "B";
 	}
 	delete ptr;
 	enable_widgets();
 }
 
 // Mark printing done
-void qso_qsl::qsl_print_done() {
-	if (extract_records_->size()) {
+void qso_qsl::qsl_mark_done() {
+	if (extract_records_->size() || single_qso_) {
 		char message[200];
 		string date_name = "QSLSDATE";
 		string sent_name = "QSL_SENT";
+		string via_name = "QSL_SENT_VIA";
 		string today = now(false, "%Y%m%d");
 		snprintf(message, 200, "EXTRACT: Setting %s to \"%s\", %s to \"Y\"", date_name.c_str(), today.c_str(), sent_name.c_str());
 		status_->misc_status(ST_NOTE, message);
-		for (auto it = extract_records_->begin(); it != extract_records_->end(); it++) {
+		if (single_qso_) {
+			qso_manager* mgr = ancestor_view<qso_manager>(this);
+			record* qso = mgr->data()->current_qso();
+			if (qso) {
+				qso->item(date_name, today);
+				qso->item(sent_name, string("Y"));
+				qso->item(via_name, via_code_);
+			}
+		}
+		else for (auto it = extract_records_->begin(); it != extract_records_->end(); it++) {
 			(*it)->item(date_name, today);
 			(*it)->item(sent_name, string("Y"));
+			(*it)->item(via_name, via_code_);
 		}
 		book_->modified(true);
 	}
@@ -613,10 +612,8 @@ void qso_qsl::qsl_1_send_email(record* qso) {
 	qsl_emailer* emailer = new qsl_emailer;
 	if (emailer->generate_email(qso)) {
 		if (emailer->send_email()) {
-			qso->item("QSL_SENT", string("Y"));
-			qso->item("QSL_SENT_VIA", string("E"));
-			qso->item("QSL_SDATE", now(false, "%Y%m%d"));
 			status_->misc_status(ST_OK, "QSL: E-mail sent");
+			via_code_ = "E";
 		}
 		else {
 			status_->misc_status(ST_ERROR, "QSL: E-mail not sent");

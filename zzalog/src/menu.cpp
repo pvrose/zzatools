@@ -160,6 +160,7 @@ config* config_ = nullptr;
 		{ "&Save", 0, menu::cb_mi_file_saveas, (void*)OT_EXTRACT },
 		{ "&Upload", 0, menu::cb_mi_ext_upload, 0 },
 		{ "&Print", 0, menu::cb_mi_ext_print, 0 },
+		{ "Send e-mail", 0, menu::cb_mi_ext_email, 0 },
 		{ "Mar&k sent", 0, menu::cb_mi_ext_mark, 0 },
 		{ 0 },
 
@@ -1097,6 +1098,11 @@ void menu::cb_mi_ext_upload(Fl_Widget* w, void* v) {
 // v is not used
 void menu::cb_mi_ext_print(Fl_Widget* w, void* v) {
 	qso_manager_->qsl_print();
+}
+
+// Extract->eMail
+void menu::cb_mi_ext_email(Fl_Widget* w, void* v) {
+	qso_manager_->qsl_email();
 }
 
 // Extract->Mark sent

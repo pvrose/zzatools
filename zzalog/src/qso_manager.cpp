@@ -454,9 +454,15 @@ void qso_manager::qsl_print() {
 	qsl_control()->qsl_print();
 }
 
+// E-mail QSLs
+void qso_manager::qsl_email() {
+	qsl_control()->qsl_generate_png();
+	qsl_control()->qsl_send_email();
+}
+
 // Mark QSL print done
 void qso_manager::qsl_print_done() {
-	qsl_control()->qsl_print_done();
+	qsl_control()->qsl_mark_done();
 }
 
 qso_qsl* qso_manager::qsl_control() {

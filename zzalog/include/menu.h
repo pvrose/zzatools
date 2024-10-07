@@ -93,6 +93,8 @@ struct search_criteria_t;
 		static void cb_mi_ext_upload(Fl_Widget* w, void* v);
 		// Extract->Print
 		static void cb_mi_ext_print(Fl_Widget* w, void* v);
+		// Extract->e-Mail
+		static void cb_mi_ext_email(Fl_Widget* w, void* v);
 		// Extract->Mark sent
 		static void cb_mi_ext_mark(Fl_Widget* w, void* v);
 		// Extract->Special->

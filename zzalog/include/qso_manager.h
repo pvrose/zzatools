@@ -126,6 +126,7 @@ enum hint_t : uchar;
 		void qsl_upload();
 		void qsl_print();
 		void qsl_print_done();
+		void qsl_email();
 
 		// Widgets have been xcreated
 		bool created_;
