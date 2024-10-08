@@ -338,6 +338,7 @@ bool url_handler::send_email(string url, string user, string password,
 		part = curl_mime_addpart(mime);
 		curl_mime_filedata(part, attachments[ix].c_str());
 		curl_mime_type(part, formats[ix].c_str());
+		curl_mime_encoder(part, "base64");
 	}
 	// Add the mime to the mail
 	curl_easy_setopt(curl_, CURLOPT_MIMEPOST, mime);

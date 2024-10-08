@@ -58,7 +58,7 @@ bool qsl_emailer::generate_email(record* qso) {
 	}
 	// Set record name to "Op" if it's not in the record
 	if (qso_->item("NAME").length() == 0) {
-		qso_->item("NAME", "Op");
+		qso_->item("NAME", string("Op"));
 	}
 	subject_ = qso_->item_merge(SUBJECT, true);
 	text_body_ = qso_->item_merge(BODY, true);
