@@ -589,7 +589,7 @@ void qsl_editor::create_fparams(int& curr_x, int& curr_y, qsl_data::field_def* f
 	// Button opens a font, size and colour dialog for the label
 	// The button's label will be displayed in the selected font, size and colour
 	Fl_Button* f_lstyle = new Fl_Button(curr_x, curr_y, HBUTTON, HBUTTON, "S");
-	f_lstyle->align(FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
+	f_lstyle->align(FL_ALIGN_INSIDE | FL_ALIGN_CENTER | FL_ALIGN_CLIP);
 	f_lstyle->callback(cb_bn_style, (void*)&field->l_style);
 	f_lstyle->when(FL_WHEN_RELEASE);
 	f_lstyle->color(FL_WHITE);
@@ -614,7 +614,7 @@ void qsl_editor::create_fparams(int& curr_x, int& curr_y, qsl_data::field_def* f
 	// Button opens a font, size and colour dialog for the value
 	// The button's label will be displayed in the selected font, size and colour
 	Fl_Button* f_tstyle = new Fl_Button(curr_x, curr_y, HBUTTON, HBUTTON, "S");
-	f_tstyle->align(FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
+	f_tstyle->align(FL_ALIGN_INSIDE | FL_ALIGN_CENTER | FL_ALIGN_CLIP);
 	f_tstyle->callback(cb_bn_style, (void*)&field->t_style);
 	f_tstyle->when(FL_WHEN_RELEASE);
 	f_tstyle->color(FL_WHITE);
@@ -695,7 +695,7 @@ void qsl_editor::create_tparams(int& curr_x, int& curr_y, qsl_data::text_def* te
 	// Button to open a font, size and colour dialog for the text value
 	// The button's label will be displayed in the selected font, size and colour
 	Fl_Button* t_tstyle = new Fl_Button(curr_x, curr_y, HBUTTON, HBUTTON, "S");
-	t_tstyle->align(FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
+	t_tstyle->align(FL_ALIGN_INSIDE | FL_ALIGN_CENTER | FL_ALIGN_CLIP);
 	t_tstyle->callback(cb_bn_style, (void*)&text->t_style);
 	t_tstyle->when(FL_WHEN_RELEASE);
 	t_tstyle->color(FL_WHITE);
