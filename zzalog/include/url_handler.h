@@ -41,7 +41,7 @@ using namespace std;
 		// Send an e-mail
 		bool send_email(string url, string user, string password,
 			vector<string> to_list, vector<string> cc_list, vector<string> bcc_list,
-			string subject, string payload, vector<string> attachments);
+			string subject, string payload, vector<string> attachments, vector<string> formats);
 
 	protected:
 		// Output the associated data to the stream for debugging purposes

@@ -262,7 +262,7 @@ bool url_handler::post_form(string url, vector<field_pair> fields, istream* req,
 // Send an e-mail
 bool url_handler::send_email(string url, string user, string password,
 	vector<string> to_list, vector<string> cc_list, vector<string> bcc_list,
-	string subject, string payload, vector<string> attachments) {
+	string subject, string payload, vector<string> attachments, vector<string> formats) {
 
 	lock_.lock();
 	CURLcode result;
@@ -324,18 +324,20 @@ bool url_handler::send_email(string url, string user, string password,
 		snprintf(text, sizeof(text), "Cc: <%s>", (*it).c_str());
 		headers = curl_slist_append(headers, text);
 	}
-	snprintf(text, sizeof(text), "Subject: %s", "Test"); // subject.c_str());
+	snprintf(text, sizeof(text), "Subject: %s", subject.c_str());
 	headers = curl_slist_append(headers, text);
 	headers = curl_slist_append(headers, "");
 	curl_easy_setopt(curl_, CURLOPT_HTTPHEADER, headers);
 	// Now add the txt
 	curl_mime* mime = curl_mime_init(curl_);
 	curl_mimepart* part = curl_mime_addpart(mime);
-	curl_mime_data(part, payload.c_str(), CURL_ZERO_TERMINATED);
+	curl_mime_data(part, payload.c_str(), payload.length());
+	curl_mime_type(part, "text/plain; charset=\"utf-8\"");
 	// Now add the attachments
-	for (auto it = attachments.begin(); it != attachments.end(); it++) {
+	for (int ix = 0; ix < attachments.size() && ix < formats.size(); ix++ ) {
 		part = curl_mime_addpart(mime);
-		curl_mime_filedata(part, (*it).c_str());
+		curl_mime_filedata(part, attachments[ix].c_str());
+		curl_mime_type(part, formats[ix].c_str());
 	}
 	// Add the mime to the mail
 	curl_easy_setopt(curl_, CURLOPT_MIMEPOST, mime);
@@ -385,7 +387,8 @@ void url_handler::dump(const char* text,
 		text, (long)size, (long)size);
 
 	// For every data byte
-	for (size_t i = 0; i < size; i++) {
+	size_t i;
+	for (i = 0; i < size && i < 30; i++) {
 
 		if (ptr[i] >= 7 && ptr[i] <= 13) {
 			// Convert control characters to escaped 
@@ -442,6 +445,9 @@ void url_handler::dump(const char* text,
 			}
 			fputc(ptr[i], stream);
 		}
+	}
+	if (i < size) {
+		fprintf(stream, "...+%d bytes", size - i);
 	}
 	fputc('\n', stream);
 }

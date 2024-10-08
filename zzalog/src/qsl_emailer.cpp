@@ -57,7 +57,7 @@ bool qsl_emailer::generate_email(record* qso) {
 			"", qso_->item("CALL").c_str());
 	}
 	// Set record name to "Op" if it's not in the record
-	if (qso_->item("NAME").length()) {
+	if (qso_->item("NAME").length() == 0) {
 		qso_->item("NAME", "Op");
 	}
 	subject_ = qso_->item_merge(SUBJECT, true);
@@ -96,8 +96,8 @@ bool qsl_emailer::send_email() {
 		{ },
 		subject_,
 		text_body_,
-		//{ qsl_filename_ })) {
-		{ })) {
+		{ qsl_filename_ },
+		{ "image/png" })) {
 		status_->misc_status(ST_OK, "QSL: e-Mail successfully sent");
 		return true;
 	}
