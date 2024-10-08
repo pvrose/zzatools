@@ -63,7 +63,7 @@ extern qrz_handler* qrz_handler_;
 extern wsjtx_handler* wsjtx_handler_;
 extern time_t session_start_;
 extern qso_manager* qso_manager_;
-config* config_ = nullptr;
+extern config* config_;
 
 
 
@@ -464,11 +464,8 @@ void menu::cb_mi_file_backup(Fl_Widget*, void* v) {
 void menu::cb_mi_settings(Fl_Widget* w, void* v) {
 	// v provides that id of the page of the config dialogs to open with
 	config::cfg_dialog_t active = (config::cfg_dialog_t)(intptr_t)v;
-	if (!config_) {
-		// Open the config and wait for it to close
-		config_ = new config(WCONFIG, HCONFIG + 100, "Configuration", active);
-		config_ = nullptr;
-	}
+	config_->set_tab(active);
+	config_->show();
 }
 
 // Windows->Show All|Hide All

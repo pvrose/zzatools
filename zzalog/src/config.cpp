@@ -16,12 +16,14 @@
 #include <FL/Fl_Preferences.H>
 
 extern Fl_Preferences* settings_;
+extern config* config_;
 
 // Constructor
-config::config(int W, int H, const char* label, cfg_dialog_t active) :
+config::config(int W, int H, const char* label) :
 	Fl_Window(W, H, label)
 	, settings_view_(nullptr)
 	, active_(true)
+	, tabs_(nullptr)
 {
 	updatable_views_.clear();
 
@@ -34,18 +36,18 @@ config::config(int W, int H, const char* label, cfg_dialog_t active) :
 	position(left, top);
 
 	children_ids_.clear();
-	// Create the set of tabs - leave enough space beneath for OK etc buttons.
-	Fl_Tabs* tabs = new Fl_Tabs(0, 0, W, H - HBUTTON - GAP);
-	tabs->callback(cb_tab);
-	tabs->box(FL_FLAT_BOX);
-	tabs->handle_overflow(Fl_Tabs::OVERFLOW_PULLDOWN);
+	// Create the set of tabs_ - leave enough space beneath for OK etc buttons.
+	tabs_ = new Fl_Tabs(0, 0, W, H - HBUTTON - GAP);
+	tabs_->callback(cb_tab);
+	tabs_->box(FL_FLAT_BOX);
+	tabs_->handle_overflow(Fl_Tabs::OVERFLOW_PULLDOWN);
 	border(true);
 	int rx = 0;
 	int ry = 0;
 	int rw = 0;
 	int rh = 0;
 	// get client area 
-	tabs->client_area(rx, ry, rw, rh, 0);
+	tabs_->client_area(rx, ry, rw, rh, 0);
 	// File location config
 	files_dialog* files = new files_dialog(rx, ry, rw, rh, "File Locations");
 	files->labelfont(FL_BOLD);
@@ -77,6 +79,7 @@ config::config(int W, int H, const char* label, cfg_dialog_t active) :
 	qsle->labelsize(FL_NORMAL_SIZE + 2);
 	qsle->tooltip("Allows limited configuration of fonts and tip timeouts");
 	children_ids_.push_back(DLG_QSLE);
+	updatable_views_.insert(qsle);
 
 	// Lastly - a tree display showing all config
 	Fl_Group* all_settings = new Fl_Group(rx, ry, rw, rh, "All Settings");
@@ -91,28 +94,8 @@ config::config(int W, int H, const char* label, cfg_dialog_t active) :
 
 	// Default to show all config
 	settings_view_ = all_settings;
-	// Activate the required dialog
-	switch (active) {
-	case DLG_FILES:
-		tabs->value(files);
-		break;
-	case DLG_WEB:
-		tabs->value(aweb);
-		break;
-	case DLG_COLUMN:
-		tabs->value(fields);
-		break;
-	case DLG_USER:
-		tabs->value(user);
-		break;
-	case DLG_QSLE:
-		tabs->value(qsle);
-		break;
-	case DLG_ALL:
-		tabs->value(all_settings);
-		break;
-	}
-	tabs->end();
+
+	tabs_->end();
 	// button - save the current config and resume
 	Fl_Button* save_bn = new Fl_Button(W - 3 * WBUTTON - 2 * GAP, H - HBUTTON, WBUTTON, HBUTTON, "Save");
 	// save_bn->color(fl_lighter(fl_lighter(FL_BLUE)));
@@ -134,7 +117,6 @@ config::config(int W, int H, const char* label, cfg_dialog_t active) :
 	cancel_bn->tooltip("Cancel changes and close dialog");
 	add(cancel_bn);
 	callback(cb_bn_cal, (long)CA_CANCEL);
-	set_label(active);
 
 	resizable(nullptr);
 
@@ -159,12 +141,11 @@ config::~config()
 
 // Enable widgets
 void config::enable_widgets() {
-	Fl_Tabs* tabs = (Fl_Tabs*)child(0);
 	// value() returns the selected widget. We need to test which widget it is.
-	Fl_Widget* tab = tabs->value();
+	Fl_Widget* tab = tabs_->value();
 	cfg_dialog_t dlg = DLG_X;
-	for (int ix = 0; ix < tabs->children(); ix++) {
-		Fl_Widget* wx = tabs->child(ix);
+	for (int ix = 0; ix < tabs_->children(); ix++) {
+		Fl_Widget* wx = tabs_->child(ix);
 		if (wx == tab) {
 			wx->labelfont((wx->labelfont() | FL_BOLD) & (~FL_ITALIC));
 			wx->labelcolor(FL_FOREGROUND_COLOR);
@@ -182,20 +163,20 @@ void config::enable_widgets() {
 
 // Callback - Save, OK or Cancel
 void config::cb_bn_cal(Fl_Widget* w, long arg) {
-	// Find the active tab - assume that tabs is child 0
+	// Find the active tab - assume that tabs_ is child 0
 	config* that = ancestor_view<config>(w);
-	Fl_Tabs* tabs = (Fl_Tabs*)that->child(0);
-	Fl_Widget* active_tab = tabs->value();
+	Fl_Tabs* tabs_ = (Fl_Tabs*)that->child(0);
+	Fl_Widget* active_tab = tabs_->value();
 	// Button selected
 	switch ((cfg_action_t)arg) {
 	case CA_OK:
 		// Save values in active tab, close the config window
 		active_tab->do_callback(active_tab);
-		Fl::delete_widget(that);
+		that->hide();
 		break;
 	case CA_CANCEL:
 		// Close the config window
-		Fl::delete_widget(that);
+		that->hide();
 		break;
 	case CA_SAVE:
 		// Save values in active tab - recreate all_settings view
@@ -210,8 +191,16 @@ void config::cb_tab(Fl_Widget* w, void* v) {
 	that->enable_widgets();
 }
 
+// Set the tab
+void config::set_tab(cfg_dialog_t active) {
+	// Activate the required dialog
+	tabs_->value(tabs_->child(active));
+	enable_widgets();
+}
+
 // Set the window label depending on the tap selected
 void config::set_label(config::cfg_dialog_t active) {
+
 	switch (active) {
 	case DLG_FILES:
 		label("Configuration: Define location of various data files");
@@ -237,7 +226,7 @@ void config::set_label(config::cfg_dialog_t active) {
 	}
 }
 
-// Update all tabs that are selected record dependant
+// Update all tabs_ that are selected record dependant
 void config::update() {
 	for (auto it = updatable_views_.begin(); it != updatable_views_.end(); it++) {
 		(*it)->update();
@@ -253,3 +242,4 @@ bool config::active() {
 void config::inactive() {
 	active_ = false;
 }
+

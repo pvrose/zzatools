@@ -42,6 +42,7 @@ main.cpp - application entry point
 #include "fields.h"
 #include "symbols.h"
 #include "qsl_dataset.h"
+#include "config.h"
 
 // C/C++ header files
 #include <ctime>
@@ -73,7 +74,7 @@ using namespace std;
 string COPYRIGHT = "\302\251 Philip Rose GM3ZZA 2018. All rights reserved.\nPrefix data courtesy of clublog.org";
 string PROGRAM_ID = "ZZALOG";
 string PROG_ID = "ZLG";
-string PROGRAM_VERSION = "3.4.92";
+string PROGRAM_VERSION = "3.4.93";
 string VENDOR = "GM3ZZA";
 extern string TIMESTAMP;
 
@@ -133,6 +134,7 @@ wx_handler* wx_handler_ = nullptr;
 ticker* ticker_ = nullptr;
 fields* fields_ = nullptr;
 qsl_dataset* qsl_dataset_ = nullptr;
+config* config_ = nullptr;
 
 // Recent files opened
 list<string> recent_files_;
@@ -642,6 +644,11 @@ void add_data() {
 	// Add the QSL design data
 	if (!closing_) {
 		qsl_dataset_ = new qsl_dataset;
+	}
+	// Add config
+	if (!closing_) {
+		config_ = new config(WCONFIG, HCONFIG, "Configuration");
+		config_->hide();
 	}
 }
 

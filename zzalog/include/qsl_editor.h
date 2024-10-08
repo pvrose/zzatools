@@ -9,6 +9,7 @@ class qsl_display;
 class qsl_widget;
 class record;
 class filename_input;
+class field_input;
 class Fl_Choice;
 class Fl_Widget;
 class Fl_Group;
@@ -39,6 +40,9 @@ protected:
 
     // Handle the ACTIVATE/DEACTIVATE events to show/hide the display window
     virtual int handle(int event);
+
+    // Update - change callsign
+    virtual void update();
 
     // Create all the item definition widgets
     void create_items();
@@ -130,6 +134,7 @@ protected:
 
     // Filename input and browse button
     Fl_Group* g_1_;
+    field_input* ip_callsign_;
     filename_input* ip_filename_;
     // Inputs to define size and formats
     Fl_Group* g_2_;

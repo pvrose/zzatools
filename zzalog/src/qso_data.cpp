@@ -22,6 +22,7 @@
 #include "menu.h"
 #include "utils.h"
 #include "record.h"
+#include "config.h"
 
 #include <FL/Fl_Preferences.H>
 #include <FL/Fl_Tooltip.H>
@@ -41,6 +42,7 @@ extern menu* menu_;
 extern double prev_freq_;
 extern bool DARK;
 extern fields* fields_;
+extern config* config_;
 
 // qso_group_
 qso_data::qso_data(int X, int Y, int W, int H, const char* l) :
@@ -157,6 +159,7 @@ void qso_data::enable_widgets() {
 			// rig_if* rig = mgr->rig();
 			mgr->qsl_control()->enable_widgets();
 			if (menu_) menu_->update_items();
+			if (config_) config_->update();
 		}
 
 		string call;

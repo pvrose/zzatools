@@ -11,10 +11,6 @@
 		CA_CANCEL               // Cancel button pressed
 	};
 
-	// config window default sizes
-	const int WCONFIG = 600;
-	const int HCONFIG = 500;
-
 	// This class is a base class for the individual tabs within the settings dialog
 	class page_dialog : public Fl_Group
 

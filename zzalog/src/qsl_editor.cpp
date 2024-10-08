@@ -50,8 +50,7 @@ qsl_editor::qsl_editor(int X, int Y, int W, int H, const char* L) :
 	qsl_->set_card(data_);
 
 	// Only show the dipslay window if this dialog is active
-	if (active()) w_display_->show();
-	else w_display_->hide();
+	w_display_->hide();
 	// Add all the widgets in this dialog
     create_form(X, Y);
 
@@ -68,12 +67,14 @@ qsl_editor::~qsl_editor() {
 // Overload of handle() to intercept ACTIVATE and DEACTIVATE events
 int qsl_editor::handle(int event) {
 	switch(event) {
-	case FL_DEACTIVATE: {
+	case FL_DEACTIVATE:
+	case FL_HIDE: {
 		// This is being deactivated, so hide the display window
 		if (display_) w_display_->hide();
 		break;
 	}
-	case FL_ACTIVATE: {
+	case FL_ACTIVATE: 
+	case FL_SHOW: {
 		// This is being activated so show the display window
 		if (display_) w_display_->show();
 		break;
@@ -86,7 +87,9 @@ int qsl_editor::handle(int event) {
 // Load the settings
 void qsl_editor::load_values() {
 	// Get the current or default callsign to use initially
-    callsign_ = qso_manager_->get_default(qso_manager::CALLSIGN);
+	if (qso_manager_) {
+		callsign_ = qso_manager_->get_default(qso_manager::CALLSIGN);
+	}
 	qsl_type_ = qsl_data::LABEL;
 	// Get the display window position
 	Fl_Preferences windows_settings(settings_, "Windows");
@@ -118,6 +121,7 @@ void qsl_editor::create_form(int X, int Y) {
     w101->callback(cb_callsign, &callsign_);
     w101->field_name("STATION_CALLSIGN");
 	w101->tooltip("Select the callsign to change QSL template parameters for");
+	ip_callsign_ = w101;
 
 	curr_x += w101->x() + w101->w() + GAP + WLABEL;
 	Fl_Choice* w10101 = new Fl_Choice(curr_x, curr_y, WBUTTON, HBUTTON, "QSL Type");
@@ -769,6 +773,13 @@ void qsl_editor::redraw_display(bool dirty) {
 		if (example_qso_ && example_qso_->item("STATION_CALLSIGN") == callsign_) {
 			// Showing the example qSO as it exists and matches the callsign 
 			qsl_->set_qsos(&example_qso_, 1);
+		} else if (callsign_.length() == 0) {
+			callsign_ = qso_manager_->get_default(qso_manager::CALLSIGN);
+			ip_callsign_->value(callsign_.c_str());
+			// Load the display settings for this callsign
+			data_ = qsl_dataset_->get_card(callsign_, qsl_type_, true);
+			ip_filename_->value(data_->filename.c_str());
+			qsl_->set_qsos(&example_qso_, 1);
 		} else {
 			// Either there is no qSO ipor a different callsign was used
 			char msg[100];
@@ -778,6 +789,13 @@ void qsl_editor::redraw_display(bool dirty) {
 			qsl_->set_qsos(nullptr, 0);
 		}
 	} else {
+		if (qso_manager_) {
+			callsign_ = qso_manager_->get_default(qso_manager::CALLSIGN);
+			ip_callsign_->value(callsign_.c_str());
+			// Load the display settings for this callsign
+			data_ = qsl_dataset_->get_card(callsign_, qsl_type_, true);
+			ip_filename_->value(data_->filename.c_str());
+		}
 		// Do not show an example QSO
 		qsl_->set_qsos(nullptr, 0);
 	}
@@ -1099,5 +1117,10 @@ void qsl_editor::populate_qsl_type(Fl_Choice* ch) {
 	for (int ix = 0; ix < qsl_data::MAX_TYPE; ix++) {
 		ch->add(QSL_TYPES[ix].c_str());
 	}
+}
+
+// Update example call
+void qsl_editor::update() {
+	redraw_display(false);
 }
 
