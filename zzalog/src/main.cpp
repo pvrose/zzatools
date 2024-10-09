@@ -920,10 +920,10 @@ void customise_fltk() {
 	Fl::set_font(FL_TIMES_BOLD,       "Liberation Serif Bold");
 	Fl::set_font(FL_TIMES_ITALIC,     "Liberation Serif Italic");
 	Fl::set_font(FL_TIMES_BOLD_ITALIC,"Liberation Serif Bold Italic");	
-	Fl::set_font(FL_HELVETICA,            "Liberation Sans");
-	Fl::set_font(FL_HELVETICA_BOLD,       "Liberation Sans Bold");
-	Fl::set_font(FL_HELVETICA_ITALIC,     "Liberation Sans Italic");
-	Fl::set_font(FL_HELVETICA_BOLD_ITALIC,"Liberation Sans Bold Italic");	
+	// Fl::set_font(FL_HELVETICA,            "Liberation Sans");
+	// Fl::set_font(FL_HELVETICA_BOLD,       "Liberation Sans Bold");
+	// Fl::set_font(FL_HELVETICA_ITALIC,     "Liberation Sans Italic");
+	// Fl::set_font(FL_HELVETICA_BOLD_ITALIC,"Liberation Sans Bold Italic");	
 #endif
 	// Add label symbols
 	fl_add_symbol("eyeshut", &draw_eyeshut, true);

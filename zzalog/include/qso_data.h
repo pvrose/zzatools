@@ -137,6 +137,8 @@ public:
 	record* current_qso();
 	// Current QSO number
 	qso_num_t current_number();
+	// Query QSO
+	record* query_qso();
 	// Update view and 
 	void update_rig();
 	// Gt call

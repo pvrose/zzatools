@@ -1551,7 +1551,21 @@ void qso_data::action_import_query() {
 
 // Open QRZ.com page
 void qso_data::action_qrz_com() {
-	record* qso = current_qso();
+	record* qso;
+	switch(logging_state_) {
+		case qso_data::QSO_STARTED:
+		case qso_data::QSO_EDIT:
+		case qso_data::QSO_VIEW:
+		case qso_data::QSO_BROWSE:
+		case qso_data::NET_EDIT:
+		case qso_data::NET_STARTED: {
+			qso = current_qso();
+		}
+		case qso_data::QUERY_MATCH:
+		case qso_data::QUERY_NEW: {
+			qso = query_qso();
+		}
+	} 
 	qrz_handler_->open_web_page(qso->item("CALL"));
 }
 
@@ -1735,6 +1749,35 @@ record* qso_data::current_qso() {
 		return g_net_entry_->qso();
 	case MANUAL_ENTRY:
 		return g_qy_entry_->qso();
+	default:
+		return nullptr;
+	}
+}
+
+// Current QSO
+record* qso_data::query_qso() {
+	switch (logging_state_) {
+	case QSO_INACTIVE:
+	case QSO_PENDING:
+	case QSO_STARTED:
+	case QSO_ENTER:
+	case QSO_EDIT:
+	case QSO_VIEW:
+	case QSO_WSJTX:
+	case QSO_FLDIGI:
+	case TEST_ACTIVE:
+	case TEST_PENDING:
+	case NET_STARTED:
+	case NET_EDIT:
+	case MANUAL_ENTRY:
+		return nullptr;
+	case QSO_BROWSE:
+	case QUERY_DUPE:
+	case QUERY_MATCH:
+	case QUERY_NEW:
+	case QUERY_WSJTX:
+	case QRZ_MERGE:
+		return g_query_->query_qso();
 	default:
 		return nullptr;
 	}
