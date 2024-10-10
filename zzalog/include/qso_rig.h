@@ -90,6 +90,7 @@ protected:
 		OPEN,              // rig has been opened and is connected
 		POWERED_DOWN,      // Rig has powered down
 		UNRESPONSIVE,      // Rig has not responded for a while
+		STARTING,          // The app has been invoked but may not be ready to connect
 	};
 
 	// Callback - model choice
@@ -236,6 +237,8 @@ protected:
 	int cat_index_;
 	// Previous rig state
 	rig_state_t rig_state_;
+	// Flag set when start button pressed and cleared on connect button
+	bool rig_starting_;
 
 };
 

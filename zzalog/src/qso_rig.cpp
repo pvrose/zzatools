@@ -686,13 +686,16 @@ void qso_rig::save_values() {
 
 // get rig sttaus
 qso_rig::rig_state_t qso_rig::rig_state() {
-	if (!rig_) return NO_RIG;
+	if (!rig_) 
+		if (rig_starting_) return STARTING;
+		else return NO_RIG;
 	else if (rig_->is_opening()) return OPENING;
 	else if (rig_->is_open())
 		if (!rig_->get_powered()) return POWERED_DOWN;
 		else if (rig_->get_slow()) return UNRESPONSIVE;
 		else return OPEN;
 	else if (rig_->has_no_cat()) return NO_CAT;
+	else if (rig_starting_) return STARTING;
 	else return DISCONNECTED;
 }
 
@@ -1363,6 +1366,7 @@ void qso_rig::cb_bn_connect(Fl_Widget* w, void* v) {
 		that->rig_->open();
 		if (that->rig_->is_good()) that->rig_ok_ = true;
 	}
+	that->rig_starting_ = false;
 	that->enable_widgets(DAMAGE_ALL);
 }
 
@@ -1387,10 +1391,12 @@ void qso_rig::cb_bn_start(Fl_Widget* w, void* v) {
 	int result = system(command.c_str());
 	char msg[100];
 	if (result == 0) {
+		that->rig_starting_ = true;
 		snprintf(msg, sizeof(msg), "RIG: Started %s OK", command.c_str());
 		status_->misc_status(ST_OK, msg);
 	}
 	else {
+		that->rig_starting_ = false;
 		snprintf(msg, sizeof(msg), "RIG: Failed to start %s", command.c_str());
 		status_->misc_status(ST_ERROR, msg);
 	}
@@ -1495,9 +1501,9 @@ void qso_rig::switch_rig() {
 // 1 s clock interface - read rig and update status
 void qso_rig::ticker() {
 	rig_state_t current = rig_state();
+		printf("DEBUG: Rig state %d\n", (int)current);
 	if (current != rig_state_) {
 		rig_state_ = current;
-		printf("DEBUG: Rig state %d\n", (int)rig_state_);
 		// The rig may have disconnected - update connect/select buttons
 		enable_widgets(DAMAGE_ALL);
 	} else {
