@@ -1501,7 +1501,6 @@ void qso_rig::switch_rig() {
 // 1 s clock interface - read rig and update status
 void qso_rig::ticker() {
 	rig_state_t current = rig_state();
-		printf("DEBUG: Rig state %d\n", (int)current);
 	if (current != rig_state_) {
 		rig_state_ = current;
 		// The rig may have disconnected - update connect/select buttons
