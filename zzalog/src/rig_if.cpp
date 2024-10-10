@@ -224,6 +224,7 @@ void rig_if::close() {
 		delete thread_;
 		rig_close(rig_);
 		rig_cleanup(rig_);
+		rig_ = nullptr;
 	}
 	opened_ok_ = false;
 }
