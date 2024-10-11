@@ -269,3 +269,5 @@ __pycache__/
 
 # GIT files as repository = development fielstore
 .git/
+/reference/cty.xml
+/reference/cty.xml.gz
