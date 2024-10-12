@@ -231,14 +231,48 @@ void qso_rig::create_status(int curr_x, int curr_y) {
 	curr_y += op_status_->h();
 
 	// Display frequency and mode information
-	op_freq_mode_ = new Fl_Box(curr_x, curr_y, WDISPLAY, HTEXT * 3);
-	op_freq_mode_->tooltip("Current displayed mode");
-	op_freq_mode_->box(FL_FLAT_BOX);
-	op_freq_mode_->color(FL_BLACK);
-	op_freq_mode_->align(FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
-	op_freq_mode_->labelcolor(FL_YELLOW);
-	op_freq_mode_->labelfont(FL_BOLD);
-	op_freq_mode_->labelsize(FL_NORMAL_SIZE + 10);
+	Fl_Fontsize size = FL_NORMAL_SIZE + 10;
+	op_freq_ = new Fl_Box(curr_x, curr_y, WDISPLAY, HTEXT * 3 / 2);
+	op_freq_->tooltip("Current transmit frequency");
+	op_freq_->box(FL_FLAT_BOX);
+	op_freq_->color(FL_BLACK);
+	op_freq_->align(FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
+	op_freq_->labelcolor(FL_YELLOW);
+	op_freq_->labelfont(FL_BOLD);
+	op_freq_->labelsize(size);
+
+	curr_y += op_freq_->h();
+
+	op_mode_ = new Fl_Box(curr_x, curr_y, WDISPLAY / 2, HTEXT * 3 / 2);
+	op_mode_->tooltip("Current transmit mode");
+	op_mode_->box(FL_FLAT_BOX);
+	op_mode_->color(FL_BLACK);
+	op_mode_->align(FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
+	op_mode_->labelcolor(FL_YELLOW);
+	op_mode_->labelfont(FL_BOLD);
+	op_mode_->labelsize(size);
+
+	curr_x += op_mode_->w();
+
+	op_power_ = new Fl_Box(curr_x, curr_y, WDISPLAY / 4, HTEXT * 3 / 2);
+	op_power_->tooltip("Power (maximum last transmit period)");
+	op_power_->box(FL_FLAT_BOX);
+	op_power_->color(FL_BLACK);
+	op_power_->align(FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
+	op_power_->labelcolor(FL_YELLOW);
+	op_power_->labelfont(FL_BOLD);
+	op_power_->labelsize(size);
+
+	curr_x += op_power_->w();
+
+	op_smeter_ = new Fl_Box(curr_x, curr_y, WDISPLAY / 4, HTEXT * 3 / 2);
+	op_smeter_->tooltip("Reeceived signal strength (recent maximum");
+	op_smeter_->box(FL_FLAT_BOX);
+	op_smeter_->color(FL_BLACK);
+	op_smeter_->align(FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
+	op_smeter_->labelcolor(FL_YELLOW);
+	op_smeter_->labelfont(FL_BOLD);
+	op_smeter_->labelsize(size);
 
 	status_grp_->end();
 
@@ -482,25 +516,25 @@ void qso_rig::create_defaults(int curr_x, int curr_y) {
 	op_pwr_type_->align(FL_ALIGN_TOP);
 	op_pwr_type_->tooltip("Shows how the power is calculated.");
 
-	curr_y += HBUTTON + 15;
-	ip_max_pwr_ = new Fl_Float_Input(curr_x, curr_y, WBUTTON, HBUTTON, "Max. - W");
-	ip_max_pwr_->align(FL_ALIGN_TOP);
+	curr_y += HBUTTON;
+	ip_max_pwr_ = new Fl_Float_Input(curr_x, curr_y, WBUTTON, HBUTTON, "W");
+	ip_max_pwr_->align(FL_ALIGN_RIGHT);
 	ip_max_pwr_->callback(cb_value_double<Fl_Float_Input>, nullptr);
 	ip_max_pwr_->tooltip("Specify the maximum power out from the rig");
 
-	int max_y = curr_y + HBUTTON + GAP;
+	int max_y = curr_y + HBUTTON;
 
 	curr_y = save_y;
-	curr_x += WBUTTON + GAP;
+	curr_x += WBUTTON + GAP + GAP;
 
 	op_freq_type_ = new Fl_Output(curr_x, curr_y, WBUTTON, HBUTTON, "Frequency");
 	op_freq_type_->box(FL_FLAT_BOX);
 	op_freq_type_->align(FL_ALIGN_TOP);
 	op_freq_type_->tooltip("Shows hoe the frequency is generated");
 
-	curr_y += HBUTTON + 15;
-	ip_xtal_ = new Fl_Float_Input(curr_x, curr_y, WBUTTON, HBUTTON, "Fixed - MHz");
-	ip_xtal_->align(FL_ALIGN_TOP);
+	curr_y += HBUTTON;
+	ip_xtal_ = new Fl_Float_Input(curr_x, curr_y, WBUTTON, HBUTTON, "MHz");
+	ip_xtal_->align(FL_ALIGN_RIGHT);
 	ip_xtal_->callback(cb_value_double<Fl_Float_Input>, nullptr);
 	ip_xtal_->tooltip("Provide a fixed frequency - eg crystal");
 	max_y = max(max_y, curr_y + HBUTTON + GAP);
@@ -526,36 +560,36 @@ void qso_rig::create_accessory(int curr_x, int curr_y) {
 	bn_amplifier_->callback(cb_bn_amplifier, nullptr);
 	bn_amplifier_->tooltip("Select whether an ammplifier is fitted");
 
-	curr_y += HBUTTON + 15;
-	ip_gain_ = new Fl_Int_Input(curr_x, curr_y, WBUTTON, HBUTTON, "Gain - dB");
-	ip_gain_->align(FL_ALIGN_TOP);
+	curr_y += HBUTTON;
+	ip_gain_ = new Fl_Int_Input(curr_x, curr_y, WBUTTON, HBUTTON, "dB");
+	ip_gain_->align(FL_ALIGN_RIGHT);
 	ip_gain_->callback(cb_value_int<Fl_Int_Input>, nullptr);
 	ip_gain_->tooltip("Specify the amplifier gain in decibels");
 
-	int max_y = curr_y = HBUTTON + GAP;
+	int max_y = curr_y = HBUTTON;
 
 	curr_y = save_y;
-	curr_x += WBUTTON + GAP;
+	curr_x += WBUTTON + GAP + GAP;
 
 	bn_transverter_ = new Fl_Check_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Transverter");
 	bn_transverter_->box(FL_FLAT_BOX);
 	bn_transverter_->callback(cb_bn_transverter, nullptr);
 	bn_transverter_->tooltip("Select to add a transverter");
 
-	curr_y += HBUTTON + 15;
-	ip_offset_ = new Fl_Float_Input(curr_x, curr_y, WBUTTON, HBUTTON, "Offset - MHz");
-	ip_offset_->align(FL_ALIGN_TOP);
+	curr_y += HBUTTON;
+	ip_offset_ = new Fl_Float_Input(curr_x, curr_y, WBUTTON, HBUTTON, "\xCE\x94\nMHz");
+	ip_offset_->align(FL_ALIGN_RIGHT);
 	ip_offset_->callback(cb_value_double<Fl_Float_Input>, nullptr);
 	ip_offset_->tooltip("Specify the Transverter frequency offset to apply");
 
-	curr_y += HBUTTON + 15;
-	ip_tvtr_pwr_ = new Fl_Float_Input(curr_x, curr_y, WBUTTON, HBUTTON, "Power - W");
-	ip_tvtr_pwr_->align(FL_ALIGN_TOP);
+	curr_y += HBUTTON;
+	ip_tvtr_pwr_ = new Fl_Float_Input(curr_x, curr_y, WBUTTON, HBUTTON, "W");
+	ip_tvtr_pwr_->align(FL_ALIGN_RIGHT);
 	ip_tvtr_pwr_->callback(cb_value_double<Fl_Float_Input>, nullptr);
 	ip_tvtr_pwr_->tooltip("Specify the transverter power output");
 
 	max_y = max(max_y, curr_y + HBUTTON + GAP);
-	int max_x = curr_x + WBUTTON + GAP;
+	int max_x = curr_x + WBUTTON + GAP + 10;
 
 	accessory_tab_->resizable(nullptr);
 	accessory_tab_->size(max_x - accessory_tab_->x(), max_y - accessory_tab_->y());
@@ -770,8 +804,14 @@ void qso_rig::enable_widgets(uchar damage) {
 			op_status_->value("No rig specified");
 			bn_tx_rx_->label("");
 			bn_tx_rx_->color(FL_BLACK);
-			op_freq_mode_->deactivate();
-			op_freq_mode_->label("");
+			op_freq_->deactivate();
+			op_freq_->label("");
+			op_mode_->deactivate();
+			op_mode_->label("");
+			op_power_->deactivate();
+			op_power_->label("");
+			op_smeter_->deactivate();
+			op_smeter_->label("");
 			break;
 		}
 		case OPENING:
@@ -780,8 +820,14 @@ void qso_rig::enable_widgets(uchar damage) {
 			op_status_->value("Opening rig");
 			bn_tx_rx_->label("");
 			bn_tx_rx_->color(FL_YELLOW);
-			op_freq_mode_->deactivate();
-			op_freq_mode_->label("");
+			op_freq_->deactivate();
+			op_freq_->label("");
+			op_mode_->deactivate();
+			op_mode_->label("");
+			op_power_->deactivate();
+			op_power_->label("");
+			op_smeter_->deactivate();
+			op_smeter_->label("");
 			break;
 		}
 		case POWERED_DOWN:
@@ -809,8 +855,14 @@ void qso_rig::enable_widgets(uchar damage) {
 			op_status_->value("No CAT Available");
 			bn_tx_rx_->label("");
 			bn_tx_rx_->color(COLOUR_GREY);
-			op_freq_mode_->deactivate();
-			op_freq_mode_->label("");
+			op_freq_->deactivate();
+			op_freq_->label("");
+			op_mode_->deactivate();
+			op_mode_->label("");
+			op_power_->deactivate();
+			op_power_->label("");
+			op_smeter_->deactivate();
+			op_smeter_->label("");
 			break;
 		}
 		case DISCONNECTED:
@@ -840,8 +892,14 @@ void qso_rig::enable_widgets(uchar damage) {
 			op_status_->value("Disconnected");
 			bn_tx_rx_->label("");
 			bn_tx_rx_->color(FL_BLACK);
-			op_freq_mode_->deactivate();
-			op_freq_mode_->label("");
+			op_freq_->deactivate();
+			op_freq_->label("");
+			op_mode_->deactivate();
+			op_mode_->label("");
+			op_power_->deactivate();
+			op_power_->label("");
+			op_smeter_->deactivate();
+			op_smeter_->label("");
 			break;
 		}
 		}
@@ -1082,32 +1140,32 @@ void qso_rig::enable_widgets(uchar damage) {
 				bn_tx_rx_->color(FL_DARK_GREEN);
 			}
 		}
-		op_freq_mode_->activate();
-		op_freq_mode_->color(FL_BLACK);
-		op_freq_mode_->labelcolor(FL_YELLOW);
+		op_freq_->activate();
+		op_mode_->activate();
+		op_power_->activate();
+		op_smeter_->activate();
 
 		char msg[200];
 		string rig_mode;
 		string submode;
 		rig_->get_string_mode(rig_mode, submode);
 		// Set Freq/Mode to Frequency (MHz with kHz seperator), mode, power (W)
-		snprintf(msg, sizeof(msg), "%d.%03d.%03d MHz\n%s %sW %s",
-			freq_MHz, freq_kHz, freq_Hz,
-			submode.length() ? submode.c_str() : rig_mode.c_str(),
-			rig_->get_tx_power(true).c_str(),
-			rig_->get_smeter(true).c_str()
-		);
-		op_freq_mode_->copy_label(msg);
+		snprintf(msg, sizeof(msg), "%d.%03d.%03d MHz", freq_MHz, freq_kHz, freq_Hz);
+		op_freq_->copy_label(msg);
+		op_mode_->copy_label(submode.length() ? submode.c_str() : rig_mode.c_str());
+		snprintf(msg, sizeof(msg), "%s W", rig_->get_tx_power(true).c_str());
+		op_power_->copy_label(msg);
+		op_smeter_->copy_label(rig_->get_smeter(true).c_str());
 		int size = FL_NORMAL_SIZE + 10;
 		fl_font(0, size);
 		int w, h;
 		fl_measure(msg, w, h);
-		while (w > op_freq_mode_->w()) {
+		while (w > op_freq_->w()) {
 			size--;
 			fl_font(0, size);
 			fl_measure(msg, w, h);
 		}
-		op_freq_mode_->labelsize(size);
+		op_freq_->labelsize(size);
 		bn_tx_rx_->labelcolor(fl_contrast(FL_FOREGROUND_COLOR, bn_tx_rx_->color()));
 
 	}

@@ -171,7 +171,10 @@ protected:
 	// CAT index
 	Fl_Menu_Button* bn_index_;
 	// Freq/Mode display
-	Fl_Box* op_freq_mode_;
+	Fl_Box* op_freq_;
+	Fl_Box* op_mode_;
+	Fl_Box* op_power_;
+	Fl_Box* op_smeter_;
 
 	// Control buttons
 	Fl_Group* buttons_grp_;
