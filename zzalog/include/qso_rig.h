@@ -4,6 +4,7 @@
 
 #include <string>
 #include <vector>
+#include <map>
 
 #include <FL/Fl_Group.H>
 
@@ -239,6 +240,9 @@ protected:
 	rig_state_t rig_state_;
 	// Flag set when start button pressed and cleared on connect button
 	bool rig_starting_;
+
+	// Map the hamlig model_id to position in rig_model choice
+	map<int, int> rig_choice_pos_;
 
 };
 

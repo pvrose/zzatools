@@ -912,6 +912,9 @@ void qso_rig::enable_widgets(uchar damage) {
 			network_grp_->hide();
 			break;
 		}
+		// Set the rig name into the choice
+		int pos = rig_choice_pos_.at(hamlib->model_id);
+		ch_rig_model_->value(pos);
 		// Now use standard TAB highlighting
 		for (int ix = 0; ix < config_tabs_->children(); ix++) {
 			Fl_Widget* wx = config_tabs_->child(ix);
@@ -928,7 +931,12 @@ void qso_rig::enable_widgets(uchar damage) {
 		//char l[5];
 		//snprintf(l, sizeof(l), "CAT%d", cat_index_ + 1);
 		if (cat_index_ >= 0 && cat_index_ < cat_data_.size()) {
-			bn_index_->copy_label(cat_data_[cat_index_]->hamlib->model.c_str());
+			hamlib_data_t* hamlib = cat_data_[cat_index_]->hamlib;
+			if (hamlib->model.length()) {
+				bn_index_->copy_label(hamlib->model.c_str());
+			} else {
+				bn_index_->copy_label(hamlib->mfr.c_str());
+			}
 		}
 		else {
 			bn_index_->label("CAT");
@@ -1111,6 +1119,7 @@ void qso_rig::enable_widgets(uchar damage) {
 void qso_rig::populate_model_choice() {
 	// Get hamlib Model number and populate control with all model names
 	ch_rig_model_->clear();
+	rig_choice_pos_.clear();
 	set<string> rig_list;
 	map<string, rig_model_t> rig_ids;
 	rig_list.clear();
@@ -1177,6 +1186,7 @@ void qso_rig::populate_model_choice() {
 		if (cat_data_.size() && id == cat_data_[cat_index_]->hamlib->model_id) {
 			ch_rig_model_->value(pos);
 		}
+		rig_choice_pos_[id] = pos;
 	}
 	bool found = false;
 }
@@ -1256,7 +1266,12 @@ void qso_rig::populate_index_menu() {
 		for (int ix = 0; ix < cat_data_.size(); ix++) {
 			//char l[5];
 			//snprintf(l, sizeof(l), "CAT%d", ix + 1);
-			bn_index_->add(cat_data_[ix]->hamlib->model.c_str(), 0, cb_select_cat, (void*)(intptr_t)ix);
+			hamlib_data_t* hamlib = cat_data_[ix]->hamlib;
+			if (hamlib->model.length()) {
+				bn_index_->add(hamlib->model.c_str(), 0, cb_select_cat, (void*)(intptr_t)ix);
+			} else {
+				bn_index_->add(hamlib->mfr.c_str(), 0, cb_select_cat, (void*)(intptr_t)ix);
+			}
 		}
 	}
 	// Add a menu item to add a new CAT
@@ -1585,12 +1600,17 @@ void qso_rig::disconnect() {
 
 // Return selected CAT
 const char* qso_rig::cat() {
-	char* result = new char[5];
+	char* result = new char[32];
 	if (cat_data_.size() <= 1) {
 		strcpy(result, "");
 	}
 	else {
-		snprintf(result, 5, "CAT%d", cat_index_ + 1);
+		hamlib_data_t* hamlib = cat_data_[cat_index_]->hamlib;
+		if (hamlib->model.length()) {
+			strcpy(result, hamlib->model.c_str());
+		} else {
+			strcpy(result, hamlib->mfr.c_str());
+		}
 	}
 	return result;
 }
