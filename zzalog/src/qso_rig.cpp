@@ -925,9 +925,14 @@ void qso_rig::enable_widgets(uchar damage) {
 			}
 		}
 		// Label the CAT method selection with the CAT method
-		char l[5];
-		snprintf(l, sizeof(l), "CAT%d", cat_index_ + 1);
-		bn_index_->copy_label(l);
+		//char l[5];
+		//snprintf(l, sizeof(l), "CAT%d", cat_index_ + 1);
+		if (cat_index_ >= 0 && cat_index_ < cat_data_.size()) {
+			bn_index_->copy_label(cat_data_[cat_index_]->hamlib->model.c_str());
+		}
+		else {
+			bn_index_->label("CAT");
+		}
 
 
 	}
@@ -1249,9 +1254,9 @@ void qso_rig::populate_index_menu() {
 	// Add a menu item for each cat item
 	if (cat_data_.size()) {
 		for (int ix = 0; ix < cat_data_.size(); ix++) {
-			char l[5];
-			snprintf(l, sizeof(l), "CAT%d", ix + 1);
-			bn_index_->add(l, 0, cb_select_cat, (void*)(intptr_t)ix);
+			//char l[5];
+			//snprintf(l, sizeof(l), "CAT%d", ix + 1);
+			bn_index_->add(cat_data_[ix]->hamlib->model.c_str(), 0, cb_select_cat, (void*)(intptr_t)ix);
 		}
 	}
 	// Add a menu item to add a new CAT
@@ -1491,10 +1496,12 @@ void qso_rig::switch_rig() {
 	if (rig_) {
 		delete rig_;
 		rig_ = nullptr;
-		rig_ = new rig_if(label(), cat_data_.size() ?  cat_data_[cat_index_]->hamlib : nullptr);
-		modify_hamlib_data();
 	}
-	ancestor_view<qso_manager>(this)->update_rig();
+	if (cat_data_.size()) {
+		rig_ = new rig_if(label(), cat_data_[cat_index_]->hamlib);
+		modify_hamlib_data();
+		ancestor_view<qso_manager>(this)->update_rig();
+	}
 	enable_widgets(DAMAGE_ALL);
 }
 
@@ -1537,26 +1544,30 @@ Fl_Color qso_rig::alert_colour() {
 
 // Modify the values returned from the rig according to the modifier attributes
 void qso_rig::modify_hamlib_data() {
-	hamlib_data_t* hamlib = cat_data_[cat_index_]->hamlib;
-	const rig_caps* capabilities = rig_get_caps(hamlib->model_id);
-	if (capabilities->port_type == RIG_PORT_NONE) {
-		hamlib->power_mode = MAX_POWER;
-	}
-	else if (capabilities && (capabilities->has_get_level & RIG_LEVEL_RFPOWER_METER_WATTS)) {
-		hamlib->power_mode = RF_METER;
-	}
-	else if (capabilities && (capabilities->has_get_level & RIG_LEVEL_RFPOWER)) {
-		hamlib->power_mode = DRIVE_LEVEL;
-	}
-	else {
-		hamlib->power_mode = MAX_POWER;
-	}
-	if (capabilities->port_type == RIG_PORT_NONE) {
-		hamlib->freq_mode = NO_FREQ;
-	}
-	else {
-		// TODO - how do I know if it's fixed frequency?
-		hamlib->freq_mode = VFO;
+	if (cat_index_ >= 0 && cat_index_ < cat_data_.size()) {
+		hamlib_data_t* hamlib = cat_data_[cat_index_]->hamlib;
+		const rig_caps* capabilities = rig_get_caps(hamlib->model_id);
+		if (capabilities) {
+			if (capabilities->port_type == RIG_PORT_NONE) {
+				hamlib->power_mode = MAX_POWER;
+			}
+			else if (capabilities && (capabilities->has_get_level & RIG_LEVEL_RFPOWER_METER_WATTS)) {
+				hamlib->power_mode = RF_METER;
+			}
+			else if (capabilities && (capabilities->has_get_level & RIG_LEVEL_RFPOWER)) {
+				hamlib->power_mode = DRIVE_LEVEL;
+			}
+			else {
+				hamlib->power_mode = MAX_POWER;
+			}
+			if (capabilities->port_type == RIG_PORT_NONE) {
+				hamlib->freq_mode = NO_FREQ;
+			}
+			else {
+				// TODO - how do I know if it's fixed frequency?
+				hamlib->freq_mode = VFO;
+			}
+		}
 	}
 }
 

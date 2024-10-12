@@ -185,7 +185,7 @@ rig_if::rig_if(const char* name, hamlib_data_t* data)
 	thread_ = nullptr;
 	
 	// If the name has been set, there is a rig
-	if (my_rig_name_.length()) {
+	if (hamlib_data_ && my_rig_name_.length()) {
 		if (hamlib_data_->port_type != RIG_PORT_NONE) {
 			open();
 		}
