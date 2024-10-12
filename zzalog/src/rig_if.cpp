@@ -181,7 +181,8 @@ rig_if::rig_if(const char* name, hamlib_data_t* data)
 	hamlib_data_ = data;
 	run_read_ = false;
 	// Last PTT off
-	last_ptt_off_ = system_clock::now();;
+	last_ptt_off_ = system_clock::now();
+	thread_ = nullptr;
 	
 	// If the name has been set, there is a rig
 	if (my_rig_name_.length()) {
@@ -222,6 +223,7 @@ void rig_if::close() {
 		run_read_ = false;
 		thread_->join();
 		delete thread_;
+		thread_ = nullptr;
 		rig_close(rig_);
 		rig_cleanup(rig_);
 		rig_ = nullptr;
@@ -231,8 +233,8 @@ void rig_if::close() {
 
 // Opens the connection associated with the rig
 bool rig_if::open() {
+	char msg[256];
 	if (hamlib_data_->port_type == RIG_PORT_NONE) {
-		char msg[256];
 		snprintf(msg, 256, "RIG: Connection %s/%s No port to connect",
 			hamlib_data_->mfr.c_str(),
 			hamlib_data_->model.c_str()
@@ -240,7 +242,6 @@ bool rig_if::open() {
 		status_->misc_status(ST_WARNING, msg);
  	} 
 	else if (hamlib_data_->port_name.length() == 0) {
-		char msg[256];
 		snprintf(msg, 256, "RIG: Connection %s/%s No port supplied - open failed",
 			hamlib_data_->mfr.c_str(),
 			hamlib_data_->model.c_str()
@@ -255,6 +256,11 @@ bool rig_if::open() {
 	thread_ = new thread(th_run_rig, this);
 	chrono::system_clock::time_point wait_start = chrono::system_clock::now();
 	int timeout = 150000; 
+	snprintf(msg, sizeof(msg), "RIG: Connecting %s/%s - timeout = %d s",
+		hamlib_data_->mfr.c_str(),
+		hamlib_data_->model.c_str(),
+		timeout / 1000);
+	status_->misc_status(ST_NOTE, msg);
 	while(opening_) {
 		// Allow FLTK scheduler in
 		Fl::check();
@@ -269,7 +275,6 @@ bool rig_if::open() {
 		}
 	}
 		
-	char msg[256];
 	if (opened_ok_) {
 
 		if (hamlib_data_->port_type == RIG_PORT_SERIAL) {
