@@ -1041,3 +1041,18 @@ string terminal(string filename) {
 		return filename.substr(pos + 1);
 	}
 }
+
+// Resize the label in the widget
+void resize_label(Fl_Widget* wd) {
+	const char* msg = wd->label();
+	int size = FL_NORMAL_SIZE + 10;
+	int w, h;
+	fl_font(0, size);
+	fl_measure(msg, w, h);
+	while (w > wd->w()) {
+		size--;
+		fl_font(0, size);
+		fl_measure(msg, w, h);
+	}
+	wd->labelsize(size);
+}
