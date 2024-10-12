@@ -448,7 +448,7 @@ void url_handler::dump(const char* text,
 		}
 	}
 	if (i < size) {
-		fprintf(stream, "...+%d bytes", size - i);
+		fprintf(stream, "...+%zd bytes", size - i);
 	}
 	fputc('\n', stream);
 }

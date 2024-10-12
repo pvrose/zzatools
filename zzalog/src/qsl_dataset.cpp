@@ -73,7 +73,7 @@ void qsl_dataset::load_data() {
 			call_settings.get("Time Format", itemp, qsl_data::FMT_HMS_ADIF);
 			data->f_time = (qsl_data::time_format)itemp;
 			call_settings.get("Card Design", temp, "");
-			printf("Read data from file %d bytes, value ='%s'\n", strlen(temp), temp);
+			printf("Read data from file %zd bytes, value ='%s'\n", strlen(temp), temp);
 			data->filename = temp;
 			free(temp);
 			// Check it's a TSV file
