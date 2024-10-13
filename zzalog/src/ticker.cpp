@@ -27,6 +27,7 @@ void ticker::add_ticker(void* object, callback* cb, unsigned int interval) {
     entry->tick = cb;
     entry->period_ds = DEBUG_QUICK ? min(interval, 3000U) : interval;
     entry->active = true;
+    entry->not_ticked = true;
     tickers_.push_back(entry);
 }
 
@@ -64,9 +65,10 @@ void ticker::cb_ticker(void * v) {
     that->tick_count_++;
     for (auto it = that->tickers_.begin(); it != that->tickers_.end(); it++) {
         // Send ticks to all who need it at this time
-        if (that->tick_count_ % (*it)->period_ds == 0) {
+        if ((that->tick_count_ % (*it)->period_ds == 0) || (*it)->not_ticked) {
             if ((*it)->active) {
                 (*it)->tick((*it)->object);
+                (*it)->not_ticked = false;
             }
         }
     }

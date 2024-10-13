@@ -32,7 +32,6 @@ wx_handler::wx_handler() :
     report_.icon = nullptr;
     elements_.clear();
     wx_valid_ = false;
-    ticker();
     // Start ticker - 30 minutes
     ticker_->add_ticker(this, cb_ticker, DEBUG_QUICK ? SHORT_DELAY : LONG_DELAY);
 

@@ -16,6 +16,7 @@ class ticker {
         callback* tick { nullptr };     // The static function to call
         unsigned int period_ds;         // Period in deciseconds
         bool active;                    // Ticker active
+        bool not_ticked{ true };        // Ticker not yet sent - so send it regardless
     };
 
     public:

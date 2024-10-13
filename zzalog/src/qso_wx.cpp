@@ -31,6 +31,7 @@ qso_wx::qso_wx
 	display_direction_ = CARDINAL;
 	load_values();
 	create_form(X, Y);
+	enable_widgets();
 }
 
 // Weather group destructor
