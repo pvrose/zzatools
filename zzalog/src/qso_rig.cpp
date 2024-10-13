@@ -7,7 +7,6 @@
 #include "spec_data.h"
 #include "ticker.h"
 #include "field_choice.h"
-#include "utils.h"
 
 #include <set>
 #include <string>
@@ -1153,14 +1152,20 @@ void qso_rig::enable_widgets(uchar damage) {
 		// Set Freq/Mode to Frequency (MHz with kHz seperator), mode, power (W)
 		snprintf(msg, sizeof(msg), "%d.%03d.%03d MHz", freq_MHz, freq_kHz, freq_Hz);
 		op_freq_->copy_label(msg);
-		resize_label(op_freq_);
 		op_mode_->copy_label(submode.length() ? submode.c_str() : rig_mode.c_str());
-		resize_label(op_mode_);
 		snprintf(msg, sizeof(msg), "%s W", rig_->get_tx_power(true).c_str());
 		op_power_->copy_label(msg);
-		resize_label(op_power_);
 		op_smeter_->copy_label(rig_->get_smeter(true).c_str());
-		resize_label(op_smeter_);
+		int size = FL_NORMAL_SIZE + 10;
+		fl_font(0, size);
+		int w, h;
+		fl_measure(msg, w, h);
+		while (w > op_freq_->w()) {
+			size--;
+			fl_font(0, size);
+			fl_measure(msg, w, h);
+		}
+		op_freq_->labelsize(size);
 		bn_tx_rx_->labelcolor(fl_contrast(FL_FOREGROUND_COLOR, bn_tx_rx_->color()));
 
 	}

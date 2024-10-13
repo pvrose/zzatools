@@ -116,8 +116,6 @@ using namespace std;
 	// get the directroy part of a a filename
 	string directory(string filename);
 	string terminal(string filename);
-	// Resize the label to fit the widget
-	void resize_label(Fl_Widget* w);
 
 	// template function to find the enclosing widget of class WIDGET
 	template <class WIDGET>
