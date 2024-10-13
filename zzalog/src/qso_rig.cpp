@@ -482,9 +482,9 @@ void qso_rig::create_defaults(int curr_x, int curr_y) {
 	op_pwr_type_->align(FL_ALIGN_TOP);
 	op_pwr_type_->tooltip("Shows how the power is calculated.");
 
-	curr_y += HBUTTON + 15;
-	ip_max_pwr_ = new Fl_Float_Input(curr_x, curr_y, WBUTTON, HBUTTON, "Max. - W");
-	ip_max_pwr_->align(FL_ALIGN_TOP);
+	curr_y += HBUTTON;
+	ip_max_pwr_ = new Fl_Float_Input(curr_x, curr_y, WBUTTON, HBUTTON, "W");
+	ip_max_pwr_->align(FL_ALIGN_RIGHT);
 	ip_max_pwr_->callback(cb_value_double<Fl_Float_Input>, nullptr);
 	ip_max_pwr_->tooltip("Specify the maximum power out from the rig");
 
@@ -498,9 +498,9 @@ void qso_rig::create_defaults(int curr_x, int curr_y) {
 	op_freq_type_->align(FL_ALIGN_TOP);
 	op_freq_type_->tooltip("Shows hoe the frequency is generated");
 
-	curr_y += HBUTTON + 15;
-	ip_xtal_ = new Fl_Float_Input(curr_x, curr_y, WBUTTON, HBUTTON, "Fixed - MHz");
-	ip_xtal_->align(FL_ALIGN_TOP);
+	curr_y += HBUTTON;
+	ip_xtal_ = new Fl_Float_Input(curr_x, curr_y, WBUTTON, HBUTTON, "MHz");
+	ip_xtal_->align(FL_ALIGN_RIGHT);
 	ip_xtal_->callback(cb_value_double<Fl_Float_Input>, nullptr);
 	ip_xtal_->tooltip("Provide a fixed frequency - eg crystal");
 	max_y = max(max_y, curr_y + HBUTTON + GAP);
@@ -518,7 +518,6 @@ void qso_rig::create_accessory(int curr_x, int curr_y) {
 	accessory_tab_->labelsize(FL_NORMAL_SIZE + 2);
 
 	curr_x += GAP;
-	curr_y += GAP;
 	int save_y = curr_y;
 
 	bn_amplifier_ = new Fl_Check_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Amplifier");
@@ -526,9 +525,9 @@ void qso_rig::create_accessory(int curr_x, int curr_y) {
 	bn_amplifier_->callback(cb_bn_amplifier, nullptr);
 	bn_amplifier_->tooltip("Select whether an ammplifier is fitted");
 
-	curr_y += HBUTTON + 15;
-	ip_gain_ = new Fl_Int_Input(curr_x, curr_y, WBUTTON, HBUTTON, "Gain - dB");
-	ip_gain_->align(FL_ALIGN_TOP);
+	curr_y += HBUTTON;
+	ip_gain_ = new Fl_Int_Input(curr_x, curr_y, WBUTTON - 5, HBUTTON, "dB");
+	ip_gain_->align(FL_ALIGN_RIGHT);
 	ip_gain_->callback(cb_value_int<Fl_Int_Input>, nullptr);
 	ip_gain_->tooltip("Specify the amplifier gain in decibels");
 
@@ -542,15 +541,15 @@ void qso_rig::create_accessory(int curr_x, int curr_y) {
 	bn_transverter_->callback(cb_bn_transverter, nullptr);
 	bn_transverter_->tooltip("Select to add a transverter");
 
-	curr_y += HBUTTON + 15;
-	ip_offset_ = new Fl_Float_Input(curr_x, curr_y, WBUTTON, HBUTTON, "Offset - MHz");
-	ip_offset_->align(FL_ALIGN_TOP);
+	curr_y += HBUTTON;
+	ip_offset_ = new Fl_Float_Input(curr_x, curr_y, WBUTTON, HBUTTON, "\316\224MHz");
+	ip_offset_->align(FL_ALIGN_RIGHT);
 	ip_offset_->callback(cb_value_double<Fl_Float_Input>, nullptr);
 	ip_offset_->tooltip("Specify the Transverter frequency offset to apply");
 
-	curr_y += HBUTTON + 15;
-	ip_tvtr_pwr_ = new Fl_Float_Input(curr_x, curr_y, WBUTTON, HBUTTON, "Power - W");
-	ip_tvtr_pwr_->align(FL_ALIGN_TOP);
+	curr_y += HBUTTON ;
+	ip_tvtr_pwr_ = new Fl_Float_Input(curr_x, curr_y, WBUTTON, HBUTTON, "W");
+	ip_tvtr_pwr_->align(FL_ALIGN_RIGHT);
 	ip_tvtr_pwr_->callback(cb_value_double<Fl_Float_Input>, nullptr);
 	ip_tvtr_pwr_->tooltip("Specify the transverter power output");
 
@@ -913,8 +912,12 @@ void qso_rig::enable_widgets(uchar damage) {
 			break;
 		}
 		// Set the rig name into the choice
-		int pos = rig_choice_pos_.at(hamlib->model_id);
-		ch_rig_model_->value(pos);
+		if (hamlib) {
+			int pos = rig_choice_pos_.at(hamlib->model_id);
+			ch_rig_model_->value(pos);
+		} else {
+			ch_rig_model_->value(0);
+		}
 		// Now use standard TAB highlighting
 		for (int ix = 0; ix < config_tabs_->children(); ix++) {
 			Fl_Widget* wx = config_tabs_->child(ix);
@@ -953,18 +956,21 @@ void qso_rig::enable_widgets(uchar damage) {
 			switch (hamlib->power_mode) {
 			case RF_METER:
 				op_pwr_type_->value("RF Meter");
+				ip_max_pwr_->deactivate();
 				break;
 			case DRIVE_LEVEL:
 				op_pwr_type_->value("Drive");
+				ip_max_pwr_->activate();
 				break;
 			case MAX_POWER:
 				op_pwr_type_->value("Specify");
+				ip_max_pwr_->activate();
 				break;
 			default:
 				op_pwr_type_->value("");
+				ip_max_pwr_->deactivate();
 				break;
 			}
-			ip_max_pwr_->activate();
 			char text[25];
 			snprintf(text, sizeof(text), "%g", hamlib->max_power);
 			ip_max_pwr_->value(text);
@@ -975,18 +981,21 @@ void qso_rig::enable_widgets(uchar damage) {
 			switch (hamlib->freq_mode) {
 			case NO_FREQ:
 				op_freq_type_->value("Enter in QSO");
+				ip_xtal_->deactivate();
 				break;
 			case VFO:
 				op_freq_type_->value("VFO");
+				ip_xtal_->deactivate();
 				break;
 			case XTAL:
 				op_freq_type_->value("Fixed");
+				ip_xtal_->activate();
 				break;
 			default:
 				op_freq_type_->value("");
+				ip_xtal_->deactivate();
 				break;
 			}
-			ip_xtal_->activate();
 			snprintf(text, sizeof(text), "%0.6f", hamlib->frequency);
 			ip_xtal_->value(text);
 			ip_xtal_->user_data(&hamlib->frequency);
@@ -1034,9 +1043,11 @@ void qso_rig::enable_widgets(uchar damage) {
 			v_smeters_->value(hamlib->num_smeters);
 		}
 		else {
-			op_pwr_type_->deactivate();
-			ip_max_pwr_->deactivate();
-			op_freq_type_->deactivate();
+			op_pwr_type_->activate();
+			ip_max_pwr_->activate();
+			op_pwr_type_->value("Specify");
+			op_freq_type_->activate();
+			op_freq_type_->value("Enter in QSO");
 			ip_xtal_->deactivate();
 			bn_amplifier_->deactivate();
 			ip_gain_->deactivate();
@@ -1177,7 +1188,7 @@ void qso_rig::populate_model_choice() {
 	}
 	// Add the rigs in alphabetical order to the choice widget,
 	// set widget's value to intended
-	ch_rig_model_->add("");
+	ch_rig_model_->add("", 0, nullptr, nullptr);
 	for (auto ix = rig_list.begin(); ix != rig_list.end(); ix++) {
 		string name = *ix;
 		rig_model_t id = rig_ids.at(name);
