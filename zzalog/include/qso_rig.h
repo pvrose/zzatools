@@ -132,6 +132,8 @@ protected:
 	static void cb_del_cat(Fl_Widget* w, void* v);
 	// S-meter peak smapling
 	static void cb_smeters(Fl_Widget* w, void* v);
+	// Meter display
+	static void cb_meters(Fl_Widget* w, void* v);
 
 	// Get hamlib data
 	void find_hamlib_data();
@@ -172,6 +174,8 @@ protected:
 	Fl_Menu_Button* bn_index_;
 	// Freq/Mode display
 	Fl_Box* op_freq_mode_;
+	// Instantaneous mode
+	Fl_Check_Button* bn_instant_;
 
 	// Control buttons
 	Fl_Group* buttons_grp_;
@@ -243,6 +247,8 @@ protected:
 
 	// Map the hamlig model_id to position in rig_model choice
 	map<int, int> rig_choice_pos_;
+	//Display instantaneous values
+	bool instant_meters_;
 
 };
 

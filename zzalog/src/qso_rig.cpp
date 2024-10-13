@@ -39,7 +39,8 @@ qso_rig::qso_rig(int X, int Y, int W, int H, const char* L) :
 	Fl_Group(X, Y, W, H, nullptr),
 	rig_ok_(false),
 	rig_state_(NO_RIG),
-	cat_index_(-1)
+	cat_index_(-1),
+	instant_meters_(false)
 {
 	// If no name is provided then get from qso_manager
 	if (L == nullptr || strlen(L) == 0) copy_label(ancestor_view<qso_manager>(this)->get_default(qso_manager::RIG).c_str());
@@ -161,11 +162,16 @@ void qso_rig::load_values() {
 		mode_ = cat_data_.size() ? 
 			(uint16_t)cat_data_[cat_index_]->hamlib->port_type :
 			(uint16_t)RIG_PORT_NONE;
+
+		int itemp;
+		rig_settings.get("Instantaneous Values", itemp, false);
+		instant_meters_ = itemp;
 	}
 	else {
 		// New hamlib data
 		cat_data_.clear();
 		mode_ = RIG_PORT_NONE;
+		instant_meters_ = false;
 	}
 }
 
@@ -205,7 +211,7 @@ const int WDISPLAY = 3 * WBUTTON;
 void qso_rig::create_status(int curr_x, int curr_y) {
 	int save_x = curr_x;
 
-	status_grp_ = new Fl_Group(curr_x, curr_y, WDISPLAY, HBUTTON + HTEXT * 3);
+	status_grp_ = new Fl_Group(curr_x, curr_y, WDISPLAY, HBUTTON * 2 + HTEXT * 3);
 	status_grp_->box(FL_NO_BOX);
 
 	bn_tx_rx_ = new Fl_Button(curr_x, curr_y, HBUTTON, HBUTTON);
@@ -239,6 +245,16 @@ void qso_rig::create_status(int curr_x, int curr_y) {
 	op_freq_mode_->labelcolor(FL_YELLOW);
 	op_freq_mode_->labelfont(FL_BOLD);
 	op_freq_mode_->labelsize(FL_NORMAL_SIZE + 10);
+
+	curr_y += op_freq_mode_->h();
+
+	// Display instantaneous mode
+	bn_instant_ = new Fl_Check_Button(curr_x, curr_y, WDISPLAY, HBUTTON, "Display instantaneous");
+	bn_instant_->tooltip("Display shows instananoues power and S-meter values or maxuimum over recent samples");
+	bn_instant_->box(FL_FLAT_BOX);
+	bn_instant_->callback(cb_value<Fl_Button, bool>, &instant_meters_);
+	bn_instant_->value(instant_meters_);
+	bn_instant_->type(FL_TOGGLE_BUTTON);
 
 	status_grp_->end();
 
@@ -676,11 +692,13 @@ void qso_rig::save_values() {
 		rig_settings.set("Default CAT", cat_index_);
 		// Preferred antenna
 		rig_settings.set("Antenna", antenna_.c_str());
+		rig_settings.set("Instantaneous Values", instant_meters_);
 		settings_->flush();
 	} else {
 		// Remove this rig from the settings file
 		cat_settings.delete_group(label());
 	}
+
 }
 
 // get rig sttaus
@@ -1094,26 +1112,36 @@ void qso_rig::enable_widgets(uchar damage) {
 			}
 		}
 		op_freq_mode_->activate();
-		op_freq_mode_->color(FL_BLACK);
+		op_freq_mode_->color(FL_BLACK, FL_BLACK);
 		op_freq_mode_->labelcolor(FL_YELLOW);
 
 		char msg[200];
 		string rig_mode;
 		string submode;
 		rig_->get_string_mode(rig_mode, submode);
-		// Set Freq/Mode to Frequency (MHz with kHz seperator), mode, power (W)
-		snprintf(msg, sizeof(msg), "%d.%03d.%03d MHz\n%s %sW %s",
-			freq_MHz, freq_kHz, freq_Hz,
-			submode.length() ? submode.c_str() : rig_mode.c_str(),
-			rig_->get_tx_power(true).c_str(),
-			rig_->get_smeter(true).c_str()
-		);
+		if (instant_meters_) {
+			// Set Freq/Mode to Frequency (MHz with kHz seperator), mode, power (W)
+			snprintf(msg, sizeof(msg), "%d.%03d.%03d MHz\n%s %sW %s",
+				freq_MHz, freq_kHz, freq_Hz,
+				submode.length() ? submode.c_str() : rig_mode.c_str(),
+				rig_->get_tx_power(false).c_str(),
+				rig_->get_smeter(false).c_str()
+			);
+		} else {
+			// Set Freq/Mode to Frequency (MHz with kHz seperator), mode, power (W)
+			snprintf(msg, sizeof(msg), "%d.%03d.%03d MHz\n%s %sW %s",
+				freq_MHz, freq_kHz, freq_Hz,
+				submode.length() ? submode.c_str() : rig_mode.c_str(),
+				rig_->get_tx_power(true).c_str(),
+				rig_->get_smeter(true).c_str()
+			);
+		}
 		op_freq_mode_->copy_label(msg);
 		int size = FL_NORMAL_SIZE + 10;
 		fl_font(0, size);
-		int w, h;
+		int w = 0, h;
 		fl_measure(msg, w, h);
-		while (w > op_freq_mode_->w()) {
+		while (w > op_freq_mode_->w() || h > op_freq_mode_->h()) {
 			size--;
 			fl_font(0, size);
 			fl_measure(msg, w, h);

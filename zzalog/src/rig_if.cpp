@@ -27,11 +27,11 @@ string rig_if::get_smeter(bool max) {
 	// SMeter value is relative to S9
 	// Smeter value 0 indicates S9,
 	// 1 S-point is 6 dB
-	if (rig_data_.s_value < -54) {
+	if (value < -54) {
 		// Below S0
 		snprintf(text, 100, " S0%ddB", 54 + value);
 	}
-	else if (rig_data_.s_value <= 0) {
+	else if (value <= 0) {
 		// Below S9 - convert to S points (6dB per S-point
 		snprintf(text, 100, " S%1d", (54 + value) / 6);
 	}
@@ -505,7 +505,7 @@ void rig_if::th_read_values() {
 		smeters_.clear();
 	}
 	// Push value into smeters stack
-	smeters_.push_back(meter_value.i);
+	if (!rig_data_.ptt) smeters_.push_back(meter_value.i);
 	while (smeters_.size() > hamlib_data_->num_smeters) {
 		smeters_.erase(smeters_.begin());
 	}
