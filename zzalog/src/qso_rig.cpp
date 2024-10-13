@@ -243,7 +243,7 @@ void qso_rig::create_status(int curr_x, int curr_y) {
 	op_freq_mode_->color(FL_BLACK);
 	op_freq_mode_->align(FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
 	op_freq_mode_->labelcolor(FL_YELLOW);
-	op_freq_mode_->labelfont(FL_BOLD);
+	op_freq_mode_->labelfont(0);
 	op_freq_mode_->labelsize(FL_NORMAL_SIZE + 10);
 
 	curr_y += op_freq_mode_->h();
