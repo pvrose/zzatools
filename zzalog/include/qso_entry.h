@@ -132,6 +132,8 @@ public:
 
 	// Set initial focus
 	void set_initial_focus();
+	// Set focus to next input
+	void set_next_focus();
 	// QTH has changed
 	void check_qth_changed();
 
@@ -168,5 +170,7 @@ protected:
 	string previous_locator_;
 	// Previous contest serial number
 	int previous_serial_;
+	// Current active field input index
+	int current_ix_;
 };
 

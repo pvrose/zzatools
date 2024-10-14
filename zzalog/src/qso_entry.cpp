@@ -171,6 +171,7 @@ void qso_entry::enable_widgets() {
 			ip_field_[ix]->deactivate();
 		}
 		ip_notes_->deactivate();
+		set_initial_focus();
 		break;
 	case qso_data::QSO_PENDING:
 	case qso_data::TEST_PENDING:
@@ -191,6 +192,7 @@ void qso_entry::enable_widgets() {
 		ip_notes_->activate();
 		ip_notes_->color(FL_BACKGROUND2_COLOR);
 		ip_notes_->type(FL_NORMAL_INPUT);
+		set_initial_focus();
 		break;
 	case qso_data::QSO_STARTED:
 	case qso_data::NET_STARTED:
@@ -217,6 +219,7 @@ void qso_entry::enable_widgets() {
 		ip_notes_->activate();
 		ip_notes_->color(FL_BACKGROUND2_COLOR);
 		ip_notes_->type(FL_NORMAL_INPUT);
+		set_next_focus();
 		break;
 	case qso_data::QSO_VIEW:
 		// Viewing a QSO - activate all fields in use, but don't enable data entry
@@ -236,6 +239,7 @@ void qso_entry::enable_widgets() {
 		ip_notes_->activate();
 		ip_notes_->color(FL_BACKGROUND_COLOR);
 		ip_notes_->type(FL_NORMAL_OUTPUT);
+		set_initial_focus();
 		break;
 	case qso_data::MANUAL_ENTRY:
 		// Entering data for search - enable all fields in use...
@@ -255,13 +259,13 @@ void qso_entry::enable_widgets() {
 		ip_notes_->activate();
 		ip_notes_->color(FL_BACKGROUND2_COLOR);
 		ip_notes_->type(FL_NORMAL_INPUT);
+		set_next_focus();
 		break;
 	default:
 		// Reserver=d for Query states
 		hide();
 		break;
 	}
-	set_initial_focus();
 	for (int ix = 0; ix < NUMBER_TOTAL; ix++) {
 		ip_field_[ix]->redraw();
 	}
@@ -700,6 +704,8 @@ void qso_entry::cb_ip_field(Fl_Widget* w, void* v) {
 	string field = ip->field_name();
 	string value = ip->value();
 	string old_value = that->qso_->item(field);
+	// Save the index to set next focus
+	that->current_ix_ = (int)(intptr_t)v;
 	if (old_value != value) {
 		that->qso_->item(field, value);
 
@@ -892,6 +898,14 @@ void qso_entry::set_initial_focus() {
 		if (w && strlen(w->value()) == 0) {
 			if (w->take_focus()) found = true;
 		}
+	}
+}
+
+// set next focus
+void qso_entry::set_next_focus() {
+	if (current_ix_ < fields_in_use_.size()) {
+		field_input* w = ip_field_[current_ix_++];
+		w->take_focus();
 	}
 }
 
