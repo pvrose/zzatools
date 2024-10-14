@@ -1044,9 +1044,9 @@ void qso_data::action_edit() {
 }
 
 // Action VIEW - Transition from QSO_INACTIVE to QSO_VIEW
-void qso_data::action_view() {
+void qso_data::action_view(qso_num_t number) {
 	// Save a copy of the current record
-	qso_num_t qso_number = get_default_number();
+	qso_num_t qso_number = number == -1 ? get_default_number() : number;
 	logging_state_ = QSO_VIEW;
 	g_entry_->qso(qso_number);
 	g_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);

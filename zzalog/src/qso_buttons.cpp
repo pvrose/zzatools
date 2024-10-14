@@ -27,7 +27,7 @@ map<qso_data::logging_state_t, list<qso_buttons::button_type> > button_map_ =
 	{ qso_data::QSO_PENDING, { qso_buttons::START_QSO, qso_buttons::ADD_QSO, qso_buttons::EDIT_QSO, qso_buttons::COPY_QSO, 
 		qso_buttons::CLONE_QSO, qso_buttons::QUIT_QSO, qso_buttons::SAVE_QSO, 
 		qso_buttons::DELETE_QSO, qso_buttons::START_NET, qso_buttons::BROWSE, qso_buttons::VIEW_QSO } },
-	{ qso_data::QSO_STARTED, { qso_buttons::SAVE_QSO, qso_buttons::CANCEL_QSO, 
+	{ qso_data::QSO_STARTED, { qso_buttons::SAVE_QSO, qso_buttons::SAVE_VIEW, qso_buttons::SAVE_NEW, qso_buttons::CANCEL_QSO, 
 		qso_buttons::START_NET, qso_buttons::WORKED_B4, qso_buttons::PARSE, qso_buttons::QRZ_COM } },
 	{ qso_data::QSO_ENTER, { qso_buttons::SAVE_QSO, qso_buttons::SAVE_EXIT, qso_buttons::CANCEL_QSO } },
 	{ qso_data::QSO_EDIT, { qso_buttons::SAVE_EDIT, qso_buttons::SAVE_EXIT, 
@@ -81,6 +81,7 @@ map<qso_buttons::button_type, qso_buttons::button_action> action_map_ =
 	{ qso_buttons::SAVE_EDIT, { "Save", "Copy changed record back to book", FL_GREEN, qso_buttons::cb_save, (void*)qso_buttons::SAVE_EDIT}},
 	{ qso_buttons::SAVE_EXIT, { "Save && Exit", "Copy changed record and return to previous activity", COLOUR_APPLE, qso_buttons::cb_save, (void*)qso_buttons::SAVE_EXIT }},
 	{ qso_buttons::SAVE_VIEW, { "Save && View", "Copy changed record and allow view", FL_BLUE, qso_buttons::cb_save, (void*)qso_buttons::SAVE_VIEW }},
+	{ qso_buttons::SAVE_NEW, { "Save && New", "Save record and start new QSO", FL_BLUE, qso_buttons::cb_save, (void*)qso_buttons::SAVE_NEW }},
 	{ qso_buttons::CANCEL_EDIT, { "Cancel Edit", "Cancel the current QSO edit", FL_RED, qso_buttons::cb_cancel, 0 } },
 	{ qso_buttons::CANCEL_VIEW, { "Cancel", "Cancel the current QSO view", FL_RED, qso_buttons::cb_cancel, 0 } },
     { qso_buttons::NAV_FIRST, { "@$->|", "Select first record in net or book", FL_YELLOW, qso_buttons::cb_bn_navigate, (void*)NV_FIRST } },
@@ -251,6 +252,7 @@ void qso_buttons::cb_save(Fl_Widget* w, void* v) {
 	qso_data* data = ancestor_view<qso_data>(w);
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
 	button_type edit_button = (button_type)(intptr_t)v;
+	qso_num_t current = data->current_number();
 	if (that) that->disable_widgets();
 	switch (data->logging_state()) {
 	case qso_data::QSO_PENDING:
@@ -260,8 +262,23 @@ void qso_buttons::cb_save(Fl_Widget* w, void* v) {
 	case qso_data::QSO_STARTED:
 	case qso_data::TEST_ACTIVE:
 		// Realtime entry - do not start another
-		if(!data->action_save()) break;
-		data->action_activate(qso_data::QSO_AS_WAS);
+		if (!data->action_save()) break;
+		switch (edit_button) {
+			case SAVE_QSO: {
+				data->action_activate(qso_data::QSO_AS_WAS);
+				break;
+			}
+			case SAVE_NEW: {
+				data->action_activate(qso_data::QSO_AS_WAS);
+				data->action_start(qso_data::QSO_AS_WAS);
+				break;
+			}
+			case SAVE_VIEW: {
+				data->action_activate(qso_data::QSO_AS_WAS);
+				data->action_view(current);
+				break;
+			}
+		}
 		break;
 	case qso_data::QSO_ENTER:
 		// Batch entry - start another entry

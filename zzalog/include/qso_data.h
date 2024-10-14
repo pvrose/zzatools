@@ -163,7 +163,7 @@ public:
 	// Copy selected QSO and allow it to be edited
 	void action_edit();
 	// View selected QSO in entry view (disable editing)
-	void action_view();
+	void action_view(qso_num_t number = -1);
 	// Copy edited QSO back to selected QSO
 	void action_save_edit();
 	// Cancel editing

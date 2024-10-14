@@ -46,6 +46,7 @@ public:
 		SAVE_EDIT,
 		SAVE_EXIT,
 		SAVE_VIEW,
+		SAVE_NEW,
 		WORKED_B4,
 		PARSE,
 		NAV_FIRST,

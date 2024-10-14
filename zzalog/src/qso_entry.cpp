@@ -837,7 +837,6 @@ void qso_entry::qso(qso_num_t number) {
 		qso_number_ = number;
 		if (number == -1) {
 			qso_ = new record();
-			printf("Created new qso %p\n", qso_);
 		}
 		else {
 			qso_ = book_->get_record(number, false);
