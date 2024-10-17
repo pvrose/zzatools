@@ -903,8 +903,13 @@ void qso_entry::set_initial_focus() {
 // set next focus
 void qso_entry::set_next_focus() {
 	if (current_ix_ < fields_in_use_.size()) {
-		field_input* w = ip_field_[current_ix_++];
-		w->take_focus();
+		Fl_Widget* w0 = Fl::focus();
+		// Disable events fom current widget
+		Fl_When save = w0->when();
+		w0->when(0);
+		field_input* w1 = ip_field_[current_ix_++];
+		w1->take_focus();
+		w0->when(save);
 	}
 }
 
