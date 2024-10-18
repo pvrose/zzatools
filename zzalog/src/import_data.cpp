@@ -686,7 +686,7 @@ bool import_data::load_data(string filename, update_mode_t mode) {
 	bool result = book::load_data(filename);
 	if (result) {
 		tabbed_forms_->activate_pane(OT_IMPORT, true);
-		selection(record_number(0));
+		selection(record_number(size() - 1));
 		status_->misc_status(ST_NOTE, "Records read, select Import->Merge... to add them to log");
 	}
 	else {
