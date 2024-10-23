@@ -1461,8 +1461,6 @@ void qso_data::action_log_modem() {
 	}
 	// The QSO is complete
 	action_save();
-	// Open in view
-	action_view();
 	
 	book_->selection(book_->item_number(g_entry_->qso_number()), HT_INSERTED);
 	book_->enable_save(true, "Logged real-time modem QSO");
