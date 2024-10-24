@@ -1573,11 +1573,13 @@ void qso_data::action_qrz_com() {
 void qso_data::action_update_cat() {
 	switch (logging_state_) {
 		case QSO_EDIT: {
-			g_entry_->copy_cat_to_qso();
+			g_entry_->copy_cat_to_qso(true);
+			g_entry_->copy_qso_to_display(qso_entry::CF_CAT);
 			break;
 		}
 		case NET_EDIT: {
-			g_net_entry_->entry()->copy_cat_to_qso();
+			g_net_entry_->entry()->copy_cat_to_qso(true);
+			g_net_entry_->entry()->copy_qso_to_display(qso_entry::CF_CAT);
 			break;
 		}
 	}
