@@ -1558,10 +1558,12 @@ void qso_data::action_qrz_com() {
 		case qso_data::NET_EDIT:
 		case qso_data::NET_STARTED: {
 			qso = current_qso();
+			break;
 		}
 		case qso_data::QUERY_MATCH:
 		case qso_data::QUERY_NEW: {
 			qso = query_qso();
+			break;
 		}
 	} 
 	qrz_handler_->open_web_page(qso->item("CALL"));
