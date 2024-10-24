@@ -27,7 +27,8 @@ map<qso_data::logging_state_t, list<qso_buttons::button_type> > button_map_ =
 	{ qso_data::QSO_PENDING, { qso_buttons::START_QSO, qso_buttons::ADD_QSO, qso_buttons::EDIT_QSO, qso_buttons::COPY_QSO, 
 		qso_buttons::CLONE_QSO, qso_buttons::QUIT_QSO, qso_buttons::SAVE_QSO, 
 		qso_buttons::DELETE_QSO, qso_buttons::START_NET, qso_buttons::BROWSE, qso_buttons::VIEW_QSO } },
-	{ qso_data::QSO_STARTED, { qso_buttons::SAVE_QSO, qso_buttons::SAVE_VIEW, qso_buttons::SAVE_NEW, qso_buttons::CANCEL_QSO, 
+	{ qso_data::QSO_STARTED, { qso_buttons::SAVE_QSO, qso_buttons::SAVE_VIEW, qso_buttons::SAVE_NEW,
+		qso_buttons::SAVE_CONTINUE, qso_buttons::CANCEL_QSO, 
 		qso_buttons::START_NET, qso_buttons::WORKED_B4, qso_buttons::PARSE, qso_buttons::QRZ_COM } },
 	{ qso_data::QSO_ENTER, { qso_buttons::SAVE_QSO, qso_buttons::SAVE_EXIT, qso_buttons::CANCEL_QSO } },
 	{ qso_data::QSO_EDIT, { qso_buttons::SAVE_EDIT, qso_buttons::SAVE_EXIT, 
@@ -79,6 +80,7 @@ map<qso_buttons::button_type, qso_buttons::button_action> action_map_ =
 	{ qso_buttons::DELETE_QSO, { "Delete QSO", "Delete the selected QSO", COLOUR_CLARET, qso_buttons::cb_bn_delete_qso, 0 } },
 	{ qso_buttons::WORKED_B4, { "B4?", "Display all previous QSOs with this callsign", FL_BACKGROUND_COLOR, qso_buttons::cb_wkb4, 0 } },
 	{ qso_buttons::SAVE_EDIT, { "Save", "Copy changed record back to book", FL_GREEN, qso_buttons::cb_save, (void*)qso_buttons::SAVE_EDIT}},
+	{ qso_buttons::SAVE_CONTINUE, { "Save && Edit", "Set TIME_OFFand allow continued edit", FL_GREEN, qso_buttons::cb_save, (void*)qso_buttons::SAVE_CONTINUE}},
 	{ qso_buttons::SAVE_EXIT, { "Save && Exit", "Copy changed record and return to previous activity", COLOUR_APPLE, qso_buttons::cb_save, (void*)qso_buttons::SAVE_EXIT }},
 	{ qso_buttons::SAVE_VIEW, { "Save && View", "Copy changed record and allow view", FL_BLUE, qso_buttons::cb_save, (void*)qso_buttons::SAVE_VIEW }},
 	{ qso_buttons::SAVE_NEW, { "Save && New", "Save record and start new QSO", FL_BLUE, qso_buttons::cb_save, (void*)qso_buttons::SAVE_NEW }},
@@ -281,6 +283,12 @@ void qso_buttons::cb_save(Fl_Widget* w, void* v) {
 			case SAVE_VIEW: {
 				data->action_activate(qso_data::QSO_AS_WAS);
 				data->action_view(current);
+				break;
+			}
+			case SAVE_CONTINUE: {
+				data->action_activate(qso_data::QSO_AS_WAS);
+				data->action_view(current);
+				data->action_edit();
 				break;
 			}
 		}
