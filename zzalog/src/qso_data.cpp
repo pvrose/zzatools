@@ -421,7 +421,7 @@ void qso_data::update_qso(qso_num_t log_num) {
 			switch (fl_choice("Trying to select a different record while logging a QSO", "Save QSO", "Quit QSO", "Ignore")) {
 			case 0:
 				// Save QSO
-				if(!action_save()) break;
+				if(!action_save(false)) break;
 				book_->selection(book_->item_number(log_num));
 				action_deactivate();;
 				break;
@@ -794,7 +794,8 @@ void qso_data::action_start(qso_init_t mode) {
 }
 
 // Action SAVE - transition from QSO_STARTED to QSO_INACTIVE while saving record
-bool qso_data::action_save() {
+// Continuing - the QSO will be left open for logging to complete
+bool qso_data::action_save(bool continuing) {
 	record* qso = nullptr;
 	item_num_t item_number = -1;
 	qso_num_t qso_number = -1;
@@ -867,21 +868,23 @@ bool qso_data::action_save() {
 		break;
 	}
 
-	// check whether record has changed - when parsed
-	if (cty_data_->update_qso(qso)) {
+	if (continuing) {
+		// check whether record has changed - when parsed
+		if (cty_data_->update_qso(qso)) {
+		}
+
+		// check whether record has changed - when validated
+		if (spec_data_->validate(qso, item_number)) {
+		}
+
+		book_->add_use_data(qso);
+		extract_records_->check_add_record(qso_number);
+
+		book_->enable_save(true, "Saving QSO");
+
+		// Upload QSO to QSL servers
+		book_->upload_qso(qso_number);
 	}
-
-	// check whether record has changed - when validated
-	if (spec_data_->validate(qso, item_number)) {
-	}
-
-	book_->add_use_data(qso);
-	extract_records_->check_add_record(qso_number);
-
-	book_->enable_save(true, "Saving QSO");
-
-	// Upload QSO to QSL servers
-	book_->upload_qso(qso_number);
 
 	switch (logging_state_) {
 	case QSO_STARTED:
@@ -1059,7 +1062,13 @@ void qso_data::action_save_edit() {
 	// We no longer need to maintain the copy of the original QSO
 	record* qso = g_entry_->qso();
 	if (qso) {
+		qso_num_t qso_number = g_entry_->qso_number();
+		item_num_t item_number = book_->item_number(qso_number);
+		book_->upload_qso(qso_number);
+		cty_data_->update_qso(qso);
+		spec_data_->validate(qso, item_number);
 		book_->add_use_data(qso);
+
 		if (qso->is_dirty()) book_->modified(true);
 		book_->enable_save(true, "Saving edit");
 		g_entry_->delete_qso();
@@ -1370,7 +1379,7 @@ void qso_data::action_save_net_all() {
 		case NET_STARTED:
 			// SAving record number for later upload
 			upload_qsos->add_record(g_net_entry_->qso_number());
-			ok = action_save();
+			ok = action_save(false);
 			break;
 		case NET_EDIT:
 			action_save_net_edit();
@@ -1460,7 +1469,7 @@ void qso_data::action_log_modem() {
 		qso->item("TX_PWR", rig->get_tx_power(true));
 	}
 	// The QSO is complete
-	action_save();
+	action_save(false);
 	
 	book_->selection(book_->item_number(g_entry_->qso_number()), HT_INSERTED);
 	book_->enable_save(true, "Logged real-time modem QSO");
@@ -1689,7 +1698,7 @@ void qso_data::end_qso() {
 		// drop through
 	case qso_data::QSO_STARTED:
 	case qso_data::QSO_ENTER:
-		action_save();
+		action_save(false);
 		break;
 	case qso_data::QSO_EDIT:
 		action_save_edit();

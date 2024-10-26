@@ -1573,10 +1573,15 @@ bool book::delete_enabled() {
 // Upload the latest QSO imported to eQSL, LotW and Clublog
 bool book::upload_qso(qso_num_t record_num) {
 	if (AUTO_UPLOAD && upload_allowed_) {
+		record* qso = get_record(item_number(record_num), false);
 		enable_save(false, "Uploading to QSL sites");
-		bool ok = eqsl_handler_->upload_single_qso(record_num);
-		if (!lotw_handler_->upload_single_qso(record_num)) ok = false;
-		if (!club_handler_->upload_single_qso(record_num)) ok = false;
+		bool ok = true;
+		if (qso->item("EQSL_QSL_SENT") != "Y") 
+			if (!eqsl_handler_->upload_single_qso(record_num)) ok = false;
+		if (qso->item("LOTW_QSL_SENT") != "Y") 
+			if (!lotw_handler_->upload_single_qso(record_num)) ok = false;
+		if (qso->item("CLUBLOG_UPLOAD_QSL_STATUS") != "Y") 
+			if (!club_handler_->upload_single_qso(record_num)) ok = false;
 		// Clear flag as already handled new record features
 		new_record_ = false;
 		enable_save(true, "Upload to QSL sites requested");
