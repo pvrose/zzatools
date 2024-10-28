@@ -313,7 +313,7 @@ bool adi_reader::load_book(book* book, istream& in) {
 	// Update progress bar with complete or failed.
 	if (!in.eof()) {
 		status_->progress("Load failed", book->book_type());
-		status_->misc_status(ST_ERROR, "LOG: Reading failed");
+		status_->misc_status(closing_ ? ST_WARNING : ST_ERROR, "LOG: Reading failed");
 		return false;
 	}
 	else {

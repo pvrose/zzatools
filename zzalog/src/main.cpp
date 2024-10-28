@@ -686,7 +686,7 @@ void add_book(char* arg) {
 				} else {
 					char msg[100];
 					snprintf(msg, sizeof(msg), "ZZALOG: Load %s failed, no backup loaded", log_file.c_str());
-					status_->misc_status(ST_ERROR, msg);
+					status_->misc_status(closing_ ? ST_WARNING : ST_ERROR, msg);
 					book_->set_filename(log_file);
 				}
 			} else {

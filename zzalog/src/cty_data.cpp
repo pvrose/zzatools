@@ -26,6 +26,7 @@ extern club_handler* club_handler_;
 extern status* status_;
 extern spec_data* spec_data_;
 extern Fl_Preferences* settings_;
+extern bool closing_;
 
 // Constructor - Download new data and build database
 cty_data::cty_data() :
@@ -215,7 +216,7 @@ bool cty_data::load_data(string filename) {
 		else {
 			// Failed - delete what may have been loaded - this ensures no exception is reported
 			snprintf(message, 160, "CTY DATA: Failed to load %s", filename.c_str());
-			status_->misc_status(ST_ERROR, message);
+			status_->misc_status(closing_ ? ST_WARNING : ST_ERROR, message);
 			delete_contents();
 			return false;
 		}

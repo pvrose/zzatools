@@ -17,6 +17,7 @@
 extern spec_data* spec_data_;
 extern Fl_Preferences* settings_;
 extern status* status_;
+extern bool closing_;
 
 // Constructor
 adx_reader::adx_reader() :
@@ -76,7 +77,7 @@ bool adx_reader::load_book(book* book, istream& in) {
 	}
 	else {
 		// Read failed - report failure
-		status_->misc_status(ST_ERROR, "LOG: Reading failed");
+		status_->misc_status(closing_ ? ST_WARNING : ST_ERROR, "LOG: Reading failed");
 		status_->progress("Load failed", book->book_type());
 		fl_cursor(FL_CURSOR_DEFAULT);
 		return false;
