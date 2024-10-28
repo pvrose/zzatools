@@ -673,7 +673,7 @@ void add_book(char* arg) {
 				backup_settings.get("Last Backup", temp, "");
 				string backup = temp;
 				// Cannot access book - try backup
-				if (fl_choice("Load %s failed - load from backup %s", "Yes", "No", nullptr, log_file.c_str(), backup.c_str()) == 0) {
+				if (!closing_ && fl_choice("Load %s failed - load from backup %s", "Yes", "No", nullptr, log_file.c_str(), backup.c_str()) == 0) {
 					char msg[100];
 					snprintf(msg, sizeof(msg), "ZZALOG: Load %s failed, trying backup %s", log_file.c_str(), backup.c_str());
 					status_->misc_status(ST_WARNING, msg);

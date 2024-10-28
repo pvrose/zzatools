@@ -8,7 +8,7 @@
 #include <FL/fl_ask.H>
 #include <FL/Fl.H>
 
-
+extern bool closing_;
 
 // Constructor
 xml_reader::xml_reader()
@@ -43,11 +43,12 @@ xml_reader::~xml_reader()
 bool xml_reader::parse(istream& is) {
 	bool ok = true;
 	// Process alternately character data and tags
-	while (is.good() && ok) {
+	while (is.good() && ok && !closing_) {
 		ok = process_chars(is);
 		if (ok) ok = process_tag(is);
 	}
 	if (ok) {
+		// If stopped by closing, we would not be at EOF
 		ok = is.eof();
 	}
 	return ok;

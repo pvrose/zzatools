@@ -311,7 +311,7 @@ bool adi_reader::load_book(book* book, istream& in) {
 	// Restore normal cursor
 	fl_cursor(FL_CURSOR_DEFAULT);
 	// Update progress bar with complete or failed.
-	if (in.fail() && !in.eof()) {
+	if (!in.eof()) {
 		status_->progress("Load failed", book->book_type());
 		status_->misc_status(ST_ERROR, "LOG: Reading failed");
 		return false;
