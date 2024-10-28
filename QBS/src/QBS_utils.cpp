@@ -55,10 +55,16 @@ void split_line(const string& line, vector<string>& words, const char separator)
 		}
 	}
 	// Remove the final character if it is CR or LF
-	char c = a_word.back();
-	if (c == '\x0d' || c == '\x0a') {
-		words.push_back(a_word.substr(0, a_word.length() - 1));
-	} else {
+	if (a_word.length()) {
+		char c = a_word.back();
+		if (c == '\x0d' || c == '\x0a') {
+			words.push_back(a_word.substr(0, a_word.length() - 1));
+		}
+		else {
+			words.push_back(a_word);
+		}
+	}
+	else {
 		words.push_back(a_word);
 	}
 	// Tidy up

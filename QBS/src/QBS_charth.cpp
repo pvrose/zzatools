@@ -235,7 +235,7 @@ int QBS_charth::handle(int event) {
 void QBS_charth::chart_tip() {
 	int x = Fl::event_x() - chart_->x();
 	float bar_width = (float)chart_->w() / (float)number_boxes_;
-	int bar = trunc((float)x / bar_width);
+	int bar = (int)trunc((float)x / bar_width);
 	int rcvd = chart_counts_[bar * 4];
 	int rcyc = chart_counts_[bar * 4 + 1];
 	int sent = chart_counts_[bar * 4 + 2];
