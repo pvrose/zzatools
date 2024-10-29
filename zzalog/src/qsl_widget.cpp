@@ -14,6 +14,9 @@ qsl_widget::~qsl_widget() {}
 void qsl_widget::draw() {
 	display_->resize(w(), h());
 	display_->draw();
+	if (box() == FL_BORDER_BOX) {
+		fl_rect(x(), y(), w(), h(), FL_FOREGROUND_COLOR);
+	}
 }
 
 // Handle intercepts mouse button click to invoke the callback

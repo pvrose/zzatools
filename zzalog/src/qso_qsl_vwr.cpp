@@ -100,7 +100,7 @@ void qso_qsl_vwr::create_form() {
 
 	// Box - for the display of a card image 
 	qsl_thumb_ = new qsl_widget(curr_x, curr_y, WIMAGE, HIMAGE, "Image");
-	qsl_thumb_->box(FL_FLAT_BOX);
+	qsl_thumb_->box(FL_BORDER_BOX);
 	qsl_thumb_->tooltip("The card image is displayed here!");
 	qsl_thumb_->callback(cb_bn_image, nullptr);
 	qsl_thumb_->when(FL_WHEN_RELEASE);
@@ -444,6 +444,7 @@ void qso_qsl_vwr::set_image() {
 				thumb->set_text(nullptr, FL_BLACK);
 				full->set_text(nullptr, FL_BLACK);
 			}
+			qsl_thumb_->box(FL_BORDER_BOX);
 			break;
 		}
 		case QI_LABEL:
@@ -465,6 +466,7 @@ void qso_qsl_vwr::set_image() {
 				thumb->set_card(card);
 				thumb->set_qsos(nullptr, 0);
 			}
+			qsl_thumb_->box(FL_FLAT_BOX);
 			break;
 		}
 		default: {
@@ -651,6 +653,7 @@ void qso_qsl_vwr::set_image() {
 					break;
 				}
 			}
+			qsl_thumb_->box(FL_FLAT_BOX);
 			break;
 		}
 	}
