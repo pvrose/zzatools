@@ -144,6 +144,9 @@ void qso_data::create_form(int X, int Y) {
 	if (in_contest()) {
 		action_activate(QSO_ON_AIR);
 	}
+	else {
+		action_view();
+	}
 	enable_widgets();
 	// May have added widgets 
 	
