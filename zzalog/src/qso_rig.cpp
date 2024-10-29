@@ -930,7 +930,7 @@ void qso_rig::enable_widgets(uchar damage) {
 			break;
 		}
 		// Set the rig name into the choice
-		if (hamlib) {
+		if (hamlib && hamlib->model_id != -1) {
 			int pos = rig_choice_pos_.at(hamlib->model_id);
 			ch_rig_model_->value(pos);
 		} else {
@@ -1555,6 +1555,10 @@ void qso_rig::switch_rig() {
 		rig_ = new rig_if(label(), cat_data_[cat_index_]->hamlib);
 		modify_hamlib_data();
 		ancestor_view<qso_manager>(this)->update_rig();
+		mode_ = (uint16_t)cat_data_[cat_index_]->hamlib->port_type;
+	}
+	else {
+		mode_ = RIG_PORT_NONE;
 	}
 	enable_widgets(DAMAGE_ALL);
 }
