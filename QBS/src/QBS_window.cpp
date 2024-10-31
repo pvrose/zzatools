@@ -1,14 +1,13 @@
 #include "QBS_window.h"
 #include "QBS_consts.h"
 #include "QBS_data.h"
-#include "QBS_callback.h"
+#include "callback.h"
 
 #include <iostream>
 
 using namespace std;
 
 const extern char* DATE_FORMAT;
-const Fl_Color COLOUR_ORANGE = 93; /* R=4/4, B=0/4, G = 5/7 */
 const Fl_Color COLOUR_ADHOC = fl_lighter(FL_CYAN);
 const Fl_Color COLOUR_BATCH = fl_lighter(COLOUR_ORANGE);
 const Fl_Color COLOUR_REPORT = fl_lighter(FL_MAGENTA);
@@ -117,7 +116,7 @@ void QBS_window::create_form() {
 		ip_csv_dir_,
 		nullptr
 	);
-	bn_brf_csv_->callback(cb_bn_browsedir, &csv_browser_);
+	// bn_brf_csv_->callback(cb_bn_browsedir, &csv_browser_);
 
 	curr_x += bn_brf_csv_->w() + GAP;
 	max_x = max(max_x, curr_x);
@@ -152,7 +151,7 @@ void QBS_window::create_form() {
 		ip_qbs_file_,
 		nullptr
 	);
-	bn_brf_qbs_->callback(cb_bn_browsefile, &qbs_browser_);
+	// bn_brf_qbs_->callback(cb_bn_browsefile, &qbs_browser_);
 
 	curr_x += bn_brf_qbs_->w() + GAP;
 	max_x = max(max_x, curr_x);

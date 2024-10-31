@@ -3,7 +3,7 @@ TARGET_EXEC := qbs
 BUILD_TYPE := Release
 
 BUILD_DIR := ./build
-SRC_DIRS := ./src
+SRC_DIRS := ./src ../common/src ../widgets/src
 EXEC_DIR = $(BUILD_DIR)/$(BUILD_TYPE)
 INSTALL_DIR = /usr/local/bin
 
@@ -33,7 +33,7 @@ DEPS := $(OBJS:.o=.d)
 TARFILE = $(TARGET_EXEC:.exe=.tgz)
 
 # Every folder in ./src will need to be passed to GCC so that it can find header files
-INC_DIRS := ./include
+INC_DIRS := ./include ../widgets/include ../common/include
 #INC_DIRS += $(FLTK_DIR) $(FLTK_BUILD)
 #INC_DIRS += $(HAMLIB_BUILD)/include
 

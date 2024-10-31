@@ -2,8 +2,8 @@
 
 #include "QBS_consts.h"
 #include "QBS_notes.h"
-#include "QBS_utils.h"
-#include "QBS_callback.h"
+#include "utils.h"
+#include "callback.h"
 #include "QBS_charth.h"
 
 #include <map>
