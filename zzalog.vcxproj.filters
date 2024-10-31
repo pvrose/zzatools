@@ -285,9 +285,6 @@
     <ClCompile Include="zzalog\src\calendar_table.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="zzalog\src\filename_input.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="zzalog\src\qsl_dataset.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -301,6 +298,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="zzalog\src\qsl_emailer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="widgets\src\filename_input.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -593,9 +593,6 @@
     <ClInclude Include="zzalog\include\symbols.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="zzalog\include\button_input.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="zzalog\include\password_input.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -624,6 +621,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="zzalog\include\qsl_emailer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="widgets\include\button_input.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="widgets\include\filename_input.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

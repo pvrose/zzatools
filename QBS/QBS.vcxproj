@@ -155,6 +155,7 @@
     <ClInclude Include="include\QBS_charth.h" />
     <ClInclude Include="include\QBS_consts.h" />
     <ClInclude Include="include\QBS_data.h" />
+    <ClInclude Include="include\QBS_filedlg.h" />
     <ClInclude Include="include\QBS_import.h" />
     <ClInclude Include="include\QBS_logo.h" />
     <ClInclude Include="include\QBS_notes.h" />
@@ -165,6 +166,7 @@
   <ItemGroup>
     <ClCompile Include="src\QBS_charth.cpp" />
     <ClCompile Include="src\QBS_data.cpp" />
+    <ClCompile Include="src\QBS_filedlg.cpp" />
     <ClCompile Include="src\QBS_import.cpp" />
     <ClCompile Include="src\QBS_main.cpp" />
     <ClCompile Include="src\QBS_notes.cpp" />
