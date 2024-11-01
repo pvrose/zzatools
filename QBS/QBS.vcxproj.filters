@@ -33,6 +33,12 @@
     <ClInclude Include="include\QBS_notes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\QBS_callback.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\QBS_utils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="include\QBS_charth.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -40,15 +46,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\QBS_filedlg.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\include\callback.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\include\drawing.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\include\utils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -71,13 +68,13 @@
     <ClCompile Include="src\QBS_notes.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\QBS_utils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="src\QBS_charth.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\QBS_filedlg.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\src\utils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
