@@ -140,7 +140,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\pvros\source\repos\pvrose\zzatools\QBS\include;C:\Users\pvros\source\repos\fltk;C:\Users\pvros\source\repos\fltk\build;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\pvros\source\repos\pvrose\zzatools\QBS\include;C:\Users\pvros\source\repos\fltk;C:\Users\pvros\source\repos\fltk\build;C:\Users\pvros\source\repos\pvrose\zzatools\common\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -151,7 +151,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="include\QBS_callback.h" />
+    <ClInclude Include="..\common\include\callback.h" />
+    <ClInclude Include="..\common\include\drawing.h" />
+    <ClInclude Include="..\common\include\utils.h" />
     <ClInclude Include="include\QBS_charth.h" />
     <ClInclude Include="include\QBS_consts.h" />
     <ClInclude Include="include\QBS_data.h" />
@@ -159,17 +161,16 @@
     <ClInclude Include="include\QBS_logo.h" />
     <ClInclude Include="include\QBS_notes.h" />
     <ClInclude Include="include\QBS_reporter.h" />
-    <ClInclude Include="include\QBS_utils.h" />
     <ClInclude Include="include\QBS_window.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\common\src\utils.cpp" />
     <ClCompile Include="src\QBS_charth.cpp" />
     <ClCompile Include="src\QBS_data.cpp" />
     <ClCompile Include="src\QBS_import.cpp" />
     <ClCompile Include="src\QBS_main.cpp" />
     <ClCompile Include="src\QBS_notes.cpp" />
     <ClCompile Include="src\QBS_reporter.cpp" />
-    <ClCompile Include="src\QBS_utils.cpp" />
     <ClCompile Include="src\QBS_window.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
