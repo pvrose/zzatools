@@ -127,7 +127,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\pvros\source\repos\pvrose\zzatools\zzalog\include;C:\Users\pvros\source\repos\fltk\build;C:\Program Files\hamlib-w64-4.6~git\include;C:\Users\pvros\source\repos\fltk;C:\Users\pvros\source\repos\pthread-win32;C:\Users\pvros\Downloads\curl-8.9.1\curl-8.9.1\builds\libcurl-vc17-x64-release-dll-ipv6-sspi-schannel\include;C:\Users\pvros\source\repos\fltk\png;C:\Users\pvros\source\repos\fltk\zlib;C:\Users\pvros\source\repos\pvrose\zzatools\widgets\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\pvros\source\repos\pvrose\zzatools\zzalog\include;C:\Users\pvros\source\repos\fltk\build;C:\Program Files\hamlib-w64-4.6~git\include;C:\Users\pvros\source\repos\fltk;C:\Users\pvros\source\repos\pthread-win32;C:\Users\pvros\Downloads\curl-8.9.1\curl-8.9.1\builds\libcurl-vc17-x64-release-dll-ipv6-sspi-schannel\include;C:\Users\pvros\source\repos\fltk\png;C:\Users\pvros\source\repos\fltk\zlib</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>CURL_STATICLIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
@@ -154,12 +154,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="widgets\src\filename_input.cpp" />
     <ClCompile Include="zzalog\src\band_data.cpp" />
     <ClCompile Include="zzalog\src\calendar_input.cpp" />
     <ClCompile Include="zzalog\src\calendar_table.cpp" />
     <ClCompile Include="zzalog\src\config.cpp" />
     <ClCompile Include="zzalog\src\fields.cpp" />
+    <ClCompile Include="zzalog\src\filename_input.cpp" />
     <ClCompile Include="zzalog\src\font_dialog.cpp" />
     <ClCompile Include="zzalog\src\page_dialog.cpp" />
     <ClCompile Include="zzalog\src\password_input.cpp" />
@@ -255,9 +255,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="packages\pthreads.2.9.1.4\build\native\include\pthread.h" />
-    <ClInclude Include="widgets\include\button_input.h" />
-    <ClInclude Include="widgets\include\filename_input.h" />
     <ClInclude Include="zzalog\include\band_data.h" />
+    <ClInclude Include="zzalog\include\button_input.h" />
     <ClInclude Include="zzalog\include\calendar_input.h" />
     <ClInclude Include="zzalog\include\calendar_table.h" />
     <ClInclude Include="zzalog\include\callback.h" />
