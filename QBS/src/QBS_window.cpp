@@ -45,6 +45,10 @@ QBS_window::QBS_window(int W, int H, const char* L, const char* filename) :
 	// Now allow the data to be processed
 	data_->set_window(this);
 	callback(cb_close);
+	// If have data then load it
+	if (qbs_filename_.length()) {
+		cb_read_qbs(this, nullptr);
+	}
 }
 
 QBS_window::~QBS_window() {
