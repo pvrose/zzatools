@@ -13,6 +13,8 @@
 
 #include "FL/Fl_Preferences.H"
 
+class Fl_Input_Choice;
+
 using namespace std;
 
 // Data structures
@@ -207,6 +209,10 @@ public:
 
 	// Next batch ID
 	string next_batch();
+
+	// Populate call choice with extant callsigns
+	// TODO implement it in QBS_data.cpp
+	void populate_call_choice(Fl_Input_Choice* ch) {}
 	
 
 public:

@@ -43,7 +43,14 @@ enum command_t : char {
 enum process_mode_t {
 	INITIAL,                     // Initial
 	DORMANT,                     // Waiting to receive a batch
-	ACTIVE                       // Received a batch - allow dialogs
+	ACTIVE,                       // Received a batch - allow dialogs - Will be replaced by the below
+	SORTING,                     // Received cards - sorting into callsigns
+	PROCESSING,                  // Processing a callsigns cards - for posting, holding or pending disposal
+	POSTING,                     // Maerk cards destined forposting as posted
+	FINISHING,                   // Mark cards as pending disposal
+	RECYCLING,                   // Mark cards as having been disposed
+	EDITING,                     // Temporary pause to edit raw data
+	REPORTING,                   // Temporary pause to produce callsign or batch reports
 };
 
 enum reading_mode_t {

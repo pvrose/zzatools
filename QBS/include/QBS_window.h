@@ -55,6 +55,14 @@ public:
     // Open batch log
     void open_batch_log(string batch_name);
 
+    // TODO - these need to be fleshed out in QBS_window.cpp
+    // Get the current process
+    process_mode_t process() {}
+    // Push the process
+    void process(process_mode_t p) {}
+    // Pop the process - and return new process
+    process_mode_t pop_process() {}
+
 protected:
 
     // Close -
@@ -109,11 +117,24 @@ protected:
     // Populate batch choice
     void populate_batch(bool enable_change, bool add = false);
 
+public:
+    // Public variables
+
     // Various data items accessible by most classes
     Fl_Preferences settings_;
     QBS_data* data_;
     // Batch log
     ofstream* blog_file_;
+    // CSV file directory
+    string csv_directory_;
+    // QBS filename
+    string qbs_filename_;
+    // Selected box number
+    int selected_box_;
+    // Current callsign
+    string call_;   
+
+protected:
     // Log display scroll position
     int pos_batch_log_;
     // Pre-populate inputs with defaults
@@ -204,14 +225,7 @@ protected:
  
     // Command selection
     action_t action_;
-    // CSV file directory
-    string csv_directory_;
-    // QBS filename
-    string qbs_filename_;
-    // Selected box number
-    int selected_box_;
-    // Current callsign
-    string call_;
+
     // Batch operation finished - disables batch execute button
     bool batch_op_done_;
 };
