@@ -133,13 +133,14 @@ protected:
 	count_data received_box_;
 	count_data sent_box_;
 	count_data disposed_box_;
+	count_data all_boxes_;
 	// Raw data
 	vector<action_data*> actions_;
 
 	// Processing mode
 	process_mode_t mode_;
 	reading_mode_t reading_mode_;
-	action_t action_read_;
+	/*action_t*/ /*action_read_*/;
 
 	// Filename
 	string filename_;
@@ -189,8 +190,8 @@ public:
 	box_data* get_box(int box_num);
 	// Set window
 	void set_window(QBS_window* w);
-	// Get action
-	action_t get_action();
+	//// Get action
+	//action_t get_action();
 	// Get ham_info
 	notes* get_notes(string callsign);
 
@@ -210,10 +211,6 @@ public:
 	// Next batch ID
 	string next_batch();
 
-	// Populate call choice with extant callsigns
-	// TODO implement it in QBS_data.cpp
-	void populate_call_choice(Fl_Input_Choice* ch) {}
-	
 
 public:
 	// Start cards to box

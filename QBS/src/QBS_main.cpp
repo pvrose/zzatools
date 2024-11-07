@@ -12,7 +12,7 @@ using namespace std;
 
 const char* DATE_FORMAT = "%Y-%m-%d";
 extern int FL_NORMAL_SIZE;
-const char* VERSION = "1.0.13";
+const char* VERSION = "2.0.-1";
 // Main logo
 Fl_PNG_Image main_icon_("QBS_ICON", qbs_png, qbs_png_len);
 
@@ -22,7 +22,7 @@ QBS_window* window_;
 void create_window(string filename) {
 	char title[100];
 	snprintf(title, 100, "QBS - GM4-8 QSL Bureau status - %s (%s)", VERSION, __DATE__);
-	window_ = new QBS_window(10, 10, title, filename.c_str());
+	window_ = new QBS_window(400, 400, title, filename.c_str());
 	printf("%s\n", title);
 }
 
@@ -31,10 +31,10 @@ int main(int argc, char** argv)
 {	
 	// Change FL defaults
 	FL_NORMAL_SIZE = 11;
-	// Set dark mode
-	Fl::foreground(240, 240, 240);
-	Fl::background2(25, 25, 25);
-	Fl::background(0, 0, 0);
+	//// Set dark mode
+	//Fl::foreground(240, 240, 240);
+	//Fl::background2(25, 25, 25);
+	//Fl::background(0, 0, 0);
 
 	Fl_Window::default_icon(&main_icon_);
 

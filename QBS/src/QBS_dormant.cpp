@@ -7,13 +7,18 @@
 
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Input_Choice.H>
-#include <FL/Fl_Int_Input.H>
+#include <FL/Fl_Output.H>
 
-QBS_dormant::QBS_dormant(int X, int Y, int W, int H, const char* L = nullptr) :
+extern const char* DATE_FORMAT;
+
+QBS_dormant::QBS_dormant(int X, int Y, int W, int H, const char* L) :
 	Fl_Group(X, Y, W, H, L)
 {
 	win_ = ancestor_view<QBS_window>(this);
 	data_ = win_->data_;
+	callsign_ = "";
+	num_received_ = 0;
+	date_ = now(true, DATE_FORMAT);
 	create_form();
 }
 
@@ -21,37 +26,86 @@ QBS_dormant::~QBS_dormant()
 {}
 
 void QBS_dormant::create_form() {
-	int last_box = data_->get_current();
-	char l[128];
-	snprintf(l, sizeof(l), "DORMANT: Most recent batch %s", data_->get_batch(last_box).c_str());
-	copy_label(l);
 	align(FL_ALIGN_INSIDE | FL_ALIGN_LEFT | FL_ALIGN_TOP);
 	labelsize(FL_NORMAL_SIZE + 2);
 
 	int cx = x() + GAP;
-	int cy = y() + GAP;
+	int cy = y() + GAP + labelsize();
 
-	bn_receive_sase_ = new Fl_Button(cx, cy, WBUTTON, HBUTTON, "Receive SASEs");
-	bn_receive_sase_->callback(cb_receive_sases, nullptr);
-	bn_receive_sase_->tooltip("Received ");
+	bn_receive_card_ = new Fl_Button(cx, cy, 2 * WBUTTON, HBUTTON, "Rcv ad-hoc card");
+	bn_receive_card_->callback(cb_action, (void*)(intptr_t)process_mode_t::LOG_CARD);
+	bn_receive_card_->tooltip("Select to add a card received outwith a batch");
 
+	cy += HBUTTON;
 
+	bn_receive_sase_ = new Fl_Button(cx, cy, 2 * WBUTTON, HBUTTON, "Receive SASEs");
+	bn_receive_sase_->callback(cb_action, (void*)(intptr_t)process_mode_t::LOG_SASE);
+	bn_receive_sase_->tooltip("Select to add received SASEs");
+
+	cy += HBUTTON;
+
+	bn_new_batch_ = new Fl_Button(cx, cy, 2 * WBUTTON, HBUTTON, "New Batch");
+	bn_new_batch_->callback(cb_action, (void*)(intptr_t)process_mode_t::LOG_BATCH);
+	bn_new_batch_->tooltip("Select to record the receipt of a new batch of cards - goes to SORTING");
+
+	cx += 2 * WBUTTON + GAP;
+	op_new_batch_ = new Fl_Output(cx, cy, WBUTTON, HBUTTON);
+	op_new_batch_->color(FL_BACKGROUND_COLOR);
+	op_new_batch_->box(FL_FLAT_BOX);
+
+	cx = x() + GAP;
+	cy += HBUTTON;
+
+	bn_recycle_ = new Fl_Button(cx, cy, 2 * WBUTTON, HBUTTON, "Recycle");
+	bn_recycle_->callback(cb_action, (void*)(intptr_t)process_mode_t::RECYCLING);
+	bn_recycle_->tooltip("Select to record the recycling of the oldest batch of cards - goes to RECYCLING");
+
+	cx += 2 * WBUTTON + GAP;
+	op_recycle_ = new Fl_Output(cx, cy, WBUTTON, HBUTTON);
+	op_recycle_->color(FL_BACKGROUND_COLOR);
+	op_recycle_->box(FL_FLAT_BOX);
+
+	cx = x() + GAP;
+	cy += HBUTTON;
+
+	bn_edit_ = new Fl_Button(cx, cy, 2 * WBUTTON, HBUTTON, "Edit data");
+	bn_edit_->callback(cb_action, (void*)(intptr_t)process_mode_t::EDITING);
+	bn_edit_->tooltip("Select to open a spreadsheet to edit a specific calls data");
+
+	cy += HBUTTON;
+
+	bn_reports_ = new Fl_Button(cx, cy, 2 * WBUTTON, HBUTTON, "Reports");
+	bn_reports_->callback(cb_action, (void*)(intptr_t)process_mode_t::REPORTING);
+	bn_reports_->tooltip("Select to display various reports");
+
+	end();
+	show();
 }
-void enable_widgets();
 
-// Callback - Receive QSL
-static void cb_receive_qsl(Fl_Widget* w, void* v);
+void QBS_dormant::enable_widgets() {
+	// Set the label with the current batch name
+	int last_box = data_->get_current();
+	if (last_box >= 0) {
+		current_ = data_->get_batch(last_box);
+		next_ = data_->get_batch(last_box + 1);
+		head_ = data_->get_batch(data_->get_head());
+		char l[128];
+		snprintf(l, sizeof(l), "DORMANT: Most recent batch %s", current_.c_str());
+		copy_label(l);
+		// Set the note against new box with the names of that new box
+		op_new_batch_->value(next_.c_str());
+		// Set the note against recycle with the name of the batch being recycled
+		op_recycle_->value(head_.c_str());
+	}
+}
+
+
 // Callback - Receive SASEs
-static void cb_receive_sases(Fl_Widget* w, void* v);
-// Callback - New Batch
-static void cb_new_batch(Fl_Widget* w, void* v);
-// Callback - Recycle
-static void cb_recycle(Fl_Widget* w, void* v);
-// Callback - Edit
-static void cb_edit(Fl_Widget* w, void* v);
-// Callback - Reports
-static void cb_reports(Fl_Widget* w, void* v);
-// callback - callsign input
-static void cb_callsign(Fl_Widget* w, void* v);
-// callback - numeric input
+void QBS_dormant::cb_action(Fl_Widget* w, void* v) {
+	QBS_dormant* that = ancestor_view<QBS_dormant>(w);
+	that->win_->process((process_mode_t)(intptr_t)v);
+}
+
+
+
 

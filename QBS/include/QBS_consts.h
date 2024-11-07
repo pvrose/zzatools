@@ -43,7 +43,9 @@ enum command_t : char {
 enum process_mode_t {
 	INITIAL,                     // Initial
 	DORMANT,                     // Waiting to receive a batch
-	ACTIVE,                       // Received a batch - allow dialogs - Will be replaced by the below
+	LOG_CARD,                    // Log cards received ad-hoc
+	LOG_SASE,                    // Log SASEs received
+	LOG_BATCH,                   // Log new batch received
 	SORTING,                     // Received cards - sorting into callsigns
 	PROCESSING,                  // Processing a callsigns cards - for posting, holding or pending disposal
 	POSTING,                     // Maerk cards destined forposting as posted
@@ -59,25 +61,25 @@ enum reading_mode_t {
 	WRITING
 };
 
-enum action_t {
-	NONE = 0,                    // No action
-	NEW_BATCH,                   // Receive a new batch of cards (from bureau)
-	SORT_CARDS,                  // Receive cards per batch
-	RECEIVE_CARD,                // Receive individual cards 
-	RECEIVE_SASE,                // Receive envelopes
-	STUFF_CARDS,                 // stuff envelopes
-	KEEP_CARDS,                  // Keep cards for next batch
-	DISPOSE_CARDS,               // Mark cards for recycling
-	POST_CARDS,                  // Post stuffed envelopes
-	RECYCLE_CARDS,               // Recycle cards
-	DISPOSE_SASE,                // Recycle envelopes
-	SUMMARY_BATCH,               // Produce batch summary report
-	LIST_BATCH,                  // Produce batch listing
-	SUMMARY_CALL,                // Produce call summary Sreport
-	HISTORY_CALL,                // Produce call history report
-	EDIT_NOTES,                  // Edit notes for call
-	CORRECT_DATA,                // Allow correction of active card counts
-};
+//enum action_t {
+//	NONE = 0,                    // No action
+//	NEW_BATCH,                   // Receive a new batch of cards (from bureau)
+//	SORT_CARDS,                  // Receive cards per batch
+//	RECEIVE_CARD,                // Receive individual cards 
+//	RECEIVE_SASE,                // Receive envelopes
+//	STUFF_CARDS,                 // stuff envelopes
+//	KEEP_CARDS,                  // Keep cards for next batch
+//	DISPOSE_CARDS,               // Mark cards for recycling
+//	POST_CARDS,                  // Post stuffed envelopes
+//	RECYCLE_CARDS,               // Recycle cards
+//	DISPOSE_SASE,                // Recycle envelopes
+//	SUMMARY_BATCH,               // Produce batch summary report
+//	LIST_BATCH,                  // Produce batch listing
+//	SUMMARY_CALL,                // Produce call summary Sreport
+//	HISTORY_CALL,                // Produce call history report
+//	EDIT_NOTES,                  // Edit notes for call
+//	CORRECT_DATA,                // Allow correction of active card counts
+//};
 
 enum navigate_t {
 	PREV_FIRST,         // Go to beginning

@@ -27,7 +27,7 @@ QBS_data::QBS_data()
 	head_ = -1;
 	mode_ = INITIAL;
 	reading_mode_ = IMPORT;
-	action_read_ = NONE;
+	//action_read_ = NONE;
 	window_ = nullptr;
 	reporter_ = new QBS_reporter(300, 300, "Report window");
 	reporter_->hide();
@@ -67,6 +67,7 @@ int QBS_data::receive_cards(
 	int value                   // num of cards
 ) {
 	received_box_[call] += value;
+	all_boxes_[call] += value;
 	// Check box number valid
 	if (box_num != IN_BOX && box_num != boxes_.size() - 1) {
 		char message[100];
@@ -77,12 +78,14 @@ int QBS_data::receive_cards(
 	}
 	else {
 		if (box_num == IN_BOX) {
-			action_read_ = RECEIVE_CARD;
+			mode_ = LOG_CARD;
+			//action_read_ = RECEIVE_CARD;
 			// Add cards to in-box
 			in_box_[call] += value;
 		}
 		else {
-			action_read_ = SORT_CARDS;
+			mode_ = SORTING;
+			//action_read_ = SORT_CARDS;
 			// Initialisation of diposal queue
 			if (box_num == 1) {
 				tail_ = 1;
@@ -115,8 +118,8 @@ int QBS_data::new_batch(
 	string date,                // date created
 	string batch                // batch "name" - e.g. "2022 Q4"
 ) {
-	mode_ = ACTIVE;
-	action_read_ = NEW_BATCH;
+	mode_ = LOG_BATCH;
+	//action_read_ = NEW_BATCH;
 	// Check if box number is valid
 	if (box_num != boxes_.size()) {
 		char message[100];
@@ -145,7 +148,8 @@ int QBS_data::receive_sases(
 	int value                   // num of envelopes
 ) {
 	if (value < 0) {
-		action_read_ = DISPOSE_SASE;
+		mode_ = LOG_SASE;
+		//action_read_ = DISPOSE_SASE;
 		// Deleting envelopes
 		int avail = sases_[call];
 		if (avail < value) {
@@ -164,7 +168,8 @@ int QBS_data::receive_sases(
 		}
 	}
 	else {
-		action_read_ = RECEIVE_SASE;
+		mode_ = LOG_SASE;
+		//action_read_ = RECEIVE_SASE;
 		// Adding envelopes
 		sases_[call] += value;
 		log_action(SASES, -1, date, call, value, 0);
@@ -215,7 +220,8 @@ int QBS_data::stuff_cards(
 		out_box_[call] += sent;
 	}
 	else if (box_num < (signed)boxes_.size() && box_num >= head_) {
-		action_read_ = STUFF_CARDS;
+		mode_ = PROCESSING;
+		//action_read_ = STUFF_CARDS;
 		// Sending box number 
 		box_data& box = *boxes_[box_num];
 		sent = (*box.counts)[call];
@@ -317,7 +323,8 @@ int QBS_data::keep_cards(
 int QBS_data::post_cards(
 	string date                 // date actioned
 ) {
-	action_read_ = POST_CARDS;
+	mode_ = POSTING;
+	//action_read_ = POST_CARDS;
 	int box_num = (int)boxes_.size() - 1;
 	box_data& box = *boxes_[box_num];
 	int cards = 0;
@@ -334,8 +341,8 @@ int QBS_data::post_cards(
 int QBS_data::dispose_cards(
 	string date                 // date actioned
 ) {
-	mode_ = DORMANT;
-	action_read_ = DISPOSE_CARDS;
+	mode_ = FINISHING;
+	//action_read_ = DISPOSE_CARDS;
 	window_->update_actions();
 	int nbox = (int)boxes_.size() - 1;
 	box_data& box = *boxes_[nbox];
@@ -361,7 +368,8 @@ int QBS_data::recycle_cards(
 	string date,                // date actioned
 	float weight                // weight of cards
 ) {
-	action_read_ = RECYCLE_CARDS;
+	mode_ = RECYCLING;
+	//action_read_ = RECYCLE_CARDS;
 	int cards = 0;
 	int calls = 0;
 	box_data& box = *boxes_[head_];
@@ -601,16 +609,22 @@ int QBS_data::get_head() {
 
 // Get batch name for box_number
 string QBS_data::get_batch(int box_num) {
-	if (box_num < 0 || box_num >= (signed)boxes_.size()) {
-		if (box_num == (signed)boxes_.size()) {
-			return next_batch();
-		}
-		else {
-			return "Invalid";
+	if (box_num < 0) {
+		switch (box_num) {
+		case IN_BOX: return "In-box";
+		case OUT_BOX: return "Out-box";
+		case KEEP_BOX: return "Keep";
+		case SASE_BOX: return "SASE";
+		default: return "Invalid";
 		}
 	}
-	else {
+	else if (box_num < (signed)boxes_.size()) {
 		return boxes_[box_num]->id;
+	} else if (box_num == (signed)boxes_.size()) {
+		return next_batch();
+	}
+	else {
+		return "Invalid";
 	}
 }
 
@@ -625,6 +639,7 @@ count_data* QBS_data::get_count_data(int box_num) {
 		case OUT_BOX: return &out_box_;
 		case KEEP_BOX: return &keep_box_;
 		case SASE_BOX: return &sases_;
+		case RCVD_ALL: return &all_boxes_;
 		default: return nullptr;
 		}
 	}
@@ -640,17 +655,17 @@ count_data* QBS_data::get_count_data(int box_num) {
 string QBS_data::get_next_call(int box_num, string call) {
 	count_data* calls = get_count_data(box_num);;
 	if (calls == nullptr || calls->size() == 0) {
-		return call;
+		return "";
 	} else {
 		auto it = calls->find(call);
 		if (it == calls->end()) {
-			it = calls->begin();
+			return "";
 		}
 		else {
 			it++;
 		}
 		if (it == calls->end()) {
-			return call;
+			return "";
 		}
 		else {
 			return (*it).first;
@@ -731,8 +746,8 @@ notes* QBS_data::get_notes(string callsign) {
 void QBS_data::set_window(QBS_window* w) {
 	window_ = w;
 	window_->update_actions();
-	window_->update_import(0);
-	window_->update_qbs(0);
+	//window_->update_import(0);
+	//window_->update_qbs(0);
 }
 
 // Load CSV files
@@ -1136,24 +1151,29 @@ void QBS_data::trace_boxes(ostream& os) {
 // Calculate the next batch
 string QBS_data::next_batch() {
 	string batch = get_batch(get_current());
-	int year = stoi(batch.substr(0, 4));
-	int qtr = stoi(batch.substr(6, 1));
-	if (qtr >= 4) {
-		qtr = 1;
-		year++;
+	if (batch != "Invalid") {
+		int year = stoi(batch.substr(0, 4));
+		int qtr = stoi(batch.substr(6, 1));
+		if (qtr >= 4) {
+			qtr = 1;
+			year++;
+		}
+		else {
+			qtr++;
+		}
+		char temp[10];
+		snprintf(temp, 10, "%4d Q%1d", year, qtr);
+		return string(temp);
 	}
 	else {
-		qtr++;
+		return batch;
 	}
-	char temp[10];
-	snprintf(temp, 10, "%4d Q%1d", year, qtr);
-	return string(temp);
 }
 
-// Get the reading action
-action_t QBS_data::get_action() {
-	return action_read_;
-}
+//// Get the reading action
+//action_t QBS_data::get_action() {
+//	return action_read_;
+//}
 
 // Display the batch summary
 void QBS_data::display_batch_summary(int box_num) {

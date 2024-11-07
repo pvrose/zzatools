@@ -36,16 +36,16 @@ bool QBS_import::load_data(QBS_data* data, const char* directory) {
 	const int NUM_FILES = 3;
 	bool ok = true;
 
-	data_->window()->update_import(1);
+	//data_->window()->update_import(1);
 
 	ok &= read_batches();
-	data_->window()->update_import(1.25F);
+	//data_->window()->update_import(1.25F);
 	ok &= read_card_data();
-	data_->window()->update_import(1.50F);
+	//data_->window()->update_import(1.50F);
 	ok &= read_sase_data();
-	data_->window()->update_import(1.75F);
+	//data_->window()->update_import(1.75F);
 	ok &= copy_data();
-	data_->window()->update_import(2.00F);
+	//data_->window()->update_import(2.00F);
 	return ok;
 }
 

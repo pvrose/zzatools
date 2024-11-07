@@ -1,5 +1,5 @@
 #pragma once
-#include <FL\Fl_Group.H>
+#include <FL/Fl_Group.H>
 
 // Forward declarations
 class QBS_window;

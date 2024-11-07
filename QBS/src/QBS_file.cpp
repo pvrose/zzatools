@@ -1,10 +1,11 @@
 #include "QBS_file.h"
+#include "QBS_data.h"
 #include "QBS_window.h"
 
 #include "filename_input.h"
 #include "utils.h"
 
-QBS_file::QBS_file(int X, int Y, int W, int H, const char* L = nullptr) :
+QBS_file::QBS_file(int X, int Y, int W, int H, const char* L) :
     Fl_Group(X, Y, W, H, L)
 {
     win_ = ancestor_view<QBS_window>(this);
@@ -82,4 +83,5 @@ void QBS_file::cb_read(Fl_Widget* w, void* v) {
     QBS_file* that = ancestor_view<QBS_file>(w);
     that->win_->process(DORMANT);
 }
+
 

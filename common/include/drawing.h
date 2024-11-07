@@ -47,7 +47,7 @@ const int ROW_HEIGHT = DEFAULT_SIZE + 4;    // Default height for table rows
 	const Fl_Color COLOUR_MAUVE = 212;       /* R-4/4, B=3/4, G=4/7 */
 	const Fl_Color COLOUR_NAVY = 136;        /* R=0/4, B=2/4, G=0/7 */
 	const Fl_Color COLOUR_CLARET = 80;     /* R=3/4, B=0/4, G=0/4 */
-	const Fl_Color COLOUR_GREY = fl_color_average(FL_FOREGROUND_COLOR, FL_BACKGROUND_COLOR, 0.33);
+	const Fl_Color COLOUR_GREY = fl_color_average(FL_FOREGROUND_COLOR, FL_BACKGROUND_COLOR, 0.33F);
 
 
 	// the various views and data objects
