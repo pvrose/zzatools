@@ -74,9 +74,15 @@ void QBS_dormant::create_form() {
 
 	cy += HBUTTON;
 
-	bn_reports_ = new Fl_Button(cx, cy, 2 * WBUTTON, HBUTTON, "Reports");
-	bn_reports_->callback(cb_action, (void*)(intptr_t)process_mode_t::REPORTING);
-	bn_reports_->tooltip("Select to display various reports");
+	bn_batch_summary_ = new Fl_Button(cx, cy, 2 * WBUTTON, HBUTTON, "Batch summary");
+	bn_batch_summary_->callback(cb_action, (void*)(intptr_t)process_mode_t::BATCH_SUMMARY);
+	bn_batch_summary_->tooltip("Select to display the batch summary");
+
+	cy += HBUTTON;
+
+	bn_batch_report_ = new Fl_Button(cx, cy, 2 * WBUTTON, HBUTTON, "Batch report");
+	bn_batch_report_->callback(cb_action, (void*)(intptr_t)process_mode_t::BATCH_REPORT);
+	bn_batch_report_->tooltip("Select to display the full batch report");
 
 	end();
 	show();

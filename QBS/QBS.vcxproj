@@ -122,7 +122,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS,_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>C:\Users\pvros\source\repos\pvrose\zzatools\QBS\include;C:\Users\pvros\source\repos\fltk;C:\Users\pvros\source\repos\fltk\build;C:\Users\pvros\source\repos\pvrose\zzatools\common\include;C:\Users\pvros\source\repos\pvrose\zzatools\widgets\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
@@ -168,6 +168,7 @@
     <ClInclude Include="include\QBS_logo.h" />
     <ClInclude Include="include\QBS_notes.h" />
     <ClInclude Include="include\QBS_reporter.h" />
+    <ClInclude Include="include\QBS_top20.h" />
     <ClInclude Include="include\QBS_window.h" />
   </ItemGroup>
   <ItemGroup>
@@ -185,6 +186,7 @@
     <ClCompile Include="src\QBS_main.cpp" />
     <ClCompile Include="src\QBS_notes.cpp" />
     <ClCompile Include="src\QBS_reporter.cpp" />
+    <ClCompile Include="src\QBS_top20.cpp" />
     <ClCompile Include="src\QBS_window.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

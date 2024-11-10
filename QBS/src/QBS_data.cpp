@@ -620,7 +620,7 @@ string QBS_data::get_batch(int box_num) {
 	}
 	else if (box_num < (signed)boxes_.size()) {
 		return boxes_[box_num]->id;
-	} else if (box_num == (signed)boxes_.size()) {
+	} else if (box_num == (signed)boxes_.size() && box_num != 0) {
 		return next_batch();
 	}
 	else {

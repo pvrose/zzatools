@@ -116,10 +116,13 @@ void QBS_window::create_form() {
 	spells_[FINISHING] = g_batch_;
 	spells_[RECYCLING] = g_batch_;
 	spells_[LOG_BATCH] = g_batch_;
+	spells_[BATCH_SUMMARY] = g_batch_;
 
 	// TODO: Implement these spells
 	spells_[EDITING] = nullptr;
-	spells_[REPORTING] = nullptr;
+	spells_[BATCH_REPORT] = nullptr;
+	spells_[CALL_SUMMARY] = nullptr;
+	spells_[CALL_HISTORY] = nullptr;
 
 	//g_input_ = new Fl_Group(curr_x, curr_y, 1000, 1000, "Data input");
 	//g_input_->align(FL_ALIGN_TOP | FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
@@ -1630,6 +1633,7 @@ bool QBS_window::read_qbs() {
 	if (data_->read_qbs(qbs_filename_)) {
 		reading_ = false;
 		update_actions();
+		g_batch_->populate_batch_choice();
 		show_process();
 		return true;
 	}
@@ -1988,6 +1992,7 @@ process_mode_t QBS_window::process() {
 // Push the proces
 void QBS_window::process(process_mode_t p) {
 	stack_.push(p);
+	g_batch_->initialise();
 	show_process();
 }
 

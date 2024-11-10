@@ -48,9 +48,10 @@ protected:
     Fl_Button* bn_recycle_;
     Fl_Output* op_recycle_;
     Fl_Button* bn_edit_;
-    Fl_Button* bn_reports_;
-
-
+    Fl_Button* bn_batch_summary_;
+    Fl_Button* bn_batch_report_;
+    Fl_Button* bn_call_summary_;
+    Fl_Button* bn_call_history_;
 
 };
 

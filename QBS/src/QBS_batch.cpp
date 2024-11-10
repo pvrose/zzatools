@@ -1,5 +1,6 @@
 #include "QBS_batch.h"
 #include "QBS_data.h"
+#include "QBS_top20.h"
 #include "QBS_window.h"
 
 #include "utils.h"
@@ -17,6 +18,7 @@ QBS_batch::QBS_batch(int X, int Y, int W, int H, const char* L) :
 	win_ = ancestor_view<QBS_window>(this);
 	data_ = win_->data_;
 	date_ = now(true, DATE_FORMAT);
+	executed_ = false;
 
 	create_form();
 	enable_widgets();
@@ -34,6 +36,15 @@ void QBS_batch::create_form() {
 
 	int cx = x() + GAP;
 	int cy = y() + GAP + labelsize();
+
+	ch_batch_ = new Fl_Input_Choice(cx + WLABEL, cy, WSMEDIT, HBUTTON, "Batch");
+	ch_batch_->align(FL_ALIGN_LEFT);
+	ch_batch_->callback(cb_batch, &box_);
+	ch_batch_->tooltip("Select the batch to report on - disabled if not report");
+	populate_batch_choice();
+
+	cy += HBUTTON + GAP;
+
 	int sy = cy;
 
 	// Batch information
@@ -51,6 +62,10 @@ void QBS_batch::create_form() {
 	cy += HBUTTON;
 	Fl_Box* b4 = new Fl_Box(cx, cy, WLABEL, HBUTTON, "Recycled");
 	b4->box(FL_FLAT_BOX);
+
+	cy += HBUTTON;
+	Fl_Box* b41 = new Fl_Box(cx, cy, WLABEL, HBUTTON, "Held");
+	b41->box(FL_FLAT_BOX);
 
 	int my = cy + HBUTTON;
 
@@ -73,6 +88,12 @@ void QBS_batch::create_form() {
 	op_rcyc_calls_ = new Fl_Output(cx, cy, WBUTTON, HBUTTON);
 	op_rcyc_calls_->tooltip("The number of calls in the cards recycled");
 
+	cy += HBUTTON;
+	op_held_calls_ = new Fl_Output(cx, cy, WBUTTON, HBUTTON);
+	op_held_calls_->tooltip("The number of calls in the cards being held");
+
+	my = max(my, cy + HBUTTON);
+
 	cy = sy;
 	cx += WBUTTON;
 	Fl_Box* b6 = new Fl_Box(cx, cy, WBUTTON, HBUTTON, "Cards");
@@ -90,11 +111,44 @@ void QBS_batch::create_form() {
 	op_rcyc_cards_ = new Fl_Output(cx, cy, WBUTTON, HBUTTON);
 	op_rcyc_cards_->tooltip("The number of cards recycled");
 
-	cy += HBUTTON + GAP;
+	cy += HBUTTON;
+	op_held_cards_ = new Fl_Output(cx, cy, WBUTTON, HBUTTON);
+	op_held_cards_->tooltip("The number of cards being held");
+
+	my = max(my, cy + HBUTTON);
+
+	cy = sy;
+	cx += WBUTTON;
+	Fl_Box* b61 = new Fl_Box(cx, cy, WBUTTON, HBUTTON, "Date");
+	b5->box(FL_FLAT_BOX);
+
+	cy += HBUTTON;
+	op_rcvd_date_ = new Fl_Output(cx, cy, WBUTTON, HBUTTON);
+	op_rcvd_date_->tooltip("The date cards received");
+
+	cy += HBUTTON;
+	op_sent_date_ = new Fl_Output(cx, cy, WBUTTON, HBUTTON);
+	op_sent_date_->tooltip("The date the catds sent");
+
+	cy += HBUTTON;
+	op_rcyc_date_ = new Fl_Output(cx, cy, WBUTTON, HBUTTON);
+	op_rcyc_date_->tooltip("The date the cards recycled");
+
+	cy = my + GAP;
 	cx = sx;
 	ip_weight_ = new Fl_Float_Input(cx, cy, WBUTTON, HBUTTON, "Weight");
 	ip_weight_->align(FL_ALIGN_LEFT);
+	ip_weight_->callback(cb_value_float<Fl_Float_Input>, &weight_);
 	ip_weight_->tooltip("Enter the weight of cards (in kg) being recycled");
+
+	cy += HBUTTON + GAP;
+
+	int htab = y() + h() - cy - HBUTTON - GAP;
+	int wtab = x() + w() - cx - GAP;
+	tab_top20_ = new QBS_top20(cx, cy, wtab, htab, "TOP 20 Recycled");
+	tab_top20_->align(FL_ALIGN_TOP);
+	tab_top20_->tooltip("Displays the top 20 culprits for recycling");
+	tab_top20_->data(data_);
 
 	cx = x() + w() - GAP - (3 * WBUTTON);
 	cy = y() + h() - GAP - HBUTTON;
@@ -111,9 +165,9 @@ void QBS_batch::create_form() {
 
 	cx += WBUTTON;
 
-	bn_done_ = new Fl_Button(cx, cy, WBUTTON, HBUTTON, "Done");
-	bn_done_->callback(cb_done, nullptr);
-	bn_done_->tooltip("Mark action done, and proceed to next action");
+	bn_next_ = new Fl_Button(cx, cy, WBUTTON, HBUTTON, "Next");
+	bn_next_->callback(cb_next, nullptr);
+	bn_next_->tooltip("Proceed to next action");
 
 	end();
 	show();
@@ -121,25 +175,24 @@ void QBS_batch::create_form() {
 
 void QBS_batch::enable_widgets() {
 	// Set the label
-	int last_box = data_->get_current();
-	if (last_box >= 0) {
-		string last_batch = data_->get_batch(last_box);
-		string next_batch = data_->get_batch(last_box + 1);
-		int head_box = data_->get_head();
-		string head_batch = data_->get_batch(head_box);
+	if (box_ >= 0) {
+		string batch = data_->get_batch(box_);
 		char l[128];
 		switch (win_->process()) {
 		case process_mode_t::POSTING:
-			snprintf(l, sizeof(l), "POSTING: Batch %s", last_batch.c_str());
+			snprintf(l, sizeof(l), "POSTING: Batch %s", batch.c_str());
 			break;
 		case process_mode_t::FINISHING:
-			snprintf(l, sizeof(l), "FINISHING: Mark batch %s for disposal", last_batch.c_str());
+			snprintf(l, sizeof(l), "FINISHING: Mark batch %s for disposal", batch.c_str());
 			break;
 		case process_mode_t::RECYCLING:
-			snprintf(l, sizeof(l), "RECYCLING: Rrecycling batch %s cards", head_batch.c_str());
+			snprintf(l, sizeof(l), "RECYCLING: Rrecycling batch %s cards", batch.c_str());
 			break;
 		case process_mode_t::LOG_BATCH:
-			snprintf(l, sizeof(l), "NEW BATCH: Create new batch %s", next_batch.c_str());
+			snprintf(l, sizeof(l), "NEW BATCH: Create new batch %s", batch.c_str());
+			break;
+		case process_mode_t::BATCH_SUMMARY:
+			snprintf(l, sizeof(l), "BATCH SUMMARY: Batch #%d - %s", box_, batch.c_str());
 			break;
 		default:
 			snprintf(l, sizeof(l), "INVALID: Not a valid mode for this dialog");
@@ -157,23 +210,73 @@ void QBS_batch::enable_widgets() {
 		}
 		// Batch info
 		recycle_data info;
-		switch (win_->process()) {
-		case process_mode_t::POSTING:
-		case process_mode_t::FINISHING:
-			info = data_->get_recycle_data(last_box);
-			break;
-		case process_mode_t::RECYCLING:
-			info = data_->get_recycle_data(head_box);
-			break;
-		case process_mode_t::LOG_BATCH:
-			break;
+		box_data* box_data = nullptr;
+		if (box_ >= 0) {
+			info = data_->get_recycle_data(box_);
+			box_data = data_->get_box(box_);
 		}
+
 		op_rcvd_calls_->value(info.count_received);
 		op_sent_calls_->value(info.count_sent);
 		op_rcyc_calls_->value(info.count_recycled);
+		op_held_calls_->value(info.count_received - info.count_sent - info.count_recycled);
 		op_rcvd_cards_->value(info.sum_received);
 		op_sent_cards_->value(info.sum_sent);
 		op_rcyc_cards_->value(info.sum_recycled);
+		op_held_cards_->value(info.sum_received - info.sum_sent - info.sum_recycled);
+		if (box_data) {
+			op_rcvd_date_->value(box_data->date_received.c_str());
+			op_sent_date_->value(box_data->date_sent.c_str());
+			op_rcyc_date_->value(box_data->date_recycled.c_str());
+		}
+		else {
+			op_rcvd_date_->value("");
+			op_sent_date_->value("");
+			op_rcyc_date_->value("");
+		}
+		switch (win_->process()) {
+		case RECYCLING:
+			tab_top20_->activate();
+			tab_top20_->box(box_);
+			ch_batch_->deactivate();
+			break;
+		case BATCH_SUMMARY:
+			tab_top20_->activate();
+			tab_top20_->box(box_);
+			ch_batch_->activate();
+			ch_batch_->value(box_);
+			break;
+		default:
+			tab_top20_->deactivate();
+			ch_batch_->deactivate();
+			break;
+		}
+		if (executed_) {
+			bn_execute_->deactivate();
+		}
+		else {
+			bn_execute_->activate();
+		}
+	}
+}
+
+// Initialise the widget
+void QBS_batch::initialise() {
+	executed_ = false;
+	switch (win_->process()) {
+	case process_mode_t:: POSTING:
+	case process_mode_t::FINISHING:
+		box_ = data_->get_current();
+		break;
+	case process_mode_t::RECYCLING:
+		box_ = data_->get_head();
+		break;
+	case process_mode_t::LOG_BATCH:
+		box_ = data_->get_current() + 1;
+		break;
+	case process_mode_t::BATCH_SUMMARY:
+		box_ = 0;
+		break;
 	}
 }
 
@@ -199,10 +302,12 @@ void QBS_batch::cb_execute(Fl_Widget* w, void* v) {
 	case process_mode_t::LOG_BATCH:
 		that->execute_new();
 		break;
+	case process_mode_t::BATCH_SUMMARY:
+		that->enable_widgets();
 	}
 }
 
-void QBS_batch::cb_done(Fl_Widget* w, void* v) {
+void QBS_batch::cb_next(Fl_Widget* w, void* v) {
 	QBS_batch* that = ancestor_view<QBS_batch>(w);
 	switch (that->win_->process()) {
 	case process_mode_t::POSTING:
@@ -210,6 +315,7 @@ void QBS_batch::cb_done(Fl_Widget* w, void* v) {
 		break;
 	case process_mode_t::FINISHING:
 	case process_mode_t::RECYCLING:
+	case process_mode_t::BATCH_SUMMARY:
 		that->win_->process(process_mode_t::DORMANT);
 		break;
 	case process_mode_t::LOG_BATCH:
@@ -218,17 +324,23 @@ void QBS_batch::cb_done(Fl_Widget* w, void* v) {
 	}
 }
 
+void QBS_batch::cb_batch(Fl_Widget* w, void* v) {
+	QBS_batch* that = ancestor_view<QBS_batch>(w);
+	*(int*)v = ((Fl_Input_Choice*)w)->menubutton()->value();
+	that->enable_widgets();
+}
+
 void QBS_batch::execute_new() {
-	int current = data_->get_current();
-	string batch = data_->get_batch(current + 1);
-	string old_batch = data_->get_batch(current);
+	string batch = data_->get_batch(box_);
+	string old_batch = data_->get_batch(box_ - 1);
 	char log_msg[128];
-	data_->new_batch(current + 1, date_, batch);
+	data_->new_batch(box_, date_, batch);
 	snprintf(log_msg, sizeof(log_msg), "Closing batch %s: %s\n", old_batch.c_str(), date_.c_str());
 	win_->append_batch_log(log_msg);
 	win_->open_batch_log(batch);
 	snprintf(log_msg, sizeof(log_msg), "New batch %s: %s\n", batch.c_str(), date_.c_str());
 	win_->append_batch_log(log_msg);
+	executed_ = true;
 	enable_widgets();
 }
 
@@ -241,6 +353,7 @@ void QBS_batch::execute_recycle() {
 	data_->recycle_cards(date_, weight_);
 	snprintf(log_msg, sizeof(log_msg), "Recycling batch: %g kg %s\n", weight_, date_.c_str());
 	win_->append_batch_log(log_msg);
+	executed_ = true;
 	enable_widgets();
 }
 
@@ -249,6 +362,7 @@ void QBS_batch::execute_post() {
 	data_->post_cards(date_);
 	snprintf(log_msg, sizeof(log_msg), "Posting batch: %s\n", date_.c_str());
 	win_->append_batch_log(log_msg);
+	executed_ = true;
 	enable_widgets();
 }
 
@@ -257,5 +371,14 @@ void QBS_batch::execute_finish() {
 	data_->dispose_cards(date_);
 	snprintf(log_msg, sizeof(log_msg), "Marking batch for disposal: %s\n", date_.c_str());
 	win_->append_batch_log(log_msg);
+	executed_ = true;
+	enable_widgets();
 }
 
+void QBS_batch::populate_batch_choice() {
+	ch_batch_->clear();
+	int last_box = data_->get_current();
+	for (int b = 0; b <= last_box; b++) {
+		ch_batch_->add(data_->get_batch(b).c_str());
+	}
+}
