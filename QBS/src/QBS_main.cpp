@@ -31,10 +31,6 @@ int main(int argc, char** argv)
 {	
 	// Change FL defaults
 	FL_NORMAL_SIZE = 11;
-	//// Set dark mode
-	//Fl::foreground(240, 240, 240);
-	//Fl::background2(25, 25, 25);
-	//Fl::background(0, 0, 0);
 
 	Fl_Window::default_icon(&main_icon_);
 

@@ -311,12 +311,6 @@ public:
 	// Trace boxes
 	void trace_boxes(ostream& os);
 
-	//// Display batch summary
-	//void display_batch_summary(int box_num);
-	//void display_batch_listing(int box_num);
-	//void display_call_summary(string call);
-	//void display_call_history(string call);
-
 protected:
 	// Prepare disposal report
 	void evaluate_top20(

@@ -72,9 +72,6 @@ void QBS_charth::update(string call) {
 		if (box_name.substr(5, 2) == "Q1") {
 			label = box_name.substr(2, 2);
 		}
-		//else {
-		//	label = box_name.substr(5, 2);
-		//}
 		box_data* box = data_->get_box(b);
 		// Add received data
 		int rcvd = 0;

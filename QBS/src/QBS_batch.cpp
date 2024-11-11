@@ -302,6 +302,7 @@ void QBS_batch::initialise() {
 // Go back to previous process
 void QBS_batch::cb_back(Fl_Widget* w, void* v) {
 	QBS_batch* that = ancestor_view<QBS_batch>(w);
+	that->box_ = 0;
 	that->win_->pop_process();
 }
 
