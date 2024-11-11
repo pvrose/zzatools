@@ -4,6 +4,7 @@
 
 #include <FL/Fl_Group.H>
 
+class QBS_breport;
 class QBS_data;
 class QBS_top20;
 class QBS_window;
@@ -65,6 +66,7 @@ protected:
     Fl_Float_Input* ip_weight_;
 
     QBS_top20* tab_top20_;
+    QBS_breport* tab_report_;
 
     Fl_Button* bn_back_;
     Fl_Button* bn_execute_;

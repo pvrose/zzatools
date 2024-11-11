@@ -1,4 +1,5 @@
 #include "QBS_batch.h"
+#include "QBS_breport.h"
 #include "QBS_data.h"
 #include "QBS_top20.h"
 #include "QBS_window.h"
@@ -119,19 +120,19 @@ void QBS_batch::create_form() {
 
 	cy = sy;
 	cx += WBUTTON;
-	Fl_Box* b61 = new Fl_Box(cx, cy, WBUTTON, HBUTTON, "Date");
+	Fl_Box* b61 = new Fl_Box(cx, cy, WBUTTON * 3 / 2, HBUTTON, "Date");
 	b5->box(FL_FLAT_BOX);
 
 	cy += HBUTTON;
-	op_rcvd_date_ = new Fl_Output(cx, cy, WBUTTON, HBUTTON);
+	op_rcvd_date_ = new Fl_Output(cx, cy, WBUTTON * 3 / 2, HBUTTON);
 	op_rcvd_date_->tooltip("The date cards received");
 
 	cy += HBUTTON;
-	op_sent_date_ = new Fl_Output(cx, cy, WBUTTON, HBUTTON);
+	op_sent_date_ = new Fl_Output(cx, cy, WBUTTON * 3 / 2, HBUTTON);
 	op_sent_date_->tooltip("The date the catds sent");
 
 	cy += HBUTTON;
-	op_rcyc_date_ = new Fl_Output(cx, cy, WBUTTON, HBUTTON);
+	op_rcyc_date_ = new Fl_Output(cx, cy, WBUTTON * 3 / 2, HBUTTON);
 	op_rcyc_date_->tooltip("The date the cards recycled");
 
 	cy = my + GAP;
@@ -149,6 +150,11 @@ void QBS_batch::create_form() {
 	tab_top20_->align(FL_ALIGN_TOP);
 	tab_top20_->tooltip("Displays the top 20 culprits for recycling");
 	tab_top20_->data(data_);
+
+	tab_report_ = new QBS_breport(cx, cy, wtab, htab, "Callsigns in batch");
+	tab_report_->align(FL_ALIGN_TOP);
+	tab_report_->tooltip("Displays the callsigns received in this batch");
+	tab_report_->data(data_);
 
 	cx = x() + w() - GAP - (3 * WBUTTON);
 	cy = y() + h() - GAP - HBUTTON;
@@ -194,6 +200,9 @@ void QBS_batch::enable_widgets() {
 		case process_mode_t::BATCH_SUMMARY:
 			snprintf(l, sizeof(l), "BATCH SUMMARY: Batch #%d - %s", box_, batch.c_str());
 			break;
+		case process_mode_t::BATCH_REPORT:
+			snprintf(l, sizeof(l), "BATCH REPORT: Batch #%d - %s", box_, batch.c_str());
+			break;
 		default:
 			snprintf(l, sizeof(l), "INVALID: Not a valid mode for this dialog");
 			break;
@@ -236,18 +245,28 @@ void QBS_batch::enable_widgets() {
 		}
 		switch (win_->process()) {
 		case RECYCLING:
-			tab_top20_->activate();
+			tab_top20_->show();
 			tab_top20_->box(box_);
+			tab_report_->hide();
 			ch_batch_->deactivate();
 			break;
 		case BATCH_SUMMARY:
-			tab_top20_->activate();
+			tab_top20_->show();
 			tab_top20_->box(box_);
+			tab_report_->hide();
+			ch_batch_->activate();
+			ch_batch_->value(box_);
+			break;
+		case BATCH_REPORT:
+			tab_top20_->hide();
+			tab_report_->show();
+			tab_report_->box(box_);
 			ch_batch_->activate();
 			ch_batch_->value(box_);
 			break;
 		default:
-			tab_top20_->deactivate();
+			tab_top20_->hide();
+			tab_report_->hide();
 			ch_batch_->deactivate();
 			break;
 		}
@@ -316,6 +335,7 @@ void QBS_batch::cb_next(Fl_Widget* w, void* v) {
 	case process_mode_t::FINISHING:
 	case process_mode_t::RECYCLING:
 	case process_mode_t::BATCH_SUMMARY:
+	case process_mode_t::BATCH_REPORT:
 		that->win_->process(process_mode_t::DORMANT);
 		break;
 	case process_mode_t::LOG_BATCH:

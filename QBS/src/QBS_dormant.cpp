@@ -68,12 +68,6 @@ void QBS_dormant::create_form() {
 	cx = x() + GAP;
 	cy += HBUTTON;
 
-	bn_edit_ = new Fl_Button(cx, cy, 2 * WBUTTON, HBUTTON, "Edit data");
-	bn_edit_->callback(cb_action, (void*)(intptr_t)process_mode_t::EDITING);
-	bn_edit_->tooltip("Select to open a spreadsheet to edit a specific calls data");
-
-	cy += HBUTTON;
-
 	bn_batch_summary_ = new Fl_Button(cx, cy, 2 * WBUTTON, HBUTTON, "Batch summary");
 	bn_batch_summary_->callback(cb_action, (void*)(intptr_t)process_mode_t::BATCH_SUMMARY);
 	bn_batch_summary_->tooltip("Select to display the batch summary");

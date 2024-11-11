@@ -106,7 +106,7 @@ void QBS_top20::box(int b) {
 			top20_.push_back(*it);
 		}
 	}
-	rows(top20_.size());
+	rows((int)top20_.size());
 	row_height_all(ROW_HEIGHT);
 	redraw();
 }

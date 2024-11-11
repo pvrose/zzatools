@@ -51,11 +51,8 @@ enum process_mode_t {
 	POSTING,                     // Maerk cards destined forposting as posted
 	FINISHING,                   // Mark cards as pending disposal
 	RECYCLING,                   // Mark cards as having been disposed
-	EDITING,                     // Temporary pause to edit raw data
 	BATCH_SUMMARY,               // Produce batch summary report
 	BATCH_REPORT,                // Produce batch callsign report
-	CALL_HISTORY,                // Produce call history report
-	CALL_SUMMARY,                // Call summary report
 };
 
 enum reading_mode_t {

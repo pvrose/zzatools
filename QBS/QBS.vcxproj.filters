@@ -72,6 +72,9 @@
     <ClInclude Include="include\QBS_top20.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\QBS_breport.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\QBS_data.cpp">
@@ -120,6 +123,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\QBS_top20.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\QBS_breport.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

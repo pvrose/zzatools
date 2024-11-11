@@ -157,6 +157,7 @@
     <ClInclude Include="..\widgets\include\filename_input.h" />
     <ClInclude Include="..\widgets\include\input_hierch.h" />
     <ClInclude Include="include\QBS_batch.h" />
+    <ClInclude Include="include\QBS_breport.h" />
     <ClInclude Include="include\QBS_call.h" />
     <ClInclude Include="include\QBS_card_table.h" />
     <ClInclude Include="include\QBS_charth.h" />
@@ -176,6 +177,7 @@
     <ClCompile Include="..\widgets\src\filename_input.cpp" />
     <ClCompile Include="..\widgets\src\input_hierch.cpp" />
     <ClCompile Include="src\QBS_batch.cpp" />
+    <ClCompile Include="src\QBS_breport.cpp" />
     <ClCompile Include="src\QBS_call.cpp" />
     <ClCompile Include="src\QBS_card_table.cpp" />
     <ClCompile Include="src\QBS_charth.cpp" />
