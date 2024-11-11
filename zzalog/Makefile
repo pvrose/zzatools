@@ -113,7 +113,7 @@ $(INSTALL_DIR)/$(TARGET_EXEC): $(EXEC_DIR)/$(TARGET_EXEC)
 
 # timestamp file
 .PHONY: ts 
-ts: $(SRC_DIRS)/timestamp.cpp 
+ts: ./src/timestamp.cpp 
 	@echo Creating $<
 	@echo "#include <string>" > $<
 	@echo "std::string TIMESTAMP = " >> $<
