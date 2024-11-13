@@ -57,6 +57,8 @@ struct spec_dataset;
 		void field_name(const char* field_name, record* qso = nullptr);
 		const char* field_name();
 
+		void qso(record* q);
+
 		// Get reason for leaving 
 		enum exit_reason_t {
 			IR_NULL,       // Normal behaviour - enter or lose focus
@@ -85,10 +87,14 @@ struct spec_dataset;
 		bool is_string(string field);
 		// Name of field
 		string field_name_;
+		// QSO
+		record* qso_;
 		// Get reason for leaving -1 - LEFT TAB, +1 - RIGHT TAB, 0 any other
 		exit_reason_t reason_;
 		// activate the menubutton
 		bool use_menubutton_;
+		// Tip window
+		static Fl_Window* tip_window_;
 	};
 #endif
 

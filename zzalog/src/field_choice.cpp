@@ -3,12 +3,12 @@
 #include "spec_data.h"
 #include "intl_dialog.h"
 #include "utils.h"
+#include "cty_data.h"
 
 #include <FL/Fl_Preferences.H>
 
-
-
 extern spec_data* spec_data_;
+extern cty_data* cty_data_;
 extern intl_dialog* intl_dialog_;
 
 // Lists greater than this will be hierarchic - e.g. "A/ADDRESS" else not so "ADDRESS"
@@ -98,12 +98,14 @@ void field_choice::hierarchic(bool h) {
 	hierarchic_ = h;
 }
 
+Fl_Window* field_input::tip_window_ = nullptr;
+
 // field_input constructor
 field_input::field_input(int X, int Y, int W, int H, const char* label) :
 	Fl_Input_Choice(X, Y, W, H, label)
 	, field_name_("")
 	, use_menubutton_(false)
-
+	, qso_(nullptr)
 {
 	type(FL_NORMAL_INPUT);
 	resize(X, Y, W, H);
@@ -121,12 +123,47 @@ int field_input::handle(int event) {
 	// Tell international character dialog to paste to this widget
 	switch (event) {
 	case FL_PUSH:
+		if (intl_dialog_) {
+			intl_dialog_->editor(this->input());
+		}
+		// Remove any tip window on this or other field_input
+		if (tip_window_) {
+			// Delete existing tip window
+			Fl::delete_widget(tip_window_);
+			tip_window_ = nullptr;
+		}
+		return true;
 	case FL_FOCUS:
 		if (intl_dialog_) {
 			intl_dialog_->editor(this->input());
 		}
 		if (input()->take_focus()) return true;
 		return Fl_Input_Choice::handle(event);
+	case FL_RELEASE:
+		switch (Fl::event_button()) {
+		case FL_RIGHT_MOUSE: {
+			if (qso_ && field_name_.length()) {
+				string tip;
+				if (field_name_ == "CALL") {
+					tip = cty_data_->get_tip(qso_);
+				}
+				else {
+					tip = spec_data_->get_tip(field_name_, qso_);
+				}
+				if (tip_window_) {
+					// Delete existing tip window
+					Fl::delete_widget(tip_window_);
+					tip_window_ = nullptr;
+				}
+				// Remember tip position
+				tip_window_ = ::tip_window(tip, Fl::event_x_root(), Fl::event_y_root());
+				tip_window_->show();
+			}
+			break;
+		}
+
+		}
+		break;
 	case FL_KEYBOARD:
 		// Convert navigation keys to commands
 		switch (Fl::event_key()) {
@@ -190,11 +227,17 @@ void field_input::value(int i) {
 	Fl_Input_Choice::value(i);
 }
 
+// Set QSO
+void field_input::qso(record* q) {
+	qso_ = q;
+}
+
 // Set the fielname - results in choice being populated from
 // enumeration values if it is one
 // Otherwise widget behaves as an input
 void field_input::field_name(const char* field_name, record* qso /*= nullptr*/) {
 	field_name_ = field_name;
+	qso_ = qso;
 	string enum_name;
 	// Note MODE is a special case as the enumeration list is that of MODE and SUBMODE combined
 	if (field_name_ == "MODE") enum_name = "Combined";
@@ -315,6 +358,7 @@ void field_input::populate_case_choice() {
 // Repopulate choice
 void field_input::reload_choice(record* qso /* = nullptr */) {
 	field_name(field_name_.c_str(), qso);
+	qso_ = qso;
 }
 
 // Field is a string type - allow case choice
