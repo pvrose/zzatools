@@ -839,6 +839,10 @@ bool QBS_data::read_qbs(string& filename) {
 		check = 0;
 		getline(file_, line);
 		if (file_.good()) {
+			int l = line.length() - 1;
+			while (line[l] == '\r') {
+				line.resize(l--);
+			}
 			split_line(line, words, '\t');
 			if (words[0].length() == 1) command = (command_t)words[0][0];
 			else command = (command_t)' ';
