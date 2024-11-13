@@ -249,6 +249,9 @@ void QBS_call::cb_done(Fl_Widget* w, void* v) {
 
 void QBS_call::cb_call(Fl_Widget* w, void* v) {
 	cb_value<Fl_Input, string>(w, v);
+	string* s = (string*)v;
+	(*s) = to_upper(*s);
+	((Fl_Input*)w)->value(s->c_str());
 	QBS_call* that = ancestor_view<QBS_call>(w);
 	that->enable_widgets();
 }
