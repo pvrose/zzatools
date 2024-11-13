@@ -77,6 +77,7 @@ int qsl_editor::handle(int event) {
 	case FL_SHOW: {
 		// This is being activated so show the display window
 		if (display_) w_display_->show();
+		create_items();
 		break;
 	}
 	}
