@@ -120,6 +120,7 @@ int field_input::handle(int event) {
 	reason_ = IR_NULL;
 	// Tell international character dialog to paste to this widget
 	switch (event) {
+	case FL_PUSH:
 	case FL_FOCUS:
 		if (intl_dialog_) {
 			intl_dialog_->editor(this->input());
