@@ -339,8 +339,8 @@ int printer::print_page_cards(size_t &item_num) {
 			for (int i = 0; i < print_records; i++) {
 				records[i] = navigation_book_->get_record(item_num + i, false);
 			}
-			int imagex = cwin_x_ + ((card % card_data_->columns) * card_data_->width);
-			int imagey = cwin_y_ + (((card / card_data_->columns) % card_data_->rows) * card_data_->height);
+			int imagex = cwin_x_ + (int)((card % card_data_->columns) * card_data_->width);
+			int imagey = cwin_y_ + (int)(((card / card_data_->columns) % card_data_->rows) * card_data_->height);
 			qsl_display* qsl = new qsl_display(imagex, imagey);
 			qsl->set_card(card_data_);
 			qsl->set_qsos(records, print_records);
@@ -384,10 +384,10 @@ int printer::card_properties() {
 	}
 	cwin_x_ = (int)(conversion * card_data_->col_left) - left_margin;
 	cwin_y_ =  (int)(conversion * card_data_->row_top) - top_margin;
-	card_data_->width = (int)(conversion * card_data_->col_width);
-	cwin_w_ = card_data_->columns * card_data_->width;
-	card_data_->height = (int)(conversion * card_data_->row_height);
-	cwin_h_ = card_data_->rows * card_data_->height;
+	card_data_->width = (conversion * card_data_->col_width);
+	cwin_w_ = (int)(card_data_->columns * card_data_->width);
+	card_data_->height = (conversion * card_data_->row_height);
+	cwin_h_ = (int)(card_data_->rows * card_data_->height);
 	//
 	int last_item = navigation_book_->size() - 1;
 	number_pages_ = (last_item / items_per_page_) + 1;
