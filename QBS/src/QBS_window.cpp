@@ -43,6 +43,9 @@ QBS_window::QBS_window(int W, int H, const char* L, const char* filename) :
 		free(temp);
 	}
 	data_ = new QBS_data;
+	int tempi;
+	settings.get("Last Dormant", tempi, false);
+	last_dormant_ = tempi;
 	// 
 	begin();
 	create_form();
@@ -78,6 +81,12 @@ void QBS_window::cb_close(Fl_Widget* w, void* v) {
 	Fl_Preferences settings(Fl_Preferences::USER, VENDOR.c_str(), PROGRAM_ID.c_str());
 	settings.set("CSV Directory", that->csv_directory_.c_str());
 	settings.set("Filename", that->qbs_filename_.c_str());
+	if (that->process() == DORMANT) {
+		settings.set("Last Dormant", true);
+	}
+	else {
+		settings.set("Last Dormant", false);
+	}
 	settings.flush();
 	Fl_Single_Window::default_callback(that, v);
 	delete that->data_;
@@ -131,6 +140,9 @@ bool QBS_window::read_qbs() {
 		reading_ = false;
 		update_actions();
 		g_batch_->populate_batch_choice();
+		if (last_dormant_) {
+			stack_.push(DORMANT);
+		}
 		show_process();
 		return true;
 	}

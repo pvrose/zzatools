@@ -110,5 +110,7 @@ protected:
  
     // Reading - ignore update_action
     bool reading_;
+    // Last screen was DORMANT
+    bool last_dormant_;
 };
 
