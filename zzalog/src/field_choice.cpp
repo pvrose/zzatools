@@ -132,7 +132,7 @@ int field_input::handle(int event) {
 			Fl::delete_widget(tip_window_);
 			tip_window_ = nullptr;
 		}
-		return true;
+		return Fl_Input_Choice::handle(event);
 	case FL_FOCUS:
 		if (intl_dialog_) {
 			intl_dialog_->editor(this->input());
@@ -161,9 +161,8 @@ int field_input::handle(int event) {
 			}
 			break;
 		}
-
 		}
-		break;
+		return Fl_Input_Choice::handle(event);
 	case FL_KEYBOARD:
 		// Convert navigation keys to commands
 		switch (Fl::event_key()) {
