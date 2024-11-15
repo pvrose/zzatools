@@ -74,6 +74,8 @@ class app_grp :
         static void cb_ip_disable(Fl_Widget* w, void* v);
         // Callback on enetring password
         static void cb_ip_passw(Fl_Widget* w, void* v);
+        // callback to show script
+        static void cb_show_script(Fl_Widget* w, void* v);
         
     protected:
 
@@ -96,6 +98,7 @@ class app_grp :
         Fl_Button* bn_delete_;
         Fl_Check_Button* bn_disable_;
         Fl_Input* ip_disable_app_;
+        Fl_Button* bn_show_script_;
 
         app_data_t* app_data_;
 };

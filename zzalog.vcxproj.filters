@@ -303,6 +303,9 @@
     <ClCompile Include="common\src\utils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="zzalog\src\file_viewer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="zzalog\include\about_dialog.h">
@@ -624,6 +627,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="widgets\include\button_input.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zzalog\include\file_viewer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -8,6 +8,7 @@
 #include "utils.h"
 #include "callback.h"
 #include "password_input.h"
+#include "file_viewer.h"
 
 #include <FL/Fl_Preferences.H>
 #include <FL/Fl_Tabs.H>
@@ -19,6 +20,7 @@ extern fllog_emul* fllog_emul_;
 extern wsjtx_handler* wsjtx_handler_;
 extern status* status_;
 extern Fl_Preferences* settings_;
+extern file_viewer* file_viewer_;
 
 // Constructor for one set of modem controls
 app_grp::app_grp(int X, int Y, int W, int H, const char* L) :
@@ -95,8 +97,14 @@ void app_grp::create_form() {
     bn_rig_->align(FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
     bn_rig_->tooltip("Displays the current rig - or COMMON");
 
-    curr_x += WBUTTON;
     curr_y += HBUTTON;
+
+    // Button to show the script
+    bn_show_script_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Show Script");
+    bn_show_script_->callback(cb_show_script, nullptr);
+    bn_show_script_->tooltip("Show the script in a separate window");
+
+    curr_x += WBUTTON;
 
     // Input to specify the command for invoking the app
     ip_app_name_ = new Fl_Input(curr_x, curr_y, WBUTTON * 2, HBUTTON);
@@ -176,8 +184,10 @@ void app_grp::enable_widgets() {
     bn_rig_->copy_label(rig_name);
     if (app_data_->commands.find(rig_name) != app_data_->commands.end()) {
         ip_app_name_->value(app_data_->commands.at(string(rig_name)).c_str());
+        bn_show_script_->activate();
     } else {
         ip_app_name_->value("");
+        bn_show_script_->deactivate();
     }
     if (app_data_->server) {
         if (app_data_->has_server && (*(app_data_->has_server))()) {
@@ -348,6 +358,12 @@ void app_grp::cb_ip_disable(Fl_Widget* w, void* v) {
 void app_grp::cb_ip_passw(Fl_Widget* w, void* v) {
     app_grp* that = ancestor_view<app_grp>(w);
     that->enable_widgets();
+}
+
+// Show scripts
+void app_grp::cb_show_script(Fl_Widget* w, void* v) {
+    app_grp* that = ancestor_view<app_grp>(w);
+    file_viewer_->load_file(that->ip_app_name_->value());
 }
 
 // Generate rig id 
