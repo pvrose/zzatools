@@ -363,7 +363,11 @@ void app_grp::cb_ip_passw(Fl_Widget* w, void* v) {
 // Show scripts
 void app_grp::cb_show_script(Fl_Widget* w, void* v) {
     app_grp* that = ancestor_view<app_grp>(w);
-    file_viewer_->load_file(that->ip_app_name_->value());
+    if (file_viewer_->visible()) {
+        file_viewer_->hide();
+    } else {
+        file_viewer_->load_file(that->ip_app_name_->value());
+    }
 }
 
 // Generate rig id 
