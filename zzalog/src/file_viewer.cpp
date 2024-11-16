@@ -26,7 +26,9 @@ void file_viewer::create() {
 	display_ = new Fl_Text_Display(0, 0, w(), h());
 	display_->box(FL_BORDER_BOX);
 	display_->wrap_mode(Fl_Text_Display::WRAP_AT_BOUNDS, 0);
+	display_->linenumber_width(WLABEL);
 	display_->textfont(FL_COURIER);
+	display_->linenumber_font(FL_COURIER);
 	display_->textsize(12);
 
 	display_->buffer(buffer_);

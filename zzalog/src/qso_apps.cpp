@@ -309,6 +309,7 @@ void app_grp::cb_ip_app(Fl_Widget* w, void* v) {
     cb_value<Fl_Input, string>(w, &value);
     const char* rig_name = that->rig_id();
     that->app_data_->commands[rig_name] = value; 
+    that->enable_widgets();
 }
 
 // Listen and server button callback
