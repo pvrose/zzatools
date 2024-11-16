@@ -13,6 +13,7 @@ class Fl_Check_Button;
 class Fl_Radio_Light_Button;
 class Fl_Button;
 class Fl_Tabs;
+class filename_input;
 
 // App rig class
 enum app_rig_class_t {
@@ -84,7 +85,7 @@ class app_grp :
 
  
         // Widgets
-        Fl_Input* ip_app_name_;
+        filename_input* ip_app_name_;
         Fl_Light_Button* bn_listening_;
         Fl_Light_Button* bn_connect_;
         Fl_Light_Button* bn_server_;

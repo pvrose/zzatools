@@ -9,6 +9,7 @@
 #include "callback.h"
 #include "password_input.h"
 #include "file_viewer.h"
+#include "filename_input.h"
 
 #include <FL/Fl_Preferences.H>
 #include <FL/Fl_Tabs.H>
@@ -107,7 +108,7 @@ void app_grp::create_form() {
     curr_x += WBUTTON;
 
     // Input to specify the command for invoking the app
-    ip_app_name_ = new Fl_Input(curr_x, curr_y, WBUTTON * 2, HBUTTON);
+    ip_app_name_ = new filename_input(curr_x, curr_y, WBUTTON * 2, HBUTTON);
     ip_app_name_->callback(cb_ip_app);
     ip_app_name_->tooltip("Enter the command to invoke the app for the selected rig");
     ip_app_name_->when(FL_WHEN_CHANGED);
