@@ -13,6 +13,7 @@ using namespace std;
 class field_input;
 class rig_if;
 struct hamlib_data_t;
+class filename_input;
 class Fl_Output;
 class Fl_Button;
 class Fl_Box;
@@ -132,8 +133,8 @@ protected:
 	static void cb_del_cat(Fl_Widget* w, void* v);
 	// S-meter peak smapling
 	static void cb_smeters(Fl_Widget* w, void* v);
-	// Meter display
-	static void cb_meters(Fl_Widget* w, void* v);
+	// Show app
+	static void cb_show_app(Fl_Widget* w, void* v);
 
 	// Get hamlib data
 	void find_hamlib_data();
@@ -201,7 +202,8 @@ protected:
 
 	Fl_Group* network_grp_;
 	Fl_Light_Button* bn_use_app_;
-	Fl_Input* ip_app_name_;
+	Fl_Button* bn_show_app_;
+	filename_input* ip_app_name_;
 	// Hamlib widgets to revalue when rig selected changes
 	Fl_Input* ip_port_;
 

@@ -7,6 +7,8 @@
 #include "spec_data.h"
 #include "ticker.h"
 #include "field_choice.h"
+#include "filename_input.h"
+#include "file_viewer.h"
 
 #include <set>
 #include <string>
@@ -319,7 +321,7 @@ void qso_rig::create_rig_ant(int curr_x, int curr_y) {
 // Create tabbed form for configuration data
 void qso_rig::create_config(int curr_x, int curr_y) {
 	// Tabbed form
-	config_tabs_ = new Fl_Tabs(curr_x, curr_y, 10, 10);
+	config_tabs_ = new Fl_Tabs(curr_x, curr_y, w() - 2 * GAP, 10);
 	config_tabs_->box(FL_BORDER_BOX);
 	config_tabs_->callback(cb_config);
 	config_tabs_->when(FL_WHEN_CHANGED);
@@ -330,29 +332,24 @@ void qso_rig::create_config(int curr_x, int curr_y) {
 	int rw = 0;
 	int rh = 0;
 	config_tabs_->client_area(rx, ry, rw, rh, 0);
-	int saved_rw = rw;
 	int saved_rh = rh;
 	curr_x = rx;
 	curr_y = ry;
 	// Create connection tab
 	create_connex(curr_x, curr_y);
-	rw = max(rw, connect_tab_->x() + connect_tab_->w() - rx);
 	rh = max(rh, connect_tab_->y() + connect_tab_->h() - ry);
 	// Create defaults tab
 	create_defaults(curr_x, curr_y);
-	rw = max(rw, defaults_tab_->x() + defaults_tab_->w() - rx);
 	rh = max(rh, defaults_tab_->y() + defaults_tab_->h() - ry);
 	// Create accessory tab
 	create_accessory(curr_x, curr_y);
-	rw = max(rw, accessory_tab_->x() + accessory_tab_->w() - rx);
 	rh = max(rh, accessory_tab_->y() + accessory_tab_->h() - ry);
 	// Create timeout &c tab
 	create_timeout(curr_x, curr_y);
-	rw = max(rw, timeout_tab_->x() + timeout_tab_->w() - rx);
 	rh = max(rh, timeout_tab_->y() + timeout_tab_->h() - ry);
 
 	config_tabs_->resizable(nullptr);
-	config_tabs_->size(config_tabs_->w() + rw - saved_rw, config_tabs_->h() + rh - saved_rh);
+	config_tabs_->size(config_tabs_->w(), config_tabs_->h() + rh - saved_rh);
 	config_tabs_->end();
 	curr_x = config_tabs_->x() + config_tabs_->w();
 	curr_y = config_tabs_->y() + config_tabs_->h();
@@ -362,7 +359,7 @@ void qso_rig::create_config(int curr_x, int curr_y) {
 // Create form to configure the hamlib port connection
 // Create two versions: 1 for serial ports and one for networked ports
 void qso_rig::create_connex(int curr_x, int curr_y) {
-	connect_tab_ = new Fl_Group(curr_x, curr_y, 10, 10, "Connection");
+	connect_tab_ = new Fl_Group(curr_x, curr_y, w() - 2 * GAP, 10, "Connection");
 	connect_tab_->labelsize(FL_NORMAL_SIZE + 2);
 	curr_x += GAP;
 	curr_y += GAP;
@@ -370,15 +367,14 @@ void qso_rig::create_connex(int curr_x, int curr_y) {
 	int max_y = curr_y;
 	// Create serial port
 	create_serial(curr_x, curr_y);
-	max_x = max(max_x, serial_grp_->x() + serial_grp_->w());
 	max_y = max(max_y, serial_grp_->y() + serial_grp_->h());
 	// Create network port
 	create_network(curr_x, curr_y);
-	max_x = max(max_x, network_grp_->x() + network_grp_->w());
 	max_y = max(max_y, network_grp_->y() + network_grp_->h());
 
+
 	connect_tab_->resizable(nullptr);
-	connect_tab_->size(max_x - connect_tab_->x(), max_y - connect_tab_->y());
+	connect_tab_->size(connect_tab_->w(), max_y - connect_tab_->y());
 
 	connect_tab_->end();
 
@@ -386,7 +382,7 @@ void qso_rig::create_connex(int curr_x, int curr_y) {
 
 // Create form for defining a serial port connection
 void qso_rig::create_serial(int curr_x, int curr_y) {
-	serial_grp_ = new Fl_Group(curr_x, curr_y, 10, 10);
+	serial_grp_ = new Fl_Group(curr_x, curr_y, w() - 2 * GAP, 10);
 	serial_grp_->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 	serial_grp_->box(FL_NO_BOX);
 
@@ -436,7 +432,7 @@ void qso_rig::create_serial(int curr_x, int curr_y) {
 	curr_y += HBUTTON + GAP;
 	curr_y = max(max_y, curr_y);
 	serial_grp_->resizable(nullptr);
-	serial_grp_->size(curr_x - serial_grp_->x(), curr_y - serial_grp_->y());
+	serial_grp_->size(serial_grp_->w(), curr_y - serial_grp_->y());
 
 	serial_grp_->end();
 
@@ -444,22 +440,29 @@ void qso_rig::create_serial(int curr_x, int curr_y) {
 
 // Create for to configure a network connection
 void qso_rig::create_network(int curr_x, int curr_y) {
-	network_grp_ = new Fl_Group(curr_x, curr_y, 10, 10);
+	network_grp_ = new Fl_Group(curr_x, curr_y, w() - 2 * GAP, 10);
 	network_grp_->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 	network_grp_->box(FL_NO_BOX);
 
 	curr_x = network_grp_->x();
 	curr_y = network_grp_->y();
 
-	bn_use_app_ = new Fl_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Use app");
+	bn_use_app_ = new Fl_Light_Button(curr_x, curr_y, WBUTTON / 2, HBUTTON, "Use");
 	bn_use_app_->callback(cb_bn_use_app, nullptr);
 	bn_use_app_->tooltip("Set to allow a CAT app to be used");
 	bn_use_app_->value(false);
 
-	curr_x += WBUTTON;
+	curr_x += WBUTTON / 2;
+
+	bn_show_app_ = new Fl_Button(curr_x, curr_y, WBUTTON / 2, HBUTTON, "Show");
+	bn_show_app_->callback(cb_show_app, &ip_app_name_);
+	bn_show_app_->tooltip("Show the app script");
+
+	curr_x += WBUTTON / 2;
+	int this_w = network_grp_->w() + network_grp_->x() - curr_x - GAP - GAP;
 
 	// App name (flrig or wfview to connect to rig
-	ip_app_name_ = new Fl_Input(curr_x, curr_y, w() - curr_x - (2 * GAP), HTEXT);
+	ip_app_name_ = new filename_input(curr_x, curr_y, this_w, HTEXT);
 	ip_app_name_->callback(cb_value<Fl_Input, string>, nullptr);
 	ip_app_name_->tooltip("Please provide the command to use to connect");
 	ip_app_name_->value("");
@@ -1543,6 +1546,16 @@ void qso_rig::cb_bn_transverter(Fl_Widget* w, void* v) {
 		*t = (accessory_t)(*t & ~TRANSVERTER);
 	}
 	that->enable_widgets(DAMAGE_ADDONS);
+}
+
+// Show scripts
+void qso_rig::cb_show_app(Fl_Widget* w, void* v) {
+	qso_rig* that = ancestor_view<qso_rig>(w);
+	filename_input* ip = *(filename_input**)v;
+	if (strlen(ip->value()) > 0) {
+		file_viewer* fwin = new file_viewer(640, 480);
+		fwin->load_file(ip->value());
+	}
 }
 
 // Connect rig if disconnected and vice-versa
