@@ -43,7 +43,6 @@ main.cpp - application entry point
 #include "symbols.h"
 #include "qsl_dataset.h"
 #include "config.h"
-#include "file_viewer.h"
 
 // C/C++ header files
 #include <ctime>
@@ -136,8 +135,6 @@ ticker* ticker_ = nullptr;
 fields* fields_ = nullptr;
 qsl_dataset* qsl_dataset_ = nullptr;
 config* config_ = nullptr;
-file_viewer* file_viewer_ = nullptr;
-
 // Recent files opened
 list<string> recent_files_;
 
@@ -651,11 +648,6 @@ void add_data() {
 	if (!closing_) {
 		config_ = new config(WCONFIG, HCONFIG, "Configuration");
 		config_->hide();
-	}
-	// Add file viewer
-	if (!closing_) {
-		file_viewer_ = new file_viewer(640, 480, "no file!");
-		file_viewer_->hide();
 	}
 }
 

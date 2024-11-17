@@ -21,7 +21,6 @@ extern fllog_emul* fllog_emul_;
 extern wsjtx_handler* wsjtx_handler_;
 extern status* status_;
 extern Fl_Preferences* settings_;
-extern file_viewer* file_viewer_;
 
 // Constructor for one set of modem controls
 app_grp::app_grp(int X, int Y, int W, int H, const char* L) :
@@ -99,13 +98,13 @@ void app_grp::create_form() {
     bn_rig_->tooltip("Displays the current rig - or COMMON");
 
     curr_y += HBUTTON;
+    curr_x += WBUTTON / 2;
 
     // Button to show the script
-    bn_show_script_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Show Script");
-    bn_show_script_->callback(cb_show_script, nullptr);
+    bn_show_script_ = new Fl_Button(curr_x, curr_y, WBUTTON / 2, HBUTTON, "Show");
     bn_show_script_->tooltip("Show the script in a separate window");
 
-    curr_x += WBUTTON;
+    curr_x += WBUTTON / 2;
 
     // Input to specify the command for invoking the app
     ip_app_name_ = new filename_input(curr_x, curr_y, WBUTTON * 2, HBUTTON);
@@ -113,33 +112,44 @@ void app_grp::create_form() {
     ip_app_name_->tooltip("Enter the command to invoke the app for the selected rig");
     ip_app_name_->when(FL_WHEN_CHANGED);
 
+    bn_show_script_->callback(cb_show_script, &ip_app_name_);
+
     curr_y += HBUTTON;
-    curr_x = x() + GAP + WBUTTON - HBUTTON;
+    curr_x = x() + GAP;
 
     // Allow the application to be disconnected
-    bn_disable_ = new Fl_Check_Button(curr_x, curr_y, HBUTTON, HBUTTON, "Undo?");
-    bn_disable_->align(FL_ALIGN_LEFT);
+    bn_disable_ = new Fl_Light_Button(curr_x, curr_y, WBUTTON / 2, HBUTTON, "@undo");
+    bn_disable_->align(FL_ALIGN_INSIDE);
     bn_disable_->callback(cb_bn_disable);
     bn_disable_->tooltip("Select if able to disconnect from application");
 
-    curr_x += HBUTTON;
+    curr_x += WBUTTON / 2;
+
+    // Button to show the script
+    bn_show_script2_ = new Fl_Button(curr_x, curr_y, WBUTTON / 2, HBUTTON, "Show");
+    bn_show_script2_->callback(cb_show_script, &ip_disable_app_);
+    bn_show_script2_->tooltip("Show the undo script in a separate window");
+
+    curr_x += WBUTTON / 2;
 
     // The script needed to disconnect
-    ip_disable_app_ = new Fl_Input(curr_x, curr_y, WBUTTON * 2, HBUTTON);
+    ip_disable_app_ = new filename_input(curr_x, curr_y, WBUTTON * 2, HBUTTON);
     ip_disable_app_->callback(cb_ip_disable);
     ip_disable_app_->tooltip("Enter the command to disconnect the application");
     ip_disable_app_->when(FL_WHEN_CHANGED);
 
+    bn_show_script2_->callback(cb_show_script, &ip_disable_app_);
+
     curr_y += HBUTTON;
-    curr_x = x() + GAP + WBUTTON - HBUTTON;
+    curr_x = x() + GAP;
 
     // Button to run application as administrator
-    bn_admin_ = new Fl_Check_Button(curr_x, curr_y, HBUTTON, HBUTTON, "Admin");
-    bn_admin_->align(FL_ALIGN_LEFT);
+    bn_admin_ = new Fl_Light_Button(curr_x, curr_y, WBUTTON / 2, HBUTTON, "Adm");
+    bn_admin_->align(FL_ALIGN_INSIDE);
     bn_admin_->callback(cb_bn_admin);
     bn_admin_->tooltip("Run the application as adminstrator");
 
-    curr_x += HBUTTON;
+    curr_x += WBUTTON;
 
     // Password input
     ip_passw_ = new password_input(curr_x, curr_y, WBUTTON * 2, HBUTTON);
@@ -365,10 +375,10 @@ void app_grp::cb_ip_passw(Fl_Widget* w, void* v) {
 // Show scripts
 void app_grp::cb_show_script(Fl_Widget* w, void* v) {
     app_grp* that = ancestor_view<app_grp>(w);
-    if (file_viewer_->visible()) {
-        file_viewer_->hide();
-    } else {
-        file_viewer_->load_file(that->ip_app_name_->value());
+    filename_input* ip = *(filename_input**)v;
+    if (strlen(ip->value()) > 0) {
+        file_viewer* fwin = new file_viewer(640, 480);
+        fwin->load_file(ip->value());
     }
 }
 

@@ -94,12 +94,13 @@ class app_grp :
         Fl_Radio_Light_Button* bn_rig_nocat_;
         Fl_Radio_Light_Button* bn_rig_cat_;
         Fl_Button* bn_rig_;
-        Fl_Check_Button* bn_admin_;
+        Fl_Light_Button* bn_admin_;
         password_input* ip_passw_;
         Fl_Button* bn_delete_;
-        Fl_Check_Button* bn_disable_;
-        Fl_Input* ip_disable_app_;
+        Fl_Light_Button* bn_disable_;
+        filename_input* ip_disable_app_;
         Fl_Button* bn_show_script_;
+        Fl_Button* bn_show_script2_;
 
         app_data_t* app_data_;
 };
