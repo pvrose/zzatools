@@ -10,7 +10,6 @@ main.cpp - application entry point
 
 #include "utils.h"
 #include "record.h"
-// #include "config.h"
 #include "menu.h"
 #include "book.h"
 #include "cty_data.h"
@@ -74,7 +73,7 @@ using namespace std;
 string COPYRIGHT = "\302\251 Philip Rose GM3ZZA 2018. All rights reserved.\nPrefix data courtesy of clublog.org";
 string PROGRAM_ID = "ZZALOG";
 string PROG_ID = "ZLG";
-string PROGRAM_VERSION = "3.4.95";
+string PROGRAM_VERSION = "3.4.96";
 string VENDOR = "GM3ZZA";
 extern string TIMESTAMP;
 
