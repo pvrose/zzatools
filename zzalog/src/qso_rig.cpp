@@ -146,9 +146,9 @@ void qso_rig::load_values() {
 		for (int ix = 0; ix < rig_settings.groups(); ix++) {
 			cat_data_t* data = new cat_data_t;
 			data->hamlib = new hamlib_data_t;
-			char g[5];
-			snprintf(g, sizeof(g), "%d", ix);
+			const char* g = rig_settings.group(ix);
 			Fl_Preferences cat_settings(rig_settings, g);
+			data->nickname = g;
 			load_cat_data(data, cat_settings);
 			cat_data_.push_back(data);
 		}
@@ -687,9 +687,7 @@ void qso_rig::save_values() {
 		Fl_Preferences rig_settings(cat_settings, label());
 		rig_settings.clear();
 		for (int ix = 0; ix < cat_data_.size(); ix++) {
-			char g[5];
-			snprintf(g, sizeof(g), "%d", ix);
-			Fl_Preferences cat_type_settings(rig_settings, g);
+			Fl_Preferences cat_type_settings(rig_settings, cat_data_[ix]->nickname.c_str());
 			save_cat_data(cat_data_[ix], cat_type_settings);
 		}
 		rig_settings.set("Default CAT", cat_index_);
@@ -955,12 +953,7 @@ void qso_rig::enable_widgets(uchar damage) {
 		//char l[5];
 		//snprintf(l, sizeof(l), "CAT%d", cat_index_ + 1);
 		if (cat_index_ >= 0 && cat_index_ < cat_data_.size()) {
-			hamlib_data_t* hamlib = cat_data_[cat_index_]->hamlib;
-			if (hamlib->model.length()) {
-				bn_index_->copy_label(hamlib->model.c_str());
-			} else {
-				bn_index_->copy_label(hamlib->mfr.c_str());
-			}
+			bn_index_->copy_label(cat_data_[cat_index_]->nickname.c_str());
 		}
 		else {
 			bn_index_->label("CAT");
@@ -1306,14 +1299,7 @@ void qso_rig::populate_index_menu() {
 	// Add a menu item for each cat item
 	if (cat_data_.size()) {
 		for (int ix = 0; ix < cat_data_.size(); ix++) {
-			//char l[5];
-			//snprintf(l, sizeof(l), "CAT%d", ix + 1);
-			hamlib_data_t* hamlib = cat_data_[ix]->hamlib;
-			if (hamlib->model.length()) {
-				bn_index_->add(hamlib->model.c_str(), 0, cb_select_cat, (void*)(intptr_t)ix);
-			} else {
-				bn_index_->add(hamlib->mfr.c_str(), 0, cb_select_cat, (void*)(intptr_t)ix);
-			}
+			bn_index_->add(cat_data_[ix]->nickname.c_str(), 0, cb_select_cat, (void*)(intptr_t)ix);
 		}
 	}
 	// Add a menu item to add a new CAT
@@ -1503,6 +1489,8 @@ void qso_rig::cb_select_cat(Fl_Widget* w, void* v) {
 void qso_rig::cb_new_cat(Fl_Widget* w, void* v) {
 	qso_rig* that = ancestor_view<qso_rig>(w);
 	cat_data_t* data = new cat_data_t;
+	const char* nickname = fl_input("Please enter the nickname for the CAT connection", "None");
+	data->nickname = nickname;
 	data->hamlib = new hamlib_data_t;
 	that->cat_data_.push_back(data);
 	that->cat_index_ = that->cat_data_.size() - 1;
@@ -1657,16 +1645,11 @@ void qso_rig::disconnect() {
 // Return selected CAT
 const char* qso_rig::cat() {
 	char* result = new char[32];
-	if (cat_data_.size() <= 1) {
-		strcpy(result, "");
+	if (cat_data_.size() == 0) {
+		return "";
 	}
 	else {
-		hamlib_data_t* hamlib = cat_data_[cat_index_]->hamlib;
-		if (hamlib->model.length()) {
-			strcpy(result, hamlib->model.c_str());
-		} else {
-			strcpy(result, hamlib->mfr.c_str());
-		}
+		return cat_data_[cat_index_]->nickname.c_str();
 	}
 	return result;
 }

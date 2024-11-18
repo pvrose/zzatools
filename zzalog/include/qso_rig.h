@@ -29,7 +29,7 @@ class Fl_Menu_Button;
 class Fl_Preferences;
 
 const int NUMBER_RIG_APPS = 2;
-const string RIG_APP_NAMES[NUMBER_RIG_APPS] = { "FLRig", "NET rigctl" };
+const string RIG_APP_NAMES[NUMBER_RIG_APPS] = { "FLRig", "WFView" };
 // Bit-wise flags for redarwing qso_rig
 const uchar DAMAGE_STATUS = 1;
 const uchar DAMAGE_VALUES = 2;
@@ -82,6 +82,7 @@ protected:
 		hamlib_data_t* hamlib = nullptr;
 		bool use_cat_app = false;
 		string app = "";
+		string nickname = "";
 	};
 
 	enum rig_state_t : uchar {
