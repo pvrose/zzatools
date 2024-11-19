@@ -871,7 +871,7 @@ bool qso_data::action_save(bool continuing) {
 		break;
 	}
 
-	if (continuing) {
+	if (!continuing) {
 		// check whether record has changed - when parsed
 		if (cty_data_->update_qso(qso)) {
 		}

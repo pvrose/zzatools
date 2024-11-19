@@ -269,7 +269,7 @@ void qso_buttons::cb_save(Fl_Widget* w, void* v) {
 	case qso_data::QSO_STARTED:
 	case qso_data::TEST_ACTIVE:
 		// Realtime entry - do not start another
-		if (!data->action_save(edit_button != SAVE_CONTINUE)) break;
+		if (!data->action_save(edit_button == SAVE_CONTINUE)) break;
 		switch (edit_button) {
 			case SAVE_QSO: {
 				data->action_activate(qso_data::QSO_AS_WAS);
@@ -295,7 +295,7 @@ void qso_buttons::cb_save(Fl_Widget* w, void* v) {
 		break;
 	case qso_data::QSO_ENTER:
 		// Batch entry - start another entry
-		if(!data->action_save(edit_button != SAVE_CONTINUE)) break;
+		if(!data->action_save(edit_button == SAVE_CONTINUE)) break;
 		switch(edit_button) {
 			case SAVE_QSO: {
 				data->action_activate(qso_data::QSO_NONE);
@@ -333,7 +333,7 @@ void qso_buttons::cb_save(Fl_Widget* w, void* v) {
 		}
 		break;
 	case qso_data::NET_STARTED:
-		data->action_save(edit_button != SAVE_CONTINUE);
+		data->action_save(edit_button == SAVE_CONTINUE);
 		break;
 	}
 	if (that) that->enable_widgets();
