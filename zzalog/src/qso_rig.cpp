@@ -889,7 +889,7 @@ void qso_rig::enable_widgets(uchar damage) {
 		switch ((rig_mode_t)mode_) {
 		case RIG_PORT_SERIAL:
 			// Serial port - show serial configuration, hide network
-			serial_grp_->show();
+			if (visible_r()) serial_grp_->show();
 			network_grp_->hide();
 			if (!bn_select_->value()) {
 				serial_grp_->deactivate();
@@ -902,7 +902,7 @@ void qso_rig::enable_widgets(uchar damage) {
 		case RIG_PORT_USB:
 			// Network or USB port - show network, hide serial
 			serial_grp_->hide();
-			network_grp_->show();
+			if (visible_r()) network_grp_->show();
 			if (!bn_select_->value()) {
 				ip_port_->value(hamlib->port_name.c_str());
 				ip_port_->user_data(&hamlib->port_name);

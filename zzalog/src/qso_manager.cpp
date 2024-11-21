@@ -65,7 +65,7 @@ extern bool closing_;
 
 // The main dialog constructor
 qso_manager::qso_manager(int W, int H, const char* label) :
-	Fl_Double_Window(W, H, label)
+	Fl_Window(W, H, label)
 	, rig_group_(nullptr)
 	, created_(false)
 {
@@ -93,7 +93,7 @@ int qso_manager::handle(int event) {
 	case FL_SHOW:
 		// Get menu to update Windows controls
 		menu_->update_windows_items();
-		return true;
+		break;
 	case FL_KEYBOARD:
 		// This 
 		switch (Fl::event_key()) {

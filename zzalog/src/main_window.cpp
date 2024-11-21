@@ -26,7 +26,7 @@ int main_window::handle(int event) {
 	case FL_SHOW:
 		// Get menu to update Windows controls
 		if(menu_) menu_->update_windows_items();
-		return true;
+		break;
 	case FL_PASTE:
 		// Get data from paste
 		string data = Fl::event_text();

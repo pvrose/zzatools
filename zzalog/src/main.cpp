@@ -728,9 +728,6 @@ void add_dashboard() {
 			qso_manager_ = new qso_manager(10, 10);
 			qso_manager_->copy_label(l);
 		}
-		// Get the Operation window
-		// Show the scratchpad at the saved position
-		qso_manager_->show();
 		status_->misc_status(ST_NOTE, "DASH: Opened");
 	}
 }

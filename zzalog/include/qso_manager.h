@@ -8,7 +8,7 @@
 #include <set>
 #include <array>
 
-#include <FL/Fl_Double_Window.H>
+#include <FL/Fl_Window.H>
 
 using namespace std;
 
@@ -32,7 +32,7 @@ enum hint_t : uchar;
 	// It contains all the objects used during a QSO in a hierarchy
 	// of Fl_Group and Fl_Tabss
 	class qso_manager :
-		public Fl_Double_Window
+		public Fl_Window
 	{
 		// Logging mode - used when initialising a record
 	public:

@@ -62,17 +62,15 @@ qso_entry::~qso_entry() {
 	ticker_->remove_ticker(this);
 }
 
-// When shown set the focus to the most likely input widgets
+// When shown set the focus to the most likely input widgsets
 int qso_entry::handle(int event) {
+	int result = Fl_Group::handle(event);
 	switch (event) {
 	case FL_SHOW:
 		set_initial_focus();
-		return 1;
-	case FL_HIDE:
-		// Don't do anything but absorb the event
-		return 1;
+		break;
 	}
-	return Fl_Group::handle(event);
+	return result;
 }
 
 // Nothing so far
