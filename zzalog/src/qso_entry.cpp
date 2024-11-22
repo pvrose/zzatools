@@ -898,6 +898,7 @@ void qso_entry::delete_qso() {
 
 // Set initial focus - go to first blank input
 void qso_entry::set_initial_focus() {
+	if (!visible_r()) return;
 	bool found = false;
 	for (int ix = NUMBER_FIXED; !found && ix < fields_in_use_.size(); ix ++) {
 		field_input* w = ip_field_[ix];
@@ -909,6 +910,7 @@ void qso_entry::set_initial_focus() {
 
 // set next focus
 void qso_entry::set_next_focus() {
+	if (!visible_r()) return;
 	if (current_ix_ < fields_in_use_.size()) {
 		Fl_Widget* w0 = Fl::focus();
 		if (w0) {
