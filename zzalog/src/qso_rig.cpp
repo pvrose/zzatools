@@ -121,6 +121,8 @@ void qso_rig::load_cat_data(qso_rig::cat_data_t* cat_data, Fl_Preferences settin
 
 	// Read non-hamlib CAT data
 	int itemp;
+	settings.get("Override Hamlib", itemp, (int)false);
+	cat_data->override_hamlib = (bool)itemp;
 	settings.get("Power Mode", itemp, (int)power_mode_t::RF_METER);
 	cat_data->hamlib->power_mode = (power_mode_t)itemp;
 	settings.get("Maximum Power", cat_data->hamlib->max_power, 0.0);
@@ -501,6 +503,12 @@ void qso_rig::create_defaults(int curr_x, int curr_y) {
 	op_pwr_type_->align(FL_ALIGN_TOP);
 	op_pwr_type_->tooltip("Shows how the power is calculated.");
 
+	ch_pwr_type_ = new Fl_Choice(curr_x, curr_y, WBUTTON, HBUTTON, "Power");
+	ch_pwr_type_->align(FL_ALIGN_TOP);
+	ch_pwr_type_->tooltip("Select power type to override hamlib default");
+	ch_pwr_type_->callback(cb_ch_power, nullptr);
+	populate_power_choice();
+
 	curr_y += HBUTTON;
 	ip_max_pwr_ = new Fl_Float_Input(curr_x, curr_y, WBUTTON, HBUTTON, "W");
 	ip_max_pwr_->align(FL_ALIGN_RIGHT);
@@ -510,7 +518,14 @@ void qso_rig::create_defaults(int curr_x, int curr_y) {
 	int max_y = curr_y + HBUTTON + GAP;
 
 	curr_y = save_y;
-	curr_x += WBUTTON + GAP;
+	curr_x += WBUTTON;
+
+	bn_override_ = new Fl_Check_Button(curr_x, curr_y, HBUTTON, HBUTTON, "O/R");
+	bn_override_->align(FL_ALIGN_TOP);
+	bn_override_->callback(cb_bn_override, nullptr);
+	bn_override_->tooltip("Check this to override hamlib defaults - eg rigctld");
+
+	curr_x += HBUTTON;
 
 	op_freq_type_ = new Fl_Output(curr_x, curr_y, WBUTTON, HBUTTON, "Frequency");
 	op_freq_type_->box(FL_FLAT_BOX);
@@ -668,6 +683,7 @@ void qso_rig::save_cat_data(qso_rig::cat_data_t* cat_data, Fl_Preferences settin
 		settings.set("Command", cat_data->app.c_str());
 	}
 	// Read non-hamlib CAT data
+	settings.set("Override Hamlib", cat_data->override_hamlib);
 	settings.set("Power Mode", cat_data->hamlib->power_mode);
 	settings.set("Maximum Power", cat_data->hamlib->max_power, 0.0);
 	settings.set("Frequency Mode", cat_data->hamlib->freq_mode);
@@ -966,24 +982,43 @@ void qso_rig::enable_widgets(uchar damage) {
 		if (hamlib) {
 			// Only update these when not called by ticker
 			// Power defaults
-			op_pwr_type_->activate();
-			switch (hamlib->power_mode) {
-			case RF_METER:
-				op_pwr_type_->value("RF Meter");
-				ip_max_pwr_->deactivate();
-				break;
-			case DRIVE_LEVEL:
-				op_pwr_type_->value("Drive");
-				ip_max_pwr_->activate();
-				break;
-			case MAX_POWER:
-				op_pwr_type_->value("Specify");
-				ip_max_pwr_->activate();
-				break;
-			default:
-				op_pwr_type_->value("");
-				ip_max_pwr_->deactivate();
-				break;
+			bn_override_->value(cat_data_[cat_index_]->override_hamlib);
+			bn_override_->user_data(&cat_data_[cat_index_]->override_hamlib);
+			if (cat_data_[cat_index_]->override_hamlib) {
+				op_pwr_type_->hide();
+				ch_pwr_type_->show();
+				ch_pwr_type_->value(hamlib->power_mode);
+				ch_pwr_type_->user_data(&hamlib->power_mode);
+				switch(hamlib->power_mode) {
+					case DRIVE_LEVEL:
+					case MAX_POWER:
+						ip_max_pwr_->activate();
+						break;
+					default:
+						ip_max_pwr_->deactivate();
+						break;
+				}
+			} else {
+				op_pwr_type_->show();
+				ch_pwr_type_->hide();
+				switch (hamlib->power_mode) {
+				case RF_METER:
+					op_pwr_type_->value("RF Meter");
+					ip_max_pwr_->deactivate();
+					break;
+				case DRIVE_LEVEL:
+					op_pwr_type_->value("Drive");
+					ip_max_pwr_->activate();
+					break;
+				case MAX_POWER:
+					op_pwr_type_->value("Specify");
+					ip_max_pwr_->activate();
+					break;
+				default:
+					op_pwr_type_->value("None");
+					ip_max_pwr_->deactivate();
+					break;
+				}
 			}
 			char text[25];
 			snprintf(text, sizeof(text), "%g", hamlib->max_power);
@@ -1310,6 +1345,15 @@ void qso_rig::populate_index_menu() {
 	}
 }
 
+// Populate power type choice
+void qso_rig::populate_power_choice() {
+	ch_pwr_type_->clear();
+	ch_pwr_type_->add("None");
+	ch_pwr_type_->add("RF Power");
+	ch_pwr_type_->add("Max Power");
+	ch_pwr_type_->add("Specify");
+}
+
 // Model input choice selected
 // v is not used
 void qso_rig::cb_ch_model(Fl_Widget* w, void* v) {
@@ -1412,7 +1456,10 @@ void qso_rig::cb_bn_connect(Fl_Widget* w, void* v) {
 
 	} else {
 		that->rig_->open();
-		if (that->rig_->is_good()) that->rig_ok_ = true;
+		if (that->rig_->is_good()) {
+			that->rig_ok_ = true;
+			that->modify_hamlib_data();
+		}
 	}
 	that->rig_starting_ = false;
 	that->enable_widgets(DAMAGE_ALL);
@@ -1546,6 +1593,20 @@ void qso_rig::cb_show_app(Fl_Widget* w, void* v) {
 	}
 }
 
+// Override hamlib
+void qso_rig::cb_bn_override(Fl_Widget* w, void* v) {
+	cb_value<Fl_Check_Button, bool>(w, v);
+	qso_rig* that = ancestor_view<qso_rig>(w);
+	that->enable_widgets(DAMAGE_ALL);
+}
+
+// Select hamlib override power type
+void qso_rig::cb_ch_power(Fl_Widget* w, void* v) {
+	cb_value<Fl_Choice, power_mode_t>(w, v);
+	qso_rig* that = ancestor_view<qso_rig>(w);
+	that->enable_widgets(DAMAGE_ALL);
+}
+
 // Connect rig if disconnected and vice-versa
 void qso_rig::switch_rig() {
 	if (rig_) {
@@ -1604,27 +1665,29 @@ Fl_Color qso_rig::alert_colour() {
 // Modify the values returned from the rig according to the modifier attributes
 void qso_rig::modify_hamlib_data() {
 	if (cat_index_ >= 0 && cat_index_ < cat_data_.size()) {
-		hamlib_data_t* hamlib = cat_data_[cat_index_]->hamlib;
-		const rig_caps* capabilities = rig_get_caps(hamlib->model_id);
-		if (capabilities) {
-			if (capabilities->port_type == RIG_PORT_NONE) {
-				hamlib->power_mode = MAX_POWER;
-			}
-			else if (capabilities && (capabilities->has_get_level & RIG_LEVEL_RFPOWER_METER_WATTS)) {
-				hamlib->power_mode = RF_METER;
-			}
-			else if (capabilities && (capabilities->has_get_level & RIG_LEVEL_RFPOWER)) {
-				hamlib->power_mode = DRIVE_LEVEL;
-			}
-			else {
-				hamlib->power_mode = MAX_POWER;
-			}
-			if (capabilities->port_type == RIG_PORT_NONE) {
-				hamlib->freq_mode = NO_FREQ;
-			}
-			else {
-				// TODO - how do I know if it's fixed frequency?
-				hamlib->freq_mode = VFO;
+		if (!cat_data_[cat_index_]->override_hamlib) {
+			hamlib_data_t* hamlib = cat_data_[cat_index_]->hamlib;
+			const rig_caps* capabilities = rig_get_caps(hamlib->model_id);
+			if (capabilities) {
+				if (capabilities->port_type == RIG_PORT_NONE) {
+					hamlib->power_mode = MAX_POWER;
+				}
+				else if (capabilities && (capabilities->has_get_level & RIG_LEVEL_RFPOWER_METER_WATTS)) {
+					hamlib->power_mode = RF_METER;
+				}
+				else if (capabilities && (capabilities->has_get_level & RIG_LEVEL_RFPOWER)) {
+					hamlib->power_mode = DRIVE_LEVEL;
+				}
+				else {
+					hamlib->power_mode = MAX_POWER;
+				}
+				if (capabilities->port_type == RIG_PORT_NONE) {
+					hamlib->freq_mode = NO_FREQ;
+				}
+				else {
+					// TODO - how do I know if it's fixed frequency?
+					hamlib->freq_mode = VFO;
+				}
 			}
 		}
 	}

@@ -81,6 +81,7 @@ protected:
 	struct cat_data_t {
 		hamlib_data_t* hamlib = nullptr;
 		bool use_cat_app = false;
+		bool override_hamlib = false;
 		string app = "";
 		string nickname = "";
 	};
@@ -136,6 +137,10 @@ protected:
 	static void cb_smeters(Fl_Widget* w, void* v);
 	// Show app
 	static void cb_show_app(Fl_Widget* w, void* v);
+	// Callback when selecting power mode
+	static void cb_ch_power(Fl_Widget* w, void* v);
+	// Callback for hamlib override button
+	static void cb_bn_override(Fl_Widget* w, void* v);
 
 	// Get hamlib data
 	void find_hamlib_data();
@@ -148,6 +153,8 @@ protected:
 	void populate_baud_choice();
 	// Populate index menu button
 	void populate_index_menu();
+	// Populate power type choice
+	void populate_power_choice();
 	// Create the various parts of the form
 	void create_status(int x, int y);
 	void create_buttons(int x, int y);
@@ -210,7 +217,9 @@ protected:
 
 	Fl_Group* defaults_tab_;
 	Fl_Output* op_pwr_type_;
+	Fl_Choice* ch_pwr_type_;
 	Fl_Float_Input* ip_max_pwr_;
+	Fl_Check_Button* bn_override_;
 	Fl_Output* op_freq_type_;
 	Fl_Float_Input* ip_xtal_;
 
