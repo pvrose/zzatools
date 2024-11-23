@@ -299,6 +299,10 @@ void app_grp::cb_bn_connect(Fl_Widget* w, void* v) {
         char msg[128];
         snprintf(msg, sizeof(msg), "DASH: Starting app: %s", app.c_str());
         status_->misc_status(ST_NOTE, msg);
+#ifdef _WIN32
+        string cmd = "start /min " + app;
+        system(cmd.c_str());
+#else
         if (that->app_data_->admin) {
             char sudo[128];
             snprintf(sudo, sizeof(sudo), "MY_PW=%s; export MY_PW; %s", 
@@ -307,6 +311,7 @@ void app_grp::cb_bn_connect(Fl_Widget* w, void* v) {
         } else {
             system(app.c_str());
         }
+#endif
     }
     that->enable_widgets();
   
