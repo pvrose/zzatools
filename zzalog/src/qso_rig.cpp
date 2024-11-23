@@ -1482,7 +1482,11 @@ void qso_rig::cb_bn_select(Fl_Widget* w, void* v) {
 // v points to the string containing the command to  invoke flrig
 void qso_rig::cb_bn_start(Fl_Widget* w, void* v) {
 	qso_rig* that = ancestor_view<qso_rig>(w);
+#ifdef _WIN32
+	string command = "start /min " + that->cat_data_[that->cat_index_]->app;
+#else
 	string command = that->cat_data_[that->cat_index_]->app + "&";
+#endif
 	int result = system(command.c_str());
 	char msg[100];
 	if (result == 0) {
@@ -1597,14 +1601,14 @@ void qso_rig::cb_show_app(Fl_Widget* w, void* v) {
 void qso_rig::cb_bn_override(Fl_Widget* w, void* v) {
 	cb_value<Fl_Check_Button, bool>(w, v);
 	qso_rig* that = ancestor_view<qso_rig>(w);
-	that->enable_widgets(DAMAGE_ALL);
+	that->enable_widgets(DAMAGE_ADDONS);
 }
 
 // Select hamlib override power type
 void qso_rig::cb_ch_power(Fl_Widget* w, void* v) {
 	cb_value<Fl_Choice, power_mode_t>(w, v);
 	qso_rig* that = ancestor_view<qso_rig>(w);
-	that->enable_widgets(DAMAGE_ALL);
+	that->enable_widgets(DAMAGE_ADDONS);
 }
 
 // Connect rig if disconnected and vice-versa
