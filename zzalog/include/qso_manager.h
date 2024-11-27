@@ -66,8 +66,6 @@ enum hint_t : uchar;
 		virtual void save_values();
 		// Update record with MY_RIG etc. For use when importing 
 		void update_import_qso(record* import);
-		// Update time
-		void update_time(time_t when);
 
 		// Callback - close button
 		static void cb_close(Fl_Widget* w, void* v);
@@ -108,8 +106,6 @@ enum hint_t : uchar;
 		rig_if* rig();
 		// Get rig control
 		qso_rig* rig_control();
-		// Stop the 1s timer in qso_clock
-		void stop_ticker();
 		// Get current displayed QSO
 		qso_data* data();
 		// QSL handler
