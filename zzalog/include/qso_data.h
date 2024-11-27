@@ -228,6 +228,8 @@ public:
 	void action_remember_state();
 	// Go to remembered state
 	void action_return_state();
+	// Add parse details to QSO
+	void action_parse_qso();
 
 	qso_contest* contest();
 	// Contest mode is active

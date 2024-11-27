@@ -405,7 +405,7 @@ string extract_data::short_comment() {
 		}
 		if (criteria_->condition != XC_UNFILTERED) {
 			// Add if using regular expression matching
-			result += " " + comparator_labels_[(int)criteria_->comparator] +  " " + criteria_->pattern;
+			result += " " + comparator_labels_[(int)criteria_->comparator] +  " '" + criteria_->pattern + "'";
 		}
 		result += " ";
 		if (criteria_->by_dates) {

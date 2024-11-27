@@ -80,13 +80,13 @@ public:
 		UPDATE_CAT,
 		SAVE_RESTART,
 		RESTART,
+		PARSE_QSO,
 	};
 
 	// Parameters for the button
 	struct button_action {
 		const char* label;      // Its label
 		const char* tooltip;    // The tooltip to display
-		Fl_Color colour;        // The background colour
 		Fl_Callback* callback;  // Callback action
 		void* userdata;         // Callback data
 	};
@@ -153,6 +153,8 @@ public:
 	static void cb_bn_save_restart(Fl_Widget* w, void* v);
 	// Cancel current QSO and restart
 	static void cb_bn_restart(Fl_Widget* w, void* v);
+	// Pasre QSO
+	static void cb_bn_parse_qso(Fl_Widget* w, void* v);
 
 
 protected:
@@ -161,7 +163,7 @@ protected:
 	void disable_widgets();
 
 	// Number of buttons
-	static const int MAX_ACTIONS = 12;
+	static const int MAX_ACTIONS = 20;
 
 	// parent
 	qso_data* qso_data_;

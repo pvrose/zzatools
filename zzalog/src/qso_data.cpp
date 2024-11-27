@@ -1625,6 +1625,19 @@ void qso_data::action_return_state() {
 	}
 }
 
+// Parse the qso
+void qso_data::action_parse_qso() {
+	record* qso = current_qso();
+	// command parsing enabled - parse record
+	bool parse_result = cty_data_->update_qso(qso);
+	// update band
+	bool changed = qso->update_band(true);
+	if (changed || parse_result) {
+		g_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
+	}
+	enable_widgets();
+}
+
 // Dummy QSO
 record* qso_data::dummy_qso() {
 	record* dummy = new record;

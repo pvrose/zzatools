@@ -421,7 +421,7 @@ void search_dialog::save_values() {
 	case XC_DXCC:
 		// special case - DXCC and pattern not numeric
 		criteria_->pattern = to_upper(criteria_->pattern);
-		if (!criteria_->comparator != XP_REGEX) {
+		if (!criteria_->comparator != XP_REGEX && criteria_->pattern.length()) {
 			string::size_type dummy;
 			int dxcc_id;
 			// Match by DXCC - either code number of nickname (default prefix)
