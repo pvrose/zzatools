@@ -77,7 +77,7 @@ extern config* config_;
 		{ "&Save", 0, menu::cb_mi_file_save, (void*)OT_MAIN },
 		{ "Save &As", 0, menu::cb_mi_file_saveas, (void*)OT_MAIN },
 		{ "&Close", 0, menu::cb_mi_file_close, 0 },
-		{ "&Print", 0, menu::cb_mi_file_print, (void*)OT_MAIN, FL_MENU_DIVIDER },
+		{ "&Print Log", 0, menu::cb_mi_file_print, (void*)OT_MAIN, FL_MENU_DIVIDER },
 		{ "&Recent", 0, 0, 0, FL_SUBMENU | FL_MENU_DIVIDER },
 		// Extra menu items are dynamically inserted here 
 			{ 0 },
@@ -159,7 +159,7 @@ extern config* config_;
 		{ "Club&Log", 0, menu::cb_mi_ext_qsl, (void*)extract_data::CLUBLOG, FL_MENU_DIVIDER },
 		{ "&Save", 0, menu::cb_mi_file_saveas, (void*)OT_EXTRACT },
 		{ "&Upload", 0, menu::cb_mi_ext_upload, 0 },
-		{ "&Print", 0, menu::cb_mi_ext_print, 0 },
+		{ "&Print Cards", 0, menu::cb_mi_ext_print, 0 },
 		{ "Send e-mail", 0, menu::cb_mi_ext_email, 0 },
 		{ "Mar&k sent", 0, menu::cb_mi_ext_mark, 0 },
 		{ 0 },
