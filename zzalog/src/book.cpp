@@ -928,7 +928,11 @@ bool book::basic_match(record* record) {
 	{
 		// See if it is a valid nickname
 		int dxcc = cty_data_->entity(criteria_->pattern);
-		if (dxcc == -1 || criteria_->comparator == XP_LT || criteria_->comparator == XP_LE ||
+		if (criteria_->pattern.length() == 0) {
+			// Null string - check records with no value
+			return match_string(criteria_->pattern, criteria_->comparator, record->item("DXCC"));
+		}
+		else if (dxcc == -1 || criteria_->comparator == XP_LT || criteria_->comparator == XP_LE ||
 			criteria_->comparator == XP_GE || criteria_->comparator == XP_GT) {
 			// Not a nickname so match against the raw value
 			return match_int(criteria_->pattern, criteria_->comparator, record->item("DXCC"));
