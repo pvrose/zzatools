@@ -50,10 +50,9 @@ using namespace std;
 		search_criteria_t* criteria_;
 
 		// Radio button callback parameters - basic condition
-		radio_param_t condition_params_[10] =
+		radio_param_t condition_params_[XC_MAXIMUM] =
 		{
 			{ XC_DXCC, nullptr },
-			{ XC_GEO, nullptr },
 			{ XC_CQZ, nullptr },
 			{ XC_ITUZ, nullptr },
 			{ XC_CONT, nullptr },
@@ -82,8 +81,8 @@ using namespace std;
 			{XP_GT, nullptr},
 		};
 		// Labels for the condition radio buttons 
-		const string condition_labels_[10] =
-		{ "DXCC", "Geography", "CQ Zone", "ITU Zone", "Continent", "Square (2)", "Square (4)", "Callsign",
+		const string condition_labels_[XC_MAXIMUM] =
+		{ "DXCC", "CQ Zone", "ITU Zone", "Continent", "Square (2)", "Square (4)", "Callsign",
 			"All", "Field" };
 		// Labels for the combination mode radio buttons
 		const string combination_labels_[3] = {

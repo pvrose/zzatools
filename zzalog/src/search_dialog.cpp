@@ -133,10 +133,10 @@ search_dialog::search_dialog() :
 	Fl_Group* gp1a = new Fl_Group(XG, YG1, WG1, HG1A);
 	gp1a->box(FL_NO_BOX);
 	// Set the positions of the buttons
-	const int col1[10] = { C11, C12, C13, C14, C11, C12, C13, C14, C11, C12 };
-	const int row1[10] = { R11, R11, R11, R11, R12, R12, R12, R12, R13, R13 };
+	const int col1[XC_MAXIMUM] = { C11, C12, C13, C14, C11, C12, C13, C14, C11};
+	const int row1[XC_MAXIMUM] = { R11, R11, R11, R11, R12, R12, R12, R12, R13};
 	// For each condition
-	for (int i = 0; i < 10; i++) {
+	for (int i = 0; i < XC_MAXIMUM; i++) {
 		// Radio - one for each element of the search criterion
 		Fl_Radio_Round_Button* bn11 = new Fl_Radio_Round_Button(col1[i], row1[i], WBN, HBN, condition_labels_[i].c_str());
 		bn11->box(FL_THIN_UP_BOX);

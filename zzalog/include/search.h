@@ -12,16 +12,16 @@ using namespace std;
 
 	// extract match condition - values match radio button position in dialog
 	enum search_cond_t : int {
-		XC_DXCC = 0,           // records match on DXCC by code or nickname
-		XC_GEO = 1,            // records match on sub-division of DXCC by nickname
-		XC_CQZ = 2,            // records match on CQ Zone number
-		XC_ITUZ = 3,           // records match on ITU Zone number
-		XC_CONT = 4,           // records match on 2-letter continent code
-		XC_SQ2 = 5,            // records match on first two letters of grid-square locator
-		XC_SQ4 = 6,            // records match on first 4 letters of grid-square locator
-		XC_CALL = 7,           // records match on callsign (usually used with regular expressions)
-		XC_UNFILTERED = 8,     // all records
-		XC_FIELD = 9           // records match on specified ADIF field name
+		XC_DXCC = 0,       // records match on DXCC by code or nickname
+		XC_CQZ,            // records match on CQ Zone number
+		XC_ITUZ,           // records match on ITU Zone number
+		XC_CONT,           // records match on 2-letter continent code
+		XC_SQ2,            // records match on first two letters of grid-square locator
+		XC_SQ4,            // records match on first 4 letters of grid-square locator
+		XC_CALL,           // records match on callsign (usually used with regular expressions)
+		XC_UNFILTERED,     // all records
+		XC_FIELD,          // records match on specified ADIF field name
+		XC_MAXIMUM         // Value for use as a limit
 	};
 
 	// extract data combination mode - order used for radio button

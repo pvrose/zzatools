@@ -946,12 +946,6 @@ bool book::basic_match(record* record) {
 		// match by a specified field
 		return match_string(criteria_->pattern, criteria_->comparator, record->item(criteria_->field_name));
 		break;
-	case XC_GEO: {
-		// match by the "geography" - based on default prefix for that region
-		string nickname = cty_data_->nickname(record);
-		return match_string(criteria_->pattern, criteria_->comparator, nickname);
-		break;
-	}
 	case XC_ITUZ:
 		// match by ITU zone number
 		return match_int(criteria_->pattern, criteria_->comparator, record->item("ITUZ"));

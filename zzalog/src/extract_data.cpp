@@ -297,9 +297,6 @@ string extract_data::comment() {
 		case XC_DXCC:
 			result += "DXCC ";
 			break;
-		case XC_GEO:
-			result += "Prefix ";
-			break;
 		case XC_CQZ:
 			result += "CQ Zone ";
 			break;
@@ -376,9 +373,6 @@ string extract_data::short_comment() {
 		switch (criteria_->condition) {
 		case XC_DXCC:
 			result += "DX";
-			break;
-		case XC_GEO:
-			result += "PX";
 			break;
 		case XC_CQZ:
 			result += "CQ";
