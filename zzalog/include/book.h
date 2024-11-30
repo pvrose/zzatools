@@ -1,10 +1,8 @@
 #ifndef __BOOK__
 #define __BOOK__
 
-#include "spec_data.h"
-#include "drawing.h"
 #include "band.h"
-#include "fields.h"
+#include "drawing.h"
 
 #include <string>
 #include <vector>
@@ -22,7 +20,8 @@ using namespace std;
 	class record;
 	class band_set;
 	struct search_criteria_t;
-	
+	typedef vector<string> field_list;
+
 	// extern spec_data* spec_data_;
 
 

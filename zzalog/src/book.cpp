@@ -19,6 +19,7 @@
 #include "main_window.h"
 #include "qso_manager.h"
 #include "search.h"
+#include "drawing.h"
 
 // C/C++ header files
 #include <ctime>
