@@ -3,7 +3,6 @@
 
 #include "spec_data.h"
 #include "drawing.h"
-#include "search.h"
 #include "band.h"
 #include "fields.h"
 
@@ -22,7 +21,8 @@ using namespace std;
 	class adx_writer;
 	class record;
 	class band_set;
-
+	struct search_criteria_t;
+	
 	// extern spec_data* spec_data_;
 
 
@@ -136,10 +136,10 @@ using namespace std;
 		// refine match - by date band and mode
 		bool refine_match(record* record);
 		// item matching - string
-		bool match_string(string test, search_comp_t comparator, string value);
+		bool match_string(string test, int comparator, string value);
 		// item matching - integer
-		bool match_int(string test, search_comp_t comparator, string value);
-		bool match_int(int test, search_comp_t comparator, int value);
+		bool match_int(string test, int comparator, string value);
+		bool match_int(int test, int comparator, int value);
 		// get book type
 		object_t book_type();
 		// set book type

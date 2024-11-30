@@ -18,6 +18,7 @@
 #include "club_handler.h"
 #include "main_window.h"
 #include "qso_manager.h"
+#include "search.h"
 
 // C/C++ header files
 #include <ctime>
@@ -1008,8 +1009,8 @@ bool book::refine_match(record* record) {
 }
 
 // string item matches taking whether to use regex or not.
-bool book::match_string(string test, search_comp_t comparator, string value) {
-	switch (comparator) {
+bool book::match_string(string test, int comparator, string value) {
+	switch ((search_comp_t)comparator) {
 	case XP_REGEX: {
 		basic_regex<char> regex(to_upper(test));
 		return regex_match(to_upper(value), regex);
@@ -1032,7 +1033,7 @@ bool book::match_string(string test, search_comp_t comparator, string value) {
 }
 
 // integer item matching - ignores things like leading zeros and trailing non numeric characters
-bool book::match_int(string test, search_comp_t comparator, string value) {
+bool book::match_int(string test, int comparator, string value) {
 	try {
 		return match_int(stoi(test), comparator, stoi(value));
 	}
@@ -1042,8 +1043,8 @@ bool book::match_int(string test, search_comp_t comparator, string value) {
 }
 
 // integer item matching - integer vs integer
-bool book::match_int(int test, search_comp_t comparator, int value) {
-	switch (comparator) {
+bool book::match_int(int test, int comparator, int value) {
+	switch ((search_comp_t)comparator) {
 	case XP_NE:
 		return (value != test);
 	case XP_LT:
