@@ -35,7 +35,7 @@ map<qso_data::logging_state_t, list<qso_buttons::button_type> > button_map_ =
 		qso_buttons::SAVE_VIEW, qso_buttons::CANCEL_EDIT, 
 		qso_buttons::EDIT_NET, qso_buttons::NAV_FIRST,
 		qso_buttons::NAV_PREV, qso_buttons::NAV_NEXT, qso_buttons::NAV_LAST,
-		qso_buttons::UPDATE_CAT, qso_buttons::QRZ_COM, qso_buttons::PARSE_QSO } },
+		qso_buttons::UPDATE_CAT, qso_buttons::REPLACE_CAT, qso_buttons::QRZ_COM, qso_buttons::PARSE_QSO } },
 	{ qso_data::QSO_VIEW, { qso_buttons::EDIT_QSO, qso_buttons::CANCEL_VIEW, qso_buttons::START_QSO, 
 		qso_buttons::NAV_FIRST, qso_buttons::NAV_PREV, qso_buttons::NAV_NEXT, qso_buttons::NAV_LAST ,
 		qso_buttons::QRZ_COM, qso_buttons::LOOK_ALL_TXT } },
@@ -113,10 +113,11 @@ map<qso_buttons::button_type, qso_buttons::button_action> action_map_ =
 	{ qso_buttons::CANCEL_QUERY, { "Cancel", "Cancel query", qso_buttons::cb_bn_cancel_query, 0 }},
 	{ qso_buttons::IMPORT_QUERY, { "Test Import", "Test import query", qso_buttons::cb_bn_import_query, 0 }},
 	{ qso_buttons::QRZ_COM, { "@search QRZ.com", "Display details in QRZ.com", qso_buttons::cb_bn_qrz_com, 0}},
-	{ qso_buttons::UPDATE_CAT, { "Update CAT", "Update QSO with current CAT info", qso_buttons::cb_bn_update_cat, 0 }},
+	{ qso_buttons::UPDATE_CAT, { "Update CAT", "Use CAT info where current QSO has no value", qso_buttons::cb_bn_update_cat, (void*)false }},
+	{ qso_buttons::REPLACE_CAT, { "Replaxe CAT", "Use current CAT info", qso_buttons::cb_bn_update_cat, (void*)true }},
 	{ qso_buttons::SAVE_RESTART, { "Save && Restart", "Save current QSO and start a new one", qso_buttons::cb_bn_save_restart, 0 }},
 	{ qso_buttons::RESTART, { "Restart", "Ditch current QSO and start anew", qso_buttons::cb_bn_restart, 0 }},
-	{ qso_buttons::PARSE_QSO, { "Pare QSO", "Add DXCC, CQ, etc details to QSO", qso_buttons::cb_bn_parse_qso, 0 }},
+	{ qso_buttons::PARSE_QSO, { "Parse QSO", "Add DXCC, CQ, etc details to QSO", qso_buttons::cb_bn_parse_qso, 0 }},
 };
 
 // Constructor
@@ -754,10 +755,11 @@ void qso_buttons::cb_bn_qrz_com(Fl_Widget* w, void* v) {
 void qso_buttons::cb_bn_update_cat(Fl_Widget* w, void* v) {
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
 	that->disable_widgets();
+	bool clear = (bool)(intptr_t)v;
 	switch(that->qso_data_->logging_state()) {
 		case qso_data::QSO_EDIT:
 		case qso_data::NET_EDIT: {
-			that->qso_data_->action_update_cat();
+			that->qso_data_->action_update_cat(clear);
 			break;
 		}
 	}

@@ -223,7 +223,7 @@ public:
 	// Opne QRZ.com browser
 	void action_qrz_com();
 	// Update selected QSO with current CAT conditions
-	void action_update_cat();
+	void action_update_cat(bool clear);
 	// Remember state before edit or view
 	void action_remember_state();
 	// Go to remembered state

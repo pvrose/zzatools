@@ -1582,15 +1582,15 @@ void qso_data::action_qrz_com() {
 }
 
 // Action update CAT
-void qso_data::action_update_cat() {
+void qso_data::action_update_cat(bool clear) {
 	switch (logging_state_) {
 		case QSO_EDIT: {
-			g_entry_->copy_cat_to_qso(true);
+			g_entry_->copy_cat_to_qso(clear);
 			g_entry_->copy_qso_to_display(qso_entry::CF_CAT);
 			break;
 		}
 		case NET_EDIT: {
-			g_net_entry_->entry()->copy_cat_to_qso(true);
+			g_net_entry_->entry()->copy_cat_to_qso(clear);
 			g_net_entry_->entry()->copy_qso_to_display(qso_entry::CF_CAT);
 			break;
 		}
