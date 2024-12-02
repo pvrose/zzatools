@@ -1456,7 +1456,7 @@ void menu::update_items() {
 		// Get all relevant menu item indices
 		int index_save = find_index("&File/&Save");
 		int index_saveas = find_index("&File/Save &As");
-		int index_print = find_index("&File/&Print");
+		int index_print = find_index("&File/&Print Log");
 		int index_first = find_index("&Navigate/&First");
 		int index_prev = find_index("&Navigate/&Previous");
 		int index_next = find_index("&Navigate/Ne&xt");
@@ -1667,7 +1667,7 @@ void menu::update_qsl_items() {
 	int index_card = find_index("E&xtract/Car&d");
 	int index_clog = find_index("E&xtract/Club&Log");
 	int index_upload = find_index("E&xtract/&Upload");
-	int index_print = find_index("E&xtract/&Print");
+	int index_print = find_index("E&xtract/&Print Cards");
 	int index_dn_eqsl = find_index("&Import/Download e&QSL");
 	int index_dn_lotw = find_index("&Import/Download &LotW");
 
