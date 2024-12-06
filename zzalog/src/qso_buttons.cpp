@@ -36,7 +36,8 @@ map<qso_data::logging_state_t, list<qso_buttons::button_type> > button_map_ =
 		qso_buttons::EDIT_NET, qso_buttons::NAV_FIRST,
 		qso_buttons::NAV_PREV, qso_buttons::NAV_NEXT, qso_buttons::NAV_LAST,
 		qso_buttons::UPDATE_CAT, qso_buttons::REPLACE_CAT, qso_buttons::QRZ_COM, qso_buttons::PARSE_QSO } },
-	{ qso_data::QSO_VIEW, { qso_buttons::EDIT_QSO, qso_buttons::CANCEL_VIEW, qso_buttons::START_QSO, 
+	{ qso_data::QSO_VIEW, { qso_buttons::EDIT_QSO, qso_buttons::CANCEL_VIEW, qso_buttons::ACTIVATE,
+	    qso_buttons::START_QSO, 
 		qso_buttons::NAV_FIRST, qso_buttons::NAV_PREV, qso_buttons::NAV_NEXT, qso_buttons::NAV_LAST ,
 		qso_buttons::QRZ_COM, qso_buttons::LOOK_ALL_TXT } },
 	{ qso_data::QSO_BROWSE, { qso_buttons::EDIT_QSO, qso_buttons::CANCEL_BROWSE, qso_buttons::VIEW_QSO, 
@@ -225,6 +226,9 @@ void qso_buttons::cb_activate(Fl_Widget* w, void* v) {
 	qso_buttons* that = ancestor_view<qso_buttons>(w);
 	that->disable_widgets();
 	switch (that->qso_data_->logging_state()) {
+	case qso_data::QSO_VIEW:
+		that->qso_data_->action_cancel_edit();
+		// Drop through
 	case qso_data::QSO_INACTIVE:
 		that->qso_data_->action_activate(qso_data::QSO_ON_AIR);
 		break;
