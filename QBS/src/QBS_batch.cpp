@@ -211,6 +211,8 @@ void QBS_batch::enable_widgets() {
 		// Weight input
 		switch (win_->process()) {
 		case process_mode_t::RECYCLING:
+		case process_mode_t::BATCH_SUMMARY:
+		case process_mode_t::BATCH_REPORT:
 			ip_weight_->activate();
 			break;
 		default:
@@ -243,12 +245,14 @@ void QBS_batch::enable_widgets() {
 			op_sent_date_->value("");
 			op_rcyc_date_->value("");
 		}
+		snprintf(l, sizeof(l), "%.2f", info.weight_kg);
 		switch (win_->process()) {
 		case RECYCLING:
 			tab_top20_->show();
 			tab_top20_->box(box_);
 			tab_report_->hide();
-			ch_batch_->deactivate();
+			ch_batch_->deactivate();	
+			ip_weight_->value("");
 			break;
 		case BATCH_SUMMARY:
 			tab_top20_->show();
@@ -256,6 +260,7 @@ void QBS_batch::enable_widgets() {
 			tab_report_->hide();
 			ch_batch_->activate();
 			ch_batch_->value(box_);
+			ip_weight_->value(l);
 			break;
 		case BATCH_REPORT:
 			tab_top20_->hide();
@@ -263,6 +268,7 @@ void QBS_batch::enable_widgets() {
 			tab_report_->box(box_);
 			ch_batch_->activate();
 			ch_batch_->value(box_);
+			ip_weight_->value(l);
 			break;
 		default:
 			tab_top20_->hide();
