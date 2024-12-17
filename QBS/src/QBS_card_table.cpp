@@ -98,7 +98,9 @@ int QBS_card_table::num_rows() {
     case process_mode_t::SORTING:
         boxes_.push_back(IN_BOX);
         boxes_.push_back(KEEP_BOX);
-        boxes_.push_back(current);
+        for (int ix = head; ix <= current; ix++) {
+            boxes_.push_back(ix);
+        }
         break;
     case process_mode_t::LOG_CARD:
         boxes_.push_back(IN_BOX);

@@ -184,6 +184,7 @@ void QBS_call::enable_widgets() {
 	case process_mode_t::LOG_CARD:
 	case process_mode_t::LOG_SASE:
 	case process_mode_t::SORTING:
+		ip_add_qty_->value(to_string(add_qty_).c_str());
 		gp_add_item_->show();
 		gp_process_->hide();
 		break;
@@ -281,7 +282,6 @@ void QBS_call::execute_sort() {
 	snprintf(log_msg, sizeof(log_msg), "Received batch cards %s: %s %d\n", date_.c_str(), call_.c_str(), add_qty_);
 	win_->append_batch_log(log_msg);
 	add_qty_ = 0;
-	call_ = "";
 	enable_widgets();
 }
 
