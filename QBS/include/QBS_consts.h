@@ -45,6 +45,7 @@ enum process_mode_t {
 	RECYCLING,                   // Mark cards as having been disposed
 	BATCH_SUMMARY,               // Produce batch summary report
 	BATCH_REPORT,                // Produce batch callsign report
+	CALL_HISTORY,                // View call history
 };
 
 enum reading_mode_t {

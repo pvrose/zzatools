@@ -40,10 +40,14 @@ void QBS_charth::create_form() {
 	int curr_x = x() + AXIS_WIDTH;
 	int curr_w = w() - AXIS_WIDTH;
 
-	chart_ = new Fl_Chart(curr_x, y(), curr_w, h() - LEGEND_HEIGHT);
+	chart_ = new Fl_Chart(curr_x, y(), curr_w, h() - LEGEND_HEIGHT - HBUTTON);
 	chart_->box(FL_NO_BOX);
 	chart_->type(FL_BAR_CHART);
 	chart_->autosize(true);
+
+	scroll_ = new Fl_Scrollbar(x(), chart_->y() + chart_->h() + LEGEND_HEIGHT, w(), HBUTTON);
+	scroll_->type(FL_HORIZONTAL);
+	scroll_->callback(cb_scroll, nullptr);
 
 	end();
 }
@@ -53,20 +57,34 @@ void QBS_charth::data(QBS_data* d) {
 }
 
 void QBS_charth::update(string call) {
-	int stop_box = data_->get_current();
-	int start_box = stop_box > 11 ? stop_box - 11 : 0;
-	int head_box = data_->get_head();
-	// Save start and count for handle
-	start_box_ = start_box;
-	number_boxes_ = stop_box - start_box + 1;
+	call_ = call;
+	stop_box_= data_->get_current();
+	start_box_ = stop_box_ > 11 ? stop_box_ - 11 : 0;
+	head_box_ = data_->get_head();
+	number_boxes_ = stop_box_ - start_box_ + 1;
+
+	if (number_boxes_ > 11) {
+		scroll_->activate();
+		scroll_->range(12, stop_box_);
+		scroll_->value(stop_box_);
+	} else {
+		scroll_->deactivate();
+	}
+	draw_chart();
+
+}
+
+void QBS_charth::draw_chart() {
+
 	max_ = 0;
+
 	chart_counts_.resize(number_boxes_ * 4);
 
 	chart_->clear();
 
 	char err_msg[64];
 
-	for (int b = start_box, ix = 0; b <= stop_box; b++, ix++) {
+	for (int b = start_box_, ix = 0; b <= stop_box_; b++, ix++) {
 		string box_name = data_->get_batch(b);
 		string label = "";
 		if (box_name.substr(5, 2) == "Q1") {
@@ -75,8 +93,8 @@ void QBS_charth::update(string call) {
 		box_data* box = data_->get_box(b);
 		// Add received data
 		int rcvd = 0;
-		if (box->received->find(call) != box->received->end()) {
-			rcvd = box->received->at(call);
+		if (box->received->find(call_) != box->received->end()) {
+			rcvd = box->received->at(call_);
 			if (rcvd < 0) {
 				snprintf(err_msg, sizeof(err_msg), "Negative value %d received Box %s\n", rcvd, box_name.c_str());
 				clog << err_msg;
@@ -89,8 +107,8 @@ void QBS_charth::update(string call) {
 		// Add recycled and sent data
 		int rcyc = 0;
 		int sent = 0;
-		if (box->sent->find(call) != box->sent->end()) {
-			sent = box->sent->at(call);
+		if (box->sent->find(call_) != box->sent->end()) {
+			sent = box->sent->at(call_);
 			if (sent < 0) {
 				snprintf(err_msg, sizeof(err_msg), "Negative value %d sent Box %s\n", sent, box_name.c_str());
 				clog << err_msg;
@@ -100,8 +118,8 @@ void QBS_charth::update(string call) {
 		ix++;
 		chart_counts_[ix] = sent;
 		chart_->add((double)sent, "", COLOUR_SENT);
-		if (b < head_box && box->counts->find(call) != box->counts->end()) {
-			rcyc = box->counts->at(call);
+		if (b < head_box_ && box->counts->find(call_) != box->counts->end()) {
+			rcyc = box->counts->at(call_);
 			if (rcyc < 0) {
 				snprintf(err_msg, sizeof(err_msg), "Negative value %d recycled Box %s\n", rcyc, box_name.c_str());
 				clog << err_msg;
@@ -221,9 +239,11 @@ int QBS_charth::handle(int event) {
 			}
 		}
 		case FL_RELEASE: {
-			if (win_tip_) Fl::delete_widget(win_tip_);
-			win_tip_ = nullptr;
-			return true;
+			if (win_tip_)  {
+				Fl::delete_widget(win_tip_);
+				win_tip_ = nullptr;
+				return true;
+			}
 		}
 	}
 	return Fl_Group::handle(event);
@@ -274,4 +294,12 @@ void QBS_charth::chart_tip() {
 	// Must be after set_tooltip_window.
 	win_tip_->show();
 
+}
+
+void QBS_charth::cb_scroll(Fl_Widget* w, void* v) {
+	QBS_charth* that = ancestor_view<QBS_charth>(w);
+	Fl_Scrollbar* bar = (Fl_Scrollbar*)w;
+	that->stop_box_ = bar->value();
+	that->start_box_ = that->stop_box_ - that->number_boxes_ + 1;
+	that->draw_chart();
 }

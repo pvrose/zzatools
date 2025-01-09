@@ -110,6 +110,7 @@ void QBS_window::create_form() {
 	spells_[PROCESSING] = g_call_;
 	spells_[LOG_CARD] = g_call_;
 	spells_[LOG_SASE] = g_call_;
+	spells_[CALL_HISTORY] = g_call_;
 
 	g_batch_ = new QBS_batch(x(), y(), w(), h());
 	spells_[POSTING] = g_batch_;

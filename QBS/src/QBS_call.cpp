@@ -174,6 +174,9 @@ void QBS_call::enable_widgets() {
 	case process_mode_t::PROCESSING:
 		snprintf(l, sizeof(l), "PROCESSING: Sorting batch %s cards for posting, or holding", last_batch.c_str());
 		break;
+	case process_mode_t::CALL_HISTORY:
+		snprintf(l, sizeof(l), "CALL HISTORY: Recent card traffic");
+		break;
 	default:
 		snprintf(l, sizeof(l), "INVALID: Not a valid mode for this dialog");
 		break;
@@ -190,7 +193,20 @@ void QBS_call::enable_widgets() {
 		break;
 	case process_mode_t::PROCESSING:
 		gp_add_item_->hide();
+		stuff_qty_ = 0;
+		for (int ix = data_->get_head(); ix <= data_->get_current(); ix++) {
+			stuff_qty_ += data_->get_count(ix, call_);
+		}
+		stuff_qty_ += data_->get_count(KEEP_BOX, call_);
+		if (stuff_qty_ > 0) sases_qty_ = 1;
+		ip_stuff_->value(to_string(stuff_qty_).c_str());
+		ip_keep_->value(to_string(keep_qty_).c_str());
+		ip_sases_->value(to_string(sases_qty_).c_str());
 		gp_process_->show();
+		break;
+	case process_mode_t::CALL_HISTORY:
+		gp_add_item_->hide();
+		gp_process_->hide();
 		break;
 	default:
 		gp_add_item_->hide();
