@@ -355,7 +355,8 @@ void qso_qsl_vwr::cb_bn_log_card(Fl_Widget* w, void* v) {
 	that->current_qso_->item("QSLRDATE", today);
 	that->current_qso_->item("QSL_RCVD", string("Y"));
 	that->current_qso_->item("QSL_RCVD_VIA", string(source));
-	if (!that->current_qso_->item("QSL_SENT").length()) {
+	if (that->current_qso_->item("QSL_SENT") != string("Y") ||
+		that->current_qso_->item("QSL_SENT_VIA") != string(source)) {
 		that->current_qso_->item("QSL_SENT", string("Q"));
 		that->current_qso_->item("QSL_SENT_VIA", string(source));
 	}
