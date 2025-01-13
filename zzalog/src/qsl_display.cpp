@@ -346,16 +346,35 @@ Fl_Image* qsl_display::get_image(string filename) {
 		// Open as Bitmap
 		image = new Fl_BMP_Image(filename.c_str());
 	}
+	char msg[128];
 	if (image == nullptr) {
+		snprintf(msg, sizeof(msg), "QSL: File %s is not valid image data");
+		status_->misc_status(ST_ERROR, msg);
 		// File not image data
 		return nullptr;
-	} else if (image->fail()) {
+	} else {
+		switch (image->fail()) {
+		case 0:
+			return image;
+		case Fl_Image::ERR_NO_IMAGE:
+		case Fl_Image::ERR_FILE_ACCESS:
+			snprintf(msg, sizeof(msg), "QSL: File %s access failed - %s", 
+				filename.c_str(),
+				strerror(errno));
+			status_->misc_status(ST_ERROR, msg);
+			break;
+		case Fl_Image::ERR_FORMAT:
+			snprintf(msg, sizeof(msg), "QSL: File %s cannot decode image", filename.c_str());
+			status_->misc_status(ST_ERROR, msg);
+			break;
+		case Fl_Image::ERR_MEMORY_ACCESS:
+			snprintf(msg, sizeof(msg), "QSL: File %s memory violation", filename.c_str());
+			status_->misc_status(ST_ERROR, msg);
+			break;
+		}
 		// File did not load successfully
 		delete image;
 		return nullptr;
-	} else {
-		// Supply image
-		return image;
 	}
 }
 
