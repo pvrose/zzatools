@@ -1,43 +1,105 @@
 #include "wave_gen.h"
 
 #include <cmath>
+#include <cstdio>
 
 using namespace std;
 
 
 const double PI = 3.14159265358979323846264338327950288419716939937510;
 
+const int BUFFER_DEPTH = 64;
+
 
 wave_gen::wave_gen() {
 	sine_table_ = nullptr;
+	rise_table_ = nullptr;
+	fall_table_ = nullptr;
 	// Default parameters
 	set_params(48000.0, 700.0, 0.005, 0.005, RAMP);
-	set_buffer_depth(64);
+	set_buffer_depth(BUFFER_DEPTH);
+	// Initialise the signals to indefinite space
+	current_signal_ = { false, UINT64_MAX };
+	next_signal_ = { false, UINT64_MAX };
+	previous_signal_ = false;
+	if (!initialise_pa()) {
+		printf("ERROR: Portaudio failed to initialise\n");
+	}
 }
 
 wave_gen::~wave_gen() {
 	delete[] sine_table_;
+	delete[] rise_table_;
+	delete[] fall_table_;
 	// TODO - close portaudio
 }
 
 // Generate the derived parameters
 void wave_gen::process_params() {
 	// Number of samples needed to generate a sine wave closest to target frequency
-	num_samples_ = (int)round(sample_rate_ / target_frequency_);
+	cycle_samples_ = (int)round(sample_rate_ / target_frequency_);
 	// Calculate the actual frequency these samples will generate
-	audio_frequency_ = sample_rate_ / num_samples_;
-	// Calculate the steps to change the envelope value for each rise/fall sample
-	rise_step_ = 1.0 / (rise_time_ * sample_rate_);
-	fall_step_ = 1.0 / (fall_time_ * sample_rate_);
+	audio_frequency_ = sample_rate_ / cycle_samples_;
+	// And the number of samples required 
+	rise_samples_ = (int)floor(sample_rate_ / rise_time_) + 1;
+	fall_samples_ = (int)floor(sample_rate_ / fall_time_) + 1;
 }
 
 // Generate the sine table
 void wave_gen::create_sine_table() {
 	// Create the table with enough entries
 	delete[] sine_table_;
-	sine_table_ = new double[num_samples_];
-	for (int ix = 0; ix < num_samples_; ix++) {
-		sine_table_[ix] = sin(2.0 * PI * ix / num_samples_);
+	sine_table_ = new double[cycle_samples_];
+	for (int ix = 0; ix < cycle_samples_; ix++) {
+		sine_table_[ix] = sin(2.0 * PI * ix / cycle_samples_);
+	}
+}
+
+// Generate edge tables
+void wave_gen::create_edge_tables() {
+	// delete the current data
+	delete[] rise_table_;
+	delete[] fall_table_;
+	switch (shape_) {
+	case SHARP:
+		// Sharp 0->1 and 1->0 transition
+		rise_table_ = new double[2];
+		rise_table_[0] = 0.0;
+		rise_table_[1] = 1.0;
+		fall_table_ = new double[2];
+		fall_table_[0] = 1.0;
+		fall_table_[1] = 0.0;
+		break;
+	case RAMP:
+		// Linear rise and fall
+		rise_table_ = new double[rise_samples_];
+		// delta amplitude for each sample
+		double d_ampl = 1.0 / rise_samples_;
+		rise_table_[0] = 0.0;
+		for (int ix = 1; ix < rise_samples_; ix++) {
+			rise_table_[ix] = fmin(1.0, rise_table_[ix - 1] + d_ampl);
+		}
+		fall_table_ = new double[fall_samples_];
+		d_ampl = 1.0 / fall_samples_;
+		fall_table_[0] = 1.0;
+		for (int ix = 1; ix < fall_samples_; ix++) {
+			fall_table_[ix] = fmax(0.0, rise_table_[ix - 1] - d_ampl);
+		}
+		break;
+	case COSINE:
+		// Raised cosine 
+		rise_table_ = new double[rise_samples_];
+		// delta angle for each sample
+		double d_radian = PI / (rise_samples_);
+		for (int ix = 0; ix < rise_samples_; ix++) {
+			rise_table_[ix] = 0.5 * (1.0 - cos(ix * d_radian));
+		}
+		fall_table_ = new double[fall_samples_];
+		d_radian = PI / (fall_samples_ - 1);
+		for (int ix = 0; ix < fall_samples_; ix++) {
+			fall_table_[ix] = 0.5 * (1.0 + cos(ix * d_radian));
+		}
+		break;
 	}
 }
 
@@ -56,6 +118,7 @@ void wave_gen::set_params(
 	shape_ = shape;
 	process_params();
 	create_sine_table();
+	create_edge_tables();
 }
 
 double wave_gen::get_sample_rate() {
@@ -84,4 +147,108 @@ double wave_gen::get_audio_freq(bool actual) {
 	else return target_frequency_;
 }
 
+// Initialise PortAudio
+bool wave_gen::initialise_pa() {
+	PaError err;
 
+	/* Initialize library before making any other calls. */
+	err = Pa_Initialize();
+	if (err != paNoError) return false;
+
+	/* Open an audio I/O stream. */
+	// TODO Replace with specific stream selection
+	err = Pa_OpenDefaultStream(&stream_,
+		0,          /* no input channels */
+		1,          /* stereo output */
+		paFloat32,  /* 32 bit floating point output */
+		sample_rate_,
+		buffer_depth_,        /* frames per buffer */
+		cb_pa_stream,
+		this);      // Pointer to this for callback
+	if (err != paNoError) return false;
+
+	err = Pa_StartStream(stream_);
+	if (err != paNoError) return false;
+
+	return true;
+}
+
+// Receive new signal from encode engine
+bool wave_gen::new_signal(signal_def s) {
+	if (current_signal_.durn_ms == UINT64_MAX) {
+		// We are sending an indefinite signal - start a new one
+		current_signal_ = s;
+		// Default next signal to continuing new signal indefinitely
+		next_signal_ = { s.value, UINT64_MAX };
+		// Calculate number of samples
+		if (current_signal_.durn_ms == UINT64_MAX) {
+			samples_in_signal_ = UINT64_MAX;
+		}
+		else {
+			samples_in_signal_ = current_signal_.durn_ms * (sample_rate_ / 1000.0);
+		}
+		sample_number_ = 0;
+	}
+	else {
+		next_signal_ = s;
+	}
+}
+
+// Instance dependant version of callback
+int wave_gen::pa_stream(const void* input,
+	void* output,
+	unsigned long frameCount,
+	const PaStreamCallbackTimeInfo* timeInfo,
+	PaStreamCallbackFlags statusFlags) {
+	// Pointer to output buffer 
+	float* out = (float*)output;
+	// Now send the data
+	for (int ix = 0; ix < frameCount; ix++) {
+		if (current_signal_.value) {
+			// If we haven't changed value then keep at the sine wave
+			if (previous_signal_) {
+				*out = (float)(sine_table_[sine_index_]);
+			}
+			// Otherwise apply the shape for the rise period
+			else if (sample_number_ < rise_samples_) {
+				*out = (float)(rise_table_[sample_number_] * sine_table_[sine_index_]);
+			}
+			// And then keep the sine wave
+			else {
+				*out = (float)(sine_table_[sine_index_]);
+			}
+		}
+		else {
+			if (!previous_signal_) {
+				*out = 0.0F;
+			}
+			else if (sample_number_ < fall_samples_) {
+				*out = (float)(fall_table_[sample_number_] * sine_table_[sine_index_]);
+			}
+			else {
+				*out = 0.0F;
+			}
+
+		}
+		// Increment pointers
+		out++;
+		// Increment index into sine table and reset to 0 when complete
+		sine_index_++;
+		if (sine_index_ == cycle_samples_) sine_index_ = 0;
+		// Increment index into signal and when complete get next signal
+		sample_number_++;
+		if (sample_number_ == samples_in_signal_) new_signal(next_signal_);
+	}
+}
+
+// Callback - portaudio requests data or reports errors
+int wave_gen::cb_pa_stream(const void* input,
+	void* output,
+	unsigned long frameCount,
+	const PaStreamCallbackTimeInfo* timeInfo,
+	PaStreamCallbackFlags statusFlags,
+	void* userData) {
+	wave_gen* that = (wave_gen*)userData;
+	// call the non-static version
+	that->pa_stream(input, output, frameCount, timeInfo, statusFlags);
+}

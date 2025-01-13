@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\wave_gen.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\paddle_sm.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -40,6 +37,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\engine.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\wave_gen.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
