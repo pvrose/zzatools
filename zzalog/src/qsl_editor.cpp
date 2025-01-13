@@ -953,7 +953,7 @@ void qsl_editor::cb_ch_field(Fl_Widget* w, void* v) {
 // Filename changed so update display
 void qsl_editor::cb_filename(Fl_Widget* w, void* v) {
     qsl_editor* that = ancestor_view<qsl_editor>(w);
-	cb_value<Fl_Input, string>(w, v);
+	cb_value<Fl_Input, string>(w, &(that->data_->filename));
 	qsl_dataset_->load_items(that->data_);
 	that->redraw_display(true);
 	that->create_items();

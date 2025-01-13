@@ -31,6 +31,7 @@ extern extract_data* extract_records_;
 extern tabbed_forms* tabbed_forms_;
 extern status* status_;
 extern book* book_;
+extern book* navigation_book_;
 extern ticker* ticker_;
 extern eqsl_handler* eqsl_handler_;
 extern club_handler* club_handler_;
@@ -478,6 +479,7 @@ void qso_qsl::qsl_extract(extract_data::extract_mode_t server) {
 		extract_records_->extract_qsl(server);
 		extract_in_progress_ = false;
 		tabbed_forms_->activate_pane(OT_EXTRACT, true);
+		navigation_book_->selection(0);
 		enable_widgets();
 	} else {
 		status_->misc_status(ST_ERROR, "Not ready to extract - finish operating");
