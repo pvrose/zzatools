@@ -582,6 +582,13 @@ void qso_entry::initialise_fields() {
 		field_map_ = fields_->collection(fields_->coll_name(FO_QSOVIEW));
 		break;
 	}
+	if (field_map_->size() > NUMBER_TOTAL - NUMBER_FIXED) {
+		char msg[128];
+		snprintf(msg, sizeof(msg), "FIELDS: Too many fields %z specified - last field(s) ignored",
+			field_map_->size());
+		status_->misc_status(ST_WARNING, msg);
+		field_map_->resize(NUMBER_TOTAL - NUMBER_FIXED);
+	}
 	fields_in_use_.resize(field_map_->size() + NUMBER_FIXED);
 	// Clear field map
 	initialise_field_map();
@@ -639,10 +646,10 @@ void qso_entry::action_add_field(int ix, string field) {
 	}
 	else if (ix == fields_in_use_.size()) {
 		if (field_ip_map_.find(field) == field_ip_map_.end()) {
-			ch_field_[fields_in_use_.size()]->value(field.c_str());
-			ip_field_[fields_in_use_.size()]->field_name(field.c_str(), qso_);
-			ip_field_[fields_in_use_.size()]->value(qso_->item(field).c_str());
-			field_ip_map_[field] = fields_in_use_.size();
+			ch_field_[ix]->value(field.c_str());
+			ip_field_[ix]->field_name(field.c_str(), qso_);
+			ip_field_[ix]->value(qso_->item(field).c_str());
+			field_ip_map_[field] = ix;
 			field_map_->push_back({ field, field, 50 });
 			fields_in_use_.push_back(field);
 		}
