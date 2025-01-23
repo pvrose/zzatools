@@ -31,7 +31,7 @@ bool key_handler::open_device(int index) {
 		gpio_->direction(gpio::GPIO_1, gpio::INPUT);
 		gpio_->direction(gpio::GPIO_2, gpio::OUTPUT);
 		// Now start the polling thread
-		t_key_ = new thread(run_thread);
+		t_key_ = new thread(run_thread, this);
 		return true;
 	}
 	else {

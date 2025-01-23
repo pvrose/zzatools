@@ -5,10 +5,9 @@
 #include <queue>
 #include <thread>
 #include <atomic>
-#include <chrono>
+#include <cstdint>
 
 using namespace std;
-using namespace std::chrono;
 
 // This is the main encoding engine
 
@@ -21,7 +20,7 @@ enum engine_type : char {
 	SEMI,         // Semi automatic
 };
 
-const map<engine_type, string> engine_descriptors = {
+const map<engine_type, string> engine_descriptors_ = {
 	{ KEYBOARD, "Use keyboard entry"},
 	{ STRAIGHT, "Straight key"},
 	{ SQUEEZE_A, "Squeeze paddle - mode A"},
@@ -44,6 +43,7 @@ public:
 		KB_DIT_DOWN,    // Keyborad dot mark
 		KB_DASH_UP,     // Keyboard dash space
 		KB_DASH_DOWN,   // Keyboard dash mark
+		KB_SPACE,       // Keyboard space
 		A_DIT_DOWN,     // Timed dit mark
 		A_DIT_UP,       // Timed dit space
 		A_DIT_DOWN_D,   // Timed dit mark - commmited to a dash next
@@ -55,6 +55,26 @@ public:
 		A_SPACE,        // Timed space space
 	};
 
+	map<state_t, string> state_text_ = {
+		{ IDLE,           "Idle" },
+		{ UT_DIT_DOWN,    "Untimed dit mark" },
+		{ UT_DASH_DOWN,   "Untimed dash mark" },
+		{ KB_DIT_UP,      "Keyboard dot space" },
+		{ KB_DIT_DOWN,    "Keyboard dot mark" },
+		{ KB_DASH_UP,     "Keyboard dash space" },
+		{ KB_DASH_DOWN,   "Keyboard dash mark" },
+		{ KB_SPACE,       "Keyboard space" },
+		{ A_DIT_DOWN,     "Timed dit mark" },
+		{ A_DIT_UP,       "Timed dit space" },
+		{ A_DIT_DOWN_D,   "Timed dit mark - commmited to a dash" },
+		{ A_DIT_UP_D,     "Timed dit space - committed to a dash" },
+		{ A_DASH_DOWN,    "Timed dash mark" },
+		{ A_DASH_UP,      "Timed dash space" },
+		{ A_DASH_DOWN_D,  "Timed dash mark - committed to a dit" },
+		{ A_DASH_UP_D,    "Timed dash space - committed to a dit" },
+		{ A_SPACE,        "Timed space space" }
+	};
+
 	// Set the type
 	void type(engine_type t);
 	// Get the type
@@ -62,9 +82,6 @@ public:
 
 	// Return idle state
 	bool idle();
-
-	// Return the keyout state
-	bool key_out();
 
 	// Set kb character to enqueue - allows non-ASCII to be sent
 	bool send(unsigned int ch);
@@ -80,15 +97,19 @@ public:
 
 protected:
 	// Return the current state of the input paddle/key/keyboard
-	bool get_signs(bool& dit, bool& dash);
+	void get_signs(bool& dit, bool& dash);
 	// Main state machine
-	state_t next_state(state_t state, bool dit, bool dash);
+	state_t next_state(state_t state, bool dit, bool dash, uint64_t& gap);
 	// Drive key-out
-	void drive_key_out(state_t state);
+	void drive_key_out(state_t state, uint64_t gap);
 	// Core engine loop
 	void run_engine();
 	// Invoked by this threa
 	static void run_thread(engine* that);
+	// Retunr true if the state si untimed - so check inputs
+	bool is_untimed(state_t state);
+	// Returns true if the state is a timed mark - as will be follwoed by a timed space
+	bool is_timed_mark(state_t state);
 
 	// The state
 	state_t state_;
@@ -96,29 +117,26 @@ protected:
 	engine_type type_;
 	// KB character queue
 	queue<unsigned int> q_character_;
-	// Time points
-	high_resolution_clock::time_point last_edge_;
-	high_resolution_clock::time_point next_edge_;
 	// The thread
 	thread* t_engine_;
 	// Stop processing loop
 	atomic<bool> close_;
-	// Key out
-	atomic<bool> key_out_;
 	// Words per minute
 	double wpm_;
 	// Weighting
 	double weighting_;
-	// Dit time - seconds
-	milliseconds dit_time_;
+	// Dit time - milliseconds
+	uint64_t dit_time_;
 	// Dash time - seconds
-	milliseconds dash_time_;
+	uint64_t dash_time_;
 	// Space time
-	milliseconds space_time_;
+	uint64_t space_time_;
 	// Current keyboard character
 	char current_kb_[16];
 	// Pointer within above
 	char* next_sign_;
+	// Old state
+	static state_t old_state_;
 
 };
 

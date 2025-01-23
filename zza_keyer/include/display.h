@@ -83,9 +83,8 @@ protected:
     
      // Populate the device choice
     void populate_devices();
-    // Populate the paddle choice
-    void populate_paddles();
-
+    // Populate source choice
+    void populate_sources();
 
     // Attributes
     // Target audio frequency

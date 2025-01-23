@@ -3,6 +3,9 @@
 #include "portaudio.h"
 
 #include <cstdint>
+#include <queue>
+
+using namespace std;
 
 // This class generates the audio waveform representing the shaped MCW tone
 // It uses portaudio as the platform-independent layer for sending the audio
@@ -46,7 +49,7 @@ public:
 	double get_audio_freq(bool actual);
 
 	// Send a new signal - return true if accepted
-	bool new_signal(signal_def s); 
+	void new_signal(signal_def s); 
 
 	// Callback - portaudio requests data or reports errors
 	static int cb_pa_stream(const void* input,
@@ -55,6 +58,13 @@ public:
 		const PaStreamCallbackTimeInfo* timeInfo,
 		PaStreamCallbackFlags statusFlags,
 		void* userData);
+
+	// Return true if less than two portaudio buffers left.
+	bool empty();
+	// Return current state of signal
+	bool get_signal();
+	// Get current state of signal and how long
+	signal_def get_sig_durn();
 
 protected:
 	// Instance dependant version of callback
@@ -105,10 +115,8 @@ protected:
 	uint64_t samples_in_signal_;
 	// Current sample number
 	uint64_t sample_number_;
-	// Current signal
-	signal_def current_signal_;
-	// Next signal
-	signal_def next_signal_;
+	// Queue of signals
+	queue<signal_def> signal_queue_;
 	// Previous signal value
 	bool previous_signal_;
 	// Port audio stream

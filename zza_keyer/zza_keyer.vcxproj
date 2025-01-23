@@ -71,7 +71,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LibraryPath>C:\Users\pvros\source\repos\fltk\build\lib\Debug;C:\Users\pvros\source\repos\hidapi\windows\x64\Debug;$(LibraryPath)</LibraryPath>
+    <LibraryPath>C:\Users\pvros\source\repos\fltk\build\lib\Debug;C:\Users\pvros\source\repos\hidapi\windows\x64\Debug;C:\Users\pvros\Downloads\portaudio\portaudio\build\msvc\x64\Release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LibraryPath>C:\Users\pvros\source\repos\fltk\build\x64\Release;$(LibraryPath)</LibraryPath>
@@ -115,7 +115,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>fltkd.lib;hidapi.lib;gdiplus.lib;gdi32.lib;ws2_32.lib;winmm.lib;wldap32.lib;comctl32.lib;comdlg32.lib;Crypt32.lib;normaliz.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>fltkd.lib;hidapi.lib;gdiplus.lib;gdi32.lib;ws2_32.lib;winmm.lib;wldap32.lib;comctl32.lib;comdlg32.lib;Crypt32.lib;normaliz.lib;portaudio_x64.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -140,10 +140,7 @@
     <ClInclude Include="include\decoder.h" />
     <ClInclude Include="include\display.h" />
     <ClInclude Include="include\engine.h" />
-    <ClInclude Include="include\keyboard_sm.h" />
     <ClInclude Include="include\key_handler.h" />
-    <ClInclude Include="include\key_out.h" />
-    <ClInclude Include="include\paddle_sm.h" />
     <ClInclude Include="include\wave_gen.h" />
   </ItemGroup>
   <ItemGroup>
@@ -151,10 +148,7 @@
     <ClCompile Include="src\decoder.cpp" />
     <ClCompile Include="src\display.cpp" />
     <ClCompile Include="src\engine.cpp" />
-    <ClCompile Include="src\keyboard_sm.cpp" />
     <ClCompile Include="src\key_handler.cpp" />
-    <ClCompile Include="src\key_out.cpp" />
-    <ClCompile Include="src\paddle_sm.cpp" />
     <ClCompile Include="src\wave_gen.cpp" />
     <ClCompile Include="src\zzakeyer.cpp" />
   </ItemGroup>

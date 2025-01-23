@@ -18,9 +18,6 @@ wave_gen::wave_gen() {
 	// Default parameters
 	set_params(48000.0, 700.0, 0.005, 0.005, RAMP);
 	set_buffer_depth(BUFFER_DEPTH);
-	// Initialise the signals to indefinite space
-	current_signal_ = { false, UINT64_MAX };
-	next_signal_ = { false, UINT64_MAX };
 	previous_signal_ = false;
 	if (!initialise_pa()) {
 		printf("ERROR: Portaudio failed to initialise\n");
@@ -41,8 +38,8 @@ void wave_gen::process_params() {
 	// Calculate the actual frequency these samples will generate
 	audio_frequency_ = sample_rate_ / cycle_samples_;
 	// And the number of samples required 
-	rise_samples_ = (int)floor(sample_rate_ / rise_time_) + 1;
-	fall_samples_ = (int)floor(sample_rate_ / fall_time_) + 1;
+	rise_samples_ = (int)floor(sample_rate_ * rise_time_) + 1;
+	fall_samples_ = (int)floor(sample_rate_ * fall_time_) + 1;
 }
 
 // Generate the sine table
@@ -60,6 +57,8 @@ void wave_gen::create_edge_tables() {
 	// delete the current data
 	delete[] rise_table_;
 	delete[] fall_table_;
+	double d_ampl;
+	double d_radian;
 	switch (shape_) {
 	case SHARP:
 		// Sharp 0->1 and 1->0 transition
@@ -74,7 +73,7 @@ void wave_gen::create_edge_tables() {
 		// Linear rise and fall
 		rise_table_ = new double[rise_samples_];
 		// delta amplitude for each sample
-		double d_ampl = 1.0 / rise_samples_;
+		d_ampl = 1.0 / rise_samples_;
 		rise_table_[0] = 0.0;
 		for (int ix = 1; ix < rise_samples_; ix++) {
 			rise_table_[ix] = fmin(1.0, rise_table_[ix - 1] + d_ampl);
@@ -90,7 +89,7 @@ void wave_gen::create_edge_tables() {
 		// Raised cosine 
 		rise_table_ = new double[rise_samples_];
 		// delta angle for each sample
-		double d_radian = PI / (rise_samples_);
+		d_radian = PI / (rise_samples_);
 		for (int ix = 0; ix < rise_samples_; ix++) {
 			rise_table_[ix] = 0.5 * (1.0 - cos(ix * d_radian));
 		}
@@ -174,27 +173,22 @@ bool wave_gen::initialise_pa() {
 }
 
 // Receive new signal from encode engine
-bool wave_gen::new_signal(signal_def s) {
-	if (current_signal_.durn_ms == UINT64_MAX) {
-		// We are sending an indefinite signal - start a new one
-		current_signal_ = s;
-		// Default next signal to continuing new signal indefinitely
-		next_signal_ = { s.value, UINT64_MAX };
-		// Calculate number of samples
-		if (current_signal_.durn_ms == UINT64_MAX) {
+void wave_gen::new_signal(signal_def s) {
+	signal_queue_.push(s);
+	if (signal_queue_.size() == 1) {
+		// Was empty
+		if (s.durn_ms == UINT64_MAX) {
 			samples_in_signal_ = UINT64_MAX;
 		}
 		else {
-			samples_in_signal_ = current_signal_.durn_ms * (sample_rate_ / 1000.0);
+			samples_in_signal_ = (uint64_t)(s.durn_ms * (sample_rate_ / 1000.0));
 		}
 		sample_number_ = 0;
-	}
-	else {
-		next_signal_ = s;
 	}
 }
 
 // Instance dependant version of callback
+// Note this is the callback path from Portaudio.
 int wave_gen::pa_stream(const void* input,
 	void* output,
 	unsigned long frameCount,
@@ -203,8 +197,15 @@ int wave_gen::pa_stream(const void* input,
 	// Pointer to output buffer 
 	float* out = (float*)output;
 	// Now send the data
-	for (int ix = 0; ix < frameCount; ix++) {
-		if (current_signal_.value) {
+	for (unsigned int ix = 0; ix < frameCount; ix++) {
+		signal_def s;
+		if (signal_queue_.empty()) {
+			s = { false, UINT64_MAX };
+		}
+		else {
+			s = signal_queue_.front();
+		}
+		if (s.value) {
 			// If we haven't changed value then keep at the sine wave
 			if (previous_signal_) {
 				*out = (float)(sine_table_[sine_index_]);
@@ -237,8 +238,24 @@ int wave_gen::pa_stream(const void* input,
 		if (sine_index_ == cycle_samples_) sine_index_ = 0;
 		// Increment index into signal and when complete get next signal
 		sample_number_++;
-		if (sample_number_ == samples_in_signal_) new_signal(next_signal_);
+		if (sample_number_ == samples_in_signal_ || (s.durn_ms == UINT64_MAX && !signal_queue_.empty())) {
+			signal_queue_.pop();
+			if (signal_queue_.empty()) {
+				s = { s.value, UINT64_MAX };
+			}
+			else {
+				s = signal_queue_.front();
+			}
+			if (s.durn_ms == UINT64_MAX) {
+				samples_in_signal_ = UINT64_MAX;
+			}
+			else {
+				samples_in_signal_ = (uint64_t)(s.durn_ms * (sample_rate_ / 1000.0));
+			}
+			sample_number_ = 0;
+		}
 	}
+	return paContinue;
 }
 
 // Callback - portaudio requests data or reports errors
@@ -250,5 +267,27 @@ int wave_gen::cb_pa_stream(const void* input,
 	void* userData) {
 	wave_gen* that = (wave_gen*)userData;
 	// call the non-static version
-	that->pa_stream(input, output, frameCount, timeInfo, statusFlags);
+	return that->pa_stream(input, output, frameCount, timeInfo, statusFlags);
+}
+
+// Return if remaining buffer count is less than two
+bool wave_gen::empty() {
+	return signal_queue_.empty();
+}
+
+// Return current state of the signal
+bool wave_gen::get_signal() {
+	signal_def s = signal_queue_.front();
+	return s.value;
+}
+
+// Return current signal and its duration
+signal_def wave_gen::get_sig_durn() {
+	signal_def result;
+	signal_def s = signal_queue_.front();
+	// Return current signal value
+	result.value = s.value;
+	// Return number of milliseconds current duration
+	result.durn_ms = (uint64_t)(sample_number_ / (sample_rate_ / 1000.));
+	return result;
 }

@@ -1,10 +1,12 @@
 #pragma once
 
-#include <chrono>
 #include <thread>
 #include <atomic>
+#include <cstdint>
 
-using namespace std::chrono;
+struct signal_def;
+
+using namespace std;
 
 // This code decodes the generated CW
 
@@ -26,9 +28,6 @@ public:
 	// Start the decode
 	void start();
 
-	// Set the other units
-	void set_units(engine* e, display* d);
-
 	enum decode_t : char {
 		NO_CHANGE,                        // No change in monitor
 		NOISE,                            // Change should be ignored
@@ -43,12 +42,12 @@ public:
 
 protected:
 
-	void do_key_change(bool key);
+	void do_key_change(signal_def signal);
 
 	// Work out the sign
-	decode_t decode_monitor(bool key, double duration);
+	decode_t decode_monitor(signal_def signal);
 	// Adjust the speed
-	void check_speed(decode_t decode, double duration);
+	void check_speed(decode_t decode, uint64_t duration);
 	// Convert morse to letter
 	char morse_to_letter();
 
@@ -75,14 +74,8 @@ protected:
 	// Dash time - seconds
 	double dash_time_;
 
-	// Time 
-	// Previous change
-	time_point<system_clock, milliseconds> epoch_;
-	milliseconds last_change_;
 	// Previous value 
 	bool last_key_;
-	// Current value
-	bool current_key_;
 	// The key has been idle for some time
 	bool key_idle_;
 	unsigned char code_;                 // Accumulated dits and dashes from output

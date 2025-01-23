@@ -3,7 +3,6 @@
 #include "decoder.h"
 #include "engine.h"
 #include "key_handler.h"
-#include "key_out.h"
 #include "wave_gen.h"
 
 #include "drawing.h"
@@ -52,17 +51,15 @@ display::display(int W, int H, const char* L) :
 	create_form();
 	enable_widgets();
 	populate_devices();
-	populate_paddles();
+	populate_sources();
+	update_speed();
+	update_engine();
+	update_wavegen();
 	redraw();
 }
 
 // Destructor
 display::~display() {
-	// Close the GPIO device
-	if (key_handler_ && device_number_ != NO_DEVICE) {
-		key_handler_->close_device();
-	}
-	// TODO - close audio connection
 }
 
 // Create the window display - creates the individual section
@@ -339,6 +336,16 @@ void display::enable_devices() {
 	}
 }
 
+// Enable engine type choice - only if engine is idle
+void display::enable_engine() {
+	if (engine_->idle()) {
+		ch_engine_->activate();
+	}
+	else {
+		ch_engine_->deactivate();
+	}
+}
+
 // Store data between application calls
 void display::save_data() {
 	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
@@ -400,6 +407,8 @@ void display::cb_engine(Fl_Widget* w, void* v) {
 	display* that = ancestor_view<display>(w);
 	that->engine_type_ = (engine_type)((Fl_Choice*)w)->value();
 	that->update_engine();
+	that->enable_editor();
+	that->enable_engine();
 }
 
 // Callback - editor: save value - start sending data
@@ -429,7 +438,7 @@ void display::update_speed() {
 
 // Update wave_gen with frequency and shaping values
 void display::update_wavegen() {
-	wave_gen_->set_params(48000.0, target_freq_, rise_time_, fall_time_, shape_);
+	wave_gen_->set_params(48000.0, target_freq_, rise_time_ / 1000.0, fall_time_ / 1000.0, shape_);
 	// Get and display the actual frequency that got set.
 	double actual = wave_gen_->get_audio_freq(true);
 	vs_freq_->value(actual);
@@ -455,7 +464,7 @@ void display::update_editor(edit_event e) {
 	// If sending is enabled and there is data to be sent
 	if (*next_send_ != '\0') {
 		// Send it
-		keyboard_sm_->add_char(*next_send_++);
+		engine_->send(*next_send_++);
 	}
 }
 
@@ -473,11 +482,13 @@ void display::populate_devices() {
 	}
 }
 
-// Populate the paddle choice
-void display::populate_paddles() {
-	ch_paddle_->clear();
-	for (auto it = paddle_types_.begin(); it != paddle_types_.end(); it++) {
-		ch_paddle_->add((*it).second.c_str());
+// Populate the sources choice
+void display::populate_sources() {
+	ch_engine_->clear();
+	if (engine_) {
+		for (auto it = engine_descriptors_.begin(); it != engine_descriptors_.end(); it++) {
+			ch_engine_->add((*it).second.c_str());
+		}
 	}
 }
 

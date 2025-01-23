@@ -1,10 +1,12 @@
 #include "engine.h"
 #include "key_handler.h"
+#include "wave_gen.h"
 
 #include <FL/fl_ask.H>
+#include <FL/fl_utf8.h> 
 
 // Time keeping is in ms. Define a minute as seconds
-const milliseconds MINUTE(60000);
+const uint64_t MINUTE(60000);
 // Number of dit times in the word "PARIS" - ".__. ._ ._. .. ...   "
 const int DITS_PER_WORD = 50;
 // Look up table from Unicode character to morse string
@@ -69,6 +71,9 @@ const map<unsigned int, const char*> LUT_MORSE = {
 };
 
 extern key_handler* key_handler_;
+extern wave_gen* wave_gen_;
+
+engine::state_t engine::old_state_ = IDLE;
 
 
 engine::engine() :
@@ -107,14 +112,11 @@ bool engine::idle() {
 	return (state_ == IDLE);
 }
 
-// Return the keyout state
-bool engine::key_out() {
-	return key_out_;
-}
-
 // Set kb character to enqueue - allows non-ASCII to be sent
 bool engine::send(unsigned int ch) {
-	q_character_.push(ch);
+
+	q_character_.push(fl_toupper(ch));
+	return true;
 }
 
 // Set speed
@@ -125,22 +127,20 @@ void engine::set_speed(
 	wpm_ = wpm;
 	weighting_ = weighting;
 	// duration values do not have * or / operators just *= and /=
-	dit_time_ = MINUTE;
-	dit_time_ /= (wpm * DITS_PER_WORD);
-	dash_time_ = dit_time_;
-	dash_time_ *= weighting_;
-	space_time_ = dit_time_;
-	space_time_ *= 2;
+	dit_time_ = (uint64_t)( MINUTE / (wpm * DITS_PER_WORD));
+	dash_time_ = (uint64_t)(dit_time_ * weighting_);
+	space_time_ = (uint64_t)(dit_time_ * 2);
 }
 
 // Start processing
 bool engine::start() {
 	close_ = false;
-	t_engine_ = new thread(run_engine);
+	t_engine_ = new thread(run_thread, this);
+	return true;
 }
 
 // Return the current state of the input paddle/key/keyboard
-bool engine::get_signs(bool& dit, bool& dash) {
+void engine::get_signs(bool& dit, bool& dash) {
 	if (type_ == KEYBOARD) {
 		// Get the next sign (dit or dash) to send
 		if (*next_sign_ == 0) {
@@ -178,6 +178,7 @@ bool engine::get_signs(bool& dit, bool& dash) {
 			dash = false;
 			break;
 		}
+		next_sign_++;
 	}
 	else {
 		key_state ks = key_handler_->get_state();
@@ -187,11 +188,9 @@ bool engine::get_signs(bool& dit, bool& dash) {
 }
 
 // Main state machine
-engine::state_t engine::next_state(state_t state, bool dit, bool dash) {
-	state_t next = IDLE;
-	milliseconds gap(milliseconds(0));
-	high_resolution_clock::time_point now_time(high_resolution_clock::now());
-	bool time_out = (next_edge_ <= now_time);
+engine::state_t engine::next_state(state_t state, bool dit, bool dash, uint64_t& gap) {
+	state_t next = state;
+	bool time_out = wave_gen_->empty();
 	switch (state) {
 	case IDLE:           // Idle - nothing to process
 	{
@@ -264,7 +263,8 @@ engine::state_t engine::next_state(state_t state, bool dit, bool dash) {
 				gap = dash_time_;
 			}
 			else {
-				next = IDLE;
+				next = KB_SPACE;
+				gap = space_time_;
 			}
 		}
 		break;
@@ -288,7 +288,8 @@ engine::state_t engine::next_state(state_t state, bool dit, bool dash) {
 				gap = dash_time_;
 			}
 			else {
-				next = IDLE;
+				next = KB_SPACE;
+				gap = space_time_;
 			}
 		}
 		break;
@@ -301,6 +302,14 @@ engine::state_t engine::next_state(state_t state, bool dit, bool dash) {
 		}
 		break;
 
+	}
+	case KB_SPACE:
+	{
+		if (time_out) {
+			next = IDLE;
+
+		}
+		break;
 	}
 	case A_DIT_DOWN:     // Timed dit mark
 	{
@@ -398,17 +407,13 @@ engine::state_t engine::next_state(state_t state, bool dit, bool dash) {
 		break;
 	}
 	}
-	// Set next edge
-	if (gap != milliseconds::zero()) {
-		next_edge_ = last_edge_;
-		next_edge_ += gap;
-	}
-	last_edge_ = now_time;
 	return next;
 }
 
 // Drive key-out
-void engine::drive_key_out(state_t state) {
+void engine::drive_key_out(state_t state, uint64_t gap) {
+	if (state != old_state_)
+		printf("ENG: State %s for %u ms\n", state_text_[state].c_str(), gap);
 	switch (state) {
 	case IDLE:           // Idle - nothing to process
 	case KB_DIT_UP:      // Keyboard dot space
@@ -418,7 +423,7 @@ void engine::drive_key_out(state_t state) {
 	case A_DASH_UP:      // Timed dash space
 	case A_DASH_UP_D:    // Timed dash space - committed to a dit
 	case A_SPACE:        // Timed space space
-		key_out_ = false;
+		wave_gen_->new_signal({ false, gap });
 		break;
 	case UT_DIT_DOWN:    // Untimed dit mark,
 	case UT_DASH_DOWN:   // Untimed dash mark,
@@ -428,20 +433,27 @@ void engine::drive_key_out(state_t state) {
 	case A_DIT_DOWN_D:   // Timed dit mark - commmited to a dash next
 	case A_DASH_DOWN:    // Timed dash mark
 	case A_DASH_DOWN_D:  // Timed dash mark - committed to a dit next
-		key_out_ = true;
+		wave_gen_->new_signal({ true, gap });
 		break;
 	}
+	old_state_ = state;
 }
 
 // Core engine loop
 void engine::run_engine() {
 	bool dit;
 	bool dash;
+	uint64_t gap;
 	state_ = IDLE;
+	state_t old_state = IDLE;
 	while (!close_) {
-		get_signs(dit, dash);
-		state_ = next_state(state_, dit, dash);
-		drive_key_out(state_);
+		gap = UINT64_MAX;
+		if (is_untimed(state_) || wave_gen_->empty()) {
+			if (!is_timed_mark(state_)) get_signs(dit, dash);
+			state_ = next_state(state_, dit, dash, gap);
+			drive_key_out(state_, gap);
+		}
+		old_state = state_;
 		this_thread::yield();
 	}
 }
@@ -449,4 +461,30 @@ void engine::run_engine() {
 // Invoked by this threa
 void engine::run_thread(engine* that) {
 	that->run_engine();
+}
+
+// Check if state is an untimed one
+bool engine::is_untimed(state_t state) {
+	switch (state) {
+	case UT_DASH_DOWN:
+	case UT_DIT_DOWN:
+		return true;
+	default:
+		return false;
+	}
+}
+
+// Check if state is a timed mark
+bool engine::is_timed_mark(state_t state) {
+	switch (state) {
+	case KB_DIT_DOWN:
+	case KB_DASH_DOWN:
+	case A_DIT_DOWN:
+	case A_DIT_DOWN_D:
+	case A_DASH_DOWN:
+	case A_DASH_DOWN_D:
+		return true;
+	default:
+		return false;
+	}
 }

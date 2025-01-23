@@ -1,12 +1,13 @@
 #include "decoder.h"
-#include "key_out.h"
 #include "display.h"
 #include "engine.h"
-
-#include <chrono>
+#include "wave_gen.h"
 
 using namespace std;
-using namespace std::chrono;
+
+extern engine* engine_;
+extern wave_gen* wave_gen_;
+extern display* display_;
 
 // Morse lookup tables - Some characters map onto LCD1602 character set
 // Characters have from 1 to 6 signs (dits or dashes). Error code_ has 8 signs
@@ -35,12 +36,9 @@ const int DITS_PER_WORD = 50;
 
 decoder::decoder() 
 {
-	last_change_ = epoch_.time_since_epoch();
     last_key_ = false;
-    current_key_ = false;
     t_decoder_ = nullptr;
     close_ = false;
-    engine_ = nullptr;
     wpm_ = 0.0;
     weighting_ = 0.0;
     dit_time_ = 0;
@@ -73,23 +71,23 @@ void decoder::get_speed(double& wpm, double& weighting) {
 }
 
 // Decode the key
-decoder::decode_t decoder::decode_monitor(bool key, double duration) {
-    if (key) {
-        if (last_key_ != key) {
+decoder::decode_t decoder::decode_monitor(signal_def signal) {
+    if (signal.value) {
+        if (last_key_ != signal.value) {
             // We were stuck low
             if (key_idle_) {
                 return STUCK_LOW;
             }
             // Posedge on key
-            else if (duration < dit_time_ / 5) {
+            else if (signal.durn_ms < dit_time_ / 5) {
                 // Key bounce
                 return NOISE;
             }
-            else if (duration < MAX_SIGN_GAP * dit_time_) {
+            else if (signal.durn_ms < MAX_SIGN_GAP * dit_time_) {
                 // Inter sign gap
                 return SIGN;
             }
-            else if (duration < MAX_CHAR_GAP * dit_time_) {
+            else if (signal.durn_ms < MAX_CHAR_GAP * dit_time_) {
                 // Inter character gap
                 return CHAR;
             }
@@ -100,7 +98,7 @@ decoder::decode_t decoder::decode_monitor(bool key, double duration) {
         }
         else {
             // Check stuckk high
-            if (duration > TIMEOUT) {
+            if (signal.durn_ms > TIMEOUT) {
                 return STUCK_HIGH;
             }
             else {
@@ -109,13 +107,13 @@ decoder::decode_t decoder::decode_monitor(bool key, double duration) {
         }
     }
     else {
-        if (last_key_ != key) {
+        if (last_key_ != signal.value) {
             // Negedge on key
-            if (duration < dit_time_ / 5) {
+            if (signal.durn_ms < dit_time_ / 5) {
                 // Key bounce
                 return NOISE;
             }
-            else if (duration < MAX_DIT * dit_time_) {
+            else if (signal.durn_ms < MAX_DIT * dit_time_) {
                 // less tha two dit times treat as a fdit
                 return DIT;
             }
@@ -126,7 +124,7 @@ decoder::decode_t decoder::decode_monitor(bool key, double duration) {
         }
         else {
             // Check a long low
-            if (duration > MAX_DASH * dit_time_) {
+            if (signal.durn_ms > MAX_DASH * dit_time_) {
                 // Traet is as a word space
                 return STUCK_LOW;
             }
@@ -138,17 +136,17 @@ decoder::decode_t decoder::decode_monitor(bool key, double duration) {
 }
 
 // re-evaluate the speed
-void decoder::check_speed(decode_t decode, double duration) {
+void decoder::check_speed(decode_t decode, uint64_t duration_ms) {
     switch (decode) {
     case DIT:
     case SIGN: {
         // Generate biased avaearge between existing dit time and last dit/gap
-        dit_time_ = (BIAS * dit_time_) + ((1.- - BIAS) * duration);
+        dit_time_ = (BIAS * dit_time_) + ((1.- - BIAS) * duration_ms);
         break;
     }
     case DASH: {
         // First adjust dash length
-        dash_time_ = ((BIAS * dash_time_) + ((100 - BIAS) * duration)) / 100;
+        dash_time_ = ((BIAS * dash_time_) + ((100 - BIAS) * duration_ms)) / 100;
         // Now allocate it to weighting_ and dit_time_ - first
         // calculate what weight would be needed
         weighting_ = dash_time_ / dit_time_;
@@ -186,10 +184,8 @@ char decoder::morse_to_letter() {
 }
 
 // Analyse the key change
-void decoder::do_key_change(bool key) {
-	milliseconds duration = epoch_.time_since_epoch() - last_change_;
-    double dd = (double)duration.count();
-    decode_t decode = decode_monitor(key, dd);
+void decoder::do_key_change(signal_def signal) {
+    decode_t decode = decode_monitor(signal);
     switch (decode) {
     case NO_CHANGE: {
         return;
@@ -264,7 +260,7 @@ char decoder::get_char() {
 
 // Start the decoder
 void decoder::start() {
-    t_decoder_ = new thread(run_thread);
+    t_decoder_ = new thread(run_thread, this);
 }
 
 // Run the thread
@@ -275,8 +271,9 @@ void decoder::run_thread(decoder* that) {
 // That does this
 void decoder::run_decoder() {
     while (!close_) {
-        bool key_out = engine_->key_out();
-        do_key_change(key_out);
+        signal_def signal = wave_gen_->get_sig_durn();
+        do_key_change(signal);
+        last_key_ = signal.value;
         this_thread::yield();
     }
 }

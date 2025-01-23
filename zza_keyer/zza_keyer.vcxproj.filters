@@ -15,16 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\paddle_sm.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\keyboard_sm.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\decoder.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\key_out.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\display.h">
@@ -47,16 +38,7 @@
     <ClCompile Include="src\wave_gen.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\paddle_sm.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\keyboard_sm.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\decoder.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\key_out.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\display.cpp">

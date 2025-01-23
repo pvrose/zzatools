@@ -1,4 +1,8 @@
 #include "display.h"
+#include "engine.h"
+#include "key_handler.h"
+#include "decoder.h"
+#include "wave_gen.h"
 
 #include <string>
 
@@ -13,6 +17,12 @@ string PROG_ID = "ZKY";
 string PROGRAM_VERSION = "0.0.1";
 string VENDOR = "GM3ZZA";
 
+engine* engine_ = nullptr;
+key_handler* key_handler_ = nullptr;
+display* display_ = nullptr;
+wave_gen* wave_gen_ = nullptr;
+decoder* decoder_ = nullptr;
+
 int main(int argc, char** argv)
 {
 	// Set default font size for all widgets
@@ -23,9 +33,17 @@ int main(int argc, char** argv)
 	Fl::set_font(FL_COURIER_ITALIC, "Courier New Italic");
 	Fl::set_font(FL_COURIER_BOLD_ITALIC, "Courier New Bold Italic");
 
-	display* win = new display(1000, 1000);
+	// Create the various units
+	engine_ = new engine;
+	key_handler_ = new key_handler;
+	wave_gen_ = new wave_gen;
+	decoder_ = new decoder;
 
-	win->show(argc, argv);
+	display_ = new display(1000, 1000);
+
+	display_->show(argc, argv);
+
+	engine_->start();
 
 	return Fl::run();
 }
