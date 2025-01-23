@@ -74,7 +74,7 @@
     <LibraryPath>C:\Users\pvros\source\repos\fltk\build\lib\Debug;C:\Users\pvros\source\repos\hidapi\windows\x64\Debug;C:\Users\pvros\Downloads\portaudio\portaudio\build\msvc\x64\Release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LibraryPath>C:\Users\pvros\source\repos\fltk\build\x64\Release;$(LibraryPath)</LibraryPath>
+    <LibraryPath>C:\Users\pvros\source\repos\fltk\build\lib\Release;C:\Users\pvros\source\repos\hidapi\windows\x64\Release;C:\Users\pvros\Downloads\portaudio\portaudio\build\msvc\x64\Release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -126,13 +126,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\pvros\Downloads\portaudio\portaudio\include;C:\Users\pvros\source\repos\pvrose\zzatools\zza_keyer\include;C:\Users\pvros\source\repos\fltk\build;C:\Users\pvros\source\repos\fltk;C:\Users\pvros\source\repos\pvrose\zzatools\common\include;C:\Users\pvros\source\repos\hidapi;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\pvros\Downloads\portaudio\portaudio\include;C:\Users\pvros\source\repos\pvrose\zzatools\zza_keyer\include;C:\Users\pvros\source\repos\fltk\build;C:\Users\pvros\source\repos\fltk;C:\Users\pvros\source\repos\pvrose\zzatools\common\include;C:\Users\pvros\source\repos\hidapi;C:\Users\pvros\source\repos\hidapi\hidapi;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>fltk.lib;hidapi.lib;gdiplus.lib;gdi32.lib;ws2_32.lib;winmm.lib;wldap32.lib;comctl32.lib;comdlg32.lib;Crypt32.lib;normaliz.lib;portaudio_x64.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

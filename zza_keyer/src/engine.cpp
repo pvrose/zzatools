@@ -164,6 +164,7 @@ void engine::get_signs(bool& dit, bool& dash) {
 				next_sign_ = &current_kb_[0];
 			}
 		}
+		printf("ENG: Next sign is '%c' from %s\n", *next_sign_, current_kb_);
 		switch (*next_sign_) {
 		case '-':
 			dit = false;
@@ -306,8 +307,17 @@ engine::state_t engine::next_state(state_t state, bool dit, bool dash, uint64_t&
 	case KB_SPACE:
 	{
 		if (time_out) {
-			next = IDLE;
-
+			if (dit) {
+				next = KB_DIT_DOWN;
+				gap = dit_time_;
+			}
+			else if (dash) {
+				next = KB_DASH_DOWN;
+				gap = dash_time_;
+			}
+			else {
+				next = IDLE;
+			}
 		}
 		break;
 	}
@@ -407,6 +417,7 @@ engine::state_t engine::next_state(state_t state, bool dit, bool dash, uint64_t&
 		break;
 	}
 	}
+	if (next != state) printf("ENG: State %s -> %s\n", state_text_[state].c_str(), state_text_[next].c_str());
 	return next;
 }
 
@@ -418,6 +429,7 @@ void engine::drive_key_out(state_t state, uint64_t gap) {
 	case IDLE:           // Idle - nothing to process
 	case KB_DIT_UP:      // Keyboard dot space
 	case KB_DASH_UP:     // Keyboard dash space
+	case KB_SPACE:       // Keyboard space
 	case A_DIT_UP:       // Timed dit space
 	case A_DIT_UP_D:     // Timed dit space - committed to a dash
 	case A_DASH_UP:      // Timed dash space

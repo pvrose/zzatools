@@ -414,20 +414,20 @@ void display::cb_engine(Fl_Widget* w, void* v) {
 // Callback - editor: save value - start sending data
 void display::cb_editor(Fl_Widget* w, void* v) {
 	display* that = ancestor_view<display>(w);
+	int len = strlen(that->buffer_);
 	memcpy(that->buffer_, ((Fl_Input*)w)->value(), 1024);
-	that->update_editor(NEW_CHARACTER);
+	if (strlen(that->buffer_) < len) {
+		that->update_editor(DEL_CHARACTER);
+	}
+	else if (strlen(that->buffer_) > len) {
+		that->update_editor(NEW_CHARACTER);
+	}
 }
 
 // Callback - monitor data ready
 void display::cb_monitor(void* v) {
 	display* that = (display*)v;
 	that->update_monitor();
-}
-
-// Callback - kb sending done
-void display::cb_kb_done(void* v) {
-	display* that = (display*)v;
-	that->update_editor(SEND_DATA);
 }
 
 // Update paddle and keyboard SMs with speed values
@@ -461,8 +461,10 @@ void display::update_monitor() {
 
 // Update editor - TODO: what was this supposed to do?
 void display::update_editor(edit_event e) {
-	// If sending is enabled and there is data to be sent
-	if (*next_send_ != '\0') {
+	if (e == DEL_CHARACTER) {
+		// We have shortened the buffer (by 1?)
+		next_send_--;
+	} else if (*next_send_ != '\0') {
 		// Send it
 		engine_->send(*next_send_++);
 	}

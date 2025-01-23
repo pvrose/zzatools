@@ -52,8 +52,6 @@ public:
 
     // Callback - monitor data ready
     static void cb_monitor(void* v);
-    // Callback - kb sending done
-    static void cb_kb_done(void* v);
 
 protected:
     // Update paddle and keyboard SMs with speed values
@@ -67,8 +65,7 @@ protected:
     // Update editor with edit mode
     enum edit_event : char {
         NEW_CHARACTER,           // a new character has been typed
-        ENTER,                   // The enter key has been sent
-        SEND_DATA,               // Keyboard SM is empty send new data
+        DEL_CHARACTER,           // The buffer has been shortened
     };
     void update_editor(edit_event e);
     // Enable rise and fall times
