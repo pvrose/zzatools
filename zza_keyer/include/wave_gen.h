@@ -3,6 +3,7 @@
 #include "portaudio.h"
 
 #include <cstdint>
+#include <list>
 #include <queue>
 
 using namespace std;
@@ -48,9 +49,6 @@ public:
 	int get_buffer_depth();
 	double get_audio_freq(bool actual);
 
-	// Send a new signal - return true if accepted
-	void new_signal(signal_def s); 
-
 	// Callback - portaudio requests data or reports errors
 	static int cb_pa_stream(const void* input,
 		void* output,
@@ -59,12 +57,14 @@ public:
 		PaStreamCallbackFlags statusFlags,
 		void* userData);
 
-	// Return true if less than two portaudio buffers left.
-	bool empty();
 	// Return current state of signal
-	bool get_signal();
+	bool get_key();
 	// Get current state of signal and how long
-	signal_def get_sig_durn();
+	signal_def get_signal();
+	// Callback set callback
+	void callback(void (*cb)(signal_def*, void*), void* user_data);
+	// Initialise portaudio
+	bool initialise_pa();
 
 protected:
 	// Instance dependant version of callback
@@ -73,14 +73,14 @@ protected:
 		unsigned long frameCount,
 		const PaStreamCallbackTimeInfo* timeInfo,
 		PaStreamCallbackFlags statusFlags);
-	// Initialise portausio
-	bool initialise_pa();
 	// Create the sine table
 	void create_sine_table();
 	// Create dependant parameters
 	void process_params();
 	// Create the edge tables
 	void create_edge_tables();
+
+	void (*get_next_signal)(signal_def*, void*);
 
 	// Parameters
 	// Audio sample rate (samples/second)
@@ -115,12 +115,15 @@ protected:
 	uint64_t samples_in_signal_;
 	// Current sample number
 	uint64_t sample_number_;
-	// Queue of signals
-	queue<signal_def> signal_queue_;
+	// Current signal
+	signal_def current_signal_;
 	// Previous signal value
 	bool previous_signal_;
 	// Port audio stream
 	PaStream* stream_;
+
+	// Engine
+	void* engine_;
 	
 };
 

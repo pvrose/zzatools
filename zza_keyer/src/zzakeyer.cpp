@@ -43,7 +43,10 @@ int main(int argc, char** argv)
 
 	display_->show(argc, argv);
 
-	engine_->start();
+	// Connect wave_gen to source of signals
+	wave_gen_->callback(engine::cb_signal, engine_);
+	// Start wave_gen
+	wave_gen_->initialise_pa();
 
 	return Fl::run();
 }

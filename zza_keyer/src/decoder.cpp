@@ -271,7 +271,7 @@ void decoder::run_thread(decoder* that) {
 // That does this
 void decoder::run_decoder() {
     while (!close_) {
-        signal_def signal = wave_gen_->get_sig_durn();
+        signal_def signal = wave_gen_->get_signal();
         do_key_change(signal);
         last_key_ = signal.value;
         this_thread::yield();

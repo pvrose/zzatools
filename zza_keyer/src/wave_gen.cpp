@@ -19,9 +19,6 @@ wave_gen::wave_gen() {
 	set_params(48000.0, 700.0, 0.005, 0.005, RAMP);
 	set_buffer_depth(BUFFER_DEPTH);
 	previous_signal_ = false;
-	if (!initialise_pa()) {
-		printf("ERROR: Portaudio failed to initialise\n");
-	}
 }
 
 wave_gen::~wave_gen() {
@@ -82,7 +79,7 @@ void wave_gen::create_edge_tables() {
 		d_ampl = 1.0 / fall_samples_;
 		fall_table_[0] = 1.0;
 		for (int ix = 1; ix < fall_samples_; ix++) {
-			fall_table_[ix] = fmax(0.0, rise_table_[ix - 1] - d_ampl);
+			fall_table_[ix] = fmax(0.0, fall_table_[ix - 1] - d_ampl);
 		}
 		break;
 	case COSINE:
@@ -172,21 +169,6 @@ bool wave_gen::initialise_pa() {
 	return true;
 }
 
-// Receive new signal from encode engine
-void wave_gen::new_signal(signal_def s) {
-	signal_queue_.push(s);
-	if (signal_queue_.size() == 1) {
-		// Was empty
-		if (s.durn_ms == UINT64_MAX) {
-			samples_in_signal_ = UINT64_MAX;
-		}
-		else {
-			samples_in_signal_ = (uint64_t)(s.durn_ms * (sample_rate_ / 1000.0));
-		}
-		sample_number_ = 0;
-	}
-}
-
 // Instance dependant version of callback
 // Note this is the callback path from Portaudio.
 int wave_gen::pa_stream(const void* input,
@@ -197,15 +179,13 @@ int wave_gen::pa_stream(const void* input,
 	// Pointer to output buffer 
 	float* out = (float*)output;
 	// Now send the data
-	for (unsigned int ix = 0; ix < frameCount; ix++) {
-		signal_def s;
-		if (signal_queue_.empty()) {
-			s = { false, UINT64_MAX };
+	for (unsigned int ix = 0; ix < frameCount; ix++) {;
+		if (current_signal_.durn_ms == 0) {
+			get_next_signal(&current_signal_, engine_);
+			samples_in_signal_ = (uint64_t)(current_signal_.durn_ms * (sample_rate_ / 1000.0));
+			sample_number_ = 0;
 		}
-		else {
-			s = signal_queue_.front();
-		}
-		if (s.value) {
+		if (current_signal_.value) {
 			// If we haven't changed value then keep at the sine wave
 			if (previous_signal_) {
 				*out = (float)(sine_table_[sine_index_]);
@@ -238,20 +218,11 @@ int wave_gen::pa_stream(const void* input,
 		if (sine_index_ == cycle_samples_) sine_index_ = 0;
 		// Increment index into signal and when complete get next signal
 		sample_number_++;
-		if (sample_number_ == samples_in_signal_ || (s.durn_ms == UINT64_MAX && !signal_queue_.empty())) {
-			signal_queue_.pop();
-			if (signal_queue_.empty()) {
-				s = { s.value, UINT64_MAX };
-			}
-			else {
-				s = signal_queue_.front();
-			}
-			if (s.durn_ms == UINT64_MAX) {
-				samples_in_signal_ = UINT64_MAX;
-			}
-			else {
-				samples_in_signal_ = (uint64_t)(s.durn_ms * (sample_rate_ / 1000.0));
-			}
+		if (sample_number_ == samples_in_signal_) {
+			//printf("Finished sending %d\n", current_signal_.value);
+			current_signal_.durn_ms = 0;
+			get_next_signal(&current_signal_, engine_);
+			samples_in_signal_ = (uint64_t)(current_signal_.durn_ms * (sample_rate_ / 1000.0));
 			sample_number_ = 0;
 		}
 	}
@@ -270,24 +241,22 @@ int wave_gen::cb_pa_stream(const void* input,
 	return that->pa_stream(input, output, frameCount, timeInfo, statusFlags);
 }
 
-// Return if remaining buffer count is less than two
-bool wave_gen::empty() {
-	return signal_queue_.empty();
-}
-
 // Return current state of the signal
-bool wave_gen::get_signal() {
-	signal_def s = signal_queue_.front();
-	return s.value;
+bool wave_gen::get_key() {
+	return current_signal_.value;
 }
 
 // Return current signal and its duration
-signal_def wave_gen::get_sig_durn() {
+signal_def wave_gen::get_signal() {
 	signal_def result;
-	signal_def s = signal_queue_.front();
 	// Return current signal value
-	result.value = s.value;
+	result.value = current_signal_.value;
 	// Return number of milliseconds current duration
 	result.durn_ms = (uint64_t)(sample_number_ / (sample_rate_ / 1000.));
 	return result;
+}
+
+void wave_gen::callback(void (*cb)(signal_def*, void*), void* user_data) {
+	get_next_signal = cb;
+	engine_ = user_data;
 }

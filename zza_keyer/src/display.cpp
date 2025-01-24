@@ -414,7 +414,7 @@ void display::cb_engine(Fl_Widget* w, void* v) {
 // Callback - editor: save value - start sending data
 void display::cb_editor(Fl_Widget* w, void* v) {
 	display* that = ancestor_view<display>(w);
-	int len = strlen(that->buffer_);
+	size_t len = strlen(that->buffer_);
 	memcpy(that->buffer_, ((Fl_Input*)w)->value(), 1024);
 	if (strlen(that->buffer_) < len) {
 		that->update_editor(DEL_CHARACTER);

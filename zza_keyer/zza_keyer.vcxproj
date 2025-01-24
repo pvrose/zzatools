@@ -134,6 +134,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>fltk.lib;hidapi.lib;gdiplus.lib;gdi32.lib;ws2_32.lib;winmm.lib;wldap32.lib;comctl32.lib;comdlg32.lib;Crypt32.lib;normaliz.lib;portaudio_x64.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

@@ -6,8 +6,11 @@
 #include <thread>
 #include <atomic>
 #include <cstdint>
+#include <list>
 
 using namespace std;
+
+struct signal_def;
 
 // This is the main encoding engine
 
@@ -92,24 +95,27 @@ public:
 		double weighting   // Dash to dot ratio
 	);
 
-	// Start processing
-	bool start();
+	// Callback from wave_gen
+	static void cb_signal(signal_def* data, void* user_data);
 
 protected:
+
 	// Return the current state of the input paddle/key/keyboard
 	void get_signs(bool& dit, bool& dash);
 	// Main state machine
 	state_t next_state(state_t state, bool dit, bool dash, uint64_t& gap);
 	// Drive key-out
-	void drive_key_out(state_t state, uint64_t gap);
-	// Core engine loop
-	void run_engine();
-	// Invoked by this threa
-	static void run_thread(engine* that);
+	bool drive_key_out(state_t state);
+	//// Core engine loop
+	//void run_engine();
+	//// Invoked by this threa
+	//static void run_thread(engine* that);
 	// Retunr true if the state si untimed - so check inputs
 	bool is_untimed(state_t state);
 	// Returns true if the state is a timed mark - as will be follwoed by a timed space
 	bool is_timed_mark(state_t state);
+	// Non-statis call
+	void get_signal(signal_def* data);
 
 	// The state
 	state_t state_;
@@ -117,10 +123,10 @@ protected:
 	engine_type type_;
 	// KB character queue
 	queue<unsigned int> q_character_;
-	// The thread
-	thread* t_engine_;
-	// Stop processing loop
-	atomic<bool> close_;
+	//// The thread
+	//thread* t_engine_;
+	//// Stop processing loop
+	//atomic<bool> close_;
 	// Words per minute
 	double wpm_;
 	// Weighting
@@ -137,6 +143,8 @@ protected:
 	char* next_sign_;
 	// Old state
 	static state_t old_state_;
+	//// Debug history
+	//list<signal_def> history_;
 
 };
 
