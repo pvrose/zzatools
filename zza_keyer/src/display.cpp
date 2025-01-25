@@ -268,8 +268,10 @@ void display::create_monitor(int& curr_x, int& curr_y) {
 
 	td_monitor_ = new Fl_Text_Display(curr_x, curr_y, 3 * WBUTTON, 4 * HBUTTON);
 	Fl_Text_Buffer* buffer = new Fl_Text_Buffer;
+	td_monitor_->textfont(FL_COURIER);
 	td_monitor_->buffer(buffer);
 	td_monitor_->tooltip("Displays the code sent");
+	td_monitor_->wrap_mode(Fl_Text_Display::WRAP_AT_BOUNDS, 0);
 
 	curr_x += td_monitor_->w() + GAP;
 	curr_y += td_monitor_->h() + GAP;
@@ -455,8 +457,8 @@ void display::update_monitor() {
 	decoder_->get_speed(wpm_, weight_);
 	vs_wpm_->value(wpm_);
 	vs_weight_->value(weight_);
-	char c = decoder_->get_char();
-	td_monitor_->buffer()->append(&c, 1);
+	string s = decoder_->get_characters();
+	td_monitor_->buffer()->text(s.c_str());
 }
 
 // Update editor - TODO: what was this supposed to do?

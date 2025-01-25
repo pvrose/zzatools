@@ -104,8 +104,8 @@ protected:
 	void get_signs(bool& dit, bool& dash);
 	// Main state machine
 	state_t next_state(state_t state, bool dit, bool dash, uint64_t& gap);
-	// Drive key-out
-	bool drive_key_out(state_t state);
+	// Get the key out value
+	bool key_out(state_t state);
 	//// Core engine loop
 	//void run_engine();
 	//// Invoked by this threa

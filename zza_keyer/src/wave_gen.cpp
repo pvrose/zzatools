@@ -178,12 +178,30 @@ int wave_gen::pa_stream(const void* input,
 	PaStreamCallbackFlags statusFlags) {
 	// Pointer to output buffer 
 	float* out = (float*)output;
+	signal_def last_signal;
 	// Now send the data
 	for (unsigned int ix = 0; ix < frameCount; ix++) {;
 		if (current_signal_.durn_ms == 0) {
-			get_next_signal(&current_signal_, engine_);
-			samples_in_signal_ = (uint64_t)(current_signal_.durn_ms * (sample_rate_ / 1000.0));
-			sample_number_ = 0;
+			signal_def next_signal;
+			get_next_signal(&next_signal, engine_);
+			last_signal.value = current_signal_.value;
+			last_signal.durn_ms = sample_number_ / (sample_rate_ / 1000.0);
+			if (next_signal.value == current_signal_.value) {
+				// We are continuing to send the same signal
+				if (next_signal.durn_ms == 0) {
+					current_signal_.durn_ms = 0;
+					samples_in_signal_ = 0;
+				}
+				else {
+					current_signal_.durn_ms += next_signal.durn_ms;
+					samples_in_signal_ = (uint64_t)(current_signal_.durn_ms * (sample_rate_ / 1000.0));
+				}
+			}
+			else {
+				current_signal_ = next_signal;
+				samples_in_signal_ = (uint64_t)(current_signal_.durn_ms * (sample_rate_ / 1000.0));
+				sample_number_ = 0;
+			}
 		}
 		if (current_signal_.value) {
 			// If we haven't changed value then keep at the sine wave
@@ -218,12 +236,27 @@ int wave_gen::pa_stream(const void* input,
 		if (sine_index_ == cycle_samples_) sine_index_ = 0;
 		// Increment index into signal and when complete get next signal
 		sample_number_++;
-		if (sample_number_ == samples_in_signal_) {
-			//printf("Finished sending %d\n", current_signal_.value);
-			current_signal_.durn_ms = 0;
-			get_next_signal(&current_signal_, engine_);
-			samples_in_signal_ = (uint64_t)(current_signal_.durn_ms * (sample_rate_ / 1000.0));
-			sample_number_ = 0;
+		if (sample_number_ >= samples_in_signal_ && samples_in_signal_ != 0) {
+			signal_def next_signal;
+			get_next_signal(&next_signal, engine_);
+			last_signal.value = current_signal_.value;
+			last_signal.durn_ms = sample_number_ / (sample_rate_ / 1000.0);
+			//printf("Signal complete %d for %d ms (%d samples) \n", last_signal.value, last_signal.durn_ms, sample_number_);
+			if (next_signal.value == current_signal_.value) {
+				// We are continuing to send the same signal
+				if (next_signal.durn_ms == 0) {
+					current_signal_.durn_ms = 0;
+					samples_in_signal_ = 0;
+				}
+				else {
+					current_signal_.durn_ms += next_signal.durn_ms;
+					samples_in_signal_ = (uint64_t)(current_signal_.durn_ms * (sample_rate_ / 1000.0));
+				}
+			} else {
+				current_signal_ = next_signal;
+				samples_in_signal_ = (uint64_t)(current_signal_.durn_ms * (sample_rate_ / 1000.0));
+				sample_number_ = 0;
+			}
 		}
 	}
 	return paContinue;
@@ -246,6 +279,7 @@ bool wave_gen::get_key() {
 	return current_signal_.value;
 }
 
+// Return current signal and its duration
 // Return current signal and its duration
 signal_def wave_gen::get_signal() {
 	signal_def result;

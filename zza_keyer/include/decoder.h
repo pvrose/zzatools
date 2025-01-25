@@ -3,6 +3,8 @@
 #include <thread>
 #include <atomic>
 #include <cstdint>
+#include <map>
+#include <string>
 
 struct signal_def;
 
@@ -22,8 +24,8 @@ public:
 	// Get current speed
 	void get_speed(double& wpm, double& weighting);
 
-	// Get last character decoded
-	char get_char();
+	// Get last characters decoded
+	string get_characters();
 
 	// Start the decode
 	void start();
@@ -40,9 +42,21 @@ public:
 		STUCK_LOW                         // Signal has been low for a long time
 	};
 
+	map<decode_t, const char*> decode_text = {
+		{ NO_CHANGE, "NO_CHANGE" },
+		{ NOISE, "NOISE" },
+		{ DIT, "DIT" },
+		{ DASH, "DASH" },
+		{ SIGN, "SIGN" },
+		{ CHAR, "CHAR" },
+		{ WORD, "WORD" },
+		{ STUCK_HIGH, "STUCK HIGH" },
+		{ STUCK_LOW, "STUCK LOW" }
+	};
+
 protected:
 
-	void do_key_change(signal_def signal);
+	void do_key_change(decode_t decode);
 
 	// Work out the sign
 	decode_t decode_monitor(signal_def signal);
@@ -75,14 +89,14 @@ protected:
 	double dash_time_;
 
 	// Previous value 
-	bool last_key_;
+	signal_def* previous_signal_;
 	// The key has been idle for some time
 	bool key_idle_;
 	unsigned char code_;                 // Accumulated dits and dashes from output
 	unsigned char len_code_;             // Number of valid dits and dashes in code
 	bool char_in_progress_;              // Capturing a character is in progress
 
-	char character_;                      // Last captured
+	string characters_;                  // Last captured
 
 };
 

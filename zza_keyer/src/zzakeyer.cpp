@@ -42,6 +42,8 @@ int main(int argc, char** argv)
 	display_ = new display(1000, 1000);
 
 	display_->show(argc, argv);
+	// Start decode
+	decoder_->start();
 
 	// Connect wave_gen to source of signals
 	wave_gen_->callback(engine::cb_signal, engine_);

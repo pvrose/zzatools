@@ -382,7 +382,7 @@ engine::state_t engine::next_state(state_t state, bool dit, bool dash, uint64_t&
 }
 
 // Drive key-out
-bool engine::drive_key_out(state_t state) {
+bool engine::key_out(state_t state) {
 	if (state != old_state_) {
 		//printf("ENG: State %s for %u ms\n", state_text_[state].c_str(), gap);
 		switch (state) {
@@ -449,7 +449,7 @@ void engine::get_signal(signal_def* data) {
 	uint64_t gap = 0;
 	if (!is_timed_mark(state_)) get_signs(dit, dash);
 	state_ = next_state(state_, dit, dash, gap);
-	bool key = drive_key_out(state_);
+	bool key = key_out(state_);
 	//if (gap != 0) printf("State %s - sending %d for %d ms\n", state_text_[state_].c_str(), key, gap);
 	*data = { key, gap };
 }

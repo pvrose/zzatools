@@ -23,20 +23,21 @@ const char MLU6[] = "********" "****?_**" "**\"**.**" "**@*****"
 
 const double MAX_DIT = 2.0;          // Maximum length of a dit in dit-times
 const double MAX_SIGN_GAP = 2.0;     // Diffreence between a dit/dash gap and a character gap
-const double MAX_CHAR_GAP = 4.0;     // Difference between a character gap and a word gap
+const double MAX_CHAR_GAP = 4.0;     // Difference between a dit/dash gap and a word gap
+const double MAX_WORD_GAP = 10.0;    // Maximum wait in dit gaps before forcing end of word
 const double MAX_DASH = 5.0;         // Maximum length of a dash
 const double TIMEOUT = 5.0;          // Timeout set to 5 seconds
 const double BIAS = 2.0 / 3.0;       // Factor used in calculating biased average bit period
 const double MIN_WT = 2.8;           // Minimum weighting
 const double MAX_WT = 4.8;           // Maximum weighting
 // Time keeping is in ms. Define a minute as seconds
-const double MINUTE = 60.0;
+const double MINUTE = 60000.0;
 // Number of dit times in the word "PARIS" - ".__. ._ ._. .. ...   "
 const int DITS_PER_WORD = 50;
 
 decoder::decoder() 
 {
-    last_key_ = false;
+    previous_signal_ = new signal_def({ false, 0 });
     t_decoder_ = nullptr;
     close_ = false;
     wpm_ = 0.0;
@@ -47,7 +48,7 @@ decoder::decoder()
     code_ = 0;
     len_code_ = 0;
     char_in_progress_ = false;
-    character_ = '\0';
+    characters_ = "";
 
 }
 
@@ -62,6 +63,7 @@ void decoder::set_speed(double wpm, double weighting) {
 	weighting_ = weighting;
 	dit_time_ = MINUTE / wpm / DITS_PER_WORD;
 	dash_time_ = dit_time_ * weighting_;
+    printf("WPM %g, weighting %g, Tdit %g, Tdash %g\n", wpm_, weighting_, dit_time_, dash_time_);
 }
 
 // Get current speed
@@ -72,66 +74,64 @@ void decoder::get_speed(double& wpm, double& weighting) {
 
 // Decode the key
 decoder::decode_t decoder::decode_monitor(signal_def signal) {
-    if (signal.value) {
-        if (last_key_ != signal.value) {
-            // We were stuck low
-            if (key_idle_) {
-                return STUCK_LOW;
-            }
-            // Posedge on key
-            else if (signal.durn_ms < dit_time_ / 5) {
-                // Key bounce
-                return NOISE;
-            }
-            else if (signal.durn_ms < MAX_SIGN_GAP * dit_time_) {
-                // Inter sign gap
-                return SIGN;
-            }
-            else if (signal.durn_ms < MAX_CHAR_GAP * dit_time_) {
-                // Inter character gap
-                return CHAR;
-            }
-            else {
-                // Inter word gap
-                return WORD;
-            }
+    if (!signal.value) {
+        // We were stuck low
+        if (key_idle_) {
+            return STUCK_LOW;
+        }
+        // Posedge on key
+        else if (signal.durn_ms < dit_time_ / 5) {
+            // Key bounce
+            return NOISE;
+        }
+        else if (signal.durn_ms < MAX_SIGN_GAP * dit_time_) {
+            // Inter sign gap
+            return SIGN;
+        }
+        else if (signal.durn_ms < MAX_CHAR_GAP * dit_time_) {
+            // Inter character gap
+            return CHAR;
         }
         else {
-            // Check stuckk high
-            if (signal.durn_ms > TIMEOUT) {
-                return STUCK_HIGH;
-            }
-            else {
-                return NO_CHANGE;
-            }
+            // Inter word gap
+            return WORD;
         }
     }
+        //else {
+        //    // Check stuckk high
+        //    if (signal.durn_ms > TIMEOUT) {
+        //        return STUCK_HIGH;
+        //    }
+        //    else {
+        //        return NO_CHANGE;
+        //    }
+        //}
+    //}
     else {
-        if (last_key_ != signal.value) {
-            // Negedge on key
-            if (signal.durn_ms < dit_time_ / 5) {
-                // Key bounce
-                return NOISE;
-            }
-            else if (signal.durn_ms < MAX_DIT * dit_time_) {
-                // less tha two dit times treat as a fdit
-                return DIT;
-            }
-            else {
-                // Greater than 2 dit times treat as a dash
-                return DASH;
-            }
+        // Negedge on key
+        if (signal.durn_ms < dit_time_ / 5) {
+            // Key bounce
+            return NOISE;
+        }
+        else if (signal.durn_ms < MAX_DIT * dit_time_) {
+            // less tha two dit times treat as a fdit
+            return DIT;
         }
         else {
-            // Check a long low
-            if (signal.durn_ms > MAX_DASH * dit_time_) {
-                // Traet is as a word space
-                return STUCK_LOW;
-            }
-            else {
-                return NO_CHANGE;
-            }
+            // Greater than 2 dit times treat as a dash
+            return DASH;
         }
+        //}
+        //else {
+        //    // Check a long low
+        //    if (signal.durn_ms > MAX_DASH * dit_time_) {
+        //        // Traet is as a word space
+        //        return STUCK_LOW;
+        //    }
+        //    else {
+        //        return NO_CHANGE;
+        //    }
+        //}
     }
 }
 
@@ -184,8 +184,7 @@ char decoder::morse_to_letter() {
 }
 
 // Analyse the key change
-void decoder::do_key_change(signal_def signal) {
-    decode_t decode = decode_monitor(signal);
+void decoder::do_key_change(decode_t decode) {
     switch (decode) {
     case NO_CHANGE: {
         return;
@@ -213,13 +212,17 @@ void decoder::do_key_change(signal_def signal) {
     case CHAR: {
         // End of character
         send_char(morse_to_letter());
-        send_char(' ');
+        code_ = 0;
+        len_code_ = 0;
         key_idle_ = false;
         break;
     }
     case WORD: {
         // End of word, - complete the current dit or dash and add a word space
         send_char(morse_to_letter());
+        send_char(' ');
+        code_ = 0;
+        len_code_ = 0;
         key_idle_ = false;
         break;
     }
@@ -229,6 +232,8 @@ void decoder::do_key_change(signal_def signal) {
     case STUCK_HIGH: {
         if (!key_idle_) {
             send_char(morse_to_letter());
+            code_ = 0;
+            len_code_ = 0;
             printf("There appears to be a problem - key is stuck high\n");
         }
         key_idle_ = true;
@@ -238,6 +243,8 @@ void decoder::do_key_change(signal_def signal) {
         if (!key_idle_) {
             send_char(morse_to_letter());
             send_char(' ');
+            code_ = 0;
+            len_code_ = 0;
         }
         key_idle_ = true;
         break;
@@ -248,14 +255,14 @@ void decoder::do_key_change(signal_def signal) {
 
 // SEnd character
 void decoder::send_char(char c) {
-    character_ = c;
+    characters_ += c;
     // Get display to update the monitor
     Fl::awake(display::cb_monitor, display_);
 }
 
 // Get character
-char decoder::get_char() {
-    return character_;
+string decoder::get_characters() {
+    return characters_;
 }
 
 // Start the decoder
@@ -270,11 +277,25 @@ void decoder::run_thread(decoder* that) {
 
 // That does this
 void decoder::run_decoder() {
+    bool timed_out = false;
     while (!close_) {
-        signal_def signal = wave_gen_->get_signal();
-        do_key_change(signal);
-        last_key_ = signal.value;
+        signal_def signal;
+        signal = wave_gen_->get_signal();
+        if (signal.value != previous_signal_->value) {
+            decode_t decode = decode_monitor(*previous_signal_);
+            do_key_change(decode);
+            //printf("Edge detected - was %d for %d ms Decode %s Code = %x (l%d)\n",
+            //    previous_signal_->value, previous_signal_->durn_ms, decode_text[decode], code_, len_code_);
+            timed_out = false;
+        } else if (!timed_out && signal.durn_ms > (dit_time_ * MAX_WORD_GAP)) {
+            decode_t decode = decode_monitor(*previous_signal_);
+            do_key_change(decode);
+            //printf("Timeout detected - was %d for %d ms Decode %s Code = %x (l%d)\n",
+            //    previous_signal_->value, previous_signal_->durn_ms, decode_text[decode], code_, len_code_);
+            timed_out = true;
+        } 
         this_thread::yield();
+        *previous_signal_ = signal;
     }
 }
 

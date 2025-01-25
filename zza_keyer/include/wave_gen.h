@@ -59,7 +59,7 @@ public:
 
 	// Return current state of signal
 	bool get_key();
-	// Get current state of signal and how long
+	// Get the last unprocessed signal (or currenet onging one)
 	signal_def get_signal();
 	// Callback set callback
 	void callback(void (*cb)(signal_def*, void*), void* user_data);
