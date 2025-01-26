@@ -280,7 +280,11 @@ void decoder::run_thread(decoder* that) {
 
 // That does this
 void decoder::run_decoder() {
-    bool timed_out = false;
+    enum timed_t {
+        NONE,
+        CHAR_SEEN,
+        WORD_SEEN
+    } timed_out = NONE;
     while (!close_) {
         signal_def signal;
         signal = wave_gen_->get_signal();
@@ -289,14 +293,22 @@ void decoder::run_decoder() {
             do_key_change(decode);
             printf("Edge detected - was %d for %d ms Decode %s Code = %x (l%d)\n",
                 previous_signal_->value, previous_signal_->durn_ms, decode_text[decode], code_, len_code_);
-            timed_out = false;
-        } else if (!timed_out && signal.durn_ms > (dit_time_ * MAX_WORD_GAP)) {
+            timed_out = NONE;
+        }
+        else if (timed_out == NONE && signal.durn_ms > (dit_time_ * MAX_CHAR_GAP)) {
             decode_t decode = decode_monitor(*previous_signal_);
             do_key_change(decode);
-            printf("Timeout detected - was %d for %d ms Decode %s Code = %x (l%d)\n",
+            printf("Char gap detected - was %d for %d ms Decode %s Code = %x (l%d)\n",
                 previous_signal_->value, previous_signal_->durn_ms, decode_text[decode], code_, len_code_);
-            timed_out = true;
-        } 
+            timed_out = CHAR_SEEN;
+        }
+        else if (timed_out == NONE && signal.durn_ms > (dit_time_ * MAX_WORD_GAP)) {
+            decode_t decode = decode_monitor(*previous_signal_);
+            do_key_change(decode);
+            printf("Word gap detected - was %d for %d ms Decode %s Code = %x (l%d)\n",
+                previous_signal_->value, previous_signal_->durn_ms, decode_text[decode], code_, len_code_);
+            timed_out = WORD_SEEN;
+        }
         this_thread::yield();
         *previous_signal_ = signal;
     }
