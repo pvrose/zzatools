@@ -302,7 +302,7 @@ void decoder::run_decoder() {
                 previous_signal_->value, previous_signal_->durn_ms, decode_text[decode], code_, len_code_);
             timed_out = CHAR_SEEN;
         }
-        else if (timed_out == NONE && signal.durn_ms > (dit_time_ * MAX_WORD_GAP)) {
+        else if (timed_out == CHAR && signal.durn_ms > (dit_time_ * MAX_WORD_GAP)) {
             decode_t decode = decode_monitor(*previous_signal_);
             do_key_change(decode);
             printf("Word gap detected - was %d for %d ms Decode %s Code = %x (l%d)\n",
