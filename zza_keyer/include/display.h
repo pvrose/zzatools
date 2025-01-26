@@ -8,6 +8,7 @@ class Fl_Choice;
 class Fl_Float_Input;
 class Fl_Group;
 class Fl_Input;
+class Fl_Output;
 class Fl_Radio_Round_Button;
 class Fl_Text_Display;
 class Fl_Value_Slider;
@@ -49,6 +50,8 @@ public:
     static void cb_engine(Fl_Widget* w, void* v);
     // Callback - editor: save value - start sending data
     static void cb_editor(Fl_Widget* w, void* v);
+    // Callback - clear monitor
+    static void cb_clear(Fl_Widget* w, void* v);
 
     // Callback - monitor data ready
     static void cb_monitor(void* v);
@@ -129,6 +132,9 @@ protected:
 
     Fl_Group* g_monitor_;
     Fl_Text_Display* td_monitor_;
+    Fl_Output* op_wpm_;
+    Fl_Output* op_weight_;
+    Fl_Button* bn_clear_;
 
 };
 

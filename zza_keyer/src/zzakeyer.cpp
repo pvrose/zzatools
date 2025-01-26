@@ -33,6 +33,9 @@ int main(int argc, char** argv)
 	Fl::set_font(FL_COURIER_ITALIC, "Courier New Italic");
 	Fl::set_font(FL_COURIER_BOLD_ITALIC, "Courier New Bold Italic");
 
+	// Initialise thread handling in FLTK
+	Fl::lock();
+
 	// Create the various units
 	engine_ = new engine;
 	key_handler_ = new key_handler;

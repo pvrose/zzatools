@@ -16,6 +16,7 @@
 #include <FL/Fl_Choice.H>
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Input.H>
+#include <FL/Fl_Output.H>
 #include <FL/Fl_Radio_Round_Button.H>
 #include <FL/Fl_Text_Display.H>
 #include <FL/Fl_Value_Slider.H>
@@ -60,6 +61,7 @@ display::display(int W, int H, const char* L) :
 
 // Destructor
 display::~display() {
+	save_data();
 }
 
 // Create the window display - creates the individual section
@@ -229,7 +231,7 @@ void display::create_shape(int& curr_x, int& curr_y) {
 // Create the selectors for the keying source - input paddle or keyboard entry
 // If paddle the choose the type: Straight key, squeeze or bug
 void display::create_source(int& curr_x, int& curr_y) {
-	int height = HTEXT +  2 * HBUTTON + GAP + 2 * HBUTTON + GAP;
+	int height = HTEXT +  2 * HBUTTON + GAP + GAP;
 	g_source_ = new Fl_Group(curr_x, curr_y, g_settings_->w(), height, "Source");
 	g_source_->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 	g_source_->box(FL_BORDER_BOX);
@@ -258,7 +260,7 @@ void display::create_source(int& curr_x, int& curr_y) {
 
 // Display decode of the generated morse code
 void display::create_monitor(int& curr_x, int& curr_y) {
-	int height = HTEXT + 4 * HBUTTON + GAP;
+	int height = HTEXT + 5 * HBUTTON + GAP;
 	g_monitor_ = new Fl_Group(curr_x, curr_y, g_settings_->w(), height, "Monitor");
 	g_monitor_->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 	g_monitor_->box(FL_BORDER_BOX);
@@ -272,10 +274,30 @@ void display::create_monitor(int& curr_x, int& curr_y) {
 	td_monitor_->buffer(buffer);
 	td_monitor_->tooltip("Displays the code sent");
 	td_monitor_->wrap_mode(Fl_Text_Display::WRAP_AT_BOUNDS, 0);
+	buffer->text("");
 
-	curr_x += td_monitor_->w() + GAP;
-	curr_y += td_monitor_->h() + GAP;
+	curr_y += td_monitor_->h();
+	int max_x = curr_x + td_monitor_->w() + GAP;
+	int w5 = td_monitor_->w() / 5;
+	curr_x += w5;
+	op_wpm_ = new Fl_Output(curr_x, curr_y, w5, HBUTTON, "WPM");
+	op_wpm_->align(FL_ALIGN_LEFT);
+	op_wpm_->value("");
+	op_wpm_->tooltip("Displays the monitored words per minute");
+	curr_x += op_wpm_->w() + w5;
+	op_weight_ = new Fl_Output(curr_x, curr_y, w5, HBUTTON, "Weight");
+	op_weight_->align(FL_ALIGN_LEFT);
+	op_weight_->value("");
+	op_weight_->tooltip("Displays the monitored weighting");
+	curr_x += op_weight_->w();
+	bn_clear_ = new Fl_Button(curr_x, curr_y, w5, HBUTTON, "Clear");
+	bn_clear_->callback(cb_clear, buffer);
+	bn_clear_->tooltip("Clears the monitored text display");
+	max_x = max(max_x, curr_x + bn_clear_->w() + GAP);
 
+	curr_y += HBUTTON + GAP;
+	curr_x = max_x;
+	
 	g_monitor_->end();
 
 }
@@ -426,6 +448,13 @@ void display::cb_editor(Fl_Widget* w, void* v) {
 	}
 }
 
+// Callback - monitor - clear text display
+void display::cb_clear(Fl_Widget* w, void* v) {
+	// v points to the buffer
+	Fl_Text_Buffer* buffer = (Fl_Text_Buffer*)v;
+	buffer->text("");
+}
+
 // Callback - monitor data ready
 void display::cb_monitor(void* v) {
 	display* that = (display*)v;
@@ -454,11 +483,22 @@ void display::update_engine() {
 
 // Update monitor with data from decoder
 void display::update_monitor() {
-	decoder_->get_speed(wpm_, weight_);
-	vs_wpm_->value(wpm_);
-	vs_weight_->value(weight_);
-	string s = decoder_->get_characters();
-	td_monitor_->buffer()->text(s.c_str());
+	double wpm;
+	double weight;
+	decoder_->get_speed(wpm, weight);
+	char l[16];
+	snprintf(l, sizeof(l), "%g", wpm);
+	op_wpm_->value(l);
+	snprintf(l, sizeof(l), "%g", weight);
+	op_weight_->value(l);
+	char c;
+	char utf8[5];
+	while (decoder_->get_character(c)) {
+		memset(utf8, '\0', sizeof(utf8));
+		printf("Received WPM = %g, Weight = %g, character '%c' from decoder\n", wpm, weight, c);
+		fl_utf8encode((unsigned)c, utf8);
+		td_monitor_->buffer()->append(utf8);
+	}
 }
 
 // Update editor - TODO: what was this supposed to do?

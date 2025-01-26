@@ -44,11 +44,10 @@ decoder::decoder()
     weighting_ = 0.0;
     dit_time_ = 0;
     dash_time_ = 0;
-    key_idle_ = false;
+    key_idle_ = true;
     code_ = 0;
     len_code_ = 0;
     char_in_progress_ = false;
-    characters_ = "";
 
 }
 
@@ -223,7 +222,7 @@ void decoder::do_key_change(decode_t decode) {
         send_char(' ');
         code_ = 0;
         len_code_ = 0;
-        key_idle_ = false;
+        key_idle_ = true;
         break;
     }
     case NOISE: {
@@ -255,14 +254,18 @@ void decoder::do_key_change(decode_t decode) {
 
 // SEnd character
 void decoder::send_char(char c) {
-    characters_ += c;
+    printf("Adding '%c' to decode\n", c);
+    characters_.push(c);
     // Get display to update the monitor
     Fl::awake(display::cb_monitor, display_);
 }
 
 // Get character
-string decoder::get_characters() {
-    return characters_;
+bool decoder::get_character(char& c) {
+    if (characters_.size() == 0) return false;
+    c = characters_.front();
+    characters_.pop();
+    return true;
 }
 
 // Start the decoder
@@ -284,14 +287,14 @@ void decoder::run_decoder() {
         if (signal.value != previous_signal_->value) {
             decode_t decode = decode_monitor(*previous_signal_);
             do_key_change(decode);
-            //printf("Edge detected - was %d for %d ms Decode %s Code = %x (l%d)\n",
-            //    previous_signal_->value, previous_signal_->durn_ms, decode_text[decode], code_, len_code_);
+            printf("Edge detected - was %d for %d ms Decode %s Code = %x (l%d)\n",
+                previous_signal_->value, previous_signal_->durn_ms, decode_text[decode], code_, len_code_);
             timed_out = false;
         } else if (!timed_out && signal.durn_ms > (dit_time_ * MAX_WORD_GAP)) {
             decode_t decode = decode_monitor(*previous_signal_);
             do_key_change(decode);
-            //printf("Timeout detected - was %d for %d ms Decode %s Code = %x (l%d)\n",
-            //    previous_signal_->value, previous_signal_->durn_ms, decode_text[decode], code_, len_code_);
+            printf("Timeout detected - was %d for %d ms Decode %s Code = %x (l%d)\n",
+                previous_signal_->value, previous_signal_->durn_ms, decode_text[decode], code_, len_code_);
             timed_out = true;
         } 
         this_thread::yield();

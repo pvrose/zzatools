@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <map>
 #include <string>
+#include <queue>
 
 struct signal_def;
 
@@ -25,7 +26,7 @@ public:
 	void get_speed(double& wpm, double& weighting);
 
 	// Get last characters decoded
-	string get_characters();
+	bool get_character(char& c);
 
 	// Start the decode
 	void start();
@@ -96,7 +97,7 @@ protected:
 	unsigned char len_code_;             // Number of valid dits and dashes in code
 	bool char_in_progress_;              // Capturing a character is in progress
 
-	string characters_;                  // Last captured
+	queue<char> characters_;                 // Last captured
 
 };
 
