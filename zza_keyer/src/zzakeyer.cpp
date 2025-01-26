@@ -53,5 +53,9 @@ int main(int argc, char** argv)
 	// Start wave_gen
 	wave_gen_->initialise_pa();
 
-	return Fl::run();
+	int result = Fl::run();
+
+	// This needs to be deleted to save the new parameters
+	delete display_;
+	return result;
 }
