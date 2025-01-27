@@ -83,11 +83,11 @@ decoder::decode_t decoder::decode_monitor(signal_def signal) {
             // Key bounce
             return NOISE;
         }
-        else if (signal.durn_ms < MAX_SIGN_GAP * dit_time_) {
+        else if (signal.durn_ms <= MAX_SIGN_GAP * dit_time_) {
             // Inter sign gap
             return SIGN;
         }
-        else if (signal.durn_ms < MAX_CHAR_GAP * dit_time_) {
+        else if (signal.durn_ms <= MAX_CHAR_GAP * dit_time_) {
             // Inter character gap
             return CHAR;
         }
@@ -170,7 +170,7 @@ void decoder::check_speed(decode_t decode, uint64_t duration_ms) {
 
 char decoder::morse_to_letter() {
     switch (len_code_) {
-    case 0: return '*';
+    case 0: return '\0';
     case 1: return MLU1[code_];
     case 2: return MLU2[code_];
     case 3: return MLU3[code_];
@@ -254,10 +254,12 @@ void decoder::do_key_change(decode_t decode) {
 
 // SEnd character
 void decoder::send_char(char c) {
-    printf("Adding '%c' to decode\n", c);
-    characters_.push(c);
-    // Get display to update the monitor
-    Fl::awake(display::cb_monitor, display_);
+    if (c) {
+        printf("Adding '%c' to decode\n", c);
+        characters_.push(c);
+        // Get display to update the monitor
+        Fl::awake(display::cb_monitor, display_);
+    }
 }
 
 // Get character
@@ -280,7 +282,7 @@ void decoder::run_thread(decoder* that) {
 
 // That does this
 void decoder::run_decoder() {
-    enum timed_t {
+    enum timed_t : char {
         NONE,
         CHAR_SEEN,
         WORD_SEEN
@@ -295,14 +297,14 @@ void decoder::run_decoder() {
                 previous_signal_->value, previous_signal_->durn_ms, decode_text[decode], code_, len_code_);
             timed_out = NONE;
         }
-        else if (timed_out == NONE && signal.durn_ms > (dit_time_ * MAX_CHAR_GAP)) {
+        else if (timed_out == NONE && signal.durn_ms >= (dit_time_ * MAX_CHAR_GAP)) {
             decode_t decode = decode_monitor(*previous_signal_);
             do_key_change(decode);
             printf("Char gap detected - was %d for %d ms Decode %s Code = %x (l%d)\n",
                 previous_signal_->value, previous_signal_->durn_ms, decode_text[decode], code_, len_code_);
             timed_out = CHAR_SEEN;
         }
-        else if (timed_out == CHAR && signal.durn_ms > (dit_time_ * MAX_WORD_GAP)) {
+        else if (timed_out == CHAR_SEEN && signal.durn_ms >= (dit_time_ * MAX_WORD_GAP)) {
             decode_t decode = decode_monitor(*previous_signal_);
             do_key_change(decode);
             printf("Word gap detected - was %d for %d ms Decode %s Code = %x (l%d)\n",

@@ -50,9 +50,9 @@ display::display(int W, int H, const char* L) :
 	memset(buffer_, '\0', sizeof(buffer_));
 	load_data();
 	create_form();
-	enable_widgets();
 	populate_devices();
 	populate_sources();
+	enable_widgets();
 	update_speed();
 	update_engine();
 	update_wavegen();
@@ -533,6 +533,7 @@ void display::populate_sources() {
 		for (auto it = engine_descriptors_.begin(); it != engine_descriptors_.end(); it++) {
 			ch_engine_->add((*it).second.c_str());
 		}
+		ch_engine_->value(engine_type_);
 	}
 }
 
