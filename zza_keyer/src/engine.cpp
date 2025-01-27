@@ -317,6 +317,10 @@ engine::state_t engine::next_state(state_t state, bool dit, bool dash, uint64_t&
 			next = A_DASH_DOWN;
 			gap = dash_time_;
 		}
+		else if (dit) {
+			next = A_DIT_DOWN;
+			gap = dit_time_;
+		}
 		else {
 			next = A_SPACE;
 			gap = space_time_;
@@ -355,6 +359,10 @@ engine::state_t engine::next_state(state_t state, bool dit, bool dash, uint64_t&
 			next = A_DIT_DOWN;
 			gap = dit_time_;
 		}
+		else if (dash) {
+			next = A_DASH_DOWN;
+			gap = dash_time_;
+		}
 		else {
 			next = A_SPACE;
 			gap = space_time_;
@@ -378,6 +386,8 @@ engine::state_t engine::next_state(state_t state, bool dit, bool dash, uint64_t&
 		break;
 	}
 	}
+	//if (next != IDLE) printf("Dit:%d Dash:%d Next state = %s(%d) Time = %d ms\n", 
+	//	dit, dash, state_text_[next], (int)next, gap);
 	return next;
 }
 

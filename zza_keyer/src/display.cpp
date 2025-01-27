@@ -521,7 +521,8 @@ void display::populate_devices() {
 		char text[128];
 		for (auto it = devices->begin(); it != devices->end(); it++, ix++) {
 			snprintf(text, sizeof(text), "%02d %s", ix, ((*it).c_str()));
-			ch_devices_->add(text);
+			string name = escape_menu(text);
+			ch_devices_->add(name.c_str());
 		}
 	}
 }

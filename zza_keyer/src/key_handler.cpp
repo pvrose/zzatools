@@ -84,25 +84,29 @@ void key_handler::run_thread(key_handler* that) {
 // And non-static version
 void key_handler::run_key() {
 	current_keys_ = NEITHER;
+	unsigned char previous = 0;
 	while (!close_) {
 		// Continue sampling pins every few milliseconds
 		unsigned char c = gpio_->values();
+		// Note keys are low active - short to ground
 		switch (c & 3) {
-		case 0: 
+		case 3: 
 			current_keys_ = NEITHER;
 			break;
-		case 1:
+		case 2:
 			if (reversed_) current_keys_ = RIGHT;
 			else current_keys_ = LEFT;
 			break;
-		case 2:
+		case 1:
 			if (reversed_) current_keys_ = LEFT;
 			else current_keys_ = RIGHT;
 			break;
-		case 3:
+		case 0:
 			current_keys_ = BOTH;
 			break;
 		}
+		if (c != previous) printf("Key change - was %d now %d\n", previous, c);
+		previous = c;
 		this_thread::sleep_for(milliseconds(SAMPLE_PERIOD_MS));
 	}
 

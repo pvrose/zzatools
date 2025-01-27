@@ -147,6 +147,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\common\src\gpio.cpp" />
+    <ClCompile Include="..\common\src\utils.cpp" />
     <ClCompile Include="src\decoder.cpp" />
     <ClCompile Include="src\display.cpp" />
     <ClCompile Include="src\engine.cpp" />
