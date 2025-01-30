@@ -1,4 +1,5 @@
 #include "key_handler.h"
+#include "logger.h"
 
 #include "gpio.h"
 
@@ -7,6 +8,8 @@
 using namespace std::chrono;
 
 const int SAMPLE_PERIOD_MS = 10;
+
+extern logger* logger_;
 
 key_handler::key_handler() {
 	gpio_ = new gpio;
@@ -86,7 +89,7 @@ void key_handler::run_key() {
 	current_keys_ = NEITHER;
 	unsigned char previous = 0;
 	while (!close_) {
-		// Continue sampling pins every few milliseconds
+		// Continue sampling pins
 		unsigned char c = gpio_->values();
 		// Note keys are low active - short to ground
 		switch (c & 3) {
@@ -105,9 +108,13 @@ void key_handler::run_key() {
 			current_keys_ = BOTH;
 			break;
 		}
-		if (c != previous) printf("Key change - was %d now %d\n", previous, c);
-		previous = c;
-		this_thread::sleep_for(milliseconds(SAMPLE_PERIOD_MS));
+		if (c != previous) {
+			char ev[128];
+			snprintf(ev, sizeof(ev), "Key change - was %d now %d\n", previous, c);
+			logger_->log_event(ev);
+			previous = c;
+		}
+		this_thread::yield();
 	}
 
 }

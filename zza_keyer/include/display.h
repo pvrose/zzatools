@@ -8,6 +8,7 @@ class Fl_Choice;
 class Fl_Float_Input;
 class Fl_Group;
 class Fl_Input;
+class Fl_Light_Button;
 class Fl_Output;
 class Fl_Radio_Round_Button;
 class Fl_Text_Display;
@@ -35,6 +36,7 @@ public:
     void create_shape(int& curr_x, int& curr_y);
     void create_source(int& curr_x, int& curr_y);
     void create_monitor(int& curr_x, int& curr_y);
+    void create_log(int& curr_x, int& curr_y);
 
     // Callback - select device - update key_handler
     static void cb_device(Fl_Widget* w, void* v);
@@ -52,6 +54,16 @@ public:
     static void cb_editor(Fl_Widget* w, void* v);
     // Callback - clear monitor
     static void cb_clear(Fl_Widget* w, void* v);
+    // Callback - reverse
+    static void cb_reverse(Fl_Widget* w, void* v);
+    // Callback - clear kb input
+    static void cb_clear_kb(Fl_Widget* w, void* v);
+    // Callback - log enable
+    static void cb_log_enable(Fl_Widget* w, void* v);
+    // Callback - log view
+    static void cb_log_view(Fl_Widget* w, void* v);
+    // Callback - log clear
+    static void cb_log_clear(Fl_Widget* w, void* v);
 
     // Callback - monitor data ready
     static void cb_monitor(void* v);
@@ -69,6 +81,7 @@ protected:
     enum edit_event : char {
         NEW_CHARACTER,           // a new character has been typed
         DEL_CHARACTER,           // The buffer has been shortened
+        CLEAR                    // Clear buffer
     };
     void update_editor(edit_event e);
     // Enable rise and fall times
@@ -107,7 +120,6 @@ protected:
     // Keyboard entry buffer
     char buffer_[1024];
     char* next_send_;
-    char* last_typed_;
 
     // Widgets
     Fl_Group* g_devices_;
@@ -129,12 +141,19 @@ protected:
     Fl_Group* g_source_;
     Fl_Choice* ch_engine_;
     Fl_Input* ip_entry_;
+    Fl_Light_Button* bn_reverse_;
+    Fl_Button* bn_clear_kb_;
 
     Fl_Group* g_monitor_;
     Fl_Text_Display* td_monitor_;
     Fl_Output* op_wpm_;
     Fl_Output* op_weight_;
     Fl_Button* bn_clear_;
+
+    Fl_Group* g_log_;
+    Fl_Light_Button* bn_log_enable_;
+    Fl_Button* bn_log_view_;
+    Fl_Button* bn_log_clear_;
 
 };
 

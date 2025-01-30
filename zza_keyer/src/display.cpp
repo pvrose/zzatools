@@ -3,6 +3,7 @@
 #include "decoder.h"
 #include "engine.h"
 #include "key_handler.h"
+#include "logger.h"
 #include "wave_gen.h"
 
 #include "drawing.h"
@@ -27,10 +28,11 @@ using namespace std;
 extern string VENDOR;
 extern string PROGRAM_ID;
 extern const map<engine_type, string> engine_descriptors_;
-extern wave_gen* wave_gen_;
 extern decoder* decoder_;
 extern engine* engine_;
 extern key_handler* key_handler_;
+extern logger* logger_;
+extern wave_gen* wave_gen_;
 
 const int NO_DEVICE = -1;
 
@@ -44,7 +46,8 @@ display::display(int W, int H, const char* L) :
 	rise_time_(0.0),
 	fall_time_(0.0),
 	engine_type_(SQUEEZE_B),
-	device_number_(NO_DEVICE)
+	device_number_(NO_DEVICE),
+	reversed_(false)
 {
 	next_send_ = buffer_;
 	memset(buffer_, '\0', sizeof(buffer_));
@@ -92,6 +95,11 @@ void display::create_form() {
 	curr_x = save_x;
 	curr_y += GAP;
 	create_monitor(curr_x, curr_y);
+	max_x = max(curr_x, max_x);
+	max_y = max(curr_y, max_y);
+	curr_x = save_x;
+	curr_y += GAP;
+	create_log(curr_x, curr_y);
 	max_x = max(curr_x, max_x);
 	max_y = max(curr_y, max_y);
 	max_y += GAP;
@@ -231,7 +239,7 @@ void display::create_shape(int& curr_x, int& curr_y) {
 // Create the selectors for the keying source - input paddle or keyboard entry
 // If paddle the choose the type: Straight key, squeeze or bug
 void display::create_source(int& curr_x, int& curr_y) {
-	int height = HTEXT +  2 * HBUTTON + GAP + GAP;
+	int height = HTEXT +  3 * HBUTTON + GAP + GAP;
 	g_source_ = new Fl_Group(curr_x, curr_y, g_settings_->w(), height, "Source");
 	g_source_->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 	g_source_->box(FL_BORDER_BOX);
@@ -253,7 +261,19 @@ void display::create_source(int& curr_x, int& curr_y) {
 	ip_entry_->tooltip("Type in data to send to the remote station");
 
 
-	curr_y += ip_entry_->h() + GAP;
+	curr_y += ip_entry_->h();
+	bn_reverse_ = new Fl_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Swap L/R");
+	bn_reverse_->callback(cb_reverse, &reversed_);
+	bn_reverse_->tooltip("Swap left and right paddles");
+	bn_reverse_->selection_color(FL_RED);
+
+	curr_x += WBUTTON;
+	bn_clear_kb_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Clear");
+	bn_clear_kb_->callback(cb_clear_kb);
+	bn_clear_kb_->tooltip("Stop sending and clear keyboard input");
+
+	curr_x += WBUTTON + GAP;
+	curr_y += bn_reverse_->h() + GAP;
 
 	g_source_->end();
 }
@@ -265,6 +285,7 @@ void display::create_monitor(int& curr_x, int& curr_y) {
 	g_monitor_->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 	g_monitor_->box(FL_BORDER_BOX);
 
+	int save_x = curr_x;
 	curr_x += GAP;
 	curr_y += HTEXT;
 
@@ -300,6 +321,35 @@ void display::create_monitor(int& curr_x, int& curr_y) {
 	
 	g_monitor_->end();
 
+}
+
+void display::create_log(int& curr_x, int& curr_y) {
+	const int height = HTEXT + HBUTTON + GAP;
+	int save_x = curr_x;
+	g_log_ = new Fl_Group(curr_x, curr_y, g_monitor_->w(), height, "Logger");
+	g_log_->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
+	g_log_->box(FL_BORDER_BOX);
+	curr_x += GAP;
+	curr_y += HTEXT;
+
+	bn_log_enable_ = new Fl_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Enable");
+	bn_log_enable_->selection_color(FL_RED);
+	bn_log_enable_->callback(cb_log_enable);
+	bn_log_enable_->tooltip("Enable the event logger");
+	bn_log_enable_->value(logger_->enable());
+
+	curr_x += WBUTTON;
+	bn_log_view_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "View");
+	bn_log_view_->callback(cb_log_view);
+	bn_log_view_->tooltip("View the event logger");
+
+	curr_x += WBUTTON;
+	bn_log_clear_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Clear");
+	bn_log_clear_->callback(cb_log_clear);
+	bn_log_clear_->tooltip("Clear the event logger");
+
+	curr_y += HBUTTON + GAP;
+	curr_x += WBUTTON + GAP;
 }
 
 // Load any saved data
@@ -341,12 +391,25 @@ void display::enable_rise_fall() {
 
 // Enable the keybaord entry pad if using it
 void display::enable_editor() {
-	// Keyboard entry
-	if (engine_type_ == KEYBOARD) {
-		ip_entry_->activate();
-	}
-	else {
+	switch (engine_type_) {
+	case STRAIGHT:
+		bn_reverse_->deactivate();
 		ip_entry_->deactivate();
+		bn_clear_kb_->deactivate();
+		break;
+	case KEYBOARD:
+		bn_reverse_->deactivate();
+		ip_entry_->activate();
+		bn_clear_kb_->activate();
+		break;
+	case SQUEEZE_A:
+	case SQUEEZE_B:
+	case FULL:
+	case SEMI:
+		bn_reverse_->activate();
+		ip_entry_->deactivate();
+		bn_clear_kb_->deactivate();
+		break;
 	}
 }
 
@@ -367,6 +430,19 @@ void display::enable_engine() {
 	}
 	else {
 		ch_engine_->deactivate();
+	}
+	switch (engine_type_) {
+	case STRAIGHT:
+	case KEYBOARD:
+		reversed_ = false;
+		bn_reverse_->deactivate();
+		break;
+	case SQUEEZE_A:
+	case SQUEEZE_B:
+	case FULL:
+	case SEMI:
+		bn_reverse_->activate();
+		break;
 	}
 }
 
@@ -455,6 +531,37 @@ void display::cb_clear(Fl_Widget* w, void* v) {
 	buffer->text("");
 }
 
+// Callback - Reverse L/R paddles
+void display::cb_reverse(Fl_Widget* w, void* v) {
+	display* that = ancestor_view<display>(w);
+	bool* bv = (bool*)v;
+	*bv = ((Fl_Light_Button*)w)->value();
+	that->update_engine();
+	that->enable_engine();
+}
+
+// Callback - clear keyboard ip
+void display::cb_clear_kb(Fl_Widget* w, void* v) {
+	display* that = ancestor_view<display>(w);
+	that->update_editor(CLEAR);
+}
+
+// Callback - log enable
+void display::cb_log_enable(Fl_Widget* w, void* v) {
+	bool bv = ((Fl_Light_Button*)w)->value();
+	logger_->enable(bv);
+}
+
+// Callback - log view
+void display::cb_log_view(Fl_Widget* w, void* v) {
+	logger_->display();
+}
+
+// Callback - log clear
+void display::cb_log_clear(Fl_Widget* w, void* v) {
+	logger_->clear();
+}
+
 // Callback - monitor data ready
 void display::cb_monitor(void* v) {
 	display* that = (display*)v;
@@ -479,6 +586,7 @@ void display::update_wavegen() {
 // Update paddle with configuration
 void display::update_engine() {
 	engine_->type(engine_type_);
+	key_handler_->reversed(reversed_);
 }
 
 // Update monitor with data from decoder
@@ -495,7 +603,9 @@ void display::update_monitor() {
 	char utf8[5];
 	while (decoder_->get_character(c)) {
 		memset(utf8, '\0', sizeof(utf8));
-		printf("Received WPM = %g, Weight = %g, character '%c' from decoder\n", wpm, weight, c);
+		char ev[128];
+		snprintf(ev, sizeof(ev), "Received WPM = %g, Weight = %g, character '%c' from decoder\n", wpm, weight, c);
+		logger_->log_event(ev);
 		fl_utf8encode((unsigned)c, utf8);
 		td_monitor_->buffer()->append(utf8);
 	}
@@ -503,12 +613,22 @@ void display::update_monitor() {
 
 // Update editor - TODO: what was this supposed to do?
 void display::update_editor(edit_event e) {
-	if (e == DEL_CHARACTER) {
-		// We have shortened the buffer (by 1?)
+	switch (e) {
+	case DEL_CHARACTER:
 		next_send_--;
-	} else if (*next_send_ != '\0') {
-		// Send it
-		engine_->send(*next_send_++);
+		break;
+	case NEW_CHARACTER:
+		if (*next_send_ != '\0') {
+			// Send it
+			engine_->send(*next_send_++);
+		}
+		break;
+	case CLEAR:
+		engine_->cancel();
+		memset(buffer_, '\0', sizeof(buffer_));
+		next_send_ = buffer_;
+		ip_entry_->value("");
+		break;
 	}
 }
 

@@ -1,5 +1,6 @@
 #include "engine.h"
 #include "key_handler.h"
+#include "logger.h"
 #include "wave_gen.h"
 
 #include <FL/fl_ask.H>
@@ -71,6 +72,7 @@ const map<unsigned int, const char*> LUT_MORSE = {
 };
 
 extern key_handler* key_handler_;
+extern logger* logger_;
 extern wave_gen* wave_gen_;
 
 engine::state_t engine::old_state_ = IDLE;
@@ -112,6 +114,11 @@ bool engine::send(unsigned int ch) {
 	return true;
 }
 
+// Clear the send queue
+void engine::cancel() {
+	while (!q_character_.empty()) q_character_.pop();
+}
+
 // Set speed
 void engine::set_speed(
 	double wpm,        // Words per minute
@@ -125,6 +132,8 @@ void engine::set_speed(
 	space_time_ = (uint64_t)(dit_time_ * 2);
 }
 
+
+static key_state pk = NEITHER;
 // Return the current state of the input paddle/key/keyboard
 void engine::get_signs(bool& dit, bool& dash) {
 	if (type_ == KEYBOARD) {
@@ -168,6 +177,12 @@ void engine::get_signs(bool& dit, bool& dash) {
 	}
 	else {
 		key_state ks = key_handler_->get_state();
+		char ev[128];
+		if (ks != pk) {
+			snprintf(ev, sizeof(ev), "Engine sees keys %d\n", (int)ks);
+			logger_->log_event(ev);
+			pk = ks;
+		}
 		dit = (ks == LEFT) || (ks == BOTH);
 		dash = (ks == RIGHT) || (ks == BOTH);
 	}
@@ -235,6 +250,7 @@ engine::state_t engine::next_state(state_t state, bool dit, bool dash, uint64_t&
 		if (!dash) {
 			next = IDLE;
 		}
+		break;
 	}
 	case KB_DIT_UP:      // Keyboard dot space 
 	{
@@ -309,13 +325,16 @@ engine::state_t engine::next_state(state_t state, bool dit, bool dash, uint64_t&
 	}
 	case A_DIT_UP:       // Timed dit space
 	{
-		if (type_ == FULL && dit) {
+		if ((type_ == FULL || type_ == SEMI) && dit) {
 			next = A_DIT_DOWN;
 			gap = dit_time_;
 		}
-		else if (dash) {
+		else if (type_ != SEMI && dash) {
 			next = A_DASH_DOWN;
 			gap = dash_time_;
+		}
+		else if (type_ == SEMI && dash) {
+			next = UT_DASH_DOWN;
 		}
 		else if (dit) {
 			next = A_DIT_DOWN;
@@ -334,7 +353,7 @@ engine::state_t engine::next_state(state_t state, bool dit, bool dash, uint64_t&
 	}
 	case A_DIT_UP_D:     // Timed dit space - committed to a dash
 	{
-		next = A_DASH_DOWN;
+		next = A_DASH_DOWN; 
 		gap = dash_time_;
 		break;
 	}
@@ -394,7 +413,6 @@ engine::state_t engine::next_state(state_t state, bool dit, bool dash, uint64_t&
 // Drive key-out
 bool engine::key_out(state_t state) {
 	if (state != old_state_) {
-		//printf("ENG: State %s for %u ms\n", state_text_[state].c_str(), gap);
 		switch (state) {
 		case IDLE:           // Idle - nothing to process
 		case KB_DIT_UP:      // Keyboard dot space
@@ -458,8 +476,13 @@ void engine::get_signal(signal_def* data) {
 	bool dash = false;
 	uint64_t gap = 0;
 	if (!is_timed_mark(state_)) get_signs(dit, dash);
+	state_t previous_state = state_;
 	state_ = next_state(state_, dit, dash, gap);
 	bool key = key_out(state_);
-	//if (gap != 0) printf("State %s - sending %d for %d ms\n", state_text_[state_].c_str(), key, gap);
+	if (state_ != previous_state) {
+		char ev[128];
+		snprintf(ev, sizeof(ev), "State %s - sending %d for %d ms\n", state_text_[state_], key, gap);
+		logger_->log_event(ev);
+	}
 	*data = { key, gap };
 }
