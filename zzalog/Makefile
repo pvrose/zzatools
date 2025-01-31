@@ -3,7 +3,7 @@ TARGET_EXEC := zzalog
 BUILD_TYPE := Release
 
 BUILD_DIR := ./build
-SRC_DIRS := ./src ../widgets/src ../common/src
+SRC_DIRS := ./src ../widgets/src
 EXEC_DIR = $(BUILD_DIR)/$(BUILD_TYPE)
 INSTALL_DIR := /usr/local/bin
 
@@ -18,6 +18,7 @@ DBG = gdb
 # Find all the C and C++ files we want to compile
 # Note the single quotes around the * expressions. Make will incorrectly expand these otherwise.
 SRCS := $(shell find $(SRC_DIRS) -name '*.cpp' -or -name '*.c' -or -name '*.s')
+SRCS += ../common/src/utils.cpp
 
 # String substitution for every C/C++ file.
 # As an example, hello.cpp turns into ./build/hello.cpp.o

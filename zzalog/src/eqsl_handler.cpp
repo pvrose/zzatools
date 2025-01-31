@@ -643,7 +643,7 @@ eqsl_handler::response_t eqsl_handler::adif_filename(string& filename) {
 // Download the eQSL inbox
 eqsl_handler::response_t eqsl_handler::download_adif(string& filename, stringstream* adif) {
 	// Tell user
-	char message[256];
+	char message[512];
 	sprintf(message, "EQSL: Download %s...", filename.c_str());
 	status_->misc_status(ST_NOTE, message);
 	// Fetch the ADIF file 
