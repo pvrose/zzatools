@@ -140,12 +140,12 @@ void decoder::check_speed(decode_t decode, uint64_t duration_ms) {
     case DIT:
     case SIGN: {
         // Generate biased avaearge between existing dit time and last dit/gap
-        dit_time_ = (BIAS * dit_time_) + ((1.- - BIAS) * duration_ms);
+        dit_time_ = (BIAS * dit_time_) + ((1. - BIAS) * duration_ms);
         break;
     }
     case DASH: {
         // First adjust dash length
-        dash_time_ = ((BIAS * dash_time_) + ((100 - BIAS) * duration_ms)) / 100;
+        dash_time_ = ((BIAS * dash_time_) + ((1. - BIAS) * duration_ms)) / 100;
         // Now allocate it to weighting_ and dit_time_ - first
         // calculate what weight would be needed
         weighting_ = dash_time_ / dit_time_;
@@ -255,7 +255,7 @@ void decoder::do_key_change(decode_t decode) {
 // SEnd character
 void decoder::send_char(char c) {
     if (c) {
-        printf("Adding '%c' to decode\n", c);
+        //printf("Adding '%c' to decode\n", c);
         characters_.push(c);
         // Get display to update the monitor
         Fl::awake(display::cb_monitor, display_);
@@ -293,22 +293,22 @@ void decoder::run_decoder() {
         if (signal.value != previous_signal_->value) {
             decode_t decode = decode_monitor(*previous_signal_);
             do_key_change(decode);
-            printf("Edge detected - was %d for %d ms Decode %s Code = %x (l%d)\n",
-                previous_signal_->value, previous_signal_->durn_ms, decode_text[decode], code_, len_code_);
+            //printf("Edge detected - was %d for %d ms Decode %s Code = %x (l%d)\n",
+            //    previous_signal_->value, previous_signal_->durn_ms, decode_text[decode], code_, len_code_);
             timed_out = NONE;
         }
         else if (timed_out == NONE && signal.durn_ms >= (dit_time_ * MAX_CHAR_GAP)) {
             decode_t decode = decode_monitor(*previous_signal_);
             do_key_change(decode);
-            printf("Char gap detected - was %d for %d ms Decode %s Code = %x (l%d)\n",
-                previous_signal_->value, previous_signal_->durn_ms, decode_text[decode], code_, len_code_);
+ /*           printf("Char gap detected - was %d for %d ms Decode %s Code = %x (l%d)\n",
+                previous_signal_->value, previous_signal_->durn_ms, decode_text[decode], code_, len_code_);*/
             timed_out = CHAR_SEEN;
         }
         else if (timed_out == CHAR_SEEN && signal.durn_ms >= (dit_time_ * MAX_WORD_GAP)) {
             decode_t decode = decode_monitor(*previous_signal_);
             do_key_change(decode);
-            printf("Word gap detected - was %d for %d ms Decode %s Code = %x (l%d)\n",
-                previous_signal_->value, previous_signal_->durn_ms, decode_text[decode], code_, len_code_);
+            //printf("Word gap detected - was %d for %d ms Decode %s Code = %x (l%d)\n",
+            //    previous_signal_->value, previous_signal_->durn_ms, decode_text[decode], code_, len_code_);
             timed_out = WORD_SEEN;
         }
         this_thread::yield();

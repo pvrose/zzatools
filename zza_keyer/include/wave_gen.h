@@ -121,6 +121,8 @@ protected:
 	bool previous_signal_;
 	// Port audio stream
 	PaStream* stream_;
+	// PA initialised
+	bool pa_initialised_;
 
 	// Engine
 	void* engine_;

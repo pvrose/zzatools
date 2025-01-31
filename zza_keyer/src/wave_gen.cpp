@@ -22,6 +22,9 @@ wave_gen::wave_gen() {
 }
 
 wave_gen::~wave_gen() {
+	if (pa_initialised_) {
+		Pa_Terminate();
+	}
 	delete[] sine_table_;
 	delete[] rise_table_;
 	delete[] fall_table_;
@@ -112,6 +115,7 @@ void wave_gen::set_params(
 	rise_time_ = rise_time;
 	fall_time_ = fall_time;
 	shape_ = shape;
+	pa_initialised_ = false;
 	process_params();
 	create_sine_table();
 	create_edge_tables();
@@ -150,6 +154,8 @@ bool wave_gen::initialise_pa() {
 	/* Initialize library before making any other calls. */
 	err = Pa_Initialize();
 	if (err != paNoError) return false;
+
+	pa_initialised_ = true;
 
 	/* Open an audio I/O stream. */
 	// TODO Replace with specific stream selection

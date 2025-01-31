@@ -58,7 +58,7 @@ public:
 		A_SPACE,        // Timed space space
 	};
 
-	map<state_t, string> state_text_ = {
+	map<state_t, const char*> state_text_ = {
 		{ IDLE,           "Idle" },
 		{ UT_DIT_DOWN,    "Untimed dit mark" },
 		{ UT_DASH_DOWN,   "Untimed dash mark" },
@@ -75,7 +75,7 @@ public:
 		{ A_DASH_UP,      "Timed dash space" },
 		{ A_DASH_DOWN_D,  "Timed dash mark - committed to a dit" },
 		{ A_DASH_UP_D,    "Timed dash space - committed to a dit" },
-		{ A_SPACE,        "Timed space space" }
+		{ A_SPACE,        "Timed space space" },
 	};
 
 	// Set the type
@@ -88,6 +88,8 @@ public:
 
 	// Set kb character to enqueue - allows non-ASCII to be sent
 	bool send(unsigned int ch);
+	// Cancel sending
+	void cancel();
 
 	// Set speed
 	void set_speed(

@@ -1,7 +1,8 @@
+#include "decoder.h"
 #include "display.h"
 #include "engine.h"
 #include "key_handler.h"
-#include "decoder.h"
+#include "logger.h"
 #include "wave_gen.h"
 
 #include <string>
@@ -17,11 +18,12 @@ string PROG_ID = "ZKY";
 string PROGRAM_VERSION = "0.0.1";
 string VENDOR = "GM3ZZA";
 
+decoder* decoder_ = nullptr;
+display* display_ = nullptr;
 engine* engine_ = nullptr;
 key_handler* key_handler_ = nullptr;
-display* display_ = nullptr;
+logger* logger_ = nullptr;
 wave_gen* wave_gen_ = nullptr;
-decoder* decoder_ = nullptr;
 
 int main(int argc, char** argv)
 {
@@ -37,6 +39,7 @@ int main(int argc, char** argv)
 	Fl::lock();
 
 	// Create the various units
+	logger_ = new logger;
 	engine_ = new engine;
 	key_handler_ = new key_handler;
 	wave_gen_ = new wave_gen;
