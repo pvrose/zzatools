@@ -1,5 +1,6 @@
 #include "gpio.h"
 
+
 // Include the HIDAPI driver
 #include "hidapi/hidapi.h"
 
@@ -14,6 +15,7 @@
 #include <cstdio>
 #include <chrono>
 #include <cwchar>
+#include <cstring>
 
 using namespace std;
 using namespace std::chrono;
