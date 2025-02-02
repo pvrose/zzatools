@@ -51,6 +51,9 @@ int main(int argc, char** argv)
 	// Start decode
 	decoder_->start();
 
+	// Start the engine
+	engine_->start();
+
 	// Connect wave_gen to source of signals
 	wave_gen_->callback(engine::cb_signal, engine_);
 	// Start wave_gen

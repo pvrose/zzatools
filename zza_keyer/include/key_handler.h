@@ -42,15 +42,15 @@ public:
 
 protected:
 
-    // Thread to run
-    static void run_thread(key_handler* that);
-    // And non-static version
-    void run_key();
+    //// Thread to run
+    //static void run_thread(key_handler* that);
+    //// And non-static version
+    //void run_key();
     
-    // The thread
-    thread* t_key_;
-    // Closing
-    atomic<bool> close_;
+    //// The thread
+    //thread* t_key_;
+    //// Closing
+    //atomic<bool> close_;
 
     // Current key_state
     key_state current_keys_;
@@ -60,6 +60,8 @@ protected:
 
     // GPIO driver
     gpio* gpio_;
+    // GPIO has pins
+    bool gpio_open_;
 
 };
 

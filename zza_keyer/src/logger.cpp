@@ -7,6 +7,15 @@
 #include <iostream>
 
 logger::logger() {
+	enabled_ = true;
+	wv_ = new Fl_Window(200, 200, "Keyer log");
+	viewer_ = new Fl_Text_Display(0, 0, 200, 200);
+	Fl_Text_Buffer* b = new Fl_Text_Buffer();
+	viewer_->buffer(b);
+	wv_->resizable(viewer_);
+	wv_->end();
+	wv_->hide();
+
 }
 
 logger::~logger() {
@@ -42,14 +51,15 @@ void logger::clear() {
 
 // Display log
 void logger::display() {
-	Fl_Window* w = new Fl_Window(200, 200);
-	Fl_Text_Display* td = new Fl_Text_Display(0, 0, 200, 200);
-	Fl_Text_Buffer* b = new Fl_Text_Buffer;
-	td->buffer(b);
-	for (auto it = log_.begin(); it != log_.end(); it++) {
-		b->append(*it);
+	if (wv_->visible()) {
+		wv_->hide();
 	}
-	w->resizable(td);
-	w->end();
-	w->show();
+	else {
+		Fl_Text_Buffer* b = viewer_->buffer();
+		b->remove(0, b->length());
+		for (auto it = log_.begin(); it != log_.end(); it++) {
+			b->append(*it);
+		}
+		wv_->show();
+	}
 }

@@ -5,6 +5,7 @@
 #include <queue>
 #include <thread>
 #include <atomic>
+#include <mutex>
 #include <cstdint>
 #include <list>
 
@@ -90,6 +91,8 @@ public:
 	bool send(unsigned int ch);
 	// Cancel sending
 	void cancel();
+	// Start engine
+	void start();
 
 	// Set speed
 	void set_speed(
@@ -105,17 +108,21 @@ protected:
 	// Return the current state of the input paddle/key/keyboard
 	void get_signs(bool& dit, bool& dash);
 	// Main state machine
-	state_t next_state(state_t state, bool dit, bool dash, uint64_t& gap);
+	state_t next_state(state_t state, bool dit, bool dash, bool time_up, uint64_t& gap);
+	// Step the keyboard signa;
+	void next_keyboard();
 	// Get the key out value
 	bool key_out(state_t state);
-	//// Core engine loop
-	//void run_engine();
-	//// Invoked by this threa
-	//static void run_thread(engine* that);
+	// Core engine loop
+	void run_engine();
+	// Invoked by this threa
+	static void run_thread(engine* that);
 	// Retunr true if the state si untimed - so check inputs
 	bool is_untimed(state_t state);
 	// Returns true if the state is a timed mark - as will be follwoed by a timed space
 	bool is_timed_mark(state_t state);
+	// Returns true if kb space
+	bool is_keyboard_space(state_t state);
 	// Non-statis call
 	void get_signal(signal_def* data);
 
@@ -125,10 +132,10 @@ protected:
 	engine_type type_;
 	// KB character queue
 	queue<unsigned int> q_character_;
-	//// The thread
-	//thread* t_engine_;
-	//// Stop processing loop
-	//atomic<bool> close_;
+	// The thread
+	thread* t_engine_;
+	// Stop processing loop
+	atomic<bool> close_;
 	// Words per minute
 	double wpm_;
 	// Weighting
@@ -147,6 +154,14 @@ protected:
 	static state_t old_state_;
 	//// Debug history
 	//list<signal_def> history_;
+	// Current signal being processed by wave_gen
+	signal_def* current_signal_;
+	// Flag indicating it has changed
+	bool signal_changed_;
+	// Lock on read/write
+	mutex signal_lock_;
+	// Flag indicating signal taken
+	atomic<bool>signal_taken_;
 
 };
 

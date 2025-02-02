@@ -5,6 +5,7 @@
 #include <map>
 
 class Fl_Text_Display;
+class Fl_Window;
 
 using namespace std;
 using namespace std::chrono;
@@ -30,6 +31,7 @@ public:
 
 protected:
 	Fl_Text_Display* viewer_;
+	Fl_Window* wv_;
 	// The log
 	list<char*> log_;
 	// Enable flag

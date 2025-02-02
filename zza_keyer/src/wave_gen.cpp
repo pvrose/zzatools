@@ -19,6 +19,7 @@ wave_gen::wave_gen() {
 	set_params(48000.0, 700.0, 0.005, 0.005, RAMP);
 	set_buffer_depth(BUFFER_DEPTH);
 	previous_signal_ = false;
+	current_signal_ = { false, 0 };
 }
 
 wave_gen::~wave_gen() {

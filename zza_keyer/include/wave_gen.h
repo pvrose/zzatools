@@ -21,7 +21,7 @@ enum shape_t : char {
 // Signal definition
 struct signal_def {
 	bool value;         // Mark (true) or space (false)
-	uint64_t durn_ms;    // Duration in milliseconds - UINT64_MAX is close to indefinite
+	uint64_t durn_ms;    // Duration in milliseconds - 0 indicates indefinite
 };
 
 class wave_gen
