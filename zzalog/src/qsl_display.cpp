@@ -348,7 +348,7 @@ Fl_Image* qsl_display::get_image(string filename) {
 	}
 	char msg[128];
 	if (image == nullptr) {
-		snprintf(msg, sizeof(msg), "QSL: File %s is not valid image data");
+		snprintf(msg, sizeof(msg), "QSL: File %s is not valid image data", filename.c_str());
 		status_->misc_status(ST_ERROR, msg);
 		// File not image data
 		return nullptr;
