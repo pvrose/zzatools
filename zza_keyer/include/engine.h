@@ -108,7 +108,7 @@ protected:
 	// Return the current state of the input paddle/key/keyboard
 	void get_signs(bool& dit, bool& dash);
 	// Main state machine
-	state_t next_state(state_t state, bool dit, bool dash, bool time_up, uint64_t& gap);
+	state_t next_state(state_t state, bool dit, bool dash, char* next_kb, uint64_t& gap);
 	// Step the keyboard signa;
 	void next_keyboard();
 	// Get the key out value
@@ -154,14 +154,9 @@ protected:
 	static state_t old_state_;
 	//// Debug history
 	//list<signal_def> history_;
-	// Current signal being processed by wave_gen
-	signal_def* current_signal_;
-	// Flag indicating it has changed
-	bool signal_changed_;
-	// Lock on read/write
-	mutex signal_lock_;
-	// Flag indicating signal taken
-	atomic<bool>signal_taken_;
+	// Current dit and dash state
+	bool dit_;
+	bool dash_;
 
 };
 

@@ -81,9 +81,7 @@ engine::state_t engine::old_state_ = IDLE;
 engine::engine() 
 {
 	memset(current_kb_, 0, sizeof(current_kb_));
-	next_sign_ = nullptr;
-	current_signal_ = new signal_def;
-	*current_signal_ = { false, 0 };
+	next_sign_ = current_kb_;
 	close_ = false;
 	t_engine_ = nullptr;
 }
@@ -121,6 +119,7 @@ bool engine::idle() {
 bool engine::send(unsigned int ch) {
 
 	q_character_.push(fl_toupper(ch));
+	if (*next_sign_ == 0) next_keyboard();
 	return true;
 }
 
@@ -144,58 +143,47 @@ void engine::set_speed(
 
 // Get the next dit or dash to send from the keyboard entry
 void engine::next_keyboard() {
+	char msg[128];
 	// Get the next sign (dit or dash) to send
 	if (next_sign_ == nullptr || *next_sign_ == 0) {
 		// We do not have one - use the next in the character queue
 		if (q_character_.empty()) {
 			// None waiting
-			next_sign_ = nullptr;
+			memset(current_kb_, 0, sizeof(current_kb_));
+			next_sign_ = current_kb_;
+			//memcpy(msg, "There is no keyboard data to send\n", sizeof(msg));
+			//logger_->log_event(msg);
 			return;
 		}
 		else {
 			// Get the next in the queue
 			unsigned int unichar = q_character_.front();
 			if (LUT_MORSE.find(unichar) == LUT_MORSE.end()) {
-				fl_message("The Unicode character U+%0x cannot be represented as morse", unichar);
+				printf("The Unicode character U+%0x cannot be represented as morse\n", unichar);
 				unichar = '?';
 			}
 			memset(current_kb_, 0, sizeof(current_kb_));
 			memcpy(current_kb_, LUT_MORSE.at(unichar), strlen(LUT_MORSE.at(unichar)));
+			snprintf(msg, sizeof(msg), "Getting next character from keyboard: %c: %s\n", (char)unichar, current_kb_);
+			logger_->log_event(msg);
 			next_sign_ = &current_kb_[0];
+			q_character_.pop();
 		}
 	}
 	else {
 		next_sign_++;
 	}
-
+	if (*next_sign_) {
+		snprintf(msg, sizeof(msg), "Selecting %c from keyboard\n", (*next_sign_));
+		logger_->log_event(msg);
+	}
 }
 
 static key_state pk = NEITHER;
 // Return the current state of the input paddle/key/keyboard
 void engine::get_signs(bool& dit, bool& dash) {
-	if (type_ == KEYBOARD) {
-		if (next_sign_ == nullptr) {
-			dit = false;
-			dash = false;
-		}
-		else {
-			switch (*next_sign_) {
-			case '-':
-				dit = false;
-				dash = true;
-				break;
-			case '.':
-				dit = true;
-				dash = false;
-				break;
-			default:
-				dit = false;
-				dash = false;
-				break;
-			}
-		}
-	}
-	else {
+	key_state ks;
+	if (type_ != KEYBOARD) {
 		key_state ks = key_handler_->get_state();
 		char ev[128];
 		if (ks != pk) {
@@ -209,21 +197,26 @@ void engine::get_signs(bool& dit, bool& dash) {
 }
 
 // Main state machine
-engine::state_t engine::next_state(state_t state, bool dit, bool dash, bool time_up, uint64_t& gap) {
+engine::state_t engine::next_state(state_t state, bool dit, bool dash, char* next_kb, uint64_t& gap) {
 	state_t next = state;
+	gap = 0;
 	switch (state) {
 	case IDLE:           // Idle - nothing to process
 	{
 		switch (type_) {
 		case KEYBOARD: {
 			// dit and dash are exclusive
-			if (dit) {
+			switch (*next_kb) {
+			case '.':
 				next = KB_DIT_DOWN;
 				gap = dit_time_;
-			}
-			else if (dash) {
+				break;
+			case '-':
 				next = KB_DASH_DOWN;
 				gap = dash_time_;
+				break;
+			default:
+				next_keyboard();
 			}
 			break;
 		}
@@ -274,74 +267,70 @@ engine::state_t engine::next_state(state_t state, bool dit, bool dash, bool time
 	}
 	case KB_DIT_UP:      // Keyboard dot space 
 	{
-		if (time_up) {
-			if (dit) {
-				next = KB_DIT_DOWN;
-				gap = dit_time_;
-			}
-			else if (dash) {
-				next = KB_DASH_DOWN;
-				gap = dash_time_;
-			}
-			else {
-				next = KB_SPACE;
-				gap = space_time_;
-			}
-			next_keyboard();
+		switch (*next_kb) {
+		case '.':
+			next = KB_DIT_DOWN;
+			gap = dit_time_;
+			break;
+		case '-':
+			next = KB_DASH_DOWN;
+			gap = dash_time_;
+			break;
+		case ' ':
+			next = KB_SPACE;
+			gap = space_time_;
+			break;
 		}
+		
 		break;
 	}
 	case KB_DIT_DOWN:    // Keyborad dot mark
 	{
-		if (time_up) {
-			next = KB_DIT_UP;
-			gap = dit_time_;
-		}
+		next = KB_DIT_UP;
+		gap = dit_time_;
+		next_keyboard();
 		break;
 	}
 	case KB_DASH_UP:     // Keyboard dash space
-		if (time_up) {
-			if (dit) {
-				next = KB_DIT_DOWN;
-				gap = dit_time_;
-			}
-			else if (dash) {
-				next = KB_DASH_DOWN;
-				gap = dash_time_;
-			}
-			else {
-				next = KB_SPACE;
-				gap = space_time_;
-			}
-			next_keyboard();
+		switch (*next_kb) {
+		case '.':
+			next = KB_DIT_DOWN;
+			gap = dit_time_;
+			break;
+		case '-':
+			next = KB_DASH_DOWN;
+			gap = dash_time_;
+			break;
+		case ' ':
+			next = KB_SPACE;
+			gap = space_time_;
+			break;
 		}
 		break;
 	}
 	case KB_DASH_DOWN:   // Keyboard dash mark
 	{
-		if (time_up) {
-			next = KB_DASH_UP;
-			gap = dit_time_;
-		}
+		next = KB_DASH_UP;
+		gap = dit_time_;
+		next_keyboard();
 		break;
 
 	}
 	case KB_SPACE:
 	{
-		if (time_up) {
-			if (dit) {
-				next = KB_DIT_DOWN;
-				gap = dit_time_;
-			}
-			else if (dash) {
-				next = KB_DASH_DOWN;
-				gap = dash_time_;
-			}
-			else {
-				next = IDLE;
-			}
-			next_keyboard();
+		switch (*next_kb) {
+		case '.':
+			next = KB_DIT_DOWN;
+			gap = dit_time_;
+			break;
+		case '-':
+			next = KB_DASH_DOWN;
+			gap = dash_time_;
+			break;
+		default:
+			next = IDLE;
 		}
+		next_keyboard();
 		break;
 	}
 	case A_DIT_DOWN:     // Timed dit mark
@@ -350,51 +339,43 @@ engine::state_t engine::next_state(state_t state, bool dit, bool dash, bool time
 			next = A_DIT_DOWN_D;
 		}
 		else {
-			if (time_up) {
-				next = A_DIT_UP;
-				gap = dit_time_;
-			}
+			next = A_DIT_UP;
+			gap = dit_time_;
 		}
 		break;
 	}
 	case A_DIT_UP:       // Timed dit space
 	{
-		if (time_up) {
-			if ((type_ == FULL || type_ == SEMI) && dit) {
-				next = A_DIT_DOWN;
-				gap = dit_time_;
-			}
-			else if (type_ != SEMI && dash) {
-				next = A_DASH_DOWN;
-				gap = dash_time_;
-			}
-			else if (type_ == SEMI && dash) {
-				next = UT_DASH_DOWN;
-			}
-			else if (dit) {
-				next = A_DIT_DOWN;
-				gap = dit_time_;
-			}
-			else {
-				next = A_SPACE;
-				gap = space_time_;
-			}
+		if ((type_ == FULL || type_ == SEMI) && dit) {
+			next = A_DIT_DOWN;
+			gap = dit_time_;
+		}
+		else if (type_ != SEMI && dash) {
+			next = A_DASH_DOWN;
+			gap = dash_time_;
+		}
+		else if (type_ == SEMI && dash) {
+			next = UT_DASH_DOWN;
+		}
+		else if (dit) {
+			next = A_DIT_DOWN;
+			gap = dit_time_;
+		}
+		else {
+			next = A_SPACE;
+			gap = space_time_;
 		}
 		break;
 	}
 	case A_DIT_DOWN_D:   // Timed dit mark - commmited to a dash next
 	{
-		if (time_up) {
-			next = A_DIT_UP_D;
-		}
+		next = A_DIT_UP_D;
 		break;
 	}
 	case A_DIT_UP_D:     // Timed dit space - committed to a dash
 	{
-		if (time_up) {
-			next = A_DASH_DOWN;
-			gap = dash_time_;
-		}
+		next = A_DASH_DOWN;
+		gap = dash_time_;
 		break;
 	}
 	case A_DASH_DOWN:    // Timed dash mark 
@@ -403,62 +384,58 @@ engine::state_t engine::next_state(state_t state, bool dit, bool dash, bool time
 			next = A_DASH_DOWN_D;
 		}
 		else {
-			if (time_up) {
-				next = A_DASH_UP;
-				gap = dit_time_;
-			}
+			next = A_DASH_UP;
+			gap = dit_time_;
 		}
 		break;
 	}
 	case A_DASH_UP:      // Timed dash space
 	{
-		if (time_up) {
-			if (type_ == FULL && dash) {
-				next = A_DASH_DOWN;
-				gap = dash_time_;
-			}
-			else if (dit) {
-				next = A_DIT_DOWN;
-				gap = dit_time_;
-			}
-			else if (dash) {
-				next = A_DASH_DOWN;
-				gap = dash_time_;
-			}
-			else {
-				next = A_SPACE;
-				gap = space_time_;
-			}
+		if (type_ == FULL && dash) {
+			next = A_DASH_DOWN;
+			gap = dash_time_;
+		}
+		else if (dit) {
+			next = A_DIT_DOWN;
+			gap = dit_time_;
+		}
+		else if (dash) {
+			next = A_DASH_DOWN;
+			gap = dash_time_;
+		}
+		else {
+			next = A_SPACE;
+			gap = space_time_;
 		}
 		break;
 	}
 	case A_DASH_DOWN_D:  // Timed dash mark - committed to a dit next
 	{
-		if (time_up) {
-			next = A_DASH_UP_D;
-		}
+		next = A_DASH_UP_D;
 		break;
 	}
 	case A_DASH_UP_D:    // Timed dash space - committed to a dit
 	{
-		if (time_up) {
-			next = A_DIT_DOWN;
-			gap = dit_time_;
-		}
+		next = A_DIT_DOWN;
+		gap = dit_time_;
 		break;
 	}
 	case A_SPACE:        // Timed space space
 	{
-		if (time_up) {
-			next = IDLE;
-		}
+		next = IDLE;
 		break;
 	}
 	}
 	if (next != state) {
 		char msg[128];
-		snprintf(msg, sizeof(msg), "Dit:%d Dash:%d Next state = %s(%d) Time = %I64d ms\n",
-			dit, dash, state_text_[next], (int)next, gap);
+		if (type_ == KEYBOARD) {
+			snprintf(msg, sizeof(msg), "KB: %c Next state = %s(%d) Time = %I64d ms\n",
+				*next_kb, state_text_[next], (int)next, gap); 
+		}
+		else {
+			snprintf(msg, sizeof(msg), "Dit:%d Dash:%d Next state = %s(%d) Time = %I64d ms\n",
+				dit, dash, state_text_[next], (int)next, gap);
+		}
 		logger_->log_event(msg);
 	}
 	return next;
@@ -552,19 +529,16 @@ void engine::cb_signal(signal_def* data, void* user_data) {
 
 // get signal
 void engine::get_signal(signal_def* data) {
-	signal_lock_.lock();
-	if (signal_changed_) {
-		*data = *current_signal_;
-		signal_taken_ = true;
-		signal_changed_ = false;
+	uint64_t gap;
+	state_t next = next_state(state_, dit_, dash_, next_sign_, gap);
+	data->value = key_out(next);
+	data->durn_ms = gap;
+	if (gap) {
 		char msg[128];
 		snprintf(msg, sizeof(msg), "Wave gen taking new signal %d for %lld ms\n", data->value, data->durn_ms);
 		logger_->log_event(msg);
 	}
-	else {
-		*data = *current_signal_;
-	}
-	signal_lock_.unlock();
+	state_ = next;
 }
 
 // Core engine loop
@@ -572,28 +546,9 @@ void engine::run_engine() {
 	bool previous_dit = false;
 	bool previous_dash = false;
 	char msg[128];
-	bool dit = false;
-	bool dash = false;
 	uint64_t gap;
 	while (!close_) {
-		if (next_sign_ == nullptr) next_keyboard();
-		get_signs(dit, dash);
-		if ((is_timed_mark(state_) && signal_taken_) || previous_dash != dash || previous_dit != dit) {
-			state_t next = next_state(state_, dit, dash, signal_taken_, gap);
-			if (next != state_) {
-				signal_lock_.lock();
-				current_signal_->value = key_out(next);
-				current_signal_->durn_ms = gap;
-				signal_changed_ = true;
-				signal_taken_ = false;
-				signal_lock_.unlock();
-				snprintf(msg, sizeof(msg), "Engine setting new signal %d for %lld ms\n", current_signal_->value, current_signal_->durn_ms);
-				logger_->log_event(msg);
-				state_ = next;
-				previous_dit = dit;
-				previous_dash = dash;
-			}
-		}
+		if (!is_timed_mark(state_)) get_signs(dit_, dash_);
 		this_thread::yield();
 	}
 
