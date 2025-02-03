@@ -19,7 +19,7 @@ const char MLU3[] = "SURWDKGO";
 const char MLU4[] = "HVF\xdcL\xc4PJ" "BXCYZQ\xd6*";
 const char MLU5[] = "54*3***2" "&*+****1" "6=/*\xc9*(*" "7***8*90";
 const char MLU6[] = "********" "****?_**" "**\"**.**" "**@*****"
-                    "********" "**;!*)**" "***,****" ":*******";
+                    "********" "**;*!*)*" "***,****" ":*******";
 
 const double MAX_DIT = 2.0;          // Maximum length of a dit in dit-times
 const double MAX_SIGN_GAP = 2.0;     // Diffreence between a dit/dash gap and a character gap
