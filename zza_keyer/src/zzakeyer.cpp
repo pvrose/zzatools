@@ -15,7 +15,7 @@ using namespace std;
 string COPYRIGHT = "\302\251 Philip Rose GM3ZZA 2018. All rights reserved.";
 string PROGRAM_ID = "ZZAKEYER";
 string PROG_ID = "ZKY";
-string PROGRAM_VERSION = "0.0.1";
+string PROGRAM_VERSION = "0.0.2";
 string VENDOR = "GM3ZZA";
 
 decoder* decoder_ = nullptr;
