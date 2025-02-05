@@ -69,6 +69,7 @@ const map<unsigned int, const char*> LUT_MORSE = {
 	{ 0xc4, ".-.- " }, // A-umlaut
 	{ 0xd6, "---. " }, // O-umlaut
 	{ 0xc9, "-.-.. "}, // E-acute
+	{ 0xc5, ".--.- "}, // A-rig
 };
 
 extern key_handler* key_handler_;

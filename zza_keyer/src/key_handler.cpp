@@ -77,11 +77,11 @@ bool key_handler::reversed() {
 }
 
 // Get the pin state
+static unsigned char previous_ = 0;
 key_state key_handler::get_state() {
 	if (gpio_open_) {
 		// Continue sampling pins
 		unsigned char c = gpio_->values();
-		unsigned char previous = 0;
 		// Note keys are low active - short to ground
 		switch (c & 3) {
 		case 3:
@@ -99,11 +99,11 @@ key_state key_handler::get_state() {
 			current_keys_ = BOTH;
 			break;
 		}
-		if (c != previous) {
+		if (c != previous_) {
 			char ev[128];
-			snprintf(ev, sizeof(ev), "Key change - was %d now %d\n", previous, c);
+			snprintf(ev, sizeof(ev), "Key change - was %d now %d\n", previous_, c);
 			logger_->log_event(ev);
-			previous = c;
+			previous_ = c;
 		}
 		return current_keys_;
 	}

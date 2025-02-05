@@ -317,17 +317,17 @@ bool gpio::dcd_read_rsp() {
 				printf("GPIO %d unexpectedly an Input pin\n", p);
 				pin_state_[p].direction = INPUT;
 			}
-#ifdef _DEBUG
-			if (pin_state_[p].value != (bool)val) {
-				printf("GPIO %d has changed value to %d", p, val);
-			}
-#endif
+//#ifdef _DEBUG
+//			if (pin_state_[p].value != (bool)val) {
+//				printf("GPIO %d has changed value to %d", p, val);
+//			}
+//#endif
 			pin_state_[p].value = val;
 
 		}
-#ifdef _DEBUG
-		printf("GPIO %d set direction %s value %d\n", p, dir == 0x00 ? "out" : dir == 0x01 ? "in" : "Not gpio", val);
-#endif
+//#ifdef _DEBUG
+//		printf("GPIO %d set direction %s value %d\n", p, dir == 0x00 ? "out" : dir == 0x01 ? "in" : "Not gpio", val);
+//#endif
 	}
 	return result;
 }
@@ -421,17 +421,17 @@ bool gpio::read_gpio(write_t type) {
 }
 
 void gpio::trace_cr() {
-#ifdef _DEBUG
-	printf("Command:");
-	for (int ix = 0; ix < sizeof(command_); ix++) {
-		printf("%02x ", command_[ix]);
-	}
-	printf("\nResponse:");
-	for (int ix = 0; ix < sizeof(response_); ix++) {
-		printf("%02x ", response_[ix]);
-	}
-	printf("\n");
-#endif
+//#ifdef _DEBUG
+//	printf("Command:");
+//	for (int ix = 0; ix < sizeof(command_); ix++) {
+//		printf("%02x ", command_[ix]);
+//	}
+//	printf("\nResponse:");
+//	for (int ix = 0; ix < sizeof(response_); ix++) {
+//		printf("%02x ", response_[ix]);
+//	}
+//	printf("\n");
+//#endif
 }
 
 bool gpio::read_status(status_t type) {

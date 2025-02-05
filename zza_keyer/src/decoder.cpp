@@ -17,7 +17,7 @@ const char MLU1[] = "ET";
 const char MLU2[] = "IANM";
 const char MLU3[] = "SURWDKGO";
 const char MLU4[] = "HVF\xdcL\xc4PJ" "BXCYZQ\xd6*";
-const char MLU5[] = "54*3***2" "&*+****1" "6=/*\xc9*(*" "7***8*90";
+const char MLU5[] = "54*3***2" "&*+**\xc5*1" "6=/*\xc9*(*" "7***8*90";
 const char MLU6[] = "********" "****?_**" "**\"**.**" "**@*****"
                     "********" "**;*!*)*" "***,****" ":*******";
 
