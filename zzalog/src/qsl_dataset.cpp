@@ -73,8 +73,11 @@ void qsl_dataset::load_data() {
 			call_settings.get("Time Format", itemp, qsl_data::FMT_HMS_ADIF);
 			data->f_time = (qsl_data::time_format)itemp;
 			call_settings.get("Card Design", temp, "");
-			printf("Read data from file %zd bytes, value ='%s'\n", strlen(temp), temp);
 			data->filename = temp;
+			char msg[128];
+			snprintf(msg, sizeof(msg), "QSL: Reading QSL data for call '%s' type '%s'", 
+				call.c_str(), QSL_TYPES[ix].c_str());
+			status_->misc_status(ST_NOTE, msg);
 			free(temp);
 			// Check it's a TSV file
 			size_t pos = data->filename.find_last_of('.');

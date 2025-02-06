@@ -918,13 +918,6 @@ bool spec_data::add_user_macro(string field, string value, macro_defn macro) {
 			field.c_str(),
 			value.c_str());
 		status_->misc_status(ST_NOTE, message);
-		strcpy(message, "ADIF SPEC: Please supply one or more of the following:");
-		set<string> mfields = book_->get_macro_fields(field);
-		for (auto it = mfields.begin(); it != mfields.end(); it++) {
-			strcat(message, "\n\t\t\t\t");
-			strcat(message, (*it).c_str());
-		}
-		status_->misc_status(ST_NOTE, message);
 
 		defn = new macro_defn;
 		defn->fields = new record;
