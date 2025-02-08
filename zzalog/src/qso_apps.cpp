@@ -233,7 +233,7 @@ void app_grp::enable_widgets() {
     if (app_data_->admin) {
         bn_admin_->value(true);
         ip_passw_->activate();
-       ip_passw_->redraw();
+        ip_passw_->redraw();
     } else {
         bn_admin_->value(false);
         ip_passw_->value("");
@@ -243,10 +243,12 @@ void app_grp::enable_widgets() {
         bn_disable_->value(true);
         ip_disable_app_->value(app_data_->commands["NONE"].c_str());
         ip_disable_app_->activate();
+        bn_show_script2_->activate();
     } else {
         bn_disable_->value(false);
         ip_disable_app_->value("");
         ip_disable_app_->deactivate();
+        bn_show_script2_->deactivate();
     }
 }
 
