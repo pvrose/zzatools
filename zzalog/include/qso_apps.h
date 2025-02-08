@@ -14,6 +14,7 @@ class Fl_Radio_Light_Button;
 class Fl_Button;
 class Fl_Tabs;
 class filename_input;
+class file_viewer;
 
 // App rig class
 enum app_rig_class_t {
@@ -126,6 +127,9 @@ public:
     void add_servers(app_data_t* data);
     // Delete the application
     void delete_app(app_grp* w);
+    // Get the viewer
+    file_viewer* viewer();
+
 
     // Callback
     void static cb_bn_new(Fl_Widget* w, void* v);
@@ -147,6 +151,9 @@ protected:
 
    // Tabbed set of app_grp
     Fl_Tabs* tabs_;
+
+    // File viewer
+    file_viewer* viewer_;
 
     // The application data
     map<string, app_data_t*> apps_data_; 

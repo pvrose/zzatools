@@ -4,9 +4,10 @@
 #include "utils.h"
 #include "drawing.h"
 
+#include <FL/fl_ask.H>
+#include <FL/Fl_Button.H>
 #include <FL/Fl_Text_Buffer.H>
 #include <FL/Fl_Text_Editor.H>
-#include <FL/Fl_Button.H>
 
 extern status* status_;
 
@@ -99,6 +100,17 @@ void file_viewer::cb_modified(int pos, int inserted, int deleted, int restyled, 
 
 // Set text
 void file_viewer::load_file(string name) {
+	if (is_dirty()) {
+		switch(fl_choice("Existing file has been modified - Save or cancel?", "Save", "Cancel", nullptr)) {
+			case 0: {
+				save_file();
+				break;
+			}
+			case 1: {
+				break;
+			}
+		}
+	}
 	filename_ = name;
 	char msg[128];
 	switch (buffer_->loadfile(filename_.c_str())) {

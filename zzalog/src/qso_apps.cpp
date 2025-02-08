@@ -381,9 +381,11 @@ void app_grp::cb_ip_passw(Fl_Widget* w, void* v) {
 void app_grp::cb_show_script(Fl_Widget* w, void* v) {
     app_grp* that = ancestor_view<app_grp>(w);
     filename_input* ip = *(filename_input**)v;
-    if (strlen(ip->value()) > 0) {
-        file_viewer* fwin = new file_viewer(640, 480);
-        fwin->load_file(ip->value());
+    string fn = ip->value();
+    if (fn.length() > 0) {
+        qso_apps* qa = ancestor_view<qso_apps>(that);
+        file_viewer* fwin = qa->viewer();
+        fwin->load_file(fn);
     }
 }
 
@@ -415,6 +417,9 @@ qso_apps::qso_apps(int X, int Y, int W, int H, const char* L) :
     load_values();
     create_tabs();
     enable_widgets();
+    begin();
+    viewer_ = new file_viewer(400, 300);
+    end();
 }
 
 // Destructor - save settings
@@ -660,4 +665,8 @@ void qso_apps::delete_app(app_grp* w) {
     int ch = tabs_->find(w);
     tabs_->delete_child(ch);
     enable_widgets();
+}
+
+file_viewer* qso_apps::viewer() { 
+    return viewer_;
 }
