@@ -90,6 +90,8 @@ protected:
 	string qsl_directory_;
 	// Fullname 
 	string full_name_;
+	// QSO changed
+	bool qso_changed_;
 
 	// Card image and info
 	qsl_widget* qsl_thumb_;

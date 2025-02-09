@@ -38,6 +38,7 @@ qso_qsl_vwr::qso_qsl_vwr(int X, int Y, int W, int H, const char* L) :
 	, selected_image_(QI_NONE)
 	, raw_image_(nullptr)
 	, current_qso_(nullptr)
+	, qso_changed_(true)
 {
 	labelfont(FL_BOLD);
 	labelsize(FL_NORMAL_SIZE + 2);
@@ -402,6 +403,8 @@ void qso_qsl_vwr::cb_bn_card_reqd(Fl_Widget* w, void* v) {
 
 // set the current QSO
 void qso_qsl_vwr::set_qso(record* qso, qso_num_t number) {
+	if (current_qso_ == qso) qso_changed_ = false;
+	else qso_changed_ = true;
 	current_qso_ = qso;
 	current_qso_num_ = number;
 	enable_widgets();
@@ -867,6 +870,13 @@ void qso_qsl_vwr::update_full_view() {
 	qsl_full_->display()->get_size(w, h);
 	int sx, sy, sw, sh;
 	Fl::screen_work_area(sx, sy, sw, sh);
+	// If already visible
+	if (win_full_view_->visible() && qso_changed_) {
+		int ww = win_full_view_->w();
+		int wh = win_full_view_->h();
+		sw = min(sw, ww);
+		sh = min(sh, wh);
+	}
 	// Keep the size within the screen work area
 	w = min(w, sw);
 	h = min(h, sh);
