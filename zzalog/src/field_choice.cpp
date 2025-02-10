@@ -139,6 +139,12 @@ int field_input::handle(int event) {
 		}
 		if (input()->take_focus()) return true;
 		return Fl_Input_Choice::handle(event);
+	case FL_UNFOCUS:
+		if (tip_window_) {
+			Fl::delete_widget(tip_window_);
+			tip_window_ = nullptr;
+		}
+		return Fl_Input_Choice::handle(event);
 	case FL_RELEASE:
 		switch (Fl::event_button()) {
 		case FL_RIGHT_MOUSE: {
@@ -276,12 +282,19 @@ void field_input::populate_choice(string name) {
 	bool hierarchic = false;
 	if (dataset->data.size() > 20) hierarchic = true;
 	auto it = dataset->data.begin();
+	Fl_Menu_Button* menu = menubutton();
 	for (int i = 1; it != dataset->data.end(); i++) {
 		string menu_entry = escape_menu(it->first);
+		// string summary = spec_data_->summarise_enumaration(name, menu_entry);
 		if (hierarchic) {
 			string temp = menu_entry;
 			menu_entry = temp.substr(0, 1) + "/" + temp;
 		}
+		string value = menu_entry;
+		// if (summary.length()) {
+		// 	menu_entry += ": " + summary;
+		// }
+		// menu->add(menu_entry.c_str(), 0, nullptr, (void*)value.c_str());
 		add(menu_entry.c_str());
 		it++;
 	}
@@ -293,16 +306,19 @@ void field_input::populate_case_choice() {
 	const char* src = Fl_Input_Choice::value();
 	// Generate upper-, lower- and mixed-case versions of the input value
 	int len = strlen(src);
+	Fl_Menu_Button* menu = menubutton();
 	if (len > 0) {
 		char* dst = new char[len * 3];
 		// upper-case
 		memset(dst, 0, len * 3);
 		fl_utf_toupper((unsigned char*)src, len, dst);
 		add(dst);
+		// menu->add(dst, 0, 0, (void*)dst);
 		// lower-case
 		memset(dst, 0, len * 3);
 		fl_utf_tolower((unsigned char*)src, len, dst);
 		add(dst);
+		// menu->add(dst, 0, 0, (void*)dst);
 		// mixed-case
 		memset(dst, 0, len * 3);
 		bool mixed_upper = true;
@@ -345,12 +361,16 @@ void field_input::populate_case_choice() {
 			}
 		}
 		add(dst);
+		// menu->add(dst, 0, 0, (void*)dst);
 	}
 	else {
 		// Default place-holders if no text in input
 		add("UPPER");
 		add("lower");
 		add("Mixed");
+		// menu->add("UPPER", 0, 0, (void*)"UPPER");
+		// menu->add("lower", 0, 0, (void*)"lower");
+		// menu->add("MIxed", 0, 0, (void*)"Mixed");
 	}
 }
 

@@ -2534,3 +2534,33 @@ string spec_data::entity_name(int dxcc) {
 	map<string, string>* entry = dxccs->data[to_string(dxcc)];
 	return (*entry)["Entity Name"];
 }
+
+// Generate the summary of the enumeration value
+string spec_data::summarise_enumaration(string name, string value) {
+	spec_dataset* ds = dataset(name);
+	if (ds) {
+		auto items = ds->data.find(value);
+		if (items != ds->data.end()) {
+			if (items->second->find("Primary Administrative Subdivision") != items->second->end()) {
+				return items->second->at("Primary Administrative Subdivision");
+			} else if (items->second->find("Section Name") != items->second->end()) {
+				return items->second->at("Meaning");
+			} else if (items->second->find("Continent") != items->second->end()) {
+				return items->second->at("Meaning");
+			} else if (items->second->find("Entity Name") != items->second->end()) {
+				return items->second->at("Meaning");
+			} else if (items->second->find("Meaning") != items->second->end()) {
+				return items->second->at("Meaning");
+			} else if (items->second->find("Description") != items->second->end()) {
+				return items->second->at("Description");
+			} else {
+				return "";
+			}
+		} else {
+			return "";
+		}
+	} else {
+		return "";
+	}
+}
+

@@ -126,6 +126,8 @@ typedef size_t qso_num_t;
 		bool add_appdef(const string& name, char indicator);
 		// Generate the description of the enumeration for the designated enumerated field
 		string describe_enumeration(spec_dataset* dataset, string value);
+		// Generate the summary of the enumeration value
+		string summarise_enumaration(string name, string value);
 		// Get entity name for DXCC Number
 		string entity_name(int dxcc);
 		// Add user defined enumeration for an existing field - return true if successful
