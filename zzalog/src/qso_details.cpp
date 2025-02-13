@@ -9,8 +9,11 @@
 #include "regices.h"
 
 #include <regex>
+#include <string>
 
 #include <FL/Fl_Output.H>
+
+using namespace std;
 
 extern book* book_;
 extern status* status_;
@@ -81,7 +84,10 @@ void qso_details::get_qsos() {
 	set<string> locators;
 	set<qso_num_t> items;
 	set<qso_num_t> possibles;
+	set<qso_num_t> exacts;
 	string call = qso_ ? qso_->item("CALL") : "";
+	string band = qso_ ? qso_->item("BAND") : "";
+	string mode = qso_ ? qso_->item("MODE") : "";
 	basic_regex<char> body_match;
 	smatch m;
 	bool match_possible = true;
@@ -121,6 +127,9 @@ void qso_details::get_qsos() {
 			// Ignore current QSO
 			if (qso_->timestamp() != it->timestamp()) {
 				items.insert(ix);
+				if (band == it->item("BAND") && mode == it->item("MODE")) {
+					exacts.insert(ix);
+				}
 			}
 		} else if (match_possible) {
 			// Get call body (less prexix or suffix
@@ -140,7 +149,11 @@ void qso_details::get_qsos() {
 			label("Previous ?");
 		}
 	} else {
-		label("Previous \342\234\224");
+		if (exacts.size() == 0) {
+			label("Previous \342\234\224");
+		} else {
+			label("Previous \360\237\227\271");
+		}
 	}
 }
 
