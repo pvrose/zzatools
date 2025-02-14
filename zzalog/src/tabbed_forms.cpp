@@ -9,9 +9,7 @@
 #include "toolbar.h"
 #include "config.h"
 #include "qso_manager.h"
-
-
-
+#include "dxcc_view.h"
 
 extern book* book_;
 extern book* navigation_book_;
@@ -40,6 +38,8 @@ tabbed_forms::tabbed_forms(int X, int Y, int W, int H, const char* label) :
 	add_view<spec_tree>("Specifications", FO_LAST, OT_ADIF, "Displays the ADIF specification data in tree format");
 	// Report view
 	add_view<report_tree>("Log analysis", FO_LAST, OT_REPORT, "Displays an analysis of the log in tree format");
+	// DXCC Status report
+	add_view<dxcc_view>("DXCC Status", FO_LAST, OT_DXCC, "Displays an analysis of DXCC status in table form");
 	// Documented workround (see Fl_Tabs) to keep label heights constant
 	resizable(forms_[OT_MAIN].w);
 	// Set the callback for changing tabs

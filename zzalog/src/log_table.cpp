@@ -430,6 +430,8 @@ void log_table::update(hint_t hint, qso_num_t record_num_1, qso_num_t record_num
 		status_->misc_status(ST_WARNING, message);
 		edit_input_->hide();
 	}
+	// set the number of rows
+	rows(my_book_->get_count());
 	switch (hint) {
 	case HT_FORMAT:
 		// format has changed - it may be fields so update them
@@ -450,8 +452,6 @@ void log_table::update(hint_t hint, qso_num_t record_num_1, qso_num_t record_num
 		redraw();
 		break;
 	default:
-		// set the number of rows
-		rows(my_book_->get_count());
 		// Rows must exist before the following has an effect
 		adjust_row_sizes();
 		// select specified record

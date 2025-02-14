@@ -60,6 +60,7 @@ const int ROW_HEIGHT = DEFAULT_SIZE + 4;    // Default height for table rows
 		OT_PREFIX,           // Prefix reference view (data & view)
 		OT_ADIF,             // ADIF specification (data & view)
 		OT_REPORT,           // Report view (view)
+		OT_DXCC,             // DXCC Status report (view)
 		OT_BAND,             // Band-plan data
 		OT_SCRATCH,          // Scratchpad 
 		OT_CARD,             // Used for printing QSL card labels
@@ -76,6 +77,7 @@ const int ROW_HEIGHT = DEFAULT_SIZE + 4;    // Default height for table rows
 		{ OT_PREFIX, FL_YELLOW },
 		{ OT_ADIF, fl_color_average(FL_RED, FL_YELLOW, (float)(1.0 / 3.0)) },
 		{ OT_REPORT, fl_color_average(FL_RED, FL_WHITE, 0.25) },
+		{ OT_DXCC, FL_YELLOW },
 		{ OT_BAND, FL_GRAY },
 		{ OT_CARD, fl_color_average(FL_BLUE, FL_WHITE, 0.25) },
 		{ OT_WSJTX, COLOUR_NAVY }
