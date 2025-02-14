@@ -109,10 +109,10 @@ void dxcc_view::cb_confirm(Fl_Widget* w, void* v) {
     dxcc_view* that = ancestor_view<dxcc_view>(w);
     Fl_Check_Button* bn = (Fl_Check_Button*)w;
     if (bn->value()) {
-        (char&)that->confirm_type_ |= (char)v;
+        (char&)that->confirm_type_ |= (char)(intptr_t)v;
     }
     else {
-        (char&)that->confirm_type_ &= ~(char)v;
+        (char&)that->confirm_type_ &= ~(char)(intptr_t)v;
     }
     that->table_->confirm_type(that->confirm_type_);
 }
