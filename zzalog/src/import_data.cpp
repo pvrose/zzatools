@@ -150,11 +150,11 @@ void import_data::update_book() {
 		inhibit_view_update_ = true;
 		if (!update_in_progress_) {
 			book_->enable_save(false, "Starting update from import");
-		} else {
-			// Fetch QSL card for the queried QSO
-			if (update_mode_ == EQSL_UPDATE) {
-				eqsl_handler_->enqueue_request(record_number(0));
-			}
+		// } else {
+		// 	// Fetch QSL card for the queried QSO
+		// 	if (update_mode_ == EQSL_UPDATE) {
+		// 		eqsl_handler_->enqueue_request(record_number(0));
+		// 	}
 		}
 		// Clear flags
 		update_in_progress_ = false;
