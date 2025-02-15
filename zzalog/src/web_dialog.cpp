@@ -163,6 +163,9 @@ void web_dialog::load_values() {
 	email_settings.get("Password", temp, "");
 	email_password_ = temp;
 	free(temp);
+	email_settings.get("CC Address", temp, "");
+	email_cc_address_ = temp;
+	free(temp);
 
 }
 
@@ -696,6 +699,14 @@ void web_dialog::create_email(int rx, int ry, int rw, int rh) {
 	ip63->when(FL_WHEN_CHANGED);
 	ip63->tooltip("Please enter the password for the above account");
 
+	curr_y += HBUTTON + GAP;
+	Fl_Input* ip64 = new Fl_Input(curr_x, curr_y, WSMEDIT, HBUTTON, "CC");
+	ip64->align(FL_ALIGN_LEFT);
+	ip64->value(email_cc_address_.c_str());
+	ip64->callback(cb_value< Fl_Input, string >, &email_cc_address_);
+	ip64->when(FL_WHEN_CHANGED);
+	ip64->tooltip("Please enter an e-mail address to receive copy of e-mail sent");
+
 	gp6->end();
 
 	gp06->end();
@@ -756,6 +767,7 @@ void web_dialog::save_values() {
 	email_settings.set("Server", email_server_.c_str());
 	email_settings.set("Account", email_account_.c_str());
 	email_settings.set("Password", email_password_.c_str());
+	email_settings.set("CC Address", email_cc_address_.c_str());
 
 	settings_->flush();
 }

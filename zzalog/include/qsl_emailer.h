@@ -33,6 +33,8 @@ protected:
 	string email_password_;
 	// To address
 	string to_address_;
+	// Cc address
+	string cc_address_;
 	// Subject
 	string subject_;
 	// QSL card attachment

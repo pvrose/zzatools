@@ -145,6 +145,8 @@ class Fl_Group;
 		string email_account_;
 		// Server password
 		string email_password_;
+		// Confirmation CC address
+		string email_cc_address_;
 
 	};
 #endif

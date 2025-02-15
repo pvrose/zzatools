@@ -44,6 +44,9 @@ void qsl_emailer::load_values() {
 	email_settings.get("Password", temp, "");
 	email_password_ = temp;
 	free(temp);
+	email_settings.get("CC Address", temp, "");
+	cc_address_ = temp;
+	free(temp);
 }
 
 bool qsl_emailer::generate_email(record* qso) {
@@ -88,16 +91,17 @@ bool qsl_emailer::generate_email(record* qso) {
 // Send the e-mail
 bool qsl_emailer::send_email() {
 	if (url_handler_->send_email(
-		email_url_,
-		email_user_,
-		email_password_,
-		{ to_address_ },
-		{ },
-		{ },
-		subject_,
-		text_body_,
-		{ qsl_filename_ },
-		{ "image/png" })) {
+		email_url_,         // e-mail server
+		email_user_,        // e-mailuser
+		email_password_,    // password
+		{ to_address_ },    // recipient(s)
+		{ cc_address_ },    // cc-list
+		{ },                // bcc list
+		subject_,           // Subject line
+		text_body_,         // e-mail text
+		{ qsl_filename_ },  // file attachment
+		{ "image/png" }))   // file type
+	{
 		status_->misc_status(ST_OK, "QSL: e-Mail successfully sent");
 		return true;
 	}
