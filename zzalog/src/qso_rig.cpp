@@ -1118,9 +1118,11 @@ void qso_rig::enable_widgets(uchar damage) {
 		band_data::band_entry_t* entry = band_data_->get_entry(freq * 1000);
 		if (entry) {
 			char l[50];
-			snprintf(l, sizeof(l), "%s (%s)",
-				spec_data_->band_for_freq(freq).c_str(),
-				entry->mode.c_str());
+			strcpy(l, spec_data_->band_for_freq(freq).c_str());
+			for (auto it = entry->modes.begin(); it != entry->modes.end(); it++) {
+				strcat(l, (*it).c_str());
+				strcat(l, " ");
+			}
 			op_status_->value(l);
 			if (rig_->get_ptt()) {
 				bn_tx_rx_->label("TX");

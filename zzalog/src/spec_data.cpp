@@ -268,6 +268,23 @@ double spec_data::freq_for_band(string band) {
 	}
 }
 
+// Get the Lower frequency for a band
+void spec_data::freq_for_band(string band, double& lower, double& upper) {
+	// Get the Band dataset
+	spec_dataset* table = dataset("Band");
+	auto it = table->data.find(band);
+	if (it != table->data.end()) {
+		// Return the Lower Freq filed for the band entry
+		lower = stod(it->second->at("Lower Freq (MHz)"));
+		upper = stod(it->second->at("Upper Freq (MHz)"));
+	}
+	else {
+		// Else return NAN
+		lower = nan("");
+		upper = nan("");
+	}
+}
+
 // Is a particulat mode a submode of another mode?
 bool spec_data::is_submode(string mode) {
 	// Get the Submode dataset

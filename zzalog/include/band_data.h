@@ -2,6 +2,7 @@
 
 #include <string>
 #include <vector>
+#include <set>
 
 using namespace std;
 
@@ -15,17 +16,15 @@ public:
 		double lower;       // Lower end of sub-band (kHz)
 		double upper;       // Upper end of sub-band (kHz)
 		double bandwidth;   // Maximum bandwidth usable in sub-band
-		string mode;        // Modes allowed
+		set<string> modes;        // Modes allowed
 		string summary;     // Summary display
-		string notes;       // Notes about usage
 		// Default constructor
 		band_entry_t() :
 			lower(0.0),
 			upper(0.0),
 			bandwidth(0.0),
-			mode(""),
-			summary(""),
-			notes("") {};
+			modes({}),
+			summary("") {};
 	};
 
 	band_data();
@@ -35,6 +34,8 @@ public:
 	bool in_band(double frequency);
 	// Get the band entry for the frequency
 	band_entry_t* get_entry(double frequency);
+	// Get the set of entries for the frequency range
+	set<band_entry_t*> get_entries(double lower, double upper);
 
 protected:
 	// Read the data

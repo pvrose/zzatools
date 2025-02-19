@@ -149,7 +149,7 @@ Lower	Upper	Bandwidth	Modes	Notes
 144150	144400	2.7	CW,Dig,Phone	Limited band modse
 144400	144490	0	Beacons	Propagation Beacons
 144490	144500	0	Beacons	Personal Beacons
-144500	144794	20	CW,Dig,Phones	All modes
+144500	144794	20	CW,Dig,Phone	All modes
 144794	144990	12	Dig	MGM Digital
 144990	145193.5	12	Phone	FM/DV Repeater inputs @ 12.5 kHz channels
 145193.5	145593.5	12	Phone	FM/DV Simplex @ 12.5 kHz channels

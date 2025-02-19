@@ -92,11 +92,13 @@ band_data::band_entry_t* band_data::get_entry(string line) {
 		result->bandwidth = 0.0;
 	}
 	// Fourth is mode
-	result->mode = words[3];
-	// Fifth is summary
+	vector<string> modes;
+	split_line(words[3], modes, ',');
+	for (auto ix = modes.begin(); ix != modes.end(); ix++) {
+		result->modes.insert(*ix);
+	}
+	// Fifth is notes
 	result->summary = words[4];
-	// Sixth is notes
-	result->notes = words[4];
 	return result;
 }
 
@@ -138,6 +140,19 @@ band_data::band_entry_t* band_data::get_entry(double frequency) {
 		}
 	}
 	return nullptr;
+}
+
+// Get the band plan data entries for the frequency range
+set<band_data::band_entry_t*> band_data::get_entries(double lower, double upper) {
+	set<band_entry_t*> result;
+	for (unsigned int ix = 0; ix < entries_.size(); ix++) {
+		// If either the lower bound of the entry or the upper bound of the entry is within bounds
+		if (entries_[ix]->lower >= lower && entries_[ix]->lower <= upper ||
+			entries_[ix]->upper >= lower && entries_[ix]->upper <= upper) {
+			result.insert(entries_[ix]);
+		}
+	}
+	return result;
 }
 
 // Is the supplied frequency in a band

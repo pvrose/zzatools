@@ -79,6 +79,8 @@ typedef size_t qso_num_t;
 		string band_for_freq(double frequency_MHz);
 		// Get the Lower frequency for a band
 		double freq_for_band(string sBand);
+		// Get the upper and lower frequencies for band
+		void freq_for_band(string band, double& lower, double& upper);
 		// Get mode/submode for a particular mode
 		bool is_submode(string mode);
 		// Get DataSet

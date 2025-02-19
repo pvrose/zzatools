@@ -157,6 +157,8 @@
     <ClCompile Include="common\src\utils.cpp" />
     <ClCompile Include="widgets\src\filename_input.cpp" />
     <ClCompile Include="zzalog\src\band_data.cpp" />
+    <ClCompile Include="zzalog\src\band_widget.cpp" />
+    <ClCompile Include="zzalog\src\band_window.cpp" />
     <ClCompile Include="zzalog\src\calendar_input.cpp" />
     <ClCompile Include="zzalog\src\calendar_table.cpp" />
     <ClCompile Include="zzalog\src\config.cpp" />
@@ -175,6 +177,7 @@
     <ClCompile Include="zzalog\src\qsl_image.cpp" />
     <ClCompile Include="zzalog\src\qsl_widget.cpp" />
     <ClCompile Include="zzalog\src\qso_apps.cpp" />
+    <ClCompile Include="zzalog\src\qso_bands.cpp" />
     <ClCompile Include="zzalog\src\qso_buttons.cpp" />
     <ClCompile Include="zzalog\src\qso_clock.cpp" />
     <ClCompile Include="zzalog\src\qso_clocks.cpp" />
@@ -261,6 +264,8 @@
     <ClInclude Include="widgets\include\button_input.h" />
     <ClInclude Include="widgets\include\filename_input.h" />
     <ClInclude Include="zzalog\include\band_data.h" />
+    <ClInclude Include="zzalog\include\band_widget.h" />
+    <ClInclude Include="zzalog\include\band_window.h" />
     <ClInclude Include="zzalog\include\calendar_input.h" />
     <ClInclude Include="zzalog\include\calendar_table.h" />
     <ClInclude Include="zzalog\include\callback.h" />
@@ -283,6 +288,7 @@
     <ClInclude Include="zzalog\include\qsl_image.h" />
     <ClInclude Include="zzalog\include\qsl_widget.h" />
     <ClInclude Include="zzalog\include\qso_apps.h" />
+    <ClInclude Include="zzalog\include\qso_bands.h" />
     <ClInclude Include="zzalog\include\qso_buttons.h" />
     <ClInclude Include="zzalog\include\qso_clock.h" />
     <ClInclude Include="zzalog\include\qso_clocks.h" />

@@ -3,6 +3,7 @@
 #include "qso_apps.h"
 #include "qso_wx.h"
 #include "qso_qsl.h"
+#include "qso_bands.h"
 
 #include <algorithm>
 
@@ -72,6 +73,12 @@ void qso_log::create_form(int X, int Y) {
 	rw = max(rw, wx_ctrl_->w());
 	rh = max(rh, wx_ctrl_->h());
 
+	// Band-plan display tab
+	bands_ = new qso_bands(rx, ry, rw, rh, "Bandplan");
+	bands_->labelsize(FL_NORMAL_SIZE + 2);
+	rw = max(rw, bands_->w());
+	rh = max(rh, bands_->h());
+
 	resizable(nullptr);
 	size(w() + rw - saved_rw, h() + rh - saved_rh);
 	end();
@@ -103,6 +110,7 @@ void qso_log::enable_widgets() {
 	qsl_ctrl_->enable_widgets();
 	apps_ctrl_->enable_widgets();
 	wx_ctrl_->enable_widgets();
+	bands_->enable_widgets();
 }
 
 // Save changes

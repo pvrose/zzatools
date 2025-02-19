@@ -42,6 +42,7 @@ main.cpp - application entry point
 #include "symbols.h"
 #include "qsl_dataset.h"
 #include "config.h"
+#include "band_window.h"
 
 // C/C++ header files
 #include <ctime>
@@ -134,6 +135,7 @@ ticker* ticker_ = nullptr;
 fields* fields_ = nullptr;
 qsl_dataset* qsl_dataset_ = nullptr;
 config* config_ = nullptr;
+band_window* band_window_ = nullptr;
 // Recent files opened
 list<string> recent_files_;
 
