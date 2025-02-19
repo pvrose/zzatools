@@ -190,6 +190,7 @@ void qso_manager::save_values() {
 //	Fl_Preferences stations_settings(settings_, "Stations");
 	data_group_->save_values();
 	rig_group_->save_values();
+	info_group_->save_values();
 }
 
 // Enable the widgets - activate the group associated with each rig handler when that

@@ -30,7 +30,7 @@ band_widget::band_widget(int X, int Y, int W, int H, const char* L) :
 	Fl_Widget(X, Y, W, H, L) {
 	Fl_Widget::type(BAND_FULL);
 	value_ = nan("");
-	Fl_Widget::selection_color(FL_DARK_GREEN);
+	Fl_Widget::color(FL_FOREGROUND_COLOR, FL_DARK_GREEN);
 	band_ = "";
 	band_range_ = { nan(""), nan("") };
 	redraw();
@@ -54,20 +54,20 @@ void band_widget::draw() {
 		// Draw all the sub-bands to give priority on text positions
 		for (auto it = data_.begin(); it != data_.end(); it++) {
 			if ((*it)->lower != (*it)->upper) {
-				draw_modebars({ (*it)->lower, (*it)->upper }, (*it)->modes);
+				draw_modebars({ (*it)->lower / 1000., (*it)->upper / 1000.}, (*it)->modes);
 			}
 		}
 		draw_current(value_);
 		// Draw all the sub-bands to give priority on text positions
 		for (auto it = data_.begin(); it != data_.end(); it++) {
 			if ((*it)->lower != (*it)->upper) {
-				draw_subband({ (*it)->lower, (*it)->upper }, (*it)->bandwidth, (*it)->summary);
+				draw_subband({ (*it)->lower / 1000., (*it)->upper /1000. }, (*it)->bandwidth, (*it)->summary);
 			}
 		}
 		if (type() == BAND_FULL) {
 			for (auto it = data_.begin(); it != data_.end(); it++) {
 				if ((*it)->lower == (*it)->upper) {
-					draw_spot_text((*it)->lower, (*it)->summary);
+					draw_spot_text((*it)->lower /1000., (*it)->summary);
 				}
 			}
 		}
@@ -144,7 +144,7 @@ void band_widget::draw_scale(range_t range) {
 // Draw the current frequency
 void band_widget::draw_current(double f) {
 	fl_font(0, FL_NORMAL_SIZE);
-	fl_color(Fl_Widget::color());
+	fl_color(Fl_Widget::selection_color());
 	if (!isnan(f)) {
 		int curr_y = y_for_f(f);
 		int text_y = text_pos(curr_y);
@@ -154,7 +154,7 @@ void band_widget::draw_current(double f) {
 			fl_line(x_kink2_, text_y, x_text_, text_y);
 			char text[15];
 			snprintf(text, sizeof(text), FREQ_FORMAT, f);
-			fl_draw(text, x_text_, text_y + h_offset_);
+			fl_draw(text, x_text_ + 2, text_y + h_offset_);
 		}
 	}
 }
@@ -169,10 +169,10 @@ void band_widget::draw_subband(range_t range, double bw, string text) {
 	if (yt >= 0) {
 		char ctext[128];
 		if (type() == BAND_FULL) {
-			snprintf(ctext, sizeof(ctext), FREQ_FORMAT "-" FREQ_FORMAT " [%g] %s", range.lower, range.upper, bw, text.c_str());
+			snprintf(ctext, sizeof(ctext), FREQ_FORMAT "-" FREQ_FORMAT " [%g kHz] %s", range.lower, range.upper, bw, text.c_str());
 		}
 		else {
-			snprintf(ctext, sizeof(ctext), FREQ_FORMAT "-" FREQ_FORMAT, range.lower, range.upper);
+			snprintf(ctext, sizeof(ctext), FREQ_FORMAT, range.upper);
 		}
 		// Draw the kinked line in three segments
 		fl_line(x_scale_, yu, x_kink1_, yu, x_kink2_, yt);
@@ -223,7 +223,7 @@ void band_widget::draw_spot_text(double f, string text) {
 		fl_line(x_kink2_, yt, x_text_, yt);
 		char ctext[128];
 		snprintf(ctext, sizeof(ctext), FREQ_FORMAT " %s", f, text.c_str());
-		fl_draw(ctext, x_text_, yt + h_offset_);
+		fl_draw(ctext, x_text_ + 2, yt + h_offset_);
 	}
 }
 
@@ -259,18 +259,20 @@ void band_widget::generate_data(double f) {
 	// Get the upper an lower bounds for the band
 	band_ = spec_data_->band_for_freq(f);
 	spec_data_->freq_for_band(band_, band_range_.lower, band_range_.upper);
+	if (band_range_.lower > band_range_.upper) 
+		printf("DEBUG: Spec: F=%g, Band = (%g %g)\n", f, band_range_.lower, band_range_.upper);
 	data_ = band_data_->get_entries(band_range_.lower * 1000.0, band_range_.upper * 1000.0);
 	modes_.clear();
 	// Yes I mean these, finding the actual lower and upper band limits from the plan
 	double lower = band_range_.upper;
 	double upper = band_range_.lower;
 	for (auto it = data_.begin(); it != data_.end(); it++) {
-		(*it)->lower /= 1000.0;
-		(*it)->upper /= 1000.0;
-		if ((*it)->lower / 1000.0 < band_range_.lower || (*it)->upper / 1000. > band_range_.upper) {
+		double l = (*it)->lower / 1000.0;
+		double u = (*it)->upper / 1000.0;
+		if (l < band_range_.lower || u > band_range_.upper) {
 			char msg[128];
 			snprintf(msg, sizeof(msg), "BAND: Entry (%g, %g) outwith ADIF band (%g, %g)",
-				(*it)->lower, (*it)->upper, band_range_.lower, band_range_.upper);
+				l, u, band_range_.lower, band_range_.upper);
 			status_->misc_status(ST_WARNING, msg);
 		}
 		// Merge available modes 
@@ -279,11 +281,15 @@ void band_widget::generate_data(double f) {
 				modes_[(*iu)] = modes_.size();
 			}
 		}
-		lower = min((*it)->lower, lower);
-		upper = max((*it)->upper, upper);
+		lower = min(l, lower);
+		upper = max(u, upper);
 	}
-	band_range_.lower = lower;
-	band_range_.upper = upper;
+	if (data_.size()) {
+		band_range_.lower = lower;
+		band_range_.upper = upper;
+	}
+	if (band_range_.lower > band_range_.upper) 
+		printf("DEBUG: Plan: F=%g, Band = (%g %g)\n", f, band_range_.lower, band_range_.upper);
 }
 
 // Get Y-position for frequency
@@ -368,6 +374,7 @@ void band_widget::rescale() {
 		px_per_MHz_ = (double)(y_lower_ - y_upper_) / (scale_range_.upper - scale_range_.lower);
 		// Get the possible text positions
 		int num_poss = (y_lower_ - y_upper_) / FL_NORMAL_SIZE;
+		text_in_use_.clear();
 		text_in_use_.resize(num_poss + 1);
 		for (auto it = text_in_use_.begin(); it != text_in_use_.end(); it++) {
 			(*it) = false;

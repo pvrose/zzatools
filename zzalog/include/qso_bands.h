@@ -23,8 +23,16 @@ public:
 
     static void cb_band(Fl_Widget* w, void* v);
 
+    // Ticker callback
+    static void cb_ticker(void* v);
+
+protected:
     band_widget* summary_;
 
     band_window* full_window_;
+
+    // Saved windows coordinates
+    int left_, top_, width_, height_;
+
 };
 

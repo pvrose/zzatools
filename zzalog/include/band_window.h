@@ -7,7 +7,7 @@ class band_window :
     public Fl_Double_Window
 {
 public:
-    band_window(int W, int H, const char* L = nullptr);
+    band_window(int X, int Y, int W, int H, const char* L = nullptr);
     ~band_window();
 
     // Set the frequency

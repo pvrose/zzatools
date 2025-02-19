@@ -123,6 +123,7 @@ void qso_log::save_values() {
 			tab_settings.set("Log", ix);
 		}
 	}
+	bands_->save_values();
 	settings_->flush();
 }
 
