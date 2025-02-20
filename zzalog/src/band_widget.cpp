@@ -46,6 +46,8 @@ band_widget::~band_widget() {
 void band_widget::draw() {
 	// Rescale as w and h may have changed
 	rescale();
+	reset_markers();
+	adjust_markers();
 	// Wipe the background clean
 	fl_color(FL_BACKGROUND_COLOR);
 	fl_rectf(x(), y(), w(), h());
@@ -54,26 +56,8 @@ void band_widget::draw() {
 	// Draw the valrious items
 	if (band_.length()) {
 		draw_scale(band_range_);
-		// Draw all the sub-bands to give priority on text positions
-		for (auto it = data_.begin(); it != data_.end(); it++) {
-			if ((*it)->lower != (*it)->upper) {
-				draw_modebars({ (*it)->lower / 1000., (*it)->upper / 1000.}, (*it)->modes);
-			}
-		}
-		draw_current(value_);
-		// Draw all the sub-bands to give priority on text positions
-		for (auto it = data_.begin(); it != data_.end(); it++) {
-			if ((*it)->lower != (*it)->upper) {
-				draw_subband({ (*it)->lower / 1000., (*it)->upper /1000. }, (*it)->bandwidth, (*it)->summary);
-			}
-		}
-		if (type() == BAND_FULL) {
-			for (auto it = data_.begin(); it != data_.end(); it++) {
-				if ((*it)->lower == (*it)->upper) {
-					draw_spot_text((*it)->lower /1000., (*it)->summary);
-				}
-			}
-		}
+		draw_modebars();
+		draw_markers();
 	}
 	draw_legend();
 }
@@ -144,89 +128,60 @@ void band_widget::draw_scale(range_t range) {
 
 }
 
-// Draw the current frequency
-void band_widget::draw_current(double f) {
-	fl_font(0, FL_NORMAL_SIZE);
-	fl_color(Fl_Widget::selection_color());
-	if (!isnan(f)) {
-		int curr_y = y_for_f(f);
-		int text_y = text_pos(curr_y);
-		if (text_y >= 0) {
-			// Draw the kinked line in three segments
-			fl_line(x_scale_, curr_y, x_kink1_, curr_y, x_kink2_, text_y);
-			fl_line(x_kink2_, text_y, x_text_, text_y);
-			char text[15];
-			snprintf(text, sizeof(text), FREQ_FORMAT, f);
-			fl_draw(text, x_text_ + 2, text_y + h_offset_);
+// Draw the modebars
+void band_widget::draw_markers() {
+	for (int ix = 0; ix < markers_.size(); ix++) {
+		marker& m = markers_[ix];
+		switch (m.type) {
+		case SUBBAND_UPPER:
+			fl_color(FL_FOREGROUND_COLOR);
+			draw_line(m.y_scale, m.y_text, FL_DOT);
+			fl_draw(m.text, x_text_, m.y_text + h_offset_);
+			break;
+		case SUBBAND_LOWER:
+			fl_color(FL_FOREGROUND_COLOR);
+			draw_line(m.y_scale, m.y_text, FL_DOT);
+			break;
+		case CURRENT:
+			fl_color(Fl_Widget::selection_color());
+			draw_line(m.y_scale, m.y_text, 0);
+			break;
+		case SPOT:
+			if (!ignore_spots_) {
+				fl_color(FL_FOREGROUND_COLOR);
+				draw_line(m.y_scale, m.y_text, 0);
+				fl_draw(m.text, x_text_, m.y_text + h_offset_);
+			}
 		}
 	}
 }
 
-// Draw mode text
-void band_widget::draw_subband(range_t range, double bw, string text) {
-	fl_font(0, FL_NORMAL_SIZE);
-	fl_color(FL_FOREGROUND_COLOR);
-	int yu = y_for_f(range.upper);
-	int yt = text_pos(yu);
-	fl_line_style(FL_DASH);
-	if (yt >= 0) {
-		char ctext[128];
-		if (type() == BAND_FULL) {
-			snprintf(ctext, sizeof(ctext), FREQ_FORMAT "-" FREQ_FORMAT " [%g kHz] %s", range.lower, range.upper, bw, text.c_str());
-		}
-		else {
-			snprintf(ctext, sizeof(ctext), FREQ_FORMAT, range.upper);
-		}
-		// Draw the kinked line in three segments
-		fl_line(x_scale_, yu, x_kink1_, yu, x_kink2_, yt);
-		fl_line(x_kink2_, yt, x_text_, yt);
-		fl_draw(ctext, x_text_ + 2, yt + h_offset_);
-		// now draw arrow ended line between upper and lower
-		int yu = y_for_f(range.upper);
-		int yl = y_for_f(range.lower);
-		fl_line(x_sub_, yt, x_sub_, yl);
-		// And the arrow heads
-		fl_polygon(x_sub_, yl, x_sub_ + 3, yl - 5, x_sub_ - 3, yl - 5);
-		// And the mode bars
+// Draw single offset line
+void band_widget::draw_line(int yl, int yr, int style) {
+	fl_line_style(style);
+	if (yl == yr) {
+		// Draw single line
+		fl_line(x_scale_, yl, x_text_, yr);
 	}
 	else {
-		fl_line(x_scale_, yu, x_text_, yu);
+		// Draw three lines
+		fl_line(x_scale_, yl, x_kink1_, yl);
+		fl_line(x_kink1_, yl, x_kink2_, yr);
+		fl_line(x_kink2_, yr, x_text_, yr);
 	}
-	int yl = y_for_f(range.lower);
-	fl_line(x_scale_, yl, x_text_, yl);
-	// Restore line style
 	fl_line_style(0);
-
 }
 
-// Draw mode bars
-void band_widget::draw_modebars(range_t range, set<string> modes) {
-	int yu = y_for_f(range.upper);
-	int yl = y_for_f(range.lower);
-	for (auto it = modes.begin(); it != modes.end(); it++) {
-		if (modes_.find(*it) != modes_.end()) {
-			int bar_num = modes_.at(*it);
-			int xl = x_scale_ + (bar_num * BAR_WIDTH);
-			fl_color(MODE_COLOURS.at(*it));
-			fl_rectf(xl, yu, BAR_WIDTH, (yl - yu));
-		}
-	}
-}
-
-
-// Draw spot frequency text
-void band_widget::draw_spot_text(double f, string text) {
-	fl_font(FL_ITALIC, FL_NORMAL_SIZE);
-	fl_color(FL_FOREGROUND_COLOR);
-	int yf = y_for_f(f);
-	int yt = text_pos(yf);
-	if (yt >= 0) {
-		// Draw the kinked line in three segments
-		fl_line(x_scale_, yf, x_kink1_, yf, x_kink2_, yt);
-		fl_line(x_kink2_, yt, x_text_, yt);
-		char ctext[128];
-		snprintf(ctext, sizeof(ctext), FREQ_FORMAT " %s", f, text.c_str());
-		fl_draw(ctext, x_text_ + 2, yt + h_offset_);
+// Draw the modebars
+void band_widget::draw_modebars() {
+	for (int ix = 0; ix < mode_bars_.size(); ix++) {
+		mode_bar& m = mode_bars_[ix];
+		int yu = y_for_f(m.range.upper);
+		int yl = y_for_f(m.range.lower);
+		int bar_num = modes_.at(m.mode);
+		int xl = x_scale_ + (bar_num * BAR_WIDTH);
+		fl_color(MODE_COLOURS.at(m.mode));
+		fl_rectf(xl, yu, BAR_WIDTH, (yl - yu));
 	}
 }
 
@@ -286,6 +241,21 @@ void band_widget::generate_data(double f) {
 		}
 		lower = min(l, lower);
 		upper = max(u, upper);
+		// Now process the data item
+		if (l == u) {
+			// SPOT
+			char* text = new char[128];
+			snprintf(text, 128, FREQ_FORMAT " %s", l, (*it)->summary.c_str());
+			add_marker({ l, SPOT, y_for_f(l), y_for_f(l), text});
+		}
+		else {
+			// SUBABND
+			char* text = new char[128];
+			snprintf(text, 128, FREQ_FORMAT "-" FREQ_FORMAT " [%g] %s", 
+				l, u, (*it)->bandwidth, (*it)->summary.c_str());
+			add_marker({ l, SPOT, y_for_f(l), y_for_f(l), text });
+			add_marker({ u, SPOT, y_for_f(u), y_for_f(u), text });
+		}
 	}
 	if (data_.size()) {
 		band_range_.lower = lower;
@@ -293,7 +263,136 @@ void band_widget::generate_data(double f) {
 	}
 	if (band_range_.lower > band_range_.upper) 
 		printf("DEBUG: Plan: F=%g, Band = (%g %g)\n", f, band_range_.lower, band_range_.upper);
+	// Add current
+	char* text = new char[32];
+	snprintf(text, 32, FREQ_FORMAT, f);
+	add_marker({ f, CURRENT, y_for_f(f), y_for_f(f), text });
 }
+
+// Add marker
+void band_widget::add_marker(marker m) {
+	bool inserted = false;
+	auto it = markers_.begin();
+	while (it != markers_.end() && !inserted) {
+		if ((*it).f > m.f) {
+			markers_.insert(it, m);
+			inserted = true;
+		}
+		it++;
+	}
+	if (!inserted) {
+		markers_.push_back(m);
+	}
+}
+
+// Reset markers
+void band_widget::reset_markers() {
+	// Reset default value of ignore spots
+	if (type() == BAND_SUMMARY) ignore_spots_ = true;
+	else ignore_spots_ = false;
+	// Reset text positions - and count valid markers
+	int num_markers = 0;
+	for (auto it = markers_.begin(); it != markers_.end(); it++) {
+		// Reset text position
+		(*it).y_text = (*it).y_scale;
+		// Count whether it has a text marker
+		switch ((*it).type) {
+		case CURRENT:
+		case SUBBAND_UPPER:
+			num_markers++;
+			break;
+		case SUBBAND_LOWER:
+			break;
+		case SPOT:
+			if (ignore_spots_) num_markers++;
+			break;
+		}
+	}
+}
+
+// Adjust markers
+void band_widget::adjust_markers() {
+	bool done = markers_.size() < 2 ? true : false;
+	bool top_down = true;
+	bool adjust_up = true;
+	auto it1 = markers_.begin();
+	auto it2 = it1;
+	int iteration = 0;
+	while (!done) {
+		int adjusts = 0;
+		if (top_down) {
+			it2 = it1 + 1;
+			if (it2 == markers_.end()) {
+				// Start next iteration
+				if (adjusts == 0) {
+					// ... or quit
+					done = true;
+				}
+				else {
+					if (adjust_up) {
+						adjust_up = false;
+					}
+					else {
+						adjust_up = true;
+						top_down = false;
+						it2 = markers_.end() - 1;
+						it1 = it2 - 1;
+					}
+					printf("BAND: Iteration %d, %d adjustments\n", iteration, adjusts);
+					iteration++;
+					adjusts = 0;
+				}
+			}
+			else {
+				if (it1->y_text + FL_NORMAL_SIZE > it2->y_text) {
+					// Texts overlap
+					adjusts++;
+					if (adjust_up) it1->y_text = it2->y_text - FL_NORMAL_SIZE;
+					else it2->y_text = it1->y_text + FL_NORMAL_SIZE;
+				}
+				it1++;
+			}
+		}
+		else {
+			// Top down
+			if (it2 == markers_.begin()) {
+				// Start next iteration
+				if (adjusts == 0) {
+					// ... or quit
+					done = true;
+				}
+				else {
+					if (adjust_up) {
+						adjust_up = false;
+					}
+					else {
+						adjust_up = true;
+						top_down = true;
+					}
+					printf("BAND: Iteration %d, %d adjustments\n", iteration, adjusts);
+					iteration++;
+					adjusts = 0;
+					adjusts = 0;
+				}
+			}
+			else {
+				if (it1->y_text + FL_NORMAL_SIZE > it2->y_text) {
+					// Texts overlap
+					adjusts++;
+					if (adjust_up) it1->y_text = it2->y_text - FL_NORMAL_SIZE;
+					else it2->y_text = it1->y_text + FL_NORMAL_SIZE;
+				}
+				it2--;
+				it1--;
+			}
+		}
+	}
+
+	// Calculate total number of markers required
+	int num_markers = 0;
+
+}
+
 
 // Get Y-position for frequency
 int band_widget::y_for_f(double f) {
@@ -377,35 +476,10 @@ void band_widget::rescale() {
 		px_per_MHz_ = (double)(y_lower_ - y_upper_) / (scale_range_.upper - scale_range_.lower);
 		// Get the possible text positions
 		int num_poss = (y_lower_ - y_upper_) / FL_NORMAL_SIZE;
-		text_in_use_.clear();
-		text_in_use_.resize(num_poss + 1);
-		for (auto it = text_in_use_.begin(); it != text_in_use_.end(); it++) {
-			(*it) = false;
-		}
 	}
 	else {
 		// Start at the top
 		y_upper_ = y() + GAP;
 		y_lower_ = y() + h() - HTEXT - GAP;
 	}
-}
-
-// Get the nearest available to the Y value - returns Y position: -1 if not available
-int band_widget::text_pos(int yt) {
-	int nearest = (int)round((double)(yt - y_upper_) / (double)(FL_NORMAL_SIZE));
-	if (nearest == text_in_use_.size()) {
-		nearest--;
-	}
-	if (text_in_use_[nearest]) {
-		nearest--;
-		if (nearest < 0 || text_in_use_[nearest]) {
-			nearest += 2;
-			if (nearest == text_in_use_.size() || text_in_use_[nearest]) {
-				// Cannot use the three closest positions - not enabled
-				return -1;
-			}
-		}
-	}
-	text_in_use_[nearest] = true;
-	return y_upper_ + (nearest * FL_NORMAL_SIZE);
 }

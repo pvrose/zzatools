@@ -57,7 +57,7 @@ protected:
     };
 
     struct mode_bar {
-        string mode;       // Mode
+        std::string mode;       // Mode
         range_t range;     // Frequency range of mode bars
     };
 
@@ -69,18 +69,20 @@ protected:
     void draw_markers();
     // Draw modebars
     void draw_modebars();
+    // Draw a single line
+    void draw_line(int yl, int yr, int style);
     // Generate data for band associated with frequency
     void generate_data(double f);
     // Rescale drawing
     void rescale();
-    // Generate markers and modebars
-    void generate_items();
+    // Add a marker in its correct position
+    void add_marker(marker m);
     // Adjust markers
     void adjust_markers();
+    // Reset markers
+    void reset_markers();
     // Get Y-position for frequency
     int y_for_f(double f);
-    // Get nearest text position to y
-    int text_pos(int yt);
 
     // The data
     // The current value
@@ -118,6 +120,8 @@ protected:
     // Frequency markers
     vector<marker> markers_;
     // Mode bars
-    vector<modebar> modebars_;
+    vector<mode_bar> mode_bars_;
+    // Don't Display spots
+    bool ignore_spots_;
 };
 
