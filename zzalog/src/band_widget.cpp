@@ -6,8 +6,11 @@
 #include "drawing.h"
 
 #include <cmath>
+#include <string>
 
 #include <FL/fl_draw.H>
+
+using namespace std;
 
 extern spec_data* spec_data_;
 extern band_data* band_data_;

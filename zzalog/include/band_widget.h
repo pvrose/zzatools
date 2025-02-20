@@ -41,24 +41,42 @@ protected:
         double upper;
     };                   // Frqeuency range
   
+    enum marker_t : char {
+        SUBBAND_UPPER,
+        SUBBAND_LOWER,
+        CURRENT,
+        SPOT
+    };
 
+    struct marker {
+        double f;          // Frequency in MHz
+        marker_t type;     // Type
+        int y_scale;       // Position on scale
+        int y_text;        // Position of text
+        char* text;        // Text to display
+    };
+
+    struct mode_bar {
+        string mode;       // Mode
+        range_t range;     // Frequency range of mode bars
+    };
 
     // Draw the scale (from lower to upper +/- a bit)
     void draw_scale(range_t range);
-    // Draw the current frequency
-    void draw_current(double f);
-    // Draw mode text
-    void draw_subband(range_t range, double bw, string text);
-    // Draw subband mode bars
-    void draw_modebars(range_t range, set<string> modes);
-    // Draw spot frequenct text
-    void draw_spot_text(double f, string text);
     // Draw legend
     void draw_legend();
+    // Draw markers
+    void draw_markers();
+    // Draw modebars
+    void draw_modebars();
     // Generate data for band associated with frequency
     void generate_data(double f);
     // Rescale drawing
     void rescale();
+    // Generate markers and modebars
+    void generate_items();
+    // Adjust markers
+    void adjust_markers();
     // Get Y-position for frequency
     int y_for_f(double f);
     // Get nearest text position to y
@@ -96,8 +114,10 @@ protected:
     double major_tick_;
     // Spacing for minor tick 
     double minor_tick_;
-    // Possible text positions - used
-    vector<bool> text_in_use_;
 
+    // Frequency markers
+    vector<marker> markers_;
+    // Mode bars
+    vector<modebar> modebars_;
 };
 
