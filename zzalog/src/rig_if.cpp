@@ -390,9 +390,14 @@ void rig_if::th_read_values() {
 		opened_ok_ = false;
 		return;
 	}
-	switch (power_state) {
+	// TODO: This is a blunt instrument - WFVIEW seems to return powered off when it's not
+	if (hamlib_data_->model_id == 2) {
+		rig_data_.powered_on = true;
+	}
+	else {
+		switch (power_state) {
 		case RIG_POWER_ON:
-		case RIG_POWER_STANDBY: 
+		case RIG_POWER_STANDBY:
 		{
 			rig_data_.powered_on = true;
 			break;
@@ -401,6 +406,7 @@ void rig_if::th_read_values() {
 		{
 			rig_data_.powered_on = false;
 			return;
+		}
 		}
 	}
 	// Read TX frequency

@@ -314,7 +314,9 @@ void band_widget::add_marker(marker m) {
 			markers_.insert(it, m);
 			inserted = true;
 		}
-		it++;
+		else {
+			it++;
+		}
 	}
 	if (!inserted) {
 		markers_.push_back(m);

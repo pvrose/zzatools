@@ -89,8 +89,10 @@ void qso_bands::cb_ticker(void* v) {
 	qso_bands* that = (qso_bands*)v;
 	qso_manager* mgr = ancestor_view<qso_manager>(that);
 	rig_if* rig = mgr->rig();
-	double f = rig->get_dfrequency(true);
-	that->summary_->value(f);
-	that->full_window_->set_frequency(f);
+	if (rig) {
+		double f = rig->get_dfrequency(true);
+		that->summary_->value(f);
+		that->full_window_->set_frequency(f);
+	}
 
 }
