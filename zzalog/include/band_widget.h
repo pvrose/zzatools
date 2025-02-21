@@ -83,6 +83,10 @@ protected:
     void reset_markers();
     // Get Y-position for frequency
     int y_for_f(double f);
+    // IS textual marker
+    bool is_text_marker(marker m);
+    // Generate markers and mode_bars
+    void generate_items();
 
     // The data
     // The current value
