@@ -501,7 +501,7 @@ void rig_if::th_read_values() {
 	value_t meter_value;
 	if (opened_ok_) error_code_ = rig_get_level(rig_, RIG_VFO_CURR, RIG_LEVEL_STRENGTH, &meter_value);
 	else return;
-	if (error_code_ != RIG_OK) {
+	if (error_code_ != RIG_OK && abs(error_code_) != RIG_ENAVAIL) {
 		opened_ok_ = false;
 		return;
 	}
@@ -525,7 +525,7 @@ void rig_if::th_read_values() {
 	// Power meter
 	if (opened_ok_) error_code_ = rig_get_level(rig_, RIG_VFO_CURR, RIG_LEVEL_RFPOWER_METER_WATTS, &meter_value);
 	else return;
-	if (error_code_ != RIG_OK) {
+	if (error_code_ != RIG_OK && abs(error_code_) != RIG_ENAVAIL) {
 		opened_ok_ = false;
 		return;
 	}
