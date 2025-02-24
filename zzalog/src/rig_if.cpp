@@ -83,7 +83,8 @@ double rig_if::get_dpower(bool max) {
 	case RF_METER:
 		break;
 	case DRIVE_LEVEL:
-		value = rig_data_.drive * hamlib_data_->max_power;
+		// rig_data_.drive is a %age.
+		value = rig_data_.drive * hamlib_data_->max_power * 0.01;
 		break;
 	case MAX_POWER:
 		value = hamlib_data_->max_power;
@@ -183,6 +184,16 @@ rig_if::rig_if(const char* name, hamlib_data_t* data)
 	// Last PTT off
 	last_ptt_off_ = system_clock::now();
 	thread_ = nullptr;
+	// Access flags
+	toc_split_ = 0;
+	has_drive_ = true;
+	has_smeter_ = true;
+	if (hamlib_data_ && hamlib_data_->power_mode == RF_METER) {
+		has_rf_meter_ = true;
+	}
+	else {
+		has_rf_meter_ = false;
+	}
 	
 	// If the name has been set, there is a rig
 	if (hamlib_data_ && my_rig_name_.length()) {
@@ -255,21 +266,21 @@ bool rig_if::open() {
 	opening_.store(true, memory_order_seq_cst);
 	thread_ = new thread(th_run_rig, this);
 	chrono::system_clock::time_point wait_start = chrono::system_clock::now();
-	int timeout = 150000; 
-	snprintf(msg, sizeof(msg), "RIG: Connecting %s/%s - timeout = %d s",
+	int timeout = 150000;
+	snprintf(msg, sizeof(msg), "RIG: Connecting %s/%s - timeout = %d ms",
 		hamlib_data_->mfr.c_str(),
 		hamlib_data_->model.c_str(),
-		timeout / 1000);
+		timeout);
 	status_->misc_status(ST_NOTE, msg);
 	while(opening_) {
 		// Allow FLTK scheduler in
 		Fl::check();
 		if (chrono::system_clock::now() - wait_start > chrono::milliseconds(timeout)) {
 			char msg[128];
-			snprintf(msg, sizeof(msg), "RIG: Connecting %s/%s abandoned after %d s", 
+			snprintf(msg, sizeof(msg), "RIG: Connecting %s/%s abandoned after %d ms", 
 				hamlib_data_->mfr.c_str(),
 				hamlib_data_->model.c_str(),
-				timeout / 1000);
+				timeout);
 			status_->misc_status(ST_WARNING, msg);
 			opening_.store(false);
 		}
@@ -320,12 +331,13 @@ bool rig_if::th_open_rig() {
 			// Successful - set up the serial port parameters
 			strcpy(rig_->state.rigport.pathname, hamlib_data_->port_name.c_str());
 			rig_->state.rigport.parm.serial.rate = hamlib_data_->baud_rate;
+			rig_->state.timeout = (int)(hamlib_data_->timeout * 1000.);
 			break;
 	// open r
 		case RIG_PORT_NETWORK:
 		case RIG_PORT_USB:
 			int err = rig_set_conf(rig_, rig_token_lookup(rig_, "rig_pathname"), hamlib_data_->port_name.c_str());
-			//strcpy(rig_->state.rigport.pathname, port_name_.c_str());
+			rig_->state.timeout = (int)(hamlib_data_->timeout * 1000.);
 			break;
 		}
 	} 
@@ -386,7 +398,7 @@ void rig_if::th_read_values() {
 	powerstat_t power_state;
 	if (opened_ok_) error_code_ = rig_get_powerstat(rig_, &power_state);
 	else return;
-	if (error_code_ != RIG_OK) {
+	if (error_handler(error_code_, "Power status", nullptr, nullptr)) {
 		opened_ok_ = false;
 		return;
 	}
@@ -413,7 +425,7 @@ void rig_if::th_read_values() {
 	double d_temp;
 	if (opened_ok_) error_code_ = rig_get_freq(rig_, RIG_VFO_TX, &d_temp);
 	else return;
-	if (error_code_ != RIG_OK) {
+	if (error_handler(error_code_, "TX Frequency", nullptr, nullptr)) {
 		opened_ok_ = false;
 		return;
 	}
@@ -421,7 +433,7 @@ void rig_if::th_read_values() {
 	// Read RX frequency
 	if (opened_ok_) error_code_ = rig_get_freq(rig_, RIG_VFO_CURR, &d_temp);
 	else return;
-	if (error_code_ != RIG_OK) {
+	if (error_handler(error_code_, "RX Frequency", nullptr, nullptr)) {
 		opened_ok_ = false;
 		return;
 	}
@@ -431,7 +443,7 @@ void rig_if::th_read_values() {
 	shortfreq_t bandwidth;
 	if (opened_ok_) error_code_ = rig_get_mode(rig_, RIG_VFO_CURR, &mode, &bandwidth);
 	else return;
-	if (error_code_ != RIG_OK) {
+	if (error_handler(error_code_, "Mode/Bandwidth", nullptr, nullptr)) {
 		opened_ok_ = false;
 		return;
 	}
@@ -464,31 +476,35 @@ void rig_if::th_read_values() {
 	if (mode & RIG_MODE_DSTAR) {
 		rig_data_.mode = GM_DSTAR;
 	}
-	// Read drive level
-	value_t drive_level;
-	if (opened_ok_) error_code_ = rig_get_level(rig_, RIG_VFO_CURR, RIG_LEVEL_RFPOWER, &drive_level);
-	else return;
-	if (error_code_ != RIG_OK) {
-		opened_ok_ = false;
-		return;
+	if (has_drive_) {
+		// Read drive level
+		value_t drive_level;
+		if (opened_ok_) error_code_ = rig_get_level(rig_, RIG_VFO_CURR, RIG_LEVEL_RFPOWER, &drive_level);
+		else return;
+		if (error_handler(error_code_, "Drive level", &has_drive_, nullptr)) {
+			opened_ok_ = false;
+			return;
+		}
+		rig_data_.drive = drive_level.f * 100;
 	}
-	rig_data_.drive = drive_level.f * 100;
 	// Split
-	vfo_t TxVFO;
-	split_t split;
-	if (opened_ok_) error_code_ = rig_get_split_vfo(rig_, RIG_VFO_CURR, &split, &TxVFO);
-	else return;
-	if (error_code_ != RIG_OK) {
-		opened_ok_ = false;
-		return;
+	if (toc_split_ <= hamlib_data_->max_to_count) {
+		vfo_t TxVFO;
+		split_t split;
+		if (opened_ok_) error_code_ = rig_get_split_vfo(rig_, RIG_VFO_CURR, &split, &TxVFO);
+		else return;
+		if (error_handler(error_code_, "Split mode", nullptr, &toc_split_)) {
+			opened_ok_ = false;
+			return;
+		}
+		rig_data_.split = split == split_t::RIG_SPLIT_ON;
 	}
-	rig_data_.split = split == split_t::RIG_SPLIT_ON;
 	// PTT value
 	ptt_t ptt;
 	bool current_ptt = rig_data_.ptt;
 	if (opened_ok_) error_code_ = rig_get_ptt(rig_, RIG_VFO_CURR, &ptt);
 	else return;
-	if (error_code_ != RIG_OK) {
+	if (error_handler(error_code_, "PTT", nullptr, nullptr)) {
 		opened_ok_ = false;
 		return;
 	}
@@ -497,54 +513,58 @@ void rig_if::th_read_values() {
 	if (current_ptt & !ptt) {
 		last_ptt_off_ = system_clock::now();
 	}
-	// S-meter - set to max value during RX and last RX value during TX
 	value_t meter_value;
-	if (opened_ok_) error_code_ = rig_get_level(rig_, RIG_VFO_CURR, RIG_LEVEL_STRENGTH, &meter_value);
-	else return;
-	if (error_code_ != RIG_OK && abs(error_code_) != RIG_ENAVAIL) {
-		opened_ok_ = false;
-		return;
-	}
-	// TX->RX (or changed RX frequency - use read value
-	if (current_ptt && !rig_data_.ptt) {
-		// empty smeter queue
-		smeters_.clear();
-	}
-	// Push value into smeters stack
-	if (!rig_data_.ptt) smeters_.push_back(meter_value.i);
-	while (smeters_.size() > hamlib_data_->num_smeters) {
-		smeters_.erase(smeters_.begin());
-	}
-	// Get the max value in the stack
-	int max_smeter = -100;
-	for (auto it = smeters_.begin(); it != smeters_.end(); it++) {
-		max_smeter = max(max_smeter, *it);
-	}
-	rig_data_.s_value = max_smeter;
-	rig_data_.s_meter = meter_value.i;
-	// Power meter
-	if (opened_ok_) error_code_ = rig_get_level(rig_, RIG_VFO_CURR, RIG_LEVEL_RFPOWER_METER_WATTS, &meter_value);
-	else return;
-	if (error_code_ != RIG_OK && abs(error_code_) != RIG_ENAVAIL) {
-		opened_ok_ = false;
-		return;
-	}
-	// RX->TX - reset the power level unless...
-	if (!current_ptt && rig_data_.ptt) {
-		// ...PTT is released for only a few seconds (e.g. CW break-in or SSB VOX)
-		seconds gap = duration_cast<seconds>(system_clock::now() - last_ptt_off_);
-		if ( gap > seconds(5)) {
-			rig_data_.pwr_value = meter_value.f;
+	if (has_smeter_) {
+		// S-meter - set to max value during RX and last RX value during TX
+		if (opened_ok_) error_code_ = rig_get_level(rig_, RIG_VFO_CURR, RIG_LEVEL_STRENGTH, &meter_value);
+		else return;
+		if (error_handler(error_code_, "S-meter", &has_smeter_, nullptr)) {
+			opened_ok_ = false;
+			return;
 		}
-	}
-	// TX use accumulated maximum value
-	else if (rig_data_.ptt) {
-		if ((double)meter_value.f > rig_data_.pwr_value) {
-			rig_data_.pwr_value = (double)meter_value.f;
+		// TX->RX (or changed RX frequency - use read value
+		if (current_ptt && !rig_data_.ptt) {
+			// empty smeter queue
+			smeters_.clear();
 		}
+		// Push value into smeters stack
+		if (!rig_data_.ptt) smeters_.push_back(meter_value.i);
+		while (smeters_.size() > hamlib_data_->num_smeters) {
+			smeters_.erase(smeters_.begin());
+		}
+		// Get the max value in the stack
+		int max_smeter = -100;
+		for (auto it = smeters_.begin(); it != smeters_.end(); it++) {
+			max_smeter = max(max_smeter, *it);
+		}
+		rig_data_.s_value = max_smeter;
+		rig_data_.s_meter = meter_value.i;
 	}
-	// Also store iommediate value
-	rig_data_.pwr_meter = (double)meter_value.f;
+	if (has_rf_meter_) {
+		// Power meter
+		if (opened_ok_) error_code_ = rig_get_level(rig_, RIG_VFO_CURR, RIG_LEVEL_RFPOWER_METER_WATTS, &meter_value);
+		else return;
+		if (error_handler(error_code_, "RF Power", &has_rf_meter_, nullptr)) {
+			opened_ok_ = false;
+			return;
+		}
+		// RX->TX - reset the power level unless...
+		if (!current_ptt && rig_data_.ptt) {
+			// ...PTT is released for only a few seconds (e.g. CW break-in or SSB VOX)
+			seconds gap = duration_cast<seconds>(system_clock::now() - last_ptt_off_);
+			if (gap > seconds(5)) {
+				rig_data_.pwr_value = meter_value.f;
+			}
+		}
+		// TX use accumulated maximum value
+		else if (rig_data_.ptt) {
+			if ((double)meter_value.f > rig_data_.pwr_value) {
+				rig_data_.pwr_value = (double)meter_value.f;
+			}
+		}
+		// Also store iommediate value
+		rig_data_.pwr_meter = (double)meter_value.f;
+	}
 	// All successful
 	count_down_ = FAST_RIG_TIMER;
 	// Check rig response time and inform use if it's slowed down or back to normal
@@ -566,6 +586,40 @@ void rig_if::th_read_values() {
 	}
 
 	return;
+}
+
+// Handle hamlib responses - 
+bool rig_if::error_handler(int code, const char* meter, bool* flag, int* to_count) {
+	char msg[128];
+	switch (abs(code)) {
+	case RIG_OK:
+		return false;
+	case RIG_ENAVAIL:
+		if (flag) {
+			snprintf(msg, sizeof(msg), "RIG: Access is %s is not available - turn off future access", meter);
+			status_->misc_status(ST_WARNING, msg);
+			*flag = false;
+			return false;
+		}
+		else {
+			return true;
+		}
+	case RIG_ETIMEOUT:
+		if (to_count) {
+			(*to_count)++;
+			if (*to_count <= hamlib_data_->max_to_count) {
+				snprintf(msg, sizeof(msg), "RIG: Access to %s timed out - continuing", meter);
+				status_->misc_status(ST_WARNING, msg);
+			}
+			else {
+				snprintf(msg, sizeof(msg), "RIG: Access to %s has timed out %d times, no further access", meter, *to_count);
+				status_->misc_status(ST_ERROR, msg);
+			}
+			return false;
+		}
+	default:
+		return true;
+	}
 }
 
 // Return the most recent error message

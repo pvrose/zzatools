@@ -71,6 +71,8 @@ using namespace std::chrono;
 		rig_model_t model_id = -1;
 		// Port type
 		rig_port_t port_type = RIG_PORT_NONE;
+		// MAximum number of timeouts allowed before ignore meter
+		int max_to_count = 5;
 		// additional features required by rig_if to return data
 		// Timeout value (not a hamlib item
 		double timeout = 1.0;
@@ -177,6 +179,8 @@ using namespace std::chrono;
 		void th_read_values();
 		// Open rig - run in thread
 		bool th_open_rig();
+		// Handle errors
+		bool error_handler(int code, const char* meter, bool* flag, int* to_count);
 		// Rig opened OK
 		atomic<bool> opened_ok_;
 		// SEmaphore to use around opening
@@ -219,6 +223,12 @@ using namespace std::chrono;
 		vector<int> smeters_;
 		// Cumulated value of smeter readings
 		int sum_smeters_;
+		// Flags to avoid unsupported meters
+		bool has_smeter_;
+		bool has_drive_;
+		bool has_rf_meter_;
+		// Timeout counts
+		int toc_split_;
 
 
 };

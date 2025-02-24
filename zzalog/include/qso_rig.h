@@ -135,6 +135,8 @@ protected:
 	static void cb_del_cat(Fl_Widget* w, void* v);
 	// S-meter peak smapling
 	static void cb_smeters(Fl_Widget* w, void* v);
+	// MAx number of timeouts
+	static void cb_to_count(Fl_Widget* w, void* v);
 	// Show app
 	static void cb_show_app(Fl_Widget* w, void* v);
 	// Callback when selecting power mode
@@ -234,6 +236,7 @@ protected:
 	Fl_Group* timeout_tab_;
 	Fl_Value_Slider* v_timeout_;
 	Fl_Value_Slider* v_smeters_;
+	Fl_Value_Slider* v_to_count_;
 
 
 	// Add all ports to port choice

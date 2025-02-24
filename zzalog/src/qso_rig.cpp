@@ -601,7 +601,7 @@ void qso_rig::create_timeout(int curr_x, int curr_y) {
 	timeout_tab_->labelsize(FL_NORMAL_SIZE + 2);
 
 	curr_x = timeout_tab_->x() + WBUTTON + GAP;
-	curr_y += (HTEXT + GAP) / 2;
+	curr_y += GAP;
 
 	v_timeout_ = new Fl_Value_Slider(curr_x, curr_y, WBUTTON * 3 / 2, HBUTTON, "Timeout sec.");
 	v_timeout_->align(FL_ALIGN_LEFT);
@@ -622,6 +622,17 @@ void qso_rig::create_timeout(int curr_x, int curr_y) {
 	v_smeters_->range(1, 20);
 	v_smeters_->step(1);
 	v_smeters_->value(5);
+
+	curr_y += HBUTTON;
+
+	v_to_count_ = new Fl_Value_Slider(curr_x, curr_y, WBUTTON * 3 / 2, HBUTTON, "TO Count");
+	v_to_count_->align(FL_ALIGN_LEFT);
+	v_to_count_->type(FL_HOR_SLIDER);
+	v_to_count_->callback(cb_to_count);
+	v_to_count_->tooltip("Set the number of s-meter samples to provide peak");
+	v_to_count_->range(1, 10);
+	v_to_count_->step(1);
+	v_to_count_->value(5);
 
 	curr_x += v_smeters_->w();
 	curr_y += HBUTTON + GAP;
@@ -1090,6 +1101,8 @@ void qso_rig::enable_widgets(uchar damage) {
 			v_timeout_->value(hamlib->timeout);
 			v_smeters_->activate();
 			v_smeters_->value(hamlib->num_smeters);
+			v_to_count_->activate();
+			v_to_count_->value(hamlib->max_to_count);
 		}
 		else {
 			op_pwr_type_->activate();
@@ -1105,44 +1118,48 @@ void qso_rig::enable_widgets(uchar damage) {
 			ip_tvtr_pwr_->deactivate();
 			v_timeout_->deactivate();
 			v_smeters_->deactivate();
+			v_to_count_->deactivate();
 		}
 
 	}
 
-	if ((damage & DAMAGE_VALUES) && rig_state_ == OPEN) {
+	if ((damage & DAMAGE_VALUES) && (rig_state_ == OPEN || rig_state_ == UNRESPONSIVE)) {
 		double freq;
 		freq = rig_->get_dfrequency(true);
 		int freq_Hz = (int)(freq * 1000000) % 1000;
 		int freq_kHz = (int)(freq * 1000) % 1000;
 		int freq_MHz = (int)freq;
-		band_data::band_entry_t* entry = band_data_->get_entry(freq * 1000);
-		if (entry) {
-			char l[50];
-			strcpy(l, spec_data_->band_for_freq(freq).c_str());
-			for (auto it = entry->modes.begin(); it != entry->modes.end(); it++) {
-				strcat(l, (*it).c_str());
-				strcat(l, " ");
-			}
-			op_status_->value(l);
-			if (rig_->get_ptt()) {
-				bn_tx_rx_->label("TX");
-				bn_tx_rx_->color(FL_RED);
-			}
-			else {
-				bn_tx_rx_->label("RX");
-				bn_tx_rx_->color(FL_GREEN);
-			}
-		}
-		else {
-			op_status_->value("Out of band!");
-			if (rig_->get_ptt()) {
-				bn_tx_rx_->label("TX");
-				bn_tx_rx_->color(FL_DARK_RED);
+		if (rig_state_ == OPEN) {
+			band_data::band_entry_t* entry = band_data_->get_entry(freq * 1000);
+			if (entry) {
+				char l[50];
+				strcpy(l, spec_data_->band_for_freq(freq).c_str());
+				for (auto it = entry->modes.begin(); it != entry->modes.end(); it++) {
+					strcat(l, (*it).c_str());
+					strcat(l, " ");
+				}
+				op_status_->value(l);
+				if (rig_->get_ptt()) {
+					bn_tx_rx_->label("TX");
+					bn_tx_rx_->color(FL_RED);
+				}
+				else {
+					bn_tx_rx_->label("RX");
+					bn_tx_rx_->color(FL_GREEN);
+				}
 			}
 			else {
-				bn_tx_rx_->label("RX");
-				bn_tx_rx_->color(FL_DARK_GREEN);
+				op_status_->value("Out of band!");
+				if (rig_->get_ptt()) {
+					bn_tx_rx_->label("TX");
+					bn_tx_rx_->color(FL_DARK_RED);
+				}
+				else {
+					bn_tx_rx_->label("RX");
+					bn_tx_rx_->color(FL_DARK_GREEN);
+				}
 			}
+			bn_tx_rx_->labelcolor(fl_contrast(FL_FOREGROUND_COLOR, bn_tx_rx_->color()));
 		}
 		op_freq_mode_->activate();
 		op_freq_mode_->color(FL_BLACK, FL_BLACK);
@@ -1180,7 +1197,6 @@ void qso_rig::enable_widgets(uchar damage) {
 			fl_measure(msg, w, h);
 		}
 		op_freq_mode_->labelsize(size);
-		bn_tx_rx_->labelcolor(fl_contrast(FL_FOREGROUND_COLOR, bn_tx_rx_->color()));
 
 	}
 
@@ -1529,6 +1545,14 @@ void qso_rig::cb_smeters(Fl_Widget* w, void* v) {
 	double value;
 	cb_value<Fl_Value_Slider, double>(w, &value);
 	that->cat_data_[that->cat_index_]->hamlib->num_smeters = (int)value;;
+}
+
+// Timeout count
+void qso_rig::cb_to_count(Fl_Widget* w, void* v) {
+	qso_rig* that = ancestor_view<qso_rig>(w);
+	double value;
+	cb_value<Fl_Value_Slider, double>(w, &value);
+	that->cat_data_[that->cat_index_]->hamlib->max_to_count = (int)value;;
 }
 
 // Use selected CAT
