@@ -1368,7 +1368,7 @@ void qso_rig::populate_power_choice() {
 	ch_pwr_type_->clear();
 	ch_pwr_type_->add("None");
 	ch_pwr_type_->add("RF Power");
-	ch_pwr_type_->add("Max Power");
+	ch_pwr_type_->add("Drive");
 	ch_pwr_type_->add("Specify");
 }
 
