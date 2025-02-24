@@ -629,7 +629,7 @@ void qso_rig::create_timeout(int curr_x, int curr_y) {
 	v_to_count_->align(FL_ALIGN_LEFT);
 	v_to_count_->type(FL_HOR_SLIDER);
 	v_to_count_->callback(cb_to_count);
-	v_to_count_->tooltip("Set the number of s-meter samples to provide peak");
+	v_to_count_->tooltip("Set the number of timeouts an access to a rig value before abandoning that value");
 	v_to_count_->range(1, 10);
 	v_to_count_->step(1);
 	v_to_count_->value(5);
