@@ -1135,8 +1135,8 @@ void qso_rig::enable_widgets(uchar damage) {
 				char l[50];
 				strcpy(l, spec_data_->band_for_freq(freq).c_str());
 				for (auto it = entry->modes.begin(); it != entry->modes.end(); it++) {
-					strcat(l, (*it).c_str());
 					strcat(l, " ");
+					strcat(l, (*it).c_str());
 				}
 				op_status_->value(l);
 				if (rig_->get_ptt()) {

@@ -109,6 +109,7 @@ void band_widget::draw_scale(range_t range) {
 		int curr_y;
 		char text[15];
 		double f = scale_range_.upper;
+		// Error tolerance in FP calculations
 		double e0 = 0.00001;
 		double e1 = major_tick_ - e0;
 		char format[16];
