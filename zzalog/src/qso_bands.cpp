@@ -13,6 +13,8 @@
 
 extern ticker* ticker_;
 extern Fl_Preferences* settings_;
+extern string PROGRAM_ID;
+extern string PROGRAM_VERSION;
 
 qso_bands::qso_bands(int X, int Y, int W, int H, const char* L) :
 	Fl_Group(X, Y, W, H, L)
@@ -43,7 +45,10 @@ void qso_bands::load_values() {
 void qso_bands::create_form() {
 	// CReate the window
 	Fl_Group::current(nullptr);
-	full_window_ = new band_window(left_, top_, width_, height_, "Band Plan");
+	char l[128];
+	snprintf(l,sizeof(l), "%s %s: Bandplan", PROGRAM_ID.c_str(), PROGRAM_VERSION.c_str());
+	full_window_ = new band_window(left_, top_, width_, height_);
+	full_window_->copy_label(l);
 	full_window_->hide();
 
 	begin();
