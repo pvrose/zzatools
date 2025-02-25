@@ -111,7 +111,11 @@ void band_widget::draw_scale(range_t range) {
 		double f = scale_range_.upper;
 		double e0 = 0.00001;
 		double e1 = major_tick_ - e0;
-		while (f >= scale_range_.lower) {
+		char format[16];
+		if (major_tick_ < 0.1) strcpy(format, "%.2f");
+		else if (major_tick_ < 1.0) strcpy(format, "%.1f");
+		else strcpy(format, "%.0f");
+		while (f >= scale_range_.lower - e0) {
 			curr_y = y_for_f(f);
 			double df = fmod(f, major_tick_);
 			if (df < e0 || df > e1) {
@@ -119,7 +123,7 @@ void band_widget::draw_scale(range_t range) {
 				fl_line(x_major_, curr_y, x_scale_, curr_y);
 				// Add the freq
 				if (type() == BAND_FULL) snprintf(text, sizeof(text), FREQ_FORMAT, f);
-				else snprintf(text, sizeof(text), "%.1f", f);
+				else snprintf(text, sizeof(text), format, f);
 				fl_draw(text, x_freq_, curr_y - h_offset_, w_freq_, 2 * h_offset_, FL_ALIGN_RIGHT);
 			}
 			else {
@@ -476,7 +480,7 @@ void band_widget::rescale() {
 		fl_font(0, FL_NORMAL_SIZE);
 		char text[15];
 		if (type() == BAND_FULL) snprintf(text, sizeof(text), FREQ_FORMAT, value_);
-		else snprintf(text, sizeof(text), "%.1f", value_);
+		else snprintf(text, sizeof(text), "%.2f", value_);
 		int wx = 0, hx = 0;
 		fl_measure(text, wx, hx);
 		// Start at the left
