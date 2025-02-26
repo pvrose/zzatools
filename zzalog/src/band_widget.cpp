@@ -149,12 +149,12 @@ void band_widget::draw_markers() {
 	for (int ix = 0; ix < markers_.size(); ix++) {
 		marker& m = markers_[ix];
 		switch (m.type) {
-		case SUBBAND_UPPER:
+		case SUBBAND_LOWER:
 			fl_color(FL_FOREGROUND_COLOR);
 			draw_line(m.y_scale, m.y_text, FL_DOT);
 			fl_draw(m.text, x_text_, m.y_text + h_offset_);
 			break;
-		case SUBBAND_LOWER:
+		case SUBBAND_UPPER:
 			fl_color(FL_FOREGROUND_COLOR);
 			fl_line(x_scale_, m.y_scale, x_kink1_, m.y_text);
 			break;
@@ -294,8 +294,8 @@ void band_widget::generate_items() {
 			char* text = new char[128];
 			snprintf(text, 128, FREQ_FORMAT "-" FREQ_FORMAT " [%g] %s", 
 				l, u, (*it)->bandwidth, (*it)->summary.c_str());
-			add_marker({ u, SUBBAND_UPPER, y_for_f(u), y_for_f(u), text });
-			add_marker({ l, SUBBAND_LOWER, y_for_f(l), y_for_f(l), nullptr });
+			add_marker({ u, SUBBAND_UPPER, y_for_f(u), y_for_f(u), nullptr });
+			add_marker({ l, SUBBAND_LOWER, y_for_f(l), y_for_f(l), text });
 
 
 		}
@@ -341,10 +341,10 @@ void band_widget::reset_markers() {
 		// Count whether it has a text marker
 		switch ((*it).type) {
 		case CURRENT:
-		case SUBBAND_UPPER:
+		case SUBBAND_LOWER:
 			num_markers++;
 			break;
-		case SUBBAND_LOWER:
+		case SUBBAND_UPPER:
 			break;
 		case SPOT:
 			if (!ignore_spots_) num_markers++;
@@ -455,11 +455,11 @@ void band_widget::adjust_markers() {
 // Is a text marker
 bool band_widget::is_text_marker(marker m) {
 	switch(m.type) {
-	case CURRENT:
 	case SUBBAND_UPPER:
-		return true;
-	case SUBBAND_LOWER:
 		return false;
+	case CURRENT:
+	case SUBBAND_LOWER:
+		return true;
 	case SPOT:
 		return !ignore_spots_;
 	}

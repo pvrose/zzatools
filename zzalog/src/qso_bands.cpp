@@ -15,6 +15,7 @@ extern ticker* ticker_;
 extern Fl_Preferences* settings_;
 extern string PROGRAM_ID;
 extern string PROGRAM_VERSION;
+extern bool DARK;
 
 qso_bands::qso_bands(int X, int Y, int W, int H, const char* L) :
 	Fl_Group(X, Y, W, H, L)
@@ -49,6 +50,7 @@ void qso_bands::create_form() {
 	snprintf(l,sizeof(l), "%s %s: Bandplan", PROGRAM_ID.c_str(), PROGRAM_VERSION.c_str());
 	full_window_ = new band_window(left_, top_, width_, height_);
 	full_window_->copy_label(l);
+	full_window_->selection_color(DARK ? COLOUR_ORANGE : FL_RED);
 	full_window_->hide();
 
 	begin();
@@ -58,7 +60,7 @@ void qso_bands::create_form() {
 	int ch = h() - GAP - GAP;
 	summary_ = new band_widget(cx, cy, cw, ch);
 	summary_->type(band_widget::BAND_SUMMARY);
-	summary_->selection_color(FL_RED);
+	summary_->selection_color(DARK ? COLOUR_ORANGE : FL_RED);
 	summary_->box(FL_BORDER_FRAME);
 	summary_->callback(cb_band);
 	summary_->tooltip("Band plan display - click to open larger view");

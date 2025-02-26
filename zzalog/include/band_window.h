@@ -10,6 +10,9 @@ public:
     band_window(int X, int Y, int W, int H, const char* L = nullptr);
     ~band_window();
 
+ 
+    virtual void draw();
+    
     // Set the frequency
     void set_frequency(double f);
 
