@@ -35,6 +35,8 @@ struct search_criteria_t;
 		static void cb_mi_file_print(Fl_Widget* w, void* v);
 		// File->Backup
 		static void cb_mi_file_backup(Fl_Widget* w, void* v);
+		// File->Restore
+		static void cb_mi_file_restore(Fl_Widget* w, void* v);
 		// Settings->any
 		static void cb_mi_settings(Fl_Widget* w, void* v);
 		// Windows->all

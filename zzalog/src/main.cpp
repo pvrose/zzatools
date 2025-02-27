@@ -141,6 +141,7 @@ list<string> recent_files_;
 
 // Forward declarations
 void backup_file();
+void restore_backup();
 void set_recent_file(string filename);
 void save_switches();
 
@@ -211,6 +212,20 @@ string backup_filename(string source) {
 	string timestamp = now(false, "%Y%m%d_%H%MZ");
 	backup += base_name + "_" + timestamp + suffix;
 	return backup;
+}
+
+// Restore from last backup
+void restore_backup() {
+	string filename = book_->filename();
+	// Remove existing book
+	menu::cb_mi_file_new(nullptr, nullptr);
+	Fl_Preferences backup_settings(settings_, "Backup");
+	char* temp;
+	backup_settings.get("Last Backup", temp, "");
+	// Get backup data
+	book_->load_data(string(temp));
+	// Store as the original filenam
+	book_->store_data(filename, true);
 }
 
 // This callback intercepts the close command and performs checks and tidies up
