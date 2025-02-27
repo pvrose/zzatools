@@ -218,14 +218,14 @@ string backup_filename(string source) {
 void restore_backup() {
 	string filename = book_->filename();
 	// Remove existing book
+	status_->misc_status(ST_WARNING, "LOG: Closing current book!");
 	menu::cb_mi_file_new(nullptr, nullptr);
 	Fl_Preferences backup_settings(settings_, "Backup");
 	char* temp;
 	backup_settings.get("Last Backup", temp, "");
 	// Get backup data
+	READ_ONLY = true;
 	book_->load_data(string(temp));
-	// Store as the original filenam
-	book_->store_data(filename, true);
 }
 
 // This callback intercepts the close command and performs checks and tidies up
@@ -1245,7 +1245,7 @@ void backup_file() {
 // Add the current file to the recent files list
 void set_recent_file(string filename) {
 	// Do not add to recent file list if using backup or CLI inihibited
-	if (!PRIVATE && !using_backup_) {
+	if (!PRIVATE && !using_backup_ && filename.length()) {
 
 		// Add or move the file to the front of list
 		recent_files_.remove(filename);
