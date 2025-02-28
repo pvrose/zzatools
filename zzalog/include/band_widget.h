@@ -127,5 +127,7 @@ protected:
     vector<mode_bar> mode_bars_;
     // Don't Display spots
     bool ignore_spots_;
+    // Already warned that we have removed spots once
+    bool size_warned_;
 };
 

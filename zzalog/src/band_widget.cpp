@@ -39,6 +39,7 @@ band_widget::band_widget(int X, int Y, int W, int H, const char* L) :
 	band_ = "";
 	band_range_ = { nan(""), nan("") };
 	ignore_spots_ = false;
+	size_warned_ = false;
 	redraw();
 }
 
@@ -351,7 +352,22 @@ void band_widget::reset_markers() {
 			break;
 		}
 	}
-	if (num_markers * FL_NORMAL_SIZE > y_lower_ - y_upper_) ignore_spots_ = true;
+	if (num_markers * FL_NORMAL_SIZE > y_lower_ - y_upper_) {
+		if (!size_warned_) {
+			char msg[128];
+			if(ignore_spots_) {
+				snprintf(msg, sizeof(msg), "BAND: Too many markers %d - already ignoring spots", num_markers);
+				status_->misc_status(ST_WARNING, msg);
+			} else {
+				snprintf(msg, sizeof(msg), "BAND: Too many markers %d - removing spots", num_markers);
+				status_->misc_status(ST_NOTE, msg);
+			}
+			size_warned_ = true;
+		}
+		ignore_spots_ = true;
+	} else {
+		size_warned_ = false;
+	}
 }
 
 // Adjust markers
@@ -448,7 +464,11 @@ void band_widget::adjust_markers() {
 	}
 	// No adjustements finished.
 	if (adjusts == 0) return;
+
+	char msg[128];
 	iteration ++;
+	snprintf(msg, sizeof(msg), "BAND: Unable to fit all markers in");
+	status_->misc_status(ST_WARNING, msg);
 	adjusts = 0;
 }
 
