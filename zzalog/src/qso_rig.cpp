@@ -65,6 +65,11 @@ qso_rig::qso_rig(int X, int Y, int W, int H, const char* L) :
 	create_form(X, Y);
 	enable_widgets(DAMAGE_ALL);
 
+	if (!rig_ok_) {
+		if (cat_data_[cat_index_]->auto_start) {
+			cb_bn_start(bn_start_, nullptr);
+		}
+	}
 	ticker_->add_ticker(this, cb_ticker, 10);
 }
 
@@ -134,6 +139,12 @@ void qso_rig::load_cat_data(qso_rig::cat_data_t* cat_data, Fl_Preferences settin
 	settings.get("Transverter Power", cat_data->hamlib->tvtr_power, 0.0);
 	settings.get("Accessories", itemp, (int)BAREBACK);
 	cat_data->hamlib->accessory = (accessory_t)itemp;
+	settings.get("Start Automatcally", itemp, (int)false);
+	cat_data->auto_start = (bool)itemp;
+	settings.get("Connect Automatically", itemp, false);
+	cat_data->auto_connect = (bool)itemp;
+	settings.get("Connect Delay", cat_data->connect_delay, 1.0);
+
 	
 	free(temp);
 
@@ -340,6 +351,9 @@ void qso_rig::create_config(int curr_x, int curr_y) {
 	// Create connection tab
 	create_connex(curr_x, curr_y);
 	rh = max(rh, connect_tab_->y() + connect_tab_->h() - ry);
+	// Create auto tab
+	create_auto(curr_x, curr_y);
+	rh = max(rh, auto_tab_->y() + auto_tab_->h() - ry);
 	// Create defaults tab
 	create_defaults(curr_x, curr_y);
 	rh = max(rh, defaults_tab_->y() + defaults_tab_->h() - ry);
@@ -349,6 +363,7 @@ void qso_rig::create_config(int curr_x, int curr_y) {
 	// Create timeout &c tab
 	create_timeout(curr_x, curr_y);
 	rh = max(rh, timeout_tab_->y() + timeout_tab_->h() - ry);
+
 
 	config_tabs_->resizable(nullptr);
 	config_tabs_->size(config_tabs_->w(), config_tabs_->h() + rh - saved_rh);
@@ -485,6 +500,44 @@ void qso_rig::create_network(int curr_x, int curr_y) {
 	network_grp_->size(curr_x - network_grp_->x(), curr_y - network_grp_->y());
 
 	network_grp_->end();
+
+}
+
+// Create the automatic action tab
+void qso_rig::create_auto(int curr_x, int curr_y) {
+	auto_tab_ = new Fl_Group(curr_x, curr_y, 10, 10, "Auto");
+	auto_tab_->labelsize(FL_NORMAL_SIZE + 1);
+
+	curr_x += GAP;
+	curr_y += GAP;
+
+	bn_autostart_ = new Fl_Check_Button(curr_x, curr_y, HBUTTON, HBUTTON, "Start");
+	bn_autostart_->align(FL_ALIGN_RIGHT);
+	bn_autostart_->callback(cb_bn_autostart, nullptr);
+	bn_autostart_->tooltip("Automatically start the CAT interface application");
+
+	curr_y += HBUTTON;
+	bn_autoconn_ = new Fl_Check_Button(curr_x, curr_y, HBUTTON, HBUTTON, "Connect");
+	bn_autoconn_->align(FL_ALIGN_RIGHT);
+	bn_autoconn_->callback(cb_bn_autoconn, nullptr);
+	bn_autoconn_->tooltip("Automatically start the CAT interface application");
+
+	curr_x += WBUTTON;
+	v_connect_delay_ = new Fl_Value_Slider(curr_x, curr_y, WBUTTON * 3 / 2, HBUTTON, "Delay");
+	v_connect_delay_->align(FL_ALIGN_TOP);
+	v_connect_delay_->type(FL_HOR_SLIDER);
+	v_connect_delay_->callback(cb_connect_delay, nullptr);
+	v_connect_delay_->bounds(0.0, 10.0);
+	v_connect_delay_->step(0.5);
+	v_connect_delay_->tooltip("Specify the delay between starting the app and trying to connect");
+
+	curr_x += v_connect_delay_->w();
+	curr_y += HBUTTON + GAP;
+
+	auto_tab_->resizable(nullptr);
+	auto_tab_->size(curr_x - auto_tab_->x(), curr_y - auto_tab_->y());
+
+	auto_tab_->end();
 
 }
 
@@ -703,6 +756,9 @@ void qso_rig::save_cat_data(qso_rig::cat_data_t* cat_data, Fl_Preferences settin
 	settings.set("Transverter Offset", cat_data->hamlib->freq_offset);
 	settings.set("Transverter Power", cat_data->hamlib->tvtr_power);
 	settings.set("Accessories", cat_data->hamlib->accessory);
+	settings.set("Start Automatcally", cat_data->auto_start);
+	settings.set("Connect Automatically", cat_data->auto_connect);
+	settings.set("Connect Delay", cat_data->connect_delay);
 
 }
 
@@ -1200,6 +1256,17 @@ void qso_rig::enable_widgets(uchar damage) {
 
 	}
 
+	if (damage & DAMAGE_AUTOS) {
+		bn_autostart_->value(cat_data_[cat_index_]->auto_start);
+		bn_autoconn_->value(cat_data_[cat_index_]->auto_connect);
+		v_connect_delay_->value(cat_data_[cat_index_]->connect_delay);
+		if (cat_data_[cat_index_]->auto_connect) {
+			v_connect_delay_->activate();
+		} else {
+			v_connect_delay_->deactivate();
+		}
+	}
+
 	redraw();
 }
 
@@ -1500,10 +1567,11 @@ void qso_rig::cb_bn_select(Fl_Widget* w, void* v) {
 // v points to the string containing the command to  invoke flrig
 void qso_rig::cb_bn_start(Fl_Widget* w, void* v) {
 	qso_rig* that = ancestor_view<qso_rig>(w);
+	cat_data_t* cat_data = that->cat_data_[that->cat_index_];
 #ifdef _WIN32
-	string command = "start /min " + that->cat_data_[that->cat_index_]->app;
+	string command = "start /min " + cat_data->app;
 #else
-	string command = that->cat_data_[that->cat_index_]->app + "&";
+	string command = cat_data->app + "&";
 #endif
 	int result = system(command.c_str());
 	char msg[100];
@@ -1511,6 +1579,10 @@ void qso_rig::cb_bn_start(Fl_Widget* w, void* v) {
 		that->rig_starting_ = true;
 		snprintf(msg, sizeof(msg), "RIG: Started %s OK", command.c_str());
 		status_->misc_status(ST_OK, msg);
+		// Start the connect delay timer
+		if (cat_data->auto_connect) {
+			Fl::add_timeout(cat_data->connect_delay, cb_start_timer, (Fl_Widget*)that->bn_autoconn_);
+		}
 	}
 	else {
 		that->rig_starting_ = false;
@@ -1635,6 +1707,37 @@ void qso_rig::cb_ch_power(Fl_Widget* w, void* v) {
 	cb_value<Fl_Choice, power_mode_t>(w, v);
 	qso_rig* that = ancestor_view<qso_rig>(w);
 	that->enable_widgets(DAMAGE_ADDONS);
+}
+
+// Select autostart
+void qso_rig::cb_bn_autostart(Fl_Widget* w, void* v) {
+	bool value;
+	cb_value<Fl_Check_Button, bool>(w, &value);
+	qso_rig* that = ancestor_view<qso_rig>(w);
+	that->cat_data_[that->cat_index_]->auto_start = value;
+}
+
+// Select autoconnect
+void qso_rig::cb_bn_autoconn(Fl_Widget* w, void* v) {
+	bool value;
+	cb_value<Fl_Check_Button, bool>(w, &value);
+	qso_rig* that = ancestor_view<qso_rig>(w);
+	that->cat_data_[that->cat_index_]->auto_connect = value;
+	that->enable_widgets(DAMAGE_AUTOS);
+}
+
+// Connect delay
+void qso_rig::cb_connect_delay(Fl_Widget* w, void* v) {
+	double value;
+	cb_value<Fl_Value_Slider, double>(w, &value);
+	qso_rig* that = ancestor_view<qso_rig>(w);
+	that->cat_data_[that->cat_index_]->connect_delay = value;
+}
+
+// Connect timer delay
+void qso_rig::cb_start_timer(void* v) {
+	// Start connect
+	cb_bn_connect((Fl_Widget*)v, nullptr);
 }
 
 // Connect rig if disconnected and vice-versa

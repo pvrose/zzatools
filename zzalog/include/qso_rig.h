@@ -34,6 +34,7 @@ const string RIG_APP_NAMES[NUMBER_RIG_APPS] = { "FLRig", "WFView" };
 const uchar DAMAGE_STATUS = 1;
 const uchar DAMAGE_VALUES = 2;
 const uchar DAMAGE_ADDONS = 4;
+const uchar DAMAGE_AUTOS = 8;
 const uchar DAMAGE_ALL = 0xFF;
 
 
@@ -84,6 +85,9 @@ protected:
 		bool override_hamlib = false;
 		string app = "";
 		string nickname = "";
+		bool auto_start = false;
+		bool auto_connect = false;
+		double connect_delay = 1.0;
 	};
 
 	enum rig_state_t : uchar {
@@ -143,6 +147,14 @@ protected:
 	static void cb_ch_power(Fl_Widget* w, void* v);
 	// Callback for hamlib override button
 	static void cb_bn_override(Fl_Widget* w, void* v);
+	// Callbach for autostart
+	static void cb_bn_autostart(Fl_Widget* w, void* v);
+	// Callback for auto-connect
+	static void cb_bn_autoconn(Fl_Widget* w, void* v);
+	// Callback for connect delay
+	static void cb_connect_delay(Fl_Widget* w, void* v);
+	// Callback for start-to-connect timer
+	static void cb_start_timer(void* v);
 
 	// Get hamlib data
 	void find_hamlib_data();
@@ -168,6 +180,7 @@ protected:
 	void create_defaults(int X, int Y);
 	void create_accessory(int X, int Y);
 	void create_timeout(int X, int Y);
+	void create_auto(int X, int Y);
 
 	void load_cat_data(cat_data_t* data, Fl_Preferences settings);
 	void save_cat_data(cat_data_t* data, Fl_Preferences settings);
@@ -238,6 +251,12 @@ protected:
 	Fl_Value_Slider* v_smeters_;
 	Fl_Value_Slider* v_to_count_;
 
+	// Auto start and connect settings
+	Fl_Group* auto_tab_;
+	Fl_Check_Button* bn_autostart_;
+	Fl_Check_Button* bn_autoconn_;
+	Fl_Value_Slider* v_connect_delay_;
+
 
 	// Add all ports to port choice
 	bool use_all_ports_;
@@ -264,6 +283,5 @@ protected:
 	map<int, int> rig_choice_pos_;
 	//Display instantaneous values
 	bool instant_meters_;
-
 };
 
