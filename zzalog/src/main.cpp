@@ -74,7 +74,7 @@ using namespace std;
 string COPYRIGHT = "\302\251 Philip Rose GM3ZZA 2018. All rights reserved.\nPrefix data courtesy of clublog.org";
 string PROGRAM_ID = "ZZALOG";
 string PROG_ID = "ZLG";
-string PROGRAM_VERSION = "3.4.102";
+string PROGRAM_VERSION = "3.4.103";
 string VENDOR = "GM3ZZA";
 extern string TIMESTAMP;
 
@@ -1135,6 +1135,11 @@ int main(int argc, char** argv)
 			PROGRAM_ID.c_str(), 
 			PROGRAM_VERSION.c_str(),
 			TIMESTAMP.c_str());
+		curl_version_info_data* data = curl_version_info(CURLVERSION_LAST);
+		printf("With libraries hamlib (%s), FLTK (%d.%d.%d), Curl (%s)\n",
+			rig_version(),
+			FL_MAJOR_VERSION, FL_MINOR_VERSION, FL_PATCH_VERSION,
+			data->version);
 		return 0;
 	}
 	if (HELP) {
