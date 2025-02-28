@@ -249,7 +249,7 @@ search_dialog::search_dialog() :
 	Fl_Choice* ch27 = new Fl_Choice(C222, R22, W222, HTEXT, "Mode");
 	ch27->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
 	// Get the list of modes from the ADIF specification
-	spec_dataset* modes = spec_data_->dataset("Mode");
+	spec_dataset* modes = spec_data_->dataset("Combined");
 	// Start with "Any"
 	ch27->add("Any");
 	if (criteria_->mode == "Any") {
@@ -265,7 +265,7 @@ search_dialog::search_dialog() :
 	}
 	ch27->callback(cb_text<Fl_Choice, string>, (void*)&criteria_->mode);
 	ch27->when(FL_WHEN_RELEASE);
-	ch27->tooltip("Select the mode for matching records");
+	ch27->tooltip("Select the mode for matching records - a mode will match all submodes");
 	// Choice - Mode to limit search to
 	Fl_Choice* ch27a = new Fl_Choice(C223, R22, W223, HTEXT, "My Call");
 	ch27a->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);

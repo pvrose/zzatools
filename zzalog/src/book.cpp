@@ -985,12 +985,12 @@ bool book::refine_match(record* record) {
 	if (criteria_->band != "Any" && criteria_->band != record->item("BAND")) {
 		return false;
 	}
-	// Refine by mode - confirm if the record has that mode (converted to DXCC modes PHONE, CW, DATA)
+	// Refine by mode - confirm if the record has that mode 
 	if (criteria_->mode != "Any" && criteria_->mode != record->item("MODE") &&
 		criteria_->mode != record->item("SUBMODE")) {
 		return false;
 	}
-	// Refine by mode - confirm if the record matches my_call (STATION_CALLSIGN)
+	// Refine by call - confirm if the record matches my_call (STATION_CALLSIGN)
 	if (criteria_->my_call != "Any" && criteria_->my_call != record->item("STATION_CALLSIGN")) {
 		return false;
 	}

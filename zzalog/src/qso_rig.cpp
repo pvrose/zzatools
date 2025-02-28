@@ -66,7 +66,7 @@ qso_rig::qso_rig(int X, int Y, int W, int H, const char* L) :
 	enable_widgets(DAMAGE_ALL);
 
 	if (!rig_ok_) {
-		if (cat_data_[cat_index_]->auto_start) {
+		if (cat_data_.size() && cat_data_[cat_index_]->auto_start) {
 			cb_bn_start(bn_start_, nullptr);
 		}
 	}
@@ -1257,12 +1257,20 @@ void qso_rig::enable_widgets(uchar damage) {
 	}
 
 	if (damage & DAMAGE_AUTOS) {
-		bn_autostart_->value(cat_data_[cat_index_]->auto_start);
-		bn_autoconn_->value(cat_data_[cat_index_]->auto_connect);
-		v_connect_delay_->value(cat_data_[cat_index_]->connect_delay);
-		if (cat_data_[cat_index_]->auto_connect) {
-			v_connect_delay_->activate();
+		if (cat_data_.size()) {
+			bn_autostart_->value(cat_data->auto_start);
+			bn_autostart_->activate();
+			bn_autoconn_->value(cat_data->auto_connect);
+			bn_autoconn_->activate();
+			v_connect_delay_->value(cat_data->connect_delay);
+			if (cat_data->auto_connect) {
+				v_connect_delay_->activate();
+			} else {
+				v_connect_delay_->deactivate();
+			}
 		} else {
+			bn_autostart_->deactivate();
+			bn_autoconn_->deactivate();
 			v_connect_delay_->deactivate();
 		}
 	}
