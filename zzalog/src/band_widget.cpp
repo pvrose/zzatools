@@ -24,7 +24,9 @@ const map<string, Fl_Color> MODE_COLOURS = {
 	{ "Guard", COLOUR_ORANGE },
 	{ "Beacons", FL_RED },
 	{ "FM", FL_CYAN },
-	{ "DV", FL_MAGENTA }
+	{ "DV", FL_MAGENTA },
+	{ "Repeater", COLOUR_APPLE },
+	{ "Satellite", COLOUR_MAUVE }
 };
 const int BAR_WIDTH_F = 10;
 const int BAR_WIDTH_S = 5;
