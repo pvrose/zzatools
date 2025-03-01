@@ -44,6 +44,8 @@ protected:
     enum marker_t : char {
         SUBBAND_UPPER,
         SUBBAND_LOWER,
+        SPOTGROUP_UPPER,
+        SPOTGROUP_LOWER,
         CURRENT,
         SPOT
     };

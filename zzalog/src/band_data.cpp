@@ -95,7 +95,9 @@ band_data::band_entry_t* band_data::get_entry(string line) {
 	vector<string> modes;
 	split_line(words[3], modes, ',');
 	for (auto ix = modes.begin(); ix != modes.end(); ix++) {
-		result->modes.insert(*ix);
+		if (ix->length()) {
+			result->modes.insert(*ix);
+		}
 	}
 	// Fifth is notes
 	result->summary = words[4];

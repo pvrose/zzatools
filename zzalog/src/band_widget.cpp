@@ -16,7 +16,9 @@ using namespace std;
 extern spec_data* spec_data_;
 extern band_data* band_data_;
 extern status* status_;
+extern bool DARK;
 
+// Mode-bar colours
 const map<string, Fl_Color> MODE_COLOURS = {
 	{ "CW", FL_GREEN },
 	{ "Dig", FL_YELLOW },
@@ -26,7 +28,8 @@ const map<string, Fl_Color> MODE_COLOURS = {
 	{ "FM", FL_CYAN },
 	{ "DV", FL_MAGENTA },
 	{ "Repeater", COLOUR_APPLE },
-	{ "Satellite", COLOUR_MAUVE }
+	{ "Satellite", COLOUR_MAUVE },
+	{ "TV", COLOUR_CLARET }
 };
 const int BAR_WIDTH_F = 10;
 const int BAR_WIDTH_S = 5;
@@ -155,6 +158,7 @@ void band_widget::draw_markers() {
 		case SUBBAND_LOWER:
 			fl_color(FL_FOREGROUND_COLOR);
 			draw_line(m.y_scale, m.y_text, FL_DOT);
+			fl_font(0, FL_NORMAL_SIZE);
 			fl_draw(m.text, x_text_, m.y_text + h_offset_);
 			break;
 		case SUBBAND_UPPER:
@@ -164,14 +168,31 @@ void band_widget::draw_markers() {
 		case CURRENT:
 			fl_color(Fl_Widget::selection_color());
 			draw_line(m.y_scale, m.y_text, 0);
+			fl_font(0, FL_NORMAL_SIZE);
 			fl_draw(m.text, x_text_, m.y_text + h_offset_);
 			break;
 		case SPOT:
 			if (!ignore_spots_) {
-				fl_color(FL_FOREGROUND_COLOR);
+				fl_color(DARK ? FL_CYAN : FL_BLUE);
 				draw_line(m.y_scale, m.y_text, 0);
+				fl_font(0, FL_NORMAL_SIZE);
 				fl_draw(m.text, x_text_, m.y_text + h_offset_);
 			}
+			break;
+		case SPOTGROUP_LOWER:
+			if (!ignore_spots_) {
+				fl_color(DARK ? FL_CYAN : FL_BLUE);
+				draw_line(m.y_scale, m.y_text, FL_DOT);
+				fl_font(0, FL_NORMAL_SIZE);
+				fl_draw(m.text, x_text_, m.y_text + h_offset_);
+			}
+			break;
+		case SPOTGROUP_UPPER:
+			if (!ignore_spots_) {
+				fl_color(DARK ? FL_CYAN : FL_BLUE);
+				fl_line(x_scale_, m.y_scale, x_kink1_, m.y_text);
+			}
+			break;
 		}
 	}
 }
@@ -274,9 +295,13 @@ void band_widget::generate_data(double f) {
 }
 
 void band_widget::generate_items() {
+	for (auto it = markers_.begin(); it != markers_.end(); it++) {
+		delete[] it->text;
+	}
 	markers_.clear();
 	mode_bars_.clear();
 	for (auto it = data_.begin(); it != data_.end(); it++) {
+		char* text = new char[128];
 		double l = (*it)->lower / 1000.0;
 		double u = (*it)->upper / 1000.0;
 		for (auto iu = (*it)->modes.begin(); iu != (*it)->modes.end(); iu++) {
@@ -288,19 +313,23 @@ void band_widget::generate_items() {
 		// Now process the data item
 		if (l == u) {
 			// SPOT
-			char* text = new char[128];
 			snprintf(text, 128, FREQ_FORMAT " %s", l, (*it)->summary.c_str());
 			add_marker({ l, SPOT, y_for_f(l), y_for_f(l), text});
 		}
 		else {
-			// SUBABND
-			char* text = new char[128];
-			snprintf(text, 128, FREQ_FORMAT "-" FREQ_FORMAT " [%g] %s", 
-				l, u, (*it)->bandwidth, (*it)->summary.c_str());
-			add_marker({ u, SUBBAND_UPPER, y_for_f(u), y_for_f(u), nullptr });
-			add_marker({ l, SUBBAND_LOWER, y_for_f(l), y_for_f(l), text });
-
-
+			if ((*it)->modes.size()) {
+				// SUBBAND
+				snprintf(text, 128, FREQ_FORMAT "-" FREQ_FORMAT " [%g] %s", 
+					l, u, (*it)->bandwidth, (*it)->summary.c_str());
+				add_marker({ u, SUBBAND_UPPER, y_for_f(u), y_for_f(u), nullptr });
+				add_marker({ l, SUBBAND_LOWER, y_for_f(l), y_for_f(l), text });
+			} else {
+				// SPOTGROUP
+				snprintf(text, 128, FREQ_FORMAT "-" FREQ_FORMAT " %s", 
+					l, u, (*it)->summary.c_str());
+				add_marker({ u, SPOTGROUP_UPPER, y_for_f(u), y_for_f(u), nullptr });
+				add_marker({ l, SPOTGROUP_LOWER, y_for_f(l), y_for_f(l), text });
+			}
 		}
 	}
 	// Add current
@@ -348,8 +377,10 @@ void band_widget::reset_markers() {
 			num_markers++;
 			break;
 		case SUBBAND_UPPER:
+		case SPOTGROUP_UPPER:
 			break;
 		case SPOT:
+		case SPOTGROUP_LOWER:
 			if (!ignore_spots_) num_markers++;
 			break;
 		}
@@ -478,11 +509,13 @@ void band_widget::adjust_markers() {
 bool band_widget::is_text_marker(marker m) {
 	switch(m.type) {
 	case SUBBAND_UPPER:
+	case SPOTGROUP_UPPER:
 		return false;
 	case CURRENT:
 	case SUBBAND_LOWER:
 		return true;
 	case SPOT:
+	case SPOTGROUP_LOWER:
 		return !ignore_spots_;
 	}
 	return false;
