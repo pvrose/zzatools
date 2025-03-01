@@ -15,7 +15,7 @@ Lower	Upper	Bandwidth	Modes	Notes
 3570	3580	0.2	CW,Dig	Narrow band modes
 3580	3590	0.5	CW,Dig	Narrow band modes
 3590	3600	0.5	CW,Dig	Narrow band modes - automatically controlled data stations (unattended)
-3600	3620	2.7	CW,Dig,Phone	All modes - automatically controlled data stations (unattended), (Note 1)
+3600	3620	2.7	CW,Dig,Phone	All modes - automatically controlled data stations (unattended)
 3600	3650	2.7	CW,Dig,Phone	All modes - Phone contest preferred.
 3630				digital voice Centre of Activity
 3650	3700	2.7	CW,Dig,Phone	All modes - Telephony, Telegraphy
@@ -24,7 +24,7 @@ Lower	Upper	Bandwidth	Modes	Notes
 3700	3775	2.7	CW,Dig,Phone	All modes - Phone contest preferred
 3735				Image mode Centre of Activity
 3760				IARU Region 1 Emergency Centre of Activity
-3775	3800	2.7		All modes - Phone contest preferred. Priority for inter-continental telephony (SSB) operation
+3775	3800	2.7	CW,Dig,Phone	All modes - Phone contest preferred. Priority for inter-continental telephony (SSB) operation
 5258.5	5264	5.5	CW,Dig,Phone	All Modes. 
 5262				CW QRP Centre of Activity
 5276	5284	8	CW,Dig,Phone	All modes
@@ -35,16 +35,16 @@ Lower	Upper	Bandwidth	Modes	Notes
 5313	5323	10	CW,Dig,Phone	All modes
 5317		6		AM Spot frequency
 5333	5338	5	CW,Dig,Phone	All modes
-5354	5358	4	CW,Dig,Phone	All modes – within WRC-15 Band
-5362	5374.5	12.5	CW,Dig,Phone	All modes – partly within WRC-15 band, WSPR
+5354	5358	4	CW,Dig,Phone	All modes â€“ within WRC-15 Band
+5362	5374.5	12.5	CW,Dig,Phone	All modes â€“ partly within WRC-15 band, WSPR
 5378	5382	4	CW,Dig,Phone	All modes
 5395	5401.5	6.5	CW,Dig,Phone	All modes
 5403.5	5406.5	3	CW,Dig,Phone	All modes
 7000	7040	0.2	CW	Telegraphy
 7030				QRP Centre of Activity 
-7040	7047	0.5	CW,Dig	Narrow band modes (Note 2)
+7040	7047	0.5	CW,Dig	Narrow band modes
 7047	7050	0.5	CW,Dig	Narrow band modes, automatically controlled data stations (unattended) 
-7050	7053	2.7	CW,Dig,Phone	All modes, automatically controlled data stations (unattended), (Note 1)
+7050	7053	2.7	CW,Dig,Phone	All modes, automatically controlled data stations (unattended)
 7053	7060	2.7	CW,Dig,Phone	All modes, digimodes
 7060	7100	2.7	CW,Dig,Phone	All modes
 7070				digital voice Centre of Activity
@@ -68,7 +68,7 @@ Lower	Upper	Bandwidth	Modes	Notes
 14112	14125	2.7	CW,Phone	All modes (excluding digimodes)
 14125	14300	2.7	CW,Dig,Phone	All modes -       SSB contest preferred segment 
 14130				digital voice Centre of Activity
-14195				±5  Priority for Dxpeditions
+14195				+/-5  Priority for Dxpeditions
 14230				Image Centre of Activity.
 14285				QRP Centre of Activity
 14300	14350	2.7	CW,Dig,Phone	All modes
@@ -123,51 +123,160 @@ Lower	Upper	Bandwidth	Modes	Notes
 29000	29100	6	CW,Dig,Phone	All modes
 29100	29200	6	CW,Dig,Phone	All modes - FM simplex - 10 channels
 29200	29300	6	CW,Dig,Phone	All modes - automatically controlled data stations (unattended) 
-29270				UK Internet voice gateway - unattended
+29270				Internet voice gateway - unattended
 29280				UK Internet voice gateway - unattended
 29290				UK Internet voice gateway - unattended
-29300	29510	6	CW,Dig,Phone	Satellite links
+29300	29510	6	Satellite	Satellite links
 29510	29520		Guard	Guard channel
-29520	29590	6	CW,Dig,Phone	All modes - FM repeater inputs (RH1-RH8)
-29600	29600	6	CW,Dig,Phone	All modes - FM calling channel
-29610	29610	6	CW,Dig,Phone	All modes - FM simplex repeater (parrot) - input and output
-29620	29700	6	CW,Dig,Phone	All modes - FM repeater outputs (RH1-RH8)
+29520	29590	6	FM,Repeater	All modes - FM repeater inputs (RH1-RH8)
+29600	29600	6	FM	All modes - FM calling channel
+29610	29610	6	FM,Repeater	All modes - FM simplex repeater (parrot) - input and output
+29620	29700	6	FM,Repeater	All modes - FM repeater outputs (RH1-RH8)
 50000	50100	0.5	CW	Telegraphy only - beacon project (50000-50030)
+50050				Future International CoA
+50090				Intercontinental DX CoA
 50100	50200	2.7	CW,Phone	SSB/Telegraphy - international
+50110				Intercontinental DX CoA
+50150				International CoA
 50200	50300	2.7	CW,Phone	SSB/Telegraphy - general
-50300	50400	2.7	CW,Dig,Phone	SSB/MGM/Telegraphy
+50285				Crossband CoA
+50300	50400	2.7	CW,Dig	MGM/Narrowband/Telegraphy
+50305				PSK CoA
+50310	50320			EME
+50320	50380			MS
 50400	50500	0	Beacons	Propagation Beacons only
-50500	52000	12.5	CW,Dig,Phone	All modes
+50500	50700	12.5	FM,DV	All modes
+50520				FM/DV Internet Gateway
+50530				FM/DV Internet Gateway
+50540				FM/DV Internet Gateway
+50600	50700			Digital Communications
+50630				DV Calling
+50700	50900	12	FM,DV,Repeater	FM/DV Repeater outputs @ 10 kHz channels
+50900	51200		CW,Dig,Phone,FM,DV	All modes
+51200	51400		FM,DV,Repeater	FM/DV Repeater inputs @ 10 kHz channels
+51400	52000		CW,Dig,Phone,FM,DV	All modes
+51410	51590			FM/DV Simplex
+51510				FM Calling Channel
+51530				GB2RS News Broadcast and Slow Morse
 70000	70090	1	Beacons	Propagation Beacons Only
 70090	70100	1	Beacons	Personal Beacons
-70100	70250	2.7	CW,Dig,Phone	SSB/MGM/Telegraphy
+70100	70250	2.7	CW,Dig,Phone	Narrowband Modes
+70185				Crossband CoA
+70200				CW/SSB CoA
+70250				MS CoA
 70250	70294	12	CW,Dig,Phone	All modes
-70249	70500	12	Dig,Phone	All modes - channelised operation @ 12.5 kHz
+70260				AM/FM Calling Channel
+70270				MGM CoA
+70294	70500	12	Dig,Phone	All modes - channelised operation @ 12.5 kHz - specialised channels
+70312.5				Digital modes
+70325				DX Cluster
+70337.5				Digital Modes
+70350				Internet Voice gateway
+70362.5				Internet Voice gateway
+70387.5				Internet Voice gateway
+70412.5				Internet Voice gateway
+70425				FM Simplex
+70437.5				Digital Modes (special projects)
+70450				FM Calling channel
+70426.5				Digital Modes
+70487.5				Digital Modes
 144000	144025	2.7	CW,Dig,Phone	All modes - incl. Satellite downlinks
 144025	144100	0.5	CW	Telegraphy - incl. EME
-144100	144150	0.5	CW,Dig	Narrow band modes
+144050				Telegraphy CoA
+144100				Random MS Telegraphy
+144100	144150	0.5	CW,Dig	Telegraphy and MGM
 144150	144400	2.7	CW,Dig,Phone	Limited band modse
+144250				GB2RS and Slow Morse
+144300				SSB CoA
+144370				MGM MS Calling
 144400	144490	0	Beacons	Propagation Beacons
 144490	144500	0	Beacons	Personal Beacons
+144491	144493			Weak Signal MGM beacons
 144500	144794	20	CW,Dig,Phone	All modes
+144500				Image Modes CoA
+144600				Data CoA
+144612.5				UK DV Calling
+144750				ATV Callback
 144794	144990	12	Dig	MGM Digital
-144990	145193.5	12	Phone	FM/DV Repeater inputs @ 12.5 kHz channels
-145193.5	145593.5	12	Phone	FM/DV Simplex @ 12.5 kHz channels
-145593.5	145793.5	12	Phone	FM/DV Repeater outputs @ 12.5 kHz channels
-145793.5	145806	12	Phone	FM/DV Space downlink @145800
-145806	146000	12	CW,Dig,Phone	All modes - satellite exclusive
+144800				Unconnected nets: APRS, Uview etc.
+144812.5				DV Internet voice gateway
+144825				DV Internet voice gateway
+144837.5				DV Internet voice gateway
+144850				DV Internet voice gateway
+144862.5				DV Internet voice gateway
+144875	144912.5			Internet gateways
+144925				Digital Usage
+144937.5				Digital Usage
+144950				Digital Usage
+144962.5				FM Internet Voice gateway
+144975				Low power, ad-hoc repeaters
+144987.5				Low power, ad-hoc repeaters
+144990	145193.5	12	FM,DV,Repeater	FM/DV Repeater inputs @ 12.5 kHz channels
+145193.5	145593.5	12	FM,DV	FM/DV Simplex @ 12.5 kHz channels
+145200				FM/DV Space Communications â€“ Earth to Space
+145212.5				FM Internet Voice gateway
+145225				FM Internet Voice gateway
+145237.7				FM Internet Voice gateway
+145250				Slow Morse Transmission
+145262.5				FM Internet Voice gateway
+145287.5				FM Internet Voice gateway
+145312.5				FM Internet Voice gateway
+145337.5				FM Internet Voice gateway
+145500				FM Calling Channel
+145525				Used for GB2RS
+145550				Used for rally/exhibition talk-in
+145575				Low power, ad-hoc repeaters
+145587.5				
+145593.5	145793.5	12	FM,DV,Repeater	FM/DV Repeater outputs @ 12.5 kHz channels
+145793.5	145806	12	FM,DV	FM/DV Space downlink @145800
+145806	146000	12	CW,Dig,FM,DV	All modes - satellite exclusive
 146000	146900	500	Dig	Wideband digital modes (high-speed data or DATV)
+146500				Centre Frequency
 146900	147000	12	Dig	Narrow band digital (incl. DV)
-430000	432000	20	Phone	FM Repeater inputs
-432000	432100	0.5	CW	Telegraphy
-432100	432400	2.7	CW,Phone	SSB/Telegraphy
-432400	432490	0.5		Propagatrion beacons
-432490	432994	25	CW,Dig,Phone	All modes non-channelised
-432994	433394	25	FM,DV	Repeater outputs
-433394	433600	25	FM,DV	FM/DV Simplex
-433600	434000	25	DV	Digital Communications and experiments
-434000	434594	25	FM,DV	FM, DV Internet gateways
-434594	435000	25	FM,DV	Reopeater inputs (UK)
-435000	436000			Satellites
-436000	438000			Satellites and DATV
-438000	440000			All modes
+146937.5				Not available in/near Scotland
+430000	432000	20	FM,DV,Repeater	FM/DV Various
+430012.5	430100			FM Internet Voice gateway
+430125	430137.5			DV 9 MHz split repeater inputs
+430250	430300			DV 9 MHz reverse-split repeater outputs
+430400	430775			DV 9 MHz split repeater inputs
+430787.5				7.6 MHz reverse-split repeater inputs
+430800				7.6 MHz talk-through
+430812.5	430975			7.6 MHz split repeater outputs
+430990	431900			Digital Communications
+431015	431250			DV Internet voice gateway
+432000	432400	2.7	CW,Dig,Phone	Narrowband modes
+432200				CW CoA
+432350				Microwave talk-back
+432400	432490		Beacons	Propagation beacons only
+432490	432994	12	CW,Dig,Phone	All modes non-channelised
+432491	432493			Personal Beacons
+432500				Narrowband SSTV CoA
+432625	432675			Digital Communications
+432775				1.6 MHz Talk-through
+432994	433381	12	FM,Repeater	FM Repeater outputs
+433394	433581	12		FM/DV Simplex
+433500				FM Calling Channel
+433550				Used for rally/exhibition talk-in
+433600	434000	12	CW,Dig,FM,DV	All modes
+433625	433675			Digital Communications
+433800				Alternate APRS
+433800	434250			Digital Communications and Experiments
+434000				Low-power hot-spot
+434000	434594	12	FM,DV	FM/DV 
+433950	434050			Internet Voice gateway
+434375				1.6 MHz Talk-through
+434475	434525			DV Internet voice gateway
+435594	434981	12	FM,DV,Repeater	FM/DV Repeater inputs
+435000	436000		Satellite	Satellites only
+436000	438000		Satellite,TV	Satellites and experimental DATV
+437000				Experimental DATV CoA
+438000	440000		FM,DV,Repeater	All modes
+438000	438375			5 MHz split repeater inputs
+438400				7.6 MHz talk-through
+438412.5	438575			7.6 MHz split repeater inputs
+438612.5				DV Calling
+438800				Low-power hot-spot
+439125	439137.5			9 MHz split repeater outputs
+439600	440000			Digital Communications
+439400	439775			9 MHz split repeater outputs
+439900	439987.5			Digital Communications
