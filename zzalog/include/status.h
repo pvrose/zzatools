@@ -9,6 +9,7 @@
 #include <fstream>
 #include <list>
 #include <vector>
+#include <cstdint>
 
 using namespace std;
 
@@ -67,12 +68,12 @@ using namespace std;
 
 	// A progress stack entry
 	struct progress_item {
-		int max_value;
-		int value;
+		uint64_t max_value;
+		uint64_t value;
 		char* description;
 		char* suffix;
 		bool countdown;
-		int prev_value;
+		uint64_t prev_value;
 	};
 	
 	// This class provides the status bar and manages access to the various status information
