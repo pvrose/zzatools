@@ -199,7 +199,22 @@ void qso_buttons::enable_widgets() {
 			//bn_action_[ix]->color(action.colour);
 			//bn_action_[ix]->labelcolor(fl_contrast(FL_FOREGROUND_COLOR, action.colour));
 			bn_action_[ix]->callback(action.callback, action.userdata);
-			bn_action_[ix]->activate();
+			switch(*bn) {
+				case NAV_FIRST:
+				case NAV_LAST:
+				case NAV_NEXT:
+				case NAV_PREV:
+				{
+					if (qso_data_->can_navigate((navigate_t)(intptr_t)action.userdata)) {
+						bn_action_[ix]->activate();
+					} else {
+						bn_action_[ix]->deactivate();
+					}
+					break;
+				}
+				default:
+					bn_action_[ix]->activate();
+			}
 		}
 	}
 	// Deactivate any remaining buttons

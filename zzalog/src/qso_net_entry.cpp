@@ -262,3 +262,36 @@ void qso_net_entry::navigate(navigate_t target) {
 	qso_entry* qe = (qso_entry*)entries_->value();
 	book_->selection(qe->qso_number());
 }
+
+// Return whetehr can navigate
+bool qso_net_entry::can_navigate(navigate_t target) {
+	int ix = 0;
+	int found = false;
+	Fl_Widget* curr = entries_->value();
+	for (int i = 0; i < entries() && !found; i ++) {
+		if (curr == entries_->child(i)) {
+			found = true;
+			ix = i;
+		}
+	}
+	if (!found) return false;
+	switch(target) {
+		case NV_FIRST:
+		case NV_PREV: {
+			if (ix == 0) {
+				return false;
+			} else {
+				return true;
+			}
+		}
+		case NV_LAST:
+		case NV_NEXT: {
+			if (ix >= entries_->children() - 1) {
+				return false;
+			} else {
+				return true;
+			}
+		}
+		default: return false;
+	}
+}

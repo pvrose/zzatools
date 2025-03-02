@@ -19,6 +19,7 @@ class qso_net_entry;
 class qso_contest;
 class record;
 typedef size_t qso_num_t;
+enum navigate_t : uchar;
 
 
 // Default field sets
@@ -234,6 +235,8 @@ public:
 	qso_contest* contest();
 	// Contest mode is active
 	bool in_contest();
+	// Can we navigate the net
+	bool can_navigate(navigate_t target);
 
 	// Edit - saved logging state
 	logging_state_t edit_return_state_;

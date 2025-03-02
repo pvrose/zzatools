@@ -1888,3 +1888,59 @@ qso_contest* qso_data::contest() {
 bool qso_data::in_contest() {
 	return contest()->contest_active();
 }
+
+// Return whether can navigate
+bool qso_data::can_navigate(navigate_t target) {
+	switch(logging_state_) {
+		case QSO_EDIT:
+		case QSO_VIEW:
+		case QSO_PENDING:
+		case QSO_BROWSE: {
+			switch(target) {
+				case NV_FIRST:
+				case NV_PREV: {
+					if (navigation_book_->selection() == 0) {
+						return false;
+					} else {
+						return true;
+					}
+				}
+				case NV_LAST:
+				case NV_NEXT: {
+					if (navigation_book_->selection() >= navigation_book_->size() - 1) {
+						return false;
+					} else {
+						return true;
+					}
+				}
+				default: return false;
+			}
+		}
+		case QUERY_MATCH: {
+			switch (target) {
+				case NV_FIRST:
+				case NV_PREV: {
+					if (book_->selection() == 0) {
+						return false;
+					} else { 
+						return true;
+					}
+				}
+				case NV_LAST:
+				case NV_NEXT: {
+					if (book_->selection() >= book_->size() - 1) {
+						return false;
+					} else {
+						return true;
+					}
+				}
+				default: return false;
+			}
+		}
+		case NET_EDIT:
+		case NET_STARTED: {
+			return g_net_entry_->can_navigate(target);
+		}
+		default: return false;
+	}
+}

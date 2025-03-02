@@ -62,6 +62,8 @@ public:
 	int entries();
 	// Navigate entry
 	void navigate(navigate_t target);
+	// Ask if can navigate
+	bool can_navigate(navigate_t target);
 
 protected:
 	// The tabbed qso_entry
