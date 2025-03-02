@@ -56,8 +56,17 @@ bool qsl_emailer::generate_email(record* qso) {
 	// Firstly look in record for e-mail address
 	to_address_ = qso_->item("EMAIL");
 	if (to_address_.length() == 0 || to_address_.find('@') == string::npos) {
-		to_address_ = fl_input("Invalid or no e-mail address recorded in log for %s, please enter",
+		const char* temp = fl_input("Invalid or no e-mail address recorded in log for %s, please enter",
 			"", qso_->item("CALL").c_str());
+		if (temp == nullptr) {
+			snprintf(msg, sizeof(msg), "QSL: No e-mail address for %s - not sent",
+				qso->item("CALL").c_str());
+			status_->misc_status(ST_WARNING, msg);
+			return false;
+		} else {
+			to_address_ = temp;
+			qso_->item("EMAIL", to_address_);
+		}
 	}
 	// Set record name to "Op" if it's not in the record
 	if (qso_->item("NAME").length() == 0) {

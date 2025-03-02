@@ -750,7 +750,7 @@ void book::navigate(navigate_t target) {
 		break;
 	case NV_PREV:
 		// Select previous record
-		if (selection() != 0) {
+		if (selection() > 0) {
 			selection(selection() - 1);
 		}
 		break;
@@ -760,7 +760,7 @@ void book::navigate(navigate_t target) {
 		break;
 	case NV_NEXT:
 		// select next record 
-		if (selection() != size() - 1) {
+		if (selection() < size() - 1) {
 			selection(selection() + 1);
 		}
 		break;
