@@ -392,7 +392,7 @@ void qso_qsl_vwr::cb_bn_card_reqd(Fl_Widget* w, void* v) {
 	that->current_qso_->item("QSL_SENT", string(value));
 	switch (*value) {
 	case 'R':
-		that->current_qso_->item("QSL_SENT_VIA", that->current_qso_->item("QSL_RCVD_VIA"));
+		that->current_qso_->item("QSL_SENT_VIA", string("B"));
 		break;
 	}
 	qso_data* data = ancestor_view<qso_data>(that);
