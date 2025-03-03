@@ -959,7 +959,7 @@ void qso_data::action_cancel() {
 		break;
 	}
 	enable_widgets();
-	g_entry_->check_qth_changed();
+	// g_entry_->check_qth_changed();
 	book_->enable_save(true, "Canceling real-time QSO");
 }
 
