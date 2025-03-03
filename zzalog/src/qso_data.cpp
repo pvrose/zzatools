@@ -1015,8 +1015,8 @@ void qso_data::action_deactivate() {
 		while (g_net_entry_->entries()) {
 			g_net_entry_->remove_entry();
 		}
-		// Restore holding entry
-		g_net_entry_->add_entry();
+		//// Restore holding entry
+		//g_net_entry_->add_entry();
 		break;
 	}
 	logging_state_ = QSO_INACTIVE;
