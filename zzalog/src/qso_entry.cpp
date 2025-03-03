@@ -311,24 +311,6 @@ void qso_entry::copy_qso_to_display(int flags) {
 		}
 		// Handle NOTES separately 
 		ip_notes_->value(qso_->item("NOTES", false, true).c_str());
-
-		// If QTH changes tell DXA-IF to update home_location
-		switch (qso_data_->logging_state()) {
-		case qso_data::QSO_EDIT:
-		case qso_data::QSO_VIEW:
-		case qso_data::QSO_INACTIVE:
-		case qso_data::QSO_PENDING:
-		case qso_data::TEST_PENDING:
-		case qso_data::QSO_STARTED:
-		case qso_data::TEST_ACTIVE:
-		case qso_data::QSO_ENTER:
-			check_qth_changed();
-			break;
-		case qso_data::NET_ADDING:
-		case qso_data::NET_EDIT:
-		case qso_data::NET_STARTED:
-			break;
-		}
 	}
 	else {
 		// Clear all fields
@@ -745,7 +727,6 @@ void qso_entry::cb_ip_field(Fl_Widget* w, void* v) {
 				macro_defn entry = { nullptr, "" };
 				spec_data_->add_user_macro(field, value, entry);
 			}
-			that->check_qth_changed();
 		}
 		else if (field == "APP_ZZA_OP") {
 			// Send new value to spec_data to create an empty entry if it's a new one
@@ -753,7 +734,6 @@ void qso_entry::cb_ip_field(Fl_Widget* w, void* v) {
 				macro_defn entry = { nullptr, "" };
 				spec_data_->add_user_macro(field, value, entry);
 			}
-			that->check_qth_changed();
 		}
 		else if (field == "MY_RIG") {
 			// Update the selected rig CAT group
@@ -930,17 +910,6 @@ void qso_entry::set_next_focus() {
 		} else {
 			field_input* w1 = ip_field_[current_ix_++];
 			w1->take_focus();
-		}
-	}
-}
-
-// Check if QTH has changed and action change (redraw DxAtlas
-void qso_entry::check_qth_changed() {
-	if (qso_) {
-		if (qso_->item("MY_GRIDSQUARE", true) != previous_locator_ ||
-			qso_->item("APP_ZZA_QTH") != previous_qth_) {
-			previous_locator_ = qso_->item("MY_GRIDSQUARE", true);
-			previous_qth_ = qso_->item("APP_ZZA_QTH");
 		}
 	}
 }

@@ -134,8 +134,6 @@ public:
 	void set_initial_focus();
 	// Set focus to next input
 	void set_next_focus();
-	// QTH has changed
-	void check_qth_changed();
 
 
 protected:
