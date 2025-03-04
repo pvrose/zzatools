@@ -424,6 +424,14 @@ void qso_details::table_q::cb_table(Fl_Widget* w, void* v) {
 	if (that->callback_context() == CONTEXT_CELL) {
 		int row = that->callback_row();
 		qso_data* data = ancestor_view<qso_data>(that);
+		switch (data->logging_state()) {
+		case qso_data::QSO_BROWSE:
+		case qso_data::QSO_VIEW:
+		{
+			qso_num_t qso_num = that->items_[row];
+			book_->selection(qso_num, HT_SELECTED);
+		}
+		}
 	}
 }
 
