@@ -126,8 +126,7 @@ void band_widget::draw_scale(range_t range) {
 				// Close enough to a major tick - draw the tick
 				fl_line(x_major_, curr_y, x_scale_, curr_y);
 				// Add the freq
-				if (type() == BAND_FULL) snprintf(text, sizeof(text), FREQ_FORMAT, f);
-				else snprintf(text, sizeof(text), format, f);
+				snprintf(text, sizeof(text), format, f);
 				fl_draw(text, x_freq_, curr_y - h_offset_, w_freq_, 2 * h_offset_, FL_ALIGN_RIGHT);
 			}
 			else {
@@ -314,18 +313,35 @@ void band_widget::generate_items() {
 			add_marker({ l, SPOT, y_for_f(l), y_for_f(l), text});
 		}
 		else {
-			if ((*it)->modes.size()) {
-				// SUBBAND
-				snprintf(text, 128, FREQ_FORMAT "-" FREQ_FORMAT " [%g] %s", 
-					l, u, (*it)->bandwidth, (*it)->summary.c_str());
-				add_marker({ u, SUBBAND_UPPER, y_for_f(u), y_for_f(u), nullptr });
-				add_marker({ l, SUBBAND_LOWER, y_for_f(l), y_for_f(l), text });
+			if (type() == BAND_FULL) {
+				if ((*it)->modes.size()) {
+					// SUBBAND
+					snprintf(text, 128, FREQ_FORMAT "-" FREQ_FORMAT " [%g] %s", 
+						l, u, (*it)->bandwidth, (*it)->summary.c_str());
+					add_marker({ u, SUBBAND_UPPER, y_for_f(u), y_for_f(u), nullptr });
+					add_marker({ l, SUBBAND_LOWER, y_for_f(l), y_for_f(l), text });
+				} else {
+					// SPOTGROUP
+					snprintf(text, 128, FREQ_FORMAT "-" FREQ_FORMAT " %s", 
+						l, u, (*it)->summary.c_str());
+					add_marker({ u, SPOTGROUP_UPPER, y_for_f(u), y_for_f(u), nullptr });
+					add_marker({ l, SPOTGROUP_LOWER, y_for_f(l), y_for_f(l), text });
+				}
 			} else {
-				// SPOTGROUP
-				snprintf(text, 128, FREQ_FORMAT "-" FREQ_FORMAT " %s", 
-					l, u, (*it)->summary.c_str());
-				add_marker({ u, SPOTGROUP_UPPER, y_for_f(u), y_for_f(u), nullptr });
-				add_marker({ l, SPOTGROUP_LOWER, y_for_f(l), y_for_f(l), text });
+				if ((*it)->modes.size()) {
+					// SUBBAND
+					snprintf(text, 128, FREQ_FORMAT " [%g] %s", 
+						l, (*it)->bandwidth, (*it)->summary.c_str());
+					add_marker({ u, SUBBAND_UPPER, y_for_f(u), y_for_f(u), nullptr });
+					add_marker({ l, SUBBAND_LOWER, y_for_f(l), y_for_f(l), text });
+				} else {
+					// SPOTGROUP
+					snprintf(text, 128, FREQ_FORMAT " %s", 
+						l, (*it)->summary.c_str());
+					add_marker({ u, SPOTGROUP_UPPER, y_for_f(u), y_for_f(u), nullptr });
+					add_marker({ l, SPOTGROUP_LOWER, y_for_f(l), y_for_f(l), text });
+				}
+
 			}
 		}
 	}
@@ -529,6 +545,9 @@ void band_widget::rescale() {
 	if (type() == BAND_FULL) bar_width_ = BAR_WIDTH_F;
 	else bar_width_ = BAR_WIDTH_S;
 	if (band_.length()) {
+		// Start at the top
+		y_upper_ = y() + GAP;
+		y_lower_ = y() + h() - HTEXT - GAP;
 		// Now what's the approximate scale
 		double bw = band_range_.upper - band_range_.lower;
 		scale_range_.lower = band_range_.lower;
@@ -561,7 +580,7 @@ void band_widget::rescale() {
 				}
 				else if (d < 7.0) {
 					target = 5.0 * poss;
-					major = 25.0 * poss;
+					major = 20.0 * poss;
 				}
 				else {
 					target = 10.0 * poss;
@@ -597,9 +616,6 @@ void band_widget::rescale() {
 		x_kink2_ = x_kink1_ + bar_width_ * 2;
 		x_text_ = x_kink2_ + bar_width_;
 		x_sub_ = x_text_ - (bar_width_ / 2);
-		// Start at the top
-		y_upper_ = y() + GAP;
-		y_lower_ = y() + h() - HTEXT - GAP;
 		// Text offset
 		h_offset_ = FL_NORMAL_SIZE / 2;
 		w_freq_ = wx;
