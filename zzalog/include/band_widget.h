@@ -89,6 +89,8 @@ protected:
     bool is_text_marker(marker m);
     // Generate markers and mode_bars
     void generate_items();
+    // Format for drawing scale label
+    const char* label_format();
 
     // The data
     // The current value

@@ -118,10 +118,7 @@ void band_widget::draw_scale(range_t range) {
 		// Error tolerance in FP calculations
 		double e0 = 0.00001;
 		double e1 = major_tick_ - e0;
-		char format[16];
-		if (major_tick_ < 0.1) strcpy(format, "%.2f");
-		else if (major_tick_ < 1.0) strcpy(format, "%.1f");
-		else strcpy(format, "%.0f");
+		const char* format = label_format();
 		while (f >= scale_range_.lower - e0) {
 			curr_y = y_for_f(f);
 			double df = fmod(f, major_tick_);
@@ -532,30 +529,6 @@ void band_widget::rescale() {
 	if (type() == BAND_FULL) bar_width_ = BAR_WIDTH_F;
 	else bar_width_ = BAR_WIDTH_S;
 	if (band_.length()) {
-		// Get required width of text
-		fl_font(0, FL_NORMAL_SIZE);
-		char text[15];
-		if (type() == BAND_FULL) snprintf(text, sizeof(text), FREQ_FORMAT, value_);
-		else snprintf(text, sizeof(text), "%.2f", value_);
-		int wx = 0, hx = 0;
-		fl_measure(text, wx, hx);
-		// Start at the left
-		x_freq_ = x() + w() / 20;
-		// Add text
-		x_major_ = x_freq_ + wx;
-		x_minor_ = x_major_ + bar_width_;
-		x_scale_ = x_minor_ + bar_width_;
-		// Text - and line connecting it to the scale
-		x_kink1_ = x_scale_ + (bar_width_ * (modes_.size() + 1));
-		x_kink2_ = x_kink1_ + bar_width_ * 2;
-		x_text_ = x_kink2_ + bar_width_;
-		x_sub_ = x_text_ - (bar_width_ / 2);
-		// Start at the top
-		y_upper_ = y() + GAP;
-		y_lower_ = y() + h() - HTEXT - GAP;
-		// Text offset
-		h_offset_ = FL_NORMAL_SIZE / 2;
-		w_freq_ = wx;
 		// Now what's the approximate scale
 		double bw = band_range_.upper - band_range_.lower;
 		scale_range_.lower = band_range_.lower;
@@ -607,10 +580,40 @@ void band_widget::rescale() {
 		px_per_MHz_ = (double)(y_lower_ - y_upper_) / (scale_range_.upper - scale_range_.lower);
 		// Get the possible text positions
 		int num_poss = (y_lower_ - y_upper_) / FL_NORMAL_SIZE;
+		// Now sort out the horizontal positions
+		fl_font(0, FL_NORMAL_SIZE);
+		char text[15];
+		snprintf(text, sizeof(text), label_format(), value_);
+		int wx = 0, hx = 0;
+		fl_measure(text, wx, hx);
+		// Start at the left
+		x_freq_ = x() + w() / 20;
+		// Add text
+		x_major_ = x_freq_ + wx;
+		x_minor_ = x_major_ + bar_width_;
+		x_scale_ = x_minor_ + bar_width_;
+		// Text - and line connecting it to the scale
+		x_kink1_ = x_scale_ + (bar_width_ * (modes_.size() + 1));
+		x_kink2_ = x_kink1_ + bar_width_ * 2;
+		x_text_ = x_kink2_ + bar_width_;
+		x_sub_ = x_text_ - (bar_width_ / 2);
+		// Start at the top
+		y_upper_ = y() + GAP;
+		y_lower_ = y() + h() - HTEXT - GAP;
+		// Text offset
+		h_offset_ = FL_NORMAL_SIZE / 2;
+		w_freq_ = wx;
 	}
 	else {
 		// Start at the top
 		y_upper_ = y() + GAP;
 		y_lower_ = y() + h() - HTEXT - GAP;
 	}
+}
+
+const char* band_widget::label_format() {
+	if (major_tick_ < 0.1) return "%.2f";
+	else if (major_tick_ < 1.0) return "%.1f";
+	else return "%.0f";
+
 }
