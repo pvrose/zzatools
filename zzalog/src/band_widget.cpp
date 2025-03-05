@@ -259,20 +259,23 @@ void band_widget::draw_legend() {
 	fl_font(FL_BOLD, FL_NORMAL_SIZE + 2);
 	int wl = 0, hl = 0;
 	char t[132];
+	fl_color(FL_FOREGROUND_COLOR);
 	if (band_.length() == 0) {
 		snprintf(t, sizeof(t), FREQ_FORMAT ": OUT OF BAND!", value());
-		fl_measure(t, wl, hl);
 		fl_color(FL_RED);
 	}
-	else {
-		fl_measure(band_.c_str(), wl, hl);
-		fl_color(FL_FOREGROUND_COLOR);
+	else if ((type() & BAND_MASK) == BAND_SUMMARY) {
+		strcpy(t, band_.c_str());
 	}
+	else {
+		snprintf(t, sizeof(t), "%s: " FREQ_FORMAT " - " FREQ_FORMAT, band_.c_str(), band_range_.lower, band_range_.upper);
+	}
+	fl_measure(t, wl, hl);
 	int yt = y_lower_ + HTEXT;
 	int xt = x() + w() / 2 - wl / 2;
+	fl_draw(t, xt, yt);
 
 	if (band_.length()) {
-		fl_draw(band_.c_str(), xt, yt);
 		// Draw mode text
 		fl_font(0, FL_NORMAL_SIZE);
 		if ((type() & BAND_MASK) == BAND_FULL) {
@@ -282,8 +285,6 @@ void band_widget::draw_legend() {
 				fl_draw(90.0, ix.first.c_str(), xt, y_lower_ - 5);
 			}
 		}
-	} else {
-		fl_draw(t, xt, yt);
 	}
 }
 
