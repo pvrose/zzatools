@@ -33,6 +33,8 @@ public:
     // Types
     static const uchar BAND_FULL = 0;     // Full display 
     static const uchar BAND_SUMMARY = 1;  // Summary display
+    static const uchar ZOOMABLE = 2;      // Allow zooming 
+    static const uchar BAND_MASK = 1;  
 
 protected:
     // data structures
@@ -44,9 +46,11 @@ protected:
     enum marker_t : char {
         SUBBAND_UPPER,
         SUBBAND_LOWER,
+        SUBBAND_LOCUM,       // If lower is outwith the frequency range
         SPOTGROUP_UPPER,
         SPOTGROUP_LOWER,
         CURRENT,
+        CURRENT_LOCUM,
         SPOT
     };
 
@@ -133,5 +137,11 @@ protected:
     bool ignore_spots_;
     // Already warned that we have removed spots once
     bool size_warned_;
+    // Zoom value - 1.0 default scaling to fit available space
+    double zoom_value_; 
+    // Scroll delta - ie frequency off set of top from default
+    double scroll_offset_;
+    // Label format
+    char label_format_[16];
 };
 
