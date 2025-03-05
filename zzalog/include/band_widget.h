@@ -95,6 +95,8 @@ protected:
     void generate_items();
     // Format for drawing scale label
     const char* label_format();
+    // Debug print
+    void print_markers();
 
     // The data
     // The current value
