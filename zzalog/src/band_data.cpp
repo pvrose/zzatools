@@ -1,5 +1,6 @@
 #include "band_data.h"
 #include "status.h"
+#include "spec_data.h"
 
 #include <fstream>
 
@@ -8,11 +9,13 @@
 
 extern Fl_Preferences* settings_;
 extern status* status_;
+extern spec_data* spec_data_;
 
 // Constructor - calls the Window constructor 
 band_data::band_data()
 {
 	load_data();
+	create_bands();
 }
 
 // Destructor
@@ -76,13 +79,13 @@ band_data::band_entry_t* band_data::get_entry(string line) {
 	band_entry_t* result = new band_entry_t;
 	// Lower->Upper->Bandwidth->Mode->Notes
 	// First entry lower bound or spot entry
-	result->lower = stod(words[0]);
+	result->range.lower = stod(words[0]) / 1000.0;
 	// Second entry upper bound - if no entry then it's a spot frequency entry
 	try {
-		result->upper = stod(words[1]);
+		result->range.upper = stod(words[1]) / 1000.0;
 	}
 	catch (exception&) {
-		result->upper = result->lower;
+		result->range.upper = result->range.lower;
 	}
 	// Third entry is bandwidth
 	try {
@@ -137,7 +140,7 @@ string band_data::get_path() {
 // Get the band plan data entry for the specified frequency
 band_data::band_entry_t* band_data::get_entry(double frequency) {
 	for (unsigned int ix = 0; ix < entries_.size(); ix++) {
-		if (entries_[ix]->lower <= frequency && entries_[ix]->upper >= frequency) {
+		if (entries_[ix]->range.lower <= frequency && entries_[ix]->range.upper >= frequency) {
 			return entries_[ix];
 		}
 	}
@@ -145,12 +148,12 @@ band_data::band_entry_t* band_data::get_entry(double frequency) {
 }
 
 // Get the band plan data entries for the frequency range
-set<band_data::band_entry_t*> band_data::get_entries(double lower, double upper) {
+set<band_data::band_entry_t*> band_data::get_entries(range_t range) {
 	set<band_entry_t*> result;
 	for (unsigned int ix = 0; ix < entries_.size(); ix++) {
 		// If either the lower bound of the entry or the upper bound of the entry is within bounds
-		if (entries_[ix]->lower >= lower && entries_[ix]->lower <= upper ||
-			entries_[ix]->upper >= lower && entries_[ix]->upper <= upper) {
+		if (entries_[ix]->range.lower >= range.lower && entries_[ix]->range.lower <= range.upper ||
+			entries_[ix]->range.upper >= range.lower && entries_[ix]->range.upper <= range.upper) {
 			result.insert(entries_[ix]);
 		}
 	}
@@ -164,5 +167,26 @@ bool band_data::in_band(double frequency) {
 	}
 	else {
 		return false;
+	}
+}
+
+// Return the band list
+map<string, range_t>& band_data::bands() {
+	return bands_;
+}
+
+// Generate the band list
+void band_data::create_bands() {
+	for (auto it = entries_.begin(); it != entries_.end(); it++) {
+		string band = spec_data_->band_for_freq((*it)->range.lower);
+		if (bands_.find(band) == bands_.end()) {
+			// New band
+			bands_[band] = { (*it)->range.lower, (*it)->range.upper };
+		}
+		else {
+			range_t& band_r = bands_[band];
+			band_r.lower = min(band_r.lower, (*it)->range.lower);
+			band_r.upper = max(band_r.upper, (*it)->range.upper);
+		}
 	}
 }

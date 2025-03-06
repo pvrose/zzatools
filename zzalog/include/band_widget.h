@@ -37,11 +37,6 @@ public:
     static const uchar BAND_MASK = 1;  
 
 protected:
-    // data structures
-    struct range_t {
-        double lower;
-        double upper;
-    };                   // Frqeuency range
   
     enum marker_t : char {
         SUBBAND_UPPER,
@@ -77,6 +72,8 @@ protected:
     void draw_modebars();
     // Draw a single line
     void draw_line(int yl, int yr, int style);
+    // Draw bands
+    void draw_bands();
     // Generate data for band associated with frequency
     void generate_data(double f);
     // Rescale drawing

@@ -70,6 +70,7 @@ void band_widget::draw() {
 	fl_push_clip(x(), y(), w(), h());
 	// Draw the valrious items
 	if (band_.length()) {
+		if ((type() & BAND_MASK) == BAND_FULL) draw_bands();
 		draw_scale(band_range_);
 		draw_modebars();
 		draw_markers();
@@ -300,19 +301,55 @@ void band_widget::draw_legend() {
 	}
 }
 
+// Draw a background for the visible bands
+void band_widget::draw_bands() {
+	map<string, range_t>& bands = band_data_->bands();
+	int prev_y = y();
+	Fl_Color band_colour = fl_color_average(FL_BACKGROUND_COLOR, FL_BACKGROUND2_COLOR, 0.50F);
+	for (auto it = bands.begin(); it != bands.end(); it++) {
+		int yl;
+		int yu;
+		bool draw_it = false;
+		if (it->second.lower >= scale_range_.lower && it->second.upper <= scale_range_.upper) {
+			yl = y_for_f(it->second.lower);
+			yu = y_for_f(it->second.upper);
+			draw_it = true;
+		}
+		else if (it->second.lower >= scale_range_.lower && it->second.lower <= scale_range_.upper) {
+			yl = y_for_f(it->second.lower);
+			yu = y_for_f(scale_range_.upper);
+			draw_it = true;
+		}
+		else if (it->second.upper <= scale_range_.upper && it->second.upper >= scale_range_.lower) {
+			yl = y_for_f(scale_range_.lower);
+			yu = y_for_f(it->second.upper);
+			draw_it = true;
+		}
+		if (draw_it) {
+			fl_rectf(x(), yu, w(), yl - yu, band_colour);
+			fl_color(FL_FOREGROUND_COLOR);
+			// Add the band text if there is room
+			if (yu >= prev_y + h_offset_ * 2) {
+				fl_draw(it->first.c_str(), x(), yu, w() - GAP, 2 * h_offset_, FL_ALIGN_RIGHT);
+				prev_y = yu;
+			}
+		}
+	}
+}
+
 // Generate data for band associated with frequency
 void band_widget::generate_data(double f) {
 	// Get the upper an lower bounds for the band
 	band_ = spec_data_->band_for_freq(f);
 	spec_data_->freq_for_band(band_, band_range_.lower, band_range_.upper);
-	data_ = band_data_->get_entries(band_range_.lower * 1000.0, band_range_.upper * 1000.0);
+	data_ = band_data_->get_entries(band_range_);
 	modes_.clear();
 	// Yes I mean these, finding the actual lower and upper band limits from the plan
 	double lower = band_range_.upper;
 	double upper = band_range_.lower;
 	for (auto it = data_.begin(); it != data_.end(); it++) {
-		double l = (*it)->lower / 1000.0;
-		double u = (*it)->upper / 1000.0;
+		double l = (*it)->range.lower;
+		double u = (*it)->range.upper;
 		if (l < band_range_.lower || u > band_range_.upper) {
 			char msg[128];
 			snprintf(msg, sizeof(msg), "BAND: Entry (%g, %g) outwith ADIF band (%g, %g)",
@@ -343,8 +380,8 @@ void band_widget::generate_items() {
 	mode_bars_.clear();
 	for (auto it = data_.begin(); it != data_.end(); it++) {
 		char* text = new char[128];
-		double l = (*it)->lower / 1000.0;
-		double u = (*it)->upper / 1000.0;
+		double l = (*it)->range.lower;
+		double u = (*it)->range.upper;
 		double ll = max(l, scale_range_.lower);
 		double lu = min(u, scale_range_.upper);
 		bool include;
