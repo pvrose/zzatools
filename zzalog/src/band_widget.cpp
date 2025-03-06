@@ -102,7 +102,10 @@ int band_widget::handle(int event) {
 			double dx = Fl::event_dx();
 			// Adjust zoom by horizontal wheel or shift+single wheel
 			// each click adjust zoomm by 2^0.1. (10 clicks doubles or halves the scroll)
-			zoom_value_ *= pow(2.0, (dx * WHEEL_ADJUST));
+			// Don't allow zoom out with the range 10 GHz to 1 Hz per oixel
+			if (dx < 0 && px_per_MHz_ > 1.0e-4 || dx > 0 && px_per_MHz_ < 1e6) {
+				zoom_value_ *= pow(2.0, (dx * WHEEL_ADJUST));
+			}
 			// Adjust scroll offset. One minor tick per click.
 			scroll_offset_ += minor_tick_ * dy;
 			redraw();
@@ -138,9 +141,11 @@ void band_widget::draw_scale(range_t range) {
 		char text[15];
 		double f = scale_range_.upper;
 		// Error tolerance in FP calculations
-		double e0 = 0.00001;
+		double e0 = 0.5 / px_per_MHz_;
 		double e1 = major_tick_ - e0;
 		const char* format = label_format();
+		int num_major = 0;
+		double last_major;
 		while (f >= scale_range_.lower - e0) {
 			curr_y = y_for_f(f);
 			double df = fmod(f, major_tick_);
@@ -150,6 +155,8 @@ void band_widget::draw_scale(range_t range) {
 				// Add the freq
 				snprintf(text, sizeof(text), format, f);
 				fl_draw(text, x_freq_, curr_y - h_offset_, w_freq_, 2 * h_offset_, FL_ALIGN_RIGHT);
+				num_major++;
+				last_major = f;
 			}
 			else {
 				// draw a minor tick only
@@ -157,6 +164,11 @@ void band_widget::draw_scale(range_t range) {
 			}
 			f -= minor_tick_;
 		}
+		// Find the space between the middle two (or below the middle 1)
+		f = last_major + (num_major / 2) * major_tick_;
+		f -= (major_tick_ / 2.);
+		curr_y = y_for_f(f);
+		fl_draw("MHz", x_freq_, curr_y - h_offset_, w_freq_, 2 * h_offset_, FL_ALIGN_RIGHT);
 	}
 	else {
 		fl_font(FL_BOLD, FL_NORMAL_SIZE * 2);
@@ -268,7 +280,7 @@ void band_widget::draw_legend() {
 		strcpy(t, band_.c_str());
 	}
 	else {
-		snprintf(t, sizeof(t), "%s: " FREQ_FORMAT " - " FREQ_FORMAT, band_.c_str(), band_range_.lower, band_range_.upper);
+		snprintf(t, sizeof(t), "%s: %g MHz - %g MHz", band_.c_str(), band_range_.lower, band_range_.upper);
 	}
 	fl_measure(t, wl, hl);
 	int yt = y_lower_ + HTEXT;
@@ -634,51 +646,34 @@ void band_widget::rescale() {
 		double median = (band_range_.upper + band_range_.lower) * 0.5 + scroll_offset_;
 		scale_range_.lower = median - (bw * 0.5 * zoom_value_);
 		scale_range_.upper = median + (bw * 0.5 * zoom_value_);
+		if (scale_range_.lower < 0) {
+			scale_range_.upper -= scale_range_.lower;
+			scale_range_.lower = 0.0;
+		}
 		px_per_MHz_ = (double)(y_lower_ - y_upper_) / (scale_range_.upper - scale_range_.lower);
 		// Now work out major and minor ticks - get minor tick about 10 pixels
 		double target = 10.0 / px_per_MHz_;
 		double major;
-		double poss = 0.0001;
-		bool found = false;
-		while (!found && poss < 10000.0) {
-			if (target >= poss && target < (poss * 10)) {
-				found = true;
-				double d = target / poss;
-				if (d < 1.15) {
-					target = 1.0 * poss;
-					major = 5.0 * poss;
-				}
-				else if (d < 1.6) {
-					target = 1.25 * poss;
-					major = 5.0 * poss;
-				}
-				else if (d < 2.2) {
-					target = 2.0 * poss;
-					major = 10.0 * poss;
-				}
-				else if (d < 3.5) {
-					target = 2.5 * poss;
-					major = 10.0 * poss;
-				}
-				else if (d < 7.0) {
-					target = 5.0 * poss;
-					major = 20.0 * poss;
-				}
-				else {
-					target = 10.0 * poss;
-					major = 50.0 * poss;
-				}
-			}
-			poss *= 10.0;
+		double l10_target = log10(target);
+		double exponent = floor(l10_target);
+		double power10 = pow(10.0, exponent);
+		double mantissa = target / power10;
+		if (mantissa < 1.15) {
+			minor_tick_ = power10;
+			major_tick_ = 5.0 * power10;
+		} else if (mantissa < 1.6) {
+			minor_tick_ = 1.25 * power10;
+			major_tick_ = 5.0 * power10;
+		} else if (mantissa < 2.2) {
+			minor_tick_ = 2.0 * power10;
+			major_tick_ = 10.0 * power10;
+		} else if (mantissa < 3.5) {
+			minor_tick_ = 2.5 * power10;
+			major_tick_ = 10.0 * power10;
+		} else if (mantissa < 7.0) {
+			minor_tick_ = 5.0 * power10;
+			major_tick_ = 20.0 * power10;
 		}
-		if (!found) {
-			char msg[128];
-			snprintf(msg, sizeof(msg), "BAND: Scaling abandoned at %g MHz minor tick",
-				poss);
-			status_->misc_status(ST_WARNING, msg);
-		}
-		minor_tick_ = target;
-		major_tick_ = major;
 		// Now get to the next tick position above it
 		scale_range_.upper = ceil(scale_range_.upper / minor_tick_) * minor_tick_;
 		// And do the similar at the lower end of the scale
@@ -690,7 +685,7 @@ void band_widget::rescale() {
 		// Now sort out the horizontal positions
 		fl_font(0, FL_NORMAL_SIZE);
 		char text[15];
-		snprintf(text, sizeof(text), label_format(), value_);
+		snprintf(text, sizeof(text), label_format(), scale_range_.upper);
 		int wx = 0, hx = 0;
 		fl_measure(text, wx, hx);
 		// Start at the left
