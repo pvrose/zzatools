@@ -45,7 +45,7 @@ band_widget::band_widget(int X, int Y, int W, int H, const char* L) :
 	value_ = nan("");
 	Fl_Widget::color(FL_FOREGROUND_COLOR, FL_DARK_GREEN);
 	band_ = "";
-	band_range_ = { nan(""), nan("") };
+	band_range_ = { 0.0, 29.7 };
 	ignore_spots_ = false;
 	size_warned_ = false;
 	zoom_value_ = 1.0;
@@ -347,6 +347,7 @@ void band_widget::draw_bands() {
 void band_widget::generate_data(double f) {
 	// Get the upper an lower bounds for the band
 	band_ = spec_data_->band_for_freq(f);
+	range_t save_range = band_range_;
 	spec_data_->freq_for_band(band_, band_range_.lower, band_range_.upper);
 	data_ = band_data_->get_entries(band_range_);
 	modes_.clear();
@@ -377,9 +378,8 @@ void band_widget::generate_data(double f) {
 		band_range_.upper = upper;
 	}
 	else {
-		// For full display - no bands
-		band_range_.lower = 0.0;
-		band_range_.upper = 29.7;
+		// restore previous band range
+		band_range_ = save_range;
 	}
 }
 
