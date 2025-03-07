@@ -1186,7 +1186,7 @@ void qso_rig::enable_widgets(uchar damage) {
 		int freq_kHz = (int)(freq * 1000) % 1000;
 		int freq_MHz = (int)freq;
 		if (rig_state_ == OPEN) {
-			band_data::band_entry_t* entry = band_data_->get_entry(freq * 1000);
+			band_data::band_entry_t* entry = band_data_->get_entry(freq);
 			if (entry) {
 				char l[50];
 				strcpy(l, spec_data_->band_for_freq(freq).c_str());

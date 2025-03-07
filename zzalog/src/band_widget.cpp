@@ -2,6 +2,7 @@
 
 #include "spec_data.h"
 #include "band_data.h"
+#include "band.h"
 #include "status.h"
 #include "drawing.h"
 
@@ -303,8 +304,9 @@ void band_widget::draw_legend() {
 
 // Draw a background for the visible bands
 void band_widget::draw_bands() {
-	map<string, range_t>& bands = band_data_->bands();
-	int prev_y = y();
+	band_map<range_t>& bands = band_data_->bands();
+	int prev_y = y() + h();
+	string skipped_band = "";
 	Fl_Color band_colour = fl_color_average(FL_BACKGROUND_COLOR, FL_BACKGROUND2_COLOR, 0.50F);
 	for (auto it = bands.begin(); it != bands.end(); it++) {
 		int yl;
@@ -325,13 +327,29 @@ void band_widget::draw_bands() {
 			yu = y_for_f(it->second.upper);
 			draw_it = true;
 		}
+		else if (it->second.lower <= scale_range_.lower && it->second.upper >= scale_range_.upper) {
+			yl = y_for_f(scale_range_.lower);
+			yu = y_for_f(scale_range_.upper);
+			draw_it = true;
+		}
 		if (draw_it) {
+			// Make the bar at least 1 pixel wide
+			if (yl == yu) yl++;
 			fl_rectf(x(), yu, w(), yl - yu, band_colour);
 			fl_color(FL_FOREGROUND_COLOR);
 			// Add the band text if there is room
-			if (yu >= prev_y + h_offset_ * 2) {
-				fl_draw(it->first.c_str(), x(), yu, w() - GAP, 2 * h_offset_, FL_ALIGN_RIGHT);
+			if (yu <= prev_y - FL_NORMAL_SIZE) {
+				char text[32];
+				if (skipped_band.length()) {
+					snprintf(text, sizeof(text),"%s-%s", skipped_band.c_str(), it->first.c_str());
+				} else {
+					strcpy(text, it->first.c_str());
+				}
+				fl_draw(text, x(), yu, w() - GAP, 2 * h_offset_, FL_ALIGN_RIGHT);
 				prev_y = yu;
+				skipped_band = "";
+			} else if (skipped_band.length() == 0) {
+				skipped_band = it->first;
 			}
 		}
 	}

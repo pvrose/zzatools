@@ -1,5 +1,7 @@
 #pragma once
 
+#include "band.h"
+
 #include <string>
 #include <vector>
 #include <set>
@@ -43,7 +45,7 @@ public:
 	// Get the set of entries for the frequency range
 	set<band_entry_t*> get_entries(range_t range);
 	// Get the bands data
-	map<string, range_t>& bands();
+	band_map<range_t>& bands();
 
 protected:
 	// Read the data
@@ -57,7 +59,7 @@ protected:
 	// The band entries
 	vector<band_entry_t*> entries_;
 	// Full bands
-	map<string, range_t> bands_;
+	band_map<range_t> bands_;
 
 };
 

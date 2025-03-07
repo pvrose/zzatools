@@ -171,7 +171,7 @@ bool band_data::in_band(double frequency) {
 }
 
 // Return the band list
-map<string, range_t>& band_data::bands() {
+band_map<range_t>& band_data::bands() {
 	return bands_;
 }
 
