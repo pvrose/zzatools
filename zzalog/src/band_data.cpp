@@ -148,14 +148,10 @@ band_data::band_entry_t* band_data::get_entry(double frequency) {
 }
 
 // Get the band plan data entries for the frequency range
-set<band_data::band_entry_t*> band_data::get_entries(range_t range) {
+set<band_data::band_entry_t*> band_data::get_entries() {
 	set<band_entry_t*> result;
 	for (unsigned int ix = 0; ix < entries_.size(); ix++) {
-		// If either the lower bound of the entry or the upper bound of the entry is within bounds
-		if (entries_[ix]->range.lower >= range.lower && entries_[ix]->range.lower <= range.upper ||
-			entries_[ix]->range.upper >= range.lower && entries_[ix]->range.upper <= range.upper) {
-			result.insert(entries_[ix]);
-		}
+		result.insert(entries_[ix]);
 	}
 	return result;
 }

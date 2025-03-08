@@ -30,7 +30,8 @@ const map<string, Fl_Color> MODE_COLOURS = {
 	{ "DV", FL_MAGENTA },
 	{ "Repeater", COLOUR_APPLE },
 	{ "Satellite", COLOUR_MAUVE },
-	{ "TV", COLOUR_CLARET }
+	{ "TV", COLOUR_CLARET },
+	{ "All", FL_BLACK }
 };
 const int BAR_WIDTH_F = 10;
 const int BAR_WIDTH_S = 5;
@@ -41,16 +42,16 @@ const double WHEEL_ADJUST = -0.1;
 
 band_widget::band_widget(int X, int Y, int W, int H, const char* L) :
 	Fl_Widget(X, Y, W, H, L) {
-	Fl_Widget::type(BAND_FULL);
-	value_ = nan("");
+	type(BAND_FULL);
+	value_ = 0.0;
 	Fl_Widget::color(FL_FOREGROUND_COLOR, FL_DARK_GREEN);
 	band_ = "";
-	band_range_ = { 0.0, 29.7 };
-	ignore_spots_ = false;
-	size_warned_ = false;
-	zoom_value_ = 1.0;
-	scroll_offset_ = 0.0;
-	redraw();
+	bandwidth_ = 0.5;
+	process_data();
+	default_mode();
+	set_range();
+	set_verticals();
+	set_horizontals();
 }
 
 band_widget::~band_widget() {
@@ -58,10 +59,13 @@ band_widget::~band_widget() {
 }
 
 void band_widget::draw() {
-	// Rescale as w and h may have changed
-	rescale();
+	// Restore defaults
+	default_mode();
+	// Rescale vertically as this determines the number of items we can fit
+	set_verticals();
+	// generate items as this determines the number of mode bars we need
 	generate_items();
-	reset_markers();
+	set_horizontals();
 	adjust_markers();
 	// Wipe the background clean
 	fl_color(FL_BACKGROUND_COLOR);
@@ -71,10 +75,10 @@ void band_widget::draw() {
 	// Now restrict drawing inside the box
 	fl_push_clip(x(), y(), w(), h());
 	// Draw the valrious items
-	if ((type() & BAND_MASK) == BAND_FULL) draw_bands();
-	draw_scale(band_range_);
-	draw_modebars();
+	draw_bands();
+	draw_scale();
 	draw_markers();
+	draw_modebars();
 	draw_legend();
 	fl_pop_clip();
 }
@@ -89,8 +93,7 @@ int band_widget::handle(int event) {
 			return true;
 		}
 		case FL_MIDDLE_MOUSE:
-			zoom_value_ = 1.0;	
-			scroll_offset_ = 0.0;
+			set_range(true);
 			redraw();
 			return true;
 		}
@@ -98,17 +101,17 @@ int band_widget::handle(int event) {
 	}
 	case FL_MOUSEWHEEL: {
 		// Adjust zoom value and scroll offset
-		if ((type() & ZOOMABLE) == ZOOMABLE) {
+		if (zoomable_) {
 			double dy = Fl::event_dy();
 			double dx = Fl::event_dx();
 			// Adjust zoom by horizontal wheel or shift+single wheel
 			// each click adjust zoomm by 2^0.1. (10 clicks doubles or halves the scroll)
 			// Don't allow zoom out with the range 10 GHz to 1 Hz per oixel
 			if (dx < 0 && px_per_MHz_ > 1.0e-4 || dx > 0 && px_per_MHz_ < 1e6) {
-				zoom_value_ *= pow(2.0, (dx * WHEEL_ADJUST));
+				bandwidth_ *= pow(2.0, (dx * WHEEL_ADJUST));
 			}
 			// Adjust scroll offset. One minor tick per click.
-			scroll_offset_ += minor_tick_ * dy;
+			median_ += minor_tick_ * dy;
 			redraw();
 			return true;
 		}
@@ -122,7 +125,8 @@ void band_widget::value(double f) {
 	// Only redraw if value changes
 	if (f != value_) {
 		value_ = f;
-		generate_data(value_);
+		set_range();
+		set_verticals();
 		redraw();
 	}
 }
@@ -131,8 +135,25 @@ double band_widget::value() {
 	return value_;
 }
 
+void band_widget::set_range(bool restore_default) {
+	string prev_band = band_;
+	band_ = spec_data_->band_for_freq(value_);
+	if (band_.length()) {
+		band_limits_ = band_data_->bands().at(band_);
+		if (auto_bw_ || prev_band != band_ || restore_default) {
+			scale_range_ = band_limits_;
+			bandwidth_ = band_limits_.upper - band_limits_.lower;
+			median_ = band_limits_.lower + (bandwidth_ * 0.5);
+		} else {
+			median_ = value_;
+		}
+	} else { 
+		median_ = value_;
+	}
+}
+
 // Draw the scale (from lower to upper +/- a bit)
-void band_widget::draw_scale(range_t range) {
+void band_widget::draw_scale() {
 	// Draw the axis
 	fl_font(0, FL_NORMAL_SIZE);
 	fl_color(FL_FOREGROUND_COLOR);
@@ -177,19 +198,25 @@ void band_widget::draw_markers() {
 		marker& m = markers_[ix];
 		switch (m.type) {
 		case SUBBAND_LOWER:
-			fl_color(FL_FOREGROUND_COLOR);
-			draw_line(m.y_scale, m.y_text, FL_DOT);
-			fl_font(0, FL_NORMAL_SIZE);
-			fl_draw(m.text, x_text_, m.y_text + h_offset_);
+			if (display_subbands_) {
+				fl_color(FL_FOREGROUND_COLOR);
+				draw_line(m.y_scale, m.y_text, FL_DOT);
+				fl_font(0, FL_NORMAL_SIZE);
+				fl_draw(m.text, x_text_, m.y_text + h_offset_);
+			}
 			break;
 		case SUBBAND_LOCUM:
-			fl_color(FL_FOREGROUND_COLOR);
-			fl_font(0, FL_NORMAL_SIZE);
-			fl_draw(m.text, x_text_, m.y_text + h_offset_);
+			if (display_subbands_) {
+				fl_color(FL_FOREGROUND_COLOR);
+				fl_font(0, FL_NORMAL_SIZE);
+				fl_draw(m.text, x_text_, m.y_text + h_offset_);
+			}
 			break;
 		case SUBBAND_UPPER:
+			if (display_subbands_) {
 			fl_color(FL_FOREGROUND_COLOR);
 			fl_line(x_scale_, m.y_scale, x_kink1_, m.y_text);
+			}
 			break;
 		case CURRENT:
 			fl_color(Fl_Widget::selection_color());
@@ -203,7 +230,7 @@ void band_widget::draw_markers() {
 			fl_draw(m.text, x_text_, m.y_text + h_offset_);
 			break;
 		case SPOT:
-			if (!ignore_spots_) {
+			if (display_spots_) {
 				fl_color(DARK ? FL_CYAN : FL_BLUE);
 				draw_line(m.y_scale, m.y_text, 0);
 				fl_font(0, FL_NORMAL_SIZE);
@@ -211,7 +238,7 @@ void band_widget::draw_markers() {
 			}
 			break;
 		case SPOTGROUP_LOWER:
-			if (!ignore_spots_) {
+			if (display_spots_) {
 				fl_color(DARK ? FL_CYAN : FL_BLUE);
 				draw_line(m.y_scale, m.y_text, FL_DOT);
 				fl_font(0, FL_NORMAL_SIZE);
@@ -219,7 +246,7 @@ void band_widget::draw_markers() {
 			}
 			break;
 		case SPOTGROUP_UPPER:
-			if (!ignore_spots_) {
+			if (display_spots_) {
 				fl_color(DARK ? FL_CYAN : FL_BLUE);
 				fl_line(x_scale_, m.y_scale, x_kink1_, m.y_text);
 			}
@@ -250,8 +277,8 @@ void band_widget::draw_modebars() {
 		mode_bar& m = mode_bars_[ix];
 		int yu = y_for_f(m.range.upper);
 		int yl = y_for_f(m.range.lower);
-		int bar_num = modes_.at(m.mode);
-		int xl = x_scale_ + (bar_num * bar_width_);
+		int bar_num = used_modes_.at(m.mode);
+		int xl = x_scale_ + 1 + (bar_num * bar_width_);
 		fl_color(MODE_COLOURS.at(m.mode));
 		fl_rectf(xl, yu, bar_width_, (yl - yu));
 	}
@@ -267,26 +294,25 @@ void band_widget::draw_legend() {
 		snprintf(t, sizeof(t), FREQ_FORMAT ": OUT OF BAND!", value());
 		fl_color(FL_RED);
 	}
-	else if ((type() & BAND_MASK) == BAND_SUMMARY) {
+	else if (!verbose_) {
 		strcpy(t, band_.c_str());
 	}
 	else {
-		snprintf(t, sizeof(t), "%s: %g MHz - %g MHz", band_.c_str(), band_range_.lower, band_range_.upper);
+		snprintf(t, sizeof(t), "%s: %g MHz - %g MHz", 
+			band_.c_str(), band_limits_.lower, band_limits_.upper);
 	}
 	fl_measure(t, wl, hl);
 	int yt = y_lower_ + HTEXT;
 	int xt = x() + w() / 2 - wl / 2;
 	fl_draw(t, xt, yt);
 
-	if (band_.length()) {
-		// Draw mode text
-		fl_font(0, FL_NORMAL_SIZE);
-		if ((type() & BAND_MASK) == BAND_FULL) {
-			for (auto const& ix : modes_) {
-				int xt = x_scale_ + ix.second * bar_width_ + bar_width_ - 1;
-				fl_color(FL_FOREGROUND_COLOR);
-				fl_draw(90.0, ix.first.c_str(), xt, y_lower_ - 5);
-			}
+	// Draw mode text
+	fl_font(0, FL_NORMAL_SIZE);
+	if (verbose_) {
+		for (auto const& ix : used_modes_) {
+			int xt = x_scale_ + ix.second * bar_width_ + bar_width_ - 1;
+			fl_color(FL_FOREGROUND_COLOR);
+			fl_draw(90.0, ix.first.c_str(), xt, y_lower_ - 5);
 		}
 	}
 }
@@ -324,7 +350,7 @@ void band_widget::draw_bands() {
 		if (draw_it) {
 			// Make the bar at least 1 pixel wide
 			if (yl == yu) yl++;
-			fl_rectf(x(), yu, w(), yl - yu, band_colour);
+			fl_rectf(x() + 1, yu, w() - 2, yl - yu, band_colour);
 			fl_color(FL_FOREGROUND_COLOR);
 			// Add the band text if there is room
 			int yt = (yl - yu < FL_NORMAL_SIZE) ? (yu + yl) / 2 - h_offset_ : yu;
@@ -338,31 +364,19 @@ void band_widget::draw_bands() {
 		}
 	}
 	// Now draw the labels
-	for (auto it = band_labels.begin(); it != band_labels.end(); it++) {
-		fl_draw(it->second.c_str(), x(), it->first, w() - GAP, 2 * h_offset_, FL_ALIGN_RIGHT);
+	if (display_band_label_) {
+		for (auto it = band_labels.begin(); it != band_labels.end(); it++) {
+			fl_draw(it->second.c_str(), x(), it->first, w() - GAP, 2 * h_offset_, FL_ALIGN_RIGHT);
+		}
 	}
 }
 
 // Generate data for band associated with frequency
-void band_widget::generate_data(double f) {
+void band_widget::process_data() {
 	// Get the upper an lower bounds for the band
-	band_ = spec_data_->band_for_freq(f);
-	range_t save_range = band_range_;
-	spec_data_->freq_for_band(band_, band_range_.lower, band_range_.upper);
-	data_ = band_data_->get_entries(band_range_);
+	data_ = band_data_->get_entries();
 	modes_.clear();
-	// Yes I mean these, finding the actual lower and upper band limits from the plan
-	double lower = band_range_.upper;
-	double upper = band_range_.lower;
 	for (auto it = data_.begin(); it != data_.end(); it++) {
-		double l = (*it)->range.lower;
-		double u = (*it)->range.upper;
-		if (l < band_range_.lower || u > band_range_.upper) {
-			char msg[128];
-			snprintf(msg, sizeof(msg), "BAND: Entry (%g, %g) outwith ADIF band (%g, %g)",
-				l, u, band_range_.lower, band_range_.upper);
-			status_->misc_status(ST_WARNING, msg);
-		}
 		// Merge available modes 
 		for (auto iu = (*it)->modes.begin(); iu != (*it)->modes.end(); iu++) {
 			// Add the mode bars
@@ -370,16 +384,6 @@ void band_widget::generate_data(double f) {
 				modes_[(*iu)] = modes_.size();
 			}
 		}
-		lower = min(l, lower);
-		upper = max(u, upper);
-	}
-	if (data_.size()) {
-		band_range_.lower = lower;
-		band_range_.upper = upper;
-	}
-	else {
-		// restore previous band range
-		band_range_ = save_range;
 	}
 }
 
@@ -389,6 +393,9 @@ void band_widget::generate_items() {
 	}
 	markers_.clear();
 	mode_bars_.clear();
+	used_modes_.clear();
+	num_spots_ = 0;
+	num_subbands_ = 0;
 	for (auto it = data_.begin(); it != data_.end(); it++) {
 		char* text = new char[128];
 		double l = (*it)->range.lower;
@@ -406,6 +413,9 @@ void band_widget::generate_items() {
 			// Add the mode bars
 			if ((*iu).length() && include) {
 				mode_bars_.push_back({ *iu, ll, lu });
+				if (used_modes_.find(*iu) == used_modes_.end()) {
+					used_modes_[*iu] = used_modes_.size();
+				}
 			}
 		}
 		// Now process the data item
@@ -414,11 +424,12 @@ void band_widget::generate_items() {
 			if (include) {
 				snprintf(text, 128, FREQ_FORMAT " %s", l, (*it)->summary.c_str());
 				add_marker({ l, SPOT, y_for_f(l), y_for_f(l), text});
+				num_spots_++;
 			}
 		}
 		else {
 			if (include) {
-				if ((type() & BAND_MASK) == BAND_FULL) {
+				if (verbose_) {
 					if ((*it)->modes.size()) {
 						// SUBBAND
 						snprintf(text, 128, FREQ_FORMAT "-" FREQ_FORMAT " [%g] %s", 
@@ -426,8 +437,10 @@ void band_widget::generate_items() {
 						if (l == ll) {
 							add_marker({ u, SUBBAND_UPPER, y_for_f(u), y_for_f(u), nullptr });
 							add_marker({ l, SUBBAND_LOWER, y_for_f(l), y_for_f(l), text });
+							num_subbands_++;
 						} else {
 							add_marker({ ll, SUBBAND_LOCUM, y_for_f(ll), y_for_f(ll), text});
+							num_subbands_++;
 						}
 					} else {
 						// SPOTGROUP
@@ -436,6 +449,7 @@ void band_widget::generate_items() {
 						if (l == ll) {
 							add_marker({ u, SPOTGROUP_UPPER, y_for_f(u), y_for_f(u), nullptr });
 							add_marker({ l, SPOTGROUP_LOWER, y_for_f(l), y_for_f(l), text });
+							num_spots_++;
 						}
 					}
 				} else {
@@ -446,8 +460,10 @@ void band_widget::generate_items() {
 						if (l == ll) {
 							add_marker({ u, SUBBAND_UPPER, y_for_f(u), y_for_f(u), nullptr });
 							add_marker({ l, SUBBAND_LOWER, y_for_f(l), y_for_f(l), text });
+							num_subbands_++;
 						} else {
 							add_marker({ ll, SUBBAND_LOCUM, y_for_f(ll), y_for_f(ll), text});
+							num_subbands_++;
 						}
 					} else {
 						// SPOTGROUP
@@ -456,6 +472,7 @@ void band_widget::generate_items() {
 						if (l == ll) {
 							add_marker({ u, SPOTGROUP_UPPER, y_for_f(u), y_for_f(u), nullptr });
 							add_marker({ l, SPOTGROUP_LOWER, y_for_f(l), y_for_f(l), text });
+							num_spots_++;
 						}
 					}
 				}
@@ -475,7 +492,15 @@ void band_widget::generate_items() {
 			add_marker({ f, CURRENT, y_for_f(f), y_for_f(f), text });
 		}
 	}
-
+	int available_slots = ((y_lower_ - y_upper_) / FL_NORMAL_SIZE);
+	if (available_slots < num_subbands_) {
+		display_spots_ = false;
+		display_subbands_ = false;
+	} else {
+		if (available_slots < num_subbands_ + num_spots_) {
+			display_spots_ = false;
+		}
+	}
 }
 
 // Add marker
@@ -496,60 +521,9 @@ void band_widget::add_marker(marker m) {
 	}
 }
 
-// Reset markers
-void band_widget::reset_markers() {
-	// Reset default value of ignore spots
-	if ((type() & BAND_MASK) == BAND_SUMMARY) ignore_spots_ = true;
-	else ignore_spots_ = false;
-	// Reset text positions - and count valid markers
-	int num_markers = 0;
-	for (auto it = markers_.begin(); it != markers_.end(); it++) {
-		// Reset text position
-		(*it).y_text = (*it).y_scale;
-		// Count whether it has a text marker
-		switch ((*it).type) {
-		case CURRENT:
-		case SUBBAND_LOWER:
-			num_markers++;
-			break;
-		case SUBBAND_UPPER:
-		case SPOTGROUP_UPPER:
-			break;
-		case SPOT:
-		case SPOTGROUP_LOWER:
-			if (!ignore_spots_) num_markers++;
-			break;
-		}
-	}
-	if (num_markers * FL_NORMAL_SIZE > y_lower_ - y_upper_) {
-		if (!size_warned_) {
-			char msg[128];
-			if(ignore_spots_) {
-				snprintf(msg, sizeof(msg), "BAND: Too many markers %d - already ignoring spots", num_markers);
-				status_->misc_status(ST_WARNING, msg);
-			} else {
-				snprintf(msg, sizeof(msg), "BAND: Too many markers %d - removing spots", num_markers);
-				status_->misc_status(ST_NOTE, msg);
-			}
-			size_warned_ = true;
-		}
-		ignore_spots_ = true;
-	} else {
-		size_warned_ = false;
-	}
-}
-
-void band_widget::print_markers() {
-	for (auto it = markers_.begin(); it != markers_.end(); it++) {
-		if (is_text_marker(*it)) printf("%g at %d\n", it->f, it->y_text);
-	}
-	printf("\n");
-}
-
 // Adjust markers
 void band_widget::adjust_markers() {
 	if (markers_.size() <= 1) return;
-	// print_markers();
 	// Make it1 the lowest frequency 
 	auto it1 = markers_.begin();
 	auto it2 = it1;
@@ -664,13 +638,14 @@ bool band_widget::is_text_marker(marker m) {
 	case SPOTGROUP_UPPER:
 		return false;
 	case CURRENT:
+		return true;
 	case SUBBAND_LOWER:
 	case SUBBAND_LOCUM:
 	case CURRENT_LOCUM:
-		return true;
+		return display_subbands_;
 	case SPOT:
 	case SPOTGROUP_LOWER:
-		return !ignore_spots_;
+		return display_spots_;
 	}
 	return false;
 }
@@ -681,18 +656,13 @@ int band_widget::y_for_f(double f) {
 	return y_upper_ + (int)((scale_range_.upper - f) * px_per_MHz_);
 }
 
-// Generate drawing positions
-void band_widget::rescale() {
-	if ((type() & BAND_MASK) == BAND_FULL) bar_width_ = BAR_WIDTH_F;
-	else bar_width_ = BAR_WIDTH_S;
+void band_widget::set_verticals() {
 	// Start at the top
 	y_upper_ = y() + GAP;
 	y_lower_ = y() + h() - HTEXT - GAP;
 	// Now what's the approximate scale
-	double bw = band_range_.upper - band_range_.lower;
-	double median = (band_range_.upper + band_range_.lower) * 0.5 + scroll_offset_;
-	scale_range_.lower = median - (bw * 0.5 * zoom_value_);
-	scale_range_.upper = median + (bw * 0.5 * zoom_value_);
+	scale_range_.lower = median_ - bandwidth_ * 0.5;
+	scale_range_.upper = median_ + bandwidth_ * 0.5;
 	if (scale_range_.lower < 0) {
 		scale_range_.upper -= scale_range_.lower;
 		scale_range_.lower = 0.0;
@@ -720,15 +690,19 @@ void band_widget::rescale() {
 	} else if (mantissa < 7.0) {
 		minor_tick_ = 5.0 * power10;
 		major_tick_ = 20.0 * power10;
+	} else {
+		minor_tick_ = 10.0 * power10;
+		major_tick_ = 50.0 * power10;
 	}
-	// Now get to the next tick position above it
-	scale_range_.upper = ceil(scale_range_.upper / minor_tick_) * minor_tick_;
-	// And do the similar at the lower end of the scale
-	scale_range_.lower = floor(scale_range_.lower / minor_tick_) * minor_tick_;
-	// Recalcualte pixels/MHz
-	px_per_MHz_ = (double)(y_lower_ - y_upper_) / (scale_range_.upper - scale_range_.lower);
-	// Get the possible text positions
-	int num_poss = (y_lower_ - y_upper_) / FL_NORMAL_SIZE;
+	// // Now get to the next tick position above it
+	// scale_range_.upper = ceil(scale_range_.upper / minor_tick_) * minor_tick_;
+	// // And do the similar at the lower end of the scale
+	// scale_range_.lower = floor(scale_range_.lower / minor_tick_) * minor_tick_;
+	// // Recalcualte pixels/MHz
+	// px_per_MHz_ = (double)(y_lower_ - y_upper_) / (scale_range_.upper - scale_range_.lower);
+}
+
+void band_widget::set_horizontals() {
 	// Now sort out the horizontal positions
 	fl_font(0, FL_NORMAL_SIZE);
 	char text[15];
@@ -742,7 +716,7 @@ void band_widget::rescale() {
 	x_minor_ = x_major_ + bar_width_;
 	x_scale_ = x_minor_ + bar_width_;
 	// Text - and line connecting it to the scale
-	x_kink1_ = x_scale_ + (bar_width_ * (modes_.size() + 1));
+	x_kink1_ = x_scale_ + (bar_width_ * (used_modes_.size() + 1));
 	x_kink2_ = x_kink1_ + bar_width_ * 2;
 	x_text_ = x_kink2_ + bar_width_;
 	x_sub_ = x_text_ - (bar_width_ / 2);
@@ -759,4 +733,29 @@ const char* band_widget::label_format() {
 		strcpy(label_format_, "%.0f");
 	}
 	return label_format_;
+}
+
+void band_widget::default_mode() {
+	if ((type() & BAND_MASK) == BAND_FULL) {
+		display_bands_ = true;
+		display_band_label_ = true;
+		display_spots_ = true;
+		display_subbands_ = true;
+		auto_bw_ = false;
+		bar_width_ = 10;
+		verbose_ = true;
+	} else {
+		display_bands_ = true;
+		display_band_label_ = false;
+		display_spots_ = false;
+		display_subbands_ = true;
+		auto_bw_ = true;
+		bar_width_ = 2;
+		verbose_ = false;
+	}
+	if (type() & ZOOMABLE) {
+		zoomable_ = true;
+	} else {
+		zoomable_ = false;
+	}
 }

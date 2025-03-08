@@ -43,7 +43,7 @@ public:
 	// Get the band entry for the frequency
 	band_entry_t* get_entry(double frequency);
 	// Get the set of entries for the frequency range
-	set<band_entry_t*> get_entries(range_t range);
+	set<band_entry_t*> get_entries();
 	// Get the bands data
 	band_map<range_t>& bands();
 

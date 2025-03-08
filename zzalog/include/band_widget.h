@@ -26,6 +26,15 @@ public:
 
     virtual int handle(int event);
 
+    // intercept setting type to set the display modeds
+    virtual void type(uchar t) {
+        Fl_Widget::type(t);
+        default_mode();
+    }
+    virtual uchar type() {
+        return Fl_Widget::type();
+    }
+
     // Value - frequency
     void value(double f);
     double value();
@@ -63,7 +72,7 @@ protected:
     };
 
     // Draw the scale (from lower to upper +/- a bit)
-    void draw_scale(range_t range);
+    void draw_scale();
     // Draw legend
     void draw_legend();
     // Draw markers
@@ -74,16 +83,12 @@ protected:
     void draw_line(int yl, int yr, int style);
     // Draw bands
     void draw_bands();
-    // Generate data for band associated with frequency
-    void generate_data(double f);
-    // Rescale drawing
-    void rescale();
+    // Process data
+    void process_data();
     // Add a marker in its correct position
     void add_marker(marker m);
     // Adjust markers
     void adjust_markers();
-    // Reset markers
-    void reset_markers();
     // Get Y-position for frequency
     int y_for_f(double f);
     // IS textual marker
@@ -92,20 +97,29 @@ protected:
     void generate_items();
     // Format for drawing scale label
     const char* label_format();
-    // Debug print
-    void print_markers();
+    // Set default modes
+    void default_mode();
+    // Calculate major and minor labels and display options
+    void set_verticals();
+    // Calculate horizontal positions
+    void set_horizontals();
+    // Set scale range
+    void set_range(bool restore_default = false);
 
+ 
     // The data
     // The current value
     double value_; 
     // The band
     string band_;
-    // The band limits
-    range_t band_range_;
+    // The band range
+    range_t band_limits_;
     // the data
     set<band_data::band_entry_t*> data_;
     // Defined modes
     map<string, int> modes_;
+    // Used modes
+    map<string, int> used_modes_;
     // Major drawing positions
     int x_scale_;      // Position of scale axis
     int y_upper_;      // Upper position of scale
@@ -132,15 +146,23 @@ protected:
     vector<marker> markers_;
     // Mode bars
     vector<mode_bar> mode_bars_;
-    // Don't Display spots
-    bool ignore_spots_;
-    // Already warned that we have removed spots once
-    bool size_warned_;
-    // Zoom value - 1.0 default scaling to fit available space
-    double zoom_value_; 
-    // Scroll delta - ie frequency off set of top from default
-    double scroll_offset_;
     // Label format
     char label_format_[16];
+    // Modes
+    bool display_bands_;    // Display bands as a different background
+    bool display_spots_;    // Display spot and spot-band markers
+    bool display_subbands_; // Display sub-band markers
+    bool auto_bw_;          // automatically set bandwidth if value is within a band
+    bool display_band_label_; 
+                            // Add the label for the band
+    bool verbose_;          // text displays in full mode
+    bool zoomable_;         // The view is zoomable
+    // Attributes
+    double bandwidth_;      // Displayed bandwidth - actual
+    // Median
+    double median_;         // Median frequency - actual
+    // Number of markers
+    int num_spots_;         // Number of spot markers
+    int num_subbands_;      // Number of subband markers
 };
 
