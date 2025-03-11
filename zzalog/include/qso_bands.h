@@ -33,6 +33,7 @@ protected:
 
     // Saved windows coordinates
     int left_, top_, width_, height_;
+    bool open_window_;
 
 };
 

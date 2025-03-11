@@ -36,6 +36,9 @@ qso_bands::~qso_bands() {
 // LLoad settings
 void qso_bands::load_values() {
 	Fl_Preferences my_settings(settings_, "Windows/Bandplan");
+	int temp;
+	my_settings.get("Open Automatically", temp, (int)false);
+	open_window_ = (bool)temp;
 	my_settings.get("Left", left_, 0);
 	my_settings.get("Top", top_, 0);
 	my_settings.get("Width", width_, 300);
@@ -51,7 +54,8 @@ void qso_bands::create_form() {
 	full_window_ = new band_window(left_, top_, width_, height_);
 	full_window_->copy_label(l);
 	full_window_->selection_color(DARK ? COLOUR_ORANGE : FL_RED);
-	full_window_->hide();
+	if (open_window_) full_window_->show();
+	else full_window_->hide();
 
 	begin();
 	int cx = x() + GAP;
@@ -71,6 +75,7 @@ void qso_bands::create_form() {
 // Save settimngs
 void qso_bands::save_values() {
 	Fl_Preferences my_settings(settings_, "Windows/Bandplan");
+	my_settings.set("Open Automatically", (int)open_window_);
 	my_settings.set("Left", full_window_->x_root());
 	my_settings.set("Top", full_window_->y_root());
 	my_settings.set("Width", full_window_->w());
@@ -86,9 +91,11 @@ void qso_bands::cb_band(Fl_Widget* w, void* v) {
 	qso_bands* that = ancestor_view<qso_bands>(w);
 	if (that->full_window_->visible()) {
 		that->full_window_->hide();
+		that->open_window_ = false;
 	}
 	else {
 		that->full_window_->show();
+		that->open_window_ = true;
 	}
 }
 
