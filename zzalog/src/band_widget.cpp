@@ -141,12 +141,16 @@ void band_widget::set_range(bool restore_default) {
 	if (band_.length()) {
 		band_limits_ = band_data_->bands().at(band_);
 		if (auto_bw_ || prev_band != band_ || restore_default) {
+			// We are resetting to show the full band
 			scale_range_ = band_limits_;
 			bandwidth_ = band_limits_.upper - band_limits_.lower;
 			median_ = band_limits_.lower + (bandwidth_ * 0.5);
-		} else {
+		} else if (value_ > ( scale_range_.upper - (bandwidth_ * 0.1) ) ||
+			value_ < ( scale_range_.lower + ( bandwidth_ * 0.1 ) ) ) {
+			// Getting to within 10% of the displayed range edge
 			median_ = value_;
 		}
+		// else do not move the displayed range
 	} else { 
 		median_ = value_;
 	}
@@ -160,7 +164,9 @@ void band_widget::draw_scale() {
 	fl_line(x_scale_, y_upper_, x_scale_, y_lower_);
 	int curr_y;
 	char text[15];
-	double f = scale_range_.upper;
+	// Align start frequency to a minor tick
+	double tick_number = floor(scale_range_.upper / minor_tick_);
+	double f = tick_number * minor_tick_;
 	// Error tolerance in FP calculations
 	double e0 = 0.5 / px_per_MHz_;
 	double e1 = major_tick_ - e0;
