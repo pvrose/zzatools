@@ -58,17 +58,17 @@ void dxcc_table::draw_cell(TableContext context, int R, int C, int X, int Y, int
         char text[128];
         if (R == row_ids_.size()) {
             fl_font(FL_BOLD, FL_NORMAL_SIZE);
-            memcpy(text, "Total:", sizeof(text));
+            strcpy(text, "Total:");
         }
         else if (R == row_ids_.size() + 1) {
             fl_font(FL_BOLD | FL_ITALIC, FL_NORMAL_SIZE);
-            memcpy(text, "No. DXCCs:", sizeof(text));
+            strcpy(text, "No. DXCCs:");
         }
         else {
             int dxcc = row_ids_[R];
             fl_font(0, FL_NORMAL_SIZE);
             if (dxcc == -1) {
-                memcpy(text, "   : Invalid entity", sizeof(text));
+                strcpy(text, "   : Invalid entity");
             }
             else {
                 snprintf(text, sizeof(text), "%3d: %s", dxcc, spec_data_->entity_name(dxcc).c_str());
@@ -116,7 +116,7 @@ void dxcc_table::draw_cell(TableContext context, int R, int C, int X, int Y, int
                 fl_font(FL_BOLD, FL_NORMAL_SIZE);
                 int dxcc = row_ids_[R];
                 if (qsos_dxcc_.find(dxcc) == qsos_dxcc_.end()) {
-                    memcpy(text, "", sizeof(text));
+                    strcpy(text, "");
                 }
                 else {
                     snprintf(text, sizeof(text), "%d", qsos_dxcc_.at(dxcc));
@@ -128,7 +128,7 @@ void dxcc_table::draw_cell(TableContext context, int R, int C, int X, int Y, int
             if (R == row_ids_.size()) {
                 fl_font(FL_BOLD, FL_NORMAL_SIZE);
                 if (total_counts_.find(column_name) == total_counts_.end()) {
-                    memcpy(text, "", sizeof(text));
+                    strcpy(text, "");
                 }
                 else {
                     snprintf(text, sizeof(text), "%d", total_counts_.at(column_name));
@@ -137,7 +137,7 @@ void dxcc_table::draw_cell(TableContext context, int R, int C, int X, int Y, int
             else if (R == row_ids_.size() + 1) {
                 fl_font(FL_BOLD | FL_ITALIC, FL_NORMAL_SIZE);
                 if (dxccs_band_.find(column_name) == dxccs_band_.end()) {
-                    memcpy(text, "", sizeof(text));
+                    strcpy(text, "");
                 }
                 else {
                     snprintf(text, sizeof(text), "%d", dxccs_band_.at(column_name));
@@ -148,7 +148,7 @@ void dxcc_table::draw_cell(TableContext context, int R, int C, int X, int Y, int
                 int dxcc = row_ids_[R];
                 count_t counts = data_.at(dxcc);
                 if (counts.find(column_name) == counts.end()) {
-                    memcpy(text, "", sizeof(text));
+                    strcpy(text, "");
                 }
                 else {
                     snprintf(text, sizeof(text), "%d", counts.at(column_name));

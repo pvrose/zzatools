@@ -75,7 +75,7 @@ status::~status()
 }
 
 // Add a progress item to the stack
-void status::progress(int max_value, object_t object, const char* description, const char* suffix, bool countdown /*= false*/) {
+void status::progress(uint64_t max_value, object_t object, const char* description, const char* suffix, bool countdown /*= false*/) {
 	// Turrn off file viewer update to improve performance
 	// no_update_viewer = true;
 	// Initialise it
@@ -110,7 +110,7 @@ void status::progress(int max_value, object_t object, const char* description, c
 		update_progress(object);
 		// Use progress to check for 0 entries
 		if (max_value == 0) {
-			progress(0, object);
+			progress((uint64_t)0, object);
 		}
 	}
 }
@@ -132,7 +132,7 @@ void status::update_progress(object_t object) {
 }
 
 // Update progress to the new specified value
-void status::progress(int value, object_t object) {
+void status::progress(uint64_t value, object_t object) {
 	if (progress_items_.find(object) == progress_items_.end()) {
 		char message[100];
 		snprintf(message, 100, "%s: PROGRESS: has not started but %d done", OBJECT_NAMES.at(object), value);

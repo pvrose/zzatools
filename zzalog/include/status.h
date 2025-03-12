@@ -85,9 +85,9 @@ using namespace std;
 		~status();
 
 		// Initialise progress
-		void progress(int max_value, object_t object, const char* description, const char* suffix, bool countdown = false);
+		void progress(uint64_t max_value, object_t object, const char* description, const char* suffix, bool countdown = false);
 		// UPdate progress
-		void progress(int value, object_t object);
+		void progress(uint64_t value, object_t object);
 		// Update progress with a text message and mark 100%
 		void progress(const char* message, object_t object);
 		// Update miscellaneous status
@@ -114,7 +114,7 @@ using namespace std;
 		// Report file unusable
 		bool file_unusable_;
 		// Previous progress value
-		int previous_value_;
+		uint64_t previous_value_;
 	};
 #endif
 
