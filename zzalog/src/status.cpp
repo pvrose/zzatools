@@ -89,7 +89,7 @@ void status::progress(uint64_t max_value, object_t object, const char* descripti
 		previous_value_ = -1;
 		// Start a new progress bar process - create the progress item (total expected count, objects being counted, up/down and what view it's for)
 		char message[100];
-		snprintf(message, 100, "%s: PROGRESS: Starting %s - %d %s", 
+		snprintf(message, 100, "%s: PROGRESS: Starting %s - %I64d %s", 
 			OBJECT_NAMES.at(object), description, max_value, suffix);
 		misc_status(ST_PROGRESS, message);
 		progress_item* item = new progress_item;
@@ -124,7 +124,7 @@ void status::update_progress(object_t object) {
 		if (item->max_value > 0) {
 			pc = item->value * 100 / item->max_value;
 		}
-		sprintf(label, "%s: PROGRESS: %d/%d %s (%d%%)", 
+		sprintf(label, "%s: PROGRESS: %I64d/%I64d %s (%d%%)", 
 			OBJECT_NAMES.at(object), item->value, item->max_value, item->suffix, pc);
 		misc_status(ST_PROGRESS, label);
 		previous_value_ = item->value;
@@ -135,7 +135,7 @@ void status::update_progress(object_t object) {
 void status::progress(uint64_t value, object_t object) {
 	if (progress_items_.find(object) == progress_items_.end()) {
 		char message[100];
-		snprintf(message, 100, "%s: PROGRESS: has not started but %d done", OBJECT_NAMES.at(object), value);
+		snprintf(message, 100, "%s: PROGRESS: has not started but %I64d done", OBJECT_NAMES.at(object), value);
 		misc_status(ST_ERROR, message);
 	} else {
 		// Update progress item
@@ -146,7 +146,7 @@ void status::progress(uint64_t value, object_t object) {
 		if ((item->countdown && value <= 0) || (!item->countdown && value >= item->max_value)) {
 			char message[100];
 			update_progress(object);
-			snprintf(message, 100, "%s: PROGRESS: %s finished (%d %s)", 
+			snprintf(message, 100, "%s: PROGRESS: %s finished (%I64d %s)", 
 				OBJECT_NAMES.at(object), item->description, item->max_value, item->suffix);
 			misc_status(ST_PROGRESS, message);
 			// Remove the item from the stack - even if it's not top of the stack
@@ -171,7 +171,7 @@ void status::progress(const char* message, object_t object) {
 		progress_item* item = progress_items_.at(object);
 		char msg[100];
 		update_progress(object);
-		snprintf(msg, 100, "%s: PROGRESS: abandoned %s (%d %s)", OBJECT_NAMES.at(object), message, item->value, item->suffix);
+		snprintf(msg, 100, "%s: PROGRESS: abandoned %s (%I64d %s)", OBJECT_NAMES.at(object), message, item->value, item->suffix);
 		misc_status(ST_PROGRESS, msg);
 		delete item;
 		progress_items_.erase(object);
