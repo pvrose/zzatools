@@ -486,10 +486,10 @@ void band_widget::generate_items() {
 		}
 	}
 	// Add current
-	if (!isnan(value_)) {
+	if (!isnan(value_) && value_ != 0.0) {
 		char* text = new char[32];
 		double f = value();
-		snprintf(text, 32, FREQ_FORMAT, f);
+		snprintf(text, 32, FREQ_FORMAT " Current Frequency", f);
 		if (f > scale_range_.upper) {
 			add_marker({ f, CURRENT_LOCUM, y_for_f(scale_range_.upper), y_for_f(scale_range_.upper), text });
 		} else if ( f < scale_range_.lower) {
