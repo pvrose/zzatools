@@ -14,7 +14,7 @@ public:
     virtual void draw();
     
     // Set the frequency
-    void set_frequency(double f);
+    void set_frequency(double tx, double rx);
 
 protected:
     band_widget* bw_;

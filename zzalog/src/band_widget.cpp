@@ -43,8 +43,8 @@ const double WHEEL_ADJUST = -0.1;
 band_widget::band_widget(int X, int Y, int W, int H, const char* L) :
 	Fl_Widget(X, Y, W, H, L) {
 	type(BAND_FULL);
-	value_ = 0.0;
-	Fl_Widget::color(FL_FOREGROUND_COLOR, FL_DARK_GREEN);
+	value_tx_ = value_rx_ = 0.0;
+	Fl_Widget::color(FL_RED, FL_DARK_GREEN);
 	band_ = "";
 	bandwidth_ = 0.5;
 	process_data();
@@ -71,7 +71,7 @@ void band_widget::draw() {
 	fl_color(FL_BACKGROUND_COLOR);
 	fl_rectf(x(), y(), w(), h());
 	// Draw the outline box
-	draw_box();
+	draw_box(box(), FL_FOREGROUND_COLOR);
 	// Now restrict drawing inside the box
 	fl_push_clip(x(), y(), w(), h());
 	// Draw the valrious items
@@ -121,23 +121,20 @@ int band_widget::handle(int event) {
 }
 
 // Value - frequency
-void band_widget::value(double f) {
+void band_widget::value(double tx, double rx) {
 	// Only redraw if value changes
-	if (f != value_) {
-		value_ = f;
+	if (tx != value_tx_ || rx != value_rx_) {
+		value_tx_ = tx;
+		value_rx_ = rx;
 		set_range();
 		set_verticals();
 		redraw();
 	}
 }
 
-double band_widget::value() {
-	return value_;
-}
-
 void band_widget::set_range(bool restore_default) {
 	string prev_band = band_;
-	band_ = spec_data_->band_for_freq(value_);
+	band_ = spec_data_->band_for_freq(value_tx_);
 	if (band_.length()) {
 		band_limits_ = band_data_->bands().at(band_);
 		if (auto_bw_ || prev_band != band_ || restore_default) {
@@ -145,14 +142,14 @@ void band_widget::set_range(bool restore_default) {
 			scale_range_ = band_limits_;
 			bandwidth_ = band_limits_.upper - band_limits_.lower;
 			median_ = band_limits_.lower + (bandwidth_ * 0.5);
-		} else if (value_ > ( scale_range_.upper - (bandwidth_ * 0.1) ) ||
-			value_ < ( scale_range_.lower + ( bandwidth_ * 0.1 ) ) ) {
+		} else if (value_tx_ > ( scale_range_.upper - (bandwidth_ * 0.1) ) ||
+			value_tx_ < ( scale_range_.lower + ( bandwidth_ * 0.1 ) ) ) {
 			// Getting to within 10% of the displayed range edge
-			median_ = value_;
+			median_ = value_tx_;
 		}
 		// else do not move the displayed range
 	} else { 
-		median_ = value_;
+		median_ = value_tx_;
 	}
 }
 
@@ -225,13 +222,19 @@ void band_widget::draw_markers() {
 			}
 			break;
 		case CURRENT:
-			fl_color(Fl_Widget::selection_color());
+			fl_color(Fl_Widget::color());
 			draw_line(m.y_scale, m.y_text, 0);
 			fl_font(0, FL_NORMAL_SIZE);
 			fl_draw(m.text, x_text_, m.y_text + h_offset_);
 			break;
 		case CURRENT_LOCUM:
 			fl_color(Fl_Widget::selection_color());
+			fl_font(0, FL_NORMAL_SIZE);
+			fl_draw(m.text, x_text_, m.y_text + h_offset_);
+			break;
+		case CURRENT_RX:
+			fl_color(Fl_Widget::selection_color());
+			draw_line(m.y_scale, m.y_text, 0);
 			fl_font(0, FL_NORMAL_SIZE);
 			fl_draw(m.text, x_text_, m.y_text + h_offset_);
 			break;
@@ -297,7 +300,7 @@ void band_widget::draw_legend() {
 	char t[132];
 	fl_color(FL_FOREGROUND_COLOR);
 	if (band_.length() == 0) {
-		snprintf(t, sizeof(t), FREQ_FORMAT ": OUT OF BAND!", value());
+		snprintf(t, sizeof(t), FREQ_FORMAT ": OUT OF BAND!", value_tx_);
 		fl_color(FL_RED);
 	}
 	else if (!verbose_) {
@@ -486,16 +489,25 @@ void band_widget::generate_items() {
 		}
 	}
 	// Add current
-	if (!isnan(value_) && value_ != 0.0) {
+	if (!isnan(value_tx_) && value_tx_ != 0.0) {
 		char* text = new char[32];
-		double f = value();
-		snprintf(text, 32, FREQ_FORMAT " Current Frequency", f);
+		double f = value_tx_;
+		snprintf(text, 32, FREQ_FORMAT " TX Frequency", f);
 		if (f > scale_range_.upper) {
 			add_marker({ f, CURRENT_LOCUM, y_for_f(scale_range_.upper), y_for_f(scale_range_.upper), text });
 		} else if ( f < scale_range_.lower) {
 			add_marker({ f, CURRENT_LOCUM, y_for_f(scale_range_.lower), y_for_f(scale_range_.lower), text });
 		} else {
 			add_marker({ f, CURRENT, y_for_f(f), y_for_f(f), text });
+		}
+	}
+	// Add RX
+	if (value_rx_ != 0.0 && value_rx_ != value_tx_) {
+		char* text = new char[32];
+		double f = value_rx_;
+		snprintf(text, 32, FREQ_FORMAT " RX Frequency", f);
+		if (f <= scale_range_.upper && f >= scale_range_.lower) {
+			add_marker({ f, CURRENT_RX, y_for_f(f), y_for_f(f), text });
 		}
 	}
 	int available_slots = ((y_lower_ - y_upper_) / FL_NORMAL_SIZE);
@@ -644,6 +656,7 @@ bool band_widget::is_text_marker(marker m) {
 	case SPOTGROUP_UPPER:
 		return false;
 	case CURRENT:
+	case CURRENT_RX:
 		return true;
 	case SUBBAND_LOWER:
 	case SUBBAND_LOCUM:

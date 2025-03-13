@@ -53,7 +53,7 @@ void qso_bands::create_form() {
 	snprintf(l,sizeof(l), "%s %s: Bandplan", PROGRAM_ID.c_str(), PROGRAM_VERSION.c_str());
 	full_window_ = new band_window(left_, top_, width_, height_);
 	full_window_->copy_label(l);
-	full_window_->selection_color(DARK ? COLOUR_ORANGE : FL_RED);
+	full_window_->color(DARK ? COLOUR_ORANGE : FL_RED, DARK ? FL_GREEN : FL_DARK_GREEN);
 	if (open_window_) full_window_->show();
 	else full_window_->hide();
 
@@ -64,7 +64,7 @@ void qso_bands::create_form() {
 	int ch = h() - GAP - GAP;
 	summary_ = new band_widget(cx, cy, cw, ch);
 	summary_->type(band_widget::BAND_SUMMARY);
-	summary_->selection_color(DARK ? COLOUR_ORANGE : FL_RED);
+	summary_->color(DARK ? COLOUR_ORANGE : FL_RED, DARK ? FL_GREEN : FL_DARK_GREEN);
 	summary_->box(FL_BORDER_FRAME);
 	summary_->callback(cb_band);
 	summary_->tooltip("Band plan display - click to open larger view");
@@ -104,9 +104,10 @@ void qso_bands::cb_ticker(void* v) {
 	qso_manager* mgr = ancestor_view<qso_manager>(that);
 	rig_if* rig = mgr->rig();
 	if (rig) {
-		double f = rig->get_dfrequency(true);
-		that->summary_->value(f);
-		that->full_window_->set_frequency(f);
+		double tx = rig->get_dfrequency(true);
+		double rx = rig->get_dfrequency(false);
+		that->summary_->value(tx, rx);
+		that->full_window_->set_frequency(tx, rx);
 	}
 
 }

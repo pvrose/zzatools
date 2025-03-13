@@ -36,8 +36,7 @@ public:
     }
 
     // Value - frequency
-    void value(double f);
-    double value();
+    void value(double tx, double rx);
 
     // Types
     static const uchar BAND_FULL = 0;     // Full display 
@@ -55,6 +54,7 @@ protected:
         SPOTGROUP_LOWER,
         CURRENT,
         CURRENT_LOCUM,
+        CURRENT_RX,
         SPOT
     };
 
@@ -109,7 +109,8 @@ protected:
  
     // The data
     // The current value
-    double value_; 
+    double value_tx_;
+    double value_rx_; 
     // The band
     string band_;
     // The band range

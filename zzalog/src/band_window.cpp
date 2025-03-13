@@ -21,10 +21,10 @@ band_window::~band_window() {}
 // Overload draw
 void band_window::draw() {
 	// Pass on selection colour to the widget
-	bw_->selection_color(selection_color());
+	bw_->color(color(), selection_color());
 	Fl_Double_Window::draw();
 }
 
-void band_window::set_frequency(double f) {
-	bw_->value(f);
+void band_window::set_frequency(double tx, double rx) {
+	bw_->value(tx, rx);
 }
