@@ -64,6 +64,8 @@ public:
 	void navigate(navigate_t target);
 	// Ask if can navigate
 	bool can_navigate(navigate_t target);
+	// Set focus on the call of the displayed entry
+	void set_focus_call();
 
 protected:
 	// The tabbed qso_entry

@@ -121,6 +121,8 @@ public:
 	void copy_qso_to_display(int flags);
 	// Update rig
 	void update_rig();
+	// Set focus on call
+	void set_focus_call();
 
 	// Action add field to widgets
 	void action_add_field(int ix, string field);
@@ -130,12 +132,6 @@ public:
 	// Initialise fields
 	void initialise_fields();
 
-	// Set initial focus
-	void set_initial_focus();
-	// Set focus to next input
-	void set_next_focus();
-
-
 protected:
 	// Field input - v: field name
 	static void cb_ip_field(Fl_Widget* w, void* v);
@@ -143,6 +139,8 @@ protected:
 	static void cb_ch_field(Fl_Widget* w, void* v);
 	// Notes input field
 	static void cb_ip_notes(Fl_Widget* w, void* v);
+	// Set focus to saved 
+	void set_focus_saved();
 
 
 
@@ -168,7 +166,7 @@ protected:
 	string previous_locator_;
 	// Previous contest serial number
 	int previous_serial_;
-	// Current active field input index
-	int current_ix_;
+	// Input index that should get focus on showing
+	static int focus_ix_;
 };
 

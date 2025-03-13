@@ -28,6 +28,8 @@ extern double prev_freq_;
 // Used for contest, but not currently used
 collection_t* qso_entry::field_map_ = nullptr;
 
+int qso_entry::focus_ix_ = 0;
+
 // Constructor
 qso_entry::qso_entry(int X, int Y, int W, int H, const char* L) :
 	Fl_Group(X, Y, W, H, L)
@@ -67,7 +69,7 @@ int qso_entry::handle(int event) {
 	int result = Fl_Group::handle(event);
 	switch (event) {
 	case FL_SHOW:
-		set_initial_focus();
+		set_focus_saved();
 		break;
 	}
 	return result;
@@ -170,7 +172,6 @@ void qso_entry::enable_widgets() {
 			ip_field_[ix]->qso(nullptr);
 		}
 		ip_notes_->deactivate();
-		set_initial_focus();
 		break;
 	case qso_data::QSO_PENDING:
 	case qso_data::TEST_PENDING:
@@ -193,7 +194,6 @@ void qso_entry::enable_widgets() {
 		ip_notes_->activate();
 		ip_notes_->color(FL_BACKGROUND2_COLOR);
 		ip_notes_->type(FL_NORMAL_INPUT);
-		set_initial_focus();
 		break;
 	case qso_data::QSO_STARTED:
 	case qso_data::NET_STARTED:
@@ -222,7 +222,6 @@ void qso_entry::enable_widgets() {
 		ip_notes_->activate();
 		ip_notes_->color(FL_BACKGROUND2_COLOR);
 		ip_notes_->type(FL_NORMAL_INPUT);
-		set_next_focus();
 		break;
 	case qso_data::QSO_VIEW:
 		// Viewing a QSO - activate all fields in use, but don't enable data entry
@@ -244,7 +243,6 @@ void qso_entry::enable_widgets() {
 		ip_notes_->activate();
 		ip_notes_->color(FL_BACKGROUND_COLOR);
 		ip_notes_->type(FL_NORMAL_OUTPUT);
-		set_initial_focus();
 		break;
 	case qso_data::MANUAL_ENTRY:
 		// Entering data for search - enable all fields in use...
@@ -266,7 +264,6 @@ void qso_entry::enable_widgets() {
 		ip_notes_->activate();
 		ip_notes_->color(FL_BACKGROUND2_COLOR);
 		ip_notes_->type(FL_NORMAL_INPUT);
-		set_next_focus();
 		break;
 	default:
 		// Reserver=d for Query states
@@ -591,6 +588,7 @@ void qso_entry::initialise_fields() {
 		ip_field_[iy]->value("");
 		ip_field_[iy]->field_name("");
 	}
+	set_focus_call();
 }
 
 // Return fields that have been defines as comma seperated list
@@ -701,7 +699,7 @@ void qso_entry::cb_ip_field(Fl_Widget* w, void* v) {
 	string value = ip->value();
 	string old_value = that->qso_->item(field);
 	// Save the index to set next focus
-	that->current_ix_ = (int)(intptr_t)v;
+	that->focus_ix_ = (int)(intptr_t)v;
 	if (old_value != value) {
 		that->qso_->item(field, value);
 
@@ -863,6 +861,7 @@ qso_num_t qso_entry::qso_number() {
 // Append QSO to book
 void qso_entry::append_qso() {
 	qso_number_ = book_->insert_record(qso_);
+	set_focus_call();
 }
 
 // DElete QSO
@@ -883,37 +882,6 @@ void qso_entry::delete_qso() {
 	}
 }
 
-// Set initial focus - go to first blank input
-void qso_entry::set_initial_focus() {
-	if (!visible_r()) return;
-	bool found = false;
-	for (int ix = NUMBER_FIXED; !found && ix < fields_in_use_.size(); ix ++) {
-		field_input* w = ip_field_[ix];
-		if (w && strlen(w->value()) == 0) {
-			if (w->take_focus()) found = true;
-		}
-	}
-}
-
-// set next focus
-void qso_entry::set_next_focus() {
-	if (!visible_r()) return;
-	if (current_ix_ < fields_in_use_.size()) {
-		Fl_Widget* w0 = Fl::focus();
-		if (w0) {
-			// Disable events fom current widget
-			Fl_When save = w0->when();
-			w0->when(0);
-			field_input* w1 = ip_field_[current_ix_++];
-			w1->take_focus();
-			w0->when(save);
-		} else {
-			field_input* w1 = ip_field_[current_ix_++];
-			w1->take_focus();
-		}
-	}
-}
-
 // 1 second clock
 void qso_entry::cb_ticker(void* v) {
 	qso_entry* that = (qso_entry*)v;
@@ -927,4 +895,39 @@ void qso_entry::cb_ticker(void* v) {
 			that->copy_cat_to_qso();
 			break;
 	}
+}
+
+// Set saved focus
+void qso_entry::set_focus_saved() {
+    if (!visible_r()) return;
+	if (focus_ix_ < fields_in_use_.size()) {
+		Fl_Widget* w0 = Fl::focus();
+		if (w0) {
+			// Disable events fom current widget - stop it actioning UNFOCUS
+			Fl_When save = w0->when();
+			w0->when(0);
+			field_input* w1 = ip_field_[focus_ix_];
+			w1->take_focus();
+			w0->when(save);
+		} else {
+			field_input* w1 = ip_field_[focus_ix_];
+			w1->take_focus();
+		}
+    }
+}
+
+// Set focus on CALL input
+void qso_entry::set_focus_call() {
+	if (!visible_r()) return;
+	int call_ix = 0;
+	bool found = false;
+	while (!found && call_ix < fields_in_use_.size()) {
+		if (fields_in_use_[call_ix] == "CALL") {
+			found = true; 
+		} else {
+			call_ix++;
+		}
+	}
+	focus_ix_ = call_ix;
+	set_focus_saved();
 }

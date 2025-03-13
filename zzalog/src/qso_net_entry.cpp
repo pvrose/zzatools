@@ -295,3 +295,8 @@ bool qso_net_entry::can_navigate(navigate_t target) {
 		default: return false;
 	}
 }
+
+void qso_net_entry::set_focus_call() {
+	qso_entry* qe = (qso_entry*)entries_->value();
+	qe->set_focus_call();
+}
