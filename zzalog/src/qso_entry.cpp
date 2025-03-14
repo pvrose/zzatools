@@ -901,6 +901,7 @@ void qso_entry::cb_ticker(void* v) {
 void qso_entry::set_focus_saved() {
     if (!visible_r()) return;
 	if (focus_ix_ < fields_in_use_.size()) {
+		printf("DEBUG: %p Setting focus for widget %s\n", this, fields_in_use_[focus_ix_].c_str());
 		Fl_Widget* w0 = Fl::focus();
 		if (w0) {
 			// Disable events fom current widget - stop it actioning UNFOCUS
@@ -921,6 +922,7 @@ void qso_entry::set_focus_call() {
 	if (!visible_r()) return;
 	int call_ix = 0;
 	bool found = false;
+	// Find the ip_field_ widget that holds CALL and set focus to it. 
 	while (!found && call_ix < fields_in_use_.size()) {
 		if (fields_in_use_[call_ix] == "CALL") {
 			found = true; 
@@ -930,4 +932,17 @@ void qso_entry::set_focus_call() {
 	}
 	focus_ix_ = call_ix;
 	set_focus_saved();
+}
+
+// Save focus - when hiding
+void qso_entry::save_focus(Fl_Widget* w) {
+	bool found = false;
+	// Scan all the used ip_field_ widgets until the one that has focus is found
+	for (int ix = 0; ix < fields_in_use_.size() && !found; ix++) {
+		if (ip_field_[ix] == w) {
+			found = true;
+			focus_ix_ = ix;
+			printf("DEBUG: %p Saving focus for widget %s\n", this, fields_in_use_[focus_ix_].c_str());
+		}
+	}
 }

@@ -4,6 +4,7 @@
 #include "intl_dialog.h"
 #include "utils.h"
 #include "cty_data.h"
+#include "qso_entry.h"
 
 #include <FL/Fl_Preferences.H>
 
@@ -121,6 +122,7 @@ field_input::~field_input() {
 int field_input::handle(int event) {
 	reason_ = IR_NULL;
 	// Tell international character dialog to paste to this widget
+	qso_entry* qe = ancestor_view<qso_entry>(this);
 	switch (event) {
 	case FL_PUSH:
 		if (intl_dialog_) {
@@ -137,6 +139,7 @@ int field_input::handle(int event) {
 		if (intl_dialog_) {
 			intl_dialog_->editor(this->input());
 		}
+		if (qe) qe->save_focus(this);
 		if (input()->take_focus()) return true;
 		return Fl_Input_Choice::handle(event);
 	case FL_UNFOCUS:

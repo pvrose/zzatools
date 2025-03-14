@@ -123,6 +123,8 @@ public:
 	void update_rig();
 	// Set focus on call
 	void set_focus_call();
+	// Save focus
+	void save_focus(Fl_Widget* w);
 
 	// Action add field to widgets
 	void action_add_field(int ix, string field);
