@@ -698,8 +698,6 @@ void qso_entry::cb_ip_field(Fl_Widget* w, void* v) {
 	string field = ip->field_name();
 	string value = ip->value();
 	string old_value = that->qso_->item(field);
-	// Save the index to set next focus
-	that->focus_ix_ = (int)(intptr_t)v;
 	if (old_value != value) {
 		that->qso_->item(field, value);
 
@@ -901,7 +899,6 @@ void qso_entry::cb_ticker(void* v) {
 void qso_entry::set_focus_saved() {
     if (!visible_r()) return;
 	if (focus_ix_ < fields_in_use_.size()) {
-		printf("DEBUG: %p Setting focus for widget %s\n", this, fields_in_use_[focus_ix_].c_str());
 		Fl_Widget* w0 = Fl::focus();
 		if (w0) {
 			// Disable events fom current widget - stop it actioning UNFOCUS
@@ -936,13 +933,9 @@ void qso_entry::set_focus_call() {
 
 // Save focus - when hiding
 void qso_entry::save_focus(Fl_Widget* w) {
-	bool found = false;
 	// Scan all the used ip_field_ widgets until the one that has focus is found
-	for (int ix = 0; ix < fields_in_use_.size() && !found; ix++) {
-		if (ip_field_[ix] == w) {
-			found = true;
-			focus_ix_ = ix;
-			printf("DEBUG: %p Saving focus for widget %s\n", this, fields_in_use_[focus_ix_].c_str());
-		}
+	int ix = (intptr_t)w->user_data();
+	if (ix < fields_in_use_.size()) {
+		focus_ix_ = ix;
 	}
 }

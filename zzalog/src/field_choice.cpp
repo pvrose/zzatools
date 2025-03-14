@@ -128,6 +128,7 @@ int field_input::handle(int event) {
 		if (intl_dialog_) {
 			intl_dialog_->editor(this->input());
 		}
+		if (qe) qe->save_focus(this);
 		// Remove any tip window on this or other field_input
 		if (tip_window_) {
 			// Delete existing tip window
@@ -139,7 +140,6 @@ int field_input::handle(int event) {
 		if (intl_dialog_) {
 			intl_dialog_->editor(this->input());
 		}
-		if (qe) qe->save_focus(this);
 		if (input()->take_focus()) return true;
 		return Fl_Input_Choice::handle(event);
 	case FL_UNFOCUS:
