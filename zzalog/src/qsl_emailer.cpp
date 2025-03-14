@@ -64,7 +64,7 @@ bool qsl_emailer::generate_email(record* qso) {
 			status_->misc_status(ST_WARNING, msg);
 			return false;
 		} else {
-			to_address_ = temp;
+			to_address_ = string(temp);
 			qso_->item("EMAIL", to_address_);
 		}
 	}
