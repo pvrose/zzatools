@@ -29,6 +29,7 @@ using namespace std;
 		MT_SWL_NOMATCH,      // An SWL report that is no match for any activity
 		MT_2XSWL_MATCH,      // An SWL report matches an existing SWL report
 		MT_OVERLAP,          // The two records have same freq/mode and times overlap
+		MT_CALL_OVERLAP,     // As MT_OVERLAP but the same call
 	};
 
 	// Location source

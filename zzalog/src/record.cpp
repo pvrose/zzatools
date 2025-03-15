@@ -976,6 +976,10 @@ match_result_t record::match_records(record* record) {
 		else if (overlap && net_mismatch_count == 0 && !call_match) {
 			return MT_OVERLAP;
 		}
+		// The two records overlap their times on and off - and same call (for dupe checking)
+		else if (overlap && net_mismatch_count == 0 && call_match) {
+			return MT_CALL_OVERLAP;
+		}
 		// Significant difference - NOMATCH
 		else {
 			return MT_NOMATCH;

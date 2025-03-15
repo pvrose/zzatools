@@ -1356,6 +1356,7 @@ void book::check_dupes(bool restart) {
 		record* record_1 = get_record(test_item_, true);
 		record* record_2;
 		match_result_t match = MT_OVERLAP;
+		// MT_OVERLAP indicates it overlaps but not same call.
 		for (dupe_item_ = test_item_ + 1; 
 			dupe_item_ < size() && match == MT_OVERLAP;
 		    ) {
@@ -1373,6 +1374,7 @@ void book::check_dupes(bool restart) {
 			// Do nothing
 			break;
 		case MT_EXACT:
+		case MT_CALL_OVERLAP:
 			// Delete second occurence after query
 			match_question_ = "These appear to be duplicates - select one to delete";
 			selection(test_item_, HT_DUPE_QUERY, nullptr, dupe_item_);
@@ -1394,6 +1396,10 @@ void book::check_dupes(bool restart) {
 		char message[256];
 		snprintf(message, 256, "LOG: Dupe check complete. %zu checked, %d kept, %d removed", test_item_, number_dupes_kept_, number_dupes_removed_);
 		status_->misc_status(ST_OK, message);
+		if (number_dupes_removed_ > 0) {
+			// Progress will not be complete 
+			status_->progress("Check found duplicates", book_type());
+		}
 		inhibit_view_update_ = false;
 		selection(size() - 1, HT_ALL);
 		enable_save(true, "Checked dupes");
