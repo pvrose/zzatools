@@ -306,7 +306,12 @@ void band_widget::draw_legend() {
 	char t[132];
 	fl_color(FL_FOREGROUND_COLOR);
 	if (band_.length() == 0) {
-		snprintf(t, sizeof(t), FREQ_FORMAT ": OUT OF BAND!", value_tx_);
+		if (isnan(value_tx_)) {
+			strcpy(t, "NO FREQUENCY SUPPLIED!");
+		}
+		else {
+			snprintf(t, sizeof(t), FREQ_FORMAT ": OUT OF BAND!", value_tx_);
+		}
 		fl_color(FL_RED);
 	}
 	else if (!verbose_) {
@@ -495,7 +500,7 @@ void band_widget::generate_items() {
 		}
 	}
 	// Add current
-	if (value_tx_ != 0.0 && value_rx_ != 0.0) {
+	if (!isnan(value_tx_) && value_tx_ != 0.0 && value_rx_ != 0.0) {
 		char* text = new char[32];
 		double f = value_tx_;
 		snprintf(text, 32, FREQ_FORMAT " TX Frequency", f);
