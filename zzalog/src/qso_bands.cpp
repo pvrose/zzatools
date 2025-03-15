@@ -112,10 +112,15 @@ void qso_bands::cb_ticker(void* v) {
 		that->full_window_->set_frequency(tx, rx);
 	} else {
 		record* qso = mgr->data()->current_qso();
-		double tx;
-		qso->item("FREQ", tx);
-		that->summary_->value(tx, 0.0);
-		that->full_window_->set_frequency(tx, 0.0);
+		if (qso) {
+			double tx;
+			qso->item("FREQ", tx);
+			that->summary_->value(tx, 0.0);
+			that->full_window_->set_frequency(tx, 0.0);
+		} else {
+			that->summary_->value(0.0, 0.0);
+			that->full_window_->set_frequency(0.0, 0.0);
+		}
 	}
 
 }
