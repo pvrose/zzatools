@@ -238,6 +238,12 @@ void band_widget::draw_markers() {
 			fl_font(0, FL_NORMAL_SIZE);
 			fl_draw(m.text, x_text_, m.y_text + h_offset_);
 			break;
+		case CURRENT_QSO:
+			fl_color(DARK ? FL_YELLOW : FL_DARK_YELLOW);
+			draw_line(m.y_scale, m.y_text, 0);
+			fl_font(0, FL_NORMAL_SIZE);
+			fl_draw(m.text, x_text_, m.y_text + h_offset_);
+			break;
 		case SPOT:
 			if (display_spots_) {
 				fl_color(DARK ? FL_CYAN : FL_BLUE);
@@ -489,7 +495,7 @@ void band_widget::generate_items() {
 		}
 	}
 	// Add current
-	if (!isnan(value_tx_) && value_tx_ != 0.0) {
+	if (value_tx_ != 0.0 && value_rx_ != 0.0) {
 		char* text = new char[32];
 		double f = value_tx_;
 		snprintf(text, 32, FREQ_FORMAT " TX Frequency", f);
@@ -508,6 +514,15 @@ void band_widget::generate_items() {
 		snprintf(text, 32, FREQ_FORMAT " RX Frequency", f);
 		if (f <= scale_range_.upper && f >= scale_range_.lower) {
 			add_marker({ f, CURRENT_RX, y_for_f(f), y_for_f(f), text });
+		}
+	}
+	// Add QSO frequency
+	if (value_tx_ != 0.0 && value_rx_ == 0.0) {
+		char* text = new char[32];
+		double f = value_tx_;
+		snprintf(text, 32, FREQ_FORMAT " QSO Frequency", f);
+		if (f <= scale_range_.upper && f >= scale_range_.lower) {
+			add_marker({ f, CURRENT_QSO, y_for_f(f), y_for_f(f), text });
 		}
 	}
 	int available_slots = ((y_lower_ - y_upper_) / FL_NORMAL_SIZE);
@@ -657,6 +672,7 @@ bool band_widget::is_text_marker(marker m) {
 		return false;
 	case CURRENT:
 	case CURRENT_RX:
+	case CURRENT_QSO:
 		return true;
 	case SUBBAND_LOWER:
 	case SUBBAND_LOCUM:

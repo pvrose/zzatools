@@ -55,6 +55,7 @@ protected:
         CURRENT,
         CURRENT_LOCUM,
         CURRENT_RX,
+        CURRENT_QSO,
         SPOT
     };
 

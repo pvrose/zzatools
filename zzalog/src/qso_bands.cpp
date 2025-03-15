@@ -2,7 +2,9 @@
 
 #include "band_widget.h"
 #include "band_window.h"
+#include "qso_data.h"
 #include "qso_manager.h"
+#include "record.h"
 #include "rig_if.h"
 #include "ticker.h"
 
@@ -103,11 +105,17 @@ void qso_bands::cb_ticker(void* v) {
 	qso_bands* that = (qso_bands*)v;
 	qso_manager* mgr = ancestor_view<qso_manager>(that);
 	rig_if* rig = mgr->rig();
-	if (rig) {
+	if (rig && rig->is_good()) {
 		double tx = rig->get_dfrequency(true);
 		double rx = rig->get_dfrequency(false);
 		that->summary_->value(tx, rx);
 		that->full_window_->set_frequency(tx, rx);
+	} else {
+		record* qso = mgr->data()->current_qso();
+		double tx;
+		qso->item("FREQ", tx);
+		that->summary_->value(tx, 0.0);
+		that->full_window_->set_frequency(tx, 0.0);
 	}
 
 }
