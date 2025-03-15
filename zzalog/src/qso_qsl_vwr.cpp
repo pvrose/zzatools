@@ -441,12 +441,12 @@ void qso_qsl_vwr::set_image() {
 	switch(selected_image_) {
 		case QI_NONE: {
 			if (current_qso_) {
-				thumb->set_text(current_qso_->item("CALL").c_str(), FL_BLACK);
-				full->set_text(nullptr, FL_BLACK);
+				thumb->set_text(current_qso_->item("CALL").c_str(), FL_FOREGROUND_COLOR);
+				full->set_text(nullptr, FL_FOREGROUND_COLOR);
 			}
 			else {
-				thumb->set_text(nullptr, FL_BLACK);
-				full->set_text(nullptr, FL_BLACK);
+				thumb->set_text(nullptr, FL_FOREGROUND_COLOR);
+				full->set_text(nullptr, FL_FOREGROUND_COLOR);
 			}
 			qsl_thumb_->box(FL_BORDER_BOX);
 			break;

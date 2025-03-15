@@ -141,6 +141,7 @@ void qso_qsl::create_form() {
 	char text[10];
 	snprintf(text, sizeof(text), "%d", os_eqsl_dnld_);
 	op_eqsl_count_->copy_label(text);
+	op_eqsl_count_->labelcolor(FL_FOREGROUND_COLOR);
 	op_eqsl_count_->tooltip("Displays the number of outstanding image downloads");
 	op_eqsl_count_->minimum(0.0);
 	op_eqsl_count_->maximum(1.0);
@@ -355,12 +356,12 @@ void qso_qsl::enable_widgets() {
 	snprintf(text, sizeof(text), "%d", os_eqsl_dnld_);
 	op_eqsl_count_->copy_label(text);
 	if (os_eqsl_dnld_ == 0) {
-		op_eqsl_count_->labelcolor(FL_BLACK);
+		op_eqsl_count_->labelcolor(FL_FOREGROUND_COLOR);
 		op_eqsl_count_->labelfont(0);
 		op_eqsl_count_->color(FL_BACKGROUND_COLOR);
 		op_eqsl_count_->value(0.0);
 	} else if ( os_eqsl_dnld_ > curr) {
-		op_eqsl_count_->labelcolor(FL_BLACK);
+		op_eqsl_count_->labelcolor(FL_FOREGROUND_COLOR);
 		op_eqsl_count_->labelfont(FL_BOLD);
 		op_eqsl_count_->color(FL_WHITE, FL_DARK_YELLOW);
 		op_eqsl_count_->value(tkr_value_);

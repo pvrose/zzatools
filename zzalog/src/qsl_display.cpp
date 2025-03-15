@@ -29,7 +29,7 @@ qsl_display::qsl_display(int X, int Y, int W, int H)
 	alt_image_ = nullptr;
 	data_ = nullptr;
 	alt_text_ = nullptr;
-	alt_colour_ = FL_BLACK;
+	alt_colour_ = FL_FOREGROUND_COLOR;
 	x_ = X;
 	y_ = Y;
 	w_ = W;
