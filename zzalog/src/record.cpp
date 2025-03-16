@@ -930,35 +930,35 @@ match_result_t record::match_records(record* record) {
 	}
 	// Need more detailed analysis 
 	else {
-		// Get time difference betweem two records
-		double time_difference = difftime(timestamp(), record->timestamp());
-		// Time difference is within +/- 30 mins (fairly arbitrary)
-		bool within_30mins = abs(time_difference) <= (30.0 * 60.0);
 		// The two records overlap
-		time_t this_on = timestamp();
-		time_t this_off = timestamp(true);
-		time_t rec_on = record->timestamp();
-		time_t rec_off = record->timestamp(true);
+		chrono::system_clock::time_point this_on = chrono::system_clock::from_time_t(timestamp());
+		chrono::system_clock::time_point this_off = chrono::system_clock::from_time_t(timestamp(true));
+		chrono::system_clock::time_point that_on = chrono::system_clock::from_time_t(record->timestamp());
+		chrono::system_clock::time_point that_off = chrono::system_clock::from_time_t(record->timestamp(true));
+		chrono::seconds min30(1800);
+		// Make the QSO lengths >= 30 minutes
+		if (this_off - this_on < min30) this_off = this_on + min30;
+		if (that_off - that_on < min30) that_off = that_on + min30;
 		bool overlap =
-			(rec_on >= this_on && rec_on <= this_off) ||
-			(rec_off >= this_on && rec_off <= this_off) ||
-			(this_on >= rec_on && this_on <= rec_off) ||
-			(this_off >= rec_on && this_off <= rec_off);
+			(that_on >= this_on && that_on <= this_off) ||
+			(that_off >= this_on && that_off <= this_off) ||			
+			(this_on >= that_on && this_on <= that_off) ||
+			(this_off >= that_on && this_off <= that_off);
 		bool is_swl = (item("SWL") == "Y");
 		bool other_swl = (record->item("SWL") == "Y");
 		// Both records are SWL and match
-		if (is_swl && other_swl && swl_match && within_30mins) {
+		if (is_swl && other_swl && swl_match && overlap) {
 			return MT_2XSWL_MATCH;
 		}
 		// is_swl and time within 30 - SWL_MATCH
-		else if (is_swl && !other_swl && swl_match && within_30mins) {
+		else if (is_swl && !other_swl && swl_match && overlap) {
 			return MT_SWL_MATCH;
 		}
 		// is_swl - no match
-		else if (is_swl && !other_swl && !(swl_match && within_30mins)) {
+		else if (is_swl && !other_swl && !(swl_match && overlap)) {
 			return MT_SWL_NOMATCH;
 		}
-		else if (within_30mins && nondate_mismatch_count == 0) {
+		else if (overlap && nondate_mismatch_count == 0) {
 			// Date fields match within 30 minutes and all fields match - PROBABLE
 			if (trivial_mismatch_count == 0) {
 				return MT_PROBABLE;
@@ -975,10 +975,6 @@ match_result_t record::match_records(record* record) {
 		// The two records overlap their times on and off 
 		else if (overlap && net_mismatch_count == 0 && !call_match) {
 			return MT_OVERLAP;
-		}
-		// The two records overlap their times on and off - and same call (for dupe checking)
-		else if (overlap && net_mismatch_count == 0 && call_match) {
-			return MT_CALL_OVERLAP;
 		}
 		// Significant difference - NOMATCH
 		else {

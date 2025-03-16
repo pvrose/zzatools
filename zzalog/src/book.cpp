@@ -1374,13 +1374,12 @@ void book::check_dupes(bool restart) {
 			// Do nothing
 			break;
 		case MT_EXACT:
-		case MT_CALL_OVERLAP:
+		case MT_PROBABLE:
 			// Delete second occurence after query
 			match_question_ = "These appear to be duplicates - select one to delete";
 			selection(test_item_, HT_DUPE_QUERY, nullptr, dupe_item_);
 			possible_dupe = true;
 			break;
-		case MT_PROBABLE:
 		case MT_POSSIBLE:
 		case MT_LOC_MISMATCH:
 			// Open QSO query 
