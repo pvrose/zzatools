@@ -98,7 +98,7 @@ void web_dialog::load_values() {
 	eqsl_last_got_ = temp;
 	free(temp);
 	eqsl_settings.get("Upload per QSO", (int&)eqsl_upload_qso_, false);
-	eqsl_settings.get("Download Confrmed", (int&)eqsl_confirmed_too_, false);
+	eqsl_settings.get("Download Confirmed", (int&)eqsl_confirmed_too_, false);
 	// LotW settings
 	lotw_settings.get("Enable", (int&)lotw_enable_, false);
 	lotw_settings.get("User", temp, "");
@@ -731,7 +731,7 @@ void web_dialog::save_values() {
 	eqsl_settings.set("Password", eqsl_password_.c_str());
 	eqsl_settings.set("Last Accessed", eqsl_last_got_.c_str());
 	eqsl_settings.set("Upload per QSO", eqsl_upload_qso_);
-	eqsl_settings.set("Download Confrmed", eqsl_confirmed_too_);
+	eqsl_settings.set("Download Confirmed", eqsl_confirmed_too_);
 	// LotW settings
 	lotw_settings.set("Enable", lotw_enable_);
 	lotw_settings.set("User", lotw_username_.c_str());

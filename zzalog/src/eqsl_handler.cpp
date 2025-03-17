@@ -548,6 +548,7 @@ eqsl_handler::response_t eqsl_handler::adif_filename(string& filename) {
 		confirmed ? "" : "&UnconfirmedOnly=1");
 	response_t result = ER_OK;
 	stringstream eqsl_ss;
+	printf("DEBUG: URL: %s\n", url);
 	snprintf(message, sizeof(message), "EQSL: Queryimg in-box for %s", station.c_str());
 	status_->misc_status(ST_NOTE, message);
 	// Fetch first page to get URL of ADIF file with update
