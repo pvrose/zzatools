@@ -360,7 +360,8 @@ eqsl_handler::response_t eqsl_handler::card_filename_r(
 				// We have an error
 				got_card_filename = false;
 				response = ER_FAILED;
-				sprintf(message, "EQSL: %s fetching card %s", text_line.substr(char_pos).c_str(), call.c_str());
+				int len = text_line.length() - char_pos - 1;
+				sprintf(message, "EQSL: %s fetching card %s", text_line.substr(char_pos, len).c_str(), call.c_str());
 				status_->misc_status(ST_ERROR, message);
 			}
 			else {
