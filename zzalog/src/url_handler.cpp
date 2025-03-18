@@ -73,6 +73,8 @@ bool url_handler::read_url(string url, ostream* os) {
 	curl_easy_setopt(curl_, CURLOPT_WRITEDATA, os);
 	// Set connection timeout to 10s
 	curl_easy_setopt(curl_, CURLOPT_CONNECTTIMEOUT, 10L);
+	// Set overall timeout to 30s
+	curl_easy_setopt(curl_, CURLOPT_TIMEOUT, 30L);
 
 	/* some servers don't like requests that are made without a user-agent
 	field, so we provide one */
@@ -139,6 +141,8 @@ bool url_handler::post_url(string url, string resource, istream* req, ostream* r
 	curl_easy_setopt(curl_, CURLOPT_WRITEDATA, resp);
 	// Set connection timeout to 10s
 	curl_easy_setopt(curl_, CURLOPT_CONNECTTIMEOUT, 10L);
+	// Set overall timeout to 30s
+	curl_easy_setopt(curl_, CURLOPT_TIMEOUT, 30L);
 	/* some servers don't like requests that are made without a user-agent
 	field, so we provide one */
 	curl_easy_setopt(curl_, CURLOPT_USERAGENT, "libcurl-agent/1.0");
@@ -191,6 +195,8 @@ bool url_handler::post_form(string url, vector<field_pair> fields, istream* req,
 	curl_easy_setopt(curl_, CURLOPT_WRITEDATA, resp);
 	// Set connection timeout to 10s
 	curl_easy_setopt(curl_, CURLOPT_CONNECTTIMEOUT, 10L);
+	// Set overall timeout to 30s
+	curl_easy_setopt(curl_, CURLOPT_TIMEOUT, 30L);
 	// now apend the form fields
 	form = curl_mime_init(curl_);
 	for (auto it = fields.begin(); it != fields.end(); it++) {
