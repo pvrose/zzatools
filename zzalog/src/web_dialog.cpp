@@ -99,6 +99,7 @@ void web_dialog::load_values() {
 	free(temp);
 	eqsl_settings.get("Upload per QSO", (int&)eqsl_upload_qso_, false);
 	eqsl_settings.get("Download Confirmed", (int&)eqsl_confirmed_too_, false);
+	eqsl_settings.get("Maximum Fetches", eqsl_max_fetches_, 50);
 	// LotW settings
 	lotw_settings.get("Enable", (int&)lotw_enable_, false);
 	lotw_settings.get("User", temp, "");
@@ -205,7 +206,9 @@ void web_dialog::create_eqsl(int rx, int ry, int rw, int rh) {
 	const int H1_1 = HBUTTON;
 	const int R1_1A = R1_1 + H1_1;
 	const int H1_1A = HBUTTON;
-	const int R1_2 = R1_1A + H1_1A + GAP;
+	const int R1_1B = R1_1A + H1_1A;
+	const int H1_1B = HBUTTON;
+	const int R1_2 = R1_1B + H1_1B + GAP;
 	const int H1_2 = HBUTTON;
 	const int R1_3 = R1_2 + H1_2 + GAP;
 	const int H1_3 = HBUTTON;
@@ -276,6 +279,14 @@ void web_dialog::create_eqsl(int rx, int ry, int rw, int rh) {
 	bn1_1A_2->callback(cb_value<Fl_Check_Button, bool>, &eqsl_confirmed_too_);
 	bn1_1A_2->when(FL_WHEN_CHANGED);
 	bn1_1A_2->tooltip("Include previously confirmed QSOs");
+
+	// Row 1B Col 2 - Maximum number of fetches
+	Fl_Int_Input* ip1_1B_1 = new Fl_Int_Input(C2, R1_1B, WBUTTON, H1_1B, "Max. Fetches");
+	ip1_1B_1->align(FL_ALIGN_RIGHT);
+	ip1_1B_1->value(to_string(eqsl_max_fetches_).c_str());
+	ip1_1B_1->callback(cb_value_int<Fl_Int_Input>, &eqsl_max_fetches_);
+	ip1_1B_1->when(FL_WHEN_CHANGED);
+	ip1_1B_1->tooltip("Specify maximum number of image fetches at a time");
 
 	// Row 2 Col 1 - QSO Message enable
 	Fl_Check_Button* bn1_2_1 = new Fl_Check_Button(C1, R1_2, W1, H1_2, "Use QSO Message");
@@ -732,6 +743,7 @@ void web_dialog::save_values() {
 	eqsl_settings.set("Last Accessed", eqsl_last_got_.c_str());
 	eqsl_settings.set("Upload per QSO", eqsl_upload_qso_);
 	eqsl_settings.set("Download Confirmed", eqsl_confirmed_too_);
+	eqsl_settings.set("Maximum Fetches", eqsl_max_fetches_);
 	// LotW settings
 	lotw_settings.set("Enable", lotw_enable_);
 	lotw_settings.set("User", lotw_username_.c_str());

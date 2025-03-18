@@ -95,6 +95,8 @@ class Fl_Group;
 		bool eqsl_upload_qso_;
 		// Download confirmed as well
 		bool eqsl_confirmed_too_;
+		// MAximum number of image fetches at one time
+		int eqsl_max_fetches_;
 
 		// LotW attributes
 

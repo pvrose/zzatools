@@ -169,6 +169,8 @@ typedef size_t qso_num_t;
 		string username_;
 		// Password
 		string password_;
+		// Number of fetches remaining this session
+		int allowed_fetches_;
 		// Upload thread
 		thread* th_upload_;
 		// Enable for threads

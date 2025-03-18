@@ -59,6 +59,9 @@ eqsl_handler::eqsl_handler()
 
 	set_adif_fields();
 
+	Fl_Preferences eqsl_settings(settings_, "QSL/eQSL");
+	eqsl_settings.get("Maximum Fetches", allowed_fetches_, 50);
+
 }
 
 // Destructor
@@ -93,11 +96,20 @@ void eqsl_handler::cb_timer_deq(void* v) {
 	dequeue_param_t* param = (dequeue_param_t*)v;
 	queue_t* request_queue = param->queue;
 	eqsl_handler* that = param->handler;
+	char message[512];
+	// Do not send any requests if we have reached the limit in a session
+	if (that->allowed_fetches_ == 0) {
+		snprintf(message, sizeof(message), "EQSL: Reached the session limit for fetching card images - abandoning");
+		status_->misc_status(ST_ERROR, message);
+		while (!request_queue->empty()) {
+			request_queue->pop();
+			book_->enable_save(true, "Cancelling eQSL image request");
+		}
+	}
 	if (!request_queue->empty() && that->empty_queue_enable_) {
 		// send the next eQSL request in the queue - but leave it in the queue until we've seen the response
 		request_t request = request_queue->front();
 		// Let user know what we are doing
-		char message[512];
 		sprintf(message, "EQSL: Downloading card %s", book_->get_record(request.record_num, false)->item("CALL").c_str());
 		status_->misc_status(ST_NOTE, message);
 		// Request the eQSL card
@@ -121,6 +133,12 @@ void eqsl_handler::cb_timer_deq(void* v) {
 				break;
 			case 2:
 				// Request failed and repeat not wanted - remove request from queue
+				if (fl_choice("Do you want to remove eQSL received flag?", fl_yes, fl_no, nullptr) == 0) {
+					record* qso = book_->get_record(request.record_num, false);
+					qso->item("EQSL_QSL_RCVD", string(""));
+					qso->item("EQSL_QSLRDATE", string(""));
+					book_->modified(true);
+				}
 				request_queue->pop();
 				book_->enable_save(true, "Failed eQSL image request");
 				cards_skipped = true;
@@ -131,6 +149,7 @@ void eqsl_handler::cb_timer_deq(void* v) {
 			// request succeeded - remove request from queue
 			request_queue->pop();
 			book_->enable_save(true, "Dequeued eQSL image request");
+			that->allowed_fetches_--;
 			break;
 		case ER_SKIPPED:
 			// request skipped - remove request from queue

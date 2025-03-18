@@ -28,6 +28,7 @@
 #include "main_window.h"
 #include "qso_manager.h"
 #include "qso_data.h"
+#include "eqsl_handler.h"
 
 #include <sstream>
 #include <list>
@@ -64,6 +65,7 @@ extern wsjtx_handler* wsjtx_handler_;
 extern time_t session_start_;
 extern qso_manager* qso_manager_;
 extern config* config_;
+extern eqsl_handler* eqsl_handler_;
 
 
 
@@ -163,6 +165,7 @@ extern config* config_;
 		{ "&Print Cards", 0, menu::cb_mi_ext_print, 0 },
 		{ "Send e-mail", 0, menu::cb_mi_ext_email, 0 },
 		{ "Mar&k sent", 0, menu::cb_mi_ext_mark, 0 },
+		{ "Download &Images", 0, menu::cb_mi_ext_dl_images, 0 },
 		{ 0 },
 
 	// Log import operations
@@ -1116,6 +1119,16 @@ void menu::cb_mi_ext_email(Fl_Widget* w, void* v) {
 // v is not used
 void menu::cb_mi_ext_mark(Fl_Widget* w, void* v) {
 	qso_manager_->qsl_print_done();
+}
+
+// Extract->Download Images
+// v is not used
+void menu::cb_mi_ext_dl_images(Fl_Widget* w, void* v) {
+	for (item_num_t ix = 0; ix < extract_records_->size(); ix++) {
+		qso_num_t qn = extract_records_->record_number(ix);
+		eqsl_handler_->enqueue_request(qn, true);
+	}
+	eqsl_handler_->enable_fetch(eqsl_handler::EQ_START);
 }
 
 // Report->Clear etc. - set the report filter
