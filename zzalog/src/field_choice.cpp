@@ -6,6 +6,8 @@
 #include "cty_data.h"
 #include "qso_entry.h"
 
+#include <cstring>
+
 #include <FL/Fl_Preferences.H>
 
 extern spec_data* spec_data_;
@@ -100,6 +102,7 @@ void field_choice::hierarchic(bool h) {
 }
 
 Fl_Window* field_input::tip_window_ = nullptr;
+const char* comment_marker_ = ":--->";
 
 // field_input constructor
 field_input::field_input(int X, int Y, int W, int H, const char* label) :
@@ -109,6 +112,7 @@ field_input::field_input(int X, int Y, int W, int H, const char* label) :
 	, qso_(nullptr)
 {
 	type(FL_NORMAL_INPUT);
+	menubutton()->callback(cb_menu);
 	resize(X, Y, W, H);
 }
 
@@ -221,6 +225,7 @@ int field_input::handle(int event) {
 // Intercept the value to re-populate choice
 const char* field_input::value() {
 	if (is_string(field_name_)) populate_case_choice();
+
 	return Fl_Input_Choice::value();
 }
 
@@ -288,16 +293,16 @@ void field_input::populate_choice(string name) {
 	Fl_Menu_Button* menu = menubutton();
 	for (int i = 1; it != dataset->data.end(); i++) {
 		string menu_entry = escape_menu(it->first);
-		// string summary = spec_data_->summarise_enumaration(name, menu_entry);
+		string summary = spec_data_->summarise_enumaration(name, menu_entry);
 		if (hierarchic) {
 			string temp = menu_entry;
 			menu_entry = temp.substr(0, 1) + "/" + temp;
 		}
 		string value = menu_entry;
-		// if (summary.length()) {
-		// 	menu_entry += ": " + summary;
-		// }
-		// menu->add(menu_entry.c_str(), 0, nullptr, (void*)value.c_str());
+		if (summary.length()) {
+			menu_entry += comment_marker_ + summary;
+		}
+		menu->add(menu_entry.c_str(), 0, nullptr, (void*)value.c_str());
 		add(menu_entry.c_str());
 		it++;
 	}
@@ -421,4 +426,20 @@ void field_input::draw() {
 		menubutton()->deactivate();
 	}
 	Fl_Input_Choice::draw();
+}
+
+// Menu button callback
+void field_input::cb_menu(Fl_Widget* w, void* v) {
+	field_input* that = ancestor_view<field_input>(w);
+	const char* val = that->menubutton()->text();
+	const char* pos = strstr(val, comment_marker_);
+	if (pos == nullptr) {
+		that->input()->value(val);
+	} else {
+		char* nval = new char[pos - val + 1];
+		memset(nval, 0, pos - val + 1);
+		strncpy(nval, val, pos - val);
+		that->input()->value(nval);
+	}
+	that->do_callback();
 }

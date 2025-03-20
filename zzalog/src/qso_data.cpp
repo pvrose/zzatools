@@ -1073,7 +1073,7 @@ void qso_data::action_save_edit() {
 		book_->add_use_data(qso);
 
 		if (qso->is_dirty()) book_->modified(true);
-		book_->enable_save(true, "Saving edit");
+		// book_->enable_save(true, "Saving edit");
 		g_entry_->delete_qso();
 	}
 	((qso_manager*)parent())->enable_widgets();

@@ -77,6 +77,9 @@ struct spec_dataset;
 		// Overload draw - deactivates menubeutton accordingly
 		virtual void draw();
 
+		// Overide the menu callback
+		static void cb_menu(Fl_Widget* w, void* v);
+
 	protected:
 
 		// Populate the choice
