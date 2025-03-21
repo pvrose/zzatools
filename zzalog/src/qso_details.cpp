@@ -82,6 +82,7 @@ void qso_details::get_qsos() {
 	set<string> names;
 	set<string> qths;
 	set<string> locators;
+	set<string> states;
 	set<qso_num_t> items;
 	set<qso_num_t> possibles;
 	set<qso_num_t> exacts;
@@ -124,6 +125,11 @@ void qso_details::get_qsos() {
 			if (locator.length()) {
 				locators.insert(locator);
 			}
+			// Get all STATE fields
+			string state = it->item("STATE");
+			if (state.length()) {
+				states.insert(state);
+			}
 			// Ignore current QSO
 			if (qso_->timestamp() != it->timestamp()) {
 				items.insert(ix);
@@ -139,7 +145,7 @@ void qso_details::get_qsos() {
 		}
 
 	}
-	table_details_->set_data(names, qths, locators);
+	table_details_->set_data(names, qths, locators, states);
 	table_qsos_->set_data(items, possibles);
 	// Mark with either a tick or cross depending on whether there are any previous
 	if (items.size() == 0) {
@@ -246,7 +252,11 @@ void qso_details::table_d::draw_cell(TableContext context, int R, int C, int X, 
 }
 
 // Concatenate NAME, QTH and GRIDSQUARE lists into a single dataset for the table
-void qso_details::table_d::set_data(set<string>names, set < string>qths, set<string> locators) {
+void qso_details::table_d::set_data(
+	set<string>names, 
+	set < string>qths, 
+	set<string> locators,
+	set<string> states) {
 	items_.clear();
 	for (auto it = names.begin(); it != names.end(); it++) {
 		items_.push_back({ NAME, (*it) });
@@ -260,6 +270,10 @@ void qso_details::table_d::set_data(set<string>names, set < string>qths, set<str
 		items_.push_back({ LOCATOR, (*it) });
 	}
 	if (locators.size() == 0) items_.push_back({ LOCATOR, "" });
+	for (auto it = states.begin(); it != states.end(); it++) {
+		items_.push_back({ STATE, (*it) });
+	}
+	if (states.size() == 0) items_.push_back({ STATE, "" });
 	cols(1);
 	rows(items_.size());
 	row_height_all(ROW_HEIGHT);

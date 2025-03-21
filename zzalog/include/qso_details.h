@@ -41,7 +41,7 @@ protected:
         virtual void draw_cell(TableContext context, int R = 0, int C = 0, int X = 0, int Y = 0,
             int W = 0, int H = 0);
         // Set data
-        void set_data(set<string> names, set<string> qths, set<string> locators);
+        void set_data(set<string> names, set<string> qths, set<string> locators, set<string> states);
         // Use button
         static void cb_table(Fl_Widget* w, void* v);
 
@@ -52,7 +52,8 @@ protected:
         enum item_type {
             NAME,
             QTH,
-            LOCATOR
+            LOCATOR,
+            STATE
         };
 
         // The row contents
@@ -73,7 +74,8 @@ protected:
         const map<item_type, item_names> name_map_ = {
             {NAME, {"NAME ", "NAME"}},
             {QTH, {"QTH ", "QTH"}},
-            {LOCATOR, {"GRID ", "GRIDSQUARE" }}
+            {LOCATOR, {"GRID ", "GRIDSQUARE" }},
+            {STATE, {"STATE", "STATE"}}
         };
 
     };
