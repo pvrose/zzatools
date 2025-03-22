@@ -52,7 +52,7 @@ void qso_details::create_form() {
 
 	curr_y += op_call_->h() + GAP;
 	// Add table for the contact's details
-	table_details_ = new table_d(curr_x, curr_y, avail_width, 5 * ROW_HEIGHT);
+	table_details_ = new table_d(curr_x, curr_y, avail_width, 6 * ROW_HEIGHT);
 
 	curr_y += table_details_->h() + GAP;
 
