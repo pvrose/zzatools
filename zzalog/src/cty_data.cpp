@@ -276,6 +276,17 @@ void cty_data::parse(record* qso) {
 // Get prefix
 cty_data::prefix_entry* cty_data::prefix(record* qso) {
 	time_t timestamp = qso->timestamp();
+	string dxcc = qso->item("DXCC");
+	if (dxcc.length()) {
+		int idxcc = stoi(dxcc);
+		// Find a prefix with that DXCC and use it
+		for (auto it1 = prefixes_.begin(); it1 != prefixes_.end(); it1++) {
+			for (auto it2 = (*it1).second.begin(); it2 != (*it1).second.end(); it2++) {
+				prefix_entry* prefix = *it2;
+				if (prefix->adif_id == idxcc) return prefix;
+			}
+		}
+	}
 	// Split the callsign into its various components
 	vector<string> words;
 	split_line(parse_call_, words, '/');
@@ -459,6 +470,8 @@ bool cty_data::update_qso(record* qso) {
 	bool has_query = false;
 	bool invalid_record = !qso->is_valid();
 	bool query_error = false;
+	// Remove previous QSO as it falsely keeps previous parse result.
+	qso_ = nullptr;
 
 	parse(qso);
 	// Use the values in the exceptions entry
