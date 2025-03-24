@@ -30,6 +30,9 @@ collection_t* qso_entry::field_map_ = nullptr;
 
 int qso_entry::focus_ix_ = 0;
 
+// N rows of NUMBER_PER_ROW
+const int NUMBER_PER_ROW = 2;
+
 // Constructor
 qso_entry::qso_entry(int X, int Y, int W, int H, const char* L) :
 	Fl_Group(X, Y, W, H, L)
@@ -97,8 +100,6 @@ void qso_entry::create_form(int X, int Y) {
 
 	int save_y = curr_y;
 
-	// N rows of NUMBER_PER_ROW
-	const int NUMBER_PER_ROW = 2;
 	const int WCHOICE = WBUTTON * 3 / 2;
 	const int WINPUT = WBUTTON * 7 / 4;
 
@@ -695,6 +696,8 @@ void qso_entry::cb_ip_field(Fl_Widget* w, void* v) {
 	qso_entry* that = ancestor_view<qso_entry>(w);
 	qso_manager* mgr = ancestor_view<qso_manager>(that->qso_data_);
 	field_input* ip = (field_input*)w;
+	field_input::exit_reason_t reason = ip->reason();
+	// Index number of field_input
 	string field = ip->field_name();
 	string value = ip->value();
 	string old_value = that->qso_->item(field);
@@ -801,6 +804,34 @@ void qso_entry::cb_ip_field(Fl_Widget* w, void* v) {
 		default:
 			break;
 		}
+	}
+	int ix = (int)(intptr_t)v;
+	// catch navigation events
+	switch (reason) {
+	case field_input::IR_RIGHT:
+		if (ix + 1 < NUMBER_TOTAL) {
+			that->focus_ix_ = ix + 1;
+			that->set_focus_saved();
+		}
+		return;
+	case field_input::IR_LEFT:
+		if (ix > 0) {
+			that->focus_ix_ = ix - 1;
+			that->set_focus_saved();
+		}
+		return;
+	case field_input::IR_DOWN:
+		if (ix + NUMBER_PER_ROW < NUMBER_TOTAL) {
+			that->focus_ix_ = ix + NUMBER_PER_ROW;
+			that->set_focus_saved();
+		}
+		return;
+	case field_input::IR_UP:
+		if (ix >= NUMBER_PER_ROW) {
+			that->focus_ix_ = ix - NUMBER_PER_ROW;
+			that->set_focus_saved();
+		}
+		return;
 	}
 }
 
