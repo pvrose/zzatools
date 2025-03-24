@@ -130,7 +130,7 @@ int field_input::handle(int event) {
 	switch (event) {
 	case FL_PUSH:
 		if (intl_dialog_) {
-			intl_dialog_->editor(this->input());
+			intl_dialog_->editor(this);
 		}
 		if (qe) qe->save_focus(this);
 		// Remove any tip window on this or other field_input
@@ -216,6 +216,12 @@ int field_input::handle(int event) {
 			}
 		}
 		return Fl_Input_Choice::handle(event);
+	case FL_PASTE: {
+		// After default pasting sction want to retain focus
+		int result = input()->handle(event);
+		take_focus();
+		return result;
+	}
 	default:
 		// Do normal handling
 		return Fl_Input_Choice::handle(event);
