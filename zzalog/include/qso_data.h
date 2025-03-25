@@ -98,6 +98,9 @@ public:
 	qso_data(int X, int Y, int W, int H, const char* l);
 	~qso_data();
 
+	// Custom event handling
+	virtual int handle(int event);
+
 	// get settings
 	void load_values();
 	// Create form

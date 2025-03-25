@@ -63,6 +63,43 @@ qso_data::qso_data(int X, int Y, int W, int H, const char* l) :
 qso_data::~qso_data() {
 }
 
+// Event handler - catch Page up, page down, home and end and navigate accordingly
+int qso_data::handle(int event) {
+	navigate_t dirn;
+	bool do_nav = false;
+	switch(event) {
+	case FL_FOCUS:
+	case FL_UNFOCUS:
+		// Tell FLTK event handler we are interested in keyboard events
+		return 1;
+	case FL_KEYBOARD:
+		switch (Fl::event_key()) {
+		case FL_Page_Up:
+			dirn = NV_PREV;
+			do_nav = true;
+			break;
+		case FL_Page_Down:
+			dirn = NV_NEXT;
+			do_nav = true;
+			break;
+		case FL_Home:
+			dirn = NV_FIRST;
+			do_nav = true;
+			break;
+		case FL_End:
+			dirn = NV_LAST;
+			do_nav = true;
+			break;
+		}
+	}
+	if (do_nav) {
+		action_navigate(dirn);
+		return false; 
+	} else {
+		return Fl_Group::handle(event);
+	}
+}
+
 // Load values
 void qso_data::load_values() {
 	// Set logging mode -default is On-air with or without rig connection
