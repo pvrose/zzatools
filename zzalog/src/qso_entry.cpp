@@ -701,6 +701,8 @@ void qso_entry::cb_ip_field(Fl_Widget* w, void* v) {
 	string field = ip->field_name();
 	string value = ip->value();
 	string old_value = that->qso_->item(field);
+	// Save cursor position
+	int pos = ip->input()->insert_position();
 	if (old_value != value) {
 		that->qso_->item(field, value);
 
@@ -805,6 +807,8 @@ void qso_entry::cb_ip_field(Fl_Widget* w, void* v) {
 			break;
 		}
 	}
+	// Restore cursor position after possible value change
+	ip->input()->insert_position(pos);
 	int ix = (int)(intptr_t)v;
 	// catch navigation events
 	switch (reason) {
