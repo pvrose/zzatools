@@ -306,7 +306,7 @@ void field_input::populate_choice(string name) {
 		}
 		string value = menu_entry;
 		if (summary.length()) {
-			menu_entry += comment_marker_ + summary;
+			menu_entry += comment_marker_ + escape_menu(summary);
 		}
 		menu->add(menu_entry.c_str(), 0, nullptr, (void*)value.c_str());
 		add(menu_entry.c_str());

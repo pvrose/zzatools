@@ -133,6 +133,8 @@ public:
 
 	// Initialise fields
 	void initialise_fields();
+	// Set focus to saved 
+	void set_focus_saved();
 
 protected:
 	// Field input - v: field name
@@ -141,8 +143,6 @@ protected:
 	static void cb_ch_field(Fl_Widget* w, void* v);
 	// Notes input field
 	static void cb_ip_notes(Fl_Widget* w, void* v);
-	// Set focus to saved 
-	void set_focus_saved();
 
 
 

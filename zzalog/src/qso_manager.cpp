@@ -200,9 +200,9 @@ void qso_manager::enable_widgets() {
 	// Not all widgets may exist yet!
 	if (!created_) return;
 
-	data_group_->enable_widgets();
 	rig_group_->enable_widgets();
 	info_group_->enable_widgets();
+	data_group_->enable_widgets();
 
 }
 
