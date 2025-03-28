@@ -142,7 +142,7 @@ int field_input::handle(int event) {
 		return Fl_Input_Choice::handle(event);
 	case FL_FOCUS:
 		if (intl_dialog_) {
-			intl_dialog_->editor(this->input());
+			intl_dialog_->editor(this);
 		}
 		if (input()->take_focus()) return true;
 		return Fl_Input_Choice::handle(event);
@@ -177,7 +177,7 @@ int field_input::handle(int event) {
 		}
 		return Fl_Input_Choice::handle(event);
 	case FL_KEYBOARD:
-		// Convert navigation keys to commands
+	// Convert navigation keys to commands
 		switch (Fl::event_key()) {
 		case FL_Tab:
 			// Send to parent to handle

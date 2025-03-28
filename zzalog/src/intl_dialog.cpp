@@ -171,6 +171,8 @@ void intl_dialog::cb_bn_use(Fl_Widget* w, void* v) {
 		Fl::copy(utf8, len);
 		// Paste to currently open editor
 		Fl::paste(*that->editor_);
+		// Set focus to that widget
+		Fl::focus(that->editor_);
 	}
 }
 
