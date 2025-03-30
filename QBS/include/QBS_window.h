@@ -57,6 +57,8 @@ public:
     void process(process_mode_t p);
     // Pop the process - and return new process
     process_mode_t pop_process();
+    // Restore previous pop
+    void restore_process();
     // Populate call choice with extant callsigns
     // TODO implement it in QBS_window.cpp
     void populate_call_choice(input_hierch* ch);
@@ -107,10 +109,11 @@ protected:
 
     // The stack of operations
     stack<process_mode_t, vector<process_mode_t> > stack_;
+
+    // Last popped processe (for resume)
+    process_mode_t popped_;
  
     // Reading - ignore update_action
     bool reading_;
-    // Last screen was DORMANT
-    bool last_dormant_;
 };
 

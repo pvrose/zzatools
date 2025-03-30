@@ -24,7 +24,8 @@ QBS_window::QBS_window(int W, int H, const char* L, const char* filename) :
 	data_(nullptr),
 	qbs_filename_(filename),
 	blog_file_(nullptr),
-	reading_(false)
+	reading_(false),
+	popped_(DORMANT)
 {
 	spells_.clear();
 	stack_.push(INITIAL);
@@ -43,9 +44,6 @@ QBS_window::QBS_window(int W, int H, const char* L, const char* filename) :
 		free(temp);
 	}
 	data_ = new QBS_data;
-	int tempi;
-	settings.get("Last Dormant", tempi, false);
-	last_dormant_ = tempi;
 	// 
 	begin();
 	create_form();
@@ -81,12 +79,6 @@ void QBS_window::cb_close(Fl_Widget* w, void* v) {
 	Fl_Preferences settings(Fl_Preferences::USER, VENDOR.c_str(), PROGRAM_ID.c_str());
 	settings.set("CSV Directory", that->csv_directory_.c_str());
 	settings.set("Filename", that->qbs_filename_.c_str());
-	if (that->process() == DORMANT) {
-		settings.set("Last Dormant", true);
-	}
-	else {
-		settings.set("Last Dormant", false);
-	}
 	settings.flush();
 	Fl_Single_Window::default_callback(that, v);
 	delete that->data_;
@@ -139,13 +131,12 @@ void QBS_window::update_actions() {
 // Callback - read QBS data - pass filename to data to start reading it
 bool QBS_window::read_qbs() {
 	reading_ = true;
+	// Initialise stack to DORMANT
+	stack_.push(DORMANT);
 	if (data_->read_qbs(qbs_filename_)) {
 		reading_ = false;
 		update_actions();
 		g_batch_->populate_batch_choice();
-		if (last_dormant_) {
-			stack_.push(DORMANT);
-		}
 		show_process();
 		return true;
 	}
@@ -184,9 +175,16 @@ void QBS_window::process(process_mode_t p) {
 
 // Pop the process - and return new process
 process_mode_t QBS_window::pop_process() {
+	popped_ = stack_.top();
 	stack_.pop();
 	show_process();
 	return stack_.top();
+}
+
+// Restore last popped process
+void QBS_window::restore_process() {
+	stack_.push(popped_);
+	show_process();
 }
 
 void QBS_window::show_process() {

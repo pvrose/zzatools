@@ -146,7 +146,7 @@ void QBS_call::create_form() {
 
 	cx += WBUTTON;
 
-	bn_done_ = new Fl_Button(cx, cy, WBUTTON, HBUTTON, "Done");
+	bn_done_ = new Fl_Button(cx, cy, WBUTTON, HBUTTON, "Next");
 	bn_done_->callback(cb_done, nullptr);
 	bn_done_->tooltip("Mark action done, and proceed to next action");
 

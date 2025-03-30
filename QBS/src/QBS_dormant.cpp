@@ -83,6 +83,13 @@ void QBS_dormant::create_form() {
 	bn_call_history_ = new Fl_Button(cx, cy, 2 *WBUTTON, HBUTTON, "Call History");
 	bn_call_history_->callback(cb_action, (void*)(intptr_t)process_mode_t::CALL_HISTORY);
 	bn_call_history_->tooltip("Display recent activity for call");
+
+	cy += HBUTTON + GAP;
+
+	bn_undo_ = new Fl_Button(cx, cy, 2 * WBUTTON, HBUTTON, "Undo previous");
+	bn_undo_->callback(cb_undo, nullptr);
+	bn_undo_->tooltip("Go back to the last process");
+
 	end();
 	show();
 }
@@ -111,6 +118,11 @@ void QBS_dormant::cb_action(Fl_Widget* w, void* v) {
 	that->win_->process((process_mode_t)(intptr_t)v);
 }
 
+// Callback undo
+void QBS_dormant::cb_undo(Fl_Widget* w, void* v) {
+	QBS_dormant* that = ancestor_view<QBS_dormant>(w);
+	that->win_->restore_process();
+}
 
 
 
