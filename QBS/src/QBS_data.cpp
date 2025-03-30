@@ -136,7 +136,7 @@ int QBS_data::new_batch(
 		int num = (int)boxes_.size();
 		boxes_.push_back(box);
 		log_action(BATCH, box_num, date, batch, 0, 0);
-		window_->update_actions();
+		// window_->update_actions();
 		return num;
 	}
 }
@@ -343,7 +343,7 @@ int QBS_data::dispose_cards(
 ) {
 	mode_ = FINISHING;
 	//action_read_ = DISPOSE_CARDS;
-	window_->update_actions();
+	// window_->update_actions();
 	int nbox = (int)boxes_.size() - 1;
 	box_data& box = *boxes_[nbox];
 	int cards = 0;
@@ -745,7 +745,7 @@ notes* QBS_data::get_notes(string callsign) {
 // Connect to parent window and tell it the status
 void QBS_data::set_window(QBS_window* w) {
 	window_ = w;
-	window_->update_actions();
+	// window_->update_actions();
 }
 
 // Load CSV files
@@ -762,7 +762,7 @@ bool QBS_data::import_cvs(string& directory) {
 		}
 	}
 	window_->open_batch_log(boxes_[get_current()]->id);
-	window_->update_actions();
+	// window_->update_actions();
 	return result;
 }
 

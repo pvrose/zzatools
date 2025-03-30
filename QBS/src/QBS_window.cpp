@@ -120,6 +120,8 @@ void QBS_window::create_form() {
 	spells_[BATCH_SUMMARY] = g_batch_;
 	spells_[BATCH_REPORT] = g_batch_;
 
+	wiz_->end();
+
 	end();
 	show();
 
