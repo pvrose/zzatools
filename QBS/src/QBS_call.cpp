@@ -22,6 +22,7 @@ QBS_call::QBS_call(int X, int Y, int W, int H, const char* L) :
 	stuff_qty_ = 0;
 	keep_qty_ = 0;
 	sases_qty_ = 0;
+	do_keep_ = false;
 	win_ = ancestor_view<QBS_window>(this);
 	data_ = win_->data_;
 	date_ = now(false, DATE_FORMAT);
@@ -106,7 +107,12 @@ void QBS_call::create_form() {
 	maxx = cx + WBUTTON;
 	cy += HBUTTON + GAP;
 
-	ip_keep_ = new Fl_Int_Input(cx, cy, WBUTTON, HBUTTON, "Keep");
+	bn_keep_ = new Fl_Light_Button(cx - WBUTTON, cy, WBUTTON, HBUTTON, "Keep");
+	bn_keep_->callback(cb_keep, &do_keep_);
+	bn_keep_->tooltip("Populate for keeping cards");
+	bn_keep_->value(do_keep_);
+
+	ip_keep_ = new Fl_Int_Input(cx, cy, WBUTTON, HBUTTON);
 	ip_keep_->align(FL_ALIGN_LEFT);
 	ip_keep_->callback(cb_value_int<Fl_Int_Input>, &keep_qty_);
 	ip_keep_->value(to_string(keep_qty_).c_str());
@@ -198,6 +204,13 @@ void QBS_call::enable_widgets() {
 			stuff_qty_ += data_->get_count(ix, call_);
 		}
 		stuff_qty_ += data_->get_count(KEEP_BOX, call_);
+		// Make it easier to keep
+		if (do_keep_) {
+			keep_qty_ = stuff_qty_;
+			stuff_qty_ = 0;
+		} else {
+			keep_qty_ = 0;
+		}
 		if (stuff_qty_ > 0) sases_qty_ = 1;
 		ip_stuff_->value(to_string(stuff_qty_).c_str());
 		ip_keep_->value(to_string(keep_qty_).c_str());
@@ -269,6 +282,12 @@ void QBS_call::cb_call(Fl_Widget* w, void* v) {
 	string* s = (string*)v;
 	(*s) = to_upper(*s);
 	((Fl_Input*)w)->value(s->c_str());
+	QBS_call* that = ancestor_view<QBS_call>(w);
+	that->enable_widgets();
+}
+
+void QBS_call::cb_keep(Fl_Widget* w, void* v) {
+	cb_value<Fl_Button, bool>(w, v);
 	QBS_call* that = ancestor_view<QBS_call>(w);
 	that->enable_widgets();
 }

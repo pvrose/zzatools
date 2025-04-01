@@ -13,6 +13,7 @@ class QBS_window;
 class Fl_Button;
 class Fl_Input;
 class Fl_Int_Input;
+class Fl_Light_Button;
 
 class QBS_call :
     public Fl_Group
@@ -28,6 +29,7 @@ public:
     static void cb_execute(Fl_Widget* w, void* v);
     static void cb_done(Fl_Widget* w, void* v);
     static void cb_call(Fl_Widget* w, void* v);
+    static void cb_keep(Fl_Widget* w, void* v);
 
 protected:
     // Process specific executes
@@ -53,6 +55,7 @@ protected:
     Fl_Int_Input* ip_stuff_;
     Fl_Int_Input* ip_keep_;
     Fl_Int_Input* ip_sases_;
+    Fl_Light_Button* bn_keep_;
 
     // References
     QBS_window* win_;
@@ -71,6 +74,8 @@ protected:
     int sases_qty_;
     // Current date
     string date_;
+    // Populate for keepin
+    bool do_keep_;
 
 
 
