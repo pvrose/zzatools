@@ -43,6 +43,7 @@ protected:
 
     void draw_y_axis();
     void draw_legend();
+    void draw_average();
     
     void draw_chart();
 
@@ -50,6 +51,8 @@ protected:
     void chart_tip();
 
     int max_;
+    // average through range
+    double average_;
 
     // Number of bars in bar chart
     int start_box_;

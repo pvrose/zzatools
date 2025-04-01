@@ -77,6 +77,8 @@ void QBS_charth::update(string call) {
 void QBS_charth::draw_chart() {
 
 	max_ = 0;
+	average_ = 0.0;
+	int count = 0;
 
 	chart_counts_.resize(number_boxes_ * 4);
 
@@ -84,7 +86,7 @@ void QBS_charth::draw_chart() {
 
 	char err_msg[64];
 
-	for (int b = start_box_, ix = 0; b <= stop_box_; b++, ix++) {
+	for (int b = start_box_, ix = 0; b <= stop_box_; b++, ix++, count++) {
 		string box_name = data_->get_batch(b);
 		string label = "";
 		if (box_name.substr(5, 2) == "Q1") {
@@ -101,6 +103,7 @@ void QBS_charth::draw_chart() {
 				rcvd = 0;
 			}
 			max_ = max(max_, rcvd);
+			average_ += rcvd;
 		}
 		chart_counts_[ix] = rcvd;
 		chart_->add((double)rcvd, label.c_str(), COLOUR_RECEIVED);
@@ -135,6 +138,8 @@ void QBS_charth::draw_chart() {
 		chart_counts_[ix] = 0;
 		chart_->add(0, "", color());
 	}
+
+	average_ /= count;
 
 	if (max_ > 50) max_ = 100;
 	else if(max_ > 25) max_ = 50;
@@ -195,6 +200,21 @@ void QBS_charth::draw_y_axis() {
 	}
 }
 
+void QBS_charth::draw_average() {
+	int ax = x() + AXIS_WIDTH;
+	int ay = y();
+	int dh = fl_height();
+	int ah = chart_->h() - dh - 1;
+	int aw = chart_->w();
+	double pixel_per_unit = (double)ah / (double)max_;
+	int ly = ay + ah - (int)round(average_ * pixel_per_unit);
+	// Draw the line
+	fl_color(FL_BLUE);
+	fl_line_style(FL_DASHDOT);
+	fl_line(ax, ly, ax + aw, ly);
+	fl_line_style(0);
+}
+
 void QBS_charth::draw_legend() {
 	int x = Fl_Group::x();
 	int y = Fl_Group::y() + chart_->h();
@@ -223,6 +243,7 @@ void QBS_charth::draw_legend() {
 void QBS_charth::draw() {
 	Fl_Group::draw();
 	draw_y_axis();
+	draw_average();
 	draw_legend();
 }
 
