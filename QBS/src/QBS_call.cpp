@@ -376,6 +376,20 @@ void QBS_call::execute_process() {
 	stuff_qty_ = 0;
 	keep_qty_ = 0;
 	sases_qty_ = 0;
+	// Get the next 
+	count_data* sases = data_->get_count_data(SASE_BOX);
+	auto it = sases->find(call_);
+	if (it != sases->end()) {
+		it++;
+		int count = 0;
+		while(it != sases->end() && count == 0) {
+			count = (*it).second;
+			if (count != 0) call_ = (*it).first;
+			it++;
+		}
+	}
+	ip_call_->value(call_.c_str());
+
 	enable_widgets();
 }
 
