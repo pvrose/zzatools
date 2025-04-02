@@ -358,6 +358,10 @@ void QBS_batch::cb_batch(Fl_Widget* w, void* v) {
 }
 
 void QBS_batch::execute_new() {
+	if (data_->get_current() != data_->get_tail()) {
+		fl_message("Previous batch has not been marked for disposal!");
+		return;
+	}
 	string batch = data_->get_batch(box_);
 	string old_batch = data_->get_batch(box_ - 1);
 	char log_msg[128];
