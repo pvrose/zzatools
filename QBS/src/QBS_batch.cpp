@@ -137,11 +137,17 @@ void QBS_batch::create_form() {
 
 	cy = my + GAP;
 	cx = sx;
-	ip_weight_ = new Fl_Float_Input(cx, cy, WBUTTON, HBUTTON, "Weight");
+	ip_weight_ = new Fl_Float_Input(cx, cy, WBUTTON, HBUTTON, "Weight (kg)");
 	ip_weight_->align(FL_ALIGN_LEFT);
 	ip_weight_->callback(cb_value_float<Fl_Float_Input>, &weight_);
 	ip_weight_->tooltip("Enter the weight of cards (in kg) being recycled");
 
+	cx += WBUTTON;
+	op_wt_card_ = new Fl_Output(cx, cy, WBUTTON, HBUTTON, "g/card");
+	op_wt_card_->align(FL_ALIGN_RIGHT);
+	op_wt_card_->tooltip("Shows the average weight per card");
+
+	cx = sx;
 	cy += HBUTTON + GAP;
 
 	int htab = y() + h() - cy - HBUTTON - GAP;
@@ -192,7 +198,7 @@ void QBS_batch::enable_widgets() {
 			snprintf(l, sizeof(l), "FINISHING: Mark batch %s for disposal", batch.c_str());
 			break;
 		case process_mode_t::RECYCLING:
-			snprintf(l, sizeof(l), "RECYCLING: Rrecycling batch %s cards", batch.c_str());
+			snprintf(l, sizeof(l), "RECYCLING: Recycling batch %s cards", batch.c_str());
 			break;
 		case process_mode_t::LOG_BATCH:
 			snprintf(l, sizeof(l), "NEW BATCH: Create new batch %s", batch.c_str());
@@ -246,13 +252,16 @@ void QBS_batch::enable_widgets() {
 			op_rcyc_date_->value("");
 		}
 		snprintf(l, sizeof(l), "%.2f", info.weight_kg);
+		char l2[32];
 		switch (win_->process()) {
 		case RECYCLING:
 			tab_top20_->show();
 			tab_top20_->box(box_);
 			tab_report_->hide();
 			ch_batch_->deactivate();	
-			ip_weight_->value("");
+			ip_weight_->value(weight_);
+			snprintf(l2, sizeof(l2), "%.1f", weight_ * 1000. / (info.sum_received - info.sum_sent));
+			op_wt_card_->value(l2);
 			break;
 		case BATCH_SUMMARY:
 			tab_top20_->show();
@@ -261,6 +270,12 @@ void QBS_batch::enable_widgets() {
 			ch_batch_->activate();
 			ch_batch_->value(box_);
 			ip_weight_->value(l);
+			if (info.sum_recycled > 0) {
+				snprintf(l2, sizeof(l2), "%.1f", info.weight_kg * 1000 / info.sum_recycled);
+				op_wt_card_->value(l2);
+			} else {
+				op_wt_card_->value("");
+			}
 			break;
 		case BATCH_REPORT:
 			tab_top20_->hide();
@@ -269,6 +284,12 @@ void QBS_batch::enable_widgets() {
 			ch_batch_->activate();
 			ch_batch_->value(box_);
 			ip_weight_->value(l);
+			if (info.sum_recycled > 0) {
+				snprintf(l2, sizeof(l2), "%.1f", info.weight_kg * 1000 / info.sum_recycled);
+				op_wt_card_->value(l2);
+			} else {
+				op_wt_card_->value("");
+			}
 			break;
 		default:
 			tab_top20_->hide();

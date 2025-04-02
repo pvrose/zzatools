@@ -64,6 +64,7 @@ protected:
     Fl_Output* op_rcyc_date_;
 
     Fl_Float_Input* ip_weight_;
+    Fl_Output* op_wt_card_;
 
     QBS_top20* tab_top20_;
     QBS_breport* tab_report_;
