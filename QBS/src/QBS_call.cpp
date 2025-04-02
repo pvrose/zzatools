@@ -208,6 +208,7 @@ void QBS_call::enable_widgets() {
 		if (do_keep_) {
 			keep_qty_ = stuff_qty_;
 			stuff_qty_ = 0;
+			sases_qty_ = 0;
 		} else {
 			keep_qty_ = 0;
 		}
