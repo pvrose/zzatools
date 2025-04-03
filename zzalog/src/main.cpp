@@ -76,7 +76,7 @@ string PROGRAM_ID = "ZZALOG";
 string PROG_ID = "ZLG";
 string PROGRAM_VERSION = "3.4.108";
 string VENDOR = "GM3ZZA";
-extern string TIMESTAMP;
+string TIMESTAMP = string(__DATE__) + " " + string(__TIME__);
 
 // switches
 // Debug levels

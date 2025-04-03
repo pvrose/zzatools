@@ -204,7 +204,6 @@
     <ClCompile Include="zzalog\src\socket_server.cpp" />
     <ClCompile Include="zzalog\src\symbols.cpp" />
     <ClCompile Include="zzalog\src\ticker.cpp" />
-    <ClCompile Include="zzalog\src\timestamp.cpp" />
     <ClCompile Include="zzalog\src\url_handler.cpp" />
     <ClCompile Include="zzalog\src\win_dialog.cpp" />
     <ClCompile Include="zzalog\src\wx_handler.cpp" />

@@ -243,9 +243,6 @@
     <ClCompile Include="zzalog\src\qso_wx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="zzalog\src\timestamp.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="zzalog\src\qsl_display.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
