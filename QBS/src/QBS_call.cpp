@@ -137,14 +137,8 @@ void QBS_call::create_form() {
 	gp_process_->size(gw, gh);
 	gp_process_->end();
 
-	cx = x() + w() - GAP - (3 * WBUTTON);
+	cx = x() + w() - GAP - (2 * WBUTTON);
 	cy = y() + h() - GAP - HBUTTON;
-
-	bn_back_ = new Fl_Button(cx, cy, WBUTTON, HBUTTON, "Back");
-	bn_back_->callback(cb_back, nullptr);
-	bn_back_->tooltip("Go back to previous action");
-
-	cx += WBUTTON;
 
 	bn_execute_ = new Fl_Button(cx, cy, WBUTTON, HBUTTON, "Execute");
 	bn_execute_->callback(cb_execute, nullptr);
@@ -167,7 +161,7 @@ void QBS_call::enable_widgets() {
 	int head_box = data_->get_head();
 	string head_batch = data_->get_batch(head_box);
 	char l[128];
-	switch (win_->process()) {
+	switch (data_->mode()) {
 	case process_mode_t::LOG_CARD:
 		snprintf(l, sizeof(l), "LOG CARD: Adding out-of-batch card - last batch %s", last_batch.c_str());
 		break;
@@ -189,13 +183,19 @@ void QBS_call::enable_widgets() {
 	}
 	copy_label(l);
 	// Show one or the other input group
-	switch (win_->process()) {
+	switch (data_->mode()) {
 	case process_mode_t::LOG_CARD:
 	case process_mode_t::LOG_SASE:
+		ip_add_qty_->value(to_string(add_qty_).c_str());
+		gp_add_item_->show();
+		gp_process_->hide();
+		bn_done_->deactivate();
+		break;
 	case process_mode_t::SORTING:
 		ip_add_qty_->value(to_string(add_qty_).c_str());
 		gp_add_item_->show();
 		gp_process_->hide();
+		bn_done_->activate();
 		break;
 	case process_mode_t::PROCESSING:
 		gp_add_item_->hide();
@@ -217,14 +217,17 @@ void QBS_call::enable_widgets() {
 		ip_keep_->value(to_string(keep_qty_).c_str());
 		ip_sases_->value(to_string(sases_qty_).c_str());
 		gp_process_->show();
+		bn_done_->activate();
 		break;
 	case process_mode_t::CALL_HISTORY:
 		gp_add_item_->hide();
 		gp_process_->hide();
+		bn_done_->deactivate();
 		break;
 	default:
 		gp_add_item_->hide();
 		gp_process_->hide();
+		bn_done_->deactivate();
 		break;
 	}
 	// Update the holdoing table
@@ -235,16 +238,10 @@ void QBS_call::enable_widgets() {
 	ch_history_->show();
 }
 
-// Go back to previous process
-void QBS_call::cb_back(Fl_Widget* w, void* v) {
-	QBS_call* that = ancestor_view<QBS_call>(w);
-	that->win_->pop_process();
-}
-
 // Execute the action
 void QBS_call::cb_execute(Fl_Widget* w, void* v) {
 	QBS_call* that = ancestor_view<QBS_call>(w);
-	switch (that->win_->process()) {
+	switch (that->data_->mode()) {
 	case process_mode_t::LOG_CARD:
 		that->execute_log_card();
 		break;
@@ -262,19 +259,15 @@ void QBS_call::cb_execute(Fl_Widget* w, void* v) {
 
 void QBS_call::cb_done(Fl_Widget* w, void* v) {
 	QBS_call* that = ancestor_view<QBS_call>(w);
-	switch (that->win_->process()) {
-	case process_mode_t::LOG_CARD:
-		that->win_->pop_process();
-		break;
-	case process_mode_t::LOG_SASE:
-		that->win_->pop_process();
-		break;
+	switch (that->data_->mode()) {
 	case process_mode_t::SORTING:
-		that->win_->process(process_mode_t::PROCESSING);
+		that->data_->mode(process_mode_t::PROCESSING);
+		that->win_->update_actions();
 		break;
 	case process_mode_t::PROCESSING:
-		that->win_->process(process_mode_t::POSTING);
-		break;
+	that->data_->mode(process_mode_t::POSTING);
+	that->win_->update_actions();
+	break;
 	}
 }
 
@@ -300,7 +293,7 @@ void QBS_call::execute_log_card() {
 	snprintf(log_msg, sizeof(log_msg), "Received non-batch cards %s: %s %d\n", date_.c_str(), call_.c_str(), add_qty_);
 	win_->append_batch_log(log_msg);
 	add_qty_ = 0;
-	enable_widgets();
+	win_->update_actions();
 }
 
 void QBS_call::execute_log_sase() {
@@ -309,7 +302,7 @@ void QBS_call::execute_log_sase() {
 	snprintf(log_msg, sizeof(log_msg), "Received SASEs %s: %s %d\n", date_.c_str(), call_.c_str(), add_qty_);
 	win_->append_batch_log(log_msg);
 	add_qty_ = 0;
-	enable_widgets();
+	win_->update_actions();
 }
 
 void QBS_call::execute_sort() {
@@ -318,7 +311,7 @@ void QBS_call::execute_sort() {
 	snprintf(log_msg, sizeof(log_msg), "Received batch cards %s: %s %d\n", date_.c_str(), call_.c_str(), add_qty_);
 	win_->append_batch_log(log_msg);
 	add_qty_ = 0;
-	enable_widgets();
+	win_->update_actions();
 }
 
 // Stuff from specified box
@@ -391,6 +384,6 @@ void QBS_call::execute_process() {
 	}
 	ip_call_->value(call_.c_str());
 
-	enable_widgets();
+	win_->update_actions();
 }
 

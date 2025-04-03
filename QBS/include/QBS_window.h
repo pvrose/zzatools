@@ -51,15 +51,7 @@ public:
     // Open batch log
     void open_batch_log(string batch_name);
 
-    // Get the current process
-    process_mode_t process();
-    // Push the proces
-    void process(process_mode_t p);
-    // Pop the process - and return new process
-    process_mode_t pop_process();
-    // Restore previous pop
-    void restore_process();
-    // Populate call choice with extant callsigns
+     // Populate call choice with extant callsigns
     // TODO implement it in QBS_window.cpp
     void populate_call_choice(input_hierch* ch);
     // Write batch log
@@ -76,8 +68,6 @@ protected:
     void create_form();
     // Configure the widgets
     void enable_widgets();
-
-    void show_process();
 
 public:
     // Public variables
@@ -107,12 +97,6 @@ protected:
     // The groups within the wizard that perform specific acts (hence spells).
     map<process_mode_t, Fl_Group*> spells_;
 
-    // The stack of operations
-    stack<process_mode_t, vector<process_mode_t> > stack_;
-
-    // Last popped processe (for resume)
-    process_mode_t popped_;
- 
     // Reading - ignore update_action
     bool reading_;
 };

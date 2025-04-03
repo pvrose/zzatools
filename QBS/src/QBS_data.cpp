@@ -78,13 +78,12 @@ int QBS_data::receive_cards(
 	}
 	else {
 		if (box_num == IN_BOX) {
-			mode_ = LOG_CARD;
 			//action_read_ = RECEIVE_CARD;
 			// Add cards to in-box
 			in_box_[call] += value;
+			mode_ = DORMANT;
 		}
 		else {
-			mode_ = SORTING;
 			//action_read_ = SORT_CARDS;
 			// Initialisation of diposal queue
 			if (box_num == 1) {
@@ -106,6 +105,7 @@ int QBS_data::receive_cards(
 			if (value > 0) {
 				(*boxes_[box_num]).recycle_info->count_received += 1;
 			}
+			// Mode does not change
 		}
 		log_action(CARDS, box_num, date, call, value, 0);
 		return value;
@@ -118,7 +118,6 @@ int QBS_data::new_batch(
 	string date,                // date created
 	string batch                // batch "name" - e.g. "2022 Q4"
 ) {
-	mode_ = LOG_BATCH;
 	//action_read_ = NEW_BATCH;
 	// Check if box number is valid
 	if (box_num != boxes_.size()) {
@@ -137,6 +136,8 @@ int QBS_data::new_batch(
 		boxes_.push_back(box);
 		log_action(BATCH, box_num, date, batch, 0, 0);
 		// window_->update_actions();
+		// Next action is to sort
+		mode_ = SORTING;
 		return num;
 	}
 }
@@ -148,7 +149,6 @@ int QBS_data::receive_sases(
 	int value                   // num of envelopes
 ) {
 	if (value < 0) {
-		mode_ = LOG_SASE;
 		//action_read_ = DISPOSE_SASE;
 		// Deleting envelopes
 		int avail = sases_[call];
@@ -159,11 +159,13 @@ int QBS_data::receive_sases(
 			cerr << message << endl;
 			log_action(SASES, -1, date, call, -avail, 0);
 			sases_[call] = 0;
+			mode_ = DORMANT;
 			return avail;
 		}
 		else {
 			sases_[call] += value;
 			log_action(SASES, -1, date, call, value, 0);
+			mode_ = DORMANT;
 			return -value;
 		}
 	}
@@ -173,6 +175,7 @@ int QBS_data::receive_sases(
 		// Adding envelopes
 		sases_[call] += value;
 		log_action(SASES, -1, date, call, value, 0);
+		mode_ = DORMANT;
 		return value;
 	}
 }
@@ -220,7 +223,6 @@ int QBS_data::stuff_cards(
 		out_box_[call] += sent;
 	}
 	else if (box_num < (signed)boxes_.size() && box_num >= head_) {
-		mode_ = PROCESSING;
 		//action_read_ = STUFF_CARDS;
 		// Sending box number 
 		box_data& box = *boxes_[box_num];
@@ -323,7 +325,6 @@ int QBS_data::keep_cards(
 int QBS_data::post_cards(
 	string date                 // date actioned
 ) {
-	mode_ = POSTING;
 	//action_read_ = POST_CARDS;
 	int box_num = (int)boxes_.size() - 1;
 	box_data& box = *boxes_[box_num];
@@ -334,6 +335,7 @@ int QBS_data::post_cards(
 	box.date_sent = date;
 	out_box_.clear();
 	log_action(POST, box_num, date, "", cards, 0);
+	mode_ = FINISHING;
 	return cards;
 }
 
@@ -341,7 +343,6 @@ int QBS_data::post_cards(
 int QBS_data::dispose_cards(
 	string date                 // date actioned
 ) {
-	mode_ = FINISHING;
 	//action_read_ = DISPOSE_CARDS;
 	// window_->update_actions();
 	int nbox = (int)boxes_.size() - 1;
@@ -360,6 +361,7 @@ int QBS_data::dispose_cards(
 	}
 	tail_ = nbox;
 	log_action(DISPOSE, nbox, date, "", cards, 0);
+	mode_ = DORMANT;
 	return cards;
 }
 
@@ -368,7 +370,6 @@ int QBS_data::recycle_cards(
 	string date,                // date actioned
 	float weight                // weight of cards
 ) {
-	mode_ = RECYCLING;
 	//action_read_ = RECYCLE_CARDS;
 	int cards = 0;
 	int calls = 0;
@@ -387,6 +388,7 @@ int QBS_data::recycle_cards(
 	log_action(RECYCLE, head_, date, "", cards, weight);
 	evaluate_top20(head_);
 	head_++;
+	mode_ = DORMANT;
 	return cards;
 }
 
@@ -858,12 +860,15 @@ bool QBS_data::read_qbs(string& filename) {
 				box = stoi(words[2]);
 				call = words[3];
 				value = stoi(words[4]);
+				if (box == IN_BOX) mode_ = LOG_CARD;
+				else mode_ = SORTING;
 				check = receive_cards(box, date, call, value);
 				break;
 			case BATCH:
 				date = words[1];
 				box = stoi(words[2]);
 				batch = words[3];
+				mode_ = LOG_BATCH;
 				check = new_batch(box, date, batch);
 				do_check = false;
 				break;
@@ -871,6 +876,7 @@ bool QBS_data::read_qbs(string& filename) {
 				date = words[1];
 				call = words[2];
 				value = stoi(words[3]);
+				mode_ = LOG_SASE;
 				check = receive_sases(date, call, value);
 				break;
 			case OUTPUT:
@@ -878,12 +884,14 @@ bool QBS_data::read_qbs(string& filename) {
 				box = stoi(words[2]);
 				call = words[3];
 				value = stoi(words[4]);
+				mode_ = PROCESSING;
 				check = stuff_cards(box, date, call, value);
 				break;
 			case USE:
 				date = words[1];
 				call = words[2];
 				value = stoi(words[3]);
+				mode_ = PROCESSING;
 				check = use_sases(date, call, value);
 				break;
 			case KEEP:
@@ -891,18 +899,21 @@ bool QBS_data::read_qbs(string& filename) {
 				box = stoi(words[2]);
 				call = words[3];
 				value = stoi(words[4]);
+				mode_ = PROCESSING;
 				check = keep_cards(box, date, call, value);
 				break;
 			case POST:
 				date = words[1];
 				box = stoi(words[2]);
 				value = stoi(words[3]);
+				mode_ = POSTING;
 				check = post_cards(date);
 				break;
 			case DISPOSE:
 				date = words[1];
 				box = stoi(words[2]);
 				value = stoi(words[3]);
+				mode_ = FINISHING;
 				check = dispose_cards(date);
 				break;
 			case RECYCLE:
@@ -910,6 +921,7 @@ bool QBS_data::read_qbs(string& filename) {
 				box = stoi(words[2]);
 				value = stoi(words[3]);
 				f_value = stof(words[4]);
+				mode_ = RECYCLING;
 				check = recycle_cards(date, f_value);
 				break;
 			case TOTALISE:

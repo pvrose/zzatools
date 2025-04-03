@@ -33,8 +33,6 @@ public:
 
 protected:
 
-    static void cb_back(Fl_Widget* w, void* v);
-    static void cb_execute(Fl_Widget* w, void* v);
     static void cb_next(Fl_Widget* w, void* v);
     static void cb_batch(Fl_Widget* w, void* v);
 
@@ -78,7 +76,5 @@ protected:
     // The box number to be/have been processed
     int box_;
 
-    // Indicates that this has been executed
-    bool executed_;
 };
 

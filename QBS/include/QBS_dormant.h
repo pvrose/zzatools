@@ -24,8 +24,6 @@ public:
 
     // Callback - Receive ad-hoc cards
     static void cb_action(Fl_Widget* w, void* v);
-    // Callback - undo
-    static void cb_undo(Fl_Widget* w, void* v);
 
     QBS_window* win_;
     QBS_data* data_;
@@ -54,7 +52,6 @@ protected:
     Fl_Button* bn_batch_report_;
     Fl_Button* bn_call_summary_;
     Fl_Button* bn_call_history_;
-    Fl_Button* bn_undo_;
 
 };
 

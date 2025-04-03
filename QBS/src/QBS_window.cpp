@@ -24,11 +24,9 @@ QBS_window::QBS_window(int W, int H, const char* L, const char* filename) :
 	data_(nullptr),
 	qbs_filename_(filename),
 	blog_file_(nullptr),
-	reading_(false),
-	popped_(DORMANT)
+	reading_(false)
 {
 	spells_.clear();
-	stack_.push(INITIAL);
 
 	Fl_Preferences settings(Fl_Preferences::USER, VENDOR.c_str(), PROGRAM_ID.c_str());
 
@@ -124,20 +122,29 @@ void QBS_window::create_form() {
 // Depending on the current processin phase allow/disallow the command
 // buttons;
 void QBS_window::update_actions() {
-	process_mode_t mode = data_->mode();
-	process(mode);
+	g_batch_->initialise();
+	if (!reading_) {
+		process_mode_t mode = data_->mode();
+		Fl_Group* spell = spells_.at(mode);
+		if (spell) {
+			wiz_->value(spell);
+		}
+		else {
+			fl_message("Attempting to show a spell that's not yet implemented");
+		}
+		enable_widgets();
+	}
+	
 }
 
 // Callback - read QBS data - pass filename to data to start reading it
 bool QBS_window::read_qbs() {
 	reading_ = true;
 	// Initialise stack to DORMANT
-	stack_.push(DORMANT);
 	if (data_->read_qbs(qbs_filename_)) {
 		reading_ = false;
-		update_actions();
 		g_batch_->populate_batch_choice();
-		show_process();
+		update_actions();
 		return true;
 	}
 	reading_ = false;
@@ -161,45 +168,6 @@ void QBS_window::append_batch_log(const char* text) {
 	cout << text;
 }
 
-// Get the current process
-process_mode_t QBS_window::process() {
-	return stack_.top();
-}
-
-// Push the proces
-void QBS_window::process(process_mode_t p) {
-	stack_.push(p);
-	g_batch_->initialise();
-	show_process();
-}
-
-// Pop the process - and return new process
-process_mode_t QBS_window::pop_process() {
-	popped_ = stack_.top();
-	stack_.pop();
-	show_process();
-	return stack_.top();
-}
-
-// Restore last popped process
-void QBS_window::restore_process() {
-	stack_.push(popped_);
-	show_process();
-}
-
-void QBS_window::show_process() {
-	if (!reading_) {
-		process_mode_t top = process();
-		Fl_Group* spell = spells_.at(top);
-		if (spell) {
-			wiz_->value(spell);
-		}
-		else {
-			fl_message("Attempting to show a spell that's not yet implemented");
-		}
-		enable_widgets();
-	}
-}
 
 // Populate call choice with extant callsigns
 void QBS_window::populate_call_choice(input_hierch* ch) {

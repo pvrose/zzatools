@@ -86,7 +86,7 @@ int QBS_card_table::num_rows() {
     int current = data_->get_current();
     // Rows
     boxes_.clear();
-    switch (win_->process()) {
+    switch (data_->mode()) {
     case process_mode_t::PROCESSING:
         for (int ix = head; ix <= current; ix++) {
             boxes_.push_back(ix);

@@ -19,7 +19,6 @@ QBS_batch::QBS_batch(int X, int Y, int W, int H, const char* L) :
 	win_ = ancestor_view<QBS_window>(this);
 	data_ = win_->data_;
 	date_ = now(true, DATE_FORMAT);
-	executed_ = false;
 
 	create_form();
 	enable_widgets();
@@ -162,20 +161,8 @@ void QBS_batch::create_form() {
 	tab_report_->tooltip("Displays the callsigns received in this batch");
 	tab_report_->data(data_);
 
-	cx = x() + w() - GAP - (3 * WBUTTON);
+	cx = x() + w() - GAP - WBUTTON;
 	cy = y() + h() - GAP - HBUTTON;
-
-	bn_back_ = new Fl_Button(cx, cy, WBUTTON, HBUTTON, "Back");
-	bn_back_->callback(cb_back, nullptr);
-	bn_back_->tooltip("Go back to previous action");
-
-	cx += WBUTTON;
-
-	bn_execute_ = new Fl_Button(cx, cy, WBUTTON, HBUTTON, "Execute");
-	bn_execute_->callback(cb_execute, nullptr);
-	bn_execute_->tooltip("Execute the current action");
-
-	cx += WBUTTON;
 
 	bn_next_ = new Fl_Button(cx, cy, WBUTTON, HBUTTON, "Next");
 	bn_next_->callback(cb_next, nullptr);
@@ -190,7 +177,7 @@ void QBS_batch::enable_widgets() {
 	if (box_ >= 0) {
 		string batch = data_->get_batch(box_);
 		char l[128];
-		switch (win_->process()) {
+		switch (data_->mode()) {
 		case process_mode_t::POSTING:
 			snprintf(l, sizeof(l), "POSTING: Batch %s", batch.c_str());
 			break;
@@ -215,7 +202,7 @@ void QBS_batch::enable_widgets() {
 		}
 		copy_label(l);
 		// Weight input
-		switch (win_->process()) {
+		switch (data_->mode()) {
 		case process_mode_t::RECYCLING:
 		case process_mode_t::BATCH_SUMMARY:
 		case process_mode_t::BATCH_REPORT:
@@ -253,7 +240,7 @@ void QBS_batch::enable_widgets() {
 		}
 		snprintf(l, sizeof(l), "%.2f", info.weight_kg);
 		char l2[32];
-		switch (win_->process()) {
+		switch (data_->mode()) {
 		case RECYCLING:
 			tab_top20_->show();
 			tab_top20_->box(box_);
@@ -297,19 +284,12 @@ void QBS_batch::enable_widgets() {
 			ch_batch_->deactivate();
 			break;
 		}
-		if (executed_) {
-			bn_execute_->deactivate();
-		}
-		else {
-			bn_execute_->activate();
-		}
 	}
 }
 
 // Initialise the widget
 void QBS_batch::initialise() {
-	executed_ = false;
-	switch (win_->process()) {
+	switch (data_->mode()) {
 	case process_mode_t:: POSTING:
 	case process_mode_t::FINISHING:
 		box_ = data_->get_current();
@@ -326,51 +306,25 @@ void QBS_batch::initialise() {
 	}
 }
 
-// Go back to previous process
-void QBS_batch::cb_back(Fl_Widget* w, void* v) {
-	QBS_batch* that = ancestor_view<QBS_batch>(w);
-	that->box_ = 0;
-	that->win_->pop_process();
-}
-
-// Execute the action
-void QBS_batch::cb_execute(Fl_Widget* w, void* v) {
-	QBS_batch* that = ancestor_view<QBS_batch>(w);
-	switch (that->win_->process()) {
-	case process_mode_t::POSTING:
-		that->execute_post();
-		break;
-	case process_mode_t::FINISHING:
-		that->execute_finish();
-		break;
-	case process_mode_t::RECYCLING:
-		that->execute_recycle();
-		break;
-	case process_mode_t::LOG_BATCH:
-		that->execute_new();
-		break;
-	case process_mode_t::BATCH_SUMMARY:
-		that->enable_widgets();
-	}
-}
-
 void QBS_batch::cb_next(Fl_Widget* w, void* v) {
 	QBS_batch* that = ancestor_view<QBS_batch>(w);
-	switch (that->win_->process()) {
-	case process_mode_t::POSTING:
-		that->win_->process(process_mode_t::FINISHING);
-		break;
-	case process_mode_t::FINISHING:
-	case process_mode_t::RECYCLING:
-	case process_mode_t::BATCH_SUMMARY:
-	case process_mode_t::BATCH_REPORT:
-		that->win_->process(process_mode_t::DORMANT);
-		break;
-	case process_mode_t::LOG_BATCH:
-		that->win_->process(process_mode_t::SORTING);
-		break;
+	switch (that->data_->mode()) {
+		case process_mode_t::POSTING:
+			that->execute_post();
+			break;
+		case process_mode_t::FINISHING:
+			that->execute_finish();
+			break;
+		case process_mode_t::RECYCLING:
+			that->execute_recycle();
+			break;
+		case process_mode_t::LOG_BATCH:
+			that->execute_new();
+			break;
+		case process_mode_t::BATCH_SUMMARY:
+			that->enable_widgets();
+		}
 	}
-}
 
 void QBS_batch::cb_batch(Fl_Widget* w, void* v) {
 	QBS_batch* that = ancestor_view<QBS_batch>(w);
@@ -392,8 +346,7 @@ void QBS_batch::execute_new() {
 	win_->open_batch_log(batch);
 	snprintf(log_msg, sizeof(log_msg), "New batch %s: %s\n", batch.c_str(), date_.c_str());
 	win_->append_batch_log(log_msg);
-	executed_ = true;
-	enable_widgets();
+	win_->update_actions();
 }
 
 void QBS_batch::execute_recycle() {
@@ -405,8 +358,7 @@ void QBS_batch::execute_recycle() {
 	data_->recycle_cards(date_, weight_);
 	snprintf(log_msg, sizeof(log_msg), "Recycling batch: %g kg %s\n", weight_, date_.c_str());
 	win_->append_batch_log(log_msg);
-	executed_ = true;
-	enable_widgets();
+	win_->update_actions();
 }
 
 void QBS_batch::execute_post() {
@@ -414,8 +366,7 @@ void QBS_batch::execute_post() {
 	data_->post_cards(date_);
 	snprintf(log_msg, sizeof(log_msg), "Posting batch: %s\n", date_.c_str());
 	win_->append_batch_log(log_msg);
-	executed_ = true;
-	enable_widgets();
+	win_->update_actions();
 }
 
 void QBS_batch::execute_finish() {
@@ -423,8 +374,7 @@ void QBS_batch::execute_finish() {
 	data_->dispose_cards(date_);
 	snprintf(log_msg, sizeof(log_msg), "Marking batch for disposal: %s\n", date_.c_str());
 	win_->append_batch_log(log_msg);
-	executed_ = true;
-	enable_widgets();
+	win_->update_actions();
 }
 
 void QBS_batch::populate_batch_choice() {
