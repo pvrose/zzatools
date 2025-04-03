@@ -266,7 +266,7 @@ Lower	Upper	Bandwidth	Modes	Notes
 433950	434050			Internet Voice gateway
 434375				1.6 MHz Talk-through
 434475	434525			DV Internet voice gateway
-435594	434981	12	FM,DV,Repeater	FM/DV Repeater inputs
+434594	434981	12	FM,DV,Repeater	FM/DV Repeater inputs
 435000	436000		Satellite	Satellites only
 436000	438000		Satellite,TV	Satellites and experimental DATV
 437000				Experimental DATV CoA
@@ -280,3 +280,43 @@ Lower	Upper	Bandwidth	Modes	Notes
 439600	440000			Digital Communications
 439400	439775			9 MHz split repeater outputs
 439900	439987.5			Digital Communications
+1240000	1240750	2.7	CW,Phone	Alternative narrow-band operations
+1240750	1241000	20	FM,DV,Repeater	FM/DV Repeater inputs
+1241000	1241750	150	Dig	High-speed digital data
+1241750	1242000	20	FM,DV	FM/DV Simplex @ 25 kHz channels
+1242000	1249000		TV	Repeater inputs
+1249000	1249250	20	FM,DV,Repeater	FM/DV Repeater outputs
+1250000	1290000		Satellite	Amateur Satellite service
+1290000	1291500	20	FM,DV,Repeater	FM/DV Repeater – inputs
+1291500	1296000		CW,Dig,Phone,FM,DV	All mdes
+1296000	1296150	0.5	CW,Dig	Narrow band 
+1296150	1296800	2.7	CW,Dig,Phone	
+1296800	1296994		Beacons	Beacons
+1296994	1297481	20	FM,DV,Repeater	FM/DV Repeater outputs
+1297494	1297981	20	FM,DV	FM/DV Simplex
+1298000	1299000	20	CW,Dig,Phone,FM,DV	All modes
+1299000	1299750	150	Dig	High-speed digital data
+1299750	1300000	20	FM,DV	FM/DV Simplex
+1300000	1325000		TV,Repeater	TV Repeaters
+2300000	2300400	2.7	CW,Dig,Phone	Narrowband modes
+2300400	2301800	500	FM,DV,Dig	Wideband modes
+2301800	2301000	2.7	CW,Dig,Phone	Narrowband modes
+2310000	2320000	200	Repeater,Dig	
+2320000	2320800	2.7	Phone	
+2320800	2321000		Beacons	
+2321000	2322000	20	FM,DV	
+2322000	2350000		TV,Dig	Wideband modes
+2390000	2400000		TV,Repeater	
+2400000	2450000		TV,Repeater	
+3400000	3400800	2.7	CW,Dig,Phone	Narrowband modes
+3400800	3400998		Beacons	
+3401000	3402000	200	Dig	Wideband 
+3402000	3410000		Dig,TV	Wideband modes
+5650000	5850000		All	
+10000000	10500000		All	
+24000000	24250000		All	
+47000000	47090000		All	
+75500000	81000000		All	
+122250000	123000000		All	
+134000000	141000000		All	
+241000000	250000000		All	
