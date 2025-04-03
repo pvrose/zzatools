@@ -112,15 +112,6 @@ $(INSTALL_DIR)/$(TARGET_EXEC): $(EXEC_DIR)/$(TARGET_EXEC)
 	@echo Installing $(INSTALL_DIR)/$(TARGET_EXEC)
 	@sudo cp $(EXEC_DIR)/$(TARGET_EXEC) $(INSTALL_DIR)
 
-# timestamp file
-.PHONY: ts 
-ts: ./src/timestamp.cpp 
-	@echo Creating $<
-	@echo "#include <string>" > $<
-	@echo "std::string TIMESTAMP = " >> $<
-	@date -u +"\"%Y%m%d__%H%M%SZ\"" >> $<
-	@echo ";" >> $<
-
 # Include the .d makefiles. The - at the front suppresses the errors of missing
 # Makefiles. Initially, all the .d files will be missing, and we don't want those
 # errors to show up.
