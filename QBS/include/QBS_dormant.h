@@ -43,6 +43,8 @@ protected:
     // Buttons that can be disabled
     Fl_Button* bn_receive_card_;
     Fl_Button* bn_receive_sase_;
+    Fl_Button* bn_repoen_;
+    Fl_Output* op_reopen_;
     Fl_Button* bn_new_batch_;
     Fl_Output* op_new_batch_;
     Fl_Button* bn_recycle_;

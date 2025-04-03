@@ -44,6 +44,18 @@ void QBS_dormant::create_form() {
 
 	cy += HBUTTON;
 
+	bn_repoen_ = new Fl_Button(cx, cy, 2 * WBUTTON, HBUTTON, "Re-open");
+	bn_repoen_->callback(cb_action, (void*)(intptr_t)process_mode_t::SORTING);
+	bn_repoen_->tooltip("Re-open current batch for further processing");
+
+	cx += 2 * WBUTTON + GAP;
+	op_reopen_ = new Fl_Output(cx, cy, WBUTTON, HBUTTON);
+	op_reopen_->color(FL_BACKGROUND_COLOR);
+	op_reopen_->box(FL_FLAT_BOX);
+
+	cx = x() + GAP;
+	cy += HBUTTON;
+
 	bn_new_batch_ = new Fl_Button(cx, cy, 2 * WBUTTON, HBUTTON, "New Batch");
 	bn_new_batch_->callback(cb_action, (void*)(intptr_t)process_mode_t::LOG_BATCH);
 	bn_new_batch_->tooltip("Select to record the receipt of a new batch of cards - goes to SORTING");
@@ -98,6 +110,8 @@ void QBS_dormant::enable_widgets() {
 		char l[128];
 		snprintf(l, sizeof(l), "DORMANT: Most recent batch %s", current_.c_str());
 		copy_label(l);
+		// Add current box 
+		op_reopen_->value(current_.c_str());
 		// Set the note against new box with the names of that new box
 		op_new_batch_->value(next_.c_str());
 		// Set the note against recycle with the name of the batch being recycled
