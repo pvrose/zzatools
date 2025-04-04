@@ -197,8 +197,8 @@ void band_widget::draw_scale() {
 
 // Draw the modebars
 void band_widget::draw_markers() {
-	for (int ix = 0; ix < markers_.size(); ix++) {
-		marker& m = markers_[ix];
+	for (auto it = markers_.begin(); it != markers_.end(); it++) {
+		marker& m = *it;
 		switch (m.type) {
 		case SUBBAND_LOWER:
 			if (display_subbands_) {
@@ -568,10 +568,11 @@ void band_widget::adjust_markers() {
 	int iteration = 0;
 	bool squashed = false;
 	// First from highest frequency to lowest - adjust lower frequency downward (higher y)
-	it2 = markers_.end() - 1;
+	it2 = markers_.end();
+	it2--;
 	while (!is_text_marker(*it2) && it2 != markers_.begin()) it2--;
 	if (it2 == markers_.begin()) return;
-	it1 = it2 - 1;
+	it1 = it2; it1--;
 	while (!is_text_marker(*it1) && it1 != markers_.begin()) it1--;
 	while (it2 != markers_.begin()) {
 		int next = it2->y_text + FL_NORMAL_SIZE;
@@ -583,7 +584,7 @@ void band_widget::adjust_markers() {
 		do it2--;
 		while (!is_text_marker(*it2) && it2 != markers_.begin());
 		if (it2 != markers_.begin()) {
-			it1 = it2 - 1;
+			it1 = it2; it1--;
 			while (!is_text_marker(*it1) && it1 != markers_.begin()) it1--;
 		}
 	}
@@ -596,7 +597,7 @@ void band_widget::adjust_markers() {
 	it1 = markers_.begin();
 	while(!is_text_marker(*it1) && it1 != markers_.end()) it1++;
 	if (it1 == markers_.end()) return;
-	it2 = it1 + 1;
+	it2 = it1; it2++;
 	while(!is_text_marker(*it2) && it2 != markers_.end()) it2++;
 	while (it2 != markers_.end()) {
 		int next = it1->y_text - FL_NORMAL_SIZE;
@@ -608,7 +609,7 @@ void band_widget::adjust_markers() {
 		do it1++;
 		while(!is_text_marker(*it1) && it1 != markers_.end());
 		if (it1 == markers_.end()) return;
-		it2 = it1 + 1;
+		it2 = it1; it2++;
 		while(!is_text_marker(*it2) && it2 != markers_.end()) it2++;
 	}
 	// print_markers();
@@ -620,7 +621,7 @@ void band_widget::adjust_markers() {
 	it1 = markers_.begin();
 	while(!is_text_marker(*it1) && it1 != markers_.end()) it1++;
 	if (it1 == markers_.end()) return;
-	it2 = it1 + 1;
+	it2 = it1; it2++;
 	while(!is_text_marker(*it2) && it2 != markers_.end()) it2++;
 	while (it2 != markers_.end()) {
 		int next = it2->y_text + FL_NORMAL_SIZE;
@@ -632,7 +633,7 @@ void band_widget::adjust_markers() {
 		do it1++;
 		while(!is_text_marker(*it1) && it1 != markers_.end());
 		if (it1 == markers_.end()) return;
-		it2 = it1 + 1;
+		it2 = it1; it2++;
 		while(!is_text_marker(*it2) && it2 != markers_.end()) it2++;
 	}
 	// print_markers();
@@ -641,10 +642,10 @@ void band_widget::adjust_markers() {
 	iteration++;
 	squashed = false;
 	// Fourth from highest frequency to lowest - adjust higher frequency downward (higher y)
-	it2 = markers_.end() - 1;
+	it2 = markers_.end(); it2--;
 	while (!is_text_marker(*it2) && it2 != markers_.begin()) it2--;
 	if (it2 == markers_.begin()) return;
-	it1 = it2 - 1;
+	it1 = it2; it1--;
 	while (!is_text_marker(*it1) && it1 != markers_.begin()) it1--;
 	while (it2 != markers_.begin()) {
 		int next = it1->y_text - FL_NORMAL_SIZE;
@@ -655,7 +656,7 @@ void band_widget::adjust_markers() {
 		do it2--;
 		while (!is_text_marker(*it2) && it2 != markers_.begin());
 		if (it2 != markers_.begin()) {
-			it1 = it2 - 1;
+			it1 = it2; it1--;
 			while (!is_text_marker(*it1) && it1 != markers_.begin()) it1--;
 		}
 	}

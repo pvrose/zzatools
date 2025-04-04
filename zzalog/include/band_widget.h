@@ -6,6 +6,7 @@
 #include <set>
 #include <vector>
 #include <map>
+#include <list>
 
 #include <FL/Fl_Widget.H>
 #include <FL/Enumerations.H>
@@ -145,7 +146,7 @@ protected:
     double minor_tick_;
 
     // Frequency markers
-    vector<marker> markers_;
+    list<marker> markers_;
     // Mode bars
     vector<mode_bar> mode_bars_;
     // Label format
