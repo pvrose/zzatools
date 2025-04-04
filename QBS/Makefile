@@ -63,38 +63,42 @@ CXXFLAGS += -g
 
 # The final build step.
 $(EXEC_DIR)/$(TARGET_EXEC): $(OBJS)
-	$(CXX) $(OBJS) -o $@ $(LDFLAGS)
+	@echo Linking $@
+	@$(CXX) $(OBJS) -o $@ $(LDFLAGS)
 
 # Build step for C source
 $(EXEC_DIR)/%.c.o: %.c
-	mkdir -p $(dir $@)
+	@echo Compiling $@
+	@mkdir -p $(dir $@)
 ifeq ($(BUILD_TYPE), Debug)
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEBUG_FLAG) -c $< -o $@
+	@$(CC) $(CPPFLAGS) $(CFLAGS) $(DEBUG_FLAG) -c $< -o $@
 else
-	$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
+	@$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
 endif
 # Build step for C++ source
 $(EXEC_DIR)/%.cpp.o: %.cpp
-	mkdir -p $(dir $@)
+	@echo Compiling $@
+	@mkdir -p $(dir $@)
 ifeq ($(BUILD_TYPE), Debug)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(DEBUG_FLAG) -c $< -o $@
+	@$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(DEBUG_FLAG) -c $< -o $@
 else
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
+	@$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
 endif
 # Create the logo includefile
 ./include/QBS_logo.h: $(TARGET_EXEC).png
-	xxd -i $< > $@
+	@echo Creating $@
+	@xxd -i $< > $@
 	
 
 # Create a target to run the compiled code
 .PHONY: run
 run: $(EXEC_DIR)/$(TARGET_EXEC)
-	$(EXEC_DIR)/$(TARGET_EXEC)
+	@$(EXEC_DIR)/$(TARGET_EXEC)
 
 # Create a target to run debugger
 .PHONY: debug
 debug: $(EXEC_DIR)/$(TARGET_EXEC)
-	$(DBG) $(EXEC_DIR)/$(TARGET_EXEC)
+	@$(DBG) $(EXEC_DIR)/$(TARGET_EXEC)
 
 .PHONY: clean
 clean:
@@ -105,7 +109,8 @@ clean:
 install: $(INSTALL_DIR)/$(TARGET_EXEC)
 
 $(INSTALL_DIR)/$(TARGET_EXEC): $(EXEC_DIR)/$(TARGET_EXEC)
-	sudo cp $(EXEC_DIR)/$(TARGET_EXEC) $(INSTALL_DIR)
+	@echo Installing $(INSTALL_DIR)/$(TARGET_EXEC)
+	@sudo cp $(EXEC_DIR)/$(TARGET_EXEC) $(INSTALL_DIR)
 
 # Include the .d makefiles. The - at the front suppresses the errors of missing
 # Makefiles. Initially, all the .d files will be missing, and we don't want those
