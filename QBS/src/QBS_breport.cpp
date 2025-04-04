@@ -4,6 +4,8 @@
 
 QBS_breport::QBS_breport(int X, int Y, int W, int H, const char* L) :
     Fl_Table(X, Y, W, H, L)
+	,box_(0)
+	,data_(nullptr)
 {
 	cols(6);
 	// Scroll Bar width

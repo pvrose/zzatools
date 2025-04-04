@@ -70,7 +70,7 @@ protected:
     // Holding batch data - 2D: data x batch + direction
     struct event_t {
         string batch;
-        direction_t in_out;
+        direction_t in_out{ RECEIVED };
     };
     map <string, event_t > dates_;
     // Map batch names to box number - initial batch is not a box (=-1)

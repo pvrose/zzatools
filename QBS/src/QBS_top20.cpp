@@ -7,6 +7,8 @@ using namespace std;
 
 QBS_top20::QBS_top20(int X, int Y, int W, int H, const char* L) :
 	Fl_Table(X, Y, W, H, L)
+	,box_(0)
+	,data_(nullptr)
 {
 	cols(4);
 	// Scroll Bar width

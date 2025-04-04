@@ -31,9 +31,9 @@ protected:
 
     struct count_data {
         string callsign;
-        int received;
-        int sent;
-        int recycled;
+        int received{ 0 };
+        int sent{ 0 };
+        int recycled{ 0 };
     };
      
     vector<count_data*> counts_;

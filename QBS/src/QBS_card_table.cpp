@@ -50,7 +50,7 @@ void QBS_card_table::draw_cell(TableContext context, int R, int C, int X, int Y,
         fl_push_clip(X, Y, W, H);
         fl_color(FL_FOREGROUND_COLOR);
         char txt[32];
-        Fl_Align align;
+        Fl_Align align = FL_ALIGN_LEFT;
         switch (C) {
         case 0:
             strcpy(txt, data_->get_batch(boxes_[R]).c_str());
