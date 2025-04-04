@@ -111,7 +111,7 @@ void dxcc_table::draw_cell(TableContext context, int R, int C, int X, int Y, int
                 snprintf(text, sizeof(text), "%d", total_qsos_);
             } else if (R == row_ids_.size() + 1) {
                 fl_font(FL_BOLD | FL_ITALIC, FL_NORMAL_SIZE);
-                snprintf(text, sizeof(text), "%d", data_.size());
+                snprintf(text, sizeof(text), "%d", (int)data_.size());
             } else {
                 fl_font(FL_BOLD, FL_NORMAL_SIZE);
                 int dxcc = row_ids_[R];
