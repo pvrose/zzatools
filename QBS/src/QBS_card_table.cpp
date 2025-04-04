@@ -57,7 +57,7 @@ void QBS_card_table::draw_cell(TableContext context, int R, int C, int X, int Y,
             align = FL_ALIGN_CENTER;
             break;
         case 1:
-            snprintf(txt, sizeof(txt), "%0.0f", data_->get_count(boxes_[R], call_));
+            snprintf(txt, sizeof(txt), "%0d", data_->get_count(boxes_[R], call_));
             align = FL_ALIGN_RIGHT;
             break;
         }

@@ -95,11 +95,6 @@ enum special_box_t {
 	RCVD_BOX = -5,        // "Box" representing ALL received cards
 	SENT_BOX = -6,        // "Box" representing cards placed in post-box
 	DISP_BOX = -7,        // "Box" representing cards placed in recycling bin  
-	RCVD_AVE = -8,        // Average over all boxes
-	LAST4_AVE = -9,       // Average over last 4 boxes
-	PREV4_AVE = -10,      // Average over previous 4
-	UNSENT_AVE = -11,     // Average cards not sent previously
-	SENT_AVE = -12,       // Average sent
 	RCVD_ALL = -13,       // cards received for call in all boxes
 	SENT_ALL = -14,       // cards sent for call in all boxes
 	UNSENT_ALL = -15,     // cards not sent for call in all boxes
@@ -167,8 +162,8 @@ public:
 	}
 
 	// Windows interface - get data
-	// Get count for specific box/call
-	float get_count(int box_num, string call);
+	// Get count for specific box/call - NB floating point as some "Boxes" represent averages
+	int get_count(int box_num, string call);
 	// Get current box_number
 	int get_current();
 	// Het dispose tal box_num

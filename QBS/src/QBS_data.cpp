@@ -455,99 +455,40 @@ int QBS_data::ham_data(
 	return 0;
 }
 
-// Get count for specific box/call
-float QBS_data::get_count(int box_num, string call) {
+// Get count for specific box/call - NB floating point as some "Boxes" represent averages
+int QBS_data::get_count(int box_num, string call) {
 	switch (box_num) {
 	case IN_BOX:
 		if (in_box_.find(call) == in_box_.end()) {
-			return 0.0F;
+			return 0;
 		}
 		else {
-			return (float)in_box_.at(call);
+			return in_box_.at(call);
 		}
 	case OUT_BOX:
 		if (out_box_.find(call) == out_box_.end()) {
-			return 0.0F;
+			return 0;
 		}
 		else {
-			return (float)out_box_.at(call);
+			return out_box_.at(call);
 		}
 	case KEEP_BOX:
 		if (keep_box_.find(call) == keep_box_.end()) {
-			return 0.0F;
+			return 0;
 		}
 		else {
-			return (float)keep_box_[call];
+			return keep_box_[call];
 		}
 	case SASE_BOX:
 		if (sases_.find(call) == sases_.end()) {
-			return 0.0F;
+			return 0;
 		}
 		else {
-			return (float)sases_[call];
+			return sases_[call];
 		}
-	case RCVD_AVE: {
-		float count = 0.0F;
-		int b = 0;
-		for (; b <= get_current(); b++) {
-			if (boxes_[b]->received->find(call) != boxes_[b]->received->end()) {
-				int d = boxes_[b]->received->at(call);
-				count += d;
-			}
-		}
-		b++;
-		return count / b;
-	}
-	case SENT_AVE: {
-		float count = 0.0F;
-		int b = 0;
-		for (; b <= get_current(); b++) {
-			if (boxes_[b]->sent->find(call) != boxes_[b]->sent->end()) {
-				int d = boxes_[b]->sent->at(call);
-				count += d;
-			}
-		}
-		b++;
-		return count / b;
-	}
-	case LAST4_AVE: {
-		float count = 0.0F;
-		int i = 0;
-		for (int b = get_current(); i < 4 && b >= 0; b--, i++) {
-			if (boxes_[b]->received->find(call) != boxes_[b]->received->end()) {
-				int d = boxes_[b]->received->at(call);
-				count += d;
-			}
-		}
-		return count / i;
-	}
-	case PREV4_AVE: {
-		float count = 0.0F;
-		int i = 0;
-		for (int b = get_current() - 1; i < 4 && b >= 0; b--, i++) {
-			if (boxes_[b]->received->find(call) != boxes_[b]->received->end()) {
-				int d = boxes_[b]->received->at(call);
-				count += d;
-			}
-		}
-		return count / i;
-	}
-
-	case UNSENT_AVE: {
-		float count = 0.0F;
-		int b = 0;
-		for (; b < get_current(); b++) {
-			if (boxes_[b]->counts->find(call) != boxes_[b]->counts->end()) {
-				int d = boxes_[b]->counts->at(call);
-				count += d;
-			}
-		}
-		b++;
-		return count / b;
-	}
 
 	case RCVD_ALL: {
-		float count = 0.0F;
+		int count = 0;
 		for (int b = 0; b < get_current(); b++) {
 			if (boxes_[b]->received->find(call) != boxes_[b]->received->end()) {
 				int d = boxes_[b]->received->at(call);
@@ -558,7 +499,7 @@ float QBS_data::get_count(int box_num, string call) {
 	}
 
 	case SENT_ALL: {
-		float count = 0.0F;
+		int count = 0;
 		for (int b = 0; b < get_current(); b++) {
 			if (boxes_[b]->sent->find(call) != boxes_[b]->sent->end()) {
 				int d = boxes_[b]->sent->at(call);
@@ -569,7 +510,7 @@ float QBS_data::get_count(int box_num, string call) {
 	}
 
 	case UNSENT_ALL: {
-		float count = 0.0F;
+		int count = 0;
 		for (int b = 0; b < get_current(); b++) {
 			if (boxes_[b]->counts->find(call) != boxes_[b]->counts->end()) {
 				int d = boxes_[b]->counts->at(call);
@@ -581,14 +522,14 @@ float QBS_data::get_count(int box_num, string call) {
 
 	default:
 		if (box_num >= (signed)boxes_.size() || box_num < 0) {
-			return 0.0F;
+			return 0;
 		}
 		else {
 			if (boxes_[box_num]->counts->find(call) == boxes_[box_num]->counts->end()) {
-				return 0.0F;
+				return 0;
 			}
 			else {
-				return (float)boxes_[box_num]->counts->at(call);
+				return boxes_[box_num]->counts->at(call);
 			}
 		}
 	}
@@ -841,7 +782,7 @@ bool QBS_data::read_qbs(string& filename) {
 		check = 0;
 		getline(file_, line);
 		if (file_.good()) {
-			int l = line.length() - 1;
+			int l = (int)line.length() - 1;
 			while (line[l] == '\r') {
 				line.resize(l--);
 			}
