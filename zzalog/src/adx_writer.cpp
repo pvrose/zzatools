@@ -29,6 +29,7 @@ adx_writer::adx_writer()
 	, value_("")
 	, type_indicator_(' ')
 	, clean_records_(false)
+	, current_(0)
 {
 }
 

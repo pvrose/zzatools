@@ -98,12 +98,6 @@ uchar THEME;
 bool DISPLAY_VERSION = false;
 bool NEW_BOOK = false;
 
-// Ticker values - main clock runs at 10 Hz - individual objects
-// will get a divided down version
-const double TICK = 0.1;      // 100 ms
-const unsigned int TICK_SECOND = (int)(1.0 / TICK);
-
-
 // FLTK externals
 extern int FL_NORMAL_SIZE;
 
@@ -624,10 +618,12 @@ void recent_files() {
 		char* filename = nullptr;
 		recent_settings.get(path, filename, "");
 		// If we have a non empty string then add it to the list
-		if (filename && filename[0]) {
-			recent_files_.push_back(string(filename));
+		if (filename) {
+			if (*filename) {
+				recent_files_.push_back(string(filename));
+			}
+			free(filename);
 		}
-		free(filename);
 	}
 }
 

@@ -169,7 +169,7 @@ void band_widget::draw_scale() {
 	double e1 = major_tick_ - e0;
 	const char* format = label_format();
 	int num_major = 0;
-	double last_major;
+	double last_major = 0.0;
 	while (f >= scale_range_.lower - e0) {
 		curr_y = y_for_f(f);
 		double df = fmod(f, major_tick_);

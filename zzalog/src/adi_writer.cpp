@@ -27,6 +27,8 @@ extern string PROGRAM_ID;
 adi_writer::adi_writer()
 {
 	clean_records_ = false;
+	out_book_ = nullptr;
+	current_ = 0;
 }
 
 // Default constructor

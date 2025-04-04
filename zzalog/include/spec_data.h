@@ -51,7 +51,7 @@ typedef size_t qso_num_t;
 
 	// Macro definition set - macro name versions set of fields it represents
 	struct macro_defn {
-		record* fields;
+		record* fields{ nullptr };
 		string description;
 	};
 	typedef map<string, macro_defn*> macro_map;

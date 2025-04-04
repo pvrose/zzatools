@@ -42,30 +42,30 @@ enum wxe_element_t {
 // The data received in a weather reports
 struct wx_report {
 
-    unsigned int city_id;       // City ID number
-    string city_name;           // Location name
-    lat_long_t city_location;   // Latitude and longitude
-    string iso_country;         // ISO country code (eg GB)
-    float timezone_hr;          // Timezone difference (hours)
-    time_t sunrise;             // Sunrise (UTC)
-    time_t sunset;              // Sunset (UTC)
-    float temperature_K;        // Temperature (kelvin) 
-    float subjective_K;         // Subjective temperature
-    unsigned int humidity_pc;   // Relative humidity
-    unsigned int pressure_hPa;  // Air pressure (hPa - aka mbar)
-    float wind_speed_ms;        // Wind speed (m/s)
-    string wind_name;           // Wind name (Beaufort scale?)
-    unsigned int wind_dirn;     // Wind direction (degrees);
-    string wind_cardinal;       // Cardinal (sixteenth) whence the wind
-    float gusting_ms;           // Gusting up to ... (m/s)
-    unsigned int cloud_cover;   // Percentage cloud cover
-    string cloud_name;          // Cloud cover description
-    unsigned int visibility_m;  // Visibility (m - max 10 km)
-    string precipitation;       // Precipitation "no", "rain", "snow"
-    float precip_mm;            // Precipitation in last hour (mm)
-    string description;         // Overall weather description
-    Fl_Image* icon;             // Weather image
-    time_t updated;             // Time last updated
+    unsigned int city_id{ 0 };       // City ID number
+    string city_name;                // Location name
+    lat_long_t city_location;        // Latitude and longitude
+    string iso_country;              // ISO country code (eg GB)
+    float timezone_hr{ 0.0F };       // Timezone difference (hours)
+    time_t sunrise{ 0 };             // Sunrise (UTC)
+    time_t sunset{ 0 };              // Sunset (UTC)
+    float temperature_K{ 0.0F };     // Temperature (kelvin) 
+    float subjective_K{ 0.0F };      // Subjective temperature
+    unsigned int humidity_pc{ 0 };   // Relative humidity
+    unsigned int pressure_hPa{ 0 };  // Air pressure (hPa - aka mbar)
+    float wind_speed_ms{ 0.0F };     // Wind speed (m/s)
+    string wind_name;                // Wind name (Beaufort scale?)
+    unsigned int wind_dirn{ 0 };     // Wind direction (degrees);
+    string wind_cardinal;            // Cardinal (sixteenth) whence the wind
+    float gusting_ms{ 0.0F };        // Gusting up to ... (m/s)
+    unsigned int cloud_cover{ 0 };   // Percentage cloud cover
+    string cloud_name;               // Cloud cover description
+    unsigned int visibility_m{ 0 };  // Visibility (m - max 10 km)
+    string precipitation;            // Precipitation "no", "rain", "snow"
+    float precip_mm{ 0 };            // Precipitation in last hour (mm)
+    string description;              // Overall weather description
+    Fl_Image* icon{ nullptr };       // Weather image
+    time_t updated{ 0 };             // Time last updated
 
 };
 

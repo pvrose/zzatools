@@ -378,7 +378,7 @@ void qso_qsl::enable_widgets() {
 void qso_qsl::cb_auto(Fl_Widget* w, void* v) {
 	Fl_Check_Button* bn = (Fl_Check_Button*)w;
 	qso_qsl* that = ancestor_view<qso_qsl>(w);
-	bool* enable;
+	bool* enable = nullptr;
 	extract_data::extract_mode_t server = (extract_data::extract_mode_t)(intptr_t)v;
 	switch (server) {
 	case extract_data::EQSL:
@@ -391,7 +391,7 @@ void qso_qsl::cb_auto(Fl_Widget* w, void* v) {
 		enable = &that->auto_club_;
 		break;
 	}
-	*enable = bn->value();
+	if (enable) *enable = bn->value();
 	that->save_values();
 	that->enable_widgets();
 }

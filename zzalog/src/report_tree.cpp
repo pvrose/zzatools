@@ -145,8 +145,8 @@ void report_tree::add_record(item_num_t record_num, report_map_entry_t* entry) {
 	string custom_code;
 	// Get record
 	record* record = get_book()->get_record(record_num, false);
-	report_cat_t category;
-	report_cat_t next_category;
+	report_cat_t category = RC_EMPTY;
+	report_cat_t next_category = RC_EMPTY;
 	// Entry type is valid
 	bool skip_state = false;
 	if (entry->entry_type != -1 && (size_t)entry->entry_type < adj_order_.size()) {

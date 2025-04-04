@@ -19,7 +19,9 @@ extern fields* fields_;
 
 // Constructor
 fields_table::fields_table(int X, int Y, int W, int H, const char* L) :
-    Fl_Table_Row(X, Y, W, H, L) 
+    Fl_Table_Row(X, Y, W, H, L),
+    data_(nullptr),
+    selected_row_(0)
 {
     col_header(1);
     col_resize(0);
@@ -166,7 +168,7 @@ void fields_table::cb_table(Fl_Widget* w, void* v) {
                         }
                         field_info_t& info = (*that->data_)[row];
                         // Which column
-                        Fl_Widget* edit;
+                        Fl_Widget* edit = nullptr;
                         switch(col) {
                             case 0: {
                                 edit = that->ch_field_;
@@ -186,9 +188,11 @@ void fields_table::cb_table(Fl_Widget* w, void* v) {
                                 break;
                             }
                         }
-                        edit->resize(X, Y, W, H);
-                        edit->user_data((void*)(intptr_t)row);
-                        edit->show();
+                        if (edit) {
+                            edit->resize(X, Y, W, H);
+                            edit->user_data((void*)(intptr_t)row);
+                            edit->show();
+                        }
                         that->edit_row_ = row;
                         that->edit_col_ = col;
                     } else {

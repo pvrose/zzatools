@@ -958,7 +958,7 @@ void wsjtx_handler::delete_qso(string call) {
 		qsos_.erase(call);
 	} else {
 		char msg[128];
-		snprintf(msg, sizeof(msg),"WSJTX: Request to delete unknown record from cache", call.c_str());
+		snprintf(msg, sizeof(msg),"WSJTX: Request to delete unknown record %s from cache", call.c_str());
 		status_->misc_status(ST_ERROR, msg);
 	}
 }

@@ -284,7 +284,7 @@ void qso_details::table_d::set_data(
 // Set the selected value in the appropriate record item
 void qso_details::table_d::cb_table(Fl_Widget* w, void* v) {
 	table_d* that = ancestor_view<table_d>(w);
-	if (that->callback_context() == CONTEXT_CELL) {
+	if (that->callback_context() & CONTEXT_CELL) {
 		int row = that->callback_row();
 		string field = that->name_map_.at(that->items_[row].type).field;
 		string value = that->items_[row].value;
@@ -435,7 +435,7 @@ void qso_details::table_q::draw_cell(TableContext context, int R, int C, int X, 
 // Set the selected value in the appropriate record item
 void qso_details::table_q::cb_table(Fl_Widget* w, void* v) {
 	table_q* that = (table_q*)w;
-	if (that->callback_context() == CONTEXT_CELL) {
+	if (that->callback_context() & CONTEXT_CELL) {
 		int row = that->callback_row();
 		qso_data* data = ancestor_view<qso_data>(that);
 		switch (data->logging_state()) {

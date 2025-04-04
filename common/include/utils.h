@@ -21,8 +21,8 @@ using namespace std;
 
 	// Latitude/longitude pair
 	struct lat_long_t {
-		double latitude;    // latitude (positive = N)
-		double longitude;   // longitude (positive = E)
+		double latitude{ 0.0 };    // latitude (positive = N)
+		double longitude{ 0.0 };   // longitude (positive = E)
 
 		bool is_nan() {
 			return isnan(latitude) || isnan(longitude);

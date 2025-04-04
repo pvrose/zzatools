@@ -1257,7 +1257,7 @@ void qso_rig::enable_widgets(uchar damage) {
 	}
 
 	if (damage & DAMAGE_AUTOS) {
-		if (cat_data_.size()) {
+		if (cat_data) {
 			bn_autostart_->value(cat_data->auto_start);
 			bn_autostart_->activate();
 			bn_autoconn_->value(cat_data->auto_connect);
@@ -1372,7 +1372,8 @@ void qso_rig::populate_port_choice() {
 		for (int i = 0; i < num_ports; i++) {
 			// Add the name onto the choice drop-down list
 			char message[100];
-			const char* port = existing_ports[i].c_str();
+			string sport = *(existing_ports + i);
+			const char* port = sport.c_str();
 			snprintf(message, sizeof(message), "DASH: Found port %s", port);
 			status_->misc_status(ST_LOG, message);
 			ch_port_name_->add(port);

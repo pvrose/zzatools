@@ -36,7 +36,9 @@ adx_reader::adx_reader() :
 	column_num_(0),
 	modified_(false),
 	file_size_(0),
-	previous_count_(0)
+	previous_count_(0),
+	current_count_(0),
+	ignore_app_(false)
 {
 	elements_.clear();
 	userdef_fields_.clear();

@@ -38,7 +38,9 @@ socket_server::socket_server(protocol_t protocol, string address, int port_num) 
 	client_(INVALID_SOCKET),
     protocol_(protocol),
     port_num_(port_num),
-    th_socket_(nullptr)
+    th_socket_(nullptr),
+	prev_port_(0),
+	do_request(nullptr)
 {
 	if (address.length())
 	{
@@ -48,6 +50,7 @@ socket_server::socket_server(protocol_t protocol, string address, int port_num) 
 	{
 		address_ = "0.0.0.0";
 	}
+	memset(&client_addr_, 0, sizeof(client_addr_));
 }
 
 // Create and start the server
@@ -368,15 +371,15 @@ int socket_server::rcv_packet()
 		switch (protocol_)
 		{
 		case UDP:
-			bytes_rcvd = recvfrom(server_, buffer, buffer_len, 0, (SOCKADDR *)&client_addr_, &len_client_addr);
+			if (buffer) bytes_rcvd = recvfrom(server_, buffer, buffer_len, 0, (SOCKADDR *)&client_addr_, &len_client_addr);
 			break;
 		case HTTP:
-			bytes_rcvd = recv(client_, buffer, buffer_len, 0);
+			if (buffer) bytes_rcvd = recv(client_, buffer, buffer_len, 0);
 			break;
 		}
 		if (bytes_rcvd > 0)
 		{
-			dump(string(buffer, bytes_rcvd));
+			if (buffer) dump(string(buffer, bytes_rcvd));
 			mu_packet_.lock();
 			string s = string(buffer, bytes_rcvd);
 			q_packet_.push(s);

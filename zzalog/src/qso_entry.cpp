@@ -564,8 +564,8 @@ void qso_entry::initialise_fields() {
 	}
 	if (field_map_->size() > NUMBER_TOTAL - NUMBER_FIXED) {
 		char msg[128];
-		snprintf(msg, sizeof(msg), "FIELDS: Too many fields %z specified - last field(s) ignored",
-			field_map_->size());
+		snprintf(msg, sizeof(msg), "FIELDS: Too many fields %d specified - last field(s) ignored",
+			(int)field_map_->size());
 		status_->misc_status(ST_WARNING, msg);
 		field_map_->resize(NUMBER_TOTAL - NUMBER_FIXED);
 	}
@@ -625,7 +625,7 @@ void qso_entry::action_add_field(int ix, string field) {
 		field_ip_map_[field] = ix;
 		(*field_map_)[ix - NUMBER_FIXED].field = field;
 	}
-	else if (ix == fields_in_use_.size()) {
+	else if (ix == fields_in_use_.size() && ix < NUMBER_TOTAL) {
 		if (field_ip_map_.find(field) == field_ip_map_.end()) {
 			ch_field_[ix]->value(field.c_str());
 			ip_field_[ix]->field_name(field.c_str(), qso_);

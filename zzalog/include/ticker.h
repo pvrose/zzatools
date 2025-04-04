@@ -14,8 +14,8 @@ class ticker {
     struct ticker_entry {
         void* object { nullptr };       // Pointer to the object - gets returned to the object
         callback* tick { nullptr };     // The static function to call
-        unsigned int period_ds;         // Period in deciseconds
-        bool active;                    // Ticker active
+        unsigned int period_ds{ 0 };         // Period in deciseconds
+        bool active{ false };                    // Ticker active
         bool not_ticked{ true };        // Ticker not yet sent - so send it regardless
     };
 

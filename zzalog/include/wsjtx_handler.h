@@ -104,25 +104,25 @@ class socket_server;
 				* TX Message
 			*/
 			string id;
-			uint64_t dial_freq;
+			uint64_t dial_freq{ 0 };
 			string mode;
 			string dx_call;
 			string report;
 			string tx_mode;
-			bool tx_eanbled;
-			bool transmitting;
-			bool decoding;
-			uint32_t rx_offset;
-			uint32_t tx_offset;
+			bool tx_eanbled{ false };
+			bool transmitting{ false };
+			bool decoding{ false };
+			uint32_t rx_offset{ 0 };
+			uint32_t tx_offset{ 0 };
 			string own_call;
 			string own_grid;
 			string dx_grid;
-			bool tx_watchdog;
+			bool tx_watchdog{ false };
 			string submode;
-			bool fast_mode;
-			uint8_t special_op;
-			uint32_t freq_tolerance;
-			uint32_t tx_rx_period;
+			bool fast_mode{ false };
+			uint8_t special_op{ 0 };
+			uint32_t freq_tolerance{ 0 };
+			uint32_t tx_rx_period{ 0 };
 			string config_name;
 			string tx_message;
 		};
@@ -145,7 +145,7 @@ class socket_server;
 
 		// The message decoded
 		struct decoded_msg {
-			message_t type;		// Message format
+			message_t type{ TX1 };		// Message format
 			string target;		// The call the message is for
 			string sender;		// The call the message is from
 			string exchange;	// The message payload (grid, report)

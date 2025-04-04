@@ -142,7 +142,7 @@ void file_viewer::save_file() {
 		status_->misc_status(ST_WARNING, msg);
 		break;
 		case 0:
-		snprintf(msg, sizeof(msg), "APPS: File written OK", filename_.c_str());
+		snprintf(msg, sizeof(msg), "APPS: File %s written OK", filename_.c_str());
 		status_->misc_status(ST_NOTE, msg);
 		dirty_ = false;
 		enable_widgets();

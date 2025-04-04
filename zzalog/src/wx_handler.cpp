@@ -27,8 +27,10 @@ const double SHORT_DELAY = 3. * 60. * 10.;
 
 // Constructor
 wx_handler::wx_handler() :
-    xml_reader() {
-
+    xml_reader(),
+    wx_thread_(nullptr),
+    error_code_(0)
+{
     report_.icon = nullptr;
     elements_.clear();
     wx_valid_ = false;
@@ -532,7 +534,7 @@ bool wx_handler::end_wind() {
 // Start SPEED elements - for wind speed
 bool wx_handler::start_wind_speed(map<string, string>* attributes) {
     elements_.push_back(WXE_SPEED);
-    float value;
+    float value = 0.0F;
     for (auto it = attributes->begin(); it != attributes->end(); it++) {
         string att_name = to_upper(it->first);
         if (att_name == "VALUE") {

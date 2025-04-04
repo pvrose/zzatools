@@ -63,7 +63,7 @@ struct qsl_data {
 
     // Structure describing the paarmeters of an item
     struct item_def {
-        item_type type;
+        item_type type{ NONE };
         field_def field;
         text_def text;
         image_def image;

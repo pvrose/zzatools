@@ -1599,7 +1599,7 @@ void qso_data::action_import_query() {
 
 // Open QRZ.com page
 void qso_data::action_qrz_com() {
-	record* qso;
+	record* qso = nullptr;
 	switch(logging_state_) {
 		case qso_data::QSO_STARTED:
 		case qso_data::QSO_EDIT:
@@ -1616,7 +1616,7 @@ void qso_data::action_qrz_com() {
 			break;
 		}
 	} 
-	qrz_handler_->open_web_page(qso->item("CALL"));
+	if (qso) qrz_handler_->open_web_page(qso->item("CALL"));
 }
 
 // Action update CAT

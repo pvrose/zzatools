@@ -194,6 +194,8 @@ rig_if::rig_if(const char* name, hamlib_data_t* data)
 	else {
 		has_rf_meter_ = false;
 	}
+	count_down_ = 0;
+	sum_smeters_ = 0;
 	
 	// If the name has been set, there is a rig
 	if (hamlib_data_ && my_rig_name_.length()) {

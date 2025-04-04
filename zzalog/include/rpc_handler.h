@@ -51,7 +51,7 @@ class socket_server;
 		struct method_def {
 			string signature;
 			string help_text;
-			int(*callback)(rpc_data_item::rpc_list& params, rpc_data_item& response);
+			int(*callback)(rpc_data_item::rpc_list& params, rpc_data_item& response) { nullptr };
 		};
 
 

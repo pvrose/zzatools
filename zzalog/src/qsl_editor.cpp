@@ -834,6 +834,10 @@ void qsl_editor::update_size() {
 			pw = data_->width;
 			ph = data_->height;
 			break;
+		default:
+			pw = 0;
+			ph = 0;
+			break;
 	}
 	snprintf(temp, sizeof(temp), "%d x %d", pw, ph);
 	op_size_->value(temp);

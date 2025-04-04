@@ -236,7 +236,8 @@ qso_dxcc::wb4_buttons::wb4_buttons(int X, int Y, int W, int H, const char* L) :
 	Fl_Scroll(X, Y, W, H, L),
 	dxcc_bands_(nullptr),
 	dxcc_submodes_(nullptr),
-	all_bands_(nullptr)
+	all_bands_(nullptr),
+	all_submodes_(nullptr)
 {
 	type(VERTICAL_ALWAYS);
 	end();

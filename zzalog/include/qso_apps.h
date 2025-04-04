@@ -26,14 +26,14 @@ enum app_rig_class_t {
 // The app related data
 struct app_data_t {
     string name;        // The name of the app
-    bool server;        // ZZALOG acts as a log server
-    app_rig_class_t rig_class;     // Same command used for all rigs
+    bool server{ false };        // ZZALOG acts as a log server
+    app_rig_class_t rig_class{ ALL_RIGS };     // Same command used for all rigs
     map<string, string> commands;   
                         // The commands for each rig
-    bool admin;         // The command needs to be run in administrator mode
-    bool can_disable;       // The app can be disconnected (Rig = NONE)
-    bool (*has_server)();   // Function to call to see if serever is active
-    bool (*has_data)();     // Function to call to see if server has request
+    bool admin{ false };         // The command needs to be run in administrator mode
+    bool can_disable{ false };       // The app can be disconnected (Rig = NONE)
+    bool (*has_server)() { nullptr };   // Function to call to see if serever is active
+    bool (*has_data)() { nullptr };     // Function to call to see if server has request
 };
 
 // Displays and controls the status of a single modem apps using zzalog as a log server

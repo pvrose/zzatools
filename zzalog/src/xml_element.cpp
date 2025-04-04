@@ -1,10 +1,9 @@
 #include "xml_element.h"
 
 // Constructor - creates an empty element
-xml_element::xml_element()
+xml_element::xml_element() :
+	xml_element(nullptr, "", "", nullptr)
 {
-	string s = "";
-	xml_element(nullptr, s, s, nullptr);
 }
 
 // Creates a complete element (apart from children)

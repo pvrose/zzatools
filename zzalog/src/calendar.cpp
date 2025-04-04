@@ -11,7 +11,8 @@
 // Constructor
 calendar::calendar(int X, int Y) :
     Fl_Window(X, Y, 10, 10, nullptr),
-	display_date_(tm())
+	display_date_(tm()),
+	value_(nullptr)
 {
 	// Position calculations
 	const int WSMALLBN = HBUTTON * 3 / 2;

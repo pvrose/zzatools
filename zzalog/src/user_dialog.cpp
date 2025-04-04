@@ -29,6 +29,8 @@ user_dialog::user_dialog(int X, int Y, int W, int H, const char* label) :
 	tip_font_ = Fl_Tooltip::font();
 	tip_size_ = Fl_Tooltip::size();
 	session_elapse_ = 30.0;
+	tree_size_ = FL_NORMAL_SIZE;
+	tree_font_ = 0;
 
 	do_creation(X, Y);
 }

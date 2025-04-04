@@ -65,6 +65,8 @@ cty_reader::cty_reader() {
 	current_zone_exc_ = nullptr;
 	current_entity_ = nullptr;
 	current_prefix_ = nullptr;
+	data_ = nullptr;
+	file_ = nullptr;
 }
 
 // Destructor

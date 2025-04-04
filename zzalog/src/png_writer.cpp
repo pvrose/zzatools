@@ -22,6 +22,8 @@ png_writer::png_writer() {
 	info_ = nullptr;
 	out_file_ = 0;
 	png_ = nullptr;
+	buffer_ = nullptr;
+	memset(&jump_buf_, 0, sizeof(jump_buf_));
 
 }
 
@@ -195,8 +197,9 @@ void png_writer::error_handler(png_structp png, png_const_charp msg) {
 		snprintf(temp, sizeof(temp), "PNG: Unrecoverable error");
 		status_->misc_status(ST_SEVERE, temp);
 	}
-
-	longjmp(that->jump_buf_, 1);
+	else {
+		longjmp(that->jump_buf_, 1);
+	}
 }
 
 
