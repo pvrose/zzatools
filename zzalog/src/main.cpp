@@ -619,7 +619,7 @@ void recent_files() {
 		recent_settings.get(path, filename, "");
 		// If we have a non empty string then add it to the list
 		if (filename) {
-			if (*filename) {
+			if (strlen(filename)) {
 				recent_files_.push_back(string(filename));
 			}
 			free(filename);
