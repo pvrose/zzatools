@@ -72,7 +72,6 @@ int printer::print_book() {
 	status_->misc_status(ST_NOTE, message);
 	// Get page title for log print
 	if (navigation_book_->size() > 0) {
-		record* record_0 = navigation_book_->get_record(0, false);
 		string callsign = qso_manager_->get_default(qso_manager::CALLSIGN);
 		const char* temp = fl_input("Please specify the page title", callsign.c_str());
 		if (temp != nullptr) page_title_ = temp;

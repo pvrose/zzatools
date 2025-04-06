@@ -390,6 +390,8 @@ void qso_qsl::cb_auto(Fl_Widget* w, void* v) {
 	case extract_data::CLUBLOG:
 		enable = &that->auto_club_;
 		break;
+	default:
+		break;
 	}
 	if (enable) *enable = bn->value();
 	that->save_values();
@@ -517,6 +519,8 @@ void qso_qsl::qsl_1_upload(extract_data::extract_mode_t mode) {
 			lotw_handler_->upload_single_qso(number);
 			break;
 		}
+		default:
+			break;
 		}
 	} else {
 		status_->misc_status(ST_ERROR, "QSL: Have no QSO to upload");

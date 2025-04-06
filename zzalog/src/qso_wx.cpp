@@ -62,9 +62,6 @@ void qso_wx::create_form(int X, int Y) {
 
 	const int WCLOCKS = 200;
 
-	const int TIME_SZ = 4 * FL_NORMAL_SIZE;
-	const int DATE_SZ = 3 * FL_NORMAL_SIZE / 2;
-
 	const int WICON = 2 * HBUTTON;
 	const int WTEXT = WCLOCKS - WICON - GAP;
 	const int WWX = WCLOCKS - GAP;
@@ -197,11 +194,9 @@ void qso_wx::enable_widgets() {
 	string wx_location = wx_handler_ ? wx_handler_->location() : "";
 	string wx_latlong = wx_handler_ ? wx_handler_->latlong() : "";
 
-	tm value;
 	tm sunup_time;
 	tm sundown_time;
 	tm updated_time;
-	char result[100];
 	// Sunrise and sunset
 	sunup_time = *localtime(&sunrise);
 	sundown_time = *localtime(&sunset);
@@ -331,7 +326,6 @@ void qso_wx::enable_widgets() {
 
 	char sunup[16];
 	char sundown[16];
-	char update_value[16];
 	// Set sunrise and sunset times and last updated time (local)
 	strftime(sunup, sizeof(sunup), "%H:%M", &sunup_time);
 	strftime(sundown, sizeof(sundown), "%H:%M", &sundown_time);

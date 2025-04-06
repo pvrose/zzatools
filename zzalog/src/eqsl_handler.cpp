@@ -182,6 +182,8 @@ void eqsl_handler::cb_timer_deq(void* v) {
 				break;
 			}
 			break;
+		default:
+			break;
 		}
 		// Set the timeout again if the queue is still not empty and fetches are enabled
 		if (!request_queue->empty() && that->empty_queue_enable_) {
@@ -726,7 +728,6 @@ bool eqsl_handler::upload_eqsl_log(book* book) {
 	}
 	// Takes time - show timer cursor
 	fl_cursor(FL_CURSOR_WAIT);
-	bool ok = true;
 	// For book - use STATION_CALLSIGN of first QSO
 	record* this_record = book->get_record(0, false);
 	string station = this_record->item("STATION_CALLSIGN", true, true);
@@ -854,6 +855,8 @@ bool eqsl_handler::upload_eqsl_log(book* book) {
 					// Error message
 					status_->misc_status(ST_ERROR, message);
 					break;
+				default:
+					break;
 				}
 			}
 		}
@@ -956,7 +959,6 @@ bool eqsl_handler::upload_single_qso(qso_num_t record_num) {
 		string qsl_message;
 		string swl_message;
 		string error_message;
-		response_t status = ER_OK;
 		if (!user_details(&username, &password, nullptr, &qsl_message, &swl_message, nullptr)) {
 			char* message = new char[50 + username.length() + password.length()];
 			sprintf(message, "EQSL: User or password is missing: U=%s, P=%s", username.c_str(), password.c_str());
@@ -964,7 +966,6 @@ bool eqsl_handler::upload_single_qso(qso_num_t record_num) {
 			delete[] message;
 			return false;
 		}
-		bool ok = true;
 		// For single QSO - use STATION_CALLSIGN
 		string station = this_record->item("STATION_CALLSIGN", true, true);
 		if (station.length() && station != to_upper(username)) {
@@ -977,9 +978,6 @@ bool eqsl_handler::upload_single_qso(qso_num_t record_num) {
 			status_->misc_status(ST_WARNING, message);
 			username = station;
 		}
-		// Count of records successfully uploaded
-		int num_successful = 0;
-		status = ER_OK;
 		// Merge info from record into QSL message
 		// Add QSL_MSG field depending on QSO or SWL report
 		string this_message;
@@ -1006,7 +1004,6 @@ bool eqsl_handler::upload_single_qso(qso_num_t record_num) {
 // Upload the QSO. This is running in a separate thread
 bool eqsl_handler::th_upload_qso(record* this_record) {
 	if (DEBUG_THREADS) printf("EQSL THREAD: Uploading eQSL %s\n", this_record->item("CALL").c_str());
-	bool update = false;
 	// Generate URL parameters for QSL
 	char qsl_data[2048];
 	sprintf(qsl_data, "%s %s %s %s %s %s %s <EOR>",
@@ -1103,7 +1100,6 @@ bool eqsl_handler::th_upload_qso(record* this_record) {
 		};
 		if (valid_response) {
 			if (uploaded) {
-				update = true;
 			}
 			else if (upload_failed) {
 				// Upload failed
@@ -1113,7 +1109,6 @@ bool eqsl_handler::th_upload_qso(record* this_record) {
 			else {
 				// If marked duplicate may need to update if we had not logged it previously
 				if (warning_text.find("Duplicate") != warning_text.npos) {
-					update = true;
 					response->status = ER_DUPLICATE;
 				}
 			}
@@ -1177,6 +1172,8 @@ bool eqsl_handler::upload_done(upload_response_t* response) {
 	case ER_FAILED:
 		// Error message
 		status_->misc_status(ST_ERROR, message);
+		break;
+	default:
 		break;
 	}
 	// Display the response in a help dialog

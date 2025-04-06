@@ -288,7 +288,6 @@ string record::item(string field, bool formatted/* = false*/, bool indirect/* = 
 		if (result == "") {
 			// Not set in the item
 			// If station location details fetch them the settings.
-			int station_id = -1;
 			string qth_name;
 			// Read APP_ZZA_QTH field and get the settings for that value 
 			qth_name = item("APP_ZZA_QTH", false, false);
@@ -566,7 +565,6 @@ lat_long_t record::location(bool my_station, location_t& source) {
 		// 2 or 4 character grid square - use centre of grid square
 		if (value_1.length() <= 4) {
 			// Get prefix coordinates
-			lat_long_t prefix_lat_long = cty_data_->location(this);
 			if (value_1.length()) {
 				double side = 0.0;
 				switch (value_1.length()) {
@@ -577,9 +575,11 @@ lat_long_t record::location(bool my_station, location_t& source) {
 					side = 1.0;
 					break;
 				}
+				lat_long.latitude += (side / 4.0);
+				lat_long.longitude += (side / 2.0);
 			}
 			else {
-				lat_long = prefix_lat_long;
+				lat_long = cty_data_->location(this);
 				source = LOC_PREFIX;
 				return lat_long;
 			}

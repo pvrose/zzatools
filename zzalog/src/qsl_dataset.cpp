@@ -176,6 +176,8 @@ void qsl_dataset::load_items(qsl_data* data) {
 				}
 				break;
 			}
+			default:
+				break;
 			}
 			// Add the item's data to the data structure
 			data->items.push_back(item);
@@ -222,7 +224,6 @@ void qsl_dataset::save_data() {
 				ofstream op;
 				op.open(data->filename.c_str(), fstream::out);
 				string line;
-				int pos = 0;
 				// For all drawing items...
 				for (int ix = 0; ix < data->items.size() && op.good(); ix++) {
 					qsl_data::item_def* item = data->items[ix];
@@ -267,6 +268,8 @@ void qsl_dataset::save_data() {
 								item->image.dy << endl;
 							break;
 						}
+						default:
+							break;
 						}
 					}
 				}

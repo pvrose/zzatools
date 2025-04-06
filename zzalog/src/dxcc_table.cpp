@@ -160,6 +160,8 @@ void dxcc_table::draw_cell(TableContext context, int R, int C, int X, int Y, int
         fl_pop_clip();
         break;
     }
+    default:
+        break;
     }
 }
 

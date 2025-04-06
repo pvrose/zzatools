@@ -83,6 +83,8 @@ void qsl_display::draw() {
 					draw_image(item.image);
 					break;
 				}
+				default:
+					break;
 				}
 			}
 		}
@@ -225,6 +227,8 @@ void qsl_display::draw_field(qsl_data::field_def& field) {
 			fl_draw(field.label.c_str(), lx, ly);
 		}
 	}
+	// Restore font
+	fl_font(savef, savez);
 
 	// set the next X,Y position
 	if (field.vertical) {

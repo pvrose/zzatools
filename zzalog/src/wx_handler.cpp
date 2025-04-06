@@ -131,6 +131,7 @@ bool wx_handler::end_element(string name) {
     case WXE_CLIENTERROR: return end_clienterror();
     case WXE_COD: return end_cod();
     case WXE_MESSAGE: return end_message();
+    default: break;
     }
 
 	char* message = new char[50 + name.length()];

@@ -229,7 +229,7 @@ bool rpc_handler::write_item(xml_writer* writer, rpc_data_item* item) {
 		xml_ok &= writer->end_element("data");
 		xml_ok &= writer->end_element("array");
 		break;
-	case XRT_STRUCT:
+	case XRT_STRUCT: {
 		// <struct><member>[<name>...</name>item]</member></struct>
 		xml_ok &= writer->start_element("struct", nullptr);
 		rpc_data_item::rpc_struct* struct_item = item->get_struct();
@@ -242,6 +242,10 @@ bool rpc_handler::write_item(xml_writer* writer, rpc_data_item* item) {
 			xml_ok &= writer->end_element("member");
 		}
 		xml_ok &= writer->end_element("struct");
+		break;
+	}
+	default:
+		break;
 	}
 
 	xml_ok &= writer->end_element("value");
@@ -787,7 +791,6 @@ bool rpc_handler::strip_header(stringstream& message, stringstream& payload) {
 			getline(message, line);
 			split_line(line, words, ' ');
 		}
-		long payload_sz = stoi(words[1]);
 		// Now go on to the payload indicated by an empty line
 		while (line != "" && line != "\r") {
 			getline(message, line);

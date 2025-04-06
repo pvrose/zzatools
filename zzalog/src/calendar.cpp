@@ -187,7 +187,7 @@ void calendar::cb_cal_cal(Fl_Widget* w, void* v) {
 	int col = table->callback_col();
 	// Why is it clicked
 	switch (table->callback_context()) {
-	case Fl_Table::CONTEXT_CELL:
+	case Fl_Table::CONTEXT_CELL: {
 		// Clicked on a cell
 		// Get the new date from the calendar table - 
 		// nullptr returned if an invalid cell is clicked
@@ -196,6 +196,9 @@ void calendar::cb_cal_cal(Fl_Widget* w, void* v) {
 			that->display_date_ = *new_date;
 			that->change_date();
 		}
+		break;
+	}
+	default:
 		break;
 	}
 }

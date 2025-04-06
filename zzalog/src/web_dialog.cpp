@@ -224,7 +224,6 @@ void web_dialog::create_eqsl(int rx, int ry, int rw, int rh) {
 	const int H1_2 = HBUTTON;
 	const int R1_3 = R1_2 + H1_2 + GAP;
 	const int H1_3 = HBUTTON;
-	const int HGRP1 = R1_3 + H1_3 + GAP - GRP1;
 	// main columns
 	const int C1 = rx + GAP;
 	const int W1 = HBUTTON; // square check button
@@ -234,10 +233,8 @@ void web_dialog::create_eqsl(int rx, int ry, int rw, int rh) {
 	const int W3 = HBUTTON * 3 / 2;
 	const int C4 = C3 + W3 + GAP;
 	const int W4 = WSMEDIT;
-	const int W34 = W3 + W4 + GAP;
 	const int C5 = C4 + W4 + GAP;
 	const int W5 = WSMEDIT;
-	const int C6 = C5 + W5;
 	const int W6 = HBUTTON;
 	// offset columns
 	const int C2A = C1 + W1 + WLLABEL + GAP;
@@ -356,7 +353,6 @@ void web_dialog::create_lotw(int rx, int ry, int rw, int rh) {
 	const int H2_1 = HBUTTON;
 	const int R2_1A = R2_1 + H2_1;
 	const int H2_1A = HBUTTON;
-	const int HGRP2 = R2_1A + H2_1A + GAP - GRP2;
 	// main columns
 	const int C1 = rx + GAP;
 	const int W1 = HBUTTON; // square check button
@@ -366,10 +362,8 @@ void web_dialog::create_lotw(int rx, int ry, int rw, int rh) {
 	const int W3 = HBUTTON * 3 / 2;
 	const int C4 = C3 + W3 + GAP;
 	const int W4 = WSMEDIT;
-	const int W34 = W3 + W4 + GAP;
 	const int C5 = C4 + W4 + GAP;
 	const int W5 = WSMEDIT;
-	const int C6 = C5 + W5;
 	const int W6 = HBUTTON;
 
 	// Overall group for TAB
@@ -438,8 +432,6 @@ void web_dialog::create_qrz(int rx, int ry, int rw, int rh) {
 	const int R3_1 = GRP3 + GAP;
 	const int H3_1 = HBUTTON;
 	const int R3_2 = R3_1 + H3_1;
-	const int H3_2 = HRADIO;
-	const int HGRP3 = R3_2 + H3_2 + GAP - GRP3;
 	// main columns
 	const int C1 = rx + GAP;
 	const int W1 = HBUTTON; // square check button
@@ -449,11 +441,8 @@ void web_dialog::create_qrz(int rx, int ry, int rw, int rh) {
 	const int W3 = HBUTTON * 3 / 2;
 	const int C4 = C3 + W3 + GAP;
 	const int W4 = WSMEDIT;
-	const int W34 = W3 + W4 + GAP;
 	const int C5 = C4 + W4 + GAP;
 	const int W5 = WSMEDIT;
-	const int C6 = C5 + W5;
-	const int W6 = HBUTTON;
 
 	// Overall group for tabs
 	Fl_Group* gp03 = new Fl_Group(rx, ry, rw, rh, "QRZ.com");
@@ -514,7 +503,6 @@ void web_dialog::create_club(int rx, int ry, int rw, int rh) {
 	const int H4_1A = HBUTTON;
 	const int R4_2 = R4_1A + H4_1A + HTEXT;
 	const int H4_2 = HTEXT;
-	const int HGRP4 = R4_2 + H4_2 + GAP - GRP4;
 	// main columns
 	const int C1 = rx + GAP;
 	const int W1 = HBUTTON; // square check button
@@ -527,8 +515,6 @@ void web_dialog::create_club(int rx, int ry, int rw, int rh) {
 	const int W34 = W3 + W4 + GAP;
 	const int C5 = C4 + W4 + GAP;
 	const int W5 = WSMEDIT;
-	const int C6 = C5 + W5;
-	const int W6 = HBUTTON;
 
 	// Group for tabs
 	Fl_Group* gp04 = new Fl_Group(rx, ry, rw, rh, "ClubLog");
@@ -597,21 +583,8 @@ void web_dialog::create_server(int rx, int ry, int rw, int rh) {
 	const int H5_1 = HBUTTON;
 	const int R5_2 = R5_1 + H5_1;
 	const int H5_2 = HBUTTON;
-	const int HGRP5 = R5_2 + H5_2 + GAP - GRP5;
 	// main columns
 	const int C1 = rx + GAP;
-	const int W1 = HBUTTON; // square check button
-	const int C2 = C1 + W1 + GAP;
-	const int W2 = WSMEDIT;
-	const int C3 = C2 + W2 + GAP;
-	const int W3 = HBUTTON * 3 / 2;
-	const int C4 = C3 + W3 + GAP;
-	const int W4 = WSMEDIT;
-	const int W34 = W3 + W4 + GAP;
-	const int C5 = C4 + W4 + GAP;
-	const int W5 = WSMEDIT;
-	const int C6 = C5 + W5;
-	const int W6 = HBUTTON;
 
 	// Group for Fl_Tabs
 	Fl_Group* gp05 = new Fl_Group(rx, ry, rw, rh, "Network");

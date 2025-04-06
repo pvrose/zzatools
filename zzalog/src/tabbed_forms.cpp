@@ -145,6 +145,8 @@ void tabbed_forms::activate_pane(object_t pane, bool active) {
 		case OT_IMPORT:
 			navigation_book_ = import_data_;
 			break;
+		default:
+			break;
 		}
 		// Restore any query
 		v->update(last_hint_, last_record_1_, last_record_2_);
@@ -155,7 +157,6 @@ void tabbed_forms::activate_pane(object_t pane, bool active) {
 	else {
 		// "Hide" the object by switching to the main log
 		if (pane != OT_MAIN) {
-			view* vm = forms_[OT_MAIN].v;
 			Fl_Widget* wm = forms_[OT_MAIN].w;
 			Fl_Group* gm = wm->parent();
 			value(gm);
@@ -182,6 +183,8 @@ void tabbed_forms::books() {
 			break;
 		case OT_IMPORT:
 			v->set_book(import_data_);
+			break;
+		default:
 			break;
 		}
 	}
@@ -210,6 +213,8 @@ void tabbed_forms::cb_tab_change(Fl_Widget* w, void* v) {
 			break;
 		case OT_IMPORT:
 			navigation_book_ = import_data_;
+			break;
+		default:
 			break;
 		}
 	}

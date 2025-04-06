@@ -423,10 +423,10 @@ void search_dialog::save_values() {
 		criteria_->pattern = to_upper(criteria_->pattern);
 		if (!criteria_->comparator != XP_REGEX && criteria_->pattern.length()) {
 			string::size_type dummy;
-			int dxcc_id;
-			// Match by DXCC - either code number of nickname (default prefix)
+			int dxcc;
+			// Match by DXCC - either code number or nickname (default prefix)
 			try {
-				dxcc_id = stoi(criteria_->pattern, &dummy);
+				dxcc = stoi(criteria_->pattern, &dummy);
 			}
 			catch (const invalid_argument&) {
 				// exception raised if first character is non-numeric
@@ -435,7 +435,7 @@ void search_dialog::save_values() {
 			// Check that the whole condition is numeric or not 
 			if (dummy != criteria_->pattern.length()) {
 				// Some letters so nickname supplied - get the ID
-				int dxcc = cty_data_->entity(criteria_->pattern);
+				dxcc = cty_data_->entity(criteria_->pattern);
 				criteria_->pattern = to_string(dxcc);
 			}
 
@@ -447,6 +447,8 @@ void search_dialog::save_values() {
 	case XC_SQ4:
 		// Convert to upper case
 		criteria_->pattern = to_upper(criteria_->pattern);
+		break;
+	default:
 		break;
 	}
 	// Save criteria in settings

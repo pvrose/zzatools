@@ -75,7 +75,6 @@ istream& adi_reader::load_record(record* in_record, istream& in, load_result_t& 
 
 	// Until the end of record indicated by <EOR> or <EOH> - note in.good() is continually 
 	// checked to prevent running off the end
-	unsigned int num_fields = 0;
 	while (in.good() && !eor) {
 		// Each ADIF item is "<NAME:l[:T]>VALUE    " until <EOR> or <EOH>
 		string field = "";
@@ -244,6 +243,8 @@ istream& adi_reader::load_record(record* in_record, istream& in, load_result_t& 
 								old_value.c_str(),
 								value.c_str());
 							status_->misc_status(ST_WARNING, message);
+							break;
+						default:
 							break;
 						}
 					}

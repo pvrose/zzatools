@@ -165,8 +165,6 @@ void import_data::update_book() {
 		// Initialise flags
 		bool is_updated = false;
 		bool cancel_update = false;
-		bool update_pending = false;
-		bool update_ignored = false;
 		update_in_progress_ = false;
 		update_is_new_ = false;
 		int offset = 0;
@@ -191,7 +189,6 @@ void import_data::update_book() {
 			bool found_match = false;
 			// Find the position of the record either equal in time or just after
 			offset = book_->get_insert_point(import_record);
-			int matched_record_num = 0;
 			number_checked_++;
 			// Need separate checks for SWL report - wait until all records checked to see if one is a 2-way SWL match
 			bool had_swl_match = false;
@@ -304,10 +301,8 @@ void import_data::update_book() {
 						break;
 					}
 					break;
-				}
-				if (found_match) {
-					// Note matching record
-					matched_record_num = test_record;
+				default:
+					break;
 				}
 			}
 			if (had_swl_match) {
@@ -321,7 +316,6 @@ void import_data::update_book() {
 				accept_update();
 				is_updated = true;
 				found_match = true;
-				matched_record_num = offset;
 				number_swl_++;
 				had_swl_match = false;
 			}
@@ -399,6 +393,8 @@ void import_data::stop_update(bool immediate) {
 		}
 		close_pending_ = false;
 		break;
+	default:
+		break;
 	}
 }
 
@@ -425,6 +421,8 @@ void import_data::finish_update(bool merged /*= true*/) {
 				break;
 			case CLIPBOARD:
 				source = "CLIPBOARD";
+				break;
+			default:
 				break;
 			}
 			sprintf(message, "IMPORT: %s %d records read, %d checked, %d modified, %d matched, %d added, %d SWLs added, %d rejected",
@@ -478,7 +476,6 @@ void import_data::convert_update(record* record) {
 		string field_name = it->first;
 		string update_name;
 		string value = it->second;
-		bool override = false;
 		bool ignore = false;
 		// Sometimes need to compare different fields - RST_SENT vs RST_RCVD
 		// To avoid the name being switched back, a '!' is prepended to the field name in some cases
@@ -488,13 +485,11 @@ void import_data::convert_update(record* record) {
 			// QSL_SENT => EQSL_QSL_RCVD
 			if (field_name == "QSL_SENT") {
 				update_name = "EQSL_QSL_RCVD";
-				override = true;
 			}
 			else if (
 				// QSL_SENT_VIA => QSL_RCVD_VIA
 				field_name == "QSL_SENT_VIA") {
 				update_name = "!QSL_RCVD_VIA";
-				override = true;
 			}
 			else if (
 				// RST_SENT => RST_RCVD - note use temporary name until all changes done.
@@ -529,11 +524,9 @@ void import_data::convert_update(record* record) {
 			// Update from LotW - QSL => LOTW_QSL
 			if (field_name == "QSL_RCVD") {
 				update_name = "LOTW_QSL_RCVD";
-				override = true;
 			}
 			else if (field_name == "QSLRDATE") {
 				update_name = "LOTW_QSLRDATE";
-				override = true;
 			}
 			else if (
 				// OPERATOR => APP_ZZA_OPERATOR
@@ -618,6 +611,8 @@ bool import_data::download_data(import_data::update_mode_t server) {
 		update_mode_ = server;
 		status_->misc_status(ST_NOTE, "IMPORT: Downloading LotW");
 		result = lotw_handler_->download_lotw_log(&adif);
+		break;
+	default:
 		break;
 	}
 	// If the download was successful

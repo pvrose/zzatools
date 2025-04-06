@@ -383,6 +383,6 @@ void qrz_handler::open_web_page(string callsign) {
 	char uri[256];
 	snprintf(uri, sizeof(uri), "http://www.qrz.com/lookup?callsign=%s", callsign.c_str());
 	status_->misc_status(ST_NOTE, string("QRZ: Launching QRZ web page for " + callsign).c_str());
-	int result = fl_open_uri(uri);
+	fl_open_uri(uri);
 }
 

@@ -320,7 +320,6 @@ void field_input::populate_case_choice() {
 	const char* src = Fl_Input_Choice::value();
 	// Generate upper-, lower- and mixed-case versions of the input value
 	int len = strlen(src);
-	Fl_Menu_Button* menu = menubutton();
 	if (len > 0) {
 		char* dst = new char[len * 3];
 		// upper-case

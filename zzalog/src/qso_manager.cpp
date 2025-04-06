@@ -133,7 +133,6 @@ void qso_manager::create_form(int X, int Y) {
 
 	curr_x = X + GAP;
 	curr_y += GAP;
-	int save_y = curr_y;
 
 	Fl_Group::current(this);
 	// Rig control tabbed form
@@ -264,8 +263,9 @@ bool qso_manager::qso_in_progress() {
 	case qso_data::QSO_FLDIGI:
 	case qso_data::NET_STARTED:
 		return true;
+	default:
+		return false;
 	}
-	return false;
 }
 
 // Switch the rig connection on or off
@@ -334,6 +334,8 @@ void qso_manager::update_qso(hint_t hint, qso_num_t match_num, qso_num_t query_n
 		break;
 	case HT_MERGE_DETAILS:
 		data_group_->update_query(qso_data::QRZ_MERGE, match_num, query_num);
+		break;
+	default:
 		break;
 	}
 	// // Set this window to the top

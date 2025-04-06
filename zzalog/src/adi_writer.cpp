@@ -41,7 +41,6 @@ bool adi_writer::store_book(book* out_book, ostream& out, bool clean, field_list
 	// Takes a finite time so put the timer cursor up.
 	fl_cursor(FL_CURSOR_WAIT);
 	load_result_t result = LR_GOOD;
-	int count = 0;
 	clean_records_ = clean;
 	out_book_ = out_book;
 
@@ -139,8 +138,6 @@ string adi_writer::item_to_adif(record* record, string field) {
 // Convert record to ADIF format text
 void adi_writer::to_adif(record* record, ostream& out, field_list* fields /* = nullptr */) {
 	string temp;
-
-	int len_line = 0;
 
 	// Header - write out any comment first - 
 	if (record->is_header()) {

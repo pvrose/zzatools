@@ -241,7 +241,7 @@ string spec_data::band_for_freq(double frequency_MHz) {
 	string result = "";
 	bool found = false;
 	// Scan the band data until we get an entry for which the frequency lies between the band edges
-	for (auto it = table->data.begin(); it != table->data.end(); it++) {
+	for (auto it = table->data.begin(); it != table->data.end() && !found; it++) {
 		// If the frequency is within that specified, return band and stop
 		double lower = stod(it->second->at("Lower Freq (MHz)"));
 		double upper = stod(it->second->at("Upper Freq (MHz)"));
@@ -444,7 +444,6 @@ string spec_data::userdef_values(string& field_name) {
 	if (it_field != fields->data.end()) {
 		// If the field has an entry
 		// Get the Data Types dataset
-		spec_dataset* data_types = dataset("Data Types");
 		if (it_field->second->at("Data Type") == "Enumeration") {
 			// Build up the comma-separated list of enumeration values
 			char temp[100];
@@ -1888,6 +1887,8 @@ void spec_data::report_error(valn_error_t error_code, const string&  data, const
 		error_level = ST_LOG;
 		break;
 	}
+	default:
+		break;
 	}
 	// Write the error report
 	status_->misc_status(error_level, output_line.c_str());
@@ -2201,6 +2202,8 @@ bool spec_data::auto_correction(valn_error_t error_code, const string&  data, co
 	case VE_VALUE_UNCHECKABLE:
 		correction_message_ = "";
 		return false;
+	default:
+		break;
 	}
 	return false;
 }
@@ -2389,6 +2392,8 @@ string spec_data::get_tip(const string& field, record* record) {
 			break;
 		case VE_VALUE_UNCHECKABLE:          // string value cannot be checked for compatibility
 			tip += "No data to check compatibility with other fields";
+			break;
+		default:
 			break;
 		}
 		tip += '\n';

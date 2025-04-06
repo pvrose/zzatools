@@ -110,6 +110,8 @@ void qso_query::cb_tab_qso(Fl_Widget* w, void* v) {
 			that->action_handle_dclick(col, field);
 		}
 		break;
+	default:
+		break;
 	}
 }
 
@@ -177,6 +179,8 @@ void qso_query::action_handle_dclick(int col, string field) {
 			log_qso_->item(field, original_qso_->item(field));
 			break;
 		}
+	default:
+		break;
 	}
 	enable_widgets();
 }

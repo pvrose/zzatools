@@ -508,6 +508,8 @@ void qsl_editor::create_items() {
 				create_iparams(curr_x, curr_y, &item->image);
 				break;
 			}
+			default:
+				break;
 			}
 			g_401->resizable(nullptr);
 			g_401->size(curr_x - g_401->x(), g_401->h());
@@ -979,7 +981,6 @@ void qsl_editor::cb_ch_type(Fl_Widget* w, void* v) {
 void qsl_editor::cb_new_item(Fl_Widget* w, void* v) {
 	qsl_editor* that = ancestor_view<qsl_editor>(w);
 	Fl_Choice* ch = (Fl_Choice*)w;
-	qsl_data::item_type* type = (qsl_data::item_type*)v;
 	qsl_data::item_def* item = new qsl_data::item_def();
 	item->type = (qsl_data::item_type)ch->value();
 	if (item->type == qsl_data::IMAGE) {
@@ -996,7 +997,6 @@ void qsl_editor::cb_image(Fl_Widget* w, void* v) {
 	qsl_editor* that = ancestor_view<qsl_editor>(w);
 	cb_value<Fl_Input, string>(w, &image.filename);
 
-	size_t pos = image.filename.find_last_of("/\\");
 	if (directory(image.filename) != directory(that->data_->filename)) {
 		char msg[256];
 		snprintf(msg, sizeof(msg), "QSL: Image %s not in same directory as QSL data %s",

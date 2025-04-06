@@ -165,13 +165,8 @@ void files_dialog::create_form(int X, int Y) {
 	const int GRP8 = GRP7A + HGRP7A;
 	const int ROW8_1 = GRP8 + HTEXT;
 	const int HGRP8 = ROW8_1 - GRP8 + max(HBUTTON, HTEXT) + GAP;
-	// Group 9, row1
-	const int GRP9 = GRP8 + HGRP8;
-	const int ROW9_1 = GRP9 + HTEXT;
-	const int HGRP9 = ROW9_1 - GRP9 + max(HBUTTON, HTEXT) + GAP;
 
 	// Bottom of required dialog
-	const int YMAX = GRP8 + HGRP8 + EDGE;
 	
 	Fl_Group* grp_tqsl = new Fl_Group(X + XGRP, Y + GRP2, XMAX, HGRP2, "TQSL Executable");
 	grp_tqsl->box(FL_BORDER_BOX);

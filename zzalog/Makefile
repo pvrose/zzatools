@@ -51,10 +51,11 @@ LDFLAGS := $(FLTK_FLAGS) $(HAMLIB_FLAGS) $(CURL_FLAGS)
 # These files will have .d instead of .o as the output.
 CPPFLAGS := $(INC_FLAGS) -MMD -MP 
 
+LINTFLAG := -Wunused -Wswitch 
 # Set ccompile flags
 # include debug data
-CFLAGS += -g
-CXXFLAGS += -g
+CFLAGS += -g $(LINTFLAG)
+CXXFLAGS += -g $(LINTFLAG)
 
 ifeq ($(BUILD_TYPE), Anal)
 CXXFLAGS += -fsanitize=address

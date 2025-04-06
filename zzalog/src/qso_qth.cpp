@@ -111,8 +111,6 @@ void qso_qth::enable_widgets() {
 	else bn_edit_->deactivate();
 	table_->redraw();
 	redraw();
-
-	qso_data* data = ancestor_view<qso_data>(this);
 }
 
 // Set the QTH details
@@ -148,6 +146,8 @@ void qso_qth::cb_bn_edit(Fl_Widget* w, void* v) {
 		break;
 	}
 	case BN_CANCEL:
+		break;
+	default:
 		break;
 	}
 	delete dlg;
@@ -220,6 +220,8 @@ void qso_qth::table::draw_cell(TableContext context, int R, int C, int X, int Y,
 			fl_pop_clip();
 			return;
 		}
+	default:
+		break;
 	}
 }
 

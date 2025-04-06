@@ -805,7 +805,6 @@ void book::go_date(string date) {
 
 // Set the modified flag - conditionally update the status progress bar (as indication it's modified
 void book::modified(bool value, bool update_progress /*= true*/) {
-	record* qso = get_record();
 	// Set the flag
 	modified_ = value;
 	if (modified_) {
@@ -908,7 +907,6 @@ bool book::match_record(record* record) {
 
 // Returns whether a record matches the basic search condition.
 bool book::basic_match(record* record) {
-	string::size_type dummy = 0;
 	// See if record matches criterion
 	switch (criteria_->condition) {
 	case XC_UNFILTERED:
@@ -966,6 +964,8 @@ bool book::basic_match(record* record) {
 		if (criteria_->comparator != XP_REGEX && record->item("GRIDSQUARE").length() < 4) break;
 		return match_string(criteria_->pattern.substr(0, 4), criteria_->comparator, record->item("GRIDSQUARE").substr(0, 4));
 		break;
+	default:
+		return false;
 	}
 	// we should never get here
 	return false;
@@ -1058,8 +1058,9 @@ bool book::match_int(int test, int comparator, int value) {
 		return (value >= test);
 	case XP_GT:
 		return (value > test);
+	default:
+		return (test == value);
 	}
-	return (test == value);
 }
 
 // Returns the position of the next record that matches search criterion

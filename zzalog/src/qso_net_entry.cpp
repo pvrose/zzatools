@@ -66,7 +66,7 @@ qso_entry* qso_net_entry::entry() {
 
 // Set the entry
 void qso_net_entry::entry(qso_entry* w) {
-	int ok = entries_->value(w);
+	entries_->value(w);
 }
 
 // Returns the number of qso_entry forms

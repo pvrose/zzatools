@@ -248,6 +248,8 @@ void qso_buttons::cb_activate(Fl_Widget* w, void* v) {
 	case qso_data::QSO_INACTIVE:
 		that->qso_data_->action_activate(qso_data::QSO_ON_AIR);
 		break;
+	default:
+		break;
 	}
 	that->enable_widgets();
 }
@@ -270,6 +272,8 @@ void qso_buttons::cb_start(Fl_Widget* w, void* v) {
 		that->qso_data_->action_cancel_edit();
 		that->qso_data_->action_activate(mode);
 		that->qso_data_->action_start(mode);
+		break;
+	default:
 		break;
 	}
 	that->enable_widgets();
@@ -313,6 +317,8 @@ void qso_buttons::cb_save(Fl_Widget* w, void* v) {
 				data->action_edit();
 				break;
 			}
+			default:
+				break;
 		}
 		break;
 	case qso_data::QSO_ENTER:
@@ -328,6 +334,8 @@ void qso_buttons::cb_save(Fl_Widget* w, void* v) {
 				data->action_deactivate();
 				break;
 			}
+			default:
+				break;
 		}
 		break;
 		// QSO editing
@@ -344,6 +352,8 @@ void qso_buttons::cb_save(Fl_Widget* w, void* v) {
 			case qso_data::MANUAL_ENTRY:
 				data->action_query_entry();
 				break;
+			default:
+				break;
 			}
 			break;
 		case SAVE_EDIT:
@@ -352,10 +362,14 @@ void qso_buttons::cb_save(Fl_Widget* w, void* v) {
 		case SAVE_VIEW:
 			data->action_view();
 			break;
+		default:
+			break;
 		}
 		break;
 	case qso_data::NET_STARTED:
 		data->action_save(edit_button == SAVE_CONTINUE);
+		break;
+	default:
 		break;
 	}
 	if (that) that->enable_widgets();
@@ -394,6 +408,8 @@ void qso_buttons::cb_cancel(Fl_Widget* w, void* v) {
 	case qso_data::QSO_FLDIGI:
 		data->action_cancel_modem();
 		break;
+	default:
+		break;
 	}
 	if (that) that->enable_widgets();
 }
@@ -419,6 +435,8 @@ void qso_buttons::cb_edit(Fl_Widget* w, void* v) {
 	case qso_data::QSO_VIEW:
 		that->qso_data_->action_edit();
 		break;
+	default:
+		break;
 	}
 	that->enable_widgets();
 }
@@ -440,6 +458,8 @@ void qso_buttons::cb_bn_view_qso(Fl_Widget* w, void* v) {
 	case qso_data::QSO_BROWSE:
 		that->qso_data_->action_cancel_browse();
 		that->qso_data_->action_view();
+		break;
+	default:
 		break;
 	}
 	that->enable_widgets();
@@ -628,6 +648,8 @@ void qso_buttons::cb_bn_save_all(Fl_Widget* w, void* v) {
 	case qso_data::NET_EDIT:
 		that->qso_data_->action_save_net_all();
 		break;
+	default:
+		break;
 	}
 	that->enable_widgets();
 }
@@ -641,6 +663,8 @@ void qso_buttons::cb_bn_cancel_all(Fl_Widget* w, void* v) {
 	case qso_data::NET_STARTED:
 	case qso_data::NET_EDIT:
 		that->qso_data_->action_cancel_net_all();
+		break;
+	default:
 		break;
 	}
 	that->enable_widgets();
@@ -664,6 +688,8 @@ void qso_buttons::cb_bn_add_net(Fl_Widget* w, void* v) {
 	case qso_data::NET_EDIT:
 		that->qso_data_->action_add_net_qso();
 		break;
+	default:
+		break;
 	}
 	that->enable_widgets();
 }
@@ -683,6 +709,8 @@ void qso_buttons::cb_bn_start_net(Fl_Widget* w, void* v) {
 	case qso_data::QSO_STARTED:
 		that->qso_data_->action_create_net();
 		break;
+	default:
+		break;
 	}
 	that->enable_widgets();
 }
@@ -697,6 +725,8 @@ void qso_buttons::cb_bn_delete_qso(Fl_Widget* w, void* v) {
 	case qso_data::QSO_PENDING:
 		that->qso_data_->action_delete_qso();
 		break;
+	default:
+		break;
 	}
 	that->enable_widgets();
 }
@@ -709,6 +739,8 @@ void qso_buttons::cb_bn_query_entry(Fl_Widget* w, void* v) {
 	switch (that->qso_data_->logging_state()) {
 	case qso_data::QSO_INACTIVE:
 		that->qso_data_->action_query_entry();
+		break;
+	default:
 		break;
 	}
 	that->enable_widgets();
@@ -724,6 +756,8 @@ void qso_buttons::cb_bn_execute_query(Fl_Widget* w, void* v) {
 	case qso_data::MANUAL_ENTRY:
 		that->qso_data_->action_exec_query();
 		break;
+	default:
+		break;
 	}
 	that->enable_widgets();
 }
@@ -737,6 +771,8 @@ void qso_buttons::cb_bn_cancel_query(Fl_Widget* w, void* v) {
 	case qso_data::MANUAL_ENTRY:
 		that->qso_data_->action_cancel_query();
 		break;
+	default:
+		break;
 	}
 	that->enable_widgets();
 }
@@ -749,6 +785,8 @@ void qso_buttons::cb_bn_import_query(Fl_Widget* w, void* v) {
 	switch (that->qso_data_->logging_state()) {
 	case qso_data::MANUAL_ENTRY:
 		that->qso_data_->action_import_query();
+		break;
+	default:
 		break;
 	}
 	that->enable_widgets();
@@ -770,6 +808,8 @@ void qso_buttons::cb_bn_qrz_com(Fl_Widget* w, void* v) {
 	case qso_data::QUERY_NEW:
 		that->qso_data_->action_qrz_com();
 		break;
+	default:
+		break;
 	}
 	that->enable_widgets();
 }
@@ -784,6 +824,8 @@ void qso_buttons::cb_bn_update_cat(Fl_Widget* w, void* v) {
 		case qso_data::QSO_EDIT:
 		case qso_data::NET_EDIT: {
 			that->qso_data_->action_update_cat(clear);
+			break;
+		default:
 			break;
 		}
 	}
@@ -802,6 +844,8 @@ void qso_buttons::cb_bn_save_restart(Fl_Widget* w, void* v) {
 		that->qso_data_->action_start(qso_data::QSO_ON_AIR);
 		break;
 	}
+	default:
+		break;
 	}
 	that->enable_widgets();
 }
@@ -817,6 +861,8 @@ void qso_buttons::cb_bn_restart(Fl_Widget* w, void* v) {
 		that->qso_data_->action_start(qso_data::QSO_ON_AIR);
 		break;
 	}
+	default:
+		break;
 	}
 	that->enable_widgets();
 }
@@ -830,6 +876,8 @@ void qso_buttons::cb_bn_parse_qso(Fl_Widget* w, void* v) {
 		that->qso_data_->action_parse_qso();
 		break;
 	}
+	default:
+		break;
 	}
 	that->enable_widgets();
 }

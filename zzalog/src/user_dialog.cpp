@@ -228,7 +228,6 @@ void user_dialog::cb_br_logfont(Fl_Widget* w, void* v) {
 // Callback for all size browsers
 // v is a pointer to the size variable
 void user_dialog::cb_br_size(Fl_Widget* w, void* v) {
-	user_dialog* that = ancestor_view<user_dialog>(w);
 	Fl_Hold_Browser* size_br = (Fl_Hold_Browser*)w;
 	int line = size_br->value();
 	*(Fl_Fontsize*)v = stoi(size_br->text(line));

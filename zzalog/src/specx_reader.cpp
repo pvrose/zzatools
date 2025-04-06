@@ -334,6 +334,8 @@ bool specx_reader::end_element(string name) {
 	case SXE_FIELDS:
 		if (element_name == "FIELDS") return end_fields();
 		break;
+	default:
+		break;
 	}
 	char* message = new char[50 + name.length()];
 	sprintf(message, "SPEC DATA: Invalid XML - mismatch start and end of element %s", name.c_str());

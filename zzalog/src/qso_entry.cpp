@@ -91,14 +91,11 @@ void qso_entry::create_form(int X, int Y) {
 	int curr_x = X;
 	int curr_y = Y;
 
-	int col2_y = curr_y;
 	int max_x = X;
-	int max_y = Y;
 
 	curr_x += GAP;
 	curr_y += HTEXT;
 
-	int save_y = curr_y;
 
 	const int WCHOICE = WBUTTON * 3 / 2;
 	const int WINPUT = WBUTTON * 7 / 4;
@@ -138,7 +135,6 @@ void qso_entry::create_form(int X, int Y) {
 		}
 	}
 	max_x = max(max_x, curr_x);
-	max_y = curr_y;
 	// Clear QSO fields
 
 	curr_x = max_x;
@@ -383,7 +379,7 @@ void qso_entry::copy_cat_to_qso(bool clear) {
 			switch (qso_data_->logging_state()) {
 			case qso_data::QSO_PENDING:
 			case qso_data::NET_STARTED:
-			case qso_data_->TEST_PENDING:
+			case qso_data::TEST_PENDING:
 			{
 				// Load values from rig
 				qso_->item("FREQ", freqy);
@@ -458,6 +454,8 @@ void qso_entry::copy_cat_to_qso(bool clear) {
 				tabbed_forms_->update_views(nullptr, HT_MINOR_CHANGE, qso_number_);
 				break;
 			}
+			default:
+				break;
 			}
 		}
 	}
@@ -487,6 +485,8 @@ void qso_entry::copy_clock_to_qso() {
 			copy_qso_to_display(CF_TIME | CF_DATE);
 			break;
 		}
+		default:
+			break;
 		}
 	}
 }
@@ -652,7 +652,6 @@ void qso_entry::action_add_field(int ix, string field) {
 void qso_entry::action_del_field(int ix) {
 	int iy = ix - NUMBER_FIXED;
 	string& old_field = (*field_map_)[iy].field;
-	int ip = field_ip_map_[old_field];
 	field_ip_map_.erase(old_field);
 	int pos = ix;
 	for (; pos < fields_in_use_.size() - 1; pos++) {
@@ -762,6 +761,8 @@ void qso_entry::cb_ip_field(Fl_Widget* w, void* v) {
 					that->copy_cat_to_qso(true);
 					break;
 				}
+				default:
+					break;
 			}
 		}
 		else if (field == "QSO_DATE" || field == "TIME_ON") {
@@ -835,6 +836,8 @@ void qso_entry::cb_ip_field(Fl_Widget* w, void* v) {
 			that->focus_ix_ = ix - NUMBER_PER_ROW;
 			that->set_focus_saved();
 		}
+		return;
+	default:
 		return;
 	}
 }
@@ -926,6 +929,8 @@ void qso_entry::cb_ticker(void* v) {
 		case qso_data::TEST_PENDING:
 		case qso_data::TEST_ACTIVE:
 			that->copy_cat_to_qso();
+			break;
+		default:
 			break;
 	}
 }

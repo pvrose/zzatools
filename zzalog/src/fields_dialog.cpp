@@ -124,6 +124,8 @@ void fields_table::draw_cell(TableContext context, int R, int C, int X, int Y,
             }
             return;
         }
+        default:
+            break;
     }
 }
 
@@ -205,6 +207,8 @@ void fields_table::cb_table(Fl_Widget* w, void* v) {
                 }
             }
         }
+        default:
+            break;
     }
 }
 

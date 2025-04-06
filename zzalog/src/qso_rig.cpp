@@ -380,7 +380,6 @@ void qso_rig::create_connex(int curr_x, int curr_y) {
 	connect_tab_->labelsize(FL_NORMAL_SIZE + 2);
 	curr_x += GAP;
 	curr_y += GAP;
-	int max_x = curr_x;
 	int max_y = curr_y;
 	// Create serial port
 	create_serial(curr_x, curr_y);
@@ -969,7 +968,7 @@ void qso_rig::enable_widgets(uchar damage) {
 				network_grp_->set_output();
 			}
 		}
-		switch ((rig_mode_t)mode_) {
+		switch ((rig_port_e)mode_) {
 		case RIG_PORT_SERIAL:
 			// Serial port - show serial configuration, hide network
 			if (visible_r()) serial_grp_->show();
@@ -1011,6 +1010,8 @@ void qso_rig::enable_widgets(uchar damage) {
 			// Hide both sets of configuration
 			serial_grp_->hide();
 			network_grp_->hide();
+			break;
+		default:
 			break;
 		}
 		// Set the rig name into the choice
@@ -1351,7 +1352,6 @@ void qso_rig::populate_model_choice() {
 		}
 		rig_choice_pos_[id] = pos;
 	}
-	bool found = false;
 }
 
 // Populate the choice with the available ports
@@ -1491,6 +1491,8 @@ void qso_rig::cb_ch_model(Fl_Widget* w, void* v) {
 		break;
 	case RIG_PORT_NONE:
 		// Retain mode = NONE until the add button is clicked
+		break;
+	default:
 		break;
 	}
 	that->populate_baud_choice();
@@ -1696,7 +1698,6 @@ void qso_rig::cb_bn_transverter(Fl_Widget* w, void* v) {
 
 // Show scripts
 void qso_rig::cb_show_app(Fl_Widget* w, void* v) {
-	qso_rig* that = ancestor_view<qso_rig>(w);
 	filename_input* ip = *(filename_input**)v;
 	if (strlen(ip->value()) > 0) {
 		file_viewer* fwin = new file_viewer(640, 480);

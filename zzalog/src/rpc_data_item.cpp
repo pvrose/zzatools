@@ -93,6 +93,8 @@ rpc_data_item::~rpc_data_item()
 		struct_->clear();
 		delete struct_;
 		break;
+	default:
+		break;
 	}
 }
 
@@ -240,6 +242,8 @@ string rpc_data_item::print_item() {
 			result += temp;
 			result += item->print_item();
 		}
+		break;
+	default:
 		break;
 	}
 	return result;

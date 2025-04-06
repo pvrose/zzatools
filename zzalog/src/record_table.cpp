@@ -170,6 +170,8 @@ void record_table::draw_cell(TableContext context, int R, int C, int X, int Y, i
 					break;
 				}
 				break;
+			default:
+				break;
 			}
 			fl_draw(text.c_str(), X, Y, W, H, FL_ALIGN_CENTER);
 		}
@@ -201,6 +203,8 @@ void record_table::draw_cell(TableContext context, int R, int C, int X, int Y, i
 					// Query record
 					text = query_record_->item(field_name);
 					break;
+				default:
+					break;
 				}
 				break;
 			case 1:
@@ -214,6 +218,8 @@ void record_table::draw_cell(TableContext context, int R, int C, int X, int Y, i
 				case DUPE_QUERY:
 					// Query record
 					text = query_record_->item(field_name);
+					break;
+				default:
 					break;
 				}
 				break;
@@ -229,6 +235,8 @@ void record_table::draw_cell(TableContext context, int R, int C, int X, int Y, i
 					// Original log entry
 					text = saved_record_->item(field_name);
 					break;
+				default:
+					break;
 				}
 				break;
 			}
@@ -240,6 +248,8 @@ void record_table::draw_cell(TableContext context, int R, int C, int X, int Y, i
 			fl_line(X, Y, X + W - 1, Y, X + W - 1, Y + H - 1);
 		}
 		fl_pop_clip();
+		return;
+	default:
 		return;
 	}
 

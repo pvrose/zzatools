@@ -255,7 +255,6 @@ void qso_contest::cb_contest_id(Fl_Widget* w, void* v) {
 	// Read the data and load into the widgets
 	that->load_settings();
 	that->enable_widgets();
-	qso_data* data = ancestor_view<qso_data>(that);
 	if (that->active_) cb_active(that->bn_active_, &that->active_);
 }
 

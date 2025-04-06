@@ -78,7 +78,6 @@ void fields::load_data() {
 	Fl_Preferences display_settings(settings_, "Display");
 	Fl_Preferences fields_settings(display_settings, "Fields");
 	// Number of field sets (a field set is a set of fields and their ordering)
-	int num_field_sets = fields_settings.groups();
 	// Then get the field sets for each
 	char app_path[128];
 	char* temp;
@@ -133,7 +132,6 @@ void fields::add_collections(Fl_Preferences& settings, string name) {
                 // Read the field info: name, width and heading from the settings
                 field_info_t field;
                 string field_id = colln_settings.group(j);
-                int field_num = stoi(field_id.substr(6)); // "Field n"
                 Fl_Preferences field_settings(colln_settings, field_id.c_str());
                 field_settings.get("Width", (int&)field.width, 50);
                 char* temp;

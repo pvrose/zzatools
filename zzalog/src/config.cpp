@@ -88,8 +88,6 @@ config::config(int W, int H, const char* label) :
 	all_settings->tooltip("Displays the current config in tree format");
 	children_ids_.push_back(DLG_ALL);
 
-	config_tree* all_tree = new config_tree(rx, ry, rw, rh);
-
 	all_settings->end();
 
 	// Default to show all config

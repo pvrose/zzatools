@@ -338,8 +338,10 @@ bool rig_if::th_open_rig() {
 	// open r
 		case RIG_PORT_NETWORK:
 		case RIG_PORT_USB:
-			int err = rig_set_conf(rig_, rig_token_lookup(rig_, "rig_pathname"), hamlib_data_->port_name.c_str());
+			rig_set_conf(rig_, rig_token_lookup(rig_, "rig_pathname"), hamlib_data_->port_name.c_str());
 			rig_->state.timeout = (int)(hamlib_data_->timeout * 1000.);
+			break;
+		default:
 			break;
 		}
 	} 
@@ -421,6 +423,8 @@ void rig_if::th_read_values() {
 			rig_data_.powered_on = false;
 			return;
 		}
+		default:
+			break;
 		}
 	}
 	// Read TX frequency

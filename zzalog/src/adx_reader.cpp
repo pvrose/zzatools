@@ -54,8 +54,6 @@ adx_reader::~adx_reader()
 // load data to book from the input stream
 bool adx_reader::load_book(book* book, istream& in) {
 	in_ = &in;
-	load_result_t result = LR_GOOD;
-	int count = 0;
 	// Takes time so set the timer cursor
 	fl_cursor(FL_CURSOR_WAIT);
 	my_book_ = book;
@@ -305,6 +303,8 @@ bool adx_reader::characters(string content) {
 					value_ += content[i];
 				}
 			}
+			break;
+		default:
 			break;
 		}
 	}

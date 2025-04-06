@@ -95,6 +95,8 @@ void calendar_table::draw_cell(TableContext context, int R, int C, int X, int Y,
 		}
 		fl_pop_clip();
 		return;
+	default:
+		return;
 	}
 }
 

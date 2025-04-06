@@ -299,7 +299,6 @@ int socket_server::create_server()
 // Accept any client asking to connect, use non-blocking call to avoid locking out other code
 socket_server::client_status socket_server::accept_client()
 {
-	char message[256];
 	LEN_SOCKET_ADDR len_client_addr = sizeof(client_addr_);
 	client_ = accept(server_, (SOCKADDR *)&client_addr_, &len_client_addr);
 	if (client_ == INVALID_SOCKET)
@@ -359,11 +358,8 @@ int socket_server::rcv_packet()
 		}
 	}
 
-	bool packet_complete = false;
-	int payload_size = 0;
 	string resource = "";
 	string function = "";
-	int pos_payload = 0;
 	LEN_SOCKET_ADDR len_client_addr = sizeof(client_addr_);
 	do
 	{

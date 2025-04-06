@@ -122,7 +122,6 @@ void change_dialog::create_form() {
 	// Old field name choice
 	field_choice* ch12 = new field_choice(C2, R1, W2, H1);
 	ch12->set_dataset("Fields");
-	int ix = 0;
 	ch12->value(0);
 	old_field_name_ = ch12->value();
 	ch12->callback(cb_ch_old_field, (void*)&old_field_name_);
@@ -132,7 +131,6 @@ void change_dialog::create_form() {
 	// New field name choice
 	field_choice* ch22 = new field_choice(C2, R2, W2, H2);
 	ch22->set_dataset("Fields");
-	ix = 0;
 	ch22->value(0);
 	new_field_name_ = ch22->value();
 	ch22->callback(cb_value<field_choice, string>, (void*)&new_field_name_);

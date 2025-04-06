@@ -171,7 +171,7 @@ void log_table::cb_tab_log(Fl_Widget* w, void* v) {
 						that->edit_cell(row, col);
 					}
 					else {
-						item_num_t selected = that->my_book_->selection(item_num, HT_SELECTED, that);
+						that->my_book_->selection(item_num, HT_SELECTED, that);
 					}
 					that->current_item_num_ = item_num;
 				}
@@ -186,6 +186,8 @@ void log_table::cb_tab_log(Fl_Widget* w, void* v) {
 		case FL_PUSH:
 			// Keep the focus
 			that->take_focus();
+			break;
+		default:
 			break;
 		}
 		break;
@@ -204,6 +206,8 @@ void log_table::cb_tab_log(Fl_Widget* w, void* v) {
 			// A row or column has been resized
 			that->drag_column(col);
 		}
+		break;
+	default:
 		break;
 	}
 }
@@ -262,6 +266,8 @@ void log_table::edit_save(field_input::exit_reason_t exit_type) {
 		else {
 			status_->misc_status(ST_WARNING, "LOG: There is no cell downwards to edit.");
 		}
+		break;
+	default:
 		break;
 	}
 	// Select new row to edit
@@ -417,7 +423,6 @@ int log_table::handle(int event) {
 
 // override of view::update(). view-specific actions on update
 void log_table::update(hint_t hint, qso_num_t record_num_1, qso_num_t record_num_2) {
-	record* this_record = my_book_->get_record(my_book_->item_number(record_num_1), false);
 	// Hide any edit input 
 	if (edit_input_->visible()) {
 		record* old_record = my_book_->get_record(edit_row_, false);
@@ -623,6 +628,9 @@ void log_table::draw_cell(TableContext context, int R, int C, int X, int Y, int 
 			edit_input_->resize(X, Y, W, H);
 			init_sizes();
 		}
+		return;
+	default:
+		break;
 	}
 }
 
@@ -737,6 +745,8 @@ void log_table::done_edit(bool keep_row) {
 			case OT_IMPORT:
 				// Otherwise just redraw this log
 				redraw();
+				break;
+			default:
 				break;
 			}
 		}

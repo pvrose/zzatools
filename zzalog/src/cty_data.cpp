@@ -126,11 +126,11 @@ bool cty_data::data_valid(string filename) {
 	// Get file status
 #ifdef _WIN32
 	struct _stat status;
-	int result = _fstat(fd, &status);
+	_fstat(fd, &status);
 	_close(fd);
 #else
 	struct stat status;
-	int result = fstat(fd, &status);
+	fstat(fd, &status);
 	close(fd);
 #endif
 	time_t now;
@@ -462,14 +462,6 @@ cty_data::parse_source_t cty_data::get_source(record* qso) {
 
 // Update record based on parsing
 bool cty_data::update_qso(record* qso) {
-	bool result = false;
-	// Returned when the QSO entry is modified
-	bool updated = false;
-	// Provides the reason for the query
-	string query_reason = "";
-	bool has_query = false;
-	bool invalid_record = !qso->is_valid();
-	bool query_error = false;
 	// Remove previous QSO as it falsely keeps previous parse result.
 	qso_ = nullptr;
 

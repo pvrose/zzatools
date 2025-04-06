@@ -74,7 +74,7 @@ using namespace std;
 string COPYRIGHT = "\302\251 Philip Rose GM3ZZA 2018. All rights reserved.\nPrefix data courtesy of clublog.org";
 string PROGRAM_ID = "ZZALOG";
 string PROG_ID = "ZLG";
-string PROGRAM_VERSION = "3.4.108";
+string PROGRAM_VERSION = "3.4.109";
 string VENDOR = "GM3ZZA";
 string TIMESTAMP = string(__DATE__) + " " + string(__TIME__);
 
@@ -202,7 +202,6 @@ string backup_filename(string source) {
 	else {
 		base_name = source.substr(last_slash + 1, last_period - last_slash - 1);
 	}
-	record* last_record = book_->get_latest();
 	string timestamp = now(false, "%Y%m%d_%H%MZ");
 	backup += base_name + "_" + timestamp + suffix;
 	return backup;
@@ -591,7 +590,6 @@ void add_properties() {
 	Fl_Font font;
 	Fl_Fontsize size;
 	float duration;
-	int enabled;
 	tip_settings.get("Duration", duration, (float)TIP_SHOW);
 	tip_settings.get("Font Name", font, 0);
 	tip_settings.get("Font Size", size, FL_NORMAL_SIZE);
