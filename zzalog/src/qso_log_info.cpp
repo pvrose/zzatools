@@ -113,6 +113,7 @@ void qso_log_info::enable_timer_widgets() {
 			pr_loadsave_->color(FL_GREEN);
 		}
 	}
+	enable_widgets();
 }
 
 // Enable widgets

@@ -57,7 +57,7 @@ bool club_handler::upload_log(book* book) {
 		stringstream ss;
 		adi_writer* writer = new adi_writer;
 		set<string> adif_fields;
-		writer->store_book(book, ss, &adif_fields_);
+		writer->store_book(book, ss, false, &adif_fields_);
 		// Get back to start of stream
 		ss.seekg(ss.beg);
 		// Get the parameters and make available for the HTTP POST FORM

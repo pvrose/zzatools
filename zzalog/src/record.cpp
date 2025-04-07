@@ -1166,7 +1166,8 @@ string record::item_merge(string data, bool indirect /*=false*/) {
 }
 
 // Return dirtty flag
-bool record::is_dirty() { return is_dirty_; }
+bool record::is_dirty() { 
+	return is_dirty_; }
 
 // Clear dirty flag
 void record::clean() { is_dirty_ = false; }

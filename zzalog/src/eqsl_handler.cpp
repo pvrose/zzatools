@@ -760,7 +760,7 @@ bool eqsl_handler::upload_eqsl_log(book* book) {
 	// Create an internal stringstream to accept the ADIF data
 	stringstream ss;
 	adi_writer* writer = new adi_writer;
-	writer->store_book(book, ss, &adif_fields_);
+	writer->store_book(book, ss, false, &adif_fields_);
 	// Revert to start of stream
 	ss.seekg(ss.beg);
 	// Get the HTTP POST FORM fields
