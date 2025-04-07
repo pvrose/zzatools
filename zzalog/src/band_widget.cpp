@@ -711,7 +711,6 @@ void band_widget::set_verticals() {
 	px_per_MHz_ = (double)(y_lower_ - y_upper_) / (scale_range_.upper - scale_range_.lower);
 	// Now work out major and minor ticks - get minor tick about 10 pixels
 	double target = 10.0 / px_per_MHz_;
-	double major;
 	double l10_target = log10(target);
 	double exponent = floor(l10_target);
 	double power10 = pow(10.0, exponent);

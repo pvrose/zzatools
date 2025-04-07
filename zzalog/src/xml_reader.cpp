@@ -114,7 +114,6 @@ bool xml_reader::report_error(string message, bool can_accept) {
 bool xml_reader::process_name(istream& is, string& name) {
 	// find the end of the name indicated by white-space, / or >
 	bool end = false;
-	int span = 0;
 	while (!end) {
 		// Read the character
 		char c = is.get();
@@ -420,12 +419,12 @@ bool xml_reader::process_start_tag(istream& is) {
 			// We have an empty element tag (i.e. no content so Start and end it)
 			end_element(name);
 			// skip />
-			char c = is.get();
-			c = is.get();
+			is.get();
+			is.get();
 		}
 		else {
 			// skip >
-			char c = is.get();
+			is.get();
 		}
 	}
 	else

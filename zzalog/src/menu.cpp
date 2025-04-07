@@ -258,7 +258,6 @@ menu::~menu()
 // File->New
 // v is not used
 void menu::cb_mi_file_new(Fl_Widget* w, void* v) {
-	menu* that = ancestor_view<menu>(w);
 	// Gracefully stop any import in progress - restart with ON_AIR logging - if no rig will drop to OFF_AIR
 	import_data_->stop_update(false);
 	while (!import_data_->update_complete()) Fl::check();
@@ -297,7 +296,6 @@ void menu::cb_mi_file_new(Fl_Widget* w, void* v) {
 // File->Open
 // v is a long. -1 = open browser and open file read-only; 0 = open browser and open file; 1-4 = open specific recent file
 void menu::cb_mi_file_open(Fl_Widget* w, void* v) {
-	menu* that = ancestor_view<menu>(w);
 	// Stop any import occurring
 	import_data_->stop_update(false);
 	while (!import_data_->update_complete()) Fl::check();
@@ -419,6 +417,8 @@ void menu::cb_mi_file_saveas(Fl_Widget* w, void* v) {
 			case OT_EXTRACT:
 				b = extract_records_;
 				break;
+			default:
+				break;
 			}
 			// Save even if not modified
 			b->store_data(filename, true);
@@ -534,7 +534,6 @@ void menu::cb_mi_navigate(Fl_Widget* w, void* v) {
 // Navigate->Date: Opens a calendar window
 // v is ignored
 void menu::cb_mi_nav_date(Fl_Widget* w, void* v) {
-	menu* that = ancestor_view<menu>(w);
 	// Populate calendar with today's date
 	record* qso = navigation_book_->get_record();
 	string date;
@@ -663,7 +662,6 @@ void menu::cb_mi_parse_log(Fl_Widget* w, void* v) {
 	if (true) {	
 		// If command parsing allowed
 		bool abandon = false;
-		int record_num = -1;
 		int item_number = 0;
 		// Initialise progress
 		status_->misc_status(ST_NOTE, "LOG: Started parsing");
@@ -674,7 +672,6 @@ void menu::cb_mi_parse_log(Fl_Widget* w, void* v) {
 			// Parse each record in turn
 			bool parse_result = cty_data_->update_qso(record);
 			bool changed = record->update_band(true);
-			record_num = navigation_book_->record_number(i);
 			item_number = i;
 			// Update progress
 			status_->progress(++i, navigation_book_->book_type());
@@ -745,7 +742,6 @@ void menu::cb_mi_valid8_log(Fl_Widget* w, void* v) {
 // Log->New - start a new record
 // v is not used
 void menu::cb_mi_log_new(Fl_Widget* w, void* v) {
-	menu* that = ancestor_view<menu>(w);
 	// Force main log book
 	tabbed_forms_->activate_pane(OT_MAIN, true);
 	// Create a new record - on or off-air
@@ -1081,7 +1077,6 @@ void menu::cb_mi_ext_qsl(Fl_Widget* w, void* v) {
 // Extract->Quick->* - one-click for specific searches
 // v is enum extract_mode_t: NO_NAME, NO_QTH or (inadequate) LOCATOR
 void menu::cb_mi_ext_special(Fl_Widget* w, void* v) {
-	menu* that = (menu*)w;
 	// v passes the particular option
 	extract_data::extract_mode_t reason = (extract_data::extract_mode_t)(intptr_t)v;
 	extract_records_->extract_special(reason);
@@ -1091,7 +1086,6 @@ void menu::cb_mi_ext_special(Fl_Widget* w, void* v) {
 // Extract->No Image-
 // v is not used 
 void menu::cb_mi_ext_no_image(Fl_Widget* w, void* v) {
-	menu* that = (menu*)w;
 	// v passes the particular option
 	extract_records_->extract_no_image();
 	tabbed_forms_->activate_pane(OT_EXTRACT, true);
@@ -1162,7 +1156,6 @@ void menu::cb_mi_rep_level(Fl_Widget* w, void* v) {
 // v is string*. nullptr = uses selected record else uses call sign in v.
 void menu::cb_mi_info_qrz(Fl_Widget* w, void* v) {
 	record* record = book_->get_record();
-	menu* that = ancestor_view<menu>(w);
 	if (v != nullptr) {
 		// Open with the web browser and fetch the page for the callsign
 		qrz_handler_->open_web_page(*(string*)v);
@@ -1190,7 +1183,6 @@ void menu::cb_mi_info_qrz(Fl_Widget* w, void* v) {
 void menu::cb_mi_info_map(Fl_Widget* w, void* v) {
 	// Get currently selected record
 	record* record = book_->get_record();
-	menu* that = ancestor_view<menu>(w);
 	if (record != nullptr) {
 		// If there is one
 		// Get locator, QTH and callsign
@@ -1221,7 +1213,7 @@ void menu::cb_mi_info_map(Fl_Widget* w, void* v) {
 			return;
 		}
 		status_->misc_status(ST_NOTE, message);
-		int result = fl_open_uri(uri);
+		fl_open_uri(uri);
 	}
 }
 
@@ -1245,7 +1237,7 @@ void menu::cb_mi_info_web(Fl_Widget* w, void* v) {
 		char message[128];
 		snprintf(message, 128, "INFO: Opening website %s", website.c_str());
 		status_->misc_status(ST_NOTE, message);
-		int result = fl_open_uri(uri);
+		fl_open_uri(uri);
 	}
 	else {
 		char message[128];
@@ -1399,6 +1391,8 @@ void menu::report_mode(vector<report_cat_t> report_mode, report_filter_t filter)
 				mode(index_calls, mode(index_calls) & ~FL_MENU_VALUE);
 				mode(index_custom, mode(index_custom) | FL_MENU_VALUE);
 				break;
+			default:
+				break;
 			}
 		}
 		else {
@@ -1446,6 +1440,8 @@ void menu::report_mode(vector<report_cat_t> report_mode, report_filter_t filter)
 		mode(index_all, mode(index_all) & ~FL_MENU_VALUE);
 		mode(index_extracted, mode(index_extracted) & ~FL_MENU_VALUE);
 		mode(index_selected, mode(index_selected) | FL_MENU_VALUE);
+		break;
+	default:
 		break;
 	}
 }
@@ -1496,7 +1492,6 @@ void menu::update_items() {
 		int index_rep = find_index("Re&port");
 		int index_info = find_index("&Information");
 		int index_web = find_index("&Information/QSO &Web-site");
-		int index_append_log = find_index("&Help/&Status/&Append File");
 		// Enable/Disable save 
 		if (modified) {
 			mode(index_save, mode(index_save) & ~FL_MENU_INACTIVE);
@@ -1621,7 +1616,6 @@ void menu::update_windows_items() {
 	// Get indices to menu items
 	int index_main = find_index("&Windows/&Main");
 	int index_oper = find_index("&Windows/Das&hboard");
-	int index_status = find_index("&Windows/S&tatus Viewer");
 	//int index_band = find_index("&Windows/&Band View");
 	int index_intl = find_index("&Windows/&International Chars");
 

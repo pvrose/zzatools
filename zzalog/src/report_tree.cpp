@@ -127,6 +127,8 @@ void report_tree::update(hint_t hint, qso_num_t record_num_1, qso_num_t record_n
 		item_labelsize(fontsize_);
 		populate_tree(false);
 		break;
+	default:
+		break;
 	}
 }
 
@@ -250,6 +252,8 @@ void report_tree::add_record(item_num_t record_num, report_map_entry_t* entry) {
 				map_key = "Custom field not specified";
 			}
 			break;
+		default:
+			break;
 		}
 	}
 	if ((size_t)entry->entry_type < adj_order_.size()) {
@@ -326,7 +330,6 @@ void report_tree::add_record(item_num_t record_num, report_map_entry_t* entry) {
 
 // Copy the map to the tree control and totalise record counts
 void report_tree::copy_map_to_tree(int type, void* this_map, Fl_Tree_Item* item, int& num_records, int& num_eqsl, int& num_lotw, int& num_card, int& num_dxcc, int &num_any) {
-	report_cat_t cat = adj_order_[type];
 	report_map_entry_t* next_entry;
 	string map_key;
 	char* text = new char[1024];
@@ -533,6 +536,8 @@ void report_tree::create_map() {
 	case report_filter_t::RF_NONE:
 		delete_map(&map_);
 		return;
+	default:
+		break;
 	}
 	status_->misc_status(ST_NOTE, "LOG: Report selection started");
 	status_->progress(get_book()->size(), OT_REPORT, "Converting log into a report tree", "records");
@@ -561,6 +566,8 @@ void report_tree::create_map() {
 		break;
 	case RC_CALL:
 		field_name = "CALL";
+		break;
+	default:
 		break;
 	}
 
@@ -686,6 +693,8 @@ void report_tree::populate_tree(bool activate) {
 			case report_filter_t::RF_SELECTED:
 				filter = "Selected";
 				break;
+			default:
+				break;
 			}
 			switch (adj_order_[0]) {
 			case RC_DXCC:
@@ -745,6 +754,8 @@ void report_tree::update_status() {
 			text += "As selected QSO";
 		}
 		break;
+	default:
+		break;
 	}
 	// Add the ordering criteria
 	for (size_t i = 0; i < adj_order_.size(); i++) {
@@ -763,6 +774,9 @@ void report_tree::update_status() {
 			break;
 		case RC_CALL:
 			text += " Callsigns";
+			break;
+		default:
+			break;
 		}
 	}
 	// Get document to update status pane

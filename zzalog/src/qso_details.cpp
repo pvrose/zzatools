@@ -248,6 +248,8 @@ void qso_details::table_d::draw_cell(TableContext context, int R, int C, int X, 
 			fl_pop_clip();
 			return;
 		}
+	default:
+		break;
 	}
 }
 
@@ -426,6 +428,8 @@ void qso_details::table_q::draw_cell(TableContext context, int R, int C, int X, 
 			fl_pop_clip();
 			return;
 		}
+	default:
+		break;
 	}
 	// Restore font saved on entry
 	fl_font(sv_font, sv_size);
@@ -445,6 +449,8 @@ void qso_details::table_q::cb_table(Fl_Widget* w, void* v) {
 			qso_num_t qso_num = that->items_[row];
 			book_->selection(qso_num, HT_SELECTED);
 		}
+		default:
+			break;
 		}
 	}
 }

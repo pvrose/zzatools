@@ -102,9 +102,6 @@ int qso_data::handle(int event) {
 
 // Load values
 void qso_data::load_values() {
-	// Set logging mode -default is On-air with or without rig connection
-	rig_if* rig = ((qso_manager*)parent())->rig();
-	bool have_rig = rig && rig->is_good();
 }
 
 // Create qso_data
@@ -120,7 +117,6 @@ void qso_data::create_form(int X, int Y) {
 	labelsize(FL_NORMAL_SIZE + 2);
 
 	int curr_y = Y + HTEXT;
-	int top = Y;
 	int curr_x = X + GAP;
 
 	// One or the other of the two groups below will be shown at a time
@@ -425,6 +421,8 @@ void qso_data::enable_widgets() {
 			g_misc_->qso(current_qso(), current_number());
 			g_misc_->enable_widgets();
 			break;
+		default:
+			break;
 		}
 		g_buttons_->enable_widgets();
 
@@ -555,6 +553,8 @@ void qso_data::update_qso(qso_num_t log_num) {
 			g_misc_->enable_widgets();
 		}
 		break;
+	default:
+		break;
 	}
 }
 
@@ -680,6 +680,8 @@ void qso_data::enter_modem_qso(record* qso) {
 			tabbed_forms_->update_views(nullptr, HT_INSERTED, g_entry_->qso_number());
 			enable_widgets();
 		}
+		default:
+			break;
 	}
 }
 
@@ -794,6 +796,8 @@ void qso_data::action_new_qso(record* qso, qso_init_t mode) {
 		qe->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
 		g_misc_->qso(current_qso(), current_number());
 		break;
+	default:
+		break;
 	}
 	qe->set_focus_call();
 	previous_mode_ = new_mode;
@@ -803,7 +807,6 @@ void qso_data::action_new_qso(record* qso, qso_init_t mode) {
 // Action ACTIVATE: transition from QSO_INACTIVE to QSO_PENDING
 void qso_data::action_activate(qso_init_t mode) {
 	record* source_record = book_->get_record();
-	qso_manager* mgr = ancestor_view<qso_manager>(this);
 	if (contest()->contest_active()) logging_state_ = TEST_PENDING;
 	else logging_state_ = QSO_PENDING;
 	action_new_qso(source_record, mode);
@@ -907,6 +910,8 @@ bool qso_data::action_save(bool continuing) {
 		item_number = book_->correct_record_position(item_number);
 		qso_number = book_->record_number(item_number);
 		break;
+	default:
+		break;
 	}
 
 	if (!continuing) {
@@ -964,6 +969,8 @@ bool qso_data::action_save(bool continuing) {
 			logging_state_ = NET_STARTED;
 		}
 		break;
+	default:
+		break;
 	}
 	enable_widgets();
 	return true;
@@ -995,6 +1002,8 @@ void qso_data::action_cancel() {
 			action_return_state();
 		}
 		break;
+	default:
+		break;
 	}
 	enable_widgets();
 	book_->enable_save(true, "Canceling real-time QSO");
@@ -1013,6 +1022,8 @@ void qso_data::action_delete_qso() {
 		action_deactivate();
 		break;
 	case QSO_PENDING:
+		break;
+	default:
 		break;
 	}
 
@@ -1054,6 +1065,8 @@ void qso_data::action_deactivate() {
 		}
 		//// Restore holding entry
 		//g_net_entry_->add_entry();
+		break;
+	default:
 		break;
 	}
 	logging_state_ = QSO_INACTIVE;
@@ -1180,6 +1193,8 @@ void qso_data::action_navigate(int target) {
 		g_net_entry_->navigate((navigate_t) target);
 		break;
 	}
+	default:
+		break;
 	}
 	inhibit_drawing_ = false;
 	enable_widgets();
@@ -1329,6 +1344,8 @@ void qso_data::action_look_all_txt() {
 				status_->misc_status(ST_WARNING, "DASH: ALL.TXT search did not find QSO");
 			}
 			break;
+		default:
+			break;
 	}
 	enable_widgets();
 }
@@ -1398,6 +1415,8 @@ void qso_data::action_add_net_qso() {
 	case NET_EDIT:
 		action_new_qso(qso, QSO_COPY_FOR_NET);
 		break;
+	default:
+		break;
 	}
 	// Add it to the book
 	book_->enable_save(false, "Adding a QSO to a net");
@@ -1424,6 +1443,8 @@ void qso_data::action_save_net_all() {
 			break;
 		case NET_EDIT:
 			action_save_net_edit();
+			break;
+		default:
 			break;
 		}
 	}
@@ -1462,6 +1483,8 @@ void qso_data::action_cancel_net_all() {
 			break;
 		case NET_EDIT:
 			action_cancel_net_edit();
+			break;
+		default:
 			break;
 		}
 	}
@@ -1535,6 +1558,8 @@ void qso_data::action_cancel_modem() {
 			book_->enable_save(true, "Cancel real-time modem QSO");
 			break;
 		}
+		default:
+			break;
 	}
 	enable_widgets();
 }
@@ -1615,6 +1640,8 @@ void qso_data::action_qrz_com() {
 			qso = query_qso();
 			break;
 		}
+		default:
+			break;
 	} 
 	if (qso) qrz_handler_->open_web_page(qso->item("CALL"));
 }
@@ -1632,6 +1659,8 @@ void qso_data::action_update_cat(bool clear) {
 			g_net_entry_->entry()->copy_qso_to_display(qso_entry::CF_CAT);
 			break;
 		}
+		default:
+			break;
 	}
 }
 
@@ -1659,6 +1688,8 @@ void qso_data::action_return_state() {
 			break;
 		case MANUAL_ENTRY:
 			action_query_entry();
+			break;
+		default:
 			break;
 	}
 }
@@ -1738,6 +1769,8 @@ void qso_data::start_qso(qso_init_t mode) {
 	case QSO_ENTER:
 		status_->misc_status(ST_ERROR, "DASH: Cannot start a QSO when enterrring another");
 		break;
+	default:
+		break;
 	}
 }
 
@@ -1761,6 +1794,8 @@ void qso_data::end_qso() {
 	case NET_EDIT:
 		action_save_net_all();
 		break;
+	default:
+		break;
 	}
 }
 
@@ -1779,6 +1814,8 @@ void qso_data::edit_qso() {
 	case NET_EDIT:
 	case QSO_ENTER:
 		status_->misc_status(ST_ERROR, "DASH: Cannot edit another QSO while editing an existing one");
+		break;
+	default:
 		break;
 	}
 }

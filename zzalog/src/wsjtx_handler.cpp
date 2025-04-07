@@ -533,7 +533,6 @@ record* wsjtx_handler::update_qso(bool tx, string time, double audio_freq, strin
 			return nullptr;
 		}
 		else if (sender != my_call_) {
-			char msg[100];
 			snprintf(msg, sizeof(msg), "WSJTX: TX decode not for user %s: %s", my_call_.c_str(), message.c_str());
 			status_->misc_status(ST_WARNING, msg);
 			return nullptr;
@@ -872,7 +871,6 @@ bool wsjtx_handler::match_all_txt(record* qso, bool update_qso) {
 		if (count <= file_size) status_->progress(count, OT_RECORD);
 
 		// Does the line contain sought date, time, both calls and "Tx" or "Transmitting"
-		bool found = false;
 		if (line.substr(0,6) == datestamp) {
 			if (line.substr(7,4) == timestamp.substr(0,4) || 
 				copy_status != SEARCHING) {

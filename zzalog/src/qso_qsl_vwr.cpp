@@ -477,7 +477,6 @@ void qso_qsl_vwr::set_image() {
 			bool use_default = false;
 			bool found_image = false;
 			bool png_is_jpeg = false;
-			int result;
 			char filename[256];
 			string target_name = "";
 			// string default_name;
@@ -536,6 +535,8 @@ void qso_qsl_vwr::set_image() {
 							station.c_str(),
 							call.c_str(),
 							current_qso_->item("QSO_DATE").c_str());
+						break;
+					default:
 						break;
 					}
 					// Images could be any graphic format
@@ -630,7 +631,7 @@ void qso_qsl_vwr::set_image() {
 						"QSL: Renaming station %s as %s", full_name_.c_str(), target_name.c_str());
 					status_->misc_status(ST_WARNING, message);
 					fl_make_path_for_file(target_name.c_str());
-					result = rename(full_name_.c_str(), target_name.c_str());
+					rename(full_name_.c_str(), target_name.c_str());
 					full_name_ = target_name;
 					break;
 				}
@@ -653,7 +654,7 @@ void qso_qsl_vwr::set_image() {
 						"QSL: Renaming type %s as %s", full_name_.c_str(), jpeg_name.c_str());
 					status_->misc_status(ST_WARNING, message);
 					fl_make_path_for_file(jpeg_name.c_str());
-					result = rename(full_name_.c_str(), jpeg_name.c_str());
+					rename(full_name_.c_str(), jpeg_name.c_str());
 					full_name_ = jpeg_name;
 					break;
 				}

@@ -319,6 +319,8 @@ string extract_data::comment() {
 		case XC_FIELD:
 			result += "Field (" + criteria_->field_name + ") ";
 			break;
+		default:
+			break;
 		}
 		if (criteria_->condition != XC_UNFILTERED) {
 			// Add condition label
@@ -367,6 +369,8 @@ string extract_data::short_comment() {
 		case XM_OR:
 			result += "| ";
 			break;
+		default:
+			break;
 		}
 		// Only select those which didn't match
 		// Add the main condition
@@ -395,6 +399,8 @@ string extract_data::short_comment() {
 			break;
 		case XC_FIELD:
 			result += criteria_->field_name;
+			break;
+		default:
 			break;
 		}
 		if (criteria_->condition != XC_UNFILTERED) {
@@ -443,7 +449,9 @@ void extract_data::extract_qsl(extract_data::extract_mode_t server) {
 		break;
 	case EMAIL:
 		reason = "Generate e-mail and PNG";
-		field_name = "QSL_SENT";                    
+		field_name = "QSL_SENT";    
+	default:
+		break;
 	}
 	// Now check that they are all for the current station
 	string station = qso_manager_->get_default(qso_manager::CALLSIGN);
