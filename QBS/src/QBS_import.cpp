@@ -33,7 +33,6 @@ void QBS_import::clear_maps() {
 bool QBS_import::load_data(QBS_data* data, const char* directory) {
 	data_ = data;
 	directory_ = directory;
-	const int NUM_FILES = 3;
 	bool ok = true;
 
 	ok &= read_batches();
@@ -130,7 +129,6 @@ bool QBS_import::read_card_data() {
 	if (in_.good()) {
 		getline(in_, line);
 		split_line(line, columns_, ',');
-		int ix = 0;
 		while (in_.good()) {
 			getline(in_, line);
 			read_call(true, line);
@@ -155,7 +153,6 @@ bool QBS_import::read_sase_data() {
 	if (in_.good()) {
 		getline(in_, line);
 		split_line(line, columns_, ',');
-		int ix = 0;
 		while (in_.good()) {
 			getline(in_, line);
 			read_call(false, line);

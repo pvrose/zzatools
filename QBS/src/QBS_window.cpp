@@ -85,8 +85,6 @@ void QBS_window::cb_close(Fl_Widget* w, void* v) {
 
 // Instantiate all the widgets
 void QBS_window::create_form() {
-	const int WPBUTTON = WBUTTON * 2;
-
 	wiz_ = new Fl_Wizard(x(), y(), w(), h());
 
 	g_file_ = new QBS_file(x(), y(), w(), h());

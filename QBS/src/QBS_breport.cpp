@@ -121,8 +121,6 @@ void QBS_breport::draw_cell(TableContext context, int R, int C, int X, int Y, in
 	case CONTEXT_CELL: {
 		fl_push_clip(X, Y, W, H);
 		fl_rectf(X, Y, W, H, FL_BACKGROUND_COLOR);
-		box_data* box_data = data_->get_box(box_);
-		recycle_data* info = box_data->recycle_info;
 		fl_rect(X, Y, W, H, FL_FOREGROUND_COLOR);
 		string call = counts_[R]->callsign;
 		int received = counts_[R]->received;
@@ -157,7 +155,8 @@ void QBS_breport::draw_cell(TableContext context, int R, int C, int X, int Y, in
 		fl_draw(temp, X, Y, W, H, FL_ALIGN_CENTER);
 		fl_pop_clip();
 	}
-
+	default:
+		break;
 	}
 }
 

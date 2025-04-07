@@ -947,6 +947,8 @@ void QBS_data::log_action(
 	case SASES:
 	case OUTPUT:
 		break;
+	default:
+		break;
 	}
 	// Log commands for rereading
 	if (reading_mode_ != READING && (file_.eof() || file_.good())) {

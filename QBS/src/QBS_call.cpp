@@ -66,7 +66,6 @@ void QBS_call::create_form() {
 	ch_history_->data(data_);
 
 	maxx = max(maxx, cx + ch_history_->w());
-	int maxy = cy + ch_history_->h();
 
 	int gw = 0;
 	int gh = 0;
@@ -254,6 +253,8 @@ void QBS_call::cb_execute(Fl_Widget* w, void* v) {
 	case process_mode_t::PROCESSING:
 		that->execute_process();
 		break;
+	default:
+		break;
 	}
 }
 
@@ -265,9 +266,11 @@ void QBS_call::cb_done(Fl_Widget* w, void* v) {
 		that->win_->update_actions();
 		break;
 	case process_mode_t::PROCESSING:
-	that->data_->mode(process_mode_t::POSTING);
-	that->win_->update_actions();
-	break;
+		that->data_->mode(process_mode_t::POSTING);
+		that->win_->update_actions();
+		break;
+	default:
+		break;
 	}
 }
 

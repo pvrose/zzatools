@@ -93,6 +93,8 @@ void QBS_notes::draw_cell(TableContext context, int R, int C, int X, int Y, int 
 		}
 		fl_pop_clip();
 		return;
+    default:
+        break;
 	}
 
 }

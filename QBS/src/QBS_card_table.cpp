@@ -23,9 +23,6 @@ QBS_card_table::~QBS_card_table() {
 
 // inherited from Fl_Table
 void QBS_card_table::draw_cell(TableContext context, int R, int C, int X, int Y, int W, int H) {
-    int head = data_->get_head();
-    int current = data_->get_current();
-
     switch (context) {
     case CONTEXT_STARTPAGE:
         fl_font(0, FL_NORMAL_SIZE);
@@ -46,7 +43,7 @@ void QBS_card_table::draw_cell(TableContext context, int R, int C, int X, int Y,
         fl_pop_clip();
         break;
 
-    case CONTEXT_CELL:
+    case CONTEXT_CELL: {
         fl_push_clip(X, Y, W, H);
         fl_color(FL_FOREGROUND_COLOR);
         char txt[32];
@@ -63,6 +60,9 @@ void QBS_card_table::draw_cell(TableContext context, int R, int C, int X, int Y,
         }
         fl_draw(txt, X, Y, W, H, align);
         fl_pop_clip();
+        break;
+    }
+    default:
         break;
     }
 }
@@ -107,6 +107,8 @@ int QBS_card_table::num_rows() {
         break;
     case process_mode_t::LOG_SASE:
         boxes_.push_back(SASE_BOX);
+        break;
+    default:
         break;
     }
     return (int)boxes_.size();

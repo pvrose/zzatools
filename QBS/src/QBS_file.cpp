@@ -81,6 +81,7 @@ void QBS_file::cb_import(Fl_Widget* w, void* v) {
 // Callback - read QBS file
 void QBS_file::cb_read(Fl_Widget* w, void* v) {
     QBS_file* that = ancestor_view<QBS_file>(w);
+    that->win_->data_->read_qbs(that->win_->qbs_filename_);
 }
 
 

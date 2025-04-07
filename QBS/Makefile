@@ -51,11 +51,12 @@ LDFLAGS := $(FLTK_FLAGS)
 # The -MMD and -MP flags together generate Makefiles for us!
 # These files will have .d instead of .o as the output.
 CPPFLAGS := $(INC_FLAGS) -MMD -MP 
-CFLAGS += -g
 
+LINTFLAG := -Wunused -Wswitch 
 # Set ccompile flags
 # include debug data
-CXXFLAGS += -g
+CFLAGS += -g $(LINTFLAG)
+CXXFLAGS += -g $(LINTFLAG)
 # Avoid muliple definition of byte
 # CXXFLAGS += -DWIN32_LEAN_AND_MEAN
 

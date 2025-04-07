@@ -84,7 +84,8 @@ void QBS_top20::draw_cell(TableContext context, int R, int C, int X, int Y,	int 
 		}
 		fl_pop_clip();
 	}
-
+	default:
+		break;
 	}
 
 }

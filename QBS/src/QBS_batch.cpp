@@ -97,7 +97,7 @@ void QBS_batch::create_form() {
 	cy = sy;
 	cx += WBUTTON;
 	Fl_Box* b6 = new Fl_Box(cx, cy, WBUTTON, HBUTTON, "Cards");
-	b5->box(FL_FLAT_BOX);
+	b6->box(FL_FLAT_BOX);
 
 	cy += HBUTTON;
 	op_rcvd_cards_ = new Fl_Output(cx, cy, WBUTTON, HBUTTON);
@@ -120,7 +120,7 @@ void QBS_batch::create_form() {
 	cy = sy;
 	cx += WBUTTON;
 	Fl_Box* b61 = new Fl_Box(cx, cy, WBUTTON * 3 / 2, HBUTTON, "Date");
-	b5->box(FL_FLAT_BOX);
+	b61->box(FL_FLAT_BOX);
 
 	cy += HBUTTON;
 	op_rcvd_date_ = new Fl_Output(cx, cy, WBUTTON * 3 / 2, HBUTTON);
@@ -303,6 +303,8 @@ void QBS_batch::initialise() {
 	case process_mode_t::BATCH_SUMMARY:
 		box_ = 0;
 		break;
+	default:
+		break;
 	}
 }
 
@@ -323,6 +325,8 @@ void QBS_batch::cb_next(Fl_Widget* w, void* v) {
 			break;
 		case process_mode_t::BATCH_SUMMARY:
 			that->enable_widgets();
+		default:
+			break;
 		}
 	}
 
