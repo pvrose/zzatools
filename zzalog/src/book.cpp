@@ -1670,13 +1670,17 @@ bool book::has_record(record* qso) {
 
 // Add this record to the dirty set
 void book::add_dirty_record(record* qso) {
-	if (has_record(qso)) dirty_qsos_.insert(qso);
-	been_modified_ = true;
+	if (has_record(qso)) { 
+		dirty_qsos_.insert(qso);
+		been_modified_ = true;
+	}
 }
 
 // Remove this record from the dirty set
 void book::delete_dirty_record(record* qso) {
-	if (has_record(qso)) dirty_qsos_.erase(qso);
+	if (has_record(qso)) {
+		dirty_qsos_.erase(qso);
+	}
 }
 
 // Are there any dirty records
