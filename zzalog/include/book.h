@@ -118,14 +118,10 @@ using namespace std;
 		void navigate(navigate_t target);
 		// Go to a date
 		void go_date(string date);
-		// set modified
-		void modified(bool yes, bool update_progress = true);
 		// get the position at which to chronologically insert a record
 		item_num_t get_insert_point(record* record);
 		// insert the record at specific position
 		void insert_record_at(item_num_t pos_record, record* record);
-		// get modified
-		bool modified();
 		// get filename
 		string filename(bool full = true);
 		// match record
@@ -149,10 +145,6 @@ using namespace std;
 		set<string>* used_modes(int32_t dxcc = INT32_MIN, string call = "");
 		// get used submodes
 		set<string>* used_submodes(int32_t dxcc = INT32_MIN, string call = "");
-		// Enterring record
-		bool modified_record();
-		// Set entering record
-		void modified_record(bool value);
 		// New record
 		bool new_record();
 		// Set new record
@@ -226,6 +218,16 @@ using namespace std;
 		void set_filename(string filename);
 		// Get macro field
 		set<string> get_macro_fields(string name);
+		// Is this record in the book
+		bool has_record(record* qso);
+		// Mark this record dirty
+		void add_dirty_record(record* qso);
+		// Mark this record clean
+		void delete_dirty_record(record* qso);
+		// Record is dirty
+		bool is_dirty_record(record* qso);
+		// Book is dirty
+		bool is_dirty();
 
 
 		// Protected attributes
@@ -240,8 +242,6 @@ using namespace std;
 		item_num_t newest_item_;
 		// Book type
 		object_t book_type_;
-		// modified flag
-		bool modified_;
 		// Save in progress
 		bool save_in_progress_;
 		// current filename 
@@ -254,8 +254,6 @@ using namespace std;
 		bool inhibit_view_update_;
 		// New record being created
 		bool new_record_;
-		// Modifying an existing one
-		bool modified_record_;
 		// header record
 		record* header_;
 		// Current find/extract criteria
@@ -318,6 +316,8 @@ using namespace std;
 		static set<string> qth_fields_;
 		// "APP_ZZA_OP" implies a macro substitution
 		static set<string> op_fields_;
+		// Set of dirty QSOs
+		set<record*> dirty_qsos_;
 
 	};
 

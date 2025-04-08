@@ -363,7 +363,6 @@ bool adx_reader::start_app(map<string, string>* attributes) {
 			// Convert program ID ZZALOG to ZZA and mark we ghave modified the data
 			if (id == "ZZALOG") {
 				id = "ZZA";
-				my_book_->modified(true, false);
 			}
 		}
 		else if (attr_name == "FIELDNAME") {

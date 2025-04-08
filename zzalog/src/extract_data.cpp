@@ -44,7 +44,7 @@ extract_data::~extract_data()
 {
 	// Same as book::delete_contents without deleting the records - these are wanted
 	clear();
-	modified(false);
+	dirty_qsos_.clear();
 	filename_ = "";
 	format_ = FT_NONE;
 	delete header_;

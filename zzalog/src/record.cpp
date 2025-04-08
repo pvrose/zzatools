@@ -80,8 +80,6 @@ record& record::operator= (const record& rhs) {
 			string value = iter->second;
 			item(field, value, false, false);
 		}
-		// Restore the original is_dirty_flag as the assignments will have set it.
-		this->is_dirty_ = rhs.is_dirty_;
 	}
 	return *this;
 }
@@ -96,7 +94,6 @@ void record::delete_contents() {
 	is_header_ = false;
 	header_comment_ = "";
 	is_incomplete_ = false;
-	is_dirty_ = false;
 	// Delete items
 	// clear();
 }
@@ -271,7 +268,7 @@ void record::item(string field, string value, bool formatted/* = false*/, bool d
 			orig_value = "";
 		}
 		if (orig_value != formatted_value) {
-			is_dirty_ = true;
+			book_->add_dirty_record(this);
 		}
 	}
 	// Set in item
@@ -490,6 +487,7 @@ bool record::item_exists(string field) {
 void record::header(string comment) {
 	is_header_ = true;
 	header_comment_ = comment;
+	book_->add_dirty_record(this);
 }
 
 // get the header information
@@ -799,7 +797,6 @@ bool record::merge_records(record* merge_record, bool allow_loc_mismatch /* = fa
 void record::update_bearing() {
 	lat_long_t their_location = location(false);
 	lat_long_t my_location = location(true);
-	bool updated = false;
 	// Need both user and contact locations
 	if (!isnan(my_location.latitude) && !isnan(my_location.longitude) &&
 		!isnan(their_location.latitude) && !isnan(their_location.longitude)) {
@@ -814,15 +811,10 @@ void record::update_bearing() {
 		// Update if different
 		if (item("ANT_AZ") != azimuth) {
 			item("ANT_AZ", string(azimuth));
-			updated = true;
 		}
 		if (item("DISTANCE") != distance_string) {
 			item("DISTANCE", string(distance_string));
-			updated = true;
 		}
-	}
-	if (updated) {
-		is_dirty_ = true;
 	}
 }
 
@@ -1164,13 +1156,6 @@ string record::item_merge(string data, bool indirect /*=false*/) {
 	}
 	return result;
 }
-
-// Return dirtty flag
-bool record::is_dirty() { 
-	return is_dirty_; }
-
-// Clear dirty flag
-void record::clean() { is_dirty_ = false; }
 
 // Invalidate QSL status
 void record::invalidate_qsl_status() {

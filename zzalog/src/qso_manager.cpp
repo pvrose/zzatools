@@ -238,7 +238,7 @@ bool qso_manager::editing() {
 	case qso_data::QSO_STARTED:
 	case qso_data::QSO_ENTER:
 		edit_qso = data_group_->current_qso();
-		return edit_qso->is_dirty();
+		return book_->is_dirty_record(edit_qso);
 	default:
 		return false;
 	}

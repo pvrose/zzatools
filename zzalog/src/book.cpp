@@ -77,12 +77,10 @@ set<string> book::op_fields_ = {
 // Constructor - initialises some attributes
 book::book(object_t type)
 	: book_type_(type)
-	, modified_record_(false)
 	, new_record_(false)
 	, header_(nullptr)
 	, inhibit_view_update_(false)
 	, current_item_(0)
-	, modified_(false)
 	, filename_("")
 	, format_(FT_ADI)
 	, criteria_(nullptr)
@@ -134,7 +132,7 @@ bool book::load_data(string filename)
 			CANCEL = 2
 		};
 		choice_t choice = SAVE;
-		if (modified()) {
+		if (is_dirty()) {
 			// If the current data is modified, ask the user if it should be saved first
 			fl_beep(FL_BEEP_QUESTION);
 			choice = (choice_t)fl_choice("Current file is modified - do you want to save the changes?", "Save", "Don't Save", "Cancel");
@@ -366,7 +364,7 @@ bool book::store_data(string filename, bool force, field_list* fields) {
 			}
 
 			// First parse and validate if necessary
-			if (modified() == true || force) {
+			if (is_dirty() == true || force) {
 				// Only write out if modified or force is set
 				if (!header_) {
 					// No header then create one.
@@ -467,9 +465,6 @@ bool book::store_data(string filename, bool force, field_list* fields) {
 					delete[] message;
 				}
 				if (ok && book_type_ == OT_MAIN) {
-					// As file has been stored, clear modified flag
-					modified(false);
-					modified_record(false);
 					// File was closed in the fail paths
 					file.close();
 					// Update file name on window label
@@ -529,7 +524,7 @@ record* book::get_latest() {
 // Copy the current record
 void book::remember_record() {
 	// Assume we are changing selection so if the record is unmodified save its contents
-	if (!modified_record_ && !new_record() && book_type_ == OT_MAIN) {
+	if (!is_dirty_record(get_record()) && !new_record() && book_type_ == OT_MAIN) {
 		delete old_record_;
 		old_record_ = new record(*get_record(current_item_, false));
 	}
@@ -563,8 +558,6 @@ item_num_t book::selection(item_num_t num_item, hint_t hint /* = HT_SELECTED */,
 		case HT_CHANGED:
 		case HT_MINOR_CHANGE:
 			if (!inhibit_view_update_) {
-				// Set modified flag
-				if (!new_record_) modified(true);
 				// Update to this record
 				tabbed_forms_->update_views(requester, hint, record_num);
 			}
@@ -573,8 +566,6 @@ item_num_t book::selection(item_num_t num_item, hint_t hint /* = HT_SELECTED */,
 		case HT_INSERTED_NODXA:
 		case HT_DELETED:
 			if (!inhibit_view_update_) {
-				// Set modified flag
-				if (!new_record_) modified(true);
 				// Update to this record
 				tabbed_forms_->update_views(requester, hint, record_num);
 			}
@@ -584,7 +575,6 @@ item_num_t book::selection(item_num_t num_item, hint_t hint /* = HT_SELECTED */,
 			this_record = get_record(current_item_, false);
 			erase(begin() + current_item_);
 			record_num = insert_record(this_record);
-			if (!new_record_) modified(true);
 			tabbed_forms_->update_views(requester, HT_ALL, record_num);
 			break;
 		default:
@@ -596,7 +586,7 @@ item_num_t book::selection(item_num_t num_item, hint_t hint /* = HT_SELECTED */,
 		if (current_item_ != previous && 
 			!READ_ONLY && 
 			save_level_ == 0 && 
-			modified() && 
+			is_dirty() && 
 			!save_in_progress_ ) {
 			if (AUTO_SAVE) store_data();
 		}
@@ -613,6 +603,8 @@ item_num_t book::selection() {
 
 // Insert a record in its chronological position 
 qso_num_t book::insert_record(record* record) {
+	// Always mark a new record dirty
+	add_dirty_record(record);
 	// Get the offset where to add the record and insert it into the array
 	item_num_t pos_record = get_insert_point(record);
 	insert_record_at(pos_record, record);
@@ -621,6 +613,8 @@ qso_num_t book::insert_record(record* record) {
 
 // Append a record at the end of the book
 item_num_t book::append_record(record* record) {
+	// Always mark a new record dirty
+	add_dirty_record(record);
 	item_num_t pos_record = size();
 	insert_record_at(pos_record, record);
 	return pos_record;
@@ -646,7 +640,7 @@ void book::delete_contents(bool new_book) {
 	// Clear the array
 	clear();
 	// Set it unmodified
-	modified(false);
+	dirty_qsos_.clear();
 	filename_ = "";
 	format_ = FT_NONE;
 	delete header_;
@@ -803,21 +797,6 @@ void book::go_date(string date) {
 	selection(l_bound);
 }
 
-// Set the modified flag - conditionally update the status progress bar (as indication it's modified
-void book::modified(bool value, bool update_progress /*= true*/) {
-	// Set the flag
-	modified_ = value;
-	if (modified_) {
-		been_modified_ = true;
-	}
-}
-
-// Return the modified flag
-bool book::modified() {
-	return modified_;
-}
-
-
 // return the filename
 string book::filename(bool full /*=true*/) {
 	if (full) {
@@ -850,11 +829,12 @@ void book::delete_record(bool force) {
 			delete_in_progress_ = true;
 			menu_->update_items();
 			// Remove the current record from both the book_ and the extract_data_
+			record* del_record = get_record();
 			if (book_type_ == OT_EXTRACT) {
 				book_->erase(book_->begin() + record_number(current_item_));
 			} 
 			erase(begin() + current_item_);
-			if (!new_record_) modified(true);
+			delete_dirty_record(del_record);
 			// if current record no longer exists decrement it (exept if already first record)
 			if (current_item_ == size() && current_item_ > 0) {
 				current_item_--;
@@ -862,13 +842,12 @@ void book::delete_record(bool force) {
 			// Tell the views a record has been deleted and to redraw from the current selection
 			selection(current_item_, HT_DELETED);
 			new_record_ = false;
-			modified_record_ = false;
 			// After selection has done its all can allow another delete
 			delete_in_progress_ = false;
 			menu_->update_items();
 		}
 	}
-	else if (modified_record_) {
+	else if (is_dirty_record(get_record())) {
 		// Update status bar and menu items
 		char text[128];
 		sprintf(text, "LOG: Canceling edit record %s %s %s",
@@ -880,7 +859,7 @@ void book::delete_record(bool force) {
 		*get_record() = *old_record_;
 		delete old_record_;
 		old_record_ = nullptr;
-		modified_record_ = false;
+		delete_dirty_record(get_record());
 		// Because we have not updated other views yet, we only regard this as a minor change
 		selection(-1, HT_MINOR_CHANGE);
 		menu_->update_items();
@@ -1196,7 +1175,6 @@ bool book::get_macro(record* use_record, string macro_name, set<string> field_na
 							ignore_gridsquare_ = true;
 						}
 						use_record->item((*it), old_value);
-						modified(true);
 					}
 					else {
 						snprintf(message, 128, "LOG: %s %s %s %s - new value  (%s) differs from old (%s)",
@@ -1302,14 +1280,6 @@ set<string>* book::used_submodes(int32_t dxcc, string call) {
 	return result;
 }
 
-// Returns true if in incomplete new_record
-bool book::modified_record() { return modified_record_; }
-
-// Set entering record
-void book::modified_record(bool value) { 
-	modified_record_ = value;
-}
-
 // Returns true if a new record being entered
 bool book::new_record() { return new_record_; }
 
@@ -1329,7 +1299,7 @@ void book::enable_save(bool enable, const char* reason) {
 	char msg[128];
 	snprintf(msg, sizeof(msg), "LOG: Setting save enable level %d - %s", save_level_, reason);
 	status_->misc_status(ST_LOG, msg);
-	if (AUTO_SAVE && save_level_ == 0 && !READ_ONLY && modified()) {
+	if (AUTO_SAVE && save_level_ == 0 && !READ_ONLY && is_dirty()) {
 		store_data();
 	}
 }
@@ -1551,7 +1521,6 @@ void book::cb_close_edith(Fl_Widget* w, void* v) {
 			that->header_ = new record();
 		}
 		that->header_->header(string(editor->buffer()->text()));
-		that->modified(true);
 	}
 	menu_->enable(true);
 	status_->misc_status(ST_OK, "LOG: Editting header comment - Done!");
@@ -1606,7 +1575,7 @@ bool book::been_modified() {
 
 // return entrring new record
 bool book::enterring_record() {
-	return new_record_ || modified_record_;
+	return new_record_ || is_dirty_record(get_record());
 }
 
 // Find the most recent QSO that is the gap after the previous one and set that as session start
@@ -1690,4 +1659,32 @@ set<string> book::get_macro_fields(string name) {
 		status_->misc_status(ST_ERROR, msg);
 		return {""};
 	}
+}
+
+// Is this QSO record in te book?
+bool book::has_record(record* qso) {
+	item_num_t num = get_insert_point(qso);
+	if (get_record(num, false) == qso) return true;
+	else return false;
+}
+
+// Add this record to the dirty set
+void book::add_dirty_record(record* qso) {
+	if (has_record(qso)) dirty_qsos_.insert(qso);
+	been_modified_ = true;
+}
+
+// Remove this record from the dirty set
+void book::delete_dirty_record(record* qso) {
+	if (has_record(qso)) dirty_qsos_.erase(qso);
+}
+
+// Are there any dirty records
+bool book::is_dirty() {
+	return (!dirty_qsos_.empty());
+}
+
+// Is this record dirty
+bool book::is_dirty_record(record* qso) {
+	return (dirty_qsos_.find(qso) != dirty_qsos_.end());
 }

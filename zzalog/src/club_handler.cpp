@@ -85,8 +85,6 @@ bool club_handler::upload_log(book* book) {
 			}
 			// Go back to last entry in book.
 			book_->selection(book_->size() - 1, HT_SELECTED);
-			// Force the book to save itself with these changes
-			book_->modified(true);
 			book_->enable_save(true, "Updated Clublog status");
 		}
 		fl_cursor(FL_CURSOR_DEFAULT);
@@ -307,8 +305,6 @@ bool club_handler::upload_done(bool response) {
 		string today = now(false, "%Y%m%d");
 		this_record->item("CLUBLOG_QSO_UPLOAD_DATE", today);
 		this_record->item("CLUBLOG_QSO_UPLOAD_STATUS", string("Y"));
-		// Force the book to save itself with these changes
-		book_->modified(true);
 		book_->enable_save(true, "Uploaded to Clublog");
 	}
 	upload_done_queue_.pop();

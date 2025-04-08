@@ -261,7 +261,7 @@ void menu::cb_mi_file_new(Fl_Widget* w, void* v) {
 	// Gracefully stop any import in progress - restart with ON_AIR logging - if no rig will drop to OFF_AIR
 	import_data_->stop_update(false);
 	while (!import_data_->update_complete()) Fl::check();
-	if (book_->modified_record() || book_->new_record()) {
+	if (book_->is_dirty_record(book_->get_record()) || book_->new_record()) {
 		fl_beep(FL_BEEP_QUESTION);
 		switch (fl_choice("You are currently modifying a record? Save or Quit?", "Save?", "Quit?", nullptr)) {
 		case 0:
@@ -272,7 +272,7 @@ void menu::cb_mi_file_new(Fl_Widget* w, void* v) {
 			break;
 		}
 	}
-	if (book_->modified()) {
+	if (book_->is_dirty()) {
 		fl_beep(FL_BEEP_QUESTION);
 		if (fl_choice("Book has been modified, do you want to save?", "Yes", "No", nullptr) == 0) {
 			book_->store_data();
@@ -300,7 +300,7 @@ void menu::cb_mi_file_open(Fl_Widget* w, void* v) {
 	import_data_->stop_update(false);
 	while (!import_data_->update_complete()) Fl::check();
 
-	if (book_->modified()) {
+	if (book_->is_dirty()) {
 		fl_beep(FL_BEEP_QUESTION);
 		if (fl_choice("Book has been modified, do you want to save?", "Yes", "No", nullptr) == 0) {
 			// Do File->Save first
@@ -629,7 +629,6 @@ void menu::cb_mi_parse_qso(Fl_Widget* w, void* v) {
 		if (changed || parse_result) {
 			// If modified - tell views to update
 			navigation_book_->selection(-1, HT_CHANGED);
-			book_->modified(true);
 		}
 	}
 }
@@ -641,7 +640,6 @@ void menu::cb_mi_unparse_qso(Fl_Widget* w, void* v) {
 	record* record = navigation_book_->get_record();
 	record->unparse();
 	navigation_book_->selection(-1, HT_CHANGED);
-	book_->modified(true);
 }
 
 // Log->Reparse QSO - Unparse followed by parse
@@ -676,7 +674,6 @@ void menu::cb_mi_parse_log(Fl_Widget* w, void* v) {
 			// Update progress
 			status_->progress(++i, navigation_book_->book_type());
 			if (changed || parse_result) {
-				book_->modified(true);
 				// The parsing may have modified date and time
 				book_->correct_record_position(navigation_book_->record_number(item_number));
 			}
@@ -701,7 +698,6 @@ void menu::cb_mi_valid8_qso(Fl_Widget* w, void* v) {
 		// Update views if record has changed
 		item_num_t item_num = navigation_book_->item_number(record_num);
 		navigation_book_->selection(item_num, HT_MINOR_CHANGE);
-		book_->modified(true);
 	}
 	book_->enable_save(true, "Ended validate QSO");
 }
@@ -785,8 +781,6 @@ void menu::cb_mi_log_retime(Fl_Widget* w, void* v) {
 		old_time.c_str(),
 		time.c_str());
 	status_->misc_status(ST_NOTE, message);
-	book_->modified_record(true);
-	book_->modified(true);
 	tabbed_forms_->update_views(nullptr, HT_CHANGED, navigation_book_->selection());
 	menu* that = ancestor_view<menu>(w);
 	that->update_items();
@@ -819,27 +813,23 @@ void menu::cb_mi_log_bulk(Fl_Widget* w, void* v) {
 				case RENAME_FIELD:
 					// Change the field_name from old to new
 					record->change_field_name(old_field_name, new_field_name);
-					book_->modified(true);
 					num_changed++;
 					break;
 				case DELETE_FIELD:
 					// Delete the field with this name
 					record->item(old_field_name, string(""));
-					book_->modified(true);
 					num_changed++;
 					break;
 				case ADD_FIELD:
 					// Add a field with this name and value
 					if (record->item(old_field_name) == "") {
 						record->item(old_field_name, new_text);
-						book_->modified(true);
 						num_changed++;
 					}
 					break;
 				case CHANGE_FIELD:
 					// Change the field to this value - adding the field if necessary
 					record->item(old_field_name, new_text);
-					book_->modified(true);
 					num_changed++;
 					break;
 				}
@@ -1461,11 +1451,11 @@ void menu::append_file(bool append) {
 void menu::update_items() {
 	if (active_enabled_) {
 		// Get conditions
-		bool modified = book_->modified();
+		bool modified = book_->is_dirty();
 		bool empty = book_->size() == 0;
 		bool first = navigation_book_->selection() == 0;
 		bool last = navigation_book_->selection() == navigation_book_->size() - 1;
-		bool record_modified = book_->modified_record();
+		bool record_modified = book_->is_dirty_record(book_->get_record());
 		bool new_record = book_->new_record();
 		bool delete_enabled = book_->delete_enabled();
 		bool save_enabled = book_->enable_save();

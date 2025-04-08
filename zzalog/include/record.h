@@ -108,10 +108,6 @@ using namespace std;
 		time_t timestamp(bool time_off = false);
 		// items match between records
 		bool items_match(record* record, string field_name);
-		// Record is dirty
-		bool is_dirty();
-		// Clear dirty marker
-		void clean();
 		// Delete all contents
 		void delete_contents();
 		// Invalidate QSL statuses
@@ -125,8 +121,6 @@ using namespace std;
 		string header_comment_;
 		// incomplete record read
 		bool is_incomplete_;
-		// Record is dirty
-		bool is_dirty_;
 
 		// Expecting a header record
 		static bool expecting_header_;

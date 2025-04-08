@@ -171,13 +171,11 @@ istream& adi_reader::load_record(record* in_record, istream& in, load_result_t& 
 							if (field.length() > 11 && field.substr(0, 11) == "APP_ZZALOG_") {
 								string part2 = field.substr(11);
 								field = "APP_ZZA_" + part2;
-								if (my_book_) my_book_->modified(true, false);
 							}
 							// Ignore all non-ZZALOG app specific fields (except APP_EQSL_SWL and any in the header.
 							if (field.substr(0, 8) != "APP_ZZA_" && !in_record->is_header()) {
 								if (field == "APP_EQSL_SWL") {
 									field = "SWL";
-									if (my_book_) my_book_->modified(true, false);
 								}
 								else {
 									validity = IGNORED_APP;
@@ -203,12 +201,9 @@ istream& adi_reader::load_record(record* in_record, istream& in, load_result_t& 
 								value = to_upper(value);
 							}
 							// Add the item to the record
-							in_record->item(field, value, false, false);
+							in_record->item(field, value, false);
 						}
 						else {
-
-							// Field ignored so set modified
-							if (my_book_) my_book_->modified(true, false);
 							bad_field = field;
 						}
 						// Report if an error case has been seen

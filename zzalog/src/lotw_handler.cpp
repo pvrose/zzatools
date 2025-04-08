@@ -390,7 +390,6 @@ bool lotw_handler::upload_done(int result) {
 		}
 		break;
 	}
-	bool updated = false;
 	size_t count = upload_done_szq_.front();
 	upload_done_szq_.pop();
 	for (size_t ix = 0; ix < count; ix++) {
@@ -399,15 +398,12 @@ bool lotw_handler::upload_done(int result) {
 		if (ok) {
 			if (qso->item("LOTW_QSLSDATE") == "") {
 				qso->item("LOTW_QSLSDATE", now(false, "%Y%m%d"));
-				updated = true;
 			}
 			if (qso->item("LOTW_QSL_SENT") != "Y") {
 				qso->item("LOTW_QSL_SENT", string("Y"));
-				updated = true;
 			}
 		}
 	}
-	book_->modified(updated);
 	book_->enable_save(true, "Uploaded to LotW");
 	return ok;
 }

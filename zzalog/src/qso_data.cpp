@@ -483,7 +483,7 @@ void qso_data::update_qso(qso_num_t log_num) {
 	case QSO_EDIT:
 		// Ask whether to save or quit then open new QSO in edit mode
 		if (log_num != g_entry_->qso_number()) {
-			if (g_entry_->qso()->is_dirty()) {
+			if (book_->is_dirty_record(g_entry_->qso())) {
 				fl_beep(FL_BEEP_QUESTION);
 				switch (fl_choice("Trying to select a different record while editing a record", "Save edit", "Cancel edit", "Ignore")) {
 				case 0:
@@ -592,7 +592,7 @@ record* qso_data::start_modem_qso(string call, qso_init_t source) {
 		break;	
 
 	case QSO_EDIT:
-		if (g_entry_->qso()->is_dirty()) {
+		if (book_->is_dirty_record(g_entry_->qso())) {
 			fl_beep(FL_BEEP_QUESTION);
 			switch (fl_choice("Trying to select a different record while editing a record", "Save edit", "Cancel edit", "Ignore")) {
 			case 0:
@@ -936,14 +936,12 @@ bool qso_data::action_save(bool continuing) {
 	case QSO_STARTED:
 	case QSO_ENTER:
 		logging_state_ = SWITCHING;
-		book_->modified(true);
 		book_->selection(item_number, HT_INSERTED);
 		action_deactivate();;
 		action_activate(previous_mode_);
 		break;
 	case TEST_ACTIVE:
 		logging_state_ = SWITCHING;
-		book_->modified(true);
 		book_->selection(item_number, HT_INSERTED);
 		logging_state_ = TEST_PENDING;
 		action_activate(previous_mode_);
@@ -951,7 +949,6 @@ bool qso_data::action_save(bool continuing) {
 	case QSO_WSJTX:
 	case QSO_FLDIGI:
 		logging_state_ = SWITCHING;
-		book_->modified(true);
 		book_->selection(item_number, HT_INSERTED);
 		action_deactivate();;
 		break;
@@ -959,12 +956,10 @@ bool qso_data::action_save(bool continuing) {
 		g_net_entry_->remove_entry();
 		logging_state_ = SWITCHING;
 		if (g_net_entry_->entries() == 0) {
-			book_->modified(true);
 			book_->selection(item_number, HT_INSERTED);
 			action_deactivate();;
 		}
 		else {
-			book_->modified(true);
 			book_->selection(g_net_entry_->qso_number(), HT_INSERTED_NODXA);
 			logging_state_ = NET_STARTED;
 		}
@@ -1122,8 +1117,6 @@ void qso_data::action_save_edit() {
 		spec_data_->validate(qso, item_number);
 		book_->add_use_data(qso);
 
-		if (qso->is_dirty()) book_->modified(true);
-		// book_->enable_save(true, "Saving edit");
 		g_entry_->delete_qso();
 	}
 	((qso_manager*)parent())->enable_widgets();
@@ -1314,7 +1307,6 @@ void qso_data::action_handle_dupe(dupe_flags action) {
 void qso_data::action_save_merge() {
 	// We no longer need to maintain the copy of the original QSO
 	book_->add_use_data(g_query_->qso());
-	book_->modified(true);
 	g_query_->clear_query();
 	action_deactivate();;
 	enable_widgets();
@@ -1460,7 +1452,6 @@ void qso_data::action_save_net_all() {
 void qso_data::action_save_net_edit() {
 	// We no longer need to maintain the copy of the original QSO
 	book_->add_use_data(g_net_entry_->qso());
-	book_->modified(true);
 	book_->enable_save(true, "Saving net edit QSO");
 	g_net_entry_->remove_entry();
 	if (g_net_entry_->entries() == 0) {

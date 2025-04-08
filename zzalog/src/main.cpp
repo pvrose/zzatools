@@ -235,7 +235,7 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 		status_->misc_status(ST_NOTE, "ZZALOG: Closing...");
 		// Delete band view
 		// Currently modifying a (potentially new) record
-		if (book_ && (book_->modified_record() || book_->new_record()) ) {
+		if (book_ && (book_->is_dirty_record(book_->get_record()) || book_->new_record()) ) {
 			fl_beep(FL_BEEP_QUESTION);
 			switch (fl_choice("You are currently modifying a record? Save or Quit?", "Save", "Quit", nullptr)) {
 			case 0:
@@ -292,7 +292,7 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 		}
 
 		// Check the book needs saving
-		if (book_ && book_->modified()) {
+		if (book_ && book_->is_dirty()) {
 			fl_beep(FL_BEEP_QUESTION);
 			switch (fl_choice("Book has been modified. Do you want to save and exit, exit or cancel exit?", "Exit", "Save && Exit", "Cancel Exit")) {
 			case 0:

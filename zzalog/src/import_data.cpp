@@ -101,15 +101,9 @@ void import_data::merge_update() {
 	record* book_record = book_->get_record();
 	// Grid square may change (more accurate)
 	hint_t hint;
-	if (book_record->merge_records(import_record, false, &hint)) {
-		book_->modified(true, false);
-	}
-	if (cty_data_->update_qso(book_record)) {
-		book_->modified(true, false);
-	}
-	if (spec_data_->validate(book_record, book_->selection())) {
-		book_->modified(true, false);
-	}
+	book_record->merge_records(import_record, false, &hint);
+	cty_data_->update_qso(book_record);
+	spec_data_->validate(book_record, book_->selection());
 	// Tell views to update with new record
 	book_->selection(-1, hint);
 	// Delete the record from this book
@@ -163,7 +157,6 @@ void import_data::update_book() {
 		// Keep track on number left to import
 		int number_update_records = size();
 		// Initialise flags
-		bool is_updated = false;
 		bool cancel_update = false;
 		update_in_progress_ = false;
 		update_is_new_ = false;
@@ -231,7 +224,6 @@ void import_data::update_book() {
 							record->item("CALL").c_str(),
 							record->item("BAND").c_str(), record->item("MODE").c_str());
 						status_->misc_status(ST_LOG, message);
-						is_updated = true;
 						number_modified_++;
 						if (record->item("CLUBLOG_QSO_UPLOAD_STATUS") == "M") {
 							number_clublog_++;
@@ -267,7 +259,6 @@ void import_data::update_book() {
 				case MT_PROBABLE:
 					found_match = true;
 					if (record->merge_records(import_record, update_mode_ == LOTW_UPDATE)) {
-						is_updated = true;
 						number_modified_++;
 					}
 					number_matched_++;
@@ -314,7 +305,6 @@ void import_data::update_book() {
 				}
 				// Remove the record from this book
 				accept_update();
-				is_updated = true;
 				found_match = true;
 				number_swl_++;
 				had_swl_match = false;
@@ -349,7 +339,6 @@ void import_data::update_book() {
 				number_added_++;
 				last_added_number_ = offset;
 				accept_update();
-				is_updated = true;
 			}
 		}
 		// Update import progress
@@ -357,10 +346,6 @@ void import_data::update_book() {
 		status_->progress(number_to_import_ - size(), book_type());
 		// Allow view updates
 		inhibit_view_update_ = false;
-		// If we have updated any record
-		if (is_updated) {
-			book_->modified(true, false);
-		}
 		// Leaving after completing update so tidy up and select most recent record
 		if (!update_in_progress_) {
 			finish_update();

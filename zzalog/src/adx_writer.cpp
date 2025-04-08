@@ -229,7 +229,7 @@ bool adx_writer::write_element(adx_element_t element) {
 			// Write RECORD element
 			ok &= write_element(AET_RECORD);
 			if (clean_records_) {
-				record_->clean();
+				my_book_->delete_dirty_record(record_);
 			}
 			// Update progress every record
 			status_->progress(current_, my_book_->book_type());

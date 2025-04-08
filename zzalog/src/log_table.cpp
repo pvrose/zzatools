@@ -532,14 +532,14 @@ void log_table::draw_cell(TableContext context, int R, int C, int X, int Y, int 
 			record* this_record = my_book_->get_record(item_number, false);
 			// If the row is selected include the row header in the colouring
 			Fl_Color bg_colour = row_selected(R) ? selection_color() : row_header_color();
-			if (this_record && this_record->is_dirty()) bg_colour = fl_lighter(bg_colour);
+			if (this_record && my_book_->is_dirty_record(this_record)) bg_colour = fl_lighter(bg_colour);
 			fl_color(bg_colour);
 			fl_rectf(X, Y, W, H);
 			fl_color(line_colour);
 			fl_yxline(X, Y, Y + H - 1, X + W);
 
 			// TEXT - contrast its colour to the bg colour.
-			if (this_record && this_record->is_dirty()) {
+			if (this_record && my_book_->is_dirty_record(this_record)) {
 				fl_color(FL_RED);
 			}
 			else {
@@ -590,7 +590,7 @@ void log_table::draw_cell(TableContext context, int R, int C, int X, int Y, int 
 				// Selected rows will have table specific colour, others in current sesson grey, rest white
 				Fl_Color default_bg_colour = in_current_session(this_record) ? COLOUR_GREY : (DARK ? FL_BACKGROUND2_COLOR : FL_WHITE);
 				Fl_Color bg_colour = row_selected(R) ? selection_color() : default_bg_colour;
-				if (this_record && this_record->is_dirty()) bg_colour = fl_lighter(bg_colour);
+				if (this_record && my_book_->is_dirty_record(this_record)) bg_colour = fl_lighter(bg_colour);
 				fl_color(bg_colour);
 				fl_rectf(X, Y, W, H);
 				// Add a cell border
@@ -598,7 +598,7 @@ void log_table::draw_cell(TableContext context, int R, int C, int X, int Y, int 
 				fl_yxline(X, Y, Y + H - 1, X + W);
 
 				// TEXT - contrast its colour to the bg colour.
-				if (this_record && this_record->is_dirty()) {
+				if (this_record && my_book_->is_dirty_record(this_record)) {
 					fl_color(FL_RED);
 				}
 				else {
@@ -689,18 +689,8 @@ void log_table::done_edit(bool keep_row) {
 			switch (my_book_->book_type()) {
 			case OT_MAIN:
 			case OT_EXTRACT:
-				// Set book is modified if a new record
-				if (!my_book_->modified_record() && !my_book_->new_record()) {
-					if (!my_book_->new_record()) {
-						my_book_->modified_record(true);
-					}
-				}
-				else {
-					// This book has now been modified. Redraw it and tell menu to update enabled menu items
-					redraw();
-					book_->modified(true);
-					menu_->update_items();
-				}
+				redraw();
+				menu_->update_items();
 				// Update all views with the change - fields that change location are major changes that require DxAtlas to be redrawn, date/time the book to be reordered
 				if (field_info.field == "QSO_DATE" || field_info.field == "TIME_ON") {
 					// The book will tell all views

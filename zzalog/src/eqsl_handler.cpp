@@ -137,7 +137,6 @@ void eqsl_handler::cb_timer_deq(void* v) {
 					record* qso = book_->get_record(request.record_num, false);
 					qso->item("EQSL_QSL_RCVD", string(""));
 					qso->item("EQSL_QSLRDATE", string(""));
-					book_->modified(true);
 				}
 				request_queue->pop();
 				book_->enable_save(true, "Failed eQSL image request");
@@ -880,7 +879,6 @@ bool eqsl_handler::upload_eqsl_log(book* book) {
 			if (!dont_update) {
 				record->item("EQSL_QSLSDATE", now(false, "%Y%m%d"));
 				record->item("EQSL_QSL_SENT", string("Y"));
-				book_->modified(true);
 			}
 		}
 		book_->enable_save(true, "Updated eQSL upload status");
@@ -1186,7 +1184,6 @@ bool eqsl_handler::upload_done(upload_response_t* response) {
 			response->qso->item("TIME_ON").c_str(),
 			response->qso->item("CALL").c_str());
 		status_->misc_status(ST_OK, ok_message);
-		book_->modified(true);
 	}
 	book_->enable_save(true, "Uploaded to eQSL");
 	return passed;

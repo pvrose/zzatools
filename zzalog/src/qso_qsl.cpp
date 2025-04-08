@@ -564,7 +564,6 @@ void qso_qsl::qsl_mark_done() {
 			(*it)->item(sent_name, string("Y"));
 			(*it)->item(via_name, via_code_);
 		}
-		book_->modified(true);
 	}
 	else {
 		status_->misc_status(ST_WARNING, "EXTRACT: No records to change");

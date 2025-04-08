@@ -76,7 +76,7 @@ bool adi_writer::store_book(book* out_book, ostream& out, bool clean, field_list
 ostream& adi_writer::store_record(record* record, ostream& out, load_result_t& result, field_list* fields /* = nullptr */) {
 	// convert to text
 	to_adif(record, out, fields);
-	if (clean_records_) record->clean();
+	if (clean_records_) out_book_->delete_dirty_record(record);
 	return out;
 }
 
