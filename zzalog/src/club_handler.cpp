@@ -287,16 +287,22 @@ void club_handler::th_upload(record* this_record) {
 // called when the thread handling upload has finished
 // Updates the QSO recotrd that the update has been completed
 bool club_handler::upload_done(bool response) {
+	char message[200];
+	record* this_record = upload_done_queue_.front();
 	if (response == false) {
 		// Display error message received from post
-		char message[128];
-		snprintf(message, sizeof(message), "CLUBLOG: Upload failed - %s", upload_error_.c_str());
+		snprintf(message, 200, "CLUBLOG: %s %s %s QSL upload failed",
+			this_record->item("QSO_DATE").c_str(),
+			this_record->item("TIME_ON").c_str(),
+			this_record->item("CALL").c_str());
 		status_->misc_status(ST_ERROR, message);
+		if (fl_choice("Upload failed - Do you want to allow it to try again or be ignored?", "Try later", "Ignore", nullptr) == 1) {
+			this_record->item("CLUBLOG_QSO_UPLOAD_STATUS", string("N"));
+			book_->enable_save(true, "Not uploaded to Clublog");
+		}
 	}
 	else {
 		// Update all records sent with the fact that they have been uploaded and when
-		char message[200];
-		record* this_record = upload_done_queue_.front();
 		snprintf(message, 200, "CLUBLOG: %s %s %s QSL uploaded",
 			this_record->item("QSO_DATE").c_str(),
 			this_record->item("TIME_ON").c_str(),
