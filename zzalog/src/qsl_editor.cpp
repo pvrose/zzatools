@@ -792,13 +792,13 @@ void qsl_editor::redraw_display(bool dirty) {
 			qsl_->set_qsos(nullptr, 0);
 		}
 	} else {
-		if (qso_manager_) {
-			callsign_ = qso_manager_->get_default(qso_manager::CALLSIGN);
-			ip_callsign_->value(callsign_.c_str());
-			// Load the display settings for this callsign
-			data_ = qsl_dataset_->get_card(callsign_, qsl_type_, true);
-			ip_filename_->value(data_->filename.c_str());
-		}
+		//if (qso_manager_) {
+		//	callsign_ = qso_manager_->get_default(qso_manager::CALLSIGN);
+		//	ip_callsign_->value(callsign_.c_str());
+		//	// Load the display settings for this callsign
+		//	data_ = qsl_dataset_->get_card(callsign_, qsl_type_, true);
+		//	ip_filename_->value(data_->filename.c_str());
+		//}
 		// Do not show an example QSO
 		qsl_->set_qsos(nullptr, 0);
 	}

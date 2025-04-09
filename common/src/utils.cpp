@@ -1019,6 +1019,14 @@ void de_slash(string& data) {
 	}
 }
 
+// Replace all / characters in a string with _ - used for callsigns as filenames 
+// menu items
+void re_slash(string& data) {
+	for (size_t ix = 0; ix < data.length(); ix++) {
+		if (data[ix] == '_') data[ix] = '/';
+	}
+}
+
 // Return the directory part of the filenam
 string directory(string filename) {
 	size_t pos = filename.find_last_of("/\\");
