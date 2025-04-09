@@ -654,11 +654,6 @@ void add_data() {
 	if (!closing_) {
 		qsl_dataset_ = new qsl_dataset;
 	}
-	// Add config
-	if (!closing_) {
-		config_ = new config(WCONFIG, HCONFIG, "Configuration");
-		config_->hide();
-	}
 }
 
 // read in the log data
@@ -1171,6 +1166,11 @@ int main(int argc, char** argv)
 	rig_load_all_backends();
 	// Add qso_manager
 	add_dashboard();
+	// Add config - uses dynamic enumerated ADIF fields so needs the book loaded. and manager running
+	if (!closing_) {
+		config_ = new config(WCONFIG, HCONFIG, "Configuration");
+		config_->hide();
+	}
 	// Add qsl_handlers - note add_rig_if() may have added URL handler
 	add_qsl_handlers();
 	int code = 0;

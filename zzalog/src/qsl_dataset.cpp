@@ -1,5 +1,6 @@
 #include "qsl_dataset.h"
 #include "status.h"
+#include "utils.h"
 
 #include <string>
 #include <vector>
@@ -51,6 +52,7 @@ void qsl_dataset::load_data() {
 		for (int iy = 0; iy < num_calls; iy++) {
 			string call = type_settings.group(iy);
 			Fl_Preferences call_settings(type_settings, call.c_str());
+			re_slash(call);
 			qsl_data* data = new qsl_data;
 			(*type_data)[call] = data;
 			// Temporary values to convert char* and int to string and enums
@@ -197,7 +199,9 @@ void qsl_dataset::save_data() {
 		qsl_data::qsl_type type = it->first;
 		Fl_Preferences type_settings(qsl_settings, QSL_TYPES[(int)type].c_str());
 		for (auto ita = it->second->begin(); ita != it->second->end(); ita++) {
-			Fl_Preferences call_settings(type_settings, ita->first.c_str());
+			string call = ita->first;
+			de_slash(call);
+			Fl_Preferences call_settings(type_settings, call.c_str());
 			qsl_data* data = ita->second;
 			// SAve the card label parameters
 			call_settings.set("Width", data->width);

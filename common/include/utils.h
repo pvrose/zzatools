@@ -111,8 +111,10 @@ using namespace std;
 	string hex_to_string(string);
 	// Calculate the great circle bearing and distance between two locations on the Earth's surface
 	void great_circle(lat_long_t source, lat_long_t destination, double& bearing, double& distance);
-	// Replace '/' with '_' throught
+	// Replace '/' with '_' throughout
 	void de_slash(string& data);
+	// Replace '_' with '/' throughout
+	void re_slash(string& data);
 	// get the directroy part of a a filename
 	string directory(string filename);
 	string terminal(string filename);
