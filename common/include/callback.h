@@ -1,7 +1,10 @@
 #ifndef __CALLBACK__
 #define __CALLBACK__
 
+#ifndef _WIN32
 #pragma GCC diagnostic ignored "-Wunused-function"
+#endif
+
 
 #include "utils.h"
 #include "drawing.h"
@@ -236,5 +239,7 @@ extern bool DEBUG_ERRORS;
 		}
 	}
 
+#ifndef _WIN32
 #pragma GCC diagnostic pop
+#endif
 #endif
