@@ -1,6 +1,8 @@
 #ifndef __CALLBACK__
 #define __CALLBACK__
 
+#pragma GCC diagnostic ignored "-Wunused-function"
+
 #include "utils.h"
 #include "drawing.h"
 
@@ -213,6 +215,8 @@ extern bool DEBUG_ERRORS;
 			//	// Close item and all children
 			//	item->close();
 			//	break;
+		default: // Do nothing
+			break;
 		}
 	}
 
@@ -231,4 +235,6 @@ extern bool DEBUG_ERRORS;
 			*enum_value = "";
 		}
 	}
+
+#pragma GCC diagnostic pop
 #endif

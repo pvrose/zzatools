@@ -110,10 +110,7 @@ bool string_to_tm(string source, tm& time, string format) {
 					case 'y':
 						// %y: 2 digit year (1970-2069)
 						time.tm_year = stoi(source.substr(parse_point, 2));
-						if (time.tm_year >= 70) {
-							time.tm_year;
-						}
-						else {
+						if (time.tm_year < 70) {
 							time.tm_year += 100;
 						}
 						parse_point += 2;
