@@ -659,7 +659,8 @@ void qso_qsl_vwr::set_image() {
 					break;
 				}
 			}
-			qsl_thumb_->box(FL_FLAT_BOX);
+			if (raw_image_)	qsl_thumb_->box(FL_FLAT_BOX);
+			else qsl_thumb_->box(FL_BORDER_BOX);
 			break;
 		}
 	}
