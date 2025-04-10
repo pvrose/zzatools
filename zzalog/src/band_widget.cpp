@@ -314,12 +314,21 @@ void band_widget::draw_legend() {
 		}
 		fl_color(FL_RED);
 	}
-	else if (!verbose_) {
-		strcpy(t, band_.c_str());
-	}
 	else {
-		snprintf(t, sizeof(t), "%s: %g MHz - %g MHz", 
-			band_.c_str(), band_limits_.lower, band_limits_.upper);
+		band_data::band_entry_t* entry = band_data_->get_entry(value_tx_);
+		if (entry) {
+			if (!verbose_) {
+				strcpy(t, band_.c_str());
+			}
+			else {
+				snprintf(t, sizeof(t), "%s: %g MHz - %g MHz", 
+					band_.c_str(), band_limits_.lower, band_limits_.upper);
+			}
+			fl_color(FL_FOREGROUND_COLOR);
+		} else {
+			snprintf(t, sizeof(t), "%s: " FREQ_FORMAT " (OUT OF ALLOC.)", band_.c_str(), value_tx_);
+			fl_color(FL_RED);
+		}
 	}
 	fl_measure(t, wl, hl);
 	int yt = y_lower_ + HTEXT;
