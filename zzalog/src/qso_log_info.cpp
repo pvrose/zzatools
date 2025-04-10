@@ -15,6 +15,7 @@
 extern book* book_;
 extern import_data* import_data_;
 extern ticker* ticker_;
+extern bool AUTO_SAVE;
 
 // Constructor
 qso_log_info::qso_log_info(int X, int Y, int W, int H, const char* l) :
@@ -77,7 +78,7 @@ void qso_log_info::create_form(int X, int Y) {
 	bn_save_enable_->align(FL_ALIGN_LEFT);
 	bn_save_enable_->tooltip("Enable/Disable save");
 	bn_save_enable_->callback(cb_bn_enable);
-	bn_save_enable_->when(FL_WHEN_RELEASE);
+	bn_save_enable_->when(FL_WHEN_CHANGED);
 	bn_save_enable_->value(true);
 
 	curr_x += WSMEDIT;
@@ -146,12 +147,17 @@ void qso_log_info::enable_widgets() {
 			op_status_->value("Unmodified");
 			bn_save_->deactivate();
 		}
-		if (book_->enable_save()) {
+		if (book_->enable_save() && AUTO_SAVE) {
 			bn_save_enable_->value(true);
 		}
 		else {
 			bn_save_enable_->value(false);
 		}
+	}
+	if (AUTO_SAVE) {
+		bn_save_enable_->activate();
+	} else {
+		bn_save_enable_->deactivate();
 	}
 	redraw();
 }
