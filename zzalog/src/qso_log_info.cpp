@@ -49,10 +49,13 @@ void qso_log_info::create_form(int X, int Y) {
 	int curr_y = Y;
 
 	// Display progress in loading or saving the log
-	pr_loadsave_ = new Fl_Button(curr_x, curr_y, HBUTTON, HBUTTON, nullptr);
+	pr_loadsave_ = new Fl_Fill_Dial(curr_x, curr_y, HBUTTON, HBUTTON, nullptr);
 	pr_loadsave_->color(FL_BACKGROUND_COLOR, FL_BLUE);
 	pr_loadsave_->box(FL_OVAL_BOX);
 	pr_loadsave_->tooltip("Displays loading or saving progress");
+	pr_loadsave_->minimum(0.0);
+	pr_loadsave_->maximum(1.0);
+	pr_loadsave_->angles(180, 540);
 
 	curr_x += HBUTTON;
 
@@ -98,14 +101,18 @@ void qso_log_info::create_form(int X, int Y) {
 // Configure timer dependent widgets
 void qso_log_info::enable_timer_widgets() {
 	if (book_->empty()) {
-		pr_loadsave_->color(FL_BACKGROUND_COLOR);
+		pr_loadsave_->color(FL_BACKGROUND_COLOR, FL_BACKGROUND_COLOR);
+		pr_loadsave_->value(0.0);
 	}
 	else if (book_->storing()) {
-		pr_loadsave_->color(fl_color_average(FL_GREEN, FL_RED, (float)book_->get_complete()));
+		pr_loadsave_->color(FL_RED, FL_GREEN);
+		pr_loadsave_->value(book_->get_complete());
 	}
 	else if (book_->loading()) {
-		pr_loadsave_->color(fl_color_average(FL_GREEN, FL_BACKGROUND_COLOR, (float)book_->get_complete()));
+		pr_loadsave_->color(FL_BACKGROUND_COLOR, FL_GREEN);
+		pr_loadsave_->value(book_->get_complete());
 	} else {
+		pr_loadsave_->value(0.0);
 		if (book_->is_dirty()) {
 			pr_loadsave_->color(FL_RED);
 		}

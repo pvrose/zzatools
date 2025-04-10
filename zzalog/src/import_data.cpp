@@ -26,9 +26,7 @@
 
 #include <FL/Fl_Preferences.H>
 #include <FL/Fl.H>
-
-
-
+#include <FL/fl_ask.H>
 
 extern status* status_;
 extern book* book_;
@@ -297,15 +295,13 @@ void import_data::update_book() {
 				}
 			}
 			if (had_swl_match) {
-				// Insert the record
-				book_->insert_record_at(offset, import_record);
-				// Fetch the e-card from eQSL.cc
-				if (update_mode_ == EQSL_UPDATE) {
-					eqsl_handler_->enqueue_request(offset);
-				}
-				// Remove the record from this book
-				accept_update();
-				found_match = true;
+				// get the possible values for STATION_CALLSIGN
+				string stn1 = book_->get_record(offset, false)->item("STATION_CALLSIGN");
+				import_record->item("STATION_CALLSIGN", stn1);
+				// ASk if valid SWL report
+				update_in_progress_ = true;
+				match_question_ = "SWL Report - please check validity.";
+				book_->selection(offset, HT_IMPORT_QUERYSWL);
 				number_swl_++;
 				had_swl_match = false;
 			}

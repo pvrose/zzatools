@@ -62,6 +62,7 @@ public:
 		QUERY_NEW,       // Query: Not able to find QSO - allow manual matching
 		QUERY_WSJTX,     // Query found in WSJT-X ALL.TXT file
 		QUERY_DUPE,      // Query: Two records in log found to be possible duplicates - select either, both or a merge
+		QUERY_SWL,       // Query: SWL report
 		QRZ_MERGE,       // Merge details downloaded from QRZ.com
 		NET_STARTED,     // Started several QSOs in a net.
 		NET_EDIT,        // Converting sngle QSO into a net by adding callsigns

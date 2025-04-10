@@ -566,6 +566,8 @@ void qso_data::update_query(logging_state_t query, qso_num_t match_num, qso_num_
 	case QSO_VIEW:
 	case QUERY_NEW:
 	case QUERY_WSJTX:
+	case QUERY_DUPE:
+	case QUERY_SWL:
 	case MANUAL_ENTRY:
 		action_query(query, match_num, query_num);
 		break;
@@ -1212,6 +1214,9 @@ void qso_data::action_query(logging_state_t query, qso_num_t match_number, qso_n
 		potential_match_ = match_number;
 		query_number_ = query_number;
 		g_query_->set_query(import_data_->match_question(), -1, import_data_->get_record(query_number, false));
+		break;
+	case QUERY_SWL:
+		g_query_->set_query(import_data_->match_question(), match_number, import_data_->get_record(query_number, false));
 		break;
 	case QUERY_DUPE:
 		// Note record numbers relate to book even if it is extracted data that refered the dupe check

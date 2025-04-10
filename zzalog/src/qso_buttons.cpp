@@ -51,6 +51,7 @@ map<qso_data::logging_state_t, list<qso_buttons::button_type> > button_map_ =
 	{ qso_data::QUERY_WSJTX, { qso_buttons::ADD_QUERY, qso_buttons::REJECT_QUERY } },
 	{ qso_data::QUERY_DUPE, { qso_buttons::KEEP_DUPE_1, qso_buttons::MERGE_DUPE, qso_buttons::KEEP_DUPE_2,
 		qso_buttons::KEEP_BOTH_DUPES }},
+	{ qso_data::QUERY_SWL, { qso_buttons::ADD_QUERY, qso_buttons::REJECT_QUERY } },
 	{ qso_data::QRZ_MERGE, { qso_buttons::MERGE_DONE }},
 	{ qso_data::NET_STARTED, {qso_buttons::SAVE_NET, qso_buttons::SAVE_QSO, qso_buttons::CANCEL_QSO, qso_buttons::CANCEL_NET,
 		qso_buttons::NAV_FIRST, qso_buttons::NAV_PREV, qso_buttons::NAV_NEXT, qso_buttons::NAV_LAST,
@@ -533,6 +534,7 @@ void qso_buttons::cb_bn_add_query(Fl_Widget* w, void* v) {
 	case qso_data::QUERY_MATCH:
 	case qso_data::QUERY_NEW:
 	case qso_data::QUERY_WSJTX:
+	case qso_data::QUERY_SWL:
 		that->qso_data_->action_add_query();
 		break;
 	default:
@@ -550,6 +552,7 @@ void qso_buttons::cb_bn_reject_query(Fl_Widget* w, void* v) {
 	case qso_data::QUERY_MATCH:
 	case qso_data::QUERY_NEW:
 	case qso_data::QUERY_WSJTX:
+	case qso_data::QUERY_SWL:
 		that->qso_data_->action_reject_query();
 		break;
 	default:

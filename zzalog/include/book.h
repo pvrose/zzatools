@@ -55,6 +55,7 @@ using namespace std;
 		HT_EXTRACTION,            // Extract conditions have changed - invalidate OT_EXTRACT and views displaying extracted data
 		HT_IMPORT_QUERY,          // Import record cannot be processed without user intervention - 
 		HT_IMPORT_QUERYNEW,       // Query whether mismatch is a new record
+		HT_IMPORT_QUERYSWL,       // Query whether SWL report is valid
 		HT_DUPE_QUERY,            // Query whether records are duplicates
 		HT_FORMAT,                // Formats or Columns have changed (LOGVIEW and EXTRACTVIEW)
 		HT_STARTING,              // Record is being created as HT_INSERTED but don't include it
