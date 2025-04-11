@@ -128,10 +128,11 @@ Lower	Upper	Bandwidth	Modes	Notes
 29290				UK Internet voice gateway - unattended
 29300	29510	6	Satellite	Satellite links
 29510	29520		Guard	Guard channel
-29520	29590	6	FM,Repeater	All modes - FM repeater inputs (RH1-RH8)
-29600	29600	6	FM	All modes - FM calling channel
-29610	29610	6	FM,Repeater	All modes - FM simplex repeater (parrot) - input and output
-29620	29700	6	FM,Repeater	All modes - FM repeater outputs (RH1-RH8)
+29520	29700	6	FM,Repeater	
+29520	29590	6		All modes - FM repeater inputs (RH1-RH8)
+29600	29600	6		All modes - FM calling channel
+29610	29610	6		All modes - FM simplex repeater (parrot) - input and output
+29620	29700	6		All modes - FM repeater outputs (RH1-RH8)
 50000	50100	0.5	CW	Telegraphy only - beacon project (50000-50030)
 50050				Future International CoA
 50090				Intercontinental DX CoA
