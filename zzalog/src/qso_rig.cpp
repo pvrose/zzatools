@@ -95,6 +95,8 @@ void qso_rig::load_cat_data(qso_rig::cat_data_t* cat_data, Fl_Preferences settin
 	settings.get("Model ID", (int&)cat_data->hamlib->model_id, -1);
 	// Timeout value
 	settings.get("Timeout", cat_data->hamlib->timeout, 1.0);
+	settings.get("Maximum Timeouts", cat_data->hamlib->max_to_count, 5);
+	settings.get("S-meter Hold", cat_data->hamlib->num_smeters, 5);
 
 	// Check that hamlib is currently OK
 	const rig_caps* capabilities = rig_get_caps(cat_data->hamlib->model_id);
@@ -742,6 +744,8 @@ void qso_rig::save_cat_data(qso_rig::cat_data_t* cat_data, Fl_Preferences settin
 	settings.set("Baud Rate", cat_data->hamlib->baud_rate);
 	settings.set("Model ID", (int)cat_data->hamlib->model_id);
 	settings.set("Timeout", cat_data->hamlib->timeout);
+	settings.set("Maximum Timeouts", cat_data->hamlib->max_to_count);
+	settings.set("S-meter Hold", cat_data->hamlib->num_smeters);
 	if (cat_data->use_cat_app) {
 		settings.set("Command", cat_data->app.c_str());
 	}

@@ -494,7 +494,7 @@ void rig_if::th_read_values() {
 		rig_data_.drive = drive_level.f * 100;
 	}
 	// Split
-	if (toc_split_ <= hamlib_data_->max_to_count) {
+	if (toc_split_ < hamlib_data_->max_to_count) {
 		vfo_t TxVFO;
 		split_t split;
 		if (opened_ok_) error_code_ = rig_get_split_vfo(rig_, RIG_VFO_CURR, &split, &TxVFO);
@@ -613,7 +613,7 @@ bool rig_if::error_handler(int code, const char* meter, bool* flag, int* to_coun
 	case RIG_ETIMEOUT:
 		if (to_count) {
 			(*to_count)++;
-			if (*to_count <= hamlib_data_->max_to_count) {
+			if (*to_count < hamlib_data_->max_to_count) {
 				snprintf(msg, sizeof(msg), "RIG: Access to %s timed out - continuing", meter);
 				status_->misc_status(ST_WARNING, msg);
 			}
