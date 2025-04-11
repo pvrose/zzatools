@@ -179,6 +179,12 @@ void band_data::create_bands() {
 			string band = spec_data_->band_for_freq((*it)->range.lower);
 			// New range - add the previous range
 			if (current_band.length()) {
+				if (bands_.at(current_band).size() == 1) {
+					char msg[128];
+					snprintf(msg, sizeof(msg), "BAND: Multiple ranges found for %s",
+						band.c_str());
+					status_->misc_status(ST_WARNING, msg);
+				}
 				bands_.at(current_band).insert(current_range); 
 			}
 			if (band != current_band) {
