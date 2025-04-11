@@ -254,8 +254,8 @@ Lower	Upper	Bandwidth	Modes	Notes
 432500				Narrowband SSTV CoA
 432625	432675			Digital Communications
 432775				1.6 MHz Talk-through
-432994	433381	12	FM,Repeater	FM Repeater outputs
-433394	433581	12		FM/DV Simplex
+432994	433387.5	12	FM,Repeater	FM Repeater outputs
+433387.5	433600	12		FM/DV Simplex
 433500				FM Calling Channel
 433550				Used for rally/exhibition talk-in
 433600	434000	12	CW,Dig,FM,DV	All modes
@@ -267,7 +267,7 @@ Lower	Upper	Bandwidth	Modes	Notes
 433950	434050			Internet Voice gateway
 434375				1.6 MHz Talk-through
 434475	434525			DV Internet voice gateway
-434594	434981	12	FM,DV,Repeater	FM/DV Repeater inputs
+434594	435000	12	FM,DV,Repeater	FM/DV Repeater inputs
 435000	436000		Satellite	Satellites only
 436000	438000		Satellite,TV	Satellites and experimental DATV
 437000				Experimental DATV CoA
@@ -287,14 +287,15 @@ Lower	Upper	Bandwidth	Modes	Notes
 1241750	1242000	20	FM,DV	FM/DV Simplex @ 25 kHz channels
 1242000	1249000		TV	Repeater inputs
 1249000	1249250	20	FM,DV,Repeater	FM/DV Repeater outputs
+1249250	1250000		Guard	
 1250000	1290000		Satellite	Amateur Satellite service
 1290000	1291500	20	FM,DV,Repeater	FM/DV Repeater – inputs
 1291500	1296000		CW,Dig,Phone,FM,DV	All mdes
 1296000	1296150	0.5	CW,Dig	Narrow band 
 1296150	1296800	2.7	CW,Dig,Phone	
 1296800	1296994		Beacons	Beacons
-1296994	1297481	20	FM,DV,Repeater	FM/DV Repeater outputs
-1297494	1297981	20	FM,DV	FM/DV Simplex
+1296994	1297487.5	20	FM,DV,Repeater	FM/DV Repeater outputs
+1297487.5	1298000	20	FM,DV	FM/DV Simplex
 1298000	1299000	20	CW,Dig,Phone,FM,DV	All modes
 1299000	1299750	150	Dig	High-speed digital data
 1299750	1300000	20	FM,DV	FM/DV Simplex
@@ -310,7 +311,7 @@ Lower	Upper	Bandwidth	Modes	Notes
 2390000	2400000		TV,Repeater	
 2400000	2450000		TV,Repeater	
 3400000	3400800	2.7	CW,Dig,Phone	Narrowband modes
-3400800	3400998		Beacons	
+3400800	3401000		Beacons	
 3401000	3402000	200	Dig	Wideband 
 3402000	3410000		Dig,TV	Wideband modes
 5650000	5850000		All	
