@@ -166,22 +166,29 @@ bool band_data::in_band(double frequency) {
 }
 
 // Return the band list
-band_map<range_t>& band_data::bands() {
+band_map<set<range_t >>& band_data::bands() {
 	return bands_;
 }
 
 // Generate the band list
 void band_data::create_bands() {
+	range_t current_range = { 0.0, 0.0 };
+	string current_band = ""; 
 	for (auto it = entries_.begin(); it != entries_.end(); it++) {
-		string band = spec_data_->band_for_freq((*it)->range.lower);
-		if (bands_.find(band) == bands_.end()) {
-			// New band
-			bands_[band] = { (*it)->range.lower, (*it)->range.upper };
-		}
-		else {
-			range_t& band_r = bands_[band];
-			band_r.lower = min(band_r.lower, (*it)->range.lower);
-			band_r.upper = max(band_r.upper, (*it)->range.upper);
+		if ((*it)->range.lower > current_range.upper) {
+			string band = spec_data_->band_for_freq((*it)->range.lower);
+			// New range - add the previous range
+			if (current_band.length()) {
+				bands_.at(current_band).insert(current_range); 
+			}
+			if (band != current_band) {
+				// Create new band with an empty set of ranges
+				current_band = band;
+				bands_[current_band] = {};
+			}
+			current_range = (*it)->range;
+		} else {
+			current_range.upper = max(current_range.upper, (*it)->range.upper);
 		}
 	}
 }

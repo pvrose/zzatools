@@ -9,6 +9,7 @@
 #include <cmath>
 #include <string>
 #include <algorithm>
+#include <cfloat>
 
 #include <FL/fl_draw.H>
 
@@ -136,7 +137,12 @@ void band_widget::set_range(bool restore_default) {
 	string prev_band = band_;
 	band_ = spec_data_->band_for_freq(value_tx_);
 	if (band_.length()) {
-		band_limits_ = band_data_->bands().at(band_);
+		set<range_t> ranges = band_data_->bands().at(band_);
+		band_limits_ = { DBL_MAX, 0.0 };
+		for (auto it = ranges.begin(); it != ranges.end(); it++) {
+			band_limits_.lower = min(band_limits_.lower, (*it).lower);
+			band_limits_.upper = max(band_limits_.upper, (*it).upper);
+		}
 		if (auto_bw_ || prev_band != band_ || restore_default) {
 			// We are resetting to show the full band
 			scale_range_ = band_limits_;
@@ -348,47 +354,49 @@ void band_widget::draw_legend() {
 
 // Draw a background for the visible bands
 void band_widget::draw_bands() {
-	band_map<range_t>& bands = band_data_->bands();
+	band_map<set<range_t> >& bands = band_data_->bands();
 	int prev_y = y() + h();
 	Fl_Color band_colour = fl_color_average(FL_BACKGROUND_COLOR, FL_BACKGROUND2_COLOR, 0.50F);
 	map<int, string> band_labels;
-	for (auto it = bands.begin(); it != bands.end(); it++) {
-		int yl;
-		int yu;
-		bool draw_it = false;
-		if (it->second.lower >= scale_range_.lower && it->second.upper <= scale_range_.upper) {
-			yl = y_for_f(it->second.lower);
-			yu = y_for_f(it->second.upper);
-			draw_it = true;
-		}
-		else if (it->second.lower >= scale_range_.lower && it->second.lower <= scale_range_.upper) {
-			yl = y_for_f(it->second.lower);
-			yu = y_for_f(scale_range_.upper);
-			draw_it = true;
-		}
-		else if (it->second.upper <= scale_range_.upper && it->second.upper >= scale_range_.lower) {
-			yl = y_for_f(scale_range_.lower);
-			yu = y_for_f(it->second.upper);
-			draw_it = true;
-		}
-		else if (it->second.lower <= scale_range_.lower && it->second.upper >= scale_range_.upper) {
-			yl = y_for_f(scale_range_.lower);
-			yu = y_for_f(scale_range_.upper);
-			draw_it = true;
-		}
-		if (draw_it) {
-			// Make the bar at least 1 pixel wide
-			if (yl == yu) yl++;
-			fl_rectf(x() + 1, yu, w() - 2, yl - yu, band_colour);
-			fl_color(FL_FOREGROUND_COLOR);
-			// Add the band text if there is room
-			int yt = (yl - yu < FL_NORMAL_SIZE) ? (yu + yl) / 2 - h_offset_ : yu;
-			if (yt <= prev_y - FL_NORMAL_SIZE) {
-				band_labels[yt] = it->first;
-				prev_y = yt;
+	for (auto it0 = bands.begin(); it0 != bands.end(); it0++) {
+		for (auto it = it0->second.begin(); it != (*it0).second.end(); it++) {
+			int yl;
+			int yu;
+			bool draw_it = false;
+			if (it->lower >= scale_range_.lower && it->upper <= scale_range_.upper) {
+				yl = y_for_f(it->lower);
+				yu = y_for_f(it->upper);
+				draw_it = true;
 			}
-			else {
-				band_labels[prev_y] += ',' + it->first;
+			else if (it->lower >= scale_range_.lower && it->lower <= scale_range_.upper) {
+				yl = y_for_f(it->lower);
+				yu = y_for_f(scale_range_.upper);
+				draw_it = true;
+			}
+			else if (it->upper <= scale_range_.upper && it->upper >= scale_range_.lower) {
+				yl = y_for_f(scale_range_.lower);
+				yu = y_for_f(it->upper);
+				draw_it = true;
+			}
+			else if (it->lower <= scale_range_.lower && it->upper >= scale_range_.upper) {
+				yl = y_for_f(scale_range_.lower);
+				yu = y_for_f(scale_range_.upper);
+				draw_it = true;
+			}
+			if (draw_it) {
+				// Make the bar at least 1 pixel wide
+				if (yl == yu) yl++;
+				fl_rectf(x() + 1, yu, w() - 2, yl - yu, band_colour);
+				fl_color(FL_FOREGROUND_COLOR);
+				// Add the band text if there is room
+				int yt = (yl - yu < FL_NORMAL_SIZE) ? (yu + yl) / 2 - h_offset_ : yu;
+				if (yt <= prev_y - FL_NORMAL_SIZE) {
+					band_labels[yt] = it0->first;
+					prev_y = yt;
+				}
+				else {
+					band_labels[prev_y] += ',' + it0->first;
+				}
 			}
 		}
 	}

@@ -13,7 +13,14 @@ using namespace std;
 struct range_t {
 	double lower;
 	double upper;
-};                   // Frqeuency range - MHz
+
+	// Provide comparison operator for set ordering
+	bool operator< (const range_t& rhs) const {
+		return lower < rhs.lower;
+	}
+};   
+
+// Frqeuency range - MHz
 
 
 // This class reads in the IARU band-plan in TSV form into a database
@@ -45,7 +52,7 @@ public:
 	// Get the set of entries for the frequency range
 	set<band_entry_t*> get_entries();
 	// Get the bands data
-	band_map<range_t>& bands();
+	band_map<set<range_t> >& bands();
 
 protected:
 	// Read the data
@@ -59,7 +66,7 @@ protected:
 	// The band entries
 	vector<band_entry_t*> entries_;
 	// Full bands
-	band_map<range_t> bands_;
+	band_map<set<range_t> > bands_;
 
 };
 
