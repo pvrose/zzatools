@@ -229,6 +229,8 @@ using namespace std::chrono;
 		bool has_rf_meter_;
 		// Timeout counts
 		int toc_split_;
+		// Phase - for debug mostly
+		string read_item_;
 
 
 };

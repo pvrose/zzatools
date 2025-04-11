@@ -17,7 +17,7 @@ extern bool DEBUG_THREADS;
 
 // Returns if the rig opened OK
 bool rig_if::is_open() {
-	return opened_ok_;
+	return opened_ok_.load();
 }
 
 // Convert s-meter reading into display format
@@ -170,8 +170,8 @@ bool rig_if::get_powered() {
 rig_if::rig_if(const char* name, hamlib_data_t* data) 
 {
 	// Initialise
-	opening_ = false;
-	opened_ok_ = false;
+	opening_.store( false);
+	opened_ok_.store(false);
 	// Default action
 	have_freq_to_band_ = false;
 	inhibit_repeated_errors = false;
@@ -196,6 +196,7 @@ rig_if::rig_if(const char* name, hamlib_data_t* data)
 	}
 	count_down_ = 0;
 	sum_smeters_ = 0;
+	read_item_ = "";
 	
 	// If the name has been set, there is a rig
 	if (hamlib_data_ && my_rig_name_.length()) {
@@ -222,7 +223,7 @@ void rig_if::close() {
 
 
 	if (rig_ != nullptr) {
-		if (opened_ok_) {
+		if (opened_ok_.load()) {
 			char msg[128];
 			snprintf(msg, 128, "RIG: Closing connection %s (%s/%s on port %s)",
 				my_rig_name_.c_str(),
@@ -241,7 +242,7 @@ void rig_if::close() {
 		rig_cleanup(rig_);
 		rig_ = nullptr;
 	}
-	opened_ok_ = false;
+	opened_ok_.store(false);
 }
 
 // Opens the connection associated with the rig
@@ -274,7 +275,7 @@ bool rig_if::open() {
 		hamlib_data_->model.c_str(),
 		timeout);
 	status_->misc_status(ST_NOTE, msg);
-	while(opening_) {
+	while(opening_.load()) {
 		// Allow FLTK scheduler in
 		Fl::check();
 		if (chrono::system_clock::now() - wait_start > chrono::milliseconds(timeout)) {
@@ -288,7 +289,7 @@ bool rig_if::open() {
 		}
 	}
 		
-	if (opened_ok_) {
+	if (opened_ok_.load()) {
 
 		if (hamlib_data_->port_type == RIG_PORT_SERIAL) {
 			snprintf(msg, 256, "RIG: Connection %s/%s on port %s opened OK",
@@ -351,13 +352,13 @@ bool rig_if::th_open_rig() {
 		// Not opened, tidy hamlib memory usage and mark it so.
 		rig_cleanup(rig_);
 		rig_ = nullptr;
-		opened_ok_ = false;
+		opened_ok_.store(false);
 	}
 	else {
 		// Opened OK
-		opened_ok_ = true;
+		opened_ok_.store(true);
 	}
-	return opened_ok_;
+	return opened_ok_.load();
 }
 
 // Return rig name
@@ -369,26 +370,31 @@ string& rig_if::rig_name() {
 
 // Thraed method
 void rig_if::th_run_rig(rig_if* that) {
-	if (DEBUG_THREADS) printf("RIG THREAD: Rig access thread started\n");
+	if (DEBUG_THREADS) printf("RIG THREAD: Rig access thread started ID=%d\n", this_thread::get_id());
 	// Open the rig
 	if (!that->th_open_rig()) {
-		that->opening_ = false;
+		that->opening_.store(false);
 		if (DEBUG_THREADS) printf("RIG THREAD: Open failed\n");
 		return;
 	}
 	// run_read_ will be cleared when the rig closes or errors.
 	that->th_read_values();
-	if (that->opened_ok_) {
+	if (that->opened_ok_.load()) {
 		if (DEBUG_THREADS) printf("RIG THREAD: Reading from rig\n");
-		that->opening_ = false;
+		that->opening_.store(false);
 		that->run_read_ = true;
-		while (that->run_read_) {
+		while (that->run_read_ && that->opened_ok_.load()) {
 			// Read the values from the rig once per second
 			that->th_read_values();
 			this_thread::sleep_for(chrono::milliseconds(1000));
 		}
+		if (!that->opened_ok_.load()) {
+			char msg[128];
+			snprintf(msg, sizeof(msg), "RIG: No longer open %s", that->error_message(that->read_item_.c_str()).c_str());
+			status_->misc_status(ST_ERROR, msg);
+		}
 	} else {
-		that->opening_ = false;
+		that->opening_.store(false);
 	}
 }
 
@@ -398,19 +404,20 @@ void rig_if::th_read_values() {
 	if (hamlib_data_->port_type == RIG_PORT_NONE) {
 		return;
 	}
-	// Check powered on
-	powerstat_t power_state;
-	if (opened_ok_) error_code_ = rig_get_powerstat(rig_, &power_state);
-	else return;
-	if (error_handler(error_code_, "Power status", nullptr, nullptr)) {
-		opened_ok_ = false;
-		return;
-	}
 	// TODO: This is a blunt instrument - WFVIEW seems to return powered off when it's not
 	if (hamlib_data_->model_id == 2) {
 		rig_data_.powered_on = true;
 	}
 	else {
+		read_item_ = "powerstat";
+		// Check powered on
+		powerstat_t power_state;
+		if (opened_ok_.load()) error_code_ = rig_get_powerstat(rig_, &power_state);
+		else return;
+		if (error_handler(error_code_, "Power status", nullptr, nullptr)) {
+			opened_ok_.store(false);
+			return;
+		}
 		switch (power_state) {
 		case RIG_POWER_ON:
 		case RIG_POWER_STANDBY:
@@ -429,28 +436,31 @@ void rig_if::th_read_values() {
 	}
 	// Read TX frequency
 	double d_temp;
-	if (opened_ok_) error_code_ = rig_get_freq(rig_, RIG_VFO_TX, &d_temp);
+	read_item_ = "TX Frequency";
+	if (opened_ok_.load()) error_code_ = rig_get_freq(rig_, RIG_VFO_TX, &d_temp);
 	else return;
 	if (error_handler(error_code_, "TX Frequency", nullptr, nullptr)) {
-		opened_ok_ = false;
+		opened_ok_.store(false);
 		return;
 	}
 	rig_data_.tx_frequency = d_temp;
 	// Read RX frequency
-	if (opened_ok_) error_code_ = rig_get_freq(rig_, RIG_VFO_CURR, &d_temp);
+	read_item_ = "RX Frequency";
+	if (opened_ok_.load()) error_code_ = rig_get_freq(rig_, RIG_VFO_CURR, &d_temp);
 	else return;
 	if (error_handler(error_code_, "RX Frequency", nullptr, nullptr)) {
-		opened_ok_ = false;
+		opened_ok_.store(false);
 		return;
 	}
 	rig_data_.rx_frequency = d_temp;
 	// Read mode
+	read_item_ = "mode";
 	rmode_t mode;
 	shortfreq_t bandwidth;
-	if (opened_ok_) error_code_ = rig_get_mode(rig_, RIG_VFO_CURR, &mode, &bandwidth);
+	if (opened_ok_.load()) error_code_ = rig_get_mode(rig_, RIG_VFO_CURR, &mode, &bandwidth);
 	else return;
 	if (error_handler(error_code_, "Mode/Bandwidth", nullptr, nullptr)) {
-		opened_ok_ = false;
+		opened_ok_.store(false);
 		return;
 	}
 	// Convert hamlib mode encoding to ZLG encoding
@@ -483,35 +493,38 @@ void rig_if::th_read_values() {
 		rig_data_.mode = GM_DSTAR;
 	}
 	if (has_drive_) {
+		read_item_ = "TX Drive";
 		// Read drive level
 		value_t drive_level;
-		if (opened_ok_) error_code_ = rig_get_level(rig_, RIG_VFO_CURR, RIG_LEVEL_RFPOWER, &drive_level);
+		if (opened_ok_.load()) error_code_ = rig_get_level(rig_, RIG_VFO_CURR, RIG_LEVEL_RFPOWER, &drive_level);
 		else return;
 		if (error_handler(error_code_, "Drive level", &has_drive_, nullptr)) {
-			opened_ok_ = false;
+			opened_ok_.store(false);
 			return;
 		}
 		rig_data_.drive = drive_level.f * 100;
 	}
 	// Split
 	if (toc_split_ < hamlib_data_->max_to_count) {
+		read_item_ = "split";
 		vfo_t TxVFO;
 		split_t split;
-		if (opened_ok_) error_code_ = rig_get_split_vfo(rig_, RIG_VFO_CURR, &split, &TxVFO);
+		if (opened_ok_.load()) error_code_ = rig_get_split_vfo(rig_, RIG_VFO_CURR, &split, &TxVFO);
 		else return;
 		if (error_handler(error_code_, "Split mode", nullptr, &toc_split_)) {
-			opened_ok_ = false;
+			opened_ok_.store(false);
 			return;
 		}
 		rig_data_.split = split == split_t::RIG_SPLIT_ON;
 	}
 	// PTT value
+	read_item_ = "PTT";
 	ptt_t ptt;
 	bool current_ptt = rig_data_.ptt;
-	if (opened_ok_) error_code_ = rig_get_ptt(rig_, RIG_VFO_CURR, &ptt);
+	if (opened_ok_.load()) error_code_ = rig_get_ptt(rig_, RIG_VFO_CURR, &ptt);
 	else return;
 	if (error_handler(error_code_, "PTT", nullptr, nullptr)) {
-		opened_ok_ = false;
+		opened_ok_.store(false);
 		return;
 	}
 	rig_data_.ptt = ptt == ptt_t::RIG_PTT_ON;
@@ -521,11 +534,12 @@ void rig_if::th_read_values() {
 	}
 	value_t meter_value;
 	if (has_smeter_) {
+		read_item_ = "S-meter";
 		// S-meter - set to max value during RX and last RX value during TX
-		if (opened_ok_) error_code_ = rig_get_level(rig_, RIG_VFO_CURR, RIG_LEVEL_STRENGTH, &meter_value);
+		if (opened_ok_.load()) error_code_ = rig_get_level(rig_, RIG_VFO_CURR, RIG_LEVEL_STRENGTH, &meter_value);
 		else return;
 		if (error_handler(error_code_, "S-meter", &has_smeter_, nullptr)) {
-			opened_ok_ = false;
+			opened_ok_.store(false);
 			return;
 		}
 		// TX->RX (or changed RX frequency - use read value
@@ -547,11 +561,12 @@ void rig_if::th_read_values() {
 		rig_data_.s_meter = meter_value.i;
 	}
 	if (has_rf_meter_) {
+		read_item_ = "RF meter";
 		// Power meter
-		if (opened_ok_) error_code_ = rig_get_level(rig_, RIG_VFO_CURR, RIG_LEVEL_RFPOWER_METER_WATTS, &meter_value);
+		if (opened_ok_.load()) error_code_ = rig_get_level(rig_, RIG_VFO_CURR, RIG_LEVEL_RFPOWER_METER_WATTS, &meter_value);
 		else return;
 		if (error_handler(error_code_, "RF Power", &has_rf_meter_, nullptr)) {
-			opened_ok_ = false;
+			opened_ok_.store(false);
 			return;
 		}
 		// RX->TX - reset the power level unless...
@@ -571,6 +586,7 @@ void rig_if::th_read_values() {
 		// Also store iommediate value
 		rig_data_.pwr_meter = (double)meter_value.f;
 	}
+	read_item_ = "";
 	// All successful
 	count_down_ = FAST_RIG_TIMER;
 	// Check rig response time and inform use if it's slowed down or back to normal
@@ -639,7 +655,7 @@ string rig_if::error_message(const char* func_name) {
 
 // Error Code is OK.
 bool rig_if::is_good() {
-	return opened_ok_ && error_code_ == RIG_OK;
+	return opened_ok_.load() && error_code_ == RIG_OK;
 }
 
 // Error code is network error
@@ -698,7 +714,7 @@ const char* rig_if::error_text(rig_errcode_e code) {
 
 // returns true if the connection is in the process of being opened
 bool rig_if::is_opening() {
-	return opening_;
+	return opening_.load();
 }
 
 // Returns true if the rig has CAT control
