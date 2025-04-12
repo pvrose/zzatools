@@ -156,7 +156,19 @@ void qso_manager::create_form(int X, int Y) {
 	max_y = max(max_y, curr_y);
 
 	this->resizable(nullptr);
-	this->size(max_x + GAP - X, max_y + GAP - Y);
+	// Now position it within the screen
+	int rw = max_x + GAP - X;
+	int rh = max_y + GAP - Y;
+	int rx = x_root();
+	int ry = y_root();
+	int sx, sy, sw, sh;
+	Fl::screen_work_area(sx, sy, sw, sh);
+	if (rx < sx) rx = sx;
+    else if (rx + rw > sx + sw) rx = sx + sw - rw;
+	if (ry < sy) ry = sy;
+	else if (ry + rh > sy + sh) ry = sy + sh - rh;
+	this->resize(rx, ry, rw, rh);
+
 	created_ = true;
 
 	end();

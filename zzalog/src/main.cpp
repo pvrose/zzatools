@@ -802,7 +802,17 @@ void resize_window() {
 	int min_h = tabbed_forms_->min_h() + toolbar_->h() + menu_->h();
 	main_window_->size_range(min_w, min_h);
 	// Set the size to the setting or minimum specified by the view + bars if that's larger
-	main_window_->resize(max(left, 0), max(top, 100), max(min_w, width), max(min_h, height));
+	int rx = left;
+	int ry = top;
+	int rw = max(min_w, width);
+	int rh = max(min_h, height);
+	int sx, sy, sw, sh;
+	Fl::screen_work_area(sx, sy, sw, sh);
+	if (rx < sx) rx = sx;
+	else if (rx + rw > sx + sw) rx = sx + sw - rw;
+	if (ry < sy) ry = sy;
+	else if (ry + rh > sy + sh) ry = sy + sh - rh;
+	main_window_->resize(rx, ry, rw, rh);
 }
 
 // Tidy memory
