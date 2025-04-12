@@ -77,7 +77,7 @@ void qso_bands::create_form() {
 // Save settimngs
 void qso_bands::save_values() {
 	Fl_Preferences my_settings(settings_, "Windows/Bandplan");
-	my_settings.set("Open Automatically", (int)open_window_);
+	my_settings.set("Open Automatically", (int)full_window_->visible());
 	my_settings.set("Left", full_window_->x_root());
 	my_settings.set("Top", full_window_->y_root());
 	my_settings.set("Width", full_window_->w());
