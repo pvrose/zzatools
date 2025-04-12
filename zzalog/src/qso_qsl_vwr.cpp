@@ -379,7 +379,7 @@ void qso_qsl_vwr::cb_bn_image(Fl_Widget* w, void* v) {
 		that->win_full_view_->hide();
 	}
 	else {
-		that->update_full_view();
+		// that->update_full_view();
 		that->win_full_view_->show();
 	}
 }
@@ -430,7 +430,7 @@ void qso_qsl_vwr::enable_widgets() {
 	// Display the image choice buttons
 	set_image_buttons();
 	set_log_buttons();
-	update_full_view();
+	// update_full_view();
 	redraw();
 }
 
@@ -601,10 +601,6 @@ void qso_qsl_vwr::set_image() {
 								}
 							}
 						}
-					}
-					if (found_image) {
-						update_full_view();
-						// Test Whether we've used default station callsign
 					}
 				}
 			} else {
@@ -868,24 +864,24 @@ void qso_qsl_vwr::set_log_buttons() {
 
 // Update  the full view window
 void qso_qsl_vwr::update_full_view() {
-	int w;
-	int h;
-	qsl_full_->display()->get_size(w, h);
+	int rw;
+	int rh;
+	qsl_full_->display()->get_size(rw, rh);
+	int rx = win_full_view_->x_root();
+	int ry = win_full_view_->y_root();
 	int sx, sy, sw, sh;
 	Fl::screen_work_area(sx, sy, sw, sh);
-	// If already visible
-	if (win_full_view_->visible() && qso_changed_) {
-		int ww = win_full_view_->w();
-		int wh = win_full_view_->h();
-		sw = min(sw, ww);
-		sh = min(sh, wh);
-	}
-	// Keep the size within the screen work area
-	w = min(w, sw);
-	h = min(h, sh);
+	// Adjust width to fit in screen
+	if (rw > sw) rw = sw;
+	if (rh > sh) rh = sh;
+	// Now keep the window on screen
+	if (rx < sx) rx = sx;
+	else if (rx + rw > sx + sw) rx = sx + sw - rw;
+	if (ry < sy) ry = sy;
+	else if (ry + rh > sy + sh) ry = sy + sh - rh;
 	// And resize the full view window
-	win_full_view_->size(w, h);
-	qsl_full_->size(w, h);
+	win_full_view_->resize(rx, ry, rw, rh);
+	qsl_full_->size(rw, rh);
 	win_full_view_->redraw();
 }
 
