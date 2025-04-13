@@ -79,7 +79,6 @@ public:
 		QRZ_COM,
 		UPDATE_CAT,
 		REPLACE_CAT,
-		SAVE_RESTART,
 		RESTART,
 		PARSE_QSO,
 	};
@@ -150,8 +149,6 @@ public:
 	static void cb_bn_qrz_com(Fl_Widget* w, void* v);
 	// Update CAT
 	static void cb_bn_update_cat(Fl_Widget* w, void* v);
-	// Save Contest QSO and restart
-	static void cb_bn_save_restart(Fl_Widget* w, void* v);
 	// Cancel current QSO and restart
 	static void cb_bn_restart(Fl_Widget* w, void* v);
 	// Pasre QSO

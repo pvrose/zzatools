@@ -1129,8 +1129,10 @@ void qso_data::action_save_edit() {
 // ACtion CANCEL EDIT - Transition from QSO_EDIT to QSO_INACTIVE scrapping changes
 void qso_data::action_cancel_edit() {
 	// Copy original back to the book
-	if (g_entry_->original_qso()) {
-		*book_->get_record(g_entry_->qso_number(), false) = *g_entry_->original_qso();
+	if (logging_state_ == QSO_EDIT) {
+		if (g_entry_->original_qso()) {
+			*book_->get_record(g_entry_->qso_number(), false) = *g_entry_->original_qso();
+		}
 	}
 	g_entry_->delete_qso();
 	action_return_state();
