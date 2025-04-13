@@ -319,6 +319,8 @@ using namespace std;
 		static set<string> op_fields_;
 		// Set of dirty QSOs
 		set<record*> dirty_qsos_;
+		// Need flag to indicate a record has been deleted
+		bool deleted_record_;
 
 	};
 

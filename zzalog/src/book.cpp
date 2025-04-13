@@ -98,6 +98,7 @@ book::book(object_t type)
 	, adx_writer_(nullptr)
 	, ignore_null_(false)
 	, upload_allowed_(true)
+	, deleted_record_(false)
 {
 	used_bands_.clear();
 	used_modes_.clear();
@@ -457,6 +458,7 @@ bool book::store_data(string filename, bool force, field_list* fields) {
 					ok = false;
 				}
 				if (ok) {
+					deleted_record_ = false;
 					char* message = new char[filename_.length() + 100];
 					size_t num_records = size();
 					if (header()) num_records++;
@@ -842,6 +844,8 @@ void book::delete_record(bool force) {
 			// Tell the views a record has been deleted and to redraw from the current selection
 			selection(current_item_, HT_DELETED);
 			new_record_ = false;
+			been_modified_ = true;
+			deleted_record_ = true;
 			// After selection has done its all can allow another delete
 			delete_in_progress_ = false;
 			menu_->update_items();
@@ -864,6 +868,10 @@ void book::delete_record(bool force) {
 		selection(-1, HT_MINOR_CHANGE);
 		menu_->update_items();
 	}
+	if (AUTO_SAVE && save_level_ == 0 && !READ_ONLY && is_dirty()) {
+		store_data();
+	}
+
 }
 
 // Move the record to its correct chronological position
@@ -1685,7 +1693,7 @@ void book::delete_dirty_record(record* qso) {
 
 // Are there any dirty records
 bool book::is_dirty() {
-	return (!dirty_qsos_.empty());
+	return (!dirty_qsos_.empty() || deleted_record_);
 }
 
 // Is this record dirty
