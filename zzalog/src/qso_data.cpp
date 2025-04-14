@@ -1118,6 +1118,7 @@ void qso_data::action_save_edit() {
 		cty_data_->update_qso(qso);
 		spec_data_->validate(qso, item_number);
 		book_->add_use_data(qso);
+		book_->enable_save(true, "Saving edit");
 
 		g_entry_->delete_qso();
 	}

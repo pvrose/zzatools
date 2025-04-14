@@ -832,11 +832,11 @@ void book::delete_record(bool force) {
 			menu_->update_items();
 			// Remove the current record from both the book_ and the extract_data_
 			record* del_record = get_record();
+			delete_dirty_record(del_record);
 			if (book_type_ == OT_EXTRACT) {
 				book_->erase(book_->begin() + record_number(current_item_));
 			} 
 			erase(begin() + current_item_);
-			delete_dirty_record(del_record);
 			// if current record no longer exists decrement it (exept if already first record)
 			if (current_item_ == size() && current_item_ > 0) {
 				current_item_--;
@@ -863,7 +863,6 @@ void book::delete_record(bool force) {
 		*get_record() = *old_record_;
 		delete old_record_;
 		old_record_ = nullptr;
-		delete_dirty_record(get_record());
 		// Because we have not updated other views yet, we only regard this as a minor change
 		selection(-1, HT_MINOR_CHANGE);
 		menu_->update_items();
@@ -1693,7 +1692,9 @@ void book::delete_dirty_record(record* qso) {
 
 // Are there any dirty records
 bool book::is_dirty() {
-	return (!dirty_qsos_.empty() || deleted_record_);
+	size_t num_dirty = dirty_qsos_.size();
+	bool result = num_dirty != 0 || deleted_record_;
+	return result;
 }
 
 // Is this record dirty
