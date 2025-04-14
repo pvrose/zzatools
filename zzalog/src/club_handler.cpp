@@ -236,12 +236,6 @@ bool club_handler::upload_single_qso(qso_num_t record_num) {
 	}
 	record* this_record = book_->get_record(record_num, false);
 	if (this_record->item("CLUBLOG_QSO_UPLOAD_STATUS") == "Y") {
-		char message[128];
-		snprintf(message, 128, "CLUBLOG: QSO %s %s %s already uploaded - not uploading",
-			this_record->item("QSO_DATE").c_str(),
-			this_record->item("TIME_ON").c_str(),
-			this_record->item("CALL").c_str());
-		status_->misc_status(ST_WARNING, message);
 		upload_qso = false;
 	}
 	if (upload_qso) {
