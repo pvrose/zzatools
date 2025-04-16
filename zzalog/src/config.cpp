@@ -82,7 +82,7 @@ config::config(int W, int H, const char* label) :
 	updatable_views_.insert(qsle);
 
 	// Lastly - a tree display showing all config
-	Fl_Group* all_settings = new Fl_Group(rx, ry, rw, rh, "All Settings");
+	Fl_Group* all_settings = new config_tree(rx, ry, rw, rh, "All Settings");
 	all_settings->labelfont(FL_BOLD);
 	all_settings->labelsize(FL_NORMAL_SIZE + 2);
 	all_settings->tooltip("Displays the current config in tree format");
