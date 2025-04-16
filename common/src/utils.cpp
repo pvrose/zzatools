@@ -23,6 +23,7 @@ utils.h - Utility methods
 #include <cmath>
 #include <chrono>
 #include <set>
+#include <random>
 
 using namespace std;
 using namespace std::chrono;
@@ -1044,5 +1045,26 @@ string terminal(string filename) {
 		return filename;
 	} else {
 		return filename.substr(pos + 1);
+	}
+}
+
+// 8-bit hash - XOR all the characters in src string
+uchar hash(const char* src) {
+	uchar result = '\x00';
+	// Hash in the next character and increment the pointer
+	while (*src != '\x00') result ^= *(src++);
+	return result;
+}
+
+// Basic XOR encryption using a pseudo-random key
+void xor_crypt(char* src, int len, uint32_t seed, uchar offset) {
+	// Seed a pseudo-random number sequence
+	minstd_rand key(seed);
+	// Now offset into the sequence
+	key.discard(offset);
+	// Now use the sequence to en/decrypt the string
+	for (int ix = 0; ix < len; ix++, src++) {
+		uchar key_byte = key() & 255;
+		*src ^= key_byte;
 	}
 }

@@ -161,6 +161,8 @@ Fl_PNG_Image main_icon_("ZZALOG_ICON", ___rose_png, ___rose_png_len);
 bool using_backup_ = false;
 // Sticky switches mesasge
 string sticky_message_ = "";
+// Common seed to use in password encryption - maintaned with sessions
+uint32_t seed_;
 
 // Get the backup filename
 string backup_filename(string source) {
@@ -815,6 +817,19 @@ void resize_window() {
 	main_window_->resize(rx, ry, rw, rh);
 }
 
+void get_seed() {
+	Fl_Preferences security_settings(settings_, "Security");
+	// seed is uint32_t so use int to read and write from settings
+	int seed;
+	if(security_settings.get("Seed", seed, 0)) {
+		seed_ = seed;
+	} else {
+		seed_ = time(nullptr);
+	}
+	seed = seed_;
+	security_settings.set("Seed", seed);
+}
+
 // Tidy memory
 void tidy() {
 	// Tidy memory - this is not perfect
@@ -1113,6 +1128,9 @@ int main(int argc, char** argv)
 	if (!open_settings()) {
 		return 255;
 	}
+
+	// Prime encryption seed
+	get_seed();
 
 	// Create the ticker first of all
 	ticker_ = new ticker();

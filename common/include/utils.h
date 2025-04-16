@@ -118,6 +118,10 @@ using namespace std;
 	// get the directroy part of a a filename
 	string directory(string filename);
 	string terminal(string filename);
+	// Simple 8-bit hash
+	uchar hash(const char* src);
+	// "XOR" encrypt/decrypt - use seed and offset to define the key string
+	void xor_crypt(char* str, int len, uint32_t seed, uchar offset);
 
 	// template function to find the enclosing widget of class WIDGET
 	template <class WIDGET>
