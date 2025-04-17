@@ -6,18 +6,22 @@
 #include "wsjtx_handler.h"
 #include "fllog_emul.h"
 #include "password_input.h"
+#include "spec_data.h"
 
 #include <FL/Fl_Preferences.H>
 #include <FL/Fl_Check_Button.H>
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Group.H>
-#include <FL/Fl_RGB_Image.H>
 #include <FL/Fl_Int_Input.H>
+#include <FL/Fl_Output.H>
+#include <FL/Fl_RGB_Image.H>
 #include <FL/Fl_Tabs.H>
 
 extern Fl_Preferences* settings_;
 extern wsjtx_handler* wsjtx_handler_;
 extern fllog_emul* fllog_emul_;
+extern spec_data* spec_data_;
+extern uint32_t seed_;
 
 // Constructor
 web_dialog::web_dialog(int X, int Y, int W, int H, const char* label) :
@@ -39,9 +43,9 @@ web_dialog::web_dialog(int X, int Y, int W, int H, const char* label) :
 	, lotw_username_("")
 	, lotw_password_("")
 	, lotw_upload_qso_(false)
-	, qrz_enable_(false)
 	, qrz_username_("")
 	, qrz_password_("")
+	, qrz_api_enable_(false)
 	, grp_eqsl_(nullptr)
 	, grp_lotw_(nullptr)
 	, grp_qrz_(nullptr)
@@ -65,6 +69,7 @@ web_dialog::web_dialog(int X, int Y, int W, int H, const char* label) :
 	, email_password_("")
 {
 	image_widgets_.clear();
+	qrz_api_data_.clear();
 
 	do_creation(X, Y);
 }
@@ -100,6 +105,8 @@ void web_dialog::load_values() {
 	// eQSL User/Password
 	eqsl_settings.get("Enable", (int&)eqsl_enable_, false);
 	char * temp;
+	int sz_temp;
+	char* nu_temp;
 	eqsl_settings.get("User", temp, "");
 	eqsl_username_ = temp;
 	free(temp);
@@ -126,7 +133,6 @@ void web_dialog::load_values() {
 	lotw_settings.get("Upload per QSO", (int&)lotw_upload_qso_, false);
 
 	// QRZ.com User/Password
-	qrz_settings.get("Enable", (int&)qrz_enable_, false);
 	qrz_settings.get("User", temp, "");
 	qrz_username_ = temp;
 	free(temp);
@@ -134,6 +140,32 @@ void web_dialog::load_values() {
 	qrz_password_ = temp;
 	free(temp);
 	qrz_settings.get("Use XML Database", (int&)qrz_xml_merge_, false);
+	qrz_settings.get("Use API", (int&)qrz_api_enable_, false);
+	string name = spec_data_->enumeration_name("STATION_CALLSIGN", nullptr);
+	spec_dataset* calls = spec_data_->dataset(name);
+	Fl_Preferences api_settings(qrz_settings, "Logbooks");
+	uchar offset = hash8(api_settings.path());
+	for (auto it = calls->data.begin(); it != calls->data.end(); it++) {
+		string call = (*it).first;
+		de_slash(call);
+		Fl_Preferences call_settings(api_settings, call.c_str());
+		api_logbook_data* data = new api_logbook_data;
+		call_settings.get("Key Length", sz_temp, 128);
+		nu_temp = new char[sz_temp];
+		call_settings.get("Key", nu_temp, (void*)"", 0, &sz_temp);
+		string crypt = string(nu_temp, sz_temp);
+		string key = xor_crypt(crypt, seed_, offset);
+		delete[] nu_temp;
+		data->key = key;
+		call_settings.get("Last Log ID", data->last_logid, -1);
+		call_settings.get("Last Download", temp, "");
+		data->last_download = temp;
+		free(temp);
+		qrz_api_data_[it->first] = data;
+		int tint;
+		call_settings.get("In Use", tint, false);
+		data->used = tint;
+	}
 
 	// QSL message settings (for eQSL and card)
 	card_settings.get("QSL Enable", (int&)eqsl_use_qso_msg_, false);
@@ -427,22 +459,6 @@ void web_dialog::create_lotw(int rx, int ry, int rw, int rh) {
 
 // Craete QRZ.com group
 void web_dialog::create_qrz(int rx, int ry, int rw, int rh) {
-	// Group 3 QRZ.com widgets
-	const int GRP3 = ry + GAP;
-	const int R3_1 = GRP3 + GAP;
-	const int H3_1 = HBUTTON;
-	const int R3_2 = R3_1 + H3_1;
-	// main columns
-	const int C1 = rx + GAP;
-	const int W1 = HBUTTON; // square check button
-	const int C2 = C1 + W1 + GAP;
-	const int W2 = WSMEDIT;
-	const int C3 = C2 + W2 + GAP;
-	const int W3 = HBUTTON * 3 / 2;
-	const int C4 = C3 + W3 + GAP;
-	const int W4 = WSMEDIT;
-	const int C5 = C4 + W4 + GAP;
-	const int W5 = WSMEDIT;
 
 	// Overall group for tabs
 	Fl_Group* gp03 = new Fl_Group(rx, ry, rw, rh, "QRZ.com");
@@ -453,42 +469,134 @@ void web_dialog::create_qrz(int rx, int ry, int rw, int rh) {
 	gp3->box(FL_BORDER_BOX);
 	gp3->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 
+	int curr_x = rx + GAP;
+	int curr_y = ry + GAP;
+
+	// XML enable
+
+	Fl_Check_Button* bn3_2_1 = new Fl_Check_Button(curr_x, curr_y, WRADIO, HRADIO, "Use XML Database");
+	bn3_2_1->align(FL_ALIGN_RIGHT);
+	bn3_2_1->value(qrz_xml_merge_);
+	bn3_2_1->callback(cb_ch_enable, &qrz_xml_merge_);
+	bn3_2_1->tooltip("Always the QRZ XML database even if non-subscriber");
+
+	curr_x += WLLABEL + WRADIO;
+
+	grp_qrz_xml_ = new Fl_Group(curr_x, curr_y, rw + rx - curr_x - GAP, HBUTTON + GAP);
+	grp_qrz_xml_->box(FL_FLAT_BOX);
+
+	curr_y += GAP;
 
 	// Row 1 Col 4 - User entry field
-	intl_input* in3_1_4 = new intl_input(C4, R3_1, W4, H3_1, "User");
+	intl_input* in3_1_4 = new intl_input(curr_x, curr_y, WSMEDIT, HBUTTON, "User");
 	in3_1_4->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
 	in3_1_4->value(qrz_username_.c_str());
 	in3_1_4->callback(cb_value<intl_input, string>, &qrz_username_);
 	in3_1_4->when(FL_WHEN_CHANGED);
 	in3_1_4->tooltip("Enter user name for QRZ.com");
 
+	curr_x += WSMEDIT + GAP;
+
 	// Row 1 Col 5 - Password entry field
-	password_input* in3_1_5 = new password_input(C5, R3_1, W5, H3_1, "Password");
+	password_input* in3_1_5 = new password_input(curr_x, curr_y, WSMEDIT, HBUTTON, "Password");
 	in3_1_5->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
 	in3_1_5->value(qrz_password_.c_str());
 	in3_1_5->callback(cb_value<Fl_Input, string>, &qrz_password_);
 	in3_1_5->when(FL_WHEN_CHANGED);
 	in3_1_5->tooltip("Enter password for QRZ.com");
 
-	// Row 2 Col 4 - Always use XML database
-	Fl_Check_Button* bn3_2_1 = new Fl_Check_Button(C4, R3_2, WRADIO, HRADIO, "Use XML Database");
-	bn3_2_1->align(FL_ALIGN_RIGHT);
-	bn3_2_1->value(qrz_xml_merge_);
-	bn3_2_1->callback(cb_value<Fl_Check_Button, bool>, &qrz_xml_merge_);
-	bn3_2_1->tooltip("Always the QRZ XML database even if non-subscriber");
+	grp_qrz_xml_->end();
+
+	curr_x = rx + GAP;
+	curr_y += HBUTTON + GAP;
+
+	Fl_Check_Button* bn_qrz_api = new Fl_Check_Button(curr_x, curr_y, WRADIO, HRADIO, "API Enable");
+	bn_qrz_api->align(FL_ALIGN_RIGHT);
+	bn_qrz_api->value(qrz_api_enable_);
+	bn_qrz_api->callback(cb_ch_enable, &qrz_api_enable_);
+	bn_qrz_api->tooltip("Select if can upload/download using QRZ.com API");
+
+	curr_x += WLLABEL + WRADIO;
+	
+	grp_qrz_api_ = new Fl_Group(curr_x, curr_y, rw + rx - curr_x - GAP, HBUTTON * (qrz_api_data_.size() + 1));
+	grp_qrz_api_->box(FL_FLAT_BOX);
+
+	// Now the headers
+	const int WBOOK = WBUTTON;
+	const int WUSE = WRADIO;
+	const int WKEY = WSMEDIT;
+	const int WLASTID = WBUTTON;
+	const int WLASTDL = WSMEDIT;
+	const int XBOOK = curr_x;
+	const int XUSE = XBOOK + WBOOK;
+	const int XKEY = XUSE + WUSE + GAP;
+	const int XLASTID = XKEY + WKEY;
+	const int XLASTDL = XLASTID + WLASTID;
+
+	Fl_Box* b1 = new Fl_Box(XBOOK, curr_y, WBOOK, HBUTTON, "Book");
+	b1->align(FL_ALIGN_CENTER);
+	b1->box(FL_FLAT_BOX);
+
+	Fl_Box* b1a = new Fl_Box(XUSE, curr_y, WUSE, HBUTTON, "Used");
+	b1a->align(FL_ALIGN_CENTER);
+	b1a->box(FL_FLAT_BOX);
+	
+	Fl_Box* b2 = new Fl_Box(XKEY, curr_y, WKEY, HBUTTON, "Key");
+	b2->align(FL_ALIGN_CENTER);
+	b2->box(FL_FLAT_BOX);
+	
+	Fl_Box* b3 = new Fl_Box(XLASTID, curr_y, WLASTID, HBUTTON, "Last Log ID");
+	b3->align(FL_ALIGN_CENTER);
+	b3->box(FL_FLAT_BOX);
+	
+	Fl_Box* b4 = new Fl_Box(XLASTDL, curr_y, WLASTDL, HBUTTON, "Last Downloaded");
+	b4->align(FL_ALIGN_CENTER);
+	b4->box(FL_FLAT_BOX);
+	
+	curr_y += HBUTTON;
+	char temp[128];
+	for (auto it = qrz_api_data_.begin(); it != qrz_api_data_.end(); it ++) {
+		Fl_Output* op_book = new Fl_Output(XBOOK, curr_y, WBOOK, HBUTTON);
+		op_book->box(FL_FLAT_BOX);
+		op_book->color(FL_BACKGROUND_COLOR);
+		op_book->value(it->first.c_str());
+
+		Fl_Check_Button* bn_use = new Fl_Check_Button(XUSE, curr_y, WUSE, HBUTTON);
+		bn_use->value(it->second->used);
+		bn_use->callback(cb_ch_enable, &it->second->used);
+		bn_use->tooltip("Select to allow access for this book");
+
+		Fl_Group* grp_api = new Fl_Group(XKEY, curr_y, WKEY + WLASTID + WLASTDL, HBUTTON);
+		grp_api->box(FL_FLAT_BOX);
+
+		password_input* ip_key = new password_input(XKEY, curr_y, WKEY, HBUTTON);
+		ip_key->value(it->second->key.c_str());
+		ip_key->callback(cb_value<Fl_Input, string>, &it->second->key);
+		ip_key->tooltip("Enter the QRZ.com API key for logbook");
+
+		Fl_Int_Input* ip_lastid = new Fl_Int_Input(XLASTID, curr_y, WLASTID, HBUTTON);
+		snprintf(temp, sizeof(temp), "%d", it->second->last_logid);
+		ip_lastid->value(temp);
+		ip_lastid->callback(cb_value_int<Fl_Int_Input>, &it->second->last_logid);
+		ip_lastid->tooltip("Normally displays the LogID of the last record downloaded");
+
+		calendar_input* ip_lastdl = new calendar_input(XLASTDL, curr_y, WLASTDL, HBUTTON);
+		ip_lastdl->value(it->second->last_download.c_str());
+		ip_lastdl->callback(cb_value<intl_input, string>, &it->second->last_download);
+		ip_lastdl->tooltip("The date of the last download");
+
+		grp_api->end();
+		grp_api_books_[it->first] = grp_api;
+
+		curr_y += HBUTTON;
+	}
+
+	grp_qrz_api_->end();
 
 	// Create the list of widgets to be disabled when eQSL disabled
 	grp_qrz_ = gp3;
 
 	gp3->end();
-
-	// Row 1 Col 1 - QRZ Enable
-	Fl_Check_Button* bn3_1_1 = new Fl_Check_Button(C1, R3_1, W1, H3_1, "En");
-	bn3_1_1->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
-	bn3_1_1->value(qrz_enable_);
-	bn3_1_1->callback(cb_ch_enable, &qrz_enable_);
-	bn3_1_1->when(FL_WHEN_CHANGED);
-	bn3_1_1->tooltip("Enable QRZ.com access");
 
 	gp03->end();
 }
@@ -736,10 +844,23 @@ void web_dialog::save_values() {
 	lotw_settings.set("Last Accessed", lotw_last_got_.c_str());
 	lotw_settings.set("Upload per QSO", lotw_upload_qso_);
 	// QRZ.com Settings
-	qrz_settings.set("Enable", qrz_enable_);
 	qrz_settings.set("User", qrz_username_.c_str());
 	qrz_settings.set("Password", qrz_password_.c_str());
 	qrz_settings.set("Use XML Database", qrz_xml_merge_);
+	qrz_settings.set("Use API", (int)qrz_api_enable_);
+	Fl_Preferences api_settings(qrz_settings, "Logbooks");
+	uchar offset = hash8(api_settings.path());
+	for (auto it = qrz_api_data_.begin(); it != qrz_api_data_.end(); it++) {
+		string call = it->first;
+		de_slash(call);
+		Fl_Preferences call_settings(api_settings, call.c_str());
+		string encrypt = xor_crypt(it->second->key, seed_, offset);
+		call_settings.set("Key Length", (int)encrypt.length());
+		call_settings.set("Key", (void*)encrypt.c_str(), encrypt.length());
+		call_settings.set("Last Log ID", it->second->last_logid);
+		call_settings.set("Last Download", it->second->last_download.c_str());
+		call_settings.set("In Use", (int)it->second->used);
+	}
 
 	// QSL message settings (for eQSL and card)
 	card_settings.set("QSL Enable", eqsl_use_qso_msg_);
@@ -786,11 +907,22 @@ void web_dialog::enable_widgets() {
 		grp_lotw_->deactivate();
 	}
 	// Enable/disable QRZ.com widgets
-	if (qrz_enable_) {
-		grp_qrz_->activate();
+	if (qrz_xml_merge_) {
+		grp_qrz_xml_->activate();
+	} else {
+		grp_qrz_xml_->deactivate();
 	}
-	else {
-		grp_qrz_->deactivate();
+	if (qrz_api_enable_) {
+		grp_qrz_api_->activate();
+		for (auto it = qrz_api_data_.begin(); it != qrz_api_data_.end(); it++) {
+			if (it->second->used) {
+				grp_api_books_.at(it->first)->activate();
+			} else {
+				grp_api_books_.at(it->first)->deactivate();
+			}
+		}
+	} else {
+		grp_qrz_api_->deactivate();
 	}
 	// Enable/disable ClubLog widgets
 	if (club_enable_) {

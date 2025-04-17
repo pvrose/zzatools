@@ -7,6 +7,7 @@
 #include <string>
 #include <ctime>
 #include <set>
+#include <map>
 
 using namespace std;
 
@@ -61,6 +62,8 @@ class Fl_Group;
 		Fl_Group* grp_lotw_;
 		// Widgets for QRZ.com
 		Fl_Group* grp_qrz_;
+		Fl_Group* grp_qrz_xml_;
+		Fl_Group* grp_qrz_api_;
 		// Widgets for ClubLog
 		Fl_Group* grp_club_;
 		// Widgets for networking
@@ -73,6 +76,8 @@ class Fl_Group;
 		// 
 		Fl_Group* grp_wsjtx_;
 		Fl_Group* grp_fldigi_;
+
+		map<string, Fl_Group*> grp_api_books_;
 
 
 		// eQSL attributes
@@ -112,13 +117,21 @@ class Fl_Group;
 
 		// QRZ.com attributes
 
-		// enable
-		bool qrz_enable_;
 		// username/password
 		string qrz_username_;
 		string qrz_password_;
 		// Use XML database and merge
 		bool qrz_xml_merge_;
+		// Use API
+		bool qrz_api_enable_;
+		// Structure to hold API data per QRZ.com logbook		
+		struct api_logbook_data {
+			bool used;
+			string key;
+			int last_logid;
+			string last_download;
+		};
+		map<string, api_logbook_data*> qrz_api_data_;
 
 		// ClubLog attributes
 
