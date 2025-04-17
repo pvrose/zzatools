@@ -119,9 +119,10 @@ using namespace std;
 	string directory(string filename);
 	string terminal(string filename);
 	// Simple 8-bit hash
-	uchar hash(const char* src);
+	uchar hash8(const char* src);
 	// "XOR" encrypt/decrypt - use seed and offset to define the key string
 	void xor_crypt(char* str, int len, uint32_t seed, uchar offset);
+	string xor_crypt(string, uint32_t seed, uchar offset);
 
 	// template function to find the enclosing widget of class WIDGET
 	template <class WIDGET>

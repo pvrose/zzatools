@@ -815,10 +815,10 @@ string encode_base_64(string value) {
 			result += encode_base_64(out);
 			break;
 		}
-		// Pad the resulting string
-		while (result.length() % 4 != 0) {
-			result += '=';
-		}
+	}
+	// Pad the resulting string
+	while (result.length() % 4 != 0) {
+		result += '=';
 	}
 	return result;
 }
@@ -1049,7 +1049,7 @@ string terminal(string filename) {
 }
 
 // 8-bit hash - XOR all the characters in src string
-uchar hash(const char* src) {
+uchar hash8(const char* src) {
 	uchar result = '\x00';
 	// Hash in the next character and increment the pointer
 	while (*src != '\x00') result ^= *(src++);
@@ -1067,4 +1067,20 @@ void xor_crypt(char* src, int len, uint32_t seed, uchar offset) {
 		uchar key_byte = key() & 255;
 		*src ^= key_byte;
 	}
+}
+
+// String version
+string xor_crypt(string src, uint32_t seed, uchar offset) {
+	string result;
+	result.resize(src.length());
+	// Seed a pseudo-random number sequence
+	minstd_rand key(seed);
+	// Now offset into the sequence
+	key.discard(offset);
+	// Now use the sequence to en/decrypt the string
+	for (int ix = 0; ix < src.length(); ix++) {
+		uchar key_byte = key() & 255;
+		result[ix]  = src[ix] ^ key_byte;
+	}
+	return result;
 }

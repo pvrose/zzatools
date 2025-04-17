@@ -107,6 +107,7 @@ void web_dialog::load_values() {
 	char * temp;
 	int sz_temp;
 	char* nu_temp;
+	const unsigned long long u64_zero = 0ull; 
 	eqsl_settings.get("User", temp, "");
 	eqsl_username_ = temp;
 	free(temp);
@@ -157,7 +158,7 @@ void web_dialog::load_values() {
 		string key = xor_crypt(crypt, seed_, offset);
 		delete[] nu_temp;
 		data->key = key;
-		call_settings.get("Last Log ID", data->last_logid, -1);
+		call_settings.get("Last Log ID", (void*)&data->last_logid, (void*)&u64_zero, sizeof(uint64_t), sizeof(uint64_t));
 		call_settings.get("Last Download", temp, "");
 		data->last_download = temp;
 		free(temp);
@@ -575,9 +576,9 @@ void web_dialog::create_qrz(int rx, int ry, int rw, int rh) {
 		ip_key->tooltip("Enter the QRZ.com API key for logbook");
 
 		Fl_Int_Input* ip_lastid = new Fl_Int_Input(XLASTID, curr_y, WLASTID, HBUTTON);
-		snprintf(temp, sizeof(temp), "%d", it->second->last_logid);
+		snprintf(temp, sizeof(temp), "%llu", it->second->last_logid);
 		ip_lastid->value(temp);
-		ip_lastid->callback(cb_value_int<Fl_Int_Input>, &it->second->last_logid);
+		ip_lastid->callback(cb_value_ull<Fl_Int_Input>, &it->second->last_logid);
 		ip_lastid->tooltip("Normally displays the LogID of the last record downloaded");
 
 		calendar_input* ip_lastdl = new calendar_input(XLASTDL, curr_y, WLASTDL, HBUTTON);
@@ -857,7 +858,7 @@ void web_dialog::save_values() {
 		string encrypt = xor_crypt(it->second->key, seed_, offset);
 		call_settings.set("Key Length", (int)encrypt.length());
 		call_settings.set("Key", (void*)encrypt.c_str(), encrypt.length());
-		call_settings.set("Last Log ID", it->second->last_logid);
+		call_settings.set("Last Log ID", (void*)&it->second->last_logid, sizeof(uint64_t));
 		call_settings.set("Last Download", it->second->last_download.c_str());
 		call_settings.set("In Use", (int)it->second->used);
 	}

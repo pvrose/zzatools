@@ -113,6 +113,20 @@ extern bool DEBUG_ERRORS;
 		}
 		*target = i;
 	}
+	// Callback to get an ull/uint64_t value from a WIDGET widget that has char* value - returns 0 if first character is non-integer
+	template <class WIDGET>
+	static void cb_value_ull(Fl_Widget* w, void* v) {
+		const char* value = ((WIDGET*)w)->value();
+		unsigned long long* target = (unsigned long long*)v;
+		unsigned long long i;
+		try {
+			i = stoull(value);
+		}
+		catch (invalid_argument&) {
+			i = 0;
+		}
+		*target = i;
+	}
 	// Callback to get a float value from a widget that has char* - returns nan if not numeric
 	template <class WIDGET>
 	static void cb_value_float(Fl_Widget* w, void* v) {

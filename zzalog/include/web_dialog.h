@@ -128,7 +128,7 @@ class Fl_Group;
 		struct api_logbook_data {
 			bool used;
 			string key;
-			int last_logid;
+			unsigned long long last_logid;
 			string last_download;
 		};
 		map<string, api_logbook_data*> qrz_api_data_;
