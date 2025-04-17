@@ -593,6 +593,8 @@ bool import_data::download_data(import_data::update_mode_t server) {
 		status_->misc_status(ST_NOTE, "IMPORT: Downloading LotW");
 		result = lotw_handler_->download_lotw_log(&adif);
 		break;
+	case QRZCOM_UPDATE:
+		// 
 	default:
 		break;
 	}

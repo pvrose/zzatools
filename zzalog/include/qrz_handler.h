@@ -35,6 +35,10 @@ class Fl_Help_Dialog;
 		bool has_session();
 		// Open web-page using browser
 		void open_web_page(string callsign);
+		// Download update - for STATION_CALLSIGN == station
+		bool download_qsos(string station);
+		// Upload current QSL.
+		bool upload_qso(record* qso);
 
 
 	protected:

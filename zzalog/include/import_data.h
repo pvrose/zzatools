@@ -26,6 +26,7 @@ class book;
 			FILE_UPDATE,     // Book contains data to be merged from a file (i.e. check it exists)
 			EQSL_UPDATE,     // Book contains data downloaded from eQSL.cc
 			LOTW_UPDATE,     // Book contains data downloaded from arrl.org/lotw
+			QRZCOM_UPDATE,   // Book contains data downloaded from QRZ.com
 			DATAGRAM,        // Book contains data received from WSJT-X datagram
 			CLIPBOARD,       // Book is being imported from clipboard
 			SINGLE_ADIF,     // Import a single ADIF

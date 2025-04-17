@@ -170,7 +170,8 @@ extern eqsl_handler* eqsl_handler_;
 
 	// Log import operations
 	{ "&Import", 0, 0, 0, FL_SUBMENU },
-		{ "&File", 0, menu::cb_mi_imp_file, 0 },
+		{ "&File", 0, menu::cb_mi_imp_file, (void*)(long)import_data::FILE_IMPORT },
+		{ "File (Up&date QSOs)", 0, menu::cb_mi_imp_file, (void*)(long)import_data::FILE_UPDATE },
 		{ "Download e&QSL", 0, menu::cb_mi_download, (void*)(long)import_data::EQSL_UPDATE },
 		{ "Download &LotW", 0, menu::cb_mi_download, (void*)(long)import_data::LOTW_UPDATE, FL_MENU_DIVIDER },
 		{ "Clip&board", 0, menu::cb_mi_imp_clipb, nullptr },
@@ -950,9 +951,10 @@ void menu::cb_mi_imp_file(Fl_Widget* w, void* v) {
 	chooser->title("Select file name");
 	chooser->directory(directory);
 	chooser->filter("ADI files\t*.adi\nADX Files\t*.adx");
+	import_data::update_mode_t mode = (import_data::update_mode_t)(intptr_t)v;
 	if (chooser->show() == 0) {
 		filename = chooser->filename();
-		import_data_->load_data(filename, import_data::FILE_IMPORT);
+		import_data_->load_data(filename, mode);
 	}
 	delete chooser;
 	free(directory);
