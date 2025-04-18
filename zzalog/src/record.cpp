@@ -860,20 +860,17 @@ match_result_t record::match_records(record* record) {
 		}
 		else if (
 			// Location information matches
-			field_name == "CNTY" ||
 			field_name == "CONT" ||
-			field_name == "COUNTRY" ||
-			field_name == "CQZ" ||
 			field_name == "DXCC" ||
 			field_name == "GRIDSQUARE" ||
 			field_name == "IOTA" ||
-			field_name == "ITUZ" ||
-			field_name == "PFX" ||
-			field_name == "STATE") {
+			field_name == "PFX") {
 			location_match &= items_match(record, field_name);
 		}
 		else if (
 			// Ignore QSL information
+			field_name.substr(0,7) == "QRZLOG_" ||
+			field_name.substr(0,8) == "CLUBLOG_" ||
 			field_name == "EQSL_QSLRDATE" ||
 			field_name == "EQSL_QSL_RCVD" ||
 			field_name == "EQSL_QSLSDATE" ||
@@ -898,8 +895,9 @@ match_result_t record::match_records(record* record) {
 			}
 		}
 		else if (
-			// call MUST match - but not for SWL
-			field_name == "CALL") {
+			// CALL and STATION_CALLSIGN _MUST_ match - but not for SWL
+			field_name == "CALL" ||
+			field_name == "STATION_CALLSIGN") {
 			if (!(items_match(record, field_name))) {
 				nondate_mismatch_count++;
 				call_match = false;
@@ -993,16 +991,37 @@ bool record::items_match(record* record, string field_name) {
 		return true;
 	}
 	// Special cases
-	else if (field_name == "GRIDSQUARE" || field_name == "MY_GRIDSQUARE" || field_name == "FREQ" || field_name == "FREQ_RX") {
-		// Special case for GRIDSQUARE and FREQ
+	else if (field_name == "GRIDSQUARE" || field_name == "MY_GRIDSQUARE") {
+		// Special case for GRIDSQUARE
 		// they compare if they are equal for the length
 		// of the shorter.
 		int iLength = min(lhs.length(), rhs.length());
+		iLength = min(iLength, 4);
 		if (lhs.substr(0, iLength) == rhs.substr(0, iLength)) {
 			return true;
 		}
 		else {
 			return false;
+		}
+	}
+	else if (field_name == "CALL") {
+		// Ignore /M or /P
+		if (lhs.length() == rhs.length() - 2 && rhs[lhs.length()] == '/') {
+			return true;
+		} else if (rhs.length() == lhs.length() - 2 && lhs[rhs.length()] == '/') {
+			return true;
+		} else {
+			// Remove intermediate dashes in SWL calls
+			string lhs1;
+			for (int ix = 0; ix < lhs.length(); ix++) {
+				if (lhs[ix] != '-') lhs1 += lhs[ix];
+			}
+			string rhs1;
+			for (int ix = 0; ix < rhs.length(); ix++) {
+				if (rhs[ix] != '-') rhs1 += rhs[ix];
+			}
+			if (lhs1 == rhs1) return true;
+			else return false;
 		}
 	}
 	else if (field_name == "TIME_ON" || field_name == "TIME_OFF") {
@@ -1034,6 +1053,18 @@ bool record::items_match(record* record, string field_name) {
 			return false;
 		}
 
+	}
+	else if (field_name == "FREQ" || field_name == "FREQ_RX") {
+		// Frequency may be given to fewer decimal places
+		// Match if in same band
+		double f1, f2;
+		item(field_name, f1);
+		record->item(field_name, f2);
+		if (spec_data_->band_for_freq(f1) == spec_data_->band_for_freq(f2)) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 	return false;
 }

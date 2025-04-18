@@ -2461,6 +2461,9 @@ void spec_data::add_my_appdefs() {
 		"APP_ZZA_QTH_DESCR",
 		"APP_LOTW_NUMREC",
 		"APP_LOTW_LASTQSL",
+		"APP_QRZLOG_LOGID",
+		"APP_QRZLOG_QSLDATE",
+		"APP_QRZLOG_STATUS",
 		""
 	};
 	int i = 0;

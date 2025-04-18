@@ -240,7 +240,7 @@ void record_table::draw_cell(TableContext context, int R, int C, int X, int Y, i
 				}
 				break;
 			}
-			fl_draw(text.c_str(), X + 1, Y, W - 1, H, FL_ALIGN_LEFT);
+			fl_draw(text.c_str(), X + 1, Y, W - 1, H, FL_ALIGN_LEFT, nullptr, 0);
 
 			// BORDER
 			fl_color(FL_LIGHT1);
