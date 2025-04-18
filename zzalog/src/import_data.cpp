@@ -528,7 +528,9 @@ void import_data::convert_update(record* record) {
 				field_name.substr(0,3) == "MY_" ||
 				field_name == "QSL_RCVD" ||
 				field_name == "QSL_SENT" ||
-				field_name == "QSL_SENT_VIA") {
+				field_name == "QSL_SENT_VIA" ||
+				field_name == "NAME" ||
+				field_name == "QTH") {
 				// These are all fields that conflict with ZZALOG usage
 				ignore = true;
 			} else if (field_name == "BAND_RX" && 
@@ -537,6 +539,8 @@ void import_data::convert_update(record* record) {
 			} else if (field_name == "FREQ_RX" &&
 				record->item("FREQ_RX") == record->item("FREQ")) {
 				ignore = true;
+			} else if (field_name == "OPERATOR") {
+				update_name = "APP_ZZA_OPERATOR";
 			} else {
 				update_name = field_name;
 			}

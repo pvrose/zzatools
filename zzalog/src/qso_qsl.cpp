@@ -483,6 +483,7 @@ void qso_qsl::qsl_extract(extract_data::extract_mode_t server) {
 		extract_in_progress_ = false;
 		tabbed_forms_->activate_pane(OT_EXTRACT, true);
 		navigation_book_->selection(0);
+		via_code_ = "";
 		enable_widgets();
 	} else {
 		status_->misc_status(ST_ERROR, "Not ready to extract - finish operating");
@@ -544,10 +545,25 @@ void qso_qsl::qsl_print() {
 void qso_qsl::qsl_mark_done() {
 	if (extract_records_->size() || single_qso_) {
 		char message[200];
-		string date_name = "QSLSDATE";
-		string sent_name = "QSL_SENT";
-		string via_name = "QSL_SENT_VIA";
+		string date_name;
+		string sent_name;
+		string via_name;
 		string today = now(false, "%Y%m%d");
+		switch(extract_records_->use_mode()) {
+		case extract_data::extract_mode_t::CARD:
+			date_name = "QSLSDATE";
+			sent_name = "QSL_SENT";
+			via_name = "QSL_SENT_VIA";
+			break;
+		case extract_data::extract_mode_t::QRZCOM:
+			date_name = "QRZCOM_QSO_UPLOAD_DATE";
+			sent_name = "QRZCOM_QSO_UPLOAD_STATUS";
+			via_name = "QSL_SENT_VIA";
+			break;
+		default:
+			status_->misc_status(ST_WARNING, "EXTRACT: Action to mark uploaded on this is not supported");
+			return;
+		}
 		snprintf(message, 200, "EXTRACT: Setting %s to \"%s\", %s to \"Y\"", date_name.c_str(), today.c_str(), sent_name.c_str());
 		status_->misc_status(ST_NOTE, message);
 		if (single_qso_) {

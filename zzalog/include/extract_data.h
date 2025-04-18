@@ -24,6 +24,7 @@ using namespace std;
 			SEARCH,      // search results
 			EQSL,        // upload to eQSL.cc
 			LOTW,        // upload to arrl.org/LotW
+			QRZCOM,      // upload to qrz.com
 			CARD,        // printing cards.
 			EMAIL,       // Generate PNG file and send as attachment to e-mail
 			CLUBLOG,     // upload to ClubLog
