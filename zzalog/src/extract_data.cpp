@@ -449,7 +449,12 @@ void extract_data::extract_qsl(extract_data::extract_mode_t server) {
 		break;
 	case EMAIL:
 		reason = "Generate e-mail and PNG";
-		field_name = "QSL_SENT";    
+		field_name = "QSL_SENT";  
+		break;
+	case QRZCOM:
+		reason = "upload to QRZ.com";
+		field_name = "QRZCOM_QSO_UPLOAD_STATUS";
+		break;
 	default:
 		break;
 	}
@@ -494,7 +499,7 @@ void extract_data::extract_qsl(extract_data::extract_mode_t server) {
 	};
 	status_->misc_status(ST_NOTE, "EXTRACT: Removing incomplete QSOs");
 	criteria(new_criteria, server);
-	if (server == LOTW || server == CLUBLOG) {
+	if (server == LOTW || server == CLUBLOG || server == QRZCOM) {
 		// Only send those to which are QSOs !(SWL==Y)
 		new_criteria = {
 			/*search_cond_t condition*/ XC_FIELD,
@@ -599,7 +604,7 @@ void extract_data::extract_qsl(extract_data::extract_mode_t server) {
 		status_->misc_status(ST_NOTE, "EXTRACT: Extracting cards for sending by e-mail");
 		criteria(new_criteria, server);
 	}
-	if (server == CLUBLOG) {
+	if (server == CLUBLOG || server == QRZCOM) {
 		// Remove those previously marked as rejected CLUBLOG_QSO_UPLOAD_STATUS=N
 		new_criteria = {
 			/*search_cond_t condition*/ XC_FIELD,
@@ -613,7 +618,7 @@ void extract_data::extract_qsl(extract_data::extract_mode_t server) {
 			/*bool confirmed_lotw;*/ false,
 			/*bool confirmed_card;*/ false,
 			/*search_combi_t combi_mode;*/ XM_AND,
-			/*string field_name; */ "CLUBLOG_QSO_UPLOAD_STATUS",
+			/*string field_name; */ field_name,
 			/*string pattern;*/ "N",
 			/*string my_call*/ station
 		};

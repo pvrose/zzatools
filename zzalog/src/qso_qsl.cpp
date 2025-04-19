@@ -549,16 +549,19 @@ void qso_qsl::qsl_mark_done() {
 		string sent_name;
 		string via_name;
 		string today = now(false, "%Y%m%d");
+		bool overwrite = false;
 		switch(extract_records_->use_mode()) {
 		case extract_data::extract_mode_t::CARD:
 			date_name = "QSLSDATE";
 			sent_name = "QSL_SENT";
 			via_name = "QSL_SENT_VIA";
+			overwrite = true;
 			break;
 		case extract_data::extract_mode_t::QRZCOM:
 			date_name = "QRZCOM_QSO_UPLOAD_DATE";
 			sent_name = "QRZCOM_QSO_UPLOAD_STATUS";
 			via_name = "QSL_SENT_VIA";
+			overwrite = false;
 			break;
 		default:
 			status_->misc_status(ST_WARNING, "EXTRACT: Action to mark uploaded on this is not supported");
@@ -569,16 +572,18 @@ void qso_qsl::qsl_mark_done() {
 		if (single_qso_) {
 			qso_manager* mgr = ancestor_view<qso_manager>(this);
 			record* qso = mgr->data()->current_qso();
-			if (qso) {
+			if (qso && (overwrite || qso->item(sent_name) == "")) {
 				qso->item(date_name, today);
 				qso->item(sent_name, string("Y"));
 				qso->item(via_name, via_code_);
 			}
 		}
 		else for (auto it = extract_records_->begin(); it != extract_records_->end(); it++) {
-			(*it)->item(date_name, today);
-			(*it)->item(sent_name, string("Y"));
-			(*it)->item(via_name, via_code_);
+			if (overwrite || (*it)->item(sent_name) == "") {
+				(*it)->item(date_name, today);
+				(*it)->item(sent_name, string("Y"));
+				(*it)->item(via_name, via_code_);
+			}
 		}
 	}
 	else {
