@@ -517,7 +517,8 @@ void web_dialog::create_qrz(int rx, int ry, int rw, int rh) {
 	bn_qrz_api->callback(cb_ch_enable, &qrz_api_enable_);
 	bn_qrz_api->tooltip("Select if can upload/download using QRZ.com API");
 
-	curr_x += WLLABEL + WRADIO;
+	curr_x += WRADIO;
+	curr_y += HBUTTON;
 	
 	grp_qrz_api_ = new Fl_Group(curr_x, curr_y, rw + rx - curr_x - GAP, HBUTTON * (qrz_api_data_.size() + 1));
 	grp_qrz_api_->box(FL_FLAT_BOX);
@@ -525,8 +526,8 @@ void web_dialog::create_qrz(int rx, int ry, int rw, int rh) {
 	// Now the headers
 	const int WBOOK = WBUTTON;
 	const int WUSE = WRADIO;
-	const int WKEY = WSMEDIT;
-	const int WLASTID = WBUTTON;
+	const int WKEY = WEDIT;
+	const int WLASTID = WSMEDIT;
 	const int WLASTDL = WSMEDIT;
 	const int XBOOK = curr_x;
 	const int XUSE = XBOOK + WBOOK;
@@ -535,7 +536,7 @@ void web_dialog::create_qrz(int rx, int ry, int rw, int rh) {
 	const int XLASTDL = XLASTID + WLASTID;
 
 	Fl_Box* b1 = new Fl_Box(XBOOK, curr_y, WBOOK, HBUTTON, "Book");
-	b1->align(FL_ALIGN_CENTER);
+	b1->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
 	b1->box(FL_FLAT_BOX);
 
 	Fl_Box* b1a = new Fl_Box(XUSE, curr_y, WUSE, HBUTTON, "Used");
