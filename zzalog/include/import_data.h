@@ -64,6 +64,8 @@ class book;
 		void load_stream(stringstream& adif, update_mode_t mode);
 		// Load record
 		void load_record(record* qso, update_mode_t mode = SINGLE_ADIF);
+		// Last record loaded
+		record* last_record_loaded();
 
 	protected:
 		// Finish the update process
@@ -107,6 +109,8 @@ class book;
 		bool close_pending_;
 		// Last added record number
 		qso_num_t last_added_number_;
+		// Last record loaded
+		record* last_record_loaded_;
 
 	};
 #endif

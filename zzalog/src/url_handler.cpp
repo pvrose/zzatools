@@ -5,6 +5,10 @@
 
 extern bool DEBUG_CURL;
 extern status* status_;
+extern string PROGRAM_ID;
+extern string PROGRAM_VERSION;
+
+string USER_AGENT = PROGRAM_ID + '/' + PROGRAM_VERSION;
 
 // Make sure only one HTML transfer happens at once
 mutex url_handler::lock_;
@@ -78,7 +82,7 @@ bool url_handler::read_url(string url, ostream* os) {
 
 	/* some servers don't like requests that are made without a user-agent
 	field, so we provide one */
-	curl_easy_setopt(curl_, CURLOPT_USERAGENT, "libcurl-agent/1.0");
+	curl_easy_setopt(curl_, CURLOPT_USERAGENT, USER_AGENT.c_str());
 	// Error buffer
 	char* error_msg = new char[CURL_ERROR_SIZE];
 	curl_easy_setopt(curl_, CURLOPT_ERRORBUFFER, error_msg);
@@ -128,7 +132,9 @@ bool url_handler::post_url(string url, string resource, istream* req, ostream* r
 	/* now specify we want to POST data */
 	curl_easy_setopt(curl_, CURLOPT_POST, 1L);
 	// Request target
-	curl_easy_setopt(curl_, CURLOPT_REQUEST_TARGET, resource.c_str());
+	if (resource.length()) {
+		curl_easy_setopt(curl_, CURLOPT_REQUEST_TARGET, resource.c_str());
+	}
 	// Set the request handler
 	curl_easy_setopt(curl_, CURLOPT_READFUNCTION, cb_read);
 	// Provde the request data
@@ -145,7 +151,7 @@ bool url_handler::post_url(string url, string resource, istream* req, ostream* r
 	curl_easy_setopt(curl_, CURLOPT_TIMEOUT, 30L);
 	/* some servers don't like requests that are made without a user-agent
 	field, so we provide one */
-	curl_easy_setopt(curl_, CURLOPT_USERAGENT, "libcurl-agent/1.0");
+	curl_easy_setopt(curl_, CURLOPT_USERAGENT, USER_AGENT.c_str());
 	// Error buffer
 	char* error_msg = new char[CURL_ERROR_SIZE];
 	curl_easy_setopt(curl_, CURLOPT_ERRORBUFFER, error_msg);

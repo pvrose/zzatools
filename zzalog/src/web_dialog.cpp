@@ -7,6 +7,7 @@
 #include "fllog_emul.h"
 #include "password_input.h"
 #include "spec_data.h"
+#include "qrz_handler.h"
 
 #include <FL/Fl_Preferences.H>
 #include <FL/Fl_Check_Button.H>
@@ -150,7 +151,7 @@ void web_dialog::load_values() {
 		string call = (*it).first;
 		de_slash(call);
 		Fl_Preferences call_settings(api_settings, call.c_str());
-		api_logbook_data* data = new api_logbook_data;
+		qrz_api_data* data = new qrz_api_data;
 		call_settings.get("Key Length", sz_temp, 128);
 		nu_temp = new char[sz_temp];
 		call_settings.get("Key", nu_temp, (void*)"", 0, &sz_temp);

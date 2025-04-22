@@ -433,6 +433,24 @@ void record::item(string field, int& value) {
 	}
 }
 
+// get an item - as an unsigned long long, default 0
+void record::item(string field, unsigned long long& value) {
+	if (item_exists(field)) {
+		try {
+			// Return integer value
+			value = stoull(item(field));
+		}
+		catch (invalid_argument&) {
+			// Not a valid integer
+			value = 0;
+		}
+	}
+	else {
+		// Field not present
+		value = 0;
+	}
+}
+
 // get an item - as a double, default "not-a-number"
 void record::item(string field, double& value) {
 	if (item_exists(field)) {

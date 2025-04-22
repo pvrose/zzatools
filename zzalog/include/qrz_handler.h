@@ -13,6 +13,13 @@ class Fl_Help_Dialog;
 
 // This class provides the interface to the QRZ.com XML database look-up - it currently
 // is restricted to looking up details based on callsign. 
+// Structure to hold API data per QRZ.com logbook		
+struct qrz_api_data {
+	bool used;
+	string key;
+	unsigned long long last_logid;
+	string last_download;
+};
 
 
 	class qrz_handler
@@ -20,6 +27,13 @@ class Fl_Help_Dialog;
 	public:
 		qrz_handler();
 		~qrz_handler();
+
+		// Load the API information
+		void load_data();
+		// Update the API information
+		void store_data();
+
+		
 
 		// Open the QRZ.com session
 		bool open_session();
@@ -36,7 +50,7 @@ class Fl_Help_Dialog;
 		// Open web-page using browser
 		void open_web_page(string callsign);
 		// Download update - for STATION_CALLSIGN == station
-		bool download_qsos(string station);
+		bool download_qrzlog_log(stringstream* adif);
 		// Upload current QSL.
 		bool upload_qso(record* qso);
 
@@ -62,6 +76,12 @@ class Fl_Help_Dialog;
 		bool decode_session(xml_element* element);
 		// Decode Callsign element
 		bool decode_callsign(xml_element* element);
+		// Generate fetch request
+		bool fetch_request(qrz_api_data* api, ostream& request, int count);
+		// Decode fetch response
+		bool fetch_response(qrz_api_data* api, istream& response, int& count, stringstream& adif);
+		// Get last LogID downloaded
+		unsigned long long last_logid(qrz_api_data* api, string adif);
 
 		// The key returned from the login session attempt
 		string session_key_;
@@ -81,8 +101,12 @@ class Fl_Help_Dialog;
 		bool use_xml_database_;
 		// Non-subscriber
 		bool non_subscriber_;
+		// Use API
+		bool use_api_;
 		// Web dialog
 		Fl_Help_Dialog* web_dialog_;
+		// API data
+		map<string, qrz_api_data*> api_data_;
 
 	};
 

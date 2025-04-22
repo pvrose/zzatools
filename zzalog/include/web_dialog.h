@@ -13,6 +13,7 @@ using namespace std;
 
 class Fl_Widget;
 class Fl_Group;
+struct qrz_api_data;
 
 	// This class provides a dialog to let the user supply web addresses, usernames and passwords
 	class web_dialog :
@@ -124,14 +125,8 @@ class Fl_Group;
 		bool qrz_xml_merge_;
 		// Use API
 		bool qrz_api_enable_;
-		// Structure to hold API data per QRZ.com logbook		
-		struct api_logbook_data {
-			bool used;
-			string key;
-			unsigned long long last_logid;
-			string last_download;
-		};
-		map<string, api_logbook_data*> qrz_api_data_;
+
+		map<string, qrz_api_data*> qrz_api_data_;
 
 		// ClubLog attributes
 

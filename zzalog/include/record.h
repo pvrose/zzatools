@@ -72,6 +72,8 @@ using namespace std;
 		void item(string field, int& value);
 		// get an item - as a double
 		void item(string field, double& value);
+		// Get an item as an unsigned long long
+		void item(string field, unsigned long long& value);
 		// is the QSO valid - has a minimum subset of fields
 		bool is_valid();
 		// does the item exist - in the map and not an empty string

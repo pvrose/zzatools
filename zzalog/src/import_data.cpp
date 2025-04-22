@@ -6,6 +6,7 @@
 #include "eqsl_handler.h"
 #include "lotw_handler.h"
 #include "club_handler.h"
+#include "qrz_handler.h"
 #include "utils.h"
 #include "menu.h"
 #include "qso_manager.h"
@@ -37,6 +38,7 @@ extern tabbed_forms* tabbed_forms_;
 extern eqsl_handler* eqsl_handler_;
 extern lotw_handler* lotw_handler_;
 extern club_handler* club_handler_;
+extern qrz_handler* qrz_handler_;
 extern menu* menu_;
 extern qso_manager* qso_manager_;
 
@@ -620,7 +622,11 @@ bool import_data::download_data(import_data::update_mode_t server) {
 		result = lotw_handler_->download_lotw_log(&adif);
 		break;
 	case QRZCOM_UPDATE:
-		// 
+		// Fetch inbox from QRZ.com into local stream
+		update_mode_ = server;
+		status_->misc_status(ST_NOTE, "IMPORT: Downloading QRZ.com");
+		result = qrz_handler_->download_qrzlog_log(&adif);
+		break;
 	default:
 		break;
 	}
@@ -651,6 +657,7 @@ void import_data::load_stream(stringstream& adif, import_data::update_mode_t ser
 		// Process the LotW header 
 		process_lotw_header();
 	}
+	last_record_loaded_ = get_record(size() - 1, false);
 	// Switch the view to the import view and select first record
 	tabbed_forms_->activate_pane(OT_IMPORT, true);
 	// selection(record_number(0));
@@ -721,5 +728,10 @@ void import_data::process_lotw_header() {
 // Number of update files
 int import_data::number_update_files() {
 	return num_update_files_;
+}
+
+// Last record loaded
+record* import_data::last_record_loaded() {
+	return last_record_loaded_;
 }
 
