@@ -111,6 +111,10 @@ void record::item(string field, string value, bool formatted/* = false*/, bool d
 		status_->misc_status(ST_FATAL, message);
 		return;
 	}
+	// Otherwise if writing to "", erase the item
+	if (!value.length()) {
+		erase(field);
+	}
 	// Certain fields - always log in upper case
 	string upper_value;
 	if (field == "CALL" ||

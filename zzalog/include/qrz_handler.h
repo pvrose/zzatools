@@ -79,7 +79,7 @@ struct qrz_api_data {
 		// Generate fetch request
 		bool fetch_request(qrz_api_data* api, ostream& request, int count);
 		// Decode fetch response
-		bool fetch_response(qrz_api_data* api, istream& response, int& count, stringstream& adif);
+		bool fetch_response(qrz_api_data* api, istream& response, int& count, string& adif);
 		// Get last LogID downloaded
 		unsigned long long last_logid(qrz_api_data* api, string adif);
 

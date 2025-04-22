@@ -467,13 +467,16 @@ bool qrz_handler::download_qrzlog_log(stringstream* adif) {
 	int total = 0;
 	int request_count = 0;
 	bool ok = true;
+	// Create a 1M holding string (for debug)
+	string sadif;
+	sadif.reserve(1024 * 1024);
 	while(!done && ok) {
 		stringstream request;
 		stringstream response;
 			fetch_request(api_data_.at(callsign), request, MAX_PER_REQUEST);
 		url_handler_->post_url("https://logbook.qrz.com/api", "", &request, &response);
 		response.seekg(0, ios::beg);
-		if (!fetch_response(api_data_.at(callsign), response, count, *adif)) {
+		if (!fetch_response(api_data_.at(callsign), response, count, sadif)) {
 			status_->misc_status(ST_WARNING, "QRZ: Fetch data over API has failed");
 			ok = false;
 		} else {
@@ -489,6 +492,8 @@ bool qrz_handler::download_qrzlog_log(stringstream* adif) {
 					total, api_data_.at(callsign)->last_logid);
 				status_->misc_status(ST_LOG, msg);
 			}
+			// Copy the first page of records to the stream
+			*adif << sadif;
 		}
 	}
 	if (total > 0) {
@@ -515,7 +520,7 @@ bool qrz_handler::fetch_request(qrz_api_data* api, ostream& req, int count) {
 }
 
 // Decode the fetch response and copy to import_data
-bool qrz_handler::fetch_response(qrz_api_data* api, istream& resp, int& count, stringstream& adif) {
+bool qrz_handler::fetch_response(qrz_api_data* api, istream& resp, int& count, string& adif) {
 	bool ok = true;
 	char msg[128];
 	bool done = false;
@@ -563,13 +568,13 @@ bool qrz_handler::fetch_response(qrz_api_data* api, istream& resp, int& count, s
 			state = ADIF;
 			got_adif = true;
 			if (len > 5) {
-				adif << data.substr(5);
+				adif += data.substr(5);
 			}
 		} else if (state == ADIF && len > 3 && data.substr(0,3) == "lt;") {
 			// esacped '<'
-			adif << '<';
+			adif += '<';
 			if (len > 3) {
-				adif << data.substr(3);
+				adif += data.substr(3);
 			}
 			if (len > 20 && data.substr(3, 17) == "app_qrzlog_logid:") {
 				// Special processing - required after next '>'
@@ -584,17 +589,17 @@ bool qrz_handler::fetch_response(qrz_api_data* api, istream& resp, int& count, s
 				is_logid = false;
 				count_records++;
 			}
-			adif << '>';
+			adif += '>';
 			if (len > 3) {
-				adif << data.substr(3);
+				adif += data.substr(3);
 			}
 		} else if (state == ADIF) {
 			// Copy ampersand and data
-			adif << '&';
-			adif << data;
+			adif += '&';
+			adif += data;
 		} else if (eod) {
 			// The ADIF will tail off
-			if (state == ADIF) adif << data;
+			if (state == ADIF) adif += data;
 		} else {
 			snprintf(msg, sizeof(msg), "QRZ: Unexpected '&' followed by %s", data);
 			status_->misc_status(ST_ERROR, msg);

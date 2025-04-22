@@ -188,18 +188,64 @@ void import_data::update_book() {
 			// There may be a slight discrepancy in time so check 2 records either side of this position  
 			// Any more than this is presented to the user to search for possible match
 			// Start at previous record or beginning of the book
-			int tries[] = { 0, -1, -2, 1, 2};
-			for (int ix = 0;
-				// Stop at next record, possible match or match found or end of book 
-				ix < 5 && !update_in_progress_ && !found_match;
+
+			// Start looking for an exact match only from 2 before until no longer overlap
+			bool overlap = false;
+			for (int ix = -2;
+				(ix < 2 || overlap) && !found_match;
 				ix++) {
-				int test_record = offset + tries[ix];
+				int test_record = offset + ix;
 				// If the test record is outwith the book skip the check
 				if (test_record < 0 || test_record >= book_->size()) continue;
 				// Get potential match QSO
-				record* record = book_->get_record(test_record, false);
+				record* test_qso = book_->get_record(test_record, false);
 				// Compare QSO records - Import record should have fewer fields
-				match_result_t match_result = import_record->match_records(record);
+				match_result_t match_result = import_record->match_records(test_qso);
+				switch(match_result) {
+				case MT_EXACT:
+				case MT_LOC_MISMATCH:
+					found_match = true;
+					had_swl_match = false;
+					// merge_records the matching record from the import record and delete the import record
+					if (test_qso->merge_records(import_record, update_mode_ == LOTW_UPDATE)) {
+						snprintf(message, 256, "IMPORT: Updated record. %s %s %s %s %s",
+							test_qso->item("QSO_DATE").c_str(), test_qso->item("TIME_ON").c_str(),
+							test_qso->item("CALL").c_str(),
+							test_qso->item("BAND").c_str(), test_qso->item("MODE").c_str());
+						status_->misc_status(ST_LOG, message);
+						number_modified_++;
+						if (test_qso->item("CLUBLOG_QSO_UPLOAD_STATUS") == "M") {
+							number_clublog_++;
+						}
+					}
+					number_matched_++;
+					// For eQSL.cc request the eQSL e-card. These are queued not to overwhelm eQSL.cc
+					if (update_mode_ == EQSL_UPDATE) {
+						eqsl_handler_->enqueue_request(test_record);
+					}
+					// Accepted - discard this record
+					discard_update(false);
+					break;
+				case MT_OVERLAP:
+					overlap = true;
+					break;
+				default:
+					break;
+				}
+			}
+			// Now look for near misses.
+			overlap = false;
+			for (int ix = -2;
+				// Stop at next record, possible match or match found or end of book 
+				(ix < 5 || overlap) && !update_in_progress_ && !found_match;
+				ix++) {
+				int test_record = offset + ix;
+				// If the test record is outwith the book skip the check
+				if (test_record < 0 || test_record >= book_->size()) continue;
+				// Get potential match QSO
+				record* test_qso = book_->get_record(test_record, false);
+				// Compare QSO records - Import record should have fewer fields
+				match_result_t match_result = import_record->match_records(test_qso);
 				// LotW returns countries as listed in the ADIF spec,
 				// whereas parsing has used DxAtlas names so accept difference for LotW 
 				// but change to a possible match for any other source
@@ -212,31 +258,6 @@ void import_data::update_book() {
 				switch (match_result) {
 					// Match exactly - may have additional fields in update so update log record from update record
 					// Location mismatch for LoTW and everything else OK
-				case MT_EXACT:
-				case MT_LOC_MISMATCH:
-					found_match = true;
-					// MT_2XSWL_MATCH can be reported as MT_EXACT
-					had_swl_match = false;
-					// merge_records the matching record from the import record and delete the import record
-					if (record->merge_records(import_record, update_mode_ == LOTW_UPDATE)) {
-						snprintf(message, 256, "IMPORT: Updated record. %s %s %s %s %s",
-							record->item("QSO_DATE").c_str(), record->item("TIME_ON").c_str(),
-							record->item("CALL").c_str(),
-							record->item("BAND").c_str(), record->item("MODE").c_str());
-						status_->misc_status(ST_LOG, message);
-						number_modified_++;
-						if (record->item("CLUBLOG_QSO_UPLOAD_STATUS") == "M") {
-							number_clublog_++;
-						}
-					}
-					number_matched_++;
-					// For eQSL.cc request the eQSL e-card. These are queued not to overwhelm eQSL.cc
-					if (update_mode_ == EQSL_UPDATE) {
-						eqsl_handler_->enqueue_request(test_record);
-					}
-					// Accepted - discard this record
-					discard_update(false);
-					break;
 					// 2-way SWL match - ignore it
 				case MT_2XSWL_MATCH:
 					found_match = true;
@@ -258,7 +279,7 @@ void import_data::update_book() {
 					// can update without query and delete record
 				case MT_PROBABLE:
 					found_match = true;
-					if (record->merge_records(import_record, update_mode_ == LOTW_UPDATE)) {
+					if (test_qso->merge_records(import_record, update_mode_ == LOTW_UPDATE)) {
 						number_modified_++;
 					}
 					number_matched_++;
@@ -291,6 +312,9 @@ void import_data::update_book() {
 						found_match = true;
 						break;
 					}
+					break;
+				case MT_OVERLAP:
+					overlap = true;
 					break;
 				default:
 					break;
