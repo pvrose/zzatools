@@ -194,6 +194,7 @@ void import_data::update_book() {
 			for (int ix = -2;
 				(ix < 2 || overlap) && !found_match;
 				ix++) {
+				overlap = false;
 				int test_record = offset + ix;
 				// If the test record is outwith the book skip the check
 				if (test_record < 0 || test_record >= book_->size()) continue;
@@ -239,6 +240,7 @@ void import_data::update_book() {
 				// Stop at next record, possible match or match found or end of book 
 				(ix < 5 || overlap) && !update_in_progress_ && !found_match;
 				ix++) {
+				overlap = false;
 				int test_record = offset + ix;
 				// If the test record is outwith the book skip the check
 				if (test_record < 0 || test_record >= book_->size()) continue;

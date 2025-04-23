@@ -114,6 +114,7 @@ void record::item(string field, string value, bool formatted/* = false*/, bool d
 	// Otherwise if writing to "", erase the item
 	if (!value.length()) {
 		erase(field);
+		return;
 	}
 	// Certain fields - always log in upper case
 	string upper_value;

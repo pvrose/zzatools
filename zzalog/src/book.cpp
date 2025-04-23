@@ -729,6 +729,9 @@ item_num_t book::get_insert_point(record* record) {
 void book::insert_record_at(item_num_t pos_record, record* record) {
 	// get the iterator to the insert position
 	insert(begin() + pos_record, record);
+	if (!loading()) {
+		add_dirty_record(record);
+	}
 	if (book_type_ == OT_MAIN) {
 		// Update summary lookups
 		if (record->item("QSO_COMPLETE") == "" || record->item("QSO_COMPLETE") == "Y") {
