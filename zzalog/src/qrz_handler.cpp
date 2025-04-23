@@ -461,7 +461,7 @@ bool qrz_handler::download_qrzlog_log(stringstream* adif) {
 		return false;
 	}
 	bool done = false;
-	const int MAX_PER_REQUEST = 200;
+	const int MAX_PER_REQUEST = 250;
 	const int REQUESTS = 1;
 	int count = 0;
 	int total = 0;
@@ -527,6 +527,7 @@ bool qrz_handler::fetch_response(qrz_api_data* api, istream& resp, int& count, s
 	bool got_count = false;
 	bool got_result = false;
 	bool got_adif = false;
+	bool failed = false;
 	enum { RESULT, COUNT, ADIF } state;
 	bool is_logid = false;
 	int count_logid = 0;
@@ -556,7 +557,11 @@ bool qrz_handler::fetch_response(qrz_api_data* api, istream& resp, int& count, s
 		if (len > 7 && data.substr(0, 7) == "RESULT=") {
 			state = RESULT;
 			got_result = true;
-			if (data.substr(7) != "OK") {
+			if (data.substr(7) == "FAIL") {
+				status_->misc_status(ST_WARNING, "QRZ: Download failed - probably no data available");
+				failed = true;
+			}
+			else if (data.substr(7) != "OK") {
 				snprintf(msg, sizeof(msg), "QRZ: Invalid - %s", data.c_str());
 				status_->misc_status(ST_ERROR, msg);
 			}
@@ -615,7 +620,7 @@ bool qrz_handler::fetch_response(qrz_api_data* api, istream& resp, int& count, s
 				status_->misc_status(ST_ERROR, "QRZ: EOF reached with no RESULT=");
 			if (!got_count) 
 				status_->misc_status(ST_ERROR, "QRZ: EOF reached with no COUNT=");
-			if (!got_adif) 
+			if (!got_adif && !failed) 
 				status_->misc_status(ST_ERROR, "QRZ: EOF reached with no ADIF=");
 		}
 		if (ok) api->last_logid = last_logid;

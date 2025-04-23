@@ -479,12 +479,16 @@ void import_data::finish_update(bool merged /*= true*/) {
 
 // Where an update has come from a QSL server, some ADIF fields are renamed to the viewpoiint of this 
 // log not the server
-void import_data::convert_update(record* record) {
+void import_data::convert_update(record* qso) {
 	// For each field in the record
-	for (auto it = record->begin(); it != record->end(); it++) {
-		string field_name = it->first;
+	// Get the list of fields because we may end up erasing some
+	set<string> field_names;
+	for (auto it : *qso) {
+		field_names.insert(it.first);
+	}
+	for (string field_name : field_names) {
 		string update_name;
-		string value = it->second;
+		string value = qso->item(field_name);
 		bool ignore = false;
 		// Sometimes need to compare different fields - RST_SENT vs RST_RCVD
 		// To avoid the name being switched back, a '!' is prepended to the field name in some cases
@@ -562,13 +566,15 @@ void import_data::convert_update(record* record) {
 				// These are all fields that conflict with ZZALOG usage
 				ignore = true;
 			} else if (field_name == "BAND_RX" && 
-				record->item("BAND_RX") == record->item("BAND")) {
+				qso->item("BAND_RX") == qso->item("BAND")) {
 				ignore = true;
 			} else if (field_name == "FREQ_RX" &&
-				record->item("FREQ_RX") == record->item("FREQ")) {
+				qso->item("FREQ_RX") == qso->item("FREQ")) {
 				ignore = true;
 			} else if (field_name == "OPERATOR") {
 				update_name = "APP_ZZA_OPERATOR";
+			} else if (field_name == "QSL_VIA") {
+				update_name = "APP_ZZA_QSL_ROUTE";
 			} else {
 				update_name = field_name;
 			}
@@ -578,12 +584,12 @@ void import_data::convert_update(record* record) {
 			break;
 		}
 		if (ignore) {
-			record->item(field_name, string(""));
+			qso->item(field_name, string(""));
 		}
 		else {
 			// If field name changed move from one to the other
 			if (update_name != field_name) {
-				record->change_field_name(field_name, update_name);
+				qso->change_field_name(field_name, update_name);
 			}
 		}
 	}
@@ -593,26 +599,26 @@ void import_data::convert_update(record* record) {
 		set<string> erasees;
 		erasees.clear();
 		// For each field in the record
-		for (auto it = record->begin(); it != record->end(); it++) {
+		for (auto it = qso->begin(); it != qso->end(); it++) {
 			string field_name = it->first;
 			string value = it->second;
 			// If the field name starts with a bang
 			if (field_name[0] == '!') {
 				// Change it back to without
-				record->change_field_name(field_name, field_name.substr(1));
+				qso->change_field_name(field_name, field_name.substr(1));
 				erasees.insert(field_name);
 			}
 		}
 		// Remove all the fields starting with a bang
 		for (auto it = erasees.begin(); it != erasees.end(); it++) {
-			record->erase(*it);
+			qso->erase(*it);
 		}
 		// Add EQSL_QSLRDATE - date eQSL received and the eQSL timestamp
 		string qsl_rdate = now(false, "%Y%m%d");
-		record->item("EQSL_QSLRDATE", qsl_rdate);
+		qso->item("EQSL_QSLRDATE", qsl_rdate);
 
 		// Delete QSLMSG
-		record->item("QSLMSG", string(""));
+		qso->item("QSLMSG", string(""));
 	}
 }
 
