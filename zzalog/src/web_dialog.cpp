@@ -143,6 +143,7 @@ void web_dialog::load_values() {
 	free(temp);
 	qrz_settings.get("Use XML Database", (int&)qrz_xml_merge_, false);
 	qrz_settings.get("Use API", (int&)qrz_api_enable_, false);
+	qrz_settings.get("Upload per QSO", (int&)qrz_upload_qso_, false);
 	string name = spec_data_->enumeration_name("STATION_CALLSIGN", nullptr);
 	spec_dataset* calls = spec_data_->dataset(name);
 	Fl_Preferences api_settings(qrz_settings, "Logbooks");
@@ -518,10 +519,9 @@ void web_dialog::create_qrz(int rx, int ry, int rw, int rh) {
 	bn_qrz_api->callback(cb_ch_enable, &qrz_api_enable_);
 	bn_qrz_api->tooltip("Select if can upload/download using QRZ.com API");
 
-	curr_x += WRADIO;
 	curr_y += HBUTTON;
 	
-	grp_qrz_api_ = new Fl_Group(curr_x, curr_y, rw + rx - curr_x - GAP, HBUTTON * (qrz_api_data_.size() + 1));
+	grp_qrz_api_ = new Fl_Group(curr_x, curr_y, rw + rx - curr_x - GAP, HBUTTON * (qrz_api_data_.size() + 2) + GAP);
 	grp_qrz_api_->box(FL_FLAT_BOX);
 
 	// Now the headers
@@ -530,12 +530,21 @@ void web_dialog::create_qrz(int rx, int ry, int rw, int rh) {
 	const int WKEY = WEDIT;
 	const int WLASTID = WSMEDIT;
 	const int WLASTDL = WSMEDIT;
-	const int XBOOK = curr_x;
+	const int XBOOK = curr_x + WRADIO;
 	const int XUSE = XBOOK + WBOOK;
 	const int XKEY = XUSE + WUSE + GAP;
 	const int XLASTID = XKEY + WKEY;
 	const int XLASTDL = XLASTID + WLASTID;
 
+	Fl_Check_Button* bn_qrz_upload = new Fl_Check_Button(curr_x, curr_y, WRADIO, HRADIO, "Update each QSO");
+	bn_qrz_upload->align(FL_ALIGN_RIGHT);
+	bn_qrz_upload->value(qrz_upload_qso_);
+	bn_qrz_upload->callback(cb_value < Fl_Check_Button, bool>, &qrz_upload_qso_);
+	bn_qrz_upload->when(FL_WHEN_CHANGED);
+	bn_qrz_upload->tooltip("Upload each QSO as it is logged");
+
+	curr_x += WRADIO;
+	curr_y += HRADIO;
 	Fl_Box* b1 = new Fl_Box(XBOOK, curr_y, WBOOK, HBUTTON, "Book");
 	b1->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
 	b1->box(FL_FLAT_BOX);
@@ -851,6 +860,7 @@ void web_dialog::save_values() {
 	qrz_settings.set("Password", qrz_password_.c_str());
 	qrz_settings.set("Use XML Database", qrz_xml_merge_);
 	qrz_settings.set("Use API", (int)qrz_api_enable_);
+	qrz_settings.set("Upload per QSO", qrz_upload_qso_);
 	Fl_Preferences api_settings(qrz_settings, "Logbooks");
 	uchar offset = hash8(api_settings.path());
 	for (auto it = qrz_api_data_.begin(); it != qrz_api_data_.end(); it++) {

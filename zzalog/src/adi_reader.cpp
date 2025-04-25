@@ -176,11 +176,11 @@ istream& adi_reader::load_record(record* in_record, istream& in, load_result_t& 
 							if (field.substr(0, 8) != "APP_ZZA_" && !in_record->is_header()) {
 								if (field == "APP_EQSL_SWL") {
 									field = "SWL";
+									// Also don't ignore APP_QRZLOG_LOGID as we need these to progress
+									// QRZ.com downloads - ignore them in import_data::convert_update
+								} else if (field.substr(0,11) != "APP_QRZLOG_") {
+									validity = IGNORED_APP;
 								}
-							// Also don't ignore APP_QRZLOG_ as we need these to progress
-							// QRZ.log downloads - ignore them in import_data::convert_update
-							} else if (field.substr(0,11) != "APP_QRZLOG_") {
-								validity = IGNORED_APP;
 							}
 						}
 						// If the data type is not valid then the field isn't

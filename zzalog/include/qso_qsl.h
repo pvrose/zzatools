@@ -36,6 +36,7 @@ public:
     void qsl_cancel();
     void qsl_generate_png();
     void qsl_send_email();
+    void qsl_save();
     // Single QSO versions 
     void qsl_1_upload(extract_data::extract_mode_t server);
     void qsl_1_generate_png();
@@ -78,6 +79,7 @@ protected:
     bool auto_eqsl_;
     bool auto_lotw_;
     bool auto_club_;
+    bool auto_qrz_;
 
     // Outstanding eQSL downloads
     int os_eqsl_dnld_;
@@ -95,6 +97,7 @@ protected:
     Fl_Check_Button* bn_auto_eqsl_;
     Fl_Check_Button* bn_auto_lotw_;
     Fl_Check_Button* bn_auto_club_;
+    Fl_Check_Button* bn_auto_qrz_;
     Fl_Button* bn_down_eqsl_;
     Fl_Button* bn_down_lotw_;
     Fl_Button* bn_extr_eqsl_;
@@ -105,6 +108,11 @@ protected:
     Fl_Button* bn_upld_eqsl_;
     Fl_Button* bn_upld_lotw_;
     Fl_Button* bn_upld_club_;
+    Fl_Button* bn_down_qrz_;
+    Fl_Button* bn_extr_qrz_;
+    Fl_Button* bn_upld_qrz_;
+    Fl_Button* bn_save_qrz_;
+    Fl_Button* bn_qrz_done_;
     Fl_Button* bn_print_;
     Fl_Button* bn_png_;
     Fl_Button* bn_card_done_;

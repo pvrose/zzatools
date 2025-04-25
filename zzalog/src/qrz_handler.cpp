@@ -11,6 +11,7 @@
 #include "import_data.h"
 #include "qso_manager.h"
 #include "adi_reader.h"
+#include "adi_writer.h"
 
 #include <sstream>
 #include <iostream>
@@ -34,6 +35,8 @@ extern string PROGRAM_VERSION;
 extern uint32_t seed_;
 extern import_data* import_data_;
 extern qso_manager* qso_manager_;
+extern book* book_;
+extern bool DEBUG_THREADS;
 
 // Constructor
 qrz_handler::qrz_handler() :
@@ -44,6 +47,11 @@ qrz_handler::qrz_handler() :
 	, qrz_version_("")
 	, merge_done_(false)
 {
+
+	run_threads_ = true;
+	if (DEBUG_THREADS) printf("QRZ MAIN: Starting thread\n");
+	th_upload_ = new thread(thread_run, this);
+
 	// Got no log-in details - raise a warning for now.
 	if (!user_details()) {
 		status_->misc_status(ST_WARNING, "QRZ: login details have not been established yet. Do so before first use");
@@ -52,12 +60,16 @@ qrz_handler::qrz_handler() :
 		url_handler_ = new url_handler();
 	}
 	web_dialog_ = new Fl_Help_Dialog;
-	load_data();
 	data_.clear();
 }
 
 // Destructor
 qrz_handler::~qrz_handler() {
+	// Close the upload thread
+	run_threads_ = false;
+	th_upload_->join();
+	delete th_upload_;
+	// Delete dynamic data
 	delete qrz_info_;
 	data_.clear();
 }
@@ -403,6 +415,8 @@ void qrz_handler::load_data() {
 	unsigned long long uultemp; // For uint64 (as binary)
 	qrz_settings.get("Use API", itemp, false);
 	use_api_ = itemp;
+	qrz_settings.get("Upload per QSO", itemp, false);
+	upload_qso_ = itemp;
 	Fl_Preferences api_settings(qrz_settings, "Logbooks");
 	uchar offset = hash8(api_settings.path());
 	int num_groups = api_settings.groups();
@@ -448,6 +462,7 @@ void qrz_handler::store_data() {
 // Request download for callsign
 bool qrz_handler::download_qrzlog_log(stringstream* adif) {
 	char msg[128];
+	load_data();
 	if (!use_api_) {
 		strcpy(msg, "QRZ: The API interface is not-supported");
 		status_->misc_status(ST_WARNING, msg);
@@ -473,7 +488,7 @@ bool qrz_handler::download_qrzlog_log(stringstream* adif) {
 	while(!done && ok) {
 		stringstream request;
 		stringstream response;
-			fetch_request(api_data_.at(callsign), request, MAX_PER_REQUEST);
+		fetch_request(api_data_.at(callsign), request, MAX_PER_REQUEST);
 		url_handler_->post_url("https://logbook.qrz.com/api", "", &request, &response);
 		response.seekg(0, ios::beg);
 		if (!fetch_response(api_data_.at(callsign), response, count, sadif)) {
@@ -645,4 +660,199 @@ unsigned long long qrz_handler::last_logid(qrz_api_data* api, string adif) {
 	}
 	delete temp;
 	return max_logid;
+}
+
+bool qrz_handler::upload_single_qso(qso_num_t qso_number) {
+	char msg[128];
+	load_data();
+	// Check whether we can upload if so if we need to
+	if (!use_api_) {
+		strcpy(msg, "QRZ: The API interface is not-supported");
+		status_->misc_status(ST_WARNING, msg);
+		return false;
+	}
+	if (!upload_qso_) {
+		strcpy(msg, "QRZ: Uploading per QSO is disabled");
+		status_->misc_status(ST_WARNING, msg);
+		return false;
+	}
+	record* qso = book_->get_record(qso_number, false);
+	string sent_status = qso->item("QRZCOM_QSO_UPLOAD_STATUS");
+	if (sent_status == "Y") {
+		strcpy(msg, "QRZ: Already uploaded this QSO - not uploading");
+		status_->misc_status(ST_WARNING, msg);
+		return false;
+	}
+	if (sent_status == "N") {
+		strcpy(msg, "QRZ: QSO marked not for update to QRZ.com - not uploading");
+		status_->misc_status(ST_NOTE, msg);
+		return false;
+	}
+	string callsign = qso->item("STATION_CALLSIGN");
+	if (api_data_.find(callsign) == api_data_.end() ||
+		!api_data_.at(callsign)->used) {
+		snprintf(msg, sizeof(msg), "QRZ: No logbook exists for call %s", callsign.c_str());
+		status_->misc_status(ST_WARNING, msg);
+		return false;
+	}
+	book_->enable_save(false, "Uploading to eQSL");
+	// Now send to upload thread to process
+	upload_lock_.lock();
+	if (DEBUG_THREADS) printf("EQSL MAIN: Enqueueing eQSL request %s\n", qso->item("CALL").c_str());
+	upload_queue_.push(qso);
+	upload_lock_.unlock();
+	return true;
+}
+
+// Upload thread - sit in a loop waiting for upload requests
+void qrz_handler::thread_run(qrz_handler* that) {
+	if (DEBUG_THREADS) printf("QRZ THREAD: Thread started\n");
+	while (that->run_threads_) {
+		// Wait until qso placed on interface
+		while (that->run_threads_ && that->upload_queue_.empty()) {
+			this_thread::sleep_for(chrono::milliseconds(1000));
+		}
+		// Process it
+		that->upload_lock_.lock();
+		if (!that->upload_queue_.empty()) {
+			record* qso = that->upload_queue_.front();
+			that->upload_queue_.pop();
+			if (DEBUG_THREADS) printf("QRZ THREAD: Received request %s\n", qso->item("CALL").c_str());
+			that->upload_lock_.unlock();
+			that->th_upload_qso(qso);
+		}
+		else {
+			that->upload_lock_.unlock();
+		}
+		this_thread::yield();
+	}
+}
+
+// Upload a single QSO in th ethead
+void qrz_handler::th_upload_qso(record* qso) {
+	stringstream request;
+	stringstream response;
+	string callsign = qso->item("STATION_CALLSIGN");
+	qrz_api_data* api_data = api_data_.at(callsign);
+	string fail_message;
+	insert_request(api_data, request, qso);
+	url_handler_->post_url("https://logbook.qrz.com/api", "", &request, &response);
+	response.seekg(0, ios::beg);
+	upload_resp_t* resp = new upload_resp_t;
+	resp->success = insert_response(api_data, response, resp->message, resp->logid);
+	resp->qso = qso;
+	// Send response back to 
+	upload_resp_ = resp;
+	if (DEBUG_THREADS) printf("QRZ THREAD: Calling thread callback\n");
+	Fl::awake(cb_upload_done, (void*)this);
+	this_thread::yield();
+}
+
+// Upload done: wrapper
+void qrz_handler::cb_upload_done(void* v) {
+	if (DEBUG_THREADS) printf("QRZ MAIN: Entered thread callback handler\n");
+	qrz_handler* that = (qrz_handler*)v;
+	that->upload_done(that->upload_resp_);
+}
+
+// Upload done - main functionality
+void qrz_handler::upload_done(upload_resp_t* resp) {
+	char msg[128];
+	switch(resp->success) {
+		case GOOD:
+		resp->qso->item("QRZCOM_QSO_UPLOAD_STATUS", string("Y"));
+		resp->qso->item("QRZCOM_QSO_UPLOAD_DATE", now(false, "%Y%m%d"));
+		resp->qso->item("APP_QRZLOG_LOGID", to_string(resp->logid));
+		snprintf(msg, sizeof(msg), "QRZ: %s %s %s QSL uploaded (logid=%d)",
+			resp->qso->item("QSO_DATE").c_str(),
+			resp->qso->item("TIME_ON").c_str(),
+			resp->qso->item("CALL").c_str(),
+			resp->logid);
+		status_->misc_status(ST_OK, msg);
+		break;
+	case DUPLICATE:
+		resp->qso->item("QRZCOM_QSO_UPLOAD_STATUS", string("Y"));
+		resp->qso->item("QRZCOM_QSO_UPLOAD_DATE", now(false, "%Y%m%d"));
+		resp->qso->item("APP_QRZLOG_LOGID", to_string(resp->logid));
+		snprintf(msg, sizeof(msg), "QRZ: %s %s %s QSL uploaded (duplicate logid=%d)",
+			resp->qso->item("QSO_DATE").c_str(),
+			resp->qso->item("TIME_ON").c_str(),
+			resp->qso->item("CALL").c_str(),
+			resp->logid);
+		status_->misc_status(ST_WARNING, msg);
+		break;
+	case FAIL:
+		snprintf(msg, sizeof(msg), "QRZ: QSL upload failed - %s", resp->message.c_str());
+		status_->misc_status(ST_ERROR, msg);
+		break;
+	case ERROR:
+		snprintf(msg, sizeof(msg), "QRZ: QSL upload protocol error %s", resp->message.c_str());
+		status_->misc_status(ST_ERROR, msg);
+		break;
+	}
+}
+
+// Generate insert request
+bool qrz_handler::insert_request(qrz_api_data* api, ostream& request, record* qso) {
+	// Key
+	request << "KEY=" << api->key << "&";
+	// Action insert
+	request << "ACTION=INSERT&";
+	// aDIF
+	request << "ADIF=";
+	adi_writer::to_adif(qso, request);
+	return true;
+}
+
+// Decode insert response
+qrz_handler::insert_resp_t qrz_handler::insert_response(
+	qrz_api_data* api, 
+	istream& response, 
+	string& fail_reason,
+	unsigned long long& logid
+) {
+	string buffer;
+	string buff1;
+	bool done = false;
+	insert_resp_t resp = GOOD;
+	size_t pos = 0;
+	// Read the entire stream into buffer
+	while (!response.eof()) {
+		getline(response, buff1, '\0');
+		buffer += buff1;
+	}
+	while (!done) {
+		// Get the next bit of data
+		size_t amper = buffer.find('&', pos);
+		string data;
+		if (amper == string::npos) {
+			data = buffer.substr(pos);
+			done = true;
+		} else {
+			data = buffer.substr(pos, amper - pos);
+		}
+		// Read until next ampersand (or EOF)
+		int len = data.length();
+		if (len > 7 && data.substr(0, 7) == "RESULT=") {
+			if (data.substr(7) == "FAIL") {
+				resp = FAIL;
+			} else if (data.substr(7) == "REPLACE") {
+				resp = DUPLICATE;
+			} else if (data.substr(7) != "OK") {
+				resp = ERROR;
+				fail_reason += "Error RESULT=" + data.substr(7) + " ";
+			}
+		} else if (len > 6 && data.substr(0,6) == "COUNT=") {
+			if (data.substr(6) != "0" && data.substr(6) != "1") {
+				resp = ERROR;
+				fail_reason += "Error COUNT=" + data.substr(7) + " "
+;			} 
+		} else if (len > 6 && data.substr(0,6) == "LOGID=") {
+			logid = stoull(data.substr(6));
+		} else if (len > 7 && data.substr(0,7) == "REASON=") {
+			fail_reason = data.substr(7);
+		}
+		pos = amper + 1;
+	}
+	return resp;
 }

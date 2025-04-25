@@ -4,12 +4,17 @@
 #include <string>
 #include <istream>
 #include <map>
+#include <thread>
+#include <atomic>
+#include <mutex>
+#include <queue>
 
 using namespace std;
 
 class record;
 class xml_element;
 class Fl_Help_Dialog;
+typedef size_t qso_num_t;
 
 // This class provides the interface to the QRZ.com XML database look-up - it currently
 // is restricted to looking up details based on callsign. 
@@ -52,10 +57,19 @@ struct qrz_api_data {
 		// Download update - for STATION_CALLSIGN == station
 		bool download_qrzlog_log(stringstream* adif);
 		// Upload current QSL.
-		bool upload_qso(record* qso);
+		bool upload_single_qso(qso_num_t qso_number);
 
 
 	protected:
+		
+		enum insert_resp_t { GOOD, FAIL, DUPLICATE, ERROR };
+		// Upload response
+		struct upload_resp_t {
+			insert_resp_t success = ERROR;
+			string message = "";
+			record* qso = nullptr;
+			unsigned long long logid = 0ull;
+		};
 		// Decode session response
 		bool decode_session_response(istream& response);
 		// DEcode details response
@@ -82,6 +96,19 @@ struct qrz_api_data {
 		bool fetch_response(qrz_api_data* api, istream& response, int& count, string& adif);
 		// Get last LogID downloaded
 		unsigned long long last_logid(qrz_api_data* api, string adif);
+		// Generate insert request
+		bool insert_request(qrz_api_data* api, ostream& request, record* qso);
+		// Decode insert response
+		insert_resp_t insert_response(qrz_api_data* api, istream& response, 
+			string& fail_reason, unsigned long long& logid);
+		// Callback when insert complete
+		static void cb_upload_done(void* v);
+		// Call to upload thread to upload qso
+		void th_upload_qso(record* qso);
+		// Run the thread in the background
+		static void thread_run(qrz_handler* that);
+		// Upload done (run in main thread)
+		void upload_done(upload_resp_t* resp);
 
 		// The key returned from the login session attempt
 		string session_key_;
@@ -103,10 +130,22 @@ struct qrz_api_data {
 		bool non_subscriber_;
 		// Use API
 		bool use_api_;
+		// Upload per QSO
+		bool upload_qso_;
 		// Web dialog
 		Fl_Help_Dialog* web_dialog_;
 		// API data
 		map<string, qrz_api_data*> api_data_;
+		// Upload thread
+		thread* th_upload_;
+		// Allow thread to run
+		atomic<bool> run_threads_;
+		// Lock between main and upload thread
+		mutex upload_lock_;
+		// Upload response
+		atomic<upload_resp_t*> upload_resp_;
+		// Upload queue
+		queue<record*> upload_queue_;
 
 	};
 

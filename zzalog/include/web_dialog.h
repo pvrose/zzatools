@@ -125,6 +125,8 @@ struct qrz_api_data;
 		bool qrz_xml_merge_;
 		// Use API
 		bool qrz_api_enable_;
+		// Upload QSOs as logged
+		bool qrz_upload_qso_;
 
 		map<string, qrz_api_data*> qrz_api_data_;
 

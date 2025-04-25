@@ -156,10 +156,10 @@ bool specx_reader::start_adif(map<string, string>* attributes) {
 			}
 			else {
 				char* message = new char[50 + (it->second).length()];
-				sprintf(message, "ADIF SPEC: Invalid attribute %s in ADIF element", it->second.c_str());
-				status_->misc_status(ST_ERROR, message);
+				sprintf(message, "ADIF SPEC: Unexpected attribute %s=%s in ADIF element",
+					it->first.c_str(), it->second.c_str());
+				status_->misc_status(ST_WARNING, message);
 				delete[] message;
-				return false;
 			}
 		}
 	}

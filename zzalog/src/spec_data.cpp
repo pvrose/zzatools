@@ -2462,8 +2462,8 @@ void spec_data::add_my_appdefs() {
 		"APP_LOTW_NUMREC",
 		"APP_LOTW_LASTQSL",
 		"APP_QRZLOG_LOGID",
-		"APP_QRZLOG_QSLDATE",
 		"APP_QRZLOG_STATUS",
+		"APP_QRZLOG_QSLDATE",
 		"APP_ZZA_QSL_ROUTE",   // QRZ.com return QSL_VIA - Op's preferred QSL route
 		""
 	};

@@ -178,7 +178,7 @@ void fields::store_data() {
             field_settings.set("Header", field.header.c_str());
 		}
 	}
-    settings_->flush();
+    // settings_->flush();
 }
 
 // Get the list of collection names

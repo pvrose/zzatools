@@ -15,9 +15,11 @@
 #include "eqsl_handler.h"
 #include "club_handler.h"
 #include "lotw_handler.h"
+#include "qrz_handler.h"
 #include "qsl_data.h"
 #include "qsl_image.h"
 #include "qsl_emailer.h"
+#include "menu.h"
 
 #include <FL/Fl_Preferences.H>
 #include <FL/Fl_Box.H>
@@ -36,6 +38,7 @@ extern ticker* ticker_;
 extern eqsl_handler* eqsl_handler_;
 extern club_handler* club_handler_;
 extern lotw_handler* lotw_handler_;
+extern qrz_handler* qrz_handler_;
 
 // Constructor
 qso_qsl::qso_qsl(int X, int Y, int W, int H, const char* L) :
@@ -82,6 +85,12 @@ void qso_qsl::load_values() {
 	Fl_Preferences club_settings(qsl_settings, "ClubLog");
 	club_settings.get("Upload per QSO", upload_qso, false);
 	auto_club_ = upload_qso;
+
+	// QRZ.com
+	Fl_Preferences qrz_settings(qsl_settings, "QRZ");
+	qrz_settings.get("Upload per QSO", upload_qso, false);
+	auto_qrz_ = upload_qso;
+
 }
 
 // Draw the widgets
@@ -195,6 +204,37 @@ void qso_qsl::create_form() {
 
 	curr_y += HBUTTON;
 
+	Fl_Box* box_z = new Fl_Box(C1, curr_y, W1, HBUTTON, "QRZ.com");
+	box_z->box(FL_FLAT_BOX);
+	box_z->color(FL_BACKGROUND_COLOR);
+	// Auto upload
+	bn_auto_qrz_ = new Fl_Check_Button(C2, curr_y, W2, HBUTTON);
+	bn_auto_qrz_->value(auto_qrz_);
+	bn_auto_qrz_->callback(cb_auto, (void*)extract_data::QRZCOM);
+	bn_auto_qrz_->tooltip("Enable automatic upload of QRZ.com after logging");
+	// Download
+	bn_down_qrz_ = new Fl_Button(C3, curr_y, W3, HBUTTON, "@2->");
+	bn_down_qrz_->callback(cb_download, (void*)import_data::QRZCOM_UPDATE);
+	bn_down_qrz_->tooltip("Download latest records from QRZ.com");
+	// Extract
+	bn_extr_qrz_ = new Fl_Button(C4, curr_y, W4, HBUTTON, "@search");
+	bn_extr_qrz_->callback(cb_extract, (void*)extract_data::QRZCOM);
+	bn_extr_qrz_->tooltip("Extract records for upload to QRZ.com");
+	// print
+	bn_save_qrz_ = new Fl_Button(C5, curr_y, W5, HBUTTON, "@filesave");
+	bn_save_qrz_->callback(menu::cb_mi_file_saveas, (void*)OT_EXTRACT);
+	bn_save_qrz_->tooltip("Save extracted data to file for manual upload to QRZ.com");
+	// Upload
+	bn_upld_qrz_ = new Fl_Button(C6, curr_y, W6, HBUTTON, "@8->");
+	bn_upld_qrz_->callback(cb_upload, (void*)extract_data::QRZCOM);
+	bn_upld_qrz_->tooltip("Upload extracted records to QRZ.com");
+	// Mark read
+	bn_qrz_done_ = new Fl_Button(C7, curr_y, W7, HBUTTON, "Done");
+	bn_qrz_done_->callback(cb_mark_done, (void*)(intptr_t)'E');
+	bn_qrz_done_->tooltip("Mark extracted records as uploaded");
+
+	curr_y += HBUTTON;
+
 	// Title
 	Fl_Box* box_q = new Fl_Box(C1, curr_y, W1, HBUTTON, "Cards");
 	box_q->box(FL_FLAT_BOX);
@@ -262,6 +302,9 @@ void qso_qsl::save_values() {
 	// Clublog
 	Fl_Preferences club_settings(qsl_settings, "ClubLog");
 	club_settings.set("Upload per QSO", auto_club_);
+	// QRZ.com
+	Fl_Preferences qrz_settings(qsl_settings, "ClubLog");
+	club_settings.set("Upload per QSO", auto_qrz_);
 	settings_->flush();
 }
 
@@ -279,17 +322,21 @@ void qso_qsl::enable_widgets() {
 	if (mgr->data()->inactive() && os_eqsl_dnld_ == 0 && !extract_in_progress_ && !single_qso_) {
 		bn_down_eqsl_->activate();
 		bn_down_lotw_->activate();
+		bn_down_qrz_->activate();
 		bn_extr_club_->activate();
 		bn_extr_eqsl_->activate();
 		bn_extr_lotw_->activate();
+		bn_extr_qrz_->activate();
 		bn_extr_card_->activate();
 		bn_extr_email_->activate();
 	} else {
 		bn_down_eqsl_->deactivate();
 		bn_down_lotw_->deactivate();
+		bn_down_qrz_->deactivate();
 		bn_extr_club_->deactivate();
 		bn_extr_eqsl_->deactivate();
 		bn_extr_lotw_->deactivate();
+		bn_extr_qrz_->deactivate();
 		bn_extr_card_->deactivate();
 		bn_extr_email_->deactivate();
 	}
@@ -327,6 +374,19 @@ void qso_qsl::enable_widgets() {
 	}
 	else {
 		bn_upld_club_->deactivate();
+	}
+	// QRZ.com upload is only valid for a single QSO.
+	if (single_qso_) {
+		bn_upld_qrz_->activate();
+	} else {
+		bn_upld_qrz_->deactivate();
+	}
+	if (!extract_in_progress_ && extract_records_->use_mode() == extract_data::QRZCOM) {
+		bn_save_qrz_->activate();
+		bn_qrz_done_->activate();
+	} else {
+		bn_save_qrz_->deactivate();
+		bn_qrz_done_->deactivate();
 	}
 	if (!extract_in_progress_ && extract_records_->use_mode() == extract_data::CARD && !single_qso_) {
 		bn_print_->activate();
@@ -390,6 +450,8 @@ void qso_qsl::cb_auto(Fl_Widget* w, void* v) {
 	case extract_data::CLUBLOG:
 		enable = &that->auto_club_;
 		break;
+	case extract_data::extract_mode_t::QRZCOM:
+		enable = &that->auto_qrz_;
 	default:
 		break;
 	}
@@ -431,6 +493,7 @@ void qso_qsl::cb_print(Fl_Widget* w, void* v) {
 void qso_qsl::cb_mark_done(Fl_Widget* w, void* v) {
 	qso_qsl* that = ancestor_view<qso_qsl>(w);
 	string via = { (char)(intptr_t)v };
+	that->via_code_ = via;
 	that->qsl_mark_done();
 }
 
@@ -518,6 +581,10 @@ void qso_qsl::qsl_1_upload(extract_data::extract_mode_t mode) {
 		}
 		case extract_data::LOTW: {
 			lotw_handler_->upload_single_qso(number);
+			break;
+		}
+		case extract_data::QRZCOM: {
+			qrz_handler_->upload_single_qso(number);
 			break;
 		}
 		default:

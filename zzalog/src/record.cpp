@@ -892,7 +892,7 @@ match_result_t record::match_records(record* record) {
 		}
 		else if (
 			// Ignore QSL information
-			field_name.substr(0,7) == "QRZLOG_" ||
+			field_name.substr(0,7) == "QRZCOM_" ||
 			field_name.substr(0,8) == "CLUBLOG_" ||
 			field_name == "EQSL_QSLRDATE" ||
 			field_name == "EQSL_QSL_RCVD" ||
