@@ -638,10 +638,10 @@ bool qrz_handler::fetch_response(qrz_api_data* api, istream& resp, int& count, s
 			if (!got_adif && !failed) 
 				status_->misc_status(ST_ERROR, "QRZ: EOF reached with no ADIF=");
 		}
-		if (ok) api->last_logid = last_logid;
 		if (!got_count) count = count_records;
 		pos = amper + 1;
 	}
+	if (ok) api->last_logid = last_logid;
 	return ok;
 }
 
@@ -798,6 +798,8 @@ bool qrz_handler::insert_request(qrz_api_data* api, ostream& request, record* qs
 	request << "KEY=" << api->key << "&";
 	// Action insert
 	request << "ACTION=INSERT&";
+	// Option Replace
+	request << "OPTION=REPLACE&";
 	// aDIF
 	request << "ADIF=";
 	adi_writer::to_adif(qso, request);

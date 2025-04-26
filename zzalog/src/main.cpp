@@ -1217,7 +1217,7 @@ int main(int argc, char** argv)
 		code = Fl::run();
 	}
 	// Delete everything we've created
-	tidy();
+	// tidy();
 	printf("ZZALOG Closed\n");
 	return code;
 }
