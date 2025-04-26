@@ -810,10 +810,11 @@ void resize_window() {
 	int rh = max(min_h, height);
 	int sx, sy, sw, sh;
 	Fl::screen_work_area(sx, sy, sw, sh);
+	printf("DEBUG: Screen placement X=%d, Y=%d, W=%d, H=%d\n", sx, sy, sw, sh);
 	if (rx < sx) rx = sx;
-	else if (rx + rw > sx + sw) rx = sx + sw - rw;
+	else if (rx + rw > sx + sw) rx = max(0, sx + sw - rw);
 	if (ry < sy) ry = sy;
-	else if (ry + rh > sy + sh) ry = sy + sh - rh;
+	else if (ry + rh > sy + sh) ry = max(20, sy + sh - rh);
 	main_window_->resize(rx, ry, rw, rh);
 }
 
