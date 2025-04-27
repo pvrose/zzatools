@@ -597,6 +597,7 @@ void import_data::convert_update(record* qso) {
 	if (update_mode_ == EQSL_UPDATE) {
 		// Rename !RST_RCVD etc back again
 		set<string> erasees;
+		map<string, string> new_fields;
 		erasees.clear();
 		// For each field in the record
 		for (auto it = qso->begin(); it != qso->end(); it++) {
@@ -605,9 +606,13 @@ void import_data::convert_update(record* qso) {
 			// If the field name starts with a bang
 			if (field_name[0] == '!') {
 				// Change it back to without
-				qso->change_field_name(field_name, field_name.substr(1));
+				new_fields[field_name.substr(1)] = value;
 				erasees.insert(field_name);
 			}
+		}
+		// Add the inserted fields
+		for(auto it = new_fields.begin(); it != new_fields.begin(); it++) {
+			qso->item(it->first, it->second);
 		}
 		// Remove all the fields starting with a bang
 		for (auto it = erasees.begin(); it != erasees.end(); it++) {
