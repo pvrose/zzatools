@@ -20,7 +20,7 @@
 
 extern status* status_;
 extern spec_data* spec_data_;
-extern string COPYRIGHT;
+extern string DATA_COPYRIGHT;
 extern string PROGRAM_ID;
 
 // Default constructor
@@ -173,10 +173,13 @@ void adi_writer::to_adif(record* record, ostream& out, field_list* fields /* = n
 		}
 	}
 	if (record->is_header()) {
+		string year = now(false, "%Y");
+		char copyright[128];
+		snprintf(copyright, sizeof(copyright), DATA_COPYRIGHT.c_str(), year.c_str());
 		// Add red-tape after header fields
 		out << endl;
 		out << PROGRAM_ID << endl;
-		out << COPYRIGHT << endl;
+		out << copyright << endl;
 		out << "<EOH>" << endl << endl;
 	}
 	else {
