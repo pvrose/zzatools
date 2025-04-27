@@ -24,6 +24,7 @@ extern book* book_;
 extern url_handler* url_handler_;
 extern bool DEBUG_THREADS;
 extern fields* fields_;
+extern uint32_t seed_;
 
 // Constructor
 lotw_handler::lotw_handler()
@@ -234,10 +235,15 @@ bool lotw_handler::user_details(string* username, string* password, string* last
 		*username = temp;
 		free(temp);
 	}
+	// Check password
 	if (password != nullptr) {
-		lotw_settings.get("Password", temp, "");
-		*password = temp;
-		free(temp);
+		int pwlen;
+		uchar offset = hash8(lotw_settings.path());
+		lotw_settings.get("Password Length", pwlen, 0);
+		char* btemp = new char[pwlen];
+		lotw_settings.get("Password", btemp, (void*)"", 0, &pwlen);
+		string crypt(btemp, pwlen);
+		*password = xor_crypt(crypt, seed_, offset);
 	}
 	if (last_access != nullptr) {
 		string today = now(false, "%Y%m%d");

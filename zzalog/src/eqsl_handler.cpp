@@ -35,7 +35,7 @@ extern url_handler* url_handler_;
 extern bool DEBUG_THREADS;
 extern string default_station_;
 extern fields* fields_;
-
+extern uint32_t seed_;
 
 // Constructor
 eqsl_handler::eqsl_handler()
@@ -494,9 +494,13 @@ bool eqsl_handler::user_details(
 	}
 	// Check password
 	if (password != nullptr) {
-		eqsl_settings.get("Password", temp, "");
-		*password = temp;
-		free(temp);
+		int pwlen;
+		uchar offset = hash8(eqsl_settings.path());
+		eqsl_settings.get("Password Length", pwlen, 0);
+		char* btemp = new char[pwlen];
+		eqsl_settings.get("Password", btemp, (void*)"", 0, &pwlen);
+		string crypt(btemp, pwlen);
+		*password = xor_crypt(crypt, seed_, offset);
 	}
 	// Check date last access
 	if (last_access != nullptr) {

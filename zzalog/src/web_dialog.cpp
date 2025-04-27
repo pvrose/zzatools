@@ -108,13 +108,18 @@ void web_dialog::load_values() {
 	char * temp;
 	int sz_temp;
 	char* nu_temp;
+	uchar offset = hash8(eqsl_settings.path());
+	string crypt;
 	const unsigned long long u64_zero = 0ull; 
 	eqsl_settings.get("User", temp, "");
 	eqsl_username_ = temp;
 	free(temp);
-	eqsl_settings.get("Password", temp, "");
-	eqsl_password_ = temp;
-	free(temp);
+	eqsl_settings.get("Password Length", sz_temp, 0);
+	nu_temp = new char[sz_temp];
+	eqsl_settings.get("Password", nu_temp, (void*)"", 0, &sz_temp);
+	crypt = string(nu_temp, sz_temp);
+	eqsl_password_ = xor_crypt(crypt, seed_, offset);
+	delete[] nu_temp;
 	eqsl_settings.get("Last Accessed", temp, "");
 	eqsl_last_got_ = temp;
 	free(temp);
@@ -122,13 +127,17 @@ void web_dialog::load_values() {
 	eqsl_settings.get("Download Confirmed", (int&)eqsl_confirmed_too_, false);
 	eqsl_settings.get("Maximum Fetches", eqsl_max_fetches_, 50);
 	// LotW settings
+	offset = hash8(lotw_settings.path());
 	lotw_settings.get("Enable", (int&)lotw_enable_, false);
 	lotw_settings.get("User", temp, "");
 	lotw_username_ = temp;
 	free(temp);
-	lotw_settings.get("Password", temp, "");
-	lotw_password_ = temp;
-	free(temp);
+	lotw_settings.get("Password Length", sz_temp, 0);
+	nu_temp = new char[sz_temp];
+	lotw_settings.get("Password", nu_temp, (void*)"", 0 , &sz_temp);
+	crypt = string(nu_temp, sz_temp);
+	lotw_password_ = xor_crypt(crypt, seed_, offset);
+	delete[] nu_temp;
 	lotw_settings.get("Last Accessed", temp, "");
 	lotw_last_got_ = temp;
 	free(temp);
@@ -147,7 +156,7 @@ void web_dialog::load_values() {
 	string name = spec_data_->enumeration_name("STATION_CALLSIGN", nullptr);
 	spec_dataset* calls = spec_data_->dataset(name);
 	Fl_Preferences api_settings(qrz_settings, "Logbooks");
-	uchar offset = hash8(api_settings.path());
+	offset = hash8(api_settings.path());
 	for (auto it = calls->data.begin(); it != calls->data.end(); it++) {
 		string call = (*it).first;
 		de_slash(call);
@@ -156,7 +165,7 @@ void web_dialog::load_values() {
 		call_settings.get("Key Length", sz_temp, 128);
 		nu_temp = new char[sz_temp];
 		call_settings.get("Key", nu_temp, (void*)"", 0, &sz_temp);
-		string crypt = string(nu_temp, sz_temp);
+		crypt = string(nu_temp, sz_temp);
 		string key = xor_crypt(crypt, seed_, offset);
 		delete[] nu_temp;
 		data->key = key;
@@ -181,13 +190,20 @@ void web_dialog::load_values() {
 	free(temp);
 
 	// ClubLog settings
+	offset = hash8(club_settings.path());
 	club_settings.get("Enable", (int&)club_enable_, false);
-	club_settings.get("Email", temp, "");
-	club_username_ = temp;
-	free(temp);
-	club_settings.get("Password", temp, "");
-	club_password_ = temp;
-	free(temp);
+	club_settings.get("Email Length", sz_temp, 0);
+	nu_temp = new char[sz_temp];
+	club_settings.get("Email", nu_temp, (void*)"", 0, &sz_temp);
+	crypt = string(nu_temp, sz_temp);
+	club_username_ = xor_crypt(crypt, seed_, offset);
+	delete[] nu_temp;
+	club_settings.get("Password Length", sz_temp, 0);
+	nu_temp = new char[sz_temp];
+	club_settings.get("Password", nu_temp, (void*)"", 0, &sz_temp);
+	crypt = string(nu_temp, sz_temp);
+	club_password_ = xor_crypt(crypt, seed_, offset);
+	delete[] nu_temp;
 	club_settings.get("Interval", club_interval_, 7);
 	club_settings.get("Upload per QSO", (int&)club_upload_qso_, false);
 
@@ -202,18 +218,28 @@ void web_dialog::load_values() {
 	fllog_settings.get("Port Number", fldigi_rpc_port_, 8421);
 
 	// e-Mail settings
+	offset = hash8(email_settings.path());
 	email_settings.get("Server", temp, "");
 	email_server_ = temp;
 	free(temp);
-	email_settings.get("Account", temp, "");
-	email_account_ = temp;
-	free(temp);
-	email_settings.get("Password", temp, "");
-	email_password_ = temp;
-	free(temp);
-	email_settings.get("CC Address", temp, "");
-	email_cc_address_ = temp;
-	free(temp);
+	email_settings.get("Account Length", sz_temp, 0);
+	nu_temp = new char[sz_temp];
+	email_settings.get("Account", nu_temp, (void*)"", 0, sz_temp);
+	crypt = string(nu_temp, sz_temp);
+	email_account_ = xor_crypt(crypt, seed_, offset);
+	delete[] nu_temp;
+	email_settings.get("Password Length", sz_temp, 0);
+	nu_temp = new char[sz_temp];
+	email_settings.get("Password", nu_temp, (void*)"", 0, &sz_temp);
+	crypt = string(nu_temp, sz_temp);
+	email_password_ = xor_crypt(crypt, seed_, offset);
+	delete[] nu_temp;
+	email_settings.get("CC Address Length", sz_temp, 0);
+	nu_temp = new char[sz_temp];
+	email_settings.get("CC Address", nu_temp, (void*)"", 0, &sz_temp);
+	crypt = string(nu_temp, sz_temp);
+	email_cc_address_ = xor_crypt(crypt, seed_, offset);
+	delete[] nu_temp;
 
 }
 
@@ -842,17 +868,24 @@ void web_dialog::save_values() {
 	Fl_Preferences fllog_settings(nw_settings, "Fllog");
 	Fl_Preferences email_settings(settings_, "e-Mail");
 	// eQSL Settings
+	uchar offset = hash8(eqsl_settings.path());
+	string encrypt;
 	eqsl_settings.set("Enable", eqsl_enable_);
 	eqsl_settings.set("User", eqsl_username_.c_str());
-	eqsl_settings.set("Password", eqsl_password_.c_str());
+	encrypt = xor_crypt(eqsl_password_, seed_, offset);
+	eqsl_settings.set("Password Length", (int)encrypt.length());
+	eqsl_settings.set("Password", (void*)encrypt.c_str(), encrypt.length());
 	eqsl_settings.set("Last Accessed", eqsl_last_got_.c_str());
 	eqsl_settings.set("Upload per QSO", eqsl_upload_qso_);
 	eqsl_settings.set("Download Confirmed", eqsl_confirmed_too_);
 	eqsl_settings.set("Maximum Fetches", eqsl_max_fetches_);
 	// LotW settings
+	offset = hash8(lotw_settings.path());
 	lotw_settings.set("Enable", lotw_enable_);
 	lotw_settings.set("User", lotw_username_.c_str());
-	lotw_settings.set("Password", lotw_password_.c_str());
+	encrypt = xor_crypt(lotw_password_, seed_, offset);
+	lotw_settings.set("Password Length", (int)encrypt.length());
+	lotw_settings.set("Password", (void*)encrypt.c_str(), encrypt.length());
 	lotw_settings.set("Last Accessed", lotw_last_got_.c_str());
 	lotw_settings.set("Upload per QSO", lotw_upload_qso_);
 	// QRZ.com Settings
@@ -862,12 +895,12 @@ void web_dialog::save_values() {
 	qrz_settings.set("Use API", (int)qrz_api_enable_);
 	qrz_settings.set("Upload per QSO", qrz_upload_qso_);
 	Fl_Preferences api_settings(qrz_settings, "Logbooks");
-	uchar offset = hash8(api_settings.path());
+	offset = hash8(api_settings.path());
 	for (auto it = qrz_api_data_.begin(); it != qrz_api_data_.end(); it++) {
 		string call = it->first;
 		de_slash(call);
 		Fl_Preferences call_settings(api_settings, call.c_str());
-		string encrypt = xor_crypt(it->second->key, seed_, offset);
+		encrypt = xor_crypt(it->second->key, seed_, offset);
 		call_settings.set("Key Length", (int)encrypt.length());
 		call_settings.set("Key", (void*)encrypt.c_str(), encrypt.length());
 		call_settings.set("Last Log ID", (void*)&it->second->last_logid, sizeof(uint64_t));
@@ -882,9 +915,14 @@ void web_dialog::save_values() {
 	card_settings.set("SWL Message", eqsl_swl_msg_.c_str());
 
 	// ClubLog settings
+	offset = hash8(club_settings.path());
 	club_settings.set("Enable", club_enable_);
-	club_settings.set("Email", club_username_.c_str());
-	club_settings.set("Password", club_password_.c_str());
+	encrypt = xor_crypt(club_username_, seed_, offset);
+	club_settings.set("Email Length", (int)encrypt.length());
+	club_settings.set("Email", (void*)encrypt.c_str(), encrypt.length());
+	encrypt = xor_crypt(club_password_, seed_, offset);
+	club_settings.set("Password Length", (int)encrypt.length());
+	club_settings.set("Password", (void*)encrypt.c_str(), encrypt.length());
 	club_settings.set("Interval", club_interval_);
 	club_settings.set("Upload per QSO", club_upload_qso_);
 
@@ -895,10 +933,17 @@ void web_dialog::save_values() {
 	fllog_settings.set("Port Number", fldigi_rpc_port_);
 
 	// e-Mail settings
+	offset = hash8(email_settings.path());
 	email_settings.set("Server", email_server_.c_str());
-	email_settings.set("Account", email_account_.c_str());
-	email_settings.set("Password", email_password_.c_str());
-	email_settings.set("CC Address", email_cc_address_.c_str());
+	encrypt = xor_crypt(email_account_, seed_, offset);
+	email_settings.set("Account Length", (int)encrypt.length());
+	email_settings.set("Account", (void*)encrypt.c_str(), encrypt.length());
+	encrypt = xor_crypt(email_password_, seed_, offset);
+	email_settings.set("Password Length", (int)encrypt.length());
+	email_settings.set("Password", (void*)encrypt.c_str(), encrypt.length());
+	encrypt = xor_crypt(email_cc_address_, seed_, offset);
+	email_settings.set("CC Address Length", (int)encrypt.length());
+	email_settings.set("CC Address", (void*)encrypt.c_str(), encrypt.length());
 
 	settings_->flush();
 }

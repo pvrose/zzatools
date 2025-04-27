@@ -26,6 +26,7 @@ extern book* book_;
 extern qso_manager* qso_manager_;
 extern bool DEBUG_THREADS;
 extern fields* fields_;
+extern uint32_t seed_;
 
 // Constructor 
 club_handler::club_handler() {
@@ -102,12 +103,23 @@ void club_handler::generate_form(vector<url_handler::field_pair>& fields, record
 	// Read the settings that define user's access 
 	Fl_Preferences qsl_settings(settings_, "QSL");
 	Fl_Preferences clublog_settings(qsl_settings, "ClubLog");
+	uchar offset = hash8(clublog_settings.path());
+	int itemp;
+	clublog_settings.get("Email Length", itemp, 0);
 	char* email;
-	clublog_settings.get("Email", email, "");
+	char *btemp;
+	btemp = new char[itemp];
+	clublog_settings.get("Email", btemp, (void*)"", 0, &itemp);
+	string crypt = string(btemp, itemp);
+	strcpy(email, xor_crypt(crypt, seed_, offset).c_str());
 	fields.push_back({"email", email, "", ""});
 	free(email);
+	clublog_settings.get("Password Length", itemp, 0);
 	char* password;
-	clublog_settings.get("Password", password, "");
+	btemp = new char[itemp];
+	clublog_settings.get("Password", btemp, (void*)"", 0, &itemp);
+	crypt = string(btemp, itemp);
+	strcpy(password, xor_crypt(crypt, seed_, offset).c_str());
 	fields.push_back({ "password", password, "", "" });
 	free(password);
 	if (the_qso != nullptr) {
