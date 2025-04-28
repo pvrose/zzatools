@@ -148,18 +148,21 @@ bool fields::load_collections(Fl_Preferences& settings) {
         getline(ip, line);
         vector<string> words;
         split_line(line, words, '\t');
-        collection_t* coll;
-        // Each line consists of <COLL NAME>\t<INDEX\t<NAME>\t<WIDTH>\t<HEADING>
-        if (coll_map_.find(words[0]) == coll_map_.end()) {
-            // New collection
-            coll = new collection_t;
-            coll_map_[words[0]] = coll;
-        } else {
-            coll = coll_map_.at(words[0]);
+        if (words.size() == 5) {
+            collection_t* coll;
+            // Each line consists of <COLL NAME>\t<INDEX\t<NAME>\t<WIDTH>\t<HEADING>
+            if (coll_map_.find(words[0]) == coll_map_.end()) {
+                // New collection
+                coll = new collection_t;
+                coll_map_[words[0]] = coll;
+            } else {
+                coll = coll_map_.at(words[0]);
+            }
+            int ix = stoi(words[1]);
+            field_info_t info(words[2], words[4], stoi(words[3]));
+            coll->resize(max((int)coll->size(), ix + 1));
+            (*coll)[ix] = info;
         }
-        int ix = stoi(words[1]);
-        field_info_t info(words[2], words[4], stoi(words[3]));
-        (*coll)[ix] = info;
     }
     ip.close();
     return true;
