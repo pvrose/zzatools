@@ -106,22 +106,19 @@ void club_handler::generate_form(vector<url_handler::field_pair>& fields, record
 	uchar offset = hash8(clublog_settings.path());
 	int itemp;
 	clublog_settings.get("Email Length", itemp, 0);
-	char* email;
-	char *btemp;
-	btemp = new char[itemp];
-	clublog_settings.get("Email", btemp, (void*)"", 0, &itemp);
-	string crypt = string(btemp, itemp);
-	strcpy(email, xor_crypt(crypt, seed_, offset).c_str());
+	char* email = new char[itemp + 1];
+	memset(email, '\0', itemp + 1);
+	clublog_settings.get("Email", email, (void*)"", 0, &itemp);
+	xor_crypt(email, itemp, seed_, offset);
 	fields.push_back({"email", email, "", ""});
-	free(email);
+	delete[] email;
 	clublog_settings.get("Password Length", itemp, 0);
-	char* password;
-	btemp = new char[itemp];
-	clublog_settings.get("Password", btemp, (void*)"", 0, &itemp);
-	crypt = string(btemp, itemp);
-	strcpy(password, xor_crypt(crypt, seed_, offset).c_str());
+	char* password = new char[itemp + 1];
+	memset(password, '\0', itemp + 1);
+	clublog_settings.get("Password", password, (void*)"", 0, &itemp);
+	xor_crypt(password, itemp, seed_, offset);
 	fields.push_back({ "password", password, "", "" });
-	free(password);
+	delete[] password;
 	if (the_qso != nullptr) {
 		// get logging callsign from QSO record
 		string callsign = qso_manager_->get_default(qso_manager::CALLSIGN);
