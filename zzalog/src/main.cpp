@@ -75,7 +75,7 @@ string COPYRIGHT = "\302\251 Philip Rose GM3ZZA 2018. All rights reserved.\nPref
 string DATA_COPYRIGHT = "\302\251 Philip Rose %s. This data may be copied for the purpose of correlation and analysis";
 string PROGRAM_ID = "ZZALOG";
 string PROG_ID = "ZLG";
-string PROGRAM_VERSION = "3.4.109";
+string PROGRAM_VERSION = "3.4.110";
 string VENDOR = "GM3ZZA";
 string TIMESTAMP = string(__DATE__) + " " + string(__TIME__);
 
