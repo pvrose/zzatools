@@ -12,10 +12,11 @@
 
 using namespace std;
 
-extern Fl_Preferences* settings_;
 extern status* status_;
 extern url_handler* url_handler_;
 extern uint32_t seed_;
+extern string VENDOR;
+extern string PROGRAM_ID;
 
 const string SUBJECT = "QSL for <CALL> <QSO_DATE> <BAND> <MODE> from <STATION_CALLSIGN>";
 const string BODY = 
@@ -33,7 +34,8 @@ qsl_emailer::~qsl_emailer() {
 }
 
 void qsl_emailer::load_values() {
-	Fl_Preferences email_settings(settings_, "e-Mail");
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences email_settings(settings, "e-Mail");
 	char* temp;
 	char* ntemp;
 	int itemp;

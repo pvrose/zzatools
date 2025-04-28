@@ -18,7 +18,6 @@ using namespace std;
 
 extern qso_manager* qso_manager_;
 extern status* status_;
-extern Fl_Preferences* settings_;
 // Dynamically drawn QSL card label
 
 // Constructor - just initialises the data

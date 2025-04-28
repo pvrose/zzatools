@@ -13,10 +13,11 @@
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Counter.H>
 
-extern Fl_Preferences* settings_;
 extern book* book_;
 extern qso_manager* qso_manager_;
 extern tabbed_forms* tabbed_forms_;
+extern string VENDOR;
+extern string PROGRAM_ID;
 
 // constructor
 user_dialog::user_dialog(int X, int Y, int W, int H, const char* label) :
@@ -38,9 +39,10 @@ user_dialog::user_dialog(int X, int Y, int W, int H, const char* label) :
 // Destructor
 user_dialog::~user_dialog() {}
 
-// Load values from settings_
+// Load values from settings
 void user_dialog::load_values() {
-	Fl_Preferences user_settings(settings_, "User Settings");
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences user_settings(settings, "User Settings");
 	// Log table
 	Fl_Preferences log_settings(user_settings, "Log Table");
 	log_settings.get("Font Name", (int&)log_font_, log_font_);
@@ -182,7 +184,8 @@ void user_dialog::create_form(int X, int Y) {
 
 // Used to write settings back
 void user_dialog::save_values() {
-	Fl_Preferences user_settings(settings_, "User Settings");
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences user_settings(settings, "User Settings");
 	// Log settings
 	Fl_Preferences log_settings(user_settings, "Log Table");
 	log_settings.set("Font Name", (int&)log_font_);
@@ -209,8 +212,6 @@ void user_dialog::save_values() {
 
 	// Now tell all views to update formats
 	book_->selection(-1, HT_FORMAT);
-
-	settings_->flush();
 }
 
 // Used to enable/disable specific widget - any widgets enabled must be attributes

@@ -11,7 +11,8 @@
 
 using namespace std;
 
-extern Fl_Preferences* settings_;
+extern string VENDOR;
+extern string PROGRAM_ID;
 
 // Constructor
 qso_log::qso_log(int X, int Y, int W, int H, const char* l) :
@@ -35,7 +36,8 @@ qso_log::~qso_log() {
 // get settings 
 void qso_log::load_values() {
 	// Load default tab value
-	Fl_Preferences tab_settings(settings_, "Dashboard/Tabs");
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences tab_settings(settings, "Dashboard/Tabs");
 	tab_settings.get("Log", default_tab_, 0);
 }
 
@@ -115,7 +117,8 @@ void qso_log::enable_widgets() {
 
 // Save changes
 void qso_log::save_values() {
-	Fl_Preferences tab_settings(settings_, "Dashboard/Tabs");
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences tab_settings(settings, "Dashboard/Tabs");
 	// Find the current selected tab and save its index
 	Fl_Widget* w = value();
 	for (int ix = 0; ix != children(); ix++) {
@@ -124,7 +127,6 @@ void qso_log::save_values() {
 		}
 	}
 	bands_->save_values();
-	settings_->flush();
 }
 
 // Callback on switching tab

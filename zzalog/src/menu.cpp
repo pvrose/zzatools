@@ -55,7 +55,6 @@ extern status* status_;
 extern tabbed_forms* tabbed_forms_;
 extern url_handler* url_handler_;
 extern main_window* main_window_;
-extern Fl_Preferences* settings_;
 extern bool READ_ONLY;
 extern list<string> recent_files_;
 extern intl_dialog* intl_dialog_;
@@ -66,6 +65,8 @@ extern time_t session_start_;
 extern qso_manager* qso_manager_;
 extern config* config_;
 extern eqsl_handler* eqsl_handler_;
+extern string VENDOR;
+extern string PROGRAM_ID;
 
 
 
@@ -327,7 +328,8 @@ void menu::cb_mi_file_open(Fl_Widget* w, void* v) {
 	// Open chooser and open read/write (0) or read only (-1)
 	if (file_id <= 0) {
 		// Open file chooser to get file to load
-		Fl_Preferences datapath_settings(settings_, "Datapath");
+		Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+		Fl_Preferences datapath_settings(settings, "Datapath");
 		char* directory;
 		datapath_settings.get("Log Directory", directory, "");
 		Fl_Native_File_Chooser* chooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_FILE);
@@ -342,7 +344,8 @@ void menu::cb_mi_file_open(Fl_Widget* w, void* v) {
 	}
 	else {
 		// Get the recent file with supplied ID
-		Fl_Preferences recent_settings(settings_, "Recent Files");
+		Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+		Fl_Preferences recent_settings(settings, "Recent Files");
 		char * temp;
 		char path[6];
 		sprintf(path, "File%c", file_id);
@@ -946,7 +949,8 @@ void menu::cb_mi_imp_file(Fl_Widget* w, void* v) {
 	while (!import_data_->update_complete()) Fl::check();
 	// Get data directory
 	char* directory;
-	Fl_Preferences datapath_settings(settings_, "Datapath");
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences datapath_settings(settings, "Datapath");
 	datapath_settings.get("Log Directory", directory, "");
 	// Open file chooser
 	string filename;
@@ -1648,7 +1652,8 @@ void menu::update_windows_items() {
 string menu::get_browser() {
 	// Get browser from config
 	char* temp;
-	Fl_Preferences datapath_settings(settings_, "Datapath");
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences datapath_settings(settings, "Datapath");
 	datapath_settings.get("Web Browser", temp, "");
 	string browser = temp;
 	free(temp);
@@ -1667,7 +1672,6 @@ string menu::get_browser() {
 		delete chooser;
 	}
 	datapath_settings.set("Web Browser", browser.c_str());
-	settings_->flush();
 	return browser;
 }
 

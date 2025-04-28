@@ -7,10 +7,11 @@
 #include <FL/Fl_Preferences.H>
 
 
-extern Fl_Preferences* settings_;
 extern spec_data* spec_data_;
 extern status* status_;
 extern bool closing_;
+extern string VENDOR;
+extern string PROGRAM_ID;
 
 // Constructor for the rigs set of tabs
 qso_tabbed_rigs::qso_tabbed_rigs(int X, int Y, int W, int H, const char* L) :
@@ -38,7 +39,8 @@ qso_tabbed_rigs::~qso_tabbed_rigs() {
 void qso_tabbed_rigs::load_values() {
 	// Get existing rig names from spec_data
 	spec_dataset* rig_dataset = spec_data_->dataset("Dynamic MY_RIG");
-	Fl_Preferences cat_settings(settings_, "CAT");
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences cat_settings(settings, "CAT");
 	for (int g = 0; g < cat_settings.groups(); g++) {
 		const char* name = cat_settings.group(g);
 		// If the names is both in settings and in the list read from the log add it to the list
@@ -50,7 +52,7 @@ void qso_tabbed_rigs::load_values() {
 		label_map_[string("")] = nullptr;
 	}
 	// Load default tab value
-	Fl_Preferences tab_settings(settings_, "Dashboard/Tabs");
+	Fl_Preferences tab_settings(settings, "Dashboard/Tabs");
 	tab_settings.get("Rigs", default_tab_, 0);
 }
 
@@ -114,7 +116,8 @@ void qso_tabbed_rigs::enable_widgets() {
 
 // Save changes
 void qso_tabbed_rigs::save_values() {
-	Fl_Preferences tab_settings(settings_, "Dashboard/Tabs");
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences tab_settings(settings, "Dashboard/Tabs");
 	// Find the current selected tab and save its index
 	Fl_Widget* w = value();
 	for (int ix = 0; ix != children(); ix++) {
@@ -122,7 +125,6 @@ void qso_tabbed_rigs::save_values() {
 			tab_settings.set("Rigs", ix);
 		}
 	}
-	settings_->flush();
 }
 
 // Switch to the selected rig

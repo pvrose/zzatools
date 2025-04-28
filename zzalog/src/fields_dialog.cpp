@@ -13,7 +13,6 @@
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Choice.H>
 
-extern Fl_Preferences* settings_;
 extern book* book_;
 extern fields* fields_;
 

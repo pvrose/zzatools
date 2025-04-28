@@ -48,7 +48,6 @@
 
 
 // External declarations
-extern Fl_Preferences* settings_;
 extern status* status_;
 extern tabbed_forms* tabbed_forms_;
 extern spec_data* spec_data_;
@@ -62,6 +61,8 @@ extern import_data* import_data_;
 extern qrz_handler* qrz_handler_;
 extern main_window* main_window_;
 extern bool closing_;
+extern string VENDOR;
+extern string PROGRAM_ID;
 
 // The main dialog constructor
 qso_manager::qso_manager(int W, int H, const char* label) :
@@ -180,7 +181,8 @@ void qso_manager::create_form(int X, int Y) {
 // Load values
 void qso_manager::load_values() {
 	// Get position of window
-	Fl_Preferences windows_settings(settings_, "Windows");
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences windows_settings(settings, "Windows");
 	Fl_Preferences dash_settings(windows_settings, "Dashboard");
 	int left, top;
 	dash_settings.get("Left", left, 0);
@@ -192,13 +194,12 @@ void qso_manager::load_values() {
 void qso_manager::save_values() {
 
 	// Save window position
-	Fl_Preferences windows_settings(settings_, "Windows");
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences windows_settings(settings, "Windows");
 	Fl_Preferences dash_settings(windows_settings, "Dashboard");
 	dash_settings.set("Left", x_root());
 	dash_settings.set("Top", y_root());
-	settings_->flush();
 
-//	Fl_Preferences stations_settings(settings_, "Stations");
 	data_group_->save_values();
 	rig_group_->save_values();
 	info_group_->save_values();

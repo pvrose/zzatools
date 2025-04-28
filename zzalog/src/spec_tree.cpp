@@ -21,8 +21,9 @@
 extern spec_data* spec_data_;
 extern tabbed_forms* tabbed_forms_;
 extern status* status_;
-extern Fl_Preferences* settings_;
 extern bool DARK;
+extern string VENDOR;
+extern string PROGRAM_ID;
 
 using namespace std;
 
@@ -35,7 +36,8 @@ spec_tree::spec_tree(int X, int Y, int W, int H, const char* label, field_app_t 
 	, sub_item_(nullptr)
 {
 	// Tree parameters
-	Fl_Preferences user_settings(settings_, "User Settings");
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences user_settings(settings, "User Settings");
 	Fl_Preferences tree_settings(user_settings, "Tree Views");
 	tree_settings.get("Font Name", (int&)font_, 0);
 	tree_settings.get("Font Size", (int&)fontsize_, FL_NORMAL_SIZE);

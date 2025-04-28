@@ -26,10 +26,11 @@
 
 using namespace std;
 
-extern Fl_Preferences* settings_;
 extern qso_manager* qso_manager_;
 extern qsl_dataset* qsl_dataset_;
 extern status* status_;
+extern string VENDOR;
+extern string PROGRAM_ID;
 
 // Constructor
 qsl_editor::qsl_editor(int X, int Y, int W, int H, const char* L) :
@@ -93,7 +94,8 @@ void qsl_editor::load_values() {
 	}
 	qsl_type_ = qsl_data::LABEL;
 	// Get the display window position
-	Fl_Preferences windows_settings(settings_, "Windows");
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences windows_settings(settings, "Windows");
 	Fl_Preferences qsl_win_settings(windows_settings, "QSL Design");
 	qsl_win_settings.get("Top", win_y_, 10);
 	qsl_win_settings.get("Left", win_x_, 10);
@@ -404,7 +406,8 @@ void qsl_editor::resize() {
 void qsl_editor::save_values() {
 
 	// Sabe the display window position
-	Fl_Preferences windows_settings(settings_, "Windows");
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences windows_settings(settings, "Windows");
 	Fl_Preferences qsl_win_settings(windows_settings, "QSL Design");
 	qsl_win_settings.set("Top", win_y_);
 	qsl_win_settings.set("Left", win_x_);
@@ -417,8 +420,6 @@ void qsl_editor::save_values() {
 		status_->misc_status(ST_ERROR, msg);
 	}
 	qsl_dataset_->save_data();
-
-	settings_->flush();
 }
 // Create the card data item data widgets
 void qsl_editor::create_items() {

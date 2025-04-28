@@ -8,8 +8,9 @@
 
 #include <FL/Fl_Preferences.H>
 
-extern Fl_Preferences* settings_;
 extern status* status_;
+extern string VENDOR;
+extern string PROGRAM_ID;
 
 qsl_dataset::qsl_dataset() {
 	load_data();
@@ -41,7 +42,8 @@ qsl_data* qsl_dataset::get_card(string callsign, qsl_data::qsl_type type, bool c
 // Read card designs
 void qsl_dataset::load_data() {
 	data_.clear();
-	Fl_Preferences qsl_settings(settings_, "QSL Design");
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences qsl_settings(settings, "QSL Design");
 
 	for (int ix = 0; ix < (int)qsl_data::MAX_TYPE; ix++) {
 		map<string, qsl_data*>* type_data = new map<string, qsl_data*>;
@@ -193,7 +195,8 @@ void qsl_dataset::load_items(qsl_data* data) {
 
 // Store card designs
 void qsl_dataset::save_data() {
-	Fl_Preferences qsl_settings(settings_, "QSL Design");
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences qsl_settings(settings, "QSL Design");
 	qsl_settings.clear();
 	for (auto it = data_.begin(); it != data_.end(); it++) {
 		qsl_data::qsl_type type = it->first;

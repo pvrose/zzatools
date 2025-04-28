@@ -15,7 +15,6 @@
 
 
 extern spec_data* spec_data_;
-extern Fl_Preferences* settings_;
 extern status* status_;
 extern bool closing_;
 

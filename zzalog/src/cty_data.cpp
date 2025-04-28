@@ -25,8 +25,9 @@
 extern club_handler* club_handler_;
 extern status* status_;
 extern spec_data* spec_data_;
-extern Fl_Preferences* settings_;
 extern bool closing_;
+extern string VENDOR;
+extern string PROGRAM_ID;
 
 // Constructor - Download new data and build database
 cty_data::cty_data() :
@@ -233,7 +234,8 @@ bool cty_data::load_data(string filename) {
 // Get the filename {REFERENCE DIR}/cty.xml
 string cty_data::get_filename() {
 	// get the datapath settings group.
-	Fl_Preferences datapath(settings_, "Datapath");
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences datapath(settings, "Datapath");
 	char* dirname = nullptr;
 	string directory_name;
 	// get the value from settings or force new browse
@@ -255,7 +257,6 @@ string cty_data::get_filename() {
 	}
 	if (dirname) free(dirname);
 	datapath.set("Reference", directory_name.c_str());
-	settings_->flush();
 	return directory_name + "cty.xml";
 }
 

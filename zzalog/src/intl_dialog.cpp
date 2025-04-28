@@ -14,8 +14,9 @@
 
 
 extern status* status_;
-extern Fl_Preferences* settings_;
 extern menu* menu_;
+extern string VENDOR;
+extern string PROGRAM_ID;
 
 // Constructs a window 
 intl_dialog::intl_dialog() :
@@ -179,7 +180,8 @@ void intl_dialog::cb_bn_use(Fl_Widget* w, void* v) {
 // Get the data path to the files - returns directory name
 string intl_dialog::get_path() {
 	// get the datapath settings group.
-	Fl_Preferences datapath(settings_, "Datapath");
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences datapath(settings, "Datapath");
 	char *dirname = nullptr;
 	string directory_name;
 	// get the value from settings or force new browse
@@ -203,7 +205,6 @@ string intl_dialog::get_path() {
 	}
 	if (dirname) free(dirname);
 	datapath.set("Reference", directory_name.c_str());
-	settings_->flush();
 	return directory_name;
 }
 

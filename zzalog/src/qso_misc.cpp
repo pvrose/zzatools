@@ -9,7 +9,8 @@
 
 #include <FL/Fl_Preferences.H>
 
-extern Fl_Preferences* settings_;
+extern string VENDOR;
+extern string PROGRAM_ID;
 
 // Constructor
 qso_misc::qso_misc(int X, int Y, int W, int H, const char* L) :
@@ -29,7 +30,8 @@ qso_misc::~qso_misc() {
 // get settings
 void qso_misc::load_values() {
 	// Load default tab value
-	Fl_Preferences tab_settings(settings_, "Dashboard/Tabs");
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences tab_settings(settings, "Dashboard/Tabs");
 	tab_settings.get("Miscellaneous", default_tab_, 0);
 
 }
@@ -87,7 +89,8 @@ void qso_misc::enable_widgets() {
 
 // save value
 void qso_misc::save_values() {
-	Fl_Preferences tab_settings(settings_, "Dashboard/Tabs");
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences tab_settings(settings, "Dashboard/Tabs");
 	// Find the current selected tab and save its index
 	Fl_Widget* w = value();
 	for (int ix = 0; ix != children(); ix++) {
@@ -95,7 +98,6 @@ void qso_misc::save_values() {
 			tab_settings.set("Miscellaneous", ix);
 		}
 	}
-	settings_->flush();
 }
 
 // set the QSO details into the various forms

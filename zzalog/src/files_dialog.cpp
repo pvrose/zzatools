@@ -18,10 +18,11 @@
 
 
 
-extern Fl_Preferences* settings_;
 extern import_data* import_data_;
 extern main_window* main_window_;
 extern qso_manager* qso_manager_;
+extern string VENDOR;
+extern string PROGRAM_ID;
 
 // Constructor
 files_dialog::files_dialog(int X, int Y, int W, int H, const char* label) :
@@ -59,11 +60,12 @@ void files_dialog::load_values() {
 	char * temp_string;
 
 	// Settings groups required below
-	Fl_Preferences qsl_settings(settings_, "QSL");
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences qsl_settings(settings, "QSL");
 	Fl_Preferences lotw_settings(qsl_settings, "LotW");
-	Fl_Preferences datapath_settings(settings_, "Datapath");
-	Fl_Preferences backup_settings(settings_, "Backup");
-	Fl_Preferences status_settings(settings_, "Status");
+	Fl_Preferences datapath_settings(settings, "Datapath");
+	Fl_Preferences backup_settings(settings, "Backup");
+	Fl_Preferences status_settings(settings, "Status");
 	Fl_Preferences clublog_settings(qsl_settings, "ClubLog");
 
 	// TQSL Executable
@@ -325,13 +327,14 @@ void files_dialog::create_form(int X, int Y) {
 // save values to the settings
 void files_dialog::save_values() {
 	// Settings groups for below
-	Fl_Preferences qsl_settings(settings_, "QSL");
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences qsl_settings(settings, "QSL");
 	Fl_Preferences lotw_settings(qsl_settings, "LotW");
-	Fl_Preferences datapath_settings(settings_, "Datapath");
-	Fl_Preferences backup_settings(settings_, "Backup");
-	Fl_Preferences status_settings(settings_, "Status");
+	Fl_Preferences datapath_settings(settings, "Datapath");
+	Fl_Preferences backup_settings(settings, "Backup");
+	Fl_Preferences status_settings(settings, "Status");
 	Fl_Preferences clublog_settings(qsl_settings, "ClubLog");
-	Fl_Preferences qsld_settings(settings_, "QSL Design");
+	Fl_Preferences qsld_settings(settings, "QSL Design");
 	Fl_Preferences call_settings(qsld_settings, station_callsign_.c_str());
 
 	// TQSL Executable
@@ -362,8 +365,6 @@ void files_dialog::save_values() {
 	// Clublog
 	clublog_settings.set("Unzip Command", unzipper_.c_str());
 	clublog_settings.set("Unzip Switches", unzip_switches_.c_str());
-
-	settings_->flush();
 
 }
 

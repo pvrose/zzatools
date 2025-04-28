@@ -16,11 +16,12 @@
 #include <FL/Fl_Radio_Light_Button.H>
 #include <FL/Fl_Output.H>
 
-extern Fl_Preferences* settings_;
 extern fields* fields_;
 extern status* status_;
 extern extract_data* extract_records_;
 extern tabbed_forms* tabbed_forms_;
+extern string VENDOR;
+extern string PROGRAM_ID;
 
 // Constructor
 qso_contest::qso_contest(int X, int Y, int W, int H, const char* L) :
@@ -376,14 +377,15 @@ void qso_contest::cb_wradio(Fl_Widget* w, void* v) {
 
 // Load config for the contest ID
 void qso_contest::load_settings() {
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
 	char* temp;
 	if (contest_id_ == "") {
-		settings_->get("Contests/Current", temp, "");
+		settings.get("Contests/Current", temp, "");
 		contest_id_ = temp;
 		free(temp);
 	}
 	if (contest_id_ != "") {
-		Fl_Preferences contests(settings_, "Contests");
+		Fl_Preferences contests(settings, "Contests");
 		Fl_Preferences c_settings(contests, contest_id_.c_str());
 		c_settings.get("Fields", temp, "Contest/General");
 		collection_ = temp;
@@ -428,7 +430,8 @@ void qso_contest::load_settings() {
 
 // SAve config for the contest ID
 void qso_contest::save_settings() {
-	Fl_Preferences contests(settings_, "Contests");
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences contests(settings, "Contests");
 	contests.set("Current", contest_id_.c_str());
 	Fl_Preferences c_settings(contests, contest_id_.c_str());
 	c_settings.set("Fields", collection_.c_str());

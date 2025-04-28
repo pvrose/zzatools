@@ -18,11 +18,12 @@
 #include <FL/Fl_RGB_Image.H>
 #include <FL/Fl_Tabs.H>
 
-extern Fl_Preferences* settings_;
 extern wsjtx_handler* wsjtx_handler_;
 extern fllog_emul* fllog_emul_;
 extern spec_data* spec_data_;
 extern uint32_t seed_;
+extern string VENDOR;
+extern string PROGRAM_ID;
 
 // Constructor
 web_dialog::web_dialog(int X, int Y, int W, int H, const char* label) :
@@ -92,16 +93,17 @@ web_dialog::~web_dialog()
 // Load initial values from settings
 void web_dialog::load_values() {
 	// Get the various settings
-	Fl_Preferences qsl_settings(settings_, "QSL");
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences qsl_settings(settings, "QSL");
 	Fl_Preferences eqsl_settings(qsl_settings, "eQSL");
 	Fl_Preferences lotw_settings(qsl_settings, "LotW");
 	Fl_Preferences qrz_settings(qsl_settings, "QRZ");
 	Fl_Preferences card_settings(qsl_settings, "Card");
 	Fl_Preferences club_settings(qsl_settings, "ClubLog");
-	Fl_Preferences nw_settings(settings_, "Network");
+	Fl_Preferences nw_settings(settings, "Network");
 	Fl_Preferences wsjtx_settings(nw_settings, "WSJT-X");
 	Fl_Preferences fllog_settings(nw_settings, "Fllog");
-	Fl_Preferences email_settings(settings_, "e-Mail");
+	Fl_Preferences email_settings(settings, "e-Mail");
 
 	// eQSL User/Password
 	eqsl_settings.get("Enable", (int&)eqsl_enable_, false);
@@ -857,16 +859,17 @@ void web_dialog::create_email(int rx, int ry, int rw, int rh) {
 // Save values to settings
 void web_dialog::save_values() {
 	// Get settings
-	Fl_Preferences qsl_settings(settings_, "QSL");
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences qsl_settings(settings, "QSL");
 	Fl_Preferences eqsl_settings(qsl_settings, "eQSL");
 	Fl_Preferences lotw_settings(qsl_settings, "LotW");
 	Fl_Preferences qrz_settings(qsl_settings, "QRZ");
 	Fl_Preferences card_settings(qsl_settings, "Card");
 	Fl_Preferences club_settings(qsl_settings, "ClubLog");
-	Fl_Preferences nw_settings(settings_, "Network");
+	Fl_Preferences nw_settings(settings, "Network");
 	Fl_Preferences wsjtx_settings(nw_settings, "WSJT-X");
 	Fl_Preferences fllog_settings(nw_settings, "Fllog");
-	Fl_Preferences email_settings(settings_, "e-Mail");
+	Fl_Preferences email_settings(settings, "e-Mail");
 	// eQSL Settings
 	uchar offset = hash8(eqsl_settings.path());
 	string encrypt;
@@ -945,7 +948,6 @@ void web_dialog::save_values() {
 	email_settings.set("CC Address Length", (int)encrypt.length());
 	email_settings.set("CC Address", (void*)encrypt.c_str(), encrypt.length());
 
-	settings_->flush();
 }
 
 // Enable widgets after enabling/disabling stuff

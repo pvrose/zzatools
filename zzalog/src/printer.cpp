@@ -22,7 +22,6 @@
 extern tabbed_forms* tabbed_forms_;
 extern status* status_;
 extern book* navigation_book_;
-extern Fl_Preferences* settings_;
 extern qso_manager* qso_manager_;
 extern qsl_dataset* qsl_dataset_;
 

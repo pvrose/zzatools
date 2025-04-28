@@ -18,13 +18,14 @@
 #include <FL/fl_draw.H>
 #include <FL/Fl_Help_Dialog.H>
 
-extern Fl_Preferences* settings_;
 extern status* status_;
 extern book* book_;
 extern url_handler* url_handler_;
 extern bool DEBUG_THREADS;
 extern fields* fields_;
 extern uint32_t seed_;
+extern string VENDOR;
+extern string PROGRAM_ID;
 
 // Constructor
 lotw_handler::lotw_handler()
@@ -53,7 +54,8 @@ bool lotw_handler::upload_lotw_log(book* book, bool mine) {
 	status_->misc_status(ST_DEBUG, "LOTW: uploading extracted data");
 	fl_cursor(FL_CURSOR_WAIT);
 	// Get LotW settings
-	Fl_Preferences qsl_settings(settings_, "QSL");
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences qsl_settings(settings, "QSL");
 	Fl_Preferences lotw_settings(qsl_settings, "LotW");
 	char* filename;
 	string new_filename = "";
@@ -91,7 +93,8 @@ bool lotw_handler::upload_lotw_log(book* book, bool mine) {
 			// Get the TQSL (an app that signs the upload) executable
 			string tqsl_executable;
 			char* temp;
-			Fl_Preferences datapath_settings(settings_, "Datapath");
+			Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+			Fl_Preferences datapath_settings(settings, "Datapath");
 			datapath_settings.get("TQSL Executable", temp, "");
 			tqsl_executable = temp;
 			free(temp);
@@ -154,7 +157,6 @@ bool lotw_handler::upload_lotw_log(book* book, bool mine) {
 	}
 	delete chooser;
 	fl_cursor(FL_CURSOR_DEFAULT);
-	settings_->flush();
 	return ok;
 }
 
@@ -215,19 +217,20 @@ bool lotw_handler::download_lotw_log(stringstream* adif) {
 		ok = false;
 	}
 	if (ok) {
-		Fl_Preferences qsl_settings(settings_, "QSL");
+		Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+		Fl_Preferences qsl_settings(settings, "QSL");
 		Fl_Preferences lotw_settings(qsl_settings, "LotW");
 		lotw_settings.set("Last Accessed", now(false, "%Y%m%d").c_str());
 	}
 	fl_cursor(FL_CURSOR_DEFAULT);
-	settings_->flush();
 	return ok;
 }
 
 // get user details - set any parameter to nullptr to skip setting it
 bool lotw_handler::user_details(string* username, string* password, string* last_access) {
 	// Get LotW login details from the settings
-	Fl_Preferences qsl_settings(settings_, "QSL");
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences qsl_settings(settings, "QSL");
 	Fl_Preferences lotw_settings(qsl_settings, "LotW");
 	char * temp;
 	if (username != nullptr) {
@@ -296,7 +299,8 @@ bool lotw_handler::validate_adif(stringstream* adif) {
 
 // Upload single QSO
 bool lotw_handler::upload_single_qso(item_num_t record_num) {
-	Fl_Preferences qsl_settings(settings_, "QSL");
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences qsl_settings(settings, "QSL");
 	Fl_Preferences lotw_settings(qsl_settings, "LotW");
 	int upload_qso;
 	lotw_settings.get("Upload per QSO", upload_qso, false);

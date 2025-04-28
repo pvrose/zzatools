@@ -28,12 +28,13 @@
 
 using namespace std;
 
-extern Fl_Preferences* settings_;
 extern status* status_;
 extern band_data* band_data_;
 extern spec_data* spec_data_;
 extern bool DARK;
 extern ticker* ticker_;
+extern string VENDOR;
+extern string PROGRAM_ID;
 
 
 // Constructor
@@ -155,7 +156,8 @@ void qso_rig::load_cat_data(qso_rig::cat_data_t* cat_data, Fl_Preferences settin
 // Get initial data from settings
 void qso_rig::load_values() {
 	// Read hamlib configuration - manufacturer,  model, port and baud-rate
-	Fl_Preferences cat_settings(settings_, "CAT");
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences cat_settings(settings, "CAT");
 	if (cat_settings.groupExists(label())) {
 		Fl_Preferences rig_settings(cat_settings, label());
 		for (int ix = 0; ix < rig_settings.groups(); ix++) {
@@ -768,7 +770,8 @@ void qso_rig::save_cat_data(qso_rig::cat_data_t* cat_data, Fl_Preferences settin
 // Save values in settings
 void qso_rig::save_values() {
 	// Read hamlib configuration - manufacturer,  model, port and baud-rate
-	Fl_Preferences cat_settings(settings_, "CAT");
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences cat_settings(settings, "CAT");
 	if (cat_data_.size()) {
 		Fl_Preferences rig_settings(cat_settings, label());
 		rig_settings.clear();
@@ -780,7 +783,6 @@ void qso_rig::save_values() {
 		// Preferred antenna
 		rig_settings.set("Antenna", antenna_.c_str());
 		rig_settings.set("Instantaneous Values", instant_meters_);
-		settings_->flush();
 	} else {
 		// Remove this rig from the settings file
 		cat_settings.delete_group(label());

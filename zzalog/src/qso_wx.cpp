@@ -15,7 +15,8 @@
 #include <FL/Fl_Button.H>
 
 extern wx_handler* wx_handler_;
-extern Fl_Preferences* settings_;
+extern string VENDOR;
+extern string PROGRAM_ID;
 
 // Weather group - constructor
 qso_wx::qso_wx
@@ -45,7 +46,8 @@ qso_wx::~qso_wx()
 // get settings
 void qso_wx::load_values() {
 	// Get last used display formats
-	Fl_Preferences user_settings(settings_, "User Settings");
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences user_settings(settings, "User Settings");
 	Fl_Preferences wx_settings(user_settings, "Weather");
 	wx_settings.get("Speed", (int&)display_speed_, MILE_PER_HOUR);
 	wx_settings.get("Direction", (int&)display_direction_, CARDINAL);
@@ -342,14 +344,14 @@ void qso_wx::enable_widgets() {
 
 // save value
 void qso_wx::save_values() {
-	Fl_Preferences user_settings(settings_, "User Settings");
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences user_settings(settings, "User Settings");
 	Fl_Preferences wx_settings(user_settings, "Weather");
 	wx_settings.set("Speed", (int&)display_speed_);
 	wx_settings.set("Direction", (int&)display_direction_);
 	wx_settings.set("Temperature", (int&)display_temperature_);
 	wx_settings.set("Pressure", (int&)display_pressure_);
 	wx_settings.set("Cloud", (int&)display_cloud_);
-	settings_->flush();
 }
 
 // Icon clicked' - reload weather

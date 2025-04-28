@@ -23,7 +23,6 @@
 #include <FL/Enumerations.H>
 #include <FL/fl_ask.H>
 
-extern Fl_Preferences* settings_;
 extern spec_data* spec_data_;
 extern book* book_;
 extern main_window* main_window_;
@@ -37,6 +36,8 @@ extern qso_manager* qso_manager_;
 extern bool in_current_session(record*);
 extern bool DARK;
 extern fields* fields_;
+extern string VENDOR;
+extern string PROGRAM_ID;
 
 Fl_Font log_table::font_;
 Fl_Fontsize log_table::fontsize_;
@@ -61,7 +62,8 @@ log_table::log_table(int X, int Y, int W, int H, const char* label, field_app_t 
 	tip_root_y_ = 0;
 
 	// These are static, but will get to the same value each time
-	Fl_Preferences user_settings(settings_, "User Settings");
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences user_settings(settings, "User Settings");
 	Fl_Preferences log_settings(user_settings, "Log Table");
 	log_settings.get("Font Name", (int&)font_, 0);
 	log_settings.get("Font Size", (int&)fontsize_, FL_NORMAL_SIZE);
@@ -104,7 +106,7 @@ log_table::log_table(int X, int Y, int W, int H, const char* label, field_app_t 
 	// number of rows - available internal height / default row height
 	rows_per_page_ = Fl_Table_Row::tih / (row_height);
 	// Reverse order
-	Fl_Preferences display_settings(settings_, "Display");
+	Fl_Preferences display_settings(settings, "Display");
 	display_settings.get("Recent First", (int&)order_, FIRST_TO_LAST);
 
 	// Set minimum resizing - width 1/3
@@ -817,7 +819,8 @@ void log_table::dbl_click_column(int col) {
 		current_item_num_ = my_book_->size() - 1 - current_item_num_;
 		display_current();
 		// Save value in settings
-		Fl_Preferences display_settings(settings_, "Display");
+		Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+		Fl_Preferences display_settings(settings, "Display");
 		display_settings.set("Recent First", order_);
 		// Redraw the window
 		redraw();
@@ -870,7 +873,6 @@ void log_table::dbl_click_column(int col) {
 		snprintf(message, 128, "LOG: Sort on %s not available with this log type. Sort ignored", field_info.field.c_str());
 		status_->misc_status(ST_WARNING, message);
 	}
-	settings_->flush();
 }
 
 // Select and go to item 

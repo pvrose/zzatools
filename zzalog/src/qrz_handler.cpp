@@ -29,9 +29,10 @@ extern tabbed_forms* tabbed_forms_;
 extern url_handler* url_handler_;
 extern book* navigation_book_;
 extern menu* menu_;
-extern Fl_Preferences* settings_;
 extern string PROG_ID;
 extern string PROGRAM_VERSION;
+extern string VENDOR;
+extern string PROGRAM_ID;
 extern uint32_t seed_;
 extern import_data* import_data_;
 extern qso_manager* qso_manager_;
@@ -102,9 +103,9 @@ bool qrz_handler::open_session() {
 				if (fl_choice("You are not a subscriber to the QRZ XML Database so will only receive limited info.\n"
 					"Do you wish to continue or use the standard web page?", "Continue", "Use Web Page", nullptr) == 1) {
 					use_xml_database_ = false;
-					Fl_Preferences qrz_settings(settings_, "QRZ");
+					Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+					Fl_Preferences qrz_settings(settings, "QRZ");
 					qrz_settings.set("Use XML Database", false);
-					settings_->flush();
 					return false;
 				}
 			}
@@ -210,7 +211,8 @@ string qrz_handler::generate_details_uri(string callsign) {
 
 // Fetch user details - returns false if not enabled or whether username or password are blank strings
 bool qrz_handler::user_details() {
-	Fl_Preferences qsl_settings(settings_, "QSL");
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences qsl_settings(settings, "QSL");
 	Fl_Preferences qrz_settings(qsl_settings, "QRZ");
 	int enabled;
 	qrz_settings.get("Enable", enabled, false);
@@ -408,7 +410,8 @@ void qrz_handler::open_web_page(string callsign) {
 
 // Load the api_data from settings
 void qrz_handler::load_data() {
-	Fl_Preferences qrz_settings(settings_, "QSL/QRZ");
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences qrz_settings(settings, "QSL/QRZ");
 	int itemp; // For bool settings
 	char* stemp; // For Cstring settings
 	char* btemp; // For binary settings - encrypted string
@@ -444,7 +447,8 @@ void qrz_handler::load_data() {
 
 // Store the api_data to settings
 void qrz_handler::store_data() {
-	Fl_Preferences api_settings(settings_, "QSL/QRZ/Logbooks");
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences api_settings(settings, "QSL/QRZ/Logbooks");
 	uchar offset = hash8(api_settings.path());
 	for (auto it = api_data_.begin(); it != api_data_.end(); it++) {
 		string call = it->first;

@@ -31,7 +31,7 @@ class Fl_Preferences;
 		// Add a leaf node at the current point
 		void add_leaf(Fl_Tree_Item* parent, string label, string value);
 		// Add a new branch at the current point
-		void add_branch(Fl_Tree_Item* parent, Fl_Preferences* settings);
+		void add_branch(Fl_Tree_Item* parent, Fl_Preferences& settings);
 		// Delete the tree
 		void delete_tree();
 	};

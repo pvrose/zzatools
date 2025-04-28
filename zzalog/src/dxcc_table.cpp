@@ -10,7 +10,6 @@
 
 extern book* book_;
 extern spec_data* spec_data_;
-extern Fl_Preferences* settings_;
 
 dxcc_table::dxcc_table(int X, int Y, int W, int H, const char* L) :
     Fl_Table(X, Y, W, H, L)

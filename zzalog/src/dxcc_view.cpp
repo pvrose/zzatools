@@ -6,7 +6,8 @@
 #include <FL/Fl_Check_Button.H>
 #include <FL/Fl_Preferences.H>
 
-extern Fl_Preferences* settings_;
+extern string VENDOR;
+extern string PROGRAM_ID;
 
 dxcc_view::dxcc_view(int X, int Y, int W, int H, const char* L, field_app_t fo) :
 	view(),
@@ -119,7 +120,8 @@ void dxcc_view::cb_confirm(Fl_Widget* w, void* v) {
 
 // Get previously saved values for display and confirmation types
 void dxcc_view::load_data() {
-    Fl_Preferences user_settings(settings_, "User Settings");
+    Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+    Fl_Preferences user_settings(settings, "User Settings");
     Fl_Preferences dxcc_settings(user_settings, "DXCC Table");
     int temp;
     dxcc_settings.get("Display Type", temp, (int)dxcc_table::BANDS);
@@ -130,7 +132,8 @@ void dxcc_view::load_data() {
 
 // Remember values for display and confirmation types
 void dxcc_view::store_data() {
-    Fl_Preferences user_settings(settings_, "User Settings");
+    Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+    Fl_Preferences user_settings(settings, "User Settings");
     Fl_Preferences dxcc_settings(user_settings, "DXCC Table");
     dxcc_settings.set("Display Type", (int)display_type_);
     dxcc_settings.set("Confirmation", (int)confirm_type_);

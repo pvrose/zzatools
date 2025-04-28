@@ -20,13 +20,14 @@
 using namespace std;
 
 extern url_handler* url_handler_;
-extern Fl_Preferences* settings_;
 extern status* status_;
 extern book* book_;
 extern qso_manager* qso_manager_;
 extern bool DEBUG_THREADS;
 extern fields* fields_;
 extern uint32_t seed_;
+extern string VENDOR;
+extern string PROGRAM_ID;
 
 // Constructor 
 club_handler::club_handler() {
@@ -101,7 +102,8 @@ bool club_handler::upload_log(book* book) {
 // Generate the fields in the form
 void club_handler::generate_form(vector<url_handler::field_pair>& fields, record* the_qso) {
 	// Read the settings that define user's access 
-	Fl_Preferences qsl_settings(settings_, "QSL");
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences qsl_settings(settings, "QSL");
 	Fl_Preferences clublog_settings(qsl_settings, "ClubLog");
 	uchar offset = hash8(clublog_settings.path());
 	int itemp;
@@ -212,7 +214,8 @@ bool club_handler::unzip_exception(string filename) {
 // Get reference directory
 void club_handler::get_reference(string& dir_name) {
 	// Get the reference data directory from the settings
-	Fl_Preferences datapath(settings_, "Datapath");
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences datapath(settings, "Datapath");
 	char* temp = nullptr;
 	// If the path is not in the settings
 	if (!datapath.get("Reference", temp, "")) {
@@ -231,12 +234,12 @@ void club_handler::get_reference(string& dir_name) {
 		dir_name = temp;
 	}
 	if (temp) free(temp);
-	settings_->flush();
 }
 
 // Upload the single specified QSO in real time
 bool club_handler::upload_single_qso(qso_num_t record_num) {
-	Fl_Preferences qsl_settings(settings_, "QSL");
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences qsl_settings(settings, "QSL");
 	Fl_Preferences club_settings(qsl_settings, "ClubLog");
 	int upload_qso;
 	club_settings.get("Upload per QSO", upload_qso, false);

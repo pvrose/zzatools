@@ -25,7 +25,7 @@ struct qrz_api_data;
 
 		// inherited methods
 		// Standard methods - need to be written for each
-		// Load values from settings_
+		// Load values from settings
 		virtual void load_values();
 		// Used to create the form
 		virtual void create_form(int X, int Y);

@@ -22,9 +22,10 @@ using namespace std;
 
 
 
-extern Fl_Preferences* settings_;
 extern spec_data* spec_data_;
 extern cty_data* cty_data_;
+extern string VENDOR;
+extern string PROGRAM_ID;
 
 // Constructor
 search_dialog::search_dialog() :
@@ -385,7 +386,8 @@ void search_dialog::load_values() {
 	criteria_ = new search_criteria_t;
 	criteria_->from_date = "";
 	// Get previous criteria from settings
-	Fl_Preferences search_settings(settings_, "Search");
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences search_settings(settings, "Search");
 	char * temp;
 	search_settings.get("By Dates", (int&)criteria_->by_dates, false);
 	search_settings.get("By Comparison", (int&)criteria_->comparator, XP_EQ);
@@ -452,7 +454,8 @@ void search_dialog::save_values() {
 		break;
 	}
 	// Save criteria in settings
-	Fl_Preferences search_settings(settings_, "Search");
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences search_settings(settings, "Search");
 	search_settings.set("By Dates", criteria_->by_dates);
 	search_settings.set("By Comparison", criteria_->comparator);
 	search_settings.set("Confirmed Card", criteria_->confirmed_card);
@@ -466,8 +469,6 @@ void search_dialog::save_values() {
 	search_settings.set("Condition", criteria_->pattern.c_str());
 	search_settings.set("Field", criteria_->field_name.c_str());
 	search_settings.set("Mode", criteria_->mode.c_str());
-
-	settings_->flush();
 }
 
 // get the extract criteria

@@ -29,13 +29,14 @@
 
 extern book* book_;
 extern status* status_;
-extern Fl_Preferences* settings_;
 extern qso_manager* qso_manager_;
 extern url_handler* url_handler_;
 extern bool DEBUG_THREADS;
 extern string default_station_;
 extern fields* fields_;
 extern uint32_t seed_;
+extern string VENDOR;
+extern string PROGRAM_ID;
 
 // Constructor
 eqsl_handler::eqsl_handler()
@@ -59,7 +60,8 @@ eqsl_handler::eqsl_handler()
 
 	set_adif_fields();
 
-	Fl_Preferences eqsl_settings(settings_, "QSL/eQSL");
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences eqsl_settings(settings, "QSL/eQSL");
 	eqsl_settings.get("Maximum Fetches", allowed_fetches_, 50);
 
 }
@@ -271,7 +273,8 @@ string eqsl_handler::card_filename_l(record* record, bool use_default) {
 	string station = use_default ? default_station_ : record->item("STATION_CALLSIGN");
 	de_slash(station);
 	// Location of top-directory for QSL card images
-	Fl_Preferences datapath_settings(settings_, "Datapath");
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences datapath_settings(settings, "Datapath");
 	string qsl_directory;
 	char * temp;
 	datapath_settings.get("QSLs", temp, "");
@@ -285,7 +288,6 @@ string eqsl_handler::card_filename_l(record* record, bool use_default) {
 		while (chooser->show()) {}
 		qsl_directory = chooser->filename();
 		datapath_settings.set("QSLs", qsl_directory.c_str());
-		settings_->flush();
 		delete chooser;
 	}
 	char save_filename[2048];
@@ -474,7 +476,8 @@ bool eqsl_handler::user_details(
 	bool* confirmed) {
 
 	// Get username and password for building url to fetch card
-	Fl_Preferences qsl_settings(settings_, "QSL");
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences qsl_settings(settings, "QSL");
 	Fl_Preferences eqsl_settings(qsl_settings, "eQSL");
 	string callsign = qso_manager_->get_default(qso_manager::CALLSIGN);
 
@@ -657,10 +660,10 @@ eqsl_handler::response_t eqsl_handler::adif_filename(string& filename) {
 	// Remember now as the last download date
 	if (result == ER_OK) {
 		last_access = now(false, EQSL_TIMEFORMAT);
-		Fl_Preferences qsl_settings(settings_, "QSL");
+		Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+		Fl_Preferences qsl_settings(settings, "QSL");
 		Fl_Preferences eqsl_settings(qsl_settings, "eQSL");
 		eqsl_settings.set("Last Accessed", last_access.c_str());
-		settings_->flush();
 	}
 
 	return result;
@@ -937,7 +940,8 @@ map<string, string> eqsl_handler::parse_warning(string text) {
 
 // Upload single QSO to eQSL.cc
 bool eqsl_handler::upload_single_qso(qso_num_t record_num) {
-	Fl_Preferences qsl_settings(settings_, "QSL");
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences qsl_settings(settings, "QSL");
 	Fl_Preferences eqsl_settings(qsl_settings, "eQSL");
 	int upload_qso;
 	eqsl_settings.get("Upload per QSO", upload_qso, false);

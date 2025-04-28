@@ -13,8 +13,9 @@
 #include <FL/fl_utf8.h>
 
 
-extern Fl_Preferences* settings_;
 extern status* status_;
+extern string VENDOR;
+extern string PROGRAM_ID;
 
 png_writer::png_writer() {
 	// TODO: Any initialisation of the libpng
@@ -38,7 +39,8 @@ string png_writer::png_filename(record* qso) {
 	string call = qso->item("CALL");
 	string date = qso->item("QSO_DATE");
 
-	Fl_Preferences dp_settings(settings_, "Datapath");
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences dp_settings(settings, "Datapath");
 	char* temp;
 	dp_settings.get("QSLs", temp, "");
 	string dir = temp;

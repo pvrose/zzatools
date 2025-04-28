@@ -17,7 +17,6 @@
 
 using namespace std;
 
-extern Fl_Preferences* settings_;
 extern menu* menu_;
 extern main_window* main_window_;
 extern status* status_;
@@ -26,6 +25,7 @@ extern bool READ_ONLY;
 extern string PROGRAM_ID;
 extern string PROGRAM_VERSION;
 extern bool DEBUG_STATUS;
+extern string VENDOR;
 extern ticker* ticker_;
 
 // Constructor
@@ -40,7 +40,8 @@ status::status() :
 
 	// Get report filename from the settings
 	char * filename;
-	Fl_Preferences status_settings(settings_, "Status");
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences status_settings(settings, "Status");
 	status_settings.get("Report File", filename, "status.txt");
 	report_filename_ = filename;
 	free(filename);
@@ -236,9 +237,9 @@ void status::misc_status(status_t status, const char* label) {
 				chooser->filter("Text files\t*.txt");
 				if (chooser->show() == 0) {
 					report_filename_ = chooser->filename();
-					Fl_Preferences status_settings(settings_, "Status");
+					Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+					Fl_Preferences status_settings(settings, "Status");
 					status_settings.set("Report File", report_filename_.c_str());
-					settings_->flush();
 				}
 				delete chooser;
 			}

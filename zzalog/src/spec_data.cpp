@@ -28,10 +28,11 @@
 
 using namespace std;
 
-extern Fl_Preferences* settings_;
 extern book* book_;
 extern cty_data* cty_data_;
 extern status* status_;
+extern string VENDOR;
+extern string PROGRAM_ID;
 
 // Default constructor
 spec_data::spec_data()
@@ -85,7 +86,8 @@ spec_data::~spec_data()
 // Get the data path to the files - returns directory name
 string spec_data::get_path(bool force) {
 	// get the datapath settings group.
-	Fl_Preferences datapath(settings_, "Datapath");
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences datapath(settings, "Datapath");
 	char *dirname = nullptr;
 	string directory_name;
 	// get the value from settings or force new browse
@@ -109,7 +111,6 @@ string spec_data::get_path(bool force) {
 	}
 	if (dirname) free(dirname);
 	datapath.set("Reference", directory_name.c_str());
-	settings_->flush();
 	return directory_name;
 }
 
@@ -131,7 +132,7 @@ bool spec_data::load_data(bool force) {
 	// Create an input stream from the file
 	string file_name = directory + ADIF_FILE;
 	ifstream file;
-	file.open(file_name.c_str(), fstream::in);
+	file.open(file_name.c_str(), ios_base::in);
 	// Load data from the input stream to the appropriate dataset
 	if (file.good()) {
 		ok = reader->load_data(this, file, adif_version_);

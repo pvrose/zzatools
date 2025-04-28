@@ -1,11 +1,21 @@
 #include "fields.h"
+#include "utils.h"
+#include "status.h"
+
+#include <fstream>
 
 #include <FL/Fl_Preferences.H>
+#include <FL/fl_utf8.h>
 
-extern Fl_Preferences* settings_;
+extern status* status_;
+extern string PROGRAM_ID;
+extern string VENDOR;
+
+using namespace std;
 
 // Constructor
 fields::fields() {
+    filename_ = "";
     load_data();
 } 
 // Destructor
@@ -75,7 +85,8 @@ field_list fields::field_names(string name) {
 // Read settings
 void fields::load_data() {
    	// Read the field data from the settings
-	Fl_Preferences display_settings(settings_, "Display");
+    Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences display_settings(settings, "Display");
 	Fl_Preferences fields_settings(display_settings, "Fields");
 	// Number of field sets (a field set is a set of fields and their ordering)
 	// Then get the field sets for each
@@ -96,8 +107,10 @@ void fields::load_data() {
         }
     }
 	coll_map_.clear();
-	// Read all the field field sets
-    add_collections(fields_settings, "");
+    if (!load_collections(fields_settings)) {
+        // Read all the field field sets
+        add_collections(fields_settings, "");
+    }
     if (coll_map_.find("Default") == coll_map_.end()) {
         // Create the default collection
         collection_t* coll = new collection_t;
@@ -107,6 +120,49 @@ void fields::load_data() {
         }
         coll_map_["Default"] = coll;
     }
+}
+
+// Read - <Prefs path>.fields.tsv
+bool fields::load_collections(Fl_Preferences& settings) {
+    char buffer[128];
+    Fl_Preferences::Root root = settings.filename(buffer, sizeof(buffer), 
+        Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+    if (root != Fl_Preferences::USER_L) {
+        status_->misc_status(ST_FATAL, "FIELDS: Cannot determine Preferences file");
+        return false;
+    } 
+    filename_ = directory(buffer) + "/" + PROGRAM_ID + "/fields.tsv";
+    fl_make_path_for_file(filename_.c_str());
+    ifstream ip;
+    ip.open(filename_.c_str(), ios_base::in);
+    if (!ip.good()) {
+        char msg[128];
+        snprintf(msg, sizeof(msg), 
+            "FIELDS: Failed to open %s, defaulting to looking in Preferences", 
+            filename_.c_str());
+        status_->misc_status(ST_WARNING, msg);
+        return false;
+    }
+    string line;
+    while(ip.good()) {
+        getline(ip, line);
+        vector<string> words;
+        split_line(line, words, '\t');
+        collection_t* coll;
+        // Each line consists of <COLL NAME>\t<INDEX\t<NAME>\t<WIDTH>\t<HEADING>
+        if (coll_map_.find(words[0]) == coll_map_.end()) {
+            // New collection
+            coll = new collection_t;
+            coll_map_[words[0]] = coll;
+        } else {
+            coll = coll_map_.at(words[0]);
+        }
+        int ix = stoi(words[1]);
+        field_info_t info(words[2], words[4], stoi(words[3]));
+        (*coll)[ix] = info;
+    }
+    ip.close();
+    return true;
 }
 
 // Adding collections needs to iterate to cope with collections named "Contest/*"
@@ -152,33 +208,42 @@ void fields::add_collections(Fl_Preferences& settings, string name) {
 // Store settings
 void fields::store_data() {
 	// Read the field data from the registry
-	Fl_Preferences display_settings(settings_, "Display");
+    Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences display_settings(settings, "Display");
 	Fl_Preferences fields_settings(display_settings, "Fields");
 	// Delete current settings
 	fields_settings.clear();
-	// Then get the field sets for the applications
-	char app_path[128];
-	for (int i = 0; i < FO_LAST; i++) {
-		sprintf(app_path, "App%d", i);
-		fields_settings.set(app_path, app_map_[(field_app_t)i].c_str());
-	}
-	// For each field set
-	auto it = coll_map_.begin();
-	for (int i = 0; it != coll_map_.end(); i++, it++) {
-		int num_fields = it->second->size();
-		Fl_Preferences colln_settings(fields_settings, it->first.c_str());
-		// For each field in the set
-		for (int j = 0; j < num_fields; j++) {
-			char field_id[10];
-			sprintf(field_id, "Field %d", j);
-			Fl_Preferences field_settings(colln_settings, field_id);
-			field_info_t field = (it->second)->at(j);
-			field_settings.set("Name", field.field.c_str());
-            field_settings.set("Width", (int)field.width);
-            field_settings.set("Header", field.header.c_str());
-		}
-	}
-    // settings_->flush();
+    if (filename_.length() == 0) {
+        char buffer[128];
+        Fl_Preferences::Root root = fields_settings.filename(buffer, sizeof(buffer), 
+            Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+        if (root != Fl_Preferences::USER_L) {
+            status_->misc_status(ST_FATAL, "FIELDS: Cannot determine Preferences file");
+            return;
+        } 
+        filename_ = directory(buffer) + "/" + PROGRAM_ID + "/fields.tsv";
+        fl_make_path_for_file(filename_.c_str());
+    }
+    ofstream op;
+    op.open(filename_.c_str(), ios_base::out);
+    if (op.good()) {
+        // Then get the field sets for the applications
+        // For each field set
+        auto it = coll_map_.begin();
+        for (int i = 0; it != coll_map_.end(); i++, it++) {
+            int num_fields = it->second->size();
+            // For each field in the set
+            for (int j = 0; j < num_fields; j++) {
+                field_info_t field = (it->second)->at(j);
+                op << it->first << '\t';
+                op << j << '\t';
+                op << field.field << '\t';
+                op << field.width << '\t';
+                op << field.header << '\n';
+             }
+        }
+    }
+    op.close();
 }
 
 // Get the list of collection names

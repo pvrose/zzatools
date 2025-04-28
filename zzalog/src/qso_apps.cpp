@@ -20,7 +20,8 @@ using namespace std;
 extern fllog_emul* fllog_emul_;
 extern wsjtx_handler* wsjtx_handler_;
 extern status* status_;
-extern Fl_Preferences* settings_;
+extern string VENDOR;
+extern string PROGRAM_ID;
 
 // Constructor for one set of modem controls
 app_grp::app_grp(int X, int Y, int W, int H, const char* L) :
@@ -431,7 +432,8 @@ qso_apps::~qso_apps() {
 
 // Load settings
 void qso_apps::load_values() {
-    Fl_Preferences apps_settings(settings_, "Apps");
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+    Fl_Preferences apps_settings(settings, "Apps");
     for (int ix = 0; ix < apps_settings.groups(); ix++) {
         const char* app = apps_settings.group(ix);
         Fl_Preferences app_settings(apps_settings, app);
@@ -464,7 +466,7 @@ void qso_apps::load_values() {
         apps_data_[data->name] = data;
     }
     // Load default tab value
-    Fl_Preferences tab_settings(settings_, "Dashboard/Tabs");
+    Fl_Preferences tab_settings(settings, "Dashboard/Tabs");
     tab_settings.get("Apps", default_tab_, 0);
 }
 
@@ -562,7 +564,8 @@ void qso_apps::adjust_size() {
 
 // save settings
 void qso_apps::save_values() {
-    Fl_Preferences apps_settings(settings_, "Apps");
+    Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+    Fl_Preferences apps_settings(settings, "Apps");
     apps_settings.clear();
     for (auto it = apps_data_.begin(); it != apps_data_.end(); it++) {
         Fl_Preferences app_settings(apps_settings, (*it).first.c_str());
@@ -576,7 +579,7 @@ void qso_apps::save_values() {
             rigs_settings.set((*iu).first.c_str(), (*iu).second.c_str());
         }
     }
-    Fl_Preferences tab_settings(settings_, "Dashboard/Tabs");
+    Fl_Preferences tab_settings(settings, "Dashboard/Tabs");
     // Find the current selected tab and save its index
     Fl_Widget* w = tabs_->value();
     for (int ix = 0; ix != children(); ix++) {
@@ -584,7 +587,6 @@ void qso_apps::save_values() {
             tab_settings.set("Apps", ix);
         }
     }
-    settings_->flush();
 }
 
 // Configure widgets

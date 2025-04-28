@@ -27,7 +27,6 @@
 #include <FL/Fl_Check_Button.H>
 #include <FL/Fl_Fill_Dial.H>
 
-extern Fl_Preferences* settings_;
 extern import_data* import_data_;
 extern extract_data* extract_records_;
 extern tabbed_forms* tabbed_forms_;
@@ -39,6 +38,8 @@ extern eqsl_handler* eqsl_handler_;
 extern club_handler* club_handler_;
 extern lotw_handler* lotw_handler_;
 extern qrz_handler* qrz_handler_;
+extern string VENDOR;
+extern string PROGRAM_ID;
 
 // Constructor
 qso_qsl::qso_qsl(int X, int Y, int W, int H, const char* L) :
@@ -70,7 +71,8 @@ qso_qsl::~qso_qsl() {
 // Load settings data
 void qso_qsl::load_values() {
 	// eQSL
-	Fl_Preferences qsl_settings(settings_, "QSL");
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences qsl_settings(settings, "QSL");
 	Fl_Preferences eqsl_settings(qsl_settings, "eQSL");
 	int upload_qso;
 	eqsl_settings.get("Upload per QSO", upload_qso, false);
@@ -293,7 +295,8 @@ void qso_qsl::create_form() {
 // Save settings
 void qso_qsl::save_values() {
 	// eQSL
-	Fl_Preferences qsl_settings(settings_, "QSL");
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences qsl_settings(settings, "QSL");
 	Fl_Preferences eqsl_settings(qsl_settings, "eQSL");
 	eqsl_settings.set("Upload per QSO", auto_eqsl_);
 	// LotW
@@ -305,7 +308,6 @@ void qso_qsl::save_values() {
 	// QRZ.com
 	Fl_Preferences qrz_settings(qsl_settings, "ClubLog");
 	club_settings.set("Upload per QSO", auto_qrz_);
-	settings_->flush();
 }
 
 // Configure widgets

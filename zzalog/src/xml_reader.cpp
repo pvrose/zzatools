@@ -4,11 +4,15 @@
 
 #include <regex>
 #include <ctime>
+#include <istream>
+#include <string>
 
 #include <FL/fl_ask.H>
 #include <FL/Fl.H>
 
 extern bool closing_;
+
+using namespace std;
 
 // Constructor
 xml_reader::xml_reader()

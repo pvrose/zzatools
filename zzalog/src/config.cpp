@@ -15,8 +15,9 @@
 #include <FL/Fl_Tabs.H>
 #include <FL/Fl_Preferences.H>
 
-extern Fl_Preferences* settings_;
 extern config* config_;
+extern string VENDOR;
+extern string PROGRAM_ID;
 
 // Constructor
 config::config(int W, int H, const char* label) :
@@ -28,7 +29,8 @@ config::config(int W, int H, const char* label) :
 	updatable_views_.clear();
 
 	// Set position on screen
-	Fl_Preferences windows_settings(settings_, "Windows");
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences windows_settings(settings, "Windows");
 	Fl_Preferences window_settings(windows_settings, "Settings");
 	int left, top;
 	window_settings.get("Left", left, 0);
@@ -129,12 +131,12 @@ config::~config()
 {
 	active_ = false;
 	// Rememeber window position
-	Fl_Preferences windows_settings(settings_, "Windows");
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences windows_settings(settings, "Windows");
 	Fl_Preferences window_settings(windows_settings, "Settings");
 	window_settings.set("Left", x_root());
 	window_settings.set("Top", y_root());
 
-	settings_->flush();
 }
 
 // Enable widgets

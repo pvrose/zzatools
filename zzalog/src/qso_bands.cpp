@@ -14,9 +14,9 @@
 #include <FL/Fl_Preferences.H>
 
 extern ticker* ticker_;
-extern Fl_Preferences* settings_;
 extern string PROGRAM_ID;
 extern string PROGRAM_VERSION;
+extern string VENDOR;
 extern bool DARK;
 
 qso_bands::qso_bands(int X, int Y, int W, int H, const char* L) :
@@ -37,7 +37,8 @@ qso_bands::~qso_bands() {
 
 // LLoad settings
 void qso_bands::load_values() {
-	Fl_Preferences my_settings(settings_, "Windows/Bandplan");
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences my_settings(settings, "Windows/Bandplan");
 	int temp;
 	my_settings.get("Open Automatically", temp, (int)false);
 	open_window_ = (bool)temp;
@@ -76,7 +77,8 @@ void qso_bands::create_form() {
 
 // Save settimngs
 void qso_bands::save_values() {
-	Fl_Preferences my_settings(settings_, "Windows/Bandplan");
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences my_settings(settings, "Windows/Bandplan");
 	my_settings.set("Open Automatically", (int)full_window_->visible());
 	my_settings.set("Left", full_window_->x_root());
 	my_settings.set("Top", full_window_->y_root());

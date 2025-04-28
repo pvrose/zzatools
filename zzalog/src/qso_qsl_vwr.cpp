@@ -25,12 +25,13 @@
 
 
 extern eqsl_handler* eqsl_handler_;
-extern Fl_Preferences* settings_;
 extern status* status_;
 extern book* book_;
 extern string default_station_;
 extern tabbed_forms* tabbed_forms_;
 extern qsl_dataset* qsl_dataset_;
+extern string VENDOR;
+extern string PROGRAM_ID;
 
 // Constructor
 qso_qsl_vwr::qso_qsl_vwr(int X, int Y, int W, int H, const char* L) :
@@ -53,9 +54,10 @@ qso_qsl_vwr::~qso_qsl_vwr() {
 
 // Load values
 void qso_qsl_vwr::load_values() {
-	Fl_Preferences display_settings(settings_, "Display");
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences display_settings(settings, "Display");
 	display_settings.get("Image Type", (int&)selected_image_, QI_NONE);
-	Fl_Preferences datapath(settings_, "Datapath");
+	Fl_Preferences datapath(settings, "Datapath");
 	char* temp;
 	if (!datapath.get("QSLs", temp, "")) {
 		//Fl_File_Chooser* chooser = new Fl_File_Chooser("", nullptr, Fl_File_Chooser::DIRECTORY,
@@ -66,7 +68,6 @@ void qso_qsl_vwr::load_values() {
 			qsl_directory_ = chooser->filename();
 		}
 		datapath.set("QSLs", qsl_directory_.c_str());
-		settings_->flush();
 		delete chooser;
 	}
 	else {
@@ -76,11 +77,11 @@ void qso_qsl_vwr::load_values() {
 
 // Save values
 void qso_qsl_vwr::save_values() {
-	Fl_Preferences display_settings(settings_, "Display");
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences display_settings(settings, "Display");
 	display_settings.set("Image Type", selected_image_);
-	Fl_Preferences datapath(settings_, "Datapath");
+	Fl_Preferences datapath(settings, "Datapath");
 	datapath.set("QSLs", qsl_directory_.c_str());
-	settings_->flush();
 }
 
 // Create form

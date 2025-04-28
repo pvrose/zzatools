@@ -29,7 +29,7 @@
 		static void cb_ch_enable(Fl_Widget* w, void* v);
 
 		// Standard methods - need to be written for each class that inherits from this
-		// Load values from settings_
+		// Load values from settings
 		virtual void load_values() = 0;
 		// Used to create the form
 		virtual void create_form(int X, int Y) = 0;

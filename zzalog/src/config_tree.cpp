@@ -7,7 +7,9 @@
 #include <FL/Fl_Tree_Item.H>
 #include <FL/Fl_Preferences.H>
 
-extern Fl_Preferences* settings_;
+extern string VENDOR;
+extern string PROGRAM_ID;
+
 
 // Constructor
 config_tree::config_tree(int X, int Y, int W, int H, const char* label) :
@@ -33,7 +35,8 @@ void config_tree::create_tree() {
 	// Remove existing data
 	delete_tree();
 	// Create the root branch
-	add_branch(nullptr, settings_);
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	add_branch(nullptr, settings);
 }
 
 // Add a leaf node - label plus value
@@ -55,11 +58,11 @@ void config_tree::add_leaf(Fl_Tree_Item* parent, string label, string value) {
 }
 
 // Add a branch node - adds all the children as well 
-void config_tree::add_branch(Fl_Tree_Item* parent, Fl_Preferences* settings) {
+void config_tree::add_branch(Fl_Tree_Item* parent, Fl_Preferences& settings) {
 	Fl_Tree_Item* branch = nullptr;
 	if (parent != nullptr) {
 		// Add the branch with the name of the settings group
-		branch = parent->add(prefs(), settings->name());
+		branch = parent->add(prefs(), settings.name());
 	}
 	else {	
 		// Create the root item as the branch
@@ -73,23 +76,23 @@ void config_tree::add_branch(Fl_Tree_Item* parent, Fl_Preferences* settings) {
 	}
 	// now get the nodes in this settings group
 	// Entries
-	int num_entries = settings->entries();
+	int num_entries = settings.entries();
 	// For each entry
 	for (int i = 0; i < num_entries; i++) {
 		// Add a leaf with it's name and value
 		char *temp;
-		settings->get(settings->entry(i), temp, "");
+		settings.get(settings.entry(i), temp, "");
 		string value = temp;
 		free(temp);
-		add_leaf(branch, settings->entry(i), value);
+		add_leaf(branch, settings.entry(i), value);
 	}
 	// Further settings groups
-	int num_groups = settings->groups();
+	int num_groups = settings.groups();
 	// For each group
 	for (int i = 0; i < num_groups; i++) {
 		// Add a branch for that group
 		Fl_Preferences group_settings(settings, i);
-		add_branch(branch, &group_settings);
+		add_branch(branch, group_settings);
 	}
 }
 

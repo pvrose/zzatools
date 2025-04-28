@@ -29,9 +29,10 @@ using namespace std;
 
 extern cty_data* cty_data_;
 extern spec_data* spec_data_;
-extern Fl_Preferences* settings_;
 extern status* status_;
 extern book* book_;
+extern string VENDOR;
+extern string PROGRAM_ID;
 
 // initialise the static variables
 bool record::expecting_header_ = true;
@@ -187,7 +188,6 @@ void record::item(string field, string value, bool formatted/* = false*/, bool d
 			double as_d = 0.0;
 			int as_i = 0;
 			char c;
-			Fl_Preferences display_settings(settings_, "Display");
 			switch (type_indicator) {
 			case 'N':
 			case 'S':
@@ -348,8 +348,6 @@ string record::item(string field, bool formatted/* = false*/, bool indirect/* = 
 			result = unformatted_value;
 		}
 		else {
-			// Get display settings
-			Fl_Preferences display_settings(settings_, "Display");
 
 			// Get the type indicator of the field
 			char type_indicator = spec_data_->datatype_indicator(field);

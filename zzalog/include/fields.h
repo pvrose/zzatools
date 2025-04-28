@@ -113,11 +113,15 @@ protected:
 	void store_data();
 	// Load collections
 	void add_collections(Fl_Preferences& settings, string name);
+	// Load collections
+	bool load_collections(Fl_Preferences& settings);
 
 	// The data - mapping app to collection name
 	map<field_app_t, string> app_map_;
 	// The data - mapping collection by name
 	map<string, collection_t*> coll_map_;
+	// Field settings filename
+	string filename_;
 
 };
 

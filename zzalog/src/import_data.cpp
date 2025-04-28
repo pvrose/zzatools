@@ -31,7 +31,6 @@
 
 extern status* status_;
 extern book* book_;
-extern Fl_Preferences* settings_;
 extern cty_data* cty_data_;
 extern spec_data* spec_data_;
 extern tabbed_forms* tabbed_forms_;

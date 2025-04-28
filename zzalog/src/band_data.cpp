@@ -7,9 +7,10 @@
 #include <FL/Fl_Preferences.H>
 #include <FL/Fl_Native_File_Chooser.H>
 
-extern Fl_Preferences* settings_;
 extern status* status_;
 extern spec_data* spec_data_;
+extern string VENDOR;
+extern string PROGRAM_ID;
 
 // Constructor - calls the Window constructor 
 band_data::band_data()
@@ -109,7 +110,8 @@ band_data::band_entry_t* band_data::get_entry(string line) {
 // Get the directory of the reference files
 string band_data::get_path() {
 	// get the datapath settings group.
-	Fl_Preferences datapath(settings_, "Datapath");
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	Fl_Preferences datapath(settings, "Datapath");
 	char* dirname = nullptr;
 	string directory_name;
 	// get the value from settings or force new browse

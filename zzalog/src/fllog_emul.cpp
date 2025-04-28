@@ -22,7 +22,8 @@ extern extract_data* extract_records_;
 extern book* book_;
 extern spec_data* spec_data_;
 extern qso_manager* qso_manager_;
-extern Fl_Preferences* settings_;
+extern string VENDOR;
+extern string PROGRAM_ID;
 
 // Static - only one instance of this class supported
 fllog_emul* fllog_emul::that_ = nullptr;
@@ -46,7 +47,8 @@ fllog_emul::~fllog_emul() {
 void fllog_emul::run_server() {
 	status_->misc_status(ST_NOTE, "FLLOG_EMUL: Creating new socket");
 	if (!rpc_handler_) {
-		Fl_Preferences nw_settings(settings_, "Network");
+		Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+		Fl_Preferences nw_settings(settings, "Network");
 		Fl_Preferences fllog_settings(nw_settings, "Fllog");
 		int rpc_port = 8421;
 		fllog_settings.get("Port Number", rpc_port, rpc_port);
