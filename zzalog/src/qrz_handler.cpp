@@ -763,7 +763,7 @@ void qrz_handler::cb_upload_done(void* v) {
 void qrz_handler::upload_done(upload_resp_t* resp) {
 	char msg[128];
 	switch(resp->success) {
-		case GOOD:
+		case IR_GOOD:
 		resp->qso->item("QRZCOM_QSO_UPLOAD_STATUS", string("Y"));
 		resp->qso->item("QRZCOM_QSO_UPLOAD_DATE", now(false, "%Y%m%d"));
 		resp->qso->item("APP_QRZLOG_LOGID", to_string(resp->logid));
@@ -774,7 +774,7 @@ void qrz_handler::upload_done(upload_resp_t* resp) {
 			resp->logid);
 		status_->misc_status(ST_OK, msg);
 		break;
-	case DUPLICATE:
+	case IR_DUPLICATE:
 		resp->qso->item("QRZCOM_QSO_UPLOAD_STATUS", string("Y"));
 		resp->qso->item("QRZCOM_QSO_UPLOAD_DATE", now(false, "%Y%m%d"));
 		resp->qso->item("APP_QRZLOG_LOGID", to_string(resp->logid));
@@ -785,11 +785,11 @@ void qrz_handler::upload_done(upload_resp_t* resp) {
 			resp->logid);
 		status_->misc_status(ST_WARNING, msg);
 		break;
-	case FAIL:
+	case IR_FAIL:
 		snprintf(msg, sizeof(msg), "QRZ: QSL upload failed - %s", resp->message.c_str());
 		status_->misc_status(ST_ERROR, msg);
 		break;
-	case ERROR:
+	case IR_ERROR:
 		snprintf(msg, sizeof(msg), "QRZ: QSL upload protocol error %s", resp->message.c_str());
 		status_->misc_status(ST_ERROR, msg);
 		break;
@@ -820,7 +820,7 @@ qrz_handler::insert_resp_t qrz_handler::insert_response(
 	string buffer;
 	string buff1;
 	bool done = false;
-	insert_resp_t resp = GOOD;
+	insert_resp_t resp = IR_GOOD;
 	size_t pos = 0;
 	// Read the entire stream into buffer
 	while (!response.eof()) {
@@ -841,16 +841,16 @@ qrz_handler::insert_resp_t qrz_handler::insert_response(
 		int len = data.length();
 		if (len > 7 && data.substr(0, 7) == "RESULT=") {
 			if (data.substr(7) == "FAIL") {
-				resp = FAIL;
+				resp = IR_FAIL;
 			} else if (data.substr(7) == "REPLACE") {
-				resp = DUPLICATE;
+				resp = IR_DUPLICATE;
 			} else if (data.substr(7) != "OK") {
-				resp = ERROR;
+				resp = IR_ERROR;
 				fail_reason += "Error RESULT=" + data.substr(7) + " ";
 			}
 		} else if (len > 6 && data.substr(0,6) == "COUNT=") {
 			if (data.substr(6) != "0" && data.substr(6) != "1") {
-				resp = ERROR;
+				resp = IR_ERROR;
 				fail_reason += "Error COUNT=" + data.substr(7) + " "
 ;			} 
 		} else if (len > 6 && data.substr(0,6) == "LOGID=") {

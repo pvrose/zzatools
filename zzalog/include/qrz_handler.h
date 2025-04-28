@@ -62,10 +62,10 @@ struct qrz_api_data {
 
 	protected:
 		
-		enum insert_resp_t { GOOD, FAIL, DUPLICATE, ERROR };
+		enum insert_resp_t { IR_GOOD, IR_FAIL, IR_DUPLICATE, IR_ERROR };
 		// Upload response
 		struct upload_resp_t {
-			insert_resp_t success = ERROR;
+			insert_resp_t success = IR_ERROR;
 			string message = "";
 			record* qso = nullptr;
 			unsigned long long logid = 0ull;
