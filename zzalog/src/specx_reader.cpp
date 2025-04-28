@@ -154,6 +154,9 @@ bool specx_reader::start_adif(map<string, string>* attributes) {
 			else if (name == "CREATED") {
 				created_ = it->second;
 			}
+			else if (name == "DATE") {
+				// Ignore
+			}
 			else {
 				char* message = new char[50 + (it->second).length()];
 				sprintf(message, "ADIF SPEC: Unexpected attribute %s=%s in ADIF element",
