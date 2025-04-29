@@ -81,7 +81,7 @@ qso_rig::~qso_rig() {
 	ticker_->remove_ticker(this);
 }
 
-void qso_rig::load_cat_data(qso_rig::cat_data_t* cat_data, Fl_Preferences settings) {
+void qso_rig::load_cat_data(qso_rig::cat_data_t* cat_data, Fl_Preferences& settings) {
 	char* temp;
 	settings.get("Rig Model", temp, "dummy");
 	cat_data->hamlib->model = temp;
@@ -164,9 +164,9 @@ void qso_rig::load_values() {
 			cat_data_t* data = new cat_data_t;
 			data->hamlib = new hamlib_data_t;
 			const char* g = rig_settings.group(ix);
-			Fl_Preferences cat_settings(rig_settings, g);
+			Fl_Preferences app_settings(rig_settings, g);
 			data->nickname = g;
-			load_cat_data(data, cat_settings);
+			load_cat_data(data, app_settings);
 			cat_data_.push_back(data);
 		}
 		char* temp;
@@ -739,7 +739,7 @@ void qso_rig::create_form(int X, int Y) {
 	end();
 }
 
-void qso_rig::save_cat_data(qso_rig::cat_data_t* cat_data, Fl_Preferences settings) {
+void qso_rig::save_cat_data(qso_rig::cat_data_t* cat_data, Fl_Preferences& settings) {
 	settings.set("Rig Model", cat_data->hamlib->model.c_str());
 	settings.set("Manufacturer", cat_data->hamlib->mfr.c_str());
 	settings.set("Port", cat_data->hamlib->port_name.c_str());

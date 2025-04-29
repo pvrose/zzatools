@@ -182,8 +182,8 @@ protected:
 	void create_timeout(int X, int Y);
 	void create_auto(int X, int Y);
 
-	void load_cat_data(cat_data_t* data, Fl_Preferences settings);
-	void save_cat_data(cat_data_t* data, Fl_Preferences settings);
+	void load_cat_data(cat_data_t* data, Fl_Preferences& settings);
+	void save_cat_data(cat_data_t* data, Fl_Preferences& settings);
 
 	void modify_hamlib_data();
 
