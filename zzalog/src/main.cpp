@@ -43,6 +43,7 @@ main.cpp - application entry point
 #include "qsl_dataset.h"
 #include "config.h"
 #include "band_window.h"
+#include "rig_data.h"
 
 // C/C++ header files
 #include <ctime>
@@ -75,7 +76,7 @@ string COPYRIGHT = "\302\251 Philip Rose GM3ZZA 2018. All rights reserved.\nPref
 string DATA_COPYRIGHT = "\302\251 Philip Rose %s. This data may be copied for the purpose of correlation and analysis";
 string PROGRAM_ID = "ZZALOG";
 string PROG_ID = "ZLG";
-string PROGRAM_VERSION = "3.4.110";
+string PROGRAM_VERSION = "3.4.111";
 string VENDOR = "GM3ZZA";
 string TIMESTAMP = string(__DATE__) + " " + string(__TIME__);
 
@@ -130,6 +131,7 @@ fields* fields_ = nullptr;
 qsl_dataset* qsl_dataset_ = nullptr;
 config* config_ = nullptr;
 band_window* band_window_ = nullptr;
+rig_data* rig_data_ = nullptr;
 // Recent files opened
 list<string> recent_files_;
 
@@ -845,6 +847,7 @@ void tidy() {
 	fl_message_title_default(nullptr);
 	delete wx_handler_;
 	delete qso_manager_;
+	delete rig_data_;
 	delete wsjtx_handler_;
 	delete club_handler_;
 	delete qrz_handler_;
@@ -1126,6 +1129,15 @@ bool open_settings() {
 	return true;
 }
 
+// Load all the hamlib data, and then the rig connection details
+void load_rig_data() {
+	rig_set_debug(HAMLIB_DEBUG_LEVEL);
+	rig_load_all_backends();
+	if (!closing_) {
+		rig_data_ = new rig_data;
+	}
+}
+
 // The main app entry point
 int main(int argc, char** argv)
 {
@@ -1198,8 +1210,7 @@ int main(int argc, char** argv)
 	add_book(filename_);
 	Fl::check();
 	// Connect to the rig - load all hamlib backends once only here
-	rig_set_debug(HAMLIB_DEBUG_LEVEL);
-	rig_load_all_backends();
+	load_rig_data();
 	// Add qso_manager
 	add_dashboard();
 	// Add config - uses dynamic enumerated ADIF fields so needs the book loaded. and manager running

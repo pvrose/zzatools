@@ -13,6 +13,8 @@ using namespace std;
 class field_input;
 class rig_if;
 struct hamlib_data_t;
+struct cat_data_t;
+struct rig_data_t;
 class filename_input;
 class Fl_Output;
 class Fl_Button;
@@ -78,17 +80,6 @@ public:
 	const char* cat();
 
 protected:
-
-	struct cat_data_t {
-		hamlib_data_t* hamlib = nullptr;
-		bool use_cat_app = false;
-		bool override_hamlib = false;
-		string app = "";
-		string nickname = "";
-		bool auto_start = false;
-		bool auto_connect = false;
-		double connect_delay = 1.0;
-	};
 
 	enum rig_state_t : uchar {
 		NO_RIG,            // No rig specified
@@ -156,9 +147,6 @@ protected:
 	// Callback for start-to-connect timer
 	static void cb_start_timer(void* v);
 
-	// Get hamlib data
-	void find_hamlib_data();
-
 	//populate port choice
 	void populate_port_choice();
 	// Populate model choice
@@ -181,9 +169,6 @@ protected:
 	void create_accessory(int X, int Y);
 	void create_timeout(int X, int Y);
 	void create_auto(int X, int Y);
-
-	void load_cat_data(cat_data_t* data, Fl_Preferences& settings);
-	void save_cat_data(cat_data_t* data, Fl_Preferences& settings);
 
 	void modify_hamlib_data();
 
@@ -264,24 +249,18 @@ protected:
 	bool use_all_rates_;
 
 	rig_if* rig_;
-	// hamlib data
-	vector<cat_data_t*> cat_data_;
-	// Current mode - note C enum in hamlib/rig.h
-	uint16_t mode_;
-	// Current antenna
-	string antenna_;
+	// CAT data for particular RIG and cat_index_
+	cat_data_t* cat_data_;
+	// Rig data
+	rig_data_t* rig_info_;
 	// Rig was good
 	bool rig_ok_;
-	// CAT index
-	int cat_index_;
-	// Previous rig state
+// Previous rig state
 	rig_state_t rig_state_;
 	// Flag set when start button pressed and cleared on connect button
 	bool rig_starting_;
 
 	// Map the hamlig model_id to position in rig_model choice
 	map<int, int> rig_choice_pos_;
-	//Display instantaneous values
-	bool instant_meters_;
 };
 

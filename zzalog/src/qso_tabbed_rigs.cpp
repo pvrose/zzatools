@@ -48,9 +48,6 @@ void qso_tabbed_rigs::load_values() {
 			label_map_[string(name)] = nullptr;
 		}
 	}
-	if (label_map_.size() == 0) {
-		label_map_[string("")] = nullptr;
-	}
 	// Load default tab value
 	Fl_Preferences tab_settings(settings, "Dashboard/Tabs");
 	tab_settings.get("Rigs", default_tab_, 0);
@@ -65,6 +62,14 @@ void qso_tabbed_rigs::create_form(int X, int Y) {
 	client_area(rx, ry, rw, rh, 0);
 	int saved_rw = rw;
 	int saved_rh = rh;
+	if (label_map_.size() == 0) {
+		// Create a dummy instance of qao_rig to get its size
+		qso_rig* w = new qso_rig(rx, ry, rw, rh, "");
+		rw = w->w();
+		rh = w->h();
+		// And delete it
+		remove(w);
+	}
 	// For each currently salient rig...
 	for (auto ix = label_map_.begin(); ix != label_map_.end(); ix++) {
 		char msg[128];

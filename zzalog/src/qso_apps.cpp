@@ -396,18 +396,27 @@ void app_grp::cb_show_script(Fl_Widget* w, void* v) {
 const char* app_grp::rig_id() {
     char* result = new char[32];
     qso_manager* mgr = ancestor_view<qso_manager>(this);
+    qso_rig* rig_ctrl = mgr->rig_control();
     switch(app_data_->rig_class) {
         case ALL_RIGS:
             strcpy(result, "COMMON");
             break;
-        case RIG_NO_CAT:
-            strcpy(result, mgr->rig_control()->label());
+        case RIG_NO_CAT: 
+            if (rig_ctrl) {
+                strcpy(result, mgr->rig_control()->label());
+            } else {
+                strcpy(result, "");
+            }
             break;
         case RIG_CAT:
-            snprintf(result, 32, "%s %s",
-                mgr->rig_control()->label(),
-                mgr->rig_control()->cat());
-            break;
+            if (rig_ctrl) {
+                snprintf(result, 32, "%s %s",
+                    mgr->rig_control()->label(),
+                    mgr->rig_control()->cat());
+            } else {
+                strcpy(result, "");
+            }
+        break;
     }
     return result;
 }
