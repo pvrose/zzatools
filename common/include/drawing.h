@@ -65,6 +65,7 @@ const int ROW_HEIGHT = DEFAULT_SIZE + 4;    // Default height for table rows
 		OT_SCRATCH,          // Scratchpad 
 		OT_CARD,             // Used for printing QSL card labels
 		OT_WSJTX,            // Import from WSJT-X
+		OT_RIGS,             // Reading Rig data XML file
 	};
 
 	// Default colours to use in tab view labels and/or progress bar
@@ -80,7 +81,8 @@ const int ROW_HEIGHT = DEFAULT_SIZE + 4;    // Default height for table rows
 		{ OT_DXCC, FL_YELLOW },
 		{ OT_BAND, FL_GRAY },
 		{ OT_CARD, fl_color_average(FL_BLUE, FL_WHITE, 0.25) },
-		{ OT_WSJTX, COLOUR_NAVY }
+		{ OT_WSJTX, COLOUR_NAVY },
+		{ OT_RIGS, FL_BACKGROUND_COLOR },
 	};
 
 	// Names of the objects
@@ -96,6 +98,7 @@ const int ROW_HEIGHT = DEFAULT_SIZE + 4;    // Default height for table rows
 		{ OT_BAND, "BAND" },
 		{ OT_CARD, "QSL" },
 		{ OT_WSJTX, "WSJT-X" },
+		{ OT_RIGS, "RIG DATA" },
 	};
 
 	// Main window default sizes
