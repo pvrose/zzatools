@@ -864,7 +864,7 @@ void qso_rig::enable_widgets(uchar damage) {
 		// Label the CAT method selection with the CAT method
 		//char l[5];
 		//snprintf(l, sizeof(l), "CAT%d", cat_index_ + 1);
-		if (rig_info_->default_app >= 0 && rig_info_->default_app < rig_data_->rigs().size()) {
+		if (rig_info_->default_app >= 0 && rig_info_->default_app < rig_info_->cat_data.size()) {
 			bn_index_->copy_label(cat_data_->nickname.c_str());
 		}
 		else {

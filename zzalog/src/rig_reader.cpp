@@ -348,7 +348,10 @@ bool rig_reader::end_value(rig_reader* that) {
 			hd->max_to_count = stoi(that->value_data_);
 		else if (that->value_name_ == "S-meter Hold")
 			hd->num_smeters = stoi(that->value_data_);
-		else if (that->value_name_ == "Command") ad->app = that->value_data_;
+		else if (that->value_name_ == "Command") {
+			ad->app = that->value_data_;
+			if (ad->app.length()) ad->use_cat_app = true;
+		}
 		else if (that->value_name_ == "Override Hamlib") 
 			ad->override_hamlib = (bool)stoi(that->value_data_);
 		else if (that->value_name_ == "Power Mode")
