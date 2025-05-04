@@ -197,7 +197,10 @@
     <ClCompile Include="zzalog\src\qso_query.cpp" />
     <ClCompile Include="zzalog\src\qso_tabbed_rigs.cpp" />
     <ClCompile Include="zzalog\src\qso_wx.cpp" />
+    <ClCompile Include="zzalog\src\rig_data.cpp" />
     <ClCompile Include="zzalog\src\rig_if.cpp" />
+    <ClCompile Include="zzalog\src\rig_reader.cpp" />
+    <ClCompile Include="zzalog\src\rig_writer.cpp" />
     <ClCompile Include="zzalog\src\rpc_data_item.cpp" />
     <ClCompile Include="zzalog\src\rpc_handler.cpp" />
     <ClCompile Include="zzalog\src\serial.cpp" />
@@ -308,7 +311,10 @@
     <ClInclude Include="zzalog\include\qso_tabbed_rigs.h" />
     <ClInclude Include="zzalog\include\qso_wx.h" />
     <ClInclude Include="zzalog\include\regices.h" />
+    <ClInclude Include="zzalog\include\rig_data.h" />
     <ClInclude Include="zzalog\include\rig_if.h" />
+    <ClInclude Include="zzalog\include\rig_reader.h" />
+    <ClInclude Include="zzalog\include\rig_writer.h" />
     <ClInclude Include="zzalog\include\rpc_data_item.h" />
     <ClInclude Include="zzalog\include\rpc_handler.h" />
     <ClInclude Include="zzalog\include\serial.h" />

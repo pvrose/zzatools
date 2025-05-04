@@ -318,6 +318,15 @@
     <ClCompile Include="zzalog\src\qso_bands.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="zzalog\src\rig_data.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zzalog\src\rig_reader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zzalog\src\rig_writer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="zzalog\include\about_dialog.h">
@@ -657,6 +666,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="zzalog\include\qso_bands.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zzalog\include\rig_data.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zzalog\include\rig_reader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zzalog\include\rig_writer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
