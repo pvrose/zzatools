@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<adif version="3.1.4" status="Released" created="2022-12-06T22:03:52Z">
+<adif version="3.1.5" status="Released" date="2024-11-28T00:00:00Z" created="2024-11-28T09:18:56Z">
   <dataTypes>
     <header>
       <value>Data Type Name</value>
@@ -112,7 +112,7 @@
     </record>
     <record>
       <value name="Data Type Name">POTARef</value>
-      <value name="Description">a sequence of case-insensitive Characters representing a Parks on the Air park reference in the form xxxx-nnnnn[@yyyyyy] comprising 6 to 17 characters where: xxxx is the POTA national program and is 1 to 4 characters in length, typically the default callsign prefix of the national program (rather than the DX entity) nnnnn represents the unique number within the national program and is either 4 or 5 characters in length (use the exact format listed on the POTA website) yyyyyy **Optional** is the 4 to 6 character ISO 3166-2 code to differentiate which state/province/prefecture/primary administration location the contact represents, in the case that the park reference spans more than one location (such as a trail). Examples of the POTARef Data Type: ReferenceLocation K-5033Golden Hill State Forest K-100005-digit park numbers are reserved for future use VE-5082@CA-ABThe Great Trail of Canada (the Canadian Trailway) National Scenic Trail, within Alberta, Canada 8P-0012Chancery Lane Swamp National Park VK-0556Pieman River State Reserve K-4562@US-CAPacific Crest Trail, within California, USA Additional Notes on POTARef: A browsable and searchable list of all park references is available. A complete CSV file is available (generated nightly). For more information, visit the Parks on the Air documentation website.</value>
+      <value name="Description">a sequence of case-insensitive Characters representing a Parks on the Air park reference in the form xxxx-nnnnn[@yyyyyy] comprising 6 to 17 characters where: xxxx is the POTA national program and is 1 to 4 characters in length, typically the default callsign prefix of the national program (rather than the DX entity) nnnnn represents the unique number within the national program and is either 4 or 5 characters in length (use the exact format listed on the POTA website) yyyyyy **Optional** is the 4 to 6 character ISO 3166-2 code to differentiate which state/province/prefecture/primary administration location the contact represents, in the case that the park reference spans more than one location (such as a trail). Examples of the POTARef Data Type: ReferenceLocation K-5033Golden Hill State Forest K-10000 5-digit park numbers are reserved for future use VE-5082@CA-ABThe Great Trail of Canada (the Canadian Trailway) National Scenic Trail, within Alberta, Canada 8P-0012Chancery Lane Swamp National Park VK-0556Pieman River State Reserve K-4562@US-CAPacific Crest Trail, within California, USA Additional Notes on POTARef: A browsable and searchable list of all park references is available. A complete CSV file is available (generated nightly). For more information, visit the Parks on the Air documentation website.</value>
     </record>
     <record>
       <value name="Data Type Name">POTARefList</value>
@@ -121,6 +121,10 @@
     <record>
       <value name="Data Type Name">SecondarySubdivisionList</value>
       <value name="Description">a colon-delimited list of two or more members of the Secondary_Administrative_Subdivision enumeration. E.g.: MA,Franklin:MA,Hampshire</value>
+    </record>
+    <record>
+      <value name="Data Type Name">SecondaryAdministrativeSubdivisionListAlt</value>
+      <value name="Description">a semicolon (;) delimited, unordered list of one or more members of a Secondary_Administrative_Subdivision_Alt enumeration in the form: enumeration-name:enumeration-code Where there is more than one locality represented by the enumeration-code, they are separated by slash (/) characters. Only one of each enumeration-name valid for the DXCC entity concerned can appear in the list. Examples: &lt;CNTY_ALT:28&gt;NZ_Regions:Hawkes Bay/Wairoa &lt;MY_CNTY_ALT:52&gt;NZ_Islands:North Island;NZ_Regions:Hawkes Bay/Wairoa The first example shows the enumeration-name NZ_Regions with the region Hawkes Bay and the district Wairoa. For the purposes of illustration, the second example includes a non-existent subdivision with two available enumeration-codes, NZ_Islands:North Island and NZ_Islands:South Island. The example shows: the enumeration-name NZ_Islands with the island North Island the enumeration-name NZ_Regions with the region Hawkes Bay and the district Wairoa</value>
     </record>
     <record>
       <value name="Data Type Name">SOTARef</value>
@@ -264,10 +268,19 @@
       </record>
       <record>
         <value name="Enumeration Name">ARRL_Section</value>
+        <value name="Abbreviation">GH</value>
+        <value name="Section Name">Golden Horseshoe</value>
+        <value name="DXCC Entity Code">1</value>
+        <value name="From Date">2023-01-01Z</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">ARRL_Section</value>
         <value name="Abbreviation">GTA</value>
         <value name="Section Name">Greater Toronto Area</value>
         <value name="DXCC Entity Code">1</value>
         <value name="From Date">2012-09-01Z</value>
+        <value name="Deleted Date">2023-01-01Z</value>
+        <value name="Comments">replaced by GH</value>
       </record>
       <record>
         <value name="Enumeration Name">ARRL_Section</value>
@@ -334,6 +347,8 @@
         <value name="Abbreviation">MAR</value>
         <value name="Section Name">Maritime</value>
         <value name="DXCC Entity Code">1</value>
+        <value name="Deleted Date">2023-01-01Z</value>
+        <value name="Comments">replaced by NB and NS</value>
       </record>
       <record>
         <value name="Enumeration Name">ARRL_Section</value>
@@ -382,6 +397,13 @@
         <value name="Abbreviation">NV</value>
         <value name="Section Name">Nevada</value>
         <value name="DXCC Entity Code">291</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">ARRL_Section</value>
+        <value name="Abbreviation">NB</value>
+        <value name="Section Name">New Brunswick</value>
+        <value name="DXCC Entity Code">1</value>
+        <value name="From Date">2023-01-01Z</value>
       </record>
       <record>
         <value name="Enumeration Name">ARRL_Section</value>
@@ -449,6 +471,8 @@
         <value name="Section Name">Northwest Territories/Yukon/Nunavut</value>
         <value name="DXCC Entity Code">1</value>
         <value name="From Date">2003-11-01Z</value>
+        <value name="Deleted Date">2023-01-01Z</value>
+        <value name="Comments">replaced by TER</value>
       </record>
       <record>
         <value name="Enumeration Name">ARRL_Section</value>
@@ -457,6 +481,13 @@
         <value name="DXCC Entity Code">1</value>
         <value name="Deleted Date">2003-11-01Z</value>
         <value name="Comments">replaced by NT</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">ARRL_Section</value>
+        <value name="Abbreviation">NS</value>
+        <value name="Section Name">Nova Scotia</value>
+        <value name="DXCC Entity Code">1</value>
+        <value name="From Date">2023-01-01Z</value>
       </record>
       <record>
         <value name="Enumeration Name">ARRL_Section</value>
@@ -515,7 +546,7 @@
         <value name="Enumeration Name">ARRL_Section</value>
         <value name="Abbreviation">PAC</value>
         <value name="Section Name">Pacific</value>
-        <value name="DXCC Entity Code">9,20,103,110,123,134,138,166,174,197,297,515</value>
+        <value name="DXCC Entity Code">9,20,103,110,123,138,166,174,197,297,515</value>
       </record>
       <record>
         <value name="Enumeration Name">ARRL_Section</value>
@@ -619,6 +650,13 @@
         <value name="Abbreviation">TN</value>
         <value name="Section Name">Tennessee</value>
         <value name="DXCC Entity Code">291</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">ARRL_Section</value>
+        <value name="Abbreviation">TER</value>
+        <value name="Section Name">Territories</value>
+        <value name="DXCC Entity Code">1</value>
+        <value name="From Date">2023-01-01Z</value>
       </record>
       <record>
         <value name="Enumeration Name">ARRL_Section</value>
@@ -1229,6 +1267,36 @@
       </record>
       <record>
         <value name="Enumeration Name">Contest_ID</value>
+        <value name="Contest-ID">ARI-EME</value>
+        <value name="Description">ARI Italian EME Trophy</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Contest_ID</value>
+        <value name="Contest-ID">ARI-IAC-13CM</value>
+        <value name="Description">ARI Italian Activity Contest (13cm+)</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Contest_ID</value>
+        <value name="Contest-ID">ARI-IAC-23CM</value>
+        <value name="Description">ARI Italian Activity Contest (23cm)</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Contest_ID</value>
+        <value name="Contest-ID">ARI-IAC-6M</value>
+        <value name="Description">ARI Italian Activity Contest (6m)</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Contest_ID</value>
+        <value name="Contest-ID">ARI-IAC-UHF</value>
+        <value name="Description">ARI Italian Activity Contest (UHF)</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Contest_ID</value>
+        <value name="Contest-ID">ARI-IAC-VHF</value>
+        <value name="Description">ARI Italian Activity Contest (VHF)</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Contest_ID</value>
         <value name="Contest-ID">ARRL-10</value>
         <value name="Description">ARRL 10 Meter Contest</value>
       </record>
@@ -1436,6 +1504,11 @@
         <value name="Enumeration Name">Contest_ID</value>
         <value name="Contest-ID">CWOPS-CWT</value>
         <value name="Description">CWops Mini-CWT Test</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Contest_ID</value>
+        <value name="Contest-ID">DARC-FT4</value>
+        <value name="Description">DARC FT4 Contest</value>
       </record>
       <record>
         <value name="Enumeration Name">Contest_ID</value>
@@ -1670,6 +1743,11 @@
       </record>
       <record>
         <value name="Enumeration Name">Contest_ID</value>
+        <value name="Contest-ID">K1USN-SSO</value>
+        <value name="Description">K1USN Slow Speed Open</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Contest_ID</value>
         <value name="Contest-ID">K1USN-SST</value>
         <value name="Description">K1USN Slow Speed Test</value>
       </record>
@@ -1882,6 +1960,11 @@
         <value name="Enumeration Name">Contest_ID</value>
         <value name="Contest-ID">PACC</value>
         <value name="Description">Dutch PACC Contest</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Contest_ID</value>
+        <value name="Contest-ID">PCC</value>
+        <value name="Description">PCCPro CW Contest</value>
       </record>
       <record>
         <value name="Enumeration Name">Contest_ID</value>
@@ -2333,7 +2416,7 @@
       <record>
         <value name="Enumeration Name">Continent</value>
         <value name="Abbreviation">OC</value>
-        <value name="Continent">Oceana</value>
+        <value name="Continent">Oceania</value>
       </record>
       <record>
         <value name="Enumeration Name">Continent</value>
@@ -3913,7 +3996,7 @@
       <record>
         <value name="Enumeration Name">DXCC_Entity_Code</value>
         <value name="Entity Code">207</value>
-        <value name="Entity Name">RODRIGUEZ I.</value>
+        <value name="Entity Name">RODRIGUES I.</value>
       </record>
       <record>
         <value name="Enumeration Name">DXCC_Entity_Code</value>
@@ -4746,7 +4829,7 @@
       <record>
         <value name="Enumeration Name">DXCC_Entity_Code</value>
         <value name="Entity Code">462</value>
-        <value name="Entity Name">SOUTH AFRICA</value>
+        <value name="Entity Name">REPUBLIC OF SOUTH AFRICA</value>
       </record>
       <record>
         <value name="Enumeration Name">DXCC_Entity_Code</value>
@@ -4761,7 +4844,7 @@
       <record>
         <value name="Enumeration Name">DXCC_Entity_Code</value>
         <value name="Entity Code">468</value>
-        <value name="Entity Name">SWAZILAND</value>
+        <value name="Entity Name">KINGDOM OF ESWATINI</value>
       </record>
       <record>
         <value name="Enumeration Name">DXCC_Entity_Code</value>
@@ -4838,7 +4921,7 @@
       <record>
         <value name="Enumeration Name">DXCC_Entity_Code</value>
         <value name="Entity Code">502</value>
-        <value name="Entity Name">MACEDONIA</value>
+        <value name="Entity Name">NORTH MACEDONIA (REPUBLIC OF)</value>
       </record>
       <record>
         <value name="Enumeration Name">DXCC_Entity_Code</value>
@@ -4918,7 +5001,7 @@
       <record>
         <value name="Enumeration Name">DXCC_Entity_Code</value>
         <value name="Entity Code">518</value>
-        <value name="Entity Name">ST MAARTEN</value>
+        <value name="Entity Name">SINT MAARTEN</value>
       </record>
       <record>
         <value name="Enumeration Name">DXCC_Entity_Code</value>
@@ -5016,7 +5099,7 @@
       <record>
         <value name="Enumeration Name">Mode</value>
         <value name="Mode">HELL</value>
-        <value name="Submodes">FMHELL,FSKHELL,HELL80,HELLX5,HELLX9,HFSK,PSKHELL,SLOWHELL</value>
+        <value name="Submodes">FMHELL,FSKH105,FSKH245,FSKHELL,HELL80,HELLX5,HELLX9,HFSK,PSKHELL,SLOWHELL</value>
       </record>
       <record>
         <value name="Enumeration Name">Mode</value>
@@ -5373,6 +5456,74 @@
         <value name="Import-only">true</value>
       </record>
     </enumeration>
+    <enumeration name="Morse_Key_Type">
+      <header>
+        <value>Enumeration Name</value>
+        <value>Abbreviation</value>
+        <value>Meaning</value>
+        <value>Characteristics</value>
+        <value>Morse Composition</value>
+        <value>Examples</value>
+        <value>Import-only</value>
+        <value>Comments</value>
+      </header>
+      <record>
+        <value name="Enumeration Name">Morse_Key_Type</value>
+        <value name="Abbreviation">SK</value>
+        <value name="Meaning">Straight Key</value>
+        <value name="Characteristics">a single control which actuates a single switch.</value>
+        <value name="Morse Composition">a human makes the dits and dahs and builds characters</value>
+        <value name="Examples">Lionel J-38</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Morse_Key_Type</value>
+        <value name="Abbreviation">SS</value>
+        <value name="Meaning">Sideswiper</value>
+        <value name="Characteristics">a single control which actuates a SPDT (single poll, double throw) switch.</value>
+        <value name="Morse Composition">a human makes the dits and dahs and builds characters</value>
+        <value name="Examples">W1SFR Green Machine Torsion Bar Cootie</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Morse_Key_Type</value>
+        <value name="Abbreviation">BUG</value>
+        <value name="Meaning">Mechanical semi-automatic keyer or Bug</value>
+        <value name="Characteristics">a control which actuates a switch as well as a control which actuates a spring and pendulum mechanism which actuates a switch. Both switches are wired in parallel.</value>
+        <value name="Morse Composition">a machine makes the dits and a human makes the dahs and builds characters.</value>
+        <value name="Examples">Vibroplex Blue Racer Deluxe</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Morse_Key_Type</value>
+        <value name="Abbreviation">FAB</value>
+        <value name="Meaning">Mechanical fully-automatic keyer or Bug</value>
+        <value name="Characteristics">a control which actuates one of two separate spring and pendulum mechanisms at a time, each of which actuates a switch. Both switches are wired in parallel.</value>
+        <value name="Morse Composition">a machine makes the dits and the dahs and a human builds characters.</value>
+        <value name="Examples">GHD GN209FA fully-automatic bug</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Morse_Key_Type</value>
+        <value name="Abbreviation">SP</value>
+        <value name="Meaning">Single Paddle</value>
+        <value name="Characteristics">a single control which actuates two independent switches.</value>
+        <value name="Morse Composition">a machine makes the dits and the dahs and a human builds the characters.</value>
+        <value name="Examples">American Morse Mini-B</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Morse_Key_Type</value>
+        <value name="Abbreviation">DP</value>
+        <value name="Meaning">Dual Paddle</value>
+        <value name="Characteristics">two controls which actuate independent switches.</value>
+        <value name="Morse Composition">a machine makes the dits and the dahs and a human builds the characters.</value>
+        <value name="Examples">Begali Sculpture, VK3IL pressure paddles, M0UKD capacitive touch paddles</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Morse_Key_Type</value>
+        <value name="Abbreviation">CPU</value>
+        <value name="Meaning">Computer Driven</value>
+        <value name="Characteristics">an electronic device performs the actuation of the switch.</value>
+        <value name="Morse Composition">a machine makes the dits and dahs to build the characters.</value>
+        <value name="Examples">N1MM+ Logging Software</value>
+      </record>
+    </enumeration>
     <enumeration name="Primary_Administrative_Subdivision">
       <header>
         <value>Enumeration Name</value>
@@ -5600,6 +5751,13 @@
         <value name="Code">AK</value>
         <value name="Primary Administrative Subdivision">Alaska</value>
         <value name="DXCC Entity Code">6</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">AN</value>
+        <value name="Primary Administrative Subdivision">Andaman and Nicobar Islands</value>
+        <value name="DXCC Entity Code">11</value>
+        <value name="Comments">Union territory</value>
       </record>
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
@@ -5977,7 +6135,7 @@
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">IB</value>
-        <value name="Primary Administrative Subdivision">Baleares</value>
+        <value name="Primary Administrative Subdivision">Balears</value>
         <value name="DXCC Entity Code">21</value>
       </record>
       <record>
@@ -6037,7 +6195,7 @@
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">TF</value>
-        <value name="Primary Administrative Subdivision">Tenerife</value>
+        <value name="Primary Administrative Subdivision">Santa Cruz de Tenerife</value>
         <value name="DXCC Entity Code">29</value>
       </record>
       <record>
@@ -6063,11 +6221,26 @@
         <value name="Code">DF</value>
         <value name="Primary Administrative Subdivision">Distrito Federal</value>
         <value name="DXCC Entity Code">50</value>
+        <value name="Import-only">true</value>
+        <value name="Comments">import-only replaced by CMX</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">CMX</value>
+        <value name="Primary Administrative Subdivision">Ciudad de México</value>
+        <value name="DXCC Entity Code">50</value>
       </record>
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">EMX</value>
         <value name="Primary Administrative Subdivision">Estado de México</value>
+        <value name="DXCC Entity Code">50</value>
+        <value name="Import-only">true</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">MEX</value>
+        <value name="Primary Administrative Subdivision">México</value>
         <value name="DXCC Entity Code">50</value>
       </record>
       <record>
@@ -6075,10 +6248,24 @@
         <value name="Code">GTO</value>
         <value name="Primary Administrative Subdivision">Guanajuato</value>
         <value name="DXCC Entity Code">50</value>
+        <value name="Import-only">true</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">GUA</value>
+        <value name="Primary Administrative Subdivision">Guanajuato</value>
+        <value name="DXCC Entity Code">50</value>
       </record>
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">HGO</value>
+        <value name="Primary Administrative Subdivision">Hidalgo</value>
+        <value name="DXCC Entity Code">50</value>
+        <value name="Import-only">true</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">HID</value>
         <value name="Primary Administrative Subdivision">Hidalgo</value>
         <value name="DXCC Entity Code">50</value>
       </record>
@@ -6117,17 +6304,31 @@
         <value name="Code">QRO</value>
         <value name="Primary Administrative Subdivision">Querétaro de Arteaga</value>
         <value name="DXCC Entity Code">50</value>
+        <value name="Import-only">true</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">QUE</value>
+        <value name="Primary Administrative Subdivision">Querétaro</value>
+        <value name="DXCC Entity Code">50</value>
       </record>
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">TLX</value>
         <value name="Primary Administrative Subdivision">Tlaxcala</value>
         <value name="DXCC Entity Code">50</value>
+        <value name="Import-only">true</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">TLA</value>
+        <value name="Primary Administrative Subdivision">Tlaxcala</value>
+        <value name="DXCC Entity Code">50</value>
       </record>
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">VER</value>
-        <value name="Primary Administrative Subdivision">Veracruz-Llave</value>
+        <value name="Primary Administrative Subdivision">Veracruz de Ignacio de la Llave</value>
         <value name="DXCC Entity Code">50</value>
       </record>
       <record>
@@ -6135,10 +6336,24 @@
         <value name="Code">AGS</value>
         <value name="Primary Administrative Subdivision">Aguascalientes</value>
         <value name="DXCC Entity Code">50</value>
+        <value name="Import-only">true</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">AGU</value>
+        <value name="Primary Administrative Subdivision">Aguascalientes</value>
+        <value name="DXCC Entity Code">50</value>
       </record>
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">BC</value>
+        <value name="Primary Administrative Subdivision">Baja California</value>
+        <value name="DXCC Entity Code">50</value>
+        <value name="Import-only">true</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">BCN</value>
         <value name="Primary Administrative Subdivision">Baja California</value>
         <value name="DXCC Entity Code">50</value>
       </record>
@@ -6165,11 +6380,25 @@
         <value name="Code">DGO</value>
         <value name="Primary Administrative Subdivision">Durango</value>
         <value name="DXCC Entity Code">50</value>
+        <value name="Import-only">true</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">DUR</value>
+        <value name="Primary Administrative Subdivision">Durango</value>
+        <value name="DXCC Entity Code">50</value>
       </record>
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">NL</value>
         <value name="Primary Administrative Subdivision">Nuevo Leon</value>
+        <value name="DXCC Entity Code">50</value>
+        <value name="Import-only">true</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">NLE</value>
+        <value name="Primary Administrative Subdivision">Nuevo León</value>
         <value name="DXCC Entity Code">50</value>
       </record>
       <record>
@@ -6195,6 +6424,13 @@
         <value name="Code">TMS</value>
         <value name="Primary Administrative Subdivision">Tamaulipas</value>
         <value name="DXCC Entity Code">50</value>
+        <value name="Import-only">true</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">TAM</value>
+        <value name="Primary Administrative Subdivision">Tamaulipas</value>
+        <value name="DXCC Entity Code">50</value>
       </record>
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
@@ -6213,6 +6449,13 @@
         <value name="Code">CHS</value>
         <value name="Primary Administrative Subdivision">Chiapas</value>
         <value name="DXCC Entity Code">50</value>
+        <value name="Import-only">true</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">CHP</value>
+        <value name="Primary Administrative Subdivision">Chiapas</value>
+        <value name="DXCC Entity Code">50</value>
       </record>
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
@@ -6229,6 +6472,13 @@
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">QTR</value>
+        <value name="Primary Administrative Subdivision">Quintana Roo</value>
+        <value name="DXCC Entity Code">50</value>
+        <value name="Import-only">true</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">ROO</value>
         <value name="Primary Administrative Subdivision">Quintana Roo</value>
         <value name="DXCC Entity Code">50</value>
       </record>
@@ -6750,6 +7000,118 @@
       </record>
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">15</value>
+        <value name="Primary Administrative Subdivision">Artemisa</value>
+        <value name="DXCC Entity Code">70</value>
+        <value name="Comments">province</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">09</value>
+        <value name="Primary Administrative Subdivision">Camagüey</value>
+        <value name="DXCC Entity Code">70</value>
+        <value name="Comments">province</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">08</value>
+        <value name="Primary Administrative Subdivision">Ciego de Ávila</value>
+        <value name="DXCC Entity Code">70</value>
+        <value name="Comments">province</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">06</value>
+        <value name="Primary Administrative Subdivision">Cienfuegos</value>
+        <value name="DXCC Entity Code">70</value>
+        <value name="Comments">province</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">12</value>
+        <value name="Primary Administrative Subdivision">Granma</value>
+        <value name="DXCC Entity Code">70</value>
+        <value name="Comments">province</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">14</value>
+        <value name="Primary Administrative Subdivision">Guantánamo</value>
+        <value name="DXCC Entity Code">70</value>
+        <value name="Comments">province</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">11</value>
+        <value name="Primary Administrative Subdivision">Holguín</value>
+        <value name="DXCC Entity Code">70</value>
+        <value name="Comments">province</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">99</value>
+        <value name="Primary Administrative Subdivision">Isla de la Juventud</value>
+        <value name="DXCC Entity Code">70</value>
+        <value name="Comments">special municipality</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">03</value>
+        <value name="Primary Administrative Subdivision">La Habana</value>
+        <value name="DXCC Entity Code">70</value>
+        <value name="Comments">province</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">10</value>
+        <value name="Primary Administrative Subdivision">Las Tunas</value>
+        <value name="DXCC Entity Code">70</value>
+        <value name="Comments">province</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">04</value>
+        <value name="Primary Administrative Subdivision">Matanzas</value>
+        <value name="DXCC Entity Code">70</value>
+        <value name="Comments">province</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">16</value>
+        <value name="Primary Administrative Subdivision">Mayabeque</value>
+        <value name="DXCC Entity Code">70</value>
+        <value name="Comments">province</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">01</value>
+        <value name="Primary Administrative Subdivision">Pinar del Río</value>
+        <value name="DXCC Entity Code">70</value>
+        <value name="Comments">province</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">07</value>
+        <value name="Primary Administrative Subdivision">Sancti Spíritus</value>
+        <value name="DXCC Entity Code">70</value>
+        <value name="Comments">province</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">13</value>
+        <value name="Primary Administrative Subdivision">Santiago de Cuba</value>
+        <value name="DXCC Entity Code">70</value>
+        <value name="Comments">province</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">05</value>
+        <value name="Primary Administrative Subdivision">Villa Clara</value>
+        <value name="DXCC Entity Code">70</value>
+        <value name="Comments">province</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">C</value>
         <value name="Primary Administrative Subdivision">Capital federal</value>
         <value name="DXCC Entity Code">100</value>
@@ -6782,7 +7144,7 @@
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">X</value>
-        <value name="Primary Administrative Subdivision">Cordoba</value>
+        <value name="Primary Administrative Subdivision">Córdoba</value>
         <value name="DXCC Entity Code">100</value>
       </record>
       <record>
@@ -6794,7 +7156,7 @@
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">E</value>
-        <value name="Primary Administrative Subdivision">Entre Rios</value>
+        <value name="Primary Administrative Subdivision">Entre Ríos</value>
         <value name="DXCC Entity Code">100</value>
       </record>
       <record>
@@ -6866,7 +7228,7 @@
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">R</value>
-        <value name="Primary Administrative Subdivision">Rió Negro</value>
+        <value name="Primary Administrative Subdivision">Río Negro</value>
         <value name="DXCC Entity Code">100</value>
       </record>
       <record>
@@ -6938,7 +7300,7 @@
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">AP</value>
-        <value name="Primary Administrative Subdivision">Amapã</value>
+        <value name="Primary Administrative Subdivision">Amapá</value>
         <value name="DXCC Entity Code">108</value>
       </record>
       <record>
@@ -6950,7 +7312,7 @@
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">MA</value>
-        <value name="Primary Administrative Subdivision">Maranhao</value>
+        <value name="Primary Administrative Subdivision">Maranhão</value>
         <value name="DXCC Entity Code">108</value>
       </record>
       <record>
@@ -6962,15 +7324,14 @@
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">PI</value>
-        <value name="Primary Administrative Subdivision">Piaui</value>
+        <value name="Primary Administrative Subdivision">Piauí</value>
         <value name="DXCC Entity Code">108</value>
       </record>
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">DF</value>
-        <value name="Primary Administrative Subdivision">Oietrito Federal</value>
+        <value name="Primary Administrative Subdivision">Distrito Federal</value>
         <value name="DXCC Entity Code">108</value>
-        <value name="Comments">Brasila</value>
       </record>
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
@@ -7011,7 +7372,7 @@
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">SP</value>
-        <value name="Primary Administrative Subdivision">Sao Paulo</value>
+        <value name="Primary Administrative Subdivision">São Paulo</value>
         <value name="DXCC Entity Code">108</value>
       </record>
       <record>
@@ -7029,7 +7390,7 @@
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">PR</value>
-        <value name="Primary Administrative Subdivision">Paranã</value>
+        <value name="Primary Administrative Subdivision">Paraná</value>
         <value name="DXCC Entity Code">108</value>
       </record>
       <record>
@@ -7047,7 +7408,7 @@
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">PA</value>
-        <value name="Primary Administrative Subdivision">Parã</value>
+        <value name="Primary Administrative Subdivision">Pará</value>
         <value name="DXCC Entity Code">108</value>
       </record>
       <record>
@@ -7067,10 +7428,24 @@
         <value name="Code">II</value>
         <value name="Primary Administrative Subdivision">Antofagasta</value>
         <value name="DXCC Entity Code">112</value>
+        <value name="Import-only">true</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">AN</value>
+        <value name="Primary Administrative Subdivision">Antofagasta</value>
+        <value name="DXCC Entity Code">112</value>
       </record>
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">III</value>
+        <value name="Primary Administrative Subdivision">Atacama</value>
+        <value name="DXCC Entity Code">112</value>
+        <value name="Import-only">true</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">AT</value>
         <value name="Primary Administrative Subdivision">Atacama</value>
         <value name="DXCC Entity Code">112</value>
       </record>
@@ -7079,10 +7454,24 @@
         <value name="Code">I</value>
         <value name="Primary Administrative Subdivision">Tarapacá</value>
         <value name="DXCC Entity Code">112</value>
+        <value name="Import-only">true</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">TA</value>
+        <value name="Primary Administrative Subdivision">Tarapacá</value>
+        <value name="DXCC Entity Code">112</value>
       </record>
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">XV</value>
+        <value name="Primary Administrative Subdivision">Arica y Parinacota</value>
+        <value name="DXCC Entity Code">112</value>
+        <value name="Import-only">true</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">AP</value>
         <value name="Primary Administrative Subdivision">Arica y Parinacota</value>
         <value name="DXCC Entity Code">112</value>
       </record>
@@ -7091,10 +7480,24 @@
         <value name="Code">IV</value>
         <value name="Primary Administrative Subdivision">Coquimbo</value>
         <value name="DXCC Entity Code">112</value>
+        <value name="Import-only">true</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">CO</value>
+        <value name="Primary Administrative Subdivision">Coquimbo</value>
+        <value name="DXCC Entity Code">112</value>
       </record>
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">V</value>
+        <value name="Primary Administrative Subdivision">Valparaíso</value>
+        <value name="DXCC Entity Code">112</value>
+        <value name="Import-only">true</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">VS</value>
         <value name="Primary Administrative Subdivision">Valparaíso</value>
         <value name="DXCC Entity Code">112</value>
       </record>
@@ -7109,10 +7512,24 @@
         <value name="Code">VI</value>
         <value name="Primary Administrative Subdivision">Libertador General Bernardo O'Higgins</value>
         <value name="DXCC Entity Code">112</value>
+        <value name="Import-only">true</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">LI</value>
+        <value name="Primary Administrative Subdivision">Libertador General Bernardo O'Higgins</value>
+        <value name="DXCC Entity Code">112</value>
       </record>
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">VII</value>
+        <value name="Primary Administrative Subdivision">Maule</value>
+        <value name="DXCC Entity Code">112</value>
+        <value name="Import-only">true</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">ML</value>
         <value name="Primary Administrative Subdivision">Maule</value>
         <value name="DXCC Entity Code">112</value>
       </record>
@@ -7121,10 +7538,24 @@
         <value name="Code">VIII</value>
         <value name="Primary Administrative Subdivision">Bío-Bío</value>
         <value name="DXCC Entity Code">112</value>
+        <value name="Import-only">true</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">BI</value>
+        <value name="Primary Administrative Subdivision">Biobío</value>
+        <value name="DXCC Entity Code">112</value>
       </record>
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">IX</value>
+        <value name="Primary Administrative Subdivision">La Araucanía</value>
+        <value name="DXCC Entity Code">112</value>
+        <value name="Import-only">true</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">AR</value>
         <value name="Primary Administrative Subdivision">La Araucanía</value>
         <value name="DXCC Entity Code">112</value>
       </record>
@@ -7133,10 +7564,24 @@
         <value name="Code">XIV</value>
         <value name="Primary Administrative Subdivision">Los Ríos</value>
         <value name="DXCC Entity Code">112</value>
+        <value name="Import-only">true</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">LR</value>
+        <value name="Primary Administrative Subdivision">Los Ríos</value>
+        <value name="DXCC Entity Code">112</value>
       </record>
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">X</value>
+        <value name="Primary Administrative Subdivision">Los Lagos</value>
+        <value name="DXCC Entity Code">112</value>
+        <value name="Import-only">true</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">LL</value>
         <value name="Primary Administrative Subdivision">Los Lagos</value>
         <value name="DXCC Entity Code">112</value>
       </record>
@@ -7145,12 +7590,38 @@
         <value name="Code">XI</value>
         <value name="Primary Administrative Subdivision">Aisén del General Carlos Ibáñez del Campo</value>
         <value name="DXCC Entity Code">112</value>
+        <value name="Import-only">true</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">AI</value>
+        <value name="Primary Administrative Subdivision">Aisén del General Carlos Ibañez del Campo</value>
+        <value name="DXCC Entity Code">112</value>
       </record>
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">XII</value>
         <value name="Primary Administrative Subdivision">Magallanes</value>
         <value name="DXCC Entity Code">112</value>
+        <value name="Import-only">true</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">MA</value>
+        <value name="Primary Administrative Subdivision">Magallanes</value>
+        <value name="DXCC Entity Code">112</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">NB</value>
+        <value name="Primary Administrative Subdivision">Ñuble</value>
+        <value name="DXCC Entity Code">112</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">22</value>
+        <value name="Primary Administrative Subdivision">Jan Mayen</value>
+        <value name="DXCC Entity Code">118</value>
       </record>
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
@@ -7191,6 +7662,13 @@
         <value name="Code">01</value>
         <value name="Primary Administrative Subdivision">Concepción</value>
         <value name="DXCC Entity Code">132</value>
+        <value name="Import-only">true</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">1</value>
+        <value name="Primary Administrative Subdivision">Concepción</value>
+        <value name="DXCC Entity Code">132</value>
       </record>
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
@@ -7201,6 +7679,13 @@
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">02</value>
+        <value name="Primary Administrative Subdivision">San Pedro</value>
+        <value name="DXCC Entity Code">132</value>
+        <value name="Import-only">true</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">2</value>
         <value name="Primary Administrative Subdivision">San Pedro</value>
         <value name="DXCC Entity Code">132</value>
       </record>
@@ -7221,10 +7706,24 @@
         <value name="Code">03</value>
         <value name="Primary Administrative Subdivision">Cordillera</value>
         <value name="DXCC Entity Code">132</value>
+        <value name="Import-only">true</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">3</value>
+        <value name="Primary Administrative Subdivision">Cordillera</value>
+        <value name="DXCC Entity Code">132</value>
       </record>
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">09</value>
+        <value name="Primary Administrative Subdivision">Paraguarí</value>
+        <value name="DXCC Entity Code">132</value>
+        <value name="Import-only">true</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">9</value>
         <value name="Primary Administrative Subdivision">Paraguarí</value>
         <value name="DXCC Entity Code">132</value>
       </record>
@@ -7233,10 +7732,24 @@
         <value name="Code">06</value>
         <value name="Primary Administrative Subdivision">Caazapl</value>
         <value name="DXCC Entity Code">132</value>
+        <value name="Import-only">true</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">6</value>
+        <value name="Primary Administrative Subdivision">Caazapá</value>
+        <value name="DXCC Entity Code">132</value>
       </record>
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">05</value>
+        <value name="Primary Administrative Subdivision">Caeguazú</value>
+        <value name="DXCC Entity Code">132</value>
+        <value name="Import-only">true</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">5</value>
         <value name="Primary Administrative Subdivision">Caeguazú</value>
         <value name="DXCC Entity Code">132</value>
       </record>
@@ -7245,17 +7758,31 @@
         <value name="Code">04</value>
         <value name="Primary Administrative Subdivision">Guairá</value>
         <value name="DXCC Entity Code">132</value>
+        <value name="Import-only">true</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">4</value>
+        <value name="Primary Administrative Subdivision">Guairá</value>
+        <value name="DXCC Entity Code">132</value>
       </record>
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">08</value>
         <value name="Primary Administrative Subdivision">Miaiones</value>
         <value name="DXCC Entity Code">132</value>
+        <value name="Import-only">true</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">8</value>
+        <value name="Primary Administrative Subdivision">Misiones</value>
+        <value name="DXCC Entity Code">132</value>
       </record>
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">12</value>
-        <value name="Primary Administrative Subdivision">Ñeembucu</value>
+        <value name="Primary Administrative Subdivision">Ñeembucú</value>
         <value name="DXCC Entity Code">132</value>
       </record>
       <record>
@@ -7268,6 +7795,13 @@
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">07</value>
         <value name="Primary Administrative Subdivision">Itapua</value>
+        <value name="DXCC Entity Code">132</value>
+        <value name="Import-only">true</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">7</value>
+        <value name="Primary Administrative Subdivision">Itapúa</value>
         <value name="DXCC Entity Code">132</value>
       </record>
       <record>
@@ -7402,6 +7936,13 @@
       </record>
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">LD</value>
+        <value name="Primary Administrative Subdivision">Lakshadweep</value>
+        <value name="DXCC Entity Code">142</value>
+        <value name="Comments">Union territory</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">MO</value>
         <value name="Primary Administrative Subdivision">Montevideo</value>
         <value name="DXCC Entity Code">144</value>
@@ -7433,13 +7974,13 @@
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">RN</value>
-        <value name="Primary Administrative Subdivision">Rio Negro</value>
+        <value name="Primary Administrative Subdivision">Río Negro</value>
         <value name="DXCC Entity Code">144</value>
       </record>
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">PA</value>
-        <value name="Primary Administrative Subdivision">Paysandu</value>
+        <value name="Primary Administrative Subdivision">Paysandú</value>
         <value name="DXCC Entity Code">144</value>
       </record>
       <record>
@@ -7451,7 +7992,7 @@
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">AR</value>
-        <value name="Primary Administrative Subdivision">Artigsa</value>
+        <value name="Primary Administrative Subdivision">Artigas</value>
         <value name="DXCC Entity Code">144</value>
       </record>
       <record>
@@ -7475,7 +8016,7 @@
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">TA</value>
-        <value name="Primary Administrative Subdivision">Tacuarembo</value>
+        <value name="Primary Administrative Subdivision">Tacuarembó</value>
         <value name="DXCC Entity Code">144</value>
       </record>
       <record>
@@ -7827,11 +8368,18 @@
         <value name="Code">NSA</value>
         <value name="Primary Administrative Subdivision">North Solomons</value>
         <value name="DXCC Entity Code">163</value>
+        <value name="Import-only">true</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">NSB</value>
+        <value name="Primary Administrative Subdivision">Bougainville</value>
+        <value name="DXCC Entity Code">163</value>
       </record>
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">SAN</value>
-        <value name="Primary Administrative Subdivision">Santaun</value>
+        <value name="Primary Administrative Subdivision">West Sepik</value>
         <value name="DXCC Entity Code">163</value>
       </record>
       <record>
@@ -7856,6 +8404,25 @@
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">WBR</value>
         <value name="Primary Administrative Subdivision">West New Britain</value>
+        <value name="DXCC Entity Code">163</value>
+        <value name="Import-only">true</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">WBK</value>
+        <value name="Primary Administrative Subdivision">West New Britain</value>
+        <value name="DXCC Entity Code">163</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">HLA</value>
+        <value name="Primary Administrative Subdivision">Hela</value>
+        <value name="DXCC Entity Code">163</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">JWK</value>
+        <value name="Primary Administrative Subdivision">Jiwaka</value>
         <value name="DXCC Entity Code">163</value>
       </record>
       <record>
@@ -7891,13 +8458,13 @@
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">HKB</value>
-        <value name="Primary Administrative Subdivision">Hawkes Bay</value>
+        <value name="Primary Administrative Subdivision">Hawke's Bay</value>
         <value name="DXCC Entity Code">170</value>
       </record>
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">MWT</value>
-        <value name="Primary Administrative Subdivision">Manawatu-Wanganui</value>
+        <value name="Primary Administrative Subdivision">Manawatū-Whanganui</value>
         <value name="DXCC Entity Code">170</value>
       </record>
       <record>
@@ -7909,7 +8476,7 @@
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">WGN</value>
-        <value name="Primary Administrative Subdivision">Wellington</value>
+        <value name="Primary Administrative Subdivision">Greater Wellington</value>
         <value name="DXCC Entity Code">170</value>
       </record>
       <record>
@@ -12130,6 +12697,15 @@
         <value name="Primary Administrative Subdivision">Carbonia-Iglesias</value>
         <value name="DXCC Entity Code">225</value>
         <value name="Contained Within">Sardinia (Sardegna)</value>
+        <value name="Import-only">true</value>
+        <value name="Comments">import-only replaced by SU</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">SU</value>
+        <value name="Primary Administrative Subdivision">Sud Sardegna</value>
+        <value name="DXCC Entity Code">225</value>
+        <value name="Contained Within">Sardinia (Sardegna)</value>
       </record>
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
@@ -12256,7 +12832,7 @@
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">13</value>
-        <value name="Primary Administrative Subdivision">Bouches-du-Rhone</value>
+        <value name="Primary Administrative Subdivision">Bouches-du-Rhône</value>
         <value name="DXCC Entity Code">227</value>
       </record>
       <record>
@@ -12298,13 +12874,13 @@
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">21</value>
-        <value name="Primary Administrative Subdivision">Cote-d'Or</value>
+        <value name="Primary Administrative Subdivision">Côte-d'Or</value>
         <value name="DXCC Entity Code">227</value>
       </record>
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">22</value>
-        <value name="Primary Administrative Subdivision">Cotes-d'Armor</value>
+        <value name="Primary Administrative Subdivision">Côtes-d'Armor</value>
         <value name="DXCC Entity Code">227</value>
       </record>
       <record>
@@ -12364,7 +12940,7 @@
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">32</value>
-        <value name="Primary Administrative Subdivision">Gere</value>
+        <value name="Primary Administrative Subdivision">Gers</value>
         <value name="DXCC Entity Code">227</value>
       </record>
       <record>
@@ -12520,7 +13096,7 @@
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">58</value>
-        <value name="Primary Administrative Subdivision">Niëvre</value>
+        <value name="Primary Administrative Subdivision">Nièvre</value>
         <value name="DXCC Entity Code">227</value>
       </record>
       <record>
@@ -12562,7 +13138,7 @@
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">65</value>
-        <value name="Primary Administrative Subdivision">Hautea-Pyrénées</value>
+        <value name="Primary Administrative Subdivision">Hautes-Pyrénées</value>
         <value name="DXCC Entity Code">227</value>
       </record>
       <record>
@@ -12724,7 +13300,7 @@
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">92</value>
-        <value name="Primary Administrative Subdivision">Hauts-de-Selne</value>
+        <value name="Primary Administrative Subdivision">Hauts-de-Seine</value>
         <value name="DXCC Entity Code">227</value>
       </record>
       <record>
@@ -12766,13 +13342,13 @@
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">BY</value>
-        <value name="Primary Administrative Subdivision">Freistaat Bayern</value>
+        <value name="Primary Administrative Subdivision">Bayern</value>
         <value name="DXCC Entity Code">230</value>
       </record>
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">HB</value>
-        <value name="Primary Administrative Subdivision">Freie Hansestadt Bremen</value>
+        <value name="Primary Administrative Subdivision">Bremen</value>
         <value name="DXCC Entity Code">230</value>
       </record>
       <record>
@@ -12784,7 +13360,7 @@
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">HH</value>
-        <value name="Primary Administrative Subdivision">Freie und Hansestadt Hamburg</value>
+        <value name="Primary Administrative Subdivision">Hamburg</value>
         <value name="DXCC Entity Code">230</value>
       </record>
       <record>
@@ -12826,7 +13402,7 @@
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">SN</value>
-        <value name="Primary Administrative Subdivision">Freistaat Sachsen</value>
+        <value name="Primary Administrative Subdivision">Sachsen</value>
         <value name="DXCC Entity Code">230</value>
       </record>
       <record>
@@ -12838,7 +13414,7 @@
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">TH</value>
-        <value name="Primary Administrative Subdivision">Freistaat Thüringen</value>
+        <value name="Primary Administrative Subdivision">Thüringen</value>
         <value name="DXCC Entity Code">230</value>
       </record>
       <record>
@@ -12990,6 +13566,14 @@
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">C</value>
+        <value name="Primary Administrative Subdivision">Cork</value>
+        <value name="DXCC Entity Code">245</value>
+        <value name="Import-only">true</value>
+        <value name="Comments">Corcaigh) (import-only</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">CO</value>
         <value name="Primary Administrative Subdivision">Cork</value>
         <value name="DXCC Entity Code">245</value>
         <value name="Comments">Corcaigh</value>
@@ -13880,6 +14464,78 @@
       </record>
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">21</value>
+        <value name="Primary Administrative Subdivision">Svalbard</value>
+        <value name="DXCC Entity Code">259</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">42</value>
+        <value name="Primary Administrative Subdivision">Agder</value>
+        <value name="DXCC Entity Code">266</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">34</value>
+        <value name="Primary Administrative Subdivision">Innlandet</value>
+        <value name="DXCC Entity Code">266</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">15</value>
+        <value name="Primary Administrative Subdivision">Møre og Romsdal</value>
+        <value name="DXCC Entity Code">266</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">18</value>
+        <value name="Primary Administrative Subdivision">Nordland</value>
+        <value name="DXCC Entity Code">266</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">03</value>
+        <value name="Primary Administrative Subdivision">Oslo</value>
+        <value name="DXCC Entity Code">266</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">11</value>
+        <value name="Primary Administrative Subdivision">Rogaland</value>
+        <value name="DXCC Entity Code">266</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">54</value>
+        <value name="Primary Administrative Subdivision">Troms og Finnmark</value>
+        <value name="DXCC Entity Code">266</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">50</value>
+        <value name="Primary Administrative Subdivision">Trøndelag</value>
+        <value name="DXCC Entity Code">266</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">38</value>
+        <value name="Primary Administrative Subdivision">Vestfold og Telemark</value>
+        <value name="DXCC Entity Code">266</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">46</value>
+        <value name="Primary Administrative Subdivision">Vestland</value>
+        <value name="DXCC Entity Code">266</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">30</value>
+        <value name="Primary Administrative Subdivision">Viken</value>
+        <value name="DXCC Entity Code">266</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">MD</value>
         <value name="Primary Administrative Subdivision">Madeira</value>
         <value name="DXCC Entity Code">256</value>
@@ -13893,7 +14549,7 @@
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">FR</value>
-        <value name="Primary Administrative Subdivision">Friesland</value>
+        <value name="Primary Administrative Subdivision">Fryslân</value>
         <value name="DXCC Entity Code">263</value>
       </record>
       <record>
@@ -13931,10 +14587,24 @@
         <value name="Code">GD</value>
         <value name="Primary Administrative Subdivision">Gelderland</value>
         <value name="DXCC Entity Code">263</value>
+        <value name="Import-only">true</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">GE</value>
+        <value name="Primary Administrative Subdivision">Gelderland</value>
+        <value name="DXCC Entity Code">263</value>
       </record>
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">LB</value>
+        <value name="Primary Administrative Subdivision">Limburg</value>
+        <value name="DXCC Entity Code">263</value>
+        <value name="Import-only">true</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">LI</value>
         <value name="Primary Administrative Subdivision">Limburg</value>
         <value name="DXCC Entity Code">263</value>
       </record>
@@ -13953,6 +14623,13 @@
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">ZL</value>
+        <value name="Primary Administrative Subdivision">Zeeland</value>
+        <value name="DXCC Entity Code">263</value>
+        <value name="Import-only">true</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">ZE</value>
         <value name="Primary Administrative Subdivision">Zeeland</value>
         <value name="DXCC Entity Code">263</value>
       </record>
@@ -14169,7 +14846,7 @@
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">CS</value>
-        <value name="Primary Administrative Subdivision">Cara'-Severin</value>
+        <value name="Primary Administrative Subdivision">Caraș-Severin</value>
         <value name="DXCC Entity Code">275</value>
       </record>
       <record>
@@ -14181,16 +14858,22 @@
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">TM</value>
-        <value name="Primary Administrative Subdivision">Timiş</value>
+        <value name="Primary Administrative Subdivision">Timiș</value>
         <value name="DXCC Entity Code">275</value>
-        <value name="Comments">Timis</value>
       </record>
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">BU</value>
         <value name="Primary Administrative Subdivision">Bucureşti</value>
         <value name="DXCC Entity Code">275</value>
-        <value name="Comments">Bucure'ti</value>
+        <value name="Import-only">true</value>
+        <value name="Comments">Bucure'ti) (import-only</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">B</value>
+        <value name="Primary Administrative Subdivision">București</value>
+        <value name="DXCC Entity Code">275</value>
       </record>
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
@@ -14203,18 +14886,17 @@
         <value name="Code">BR</value>
         <value name="Primary Administrative Subdivision">Brăila</value>
         <value name="DXCC Entity Code">275</value>
-        <value name="Comments">Braila</value>
       </record>
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">CT</value>
-        <value name="Primary Administrative Subdivision">Conatarta</value>
+        <value name="Primary Administrative Subdivision">Constanța</value>
         <value name="DXCC Entity Code">275</value>
       </record>
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">GL</value>
-        <value name="Primary Administrative Subdivision">Galati</value>
+        <value name="Primary Administrative Subdivision">Galați</value>
         <value name="DXCC Entity Code">275</value>
       </record>
       <record>
@@ -14244,7 +14926,7 @@
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">BN</value>
-        <value name="Primary Administrative Subdivision">Bistrita-Nasaud</value>
+        <value name="Primary Administrative Subdivision">Bistrița-Năsăud</value>
         <value name="DXCC Entity Code">275</value>
       </record>
       <record>
@@ -14256,16 +14938,14 @@
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">MM</value>
-        <value name="Primary Administrative Subdivision">Maramureş</value>
+        <value name="Primary Administrative Subdivision">Maramureș</value>
         <value name="DXCC Entity Code">275</value>
-        <value name="Comments">Maramures</value>
       </record>
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">SJ</value>
         <value name="Primary Administrative Subdivision">Sălaj</value>
         <value name="DXCC Entity Code">275</value>
-        <value name="Comments">Salaj</value>
       </record>
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
@@ -14276,9 +14956,8 @@
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">BV</value>
-        <value name="Primary Administrative Subdivision">Braşov</value>
+        <value name="Primary Administrative Subdivision">Brașov</value>
         <value name="DXCC Entity Code">275</value>
-        <value name="Comments">Bra'ov</value>
       </record>
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
@@ -14295,9 +14974,8 @@
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">MS</value>
-        <value name="Primary Administrative Subdivision">Mureş</value>
+        <value name="Primary Administrative Subdivision">Mureș</value>
         <value name="DXCC Entity Code">275</value>
-        <value name="Comments">Mures</value>
       </record>
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
@@ -14308,7 +14986,7 @@
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">AG</value>
-        <value name="Primary Administrative Subdivision">Arge'</value>
+        <value name="Primary Administrative Subdivision">Argeș</value>
         <value name="DXCC Entity Code">275</value>
       </record>
       <record>
@@ -14326,9 +15004,8 @@
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">MH</value>
-        <value name="Primary Administrative Subdivision">Mehedinţi</value>
+        <value name="Primary Administrative Subdivision">Mehedinți</value>
         <value name="DXCC Entity Code">275</value>
-        <value name="Comments">Mehedinti</value>
       </record>
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
@@ -14345,28 +15022,26 @@
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">BC</value>
-        <value name="Primary Administrative Subdivision">Bacau</value>
+        <value name="Primary Administrative Subdivision">Bacău</value>
         <value name="DXCC Entity Code">275</value>
       </record>
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">BT</value>
-        <value name="Primary Administrative Subdivision">Boto'ani</value>
+        <value name="Primary Administrative Subdivision">Botoșani</value>
         <value name="DXCC Entity Code">275</value>
       </record>
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">IS</value>
-        <value name="Primary Administrative Subdivision">Iaşi</value>
+        <value name="Primary Administrative Subdivision">Iași</value>
         <value name="DXCC Entity Code">275</value>
-        <value name="Comments">Iasi</value>
       </record>
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">NT</value>
-        <value name="Primary Administrative Subdivision">Neamţ</value>
+        <value name="Primary Administrative Subdivision">Neamț</value>
         <value name="DXCC Entity Code">275</value>
-        <value name="Comments">Neamt</value>
       </record>
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
@@ -14385,32 +15060,29 @@
         <value name="Code">BZ</value>
         <value name="Primary Administrative Subdivision">Buzău</value>
         <value name="DXCC Entity Code">275</value>
-        <value name="Comments">Buzau</value>
       </record>
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">CL</value>
-        <value name="Primary Administrative Subdivision">Călăraşi</value>
+        <value name="Primary Administrative Subdivision">Călărași</value>
         <value name="DXCC Entity Code">275</value>
-        <value name="Comments">Calarasi</value>
       </record>
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">DB</value>
-        <value name="Primary Administrative Subdivision">Dâmboviţa</value>
+        <value name="Primary Administrative Subdivision">Dâmbovița</value>
         <value name="DXCC Entity Code">275</value>
-        <value name="Comments">Dambovita</value>
       </record>
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">GR</value>
-        <value name="Primary Administrative Subdivision">Giurqiu</value>
+        <value name="Primary Administrative Subdivision">Giurgiu</value>
         <value name="DXCC Entity Code">275</value>
       </record>
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">IL</value>
-        <value name="Primary Administrative Subdivision">Ialomita</value>
+        <value name="Primary Administrative Subdivision">Ialomița</value>
         <value name="DXCC Entity Code">275</value>
       </record>
       <record>
@@ -14428,7 +15100,7 @@
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">AV</value>
-        <value name="Primary Administrative Subdivision">Avila</value>
+        <value name="Primary Administrative Subdivision">Ávila</value>
         <value name="DXCC Entity Code">281</value>
       </record>
       <record>
@@ -14446,7 +15118,7 @@
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">LE</value>
-        <value name="Primary Administrative Subdivision">Leon</value>
+        <value name="Primary Administrative Subdivision">León</value>
         <value name="DXCC Entity Code">281</value>
       </record>
       <record>
@@ -14470,6 +15142,13 @@
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">OU</value>
+        <value name="Primary Administrative Subdivision">Ourense</value>
+        <value name="DXCC Entity Code">281</value>
+        <value name="Import-only">true</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">OR</value>
         <value name="Primary Administrative Subdivision">Ourense</value>
         <value name="DXCC Entity Code">281</value>
       </record>
@@ -14524,7 +15203,7 @@
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">BI</value>
-        <value name="Primary Administrative Subdivision">Vizcaya</value>
+        <value name="Primary Administrative Subdivision">Bizkaia</value>
         <value name="DXCC Entity Code">281</value>
       </record>
       <record>
@@ -14542,7 +15221,7 @@
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">SS</value>
-        <value name="Primary Administrative Subdivision">Guipuzcoa</value>
+        <value name="Primary Administrative Subdivision">Gipuzkoa</value>
         <value name="DXCC Entity Code">281</value>
       </record>
       <record>
@@ -14554,7 +15233,7 @@
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">VI</value>
-        <value name="Primary Administrative Subdivision">Alava</value>
+        <value name="Primary Administrative Subdivision">Álava</value>
         <value name="DXCC Entity Code">281</value>
       </record>
       <record>
@@ -14596,7 +15275,7 @@
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">CC</value>
-        <value name="Primary Administrative Subdivision">Caceres</value>
+        <value name="Primary Administrative Subdivision">Cáceres</value>
         <value name="DXCC Entity Code">281</value>
       </record>
       <record>
@@ -14644,7 +15323,7 @@
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">CS</value>
-        <value name="Primary Administrative Subdivision">Castellon</value>
+        <value name="Primary Administrative Subdivision">Castellón</value>
         <value name="DXCC Entity Code">281</value>
       </record>
       <record>
@@ -14656,7 +15335,7 @@
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">V</value>
-        <value name="Primary Administrative Subdivision">Valencia</value>
+        <value name="Primary Administrative Subdivision">València</value>
         <value name="DXCC Entity Code">281</value>
       </record>
       <record>
@@ -14668,13 +15347,13 @@
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">CA</value>
-        <value name="Primary Administrative Subdivision">Cadiz</value>
+        <value name="Primary Administrative Subdivision">Cádiz</value>
         <value name="DXCC Entity Code">281</value>
       </record>
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">CO</value>
-        <value name="Primary Administrative Subdivision">Cordoba</value>
+        <value name="Primary Administrative Subdivision">Córdoba</value>
         <value name="DXCC Entity Code">281</value>
       </record>
       <record>
@@ -14692,13 +15371,13 @@
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">J</value>
-        <value name="Primary Administrative Subdivision">Jaen</value>
+        <value name="Primary Administrative Subdivision">Jaén</value>
         <value name="DXCC Entity Code">281</value>
       </record>
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">MA</value>
-        <value name="Primary Administrative Subdivision">Malaga</value>
+        <value name="Primary Administrative Subdivision">Málaga</value>
         <value name="DXCC Entity Code">281</value>
       </record>
       <record>
@@ -14710,7 +15389,7 @@
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">AB</value>
-        <value name="Primary Administrative Subdivision">Stockholm län</value>
+        <value name="Primary Administrative Subdivision">Stockholms län</value>
         <value name="DXCC Entity Code">284</value>
       </record>
       <record>
@@ -14752,7 +15431,7 @@
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">W</value>
-        <value name="Primary Administrative Subdivision">Dalarna län</value>
+        <value name="Primary Administrative Subdivision">Dalarnas län</value>
         <value name="DXCC Entity Code">284</value>
       </record>
       <record>
@@ -15731,6 +16410,251 @@
       </record>
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">AP</value>
+        <value name="Primary Administrative Subdivision">Andhra Pradesh</value>
+        <value name="DXCC Entity Code">324</value>
+        <value name="Comments">state</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">AR</value>
+        <value name="Primary Administrative Subdivision">Arunāchal Pradesh</value>
+        <value name="DXCC Entity Code">324</value>
+        <value name="Comments">state</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">AS</value>
+        <value name="Primary Administrative Subdivision">Assam</value>
+        <value name="DXCC Entity Code">324</value>
+        <value name="Comments">state</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">BR</value>
+        <value name="Primary Administrative Subdivision">Bihār</value>
+        <value name="DXCC Entity Code">324</value>
+        <value name="Comments">state</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">CH</value>
+        <value name="Primary Administrative Subdivision">Chandīgarh</value>
+        <value name="DXCC Entity Code">324</value>
+        <value name="Comments">Union territory</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">CG</value>
+        <value name="Primary Administrative Subdivision">Chhattīsgarh</value>
+        <value name="DXCC Entity Code">324</value>
+        <value name="Comments">state</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">DD</value>
+        <value name="Primary Administrative Subdivision">Damān and Diu</value>
+        <value name="DXCC Entity Code">324</value>
+        <value name="Comments">Union territory</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">DL</value>
+        <value name="Primary Administrative Subdivision">Delhi</value>
+        <value name="DXCC Entity Code">324</value>
+        <value name="Comments">Union territory</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">DN</value>
+        <value name="Primary Administrative Subdivision">Dādra and Nagar Haveli</value>
+        <value name="DXCC Entity Code">324</value>
+        <value name="Comments">Union territory</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">GA</value>
+        <value name="Primary Administrative Subdivision">Goa</value>
+        <value name="DXCC Entity Code">324</value>
+        <value name="Comments">state</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">GJ</value>
+        <value name="Primary Administrative Subdivision">Gujarāt</value>
+        <value name="DXCC Entity Code">324</value>
+        <value name="Comments">state</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">HR</value>
+        <value name="Primary Administrative Subdivision">Haryāna</value>
+        <value name="DXCC Entity Code">324</value>
+        <value name="Comments">state</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">HP</value>
+        <value name="Primary Administrative Subdivision">Himāchal Pradesh</value>
+        <value name="DXCC Entity Code">324</value>
+        <value name="Comments">state</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">JK</value>
+        <value name="Primary Administrative Subdivision">Jammu and Kashmīr</value>
+        <value name="DXCC Entity Code">324</value>
+        <value name="Comments">Union territory</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">JH</value>
+        <value name="Primary Administrative Subdivision">Jhārkhand</value>
+        <value name="DXCC Entity Code">324</value>
+        <value name="Comments">state</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">KA</value>
+        <value name="Primary Administrative Subdivision">Karnātaka</value>
+        <value name="DXCC Entity Code">324</value>
+        <value name="Comments">state</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">KL</value>
+        <value name="Primary Administrative Subdivision">Kerala</value>
+        <value name="DXCC Entity Code">324</value>
+        <value name="Comments">state</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">LA</value>
+        <value name="Primary Administrative Subdivision">Ladākh</value>
+        <value name="DXCC Entity Code">324</value>
+        <value name="Comments">Union territory</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">MP</value>
+        <value name="Primary Administrative Subdivision">Madhya Pradesh</value>
+        <value name="DXCC Entity Code">324</value>
+        <value name="Comments">state</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">MH</value>
+        <value name="Primary Administrative Subdivision">Mahārāshtra</value>
+        <value name="DXCC Entity Code">324</value>
+        <value name="Comments">state</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">MN</value>
+        <value name="Primary Administrative Subdivision">Manipur</value>
+        <value name="DXCC Entity Code">324</value>
+        <value name="Comments">state</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">ML</value>
+        <value name="Primary Administrative Subdivision">Meghālaya</value>
+        <value name="DXCC Entity Code">324</value>
+        <value name="Comments">state</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">MZ</value>
+        <value name="Primary Administrative Subdivision">Mizoram</value>
+        <value name="DXCC Entity Code">324</value>
+        <value name="Comments">state</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">NL</value>
+        <value name="Primary Administrative Subdivision">Nāgāland</value>
+        <value name="DXCC Entity Code">324</value>
+        <value name="Comments">state</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">OD</value>
+        <value name="Primary Administrative Subdivision">Odisha</value>
+        <value name="DXCC Entity Code">324</value>
+        <value name="Comments">state</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">PY</value>
+        <value name="Primary Administrative Subdivision">Puducherry</value>
+        <value name="DXCC Entity Code">324</value>
+        <value name="Comments">Union territory</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">PB</value>
+        <value name="Primary Administrative Subdivision">Punjab</value>
+        <value name="DXCC Entity Code">324</value>
+        <value name="Comments">state</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">RJ</value>
+        <value name="Primary Administrative Subdivision">Rājasthān</value>
+        <value name="DXCC Entity Code">324</value>
+        <value name="Comments">state</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">SK</value>
+        <value name="Primary Administrative Subdivision">Sikkim</value>
+        <value name="DXCC Entity Code">324</value>
+        <value name="Comments">state</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">TN</value>
+        <value name="Primary Administrative Subdivision">Tamil Nādu</value>
+        <value name="DXCC Entity Code">324</value>
+        <value name="Comments">state</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">TG</value>
+        <value name="Primary Administrative Subdivision">Telangāna</value>
+        <value name="DXCC Entity Code">324</value>
+        <value name="Comments">state</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">TR</value>
+        <value name="Primary Administrative Subdivision">Tripura</value>
+        <value name="DXCC Entity Code">324</value>
+        <value name="Comments">state</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">UP</value>
+        <value name="Primary Administrative Subdivision">Uttar Pradesh</value>
+        <value name="DXCC Entity Code">324</value>
+        <value name="Comments">state</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">UK</value>
+        <value name="Primary Administrative Subdivision">Uttarākhand</value>
+        <value name="DXCC Entity Code">324</value>
+        <value name="Comments">state</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
+        <value name="Code">WB</value>
+        <value name="Primary Administrative Subdivision">West Bengal</value>
+        <value name="DXCC Entity Code">324</value>
+        <value name="Comments">state</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">12</value>
         <value name="Primary Administrative Subdivision">Chiba</value>
         <value name="DXCC Entity Code">339</value>
@@ -16229,7 +17153,7 @@
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">KAL</value>
-        <value name="Primary Administrative Subdivision">Kalinga-Apayso</value>
+        <value name="Primary Administrative Subdivision">Kalinga</value>
         <value name="DXCC Entity Code">375</value>
         <value name="Contained Within">Cordillera Administrative Region</value>
       </record>
@@ -16243,7 +17167,7 @@
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">BAN</value>
-        <value name="Primary Administrative Subdivision">Batasn</value>
+        <value name="Primary Administrative Subdivision">Bataan</value>
         <value name="DXCC Entity Code">375</value>
         <value name="Contained Within">Central Luzon</value>
       </record>
@@ -16404,7 +17328,7 @@
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">NEC</value>
-        <value name="Primary Administrative Subdivision">Negroe Occidental</value>
+        <value name="Primary Administrative Subdivision">Negros Occidental</value>
         <value name="DXCC Entity Code">375</value>
         <value name="Contained Within">Western Visayas</value>
       </record>
@@ -16460,30 +17384,30 @@
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">NCO</value>
-        <value name="Primary Administrative Subdivision">North Cotabato</value>
+        <value name="Primary Administrative Subdivision">Cotabato</value>
         <value name="DXCC Entity Code">375</value>
-        <value name="Contained Within">SOCCSKSARGEN (Central Mindanao)</value>
+        <value name="Contained Within">Soccsksargen (Central Mindanao)</value>
       </record>
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">SUK</value>
         <value name="Primary Administrative Subdivision">Sultan Kudarat</value>
         <value name="DXCC Entity Code">375</value>
-        <value name="Contained Within">SOCCSKSARGEN (Central Mindanao)</value>
+        <value name="Contained Within">Soccsksargen (Central Mindanao)</value>
       </record>
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">SAR</value>
         <value name="Primary Administrative Subdivision">Sarangani</value>
         <value name="DXCC Entity Code">375</value>
-        <value name="Contained Within">SOCCSKSARGEN (Central Mindanao)</value>
+        <value name="Contained Within">Soccsksargen (Central Mindanao)</value>
       </record>
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">SCO</value>
         <value name="Primary Administrative Subdivision">South Cotabato</value>
         <value name="DXCC Entity Code">375</value>
-        <value name="Contained Within">SOCCSKSARGEN (Central Mindanao)</value>
+        <value name="Contained Within">Soccsksargen (Central Mindanao)</value>
       </record>
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
@@ -16558,7 +17482,7 @@
       <record>
         <value name="Enumeration Name">Primary_Administrative_Subdivision</value>
         <value name="Code">COM</value>
-        <value name="Primary Administrative Subdivision">Compostela Valley</value>
+        <value name="Primary Administrative Subdivision">Davao de Oro</value>
         <value name="DXCC Entity Code">375</value>
         <value name="Contained Within">Davao (Southern Mindanao)</value>
       </record>
@@ -18318,6 +19242,30 @@
         <value name="Meaning">uncertain</value>
       </record>
     </enumeration>
+    <enumeration name="QSO_Download_Status">
+      <header>
+        <value>Enumeration Name</value>
+        <value>Status</value>
+        <value>Description</value>
+        <value>Import-only</value>
+        <value>Comments</value>
+      </header>
+      <record>
+        <value name="Enumeration Name">QSO_Download_Status</value>
+        <value name="Status">Y</value>
+        <value name="Description">the QSO has been downloaded from the online service</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">QSO_Download_Status</value>
+        <value name="Status">N</value>
+        <value name="Description">the QSO has not been downloaded from the online service</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">QSO_Download_Status</value>
+        <value name="Status">I</value>
+        <value name="Description">ignore or invalid</value>
+      </record>
+    </enumeration>
     <enumeration name="QSO_Upload_Status">
       <header>
         <value>Enumeration Name</value>
@@ -18372,7 +19320,7 @@
         <value name="DXCC Entity Code">248</value>
         <value name="Region">African Italy</value>
         <value name="Prefix">IG9</value>
-        <value name="Applicability">WAE</value>
+        <value name="Applicability">CQ</value>
       </record>
       <record>
         <value name="Enumeration Name">Region</value>
@@ -18858,6 +19806,529 @@
         <value name="Alaska Judicial District">Alaska Fourth Judicial District</value>
       </record>
     </enumeration>
+    <enumeration name="Secondary_Administrative_Subdivision_Alt">
+      <header>
+        <value>Enumeration Name</value>
+        <value>Code</value>
+        <value>DXCC Entity Code</value>
+        <value>Region</value>
+        <value>District</value>
+        <value>Deleted</value>
+        <value>Import-only</value>
+        <value>Comments</value>
+      </header>
+      <record>
+        <value name="Enumeration Name">Secondary_Administrative_Subdivision_Alt</value>
+        <value name="Code">NZ_Regions:Northland/Far North</value>
+        <value name="DXCC Entity Code">170</value>
+        <value name="Region">Northland</value>
+        <value name="District">Far North</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Secondary_Administrative_Subdivision_Alt</value>
+        <value name="Code">NZ_Regions:Northland/Whangarei</value>
+        <value name="DXCC Entity Code">170</value>
+        <value name="Region">Northland</value>
+        <value name="District">Whangarei</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Secondary_Administrative_Subdivision_Alt</value>
+        <value name="Code">NZ_Regions:Northland/Kaipara</value>
+        <value name="DXCC Entity Code">170</value>
+        <value name="Region">Northland</value>
+        <value name="District">Kaipara</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Secondary_Administrative_Subdivision_Alt</value>
+        <value name="Code">NZ_Regions:Auckland/Rodney</value>
+        <value name="DXCC Entity Code">170</value>
+        <value name="Region">Auckland</value>
+        <value name="District">Rodney</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Secondary_Administrative_Subdivision_Alt</value>
+        <value name="Code">NZ_Regions:Auckland/North Shore</value>
+        <value name="DXCC Entity Code">170</value>
+        <value name="Region">Auckland</value>
+        <value name="District">North Shore</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Secondary_Administrative_Subdivision_Alt</value>
+        <value name="Code">NZ_Regions:Auckland/Waitakere</value>
+        <value name="DXCC Entity Code">170</value>
+        <value name="Region">Auckland</value>
+        <value name="District">Waitakere</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Secondary_Administrative_Subdivision_Alt</value>
+        <value name="Code">NZ_Regions:Auckland/Auckland</value>
+        <value name="DXCC Entity Code">170</value>
+        <value name="Region">Auckland</value>
+        <value name="District">Auckland</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Secondary_Administrative_Subdivision_Alt</value>
+        <value name="Code">NZ_Regions:Auckland/Manukau</value>
+        <value name="DXCC Entity Code">170</value>
+        <value name="Region">Auckland</value>
+        <value name="District">Manukau</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Secondary_Administrative_Subdivision_Alt</value>
+        <value name="Code">NZ_Regions:Auckland/Papakura</value>
+        <value name="DXCC Entity Code">170</value>
+        <value name="Region">Auckland</value>
+        <value name="District">Papakura</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Secondary_Administrative_Subdivision_Alt</value>
+        <value name="Code">NZ_Regions:Auckland/Franklin</value>
+        <value name="DXCC Entity Code">170</value>
+        <value name="Region">Auckland</value>
+        <value name="District">Franklin</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Secondary_Administrative_Subdivision_Alt</value>
+        <value name="Code">NZ_Regions:Waikato/Thames-Coromandel</value>
+        <value name="DXCC Entity Code">170</value>
+        <value name="Region">Waikato</value>
+        <value name="District">Thames-Coromandel</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Secondary_Administrative_Subdivision_Alt</value>
+        <value name="Code">NZ_Regions:Waikato/Hauraki</value>
+        <value name="DXCC Entity Code">170</value>
+        <value name="Region">Waikato</value>
+        <value name="District">Hauraki</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Secondary_Administrative_Subdivision_Alt</value>
+        <value name="Code">NZ_Regions:Waikato/Waikato</value>
+        <value name="DXCC Entity Code">170</value>
+        <value name="Region">Waikato</value>
+        <value name="District">Waikato</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Secondary_Administrative_Subdivision_Alt</value>
+        <value name="Code">NZ_Regions:Waikato/Matamata Piako</value>
+        <value name="DXCC Entity Code">170</value>
+        <value name="Region">Waikato</value>
+        <value name="District">Matamata Piako</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Secondary_Administrative_Subdivision_Alt</value>
+        <value name="Code">NZ_Regions:Waikato/Hamilton</value>
+        <value name="DXCC Entity Code">170</value>
+        <value name="Region">Waikato</value>
+        <value name="District">Hamilton</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Secondary_Administrative_Subdivision_Alt</value>
+        <value name="Code">NZ_Regions:Waikato/Waipa</value>
+        <value name="DXCC Entity Code">170</value>
+        <value name="Region">Waikato</value>
+        <value name="District">Waipa</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Secondary_Administrative_Subdivision_Alt</value>
+        <value name="Code">NZ_Regions:Waikato/Otorohanga</value>
+        <value name="DXCC Entity Code">170</value>
+        <value name="Region">Waikato</value>
+        <value name="District">Otorohanga</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Secondary_Administrative_Subdivision_Alt</value>
+        <value name="Code">NZ_Regions:Waikato/South Waikato</value>
+        <value name="DXCC Entity Code">170</value>
+        <value name="Region">Waikato</value>
+        <value name="District">South Waikato</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Secondary_Administrative_Subdivision_Alt</value>
+        <value name="Code">NZ_Regions:Waikato/Waitomo</value>
+        <value name="DXCC Entity Code">170</value>
+        <value name="Region">Waikato</value>
+        <value name="District">Waitomo</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Secondary_Administrative_Subdivision_Alt</value>
+        <value name="Code">NZ_Regions:Waikato/Taupo</value>
+        <value name="DXCC Entity Code">170</value>
+        <value name="Region">Waikato</value>
+        <value name="District">Taupo</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Secondary_Administrative_Subdivision_Alt</value>
+        <value name="Code">NZ_Regions:Bay of Plenty/Western Bay of Plenty</value>
+        <value name="DXCC Entity Code">170</value>
+        <value name="Region">Bay of Plenty</value>
+        <value name="District">Western Bay of Plenty</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Secondary_Administrative_Subdivision_Alt</value>
+        <value name="Code">NZ_Regions:Bay of Plenty/Tauranga</value>
+        <value name="DXCC Entity Code">170</value>
+        <value name="Region">Bay of Plenty</value>
+        <value name="District">Tauranga</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Secondary_Administrative_Subdivision_Alt</value>
+        <value name="Code">NZ_Regions:Bay of Plenty/Rotorua</value>
+        <value name="DXCC Entity Code">170</value>
+        <value name="Region">Bay of Plenty</value>
+        <value name="District">Rotorua</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Secondary_Administrative_Subdivision_Alt</value>
+        <value name="Code">NZ_Regions:Bay of Plenty/Kawerau</value>
+        <value name="DXCC Entity Code">170</value>
+        <value name="Region">Bay of Plenty</value>
+        <value name="District">Kawerau</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Secondary_Administrative_Subdivision_Alt</value>
+        <value name="Code">NZ_Regions:Bay of Plenty/Whakatane</value>
+        <value name="DXCC Entity Code">170</value>
+        <value name="Region">Bay of Plenty</value>
+        <value name="District">Whakatane</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Secondary_Administrative_Subdivision_Alt</value>
+        <value name="Code">NZ_Regions:Bay of Plenty/Opotiki</value>
+        <value name="DXCC Entity Code">170</value>
+        <value name="Region">Bay of Plenty</value>
+        <value name="District">Opotiki</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Secondary_Administrative_Subdivision_Alt</value>
+        <value name="Code">NZ_Regions:Gisborne/Gisborne</value>
+        <value name="DXCC Entity Code">170</value>
+        <value name="Region">Gisborne</value>
+        <value name="District">Gisborne</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Secondary_Administrative_Subdivision_Alt</value>
+        <value name="Code">NZ_Regions:Hawkes Bay/Wairoa</value>
+        <value name="DXCC Entity Code">170</value>
+        <value name="Region">Hawkes Bay</value>
+        <value name="District">Wairoa</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Secondary_Administrative_Subdivision_Alt</value>
+        <value name="Code">NZ_Regions:Hawkes Bay/Hastings</value>
+        <value name="DXCC Entity Code">170</value>
+        <value name="Region">Hawkes Bay</value>
+        <value name="District">Hastings</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Secondary_Administrative_Subdivision_Alt</value>
+        <value name="Code">NZ_Regions:Hawkes Bay/Napier</value>
+        <value name="DXCC Entity Code">170</value>
+        <value name="Region">Hawkes Bay</value>
+        <value name="District">Napier</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Secondary_Administrative_Subdivision_Alt</value>
+        <value name="Code">NZ_Regions:Hawkes Bay/Central Hawkes Bay</value>
+        <value name="DXCC Entity Code">170</value>
+        <value name="Region">Hawkes Bay</value>
+        <value name="District">Central Hawkes Bay</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Secondary_Administrative_Subdivision_Alt</value>
+        <value name="Code">NZ_Regions:Taranaki/New Plymouth</value>
+        <value name="DXCC Entity Code">170</value>
+        <value name="Region">Taranaki</value>
+        <value name="District">New Plymouth</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Secondary_Administrative_Subdivision_Alt</value>
+        <value name="Code">NZ_Regions:Taranaki/Stratford</value>
+        <value name="DXCC Entity Code">170</value>
+        <value name="Region">Taranaki</value>
+        <value name="District">Stratford</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Secondary_Administrative_Subdivision_Alt</value>
+        <value name="Code">NZ_Regions:Taranaki/South Taranaki</value>
+        <value name="DXCC Entity Code">170</value>
+        <value name="Region">Taranaki</value>
+        <value name="District">South Taranaki</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Secondary_Administrative_Subdivision_Alt</value>
+        <value name="Code">NZ_Regions:Wanganui-Manawatu/Ruapehu</value>
+        <value name="DXCC Entity Code">170</value>
+        <value name="Region">Wanganui-Manawatu</value>
+        <value name="District">Ruapehu</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Secondary_Administrative_Subdivision_Alt</value>
+        <value name="Code">NZ_Regions:Wanganui-Manawatu/Wanganui</value>
+        <value name="DXCC Entity Code">170</value>
+        <value name="Region">Wanganui-Manawatu</value>
+        <value name="District">Wanganui</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Secondary_Administrative_Subdivision_Alt</value>
+        <value name="Code">NZ_Regions:Wanganui-Manawatu/Rangitikei</value>
+        <value name="DXCC Entity Code">170</value>
+        <value name="Region">Wanganui-Manawatu</value>
+        <value name="District">Rangitikei</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Secondary_Administrative_Subdivision_Alt</value>
+        <value name="Code">NZ_Regions:Wanganui-Manawatu/Manawatu</value>
+        <value name="DXCC Entity Code">170</value>
+        <value name="Region">Wanganui-Manawatu</value>
+        <value name="District">Manawatu</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Secondary_Administrative_Subdivision_Alt</value>
+        <value name="Code">NZ_Regions:Wanganui-Manawatu/Palmerston North</value>
+        <value name="DXCC Entity Code">170</value>
+        <value name="Region">Wanganui-Manawatu</value>
+        <value name="District">Palmerston North</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Secondary_Administrative_Subdivision_Alt</value>
+        <value name="Code">NZ_Regions:Wanganui-Manawatu/Horowhenua</value>
+        <value name="DXCC Entity Code">170</value>
+        <value name="Region">Wanganui-Manawatu</value>
+        <value name="District">Horowhenua</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Secondary_Administrative_Subdivision_Alt</value>
+        <value name="Code">NZ_Regions:Wanganui-Manawatu/Tararua</value>
+        <value name="DXCC Entity Code">170</value>
+        <value name="Region">Wanganui-Manawatu</value>
+        <value name="District">Tararua</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Secondary_Administrative_Subdivision_Alt</value>
+        <value name="Code">NZ_Regions:Wellington/Masterton</value>
+        <value name="DXCC Entity Code">170</value>
+        <value name="Region">Wellington</value>
+        <value name="District">Masterton</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Secondary_Administrative_Subdivision_Alt</value>
+        <value name="Code">NZ_Regions:Wellington/Carterton</value>
+        <value name="DXCC Entity Code">170</value>
+        <value name="Region">Wellington</value>
+        <value name="District">Carterton</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Secondary_Administrative_Subdivision_Alt</value>
+        <value name="Code">NZ_Regions:Wellington/South Wairarapa</value>
+        <value name="DXCC Entity Code">170</value>
+        <value name="Region">Wellington</value>
+        <value name="District">South Wairarapa</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Secondary_Administrative_Subdivision_Alt</value>
+        <value name="Code">NZ_Regions:Wellington/Kapiti Coast</value>
+        <value name="DXCC Entity Code">170</value>
+        <value name="Region">Wellington</value>
+        <value name="District">Kapiti Coast</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Secondary_Administrative_Subdivision_Alt</value>
+        <value name="Code">NZ_Regions:Wellington/Porirua</value>
+        <value name="DXCC Entity Code">170</value>
+        <value name="Region">Wellington</value>
+        <value name="District">Porirua</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Secondary_Administrative_Subdivision_Alt</value>
+        <value name="Code">NZ_Regions:Wellington/Upper Hutt</value>
+        <value name="DXCC Entity Code">170</value>
+        <value name="Region">Wellington</value>
+        <value name="District">Upper Hutt</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Secondary_Administrative_Subdivision_Alt</value>
+        <value name="Code">NZ_Regions:Wellington/Lower Hutt</value>
+        <value name="DXCC Entity Code">170</value>
+        <value name="Region">Wellington</value>
+        <value name="District">Lower Hutt</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Secondary_Administrative_Subdivision_Alt</value>
+        <value name="Code">NZ_Regions:Wellington/Wellington</value>
+        <value name="DXCC Entity Code">170</value>
+        <value name="Region">Wellington</value>
+        <value name="District">Wellington</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Secondary_Administrative_Subdivision_Alt</value>
+        <value name="Code">NZ_Regions:Nelson/Nelson</value>
+        <value name="DXCC Entity Code">170</value>
+        <value name="Region">Nelson</value>
+        <value name="District">Nelson</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Secondary_Administrative_Subdivision_Alt</value>
+        <value name="Code">NZ_Regions:Marlborough/Marlborough</value>
+        <value name="DXCC Entity Code">170</value>
+        <value name="Region">Marlborough</value>
+        <value name="District">Marlborough</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Secondary_Administrative_Subdivision_Alt</value>
+        <value name="Code">NZ_Regions:Tasman/Tasman</value>
+        <value name="DXCC Entity Code">170</value>
+        <value name="Region">Tasman</value>
+        <value name="District">Tasman</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Secondary_Administrative_Subdivision_Alt</value>
+        <value name="Code">NZ_Regions:West Coast/Buller</value>
+        <value name="DXCC Entity Code">170</value>
+        <value name="Region">West Coast</value>
+        <value name="District">Buller</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Secondary_Administrative_Subdivision_Alt</value>
+        <value name="Code">NZ_Regions:West Coast/Grey</value>
+        <value name="DXCC Entity Code">170</value>
+        <value name="Region">West Coast</value>
+        <value name="District">Grey</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Secondary_Administrative_Subdivision_Alt</value>
+        <value name="Code">NZ_Regions:West Coast/Westland</value>
+        <value name="DXCC Entity Code">170</value>
+        <value name="Region">West Coast</value>
+        <value name="District">Westland</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Secondary_Administrative_Subdivision_Alt</value>
+        <value name="Code">NZ_Regions:Canterbury/Kaikoura</value>
+        <value name="DXCC Entity Code">170</value>
+        <value name="Region">Canterbury</value>
+        <value name="District">Kaikoura</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Secondary_Administrative_Subdivision_Alt</value>
+        <value name="Code">NZ_Regions:Canterbury/Hurunui</value>
+        <value name="DXCC Entity Code">170</value>
+        <value name="Region">Canterbury</value>
+        <value name="District">Hurunui</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Secondary_Administrative_Subdivision_Alt</value>
+        <value name="Code">NZ_Regions:Canterbury/Selwyn</value>
+        <value name="DXCC Entity Code">170</value>
+        <value name="Region">Canterbury</value>
+        <value name="District">Selwyn</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Secondary_Administrative_Subdivision_Alt</value>
+        <value name="Code">NZ_Regions:Canterbury/Waimakariri</value>
+        <value name="DXCC Entity Code">170</value>
+        <value name="Region">Canterbury</value>
+        <value name="District">Waimakariri</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Secondary_Administrative_Subdivision_Alt</value>
+        <value name="Code">NZ_Regions:Canterbury/Christchurch</value>
+        <value name="DXCC Entity Code">170</value>
+        <value name="Region">Canterbury</value>
+        <value name="District">Christchurch</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Secondary_Administrative_Subdivision_Alt</value>
+        <value name="Code">NZ_Regions:Canterbury/Banks Peninsula</value>
+        <value name="DXCC Entity Code">170</value>
+        <value name="Region">Canterbury</value>
+        <value name="District">Banks Peninsula</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Secondary_Administrative_Subdivision_Alt</value>
+        <value name="Code">NZ_Regions:Canterbury/Ashburton</value>
+        <value name="DXCC Entity Code">170</value>
+        <value name="Region">Canterbury</value>
+        <value name="District">Ashburton</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Secondary_Administrative_Subdivision_Alt</value>
+        <value name="Code">NZ_Regions:Canterbury/Mackenzie</value>
+        <value name="DXCC Entity Code">170</value>
+        <value name="Region">Canterbury</value>
+        <value name="District">Mackenzie</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Secondary_Administrative_Subdivision_Alt</value>
+        <value name="Code">NZ_Regions:Canterbury/Timaru</value>
+        <value name="DXCC Entity Code">170</value>
+        <value name="Region">Canterbury</value>
+        <value name="District">Timaru</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Secondary_Administrative_Subdivision_Alt</value>
+        <value name="Code">NZ_Regions:Canterbury/Waimate</value>
+        <value name="DXCC Entity Code">170</value>
+        <value name="Region">Canterbury</value>
+        <value name="District">Waimate</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Secondary_Administrative_Subdivision_Alt</value>
+        <value name="Code">NZ_Regions:Otago/Waitaki</value>
+        <value name="DXCC Entity Code">170</value>
+        <value name="Region">Otago</value>
+        <value name="District">Waitaki</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Secondary_Administrative_Subdivision_Alt</value>
+        <value name="Code">NZ_Regions:Otago/Queenstown-Lakes</value>
+        <value name="DXCC Entity Code">170</value>
+        <value name="Region">Otago</value>
+        <value name="District">Queenstown-Lakes</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Secondary_Administrative_Subdivision_Alt</value>
+        <value name="Code">NZ_Regions:Otago/Central Otago</value>
+        <value name="DXCC Entity Code">170</value>
+        <value name="Region">Otago</value>
+        <value name="District">Central Otago</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Secondary_Administrative_Subdivision_Alt</value>
+        <value name="Code">NZ_Regions:Otago/Dunedin</value>
+        <value name="DXCC Entity Code">170</value>
+        <value name="Region">Otago</value>
+        <value name="District">Dunedin</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Secondary_Administrative_Subdivision_Alt</value>
+        <value name="Code">NZ_Regions:Otago/Clutha</value>
+        <value name="DXCC Entity Code">170</value>
+        <value name="Region">Otago</value>
+        <value name="District">Clutha</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Secondary_Administrative_Subdivision_Alt</value>
+        <value name="Code">NZ_Regions:Southland/Gore</value>
+        <value name="DXCC Entity Code">170</value>
+        <value name="Region">Southland</value>
+        <value name="District">Gore</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Secondary_Administrative_Subdivision_Alt</value>
+        <value name="Code">NZ_Regions:Southland/Southland</value>
+        <value name="DXCC Entity Code">170</value>
+        <value name="Region">Southland</value>
+        <value name="District">Southland</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Secondary_Administrative_Subdivision_Alt</value>
+        <value name="Code">NZ_Regions:Southland/Invercargill</value>
+        <value name="DXCC Entity Code">170</value>
+        <value name="Region">Southland</value>
+        <value name="District">Invercargill</value>
+      </record>
+    </enumeration>
     <enumeration name="Submode">
       <header>
         <value>Enumeration Name</value>
@@ -19030,6 +20501,16 @@
         <value name="Enumeration Name">Submode</value>
         <value name="Submode">FSK31</value>
         <value name="Mode">PSK</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
+        <value name="Submode">FSKH105</value>
+        <value name="Mode">HELL</value>
+      </record>
+      <record>
+        <value name="Enumeration Name">Submode</value>
+        <value name="Submode">FSKH245</value>
+        <value name="Mode">HELL</value>
       </record>
       <record>
         <value name="Enumeration Name">Submode</value>
@@ -19805,7 +21286,7 @@
     <record>
       <value name="Field Name">USERDEFn</value>
       <value name="Data Type">String</value>
-      <value name="Description">specifies the name and optional enumeration or range of the nth user-defined field, where n is a positive integer The name of a user-defined field may not be an ADIF Field name The name of a user-defined field may not contain a comma a colon an open-angle-bracket or close-angle-bracket character an open-curly-bracket or close-curly-bracket character The name of a user-defined field may not begin or end with a space character</value>
+      <value name="Description">specifies the name and optional enumeration or range of the nth user-defined field, where n is a positive integer The name of a user-defined field may not be an ADIF Field name contain a comma a colon an open-angle-bracket or close-angle-bracket character an open-curly-bracket or close-curly-bracket character begin or end with a space character</value>
       <value name="Header Field">true</value>
     </record>
     <record>
@@ -19920,14 +21401,19 @@
       <value name="Description">the contacted station's Secondary Administrative Subdivision (e.g. US county, JA Gun), in the specified format</value>
     </record>
     <record>
+      <value name="Field Name">CNTY_ALT</value>
+      <value name="Data Type">SecondaryAdministrativeSubdivisionListAlt</value>
+      <value name="Description">a semicolon (;) delimited, unordered list of Secondary Administrative Subdivision Alt codes for the contacted station See the Data Type for details.</value>
+    </record>
+    <record>
       <value name="Field Name">COMMENT</value>
       <value name="Data Type">String</value>
-      <value name="Description">comment field for QSO recommended use: information of interest to the contacted station's operator</value>
+      <value name="Description">comment field for QSO for a message to be incorporated in a paper or electronic QSL for the contacted station's operator, use the QSLMSG field recommended use: information of interest to the contacted station's operator</value>
     </record>
     <record>
       <value name="Field Name">COMMENT_INTL</value>
       <value name="Data Type">IntlString</value>
-      <value name="Description">comment field for QSO recommended use: information of interest to the contacted station's operator</value>
+      <value name="Description">comment field for QSO for a message to be incorporated in a paper or electronic QSL for the contacted station's operator, use the QSLMSG_INTL field recommended use: information of interest to the contacted station's operator</value>
     </record>
     <record>
       <value name="Field Name">CONT</value>
@@ -19966,19 +21452,41 @@
     <record>
       <value name="Field Name">CREDIT_SUBMITTED</value>
       <value name="Data Type">CreditList,AwardList</value>
-      <value name="Enumeration">Credit Award (import-only)</value>
+      <value name="Enumeration">Credit,Award</value>
       <value name="Description">the list of credits sought for this QSO Use of data type AwardList and enumeration Award are import-only</value>
     </record>
     <record>
       <value name="Field Name">CREDIT_GRANTED</value>
       <value name="Data Type">CreditList,AwardList</value>
-      <value name="Enumeration">Credit Award (import-only)</value>
+      <value name="Enumeration">Credit,Award</value>
       <value name="Description">the list of credits granted to this QSO Use of data type AwardList and enumeration Award are import-only</value>
     </record>
     <record>
       <value name="Field Name">DARC_DOK</value>
       <value name="Data Type">Enumeration</value>
       <value name="Description">the contacted station's DARC DOK (District Location Code) A DOK comprises letters and numbers, e.g. &lt;DARC_DOK:3&gt;A01</value>
+    </record>
+    <record>
+      <value name="Field Name">DCL_QSLRDATE</value>
+      <value name="Data Type">Date</value>
+      <value name="Description">date QSL received from DCL (only valid if DCL_QSL_RCVD is Y, I, or V)(V import-only)</value>
+    </record>
+    <record>
+      <value name="Field Name">DCL_QSLSDATE</value>
+      <value name="Data Type">Date</value>
+      <value name="Description">date QSL sent to DCL (only valid if DCL_QSL_SENT is Y, Q, or I)</value>
+    </record>
+    <record>
+      <value name="Field Name">DCL_QSL_RCVD</value>
+      <value name="Data Type">Enumeration</value>
+      <value name="Enumeration">QSL_Rcvd</value>
+      <value name="Description">DCL QSL received status Default Value: N</value>
+    </record>
+    <record>
+      <value name="Field Name">DCL_QSL_SENT</value>
+      <value name="Data Type">Enumeration</value>
+      <value name="Enumeration">QSL_Sent</value>
+      <value name="Description">DCL QSL sent status Default Value: N</value>
     </record>
     <record>
       <value name="Field Name">DISTANCE</value>
@@ -20171,6 +21679,17 @@
       <value name="Description">QSO Mode</value>
     </record>
     <record>
+      <value name="Field Name">MORSE_KEY_INFO</value>
+      <value name="Data Type">String</value>
+      <value name="Description">details of the contacted station's Morse key (e.g. make, model, etc). Example: &lt;MORSE_KEY_INFO:16&gt;Begali Sculpture</value>
+    </record>
+    <record>
+      <value name="Field Name">MORSE_KEY_TYPE</value>
+      <value name="Data Type">Enumeration</value>
+      <value name="Enumeration">Morse_Key_Type</value>
+      <value name="Description">the contacted station's Morse key type (e.g. straight key, bug, etc). Example for a dual-lever paddle: &lt;MORSE_KEY_TYPE:3&gt;DLP</value>
+    </record>
+    <record>
       <value name="Field Name">MS_SHOWER</value>
       <value name="Data Type">String</value>
       <value name="Description">For Meteor Scatter QSOs, the name of the meteor shower in progress</value>
@@ -20213,6 +21732,11 @@
       <value name="Description">the logging station's Secondary Administrative Subdivision (e.g. US county, JA Gun), in the specified format</value>
     </record>
     <record>
+      <value name="Field Name">MY_CNTY_ALT</value>
+      <value name="Data Type">SecondaryAdministrativeSubdivisionListAlt</value>
+      <value name="Description">a semicolon (;) delimited, unordered list of Secondary Administrative Subdivision Alt codes for the logging station See the Data Type for details.</value>
+    </record>
+    <record>
       <value name="Field Name">MY_COUNTRY</value>
       <value name="Data Type">String</value>
       <value name="Enumeration">Country</value>
@@ -20230,6 +21754,11 @@
       <value name="Description">the logging station's CQ Zone in the range 1 to 40 (inclusive)</value>
       <value name="Minimum Value">1</value>
       <value name="Maximum Value">40</value>
+    </record>
+    <record>
+      <value name="Field Name">MY_DARC_DOK</value>
+      <value name="Data Type">Enumeration</value>
+      <value name="Description">the logging station's DARC DOK (District Location Code) A DOK comprises letters and numbers, e.g. &lt;MY_DARC_DOK:3&gt;A01</value>
     </record>
     <record>
       <value name="Field Name">MY_DXCC</value>
@@ -20281,6 +21810,17 @@
       <value name="Field Name">MY_LON</value>
       <value name="Data Type">Location</value>
       <value name="Description">the logging station's longitude</value>
+    </record>
+    <record>
+      <value name="Field Name">MY_MORSE_KEY_INFO</value>
+      <value name="Data Type">String</value>
+      <value name="Description">details of the logging station's Morse key (e.g. make, model, etc). Example: &lt;MY_MORSE_KEY_INFO:16&gt;Begali Sculpture</value>
+    </record>
+    <record>
+      <value name="Field Name">MY_MORSE_KEY_TYPE</value>
+      <value name="Data Type">Enumeration</value>
+      <value name="Enumeration">Morse_Key_Type</value>
+      <value name="Description">the logging station's Morse key type (e.g. straight key, bug, etc). Example for a dual-lever paddle: &lt;MY_MORSE_KEY_TYPE:3&gt;DLP</value>
     </record>
     <record>
       <value name="Field Name">MY_NAME</value>
@@ -20366,7 +21906,7 @@
     <record>
       <value name="Field Name">MY_VUCC_GRIDS</value>
       <value name="Data Type">GridSquareList</value>
-      <value name="Description">two or four adjacent Maidenhead grid locators, each four characters long, representing the logging station's grid squares that the contacted station may claim for the ARRL VUCC award program. E.g. EN98,FM08,EM97,FM07</value>
+      <value name="Description">two or four adjacent Maidenhead grid locators, each four or six characters long, representing the logging station's grid squares that the contacted station may claim for the ARRL VUCC award program. E.g. EN98,FM08,EM97,FM07</value>
     </record>
     <record>
       <value name="Field Name">MY_WWFF_REF</value>
@@ -20442,6 +21982,17 @@
       <value name="Description">public encryption key</value>
     </record>
     <record>
+      <value name="Field Name">QRZCOM_QSO_DOWNLOAD_DATE</value>
+      <value name="Data Type">Date</value>
+      <value name="Description">date QSO downloaded from QRZ.COM logbook</value>
+    </record>
+    <record>
+      <value name="Field Name">QRZCOM_QSO_DOWNLOAD_STATUS</value>
+      <value name="Data Type">Enumeration</value>
+      <value name="Enumeration">QSO_Download_Status</value>
+      <value name="Description">QRZ.COM logbook QSO download status</value>
+    </record>
+    <record>
       <value name="Field Name">QRZCOM_QSO_UPLOAD_DATE</value>
       <value name="Data Type">Date</value>
       <value name="Description">the date the QSO was last uploaded to the QRZ.COM online service</value>
@@ -20455,12 +22006,17 @@
     <record>
       <value name="Field Name">QSLMSG</value>
       <value name="Data Type">MultilineString</value>
-      <value name="Description">QSL card message</value>
+      <value name="Description">a message for the contacted station's operator to be incorporated in a paper or electronic QSL</value>
     </record>
     <record>
       <value name="Field Name">QSLMSG_INTL</value>
       <value name="Data Type">IntlMultilineString</value>
-      <value name="Description">QSL card message</value>
+      <value name="Description">a message for the contacted station's operator to be incorporated in a paper or electronic QSL</value>
+    </record>
+    <record>
+      <value name="Field Name">QSLMSG_RCVD</value>
+      <value name="Data Type">MultilineString</value>
+      <value name="Description">a message addressed to the logging station's operator incorporated in a paper or electronic QSL</value>
     </record>
     <record>
       <value name="Field Name">QSLRDATE</value>
@@ -20702,7 +22258,7 @@
     <record>
       <value name="Field Name">VUCC_GRIDS</value>
       <value name="Data Type">GridSquareList</value>
-      <value name="Description">two or four adjacent Maidenhead grid locators, each four characters long, representing the contacted station's grid squares credited to the QSO for the ARRL VUCC award program. E.g. EN98,FM08,EM97,FM07</value>
+      <value name="Description">two or four adjacent Maidenhead grid locators, each four or six characters long, representing the contacted station's grid squares credited to the QSO for the ARRL VUCC award program. E.g. EN98,FM08,EM97,FM07</value>
     </record>
     <record>
       <value name="Field Name">WEB</value>
