@@ -155,6 +155,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="common\src\utils.cpp" />
+    <ClCompile Include="common\src\xml_element.cpp" />
+    <ClCompile Include="common\src\xml_reader.cpp" />
+    <ClCompile Include="common\src\xml_writer.cpp" />
     <ClCompile Include="widgets\src\filename_input.cpp" />
     <ClCompile Include="zzalog\src\band_data.cpp" />
     <ClCompile Include="zzalog\src\band_widget.cpp" />
@@ -210,9 +213,6 @@
     <ClCompile Include="zzalog\src\url_handler.cpp" />
     <ClCompile Include="zzalog\src\win_dialog.cpp" />
     <ClCompile Include="zzalog\src\wx_handler.cpp" />
-    <ClCompile Include="zzalog\src\xml_element.cpp" />
-    <ClCompile Include="zzalog\src\xml_reader.cpp" />
-    <ClCompile Include="zzalog\src\xml_writer.cpp" />
     <ClCompile Include="zzalog\src\about_dialog.cpp">
       <ScanSourceForModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ScanSourceForModuleDependencies>
     </ClCompile>
@@ -262,6 +262,9 @@
     <ClCompile Include="zzalog\src\wsjtx_handler.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="common\include\xml_element.h" />
+    <ClInclude Include="common\include\xml_reader.h" />
+    <ClInclude Include="common\include\xml_writer.h" />
     <ClInclude Include="packages\pthreads.2.9.1.4\build\native\include\pthread.h" />
     <ClInclude Include="widgets\include\button_input.h" />
     <ClInclude Include="widgets\include\filename_input.h" />
@@ -325,9 +328,6 @@
     <ClInclude Include="zzalog\include\utils.h" />
     <ClInclude Include="zzalog\include\win_dialog.h" />
     <ClInclude Include="zzalog\include\wx_handler.h" />
-    <ClInclude Include="zzalog\include\xml_element.h" />
-    <ClInclude Include="zzalog\include\xml_reader.h" />
-    <ClInclude Include="zzalog\include\xml_writer.h" />
     <ClInclude Include="zzalog\include\about_dialog.h" />
     <ClInclude Include="zzalog\include\adi_reader.h" />
     <ClInclude Include="zzalog\include\adi_writer.h" />
