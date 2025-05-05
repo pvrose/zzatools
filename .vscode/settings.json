@@ -1,3 +1,10 @@
 {
-    "makefile.extensionOutputFolder": "./.vscode"
+    "makefile.extensionOutputFolder": "./.vscode",
+    "files.associations": {
+        "*.tcc": "cpp",
+        "sstream": "cpp",
+        "new": "cpp",
+        "optional": "cpp",
+        "system_error": "cpp"
+    }
 }

@@ -50,7 +50,7 @@ class record;
 		// Special element
 		virtual bool declaration(xml_element::element_t element_type, string name, string content);
 		// Processing instruction
-		virtual bool processing_instr(string name, string content);
+		virtual bool process_instr(string name, string content);
 		// characters
 		virtual bool characters(string content);
 

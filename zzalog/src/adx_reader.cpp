@@ -335,7 +335,7 @@ bool adx_reader::declaration(xml_element::element_t element_type, string name, s
 }
 
 // Explicitly ignore processing instructions
-bool adx_reader::processing_instr(string name, string content) {
+bool adx_reader::process_instr(string name, string content) {
 	num_ignored_++;
 	return true;
 }

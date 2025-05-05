@@ -229,7 +229,7 @@ bool cty_reader::declaration(xml_element::element_t element_type, string name, s
 }
 
 // Processing instruction - ignored
-bool cty_reader::processing_instr(string name, string content) {
+bool cty_reader::process_instr(string name, string content) {
 	return false;
 }
 
