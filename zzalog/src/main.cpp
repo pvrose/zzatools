@@ -858,6 +858,7 @@ void tidy() {
 	delete extract_records_;
 	delete import_data_;
 	delete book_;
+	delete qsl_dataset_;
 	delete band_data_;
 	delete intl_dialog_;
 	// This will be used in toolbar_

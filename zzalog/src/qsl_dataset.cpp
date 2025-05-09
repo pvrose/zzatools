@@ -1,4 +1,6 @@
 #include "qsl_dataset.h"
+#include "qsl_reader.h"
+#include "qsl_writer.h"
 #include "status.h"
 #include "utils.h"
 
@@ -30,8 +32,11 @@ qsl_data* qsl_dataset::get_card(string callsign, qsl_data::qsl_type type, bool c
 	}
 	qsl_data* data = new qsl_data;
 	if (create) {
+		if (data_.find(type) == data_.end()) {
+			map<string, qsl_data*>* call_map = new map<string, qsl_data* >;
+			data_[type] = call_map;
+		}
 		(*data_[type])[callsign] = data;
-		dirty_[data] = true;
 		return data;
 	}
 	else {
@@ -43,6 +48,14 @@ qsl_data* qsl_dataset::get_card(string callsign, qsl_data::qsl_type type, bool c
 void qsl_dataset::load_data() {
 	data_.clear();
 	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	if (!load_xml(settings)) {
+		load_prefs(settings);
+	}
+
+}
+
+void qsl_dataset::load_prefs(Fl_Preferences& settings) {
+
 	Fl_Preferences qsl_settings(settings, "QSL Design");
 
 	for (int ix = 0; ix < (int)qsl_data::MAX_TYPE; ix++) {
@@ -78,6 +91,7 @@ void qsl_dataset::load_data() {
 			data->f_time = (qsl_data::time_format)itemp;
 			call_settings.get("Card Design", temp, "");
 			data->filename = temp;
+			data->filename_valid = true;
 			char msg[128];
 			snprintf(msg, sizeof(msg), "QSL: Reading QSL data for call '%s' type '%s'", 
 				call.c_str(), QSL_TYPES[ix].c_str());
@@ -113,7 +127,6 @@ void qsl_dataset::load_data() {
 				status_->misc_status(ST_LOG, msg);
 				load_items(data);
 			}
-			dirty_[data] = false;
 		}
 	}
 }
@@ -193,107 +206,138 @@ void qsl_dataset::load_items(qsl_data* data) {
 	status_->misc_status(ST_OK, msg);
 }
 
+string qsl_dataset::xml_file(Fl_Preferences& settings) {
+	char* temp;
+	Fl_Preferences data_settings(settings, "Datapath");
+	data_settings.get("QSLs", temp,"");
+	string filename = string(temp) + "/designs.xml";
+	free(temp);
+	return filename;
+}
+
+bool qsl_dataset::load_xml(Fl_Preferences& settings) {
+	ifstream is;
+	is.open(xml_file(settings), ios_base::in);
+	if (is.good()) {
+		qsl_reader* reader = new qsl_reader();
+		if (reader->load_data(&data_, is)) {
+			status_->misc_status(ST_OK, "QSL DATA: XML loaded OK");
+			return true;
+		}
+	}
+	// else
+	status_->misc_status(ST_WARNING, "QSL DATA: XML data faile to load - defaulting to prefernces");
+	return false;
+}
+
 // Store card designs
 void qsl_dataset::save_data() {
 	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-	Fl_Preferences qsl_settings(settings, "QSL Design");
-	qsl_settings.clear();
-	for (auto it = data_.begin(); it != data_.end(); it++) {
-		qsl_data::qsl_type type = it->first;
-		Fl_Preferences type_settings(qsl_settings, QSL_TYPES[(int)type].c_str());
-		for (auto ita = it->second->begin(); ita != it->second->end(); ita++) {
-			string call = ita->first;
-			de_slash(call);
-			Fl_Preferences call_settings(type_settings, call.c_str());
-			qsl_data* data = ita->second;
-			// SAve the card label parameters
-			call_settings.set("Width", data->width);
-			call_settings.set("Height", data->height);
-			call_settings.set("Unit", (int)data->unit);
-			call_settings.set("Number Rows", data->rows);
-			call_settings.set("Number Columns", data->columns);
-			call_settings.set("Column Width", data->col_width);
-			call_settings.set("Row Height", data->row_height);
-			call_settings.set("First Row", data->row_top);
-			call_settings.set("First Column", data->col_left);
-			call_settings.set("Max QSOs per Card", data->max_qsos);
-			call_settings.set("Date Format", (int)data->f_date);
-			call_settings.set("Time Format", (int)data->f_time);
-			call_settings.set("Card Design", data->filename.c_str());
-			// Writing the file with the drawing data
-			if (dirty_.at(data)) {
-				char msg[100];
-				snprintf(msg, sizeof(msg), "QSL: Writing card image data for %s %s to %s", 
-					ita->first.c_str(),
-					QSL_TYPES[(int)type].c_str(),
-					data->filename.c_str());
-				status_->misc_status(ST_LOG, msg);
-				ofstream op;
-				op.open(data->filename.c_str(), fstream::out);
-				string line;
-				// For all drawing items...
-				for (int ix = 0; ix < data->items.size() && op.good(); ix++) {
-					qsl_data::item_def* item = data->items[ix];
-					// Ignore any item marked with type NONE
-					if (item->type != qsl_data::NONE) {
-						// Write type the a tab
-						op << (int)item->type << '\t';
-						switch (item->type) {
-						case qsl_data::FIELD: {
-							// Write field item data separated by tabs
-							op << item->field.field << '\t' <<
-								item->field.label << '\t' <<
-								(int)item->field.l_style.font << '\t' <<
-								(int)item->field.l_style.size << '\t' <<
-								(int)item->field.l_style.colour << '\t' <<
-								(int)item->field.t_style.font << '\t' <<
-								(int)item->field.t_style.size << '\t' <<
-								(int)item->field.t_style.colour << '\t' <<
-								item->field.dx << '\t' <<
-								item->field.dy << '\t' <<
-								(int)item->field.vertical << '\t' <<
-								(int)item->field.multi_qso << '\t' <<
-								(int)item->field.box << '\t' <<
-								(int)item->field.display_empty << endl;
-							break;
-						}
-						case qsl_data::TEXT: {
-							// Write text item data separated by tabs
-							op << item->text.text << '\t' <<
-								(int)item->text.t_style.font << '\t' <<
-								(int)item->text.t_style.size << '\t' <<
-								(int)item->text.t_style.colour << '\t' <<
-								item->text.dx << '\t' <<
-								item->text.dy << '\t' <<
-								(int)item->text.vertical << endl;
-							break;
-						}
-						case qsl_data::IMAGE: {
-							// Write image item data separted by tabs
-							op << terminal(item->image.filename) << '\t' <<
-								item->image.dx << '\t' <<
-								item->image.dy << endl;
-							break;
-						}
-						default:
-							break;
-						}
-					}
-				}
-				op.close();
-				snprintf(msg, sizeof(msg), "QSL: %zd items written to %s", data->items.size(), data->filename.c_str());
-				status_->misc_status(ST_OK, msg);
-				dirty_[data] = false;
-			}
+	settings.delete_group("QSL Design");
+	save_xml(settings);
+}
+	// Fl_Preferences qsl_settings(settings, "QSL Design");
+	// qsl_settings.clear();
+	// for (auto it = data_.begin(); it != data_.end(); it++) {
+	// 	qsl_data::qsl_type type = it->first;
+	// 	Fl_Preferences type_settings(qsl_settings, QSL_TYPES[(int)type].c_str());
+	// 	for (auto ita = it->second->begin(); ita != it->second->end(); ita++) {
+	// 		string call = ita->first;
+	// 		de_slash(call);
+	// 		Fl_Preferences call_settings(type_settings, call.c_str());
+	// 		qsl_data* data = ita->second;
+	// 		// SAve the card label parameters
+	// 		call_settings.set("Width", data->width);
+	// 		call_settings.set("Height", data->height);
+	// 		call_settings.set("Unit", (int)data->unit);
+	// 		call_settings.set("Number Rows", data->rows);
+	// 		call_settings.set("Number Columns", data->columns);
+	// 		call_settings.set("Column Width", data->col_width);
+	// 		call_settings.set("Row Height", data->row_height);
+	// 		call_settings.set("First Row", data->row_top);
+	// 		call_settings.set("First Column", data->col_left);
+	// 		call_settings.set("Max QSOs per Card", data->max_qsos);
+	// 		call_settings.set("Date Format", (int)data->f_date);
+	// 		call_settings.set("Time Format", (int)data->f_time);
+	// 		call_settings.set("Card Design", data->filename.c_str());
+	// 		// Writing the file with the drawing data
+	// 		if (dirty_.at(data)) {
+	// 			char msg[100];
+	// 			snprintf(msg, sizeof(msg), "QSL: Writing card image data for %s %s to %s", 
+	// 				ita->first.c_str(),
+	// 				QSL_TYPES[(int)type].c_str(),
+	// 				data->filename.c_str());
+	// 			status_->misc_status(ST_LOG, msg);
+	// 			ofstream op;
+	// 			op.open(data->filename.c_str(), fstream::out);
+	// 			string line;
+	// 			// For all drawing items...
+	// 			for (int ix = 0; ix < data->items.size() && op.good(); ix++) {
+	// 				qsl_data::item_def* item = data->items[ix];
+	// 				// Ignore any item marked with type NONE
+	// 				if (item->type != qsl_data::NONE) {
+	// 					// Write type the a tab
+	// 					op << (int)item->type << '\t';
+	// 					switch (item->type) {
+	// 					case qsl_data::FIELD: {
+	// 						// Write field item data separated by tabs
+	// 						op << item->field.field << '\t' <<
+	// 							item->field.label << '\t' <<
+	// 							(int)item->field.l_style.font << '\t' <<
+	// 							(int)item->field.l_style.size << '\t' <<
+	// 							(int)item->field.l_style.colour << '\t' <<
+	// 							(int)item->field.t_style.font << '\t' <<
+	// 							(int)item->field.t_style.size << '\t' <<
+	// 							(int)item->field.t_style.colour << '\t' <<
+	// 							item->field.dx << '\t' <<
+	// 							item->field.dy << '\t' <<
+	// 							(int)item->field.vertical << '\t' <<
+	// 							(int)item->field.multi_qso << '\t' <<
+	// 							(int)item->field.box << '\t' <<
+	// 							(int)item->field.display_empty << endl;
+	// 						break;
+	// 					}
+	// 					case qsl_data::TEXT: {
+	// 						// Write text item data separated by tabs
+	// 						op << item->text.text << '\t' <<
+	// 							(int)item->text.t_style.font << '\t' <<
+	// 							(int)item->text.t_style.size << '\t' <<
+	// 							(int)item->text.t_style.colour << '\t' <<
+	// 							item->text.dx << '\t' <<
+	// 							item->text.dy << '\t' <<
+	// 							(int)item->text.vertical << endl;
+	// 						break;
+	// 					}
+	// 					case qsl_data::IMAGE: {
+	// 						// Write image item data separted by tabs
+	// 						op << terminal(item->image.filename) << '\t' <<
+	// 							item->image.dx << '\t' <<
+	// 							item->image.dy << endl;
+	// 						break;
+	// 					}
+	// 					default:
+	// 						break;
+	// 					}
+	// 				}
+	// 			}
+	// 			op.close();
+	// 			snprintf(msg, sizeof(msg), "QSL: %zd items written to %s", data->items.size(), data->filename.c_str());
+	// 			status_->misc_status(ST_OK, msg);
+	// 			dirty_[data] = false;
+	// 		}
+	// 	}
+	// }
+
+void qsl_dataset::save_xml(Fl_Preferences& settings) {
+	string filename = xml_file(settings);
+	ofstream os;
+	os.open(filename, ios_base::out);
+	if (os.good()) {
+		qsl_writer* writer = new qsl_writer();
+		if (!writer->store_data(&data_, os)) {
+			status_->misc_status(ST_OK, "RIG DATA: Saved XML OK");
 		}
 	}
 }
 
-void qsl_dataset::dirty(qsl_data* data) {
-	if (dirty_.find(data) == dirty_.end()) {
-		status_->misc_status(ST_FATAL, "QSL: Attempting to mark dirty a non-existant card design");
-	}
-	else {
-		dirty_[data] = true;
-	}
-}
+

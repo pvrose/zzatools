@@ -16,6 +16,7 @@ class Fl_Group;
 class Fl_Window;
 class Fl_Output;
 class Fl_Value_Input;
+class Fl_Check_Button;
 
 // This class provides the dialog to edit the card label parameters
 // and define the items used in drawing the card label
@@ -70,6 +71,8 @@ protected:
     static void cb_callsign(Fl_Widget* w, void* v);
     // Filename
     static void cb_filename(Fl_Widget* w, void* v);
+    // Load TSV
+    static void cb_bn_loadtsv(Fl_Widget* w, void* v);
     // Dimension radio 
     static void cb_radio_dim(Fl_Widget* w, void* v);
     // Size parameter changed
@@ -128,6 +131,8 @@ protected:
     qsl_data* data_;
     // QSL type
     qsl_data::qsl_type qsl_type_;
+    // Load data from TSV file
+    bool load_tsv_;
 
 
     //Widgets to reference:-
@@ -136,6 +141,8 @@ protected:
     Fl_Group* g_1_;
     field_input* ip_callsign_;
     filename_input* ip_filename_;
+    Fl_Check_Button* bn_loadtsv_;
+
     // Inputs to define size and formats
     Fl_Group* g_2_;
     Fl_Value_Input* ip_cols_;

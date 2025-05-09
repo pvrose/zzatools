@@ -88,8 +88,9 @@ struct qsl_data {
         FMT_Y4MD_ADIF,     // 20240618
         FMT_Y4MD,          // 2024/06/18
         FMT_Y2MD,          // 24/06/18
-        FMT_DMY2,          // 18/06/24
-        FMT_MDY2           // 06/18/24
+        FMT_INVALID_DATA,
+        // FMT_DMY2,          // 18/06/24
+        // FMT_MDY2           // 06/18/24
     };
 
     // Time format
@@ -97,7 +98,8 @@ struct qsl_data {
         FMT_HMS_ADIF,      // 171033
         FMT_HMS,           // 17:10:33
         FMT_HM_ADIF,       // 1710
-        FMT_HM             // 17:10
+        FMT_HM,            // 17:10
+        FMT_INVALID_TIME,
     };
 
     // Defaults are for an 8-label sheet
@@ -113,6 +115,7 @@ struct qsl_data {
     int max_qsos{ 1 };                // maximum number of QSOs per label
     date_format f_date{ FMT_Y4MD_ADIF };   // Format for date to be printed
     time_format f_time{ FMT_HMS_ADIF };    // Format for time to be printed
+    bool filename_valid{ false };     // Layout data file used (else from XML)   
     string filename{ "" };            // Filename of layout data file
     vector<item_def*> items;          // layout items read in from file 
 

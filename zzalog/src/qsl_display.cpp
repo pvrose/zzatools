@@ -398,14 +398,14 @@ string qsl_display::convert_date(string value) {
 		// "24/06/21"
 			result = value.substr(0, 4) + '/' + value.substr(4, 2) + '/' + value.substr(6, 2);
 			return result;
-		case qsl_data::FMT_DMY2:
-		// "21/06/24"
-			result = value.substr(6,2) + '/' + value.substr(4,2) + '/' + value.substr(2,2);
-			return result;
-		case qsl_data::FMT_MDY2:
-		// ""06/21/24"
-			result = value.substr(4,2) + '/' + value.substr(6,2) + '/' + value.substr(2,2);
-			return result;
+		// case qsl_data::FMT_DMY2:
+		// // "21/06/24"
+		// 	result = value.substr(6,2) + '/' + value.substr(4,2) + '/' + value.substr(2,2);
+		// 	return result;
+		// case qsl_data::FMT_MDY2:
+		// // ""06/21/24"
+		// 	result = value.substr(4,2) + '/' + value.substr(6,2) + '/' + value.substr(2,2);
+		// 	return result;
 		default:
 			return "Invalid";
 	}

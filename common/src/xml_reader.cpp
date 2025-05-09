@@ -418,7 +418,7 @@ bool xml_reader::process_start_tag(istream& is) {
 	}
 	if (is.good()) {
 		// create the element
-		start_element(name, attributes);
+		ok &= start_element(name, attributes);
 		if (is.peek() == '/') {
 			// We have an empty element tag (i.e. no content so Start and end it)
 			end_element(name);

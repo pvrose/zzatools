@@ -13,7 +13,7 @@ extern string PROGRAM_VERSION;
 
 // Consgructor
 rig_reader::rig_reader() :
-    xml_reader()
+    xml_wreader()
     , data_(nullptr)
     , rig_data_(nullptr)
     , rig_name_("")
@@ -21,6 +21,8 @@ rig_reader::rig_reader() :
     , in_file_(nullptr)
 {
     elements_.clear();
+	xml_wreader::method_map_ = method_map_;
+	xml_wreader::element_map_ = element_map_;
 }
 
 // Destructor
@@ -60,92 +62,8 @@ bool rig_reader::load_data(map<string, rig_data_t*>* data, istream& in) {
 	}
 }
 
-bool rig_reader::start_element(string name, map<string, string>* attributes) {
-	string element_name = to_upper(name);
-	bool result = true;
-	if (element_map_.find(element_name) == element_map_.end()) {
-		char msg[128];
-		snprintf(msg, sizeof(msg), "RIG DATA: Unexpected XML element %s encountered - ignored");
-		status_->misc_status(ST_WARNING, msg);
-		if (attributes != nullptr) {
-			attributes->clear();
-			delete attributes;
-		}
-		return false;
-	} else {
-		rigs_element_t e = element_map_.at(element_name);
-		if (method_map_.find(e) == method_map_.end()) {
-			status_->misc_status(ST_SEVERE, "RIG DATA: Element method table screwed!");
-			return false;
-		} else {
-			methods m = method_map_.at(e);
-			if (m.start_method) {
-				result = m.start_method(this, attributes);
-			} else {
-				result = true;
-			}
-			return result;
-		}
-	}
-}
-
-// End element - call the appropriate handler
-bool rig_reader::end_element(string name) {
-	string element_name = to_upper(name);
-	char msg[128];
-	if (element_map_.find(element_name) == element_map_.end()) {
-		snprintf(msg, sizeof(msg), "RIG DATA: Unexpected XML element %s encountered - ignored");
-		status_->misc_status(ST_WARNING, msg);
-		return false;
-	} // else
-	rigs_element_t e = element_map_.at(element_name);
-	rigs_element_t exp_e = elements_.back();
-	elements_.pop_back();
-	if (e != exp_e) {
-		snprintf(msg, sizeof(msg), "RIG DATA: Invalid XML - Not expecting element %s", name.c_str());
-		status_->misc_status(ST_ERROR, msg);
-		return false;
-	} 
-	// else
-	if (method_map_.find(e) == method_map_.end()) {
-		status_->misc_status(ST_SEVERE, "RIG DATA: Element method table screwed!");
-		return false;
-	} // else
-	methods m = method_map_.at(e);
-	if (m.end_method) {
-		return m.end_method(this);
-	} else {
-		return true;
-	}
-}
-
-bool rig_reader::declaration(xml_element::element_t e, string n, string c) {
-	return true;
-}
-
-bool rig_reader::processing_instr(string n, string c) {
-	return true;
-}
-
-bool rig_reader::characters(string content) {
-	if (elements_.size()) {
-		rigs_element_t e = elements_.back();
-		if (method_map_.find(e) == method_map_.end()) {
-			status_->misc_status(ST_SEVERE, "RIG DATA: Element method table screwed!");
-			return false;
-		} // else
-		methods m = method_map_.at(e);
-		if (m.chars_method) {
-			return m.chars_method(this, content);
-		} else {
-			return true;
-		}
-	}
-	return true;
-}
-
 // <rigs version="...">
-bool rig_reader::start_rigs(rig_reader* that, map<string, string>* attributes) {
+bool rig_reader::start_rigs(xml_wreader* that, map<string, string>* attributes) {
 	if (that->elements_.size()) {
 		status_->misc_status(ST_ERROR, "RIG DATA: unexpected RIGS element ");
 		return false;
@@ -155,7 +73,7 @@ bool rig_reader::start_rigs(rig_reader* that, map<string, string>* attributes) {
 	for (auto it : *attributes) {
 		string name = to_upper(it.first);
 		if (name == "VERSION") {
-			if (!that->check_version(it.second)) {
+			if (!((rig_reader*)that)->check_version(it.second)) {
 				return false;
 			}
 			return true;
@@ -170,7 +88,7 @@ bool rig_reader::start_rigs(rig_reader* that, map<string, string>* attributes) {
 }
 
 // <rig name="FlRig">
-bool rig_reader::start_rig(rig_reader* that, map<string, string>*attributes) {
+bool rig_reader::start_rig(xml_wreader* that, map<string, string>*attributes) {
 	char msg[128];
 	// Only expect in RIGS
 	if (that->elements_.back() != RIG_RIGS) {
@@ -183,29 +101,30 @@ bool rig_reader::start_rig(rig_reader* that, map<string, string>*attributes) {
 	for (auto it : *attributes) {
 		string name = to_upper(it.first);
 		if (name == "NAME") {
-			if (that->data_->find(it.second) != that->data_->end()) {
+			if (((rig_reader*)that)->data_->find(it.second) != ((rig_reader*)that)->data_->end()) {
 				snprintf(msg, sizeof(msg), "RIG DATA: Duplicate rig %s found",
 					it.second.c_str());
 				status_->misc_status(ST_ERROR, msg);
 				return false;
 			}
 			// else
-			that->rig_name_ = it.second;
-			that->rig_data_ = new rig_data_t;
-			(*that->data_)[it.second] = that->rig_data_;
+			((rig_reader*)that)->rig_name_ = it.second;
+			((rig_reader*)that)->rig_data_ = new rig_data_t;
+			(*((rig_reader*)that)->data_)[it.second] = ((rig_reader*)that)->rig_data_;
 			return true;
 		}
 		// else
 		char msg[128];
 		snprintf(msg, sizeof(msg), "RIG DATA: Unexpected attribute %=% in RIG element",
 			it.first.c_str(), it.second.c_str());
-		return false;
+			status_->misc_status(ST_ERROR, msg);
+			return false;
 	}
 	return true;
 }
 
 // <value name=...>....
-bool rig_reader::start_value(rig_reader* that, map<string, string>* attributes) {
+bool rig_reader::start_value(xml_wreader* that, map<string, string>* attributes) {
 	switch(that->elements_.back()) {
 	case RIG_RIG:
 	case RIG_APP:
@@ -215,8 +134,8 @@ bool rig_reader::start_value(rig_reader* that, map<string, string>* attributes) 
 			string name = to_upper(it.first);
 			if (name == "NAME") {
 				// Iyt might be an empty value
-				that->value_data_ = "";
-				that->value_name_ = it.second;
+				((rig_reader*)that)->value_data_ = "";
+				((rig_reader*)that)->value_name_ = it.second;
 				return true;
 			}
 			// else
@@ -232,7 +151,7 @@ bool rig_reader::start_value(rig_reader* that, map<string, string>* attributes) 
 }
 
 // <app name="FlRig">
-bool rig_reader::start_app(rig_reader* that, map<string, string>*attributes) {
+bool rig_reader::start_app(xml_wreader* that, map<string, string>*attributes) {
 	// Only expect in RIGS
 	if (that->elements_.back() != RIG_RIG) {
 		status_->misc_status(ST_ERROR, "RIG DATA: Unexpected APP element");
@@ -244,11 +163,11 @@ bool rig_reader::start_app(rig_reader* that, map<string, string>*attributes) {
 	for (auto it : *attributes) {
 		string name = to_upper(it.first);
 		if (name == "NAME") {
-			that->app_name_ = it.second;
-			that->app_data_ = new cat_data_t;
-			that->rig_data_->cat_data.push_back(that->app_data_);
-			that->app_data_->nickname = it.second;
-			that->app_data_->hamlib = new hamlib_data_t;
+			((rig_reader*)that)->app_name_ = it.second;
+			((rig_reader*)that)->app_data_ = new cat_data_t;
+			((rig_reader*)that)->rig_data_->cat_data.push_back(((rig_reader*)that)->app_data_);
+			((rig_reader*)that)->app_data_->nickname = it.second;
+			((rig_reader*)that)->app_data_->hamlib = new hamlib_data_t;
 			return true;
 		}
 		// else
@@ -261,7 +180,7 @@ bool rig_reader::start_app(rig_reader* that, map<string, string>*attributes) {
 }
 
 // </rigs>
-bool rig_reader::end_rigs(rig_reader* that) {
+bool rig_reader::end_rigs(xml_wreader* that) {
 	if (that->elements_.size()) {
 		status_->misc_status(ST_ERROR, "RIG DATA: Closing </rigs> encountered while incomplete elements are outstanding");
 		return false;
@@ -270,20 +189,20 @@ bool rig_reader::end_rigs(rig_reader* that) {
 }
 
 // </rig>
-bool rig_reader::end_rig(rig_reader* that) {
-	that->rig_data_ = nullptr;
-	that->rig_name_ = "";
+bool rig_reader::end_rig(xml_wreader* that) {
+	((rig_reader*)that)->rig_data_ = nullptr;
+	((rig_reader*)that)->rig_name_ = "";
 	return true;
 }
 
 // </app>
-bool rig_reader::end_app(rig_reader* that) {
+bool rig_reader::end_app(xml_wreader* that) {
 	// There are a few items in hamlib data that need to be tidied up
-	hamlib_data_t* hd = that->app_data_->hamlib;
+	hamlib_data_t* hd = ((rig_reader*)that)->app_data_->hamlib;
 	const rig_caps* capabilities = rig_get_caps(hd->model_id);
 	if (capabilities == nullptr) {
 		char msg[128];
-		snprintf(msg, sizeof(msg), "RIG: No CAT details for %s", that->rig_name_.c_str());
+		snprintf(msg, sizeof(msg), "RIG: No CAT details for %s", ((rig_reader*)that)->rig_name_.c_str());
 		status_->misc_status(ST_WARNING, msg);
 	}
 	else {
@@ -303,31 +222,31 @@ bool rig_reader::end_app(rig_reader* that) {
 		hd->port_type = capabilities->port_type;
 	}
 
-	that->app_data_ = nullptr;
-	that->app_name_ = "";
+	((rig_reader*)that)->app_data_ = nullptr;
+	((rig_reader*)that)->app_name_ = "";
 	return true;
 }
 
 // </value>
-bool rig_reader::end_value(rig_reader* that) {
+bool rig_reader::end_value(xml_wreader* that) {
 	char msg[128];
-	rigs_element_t parent = that->elements_.back();
-	rig_data_t* rd = that->rig_data_;
+	rigs_element_t parent = (rigs_element_t)((rig_reader*)that)->elements_.back();
+	rig_data_t* rd = ((rig_reader*)that)->rig_data_;
 	cat_data_t* ad;
 	hamlib_data_t* hd;
 	switch(parent) {
 	case RIG_RIG: 
-		if (that->value_name_ == "Default App") 
-			rd->default_app = stoi(that->value_data_);
-		else if (that->value_name_ == "Antenna")
-			rd->antenna = that->value_data_;
-		else if (that->value_name_ == "Instantaneous Values")
-			rd->use_instant_values = (bool)stoi(that->value_data_);
+		if (((rig_reader*)that)->value_name_ == "Default App") 
+			rd->default_app = stoi(((rig_reader*)that)->value_data_);
+		else if (((rig_reader*)that)->value_name_ == "Antenna")
+			rd->antenna = ((rig_reader*)that)->value_data_;
+		else if (((rig_reader*)that)->value_name_ == "Instantaneous Values")
+			rd->use_instant_values = (bool)stoi(((rig_reader*)that)->value_data_);
 		else {
 			snprintf(msg, sizeof(msg), "RIG DATA: Unexpected value item %s: %s in RIG %s",
-				that->value_name_.c_str(),
-				that->value_data_.c_str(),
-				that->rig_name_.c_str());
+				((rig_reader*)that)->value_name_.c_str(),
+				((rig_reader*)that)->value_data_.c_str(),
+				((rig_reader*)that)->rig_name_.c_str());
 			status_->misc_status(ST_ERROR, msg);
 			return false;
 		}
@@ -335,53 +254,53 @@ bool rig_reader::end_value(rig_reader* that) {
 	case RIG_APP:
 		ad = rd->cat_data.back();
 		hd = ad->hamlib;
-		if (that->value_name_ == "Rig Model") hd->model = that->value_data_;
-		else if (that->value_name_ == "Manufacturer") hd->mfr = that->value_data_;
-		else if (that->value_name_ == "Port") hd->port_name = that->value_data_;
-		else if (that->value_name_ == "Baud Rate") 
-			hd->baud_rate = stoi(that->value_data_);
-		else if (that->value_name_ == "Model ID") 
-			hd->model_id = stoi(that->value_data_);
-		else if (that->value_name_ == "Timeout") 
-			hd->timeout = stod(that->value_data_);
-		else if (that->value_name_ == "Maximum Timeouts")
-			hd->max_to_count = stoi(that->value_data_);
-		else if (that->value_name_ == "S-meter Hold")
-			hd->num_smeters = stoi(that->value_data_);
-		else if (that->value_name_ == "Command") {
-			ad->app = that->value_data_;
+		if (((rig_reader*)that)->value_name_ == "Rig Model") hd->model = ((rig_reader*)that)->value_data_;
+		else if (((rig_reader*)that)->value_name_ == "Manufacturer") hd->mfr = ((rig_reader*)that)->value_data_;
+		else if (((rig_reader*)that)->value_name_ == "Port") hd->port_name = ((rig_reader*)that)->value_data_;
+		else if (((rig_reader*)that)->value_name_ == "Baud Rate") 
+			hd->baud_rate = stoi(((rig_reader*)that)->value_data_);
+		else if (((rig_reader*)that)->value_name_ == "Model ID") 
+			hd->model_id = stoi(((rig_reader*)that)->value_data_);
+		else if (((rig_reader*)that)->value_name_ == "Timeout") 
+			hd->timeout = stod(((rig_reader*)that)->value_data_);
+		else if (((rig_reader*)that)->value_name_ == "Maximum Timeouts")
+			hd->max_to_count = stoi(((rig_reader*)that)->value_data_);
+		else if (((rig_reader*)that)->value_name_ == "S-meter Hold")
+			hd->num_smeters = stoi(((rig_reader*)that)->value_data_);
+		else if (((rig_reader*)that)->value_name_ == "Command") {
+			ad->app = ((rig_reader*)that)->value_data_;
 			if (ad->app.length()) ad->use_cat_app = true;
 		}
-		else if (that->value_name_ == "Override Hamlib") 
-			ad->override_hamlib = (bool)stoi(that->value_data_);
-		else if (that->value_name_ == "Power Mode")
-			hd->power_mode = (power_mode_t)stoi(that->value_data_);
-		else if (that->value_name_ == "Maximum Power") 
-			hd->max_power = stod(that->value_data_);
-		else if (that->value_name_ == "Frequency Mode")
-			hd->freq_mode = (freq_mode_t)stoi(that->value_data_);
-		else if (that->value_name_ == "Crystal Frequency")
-			hd->frequency = stod(that->value_data_);
-		else if (that->value_name_ == "Amplifier Gain")
-			hd->gain = stoi(that->value_data_);
-		else if (that->value_name_ == "Transverter Offset")
-			hd->freq_offset = stod(that->value_data_);
-		else if (that->value_name_ == "Transverter Power") 
-			hd->tvtr_power = stod(that->value_data_);
-		else if (that->value_name_ == "Accessories")
-			hd->accessory = (accessory_t)stoi(that->value_data_);
-		else if (that->value_name_ == "Start Automatically")
-			ad->auto_start = (bool)stoi(that->value_data_);
-		else if (that->value_name_ == "Connect Automatically")
-			ad->auto_connect = (bool)stoi(that->value_data_);
-		else if (that->value_name_ == "Connect Delay")
-			ad->connect_delay = stod(that->value_data_);
+		else if (((rig_reader*)that)->value_name_ == "Override Hamlib") 
+			ad->override_hamlib = (bool)stoi(((rig_reader*)that)->value_data_);
+		else if (((rig_reader*)that)->value_name_ == "Power Mode")
+			hd->power_mode = (power_mode_t)stoi(((rig_reader*)that)->value_data_);
+		else if (((rig_reader*)that)->value_name_ == "Maximum Power") 
+			hd->max_power = stod(((rig_reader*)that)->value_data_);
+		else if (((rig_reader*)that)->value_name_ == "Frequency Mode")
+			hd->freq_mode = (freq_mode_t)stoi(((rig_reader*)that)->value_data_);
+		else if (((rig_reader*)that)->value_name_ == "Crystal Frequency")
+			hd->frequency = stod(((rig_reader*)that)->value_data_);
+		else if (((rig_reader*)that)->value_name_ == "Amplifier Gain")
+			hd->gain = stoi(((rig_reader*)that)->value_data_);
+		else if (((rig_reader*)that)->value_name_ == "Transverter Offset")
+			hd->freq_offset = stod(((rig_reader*)that)->value_data_);
+		else if (((rig_reader*)that)->value_name_ == "Transverter Power") 
+			hd->tvtr_power = stod(((rig_reader*)that)->value_data_);
+		else if (((rig_reader*)that)->value_name_ == "Accessories")
+			hd->accessory = (accessory_t)stoi(((rig_reader*)that)->value_data_);
+		else if (((rig_reader*)that)->value_name_ == "Start Automatically")
+			ad->auto_start = (bool)stoi(((rig_reader*)that)->value_data_);
+		else if (((rig_reader*)that)->value_name_ == "Connect Automatically")
+			ad->auto_connect = (bool)stoi(((rig_reader*)that)->value_data_);
+		else if (((rig_reader*)that)->value_name_ == "Connect Delay")
+			ad->connect_delay = stod(((rig_reader*)that)->value_data_);
 		else {
 			snprintf(msg, sizeof(msg), "RIG DATA: Unexpected value item %s: %s in RIG/APP %s/%s",
-				that->value_name_.c_str(),
-				that->value_data_.c_str(),
-				that->rig_name_.c_str(),
-				that->app_name_.c_str());
+				((rig_reader*)that)->value_name_.c_str(),
+				((rig_reader*)that)->value_data_.c_str(),
+				((rig_reader*)that)->rig_name_.c_str(),
+				((rig_reader*)that)->app_name_.c_str());
 			status_->misc_status(ST_ERROR, msg);
 			return false;
 		}
@@ -391,8 +310,8 @@ bool rig_reader::end_value(rig_reader* that) {
 	}
 }
 
-bool rig_reader::chars_value(rig_reader* that, string content) {
-	that->value_data_ = content;
+bool rig_reader::chars_value(xml_wreader* that, string content) {
+	((rig_reader*)that)->value_data_ = content;
 	return true;
 }
 
