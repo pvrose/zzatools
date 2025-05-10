@@ -178,7 +178,9 @@
     <ClCompile Include="zzalog\src\qsl_editor.cpp" />
     <ClCompile Include="zzalog\src\qsl_emailer.cpp" />
     <ClCompile Include="zzalog\src\qsl_image.cpp" />
+    <ClCompile Include="zzalog\src\qsl_reader.cpp" />
     <ClCompile Include="zzalog\src\qsl_widget.cpp" />
+    <ClCompile Include="zzalog\src\qsl_writer.cpp" />
     <ClCompile Include="zzalog\src\qso_apps.cpp" />
     <ClCompile Include="zzalog\src\qso_bands.cpp" />
     <ClCompile Include="zzalog\src\qso_buttons.cpp" />
@@ -260,6 +262,7 @@
     <ClCompile Include="zzalog\src\view.cpp" />
     <ClCompile Include="zzalog\src\web_dialog.cpp" />
     <ClCompile Include="zzalog\src\wsjtx_handler.cpp" />
+    <ClCompile Include="zzalog\src\xml_wreader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="common\include\xml_element.h" />
@@ -291,7 +294,9 @@
     <ClInclude Include="zzalog\include\qsl_editor.h" />
     <ClInclude Include="zzalog\include\qsl_emailer.h" />
     <ClInclude Include="zzalog\include\qsl_image.h" />
+    <ClInclude Include="zzalog\include\qsl_reader.h" />
     <ClInclude Include="zzalog\include\qsl_widget.h" />
+    <ClInclude Include="zzalog\include\qsl_writer.h" />
     <ClInclude Include="zzalog\include\qso_apps.h" />
     <ClInclude Include="zzalog\include\qso_bands.h" />
     <ClInclude Include="zzalog\include\qso_buttons.h" />
@@ -378,6 +383,7 @@
     <ClInclude Include="zzalog\include\view.h" />
     <ClInclude Include="zzalog\include\web_dialog.h" />
     <ClInclude Include="zzalog\include\wsjtx_handler.h" />
+    <ClInclude Include="zzalog\include\xml_wreader.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="reference\Prefix.lst" />

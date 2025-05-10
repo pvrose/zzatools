@@ -112,6 +112,9 @@ protected:
     // Populate the QSL type choice
     void populate_qsl_type(Fl_Choice* ch);
 
+    // Remove filepath from filename - returns false if unsuccesful
+    bool relative_filename(string& filename);
+
      // Callsign to read parameters
     string callsign_;
     // Data for file browser

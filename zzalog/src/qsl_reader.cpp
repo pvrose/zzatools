@@ -15,6 +15,8 @@ qsl_reader::qsl_reader() :
     , data_(nullptr)
     , callsign_("")
     , type_(qsl_data::LABEL)
+	, current_(nullptr)
+	, item_(nullptr)
 {
     elements_.clear();
 	xml_wreader::method_map_ = method_map_;

@@ -1,4 +1,5 @@
 #include "qsl_display.h"
+#include "qsl_dataset.h"
 #include "qso_manager.h"
 #include "status.h"
 #include "record.h"
@@ -18,6 +19,7 @@ using namespace std;
 
 extern qso_manager* qso_manager_;
 extern status* status_;
+extern qsl_dataset* qsl_dataset_;
 // Dynamically drawn QSL card label
 
 // Constructor - just initialises the data
@@ -275,7 +277,9 @@ void qsl_display::draw_text(qsl_data::text_def& text) {
 
 // Draw an image item -
 void qsl_display::draw_image(qsl_data::image_def& image) {
-	Fl_Image* image_data = get_image(image.filename);
+	string filename = image.filename;
+	absolute_filename(filename);
+	Fl_Image* image_data = get_image(filename);
 	if (image_data) {
 		draw_image(image.dx, image.dy, image_data);
 	}
@@ -559,4 +563,11 @@ void qsl_display::get_size(int& w, int& h) {
 		w = w_;
 		h = h_;
 	}
+}
+
+// Prepend filename with pathname
+bool qsl_display::absolute_filename(string& filename) {
+	string path = qsl_dataset_->get_path();
+	filename = path + "/" + filename;
+	return true;
 }

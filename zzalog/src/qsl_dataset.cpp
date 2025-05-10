@@ -49,88 +49,89 @@ void qsl_dataset::load_data() {
 	data_.clear();
 	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
 	if (!load_xml(settings)) {
-		load_prefs(settings);
+		status_->misc_status(ST_ERROR, "QSL DATA; No QSl data loaded");
+		//load_prefs(settings);
 	}
 
 }
 
-void qsl_dataset::load_prefs(Fl_Preferences& settings) {
-
-	Fl_Preferences qsl_settings(settings, "QSL Design");
-
-	for (int ix = 0; ix < (int)qsl_data::MAX_TYPE; ix++) {
-		map<string, qsl_data*>* type_data = new map<string, qsl_data*>;
-		data_[(qsl_data::qsl_type)ix] = type_data;
-		Fl_Preferences type_settings(qsl_settings, QSL_TYPES[ix].c_str());
-		// Now fetch each callsign that is in the prefs file
-		int num_calls = type_settings.groups();
-		for (int iy = 0; iy < num_calls; iy++) {
-			string call = type_settings.group(iy);
-			Fl_Preferences call_settings(type_settings, call.c_str());
-			re_slash(call);
-			qsl_data* data = new qsl_data;
-			(*type_data)[call] = data;
-			// Temporary values to convert char* and int to string and enums
-			char* temp;
-			int itemp;
-			// Get the card label data_ for this callsign
-			call_settings.get("Width", data->width, 0);
-			call_settings.get("Height", data->height, 0);
-			call_settings.get("Unit", itemp, (int)qsl_data::MILLIMETER);
-			data->unit = (qsl_data::dim_unit)itemp;
-			call_settings.get("Number Rows", data->rows, 4);
-			call_settings.get("Number Columns", data->columns, 2);
-			call_settings.get("Column Width", data->col_width, 101.6);
-			call_settings.get("Row Height", data->row_height, 67.7);
-			call_settings.get("First Row", data->row_top, 12.9);
-			call_settings.get("First Column", data->col_left, 4.6);
-			call_settings.get("Max QSOs per Card", data->max_qsos, 1);
-			call_settings.get("Date Format", itemp, qsl_data::FMT_Y4MD_ADIF);
-			data->f_date = (qsl_data::date_format)itemp;
-			call_settings.get("Time Format", itemp, qsl_data::FMT_HMS_ADIF);
-			data->f_time = (qsl_data::time_format)itemp;
-			call_settings.get("Card Design", temp, "");
-			data->filename = temp;
-			data->filename_valid = true;
-			char msg[128];
-			snprintf(msg, sizeof(msg), "QSL: Reading QSL data for call '%s' type '%s'", 
-				call.c_str(), QSL_TYPES[ix].c_str());
-			status_->misc_status(ST_NOTE, msg);
-			free(temp);
-			// Check it's a TSV file
-			size_t pos = data->filename.find_last_of('.');
-			if (pos == string::npos || data->filename.substr(pos) != ".tsv") {
-				// Not a TSV file (or no filename)
-				char msg[256];
-				snprintf(msg, sizeof(msg), "QSL: Invalid filename %s - setting to no value", data->filename.c_str());
-				status_->misc_status(ST_WARNING, msg);
-				data->filename = "";
-			}
-			// Minimum data_ required
-			if (data->width == 0 || data->height == 0 || data->filename.length() == 0) {
-				// We have either width or height not defined - so load the edfault data_
-				char msg[256];
-				snprintf(msg, sizeof(msg), "QSL: Incorrect info W=%g, H=%g, File=%s", data->width, data->height, data->filename.c_str());
-				status_->misc_status(ST_ERROR, msg);
-				data->items.clear();
-				// Default width and height if zero
-				if (data->width == 0) data->width = data->col_width;
-				if (data->height == 0) data->height = data->row_height;
-			}
-			if (data->filename.length()) {
-				// Data looks good so far
-				char msg[100];
-				snprintf(msg, sizeof(msg), "QSL: Reading card image data %s %s from %s",
-					call.c_str(),
-					QSL_TYPES[ix].c_str(),
-					data->filename.c_str());
-				status_->misc_status(ST_LOG, msg);
-				load_items(data);
-			}
-		}
-	}
-}
-
+//void qsl_dataset::load_prefs(Fl_Preferences& settings) {
+//
+//	Fl_Preferences qsl_settings(settings, "QSL Design");
+//
+//	for (int ix = 0; ix < (int)qsl_data::MAX_TYPE; ix++) {
+//		map<string, qsl_data*>* type_data = new map<string, qsl_data*>;
+//		data_[(qsl_data::qsl_type)ix] = type_data;
+//		Fl_Preferences type_settings(qsl_settings, QSL_TYPES[ix].c_str());
+//		// Now fetch each callsign that is in the prefs file
+//		int num_calls = type_settings.groups();
+//		for (int iy = 0; iy < num_calls; iy++) {
+//			string call = type_settings.group(iy);
+//			Fl_Preferences call_settings(type_settings, call.c_str());
+//			re_slash(call);
+//			qsl_data* data = new qsl_data;
+//			(*type_data)[call] = data;
+//			// Temporary values to convert char* and int to string and enums
+//			char* temp;
+//			int itemp;
+//			// Get the card label data_ for this callsign
+//			call_settings.get("Width", data->width, 0);
+//			call_settings.get("Height", data->height, 0);
+//			call_settings.get("Unit", itemp, (int)qsl_data::MILLIMETER);
+//			data->unit = (qsl_data::dim_unit)itemp;
+//			call_settings.get("Number Rows", data->rows, 4);
+//			call_settings.get("Number Columns", data->columns, 2);
+//			call_settings.get("Column Width", data->col_width, 101.6);
+//			call_settings.get("Row Height", data->row_height, 67.7);
+//			call_settings.get("First Row", data->row_top, 12.9);
+//			call_settings.get("First Column", data->col_left, 4.6);
+//			call_settings.get("Max QSOs per Card", data->max_qsos, 1);
+//			call_settings.get("Date Format", itemp, qsl_data::FMT_Y4MD_ADIF);
+//			data->f_date = (qsl_data::date_format)itemp;
+//			call_settings.get("Time Format", itemp, qsl_data::FMT_HMS_ADIF);
+//			data->f_time = (qsl_data::time_format)itemp;
+//			call_settings.get("Card Design", temp, "");
+//			data->filename = temp;
+//			data->filename_valid = true;
+//			char msg[128];
+//			snprintf(msg, sizeof(msg), "QSL: Reading QSL data for call '%s' type '%s'", 
+//				call.c_str(), QSL_TYPES[ix].c_str());
+//			status_->misc_status(ST_NOTE, msg);
+//			free(temp);
+//			// Check it's a TSV file
+//			size_t pos = data->filename.find_last_of('.');
+//			if (pos == string::npos || data->filename.substr(pos) != ".tsv") {
+//				// Not a TSV file (or no filename)
+//				char msg[256];
+//				snprintf(msg, sizeof(msg), "QSL: Invalid filename %s - setting to no value", data->filename.c_str());
+//				status_->misc_status(ST_WARNING, msg);
+//				data->filename = "";
+//			}
+//			// Minimum data_ required
+//			if (data->width == 0 || data->height == 0 || data->filename.length() == 0) {
+//				// We have either width or height not defined - so load the edfault data_
+//				char msg[256];
+//				snprintf(msg, sizeof(msg), "QSL: Incorrect info W=%g, H=%g, File=%s", data->width, data->height, data->filename.c_str());
+//				status_->misc_status(ST_ERROR, msg);
+//				data->items.clear();
+//				// Default width and height if zero
+//				if (data->width == 0) data->width = data->col_width;
+//				if (data->height == 0) data->height = data->row_height;
+//			}
+//			if (data->filename.length()) {
+//				// Data looks good so far
+//				char msg[100];
+//				snprintf(msg, sizeof(msg), "QSL: Reading card image data %s %s from %s",
+//					call.c_str(),
+//					QSL_TYPES[ix].c_str(),
+//					data->filename.c_str());
+//				status_->misc_status(ST_LOG, msg);
+//				load_items(data);
+//			}
+//		}
+//	}
+//}
+//
 void qsl_dataset::load_items(qsl_data* data) {
 	ifstream ip;
 	ip.open(data->filename.c_str(), fstream::in);
@@ -210,7 +211,8 @@ string qsl_dataset::xml_file(Fl_Preferences& settings) {
 	char* temp;
 	Fl_Preferences data_settings(settings, "Datapath");
 	data_settings.get("QSLs", temp,"");
-	string filename = string(temp) + "/designs.xml";
+	qsl_path_ = temp;
+	string filename = qsl_path_ + "/designs.xml";
 	free(temp);
 	return filename;
 }
@@ -338,6 +340,11 @@ void qsl_dataset::save_xml(Fl_Preferences& settings) {
 			status_->misc_status(ST_OK, "RIG DATA: Saved XML OK");
 		}
 	}
+}
+
+// Get path to QSL data
+string qsl_dataset::get_path() {
+	return qsl_path_;
 }
 
 
