@@ -621,6 +621,7 @@ void qso_qsl::qsl_mark_done() {
 		bool overwrite = false;
 		switch(extract_records_->use_mode()) {
 		case extract_data::extract_mode_t::CARD:
+		case extract_data::extract_mode_t::EMAIL:
 			date_name = "QSLSDATE";
 			sent_name = "QSL_SENT";
 			via_name = "QSL_SENT_VIA";
