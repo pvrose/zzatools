@@ -1020,11 +1020,18 @@ void de_slash(string& data) {
 	}
 }
 
-// Replace all / characters in a string with _ - used for callsigns as filenames 
+// Replace all _ characters in a string with / - used for callsigns as filenames 
 // menu items
 void re_slash(string& data) {
 	for (size_t ix = 0; ix < data.length(); ix++) {
 		if (data[ix] == '_') data[ix] = '/';
+	}
+}
+
+// Replace all backslash with foreslashes - filename portability
+void forward_slash(string& data) {
+	for (size_t ix = 0; ix < data.length(); ix++) {
+		if (data[ix] == '\\') data[ix] = '/';
 	}
 }
 

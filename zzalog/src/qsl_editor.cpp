@@ -1170,6 +1170,9 @@ void qsl_editor::update() {
 // Remove the full path name - leave what's left after the QSL Data path name
 bool qsl_editor::relative_filename(string& filename) {
 	string path = qsl_dataset_->get_path();
+	// Make both names portable
+	forward_slash(path);
+	forward_slash(filename);
 	string result;
 	char msg[256];
 	// First check it's directly under the path

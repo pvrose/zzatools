@@ -115,6 +115,8 @@ using namespace std;
 	void de_slash(string& data);
 	// Replace '_' with '/' throughout
 	void re_slash(string& data);
+	// Replace '\\' with '/'
+	void forward_slash(string& data);
 	// get the directroy part of a a filename
 	string directory(string filename);
 	string terminal(string filename);

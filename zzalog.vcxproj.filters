@@ -518,9 +518,6 @@
     <ClInclude Include="zzalog\include\url_handler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="zzalog\include\utils.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="zzalog\include\win_dialog.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -693,6 +690,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="zzalog\include\xml_wreader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="common\include\utils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
