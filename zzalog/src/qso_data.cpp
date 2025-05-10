@@ -1586,7 +1586,7 @@ void qso_data::action_exec_query() {
 		snprintf(msg, sizeof(msg), "DASH: %zu matching records found", extract_records_->size());
 		status_->misc_status(ST_NOTE, msg);
 		// Display the first record
-		book_->selection(extract_records_->record_number(0), HT_IGNORE);
+		book_->selection(extract_records_->record_number(0), HT_SELECTED);
 		action_edit();
 	}
 	else {
