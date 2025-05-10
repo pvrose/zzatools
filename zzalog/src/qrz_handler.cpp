@@ -699,7 +699,7 @@ bool qrz_handler::upload_single_qso(qso_num_t qso_number) {
 		status_->misc_status(ST_WARNING, msg);
 		return false;
 	}
-	book_->enable_save(false, "Uploading to eQSL");
+	book_->enable_save(false, "Uploading to QRZ.com");
 	// Now send to upload thread to process
 	upload_lock_.lock();
 	if (DEBUG_THREADS) printf("EQSL MAIN: Enqueueing eQSL request %s\n", qso->item("CALL").c_str());
@@ -773,6 +773,7 @@ void qrz_handler::upload_done(upload_resp_t* resp) {
 			resp->qso->item("CALL").c_str(),
 			resp->logid);
 		status_->misc_status(ST_OK, msg);
+		book_->enable_save(true, "Uploaded to QRZ.com");
 		break;
 	case IR_DUPLICATE:
 		resp->qso->item("QRZCOM_QSO_UPLOAD_STATUS", string("Y"));
@@ -784,6 +785,7 @@ void qrz_handler::upload_done(upload_resp_t* resp) {
 			resp->qso->item("CALL").c_str(),
 			resp->logid);
 		status_->misc_status(ST_WARNING, msg);
+		book_->enable_save(true, "Uploaded to QRZ.com");
 		break;
 	case IR_FAIL:
 		snprintf(msg, sizeof(msg), "QRZ: QSL upload failed - %s", resp->message.c_str());

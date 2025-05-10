@@ -16,6 +16,7 @@
 #include "eqsl_handler.h"
 #include "lotw_handler.h"
 #include "club_handler.h"
+#include "qrz_handler.h"
 #include "main_window.h"
 #include "qso_manager.h"
 #include "search.h"
@@ -46,6 +47,7 @@ extern book* book_;
 extern eqsl_handler* eqsl_handler_;
 extern lotw_handler* lotw_handler_;
 extern club_handler* club_handler_;
+extern qrz_handler* qrz_handler_;
 extern qso_manager* qso_manager_;
 extern bool READ_ONLY;
 extern void main_window_label(string text);
@@ -1568,6 +1570,9 @@ bool book::upload_qso(qso_num_t record_num) {
 			if (!lotw_handler_->upload_single_qso(record_num)) ok = false;
 		if (qso->item("CLUBLOG_UPLOAD_QSL_STATUS") != "Y") 
 			if (!club_handler_->upload_single_qso(record_num)) ok = false;
+		if (qso->item("QRZCOM_QSO_UPLOAD_STATUS") != "Y") {
+			if (!qrz_handler_->upload_single_qso(record_num)) ok = false;
+		}
 		// Clear flag as already handled new record features
 		new_record_ = false;
 		enable_save(true, "Upload to QSL sites requested");
