@@ -507,7 +507,7 @@ bool qrz_handler::download_qrzlog_log(stringstream* adif) {
 				status_->misc_status(ST_NOTE, msg);
 				done = true;
 			} else {
-				snprintf(msg, sizeof(msg), "QRZ: Fetch continuing %d downloaded - last logid %u", 
+				snprintf(msg, sizeof(msg), "QRZ: Fetch continuing %d downloaded - last logid %llu", 
 					total, api_data_.at(callsign)->last_logid);
 				status_->misc_status(ST_LOG, msg);
 			}
@@ -625,7 +625,7 @@ bool qrz_handler::fetch_response(qrz_api_data* api, istream& resp, int& count, s
 			// The ADIF will tail off
 			if (state == ADIF) adif += data;
 		} else {
-			snprintf(msg, sizeof(msg), "QRZ: Unexpected '&' followed by %s", data);
+			snprintf(msg, sizeof(msg), "QRZ: Unexpected '&' followed by %s", data.c_str());
 			status_->misc_status(ST_ERROR, msg);
 			ok = false;
 		} 
@@ -767,7 +767,7 @@ void qrz_handler::upload_done(upload_resp_t* resp) {
 		resp->qso->item("QRZCOM_QSO_UPLOAD_STATUS", string("Y"));
 		resp->qso->item("QRZCOM_QSO_UPLOAD_DATE", now(false, "%Y%m%d"));
 		resp->qso->item("APP_QRZLOG_LOGID", to_string(resp->logid));
-		snprintf(msg, sizeof(msg), "QRZ: %s %s %s QSL uploaded (logid=%d)",
+		snprintf(msg, sizeof(msg), "QRZ: %s %s %s QSL uploaded (logid=%llu)",
 			resp->qso->item("QSO_DATE").c_str(),
 			resp->qso->item("TIME_ON").c_str(),
 			resp->qso->item("CALL").c_str(),
@@ -778,7 +778,7 @@ void qrz_handler::upload_done(upload_resp_t* resp) {
 		resp->qso->item("QRZCOM_QSO_UPLOAD_STATUS", string("Y"));
 		resp->qso->item("QRZCOM_QSO_UPLOAD_DATE", now(false, "%Y%m%d"));
 		resp->qso->item("APP_QRZLOG_LOGID", to_string(resp->logid));
-		snprintf(msg, sizeof(msg), "QRZ: %s %s %s QSL uploaded (duplicate logid=%d)",
+		snprintf(msg, sizeof(msg), "QRZ: %s %s %s QSL uploaded (duplicate logid=%llu)",
 			resp->qso->item("QSO_DATE").c_str(),
 			resp->qso->item("TIME_ON").c_str(),
 			resp->qso->item("CALL").c_str(),

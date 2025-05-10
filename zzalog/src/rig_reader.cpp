@@ -80,7 +80,7 @@ bool rig_reader::start_rigs(xml_wreader* that, map<string, string>* attributes) 
 		} 
 		// else 
 		char msg[128];
-		snprintf(msg, sizeof(msg), "RIG DATA: Unexpected attribute %=% in RIGS element",
+		snprintf(msg, sizeof(msg), "RIG DATA: Unexpected attribute %s=%s in RIGS element",
 			it.first.c_str(), it.second.c_str());
 		return false;
 	}
@@ -115,7 +115,7 @@ bool rig_reader::start_rig(xml_wreader* that, map<string, string>*attributes) {
 		}
 		// else
 		char msg[128];
-		snprintf(msg, sizeof(msg), "RIG DATA: Unexpected attribute %=% in RIG element",
+		snprintf(msg, sizeof(msg), "RIG DATA: Unexpected attribute %s=%s in RIG element",
 			it.first.c_str(), it.second.c_str());
 			status_->misc_status(ST_ERROR, msg);
 			return false;
@@ -140,7 +140,7 @@ bool rig_reader::start_value(xml_wreader* that, map<string, string>* attributes)
 			}
 			// else
 			char msg[128];
-			snprintf(msg, sizeof(msg), "RIG DATA: Unexpected attribute %=% in VALUE element",
+			snprintf(msg, sizeof(msg), "RIG DATA: Unexpected attribute %s=%s in VALUE element",
 				it.first.c_str(), it.second.c_str());
 			return false;
 		}
@@ -172,7 +172,7 @@ bool rig_reader::start_app(xml_wreader* that, map<string, string>*attributes) {
 		}
 		// else
 		char msg[128];
-		snprintf(msg, sizeof(msg), "RIG DATA: Unexpected attribute %=% in APP element",
+		snprintf(msg, sizeof(msg), "RIG DATA: Unexpected attribute %s=%s in APP element",
 			it.first.c_str(), it.second.c_str());
 		return false;
 	}

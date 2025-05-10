@@ -370,7 +370,7 @@ string& rig_if::rig_name() {
 
 // Thraed method
 void rig_if::th_run_rig(rig_if* that) {
-	if (DEBUG_THREADS) printf("RIG THREAD: Rig access thread started ID=%d\n", this_thread::get_id());
+	if (DEBUG_THREADS) printf("RIG THREAD: Rig access thread started\n");
 	// Open the rig
 	if (!that->th_open_rig()) {
 		that->opening_.store(false);

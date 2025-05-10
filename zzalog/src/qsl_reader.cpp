@@ -72,7 +72,7 @@ bool qsl_reader::start_qsls(xml_wreader* that, map<string, string>* attributes) 
 			}
 			// else 
 			char msg[128];
-			snprintf(msg, sizeof(msg), "QSL DATA: Unexpected attribute %=% in QSLS element",
+			snprintf(msg, sizeof(msg), "QSL DATA: Unexpected attribute %s=%s in QSLS element",
 				it.first.c_str(), it.second.c_str());
 			return false;
 		}
@@ -103,7 +103,7 @@ bool qsl_reader::start_qsl(xml_wreader* that, map<string, string>* attributes) {
 			if (it.second == "file") type = qsl_data::FILE;
 		}
 		else {
-			snprintf(msg, sizeof(msg), "QSL DATA: Unexpected attribute %=% in RIG element",
+			snprintf(msg, sizeof(msg), "QSL DATA: Unexpected attribute %s=%s in RIG element",
 			it.first.c_str(), it.second.c_str());
 			return false;
 		}
