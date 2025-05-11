@@ -760,6 +760,9 @@ void report_tree::update_status() {
 	case RF_ALL:
 		text += "ALL:";
 		break;
+	case RF_ALL_CURRENT:
+		text += station_call_ + ":";
+		break;
 	case RF_EXTRACTED:
 		text += "Extracted QSOs:";
 		break;
