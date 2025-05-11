@@ -146,6 +146,8 @@ template <class T> class band_map;
 		int entities_any_;
 		// Custom field name
 		string custom_field_;
+		// Station callsign used
+		string station_call_;
 
 	};
 #endif

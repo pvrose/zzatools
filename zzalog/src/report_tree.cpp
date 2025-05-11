@@ -529,12 +529,17 @@ void report_tree::copy_records_to_tree(record_list_t* record_list, Fl_Tree_Item*
 
 // Create the map top-down
 void report_tree::create_map() {
+	bool station_only = false;
 	// Select what records are being analysed
 	switch (filter_) {
 	case report_filter_t::RF_ALL:
 	case report_filter_t::RF_SELECTED:
 		// Select records from the main log book
 		set_book(book_);
+		break;
+	case report_filter_t::RF_ALL_CURRENT:
+		set_book(book_);
+		station_only = true;
 		break;
 	case report_filter_t::RF_EXTRACTED:
 		// Select records from the extracted records list
@@ -553,6 +558,7 @@ void report_tree::create_map() {
 	report_cat_t category = adj_order_[0];
 	string selector_name;
 	string field_name;
+	station_call_ = selection->item("STATION_CALLSIGN");
 	// map_.entry_cat = category;
 	// Get the field we use from the selected record to get our report criterion
 	switch (category) {
@@ -587,9 +593,11 @@ void report_tree::create_map() {
 	// For each record in the book
 	for (size_t i = 0; i < get_book()->size(); i++) {
 		record* record = get_book()->get_record(i, false);
-		if (filter_ != RF_SELECTED || record->item(field_name, true) == selector_name) {
-			// If it is in the domain of the analysis - add it to the map
-			add_record(i, &map_);
+		if (!station_only || record->item("STATION_CALLSIGN") == station_call_) {
+			if (filter_ != RF_SELECTED || record->item(field_name, true) == selector_name) {
+				// If it is in the domain of the analysis - add it to the map
+				add_record(i, &map_);
+			}
 		}
 		status_->progress(i, OT_REPORT);
 	}
@@ -693,6 +701,9 @@ void report_tree::populate_tree(bool activate) {
 			switch (filter_) {
 			case report_filter_t::RF_ALL:
 				filter = "All";
+				break;
+			case report_filter_t::RF_ALL_CURRENT:
+				filter = station_call_;
 				break;
 			case report_filter_t::RF_EXTRACTED:
 				filter = "Extracted";

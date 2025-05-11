@@ -189,6 +189,7 @@ extern string PROGRAM_ID;
 	{ "Re&port", 0, 0, 0, FL_SUBMENU },
 		{ "&Clear", 0, menu::cb_mi_rep_filter, (void*)RF_NONE, FL_MENU_RADIO },
 		{ "&All", 0, menu::cb_mi_rep_filter, (void*)RF_ALL, FL_MENU_RADIO | FL_MENU_VALUE },
+		{ "A&ll Station", 0, menu::cb_mi_rep_filter, (void*)RF_ALL_CURRENT, FL_MENU_RADIO },
 		{ "E&xtracted", 0, menu::cb_mi_rep_filter, (void*)RF_EXTRACTED, FL_MENU_RADIO },
 		{ "&Selected record", 0, menu::cb_mi_rep_filter, (void*)RF_SELECTED, FL_MENU_RADIO | FL_MENU_DIVIDER },
 		{ "Level &1", 0, 0, 0, FL_SUBMENU },
