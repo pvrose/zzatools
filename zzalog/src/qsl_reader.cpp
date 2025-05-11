@@ -159,7 +159,6 @@ bool qsl_reader::start_size(xml_wreader* that, map<string, string>* attributes) 
 			else if (it.second == "mm") data->unit = qsl_data::MILLIMETER;
 			else if (it.second == "point") data->unit = qsl_data::POINT;
 			else ok = false;
-			break;
 		} else if (name == "WIDTH") data->width = stod(it.second);
 		else if (name == "HEIGHT") data->height = stod(it.second);
 		else {
