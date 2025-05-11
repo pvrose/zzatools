@@ -187,8 +187,13 @@ void report_tree::add_record(item_num_t record_num, report_map_entry_t* entry) {
 					}
 				}
 				else {
-					// We cannot find the DXCC entry
-					map_key = nickname + " *** Entity Name not available ***";
+					// Special case "-1" indicates invalid
+					if (record->item("DXCC") == "-1") {
+						map_key += " *** Entity not accepted for DXCC ***";
+					} else {
+						// We cannot find the DXCC entry
+						map_key = nickname + " *** Entity Name not available ***";
+					}
 				}
 			}
 			break;
