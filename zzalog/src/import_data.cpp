@@ -552,7 +552,6 @@ void import_data::convert_update(record* qso) {
 		case QRZCOM_UPDATE:
 			// Update from QRZ.com
 			if (field_name == "APP_QRZLOG_QSL_DATE" ||
-				field_name == "APP_QRZLOG_STATUS" ||
 				field_name == "DISTANCE"||
 				field_name.substr(0,4) == "EQSL" ||
 				field_name.substr(0,4) == "LOTW" ||
