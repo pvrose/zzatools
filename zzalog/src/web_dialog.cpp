@@ -112,7 +112,6 @@ void web_dialog::load_values() {
 	char* nu_temp;
 	uchar offset = hash8(eqsl_settings.path());
 	string crypt;
-	const unsigned long long u64_zero = 0ull; 
 	eqsl_settings.get("User", temp, "");
 	eqsl_username_ = temp;
 	free(temp);
@@ -171,7 +170,6 @@ void web_dialog::load_values() {
 		string key = xor_crypt(crypt, seed_, offset);
 		delete[] nu_temp;
 		data->key = key;
-		call_settings.get("Last Log ID", (void*)&data->last_logid, (void*)&u64_zero, sizeof(uint64_t), sizeof(uint64_t));
 		call_settings.get("Last Download", temp, "");
 		data->last_download = temp;
 		free(temp);
@@ -561,8 +559,7 @@ void web_dialog::create_qrz(int rx, int ry, int rw, int rh) {
 	const int XBOOK = curr_x + WRADIO;
 	const int XUSE = XBOOK + WBOOK;
 	const int XKEY = XUSE + WUSE + GAP;
-	const int XLASTID = XKEY + WKEY;
-	const int XLASTDL = XLASTID + WLASTID;
+	const int XLASTDL = XKEY + WKEY;
 
 	Fl_Check_Button* bn_qrz_upload = new Fl_Check_Button(curr_x, curr_y, WRADIO, HRADIO, "Update each QSO");
 	bn_qrz_upload->align(FL_ALIGN_RIGHT);
@@ -585,16 +582,11 @@ void web_dialog::create_qrz(int rx, int ry, int rw, int rh) {
 	b2->align(FL_ALIGN_CENTER);
 	b2->box(FL_FLAT_BOX);
 	
-	Fl_Box* b3 = new Fl_Box(XLASTID, curr_y, WLASTID, HBUTTON, "Last Log ID");
-	b3->align(FL_ALIGN_CENTER);
-	b3->box(FL_FLAT_BOX);
-	
 	Fl_Box* b4 = new Fl_Box(XLASTDL, curr_y, WLASTDL, HBUTTON, "Last Downloaded");
 	b4->align(FL_ALIGN_CENTER);
 	b4->box(FL_FLAT_BOX);
 	
 	curr_y += HBUTTON;
-	char temp[128];
 	for (auto it = qrz_api_data_.begin(); it != qrz_api_data_.end(); it ++) {
 		Fl_Output* op_book = new Fl_Output(XBOOK, curr_y, WBOOK, HBUTTON);
 		op_book->box(FL_FLAT_BOX);
@@ -613,12 +605,6 @@ void web_dialog::create_qrz(int rx, int ry, int rw, int rh) {
 		ip_key->value(it->second->key.c_str());
 		ip_key->callback(cb_value<Fl_Input, string>, &it->second->key);
 		ip_key->tooltip("Enter the QRZ.com API key for logbook");
-
-		Fl_Int_Input* ip_lastid = new Fl_Int_Input(XLASTID, curr_y, WLASTID, HBUTTON);
-		snprintf(temp, sizeof(temp), "%llu", it->second->last_logid);
-		ip_lastid->value(temp);
-		ip_lastid->callback(cb_value_ull<Fl_Int_Input>, &it->second->last_logid);
-		ip_lastid->tooltip("Normally displays the LogID of the last record downloaded");
 
 		calendar_input* ip_lastdl = new calendar_input(XLASTDL, curr_y, WLASTDL, HBUTTON);
 		ip_lastdl->value(it->second->last_download.c_str());
@@ -906,7 +892,6 @@ void web_dialog::save_values() {
 		encrypt = xor_crypt(it->second->key, seed_, offset);
 		call_settings.set("Key Length", (int)encrypt.length());
 		call_settings.set("Key", (void*)encrypt.c_str(), encrypt.length());
-		call_settings.set("Last Log ID", (void*)&it->second->last_logid, sizeof(uint64_t));
 		call_settings.set("Last Download", it->second->last_download.c_str());
 		call_settings.set("In Use", (int)it->second->used);
 	}

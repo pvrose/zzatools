@@ -91,11 +91,9 @@ struct qrz_api_data {
 		// Decode Callsign element
 		bool decode_callsign(xml_element* element);
 		// Generate fetch request
-		bool fetch_request(qrz_api_data* api, ostream& request, int count);
+		bool fetch_request(qrz_api_data* api, ostream& request);
 		// Decode fetch response
 		bool fetch_response(qrz_api_data* api, istream& response, int& count, string& adif);
-		// Get last LogID downloaded
-		unsigned long long last_logid(qrz_api_data* api, string adif);
 		// Generate insert request
 		bool insert_request(qrz_api_data* api, ostream& request, record* qso);
 		// Decode insert response

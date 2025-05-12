@@ -415,7 +415,6 @@ void qrz_handler::load_data() {
 	int itemp; // For bool settings
 	char* stemp; // For Cstring settings
 	char* btemp; // For binary settings - encrypted string
-	unsigned long long uultemp; // For uint64 (as binary)
 	qrz_settings.get("Use API", itemp, false);
 	use_api_ = itemp;
 	qrz_settings.get("Upload per QSO", itemp, false);
@@ -434,7 +433,6 @@ void qrz_handler::load_data() {
 		string key = xor_crypt(crypt, seed_, offset);
 		delete[] btemp;
 		data->key = key;
-		call_settings.get("Last Log ID", (void*)&data->last_logid, (void*)&uultemp, sizeof(uint64_t), sizeof(uint64_t));
 		call_settings.get("Last Download", stemp, "");
 		data->last_download = stemp;
 		free(stemp);
@@ -457,7 +455,6 @@ void qrz_handler::store_data() {
 		string encrypt = xor_crypt(it->second->key, seed_, offset);
 		call_settings.set("Key Length", (int)encrypt.length());
 		call_settings.set("Key", (void*)encrypt.c_str(), encrypt.length());
-		call_settings.set("Last Log ID", (void*)&it->second->last_logid, sizeof(uint64_t));
 		call_settings.set("Last Download", it->second->last_download.c_str());
 		call_settings.set("In Use", (int)it->second->used);
 	}
@@ -479,43 +476,25 @@ bool qrz_handler::download_qrzlog_log(stringstream* adif) {
 		status_->misc_status(ST_WARNING, msg);
 		return false;
 	}
-	bool done = false;
-	const int MAX_PER_REQUEST = 250;
-	const int REQUESTS = 1;
 	int count = 0;
-	int total = 0;
-	int request_count = 0;
-	bool ok = true;
 	// Create a 1M holding string (for debug)
 	string sadif;
 	sadif.reserve(1024 * 1024);
-	while(!done && ok) {
-		stringstream request;
-		stringstream response;
-		fetch_request(api_data_.at(callsign), request, MAX_PER_REQUEST);
-		url_handler_->post_url("https://logbook.qrz.com/api", "", &request, &response);
-		response.seekg(0, ios::beg);
-		if (!fetch_response(api_data_.at(callsign), response, count, sadif)) {
-			status_->misc_status(ST_WARNING, "QRZ: Fetch data over API has failed");
-			ok = false;
-		} else {
-			total += count;
-			request_count++;
-			if (count != MAX_PER_REQUEST || request_count == REQUESTS) {
-				snprintf(msg, sizeof(msg), "QRZ: Fetch finished %d records downloaded in %d pages!",
-					total, request_count);
-				status_->misc_status(ST_NOTE, msg);
-				done = true;
-			} else {
-				snprintf(msg, sizeof(msg), "QRZ: Fetch continuing %d downloaded - last logid %llu", 
-					total, api_data_.at(callsign)->last_logid);
-				status_->misc_status(ST_LOG, msg);
-			}
-			// Copy the first page of records to the stream
-			*adif << sadif;
-		}
+	stringstream request;
+	stringstream response;
+	fetch_request(api_data_.at(callsign), request);
+	url_handler_->post_url("https://logbook.qrz.com/api", "", &request, &response);
+	response.seekg(0, ios::beg);
+	if (!fetch_response(api_data_.at(callsign), response, count, sadif)) {
+		status_->misc_status(ST_WARNING, "QRZ: Fetch data over API has failed");
+	} else {
+		snprintf(msg, sizeof(msg), "QRZ: Fetch finished %d records downloaded!",
+				count);
+		status_->misc_status(ST_NOTE, msg);
+		// Copy the first page of records to the stream
+		*adif << sadif;
 	}
-	if (total > 0) {
+	if (count > 0) {
 		// Write back the API data to settings
 		store_data();
 		return true;
@@ -525,7 +504,7 @@ bool qrz_handler::download_qrzlog_log(stringstream* adif) {
 }
 
 // Generate the fetch request
-bool qrz_handler::fetch_request(qrz_api_data* api, ostream& req, int count) {
+bool qrz_handler::fetch_request(qrz_api_data* api, ostream& req) {
 	// Key
 	req << "KEY=" << api->key << "&";
 	// Action
@@ -533,8 +512,7 @@ bool qrz_handler::fetch_request(qrz_api_data* api, ostream& req, int count) {
 	// Options
 	string lastdate = api->last_download.substr(0,4) + "-" +
 		api->last_download.substr(4,2) + "-" + api->last_download.substr(6,2);
- 	req << "OPTION=AFTERLOGID:" << (api->last_logid + 1ull) << ",";
-	req << "MAX:" << count << '\n';
+ 	req << "OPTION=MODSINCE:" << lastdate << '\n';
 	return true;
 }
 
@@ -645,25 +623,12 @@ bool qrz_handler::fetch_response(qrz_api_data* api, istream& resp, int& count, s
 		if (!got_count) count = count_records;
 		pos = amper + 1;
 	}
-	if (ok) api->last_logid = last_logid;
-	return ok;
-}
-
-unsigned long long qrz_handler::last_logid(qrz_api_data* api, string adif) {
-	stringstream ss;
-	ss << adif;
-	book* temp = new book(OT_NONE);
-	adi_reader* reader = new adi_reader();
-	reader->load_book(temp, ss);
-	delete reader;
-	unsigned long long logid = 0ull;
-	unsigned long long max_logid = 0ull;
-	for (auto it = temp->begin(); it != temp->end(); it++) {
-		(*it)->item("APP_QRZLOG_LOGID", logid);
-		max_logid = max(max_logid, logid);
+	if (ok)  {
+		string today = now(false, "%Y%m%d");
+		api->last_download = today;
+		api->last_logid = last_logid;
 	}
-	delete temp;
-	return max_logid;
+	return ok;
 }
 
 bool qrz_handler::upload_single_qso(qso_num_t qso_number) {
