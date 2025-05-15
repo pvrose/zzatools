@@ -960,8 +960,8 @@ string string_to_hex(string data, bool escape /*=true*/) {
 		if (escape) result[ix++] = 'x';
 		result[ix++] = hex_chars[(c >> 4)];
 		result[ix++] = hex_chars[(c & '\x0f')];
-		result[ix++] = ' ';
 	}
+	result.resize(ix);
 	return result;
 }
 
@@ -971,7 +971,7 @@ string hex_to_string(string data) {
 	int ix = 0;
 	// For the length of the source striing
 	while ((unsigned)ix < data.length()) {
-		if (data[ix] == 'x') {
+		if (data[ix] == 'x' || data[ix] == ' ') {
 			ix++;
 		}
 		result += to_ascii(data, ix);

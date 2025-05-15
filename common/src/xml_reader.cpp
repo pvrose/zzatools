@@ -513,7 +513,7 @@ void xml_reader::process_escape(istream& is, string& output) {
 
 // Start element
 bool xml_reader::start_element(string name, map<string, string>* attributes) {
-	if (element_ == nullptr) {
+	if (current_element_ == nullptr) {
 		// This is the top element - create it and allow other elements to hang from it
 		element_ = new xml_element(nullptr, name, "", attributes);
 		current_element_ = element_;
