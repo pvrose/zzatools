@@ -14,6 +14,7 @@ using namespace std;
 class Fl_Widget;
 class Fl_Group;
 struct qrz_api_data;
+struct server_data_t;
 
 	// This class provides a dialog to let the user supply web addresses, usernames and passwords
 	class web_dialog :
@@ -55,6 +56,9 @@ struct qrz_api_data;
 		void create_server(int rx, int ry, int rw, int rh);
 		// Create the e-mail group
 		void create_email(int rx, int ry, int rw, int rh);
+
+		// Get the server
+		server_data_t* get_server(string name);
 		
 
 		// Widgets for eQSL
@@ -80,67 +84,11 @@ struct qrz_api_data;
 
 		map<string, Fl_Group*> grp_api_books_;
 
-
-		// eQSL attributes
-
-		// enable eQSL access
-		bool eqsl_enable_;
-		// download starting at this date
-		string eqsl_last_got_;
-		// user name
-		string eqsl_username_;
-		// password
-		string eqsl_password_;
-		// use QSO message
-		bool eqsl_use_qso_msg_;
-		string eqsl_qso_msg_;
-		// SWL message
-		bool eqsl_use_swl_msg_;
-		string eqsl_swl_msg_;
-		// Upload QSOs as logged
-		bool eqsl_upload_qso_;
-		// Download confirmed as well
-		bool eqsl_confirmed_too_;
-		// MAximum number of image fetches at one time
-		int eqsl_max_fetches_;
-
-		// LotW attributes
-
-		// enable
-		bool lotw_enable_;
-		// download start date
-		string lotw_last_got_;
-		// user name/password
-		string lotw_username_;
-		string lotw_password_;
-		// Upload QSOs as logged
-		bool lotw_upload_qso_;
-
-		// QRZ.com attributes
-
-		// username/password
-		string qrz_username_;
-		string qrz_password_;
-		// Use XML database and merge
-		bool qrz_xml_merge_;
-		// Use API
-		bool qrz_api_enable_;
-		// Upload QSOs as logged
-		bool qrz_upload_qso_;
-
-		map<string, qrz_api_data*> qrz_api_data_;
-
-		// ClubLog attributes
-
-		// enable
-		bool club_enable_;
-		// username (e-mail)
-		string club_password_;
-		string club_username_;
-		// Number of days between downloads
-		int club_interval_;
-		// Upload QSOs as logged
-		bool club_upload_qso_;
+		server_data_t* eqsl_data_;
+		server_data_t* lotw_data_;
+		server_data_t* club_data_;
+		server_data_t* qrz_data_;
+		server_data_t* email_data_;
 
 		// wsjt-x udp PORT CONNECTION
 		int wsjtx_udp_port_;
@@ -150,15 +98,6 @@ struct qrz_api_data;
 		int fldigi_rpc_port_;
 		string fldigi_rpc_addr_;
 		bool fldigi_enable_;
-
-		// e-mail URL 
-		string email_server_;
-		// Server account
-		string email_account_;
-		// Server password
-		string email_password_;
-		// Confirmation CC address
-		string email_cc_address_;
 
 	};
 #endif

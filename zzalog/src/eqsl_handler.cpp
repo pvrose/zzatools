@@ -6,7 +6,7 @@
 #include "adi_writer.h"
 #include "qso_manager.h"
 #include "qso_qsl.h"
-
+#include "qsl_dataset.h"
 #include "utils.h"
 #include "url_handler.h"
 #include "callback.h"
@@ -34,7 +34,8 @@ extern url_handler* url_handler_;
 extern bool DEBUG_THREADS;
 extern string default_station_;
 extern fields* fields_;
-extern uint32_t seed_;
+// extern uint32_t seed_;
+extern qsl_dataset* qsl_dataset_;
 extern string VENDOR;
 extern string PROGRAM_ID;
 
@@ -60,10 +61,7 @@ eqsl_handler::eqsl_handler()
 
 	set_adif_fields();
 
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-	Fl_Preferences eqsl_settings(settings, "QSL/eQSL");
-	eqsl_settings.get("Maximum Fetches", allowed_fetches_, 50);
-
+	allowed_fetches_ = 100;
 }
 
 // Destructor
@@ -475,20 +473,17 @@ bool eqsl_handler::user_details(
 	string* swl_message,
 	bool* confirmed) {
 
-	// Get username and password for building url to fetch card
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-	Fl_Preferences qsl_settings(settings, "QSL");
-	Fl_Preferences eqsl_settings(qsl_settings, "eQSL");
+	server_data_t* eqsl_data = qsl_dataset_->get_server_data("eQSL");
+
 	string callsign = qso_manager_->get_default(qso_manager::CALLSIGN);
 
-	char * temp;
-	int tempi;
 	// Check user name
 	if (username != nullptr) {
-		eqsl_settings.get("User", temp, "");
-		*username = temp;
-		free(temp);
-		if (*username == callsign) {
+		*username = eqsl_data->user;
+		// eqsl_data.get("User", temp, "");
+		// *username = temp;
+		// free(temp);
+		if (to_upper(*username) != callsign) {
 			char message[128];
 			snprintf(message, 128, "EQSL: Station call %s differs from username %s", callsign.c_str(), username->c_str());
 			status_->misc_status(ST_WARNING, message);
@@ -497,36 +492,23 @@ bool eqsl_handler::user_details(
 	}
 	// Check password
 	if (password != nullptr) {
-		int pwlen;
-		uchar offset = hash8(eqsl_settings.path());
-		eqsl_settings.get("Password Length", pwlen, 0);
-		char* btemp = new char[pwlen];
-		eqsl_settings.get("Password", btemp, (void*)"", 0, &pwlen);
-		string crypt(btemp, pwlen);
-		*password = xor_crypt(crypt, seed_, offset);
+		*password = eqsl_data->password;
 	}
 	// Check date last access
 	if (last_access != nullptr) {
-		eqsl_settings.get("Last Accessed", temp, "19700101");
-		*last_access = temp;
-		free(temp);
+		*last_access = eqsl_data->last_downloaded;
 	}
 	// Get any message for QSL_MSG
 	if (qsl_message != nullptr) {
-		eqsl_settings.get("QSL Message", temp, "");
-		*qsl_message = temp;
-		free(temp);
+		*qsl_message = eqsl_data->qso_message;
 	}
 	// Get any message for QSL_MSG_SWL
 	if (swl_message != nullptr) {
-		eqsl_settings.get("SWL Message", temp, "");
-		*swl_message = temp;
-		free(temp);
+		*swl_message = eqsl_data->swl_message;
 	}
 	// Get confirmed 
 	if (confirmed != nullptr) {
-		eqsl_settings.get("Download Confirmed", tempi, false);
-		*confirmed = (bool)tempi;
+		*confirmed = eqsl_data->download_confirmed;
 	}
 	if (username == nullptr || *username == "" || password == nullptr || *password == "") {
 		// User name or password not set
@@ -660,10 +642,8 @@ eqsl_handler::response_t eqsl_handler::adif_filename(string& filename) {
 	// Remember now as the last download date
 	if (result == ER_OK) {
 		last_access = now(false, EQSL_TIMEFORMAT);
-		Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-		Fl_Preferences qsl_settings(settings, "QSL");
-		Fl_Preferences eqsl_settings(qsl_settings, "eQSL");
-		eqsl_settings.set("Last Accessed", last_access.c_str());
+		server_data_t* eqsl_data = qsl_dataset_->get_server_data("eQSL");
+		eqsl_data->last_downloaded = last_access;
 	}
 
 	return result;

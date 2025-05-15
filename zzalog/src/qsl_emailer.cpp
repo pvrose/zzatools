@@ -3,6 +3,7 @@
 #include "png_writer.h"
 #include "status.h"
 #include "url_handler.h"
+#include "qsl_dataset.h"
 
 #include <string>
 #include <cstdio>
@@ -14,9 +15,7 @@ using namespace std;
 
 extern status* status_;
 extern url_handler* url_handler_;
-extern uint32_t seed_;
-extern string VENDOR;
-extern string PROGRAM_ID;
+extern qsl_dataset* qsl_dataset_;
 
 const string SUBJECT = "QSL for <CALL> <QSO_DATE> <BAND> <MODE> from <STATION_CALLSIGN>";
 const string BODY = 
@@ -34,33 +33,11 @@ qsl_emailer::~qsl_emailer() {
 }
 
 void qsl_emailer::load_values() {
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-	Fl_Preferences email_settings(settings, "e-Mail");
-	char* temp;
-	char* ntemp;
-	int itemp;
-	uchar offset = hash8(email_settings.path());
-	// e-Mail settings
-	email_settings.get("Server", temp, "");
-	email_url_ = temp;
-	free(temp);
-	email_settings.get("Account Length", itemp, 0);
-	ntemp = new char[itemp];
-	email_settings.get("Account", ntemp, (void*)"", 0, &itemp);
-	string crypt(ntemp, itemp);
-	delete[] ntemp;
-	email_user_ = xor_crypt(crypt, seed_, offset);
-	email_settings.get("Password Length", itemp, 0);
-	ntemp = new char[itemp];
-	email_settings.get("Password", ntemp, (void*)"", 0, &itemp);
-	crypt = string(ntemp, itemp);
-	delete[] ntemp;
-	email_password_ = xor_crypt(crypt, seed_, offset);
-	email_settings.get("CC Address Length", itemp, 0);
-	ntemp = new char[itemp];
-	email_settings.get("CC Address", ntemp, (void*)"", 0, &itemp);
-	crypt = string(ntemp, itemp);
-	cc_address_ = xor_crypt(crypt, seed_, offset);
+	server_data_t* email_data = qsl_dataset_->get_server_data("eMail");
+	email_url_ = email_data->mail_server;
+	email_user_ = email_data->user;
+	email_password_ = email_data->password;
+	cc_address_ = email_data->cc_address;
 }
 
 bool qsl_emailer::generate_email(record* qso) {

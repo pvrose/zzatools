@@ -12,6 +12,7 @@
 #include "qso_manager.h"
 #include "adi_reader.h"
 #include "adi_writer.h"
+#include "qsl_dataset.h"
 
 #include <sstream>
 #include <iostream>
@@ -28,16 +29,14 @@ extern status* status_;
 extern tabbed_forms* tabbed_forms_;
 extern url_handler* url_handler_;
 extern book* navigation_book_;
-extern menu* menu_;
 extern string PROG_ID;
 extern string PROGRAM_VERSION;
-extern string VENDOR;
-extern string PROGRAM_ID;
 extern uint32_t seed_;
 extern import_data* import_data_;
 extern qso_manager* qso_manager_;
 extern book* book_;
 extern bool DEBUG_THREADS;
+extern qsl_dataset* qsl_dataset_;
 
 // Constructor
 qrz_handler::qrz_handler() :
@@ -103,9 +102,8 @@ bool qrz_handler::open_session() {
 				if (fl_choice("You are not a subscriber to the QRZ XML Database so will only receive limited info.\n"
 					"Do you wish to continue or use the standard web page?", "Continue", "Use Web Page", nullptr) == 1) {
 					use_xml_database_ = false;
-					Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-					Fl_Preferences qrz_settings(settings, "QRZ");
-					qrz_settings.set("Use XML Database", false);
+					server_data_t* qrz_data = qsl_dataset_->get_server_data("QRZ");
+					qrz_data->use_xml = false;
 					return false;
 				}
 			}
@@ -211,19 +209,12 @@ string qrz_handler::generate_details_uri(string callsign) {
 
 // Fetch user details - returns false if not enabled or whether username or password are blank strings
 bool qrz_handler::user_details() {
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-	Fl_Preferences qsl_settings(settings, "QSL");
-	Fl_Preferences qrz_settings(qsl_settings, "QRZ");
-	int enabled;
-	qrz_settings.get("Enable", enabled, false);
+	server_data_t* qrz_data = qsl_dataset_->get_server_data("QRZ");
+	bool enabled = qrz_data->enabled;
 	if (enabled) {
-		char* temp;
-		qrz_settings.get("User", temp, "");
-		username_ = temp;
-		free(temp);
-		qrz_settings.get("Password", temp, "");
-		password_ = temp;
-		qrz_settings.get("Use XML Database", (int&)use_xml_database_, false);
+		username_ = qrz_data->user;
+		password_ = qrz_data->password;
+		use_xml_database_ = qrz_data->use_xml;
 		if (!username_.length() || !password_.length()) {
 			return false;
 		}
@@ -410,54 +401,14 @@ void qrz_handler::open_web_page(string callsign) {
 
 // Load the api_data from settings
 void qrz_handler::load_data() {
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-	Fl_Preferences qrz_settings(settings, "QSL/QRZ");
-	int itemp; // For bool settings
-	char* stemp; // For Cstring settings
-	char* btemp; // For binary settings - encrypted string
-	qrz_settings.get("Use API", itemp, false);
-	use_api_ = itemp;
-	qrz_settings.get("Upload per QSO", itemp, false);
-	upload_qso_ = itemp;
-	Fl_Preferences api_settings(qrz_settings, "Logbooks");
-	uchar offset = hash8(api_settings.path());
-	int num_groups = api_settings.groups();
-	for (int ix = 0; ix < num_groups; ix++) {
-		string call = api_settings.group(ix);
-		Fl_Preferences call_settings(api_settings, call.c_str());
-		qrz_api_data* data = new qrz_api_data;
-		call_settings.get("Key Length", itemp, 128);
-		btemp = new char[itemp];
-		call_settings.get("Key", btemp, (void*)"", 0, &itemp);
-		string crypt = string(btemp, itemp);
-		string key = xor_crypt(crypt, seed_, offset);
-		delete[] btemp;
-		data->key = key;
-		call_settings.get("Last Download", stemp, "");
-		data->last_download = stemp;
-		free(stemp);
-		re_slash(call);
-		api_data_[call] = data;
-		call_settings.get("In Use", itemp, false);
-		data->used = itemp;
-	}
+	server_data_t* qrz_data = qsl_dataset_->get_server_data("QRZ");
+	use_api_ = qrz_data->use_api;
+	upload_qso_ = qrz_data->upload_per_qso;
+	api_data_ = &qrz_data->api_data;
 }
 
 // Store the api_data to settings
 void qrz_handler::store_data() {
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-	Fl_Preferences api_settings(settings, "QSL/QRZ/Logbooks");
-	uchar offset = hash8(api_settings.path());
-	for (auto it = api_data_.begin(); it != api_data_.end(); it++) {
-		string call = it->first;
-		de_slash(call);
-		Fl_Preferences call_settings(api_settings, call.c_str());
-		string encrypt = xor_crypt(it->second->key, seed_, offset);
-		call_settings.set("Key Length", (int)encrypt.length());
-		call_settings.set("Key", (void*)encrypt.c_str(), encrypt.length());
-		call_settings.set("Last Download", it->second->last_download.c_str());
-		call_settings.set("In Use", (int)it->second->used);
-	}
 }
 
 // Request download for callsign
@@ -470,8 +421,8 @@ bool qrz_handler::download_qrzlog_log(stringstream* adif) {
 		return false;
 	}
 	string callsign = qso_manager_->get_default(qso_manager::CALLSIGN);
-	if (api_data_.find(callsign) == api_data_.end() ||
-		!api_data_.at(callsign)->used) {
+	if (api_data_->find(callsign) == api_data_->end() ||
+		!api_data_->at(callsign)->used) {
 		snprintf(msg, sizeof(msg), "QRZ: No logbook exists for call %s", callsign.c_str());
 		status_->misc_status(ST_WARNING, msg);
 		return false;
@@ -482,10 +433,10 @@ bool qrz_handler::download_qrzlog_log(stringstream* adif) {
 	sadif.reserve(1024 * 1024);
 	stringstream request;
 	stringstream response;
-	fetch_request(api_data_.at(callsign), request);
+	fetch_request(api_data_->at(callsign), request);
 	url_handler_->post_url("https://logbook.qrz.com/api", "", &request, &response);
 	response.seekg(0, ios::beg);
-	if (!fetch_response(api_data_.at(callsign), response, count, sadif)) {
+	if (!fetch_response(api_data_->at(callsign), response, count, sadif)) {
 		status_->misc_status(ST_WARNING, "QRZ: Fetch data over API has failed");
 	} else {
 		snprintf(msg, sizeof(msg), "QRZ: Fetch finished %d records downloaded!",
@@ -658,8 +609,8 @@ bool qrz_handler::upload_single_qso(qso_num_t qso_number) {
 		return false;
 	}
 	string callsign = qso->item("STATION_CALLSIGN");
-	if (api_data_.find(callsign) == api_data_.end() ||
-		!api_data_.at(callsign)->used) {
+	if (api_data_->find(callsign) == api_data_->end() ||
+		!api_data_->at(callsign)->used) {
 		snprintf(msg, sizeof(msg), "QRZ: No logbook exists for call %s", callsign.c_str());
 		status_->misc_status(ST_WARNING, msg);
 		return false;
@@ -702,7 +653,7 @@ void qrz_handler::th_upload_qso(record* qso) {
 	stringstream request;
 	stringstream response;
 	string callsign = qso->item("STATION_CALLSIGN");
-	qrz_api_data* api_data = api_data_.at(callsign);
+	qrz_api_data* api_data = api_data_->at(callsign);
 	string fail_message;
 	insert_request(api_data, request, qso);
 	url_handler_->post_url("https://logbook.qrz.com/api", "", &request, &response);

@@ -76,7 +76,7 @@ string COPYRIGHT = "\302\251 Philip Rose GM3ZZA 2018. All rights reserved.\nPref
 string DATA_COPYRIGHT = "\302\251 Philip Rose %s. This data may be copied for the purpose of correlation and analysis";
 string PROGRAM_ID = "ZZALOG";
 string PROG_ID = "ZLG";
-string PROGRAM_VERSION = "3.4.113";
+string PROGRAM_VERSION = "3.4.114";
 string VENDOR = "GM3ZZA";
 string TIMESTAMP = string(__DATE__) + " " + string(__TIME__);
 
@@ -164,7 +164,7 @@ bool using_backup_ = false;
 // Sticky switches mesasge
 string sticky_message_ = "";
 // Common seed to use in password encryption - maintaned with sessions
-uint32_t seed_;
+uint32_t seed_ = 0;
 
 // Get the backup filename
 string backup_filename(string source) {
@@ -826,20 +826,6 @@ void resize_window() {
 	main_window_->resize(rx, ry, rw, rh);
 }
 
-void get_seed() {
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-	Fl_Preferences security_settings(settings, "Security");
-	// seed is uint32_t so use int to read and write from settings
-	int seed;
-	if(security_settings.get("Seed", seed, 0)) {
-		seed_ = seed;
-	} else {
-		seed_ = time(nullptr);
-	}
-	seed = seed_;
-	security_settings.set("Seed", seed);
-}
-
 // Tidy memory
 void tidy() {
 	// Tidy memory - this is not perfect
@@ -1149,9 +1135,6 @@ int main(int argc, char** argv)
 	if (!open_settings()) {
 		return 255;
 	}
-
-	// Prime encryption seed
-	get_seed();
 
 	// Create the ticker first of all
 	ticker_ = new ticker();

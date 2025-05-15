@@ -1,18 +1,28 @@
 #include "qsl_writer.h"
 #include "qsl_reader.h"
+#include "qrz_handler.h"
+#include "qsl_dataset.h"
 #include "status.h"
 
 extern status* status_;
 extern string PROGRAM_VERSION;
+extern uint32_t seed_;
 
 qsl_writer::qsl_writer() {
+    // Create the seed if it isn't already available
+    if (seed_ == 0) {
+        seed_ = time(nullptr);
+    }
 }
 
 qsl_writer::~qsl_writer() {
 }
 
-bool qsl_writer::store_data(map<qsl_data::qsl_type, map<string, qsl_data*>* >* all_data, ostream& os) {
+bool qsl_writer::store_data(
+    map<qsl_data::qsl_type, map<string, qsl_data*>* >* all_data, 
+    map<string, server_data_t*>* servers, ostream& os) {
     data_ = all_data;
+    servers_ = servers;
     status_->misc_status(ST_NOTE, "QSL DATA: Starting XML generation");
    
  
@@ -38,18 +48,26 @@ bool qsl_writer::write_element(qsl_element_t element) {
     map<string, string>* attributes;
     char text[32];
     switch(element) {
-    case QSL_NONE:
+        case QSL_NONE:
         // Prolog
         name = "xml";
         data = "version=\"1.0\" encoding=\"utf-8\" ";
         if (!process_instr(name, data)) return false;
         // else
+        if (!write_element(QSL_QSL_DATA)) return false;
+        return true;
+    case QSL_QSL_DATA:
+        name = "qsl_data";
+        attributes = new map<string, string>;
+        (*attributes)["version"] = PROGRAM_VERSION;
+        if (!start_element(name, attributes)) return false;
         if (!write_element(QSL_QSLS)) return false;
+        if (!write_element(QSL_SERVERS)) return false;
+        if (!end_element(name)) return false;
         return true;
     case QSL_QSLS:
         name = "qsls";
-        attributes = new map<string, string>;
-        (*attributes)["version"] = PROGRAM_VERSION;
+        attributes = nullptr;
         if (!start_element(name, attributes)) return false;
         // else
         for (auto itt : *data_) {
@@ -310,6 +328,67 @@ bool qsl_writer::write_element(qsl_element_t element) {
         if (!characters(item_->image.filename)) return false;
         if (!end_element(name)) return false;
         return true;
+    case QSL_SERVERS:
+        name = "servers";
+        attributes = new map<string, string>;
+        snprintf(text, sizeof(text), "%d", seed_);
+        (*attributes)["seed"] = text;
+        if (!start_element(name, attributes)) return false;
+        for (auto it : *servers_) {
+            server_name_ = it.first;
+            server_ = it.second;
+            offset_ = hash8(server_name_.c_str());
+            if (!write_element(QSL_SERVER)) return false;
+        }
+        if (!end_element(name)) return false;
+        return true;
+    case QSL_SERVER:
+        name = "server";
+        attributes = new map<string, string>;
+        (*attributes)["name"] = server_name_;
+        if (!start_element(name, attributes)) return false;
+        if (!write_value("User", server_->user)) return false;
+        if (!write_value("Password", encrypt(server_->password, offset_))) return false;
+        if (server_name_ != "eMail") { 
+            if (!write_value("Enable", server_->enabled)) return false;
+            if (!write_value("Upload per QSO", server_->upload_per_qso)) return false;
+             if (!write_value("Last Download", server_->last_downloaded)) return false;
+        }
+        if (server_name_ == "eqSL") {
+            if (!write_value("Download Confirmed", server_->download_confirmed)) return false;
+            if (!write_value("QSO Message", server_->qso_message)) return false;
+            if (!write_value("SWL Message", server_->swl_message)) return false;
+        }
+        if (server_name_ == "LotW") {
+            if (!write_value("Export File", server_->export_file)) return false;
+        } 
+        if (server_name_ == "QRZ") {
+            if (!write_value("Use XML Database", server_->use_xml)) return false;
+            if (!write_value("Use API", server_->use_api)) return false;
+            for (auto it : server_->api_data) {
+                logbook_name_ = it.first;
+                api_data_ = it.second;
+                if (!write_element(QSL_LOGBOOK)) return false;
+            }
+        }
+        if (server_name_ == "eMail") {
+            if (!write_value("eMail Server", server_->mail_server)) return false;
+            if (!write_value("cc Address", server_->cc_address)) return false;
+        }
+        if (!end_element(name)) return false;
+        return true;
+    case QSL_LOGBOOK:
+        name = "logbook";
+        attributes = new map<string, string>;
+        (*attributes)["call"] = logbook_name_;
+        if (!start_element(name, attributes)) return false;
+        if (!write_value("In Use", api_data_->used)) return false;
+        if (!write_value("Last Download", api_data_->last_download)) return false;
+        if (!write_value("Key", encrypt(api_data_->key, offset_))) return false;
+        if (!end_element(name)) return false;
+        return true;
+    default:
+        return false;
     }
     return false;
 }
@@ -338,4 +417,36 @@ string qsl_writer::font2text(Fl_Font f) {
     if (f & FL_ITALIC) s += " italic";
     if (f & FL_BOLD) s += " bold";
     return s;
+}
+
+bool qsl_writer::write_value(string name, string data) {
+    map<string, string>* attributes = new map<string, string>;
+    (*attributes)["name"] = name;
+    if (!start_element("value", attributes)) return false;
+    if (!characters(data)) return false;
+    if (!end_element("value")) return false;
+    return true;
+}
+
+bool qsl_writer::write_value(string name, int data) {
+    return write_value(name, to_string(data));
+}
+
+bool qsl_writer::write_value(string name, double data) {
+    char text[32];
+    snprintf(text, sizeof(text), "%g", data);
+    return write_value(name, string(text));
+}
+
+bool qsl_writer::write_value(string name, bool data) {
+    if (data) {
+        return write_value(name, string("yes"));
+    } else {
+        return write_value(name, string("no"));
+    }
+}
+
+// Encrypt data and convert to hex digits
+string qsl_writer::encrypt(string s, uchar off) {
+    return string_to_hex(xor_crypt(s, seed_, off));
 }

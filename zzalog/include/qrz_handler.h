@@ -133,7 +133,7 @@ struct qrz_api_data {
 		// Web dialog
 		Fl_Help_Dialog* web_dialog_;
 		// API data
-		map<string, qrz_api_data*> api_data_;
+		map<string, qrz_api_data*>* api_data_;
 		// Upload thread
 		thread* th_upload_;
 		// Allow thread to run

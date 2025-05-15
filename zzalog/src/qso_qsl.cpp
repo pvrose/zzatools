@@ -19,6 +19,7 @@
 #include "qsl_data.h"
 #include "qsl_image.h"
 #include "qsl_emailer.h"
+#include "qsl_dataset.h"
 #include "menu.h"
 
 #include <FL/Fl_Preferences.H>
@@ -38,6 +39,7 @@ extern eqsl_handler* eqsl_handler_;
 extern club_handler* club_handler_;
 extern lotw_handler* lotw_handler_;
 extern qrz_handler* qrz_handler_;
+extern qsl_dataset* qsl_dataset_;
 extern string VENDOR;
 extern string PROGRAM_ID;
 
@@ -70,29 +72,14 @@ qso_qsl::~qso_qsl() {
 
 // Load settings data
 void qso_qsl::load_values() {
-	// eQSL
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-	Fl_Preferences qsl_settings(settings, "QSL");
-	Fl_Preferences eqsl_settings(qsl_settings, "eQSL");
-	int upload_qso;
-	eqsl_settings.get("Upload per QSO", upload_qso, false);
-	auto_eqsl_ = upload_qso;
-
-	// LotW
-	Fl_Preferences lotw_settings(qsl_settings, "LotW");
-	lotw_settings.get("Upload per QSO", upload_qso, false);
-	auto_lotw_ = upload_qso;
-
-	// Clublog
-	Fl_Preferences club_settings(qsl_settings, "ClubLog");
-	club_settings.get("Upload per QSO", upload_qso, false);
-	auto_club_ = upload_qso;
-
-	// QRZ.com
-	Fl_Preferences qrz_settings(qsl_settings, "QRZ");
-	qrz_settings.get("Upload per QSO", upload_qso, false);
-	auto_qrz_ = upload_qso;
-
+	server_data_t* eqsl_data = qsl_dataset_->get_server_data("eQSL");
+	auto_eqsl_ = eqsl_data->upload_per_qso;
+	server_data_t* lotw_data = qsl_dataset_->get_server_data("LotW");
+	auto_lotw_ = lotw_data->upload_per_qso;
+	server_data_t* club_data = qsl_dataset_->get_server_data("Club");
+	auto_club_ = club_data->upload_per_qso;
+	server_data_t* qrz_data = qsl_dataset_->get_server_data("QRZ");
+	auto_qrz_ = qrz_data->upload_per_qso;
 }
 
 // Draw the widgets
@@ -294,24 +281,20 @@ void qso_qsl::create_form() {
 
 // Save settings
 void qso_qsl::save_values() {
-	// eQSL
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-	Fl_Preferences qsl_settings(settings, "QSL");
-	Fl_Preferences eqsl_settings(qsl_settings, "eQSL");
-	eqsl_settings.set("Upload per QSO", auto_eqsl_);
-	// LotW
-	Fl_Preferences lotw_settings(qsl_settings, "LotW");
-	lotw_settings.set("Upload per QSO", auto_lotw_);
-	// Clublog
-	Fl_Preferences club_settings(qsl_settings, "ClubLog");
-	club_settings.set("Upload per QSO", auto_club_);
-	// QRZ.com
-	Fl_Preferences qrz_settings(qsl_settings, "ClubLog");
-	club_settings.set("Upload per QSO", auto_qrz_);
+	server_data_t* eqsl_data = qsl_dataset_->get_server_data("eQSL");
+	eqsl_data->upload_per_qso = auto_eqsl_;
+	server_data_t* lotw_data = qsl_dataset_->get_server_data("LotW");
+	lotw_data->upload_per_qso = auto_lotw_;
+	server_data_t* club_data = qsl_dataset_->get_server_data("Club");
+	club_data->upload_per_qso = auto_club_;
+	server_data_t* qrz_data = qsl_dataset_->get_server_data("QRZ");
+	qrz_data->upload_per_qso = auto_qrz_;
 }
 
 // Configure widgets
 void qso_qsl::enable_widgets() {
+	// Update the Auto update flags
+	load_values();
 	// Single QSO - do this first as the valeu of single_qso_ affects the others
 	qso_manager* mgr = ancestor_view<qso_manager>(this);
 	if (mgr->data()->current_qso()) bn_single_qso_->activate();

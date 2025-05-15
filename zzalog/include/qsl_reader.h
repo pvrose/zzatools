@@ -8,11 +8,15 @@
 
 using namespace std;
 
+struct server_data_t;
+struct qrz_api_data;
+
 
 // XML element used in qsls.xml
 enum qsl_element_t : char {
     QSL_NONE,         // Not yet processing an element
-    QSL_QSLS,         // Top level elemene <qsls version=".."
+    QSL_QSL_DATA,     // Top level element <qsl_data version=".."
+    QSL_QSLS,         // start of element <qsls>
     QSL_QSL,          // Individual design <qsl call="GM3ZZA" type="label">
     QSL_SIZE,         // Size of overall image <size unit="mm" width="nnn" height="nnn"/>
     QSL_ARRAY,        // Position of images on a printing page - 6 attributes
@@ -26,6 +30,10 @@ enum qsl_element_t : char {
     QSL_OPTIONS,      // Options - vertical=y/n box=y/n multi=y/n always=y/n
     QSL_IMAGE,        // Start of image item
     QSL_FILE,         // Filename <file>.....</file>
+    QSL_SERVERS,      // Start of data for servers
+    QSL_SERVER,       // Start of individual server data
+    QSL_VALUE,        // Individual value item
+    QSL_LOGBOOK,      // Start of individual QRZ.com log book credentials
 };
 
 class qsl_reader :
@@ -35,11 +43,14 @@ public:
     qsl_reader();
     ~qsl_reader();
 
-    // Load datra
-    bool load_data(map<qsl_data::qsl_type, map<string, qsl_data*>* >* data, istream& in);
+    // Load data
+    bool load_data(map<qsl_data::qsl_type, map<string, qsl_data*>* >* data, 
+        map<string, server_data_t*>* servers_,
+        istream& in);
 
 protected:
     // Start the specific elementys
+    static bool start_qsl_data(xml_wreader* w, map<string, string>* attributes);
     static bool start_qsls(xml_wreader* that, map<string, string>* attributes);
     static bool start_qsl(xml_wreader* that, map<string, string>* attributes);
     static bool start_size(xml_wreader* that, map<string, string>* attributes);
@@ -54,15 +65,21 @@ protected:
     static bool start_options(xml_wreader* that, map<string, string>* attributes);
     static bool start_image(xml_wreader* that, map<string, string>* attributes);
     static bool start_file(xml_wreader* that, map<string, string>* attributes);
+    static bool start_servers(xml_wreader* w, map<string, string>* attributes);
+    static bool start_server(xml_wreader* w, map<string, string>* attributes);
+    static bool start_logbook(xml_wreader* w, map<string, string>* attributes);
+    static bool start_value(xml_wreader* w, map<string, string>* attributes);
 
     // End the specific elements
-    static bool end_qsls(xml_wreader* that);
+    static bool end_qsl_data(xml_wreader* that);
     static bool end_qsl(xml_wreader* that);
+    static bool end_value(xml_wreader* w);
 
     // Specific character processing
     static bool chars_file(xml_wreader* that, string content);
     static bool chars_label(xml_wreader* that, string content);
     static bool chars_data(xml_wreader* that, string content);
+    static bool chars_value(xml_wreader* w, string content);
     
 
     // Check version
@@ -76,10 +93,13 @@ protected:
     static Fl_Font parse_font(string s);
     // Convert yes/no into bool
     static bool parse_bool(string s);
+    // Decrypt string
+    static string decrypt(string s, uchar offset);
 
 
     // Name to element mapping
     const map<string, char> element_map_ = {
+        { "QSL_DATA", QSL_QSL_DATA },
         { "QSLS", QSL_QSLS },
         { "QSL", QSL_QSL },
         { "SIZE", QSL_SIZE },
@@ -93,12 +113,17 @@ protected:
         { "OPTIONS", QSL_OPTIONS },
         { "FIELD", QSL_FIELD },
         { "IMAGE", QSL_IMAGE },
-        { "FILE", QSL_FILE }
+        { "FILE", QSL_FILE },
+        { "SERVERS", QSL_SERVERS },
+        { "SERVER", QSL_SERVER },
+        { "LOGBOOK", QSL_LOGBOOK },
+        { "VALUE", QSL_VALUE },
     };
 
 
     const map<char, methods> method_map_ = {
-        { QSL_QSLS, { start_qsls, end_qsls, nullptr }},
+        { QSL_QSL_DATA, { start_qsl_data, end_qsl_data, nullptr }},
+        { QSL_QSLS, { start_qsls, nullptr, nullptr }},
         { QSL_QSL, { start_qsl, end_qsl, nullptr }},
         { QSL_SIZE, { start_size, nullptr, nullptr }},
         { QSL_ARRAY, { start_array, nullptr, nullptr }},
@@ -111,11 +136,17 @@ protected:
         { QSL_DATA, { start_data, nullptr, chars_data }},
         { QSL_OPTIONS, { start_options, nullptr, nullptr }},
         { QSL_IMAGE, { start_image, nullptr, nullptr }},
-        { QSL_FILE, { start_file, nullptr, chars_file }}    
+        { QSL_FILE, { start_file, nullptr, chars_file }}, 
+        { QSL_SERVERS, { start_servers, nullptr, nullptr }},
+        { QSL_SERVER, { start_server, nullptr, nullptr }},
+        { QSL_LOGBOOK, { start_logbook, nullptr, nullptr }},
+        { QSL_VALUE, { start_value, end_value, chars_value }},
+
     };
 
     // The data to load
     map<qsl_data::qsl_type, map<string, qsl_data*>* >* data_;
+    map<string, server_data_t*>* servers_;
    // Attributes
     // callsign
     string callsign_;
@@ -126,6 +157,17 @@ protected:
     qsl_data* current_;
     // Current item definition
     qsl_data::item_def* item_;
-    
+    // Current server data
+    server_data_t* server_;
+    // Current QRZ logbook api credentials
+    qrz_api_data* api_data_;
+    // Current value name
+    string value_name_;
+    // Current value data
+    string value_data_;
+    // Current encryption offset
+    uchar offset_;
+    // Name of parent
+    string parent_name_;
 
 };

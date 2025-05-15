@@ -1,5 +1,7 @@
 #include "qsl_reader.h"
 #include "qsl_data.h"
+#include "qsl_dataset.h"
+#include "qrz_handler.h"
 #include "status.h"
 
 #include <regex>
@@ -8,11 +10,14 @@ using namespace std;
 
 extern status* status_;
 extern string PROGRAM_VERSION;
+extern uint32_t seed_;
 
 // Constructor
 qsl_reader::qsl_reader() :
     xml_wreader()
     , data_(nullptr)
+	, server_(nullptr)
+	, api_data_(nullptr)
     , callsign_("")
     , type_(qsl_data::LABEL)
 	, current_(nullptr)
@@ -28,8 +33,12 @@ qsl_reader::~qsl_reader() {
     elements_.clear();
 }
 
-bool qsl_reader::load_data(map<qsl_data::qsl_type, map<string, qsl_data*>* >* data, istream& in) {
+bool qsl_reader::load_data(
+	map<qsl_data::qsl_type, map<string, qsl_data*>* >* data, 
+	map<string, server_data_t*>* servers,
+	istream& in) {
     data_ = data;
+	servers_ = servers;
   	// calculate the file size and initialise the progress bar
 	streampos startpos = in.tellg();
 	in.seekg(0, ios::end);
@@ -54,14 +63,14 @@ bool qsl_reader::load_data(map<qsl_data::qsl_type, map<string, qsl_data*>* >* da
 	}
 }
 
-// <qsls version="....">
-bool qsl_reader::start_qsls(xml_wreader* that, map<string, string>* attributes) {
+// <qsl_data version="....">
+bool qsl_reader::start_qsl_data(xml_wreader* that, map<string, string>* attributes) {
 	if (that->elements_.size()) {
-		status_->misc_status(ST_ERROR, "QSL DATA: Unexpected QSLS element");
+		status_->misc_status(ST_ERROR, "QSL DATA: Unexpected QSL_DATA element");
 		return false;
 	} 
 	// else
-	that->elements_.push_back(QSL_QSLS);
+	that->elements_.push_back(QSL_QSL_DATA);
 	for (auto it : *attributes) {
 		string name = to_upper(it.first);
 		if (name == "VERSION") {
@@ -72,11 +81,23 @@ bool qsl_reader::start_qsls(xml_wreader* that, map<string, string>* attributes) 
 			}
 			// else 
 			char msg[128];
-			snprintf(msg, sizeof(msg), "QSL DATA: Unexpected attribute %s=%s in QSLS element",
+			snprintf(msg, sizeof(msg), "QSL DATA: Unexpected attribute %s=%s in QSL_DATA element",
 				it.first.c_str(), it.second.c_str());
 			return false;
 		}
 	}
+	return true;
+}
+
+// <qsls>
+bool qsl_reader::start_qsls(xml_wreader* that, map<string, string>* attributes) {
+	// Only expect in QSL
+	if (that->elements_.back() != QSL_QSL_DATA) {
+		status_->misc_status(ST_ERROR, "QSL DATA: Unexpected QSLS element");
+		return false;
+	}
+	// else
+	that->elements_.push_back(QSL_QSLS);
 	return true;
 }
 
@@ -525,11 +546,146 @@ bool qsl_reader::start_file(xml_wreader* that, map<string, string>* attributes) 
 	return true;
 }
 
+// <SERVERS>
+bool qsl_reader::start_servers(xml_wreader* that, map<string, string>* attributes) {
+	if (that->elements_.back() != QSL_QSL_DATA) {
+		status_->misc_status(ST_ERROR, "QSL DATA: Unexpected QSLS element");
+		return false;
+	} 
+	// else
+	that->elements_.push_back(QSL_SERVERS);
+	char msg[128];
+	for (auto it : *attributes) {
+		string name = to_upper(it.first);
+		if (name == "SEED") {
+			uint32_t new_seed = stoi(it.second);
+			if (seed_ == 0) {
+				seed_ = new_seed;
+			} else {
+				snprintf(msg, sizeof(msg), "QSL: Changing value seed from %i to %i", seed_, new_seed);
+				status_->misc_status(ST_WARNING, msg);
+			}
+			return true;
+		}
+		// else 
+		char msg[128];
+		snprintf(msg, sizeof(msg), "QSL DATA: Unexpected attribute %s=%s in QSLS element",
+			it.first.c_str(), it.second.c_str());
+		return false;
+	}
+	return true;
+}
+
+// <SERVER name="[server]">
+bool qsl_reader::start_server(xml_wreader* w, map<string, string>* attributes) {
+	qsl_reader* that = (qsl_reader*)w;
+	if (that->elements_.back() != QSL_SERVERS) {
+		status_->misc_status(ST_ERROR, "QSL DATA: Unexpected SERVER element");
+		return false;
+	} 
+	// else
+	that->elements_.push_back(QSL_SERVER);
+	char msg[128];
+	for (auto it : *attributes) {
+		string name = to_upper(it.first);
+		if (name == "NAME") {
+			string sname = it.second;
+			if (that->servers_->find(sname) != that->servers_->end()) {
+				snprintf(msg, sizeof(msg), "QSL: Already have data for QSL server %s", sname.c_str());
+				status_->misc_status(ST_WARNING, msg);
+			}
+			// else
+			that->parent_name_ = sname;
+			that->server_ = new server_data_t;
+			(*that->servers_)[sname] = that->server_;
+			that->offset_ = hash8(sname.c_str());
+			return true;
+		}
+		// else 
+		char msg[128];
+		snprintf(msg, sizeof(msg), "QSL DATA: Unexpected attribute %s=%s in QSLS element",
+			it.first.c_str(), it.second.c_str());
+		return false;
+	}
+	if (that->server_ == nullptr) {
+		snprintf(msg, sizeof(msg), "QSL: No server name supplied");
+		status_->misc_status(ST_ERROR, msg);
+		return false;
+	}
+	return true;
+}
+
+bool qsl_reader::start_logbook(xml_wreader* w, map<string, string>* attributes) {
+	qsl_reader* that = (qsl_reader*)w;
+	if (that->elements_.back() != QSL_SERVER) {
+		status_->misc_status(ST_ERROR, "QSL DATA: Unexpected LOGBOOK element");
+		return false;
+	} 
+	// else
+	that->elements_.push_back(QSL_LOGBOOK);
+	char msg[128];
+	for (auto it : *attributes) {
+		string name = to_upper(it.first);
+		if (name == "CALL") {
+			string sname = it.second;
+			if (that->server_->api_data.find(sname) != that->server_->api_data.end()) {
+				snprintf(msg, sizeof(msg), "QSL: Already have api data for QRZ callsign %s", sname.c_str());
+				status_->misc_status(ST_WARNING, msg);
+			}
+			// else
+			that->parent_name_ = sname;
+			that->api_data_ = new qrz_api_data;
+			that->server_->api_data[sname] = that->api_data_;
+			return true;
+		}
+		// else 
+		char msg[128];
+		snprintf(msg, sizeof(msg), "QSL DATA: Unexpected attribute %s=%s in QSLS element",
+			it.first.c_str(), it.second.c_str());
+		return false;
+	}
+	if (that->api_data_ == nullptr) {
+		snprintf(msg, sizeof(msg), "QSL: No logbook name supplied");
+		status_->misc_status(ST_ERROR, msg);
+		return false;
+	}
+	return true;
+
+}
+
+bool qsl_reader::start_value(xml_wreader* w, map<string, string>* attributes) {
+	qsl_reader* that = (qsl_reader*)w;
+	switch(that->elements_.back()) {
+		case QSL_SERVER:
+		case QSL_LOGBOOK:
+			that->elements_.push_back(QSL_VALUE);
+			// get the name
+			for (auto it : *attributes) {
+				string name = to_upper(it.first);
+				if (name == "NAME") {
+					// Iyt might be an empty value
+					that->value_data_ = "";
+					that->value_name_ = it.second;
+					return true;
+				}
+				// else
+				char msg[128];
+				snprintf(msg, sizeof(msg), "QSL: Unexpected attribute %s=%s in VALUE element",
+					it.first.c_str(), it.second.c_str());
+				return false;
+			}
+		default:
+			status_->misc_status(ST_ERROR, "QSL: Unexpected VALUE element");
+			return false;
+		}
+	
+}
+
 // </QSLS>
-bool qsl_reader::end_qsls(xml_wreader* w) {
+bool qsl_reader::end_qsl_data(xml_wreader* w) {
 	qsl_reader* that = (qsl_reader*)w;
 	if (that->elements_.size()) {
-		status_->misc_status(ST_ERROR, "QSL DATA: Closing /RIGS element encountered unexpectedly");
+		status_->misc_status(ST_ERROR, "QSL DATA: Closing /QSL_DATA element encountered unexpectedly");
 		return false;
 	} 
 	return true;
@@ -544,6 +700,54 @@ bool qsl_reader::end_qsl(xml_wreader* w) {
 	that->item_ = nullptr;
 	return true;
 }
+
+// </VALUE>
+bool qsl_reader::end_value(xml_wreader* w) {
+	char msg[128];
+	qsl_reader* that = (qsl_reader*)w;
+	qsl_element_t parent = (qsl_element_t)that->elements_.back();
+	server_data_t* sd = that->server_;
+	qrz_api_data* ad = that->api_data_;
+	string& vn = that->value_name_;
+	string& vd = that->value_data_;
+	uchar& off = that->offset_;
+	switch(parent) {
+	case QSL_SERVER:
+		if (vn == "Enable") sd->enabled = parse_bool(vd);
+		else if (vn == "Upload per QSO") sd->upload_per_qso = parse_bool(vd);
+		else if (vn == "User") sd->user = vd;
+		else if (vn == "Password") sd->password = decrypt(vd, off);
+		else if (vn == "Last Download") sd->last_downloaded = vd;
+		else if (vn == "Download Confirmed") sd->download_confirmed = parse_bool(vd);
+		else if (vn == "QSO Message") sd->qso_message = vd;
+		else if (vn == "SWL Message") sd->swl_message = vd;
+		else if (vn == "Export File") sd->export_file = vd;
+		else if (vn == "Use XML Database") sd->use_xml = parse_bool(vd);
+		else if (vn == "Use API") sd->use_api = parse_bool(vd);
+		else if (vn == "eMail Server") sd->mail_server = vd;
+		else if (vn == "cc Address") sd->cc_address = vd;
+		else {
+			snprintf(msg, sizeof(msg), "QSL: Unexpected value item %s: %s in Server %s",
+				vn.c_str(), vd.c_str(), that->parent_name_.c_str());
+			status_->misc_status(ST_ERROR, msg);
+			return false;
+		}
+		return true;
+	case QSL_LOGBOOK:
+		if (vn == "Key") ad->key = decrypt(vd, off);
+		if (vn == "Last Download") ad->last_download = vd;
+		if (vn == "In Use") ad->used = parse_bool(vd);
+		else {
+			snprintf(msg, sizeof(msg), "QSL: Unexpected value item %s: %s in Server %s",
+				vn.c_str(), vd.c_str(), that->parent_name_.c_str());
+			status_->misc_status(ST_ERROR, msg);
+			return false;
+		}
+		return true;
+	default:
+		return false;
+	}
+}
 // <FILE>[filename]</FILE>
 bool qsl_reader::chars_file(xml_wreader* w, string content) {
 	qsl_reader* that = (qsl_reader*)w;
@@ -555,6 +759,8 @@ bool qsl_reader::chars_file(xml_wreader* w, string content) {
 		return false;
 	}
 }
+
+
 
 // <LABEL FONT=.....>[Text to use]</LABEL
 bool qsl_reader::chars_label(xml_wreader* w, string content) {
@@ -582,6 +788,11 @@ bool qsl_reader::chars_data(xml_wreader* w, string content) {
 		status_->misc_status(ST_ERROR, "QSL DATA: Processing data when not processing a field or text item");
 		return false;
 	}
+}
+
+bool qsl_reader::chars_value(xml_wreader* w, string content) {
+	((qsl_reader*)w)->value_data_ = content;
+	return true;
 }
 
 // Valid date - YYYYMMDD from 1930
@@ -632,6 +843,10 @@ bool qsl_reader::parse_bool(string s) {
 	else return false;
 }
 
+// Decrypt stored value - stored as hex digits 
+string qsl_reader::decrypt(string s, uchar off) {
+	return xor_crypt(hex_to_string(s), seed_, off);
+}
 // Check app version is >= version in settings file
 bool qsl_reader::check_version(string v) {
 	vector<string> file_words;

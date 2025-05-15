@@ -8,11 +8,12 @@
 #include "extract_data.h"
 #include "fields.h"
 #include "record.h"
+#include "qsl_dataset.h"
 
 #include <cstdlib>
 
 #include <FL/Fl_Native_File_Chooser.H>
-#include <FL/Fl_Preferences.H>
+// #include <FL/Fl_Preferences.H>
 #include <FL/Fl_Text_Display.H>
 #include <FL/Fl_Window.H>
 #include <FL/fl_draw.H>
@@ -23,9 +24,7 @@ extern book* book_;
 extern url_handler* url_handler_;
 extern bool DEBUG_THREADS;
 extern fields* fields_;
-extern uint32_t seed_;
-extern string VENDOR;
-extern string PROGRAM_ID;
+extern qsl_dataset* qsl_dataset_;
 
 // Constructor
 lotw_handler::lotw_handler()
@@ -54,16 +53,14 @@ bool lotw_handler::upload_lotw_log(book* book, bool mine) {
 	status_->misc_status(ST_DEBUG, "LOTW: uploading extracted data");
 	fl_cursor(FL_CURSOR_WAIT);
 	// Get LotW settings
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-	Fl_Preferences qsl_settings(settings, "QSL");
-	Fl_Preferences lotw_settings(qsl_settings, "LotW");
-	char* filename;
+	server_data_t* lotw_data = qsl_dataset_->get_server_data("LotW");
+	string filename = lotw_data->export_file;
 	string new_filename = "";
 	bool ok = true;
-	lotw_settings.get("Export File", filename, "");
+	// lotw_settings.get("Export File", filename, "");
 	// Open a file chooser to get file to export to - allows user to cancel upload
 	Fl_Native_File_Chooser* chooser = nullptr;
-	if (strlen(filename) == 0) {
+	if (filename.length() == 0) {
 		chooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_SAVE_FILE);
 		chooser->title("Please select file for sending to LotW");
 		chooser->filter("ADI Files\t*.adi");
@@ -73,7 +70,7 @@ bool lotw_handler::upload_lotw_log(book* book, bool mine) {
 	}
 	else {
 		new_filename = filename;
-		free(filename);
+		// free(filename);
 	}
 	if (chooser != nullptr && !ok) {
 		// User cancelled
@@ -85,37 +82,14 @@ bool lotw_handler::upload_lotw_log(book* book, bool mine) {
 		char message[256];
 		snprintf(message, 256, "LOTW: Writing file %s", new_filename.c_str());
 		status_->misc_status(ST_DEBUG, message);
-		lotw_settings.set("Export File", new_filename.c_str());
+		lotw_data->export_file = new_filename;
+		// lotw_settings.set("Export File", new_filename.c_str());
 		// Set the fields to export 
 		// Write the book (only the above fields)
 		if (book->size() && book->store_data(string(new_filename), true, &adif_fields_)) {
 #ifdef WIN32
 			// Get the TQSL (an app that signs the upload) executable
-			string tqsl_executable;
-			char* temp;
-			Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-			Fl_Preferences datapath_settings(settings, "Datapath");
-			datapath_settings.get("TQSL Executable", temp, "");
-			tqsl_executable = temp;
-			free(temp);
-			// We have no value in the settings for it
-			if (!tqsl_executable.length()) {
-				// Create an Open dialog; the default file name extension is ".exe".
-				Fl_Native_File_Chooser* chooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_FILE);
-				chooser->title("Please locate TQSL executable");
-				chooser->filter("Applications\t*.exe");
-				if (chooser->show() != 0) {
-					// No executable found - cancel upload
-					status_->misc_status(ST_ERROR, "LOTW: TQSL Executable not found, upload cancelled");
-					ok = false;
-				}
-				else {
-					// Set the value in the settings
-					tqsl_executable = chooser->filename();
-					datapath_settings.set("TQSL Executable", tqsl_executable.c_str());
-				}
-				delete chooser;
-			}
+			string tqsl_executable = "tqsl";
 #else
 			string tqsl_executable = "tqsl";
 #endif			
@@ -217,10 +191,8 @@ bool lotw_handler::download_lotw_log(stringstream* adif) {
 		ok = false;
 	}
 	if (ok) {
-		Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-		Fl_Preferences qsl_settings(settings, "QSL");
-		Fl_Preferences lotw_settings(qsl_settings, "LotW");
-		lotw_settings.set("Last Accessed", now(false, "%Y%m%d").c_str());
+		server_data_t* lotw_data = qsl_dataset_->get_server_data("LotW");
+		lotw_data->last_downloaded = now(false, "%Y%m%d");
 	}
 	fl_cursor(FL_CURSOR_DEFAULT);
 	return ok;
@@ -228,34 +200,16 @@ bool lotw_handler::download_lotw_log(stringstream* adif) {
 
 // get user details - set any parameter to nullptr to skip setting it
 bool lotw_handler::user_details(string* username, string* password, string* last_access) {
-	// Get LotW login details from the settings
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-	Fl_Preferences qsl_settings(settings, "QSL");
-	Fl_Preferences lotw_settings(qsl_settings, "LotW");
-	char * temp;
+	server_data_t* lotw_data = qsl_dataset_->get_server_data("LotW");
 	if (username != nullptr) {
-		lotw_settings.get("User", temp, "");
-		*username = temp;
-		free(temp);
+		*username = lotw_data->user;
 	}
 	// Check password
 	if (password != nullptr) {
-		int pwlen;
-		uchar offset = hash8(lotw_settings.path());
-		lotw_settings.get("Password Length", pwlen, 0);
-		char* btemp = new char[pwlen];
-		lotw_settings.get("Password", btemp, (void*)"", 0, &pwlen);
-		string crypt(btemp, pwlen);
-		*password = xor_crypt(crypt, seed_, offset);
+		*password = lotw_data->password;
 	}
 	if (last_access != nullptr) {
-		string today = now(false, "%Y%m%d");
-		lotw_settings.get("Last Accessed", temp, today.c_str());
-		*last_access = temp;
-		free(temp);
-		if (last_access->length() != 8) {
-			*last_access = today;
-		}
+		*last_access = lotw_data->last_downloaded;
 	}
 	// If we've not got a username or password
 	if (username == nullptr || *username == "" || password == nullptr || *password == "") {
@@ -299,11 +253,8 @@ bool lotw_handler::validate_adif(stringstream* adif) {
 
 // Upload single QSO
 bool lotw_handler::upload_single_qso(item_num_t record_num) {
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-	Fl_Preferences qsl_settings(settings, "QSL");
-	Fl_Preferences lotw_settings(qsl_settings, "LotW");
-	int upload_qso;
-	lotw_settings.get("Upload per QSO", upload_qso, false);
+	server_data_t* lotw_data = qsl_dataset_->get_server_data("LotW");
+	bool upload_qso = lotw_data->upload_per_qso;
 	if (upload_qso == false) {
 		status_->misc_status(ST_WARNING, "LOTW: Uploading per QSO is disabled.");
 	}
