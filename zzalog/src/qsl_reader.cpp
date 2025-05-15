@@ -735,10 +735,10 @@ bool qsl_reader::end_value(xml_wreader* w) {
 		return true;
 	case QSL_LOGBOOK:
 		if (vn == "Key") ad->key = decrypt(vd, off);
-		if (vn == "Last Download") ad->last_download = vd;
-		if (vn == "In Use") ad->used = parse_bool(vd);
+		else if (vn == "Last Download") ad->last_download = vd;
+		else if (vn == "In Use") ad->used = parse_bool(vd);
 		else {
-			snprintf(msg, sizeof(msg), "QSL: Unexpected value item %s: %s in Server %s",
+			snprintf(msg, sizeof(msg), "QSL: Unexpected value item %s: %s in Logbook %s",
 				vn.c_str(), vd.c_str(), that->parent_name_.c_str());
 			status_->misc_status(ST_ERROR, msg);
 			return false;
