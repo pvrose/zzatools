@@ -176,7 +176,7 @@ using namespace std::chrono;
 
 		// Protected attributes
 	protected:
-		void th_read_values();
+		bool th_read_values();
 		// Open rig - run in thread
 		bool th_open_rig();
 		// Handle errors
