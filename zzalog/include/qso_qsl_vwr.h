@@ -112,9 +112,12 @@ protected:
 	// QSL status
 	Fl_Light_Button* bn_eqsl_rstatus_;
 	Fl_Light_Button* bn_lotw_rstatus_;
+	Fl_Light_Button* bn_qrz_rstatus_;
 	Fl_Light_Button* bn_card_rstatus_;
 	Fl_Light_Button* bn_eqsl_sstatus_;
 	Fl_Light_Button* bn_lotw_sstatus_;
+	Fl_Light_Button* bn_qrz_sstatus_;
+	Fl_Light_Button* bn_club_sstatus_;
 	Fl_Light_Button* bn_card_sstatus_;
 	// Window to contain full view
 	Fl_Window* win_full_view_;

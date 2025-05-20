@@ -127,20 +127,28 @@ void qso_qsl_vwr::create_form() {
 
 	curr_x += WRADIO;
 
+	const int WSTATUS = WBUTTON * 3 / 5;
+
 	// Light to indicate received eQSL
-	bn_eqsl_rstatus_ = new Fl_Light_Button(curr_x, curr_y, WBUTTON, HRADIO, "eQSL");
+	bn_eqsl_rstatus_ = new Fl_Light_Button(curr_x, curr_y, WSTATUS, HRADIO, "eQSL");
 	bn_eqsl_rstatus_->box(FL_FLAT_BOX);
 	bn_eqsl_rstatus_->type(bn_eqsl_rstatus_->type() & ~FL_TOGGLE_BUTTON);
 
-	curr_x += WBUTTON;
+	curr_x += WSTATUS;
 	// Light to indicate received LotW
-	bn_lotw_rstatus_ = new Fl_Light_Button(curr_x, curr_y, WBUTTON, HRADIO, "LotW");
+	bn_lotw_rstatus_ = new Fl_Light_Button(curr_x, curr_y, WSTATUS, HRADIO, "LotW");
 	bn_lotw_rstatus_->box(FL_FLAT_BOX);
 	bn_lotw_rstatus_->type(bn_lotw_rstatus_->type() & ~FL_TOGGLE_BUTTON);
 
-	curr_x += WBUTTON;
+	curr_x += WSTATUS;
+	// Light to indicate received LotW
+	bn_qrz_rstatus_ = new Fl_Light_Button(curr_x, curr_y, WSTATUS, HRADIO, "QRZ");
+	bn_qrz_rstatus_->box(FL_FLAT_BOX);
+	bn_qrz_rstatus_->type(bn_qrz_rstatus_->type() & ~FL_TOGGLE_BUTTON);
+
+	curr_x += WSTATUS + WSTATUS;
 	// Light to indicate received a paper card
-	bn_card_rstatus_ = new Fl_Light_Button(curr_x, curr_y, WBUTTON, HRADIO, "Card");
+	bn_card_rstatus_ = new Fl_Light_Button(curr_x, curr_y, WSTATUS, HRADIO, "Card");
 	bn_card_rstatus_->box(FL_FLAT_BOX);
 	bn_card_rstatus_->type(bn_card_rstatus_->type() & ~FL_TOGGLE_BUTTON);
 
@@ -155,19 +163,31 @@ void qso_qsl_vwr::create_form() {
 	curr_x += WRADIO;
 
 	// Light to indicate received eQSL
-	bn_eqsl_sstatus_ = new Fl_Light_Button(curr_x, curr_y, WBUTTON, HRADIO, "eQSL");
+	bn_eqsl_sstatus_ = new Fl_Light_Button(curr_x, curr_y, WSTATUS, HRADIO, "eQSL");
 	bn_eqsl_sstatus_->box(FL_FLAT_BOX);
 	bn_eqsl_sstatus_->type(bn_eqsl_sstatus_->type() & ~FL_TOGGLE_BUTTON);
 
-	curr_x += WBUTTON;
+	curr_x += WSTATUS;
 	// Light to indicate received LotW
-	bn_lotw_sstatus_ = new Fl_Light_Button(curr_x, curr_y, WBUTTON, HRADIO, "LotW");
+	bn_lotw_sstatus_ = new Fl_Light_Button(curr_x, curr_y, WSTATUS, HRADIO, "LotW");
 	bn_lotw_sstatus_->box(FL_FLAT_BOX);
 	bn_lotw_sstatus_->type(bn_lotw_sstatus_->type() & ~FL_TOGGLE_BUTTON);
 
-	curr_x += WBUTTON;
+	curr_x += WSTATUS;
+	// Light to indicate received LotW
+	bn_qrz_sstatus_ = new Fl_Light_Button(curr_x, curr_y, WSTATUS, HRADIO, "QRZ");
+	bn_qrz_sstatus_->box(FL_FLAT_BOX);
+	bn_qrz_sstatus_->type(bn_lotw_sstatus_->type() & ~FL_TOGGLE_BUTTON);
+
+	curr_x += WSTATUS;
+	// Light to indicate received LotW
+	bn_club_sstatus_ = new Fl_Light_Button(curr_x, curr_y, WSTATUS, HRADIO, "Club");
+	bn_club_sstatus_->box(FL_FLAT_BOX);
+	bn_club_sstatus_->type(bn_lotw_sstatus_->type() & ~FL_TOGGLE_BUTTON);
+
+	curr_x += WSTATUS;
 	// Light to indicate received a paper card
-	bn_card_sstatus_ = new Fl_Light_Button(curr_x, curr_y, WBUTTON, HRADIO, "Card");
+	bn_card_sstatus_ = new Fl_Light_Button(curr_x, curr_y, WSTATUS, HRADIO, "Card");
 	bn_card_sstatus_->box(FL_FLAT_BOX);
 	bn_card_sstatus_->type(bn_card_sstatus_->type() & ~FL_TOGGLE_BUTTON);
 
@@ -778,6 +798,11 @@ void qso_qsl_vwr::set_qsl_status() {
 		else {
 			bn_lotw_rstatus_->value(false);
 		}
+		if (current_qso_->item("QRZCOM_QSO_DOWNLOAD_STATUS") == "Y") {
+			bn_qrz_rstatus_->value(true);
+		} else {
+			bn_qrz_rstatus_->value(false);
+		}
 		if (current_qso_->item("QSL_RCVD") == "Y") {
 			bn_card_rstatus_->value(true);
 			string s = current_qso_->item("QSL_RCVD_VIA");
@@ -809,6 +834,20 @@ void qso_qsl_vwr::set_qsl_status() {
 		}
 		else {
 			bn_lotw_sstatus_->value(false);
+		}
+		if (current_qso_->item("QRZCOM_QSO_UPLOAD_STATUS") == "Y") {
+			bn_qrz_sstatus_->value(true);
+		} else {
+			bn_qrz_sstatus_->value(false);
+		}
+		if (current_qso_->item("CLUBLOG_QSO_UPLOAD_STATUS") == "Y") {
+			bn_club_sstatus_->value(true);
+			bn_club_sstatus_->selection_color(FL_YELLOW);
+		} else if (current_qso_->item("CLUBLOG_QSO_UPLOAD_STATUS") == "M") {
+			bn_club_sstatus_->value(true);
+			bn_club_sstatus_->selection_color(FL_RED);
+		} else {
+			bn_club_sstatus_->value(false);
 		}
 		if (current_qso_->item("QSL_SENT") == "Y") {
 			bn_card_sstatus_->value(true);
