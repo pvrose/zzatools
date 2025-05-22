@@ -613,7 +613,10 @@ void log_table::draw_cell(TableContext context, int R, int C, int X, int Y, int 
 				if (direct == text) font &= ~FL_ITALIC;
 				else font |= FL_ITALIC;
 				bool swl = this_record->item("SWL") == "Y";
-				if (swl) font |= FL_ITALIC;
+				if (swl) { 
+					font |= FL_ITALIC;
+					fl_color(fl_color_average(fl_color(), bg_colour, 2.F/3.F));
+				}
 				else font &= ~FL_ITALIC;
 				// if (DARK) font |= FL_BOLD;
 				// else font &= ~FL_BOLD;
