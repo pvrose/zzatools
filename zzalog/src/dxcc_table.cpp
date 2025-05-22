@@ -48,7 +48,7 @@ void dxcc_table::draw_cell(TableContext context, int R, int C, int X, int Y, int
     case CONTEXT_ROW_HEADER: {
         fl_push_clip(X, Y, W, H);
         // Draw the box
-        fl_color(COLOUR_GREY);
+        fl_color(FL_BACKGROUND_COLOR);
         fl_rectf(X, Y, W, H);
         fl_color(FL_FOREGROUND_COLOR);
         fl_yxline(X, Y, Y + H - 1, X + W);
@@ -80,7 +80,7 @@ void dxcc_table::draw_cell(TableContext context, int R, int C, int X, int Y, int
     case CONTEXT_COL_HEADER:
         fl_push_clip(X, Y, W, H);
         // Draw the box
-        fl_color(COLOUR_GREY);
+        fl_color(FL_BACKGROUND_COLOR);
         fl_rectf(X, Y, W, H);
         fl_color(FL_FOREGROUND_COLOR);
         fl_yxline(X, Y, Y + H - 1, X + W);
@@ -99,7 +99,7 @@ void dxcc_table::draw_cell(TableContext context, int R, int C, int X, int Y, int
     case CONTEXT_CELL: {
         fl_push_clip(X, Y, W, H);
         // Draw the box
-        fl_color(FL_BACKGROUND_COLOR);
+        fl_color(FL_WHITE);
         fl_rectf(X, Y, W, H);
         fl_color(FL_FOREGROUND_COLOR);
         fl_yxline(X, Y, Y + H - 1, X + W);
