@@ -508,7 +508,7 @@ void log_table::draw_cell(TableContext context, int R, int C, int X, int Y, int 
 	{
 		// Code trying to write text into the top-left corner
 		// Set the font for the header header
-		fl_font(fl_font() | FL_ITALIC, fontsize_);
+		fl_font(fl_font() ^ FL_ITALIC, fontsize_);
 		// Set the col header row header crossing point
 		fl_color(col_header_color());
 		int X1 = Fl_Table_Row::wix;
@@ -549,7 +549,7 @@ void log_table::draw_cell(TableContext context, int R, int C, int X, int Y, int 
 			}
 			// Make this italic version of default font
 			Fl_Font save = fl_font();
-			fl_font(font_ | FL_BOLD_ITALIC, fontsize_);
+			fl_font(font_ ^ FL_BOLD_ITALIC, fontsize_);
 			// Display record number (starting at 1) in the row header
 			text = to_string(my_book_->record_number(item_number) + 1);
 			fl_draw(text.c_str(), X, Y, W, H, FL_ALIGN_LEFT);
@@ -610,14 +610,14 @@ void log_table::draw_cell(TableContext context, int R, int C, int X, int Y, int 
 				string direct = this_record->item((*log_fields_)[C].field, true, false);
 				text = this_record->item((*log_fields_)[C].field, true, true);
 				Fl_Font font = font_;
-				if (direct == text) font &= ~FL_ITALIC;
-				else font |= FL_ITALIC;
+				if (direct == text) font = font;
+				else font ^= FL_ITALIC;
 				bool swl = this_record->item("SWL") == "Y";
 				if (swl) { 
-					font |= FL_ITALIC;
+					font ^= FL_ITALIC;
 					fl_color(fl_color_average(fl_color(), bg_colour, 2.F/3.F));
 				}
-				else font &= ~FL_ITALIC;
+				else font = font;
 				// if (DARK) font |= FL_BOLD;
 				// else font &= ~FL_BOLD;
 				fl_font(font, fontsize_);

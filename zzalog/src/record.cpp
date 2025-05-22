@@ -114,6 +114,19 @@ void record::item(string field, string value, bool formatted/* = false*/, bool d
 	}
 	// Otherwise if writing to "", erase the item
 	if (!value.length()) {
+		// SEt dirty flag if contents are changing
+		if (dirty) {
+			string orig_value;
+			if (find(field) != end()) {
+				orig_value = at(field);
+			}
+			else {
+				orig_value = "";
+			}
+			if (orig_value != "") {
+				book_->add_dirty_record(this);
+			}
+		}
 		erase(field);
 		return;
 	}
