@@ -72,11 +72,11 @@ main.cpp - application entry point
 using namespace std;
 
 // Program strings
-string COPYRIGHT = "\302\251 Philip Rose GM3ZZA 2018. All rights reserved.\nPrefix data courtesy of clublog.org";
+string COPYRIGHT = "\302\251 Philip Rose GM3ZZA 2018-2025. All rights reserved.\nPrefix data courtesy of clublog.org";
 string DATA_COPYRIGHT = "\302\251 Philip Rose %s. This data may be copied for the purpose of correlation and analysis";
 string PROGRAM_ID = "ZZALOG";
 string PROG_ID = "ZLG";
-string PROGRAM_VERSION = "3.4.114";
+string PROGRAM_VERSION = "3.5.0";
 string VENDOR = "GM3ZZA";
 string TIMESTAMP = string(__DATE__) + " " + string(__TIME__);
 
