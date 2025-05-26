@@ -704,5 +704,8 @@
     <Image Include="zzalog\zzalog.ico">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="rose.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

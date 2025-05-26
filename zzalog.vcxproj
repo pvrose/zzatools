@@ -390,6 +390,7 @@
     <None Include="zzalog\Makefile" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="rose.png" />
     <Image Include="zzalog\zzalog.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
