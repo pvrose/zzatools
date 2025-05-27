@@ -37,12 +37,8 @@ using namespace std;
 		string tqsl_executable_;
 		// eQSL e-card directory
 		string card_directory_;
-		// Reference data (prefix database and ADIF specification database)
-		string ref_data_directory_;
 		// Back up directory
 		string backup_directory_;
-		// Status log file
-		string status_log_file_;
 		// All.txt file
 		string wsjtx_directory_;
 		// Unzipper location

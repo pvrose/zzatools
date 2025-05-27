@@ -1,4 +1,4 @@
-#include "intl_dialog.h"
+﻿#include "intl_dialog.h"
 #include "utils.h"
 #include "status.h"
 #include "callback.h"
@@ -10,13 +10,14 @@
 #include <FL/Fl_Text_Editor.H>
 #include <FL/Fl_Native_File_Chooser.H>
 
-
-
-
 extern status* status_;
 extern menu* menu_;
 extern string VENDOR;
 extern string PROGRAM_ID;
+extern string default_data_directory_;
+
+// Majo
+string DEFAULT_INTL = "";
 
 // Constructs a window 
 intl_dialog::intl_dialog() :
@@ -78,7 +79,14 @@ void intl_dialog::add_buttons(int width) {
 	buttons_->begin();
 	// Get size of array
 	int num_cols = width / HBUTTON;
-	int num_rows = ((symbols_.size() - 1) / num_cols) + 1;
+	int num_rows;
+	// Have to do it this way as mixed signed/unsigned arithmetic
+	if (symbols_.size()) {
+		num_rows = ((symbols_.size() - 1) / num_cols) + 1;
+	}
+	else {
+		num_rows = 0;
+	}
 	// Max 4 bytes per UTF character plus terminal \0
 	char utf8[5];
 	int len;
@@ -179,33 +187,7 @@ void intl_dialog::cb_bn_use(Fl_Widget* w, void* v) {
 
 // Get the data path to the files - returns directory name
 string intl_dialog::get_path() {
-	// get the datapath settings group.
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-	Fl_Preferences datapath(settings, "Datapath");
-	char *dirname = nullptr;
-	string directory_name;
-	// get the value from settings or force new browse
-	if (!datapath.get("Reference", dirname, "")) {
-		// We do not have one - so open chooser to get one
-		//Fl_File_Chooser* chooser = new Fl_File_Chooser(dirname, nullptr, Fl_File_Chooser::DIRECTORY,
-		//	"Select reference file directory");
-		Fl_Native_File_Chooser* chooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_DIRECTORY);
-		chooser->title("Select reference file directory");
-		chooser->preset_file(dirname);
-		while (chooser->show()) {}
-		directory_name = chooser->filename();
-		delete chooser;
-	}
-	else {
-		directory_name = dirname;
-	}
-	// Append a foreslash if one is not present
-	if (directory_name.back() != '/') {
-		directory_name.append(1, '/');
-	}
-	if (dirname) free(dirname);
-	datapath.set("Reference", directory_name.c_str());
-	return directory_name;
+	return default_data_directory_;
 }
 
 // Set the widget to receive the pasted character
@@ -245,17 +227,23 @@ bool intl_dialog::load_data() {
 	symbols_.clear();
 	ifstream is(filename_.c_str());
 	string line;
-	while (is.good()) {
-		getline(is, line);
-		if (is.good()) {
-			add_symbols(line);
-		}
-	}
-	if (is.eof()) {
+	if (!is.good()) {
+		add_symbols(DEFAULT_INTL);
 		return true;
 	}
 	else {
-		return false;
+		while (is.good()) {
+			getline(is, line);
+			if (is.good()) {
+				add_symbols(line);
+			}
+		}
+		if (is.eof()) {
+			return true;
+		}
+		else {
+			return false;
+		}
 	}
 }
 

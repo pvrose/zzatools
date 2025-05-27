@@ -50,11 +50,11 @@ protected:
     // Load data from preferences file
     void load_prefs(Fl_Preferences& settings);
     // Load data from XML 
-    bool load_xml(Fl_Preferences& settings);
+    bool load_xml();
     // Store data to preferences directory
     bool store_data();
     // Store data to XML
-    bool store_xml(Fl_Preferences& settings);
+    bool store_xml();
     // The rig data
     map<string, rig_data_t*> data_;
 

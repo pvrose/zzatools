@@ -33,6 +33,7 @@ extern cty_data* cty_data_;
 extern status* status_;
 extern string VENDOR;
 extern string PROGRAM_ID;
+extern string default_data_directory_;
 
 // Default constructor
 spec_data::spec_data()
@@ -54,7 +55,7 @@ spec_data::spec_data()
 	, bands_(nullptr)
 {
 	// get data and load it
-	load_data(false);
+	load_data();
 }
 
 // Default destructor
@@ -84,38 +85,12 @@ spec_data::~spec_data()
 }
 
 // Get the data path to the files - returns directory name
-string spec_data::get_path(bool force) {
-	// get the datapath settings group.
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-	Fl_Preferences datapath(settings, "Datapath");
-	char *dirname = nullptr;
-	string directory_name;
-	// get the value from settings or force new browse
-	if (force || !datapath.get("Reference", dirname, "")) {
-		// We do not have one - so open chooser to get one
-		//Fl_File_Chooser* chooser = new Fl_File_Chooser(dirname, nullptr, Fl_File_Chooser::DIRECTORY,
-		//	"Select reference file directory");
-		Fl_Native_File_Chooser* chooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_DIRECTORY);
-		if (!force)	chooser->directory(dirname);
-		chooser->title("Select reference file directory");
-		while (chooser->show()) {}
-		directory_name = chooser->filename();
-		delete chooser;
-	}
-	else {
-		directory_name = dirname;
-	}
-	// Append a foreslash if one is not present
-	if (directory_name.back() != '/') {
-		directory_name.append(1, '/');
-	}
-	if (dirname) free(dirname);
-	datapath.set("Reference", directory_name.c_str());
-	return directory_name;
+string spec_data::get_path() {
+	return default_data_directory_;
 }
 
 // load the data
-bool spec_data::load_data(bool force) {
+bool spec_data::load_data() {
 	// Clear all containers
 	field_names_.clear();
 	userdef_names_.clear();
@@ -126,7 +101,7 @@ bool spec_data::load_data(bool force) {
 
 	bool ok = true;
 	// Get the directory
-	string directory = get_path(force);
+	string directory = get_path();
 	// Open an ADIF Specification input interpreter
 	specx_reader* reader = new specx_reader;
 	// Create an input stream from the file
@@ -136,25 +111,27 @@ bool spec_data::load_data(bool force) {
 	// Load data from the input stream to the appropriate dataset
 	if (file.good()) {
 		ok = reader->load_data(this, file, adif_version_);
+		file.close();
+		delete reader;
 	} else {
 		ok = false;
 		char* message = new char[30 + file_name.length()];
-		sprintf(message, "ADIF SPEC: Fail to open %s", file_name.c_str());
+		sprintf(message, "ADIF SPEC: Fail to open %s - finding file", file_name.c_str());
 		status_->misc_status(ST_WARNING, message);
 		file.close();
-		// Try again to get a new reference
-		if (!force) {
-			ok = load_data(true);
-			return ok;
-		}
+		delete reader;
+		ok = find_and_copy_data();
+		ok &= load_data();
 	}
-	file.close();
-	delete reader;
 	if (ok) {
 		// File read in OK
 		process_fieldnames();
 		process_modes();
 		add_my_appdefs();
+		data_loaded_ = true;
+	}
+	else {
+		data_loaded_ = false;
 	}
 	return ok;
 }
@@ -2591,3 +2568,59 @@ string spec_data::summarise_enumaration(string name, string value) {
 	}
 }
 
+bool spec_data::valid() { return data_loaded_; }
+
+// Locate the all.xml file and copy to default data directory
+bool spec_data::find_and_copy_data() {
+	string source;
+	Fl_Native_File_Chooser* chooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_FILE);
+	chooser->title("Select ADIF Spec all.xml");
+	chooser->filter("XML File\t*.xml");
+	if (chooser->show() == 0) {
+		source = chooser->filename();
+	}
+	delete chooser;
+	string target = get_path() + ADIF_FILE;
+	char msg[128];
+	snprintf(msg, sizeof(msg), "ADIF SPEC: Copying %s", source.c_str());
+	status_->misc_status(ST_NOTE, msg);
+	// In and out streams
+	ifstream in(source);
+	in.seekg(0, in.end);
+	int length = (int)in.tellg();
+	const int increment = 8000;
+	in.seekg(0, in.beg);
+	status_->progress(length, OT_ADIF, "Copying data to backup", "bytes");
+	ofstream out(target);
+	bool ok = in.good() && out.good();
+	char buffer[increment];
+	int count = 0;
+	// Copy file in 7999 byte chunks
+	while (!in.eof() && ok) {
+		in.read(buffer, increment);
+		out.write(buffer, in.gcount());
+		count += (int)in.gcount();
+		ok = out.good() && (in.good() || in.eof());
+		status_->progress(count, OT_ADIF);
+	}
+	if (!ok) {
+		status_->progress("Failed before completion", OT_ADIF);
+	}
+	else {
+		if (count != length) {
+			status_->progress(length, OT_ADIF);
+		}
+	}
+	in.close();
+	out.close();
+	if (!ok) {
+		// Report error
+		status_->misc_status(ST_FATAL, "ADIF SPEC: failed");
+		data_loaded_ = false;
+		return false;
+	}
+	else {
+		status_->misc_status(ST_OK, "ADIF SPEC: Copied");
+		return true;
+	}
+}

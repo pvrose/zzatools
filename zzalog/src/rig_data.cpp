@@ -14,6 +14,7 @@ using namespace std;
 extern string VENDOR;
 extern string PROGRAM_ID;
 extern status* status_;
+extern string default_data_directory_;
 
 rig_data::rig_data() {
     load_data();
@@ -63,7 +64,7 @@ rig_data_t* rig_data::get_rig(string rig) {
 
 void rig_data::load_data() {
     Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-    if (!load_xml(settings)) {
+    if (!load_xml()) {
         load_prefs(settings);
     }
 }
@@ -71,7 +72,7 @@ void rig_data::load_data() {
 bool rig_data::store_data() {
     Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
     settings.delete_group("CAT");
-    return store_xml(settings);
+    return store_xml();
 }
 
 void rig_data::load_prefs(Fl_Preferences& settings) {
@@ -165,42 +166,32 @@ void rig_data::load_prefs(Fl_Preferences& settings) {
     }
 }
 
-bool rig_data::load_xml(Fl_Preferences& setting) {
-    char buff[128];
-    Fl_Preferences::Root root = setting.filename(buff, sizeof(buff),
-        Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-    if (root == Fl_Preferences::USER_L) {
-        string filename = directory(buff) + "/" + PROGRAM_ID + "/rigs.xml";
-        ifstream is;
-        is.open(filename, ios_base::in);
-        if (is.good()) {
-            rig_reader* reader = new rig_reader();
-            if(reader->load_data(&data_, is)) {
-                status_->misc_status(ST_OK, "RIG DATA: XML loaded OK");
-                return true;
-            }
-        }
+bool rig_data::load_xml() {
+    string filename = default_data_directory_ + "rigs.xml";
+    ifstream is;
+    is.open(filename, ios_base::in);
+    if (is.good()) {
+        rig_reader* reader = new rig_reader();
+        if(reader->load_data(&data_, is)) {
+            status_->misc_status(ST_OK, "RIG DATA: XML loaded OK");
+            return true;
+        } 
     }
-    // else
-    status_->misc_status(ST_WARNING, "RIG DATA: XML data faile to load - defaulting to prefernces");
+    status_->misc_status(ST_WARNING, "RIG DATA: XML data failed to load");
     return false;
 }
 
-bool rig_data::store_xml(Fl_Preferences& setting) {
-    char buff[128];
-    Fl_Preferences::Root root = setting.filename(buff, sizeof(buff),
-        Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-    if (root == Fl_Preferences::USER_L) {
-        string filename = directory(buff) + "/" + PROGRAM_ID + "/rigs.xml";
-        ofstream os;
-        os.open(filename, ios_base::out);
-        if (os.good()) {
-            rig_writer* writer = new rig_writer();
-            if (!writer->store_data(&data_, os)) {
-                status_->misc_status(ST_OK, "RIG DATA: Saved XML OK");
-                return true;
-            }
+bool rig_data::store_xml() {
+    string filename = default_data_directory_ + "rigs.xml";
+    ofstream os;
+    os.open(filename, ios_base::out);
+    if (os.good()) {
+        rig_writer* writer = new rig_writer();
+        if (!writer->store_data(&data_, os)) {
+            status_->misc_status(ST_OK, "RIG DATA: Saved XML OK");
+            return true;
         }
     }
     return false;
 }
+

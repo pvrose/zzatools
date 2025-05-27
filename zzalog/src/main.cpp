@@ -86,6 +86,7 @@ bool DEBUG_ERRORS = true;
 bool DEBUG_THREADS = false;
 bool DEBUG_CURL = false;
 bool DEBUG_STATUS = true;
+bool DEBUG_PRETTY = false;
 bool DEBUG_QUICK = false;
 rig_debug_level_e HAMLIB_DEBUG_LEVEL = RIG_DEBUG_ERR;
 bool AUTO_UPLOAD = true;
@@ -165,6 +166,8 @@ bool using_backup_ = false;
 string sticky_message_ = "";
 // Common seed to use in password encryption - maintaned with sessions
 uint32_t seed_ = 0;
+// Defaults config files
+string default_data_directory_ = "";
 
 // Get the backup filename
 string backup_filename(string source) {
@@ -483,6 +486,14 @@ int cb_args(int argc, char** argv, int& i) {
 				DEBUG_STATUS = false;
 				i += 1;
 			}
+			else if (strcmp("p", argv[i]) == 0 || strcmp("pretty", argv[i]) == 0) {
+				DEBUG_PRETTY = true;
+				i += 1;
+			}
+			else if (strcmp("nop", argv[i]) == 0 || strcmp("nopretty", argv[i]) == 0) {
+				DEBUG_PRETTY = false;
+				i += 1;
+			}
 			else if (strcmp("q", argv[i]) == 0 || strcmp("quick", argv[i]) == 0) {
 				DEBUG_QUICK = true;
 				i += 1;
@@ -537,6 +548,8 @@ void show_help() {
 	"\t\te|errors\tprovide more details on errors\n"
 	"\t\t\tnoe|noerrors\n"
 	"\t\th=N|hamlib=N\tSet hamlib debug level (default ERRORS)\n"
+	"\t\tp|pretty\tDisplay formated status message (Needs terminal support)\n"
+	"\t\tnop|nopretty\n"
 	"\t\tq|quick\tShorten long timeout and polling intervals\n"
 	"\t\ts|status\tPrint status messages to terminal\n"
 	"\t\t\tnos|nostatus\n"
@@ -644,10 +657,18 @@ void add_data() {
 	if (!closing_) {
 		// add ADIF specification data.
 		spec_data_ = new spec_data;
-		// This can only be done once it has been fully created
-		spec_data_->process_bands();
-		// Draw the specification view
-		((spec_tree*)tabbed_forms_->get_view(OT_ADIF))->populate_tree(false);
+		// Check if loaded
+		if (!spec_data_->valid()) {
+			// This sets a callback to close the app
+			status_->misc_status(ST_FATAL, "Do not have a valid ADIF reference - please copy");
+			Fl::check();
+		}
+		else {
+			// This can only be done once it has been fully created
+			spec_data_->process_bands();
+			// Draw the specification view
+			((spec_tree*)tabbed_forms_->get_view(OT_ADIF))->populate_tree(false);
+		}
 	}
 	// Add intl dialog
 	if (!closing_) {
@@ -1041,8 +1062,12 @@ void read_saved_switches() {
 	else strcat(msg, "-q ");
 	switch_settings.get("Auto Save QSOs", temp, false);
 	AUTO_SAVE = (bool)temp;
-	if (AUTO_SAVE) strcat(msg, "-a");
-	else strcat(msg, "-w");
+	if (AUTO_SAVE) strcat(msg, "-a ");
+	else strcat(msg, "-w ");
+	switch_settings.get("Pretty Messages", temp, false);
+	DEBUG_PRETTY = (bool)temp;
+	if (DEBUG_PRETTY) strcat(msg, "-d p");
+	else strcat(msg, "-d nop");
 	sticky_message_ = msg;
 }
 
@@ -1057,6 +1082,7 @@ void save_switches() {
 	switch_settings.set("Theme Colour", temp);
 	switch_settings.set("Auto Update QSOs", (int)AUTO_UPLOAD);
 	switch_settings.set("Auto Save QSOs", (bool)AUTO_SAVE);
+	switch_settings.set("Pretty Messages", (bool)DEBUG_PRETTY);
 }
 
 // Open preferences and save them - it is possible to corrupt the settings
@@ -1064,17 +1090,18 @@ void save_switches() {
 bool open_settings() {
 	// Open the settings file 
 	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	// Now set the default app data directory
+	char buffer[128];
+	Fl_Preferences::Root root = settings.filename(buffer, sizeof(buffer),
+		Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+	default_data_directory_ = directory(buffer) + "/" + PROGRAM_ID + "/";
 
-	char source[256];
-	Fl_Preferences::Root root = settings.filename(source, sizeof(source));
-	if (root == Fl_Preferences::USER) {
-		printf("ZZALOG: Opened settings %s\n", source);
-	}
+	printf("ZZALOG: Opened settings %s\n", buffer);
 	char backup[256];
-	strcpy(backup, source);
+	strcpy(backup, buffer);
 	strcat(backup, ".save");
 	// In and out streams
-	ifstream in(source);
+	ifstream in(buffer);
 	in.seekg(0, in.end);
 	int length = (int)in.tellg();
 	if (in.good() && length) {
@@ -1139,12 +1166,6 @@ int main(int argc, char** argv)
 	// Create the ticker first of all
 	ticker_ = new ticker();
 
-	// Ctreate status to handle status messages
-	status_ = new status();
-
-	// Read the fields data
-	fields_ = new fields;
-
 	// Read any switches that stick between calls
 	read_saved_switches();
 	// Parse command-line arguments - accept FLTK standard arguments and custom ones (in cb_args)
@@ -1168,6 +1189,13 @@ int main(int argc, char** argv)
 		show_help();
 		return 0;
 	}
+
+	// Ctreate status to handle status messages
+	status_ = new status();
+
+	// Read the fields data
+	fields_ = new fields;
+
 	// Now display sticky switch message
 	status_->misc_status(ST_NOTE, sticky_message_.c_str());	
 

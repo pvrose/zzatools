@@ -10,6 +10,7 @@
 extern status* status_;
 extern string PROGRAM_ID;
 extern string VENDOR;
+extern string default_data_directory_;
 
 using namespace std;
 
@@ -124,14 +125,7 @@ void fields::load_data() {
 
 // Read - <Prefs path>.fields.tsv
 bool fields::load_collections(Fl_Preferences& settings) {
-    char buffer[128];
-    Fl_Preferences::Root root = settings.filename(buffer, sizeof(buffer), 
-        Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-    if (root != Fl_Preferences::USER_L) {
-        status_->misc_status(ST_FATAL, "FIELDS: Cannot determine Preferences file");
-        return false;
-    } 
-    filename_ = directory(buffer) + "/" + PROGRAM_ID + "/fields.tsv";
+    filename_ = default_data_directory_ + "fields.tsv";
     fl_make_path_for_file(filename_.c_str());
     ifstream ip;
     ip.open(filename_.c_str(), ios_base::in);
@@ -217,14 +211,7 @@ void fields::store_data() {
 	// Delete current settings
 	fields_settings.clear();
     if (filename_.length() == 0) {
-        char buffer[128];
-        Fl_Preferences::Root root = fields_settings.filename(buffer, sizeof(buffer), 
-            Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-        if (root != Fl_Preferences::USER_L) {
-            status_->misc_status(ST_FATAL, "FIELDS: Cannot determine Preferences file");
-            return;
-        } 
-        filename_ = directory(buffer) + "/" + PROGRAM_ID + "/fields.tsv";
+         filename_ = default_data_directory_ + "fields.tsv";
         fl_make_path_for_file(filename_.c_str());
     }
     ofstream op;

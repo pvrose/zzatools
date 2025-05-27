@@ -11,6 +11,7 @@ extern status* status_;
 extern spec_data* spec_data_;
 extern string VENDOR;
 extern string PROGRAM_ID;
+extern string default_data_directory_;
 
 // Constructor - calls the Window constructor 
 band_data::band_data()
@@ -33,6 +34,12 @@ bool band_data::load_data() {
 	string filename = get_path() + "band_plan.tsv";
 	ifstream file;
 	file.open(filename.c_str(), fstream::in);
+	if (!file.good()) {
+		file.close();
+		bool ok = find_and_copy_data();
+		ok &= load_data();
+		return ok;
+	}
 	// calculate the file size
 	streampos startpos = file.tellg();
 	file.seekg(0, ios::end);
@@ -109,33 +116,7 @@ band_data::band_entry_t* band_data::get_entry(string line) {
 
 // Get the directory of the reference files
 string band_data::get_path() {
-	// get the datapath settings group.
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-	Fl_Preferences datapath(settings, "Datapath");
-	char* dirname = nullptr;
-	string directory_name;
-	// get the value from settings or force new browse
-	if (!datapath.get("Reference", dirname, "")) {
-		// We do not have one - so open chooser to get one
-		Fl_Native_File_Chooser* chooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_DIRECTORY);
-		chooser->title("Select reference file directory");
-		chooser->preset_file(dirname);
-		while (chooser->show()) {}
-		directory_name = chooser->filename();
-		delete chooser;
-	}
-	else {
-		directory_name = dirname;
-	}
-	// Append a foreslash if one is not present
-	if (directory_name.back() != '/') {
-		directory_name.append(1, '/');
-	}
-	// Free any memory used
-	if (dirname) free(dirname);
-	datapath.set("Reference", directory_name.c_str());
-	return directory_name;
-
+	return default_data_directory_;
 }
 
 // Get the band plan data entry for the specified frequency
@@ -198,5 +179,59 @@ void band_data::create_bands() {
 		} else {
 			current_range.upper = max(current_range.upper, (*it)->range.upper);
 		}
+	}
+}
+
+// Locate the all.xml file and copy to default data directory
+bool band_data::find_and_copy_data() {
+	string source;
+	Fl_Native_File_Chooser* chooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_FILE);
+	chooser->title("Select Band plan file band_plan.tsv");
+	chooser->filter("TSV File\t*.tsv");
+	if (chooser->show() == 0) {
+		source = chooser->filename();
+	}
+	delete chooser;
+	string target = get_path() + "band_plan.tsv";
+	char msg[128];
+	snprintf(msg, sizeof(msg), "BAND: Copying %s", source.c_str());
+	status_->misc_status(ST_NOTE, msg);
+	// In and out streams
+	ifstream in(source);
+	in.seekg(0, in.end);
+	int length = (int)in.tellg();
+	const int increment = 8000;
+	in.seekg(0, in.beg);
+	status_->progress(length, OT_BAND, "Copying data to backup", "bytes");
+	ofstream out(target);
+	bool ok = in.good() && out.good();
+	char buffer[increment];
+	int count = 0;
+	// Copy file in 7999 byte chunks
+	while (!in.eof() && ok) {
+		in.read(buffer, increment);
+		out.write(buffer, in.gcount());
+		count += (int)in.gcount();
+		ok = out.good() && (in.good() || in.eof());
+		status_->progress(count, OT_BAND);
+	}
+	if (!ok) {
+		status_->progress("Failed before completion", OT_BAND);
+	}
+	else {
+		if (count != length) {
+			status_->progress(length, OT_BAND);
+		}
+	}
+	in.close();
+	out.close();
+	if (!ok) {
+		// Report error
+		status_->misc_status(ST_FATAL, "BAND: failed");
+		return false;
+	}
+	else {
+		status_->misc_status(ST_OK, "BAND: Copied");
+		return true;
 	}
 }

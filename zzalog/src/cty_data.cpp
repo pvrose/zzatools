@@ -28,6 +28,7 @@ extern spec_data* spec_data_;
 extern bool closing_;
 extern string VENDOR;
 extern string PROGRAM_ID;
+extern string default_data_directory_;
 
 // Constructor - Download new data and build database
 cty_data::cty_data() :
@@ -233,31 +234,7 @@ bool cty_data::load_data(string filename) {
 
 // Get the filename {REFERENCE DIR}/cty.xml
 string cty_data::get_filename() {
-	// get the datapath settings group.
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-	Fl_Preferences datapath(settings, "Datapath");
-	char* dirname = nullptr;
-	string directory_name;
-	// get the value from settings or force new browse
-	if (!datapath.get("Reference", dirname, "")) {
-		// We do not have one - so open chooser to get one
-		Fl_Native_File_Chooser* chooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_DIRECTORY);
-		chooser->title("Select reference file directory");
-		chooser->preset_file(dirname);
-		while (chooser->show()) {}
-		directory_name = chooser->filename();
-		delete chooser;
-	}
-	else {
-		directory_name = dirname;
-	}
-	// Append a foreslash if one is not present
-	if (directory_name.back() != '/') {
-		directory_name.append(1, '/');
-	}
-	if (dirname) free(dirname);
-	datapath.set("Reference", directory_name.c_str());
-	return directory_name + "cty.xml";
+	return default_data_directory_ + "cty.xml";
 }
 
 // Parse the record

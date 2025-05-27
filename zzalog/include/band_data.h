@@ -61,6 +61,8 @@ protected:
 	void create_bands();
 	// Get the file name
 	string get_path();
+	// Find the band_plan.tsv file
+	bool find_and_copy_data();
 	// Parse the band entry
 	band_entry_t* get_entry(string line);
 	// The band entries

@@ -25,8 +25,10 @@ extern bool READ_ONLY;
 extern string PROGRAM_ID;
 extern string PROGRAM_VERSION;
 extern bool DEBUG_STATUS;
+extern bool DEBUG_PRETTY;
 extern string VENDOR;
 extern ticker* ticker_;
+extern string default_data_directory_;
 
 // Constructor
 status::status() :
@@ -39,24 +41,7 @@ status::status() :
 	progress_items_.clear();
 
 	// Get report filename from the settings
-	char * filename;
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-	Fl_Preferences status_settings(settings, "Status");
-	status_settings.get("Report File", filename, "status.txt");
-	report_filename_ = filename;
-	free(filename);
-	// If it's not in the settings, open file dialog, get it and set it.
-	while (report_filename_.length() == 0) {
-		// Create an Open dialog; the default file name extension is ".txt".
-		Fl_Native_File_Chooser* chooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_SAVE_FILE);
-		chooser->title("Select file name for status report");
-		chooser->filter("Text files\t*.txt");
-		chooser->preset_file(report_filename_.c_str());
-		if (chooser->show() == 0) {}
-		report_filename_ = chooser->filename();
-		status_settings.set("Report File", report_filename_.c_str());
-		delete chooser;
-	}
+	report_filename_ = default_data_directory_ + "status.txt";
 
 	// Set 500 ms ticker
 	ticker_->add_ticker(this, cb_ticker, 5);
@@ -204,17 +189,22 @@ void status::misc_status(status_t status, const char* label) {
 	snprintf(f_message, sizeof(f_message), "%c %s %s\n", STATUS_CODES.at(status), timestamp.c_str(), label);
 
 	if (DEBUG_STATUS) {
-		// Restore default colours
-		const char restore[] = "\033[0m";
-		const char faint[] = "\033[2m";
-		printf("%s%s%s %s%s%s%s\n", 
-			faint,
-			timestamp.c_str(), 
-			restore,
-			colour_code(status, true).c_str(),
-			colour_code(status, false).c_str(),
-			label,
-			restore);
+		if (DEBUG_PRETTY) {
+			// Restore default colours
+			const char restore[] = "\033[0m";
+			const char faint[] = "\033[2m";
+			printf("%s%s%s %s%s%s%s\n",
+				faint,
+				timestamp.c_str(),
+				restore,
+				colour_code(status, true).c_str(),
+				colour_code(status, false).c_str(),
+				label,
+				restore);
+		}
+		else {
+			cout << f_message;
+		}
 	}
 	if (!report_file_) {
 		// Append the status to the file

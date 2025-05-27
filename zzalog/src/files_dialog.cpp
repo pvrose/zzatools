@@ -33,9 +33,7 @@ files_dialog::files_dialog(int X, int Y, int W, int H, const char* label) :
 	enable_backup_ = false;
 	tqsl_executable_ = "";
 	card_directory_ = "";
-	ref_data_directory_ = "";
 	backup_directory_ = "";
-	status_log_file_ = "";
 	unzipper_ = "";
 
 	// initialise and create form
@@ -65,7 +63,6 @@ void files_dialog::load_values() {
 	Fl_Preferences lotw_settings(qsl_settings, "LotW");
 	Fl_Preferences datapath_settings(settings, "Datapath");
 	Fl_Preferences backup_settings(settings, "Backup");
-	Fl_Preferences status_settings(settings, "Status");
 	Fl_Preferences clublog_settings(qsl_settings, "ClubLog");
 
 	// TQSL Executable
@@ -93,22 +90,12 @@ void files_dialog::load_values() {
 		card_directory_ = "";
 	}
 
-	// Reference directory
-	datapath_settings.get("Reference", temp_string, "");
-	ref_data_directory_ = temp_string;
-	free(temp_string);
-
 	// Backup directory
 	backup_settings.get("Path", temp_string, "");
 	backup_directory_ = temp_string;
 	free(temp_string);
 	backup_settings.get("Enable", temp_bool, false);
 	enable_backup_ = temp_bool;
-
-	// Status log file
-	status_settings.get("Report File", temp_string, "");
-	status_log_file_ = temp_string;
-	free(temp_string);
 
 	// WSJT-X directory
 	datapath_settings.get("WSJT-X", temp_string, "");
@@ -219,22 +206,6 @@ void files_dialog::create_form(int X, int Y) {
 
 	grp_card->end();
 
-	Fl_Group* grp_ref_data = new Fl_Group(X + XGRP, Y + GRP4, XMAX, HGRP2, "Reference Data Directory");
-	grp_ref_data->labelsize(FL_NORMAL_SIZE + 2);
-	grp_ref_data->labelfont(FL_BOLD);
-	grp_ref_data->box(FL_BORDER_BOX);
-	grp_ref_data->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
-	// Input - directory name for the reference (ADIF spec, Prefix data and band plans)
-	filename_input* in_ref_data_file = new filename_input(X + COL2, Y + ROW4_1, WEDIT + GAP + WBUTTON + GAP + WBUTTON, HTEXT);
-	in_ref_data_file->callback(cb_value<Fl_Input, string>, &ref_data_directory_);
-	in_ref_data_file->when(FL_WHEN_CHANGED);
-	in_ref_data_file->value(ref_data_directory_.c_str());
-	in_ref_data_file->tooltip("Directory containing reference data");
-	in_ref_data_file->type(filename_input::DIRECTORY);
-	in_ref_data_file->title("Please enter the reference data directory");
-
-	grp_ref_data->end();
-
 	Fl_Group* grp_backup = new Fl_Group(X + XGRP, Y + GRP5, XMAX, HGRP2, "Backup Directory");
 	grp_backup->labelsize(FL_NORMAL_SIZE + 2);
 	grp_backup->labelfont(FL_BOLD);
@@ -256,23 +227,6 @@ void files_dialog::create_form(int X, int Y) {
 	in_backup_file->title("Please enter the backup directory");
 
 	grp_backup->end();
-
-	Fl_Group* grp_status = new Fl_Group(X + XGRP, Y + GRP7, XMAX, HGRP7, "Status log file");
-	grp_status->labelsize(FL_NORMAL_SIZE + 2);
-	grp_status->labelfont(FL_BOLD);
-	grp_status->box(FL_BORDER_BOX);
-	grp_status->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
-	// Input - status log file name
-	filename_input* in_status_file = new filename_input(X + COL2, Y + ROW7_1, WEDIT + GAP + WBUTTON + GAP + WBUTTON, HTEXT);
-	in_status_file->callback(cb_value<Fl_Input, string>, &status_log_file_);
-	in_status_file->when(FL_WHEN_CHANGED);
-	in_status_file->value(status_log_file_.c_str());
-	in_status_file->tooltip("Location of status log file");
-	in_status_file->type(filename_input::FILE);
-	in_status_file->title("Please enter the status log file");
-	in_status_file->pattern("Text\t*.txt");
-
-	grp_status->end();
 
 	Fl_Group* grp_wsjtx = new Fl_Group(X + XGRP, Y + GRP7A, XMAX, HGRP7A, "WSJT-X directory");
 	grp_wsjtx->labelsize(FL_NORMAL_SIZE + 2);
@@ -332,7 +286,6 @@ void files_dialog::save_values() {
 	Fl_Preferences lotw_settings(qsl_settings, "LotW");
 	Fl_Preferences datapath_settings(settings, "Datapath");
 	Fl_Preferences backup_settings(settings, "Backup");
-	Fl_Preferences status_settings(settings, "Status");
 	Fl_Preferences clublog_settings(qsl_settings, "ClubLog");
 	Fl_Preferences qsld_settings(settings, "QSL Design");
 	Fl_Preferences call_settings(qsld_settings, station_callsign_.c_str());
@@ -349,15 +302,9 @@ void files_dialog::save_values() {
 		datapath_settings.set("QSLs", card_directory_.c_str());
 	}
 
-	// Reference data directory
-	datapath_settings.set("Reference", ref_data_directory_.c_str());
-
 	// Backup 
 	backup_settings.set("Path", backup_directory_.c_str());
 	backup_settings.set("Enable", enable_backup_);
-
-	// Status log file
-	status_settings.set("Report File", status_log_file_.c_str());
 
 	// WSJT-X directory
 	datapath_settings.set("WSJT-X", wsjtx_directory_.c_str());

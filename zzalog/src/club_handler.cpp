@@ -30,6 +30,7 @@ extern qsl_dataset* qsl_dataset_;
 // extern uint32_t seed_;
 extern string VENDOR;
 extern string PROGRAM_ID;
+extern string default_data_directory_;
 
 // Constructor 
 club_handler::club_handler() {
@@ -218,27 +219,7 @@ bool club_handler::unzip_exception(string filename) {
 
 // Get reference directory
 void club_handler::get_reference(string& dir_name) {
-	// Get the reference data directory from the settings
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-	Fl_Preferences datapath(settings, "Datapath");
-	char* temp = nullptr;
-	// If the path is not in the settings
-	if (!datapath.get("Reference", temp, "")) {
-		// Open a chooser to get it
-		//Fl_File_Chooser* chooser = new Fl_File_Chooser("", nullptr, Fl_File_Chooser::DIRECTORY,
-		//	"Select reference file directory");
-		Fl_Native_File_Chooser* chooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_DIRECTORY);
-		chooser->title("Select reference file directory");
-		chooser->preset_file(temp);
-		while (chooser->show()) {}
-		dir_name = chooser->filename();
-		delete chooser;
-		datapath.set("Reference", dir_name.c_str());
-	}
-	else {
-		dir_name = temp;
-	}
-	if (temp) free(temp);
+	dir_name = default_data_directory_;
 }
 
 // Upload the single specified QSO in real time

@@ -93,10 +93,12 @@ void web_dialog::load_values() {
 	email_data_ = get_server("eMail");
 	// Add any STATION_CALLSIGNs not yet in the data read from file
 	spec_dataset* call_set = spec_data_->dataset("Dynamic STATION_CALLSIGN");
-	for (auto it : call_set->data) {
-		string call = it.first;
-		if (qrz_data_->api_data.find(call) == qrz_data_->api_data.end()) {
-			qrz_data_->api_data[call] = new qrz_api_data;
+	if (call_set) {
+		for (auto it : call_set->data) {
+			string call = it.first;
+			if (qrz_data_->api_data.find(call) == qrz_data_->api_data.end()) {
+				qrz_data_->api_data[call] = new qrz_api_data;
+			}
 		}
 	}
 

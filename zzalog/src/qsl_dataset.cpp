@@ -11,6 +11,7 @@
 #include <fstream>
 
 #include <FL/Fl_Preferences.H>
+#include <FL/Fl_Native_File_Chooser.H>
 
 extern status* status_;
 extern string VENDOR;
@@ -75,7 +76,7 @@ void qsl_dataset::load_data() {
 	data_.clear();
 	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
 	if (!load_xml(settings)) {
-		status_->misc_status(ST_ERROR, "QSL DATA; No QSl data loaded");
+		status_->misc_status(ST_ERROR, "QSL: No QSl data loaded");
 		//load_prefs(settings);
 	}
 
@@ -161,6 +162,16 @@ string qsl_dataset::xml_file(Fl_Preferences& settings) {
 	Fl_Preferences data_settings(settings, "Datapath");
 	data_settings.get("QSLs", temp,"");
 	qsl_path_ = temp;
+	if (qsl_path_.length() == 0) {
+		status_->misc_status(ST_WARNING, "QSL: No directory in settings - please search");
+		Fl_Native_File_Chooser* chooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_DIRECTORY);
+		chooser->title("Select QSL Directory");
+		if (chooser->show() == 0) {
+			qsl_path_ = chooser->filename();
+		}
+		delete chooser;
+		data_settings.set("QSLs", qsl_path_.c_str());
+	}
 	string filename = qsl_path_ + "/config.xml";
 	free(temp);
 	return filename;
@@ -172,12 +183,12 @@ bool qsl_dataset::load_xml(Fl_Preferences& settings) {
 	if (is.good()) {
 		qsl_reader* reader = new qsl_reader();
 		if (reader->load_data(&data_, &server_data_, is)) {
-			status_->misc_status(ST_OK, "QSL DATA: XML loaded OK");
+			status_->misc_status(ST_OK, "QSL: XML loaded OK");
 			return true;
 		}
 	}
 	// else
-	status_->misc_status(ST_WARNING, "QSL DATA: XML data faile to load - defaulting to prefernces");
+	status_->misc_status(ST_WARNING, "QSL: XML data failed to load - defaulting to prefernces");
 	return false;
 }
 

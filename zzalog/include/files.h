@@ -20,5 +20,5 @@ using namespace std;
 	const string PREFIX_FILE = "/Prefix.lst";
 
 	// Default specification database
-	const string ADIF_FILE = "/all.xml";
+	const string ADIF_FILE = "all.xml";
 #endif

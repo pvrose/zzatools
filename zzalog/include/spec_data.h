@@ -70,7 +70,7 @@ typedef size_t qso_num_t;
 		// public methods
 	public:
 		// load the data
-		bool load_data(bool force);
+		bool load_data();
 		// Get the DXCC award mode for a particulat ADIF mode
 		string dxcc_mode(string mode);
 		// Get the ADIF mode for a submode
@@ -146,11 +146,14 @@ typedef size_t qso_num_t;
 		band_set* bands();
 		// Create a list of bands in frequency order
 		void process_bands();
+		// Return spec data valid
+		bool valid();
+
 
 
 	// protected methods
 	protected:
-		string get_path(bool force);
+		string get_path();
 		// Sort filed names
 		void process_fieldnames();
 		// Combine mode and submode into single dataset
@@ -185,6 +188,8 @@ typedef size_t qso_num_t;
 		string convert_ml_string(const string& data);
 		// Generate report timestamp and fault
 		string report_timestamp(string field, string data);
+		// Find the all.xml file
+		bool find_and_copy_data();
 		// protected attributes
 	protected:
 		// ADIF Version
@@ -230,5 +235,7 @@ typedef size_t qso_num_t;
 		bool abandon_validation_;
 		// List of bands in frrequency order
 		band_set* bands_;
+		//Spec data loaded
+		bool data_loaded_;
 
 	};
