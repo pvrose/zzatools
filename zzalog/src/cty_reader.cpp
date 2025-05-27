@@ -252,12 +252,12 @@ bool cty_reader::load_data(cty_data* data, istream& in, string& version) {
 	// reposition back to beginning
 	in.seekg(0, ios::beg);
 	// Initialsie the progress
-	status_->misc_status(ST_NOTE, "EXCEPTION: Started extracting data");
-	status_->progress(file_size, OT_PREFIX, "Extracting Exception data from XML", "bytes");
+	status_->misc_status(ST_NOTE, "EXCEPTION: Started importing data");
+	status_->progress(file_size, OT_PREFIX, "Importing Exception data from XML", "bytes");
 	// Call the XML parser - calls back to the overides herein
 	if (parse(in)) {
 		// Read successful - complete progress
-		status_->misc_status(ST_OK, "EXCEPTION: Extraction done!");
+		status_->misc_status(ST_OK, "EXCEPTION: Import done!");
 		version = timestamp_;
 		fl_cursor(FL_CURSOR_DEFAULT);
 		return true;
@@ -270,7 +270,7 @@ bool cty_reader::load_data(cty_data* data, istream& in, string& version) {
 	}
 	else {
 		// Read failed - report failure
-		status_->misc_status(ST_ERROR, "EXCEPTION: Extraction failed");
+		status_->misc_status(ST_ERROR, "EXCEPTION: Import failed");
 		status_->progress("Load failed", OT_PREFIX);
 		fl_cursor(FL_CURSOR_DEFAULT);
 		return false;
