@@ -324,7 +324,7 @@ bool rig_reader::check_version(string v) {
 	if (stoi(prog_words[0]) > stoi(file_words[0])) {
 		return true;
 	} else if (prog_words[0] == file_words[0]) {
-		if (stoi(prog_words[1]) > stoi(prog_words[1])) {
+		if (stoi(prog_words[1]) > stoi(file_words[1])) {
 			return true;
 		}
 		else if (prog_words[1] == file_words[1]) {

@@ -1092,7 +1092,7 @@ bool open_settings() {
 	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
 	// Now set the default app data directory
 	char buffer[128];
-	Fl_Preferences::Root root = settings.filename(buffer, sizeof(buffer),
+	settings.filename(buffer, sizeof(buffer),
 		Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
 	default_data_directory_ = directory(buffer) + "/" + PROGRAM_ID + "/";
 
