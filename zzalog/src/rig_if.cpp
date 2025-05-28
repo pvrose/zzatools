@@ -402,7 +402,6 @@ void rig_if::th_run_rig(rig_if* that) {
 
 // Read the data from the rig
 bool rig_if::th_read_values() {
-	bool ok = true;
 	system_clock::time_point start = system_clock::now();
 	if (hamlib_data_->port_type == RIG_PORT_NONE) {
 		return false;

@@ -1175,7 +1175,7 @@ int main(int argc, char** argv)
 	int i = 1;
 	Fl::args(argc, argv, i, cb_args);
 	if (DISPLAY_VERSION) {
-#ifdef WIN32_
+#ifndef WIN32
 		// Display version
 		printf("%s Version %s Compiled %s\n", 
 			PROGRAM_ID.c_str(), 
@@ -1184,7 +1184,7 @@ int main(int argc, char** argv)
 		curl_version_info_data* data = curl_version_info(CURLVERSION_LAST);
 		if (DEBUG_PRETTY) {
 			// Use left lower box symbol
-			printf("\342\224\224With libraries hamlib (%s), FLTK (%d.%d.%d), Curl (%s)\n",
+			printf("\342\224\224 With libraries hamlib (%s), FLTK (%d.%d.%d), Curl (%s)\n",
 				rig_version(),
 				FL_MAJOR_VERSION, FL_MINOR_VERSION, FL_PATCH_VERSION,
 				data->version);
