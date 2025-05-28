@@ -183,7 +183,7 @@ void status::cb_ticker(void* v) {
 void status::misc_status(status_t status, const char* label) {
 	// Start each entry with a timestamp
 	string timestamp = now(false, "%Y/%m/%d %H:%M:%S", true);
-	char f_message[128];
+	char f_message[256];
 	// X YYYY/MM/DD HH:MM:SS Message 
 	// X is a single letter indicating the message severity
 	snprintf(f_message, sizeof(f_message), "%c %s %s\n", STATUS_CODES.at(status), timestamp.c_str(), label);
