@@ -47,17 +47,17 @@ bool qsl_reader::load_data(
 	// reposition back to beginning
 	in.seekg(0, ios::beg);
 	// Initialsie the progress
-	status_->misc_status(ST_NOTE, "QSL DATA: Started");
+	status_->misc_status(ST_NOTE, "QSL: Started");
 	status_->progress(file_size, OT_QSLS, "Converting XML into QSL Design database", "bytes");
 	// Call the XML parser - calls back to the overides herein
 	if (parse(in)) {
 		// Read successful - complete progress
-		status_->misc_status(ST_OK, "QSL DATA: Done!");
+		status_->misc_status(ST_OK, "QSL: Done!");
 		status_->progress(file_size, OT_QSLS);
 		return true;
 	} else {
 		// Read failed - report failure
-		status_->misc_status(ST_FATAL, "QSL DATA: Read failed");
+		status_->misc_status(ST_FATAL, "QSL: Read failed");
 		status_->progress("Load failed", OT_QSLS);
 		return false;
 	}
@@ -66,7 +66,7 @@ bool qsl_reader::load_data(
 // <qsl_data version="....">
 bool qsl_reader::start_qsl_data(xml_wreader* that, map<string, string>* attributes) {
 	if (that->elements_.size()) {
-		status_->misc_status(ST_ERROR, "QSL DATA: Unexpected QSL_DATA element");
+		status_->misc_status(ST_ERROR, "QSL: Unexpected QSL_DATA element");
 		return false;
 	} 
 	// else
@@ -81,7 +81,7 @@ bool qsl_reader::start_qsl_data(xml_wreader* that, map<string, string>* attribut
 			}
 			// else 
 			char msg[128];
-			snprintf(msg, sizeof(msg), "QSL DATA: Unexpected attribute %s=%s in QSL_DATA element",
+			snprintf(msg, sizeof(msg), "QSL: Unexpected attribute %s=%s in QSL_DATA element",
 				it.first.c_str(), it.second.c_str());
 			return false;
 		}
@@ -93,7 +93,7 @@ bool qsl_reader::start_qsl_data(xml_wreader* that, map<string, string>* attribut
 bool qsl_reader::start_qsls(xml_wreader* that, map<string, string>* attributes) {
 	// Only expect in QSL
 	if (that->elements_.back() != QSL_QSL_DATA) {
-		status_->misc_status(ST_ERROR, "QSL DATA: Unexpected QSLS element");
+		status_->misc_status(ST_ERROR, "QSL: Unexpected QSLS element");
 		return false;
 	}
 	// else
@@ -106,7 +106,7 @@ bool qsl_reader::start_qsl(xml_wreader* that, map<string, string>* attributes) {
 	char msg[128];
 	// Only expect in QSLS
 	if (that->elements_.back() != QSL_QSLS) {
-		status_->misc_status(ST_ERROR, "QSL DATA: Unexpected QSL element");
+		status_->misc_status(ST_ERROR, "QSL: Unexpected QSL element");
 		return false;
 	}
 	// else
@@ -124,13 +124,13 @@ bool qsl_reader::start_qsl(xml_wreader* that, map<string, string>* attributes) {
 			if (it.second == "file") type = qsl_data::FILE;
 		}
 		else {
-			snprintf(msg, sizeof(msg), "QSL DATA: Unexpected attribute %s=%s in RIG element",
+			snprintf(msg, sizeof(msg), "QSL: Unexpected attribute %s=%s in RIG element",
 			it.first.c_str(), it.second.c_str());
 			return false;
 		}
 	}
 	if (call == "" || type == qsl_data::MAX_TYPE) {
-		snprintf(msg, sizeof(msg), "QSL DATA: Either call= or type= is messing from QSL element");
+		snprintf(msg, sizeof(msg), "QSL: Either call= or type= is messing from QSL element");
 		status_->misc_status(ST_ERROR, msg);
 		return false;
 	}
@@ -157,7 +157,7 @@ bool qsl_reader::start_qsl(xml_wreader* that, map<string, string>* attributes) {
 		return true;
 	}
 	// else
-	snprintf(msg, sizeof(msg), "QSL DATA: Duplicate design call=%s, type=%s", call.c_str(), stype.c_str());
+	snprintf(msg, sizeof(msg), "QSL: Duplicate design call=%s, type=%s", call.c_str(), stype.c_str());
 	status_->misc_status(ST_ERROR, msg);
 	return false;
 }
@@ -166,7 +166,7 @@ bool qsl_reader::start_qsl(xml_wreader* that, map<string, string>* attributes) {
 bool qsl_reader::start_size(xml_wreader* that, map<string, string>* attributes) {
 	// Only expect in QSL
 	if (that->elements_.back() != QSL_QSL) {
-		status_->misc_status(ST_ERROR, "QSL DATA: Unexpected SIZE element");
+		status_->misc_status(ST_ERROR, "QSL: Unexpected SIZE element");
 		return false;
 	}
 	// else
@@ -188,7 +188,7 @@ bool qsl_reader::start_size(xml_wreader* that, map<string, string>* attributes) 
 		}
 	}
 	if (!ok) {
-		status_->misc_status(ST_ERROR, "QSL DATA: Invalid attributes in SIZE element");
+		status_->misc_status(ST_ERROR, "QSL: Invalid attributes in SIZE element");
 	}
 	return ok;
 }
@@ -197,7 +197,7 @@ bool qsl_reader::start_size(xml_wreader* that, map<string, string>* attributes) 
 bool qsl_reader::start_array(xml_wreader* that, map<string, string>* attributes) {
 	// Only expect in QSL
 	if (that->elements_.back() != QSL_QSL) {
-		status_->misc_status(ST_ERROR, "QSL DATA: Unexpected ARRAY element");
+		status_->misc_status(ST_ERROR, "QSL: Unexpected ARRAY element");
 		return false;
 	}
 	// else
@@ -218,7 +218,7 @@ bool qsl_reader::start_array(xml_wreader* that, map<string, string>* attributes)
 		}
 	}
 	if (!ok) {
-		status_->misc_status(ST_ERROR, "QSL DATA: Invalid attributes in ARRAY element");
+		status_->misc_status(ST_ERROR, "QSL: Invalid attributes in ARRAY element");
 	}
 	return ok;
 }
@@ -228,7 +228,7 @@ bool qsl_reader::start_formats(xml_wreader* that, map<string, string>* attribute
 	char msg[128];
 	// Only expect in QSL
 	if (that->elements_.back() != QSL_QSL) {
-		status_->misc_status(ST_ERROR, "QSL DATA: Unexpected FORMATS element");
+		status_->misc_status(ST_ERROR, "QSL: Unexpected FORMATS element");
 		return false;
 	}
 	// else
@@ -245,20 +245,20 @@ bool qsl_reader::start_formats(xml_wreader* that, map<string, string>* attribute
 			break;
 		}
 		if (data->f_date == qsl_data::FMT_INVALID_DATA) {
-			snprintf(msg, sizeof(msg), "QSL DATA: Unable to parse data %s", it.second.c_str());
+			snprintf(msg, sizeof(msg), "QSL: Unable to parse data %s", it.second.c_str());
 			status_->misc_status(ST_ERROR, msg);
 			ok = false;
 			break;
 		}
 		if (data->f_time == qsl_data::FMT_INVALID_TIME) {
-			snprintf(msg, sizeof(msg), "QSL DATA: Unable to parse time %s", it.second.c_str());
+			snprintf(msg, sizeof(msg), "QSL: Unable to parse time %s", it.second.c_str());
 			status_->misc_status(ST_ERROR, msg);
 			ok = false;
 			break;
 		}
 	}
 	if (!ok) {
-		status_->misc_status(ST_ERROR, "QSL DATA: Invalid attributes in FORMATS element");
+		status_->misc_status(ST_ERROR, "QSL: Invalid attributes in FORMATS element");
 	}
 	return ok;
 
@@ -268,7 +268,7 @@ bool qsl_reader::start_formats(xml_wreader* that, map<string, string>* attribute
 bool qsl_reader::start_design(xml_wreader* that, map<string, string>* attributes) {
 	// Only expect in QSL
 	if (that->elements_.back() != QSL_QSL) {
-		status_->misc_status(ST_ERROR, "QSL DATA: Unexpected QSL element");
+		status_->misc_status(ST_ERROR, "QSL: Unexpected QSL element");
 		return false;
 	}
 	// else
@@ -276,7 +276,7 @@ bool qsl_reader::start_design(xml_wreader* that, map<string, string>* attributes
 	bool ok = true;
 	if (attributes->size() != 0) ok = false;
 	if (!ok) {
-		status_->misc_status(ST_ERROR, "QSL DATA: Invalid attributes in DESIGN element");
+		status_->misc_status(ST_ERROR, "QSL: Invalid attributes in DESIGN element");
 	}
 	return ok;
 }
@@ -285,7 +285,7 @@ bool qsl_reader::start_design(xml_wreader* that, map<string, string>* attributes
 bool qsl_reader::start_text(xml_wreader* that, map<string, string>* attributes) {
 	// Only expect in QSL
 	if (that->elements_.back() != QSL_DESIGN) {
-		status_->misc_status(ST_ERROR, "QSL DATA: Unexpected TEXT element");
+		status_->misc_status(ST_ERROR, "QSL: Unexpected TEXT element");
 		return false;
 	}
 	// else
@@ -306,7 +306,7 @@ bool qsl_reader::start_position(xml_wreader* that, map<string, string>* attribut
 	case QSL_IMAGE:
 		break;
 	default:
-		status_->misc_status(ST_ERROR, "QSL DATA: Unexpected POSITION element");
+		status_->misc_status(ST_ERROR, "QSL: Unexpected POSITION element");
 		return false;
 	}
 
@@ -344,7 +344,7 @@ bool qsl_reader::start_position(xml_wreader* that, map<string, string>* attribut
 		break;
 	}
 	if (!ok) {
-		status_->misc_status(ST_ERROR, "QSL DATA: Unexpected POSITION element");
+		status_->misc_status(ST_ERROR, "QSL: Unexpected POSITION element");
 		return false;
 	}
 	//else
@@ -360,7 +360,7 @@ bool qsl_reader::start_position(xml_wreader* that, map<string, string>* attribut
 		}
 	}
 	if (!ok) {
-		status_->misc_status(ST_ERROR, "QSL DATA: Invalid attributes in POSITION element");
+		status_->misc_status(ST_ERROR, "QSL: Invalid attributes in POSITION element");
 	}
 	return ok;
 }
@@ -383,7 +383,7 @@ bool qsl_reader::start_label(xml_wreader* that, map<string, string>* attributes)
 		break;
 	}
 	if (!ok) {
-		status_->misc_status(ST_ERROR, "QSL DATA: Unexpected POSITION element");
+		status_->misc_status(ST_ERROR, "QSL: Unexpected POSITION element");
 		return false;
 	}
 	that->elements_.push_back(QSL_LABEL);
@@ -398,7 +398,7 @@ bool qsl_reader::start_label(xml_wreader* that, map<string, string>* attributes)
 		}
 	}
 	if (!ok) {
-		status_->misc_status(ST_ERROR, "QSL DATA: Invalid attributes in POSITION element");
+		status_->misc_status(ST_ERROR, "QSL: Invalid attributes in POSITION element");
 	}
 	return ok;
 }
@@ -407,7 +407,7 @@ bool qsl_reader::start_label(xml_wreader* that, map<string, string>* attributes)
 bool qsl_reader::start_field(xml_wreader* that, map<string, string>* attributes) {
 	// Only expect in QSL
 	if (that->elements_.back() != QSL_DESIGN) {
-		status_->misc_status(ST_ERROR, "QSL DATA: Unexpected FIELD element");
+		status_->misc_status(ST_ERROR, "QSL: Unexpected FIELD element");
 		return false;
 	}
 	// else
@@ -445,7 +445,7 @@ bool qsl_reader::start_data(xml_wreader* that, map<string, string>* attributes) 
 		break;
 	}
 	if (!ok) {
-		status_->misc_status(ST_ERROR, "QSL DATA: Unexpected POSITION element");
+		status_->misc_status(ST_ERROR, "QSL: Unexpected POSITION element");
 		return false;
 	}
 	that->elements_.push_back(QSL_DATA);
@@ -461,7 +461,7 @@ bool qsl_reader::start_data(xml_wreader* that, map<string, string>* attributes) 
 		}
 	}
 	if (!ok) {
-		status_->misc_status(ST_ERROR, "QSL DATA: Invalid attributes in POSITION element");
+		status_->misc_status(ST_ERROR, "QSL: Invalid attributes in POSITION element");
 	}
 	return ok;
 }
@@ -497,7 +497,7 @@ bool qsl_reader::start_options(xml_wreader* that, map<string, string>* attribute
 		break;
 	}
 	if (!ok) {
-		status_->misc_status(ST_ERROR, "QSL DATA: Unexpected OPTIONS element");
+		status_->misc_status(ST_ERROR, "QSL: Unexpected OPTIONS element");
 		return false;
 	}
 	that->elements_.push_back(QSL_OPTIONS);
@@ -513,7 +513,7 @@ bool qsl_reader::start_options(xml_wreader* that, map<string, string>* attribute
 		}
 	}
 	if (!ok) {
-		status_->misc_status(ST_ERROR, "QSL DATA: Invalid attributes in OPTIONS element");
+		status_->misc_status(ST_ERROR, "QSL: Invalid attributes in OPTIONS element");
 	}
 	return ok;
 }
@@ -522,7 +522,7 @@ bool qsl_reader::start_options(xml_wreader* that, map<string, string>* attribute
 bool qsl_reader::start_image(xml_wreader* that, map<string, string>* attributes) {
 	// Only expect in QSL
 	if (that->elements_.back() != QSL_DESIGN) {
-		status_->misc_status(ST_ERROR, "QSL DATA: Unexpected IMAGE element");
+		status_->misc_status(ST_ERROR, "QSL: Unexpected IMAGE element");
 		return false;
 	}
 	// else
@@ -538,7 +538,7 @@ bool qsl_reader::start_image(xml_wreader* that, map<string, string>* attributes)
 bool qsl_reader::start_file(xml_wreader* that, map<string, string>* attributes) {
 	// Only expect in QSL
 	if (that->elements_.back() != QSL_IMAGE) {
-		status_->misc_status(ST_ERROR, "QSL DATA: Unexpected FILE element");
+		status_->misc_status(ST_ERROR, "QSL: Unexpected FILE element");
 		return false;
 	}
 	// else
@@ -549,7 +549,7 @@ bool qsl_reader::start_file(xml_wreader* that, map<string, string>* attributes) 
 // <SERVERS>
 bool qsl_reader::start_servers(xml_wreader* that, map<string, string>* attributes) {
 	if (that->elements_.back() != QSL_QSL_DATA) {
-		status_->misc_status(ST_ERROR, "QSL DATA: Unexpected QSLS element");
+		status_->misc_status(ST_ERROR, "QSL: Unexpected QSLS element");
 		return false;
 	} 
 	// else
@@ -569,7 +569,7 @@ bool qsl_reader::start_servers(xml_wreader* that, map<string, string>* attribute
 		}
 		// else 
 		char msg[128];
-		snprintf(msg, sizeof(msg), "QSL DATA: Unexpected attribute %s=%s in QSLS element",
+		snprintf(msg, sizeof(msg), "QSL: Unexpected attribute %s=%s in QSLS element",
 			it.first.c_str(), it.second.c_str());
 		return false;
 	}
@@ -580,7 +580,7 @@ bool qsl_reader::start_servers(xml_wreader* that, map<string, string>* attribute
 bool qsl_reader::start_server(xml_wreader* w, map<string, string>* attributes) {
 	qsl_reader* that = (qsl_reader*)w;
 	if (that->elements_.back() != QSL_SERVERS) {
-		status_->misc_status(ST_ERROR, "QSL DATA: Unexpected SERVER element");
+		status_->misc_status(ST_ERROR, "QSL: Unexpected SERVER element");
 		return false;
 	} 
 	// else
@@ -603,7 +603,7 @@ bool qsl_reader::start_server(xml_wreader* w, map<string, string>* attributes) {
 		}
 		// else 
 		char msg[128];
-		snprintf(msg, sizeof(msg), "QSL DATA: Unexpected attribute %s=%s in QSLS element",
+		snprintf(msg, sizeof(msg), "QSL: Unexpected attribute %s=%s in QSLS element",
 			it.first.c_str(), it.second.c_str());
 		return false;
 	}
@@ -618,7 +618,7 @@ bool qsl_reader::start_server(xml_wreader* w, map<string, string>* attributes) {
 bool qsl_reader::start_logbook(xml_wreader* w, map<string, string>* attributes) {
 	qsl_reader* that = (qsl_reader*)w;
 	if (that->elements_.back() != QSL_SERVER) {
-		status_->misc_status(ST_ERROR, "QSL DATA: Unexpected LOGBOOK element");
+		status_->misc_status(ST_ERROR, "QSL: Unexpected LOGBOOK element");
 		return false;
 	} 
 	// else
@@ -640,7 +640,7 @@ bool qsl_reader::start_logbook(xml_wreader* w, map<string, string>* attributes) 
 		}
 		// else 
 		char msg[128];
-		snprintf(msg, sizeof(msg), "QSL DATA: Unexpected attribute %s=%s in QSLS element",
+		snprintf(msg, sizeof(msg), "QSL: Unexpected attribute %s=%s in QSLS element",
 			it.first.c_str(), it.second.c_str());
 		return false;
 	}
@@ -685,7 +685,7 @@ bool qsl_reader::start_value(xml_wreader* w, map<string, string>* attributes) {
 bool qsl_reader::end_qsl_data(xml_wreader* w) {
 	qsl_reader* that = (qsl_reader*)w;
 	if (that->elements_.size()) {
-		status_->misc_status(ST_ERROR, "QSL DATA: Closing /QSL_DATA element encountered unexpectedly");
+		status_->misc_status(ST_ERROR, "QSL: Closing /QSL_DATA element encountered unexpectedly");
 		return false;
 	} 
 	return true;
@@ -755,7 +755,7 @@ bool qsl_reader::chars_file(xml_wreader* w, string content) {
 		that->item_->image.filename = content;
 		return true;
 	} else {
-		status_->misc_status(ST_ERROR, "QSL DATA: Processing image filename when not processing an image");
+		status_->misc_status(ST_ERROR, "QSL: Processing image filename when not processing an image");
 		return false;
 	}
 }
@@ -770,7 +770,7 @@ bool qsl_reader::chars_label(xml_wreader* w, string content) {
 		that->item_->field.label = content;
 		return true;
 	default:
-		status_->misc_status(ST_ERROR, "QSL DATA: Processing label when not processing a field item");
+		status_->misc_status(ST_ERROR, "QSL: Processing label when not processing a field item");
 		return false;
 	}
 }
@@ -785,7 +785,7 @@ bool qsl_reader::chars_data(xml_wreader* w, string content) {
 		that->item_->text.text = content;
 		return true;
 	default:
-		status_->misc_status(ST_ERROR, "QSL DATA: Processing data when not processing a field or text item");
+		status_->misc_status(ST_ERROR, "QSL: Processing data when not processing a field or text item");
 		return false;
 	}
 }

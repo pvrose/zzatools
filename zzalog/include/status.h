@@ -63,6 +63,21 @@ using namespace std;
 		{ ST_FATAL, 'F'}
 	};
 
+	// Abbreviations
+	const map < status_t, const char* > STATUS_ABBREV = {
+		{ ST_NONE, "    "},
+		{ ST_LOG, " LOG "},
+		{ ST_DEBUG, " DBUG"},
+		{ ST_NOTE, " NOTE"},
+		{ ST_PROGRESS, " PROG"},
+		{ ST_OK, " OK  "},
+		{ ST_WARNING, "?WARN"},
+		{ ST_NOTIFY, " NTFY"},
+		{ ST_ERROR, "*ERR*"},
+		{ ST_SEVERE, "!SVR!"},
+		{ ST_FATAL, "!FTL!"}
+	};
+
 	// 
 	enum object_t;
 

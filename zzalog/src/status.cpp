@@ -203,7 +203,10 @@ void status::misc_status(status_t status, const char* label) {
 				restore);
 		}
 		else {
-			cout << f_message;
+			printf("%s %s %s\n",
+				STATUS_ABBREV.at(status),
+				timestamp.c_str(),
+				label);
 		}
 	}
 	if (!report_file_) {

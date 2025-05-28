@@ -8,42 +8,45 @@ main.cpp - application entry point
 
 // local header files
 
-#include "utils.h"
-#include "record.h"
-#include "menu.h"
-#include "book.h"
-#include "cty_data.h"
-#include "toolbar.h"
-#include "spec_data.h"
-#include "status.h"
-#include "tabbed_forms.h"
-#include "import_data.h"
-#include "extract_data.h"
-#include "lotw_handler.h"
-#include "eqsl_handler.h"
-#include "url_handler.h"
-#include "spec_tree.h"
-#include "report_tree.h"
 #include "callback.h"
 #include "drawing.h"
-#include "intl_dialog.h"
+#include "utils.h"
+
+#include "about_dialog.h"
 #include "band_data.h"
-#include "qrz_handler.h"
-#include "club_handler.h"
-#include "wsjtx_handler.h"
-#include "fllog_emul.h"
-#include "hamlib/rig.h"
-#include "main_window.h"
-#include "qso_manager.h"
-#include "logo.h"
-#include "wx_handler.h"
-#include "ticker.h"
-#include "fields.h"
-#include "symbols.h"
-#include "qsl_dataset.h"
-#include "config.h"
 #include "band_window.h"
+#include "book.h"
+#include "club_handler.h"
+#include "config.h"
+#include "cty_data.h"
+#include "eqsl_handler.h"
+#include "extract_data.h"
+#include "fields.h"
+#include "fllog_emul.h"
+#include "import_data.h"
+#include "intl_dialog.h"
+#include "logo.h"
+#include "lotw_handler.h"
+#include "main_window.h"
+#include "menu.h"
+#include "qrz_handler.h"
+#include "qsl_dataset.h"
+#include "qso_manager.h"
+#include "record.h"
+#include "report_tree.h"
 #include "rig_data.h"
+#include "spec_data.h"
+#include "spec_tree.h"
+#include "status.h"
+#include "symbols.h"
+#include "tabbed_forms.h"
+#include "ticker.h"
+#include "toolbar.h"
+#include "url_handler.h"
+#include "wsjtx_handler.h"
+#include "wx_handler.h"
+
+#include "hamlib/rig.h"
 
 // C/C++ header files
 #include <ctime>
@@ -78,7 +81,7 @@ string PROGRAM_ID = "ZZALOG";
 string PROG_ID = "ZLG";
 string PROGRAM_VERSION = "3.5.0";
 string VENDOR = "GM3ZZA";
-string TIMESTAMP = string(__DATE__) + " " + string(__TIME__);
+string TIMESTAMP = string(__DATE__) + " " + string(__TIME__) + " Local";
 
 // switches
 // Debug levels
@@ -839,7 +842,6 @@ void resize_window() {
 	int rh = max(min_h, height);
 	int sx, sy, sw, sh;
 	Fl::screen_work_area(sx, sy, sw, sh);
-	printf("DEBUG: Screen placement X=%d, Y=%d, W=%d, H=%d\n", sx, sy, sw, sh);
 	if (rx < sx) rx = sx;
 	else if (rx + rw > sx + sw) rx = max(0, sx + sw - rw);
 	if (ry < sy) ry = sy;
@@ -1173,16 +1175,31 @@ int main(int argc, char** argv)
 	int i = 1;
 	Fl::args(argc, argv, i, cb_args);
 	if (DISPLAY_VERSION) {
+#ifdef WIN32_
 		// Display version
 		printf("%s Version %s Compiled %s\n", 
 			PROGRAM_ID.c_str(), 
 			PROGRAM_VERSION.c_str(),
 			TIMESTAMP.c_str());
 		curl_version_info_data* data = curl_version_info(CURLVERSION_LAST);
-		printf("With libraries hamlib (%s), FLTK (%d.%d.%d), Curl (%s)\n",
-			rig_version(),
-			FL_MAJOR_VERSION, FL_MINOR_VERSION, FL_PATCH_VERSION,
-			data->version);
+		if (DEBUG_PRETTY) {
+			// Use left lower box symbol
+			printf("\342\224\224With libraries hamlib (%s), FLTK (%d.%d.%d), Curl (%s)\n",
+				rig_version(),
+				FL_MAJOR_VERSION, FL_MINOR_VERSION, FL_PATCH_VERSION,
+				data->version);
+		}
+		else {
+			printf("|-With libraries hamlib (%s), FLTK (%d.%d.%d), Curl (%s)\n",
+				rig_version(),
+				FL_MAJOR_VERSION, FL_MINOR_VERSION, FL_PATCH_VERSION,
+				data->version); 
+		}
+#else
+		about_dialog* dlg = new about_dialog;
+		dlg->show();
+		while (dlg->visible()) Fl::check();
+#endif
 		return 0;
 	}
 	if (HELP) {

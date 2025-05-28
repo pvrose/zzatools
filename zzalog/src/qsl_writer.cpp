@@ -23,21 +23,21 @@ bool qsl_writer::store_data(
     map<string, server_data_t*>* servers, ostream& os) {
     data_ = all_data;
     servers_ = servers;
-    status_->misc_status(ST_NOTE, "QSL DATA: Starting XML generation");
+    status_->misc_status(ST_NOTE, "QSL: Starting XML generation");
    
  
     if (!write_element(QSL_NONE)) {
-        status_->misc_status(ST_ERROR, "QSL DATA: XML generation failed");
+        status_->misc_status(ST_ERROR, "QSL: XML generation failed");
         return false;
     }
     // else
-    status_->misc_status(ST_OK, "QSL DATA: XML Generation succeeded, now writing");
+    status_->misc_status(ST_OK, "QSL: XML Generation succeeded, now writing");
     if (!data(os)) {
-        status_->misc_status(ST_ERROR, "QSL DATA: XML Writing failed");
+        status_->misc_status(ST_ERROR, "QSL: XML Writing failed");
         return false;
     }
     // else
-    status_->misc_status(ST_OK, "QSL DATA: XML Writing done");
+    status_->misc_status(ST_OK, "QSL: XML Writing done");
     return true;
    
 }
@@ -409,7 +409,7 @@ string qsl_writer::font2text(Fl_Font f) {
         break;
     default:
         char msg[128];
-        snprintf(msg, sizeof(msg), "QSL DATA: Unsupported font %d: %s", f, Fl::get_font_name(f));
+        snprintf(msg, sizeof(msg), "QSL: Unsupported font %d: %s", f, Fl::get_font_name(f));
         status_->misc_status(ST_WARNING, msg);
         s = Fl::get_font_name(f);
         break;

@@ -101,7 +101,7 @@ const int ROW_HEIGHT = DEFAULT_SIZE + 4;    // Default height for table rows
 		{ OT_CARD, "QSL" },
 		{ OT_WSJTX, "WSJT-X" },
 		{ OT_RIGS, "RIG DATA" },
-		{ OT_QSLS, "QSL DATA" },
+		{ OT_QSLS, "QSL" },
 	};
 
 	// Main window default sizes
