@@ -212,6 +212,15 @@ void status::misc_status(status_t status, const char* label) {
 	if (!report_file_) {
 		// Append the status to the file
 		// Try to open the file. Open and close it each message
+		// Save previous files
+		for (char c = '8'; c > '0'; c--) {
+			// Rename will fail if file does not exist, so no need to test file exists
+			string oldfile = report_filename_ + c;
+			char c2 = c + 1;
+			string newfile = report_filename_ + c2;
+			fl_rename(oldfile.c_str(), newfile.c_str());
+		}
+		fl_rename(report_filename_.c_str(), (report_filename_ + '1').c_str());
 		// Create a new file 
 		report_file_ = new ofstream(report_filename_, ios::out | ios::trunc);
 		if (!report_file_->good()) {
