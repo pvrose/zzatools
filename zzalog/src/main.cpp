@@ -361,7 +361,6 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 		for (Fl_Window* wx = Fl::first_window(); wx; wx = Fl::first_window()) wx->hide();
 
 		// Exit and close application
-		status_->misc_status(ST_OK, "ZZALOG: Closed");
 		Fl_Single_Window::default_callback((Fl_Window*)w, v);
 	}
 }
@@ -877,6 +876,7 @@ void tidy() {
 	delete tabbed_forms_;
 	delete toolbar_;
 	delete fields_;
+	if (closing_) status_->misc_status(ST_OK, "ZZALOG: Closed");
 	delete status_;
 	delete menu_;
 	delete main_window_;
@@ -1267,7 +1267,6 @@ int main(int argc, char** argv)
 	}
 	// Delete everything we've created
 	tidy();
-	printf("ZZALOG Closed\n");
 	return code;
 }
 
