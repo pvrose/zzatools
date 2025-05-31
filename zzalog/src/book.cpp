@@ -868,9 +868,11 @@ void book::delete_record(bool force) {
 			get_record()->item("CALL").c_str());
 		status_->misc_status(ST_NOTE, text);
 		// Cancel record edit.
-		*get_record() = *old_record_;
-		delete old_record_;
-		old_record_ = nullptr;
+		if (old_record_) {
+			*get_record() = *old_record_;
+			delete old_record_;
+			old_record_ = nullptr;
+		}
 		// Because we have not updated other views yet, we only regard this as a minor change
 		selection(-1, HT_MINOR_CHANGE);
 		menu_->update_items();
