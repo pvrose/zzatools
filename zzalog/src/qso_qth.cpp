@@ -74,7 +74,17 @@ void qso_qth::create_form(int X, int Y) {
 	// bn_edit_->labelcolor(FL_BLACK);
 	bn_edit_->callback(cb_bn_edit, nullptr);
 	bn_edit_->tooltip("Open window to allow QTH to be edited");
-	max_x = max(max_x, bn_edit_->x() + bn_edit_->w());
+	int save_x = curr_x;
+	curr_x += bn_edit_->w() + GAP;
+
+	// Copy button
+	bn_copy_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Copy");
+	bn_copy_->callback(cb_bn_copy, nullptr);
+	bn_copy_->tooltip("Expand macro into the current QSO");
+
+	curr_x = save_x;
+	max_x = max(max_x, bn_copy_->x() + bn_copy_->w());
+
 
 	// Table showing details
 	table_ = new table(curr_x, save_y, width, curr_y - save_y, "Macro definition");
@@ -153,6 +163,14 @@ void qso_qth::cb_bn_edit(Fl_Widget* w, void* v) {
 		break;
 	}
 	delete dlg;
+	that->enable_widgets();
+}
+
+// Copy the macro expansion into current QSO
+void qso_qth::cb_bn_copy(Fl_Widget* w, void* v) {
+	qso_qth* that = ancestor_view<qso_qth>(w);
+	qso_data* qd = ancestor_view<qso_data>(that);
+	qd->action_expand_macro("APP_ZZA_QTH");
 	that->enable_widgets();
 }
 

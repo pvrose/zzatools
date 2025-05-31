@@ -37,6 +37,8 @@ protected:
 
     // Edit button clicked - opens qth_dialog
     static void cb_bn_edit(Fl_Widget* w, void* v);
+    // Copy button clicked - copy macro to QSO
+    static void cb_bn_copy(Fl_Widget* w, void* v);
 
     // Editing table 
     class table : public Fl_Table_Row
@@ -67,6 +69,7 @@ protected:
     Fl_Output* op_descr_;
     table* table_;
     Fl_Button* bn_edit_;
+    Fl_Button* bn_copy_;
 
 };
 

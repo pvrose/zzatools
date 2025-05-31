@@ -979,3 +979,4 @@ void qso_entry::save_focus(Fl_Widget* w) {
 		focus_ix_ = ix;
 	}
 }
+

@@ -910,6 +910,11 @@ bool qso_data::action_save(bool continuing) {
 	}
 
 	if (!continuing) {
+		// If record 0 and size = 0 - copy QTH definition into QSO
+		if (book_->size() == 1 && qso_number == 0) {
+			action_expand_macro("APP_ZZA_QTH");
+		}
+
 		// check whether record has changed - when parsed
 		if (cty_data_->update_qso(qso)) {
 		}
@@ -1696,6 +1701,15 @@ void qso_data::action_parse_qso() {
 	if (changed || parse_result) {
 		g_entry_->copy_qso_to_display(qso_entry::CF_ALL_FLAGS);
 	}
+	enable_widgets();
+}
+
+// Expand macro into current QSO
+void qso_data::action_expand_macro(string macro) {
+	record* qso = current_qso();
+	string name = qso->item(macro);
+	record* macro_data = spec_data_->expand_macro(macro, name);
+	qso->merge_records(macro_data);
 	enable_widgets();
 }
 

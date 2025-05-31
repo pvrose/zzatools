@@ -235,6 +235,8 @@ public:
 	void action_return_state();
 	// Add parse details to QSO
 	void action_parse_qso();
+	// Expand macro
+	void action_expand_macro(string macro);
 
 	qso_contest* contest();
 	// Contest mode is active
