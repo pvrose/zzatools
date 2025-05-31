@@ -116,7 +116,6 @@ void qso_qth::enable_widgets() {
 		op_descr_->value("");
 		table_->set_data(nullptr);
 	}
-	qso_data* qd = ancestor_view<qso_data>(this);
 	// TODO - just to get it working for release at initialisation - needs deeper thought
 	bn_edit_->activate();
 	//if (qd->qso_editing(qd->current_number())) bn_edit_->activate();
