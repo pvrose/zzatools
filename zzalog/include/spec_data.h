@@ -148,8 +148,10 @@ typedef size_t qso_num_t;
 		void process_bands();
 		// Return spec data valid
 		bool valid();
-
-
+		// Load default QTH macro
+		void load_default_qth();
+		// Store default QTH macro
+		void store_default_qth();
 
 	// protected methods
 	protected:

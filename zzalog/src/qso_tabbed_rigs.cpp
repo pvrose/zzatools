@@ -60,15 +60,15 @@ void qso_tabbed_rigs::create_form(int X, int Y) {
 	int rw = 0;
 	int rh = 0;
 	client_area(rx, ry, rw, rh, 0);
-	int saved_rw = rw;
-	int saved_rh = rh;
+	int delta_w = w() - rw;
+	int delta_h = h() - rh;
 	if (label_map_.size() == 0) {
 		// Create a dummy instance of qao_rig to get its size
 		qso_rig* w = new qso_rig(rx, ry, rw, rh, "");
 		rw = w->w();
 		rh = w->h();
 		// And delete it
-		remove(w);
+		// remove(w);
 	}
 	// For each currently salient rig...
 	for (auto ix = label_map_.begin(); ix != label_map_.end(); ix++) {
@@ -86,8 +86,9 @@ void qso_tabbed_rigs::create_form(int X, int Y) {
 		rh = max(rh, w->h());
 	}
 	resizable(nullptr);
-	size(w() + rw - saved_rw, h() + rh - saved_rh);
+	size(rw + delta_w, rh + delta_h);
 	end();
+	show();
 
 	if (children() > default_tab_) value(child(default_tab_));
 

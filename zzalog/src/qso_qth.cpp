@@ -107,8 +107,10 @@ void qso_qth::enable_widgets() {
 		table_->set_data(nullptr);
 	}
 	qso_data* qd = ancestor_view<qso_data>(this);
-	if (qd->qso_editing(qd->current_number())) bn_edit_->activate();
-	else bn_edit_->deactivate();
+	// TODO - just to get it working for release at initialisation - needs deeper thought
+	bn_edit_->activate();
+	//if (qd->qso_editing(qd->current_number())) bn_edit_->activate();
+	//else bn_edit_->deactivate();
 	table_->redraw();
 	redraw();
 }

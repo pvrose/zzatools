@@ -2624,3 +2624,132 @@ bool spec_data::find_and_copy_data() {
 		return true;
 	}
 }
+
+// Load a default QTH - called when log book empty
+void spec_data::load_default_qth() {
+	Fl_Preferences settings(Fl_Preferences::USER, VENDOR.c_str(), PROGRAM_ID.c_str());
+	if (settings.group_exists("Default QTH")) {
+		Fl_Preferences qth_settings(settings, "Default QTH");
+		string name;
+		char* temp;
+		if (qth_settings.get("Name", temp, "")) {
+			name = temp;
+			string description;
+			record* qth_details = new record;
+			if (qth_settings.get("Street", temp, "")) {
+				qth_details->item("MY_STREET", string(temp));
+			}
+			free(temp);
+			if (qth_settings.get("City", temp, "")) {
+				qth_details->item("MY_CITY", string(temp));
+			}
+			free(temp);
+			if (qth_settings.get("Postcode", temp, "")) {
+				qth_details->item("MY_POSTAL_CODE", string(temp));
+			}
+			free(temp);
+			if (qth_settings.get("Locator", temp, "")) {
+				qth_details->item("MY_GRIDSQUARE", string(temp));
+			}
+			free(temp);
+			if (qth_settings.get("DXCC Name", temp, "")) {
+				qth_details->item("MY_COUNTRY", string(temp));
+			}
+			free(temp);
+			if (qth_settings.get("DXCC ID", temp, "")) {
+				qth_details->item("MY_DXCC", string(temp));
+			}
+			free(temp);
+			if (qth_settings.get("Primary Subdivision", temp, "")) {
+				qth_details->item("MY_STATE", string(temp));
+			}
+			free(temp);
+			if (qth_settings.get("Secondary Subdivision", temp, "")) {
+				qth_details->item("MY_CNTY", string(temp));
+			}
+			free(temp);
+			if (qth_settings.get("CQ Zone", temp, "")) {
+				qth_details->item("MY_CQ_ZONE", string(temp));
+			}
+			free(temp);
+			if (qth_settings.get("ITU Zone", temp, "")) {
+				qth_details->item("MY_ITU_ZONE", string(temp));
+			}
+			free(temp);
+			if (qth_settings.get("Continent", temp, "")) {
+				qth_details->item("MY_CONT", string(temp));
+			}
+			free(temp);
+			if (qth_settings.get("IOTA", temp, "")) {
+				qth_details->item("MY_IOTA", string(temp));
+			}
+			free(temp);
+			if (qth_settings.get("WAB", temp, "")) {
+				qth_details->item("APP_ZZA_MY_WAB", string(temp));
+			}
+			free(temp);
+			if (qth_settings.get("Description", temp, "")) {
+				description = temp;
+			}
+			free(temp);
+			add_user_macro("APP_ZZA_QTH", name, { qth_details, description });
+			char msg[128];
+			snprintf(msg, sizeof(msg), "SPEC DATA: Default QTH %s loaded", name.c_str());
+			status_->misc_status(ST_OK, msg);
+			return;
+		}
+	}
+	// else
+	status_->misc_status(ST_NOTE, "SPEC DATA: No default QTH in settings");
+}
+
+// Store the default QTH - called when log book otherwise empty
+void spec_data::store_default_qth() {
+	if (macros_.size() > 0 && macros_.find("APP_ZZA_QTH") != macros_.end()) {
+		macro_map* qth_macro = macros_.at("APP_ZZA_QTH");
+		if (qth_macro->size() > 1) {
+			status_->misc_status(ST_WARNING, "More than 1 QTH specified - saving first only");
+		}
+		if (qth_macro->size() > 0) {
+			string name = qth_macro->begin()->first;
+			record* qth_details = qth_macro->begin()->second->fields;
+			string description = qth_macro->begin()->second->description;
+			Fl_Preferences settings(Fl_Preferences::USER, VENDOR.c_str(), PROGRAM_ID.c_str());
+			Fl_Preferences qth_settings(settings, "Default QTH");
+			qth_settings.set("Name", name.c_str());
+			qth_settings.set("Description", description.c_str());
+			string value;
+			value = qth_details->item("MY_STREET");
+			if (value.length()) qth_settings.set("Street", value.c_str());
+			value = qth_details->item("MY_CITY");
+			if (value.length()) qth_settings.set("City", value.c_str());
+			value = qth_details->item("MY_POSTAL_CODE");
+			if (value.length()) qth_settings.set("Postcode", value.c_str());
+			value = qth_details->item("MY_GRIDSQUARE");
+			if (value.length()) qth_settings.set("Locator", value.c_str());
+			value = qth_details->item("MY_COUNTRY");
+			if (value.length()) qth_settings.set("DXCC Name", value.c_str());
+			value = qth_details->item("MY_DXCC");
+			if (value.length()) qth_settings.set("DXCC ID", value.c_str());
+			value = qth_details->item("MY_STATE");
+			if (value.length()) qth_settings.set("Primary Subdivision", value.c_str());
+			value = qth_details->item("MY_CNTY");
+			if (value.length()) qth_settings.set("Secondary Subdivision", value.c_str());
+			value = qth_details->item("MY_CQ_ZONE");
+			if (value.length()) qth_settings.set("CQ Zone", value.c_str());
+			value = qth_details->item("MY_ITU_ZONE");
+			if (value.length()) qth_settings.set("ITU ZOne", value.c_str());
+			value = qth_details->item("MY_CONT");
+			if (value.length()) qth_settings.set("Continent", value.c_str());
+			value = qth_details->item("MY_IOTA");
+			if (value.length()) qth_settings.set("IOTA", value.c_str());
+			value = qth_details->item("APP_ZZA_MY_WAB");
+			if (value.length()) qth_settings.set("WAB", value.c_str());
+			char msg[128];
+			snprintf(msg, sizeof(msg), "SPEC DATA: Saving default QTH %s", name.c_str());
+			status_->misc_status(ST_OK, msg);
+			return;
+		}
+	}
+	status_->misc_status(ST_OK, "SPEC DATA: No default QTH saved");
+}

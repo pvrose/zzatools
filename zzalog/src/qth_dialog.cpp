@@ -56,7 +56,9 @@ qth_dialog::~qth_dialog() {
 // Get initial data from settings - additional ones for the QTH group
 void qth_dialog::load_values() {
 	// Get the QTH details
-	qth_details_ = new record(*spec_data_->expand_macro("APP_ZZA_QTH", qth_name_));
+	record* macro = spec_data_->expand_macro("APP_ZZA_QTH", qth_name_);
+	if (macro) qth_details_ = new record(*macro);
+	else qth_details_ = new record();
 	current_qth_.street = qth_details_->item("MY_STREET");
 	current_qth_.city = qth_details_->item("MY_CITY");
 	current_qth_.postcode = qth_details_->item("MY_POSTAL_CODE");

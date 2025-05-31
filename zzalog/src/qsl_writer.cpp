@@ -75,7 +75,9 @@ bool qsl_writer::write_element(qsl_element_t element) {
             for (auto itc : *itt.second) {
                 callsign_ = itc.first;
                 current_ = itc.second;
-                if (!write_element(QSL_QSL)) return false;
+                if (callsign_ != "") {
+                    if (!write_element(QSL_QSL)) return false;
+                }
             }
         }
         if (!end_element(name)) return false;

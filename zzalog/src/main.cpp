@@ -261,6 +261,9 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 				break;
 			}
 		}
+		if (book_ && book_->size() == 0) {
+			spec_data_->store_default_qth();
+		}
 		// Wait for auto-import of files to complete
 		if (import_data_) {
 			if (!import_data_->update_complete()) {

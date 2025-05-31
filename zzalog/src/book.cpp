@@ -303,6 +303,9 @@ bool book::load_data(string filename)
 				for (auto mx = used_qths_.begin(); mx != used_qths_.end(); mx++) {
 					spec_data_->add_user_macro("APP_ZZA_QTH", (*mx).first, *((*mx).second));
 				}
+				if (used_qths_.size() == 0) {
+					spec_data_->load_default_qth();
+				}
 				// Update spec_data_item_
 				for (auto mx = used_ops_.begin(); mx != used_ops_.end(); mx++) {
 					spec_data_->add_user_macro("APP_ZZA_OP", (*mx).first, *((*mx).second));

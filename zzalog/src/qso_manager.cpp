@@ -125,7 +125,7 @@ void qso_manager::create_form(int X, int Y) {
 	begin();
 
 	// QSO Data form
-	data_group_ = new qso_data(curr_x, curr_y, 0, 0, nullptr);
+	data_group_ = new qso_data(curr_x, curr_y, 50, 50, nullptr);
 	data_group_->create_form(curr_x, curr_y);
 	curr_x += data_group_->w();
 	curr_y += data_group_->h();
@@ -137,16 +137,16 @@ void qso_manager::create_form(int X, int Y) {
 
 	Fl_Group::current(this);
 	// Rig control tabbed form
-	rig_group_ = new qso_tabbed_rigs(curr_x, curr_y, 0, 0, nullptr);
+	rig_group_ = new qso_tabbed_rigs(curr_x, curr_y, 50, 50, nullptr);
 
 	curr_x += rig_group_->w() + GAP;
 
 	// Clocks tabbed form
-	clock_group_ = new qso_clocks(curr_x, curr_y, 0, 0, nullptr);
+	clock_group_ = new qso_clocks(curr_x, curr_y, 50, 50, nullptr);
 	curr_x += clock_group_->w() + GAP;
 
 	// Information tabbed form
-	info_group_ = new qso_log(curr_x, curr_y, 0, 0, nullptr);
+	info_group_ = new qso_log(curr_x, curr_y, 50, 50, nullptr);
 	curr_x += info_group_->w() + GAP;
 
 	curr_y += max(
