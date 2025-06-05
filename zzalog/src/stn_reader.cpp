@@ -197,7 +197,6 @@ bool stn_reader::start_scallsign(xml_wreader* rdr, map<string, string>* attribut
 	stn_reader* that = (stn_reader*)rdr;
 	string call = "";
 	string description = "";
-	char msg[128];
 	for (auto it : *attributes) {
 		string name = to_upper(it.first);
 		if (name == "CALL") call = it.second;

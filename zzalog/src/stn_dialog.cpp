@@ -67,31 +67,8 @@ void stn_dialog::create_form(int X, int Y) {
 // Used to write settings back
 void stn_dialog::save_values() {
 	g_qth_->save_data();
-	const qth_info_t* qth = stn_data_->get_qth(g_qth_->id());
 	g_oper_->save_data();
-	const oper_info_t* oper = stn_data_->get_oper(g_oper_->id());
 	g_call_->save_data();
-	// Copy fields back to current QSO
-	//if (qso_) {
-	//	// Copy QTH fields 
-	//	for (auto it : QTH_ADIF_MAP) {
-	//		string value = qth->data.at(it.first);
-	//		string field = it.second;
-	//		if (value.length()) {
-	//			qso_->item(field, value);
-	//		}
-	//	}
-	//	// Copy Operator fields
-	//	for (auto it : OPER_ADIF_MAP) {
-	//		string value = oper->data.at(it.first);
-	//		string field = it.second;
-	//		if (value.length()) {
-	//			qso_->item(field, value);
-	//		}
-	//	}
-	//	// Copy callsign
-	//	qso_->item("STATION_CALLSIGN", g_call_->id());
-	//}
 }
 
 // Used to enable/disable specific widget - any widgets enabled musr be attributes
