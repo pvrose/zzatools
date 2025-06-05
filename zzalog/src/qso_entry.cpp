@@ -340,6 +340,9 @@ void qso_entry::copy_qso_to_qso(record* old_record, int flags) {
 			}
 		}
 	}
+	if (flags & CF_RIG_ETC) {
+		qso_data_->update_station_fields(qso_);
+	}
 	qso_->item("QSO_COMPLETE", string("N"));
 	copy_qso_to_display(CF_ALL_FLAGS);
 }
@@ -496,12 +499,10 @@ void qso_entry::copy_default_to_qso() {
 	if (qso_) {
 		record* latest = book_->get_latest();
 		if (latest) {
-			qso_->item("STATION_CALLSIGN", latest->item("STATION_CALLSIGN"));
-			qso_->item("APP_ZZA_QTH", latest->item("APP_ZZA_QTH"));
 			qso_->item("MY_RIG", latest->item("MY_RIG"));
 			qso_->item("MY_ANTENNA", latest->item("MY_ANTENNA"));
-			qso_->item("APP_ZZA_OP", latest->item("APP_ZZA_OP"));
 		}
+		qso_data_->update_station_fields(qso_);
 	}
 }
 
@@ -719,20 +720,6 @@ void qso_entry::cb_ip_field(Fl_Widget* w, void* v) {
 			else {
 				that->qso_->item("MODE", value);
 				that->qso_->item("SUBMODE", string(""));
-			}
-		}
-		else if (field == "APP_ZZA_QTH") {
-			// Send new value to spec_data to create an empty entry if it's a new one
-			if (!ip->menubutton()->changed()) {
-				macro_defn entry = { nullptr, "" };
-				spec_data_->add_user_macro(field, value, entry);
-			}
-		}
-		else if (field == "APP_ZZA_OP") {
-			// Send new value to spec_data to create an empty entry if it's a new one
-			if (!ip->menubutton()->changed()) {
-				macro_defn entry = { nullptr, "" };
-				spec_data_->add_user_macro(field, value, entry);
 			}
 		}
 		else if (field == "MY_RIG") {

@@ -42,7 +42,7 @@ public:
 	// Map indicating which fields get copied per the above flags
 	const map < copy_flags, set<string> > COPY_FIELDS =
 	{
-		{ CF_RIG_ETC, { "MY_RIG", "MY_ANTENNA", "STATION_CALLSIGN", "APP_ZZA_QTH", "APP_ZZA_OP" } },
+		{ CF_RIG_ETC, { "MY_RIG", "MY_ANTENNA", "STATION_CALLSIGN" } },
 		{ CF_CAT, { "MODE", "FREQ", "SUBMODE", "TX_PWR", "BAND" } },
 		{ CF_DATE, { "QSO_DATE" } },
 		{ CF_TIME, { "QSO_DATE_OFF", "TIME_ON", "TIME_OFF" } },
@@ -55,7 +55,7 @@ public:
 	const set < copy_flags > COPY_SET = { CF_RIG_ETC, CF_CAT, CF_DATE, CF_TIME, CF_CALL, CF_DETAILS, CF_REPORTS };
 
 	// Loggable field names
-	static const int NUMBER_FIXED = 4;
+	static const int NUMBER_FIXED = 2;
 	static const int NUMBER_TOTAL = NUMBER_FIXED + 20;
 
 	// Variable fields - per usage

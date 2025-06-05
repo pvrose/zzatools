@@ -67,6 +67,7 @@ const int ROW_HEIGHT = DEFAULT_SIZE + 4;    // Default height for table rows
 		OT_WSJTX,            // Import from WSJT-X
 		OT_RIGS,             // Reading Rig data XML file
 		OT_QSLS,             // Redaing QSL data XML file
+		OT_STN,              // Reading Station data XML file
 	};
 
 	// Default colours to use in tab view labels and/or progress bar
@@ -85,6 +86,7 @@ const int ROW_HEIGHT = DEFAULT_SIZE + 4;    // Default height for table rows
 		{ OT_WSJTX, COLOUR_NAVY },
 		{ OT_RIGS, FL_BACKGROUND_COLOR },
 		{ OT_QSLS, FL_BACKGROUND_COLOR },
+		{ OT_STN, FL_BACKGROUND_COLOR },
 	};
 
 	// Names of the objects
@@ -102,6 +104,7 @@ const int ROW_HEIGHT = DEFAULT_SIZE + 4;    // Default height for table rows
 		{ OT_WSJTX, "WSJT-X" },
 		{ OT_RIGS, "RIG DATA" },
 		{ OT_QSLS, "QSL" },
+		{ OT_STN, "STN DATA" },
 	};
 
 	// Main window default sizes

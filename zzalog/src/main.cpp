@@ -38,6 +38,7 @@ main.cpp - application entry point
 #include "spec_data.h"
 #include "spec_tree.h"
 #include "status.h"
+#include "stn_data.h"
 #include "symbols.h"
 #include "tabbed_forms.h"
 #include "ticker.h"
@@ -79,7 +80,7 @@ string COPYRIGHT = "\302\251 Philip Rose GM3ZZA 2018-2025. All rights reserved.\
 string DATA_COPYRIGHT = "\302\251 Philip Rose %s. This data may be copied for the purpose of correlation and analysis";
 string PROGRAM_ID = "ZZALOG";
 string PROG_ID = "ZLG";
-string PROGRAM_VERSION = "3.5.0";
+string PROGRAM_VERSION = "3.5.1";
 string VENDOR = "GM3ZZA";
 string TIMESTAMP = string(__DATE__) + " " + string(__TIME__) + " Local";
 
@@ -136,6 +137,7 @@ qsl_dataset* qsl_dataset_ = nullptr;
 config* config_ = nullptr;
 band_window* band_window_ = nullptr;
 rig_data* rig_data_ = nullptr;
+stn_data* stn_data_ = nullptr;
 // Recent files opened
 list<string> recent_files_;
 
@@ -260,9 +262,6 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 				book_->delete_record(book_->new_record());
 				break;
 			}
-		}
-		if (book_ && book_->size() == 0) {
-			spec_data_->store_default_qth();
 		}
 		// Wait for auto-import of files to complete
 		if (import_data_) {
@@ -688,6 +687,10 @@ void add_data() {
 	if (!closing_) {
 		qsl_dataset_ = new qsl_dataset;
 	}
+	// Add the Station details database
+	if (!closing_) {
+		stn_data_ = new stn_data;
+	}
 }
 
 // read in the log data
@@ -869,6 +872,7 @@ void tidy() {
 	delete extract_records_;
 	delete import_data_;
 	delete book_;
+	delete stn_data_;
 	delete qsl_dataset_;
 	delete band_data_;
 	delete intl_dialog_;

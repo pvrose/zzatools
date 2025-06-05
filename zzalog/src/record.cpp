@@ -299,58 +299,10 @@ string record::item(string field, bool formatted/* = false*/, bool indirect/* = 
 	if (indirect) {
 		// Get the formatted version if exists
 		result = item(field, formatted);
-		// Get the item value based on APP_ZZA_QTH if it doesn't exist
 		if (result == "") {
 			// Not set in the item
 			// If station location details fetch them the settings.
 			string qth_name;
-			// Read APP_ZZA_QTH field and get the settings for that value 
-			qth_name = item("APP_ZZA_QTH", false, false);
-			if (qth_name.length()) {
-				record* macro = spec_data_->expand_macro("APP_ZZA_QTH", qth_name);
-				if (macro != nullptr) {
-					if (field == "MY_COUNTRY") {
-						int entity_id;
-						macro->item("MY_DXCC", entity_id);
-						spec_dataset* entities = spec_data_->dataset("DXCC_Entity_Code");
-						map<string, string>* entity_data = entities->data.at(to_string(entity_id));
-						result = entity_data->at("Entity Name");
-					}
-					else if (field == "MY_GRIDSQUARE") {
-						// Get operator's gridsquare
-						string grid = macro->item("MY_GRIDSQUARE");
-						if (grid.length() > 8) {
-							result = grid.substr(0, 8);
-						}
-						else {
-							result = grid;
-						}
-					}
-					else if (field == "MY_GRIDSQUARE_EXT") {
-						// Get operator's gridsquare
-						string grid = macro->item("MY_GRIDSQUARE");
-						if (grid.length() > 8) {
-							result = grid.substr(8);
-						}
-						else {
-							result = "";
-						}
-					}
-					else {
-						result = macro->item(field);
-					}
-				}
-			}
-		}
-		if (result == "") {
-			string op_name = item("APP_ZZA_OP", false, false);
-			if (op_name.length()) {
-				// Read APP_ZZA_OP field and get the settings for that value
-				record* macro = spec_data_->expand_macro("APP_ZZA_OP", op_name);
-				if (macro != nullptr) {
-					result = macro->item(field);
-				}
-			}
 		}
 	}
 	else if (formatted) {

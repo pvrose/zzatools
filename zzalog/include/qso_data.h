@@ -11,12 +11,13 @@
 
 using namespace std;
 
-class qso_entry;
-class qso_query;
 class qso_buttons;
+class qso_contest;
+class qso_entry;
 class qso_misc;
 class qso_net_entry;
-class qso_contest;
+class qso_operation;
+class qso_query;
 class record;
 typedef size_t qso_num_t;
 enum navigate_t : uchar;
@@ -38,8 +39,6 @@ static const field_list QSO_FIELDS = {
 static const field_list STN_FIELDS = {
 	"MY_RIG",
 	"MY_ANTENNA",
-	"APP_ZZA_QTH",
-	"STATION_CALLSIGN"
 };
 
 
@@ -152,6 +151,10 @@ public:
 	bool qso_editing(qso_num_t number);
 	// Not actively editing
 	bool inactive();
+	// Get default station information
+	string get_default_station(char t);
+	// Update record from station information
+	void update_station_fields(record* qso);
 
 
 	// State transition actions:-
@@ -235,8 +238,6 @@ public:
 	void action_return_state();
 	// Add parse details to QSO
 	void action_parse_qso();
-	// Expand macro
-	void action_expand_macro(string macro);
 
 	qso_contest* contest();
 	// Contest mode is active
@@ -268,6 +269,8 @@ protected:
 	record* peeked_qso_;
 
 	// Widgets
+	// Station operations group
+	qso_operation* g_station_;
 	// Entry group
 	qso_entry* g_entry_;
 	// Query group

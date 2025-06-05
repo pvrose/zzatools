@@ -25,11 +25,12 @@ const int HCONFIG = 500;
 
 	public:
 
-		// The tab types in the config dialog
+		// The tab types in the config dialog - order is speific!
 		enum cfg_dialog_t {
 			DLG_FILES,
 			DLG_WEB,
 			DLG_COLUMN,
+			DLG_STATION,
 			DLG_USER,
 			DLG_QSLE,
 			DLG_ALL,
@@ -51,6 +52,8 @@ const int HCONFIG = 500;
 		void inactive();
 		// Set the tab
 		void set_tab(cfg_dialog_t active);
+		// Set and Get the tab
+		Fl_Widget* get_tab(cfg_dialog_t active);
 
 		// protected methods
 	protected:

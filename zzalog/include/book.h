@@ -213,12 +213,12 @@ using namespace std;
 		bool loading();
 		bool storing();
 
-		// Process macro fields
-		bool get_macro(record* use_record, string macro_name, set<string> field_names, macro_map& map, bool allow_null = false);
+		// Remove old macros
+		void deprecate_macros(record* use_record);
 		// Set the filename
 		void set_filename(string filename);
-		// Get macro field
-		set<string> get_macro_fields(string name);
+		//// Get macro field
+		//set<string> get_macro_fields(string name);
 		// Is this record in the book
 		bool has_record(record* qso);
 		// Mark this record dirty
@@ -273,10 +273,6 @@ using namespace std;
 		set<string> used_antennas_;
 		// Callsigns used
 		set<string> used_callsigns_;
-		// QTHs used - with data
-		macro_map used_qths_;
-		// Operators used
-		macro_map used_ops_;
 		// Ignore null macros
 		bool ignore_null_;
 		// Bands worked per DXCC
@@ -312,11 +308,6 @@ using namespace std;
 		adx_writer* adx_writer_;
 		// Upload allowed
 		bool upload_allowed_;
-		// "APP_ZZA_QTH" inplies a macro substitition. Description given in APP_ZZA_QTH_DESCR
-		// Allow compiler to optimise this
-		static set<string> qth_fields_;
-		// "APP_ZZA_OP" implies a macro substitution
-		static set<string> op_fields_;
 		// Set of dirty QSOs
 		set<record*> dirty_qsos_;
 		// Need flag to indicate a record has been deleted

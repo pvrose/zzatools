@@ -4,6 +4,7 @@
 #include "url_handler.h"
 #include "qso_manager.h"
 #include "record.h"
+#include "stn_data.h"
 #include "ticker.h"
 
 #include <sstream>
@@ -17,6 +18,7 @@ extern status* status_;
 extern url_handler* url_handler_;
 extern qso_manager* qso_manager_;
 extern ticker* ticker_;
+extern stn_data* stn_data_;
 extern bool DEBUG_THREADS;
 extern bool DEBUG_QUICK;
 
@@ -174,10 +176,15 @@ void wx_handler::update() {
     // Create a dummy record to get own location
     char msg[1024];
     record* dummy = qso_manager_->dummy_qso();
-    dummy->item("APP_ZZA_QTH", qso_manager_->get_default(qso_manager::QTH));
-    lat_long_t location = dummy->location(true);
+    string qth_id = qso_manager_->get_default(qso_manager::QTH);
+    const qth_info_t* info = stn_data_->get_qth(qth_id);
+    lat_long_t location = { nan(""), nan("") };
+    if (info != nullptr) {
+        dummy->item("MY_GRIDSQUARE", info->data.at(LOCATOR));
+        location = dummy->location(true);
+    }
     if (isnan(location.latitude) || isnan(location.longitude)) {
-        snprintf(msg, sizeof(msg),"WX_HANDLER: Location '%s' has no coordinates", dummy->item("APP_ZZA_QTH").c_str());
+        snprintf(msg, sizeof(msg),"WX_HANDLER: Location '%s' has no coordinates", qth_id.c_str());
         status_->misc_status(ST_ERROR, msg);
         report_ = wx_report();
         report_.city_name = "Not known";

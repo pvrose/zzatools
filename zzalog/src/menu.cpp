@@ -93,6 +93,7 @@ extern string PROGRAM_ID;
 		{ "Fi&les", 0, menu::cb_mi_settings, (void*)config::DLG_FILES },
 		{ "&Web/Network", 0, menu::cb_mi_settings, (void*)config::DLG_WEB },
 		{ "&Fields", 0, menu::cb_mi_settings, (void*)config::DLG_COLUMN },
+		{ "&Station", 0, menu::cb_mi_settings, (void*)config::DLG_STATION },
 		{ "&User config", 0, menu::cb_mi_settings, (void*)config::DLG_USER },
 		{ "&QSL design", 0, menu::cb_mi_settings, (void*)config::DLG_QSLE },
 		{ "&All", 0, menu::cb_mi_settings, (void*)config::DLG_ALL },

@@ -33,7 +33,8 @@ public:
         bool (*end_method)(xml_wreader*);
         bool (*chars_method)(xml_wreader*, string);
     };
-   // Name to element map - set by client
+  
+    // Name to element map - set by client
     map<string, char> element_map_;
     // Map for methods to call for the particular element 
     map<char, methods> method_map_;

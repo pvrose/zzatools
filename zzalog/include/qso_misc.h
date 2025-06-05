@@ -3,7 +3,6 @@
 #include <FL/Fl_Tabs.H>
 
 class record;
-class qso_qth;
 class qso_details;
 class qso_dxcc;
 class qso_qsl_vwr;
@@ -40,7 +39,6 @@ protected:
 	record* qso_;
 
 	// Widgets
-	qso_qth* qth_;
 	qso_details* details_;
 	qso_dxcc* dxcc_;
 	qso_qsl_vwr* qsl_;

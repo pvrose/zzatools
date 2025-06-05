@@ -20,7 +20,6 @@
 #include "field_choice.h"
 #include "tabbed_forms.h"
 #include "import_data.h"
-#include "qth_dialog.h"
 #include "utils.h"
 #include "qrz_handler.h"
 #include "main_window.h"
@@ -395,12 +394,6 @@ void qso_manager::update_import_qso(record* import_qso) {
 			import_qso->item("MY_RIG", get_default(RIG));
 		if (import_qso->item("MY_ANTENNA").length() == 0) 
 			import_qso->item("MY_ANTENNA", get_default(ANTENNA));
-		if (import_qso->item("STATION_CALLSIGN").length() == 0) 
-			import_qso->item("STATION_CALLSIGN", get_default(CALLSIGN));
-		if (import_qso->item("APP_ZZA_QTH").length() == 0) 
-			import_qso->item("APP_ZZA_QTH", get_default(QTH));
-		if (import_qso->item("APP_ZZA_OP").length() == 0) 
-			import_qso->item("APP_ZZA_OP", get_default(OP));
 	}
 }
 
@@ -418,11 +411,9 @@ string qso_manager::get_default(stn_item_t item) {
 		case ANTENNA:
 			return source->item("MY_ANTENNA");
 		case CALLSIGN:
-			return source->item("STATION_CALLSIGN");
 		case QTH:
-			return source->item("APP_ZZA_QTH");
 		case OP:
-			return source->item("APP_ZZA_OP");
+			return data()->get_default_station(item);
 		default:
 			return "";
 		}

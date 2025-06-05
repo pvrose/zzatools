@@ -4,7 +4,6 @@
 #include "book.h"
 #include "cty_data.h"
 #include "qso_manager.h"
-#include "qth_dialog.h"
 #include "spec_data.h"
 #include "drawing.h"
 #include "callback.h"

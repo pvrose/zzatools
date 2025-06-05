@@ -1,5 +1,4 @@
 #include "qso_misc.h"
-#include "qso_qth.h"
 #include "qso_details.h"
 #include "qso_dxcc.h"
 #include "qso_contest.h"
@@ -53,8 +52,6 @@ void qso_misc::create_form() {
 	details_ = new qso_details(rx, ry, rw, rh, "Previous");
 	// DXCC and worked before status form
 	dxcc_ = new qso_dxcc(rx, ry, rw, rh, "DX?");
-	// Edit my QTH form
-	qth_ = new qso_qth(rx, ry, rw, rh, "My QTH");
 	// QSL details form
 	qsl_ = new qso_qsl_vwr(rx, ry, rw, rh, "QSL");
 	// Contest form
@@ -80,7 +77,6 @@ void qso_misc::enable_widgets() {
 			wx->labelcolor(FL_FOREGROUND_COLOR);
 		}
 	}
-	qth_->enable_widgets();
 	details_->enable_widgets();
 	dxcc_->enable_widgets();
 	qsl_->enable_widgets();
@@ -103,7 +99,6 @@ void qso_misc::save_values() {
 // set the QSO details into the various forms
 void qso_misc::qso(record* qso, qso_num_t number) {
 	qso_ = qso;
-	qth_->set_qth(qso_ ? qso_->item("APP_ZZA_QTH") : "");
 	details_->set_qso(qso_);
 	dxcc_->set_data(qso);
 	qsl_->set_qso(qso_, number);

@@ -49,13 +49,6 @@ typedef size_t qso_num_t;
 		}
 	};
 
-	// Macro definition set - macro name versions set of fields it represents
-	struct macro_defn {
-		record* fields{ nullptr };
-		string description;
-	};
-	typedef map<string, macro_defn*> macro_map;
-
 	enum status_t : char;
 
 	// This class provides the ADIF specification reference database as a set of named datasets. 
@@ -134,12 +127,6 @@ typedef size_t qso_num_t;
 		string entity_name(int dxcc);
 		// Add user defined enumeration for an existing field - return true if successful
 		bool add_user_enum(string field, string value);
-		// Add app defined macro (use one field "APP_ZZA..." to represent several others)
-		bool add_user_macro(string field, string name, macro_defn macro);
-		// Get macro changes
-		set<string> get_macro_changes();
-		// Get the record fields for a mmacro 
-		record* expand_macro(string field, string value);
 		// Remove user enums and macros - and restore originals
 		void delete_user_data();
 		// REturn list of bands in frequency order
@@ -148,10 +135,6 @@ typedef size_t qso_num_t;
 		void process_bands();
 		// Return spec data valid
 		bool valid();
-		// Load default QTH macro
-		void load_default_qth();
-		// Store default QTH macro
-		void store_default_qth();
 
 	// protected methods
 	protected:
@@ -206,10 +189,6 @@ typedef size_t qso_num_t;
 		set<string> user_enums_;
 		// Quick lookup of datatype indicator
 		map<string, char> datatype_indicators_;
-		// Macro definitions
-		map<string, macro_map*> macros_;
-		// Fields that change in the last evocation of add_user_macro
-		set<string> macro_changes_;
 		// Missing file already reported
 		bool error_reported_;
 		// Correction message

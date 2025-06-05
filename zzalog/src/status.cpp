@@ -43,8 +43,8 @@ status::status() :
 	// Get report filename from the settings
 	report_filename_ = default_data_directory_ + "status.txt";
 
-	// Set 500 ms ticker
-	ticker_->add_ticker(this, cb_ticker, 5);
+	// Set 2s ticker
+	ticker_->add_ticker(this, cb_ticker, 20);
 
 }
 

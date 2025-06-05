@@ -193,9 +193,9 @@
     <ClCompile Include="zzalog\src\qso_log_info.cpp" />
     <ClCompile Include="zzalog\src\qso_misc.cpp" />
     <ClCompile Include="zzalog\src\qso_net_entry.cpp" />
+    <ClCompile Include="zzalog\src\qso_operation.cpp" />
     <ClCompile Include="zzalog\src\qso_qsl.cpp" />
     <ClCompile Include="zzalog\src\qso_qsl_vwr.cpp" />
-    <ClCompile Include="zzalog\src\qso_qth.cpp" />
     <ClCompile Include="zzalog\src\qso_rig.cpp" />
     <ClCompile Include="zzalog\src\qso_data.cpp" />
     <ClCompile Include="zzalog\src\qso_entry.cpp" />
@@ -210,6 +210,10 @@
     <ClCompile Include="zzalog\src\rpc_handler.cpp" />
     <ClCompile Include="zzalog\src\serial.cpp" />
     <ClCompile Include="zzalog\src\socket_server.cpp" />
+    <ClCompile Include="zzalog\src\stn_data.cpp" />
+    <ClCompile Include="zzalog\src\stn_dialog.cpp" />
+    <ClCompile Include="zzalog\src\stn_reader.cpp" />
+    <ClCompile Include="zzalog\src\stn_writer.cpp" />
     <ClCompile Include="zzalog\src\symbols.cpp" />
     <ClCompile Include="zzalog\src\ticker.cpp" />
     <ClCompile Include="zzalog\src\url_handler.cpp" />
@@ -246,7 +250,6 @@
     <ClCompile Include="zzalog\src\menu.cpp" />
     <ClCompile Include="zzalog\src\printer.cpp" />
     <ClCompile Include="zzalog\src\qrz_handler.cpp" />
-    <ClCompile Include="zzalog\src\qth_dialog.cpp" />
     <ClCompile Include="zzalog\src\record.cpp" />
     <ClCompile Include="zzalog\src\record_table.cpp" />
     <ClCompile Include="zzalog\src\report_tree.cpp" />
@@ -310,9 +313,9 @@
     <ClInclude Include="zzalog\include\qso_log_info.h" />
     <ClInclude Include="zzalog\include\qso_misc.h" />
     <ClInclude Include="zzalog\include\qso_net_entry.h" />
+    <ClInclude Include="zzalog\include\qso_operation.h" />
     <ClInclude Include="zzalog\include\qso_qsl.h" />
     <ClInclude Include="zzalog\include\qso_qsl_vwr.h" />
-    <ClInclude Include="zzalog\include\qso_qth.h" />
     <ClInclude Include="zzalog\include\qso_rig.h" />
     <ClInclude Include="zzalog\include\qso_data.h" />
     <ClInclude Include="zzalog\include\qso_entry.h" />
@@ -328,6 +331,10 @@
     <ClInclude Include="zzalog\include\rpc_handler.h" />
     <ClInclude Include="zzalog\include\serial.h" />
     <ClInclude Include="zzalog\include\socket_server.h" />
+    <ClInclude Include="zzalog\include\stn_data.h" />
+    <ClInclude Include="zzalog\include\stn_dialog.h" />
+    <ClInclude Include="zzalog\include\stn_reader.h" />
+    <ClInclude Include="zzalog\include\stn_writer.h" />
     <ClInclude Include="zzalog\include\symbols.h" />
     <ClInclude Include="zzalog\include\ticker.h" />
     <ClInclude Include="zzalog\include\url_handler.h" />
@@ -366,7 +373,6 @@
     <ClInclude Include="zzalog\include\pfx_data.old.h" />
     <ClInclude Include="zzalog\include\prefix.h" />
     <ClInclude Include="zzalog\include\printer.h" />
-    <ClInclude Include="zzalog\include\qth_dialog.h" />
     <ClInclude Include="zzalog\include\record.h" />
     <ClInclude Include="zzalog\include\record_table.h" />
     <ClInclude Include="zzalog\include\report_tree.h" />

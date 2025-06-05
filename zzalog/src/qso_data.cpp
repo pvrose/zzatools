@@ -1,28 +1,29 @@
 #include "qso_data.h"
-#include "qso_entry.h"
-#include "qso_net_entry.h"
-#include "qso_query.h"
-#include "qso_misc.h"
-#include "qso_buttons.h"
-#include "qso_manager.h"
-#include "qso_contest.h"
-#include "qso_qsl.h"
-#include "qth_dialog.h"
-#include "config.h"
-#include "rig_if.h"
+
 #include "book.h"
-#include "status.h"
-#include "extract_data.h"
+#include "config.h"
 #include "cty_data.h"
+#include "extract_data.h"
+#include "import_data.h"
+#include "menu.h"
+#include "qrz_handler.h"
+#include "qso_buttons.h"
+#include "qso_contest.h"
+#include "qso_entry.h"
+#include "qso_manager.h"
+#include "qso_misc.h"
+#include "qso_net_entry.h"
+#include "qso_operation.h"
+#include "qso_qsl.h"
+#include "qso_query.h"
+#include "record.h"
+#include "rig_if.h"
+#include "status.h"
 #include "spec_data.h"
 #include "tabbed_forms.h"
-#include "import_data.h"
-#include "qrz_handler.h"
 #include "wsjtx_handler.h"
-#include "menu.h"
+
 #include "utils.h"
-#include "record.h"
-#include "config.h"
 
 #include <FL/Fl_Preferences.H>
 #include <FL/Fl_Tooltip.H>
@@ -120,7 +121,11 @@ void qso_data::create_form(int X, int Y) {
 	int curr_y = Y + HTEXT;
 	int curr_x = X + GAP;
 
-	// One or the other of the two groups below will be shown at a time
+	g_station_ = new qso_operation(curr_x, curr_y, 10, 10);
+
+	curr_y += g_station_->h();
+
+	// One or the other of the three groups below will be shown at a time
 
 	// Single QSO entry 
 	g_entry_ = new qso_entry(curr_x, curr_y, 10, 10);
@@ -202,6 +207,8 @@ void qso_data::enable_widgets() {
 		string call;
 		if (current_qso()) call = current_qso()->item("CALL");
 		else call = "N/A";
+		// Enable station details
+		g_station_->qso(current_qso());
 		char l[128];
 		switch (logging_state_) {
 		case QSO_INACTIVE:
@@ -910,10 +917,6 @@ bool qso_data::action_save(bool continuing) {
 	}
 
 	if (!continuing) {
-		// If record 0 and size = 0 - copy QTH definition into QSO
-		if (book_->size() == 1 && qso_number == 0) {
-			action_expand_macro("APP_ZZA_QTH");
-		}
 
 		// check whether record has changed - when parsed
 		if (cty_data_->update_qso(qso)) {
@@ -1704,15 +1707,6 @@ void qso_data::action_parse_qso() {
 	enable_widgets();
 }
 
-// Expand macro into current QSO
-void qso_data::action_expand_macro(string macro) {
-	record* qso = current_qso();
-	string name = qso->item(macro);
-	record* macro_data = spec_data_->expand_macro(macro, name);
-	qso->merge_records(macro_data);
-	enable_widgets();
-}
-
 // Dummy QSO
 record* qso_data::dummy_qso() {
 	record* dummy = new record;
@@ -2024,4 +2018,24 @@ bool qso_data::can_navigate(navigate_t target) {
 		}
 		default: return false;
 	}
+}
+
+// Get default station information
+string qso_data::get_default_station(char item) {
+	switch ((qso_manager::stn_item_t)item) {
+	case qso_manager::CALLSIGN:
+		return g_station_->current_call();
+	case qso_manager::OP:
+		return g_station_->current_oper();
+	case qso_manager::QTH:
+		return g_station_->current_qth();
+	default:
+		return "";
+	}
+}
+
+// Update the QSO from the current station information
+void qso_data::update_station_fields(record* qso) {
+	g_station_->update_qso(qso);
+	return;
 }

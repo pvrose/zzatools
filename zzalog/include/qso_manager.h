@@ -38,12 +38,12 @@ enum hint_t : uchar;
 	public:
 
 		// Used in get_default to identify the object
-		enum stn_item_t {
+		enum stn_item_t : char {
 			RIG = 1,        // MY_RIG
 			ANTENNA = 2,    // MY_ANTENNA
 			CALLSIGN = 4,   // STATION_CALLSIGN
-			QTH = 8,        // APP_ZZA_QTH
-			OP = 16,        // APP_ZZA_OP
+			QTH = 8,        // MY_CITY etc.
+			OP = 16,        // MY_NAME etc.
 			NONE = 0
 		};
 
