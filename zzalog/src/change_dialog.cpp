@@ -147,9 +147,9 @@ void change_dialog::create_form() {
 	w_text_ = ip42;
 
 	// Alternate enumeration vale
-	field_choice* ch52 = new field_choice(C2, R5, W2, H5, "Enum. Value");
+	field_input* ch52 = new field_input(C2, R5, W2, H5, "Enum. Value");
 	ch52->align(FL_ALIGN_TOP | FL_ALIGN_CENTER);
-	ch52->callback(cb_choice_text, (void*)&new_text_);
+	ch52->callback(cb_value<field_input, string>, (void*)&new_text_);
 	ch52->when(FL_WHEN_CHANGED | FL_WHEN_NOT_CHANGED);
 	ch52->tooltip("Select the enumerated value to apply");
 	w_enum_ = ch52;
@@ -266,7 +266,6 @@ void change_dialog::enable_widgets() {
 
 // Populate enumeration choice
 void change_dialog::populate_enum(string name) {
-	field_choice* ch = (field_choice*)w_enum_;
-	ch->clear();
-	ch->set_dataset(name);
+	field_input* ch = (field_input*)w_enum_;
+	ch->field_name(old_field_name_.c_str());
 }

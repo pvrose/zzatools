@@ -293,16 +293,19 @@ void field_input::populate_choice(string name) {
 	add("");
 
 	// For all dataset
-	bool hierarchic = false;
-	if (dataset->data.size() > 20) hierarchic = true;
+	int hierarchic = 0;
+	if (dataset->data.size() > 50) hierarchic = 2;
+	else if (dataset->data.size() > 20) hierarchic = 1;
 	auto it = dataset->data.begin();
 	Fl_Menu_Button* menu = menubutton();
 	for (int i = 1; it != dataset->data.end(); i++) {
 		string menu_entry = escape_menu(it->first);
 		string summary = spec_data_->summarise_enumaration(name, menu_entry);
-		if (hierarchic) {
-			string temp = menu_entry;
+		string temp = menu_entry;
+		if (hierarchic == 1 || hierarchic == 2 && temp.length() == 1) {
 			menu_entry = temp.substr(0, 1) + "/" + temp;
+		} else if (hierarchic == 2) {
+			menu_entry = temp.substr(0, 1) + "/" + temp.substr(0, 2) + "/" + temp;
 		}
 		string value = menu_entry;
 		if (summary.length()) {
