@@ -13,7 +13,7 @@ using namespace std;
 	enum load_result_t {
 		LR_GOOD,     // loaded OK.
 		LR_BAD,      // failed to complete loading
-		LR_EOF       // EOF read
+		LR_EOF,      // EOF read
 	};
 
 	// Default prefix database

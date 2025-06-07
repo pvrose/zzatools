@@ -22,6 +22,7 @@ using namespace std;
 extern status* status_;
 extern spec_data* spec_data_;
 extern bool closing_;
+extern bool new_file_;
 
 
 // Helper class that reads and decodes an ADIF .adi format file and stores it a book container
@@ -269,6 +270,12 @@ bool adi_reader::load_book(book* book, istream& in) {
 	in.seekg(0, ios::end);
 	streampos endpos = in.tellg();
 	file_size_ = (long)(endpos - startpos);
+	// If the file has data it cannot be a new file
+	if (file_size_ > 0) new_file_ = false;
+	if (new_file_) {
+		status_->misc_status(ST_NOTE, "LOG: New file");
+		return true;
+	}
 	status_->misc_status(ST_NOTE, "LOG: Started reading ADI");
 	status_->progress(file_size_, book->book_type(), "Loading ADIF", "bytes");
 	// reposition back to beginning

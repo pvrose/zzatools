@@ -252,6 +252,7 @@ void status::misc_status(status_t status, const char* label) {
 	if (report_file_) {
 		// File did open correctly - write all message to file
 		*report_file_ << f_message;
+		report_file_->flush();
 	}
 
 	// Depending on the severity: LOG, NOTE, OK, WARNING, ERROR, SEVERE or FATAL

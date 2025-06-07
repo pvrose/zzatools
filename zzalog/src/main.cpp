@@ -80,7 +80,7 @@ string COPYRIGHT = "\302\251 Philip Rose GM3ZZA 2018-2025. All rights reserved.\
 string DATA_COPYRIGHT = "\302\251 Philip Rose %s. This data may be copied for the purpose of correlation and analysis";
 string PROGRAM_ID = "ZZALOG";
 string PROG_ID = "ZLG";
-string PROGRAM_VERSION = "3.5.2";
+string PROGRAM_VERSION = "3.5.3";
 string VENDOR = "GM3ZZA";
 string TIMESTAMP = string(__DATE__) + " " + string(__TIME__) + " Local";
 
@@ -161,6 +161,8 @@ bool resuming_ = false;
 uint64_t ticks_ = 0;
 // Filename in arguments
 char* filename_ = nullptr;
+// File is new (neither in argument or settings
+bool new_file_ = false;
 // Default station callsign
 string default_station_ = "";
 // Main logo
@@ -597,6 +599,7 @@ string get_file(char * arg_filename) {
 				result = chooser->filename();
 			}
 			delete chooser;
+			new_file_ = true;
 		}
 	}
 	else {
@@ -734,6 +737,13 @@ void add_book(char* arg) {
 			} else {
 				// Move this file to the top of the recent file list
 				set_recent_file(log_file);
+				char msg[128];
+				if (new_file_) {
+					if (!book_->store_data(log_file, true)) {
+						snprintf(msg, sizeof(msg), "ZZALOG: Failed to create %s", log_file.c_str());
+						status_->misc_status(ST_ERROR, msg);
+					}
+				}
 			}
 		}
 	}
