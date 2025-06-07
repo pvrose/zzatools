@@ -52,6 +52,7 @@ qso_qsl::qso_qsl(int X, int Y, int W, int H, const char* L) :
 	labelsize(FL_NORMAL_SIZE + 2);
 	//align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 	box(FL_BORDER_BOX);
+	tooltip("controsl for the uploading and downloading of data from QSL sites");
 	os_eqsl_dnld_ = 0;
 	tkr_value_ = 0.0;
 	extract_in_progress_ = false;

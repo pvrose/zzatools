@@ -425,6 +425,7 @@ const char* app_grp::rig_id() {
 qso_apps::qso_apps(int X, int Y, int W, int H, const char* L) :
     Fl_Group(X, Y, W, H, L)
 {
+    tooltip("Controls any partner apps");
     create_form();
     load_values();
     create_tabs();

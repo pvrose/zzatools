@@ -53,6 +53,7 @@ qso_entry::qso_entry(int X, int Y, int W, int H, const char* L) :
 
 	// Initialise field input map
 	field_ip_map_.clear();
+	tooltip("Allows the display and editing of QSO record fields");
 	load_values();
 	create_form(X, Y);
 	enable_widgets();

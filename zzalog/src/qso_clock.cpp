@@ -19,6 +19,7 @@ qso_clock::qso_clock
 	labelfont(FL_BOLD);
 	labelsize(FL_NORMAL_SIZE + 2);
 	box(FL_BORDER_BOX);
+	tooltip("Displays current clock value in the appropriate timezone");
 	load_values();
 	create_form(X, Y);
 

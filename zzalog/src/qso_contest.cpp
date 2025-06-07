@@ -39,6 +39,7 @@ qso_contest::qso_contest(int X, int Y, int W, int H, const char* L) :
 {
 	labelfont(FL_BOLD);
 	labelsize(FL_NORMAL_SIZE + 2);
+	tooltip("Allows configuration of contsts - Work in progress");
 	load_settings();
 	create_form();
 	// Set default values if necessary

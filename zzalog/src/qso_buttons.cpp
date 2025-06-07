@@ -128,6 +128,7 @@ qso_buttons::qso_buttons(int X, int Y, int W, int H, const char* L) :
 	Fl_Group(X, Y, W, H, L),
 	qso_data_((qso_data*)parent())
 {
+	tooltip("Control buttons");
 	load_values();
 	create_form(X, Y);
 	enable_widgets();

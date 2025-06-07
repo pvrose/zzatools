@@ -22,6 +22,7 @@ extern bool DARK;
 qso_bands::qso_bands(int X, int Y, int W, int H, const char* L) :
 	Fl_Group(X, Y, W, H, L)
 {
+	tooltip("Displays the bandplan for the current selected frequency (logged or live)");
 	load_values();
 	create_form();
 	enable_widgets();

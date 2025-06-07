@@ -54,6 +54,7 @@ qso_rig::qso_rig(int X, int Y, int W, int H, const char* L) :
 	labelsize(FL_NORMAL_SIZE + 2);
 	//align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 	box(FL_BORDER_BOX);
+	tooltip("Allows the onfiguration of an individual rig connection and displays current status");
 	load_values();
 	if (cat_data_) {
 		rig_ = new rig_if(label(), cat_data_->hamlib);

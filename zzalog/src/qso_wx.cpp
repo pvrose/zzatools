@@ -26,6 +26,7 @@ qso_wx::qso_wx
 	labelfont(FL_BOLD);
 	labelsize(FL_NORMAL_SIZE + 2);
 	box(FL_BORDER_BOX);
+	tooltip("Displays the current weather - as supplied by openweather.com");
 	display_speed_ = MILE_PER_HOUR;
 	display_temperature_ = CELSIUS;
 	display_pressure_ = HECTOPASCAL;

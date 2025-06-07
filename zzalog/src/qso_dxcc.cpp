@@ -35,6 +35,7 @@ qso_dxcc::qso_dxcc(int X, int Y, int W, int H, const char* L) :
 {
 	labelfont(FL_BOLD);
 	labelsize(FL_NORMAL_SIZE + 2);
+	tooltip("Displays the current worked before status for the DXCC");
 	create_form();
 	enable_widgets();
 	end();

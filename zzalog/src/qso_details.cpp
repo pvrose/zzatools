@@ -28,6 +28,7 @@ qso_details::qso_details(int X, int Y, int W, int H, const char* L) :
 	labelfont(FL_BOLD);
 	labelsize(FL_NORMAL_SIZE + 2);
 	//align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
+	tooltip("Displays any previous contacts with this station or similar calls");
 	create_form();
 	enable_widgets();
 }

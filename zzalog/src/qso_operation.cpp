@@ -12,7 +12,7 @@
 #include "utils.h"
 
 #include <FL/Fl_Input_Choice.H>
-#include <FL/Fl_Button.H>;
+#include <FL/Fl_Button.H>
 
 extern config* config_;
 extern status* status_;
@@ -24,6 +24,7 @@ qso_operation::qso_operation(int X, int Y, int W, int H, const char* L) :
 	current_oper_(""),
 	current_qso_(nullptr)
 {
+	tooltip("Displays the current station opertaion: QTH, Operator and callsign used");
 	create_form();
 	populate_choices();
 	enable_widgets();

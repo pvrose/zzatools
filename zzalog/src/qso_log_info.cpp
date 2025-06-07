@@ -26,6 +26,7 @@ qso_log_info::qso_log_info(int X, int Y, int W, int H, const char* l) :
 	labelsize(FL_NORMAL_SIZE + 2);
 	//align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE);
 	box(FL_BORDER_BOX);
+	tooltip("Displays the current status of the logbok data");
 	load_values();
 	create_form(X, Y);
 	enable_widgets();

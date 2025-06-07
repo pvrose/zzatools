@@ -43,6 +43,7 @@ qso_qsl_vwr::qso_qsl_vwr(int X, int Y, int W, int H, const char* L) :
 {
 	labelfont(FL_BOLD);
 	labelsize(FL_NORMAL_SIZE + 2);
+	tooltip("Displays the received and sent QSL status for this QSO");
 	load_values();
 	create_form();
 	enable_widgets();
