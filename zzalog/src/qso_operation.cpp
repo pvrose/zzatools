@@ -12,6 +12,7 @@
 #include "utils.h"
 
 #include <FL/Fl_Input_Choice.H>
+#include <FL/Fl_Button.H>;
 
 extern config* config_;
 extern status* status_;
@@ -37,27 +38,41 @@ void qso_operation::create_form() {
 	int curr_y = y();
 
 	curr_x += WLABEL;
-	ch_qth_ = new Fl_Input_Choice(curr_x, curr_y, WSMEDIT, HBUTTON, "QTH");
+	ch_qth_ = new annotated_choice(curr_x, curr_y, WSMEDIT, HBUTTON, "QTH");
 	ch_qth_->align(FL_ALIGN_LEFT);
 	ch_qth_->callback(cb_qth, &current_qth_);
 	ch_qth_->input()->when(FL_WHEN_ENTER_KEY_ALWAYS);
 	ch_qth_->tooltip("Select the current operating location (or eneter a new one)");
 
-	curr_x += ch_qth_->w() + WLABEL;
-	ch_oper_ = new Fl_Input_Choice(curr_x, curr_y, WSMEDIT, HBUTTON, "Operator");
+	curr_x += ch_qth_->w();
+	Fl_Button* bn_show_qth = new Fl_Button(curr_x, curr_y, WBUTTON/2, HBUTTON, "Show"); 
+	bn_show_qth->callback(cb_show, (void*)(intptr_t)stn_dialog::QTH);
+
+	curr_x += bn_show_qth->w() + WLABEL;
+	ch_oper_ = new annotated_choice(curr_x, curr_y, WSMEDIT, HBUTTON, "Operator");
 	ch_oper_->align(FL_ALIGN_LEFT);
 	ch_oper_->callback(cb_oper, &current_oper_);
 	ch_oper_->input()->when(FL_WHEN_ENTER_KEY_ALWAYS);
 	ch_oper_->tooltip("Specify the current operator - select or enter new");
 
-	curr_x += ch_oper_->w() + WLABEL;
-	ch_call_ = new Fl_Input_Choice(curr_x, curr_y, WSMEDIT, HBUTTON, "Callsign");
+
+	curr_x += ch_qth_->w();
+	Fl_Button* bn_show_oper = new Fl_Button(curr_x, curr_y, WBUTTON/2, HBUTTON, "Show"); 
+	bn_show_oper->callback(cb_show, (void*)(intptr_t)stn_dialog::OPERATOR);
+
+	curr_x += bn_show_oper->w() + WLABEL;
+	ch_call_ = new Fl_Input_Choice(curr_x, curr_y, WSMEDIT, HBUTTON, "Station\nCallsign");
 	ch_call_->align(FL_ALIGN_LEFT);
 	ch_call_->callback(cb_call, &current_call_);
 	ch_call_->input()->when(FL_WHEN_ENTER_KEY_ALWAYS);
 	ch_call_->tooltip("Specify the current station callsign");
 
-	curr_x += ch_call_->w() + GAP;
+
+	curr_x += ch_qth_->w();
+	Fl_Button* bn_show_call = new Fl_Button(curr_x, curr_y, WBUTTON/2, HBUTTON, "Show"); 
+	bn_show_call->callback(cb_show, (void*)(intptr_t)stn_dialog::CALLSIGN);
+
+	curr_x += bn_show_call->w() + GAP;
 	curr_y += HBUTTON + GAP;
 
 	resizable(nullptr);
@@ -123,7 +138,21 @@ void qso_operation::cb_call(Fl_Widget* w, void* v) {
 	}
 }
 
-
+void qso_operation::cb_show(Fl_Widget* w, void* v) {
+	qso_operation* that = ancestor_view<qso_operation>(w);
+	stn_dialog::tab_type t = (stn_dialog::tab_type)(intptr_t)v;
+	switch(t) {
+		case stn_dialog::QTH:
+		that->new_qth();
+		break;
+	case stn_dialog::OPERATOR:
+		that->new_oper();
+		break;
+	case stn_dialog::CALLSIGN:
+		that->new_call();
+		break;
+	}
+}
 // set the QSO
 void qso_operation::qso(record* qso) {
 	current_qso_ = qso;
@@ -146,15 +175,37 @@ string qso_operation::current_call() {
 
 // Populate the choices
 void qso_operation::populate_choices() {
+	char l[64];
 	// Populate QTH choice
 	ch_qth_->add("");
 	for (auto it : *stn_data_->get_qths()) {
-		ch_qth_->add(escape_menu(it.first).c_str());
-	}
+		if (it.second->description.length()) {
+			snprintf(l, sizeof(l), "%s:--->%s", it.first.c_str(), it.second->description.c_str());
+		} else {
+			map<qth_value_t, string>& data = it.second->data;
+			snprintf(l, sizeof(l), "%s:--->%s,%s,%s", 
+				escape_menu(it.first).c_str(),
+				data.find(STREET) == data.end() ? "" : data.at(STREET).c_str(),
+				data.find(CITY) == data.end() ? "" : data.at(CITY).c_str(),
+				data.find(LOCATOR) == data.end() ? "" : data.at(LOCATOR).c_str());
+		}
+		ch_qth_->add(l);
+		ch_qth_->menubutton()->user_data((void*)&it.first);
+	}  
 	// Populate Operator choice
 	ch_oper_->add("");
 	for (auto it : *stn_data_->get_opers()) {
-		ch_oper_->add(escape_menu(it.first).c_str());
+		if (it.second->description.length()) {
+			snprintf(l, sizeof(l), "%s:--->%s", it.first.c_str(), it.second->description.c_str());
+		} else {
+			map<oper_value_t, string>& data = it.second->data;
+			snprintf(l, sizeof(l), "%s:--->%s,%s", 
+				escape_menu(it.first).c_str(),
+				data.find(NAME) == data.end() ? "" : data.at(NAME).c_str(),
+				data.find(CALLSIGN) == data.end() ? "" : data.at(CALLSIGN).c_str());
+		}
+		ch_oper_->add(l);
+		ch_oper_->menubutton()->user_data((void*)&it.first);
 	}
 	// Populate callsign choice
 	ch_call_->add("");

@@ -1,14 +1,45 @@
 #pragma once
 
+#include "utils.h"
+
 #include <string>
 
 #include <FL/Fl_Group.H>
+#include <FL/Fl_Input_Choice.H>
 
 using namespace std;
 
 class qso_data;
-class Fl_Input_Choice;
 class record;
+
+
+// Special version of Fl_Input_Choice that allows annoated menu items - value is user_data
+class annotated_choice :
+    public Fl_Input_Choice 
+{
+public:
+
+    // Copy user data rather than value to input
+    static void cb_menu(Fl_Widget* w, void* v) {
+        annotated_choice* that = ancestor_view<annotated_choice>(w);
+        const char* val = that->menubutton()->text();
+        const char* pos = strstr(val, ":--->");
+        if (pos == nullptr) {
+            that->input()->value(val);
+        } else {
+            char* nval = new char[pos - val + 1];
+            memset(nval, 0, pos - val + 1);
+            strncpy(nval, val, pos - val);
+            that->input()->value(nval);
+        }
+        }
+
+    annotated_choice(int X, int Y, int W, int H, const char* L = nullptr) :
+    Fl_Input_Choice(X, Y, W, H, L) 
+    {
+        menubutton()->callback(cb_menu);
+    }
+};
 
 class qso_operation :
     public Fl_Group
@@ -23,6 +54,8 @@ public:
     static void cb_qth(Fl_Widget* w, void* v);
     static void cb_oper(Fl_Widget* w, void* v);
     static void cb_call(Fl_Widget* w, void* v);
+
+    static void cb_show(Fl_Widget*w, void* v);
 
     // set the QSO
     void qso(record* qso);
