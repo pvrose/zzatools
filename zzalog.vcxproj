@@ -273,6 +273,7 @@
     <ClInclude Include="common\include\xml_reader.h" />
     <ClInclude Include="common\include\xml_writer.h" />
     <ClInclude Include="packages\pthreads.2.9.1.4\build\native\include\pthread.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="widgets\include\button_input.h" />
     <ClInclude Include="widgets\include\filename_input.h" />
     <ClInclude Include="zzalog\include\band_data.h" />
@@ -396,8 +397,11 @@
     <None Include="zzalog\Makefile" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="zzalog.ico" />
     <Image Include="rose.png" />
-    <Image Include="zzalog\zzalog.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="zzalog.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />

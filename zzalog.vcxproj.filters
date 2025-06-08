@@ -713,17 +713,25 @@
     <ClInclude Include="zzalog\include\stn_dialog.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="reference\Prefix.lst" />
     <None Include="zzalog\Makefile" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="zzalog\zzalog.ico">
+    <Image Include="zzalog.ico">
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="rose.png">
-      <Filter>Resource Files</Filter>
+      <Filter>Source Files</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="zzalog.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>
