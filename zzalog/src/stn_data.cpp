@@ -44,10 +44,7 @@ void stn_data::store_data() {
 	os.open(filename, ios_base::out);
 	if (os.good()) {
 		stn_writer* writer = new stn_writer();
-		if (writer->store_data(&qths_, &opers_, &calls_, os)) {
-			status_->misc_status(ST_OK, "STN DATA: XML Saved OK");
-		}
-		else {
+		if (!writer->store_data(&qths_, &opers_, &calls_, os)) {
 			status_->misc_status(ST_ERROR, "STN DATA: Error writing XML");
 		}
 	}

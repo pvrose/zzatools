@@ -37,7 +37,7 @@ bool qsl_writer::store_data(
         return false;
     }
     // else
-    status_->misc_status(ST_OK, "QSL: XML Writing done");
+    status_->misc_status(ST_OK, "QSL: XML Saved OK");
     return true;
    
 }

@@ -45,7 +45,7 @@ fllog_emul::~fllog_emul() {
 
 // Start and run the RPC Server
 void fllog_emul::run_server() {
-	status_->misc_status(ST_NOTE, "FLLOG_EMUL: Creating new socket");
+	status_->misc_status(ST_NOTE, "FLLOG: Creating new socket");
 	if (!rpc_handler_) {
 		Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
 		Fl_Preferences nw_settings(settings, "Network");
@@ -74,7 +74,7 @@ void fllog_emul::run_server() {
 // Close the RPC server
 void fllog_emul::close_server() {
 	if (rpc_handler_) {
-		status_->misc_status(ST_NOTE, "FLLOG_EMUL: Closing server");
+		status_->misc_status(ST_NOTE, "FLLOG: Closing server");
 		rpc_handler_->close_server();
 		delete rpc_handler_;
 		rpc_handler_ = nullptr;
@@ -237,7 +237,7 @@ int fllog_emul::add_record(rpc_data_item::rpc_list& params, rpc_data_item& respo
 		qso->item("MY_STATE", string(""));
 		qso->item("MODE", qso->item("MODE"), true);
 		qso_manager_->update_modem_qso(true);
-		status_->misc_status(ST_NOTE, "FLLOG_EMUL: Logged QSO");
+		status_->misc_status(ST_NOTE, "FLLOG: Logged QSO");
 		return 0;
 	}
 	else {

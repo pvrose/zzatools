@@ -252,25 +252,25 @@ bool cty_reader::load_data(cty_data* data, istream& in, string& version) {
 	// reposition back to beginning
 	in.seekg(0, ios::beg);
 	// Initialsie the progress
-	status_->misc_status(ST_NOTE, "EXCEPTION: Started importing data");
+	status_->misc_status(ST_NOTE, "CTY DATA: Started importing data");
 	status_->progress(file_size, OT_PREFIX, "Importing Exception data from XML", "bytes");
 	// Call the XML parser - calls back to the overides herein
 	if (parse(in)) {
 		// Read successful - complete progress
-		status_->misc_status(ST_OK, "EXCEPTION: Import done!");
+		status_->misc_status(ST_OK, "CTY DATA: Import done!");
 		version = timestamp_;
 		fl_cursor(FL_CURSOR_DEFAULT);
 		return true;
 	}
 	else if (closing_) {
-		status_->misc_status(ST_WARNING, "EXCEPTION: Cancelled as close-down requested");
+		status_->misc_status(ST_WARNING, "CTY DATA: Cancelled as close-down requested");
 		status_->progress("Load cancelled", OT_PREFIX);
 		fl_cursor(FL_CURSOR_DEFAULT);
 		return false;
 	}
 	else {
 		// Read failed - report failure
-		status_->misc_status(ST_ERROR, "EXCEPTION: Import failed");
+		status_->misc_status(ST_ERROR, "CTY DATA: Import failed");
 		status_->progress("Load failed", OT_PREFIX);
 		fl_cursor(FL_CURSOR_DEFAULT);
 		return false;

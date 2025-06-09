@@ -43,7 +43,7 @@ bool stn_writer::store_data(
         return false;
     }
     // else
-    status_->misc_status(ST_OK, "RIG_DATA: XML Writing done");
+    status_->misc_status(ST_OK, "STN DATA: XML Saved OK");
     return true;
 }
 

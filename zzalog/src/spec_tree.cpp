@@ -117,7 +117,7 @@ void spec_tree::populate_tree(bool activate) {
 	// Update display
 	show();
 	redraw();
-	status_->misc_status(ST_OK, "SPEC: Specification displayed");
+	status_->misc_status(ST_OK, "ADIF SPEC: Specification displayed");
 	// Restore cursor
 	fl_cursor(FL_CURSOR_DEFAULT);
 	// Tell tabbed view to activate this view
