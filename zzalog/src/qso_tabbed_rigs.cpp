@@ -1,12 +1,13 @@
 #include "qso_tabbed_rigs.h"
 #include "qso_rig.h"
 #include "qso_manager.h"
+#include "rig_data.h"
 #include "spec_data.h"
 #include "status.h"
 
 #include <FL/Fl_Preferences.H>
 
-
+extern rig_data* rig_data_;
 extern spec_data* spec_data_;
 extern status* status_;
 extern bool closing_;
@@ -37,18 +38,19 @@ qso_tabbed_rigs::~qso_tabbed_rigs() {
 
 // get settings - find what we've created in the settings
 void qso_tabbed_rigs::load_values() {
-	// Get existing rig names from spec_data
+	// Get existing rig names from spec_data - as seen in log
 	spec_dataset* rig_dataset = spec_data_->dataset("Dynamic MY_RIG");
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-	Fl_Preferences cat_settings(settings, "CAT");
-	for (int g = 0; g < cat_settings.groups(); g++) {
-		const char* name = cat_settings.group(g);
-		// If the names is both in settings and in the list read from the log add it to the list
-		if (rig_dataset && rig_dataset->data.find(name) != rig_dataset->data.end()) {
-			label_map_[string(name)] = nullptr;
+	// Ger the list of rigs as seen in rig.xml
+	vector<string> rigs = rig_data_->rigs();
+	for (auto it : rigs) {
+		// If the rig is in both lists
+		rig_data_t* rig_info = rig_data_->get_rig(it);
+		if (rig_info->default_app >= 0 && rig_dataset->data.find(it) != rig_dataset->data.end()) {
+			label_map_[string(it)] = nullptr;
 		}
 	}
 	// Load default tab value
+	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
 	Fl_Preferences tab_settings(settings, "Dashboard/Tabs");
 	tab_settings.get("Rigs", default_tab_, 0);
 }

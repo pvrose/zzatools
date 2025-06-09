@@ -41,7 +41,6 @@ void qso_operation::create_form()
 	ch_qth_ = new annotated_choice(curr_x, curr_y, WSMEDIT, HBUTTON, "QTH");
 	ch_qth_->align(FL_ALIGN_LEFT);
 	ch_qth_->callback(cb_qth, &current_qth_);
-	//	ch_qth_->input()->when(FL_WHEN_ENTER_KEY_ALWAYS);
 	ch_qth_->when(FL_WHEN_ENTER_KEY_ALWAYS);
 	ch_qth_->tooltip("Select the current operating location (or eneter a new one)");
 
@@ -53,7 +52,7 @@ void qso_operation::create_form()
 	ch_oper_ = new annotated_choice(curr_x, curr_y, WSMEDIT, HBUTTON, "Operator");
 	ch_oper_->align(FL_ALIGN_LEFT);
 	ch_oper_->callback(cb_oper, &current_oper_);
-	//	ch_oper_->input()->when(FL_WHEN_ENTER_KEY_ALWAYS);
+	ch_oper_->when(FL_WHEN_ENTER_KEY_ALWAYS);
 	ch_oper_->tooltip("Specify the current operator - select or enter new");
 
 	curr_x += ch_qth_->w();
@@ -64,7 +63,7 @@ void qso_operation::create_form()
 	ch_call_ = new Fl_Input_Choice(curr_x, curr_y, WSMEDIT, HBUTTON, "Station\nCallsign");
 	ch_call_->align(FL_ALIGN_LEFT);
 	ch_call_->callback(cb_call, &current_call_);
-	//	ch_call_->input()->when(FL_WHEN_ENTER_KEY_ALWAYS);
+	ch_call_->when(FL_WHEN_ENTER_KEY_ALWAYS);
 	ch_call_->tooltip("Specify the current station callsign");
 
 	curr_x += ch_qth_->w();
@@ -82,7 +81,6 @@ void qso_operation::create_form()
 // Update the widget values
 void qso_operation::enable_widgets()
 {
-	qso_data *qd = ancestor_view<qso_data>(this);
 	ch_qth_->value(current_qth_.c_str());
 	ch_oper_->value(current_oper_.c_str());
 	ch_call_->value(current_call_.c_str());
