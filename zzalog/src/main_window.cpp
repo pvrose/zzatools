@@ -1,13 +1,12 @@
 #include "main_window.h"
-#include "menu.h"
+
 #include "import_data.h"
+#include "menu.h"
+
 #include <sstream>
-
-
 
 extern menu* menu_;
 extern import_data* import_data_;
-extern status* status_;
 
 // Create the window
 main_window::main_window(int W, int H, const char* label) :

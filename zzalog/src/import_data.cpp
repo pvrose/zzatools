@@ -412,7 +412,8 @@ void import_data::finish_update(bool merged /*= true*/) {
 	if (merged && size() == 0) {
 		char message[256];
 		if (update_mode_ == LOTW_UPDATE) {
-			sprintf(message, "IMPORT: LOTW %d records read, %d checked, %d modified, %d matched, %d added, %d SWLs added, %d rejected, %d changed ClubLog",
+			snprintf(message, sizeof(message),
+				"IMPORT: LOTW %d records read, %d checked, %d modified, %d matched, %d added, %d SWLs added, %d rejected, %d changed ClubLog",
 				number_to_import_, number_checked_, number_modified_, number_matched_, number_added_, number_swl_, number_rejected_, number_clublog_);
 		}
 		else {
@@ -433,10 +434,15 @@ void import_data::finish_update(bool merged /*= true*/) {
 			default:
 				break;
 			}
-			sprintf(message, "IMPORT: %s %d records read, %d checked, %d modified, %d matched, %d added, %d SWLs added, %d rejected",
+			snprintf(message, sizeof(message), 
+				"IMPORT: %s %d records read, %d checked, %d modified, %d matched, %d added, %d SWLs added, %d rejected",
 				source.c_str(), number_to_import_, number_checked_, number_modified_, number_matched_, number_added_, number_swl_, number_rejected_);
 		}
 		status_->misc_status(ST_OK, message);
+		if (number_added_) {
+			snprintf(message, sizeof(message), "IMPORT: %d records added - check station details", number_added_);
+			status_->misc_status(ST_WARNING, message);
+		}
 		if (number_modified_ || number_added_ || number_swl_) {
 			// Some records have been changed or added
 			book_->selection(book_->size() - 1, HT_ALL);
