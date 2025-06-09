@@ -28,14 +28,15 @@ map<qso_data::logging_state_t, list<qso_buttons::button_type> > button_map_ =
 		qso_buttons::DELETE_QSO, qso_buttons::START_NET, qso_buttons::BROWSE, qso_buttons::VIEW_QSO } },
 	{ qso_data::QSO_STARTED, { qso_buttons::SAVE_QSO, qso_buttons::SAVE_VIEW, qso_buttons::SAVE_NEW,
 		qso_buttons::SAVE_CONTINUE, qso_buttons::CANCEL_QSO, 
-		qso_buttons::START_NET, qso_buttons::WORKED_B4, qso_buttons::PARSE, qso_buttons::QRZ_COM } },
+		qso_buttons::START_NET, qso_buttons::UPDATE_STATION, qso_buttons::WORKED_B4, qso_buttons::PARSE, qso_buttons::QRZ_COM } },
 	{ qso_data::QSO_ENTER, { qso_buttons::SAVE_NEW, qso_buttons::SAVE_EXIT, 
-		qso_buttons::SAVE_CONTINUE, qso_buttons::CANCEL_QSO } },
+		qso_buttons::SAVE_CONTINUE, qso_buttons::UPDATE_STATION, qso_buttons::CANCEL_QSO } },
 	{ qso_data::QSO_EDIT, { qso_buttons::SAVE_EDIT, qso_buttons::SAVE_EXIT, 
 		qso_buttons::SAVE_VIEW, qso_buttons::CANCEL_EDIT, 
 		qso_buttons::EDIT_NET, qso_buttons::NAV_FIRST,
 		qso_buttons::NAV_PREV, qso_buttons::NAV_NEXT, qso_buttons::NAV_LAST,
-		qso_buttons::UPDATE_CAT, qso_buttons::REPLACE_CAT, qso_buttons::QRZ_COM, qso_buttons::PARSE_QSO } },
+		qso_buttons::UPDATE_CAT, qso_buttons::REPLACE_CAT, qso_buttons::UPDATE_STATION, 
+		qso_buttons::QRZ_COM, qso_buttons::PARSE_QSO } },
 	{ qso_data::QSO_VIEW, { qso_buttons::EDIT_QSO, qso_buttons::CANCEL_VIEW, qso_buttons::ACTIVATE,
 	    qso_buttons::START_QSO, 
 		qso_buttons::NAV_FIRST, qso_buttons::NAV_PREV, qso_buttons::NAV_NEXT, qso_buttons::NAV_LAST ,
@@ -121,6 +122,7 @@ map<qso_buttons::button_type, qso_buttons::button_action> action_map_ =
 	{ qso_buttons::REPLACE_CAT, { "Replaxe CAT", "Use current CAT info", qso_buttons::cb_bn_update_cat, (void*)true }},
 	{ qso_buttons::RESTART, { "Restart", "Ditch current QSO and start anew", qso_buttons::cb_bn_restart, 0 }},
 	{ qso_buttons::PARSE_QSO, { "Parse QSO", "Add DXCC, CQ, etc details to QSO", qso_buttons::cb_bn_parse_qso, 0 }},
+	{ qso_buttons::UPDATE_STATION, { "U/d Station", "Add QTH, Operator and station callsigns to QSO", qso_buttons::cb_bn_update_station, 0 }},
 };
 
 // Constructor
@@ -862,6 +864,21 @@ void qso_buttons::cb_bn_parse_qso(Fl_Widget* w, void* v) {
 		that->qso_data_->action_parse_qso();
 		break;
 	}
+	default:
+		break;
+	}
+	that->enable_widgets();
+}
+
+// Update station details
+void qso_buttons::cb_bn_update_station(Fl_Widget* w, void* v) {
+	qso_buttons* that = ancestor_view<qso_buttons>(w);
+	switch(that->qso_data_->logging_state()) {
+	case qso_data::QSO_STARTED:
+	case qso_data::QSO_EDIT:
+	case qso_data::QSO_ENTER:
+		that->qso_data_->update_station_fields();
+		break;
 	default:
 		break;
 	}

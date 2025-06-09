@@ -2036,6 +2036,7 @@ string qso_data::get_default_station(char item) {
 
 // Update the QSO from the current station information
 void qso_data::update_station_fields(record* qso) {
-	g_station_->update_qso(qso);
+	record* ud_qso = (qso == nullptr) ? current_qso() : qso;
+	g_station_->update_qso(ud_qso);
 	return;
 }

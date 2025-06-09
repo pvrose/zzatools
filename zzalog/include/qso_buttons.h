@@ -81,6 +81,7 @@ public:
 		REPLACE_CAT,
 		RESTART,
 		PARSE_QSO,
+		UPDATE_STATION,
 	};
 
 	// Parameters for the button
@@ -153,6 +154,8 @@ public:
 	static void cb_bn_restart(Fl_Widget* w, void* v);
 	// Pasre QSO
 	static void cb_bn_parse_qso(Fl_Widget* w, void* v);
+	// Update station details
+	static void cb_bn_update_station(Fl_Widget* w, void* v);
 
 
 protected:

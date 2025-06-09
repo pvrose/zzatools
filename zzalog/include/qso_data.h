@@ -154,7 +154,7 @@ public:
 	// Get default station information
 	string get_default_station(char t);
 	// Update record from station information
-	void update_station_fields(record* qso);
+	void update_station_fields(record* qso = nullptr);
 
 
 	// State transition actions:-

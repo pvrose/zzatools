@@ -32,12 +32,22 @@ public:
             strncpy(nval, val, pos - val);
             that->input()->value(nval);
         }
-        }
+        // Pretend that the enter key was pressed for the outer when
+        that->do_callback(FL_REASON_ENTER_KEY);
+    }
+
+    // Override input callback to pick up 
+    static void cb_inp(Fl_Widget* w, void* v) {
+        annotated_choice* that = ancestor_view<annotated_choice>(w);
+        that->do_callback(FL_REASON_ENTER_KEY);
+    }
 
     annotated_choice(int X, int Y, int W, int H, const char* L = nullptr) :
     Fl_Input_Choice(X, Y, W, H, L) 
     {
         menubutton()->callback(cb_menu);
+        input()->callback(cb_inp);
+        input()->when(FL_WHEN_ENTER_KEY);
     }
 };
 
