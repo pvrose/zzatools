@@ -104,6 +104,7 @@ bool DARK = false;
 uchar THEME;
 bool DISPLAY_VERSION = false;
 bool NEW_BOOK = false;
+bool NEW_SETTINGS = false;
 
 // FLTK externals
 extern int FL_NORMAL_SIZE;
@@ -454,6 +455,11 @@ int cb_args(int argc, char** argv, int& i) {
 		NEW_BOOK = true;
 		i+=1;
 	}
+	// New settings
+	else if (strcmp("-s", argv[i]) == 0 || strcmp("--new-settings", argv[i]) == 0) {
+		NEW_SETTINGS = true;
+		i+=1;
+	}
 	// Debug
 	else if (strcmp("-d", argv[i]) == 0 || strcmp("--debug", argv[i]) == 0) {
 		i += 1;
@@ -523,9 +529,7 @@ int cb_args(int argc, char** argv, int& i) {
 		if (*argv[i] == '-') {
 			int i_fltk = Fl::arg(argc, argv, i);
 			if (i_fltk == 0) {
-				char msg[128];
-				snprintf(msg, sizeof(msg), "ZZALOG: Unrecognised switch %s", argv[i]);
-				status_->misc_status(ST_ERROR, msg);
+				printf("ZZALOG: Unrecognised switch %s", argv[i]);
 				i += 1;
 			}
 			return i;
@@ -570,6 +574,7 @@ void show_help() {
 	"\t-p|--private\tDo not update recent files list\n"
 	"\t-q|--quiet\tDo not publish QSOs to online sites (sticky)\n"
 	"\t-r|--read_only\tOpen file in read only mode\n"
+	"\t-s|--new-settings\tUse new settings file\n"
 	"\t-t|--test\tTest mode: infers -q -w\n"
 	"\t-u|--usual\tNormal mode: infers -a -n\n"
 	"\t-w|--wait_save\tDo not automatically save each change (sticky)\n"
@@ -949,6 +954,7 @@ void print_args(int argc, char** argv) {
 	status_->misc_status(ST_NOTE, message);
 	if (NEW_BOOK && !filename_) status_->misc_status(ST_NOTE, "ZZALOG: -e - Starting with empty file");
 	if (NEW_BOOK && filename_) status_->misc_status(ST_WARNING, "ZZALOG: -e - filename specified, switch ignored");
+	if (NEW_SETTINGS) status_->misc_status(ST_NOTE, "ZZALOG: -s - Clear settings");
 	if (AUTO_UPLOAD) status_->misc_status(ST_NOTE, "ZZALOG: -n - QSOs uploaded to QSL sites automatically");
 	else status_->misc_status(ST_WARNING, "ZZALOG: -q - QSOs are not being uploaded to QSL sites");
 	if (AUTO_SAVE) status_->misc_status(ST_NOTE, "ZZALOG: -a - QSOs being saved automatically");
@@ -1119,17 +1125,22 @@ bool open_settings() {
 	printf("ZZALOG: Opened settings %s\n", buffer);
 	char backup[256];
 	strcpy(backup, buffer);
-	strcat(backup, ".save");
+	char tbuff[60];
+	time_t today = time(nullptr);
+	tm* ts = gmtime(&today);
+	strftime(tbuff, sizeof(tbuff), ".%Y%m%d%H%M%S", ts);
+	strcat(backup, tbuff);
 	// In and out streams
 	ifstream in(buffer);
 	in.seekg(0, in.end);
 	int length = (int)in.tellg();
+	bool ok = false;
 	if (in.good() && length) {
 		// We do have a (probably) valid settings file
 		const int increment = 8000;
 		in.seekg(0, in.beg);
 		ofstream out(backup);
-		bool ok = in.good() && out.good();
+		ok = in.good() && out.good();
 		char buffer[increment];
 		int count = 0;
 		// Copy file in 7999 byte chunks
@@ -1146,7 +1157,11 @@ bool open_settings() {
 			printf("ZZALOG: Settings saved as %s\n", backup);
 		}
 	}
-	else {
+	if (NEW_SETTINGS) {
+		settings.clear();
+		settings.flush();
+	}
+	if (NEW_SETTINGS || !ok) {
 		// No settings file - check a new installation
 		switch(fl_choice("This appears to be a new installation, Continue?", "Yes", "No", nullptr)) {
 			case 0: {
@@ -1177,7 +1192,9 @@ int main(int argc, char** argv)
 {
 	// Allow the main thread to respond to Fl::awake() requests
 	Fl::lock();
-	// Set default Fil Chooser on non-windows
+	// Parse command-line arguments - accept FLTK standard arguments and custom ones (in cb_args)
+	int i = 1;
+	Fl::args(argc, argv, i, cb_args);
 	// Create the settings before anything else 
 	if (!open_settings()) {
 		return 255;
@@ -1188,9 +1205,6 @@ int main(int argc, char** argv)
 
 	// Read any switches that stick between calls
 	read_saved_switches();
-	// Parse command-line arguments - accept FLTK standard arguments and custom ones (in cb_args)
-	int i = 1;
-	Fl::args(argc, argv, i, cb_args);
 	if (DISPLAY_VERSION) {
 #ifndef WIN32
 		// Display version
@@ -1224,7 +1238,6 @@ int main(int argc, char** argv)
 		show_help();
 		return 0;
 	}
-
 	// Ctreate status to handle status messages
 	status_ = new status();
 
