@@ -45,7 +45,7 @@ void qso_tabbed_rigs::load_values() {
 	for (auto it : rigs) {
 		// If the rig is in both lists
 		rig_data_t* rig_info = rig_data_->get_rig(it);
-		if (rig_info->default_app >= 0 && rig_dataset->data.find(it) != rig_dataset->data.end()) {
+		if (rig_info->default_app >= 0 && rig_dataset && rig_dataset->data.find(it) != rig_dataset->data.end()) {
 			label_map_[string(it)] = nullptr;
 		}
 	}
