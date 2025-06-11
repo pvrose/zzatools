@@ -298,9 +298,11 @@ bool adi_reader::load_book(book* book, istream& in) {
 				// Otherwise add the record in its time-order position in the book
 				book->insert_record(in_record);
 			}
-			// Check progress and update bar every record read
-			byte_count_ = (long)in.tellg();
-			status_->progress(byte_count_, book->book_type());
+			// Check progress and update bar every 100 records read
+			if (book->size() % 100 == 0) {
+				byte_count_ = (long)in.tellg();
+				status_->progress(byte_count_, book->book_type());
+			}
 		}
 		else {
 			if (result == LR_EOF && byte_count_ != file_size_) {

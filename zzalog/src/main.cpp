@@ -80,7 +80,7 @@ string COPYRIGHT = "\302\251 Philip Rose GM3ZZA 2018-2025. All rights reserved.\
 string DATA_COPYRIGHT = "\302\251 Philip Rose %s. This data may be copied for the purpose of correlation and analysis";
 string PROGRAM_ID = "ZZALOG";
 string PROG_ID = "ZLG";
-string PROGRAM_VERSION = "3.5.4";
+string PROGRAM_VERSION = "3.5.5";
 string VENDOR = "GM3ZZA";
 string TIMESTAMP = string(__DATE__) + " " + string(__TIME__) + " Local";
 
@@ -1123,13 +1123,16 @@ bool open_settings() {
 	default_data_directory_ = directory(buffer) + "/" + PROGRAM_ID + "/";
 
 	printf("ZZALOG: Opened settings %s\n", buffer);
+	for (char c = '8'; c > '0'; c--) {
+		// Rename will fail if file does not exist, so no need to test file exists
+		string oldfile = string(buffer) + c;
+		char c2 = c + 1;
+		string newfile = string(buffer) + c2;
+		fl_rename(oldfile.c_str(), newfile.c_str());
+	}
 	char backup[256];
 	strcpy(backup, buffer);
-	char tbuff[60];
-	time_t today = time(nullptr);
-	tm* ts = gmtime(&today);
-	strftime(tbuff, sizeof(tbuff), ".%Y%m%d%H%M%S", ts);
-	strcat(backup, tbuff);
+	strcat(backup, "1");
 	// In and out streams
 	ifstream in(buffer);
 	in.seekg(0, in.end);

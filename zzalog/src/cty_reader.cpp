@@ -215,8 +215,9 @@ bool cty_reader::end_element(string name) {
 			else if (element == "end") current_zone_exc_->end = convert_xml_datetime(value_);
 		}
 	}
-	if (elements_.size() <= 3) {
-		// Report progress only when the depth of elements is less than three.
+	number_read_++;
+	if (number_read_ % 1000 == 0 || elements_.size() <= 1) {
+		// Report progress every 1000 elements
 		int bytes = (int)file_->tellg();
 		status_->progress(bytes, OT_PREFIX);
 	}

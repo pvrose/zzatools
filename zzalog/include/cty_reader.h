@@ -56,6 +56,8 @@ using namespace std;
 		string value_;
 		// Pointer to file
 		istream* file_;
+		// Number of elements read
+		int number_read_;
 
 
 	};
