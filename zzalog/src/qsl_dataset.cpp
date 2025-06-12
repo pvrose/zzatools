@@ -18,6 +18,7 @@ extern string VENDOR;
 extern string PROGRAM_ID;
 
 qsl_dataset::qsl_dataset() {
+	load_failed_ = false;
 	load_data();
 }
 
@@ -76,6 +77,7 @@ void qsl_dataset::load_data() {
 	data_.clear();
 	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
 	if (!load_xml(settings)) {
+		load_failed_ = true;
 		status_->misc_status(ST_ERROR, "QSL: No QSl data loaded");
 		//load_prefs(settings);
 	}
@@ -194,9 +196,11 @@ bool qsl_dataset::load_xml(Fl_Preferences& settings) {
 
 // Store card designs
 void qsl_dataset::save_data() {
-	Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
-	settings.delete_group("QSL Design");
-	save_xml(settings);
+	if (!load_failed_) {
+		Fl_Preferences settings(Fl_Preferences::USER_L, VENDOR.c_str(), PROGRAM_ID.c_str());
+		settings.delete_group("QSL Design");
+		save_xml(settings);
+	}
 }
 
 void qsl_dataset::save_xml(Fl_Preferences& settings) {

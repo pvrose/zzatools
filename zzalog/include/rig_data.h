@@ -47,8 +47,6 @@ public:
 protected:
     // Load data from preferences directory
     void load_data();
-    // Load data from preferences file
-    void load_prefs(Fl_Preferences& settings);
     // Load data from XML 
     bool load_xml();
     // Store data to preferences directory
@@ -57,5 +55,6 @@ protected:
     bool store_xml();
     // The rig data
     map<string, rig_data_t*> data_;
-
+    // Load faields
+    bool load_failed_;
 };

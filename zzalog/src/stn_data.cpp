@@ -8,6 +8,7 @@ extern string default_data_directory_;
 
 stn_data::stn_data()
 {
+	load_failed_ = false;
 	load_data();
 }
 
@@ -27,11 +28,13 @@ void stn_data::load_data() {
 			status_->misc_status(ST_OK, "STN DATA: XML Loaded OK");
 		}
 		else {
+			load_failed_ = true;
 			snprintf(msg, sizeof(msg), "STN DATA: File %s did not load correctly", filename.c_str());
 			status_->misc_status(ST_ERROR, msg);
 		}
 	}
 	else {
+		load_failed_ = true;
 		snprintf(msg, sizeof(msg), "STN DATA: File %s may not exist", filename.c_str());
 		status_->misc_status(ST_WARNING, msg);
 	}
@@ -39,18 +42,20 @@ void stn_data::load_data() {
 
 // Store data to station.xml
 void stn_data::store_data() {
-	string filename = default_data_directory_ + "station.xml";
-	ofstream os;
-	os.open(filename, ios_base::out);
-	if (os.good()) {
-		stn_writer* writer = new stn_writer();
-		if (!writer->store_data(&qths_, &opers_, &calls_, os)) {
-			status_->misc_status(ST_ERROR, "STN DATA: Error writing XML");
+	if (!load_failed_) {
+		string filename = default_data_directory_ + "station.xml";
+		ofstream os;
+		os.open(filename, ios_base::out);
+		if (os.good()) {
+			stn_writer* writer = new stn_writer();
+			if (!writer->store_data(&qths_, &opers_, &calls_, os)) {
+				status_->misc_status(ST_ERROR, "STN DATA: Error writing XML");
+			}
 		}
-	}
-	else {
-		char msg[128];
-		snprintf(msg, sizeof(msg), "STN DATA: Failed to open %s", filename.c_str());
+		else {
+			char msg[128];
+			snprintf(msg, sizeof(msg), "STN DATA: Failed to open %s", filename.c_str());
+		}
 	}
 }
 

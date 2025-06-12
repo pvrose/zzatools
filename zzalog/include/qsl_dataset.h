@@ -76,6 +76,8 @@ protected:
 	map<string, server_data_t*> server_data_; 
 	// PAth to QSL data
 	string qsl_path_;
+	// Load failed
+	bool load_failed_;
 
 };
 

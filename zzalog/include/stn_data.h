@@ -103,5 +103,7 @@ protected:
 	map<string, oper_info_t*> opers_;
 	// Station callsigns
 	map<string, string> calls_;
+	// Load failed
+	bool load_failed_;
 };
 
