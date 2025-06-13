@@ -1191,19 +1191,10 @@ int main(int argc, char** argv)
 			PROGRAM_VERSION.c_str(),
 			TIMESTAMP.c_str());
 		curl_version_info_data* data = curl_version_info(CURLVERSION_LAST);
-		if (DEBUG_PRETTY) {
-			// Use left lower box symbol
-			printf("\342\224\224 With libraries hamlib (%s), FLTK (%d.%d.%d), Curl (%s)\n",
-				rig_version(),
-				FL_MAJOR_VERSION, FL_MINOR_VERSION, FL_PATCH_VERSION,
-				data->version);
-		}
-		else {
-			printf("|-With libraries hamlib (%s), FLTK (%d.%d.%d), Curl (%s)\n",
-				rig_version(),
-				FL_MAJOR_VERSION, FL_MINOR_VERSION, FL_PATCH_VERSION,
+		printf("|-With libraries hamlib (%s), FLTK (%d.%d.%d), Curl (%s)\n",
+			rig_version(),
+			FL_MAJOR_VERSION, FL_MINOR_VERSION, FL_PATCH_VERSION,
 				data->version); 
-		}
 #else
 		about_dialog* dlg = new about_dialog;
 		dlg->show();

@@ -172,15 +172,19 @@ void banner::add_progress(uint64_t value, uint64_t max_value) {
 	char text[64];
 	if (max_value != -1) {
 		max_value_ = max_value;
+		prev_value_ = -(max_value_ / 2);
 		snprintf(text, sizeof(text), "/%lld", max_value_);
 		op_prog_value_->copy_label(text);
 		redraw();
 	}
 	// Do not redraw these until ticker
-	snprintf(text, sizeof(text), "%lld", value);
-	op_prog_value_->value(text);
-	fd_progress_->value((double)value / double(max_value_));
-	redraw();
+	if ((value - prev_value_) > (max_value_ / 100) ) {
+		snprintf(text, sizeof(text), "%lld", value);
+		op_prog_value_->value(text);
+		fd_progress_->value((double)value / double(max_value_));
+		prev_value_ = value;
+		redraw();
+	}
 }
 
 // Update progress

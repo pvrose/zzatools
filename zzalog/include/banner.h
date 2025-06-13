@@ -1,5 +1,7 @@
 #pragma once
-#include <FL\Fl_Double_Window.H>
+
+#include <cstdint>
+#include <FL/Fl_Double_Window.H>
 
 enum status_t : char;
 enum object_t : char;
@@ -59,6 +61,8 @@ protected:
     bool large_;
     // Progress maximum value
     uint64_t max_value_;
+    // Previous value
+    uint64_t prev_value_;
     // Progress unit
     const char* prg_unit_;
 
