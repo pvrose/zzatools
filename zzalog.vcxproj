@@ -162,6 +162,7 @@
     <ClCompile Include="zzalog\src\band_data.cpp" />
     <ClCompile Include="zzalog\src\band_widget.cpp" />
     <ClCompile Include="zzalog\src\band_window.cpp" />
+    <ClCompile Include="zzalog\src\banner.cpp" />
     <ClCompile Include="zzalog\src\calendar_input.cpp" />
     <ClCompile Include="zzalog\src\calendar_table.cpp" />
     <ClCompile Include="zzalog\src\config.cpp" />
@@ -279,6 +280,7 @@
     <ClInclude Include="zzalog\include\band_data.h" />
     <ClInclude Include="zzalog\include\band_widget.h" />
     <ClInclude Include="zzalog\include\band_window.h" />
+    <ClInclude Include="zzalog\include\banner.h" />
     <ClInclude Include="zzalog\include\calendar_input.h" />
     <ClInclude Include="zzalog\include\calendar_table.h" />
     <ClInclude Include="zzalog\include\callback.h" />
