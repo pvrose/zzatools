@@ -2206,25 +2206,25 @@ void spec_data::reset_continue() {
 // Add this app's app defined fields, plus a couple of LOTW ones
 void spec_data::add_my_appdefs() {
 	string my_appdefs[] = {
-		"APP_ZZA_PFX",
-		"APP_ZZA_QTH",
-		"APP_ZZA_QTH_DESCR",
+		"APP_ZZA_CQ",
+		"APP_ZZA_ECARD",
 		"APP_ZZA_EQSL_MSG",
 		"APP_ZZA_ERROR",
-		"APP_ZZA_ECARD",
-		"APP_ZZA_CQ",
+		"APP_ZZA_MY_WAB",      // 
+		"APP_ZZA_NUMRECORDS",
 		"APP_ZZA_OP",
 		"APP_ZZA_OP_DESCR",
 		"APP_ZZA_OPERATOR",    // Operator of QSL partner - provided in OPERATOR
-		"APP_ZZA_QTH",         // Macro
-		"APP_ZZA_MY_WAB",      // 
+		"APP_ZZA_PFX",
+		"APP_ZZA_QSL_ROUTE",   // QRZ.com return QSL_VIA - Op's preferred QSL route
+		"APP_ZZA_QTH",
 		"APP_ZZA_QTH_DESCR",
+		"APP_ZZA_QTH",         // Macro
 		"APP_LOTW_NUMREC",
 		"APP_LOTW_LASTQSL",
 		"APP_QRZLOG_LOGID",
 		"APP_QRZLOG_STATUS",
 		"APP_QRZLOG_QSLDATE",
-		"APP_ZZA_QSL_ROUTE",   // QRZ.com return QSL_VIA - Op's preferred QSL route
 		""
 	};
 	int i = 0;

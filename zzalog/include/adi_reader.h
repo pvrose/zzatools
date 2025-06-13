@@ -44,9 +44,8 @@ class record;
 		// Neither a header nor the first record has been read yet.
 		bool expecting_header_;
 		// Counts for progress 
-		long previous_count_; // Previous reported count
-		long byte_count_;     // Current number of bytes read
-		long file_size_;      // Total expected number of bytes in stream
+		int number_records_;
+		int record_count_;
 
 		// Set of external application-defined fields that have been encountered altready
 		set<string> known_app_fields;

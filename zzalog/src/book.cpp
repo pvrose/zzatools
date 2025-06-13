@@ -201,6 +201,7 @@ bool book::load_data(string filename)
 							}
 							else {
 								main_window_label(filename);
+								header_->item("APP_ZZA_NUMRECORDS", to_string(size()));
 							}
 						}
 						delete adi_reader_;
@@ -1637,6 +1638,10 @@ bool book::has_record(record* qso) {
 // Add this record to the dirty set
 void book::add_dirty_record(record* qso) {
 	if (has_record(qso)) { 
+		dirty_qsos_.insert(qso);
+		been_modified_ = true;
+	}
+	else if (qso == header_) {
 		dirty_qsos_.insert(qso);
 		been_modified_ = true;
 	}

@@ -28,10 +28,9 @@ extern bool new_file_;
 // Helper class that reads and decodes an ADIF .adi format file and stores it a book container
 adi_reader::adi_reader()
 	: expecting_header_(false)
-	, previous_count_(0)
-	, byte_count_(0)
-	, file_size_(0)
 	, my_book_(nullptr)
+	, number_records_(0)
+	, record_count_(0)
 {
 }
 
@@ -265,24 +264,13 @@ bool adi_reader::load_book(book* book, istream& in) {
 	fl_cursor(FL_CURSOR_WAIT);
 	// Initialise Known apps 
 	known_app_fields.clear();
-	// calculate the file size and initialise the progress bar
-	streampos startpos = in.tellg();
-	in.seekg(0, ios::end);
-	streampos endpos = in.tellg();
-	file_size_ = (long)(endpos - startpos);
-	// If the file has data it cannot be a new file
-	if (file_size_ > 0) new_file_ = false;
 	if (new_file_) {
 		status_->misc_status(ST_NOTE, "LOG: New file");
 		return true;
 	}
 	status_->misc_status(ST_NOTE, "LOG: Started reading ADI");
-	status_->progress(file_size_, book->book_type(), "Loading ADIF", "bytes");
-	// reposition back to beginning
-	in.seekg(0, ios::beg);
-	// Initialise progress counters
-	byte_count_ = 0;
-	previous_count_ = 0;
+	number_records_ = 10000;
+	bool first = true;
 	// While we have data to read
 	while (in.good() && !closing_) {
 		// Create a new record
@@ -293,22 +281,25 @@ bool adi_reader::load_book(book* book, istream& in) {
 			if (in_record->is_header()) {
 				// Store any header as the header record
 				book->header(in_record);
+				if (in_record->item("APP_ZZA_NUMRECORDS").length()) {
+					in_record->item("APP_ZZA_NUMRECORDS", number_records_);
+				}
 			}
 			else {
 				// Otherwise add the record in its time-order position in the book
 				book->insert_record(in_record);
 			}
-			// Check progress and update bar every 100 records read
-			if (book->size() % 100 == 0) {
-				byte_count_ = (long)in.tellg();
-				status_->progress(byte_count_, book->book_type());
+			if (first) {
+				status_->progress(number_records_, book->book_type(), "Reading ADIF", "records");
+				first = false;
 			}
+			status_->progress(record_count_, book->book_type());
+			record_count_++;
 		}
 		else {
-			if (result == LR_EOF && byte_count_ != file_size_) {
+			if (result == LR_EOF && record_count_ < number_records_) {
 				// We need one last telling of progress that it's done
-				byte_count_ = file_size_;
-				status_->progress(byte_count_, book->book_type());
+				status_->progress("End of book", book->book_type());
 			}
 			// Bad record
 			delete in_record;
@@ -330,5 +321,5 @@ bool adi_reader::load_book(book* book, istream& in) {
 
 // Calculate the percentage file read
 double adi_reader::progress() {
-	return (double)byte_count_ / (double)file_size_;
+	return (double)record_count_ / (double)number_records_;
 }
