@@ -6,14 +6,12 @@
 #include "hamlib/rig.h"
 #include <curl/curl.h>
 
-#include <FL/Fl_Multiline_Output.H>
 #include <FL/fl_draw.H>
-#include <FL/Fl_Button.H>
-#include <FL/Fl_PNG_Image.H>
 #include <FL/Fl.H>
-
-
-
+#include <FL/Fl_Box.H>
+#include <FL/Fl_Button.H>
+#include <FL/Fl_Multiline_Output.H>
+#include <FL/Fl_PNG_Image.H>
 
 extern spec_data* spec_data_;
 extern string PROGRAM_ID;
@@ -21,7 +19,6 @@ extern string PROGRAM_VERSION;
 extern string COPYRIGHT;
 extern string TIMESTAMP;
 extern Fl_PNG_Image main_icon_;
-
 
 // Creates the about box dialog and displays it.
 about_dialog::about_dialog() :
@@ -43,7 +40,7 @@ about_dialog::about_dialog() :
 	curl_version_info_data* data = curl_version_info(CURLVERSION_LAST);
 
 	// Draw the two text boxes - first program ID and versions
-	string program_id = PROGRAM_ID + " " + PROGRAM_VERSION + "\n" +
+	string program_id = 
 		"Compiled " + TIMESTAMP + "\n" +
 		(spec_data_ ? "using ADIF Version " + spec_data_->adif_version() + "\n" : "") +
 		" hamlib version " + rig_version() +
@@ -79,11 +76,25 @@ about_dialog::about_dialog() :
 
 	// now calculate where to put the icon - centralise its Y position
 	const int YICON = (HALL - HICON) / 2;
+	const int YNAME = YICON - HBUTTON;
+	Fl_Box* bx_name = new Fl_Box(C1, YNAME, WICON, HBUTTON);
+	bx_name->copy_label(PROGRAM_ID.c_str());
+	bx_name->labelfont(FL_BOLD);
+	bx_name->labelsize(FL_NORMAL_SIZE + 4);
+	bx_name->align(FL_ALIGN_CENTER);
+
 	Fl_Button* bn_icon = new Fl_Button(C1, YICON, WICON, HICON);
 	// Expand it to 48*48
 	bn_icon->image(main_icon_);
 	// No edge to the button
 	bn_icon->box(FL_FLAT_BOX);
+
+	const int YVERS = YICON + HICON;
+	Fl_Box* bx_vers = new Fl_Box(C1, YVERS, WICON, HBUTTON);
+	bx_vers->copy_label(PROGRAM_VERSION.c_str());
+	bx_vers->labelfont(FL_BOLD);
+	bx_vers->labelsize(FL_NORMAL_SIZE + 4);
+	bx_vers->align(FL_ALIGN_CENTER);
 
 	// resize the window to include everything
 	resizable(nullptr);
