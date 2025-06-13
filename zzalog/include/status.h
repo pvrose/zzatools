@@ -13,6 +13,8 @@
 
 using namespace std;
 
+class banner;
+
 	// Default colours for status bars
 	struct colours_t {
 		Fl_Color fg;
@@ -79,7 +81,7 @@ using namespace std;
 	};
 
 	// 
-	enum object_t;
+	enum object_t : char;
 
 	// A progress stack entry
 	struct progress_item {
@@ -130,6 +132,8 @@ using namespace std;
 		bool file_unusable_;
 		// Previous progress value
 		uint64_t previous_value_;
+		// Banner
+		banner* banner_;
 	};
 #endif
 

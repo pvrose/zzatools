@@ -51,7 +51,7 @@ const int ROW_HEIGHT = DEFAULT_SIZE + 4;    // Default height for table rows
 
 
 	// the various views and data objects
-	enum object_t {
+	enum object_t : char {
 		OT_NONE,             // No object (for default us)
 		OT_MAIN,             // The main log view (book & view)
 		OT_RECORD,           // The record form (view)
@@ -84,9 +84,9 @@ const int ROW_HEIGHT = DEFAULT_SIZE + 4;    // Default height for table rows
 		{ OT_BAND, FL_GRAY },
 		{ OT_CARD, fl_color_average(FL_BLUE, FL_WHITE, 0.25) },
 		{ OT_WSJTX, COLOUR_NAVY },
-		{ OT_RIGS, FL_BACKGROUND_COLOR },
-		{ OT_QSLS, FL_BACKGROUND_COLOR },
-		{ OT_STN, FL_BACKGROUND_COLOR },
+		{ OT_RIGS, COLOUR_PINK },
+		{ OT_QSLS, COLOUR_CLARET },
+		{ OT_STN, COLOUR_APPLE },
 	};
 
 	// Names of the objects

@@ -89,8 +89,6 @@ string TIMESTAMP = string(__DATE__) + " " + string(__TIME__) + " Local";
 bool DEBUG_ERRORS = true;
 bool DEBUG_THREADS = false;
 bool DEBUG_CURL = false;
-bool DEBUG_STATUS = true;
-bool DEBUG_PRETTY = false;
 bool DEBUG_QUICK = false;
 rig_debug_level_e HAMLIB_DEBUG_LEVEL = RIG_DEBUG_ERR;
 bool AUTO_UPLOAD = true;
@@ -490,22 +488,6 @@ int cb_args(int argc, char** argv, int& i) {
 				DEBUG_CURL = false;
 				i += 1;
 			}
-			else if (strcmp("s", argv[i]) == 0 || strcmp("status", argv[i]) == 0) {
-				DEBUG_STATUS = true;
-				i += 1;
-			}
-			else if (strcmp("nos", argv[i]) == 0 || strcmp("nostatus", argv[i]) == 0) {
-				DEBUG_STATUS = false;
-				i += 1;
-			}
-			else if (strcmp("p", argv[i]) == 0 || strcmp("pretty", argv[i]) == 0) {
-				DEBUG_PRETTY = true;
-				i += 1;
-			}
-			else if (strcmp("nop", argv[i]) == 0 || strcmp("nopretty", argv[i]) == 0) {
-				DEBUG_PRETTY = false;
-				i += 1;
-			}
 			else if (strcmp("q", argv[i]) == 0 || strcmp("quick", argv[i]) == 0) {
 				DEBUG_QUICK = true;
 				i += 1;
@@ -801,7 +783,7 @@ void main_window_label(string text) {
 	const char* current = main_window_->label();
 	if (!current || label != string(current)) {
 		main_window_->copy_label(label.c_str());
-		if (!DEBUG_STATUS) printf("%s\n", label.c_str());
+		printf("%s\n", label.c_str());
 	}
 }
 
@@ -946,8 +928,6 @@ void print_args(int argc, char** argv) {
 	if (DEBUG_ERRORS) status_->misc_status(ST_NOTE, "ZZALOG: -d e - Displaying debug error messages");
 	if (DEBUG_THREADS) status_->misc_status(ST_NOTE, "ZZALOG: -d t - Displaying thread debug messages");
 	if (DEBUG_CURL) status_->misc_status(ST_NOTE, "ZZALOG: -d c - Displaying more verbosity from libcurl");
-	if (DEBUG_STATUS) status_->misc_status(ST_NOTE, "ZZALOG: -d s - Displaying status messages");
-	if (DEBUG_PRETTY) status_->misc_status(ST_NOTE, "ZZALOG: -d p - Displaying formatted messages");
 	if (DEBUG_QUICK) status_->misc_status(ST_WARNING, "ZZALOG: -d q - Reducing periods of some reguat events");
 	snprintf(message, sizeof(message), "ZZALOG: -d h=%d - Hamlib debug level %d", 
 		(int)HAMLIB_DEBUG_LEVEL, (int)HAMLIB_DEBUG_LEVEL);
@@ -1090,10 +1070,6 @@ void read_saved_switches() {
 	AUTO_SAVE = (bool)temp;
 	if (AUTO_SAVE) strcat(msg, "-a ");
 	else strcat(msg, "-w ");
-	switch_settings.get("Pretty Messages", temp, false);
-	DEBUG_PRETTY = (bool)temp;
-	if (DEBUG_PRETTY) strcat(msg, "-d p");
-	else strcat(msg, "-d nop");
 	sticky_message_ = msg;
 }
 
@@ -1108,7 +1084,6 @@ void save_switches() {
 	switch_settings.set("Theme Colour", temp);
 	switch_settings.set("Auto Update QSOs", (int)AUTO_UPLOAD);
 	switch_settings.set("Auto Save QSOs", (bool)AUTO_SAVE);
-	switch_settings.set("Pretty Messages", (bool)DEBUG_PRETTY);
 }
 
 // Open preferences and save them - it is possible to corrupt the settings
@@ -1241,6 +1216,10 @@ int main(int argc, char** argv)
 		show_help();
 		return 0;
 	}
+	// Switches affect the customisation
+	customise_fltk();
+	add_icon(argv[0]);
+
 	// Ctreate status to handle status messages
 	status_ = new status();
 
@@ -1250,10 +1229,7 @@ int main(int argc, char** argv)
 	// Now display sticky switch message
 	status_->misc_status(ST_NOTE, sticky_message_.c_str());	
 
-	// Switches affect the customisation
-	customise_fltk();
 	// Create window
-	add_icon(argv[0]);
 	create_window();
 	add_properties();
 	recent_files();

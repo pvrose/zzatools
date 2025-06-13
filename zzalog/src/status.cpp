@@ -1,12 +1,14 @@
 #include "status.h"
 
-#include "utils.h"
-#include "callback.h"
-#include "menu.h"
+#include "banner.h"
 #include "intl_widgets.h"
 #include "main_window.h"
+#include "menu.h"
 #include "qso_manager.h"
 #include "ticker.h"
+
+#include "callback.h"
+#include "utils.h"
 
 #include <iostream>
 
@@ -24,7 +26,6 @@ extern qso_manager* qso_manager_;
 extern bool READ_ONLY;
 extern string PROGRAM_ID;
 extern string PROGRAM_VERSION;
-extern bool DEBUG_STATUS;
 extern bool DEBUG_PRETTY;
 extern string VENDOR;
 extern ticker* ticker_;
@@ -43,6 +44,11 @@ status::status() :
 	// Get report filename from the settings
 	report_filename_ = default_data_directory_ + "status.txt";
 
+	// Create banner
+	banner_ = new banner(100, 100);
+	string title = PROGRAM_ID + " " + PROGRAM_VERSION;
+	banner_->copy_label(title.c_str());
+
 	// Set 2s ticker
 	ticker_->add_ticker(this, cb_ticker, 20);
 
@@ -51,6 +57,7 @@ status::status() :
 // Destructor
 status::~status()
 {
+	banner_->hide();
 	ticker_->remove_ticker(this);
 	if (report_file_) report_file_->close();
 	for (auto it = progress_items_.begin(); it != progress_items_.end(); it++) {
@@ -78,6 +85,8 @@ void status::progress(uint64_t max_value, object_t object, const char* descripti
 		snprintf(message, 100, "%s: PROGRESS: Starting %s - %lld %s", 
 			OBJECT_NAMES.at(object), description, max_value, suffix);
 		misc_status(ST_PROGRESS, message);
+		banner_->add_message(ST_PROGRESS, message, object, suffix);
+		banner_->add_progress(0, max_value);
 		progress_item* item = new progress_item;
 		item->max_value = max_value;
 		if (countdown) {
@@ -127,6 +136,7 @@ void status::progress(uint64_t value, object_t object) {
 		// Update progress item
 		progress_item* item = progress_items_.at(object);
 		item->value = value;
+		banner_->add_progress(value);
 		// update_progress(object);
 		// If it's 100% (or 0% if counting down) delete item and draw the next in the stack - certain objects can overrun (this will give an error)
 		if ((item->countdown && value <= 0) || (!item->countdown && value >= item->max_value)) {
@@ -135,6 +145,7 @@ void status::progress(uint64_t value, object_t object) {
 			snprintf(message, 100, "%s: PROGRESS: %s finished (%lld %s)", 
 				OBJECT_NAMES.at(object), item->description, item->max_value, item->suffix);
 			misc_status(ST_PROGRESS, message);
+			banner_->add_progress(item->max_value);
 			// Remove the item from the stack - even if it's not top of the stack
 			delete item;
 			progress_items_.erase(object);
@@ -159,6 +170,8 @@ void status::progress(const char* message, object_t object) {
 		update_progress(object);
 		snprintf(msg, 100, "%s: PROGRESS: abandoned %s (%lld %s)", OBJECT_NAMES.at(object), message, item->value, item->suffix);
 		misc_status(ST_PROGRESS, msg);
+		banner_->add_message(ST_PROGRESS, msg, object);
+		banner_->add_progress(item->max_value);
 		delete item;
 		progress_items_.erase(object);
 		
@@ -187,28 +200,10 @@ void status::misc_status(status_t status, const char* label) {
 	// X YYYY/MM/DD HH:MM:SS Message 
 	// X is a single letter indicating the message severity
 	snprintf(f_message, sizeof(f_message), "%c %s %s\n", STATUS_CODES.at(status), timestamp.c_str(), label);
-
-	if (DEBUG_STATUS) {
-		if (DEBUG_PRETTY) {
-			// Restore default colours
-			const char restore[] = "\033[0m";
-			const char faint[] = "\033[2m";
-			printf("%s%s%s %s%s%s%s\n",
-				faint,
-				timestamp.c_str(),
-				restore,
-				colour_code(status, true).c_str(),
-				colour_code(status, false).c_str(),
-				label,
-				restore);
-		}
-		else {
-			printf("%s %s %s\n",
-				STATUS_ABBREV.at(status),
-				timestamp.c_str(),
-				label);
-		}
+	if (status != ST_PROGRESS) {
+		banner_->add_message(status, label, OT_NONE);
 	}
+
 	if (!report_file_) {
 		// Append the status to the file
 		// Try to open the file. Open and close it each message
