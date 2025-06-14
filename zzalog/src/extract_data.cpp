@@ -688,7 +688,7 @@ void extract_data::extract_no_image() {
 		// For all records in this book
 		item_num_t total = get_count();
 		size_t checked = 0;
-		status_->progress((int)total, OT_EXTRACT, "Extracting records with no card image", "records", false);
+		status_->progress((int)total, OT_EXTRACT, "Extracting records with no card image", "records");
 		for (item_num_t ixe = 0; ixe < get_count(); ) {
 			// Check file exists for this record
 			string filename = eqsl_handler_->card_filename_l(get_record(ixe, false));

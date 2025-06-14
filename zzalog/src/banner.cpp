@@ -46,7 +46,6 @@ banner::banner(int W, int H, const char* L) :
 	, h_small_(0)
 {
 	// Set the ticker for 2 seconds
-	ticker_->add_ticker(this, cb_ticker, 20);
 	callback(cb_close);
 	create_form();
 	enable_widgets();
@@ -134,12 +133,10 @@ void banner::create_form() {
 void banner::enable_widgets() {}
 
 // Add a message to the banner
-void banner::add_message(status_t type, const char* msg, object_t object, const char* prg_unit) {
+void banner::add_message(status_t type, const char* msg) {
 	switch (type) {
 	case ST_PROGRESS: {
-		op_prog_title_->value(msg);
-		fd_progress_->selection_color(OBJECT_COLOURS.at(object));
-		prg_unit_ = prg_unit;
+		printf("Attekmpting to add progress message incorrectly\n");
 		break;
 	}
 	case ST_NONE:
@@ -168,35 +165,66 @@ void banner::add_message(status_t type, const char* msg, object_t object, const 
 }
 
 // Add progress
-void banner::add_progress(uint64_t value, uint64_t max_value) {
-	char text[64];
-	if (max_value != -1) {
-		max_value_ = max_value;
-		prev_value_ = -(max_value_ / 2);
-		snprintf(text, sizeof(text), "/%lld", max_value_);
-		op_prog_value_->copy_label(text);
-		redraw();
-	}
-	// Do not redraw these until ticker
-	if ((value - prev_value_) > (max_value_ / 100) ) {
+void banner::start_progress(uint64_t max_value, object_t object, const char* msg, const char* suffix) {
+	char text[128];
+	const uint64_t FRACTION = 100L;
+	max_value_ = max_value;
+	delta_ = max_value / FRACTION;
+	prev_value_ = 0L;
+	prg_msg_ = msg;
+	prg_unit_ = suffix;
+	prg_object_ = object;
+	// Set display message
+	snprintf(text, sizeof(text), "%s: PROGRESS: Starting %s - %lld %s", OBJECT_NAMES.at(object), msg, max_value, suffix);
+	op_prog_title_->value(text);
+	copy_msg_display(ST_PROGRESS, text);
+	snprintf(text, sizeof(text), "/%lld %s", max_value, suffix);
+	op_prog_value_->copy_label(text);
+	op_prog_value_->value("0");
+	fd_progress_->selection_color(OBJECT_COLOURS.at(object));
+
+	redraw();
+	Fl::check();
+}
+
+// Update progress dial and output
+void banner::add_progress(uint64_t value) {
+	char text[128];
+	if ((value == max_value_) || (value - prev_value_) > delta_) {
 		snprintf(text, sizeof(text), "%lld", value);
 		op_prog_value_->value(text);
 		fd_progress_->value((double)value / double(max_value_));
 		prev_value_ = value;
-		redraw();
+		if (value == max_value_) {
+			end_progress();
+		}
+		else {
+			redraw();
+			Fl::check();
+		}
 	}
 }
 
-// Update progress
-void banner::ticker() {
-	op_prog_value_->redraw();
-	fd_progress_->redraw();
+// Ending the progress - log message
+void banner::end_progress() {
+	char text[128];
+	// Set display message
+	snprintf(text, sizeof(text), "%s: PROGRESS: Ending %s", OBJECT_NAMES.at(prg_object_), prg_msg_);
+	op_prog_title_->value(text);
+	copy_msg_display(ST_PROGRESS, text);
+	redraw();
+	Fl::check();
 }
 
-// Callback - ticker
-void banner::cb_ticker(void* v) {
-	banner* that = (banner*)v;
-	that->ticker();
+// cancelling the progress - log message
+void banner::cancel_progress(const char* msg) {
+	char text[128];
+	// Set display message
+	snprintf(text, sizeof(text), "%s: PROGRESS: cancelling %s - %s", OBJECT_NAMES.at(prg_object_), prg_msg_, msg);
+	op_prog_title_->value(text);
+	copy_msg_display(ST_PROGRESS, text);
+	redraw();
+	Fl::check();
 }
 
 // Callback - drop down viewer

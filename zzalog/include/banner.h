@@ -25,14 +25,13 @@ public:
     void enable_widgets();
 
     // Add a message to the banner
-    void add_message(status_t type, const char* msg, object_t object, const char* prg_unit = nullptr);
+    void add_message(status_t type, const char* msg);
     // Add progress
-    void add_progress(uint64_t value, uint64_t max_value = -1);
-    // Update progress
-    void ticker();
-
-    // Callback - ticker
-    static void cb_ticker(void* v);
+    void start_progress(uint64_t max_value, object_t object, const char* msg, const char* suffix);
+    void add_progress(uint64_t value);
+    void end_progress();
+    void cancel_progress(const char* msg);
+ 
     // Callback - drop down viewer
     static void cb_bn_pulldown(Fl_Widget* w, void* v);
     // Callback - close button - ignore
@@ -61,10 +60,16 @@ protected:
     bool large_;
     // Progress maximum value
     uint64_t max_value_;
+    // Delta value to trigger update of progress
+    uint64_t delta_;
     // Previous value
     uint64_t prev_value_;
     // Progress unit
     const char* prg_unit_;
+    // Progress messafe
+    const char* prg_msg_;
+    // Progress object
+    object_t prg_object_;
 
 };
 

@@ -36,11 +36,7 @@ status::status() :
 	  report_filename_("")
 	, report_file_(nullptr)
 	, file_unusable_(false)
-	, previous_value_(-1)
 {
-	// Initialise attributes
-	progress_items_.clear();
-
 	// Get report filename from the settings
 	report_filename_ = default_data_directory_ + "status.txt";
 
@@ -48,10 +44,6 @@ status::status() :
 	banner_ = new banner(100, 100);
 	string title = PROGRAM_ID + " " + PROGRAM_VERSION;
 	banner_->copy_label(title.c_str());
-
-	// Set 2s ticker
-	ticker_->add_ticker(this, cb_ticker, 20);
-
 }
 
 // Destructor
@@ -60,136 +52,28 @@ status::~status()
 	banner_->hide();
 	ticker_->remove_ticker(this);
 	if (report_file_) report_file_->close();
-	for (auto it = progress_items_.begin(); it != progress_items_.end(); it++) {
-		update_progress(it->first);
-		delete (it->second);
-	}
-	progress_items_.clear();
 }
 
 // Add a progress item to the stack
-void status::progress(uint64_t max_value, object_t object, const char* description, const char* suffix, bool countdown /*= false*/) {
+void status::progress(uint64_t max_value, object_t object, const char* description, const char* suffix) {
 	// Turrn off file viewer update to improve performance
 	// no_update_viewer = true;
 	// Initialise it
-	if (progress_items_.find(object) != progress_items_.end()) {
-		// We already have a progress bar process in place for this object
-		char message[100];
-		snprintf(message, 100, "%s PROGRESS: Already started progress", OBJECT_NAMES.at(object));
-		misc_status(ST_ERROR, message);
-	} else {
-		// Reset previous value as a new progress
-		previous_value_ = -1;
-		// Start a new progress bar process - create the progress item (total expected count, objects being counted, up/down and what view it's for)
-		char message[100];
-		snprintf(message, 100, "%s: PROGRESS: Starting %s - %lld %s", 
-			OBJECT_NAMES.at(object), description, max_value, suffix);
-		misc_status(ST_PROGRESS, message);
-		banner_->add_message(ST_PROGRESS, message, object, suffix);
-		banner_->add_progress(0, max_value);
-		progress_item* item = new progress_item;
-		item->max_value = max_value;
-		if (countdown) {
-			item->value = max_value;
-		}
-		else {
-			item->value = 0;
-		}
-		item->countdown = countdown;
-		item->suffix = new char[strlen(suffix) + 1];
-		item->description = new char[strlen(description) + 1];
-		item->prev_value = 0;
-		strcpy(item->suffix, suffix);
-		strcpy(item->description, description);
-		progress_items_[object] = item;
-		update_progress(object);
-		// Use progress to check for 0 entries
-		if (max_value == 0) {
-			progress((uint64_t)0, object);
-		}
-	}
-}
-
-// Update the progress for the specified object
-void status::update_progress(object_t object) {
-	progress_item* item = progress_items_.at(object);
-	if (item->value != previous_value_) {
-		char label[100];
-		int pc = 100;
-		if (item->max_value > 0) {
-			pc = item->value * 100 / item->max_value;
-		}
-		sprintf(label, "%s: PROGRESS: %lld/%lld %s (%d%%)", 
-			OBJECT_NAMES.at(object), item->value, item->max_value, item->suffix, pc);
-		misc_status(ST_PROGRESS, label);
-		previous_value_ = item->value;
-	}
+	// Reset previous value as a new progress
+	// Start a new progress bar process - create the progress item (total expected count, objects being counted, up/down and what view it's for)
+	char message[100];
+	banner_->start_progress(max_value, object, description, suffix);
 }
 
 // Update progress to the new specified value
 void status::progress(uint64_t value, object_t object) {
-	if (progress_items_.find(object) == progress_items_.end()) {
-		char message[100];
-		snprintf(message, 100, "%s: PROGRESS: has not started but %lld done", OBJECT_NAMES.at(object), value);
-		misc_status(ST_ERROR, message);
-	} else {
-		// Update progress item
-		progress_item* item = progress_items_.at(object);
-		item->value = value;
-		banner_->add_progress(value);
-		// update_progress(object);
-		// If it's 100% (or 0% if counting down) delete item and draw the next in the stack - certain objects can overrun (this will give an error)
-		if ((item->countdown && value <= 0) || (!item->countdown && value >= item->max_value)) {
-			char message[100];
-			update_progress(object);
-			snprintf(message, 100, "%s: PROGRESS: %s finished (%lld %s)", 
-				OBJECT_NAMES.at(object), item->description, item->max_value, item->suffix);
-			misc_status(ST_PROGRESS, message);
-			banner_->add_progress(item->max_value);
-			// Remove the item from the stack - even if it's not top of the stack
-			delete item;
-			progress_items_.erase(object);
-		} else {
-			// Let the time come in if it's waiting
-			Fl::check();
-		}
-	}
+	// Update progress item
+	banner_->add_progress(value);
 }
 
 // Update progress with a message - e.g. cancel it and display why cancelled
 void status::progress(const char* message, object_t object) {
-	if (progress_items_.find(object) == progress_items_.end()) {
-		// WE didn't start the bar in the first place
-		char msg[100];
-		snprintf(msg, 100, "%s: PROGRESS: has not started %s", OBJECT_NAMES.at(object), message);
-		misc_status(ST_ERROR, msg);
-	}
-	else {
-		progress_item* item = progress_items_.at(object);
-		char msg[100];
-		update_progress(object);
-		snprintf(msg, 100, "%s: PROGRESS: abandoned %s (%lld %s)", OBJECT_NAMES.at(object), message, item->value, item->suffix);
-		misc_status(ST_PROGRESS, msg);
-		banner_->add_message(ST_PROGRESS, msg, object);
-		banner_->add_progress(item->max_value);
-		delete item;
-		progress_items_.erase(object);
-		
-	}
-}
-
-// 200 millisecond ticker - display latest progress
-void status::ticker() {
-	// Redraw all status 
-	for (auto it = progress_items_.begin(); it != progress_items_.end(); it++) {
-		// Display progress item at top of stack
-		update_progress(it->first);
-	}
-}
-
-// Static version
-void status::cb_ticker(void* v) {
-	((status*)v)->ticker();
+	banner_->cancel_progress(message);
 }
 
 // Update miscellaneous status - set text and colour, log the status
@@ -201,7 +85,7 @@ void status::misc_status(status_t status, const char* label) {
 	// X is a single letter indicating the message severity
 	snprintf(f_message, sizeof(f_message), "%c %s %s\n", STATUS_CODES.at(status), timestamp.c_str(), label);
 	if (status != ST_PROGRESS) {
-		banner_->add_message(status, label, OT_NONE);
+		banner_->add_message(status, label);
 	}
 
 	if (!report_file_) {

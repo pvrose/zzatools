@@ -83,16 +83,6 @@ class banner;
 	// 
 	enum object_t : char;
 
-	// A progress stack entry
-	struct progress_item {
-		uint64_t max_value;
-		uint64_t value;
-		char* description;
-		char* suffix;
-		bool countdown;
-		uint64_t prev_value;
-	};
-	
 	// This class provides the status bar and manages access to the various status information
 	class status 
 	{
@@ -102,22 +92,15 @@ class banner;
 		~status();
 
 		// Initialise progress
-		void progress(uint64_t max_value, object_t object, const char* description, const char* suffix, bool countdown = false);
+		void progress(uint64_t max_value, object_t object, const char* description, const char* suffix);
 		// UPdate progress
 		void progress(uint64_t value, object_t object);
 		// Update progress with a text message and mark 100%
 		void progress(const char* message, object_t object);
 		// Update miscellaneous status
 		void misc_status(status_t status, const char* label);
-		// 200 ms ticker
-		void ticker();
-		// Static version
-		static void cb_ticker(void* v);
 
 	protected:
-		// Re-initialise progress bar
-		void update_progress(object_t object);
-
 		// Colour code
 		string colour_code(status_t status, bool fg); 
 
@@ -126,12 +109,8 @@ class banner;
 		// Status report file
 		string report_filename_;
 		ofstream* report_file_;
-		// The progress items in the stack
-		map<object_t, progress_item*> progress_items_;
 		// Report file unusable
 		bool file_unusable_;
-		// Previous progress value
-		uint64_t previous_value_;
 		// Banner
 		banner* banner_;
 	};
