@@ -776,15 +776,9 @@ void add_dashboard() {
 // Set the text in the main window label
 void main_window_label(string text) {
 	// e.g. ZZALOG 3.0.0: <filename> - PROGRAM_VERSION includes (Debug) if compiled under _DEBUG
-	string label = PROGRAM_ID + " " + PROGRAM_VERSION;
-	if (text.length()) {
-		label += ": " + text;
-	}
-	const char* current = main_window_->label();
-	if (!current || label != string(current)) {
-		main_window_->copy_label(label.c_str());
-		printf("%s\n", label.c_str());
-	}
+	string label = PROGRAM_ID + " " + PROGRAM_VERSION + ": " + text;
+	main_window_->copy_label(label.c_str());
+	printf("%s\n", label.c_str());
 }
 
 // Create the main window
@@ -1262,6 +1256,8 @@ int main(int argc, char** argv)
 		// Only do this if we haven't tried to close
 		fllog_emul_->run_server();
 		// enable menu
+		// Remove banner from being on  top
+		status_->relax_banner();
 		// Run the application until it is closed
 		code = Fl::run();
 	}

@@ -61,7 +61,6 @@ void status::progress(uint64_t max_value, object_t object, const char* descripti
 	// Initialise it
 	// Reset previous value as a new progress
 	// Start a new progress bar process - create the progress item (total expected count, objects being counted, up/down and what view it's for)
-	char message[100];
 	banner_->start_progress(max_value, object, description, suffix);
 }
 
@@ -84,9 +83,7 @@ void status::misc_status(status_t status, const char* label) {
 	// X YYYY/MM/DD HH:MM:SS Message 
 	// X is a single letter indicating the message severity
 	snprintf(f_message, sizeof(f_message), "%c %s %s\n", STATUS_CODES.at(status), timestamp.c_str(), label);
-	if (status != ST_PROGRESS) {
-		banner_->add_message(status, label);
-	}
+	banner_->add_message(status, label);
 
 	if (!report_file_) {
 		// Append the status to the file
@@ -181,4 +178,11 @@ string status::colour_code(status_t status, bool fg) {
 		snprintf(result, sizeof(result), "\033[48;2;%d;%d;%dm", r, g, b);
 	}
 	return string(result);
+}
+
+// Relax the banner from being on-top all the time
+void status::relax_banner() {
+	banner_->hide();
+	banner_->clear_modal_states();
+	banner_->show();
 }

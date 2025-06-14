@@ -100,6 +100,9 @@ class banner;
 		// Update miscellaneous status
 		void misc_status(status_t status, const char* label);
 
+		// Take banner off being on top all thetime
+		void relax_banner();
+
 	protected:
 		// Colour code
 		string colour_code(status_t status, bool fg); 

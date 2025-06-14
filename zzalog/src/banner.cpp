@@ -8,6 +8,7 @@
 #include <string>
 
 // FLTK classes
+#include <FL/Fl.H>
 #include <FL/Fl_Box.H>
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Fill_Dial.H>
@@ -23,6 +24,7 @@ using namespace std;
 extern string PROGRAM_ID;
 extern string PROGRAM_VERSION;
 extern Fl_PNG_Image main_icon_;
+extern status* status_;
 extern ticker* ticker_;
 
 const Fl_Text_Display::Style_Table_Entry style_table_[] = {
@@ -126,7 +128,13 @@ void banner::create_form() {
 
 	resizable(nullptr);
 	size(max_x + GAP - x(), h_small_);
-
+	// Center the banner in the middle of the screen (windows manager permitting)
+	int sx, sy, sw, sh;
+	Fl::screen_xywh(sx, sy, sw, sh, x(), y());
+	int nx = sx + (sw / 2) - (w() / 2);
+	int ny = sy + (sh / 2) - (h() / 2);
+	set_non_modal();
+	resize(nx, ny, w(), h());
 	show();
 }
 
@@ -136,21 +144,20 @@ void banner::enable_widgets() {}
 void banner::add_message(status_t type, const char* msg) {
 	switch (type) {
 	case ST_PROGRESS: {
-		printf("Attekmpting to add progress message incorrectly\n");
 		break;
 	}
 	case ST_NONE:
 	case ST_LOG:
 	case ST_DEBUG:
 	case ST_NOTE:
-	case ST_OK: {
+	case ST_OK: 
+	case ST_WARNING:
+	case ST_NOTIFY: {
 		op_msg_low_->value(msg);
 		op_msg_low_->color(STATUS_COLOURS.at(type).bg);
 		op_msg_low_->textcolor(STATUS_COLOURS.at(type).fg);
 		break;
 	}
-	case ST_WARNING:
-	case ST_NOTIFY:
 	case ST_ERROR:
 	case ST_SEVERE:
 	case ST_FATAL: {
@@ -176,8 +183,7 @@ void banner::start_progress(uint64_t max_value, object_t object, const char* msg
 	prg_object_ = object;
 	// Set display message
 	snprintf(text, sizeof(text), "%s: PROGRESS: Starting %s - %lld %s", OBJECT_NAMES.at(object), msg, max_value, suffix);
-	op_prog_title_->value(text);
-	copy_msg_display(ST_PROGRESS, text);
+	status_->misc_status(ST_PROGRESS, text);
 	snprintf(text, sizeof(text), "/%lld %s", max_value, suffix);
 	op_prog_value_->copy_label(text);
 	op_prog_value_->value("0");
@@ -211,7 +217,7 @@ void banner::end_progress() {
 	// Set display message
 	snprintf(text, sizeof(text), "%s: PROGRESS: Ending %s", OBJECT_NAMES.at(prg_object_), prg_msg_);
 	op_prog_title_->value(text);
-	copy_msg_display(ST_PROGRESS, text);
+	status_->misc_status(ST_PROGRESS, text);
 	redraw();
 	Fl::check();
 }
@@ -222,7 +228,7 @@ void banner::cancel_progress(const char* msg) {
 	// Set display message
 	snprintf(text, sizeof(text), "%s: PROGRESS: cancelling %s - %s", OBJECT_NAMES.at(prg_object_), prg_msg_, msg);
 	op_prog_title_->value(text);
-	copy_msg_display(ST_PROGRESS, text);
+	status_->misc_status(ST_PROGRESS, text);
 	redraw();
 	Fl::check();
 }
