@@ -770,6 +770,7 @@ void add_dashboard() {
 			qso_manager_->copy_label(l);
 		}
 		status_->misc_status(ST_NOTE, "DASH: Opened");
+		qso_manager_->hide();
 	}
 }
 
@@ -788,6 +789,7 @@ void create_window() {
 	main_window_label("");
 	// add callback to intercept close command
 	main_window_->callback(cb_bn_close);
+	main_window_->hide();
 
 }
 
@@ -1219,8 +1221,6 @@ int main(int argc, char** argv)
 	add_properties();
 	recent_files();
 
-	// now show the window
-	main_window_->show(argc, argv);
 	// add the various drawn items
 	int curr_y = 0;
 	add_widgets(curr_y);
@@ -1258,6 +1258,9 @@ int main(int argc, char** argv)
 		// enable menu
 		// Remove banner from being on  top
 		status_->relax_banner();
+		// now show the window
+		main_window_->show(argc, argv);
+		qso_manager_->show();
 		// Run the application until it is closed
 		code = Fl::run();
 	}
