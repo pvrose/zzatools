@@ -15,6 +15,7 @@ main.cpp - application entry point
 #include "about_dialog.h"
 #include "band_data.h"
 #include "band_window.h"
+#include "banner.h"
 #include "book.h"
 #include "club_handler.h"
 #include "config.h"
@@ -137,6 +138,7 @@ config* config_ = nullptr;
 band_window* band_window_ = nullptr;
 rig_data* rig_data_ = nullptr;
 stn_data* stn_data_ = nullptr;
+banner* banner_ = nullptr;
 // Recent files opened
 list<string> recent_files_;
 
@@ -174,6 +176,8 @@ string sticky_message_ = "";
 uint32_t seed_ = 0;
 // Defaults config files
 string default_data_directory_ = "";
+// Do not close banner
+bool keep_banner_ = false;
 
 // Get the backup filename
 string backup_filename(string source) {
@@ -246,7 +250,11 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 	else {
 		closing_ = true;
 		// Stop the ticker
+		banner_->hide();
+		banner_->set_non_modal();
+		banner_->show();
 		status_->misc_status(ST_NOTE, "ZZALOG: Closing...");
+		// Bring banner 
 		// Delete band view
 		// Currently modifying a (potentially new) record
 		if (book_ && (book_->is_dirty_record(book_->get_record()) || book_->new_record()) ) {
@@ -361,10 +369,11 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 		save_switches();
 
 		// Hide all the open windows - this will allow Fl to close the app.
-		for (Fl_Window* wx = Fl::first_window(); wx; wx = Fl::first_window()) wx->hide();
-
-		// Exit and close application
-		Fl_Single_Window::default_callback((Fl_Window*)w, v);
+		Fl_Window* wx = Fl::first_window();
+		for (; wx; wx = Fl::next_window(wx)) {
+			// Keep the banner showing if we need to see a severe or fatal error.
+			if (wx != (Fl_Window*)banner_ || !keep_banner_) wx->hide();
+		}
 	}
 }
 
@@ -1209,6 +1218,10 @@ int main(int argc, char** argv)
 
 	// Ctreate status to handle status messages
 	status_ = new status();
+	// Create banner
+	banner_ = new banner(100, 100);
+	string title = PROGRAM_ID + " " + PROGRAM_VERSION;
+	banner_->copy_label(title.c_str());
 
 	// Read the fields data
 	fields_ = new fields;
@@ -1257,7 +1270,9 @@ int main(int argc, char** argv)
 		fllog_emul_->run_server();
 		// enable menu
 		// Remove banner from being on  top
-		status_->relax_banner();
+		banner_->hide();
+		banner_->clear_modal_states();
+		banner_->show();
 		// now show the window
 		main_window_->show(argc, argv);
 		qso_manager_->show();
@@ -1266,6 +1281,8 @@ int main(int argc, char** argv)
 	}
 	// Delete everything we've created
 	tidy();
+	banner_->allow_close();
+	while (banner_ && banner_->visible()) Fl::check();
 	return code;
 }
 

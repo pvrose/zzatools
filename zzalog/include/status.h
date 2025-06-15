@@ -30,7 +30,6 @@ class banner;
 		ST_PROGRESS,         // A progress note
 		ST_OK,               // Task successful
 		ST_WARNING,          // A warning message
-		ST_NOTIFY,           // A notification to the user
 		ST_ERROR,            // An error has been signaled
 		ST_SEVERE,           // A sever error that will result in reduced capability
 		ST_FATAL             // A fatal (non-recoverable) error has been signaled
@@ -44,7 +43,6 @@ class banner;
 		{ ST_PROGRESS, { fl_darker(FL_WHITE), FL_BLACK } },
 		{ ST_OK, { fl_lighter(FL_GREEN), FL_BLACK } },
 		{ ST_WARNING, { FL_YELLOW, FL_BLACK } },
-		{ ST_NOTIFY, { fl_darker(FL_YELLOW), FL_BLACK } },
 		{ ST_ERROR, { FL_RED, FL_BLACK } },
 		{ ST_SEVERE, { FL_RED, FL_WHITE } },
 		{ ST_FATAL, { FL_BLACK, FL_RED } },
@@ -59,7 +57,6 @@ class banner;
 		{ ST_PROGRESS, 'P'},
 		{ ST_OK, 'D'},
 		{ ST_WARNING, 'W'},
-		{ ST_NOTIFY, 'Y'},
 		{ ST_ERROR, 'E'},
 		{ ST_SEVERE, 'S'},
 		{ ST_FATAL, 'F'}
@@ -74,7 +71,6 @@ class banner;
 		{ ST_PROGRESS, " PROG"},
 		{ ST_OK, " OK  "},
 		{ ST_WARNING, "?WARN"},
-		{ ST_NOTIFY, " NTFY"},
 		{ ST_ERROR, "*ERR*"},
 		{ ST_SEVERE, "!SVR!"},
 		{ ST_FATAL, "!FTL!"}
@@ -100,9 +96,6 @@ class banner;
 		// Update miscellaneous status
 		void misc_status(status_t status, const char* label);
 
-		// Take banner off being on top all thetime
-		void relax_banner();
-
 	protected:
 		// Colour code
 		string colour_code(status_t status, bool fg); 
@@ -114,8 +107,6 @@ class banner;
 		ofstream* report_file_;
 		// Report file unusable
 		bool file_unusable_;
-		// Banner
-		banner* banner_;
 	};
 #endif
 

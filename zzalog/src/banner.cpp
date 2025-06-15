@@ -35,7 +35,6 @@ const Fl_Text_Display::Style_Table_Entry style_table_[] = {
 	{ STATUS_COLOURS.at(ST_PROGRESS).fg, FL_COURIER, FL_NORMAL_SIZE, Fl_Text_Display::ATTR_BGCOLOR, STATUS_COLOURS.at(ST_PROGRESS).bg,},
 	{ STATUS_COLOURS.at(ST_OK).fg, FL_COURIER, FL_NORMAL_SIZE, Fl_Text_Display::ATTR_BGCOLOR, STATUS_COLOURS.at(ST_OK).bg },
 	{ STATUS_COLOURS.at(ST_WARNING).fg, FL_COURIER, FL_NORMAL_SIZE, Fl_Text_Display::ATTR_BGCOLOR, STATUS_COLOURS.at(ST_WARNING).bg },
-	{ STATUS_COLOURS.at(ST_NOTIFY).fg, FL_COURIER, FL_NORMAL_SIZE, Fl_Text_Display::ATTR_BGCOLOR, STATUS_COLOURS.at(ST_NOTIFY).bg },
 	{ STATUS_COLOURS.at(ST_ERROR).fg, FL_COURIER, FL_NORMAL_SIZE, Fl_Text_Display::ATTR_BGCOLOR, STATUS_COLOURS.at(ST_ERROR).bg },
 	{ STATUS_COLOURS.at(ST_SEVERE).fg, FL_COURIER, FL_NORMAL_SIZE, Fl_Text_Display::ATTR_BGCOLOR, STATUS_COLOURS.at(ST_SEVERE).bg },
 	{ STATUS_COLOURS.at(ST_FATAL).fg, FL_COURIER, FL_NORMAL_SIZE, Fl_Text_Display::ATTR_BGCOLOR, STATUS_COLOURS.at(ST_FATAL).bg }
@@ -46,6 +45,7 @@ banner::banner(int W, int H, const char* L) :
 	, large_(false)
 	, h_large_(0)
 	, h_small_(0)
+	, can_close_(false)
 {
 	// Set the ticker for 2 seconds
 	callback(cb_close);
@@ -150,25 +150,28 @@ void banner::add_message(status_t type, const char* msg) {
 	case ST_LOG:
 	case ST_DEBUG:
 	case ST_NOTE:
-	case ST_OK: 
-	case ST_WARNING:
-	case ST_NOTIFY: {
+	case ST_OK: {
 		op_msg_low_->value(msg);
 		op_msg_low_->color(STATUS_COLOURS.at(type).bg);
 		op_msg_low_->textcolor(STATUS_COLOURS.at(type).fg);
 		break;
 	}
+	case ST_WARNING:
 	case ST_ERROR:
 	case ST_SEVERE:
 	case ST_FATAL: {
 		op_msg_high_->value(msg);
 		op_msg_high_->color(STATUS_COLOURS.at(type).bg);
 		op_msg_high_->textcolor(STATUS_COLOURS.at(type).fg);
+		hide();
+		set_non_modal();
+		show();
 		break;
 	}
 	}
 	copy_msg_display(type, msg);
 	redraw();
+	Fl::check();
 }
 
 // Add progress
@@ -248,7 +251,13 @@ void banner::cb_bn_pulldown(Fl_Widget* w, void* v) {
 
 // Callback - close button - ignore
 void banner::cb_close(Fl_Widget* w, void* v) {
-	printf("ZZALOG: Cannot close the banner\n");
+	banner* that = (banner*)w;
+	if (that->can_close_) {
+		Fl_Double_Window::default_callback(that, v);
+	}
+	else {
+		printf("ZZALOG: Cannot close the banner\n");
+	}
 }
 
 // Add message to display (with colour)
@@ -268,4 +277,9 @@ void banner::copy_msg_display(status_t type, const char* msg) {
 	Fl_Text_Buffer* s_buffer = display_->style_buffer();
 	s_buffer->append(style);
 
+}
+
+// set the can_close flag
+void banner::allow_close() {
+	can_close_ = true;
 }

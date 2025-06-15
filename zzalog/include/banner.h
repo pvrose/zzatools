@@ -31,6 +31,9 @@ public:
     void add_progress(uint64_t value);
     void end_progress();
     void cancel_progress(const char* msg);
+
+    // Allow baner to close
+    void allow_close();
  
     // Callback - drop down viewer
     static void cb_bn_pulldown(Fl_Widget* w, void* v);
@@ -70,6 +73,8 @@ protected:
     const char* prg_msg_;
     // Progress object
     object_t prg_object_;
+    // Can close the window
+    bool can_close_;
 
 };
 

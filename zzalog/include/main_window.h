@@ -1,7 +1,7 @@
 #ifndef __MAIN_WINDOW__
 #define __MAIN_WINDOW__
 
-#include <FL/Fl_Single_Window.H>
+#include <FL/Fl_Double_Window.H>
 
 using namespace std;
 
@@ -10,7 +10,7 @@ using namespace std;
 	// This calss inherits from Fl_Single_Window and is the main application window
 	// It allows custom handling FL_SHOW and FL_HIDE events
 	class main_window :
-		public Fl_Single_Window
+		public Fl_Double_Window
 	{
 	public:
 

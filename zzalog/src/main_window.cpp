@@ -10,7 +10,7 @@ extern import_data* import_data_;
 
 // Create the window
 main_window::main_window(int W, int H, const char* label) :
-	Fl_Single_Window(W, H, label)
+	Fl_Double_Window(W, H, label)
 {
 }
 
@@ -40,5 +40,5 @@ int main_window::handle(int event) {
 		return true;
 	}
 
-	return Fl_Single_Window::handle(event);
+	return Fl_Double_Window::handle(event);
 }

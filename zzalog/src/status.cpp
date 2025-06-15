@@ -29,7 +29,9 @@ extern string PROGRAM_VERSION;
 extern bool DEBUG_PRETTY;
 extern string VENDOR;
 extern ticker* ticker_;
+extern banner* banner_;
 extern string default_data_directory_;
+extern bool keep_banner_;
 
 // Constructor
 status::status() :
@@ -40,17 +42,11 @@ status::status() :
 	// Get report filename from the settings
 	report_filename_ = default_data_directory_ + "status.txt";
 
-	// Create banner
-	banner_ = new banner(100, 100);
-	string title = PROGRAM_ID + " " + PROGRAM_VERSION;
-	banner_->copy_label(title.c_str());
 }
 
 // Destructor
 status::~status()
 {
-	banner_->hide();
-	ticker_->remove_ticker(this);
 	if (report_file_) report_file_->close();
 }
 
@@ -140,6 +136,7 @@ void status::misc_status(status_t status, const char* label) {
 		// A severe error - ask the user whether to continue
 		if (fl_choice("An error that resulted in reduced functionality occurred:\n%s\n\nDo you want to try to continue or quit?", "Continue", "Quit", nullptr, label, report_filename_.c_str()) == 1) {
 			// Set the flag to continue showing the file viewer after all other windows have been hidden.
+			keep_banner_ = true;
 			main_window_->do_callback();
 		}
 		break;
@@ -149,15 +146,12 @@ void status::misc_status(status_t status, const char* label) {
 		// A fatal error - quit the application
 		fl_message("An unrecoverable error has occurred, closing down - check status log");
 		// Close the application down
+		keep_banner_ = true;
 		main_window_->do_callback();
 		break;
 	case ST_ERROR:
 		// Open status file viewer and continue
 		fl_beep(FL_BEEP_ERROR);
-		break;
-	case ST_NOTIFY:
-		// Open status file viewer, beep and continue
-		fl_beep(FL_BEEP_NOTIFICATION);
 		break;
 	default:
 		break;
@@ -178,11 +172,4 @@ string status::colour_code(status_t status, bool fg) {
 		snprintf(result, sizeof(result), "\033[48;2;%d;%d;%dm", r, g, b);
 	}
 	return string(result);
-}
-
-// Relax the banner from being on-top all the time
-void status::relax_banner() {
-	banner_->hide();
-	banner_->clear_modal_states();
-	banner_->show();
 }
