@@ -55,14 +55,14 @@ bool stn_reader::load_data(
 		return true;
 	}
 	else if (closing_) {
-		status_->misc_status(ST_WARNING, "STN DATA: Read cancelled as close-down requested");
 		status_->progress("Load abandoned", OT_STN);
+		status_->misc_status(ST_WARNING, "STN DATA: Read cancelled as close-down requested");
 		return false;
 	}
 	else {
 		// Read failed - report failure
-		status_->misc_status(ST_FATAL, "STN DATA: Read failed");
 		status_->progress("Load failed", OT_RIGS);
+		status_->misc_status(ST_FATAL, "STN DATA: Read failed");
 		return false;
 	}
 }

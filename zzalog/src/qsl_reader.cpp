@@ -52,13 +52,13 @@ bool qsl_reader::load_data(
 	// Call the XML parser - calls back to the overides herein
 	if (parse(in)) {
 		// Read successful - complete progress
-		status_->misc_status(ST_OK, "QSL: Done!");
 		status_->progress(file_size, OT_QSLS);
+		status_->misc_status(ST_OK, "QSL: Done!");
 		return true;
 	} else {
 		// Read failed - report failure
-		status_->misc_status(ST_FATAL, "QSL: Read failed");
 		status_->progress("Load failed", OT_QSLS);
+		status_->misc_status(ST_FATAL, "QSL: Read failed");
 		return false;
 	}
 }

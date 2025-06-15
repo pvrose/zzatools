@@ -51,13 +51,13 @@ bool rig_reader::load_data(map<string, rig_data_t*>* data, istream& in) {
 		return true;
 	}
 	else if (closing_) {
-		status_->misc_status(ST_WARNING, "RIG_DATA: Read cancelled as close-down requested");
 		status_->progress("Load abandoned", OT_RIGS);
+		status_->misc_status(ST_WARNING, "RIG_DATA: Read cancelled as close-down requested");
 		return false;
 	} else {
 		// Read failed - report failure
-		status_->misc_status(ST_FATAL, "RIG DATA: Read failed");
 		status_->progress("Load failed", OT_RIGS);
+		status_->misc_status(ST_FATAL, "RIG DATA: Read failed");
 		return false;
 	}
 }
