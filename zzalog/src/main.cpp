@@ -253,6 +253,7 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 		banner_->hide();
 		banner_->set_non_modal();
 		banner_->show();
+		ticker_->stop_all();
 		status_->misc_status(ST_NOTE, "ZZALOG: Closing...");
 		// Bring banner 
 		// Delete band view
@@ -370,9 +371,9 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 
 		// Hide all the open windows - this will allow Fl to close the app.
 		Fl_Window* wx = Fl::first_window();
-		for (; wx; wx = Fl::next_window(wx)) {
+		for (; wx; wx = Fl::first_window()) {
 			// Keep the banner showing if we need to see a severe or fatal error.
-			if (wx != (Fl_Window*)banner_ || !keep_banner_) wx->hide();
+			wx->hide();
 		}
 	}
 }
@@ -1281,8 +1282,11 @@ int main(int argc, char** argv)
 	}
 	// Delete everything we've created
 	tidy();
-	banner_->allow_close();
-	while (banner_ && banner_->visible()) Fl::check();
+	if (keep_banner_) {
+		banner_->allow_close();
+		banner_->show();
+		while (banner_ && banner_->visible()) Fl::check();
+	}
 	return code;
 }
 

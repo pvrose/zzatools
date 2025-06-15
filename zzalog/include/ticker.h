@@ -31,6 +31,8 @@ class ticker {
     void remove_ticker(void* object);
     // Suspend/restart ticker
     void activate_ticker(void* object, bool active);
+    // Close all tickers
+    void stop_all();
     
     protected:
 

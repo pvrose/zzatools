@@ -13,11 +13,15 @@ ticker::ticker() {
 }
 
 // Destructor
-ticker::~ticker() {
+void ticker::stop_all() {
     Fl::remove_timeout(cb_ticker);
     for( auto it = tickers_.begin(); it != tickers_.end(); it++) {
         delete *it;
     };
+}
+
+ticker::~ticker() {
+    stop_all();
 }
 
 // Add ticker
