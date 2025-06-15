@@ -174,7 +174,6 @@ bool wx_handler::characters(string content){
 // Update weather report - forecd
 void wx_handler::update() {
     // Create a dummy record to get own location
-    char msg[1024];
     record* dummy = qso_manager_->dummy_qso();
     string qth_id = qso_manager_->get_default(qso_manager::QTH);
     const qth_info_t* info = stn_data_->get_qth(qth_id);
@@ -195,7 +194,6 @@ void wx_handler::update() {
         location.longitude,
         key_);
     if (url_handler_->read_url(string(url), &ss)) {
-        char msg[128];
         ss.seekg(ios::beg);
         parse(ss);
      } else {

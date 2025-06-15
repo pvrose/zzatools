@@ -362,7 +362,6 @@ bool url_handler::send_email(string url, string user, string password,
 
 	/* check for errors */
 	if (result != CURLE_OK) {
-		char msg[256];
 		printf("URL_HANDLER: ERROR - %s", error_msg);
 		// Reset the operation and clean up
 
