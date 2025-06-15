@@ -250,9 +250,6 @@ static void cb_bn_close(Fl_Widget* w, void*v) {
 	else {
 		closing_ = true;
 		// Stop the ticker
-		banner_->hide();
-		banner_->set_non_modal();
-		banner_->show();
 		ticker_->stop_all();
 		status_->misc_status(ST_NOTE, "ZZALOG: Closing...");
 		// Bring banner 
@@ -1270,10 +1267,6 @@ int main(int argc, char** argv)
 		// Only do this if we haven't tried to close
 		fllog_emul_->run_server();
 		// enable menu
-		// Remove banner from being on  top
-		banner_->hide();
-		banner_->clear_modal_states();
-		banner_->show();
 		// now show the window
 		main_window_->show(argc, argv);
 		qso_manager_->show();

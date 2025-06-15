@@ -1,10 +1,10 @@
 #include "url_handler.h"
-#include "status.h"
+
+#include "utils.h"
 
 #include <FL/fl_ask.H>
 
 extern bool DEBUG_CURL;
-extern status* status_;
 extern string PROGRAM_ID;
 extern string PROGRAM_VERSION;
 
@@ -98,8 +98,7 @@ bool url_handler::read_url(string url, ostream* os) {
 	/* check for errors */
 	if (result != CURLE_OK) {
 		char msg[256];
-		snprintf(msg, sizeof(msg), "URL_HANDLER: %s", error_msg);
-		status_->misc_status(ST_ERROR, msg);
+		printf(msg, sizeof(msg), "ERROR - URL_HANDLER: %s\n", error_msg);
 		curl_easy_cleanup(curl_);
 		lock_.unlock();
 		return false;
@@ -167,8 +166,7 @@ bool url_handler::post_url(string url, string resource, istream* req, ostream* r
 	/* check for errors */
 	if (result != CURLE_OK) {
 		char msg[256];
-		snprintf(msg, sizeof(msg), "URL_HANDLER: %s", error_msg);
-		status_->misc_status(ST_ERROR, msg);
+		printf(msg, sizeof(msg), "URL_HANDLER: ERROR %s\n", error_msg);
 		// Reset the operation and clean up
 
 		curl_easy_reset(curl_);
@@ -283,7 +281,7 @@ bool url_handler::send_email(string url, string user, string password,
 	curl_ = curl_easy_init();
 
 	if (curl_ == nullptr) {
-		status_->misc_status(ST_ERROR, "URL_HANDLER: failed to get an instance of 'curl'");
+		printf("URL_HANDLER: ERROR - failed to get an instance of 'curl'\n");
 		lock_.unlock();
 		return false;
 	}
@@ -365,8 +363,7 @@ bool url_handler::send_email(string url, string user, string password,
 	/* check for errors */
 	if (result != CURLE_OK) {
 		char msg[256];
-		snprintf(msg, sizeof(msg), "URL_HANDLER: %s", error_msg);
-		status_->misc_status(ST_ERROR, msg);
+		printf("URL_HANDLER: ERROR - %s", error_msg);
 		// Reset the operation and clean up
 
 		curl_slist_free_all(recipients);

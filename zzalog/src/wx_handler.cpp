@@ -184,8 +184,6 @@ void wx_handler::update() {
         location = dummy->location(true);
     }
     if (isnan(location.latitude) || isnan(location.longitude)) {
-        snprintf(msg, sizeof(msg),"WX_HANDLER: Location '%s' has no coordinates", qth_id.c_str());
-        status_->misc_status(ST_ERROR, msg);
         report_ = wx_report();
         report_.city_name = "Not known";
         return;
@@ -196,22 +194,11 @@ void wx_handler::update() {
         location.latitude,
         location.longitude,
         key_);
-    snprintf(msg, sizeof(msg), "WX_HANDLER: Fetching %s", url);
-    status_->misc_status(ST_NOTE, msg);
     if (url_handler_->read_url(string(url), &ss)) {
         char msg[128];
         ss.seekg(ios::beg);
         parse(ss);
-        snprintf(msg, sizeof(msg), "WX_HANDLER: Weather read OK: %s %0.0f\302\260C %0.0fMPH %s %0.0f hPa. %0.0f%% cloud",
-            description().c_str(), temperature(), wind_speed(), wind_direction().c_str(), pressure(), cloud() * 100);
-        status_->misc_status(ST_OK, msg);
-    } else {
-        status_->misc_status(ST_ERROR, "WX_HANDLER: WX read failed - see pop-up help window");
-        Fl_Help_Dialog* dlg = new Fl_Help_Dialog();
-        ss.seekg(ios::beg);
-        dlg->load(ss.str().c_str());
-        dlg->show();
-        // Create a dummy report
+     } else {
         report_ = wx_report();
         report_.city_name = "Not known";
     }
@@ -219,6 +206,7 @@ void wx_handler::update() {
 
 // Timer - called every 30 minutes
 void wx_handler::ticker() {
+    char msg[1024];
     wx_valid_ = false;
     if (DEBUG_THREADS) printf("WX MAIN: Starting WX fetch\n");
     wx_thread_ = new thread(do_thread, this);
@@ -227,6 +215,9 @@ void wx_handler::ticker() {
     if (DEBUG_THREADS) printf("WX MAIN: Finished WX fetch\n");
     delete wx_thread_;
     wx_thread_ = nullptr;
+    snprintf(msg, sizeof(msg), "WX_HANDLER: Weather read OK: %s %0.0f\302\260C %0.0fMPH %s %0.0f hPa. %0.0f%% cloud",
+        description().c_str(), temperature(), wind_speed(), wind_direction().c_str(), pressure(), cloud() * 100);
+    status_->misc_status(ST_OK, msg);
     qso_manager_->enable_widgets();
 }
 

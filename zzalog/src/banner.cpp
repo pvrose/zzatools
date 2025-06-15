@@ -150,16 +150,18 @@ void banner::add_message(status_t type, const char* msg) {
 	case ST_LOG:
 	case ST_DEBUG:
 	case ST_NOTE:
-	case ST_OK: {
+	case ST_OK: 
+	case ST_WARNING:
+	{
 		op_msg_low_->value(msg);
 		op_msg_low_->color(STATUS_COLOURS.at(type).bg);
 		op_msg_low_->textcolor(STATUS_COLOURS.at(type).fg);
 		break;
 	}
-	case ST_WARNING:
 	case ST_ERROR:
 	case ST_SEVERE:
-	case ST_FATAL: {
+	case ST_FATAL:
+	{
 		op_msg_high_->value(msg);
 		op_msg_high_->color(STATUS_COLOURS.at(type).bg);
 		op_msg_high_->textcolor(STATUS_COLOURS.at(type).fg);
