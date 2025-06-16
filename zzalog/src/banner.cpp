@@ -278,6 +278,7 @@ void banner::copy_msg_display(status_t type, const char* msg) {
 	// Append it to the style buffer
 	Fl_Text_Buffer* s_buffer = display_->style_buffer();
 	s_buffer->append(style);
+	display_->scroll(buffer->count_lines(0, buffer->length()),0);
 
 }
 
