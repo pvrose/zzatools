@@ -7,11 +7,14 @@
 using namespace std;
 
 class record;
-class Fl_Button;
-class Fl_Light_Button;
-class Fl_Radio_Light_Button;
-class Fl_Image;
 class qsl_widget;
+
+class Fl_Button;
+class Fl_Check_Button;
+class Fl_Image;
+class Fl_Radio_Light_Button;
+class Fl_Tabs;
+
 
 typedef size_t qso_num_t;
 
@@ -58,6 +61,8 @@ public:
 	static void cb_bn_card_reqd(Fl_Widget* w, void* v);
 	// My QSL button
 	static void cb_bn_myqsl(Fl_Widget* w, void* v);
+	// Tabs
+	static void cb_tabs(Fl_Widget* w, void* v);
 
 	// Set record
 	void set_qso(record* qso, qso_num_t number);
@@ -93,6 +98,9 @@ protected:
 	// QSO changed
 	bool qso_changed_;
 
+	Fl_Tabs* tabs_;
+
+	Fl_Group* grp_viewer_;
 	// Card image and info
 	qsl_widget* qsl_thumb_;
 	// Card controls
@@ -103,22 +111,26 @@ protected:
 	Fl_Radio_Light_Button* radio_emailr_;
 	Fl_Radio_Light_Button* radio_label_;
 	Fl_Radio_Light_Button* radio_emails_;
+	// QSL status
+	Fl_Group* grp_status_;
+	Fl_Check_Button* bn_eqsl_rstatus_;
+	Fl_Check_Button* bn_lotw_rstatus_;
+	Fl_Check_Button* bn_qrz_rstatus_;
+	Fl_Check_Button* bn_card_rstatus_;
+	Fl_Check_Button* bn_eqsl_sstatus_;
+	Fl_Check_Button* bn_lotw_sstatus_;
+	Fl_Check_Button* bn_qrz_sstatus_;
+	Fl_Check_Button* bn_club_sstatus_;
+	Fl_Check_Button* bn_card_sstatus_;
+	// Editing
+	Fl_Group* grp_editor_;
 	Fl_Button* bn_fetch_;
 	Fl_Button* bn_log_bureau_;
 	Fl_Button* bn_log_email_;
 	Fl_Button* bn_log_direct_;
 	Fl_Button* bn_card_reqd_;
 	Fl_Button* bn_card_decl_;
-	// QSL status
-	Fl_Light_Button* bn_eqsl_rstatus_;
-	Fl_Light_Button* bn_lotw_rstatus_;
-	Fl_Light_Button* bn_qrz_rstatus_;
-	Fl_Light_Button* bn_card_rstatus_;
-	Fl_Light_Button* bn_eqsl_sstatus_;
-	Fl_Light_Button* bn_lotw_sstatus_;
-	Fl_Light_Button* bn_qrz_sstatus_;
-	Fl_Light_Button* bn_club_sstatus_;
-	Fl_Light_Button* bn_card_sstatus_;
+
 	// Window to contain full view
 	Fl_Window* win_full_view_;
 	// Button

@@ -17,7 +17,7 @@
 #include <FL/Fl_JPEG_Image.H>
 #include <FL/Fl_BMP_Image.H>
 #include <FL/Fl_PNG_Image.H>
-#include <FL/Fl_Light_Button.H>
+#include <FL/Fl_Check_Button.H>
 #include <FL/Fl_Radio_Light_Button.H>
 #include <FL/Fl_Native_File_Chooser.H>
 #include <FL/Fl_Box.H>
@@ -94,12 +94,27 @@ void qso_qsl_vwr::create_form() {
 	const int WCARD = 540;
 	const int HCARD = 340;
 
-	int curr_x = x();
-	int curr_y = y();
-	// Create image size in ratio 540x340 to fit supplied width
-	const int WIMAGE = w();
+	int curr_x = x() + GAP;
+	int curr_y = y() + GAP;
+
+	// Tabbed form
+	tabs_ = new Fl_Tabs(curr_x, curr_y, w() - (2 * GAP), h() - GAP);
+	tabs_->box(FL_BORDER_BOX);
+	tabs_->handle_overflow(Fl_Tabs::OVERFLOW_PULLDOWN);
+	tabs_->callback(cb_tabs);
+
+	int rx=0, ry=0, rw=0, rh=0;
+	tabs_->client_area(rx, ry, rw, rh);
+
+	grp_viewer_ = new Fl_Group(rx, ry, rw, rh, "Display");
+	grp_viewer_->labelsize(FL_NORMAL_SIZE + 1);
+
+		// Create image size in ratio 540x340 to fit supplied width
+	const int WIMAGE = grp_viewer_->w();
 	const int HIMAGE = w() * HCARD / WCARD;
 
+	curr_x = rx;
+	curr_y = ry;
 
 	// Box - for the display of a card image 
 	qsl_thumb_ = new qsl_widget(curr_x, curr_y, WIMAGE, HIMAGE, "Image");
@@ -110,101 +125,10 @@ void qso_qsl_vwr::create_form() {
 
 	curr_y += qsl_thumb_->h();
 
-	curr_x = x() + GAP;
+	curr_x = grp_viewer_->x() + GAP / 2;
 
-	// Row header
-	Fl_Box* label1 = new Fl_Box(curr_x, curr_y, WSMEDIT, HRADIO, "QSL status..");
-	label1->box(FL_FLAT_BOX);
-	label1->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
-	label1->color(FL_BACKGROUND_COLOR);
-
-	curr_y += HTEXT;
-	curr_x = x() + GAP;
-
-	Fl_Box* label1A = new Fl_Box(curr_x, curr_y, WRADIO, HRADIO, "R");
-	label1A->box(FL_FLAT_BOX);
-	label1A->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
-	label1A->color(FL_BACKGROUND_COLOR);
-
-	curr_x += WRADIO;
-
-	const int WSTATUS = WBUTTON * 3 / 5;
-
-	// Light to indicate received eQSL
-	bn_eqsl_rstatus_ = new Fl_Light_Button(curr_x, curr_y, WSTATUS, HRADIO, "eQSL");
-	bn_eqsl_rstatus_->box(FL_FLAT_BOX);
-	bn_eqsl_rstatus_->type(bn_eqsl_rstatus_->type() & ~FL_TOGGLE_BUTTON);
-
-	curr_x += WSTATUS;
-	// Light to indicate received LotW
-	bn_lotw_rstatus_ = new Fl_Light_Button(curr_x, curr_y, WSTATUS, HRADIO, "LotW");
-	bn_lotw_rstatus_->box(FL_FLAT_BOX);
-	bn_lotw_rstatus_->type(bn_lotw_rstatus_->type() & ~FL_TOGGLE_BUTTON);
-
-	curr_x += WSTATUS;
-	// Light to indicate received LotW
-	bn_qrz_rstatus_ = new Fl_Light_Button(curr_x, curr_y, WSTATUS, HRADIO, "QRZ");
-	bn_qrz_rstatus_->box(FL_FLAT_BOX);
-	bn_qrz_rstatus_->type(bn_qrz_rstatus_->type() & ~FL_TOGGLE_BUTTON);
-
-	curr_x += WSTATUS + WSTATUS;
-	// Light to indicate received a paper card
-	bn_card_rstatus_ = new Fl_Light_Button(curr_x, curr_y, WSTATUS, HRADIO, "Card");
-	bn_card_rstatus_->box(FL_FLAT_BOX);
-	bn_card_rstatus_->type(bn_card_rstatus_->type() & ~FL_TOGGLE_BUTTON);
-
-	curr_y += HRADIO;
-	curr_x = x() + GAP;
-
-	Fl_Box* label1B = new Fl_Box(curr_x, curr_y, WRADIO, HRADIO, "S");
-	label1B->box(FL_FLAT_BOX);
-	label1B->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
-	label1B->color(FL_BACKGROUND_COLOR);
-
-	curr_x += WRADIO;
-
-	// Light to indicate received eQSL
-	bn_eqsl_sstatus_ = new Fl_Light_Button(curr_x, curr_y, WSTATUS, HRADIO, "eQSL");
-	bn_eqsl_sstatus_->box(FL_FLAT_BOX);
-	bn_eqsl_sstatus_->type(bn_eqsl_sstatus_->type() & ~FL_TOGGLE_BUTTON);
-
-	curr_x += WSTATUS;
-	// Light to indicate received LotW
-	bn_lotw_sstatus_ = new Fl_Light_Button(curr_x, curr_y, WSTATUS, HRADIO, "LotW");
-	bn_lotw_sstatus_->box(FL_FLAT_BOX);
-	bn_lotw_sstatus_->type(bn_lotw_sstatus_->type() & ~FL_TOGGLE_BUTTON);
-
-	curr_x += WSTATUS;
-	// Light to indicate received LotW
-	bn_qrz_sstatus_ = new Fl_Light_Button(curr_x, curr_y, WSTATUS, HRADIO, "QRZ");
-	bn_qrz_sstatus_->box(FL_FLAT_BOX);
-	bn_qrz_sstatus_->type(bn_lotw_sstatus_->type() & ~FL_TOGGLE_BUTTON);
-
-	curr_x += WSTATUS;
-	// Light to indicate received LotW
-	bn_club_sstatus_ = new Fl_Light_Button(curr_x, curr_y, WSTATUS, HRADIO, "Club");
-	bn_club_sstatus_->box(FL_FLAT_BOX);
-	bn_club_sstatus_->type(bn_lotw_sstatus_->type() & ~FL_TOGGLE_BUTTON);
-
-	curr_x += WSTATUS;
-	// Light to indicate received a paper card
-	bn_card_sstatus_ = new Fl_Light_Button(curr_x, curr_y, WSTATUS, HRADIO, "Card");
-	bn_card_sstatus_->box(FL_FLAT_BOX);
-	bn_card_sstatus_->type(bn_card_sstatus_->type() & ~FL_TOGGLE_BUTTON);
-
-	curr_y += HRADIO;
-	curr_x = x() + GAP;
-
-	// Row header
-	Fl_Box* label3 = new Fl_Box(curr_x, curr_y, WSMEDIT, HTEXT, "Display card...");
-	label3->box(FL_FLAT_BOX);
-	label3->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
-	label3->color(FL_BACKGROUND_COLOR);
-
-	curr_y += HTEXT;
-	curr_x = x() + GAP;
 	// Group the following radio buttons
-	grp_card_type_ = new Fl_Group(curr_x, curr_y, w() - GAP * 2, HBUTTON * 2);
+	grp_card_type_ = new Fl_Group(curr_x, curr_y, w(), HBUTTON * 2);
 	grp_card_type_->box(FL_FLAT_BOX);
 
 	// Radio - Display eQSL.cc card image
@@ -230,7 +154,8 @@ void qso_qsl_vwr::create_form() {
 	radio_card_back_->callback(cb_rad_card, (void*)QI_CARD_BACK);
 	radio_card_back_->when(FL_WHEN_RELEASE_ALWAYS);
 	radio_card_back_->tooltip("Select image scanned of paper card back");
-	curr_x = x() + GAP;
+
+	curr_x = grp_viewer_->x() + GAP / 2;
 	curr_y += HBUTTON;
 	// Radio - display received e-mail image
 	radio_emailr_ = new Fl_Radio_Light_Button(curr_x, curr_y, WBUTTON, HBUTTON, "eMail (R)");
@@ -255,13 +180,148 @@ void qso_qsl_vwr::create_form() {
 	radio_emails_->callback(cb_rad_card, (void*)QI_EMAILS);
 	radio_emails_->when(FL_WHEN_RELEASE_ALWAYS);
 	radio_emails_->tooltip("Select image to be sent by e-mail");
+	curr_y += HBUTTON + GAP;
+
 
 	grp_card_type_->end();
 
-	curr_x += WBUTTON;
+	rh = max(rh, curr_y - grp_viewer_->y());
+	grp_viewer_->resizable(nullptr);
+	grp_viewer_->size(grp_viewer_->w(), rh);
 
+	grp_viewer_->end();
+
+	grp_status_ = new Fl_Group(rx, ry, rw, rh, "Status");
+	grp_status_->labelsize(FL_NORMAL_SIZE + 1);
+
+
+	curr_y = grp_status_->y() + GAP;
+	curr_x = grp_status_->x() + GAP;
+	const int W2 = WBUTTON / 2;
+	const int W1 = grp_viewer_->w() - 2 * GAP - 2 * W2;
+	curr_x += W1;
+
+	Fl_Box* labelC2= new Fl_Box(curr_x, curr_y, W2, HBUTTON, "R");
+	labelC2->box(FL_FLAT_BOX);
+	labelC2->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
+	labelC2->color(FL_BACKGROUND_COLOR);
+
+	curr_x += W2;
+
+	Fl_Box* labelC3= new Fl_Box(curr_x, curr_y, W2, HBUTTON, "S");
+	labelC3->box(FL_FLAT_BOX);
+	labelC3->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
+	labelC3->color(FL_BACKGROUND_COLOR);
+
+	curr_x = grp_status_->x() + GAP;
 	curr_y += HBUTTON;
+
+	Fl_Box* lbl_eqsl = new Fl_Box(curr_x, curr_y, W1, HBUTTON, "eQSL.cc");
+	lbl_eqsl->box(FL_FLAT_BOX);
+	lbl_eqsl->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
+
+	curr_x += W1;
+
+	// Light to indicate received eQSL
+	bn_eqsl_rstatus_ = new Fl_Check_Button(curr_x, curr_y, W2, HRADIO);
+	bn_eqsl_rstatus_->box(FL_FLAT_BOX);
+	bn_eqsl_rstatus_->type(bn_eqsl_rstatus_->type() & ~FL_TOGGLE_BUTTON);
+
+	curr_x += W2;
+	// Light to indicate received eQSL
+	bn_eqsl_sstatus_ = new Fl_Check_Button(curr_x, curr_y, W2, HRADIO);
+	bn_eqsl_sstatus_->box(FL_FLAT_BOX);
+	bn_eqsl_sstatus_->type(bn_eqsl_sstatus_->type() & ~FL_TOGGLE_BUTTON);
+
+	curr_x = grp_status_->x() + GAP;
+	curr_y += HBUTTON;
+
+	Fl_Box* lbl_lotw = new Fl_Box(curr_x, curr_y, W1, HBUTTON, "LotW");
+	lbl_lotw->box(FL_FLAT_BOX);
+	lbl_lotw->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
+
+	curr_x += W1;
+
+	// Light to indicate received LotW
+	bn_lotw_rstatus_ = new Fl_Check_Button(curr_x, curr_y, W2, HRADIO);
+	bn_lotw_rstatus_->box(FL_FLAT_BOX);
+	bn_lotw_rstatus_->type(bn_lotw_rstatus_->type() & ~FL_TOGGLE_BUTTON);
+
+	curr_x += W2;
+
+	// Light to indicate received LotW
+	bn_lotw_sstatus_ = new Fl_Check_Button(curr_x, curr_y, W2, HRADIO);
+	bn_lotw_sstatus_->box(FL_FLAT_BOX);
+	bn_lotw_sstatus_->type(bn_lotw_sstatus_->type() & ~FL_TOGGLE_BUTTON);
+
+	curr_x = grp_status_->x() + GAP;
+	curr_y += HBUTTON;
+
+	Fl_Box* lbl_qrz = new Fl_Box(curr_x, curr_y, W1, HBUTTON, "QRZ.com");
+	lbl_qrz->box(FL_FLAT_BOX);
+	lbl_qrz->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
+
+	curr_x += W1;
+	
+	// Light to indicate received QRZ.com
+	bn_qrz_rstatus_ = new Fl_Check_Button(curr_x, curr_y, W2, HRADIO);
+	bn_qrz_rstatus_->box(FL_FLAT_BOX);
+	bn_qrz_rstatus_->type(bn_qrz_rstatus_->type() & ~FL_TOGGLE_BUTTON);
+
+	curr_x += W2;
+	// Light to indicate received LotW
+	bn_qrz_sstatus_ = new Fl_Check_Button(curr_x, curr_y, W2, HRADIO);
+	bn_qrz_sstatus_->box(FL_FLAT_BOX);
+	bn_qrz_sstatus_->type(bn_lotw_sstatus_->type() & ~FL_TOGGLE_BUTTON);
+
+	curr_x = grp_status_->x() + GAP;
+	curr_y += HBUTTON;
+
+	Fl_Box* lbl_club = new Fl_Box(curr_x, curr_y, W1, HBUTTON, "Clublog.org");
+	lbl_club->box(FL_FLAT_BOX);
+	lbl_club->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
+
+	curr_x += W1 + W2;
+	// Light to indicate received LotW
+	bn_club_sstatus_ = new Fl_Check_Button(curr_x, curr_y, W2, HRADIO);
+	bn_club_sstatus_->box(FL_FLAT_BOX);
+	bn_club_sstatus_->type(bn_lotw_sstatus_->type() & ~FL_TOGGLE_BUTTON);
+
+	curr_x = grp_status_->x() + GAP;
+	curr_y += HBUTTON;
+
+	Fl_Box* lbl_card = new Fl_Box(curr_x, curr_y, W1, HBUTTON, "Card or e-mail");
+	lbl_card->box(FL_FLAT_BOX);
+	lbl_card->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
+
+	curr_x += W1;
+
+	// Light to indicate received a paper card
+	bn_card_rstatus_ = new Fl_Check_Button(curr_x, curr_y, W2, HRADIO);
+	bn_card_rstatus_->box(FL_FLAT_BOX);
+	bn_card_rstatus_->type(bn_card_rstatus_->type() & ~FL_TOGGLE_BUTTON);
+
+	curr_x += W2;
+
+	// Light to indicate received a paper card
+	bn_card_sstatus_ = new Fl_Check_Button(curr_x, curr_y, W2, HRADIO);
+	bn_card_sstatus_->box(FL_FLAT_BOX);
+	bn_card_sstatus_->type(bn_card_sstatus_->type() & ~FL_TOGGLE_BUTTON);
+
+	curr_y += HBUTTON + GAP;
 	curr_x = x() + GAP;
+
+	rh = max(rh, curr_y - grp_status_->y());
+	grp_status_->resizable(nullptr);
+	grp_status_->size(grp_status_->w(), rh);
+
+	grp_status_->end();
+
+	grp_editor_ = new Fl_Group(rx, ry, rw, rh, "Edit");
+	grp_editor_->labelsize(FL_NORMAL_SIZE + 1);
+
+	curr_x = grp_editor_->x()+ GAP / 2;
+	curr_y = grp_editor_->y() + GAP;
 
 	// Row header
 	Fl_Box* label2 = new Fl_Box(curr_x, curr_y, WSMEDIT, HTEXT, "Log received");
@@ -269,7 +329,7 @@ void qso_qsl_vwr::create_form() {
 	label2->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
 	label2->color(FL_BACKGROUND_COLOR);
 
-	curr_x = x() + GAP;
+	curr_x = grp_editor_->x()+ GAP / 2;
 	curr_y += HTEXT;
 	// Button - Mark paper card received
 	bn_log_bureau_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Bureau");
@@ -289,8 +349,9 @@ void qso_qsl_vwr::create_form() {
 	bn_log_direct_->callback(cb_bn_log_card, (void*)"D");
 	bn_log_direct_->when(FL_WHEN_RELEASE);
 
-	curr_x = x() + GAP;
+	curr_x = grp_editor_->x()+ GAP / 2;
 	curr_y += HBUTTON + GAP;;
+
 	// Button - Fetch the card image from eQSL.cc
 	bn_fetch_ = new Fl_Button(curr_x, curr_y, WBUTTON, HBUTTON, "Fetch");
 	bn_fetch_->tooltip("Request a fresh download of the eQSL image");
@@ -310,6 +371,13 @@ void qso_qsl_vwr::create_form() {
 	bn_card_decl_->when(FL_WHEN_RELEASE);
 	
 	curr_x += WBUTTON;
+
+	rh = max(rh, curr_y - grp_editor_->y());
+	grp_editor_->resizable(nullptr);
+	grp_editor_->size(grp_status_->w(), rh);
+
+	grp_editor_->end();
+	tabs_->end();
 
 	end();
 	show();
@@ -423,6 +491,12 @@ void qso_qsl_vwr::cb_bn_card_reqd(Fl_Widget* w, void* v) {
 
 }
 
+// tabs
+void qso_qsl_vwr::cb_tabs(Fl_Widget* w, void* v) {
+	qso_qsl_vwr* that = ancestor_view<qso_qsl_vwr>(w);
+	that->enable_widgets();
+}
+
 // set the current QSO
 void qso_qsl_vwr::set_qso(record* qso, qso_num_t number) {
 	if (current_qso_ == qso) qso_changed_ = false;
@@ -434,6 +508,19 @@ void qso_qsl_vwr::set_qso(record* qso, qso_num_t number) {
 
 // Redraw the form after stuff has changed
 void qso_qsl_vwr::enable_widgets() {
+	if (tabs_->value()) {
+        for (int ix = 0; ix < tabs_->children(); ix++) {
+            Fl_Group* ax = (Fl_Group*)tabs_->child(ix);
+            if (ax == tabs_->value()) {
+                ax->labelfont((ax->labelfont() | FL_BOLD) & (~FL_ITALIC));
+                ax->labelcolor(FL_FOREGROUND_COLOR);
+            }
+            else {
+                ax->labelfont((ax->labelfont() & (~FL_BOLD)) | FL_ITALIC);
+                ax->labelcolor(FL_FOREGROUND_COLOR);
+            }
+        }
+    }
 	set_image();
 	set_qsl_status();
 	char title[128];
@@ -807,22 +894,11 @@ void qso_qsl_vwr::set_qsl_status() {
 		if (current_qso_->item("QSL_RCVD") == "Y") {
 			bn_card_rstatus_->value(true);
 			string s = current_qso_->item("QSL_RCVD_VIA");
-			if (s == "B") {
-				bn_card_rstatus_->label("Bureau");
-			}
-			else if (s == "D") {
-				bn_card_rstatus_->label("Direct");
-			}
-			else if (s == "E") {
-				bn_card_rstatus_->label("e-mail");
-			}
-			else {
-				bn_card_rstatus_->label("Card");
-			}
+			bn_card_rstatus_->copy_label(s.c_str());
 		}
 		else {
 			bn_card_rstatus_->value(false);
-			bn_card_rstatus_->label("Card");
+			bn_card_rstatus_->label("");
 		}
 		if (current_qso_->item("EQSL_QSL_SENT") == "Y") {
 			bn_eqsl_sstatus_->value(true);
@@ -853,33 +929,22 @@ void qso_qsl_vwr::set_qsl_status() {
 		if (current_qso_->item("QSL_SENT") == "Y") {
 			bn_card_sstatus_->value(true);
 			string s = current_qso_->item("QSL_SENT_VIA");
-			if (s == "B") {
-				bn_card_sstatus_->label("Bureau");
-			}
-			else if (s == "D") {
-				bn_card_sstatus_->label("Direct");
-			}
-			else if (s == "E") {
-				bn_card_sstatus_->label("e-mail");
-			}
-			else {
-				bn_card_sstatus_->label("Card");
-			}
+			bn_card_sstatus_->copy_label(s.c_str());
 		}
 		else {
 			bn_card_sstatus_->value(false);
-			bn_card_sstatus_->label("Card");
+			bn_card_sstatus_->label("");
 		}
 	}
 	else {
 		bn_eqsl_rstatus_->value(false);
 		bn_lotw_rstatus_->value(false);
 		bn_card_rstatus_->value(false);
-		bn_card_rstatus_->label("Card");
+		bn_card_rstatus_->label("");
 		bn_eqsl_sstatus_->value(false);
 		bn_lotw_sstatus_->value(false);
 		bn_card_sstatus_->value(false);
-		bn_card_sstatus_->label("Card");
+		bn_card_sstatus_->label("");
 	}
 }
 
@@ -887,19 +952,21 @@ void qso_qsl_vwr::set_qsl_status() {
 void qso_qsl_vwr::set_log_buttons() {
 	qso_data* data = ancestor_view<qso_data>(this);
 	if (current_qso_ && data->qso_editing(current_qso_num_)) {
-		bn_fetch_->activate();
-		bn_log_bureau_->activate();
-		bn_log_email_->activate();
-		bn_log_direct_->activate();
-		bn_card_reqd_->activate();
-		bn_card_decl_->activate();
+		grp_editor_->activate();
+		// bn_fetch_->activate();
+		// bn_log_bureau_->activate();
+		// bn_log_email_->activate();
+		// bn_log_direct_->activate();
+		// bn_card_reqd_->activate();
+		// bn_card_decl_->activate();
 	} else {
-		bn_fetch_->deactivate();
-		bn_log_bureau_->deactivate();
-		bn_log_email_->deactivate();
-		bn_log_direct_->deactivate();
-		bn_card_reqd_->deactivate();
-		bn_card_decl_->deactivate();
+		grp_editor_->deactivate();
+		// bn_fetch_->deactivate();
+		// bn_log_bureau_->deactivate();
+		// bn_log_email_->deactivate();
+		// bn_log_direct_->deactivate();
+		// bn_card_reqd_->deactivate();
+		// bn_card_decl_->deactivate();
 	}
 }
 
