@@ -31,6 +31,7 @@
 #endif
 
 extern status *status_;
+extern bool DEBUG_THREADS;
 
 // Constructor
 socket_server::socket_server(protocol_t protocol, string address, int port_num) : 
@@ -72,6 +73,9 @@ void socket_server::run_server()
 		}
 	}
 	// Start listening for packets - will set a timer to the listen after that
+	if (DEBUG_THREADS) {
+		printf("SOCKET MAIN: Staring thread for %s\n", protocol_ == UDP ? "UDP" : "HTTP");
+	}
 	th_socket_ = new thread(thread_run, this);
 }
 
@@ -350,7 +354,11 @@ int socket_server::rcv_packet()
 		while (client_ == INVALID_SOCKET && result == BLOCK && !closing_)
 		{
 			result = accept_client();
+#ifdef _WIN32
+			this_thread::sleep_for(std::chrono::milliseconds(50));
+#else
 			this_thread::yield();
+#endif
 		}
 		if (result == NG)
 		{
@@ -552,5 +560,8 @@ void socket_server::cb_th_packet(void *v)
 // Thread runner
 void socket_server::thread_run(socket_server *that)
 {
+	if (DEBUG_THREADS) {
+		printf("SOCKET THREAD: Listening for packets\n");
+	}
 	that->rcv_packet();
 }
