@@ -354,11 +354,7 @@ int socket_server::rcv_packet()
 		while (client_ == INVALID_SOCKET && result == BLOCK && !closing_)
 		{
 			result = accept_client();
-#ifdef _WIN32
-			this_thread::sleep_for(std::chrono::milliseconds(50));
-#else
 			this_thread::yield();
-#endif
 		}
 		if (result == NG)
 		{
