@@ -90,6 +90,7 @@ void qso_details::get_qsos() {
 	string call = qso_ ? qso_->item("CALL") : "";
 	string band = qso_ ? qso_->item("BAND") : "";
 	string mode = qso_ ? qso_->item("MODE") : "";
+	string my_call = qso_ ? qso_->item("STATION_CALLSIGN") : "";
 	basic_regex<char> body_match;
 	smatch m;
 	bool match_possible = true;
@@ -134,7 +135,7 @@ void qso_details::get_qsos() {
 			// Ignore current QSO
 			if (qso_->timestamp() != it->timestamp()) {
 				items.insert(ix);
-				if (band == it->item("BAND") && mode == it->item("MODE")) {
+				if (band == it->item("BAND") && mode == it->item("MODE") && my_call == it->item("STATION_CALLSIGN")) {
 					exacts.insert(ix);
 				}
 			}
