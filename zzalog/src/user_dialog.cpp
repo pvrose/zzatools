@@ -231,7 +231,9 @@ void user_dialog::cb_br_logfont(Fl_Widget* w, void* v) {
 void user_dialog::cb_br_size(Fl_Widget* w, void* v) {
 	Fl_Hold_Browser* size_br = (Fl_Hold_Browser*)w;
 	int line = size_br->value();
-	*(Fl_Fontsize*)v = stoi(size_br->text(line));
+	if (isdigit(size_br->value())) {
+		*(Fl_Fontsize*)v = stoi(size_br->text(line));
+	}
 }
 
 // Callback for tooltip font browser
