@@ -977,6 +977,12 @@ void customise_fltk() {
 	// Fl::set_font(FL_HELVETICA_BOLD,       "Liberation Sans Bold");
 	// Fl::set_font(FL_HELVETICA_ITALIC,     "Liberation Sans Italic");
 	// Fl::set_font(FL_HELVETICA_BOLD_ITALIC,"Liberation Sans Bold Italic");	
+#else 
+	// Set courier font - ensure it's Courier New
+	Fl::set_font(FL_COURIER, " Courier New");
+	Fl::set_font(FL_COURIER_BOLD, "BCourier New");
+	Fl::set_font(FL_COURIER_ITALIC, "ICourier New");
+	Fl::set_font(FL_COURIER_BOLD_ITALIC, "PCourier New");
 #endif
 	// Add label symbols
 	fl_add_symbol("eyeshut", &draw_eyeshut, true);
