@@ -962,12 +962,12 @@ void customise_fltk() {
 	FL_NORMAL_SIZE = 10;
 	// FLTK 1.4 default contrast algorithm
 	fl_contrast_mode(FL_CONTRAST_CIELAB);
-	// Set courier font - ensure it's Courier New
-	Fl::set_font(FL_COURIER,            "Courier New");
-	Fl::set_font(FL_COURIER_BOLD,       "Courier New Bold");
-	Fl::set_font(FL_COURIER_ITALIC,     "Courier New Italic");
-	Fl::set_font(FL_COURIER_BOLD_ITALIC,"Courier New Bold Italic");	
 #ifndef _WIN32
+	// Set courier font - ensure it's Courier New
+	Fl::set_font(FL_COURIER, "Courier New");
+	Fl::set_font(FL_COURIER_BOLD, "Courier New Bold");
+	Fl::set_font(FL_COURIER_ITALIC, "Courier New Italic");
+	Fl::set_font(FL_COURIER_BOLD_ITALIC, "Courier New Bold Italic");
 	// Use liberation fonts as closest to Windows fonts
 	Fl::set_font(FL_TIMES,            "Liberation Serif");
 	Fl::set_font(FL_TIMES_BOLD,       "Liberation Serif Bold");

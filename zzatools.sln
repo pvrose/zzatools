@@ -15,6 +15,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gpio_test", "gpio_test\gpio
 EndProject
 Project("{840C416C-B8F3-42BC-B0DD-F6BB14C9F8CB}") = "Test AI 2", "..\Test AI 2\Test AI 2.aiproj", "{D36F3741-DD8E-449C-9353-53305FAF986E}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestFont", "..\TestFont\TestFont.vcxproj", "{8DFCBDD5-8B6A-45EE-8B49-5897829BDDFB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -85,6 +87,18 @@ Global
 		{D36F3741-DD8E-449C-9353-53305FAF986E}.Release|x64.Build.0 = DefaultBuild
 		{D36F3741-DD8E-449C-9353-53305FAF986E}.Release|x86.ActiveCfg = DefaultBuild
 		{D36F3741-DD8E-449C-9353-53305FAF986E}.Release|x86.Build.0 = DefaultBuild
+		{8DFCBDD5-8B6A-45EE-8B49-5897829BDDFB}.Debug|x64.ActiveCfg = Debug|x64
+		{8DFCBDD5-8B6A-45EE-8B49-5897829BDDFB}.Debug|x64.Build.0 = Debug|x64
+		{8DFCBDD5-8B6A-45EE-8B49-5897829BDDFB}.Debug|x86.ActiveCfg = Debug|Win32
+		{8DFCBDD5-8B6A-45EE-8B49-5897829BDDFB}.Debug|x86.Build.0 = Debug|Win32
+		{8DFCBDD5-8B6A-45EE-8B49-5897829BDDFB}.DefaultBuild|x64.ActiveCfg = Release|x64
+		{8DFCBDD5-8B6A-45EE-8B49-5897829BDDFB}.DefaultBuild|x64.Build.0 = Release|x64
+		{8DFCBDD5-8B6A-45EE-8B49-5897829BDDFB}.DefaultBuild|x86.ActiveCfg = Release|Win32
+		{8DFCBDD5-8B6A-45EE-8B49-5897829BDDFB}.DefaultBuild|x86.Build.0 = Release|Win32
+		{8DFCBDD5-8B6A-45EE-8B49-5897829BDDFB}.Release|x64.ActiveCfg = Release|x64
+		{8DFCBDD5-8B6A-45EE-8B49-5897829BDDFB}.Release|x64.Build.0 = Release|x64
+		{8DFCBDD5-8B6A-45EE-8B49-5897829BDDFB}.Release|x86.ActiveCfg = Release|Win32
+		{8DFCBDD5-8B6A-45EE-8B49-5897829BDDFB}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
