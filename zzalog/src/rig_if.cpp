@@ -451,25 +451,75 @@ bool rig_if::th_read_values() {
 		break;
 		}
 	}
-	// Read TX frequency
+	// Split
+	if (toc_split_ < hamlib_data_->max_to_count) {
+		read_item_ = "split";
+		vfo_t TxVFO;
+		split_t split;
+		if (DEBUG_RIGS) printf("RIGS: Reading Split mode\n");
+		error_code_ = rig_get_split_vfo(rig_, RIG_VFO_CURR, &split, &TxVFO);
+		if (DEBUG_RIGS) printf("RIGS: Read Split - %d (TX VFO = %d)\n", (int)split, (int)TxVFO);
+		if (error_handler(error_code_, "Split mode", nullptr, &toc_split_)) {
+			return false;
+		}
+		rig_data_.split = split == split_t::RIG_SPLIT_ON;
+	}
+	// PTT value
+	read_item_ = "PTT";
+	ptt_t ptt;
+	bool current_ptt = rig_data_.ptt;
+	if (DEBUG_RIGS) printf("RIGS: Reading PTT\n");
+	error_code_ = rig_get_ptt(rig_, RIG_VFO_CURR, &ptt);
+	if (DEBUG_RIGS) printf("RIGS: Read PTT - %d\n", (int)ptt);
+	if (error_handler(error_code_, "PTT", nullptr, nullptr)) {
+		return false;
+	}
+	rig_data_.ptt = ptt == ptt_t::RIG_PTT_ON;
+	// If we are releasing PTT record the time
+	if (current_ptt & !ptt) {
+		last_ptt_off_ = system_clock::now();
+	}
+	// Read frequencies
 	double d_temp;
-	read_item_ = "TX Frequency";
-	if (DEBUG_RIGS) printf("RIGS: Reading TX Frequency\n");
-	error_code_ = rig_get_freq(rig_, RIG_VFO_TX, &d_temp);
-	if (DEBUG_RIGS) printf("RIGS: Read TX Frequency - %g Hz\n", d_temp);
-	if (error_handler(error_code_, "TX Frequency", nullptr, nullptr)) {
-		return false;
+	if (rig_data_.split) {
+		// Read TX and RX frequencies per split VFO_TX and VFO_CURR
+		read_item_ = "TX Frequency";
+		if (DEBUG_RIGS) printf("RIGS: Reading TX Frequency\n");
+		error_code_ = rig_get_freq(rig_, RIG_VFO_TX, &d_temp);
+		if (DEBUG_RIGS) printf("RIGS: Read TX Frequency - %g Hz\n", d_temp);
+		if (error_handler(error_code_, "TX Frequency", nullptr, nullptr)) {
+			return false;
+		}
+		rig_data_.tx_frequency = d_temp;
+		// Read RX frequency
+		read_item_ = "RX Frequency";
+		if (DEBUG_RIGS) printf("RIGS: Reading RX Frequency\n");
+		error_code_ = rig_get_freq(rig_, RIG_VFO_CURR, &d_temp);
+		if (DEBUG_RIGS) printf("RIGS: Read RX Frequency - %g Hz\n", d_temp);
+		if (error_handler(error_code_, "RX Frequency", nullptr, nullptr)) {
+			return false;
+		}
+		rig_data_.rx_frequency = d_temp;
+	} else {
+		// Read current VFO - this is mostly a work-round for repeater duplex operation
+		// flrig does not support repeater shift and offset yet. 
+		read_item_ = "Current Frequency";
+		if (DEBUG_RIGS) printf("RIGS: Reading current Frequency\n");
+		error_code_ = rig_get_freq(rig_, RIG_VFO_CURR, &d_temp);
+		if (DEBUG_RIGS) printf("RIGS: Read current Frequency - %g Hz\n", d_temp);
+		if (error_handler(error_code_, "Current Frequency", nullptr, nullptr)) {
+			return false;
+		}
+		// Set RX frequency to current while RX and TX frequency while TX.
+		double previous_freq = rig_data_.rx_frequency;
+		if (!rig_data_.ptt) {
+			rig_data_.rx_frequency = d_temp;
+			// If we have QSY'd then set TX frequency to RX frequency
+			if (previous_freq != d_temp) rig_data_.tx_frequency = d_temp;
+		} else {
+			rig_data_.tx_frequency = d_temp;
+		}
 	}
-	rig_data_.tx_frequency = d_temp;
-	// Read RX frequency
-	read_item_ = "RX Frequency";
-	if (DEBUG_RIGS) printf("RIGS: Reading RX Frequency\n");
-	error_code_ = rig_get_freq(rig_, RIG_VFO_CURR, &d_temp);
-	if (DEBUG_RIGS) printf("RIGS: Read RX Frequency - %g Hz\n", d_temp);
-	if (error_handler(error_code_, "RX Frequency", nullptr, nullptr)) {
-		return false;
-	}
-	rig_data_.rx_frequency = d_temp;
 	// Read mode
 	read_item_ = "mode";
 	rmode_t mode;
@@ -528,34 +578,6 @@ bool rig_if::th_read_values() {
 			return false;
 		}
 		rig_data_.drive = drive_level.f * 100;
-	}
-	// Split
-	if (toc_split_ < hamlib_data_->max_to_count) {
-		read_item_ = "split";
-		vfo_t TxVFO;
-		split_t split;
-		if (DEBUG_RIGS) printf("RIGS: Reading Split mode\n");
-		error_code_ = rig_get_split_vfo(rig_, RIG_VFO_CURR, &split, &TxVFO);
-		if (DEBUG_RIGS) printf("RIGS: Read Split - %d\n", (int)split);
-		if (error_handler(error_code_, "Split mode", nullptr, &toc_split_)) {
-			return false;
-		}
-		rig_data_.split = split == split_t::RIG_SPLIT_ON;
-	}
-	// PTT value
-	read_item_ = "PTT";
-	ptt_t ptt;
-	bool current_ptt = rig_data_.ptt;
-	if (DEBUG_RIGS) printf("RIGS: Reading PTT\n");
-	error_code_ = rig_get_ptt(rig_, RIG_VFO_CURR, &ptt);
-	if (DEBUG_RIGS) printf("RIGS: Read PTT - %d\n", (int)ptt);
-	if (error_handler(error_code_, "PTT", nullptr, nullptr)) {
-		return false;
-	}
-	rig_data_.ptt = ptt == ptt_t::RIG_PTT_ON;
-	// If we are releasing PTT record the time
-	if (current_ptt & !ptt) {
-		last_ptt_off_ = system_clock::now();
 	}
 	value_t meter_value;
 	if (has_smeter_) {
