@@ -1010,16 +1010,14 @@ void qso_rig::enable_widgets(uchar damage) {
 	}
 
 	if ((damage & DAMAGE_VALUES) && (rig_state_ == OPEN || rig_state_ == UNRESPONSIVE)) {
-		double freq;
-		freq = rig_->get_dfrequency(true);
-		int freq_Hz = (int)(freq * 1000000) % 1000;
-		int freq_kHz = (int)(freq * 1000) % 1000;
-		int freq_MHz = (int)freq;
+		double tx_freq, rx_freq;
+		tx_freq = rig_->get_dfrequency(true);
+		rx_freq = rig_->get_dfrequency(false);
 		if (rig_state_ == OPEN) {
-			band_data::band_entry_t* entry = band_data_->get_entry(freq);
+			band_data::band_entry_t* entry = band_data_->get_entry(tx_freq);
 			if (entry) {
 				char l[50];
-				strcpy(l, spec_data_->band_for_freq(freq).c_str());
+				strcpy(l, spec_data_->band_for_freq(tx_freq).c_str());
 				for (auto it = entry->modes.begin(); it != entry->modes.end(); it++) {
 					strcat(l, " ");
 					strcat(l, (*it).c_str());
@@ -1055,18 +1053,40 @@ void qso_rig::enable_widgets(uchar damage) {
 		string rig_mode;
 		string submode;
 		rig_->get_string_mode(rig_mode, submode);
-		if (rig_info_->use_instant_values) {
+		bool ptt = rig_->get_ptt();
+		char tx_mark = ptt ? '*' : ' ';
+		char rx_mark = ptt ? ' ' : '*';
+		if (tx_freq == rx_freq) {
+			if (rig_info_->use_instant_values) {
+				// Set Freq/Mode to Frequency (MHz with kHz seperator), mode, power (W)
+				snprintf(msg, sizeof(msg), "%0.6f MHz\n%s %sW %s",
+					tx_freq,
+					submode.length() ? submode.c_str() : rig_mode.c_str(),
+					rig_->get_tx_power(false).c_str(),
+					rig_->get_smeter(false).c_str()
+				);
+			} else {
+				// Set Freq/Mode to Frequency (MHz with kHz seperator), mode, power (W)
+				snprintf(msg, sizeof(msg), "%0.6f MHz\n%s %sW %s",
+					tx_freq,
+					submode.length() ? submode.c_str() : rig_mode.c_str(),
+					rig_->get_tx_power(true).c_str(),
+					rig_->get_smeter(true).c_str()
+				);
+			}
+		}
+	else if (rig_info_->use_instant_values) {
 			// Set Freq/Mode to Frequency (MHz with kHz seperator), mode, power (W)
-			snprintf(msg, sizeof(msg), "%d.%03d.%03d MHz\n%s %sW %s",
-				freq_MHz, freq_kHz, freq_Hz,
+			snprintf(msg, sizeof(msg), "%c %0.6f MHz\n%c %0.6f MHz\n%s %sW %s",
+				tx_mark, tx_freq, rx_mark, rx_freq,
 				submode.length() ? submode.c_str() : rig_mode.c_str(),
 				rig_->get_tx_power(false).c_str(),
 				rig_->get_smeter(false).c_str()
 			);
 		} else {
 			// Set Freq/Mode to Frequency (MHz with kHz seperator), mode, power (W)
-			snprintf(msg, sizeof(msg), "%d.%03d.%03d MHz\n%s %sW %s",
-				freq_MHz, freq_kHz, freq_Hz,
+			snprintf(msg, sizeof(msg), "%c %0.6f MHz\n%c %0.6f MHz\n%s %sW %s",
+				tx_mark, tx_freq, rx_mark, rx_freq,
 				submode.length() ? submode.c_str() : rig_mode.c_str(),
 				rig_->get_tx_power(true).c_str(),
 				rig_->get_smeter(true).c_str()
