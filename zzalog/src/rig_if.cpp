@@ -361,7 +361,7 @@ void rig_if::th_open_rig() {
 		}
 	} 
 	// open rig connection over serial port
-	if (DEBUG_RIGS) printf("RIGS: Opening rig %d=s/%s\n", hamlib_data_->mfr.c_str(), hamlib_data_->model.c_str());
+	if (DEBUG_RIGS) printf("RIGS: Opening rig %s/%s\n", hamlib_data_->mfr.c_str(), hamlib_data_->model.c_str());
 	error_code_ = rig_open(rig_);
 	if (error_code_ != RIG_OK) {
 		// Not opened, tidy hamlib memory usage and mark it so.
