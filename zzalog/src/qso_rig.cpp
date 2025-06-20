@@ -1010,14 +1010,15 @@ void qso_rig::enable_widgets(uchar damage) {
 	}
 
 	if ((damage & DAMAGE_VALUES) && (rig_state_ == OPEN || rig_state_ == UNRESPONSIVE)) {
-		double tx_freq, rx_freq;
+		double tx_freq, rx_freq, freq;
 		tx_freq = rig_->get_dfrequency(true);
 		rx_freq = rig_->get_dfrequency(false);
+		freq = rig_->get_ptt() ? tx_freq : rx_freq;
 		if (rig_state_ == OPEN) {
-			band_data::band_entry_t* entry = band_data_->get_entry(tx_freq);
+			band_data::band_entry_t* entry = band_data_->get_entry(freq);
 			if (entry) {
 				char l[50];
-				strcpy(l, spec_data_->band_for_freq(tx_freq).c_str());
+				strcpy(l, spec_data_->band_for_freq(freq).c_str());
 				for (auto it = entry->modes.begin(); it != entry->modes.end(); it++) {
 					strcat(l, " ");
 					strcat(l, (*it).c_str());
@@ -1054,8 +1055,7 @@ void qso_rig::enable_widgets(uchar damage) {
 		string submode;
 		rig_->get_string_mode(rig_mode, submode);
 		bool ptt = rig_->get_ptt();
-		char tx_mark = ptt ? '*' : ' ';
-		char rx_mark = ptt ? ' ' : '*';
+		char bullet[] = "\342\200\243";
 		if (tx_freq == rx_freq) {
 			if (rig_info_->use_instant_values) {
 				// Set Freq/Mode to Frequency (MHz with kHz seperator), mode, power (W)
@@ -1075,18 +1075,18 @@ void qso_rig::enable_widgets(uchar damage) {
 				);
 			}
 		}
-	else if (rig_info_->use_instant_values) {
+		else if (rig_info_->use_instant_values) {
 			// Set Freq/Mode to Frequency (MHz with kHz seperator), mode, power (W)
-			snprintf(msg, sizeof(msg), "%c %0.6f MHz\n%c %0.6f MHz\n%s %sW %s",
-				tx_mark, tx_freq, rx_mark, rx_freq,
+			snprintf(msg, sizeof(msg), "%s %0.6f MHz\n%s %0.6f MHz\n%s %sW %s",
+				ptt ? bullet : " ", tx_freq, ptt ? " " : bullet, rx_freq,
 				submode.length() ? submode.c_str() : rig_mode.c_str(),
 				rig_->get_tx_power(false).c_str(),
 				rig_->get_smeter(false).c_str()
 			);
 		} else {
 			// Set Freq/Mode to Frequency (MHz with kHz seperator), mode, power (W)
-			snprintf(msg, sizeof(msg), "%c %0.6f MHz\n%c %0.6f MHz\n%s %sW %s",
-				tx_mark, tx_freq, rx_mark, rx_freq,
+			snprintf(msg, sizeof(msg), "%s %0.6f MHz\n%s %0.6f MHz\n%s %sW %s",
+				ptt ? bullet : " ", tx_freq, ptt ? " " : bullet, rx_freq,
 				submode.length() ? submode.c_str() : rig_mode.c_str(),
 				rig_->get_tx_power(true).c_str(),
 				rig_->get_smeter(true).c_str()
