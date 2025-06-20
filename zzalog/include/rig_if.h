@@ -174,11 +174,13 @@ using namespace std::chrono;
 		// Power on-off
 		bool get_powered();
 
+		static void th_sopen_rig(rig_if* that);
+
 		// Protected attributes
 	protected:
 		bool th_read_values();
 		// Open rig - run in thread
-		bool th_open_rig();
+		void th_open_rig();
 		// Handle errors
 		bool error_handler(int code, const char* meter, bool* flag, int* to_count);
 		// Rig opened OK

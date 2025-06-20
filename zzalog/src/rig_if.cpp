@@ -1,6 +1,8 @@
 ﻿#include "rig_if.h"
-#include "utils.h"
+
 #include "status.h"
+
+#include "utils.h"
 
 #include <climits>
 #include <chrono>
@@ -14,6 +16,7 @@
 
 extern status* status_;
 extern bool DEBUG_THREADS;
+extern bool DEBUG_RIGS;
 
 // Returns if the rig opened OK
 bool rig_if::is_open() {
@@ -266,10 +269,11 @@ bool rig_if::open() {
 	}
 	if (DEBUG_THREADS) printf("RIG MAIN: Starting rig %s/%s access thread\n",
 		hamlib_data_->mfr.c_str(), hamlib_data_->model.c_str());
+	if (rig_ == nullptr) close();
 	opening_.store(true, memory_order_seq_cst);
-	thread_ = new thread(th_run_rig, this);
+	thread_ = new thread(th_sopen_rig, this);
 	chrono::system_clock::time_point wait_start = chrono::system_clock::now();
-	int timeout = 150000;
+	int timeout = 40000;
 	snprintf(msg, sizeof(msg), "RIG: Connecting %s/%s - timeout = %d ms",
 		hamlib_data_->mfr.c_str(),
 		hamlib_data_->model.c_str(),
@@ -288,6 +292,9 @@ bool rig_if::open() {
 			opening_.store(false);
 		}
 	}
+	if (DEBUG_THREADS) printf("RIG MAIN: Finished opening rig failed = %d\n", opened_ok_.load());
+	thread_->join();
+
 		
 	if (opened_ok_.load()) {
 
@@ -305,10 +312,13 @@ bool rig_if::open() {
 				rig_get_info(rig_));
 		}
 		status_->misc_status(ST_OK, msg);
+
+		if (DEBUG_THREADS) printf("RIG MAIN: Starting reading rig daya\n");
+		thread_ = new thread(th_run_rig, this);
+
 		return true;
 	}
 	else {
-		if (DEBUG_THREADS) printf("RIG MAIN: Rig failed to open\n");
 		snprintf(msg, 256, "open(): %s/%s port %s",
 			hamlib_data_->mfr.c_str(),
 			hamlib_data_->model.c_str(),
@@ -321,12 +331,16 @@ bool rig_if::open() {
 }
 
 // This is within the thread
-bool rig_if::th_open_rig() {
-	// If changing rig type - delete any existing rig and create new one
-	if (rig_ != nullptr) {
-		close();
-	}
+void rig_if::th_sopen_rig(rig_if* that) {
+	if (DEBUG_THREADS) printf("RIG THREAD: Opening rig\n");
+	that->th_open_rig();
+	that->opening_.store(false);
+	if (DEBUG_THREADS) printf("RIG THREAD: Opened (or not) rig\n");
+}
+
+void rig_if::th_open_rig() {
 	// Get the rig interface
+	if (DEBUG_RIGS) printf("RIGS: Initialising rig %s/%s\n", hamlib_data_->mfr.c_str(), hamlib_data_->model.c_str());
 	rig_ = rig_init(hamlib_data_->model_id);
 	if (rig_ != nullptr) {
 		switch (hamlib_data_->port_type) {
@@ -347,6 +361,7 @@ bool rig_if::th_open_rig() {
 		}
 	} 
 	// open rig connection over serial port
+	if (DEBUG_RIGS) printf("RIGS: Opening rig %d=s/%s\n", hamlib_data_->mfr.c_str(), hamlib_data_->model.c_str());
 	error_code_ = rig_open(rig_);
 	if (error_code_ != RIG_OK) {
 		// Not opened, tidy hamlib memory usage and mark it so.
@@ -358,7 +373,6 @@ bool rig_if::th_open_rig() {
 		// Opened OK
 		opened_ok_.store(true);
 	}
-	return opened_ok_.load();
 }
 
 // Return rig name
@@ -371,12 +385,6 @@ string& rig_if::rig_name() {
 // Thraed method
 void rig_if::th_run_rig(rig_if* that) {
 	if (DEBUG_THREADS) printf("RIG THREAD: Rig access thread started\n");
-	// Open the rig
-	if (!that->th_open_rig()) {
-		that->opening_.store(false);
-		if (DEBUG_THREADS) printf("RIG THREAD: Open failed\n");
-		return;
-	}
 	// run_read_ will be cleared when the rig closes or errors.
 	bool ok = that->th_read_values();
 	that->opened_ok_.store(ok);
@@ -414,37 +422,50 @@ bool rig_if::th_read_values() {
 		read_item_ = "powerstat";
 		// Check powered on
 		powerstat_t power_state;
+		if (DEBUG_RIGS) printf("RIGS: Reading power status\n");
 		error_code_ = rig_get_powerstat(rig_, &power_state);
 		if (error_handler(error_code_, "Power status", nullptr, nullptr)) {
 			return false;
 		}
 		switch (power_state) {
 		case RIG_POWER_ON:
+		{
+			if (DEBUG_RIGS) printf("RIGS: Power status - ON\n");
+			rig_data_.powered_on = true;
+			break;
+		}
 		case RIG_POWER_STANDBY:
 		{
+			if (DEBUG_RIGS) printf("RIGS: Power status - STANDBY\n");
 			rig_data_.powered_on = true;
 			break;
 		}
 		case RIG_POWER_OFF:
 		{
+			if (DEBUG_RIGS) printf("RIGS: Power status - OFF\n");
 			rig_data_.powered_on = false;
 			return false;
 		}
 		default:
-			break;
+		if (DEBUG_RIGS) printf("RIGS: Power status - Unknown\n");
+		break;
 		}
 	}
 	// Read TX frequency
 	double d_temp;
 	read_item_ = "TX Frequency";
+	if (DEBUG_RIGS) printf("RIGS: Reading TX Frequency\n");
 	error_code_ = rig_get_freq(rig_, RIG_VFO_TX, &d_temp);
+	if (DEBUG_RIGS) printf("RIGS: Read TX Frequency - %g Hz\n", d_temp);
 	if (error_handler(error_code_, "TX Frequency", nullptr, nullptr)) {
 		return false;
 	}
 	rig_data_.tx_frequency = d_temp;
 	// Read RX frequency
 	read_item_ = "RX Frequency";
+	if (DEBUG_RIGS) printf("RIGS: Reading RX Frequency\n");
 	error_code_ = rig_get_freq(rig_, RIG_VFO_CURR, &d_temp);
+	if (DEBUG_RIGS) printf("RIGS: Read RX Frequency - %g Hz\n", d_temp);
 	if (error_handler(error_code_, "RX Frequency", nullptr, nullptr)) {
 		return false;
 	}
@@ -453,6 +474,7 @@ bool rig_if::th_read_values() {
 	read_item_ = "mode";
 	rmode_t mode;
 	shortfreq_t bandwidth;
+	if (DEBUG_RIGS) printf("RIGS: Reading Mode\n");
 	error_code_ = rig_get_mode(rig_, RIG_VFO_CURR, &mode, &bandwidth);
 	if (error_handler(error_code_, "Mode/Bandwidth", nullptr, nullptr)) {
 		return false;
@@ -460,37 +482,48 @@ bool rig_if::th_read_values() {
 	// Convert hamlib mode encoding to ZLG encoding
 	rig_data_.mode = GM_INVALID;
 	if (mode & RIG_MODE_AM) {
+		if (DEBUG_RIGS) printf("RIGS: Read Mode - AM\n");
 		rig_data_.mode = GM_AM;
 	}
 	if (mode & RIG_MODE_CW) {
+		if (DEBUG_RIGS) printf("RIGS: Read Mode - CW\n");
 		rig_data_.mode = GM_CWU;
 	}
 	if (mode & RIG_MODE_CWR) {
+		if (DEBUG_RIGS) printf("RIGS: Read Mode - CW (reveresed)\n");
 		rig_data_.mode = GM_CWL;
 	}
 	if (mode & RIG_MODE_LSB) {
+		if (DEBUG_RIGS) printf("RIGS: Read Mode - LSB\n");
 		rig_data_.mode = GM_LSB;
 	}
 	if (mode & RIG_MODE_USB) {
+		if (DEBUG_RIGS) printf("RIGS: Read Mode - USB\n");
 		rig_data_.mode = GM_USB;
 	}
 	if (mode & RIG_MODE_FM) {
+		if (DEBUG_RIGS) printf("RIGS: Read Mode - FM\n");
 		rig_data_.mode = GM_FM;
 	}
 	if (mode & (RIG_MODE_RTTY | RIG_MODE_PKTLSB)) {
+		if (DEBUG_RIGS) printf("RIGS: Read Mode - Data LSB\n");
 		rig_data_.mode = GM_DIGL;
 	}
 	if (mode & (RIG_MODE_RTTYR | RIG_MODE_PKTUSB)) {
+		if (DEBUG_RIGS) printf("RIGS: Read Mode - Data USB\n");
 		rig_data_.mode = GM_DIGU;
 	}
 	if (mode & RIG_MODE_DSTAR) {
+		if (DEBUG_RIGS) printf("RIGS: Read Mode - DStar\n");
 		rig_data_.mode = GM_DSTAR;
 	}
 	if (has_drive_) {
 		read_item_ = "TX Drive";
 		// Read drive level
 		value_t drive_level;
+		if (DEBUG_RIGS) printf("RIGS: Reading TX Drive\n");
 		error_code_ = rig_get_level(rig_, RIG_VFO_CURR, RIG_LEVEL_RFPOWER, &drive_level);
+		if (DEBUG_RIGS) printf("RIGS: Read TX Drive - %g\n", drive_level.f);
 		if (error_handler(error_code_, "Drive level", &has_drive_, nullptr)) {
 			return false;
 		}
@@ -501,7 +534,9 @@ bool rig_if::th_read_values() {
 		read_item_ = "split";
 		vfo_t TxVFO;
 		split_t split;
+		if (DEBUG_RIGS) printf("RIGS: Reading Split mode\n");
 		error_code_ = rig_get_split_vfo(rig_, RIG_VFO_CURR, &split, &TxVFO);
+		if (DEBUG_RIGS) printf("RIGS: Read Split - %d\n", (int)split);
 		if (error_handler(error_code_, "Split mode", nullptr, &toc_split_)) {
 			return false;
 		}
@@ -511,7 +546,9 @@ bool rig_if::th_read_values() {
 	read_item_ = "PTT";
 	ptt_t ptt;
 	bool current_ptt = rig_data_.ptt;
+	if (DEBUG_RIGS) printf("RIGS: Reading PTT\n");
 	error_code_ = rig_get_ptt(rig_, RIG_VFO_CURR, &ptt);
+	if (DEBUG_RIGS) printf("RIGS: Read PTT - %d\n", (int)ptt);
 	if (error_handler(error_code_, "PTT", nullptr, nullptr)) {
 		return false;
 	}
@@ -524,7 +561,9 @@ bool rig_if::th_read_values() {
 	if (has_smeter_) {
 		read_item_ = "S-meter";
 		// S-meter - set to max value during RX and last RX value during TX
+		if (DEBUG_RIGS) printf("RIGS: Reading S-meter\n");
 		error_code_ = rig_get_level(rig_, RIG_VFO_CURR, RIG_LEVEL_STRENGTH, &meter_value);
+		if (DEBUG_RIGS) printf("RIGS: Read S-meter - %d\n", meter_value.i);
 		if (error_handler(error_code_, "S-meter", &has_smeter_, nullptr)) {
 			return false;
 		}
@@ -549,7 +588,9 @@ bool rig_if::th_read_values() {
 	if (has_rf_meter_) {
 		read_item_ = "RF meter";
 		// Power meter
+		if (DEBUG_RIGS) printf("RIGS: Reading RF meter\n");
 		error_code_ = rig_get_level(rig_, RIG_VFO_CURR, RIG_LEVEL_RFPOWER_METER_WATTS, &meter_value);
+		if (DEBUG_RIGS) printf("RIGS: Read RF meter - %g\n", meter_value.f);
 		if (error_handler(error_code_, "RF Power", &has_rf_meter_, nullptr)) {
 			return false;
 		}

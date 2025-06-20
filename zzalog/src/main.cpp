@@ -91,6 +91,7 @@ bool DEBUG_ERRORS = true;
 bool DEBUG_THREADS = false;
 bool DEBUG_CURL = false;
 bool DEBUG_QUICK = false;
+bool DEBUG_RIGS = false;
 rig_debug_level_e HAMLIB_DEBUG_LEVEL = RIG_DEBUG_ERR;
 bool AUTO_UPLOAD = true;
 bool AUTO_SAVE = true;
@@ -509,6 +510,10 @@ int cb_args(int argc, char** argv, int& i) {
 				HAMLIB_DEBUG_LEVEL = (rig_debug_level_e)v;
 				i += 1;
 			}
+			else if (strcmp("r", argv[i]) == 0 || strcmp("run", argv[i]) == 0) {
+				DEBUG_RIGS = true;
+				i += 1;
+			}
 			// Not processed any parameter
 			if (i == save_i) debugs = false;
 		}
@@ -550,6 +555,7 @@ void show_help() {
 	"\t\tp|pretty\tDisplay formated status message (Needs terminal support)\n"
 	"\t\tnop|nopretty\n"
 	"\t\tq|quick\tShorten long timeout and polling intervals\n"
+	"\t\tr|rig\tPrint rig diagnostics\n"
 	"\t\ts|status\tPrint status messages to terminal\n"
 	"\t\t\tnos|nostatus\n"
 	"\t\tt|threads\tProvide debug tracing on thread use\n"
