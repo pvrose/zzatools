@@ -173,7 +173,8 @@ void banner::add_message(status_t type, const char* msg) {
 	}
 	copy_msg_display(type, msg);
 	redraw();
-	Fl::check();
+	// TODO: This appears to cause more trouble than it is worth.
+	// Fl::check();
 }
 
 // Add progress

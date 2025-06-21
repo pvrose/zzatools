@@ -35,7 +35,11 @@ wx_handler::wx_handler() :
 {
     report_.icon = nullptr;
     elements_.clear();
-    wx_valid_ = false;
+    // Start thread
+    wx_fetch_.store(false);
+    wx_valid_.store(false);
+    wx_thread_ = new thread(do_thread, this);
+    wx_fetch_.store(true);
     // Start ticker - 30 minutes
     ticker_->add_ticker(this, cb_ticker, DEBUG_QUICK ? SHORT_DELAY : LONG_DELAY);
 
@@ -51,10 +55,13 @@ wx_handler::~wx_handler() {
 // Do thread - when told to by wx_fetch_ fetch the WX data.
 // Abandon when run_thread_ is deasserted
 void wx_handler::do_thread(wx_handler* that) {
+    while(!that->wx_fetch_.load());
     if (DEBUG_THREADS) printf("WX THREAD: staring to fetch\n");
+    that->wx_fetch_.store(false);
     that->update();
     if (DEBUG_THREADS) printf("WX THREAD: fetching complete\n");
-    that->wx_valid_ = true;
+	Fl::awake(cb_fetch_done, (void*)that);
+    that->wx_valid_.store(true);
 }
 
 // XML reader overloads
@@ -204,24 +211,30 @@ void wx_handler::update() {
 
 // Timer - called every 30 minutes
 void wx_handler::ticker() {
-    char msg[1024];
-    wx_valid_ = false;
+    wx_valid_.store(false);
     if (DEBUG_THREADS) printf("WX MAIN: Starting WX fetch\n");
-    wx_thread_ = new thread(do_thread, this);
-    while(!wx_valid_) Fl::check();
-    wx_thread_->join();
-    if (DEBUG_THREADS) printf("WX MAIN: Finished WX fetch\n");
-    delete wx_thread_;
-    wx_thread_ = nullptr;
-    snprintf(msg, sizeof(msg), "WX_HANDLER: Weather read OK: %s %0.0f\302\260C %0.0fMPH %s %0.0f hPa. %0.0f%% cloud",
-        description().c_str(), temperature(), wind_speed(), wind_direction().c_str(), pressure(), cloud() * 100);
-    status_->misc_status(ST_OK, msg);
-    qso_manager_->enable_widgets();
+    wx_fetch_.store(true);
 }
 
 // Static
 void wx_handler::cb_ticker(void* v) {
     ((wx_handler*)v)->ticker();
+}
+
+// Static call back: WX fetch complete
+void wx_handler::cb_fetch_done(void* v) {
+    wx_handler* that = (wx_handler*)v;
+    that->wx_fetch_.store(false);
+    char msg[1024];
+    snprintf(msg, sizeof(msg), "WX_HANDLER: Weather read OK: %s %0.0f\302\260C %0.0fMPH %s %0.0f hPa. %0.0f%% cloud",
+        that->description().c_str(), 
+        that->temperature(), 
+        that->wind_speed(), 
+        that->wind_direction().c_str(), 
+        that->pressure(), 
+        that->cloud() * 100);
+    status_->misc_status(ST_OK, msg);
+    qso_manager_->enable_widgets();
 }
 
 // Get the various weather items - 

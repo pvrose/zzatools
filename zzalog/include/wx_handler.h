@@ -99,6 +99,8 @@ public:
     // Timer 
     void ticker();
     static void cb_ticker(void* v);
+    // Fetch complete callback
+    static void cb_fetch_done(void* v);
     
     // Get the various weather items - 
     // summation icon
@@ -213,6 +215,7 @@ protected:
     thread* wx_thread_;
     // Thread control
     atomic<bool> wx_valid_;
+    atomic<bool> wx_fetch_;
 
 
     // Current elements being processed
