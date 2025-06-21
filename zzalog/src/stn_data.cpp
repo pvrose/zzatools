@@ -135,7 +135,7 @@ bool stn_data::add_oper_item(string id, oper_value_t item, string value) {
 		else {
 			if (opers_.at(id)->data.at(item) != value) {
 				char msg[128];
-				snprintf(msg, sizeof(msg), "STN DATA: Operator %s Item %s value change from %s to %s ignored",
+				snprintf(msg, sizeof(msg), "STN DATA: Operator \"%s\" Item \"%s\" value change from \"%s\" to \"%s\" ignored",
 					id.c_str(), OPER_ADIF_MAP.at(item).c_str(),
 					opers_.at(id)->data.at(item).c_str(), value.c_str());
 				status_->misc_status(ST_WARNING, msg);
@@ -168,7 +168,7 @@ bool stn_data::add_oper(string id, oper_info_t* oper) {
 	}
 	else {
 		char msg[128];
-		snprintf(msg, sizeof(msg), "STN DATA: Already have data for Operator %s", id.c_str());
+		snprintf(msg, sizeof(msg), "STN DATA: Already have data for Operator \"%s\"", id.c_str());
 		status_->misc_status(ST_ERROR, msg);
 		return false;
 	}
@@ -178,7 +178,7 @@ bool stn_data::add_oper(string id, oper_info_t* oper) {
 const qth_info_t* stn_data::get_qth(string id) {
 	if (qths_.find(id) == qths_.end()) {
 		char msg[128];
-		snprintf(msg, sizeof(msg), "STN DATA: No data for QTH %s", id.c_str());
+		snprintf(msg, sizeof(msg), "STN DATA: No data for QTH \"%s\"", id.c_str());
 		status_->misc_status(ST_ERROR, msg);
 		return nullptr;
 	}
@@ -190,7 +190,7 @@ const qth_info_t* stn_data::get_qth(string id) {
 const oper_info_t* stn_data::get_oper(string id) {
 	if (opers_.find(id) == opers_.end()) {
 		char msg[128];
-		snprintf(msg, sizeof(msg), "STN DATA: No data for Operator %s", id.c_str());
+		snprintf(msg, sizeof(msg), "STN DATA: No data for Operator \"%s\"", id.c_str());
 		status_->misc_status(ST_ERROR, msg);
 		return nullptr;
 	}
