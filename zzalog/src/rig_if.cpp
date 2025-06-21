@@ -399,12 +399,11 @@ void rig_if::th_run_rig(rig_if* that) {
 			that->opened_ok_.store(ok);
 		}
 		if (!ok) {
-			char msg[128];
-			snprintf(msg, sizeof(msg), "RIG: No longer open %s", that->error_message(that->read_item_.c_str()).c_str());
-			status_->misc_status(ST_ERROR, msg);
+			Fl::awake(cb_rig_error, that);
 		}
 	} else {
 		that->opening_.store(false);
+		Fl::awake(cb_rig_error, that);
 	}
 }
 
@@ -661,6 +660,7 @@ bool rig_if::th_read_values() {
 // Handle hamlib responses - 
 bool rig_if::error_handler(int code, const char* meter, bool* flag, int* to_count) {
 	char msg[128];
+	bool ok = false;
 	switch (abs(code)) {
 	case RIG_OK:
 		return false;
@@ -669,10 +669,10 @@ bool rig_if::error_handler(int code, const char* meter, bool* flag, int* to_coun
 			snprintf(msg, sizeof(msg), "RIG: Access is %s is not available - turn off future access", meter);
 			status_->misc_status(ST_WARNING, msg);
 			*flag = false;
-			return false;
+			ok = false;
 		}
 		else {
-			return true;
+			ok = true;
 		}
 	case RIG_ETIMEOUT:
 		if (to_count) {
@@ -685,11 +685,21 @@ bool rig_if::error_handler(int code, const char* meter, bool* flag, int* to_coun
 				snprintf(msg, sizeof(msg), "RIG: Access to %s has timed out %d times, no further access", meter, *to_count);
 				status_->misc_status(ST_ERROR, msg);
 			}
-			return false;
+			ok = false;
 		}
 	default:
-		return true;
+		ok =  true;
 	}
+	return ok;
+}
+
+void rig_if::cb_rig_error(void* v) {
+	rig_if* that = (rig_if*)v;
+	that->opened_ok_.store(false);
+	char msg[128];
+	snprintf(msg, sizeof(msg), "RIG: No longer open %s", that->error_message(that->read_item_.c_str()).c_str());
+	status_->misc_status(ST_ERROR, msg);
+	that->close();
 }
 
 // Return the most recent error message

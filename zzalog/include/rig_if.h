@@ -167,14 +167,16 @@ using namespace std::chrono;
 		string get_smeter(bool max = true);
 		// Return PTT value
 		bool get_ptt();
-		// Get the data from the rig
+		// Run in thread to get the data from the rig
 		static void th_run_rig(rig_if* that);
 		// Get slow - rig taking over 1 s to access
 		bool get_slow();
 		// Power on-off
 		bool get_powered();
-
+		// Separate run in thread to open rig
 		static void th_sopen_rig(rig_if* that);
+		// Callback if error while accessing rig
+		static void cb_rig_error(void* v);
 
 		// Protected attributes
 	protected:
