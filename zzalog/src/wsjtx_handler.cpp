@@ -919,8 +919,8 @@ bool wsjtx_handler::match_all_txt(record* qso, bool update_qso) {
 		// If we are complete then say so
 		if (qso->item("QSO_COMPLETE") != "N" && qso->item("QSO_COMPLETE") != "?") {
 			all_file->close();
-			fl_cursor(FL_CURSOR_DEFAULT);
 		}
+		fl_cursor(FL_CURSOR_DEFAULT);
 		return true;
 	}
 	else {

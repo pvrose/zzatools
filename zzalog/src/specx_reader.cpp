@@ -47,6 +47,7 @@ bool specx_reader::load_data(spec_data* data, istream& in, string& version) {
 	in.seekg(0, ios::beg);
 	// Initialsie the progress
 	status_->misc_status(ST_NOTE, "ADIF SPEC: Started");
+	fl_cursor(FL_CURSOR_WAIT);
 	status_->progress(file_size, OT_ADIF, "Converting XML into ADIF specification database", "bytes");
 	// Call the XML parser - calls back to the overides herein
 	if (parse(in)) {
