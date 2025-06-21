@@ -174,7 +174,7 @@ void banner::add_message(status_t type, const char* msg) {
 	copy_msg_display(type, msg);
 	redraw();
 	// TODO: This appears to cause more trouble than it is worth.
-	// Fl::check();
+	if (visible()) Fl::check();
 }
 
 // Add progress
@@ -196,7 +196,7 @@ void banner::start_progress(uint64_t max_value, object_t object, const char* msg
 	fd_progress_->selection_color(OBJECT_COLOURS.at(object));
 
 	redraw();
-	Fl::check();
+	if (visible()) Fl::check();
 }
 
 // Update progress dial and output
@@ -212,7 +212,7 @@ void banner::add_progress(uint64_t value) {
 		}
 		else {
 			redraw();
-			Fl::check();
+			if (visible()) Fl::check();
 		}
 	}
 }
@@ -225,7 +225,7 @@ void banner::end_progress() {
 	op_prog_title_->value(text);
 	status_->misc_status(ST_PROGRESS, text);
 	redraw();
-	Fl::check();
+	if (visible()) Fl::check();
 }
 
 // cancelling the progress - log message
@@ -236,7 +236,7 @@ void banner::cancel_progress(const char* msg) {
 	op_prog_title_->value(text);
 	status_->misc_status(ST_PROGRESS, text);
 	redraw();
-	Fl::check();
+	if (visible()) Fl::check();
 }
 
 // Callback - drop down viewer
