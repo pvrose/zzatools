@@ -102,7 +102,6 @@ void qso_details::get_qsos() {
 		call_body = parts[0];
 	}
 	else {
-		bool found = false;
 		for (auto it : parts) {
 			if (regex_search(it, m, REGEX_CALL_BODY)) {
 				call_body = it;
