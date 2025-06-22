@@ -190,6 +190,8 @@ void banner::start_progress(uint64_t max_value, object_t object, const char* msg
 	// Set display message
 	snprintf(text, sizeof(text), "%s: PROGRESS: Starting %s - %lld %s", OBJECT_NAMES.at(object), msg, max_value, suffix);
 	status_->misc_status(ST_PROGRESS, text);
+	snprintf(text, sizeof(text), "%s: %s", OBJECT_NAMES.at(object), msg);
+	op_prog_title_->value(text);
 	snprintf(text, sizeof(text), "/%lld %s", max_value, suffix);
 	op_prog_value_->copy_label(text);
 	op_prog_value_->value("0");
@@ -222,8 +224,9 @@ void banner::end_progress() {
 	char text[128];
 	// Set display message
 	snprintf(text, sizeof(text), "%s: PROGRESS: Ending %s", OBJECT_NAMES.at(prg_object_), prg_msg_);
-	op_prog_title_->value(text);
 	status_->misc_status(ST_PROGRESS, text);
+	snprintf(text, sizeof(text), "%s: %s Done", OBJECT_NAMES.at(prg_object_), prg_msg_);
+	op_prog_title_->value(text);
 	redraw();
 	if (visible()) Fl::check();
 }
