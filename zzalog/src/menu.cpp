@@ -1,34 +1,35 @@
 #include "menu.h"
-#include "book.h"
-#include "record.h"
-#include "cty_data.h"
-#include "spec_data.h"
-#include "config.h"
-#include "tabbed_forms.h"
-#include "import_data.h"
-#include "utils.h"
-#include "status.h"
 
-
-#include "printer.h"
-#include "extract_data.h"
-#include "search_dialog.h"
-#include "change_dialog.h"
-#include "about_dialog.h"
-#include "spec_tree.h"
-#include "report_tree.h"
-#include "url_handler.h"
 #include "callback.h"
-#include "page_dialog.h"
-#include "intl_dialog.h"
-#include "toolbar.h"
+#include "utils.h"
+
+#include "about_dialog.h"
+#include "book.h"
 #include "calendar.h"
-#include "qrz_handler.h"
-#include "wsjtx_handler.h"
-#include "main_window.h"
-#include "qso_manager.h"
-#include "qso_data.h"
+#include "change_dialog.h"
+#include "config.h"
+#include "cty_data.h"
 #include "eqsl_handler.h"
+#include "extract_data.h"
+#include "import_data.h"
+#include "intl_dialog.h"
+#include "main_window.h"
+#include "page_dialog.h"
+#include "printer.h"
+#include "qrz_handler.h"
+#include "qso_data.h"
+#include "qso_manager.h"
+#include "record.h"
+#include "report_tree.h"
+#include "search_dialog.h"
+#include "spec_data.h"
+#include "spec_tree.h"
+#include "status.h"
+#include "tabbed_forms.h"
+#include "ticker.h"
+#include "toolbar.h"
+#include "url_handler.h"
+#include "wsjtx_handler.h"
 
 #include <sstream>
 #include <list>
@@ -46,25 +47,27 @@
 
 
 extern book* book_;
-extern import_data* import_data_;
-extern extract_data* extract_records_;
 extern book* navigation_book_;
+extern config* config_;
 extern cty_data* cty_data_;
+extern eqsl_handler* eqsl_handler_;
+extern extract_data* extract_records_;
+extern import_data* import_data_;
+extern intl_dialog* intl_dialog_;
+extern main_window* main_window_;
+extern qrz_handler* qrz_handler_;
+extern qso_manager* qso_manager_;
 extern spec_data* spec_data_;
 extern status* status_;
 extern tabbed_forms* tabbed_forms_;
+extern ticker* ticker_;
+extern toolbar* toolbar_;
 extern url_handler* url_handler_;
-extern main_window* main_window_;
+extern wsjtx_handler* wsjtx_handler_;
+
 extern bool READ_ONLY;
 extern list<string> recent_files_;
-extern intl_dialog* intl_dialog_;
-extern toolbar* toolbar_;
-extern qrz_handler* qrz_handler_;
-extern wsjtx_handler* wsjtx_handler_;
 extern time_t session_start_;
-extern qso_manager* qso_manager_;
-extern config* config_;
-extern eqsl_handler* eqsl_handler_;
 extern string VENDOR;
 extern string PROGRAM_ID;
 
@@ -286,6 +289,7 @@ void menu::cb_mi_file_new(Fl_Widget* w, void* v) {
 		}
 	}
 
+	ticker_->stop_all();
 	qso_manager_->deactivate_all();
 
 	// get book to delete contents by loading no data
@@ -315,6 +319,7 @@ void menu::cb_mi_file_open(Fl_Widget* w, void* v) {
 		}
 	}
 
+	ticker_->stop_all();
 	qso_manager_->deactivate_all();
 	
 	// Set to a recent file number (1 to 4) or 0 for file_chooser
@@ -449,7 +454,10 @@ void menu::cb_mi_file_close(Fl_Widget* w, void* v) {
 	// Gracefully stop import
 	import_data_->stop_update(false);
 	while (!import_data_->update_complete()) Fl::check();
+
+	ticker_->stop_all();
 	qso_manager_->deactivate_all();
+
 	main_window_->do_callback();
 }
 

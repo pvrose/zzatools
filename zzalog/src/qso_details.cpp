@@ -91,21 +91,45 @@ void qso_details::get_qsos() {
 	string band = qso_ ? qso_->item("BAND") : "";
 	string mode = qso_ ? qso_->item("MODE") : "";
 	string my_call = qso_ ? qso_->item("STATION_CALLSIGN") : "";
-	basic_regex<char> body_match;
+	vector<basic_regex<char> > body_matches;
 	smatch m;
 	bool match_possible = true;
-	if (call.length()) {
-		if (!regex_search(call, m, REGEX_CALL_BODY)) {
-			char msg[128];
-			snprintf(msg, sizeof(msg), "DASH: Call %s does not match a typical call", call.c_str());
-			status_->misc_status(ST_WARNING, msg);
-			match_possible = false;
-		} else {
-			string match = "^.+" + m[2].str() + "(/.+)?$";
-			body_match = match;
+	vector < string > parts;
+	// Split the call up into potential prefix, body and suffix
+	split_line(call, parts, '/');
+	string call_body = "";
+	if (parts.size() == 1) {
+		call_body = parts[0];
+	}
+	else {
+		bool found = false;
+		for (auto it : parts) {
+			if (regex_search(it, m, REGEX_CALL_BODY)) {
+				call_body = it;
+				break;
+			}
 		}
-	} else {
+	}
+	if (call_body.length() == 0) {
+		char msg[128];
+		snprintf(msg, sizeof(msg), "DASH: Call %s does not match a typical call", call.c_str());
+		status_->misc_status(ST_WARNING, msg);
 		match_possible = false;
+	}
+	else {
+		// Basic callsign body match - [PFX/]CALL[/SFX]
+		body_matches.push_back(basic_regex<char>("^(.*/)?" + call_body + "(/.*)?$"));
+		// Now DXCC specific
+		switch (call_body[0]) {
+		case '2':
+		case 'M':
+		case 'G':
+		{ // UK & CD
+			regex_search(call_body, m, REGEX_CALL_BODY);
+			body_matches.push_back(basic_regex<char>("^(.*/)?" + m[1].str() + ".?" + m[2].str() + "(/.*)?$"));
+			break;
+		}
+		}
 	}
 
 	// Scan the book for all records with this callsign
@@ -140,9 +164,11 @@ void qso_details::get_qsos() {
 				}
 			}
 		} else if (match_possible) {
-			// Get call body (less prexix or suffix
-			if (regex_search(it->item("CALL"), body_match)) {
-				possibles.insert(ix);
+			// Match against possibles
+			for (auto iu : body_matches) {
+				if (regex_search(it->item("CALL"), iu)) {
+					possibles.insert(ix);
+				}
 			}
 		}
 
