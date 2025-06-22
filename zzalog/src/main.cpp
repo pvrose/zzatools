@@ -1206,7 +1206,7 @@ int main(int argc, char** argv)
 			PROGRAM_VERSION.c_str(),
 			TIMESTAMP.c_str());
 		curl_version_info_data* data = curl_version_info(CURLVERSION_LAST);
-		printf("|-With libraries hamlib (%s), FLTK (%d.%d.%d), Curl (%s)\n",
+		printf("|-With libraries\n  |- hamlib (%s)\n  |- FLTK (%d.%d.%d)\n  |- Curl (%s)\n",
 			rig_version(),
 			FL_MAJOR_VERSION, FL_MINOR_VERSION, FL_PATCH_VERSION,
 				data->version); 
