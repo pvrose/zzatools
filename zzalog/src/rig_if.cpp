@@ -159,6 +159,11 @@ bool rig_if::get_ptt() {
 	return rig_data_.ptt;
 }
 
+// Get current Split value
+bool rig_if::get_split() {
+	return rig_data_.split;
+}
+
 // Get rig access is slow
 bool rig_if::get_slow() {
 	return rig_data_.slow;

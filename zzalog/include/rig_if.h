@@ -167,6 +167,8 @@ using namespace std::chrono;
 		string get_smeter(bool max = true);
 		// Return PTT value
 		bool get_ptt();
+		// Return Splt value
+		bool get_split();
 		// Run in thread to get the data from the rig
 		static void th_run_rig(rig_if* that);
 		// Get slow - rig taking over 1 s to access

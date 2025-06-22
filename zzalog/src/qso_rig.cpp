@@ -1018,10 +1018,16 @@ void qso_rig::enable_widgets(uchar damage) {
 			band_data::band_entry_t* entry = band_data_->get_entry(freq);
 			if (entry) {
 				char l[50];
-				strcpy(l, spec_data_->band_for_freq(freq).c_str());
-				for (auto it = entry->modes.begin(); it != entry->modes.end(); it++) {
-					strcat(l, " ");
-					strcat(l, (*it).c_str());
+				if (rig_->get_split()) {
+					snprintf(l, sizeof(l), "SPLIT %s/%s",
+					spec_data_->band_for_freq(tx_freq).c_str(),
+					spec_data_->band_for_freq(rx_freq).c_str());
+				} else {
+					strcpy(l, spec_data_->band_for_freq(freq).c_str());
+					for (auto it = entry->modes.begin(); it != entry->modes.end(); it++) {
+						strcat(l, " ");
+						strcat(l, (*it).c_str());
+					}
 				}
 				op_status_->value(l);
 				if (rig_->get_ptt()) {
