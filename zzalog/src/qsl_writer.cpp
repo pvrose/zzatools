@@ -356,7 +356,7 @@ bool qsl_writer::write_element(qsl_element_t element) {
             if (!write_value("Upload per QSO", server_->upload_per_qso)) return false;
              if (!write_value("Last Download", server_->last_downloaded)) return false;
         }
-        if (server_name_ == "eqSL") {
+        if (server_name_ == "eQSL") {
             if (!write_value("Download Confirmed", server_->download_confirmed)) return false;
             if (!write_value("QSO Message", server_->qso_message)) return false;
             if (!write_value("SWL Message", server_->swl_message)) return false;
