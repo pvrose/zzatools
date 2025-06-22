@@ -333,12 +333,12 @@ bool rig_if::open() {
 // This is within the thread
 void rig_if::th_sopen_rig(rig_if* that) {
 	if (DEBUG_THREADS) printf("RIG THREAD: Opening rig\n");
-	that->th_open_rig();
+	that->th_open_rig(that);
 	that->opening_.store(false);
 	if (DEBUG_THREADS) printf("RIG THREAD: Opened (or not) rig\n");
 }
 
-void rig_if::th_open_rig() {
+void rig_if::th_open_rig(rig_if* that) {
 	// Get the rig interface
 	if (DEBUG_RIGS) printf("RIGS: Initialising rig %s/%s\n", hamlib_data_->mfr.c_str(), hamlib_data_->model.c_str());
 	rig_ = rig_init(hamlib_data_->model_id);
@@ -364,6 +364,7 @@ void rig_if::th_open_rig() {
 	if (DEBUG_RIGS) printf("RIGS: Opening rig %s/%s\n", hamlib_data_->mfr.c_str(), hamlib_data_->model.c_str());
 	error_code_ = rig_open(rig_);
 	if (error_code_ != RIG_OK) {
+		Fl::awake(cb_rig_error, that);
 		// Not opened, tidy hamlib memory usage and mark it so.
 		rig_cleanup(rig_);
 		rig_ = nullptr;

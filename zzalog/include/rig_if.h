@@ -182,7 +182,7 @@ using namespace std::chrono;
 	protected:
 		bool th_read_values();
 		// Open rig - run in thread
-		void th_open_rig();
+		void th_open_rig(rig_if* that);
 		// Handle errors
 		bool error_handler(int code, const char* meter, bool* flag, int* to_count);
 		// Rig opened OK
