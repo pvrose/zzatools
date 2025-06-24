@@ -70,6 +70,15 @@ using namespace std;
 		HT_INSERTED_NODXA,         // As HT_INSERTED but do not update DxAtlas
 	};
 
+	// Worked before categories
+	enum worked_t : uchar {
+		WK_ANY,                   // Any QSO
+		WK_DXCC,                  // DXCC
+		WK_GRID4,                 // 4-character gridsquares
+		WK_CQZ,                   // CQ Zone
+		WK_CONT,                  // Continent
+	};
+
 	// The records are kept in a container with size_t as index
 	typedef size_t item_num_t;    // Position of item within this book
 	typedef size_t qso_num_t;     // Position of item within book_ instance
@@ -140,12 +149,18 @@ using namespace std;
 		object_t book_type();
 		// set book type
 		void book_type(object_t);
-		// get used bands - INTMAX_MIN = all DXCC
-		band_set* used_bands(int32_t dxcc = INT32_MIN, string call = "");
+		// get used bands - worked type WK_ANY - all QSOs
+		band_set* used_bands();
+		band_set* used_bands(worked_t category, int32_t entity, string call);
+		band_set* used_bands(worked_t category, string entity, string call);
 		// get used modes 
-		set<string>* used_modes(int32_t dxcc = INT32_MIN, string call = "");
+		set<string>* used_modes();
+		set<string>* used_modes(worked_t category, int32_t entity, string call);
+		set<string>* used_modes(worked_t category, string entity, string call);
 		// get used submodes
-		set<string>* used_submodes(int32_t dxcc = INT32_MIN, string call = "");
+		set<string>* used_submodes();
+		set<string>* used_submodes(worked_t category, int32_t entity, string call);
+		set<string>* used_submodes(worked_t category, string entity, string call);
 		// New record
 		bool new_record();
 		// Set new record
@@ -230,6 +245,8 @@ using namespace std;
 		// Book is dirty
 		bool is_dirty();
 
+		// Convert short string to integer
+		int32_t hashed(string s);
 
 		// Protected attributes
 	protected:
@@ -276,11 +293,11 @@ using namespace std;
 		// Ignore null macros
 		bool ignore_null_;
 		// Bands worked per DXCC
-		map < string, map < int, band_set > > bands_per_dxcc_;
+		map < string, map < worked_t, map < int, band_set > > > bands_;
 		// mOdes worked per DXCC
-		map < string, map < int, set<string> > > modes_per_dxcc_;
+		map < string, map < worked_t, map < int, set<string> > > > modes_;
 		// submOdes worked per DXCC
-		map < string, map < int, set<string> > > submodes_per_dxcc_;
+		map < string, map < worked_t, map < int, set<string> > > > submodes_;
 		// match query question
 		string match_question_;
 		// INhibit automatic save -
@@ -312,7 +329,6 @@ using namespace std;
 		set<record*> dirty_qsos_;
 		// Need flag to indicate a record has been deleted
 		bool deleted_record_;
-
 	};
 
 #endif

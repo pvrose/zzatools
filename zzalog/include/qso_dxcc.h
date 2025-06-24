@@ -10,16 +10,20 @@
 
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Scroll.H>
+#include <FL/Fl_Table.H>
 
 using namespace std;
 
-class book;
 class band_set;
-class Fl_Output;
+class book;
+class record;
+
 class Fl_Button;
 class Fl_Light_Button;
+class Fl_Output;
 
 enum location_t : uchar;
+enum worked_t : uchar;
 
 
 // This class displays the "worked before" status for the DX - band and mode
@@ -27,37 +31,33 @@ class qso_dxcc :
     public Fl_Group
 {
 
-    // A display of all the bands and modes worked with the ones for this DXCC
-    // indicated by button colour
-    class wb4_buttons : public Fl_Scroll
-    {
+    // A table 
+    class wb4_table : public Fl_Table {
+
     public:
-        wb4_buttons(int X, int Y, int W, int H, const char* L = nullptr);
-        ~wb4_buttons();
 
-        // Callback when a mode button is clicked
-        static void cb_bn_mode(Fl_Widget* w, void* v);
-        // Callback when a band button is clicked
-        static void cb_bn_band(Fl_Widget* w, void* v);
+        wb4_table(int X, int Y, int W, int H, const char* L = nullptr);
+        ~wb4_table();
+        // inherited from Fl_Table
+        virtual void draw_cell(TableContext context, int R = 0, int C = 0, int X = 0, int Y = 0,
+            int W = 0, int H = 0);
 
-        // Create the buttons
-        void create_form();
-        // Update their status
-        void enable_widgets();
+        void set_qso(record* qso, string nickname);
 
-        // widget maps
-        map<string, Fl_Widget*> map_;
-
- 
     protected:
-        // A set of bands worked (ordered by frequency)
-        band_set* dxcc_bands_;
-        // A set of submodes worked
-        set<string>* dxcc_submodes_;
-        // A set of all bands in the log (ordered by frequency)
-        band_set* all_bands_;
-        // a set of all submodes in the log
-        set<string>* all_submodes_;
+        // Worked data
+        struct wkd_line {
+            string text;
+            bool any;
+            bool band;
+            bool mode;
+        };
+        // worked matrix
+        map < worked_t, wkd_line > wkd_matrix_;
+        // Station callsign
+        string call_;
+
+
     };
 
 public:
@@ -90,7 +90,7 @@ protected:
     Fl_Output* op_dist_bear_;
     // 
     // Buttons showing worked before
-    wb4_buttons* g_wb4_;
+    wb4_table* g_wb4_;
     // Call QRZ.com
     Fl_Button* bn_qrz_;
     // Show all/extracted

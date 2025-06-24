@@ -104,7 +104,8 @@ void qso_dxcc::create_form() {
 	avail_height -= (curr_y - y());
 
 	// Display worked before status (bands and modes)
-	g_wb4_ = new wb4_buttons(curr_x, curr_y, avail_width, avail_height);
+	g_wb4_ = new wb4_table(curr_x, curr_y, avail_width, avail_height, "Worked Before?");
+	//g_wb4_ = new wb4_buttons(curr_x, curr_y, avail_width, avail_height);
 	g_wb4_->align(FL_ALIGN_TOP);
 
 	end();
@@ -194,7 +195,6 @@ void qso_dxcc::enable_widgets() {
 		show_extract_ = false;
 		bn_show_extract_->value(show_extract_);
 	}
-	g_wb4_->enable_widgets();
 }
 
 // Set the data - parse the callsign in the current qso
@@ -214,6 +214,7 @@ void qso_dxcc::set_data(record* qso) {
 		dxcc_ = cty_data_->entity(qso_);
 		my_location_ = qso_->location(true);
 		continent_ = cty_data_->continent(qso_);
+		g_wb4_->set_qso(qso, nickname_);
 	}
 
 }
@@ -231,225 +232,206 @@ void qso_dxcc::cb_bn_show_xt(Fl_Widget* w, void* v) {
 	that->enable_widgets();
 }
 
-// The "worked before" lights
-// Inherit from Fl_Scroll as there are too many buttons for the available display
-qso_dxcc::wb4_buttons::wb4_buttons(int X, int Y, int W, int H, const char* L) :
-	Fl_Scroll(X, Y, W, H, L),
-	dxcc_bands_(nullptr),
-	dxcc_submodes_(nullptr),
-	all_bands_(nullptr),
-	all_submodes_(nullptr)
+
+qso_dxcc::wb4_table::wb4_table(int X, int Y, int W, int H, const char* L) :
+	Fl_Table(X, Y, W, H, L) 
 {
-	type(VERTICAL_ALWAYS);
-	end();
+	rows(4);
+	cols(3);
+	col_header(true);
+	row_header(true);
+	fl_font(0, FL_NORMAL_SIZE);
+	row_height_all(HBUTTON);
+	col_width_all(w() / (cols() + 1));
+	row_header_width(col_width(0));
+	col_header_height(HBUTTON);
 }
 
-// Destructor
-qso_dxcc::wb4_buttons::~wb4_buttons() {}
+qso_dxcc::wb4_table::~wb4_table() {
 
-// Create the buttons
-void qso_dxcc::wb4_buttons::create_form() {
-	const int NUM_WIDE = 4;
-	const int AWIDTH = w() - Fl::scrollbar_size();
-	const int BWIDTH = AWIDTH / NUM_WIDE;
-	int bn_number = 0;
-	clear();
-	// I am going to add widgets to this group - temporarily make it current
-	Fl_Group* saveg = Fl_Group::current();
-	Fl_Group::current(this);
-	int curr_x = x();
-	int curr_y = y();
-	Fl_Button* b1 = new Fl_Button(curr_x, curr_y, BWIDTH * NUM_WIDE, HBUTTON, "Bands:");
-	b1->box(FL_FLAT_BOX);
-	b1->align(FL_ALIGN_INSIDE);
-	b1->labelcolor(FL_FOREGROUND_COLOR);
-	curr_y += HBUTTON;
-	// For all bands in the log...
-	for (auto it = all_bands_->begin(); it != all_bands_->end(); it++) {
-		// ... create a button
-		Fl_Toggle_Button* bn = new Fl_Toggle_Button(curr_x, curr_y, BWIDTH, HBUTTON);
-		bn->copy_label((*it).c_str());
-		bn->callback(cb_bn_band, (void*)(*it).c_str());
-		map_[*it] = bn;
-		curr_x += BWIDTH;
-		bn_number++;
-		if (bn_number % NUM_WIDE == 0) {
-			curr_x = x();
-			curr_y += HBUTTON;
-		}
-	}
-	if (curr_x != x()) {
-		curr_x = x();
-		curr_y += HBUTTON;
-	}
-
-	Fl_Button* b2 = new Fl_Button(curr_x, curr_y, BWIDTH * NUM_WIDE, HBUTTON, "Modes:");
-	b2->box(FL_FLAT_BOX);
-	b2->align(FL_ALIGN_INSIDE);
-	b2->labelcolor(FL_FOREGROUND_COLOR);
-	curr_y += HBUTTON;
-	bn_number = 0;
-	// For all modes and submodes in the log...
-	for (auto it = all_submodes_->begin(); it != all_submodes_->end(); it++) {
-		// ... add a log
-		Fl_Toggle_Button* bn = new Fl_Toggle_Button(curr_x, curr_y, BWIDTH, HBUTTON);
-		bn->copy_label((*it).c_str());
-		bn->callback(cb_bn_mode, (void*)(*it).c_str());
-		map_[*it] = bn;
-		curr_x += BWIDTH;
-		bn_number++;
-		if (bn_number % NUM_WIDE == 0) {
-			curr_x = x();
-			curr_y += HBUTTON;
-		}
-	}
-	// Restore previous group as current
-	Fl_Group::current(saveg);
 }
 
-// Light the buttons that have been worked: 
-void qso_dxcc::wb4_buttons::enable_widgets() {
-	record* qso = ((qso_dxcc*)parent())->qso_;
-	string qso_band = "";
-	string qso_mode = "";
-	string qso_submode = "";
-	if (((qso_dxcc*)parent())->show_extract_) {
-		all_bands_ = navigation_book_->used_bands();
-		all_submodes_ = navigation_book_->used_submodes();
-	} else {
-		all_bands_ = book_->used_bands();
-		all_submodes_ = book_->used_submodes();
-	}
-	if (qso && qso->item("CALL").length()) {
-		// Get the details for this QSO
-		qso_band = qso->item("BAND");
-		qso_submode = qso->item("SUBMODE");
-		qso_mode = qso->item("MODE");
-		int dxcc = cty_data_->entity(qso);
-		string my_call = qso->item("STATION_CALLSIGN");
-		// Add this QSOs band and mode to the list of logged 
-		if (qso_band.length()) all_bands_->insert(qso_band);
-		if (qso_submode.length()) all_submodes_->insert(qso_submode);
-		// Get the bands and modes worked for this DXCC
-		if (((qso_dxcc*)parent())->show_extract_) {
-			dxcc_bands_ = navigation_book_->used_bands(dxcc, my_call);
-			dxcc_submodes_ = navigation_book_->used_submodes(dxcc, my_call);
-		} else {
-			dxcc_bands_ = book_->used_bands(dxcc, my_call);
-			dxcc_submodes_ = book_->used_submodes(dxcc, my_call);
+// inherited from Fl_Table
+void qso_dxcc::wb4_table::draw_cell(TableContext context, int R, int C, int X, int Y, int W, int H) {
+	worked_t cat = (worked_t)(R + 1);
+	switch (context) {
+	case CONTEXT_ROW_HEADER:
+		fl_color(FL_BACKGROUND_COLOR);
+		fl_rectf(X, Y, W, H);
+		fl_color(FL_FOREGROUND_COLOR);
+		fl_yxline(X, Y, Y + H - 1, X + W);
+		if (wkd_matrix_.at(cat).text.length()) {
+			fl_draw(wkd_matrix_.at(cat).text.c_str(), X, Y, W, H, FL_ALIGN_CENTER);
 		}
-		char l[128];
-		snprintf(l, sizeof(l), "DXCC worked status as %s", my_call.c_str());
-		copy_label(l);
-	} else {
-		char l[128];
-		snprintf(l, sizeof(l), "DXCC worked status");
-		copy_label(l);
-		if (dxcc_bands_) dxcc_bands_->clear();
-		if (dxcc_submodes_) dxcc_submodes_->clear();
-	}
-	// Create all the buttons
-	create_form();
-	// Reset all the buttons' colouring
-	for (int ix = 0; ix < children(); ix++) {
-		Fl_Toggle_Button* bn = dynamic_cast<Fl_Toggle_Button*>(child(ix));
-			if (bn != nullptr) {
-			// Only for the band and mode toggle buttons
-			string l = bn->label();
-			// If it's a band/submode worked for this DXCC - set normal
-			if (dxcc_bands_ && dxcc_bands_->find(l) != dxcc_bands_->end()) {
-				bn->activate();
-				bn->color(FL_BACKGROUND_COLOR, FL_BACKGROUND_COLOR);
-				bn->labelcolor(FL_FOREGROUND_COLOR);
-				bn->labelfont(0);
-			} else 
-			if (dxcc_submodes_ && dxcc_submodes_->find(l) != dxcc_submodes_->end()) {
-				bn->activate();
-				bn->color(FL_BACKGROUND_COLOR, FL_BACKGROUND_COLOR);
-				bn->labelcolor(FL_FOREGROUND_COLOR);
-				bn->labelfont(0);
-			} else 
-			// If it's inthe current qso - set reversed
-			if (l == qso_band || l == qso_submode || l == qso_mode) {
-				bn->activate();
-				bn->color(FL_FOREGROUND_COLOR, FL_FOREGROUND_COLOR);
-				bn->labelcolor(FL_BACKGROUND_COLOR);
-				bn->labelfont(0);
-			} else 
-			// It's not used - deactivate
-			{
-				bn->deactivate();
+		else {
+			fl_font(FL_ITALIC, FL_NORMAL_SIZE);
+			switch (cat) {
+			case WK_DXCC:
+				fl_draw("DXCC", X, Y, W, H, FL_ALIGN_CENTER);
+				break;
+			case WK_GRID4:
+				fl_draw("Grid", X, Y, W, H, FL_ALIGN_CENTER);
+				break;
+			case WK_CQZ:
+				fl_draw("CQ Zone", X, Y, W, H, FL_ALIGN_CENTER);
+				break;
+			case WK_CONT:
+				fl_draw("Continent", X, Y, W, H, FL_ALIGN_CENTER);
+				break;
 			}
-			// If it's the current QSO depress the button
-			if (l == qso_band || l == qso_mode || l == qso_submode) {
-				bn->value(true);
-			} else {
-				bn->value(false);
+			fl_font(0, FL_NORMAL_SIZE);
+		}
+		break;
+	case CONTEXT_COL_HEADER:
+		fl_color(FL_BACKGROUND_COLOR);
+		fl_rectf(X, Y, W, H);
+		fl_color(FL_FOREGROUND_COLOR);
+		fl_yxline(X, Y, Y + H - 1, X + W);
+		switch (C) {
+		case 0:
+			fl_draw("ANY", X, Y, W, H, FL_ALIGN_CENTER);
+			break;
+		case 1:
+			fl_draw("BAND", X, Y, W, H, FL_ALIGN_CENTER);
+			break;
+		case 2:
+			fl_draw("MODE", X, Y, W, H, FL_ALIGN_CENTER);
+			break;
+		}
+		break;
+	case CONTEXT_CELL: {
+		bool new_entity;
+		wkd_line& w = wkd_matrix_.at(cat);
+		fl_color(FL_BACKGROUND_COLOR);
+		fl_rectf(X, Y, W, H);
+		fl_color(FL_FOREGROUND_COLOR);
+		fl_yxline(X, Y, Y + H - 1, X + W);
+		switch (C) {
+		case 0:
+			new_entity = w.any;
+			break;
+		case 1:
+			new_entity = w.band;
+			break;
+		case 2:
+			new_entity = w.mode;
+			break;
+		}
+		if (w.text.length()) {
+			if (new_entity) {
+				fl_font(FL_BOLD, FL_NORMAL_SIZE);
+				fl_draw("NEW", X, Y, W, H, FL_ALIGN_CENTER);
+				fl_font(0, FL_NORMAL_SIZE);
+			}
+			else {
+				fl_draw("\342\234\224", X, Y, W, H, FL_ALIGN_CENTER);
 			}
 		}
+		else {
+			fl_draw("?", X, Y, W, H, FL_ALIGN_CENTER);
+		}
+		break;
+	}
+	case CONTEXT_ENDPAGE:
+	{
+		int X1 = Fl_Table::wix;
+		int Y1 = Fl_Table::wiy;
+		int W1 = row_header_width();
+		int H1 = col_header_height();
+		fl_color(FL_BACKGROUND_COLOR);
+		fl_rectf(X1, Y1, W1, H1);
+		fl_color(FL_FOREGROUND_COLOR);
+		fl_yxline(X1, Y1, Y1 + H1 - 1, X1 + W1);
+		fl_draw(call_.c_str(), X1, Y1, W1, H1, FL_ALIGN_CENTER);
+		break;
+	}
 	}
 }
 
-// Get records that match nickname, station and pressed button
-void qso_dxcc::wb4_buttons::cb_bn_mode(Fl_Widget* w, void* v) {
-	qso_dxcc* qd = ancestor_view<qso_dxcc>(w);
-	qso_data* qdd = ancestor_view<qso_data>(qd);
-	record* qso = qd->qso_;
-	Fl_Button* bn = (Fl_Button*)w;
-	string mode = string(bn->label());
-	bool save = bn->value();
-	// Extract those records not sent to QSL server !(*QSL_SENT==Y) 
-	search_criteria_t	new_criteria = {
-		/*search_cond_t condition*/ XC_DXCC,
-		/*search_comp_t comparator*/ XP_EQ,
-		/*bool by_dates*/ false,
-		/*string from_date*/"",
-		/*string to_date;*/"",
-		/*string band;*/ "Any",
-		/*string mode;*/ mode,
-		/*bool confirmed_eqsl;*/ false,
-		/*bool confirmed_lotw;*/ false,
-		/*bool confirmed_card;*/ false,
-		/*search_combi_t combi_mode;*/ XM_NEW,
-		/*string field_name; */ "",
-		/*string pattern;*/ qd->nickname_,
-		/*string my_call*/ qso->item("STATION_CALLSIGN")
-	};
-	extract_records_->criteria(new_criteria);
-	tabbed_forms_->activate_pane(OT_EXTRACT, true);
-	item_num_t item = navigation_book_->item_number(qdd->current_number());
-	navigation_book_->selection(item, HT_EXTRACTION);
-	bn->value(!save);
+// Getthe data for the table
+void qso_dxcc::wb4_table::set_qso(record * qso, string nickname) {
+	if (qso == nullptr) return;
+	call_ = qso->item("STATION_CALLSIGN");
+	int dxcc;
+	qso->item("DXCC", dxcc);
+	int cqz;
+	qso->item("CQZ", cqz);
+	string grid = qso->item("GRIDSQUARE").substr(0, 4);
+	string cont = qso->item("CONT");
+	string band = qso->item("BAND");
+	string mode = qso->item("MODE");
+
+	band_set* dxcc_b = book_->used_bands(WK_DXCC, dxcc, call_);
+	set<string>* dxcc_m = book_->used_modes(WK_DXCC, dxcc, call_);
+	if (dxcc_b) {
+		wkd_matrix_[WK_DXCC].any = (bool)dxcc_b->size() == 0;
+		wkd_matrix_[WK_DXCC].band = dxcc_b->find(band) == dxcc_b->end();
+	}
+	else {
+		wkd_matrix_[WK_DXCC].any = true;
+		wkd_matrix_[WK_DXCC].band = true;
+	}
+	if (dxcc_m) {
+		wkd_matrix_[WK_DXCC].mode = dxcc_m->find(mode) == dxcc_m->end();
+	}
+	else {
+		wkd_matrix_[WK_DXCC].mode = true;
+	}
+	wkd_matrix_[WK_DXCC].text = nickname;
+
+	band_set* grid_b = book_->used_bands(WK_GRID4, grid, call_);
+	set<string>* grid_m = book_->used_modes(WK_GRID4, grid, call_);
+	if (grid_b) {
+		wkd_matrix_[WK_GRID4].any = (bool)grid_b->size() == 0;
+		wkd_matrix_[WK_GRID4].band = grid_b->find(band) == grid_b->end();
+	}
+	else {
+		wkd_matrix_[WK_GRID4].any = true;
+		wkd_matrix_[WK_GRID4].band = true;
+	}
+	if (grid_m) {
+		wkd_matrix_[WK_GRID4].mode = grid_m->find(mode) == grid_m->end();
+	}
+	else {
+		wkd_matrix_[WK_GRID4].mode = true;
+	}
+	wkd_matrix_[WK_GRID4].text = grid;
+
+	band_set* cqz_b = book_->used_bands(WK_CQZ, cqz, call_);
+	set<string>* cqz_m = book_->used_modes(WK_CQZ, cqz, call_);
+	if (cqz_b) {
+		wkd_matrix_[WK_CQZ].any = (bool)cqz_b->size() == 0;
+		wkd_matrix_[WK_CQZ].band = cqz_b->find(band) == cqz_b->end();
+	}
+	else {
+		wkd_matrix_[WK_CQZ].any = true;
+		wkd_matrix_[WK_CQZ].band = true;
+	}
+	if (cqz_m) {
+		wkd_matrix_[WK_CQZ].mode = cqz_m->find(mode) == cqz_m->end();
+	}
+	else {
+		wkd_matrix_[WK_CQZ].mode = true;
+	}
+	wkd_matrix_[WK_CQZ].text = cqz ? "CQZ " + qso->item("CQZ") : "";
+
+	band_set* cont_b = book_->used_bands(WK_CONT, cont, call_);
+	set<string>* cont_m = book_->used_modes(WK_CONT, cont, call_);
+	if (cont_b) {
+		wkd_matrix_[WK_CONT].any = (bool)cont_b->size() == 0;
+		wkd_matrix_[WK_CONT].band = cont_b->find(band) == cont_b->end();
+	}
+	else {
+		wkd_matrix_[WK_CONT].any = true;
+		wkd_matrix_[WK_CONT].band = true;
+	}
+	if (cont_m) {
+		wkd_matrix_[WK_CONT].mode = cont_m->find(mode) == cont_m->end();
+	}
+	else {
+		wkd_matrix_[WK_CONT].mode = true;
+	}
+	wkd_matrix_[WK_CONT].text = cont;
+
 }
 
-// Get records that match nickname, station and pressed button
-void qso_dxcc::wb4_buttons::cb_bn_band(Fl_Widget* w, void* v) {
-	qso_dxcc* qd = ancestor_view<qso_dxcc>(w);
-	qso_data* qdd = ancestor_view<qso_data>(qd);
-	record* qso = qd->qso_;
-	Fl_Button* bn = (Fl_Button*)w;
-	string band = string((char*)v);
-	bool save = bn->value();
-	// Extract those records not sent to QSL server !(*QSL_SENT==Y) 
-	search_criteria_t	new_criteria = {
-		/*search_cond_t condition*/ XC_DXCC,
-		/*search_comp_t comparator*/ XP_EQ,
-		/*bool by_dates*/ false,
-		/*string from_date*/"",
-		/*string to_date;*/"",
-		/*string band;*/ band,
-		/*string mode;*/ "Any",
-		/*bool confirmed_eqsl;*/ false,
-		/*bool confirmed_lotw;*/ false,
-		/*bool confirmed_card;*/ false,
-		/*search_combi_t combi_mode;*/ XM_NEW,
-		/*string field_name; */ "",
-		/*string pattern;*/ qd->nickname_,
-		/*string my_call*/ qso->item("STATION_CALLSIGN")
-	};
-	extract_records_->criteria(new_criteria);
-	tabbed_forms_->activate_pane(OT_EXTRACT, true);
-	item_num_t item = navigation_book_->item_number(qdd->current_number());
-	navigation_book_->selection(item, HT_EXTRACTION);
-	bn->value(!save);
-}
